@@ -1,20 +1,22 @@
-#ifndef PN_PROJECT_SYSCFG_H
-#define PN_PROJECT_SYSCFG_H 1
-// Can't use a pragma guard, because there are multiple syscfgs.
+#ifndef PN_SYSCFG_H
+#define PN_SYSCFG_H 1
 
-#pragma cpp_extensions on
+#include <wchar.h>
 
+#if !__cplusplus
+#warning BUILDING AS PLAIN C!!!
+#else
 #include "include/platforms.h"
 
 #include <cmath>
 #include <libkern/OSByteOrder.h>
 
+#define TEUL_CLIENT	0
+#define TEUL_SERVER	1
 #define platBuild TEUL_CLIENT
 
 #define FRONT_END
-#define FE
-
-#define _UNICODE		// Because Ramp added dependencies on it
+#define _UNICODE
 
 #ifndef RELEASE_CLIENT
 #define RELEASE_CLIENT 1
@@ -22,8 +24,6 @@
 
 #define OPENGL3D 1
 #define USE_3DAPI_LIGHTING
-#define DEF_USE_MAC_CURSOR 1
-#define NDEBUG 1
 
 #define MAXMIPLEVELS	12
 
@@ -41,29 +41,40 @@
 
 #include "log/log.h"
 
-#define USING_EXT_NAMESPACE using namespace __gnu_cxx
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <ctype.h>
+#include <wchar.h>
 
-#if defined(__cplusplus) && !defined(GLOBALS)
+#if defined(__cplusplus)
+# include <string>
+# include <stdexcept>
+# include <vector>
+# include <map>
+# include <set>
 # include <queue>
-# include <deque>
+# include <list>
+# include <algorithm>
+# include "dbug/dbug.h"
+# include "mem/mem.h"
 # include "math/mathvect.h"
-# include "math/mathnum.h"
-# include "math/Matrixd.h"
-# include "math/Matrixf.h"
 
+# include "pi/pi.h"
 # include "include/vars.h"
 
 # include "wwii/wwiiOwnershipEnums.h"
 # include "wwii/wwiiFullObjID.h"
+# include "chat/chatHandle.h"
 # include "wwii/wwiiCovert.h"
 # include "wwii/wwiiString.h"
 # include "str/stringLib.h"
 # include "weap/weapDefs.h"
 # include "weap/weapSpec.h"
+# include "teul/teulKit.h"
 
 # include "phui/Javascript.h"
-
-# include "pi/pi.h"
 
 # include "fio/fio.h"
 # include "fio/fiod.h"
@@ -77,19 +88,17 @@
 # include "sdm/sdmHash.h"
 
 # include "gl/glew.h"
-# include <OpenGL/OpenGL.h>
+#include <OpenGL/OpenGL.h>
 
 # include "pers/pershud.h"
-//# include "fp/fpFPS.h"
 # include "trn/trnmain.h"
 # include "ui/uiMain.h"
 
-# include "inst/instDescriptor.h"
 #endif
 
 #include "cfg/cfgPrefs.h"
 #include "ogl/ogl.h"
-
+#endif
 
 #endif //PN_SYSCFG_H
 

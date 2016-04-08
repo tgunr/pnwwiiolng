@@ -1148,7 +1148,11 @@ UINT32 mlGetAirfoilForcesAndTorques(FLOAT64VECTOR* RetForce,
 					AirfoilComponentData->VortexEffectPercent;
 			ComponentVel.z += PropellerData->VortexRotationSpeed *
 							AirfoilComponentData->VortexEffectOffset;
+            /*
+             TBD - investigate whether or not Z should incorporate VortexEffectPercent
+             
 							AirfoilComponentData->VortexEffectPercent;
+             */
 		}
 	}
 

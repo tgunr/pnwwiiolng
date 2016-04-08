@@ -123,6 +123,9 @@ void GameProcess::RequestStop()
 		return;
 	m_wantRunning = false;
 	Log("requestStop");
+
+	// TODO: Close cleanly.
+	Kill();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -288,7 +291,7 @@ bool GameProcess::CheckStatus()
 	return false;
 }
 
-static void _getCurrentProcessPath(char (& processPath)[MAX_PATH])
+static void _getCurrentProcessPath(char (& processPath)[PATH_MAX])
 {
 #if platOS == OS_WIN32
 	GetModuleFileNameA(NULL, processPath, sizeof(processPath) - 1);
@@ -296,7 +299,7 @@ static void _getCurrentProcessPath(char (& processPath)[MAX_PATH])
 	extern const char* g_argv0;
 	strncpy(processPath, g_argv0, sizeof(processPath) - 1);
 #endif
-	char* endCharacter = strrchr(processPath, PATH_SEPARATOR);
+	char* endCharacter = strrchr(processPath, '/');
 	if ( endCharacter != nullptr )
 		*(endCharacter) = 0;
 	else
@@ -305,10 +308,10 @@ static void _getCurrentProcessPath(char (& processPath)[MAX_PATH])
 
 static bool _spawnProcess(GameProcess* const starter_, const char* const processName_, processhandle_t& process_, UINT64& pid_, int errno_)
 {
-	char processPath[MAX_PATH];
+	char processPath[PATH_MAX];
 	processPath[sizeof(processPath) - 1] = 0;
 	_getCurrentProcessPath(processPath);
-	strncat(processPath, PATH_SEPSTR, sizeof(processPath) - 1);
+	strncat(processPath, "/", sizeof(processPath) - 1);
 	strncat(processPath, processName_, sizeof(processPath) - 1);
 
 #if platOS == OS_WIN32
@@ -318,7 +321,7 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 	memset(&sinf, 0, sizeof(sinf));
 	memset(&pinf, 0, sizeof(pinf));
 
-	char pwd[MAX_PATH];
+	char pwd[PATH_MAX];
 	GetCurrentDirectoryA(sizeof(pwd), pwd);
 	sinf.lpTitle = const_cast<LPSTR>(starter_->ServerTypeName());
 	dbugLog(_FLD, "starting %s server %s", sinf.lpTitle, processPath);
@@ -465,8 +468,7 @@ namespace GameProcessManager
 		// Ask all processes to stop.
 		for ( auto it = s_processes.begin(); it != s_processes.end(); ++it )
 		{
-			auto& proc = *(it++);
-			proc.RequestDiscontinue();
+			it->RequestDiscontinue();
 		}
 
 		teulSyncClock();

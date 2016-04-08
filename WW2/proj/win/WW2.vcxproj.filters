@@ -730,9 +730,6 @@
     <ClInclude Include="..\..\src\mem\mem.h">
       <Filter>mem</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\mem\memAligned.h">
-      <Filter>mem</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\miss\missActiveMission.h">
       <Filter>miss</Filter>
     </ClInclude>
@@ -2000,12 +1997,6 @@
     <ClCompile Include="..\..\SRC\math\Quat.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\mem\mem.cpp">
-      <Filter>mem</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\mem\tracealloc.cpp">
-      <Filter>mem</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\miss\missActiveMission.cpp">
       <Filter>miss</Filter>
     </ClCompile>
@@ -2692,6 +2683,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\omg\omgChat.cxx">
       <Filter>omg\Generated Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obinfo.cpp">
+      <Filter>ob</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

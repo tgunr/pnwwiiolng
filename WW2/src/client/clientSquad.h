@@ -13,7 +13,7 @@
 #include "chat/chatWho.h"
 #include "teul/teulTime.h"
 
-typedef std::map<const ChatHandle, Chat::Who> SquadMembers;
+typedef std::map<ChatHandle, Chat::Who> SquadMembers;
 typedef std::vector<Recruiter> RecruiterList;
 
 #define SQUAD_INVITATION_TIMEOUT 120
@@ -25,7 +25,6 @@ class ClientSquad : public Squad
 public:
 	ClientSquad();
 	ClientSquad(const Squad&);
-	virtual ~ClientSquad() {}
 
 	UINT32 size() { return m_members.size(); }
 	void addMember(const Chat::Who& who);
@@ -52,7 +51,6 @@ class SquadInvite
 public:
 	SquadInvite(): m_invited(0) {}
 	SquadInvite(const SquadMsg& m): m_invited((UINT32)teulTime()), m_invitation(m)  {}
-	virtual ~SquadInvite() {}
 
 	SquadMsg const& msg() const { return m_invitation; }
 	const wchar_t* inviter(){ return chatGetWideCallsign(m_invitation.inviter()); }

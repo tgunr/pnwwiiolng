@@ -30,8 +30,8 @@ WaypointLayer::WaypointLayer():
 	_waypointtexid(-1),
 	_contacttexid(-1),
 	_markertexid(-1),
-	_aiInit(true),
-	_aiCount(0)
+	_aiCount(0),
+    _aiInit(true)
 {
 	minscale = 0;
 }
@@ -383,6 +383,9 @@ void WaypointMapObject::DrawSelf(SuperCellMapView* mv)
 			}
 		break;
 		*/
+        default:
+            // Invalid type, nothing to draw
+            break;
 	}
 
 	if(texid > -1)
@@ -484,8 +487,10 @@ void WaypointMapObject::Over(SuperCellMapView* mv, int state)
 			// Build Distance mouseover like  "  (Distance: ?m)"
 			if(uiInGame())
 			{
-				// Calculate distance between waypoint and player
+                // Calculate distance between waypoint and player
+#if platOS != OS_MACOS
 				char dbuff[8];
+#endif
 				double dist = -1.0;
 				vehVehicle* player = persGetPersonaVehiclePtr();
 				if(player != nullptr)

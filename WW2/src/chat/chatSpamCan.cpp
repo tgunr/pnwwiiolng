@@ -32,7 +32,7 @@ public:
 	DotSpam() : DotCommand("spam", "Add to or clear the spam can"
 								, IS_PLAYNET, LSTR_SPAM_USAGE, LSTR_SPAM_DETAIL
 								) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		if ( *arguments != '+' )
 		{
@@ -95,7 +95,7 @@ public:
 		}
 	}
 
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
 	{
 		if ( theSpamCan.size() == 0 )
 		{

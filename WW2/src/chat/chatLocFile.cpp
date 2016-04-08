@@ -20,8 +20,7 @@ bool
 chatReadHostLocFile()
 {
 	std::string hostLocFile = cv_dataDir.GetString();
-	hostLocFile += PATH_SEPARATOR;
-	hostLocFile += "host.loc";
+	hostLocFile += "/host.loc";
 	FILE* fp = fopen(hostLocFile.c_str(), "rb");
 	if ( fp == nullptr )
 	{

@@ -88,6 +88,8 @@ teulAllocCALLBACKi(Teul::CallbackInit* const ci)
 		realObject->m_recvAction = ci->recvAction;
 		realObject->m_callX = ci->callX;
 		realObject->m_callY = ci->callY;
+		realObject->m_callXName = ci->callXName;
+		realObject->m_callYName = ci->callYName;
 
 		TEUL_CALLBACK::s_callbackArray[realObject->m_callX][realObject->m_callY] = realObject;
 
@@ -124,8 +126,11 @@ teulAllocCallback(Teul::CallbackInit* const ci)
 	}
 
 #if defined(DEV_RELEASE)
-	dbugLog(_FLD,"Alloc entered x:%d y:%d sendA:%p recvA:%p"
-				, ci->callX, ci->callY, ci->sendAction, ci->recvAction);
+	dbugLog(_FLD, "Alloc entered x:%d(%s) y:%d(%s) mode:%d "
+		"sendA:%p recvA:%p timeout:%d"
+		, ci->callX, ci->callXName, ci->callY, ci->callYName, ci->mode
+		, ci->sendAction, ci->recvAction, ci->sendTimeout);
+
 #endif
 
 	return teulAllocCALLBACKi(ci);
@@ -140,7 +145,7 @@ teulAllocSystemCallback(Teul::CallbackInit* const ci)
 	if ( PN_UNLIKELY(ci->callX >= Teul::RestrictedCallbackRange_X) )
 		LogAbort("cb:%u,%u: Invalid system callback", ci->callX, ci->callY);
 	if ( PN_UNLIKELY(ci->sendAction == nullptr && ci->recvAction == nullptr) )
-		LogAbort(_FLA, "cb:%u,%u: Invalid send/recv parameters for system callback", ci->callX, ci->callY);
+		LogAbort("cb:%u,%u: Invalid send/recv parameters for system callback", ci->callX, ci->callY);
 
 	return teulAllocCALLBACKi(ci);
 }
@@ -204,6 +209,8 @@ _doAction(ENDPOINT& endpoint
 	actionObj.fromPort = ntohs(from.sin_port);
 
 	TIMER_STOP("doact:start")
+
+	dbugLog(_FLD, "t:%d executing callback x:%d(%s) y:%d(%s) size:%d", endpoint.teulIndex(), callback.callX(), callback.callXName(), callback.callY(), callback.callYName(), dataSize_bytes);
 
 	TIMER_START
 	const SINT32 retval = callback.recvAction()(&actionObj);

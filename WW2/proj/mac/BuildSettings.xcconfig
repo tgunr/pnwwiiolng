@@ -1,0 +1,62 @@
+//
+//  BuildSettings.xcconfig
+//  WW2OL
+//
+//  Created by Gwynne Raskind on 10/30/15.
+//  Copyright © 2015 Playnet. All rights reserved.
+//
+
+// Get all our warning flags
+#include "Warnings.xcconfig"
+
+// Get all our preprocessor macros
+#include "Defines.xcconfig"
+
+// Grab code signing configuration
+//#include "CodeSigning.xcconfig"
+
+// Grab various search paths
+#include "SearchPaths.xcconfig"
+
+// We do not set ARCHS, SDKROOT, or MACOSX_DEPLOYMENT_TARGET here. These are
+// more per-target than per-configuration, and can be set from the build
+// settings for the targets in question.
+
+// Settings common to all configurations
+GCC_INLINES_ARE_PRIVATE_EXTERN = NO                         // Don't export inline functions
+GCC_C_LANGUAGE_STANDARD = gnu11                             // Use C11 with GNU extensions for C files
+CLANG_CXX_LANGUAGE_STANDARD = gnu++14                       // Use C++14 with GNU extensions for C++ files
+CLANG_CXX_LIBRARY = libc++                                  // Use Clang's libc++
+GCC_GENERATE_DEBUGGING_SYMBOLS = YES                        // Always generate debugging symbols
+DEPLOYMENT_POSTPROCESSING = YES                             // Strip and set proper file modes on binaries
+STRIP_STYLE = non-global                                    // Always strip all non-global symbols if stripping is enabled
+GCC_ENABLE_TRIGRAPHS = NO                                   // Don't allow C89 trigraphs, ew
+GCC_ENABLE_PASCAL_STRINGS = NO                              // Don't allow \p for Pascal strings, why would you want this?
+RUN_CLANG_STATIC_ANALYZER = NO                              // Don't run the static analyzer if not explicitly requested
+CLANG_STATIC_ANALYZER_MODE_ON_ANALYZE_ACTION = deep         // Do deep analysis when explicitly requested
+CLANG_STATIC_ANALYZER_MODE = shallow                        // Do shallow analysis the rest of the time
+
+// Settings for Development configuration - please keep this in sync with Debug
+GCC_UNROLL_LOOPS_Development            = NO                // Don't unroll loops
+GCC_OPTIMIZATION_LEVEL_Development      = 0                 // Don't optimize anything at all
+DEBUG_INFORMATION_FORMAT_Development    = dwarf             // Don't use a separate dSYM file
+STRIP_INSTALLED_PRODUCT_Development     = NO                // Don't strip the built binary
+
+// Settings for Debug configuration - please keep this in sync with Development
+GCC_UNROLL_LOOPS_Debug                  = NO                // Don't unroll loops
+GCC_OPTIMIZATION_LEVEL_Debug            = 0                 // Don't optimize anything at all
+DEBUG_INFORMATION_FORMAT_Debug          = dwarf             // Don't use a separate dSYM file
+STRIP_INSTALLED_PRODUCT_Debug           = NO                // Don't strip the built binary
+
+// Settings for Release configuration - there's nothing to sync this with :)
+GCC_UNROLL_LOOPS_Release                = YES               // Do unroll loops
+GCC_OPTIMIZATION_LEVEL_Release          = s                 // Optimize for size, as recommended on OS X
+DEBUG_INFORMATION_FORMAT_Release        = dwarf-with-dsym   // Keep debugging information separate
+STRIP_INSTALLED_PRODUCT_Release         = YES               // Do strip the built binary
+
+
+// Gather the config-specific settings
+GCC_UNROLL_LOOPS = $(GCC_UNROLL_LOOPS_$(CONFIGURATION))
+GCC_OPTIMIZATION_LEVEL = $(GCC_OPTIMIZATION_LEVEL_$(CONFIGURATION))
+DEBUG_INFORMATION_FORMAT = $(DEBUG_INFORMATION_FORMAT_$(CONFIGURATION))
+STRIP_INSTALLED_PRODUCT = $(STRIP_INSTALLED_PRODUCT_$(CONFIGURATION))

@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "playbuilder", "playbuilder\playbuilder.vcproj", "{9D929F49-2A82-41A3-8528-27A8E4B84F50}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9D929F49-2A82-41A3-8528-27A8E4B84F50}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9D929F49-2A82-41A3-8528-27A8E4B84F50}.Debug|Win32.Build.0 = Debug|Win32
+		{9D929F49-2A82-41A3-8528-27A8E4B84F50}.Release|Win32.ActiveCfg = Release|Win32
+		{9D929F49-2A82-41A3-8528-27A8E4B84F50}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

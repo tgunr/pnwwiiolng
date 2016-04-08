@@ -174,6 +174,7 @@ public:
 	virtual int RequestBrigadeSelection(unsigned int brigadeID);
 	virtual int RequestBrigadeDetail(unsigned int brigadeID);
 	virtual int RequestMissionList();
+	virtual int RequestQuickMissionList();
 	virtual int RequestBrigadeList();
 	virtual int RequestMissionPost(MISSION_POST_REQ const&);
 	virtual int RequestMissionWeapCancel();

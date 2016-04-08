@@ -652,6 +652,9 @@ JS_FUNCTION_DEF(jsMapView, deletereports)
 				case WPT_MORTAR:
 					PlayerClient()->RemoveWaypoint(wp.handle());
 				break;
+                default:
+                    // TBD - the rest aren't removable I take it?
+                    break;
 			}
 		}
 		else

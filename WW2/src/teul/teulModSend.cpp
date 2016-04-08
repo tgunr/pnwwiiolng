@@ -9,6 +9,8 @@
 //
 // Originating Programmer: Martin Poulin
 
+//#define DEBUG_SEND_PACKET
+
 #include "teul/teulCallbackStruct.h"
 #include "teul/teulClosingEnums.h"
 #include "teul/teulEndpoint.h"
@@ -62,6 +64,9 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 		dbugLog(_FLA,"endpoint not open state = %d, index %d callback %d:%d ", endpoint.state(), endpoint.teulIndex(), callback.callX(), callback.callY());
 		return -ETEUL_CB_CONN_DEAD;
 	}
+
+	dbugLog(_FLD, "t:%d sending callback x:%d(%s) y:%d(%s)", endpoint.teulIndex(), callback.callX(), callback.callXName(), callback.callY(), callback.callYName());
+	
 	if ( PN_UNLIKELY(callback.m_sendAction == nullptr) )
 	{
 		dbugLog(_FLA, "cant execute null callback x:%d y:%d", callback.callX(), callback.callY());
@@ -110,15 +115,20 @@ ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 }
 #endif
 
-//////////////////////////////////////////////////////////////////////
 // Actually write data to a socket.
 
 SINT32
 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port)
 {
+
 	if ( protocol == PROTOCOL_TCP || protocol == PROTOCOL_CTRL )
 	{
-		return ::send(socket, (const char*)data, sizeInBytes, SOCK_SEND_FLAGS);
+		// dbugLog(_FLD, "about to send sub-packet");
+	 	SINT32 retval = ::send(socket, (const char*)data, sizeInBytes, SOCK_SEND_FLAGS);
+		// dbugLog(_FLD, "Write result %d", retval);
+		if (retval > 0)
+			dbugOutputPacket( (*this), false, data, retval );
+		return retval;
 	}
 
 	// Apply the default port.
@@ -160,9 +170,15 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 						);
 			return -ETEUL_ENOSPC_SEND_SOCKET;
 		}
+		else 
+		{
+			dbugLog(_FLD, "::sendto returned code %d, try again return", err);
+		}
 
 		return 0;
 	}
+
+	dbugLog(_FLD, "%d bytes sent %d requested", result, sizeInBytes);
 
 	lastDataSent.makeCurrent();
 
@@ -180,10 +196,14 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 	// If there's no send queue, try and send the data directly.
 	if ( m_impl->m_sendQueue.empty() == true )
 	{
+		// dbugLog(_FLD, "writing direct 1st time: bytesToSend = %d ", packetBytes);
+		// dbugLog(_FLD, "start of packet address = %p", packet.packet());
+		// dbugLog(_FLD, "address of packet obj = %p", &packet);
+
 		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
 		// Anything but a partial send, the sender handles.
 		if ( PN_UNLIKELY(result < 0) )
-		{
+		{	
 			// If the error was the result of an interruption, then lets just queue the packet
 			// and give it a retry later on.
 			const SINT32 err = dbugGetErrno();
@@ -195,9 +215,16 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 		if ( result > 0 )
 		{
 			const size_t sent = (size_t) result;
+#ifdef DEBUG_SEND_PACKET
+			dbugLog(_FLD, "t:%d SendPacketInit [%u:%u] : %d/%u bytes",
+			        teulIndex(), packet.header().m_callX, packet.header().m_callY,
+			        result, packet.packetSizeBytes());
+#endif
 			packet.sentBytes(sent);
 			if ( packet.sentBytes() >= packetBytes )
+			{
 				return packetBytes;
+			}
 		}
 		// Partial or blocked send falls thru and queues the remainder.
 	}
@@ -241,6 +268,12 @@ ENDPOINT::pushSendQueue()
 		const size_t sentBytes = packet->sentBytes();
 		const size_t remainingBytes = packet->packetSizeBytes() - sentBytes;
 		void* data = (char*)packet->packet() + sentBytes;
+
+		// dbugLog(_FLD, "writing off of queue: sentBytes = %d, packet->packetSizeBytes = %d, remaining = %d", sentBytes, packet->packetSizeBytes(), remainingBytes);
+		// dbugLog(_FLD, "start of packet address = %p", packet->packet());
+		// dbugLog(_FLD, "address of packet obj = %p", packet);
+		// dbugLog(_FLD, "address for write to start from = %p", data);
+
 		const SINT32 result = writeData(data, remainingBytes, packet->address(), packet->port());
 		// Result will be less than sendbytes if it is an error (negative),
 		// close (0) or smaller number of bytes.
@@ -249,6 +282,11 @@ ENDPOINT::pushSendQueue()
 			setWritesPending(true);
 			return result;
 		}
+#ifdef DEBUG_SEND_PACKET
+		dbugLog(_FLD, "t:%d SendPacketCont [%u:%u] : %d/%u bytes",
+		        teulIndex(), packet->header().m_callX, packet->header().m_callY,
+		        result, remainingBytes);
+#endif
 		packet->sentBytes((size_t)result);
 		if ( packet->sentBytes() >= packet->packetSizeBytes() )
 		{

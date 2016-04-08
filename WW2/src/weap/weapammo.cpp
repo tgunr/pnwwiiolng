@@ -292,8 +292,6 @@ LOGICAL ConcussionEnabled = TRUE;
 LOGICAL SpallEnabled = TRUE;
 LOGICAL ShrapnelEnabled = TRUE;
 
-static AmmoTrajectory _ammoTrajectory;
-
 static bool IsBouncingGrenade(weapAmmoType const* AmmoType)
 {
 	return (AmmoType->SubType == WEAPAMMO_SUBTYPE_GRENADE || AmmoType->SubType == WEAPAMMO_SUBTYPE_MORTAR) && AmmoType->FuzeTime > 0;
@@ -983,181 +981,6 @@ UINT32 weapUpdate(void)
 	return 0;
 }
 
-/************************************************************************************************
-	persComputeRangeTable
-*************************************************************************************************/
-
-AmmoTrajectory& weapAmmoTrajectory(const weapAmmoType* ammo,
-								   const Matrixd& fireMat,
-								   FLOAT64 speed,
-								   FLOAT64 timeStep,
-								   SINT32 maxSteps)
-{
-	weapAmmoTrajectory(_ammoTrajectory, ammo, fireMat, speed, timeStep, maxSteps);
-	return _ammoTrajectory;
-}
-
-void weapAmmoTrajectory(AmmoTrajectory& trajectory,
-						const weapAmmoType* ammo,
-						const Matrixd& fireMat,
-						FLOAT64 speed,
-						FLOAT64 timeStep,
-						SINT32 maxSteps)
-{
-	trajectory.Reset();
-
-	FLOAT64 Mach = 0.0;
-	FLOAT64 Speed = 0.0;
-	FLOAT64 TempNum = 0.0;
-	SINT32 Index1 = 0;
-	SINT32 Index2 = 0;
-	FLOAT64 Cd = 0.0;
-	FLOAT64 Delta = 0.0;
-
-	Vec3d Accel;
-	Vec3d LastAcc;
-
-	Vec3d TempVec2;
-
-	Vec3d Position;
-	Vec3d LastPosition;
-
-	Vec3d Velocity;
-	Vec3d LastVel;
-	
-	FLOAT64 DeltaTime = timeStep;
-
-	FLOAT64 BaseMach = 0.0;
-	mlGetAltSpeedOfSound(&BaseMach, 0);
-
-	FLOAT64 Density = 0.0;
-	mlGetAltDensity(&Density, 0);
-
-	FLOAT64 Time = 0.0;
-	FLOAT64 LastTime = 0.0;
-
-	trajectory.fireMatrix = fireMat;
-
-	Vec3d firePos = fireMat.getTrans();
-
-	Matrixd fireAtt = fireMat;
-	fireAtt.setTrans(0, 0, 0);
-	
-	Velocity.y() = speed; //AmmoType->InitVelocity;
-	Velocity = Velocity * fireAtt;
-
-	Position = firePos;
-
-	// add first point
-	trajectory.points.push_back(Position);
-	
-	SINT32 step = 0;
-
-	while (step < maxSteps)
-	{
-		LastTime = Time;
-
-		Time += timeStep;
-
-		Speed = Velocity.length(); //mathExactVectorLength(&(Ammo.Velocity));
-		Mach = Speed / BaseMach;
-
-		Index1 = (UINT32)(floor(Mach / G1_CHART_MACH_DELTA));
-		Index2 = Index1+1;
-
-		if (Index2 >= G1_CHART_NUM_DIVISIONS)
-		{
-			Cd = G1MachChart[G1_CHART_NUM_DIVISIONS - 1];
-		}
-		else
-		{
-			Delta = (Mach / G1_CHART_MACH_DELTA) - Index1;
-			mlInterpolate(&Cd, G1MachChart[Index1], G1MachChart[Index2], Delta);
-		}
-
-		static FLOAT64 bcScaler = 1.0;
-
-	//	TempNum = Density / Density0 * 0.5 * Cd / Ammo->AmmoType->BallisticCoefficient;
-		// NOTE: the 1790 is a constant that makes the Cd table work with
-		// G1 ballistic coefficients and this particular formula
-		TempNum = Density * Cd * Speed / ((ammo->BallisticCoefficient * 1790.0f) * bcScaler);
-
-		Accel.x() = TempNum * Velocity.x();
-		Accel.y() = TempNum * Velocity.y();
-		Accel.z() = TempNum * Velocity.z();
-
-		TempVec2.x() = (Accel.x() + LastAcc.x()) * 0.5;
-		TempVec2.y() = (Accel.y() + LastAcc.y()) * 0.5;
-		TempVec2.z() = (Accel.z() + LastAcc.z()) * 0.5;
-
-		Velocity.x() -= TempVec2.x() * DeltaTime;
-		Velocity.y() -= TempVec2.y() * DeltaTime;
-		Velocity.z() -= TempVec2.z() * DeltaTime;
-
-		// add in gravity
-		Velocity.z() -= 9.8 * DeltaTime;
-
-		// now apply velocity vector
-		if (fabs(LastVel.x()) > fabs(Velocity.x()) ||
-			fabs(LastVel.y()) > fabs(Velocity.y()))
-		{
-			Position.x() += LastVel.x() * DeltaTime + 0.5 * TempVec2.x() * DeltaTime * DeltaTime;
-			Position.y() += LastVel.y() * DeltaTime + 0.5 * TempVec2.y() * DeltaTime * DeltaTime;
-			Position.z() += LastVel.z() * DeltaTime + 0.5 * TempVec2.z() * DeltaTime * DeltaTime;
-		}
-		else
-		{
-			Position.x() += Velocity.x() * DeltaTime;
-			Position.y() += Velocity.y() * DeltaTime;
-			Position.z() += Velocity.z() * DeltaTime;
-		}
-		
-		if(step > 0)
-		{
-			//Vec3d start = LastPosition;
-			Vec3d dir = Position - LastPosition;
-			FLOAT64 distance = dir.length();
-			dir.normalize();
-			//dir = -dir;
-			//start += (dir * .05);
-			//dir = -dir;
-
-			UINT32 mask = (COLLIDER_HARDTERRAIN_MASK|COLLIDER_TILE|COLLIDER_DRIVABLE_MASK);
-
-            Vec3d lp = physicsGameToPhysical(LastPosition);
-
-			const colliderQuery::CollisionList& hits = collideRayList(mask, distance, lp, dir);
-
-			if(!hits.empty())
-			{
-				const colliderQuery::Collision& hit = hits.at(0);
-
-				//nextPosition = position + (dir * hit.depth);
-                Vec3d pos = physicsPhysicalToGame(hit.pos);
-
-				trajectory.points.push_back(pos);
-				trajectory.impactPosition = pos;
-				trajectory.impactNormal = hit.normal;
-
-				break;
-			}
-			else
-			{
-				trajectory.points.push_back(Position);
-			}
-		}
-		else
-		{
-			trajectory.points.push_back(Position);
-		}
-
-		LastPosition = Position;
-		LastVel = Velocity;
-		LastAcc = Accel;
-		
-		step++;
-	}
-}
 
 struct ObjectFlag2State
 {
@@ -2316,8 +2139,6 @@ UINT32 weapCollideRoundWithVehicles(FASTCOLLIDE ** CollideListPtr,
 
     if(!PlayerVehicle)
         return 0;
-
-	bool iAmVehicle = (PlayerVehicle->VehicleType->Type != VEH_TYPE_PERSON);
 
 	//if(!Online && PlayerVehicle->VehicleType->Type != VEH_TYPE_PERSON)
 	//	return 0; // disable vehicle collisions for non infantry offline
@@ -3890,16 +3711,16 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 
 			// OGS->Ramp: If AutoGun is NOT null and ... other stuff
 			if (TO->ObjId.objClass != CLASS_BUILDING ||
-				TO->ObjId.objType != BUILDING_CAPTURE &&
-				TO->TrnAutoGun == nullptr)
+				(TO->ObjId.objType != BUILDING_CAPTURE &&
+				TO->TrnAutoGun == nullptr))
 			{
 				weapAmmoApplyDamageToObject(Ammo, Damage, TO, nullptr);
 			}
 
 			// OGS->Ramp: If AutoGun is NOT null and ... other stuff
 			if (TO->ObjId.objClass != CLASS_BUILDING ||
-				TO->ObjId.objType != BUILDING_CAPTURE &&
-				TO->TrnAutoGun != nullptr)
+				(TO->ObjId.objType != BUILDING_CAPTURE &&
+				TO->TrnAutoGun != nullptr))
 			{
 				trnAutoGun* AG;
 				piVECTOR P1;
@@ -4034,6 +3855,7 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 
 			if ((Ammo->Flags & WEAP_AMMOFLAG_DONTCHECKVEHICLES) == 0)
 			{
+				const FLOAT64VECTOR world_offset(WorldOriginOffset);
 
 				weapCollideRoundWithVehicles(&CollideListPtr,
 										  &TempCDNum,
@@ -4043,7 +3865,7 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 										  frametime,
 										  !(Ammo->Flags & WEAP_AMMOFLAG_CANTHITPLAYER),
 										  Ammo->Flags & WEAP_AMMOFLAG_ONLY_CHECKPLAYER,
-										  &WorldOriginOffset,
+										  &world_offset,
 										  0,
 										  0);
 			}
@@ -4599,9 +4421,13 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	}
 
 	// commented out because it doesn't do anything
+    /*
+     TBD - I guess then we should fix it ???
+     
 //	if(Vehicle && Vehicle->ModelData && Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
 //		_TransferMomentum(Vehicle->ModelData, Collision, Ammo, AmmoSpeed - ResidualSpeed);
-
+     */
+    
 	if(AmmoStopped)
 		ResidualSpeed = 0;
 
@@ -4871,10 +4697,11 @@ static UINT32 _GetProjectileCollisions(weapAmmo* Ammo, UINT32 Flags, FASTCOLLIDE
 	logTimerBeginExtMacro(weapCollideRoundWithVehicles);
 	if(!(Flags & WEAP_AMMOFLAG_DONTCHECKVEHICLES))
 	{
+		const FLOAT64VECTOR world_offset(WorldOriginOffset);
 		weapCollideRoundWithVehicles(&CollideListPtr, &CollisionSlotsLeft, OldPos, NewPos,
 									  CurrentTime - DeltaTime, CurrentTime,
 									  !(Flags & WEAP_AMMOFLAG_CANTHITPLAYER), Flags & WEAP_AMMOFLAG_ONLY_CHECKPLAYER,
-									  &WorldOriginOffset, 0, 0);
+									  &world_offset, 0, 0);
 	}
 	NumCollisions = MaxCollisions - CollisionSlotsLeft;
 	for(i = PrevNumCollisions; i < NumCollisions; i++)

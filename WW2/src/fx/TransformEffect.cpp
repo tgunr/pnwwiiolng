@@ -706,7 +706,7 @@ void ApplySpecial(struct vehVehicle* v)
 
     if(v->VehicleType->Type == VEH_TYPE_SEA)
     {
-        char* screws[2] =
+        const char* screws[2] =
         {
             "lscrew",
             "rscrew"
@@ -1147,56 +1147,6 @@ TransformEffect* TransformEffect::AddTracer(const weapAmmo* ammo, const char* ef
         te->setweapammo(ammo);
         te->enableemitters(true);;
     }
-
-    return te;
-}
-
-/*----------------------------------------------------------------------
-Function: TransformEffect::AddTargetAim
-Description:
------------------------------------------------------------------------*/
-TransformEffect* TransformEffect::AddTargetAim(const char* effect)
-{
-    TransformEffect* te = GetFreeTransform();
-    if(!te)
-    {
-        return nullptr;
-    }
-
-    if(!te->allocateparticles(effect, max_trajectory_steps))
-        return false;
-
-    te->setflag(TARGET_AIM);
-    te->enable(true);
-
-    std::vector<Particle2*>& particles = te->GetParticles();
-    
-    unsigned int red = piRGBA_GETRED(gIconFriendlyColor);
-    unsigned int grn = piRGBA_GETGREEN(gIconFriendlyColor);
-    unsigned int blu = piRGBA_GETBLUE(gIconFriendlyColor);
-
-    float r = (float)red * colorONEOVER255;
-    float g = (float)grn * colorONEOVER255;
-    float b = (float)blu * colorONEOVER255;
-
-    for(size_t i = 0; i < particles.size(); i++)
-    {
-        particles[i]->_color[0].set(r, g, b);
-        particles[i]->_color[1].set(r, g, b);
-        particles[i]->_flags |= part_is_beam;
-    }
-
-    // Leave last particle for impact point
-    ParticleEffect* pe = FxGet().getparticleeffect("targetaimparticleground");
-    _particlemgr->setupparticle(pe, Vec3f(0, 0, -1), Vec3d(0, 0, 0), frametime, particles[particles.size() - 1]);
-    
-    particles[particles.size() - 1]->_flags |= part_is_beam;
-
-    te->_lastupdate = frametime + 1;
-    updatelist.insert(te);
-    
-    // Use for glow index
-    te->_damagelevel = 0;
 
     return te;
 }
@@ -1755,89 +1705,6 @@ void TransformEffect::updatetransform()
         _transform(3, 1) = pos.y();
         _transform(3, 2) = pos.z();
     }
-    else if(_flags & TARGET_AIM)
-    {
-        const AmmoTrajectory* trajectory = fpFPSGetTrajectory();
-
-        if(trajectory)
-        {
-            size_t size = _particles.size();
-
-            for(size_t j = 0; j < size; j++)
-            {
-                _particles[j]->_enabled = false;
-                _particles[j]->_ready = false;
-                _particles[j]->popflag(part_has_glow);
-                _particles[j]->_glowtime = 0;
-            }
-
-            if(ft50msticks != 0)
-            {
-                _damagelevel++;
-            }
-
-            // Glow index. Don't glow last particle. It's for the arrow
-            if(_damagelevel >= max_trajectory_steps - 1)
-                _damagelevel = 0;
-
-            size_t offset = FloatToInt((float)trajectory->points.size() / (float)size);
-
-            if(offset == 0)
-                offset = 1;
-
-            size_t idx = 0;
-            Vec3d pos;
-
-            ParticleEffect* pe = FxGet().getparticleeffect("targetaimparticle");
-
-            float increment = 1.0f;
-            float incoffset = 1.0f / (float)size;
-
-            // Leave last particle for impact point (use size - 1)
-            for(size_t i = 1; i < trajectory->points.size() && idx < size - 1; i += offset, idx++)
-            {
-                pos = trajectory->points[i];
-                pos.z() = -pos.z();
-
-                _particles[idx]->_size[0] = pe->size[0] * increment;
-                _particles[idx]->_size[1] = pe->size[1] * increment;
-
-                increment += incoffset;
-
-                _particles[idx]->_ready = true;
-                _particles[idx]->_enabled = true;
-                _particles[idx]->_position = pos;
-                _particles[idx]->_lastposition = pos;
-               
-                pos = trajectory->points[i - 1];
-                pos.z() = -pos.z();
-                _particles[idx]->_originalposition = pos;
-            }
-
-            // Glow particle
-            _particles[_damagelevel]->_flags |= part_has_glow;
-            _particles[_damagelevel]->_glowtime = -1;
-
-            // Last particle for impact point (initial setup in AddTargetAim)
-            pos = trajectory->impactPosition;
-            pos.z() = -pos.z();
-
-            Vec3d normal = trajectory->impactNormal;
-            normal.z() = -normal.z();
-
-            _particles[size - 1]->_position = pos;
-
-            pos += normal;
-
-            _particles[size - 1]->_ready = true;
-            _particles[size - 1]->_enabled = true;
-            _particles[size - 1]->_velocity = normal;
-            _particles[size - 1]->_originalposition = pos;
-            _particles[size - 1]->_lastposition = pos;
-        }
-        else
-            kill();
-    }
 
     // Eliminates problems when world origin offset moves
     _lastwooffset = Vec3d(WorldOriginOffset);
@@ -1999,7 +1866,7 @@ void TransformEffect::update()
             }
         }
        
-        if((_flags & REMOVE_ME_WHEN_DONE) && enablecount == 0 || _dead)
+        if(((_flags & REMOVE_ME_WHEN_DONE) && (enablecount == 0)) || _dead)
         {
             removelist.insert(this);
         }

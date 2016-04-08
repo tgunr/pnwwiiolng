@@ -221,17 +221,10 @@ extern void				fpFPSGetWobble(FLOAT32* horizWobble, FLOAT32* vertWobble, FLOAT32
 extern LOGICAL				fpsCheckDeploy(bool doShake = true);
 extern void				fpFPSDeployChange();
 
-static void			fpFPSAxisRotation (SINT32 param, UINT32 id);
-static void			fpFPSSetVerticalDeployedPosition (FLOAT64 newPos);
-static void			fpFPSSetHorizontalDeployedPosition (FLOAT64 newPos);
-static void			fpFPSVerticalAxisLook (SINT32 param, UINT32 data);
-static void			fpFPSHorizAxisLook (SINT32 param, UINT32 data);
-
 extern LOGICAL				fpFPSWeaponOutOfAmmo(weapWeapon* weapon);
 extern LOGICAL				fpFPSWeaponOutOfSecondaryAmmo(weapWeapon* weapon);
 
 extern void				fpFPSGetEyeUpDownRange (FLOAT32*	upAngle, FLOAT32* downAngle);
-static void			fpFPSAdjustAngles (FLOAT32 deltaTime, FLOAT64 minSpeed, FLOAT64 maxSpeed, FLOAT64* xAngle, FLOAT64 xTarget);
 
 extern void				fpFPSSightAdjust (SINT32 sightParam);
 extern void				fpFPSParadropStart();

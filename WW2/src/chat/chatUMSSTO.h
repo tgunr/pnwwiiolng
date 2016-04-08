@@ -16,12 +16,12 @@ public:
 	UMSSTO(UINT16 subType, const WorldPosition_m& position, const AttitudeVector& attitude, Player* originator);
 	UMSSTO(ACTION_OBJECT* const a);
 
-	virtual bool needsBroadcastRemoval() const OVERRIDE_FN { return true; }
-	virtual const char* typeName() const OVERRIDE_FN { return "ums"; }
+	virtual bool needsBroadcastRemoval() const override { return true; }
+	virtual const char* typeName() const override { return "ums"; }
 
 public:
-	virtual bool activate() OVERRIDE_FN;		// Special activation case.
-	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) OVERRIDE_FN;
+	virtual bool activate() override;		// Special activation case.
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) override;
 
 public:
 	STODamage& damage() { return m_damage; }

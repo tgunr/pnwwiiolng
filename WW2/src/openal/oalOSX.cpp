@@ -689,7 +689,7 @@ extern "C"
     OSStatus err = noErr;
     AudioFileID audioFile = 0;
     FSRef fsRef;
-
+      
     *data = NULL;                                 // in case of failure, do not return some unitialized value as a bogus address
 
     if (IsRelativePath(file))
@@ -705,7 +705,7 @@ extern "C"
 
     if (err == noErr)
     {
-      err = AudioFileOpen(&fsRef, fsRdPerm, 0, &audioFile);
+      err = AudioFileOpen(&fsRef, kAudioFileReadPermission, 0, &audioFile);
       if (err == noErr)
       {
         UInt32 dataSize;

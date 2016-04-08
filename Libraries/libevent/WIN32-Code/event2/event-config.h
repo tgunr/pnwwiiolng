@@ -277,7 +277,7 @@
 /* #undef _EVENT_HAVE_WORKING_KQUEUE */
 
 /* Numeric representation of the version */
-#define _EVENT_NUMERIC_VERSION 0x02001100
+#define _EVENT_NUMERIC_VERSION 0x02001600
 
 /* Name of package */
 #define _EVENT_PACKAGE "libevent"
@@ -334,7 +334,7 @@
 #define _EVENT_TIME_WITH_SYS_TIME 1
 
 /* Version number of package */
-#define _EVENT_VERSION "2.0.17-stable"
+#define _EVENT_VERSION "2.0.22-stable"
 
 /* Define to appropriate substitue if compiler doesnt have __func__ */
 #define _EVENT___func__ __FUNCTION__
@@ -355,7 +355,7 @@
 /* #undef _EVENT_size_t */
 
 /* Define to unsigned int if you dont have it */
-#undef _EVENT_socklen_t //unsigned int
+//#define _EVENT_socklen_t unsigned int
 
 /* Define to `int' if <sys/types.h> does not define. */
 #define _EVENT_ssize_t SSIZE_T

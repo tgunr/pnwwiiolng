@@ -50,7 +50,7 @@ namespace Host
 		UINT32 m_playerID;
 		ChatHandle m_handle;
 
-		virtual void Reply(ResponseType, const char* fmt, ...) const OVERRIDE_FN;
+		virtual void Reply(ResponseType, const char* fmt, ...) const override;
 	};
 }
 

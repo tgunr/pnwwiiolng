@@ -47,7 +47,7 @@
 #include "parse/parseIO.h"
 #endif
 
-extern LOGICAL obwldInit(char* levelfile);
+extern LOGICAL obwldInit(const char* levelfile);
 extern void obwldKill(void);
 extern LOGICAL obwldUpdate(void);
 

@@ -16,10 +16,10 @@ class HulkSTO : public ServerSTO
 public:
 	HulkSTO(UINT16 subType, const WorldPosition_m& position, const AttitudeVector& attitude, const class Player* originator);
 	HulkSTO(ACTION_OBJECT* const a);
-	virtual const char* typeName() const OVERRIDE_FN { return "hulk"; }
+	virtual const char* typeName() const override { return "hulk"; }
 
 public:
-	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) OVERRIDE_FN;
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) override;
 
 public:
 	const STODamage& damage() const { return m_damage; }

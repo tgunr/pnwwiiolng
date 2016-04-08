@@ -1011,7 +1011,7 @@ public:
 								, ACTIVE_OFFICER, LSTR_ATTACK_USAGE, LSTR_ATTACK_DETAIL
 								) { };
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( player.noSide() )
 			throw LSTR_SELECT_SIDE;
@@ -1040,7 +1040,7 @@ public:
 								, ACTIVE_OFFICER, LSTR_CLEAR_USAGE, LSTR_CLEAR_DETAIL
 								) { };
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( player.noSide() )
 			throw LSTR_SELECT_SIDE;
@@ -1069,7 +1069,7 @@ public:
 								, ACTIVE_OFFICER, LSTR_DEFEND_USAGE, LSTR_DEFEND_DETAIL
 								) { };
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( player.noSide() )
 			throw LSTR_SELECT_SIDE;
@@ -1098,7 +1098,7 @@ public:
 								, ACTIVE_OFFICER, LSTR_MOVEBRIGADE_USAGE, LSTR_MOVEBRIGADE_DETAIL
 								) { };
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( player.noSide() )
 			throw LSTR_SELECT_SIDE;
@@ -1131,7 +1131,7 @@ public:
 								, ACTIVE_OFFICER, LSTR_MOVEDIVISION_USAGE, LSTR_MOVEDIVISION_DETAIL
 								) { };
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( player.noSide() )
 			throw LSTR_SELECT_SIDE;
@@ -1633,7 +1633,7 @@ public:
 								, NO_MASK, LSTR_LISTOIC_USAGE, LSTR_LISTOIC_DETAIL
 								) { }
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( !isValidSide(player.side()) )
 			throw Chat::LStringErr(LSTR_SELECT_SIDE);

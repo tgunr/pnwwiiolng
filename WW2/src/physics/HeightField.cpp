@@ -119,11 +119,11 @@ Function: HeightField::HeightField
 Description:
 --------------------------------------------------------------------------------------*/
 HeightField::HeightField() :
+    columns(0),
+    rows(0),
     heightscale(1.0f),
     imgscalex(1.0f),
-    imgscaley(1.0f),
-    columns(0),
-    rows(0)
+    imgscaley(1.0f)
 {
 }
 

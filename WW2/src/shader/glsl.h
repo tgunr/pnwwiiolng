@@ -33,10 +33,10 @@ private:
 
     void _loadShaderSource(glslShader* shader, const char* file);
 
-    std::unordered_map<std::string, ref_ptr<glslProgram>> _programs;
-    std::unordered_map<std::string, ref_ptr<glslShader>> _vshaders;
-    std::unordered_map<std::string, ref_ptr<glslShader>> _fshaders;
-    std::unordered_map<std::string, ref_ptr<glslShader>> _gshaders;
+    std::map<std::string, ref_ptr<glslProgram> > _programs;
+    std::map<std::string, ref_ptr<glslShader> > _vshaders;
+    std::map<std::string, ref_ptr<glslShader> > _fshaders;
+    std::map<std::string, ref_ptr<glslShader> > _gshaders;
 };
 
 extern OpenGLShader GLSL;
@@ -53,3 +53,4 @@ extern void glslSetTextureMatrix(int unit, const Matrixf& mat);
 extern void glslKill();
 
 extern void glslLoadGlobalUniforms(glslProgram* pgm);
+

@@ -412,7 +412,7 @@ piVECTOR	d;
  * lpd = lpa * lpb
  * lpd can be equal to lpa
  */
-INLINE piVECTOR* math3dMultiplyRotation(piVECTOR* lpd, const piVECTOR* lpa, piMATRIX* lpb)
+INLINE piVECTOR* math3dMultiplyRotation(piVECTOR* lpd, const piVECTOR* lpa, const piMATRIX* lpb)
 {
 piVECTOR	d;
 
@@ -624,7 +624,7 @@ INLINE void math3dInvertMatrixComplete(piMATRIX& inverse, const piMATRIX& matrix
 /*
  * lpd = 1 / lpa
  */
-INLINE piMATRIX* math3dInvertMatrix(piMATRIX* lpd, piMATRIX* lpa)
+INLINE piMATRIX* math3dInvertMatrix(piMATRIX* lpd, const piMATRIX* lpa)
 {
 piMATRIX	d;
 
@@ -927,7 +927,7 @@ float ha, ha2, dec, lat, lon, alt, az;
 	lpd->x = dec;
 
 #if platOS == OS_MACOS
-	if (!std::isnan(lpd->x) && finite(lpd->x))
+	if (!std::isnan(lpd->x) && isfinite(lpd->x))
 #else
 	if (!_isnan(lpd->x) && _finite(lpd->x))
 #endif
@@ -949,7 +949,7 @@ float ha, ha2, dec, lat, lon, alt, az;
 
 	lpd->y = lon - ha - ha2;
 #if platOS == OS_MACOS
-	if (!std::isnan(lpd->y) && finite(lpd->y))
+	if (!std::isnan(lpd->y) && isfinite(lpd->y))
 #else
 	if (!_isnan(lpd->y) && _finite(lpd->y))
 #endif
@@ -971,7 +971,7 @@ float ha, ha2, dec, lat, lon, alt, az;
 
 	lpd->z -= az;
 #if platOS == OS_MACOS
-	if (!std::isnan(lpd->z) && finite(lpd->z))
+	if (!std::isnan(lpd->z) && isfinite(lpd->z))
 #else
 	if (!_isnan(lpd->z) && _finite(lpd->z))
 #endif

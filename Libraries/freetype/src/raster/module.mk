@@ -3,7 +3,7 @@
 #
 
 
-# Copyright 1996-2000, 2006 by
+# Copyright 1996-2015 by
 # David Turner, Robert Wilhelm, and Werner Lemberg.
 #
 # This file is part of the FreeType project, and may only be used, modified,
@@ -16,7 +16,7 @@
 FTMODULE_H_COMMANDS += RASTER_MODULE
 
 define RASTER_MODULE
-$(OPEN_DRIVER)ft_raster1_renderer_class$(CLOSE_DRIVER)
+$(OPEN_DRIVER) FT_Renderer_Class, ft_raster1_renderer_class $(CLOSE_DRIVER)
 $(ECHO_DRIVER)raster    $(ECHO_DRIVER_DESC)monochrome bitmap renderer$(ECHO_DRIVER_DONE)
 endef
 

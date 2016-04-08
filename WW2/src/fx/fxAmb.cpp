@@ -117,7 +117,7 @@ LOGICAL fxAmbInit()
 // Function: fxAmbInitRegion
 // Description:
 ///////////////////////////////////
-LOGICAL fxAmbInitRegion(REGION* lpReg, SCHAR* pFile)
+LOGICAL fxAmbInitRegion(REGION* lpReg, const SCHAR* pFile)
 {
     SINT32 hHandle = -1;
     SCHAR szBuff[80];

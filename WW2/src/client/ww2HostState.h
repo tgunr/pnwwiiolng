@@ -150,11 +150,11 @@ namespace ww2
 		virtual ~MapHostState() {}
 
 		// map specific handling
-		virtual void OnDespawn() OVERRIDE_FN;
-		virtual bool CanConnect() const OVERRIDE_FN; // can we reconnect or not
-		virtual bool Reconnect() OVERRIDE_FN;
-		virtual const char* HostName() OVERRIDE_FN;
-		virtual SINT32 ErrorActions(SINT32 error) OVERRIDE_FN;
+		virtual void OnDespawn() override;
+		virtual bool CanConnect() const override; // can we reconnect or not
+		virtual bool Reconnect() override;
+		virtual const char* HostName() override;
+		virtual SINT32 ErrorActions(SINT32 error) override;
 	};
 
 	struct ChatHostState : public HostState
@@ -163,10 +163,10 @@ namespace ww2
 		virtual ~ChatHostState() {}
 
 		// chat specific handling
-		virtual bool CanConnect() const OVERRIDE_FN; // can we reconnect or not
-		virtual bool Reconnect() OVERRIDE_FN;
-		virtual const char* HostName() OVERRIDE_FN;
-		virtual SINT32 ErrorActions(SINT32 error) OVERRIDE_FN;
+		virtual bool CanConnect() const override; // can we reconnect or not
+		virtual bool Reconnect() override;
+		virtual const char* HostName() override;
+		virtual SINT32 ErrorActions(SINT32 error) override;
 	};
 
 	struct CellHostState : public HostState
@@ -175,13 +175,13 @@ namespace ww2
 		virtual ~CellHostState() {}
 
 		// cell specific handling
-		virtual void OnDespawn() OVERRIDE_FN;
+		virtual void OnDespawn() override;
 		//virtual bool CanConnect() const; // can we reconnect or not
-		virtual bool Reconnect() OVERRIDE_FN;
-		virtual const char* FatalCallback() const OVERRIDE_FN;
-		virtual const char* HostName() OVERRIDE_FN;
-		virtual SINT32 ErrorActions(SINT32 error) OVERRIDE_FN;
-		virtual void SetFatalError()  OVERRIDE_FN {}
+		virtual bool Reconnect() override;
+		virtual const char* FatalCallback() const override;
+		virtual const char* HostName() override;
+		virtual SINT32 ErrorActions(SINT32 error) override;
+		virtual void SetFatalError()  override {}
 	};
 
 

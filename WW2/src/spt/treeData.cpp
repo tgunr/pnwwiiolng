@@ -26,8 +26,6 @@ Description:
 static std::string directory = "C:/3rdparty/SpeedTreeRT_SDK_v4.1_Full/Bin/Data/TreeModels.SouthCarolina/";
 #endif
 
-static bool _initialized = false;
-
 static std::vector<TreeData*> treedata;
 static std::vector<CTree*> basetrees;
 static std::map<std::string, CTree*> treecache;
@@ -50,7 +48,9 @@ static Tree activetreesH;
 static Tree activetreesT;
 #endif
 
+#if USE_PREALLOCATED_TREES
 static void addToFreeList(Tree* t);
+#endif
 
 /*-----------------------------------------------------------------
  Function: treeDataVBO
@@ -73,8 +73,6 @@ bool _treename(XMLLoader* loader, xmlNode* node, bool first, void* userData)
 
         TreeData* td = new TreeData;
         td->name = (const char*)s;
-
-        typedef std::vector<TreeData *> *p;
 
         treedata.push_back(td);
 

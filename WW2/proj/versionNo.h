@@ -4,13 +4,18 @@
 #define PN_WW2_PRODUCT_NO	1
 #define PN_WW2_VERSION_NO	35
 #define PN_WW2_PATCH_NO		0
-#define PN_WW2_BUILD_NO		5
+#define PN_WW2_BUILD_NO		10
 ////////// End of don't-reformat section
 
-#define FILEVER				1,35,0,5
-#define PRODUCTVER			1,35,0
-#define STRFILEVER			"1.35.0.5"
-#define STRPRODUCTVER		"1.35.0"
+// Because cpp(1) is painful
+#define __SIFY(x) #x
+#define _SIFY(x) __SIFY(x)
+#define SIFY(x) _SIFY(x)
+
+#define FILEVER				PN_WW2_PRODUCT_NO ## , ## PN_WW2_VERSION_NO ## , ## PN_WW2_PATCH_NO ## , ## PN_WW2_BUILD_NO
+#define PRODUCTVER			PN_WW2_PRODUCT_NO ## , ## PN_WW2_VERSION_NO ## , ## PN_WW2_PATCH_NO
+#define STRFILEVER			SIFY(PN_WW2_PRODUCT_NO) "." SIFY(PN_WW2_VERSION_NO) "." SIFY(PN_WW2_PATCH_NO) "." SIFY(PN_WW2_BUILD_NO)
+#define STRPRODUCTVER		SIFY(PN_WW2_PRODUCT_NO) "." SIFY(PN_WW2_VERSION_NO) "." SIFY(PN_WW2_PATCH_NO)
 #define	STRVER				STRFILEVER
 #define TEULVERMIN			"1.4.0.0"
 

@@ -151,36 +151,10 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	fioOpen
 *************************************************************************************************/
 
-#if platOS == OS_MACOS
-static void myReplace(std::string& str, const std::string& old, const std::string& nw)
-{
-  size_t pos = 0;
-  while((pos = str.find(old, pos)) != std::string::npos)
-  {
-    str.replace(pos, old.length(), nw);
-    pos += nw.length();
-  }
-}
-
-static void fixer(const char*filename, char*temp)
-{
-  std::string str(filename);
-  myReplace( str, "%5c", "/" );
-  myReplace( str, "%5C", "/" );
-  strcpy(temp, str.c_str());
-}
-
-#endif
 int fioOpen(const char* const filename)
 {
     int fd = -1;
     const char* fn = filename;
-
-#if platOS == OS_MACOS
-  char temp[PATH_MAX]; // remove the damn %5C that libxml2 puts into paths in OS 10.5 (sometimes)
-  fixer(filename,temp);
-    fn = temp;
-#endif
 
 	switch(fio_switch)
     {
@@ -188,7 +162,7 @@ int fioOpen(const char* const filename)
 		{
 			fiodSetPrepath(UserDataPath);
 			fd = fiodOpen(fn);
-			fiodSetPrepath(PREPATH);
+			fiodSetPrepath(nullptr);
 		}
 		break;
         case ISDIRECTORY:
@@ -235,7 +209,7 @@ int fioOpenWrite(const char* filename)
 		{
 			fiodSetPrepath(UserDataPath);
 			fd = fiodOpenWrite(filename);
-			fiodSetPrepath(PREPATH);
+			fiodSetPrepath(nullptr);
 		}
 		break;
 		case ISDIRECTORY:
@@ -338,7 +312,7 @@ LOGICAL fioAccess(const char* filename)
 		{
 			fiodSetPrepath(UserDataPath);
 			LOGICAL result = fiodAccess(filename);
-			fiodSetPrepath(PREPATH);
+			fiodSetPrepath(nullptr);
 			return result;
 		}
 		break;
@@ -366,7 +340,7 @@ LOGICAL fioModified(SINT32* modified, const char* filename)
 		{
 			fiodSetPrepath(UserDataPath);
 			LOGICAL result = fiodModified(modified,filename);
-			fiodSetPrepath(PREPATH);
+			fiodSetPrepath(nullptr);
 			return result;
 		}
 		break;
@@ -422,7 +396,7 @@ size_t fioFileSize(const char* name)
 		{
 			fiodSetPrepath(UserDataPath);
 			size_t size = fiodFileSize(name);
-			fiodSetPrepath(PREPATH);
+			fiodSetPrepath(nullptr);
 			return size;
 		}
 		break;

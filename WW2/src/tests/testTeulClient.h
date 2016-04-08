@@ -89,7 +89,7 @@ struct ClientRole : public Role
 		return a->offset;
 	}
 
-	virtual int RegisterCallbacks() OVERRIDE_FN
+	virtual int RegisterCallbacks() override
 	{
 		BEGIN_CALLBACK_REGISTRATION(Role::Test_X)
 			REGISTER_RECVSEND(Role::Hello_Y, recvHello, sendHello, s_cbHello);
@@ -627,6 +627,46 @@ struct ClientRole : public Role
 	}
 
 	public:
+	void TestVaryingPacketSizes(const SINT32 teulIndex) 
+	{
+		if (tSendVariety.isEnabled() == false)
+			return;
+		size_t numMsgs = 5;
+		// Summary: Packet size of 11584 is largest (payload 11576) that can be sent without error
+		size_t msgSizes[] = {256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536};
+		size_t numSizes = sizeof(msgSizes) / sizeof(size_t);
+
+		Iprintf("sending %u messages for each varing size\n", numMsgs);
+
+		uint8_t nextChar = static_cast<uint8_t>('A');
+		Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::Spam_Y));
+		outgoing.setUnencrypted();
+		outgoing.reserve(70000);
+		for (size_t i = 0; i < numSizes; ++i)
+		{
+			for (size_t j = 0; j < msgSizes[i]; ++j)
+			{
+				outgoing.append(nextChar);
+				if (++nextChar > static_cast<uint8_t>('Z'))
+				nextChar = static_cast<uint8_t>('A');
+			}
+
+			Iprintf("sending %u messages for packet size %d\n", numMsgs, msgSizes[i]);
+			for (size_t j = 0; j < numMsgs; ++j)
+			{
+				outgoing.send(teulIndex);
+			}
+			const TeulTimeMS cutoff = teulClock64 + 250;
+			while ( teulClock64 <= cutoff )
+			{
+				if ( s_lastError != 0 )
+					throw Teul::Error("Unexpected s_lastError", s_lastError);
+				teulUpdateTransport(50);
+			}
+		}
+	}
+
+	public:
 	void TestSpam(const SINT32 teulIndex, const UINT32 numUnits, size_t size)
 	{
 		if (tSendSpam.isEnabled() == false)
@@ -648,7 +688,7 @@ struct ClientRole : public Role
 		}
 	}
 
-	public: virtual void Run() OVERRIDE_FN
+	public: virtual void Run() override
 	{
 		OpenConnection();
 
@@ -715,6 +755,10 @@ struct ClientRole : public Role
 		Delay();
 
 		TestObjectMethod(secondIndex);
+
+		Delay();
+
+		TestVaryingPacketSizes(m_teulIndex);
 
 		Delay();
 

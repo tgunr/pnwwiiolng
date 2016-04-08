@@ -10,6 +10,8 @@
 
 #include "inst/instClientStatus.h"
 #include "inst/instTypes.h"
+#include <vector>
+#include <stdexcept>
 
 // Used by the host.
 class wwiiPlayer;
@@ -34,27 +36,22 @@ namespace Instance
 		Descriptor	m_descriptor;
 	};
 
-#pragma pack(push, 1)
 	// The structure used by Create/Select to describe the results
 	class Result
 	{
 	public:
-		Result() : m_status(_BAD_DATA), m_descriptor(), m_state(Instance::Invalid) {}
-		Result(const Descriptor& _descriptor) : m_status(_BAD_DATA), m_descriptor(_descriptor), m_state(Instance::Invalid) {}
-		Result(ACTION_OBJECT* a);
-		~Result() {}
-
-		int packer(unsigned int mode, struct ACTION_OBJECT* a);
-
-		State state() const { return m_state; }
-		ResultCodes status() const { return m_status; }
-		const Descriptor& descriptor() const { return m_descriptor; }
-
-		ResultCodes		m_status;
-		Descriptor		m_descriptor;
-		Instance::State	m_state;		//! Current state of the instance.
+        Result() : m_status(_BAD_DATA), m_descriptor(Descriptor()) {}
+        Result(const Descriptor& _descriptor) : m_status(_BAD_DATA), m_descriptor(_descriptor) {}
+        Result(struct ACTION_OBJECT* a) ;
+        
+        int packer(unsigned int mode, struct ACTION_OBJECT* a) ;
+        
+        ResultCodes status() const { return m_status ; }
+        const Descriptor& descriptor() const { return m_descriptor ; }
+        
+        ResultCodes		m_status ;
+        Descriptor		m_descriptor ;
 	};
-#pragma pack(pop)
 
 	// This is the stub class for handling requests for instance listings.
 	// This much is shared between the client and the host. The client is

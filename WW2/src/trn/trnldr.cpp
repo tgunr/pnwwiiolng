@@ -67,7 +67,7 @@ static TUV		tuvlist[4][9]={	{{0.5f, 0.5f}, {0.0f, 0.0f}, {0.0f, 0.5f}, {0.0f, 1.
 								{{0.5f, 0.5f}, {1.0f, 0.0f}, {0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.5f}, {0.0f, 1.0f}, {0.5f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.5f}},
 								{{0.5f, 0.5f}, {1.0f, 1.0f}, {1.0f, 0.5f}, {1.0f, 0.0f}, {0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.5f}, {0.0f, 1.0f}, {0.5f, 1.0f}},
 								{{0.5f, 0.5f}, {0.0f, 1.0f}, {0.5f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.5f}, {1.0f, 0.0f}, {0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.5f}}};
-static SINT8*	alttexname[ALT_TRN_NUMBER]={
+static const SINT8*	alttexname[ALT_TRN_NUMBER]={
 											"dunes1.bmp",
 											"water1.bmp",
 											"dunes1.bmp",
@@ -413,73 +413,6 @@ SINT32		i, j, k;
 	Write_Debug("Edit list has been minimized and ordered");
 }
 
-
-static LOGICAL GetFullObjectBBox(OBJECT* lptop, piVECTOR* bbox)
-{
-SINT32			i;
-piVectorConstPtr pv;
-OBJECT*		lpatt;
-
-	while (lptop != nullptr)
-	{
-		if (lptop->child != nullptr)
-		{
-			if (!GetFullObjectBBox(lptop->child, bbox))
-			{
-				return(FALSE);
-			}
-		}
-
-		if (!(lptop->flags & OBJECT_NOTOBJECT))
-		{
-			lpatt = lptop;
-			while (lpatt != nullptr)
-			{
-				pv = lptop->RenderPositions();
-				for (i=0; i < lptop->numverts; i++, ++pv)
-				{
-					if (pv->x < bbox[0].x)
-					{
-						bbox[0].x = pv->x;
-					}
-
-					if (pv->x > bbox[1].x)
-					{
-						bbox[1].x = pv->x;
-					}
-
-					if (pv->y < bbox[0].y)
-					{
-						bbox[0].y = pv->y;
-					}
-
-					if (pv->y > bbox[1].y)
-					{
-						bbox[1].y = pv->y;
-					}
-
-					if (pv->z < bbox[0].z)
-					{
-						bbox[0].z = pv->z;
-					}
-
-					if (pv->z > bbox[1].z)
-					{
-						bbox[1].z = pv->z;
-					}
-				}
-
-				lpatt = lpatt->attached;
-			}
-		}
-
-		lptop = lptop->sibling;
-	}
-
-	return(TRUE);
-}
-
-
 LOGICAL trnldrInit(void)
 {
 SINT8	filename[MAX_PATH], mapname[64];
@@ -660,8 +593,6 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 
 				break;
 		}
-
-        int idx = 0;
 
 		deletion(lpobj, 0, 0, 0, nullptr);
 		trnUpdateStratData(td, lpobj, -1, FALSE);
@@ -1335,42 +1266,6 @@ STRT_DTL_HEADER		sdh;
 	td->numoctetsdown = SUPERCELL_OCTETS_Y;
 
     logTimerEndMacro();
-#ifdef ANDREWTEST
-    // supercellloaded
-/*
-    printf("\n\nSuperCell %d, %d\n\n",td->scx, td->scy);
-
-    extern PoolMap _poolmap;
-
-    for (int i=0; i<td->tobndx; i++ )
-    {
-        SDM_ObjInfo* p = &td->trnobj[i];
-        //printf("%s: %10.2f %10.2f\n",p->objname, p->pos.x, p->pos.y);
-
-        std::string	str(p->objname);
-        std::string modelname;
-
-		size_t start = str.rfind('\\');
-		size_t end = str.rfind('.');
-
-		if(start == std::string::npos)
-		{
-			modelname = str.substr(0,end);
-		}
-		else
-		{
-			modelname = str.substr(start+1,end-start-1);
-		}
-
-        PoolMap::iterator it = _poolmap.find(modelname);
-        if ( it != _poolmap.end() )
-        {
-            PoolModel* pm = (*it).second;
-            //printf("Loading model: %s\n", modelname.c_str() );
-        }
-    }
-*/
-#endif
 	return(retval);
 }
 
@@ -2301,11 +2196,6 @@ BUILDING*			pbld;		// Building
 	return(FALSE);
 }
 
-#ifdef ANDREWTEST
-//extern void processObjects(TERRAIN_DETAIL* td, SINT32 sc);
-//#define LOADEVERYTHING
-#endif
-
 static LOGICAL LoadObjects(SINT32 sc)
 {
 	LOGICAL		KillObject;
@@ -2315,10 +2205,6 @@ static LOGICAL LoadObjects(SINT32 sc)
 	TERRAIN_DETAIL* td = &trndtl[sc];
 
     logTimerBeginMacro();
-
-#ifdef ANDREWTEST
-//    processObjects(td, sc);
-#endif
 
     FLOAT32 horizon;
     trnmainGetHorizon(&horizon);

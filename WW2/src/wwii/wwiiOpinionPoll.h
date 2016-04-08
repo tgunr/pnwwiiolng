@@ -20,8 +20,6 @@ public:
 	OpinionPoll() : m_pollID(0), m_size(0), m_title("") {}
 	OpinionPoll(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
-	~OpinionPoll() {}
-
 public:
 	// Accessors
 	bool empty() const { return (m_title[0] == 0 || m_size <= 0); }
@@ -52,7 +50,6 @@ class OpinionChoice
 public:
 	OpinionChoice(UINT32 withPollID=0, UINT32 withChoice=0) : m_pollID(withPollID), m_choice(withChoice) {}
 	OpinionChoice(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
-	~OpinionChoice() {}
 
 public:
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);

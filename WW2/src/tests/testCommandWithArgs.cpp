@@ -41,7 +41,7 @@ public: bool TestCommand(const char* source, const char* expectCommand, const ch
 		return true;
 	}
 
-public: virtual bool Run() OVERRIDE_FN
+public: virtual bool Run() override
 	{
 		TestCommand("", "", "");
 		TestCommand("a", "a", "");

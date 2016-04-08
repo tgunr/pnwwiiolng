@@ -1657,7 +1657,7 @@ static LOGICAL
 _dotRestart(char* arguments, OOBMessage& message)
 {
 	dbugLog(_FLA, "restarting the strat host");
-	if ( system("(sleep 1; " PN_PLAYNET_PATH PATH_SEPSTR "bin" PATH_SEPSTR "stophost; sleep 1; " PN_PLAYNET_PATH PATH_SEPSTR "bin" PATH_SEPSTR "starthost) &") < 0 )
+	if ( system("(sleep 1; " PN_PLAYNET_PATH "/bin/stophost; sleep 1; " PN_PLAYNET_PATH "/bin/starthost) &") < 0 )
 	{
 	    dbugLog(_FLA, "dotRetsart system call failed");
 	    RESPOND("System call failed");
@@ -1680,7 +1680,7 @@ _dotShutdownStrat(char* arguments, OOBMessage& message)
 	strtSaveTOESupplies();
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
-    if ( system(PN_PLAYNET_PATH PATH_SEPSTR "bin" PATH_SEPSTR "stophost &") < 0 )
+    if ( system(PN_PLAYNET_PATH "/bin/stophost &") < 0 )
     {
         RESPOND("System call failed");
         LogAbort("dotShutdownStrat system call failed");
@@ -2212,8 +2212,8 @@ _dotRunLua(char* arguments, OOBMessage& message)
 	{
 		static const UINT32 FILENAME_SIZE = 160;
 		char filename[FILENAME_SIZE+1];
-		if ( publicMode ) snprintf(filename, FILENAME_SIZE, "%s" PATH_SEPSTR "public" PATH_SEPSTR "%s.lua", cv_luaPath.GetString(), script);
-		else snprintf(filename, FILENAME_SIZE, "%s" PATH_SEPSTR "%s.lua", cv_luaPath.GetString(), script);
+		if ( publicMode ) snprintf(filename, FILENAME_SIZE, "%s" "/public/%s.lua", cv_luaPath.GetString(), script);
+		else snprintf(filename, FILENAME_SIZE, "%s" "/%s.lua", cv_luaPath.GetString(), script);
 		success = Lua::RunScript(filename);
 	}
 

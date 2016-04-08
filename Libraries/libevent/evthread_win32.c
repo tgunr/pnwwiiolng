@@ -112,7 +112,7 @@ evthread_win32_condvar_init(void)
 #define LOAD(name)				\
 	name##_fn = GetProcAddress(lib, #name)
 	LOAD(InitializeConditionVariable);
-	LOAD(SleepConditionVariable);
+	LOAD(SleepConditionVariableCS);
 	LOAD(WakeAllConditionVariable);
 	LOAD(WakeConditionVariable);
 
@@ -235,8 +235,7 @@ evthread_win32_cond_wait(void *_cond, void *_lock, const struct timeval *tv)
 	int generation_at_start;
 	int waiting = 1;
 	int result = -1;
-	DWORD ms = INFINITE, ms_orig = INFINITE;
-	ULONGLONG startTime, endTime;
+	DWORD ms = INFINITE, ms_orig = INFINITE, startTime, endTime;
 	if (tv)
 		ms_orig = ms = evutil_tv_to_msec(tv);
 
@@ -247,7 +246,7 @@ evthread_win32_cond_wait(void *_cond, void *_lock, const struct timeval *tv)
 
 	LeaveCriticalSection(lock);
 
-	startTime = GetTickCount64();
+	startTime = GetTickCount();
 	do {
 		DWORD res;
 		res = WaitForSingleObject(cond->event, ms);
@@ -265,14 +264,14 @@ evthread_win32_cond_wait(void *_cond, void *_lock, const struct timeval *tv)
 			waiting = 0;
 			goto out;
 		} else if (ms != INFINITE) {
-			endTime = GetTickCount64();
+			endTime = GetTickCount();
 			if (startTime + ms_orig <= endTime) {
 				result = 1; /* Timeout */
 				--cond->n_waiting;
 				waiting = 0;
 				goto out;
 			} else {
-				ms = (DWORD)(startTime + ms_orig - endTime);
+				ms = startTime + ms_orig - endTime;
 			}
 		}
 		/* If we make it here, we are still waiting. */

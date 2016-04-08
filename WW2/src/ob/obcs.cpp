@@ -71,7 +71,6 @@ static LOGICAL SortBSP(SORTHEADER* lpsort);
 static LOGICAL SortCockpitBSP(SORTHEADER* lpsort);
 static LOGICAL UnsortCockpitBSP(SORTHEADER* lpsort);
 #endif
-static LOGICAL unsortMultiTexture(SORTHEADER* s);
 
 static std::vector<OBJECT*> _transparentbin;
 static std::vector<OBJECT*> _transparentcockpitbin;
@@ -425,7 +424,7 @@ void obcsCullForWaterReflection(float planeheight)
     _transparentbin.clear();
     _opaquebin.clear();
 
-	int numobjects = obmainGetObjects(&list);
+	obmainGetObjects(&list);
 	o = (OBJECT*)list->next;;
 
     piVECTOR p;
@@ -665,8 +664,6 @@ void obcsCull()
             if(o && o->modelInstance)
             {
                 unsigned int mask = CLIP_ALL_PLANES;
-
-                float radius = o->modelInstance->GetBounds().radius();
 
                 static piVECTOR p1, p2;
 
@@ -983,114 +980,6 @@ SORTHEADER* obcsGetMultiTextureList()
 {
     return (SORTHEADER*)tailMultiTexture;
 }
-
-/* not used
-LOGICAL unsortMultiTexture(SORTHEADER* lpsort)
-{
-	if (lplastMultiTexture == nullptr || !bPerFrameBSP)
-	{
-		if (lplastMultiTexture == nullptr)
-		{
-			tailMultiTexture = lpsort;
-		}
-		listAddItem((LISTHEADER*)&multiTextureList, (LISTHEADER*)lpsort);
-		lplastMultiTexture = lpsort;
-	}
-	else
-	{
-		if (lpsort->layer > lplastMultiTexture->layer)
-		{
-			do
-			{
-				if (lpsort->layer < lplastMultiTexture->layer ||
-					(lpsort->layer == lplastMultiTexture->layer &&
-					lpsort->distsqr > lplastMultiTexture->distsqr))
-				{
-					listAddItemBefore((LISTHEADER*)lplastMultiTexture, (LISTHEADER*)lpsort);
-					lplastMultiTexture = lpsort;
-					break;
-				}
-				if (lplastMultiTexture->next == nullptr)
-				{
-					listAddItemAfter((LISTHEADER*)lplastMultiTexture, (LISTHEADER*)lpsort);
-					tailMultiTexture = lplastMultiTexture = lpsort;
-					break;
-				}
-				lplastMultiTexture = lplastMultiTexture->next;
-			}
-			while (TRUE);
-		}
-		else
-		if (lpsort->layer < lplastMultiTexture->layer)
-		{
-			while (lplastMultiTexture->prev)
-			{
-				if (lpsort->layer > lplastMultiTexture->layer ||
-					(lpsort->layer == lplastMultiTexture->layer &&
-					lpsort->distsqr < lplastMultiTexture->distsqr))
-				{
-					listAddItemAfter((LISTHEADER*)lplastMultiTexture, (LISTHEADER*)lpsort);
-					lplastMultiTexture = lpsort;
-					break;
-				}
-				lplastMultiTexture = lplastMultiTexture->prev;
-			}
-			if (lplastMultiTexture->prev == nullptr)
-			{
-				listAddItemBefore((LISTHEADER*)lplastMultiTexture->next, (LISTHEADER*)lpsort);
-				lplastMultiTexture = lpsort;
-			}
-		}
-		else
-		{
-			if (lpsort->distsqr < lplastMultiTexture->distsqr)
-			{
-				do
-				{
-					if (lpsort->layer < lplastMultiTexture->layer ||
-						(lpsort->layer == lplastMultiTexture->layer &&
-						lpsort->distsqr > lplastMultiTexture->distsqr))
-					{
-						listAddItemBefore((LISTHEADER*)lplastMultiTexture, (LISTHEADER*)lpsort);
-						lplastMultiTexture = lpsort;
-						break;
-					}
-					if (lplastMultiTexture->next == nullptr)
-					{
-						listAddItemAfter((LISTHEADER*)lplastMultiTexture, (LISTHEADER*)lpsort);
-						tailMultiTexture = lplastMultiTexture = lpsort;
-						break;
-					}
-					lplastMultiTexture = lplastMultiTexture->next;
-				}
-				while (TRUE);
-			}
-			else
-			{
-				while (lplastMultiTexture->prev)
-				{
-					if (lpsort->layer > lplastMultiTexture->layer ||
-						(lpsort->layer == lplastMultiTexture->layer &&
-						lpsort->distsqr < lplastMultiTexture->distsqr))
-					{
-						listAddItemAfter((LISTHEADER*)lplastMultiTexture, (LISTHEADER*)lpsort);
-						lplastMultiTexture = lpsort;
-						break;
-					}
-					lplastMultiTexture = lplastMultiTexture->prev;
-				}
-				if (lplastMultiTexture->prev == nullptr)
-				{
-					listAddItemBefore((LISTHEADER*)lplastMultiTexture->next, (LISTHEADER*)lpsort);
-					lplastMultiTexture = lpsort;
-				}
-			}
-		}
-	}
-
-    return TRUE;
-}
-*/
 
 static LOGICAL UnsortBSP(SORTHEADER* lpsort)
 {

@@ -3,13 +3,10 @@
 
 #include <libxml/parser.h>
 #include <libxml/tree.h>
-#if platOS == OS_WIN32
+
 #include <regex>
 #define RENS	std
-#else
-#include <boost/regex.hpp>
-#define RENS	boost
-#endif
+
 #include "map/mapPersonaSummary.h"
 
 #include "js/jsContent.h"

@@ -87,7 +87,7 @@ private:
 	enum { GrowthRate = 128 } ;	// Grow in units of 128. MUST BE POWER OF 2.
 	enum { GrowthMask = GrowthRate - 1 };
 public:
-    FakeVector() : _size(0), _data(0), _capacity(0)
+    FakeVector() : _data(0), _size(0), _capacity(0)
 	{
 		reserve(1024);
 	}
@@ -857,7 +857,7 @@ inline static void Treecull(TERRAIN_DETAIL* dtl, int r, int c, unsigned int mask
     unsigned int address = 0;
 
     Vec3d world;
-    world.set(WorldOriginOffset);
+    world.set((FLOAT64VECTOR)WorldOriginOffset);
 
     Vec2f dis;
     Vec3f relativepos;
@@ -1278,8 +1278,6 @@ inline static void sptDrawBillboardsDeprecated(int pass)
             tree->StartBillboardType();
             tree->SetAlphaRef(84.0f, CTree::TREE_BILLBOARDS);
 
-            unsigned int size = 4 * billboards[i].size() / stride;
-
             ogl::SetVertexPointer(4, GL_FLOAT, stride, &billboards[i][0]);
             ogl::SetTextureUnitCoordPointer(GL_TEXTURE0, 4, GL_FLOAT, stride, &billboards[i][4]);
             ogl::SetTextureUnitCoordPointer(GL_TEXTURE1, 3, GL_FLOAT, stride, &billboards[i][8]);
@@ -1359,8 +1357,6 @@ inline static void sptDrawHorizBillboardsDeprecated()
             CTree* tree = treeDataGetBaseTree(i);
             tree->StartHorizBillboardType();
             tree->SetAlphaRef(84.0f, CTree::HORIZ_BILLBOARDS);
-
-            unsigned int size = 4 * horizbillboards[i].size() / stride;
 
             // Position and fade
             ogl::SetVertexPointer(4, GL_FLOAT, stride, &horizbillboards[i][0]);
@@ -2151,7 +2147,7 @@ void drawCollisionCylinders()
 
                 mathEul_ToMatrix(&m, EulOrdXYZs, &v);
 
-                Vec3f pp = Vec3f(p[0], p[1], p[2]) * rot;
+                //Vec3f pp = Vec3f(p[0], p[1], p[2]) * rot;
 
                 Matrixf r;
                 // Flip to our coordinate system
@@ -2683,8 +2679,6 @@ Description:
 ---------------------------------------------------------------------*/
 void sptGetStats(char stats[])
 {
-    unsigned int size = treeDataGetBaseSize();
-
     sprintf(stats,
             "TREES: Total %d Drawn %d 3D = %d 2D = %d Triangles %d",
             treeDataGetTotalTrees(),
@@ -3135,7 +3129,7 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
     x += WorldOriginOffset.x;
     y += WorldOriginOffset.y;
 
-    o->mat._43 = trnmainHeightAt(&trndtl[o->trnum], x, y);
+    o->mat._43 = trnmainHeightAt(&trndtl[static_cast<int>(o->trnum)], x, y);
 
     float highz = 10000.0f;
     float lowz = -10000.0f;
@@ -3269,7 +3263,7 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
             lowz = z;
         }
 
-        unsigned int address = sptAddTree(o, types[ii] - 1, &trndtl[o->trnum], pos64, false, changecluster);
+        unsigned int address = sptAddTree(o, types[ii] - 1, &trndtl[static_cast<int>(o->trnum)], pos64, false, changecluster);
 
         if(address == 0)
         {
@@ -3788,9 +3782,6 @@ unsigned int sptAddTree(OBJECT* o,
                         bool isclutter,
                         bool changecluster)
 {
-#ifdef ANDREWTEST
-    //return 0;
-#endif
     Tree* tree = treeDataGetFreeTree();
 
     if(tree == nullptr || !dtl)
@@ -3821,7 +3812,7 @@ unsigned int sptAddTree(OBJECT* o,
         SET_IS_CLUTTER(tree->isbush_isclutter_base, 0x1);
 
     unsigned int randm = (unsigned int)((int)pos.x * 7159 + (int)pos.y * 15137);
-    tree->rot_angle = randm & numRotations;
+    tree->rot_angle = randm % numRotations;
 
     // For billboards
     float radians = DEG_TO_RAD((float)rotations[tree->rot_angle]);
@@ -3938,8 +3929,6 @@ bool sptInTreeBBox(const piVECTOR& pos, FLOAT32 altRadius)
         {
             continue;
         }
-
-        CTree* basetree = treeDataGetBaseTree(base);
 
         for(unsigned int j = 0; j < threeD[base].size(); j++)
         {
@@ -4108,7 +4097,6 @@ void sptFreeTrees(TDTL_TREES* trees)
 
             for(; itr != octet.end(); ++itr)
             {
-                Tree* t = (Tree*)(*itr);
                 remove.push_back(*itr);
             }
 

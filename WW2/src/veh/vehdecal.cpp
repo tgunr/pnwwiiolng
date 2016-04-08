@@ -780,6 +780,9 @@ static void _setIndividualTexture(vehVehicle* veh)
 		{
 			break;
 		}
+    default:
+        // no other currently valid countries
+        break;
 	}
 
     if(!oglIsTexture(texid, 0))

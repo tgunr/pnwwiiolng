@@ -160,8 +160,8 @@ public:
 	BrigadeControl(UINT32 action, UCHAR country, UCHAR branch, UINT32 brigadeID, const ChatHandle& officer, const ChatHandle& sponsor, const FULL_OBJ_ID& origin=nullObjID)
 		: m_action(action), m_country(country), m_branch(branch), m_brigadeID(brigadeID), m_officer(officer), m_sponsor(sponsor), m_origin(origin)
 		{}
-	~BrigadeControl() {}
-	BrigadeControl(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
+    
+    BrigadeControl(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 
 	bool isTargettedAction() const { return (m_action == REQ_MOVE || m_action == REQ_ATTACK || m_action == REQ_CLEAR || m_action == REQ_DEFEND); }
 	bool isObjective() const { return (m_action == REQ_ATTACK || m_action == REQ_CLEAR || m_action == REQ_DEFEND); }
@@ -262,7 +262,6 @@ public:
 	BrigadeControlNotice(const BrigadeControl& rhs, UINT32 notice, UINT32 error, UINT32 time)
 		: BrigadeControl(rhs), m_notice(notice), m_error(error), m_time(time), m_votePermit(VP_NONE), m_received(0) {}
 	BrigadeControlNotice(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
-	~BrigadeControlNotice() {}
 
 public:
 	//// CLIENT: These functions are essentially entry points

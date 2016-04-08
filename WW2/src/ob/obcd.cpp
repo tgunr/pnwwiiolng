@@ -14,37 +14,6 @@
 //#undef CD_POLY_FENCE
 
 
-static inline LOGICAL fsgn(float f)
-{
-struct
-{
-  union
-  {
-    float f;
-    UINT32 d;
-  };
-} fd;
-  fd.f = f;
-  return(!(fd.d & 0x80000000));
-}
-
-
-static inline float ftrunc(float f)
-{
-struct
-{
-  union
-  {
-    float f;
-    UINT32 d;
-  };
-} fd;
-  fd.f = f;
-  fd.d &= 0xffffff00;
-  return(fd.f);
-}
-
-
 #ifndef _DEBUG
 
 #define OutlineTriangle(a, b, c)

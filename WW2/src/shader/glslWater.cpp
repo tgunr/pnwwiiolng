@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include <syscfg.h>
 /*--------------------------------------------------------------------------------------
 Module: glslWater.cpp
 Description:
@@ -28,8 +28,6 @@ Description:
 
 static int _waternormal = -1;
 static int _watertex = -1;
-static int _waterfoam = -1;
-static int _waterheight = -1;
 static int _waterreflection = -1;
 static int _watermaterial = -1;
 static int _watermaterialcloudy = -1;
@@ -71,7 +69,10 @@ extern Texture2D* obdrawGetSurfaceTexture();
 static void DrawScenarioCoastBin();
 static void DrawScenarioRiverBin();
 static void DrawScenarioOceanBin();
+
+#if USE_STATESET
 static void DrawScenarioCoastEffectBin();
+#endif
 
 /*--------------------------------------------------------------------------------------
 Function: glslWaterCanReflect
@@ -587,7 +588,6 @@ void glslWaterDrawBin()
 
     oglSetWorldMatrix(&IdentityMatrix);
 
-    const unsigned int size = waterbin.size();
     OBJECT* o = nullptr;
 
     if(g_wantWaterReflections)

@@ -68,12 +68,12 @@ void gr2Control::Update()
 
 gr2AnimationBlend* gr2AnimationBlend::Load(const char* path)
 {
-	return gr2LoadBlendedAnimation((SCHAR*)path, 58);
+	return gr2LoadBlendedAnimation(path, 58);
 }
 
 gr2AnimationBlend* gr2AnimationBlend::Create(const char* path)
 {
-	return gr2CreateBlendedAnimation((SCHAR*)path, 58);
+	return gr2CreateBlendedAnimation(path, 58);
 }
 
 FLOAT32 gr2AnimationBlend::GetBaseLength()
@@ -111,6 +111,7 @@ gr2Model::gr2Model()
 	, attachBone(0)
 	, attachToBone(0)
 	, attachToModel(nullptr)
+    , updateAttachment(1)
 	, finalModelTransform(nullptr)
 	, rootPositioningBone(0)
 	, numTextures(0)
@@ -119,12 +120,11 @@ gr2Model::gr2Model()
 	, patchTexID(-1)
 	, pObject(nullptr)
 	, active(FALSE)
-	, updateAttachment(1)
-	, eventHandler()
-	, blends(nullptr)
-	, maxVis(0)
+    , surfaceID(-1)
 	, minVis(0)
-	, surfaceID(-1)
+    , maxVis(0)
+    , eventHandler()
+    , blends(nullptr)
 {
 }
 
@@ -1043,7 +1043,7 @@ void gr2ModelAlt::Free()
 
 gr2Model* gr2ModelAlt::AddModel(UINT32 index, gr2Model* model)
 {
-	if(index >= 0 && index < 2)
+	if(index < 2)
 		models[index].AddModel(model);
 
 	return model;

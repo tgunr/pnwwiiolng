@@ -319,7 +319,7 @@ UCHAR _EngineComponentVarNames[ML_ENGINECOM_MAX_VARNAME][32] =
 
 UINT32 _DisableEngineThrust;
 
-static char* ENGINE_DAMAGE_SOUND[4] = {"sounds\\enginedamage1.wav", "sounds\\enginedamage2.wav", "sounds\\enginedamage3.wav", "sounds\\enginedamage4.wav"};
+static const char* ENGINE_DAMAGE_SOUND[4] = {"sounds\\enginedamage1.wav", "sounds\\enginedamage2.wav", "sounds\\enginedamage3.wav", "sounds\\enginedamage4.wav"};
 
 // ---------------------- rnmainListText overrides to intercept duplicate engine/gear etc message
 
@@ -2826,8 +2826,8 @@ FLOAT32 DeltaTime = 0.0f;
 	else
 	{
 		// otherwise shift when clutch comes out
-		if (GearboxComponentData->CanShift == 0 &&
-			GearboxComponentData->LastCanShift != 0 ||
+		if ((GearboxComponentData->CanShift == 0 &&
+			GearboxComponentData->LastCanShift != 0) ||
 			FailSafeMode == 1)
 		{
 			if (GearboxComponentData->UseGear != GearboxComponentData->SelectedGear)

@@ -49,13 +49,14 @@ extern char* rmlead(char*);
 extern char* rmtrail(char* str);
 extern char* strescape(char* d, const char* s, char c);
 
-#if defined(_MSC_VER) && _MSC_VER >= 1400
-#elif platOS == OS_MACOS
-extern size_t strnlen(const char* string, size_t maxlen);
-#endif
-
 template <size_t _DestSize>
 static inline void strsafecpy(char (&dest)[_DestSize], const char* src)
+{
+	strncpy(dest, src, _DestSize - 1);
+	dest[_DestSize - 1] = 0;
+}
+
+static inline void strsafecpy(char *dest, const char* src, size_t _DestSize)
 {
 	strncpy(dest, src, _DestSize - 1);
 	dest[_DestSize - 1] = 0;
@@ -64,6 +65,5 @@ static inline void strsafecpy(char (&dest)[_DestSize], const char* src)
 template <size_t _DestSize>
 static inline void strsafecpy(wchar_t (&dest)[_DestSize], const wchar_t* src)
 {
-	wcscpy(dest, src, _DestSize - 1);
-	dest[_DestSize - 1] = 0;
+    wcsncpy(dest, src, _DestSize - 1);
 }

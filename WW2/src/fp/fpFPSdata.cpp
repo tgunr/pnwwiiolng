@@ -4,7 +4,7 @@
 //
 // First Persona data initialization
 //
-// Copyright (C) PlayNet, Inc 1999-2005 - All rights reserved.
+// Copyright (C) PlayNet, Inc 1999-2014 - All rights reserved.
 // Not for redistribution.
 //
 // Originating Programmer: Patrick "thunder" Magruder
@@ -38,20 +38,20 @@
 
 typedef std::map<std::string, fpFPSTrooperLoadout> fpFPSLoadoutMap;
 
-SCHAR*						arms_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-SCHAR*						weap_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-SCHAR*						clip_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-SCHAR*						weap_default[NUM_WEAPONS];
-SCHAR*						weap_empty_default[NUM_WEAPONS];
-SCHAR*						clip_default[NUM_WEAPONS];
+const SCHAR*						arms_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+const SCHAR*						weap_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+const SCHAR*						clip_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+const SCHAR*						weap_default[NUM_WEAPONS];
+const SCHAR*						weap_empty_default[NUM_WEAPONS];
+const SCHAR*						clip_default[NUM_WEAPONS];
 
 fpFPSWeaponData				fpsWeapons[NUM_WEAPONS];
 // moved it a bit for hacker irritation
 // fpFPSTrooperData			fpsTrooper;
 
-SCHAR* skel_model =			FPS_DIR "fullskeleton";
+const SCHAR* skel_model =			FPS_DIR "fullskeleton";
 
-SCHAR* arm_models[NUM_INFANTRY_TYPES] =
+const SCHAR* arm_models[NUM_INFANTRY_TYPES] =
 {
 	FPS_DIR "arms\\armsmesh-britinf",
 	FPS_DIR "arms\\armsmesh-germinf",
@@ -74,11 +74,11 @@ SCHAR* arm_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "arms\\armsmesh-britinf" // americans
 };
 
-SCHAR* replacement_arms_file = FPS_DIR "arms\\replacement_arms_maps";
-SCHAR* default_arms_tex_names[NUM_INFANTRY_TYPES];
-SCHAR* replacement_arms_tex_names[NUM_INFANTRY_TYPES];
+const SCHAR* replacement_arms_file = FPS_DIR "arms\\replacement_arms_maps";
+const SCHAR* default_arms_tex_names[NUM_INFANTRY_TYPES];
+const SCHAR* replacement_arms_tex_names[NUM_INFANTRY_TYPES];
 
-SCHAR* leg_models[NUM_INFANTRY_TYPES] =
+const SCHAR* leg_models[NUM_INFANTRY_TYPES] =
 {
 	FPS_DIR "legs\\brit-legs",
 	FPS_DIR "legs\\german-legs",
@@ -101,7 +101,7 @@ SCHAR* leg_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "legs\\brit-legs" // americans
 };
 
-SCHAR* hud_icons[NUM_ICONS] =
+const SCHAR* hud_icons[NUM_ICONS] =
 {
 	"hudsmg1.bmp",
 	"hudsatchel1.bmp",
@@ -120,7 +120,7 @@ SCHAR* hud_icons[NUM_ICONS] =
 	"hudltmortar1.bmp"
 };
 
-SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
+const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 {
 	"none",
 	"thompson",
@@ -147,6 +147,7 @@ SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"smoke",
 	"ammocan",
 	"mas36",
+	"mas40",
 	"rg_g30",
 	"rg_vb",
 	"rg_mills",
@@ -155,7 +156,7 @@ SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"repair",
 	"map",
 	"enfield",
-    "lebel", // french sniper
+	"lebel", // french sniper
 	"k98k",
 	"satchel", //DEG_CHANGE
 	"blmortar",
@@ -167,16 +168,21 @@ SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"colt",
 	"springfield_sniper",
 	"gewehr",
+	"g41",
 	"m1thompson",
 	"mills",
 	"bazooka",
 	"pzschreck",
 	"m1903a3",
 	"smoke",
-	"piat"
+	"piat",
+	"Sten",
+	"GreaseGun",
+	"mp34",
+	"fg42g",
 };
 
-SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES] =
+const SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES] =
 {
 	"SMG",
 	"SATCHEL",
@@ -195,7 +201,7 @@ SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES] =
 	"ROCKET"
 };
 
-SCHAR* armTypeStrings[NUM_INFANTRY_TYPES]			=
+const SCHAR* armTypeStrings[NUM_INFANTRY_TYPES]			=
 {
 	"ukarmy",
 	"dearmy",
@@ -218,60 +224,66 @@ SCHAR* armTypeStrings[NUM_INFANTRY_TYPES]			=
 	"usarmy"
 };
 
-SCHAR* weapNameStrings[NUM_WEAPONS] =
+const SCHAR* weapNameStrings[NUM_WEAPONS] =
 {
-	"none",
-	"thompson",
-	"mp40",
-	"mas",
-	"alliedsatchel",
-	"kar98k",
-	"enfield",
-	"lebel",
-	"m1935a",
-	"luger",
-	"mills36mk1",
-	"frbang",
-	"stigr",
-	"webley",
-	"binocs",
-	"axisknife",
-	"alliedknife",
-	"bren",
-	"mg34",
-	"fm29",
-	"hgr39",
-	"m18",
-	"frsmoke",
-	"ammo",
-	"mas36",
-	"rgg30",
-	"rgvb",
-	"rgmills",
-	"boysmk1",
-	"pzb39",
-	"bridgerepair",
-	"map",
-	"enfieldmk4",
-	"lebelmle",
-	"kar98ks",
-	"axissatchel",
-	"ukltmortar",
-	"frltmortar",
-	"deltmortar",
-	"buildtool",
-	"m1garand",
-	"browningbar",
-	"colt1911",
-	"springfld1903",
-	"gew43",
-	"m1thompson",
-	"mark2",
-	"bazooka",
-	"pzschreck",
-	"m1903a3",
-	"ussmoke",
-	"piat"
+	(SCHAR *)"none",
+	(SCHAR *)"thompson",
+	(SCHAR *)"mp40",
+	(SCHAR *)"mas",
+	(SCHAR *)"alliedsatchel",
+	(SCHAR *)"kar98k",
+	(SCHAR *)"enfield",
+	(SCHAR *)"lebel",
+	(SCHAR *)"m1935a",
+	(SCHAR *)"luger",
+	(SCHAR *)"mills36mk1",
+	(SCHAR *)"frbang",
+	(SCHAR *)"stigr",
+	(SCHAR *)"webley",
+	(SCHAR *)"binocs",
+	(SCHAR *)"axisknife",
+	(SCHAR *)"alliedknife",
+	(SCHAR *)"bren",
+	(SCHAR *)"mg34",
+	(SCHAR *)"fm29",
+	(SCHAR *)"hgr39",
+	(SCHAR *)"m18",
+	(SCHAR *)"frsmoke",
+	(SCHAR *)"ammo",
+	(SCHAR *)"mas36",
+	(SCHAR *)"mas40",
+	(SCHAR *)"rgg30",
+	(SCHAR *)"rgvb",
+	(SCHAR *)"rgmills",
+	(SCHAR *)"boysmk1",
+	(SCHAR *)"pzb39",
+	(SCHAR *)"bridgerepair",
+	(SCHAR *)"map",
+	(SCHAR *)"enfieldmk4",
+	(SCHAR *)"lebelmle",
+	(SCHAR *)"kar98ks",
+	(SCHAR *)"axissatchel",
+	(SCHAR *)"ukltmortar",
+	(SCHAR *)"frltmortar",
+	(SCHAR *)"deltmortar",
+	(SCHAR *)"buildtool",
+	(SCHAR *)"m1garand",
+	(SCHAR *)"browningbar",
+	(SCHAR *)"colt1911",
+	(SCHAR *)"springfld1903",
+	(SCHAR *)"gew43",
+	(SCHAR *)"gew41",
+	(SCHAR *)"m1thompson",
+	(SCHAR *)"mark2",
+	(SCHAR *)"bazooka",
+	(SCHAR *)"pzschreck",
+	(SCHAR *)"m1903a3",
+	(SCHAR *)"ussmoke",
+	(SCHAR *)"piat",
+	(SCHAR *)"stenmk2",
+	(SCHAR *)"m3a1",
+	(SCHAR *)"mp34",
+	(SCHAR *)"fg42g",
 };
 
 class fpFPSVisLoadoutsLoader : public XMLLoader2<fpFPSVisLoadoutsLoader>
@@ -360,12 +372,15 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 		else if (stricmp(buf, "firepointDisplacement") == 0)
 			fpsWeapons[weapon].firepointDisplacement = (FLOAT32) atof (varData);
 
-        else if (stricmp(buf, "firepointZDistance") == 0 || stricmp(buf, "fpYOffset") == 0)
+		else if (stricmp(buf, "firepointZDistance") == 0 || stricmp(buf, "fpYOffset") == 0)
 			fpsWeapons[weapon].firepointZDistance = (FLOAT32) atof (varData);
 		else if (stricmp(buf, "firepointHorizOffset") == 0 || stricmp(buf, "fpxOffset") == 0)
 			fpsWeapons[weapon].firepointHorizOffset = (FLOAT32) atof (varData);
-        else if (stricmp(buf, "firepointVertOffset") == 0 || stricmp(buf, "fpZOffset") == 0)
+		else if (stricmp(buf, "firepointVertOffset") == 0 || stricmp(buf, "fpZOffset") == 0)
 			fpsWeapons[weapon].firepointVertOffset = (FLOAT32) atof (varData);
+
+		else if (stricmp(buf, "grenadeVisDelay") == 0)
+			fpsWeapons[weapon].grenadeVisDelay= (FLOAT32)atof(varData);
 
 		else if (stricmp(buf, "weaponBreathMultiplier") == 0)
 			fpsWeapons[weapon].weaponBreathMultiplier = (FLOAT32) atof (varData);
@@ -402,6 +417,8 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 		else if (stricmp(buf, "staticDeploy") == 0)
 			fpsWeapons[weapon].staticDeploy = strtoul(varData, nullptr, 10);
+		else if (stricmp(buf, "grenadeDelayTime") == 0)
+			fpsWeapons[weapon].grenadeDelayTime = (SINT32)atol(varData);
 		else if (stricmp(buf, "holdfire") == 0)
 			fpsWeapons[weapon].holdfire = (SINT32) atol (varData);
 		else if (stricmp(buf, "sniperGunSight") == 0)
@@ -601,9 +618,12 @@ void fpFPSDataReadFPSFile()
 		return;
 	}
 
-	UINT64 val1 = fpStringHash("piatFile");
 
 	/*
+     
+     TBD - is this test code??
+     
+    UINT64 val1 = fpStringHash("piatFile");
 	UINT64 val1 = fpStringHash("m1garandFile");
 	UINT64 val2 = fpStringHash("colt1911File");
 	UINT64 val3 = fpStringHash("springfld1903File");
@@ -1038,6 +1058,9 @@ void fpFPSDataReadFPSFile()
 		case mas36File_hash:
 			_fpFPSDataReadWeaponFile (MAS36, varData);
 		break;
+		case mas40File_hash:
+			_fpFPSDataReadWeaponFile (MAS40, varData);
+		break;
 		case lebelMleFile_hash:
 			_fpFPSDataReadWeaponFile (LEBELMLE, varData);
 		break;
@@ -1105,6 +1128,9 @@ void fpFPSDataReadFPSFile()
 		case gew43File_hash:
 			_fpFPSDataReadWeaponFile (GEW43, varData);
 		break;
+		case gew41File_hash:
+			_fpFPSDataReadWeaponFile (GEW41, varData);
+		break;
 		case mark2File_hash:
 			_fpFPSDataReadWeaponFile (MARK2, varData);
 		break;
@@ -1158,6 +1184,19 @@ void fpFPSDataReadFPSFile()
 			_fpFPSDataReadWeaponFile (USSMOKE, varData);
 		break;
 
+		case stenmk2File_hash:
+			_fpFPSDataReadWeaponFile(STENMK2, varData);
+		break;
+		case m3a1File_hash:
+			_fpFPSDataReadWeaponFile(M3A1, varData);
+		break;
+		case mp34File_hash:
+			_fpFPSDataReadWeaponFile(MP34, varData);
+		break;
+		case fg42gFile_hash:
+			_fpFPSDataReadWeaponFile (FG42G, varData);
+		break;
+		
 		case crawlSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_CRAWL] = (SCHAR*) strpool (varData);
 		break;
@@ -1215,6 +1254,9 @@ void fpFPSDataReadFPSFile()
 		case paratroopLandingWaterSound_hash:
 			fpsTrooper.paratroopLandingWaterSound = (SCHAR*) strpool (varData);
 		break;
+
+		default:
+			Write_Debug("Unknown hash: '%s' : %llu", buf, hash);
 		}
 	}
 
@@ -1496,7 +1538,7 @@ void fpFPSDataInit ()
 	arms_anim_files[KAR98K][CREEP] = FPS_DIR "kar98k\\animations\\creep-kar98k(1)";
 	arms_anim_files[KAR98K][CRAWL] = FPS_DIR "kar98k\\animations\\crawl-kar98k(30)";
 	arms_anim_files[KAR98K][SPRINT] = FPS_DIR "kar98k\\animations\\sprint-kar98k(15)";
-    arms_anim_files[KAR98K][SIT] = FPS_DIR "kar98k\\animations\\kar98k-lowered(1)";
+	arms_anim_files[KAR98K][SIT] = FPS_DIR "kar98k\\animations\\kar98k-lowered(1)";
 
 	arms_anim_files[GEW43][RELOAD] = FPS_DIR "gewehr\\animations\\reload\\arms_gewehr_reload(72)";
 		weap_anim_files[GEW43][RELOAD] = FPS_DIR "gewehr\\animations\\reload\\weap_gewehr_reload(72)";
@@ -1514,9 +1556,27 @@ void fpFPSDataInit ()
 	arms_anim_files[GEW43][CREEP] = FPS_DIR "gewehr\\animations\\arms_gewehr_neutral(1)";
 	arms_anim_files[GEW43][CRAWL] = FPS_DIR "gewehr\\animations\\arms_gewehr_crawl(30)";
 	arms_anim_files[GEW43][SPRINT] = FPS_DIR "gewehr\\animations\\arms_gewehr_sprint(15)";
-    arms_anim_files[GEW43][SIT] = FPS_DIR "gewehr\\animations\\arms_gewehr_lowered(1)";
+	arms_anim_files[GEW43][SIT] = FPS_DIR "gewehr\\animations\\arms_gewehr_lowered(1)";
 
-    // KAR98KS Sniper animation files
+	arms_anim_files[GEW41][RELOAD]      = FPS_DIR "gewehr41\\animations\\reload\\arms_gewehr41_reload";
+	weap_anim_files[GEW41][RELOAD]      = FPS_DIR "gewehr41\\animations\\reload\\weap_gewehr41_reload";
+	arms_anim_files[GEW41][STAND_FIRE]  = FPS_DIR "gewehr41\\animations\\fire\\arms_gewehr41_fire";
+	weap_anim_files[GEW41][STAND_FIRE]  = FPS_DIR "gewehr41\\animations\\fire\\weap_gewehr41_fire";
+	arms_anim_files[GEW41][CROUCH_FIRE] = FPS_DIR "gewehr41\\animations\\fire\\arms_gewehr41_fire";
+	weap_anim_files[GEW41][CROUCH_FIRE] = FPS_DIR "gewehr41\\animations\\fire\\weap_gewehr41_fire";
+	arms_anim_files[GEW41][AIM_FIRE]    = FPS_DIR "gewehr41\\animations\\fire\\arms_gewehr41_fire_aim";
+	weap_anim_files[GEW41][AIM_FIRE]    = FPS_DIR "gewehr41\\animations\\fire\\weap_gewehr41_fire";
+	arms_anim_files[GEW41][LOWER]       = FPS_DIR "gewehr41\\animations\\arms_gewehr41_lowered";
+	arms_anim_files[GEW41][IDLE]        = FPS_DIR "gewehr41\\animations\\arms_gewehr41_neutral";
+	arms_anim_files[GEW41][KNEEL]       = FPS_DIR "gewehr41\\animations\\arms_gewehr41_neutral";
+	arms_anim_files[GEW41][AIM]         = FPS_DIR "gewehr41\\animations\\arms_gewehr41_aim";
+	arms_anim_files[GEW41][TROT]        = FPS_DIR "gewehr41\\animations\\arms_gewehr41_neutral";
+	arms_anim_files[GEW41][CREEP]       = FPS_DIR "gewehr41\\animations\\arms_gewehr41_neutral";
+	arms_anim_files[GEW41][CRAWL]       = FPS_DIR "gewehr41\\animations\\arms_gewehr41_crawl";
+	arms_anim_files[GEW41][SPRINT]      = FPS_DIR "gewehr41\\animations\\arms_gewehr41_sprint";
+	arms_anim_files[GEW41][SIT]         = FPS_DIR "gewehr41\\animations\\arms_gewehr41_lowered";
+
+	// KAR98KS Sniper animation files
 	//weap_default[KAR98KS] = FPS_DIR "kar98k\\gunbone-kar98k";
 	//clip_default[KAR98KS] = FPS_DIR "kar98k\\gunbone-5roundstripperclip";
 
@@ -1540,8 +1600,8 @@ void fpFPSDataInit ()
 	// ENFIELD animation files
 	arms_anim_files[ENFIELD][RELOAD] = FPS_DIR "enfield\\animations\\reload\\armsmesh-enfield-reload(115)";
 	weap_anim_files[ENFIELD][RELOAD] = FPS_DIR "enfield\\animations\\reload\\enfield-reload(115)";
-	arms_anim_files[ENFIELD][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\armsmesh-enfield-recycle(60)";
-	weap_anim_files[ENFIELD][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\enfield-recycle(60)";
+	arms_anim_files[ENFIELD][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\armsmesh-enfield-recycle(30)";
+	weap_anim_files[ENFIELD][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\enfield-recycle(30)";
 	arms_anim_files[ENFIELD][STAND_FIRE] = FPS_DIR "enfield\\animations\\fire\\arms-enfield-fire(3)";
 	arms_anim_files[ENFIELD][CROUCH_FIRE] = FPS_DIR "enfield\\animations\\fire\\crouch-enfield-fire(3)";
 	arms_anim_files[ENFIELD][AIM_FIRE] = FPS_DIR "enfield\\animations\\fire\\aim-enfield-fire(3)";
@@ -1611,8 +1671,8 @@ void fpFPSDataInit ()
 	// Endfeld Mark 4 Snipper
 	arms_anim_files[ENFIELDMK4][RELOAD] = FPS_DIR "enfield\\animations\\reload\\armsmesh-enfield-reload(115)";
 		weap_anim_files[ENFIELDMK4][RELOAD] = FPS_DIR "enfield\\animations\\reload\\enfield-reload(115)";
-	arms_anim_files[ENFIELDMK4][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\armsmesh-enfield-recycle(60)";
-		weap_anim_files[ENFIELDMK4][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\enfield-recycle(60)";
+	arms_anim_files[ENFIELDMK4][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\armsmesh-enfield-recycle(30)";
+		weap_anim_files[ENFIELDMK4][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\enfield-recycle(30)";
 	arms_anim_files[ENFIELDMK4][STAND_FIRE] = FPS_DIR "enfield\\animations\\fire\\arms-enfield-fire(3)";
 	arms_anim_files[ENFIELDMK4][CROUCH_FIRE] = FPS_DIR "enfield\\animations\\fire\\crouch-enfield-fire(3)";
     arms_anim_files[ENFIELDMK4][AIM_FIRE] = FPS_DIR "enfield\\animations\\fire\\aim-enfield-fire(3)";
@@ -1727,6 +1787,24 @@ void fpFPSDataInit ()
 	arms_anim_files[MAS36][SPRINT] = FPS_DIR "mas36\\animations\\sprint";
 	arms_anim_files[MAS36][SIT] = FPS_DIR "mas36\\animations\\lowered";
 
+	arms_anim_files[MAS40][RELOAD]      = FPS_DIR "mas40\\animations\\reload\\arms_mas40_reloading";
+	weap_anim_files[MAS40][RELOAD]      = FPS_DIR "mas40\\animations\\reload\\weap_mas40_reloading";
+	arms_anim_files[MAS40][STAND_FIRE]  = FPS_DIR "mas40\\animations\\fire\\arms_mas40_fire";
+	weap_anim_files[MAS40][STAND_FIRE]  = FPS_DIR "mas40\\animations\\fire\\weap_mas40_fire";
+	arms_anim_files[MAS40][CROUCH_FIRE] = FPS_DIR "mas40\\animations\\fire\\arms_mas40_fire";
+	weap_anim_files[MAS40][CROUCH_FIRE] = FPS_DIR "mas40\\animations\\fire\\weap_mas40_fire";
+	arms_anim_files[MAS40][AIM_FIRE]    = FPS_DIR "mas40\\animations\\fire\\arms_mas40_fire_aim";
+	weap_anim_files[MAS40][AIM_FIRE]    = FPS_DIR "mas40\\animations\\fire\\weap_mas40_fire";
+	arms_anim_files[MAS40][LOWER]       = FPS_DIR "mas40\\animations\\arms_mas40_lowered";
+	arms_anim_files[MAS40][IDLE]        = FPS_DIR "mas40\\animations\\arms_mas40_neutral";
+	arms_anim_files[MAS40][KNEEL]       = FPS_DIR "mas40\\animations\\arms_mas40_neutral";
+	arms_anim_files[MAS40][AIM]         = FPS_DIR "mas40\\animations\\arms_mas40_aim";
+	arms_anim_files[MAS40][TROT]        = FPS_DIR "mas40\\animations\\arms_mas40_neutral";
+	arms_anim_files[MAS40][CREEP]       = FPS_DIR "mas40\\animations\\arms_mas40_neutral";
+	arms_anim_files[MAS40][CRAWL]       = FPS_DIR "mas40\\animations\\arms_mas40_crawl";
+	arms_anim_files[MAS40][SPRINT]      = FPS_DIR "mas40\\animations\\arms_mas40_sprint";
+	arms_anim_files[MAS40][SIT]         = FPS_DIR "mas40\\animations\\arms_mas40_lowered";
+
 	// M1935A animation files
 	arms_anim_files[M1935A][RELOAD] = FPS_DIR "m1935a\\animations\\reload\\armsmesh-m1935a-reload(65)";
 	weap_anim_files[M1935A][RELOAD] = FPS_DIR "m1935a\\animations\\reload\\m1935a-reload(65)";
@@ -1804,11 +1882,8 @@ void fpFPSDataInit ()
 	// MILLS36MK1 animation files
 	arms_anim_files[MILLS36MK1][RELOAD] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[MILLS36MK1][STAND_FIRE] = FPS_DIR "mills36mk1\\animations\\fire\\charge-arms-mills36mk1(45)";
-		weap_anim_files[MILLS36MK1][STAND_FIRE] = FPS_DIR "mills36mk1\\animations\\fire\\charge-mills36mk1(45)";
-
-	arms_anim_files[MILLS36MK1][THROW] = FPS_DIR "mills36mk1\\animations\\fire\\arms_fire(48)";
-		weap_anim_files[MILLS36MK1][THROW] = FPS_DIR "mills36mk1\\animations\\fire\\weap_fire(48)";
-
+	weap_anim_files[MILLS36MK1][STAND_FIRE] = FPS_DIR "mills36mk1\\animations\\fire\\charge-mills36mk1(45)";
+	arms_anim_files[MILLS36MK1][THROW] = FPS_DIR "mills36mk1\\animations\\fire\\fire-arms-mills36mk1(20)";
 	arms_anim_files[MILLS36MK1][LOWER] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[MILLS36MK1][IDLE] = FPS_DIR "mills36mk1\\animations\\mills36mk1-stand(1)";
 	arms_anim_files[MILLS36MK1][KNEEL] = FPS_DIR "mills36mk1\\animations\\mills36mk1-stand(1)";
@@ -1823,11 +1898,8 @@ void fpFPSDataInit ()
 	// FRBANG animation files
 	arms_anim_files[FRBANG][RELOAD] = FPS_DIR "frenchgrenade\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[FRBANG][STAND_FIRE] = FPS_DIR "frenchgrenade\\animations\\fire\\charge-arms-mills36mk1(45)";
-		weap_anim_files[FRBANG][STAND_FIRE] = FPS_DIR "frenchgrenade\\animations\\fire\\charge-mills36mk1(45)";
-
-	arms_anim_files[FRBANG][THROW] = FPS_DIR "frenchgrenade\\animations\\fire\\arms_fire(48)";
-		weap_anim_files[FRBANG][THROW] = FPS_DIR "frenchgrenade\\animations\\fire\\weap_fire(48)";
-
+	weap_anim_files[FRBANG][STAND_FIRE] = FPS_DIR "frenchgrenade\\animations\\fire\\charge-mills36mk1(45)";
+	arms_anim_files[FRBANG][THROW] = FPS_DIR "frenchgrenade\\animations\\fire\\fire-arms-mills36mk1(20)";
 	arms_anim_files[FRBANG][LOWER] = FPS_DIR "frenchgrenade\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[FRBANG][IDLE] = FPS_DIR "frenchgrenade\\animations\\mills36mk1-stand(1)";
 	arms_anim_files[FRBANG][KNEEL] = FPS_DIR "frenchgrenade\\animations\\mills36mk1-stand(1)";
@@ -1846,9 +1918,7 @@ void fpFPSDataInit ()
 
 	arms_anim_files[STIGR][STAND_FIRE] = FPS_DIR "stigr\\animations\\fire\\charge-arms-stigr(55)";
 
-	//arms_anim_files[STIGR][THROW] = FPS_DIR "stigr\\animations\\fire\\fire-arms-stigr(20)";
-	arms_anim_files[STIGR][THROW] = FPS_DIR "stigr\\animations\\fire\\arms_fire(48)";
-		//weap_anim_files[STIGR][THROW] = FPS_DIR "stigr\\animations\\fire\\weap_m8smoke(48)";
+	arms_anim_files[STIGR][THROW] = FPS_DIR "stigr\\animations\\fire\\fire-arms-stigr(20)";
 
 	arms_anim_files[STIGR][LOWER] = FPS_DIR "stigr\\animations\\stigr-lowered(1)";
 
@@ -1869,8 +1939,7 @@ void fpFPSDataInit ()
 
 	arms_anim_files[HGR39][STAND_FIRE] = FPS_DIR "stigr\\animations\\fire\\charge-arms-stigr(55)";
 
-	arms_anim_files[HGR39][THROW] = FPS_DIR "stigr\\animations\\fire\\arms_fire(48)";
-		//weap_anim_files[HGR39][THROW] = FPS_DIR "stigr\\animations\\fire\\weap_m8smoke(48)";
+	arms_anim_files[HGR39][THROW] = FPS_DIR "stigr\\animations\\fire\\fire-arms-stigr(20)";
 
 	arms_anim_files[HGR39][LOWER] = FPS_DIR "stigr\\animations\\stigr-lowered(1)";
 
@@ -1889,8 +1958,7 @@ void fpFPSDataInit ()
 	// M18 animation files
 	arms_anim_files[M18][RELOAD] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[M18][STAND_FIRE] = FPS_DIR "m18\\animations\\fire\\armsCharge";
-	arms_anim_files[M18][THROW] = FPS_DIR "m8smoke\\animations\\fire\\arms_m8smoke(48)";
-		weap_anim_files[M18][THROW] = FPS_DIR "m8smoke\\animations\\fire\\weap_m8smoke(48)";
+	arms_anim_files[M18][THROW] = FPS_DIR "m18\\animations\\fire\\m18_armmesh_fire(20)";
 	arms_anim_files[M18][LOWER] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[M18][IDLE] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
 	arms_anim_files[M18][KNEEL] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
@@ -1906,8 +1974,7 @@ void fpFPSDataInit ()
 	arms_anim_files[MARK2][RELOAD] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[MARK2][STAND_FIRE] = FPS_DIR "mk2grenade\\animations\\fire\\arms_mk2_charge(30)";
 		weap_anim_files[MARK2][STAND_FIRE] = FPS_DIR "mk2grenade\\animations\\fire\\weap_mk2_charge(30)";
-	arms_anim_files[MARK2][THROW] = FPS_DIR "mk2grenade\\animations\\fire\\arms_fire(48)";
-		weap_anim_files[MARK2][THROW] = FPS_DIR "mk2grenade\\animations\\fire\\weap_fire(48)";
+	arms_anim_files[MARK2][THROW] = FPS_DIR "m18\\animations\\fire\\m18_armmesh_fire(20)";
 	arms_anim_files[MARK2][LOWER] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[MARK2][IDLE] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
 	arms_anim_files[MARK2][KNEEL] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
@@ -1923,10 +1990,7 @@ void fpFPSDataInit ()
 	arms_anim_files[FRSMOKE][RELOAD] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[FRSMOKE][STAND_FIRE] = FPS_DIR "frsmoke\\animations\\fire\\armsCharge";
 	weap_anim_files[FRSMOKE][STAND_FIRE] = FPS_DIR "frsmoke\\animations\\fire\\weapCharge";
-
-	arms_anim_files[FRSMOKE][THROW] = FPS_DIR "frenchgrenade\\animations\\fire\\arms_fire(48)";
-		weap_anim_files[FRSMOKE][THROW] = FPS_DIR "frenchgrenade\\animations\\fire\\weap_fire(48)";
-
+	arms_anim_files[FRSMOKE][THROW] = FPS_DIR "m18\\animations\\fire\\m18_armmesh_fire(20)";
 	arms_anim_files[FRSMOKE][LOWER] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[FRSMOKE][IDLE] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
 	arms_anim_files[FRSMOKE][KNEEL] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
@@ -1940,10 +2004,9 @@ void fpFPSDataInit ()
 
 	// USSMOKE animation files
 	arms_anim_files[USSMOKE][RELOAD] = FPS_DIR "m8smoke\\animations\\arms_m8smoke_lowered(1)";
-	arms_anim_files[USSMOKE][STAND_FIRE] = FPS_DIR "m8smoke\\animations\\fire\\arms_m8smoke(48)";
-		weap_anim_files[USSMOKE][STAND_FIRE] = FPS_DIR "m8smoke\\animations\\fire\\weap_m8smoke(48)";
-	arms_anim_files[USSMOKE][THROW] = FPS_DIR "m8smoke\\animations\\fire\\arms_m8smoke(48)";
-		weap_anim_files[USSMOKE][THROW] = FPS_DIR "m8smoke\\animations\\fire\\weap_m8smoke(48)";
+	arms_anim_files[USSMOKE][STAND_FIRE] = FPS_DIR "m8smoke\\animations\\fire\\arms_m8smoke_charge(45)";
+		weap_anim_files[USSMOKE][STAND_FIRE] = FPS_DIR "m8smoke\\animations\\fire\\weap_m8smoke_charge(45)";
+	arms_anim_files[USSMOKE][THROW] = FPS_DIR "m8smoke\\animations\\fire\\arms_m8smoke_fire(25)";
 	arms_anim_files[USSMOKE][LOWER] = FPS_DIR "m8smoke\\animations\\arms_m8smoke_lowered(1)";
 	arms_anim_files[USSMOKE][IDLE] = FPS_DIR "m8smoke\\animations\\arms_m8smoke_neutral(1)";
 	arms_anim_files[USSMOKE][KNEEL] = FPS_DIR "m8smoke\\animations\\arms_m8smoke_neutral(1)";
@@ -2217,8 +2280,8 @@ void fpFPSDataInit ()
     // RG_MILLS (ENFIELD based british rifle grenade) animation files
 	arms_anim_files[RG_MILLS][RELOAD] = FPS_DIR "enfield\\animations\\reload\\armsmesh-enfield-reload(115)";
 	weap_anim_files[RG_MILLS][RELOAD] = FPS_DIR "enfield\\animations\\reload\\enfield-reload(115)";
-	arms_anim_files[RG_MILLS][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\armsmesh-enfield-recycle(60)";
-	weap_anim_files[RG_MILLS][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\enfield-recycle(60)";
+	arms_anim_files[RG_MILLS][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\armsmesh-enfield-recycle(30)";
+	weap_anim_files[RG_MILLS][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\enfield-recycle(30)";
 	arms_anim_files[RG_MILLS][DEPLOYING] = FPS_DIR "mills\\animations\\armsmesh-mills-cupattach";
 	weap_anim_files[RG_MILLS][DEPLOYING] = FPS_DIR "mills\\animations\\gunmesh-mills-cupattach";
 	arms_anim_files[RG_MILLS][UNDEPLOYING] = FPS_DIR "mills\\animations\\armsmesh-mills-cupdetach";
@@ -2359,6 +2422,91 @@ void fpFPSDataInit ()
 
 	arms_anim_files[PZB39][RECYCLE] = FPS_DIR "pzb39\\animations\\reload\\armsmesh-reload";
 	weap_anim_files[PZB39][RECYCLE] = FPS_DIR "pzb39\\animations\\reload\\gunmesh-reload";
+
+	weap_anim_files[STENMK2][RELOAD]      = FPS_DIR "stenmk2\\Weapon animations\\weap_sten_reloading";
+	weap_anim_files[STENMK2][STAND_FIRE]  = FPS_DIR "stenmk2\\Weapon animations\\weap_sten_fire";
+	weap_anim_files[STENMK2][CROUCH_FIRE] = FPS_DIR "stenmk2\\Weapon animations\\weap_sten_fire";
+	weap_anim_files[STENMK2][AIM_FIRE]    = FPS_DIR "stenmk2\\Weapon animations\\weap_sten_fire";
+	arms_anim_files[STENMK2][RELOAD]      = FPS_DIR "stenmk2\\Arms animations\\arms_sten_reloading";
+	arms_anim_files[STENMK2][STAND_FIRE]  = FPS_DIR "stenmk2\\Arms animations\\arms_sten_fire";
+	arms_anim_files[STENMK2][CROUCH_FIRE] = FPS_DIR "stenmk2\\Arms animations\\arms_sten_fire";
+	arms_anim_files[STENMK2][AIM_FIRE]    = FPS_DIR "stenmk2\\Arms animations\\arms_sten_aimfire";
+	arms_anim_files[STENMK2][LOWER]       = FPS_DIR "stenmk2\\Arms animations\\arms_sten_lowered";
+	arms_anim_files[STENMK2][IDLE]        = FPS_DIR "stenmk2\\Arms animations\\arms_sten_neutral";
+	arms_anim_files[STENMK2][KNEEL]       = FPS_DIR "stenmk2\\Arms animations\\arms_sten_neutral";
+	arms_anim_files[STENMK2][AIM]         = FPS_DIR "stenmk2\\Arms animations\\arms_sten_aim";
+	arms_anim_files[STENMK2][AIM_SMG]     = FPS_DIR "stenmk2\\Arms animations\\arms_sten_aim";
+	arms_anim_files[STENMK2][TROT]        = FPS_DIR "stenmk2\\Arms animations\\arms_sten_neutral";
+	arms_anim_files[STENMK2][CREEP]       = FPS_DIR "stenmk2\\Arms animations\\arms_sten_neutral";
+	arms_anim_files[STENMK2][CRAWL]       = FPS_DIR "stenmk2\\Arms animations\\arms_sten_crawl";
+	arms_anim_files[STENMK2][SPRINT]      = FPS_DIR "stenmk2\\Arms animations\\arms_sten_sprint";
+	arms_anim_files[STENMK2][SIT]         = FPS_DIR "stenmk2\\Arms animations\\arms_sten_lowered";
+
+	weap_anim_files[M3A1][RELOAD]      = FPS_DIR "m3a1\\Weapon animations\\weap_greasegun_reloading";
+	weap_anim_files[M3A1][STAND_FIRE]  = FPS_DIR "m3a1\\Weapon animations\\weap_greasegun_fire";
+	weap_anim_files[M3A1][CROUCH_FIRE] = FPS_DIR "m3a1\\Weapon animations\\weap_greasegun_fire";
+	weap_anim_files[M3A1][AIM_FIRE]    = FPS_DIR "m3a1\\Weapon animations\\weap_greasegun_fire";
+	arms_anim_files[M3A1][RELOAD]      = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_reloading";
+	arms_anim_files[M3A1][STAND_FIRE]  = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_fire";
+	arms_anim_files[M3A1][CROUCH_FIRE] = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_fire";
+	arms_anim_files[M3A1][AIM_FIRE]    = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_aimfire";
+	arms_anim_files[M3A1][LOWER]       = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_lowered";
+	arms_anim_files[M3A1][IDLE]        = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_neutral";
+	arms_anim_files[M3A1][KNEEL]       = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_neutral";
+	arms_anim_files[M3A1][AIM]         = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_aim";
+	arms_anim_files[M3A1][AIM_SMG]     = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_aim";
+	arms_anim_files[M3A1][TROT]        = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_neutral";
+	arms_anim_files[M3A1][CREEP]       = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_neutral";
+	arms_anim_files[M3A1][CRAWL]       = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_crawl";
+	arms_anim_files[M3A1][SPRINT]      = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_sprint";
+	arms_anim_files[M3A1][SIT]         = FPS_DIR "m3a1\\Arms animations\\arms_greasegun_lowered";
+
+	weap_anim_files[MP34][RELOAD]      = FPS_DIR "mp34\\Weapon animations\\weap_mp34_reloading";
+	weap_anim_files[MP34][STAND_FIRE]  = FPS_DIR "mp34\\Weapon animations\\weap_mp34_fire";
+	weap_anim_files[MP34][CROUCH_FIRE] = FPS_DIR "mp34\\Weapon animations\\weap_mp34_fire";
+	weap_anim_files[MP34][AIM_FIRE]    = FPS_DIR "mp34\\Weapon animations\\weap_mp34_fire";
+	arms_anim_files[MP34][RELOAD]      = FPS_DIR "mp34\\Arms animations\\arms_mp34_reloading";
+	arms_anim_files[MP34][STAND_FIRE]  = FPS_DIR "mp34\\Arms animations\\arms_mp34_fire";
+	arms_anim_files[MP34][CROUCH_FIRE] = FPS_DIR "mp34\\Arms animations\\arms_mp34_fire";
+	arms_anim_files[MP34][AIM_FIRE]    = FPS_DIR "mp34\\Arms animations\\arms_mp34_aimfire";
+	arms_anim_files[MP34][LOWER]       = FPS_DIR "mp34\\Arms animations\\arms_mp34_lowered";
+	arms_anim_files[MP34][IDLE]        = FPS_DIR "mp34\\Arms animations\\arms_mp34_neutral";
+	arms_anim_files[MP34][KNEEL]       = FPS_DIR "mp34\\Arms animations\\arms_mp34_neutral";
+	arms_anim_files[MP34][AIM]         = FPS_DIR "mp34\\Arms animations\\arms_mp34_aim";
+	arms_anim_files[MP34][AIM_SMG]     = FPS_DIR "mp34\\Arms animations\\arms_mp34_aim";
+	arms_anim_files[MP34][TROT]        = FPS_DIR "mp34\\Arms animations\\arms_mp34_neutral";
+	arms_anim_files[MP34][CREEP]       = FPS_DIR "mp34\\Arms animations\\arms_mp34_neutral";
+	arms_anim_files[MP34][CRAWL]       = FPS_DIR "mp34\\Arms animations\\arms_mp34_crawl";
+	arms_anim_files[MP34][SPRINT]      = FPS_DIR "mp34\\Arms animations\\arms_mp34_sprint";
+	arms_anim_files[MP34][SIT]         = FPS_DIR "mp34\\Arms animations\\arms_mp34_lowered";
+
+	weap_anim_files[FG42G][RELOAD]          = FPS_DIR "fg42g\\Weapon Animations\\weap_FG42_reload";
+	weap_anim_files[FG42G][STAND_FIRE]      = FPS_DIR "fg42g\\Weapon Animations\\weap_FG42_fire";
+	weap_anim_files[FG42G][AIM_FIRE]        = FPS_DIR "fg42g\\Weapon Animations\\weap_FG42_fire";
+	weap_anim_files[FG42G][CROUCH_FIRE]     = FPS_DIR "fg42g\\Weapon Animations\\weap_FG42_fire";
+	weap_anim_files[FG42G][DEPLOYING]       = FPS_DIR "fg42g\\Weapon Animations\\weap_FG42_deploy";
+	weap_anim_files[FG42G][DEPLOYED]        = FPS_DIR "fg42g\\Weapon Animations\\weap_FG42_deployed";
+	weap_anim_files[FG42G][UNDEPLOYING]     = FPS_DIR "fg42g\\Weapon Animations\\weap_FG42_deploy";
+	weap_anim_files[FG42G][DEPLOYED_FIRE]   = FPS_DIR "fg42g\\Weapon Animations\\weap_FG42_deployed";
+	weap_anim_files[FG42G][DEPLOYED_RELOAD] = FPS_DIR "fg42g\\Weapon Animations\\weap_FG42_reloadDeployed";
+	arms_anim_files[FG42G][RELOAD]          = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_reload";
+	arms_anim_files[FG42G][STAND_FIRE]      = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_fire";
+	arms_anim_files[FG42G][AIM_FIRE]        = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_aimFire";
+	arms_anim_files[FG42G][CROUCH_FIRE]     = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_fire";
+	arms_anim_files[FG42G][LOWER]           = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_lowered";
+	arms_anim_files[FG42G][IDLE]            = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_neutral";
+	arms_anim_files[FG42G][KNEEL]           = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_neutral";
+	arms_anim_files[FG42G][AIM]             = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_aim";
+	arms_anim_files[FG42G][TROT]            = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_neutral";
+	arms_anim_files[FG42G][CREEP]           = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_neutral";
+	arms_anim_files[FG42G][CRAWL]           = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_crawl";
+	arms_anim_files[FG42G][SPRINT]          = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_sprint";
+	arms_anim_files[FG42G][SIT]             = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_neutral";
+	arms_anim_files[FG42G][DEPLOYING]       = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_deploy";
+	arms_anim_files[FG42G][DEPLOYED]        = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_deployed";
+	arms_anim_files[FG42G][UNDEPLOYING]     = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_deploy";
+	arms_anim_files[FG42G][DEPLOYED_FIRE]   = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_fireDeployed";
+	arms_anim_files[FG42G][DEPLOYED_RELOAD] = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_reload";
 
 	// BRIDGE_REPAIR animation files
 	arms_anim_files[BRIDGE_REPAIR][STAND_FIRE] = FPS_DIR "satchel\\animations\\fire\\satchel-fire(1)";

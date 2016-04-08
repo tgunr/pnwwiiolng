@@ -90,7 +90,7 @@ _listAddItemBefore(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node)
 	node->prev = inpoint->prev;
 	inpoint->prev = node;
 
-	if (node->prev->next != nullptr)
+	if (node->prev != nullptr)
 		node->prev->next = node;
 	else
 		*list = node;

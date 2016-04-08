@@ -15,27 +15,9 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#if _MSC_VER >= 1400
-#else
-#ifdef USE_LOCAL_STRNLEN
-size_t strnlen(const char* string, size_t maxlen)
-{
-	const char* s;
-	size_t i;
-
-	if (! string)
-		return 0;
-
-	for (s = string,i = 0
-		;*s == '\0' && i < maxlen
-		;s++, i++)
-	;
-
-	return i;
-
-}
-#endif
-#endif
+#include <ctype.h>
+#include "str/stringLib.h"
+#include <string.h>
 
 #if platOS != OS_WIN32
 
@@ -115,3 +97,4 @@ char* strescape(char* d,const char* s, char c)
 	*curr = '\0';
 	return d;
 }
+

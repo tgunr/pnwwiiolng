@@ -118,7 +118,7 @@ public:
 	bool evaluateMissionPacket();
 
 	// Exit the brigade/mission/etc you are currently on, if any
-	virtual void ExitBrigade(UINT32 state) OVERRIDE_FN;
+	virtual void ExitBrigade(UINT32 state) override;
 	void ExitMission();
 
 	bool fillMissionPacket(class Mission*);
@@ -184,14 +184,14 @@ public:
 
 	// If persona has been flagged with updateChat(), sends the
 	// chat host a persona update for this persona. Called automatically
-	void sendUpdateToChat();
+	void sendUpdateToChat(bool force = false);
 
 	void SetBranch(BRANCH_ENUM newBranch);
 	void SetBrigade(Brigade* newBrig);
 	void SetChecksumIsDirty(bool toState) { m_flags.checksumsDirty = toState; }
-	virtual void SetCountry(WWII_COUNTRY newCountry, WWII_SIDE newSide) OVERRIDE_FN;
+	virtual void SetCountry(WWII_COUNTRY newCountry, WWII_SIDE newSide) override;
 	void SetDecal(UINT8 newDecal) { m_mp.m_vehicle.decal = newDecal; }
-	virtual bool SetInstance(const Instance::Descriptor& _instance) OVERRIDE_FN;
+	virtual bool SetInstance(const Instance::Descriptor& _instance) override;
 	void SetGroups(const char* groupList);
 	void SetMeteredAccess(UINT32 newMinuteBalance);
 	void SetMission(Mission* to);
@@ -218,7 +218,7 @@ public:
 	void unsetMission() { m_mission = nullptr; m_permissionMask &= ~MISSION_LEADER; }
 
 	// Notify chat of a persona status/whereabouts change
-	void updateChat();
+	void updateChat(bool immediate = false);
 
 	// Send the latest neccesary CP updates
 	void updateMap();

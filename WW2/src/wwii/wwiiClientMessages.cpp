@@ -566,7 +566,6 @@ Teul::Connection::expire()
 {
 	/// Maximum of 60 seconds per connection attempt.
 	static const TeulTimeMS EXPIRY_TIME = 60 * 1000;
-	const TeulTimeMS cutoff = teulClock64 - EXPIRY_TIME;
 	for ( std::map<SINT32, Teul::Connection*>::iterator it = _ConnectionsByTeulIndex.begin(); it != _ConnectionsByTeulIndex.end(); ++it )
 	{
 		Teul::Connection* conn = it->second;
@@ -873,7 +872,7 @@ wwiiServiceQueue_WWII_ERROR_INFO()
 void
 wwiiOhYeah(const UCHAR withCode)
 {
-	const FULL_OBJ_ID funny = { { withCode, -withCode }, 42, 0, 0 };
+	const FULL_OBJ_ID funny = { { (SINT16)withCode, (SINT16)-withCode }, 42, 0, 0 };
 
 	chatSendLocality(PlayerClient()->ChatConnection(), 0, 39, 40, 41, funny);
 }

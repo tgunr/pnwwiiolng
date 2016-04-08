@@ -268,7 +268,7 @@ static void FindGrassParams2(std::vector<float>& params, int type, const Vec3d& 
 {
     logTimerBeginMacro();
 
-    int texture;
+    int texture = 0;
     float scalefactor;
 
     unsigned int seed = SuperFastHash((const char*)&pos, sizeof(Vec3d));
@@ -307,14 +307,6 @@ static void FindGrassParams2(std::vector<float>& params, int type, const Vec3d& 
     }
     else if(type == SpeedGrassDeprecated::type_fltgrass)
     {
-        static float grassscale[16] =
-        {
-            0.50f, 1.00f, 1.00f, 1.00f,
-            0.35f, 1.00f, 1.00f, 1.00f,
-            1.00f, 1.00f, 1.00f, 1.00f,
-            0.35f, 1.00f, 1.00f, 1.00f
-        };
-
         static bool firsttime = true;
         static std::vector<int> grasschoices;
 
@@ -396,53 +388,53 @@ static void GetUV(int r, float& u1, float& v1, float& u2, float& v2)
     static piUV uv[16][2] =
     {
         // 0
-        0.0f, 0.0f,
-        0.25f, 0.25f,
+        {{0.0f, 0.0f},
+            {0.25f, 0.25f}},
         // 1
-        0.25f, 0.0f,
-        0.5f, 0.25f,
+        {{0.25f, 0.0f},
+            {0.5f, 0.25f}},
         // 2
-        0.5f, 0.0f,
-        0.75f, 0.25f,
+        {{0.5f, 0.0f},
+            {0.75f, 0.25f}},
         // 3
-        0.75f, 0.0f,
-        1.0f, 0.25f,
+        {{0.75f, 0.0f},
+            {1.0f, 0.25f}},
         // 4
-        0.0f, 0.25f,
-        0.25f, 0.5f,
+        {{0.0f, 0.25f},
+            {0.25f, 0.5f}},
         // 5
-        0.25f, 0.25f,
-        0.5f, 0.5f,
+        {{0.25f, 0.25f},
+            {0.5f, 0.5f}},
         // 6
-        0.5f, 0.25f,
-        0.75f, 0.5f,
+        {{0.5f, 0.25f},
+            {0.75f, 0.5f}},
         // 7
-        0.75f, 0.25f,
-        1.0f, 0.5f,
+        {{0.75f, 0.25f},
+            {1.0f, 0.5f}},
         // 8
-        0.0f, 0.5f,
-        0.25f, 0.75f,
+        {{0.0f, 0.5f},
+            {0.25f, 0.75f}},
         // 9
-        0.25f, 0.5f,
-        0.5f, 0.75f,
+        {{0.25f, 0.5f},
+            {0.5f, 0.75f}},
         // 10
-        0.5f, 0.5f,
-        0.75f, 0.75f,
+        {{0.5f, 0.5f},
+            {0.75f, 0.75f}},
         // 11
-        0.75f, 0.5f,
-        1.0f, 0.75f,
+        {{0.75f, 0.5f},
+            {1.0f, 0.75f}},
         // 12
-        0.0f, 0.75f,
-        0.25f, 1.0f,
+        {{0.0f, 0.75f},
+            {0.25f, 1.0f}},
         // 13
-        0.25f, 0.75f,
-        0.5f, 1.0f,
+        {{0.25f, 0.75f},
+            {0.5f, 1.0f}},
         // 14
-        0.5f, 0.75f,
-        0.75f, 1.0f,
+        {{0.5f, 0.75f},
+            {0.75f, 1.0f}},
         // 15
-        0.75f, 0.75f,
-        1.0f, 1.0f,
+        {{0.75f, 0.75f},
+            {1.0f, 1.0f}}
     };
 
     static float offset = 0.0009765625f; // 1 / 1024
@@ -492,8 +484,6 @@ void SpeedGrassDeprecated::CreatePatch(const char* key,
 
     patch.density = density;
 
-    int positionoffset = 0;
-
     patch.vertexcount = 0;
 
     float maxdist = 0;
@@ -518,8 +508,6 @@ void SpeedGrassDeprecated::CreatePatch(const char* key,
 
         CreateGrassQuads(patch, Vec3d(xx, yy, 0.0), 1.0f);
     }
-
-    int zsize = patch.density * number_of_quads * NUMBER_OF_CORNERS;
 
     patch.vboid = vbo->AddBuffer((void*)&patch.params[0], patch.params.size() * sizeof(float), true, oglVertexBuffer::MODE_SYSTEM_RAM);
 
@@ -698,7 +686,6 @@ void SpeedGrass::Draw()
 
     grassMaterial->Apply();
 
-    int offset = 0;
     static std::vector<unsigned char> buffer;
 
     if(buffer.empty())
@@ -708,9 +695,6 @@ void SpeedGrass::Draw()
 
     int paramoffset = 0;
     int totalbytes = 0;
-    int buffoffset = 0;
-
-    int oldlod = 0;
 
     for(unsigned int i = 0; i < drawlist.size(); ++i)
     {
@@ -1034,7 +1018,6 @@ void SpeedGrassDeprecated::DrawForCustomShadows()
     ogl::Disable();
 
     oglSetWorldMatrix(&IdentityMatrix);
-    int createcount = 0;
 
     static glslUniform* alphatest = nullptr;
 
@@ -1140,7 +1123,6 @@ void SpeedGrassDeprecated::DrawForShadows()
     ogl::Disable();
 
     oglSetWorldMatrix(&IdentityMatrix);
-    int createcount = 0;
 
     static glslUniform* alphatest = nullptr;
 
@@ -1428,7 +1410,6 @@ void SpeedGrassDeprecated::DrawCustom()
     ogl::Disable();
 
     oglSetWorldMatrix(&IdentityMatrix);
-    int createcount = 0;
 
     static glslUniform* alphatest = nullptr;
 
@@ -1529,7 +1510,6 @@ void SpeedGrassDeprecated::Draw()
     ogl::Disable();
 
     oglSetWorldMatrix(&IdentityMatrix);
-    int createcount = 0;
 
     static glslUniform* alphatest = nullptr;
 
@@ -1709,7 +1689,6 @@ void SpeedGrassDeprecated::LoadBMP(const char* filename,
     piLockTextureMemorySurface(id, 0, &pisd);
 
     char* cptr;
-    int bitsPitch = pisd.Width * 3;
 
     int density = 0;
 
@@ -1727,8 +1706,6 @@ void SpeedGrassDeprecated::LoadBMP(const char* filename,
     int halfw = pisd.Width / 2;
     int halfh = pisd.Height / 2;
 
-    int positionoffset = 0;
-
     patch.w = pisd.Width;
     patch.h = pisd.Height;
 
@@ -1740,7 +1717,6 @@ void SpeedGrassDeprecated::LoadBMP(const char* filename,
     int RedMask     = pisd.PixelFormat.dwRBitMask;
     int GreenMask   = pisd.PixelFormat.dwGBitMask;
     int BlueMask    = pisd.PixelFormat.dwBBitMask;
-    int AlphaMask   = pisd.PixelFormat.dwRGBAlphaBitMask;
 
     int RedBits     = 8 - piFindBitCount(RedMask);
     int RedShift    = piFindBitShift(RedMask);
@@ -1748,8 +1724,6 @@ void SpeedGrassDeprecated::LoadBMP(const char* filename,
     int GreenShift  = piFindBitShift(GreenMask);
     int BlueBits    = 8 - piFindBitCount(BlueMask);
     int BlueShift   = piFindBitShift(BlueMask);
-    int AlphaBits   = piFindBitCount(AlphaMask);
-    int AlphaShift  = piFindBitShift(AlphaMask);
 
     unsigned int color = 0;
     unsigned int texsize = texchoices.size() - 1;
@@ -1842,8 +1816,6 @@ void SpeedGrassDeprecated::LoadBMP(const char* filename,
     }
 
     patch.density = density;
-
-    int zsize = patch.density * number_of_quads * NUMBER_OF_CORNERS;
 
     patch.vboid = vbo->AddBuffer((void*)&patch.params[0], patch.params.size() * sizeof(float), true, oglVertexBuffer::MODE_SYSTEM_RAM);
 
@@ -3161,9 +3133,6 @@ bool SpeedGrassDeprecated::GrassFromHeightMap(CollideQue* que)
 
     float x, y;
 
-    int coordx = 0;
-    int coordy = 1;
-
     index = 0;
 
     size_t code = que->key;
@@ -3227,20 +3196,6 @@ bool SpeedGrassDeprecated::GrassFromHeightMap(CollideQue* que)
     }
 
     return true;
-}
-
-/*------------------------------------------------------------------
-Function: IsSheared
-Description:
--------------------------------------------------------------------*/
-static inline bool IsSheared(OBJECT* o)
-{
-	return false;
-
-    if(!o->modelInstance)
-        return false;
-
-    return o->modelInstance->IsShearPlacement();
 }
 
 /*------------------------------------------------------------------
@@ -3460,8 +3415,6 @@ bool SpeedGrassDeprecated::CollideWithTerrain(CollideQue* que)
 	if(list.empty())
 		return false;
 
-    float centerz = 0;
-
     PNRandom::seedrandom((int)(que->pos.x() + que->pos.y() + 7793) % 360);
 
     for(unsigned int j = 0; j < list.size(); j++)
@@ -3531,7 +3484,6 @@ bool SpeedGrassDeprecated::CollideWithTerrain(CollideQue* que)
     bool created = false;
     PatchInstance& instance = Grass->GetOrCreateInstance(code, created);
 
-    int size = number_of_quads * NUMBER_OF_CORNERS;
     int count = 0;
 
     if(created)
@@ -3566,7 +3518,7 @@ bool SpeedGrassDeprecated::CollideWithTerrain(CollideQue* que)
 
             OBJECT* o = (OBJECT*)dGeomGetData(c.g2);
 
-            Vec3d pos = physicsPhysicalToGame(c.pos);
+            physicsPhysicalToGame(c.pos);
 
             if(o)
             {
@@ -3880,7 +3832,7 @@ bool SpeedGrassDeprecated::speedgrassPut(const Vec3d& pos, PatchInstance& instan
 Function: SpeedGrass::speedgrassPut
 Description:
 -------------------------------------------------------------------*/
-bool SpeedGrass::speedgrassPut(const Vec3d& pos, PatchInstance& instance, float scale, int texture)
+bool SpeedGrass::speedgrassPut(const Vec3d& pos, PatchInstance& instance, float scale, int texture, float shadow)
 {
     instance.params.push_back((float)pos.x());
     instance.params.push_back((float)pos.y());

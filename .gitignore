@@ -1,3 +1,6 @@
+/build/host
+/build/client
+
 *.pyc
 *.pyo
 *.vsp
@@ -14,10 +17,6 @@
 *.vcxproj.user
 .vs
 /BuildLog.htm
-/Debug
-/BetaRelease
-/BetaRelease/*
-/Release
 Libraries/*.html
 Libraries/*.idb
 Libraries/*.mdl
@@ -703,10 +702,7 @@ Playgate/[Bb]in
 Playgate/[Dd]ebug
 Playgate/[Rr]elease
 Playgate/obj
-/Release
-/SSE2SmartHeap
 /Template
-/TestRelease
 Tools/*.html
 Tools/*.idb
 Tools/*.mdl
@@ -1626,3 +1622,11 @@ Tools/ExeSum/exesum.sdf
 devenv/linux/.vagrant
 devenv/linux/Vagrantfile
 Libraries/lua51/mak.vs2015/lua5.1_lib.log
+WW2.VC.opendb
+*.lo
+*.o
+
+xcuserdata/
+
+ww2mods
+WW2Archives

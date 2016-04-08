@@ -84,9 +84,6 @@
     <ClCompile Include="..\WW2\src\auth\authPack.cpp">
       <Filter>Source Files\auth</Filter>
     </ClCompile>
-    <ClCompile Include="..\WW2\src\wwii\wwiiCallbacks.cpp">
-      <Filter>Source Files\wwii</Filter>
-    </ClCompile>
     <ClCompile Include="..\WW2\src\wwii\wwiiUTF.cpp">
       <Filter>Source Files\wwii</Filter>
     </ClCompile>

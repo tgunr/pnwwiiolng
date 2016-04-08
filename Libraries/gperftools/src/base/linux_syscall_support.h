@@ -83,7 +83,6 @@
  *      sys_fcntl(
  *      sys_fstat(
  *      sys_futex(
- *      sys_futex1(
  *      sys_getcpu(
  *      sys_getdents64(
  *      sys_getppid(
@@ -1583,8 +1582,8 @@ struct kernel_stat {
                               ".set reorder\n"                                \
                               : "=&r"(__v0), "+r" (__r7)                      \
                               : "i" (__NR_##name), "r"(__r4), "r"(__r5),      \
-                                "r"(__r6), "r" ((unsigned long)arg5),         \
-                                "r" ((unsigned long)arg6)                     \
+                                "r"(__r6), "m" ((unsigned long)arg5),         \
+                                "m" ((unsigned long)arg6)                     \
                               : MIPS_SYSCALL_CLOBBERS);                       \
         LSS_RETURN(type, __v0, __r7);                                         \
       }
@@ -2094,9 +2093,11 @@ struct kernel_stat {
                        int,            c, long,   a)
   LSS_INLINE _syscall2(int,     fstat,           int,         f,
                       struct kernel_stat*,   b)
-  LSS_INLINE _syscall4(int,     futex,           int*,        a,
+  LSS_INLINE _syscall6(int,     futex,           int*,        a,
                        int,            o, int,    v,
-                      struct kernel_timespec*, t)
+                      struct kernel_timespec*, t,
+                       int*, a2,
+                       int, v3)
 #ifdef __NR_getdents64
     LSS_INLINE _syscall3(int,     getdents64,      int,         f,
                          struct kernel_dirent64*, d, int,    c)

@@ -12,5 +12,5 @@ class VehicleSTO : public ServerSTO
 {
 public:
 	VehicleSTO(ACTION_OBJECT* const a) : ServerSTO(a) {}
-	virtual const char* typeName() const OVERRIDE_FN { return "veh"; }
+	virtual const char* typeName() const override { return "veh"; }
 };

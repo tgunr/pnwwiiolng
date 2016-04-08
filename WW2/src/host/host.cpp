@@ -113,6 +113,21 @@ namespace Host
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
 #endif
 
+#ifdef DEBUG_UPDATES
+UINT32 remoteVehicles = 0;
+UINT32 vehiclesSkipped = 0;
+UINT32 totalVehicles = 0;
+UINT32 qualifiedVehicles = 0;
+UINT32 vehiclesReviewed = 0;
+UINT32 vehUpdatesSent = 0;
+UINT32 vehMcrewCommanderUpdatesSent = 0;
+UINT32 vehMcrewCrewUpdatesSent = 0;
+UINT32 xmissionsFailed = 0;
+UINT32 vehiclesThrottled = 0;
+UINT32 numberOfUpdatesBehind = 0;
+UINT32 numVehiclesReported = 0;
+#endif
+
 //ERR_NOTE
 #define DEF_ERR_FLAGS	0
 
@@ -1765,13 +1780,16 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 	vehicles.reserve(maxVehicles);
 	TIMER_STOP("gvwfu_alloc");
 
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
 	const TeulTimeMS lowend = teulClock64 - 100;
 	bool reportedLagging = false;
 #endif
 	TIMER_START
 	for (auto it = _vehicleHash.begin(), end = _vehicleHash.end(); it != end;)
 	{
+#ifdef DEBUG_UPDATES
+		++totalVehicles;
+#endif
 		HostVehicle* const vehicle = it->second;
 		++it;
 
@@ -1779,8 +1797,22 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 		assert( vehicle != nullptr );
 #endif
 
-		if ( (vehicle->isRemote() == true) | (vehicle->m_nextUpdateClock > teulClock64) )
+		if ( vehicle->isRemote() )
+		{
+#ifdef DEBUG_UPDATES
+			++remoteVehicles;
+#endif
+
 			continue;
+		}
+
+		if ( vehicle->m_nextUpdateClock > teulClock64 )
+		{
+#ifdef DEBUG_UPDATES
+			++vehiclesSkipped;
+#endif
+			continue;
+		}
 
 		unsigned int fail = 0;
 		if ( PN_UNLIKELY((vehicle->index == 0) | (vehicle->isActive() == false) | (vehicle->m_holder == nullptr)) )
@@ -1790,7 +1822,9 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 
 		if ( PN_LIKELY(fail == 0) )
 		{
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
+			++qualifiedVehicles;
+
 			if ( (!reportedLagging) & (vehicle->m_nextUpdateClock < lowend) )
 			{
 				threadLog(_FLA, "c:%s v:%u*** LAGGING BEHIND UPDATES: wanted update %llums ago"
@@ -1818,6 +1852,10 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 		vehicles.resize(maxVehicles);
 		TIMER_STOP("gvwfu_shrink");
 	}
+
+#ifdef DEBUG_UPDATES
+	vehiclesReviewed = vehicles.size();
+#endif
 
 	TIMER_START
 	sort(vehicles.begin(), vehicles.end(), [](auto lhs, auto rhs) { return lhs->m_cell < rhs->m_cell; });
@@ -2020,6 +2058,10 @@ _sendNextUpdate(HostVehicle* const vehicle)
 
 	assert( wu.header.numVehicles <= framings[vehicle->framingMode].maxVehiclesPerFrame() );
 
+#ifdef DEBUG_UPDATES
+	numVehiclesReported += wu.header.numVehicles;
+#endif
+
 	// Assume 16-bytes per vehicle.
 //	TIMER_START
 	Teul::Packet packet(Teul::PacketId(Comm::CallbackX, WORLD_UPDATE_Y));
@@ -2107,6 +2149,10 @@ _sendNextUpdate(HostVehicle* const vehicle)
 //	TIMER_START
 	if ( players.empty() == false )
 	{
+
+#ifdef DEBUG_UPDATES
+		++vehUpdatesSent;
+#endif
 		// Because of encryption, we can't just send the original to
 		// the crew, we have to send a copy.
 		const size_t size = players.size();
@@ -2114,15 +2160,35 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		{
 			Teul::Packet copy(*wu.packet);
 			if ( _sendPacket(copy, players[i], vehicle->index, pingOffset) )
+			{	
 				result = true;
+#ifdef DEBUG_UPDATES
+				++vehMcrewCrewUpdatesSent;
+#endif
+			}
 			else
+			{
+#ifdef DEBUG_UPDATES
+				++xmissionsFailed;
+#endif
 				updatesFailing = true;
+			}
 		}
 
 		if ( _sendPacket(*wu.packet, players[0], vehicle->index, pingOffset) )
+		{
 			result = true;
+#ifdef DEBUG_UPDATES
+			++vehMcrewCommanderUpdatesSent;
+#endif
+		}
 		else
+		{
+#ifdef DEBUG_UPDATES
+			++xmissionsFailed;
+#endif
 			updatesFailing = true;
+		}
 	}
 //	TIMER_STOP("sendpkt");
 
@@ -2133,11 +2199,18 @@ _sendNextUpdate(HostVehicle* const vehicle)
 	{
 		if ( updatesFailing )
 		{
+#ifdef DEBUG_UPDATES
+			++vehiclesThrottled;
+#endif
+
 			// Add an extra 1.5s to the next update
 			vehicle->setNextUpdate(1500);
 		}
 		else if ( updatesBehind > 1 )
 		{
+#ifdef DEBUG_UPDATES
+			numberOfUpdatesBehind += updatesBehind;
+#endif
 			const UINT32 delay = updatesBehind * 25;
 			if ( delay >= 1000 )
 			{
@@ -2311,6 +2384,21 @@ _runHost(void)
 		}
 		TIMER_STOP("updts");
 		TIMER_REPORT(250)
+
+#ifdef DEBUG_UPDATES
+		static UINT32 nextStatsReport = teulTime();
+		if ( teulTime() >= nextStatsReport )
+		{
+			// Report output to client stats every second
+			dbugLog(_FLI, "TV=%u, RV=%u, VS=%u, QV=%u, VR=%u, VUS=%u, VMCU=%u, VCRU=%u, NVR=%u, XF=%u, VT=%u, NU=%u", 
+				totalVehicles, remoteVehicles, vehiclesSkipped, qualifiedVehicles, vehiclesReviewed, vehUpdatesSent, vehMcrewCommanderUpdatesSent, 
+				vehMcrewCrewUpdatesSent, numVehiclesReported, xmissionsFailed, vehiclesThrottled, numberOfUpdatesBehind); 
+			totalVehicles = remoteVehicles = vehiclesSkipped = qualifiedVehicles = vehiclesReviewed = vehUpdatesSent = 0;
+			vehMcrewCommanderUpdatesSent = vehMcrewCrewUpdatesSent = xmissionsFailed = vehiclesThrottled = 0;
+			numberOfUpdatesBehind = numVehiclesReported = 0;
+			nextStatsReport = teulTime() + 1;
+		}
+#endif
 
 		if ( PN_UNLIKELY(nextVehicles.size() >= _MIN_UPDATES) )
 		{

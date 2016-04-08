@@ -74,7 +74,6 @@ public:
         USER_CREATED_EFFECT = 0x2,
         STAND_ALONE         = 0x4,
         PARTICLE_LINK       = 0x8,
-        TARGET_AIM          = 0x10
     };
 
     Emitter* getemitter(unsigned int i)
@@ -93,7 +92,6 @@ public:
     static TransformEffect* AddEffect(const char* effect, const Vec3f& n, int lifetime, struct OBJECT* o);
     static TransformEffect* CreateEffect(const char* effect, const Vec3f& n, int lifetime, struct OBJECT* o, int numemitters);
     static TransformEffect* AddTracer(const weapAmmo* ammo, const char* effect);
-    static TransformEffect* AddTargetAim(const char* effect);
     static ParticleMgr* GetParticleMgr();
 
     static void Apply(struct trnCDTerrainObject* to);

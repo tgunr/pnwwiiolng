@@ -62,11 +62,15 @@ static KEY	vars[]={{"help", ENULL},
 					{"region", ESTRING},
 					{"ragdolls", ELOGICAL},
                     {"buildterrain", ENULL},
-    {"o", ESTRING},
-    {"altfont", ENULL},
+                    {"o", ESTRING},
+                    {"altfont", ENULL},
+                    {"authserver", ESTRING},
+                    {"arena", ESTRING},
+                    {"clientv", ESTRING},
+                    {"datadir", ESTRING},
 					{nullptr, ENULL}};
 
-static constexpr void*	pvars[]={&WantedHelp,
+static void* const pvars[]={&WantedHelp,
 					&WantedWidth,
 					&WantedHeight,
 					&WantedBpp,
@@ -97,8 +101,12 @@ static constexpr void*	pvars[]={&WantedHelp,
 					&RegionSuffix,
 					&gRagdolls,
 					&g_buildTerrain,
-    &HackID,
-    &AltFont,
+                    &HackID,
+                    &AltFont,
+                    &gAuthServer,
+                    &gArena,
+                    &gClientV,
+                    &DataPath,
 					nullptr};
 
 static char* _skipFilename(const char* ptr)
@@ -125,7 +133,7 @@ static char* _skipFilename(const char* ptr)
 
 LOGICAL mngoptParse(char* InputLine)
 {
-	char*	ptr, sep[2]="-", CommandLine[512];
+	char*	ptr, sep[2]="-", CommandLine[2048];
 	char	cmd[256], value[256];
 	int		i;
 
@@ -140,7 +148,7 @@ LOGICAL mngoptParse(char* InputLine)
 	if ( *ptr != '-' && *ptr != '/' )
 		return TRUE;
 
-	strncpy(CommandLine, ptr, 511);
+	strncpy(CommandLine, ptr, 2047);
 
 	ptr = CommandLine;
     sep[0] = *ptr;

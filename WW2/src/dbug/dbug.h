@@ -17,11 +17,6 @@
 	#include "dbug/dbugWErrno.h"
 #endif
 
-#if platOS == OS_MACOS
-	#define NO_DEBUG_LOG
-	#define NO_DEBUG_WRITE
-#endif
-
 #define  _FL __FILE__, __LINE__
 
 namespace Debug
@@ -46,6 +41,7 @@ namespace Debug
 
 // always use these macro's in place of Full functions so filename and number and errType are set.
 // basic parameter macros for dbugLog
+#define _FLF _FL, Debug::ERR_FATAL
 #define _FLA _FL, Debug::ERR_ABORT
 #define _FLM _FL, Debug::ERR_MINOR
 #define _FLW _FL, Debug::ERR_WARN
@@ -54,6 +50,7 @@ namespace Debug
 #define _FLD _FL, Debug::ERR_DBUG
 
 // same as above but no extra formating
+#define _FLFB _FL, (Debug::ERR_FATAL | BARE_DEBUG)
 #define _FLAB _FL, (Debug::ERR_ABORT | BARE_DEBUG)
 #define _FLMB _FL, (Debug::ERR_MINOR | BARE_DEBUG)
 #define _FLWB _FL, (Debug::ERR_WARN | BARE_DEBUG)
@@ -62,6 +59,7 @@ namespace Debug
 #define _FLDB _FL, (Debug::ERR_DBUG | BARE_DEBUG)
 
 // make go to stderr
+#define _FLFS _FL, (Debug::ERR_FATAL | STD_ERR)
 #define _FLAS _FL, (Debug::ERR_ABORT | STD_ERR)
 #define _FLMS _FL, (Debug::ERR_MINOR | STD_ERR)
 #define _FLWS _FL, (Debug::ERR_WARN | STD_ERR)
@@ -70,6 +68,7 @@ namespace Debug
 #define _FLDS _FL, (Debug::ERR_DBUG | STD_ERR)
 
 // same as above but no extra formating
+#define _FLFSB _FL, (Debug::ERR_FATAL | STD_ERR | BARE_DEBUG)
 #define _FLASB _FL, (Debug::ERR_ABORT | STD_ERR | BARE_DEBUG)
 #define _FLMSB _FL, (Debug::ERR_MINOR | STD_ERR | BARE_DEBUG)
 #define _FLWSB _FL, (Debug::ERR_WARN | STD_ERR | BARE_DEBUG)
@@ -131,9 +130,11 @@ int dbugGetErrno(void);
 // dbugLog: if the current filename, lineno or string is nullptr then it sets these members. The
 // parameters are output as a string to the debug file depending on the debug level selected and
 // the current error type.  calls handlers.
-int _dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5)));
+int _dbugLog(const char* filename, int lineno, unsigned int errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FUN(4,5);
 
-NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
+SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FUN(4,5);
+
+[[noreturn]] void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FUN(5,6);
 #define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, __VA_ARGS__)
 
 // These macros assume that the condition is unlikely and try to provide the compiler an optimization hint by

@@ -16,7 +16,7 @@ class XYZTupleTest : public TestUnit
 public:
 	XYZTupleTest() : TestUnit("XYZTuple") {}
 
-public: virtual bool Run() OVERRIDE_FN
+public: virtual bool Run() override
 	{
 		START_TEST_STAGE( "Constructors" )
 			START_SUB_STAGE( "Default" )

@@ -21,5 +21,4 @@ private:
 	SuperCellMapView* _mv;
 	bool _firstRun;
 	int _texid;
-	float _scale;
 };

@@ -905,7 +905,11 @@ main(int argc, const char* argv[])
 	if (tcpconnection < 0)
 		LogAbort("Error allocating endpoint!");
 
+#if platOS == OS_WIN32 // HACK: We should properly detect if we're using the controller via code if possible.
 	const SINT32 gameConnection = teulOpenListen(WWII::Net::Ports::InternalAuth, _acceptGameConnection, GAME_TIMEOUT, PROTOCOL_CTRL, _gameErrorFunction);
+#else
+	const SINT32 gameConnection = teulOpenListen(WWII::Net::Ports::InternalAuth, _acceptGameConnection, GAME_TIMEOUT, PROTOCOL_TCP, _gameErrorFunction);
+#endif
 	if ( gameConnection < 0 )
 		LogAbort("failed to open game listening socket");
 

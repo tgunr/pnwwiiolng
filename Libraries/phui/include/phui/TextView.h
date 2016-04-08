@@ -57,28 +57,28 @@ public:
 
 	virtual View* AsView() override { return this; }
 	
-	virtual void DrawSelf();
+	virtual void DrawSelf() override;
 
-	virtual bool KeyDown(int keycode, unsigned short unicode);
-	virtual bool KeyUp(int keycode, unsigned short unicode);
-	virtual bool MouseScroll(float x, float y, int dir);
-	virtual bool MouseDown(float x, float y, int button);
+	virtual bool KeyDown(int keycode, unsigned short unicode) override;
+	virtual bool KeyUp(int keycode, unsigned short unicode) override;
+	virtual bool MouseScroll(float x, float y, int dir) override;
+	virtual bool MouseDown(float x, float y, int button) override;
 
 	// from TextContainer
-	virtual void SetCursor(int c);
-	virtual void SetAnchor(int a);
-	virtual bool GetCursorXY(float& x, float& y) const;
-	virtual bool GetAnchorXY(float& x, float& y) const;
-	virtual void SetValue(const phui::Scalar& v);
-	virtual void CursorVMove(int dir, bool stop = false);
-	virtual void CursorHMove(int dir, bool stop = false);
-	virtual void OnCursorMoved();
-	virtual void OnTextModified();
-	virtual void ResizeToText();
+	virtual void SetCursor(int c) override;
+	virtual void SetAnchor(int a) override;
+	virtual bool GetCursorXY(float& x, float& y) const override;
+	virtual bool GetAnchorXY(float& x, float& y) const override;
+	virtual void SetValue(const phui::Scalar& v) override;
+	virtual void CursorVMove(int dir, bool stop = false) override;
+	virtual void CursorHMove(int dir, bool stop = false) override;
+	virtual void OnCursorMoved() override;
+	virtual void OnTextModified() override;
+	virtual void ResizeToText() override;
 
-	virtual void ResizeTo(float width, float height);
-	virtual void ResizeBy(float dw, float dh);
-	virtual void FontResized(unsigned int size);
+	virtual void ResizeTo(float width, float height) override;
+	virtual void ResizeBy(float dw, float dh) override;
+	virtual void FontResized(unsigned int size) override;
 	
 	void SetLineSpacing(float spacing){ _line_spacing = spacing; }
 	void SetFontShadow(float sx, float sy){ _fontshadowx = sx; _fontshadowy = sy; }

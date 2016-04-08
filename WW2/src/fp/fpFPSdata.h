@@ -77,6 +77,7 @@ enum fpsWeaponTypes
 	FRSMOKE,
 	AMMO,
 	MAS36,
+	MAS40,
 	RG_G30,             // GERMAN GRENADIER
 	RG_VB,              // FRENCH GRENADIER
 	RG_MILLS,           // BRITISH GRENADIER
@@ -97,6 +98,7 @@ enum fpsWeaponTypes
 	COLT1911,
 	SPRINGFIELD1903,
 	GEW43,
+	GEW41,
 	M1THOMPSON,
 	MARK2,
 	BAZOOKA,
@@ -104,11 +106,15 @@ enum fpsWeaponTypes
 	M1903A3,
 	USSMOKE,
 	PIAT,
+	STENMK2,
+	M3A1,
+	MP34,
+	FG42G,
 	NUM_WEAPONS
 };
 // tolua_end
 
-extern SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS];
+extern const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS];
 
 // tolua_begin
 enum fpsWeaponStates
@@ -165,7 +171,7 @@ enum fpFPSWeaponType
 };
 // tolua_end
 
-extern SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES];
+extern const SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES];
 
 // if adding an icon type, make sure to add a string to fpsData.c:hud_icons
 enum fpFPSIconType
@@ -307,6 +313,7 @@ public:
 	FLOAT32				firepointZDistance;     // z distance of firepoint when firepoint is not in the model
 	FLOAT32             firepointHorizOffset;   // horizontal offset from eyepoint when firepoint is not in the model
 	FLOAT32             firepointVertOffset;    // vertical offset from eyepoint when firepoint is not in the model
+	FLOAT64             grenadeVisDelay;        // The amount of time that the grenade appears in the hand at toss.
 
 	FLOAT32				fireDelay;				// how long to wait after pressing the fire button to actually shoot
 	FLOAT32				minimumDispersion;		// minimum dispersion, in degrees, of a human firing this weapon
@@ -349,6 +356,8 @@ public:
 	FLOAT32				auxAltConnectTime[FPS_NUM_AUX_MODELS];
 	FLOAT32				auxAltDisconnectTime[FPS_NUM_AUX_MODELS];
 
+	SINT32              grenadeDelayTime; // in ms
+
 	FLOAT32				aimVerticalCorrection;
 	FLOAT32				aimHorizontalCorrection;
 
@@ -367,7 +376,7 @@ public:
 	FLOAT32				weaponBreathMultiplier;
 	FLOAT32				weaponPoseMultiplier;
 
-	SCHAR*				deployPivotBone;		// bone around which to pivot if deployed (nullptr if no pivot)
+	SCHAR*				deployPivotBone;		// bone around which to pivot if deployed (NULL if no pivot)
 
 	SINT32				rgFiringRules;			// enable special rules for kneeling rifle grenade firing
 	FLOAT32				rgFiringAngle;			// angle that the gun is pitched at
@@ -697,19 +706,19 @@ LOGICAL					fpFPSGetHUDAmmoData(HUD_AMMO_DATA type, SINT32* data);
 UINT32					fpFPSDataGetVarnameAndContents(SCHAR ** varname, SCHAR ** varcontents, SCHAR * inputString);
 
 // data
-extern SCHAR*				skel_model;
-extern SCHAR*				arm_models[NUM_INFANTRY_TYPES];
-extern SCHAR*				leg_models[NUM_INFANTRY_TYPES];
+extern const SCHAR*				skel_model;
+extern const SCHAR*				arm_models[NUM_INFANTRY_TYPES];
+extern const SCHAR*				leg_models[NUM_INFANTRY_TYPES];
 
-extern SCHAR*				arms_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-extern SCHAR*				weap_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-extern SCHAR*				clip_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-extern SCHAR*				weap_default[NUM_WEAPONS];
-extern SCHAR*				weap_empty_default[NUM_WEAPONS];
-extern SCHAR*				clip_default[NUM_WEAPONS];
-extern SCHAR*				replacement_arms_file;
-extern SCHAR*				default_arms_tex_names[NUM_INFANTRY_TYPES];
-extern SCHAR*				replacement_arms_tex_names[NUM_INFANTRY_TYPES];
+extern const SCHAR*				arms_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+extern const SCHAR*				weap_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+extern const SCHAR*				clip_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+extern const SCHAR*				weap_default[NUM_WEAPONS];
+extern const SCHAR*				weap_empty_default[NUM_WEAPONS];
+extern const SCHAR*				clip_default[NUM_WEAPONS];
+extern const SCHAR*				replacement_arms_file;
+extern const SCHAR*				default_arms_tex_names[NUM_INFANTRY_TYPES];
+extern const SCHAR*				replacement_arms_tex_names[NUM_INFANTRY_TYPES];
 
 extern fpFPSTrooperData		fpsTrooper;
 extern fpFPSWeaponData		fpsWeapons[NUM_WEAPONS];

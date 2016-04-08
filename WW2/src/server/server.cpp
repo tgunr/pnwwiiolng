@@ -46,6 +46,15 @@
 #include "teul/teulServer.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiNetPorts.h"
+#include "teul/teulMicroWebServer.h"
+
+namespace Teul
+{
+	namespace uWeb
+	{
+		Server s_debugServer;
+	}
+}
 
 // the time that a player may be on the exit server holder
 // before he is sent back to the auth Host
@@ -224,9 +233,9 @@ _playerReleasePersona(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, 
 	if ( psn->localInfo != nullptr && _releasePersonaFn )
 	{
 
-		if ((Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT)
-			&& releaseType != Server::ReleaseType::Redirected
-			&& Server::myServerInfo.exitDestType != 0 )
+		if ( (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT)
+		     && releaseType != Server::ReleaseType::Redirected
+		     && Server::myServerInfo.exitDestType != AUTH_HOST )
 		{
 			destination = Server::ServerInfo::GetBest(Server::myServerInfo.exitDestType);
 			_playerExitTo(destination, psn, Server::Transfer::XferReason::Exit, exitCode);
@@ -495,7 +504,7 @@ _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server:
 		// assumes player has been moved to new server before called
 		_playerReleasePersona(teulIndex, psn, exitCode, releaseType);
 
-		if ( ! ((Server::myServerInfo.flags & Server::SVRFLAG_RELOGIN) && Server::myServerInfo.exitDestType == 0 ) )
+		if ( ! ((Server::myServerInfo.flags & Server::SVRFLAG_RELOGIN) && Server::myServerInfo.exitDestType == AUTH_HOST) )
 		{
 			dbugLog(_FLD, "t:%d p:%u deleting auth after redirection", teulIndex, psn->dispatch().m_customerID);
 			_playerDeleteAuth(psn);
@@ -545,7 +554,7 @@ _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType releaseType)
 		 _extractPlayerFromServer(_exitServer, psn);
 
 	// alert other servers of the players demise but only if its news
-	if ( psn->status != Server::PlayerStatus::Deleted && Server::myServerInfo.exitDestType == 0 && (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT) )
+	if ( psn->status != Server::PlayerStatus::Deleted && Server::myServerInfo.exitDestType == AUTH_HOST && (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT) )
 	{
 		psn->status = Server::PlayerStatus::Deleted;
 		_sendPlayerStatusUpdate(*psn);
@@ -685,7 +694,7 @@ _playerProc(Server::PersonaXfer* const persXfer, PlayerStatusNode* const psn, bo
 
 			if ( (Server::myServerInfo.flags & Server::SVRFLAG_DETATCHED) == 0)
 			{
-				if ( Server::myServerInfo.exitDestType == 0)
+				if ( Server::myServerInfo.exitDestType == AUTH_HOST)
 				{
 					if (!_playerAddAuth(psn))
 						return _playerDestroy(psn, createComplete);
@@ -1064,10 +1073,11 @@ Server::GetReleaseType(Server::ReleaseType releaseType)
 Server::ServerInfo*
 Server::ServerInfo::GetInfo(UINT32 baseIP_, UINT16 type_)
 {
+	// Is this necessary? Original code didn't modify it->stats.address in check below...
 	auto peerIP = Server::BroadcastMaskAddress(baseIP_);
 	for ( auto& it : s_activeServerList )
 	{
-		if ( it->stats.address == peerIP && it->stats.type == type_ )
+		if (Server::BroadcastMaskAddress(it->stats.address) == peerIP && it->stats.type == type_ )
 			return it;
 	}
 	return nullptr;
@@ -1186,8 +1196,8 @@ serverUpdate(void)
 
 	if ( teulClock64 >= _nextHeartbeat )
 	{
-		if ( (Server::myServerInfo.flags & Server::SVRFLAG_RELOGIN) && (Server::myServerInfo.exitDestType == 0 || (Server::myServerInfo.flags & Server::SVRFLAG_DETATCHED)) )
-			_timeOutPlayers();
+		if ( (Server::myServerInfo.flags & Server::SVRFLAG_RELOGIN) && (Server::myServerInfo.exitDestType == AUTH_HOST || (Server::myServerInfo.flags & Server::SVRFLAG_DETATCHED)) )
+			_timeOutPlayers(); // only one server - the mmhost - should be doing the timeouts
 
 		_timeOutXfers();
 		_sendHeartBeat();
@@ -1650,9 +1660,9 @@ _controllerConnect(ENDPOINT& endpoint)
 }
 
 static void
-_controllerError(SINT32, const UCHAR* const, SINT32, const struct TEUL_CALLBACK* const, SINT32)
+_controllerError(SINT32, const UCHAR* const, SINT32, const struct TEUL_CALLBACK* const, SINT32 error)
 {
-	dbugLog(_FLA, "error on controller connection shutting down");
+	dbugLog(_FLA, "Experienced %d error on controller connection.", error);
 }
 
 void _connectToController()
@@ -1850,7 +1860,7 @@ void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SI
 }
 #endif
 
-void NORETURN_FN _help(const char* argv[], const Server::CommandLineOptions& cliOptions)
+NORETURN_FN void _help(const char* argv[], const Server::CommandLineOptions& cliOptions)
 {
 	printf("Usage: %s [arguments | --help]\n", argv[0]);
 	for (size_t i = 0; i < cliOptions.size(); ++i)
@@ -1900,10 +1910,10 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERRO
 			if (cliOptions[i].wantParameter)
 			{
 				if (++argn >= argc)
-					LogAbort("'%s' switch expects an argument", cliOptions[i]);
+					LogAbort("'%s' switch expects an argument", cliOptions[i].command);
 				param = argv[argn];
 				if (param[0] == '-')
-					LogAbort("'%s' switch expects an argument, got '%s'", cliOptions[i], argv[argn]);
+					LogAbort("'%s' switch expects an argument, got '%s'", cliOptions[i].command, argv[argn]);
 			}
 			cliOptions[i].callback(param);
 			break;
@@ -1920,12 +1930,12 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERRO
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
 
-	// Let the controller know we are here.
-	_connectToController();
-
 	serverEnableDebugWebServer(serverType);
 
 	serverInitAddresses();
+
+	if ( Server::IsBroadcastViaController() )
+		_connectToController();
 
 	dbugLog(_FLI, "%s started, compiled %s %s", appName, __DATE__, __TIME__);
 }

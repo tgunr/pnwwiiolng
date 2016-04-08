@@ -23,14 +23,14 @@ public:
 	virtual bool message(int prefix, int msgid
 						, const char* const ptr0="", const char* const ptr1="", const char* const ptr2=""
 						, const char* const ptr3="", const char* const ptr4="", const char* const ptr5=""
-						) const OVERRIDE_FN;
-	virtual bool message(const Chat::LocalizedMessage& lmsg) const OVERRIDE_FN
+						) const override;
+	virtual bool message(const Chat::LocalizedMessage& lmsg) const override
 	{
 		return message(lmsg.m_prefix, lmsg.m_message, lmsg.m_ptr[0], lmsg.m_ptr[1], lmsg.m_ptr[2], lmsg.m_ptr[3], lmsg.m_ptr[4], lmsg.m_ptr[5]);
 	}
 
 	// Describe to another GM
-	virtual void describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, bool includePermissions) const OVERRIDE_FN;
+	virtual void describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, bool includePermissions) const override;
 
 	void SetLastChannel(const char* to) { m_lastChannel = to; }
 	void AddChannel(const char* channel);

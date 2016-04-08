@@ -216,11 +216,6 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
         memcpy(t->lpsurf[0], img->data(), size);
     }
 
-#ifdef TESTMAC
-  extern void addTexturePath( const char* path );
-  addTexturePath( regionPath.c_str() );
-#endif
-
   // Image is alreay copied to the card. Remove data to save memory
     dynamic_cast<Texture2D*>(tex.get())->setImage(nullptr);
     assert(img->referenceCount() == 1);

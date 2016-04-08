@@ -65,6 +65,12 @@
 #include "ez/EZVehicles.h"
 #include "fx/fxMisc.h"
 
+static void             fpFPSAxisRotation (SINT32 param, UINT32 id);
+static void             fpFPSSetHorizontalDeployedPosition (FLOAT64 newPos);
+static void             fpFPSVerticalAxisLook (SINT32 param, UINT32 data);
+static void             fpFPSHorizAxisLook (SINT32 param, UINT32 data);
+static void             fpFPSAdjustAngles (FLOAT32 deltaTime, FLOAT64 minSpeed, FLOAT64 maxSpeed, FLOAT64* xAngle, FLOAT64 xTarget);
+
 #define TESTING_SCOPE
 #undef TESTING_SCOPE
 //#define TESTING
@@ -80,7 +86,6 @@ static float WEAPON_LAG_BLEED		= 5.0f; // how much to bleed each frame
 static float WEAPON_LAG_MOVE		= 4.0f; // amount of lag when strafing and moving backwards
 static float WEAPON_LAG_JUMP		= 40.0f; // base value to calculate from
 static float WEAPON_LAG_JUMPMAX		= 3.0f; // max jump between frames
-static float WEAPON_LAG_JUMPMIN		= .001f; // min jump between frames
 
 #ifdef UNUSED
 static float WEAPON_LAG_INTERVAL	= 2.0f;
@@ -338,9 +343,6 @@ static FLOAT64			grenadeApperLapse = 0.0;
 
 static SINT32 _startDeathTimer = 0;
 
-// camera shake
-static SINT32 _shakeStop = 0;
-
 // movement controls
 // these are the modifiers for the various poses
 static fpFPSPositions	prevPose;
@@ -415,7 +417,7 @@ static FPSProneCollider _proneCollider;
 // debug stuff
 static FLOAT32			animationSpeed = 1.0f;
 
-static phui::View*		_captureview;
+static SINT32 fpsStartGrenadeThrowTime, fpsEndGrenadeThrowTime;
 
 #define MIN_RIDE_DISTANCE2 9
 
@@ -433,7 +435,6 @@ static UINT32 _ppoCheck = 0;
 static FLOAT32 _steepness = 0.0f;
 
 static ScenarioVolume* _volumeCollider = nullptr;
-static trnCDTerrainObject* _lastCollision = nullptr;
 
 static bool _candeploy(int direction);
 static void _calculateConvergenceAngle(int weaponIndex = -1); // 0 - 9
@@ -501,7 +502,7 @@ void fpFPSInit(vehVehicle*vehicle)
 
 	persClearGunsights();
 	// Load Binoculars
-    persLoadGunsight ("vehicles\\ground\\groundman\\8x30binoc.gs");
+    persLoadGunsight ((char *)"vehicles\\ground\\groundman\\8x30binoc.gs");
 	//persLoadInstGunsight("vehicles\\ground\\groundman\\4x_riflescope.gs");
 	persGunSightSetBaseFOV(fpsTrooper.defaultFOV);
 
@@ -945,9 +946,6 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 		{
 			if (arms_anim_files[weaponID][j][0] != 0)
 			{
-				if(weaponID == WEBLEY && j == RELOAD)
-					bool stop = true;
-
 				armsAnims[weaponID][j] = gr2LoadAnimation (arms_anim_files[weaponID][j], 1);
 			}
 
@@ -1167,6 +1165,9 @@ static fpsWeaponStates _determineNextRifleState()
 
             break;
         }
+    default:
+            // we only care about reload states
+            break;
     }
 
     return currentFPSstate;
@@ -1447,7 +1448,9 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
         old = currentFPSstate;
 
-        if (fpFPSIsWeaponSwitchOK(fpsTrooper.autoswitchWeaponNumber))
+		// HACK: First check is to avoid infinite head-shaking when trying to switch from a loaded rocket launcher.
+        if ( !(fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_ROCKET && fpsWeapons[currentWeaponModel].clipBullets != 0) &&
+		     fpFPSIsWeaponSwitchOK(fpsTrooper.autoswitchWeaponNumber))
 		{
 			fpFPSWeaponChange (fpsTrooper.autoswitchWeaponNumber, 1);
 			//return currentFPSstate; // go ahead and let it drop through; this fixes a binocs zoom issue
@@ -1533,8 +1536,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 	}
 
 	// LMGs have some special allowances for "aim"
-	if (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_LMG &&
-		fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_GRENADE)
+	if (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_LMG)
 	{
 		// no aiming while looking left or right
 		// can't aim while going backwards
@@ -1610,7 +1612,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				}
 			}
 		}
-		else if	(((stateFlags & STATE_AIM) && ((!fpsWeapons[currentWeaponModel].deployPivotBone) || currentWeaponModel == BAR)) ||
+		else if	(((stateFlags & STATE_AIM) && ((!fpsWeapons[currentWeaponModel].deployPivotBone) || currentWeaponModel == BAR || currentWeaponModel == FG42G)) ||
 				(((fpsWeapons[currentWeaponModel].deployPivotBone) && ((stateFlags & (STATE_DEPLOYED|STATE_RELOADING|STATE_LOOK_LEFT|STATE_LOOK_RIGHT|STATE_DEPLOYING|STATE_NEEDS_RECYCLE|STAT2_NEEDS_RELOAD)) == STATE_DEPLOYED))))
 		{
 //			if ((currentFPSstate == RELOAD) || (currentFPSstate == RECYCLE) || (currentFPSstate == RELOAD2) || (currentFPSstate == RELOAD3) || (currentFPSstate == THROW))
@@ -1674,18 +1676,11 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
 				if(fpsWeapons[currentWeaponModel].placedObject)
 				{
-					if(PlayerClient()->IsMissionLeader() && !fpsTrooper.isParatroop)
-					{
-						vehmainFRUBuild();
-					}
-					else
-					{
-						// we piggy back on this variable to get the type (kind of a hack)
-						SINT32 type = (SINT32)currentGameWeapon->NumRoundsAmmoLeft[0];
+					// we piggy back on this variable to get the type (kind of a hack)
+					SINT32 type = (SINT32)currentGameWeapon->NumRoundsAmmoLeft[0];
 
-						// create a new ppo
-						fpPPOCreate(type);
-					}
+					// create a new ppo
+					fpPPOCreate(type);
 				}
 
 				if(fpsWeapons[currentWeaponModel].clipBullets == -1)
@@ -1818,12 +1813,6 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				}
 				else
 				{
-					if ((currentTime - fireStartTime) > fpsWeapons[currentWeaponModel].fireDelay && !(stateFlags & STATE_FIRE_DELAYED_WEAP))
-					{
-						//stateFlags &= ~STATE_HOLD_FIRE;
-						stateFlags |= STATE_FIRE_DELAYED_WEAP;
-					}
-
 					return currentFPSstate;
 				}
 			}
@@ -1969,8 +1958,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 		 (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_BUILD) &&
 		 (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_SMG) &&
 		 (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_LMG) &&
-		 (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_KNIFE) &&
-		 (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_GRENADE))
+		 (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_KNIFE))
 	{
 		if (currSkelControl && !gr2IsControlComplete(currSkelControl))
 		{
@@ -2075,8 +2063,18 @@ fpsWeaponStates fpFPSDetermineNextState ()
 		}
 		else if (fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE)
 		{
-			stateFlags &= ~STATE_HOLD_FIRE;
-			return THROW;
+			if (!(controlStateFlags & FPS_FIRE))
+			{
+				stateFlags &= ~STATE_HOLD_FIRE;
+				stateFlags |= STATE_FIRE_DELAYED_WEAP;
+
+			}
+
+			if ((currentTime - fireStartTime) > fpsWeapons[currentWeaponModel].fireDelay)
+			{
+				stateFlags &= ~STATE_HOLD_FIRE;
+				stateFlags |= STATE_FIRE_DELAYED_WEAP;
+			}
 		}
 		else if (fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_LTMORTAR)
 		{
@@ -2187,8 +2185,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 		return LOWER;
 	}
 
-	if ((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE) &&
-		(stateFlags & (STATE_HOLD_FIRE|STATE_FIRE_DELAYED_WEAP)))
+	if ((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE) && (stateFlags & STATE_FIRE_DELAYED_WEAP))
 	{
 		return THROW;
 	}
@@ -2691,6 +2688,9 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
                     repeatCount = 1;
                     break;
                 }
+            default:
+                // only care about reload states
+                break;
             }
         }
 		else if (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_REVOLVER)
@@ -3629,7 +3629,6 @@ void fpFPSGetEyeMatrix (piMATRIX* pMatrix)
         if (fpsWeapons[currentWeaponModel].sniperScope)
 			tempMatrix._42 -= vertWobble;
 
-		static FLOAT32 zadjust = 0; //-.5f;
 		tempMatrix._43 -= _deployZ();
 
 		math3dMatrixMultiply(&eyeMatrix,&tempMatrix,&eyeMatrix);
@@ -4293,9 +4292,6 @@ void fpFPSMoveModel()
 		generateRotationMatrix (AROUND_Z, (horizWobbleAngle + horizWeaponLag), &tempMatrix);
 		math3dMatrixMultiply(&eyeRotation,&tempMatrix,&eyeRotation);
 
-		FLOAT64 test = aimVerticalDeployedPosition;
-		FLOAT64 test2 = AIM_VERTICAL_ANGLE;
-
 		generateRotationMatrix (AROUND_X,
 			-(-vertWobbleAngle + (AIM_VERTICAL_ANGLE + vertWeaponLag) - fpsTrooper.currentMuzzleRise),
 			&tempMatrix);
@@ -4328,9 +4324,6 @@ void fpFPSMoveModel()
 		eyePosition.y = eyeRotation._42;
 	}
 
-	if(vertShift)
-		bool stop = true;
-
 	eyePosition.z = eyeRotation._43 + fpFPSGetHeight() + (FLOAT32)vertShift;
 	//eyePosition.y += -2; // use this to see the 1st person stuff work in 3rd person
 
@@ -4340,85 +4333,6 @@ void fpFPSMoveModel()
 	//_recoverWeaponLag();
 
 	return;
-}
-
-bool fpFPSCanProjectGrenade()
-{
-	vehVehicle* player = persGetPersonaVehiclePtr();
-
-	if(!player)
-        return false;
-
-	// check if game weapon is a grenade type
-	if(fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_GRENADE)
-		return false;
-
-	if(!(controlStateFlags & FPS_AIM))
-		return false;
-
-    return true;
-}
-
-AmmoTrajectory* fpFPSGetTrajectory()
-{
-	static SINT32 lastUpdate = 0;
-	static AmmoTrajectory _trajectory;
-
-    if(!fpFPSCanProjectGrenade())
-        return nullptr;
-
-	if(frametime <= lastUpdate)
-		return &_trajectory;
-	
-	const weapAmmoType* ammo = currentGameWeapon->WeaponType->AmmoType[currentGameWeapon->AmmoTypeInUse];
-
-	vehVehicle* player = persGetPersonaVehiclePtr();
-
-    // look up fire position
-	piMATRIX mat;
-	fpFPSGetFirePoint(player->VehicleObjectData->PlaneObject, &mat, false);
-
-	Matrixd worldAtt = Matrixd(player->ModelData->VehicleAttMat);
-	Matrixd fireAtt = Matrixd(mat);
-	Vec3d firePos = fireAtt.getTrans();
-
-	fireAtt.setTrans(0,0,0);
-	
-	Vec3d fireDir		= Vec3d(0.0, 1.0, 0.0);
-	Vec3d forwardDir	= Vec3d(0.0, -1.0, 0.0);
-	Vec3d vehiclePos	= Vec3d(player->ModelData->VehiclePos);
-	Vec3d worldPos		= vehiclePos;
-
-	fireDir = fireDir * fireAtt;
-	fireDir = fireDir * worldAtt;
-	forwardDir = forwardDir * worldAtt;
-	firePos = firePos * worldAtt;
-	worldPos += firePos;
-	
-	//colliderDebugContact(worldPos, fireDir, colorYELLOWALPHA, "firepoint", 1.0);
-	//colliderDebugContact(worldPos, forwardDir, colorGREENALPHA, "firepoint2", 1.0);
-	
-	Matrixd fireMat;
-
-	fireMat = fireAtt;
-	fireMat = fireMat * worldAtt;
-	fireMat.setTrans(worldPos);
-	
-	// now get our trajectory
-	// this scaler is used to make the calculated trajectory match the actual trajectory.
-	// they are different because the calculated one is done via the weapon's systems ballistic model
-	// which produces a different result than the ode simulation which is what bouncing grenades use to
-	// move in the environment. In general the weapon system produces a longer trajectory than ode so we scale it
-	// down arbitrarily until they match well enough. Its a hack, but I couldn't get it to work another way.
-	static FLOAT64 scaler = .9;
-
-    static double timestep = 0.05;
-
-	weapAmmoTrajectory(_trajectory, ammo, fireMat, ammo->InitVelocity * scaler, timestep, max_trajectory_steps);
-	
-	lastUpdate = frametime;
-
-	return &_trajectory;
 }
 
 // this is called every PHYSICS loop (50 times a second) so keep processing in here
@@ -4470,8 +4384,7 @@ LOGICAL fpFPSUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 deltaTime)
 
 	if (fpsTrooper.parachuteOpen && !fpFPSIsDead())
 	{
-		// arbitrary, was .1
-		FLOAT64 scaler = .3;
+		FLOAT64 scaler = .1;
 
 		if (stateFlags & STATE_LOOK_LEFT)
 		{
@@ -5066,8 +4979,6 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	bool recentRider = (fpsTrooper.lastUnrideTime && ((frametime - fpsTrooper.lastUnrideTime) <= 3000));
 	bool considerVehicles = !recentRider;
 
-	Vec3d playerPos = pos;
-
 	// how much to push over this run (because of cage hits)
 	Vec3d push;
 
@@ -5131,7 +5042,6 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 			// push us back vector
 			Vec3d push;
-			int pcount = 0;
 
 			for(size_t i = 0; i < hits.size(); i++)
 			{
@@ -5496,12 +5406,6 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 				}
 			}
 		}
-		else if(!SuperFloat)
-		{
-			bool report = true;
-
-			//uiChatPrintLine("No ground hits detected!");
-		}
 
 		if(!cHitCount)
 			lastNormal.set(0,0,0);
@@ -5573,8 +5477,6 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 	if(nofireStrat)
 	{
-		const StratDB::StratObject* facility = nofireStrat;
-
 		while(nofireStrat && nofireStrat->StratClass() != SDM_CLASS_FACILITY)
 			nofireStrat = nofireStrat->ParentStratObject();
 
@@ -6467,6 +6369,9 @@ LOGICAL fpFPSIsWeaponSwitchOK (SINT32 weaponNumber)
 			if (!(stateFlags & STATE_RELAXED))
 				return FALSE;
 		*/
+        default:
+            // we want all other states to fall through, switch is allowed
+            break;
 	}
 
 	if (false && stateFlags & STATE_WEAPON_SWITCHING)
@@ -6492,14 +6397,16 @@ LOGICAL fpFPSIsWeaponSwitchOK (SINT32 weaponNumber)
 	if(stateFlags & (STATE_HOLD_FIRE|STATE_FIRE_DELAYED_WEAP))
 		return FALSE;
 
-	// no weapon switch with loaded rifle grenade
-	if (fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGGRENADE])
+	// Cannot switch away from grenadier with the cup attached
+	if ( fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGGRENADE] ||
+	// Cannot switch away from loaded rocket launcher
+	     (fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_ROCKET && fpsWeapons[currentWeaponModel].clipBullets != 0) )
 	{
 		persShakeHead();
 		return FALSE;
 	}
 
-	if((fpsTrooper.weaponPositionModel[weaponNumber] == BUILD_TOOL))
+	if(fpsTrooper.weaponPositionModel[weaponNumber] == BUILD_TOOL)
 	{
 		/*
 		// Don't allow PPO tool while swimming
@@ -6844,127 +6751,6 @@ static bool _toProneCheck()
 	return true;
 }
 
-#if(0)
-static bool _toPoseCheck2(int pose)
-{
-	// check timers
-	if(!_poseCheck())
-		return false;
-
-	FPSCollider* collider = nullptr;
-
-	// check colliders
-	switch(pose)
-	{
-		case POSE_STAND: collider = &_standCollider; break;
-		case POSE_CROUCH: collider = &_kneelCollider; break;
-		case POSE_PRONE: collider = &_proneCollider; break;
-	}
-
-	if(!collider || collider == _collider.collider)
-		return false;
-
-	// are we prone
-	bool prone = (fpFPSGetPlayerPose() == POSE_PRONE);
-
-	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == nullptr) return false;
-
-	// setup rays
-	Vec3d up				= Vec3d(0,0,1.0f);
-	Vec3d pos				= Vec3d(player->ModelData->VehiclePos);
-	Vec3d lpos				= Vec3d(player->ModelData->LastVehiclePos);
-	Matrixd attitude		= Matrixd(player->ModelData->VehicleAttMat);
-	Vec3d velocity			= Vec3d(player->ModelData->VehicleVel);
-	Vec3d dir				= velocity;
-
-	if(!dir.length2())
-	{
-		dir.set(0.0f, 1.0f, 0.0f);
-		dir = dir * attitude;
-	}
-
-	velocity *= 0;
-
-	// update our positions
-	collider->Update(0);
-
-	// see what we hit, what we're on, collision flags, push us back, etc...
-	if(collider->findCollisions(true))
-	{
-		// get all collisions and loop over them for inspection
-		const colliderQuery::CollisionList& hits = collider->getCollisions();
-		bool activeScenario = SCEN_MGR->IsActive();
-
-		for(size_t i = 0; i < hits.size(); i++)
-		{
-			const colliderQuery::Collision& hit = hits.at(i);
-
-			// get our flags
-			UINT32 collideBits	= dGeomGetCollideBits(hit.g1);
-			UINT32 categoryBits = dGeomGetCategoryBits(hit.g2);
-
-			std::vector<std::string> desc = colliderGetDescription(categoryBits);
-
-			if(collideBits & CAGE_COLLIDER)
-			{
-				if(colliderIsType(categoryBits, COLLIDER_BLOCK))
-				{
-					// disregard blocks if no scenario is running
-					if(!activeScenario)
-						continue;
-
-					ScenarioBlock* block = (ScenarioBlock*)dGeomGetData(hit.g2);
-
-					// see if this block pertains to our vehicle type
-					if(block && !SCEN_MGR->PlayerRelevant(block))
-						continue;
-				}
-
-				if(gCustomTerrain && colliderIsType(categoryBits, COLLIDER_TRN_WATER))
-					continue;
-
-				if(hit.depth == 0)
-					continue;
-
-				Vec3d normal = hit.normal;
-				normal.normalize();
-
-				// start out by throwing out contacts with normals
-				// in the direction of our velocity
-				bool throwOut = false;
-
-				// if we are prone, disregard relatively flat hills
-				// lower is more forgiving
-				// 1 means must be flat
-				const double raThreshold = .5f;
-
-				double upAngle = up * normal;
-
-				if(upAngle >= raThreshold)
-					throwOut = true;
-
-				// throw out really steep normals
-				if(fabs(normal.z()) >= .9f)
-					throwOut = true;
-
-				colliderDebugContact(hit.pos, normal, colorBLACKALPHA, nullptr, hit.depth);
-
-				// throw this contact out?
-				if(throwOut)
-					continue;
-
-				colliderDebugContact(hit.pos, normal, colorREDALPHA, nullptr, hit.depth);
-
-				// we hit something so bail
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
-#endif
 
 // check control block flag; used by tutorials to block certain inputs
 #define CBLOCK(x) (controlBlockFlags & (x))
@@ -7070,7 +6856,7 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 	// but for now all we want all deployable weapons like this
 	if(param && id == IMAP_HOLD_FP_GUNSIGHT && fpsWeapons[currentWeaponModel].deployPivotBone && (!gCustomTerrain || !fpsTrooper.wading))
 	{
-		// BAR can aim OR deploy - it is up to players how to map this in the keymapper
+		// BAR & FG42 can aim OR deploy - it is up to players how to map this in the keymapper
 		/*
 		deployOK = (fpsCheckDeploy(currentWeaponModel != BAR)) ? 1 : 0;
 
@@ -7080,7 +6866,7 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 		*/
 
 		// lets see if we can deploy
-		if(deployed || (currentWeaponModel != BAR))
+		if ( deployed || (currentWeaponModel != BAR && currentWeaponModel != FG42G) )
 			id = IMAP_HOLD_FP_DEPLOY;
 	}
 
@@ -7099,9 +6885,7 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 					controlStateFlags = controlStateFlags | FPS_FORWARD;
 				}
 				else
-				{
 					controlStateFlags = controlStateFlags & ~FPS_SPRINT;
-				}
 				//lastPoseChangeTime = frametime;
 
 				//if(controlStateFlags & FPS_PRONE)
@@ -7252,12 +7036,20 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 
 			if(param)
 			{
+				fpsStartGrenadeThrowTime = frametime;
+				fpsEndGrenadeThrowTime = 0;
+
 				if((controlStateFlags & FPS_FIRE) && noFire)
 				{
+					fpsEndGrenadeThrowTime = frametime;
 					controlStateFlags = controlStateFlags & ~FPS_FIRE;
 					persShakeHead();
 					uiGameEvent(GAMEEVENT_NOFIRE);
 				}
+			}
+			else
+			{
+				fpsEndGrenadeThrowTime = frametime;
 			}
 
 			fireDown = (param > 0);
@@ -7627,8 +7419,13 @@ static void fpFPSVerticalAxisLook (SINT32 param, UINT32 data)
 
 	imap_callback_ext_data*		extdata;
 	FLOAT32						maxUpAngle, maxDownAngle;
+    
+    /*
+     TBD = deal with turret elevation (currently commented out??)
+     
 	mlVehicleData*				pVehicleData = persGetPersonaModelDataPtr();
-
+     */
+    
 	extdata = (imap_callback_ext_data*)data;
 
 	fpFPSGetEyeUpDownRange(&maxUpAngle, &maxDownAngle);
@@ -7658,10 +7455,13 @@ static void fpFPSVerticalAxisLook (SINT32 param, UINT32 data)
 				angleChange = 0;
 		}
 
+        /*
+         
 		FLOAT64 total = mouseLookVertAngle + (AIM_VERTICAL_ANGLE) + angleChange;
 
-		//uiChatPrintLine("mlookangle = %.2f avertangle = %.2f change = %.2f total = %.2f min = %.2f max = %.2f", mouseLookVertAngle, AIM_VERTICAL_ANGLE, angleChange, total, maxDownAngle, maxUpAngle);
+		uiChatPrintLine("mlookangle = %.2f avertangle = %.2f change = %.2f total = %.2f min = %.2f max = %.2f", mouseLookVertAngle, AIM_VERTICAL_ANGLE, angleChange, total, maxDownAngle, maxUpAngle);
 
+         */
 		if (angleChange)
 		{
 			mouseLookVertAngle += angleChange;
@@ -7990,9 +7790,6 @@ LOGICAL fpFPSHandleControls ()
 		}
 	}
 	
-	if(controlStateFlags & FPS_SPRINT)
-		bool stop = true;
-
 	if (controlStateFlags & FPS_PRONE)
 	{
 		eyeState = EYE_PRONE;
@@ -8250,20 +8047,16 @@ LOGICAL fpFPSGetFireDirection(OBJECT* pObject, piMATRIX* pMatrix)
 	piMATRIX		rotMatrix = IdentityMatrix;
 	piMATRIX		firePoint = IdentityMatrix;
 	LOGICAL			fireFind = FALSE;
-	FLOAT32			horizWobble = 0, vertWobble = 0;
 	FLOAT32			horizAngle = 0, vertAngle = 0;
 
-	bool grenade = (fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE);
-
-	if(!grenade)
-		fireFind = gr2GetBonePosition (weapModel, "firepoint", &firePoint);
+	fireFind = gr2GetBonePosition (weapModel, "firepoint", &firePoint);
 
 	if (!fireFind)
 	{
-		if(grenade || fpsWeapons[currentWeaponModel].firepointZDistance > 0.0f)
+		if(fpsWeapons[currentWeaponModel].firepointZDistance > 0.0f)
 		{
 			firePoint._41 = fpsWeapons[currentWeaponModel].firepointHorizOffset + IdentityMatrix._41;
-			firePoint._42 = -fpsWeapons[currentWeaponModel].firepointZDistance + IdentityMatrix._42;
+			firePoint._42 = fpsWeapons[currentWeaponModel].firepointZDistance + IdentityMatrix._42;
 			firePoint._43 = ((TROOPER_STAND_EYE_HEIGHT + fpFPSGetHeight())+ fpsWeapons[currentWeaponModel].firepointVertOffset)+ IdentityMatrix._43;
 		}
 		else
@@ -8326,29 +8119,26 @@ LOGICAL	fpFPSGetFirePoint(OBJECT* pObject, piMATRIX* pMatrix, bool visual)
 {
 	fpPersonData* personData = fpGetFPPersonDataPtr();
 
-	bool grenade = (fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE);
-
-	if(!grenade && visual && personData->Flags & fpFLAGS_FORCE_EXTERNAL)
+	if(visual && personData->Flags & fpFLAGS_FORCE_EXTERNAL)
 	{
 		if(gr2AnimGetFirePointMatrix (pObject, pMatrix, visual))
 			return TRUE;
 	}
-
+	
 	piMATRIX		rotMatrix = IdentityMatrix;
 	piMATRIX		firePoint = IdentityMatrix;
 	LOGICAL			fireFind = FALSE;
 	FLOAT32			horizWobble = 0, vertWobble = 0;
 	FLOAT32			horizAngle = 0, vertAngle = 0;
 
-	if(!grenade)
-		fireFind = gr2GetBonePosition (weapModel, "firepoint", &firePoint);
+	fireFind = gr2GetBonePosition (weapModel, "firepoint", &firePoint);
 
 	if (!fireFind)
 	{
-		if(grenade || fpsWeapons[currentWeaponModel].firepointZDistance > 0.0f)
+		if(fpsWeapons[currentWeaponModel].firepointZDistance > 0.0f)
 		{
 			firePoint._41 = fpsWeapons[currentWeaponModel].firepointHorizOffset + IdentityMatrix._41;
-			firePoint._42 = -(fpsWeapons[currentWeaponModel].firepointZDistance + IdentityMatrix._42);
+			firePoint._42 = fpsWeapons[currentWeaponModel].firepointZDistance + IdentityMatrix._42;
 			firePoint._43 = ((TROOPER_STAND_EYE_HEIGHT + fpFPSGetHeight())+ fpsWeapons[currentWeaponModel].firepointVertOffset)+ IdentityMatrix._43;
 		}
 		else
@@ -8382,6 +8172,7 @@ LOGICAL	fpFPSGetFirePoint(OBJECT* pObject, piMATRIX* pMatrix, bool visual)
 	FLOAT64 ahc = fpsWeapons[currentWeaponModel].aimHorizontalCorrection;
 	FLOAT64 avc = fpsWeapons[currentWeaponModel].aimVerticalCorrection;
 
+	// HACK: Override offsets for BAR when deployed.
 	if(currentWeaponModel == BAR && fpFPSIsDeployed())
 	{
 		static FLOAT64 barAHC = .26;
@@ -8493,12 +8284,15 @@ LOGICAL fpFPSStateWeaponReadyToFire(bool honorDelays)
             weaponReady = FALSE;
             break;
         }
+    default:
+        // all other states leave weaponReady true
+        break;
     }
 
 	if (stateFlags & STATE_NEEDS_RECYCLE)
 		weaponReady = FALSE;
 
-	if (honorDelays && (stateFlags & STATE_HOLD_FIRE) && fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_GRENADE)
+	if (honorDelays && (stateFlags & STATE_HOLD_FIRE))
 		weaponReady = FALSE;
 
 	if (stateFlags & STATE_DEPLOYING)
@@ -8617,22 +8411,38 @@ LOGICAL fpFPSStateWeaponReadyToFire(bool honorDelays)
 LOGICAL fpFPSStateOKToFire ()
 {
 	LOGICAL			okToFire;
+	static SINT32	grenadeStartTime;
 
 	okToFire = FALSE;
 
 	if (!fpFPSStateWeaponReadyToFire())
 		return FALSE;
 
-	// fire any weapons that have been delayed
-	if(fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_KNIFE ||
-		fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE ||
-		fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_LTMORTAR)
+	// this lovely tidbit is to delay the grenade fire just a little, so it looks more in sync with the arms
+	if (fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE)
+	{
+		if (stateFlags & STATE_FIRE_DELAYED_WEAP)
+		{
+			if ((grenadeStartTime == 0) && (currentFPSstate != RELOAD) && (currentFPSstate != THROW))
+			{
+				grenadeStartTime = frametime;
+			}
+
+			if ((grenadeStartTime + fpsWeapons[currentWeaponModel].grenadeDelayTime) < frametime)
+			{
+				okToFire = TRUE;
+				grenadeStartTime = 0;
+				stateFlags &= ~STATE_FIRE_DELAYED_WEAP;
+			}
+		}
+	}
+	else if(fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_KNIFE ||
+			fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_LTMORTAR)
 	{
 		if (stateFlags & STATE_FIRE_DELAYED_WEAP)
 		{
 			okToFire = TRUE;
 			stateFlags &= ~STATE_FIRE_DELAYED_WEAP;
-			stateFlags &= ~STATE_HOLD_FIRE;
 		}
 	}
 	// Goofy new rule to be still while placing a satchel
@@ -9165,9 +8975,9 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 							case FPS_WEAPONTYPE_ROCKET:
 								fpsTrooper.tpsAttack = 1;
 							break;
-							case FPS_WEAPONTYPE_GRENADE:
-								showGun = FALSE;
-							break;
+                            default:
+                                // don't care about other weapon types
+                                break;
 						}
 					}
 				}
@@ -9553,9 +9363,6 @@ void fpFPSReload (weapWeapon* weapon)
 	stateFlags &= ~STATE_NEEDS_RECYCLE;
 	stat2Flags &= ~STAT2_NEEDS_RELOAD;
 
-	stateFlags &= ~STATE_HOLD_FIRE;
-	stateFlags &= ~STATE_FIRE_DELAYED_WEAP;
-
 	assert (currentGameWeapon == weapon);
 
 	SCHAR* reloadSound = nullptr;
@@ -9670,8 +9477,6 @@ void fpFPSForcedReload ()
 		persShakeHead("common.headshake.reloadstill");
 		return;
 	}
-
-	SINT32 cb = fpsWeapons[currentWeaponModel].clipBullets;
 
 	if ((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_RIFLE) && (fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGCUP]))
 	{
@@ -10903,8 +10708,6 @@ LOGICAL fpFPSRideUnrideVehicle ()
 			RidePos.y = RideObject->dof->dofmatrix2._42;
 			RidePos.z = RideObject->dof->dofmatrix2._43;
 
-			FLOAT64VECTOR temp = RidePos;
-
 			mathVectorMultiply64(&RidePos, &RidePos, &RideObject->mat);
 
 			RidePos.x += WorldOriginOffset.x;
@@ -10914,7 +10717,6 @@ LOGICAL fpFPSRideUnrideVehicle ()
 
 			if(mathExactVectorLength2(&DeltaVec) < MIN_RIDE_DISTANCE2)
 			{
-				//uiChatPrintLine("Choosing seat %d at relative position %.2f,%.2f,%.2f", i, temp.x, temp.y, temp.z);
 				FPSRideVehicle = currentVehicle;
 				vehicle->RideVehicleHostIndex = FPSRideVehicle->VehicleHostIndex;
 				vehicle->RideSeatNum = i;
@@ -11596,6 +11398,21 @@ void fpFPSDrawGunsight (void)
             persGunsightDrawOverlay();
         }
 
+		// Add the scope view function here   DEG
+		// It will use the example above, but it will have a sight mark.
+		// It will be called when the sniper wepon exists and a scope view is needed.
+
+		// This is added to calulate the delay of any grenade for FPS. DEG
+		if (fpsWeapons[currentWeaponModel].grenadeVisDelay)
+		{
+			if((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE) && 
+				(currentFPSstate == THROW)&&
+				(((frametime / 1000.0) - grenadeApperLapse) > fpsWeapons[currentWeaponModel].grenadeVisDelay ))
+			{
+				showGun = FALSE;
+			}
+		}
+
 		if(fpsWeapons[currentWeaponModel].sniperScope)
 		{
             switch(currentFPSstate)
@@ -11703,6 +11520,21 @@ void fpFPSDrawGunsight (void)
 		{
             persGunsightDrawOverlay();
         }
+
+		// Add the scope view function here   DEG
+		// It will use the example above, but it will have a sight mark.
+		// It will be called when the sniper wepon exists and a scope view is needed.
+
+		// This is added to calulate the delay of any grenade for FPS. DEG
+		if (fpsWeapons[currentWeaponModel].grenadeVisDelay)
+		{
+			if((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE) && 
+				(currentFPSstate == THROW)&&
+				(((frametime / 1000.0) - grenadeApperLapse) > fpsWeapons[currentWeaponModel].grenadeVisDelay ))
+			{
+				showGun = FALSE;
+			}
+		}
 
 		if(fpsWeapons[currentWeaponModel].sniperScope)
 		{
@@ -12112,7 +11944,7 @@ void fpFPSResupplySelf(vehVehicle*vehicle)
 {
 	if (!vehicle)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "nullptr vehicle tried to resupply me?!!");
+		Write_Log (LOG_FPS, LOG_INFO, "Null vehicle tried to resupply me?!!");
 		return;
 	}
 
@@ -12242,7 +12074,7 @@ LOGICAL fpsCheckDeploy(bool doShake)
 		    }
         }
 
-		if (!retVal && doShake && currentWeaponModel != BAR)
+		if (!retVal && doShake && currentWeaponModel != BAR && currentWeaponModel != FG42G)
 		{
 			persShakeHead();
 		}
@@ -12276,7 +12108,7 @@ LOGICAL fpsCheckDeploy(bool doShake)
 			retVal = FALSE;
 		}
 
-		if (!retVal && doShake && currentWeaponModel != BAR)
+		if (!retVal && doShake && currentWeaponModel != BAR && currentWeaponModel != FG42G)
 		{
 			persShakeHead();
 		}
@@ -12289,7 +12121,7 @@ LOGICAL fpsCheckDeploy(bool doShake)
 	return retVal;
 }
 
-SINT32 fpFPSPlaySound (SCHAR* sound)
+SINT32 fpFPSPlaySound (const SCHAR* sound)
 {
 	if (!sound)
 		return -1;
@@ -13442,15 +13274,12 @@ static inline bool _candeploy(int direction)
 
 FLOAT32 fpFPSGetGrenadeThrowPower()
 {
-	/*
 	if(fpsEndGrenadeThrowTime == 0) fpsEndGrenadeThrowTime = frametime;
 	FLOAT32 maxPower = .25f + .75f * (fpsEndGrenadeThrowTime - fpsStartGrenadeThrowTime) / 2000.0f;
 	if(maxPower < .25f) maxPower = .25f;
 	else if(maxPower > 1.0f) maxPower = 1.0f;
 
 	return maxPower;
-	*/
-	return 1.0f;
 }
 
 #define SQR(x) ((x)*(x))
@@ -13762,6 +13591,9 @@ void _updateFPSColliders()
 		case POSE_PRONE:
 			_collider.collider = &_proneCollider;
 		break;
+        default:
+            // only poses above have colliders
+            break;
 	}
 
 	//_collider.collider = &_kneelCollider;
@@ -13945,10 +13777,8 @@ void _updateWeaponLag(float deltaTime)
 	float WLA		= WEAPON_LAG_ACCEL * WMOD; // how much to lag based on mouse movement
 	float WLB		= WEAPON_LAG_BLEED * WMOD; // how much to bleed each frame
 
-	float WLM		= WEAPON_LAG_MOVE * WMOD; // amount of lag when strafing and moving backwards
 	float WLJ		= WEAPON_LAG_JUMP * WMOD; // base value to calculate from
 	float WLJMAX	= WEAPON_LAG_JUMPMAX * WMOD; // max jump between frames
-	float WLJMIN	= WEAPON_LAG_JUMPMIN * WMOD; // min jump between frames
 
 	if(horizWeaponLag || horizAvgAcc)
 	{

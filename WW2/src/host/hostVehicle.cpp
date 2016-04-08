@@ -742,8 +742,7 @@ HostVehicle::isInCaptureBuilding() const
 }
 
 static void
-_reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...) __attribute__ ((format (printf,2,3)));
-
+_reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...) FORMAT_FUN(2, 3);
 static void
 _reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...)
 {

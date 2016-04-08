@@ -84,7 +84,7 @@
 	extern LOGICAL trnmainDraw();
 	extern LOGICAL trnmainLODChange(void);
 	extern LOGICAL trnmainDrawLastFrame(OBJECT* lpobj);
-	extern LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, SINT8* texname);
+	extern LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, const SINT8* texname);
 	extern LOGICAL trnmainAddToObject(OBJECT* newobj, OBJECT* lpobj, SINT32 poly, SINT32 tonum, SINT32 drag, SINT32 roughness, SINT32 style, SINT32 orientation);
 	extern LOGICAL trnmainDrawObject(OBJECT* lpobj);
 	extern LOGICAL trnmainGetMapName(SINT8* mapname);

@@ -11,7 +11,7 @@
 #include "ob/obebox.h"
 #include "str/strpool.h"
 
-static char*         suffix[6]={"s","e","n","w","u","d"};
+static const char*         suffix[6]={"s","e","n","w","u","d"};
 static piVECTOR     norms[6]={{ 0.0f,-1.0f, 0.0f},
                               {-1.0f, 0.0f, 0.0f},
                               { 0.0f, 1.0f, 0.0f},

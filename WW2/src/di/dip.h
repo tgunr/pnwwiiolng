@@ -9,6 +9,10 @@
 	#define dipKEYDOWN(name,key)		(name[key] & 0x80)
 	#define MAX_DIDEVICES				32
 
+enum {
+
+	MAX_KEYS   = 256  // not really, but other stuff breaks because it hardcodes this value
+};
 
 	LOGICAL dipInit(void);
 

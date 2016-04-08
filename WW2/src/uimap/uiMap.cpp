@@ -450,16 +450,21 @@ void PlayerMapObject::DrawSelf(SuperCellMapView* mv)
 
 	if(_shownavring)
 	{
-		float iconscale = mv->Width() / mv->Scale();
 		/*
+         
+         TBD - Is this code truly obsolete?
+         
+        float iconscale = mv->Width() / mv->Scale();
 		width = 1000.0f/SDM_SUPERCELL_SIZE * iconscale;
 		float scalescale = pow(10.0f, (float)floor(log10(width/(mv->Width()*.9/2.0)))+1);
-		*/
 
 		//if(mv->NavScale())
 		//	width = height = (mv->Width() * mv->NavScale()) / iconscale;
 		//else
-			width = height = 2000.0f/SDM_SUPERCELL_SIZE/mv->MapScale();
+         
+         */
+
+        width = height = 2000.0f/SDM_SUPERCELL_SIZE/mv->MapScale();
 
 		x = -width/2; y = -height/2;
 

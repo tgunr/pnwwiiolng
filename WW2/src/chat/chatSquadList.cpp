@@ -91,7 +91,7 @@ public:
 
 	std::vector<Result> m_results;
 
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -113,7 +113,7 @@ public:
 		return true;
 	}
 
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		SquadList* list = chatFindSquadList(m_squadID);
 		if ( list == nullptr )
@@ -198,7 +198,7 @@ public:
 		list->announce();
 	}
 
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		dbugLog(_FLW, "sq:%u error reading squad list", m_squadID);
 	}
@@ -1214,12 +1214,12 @@ public:
 		{}
 
 public:
-	virtual bool Process(const size_t) OVERRIDE_FN
+	virtual bool Process(const size_t) override
 	{
 		return true;
 	}
 
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		///TODO: Implement non-DBD squad updating
 	}
@@ -1249,7 +1249,7 @@ public:
 	SquadNamesQuery() : DBThreadQuery(DBThread::Default, "SquadNamesQuery", "SELECT short_name FROM wwii_squads", DBThreadQuery::_IMMEDIATE) {}
 
 protected:
-	virtual void Success() OVERRIDE_FN;
+	virtual void Success() override;
 };
 
 void

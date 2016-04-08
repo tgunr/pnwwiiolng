@@ -124,18 +124,18 @@ ADD_CUSTOM_COMMAND(OUTPUT ${OMGGEN_DIR}/omggen.yy.cpp ${OMGGEN_DIR}/omggen.yy.h
     COMMENT "[FLEX] Building OMGGEN"
     WORKING_DIRECTORY ${OMGGEN_DIR}
 )
-ADD_EXECUTABLE(omggen
-    omggen/omggen.tab.cpp
-        omggen/omggen.tab.h
-    omggen/omggen.yy.cpp
-        omggen/omggen.yy.h
-    omggen/omggen.cpp
-        omggen/omggen.h
-    omggen/omggen.y
-    omggen/omggen.l
+ADD_EXECUTABLE(OMGgen
+    ${OMGGEN_DIR}/omggen.tab.cpp
+        ${OMGGEN_DIR}/omggen.tab.h
+    ${OMGGEN_DIR}/omggen.yy.cpp
+        ${OMGGEN_DIR}/omggen.yy.h
+    ${OMGGEN_DIR}/omggen.cpp
+        ${OMGGEN_DIR}/omggen.h
+    ${OMGGEN_DIR}/omggen.y
+    ${OMGGEN_DIR}/omggen.l
 )
 IF(WIN32)
-    SET_PROPERTY(TARGET omggen PROPERTY COMPILE_DEFINITIONS __STDC_VERSION__=199901L)
+    SET_PROPERTY(TARGET OMGgen PROPERTY COMPILE_DEFINITIONS __STDC_VERSION__=199901L)
 ENDIF()
 
 MACRO(ADD_OMG_TARGET _TARGET)
@@ -146,10 +146,10 @@ MACRO(ADD_OMG_TARGET _TARGET)
     ADD_CUSTOM_COMMAND(
         PRE_BUILD
         OUTPUT  ${_TARGET_PREFIX}.cxx ${_TARGET_PREFIX}.hxx
-        DEPENDS omggen ${_TARGET_PATH}/typedefs.omg ${_TARGET_PREFIX}.omg
+        DEPENDS OMGgen ${_TARGET_PATH}/typedefs.omg ${_TARGET_PREFIX}.omg
         MAIN_DEPENDENCY ${_TARGET_PREFIX}.omg
         COMMENT "[OMG] ${_FILENAME}.omg"
-        COMMAND omggen
+        COMMAND OMGgen
         ARGS -D${_TARGET_PATH} --cxx=${_FILENAME}.cxx --hxx=${_FILENAME}.hxx ${_FILENAME}.omg
         WORKING_DIRECTORY ${_TARGET_PATH}
     )
@@ -159,9 +159,9 @@ ADD_OMG_TARGET(omg/omgMissionSortieData)
 ADD_OMG_TARGET(omg/omgChat)
 
 IF(NOT MSVC)
-    SET_TARGET_PROPERTIES(omggen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
+    SET_TARGET_PROPERTIES(OMGgen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
 ENDIF( )
-SET_PROPERTY(TARGET omggen PROPERTY FOLDER "Tools")
+SET_PROPERTY(TARGET OMGgen PROPERTY FOLDER "Tools")
 
 ######################################################################
 #### Libraries.
@@ -178,7 +178,6 @@ ENDIF( )
 # TeulServer library - this is a baseline library that provides
 # teulKit services and the cluster's "server" API.
 ADD_LIBRARY(teulserver
-    mem/memlinux.cpp
     server/server.cpp
         server/server.h
             server/serverReleaseTypeEnum.h

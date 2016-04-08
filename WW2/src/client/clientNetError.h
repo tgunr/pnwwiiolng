@@ -22,7 +22,6 @@ class ClientNetError
 public:
 	ClientNetError(const char* what) : m_error(-1), m_what(what) {}
 	ClientNetError(int error, const char* what) : m_error(error), m_what(what) {}
-	virtual ~ClientNetError() {}
 
 	int Error() const { return m_error; }
 	const char* What() const { return m_what; }

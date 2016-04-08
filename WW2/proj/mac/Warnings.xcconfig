@@ -1,0 +1,103 @@
+//
+//  Warnings.xcconfig
+//  WW2OL
+//
+//  Created by Gwynne Raskind on 10/30/15.
+//  Copyright © 2015 Playnet. All rights reserved.
+//
+
+////////////////////////////////////////////////////////////////////////////////
+// Warnings. This setup enables ALL the warnings Clang's ever heard of,
+// including a lot of really useless ones, then shuts off those plus the ones we
+// can't deal with or don't consider issues. It's a shame the xcconfig parser is
+// so weak; even a Makefile could do a += and not require the -W prefixes. Or,
+// for that matter, have a \ to escape a newline!
+//
+// Please note, it is NOT practical to generate the xcconfig files from some
+// more interesting source language, Xcode doesn't handle it very well when an
+// xcconfig changes after a user action.
+//
+// The _00 one is just space filler for visual consistency. It's empty.
+//
+// See the comments in Defines.xcconfig for a bit more info.
+
+WW2_WARNINGS_34 = $(WW2_WARNINGS_35) -Wno-double-promotion                      // Honestly, I just don't care.
+WW2_WARNINGS_33 = $(WW2_WARNINGS_34) -Wno-cstring-format-directive              // It's okay to use %s with NSString, Apple
+WW2_WARNINGS_32 = $(WW2_WARNINGS_33) -Wno-error=c++11-narrowing                 // Don't make this a hard error, even though it should be
+WW2_WARNINGS_31 = $(WW2_WARNINGS_32) -Wno-packed                                // Yay, we're packing when we don't need to, big whoop
+WW2_WARNINGS_30 = $(WW2_WARNINGS_31) -Wno-pedantic                              // Don't be pedantic
+WW2_WARNINGS_29 = $(WW2_WARNINGS_30) -Wno-gnu-anonymous-struct                  // Yet another GNU extension we actually like
+WW2_WARNINGS_28 = $(WW2_WARNINGS_29) -Wno-cast-align                            // Alignment is not one of our current issues
+WW2_WARNINGS_27 = $(WW2_WARNINGS_28) -Wno-covered-switch-default                // Covered defaults are safety nets
+WW2_WARNINGS_26 = $(WW2_WARNINGS_27) -Wno-exit-time-destructors                 // Global destructors are pretty obvious too
+WW2_WARNINGS_25 = $(WW2_WARNINGS_26) -Wno-documentation                         // We don't want documentation validation
+WW2_WARNINGS_24 = $(WW2_WARNINGS_25) -Wno-unused-parameter                      // Unused parameters is not a useful warning, it happens too often
+WW2_WARNINGS_23 = $(WW2_WARNINGS_24) -Wno-c++98-compat                          // We don't care if we're compatible with C++98 anymore
+WW2_WARNINGS_22 = $(WW2_WARNINGS_23) -Wno-padded                                // Struct padding isn't useful info most of the time
+WW2_WARNINGS_21 = $(WW2_WARNINGS_22) -Wno-undef                                 // Use of undefined macros is common on most platforms
+WW2_WARNINGS_20 = $(WW2_WARNINGS_21) -Wno-c++98-compat-pedantic                 // C++98 is dead, long live C++14
+WW2_WARNINGS_19 = $(WW2_WARNINGS_20) -Wno-used-but-marked-unused                // This happens a lot with debug functions
+WW2_WARNINGS_18 = $(WW2_WARNINGS_19) -Wno-c99-extensions                        // We don't care about C89 either!
+WW2_WARNINGS_17 = $(WW2_WARNINGS_18) -Wno-disabled-macro-expansion              // This is a normal behavior of the preprocessor, who cares
+WW2_WARNINGS_16 = $(WW2_WARNINGS_17) -Wno-unused-macros                         // Unused macros are common
+WW2_WARNINGS_15 = $(WW2_WARNINGS_16) -Wno-unused-exception-parameter            // Unused exception parameters are stupid but do happen
+WW2_WARNINGS_14 = $(WW2_WARNINGS_15) -Wno-global-constructors                   // Global constructors are pretty obvious
+WW2_WARNINGS_13 = $(WW2_WARNINGS_14) -Wno-switch-enum                           // Unhandled switch cases are too noisy in this codebase
+WW2_WARNINGS_12 = $(WW2_WARNINGS_13) -Wno-gnu-zero-variadic-macro-arguments     // We like this GNU extension, why warn?
+WW2_WARNINGS_11 = $(WW2_WARNINGS_12) -Wno-variadic-macros                       // This one too
+WW2_WARNINGS_10 = $(WW2_WARNINGS_11) -Wno-missing-noreturn                      // This could be removed after a code audit
+WW2_WARNINGS_09 = $(WW2_WARNINGS_10) -Wno-unknown-warning-option                // No worrying about different compiler versions whining
+WW2_WARNINGS_08 = $(WW2_WARNINGS_09) -Wno-auto-import                           // This is a desired behavior
+WW2_WARNINGS_07 = $(WW2_WARNINGS_08) -Wno-overlength-strings                    // Unfortunately, this happens often in real code
+WW2_WARNINGS_06 = $(WW2_WARNINGS_07) -Wno-assign-enum                           // Way too noisy in this codebase
+WW2_WARNINGS_05 = $(WW2_WARNINGS_06) -Wno-objc-missing-property-synthesis       // This is desired in autosynthesizing contexts
+WW2_WARNINGS_04 = $(WW2_WARNINGS_05) -Wno-gnu-conditional-omitted-operand       // We like this GNU extension too
+WW2_WARNINGS_03 = $(WW2_WARNINGS_04) -Wno-old-style-cast                        // Too noisy in this codebase
+WW2_WARNINGS_02 = $(WW2_WARNINGS_03) -Wno-documentation-unknown-command         // WAAAAAAY too noisy in this codebase and also not very useful anyway
+WW2_WARNINGS_01 = $(WW2_WARNINGS_02) -Wno-reserved-id-macro                     // We use lots of _-prefixed macros
+
+WW2_WARNINGS    = -Weverything       $(WW2_WARNINGS_01)                         // Turn on EEEEEEEVERYTHING by default
+
+WARNING_CFLAGS = $(WW2_WARNINGS)
+
+// These are all partially (but not completely?) independent of WARNING_CFLAGS
+// and need to be specified explicitly.
+GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS = YES
+GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES
+GCC_WARN_ABOUT_RETURN_TYPE = YES
+GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES
+GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES
+CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES
+GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES
+GCC_WARN_MISSING_PARENTHESES = YES
+GCC_WARN_CHECK_SWITCH_STATEMENTS = YES
+GCC_WARN_UNUSED_FUNCTION = YES
+GCC_WARN_UNUSED_LABEL = YES
+GCC_WARN_UNUSED_PARAMETER = YES
+GCC_WARN_UNUSED_VARIABLE = YES
+GCC_WARN_UNUSED_VALUE = YES
+CLANG_WARN_EMPTY_BODY = YES
+GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE
+GCC_WARN_UNKNOWN_PRAGMAS = YES
+GCC_WARN_SHADOW = YES
+GCC_WARN_FOUR_CHARACTER_CONSTANTS = YES
+CLANG_WARN_CONSTANT_CONVERSION = YES
+CLANG_WARN_INT_CONVERSION = YES
+GCC_WARN_64_TO_32_BIT_CONVERSION = YES
+CLANG_WARN_ENUM_CONVERSION = YES
+CLANG_WARN_BOOL_CONVERSION = YES
+CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = YES
+GCC_WARN_ABOUT_MISSING_NEWLINE = YES
+CLANG_WARN_IMPLICIT_SIGN_CONVERSION = YES
+CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES
+CLANG_WARN_CXX0X_EXTENSIONS = YES
+CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES
+CLANG_WARN_OBJC_EXPLICIT_OWNERSHIP_TYPE = YES
+CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES
+CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES
+CLANG_WARN_UNREACHABLE_CODE = YES
+
+// Enable extra analyze modes
+CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES
+CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES
+CLANG_ANALYZER_SECURITY_INSECUREAPI_STRCPY = YES

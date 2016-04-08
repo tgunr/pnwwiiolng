@@ -5,6 +5,7 @@
 #include "pi/pi.h"
 #include "include/vars.h"
 
+#include "dip.h"
 #include "ob/obmain.h"
 #include "ob/obdraw.h"
 #include "ob/obwld.h"
@@ -298,8 +299,6 @@ static void PreRenderUpdate()
     fxWeatherUpdate();
     fxMgrUpdate();
 
-    bool render = uiInGame() && (Online ? g_bVehicleAttached : TRUE);
-
     if(persIsPersonaVehicleType(VEH_TYPE_AIR))
         radclutterEnable(g_bRadialWhenFlying);
     else
@@ -567,15 +566,6 @@ LOGICAL gmlpMainKill(void)
 
 //	physicsKill(); needs to go after obmainkill
 	uiKill();
-
-#ifdef MEMORY_DEBUG_EXTREME
-UINT32	mUsed, mUnused;
-UINT32	cUsed, cUnused;
-
-	memDisplayHeap(&mUsed, &mUnused, &cUsed, &cUnused);
-	Write_Debug("Used memory: %d for %d", cUsed, mUsed);
-	Write_Debug("Unused memory: %d for %d", cUnused, mUnused);
-#endif
 
 	persBombsightKill();
 	persGunsightKill();
@@ -860,7 +850,7 @@ void _RenderDeprecated()
     const bool render = uiInGame() && (Online ? g_bVehicleAttached : TRUE);
 
 #if platOS == OS_MACOS
-	render = !ddpAppHidden();
+	//render = !ddpAppHidden();
 #endif
 
 	if(render)
@@ -1123,10 +1113,6 @@ static LOGICAL _PostInternalDrawFunc(LOGICAL IsBeforeStage)
 imap_queue_entry* imapqueue;
 UINT32 imapqueuesize;
 
-#if platOS == OS_MACOS
-void checkIfInFront();
-#endif
-
 void gmlpProcessInputs(void)
 {
 	CHAR_INPUT* input;
@@ -1136,7 +1122,7 @@ void gmlpProcessInputs(void)
 	static SINT32 afkcheck	= frametime;
 
 #if platOS == OS_MACOS
-  checkIfInFront();
+    checkIfInFront();
 #endif
 
 	dimainGetInputs(&imapqueue, &imapqueuesize);

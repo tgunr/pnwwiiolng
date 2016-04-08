@@ -71,6 +71,17 @@
 bool _newpredictor = true;
 int _simlowupdate = 0;
 
+#ifdef DEBUG_UPDATES
+UINT32 vehUpdatesSent = 0;
+UINT32 vehMcrewUpdatesRecv = 0;
+UINT32 vehNonMcrewUpdatesRecv = 0;
+UINT32 vehMcommanderUpdatesIgn = 0;
+UINT32 worldUpdatesReceived = 0;
+UINT32 duplicateUpdatesIgnored = 0;
+UINT32 vehNotTracked = 0;
+UINT32 unexpectedErrors = 0;
+#endif
+
 typedef struct
 {
 	const char* name;
@@ -86,6 +97,9 @@ static const IconRank _SpecialRanks[] =
 	{"frytiger", 	FT_RANK },
 	{"snail", 		SNAIL_RANK },
 	{"lindir", 		LINDIR_RANK },
+	{"xoom",        XOOM_RANK },
+	{"ohm",         OHM_RANK },
+	{"victarus",    VICTARUS_RANK },
 #endif
 	{nullptr, 0}
 };
@@ -334,6 +348,21 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 
 	if (frametime - TempNum > 0 || ForceSend != 0)
 	{
+
+#ifdef DEBUG_UPDATES
+		static SINT32 _LastReportTime = 0; // added specific initialization 5/28/01 hoss
+										   /* Report our tracking numbers every second */
+		SINT32 Periodic = _LastReportTime + 1000;
+		if (frametime - Periodic > 0)
+		{
+			dbugLog(_FLI, "WUR: %u, VNT: %u UE: %u DUI: %u, US: %u, MCUR: %u",
+				worldUpdatesReceived, vehNotTracked, unexpectedErrors, duplicateUpdatesIgnored, vehUpdatesSent, vehMcrewUpdatesRecv);
+			vehUpdatesSent = vehMcrewUpdatesRecv = vehNonMcrewUpdatesRecv = vehMcommanderUpdatesIgn = 0;
+			worldUpdatesReceived = duplicateUpdatesIgnored = vehNotTracked = unexpectedErrors = 0;
+			_LastReportTime = frametime;
+		}
+#endif
+
 		_LastUpdateTime = frametime;
 
 		vehGetVehicleHead(&Vehicle);
@@ -360,7 +389,6 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 			}
 
 			_SendUpdate(*Vehicle, *Vehicle->ModelData);
-
 			break;
 		}
 	}
@@ -552,39 +580,37 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	VehicleInfo.stateFlags1 = 0;
 	VehicleInfo.visBits = 0;
 
+	// set the state bits according to the vehicle configuration
+	VehicleHdr.present &= ~(PR_STATE0 | PR_STATE1 | PR_VEH_VIS | PR_POSITION);
+	VehicleHdr.present |= PR_STATE0;
+	if (Vehicle.VehicleType->NumStates > 15)
+		VehicleHdr.present |= PR_STATE1;
+	if (Vehicle.VehicleType->NumStates > 31)
+		VehicleHdr.present |= PR_VEH_VIS;
+
 	for(i = 0; i < Vehicle.VehicleType->NumStates; i++)
 	{
-		// only send bits that are relavent to the player's multicrew position
-		if (Data.MultiCrewPos != 0 && Data.MultiCrewPos != Vehicle.VehicleType->StateType[i].MultiCrewPos)
-		{
-			continue;
-		}
-
+		// always send out everything we know
 		if (Vehicle.PosData.States[i])
 		{
-			if(i >= 32)
+			if ( i >= 32 )
 				VehicleInfo.visBits |= 1 << (i - 32);
-			else if (i > 15 &&  i < 32)
+			else if ( i > 15 && i < 32 )
 				VehicleInfo.stateFlags1 |= 1 << (i - 16);
 			else
 				VehicleInfo.stateFlags0 |= 1 << i;
 		}
 	}
 
-	if(Data.MultiCrewPos < 2)
+	// Although the vehicle defines this as UINT32, it is really an UPDT_STATION enum field and should not be hardcoded.
+	if(static_cast<UPDT_STATION>(Data.MultiCrewPos) != UPDT_OTHER)
 	{
 		VehicleHdr.present |= PR_POSITION;
-		if(Vehicle.VehicleType->NumStates > 0)
-			VehicleHdr.present |= PR_STATE0;
-		if(Vehicle.VehicleType->NumStates > 15)
-			VehicleHdr.present |= PR_STATE1;
-		if(Vehicle.VehicleType->NumStates > 31)
-			VehicleHdr.present |= PR_VEH_VIS;
+#ifdef DEBUG_UPDATES
+			++vehUpdatesSent;
+#endif
 	}
-	else
-	{
-		VehicleHdr.present &= ~(PR_STATE0 | PR_STATE1 | PR_VEH_VIS | PR_POSITION);
-	}
+
 
 	// mount firing
 	VehicleInfo.fire.state = 0;
@@ -601,6 +627,8 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	VehicleHdr.fireMask = VehicleInfo.fire.state;
 	VehicleHdr.present |= PR_FIRE_FLAGS;
 
+    bool sendTurrets = (Data.HasSentUpdate >= 3);
+    
 	// turret traverse
 	TurretMask = 0;
 	NumTurrets = 0;
@@ -617,8 +645,8 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 			TurretElev[i] = (turret_t)Data.TurretElevate[i];
 #endif
 
-			if (TurretTrav[i] != Vehicle.StateAnimation.LastSendTurretTrav[i] ||
-				TurretElev[i] != Vehicle.StateAnimation.LastSendTurretElev[i])
+			if (sendTurrets && (TurretTrav[i] != Vehicle.StateAnimation.LastSendTurretTrav[i] ||
+				TurretElev[i] != Vehicle.StateAnimation.LastSendTurretElev[i]))
 			{
 //				Write_Log (LOG_FPS, LOG_INFO, "XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
 				//uiChatPrintLine("TURRET XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
@@ -680,11 +708,11 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 #endif
 			break;
 			default:
-				continue;
+            break;
 			}
 
-			if (TurretTrav[i] != Vehicle.StateAnimation.LastSendTurretTrav[i] ||
-				TurretElev[i] != Vehicle.StateAnimation.LastSendTurretElev[i])
+			if (sendTurrets && (TurretTrav[i] != Vehicle.StateAnimation.LastSendTurretTrav[i] ||
+				TurretElev[i] != Vehicle.StateAnimation.LastSendTurretElev[i]))
 			{
 				//Write_Log (LOG_FPS, LOG_INFO, "XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
 				//uiChatPrintLine("TURRET XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
@@ -855,122 +883,186 @@ static void ProcessInfantryAnimationFlags(vehVehicle* Vehicle, const VEHICLE_UPD
 #endif
 }
 
+/*
+This function will convert a bitField provided to update state status info within the
+PosData client data when only appropriate to do so based on ownership of the status.
+*/
+void applyStatusBits(UINT32 stateCheck, void * bitField, UINT32 offset, UINT32 numBits,
+	const VEHICLE_UPDATE_HEADER * VehicleHeader, vehVehicle * Vehicle)
+{
+	vehVehiclePositionData * PosData = &Vehicle->PosData;
+
+	// first make sure this status field is present
+	if (VehicleHeader->present & stateCheck)
+	{
+
+		// go through each bit of the status field but numbered as they exist
+		// in the client vehicle state array
+		for (UINT32 i = offset; i < (offset + numBits); i++)
+		{
+
+			/*
+
+			Here we intend to only override our knowledge of status so long as we aren't in control.
+			oberservers:	by definition are never in control - they accept whatever they see
+			commanders:		only accept status that a crew member is in charge of
+			crew:			only accept status that the commander is in charge of
+
+			*/
+
+			bool okToUpdate = false;
+			if (Vehicle->ModelData != nullptr)
+			{
+				if (static_cast<UPDT_STATION>(Vehicle->ModelData->MultiCrewPos) == UPDT_OTHER &&
+					Vehicle->VehicleType->StateType[i].MultiCrewPos == UPDT_CONTROL)
+					okToUpdate = true;
+				else if (static_cast<UPDT_STATION>(Vehicle->ModelData->MultiCrewPos) == UPDT_CONTROL &&
+					Vehicle->VehicleType->StateType[i].MultiCrewPos == UPDT_OTHER)
+					okToUpdate = true;
+			}
+			else
+				okToUpdate = true;  // observer
+
+									// only update locally if there is no conflict
+			if (okToUpdate)
+			{
+				bool testBit = (numBits > 16) ?
+					(*reinterpret_cast<UINT32 *>(bitField) & 1 << (i - offset)) :
+					(*reinterpret_cast<UINT16 *>(bitField) & 1 << (i - offset));
+				if (testBit)
+					PosData->States[i] = TRUE;
+				else
+					PosData->States[i] = FALSE;
+			}
+		}
+	}
+}
+
 static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,const VEHICLE_UPDATE_HEADER * VehicleHeader)
 {
-	SINT16 Delta;
-	UINT32 i;
-	LOGICAL Rollover = FALSE;
-
 	if (VehicleHeader == nullptr) return 0;
 	const SHARED_VEHICLE_INFO*VehicleInfo = &VehicleHeader->vehInfo;
 
-	Delta = (SINT16)((UINT16)VehicleInfo->posTimeStamp) - (SINT16)((UINT16)PosData->CurrentSenderUpdateTime);
-	if (Delta < 0 && !(VehicleHeader->present & PR_ONE_TIME))
-	{
-		Rollover = TRUE;
-	}
+	// convert 16 bit world update time to 32bit signed by first 0 extending, then converting to signed
+	SINT32 thisTS = VehicleInfo->posTimeStamp;
 
-	// states
-	if (VehicleHeader->present & PR_STATE0)
+	/*
+		Does this World update contain a position report?
+	 */
+	if (VehicleHeader->present & (PR_POSITION | PR_RELPOS))
 	{
-		for (i=0;i<16;i++)
+		/*
+			Update prediction time saving last (current frame)
+		*/
+		PosData->LastUpdateTime = PosData->CurrentUpdateTime;
+		PosData->CurrentUpdateTime = frametime;
+		SINT32 timeDiff = (thisTS - PosData->CurrentSenderUpdateTime);
+
+		/*
+			Is this a position update (not initial) and has
+			a roll-over of the 16 bit time value ocurred (roughtly every 65 seconds)?
+		 */
+		if ( timeDiff < 0
+			
+			&& !(VehicleHeader->present & PR_ONE_TIME))
 		{
-			// only update state bits on other multicrew players update
-			if (Vehicle->ModelData != nullptr)
-			{
-				if (Vehicle->ModelData->MultiCrewPos ==
-							Vehicle->VehicleType->StateType[i].MultiCrewPos)
-				{
-					continue;
-				}
-			}
 
-			if (VehicleInfo->stateFlags0 & 1 << i)
-				PosData->States[i] = TRUE;
-			else
-				PosData->States[i] = FALSE;
-		}
-	}
-	if (VehicleHeader->present & PR_STATE1)
-	{
-		for (i=16;i<32;i++)
-		{
-			// only update state bits on other multicrew players update
-			if (Vehicle->ModelData != nullptr)
-			{
-				if (Vehicle->ModelData->MultiCrewPos ==
-							Vehicle->VehicleType->StateType[i].MultiCrewPos)
-				{
-					continue;
-				}
-			}
-
-			if (VehicleInfo->stateFlags1 & 1 << (i - 16))
-				PosData->States[i] = TRUE;
-			else
-				PosData->States[i] = FALSE;
-		}
-	}
-
-	if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON && VehicleHeader->present & PR_VEH_VIS)
-	{
-		for (i=32;i<64;i++)
-		{
-			// only update state bits on other multicrew players update
-			if (Vehicle->ModelData != nullptr)
-			{
-				if (Vehicle->ModelData->MultiCrewPos ==
-							Vehicle->VehicleType->StateType[i].MultiCrewPos)
-				{
-					continue;
-				}
-			}
-
-			if (VehicleInfo->visBits & 1 << (i - 32))
-				PosData->States[i] = TRUE;
-			else
-				PosData->States[i] = FALSE;
-		}
-	}
-
-	// position
-	// if multicrew, only crew gets this data
-	if (!Rollover && (VehicleHeader->present & PR_POSITION) && (Vehicle->ModelData == nullptr || Vehicle->ModelData->MultiCrewPos > 1))
-	{
-		if (Online == 0)
-		{
-			PosData->Pos.x = VehicleHeader->position.m_x / 100.0;
-			PosData->Pos.y = VehicleHeader->position.m_y / 100.0;
-			PosData->Pos.z = VehicleHeader->position.m_z / 100.0 - 2000.0;
+			/*
+				In the event of a UINT16 roll over (every 65 seconds) we want to store the previous
+				current as the last but treated as signed so its sign-extended to 32 bit and the
+				difference math works out.
+			*/
+#ifdef BETA_RELEASE
+			UINT32 prevCurrent = PosData->CurrentSenderUpdateTime;
+#endif
+            PosData->LastSenderUpdateTime = static_cast<SINT16>(PosData->CurrentSenderUpdateTime);
+			PosData->CurrentSenderUpdateTime = thisTS;
+#ifdef BETA_RELEASE
+			SINT32 verifyDiff = PosData->CurrentSenderUpdateTime - PosData->LastSenderUpdateTime;
+#endif
+            
+#ifdef BETA_RELEASE
+			dbugLog(_FLI, "Rollover occurred: Old TS: %d, New Old: %d, New TS: %d, diff: %d, verifyDiff: %d",
+				prevCurrent, PosData->LastSenderUpdateTime, thisTS, timeDiff, verifyDiff);
+#endif
 		}
 		else
 		{
-			PosData->Pos.x = VehicleInfo->position.m_x / 100.0;
-			PosData->Pos.y = VehicleInfo->position.m_y / 100.0;
-			PosData->Pos.z = VehicleInfo->position.m_z/ 100.0 - 2000.0;
+			PosData->LastSenderUpdateTime = PosData->CurrentSenderUpdateTime;
+			PosData->CurrentSenderUpdateTime = thisTS;
 		}
 
-		// attitude
-		PosData->Att.Pitch = VehicleInfo->attitude.attX / 10000.0;
-		PosData->Att.Roll = VehicleInfo->attitude.attY / 10000.0;
-		PosData->Att.Yaw = VehicleInfo->attitude.attZ / 10000.0;
-		// velocity
-		PosData->Vel.x = VehicleInfo->velocity.velX / 50.0;
-		PosData->Vel.y = VehicleInfo->velocity.velY / 50.0;
-		PosData->Vel.z = VehicleInfo->velocity.velZ / 50.0;
-
-		// acceleration
-		PosData->Acc.x = VehicleInfo->acceleration.accelX / 100.0;
-		PosData->Acc.y = VehicleInfo->acceleration.accelY / 100.0;
-		PosData->Acc.z = VehicleInfo->acceleration.accelZ / 100.0;
-
-		// attvel
-		PosData->AttVel.Pitch = VehicleInfo->rotational.velX / 1000.0;
-		PosData->AttVel.Roll = VehicleInfo->rotational.velY / 1000.0;
-		PosData->AttVel.Yaw = VehicleInfo->rotational.velZ / 1000.0;
 	}
 
-	if (!Rollover && VehicleHeader->present & PR_RELPOS)
+	// apply status bits to each client status field as appropriate
+	applyStatusBits(PR_STATE0, (void *)&VehicleInfo->stateFlags0, 0, 16, VehicleHeader, Vehicle);
+	applyStatusBits(PR_STATE1, (void *)&VehicleInfo->stateFlags1, 16, 16, VehicleHeader, Vehicle);
+	if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
+		applyStatusBits(PR_VEH_VIS, (void *)&VehicleInfo->visBits, 16, 32, VehicleHeader, Vehicle);
+
+	// position
+	// if multicrew, only crew gets this data
+	if (VehicleHeader->present & PR_POSITION)
+	{
+		if (Vehicle->ModelData == nullptr || Vehicle->ModelData->MultiCrewPos > 1)
+		{
+			if (Online == 0)
+			{
+				PosData->Pos.x = VehicleHeader->position.m_x / 100.0;
+				PosData->Pos.y = VehicleHeader->position.m_y / 100.0;
+				PosData->Pos.z = VehicleHeader->position.m_z / 100.0 - 2000.0;
+#ifdef DEBUG_UPDATES
+				dbugLog(_FLI, "Not online??");
+				++unexpectedErrors;
+#endif
+			}
+			else
+			{
+				PosData->Pos.x = VehicleInfo->position.m_x / 100.0;
+				PosData->Pos.y = VehicleInfo->position.m_y / 100.0;
+				PosData->Pos.z = VehicleInfo->position.m_z / 100.0 - 2000.0;
+
+#ifdef DEBUG_UPDATES
+				if (Vehicle->ModelData != nullptr)
+				{
+					// Track how far off our predictions are off and accumulate perc diff
+					++vehMcrewUpdatesRecv;
+				}
+				else
+				{
+					++vehNonMcrewUpdatesRecv;
+				}
+#endif
+			}
+
+			// attitude
+			PosData->Att.Pitch = VehicleInfo->attitude.attX / 10000.0;
+			PosData->Att.Roll = VehicleInfo->attitude.attY / 10000.0;
+			PosData->Att.Yaw = VehicleInfo->attitude.attZ / 10000.0;
+			// velocity
+			PosData->Vel.x = VehicleInfo->velocity.velX / 50.0;
+			PosData->Vel.y = VehicleInfo->velocity.velY / 50.0;
+			PosData->Vel.z = VehicleInfo->velocity.velZ / 50.0;
+
+			// acceleration
+			PosData->Acc.x = VehicleInfo->acceleration.accelX / 100.0;
+			PosData->Acc.y = VehicleInfo->acceleration.accelY / 100.0;
+			PosData->Acc.z = VehicleInfo->acceleration.accelZ / 100.0;
+
+			// attvel
+			PosData->AttVel.Pitch = VehicleInfo->rotational.velX / 1000.0;
+			PosData->AttVel.Roll = VehicleInfo->rotational.velY / 1000.0;
+			PosData->AttVel.Yaw = VehicleInfo->rotational.velZ / 1000.0;
+		}
+#ifdef DEBUG_UPDATES
+		else
+		{
+			vehMcommanderUpdatesIgn++;
+		}
+#endif
+	}
+
+	if (VehicleHeader->present & PR_RELPOS)
 	{
 		Vehicle->PosData.LastRelUpdateTime = Vehicle->PosData.CurRelUpdateTime;
 		Vehicle->PosData.CurRelUpdateTime = frametime;
@@ -995,18 +1087,9 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 	if (Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		ProcessInfantryAnimationFlags(Vehicle, VehicleHeader);
 
-	if (!Rollover && (VehicleHeader->present & (PR_POSITION | PR_RELPOS)))
-	{
-		PosData->LastSenderUpdateTime = PosData->CurrentSenderUpdateTime;
-		PosData->CurrentSenderUpdateTime = VehicleInfo->posTimeStamp;
 
-		PosData->LastUpdateTime = PosData->CurrentUpdateTime;
-		PosData->CurrentUpdateTime = frametime;
-	}
-
-
-	if ((VehicleHeader->present & (PR_POSITION | VehicleHeader->present & PR_RELPOS)) &&
-		Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
+	if (((VehicleHeader->present & PR_POSITION) | (VehicleHeader->present & PR_RELPOS)) &&
+		Vehicle->VehicleType && (Vehicle->VehicleType->Type == VEH_TYPE_PERSON))
 	{
 		if (Vehicle->VehicleObjectData != nullptr)
 		{
@@ -1108,6 +1191,10 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 	SINT32 TurretNum;
 	UINT32 i,j;
 
+#ifdef DEBUG_UPDATES
+	++worldUpdatesReceived;
+#endif
+
 	const SHARED_VEHICLE_INFO* const VehicleInfo = &VehicleHeader->vehInfo;
 
 	const UINT32 Position = VehicleInfo->index;
@@ -1135,12 +1222,19 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 			{
 				Write_Debug("Invalid countries specified for vehicle %s, host index %d",VehicleInfo->callsign,
 								VehicleInfo->index);
+#ifdef DEBUG_UPDATES
+				++unexpectedErrors;
+#endif
 				return 0;
 			}
 			{
 				WEAPON* weapon = weapLookup(VehicleInfo->spec());
 				if(weapon == nullptr)
 				{
+					Write_Debug("Weapon not found host veh index %d", VehicleInfo->index);
+#ifdef DEBUG_UPDATES
+					++unexpectedErrors;
+#endif
 					return 0;
 				}
 
@@ -1151,6 +1245,9 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 			{
 				// we're out of vehicle slots
 				Write_Debug("Out of free vehicle slots for new vehicle");
+#ifdef DEBUG_UPDATES
+				++unexpectedErrors;
+#endif
 				return 0;
 			}
 
@@ -1172,7 +1269,7 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 			else
 				Vehicle->persDecal = 0;
 
-            Vehicle->unitDecal = VehicleInfo->brigadeID;
+			Vehicle->unitDecal = VehicleInfo->brigadeID;
 
 			// Special Rat Icon Rank stuff
 			if(isupper(Vehicle->Handle[0]))
@@ -1209,12 +1306,18 @@ lastLowUpdateTime = frametime;
 	if (Vehicle == nullptr)
 	{
 		// vehicle doesn't exist in list
+#ifdef DEBUG_UPDATES
+		++vehNotTracked;
+#endif
 		Write_Debug("Received an update for vehicle not being tracked, index = %d",Position);
 		return 0;
 	}
 
-    if(VehicleInfo->timeStamp == Vehicle->PosData.LastAnyUpdateTime)
+	if(VehicleInfo->timeStamp == Vehicle->PosData.LastAnyUpdateTime)
 	{
+#ifdef DEBUG_UPDATES
+		++duplicateUpdatesIgnored;
+#endif
 		Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
 		return 0;
 	}
@@ -1302,8 +1405,8 @@ lastLowUpdateTime = frametime;
 	}
 	else
 	{
-		Delta =	(SINT16)((SINT16)((SINT16)(Vehicle->PosData.CurrentUpdateTime) - (SINT16)(Vehicle->PosData.LastUpdateTime)) -
-				(SINT16)((SINT16)(Vehicle->PosData.CurrentSenderUpdateTime) - (SINT16)(Vehicle->PosData.LastSenderUpdateTime)));
+		Delta =	(Vehicle->PosData.CurrentUpdateTime - Vehicle->PosData.LastUpdateTime) -
+				(Vehicle->PosData.CurrentSenderUpdateTime - Vehicle->PosData.LastSenderUpdateTime);
 
 		Delta += Vehicle->PosData.LastDelta;
 

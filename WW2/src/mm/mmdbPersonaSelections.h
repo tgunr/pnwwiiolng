@@ -23,5 +23,5 @@ extern void mmdbSavePersonaSelection(const Player* player);
 
 struct PersonaSelectionThread : public PNThread
 {
-	virtual void run() OVERRIDE_FN;
+	virtual void run() override;
 };

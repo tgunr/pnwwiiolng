@@ -28,6 +28,5 @@
 #include "base/commandlineflags.h"
 #include "base/dynamic_annotations.h"   // for RunningOnValgrind
 #include "base/logging.h"
-#include "base/cycleclock.h"
 
 #endif // GPERFTOOLS_PRECOMPILE_H

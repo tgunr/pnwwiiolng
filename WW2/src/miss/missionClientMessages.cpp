@@ -29,12 +29,6 @@ TEUL_CALLBACK*	missSEND_POST_REQ;
 TEUL_CALLBACK*	missSEND_EXIT;
 TEUL_CALLBACK*	missSEND_WEP_LIST_REQ;
 
-//errors
-static void _clientSendError(SINT32 teulIndex, UCHAR* const data, SINT32 size
-							, TEUL_CALLBACK* object, SINT32 error);
-static void _clientRecvError(SINT32 teulIndex, UCHAR* const data, SINT32 size
-							, TEUL_CALLBACK* object, SINT32 error);
-
 #ifdef LOAD_TEST
 #include "client/client.h"
 #endif

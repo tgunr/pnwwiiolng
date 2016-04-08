@@ -484,7 +484,7 @@ Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM bra
 
 		updateMap();
 
-		updateChat();
+		updateChat(true);
 
 		// If the player is accessing a persona that might need
 		// to be buddied up, check the other personas for higher
@@ -915,7 +915,7 @@ protected:
 	std::vector<PersonaSummary>	m_results;
 
 protected:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -945,7 +945,7 @@ protected:
 	}
 
 protected:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		Player* player = PlayerInterface::Lookup(m_playerID);
 		if ( player == nullptr || player->teulIndex() != m_teulIndex || m_results.empty() )
@@ -956,7 +956,7 @@ protected:
 		summary.send(player->teulIndex());
 	}
 
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		Player* player = PlayerInterface::Lookup(m_playerID);
 		if ( player != nullptr )
@@ -1100,7 +1100,7 @@ Player::saveMissionPacket()
 	DBThread::Do(DBThread::Default
 		, "UPDATE wwii_sortie"
 			" SET"
-				" spawn_time = IF(spawn_time IS nullptr,NOW(),spawn_time)"
+				" spawn_time = IF(spawn_time IS NULL,NOW(),spawn_time)"
 				",return_time = NOW()"
 				",rtb = %u"
 				",rtb_facility_oid = %u"
@@ -1159,7 +1159,7 @@ protected:
 	SINT32		m_teulIndex;
 	Tutorial::GroupProgressBatch m_results;
 
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		m_results.clear();
 
@@ -1179,7 +1179,7 @@ protected:
 		return true;
 	}
 
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		// Make sure we still have the same player on the same index.
 		Player* player = PlayerInterface::Lookup(m_teulIndex);
@@ -1295,7 +1295,7 @@ private:
 	std::vector<BrigadeDetailsUpdate> m_results;
 
 protected:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if (numRows <= 0)
 			return true;
@@ -1329,7 +1329,7 @@ protected:
 	}
 
 public:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		for (size_t i = 0; i < m_results.size(); ++i)
 		{
@@ -1369,7 +1369,7 @@ public:
 		s_nextBrigadeDetailsQuery = teulClock64 + _STANDARD_BDU_INTERVAL_MS;
 	}
 
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		dbugLog(_FLW, "brigade details query failed");
 		s_nextBrigadeDetailsQuery = teulClock64 + 5000;

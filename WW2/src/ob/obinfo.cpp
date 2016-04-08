@@ -6,12 +6,13 @@
  *  Copyright 2011 Playnet Inc. All rights reserved.
  *
  */
+#include <syscfg.h> // Path is project specific.
+
 #ifdef MODEL_INFO
 
-#include <syscfg.h> // Path is project specific.
 #include <fstream>
 #include <map>
-#include "oglMaterial.h"
+#include "ogl/oglMaterial.h"
 #include "obinfo.h"
 #include "obmain.h"
 #include "obMgr.h"
@@ -21,11 +22,7 @@ using namespace std;
 extern std::map<GLuint, std::string> reverseTextureIndex;
 extern std::map<int,std::string> reverse_materialnames;
 
-#if platOS == OS_MACOS
-#define INFO_OUTFILE "/Users/ahwulf/tmp/models.txt"
-#else
 #define INFO_OUTFILE "models.txt"
-#endif
 
 enum is_type
 {

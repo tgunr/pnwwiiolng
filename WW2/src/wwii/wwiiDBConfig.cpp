@@ -155,7 +155,7 @@ dbGetWWIIConfig(DBHANDLE& dbh)
 	{
 		if ( g_numVars == 0 )
 		{
-			ThreadTextQuery qry(DBThread::Game, "INSERT IGNORE INTO `game`.`host_config` (variableName,value,lastModified,description) VALUES", "");
+			ThreadTextQuery qry(DBThread::Game, "INSERT IGNORE INTO `wwiionline`.`wwii_config` (variableName,value,lastModified,description) VALUES", "");
 			// Count the number of variables we have
 			for ( g_numVars = 0; configMap[g_numVars].type < MAX_WWII_CONFIG_TYPES; g_numVars++ )
 			{
@@ -172,13 +172,13 @@ dbGetWWIIConfig(DBHANDLE& dbh)
 			dbugLog(_FLI, "counted %u host_config variables", g_numVars);
 		}
 
-		static const char* const CONFIG_UPDATE_QUERY = "SELECT variableName, value, UNIX_TIMESTAMP(lastModified) FROM `game`.`host_config` WHERE UNIX_TIMESTAMP(lastModified) > %u";
+		static const char* const CONFIG_UPDATE_QUERY = "SELECT variableName, value, UNIX_TIMESTAMP(lastModified) FROM `wwiionline`.`wwii_config` WHERE UNIX_TIMESTAMP(lastModified) > %u";
 		DBQuery q(dbh, CONFIG_UPDATE_QUERY, host_config.lastModified);
 
 		if ( q.Rows() == 0 )
 			return false;
 
-		ThreadTextQuery qry(DBThread::Game, "DELETE FROM `game`.`host_config` WHERE `variableName` IN (", ")");
+		ThreadTextQuery qry(DBThread::Game, "DELETE FROM `wwiionline`.`wwii_config` WHERE `variableName` IN (", ")");
 		while ( q.FetchRow() )
 		{
 			const DBRow& row = q.Row();

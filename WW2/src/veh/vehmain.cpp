@@ -224,7 +224,6 @@ static SINT32 _NumVehicles = 0;
 static bool _findRTBFRU(ServerTrackedObject& sto, void* cookie);
 
 #ifdef ENABLE_FLOATERS
-#undef DESPAWN_TIMER
 static SINT32	disableVehLODs;
 #endif
 
@@ -941,8 +940,10 @@ static UINT32 _UpdateVehicleLODs(void)
 					// we're a valid lod object
 					else
 #endif
-					Object->minlod = CurrentVehicle->VehicleObjectData->SavedMinLODRange[j];
-					Object->maxlod = CurrentVehicle->VehicleObjectData->SavedMaxLODRange[j];
+                    {
+                        Object->minlod = CurrentVehicle->VehicleObjectData->SavedMinLODRange[j];
+                        Object->maxlod = CurrentVehicle->VehicleObjectData->SavedMaxLODRange[j];
+                    }
 #if(0)
                     if (j == 0)
 					{
@@ -1692,10 +1693,11 @@ UINT32 _UpdateVehicleObject(vehVehicle* Vehicle)
 								&VehicleData->VehicleRealAttVel,
 								VehicleData->LastVehicleUpdateTime);
 
-				// mlForwardPredict works against the fps system and causes jitters
-				// so we just assume the rednder pos is good
-				if(persIsPersonaVehicleType(VEH_TYPE_PERSON))
-					TempVec = VehicleData->RenderPos;
+				// mlForwardPredict supposedly works against the fps system, causing jitters
+				// Previously this used the RenderPos, but that wasn't initialized on the
+				// first frame, causing bad juju.
+				if ( persIsPersonaVehicleType(VEH_TYPE_PERSON) )
+					TempVec = VehicleData->VehiclePos;
 
 				VehicleData->RenderAtt = TempAtt;
 				VehicleData->RenderPos = TempVec;
@@ -3435,7 +3437,6 @@ void vehmainBailout(BailoutSTO* pilot)
 			return;
 		}
 
-		persPersona* pdata = persGetPersonaDataPtr();
 		const vehType* vt = BailoutSTO::VTYPE(Vehicle);
 
 		if(!vt)
@@ -3483,17 +3484,11 @@ void vehmainBailout(BailoutSTO* pilot)
 	// disable controls so we can fly the plane remotely
 	vehcntrlBailout();
 
-	// should disable pilot part of hitmap so pilot can no lnger be killed
-
-	//pdata->DamagePlayObject
-
 	// make sure we stop firing after bailing
 	Vehicle->ModelData->PrimaryTriggerDown		= 0;
 	Vehicle->ModelData->PicklePrimary			= 0;
 	Vehicle->ModelData->SecondaryTriggerDown	= 0;
 	Vehicle->ModelData->PickleSecondary			= 0;
-
-	//PlayerClient()->EnableDespawnTimer(true);
 
 	_bailoutTime = frametime;
 }
@@ -3871,7 +3866,6 @@ void VehicleSTO::deactivate()
 		if(persIsInDeathCam() && !SCEN_MGR->IsActive())
         {
             // Do nothing. Leave vehicles to display while in deathcam. Vehicles removed with ClearAllVehicles
-			bool stop = true;
         }
         else
         {
@@ -4008,6 +4002,9 @@ const vehType* BailoutSTO::VTYPE(vehVehicle* v)
 					case WWII_GERMANY:
 						vid = "de-para-rfl";
 						break;
+                    default:
+                        // no other valid countries
+                        break;
 				}
 			}
 			break;
@@ -4893,7 +4890,7 @@ vehInertiaComponent const* vehFindInertiaComponent(vehType* vehtype, const char*
 
 	if(!comp)
 	{
-		static vehInertiaComponent defaultcomp = { "", 1, 1, {0,0,0}, {1,0,0,0,1,0,0,0,1} };
+		static vehInertiaComponent defaultcomp = { "", 1, 1, {0,0,0}, {{1,0,0},{0,1,0},{0,0,1}} };
 		comp = &defaultcomp;
 	}
 	return comp;
@@ -5303,7 +5300,7 @@ static MSPAWN_RESULT _nearEnemyFacility(FULL_OBJ_ID& foi, int side)
 PlayerPlacedObject* vehmainFRUBuild()
 {
 	vehVehicle* veh = persGetPersonaVehiclePtr();
-	if(veh == nullptr) return false;
+	if(veh == nullptr) return nullptr;
 
 	// do we already have an msp on this misison?
 	bool hasMobileSpawn = PlayerClient()->MobileSpawnMission();
@@ -5687,6 +5684,9 @@ SINT32 _checkCurrentDeployState(vehVehicle* veh)
 			uiChatPrintLineFeedback(IDE_LANG_MOBILE, 501, false);
             return 0;
        }
+    default:
+        // undefined
+        break;
     }
     return 0;
 }
@@ -6431,10 +6431,6 @@ void vehmainSpawnVehicle(VEHICLE_REPLY const* reply)
 
 static void vehmainSpawn()
 {
-#ifdef TESTMAC
-//  spawningin();
-#endif
-
 #ifdef ANTIHACK
 	UCHAR yeahCode = Online ? (HackID[0] != 0 ? OH_YEAH_DAMNED : 0) : 0;
 	bool checksumOK = true;
@@ -6556,17 +6552,7 @@ static void vehmainSpawn()
 #endif
 
 #ifndef ENABLE_FLOATERS
-#if RELEASE_CLIENT
-    switch(OverrideSpawner)
-    {
-    case BENCHANTWERP_OVERRIDE:
-    case BENCHRAMAGEN_OVERRIDE:
-        {
-            return;
-        }
-    }
-#endif
-// Check to make absolutely sure we aren't spawning as a floater
+    // Check to make absolutely sure we aren't spawning as a floater
 	if(pVehicle && pVehicle->VehicleType && pVehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{
   		piExitProgram(__FILE__, __LINE__, "");
@@ -7131,7 +7117,7 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 #ifdef BETA_RELEASE
 			vehicle->setDecals((SINT32)gPersDecalOverride, (SINT32)gUnitDecalOverride);
 #endif
-            int id = ServerTrackedObject::addToIndex(vehicle);
+            ServerTrackedObject::addToIndex(vehicle);
 
 			// so we can manage them via dot command
             uiDotCommandAddClone((int)vehicle->uid());

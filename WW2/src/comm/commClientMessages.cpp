@@ -40,7 +40,6 @@ TEUL_CALLBACK*				HOST_KILL;
 TEUL_CALLBACK*				commCLIENT_HIT;
 static TEUL_CALLBACK*		_PLAYER_EXIT;
 static TEUL_CALLBACK*		_REQ_JOIN_VEHICLE;
-static TEUL_CALLBACK*		_XCHG_SPAWN_DEPLOYMENT;
 
 // WWIIOL specific.
 TEUL_CALLBACK*				commSTRAT_DAMAGE;
@@ -147,7 +146,6 @@ SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32
 		return -EINVAL;
 	}
 
-	///TODO: Troy: GLOBALS MUST DIE!
 	// Note: the values are IN the World Update so you could just use that.
 	g_framingMode = wu.header.framingMode;
 	g_hostUpdateInterval = framings[g_framingMode].updateInterval;
@@ -310,9 +308,7 @@ _recvMove(ACTION_OBJECT* const a)
 static SINT32 _recvInfDeath(ACTION_OBJECT* const a)
 {
 	REQUIRE_CLIENT_DATA_AS(ww2::Client, client);
-	InfDeath& death = a->read<InfDeath>();
-
-	// All yours troy :)
+	/*InfDeath& death = */a->read<InfDeath>();
 
 	return a->offset;
 }

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include <syscfg.h>
 /*------------------------------------------------------------------------------------
 Module: glslUniform.cpp
 Description:
@@ -18,12 +18,12 @@ Function: glslUniform::Uniform()
 Description:
 -------------------------------------------------------------------------------------*/
 glslUniform::glslUniform() :
-    _type(UNDEFINED),
     _numElements(0),
-    _oldModifiedCount(0),
     _modifiedCount(0),
+    _oldModifiedCount(0),
     _oneTimeApply(false),
-    global(false)
+    global(false),
+    _type(UNDEFINED)
 {
 }
 
@@ -32,11 +32,11 @@ Function: glslUniform::Uniform()
 Description:
 -------------------------------------------------------------------------------------*/
 glslUniform::glslUniform(Type type, const std::string& name, int numElements, bool isglobal) :
-    _type(type),
     _numElements(0),
     _modifiedCount(0),
     _oneTimeApply(false),
-    global(isglobal)
+    global(isglobal),
+    _type(type)
 {
     SetName(name);
     SetNumElements(numElements);

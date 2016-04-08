@@ -47,13 +47,10 @@ typedef struct tagWATERFBO
 #define REVERSE_OPENGL_COLORS
 #endif
 
-static FLOAT32 _maxwaterheight = 0.0f;
-static FLOAT32 _mindis = 0.0f;
-
 // Statics
 
 // These are all the water textures in the game that we want to animate (or manipulate in some way)
-static SCHAR* waternames[NUM_WATER_TEXTURES] =
+static const SCHAR* waternames[NUM_WATER_TEXTURES] =
 {
     "water1.bmp",
     "to\\water1.bmp",
@@ -67,8 +64,6 @@ static SCHAR* waternames[NUM_WATER_TEXTURES] =
 
 #define NUM_WATER_NAMES NUM_WATER_TEXTURES - 1
 
-static WATERFBO _waterfbo;
-
 static piMATRIX TextureMatrix, RepeatMatrix;
 static UINT32 curtime, lastime;
 
@@ -77,13 +72,11 @@ static SINT32 caustic_bumps[32];
 static SINT32 caustic;
 //static SINT32 reflectid;
 
-static void _drawScene(OBJECT o);
-static LOGICAL _loadShaders();
 #if(0)
 static void _loadShaderWater();
 #endif
 
-LOGICAL trnwtrInit(SINT8* name)
+LOGICAL trnwtrInit( const SINT8* name)
 {
     char filename[_MAX_PATH];
     int id;
@@ -188,9 +181,9 @@ LOGICAL trnwtrUpdate(void)
 	return(TRUE);
 }
 
+#if(0)
 static SINT32		gte[8][24];
 
-#if(0)
 static void SaveTexEnv(int stage)
 {
 	SINT32		setstage;

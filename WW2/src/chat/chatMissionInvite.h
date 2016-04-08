@@ -28,7 +28,6 @@ public:
 		, m_isDirective(isDirective)
 			{}
 	MissionInvite(ACTION_OBJECT* const a);
-	~MissionInvite() {}
 
 public:
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);

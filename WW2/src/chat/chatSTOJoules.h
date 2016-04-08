@@ -16,7 +16,6 @@ public:
 	STOJoules(UINT32 uid, const SINT64& joules) : m_uid(uid), m_joules(joules) {}
 	STOJoules(ACTION_OBJECT* const a) : m_uid(0), m_joules(0LL) { packer(TEUL_UNPACK, a); }
 	STOJoules() : m_uid(0), m_joules(0LL) {}
-	~STOJoules() {}
 
 public:
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);

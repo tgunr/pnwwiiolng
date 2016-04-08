@@ -458,14 +458,14 @@ void EZPlane::InstallInputCallbacks()
 EZTruck::EZTruck(vehVehicle* v) :
 	EZGameVehicle(v),
 	_hiGear(1),
-	_hiShiftTime(500),
 	_hiShiftDownRPMs(.65f),
 	_hiShiftUpRPMs(.97f),
 	_hiAccelTime(3000),
-	_loShiftTime(100),
+    _hiShiftTime(500),
 	_loShiftDownRPMs(.65f),
 	_loShiftUpRPMs(.97f),
-	_loAccelTime(500)
+	_loAccelTime(500),
+    _loShiftTime(100)
 {
 }
 

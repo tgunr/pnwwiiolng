@@ -273,7 +273,7 @@ static const functionEntry functionTable[] =
 	{IMAP_EZ_PREVPOS,						"ezprevpos",							4008,			0,	WW2_FUNC_GENERAL, 0, WW2_FUNC_HEADER_EZ, 2},
 	{IMAP_EZ_ENGINE,						"ezengine",								4009,			0,	WW2_FUNC_GENERAL, 0, WW2_FUNC_HEADER_EZ, 2},
 
-	{IMAP_NO_FUNCTION,"",0,0,0,-1}, // end
+	{IMAP_NO_FUNCTION,"",0,0,0,(unsigned int)-1}, // end
 };
 
 static void (*localized_string) (const char*, int, char*, int) = nullptr;

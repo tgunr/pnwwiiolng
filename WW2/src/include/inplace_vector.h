@@ -116,7 +116,10 @@ namespace WWII
       reference
       at(size_type __n)
       {
-#if defined(__GNUC__)
+#if defined(__clang__)
+          if (__builtin_expect(__n >= size(), false))
+              throw std::out_of_range("vector");
+#elif defined(__GNUC__)
 		if (__builtin_expect(__n >= size(), false))
 			std::__throw_out_of_range(__N("inplace_vector::at"));
 #else
@@ -129,7 +132,9 @@ namespace WWII
       const_reference
       at(size_type __n) const
       {
-#if defined(__GNUC__)
+#if defined(__clang__)
+          throw std::out_of_range("inplace_vector::at");
+#elif defined(__GNUC__)
 		  if (__builtin_expect(__n >= size(), false))
 			  std::__throw_out_of_range(__N("inplace_vector::at"));
 #else
@@ -181,7 +186,10 @@ namespace WWII
       void
       resize(size_type __n)
       {
-#if defined(__GNUC__)
+#if defined(__clang__)
+          if (__builtin_expect(__n > capacity(), false))
+              throw std::out_of_range("inplace_vector::resize");
+#elif defined(__GNUC__)
 		if (__builtin_expect(__n > capacity(), false))
 	  		std::__throw_out_of_range(__N("inplace_vector::resize"));
 #else

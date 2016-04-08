@@ -60,21 +60,12 @@ const ChatPermissions nullChatPermissions;
 
 static	TEUL_CALLBACK* _SEND_CLIENT_MESSAGE;
 static	TEUL_CALLBACK* _SEND_UPDATE_CHANNEL;
-static	TEUL_CALLBACK* _SEND_UPDATE_HANDLE;
-static	TEUL_CALLBACK* _RECV_CLIENT_MESSAGE;
-static	TEUL_CALLBACK* _RECV_USER_NLA;
-static	TEUL_CALLBACK* _RECV_SERVER_INFO;
-static	TEUL_CALLBACK* _RECV_GCI_MESSAGE;
-static	TEUL_CALLBACK* _SVR_TUNE_TO_CHANNEL;
 static	TEUL_CALLBACK* _FE_TUNE_TO_CHANNEL;
 static	TEUL_CALLBACK* _SERVER_TRACKED_OBJECTS;
 
 static	TEUL_CALLBACK* _MOTD_REQ;
-static	TEUL_CALLBACK* _MOTD_REPLY;
-static	TEUL_CALLBACK* _RECV_LOCALIZED_MESSAGE;
 static	TEUL_CALLBACK* _SEND_LOCALITY;
 static	TEUL_CALLBACK* _SEND_RECRUITER_REQUEST;
-static	TEUL_CALLBACK* _RECV_DOT_COMMAND_LIST;
 
 TEUL_CALLBACK* HoldFallVote::s_callback;
 
@@ -445,15 +436,15 @@ _recvBrigadeControlList(ACTION_OBJECT* const a)
 		return -EINVAL;
 
 	const UCHAR& forCountry = a->read<UCHAR>();
-	const UCHAR& forBranch = a->read<UCHAR>();
+	/*const UCHAR& forBranch = */a->read<UCHAR>();
 	const PermissionMask& permissions = a->read<PermissionMask>();
 
 	const WWII_SIDE forSide = wwiiSide((WWII_COUNTRY)forCountry);
 
-	const bool alliedHC = (forSide == ALLIED) & (permissions & ALLIED_COMMAND_STAFF);
-	const bool axisHC = (forSide == AXIS) & (permissions & AXIS_COMMAND_STAFF);
+	const bool alliedHC = (forSide == ALLIED) && (permissions & ALLIED_COMMAND_STAFF);
+	const bool axisHC = (forSide == AXIS) && (permissions & AXIS_COMMAND_STAFF);
 
-	const bool isHC = alliedHC | axisHC;
+	const bool isHC = alliedHC || axisHC;
 
 	// If this persona is an HC officer, the "owner()" flag
 	// of each brigade control list wrapper is set to TRUE.

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include <syscfg.h>
 /*--------------------------------------------------------------------------------------
 Module: glslSpecular.cpp
 Description:
@@ -18,7 +18,6 @@ Description:
 #include "math/mathnum.h"
 #include "ogl/oglTextureObject.h"
 
-static int defaultSpecMap = -1;
 static std::vector<OBJECT*> specularbin;
 
 #include "osgImport/ShadowMap.h"

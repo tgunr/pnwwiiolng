@@ -18,6 +18,7 @@ namespace Teul
 			, recvAction(nullptr)
 			, error(nullptr)
 			, callX(0), callY(0)
+			, callXName(""), callYName("")
 		{}
 
 		ACTION_FN	sendAction;		//! Function for sending data or NULL.
@@ -26,6 +27,8 @@ namespace Teul
 
 		UCHAR		callX;			//! X position in the callback matrix.
 		UCHAR		callY;			//! Y position in the callback matrix.
+		const char  *callXName;
+		const char  *callYName;
 	};
 
 } // namespace Teul

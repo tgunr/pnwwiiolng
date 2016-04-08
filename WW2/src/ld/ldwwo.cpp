@@ -72,7 +72,7 @@ bool LdWWO::load()
     {
         mText = text;
         bool result = loadFromText();
-        memFreeRelease( text );
+        memFree( text );
         if ( result )
         {
             return true;

@@ -32,7 +32,6 @@
 #define SHADOW_FRAME_Y		1
 
 
-static COLLISION	collision;
 static SINT32		bounds[256][2];
 static SINT32		shadow_texture_size, shadow_texture_size1;
 static SINT32		shadow_start_x, shadow_finish_x;
@@ -587,65 +586,6 @@ OBJECT*	lpobj;
 
 	return(TRUE);
 }
-
-#if(0)
-static LOGICAL ObjectCollision(OBJECT* object, piVECTOR* oldpos, piVECTOR* newpos)
-{
-LOGICAL      retval;
-
-	memset(&collision, 0, sizeof(collision));
-	collision.object   = object;
-	collision.oldpos.x = oldpos->x;
-	collision.oldpos.y = oldpos->y;
-	collision.oldpos.z = oldpos->z;
-	collision.newpos.x = newpos->x;
-	collision.newpos.y = newpos->y;
-	collision.newpos.z = newpos->z;
-
-	retval = obcdCheck(&collision);
-
-	if (retval)
-	{
-		newpos->x = collision.colpos.x;
-		newpos->y = collision.colpos.y;
-		newpos->z = collision.colpos.z;
-	}
-	else
-	{
-		newpos->x = collision.newpos.x;
-		newpos->y = collision.newpos.y;
-		newpos->z = collision.newpos.z;
-	}
-
-	return(retval);
-}
-#endif
-
-#if(0)
-static LOGICAL FindVectorStrike(OBJECT* lpcol, piLVERTEX* pshad, piVECTOR* lv)
-{
-piVECTOR    op, np;
-
-	op.x = pshad->x - lv->x * 1000.0f * ScaleFactor;
-	op.y = pshad->y - lv->y * 1000.0f * ScaleFactor;
-	op.z = pshad->z - lv->z * 1000.0f * ScaleFactor;
-	np.x = pshad->x + lv->x * 1000.0f * ScaleFactor;
-	np.y = pshad->y + lv->y * 1000.0f * ScaleFactor;
-	np.z = pshad->z + lv->z * 1000.0f * ScaleFactor;
-
-	if (!ObjectCollision(lpcol, &op, &np))
-	{
-		return(FALSE);
-	}
-
-	op = collision.colnormal;
-	pshad->x = np.x + op.x * 0.66f * ScaleFactor;
-	pshad->y = np.y + op.y * 0.66f * ScaleFactor;
-	pshad->z = np.z + op.z * 0.66f * ScaleFactor;
-
-	return(TRUE);
-}
-#endif
 
 static LOGICAL IterateShadow(OBJECT* lpmain, OBJECT* lpshad, LOGICAL calclv, piVECTOR* lp, piVECTOR* lv, UINT32 color, piSURFACEDESC* lppisd)
 {

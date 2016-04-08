@@ -166,7 +166,6 @@
     <ClCompile Include="src\versionWin.cpp" />
     <ClCompile Include="..\WW2\src\comm\commPlaygateMessages.cpp" />
     <ClCompile Include="..\WW2\src\auth\authPack.cpp" />
-    <ClCompile Include="..\WW2\src\wwii\wwiiCallbacks.cpp" />
     <ClCompile Include="..\WW2\src\wwii\wwiiUTF.cpp" />
     <ClCompile Include="src\ddp.cpp" />
     <ClCompile Include="..\WW2\src\src\infoMessages.cpp" />

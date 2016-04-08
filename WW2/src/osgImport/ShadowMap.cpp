@@ -60,17 +60,17 @@ Description:
 ShadowMap::ShadowMap():
     _reset(false),
     _enabled(false),
-    _baseTextureUnit(0),
-    _shadowTextureUnit(0),
-    _ambientBias(0.5f, 0.5f),
-    _texwidth(2048),
-    _texheight(2048),
-    DynamicTexWidth(1024),
-    DynamicTexHeight(1024),
-    _polyOffset(1.0f, 1.0f),
-    _light(nullptr),
     _DynamicShadowDistance(40.0f),
     _StaticShadowDistance(800.0f),
+    _light(nullptr),
+    _baseTextureUnit(0),
+    _shadowTextureUnit(0),
+    _polyOffset(1.0f, 1.0f),
+    _ambientBias(0.5f, 0.5f),
+    DynamicTexWidth(1024),
+    DynamicTexHeight(1024),
+    _texwidth(2048),
+    _texheight(2048),
     lastshadowcreate(0)
 {
 }
@@ -961,11 +961,6 @@ bool ShadowMap::BeginStaticShadowMap(int corner)
     eye.y -= (float)WorldOriginOffset.y;
 
     eye.z += height;
-
-    float top = -z;
-    float bottom = z;
-    float right = -z;
-    float left = z;
 
     _smOctet[corner].proj = IdentityMatrix;
 

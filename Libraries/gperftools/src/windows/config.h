@@ -24,12 +24,10 @@
 #undef WIN32_OVERRIDE_ALLOCATORS
 
 /* Define to 1 if your libc has a snprintf implementation */
-#if _MSC_VER < 1900
-#undef HAVE_SNPRINTF
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+#define HAVE_SNPRINTF 1
 #else
-# ifndef HAVE_SNPRINTF
-#  define HAVE_SNPRINTF
-# endif
+#undef HAVE_SNPRINTF
 #endif
 
 /* Define to 1 if compiler supports __builtin_stack_pointer */
@@ -47,7 +45,7 @@
 
 /* Define to 1 if you have the declaration of `memalign', and to 0 if you
    don't. */
-#define HAVE_DECL_MEMALIGN
+#undef HAVE_DECL_MEMALIGN
 
 /* Define to 1 if you have the declaration of `posix_memalign', and to 0 if
    you don't. */
@@ -75,7 +73,7 @@
 #undef HAVE_EXECINFO_H
 
 /* Define to 1 if you have the <fcntl.h> header file. */
-#define HAVE_FCNTL_H
+#undef HAVE_FCNTL_H
 
 /* Define to 1 if you have the <features.h> header file. */
 #undef HAVE_FEATURES_H
@@ -108,7 +106,7 @@
 #undef HAVE_MALLOC_MALLOC_H
 
 /* Define to 1 if you have the <memory.h> header file. */
-#define HAVE_MEMORY_H
+#undef HAVE_MEMORY_H
 
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
@@ -135,7 +133,11 @@
 #undef HAVE_SCHED_H
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#define HAVE_STDINT_H
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+#define HAVE_STDINT_H 1
+#else
+#undef HAVE_STDINT_H
+#endif
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -210,7 +212,7 @@
 #undef INSTALL_PREFIX
 
 /* Define to 1 if int32_t is equivalent to intptr_t */
-#define INT32_EQUALS_INTPTR
+#undef INT32_EQUALS_INTPTR
 
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */

@@ -260,8 +260,13 @@ HCUnitList::packer(LOGICAL mode, ACTION_OBJECT* a)
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_listEnd, 1);	// 8-bits
 	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_count, 6);		//
 
-	for ( UINT32 i = 0; i < m_count && i < MAX_HCUNITS_PER_LIST; ++i )
+	for ( UINT32 i = 0; i < m_count && i < MAX_HCUNITS_PER_LIST; ++i ) {
+#if platBuild == TEUL_SERVER
+		a->offset = m_units[i]->packer(mode, a);
+#else
 		a->offset = m_units[i].packer(mode, a);
+#endif
+    }
 
 	return a->offset;
 }

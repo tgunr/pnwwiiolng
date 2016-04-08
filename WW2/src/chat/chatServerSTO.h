@@ -38,10 +38,10 @@ protected:
 	void _audit(EventType);
 
 public:
-	virtual bool activate() OVERRIDE_FN;
-	virtual void deactivate() OVERRIDE_FN;
+	virtual bool activate() override;
+	virtual void deactivate() override;
 
-	virtual bool applyJoules(const SINT64& /*joules*/, class Player* /*player*/=nullptr) OVERRIDE_FN { return false; }
+	virtual bool applyJoules(const SINT64& /*joules*/, class Player* /*player*/=nullptr) override { return false; }
 
 	virtual void extractPlayer(const Player* /*player*/) { }
 

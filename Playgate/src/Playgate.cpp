@@ -1,5 +1,6 @@
 // $Id: Playgate.cpp 486 2010-05-24 22:16:57Z rampster@CRS $
 // Playgate.cpp : Defines the class behaviors for the application.
+//
 
 #include "Playgate.h"
 #include "PlaygateDlg.h"
@@ -250,10 +251,28 @@ static DWORD WINAPI threadFunc(LPVOID dummyParam)
 	ExitThread(0);
 }
 
+
 // CPlaygateApp initialization
+extern char g_authHostName[256] ;
+
+namespace {
+	class CommandLineParser : public CCommandLineInfo {
+	public:
+		virtual void ParseParam(LPCTSTR lpszParam, BOOL bFlag, BOOL bLast) {
+			// HACK: Assume only argument is auth server.
+			ASSERT ( bLast == true ) ;
+			// HACK: Just modify the existing global to changes to the overall
+			// program minimal for the time being.
+			sprintf_s(g_authHostName, 256, "%s", CT2A(lpszParam)) ;
+		}
+	} ;
+}
 
 BOOL CPlaygateApp::InitInstance()
 {
+	CommandLineParser cmdParser ;
+	ParseCommandLine(cmdParser) ;
+
 	// OGS: First things first, determine what kind of client we are.
 	// If the version number ends in .255 we are appID 1, otherwise we're beta.
 	g_gameAppID = Auth::Apps::LIVE_APP_ID;

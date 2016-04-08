@@ -561,7 +561,7 @@ void PostRenderFilter::_createBlurDeprecated()
     }
 
     // Create shaders for blur in x direction
-    char* frag;
+    const char* frag;
 
     if(canUseTexture2D)
         frag = "fx/shaders/GLSL/postrender/2D/blur.frag";
@@ -628,7 +628,7 @@ void PostRenderFilter::_createDownSizeDeprecated()
     _downsizeTex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
 
     // Create shaders for downsizing
-    char* frag;
+    const char* frag;
 
     if(canUseTexture2D)
         frag = "fx/shaders/GLSL/postrender/2D/downsize.frag";
@@ -811,7 +811,7 @@ void PostRenderFilter::_createFilterXDeprecated()
     _filterXTex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
 
     // Create shaders for downsizing
-    char* frag;
+    const char* frag;
 
     if(canUseTexture2D)
         frag = "fx/shaders/GLSL/postrender/2D/filterx.frag";
@@ -864,7 +864,7 @@ void PostRenderFilter::_createFilterYDeprecated()
     _filterYTex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
 
     // Create shaders for downsizing
-    char* frag;
+    const char* frag;
 
     if(canUseTexture2D)
         frag = "fx/shaders/GLSL/postrender/2D/filtery.frag";
@@ -925,7 +925,7 @@ void PostRenderFilter::_createFakeHDRDeprecated()
     }
 
     // Create shaders for downsizing
-    char* frag;
+    const char* frag;
 
     if(canUseTexture2D)
         frag = "fx/shaders/GLSL/postrender/2D/fakehdr.frag";

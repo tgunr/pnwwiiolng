@@ -102,9 +102,7 @@ static POOLOBJHDR	objfree;
 static POOL_OBJECT_TO_DIRECTORY PoolObjectDirectoryHead;
 
 static POOLOBJHDR* ScanObjectCallback(OBJECT* lpgrp, POOLOBJHDR* lpparent, SCANOBJECT callfunc);
-static LOGICAL ScanPoolCallback(POOLOBJHDR* lpgrp, OBJECT* lpparent, SCANPOOL callfunc);
 
-static POOLOBJ* ReadPool(int hfile);
 static void SavePool(int hfile, POOLOBJ*);
 static void FreeQueuedObjects();
 
@@ -120,7 +118,7 @@ void obpoolColorSwap(POOLOBJ* lppool);
 *************************************************************************************************/
 // Allocate the pool and initialize
 // the pool free list.
-LOGICAL obpoolInit(char* name)
+LOGICAL obpoolInit(const char* name)
 {
 logTimerBeginMacro();
 	if(SIZEOF_POOLOBJ != SIZEOF_POOLOBJ_DISK || SIZEOF_OBJDATA != SIZEOF_OBJDATA_DISK || SIZEOF_DOF != SIZEOF_DOF_DISK)
@@ -244,114 +242,6 @@ static void FreeObjectTree(OBJECT* o)
 
 	return;
 }
-
-/************************************************************************************************
-	AddObjectItemToList
-*************************************************************************************************/
-
-static void AddObjectItemToList(OBJECT* o)
-{
-    if(!o)
-    {
-        return;
-    }
-
-    listDeleteOBJECT(o);
-
-#if SERIALIZED
-    listAddItem(&objectList, (LISTHEADER*)o);
-    objectnumber += 1;
-#else
-    FreeObjectTree(o);
-#endif
-}
-
-/************************************************************************************************
-	ProcessObjectTree
-*************************************************************************************************/
-
-static LOGICAL ProcessObjectTree(OBJECT* lpobj, UINT32 setflags, UINT32 setflag2, UINT32 clrflags, UINT32 clrflag2)
-{
-	if (lpobj == nullptr)
-	{
-		return(FALSE);
-	}
-
-	while (lpobj != nullptr)
-	{
-		if (lpobj->sibling != nullptr)
-		{
-			if (!ProcessObjectTree(lpobj->sibling, setflags, setflag2, clrflags, clrflag2))
-			{
-				return(FALSE);
-			}
-		}
-
-		OBJECT* lpatt = lpobj->attached;
-		OBJECT* lptmp;
-		while (lpatt != nullptr)
-		{
-			lptmp = lpatt->attached;
-			lpatt->flags |= setflags;
-			lpatt->flag2 |= setflag2;
-			lpatt->flags &= ~clrflags;
-			lpatt->flag2 &= ~clrflag2;
-            AddObjectItemToList(lpatt);
-			lpatt = lptmp;
-		}
-
-		lptmp = lpobj->child;
-		lpobj->flags |= setflags;
-		lpobj->flag2 |= setflag2;
-		lpobj->flags &= ~clrflags;
-		lpobj->flag2 &= ~clrflag2;
-        AddObjectItemToList(lpobj);
-		lpobj = lptmp;
-	}
-
-	return(TRUE);
-}
-
-#if(0)
-/************************************************************************************************
-	FreeObjectSerialized
-*************************************************************************************************/
-static void FreeObjectSerialized()
-{
-#if SERIALIZED
-    SINT32 num;
-    UINT32 cnt1, cnt2, diff;
-    OBJECT* o;
-
-    if(!objectList.next)
-    {
-        return;
-    }
-
-    num = objectnumber / (10 * 20) + 1; // 10 seconds at 20 fps
-    cnt1 = GetMillisecondTick();
-
-    while(num--)
-    {
-        o = (OBJECT*)objectList.next;
-        listDeleteOBJECT(o);
-
-       // obmainFreeObject(o);
-		FreeObjectTree(o);
-
-        objectnumber -= 1;
-        cnt2 = GetMillisecondTick();
-        diff = cnt2 - cnt1;
-
-        if(diff > 2) // Allow only 2 ms for deletions per call
-        {
-			int test=1;
-            break;
-        }
-    }
-#endif
-}
-#endif
 
 /************************************************************************************************
 	FreeQueuedObjects

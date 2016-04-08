@@ -217,12 +217,6 @@ struct OBJECTDOF
 
 };
 
-//#ifdef DEBUG_WW2
-//#define NEW_OBJECT_MEM 1
-//#else
-#define NEW_OBJECT_MEM  0
-//#endif
-
 class physicsObjectCollider;
 struct PoolModel;
 class ModelInstance;
@@ -434,28 +428,10 @@ typedef OBJECT DOFOBJECT;
 typedef OBJECT LODOBJECT;
 typedef OBJECT GROUPOBJECT;
 
-#ifdef MEMORY_DEBUG
-#define obmainGetNewObject() obmainGetNewObjectDebug(__FILE__, __LINE__)
-#define obmainGetNewNotObject(a) obmainGetNewNotObjectDebug(a, __FILE__, __LINE__)
-#define obmainGetFreeObject() obmainGetFreeObjectDebug(__FILE__, __LINE__)
-#define obmainFreeObject(a) obmainFreeObjectDebug(a, __FILE__, __LINE__)
-#else
-#define obmainGetNewObject() obmainGetNewObjectA()
-#define obmainGetNewNotObject(a) obmainGetNewNotObjectA(a)
-#define obmainGetFreeObject() obmainGetFreeObjectA()
-#define obmainFreeObject(a) obmainFreeObjectA(a)
-#endif
-
-extern struct OBJECT* obmainGetNewObjectA();
-extern struct OBJECT* obmainGetNewNotObjectA(UINT32 obtype);
-extern struct OBJECT* obmainGetFreeObjectA();
-extern LOGICAL	 obmainFreeObjectA(struct OBJECT* lpobj);
-
-extern struct OBJECT* obmainGetNewObjectDebug(char* from, int line);
-extern struct OBJECT* obmainGetNewNotObjectDebug(unsigned int type, char* from, int line);
-extern struct OBJECT* obmainGetFreeObjectDebug(char* from, int line);
-
-extern LOGICAL obmainFreeObjectDebug(OBJECT* o, char* from, int line);
+extern struct OBJECT* obmainGetNewObject();
+extern struct OBJECT* obmainGetNewNotObject(UINT32 obtype);
+extern struct OBJECT* obmainGetFreeObject();
+extern LOGICAL	 obmainFreeObject(struct OBJECT* lpobj);
 
 extern LOGICAL		obmainMoveToNotObjectTree(struct OBJECT* lpobj);
 extern LOGICAL		obmainMoveToObjectTree(struct OBJECT* lpobj);
@@ -490,13 +466,13 @@ extern struct OBJECT*	obmainGetNextTopmostObject(struct OBJECT* lpobj);
 extern struct OBJECT*	obmainFindTopmostObject(const char* name);
 extern struct OBJECT*	obmainGetFirstSubobject(struct OBJECT* lpmain);
 extern struct OBJECT*	obmainGetNextSubobject(struct OBJECT* lpobj);
-extern LOGICAL		obmainFindCrackedComment(SINT8** retptr, SINT8* comment, SINT8* cmp);
-extern LOGICAL		obmainFindCrackedCommentFirstPart(SINT8** retptr, SINT8* comment, SINT8* cmp);
-extern LOGICAL		obmainFindCommentName(SINT8** retptr, SINT8* comment, SINT8* cmp);
-extern LOGICAL 	obmainFindCommentFirstPartName(SINT8** retptr, SINT8* comment, SINT8* cmp);
-extern LOGICAL		obmainFindComment(struct OBJECT** retobj, OBJECT* lpmain, char* comment);
+extern LOGICAL		obmainFindCrackedComment(SINT8** retptr, SINT8* comment, const SINT8* cmp);
+extern LOGICAL		obmainFindCrackedCommentFirstPart(SINT8** retptr, SINT8* comment, const SINT8* cmp);
+extern LOGICAL		obmainFindCommentName(SINT8** retptr, SINT8* comment, const SINT8* cmp);
+extern LOGICAL 	obmainFindCommentFirstPartName(SINT8** retptr, SINT8* comment, const SINT8* cmp);
+extern LOGICAL		obmainFindComment(struct OBJECT** retobj, OBJECT* lpmain, const char* comment);
 extern LOGICAL		obmainFindCommentCallback(struct OBJECT* lpmain, char* comment, UINT32 user, PROCESSCALLBACK callback);
-extern LOGICAL		obmainFindCommentFirstPartCallback(struct OBJECT* lpmain, char* comment, UINT32 user, PROCESSCALLBACK callback);
+extern LOGICAL		obmainFindCommentFirstPartCallback(struct OBJECT* lpmain, const char* comment, UINT32 user, PROCESSCALLBACK callback);
 extern LOGICAL		obmainFindObjectLOD(struct OBJECT* lpmain, int lod, PROCESSCALLBACK callback);
 extern LOGICAL		obmainFindObjectDamage(struct OBJECT* lpmain, int dmg, PROCESSCALLBACK callback);
 extern void			obmainFindCallback(struct OBJECT* lpmain, FINDCALLBACK callback, void* userdata);
@@ -504,8 +480,8 @@ extern struct OBJECT*	obmainCopyObjectFull(struct OBJECT* lpcopy);
 extern struct OBJECT*	obmainCopyObject(struct OBJECT* lpcopy);
 extern struct OBJECT*	obmainCopyNamedObject(char* name);
 extern int			obmainGetObjects(LISTHEADER** lplist);
-extern LOGICAL		obmainCreateObject(struct OBJECT** newobj, char* name, int numverts, int numtris);
-extern LOGICAL		obmainCreateObjectFull(struct OBJECT** newobj, char* name, int numverts, int numtris);
+extern LOGICAL		obmainCreateObject(struct OBJECT** newobj, const char* name, int numverts, int numtris);
+extern LOGICAL		obmainCreateObjectFull(struct OBJECT** newobj, const char* name, int numverts, int numtris);
 extern LOGICAL		obmainSnapObjectToXYGrid(struct OBJECT* Object, FLOAT32 GridSize, UINT32 UseObjectMatrix);
 extern LOGICAL		obmainSnapObjectTreeToXYGrid(struct OBJECT* Object,FLOAT32 GridSize,UINT32 UseObjectMatrix);
 

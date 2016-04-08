@@ -61,7 +61,6 @@ mapOBJList mapOBJ; // All objects associated with a TO
 //#ifndef ANDREWCOLLISIONTESTS
 
 static LOGICAL g_bCheckTreeBox;
-static colliderQuery* _trnCollider = nullptr;
 
 typedef struct tagTERRAINID
 {
@@ -207,7 +206,6 @@ static UINT32 _AddStratMsgToFreeList(_StratMessageQue * StratMsg);
 static UINT32 _AddStratMsgToActiveList(_StratMessageQue * StratMsg);
 
 static SINT32 _GetDamageLevel(SINT32 visLevel);
-static UINT32 _killSound(SINT32 iID, void* data);
 
 static SINT32 _NullTexId;
 
@@ -1201,18 +1199,6 @@ _StratMessageQue*	PrevStratMsg;
 	TO->InUse = 1;
 	TO->StratSupercellX = SuperCellX;
 	TO->StratSupercellY = SuperCellY;
-
-#ifdef ANDREWTEST
-    if ( SuperCellX == SUPERCELL_INVALID )
-    {
-        //printf( "INV: %s\n", TopObject->name );
-    }
-    else
-    {
-        //printf( "%3d %s\n", SuperCellX, TopObject->name );
-    }
-#endif
-
 	TO->StratId = Id;
 	TO->DamThreshold = DamThreshold;
 	if (ObjId != nullptr)
@@ -5403,7 +5389,6 @@ UINT32 trncdInitSingleTerrainObject(trnCDTerrainObject* TO)
 UINT32 trncdAdjustTerrainObjects(piVECTOR* CameraAdjustment)
 {
 	trnCDTerrainObject* TO;
-	OBJECT*				childObj	= nullptr;
 
 	// next line should be called from the function that calls this function
 	persAdjustExternalFixedCamera(CameraAdjustment);
@@ -7083,15 +7068,9 @@ void trncdDrawShortTOBoundingBox()
 
     trnCDTerrainObject* to = nullptr;
 
-#ifdef ANDREWTEST
-    for(SINT32 i = 0; i < ML_NUM_MED_LIST_ELEMENTS; i++)
-    {
-        to = data->MedTrnList[i];
-#else
     for(SINT32 i = 0; i < ML_NUM_SHORT_LIST_ELEMENTS; i++)
     {
         to = data->ShortTrnList[i];
-#endif
         if(!to)
         {
             continue;
@@ -7121,23 +7100,6 @@ void trncdDrawShortTOBoundingBox()
         piSetWorldMatrix(&IdentityMatrix);
 
         piVECTOR p1, p2;
-#ifdef ANDREWTEST
-
-        p1.z = v1.z-4;
-        p2.z = v1.z-4;
-
-        p1.x = v1.x; p1.y = v1.y; p2.x = v2.x; p2.y = v1.y;
-        draw3dLine(&p1, &p2, colorORANGEALPHA);
-
-        p1 = p2; p2.x = v2.x; p2.y = v2.y;
-        draw3dLine(&p1, &p2, colorORANGEALPHA);
-
-        p1 = p2; p2.x = v1.x; p2.y = v2.y;
-        draw3dLine(&p1, &p2, colorORANGEALPHA);
-
-        p1 = p2; p2.x = v1.x; p2.y = v1.y;
-        draw3dLine(&p1, &p2, colorORANGEALPHA);
-#else
         p1.x = v1.x; p1.y = v1.y; p1.z = v1.z;
         p2.x = v2.x; p2.y = v1.y; p2.z = v1.z;
         draw3dLine(&p1, &p2, colorORANGEALPHA);
@@ -7185,7 +7147,6 @@ void trncdDrawShortTOBoundingBox()
         p1.x = v2.x; p1.y = v2.y; p1.z = v1.z;
         p2.x = v1.x; p2.y = v2.y; p2.z = v1.z;
         draw3dLine(&p1, &p2, colorORANGEALPHA);
-#endif
     }
 }
 
@@ -7289,13 +7250,11 @@ bool trncdCollideWithMouse(int sx, int sy)
 
     for(unsigned int j = 0; j < list.size(); j++)
     {
-        struct colliderQuery::Collision& c = list[j];
-
-        OBJECT* o = (OBJECT*)dGeomGetData(c.g2);
-
         // TODO: write contact point information or whatever
 // Debugging
 #if(0)
+        struct colliderQuery::Collision& c = list[j];
+        OBJECT* o = (OBJECT*)dGeomGetData(c.g2);
         uiChatPrintLine("%s", o->modelInstance ? o->modelInstance->GetModelName() : o->name);
 #endif
         // Can just use list[0], but keep loop for testing now...

@@ -20,7 +20,6 @@ class Squad							// Base squad info
 public:
 	Squad(UINT32 squadID=0, const ChatHandle& handle=0LL, const std::string& name="");
 	Squad(ACTION_OBJECT* const a) { a->offset = packer(TEUL_PACK, a); }
-	virtual ~Squad() {}
 
 public:
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
@@ -112,7 +111,6 @@ public:
 	Recruiter(const ChatHandle& withHandle=0LL, const Squad* withSquad=nullptr);
 	Recruiter(const class Player* withPlayer, const class SquadList* withSquad, const class ChatMission* withMission);
 	Recruiter(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
-	virtual ~Recruiter() {}
 
 public:
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);

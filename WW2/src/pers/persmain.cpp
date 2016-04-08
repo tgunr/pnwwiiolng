@@ -201,8 +201,6 @@ static UINT32 _UpdatePersonaSounds(void);
 static LOGICAL _CheckForBlocks(UINT32 Type,SINT32 Position);
 static LOGICAL _BlockView(void);
 
-static UINT32 _UpdateDeathCam(void);
-
 static UINT32 _SetGunsightToUserDraw(OBJECT * Object,UINT32 IncludeSibs);
 static LOGICAL _DrawGunsightObject(OBJECT * Object);
 
@@ -216,7 +214,6 @@ static int _DoResupplyCheck(void);
 static UINT32 _DoScenarioResupplyCheck(void);
 static UINT32 _DoGroundResupplyCheck(void);
 static UINT32 _DoStaticResupplyCheck(void);
-static UINT32 _DoNavalResupplyCheck(void);
 LOGICAL _IsValidResupplyVehicle(const vehVehicle* player, const vehVehicle* resupplier, FLOAT64VECTOR* lastPos);
 LOGICAL _IsValidResupplyBuilding(StratDB::StratObject* resupplier);
 StratDB::StratObject* _LookupResupplyBuilding();
@@ -238,7 +235,6 @@ static UINT32 _InternalViewMode;
 //static piVECTOR _ExternalFixedCameraPos;
 static UINT32 _CameraNeverSet;
 static UINT32 _InDeathCam;
-static UINT32 _RotateDeathCam;
 
 static FLOAT32 _FogScaleMultiplier = 1.0f;
 
@@ -254,7 +250,6 @@ static SINT32 _SlewViewIOHeldDown; // in out
 static FLOAT32 _ExternalFieldOfView;
 static FLOAT32 _ExternalZoom = -20.0f;
 static FLOAT32 _InternalFieldOfView = DEFAULT_INTERNAL_FOV;
-static FLOAT32 _fDeathCamDist = 0.5f;
 static int _shaketime = 0;
 static int _shakeduration = 0;
 static SINT32 _exitTime = 0;
@@ -489,14 +484,7 @@ UINT32 persUpdate(void)
 		if (_Persona.VehicleAttached->VehicleDeadTime != 0 && !_InDeathCam && !vehmainHasBailedOut())
 		{
 			persSetDeathCam();
-			//_UpdateDeathCam();
 		}
-		/*
-		else
-		{
-			_InDeathCam = 0;
-		}
-		*/
 	}
 	else
 	{
@@ -1632,8 +1620,6 @@ static piVECTOR _LastVec;
 		Att1.z = _ViewAtt.z;
 		mathEul_ToMatrix(&Mat,EulOrdXYZr,&Att1);
 		math3dVectorMultiply(&Vec,&Vec,&Mat);
-
-		vehVehicle*veh = persGetPersonaVehiclePtr();
 
 		Att1.x = 0.0;
 		Att1.z = 0.0;
@@ -3493,21 +3479,11 @@ UINT32 persSetVehicleG(FLOAT32 VehicleG, vehVehicle* Vehicle)
 {
 	if (Vehicle == _Persona.VehicleAttached && Vehicle != nullptr)
 	{
-		_VehicleG = VehicleG;
-
-		if (_Persona.VehicleAttached->ModelData != nullptr)
-		{
-			if (_Persona.VehicleAttached->VehicleType != nullptr)
-			{
-				// if we're being towed, g is treated as 1g to keep bumpiness
-				// from killing the crew
-				if (_Persona.VehicleAttached->ModelData->TowBarEnabled == TRUE &&
-					_Persona.VehicleAttached->VehicleType->Type == VEH_TYPE_GROUND)
-				{
-					_VehicleG = 1.0;
-				}
-			}
-		}
+		// HACK: This isn't being properly accumulated for ground vehicles on rough terrain.
+		if ( _Persona.VehicleAttached->VehicleType != nullptr && _Persona.VehicleAttached->VehicleType->Type == VEH_TYPE_GROUND )
+			_VehicleG = 1.0;
+		else
+			_VehicleG = VehicleG;
 	}
 
 	return 0;
@@ -4930,138 +4906,6 @@ FLOAT32 Damage;
 	return 0;
 }
 
-/*
-static UINT32 _UpdateDeathCam(void)
-{
-	FLOAT32 horizon;
-	piMATRIX DummyMat;
-	piVECTOR TempVec,V1,V2;
-	FLOAT32 TempNum;
-	FLOAT32 Delta;
-
-	if (_Persona.VehicleAttached == nullptr) return 0;
-
-
-	if (_CameraMode != _EXTERNAL_CAMERA)
-	{
-		persSetExternalCamera(1, 0, 0);
-	}
-
-	_CameraMode = _EXTERNAL_CAMERA;
-	horizon = piLongLikeFloat(FogEnd) * 2.0f;
-	piSetFieldOfView(90.0, 1.0f, horizon);
-
-	_ExternalViewMode = _EXTERNAL_FIXED;
-
-	if (_InDeathCam == 0)
-	{
-		_RotateDeathCam = FALSE;
-		_GetPlayerPos(&_CameraPos,&DummyMat);
-		_InDeathCam = 1;
-
-		if (_Persona.VehicleAttached != nullptr)
-		{
-			if (_Persona.VehicleAttached->VehicleType != nullptr &&
-				_Persona.VehicleAttached->ModelData != nullptr)
-
-			{
-				_CameraPos.x -= (FLOAT32)(_Persona.VehicleAttached->ModelData->VehicleRealVel.x * 1.5);
-				_CameraPos.y -= (FLOAT32)(_Persona.VehicleAttached->ModelData->VehicleRealVel.y * 1.5);
-				_CameraPos.z += (FLOAT32)(_Persona.VehicleAttached->ModelData->VehicleRealVel.z * 1.5);
-
-				if(_Persona.VehicleAttached->VehicleObjectData)
-				{
-					_fDeathCamDist = _Persona.VehicleAttached->VehicleObjectData->Radius;
-				}
-				else
-				{
-					_fDeathCamDist = 1.0f;
-				}
-
-				if (mathGetFloat32ChaoticNumber() > 0.5f)
-				{
-					TempVec.x = _fDeathCamDist;
-				}
-				else
-				{
-					TempVec.x = -_fDeathCamDist;
-				}
-				TempVec.y = 0.0f;
-				TempVec.z = _fDeathCamDist;
-				math3dVectorMultiply(&TempVec,&TempVec,&_Persona.VehicleAttached->ModelData->VehicleAttMat);
-				_CameraPos.x += TempVec.x;
-				_CameraPos.y += TempVec.y;
-				_CameraPos.z += TempVec.z;
-
-				TempNum = (FLOAT32)(mathExactVectorLength(&_Persona.VehicleAttached->ModelData->VehicleRealVel));
-				if (TempNum < DEF_MAX_DEATH_CAM)
-				{
-					_RotateDeathCam = TRUE;
-				}
-			}
-
-		}
-		// sanity check on altitude
-		V1.x = -_CameraPos.x;
-		V1.y = -_CameraPos.y;
-		V1.z = -_CameraPos.z;
-		V2 = V1;
-
-		V1.z += 20000.0f;
-		if (trncdCollideDownMediumList(&V2,&V1) == FALSE)
-		{
-			V1.x = -_CameraPos.x;
-			V1.y = -_CameraPos.y;
-			V1.z = -_CameraPos.z;
-			V2 = V1;
-
-			V1.z -= 20000.0f;
-			if (trncdCollideDownMediumList(&V1,&V2) == TRUE)
-			{
-				_CameraPos.z = -(V2.z - 1.0f);
-			}
-		}
-
-	}
-
-	// adjust deathcam
-	if (_RotateDeathCam == TRUE && _Persona.VehicleAttached != nullptr)
-	{
-		if (_Persona.VehicleAttached->ModelData != nullptr &&
-			_Persona.VehicleAttached->VehicleType != nullptr)
-		{
-			_GetPlayerPos(&_CameraPos,&DummyMat);
-			Delta = (frametime - _Persona.VehicleAttached->VehicleDeadTime) / 1000.0f;
-
-			_fDeathCamDist += 0.1f;
-#if(0)
-			if (_Persona.VehicleAttached->VehicleType->Type == VEH_TYPE_AIR)
-			{
-				_fDeathCamDist += 0.1f;
-			}
-			else
-			if (_Persona.VehicleAttached->VehicleType->Type == VEH_TYPE_PERSON)
-			{
-				_fDeathCamDist += 0.08f;
-			}
-			else
-			{
-				_fDeathCamDist += 0.1f;
-			}
-#endif
-			Delta *= 0.2f;
-
-			_CameraPos.x += _fDeathCamDist * Delta;
-			_CameraPos.y += _fDeathCamDist * Delta;
-			_CameraPos.z += _fDeathCamDist;
-
-		}
-	}
-
-	return 0;
-}
-*/
-
 #define POS_VALID(pos) ((pos).x || (pos).y || (pos).z)
 #define POS_MOVED(pos,chk) (((pos).x != (chk).x) || ((pos).y != (chk).y) || ((pos).z != (chk).z))
 #define POS_RESET(pos) ((pos).x = (pos).y = (pos).z = 0)
@@ -5741,8 +5585,8 @@ bool persIsCrewDead(void)
 		if (_PersonaHealth[i].PayAttentionToPersona != 0)
 		{
 			AnyCrew = true;
-			if (_PersonaHealth[i].BrainOxyMaxLevel >= _BRAIN_STRENGTH_FULLLOSS || _PersonaHealth[i].BloodLevel >= 0.5f)
-				return false;
+			if (_PersonaHealth[i].BrainOxyMaxLevel < _BRAIN_STRENGTH_FULLLOSS && _PersonaHealth[i].BloodLevel < 0.5f)
+				return false; // At least one crew member is alive.
 		}
 	}
 

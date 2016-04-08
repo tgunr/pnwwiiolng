@@ -41,7 +41,6 @@
 
 typedef std::map<UINT32,SINT32> PPO_SINK_MAP;
 
-static int _lastPlacement	= 0;
 static int _badMat			= -1;
 static int _goodMat			= -1;
 static int _offMat			= -1;
@@ -537,9 +536,13 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 
 					if(diff)
 					{
+                        /*
+                         TBD - this doesn't actually do anything.  Probably something unfinished?
+                         
 						OBJECT* ohit = colliderData<OBJECT>(hits[0].g2);
 						trnCDTerrainObject* thit = colliderSpaceData<trnCDTerrainObject>(hits[0].g2);
-
+                         */
+                        
 						std::vector<std::string> desc = colliderGetDescription(diff);
 
 						SetInvalid("ppos.badavoidance");
@@ -925,7 +928,6 @@ bool PlayerPlacedObject::Update()
 				SINT32 adjust = -coolDownProgress;
 
 				SINT32 now = frametime + adjust;
-				SINT32 end = spec->coolDownEnd + adjust;
 
 				coolDownStart = 0;
 				coolDownProgress = now;
@@ -1451,11 +1453,9 @@ static bool _inTargetFacilityRange(FLOAT32 distance, SINT32 side)
 
 	bool friendly = (so->Side() == side);
 
-    if(so->StratClass() == SDM_CLASS_FACILITY)
+	if ( so->StratClass() == SDM_CLASS_FACILITY || so->StratType() == SDM_CP_BRIDGE )
 		return _checkFacilityRange(distance, so, side, friendly);
 	else if(so->StratClass() != SDM_CLASS_CP)
-		return false;
-	else if(so->StratType() == SDM_CP_BRIDGE)
 		return false;
 
 	StratDB::StratObject::ChildList cl = so->ChildStratObjects();

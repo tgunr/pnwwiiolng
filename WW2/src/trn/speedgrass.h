@@ -32,11 +32,7 @@ struct CollideQue
 };
 
 #if platOS == OS_MACOS
-namespace __gnu_cxx
-{
-    template<> struct hash<dGeomID>  { size_t operator()(dGeomID o) const  { return *(size_t*)(&o); } };
-
-};
+template<> struct std::hash<dGeomID>  { size_t operator()(dGeomID o) const  { return *(size_t*)(&o); } };
 #endif
 
 struct Patch
@@ -66,12 +62,12 @@ struct Patch
 
     Patch() :
         indiceoffset(0),
-        vertexcount(0),
         density(0),
-        h(0),
-        w(0),
+        vertexcount(0),
         uvoffset(0),
         zoffset(0),
+        h(0),
+        w(0),
         vboid(0)
     {
     }
@@ -127,20 +123,20 @@ struct PatchInstance
 #endif
 
 	PatchInstance() :
-        indiceoffset(0),
-        alpha(0),
-        faderate(1.0f),
         lastdrawtime(0),
+        primcount(0),
         lod(0),
+        indiceoffset(0),
+        key(0),
         collided(false),
         usematrix(false),
-        colorscale(1),
         cullradius(0),
-        primcount(0),
-        key(0),
+        colorscale(1),
+        alpha(0),
+        faderate(1.0f),
         splatid(-1),
-        instanceof(nullptr),
-        userwanteddensity(0)
+        userwanteddensity(0),
+        instanceof(nullptr)
 	{
         rot.set(1, 0, 0, 0);
 	}
@@ -299,7 +295,7 @@ public:
 
     virtual bool CollideWithTerrain(CollideQue* que);
 
-    bool speedgrassPut(const Vec3d& pos, PatchInstance& instance, float scale = 1.0f, int texture = -1);
+    bool speedgrassPut(const Vec3d& pos, PatchInstance& instance, float scale = 1.0f, int texture = -1, float shadow = 1.0f);
 };
 
 void speedgrassUpdate();

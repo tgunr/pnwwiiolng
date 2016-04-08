@@ -15,7 +15,7 @@
 
 #include <string>
 
-static LANGTABLE* loclLangReadFile(SCHAR* pszPath, SCHAR** ppReturn);
+static LANGTABLE* loclLangReadFile(SCHAR* pszPath);
 static const SCHAR* _GetString(LANGTABLE* langTable, UINT32 uID);
 
 static ENUM_LANGUAGES g_language;
@@ -292,7 +292,7 @@ const SCHAR* _GetString(LANGTABLE* langTable, UINT32 uID)
 
     lpHead = langTable;
 
-    for(lpHead; lpHead != nullptr; lpHead = lpHead->next)
+    for(; lpHead != nullptr; lpHead = lpHead->next)
     {
         if(lpHead->uID == uID)
         {

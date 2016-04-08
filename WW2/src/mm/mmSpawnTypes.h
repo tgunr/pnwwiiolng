@@ -122,6 +122,11 @@ struct POSTED_WEAPON;
 
 struct MM_POSTED_WEAPON
 {
+	MM_POSTED_WEAPON(const WEAPON_SERIAL& _weaponSerial, SINT16 _portal, UINT32 _commander, UINT32 _missionID, UINT32 _crew)
+	: weaponSerial(_weaponSerial), portal(_portal), commander(_commander), missionID(_missionID), crew(_crew) {}
+	MM_POSTED_WEAPON()
+	: weaponSerial(NULL_WEAP_SERIAL), portal(0), commander(0), missionID(0), crew(0) {}
+
 	void copy(const POSTED_WEAPON& rhs);
 
 	WEAPON_SERIAL	weaponSerial;	//Marty's WEAPON_SERIAL,
@@ -189,7 +194,6 @@ public:
 					, UCHAR _decal = 0
 					, bool isHighCommander = false, bool isBuilder = false, bool isMissionleader = false);
 	FESpawnNotify(ACTION_OBJECT* const a);
-	~FESpawnNotify() {}
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 public:

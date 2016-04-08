@@ -1,0 +1,15 @@
+//
+//  CodeSigning.xcconfig
+//  WW2OL
+//
+//  Created by Gwynne Raskind on 10/30/15.
+//  Copyright © 2015 Playnet. All rights reserved.
+//
+
+// It is expected that this file may have local modifications that are never
+// committed. The version existing in version control sets a default signing
+// identity. In the future it may also contain settings pertaining to excluding
+// or including the archives in code signing.
+
+CODE_SIGN_IDENTITY = Developer ID Application
+PROVISIONING_PROFILE =

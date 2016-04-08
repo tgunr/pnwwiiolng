@@ -23,6 +23,7 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHash.h"			// For unordered map
 #include "wwii/wwiiThreads.h"
+#include "dbug/dbug.h"
 
 #include "host/hostTiming.h"
 
@@ -39,7 +40,7 @@
 #include <type_traits>
 
 #if defined(ENABLE_VIS_DEBUG)
-#define VIS_DEBUG(...) dbugLog(__VA_ARGS__
+#define VIS_DEBUG(...) dbugLog(__VA_ARGS__)
 static void
 _dumpVisListEntry(const Viewing& entry)
 {
@@ -130,7 +131,7 @@ _isMandatoryVehicle(const HostVehicle& myVehicle, const HostVehicle& newVehicle)
 	const bool isMulticrew = (newVehicle.isMultiCrewed());
 	const bool isMyRide    = (myVehicle.vehicleData.rideIndex == newVehicle.index);
 
-	return ( (isMyVehicle & isMulticrew) | isMyRide );
+	return ( (isMyVehicle && isMulticrew) || isMyRide );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -207,7 +208,7 @@ _weightCurrentVisList(HostVehicle& myVehicle)
 		}
 		else
 		{
-			if ( ((subject.isHiddenBuzzard() == true) & (myVehicle.canSeeHiddenBuzzards() == false)) == true )
+			if ( subject.isHiddenBuzzard() && ! myVehicle.canSeeHiddenBuzzards() )
 			{
 				EXTREME(_FLDB, " vv:%u hidden", it->m_index);
 				myVehicle.removeFromVisList(it);
@@ -280,8 +281,8 @@ _addCellNodesToVisList(HostVehicle& myVehicle, const Grid::VehicleSet& vehicles,
 		if ( _isMandatoryVehicle(myVehicle, subject) == false )
 		{
 			EXTREME(_FLDB, "=norm");
-			const bool isHidden = (subject.isHiddenBuzzard() == true) & (myVehicle.canSeeHiddenBuzzards() == false);
-			if ( (subject.index == myVehicle.index) | (subject.isActive() == false) | (isHidden) )
+			const bool isHidden = subject.isHiddenBuzzard() && ! myVehicle.canSeeHiddenBuzzards();
+			if ( subject.index == myVehicle.index || ! subject.isActive()  || isHidden )
 			{
 				EXTREME(_FLDB, "!vis");
 				continue;
@@ -456,7 +457,7 @@ ViewingWeightOrder::adjustWeightsForBias(const WEAP_BIAS& bias)
 		const HostVehicle& subject = viewing.m_vehicle;
 
 		// Find vehicles matching our bias pattern.
-		if ( (specSide && subject.side() != specSide) | ((specMask & subject.spec().asUINT32()) != specMask) )
+		if ( specSide && subject.side() != specSide || (specMask & subject.spec().asUINT32()) != specMask )
 			continue;
 
 		if ( current > biasedVehicles )
@@ -724,7 +725,7 @@ HostVehicle::CreateWorldUpdate()
 	for ( UINT32 i = 0; i < m_visList.size(); ++i )
 	{
 		Viewing& viewing = m_visList[i];
-		if ( (avoidRepeats) & (viewing.m_vehicle.lastRX < viewing.m_lastSent) )
+		if ( avoidRepeats && viewing.m_vehicle.lastRX < viewing.m_lastSent )
 			continue;
 
 		//viewing.m_oneTimeBits = viewing.m_vehicle.getOneTimeBitsFor(this);

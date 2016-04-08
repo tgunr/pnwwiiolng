@@ -112,6 +112,7 @@ class WeaponCounter
 {
 public:
 	WeaponCounter() : capacity(0), current(0), reinforcements(0), spawnable(0), restricted(0) {}
+    WeaponCounter (const WeaponCounter & rhs) { Copy(rhs); }
 
 public:
 	// add LOCKED value to this enum for client state notification of subscription content locking
@@ -123,15 +124,21 @@ public:
 //tolua_end
 	WeaponCounter& operator = (const WeaponCounter& rhs)
 	{
-		capacity = rhs.capacity;
-		current = rhs.current;
-		reinforcements = rhs.reinforcements;
-		spawnable = rhs.spawnable;
-		restricted = rhs.restricted;
+        Copy(rhs);
 		return *this;
 	}
+    
 //tolua_begin
 
+public:
+    void Copy( const WeaponCounter & rhs ) {
+        capacity = rhs.capacity;
+        current = rhs.current;
+        reinforcements = rhs.reinforcements;
+        spawnable = rhs.spawnable;
+        restricted = rhs.restricted;
+    }
+    
 public:
 	UINT16	capacity;				// Automatic resupply level
 	UINT16	current;				// Current actual level

@@ -30,9 +30,8 @@ unsigned int TextureBufferBind::oldname = 0;
 
 GLenum TextureState::target[MAX_TEXTURE_UNITS] = {0, 0, 0, 0, 0, 0, 0};
 
-static unsigned int TextureTargetBinds[MAX_TEXTURE_UNITS] = {0, 0, 0, 0, 0, 0, 0};
-
 #if USE_STATESET
+static unsigned int TextureTargetBinds[MAX_TEXTURE_UNITS] = {0, 0, 0, 0, 0, 0, 0};
 static bool LockedStates[RS_COUNT] = {false};
 static std::set<int> HaveAppliedState;
 

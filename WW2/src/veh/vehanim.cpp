@@ -1680,7 +1680,7 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
         if(lpLeft == nullptr)
         {
 	        SCHAR szBuff[128];
-	        SCHAR* pStr = "State %s, exhaust smoke, unable to find dof %s, Vehicle type = %s";
+	        const SCHAR* pStr = "State %s, exhaust smoke, unable to find dof %s, Vehicle type = %s";
 
 	        sprintf(szBuff,
 	                pStr,
@@ -1703,7 +1703,7 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
         if(lpRight == nullptr)
         {
 	        SCHAR szBuff[128];
-	        SCHAR* pStr = "State %s, exhaust smoke, unable to find dof %s, Vehicle type = %s";
+	        const SCHAR* pStr = "State %s, exhaust smoke, unable to find dof %s, Vehicle type = %s";
 
 	        sprintf(szBuff,
 	                pStr,

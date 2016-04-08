@@ -1,0 +1,48 @@
+﻿/* 
+  Localizable.strings
+  WW2OL
+
+  Created by Gwynne Raskind on 12/7/15.
+  Copyright © 2015 Playnet. All rights reserved.
+*/
+
+"ERROR_UNKNOWN" = "Unknown error code: ";
+
+"ERROR_1" = "Bad Playgate";
+
+"ERROR_2" = "Unable to find auth server domain";
+
+"ERROR_3" = "Patch download failed";
+
+"ERROR_4" = "Login request cancelled";
+
+"ERROR_5" = "No such application";
+
+"ERROR_6" = "Unknown application";
+
+"ERROR_7" = "Failed to launch game";
+
+"ERROR_8" = "Launch timed out";
+
+"teul_ERROR_UNKNOWN" = "Unknown error code returned by networking: ";
+
+"teul_ERROR_20000" = "Bad packet";
+"teul_ERROR_20001" = "Connection timeout";
+"teul_ERROR_20002" = "Server shut down";
+"teul_ERROR_20004" = "Broken packet";
+"teul_ERROR_20005" = "Internal error";
+"teul_ERROR_20006" = "Invalid packet";
+"teul_ERROR_20009" = "Internal failure";
+"teul_ERROR_20011" = "Internal problem";
+"teul_ERROR_20012" = "Internal issue";
+"teul_ERROR_20030" = "Server restarted";
+"teul_ERROR_20031" = "Server offline";
+"teul_ERROR_20032" = "Illegal packet";
+"teul_ERROR_20033" = "Connection stall";
+"teul_ERROR_20034" = "Connection failure";
+"teul_ERROR_20025" = "No data";
+"teul_ERROR_20026" = "Lack of data";
+
+"launch_patch_heading" = "Patch has been downloaded";
+"launch_patch_message" = "The patch has been downloaded and should appear in the Finder momentarily. The game will now quit. If the new version does not appear, go to http://www.battlegroundeurope.net/getting-started for a manual download. This process will be improved in a future patch.";
+"OK" = "OK";

@@ -108,10 +108,6 @@ public:
 		{
 		}
 
-		~EZCamera()
-		{
-		}
-
 		void Update(FLOAT64 deltaTime);
 
 		// easy camera ops
@@ -140,8 +136,8 @@ public:
 		};
 
 		EZTurret() :
-			position(0),
 			tracking(false),
+            position(0),
 			mount(nullptr),
 			vehicle(nullptr),
 			screenPosIndex(0)

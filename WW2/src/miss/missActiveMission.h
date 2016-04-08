@@ -27,7 +27,6 @@ public:
 		, m_brigadeID(brigade)
 			{}
 	ActiveMission(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
-	~ActiveMission() {}
 
 public:
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);

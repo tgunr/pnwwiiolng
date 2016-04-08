@@ -83,33 +83,29 @@ struct ScenarioObject
 
 	ScenarioObject() :
 		type(ANY),
-		flags(0),
 		team(0),
 		round(0),
 		stage(0),
-		resource(nullptr),
-		runtime(0),
+        flags(0),
+        loadFlags(ON_RUN_OBJECT),
+        runtime(0),
 		duration(0), // anytime
-		loadFlags(ON_RUN_OBJECT)
+        resource(nullptr)
 	{
 	}
 
 	ScenarioObject(TYPE t, const char* n, const char* d, UINT32 lf = ON_RUN_OBJECT) :
 		type(t),
-		name(n),
-		data(d),
-		flags(0),
 		team(0),
 		round(0),
 		stage(0),
-		resource(nullptr),
+        flags(0),
+        loadFlags(lf),
 		runtime(0),
 		duration(0), // anytime
-		loadFlags(lf)
-	{
-	}
-
-	virtual ~ScenarioObject()
+        name(n),
+        data(d),
+        resource(nullptr)
 	{
 	}
 
@@ -327,19 +323,19 @@ struct ScenarioBombBarrage : public ScenarioObject
 struct ScenarioSound : public ScenarioWorldObject
 {
 	ScenarioSound() : ScenarioWorldObject(),
-		id(-1),
 		volume(1.0f),
 		minDist(0.0f),
-		maxDist(0.0f)
+		maxDist(0.0f),
+        id(-1)
 	{
 		type = SOUND;
 	}
 
 	ScenarioSound(const char* n, const char* d) : ScenarioWorldObject(SOUND, n, d),
-		id(-1),
 		volume(1.0f),
 		minDist(0.0f),
-		maxDist(0.0f)
+		maxDist(0.0f),
+        id(-1)
 	{
 	}
 
@@ -372,6 +368,7 @@ struct ScenarioFirepoint : public ScenarioWorldObject
 	{
 	}
 
+    using ScenarioWorldObject::Update;
 	void Update(bool firing);
 
 	SINT32 turret;
@@ -471,10 +468,6 @@ struct ScenarioBlock : public ScenarioObject
 	{
 	}
 
-	virtual ~ScenarioBlock()
-	{
-	}
-
 	double height;
 	double width;
 	Vec3d pt1;
@@ -539,8 +532,8 @@ struct ScenarioBoundary : public ScenarioObject
 struct ScenarioEvent : public ScenarioObject
 {
 	ScenarioEvent(const char* n) : ScenarioObject(EVENT, n, ""),
-		nextEvent(0),
 		lastEvent(0),
+        nextEvent(0),
 		eventInterval(0),
 		runInterval(0),
 		run(-1),
@@ -631,10 +624,6 @@ struct ScenarioPlayer
 	}
 
 	ScenarioPlayer(ChatHandle h) : handle(h), lastUpdate(0)
-	{
-	}
-
-	virtual ~ScenarioPlayer()
 	{
 	}
 
@@ -916,11 +905,9 @@ private:
 	SINT32 _soundUpdate;
 	SINT32 _playerUpdate;
 	SINT32 _lastUpdate;
-	SINT32 _startTime;
     SINT32 _startTimeTerrainLoad;
 
 	bool _updatePlayers;
-	bool _objectsLoaded;
     bool _terrainReadyToLoad;
 	bool _scenarioIsComplete;
 

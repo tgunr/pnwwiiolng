@@ -824,7 +824,7 @@ int   i;
 }
 #endif
 
-LOGICAL obwldInit(char* levelfile)
+LOGICAL obwldInit(const char* levelfile)
 {
 UINT32	T1, T2;
 
@@ -854,25 +854,6 @@ logTimerEndExtMacro(parseWor);
 
 	T2 = timeGetTime();
 	Write_Debug ("*****************Total time loading blitzwor.csv file: %u milliseconds", T2-T1);
-
-#ifdef ANDREWTEST
-    {
-        /*
-        extern PoolMap _poolmap;
-
-        PoolMap::iterator it = _poolmap.begin();
-        while (it != _poolmap.end() )
-        {
-            printf("%s:", it->first.c_str() );
-            PoolModel* model = it->second;
-            PoolNode* node = it->second->node;
-            size_t size = node->calcMemoryUsage();
-            printf(" Size=%ld\n", size );
-            it++;
-        }
-        */
-    }
-#endif
 
 	// Granny2 system (needs materials loaded)
 
