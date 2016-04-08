@@ -473,7 +473,6 @@
 		E97C76C51C85395700875F44 /* kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769A1C85156F00875F44 /* kqueue.c */; };
 		E97C76C61C8539BF00875F44 /* XMLLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762B1C84E11A00875F44 /* XMLLoader.cpp */; };
 		E97C76C71C8539BF00875F44 /* XMLLoader2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */; };
-		E97C76D11C85B15800875F44 /* playarc.ww2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E97C76D41C85B21200875F44 /* HockeySDK.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = E97C76D31C85B21200875F44 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
 		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
@@ -494,6 +493,7 @@
 		FA37D74F1C937F6E00013187 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = FA37D74D1C937F6E00013187 /* MainMenu.nib */; };
 		FA37D7531C937F8F00013187 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FA37D7511C937F8F00013187 /* Localizable.strings */; };
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
+		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -521,16 +521,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		0DDF018108579F3B0027461D /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = AppData;
-			dstSubfolderSpec = 6;
-			files = (
-				E97C76D11C85B15800875F44 /* playarc.ww2 in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		E97C76D21C85B1FD00875F44 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1440,7 +1430,7 @@
 		0DDF00A508578C460027461D /* libjs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjs.a; path = lib/mac/libjs.a; sourceTree = SOURCE_ROOT; };
 		47B0ED240E9A66A40089DCC4 /* libteulKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libteulKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
-		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D0C4E970486CD37000505A6 /* World War II Online Beta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online Beta.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		E90D96A71C6E041300D5EC52 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
@@ -3003,7 +2993,7 @@
 		195DF8CFFE9D517E11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D0C4E970486CD37000505A6 /* World War II Online.app */,
+				8D0C4E970486CD37000505A6 /* World War II Online Beta.app */,
 				47B0ED240E9A66A40089DCC4 /* libteulKit.a */,
 				080C7E841062F011000A242F /* libmaclib.a */,
 				E97C76351C8513EB00875F44 /* libevent.a */,
@@ -3292,7 +3282,6 @@
 				8D0C4E8C0486CD37000505A6 /* Resources */,
 				8D0C4E8F0486CD37000505A6 /* Sources */,
 				8D0C4E910486CD37000505A6 /* Frameworks */,
-				0DDF018108579F3B0027461D /* CopyFiles */,
 				E97C76D21C85B1FD00875F44 /* Copy Files */,
 				E9320E9E1C960065003E8048 /* ShellScript */,
 			);
@@ -3306,7 +3295,7 @@
 			name = WW2OL;
 			productInstallPath = "$(HOME)/Applications";
 			productName = WW2OL;
-			productReference = 8D0C4E970486CD37000505A6 /* World War II Online.app */;
+			productReference = 8D0C4E970486CD37000505A6 /* World War II Online Beta.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E97C76341C8513EB00875F44 /* event */ = {
@@ -3368,6 +3357,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */,
 				FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */,
 				FA37D7531C937F8F00013187 /* Localizable.strings in Resources */,
 				E9320E991C95FC2C003E8048 /* local2.tkt in Resources */,
@@ -3918,7 +3908,7 @@
 				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
+				PRODUCT_NAME = "World War II Online Beta";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -3975,7 +3965,7 @@
 				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
+				PRODUCT_NAME = "World War II Online Beta";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -4050,7 +4040,7 @@
 				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
+				PRODUCT_NAME = "World War II Online Beta";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Development;
@@ -4116,7 +4106,7 @@
 				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
+				PRODUCT_NAME = "World War II Online Beta";
 				WRAPPER_EXTENSION = app;
 			};
 			name = GM;
