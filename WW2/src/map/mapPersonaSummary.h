@@ -115,7 +115,7 @@ static const UINT32 MAX_PLAYER_PERSONAS = MAX_PLAYER_COUNTRIES * MAX_COUNTRY_BRA
 class PersonaSummaries
 {
 public:
-	PersonaSummaries() : m_error(false), m_count(0), m_callsign(0LL), m_chatPermissions(nullChatPermissions) { };
+	PersonaSummaries() : m_error(false), m_count(0), m_callsign(0LL), m_chatPermissions(nullChatPermissions) { }
 	PersonaSummaries(ACTION_OBJECT* const a) : m_error(false), m_count(0), m_callsign(0LL), m_chatPermissions(), m_accountGoodUntil(0) { a->offset = packer(TEUL_UNPACK, a); }
 
     SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
@@ -171,7 +171,7 @@ public:
 		{ }
 
 	// Construct from network object
-	PersonaSelection(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); };
+	PersonaSelection(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 	// Network exchange functions
 	SINT32 send(SINT32 teulIndex);

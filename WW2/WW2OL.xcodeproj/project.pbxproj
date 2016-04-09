@@ -11,7 +11,7 @@
 		080C7EA31062F13E000A242F /* clientGlobals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0863B36E10619D66005FDF19 /* clientGlobals.cpp */; };
 		080C7EA41062F147000A242F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 08104D52103DFBE90065E0E2 /* main.m */; };
 		080C7EA61062F161000A242F /* WW2AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08104D60103DFBE90065E0E2 /* WW2AppDelegate.mm */; };
-		080C7EA71062F16F000A242F /* dpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 081048DD103DCFA30065E0E2 /* dpp.mm */; };
+		080C7EA71062F16F000A242F /* ddp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 081048DD103DCFA30065E0E2 /* ddp.mm */; };
 		080C7EA81062F17E000A242F /* diphid.mm in Sources */ = {isa = PBXBuildFile; fileRef = 081048E2103DCFBD0065E0E2 /* diphid.mm */; };
 		080D1E091404397100ECCF00 /* teulPacket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 080D1E071404397100ECCF00 /* teulPacket.cpp */; };
 		080D1E0A1404397100ECCF00 /* teulPacket.h in Headers */ = {isa = PBXBuildFile; fileRef = 080D1E081404397100ECCF00 /* teulPacket.h */; };
@@ -232,7 +232,7 @@
 		08104D4D103DFBA10065E0E2 /* stringLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D47103DFBA10065E0E2 /* stringLib.cpp */; };
 		08104D4E103DFBA10065E0E2 /* striws.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D49103DFBA10065E0E2 /* striws.cpp */; };
 		08104D4F103DFBA10065E0E2 /* strpool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D4B103DFBA10065E0E2 /* strpool.cpp */; };
-		08104D61103DFBE90065E0E2 /* authClientMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D51103DFBE90065E0E2 /* authClientMessages.cpp */; };
+		08104D61103DFBE90065E0E2 /* authClientMessages.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08104D51103DFBE90065E0E2 /* authClientMessages.mm */; };
 		08104D65103DFBE90065E0E2 /* sysmain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D59103DFBE90065E0E2 /* sysmain.cpp */; };
 		08104D66103DFBE90065E0E2 /* sysMovieMac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D5C103DFBE90065E0E2 /* sysMovieMac.cpp */; };
 		08104D67103DFBE90065E0E2 /* systhreadmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D5E103DFBE90065E0E2 /* systhreadmac.cpp */; };
@@ -385,9 +385,6 @@
 		084DD9FA1120F37F0020E34F /* mem.h in Headers */ = {isa = PBXBuildFile; fileRef = 084DD9F81120F37F0020E34F /* mem.h */; };
 		0863B34F10619AC8005FDF19 /* libphui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0863B34D10619AC8005FDF19 /* libphui.a */; };
 		0863B35010619AC8005FDF19 /* libspeedtreemac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0863B34E10619AC8005FDF19 /* libspeedtreemac.a */; };
-		086708EC10E83D9A00E43DFB /* testmac.c in Sources */ = {isa = PBXBuildFile; fileRef = 086708E010E83D9A00E43DFB /* testmac.c */; };
-		086708EE10E83D9A00E43DFB /* preloader.c in Sources */ = {isa = PBXBuildFile; fileRef = 086708E210E83D9A00E43DFB /* preloader.c */; };
-		086709C610E84BCE00E43DFB /* interceptnew.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 086709C510E84BCE00E43DFB /* interceptnew.cpp */; };
 		087286DF10D1B23B00456009 /* libimapmac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 087286DE10D1B23B00456009 /* libimapmac.a */; };
 		08744F51107BF96D009DB5AF /* liblua5.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08744F50107BF96D009DB5AF /* liblua5.1.a */; };
 		08744F53107BF977009DB5AF /* libtolua++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08744F52107BF977009DB5AF /* libtolua++.a */; };
@@ -402,8 +399,6 @@
 		08977E19134D004300C9DCFE /* Texture2DArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E18134D004300C9DCFE /* Texture2DArray.cpp */; };
 		08977E1E134D007B00C9DCFE /* sneaky.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E1D134D007B00C9DCFE /* sneaky.cpp */; };
 		0898699E13A2BB4C00D643A0 /* libotmac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0898699D13A2BB4C00D643A0 /* libotmac.a */; };
-		089FB52714194F2200EBEB5F /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 089FB52614194F2200EBEB5F /* Carbon.framework */; };
-		089FEABE112C5B1200D0F32D /* GenerateIcons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 089FEABC112C5B1200D0F32D /* GenerateIcons.cpp */; };
 		08A428C212C93A490041B628 /* oglTextureObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A428C012C93A490041B628 /* oglTextureObject.cpp */; };
 		08ACEE9E122056DC0035E877 /* glslUniformBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08ACEE9C122056DC0035E877 /* glslUniformBlock.cpp */; };
 		08ACEEA71220574E0035E877 /* oglMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08ACEEA31220574E0035E877 /* oglMaterial.cpp */; };
@@ -414,7 +409,6 @@
 		08C817B512B0271000818A11 /* FTFontReplacement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08C817B412B0271000818A11 /* FTFontReplacement.cpp */; };
 		08CBC4591291D9EB00C0987C /* wwiiServerTrackedObjectPacker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08CBC4571291D9EB00C0987C /* wwiiServerTrackedObjectPacker.cpp */; };
 		08D2989413D4A82500BA4D58 /* ldwwo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08D2989313D4A82500BA4D58 /* ldwwo.cpp */; };
-		08D5361A12B2A9EF008161DB /* trackmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08D5361612B2A9D4008161DB /* trackmac.cpp */; };
 		08D5812E106310FE00177892 /* libmaclib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 080C7E841062F011000A242F /* libmaclib.a */; };
 		08DA28151191F41C003D0D9C /* fxMisc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08DA28131191F41C003D0D9C /* fxMisc.cpp */; };
 		08DDF926106928D800720B71 /* libmacode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08DDF925106928D800720B71 /* libmacode.a */; };
@@ -426,7 +420,6 @@
 		08E5E55E13E855A100A5034D /* EZVehicles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08E5E55A13E855A100A5034D /* EZVehicles.cpp */; };
 		08E5E56113E855B600A5034D /* ScenarioMapRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08E5E55F13E855B600A5034D /* ScenarioMapRenderer.cpp */; };
 		08E800BC13745261000F25A9 /* HeightField.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08E800BB13745261000F25A9 /* HeightField.cpp */; };
-		08EBB4C8129439DD00AEDB5B /* info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08EBB4C6129439DD00AEDB5B /* info.cpp */; };
 		08EBB4D412943BE300AEDB5B /* wwiiSyncVar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08EBB4D212943BE300AEDB5B /* wwiiSyncVar.cpp */; };
 		08F41C5612D39B7B0001C6F5 /* libfreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08F41C5512D39B7B0001C6F5 /* libfreetype2.a */; };
 		08FA20E91598B791007B0B9A /* Rand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FA20E51598B791007B0B9A /* Rand.cpp */; };
@@ -439,7 +432,6 @@
 		E90D96A81C6E041300D5EC52 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A71C6E041300D5EC52 /* HockeySDK.framework */; };
 		E9320E991C95FC2C003E8048 /* local2.tkt in Resources */ = {isa = PBXBuildFile; fileRef = E9320E971C95FC2C003E8048 /* local2.tkt */; };
 		E9320E9A1C95FC2C003E8048 /* local.tkt in Resources */ = {isa = PBXBuildFile; fileRef = E9320E981C95FC2C003E8048 /* local.tkt */; };
-		E97C76131C848D5400875F44 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 089FB52614194F2200EBEB5F /* Carbon.framework */; };
 		E97C76141C848DA000875F44 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A71C6E041300D5EC52 /* HockeySDK.framework */; };
 		E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
 		E97C76161C848E3600875F44 /* CADebugger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B1120222EB00A60CC2 /* CADebugger.cpp */; };
@@ -479,8 +471,6 @@
 		E97C76C51C85395700875F44 /* kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769A1C85156F00875F44 /* kqueue.c */; };
 		E97C76C61C8539BF00875F44 /* XMLLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762B1C84E11A00875F44 /* XMLLoader.cpp */; };
 		E97C76C71C8539BF00875F44 /* XMLLoader2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */; };
-		E97C76D11C85B15800875F44 /* playarc.ww2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		E97C76D41C85B21200875F44 /* HockeySDK.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = E97C76D31C85B21200875F44 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
 		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
 		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
@@ -497,9 +487,11 @@
 		FA13BB4B1C8764BB00095818 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB491C8764BB00095818 /* libz.tbd */; };
 		FA13BB4F1C87650800095818 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB4E1C87650800095818 /* libxml2.tbd */; };
 		FA13BB511C87CF8500095818 /* libglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB501C87CF8500095818 /* libglew.a */; };
+		FA32FEAE1CB83C94000EF4C2 /* HockeySDK.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = E90D96A71C6E041300D5EC52 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FA37D74F1C937F6E00013187 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = FA37D74D1C937F6E00013187 /* MainMenu.nib */; };
 		FA37D7531C937F8F00013187 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FA37D7511C937F8F00013187 /* Localizable.strings */; };
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
+		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -527,23 +519,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		0DDF018108579F3B0027461D /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = AppData;
-			dstSubfolderSpec = 6;
-			files = (
-				E97C76D11C85B15800875F44 /* playarc.ww2 in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		E97C76D21C85B1FD00875F44 /* Copy Files */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E97C76D41C85B21200875F44 /* HockeySDK.framework in Copy Files */,
+				FA32FEAE1CB83C94000EF4C2 /* HockeySDK.framework in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -628,7 +610,7 @@
 		08104870103DCEE10065E0E2 /* clientStrtQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clientStrtQueue.cpp; sourceTree = "<group>"; };
 		08104871103DCEE10065E0E2 /* clientStrtQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clientStrtQueue.h; sourceTree = "<group>"; };
 		08104874103DCEE10065E0E2 /* GameClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameClient.cpp; sourceTree = "<group>"; };
-		08104875103DCEE10065E0E2 /* GameClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameClient.h; sourceTree = "<group>"; };
+		08104875103DCEE10065E0E2 /* GameClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = GameClient.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		08104876103DCEE10065E0E2 /* ww2Client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ww2Client.cpp; sourceTree = "<group>"; };
 		08104877103DCEE10065E0E2 /* ww2Client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ww2Client.h; sourceTree = "<group>"; };
 		081048C5103DCF340065E0E2 /* commClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = commClientMessages.cpp; sourceTree = "<group>"; };
@@ -639,7 +621,7 @@
 		081048CE103DCF340065E0E2 /* commTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = commTypes.h; sourceTree = "<group>"; };
 		081048D6103DCF7F0065E0E2 /* dbug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dbug.h; sourceTree = "<group>"; };
 		081048DC103DCFA30065E0E2 /* ddp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ddp.h; sourceTree = "<group>"; };
-		081048DD103DCFA30065E0E2 /* dpp.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = dpp.mm; sourceTree = "<group>"; };
+		081048DD103DCFA30065E0E2 /* ddp.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ddp.mm; sourceTree = "<group>"; };
 		081048E0103DCFBD0065E0E2 /* dimain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dimain.h; sourceTree = "<group>"; };
 		081048E1103DCFBD0065E0E2 /* dip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dip.h; sourceTree = "<group>"; };
 		081048E2103DCFBD0065E0E2 /* diphid.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = diphid.mm; sourceTree = "<group>"; };
@@ -735,7 +717,7 @@
 		081049E0103DD2660065E0E2 /* instBasicStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instBasicStatus.h; sourceTree = "<group>"; };
 		081049E1103DD2660065E0E2 /* instClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instClient.cpp; sourceTree = "<group>"; };
 		081049E2103DD2660065E0E2 /* instClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instClient.h; sourceTree = "<group>"; };
-		081049E3103DD2660065E0E2 /* instClientStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instClientStatus.h; sourceTree = "<group>"; };
+		081049E3103DD2660065E0E2 /* instClientStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = instClientStatus.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		081049E4103DD2660065E0E2 /* instCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instCommon.cpp; sourceTree = "<group>"; };
 		081049E5103DD2660065E0E2 /* instDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instDescriptor.h; sourceTree = "<group>"; };
 		081049EC103DD2660065E0E2 /* instListing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instListing.h; sourceTree = "<group>"; };
@@ -785,7 +767,7 @@
 		08104A4C103DD3370065E0E2 /* mapArenaDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapArenaDescription.h; sourceTree = "<group>"; };
 		08104A4D103DD3370065E0E2 /* mapAWS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapAWS.cpp; sourceTree = "<group>"; };
 		08104A4E103DD3370065E0E2 /* mapAWS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapAWS.h; sourceTree = "<group>"; };
-		08104A51103DD3370065E0E2 /* mapBrigadeSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapBrigadeSummary.h; sourceTree = "<group>"; };
+		08104A51103DD3370065E0E2 /* mapBrigadeSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = mapBrigadeSummary.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		08104A54103DD3370065E0E2 /* mapClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapClientMessages.cpp; sourceTree = "<group>"; };
 		08104A55103DD3370065E0E2 /* mapClientMessages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapClientMessages.h; sourceTree = "<group>"; };
 		08104A56103DD3370065E0E2 /* mapConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapConstants.h; sourceTree = "<group>"; };
@@ -1071,7 +1053,7 @@
 		08104D4A103DFBA10065E0E2 /* striws.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = striws.h; sourceTree = "<group>"; };
 		08104D4B103DFBA10065E0E2 /* strpool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = strpool.cpp; sourceTree = "<group>"; };
 		08104D4C103DFBA10065E0E2 /* strpool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strpool.h; sourceTree = "<group>"; };
-		08104D51103DFBE90065E0E2 /* authClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = authClientMessages.cpp; sourceTree = "<group>"; };
+		08104D51103DFBE90065E0E2 /* authClientMessages.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = authClientMessages.mm; sourceTree = "<group>"; };
 		08104D52103DFBE90065E0E2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		08104D55103DFBE90065E0E2 /* syscfg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syscfg.h; sourceTree = "<group>"; };
 		08104D56103DFBE90065E0E2 /* sysLaunchUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysLaunchUrl.h; sourceTree = "<group>"; };
@@ -1364,8 +1346,6 @@
 		0834F1D1104586AA00E75B52 /* versionNo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = versionNo.h; path = proj/versionNo.h; sourceTree = SOURCE_ROOT; };
 		0834F1D61045888700E75B52 /* sysWinISO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysWinISO.h; path = src/sys/sysWinISO.h; sourceTree = SOURCE_ROOT; };
 		0834F28110458DFA00E75B52 /* ShadowMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShadowMap.cpp; sourceTree = "<group>"; };
-		0836DAFD1109133100AC593D /* uthash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uthash.h; sourceTree = "<group>"; };
-		0836DAFE1109133100AC593D /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
 		08477137135E279F00325E43 /* trnScenario.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trnScenario.h; sourceTree = "<group>"; };
 		08477138135E279F00325E43 /* trnScenario.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = trnScenario.cpp; sourceTree = "<group>"; };
 		08492F5A131708E700C7F39E /* libftgl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libftgl.a; path = lib/mac/libftgl.a; sourceTree = "<group>"; };
@@ -1375,10 +1355,6 @@
 		0863B34D10619AC8005FDF19 /* libphui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphui.a; path = lib/mac/libphui.a; sourceTree = "<group>"; };
 		0863B34E10619AC8005FDF19 /* libspeedtreemac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspeedtreemac.a; path = lib/mac/libspeedtreemac.a; sourceTree = "<group>"; };
 		0863B36E10619D66005FDF19 /* clientGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = clientGlobals.cpp; path = src/client/clientGlobals.cpp; sourceTree = SOURCE_ROOT; };
-		086708E010E83D9A00E43DFB /* testmac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = testmac.c; sourceTree = "<group>"; };
-		086708E210E83D9A00E43DFB /* preloader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = preloader.c; sourceTree = "<group>"; };
-		086708E510E83D9A00E43DFB /* testmac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testmac.h; sourceTree = "<group>"; };
-		086709C510E84BCE00E43DFB /* interceptnew.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = interceptnew.cpp; sourceTree = "<group>"; };
 		087286DE10D1B23B00456009 /* libimapmac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libimapmac.a; path = lib/mac/libimapmac.a; sourceTree = "<group>"; };
 		08744F50107BF96D009DB5AF /* liblua5.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua5.1.a; path = lib/mac/liblua5.1.a; sourceTree = "<group>"; };
 		08744F52107BF977009DB5AF /* libtolua++.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtolua++.a"; path = "lib/mac/libtolua++.a"; sourceTree = "<group>"; };
@@ -1400,8 +1376,6 @@
 		08977E1D134D007B00C9DCFE /* sneaky.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sneaky.cpp; sourceTree = "<group>"; };
 		0898699D13A2BB4C00D643A0 /* libotmac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libotmac.a; path = lib/mac/libotmac.a; sourceTree = "<group>"; };
 		089FB52614194F2200EBEB5F /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
-		089FEABC112C5B1200D0F32D /* GenerateIcons.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GenerateIcons.cpp; sourceTree = "<group>"; };
-		089FEABD112C5B1200D0F32D /* GenerateIcons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenerateIcons.h; sourceTree = "<group>"; };
 		08A428C012C93A490041B628 /* oglTextureObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oglTextureObject.cpp; sourceTree = "<group>"; };
 		08A428C112C93A490041B628 /* oglTextureObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = oglTextureObject.h; sourceTree = "<group>"; };
 		08A43F081092021000B13339 /* glplat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glplat.h; sourceTree = "<group>"; };
@@ -1423,8 +1397,6 @@
 		08CBC4581291D9EB00C0987C /* wwiiServerTrackedObjectPacker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiServerTrackedObjectPacker.h; sourceTree = "<group>"; };
 		08D2989213D4A82500BA4D58 /* ldwwo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ldwwo.h; sourceTree = "<group>"; };
 		08D2989313D4A82500BA4D58 /* ldwwo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ldwwo.cpp; sourceTree = "<group>"; };
-		08D5361612B2A9D4008161DB /* trackmac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = trackmac.cpp; sourceTree = "<group>"; };
-		08D5361712B2A9D4008161DB /* trackmac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trackmac.h; sourceTree = "<group>"; };
 		08DA28131191F41C003D0D9C /* fxMisc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fxMisc.cpp; sourceTree = "<group>"; };
 		08DA28141191F41C003D0D9C /* fxMisc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fxMisc.h; sourceTree = "<group>"; };
 		08DDF925106928D800720B71 /* libmacode.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmacode.a; path = lib/mac/libmacode.a; sourceTree = "<group>"; };
@@ -1439,13 +1411,11 @@
 		08E5E55813E855A100A5034D /* EZManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EZManager.cpp; sourceTree = "<group>"; };
 		08E5E55913E855A100A5034D /* EZManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EZManager.h; sourceTree = "<group>"; };
 		08E5E55A13E855A100A5034D /* EZVehicles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EZVehicles.cpp; sourceTree = "<group>"; };
-		08E5E55B13E855A100A5034D /* EZVehicles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EZVehicles.h; sourceTree = "<group>"; };
+		08E5E55B13E855A100A5034D /* EZVehicles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = EZVehicles.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		08E5E55F13E855B600A5034D /* ScenarioMapRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScenarioMapRenderer.cpp; sourceTree = "<group>"; };
 		08E5E56013E855B600A5034D /* ScenarioMapRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenarioMapRenderer.h; sourceTree = "<group>"; };
 		08E800BA13745261000F25A9 /* HeightField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HeightField.h; sourceTree = "<group>"; };
 		08E800BB13745261000F25A9 /* HeightField.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HeightField.cpp; sourceTree = "<group>"; };
-		08EBB4C6129439DD00AEDB5B /* info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = info.cpp; sourceTree = "<group>"; };
-		08EBB4C7129439DD00AEDB5B /* info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = info.h; sourceTree = "<group>"; };
 		08EBB4D212943BE300AEDB5B /* wwiiSyncVar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiSyncVar.cpp; sourceTree = "<group>"; };
 		08EBB4D312943BE300AEDB5B /* wwiiSyncVar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiSyncVar.h; sourceTree = "<group>"; };
 		08F41C5512D39B7B0001C6F5 /* libfreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype2.a; path = lib/mac/libfreetype2.a; sourceTree = "<group>"; };
@@ -1458,7 +1428,7 @@
 		0DDF00A508578C460027461D /* libjs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjs.a; path = lib/mac/libjs.a; sourceTree = SOURCE_ROOT; };
 		47B0ED240E9A66A40089DCC4 /* libteulKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libteulKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
-		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D0C4E970486CD37000505A6 /* World War II Online Beta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online Beta.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		E90D96A71C6E041300D5EC52 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
@@ -1536,7 +1506,6 @@
 		E97C76A01C85156F00875F44 /* strlcpy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = strlcpy.c; path = ../../Libraries/libevent/strlcpy.c; sourceTree = "<group>"; };
 		E97C76CD1C85AFD800875F44 /* ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = ww2.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
 		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = text; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = SOURCE_ROOT; };
-		E97C76D31C85B21200875F44 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
 		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
 		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
 		FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authPlaygateTypes.h; path = src/auth/authPlaygateTypes.h; sourceTree = SOURCE_ROOT; };
@@ -1562,6 +1531,7 @@
 		FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = SearchPaths.xcconfig; path = proj/mac/SearchPaths.xcconfig; sourceTree = "<group>"; };
 		FA3D8BAA1C8BF201002C5119 /* Warnings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = proj/mac/Warnings.xcconfig; sourceTree = "<group>"; };
 		FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = BuildSettings.xcconfig; path = proj/mac/BuildSettings.xcconfig; sourceTree = "<group>"; };
+		FA56129A1C9E4E9B001FAFCB /* compiler_check.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = compiler_check.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1571,7 +1541,6 @@
 			files = (
 				0898699E13A2BB4C00D643A0 /* libotmac.a in Frameworks */,
 				E97C76141C848DA000875F44 /* HockeySDK.framework in Frameworks */,
-				E97C76131C848D5400875F44 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1601,7 +1570,6 @@
 				082CF8161202245400A60CC2 /* AudioToolbox.framework in Frameworks */,
 				082CF81C1202248E00A60CC2 /* AudioUnit.framework in Frameworks */,
 				FA13BB171C86758600095818 /* libevent.a in Frameworks */,
-				089FB52714194F2200EBEB5F /* Carbon.framework in Frameworks */,
 				E90D96A81C6E041300D5EC52 /* HockeySDK.framework in Frameworks */,
 				08D5812E106310FE00177892 /* libmaclib.a in Frameworks */,
 				47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */,
@@ -1752,7 +1720,7 @@
 			isa = PBXGroup;
 			children = (
 				081048DC103DCFA30065E0E2 /* ddp.h */,
-				081048DD103DCFA30065E0E2 /* dpp.mm */,
+				081048DD103DCFA30065E0E2 /* ddp.mm */,
 			);
 			path = ddmac;
 			sourceTree = "<group>";
@@ -1931,6 +1899,7 @@
 				081049D6103DD2310065E0E2 /* mobileSpawnEnums.h */,
 				081049DC103DD2310065E0E2 /* systypes.h */,
 				081049DD103DD2310065E0E2 /* vars.h */,
+				FA56129A1C9E4E9B001FAFCB /* compiler_check.h */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -2516,7 +2485,7 @@
 				FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */,
 				0863B36E10619D66005FDF19 /* clientGlobals.cpp */,
 				0834F1D61045888700E75B52 /* sysWinISO.h */,
-				08104D51103DFBE90065E0E2 /* authClientMessages.cpp */,
+				08104D51103DFBE90065E0E2 /* authClientMessages.mm */,
 				08104D52103DFBE90065E0E2 /* main.m */,
 				08104D55103DFBE90065E0E2 /* syscfg.h */,
 				E97C76281C84CD0700875F44 /* locIDs.h */,
@@ -2919,23 +2888,6 @@
 			path = locl;
 			sourceTree = "<group>";
 		};
-		086708D910E83D9A00E43DFB /* testmac */ = {
-			isa = PBXGroup;
-			children = (
-				08D5361612B2A9D4008161DB /* trackmac.cpp */,
-				08D5361712B2A9D4008161DB /* trackmac.h */,
-				08EBB4C6129439DD00AEDB5B /* info.cpp */,
-				08EBB4C7129439DD00AEDB5B /* info.h */,
-				0836DAFD1109133100AC593D /* uthash.h */,
-				0836DAFE1109133100AC593D /* utlist.h */,
-				086708E210E83D9A00E43DFB /* preloader.c */,
-				086709C510E84BCE00E43DFB /* interceptnew.cpp */,
-				086708E010E83D9A00E43DFB /* testmac.c */,
-				086708E510E83D9A00E43DFB /* testmac.h */,
-			);
-			path = testmac;
-			sourceTree = "<group>";
-		};
 		08977DDA134CFB7200C9DCFE /* scen */ = {
 			isa = PBXGroup;
 			children = (
@@ -2947,15 +2899,6 @@
 				08977DDD134CFB8500C9DCFE /* ScenarioManager.h */,
 			);
 			name = scen;
-			sourceTree = "<group>";
-		};
-		089FEABB112C5B1200D0F32D /* maptools */ = {
-			isa = PBXGroup;
-			children = (
-				089FEABC112C5B1200D0F32D /* GenerateIcons.cpp */,
-				089FEABD112C5B1200D0F32D /* GenerateIcons.h */,
-			);
-			path = maptools;
 			sourceTree = "<group>";
 		};
 		08E5E55513E855A100A5034D /* ez */ = {
@@ -2978,8 +2921,6 @@
 				E97C763D1C85146A00875F44 /* event */,
 				08E5E55513E855A100A5034D /* ez */,
 				08977DDA134CFB7200C9DCFE /* scen */,
-				089FEABB112C5B1200D0F32D /* maptools */,
-				086708D910E83D9A00E43DFB /* testmac */,
 				0810471B103DCC390065E0E2 /* cfg */,
 				0810473E103DCC7C0065E0E2 /* chat */,
 				0810485F103DCEE10065E0E2 /* client */,
@@ -3047,7 +2988,7 @@
 		195DF8CFFE9D517E11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D0C4E970486CD37000505A6 /* World War II Online.app */,
+				8D0C4E970486CD37000505A6 /* World War II Online Beta.app */,
 				47B0ED240E9A66A40089DCC4 /* libteulKit.a */,
 				080C7E841062F011000A242F /* libmaclib.a */,
 				E97C76351C8513EB00875F44 /* libevent.a */,
@@ -3094,7 +3035,6 @@
 				FA13BB3D1C87649000095818 /* OpenGL.framework */,
 				FA13BB3E1C87649000095818 /* QuickTime.framework */,
 				FA13BB3F1C87649000095818 /* Security.framework */,
-				E97C76D31C85B21200875F44 /* HockeySDK.framework */,
 				E90D96A71C6E041300D5EC52 /* HockeySDK.framework */,
 				0898699D13A2BB4C00D643A0 /* libotmac.a */,
 				FA13BB501C87CF8500095818 /* libglew.a */,
@@ -3336,9 +3276,7 @@
 				8D0C4E8C0486CD37000505A6 /* Resources */,
 				8D0C4E8F0486CD37000505A6 /* Sources */,
 				8D0C4E910486CD37000505A6 /* Frameworks */,
-				0DDF018108579F3B0027461D /* CopyFiles */,
 				E97C76D21C85B1FD00875F44 /* Copy Files */,
-				E9320E9E1C960065003E8048 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -3350,7 +3288,7 @@
 			name = WW2OL;
 			productInstallPath = "$(HOME)/Applications";
 			productName = WW2OL;
-			productReference = 8D0C4E970486CD37000505A6 /* World War II Online.app */;
+			productReference = 8D0C4E970486CD37000505A6 /* World War II Online Beta.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E97C76341C8513EB00875F44 /* event */ = {
@@ -3412,6 +3350,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */,
 				FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */,
 				FA37D7531C937F8F00013187 /* Localizable.strings in Resources */,
 				E9320E991C95FC2C003E8048 /* local2.tkt in Resources */,
@@ -3453,19 +3392,6 @@
 			shellPath = /bin/bash;
 			shellScript = "${SRCROOT}/proj/mac/correct-info-plist.sh";
 		};
-		E9320E9E1C960065003E8048 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "TICKET_PATH=$SRCROOT\n\nBUILD_APP_DIR=${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/AppData\n\nif [ \"$CONFIGURATION\" == \"Debug\" ]; then\ncp $TICKET_PATH/*.tkt \"$BUILD_APP_DIR/.\"\nfi";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -3477,7 +3403,7 @@
 				080C7EA41062F147000A242F /* main.m in Sources */,
 				080C7EA61062F161000A242F /* WW2AppDelegate.mm in Sources */,
 				E97C76251C84C0EE00875F44 /* sysMacCompat.mm in Sources */,
-				080C7EA71062F16F000A242F /* dpp.mm in Sources */,
+				080C7EA71062F16F000A242F /* ddp.mm in Sources */,
 				080C7EA81062F17E000A242F /* diphid.mm in Sources */,
 				E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */,
 				E97C76161C848E3600875F44 /* CADebugger.cpp in Sources */,
@@ -3743,7 +3669,7 @@
 				08104D4D103DFBA10065E0E2 /* stringLib.cpp in Sources */,
 				08104D4E103DFBA10065E0E2 /* striws.cpp in Sources */,
 				08104D4F103DFBA10065E0E2 /* strpool.cpp in Sources */,
-				08104D61103DFBE90065E0E2 /* authClientMessages.cpp in Sources */,
+				08104D61103DFBE90065E0E2 /* authClientMessages.mm in Sources */,
 				08104D65103DFBE90065E0E2 /* sysmain.cpp in Sources */,
 				08104D66103DFBE90065E0E2 /* sysMovieMac.cpp in Sources */,
 				08104D67103DFBE90065E0E2 /* systhreadmac.cpp in Sources */,
@@ -3825,10 +3751,6 @@
 				0834F1CE104585DA00E75B52 /* loclMain.cpp in Sources */,
 				0834F28210458DFA00E75B52 /* ShadowMap.cpp in Sources */,
 				0804088E10B73B35008F3954 /* BufferObject.cpp in Sources */,
-				086708EC10E83D9A00E43DFB /* testmac.c in Sources */,
-				086708EE10E83D9A00E43DFB /* preloader.c in Sources */,
-				086709C610E84BCE00E43DFB /* interceptnew.cpp in Sources */,
-				089FEABE112C5B1200D0F32D /* GenerateIcons.cpp in Sources */,
 				08E0EAE71178D2D2006619EC /* oglVertexBuffer.cpp in Sources */,
 				08E0EB0E117CEF8D006619EC /* physicsTypes.cpp in Sources */,
 				08DA28151191F41C003D0D9C /* fxMisc.cpp in Sources */,
@@ -3837,10 +3759,8 @@
 				08ACEEA81220574E0035E877 /* States.cpp in Sources */,
 				08ACEEAD122057A30035E877 /* fpPPO.cpp in Sources */,
 				08CBC4591291D9EB00C0987C /* wwiiServerTrackedObjectPacker.cpp in Sources */,
-				08EBB4C8129439DD00AEDB5B /* info.cpp in Sources */,
 				08EBB4D412943BE300AEDB5B /* wwiiSyncVar.cpp in Sources */,
 				08C817B512B0271000818A11 /* FTFontReplacement.cpp in Sources */,
-				08D5361A12B2A9EF008161DB /* trackmac.cpp in Sources */,
 				08A428C212C93A490041B628 /* oglTextureObject.cpp in Sources */,
 				081418EB12DF707B00C2F0F4 /* BuildTerrain.cpp in Sources */,
 				0818A91312E745AB0035C3B4 /* gr2layerTypes.cpp in Sources */,
@@ -3968,7 +3888,7 @@
 				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
+				PRODUCT_NAME = "World War II Online Beta";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -4025,7 +3945,7 @@
 				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
+				PRODUCT_NAME = "World War II Online Beta";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -4170,7 +4090,7 @@
 				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
+				PRODUCT_NAME = "World War II Online Beta";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Development;
@@ -4204,6 +4124,72 @@
 			};
 			name = Development;
 		};
+		FAFF04471C9F9E5300C3F5B0 /* GM */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_OPTIMIZATION_LEVEL = fast;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OBJROOT = proj/mac/build;
+				OTHER_LDFLAGS = "-bind_at_load";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SYMROOT = proj/mac/build;
+				VALID_ARCHS = i386;
+			};
+			name = GM;
+		};
+		FAFF04481C9F9E5300C3F5B0 /* GM */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				INFOPLIST_FILE = proj/mac/Info.plist;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
+				MACH_O_TYPE = mh_execute;
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online Beta";
+				WRAPPER_EXTENSION = app;
+			};
+			name = GM;
+		};
+		FAFF04491C9F9E5300C3F5B0 /* GM */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = GM;
+		};
+		FAFF044A1C9F9E5300C3F5B0 /* GM */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = GM;
+		};
+		FAFF044B1C9F9E5300C3F5B0 /* GM */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = GM;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -4214,6 +4200,7 @@
 				752429151C9F103A00CF8D78 /* Local */,
 				FA3D8BB51C8BF6D6002C5119 /* Development */,
 				085BD0CC110F5D560063F377 /* Release */,
+				FAFF044A1C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -4225,6 +4212,7 @@
 				752429131C9F103A00CF8D78 /* Local */,
 				FA3D8BB31C8BF6D6002C5119 /* Development */,
 				085BD0CA110F5D560063F377 /* Release */,
+				FAFF04481C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -4236,6 +4224,7 @@
 				752429121C9F103A00CF8D78 /* Local */,
 				FA3D8BB21C8BF6D6002C5119 /* Development */,
 				085BD0C9110F5D560063F377 /* Release */,
+				FAFF04471C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -4247,6 +4236,7 @@
 				752429141C9F103A00CF8D78 /* Local */,
 				FA3D8BB41C8BF6D6002C5119 /* Development */,
 				085BD0CB110F5D560063F377 /* Release */,
+				FAFF04491C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -4258,6 +4248,7 @@
 				752429161C9F103A00CF8D78 /* Local */,
 				FA3D8BB61C8BF6D6002C5119 /* Development */,
 				E97C763B1C8513EB00875F44 /* Release */,
+				FAFF044B1C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

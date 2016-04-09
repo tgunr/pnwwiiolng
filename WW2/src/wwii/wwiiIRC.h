@@ -27,7 +27,7 @@ struct IRC_Command : public Host::CommandMsg
 	IRC_Command(const char* fromNick, const char* reportTo, const char* withInput)
 		: Host::CommandMsg(fromNick, reportTo, withInput)
 		{}
-	virtual void Reply(ResponseType, const char* format, ...) const OVERRIDE_FN;
+	virtual void Reply(ResponseType, const char* format, ...) const override;
 };
 
 // Incase you need to call these
@@ -54,7 +54,7 @@ extern bool wwiiIRCActivate(bool includeSigHup);
 extern void wwiiIRCTerminate(const char* reason);
 
 extern void wwiiIRCChannelMessage(const char* channel, const char* message);
-extern void wwiiIRCMessage(const char* channel, const char* fmt, ...) __attribute__ ((format (printf,2,3)));
+extern void wwiiIRCMessage(const char* channel, const char* fmt, ...) FORMAT_FUN(2,3);
 extern void wwiiIRCChannelNotice(const char* channel, const char* message);
 
 typedef void(*irc_dotcmd_t)(Host::CommandMsg &);

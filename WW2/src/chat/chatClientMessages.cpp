@@ -436,14 +436,15 @@ _recvBrigadeControlList(ACTION_OBJECT* const a)
 		return -EINVAL;
 
 	const UCHAR& forCountry = a->read<UCHAR>();
+	/*const UCHAR& forBranch = */a->read<UCHAR>();
 	const PermissionMask& permissions = a->read<PermissionMask>();
 
 	const WWII_SIDE forSide = wwiiSide((WWII_COUNTRY)forCountry);
 
-	const bool alliedHC = (forSide == ALLIED) & (permissions & ALLIED_COMMAND_STAFF);
-	const bool axisHC = (forSide == AXIS) & (permissions & AXIS_COMMAND_STAFF);
+	const bool alliedHC = (forSide == ALLIED) && (permissions & ALLIED_COMMAND_STAFF);
+	const bool axisHC = (forSide == AXIS) && (permissions & AXIS_COMMAND_STAFF);
 
-	const bool isHC = alliedHC | axisHC;
+	const bool isHC = alliedHC || axisHC;
 
 	// If this persona is an HC officer, the "owner()" flag
 	// of each brigade control list wrapper is set to TRUE.

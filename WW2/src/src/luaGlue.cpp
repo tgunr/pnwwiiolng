@@ -480,7 +480,7 @@ _startInterpreter()
 	std::string luaPath = lua_tostring(_luaVM, -1);
 	luaPath.append(";");
 	luaPath.append(cv_luaPath.GetString());
-	luaPath.append(PATH_SEPSTR "?.lua");
+	luaPath.append("/?.lua");
 	lua_pop(_luaVM, 1);
 	lua_pushstring(_luaVM, luaPath.c_str());
 	lua_setfield(_luaVM, -2, "path");
@@ -490,7 +490,7 @@ _startInterpreter()
 	dbugLog(_FLI, "started Lua interpreter");
 
 	std::string rcFile = cv_luaPath.GetString();
-	rcFile += PATH_SEPARATOR;
+	rcFile += "/";
 	rcFile += cv_luaRCFile.GetString();
 	if ( !_executeScript(rcFile.c_str()) || _luaVM == nullptr )
 	{
@@ -499,8 +499,7 @@ _startInterpreter()
 	}
 
 	rcFile = cv_luaPath.GetString();
-	rcFile += PATH_SEPARATOR;
-	rcFile += "rc-";
+	rcFile += "/rc-";
 	rcFile += HostLanguage;
 	rcFile += ".lua";
 

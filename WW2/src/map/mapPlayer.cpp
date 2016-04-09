@@ -1413,9 +1413,9 @@ Player::selectNullPersona()
 // to be sent, so that updates can be aggregated, please.
 
 void
-Player::sendUpdateToChat()
+Player::sendUpdateToChat(bool force)
 {
-	if ( !m_needsChatSync )
+	if ( ! (m_needsChatSync || force) )
 		return;
 
 	dbugLog(_FLD, "t:%d p:%u c:%s sending chat update", teulIndex(), playerID(), callsign());
@@ -1645,8 +1645,13 @@ Player::SetWeapon(const WEAPON_SERIAL& toWeapon)
 // unless they already have one pending
 
 void
-Player::updateChat()
+Player::updateChat(bool immediate)
 {
+	if ( immediate ) {
+		sendUpdateToChat(true);
+		return;
+	}
+
 	// Don't need to do this if they have an update that hasn't already been sent
 	if ( needsChatSync() )
 		return;
@@ -1996,7 +2001,7 @@ _sendHCUnitList(Player* player)
 			hcul.m_listStart = false;
 			hcul.m_count = 0;
 		}
-		hcul.m_units[hcul.m_count] = *(it->second);
+		hcul.m_units[hcul.m_count] = it->second;
 		++hcul.m_count;
 		++sent;
 	}

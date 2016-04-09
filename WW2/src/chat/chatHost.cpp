@@ -681,7 +681,7 @@ class DotDetectMe : public DotCommand
 public:
 	DotDetectMe() : DotCommand("detectme", "Bans you for X days", IS_PLAYNET, LSTR_NONE, LSTR_NONE, true) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		ARGV args;
 		if ( vectorize(arguments, args, 2) < 1 )

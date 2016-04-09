@@ -13,15 +13,15 @@ class PPOSTO : public ServerSTO
 public:
 	PPOSTO(ACTION_OBJECT* const a);
 
-	virtual bool needsBroadcastRemoval() const OVERRIDE_FN { return true; }
-	virtual const char* typeName() const OVERRIDE_FN { return "ppo"; }
+	virtual bool needsBroadcastRemoval() const override { return true; }
+	virtual const char* typeName() const override { return "ppo"; }
 
 public:
-	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) OVERRIDE_FN;
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) override;
 
-	virtual void extractPlayer(const Player* player) OVERRIDE_FN;
+	virtual void extractPlayer(const Player* player) override;
 
-	virtual bool expired() const OVERRIDE_FN;
+	virtual bool expired() const override;
 
 public:
 	const STODamage& damage() const { return m_damage; }

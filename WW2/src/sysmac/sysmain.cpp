@@ -18,24 +18,22 @@
 #include "osg/osgGame.h"
 #endif
 
-#define GLOBALS
-#include "include/vars.h"
-#undef GLOBALS
+//const SINT8 Copyright[] = "Copyright 2016 Playnet, Inc. All Rights Reserved";
 
 void sysmainAddArchives();
 static int sysmainInitApp();
 
 int running = 0;
 static int _argc;
-static char** _argv;
+static const char** _argv;
 
 void sysmainGetCommandLineArgs(int* argc, char*** argv)
 {
 	*argc = _argc;
-	*argv = _argv;
+	*argv = const_cast<char **>(_argv);
 }
 
-void sysmainCommandLine(int argc, char** argv)
+void sysmainCommandLine(int argc, const char** argv)
 {
 	SetCommandLine(argc, argv);
 	_argc = argc;
@@ -46,17 +44,10 @@ void sysmainCommandLine(int argc, char** argv)
 #endif
 
 	mngoptParse((char *)"");
-
-#if platOS == OS_MACOS
-#if RELEASE_CLIENT == 1
-        WantedWindow = true;
-    #endif
-#endif
 }
 
 static size_t frames = 0;
-
-pthread_t mainthread = NULL;
+static pthread_t mainthread = NULL;
 
 int sysmain()
 {	 
@@ -69,8 +60,6 @@ int sysmain()
 		printf("sysmainInitApp: App was not able to initialize!\n");
 		exit(0);
 	}
-
-	ddpSetupGL(WantedWidth, WantedHeight);
 
 	if(!piInit())
 	{
@@ -117,20 +106,11 @@ int sysmain()
 	return 0;
 }
 
-#ifdef TESTMAC
-//extern char recording_started;
-#endif
-
 int sysmainInitApp()
 {
-#ifdef TESTMAC
-//  recording_started = 1;
-#endif
-
 	IdentityMatrix.m[0][0] = IdentityMatrix.m[1][1] = IdentityMatrix.m[2][2] = IdentityMatrix.m[3][3] = 1.0;
 	chAppDir();
 
-#if RELEASE_CLIENT == 1
 	printf("WW2OL Started\n"); fflush(stdout);
 #ifdef BETA_RELEASE
 	{
@@ -144,12 +124,10 @@ int sysmainInitApp()
 		}
 	}
 #endif
-#endif // RELEASE_CLIENT
 
 	memInit();
 
     fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
-	fiodSetPrepath(PREPATH);		
 
 	if(!WantDataDir)
 		sysmainAddArchives();
@@ -172,6 +150,7 @@ int sysmainInitApp()
 		printf("ddpCreateWnd failed!\n");
 		return -1;
 	}
+	ddpSetupGL(WantedWidth, WantedHeight);
 
 	return 0;
 } 
@@ -187,12 +166,10 @@ void sysmainKillApp()
 	osgGameKill();
 #endif
 
-#if RELEASE_CLIENT == 1
 	printf("WW2OL Quit\n"); fflush(stdout);
-#endif
 
 	dimainKill();
-//	ddpKill();
+    ddpKill();
 }
 
 void sysmainAddArchives()

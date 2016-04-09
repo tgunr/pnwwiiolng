@@ -166,7 +166,7 @@ public:	TestPackers() : TestUnit("TestPackers") {}
 		}
 	}
 
-public: virtual bool Run() OVERRIDE_FN
+public: virtual bool Run() override
 	{
 		START_TEST_STAGE( "Multiple Packers / Single Buffer" )
 			UCHAR buffer[4096];

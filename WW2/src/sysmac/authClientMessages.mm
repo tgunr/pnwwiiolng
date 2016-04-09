@@ -21,7 +21,7 @@
 
 #include "wwii/wwiiCallbacks.h"
 #include "sysmac/locIDs.h"
-#include <Carbon/Carbon.h>
+#include <Foundation/Foundation.h>
 
 //static TEUL_CALLBACK*	_APP_VERIFY;
 //static TEUL_CALLBACK*	_APP_LAUNCH;
@@ -93,12 +93,14 @@ _callbackError(
             , dest.second
             , error);
 
-    DialogRef errorDlg;
-    DialogItemIndex itemIndex;
-    CFStringRef errorStr = CFStringRef(errorText);
-    CreateStandardAlert(kAlertNoteAlert, errorStr, NULL, NULL, &errorDlg);
-    RunStandardAlert(errorDlg, NULL, &itemIndex);
-
+    NSUserNotification *notification = [[[NSUserNotification alloc] init] autorelease];
+    
+    notification.title = @"Internal Networking Error";
+    notification.informativeText = [NSString stringWithFormat:
+        @"ERROR: TeulIndex-%d, Address-%s, Dest-%u, Error-%d",
+        teulIndex, teulGetAddress(dest.first), dest.second, error
+    ];
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
 //////////////////////////////////////////////////////////////////////

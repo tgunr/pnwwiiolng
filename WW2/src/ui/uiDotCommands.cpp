@@ -5706,7 +5706,9 @@ static SINT32 dot_profileflight(const char* args)
 	rnmainListText("Started %ls profiling for the duration of %.1f minute(s) ...", profileName, profilingDurationInMinutes);
 	dot_move("move N51.13.00 E4.11.00 100");
 	mlSetProfileFlight();
+#ifdef BETA_RELEASE
 	logInitProfiling(uiUTF16toUTF8(profileName), profilingDurationInMinutes);
+#endif
 
 	return DC_HANDLED;
 }
@@ -5740,7 +5742,6 @@ static SINT32 dot_follow(const char* line)
 	return DC_HANDLED;
 }
 
-#ifdef ENABLE_FLOATERS
 /************************************************************************************************
 	InfLODCmd
 *************************************************************************************************/
@@ -5759,7 +5760,6 @@ static SINT32 dot_inflod(const char* line)
 
 	return DC_HANDLED;
 }
-#endif
 
 /************************************************************************************************
 InfLODModCmd
@@ -6012,7 +6012,7 @@ static SINT32 dot_vehlod(const char* line)
 	return DC_HANDLED;
 }
 
-#endif
+#endif // ENABLE_FLOATERS
 
 
 

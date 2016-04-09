@@ -13,7 +13,6 @@
 #include "HID_Queue_Utilities.h"
 #import <Cocoa/Cocoa.h>
 
-#define MAX_KEYS				128
 #define MAX_HID_STICKS 			4
 #define MAX_HID_KEYBOARDS 		4
 #define MAX_HID_MICE 			4
@@ -61,8 +60,6 @@ struct KEYCODE_MAP_ELEM
 	UINT32	iac;
 	UINT32 	hid;
 } ;
-
-#define MAX_KEYCODE_MAP_ELEMS (sizeof(KEYCODE_MAP)/sizeof(KEYCODE_MAP_ELEM))
 
 const KEYCODE_MAP_ELEM KEYCODE_MAP[] =
 {
@@ -168,28 +165,26 @@ const KEYCODE_MAP_ELEM KEYCODE_MAP[] =
 	{0,					DIK_F2,				IAC_F2,					kHIDUsage_KeyboardF2},						
 	{0,					DIK_PGDN,			IAC_PAGEDOWN,			kHIDUsage_KeyboardPageDown},				
 	{0,					DIK_F1,				IAC_F1,					kHIDUsage_KeyboardF1},						
-	{0,					DIK_LEFT,			IAC_LEFT,				kHIDUsage_KeyboardLeftArrow},				
-	{0,					DIK_RIGHT,			IAC_RIGHT,				kHIDUsage_KeyboardRightArrow},				
-	{0,					DIK_DOWN,			IAC_DOWN,				kHIDUsage_KeyboardDownArrow},				
-	{0,					DIK_UP,				IAC_UP,					kHIDUsage_KeyboardUpArrow},					
 	{'\'',				DIK_APOSTROPHE,		IAC_APOSTROPHE,			kHIDUsage_KeyboardQuote},					
 	{0,					DIK_LCOMMAND,		IAC_LEFTMODKEY,			kHIDUsage_KeyboardLeftGUI},
 	{0,					DIK_RCOMMAND,		IAC_RIGHTMODKEY,		kHIDUsage_KeyboardRightGUI},
 };
 
-UINT32 IAC_JOYSTICK_POSX[] = {IAC_JOYSTICK1_POSX, IAC_JOYSTICK2_POSX, IAC_JOYSTICK3_POSX, IAC_JOYSTICK4_POSX};
-UINT32 IAC_JOYSTICK_POSY[] = {IAC_JOYSTICK1_POSY, IAC_JOYSTICK2_POSY, IAC_JOYSTICK3_POSY, IAC_JOYSTICK4_POSY};
-UINT32 IAC_JOYSTICK_POSZ[] = {IAC_JOYSTICK1_POSZ, IAC_JOYSTICK2_POSZ, IAC_JOYSTICK3_POSZ, IAC_JOYSTICK4_POSZ};
+static constexpr const size_t MAX_KEYCODE_MAP_ELEMS = (sizeof(KEYCODE_MAP)/sizeof(KEYCODE_MAP_ELEM));
 
-UINT32 IAC_JOYSTICK_ROTX[] = {IAC_JOYSTICK1_ROTX, IAC_JOYSTICK2_ROTX, IAC_JOYSTICK3_ROTX, IAC_JOYSTICK4_ROTX};
-UINT32 IAC_JOYSTICK_ROTY[] = {IAC_JOYSTICK1_ROTY, IAC_JOYSTICK2_ROTY, IAC_JOYSTICK3_ROTY, IAC_JOYSTICK4_ROTY};
-UINT32 IAC_JOYSTICK_ROTZ[] = {IAC_JOYSTICK1_ROTZ, IAC_JOYSTICK2_ROTZ, IAC_JOYSTICK3_ROTZ, IAC_JOYSTICK4_ROTZ};
+static UINT32 IAC_JOYSTICK_POSX[] = {IAC_JOYSTICK1_POSX, IAC_JOYSTICK2_POSX, IAC_JOYSTICK3_POSX, IAC_JOYSTICK4_POSX};
+static UINT32 IAC_JOYSTICK_POSY[] = {IAC_JOYSTICK1_POSY, IAC_JOYSTICK2_POSY, IAC_JOYSTICK3_POSY, IAC_JOYSTICK4_POSY};
+static UINT32 IAC_JOYSTICK_POSZ[] = {IAC_JOYSTICK1_POSZ, IAC_JOYSTICK2_POSZ, IAC_JOYSTICK3_POSZ, IAC_JOYSTICK4_POSZ};
 
-UINT32 IAC_JOYSTICK_SLIDER1[] = {IAC_JOYSTICK1_SLIDER1, IAC_JOYSTICK2_SLIDER1, IAC_JOYSTICK3_SLIDER1, IAC_JOYSTICK4_SLIDER1};
-UINT32 IAC_JOYSTICK_SLIDER2[] = {IAC_JOYSTICK1_SLIDER2, IAC_JOYSTICK2_SLIDER2, IAC_JOYSTICK3_SLIDER2, IAC_JOYSTICK4_SLIDER2};
+static UINT32 IAC_JOYSTICK_ROTX[] = {IAC_JOYSTICK1_ROTX, IAC_JOYSTICK2_ROTX, IAC_JOYSTICK3_ROTX, IAC_JOYSTICK4_ROTX};
+static UINT32 IAC_JOYSTICK_ROTY[] = {IAC_JOYSTICK1_ROTY, IAC_JOYSTICK2_ROTY, IAC_JOYSTICK3_ROTY, IAC_JOYSTICK4_ROTY};
+static UINT32 IAC_JOYSTICK_ROTZ[] = {IAC_JOYSTICK1_ROTZ, IAC_JOYSTICK2_ROTZ, IAC_JOYSTICK3_ROTZ, IAC_JOYSTICK4_ROTZ};
 
-UINT32 IAC_JOYSTICK_BUTTON1[] = {IAC_JOYSTICK1_BUTTON1, IAC_JOYSTICK2_BUTTON1, IAC_JOYSTICK3_BUTTON1, IAC_JOYSTICK4_BUTTON1};
-UINT32 IAC_JOYSTICK_POV_N[IAC_MAX_JOYSTICKS][IAC_JOYSTICK_POV_MAX] = 
+static UINT32 IAC_JOYSTICK_SLIDER1[] = {IAC_JOYSTICK1_SLIDER1, IAC_JOYSTICK2_SLIDER1, IAC_JOYSTICK3_SLIDER1, IAC_JOYSTICK4_SLIDER1};
+static UINT32 IAC_JOYSTICK_SLIDER2[] = {IAC_JOYSTICK1_SLIDER2, IAC_JOYSTICK2_SLIDER2, IAC_JOYSTICK3_SLIDER2, IAC_JOYSTICK4_SLIDER2};
+
+static UINT32 IAC_JOYSTICK_BUTTON1[] = {IAC_JOYSTICK1_BUTTON1, IAC_JOYSTICK2_BUTTON1, IAC_JOYSTICK3_BUTTON1, IAC_JOYSTICK4_BUTTON1};
+static UINT32 IAC_JOYSTICK_POV_N[IAC_MAX_JOYSTICKS][IAC_JOYSTICK_POV_MAX] =
 {
 	{IAC_JOYSTICK1_POV1_N, IAC_JOYSTICK1_POV2_N, IAC_JOYSTICK1_POV3_N, IAC_JOYSTICK1_POV4_N},
 	{IAC_JOYSTICK2_POV1_N, IAC_JOYSTICK2_POV2_N, IAC_JOYSTICK2_POV3_N, IAC_JOYSTICK2_POV4_N},
@@ -222,8 +217,6 @@ static HID_ELEMENT 	_StickElements[MAX_STICK_ELEMENTS];
 static UINT32 		_NumKeyboardElements;
 static HID_ELEMENT 	_KeyboardElements[MAX_KEYBOARD_ELEMENTS];
 
-static UINT32 lastRetry;
-
 static LOGICAL init;
 
 static LOGICAL 	_AddToQueue(UINT32 iac, SINT32 count, LOGICAL state);
@@ -244,9 +237,8 @@ static UINT32 	_vcodeToIAC(UINT32 vcode);
 static const KEYCODE_MAP_ELEM* _lookupElemByASCII(UINT32 ascii);
 static const KEYCODE_MAP_ELEM* _lookupElemByDIK(UINT32 dik);
 
-extern BOOL cursorHidden;
-extern bool appHidden;
-BOOL lastmouseinit = false;
+static bool appHidden = false;
+static bool lastmouseinit = false;
 
 LOGICAL dimainInit(void)
 {
@@ -282,30 +274,29 @@ LOGICAL dipInit(void)
 
 LOGICAL dipSetupKeyboard(void)
 {	
-	int i;
 	const KEYCODE_MAP_ELEM* elem;
 	static LOGICAL first = TRUE;
-	int idx;
 	pRecDevice pHIDDevice;
 	pRecElement pHIDElement;
   
 	memset(_localKeyBuffer, 0x7F, sizeof(_localKeyBuffer));
 	memset(_lastKeyBuffer, 0x7F, sizeof(_lastKeyBuffer));
   
-	if(first)
+	if (first)
 	{
-		for(i = 0; i < MAX_KEYS; i++)
+		for (size_t i = 0; i < MAX_KEYS; i++)
 		{
 			elem = _lookupElemByDIK(i);
 			if(elem)
 			{
 				_DIKtoIAC[i] = elem->iac;
-				_DIKtoASCII[i] = elem->ascii;
+				_DIKtoASCII[i] = static_cast<UCHAR>(elem->ascii);
 			}
 			
 			elem = _lookupElemByASCII(i);
-			if(elem)
+			if (elem) {
 				_ASCIItoIAC[i] = elem->iac;
+            }
 		}
 		first = FALSE;
 	}	
@@ -313,34 +304,28 @@ LOGICAL dipSetupKeyboard(void)
 	if(1)//osVersion < 0x00001020)
 		return TRUE;
 	
-	pHIDDevice = _KeyboardList[0] =  HIDGetFirstDevice ();
-	idx = 0;
-	while(pHIDDevice)
-	{		
-		if(pHIDDevice->usage == kHIDUsage_GD_Keyboard || pHIDDevice->usage == kHIDUsage_GD_Keypad)
-		{
-			idx++;
-			if(idx >= MAX_HID_KEYBOARDS) break;
+	UINT32 idx = 0, i = 0;
+    
+    for (idx = 0, pHIDDevice = HIDGetFirstDevice(); idx < MAX_HID_KEYBOARDS && pHIDDevice; pHIDDevice = HIDGetNextDevice(pHIDDevice))
+	{
+        _KeyboardList[idx] = pHIDDevice;
+		if (pHIDDevice->usage == kHIDUsage_GD_Keyboard || pHIDDevice->usage == kHIDUsage_GD_Keypad) {
+			++idx;
 		}
-		pHIDDevice = _KeyboardList[idx] = HIDGetNextDevice (pHIDDevice);
-	}	
-  
+	}
 	_NumKeyboards = idx;
 	
-	i = 0;
-	for(idx = 0; idx < (int)_NumKeyboards; idx++)
+	for (idx = 0; idx < _NumKeyboards; idx++)
 	{
  		pHIDDevice = _KeyboardList[idx];
- 		
- 		if(pHIDDevice == NULL) continue;
+ 		if (pHIDDevice == NULL) {
+            continue;
+        }
  		HIDQueueDevice(pHIDDevice);
- 		
- 		pHIDElement = HIDGetFirstDeviceElement (pHIDDevice, kHIDElementTypeIO);
-		while(pHIDElement)
+ 		pHIDElement = HIDGetFirstDeviceElement(pHIDDevice, kHIDElementTypeIO);
+		while (pHIDElement)
 		{
-			int j;
-			
-			if(pHIDElement->type == kIOHIDElementTypeInput_Button)
+			if (pHIDElement->type == kIOHIDElementTypeInput_Button)
 			{
 				_KeyboardElements[i].ref = pHIDElement;
 				_KeyboardElements[i].dev = pHIDDevice;
@@ -348,7 +333,7 @@ LOGICAL dipSetupKeyboard(void)
 				_KeyboardElements[i].type = HID_BUTTON;
 				_KeyboardElements[i].dik = MAX_KEYS;
 				
-				for(j = 0; j < (int)MAX_KEYCODE_MAP_ELEMS; j++)
+				for (size_t j = 0; j < MAX_KEYCODE_MAP_ELEMS; j++)
 				{   
 					if(KEYCODE_MAP[j].hid == (UINT32)pHIDElement->usage)
 					{
@@ -357,18 +342,17 @@ LOGICAL dipSetupKeyboard(void)
 						break;
 					}
 				}
-				
-				i++;
-				if(i >= MAX_KEYBOARD_ELEMENTS) break;
+				if (++i >= MAX_KEYBOARD_ELEMENTS) {
+                    break;
+                }
 			}
-			
-			pHIDElement = HIDGetNextDeviceElement (pHIDElement, kHIDElementTypeIO);
+			pHIDElement = HIDGetNextDeviceElement(pHIDElement, kHIDElementTypeIO);
 		}
-		
-		if(i >= MAX_KEYBOARD_ELEMENTS) break;
+		if (i >= MAX_KEYBOARD_ELEMENTS) {
+            break;
+        }
 	}
 	_NumKeyboardElements = i;
-	
 	return _NumKeyboards > 0;
 }
 
@@ -427,7 +411,7 @@ LOGICAL dipSetupJoystick(void)
 {
 	pRecDevice pHIDDevice;
 	pRecElement pHIDElement;
-	int i, idx;
+	UINT32 i = 0, idx = 0;
 	UINT32 joyID[4];
 	
 	pHIDDevice = _StickList[0] = HIDGetFirstDevice ();
@@ -441,10 +425,9 @@ LOGICAL dipSetupJoystick(void)
 		}
 		pHIDDevice = _StickList[idx] = HIDGetNextDevice (pHIDDevice);
 	}
-	
 	_NumSticks = idx;
   
-  _SortDeviceList(_StickList, _NumSticks);
+    _SortDeviceList(_StickList, _NumSticks);
 	_LoadJoystickIDs(joyID);  	
 	_AssignDeviceNumbers(_StickList, _NumSticks, joyID, 4);
   
@@ -472,92 +455,80 @@ LOGICAL dipSetupJoystick(void)
 			{
 				case kHIDPage_GenericDesktop:
 					switch(pHIDElement->usage)
-        {
-          case kHIDUsage_GD_X:
-            _StickElements[i].type = HID_AXIS;
-            _StickElements[i].iac = IAC_JOYSTICK_POSX[idx];
-						break;
-						
-          case kHIDUsage_GD_Y:
-            _StickElements[i].type = HID_AXIS;
-            _StickElements[i].iac = IAC_JOYSTICK_POSY[idx];
-						break;
-						
-          case kHIDUsage_GD_Z:
-            _StickElements[i].type = HID_AXIS;
-            _StickElements[i].iac = IAC_JOYSTICK_POSZ[idx];
-						break;
-            
-          case kHIDUsage_GD_Slider:
-            if ( sliderNum == 0 )
-            {
-              _StickElements[i].type = HID_AXIS;
-              _StickElements[i].iac = IAC_JOYSTICK_SLIDER1[idx];
-              sliderNum = 1;
-            }
-            else if ( sliderNum == 1 )
-            {
-              _StickElements[i].type = HID_AXIS;
-              _StickElements[i].iac = IAC_JOYSTICK_SLIDER2[idx];
-            }
-            break;
-            
-          case kHIDUsage_GD_Rx:
-            _StickElements[i].type = HID_AXIS;
-            _StickElements[i].iac = IAC_JOYSTICK_ROTX[idx];
-						break;
-            
-          case kHIDUsage_GD_Ry:
-            _StickElements[i].type = HID_AXIS;
-            _StickElements[i].iac = IAC_JOYSTICK_ROTY[idx];
-						break;
-            
-          case kHIDUsage_GD_Rz:
-            _StickElements[i].type = HID_AXIS;
-            _StickElements[i].iac = IAC_JOYSTICK_ROTZ[idx];
-						break;
-						
-          case kHIDUsage_GD_Hatswitch:
-            if(povnum < IAC_JOYSTICK_POV_MAX)
-            {
-              _StickElements[i].type = HID_POV;
-              _StickElements[i].iac = IAC_JOYSTICK_POV_N[idx][povnum];
-              povnum++;
-            }
-						break;
-        }
-					
+                    {
+                        case kHIDUsage_GD_X:
+                            _StickElements[i].type = HID_AXIS;
+                            _StickElements[i].iac = IAC_JOYSTICK_POSX[idx];
+                            break;
+                        case kHIDUsage_GD_Y:
+                            _StickElements[i].type = HID_AXIS;
+                            _StickElements[i].iac = IAC_JOYSTICK_POSY[idx];
+                            break;
+                        case kHIDUsage_GD_Z:
+                            _StickElements[i].type = HID_AXIS;
+                            _StickElements[i].iac = IAC_JOYSTICK_POSZ[idx];
+                            break;
+                        case kHIDUsage_GD_Slider:
+                            if ( sliderNum == 0 ) {
+                                _StickElements[i].type = HID_AXIS;
+                                _StickElements[i].iac = IAC_JOYSTICK_SLIDER1[idx];
+                                sliderNum = 1;
+                            } else if ( sliderNum == 1 ) {
+                                _StickElements[i].type = HID_AXIS;
+                                _StickElements[i].iac = IAC_JOYSTICK_SLIDER2[idx];
+                            }
+                            break;
+                        case kHIDUsage_GD_Rx:
+                            _StickElements[i].type = HID_AXIS;
+                            _StickElements[i].iac = IAC_JOYSTICK_ROTX[idx];
+                            break;
+                        case kHIDUsage_GD_Ry:
+                            _StickElements[i].type = HID_AXIS;
+                            _StickElements[i].iac = IAC_JOYSTICK_ROTY[idx];
+                            break;
+                        case kHIDUsage_GD_Rz:
+                            _StickElements[i].type = HID_AXIS;
+                            _StickElements[i].iac = IAC_JOYSTICK_ROTZ[idx];
+                            break;
+                        case kHIDUsage_GD_Hatswitch:
+                            if(povnum < IAC_JOYSTICK_POV_MAX) {
+                                _StickElements[i].type = HID_POV;
+                                _StickElements[i].iac = IAC_JOYSTICK_POV_N[idx][povnum];
+                                povnum++;
+                            }
+                            break;
+                    }
 					// calibrate
-					if(_StickElements[i].type == HID_AXIS)
+					if(_StickElements[i].type == HID_AXIS) {
 						_LoadAxisCalibration(&_StickElements[i], pos);
-          break;
+                    }
+                    break;
           
 				case kHIDPage_Button:
 					_StickElements[i].type = HID_BUTTON;
-					_StickElements[i].iac = IAC_JOYSTICK_BUTTON1[idx] + _StickElements[i].ref->usage - 1;
-        {
-          unsigned int id = (_StickElements[i].dev->vendorID << 16) | _StickElements[i].dev->productID;
-          
-          // hack for Cyborg
-          if(id == 111345670 && _StickElements[i].ref->usage >= 11 && _StickElements[i].ref->usage <= 14)
-          {
-            _StickElements[i].ignore = 1;
-          }
-        }
-          break;
+					_StickElements[i].iac = IAC_JOYSTICK_BUTTON1[idx] + static_cast<UINT32>(_StickElements[i].ref->usage) - 1;
+                    // hack for Cyborg
+                    {
+                        unsigned int id = static_cast<unsigned int>((_StickElements[i].dev->vendorID << 16) | _StickElements[i].dev->productID);
+                        if(id == 111345670 && _StickElements[i].ref->usage >= 11 && _StickElements[i].ref->usage <= 14) {
+                            _StickElements[i].ignore = 1;
+                        }
+                    }
+                    break;
 			}
       
 			pos++;
 			i++;
-			if(i >= MAX_STICK_ELEMENTS) break;
-			
-			pHIDElement = HIDGetNextDeviceElement (pHIDElement, kHIDElementTypeIO);
+			if(i >= MAX_STICK_ELEMENTS) {
+                break;
+            }
+			pHIDElement = HIDGetNextDeviceElement(pHIDElement, kHIDElementTypeIO);
 		}
-		
-		if(i >= MAX_STICK_ELEMENTS) break;
+		if(i >= MAX_STICK_ELEMENTS) {
+            break;
+        }
 	}
 	_NumStickElements = i;
-  
 	return TRUE;
 }
 
@@ -566,37 +537,24 @@ LOGICAL dipSetupMouse(void)
 	return TRUE;
 }
 
-void checkIfInFront();
 void checkIfInFront()
 {
-	ProcessSerialNumber cur, front;
-	Boolean isFront;
-	
-	GetCurrentProcess(&cur);
-	GetFrontProcess(&front);
-	
-	SameProcess(&cur, &front, &isFront);
-  
-  if ( appHidden && isFront )
-  {
-    //printf("front\n");
-    lastmouseinit = FALSE;
-  }
-  if ( !appHidden && !isFront )
-  {
-    //printf("back\n");
-  }
-  
-  appHidden = !isFront;
+    pid_t runningApp = [[[NSWorkspace sharedWorkspace] frontmostApplication] processIdentifier];
+    pid_t activeWW2Id = [[NSProcessInfo processInfo] processIdentifier];
+    appHidden = !NSApp.active || (runningApp != activeWW2Id);
+    if (appHidden) {
+        lastmouseinit = FALSE;
+    }
 }
 
-LOGICAL dipGetKeyboardState(int bufsize, char * buffer)
+LOGICAL dipGetKeyboardState(size_t bufsize, char * buffer)
 {
-	if(!appHidden)
-		memcpy(buffer, _localKeyBuffer, bufsize);
-	else
+	if(appHidden) {
 		memset(buffer, 0x0, bufsize);
-	
+	} else {
+		memcpy(buffer, _localKeyBuffer, bufsize);
+	}
+    
 	return TRUE;
 }
 
@@ -605,17 +563,15 @@ LOGICAL dimainGetInputs(imap_queue_entry** plpiac, UINT32 *pnumentries)
 	numentries = 0;
 	numcharentries = 0;
 	
-	if(init)
-	{
-    dipSendCocoaKeyboardMouseEvents();
-    dipSendStickState();
-	}
-  else
-	{
-		if(TickCount() - lastRetry > 60)
-		{
+	if(init) {
+        dipSendCocoaKeyboardMouseEvents();
+        dipSendStickState();
+	} else {
+        static time_t lastRetry = 0;
+
+		if(time(nullptr) - lastRetry > 60) {
 			dipInit();
-			lastRetry = TickCount();
+			lastRetry = time(nullptr);
 		}
 	}
   
@@ -633,228 +589,192 @@ void dimainGetTextInputs(CHAR_INPUT**lpBuf, SINT32 *pNumElements)
 
 static int lastmousex,lastmousey;
 
-void dipSendCocoaKeyboardMouseEvents()
+static void realDipSendCocoaKeyboardMouseEvents()
 {
-	UINT32 vcode;
-	UINT16 charcode;
-//	static SINT32 lastMouseWheel;
-	static UINT32 lastmodifiers;
-	
-//	SINT32 curMouseWheel = 0;
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  
-  if ( ! lastmouseinit ) 
-  {
-    lastmouseinit = true;
-    sysGetMousePosition(&lastmousex,&lastmousey);
-  }
-  
-  int mousex,mousey,diffx=0,diffy=0;
-  if ( cursorHidden && !appHidden )
-  {
-    sysGetMousePosition(&mousex,&mousey);
+	static UINT32 lastmodifiers = 0;
+
+	UINT32 vcode = 0;
+	UINT16 charcode = 0;
+    int mousex = 0, mousey = 0, diffx = 0, diffy = 0;
     
-    diffx = mousex-lastmousex;
-    diffy = mousey-lastmousey;
+    if (!lastmouseinit) {
+        lastmouseinit = true;
+        sysGetMousePosition(&lastmousex, &lastmousey);
+    }
     
-    if ( cursorHidden && ((mousex<100||mousex>(ddpGetWidth()-100)) || (mousey<100||mousey>(ddpGetHeight()-100))) )
+    if (cursorHidden && !appHidden)
     {
-      CGPoint c = {static_cast<CGFloat>(ddpGetWidth()/2), static_cast<CGFloat>(ddpGetHeight()/2)};
-      CGAssociateMouseAndMouseCursorPosition(false); 
-      CGSetLocalEventsSuppressionInterval(0); 
-      CGWarpMouseCursorPosition(c); 
-      CGAssociateMouseAndMouseCursorPosition(true); 
-      lastmousex=ddpGetWidth()/2;
-      lastmousey=ddpGetHeight()/2;
+        sysGetMousePosition(&mousex,&mousey);
+        diffx = mousex - lastmousex;
+        diffy = mousey - lastmousey;
+
+        if (cursorHidden && ((mousex < 100 || mousex > (ddpGetWidth() - 100)) || (mousey < 100 || mousey > (ddpGetHeight() - 100))))
+        {
+            CGPoint c = { static_cast<CGFloat>(ddpGetWidth() / 2), static_cast<CGFloat>(ddpGetHeight() / 2) };
+            
+            CGAssociateMouseAndMouseCursorPosition(false);
+            /* Why is this here? We aren't posting a synthetic event, that's in
+               the documentation of CGWarpMouseCursorPosition(), it's the whole
+               point of doing it this way. Updated to get rid of the deprecated
+               (and, as it turns out, dangerous) API, but nonetheless disabling
+               for now, unless it can be shown to be needed. - Gadget
+            */
+            //NSEvent *nextEvent = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:NO];
+            //CGEventSourceSetLocalEventsSuppressionInterval(
+            //    static_cast<CGEventSourceRef>(CFBridgingRelease(CGEventCreateSourceFromEvent(nextEvent.CGEvent))),
+            //    0.0
+            //);
+            CGWarpMouseCursorPosition(c);
+            CGAssociateMouseAndMouseCursorPosition(true); 
+            lastmousex = ddpGetWidth() / 2;
+            lastmousey = ddpGetHeight() / 2;
+        }
+        else
+        {
+          lastmousex = mousex;
+          lastmousey = mousey;
+        }
     }
-    else
-    {
-      lastmousex=mousex;
-      lastmousey=mousey;
-    }
-  }
-  
-	for(;;)
+
+    NSEvent *event = nil;
+    
+	while ((event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES]))
 	{
-		NSEvent* event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES];    
-    if(!event) break;
-    
-		NSEventType type = [event type];
-		UINT32 modifiers = [event modifierFlags];
-    /*
-     if ( appHidden ) // process only certain events
-     {
-     switch(type)
-     {
-     case NSAppKitDefined:
-     if([event subtype] == NSApplicationActivatedEventType)
-     {
-     ddpShowApplication();
-     }
-     break;
-     }
-     continue;
-     }
-     */
-		switch(type)
+		NSEventType type = event.type;
+		UINT32 modifiers = event.modifierFlags;
+
+		switch (type)
 		{
 			case NSKeyDown:
 			case NSKeyUp:
 			{
-				vcode = [event keyCode];
-        
-				if( (modifiers & NSCommandKeyMask) && type == NSKeyDown)
+				vcode = event.keyCode;
+				if ((modifiers & NSCommandKeyMask) && type == NSKeyUp)
 				{
-					//if(vcode == DIK_F)			ddpToggleWindowedMode();
-					if(vcode == DIK_TAB || vcode == DIK_H)		ddpHideApplication();
+					if (vcode == DIK_PADENTER) {
+                        ddpToggleWindowedMode();
+                    } else if (vcode == DIK_TAB || vcode == DIK_H) {
+                        ddpHideApplication();
+                    }
 				}
-				
-				if(modifiers & NSCommandKeyMask)
+				if ((modifiers & NSCommandKeyMask) != 0) {
 					[NSApp sendEvent:event];
-        
-				if(vcode < MAX_KEYS)
-				{
-					if(![event isARepeat])
-					{
+                }
+				if (vcode < MAX_KEYS) {
+					if (![event isARepeat]) {
 						_localKeyBuffer[vcode] = (type == NSKeyUp) ? 0x7F : 0x80;
 						_AddToQueue(_DIKtoIAC[vcode], 1, (type == NSKeyUp) ? 0 : 1);
 					}
 					
-					if([[event characters] length] > 0)
-					{
+					if ([[event characters] length] > 0) {
 						[[event characters] getCharacters:&charcode range:NSMakeRange(0,1)];
 						_AddToCharQueue(_DIKtoIAC[vcode], charcode, (type == NSKeyUp) ? 0 : 1);
 					}
 				}
+                break;
 			}
-        break;
-			case NSFlagsChanged:
+            
+            case NSFlagsChanged:
 			{
-				if((modifiers & NSAlphaShiftKeyMask) != (lastmodifiers & NSAlphaShiftKeyMask))
-				{
+				if ((modifiers & NSAlphaShiftKeyMask) != (lastmodifiers & NSAlphaShiftKeyMask)) {
 					_localKeyBuffer[DIK_CAPITAL] = (modifiers & NSAlphaShiftKeyMask) ? 0x80 : 0x7F;
 					_AddToQueue(IAC_CAPSLOCK, 1, (modifiers & NSAlphaShiftKeyMask) ? 1 : 0);
-				}				
-        
-				if((modifiers & NSCommandKeyMask) != (lastmodifiers & NSCommandKeyMask))
-				{
+				}
+                if ((modifiers & NSCommandKeyMask) != (lastmodifiers & NSCommandKeyMask)) {
 					_localKeyBuffer[DIK_LCOMMAND] = (modifiers & NSCommandKeyMask) ? 0x80 : 0x7F;
 					_AddToQueue(IAC_LEFTMODKEY, 1, (modifiers & NSCommandKeyMask) ? 1 : 0);
 				}
-        
-				if((modifiers & NX_DEVICELSHIFTKEYMASK) != (lastmodifiers & NX_DEVICELSHIFTKEYMASK))
-				{
+				if ((modifiers & NX_DEVICELSHIFTKEYMASK) != (lastmodifiers & NX_DEVICELSHIFTKEYMASK)) {
 					_localKeyBuffer[DIK_LSHIFT] = (modifiers & NX_DEVICELSHIFTKEYMASK) ? 0x80 : 0x7F;
 					_AddToQueue(IAC_LEFTSHIFT, 1, (modifiers & NX_DEVICELSHIFTKEYMASK) ? 1 : 0);
-				}				
-        
-				if((modifiers & NX_DEVICELALTKEYMASK) != (lastmodifiers & NX_DEVICELALTKEYMASK))
-				{
+				}
+				if ((modifiers & NX_DEVICELALTKEYMASK) != (lastmodifiers & NX_DEVICELALTKEYMASK)) {
 					_localKeyBuffer[DIK_OPTION] = (modifiers & NX_DEVICELALTKEYMASK) ? 0x80 : 0x7F;
 					_AddToQueue(IAC_LEFTALT, 1, (modifiers & NX_DEVICELALTKEYMASK) ? 1 : 0);
-				}				
-        
-				if((modifiers & NX_DEVICELCTLKEYMASK) != (lastmodifiers & NX_DEVICELCTLKEYMASK))
-				{
+				}
+				if ((modifiers & NX_DEVICELCTLKEYMASK) != (lastmodifiers & NX_DEVICELCTLKEYMASK)){
 					_localKeyBuffer[DIK_LCONTROL] = (modifiers & NX_DEVICELCTLKEYMASK) ? 0x80 : 0x7F;
 					_AddToQueue(IAC_LEFTCONTROL, 1, (modifiers & NX_DEVICELCTLKEYMASK) ? 1 : 0);
-				}				
-        
-				if((modifiers & NX_DEVICERSHIFTKEYMASK) != (lastmodifiers & NX_DEVICERSHIFTKEYMASK))
-				{
+				}
+				if ((modifiers & NX_DEVICERSHIFTKEYMASK) != (lastmodifiers & NX_DEVICERSHIFTKEYMASK)) {
 					_localKeyBuffer[DIK_RSHIFT] = (modifiers & NX_DEVICERSHIFTKEYMASK) ? 0x80 : 0x7F;
 					_AddToQueue(IAC_RIGHTSHIFT, 1, (modifiers & NX_DEVICERSHIFTKEYMASK) ? 1 : 0);
-				}				
-        
-				if((modifiers & NX_DEVICERALTKEYMASK) != (lastmodifiers & NX_DEVICERALTKEYMASK))
-				{
+				}
+				if ((modifiers & NX_DEVICERALTKEYMASK) != (lastmodifiers & NX_DEVICERALTKEYMASK)) {
 					_localKeyBuffer[DIK_ROPTION] = (modifiers & NX_DEVICERALTKEYMASK) ? 0x80 : 0x7F;
 					_AddToQueue(IAC_RIGHTALT, 1, (modifiers & NX_DEVICERALTKEYMASK) ? 1 : 0);
-				}	
-				
-				if((modifiers & NX_DEVICERCTLKEYMASK) != (lastmodifiers & NX_DEVICERCTLKEYMASK))
-				{
+				}
+				if ((modifiers & NX_DEVICERCTLKEYMASK) != (lastmodifiers & NX_DEVICERCTLKEYMASK)) {
 					_localKeyBuffer[DIK_RCONTROL] = (modifiers & NX_DEVICERCTLKEYMASK) ? 0x80 : 0x7F;
 					_AddToQueue(IAC_RIGHTCONTROL, 1, (modifiers & NX_DEVICERCTLKEYMASK) ? 1 : 0);
 				}
-				
 				lastmodifiers = modifiers;
+                break;
 			}
-        break;
-        /*
-         case NSMouseMoved:
-         case NSLeftMouseDragged:
-         case NSRightMouseDragged:
-         case NSOtherMouseDragged:
-         {
-         CGMouseDelta ddx, ddy;
-         CGGetLastMouseDelta(&ddx, &ddy);
-         dx += ddx;
-         dy += ddy;	
-         }
-         break;
-         */
+            /*
+            case NSMouseMoved:
+            case NSLeftMouseDragged:
+            case NSRightMouseDragged:
+            case NSOtherMouseDragged:
+            {
+                CGMouseDelta ddx, ddy;
+                CGGetLastMouseDelta(&ddx, &ddy);
+                dx += ddx;
+                dy += ddy;	
+                break;
+            }
+            */
 			case NSLeftMouseDown:
-			case NSLeftMouseUp:
 			case NSRightMouseDown:
-			case NSRightMouseUp:
 			case NSOtherMouseDown:
+			case NSLeftMouseUp:
+			case NSRightMouseUp:
 			case NSOtherMouseUp:
 			{			
-				int button = [event buttonNumber];
-				if((modifiers & NSControlKeyMask) || (modifiers & NSControlKeyMask) && button == 0) // emulate right click for one button mice
+				int button = event.buttonNumber;
+                
+				if ((modifiers & NSControlKeyMask) != 0 && button == 0) { // emulate right click for one button mice
 					button = 1;
-        
-				_AddToQueue(IAC_MOUSEBUTTON1 + button, 1, (type == NSLeftMouseDown || type == NSRightMouseDown || type == NSOtherMouseDown) ? 1 : 0);
+                }
+                _AddToQueue(IAC_MOUSEBUTTON1 + button, 1, (type == NSLeftMouseDown || type == NSRightMouseDown || type == NSOtherMouseDown) ? 1 : 0);
+                break;
 			}
-        break;
 			case NSScrollWheel:
 			{
-                UINT32 x=0;
-                if ( [event deltaY] > 0.5 )
-                {
-                    x = IAC_MOUSE_WHEEL_UP;
+                if (event.deltaY < -0.05 || event.deltaY > 0.5) {
+                    _AddToQueue(event.deltaY < 0.0 ? IAC_MOUSE_WHEEL_DOWN : IAC_MOUSE_WHEEL_UP, 1, 1);
                 }
-                else if ([event deltaY] < -0.5)
-                {
-                    x = IAC_MOUSE_WHEEL_DOWN;
-                }
-                if ( x )
-                {
-                    _AddToQueue(x, 1, 1);
-//                    printf("%s %.2f\n", x == IAC_MOUSE_WHEEL_UP ? "up" : "dn", [event deltaY] );
-                }
-                
+                break;
 			}
-        break;
 			case NSAppKitDefined:
-				if([event subtype] == NSApplicationActivatedEventType)
+            {
+				if (event.subtype == NSApplicationActivatedEventType) {
 					ddpShowApplication();
-        break;
+                    lastmodifiers = event.modifierFlags; //[NSEvent modifierFlags];
+                } else if (event.subtype == NSApplicationDeactivatedEventType) {
+                    ddpHideApplication();
+                }
+                break;
+            }
 		}
 	}
 	
-    /*
-	// hack to send "key up" for mouse wheel
-	if(lastMouseWheel != 0 && lastMouseWheel != curMouseWheel)
-	{
-		_AddToQueue((lastMouseWheel > 0) ? IAC_MOUSE_WHEEL_UP : IAC_MOUSE_WHEEL_DOWN, 1, 0);
-//    printf("now %s\n",(lastMouseWheel > 0) ? "up" : "down" );
-	}
-	
-	lastMouseWheel = curMouseWheel;
-  */
-  if ( cursorHidden )
-  {
-    // arbitrary speed up
-    if(diffx != 0) 
-      _AddToQueue(IAC_MOUSEX, 2 * (diffx), 0);
-    if(diffy != 0) 
-      _AddToQueue(IAC_MOUSEY, 2 * (diffy), 0);
-  }
-  
-  [pool release];
-  
+    if (cursorHidden) {
+        // arbitrary speed up
+        if (diffx != 0) {
+            _AddToQueue(IAC_MOUSEX, 2 * (diffx), 0);
+        }
+        if (diffy != 0) {
+            _AddToQueue(IAC_MOUSEY, 2 * (diffy), 0);
+        }
+    }
+}
+
+void dipSendCocoaKeyboardMouseEvents()
+{
+    @autoreleasepool {
+        realDipSendCocoaKeyboardMouseEvents();
+    }
 }
 
 void dipSendStickState(void)
@@ -878,7 +798,7 @@ void dipSendStickState(void)
 			return;
 		}
 		
-    sval = HIDGetElementValue(_StickElements[i].dev,_StickElements[i].ref);
+        sval = HIDGetElementValue(_StickElements[i].dev,_StickElements[i].ref);
     
 		if(_StickElements[i].type == HID_AXIS)
 		{
@@ -896,96 +816,64 @@ void dipSendStickState(void)
 		switch(_StickElements[i].type)
 		{
 			case HID_AXIS:
-				switch(_StickElements[i].iac)
-      {
-        case IAC_JOYSTICK1_SLIDER1:
-        case IAC_JOYSTICK2_SLIDER1:
-        case IAC_JOYSTICK3_SLIDER1:
-        case IAC_JOYSTICK4_SLIDER1:
-          joyState[idx].lSlider1 += sval;
-					break;
-          
-        case IAC_JOYSTICK1_SLIDER2:
-        case IAC_JOYSTICK2_SLIDER2:
-        case IAC_JOYSTICK3_SLIDER2:
-        case IAC_JOYSTICK4_SLIDER2:
-          joyState[idx].lSlider2 += sval;
-					break;
-          
-        case IAC_JOYSTICK1_POSX:
-        case IAC_JOYSTICK2_POSX:
-        case IAC_JOYSTICK3_POSX:
-        case IAC_JOYSTICK4_POSX:
-          joyState[idx].lX += sval;
-					break;
-          
-        case IAC_JOYSTICK1_POSY:
-        case IAC_JOYSTICK2_POSY:
-        case IAC_JOYSTICK3_POSY:
-        case IAC_JOYSTICK4_POSY:	
-          joyState[idx].lY -= sval;	    				
-          break;
-          
-        case IAC_JOYSTICK1_POSZ:
-        case IAC_JOYSTICK2_POSZ:
-        case IAC_JOYSTICK3_POSZ:
-        case IAC_JOYSTICK4_POSZ:	
-          joyState[idx].lZ -= sval;	    				
-          break;
-          
-        case IAC_JOYSTICK1_ROTX:
-        case IAC_JOYSTICK2_ROTX:
-        case IAC_JOYSTICK3_ROTX:
-        case IAC_JOYSTICK4_ROTX:
-          joyState[idx].lRx += sval;	
-          break;
-          
-        case IAC_JOYSTICK1_ROTY:
-        case IAC_JOYSTICK2_ROTY:
-        case IAC_JOYSTICK3_ROTY:
-        case IAC_JOYSTICK4_ROTY:
-          joyState[idx].lRy += sval;
-          break;
-          
-        case IAC_JOYSTICK1_ROTZ:
-        case IAC_JOYSTICK2_ROTZ:
-        case IAC_JOYSTICK3_ROTZ:
-        case IAC_JOYSTICK4_ROTZ:
-          joyState[idx].lRz += sval;
-					break;
-					
-        default:
-					break;
-      }
-        break;
+                switch(_StickElements[i].iac)
+                {
+                    case IAC_JOYSTICK1_SLIDER1: case IAC_JOYSTICK2_SLIDER1: case IAC_JOYSTICK3_SLIDER1: case IAC_JOYSTICK4_SLIDER1:
+                        joyState[idx].lSlider1 += sval;
+                        break;
+                    case IAC_JOYSTICK1_SLIDER2: case IAC_JOYSTICK2_SLIDER2: case IAC_JOYSTICK3_SLIDER2: case IAC_JOYSTICK4_SLIDER2:
+                        joyState[idx].lSlider2 += sval;
+                        break;
+                    case IAC_JOYSTICK1_POSX: case IAC_JOYSTICK2_POSX: case IAC_JOYSTICK3_POSX: case IAC_JOYSTICK4_POSX:
+                        joyState[idx].lX += sval;
+                        break;
+                    case IAC_JOYSTICK1_POSY: case IAC_JOYSTICK2_POSY: case IAC_JOYSTICK3_POSY: case IAC_JOYSTICK4_POSY:
+                        joyState[idx].lY -= sval;
+                        break;
+                    case IAC_JOYSTICK1_POSZ: case IAC_JOYSTICK2_POSZ: case IAC_JOYSTICK3_POSZ: case IAC_JOYSTICK4_POSZ:
+                        joyState[idx].lZ -= sval;
+                        break;
+                    case IAC_JOYSTICK1_ROTX: case IAC_JOYSTICK2_ROTX: case IAC_JOYSTICK3_ROTX: case IAC_JOYSTICK4_ROTX:
+                        joyState[idx].lRx += sval;
+                        break;
+                    case IAC_JOYSTICK1_ROTY: case IAC_JOYSTICK2_ROTY: case IAC_JOYSTICK3_ROTY: case IAC_JOYSTICK4_ROTY:
+                        joyState[idx].lRy += sval;
+                        break;
+                    case IAC_JOYSTICK1_ROTZ: case IAC_JOYSTICK2_ROTZ: case IAC_JOYSTICK3_ROTZ: case IAC_JOYSTICK4_ROTZ:
+                        joyState[idx].lRz += sval;
+                        break;
+                    default:
+                        break;
+                }
+                break;
         
 			case HID_BUTTON:
 			{
-				if(lastbuttons[i] != sval && !_StickElements[i].ignore)
+				if(lastbuttons[i] != sval && !_StickElements[i].ignore) {
 					_AddToQueue(_StickElements[i].iac, 1, sval);
-        lastbuttons[i] = sval;
+                }
+                lastbuttons[i] = sval;
+                break;
 			}
-        break;
-        
-        
+
 			case HID_POV:
 				if(sval >= _StickElements[i].ref->min && sval <=  _StickElements[i].ref->max)
 				{
-					if(lastbuttons[i] != sval)
-					{
-						if(lastbuttons[i] > -1)
+					if(lastbuttons[i] != sval) {
+						if(lastbuttons[i] > -1) {
 							_AddToQueue(_StickElements[i].iac + lastbuttons[i] - _StickElements[i].ref->min, 1, 0);
+                        }
 						_AddToQueue(_StickElements[i].iac + sval - _StickElements[i].ref->min, 1, 1);
 					}
 					lastbuttons[i] = sval;
-        }else
-        {
-					if(lastbuttons[i] > -1)
+                } else {
+					if(lastbuttons[i] > -1) {
 						_AddToQueue(_StickElements[i].iac + lastbuttons[i] - _StickElements[i].ref->min, 1, 0);
-          lastbuttons[i] = -1;
+                    }
+                    lastbuttons[i] = -1;
+                }
+                break;
         }
-        break;
-		}
 	}
 	
 	for(i = 0; i < (int)_NumSticks; i++)

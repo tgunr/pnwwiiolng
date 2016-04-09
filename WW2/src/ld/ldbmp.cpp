@@ -166,11 +166,6 @@ SINT32		t1, t2, t3, t4, t5;
 		return(FALSE);
 	}
 
-#ifdef TESTMAC
-  extern void addTexturePath( const char* path );
-  addTexturePath( Filename );
-#endif
-
 #ifdef LOAD_TIMER
 	t2 = piReadTimeStamp32();
  	Write_Debug ("\t\t\t\tOpen: %10d", t2-t1);

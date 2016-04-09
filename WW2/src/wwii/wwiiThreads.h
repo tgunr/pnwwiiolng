@@ -69,7 +69,7 @@ extern void threadIgnoreSIGPIPE();
 class StatsThread : public PNThread
 {
 public:
-	virtual void run() OVERRIDE_FN;
+	virtual void run() override;
 };
 
 namespace DBThread

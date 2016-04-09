@@ -144,7 +144,7 @@ ENDIF ()
 #	SET(CMAKE_CXX_FLAGS "-m64")
 #ENDIF ()
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wshadow -Wno-deprecated -pthread -fno-rtti")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wshadow -Wno-deprecated -pthread -fno-rtti -std=c++14")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -LANG:libc_in_namespace_std=OFF -LANG:std=ON")
 set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG=1 -ggdb") # -D_FORTIFY_SOURCE=2")
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG=1 -g0")

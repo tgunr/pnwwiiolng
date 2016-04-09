@@ -121,7 +121,7 @@ public:
 							, NO_MASK, LSTR_AFK_USAGE, LSTR_AFK_DETAIL
 							) { }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		// When specifying a message, you always turn afk* on*
 		player.SetAFK(true, arguments);
@@ -131,7 +131,7 @@ public:
 			player.message(LSTR_NOTE, LSTR_AFK, nullptr, nullptr);
 	}
 
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
 	{
 		// Otherwise they're toggling
 		if ( player.isAFK() )
@@ -159,11 +159,11 @@ public:
 	DotAlarm() : DotCommand("alarm", "Request timed notice"
 							, IS_PLAYNET, LSTR_NONE, LSTR_NONE
 							) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN;
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override;
 }
 
 void
-DotAlarm::actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+DotAlarm::actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 {
 	static ARGV args;
 	vectorize(arguments, args, 3);
@@ -220,7 +220,7 @@ public:
 									, MISSION_LEADER, LSTR_BACKUPLEADER_USAGE, LSTR_BACKUPLEADER_DETAIL
 									) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		// Make sure no spaces
 		if ( strchr(arguments, ' ') != nullptr )
@@ -264,9 +264,9 @@ public:
 	}
 
 public:
-	virtual void action(Player& player, Chat::ClientMessage * /*message*/) const OVERRIDE_FN { chatFriendsList(player); }
+	virtual void action(Player& player, Chat::ClientMessage * /*message*/) const override { chatFriendsList(player); }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const override
 	{
 		static ARGV args;
 
@@ -297,7 +297,7 @@ public:
 		{ }
 
 	// When a user requests a list of known commands
-	virtual void action(Player& player, Chat::ClientMessage*) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage*) const override
 	{
 		LSTRING_ID lstrID = LSTR_TEXT_START;
 		std::string reply;
@@ -329,7 +329,7 @@ public:
 	}
 
 	// When a user requests help with a specific command
-	virtual void actionWith(Player& player, Chat::ClientMessage*, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage*, char* arguments) const override
 	{
 		while ( *arguments == '.' || * arguments == '/' )
 			arguments++;
@@ -353,7 +353,7 @@ public:
 	DotHQOff() : DotCommand("hqoff", "Detune the HQ channel"
 								, NO_MASK, LSTR_HQOFF_USAGE, LSTR_HQOFF_DETAIL
 								) { }
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		player.SetHqOff(true);
 		player.message(LSTR_NOTE, LSTR_HQ_UNSUBS, nullptr, nullptr);
@@ -366,7 +366,7 @@ public:
 	DotHQOn() : DotCommand("hqon", "Retune the HQ channel"
 								, NO_MASK, LSTR_HQON_USAGE, LSTR_HQON_DETAIL
 								) { }
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		player.SetHqOff(false);
 		player.message(LSTR_NOTE, LSTR_HQ_SUBS, nullptr, nullptr);
@@ -386,7 +386,7 @@ public:
 	{
 	}
 
-	virtual void action(Player& player, Chat::ClientMessage * /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage * /*message*/) const override
 	{
 		static std::string textlist = "";
 
@@ -409,7 +409,7 @@ public:
 		player.message(LSTR_NONE, LSTR_GENERIC, textlist.c_str());
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const override
 	{
 		static ARGV args;
 
@@ -437,7 +437,7 @@ public:
 									, NO_MASK, LSTR_MAKELEADER_USAGE, LSTR_MAKELEADER_DETAIL
 									) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		// Make sure no spaces
 		if ( strchr(arguments, ' ') != nullptr )
@@ -473,7 +473,7 @@ public:
 	DotMsg() : DotCommand("m", "Send a direct private message to a player"
 							, NO_MASK, LSTR_M_USAGE, LSTR_M_DETAIL
 							) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		static ARGV args;
 
@@ -557,7 +557,7 @@ public:
 		DotCommand(which, "Send a message to a specific radio", NO_MASK, LSTR_N_USAGE, LSTR_N_DETAIL)
 		, _radioNo(atoi(which.c_str()) - 1)
 		{ }
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		const Chat::ChannelSubscription& cnode = player.getChannelSub(_radioNo);
 		// Do they have a radio tuned in this slot?
@@ -595,7 +595,7 @@ public:
 	DotNoEChat() : DotCommand("noechat", "Toggle receipt of enemy area chat on/off"
 								, NO_MASK, LSTR_NOECHAT_USAGE, LSTR_NOECHAT_DETAIL
 								) { };
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( player.noEnemyChat() )
 		{
@@ -621,7 +621,7 @@ public:
 								, NO_MASK, LSTR_NOWHO_USAGE, LSTR_NOWHO_DETAIL
 								) { };
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( player.noWho() )
 		{
@@ -647,13 +647,13 @@ public:
 							, NO_MASK, LSTR_ORDERS_USAGE, LSTR_ORDERS_DETAIL
 							) { };
 
-	virtual void action(Player& player, Chat::ClientMessage* message) const  OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* message) const  override
 	{
 		if ( !player.missionID() )
 			throw Chat::LStringErr(LSTR_NOT_ON_MISSION);
 		chatMissionOrders(&player);
 	}
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, SCHAR* arguments) const  OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, SCHAR* arguments) const  override
 	{
 		if ( !player.missionID() )
 			throw Chat::LStringErr(LSTR_NOT_ON_MISSION);
@@ -699,7 +699,7 @@ public:
 	DotReport() : DotCommand("report", "Submit a bug/problem/feedback report"
 								, NO_MASK, LSTR_REPORT_USAGE, LSTR_REPORT_DETAIL
 								) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, SCHAR* arguments) const  OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, SCHAR* arguments) const  override
 	{
 		SCHAR info[MAX_MESSAGE_LENGTH + 1];
 
@@ -740,7 +740,7 @@ public:
 												, NO_MASK, LSTR_RESET_RADIO_USAGE, LSTR_RESET_RADIO_DETAIL
 												) { }
 	// Player must type "/resetradios +mycallsign"
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( _featureLockedM(player, 3) )
 			return;
@@ -768,7 +768,7 @@ public:
 								, NO_MASK, LSTR_SYSMOTD_USAGE, LSTR_SYSMOTD_DETAIL
 								) { }
 	// Player typed ".sysmotd" - display the sysmotd
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		player.message(LSTR_SYSTEM, LSTR_GENERIC, chatGetUnitMotd(SYSTEM_MOTD_UNIT), nullptr);
 	}
@@ -786,7 +786,7 @@ public:
 							, NO_MASK, LSTR_TIME_USAGE, LSTR_TIME_DETAIL
 							) { }
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		player.message(LSTR_NOTE, LSTR_SERVER_TIME, chatTimeString(teulTime()));
 	}
@@ -858,7 +858,7 @@ public:
 	DotTrainers() : DotCommand("trainers", "List any trainers currently available"
 								, NO_MASK, LSTR_TRAINERS_USAGE, LSTR_TRAINERS_DETAIL
 								) {}
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
 	{
 		if ( player.isTrainer() )
 			_listTrainersForTrainer(player);
@@ -866,7 +866,7 @@ public:
 			_listTrainersForPlayer(player);
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		if ( player.isTrainer() == false )
 		{
@@ -900,7 +900,7 @@ public:
 							, NO_MASK, LSTR_UM_USAGE, LSTR_UM_DETAIL
 							) { }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		SINT32 mode = -1;
 
@@ -935,7 +935,7 @@ public:
 							, NO_MASK, LSTR_WHISPER_USAGE, LSTR_WHISPER_DETAIL
 							) { }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		chatSay(&player, message, arguments, AREA_WHISPER, true);
 	}
@@ -1121,12 +1121,12 @@ public:
 		reset();
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
         action(player, message) ;
 	}
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		const char* str;
 		str = responses[rand_uniform(responses.size())].c_str() ;
@@ -1149,7 +1149,7 @@ public:
 	DotYell() : DotCommand("yell", "Large-area chat message"
 							, NO_MASK, LSTR_YELL_USAGE, LSTR_YELL_DETAIL
 							) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		chatSay(&player, message, arguments, AREA_YELL, true);
 	}
@@ -1167,7 +1167,7 @@ class DotTestError : public DotCommand
 public:
 	DotTestError() : DotCommand("testerror", "Test error codes", NO_MASK, LSTR_GENERIC, LSTR_GENERIC, false) {}
 
-	virtual bool help(Player& player) const OVERRIDE_FN
+	virtual bool help(Player& player) const override
 	{
 		if ( !allow(player) )
 			return false;
@@ -1176,7 +1176,7 @@ public:
 		return true;
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		ARGV args;
 		vectorize(arguments, args, 3);

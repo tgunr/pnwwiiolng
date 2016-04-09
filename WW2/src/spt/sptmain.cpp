@@ -2153,7 +2153,7 @@ void drawCollisionCylinders()
 
                 mathEul_ToMatrix(&m, EulOrdXYZs, &v);
 
-                Vec3f pp = Vec3f(p[0], p[1], p[2]) * rot;
+                //Vec3f pp = Vec3f(p[0], p[1], p[2]) * rot;
 
                 Matrixf r;
                 // Flip to our coordinate system
@@ -3818,7 +3818,7 @@ unsigned int sptAddTree(OBJECT* o,
         SET_IS_CLUTTER(tree->isbush_isclutter_base, 0x1);
 
     unsigned int randm = (unsigned int)((int)pos.x * 7159 + (int)pos.y * 15137);
-    tree->rot_angle = randm & numRotations;
+    tree->rot_angle = randm % numRotations;
 
     // For billboards
     float radians = DEG_TO_RAD((float)rotations[tree->rot_angle]);

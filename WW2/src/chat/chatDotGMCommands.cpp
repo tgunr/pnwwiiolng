@@ -153,7 +153,7 @@ public:
 							, NO_MASK, LSTR_ALL_USAGE, LSTR_ALL_DETAIL
 							) { }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 	#if !defined(BETA_RELEASE) && !defined(TEST_RELEASE)
 		player.gmNote("GM", command(), arguments, NULL);
@@ -175,7 +175,7 @@ public:
 							, NO_MASK, LSTR_BAN_USAGE, LSTR_BAN_DETAIL)
 							{}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		static ARGV argv;
 		int argc = vectorize(arguments, argv, 3);
@@ -212,7 +212,7 @@ public:
 		return (SINT32) to;
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		ARGV args;
 		bool straightUp = false, allowDown = false;
@@ -305,7 +305,7 @@ public:
 	{
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const override
 	{
 		ARGV args;
 		if (vectorize(arguments, args, 2) < 2)
@@ -391,7 +391,7 @@ protected:
 	std::vector<std::string>	m_results;
 
 protected:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if (numRows <= 0)
 			return true;
@@ -411,7 +411,7 @@ protected:
 	}
 
 public:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		Player* const player = PlayerInterface::Lookup(m_requester);
 		if (player == nullptr)
@@ -430,7 +430,7 @@ public:
 		}
 	}
 
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		Player* const player = PlayerInterface::Lookup(m_requester);
 		if (player != nullptr)
@@ -454,7 +454,7 @@ public:
 	{
 	}
 
-	virtual bool help(Player& player) const OVERRIDE_FN
+	virtual bool help(Player& player) const override
 	{
 		if (!allow(player)) return false;
 		player.message(LSTR_USAGE, LSTR_GENERIC, "/chatlog <player> <reason>");
@@ -462,7 +462,7 @@ public:
 		return true;
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const override
 	{
 		ARGV args;
 		if (vectorize(arguments, args, 2) < 2)
@@ -510,7 +510,7 @@ public:
 							, IS_PLAYNET, LSTR_CRS_USAGE, LSTR_CRS_DETAIL
 							, true
 							) { }
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
 	{
 		std::string reply = "";
 
@@ -540,7 +540,7 @@ public:
 			player.message(LSTR_NONE, LSTR_GENERIC, reply.c_str(), nullptr);
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		if ( arguments[0] == '+' )
 		{
@@ -573,7 +573,7 @@ public:
 							)
 	{
 	}
-	virtual bool help(Player& player) const OVERRIDE_FN
+	virtual bool help(Player& player) const override
 	{
 		if (!allow(player)) return false;
 		player.message(LSTR_USAGE, LSTR_GENERIC, "'/debug <condition> on|off'");
@@ -583,7 +583,7 @@ public:
 		return true;
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const override
 	{
 		ARGV argv;
 		int argc = vectorize(arguments, argv, 3);
@@ -641,7 +641,7 @@ public:
 								, true
 								) { }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		ARGV args;
 		if ( vectorize(arguments, args, 2) != 1 )
@@ -685,7 +685,7 @@ public:
 							, GAME_MANAGER, LSTR_GM_USAGE, LSTR_GM_DETAIL
 							) { }
 	// List people on the channel
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
 	{
 		std::string roster = "";
 		bool onDuty;
@@ -751,7 +751,7 @@ public:
 	}
 
 	// Send message to the channel
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		if ( !player.isEffectiveGM() )
 		{
@@ -787,7 +787,7 @@ public:
 								, NO_MASK, LSTR_GMMODE_USAGE, LSTR_GMMODE_DETAIL
 								) { }
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		player.SetGMHide(!player.gmHide());
 		if ( player.gmHide() )
@@ -796,7 +796,7 @@ public:
 			player.message(LSTR_NOTE, LSTR_GM_OFF, nullptr, nullptr);
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		static const DotCommand* dotMsg = DotCommand::index()->lookup("m", true);
 		if ( nullptr == dotMsg )
@@ -827,7 +827,7 @@ public:
 	DotGrab() : DotCommand("grab", "Direct comms with specified player"
 							, NO_MASK, LSTR_GRAB_USAGE, LSTR_GRAB_DETAIL
 							) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		ARGV args;
 
@@ -904,7 +904,7 @@ public:
 	DotKick() : DotCommand("kick", "Eject a player from the game"
 								, NO_MASK, LSTR_KICK_USAGE, LSTR_KICK_DETAIL
 								) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		// Split the incoming string into two or less arguments
 		ARGV args;
@@ -965,7 +965,7 @@ public:
 								, true
 								) { }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		player.gmNote("GM", command(), arguments, nullptr);
 
@@ -1001,7 +1001,7 @@ public:
 								, false
 								) { }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		player.gmNote("GM", command(), arguments, nullptr);
 		chatDispatchGMMessage("INFO", chatMakeTempString("%s forcing all players to despawn: %s", player.callsign(), arguments));
@@ -1034,7 +1034,7 @@ public:
 								, NO_MASK, LSTR_KICKBAN_USAGE, LSTR_KICKBAN_DETAIL
 								) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		static ARGV argv;
 		int argc = vectorize(arguments, argv, 3);
@@ -1074,7 +1074,7 @@ protected:
 	std::vector<std::string> m_results;
 
 protected:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -1092,7 +1092,7 @@ protected:
 	}
 
 protected:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		Player* const player = PlayerInterface::Lookup(m_matchID);
 		if ( player == nullptr )
@@ -1112,7 +1112,7 @@ protected:
 	}
 
 protected:
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		Player* player = PlayerInterface::Lookup(m_matchID);
 		if ( player == nullptr )
@@ -1130,7 +1130,7 @@ public:
 								, NO_MASK, LSTR_LASTCAP_USAGE, LSTR_LASTCAP_DETAIL
 							) {}
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		const char* clause = "";
 
@@ -1149,7 +1149,7 @@ public:
 		(new LastCapQuery(player.matchHandle(), clause))->Queue();
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		const char* clause = "";
 
@@ -1217,7 +1217,7 @@ protected:
 	std::vector<std::string> m_results;
 
 protected:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -1240,7 +1240,7 @@ protected:
 	}
 
 public:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		Player* const player = PlayerInterface::Lookup(m_requesterID);
 		if ( player == nullptr )
@@ -1261,7 +1261,7 @@ public:
 		}
 	}
 
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		Player* player = PlayerInterface::Lookup(m_requesterID);
 		if ( player != nullptr )
@@ -1277,7 +1277,7 @@ public:
 									, NO_MASK, LSTR_LASTDEATH_USAGE, LSTR_LASTDEATH_DETAIL
 								) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		ChatHandle handle = chatGetLowercaseHandle(arguments);
 		if ( !chatIsValidCallsign(arguments) || handle == 0 )
@@ -1324,7 +1324,7 @@ protected:
 	std::vector<std::string> m_results;
 
 protected:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -1347,7 +1347,7 @@ protected:
 	}
 
 public:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		Player* const player = PlayerInterface::Lookup(m_requesterID);
 		if ( player == nullptr )
@@ -1368,7 +1368,7 @@ public:
 		}
 	}
 
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		Player* const player = PlayerInterface::Lookup(m_requesterID);
 		if ( player != nullptr )
@@ -1384,7 +1384,7 @@ public:
 									, NO_MASK, LSTR_LASTKILLS_USAGE, LSTR_LASTKILLS_DETAIL
 								) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		ChatHandle handle = chatGetLowercaseHandle(arguments);
 		if ( !chatIsValidCallsign(arguments) || handle == 0 )
@@ -1416,7 +1416,7 @@ public:
 	{
 	}
 
-	virtual void action(Player& player, Chat::ClientMessage * /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage * /*message*/) const override
 	{
 		PLAYER_INDEX::iterator it;
 		std::string result = "";
@@ -1462,7 +1462,7 @@ public:
 	ListSquad() : DotCommand("listsquad", "List the members of an [active] squad"
 								, NO_MASK, LSTR_LISTSQUAD_USAGE, LSTR_LISTSQUAD_DETAIL) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		bool listAll = false;
 
@@ -1577,7 +1577,7 @@ public:
 								) {}
 
 	void
-	actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		ARGV argv;
 		int argc = vectorize(arguments, argv, 3);
@@ -1672,7 +1672,7 @@ protected:
 	char		m_response[MAX_MESSAGE_LENGTH];
 
 protected:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if ( numRows <= 0 || Query()->FetchRow() == false )
 			return true;
@@ -1706,7 +1706,7 @@ protected:
 	}
 
 protected:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		Player* player = PlayerInterface::Lookup(m_matchID);
 		if ( player == nullptr )
@@ -1722,7 +1722,7 @@ protected:
 		}
 	}
 
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		Player* player = PlayerInterface::Lookup(m_matchID);
 		if ( player == nullptr ) return;
@@ -1738,8 +1738,8 @@ public:
 								, NO_MASK, LSTR_PINFO_USAGE, LSTR_PINFO_DETAIL
 								) { }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN;
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override;
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		player.describeTo(player, player.lastX(), player.lastY(), false);
 	}
@@ -1988,7 +1988,7 @@ public:
 								)
 								{ }
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( _featureLockedM(player, RESYNC_LOCK_TIME_M) )
 			return;
@@ -2005,7 +2005,7 @@ public:
 		return;
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, SCHAR* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, SCHAR* arguments) const override
 	{
 		ARGV args;
 		if ( vectorize(arguments, args, 2) != 1 )
@@ -2041,12 +2041,12 @@ public:
 								, NO_MASK, LSTR_ROSTER_USAGE, LSTR_ROSTER_DETAIL
 								) { }
 
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
 	{
 		actionWith(player, message, nullptr);
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, SCHAR* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, SCHAR* arguments) const override
 	{
 		UINT32 axis = 0, allied = 0;
 		char _roster[100+1];		// Place to store rosters we generate
@@ -2085,7 +2085,7 @@ public:
 	DotSetMotd() : DotCommand("setmotd", "Set the system message of the day"
 								, NO_MASK, LSTR_SYSMOTD_STAFF_USAGE, LSTR_SYSMOTD_STAFF_DETAIL
 								) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		player.gmNote("GM", command(), arguments, nullptr);
 
@@ -2108,7 +2108,7 @@ public:
 								, NO_MASK, LSTR_SETRANK_USAGE, LSTR_SETRANK_DETAIL
 								) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		if ( player.isSpawned() )
 		{
@@ -2156,7 +2156,7 @@ public:
 	DotShutdown() : DotCommand("shutdown", "Notify players of imminent shutdown"
 											, IS_PLAYNET, LSTR_NONE, LSTR_NONE) {}
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		SINT32 remaining = chatGetShutdownTimeRemaining();
 		if ( remaining >= 0 )
@@ -2169,7 +2169,7 @@ public:
 		}
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		ARGV argv;
 		int args = vectorize(arguments, argv, 3);
@@ -2270,7 +2270,7 @@ public:
 		chatSetUnitMotd(SYSTEM_MOTD_UNIT, argv[2]);
 	}
 
-	virtual bool help(Player& player) const OVERRIDE_FN
+	virtual bool help(Player& player) const override
 	{
 		if ( !allow(player) )
 			return false;
@@ -2292,7 +2292,7 @@ public:
 	DotSnoop() : DotCommand("snoop", "Records & displays all messages to/from a particular player"
 								, NO_MASK, LSTR_SNOOP_USAGE, LSTR_SNOOP_DETAIL) {}
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( !player.m_snoopOn )
 			player.message(LSTR_NOTE, LSTR_NOT_SNOOPING, command());
@@ -2300,7 +2300,7 @@ public:
 			player.message(LSTR_NOTE, LSTR_CURRENT_SNOOP, command(), player.m_snoopOn->callsign());
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		Player* target = player.m_snoopOn;
 		if ( strcasecmp(arguments, "off") == 0 )
@@ -2365,7 +2365,7 @@ public:
 	DotCRSSnoop() : DotCommand("crssnoop", "CRS snoop that does not get announced to GMs"
 								, IS_PLAYNET, LSTR_GENERIC, LSTR_GENERIC) {}
 
-	virtual bool help(Player& player) const OVERRIDE_FN
+	virtual bool help(Player& player) const override
 	{
 		if ( !allow(player) ) return false;
 		player.message(LSTR_USAGE, LSTR_GENERIC, "'/crssnoop <player>'  or  '/crssnoop off'");
@@ -2374,7 +2374,7 @@ public:
 		return true;
 	}
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( !player.m_crsSnoopOn )
 			player.message(LSTR_NOTE, LSTR_NOT_SNOOPING, command());
@@ -2382,7 +2382,7 @@ public:
 			player.message(LSTR_NOTE, LSTR_CURRENT_SNOOP, command(), player.m_crsSnoopOn->callsign());
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		Player* target = player.m_crsSnoopOn;
 		if ( strcasecmp(arguments, "off") == 0 )
@@ -2450,7 +2450,7 @@ public:
 							, NO_MASK, LSTR_GENERIC, LSTR_GENERIC)
 							{}
 
-	virtual bool help(Player& player) const OVERRIDE_FN
+	virtual bool help(Player& player) const override
 	{
 		if ( !allow(player) ) return false;
 		player.message(LSTR_USAGE, LSTR_GENERIC, "'/summon <player>'  or  '/summon <player> <reason>'");
@@ -2458,7 +2458,7 @@ public:
 		return true;
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		ARGV args;
 		if ( vectorize(arguments, args, 2) == 0 )
@@ -2510,7 +2510,7 @@ public:
 	DotSys() : DotCommand("sys", "Anonymous SYSTEM message to all players"
 							, NO_MASK, LSTR_SYS_USAGE, LSTR_SYS_DETAIL
 							) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		player.gmNote("GM", command(), arguments, nullptr);
 		chatSystemMessage(LSTR_GENERIC, arguments);
@@ -2528,7 +2528,7 @@ public:
 	DotUnGrab() : DotCommand("ungrab", "Release a previously /grab'd player"
 								, NO_MASK, LSTR_UNGRAB_USAGE, LSTR_UNGRAB_DETAIL
 								) { }
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		// GMs can remove themeselves from another person's grab
 		if ( player.takenBy() )
@@ -2571,7 +2571,7 @@ protected:
 	std::string m_err;
 
 protected:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if ( numRows <= 0 || Query()->FetchRow() == false )
 		{
@@ -2590,7 +2590,7 @@ protected:
 	}
 
 public:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		Player* const player = PlayerInterface::Lookup(m_byPlayerID);
 		if ( player == nullptr )
@@ -2600,7 +2600,7 @@ public:
 		chatDispatchGMMessage("INFO", chatMakeTempString("%s noted %s: %s", player->callsign(), Chat::Name(m_handle).c_str(), m_text.c_str()));
 	}
 
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		Player* const player = PlayerInterface::Lookup(m_byPlayerID);
 		if ( player != nullptr )
@@ -2634,7 +2634,7 @@ protected:
 	std::vector<std::string> m_results;
 
 protected:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -2680,7 +2680,7 @@ protected:
 	}
 
 public:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		Player* player = PlayerInterface::Lookup(m_byPlayerID);
 		if ( player == nullptr )
@@ -2699,7 +2699,7 @@ public:
 		}
 	}
 
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		Player* player = PlayerInterface::Lookup(m_byPlayerID);
 		if ( player != nullptr )
@@ -2716,7 +2716,7 @@ public:
 							, GAME_MANAGER|GAME_TRAINER, LSTR_PNOTE_USAGE, LSTR_PNOTE_DETAIL)
 							{}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		ARGV args;
 		if ( vectorize(arguments, args, 2) < 1 )
@@ -2763,7 +2763,7 @@ public:
 	DotWarn() : DotCommand("warn", "Send anonymous WARNING message to a player"
 							, GAME_MANAGER|GAME_TRAINER, LSTR_WARN_USAGE, LSTR_WARN_DETAIL
 							) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		ARGV args;
 		if ( vectorize(arguments, args, 2)  < 2 )
@@ -2812,7 +2812,7 @@ public:
 								, GAME_MANAGER|GAME_TRAINER, LSTR_WARNALL_USAGE, LSTR_WARNALL_DETAIL
 								, true
 								) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		player.gmNote("GM", command(), arguments, nullptr);
 

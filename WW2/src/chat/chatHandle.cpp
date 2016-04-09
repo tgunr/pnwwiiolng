@@ -5145,10 +5145,10 @@ const wchar_t*
 chatGetWideCallsign(const ChatHandle& handle)
 {
 	static const size_t NumInstances = 16;	// must be a power of 2.
-	static Chat::NameW callsigns[NumInstances];
+	static std::array<Chat::NameW, NumInstances> callsigns;
 	static std::atomic<size_t> s_instance { 0 };
 
-	const size_t instance = (s_instance++) & NumInstances;
+	const size_t instance = (s_instance++) & (NumInstances - 1);
 	callsigns[instance] = handle;
 
 	return callsigns[instance].c_str();

@@ -1107,11 +1107,10 @@ _pollSocketsInner(const TeulTimeMS& remainder)
 		ENDPOINT& endpoint = *(*it);
 		++it;
 
-        	dbugLog(_FLD, "Interrogating endpoint");
 		const int enumErr = WSAEnumNetworkEvents(endpoint.socket, endpoint.eventObject, &eventData);
 		if ( enumErr != 0 )
 		{
-        		dbugLog(_FLD, "Aborting, error returned from WSAEnumNetworkEvents %d", enumErr);
+			dbugLog(_FLD, "Aborting, error returned from WSAEnumNetworkEvents %d", enumErr);
 			continue;
 		}
 
@@ -1296,7 +1295,7 @@ void teulMRecvUpdatePoll(ENDPOINT& endpoint)
 {
 	endpoint.updateSocketEvents();
 #ifdef EXTREME_DEBUG
-	dbugLog(_FLD, "t:%d updating endpoint slot %d socket %d combined", endpoint.teulIndex(), endpoint.m_impl->pollSlot, endpoint.socket);
+	dbugLog(_FLD, "t:%d updating endpoint slot %d socket %d combined", endpoint.teulIndex(), endpoint.m_impl->pollSlot(), endpoint.socket);
 #endif
 }
 #else

@@ -146,7 +146,6 @@ SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32
 		return -EINVAL;
 	}
 
-	///TODO: Troy: GLOBALS MUST DIE!
 	// Note: the values are IN the World Update so you could just use that.
 	g_framingMode = wu.header.framingMode;
 	g_hostUpdateInterval = framings[g_framingMode].updateInterval;
@@ -308,15 +307,9 @@ _recvMove(ACTION_OBJECT* const a)
 
 static SINT32 _recvInfDeath(ACTION_OBJECT* const a)
 {
-    /*
-     TBD - Do something real with this, currently its doing nothing
 	REQUIRE_CLIENT_DATA_AS(ww2::Client, client);
-	InfDeath& death = a->read<InfDeath>();
+	/*InfDeath& death = */a->read<InfDeath>();
 
-	// All yours troy :)
-
-     */
-    
 	return a->offset;
 }
 

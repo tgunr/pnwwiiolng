@@ -269,7 +269,7 @@ _execute(const char* name, bool dbOnly)
 	}
 	else if ( !dbOnly )
 	{
-		code = std::string(cv_luaPath.GetString()) + PATH_SEPARATOR + name + ".lua";
+		code = std::string(cv_luaPath.GetString()) + "/" + name + ".lua";
 		success = Lua::RunScript(code.c_str());
 	}
 
@@ -283,7 +283,7 @@ stratStartLua()
 		return false;
 
 	std::string stratLib = cv_luaPath.GetString();
-	stratLib += PATH_SEPARATOR;
+	stratLib += "/";
 	stratLib += cv_luaStratlibFile.GetString();
 
 	if ( !Lua::RunScript(stratLib.c_str()) )
@@ -312,7 +312,7 @@ stratStartIntermission()
 	// BECD is a tool written by xiper for creating map configurations,
 	// becdwrapper defines glue functions for reading/loading these.
 	char becdScript[1024];
-	strprintf(becdScript, SUB_PATH("%s", "becdwrapper.lua"), cv_luaPath.GetString());
+	strprintf(becdScript, "%s/becdwrapper.lua", cv_luaPath.GetString());
 	if ( Lua::RunScript(becdScript) == false )
 	{
 		dbugLog(_FLA, "Unable to load intermission functions");

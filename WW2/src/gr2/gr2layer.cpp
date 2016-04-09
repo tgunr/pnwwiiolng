@@ -48,6 +48,8 @@ static ref_ptr<RenderStateSet> depthpass;
 
 #include "fp/fpTPSdata.h"
 
+#include "str/stringLib.h"
+
 static char texname[512];
 
 #define GRANNY_VERSION(x,y) (GrannyProductMajorVersion >= x && GrannyProductMinorVersion >= y)
@@ -4280,35 +4282,18 @@ void loadTextures(granny_file_info* fileInfo, const char* path)
 
 const char* getBaseName(const char* path, const char* prePath)
 {
-	// get it into our work buffer
-	strncpy(texname, path, 511);
-
-	// lowercase it
-	_strlwr(texname);
-
-	// find the last directory seperator
-	char* ptr = strrchr(texname, '\\');
-
-	if(ptr != nullptr)
-	{
-		ptr += 1;
-		strcpy(texname, ptr);
-	}
-
-	// find the filetype seperator and null it
-	ptr = strrchr(texname, '.');
-
-	if(ptr != nullptr)
-		*ptr = 0;
-
-	// add in our prepay if one was specified
-	if(prePath)
-	{
-		std::string temp = prePath;
-		temp += texname;
-		strncpy(texname, temp.c_str(), 511);
-	}
-
+    std::string name = path;
+    size_t sepPos = std::string::npos;
+    
+    if ((sepPos = name.rfind('\\')) != std::string::npos){
+        name = name.substr(sepPos + 1);
+    }
+    std::for_each(name.begin(), name.end(), [] (char &c) { c = static_cast<char>(tolower(c)); });
+    if ((sepPos = name.rfind('.')) != std::string::npos) {
+        name = name.substr(0, sepPos);
+    }
+    name = (prePath ? prePath : "") + name;
+	strsafecpy(texname, name.c_str());
 	return texname;
 }
 

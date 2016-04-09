@@ -52,7 +52,7 @@ public:
 		PNThread::start();
 	}
 
-	virtual void run() OVERRIDE_FN;
+	virtual void run() override;
 };
 
 static const UINT32 NUM_HELPER_THREADS = 2;
@@ -146,7 +146,7 @@ threadsReadDBEnvironment()
 		db = "127.0.0.1";
 #else
 	if ( !db || *db == 0 )
-		LogAbort("Unable to read %s database address from", cv_wwiiDBAddress.GetName(), cv_wwiiDBAddress.GetEnvVarName() ? cv_wwiiDBAddress.GetEnvVarName() : "environment");
+		LogAbort("Unable to read %s database address from %s", cv_wwiiDBAddress.GetName(), cv_wwiiDBAddress.GetEnvVarName() ? cv_wwiiDBAddress.GetEnvVarName() : "environment");
 #endif
 
 	strcpy(dbConnection.host, db);

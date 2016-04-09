@@ -125,7 +125,7 @@ logTimerEndExtMacro(x)
 #endif //#ifdef USE_LOG_TIMER
 
 
-#ifdef ENABLE_FLOATERS
+#ifdef BETA_RELEASE
 extern void logInitProfiling(const char* const profileName, FLOAT32 profilingDuration);
 extern void logUpdateProfiling();
-#endif	// #ifdef ENABLE_FLOATERS
+#endif // BETA_RELEASE

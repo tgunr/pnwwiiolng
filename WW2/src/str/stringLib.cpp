@@ -97,3 +97,4 @@ char* strescape(char* d,const char* s, char c)
 	*curr = '\0';
 	return d;
 }
+

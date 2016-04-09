@@ -1084,7 +1084,7 @@ public:
 
 protected:
 	const playerid_t	m_playerID;
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		std::vector<UINT32> groupIDs;
 
@@ -1098,7 +1098,7 @@ protected:
 		playerGroups[m_playerID] = groupIDs;
 	}
 
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		threadLog(_FLA, "p:%u unable to read player groups from database", m_playerID);
 	}

@@ -61,8 +61,6 @@ extern NSString * const PGErrorDomain;
 extern NSString * const PGteulErrorDomain;
 extern NSString * const PGErrorDataKey;
 
-extern bool appHidden;
-
 // PGErrorDomain error code constants
 enum
 {
@@ -333,7 +331,7 @@ static NSString *placeholderHTML = @""
         case 0: { // loaded the static placeholder
             staticLoadState = 1;
             
-            NSURLRequest *playnetHome = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://webmap.wwiionline.com/"]];
+            NSURLRequest *playnetHome = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.wwiionline.com/pgservers.html"]];
 
             ((void (*)(id, SEL, NSURLRequest *))objc_msgSend)(frame, @selector(loadRequest:), playnetHome);
             break;
@@ -356,7 +354,11 @@ extern NSString *WebActionOriginalURLKey;
 - (void)webView:(id)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
         request:(NSURLRequest *)request frame:(id)frame decisionListener:(id)listener
 {
-    if (staticLoadState > 0 && ![request.URL.host isEqualToString:@"webmap.wwiionline.com"]) {
+    if (staticLoadState > 0 &&
+        ![request.URL.host isEqualToString:@"www.wwiionline.com"] &&
+        ![request.URL.host isEqualToString:@"www.battlegroundeurope.com"] &&
+        ![request.URL.host isEqualToString:@"www.battlegroundeurope.net"]
+    ) {
         // Note: The use of a separate variable here is not simply for
         // verbosity; the openURL method of NSWorkspace is marked _Nonnull, and
         // a dictionary returns _Nullable pointers. Thus the check is necessary
@@ -502,6 +504,8 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    dbugInit(LOG_TO_FILE, nullptr);
+
     // Wipe out any storage of insecure user info.
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserName"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserPassword"];
@@ -516,7 +520,6 @@ extern NSString *WebActionOriginalURLKey;
     chAppDir();
     
     fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
-    fiodSetPrepath(PREPATH);
     
     if(!WantDataDir) {
         extern void sysmainAddArchives();
@@ -591,7 +594,7 @@ extern NSString *WebActionOriginalURLKey;
 #else
     // Everyone else gets a build that (for now) locks the user to the 1.35 dev
     // server, which is apparently pretending to be arena 1 (e.g. "live").
-    [arenaMenu.menu addItemWithTitle:@"1.35 Testing" action:nullptr keyEquivalent:@""].tag = 1;
+    [arenaMenu.menu addItemWithTitle:@"1.35 Testing" action:nullptr keyEquivalent:@""].tag = 22;
     [arenaMenu selectItemWithTag:1];
     arenaMenu.enabled = NO;
 #endif
@@ -635,7 +638,6 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)sysmain:(NSTimer*)timer
 {
-    dbugInit(LOG_TO_FILE, nullptr);
     [self closeAllWindows];
 
     try {

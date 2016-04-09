@@ -892,6 +892,7 @@ SuperCellMapView::Renderer::LoadThread::~LoadThread()
 		std::unique_lock<std::mutex> lock(_queueMutex, std::try_to_lock);
 		_doLoad.notify_all();
 	}
+    join();
 	while(GameInProgress && isRunning()) {}
 }
 

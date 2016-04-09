@@ -108,7 +108,7 @@ public:
 								, LSTR_ALLIED_USAGE, LSTR_ALLIED_DETAIL
 								) { }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		if ( player.side() == AXIS )
 		{
@@ -135,7 +135,7 @@ public:
 							, LSTR_AXIS_USAGE, LSTR_AXIS_DETAIL
 							) { }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		if ( player.side() == ALLIED )
 		{
@@ -161,7 +161,7 @@ public:
 								, NO_MASK, LSTR_DELAY_USAGE, LSTR_DELAY_DETAIL
 								, false
 								) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		if ( player.noSide() )
 		{
@@ -189,7 +189,7 @@ public:
 								, false
 								) { }
 
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
 	{
 		if ( player.noSide() )
 		{
@@ -208,7 +208,7 @@ public:
 
 		chatStartFallback(&player, player.originCpID());
 	}
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		if ( player.noSide() )
 		{
@@ -291,9 +291,9 @@ public:
 	}
 
 	// .hc
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN;
+	virtual void action(Player& player, Chat::ClientMessage* message) const override;
 	// .hc <message>
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN;
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override;
 } dotHC;
 
 static void
@@ -392,7 +392,7 @@ public:
 								, NO_MASK, LSTR_HCOFF_USAGE, LSTR_HCOFF_DETAIL
 								) { }
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		player.SetHcOff(true);
 		player.message(LSTR_NOTE, LSTR_HC_OFF, nullptr, nullptr);
@@ -406,7 +406,7 @@ public:
 								, NO_MASK, LSTR_HCON_USAGE, LSTR_HCON_DETAIL
 								) { }
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		player.SetHcOff(false);
 		player.message(LSTR_NOTE, LSTR_HC_ON, nullptr, nullptr);
@@ -422,7 +422,7 @@ public:
 	DotHCList() : DotCommand("hclist", "Short text-list of HC officers"
 								, NO_MASK, LSTR_HCLIST_USAGE, LSTR_HCLIST_DETAIL
 								) { }
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN;
+	virtual void action(Player& player, Chat::ClientMessage* message) const override;
 } dotHCList;
 
 // Player has typed ".hclist"
@@ -454,8 +454,8 @@ public:
 								, false
 								) { }
 
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN;
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN;
+	virtual void action(Player& player, Chat::ClientMessage* message) const override;
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override;
 } dotHold;
 
 void
@@ -504,7 +504,7 @@ public:
 	DotHome() : DotCommand("home", "Display brigade's home"
 								, NO_MASK, LSTR_HOME_USAGE, LSTR_HOME_DETAIL
 							) { }
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		HCUnit* brigade = HCUnit::Lookup(player.brigadeID());
 		if ( !brigade )
@@ -533,7 +533,7 @@ public:
 								, NO_MASK, LSTR_HCMOTD_USAGE, LSTR_HCMOTD_DETAIL
 								) { }
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		WWII_SIDE commandSide = player.effectiveCommandSide();
 		if ( commandSide == ALLIED )
@@ -544,7 +544,7 @@ public:
 			player.message(LSTR_CAUTION, LSTR_NOT_ACTIVE_HC);
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		_setHCMotd(player, arguments);
 	}
@@ -563,7 +563,7 @@ public:
 								, NO_MASK, LSTR_OVERRUN_USAGE, LSTR_OVERRUN_DETAIL
 								) { };
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( player.noSide() )
 		{
@@ -613,7 +613,7 @@ private:
 	std::vector<std::string> m_results;
 
 public:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -636,7 +636,7 @@ public:
 	}
 
 public:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		Player* player = PlayerInterface::Lookup(m_matchHandle);
 		if ( player == nullptr )
@@ -653,7 +653,7 @@ public:
 			player->message(LSTR_NONE, LSTR_GENERIC, m_results[i].c_str());
 		}
 	}
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		Player* player = PlayerInterface::Lookup(m_matchHandle);
 		if ( player == nullptr ) return;
@@ -669,7 +669,7 @@ public:
 											, NO_MASK, LSTR_LASTMOVE_USAGE, LSTR_LASTMOVE_DETAIL
 							) {}
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( _featureLockedM(player, 2) )
 			return;

@@ -7509,7 +7509,7 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 	Write_Debug("InitPos x=%lf, y=%lf, z=%lf", pos.x, pos.y, pos.z);
 
 	auto sync_world_offset =
-	[&] (void) {
+	[&] (bool force_rebuild) {
 		FLOAT64VECTOR world_offset;
 		trnGetWorldOriginOffset(&world_offset);
 
@@ -7519,16 +7519,16 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 		TempPos.z = -(FLOAT32)(pos.z - world_offset.z);
 		trnCheckAndAdjustCameraPositionWithOriginOffset(&TempPos);
 
-		trnUpdateTerrainOriginOffset(FALSE);
+		trnUpdateTerrainOriginOffset(force_rebuild);
 	};
 	// First update is so we can find the spawn.
-	sync_world_offset();
-	trnUpdateTerrainOriginOffset(FALSE); // 2nd call forces terrain to load
+	sync_world_offset(false);
+	trnUpdateTerrainOriginOffset(false); // 2nd call forces terrain to load
 
 	playpos.x = playpos.y = playpos.z = 0.0f;
 
 	trnldrFinishUpdate();         // Terrain system is now configured to handle this
-	trnmainDoRawUpdate(FALSE);
+	trnmainDoRawUpdate(false);
 	trnldrFinishUpdateRelocate(); // Terrain system is now configured to handle this
 
 	if ( ! MobileSpawn && ! SpecialOverride ) {
@@ -7546,7 +7546,9 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 	Write_Debug("AdjPos x=%lf, y=%lf, z=%lf", pos.x, pos.y, pos.z);
 
 	// Now we update with the actual position.
-	sync_world_offset();
+	// HACK: If we don't force the rebuild then vehicles sometimes fall through the ground.
+	// No idea why. This code is just a mess...
+	sync_world_offset(true);
 
 
 	FLOAT64VECTOR world_offset;
@@ -10128,8 +10130,7 @@ LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total)
 
 #ifdef ENABLE_FLOATERS
 
-// more hacked stuff before the rats abandon the ship...
-static FLOAT64	profileFlightVelocity;						// double precision is so 1337!!1
+static FLOAT64	profileFlightVelocity;
 
 void mlSetProfileFlight()
 {
@@ -10142,8 +10143,8 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 #if RELEASE_CLIENT
     switch(OverrideSpawner)
     {
-    case BENCHANTWERP_OVERRIDE:
-    case BENCHRAMAGEN_OVERRIDE:
+        case BENCHANTWERP_OVERRIDE:
+        case BENCHRAMAGEN_OVERRIDE:
         {
             return 0;
         }
@@ -10362,9 +10363,7 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 
 #endif // ENABLE_FLOATERS
 
-#ifdef __MWERKS__
 #pragma mark -
-#endif
 
 // handles the magical mystery rotational co-ordinate conversion
 

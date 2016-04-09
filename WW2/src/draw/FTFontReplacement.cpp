@@ -322,10 +322,6 @@ float FTFontWestern::Advance(const wchar_t* str)
 }
 // ------------------------------------------------------------------
 
-#if platOS == OS_MACOS
-extern pthread_t mainthread;
-#endif
-
 #define ALT_DRAW_TEXT
 
 typedef struct FLPoint { float x,y; } FLPoint;
@@ -396,12 +392,6 @@ void FTFontWestern::RenderText( const T* str, int len )
 //    GLCounter::instance().call_glDrawArrays( GL_QUADS, 0, vertexes.size()/2 );
 
 
-#if platOS == OS_MACOS
-    if ( mainthread && ! pthread_equal( pthread_self(), mainthread ) )
-    {
-        printf("drawing text not on main thread\n");
-    }
-#endif
     glDrawArrays( GL_TRIANGLES, 0, tris*6 );
 
 #else

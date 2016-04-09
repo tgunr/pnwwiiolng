@@ -960,7 +960,7 @@ bool authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* fil
 {
 	assert(buffer != nullptr && bufLen > 1);
 
-	char myFilename[MAXPATHLEN*2+1];
+	char myFilename[PATH_MAX*2+1];
 	mysql_escape_string(myFilename, filename, strlen(filename));
 
 	try

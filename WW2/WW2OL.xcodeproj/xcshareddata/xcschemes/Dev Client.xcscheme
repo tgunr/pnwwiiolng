@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8D0C4E890486CD37000505A6"
-               BuildableName = "World War II Online.app"
+               BuildableName = "World War II Online Beta.app"
                BlueprintName = "WW2OL"
                ReferencedContainer = "container:WW2OL.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8D0C4E890486CD37000505A6"
-            BuildableName = "World War II Online.app"
+            BuildableName = "World War II Online Beta.app"
             BlueprintName = "WW2OL"
             ReferencedContainer = "container:WW2OL.xcodeproj">
          </BuildableReference>
@@ -49,6 +49,7 @@
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
+      enableAddressSanitizer = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
       <BuildableProductRunnable
@@ -56,7 +57,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8D0C4E890486CD37000505A6"
-            BuildableName = "World War II Online.app"
+            BuildableName = "World War II Online Beta.app"
             BlueprintName = "WW2OL"
             ReferencedContainer = "container:WW2OL.xcodeproj">
          </BuildableReference>
@@ -85,7 +86,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8D0C4E890486CD37000505A6"
-            BuildableName = "World War II Online.app"
+            BuildableName = "World War II Online Beta.app"
             BlueprintName = "WW2OL"
             ReferencedContainer = "container:WW2OL.xcodeproj">
          </BuildableReference>

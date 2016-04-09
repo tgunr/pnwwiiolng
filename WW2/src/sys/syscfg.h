@@ -125,6 +125,7 @@ typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #include "include/precompile_includes.h"
 #include <deque>
+#include "wwii/wwiiString.h"
 
 #include "math/mathvect.h"
 #include "math/math3d.h"

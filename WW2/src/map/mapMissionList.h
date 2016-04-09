@@ -104,9 +104,9 @@ enum ML_RESULT
 class MissionList
 {
 public:
-	MissionList() : m_status(MLR_ERROR), m_listStart(true), m_listEnd(true), m_count(0) { };
+	MissionList() : m_status(MLR_ERROR), m_listStart(true), m_listEnd(true), m_count(0) { }
 	MissionList(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
-	~MissionList() { };
+	~MissionList() { }
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
