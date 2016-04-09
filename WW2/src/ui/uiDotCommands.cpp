@@ -7041,12 +7041,8 @@ static SINT32 dot_time(const char* line)
 	// Grab the formatted "ctime" and remove the trailing eol
 	time_t now = time(nullptr);
 	wchar_t myTime[31];
-#if platOS == OS_WIN32
-	wcsftime(myTime, 30, L"%a %b %d %X %Y", localtime_r(&now, nullptr));
-#else
-  struct tm tmStruct;
+	struct tm tmStruct;
 	wcsftime(myTime, 30, L"%a %b %d %X %Y", localtime_r(&now, &tmStruct));
-#endif
 	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_NOTE, LSTR_LOCAL_TIME, myTime);
 
 	return DC_PASS_TO_HOST;
