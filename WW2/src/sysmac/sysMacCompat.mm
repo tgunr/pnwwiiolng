@@ -36,6 +36,13 @@ void chAppDir()
     }
 }
 
+const char *GetOSVersionString()
+{
+    /* get gadget to write some nifty thing to return version identifiers as far back as we are willing to support */
+    
+    return "OS X Version 10.X.X";
+}
+
 const char* macPreferencesPath()
 {
     static NSURL *prefsDir = nil;

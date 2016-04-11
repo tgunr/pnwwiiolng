@@ -689,6 +689,44 @@ public:
 } dotOrders;
 
 //////////////////////////////////////////////////////////////////////
+// Player bug submission
+//////////////////////////////////////////////////////////////////////
+
+//! @internal
+class DotBug : public DotCommand
+{
+public:
+        DotBug() : DotCommand("bug", "Submit a bug/problem/feedback report"
+                                                                , NO_MASK, LSTR_BUG_USAGE, LSTR_BUG_DETAIL
+                                                                ) { }
+        virtual void actionWith(Player& player, Chat::ClientMessage* message, SCHAR* arguments) const  override
+        {
+                SCHAR info[MAX_MESSAGE_LENGTH + 1];
+
+		info[0] = 0;
+                strcat(info, "[");
+                player.whereabouts(info+1, player.lastX(), player.lastY());
+                strcat(info, "]");
+
+                dbugLog(_FLI, "!BUG:%s:.%s:%s %s", player.callsign(), command(), arguments, info);
+                chatdbRecordEvent("BUG", player.callsign(), command(), arguments, info);
+
+                std::string reply(arguments);
+                reply += " ";
+                reply += info;
+
+                Chat::LocalizedMessage lmsg(LSTR_BUG, LSTR_REPORTING, player.callsign(), reply.c_str());
+                const char* ircMessage = chatLString(lmsg);
+                wwiiIRCChannelMessage("-sys", ircMessage);
+                chatBroadcastLocMessage(commandList.begin(), commandList.end(), lmsg, [] (wwiiPlayer* const& subject) { return subject->isEffectiveGM(); });
+
+                player.message(LSTR_NOTE, LSTR_REPORTED, nullptr, nullptr);
+
+                return;
+        }
+} dotBug;
+
+//////////////////////////////////////////////////////////////////////
 // Player report submission
 //////////////////////////////////////////////////////////////////////
 
@@ -696,7 +734,7 @@ public:
 class DotReport : public DotCommand
 {
 public:
-	DotReport() : DotCommand("report", "Submit a bug/problem/feedback report"
+	DotReport() : DotCommand("report", "Report suspiscious player activity"
 								, NO_MASK, LSTR_REPORT_USAGE, LSTR_REPORT_DETAIL
 								) { }
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, SCHAR* arguments) const  override
