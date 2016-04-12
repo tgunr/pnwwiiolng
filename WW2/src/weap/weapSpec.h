@@ -22,7 +22,15 @@ struct WEAPON_SPEC
 {
 	WEAPON_SPEC() : wType(0), wClass(0), wCategory(0), wCountry(0) {}
 	WEAPON_SPEC(const UINT16& rhs) { *(UINT16*)this = rhs; }
-	WEAPON_SPEC(const WEAPON_SPEC& rhs) : wType(rhs.wType), wClass(rhs.wClass), wCategory(rhs.wCategory), wCountry(rhs.wCountry) {}
+  WEAPON_SPEC(const UINT32& rhs) {
+    wType = rhs & 0x000000FF;
+    UINT32 data = rhs >> 8;
+    wClass = data & 0x0000FF;
+    data = data >> 8;
+    wCategory = data & 0x00FF;
+    wCountry = data >> 8;
+  }
+  WEAPON_SPEC(const WEAPON_SPEC& rhs) : wType(rhs.wType), wClass(rhs.wClass), wCategory(rhs.wCategory), wCountry(rhs.wCountry) {}
     WEAPON_SPEC& operator=(WEAPON_SPEC rhs) {
         wType = rhs.wType;
         wClass = rhs.wClass;
