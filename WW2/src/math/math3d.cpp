@@ -624,7 +624,7 @@ INLINE void math3dInvertMatrixComplete(piMATRIX& inverse, const piMATRIX& matrix
 /*
  * lpd = 1 / lpa
  */
-INLINE piMATRIX* math3dInvertMatrix(piMATRIX* lpd, const piMATRIX* lpa)
+INLINE piMATRIX* math3dInvertMatrix(piMATRIX* lpd, piMATRIX* lpa)
 {
 piMATRIX	d;
 

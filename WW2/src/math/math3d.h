@@ -178,7 +178,7 @@
 	/*
 	* lpd = 1 / lpa
 	*/
-	extern piMATRIX* math3dInvertMatrix(piMATRIX* lpd, const piMATRIX* lpa);
+	extern piMATRIX* math3dInvertMatrix(piMATRIX* lpd, piMATRIX* lpa);
 
 	/*
 	 * -1 lpa = lpa
