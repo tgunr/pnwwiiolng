@@ -676,7 +676,7 @@ _errException(const WWII_ERROR_INFO& info, const Player& player, const UINT32 pl
 					, info.clientTime, info.hostTime, /* NOW(), */ info.archiveWasCorrupt
 					, info.data.exceptInfo.exceptionCode, info.data.exceptInfo.exceptionAddr
 					, stackinfo.c_str(), info.data.exceptInfo.infoText
-					, info.clientSourceRevision
+					, info.clientSourceCommit
 		);
 	}
 	catch ( std::exception& e )

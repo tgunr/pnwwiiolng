@@ -221,11 +221,11 @@ wwiiQueuedSend_WWII_ERROR_INFO(WWII_ERROR_INFO* info)
 		archiveWasCorrupt = 1;
 
 	errInfo->eventID = eventID++;
-	if(!errInfo->clientVersion) errInfo->clientVersion = _strVerToHex(STRVER);
-	if(!errInfo->clientTime)  	errInfo->clientTime = teulTime();
-	if(!errInfo->hostTime) 		errInfo->hostTime = errInfo->clientTime - lastClientTime + lastHostTime;
-	if(!errInfo->hostIP) 		errInfo->hostIP = lastHostIP;
-	if(!errInfo->clientSourceRevision)	errInfo->clientSourceRevision = WWII::svnRevisionNo;
+	if ( ! errInfo->clientVersion )     errInfo->clientVersion      = _strVerToHex(STRVER);
+	if ( ! errInfo->clientTime )        errInfo->clientTime         = teulTime();
+	if ( ! errInfo->hostTime )          errInfo->hostTime           = errInfo->clientTime - lastClientTime + lastHostTime;
+	if ( ! errInfo->hostIP )            errInfo->hostIP             = lastHostIP;
+	if ( ! errInfo->clientSourceCommit) errInfo->clientSourceCommit = WWII::gitCommitNo;
 
 	return 0;
 }

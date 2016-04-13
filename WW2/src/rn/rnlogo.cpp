@@ -99,11 +99,10 @@ LOGICAL rnlogoInit(void)
     {
         std::string str = STRVER;
 
-		// For debug and beta releases, append the SVN revision number,
-		// so we can tell what code someone is testing with. Whee!
+		// For debug and beta releases, append the commit info.
 #if defined(DEBUG_WW2) || defined(BETA_RELEASE)
-		str += "r";
-		str += WWII::svnRevisionStr;
+		str += " : ";
+		str += WWII::gitCommitStr;
 #endif
 
 #if(0)

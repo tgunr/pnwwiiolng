@@ -108,7 +108,7 @@ static inline SINT32 wwiiPackERROR_INFO(LOGICAL mode, UCHAR* data, SINT32 offset
 			break;
 	}
 
-	offset = teulPackUINT32(mode, data, offset, &object->clientSourceRevision, 0);
+	offset = teulPackUINT32(mode, data, offset, &object->clientSourceCommit, 0);
 
 	return offset;
 }
