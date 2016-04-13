@@ -431,10 +431,10 @@ void GameInfoView::DisplayInfo()
 	trnTODGetTimeOfDay(&TOD);
 	Hour = trnTODGetHourFromTimeOfDay(TOD);
 	Min = trnTODGetMinuteFromTimeOfDay(TOD);
-#if !defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0
-	DrawString(L"%ls: %.0f rev %u\n", strings["hud.gameinfo.fps"].c_str(), gFPS, WWII::svnRevisionNo);
-#else
-	DrawString(L"%ls: %.0f\n", strings["hud.gameinfo.fps"].c_str(), gFPS);
+
+	DrawString(L"%ls: %.0f commit %s\n", strings["hud.gameinfo.fps"].c_str(), gFPS, WWII::gitCommitStr);
+#if defined(RELEASE_CLIENT) && RELEASE_CLIENT != 0
+	DrawString(L"%ls: %.0f commit %s\n", strings["hud.gameinfo.fps"].c_str(), gFPS);
 	DrawString(L"%ls: %02d:%02d\n", strings["hud.gameinfo.time"].c_str(), Hour, Min);
 
 	if(persIsPersonaVehicleType(VEH_TYPE_FLOATER))

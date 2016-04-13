@@ -203,7 +203,7 @@ jsGame::jsGame() : phui::js::Object(&jsclass, nullptr, nullptr,jsfunctions,jspro
 	getBuildInfo(hostversion);
 	DefineProperty("version", phui::js::ConstString(STRVER));
 	DefineProperty("buildinfo", phui::js::NewString(hostversion.c_str()));
-	DefineProperty("revision", phui::js::NewString(WWII::svnRevisionStr));
+	DefineProperty("revision", phui::js::NewString(WWII::gitCommitStr));
 	cps = new phui::js::Array;
 	keymaps = new phui::js::Array;
 	spawnablevehicles = new phui::js::Array;
