@@ -2675,7 +2675,7 @@ bool Client::SelectBrigade(UINT32 brigadeID, bool save, bool force)
 			if(current->m_brigadeID > 0)
 			{
 				BrigadeControlRequest req;
-				req.requestList(PlayerClient()->ChatConnection(), 0, 0); // lets get a new list of OIC's
+				req.requestList(PlayerClient()->ChatConnection(), current->m_countryID, current->m_branchID); // lets get a new list of OIC's
 			}
 
 			return true;
