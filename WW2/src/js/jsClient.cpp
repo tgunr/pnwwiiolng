@@ -3542,12 +3542,8 @@ JSBool jsSquad::GetProperty(JSContext* ctx, int propid, jsval* val)
 			time_t stamp(squad.created());
 
 			char created[31];
-#if platOS == OS_WIN32
-			strftime(created, 30, "%a %b %d %X %Y", localtime_r(&stamp, nullptr));
-#else
-      struct tm tmStruct;
+			struct tm tmStruct;
 			strftime(created, 30, "%a %b %d %X %Y", localtime_r(&stamp, &tmStruct));
-#endif
 			*val = phui::js::NewString(created);
 		}
 		break;

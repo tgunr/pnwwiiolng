@@ -43,8 +43,6 @@ class Vec3d
             _v[2] = v.z;
         }
 
-		Vec3d(const struct INT32VECTOR& v) : Vec3d((FLOAT64VECTOR)v) {}
-
         inline Vec3d(const Vec3f& vec) { _v[0]=vec._v[0]; _v[1]=vec._v[1]; _v[2]=vec._v[2];}
 
         inline operator Vec3f() const { return Vec3f(static_cast<float>(_v[0]),static_cast<float>(_v[1]),static_cast<float>(_v[2]));}

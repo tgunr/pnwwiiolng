@@ -18,7 +18,7 @@
 #include "..\VersionNo.h"
 #include "client_revision.h"
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION PN_WW2_VERSION_NO,PN_WW2_PATCH_NO,PN_WW2_BUILD_NO,SVN_REVISION_NO
+ FILEVERSION PN_WW2_VERSION_NO,PN_WW2_PATCH_NO,PN_WW2_BUILD_NO,GIT_COMMIT_NO
  PRODUCTVERSION PRODUCTVER
  FILEFLAGSMASK VS_FF_DEBUG | VS_FF_PRERELEASE
 #ifdef _DEBUG
@@ -41,7 +41,7 @@ BEGIN
             VALUE "Comments", "Massively Multiplayer Online Game\0"
             VALUE "CompanyName", "Playnet, Inc.\0"
             VALUE "FileDescription", "WW2\0"
-			VALUE "FileVersion", STRFILEVER ":" SVN_REVISION_STR "\0"
+			VALUE "FileVersion", STRFILEVER ":" GIT_COMMIT_STR "\0"
             VALUE "InternalName", "WW2\0"
             VALUE "LegalCopyright", "Copyright © 2000-2011\0"
             VALUE "LegalTrademarks", "\0"

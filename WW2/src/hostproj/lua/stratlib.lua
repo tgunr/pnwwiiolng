@@ -202,8 +202,10 @@ function countsAsEngagement(target)
 
 	-- If the town has at least one friendly link with a brigade present,
 	-- it's a "No Man's Land" AO.
-	for i = 0 , target.numLinks do
-		link = target:link(i)
+  local i = 0
+  while i < target.numLinks do
+		link = target:link(i) 
+    i = i + 1
 		cp = link.endDepot.cp
 		if target.side == cp.side then
 			if cp:numUnits() > 0 then

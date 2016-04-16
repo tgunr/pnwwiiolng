@@ -44,7 +44,10 @@
 #include "trn/speedgrass.h"
 #include "trn/trnRadClutter.h"
 #include "sdm/StratDB.h"
+
+#define GLOBALS
 #include "trn/trnvars.h"
+#undef GLOBALS
 
 #ifdef SPATIAL_DB
 #include "SpatialDB.h"
@@ -63,28 +66,6 @@
 #endif
 
 #include "wwii/wwiiCovert.h"
-
-/***********
-START VARS
-***********/
-LOGICAL           TerrainLightingUpdate, TerrainStable;
-LOGICAL           loading;
-SINT8             mapname[64];
-SINT32            deftexid, trnlod;
-FLOAT32           xstep, ystep, xmult, horizon;
-TERRAIN_DETAIL    trndtl[NUM_TERRAIN_RECTANGLES];
-INT32VECTOR       WorldOriginOffset; // the current offset from the absolute origin
-DEMHDR            hdr;
-TRN_OBJECT_NOTIFY creation;
-TRN_OBJECT_NOTIFY deletion;
-LOGICAL activeTerrainDetail[NUM_TERRAIN_RECTANGLES] = { FALSE, FALSE, FALSE, FALSE, FALSE,
-                                                        FALSE,  TRUE,  TRUE,  TRUE, FALSE,
-                                                        FALSE,  TRUE,  TRUE,  TRUE, FALSE,
-                                                        FALSE,  TRUE,  TRUE,  TRUE, FALSE,
-                                                        FALSE, FALSE, FALSE, FALSE, FALSE };
-/***********
-END VARS
-***********/
 
 static Covert<LOGICAL> g_trnmainDraw = TRUE;
 static Covert<LOGICAL> g_drawOctetTriangles = FALSE;
@@ -924,14 +905,14 @@ TERRAIN_DETAIL*	td;
 		}
 
 		nt = lpobj->numtris - tri - NUM_TRIANGLES_PER_OCTET;
-		memmove(&lpobj->psnorig[tri],	&lpobj->psnorig[tri + NUM_TRIANGLES_PER_OCTET],			nt * sizeof(piVECTOR));
-		memmove(&lpobj->psnorms[tri],	&lpobj->psnorms[tri + NUM_TRIANGLES_PER_OCTET],			nt * sizeof(piVECTOR));
-		memmove(&lpobj->pscdon[tri * 3],	&lpobj->pscdon[tri * 3 + 3 * NUM_TRIANGLES_PER_OCTET],	nt * 3 * sizeof(piVECTOR));
-		memmove(&lpobj->pscdn[tri * 3],	&lpobj->pscdn[tri * 3 + 3 * NUM_TRIANGLES_PER_OCTET],	nt * 3 * sizeof(piVECTOR));
+		memcpy(&lpobj->psnorig[tri],	&lpobj->psnorig[tri + NUM_TRIANGLES_PER_OCTET],			nt * sizeof(piVECTOR));
+		memcpy(&lpobj->psnorms[tri],	&lpobj->psnorms[tri + NUM_TRIANGLES_PER_OCTET],			nt * sizeof(piVECTOR));
+		memcpy(&lpobj->pscdon[tri * 3],	&lpobj->pscdon[tri * 3 + 3 * NUM_TRIANGLES_PER_OCTET],	nt * 3 * sizeof(piVECTOR));
+		memcpy(&lpobj->pscdn[tri * 3],	&lpobj->pscdn[tri * 3 + 3 * NUM_TRIANGLES_PER_OCTET],	nt * 3 * sizeof(piVECTOR));
 
 		nv = lpobj->numverts - ofs - NUM_VERTICES_PER_OCTET;
 
-		memmove(&lpobj->puverts[ofs],	&lpobj->puverts[ofs + NUM_VERTICES_PER_OCTET],	nv * sizeof(piUNIFIED_VERTEX));
+		memcpy(&lpobj->puverts[ofs],	&lpobj->puverts[ofs + NUM_VERTICES_PER_OCTET],	nv * sizeof(piUNIFIED_VERTEX));
 		lpobj->SyncMutableData();
 	}
 	else
@@ -3679,29 +3660,45 @@ LOGICAL trnGetWorldOriginOffset(FLOAT64VECTOR* retWorldOriginOffset)
 // and if it is, adjust it (and the world) so that it is no longer too far
 //
 // returns a TRUE if an adjustment happened, otherwise a FALSE
-LOGICAL trnCheckAndAdjustCameraPositionWithOriginOffset(piVECTOR* pos) {
-	_CameraAdjustment = { 0.0f, 0.0f, 0.0f };
+LOGICAL trnCheckAndAdjustCameraPositionWithOriginOffset(piVECTOR * CameraPos)
+{
+LOGICAL		RetVal;
+LOGICAL		PositionOk;
+piVECTOR	CameraAdjustment;
 
-	if ( fabs(pos->x) > MAX_CAMERA_OFFSET )
-		_CameraAdjustment.x = pos->x;
-	if ( fabs(pos->y) > MAX_CAMERA_OFFSET )
-		_CameraAdjustment.y = pos->y;
+	CameraAdjustment.x = CameraAdjustment.y = CameraAdjustment.z = 0;
 
-	if ( _CameraAdjustment.x != 0.0f || _CameraAdjustment.y != 0.0f ) {
-		_TerrainMoved = true ;
-		return true;
+	PositionOk = TRUE;
+
+	if (fabs(CameraPos->x) > MAX_CAMERA_OFFSET)
+	{
+		CameraAdjustment.x = CameraPos->x;
+		PositionOk = FALSE;
 	}
 
-	return false;
+	if (fabs(CameraPos->y) > MAX_CAMERA_OFFSET)
+	{
+		CameraAdjustment.y = CameraPos->y;
+		PositionOk = FALSE;
+	}
+
+	RetVal = FALSE;
+	if (PositionOk == FALSE)
+	{
+		RetVal = TRUE;
+
+		_TerrainMoved = TRUE;
+
+		_CameraAdjustment = CameraAdjustment;
+	}
+
+	return RetVal;
 }
 
 UINT32 trnUpdateTerrainOriginOffset(LOGICAL force)
 {
 	if (_TerrainMoved || force)
 	{
-		Write_Debug("Moving world offset: [%d:%d] + [%lf:%lf]",
-		            WorldOriginOffset.x, WorldOriginOffset.y,
-		            _CameraAdjustment.x, _CameraAdjustment.y);
 
 		mathSubVectors(&WorldOriginOffset,&WorldOriginOffset,&_CameraAdjustment);
 
@@ -3712,8 +3709,6 @@ UINT32 trnUpdateTerrainOriginOffset(LOGICAL force)
 		// now adjust the terrain
 		trnmainAdjustTerrainSections(&_CameraAdjustment);
 		trncdAdjustTerrainObjects(&_CameraAdjustment);
-
-		_CameraAdjustment.x = _CameraAdjustment.y = _CameraAdjustment.z = 0.0f;
 
 		_TerrainMoved = FALSE;
 

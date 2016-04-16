@@ -37,7 +37,7 @@
 # endif
 #elif defined(DEBUG_BUILD) || defined(PUBLIC_RELEASE)
 # ifndef APP_ID
-#  define APP_ID 1
+#  define APP_ID 12
 # endif
 #else
 # error "No build type defined"

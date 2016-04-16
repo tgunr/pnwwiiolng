@@ -29,8 +29,8 @@
 #include "chat/chatRecruiterList.h"
 #include "chat/chatMissionInviteMsg.h"
 
-const UINT32 WWII::svnRevisionNo = SVN_REVISION_NO;
-const char* const WWII::svnRevisionStr = SVN_REVISION_STR;
+const unsigned int WWII::gitCommitNo = GIT_COMMIT_NO;
+const char* const WWII::gitCommitStr = GIT_COMMIT_STR;
 
 namespace Chat
 {

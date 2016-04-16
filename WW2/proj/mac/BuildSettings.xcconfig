@@ -13,7 +13,7 @@
 #include "Defines.xcconfig"
 
 // Grab code signing configuration
-//#include "CodeSigning.xcconfig"
+#include "CodeSigning.xcconfig"
 
 // Grab various search paths
 #include "SearchPaths.xcconfig"

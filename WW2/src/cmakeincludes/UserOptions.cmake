@@ -74,5 +74,6 @@ ENDIF ()
 
 # Control which game APP_ID the executables will target.
 SET ( PN_BETA_APPID "12" CACHE STRING "Beta AppID" )
-SET ( PN_RELEASE_APPID "1" CACHE STRING "Release AppID" )
+SET ( PN_RELEASE_APPID "12" CACHE STRING "Release AppID" )
+#SET ( PN_RELEASE_APPID "1" CACHE STRING "Release AppID" )
 SET ( PN_APP_ID "${PN_BETA_APPID}" CACHE STRING "AppID for this build (${PN_BETA_APPID}=Beta, ${PN_RELEASE_APPID}=Release)" )
