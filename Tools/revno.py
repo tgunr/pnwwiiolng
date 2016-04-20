@@ -18,7 +18,8 @@ def output_from_command(cmd):
 	""" Return the standard output from a command as a string. """
 	try:
 		import subprocess
-		import sys;
+		import sys
+
 		result = str(subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).communicate()[0], sys.stdout.encoding).strip('\n')
 		return result
 	except:
