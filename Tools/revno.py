@@ -20,9 +20,7 @@ def output_from_command(cmd):
 		import subprocess
 		import sys
 
-		result = str(subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).communicate()[0]).strip('\n')
-#	NOTE: Python on Mac not supporting second paramter of str()
-#		result = str(subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).communicate()[0], sys.stdout.encoding).strip('\n')
+		result = str(subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).communicate()[0], sys.stdout.encoding).strip('\n')
 		return result
 	except:
 		raise Exception("Error occurred trying to run: "+cmd)
