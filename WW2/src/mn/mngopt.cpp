@@ -25,6 +25,7 @@ struct GVAR
 	const char* const	key;
 	key_TYPE			ktype;
     union {
+        void *basicValue;
         LOGICAL *logicalValue;
         int *intValue;
         unsigned int *uintValue;
@@ -32,25 +33,23 @@ struct GVAR
         unsigned long *dwordValue;
         float *floatValue;
         double *doubleValue;
-        struct {
-            char *stringValue;
-            size_t maxLength;
-        };
+        char *stringValue;
     } valuePtr;
+    size_t maxLength;
 };
 
 template <typename T, size_t N>
 static constexpr size_t sizeof_a(T (&)[N]) { return N; }
 
-#define NULL_KEY_DEF(cmd, var) { cmd, ENULL, { .logicalValue = &var } } 
-#define LOGICAL_KEY_DEF(cmd, var) { cmd, ELOGICAL, { .logicalValue = &var } }
-#define INT_KEY_DEF(cmd, var) { cmd, EINT, { .intValue = &var } }
-#define UINT_KEY_DEF(cmd, var) { cmd, EUINT, { .uintValue = &var } }
-#define LONG_KEY_DEF(cmd, var) { cmd, ELONG, { .longValue = &var } }
-#define DWORD_KEY_DEF(cmd, var) { cmd, EDWORD, { .dwordValue = &var } }
-#define FLOAT_KEY_DEF(cmd, var) { cmd, EFLOAT, { .floatValue = &var } }
-#define DOUBLE_KEY_DEF(cmd, var) { cmd, EDOUBLE, { .doubleValue = &var } }
-#define STRING_KEY_DEF(cmd, var) { cmd, ESTRING, { .stringValue = reinterpret_cast<char *>(&var[0]), .maxLength = sizeof_a(var) } }
+#define NULL_KEY_DEF(cmd, var) { cmd, ENULL, { &var }, 0 }
+#define LOGICAL_KEY_DEF(cmd, var) { cmd, ELOGICAL, { &var }, 0 }
+#define INT_KEY_DEF(cmd, var) { cmd, EINT, { &var }, 0 }
+#define UINT_KEY_DEF(cmd, var) { cmd, EUINT, { &var }, 0 }
+#define LONG_KEY_DEF(cmd, var) { cmd, ELONG, { &var }, 0 }
+#define DWORD_KEY_DEF(cmd, var) { cmd, EDWORD, { &var }, 0 }
+#define FLOAT_KEY_DEF(cmd, var) { cmd, EFLOAT, { &var }, 0 }
+#define DOUBLE_KEY_DEF(cmd, var) { cmd, EDOUBLE, { &var }, 0 }
+#define STRING_KEY_DEF(cmd, var) { cmd, ESTRING, { reinterpret_cast<char *>(&var[0]) }, sizeof_a(var) }
 
 //  lowercase ONLY!
 static GVAR vars[] = {
@@ -60,9 +59,9 @@ static GVAR vars[] = {
     INT_KEY_DEF("bpp", WantedBpp),
     INT_KEY_DEF("alpha", WantedAlpha),
     LOGICAL_KEY_DEF("hdw", WantedHdw),
-    { "stencil", ELOGICAL, { .intValue = &WantedStencil } }, // HACK
+    { "stencil", ELOGICAL, { .intValue = &WantedStencil }, 0 }, // HACK
     LOGICAL_KEY_DEF("window", WantedWindow),
-    { "staccato", ELOGICAL, { .intValue = &UseStaccato } }, // HACK
+    { "staccato", ELOGICAL, { .intValue = &UseStaccato }, 0 }, // HACK
     STRING_KEY_DEF("ticket", TicketFile),
     STRING_KEY_DEF("bypass", BypassString),
     STRING_KEY_DEF("serverip", GameServerIP),
@@ -90,7 +89,7 @@ static GVAR vars[] = {
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
     STRING_KEY_DEF("datadir", DataPath),
-    { nullptr, ENULL, { .logicalValue = nullptr } },
+    { nullptr, ENULL, { .logicalValue = nullptr }, 0 },
 };
 
 static char* _skipFilename(const char* ptr)
@@ -220,7 +219,7 @@ LOGICAL mngoptParse(char* InputLine)
                 *(foundCmd->valuePtr.doubleValue) = strtod(value.c_str(), nullptr);
                 break;
             case ESTRING:
-                strlcpy(foundCmd->valuePtr.stringValue, value.c_str(), foundCmd->valuePtr.maxLength);
+                strlcpy(foundCmd->valuePtr.stringValue, value.c_str(), foundCmd->maxLength);
                 break;
         }
     }
