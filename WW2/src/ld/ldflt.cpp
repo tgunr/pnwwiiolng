@@ -2439,7 +2439,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	if (ptr != nullptr)
 	{
 		ptr += 1;
-		strcpy(filename, ptr);
+        strlcpy(filename, std::string{ ptr }.c_str(), sizeof(filename)); // Cheat by using C++ to copy the string into a temporary
 	}
 
 	// Need s_conversionFile to compare group.id and filename in ReadGroup
