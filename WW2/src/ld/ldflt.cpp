@@ -336,7 +336,12 @@ static UINT32 CreateColor(int colorindex)
 
 	UINT32		rgba, alpha;
 	colorstruct	color;
-	color.full = s_colortable[colorindex].full;
+    if (colorindex >= 0 && colorindex < s_colortable.size()) {
+        color.full = s_colortable[colorindex].full;
+    } else {
+        dbugLog(_FLN, "Invalid face color index %d in FLT file, using black", colorindex);
+        color.rgb = { 0, 0, 0, 0 };
+    }
 	if (s_face->matindex >= 0)
 	{
 		alpha = (UCHAR)(material[s_face->matindex].alpha * 255.0f);
@@ -2434,7 +2439,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	if (ptr != nullptr)
 	{
 		ptr += 1;
-		strcpy(filename, ptr);
+        strlcpy(filename, std::string{ ptr }.c_str(), sizeof(filename)); // Cheat by using C++ to copy the string into a temporary
 	}
 
 	// Need s_conversionFile to compare group.id and filename in ReadGroup

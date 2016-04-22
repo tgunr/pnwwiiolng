@@ -6,9 +6,6 @@
 #include "include/vars.h"
 #include "mn/mngopt.h"
 
-// Used to build fully-qualified domain names, primarily auth.
-char RegionSuffix[512] = ".playnet.com";
-
 enum key_TYPE
 {
 	ENULL,
@@ -23,91 +20,77 @@ enum key_TYPE
 
 };
 
-struct KEY
+struct GVAR
 {
 	const char* const	key;
 	key_TYPE			ktype;
-
+    union {
+        void *basicValue;
+        LOGICAL *logicalValue;
+        int *intValue;
+        unsigned int *uintValue;
+        long *longValue;
+        unsigned long *dwordValue;
+        float *floatValue;
+        double *doubleValue;
+        char *stringValue;
+    } valuePtr;
+    size_t maxLength;
 };
 
-//  lowercase ONLY!
-static KEY	vars[]={{"help", ENULL},
-                    {"width", EINT},
-                    {"height", EINT},
-                    {"bpp", EINT},
-                    {"alpha", EINT},
-                    {"hdw", ELOGICAL},
-                    {"stencil", ELOGICAL},
-                    {"window", ELOGICAL},
-					{"staccato", ELOGICAL},
-					{"ticket", ESTRING},
-					{"bypass", ESTRING},
-					{"serverip", ESTRING},
-					{"serverport", ESTRING},
-					{"serverotp", ESTRING},
-					{"apid", ESTRING},
-					{"serverprotocol", ESTRING},
-					{"log", ELOGICAL},
-                    {"side", EINT},
-                    {"data", ELOGICAL},
-                   	{"nowor", ENULL},
-                   	{"noinf", ENULL},
-                    {"build", ENULL},
-                    {"logcomm", ENULL},
-                    {"logfps", ENULL},
-                    {"logweap", ENULL},
-                   	{"screen", ESTRING},
-                   	{"nospawn", ENULL},
-                    {"console", ENULL},
-					{"region", ESTRING},
-					{"ragdolls", ELOGICAL},
-                    {"buildterrain", ENULL},
-                    {"o", ESTRING},
-                    {"altfont", ENULL},
-                    {"authserver", ESTRING},
-                    {"arena", ESTRING},
-                    {"clientv", ESTRING},
-                    {"datadir", ESTRING},
-					{nullptr, ENULL}};
+template <typename T, size_t N>
+static constexpr size_t sizeof_a(T (&)[N]) { return N; }
 
-static void* const pvars[]={&WantedHelp,
-					&WantedWidth,
-					&WantedHeight,
-					&WantedBpp,
-					&WantedAlpha,
-					&WantedHdw,
-					&WantedStencil,
-					&WantedWindow,
-					&UseStaccato,
-					&TicketFile,
-					&BypassString,
-					&GameServerIP,
-					&GameServerPort,
-					&GameServerOTP,
-					&ServerApID,
-					&ServerProtocol,
-					&WantedUserLogEnabled,
-                    &WantedSide,
-                    &WantDataDir,
-                    &NoBlitzWorPreload,
-                    &NoInfPreload,
-                    &g_bBuildMDLS,
-					&g_log_comm,
-					&g_log_fps,
-					&g_log_weap,
-					&WantedVideoCard,
-					&OverrideSpawner,
-					&OpenConsole,
-					&RegionSuffix,
-					&gRagdolls,
-					&g_buildTerrain,
-                    &HackID,
-                    &AltFont,
-                    &gAuthServer,
-                    &gArena,
-                    &gClientV,
-                    &DataPath,
-					nullptr};
+#define NULL_KEY_DEF(cmd, var) { cmd, ENULL, { &var }, 0 }
+#define LOGICAL_KEY_DEF(cmd, var) { cmd, ELOGICAL, { &var }, 0 }
+#define INT_KEY_DEF(cmd, var) { cmd, EINT, { &var }, 0 }
+#define UINT_KEY_DEF(cmd, var) { cmd, EUINT, { &var }, 0 }
+#define LONG_KEY_DEF(cmd, var) { cmd, ELONG, { &var }, 0 }
+#define DWORD_KEY_DEF(cmd, var) { cmd, EDWORD, { &var }, 0 }
+#define FLOAT_KEY_DEF(cmd, var) { cmd, EFLOAT, { &var }, 0 }
+#define DOUBLE_KEY_DEF(cmd, var) { cmd, EDOUBLE, { &var }, 0 }
+#define STRING_KEY_DEF(cmd, var) { cmd, ESTRING, { reinterpret_cast<char *>(&var[0]) }, sizeof_a(var) }
+
+//  lowercase ONLY!
+static GVAR vars[] = {
+    NULL_KEY_DEF("help", WantedHelp),
+    INT_KEY_DEF("width", WantedWidth),
+    INT_KEY_DEF("height", WantedHeight),
+    INT_KEY_DEF("bpp", WantedBpp),
+    INT_KEY_DEF("alpha", WantedAlpha),
+    LOGICAL_KEY_DEF("hdw", WantedHdw),
+    { "stencil", ELOGICAL, { &WantedStencil }, 0 }, // HACK
+    LOGICAL_KEY_DEF("window", WantedWindow),
+    { "staccato", ELOGICAL, { &UseStaccato }, 0 }, // HACK
+    STRING_KEY_DEF("ticket", TicketFile),
+    STRING_KEY_DEF("bypass", BypassString),
+    STRING_KEY_DEF("serverip", GameServerIP),
+    STRING_KEY_DEF("serverport", GameServerPort),
+    STRING_KEY_DEF("serverotp", GameServerOTP),
+    STRING_KEY_DEF("apid", ServerApID),
+    STRING_KEY_DEF("serverprotocol", ServerProtocol),
+    LOGICAL_KEY_DEF("log", WantedUserLogEnabled),
+    INT_KEY_DEF("side", WantedSide),
+    LOGICAL_KEY_DEF("data", WantDataDir),
+    NULL_KEY_DEF("nowor", NoBlitzWorPreload),
+    NULL_KEY_DEF("noinf", NoInfPreload),
+    NULL_KEY_DEF("build", g_bBuildMDLS),
+    NULL_KEY_DEF("logcomm", g_log_comm),
+    NULL_KEY_DEF("logfps", g_log_fps),
+    NULL_KEY_DEF("logweap", g_log_weap),
+    STRING_KEY_DEF("screen", WantedVideoCard),
+    NULL_KEY_DEF("nospawn", OverrideSpawner),
+    NULL_KEY_DEF("console", OpenConsole),
+    LOGICAL_KEY_DEF("ragdolls", gRagdolls),
+    NULL_KEY_DEF("buildterrain", g_buildTerrain),
+    STRING_KEY_DEF("o", HackID),
+    NULL_KEY_DEF("altfont", AltFont),
+    STRING_KEY_DEF("authserver", gAuthServer),
+    STRING_KEY_DEF("arena", gArena),
+    STRING_KEY_DEF("clientv", gClientV),
+    STRING_KEY_DEF("datadir", DataPath),
+    { nullptr, ENULL, { nullptr }, 0 },
+};
 
 static char* _skipFilename(const char* ptr)
 {
@@ -131,12 +114,54 @@ static char* _skipFilename(const char* ptr)
 	return (char*)ptr;
 }
 
+static std::vector<std::string> split_string(const std::string &str, const std::string &delimiter, size_t max_split = SIZE_MAX)
+{
+    std::vector<std::string> strings;
+
+    std::string::size_type pos = 0;
+    std::string::size_type prev = 0;
+    while ((pos = str.find(delimiter, prev)) != std::string::npos && strings.size() < (max_split == 0 ? 0 : max_split - 1))
+    {
+        strings.push_back(str.substr(prev, pos - prev));
+        prev = pos + 1;
+    }
+    strings.push_back(str.substr(prev));
+    return strings;
+}
+
+static bool has_prefix(const std::string &str, const std::string &prefix)
+{
+    return str.compare(0, prefix.size(), prefix) == 0;
+}
+
+static std::string strtolower(const std::string &str)
+{
+    std::string result = str;
+    for (char &c : result) { c = static_cast<char>(tolower(c)); }
+    return result;
+}
+
+static std::string strtrim(const std::string &str)
+{
+    size_t snwspos = str.find_first_not_of(" \t\n\v\f\r");
+    
+    if (snwspos == std::string::npos) {
+        return "";
+    }
+    
+    size_t enwspos = str.find_last_not_of(" \t\n\v\f\r");
+    
+    if (enwspos == std::string::npos) {
+        return "";
+    }
+    
+    return str.substr(snwspos, (enwspos + 1) - snwspos);
+}
+
 LOGICAL mngoptParse(char* InputLine)
 {
-	char*	ptr, sep[2]="-", CommandLine[2048];
-	char	cmd[256], value[256];
-	int		i;
-
+	char*	ptr;
+	
 #if platOS == OS_WIN32
 	ptr = _skipFilename(GetCommandLineA());
 #else
@@ -145,152 +170,59 @@ LOGICAL mngoptParse(char* InputLine)
 
 	if ( ptr == nullptr )
 		return TRUE;
-	if ( *ptr != '-' && *ptr != '/' )
-		return TRUE;
-
-	strncpy(CommandLine, ptr, 2047);
-
-	ptr = CommandLine;
-    sep[0] = *ptr;
-
-    ptr = strtok(ptr, sep);
-
-	while ( ptr != nullptr )
-	{
-		// find end of command
-		for (i=0; ptr[i]; i++)
-		{
-			if (isspace(ptr[i]) ||
-				ptr[i] == ':' ||
-				ptr[i] == '=')
-			{
-				break;
-			}
-
-			cmd[i] = tolower(ptr[i]);
-		}
-
-		cmd[i] = 0;
-
-		// trim tail of command
-		while ( isspace(ptr[i]) )
-			++i;
-
-		// move to head of line
-		ptr = &ptr[i];
-
-		// find end of value
-		if (ptr[0] == '"')
-		{
-			ptr += 1;
-			for (i=0; ptr[i]; i++)
-			{
-				if (ptr[i] == '"')
-				{
-					break;
-				}
-
-				value[i] = tolower(ptr[i]);
-			}
-		}
-		else
-		{
-			for (i=0; ptr[i]; i++)
-			{
-				if (isspace(ptr[i]))
-				{
-					break;
-				}
-
-				value[i] = tolower(ptr[i]);
-			}
-		}
-
-		value[i] = 0;
-
-		// search for cmd in known commands
-		for (i=0; vars[i].key; i++)
-		{
-			if (0 == lstrcmp(vars[i].key, cmd))
-			{
-				break;
-			}
-		}
-
-		ptr = strtok(nullptr, sep);
-
-		// continue if command not known
-		if (nullptr == vars[i].key)
-		{
-			Write_Debug("Unknown switch: '%s', '%s'", cmd, value);
-			continue;
-		}
-
-		switch (vars[i].ktype)
-		{
-			case ENULL:
-			{
-					*(LOGICAL*)pvars[i] = TRUE;
-				break;
-			}
-			case ELOGICAL:
-			{
-				if (0 == lstrcmp(value, "false") ||
-						0 == lstrcmp(value, "0"))
-				{
-					*(LOGICAL*)pvars[i] = FALSE;
-				}
-				else
-				if (0 == lstrcmp(value, "true") ||
-						0 == lstrcmp(value, "1"))
-				{
-					*(LOGICAL*)pvars[i] = TRUE;
-				}
-				break;
-			}
-			case EINT:
-			{
-				*(int*)pvars[i] = (int)strtol(value, nullptr, 0);
-				break;
-			}
-			case EUINT:
-			{
-				*(unsigned int*)pvars[i] = (unsigned int)strtol(value, nullptr, 0);
-				break;
-			}
-			case ELONG:
-			{
-				*(long*)pvars[i] = (long)strtol(value, nullptr, 0);
-				break;
-			}
-			case EDWORD:
-			{
-				*(unsigned long*)pvars[i] = (unsigned long)strtoul(value, nullptr, 0);
-				break;
-			}
-			case EFLOAT:
-			{
-				*(float*)pvars[i] = (float)strtod(value, nullptr);
-				break;
-			}
-			case EDOUBLE:
-			{
-				*(double*)pvars[i] = (double)strtod(value, nullptr);
-				break;
-			}
-			case ESTRING:
-			{
-				strcpy((char*)pvars[i], value);
-				break;
-			}
-			default:
-			{
-				// never happen
-				continue;
-			}
-		}
-	}
-	while (ptr != nullptr);
+    
+    std::vector<std::string> args = split_string(ptr, " ");
+    
+    for (size_t i = 0, n = args.size(); i < n; i += 2) {
+        std::string cmd = strtrim(strtolower(args[i]));
+        std::string value = strtrim(strtolower(i < (n - 1) ? args[i + 1] : ""));
+        
+        if (!has_prefix(cmd, "-")) {
+            break;
+        }
+        auto foundCmd = std::find_if(&vars[0], &vars[sizeof(vars) / sizeof(GVAR)], [c = cmd.substr(1)] (const GVAR &k) { return k.key && k.key == c; });
+        
+        if (foundCmd == &vars[sizeof(vars) / sizeof(GVAR)]) {
+			Write_Debug("Unknown switch: '%s', '%s'", cmd.c_str(), value.c_str());
+            continue;
+        }
+        switch (foundCmd->ktype) {
+            case ENULL:
+                *(foundCmd->valuePtr.logicalValue) = true;
+                --i;
+                break;
+            case ELOGICAL:
+                if (value == "0" || value == "false") {
+                    *(foundCmd->valuePtr.logicalValue) = false;
+                } else if (value == "1" || value == "true") {
+                    *(foundCmd->valuePtr.logicalValue) = true;
+                } else {
+                    Write_Debug("Invalid boolean switch '%s', '%s'", cmd.c_str(), value.c_str());
+                }
+                break;
+            case EINT:
+                *(foundCmd->valuePtr.intValue) = strtol(value.c_str(), nullptr, 0);
+                break;
+            case EUINT:
+                *(foundCmd->valuePtr.uintValue) = strtoul(value.c_str(), nullptr, 0);
+                break;
+            case ELONG:
+                *(foundCmd->valuePtr.longValue) = strtol(value.c_str(), nullptr, 0);
+                break;
+            case EDWORD:
+                *(foundCmd->valuePtr.dwordValue) = strtoul(value.c_str(), nullptr, 0);
+                break;
+            case EFLOAT:
+                *(foundCmd->valuePtr.floatValue) = strtof(value.c_str(), nullptr);
+                break;
+            case EDOUBLE:
+                *(foundCmd->valuePtr.doubleValue) = strtod(value.c_str(), nullptr);
+                break;
+            case ESTRING:
+                strlcpy(foundCmd->valuePtr.stringValue, value.c_str(), foundCmd->maxLength);
+                break;
+        }
+    }
 
 	return(TRUE);
 }

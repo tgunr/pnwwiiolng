@@ -100,10 +100,8 @@ LOGICAL rnlogoInit(void)
         std::string str = STRVER;
 
 		// For debug and beta releases, append the commit info.
-#if defined(DEBUG_WW2) || defined(BETA_RELEASE)
 		str += " : ";
 		str += WWII::gitCommitStr;
-#endif
 
 #if(0)
         if(ogl::UseDeprecatedPath())
