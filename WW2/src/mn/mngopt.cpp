@@ -59,9 +59,9 @@ static GVAR vars[] = {
     INT_KEY_DEF("bpp", WantedBpp),
     INT_KEY_DEF("alpha", WantedAlpha),
     LOGICAL_KEY_DEF("hdw", WantedHdw),
-    { "stencil", ELOGICAL, { .intValue = &WantedStencil }, 0 }, // HACK
+    { "stencil", ELOGICAL, { &WantedStencil }, 0 }, // HACK
     LOGICAL_KEY_DEF("window", WantedWindow),
-    { "staccato", ELOGICAL, { .intValue = &UseStaccato }, 0 }, // HACK
+    { "staccato", ELOGICAL, { &UseStaccato }, 0 }, // HACK
     STRING_KEY_DEF("ticket", TicketFile),
     STRING_KEY_DEF("bypass", BypassString),
     STRING_KEY_DEF("serverip", GameServerIP),
@@ -89,7 +89,7 @@ static GVAR vars[] = {
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
     STRING_KEY_DEF("datadir", DataPath),
-    { nullptr, ENULL, { .logicalValue = nullptr }, 0 },
+    { nullptr, ENULL, { nullptr }, 0 },
 };
 
 static char* _skipFilename(const char* ptr)
