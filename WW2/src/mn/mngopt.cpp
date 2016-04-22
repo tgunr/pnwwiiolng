@@ -6,9 +6,6 @@
 #include "include/vars.h"
 #include "mn/mngopt.h"
 
-// Used to build fully-qualified domain names, primarily auth.
-char RegionSuffix[512] = ".playnet.com";
-
 enum key_TYPE
 {
 	ENULL,
