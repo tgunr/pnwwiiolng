@@ -336,7 +336,12 @@ static UINT32 CreateColor(int colorindex)
 
 	UINT32		rgba, alpha;
 	colorstruct	color;
-	color.full = s_colortable[colorindex].full;
+    if (colorindex >= 0 && colorindex < s_colortable.size()) {
+        color.full = s_colortable[colorindex].full;
+    } else {
+        dbugLog(_FLN, "Invalid face color index %d in FLT file, using black", colorindex);
+        color.rgb = { .red = 0, .green = 0, .blue = 0, .alpha = 0 };
+    }
 	if (s_face->matindex >= 0)
 	{
 		alpha = (UCHAR)(material[s_face->matindex].alpha * 255.0f);
