@@ -50,6 +50,7 @@
 #include "client/ww2client.h"
 #include "teul/teulPacket.h"
 #include "client/GameClient.h"
+#include "str/stringLib.h"
 
 ///TEMPORARY
 #include "map/mapAWS.h"
