@@ -15,7 +15,7 @@ TARGETS = $(LIBRARIES)
 
 LINK.o = gcc
 
-CFLAGS += -Werror -pedantic
+CFLAGS += -m32 -Werror -pedantic
 CFLAGS += -I../include
 
 vpath %.h ../include/b64
