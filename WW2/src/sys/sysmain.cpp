@@ -89,8 +89,6 @@ static void AddArchives();
 #define USE_REFERENCE_RASTERIZER
 #undef	USE_REFERENCE_RASTERIZER
 
-extern char RegionSuffix[];
-
 void decompressStatus (SINT32 archive_index)
 {
 	if (archive_index < 0)

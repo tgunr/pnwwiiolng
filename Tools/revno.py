@@ -2,7 +2,7 @@
 ##################################################
 # Script to generate a C file listing the current
 # revision of a given source repository.
-# -- Written for Python 2.7
+# -- Written for Python 3.0
 #
 # TODO: Was sloppily rewritten because of our
 # switch to git. It works just fine, but it really
@@ -16,16 +16,19 @@ revisionString = "GIT_COMMIT_STR"
 def output_from_command(cmd):
 #{
 	""" Return the standard output from a command as a string. """
-	try:
-		import subprocess
-		import sys
+	#try:
+	import subprocess
+	import sys
 
-		result = str(subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).communicate()[0]).strip('\n')
-#	NOTE: Python on Mac not supporting second paramter of str()
-#		result = str(subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).communicate()[0], sys.stdout.encoding).strip('\n')
-		return result
-	except:
-		raise Exception("Error occurred trying to run: "+cmd)
+	rawout = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).communicate()
+	if sys.version_info[0] < 3:
+		outstr = str(rawout[0])
+	else:
+		outstr = str(rawout[0], sys.stdout.encoding)
+	result = outstr.strip('\n')
+	return result
+	#except:
+	#	raise Exception("Error occurred trying to run: "+cmd)
 #}
 
 #### Command line arguments: revno.py [<TopLevelPath>]
