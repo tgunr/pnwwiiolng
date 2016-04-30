@@ -432,7 +432,8 @@ void GameInfoView::DisplayInfo()
 	Hour = trnTODGetHourFromTimeOfDay(TOD);
 	Min = trnTODGetMinuteFromTimeOfDay(TOD);
 
-	DrawString(L"%ls: %.0f commit %s\n", strings["hud.gameinfo.fps"].c_str(), gFPS, WWII::gitCommitStr);
+  DrawString(L"%ls: %.0f ", strings["hud.gameinfo.fps"].c_str(), gFPS);
+  DrawString("commit %s\n", WWII::gitCommitStr);
 #if defined(RELEASE_CLIENT) && RELEASE_CLIENT != 0
 	DrawString(L"%ls: %.0f commit %s\n", strings["hud.gameinfo.fps"].c_str(), gFPS);
 	DrawString(L"%ls: %02d:%02d\n", strings["hud.gameinfo.time"].c_str(), Hour, Min);
