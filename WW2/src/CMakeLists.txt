@@ -1,5 +1,10 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6.4)
+## Declare the CMake version requirement
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
+
+## Declare the project
 PROJECT(GameHosts)
+
+
 SET(CMAKE_CXX_STANDARD 14)
 
 # This will determine bitness, amongst other things.
