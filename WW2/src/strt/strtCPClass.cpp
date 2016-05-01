@@ -1018,6 +1018,9 @@ _checkEngagementOrSoftcap(WWII_SIDE forSide, const CPStruct* cp)
 	if ( cp->isSupplyCenter() )
 		return true;
 
+	if ( stratCountsAsEngagement(*cp) )
+		return true;
+
 	// Find out how many - if any - engagements are required before a
 	// softcap can be placed.
 	UINT32 engagementQuota = stratEngagementObjectivesQuota(g_objectiveStats.attackCapacity());
