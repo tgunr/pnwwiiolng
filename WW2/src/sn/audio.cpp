@@ -52,6 +52,8 @@ static bool UseRedirectToLFE = false;
 
 struct WaveData
 {
+    WaveData(void) : data(nullptr) {}
+
     CWaveFile wave;
     unsigned char* data;
     float maxattenuation;
