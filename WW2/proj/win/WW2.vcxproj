@@ -229,7 +229,7 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\tolua++\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>CONNECTION_TEST_BUILD;DEBUG_WW2;ENABLE_FLOATERS;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=0;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CONNECTION_TEST_BUILD;DEBUG_WW2;ENABLE_FLOATERS;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -540,7 +540,7 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\tolua++\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DEBUG_FPU;DEBUG_WW2;ENABLE_FLOATERS;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=0;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;BUILDING_GRANNY_STATIC;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG_FPU;DEBUG_WW2;ENABLE_FLOATERS;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;BUILDING_GRANNY_STATIC;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>

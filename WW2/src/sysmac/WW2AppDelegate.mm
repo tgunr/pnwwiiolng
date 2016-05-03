@@ -15,7 +15,6 @@
 #include "wwii/wwiiClientMessages.h"
 #import <objc/message.h>
 #import <CommonCrypto/CommonCrypto.h>
-#import <HockeySDK/HockeySDK.h>
 #include <libxml/xmlerror.h>
 #include "vars.h"
 #include "clientNetError.h"
@@ -510,9 +509,6 @@ extern NSString *WebActionOriginalURLKey;
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserName"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserPassword"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_RememberUserPassword"];
-    
-    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"97d81f56ff22d04ccdbc1a0d537e81c0"];
-    [[BITHockeyManager sharedHockeyManager] startManager];
     
     xmlSetGenericErrorFunc(0,xmlerrorstub);
     xmlSetStructuredErrorFunc(0,xmlstructurederrorstub);

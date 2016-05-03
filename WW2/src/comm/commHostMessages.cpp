@@ -54,7 +54,7 @@
 #include "updt/updtDeathByBuilding.h"
 #include "wwii/wwiiFullObjID.h"
 
-#define DEATH_TIMEOUT 60			// A minute
+#define DEATH_TIMEOUT 30			// A minute
 
 TEUL_CALLBACK*		commHOST_KILL;
 
@@ -605,13 +605,13 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 
 	// PR_DEAD is considered as an indication of 'Crew Dead',
 	// which sets the vehicle to auto-despawn after a period of time.
-	if ( ((vref->vehicleData.globalFlags & VEHG_DEAD) == 0) & (vh.present & PR_DEAD) )
+	if ( ((vref->vehicleData.globalFlags & VEHG_DEAD) == 0) && (vh.present & PR_DEAD) )
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s v:%i received dead from vehicle"
 					, player->teulIndex(), player->playerID(), player->callsign(), vref->index);
 		vref->setCrewDead();
 	}
-	else if ( (vref->timeOfDeath) & (vref->state == VEH_DEAD) & (teulTime() - vref->timeOfDeath >= DEATH_TIMEOUT) )
+	else if ( (vref->timeOfDeath) && (vref->state == VEH_DEAD) && (teulTime() - vref->timeOfDeath >= DEATH_TIMEOUT) )
 	{
 		dbugLog(_FLW,"t:%d p:%u c:%s v:%i forceing exit of dead vehicle"
 					, player->teulIndex(), player->playerID(), player->callsign(), vref->index);

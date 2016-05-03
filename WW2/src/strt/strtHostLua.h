@@ -15,6 +15,7 @@ extern UINT32 stratResupplyTime(const WEAPON_SPEC& weapon, StratHCUnit* unit, Fa
 extern double stratRDPSupplyPenalty(WWII_COUNTRY forCountry);
 extern UINT32 stratEWSHighThreshold(void);
 extern UINT32 stratEngagementObjectivesQuota(UINT32 attackLimit);
+extern bool stratCountsAsEngagement(const CPStruct& target);
 extern void stratProcessLuaEventQueue();
 
 extern bool strtCPEventTrigger(CPStruct&, const char* trigger);

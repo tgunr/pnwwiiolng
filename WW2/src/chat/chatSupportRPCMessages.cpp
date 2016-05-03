@@ -32,7 +32,7 @@ chatSendBroadcast(Chat::BCAST_TYPE type, const instanceid_t& instanceID, UINT64 
 						, const char* ptr0, const char* ptr1, const char* ptr2, const char* ptr3, const char* ptr4, const char* ptr5)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::BROADCAST_MESSAGE_Y));
-	outgoing.construct<Chat::Broadcast>(Chat::_EVERYONE, instanceID, targetID, prefix, message, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5);
+	outgoing.construct<Chat::Broadcast>(type, instanceID, targetID, prefix, message, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5);
 	return serverSendPacketToType(outgoing, CHAT_HOST);
 }
 
