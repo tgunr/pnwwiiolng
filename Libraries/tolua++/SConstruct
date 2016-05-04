@@ -145,7 +145,7 @@ Files will be installed on <prefix>/bin, <prefix>/lib and <prefix>/include
 ########### end of helper builders
 
 env['CPPPATH'] = '#/include'
-env['LIBPATH'] =  ['#/lib'] + env['LIBPATH']
+#env['LIBPATH'] = ['#/lib'] + env['LIBPATH'].split(",")
 
 if env['no_cygwin']:
 
