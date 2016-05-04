@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+<title>Esoteric Preferences</title><!-- MJT_HEAD_PLACEHOLDER --></head>
+<body class="docframe">
+<span class="navigation-bar"><span class="navigation-group"><a href="./command-line-tool.html" class="navigation-link">Previous</a>&nbsp;<a href="./frequently-asked-questi.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./preferences.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+<hr class="navigation-bar-separator" />
+<a name="help-anchor-esoteric-preferences"></a><div class="section" id="esoteric-preferences">
+<h1><a class="toc-backref" href="./preferences.html#id147">5.5   Esoteric Preferences</a></h1>
+<p>You can set esoteric DropDMG preferences by clicking the links on this page.
+Unlike with regular preferences, you must generally quit and re-launch DropDMG
+in order for an esoteric preference to take effect.</p>
+<dl>
+<dt>AppendDateWithSeconds</dt>
+<dd>When using the <a href="./names.html">Append current date</a> option, DropDMG usually uses the
+<a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DAppendDateWithSeconds%26v%3DNO" target="_top">YYYY-MM-DD</a> format.
+You can also set it to use the <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DAppendDateWithSeconds%26v%3DYES" target="_top">YYYY-MM-DD-HHMMSS</a> format. This is
+useful if you will be creating more than one dated disk image on the same
+day and you want the files to have unique names.</dd>
+<dt>BlankBackgroundSize</dt>
+<dd>When creating a disk image with a <a href="./layout.html">layout</a>, DropDMG normally sets the size of
+the mounted image window to the size of the background picture. If you don’t
+specify a background picture, it uses <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DBlankBackgroundSize%26v%3D%257B640%2C%2520480%257D" target="_top">640×480</a>. You can also
+set it to use <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DBlankBackgroundSize%26v%3D%257B800%2C%2520600%257D" target="_top">800×600</a>.</dd>
+<dt>CreateDeviceImages</dt>
+<dd>DropDMG normally detects when you are trying to make a disk image of a
+volume and creates a <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DCreateDeviceImages%26v%3DYES" target="_top">device image</a>. Device images are exact
+copies, and creating them is faster. You may, however, prefer that DropDMG
+create <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DCreateDeviceImages%26v%3DNO" target="_top">regular disk images</a> of volumes, as this will
+give you control over the volume name.</dd>
+<dt>DisableRetinaBackgroundPictures</dt>
+<dd>Normally DropDMG creates background pictures for your layouts that are
+optimized for Macs with <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DDisableRetinaBackgroundPictures%26v%3DNO" target="_top">both Retina and non-Retina</a> displays.
+Mac OS X 10.6 has a bug that prevents proper display of Retina background
+pictures (regardless of the Mac’s display type). Thus, for optimal
+deployment on 10.6 you can optionally set DropDMG to <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DDisableRetinaBackgroundPictures%26v%3DYES" target="_top">only create non-Retina</a> background
+pictures.</dd>
+<dt>HybridFSArgs</dt>
+<dd><p class="-first">When creating a <tt>.iso</tt> disk image, DropDMG normally includes a hybrid
+filesystem with <a href="http://en.wikipedia.org/wiki/HFS_Plus" target="_top">HFS+</a>, <a href="http://en.wikipedia.org/wiki/ISO_9660" target="_top">ISO 9660</a>, <a href="http://en.wikipedia.org/wiki/Joliet_(file_system)" target="_top">Joliet</a>, and <a href="http://en.wikipedia.org/wiki/Universal_Disk_Format" target="_top">UDF</a> components. You can
+change which filesystems are included by entering this command in Terminal
+and removing the names of filesystems that you don’t want:</p>
+<pre class="-last">
+defaults write com.c-command.DropDMG HybridFSArgs -array &quot;-hfs&quot; &quot;-iso&quot; &quot;-joliet&quot; &quot;-udf&quot;
+</pre>
+</dd>
+<dt>LayoutViewGridSize</dt>
+<dd>DropDMG <a href="./layouts.html">layouts</a> ordinarily use a grid size of <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DLayoutViewGridSize%26v%3D16" target="_top">16×16</a> points. You can
+temporarily ignore the grid by holding down the Command key or change the
+grid size to <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DLayoutViewGridSize%26v%3D8" target="_top">8×8</a>.</dd>
+<dt>MJTUpdaterDeleteDiskImage</dt>
+<dd>Normally, the <a href="./software-update.html">Software Update…</a> feature will <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DMJTUpdaterDeleteDiskImage%26v%3DYES" target="_top">clean up</a> after itself
+after downloading a new version. You can also set it to <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DMJTUpdaterDeleteDiskImage%26v%3DNO" target="_top">leave the disk
+image</a> file in
+your <tt>Downloads</tt> folder.</dd>
+<dt>ZlibLevel</dt>
+<dd>When creating disk images using the <strong>.dmg — smaller file, faster</strong> option,
+DropDMG normally uses the <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DZlibLevel%26v%3D9" target="_top">maximum level of compression</a> to produce a smaller disk image.
+You can instead set DropDMG to <a href="http://c-command.com/x-link?url=x-dropdmg%3A%2F%2Fdefault%3Fk%3DZlibLevel%26v%3D1" target="_top">faster compression</a>. On some systems this will be
+almost twice as fast, but the <tt>.dmg</tt> files will be larger.</dd>
+</dl>
+</div>
+<hr class="navigation-bar-separator" />
+<span class="navigation-bar"><span class="navigation-group"><a href="./command-line-tool.html" class="navigation-link">Previous</a>&nbsp;<a href="./frequently-asked-questi.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./preferences.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+</body>
+</html>

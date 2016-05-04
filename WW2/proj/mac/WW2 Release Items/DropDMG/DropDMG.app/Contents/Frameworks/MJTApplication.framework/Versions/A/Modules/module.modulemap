@@ -1,0 +1,6 @@
+framework module MJTApplication {
+  umbrella header "MJTApplication.h"
+
+  export *
+  module * { export * }
+}

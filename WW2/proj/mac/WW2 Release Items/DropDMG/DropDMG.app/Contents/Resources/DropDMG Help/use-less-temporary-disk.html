@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+<title>Use less temporary disk space</title><!-- MJT_HEAD_PLACEHOLDER --></head>
+<body class="docframe">
+<span class="navigation-bar"><span class="navigation-group"><a href="./always-run-with-root-ac.html" class="navigation-link">Previous</a>&nbsp;<a href="./quit-when-done.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./advanced.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+<hr class="navigation-bar-separator" />
+<a name="help-anchor-use-less-temporary-disk"></a><div class="section" id="use-less-temporary-disk">
+<h1><a class="toc-backref" href="./advanced.html#id143">5.4.3   Use less temporary disk space</a></h1>
+<p>With this option checked, DropDMG will only require free disk space on the
+destination volume equal to the size of the final disk image file. This can make
+disk image creation much slower, however. Additionally, when creating an
+encrypted disk image, all data written to the destination volume will be
+encrypted.</p>
+<p>With this option unchecked, disk image creation will generally be much faster
+(and the final compressed disk image file may be slightly smaller), however
+DropDMG may require working space on the destination volume of up to twice the
+size of the source folder. When creating an encrypted disk image, the final disk
+image file will be encrypted, however temporary files will not. Thus, if you
+plan to distribute the destination hard drive itself (rather than just the final
+<tt>.dmg</tt> file), you should use Disk Utility to <strong>Erase Free Space</strong> securely.</p>
+<p>Leaving <strong>Use less temporary disk space</strong> unchecked is generally the best
+choice, unless there is little free space on the destination volume.</p>
+</div>
+<hr class="navigation-bar-separator" />
+<span class="navigation-bar"><span class="navigation-group"><a href="./always-run-with-root-ac.html" class="navigation-link">Previous</a>&nbsp;<a href="./quit-when-done.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./advanced.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+</body>
+</html>

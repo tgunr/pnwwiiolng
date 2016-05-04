@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<dict>
+		<key>identifier</key>
+		<string>Configuration.28E8628E-D203-4098-A529-CDFB74C9E887</string>
+		<key>options</key>
+		<dict>
+			<key>appendVersionNumber</key>
+			<true/>
+			<key>customIcon</key>
+			<integer>1</integer>
+			<key>deleteAfterCreating</key>
+			<false/>
+			<key>destinationFolder</key>
+			<string>/Playnet/opt/wwiionline/Installer/release/macrelease</string>
+			<key>encryption</key>
+			<integer>0</integer>
+			<key>format</key>
+			<integer>0</integer>
+			<key>internetEnabled</key>
+			<false/>
+			<key>layoutIdentifier</key>
+			<string>Layout.60B98608-FA31-41ED-BBEB-C7B077EB2E60</string>
+			<key>optimizeForRestores</key>
+			<false/>
+			<key>promptsForDestinationFolder</key>
+			<false/>
+			<key>sanitizeForServer</key>
+			<true/>
+			<key>segmentSize</key>
+			<integer>100</integer>
+			<key>useSegments</key>
+			<false/>
+		</dict>
+	</dict>
+	<key>documentCreator</key>
+	<string>DropDMG 3.2.9</string>
+	<key>documentType</key>
+	<string>com.c-command.DropDMG.Configuration</string>
+	<key>formatVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

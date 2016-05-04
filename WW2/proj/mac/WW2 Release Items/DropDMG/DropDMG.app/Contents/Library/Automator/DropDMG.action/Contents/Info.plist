@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AMAccepts</key>
+	<dict>
+		<key>Container</key>
+		<string>List</string>
+		<key>Optional</key>
+		<false/>
+		<key>Types</key>
+		<array>
+			<string>com.apple.cocoa.path</string>
+		</array>
+	</dict>
+	<key>AMApplication</key>
+	<string>DropDMG</string>
+	<key>AMCanShowSelectedItemsWhenRun</key>
+	<true/>
+	<key>AMCanShowWhenRun</key>
+	<true/>
+	<key>AMCategory</key>
+	<string>Files</string>
+	<key>AMDefaultParameters</key>
+	<dict>
+		<key>baseName</key>
+		<string></string>
+		<key>configuration</key>
+		<string>&lt;default&gt;.Configuration</string>
+		<key>volumeName</key>
+		<string></string>
+	</dict>
+	<key>AMDescription</key>
+	<dict>
+		<key>AMDAlert</key>
+		<string>Depending on the configuration chosen, the source file(s) may  be replaced or deleted.</string>
+		<key>AMDInput</key>
+		<string>Disk image files (.dmg, .img), Archives (.tar, .tar.bz2, .tar.gz, .zip), Volumes</string>
+		<key>AMDNote</key>
+		<string>One archive or image will be created for each input item. To group multiple inputs into a single archive or image, put them in a folder before passing them to this action.</string>
+		<key>AMDOptions</key>
+		<string>You can create configurations in DropDMG’s preferences window. The names default to the base name of the input file.</string>
+		<key>AMDRelatedActions</key>
+		<array>
+			<string>com.apple.Automator.CreateZipArchive</string>
+			<string>com.apple.Automator.NewDiskImage</string>
+			<string>com.apple.Automator.MakeNewFolder</string>
+			<string>com.apple.Automator.MountDiskImage</string>
+			<string>com.apple.Automator.CreatePackage</string>
+			<string>com.c-command.dropdmg.ExpandImage</string>
+		</array>
+		<key>AMDRequires</key>
+		<string></string>
+		<key>AMDResult</key>
+		<string>Disk image files (.cdr, .dmg, .img), Archives (.tar, .tar.bz2, .tar.gz, .zip)</string>
+		<key>AMDSummary</key>
+		<string>This action creates a disk image file or archive from the file specified.</string>
+	</dict>
+	<key>AMIconName</key>
+	<string>DropDMGAutomator</string>
+	<key>AMKeywords</key>
+	<array>
+		<string>Archive</string>
+		<string>Create</string>
+		<string>Convert</string>
+		<string>Make</string>
+		<string>License</string>
+		<string>Agreement</string>
+		<string>File</string>
+		<string>Folder</string>
+		<string>Zip</string>
+		<string>Tar</string>
+		<string>GZip</string>
+		<string>BZip</string>
+		<string>Compress</string>
+		<string>Disk</string>
+		<string>DiskImage</string>
+	</array>
+	<key>AMName</key>
+	<string>Create Disk Image or Archive</string>
+	<key>AMProvides</key>
+	<dict>
+		<key>Container</key>
+		<string>List</string>
+		<key>Types</key>
+		<array>
+			<string>com.apple.cocoa.path</string>
+		</array>
+	</dict>
+	<key>AMRequiredResources</key>
+	<array>
+		<dict>
+			<key>Display Name</key>
+			<string>DropDMG</string>
+			<key>Resource</key>
+			<string>com.c-command.DropDMG</string>
+			<key>Type</key>
+			<string>application</string>
+			<key>Version</key>
+			<string>3.0</string>
+		</dict>
+	</array>
+	<key>AMWarning</key>
+	<dict>
+		<key>Level</key>
+		<integer>0</integer>
+	</dict>
+	<key>BuildMachineOSBuild</key>
+	<string>15C50</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>DropDMG</string>
+	<key>CFBundleGetInfoString</key>
+	<string>DropDMG “Create Disk Image/Archive” action</string>
+	<key>CFBundleIconFile</key>
+	<string>DropDMG</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.c-command.dropdmg.CreateImageOrArchive</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>DropDMG</string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.2.9</string>
+	<key>CFBundleSignature</key>
+	<string>mtDA</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>MacOSX</string>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>3.2.9</string>
+	<key>DTCompiler</key>
+	<string>com.apple.compilers.llvm.clang.1_0</string>
+	<key>DTPlatformBuild</key>
+	<string>7C68</string>
+	<key>DTPlatformVersion</key>
+	<string>GM</string>
+	<key>DTSDKBuild</key>
+	<string>15C43</string>
+	<key>DTSDKName</key>
+	<string>macosx10.11</string>
+	<key>DTXcode</key>
+	<string>0720</string>
+	<key>DTXcodeBuild</key>
+	<string>7C68</string>
+	<key>NSPrincipalClass</key>
+	<string>CreateImageOrArchive</string>
+</dict>
+</plist>

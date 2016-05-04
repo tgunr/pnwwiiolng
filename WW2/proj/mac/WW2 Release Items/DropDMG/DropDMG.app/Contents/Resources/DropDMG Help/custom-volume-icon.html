@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+<title>Custom volume icon</title><!-- MJT_HEAD_PLACEHOLDER --></head>
+<body class="docframe">
+<span class="navigation-bar"><span class="navigation-group"><a href="./layout.html" class="navigation-link">Previous</a>&nbsp;<a href="./internet-enabled.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./configurations.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+<hr class="navigation-bar-separator" />
+<a name="help-anchor-custom-volume-icon"></a><div class="section" id="custom-volume-icon">
+<h1><a class="toc-backref" href="./configurations.html#id132">5.1.6   Custom volume icon</a></h1>
+<p>Normally when a disk image is mounted, it shows up on the desktop with a plain
+white icon that looks like a hard drive. With this option checked, DropDMG will
+customize the icon in one of two modes:</p>
+<dl>
+<dt>Automatic</dt>
+<dd><p class="-first">If the top level of the image contains an application, DropDMG will badge
+the application’s icon onto the white drive icon. Or, if the disk image
+contains a single file, DropDMG will badge that file’s icon onto the drive.
+DropDMG renders an optimized version of the badged icon for each size up to
+512×512.</p>
+<p><img alt="custom volume icon" class="-last" height="115" src="images/custom-volume-icon.png" width="105" /></p>
+</dd>
+<dt>Manual</dt>
+<dd><p class="-first">To choose your own graphic file to use as the icon:</p>
+<ol class="-last arabic simple">
+<li>Click the <strong>Set Icon…</strong> button.</li>
+<li>Select the graphic file and click <strong>Choose</strong>.</li>
+<li>Select the source folder (the folder that you will drop onto DropDMG
+when you create the disk image) and click <strong>Choose</strong>. DropDMG will
+convert your graphic file into an invisible <tt>.VolumeIcon.icns</tt> in
+the source folder.</li>
+<li>Now, whenever you create a disk image from that source folder
+(provided that <strong>Custom volume icon</strong> is checked) DropDMG will use
+the <tt>.icns</tt> file to set the volume icon.</li>
+</ol>
+</dd>
+</dl>
+<p>DropDMG ignores the <strong>Custom volume icon</strong> option when creating a disk image by
+converting.</p>
+<p><strong>Burning a CD or DVD-ROM With a Custom Icon</strong></p>
+<ol class="arabic simple">
+<li>Put the files that will comprise your disc into a folder (called the
+source folder).</li>
+<li>In the <a href="./configurations.html">Configurations</a> preferences, set the <a href="./format.html">Format</a> to <tt>.cdr</tt> and
+make sure that <a href="./custom-volume-icon.html">Custom volume icon</a> is checked.</li>
+<li>If you want DropDMG to automatically create the icon based on the main
+file in your source folder, skip this step. To use your own graphic file
+for the icon, click the <strong>Set Icon…</strong> button. Select the graphic file and
+click <strong>Choose</strong>. Then select the source folder and click <strong>Choose</strong>.</li>
+<li>Drag your source folder onto DropDMG’s icon in the Dock. This will create
+a <tt>.cdr</tt> file.</li>
+<li>Choose <a href="./burn.html">Burn…</a> from DropDMG’s <strong>File</strong> menu. Make sure that <strong>Burn
+contents of disk images</strong> is checked. Then select the <tt>.cdr</tt> file and
+burn your disc.</li>
+</ol>
+<p><strong>Creating a Sparse Disk Image With a Custom Icon</strong></p>
+<p>DropDMG currently does not support directly creating a <tt>.sparsebundle</tt> or
+<tt>.sparseimage</tt> disk image with a custom icon. You can, however, create a
+<tt>.dmg</tt> disk image with a custom icon and then convert it to the desired format.</p>
+</div>
+<hr class="navigation-bar-separator" />
+<span class="navigation-bar"><span class="navigation-group"><a href="./layout.html" class="navigation-link">Previous</a>&nbsp;<a href="./internet-enabled.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./configurations.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+</body>
+</html>

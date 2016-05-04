@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<dict>
+		<key>identifier</key>
+		<string>Layout.60B98608-FA31-41ED-BBEB-C7B077EB2E60</string>
+		<key>options</key>
+		<dict>
+			<key>backgroundImageName</key>
+			<string>ww2-mac-bg.png</string>
+			<key>fontSize</key>
+			<integer>12</integer>
+			<key>iconSize</key>
+			<integer>48</integer>
+			<key>layoutItems</key>
+			<array>
+				<dict>
+					<key>identifier</key>
+					<string>LayoutItem.8014A5D8-1F15-4EC0-9FC2-01E7FFD67D5A</string>
+					<key>name</key>
+					<string>${APP_BASENAME}.app</string>
+					<key>position</key>
+					<string>{312, 88}</string>
+					<key>type</key>
+					<string>application</string>
+				</dict>
+				<dict>
+					<key>identifier</key>
+					<string>LayoutItem.1EBCA829-85E9-42E3-99F9-31D0B757279E</string>
+					<key>name</key>
+					<string>Applications</string>
+					<key>position</key>
+					<string>{472, 88}</string>
+					<key>type</key>
+					<string>applications</string>
+				</dict>
+				<dict>
+					<key>identifier</key>
+					<string>LayoutItem.66967FAA-0A1D-4ED9-9C12-B3E65576590A</string>
+					<key>position</key>
+					<string>{404, 32.701171875}</string>
+					<key>rtf</key>
+					<string>{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red255\green255\blue255;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\qc\partightenfactor0
+
+\f0\fs24 \cf2 Drag $\{APP_BASENAME\} to Applications folder}</string>
+					<key>size</key>
+					<string>{200, 33.40234375}</string>
+					<key>type</key>
+					<string>text</string>
+				</dict>
+				<dict>
+					<key>identifier</key>
+					<string>LayoutItem.26C09853-E599-4D43-AF65-6B265F84B6F8</string>
+					<key>position</key>
+					<string>{212, 100}</string>
+					<key>rtf</key>
+					<string>{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl}
+{\colortbl;\red255\green255\blue255;}
+}</string>
+					<key>size</key>
+					<string>{200, 30}</string>
+					<key>type</key>
+					<string>text</string>
+				</dict>
+			</array>
+			<key>windowInsets</key>
+			<string>{0, 0}</string>
+			<key>windowOriginTopLeft</key>
+			<string>{100, 100}</string>
+		</dict>
+	</dict>
+	<key>documentCreator</key>
+	<string>DropDMG 3.2.9</string>
+	<key>documentType</key>
+	<string>com.c-command.DropDMG.Layout</string>
+	<key>formatVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>
