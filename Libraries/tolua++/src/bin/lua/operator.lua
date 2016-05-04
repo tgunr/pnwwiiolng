@@ -62,7 +62,7 @@ function classOperator:supcode_tmp()
 	end
 
 	-- no overload, no parameters, always inclass
-	output("/* method:",self.name," of class ",self:inclass()," */")
+	output("/* operator:",self.name," of class ",self:inclass()," */")
 
 	output("#ifndef TOLUA_DISABLE_"..self.cname)
 	output("\nstatic int",self.cname,"(lua_State* tolua_S)")
