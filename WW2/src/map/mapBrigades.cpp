@@ -9,8 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Supporting Programmer: Patrick "thunder" Macgruder
 
-#include "versionNo.h"
-
 #include <stdexcept>
 #include <algorithm>
 

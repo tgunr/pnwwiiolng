@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "teul/teulKit.h"
 #include "wwii/wwiiPack.h"
 #include "chat/chatBrigadeMove.h"

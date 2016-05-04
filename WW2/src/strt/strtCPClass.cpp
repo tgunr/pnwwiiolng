@@ -10,8 +10,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Patrick "thunder" Magruder
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcast.h"
 #include "chat/chatDefines.h"			// For GCI_...
 #include "chat/chatGCIMessage.h"

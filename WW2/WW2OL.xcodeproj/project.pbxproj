@@ -486,6 +486,7 @@
 		FA37D7531C937F8F00013187 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FA37D7511C937F8F00013187 /* Localizable.strings */; };
 		FA3B631B1D613BA500A5A810 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; };
 		FA3B631C1D613BB400A5A810 /* HockeySDK.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FA5CDD491CD8BA6D00F93668 /* build_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA3D8BA81C8BF201002C5119 /* build_info.cpp */; };
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
 		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
 /* End PBXBuildFile section */
@@ -1520,10 +1521,12 @@
 		FA3B631A1D613BA500A5A810 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = proj/mac/HockeySDK.framework; sourceTree = "<group>"; };
 		FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CodeSigning.xcconfig; path = proj/mac/CodeSigning.xcconfig; sourceTree = "<group>"; };
 		FA3D8BA81C8BF201002C5119 /* Defines.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Defines.xcconfig; path = proj/mac/Defines.xcconfig; sourceTree = "<group>"; };
+		FA3D8BA81C8BF201002C5119 /* build_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = build_info.cpp; path = "${DERIVED_FILES_DIR}/build_info.cpp"; sourceTree = "<absolute>"; };
 		FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = SearchPaths.xcconfig; path = proj/mac/SearchPaths.xcconfig; sourceTree = "<group>"; };
 		FA3D8BAA1C8BF201002C5119 /* Warnings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = proj/mac/Warnings.xcconfig; sourceTree = "<group>"; };
 		FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = BuildSettings.xcconfig; path = proj/mac/BuildSettings.xcconfig; sourceTree = "<group>"; };
 		FA56129A1C9E4E9B001FAFCB /* compiler_check.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = compiler_check.h; sourceTree = "<group>"; };
+		FA5CDD461CD339D100F93668 /* build_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = build_info.hpp; path = src/build_info.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3128,8 +3131,10 @@
 				FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */,
 				FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */,
 				FA3D8BA81C8BF201002C5119 /* Defines.xcconfig */,
+				FA3D8BA81C8BF201002C5119 /* build_info.cpp */,
 				FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */,
 				FA3D8BAA1C8BF201002C5119 /* Warnings.xcconfig */,
+				FA5CDD461CD339D100F93668 /* build_info.hpp */,
 			);
 			name = Config;
 			sourceTree = "<group>";
@@ -3215,7 +3220,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 080C7E971062F021000A242F /* Build configuration list for PBXNativeTarget "maclib" */;
 			buildPhases = (
-				08D29A8913D9D71C00BA4D58 /* ShellScript */,
 				080C7E801062F011000A242F /* Headers */,
 				080C7E811062F011000A242F /* Sources */,
 				080C7E821062F011000A242F /* Frameworks */,
@@ -3352,19 +3356,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		08D29A8913D9D71C00BA4D58 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "python ../Tools/revno.py ..\n\n";
-		};
 		0D3AF74508FC457800621A78 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3374,10 +3365,11 @@
 			);
 			name = "Run Script";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/build_info.cpp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "${SRCROOT}/proj/mac/correct-info-plist.sh";
+			shellScript = "python ${SRCROOT}/../Tools/revno.py client \"${DERIVED_FILES_DIR}\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3757,6 +3749,7 @@
 				08977DDE134CFB8500C9DCFE /* ScenarioManager.cpp in Sources */,
 				08977E08134CFF6C00C9DCFE /* scenMain.cpp in Sources */,
 				08977E11134CFF9F00C9DCFE /* scenLua.cpp in Sources */,
+				FA5CDD491CD8BA6D00F93668 /* build_info.cpp in Sources */,
 				08977E19134D004300C9DCFE /* Texture2DArray.cpp in Sources */,
 				08977E1E134D007B00C9DCFE /* sneaky.cpp in Sources */,
 				08477139135E279F00325E43 /* trnScenario.cpp in Sources */,

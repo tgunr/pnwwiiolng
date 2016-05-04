@@ -25,9 +25,6 @@
 #ifdef HAVE_SIGNAL_H
 # include <signal.h>
 #endif
-#if AS_SERVER
-#include "hostproj/revision.h"
-#endif
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif

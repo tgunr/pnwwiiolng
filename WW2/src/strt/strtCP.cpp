@@ -11,8 +11,6 @@
 
 #define BOTH_WWII_SIDES_PRODUCE	FALSE
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcast.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "chat/chatTypes.h"

@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #ifdef BETA_RELEASE
 #include "chat/chatPlayer.h"
 #include "chat/chatDotCommand.h"

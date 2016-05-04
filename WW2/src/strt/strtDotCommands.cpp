@@ -11,8 +11,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Marty "Vandal" Poulin
 
-#include "versionNo.h"
-
 #include <sys/stat.h>
 
 #include "chat/chatDefines.h"

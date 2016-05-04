@@ -7,8 +7,6 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include "versionNo.h"
-
 #include "include/wthrTime.h"
 #include "server/serverInterface.h"
 #include "strt/strtConstants.h"

@@ -10,7 +10,6 @@
 
 // MANDATORY Playnet includes
 #include "syscfg.h"
-#include "versionNo.h"
 
 // System includes
 #include <iostream>

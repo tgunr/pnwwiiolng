@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "include/mydbQuery.h"
 #include <mysql.h>
 #include "teul/teulTime.h"

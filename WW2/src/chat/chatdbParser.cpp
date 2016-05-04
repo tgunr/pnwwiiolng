@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatdbHostMessages.h"
 #include "chat/chatdbParser.h"
 #include "chat/chatdbSquadXchg.h"

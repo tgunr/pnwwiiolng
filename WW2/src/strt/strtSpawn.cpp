@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
-
 #include <algorithm>
 
 #if platOS != OS_WIN32

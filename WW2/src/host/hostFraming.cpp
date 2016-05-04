@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "host/hostFraming.h"
 #include "host/host.h"
 #include "host/hostPlayer.h"

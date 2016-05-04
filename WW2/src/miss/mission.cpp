@@ -7,8 +7,6 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcast.h"
 #include "chat/chatHandle.h"
 #include "chat/chatSupportMessages.h"

@@ -81,7 +81,6 @@
 #include "teul/teulPacket.h"
 #include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
-#include "versionNo.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiIRC.h"

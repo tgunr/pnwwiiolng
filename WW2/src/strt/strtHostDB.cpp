@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "strt/strtDB.h"
 #include "strt/strtHostDB.h"
 #include "wwii/wwiiThreads.h"

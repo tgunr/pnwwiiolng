@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatLStringIDs.h"
 #include "chat/chatName.h"
 #include "chat/chatPlayer.h"

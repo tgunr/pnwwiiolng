@@ -10,8 +10,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcastObject.h"
 #include "chat/chatDB.h"
 #include "chat/chatDotCommand.h"

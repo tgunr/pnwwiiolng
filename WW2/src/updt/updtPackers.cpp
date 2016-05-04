@@ -12,7 +12,6 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include "versionNo.h"
 #if platBuild == TEUL_SERVER
 #include "include/clustercfg.h"
 #endif

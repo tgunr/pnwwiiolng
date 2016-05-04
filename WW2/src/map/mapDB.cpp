@@ -7,7 +7,6 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-#include "versionNo.h"
 #include "build_info.hpp"
 #include "auth/authPlayerDetails.h"
 #include "chat/chatGroupPermissionTypes.h"

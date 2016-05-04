@@ -10,7 +10,6 @@
 
 #include "include/clustercfg.h"
 
-#include "versionNo.h"
 #include <stack>
 
 #include "chat/chatCellHostSupportMessages.h"

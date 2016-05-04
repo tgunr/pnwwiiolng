@@ -12,8 +12,6 @@
 // Originating Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Marty "Vandal" Poulin
 
-#include "versionNo.h"
-
 #include "map/mapConstants.h"
 #include "parse/parseWor.h"
 #include "sdm/sdmConfigVars.h"

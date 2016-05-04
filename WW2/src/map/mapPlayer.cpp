@@ -7,8 +7,6 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-#include "versionNo.h"
-
 #include "chat/chatConstants.h"
 #include "chat/chatGroupPermissions.h"
 #include "chat/chatLStringIDs.h"

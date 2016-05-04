@@ -7,7 +7,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
 #include "hostproj/hostversion.h"
 
 #include <signal.h>  //to catch SIGHUPS with

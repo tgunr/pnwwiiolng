@@ -9,9 +9,6 @@
 
 #include <queue>
 #include <atomic>
-
-#include "versionNo.h"
-
 #include "build_info.hpp"
 #include "mem/mem.h"
 #include "server/serverFuncTypes.h"

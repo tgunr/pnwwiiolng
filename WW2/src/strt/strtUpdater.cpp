@@ -10,7 +10,6 @@
 // Originating Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Eric "Meat" Hall
 
-#include "versionNo.h"
 #include "server/serverInterface.h"
 
 #include "host/host.h"

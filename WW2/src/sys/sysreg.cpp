@@ -162,8 +162,6 @@ HKEY	hkey;
 	return(TRUE);
 }
 
-#include "versionNo.h"
-
 const TCHAR* sysregGetInstallValue(const TCHAR* Key)
 {
 	int appid = PN_WW2_INSTALL_ID;
