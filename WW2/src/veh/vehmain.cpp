@@ -3603,7 +3603,7 @@ UINT32 vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach)
     }
 	else if(persIsPersonaVehicleType(VEH_TYPE_GROUND) && Vehicle->isHulked() && vehmainCanSTO())
     {
-      if (Vehicle->VehicleDeadTime != 0) //vehExitVehicle was not called before, so request an STO was not send also
+      if (Vehicle->VehicleDeadTime == 0) //vehExitVehicle was not called before, so request an STO was not send also
       {
         // Can hulk if ground, vehicle is actually hulked and meet same requirements
         // as STO for vehicles.
