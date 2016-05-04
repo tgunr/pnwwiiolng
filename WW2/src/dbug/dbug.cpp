@@ -9,7 +9,7 @@
 // Originating Programmer: Martin Poulin
 
 #include "dbug/dbugInternal.h"
-
+#include "build_info.hpp"
 #include <fcntl.h>
 #include <sys/stat.h>
 #include "include/defs.h"
@@ -350,7 +350,7 @@ void dbugDumpBacktrace(int signum)
 		return;
 	}
 
-	_report(fd, "BACKTRACE [Rev " REPOSITORY_INFO ", %u functions]:\n", numAddrs);
+	_report(fd, "BACKTRACE [Rev %s, %u functions]:\n", PN_git_commitish_string, numAddrs);
 
 	backtrace_symbols_fd(backtraceAddrs, numAddrs, fd);
 

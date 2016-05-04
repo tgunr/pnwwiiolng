@@ -1,6 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 #include <stdarg.h>
 
+#include "build_info.hpp"
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "rn/rnlogo.h"
@@ -97,18 +98,7 @@ LOGICAL rnlogoInit(void)
 
 		// For debug and beta releases, append the commit info.
 		str += " : ";
-		str += WWII::gitCommitStr;
-
-#if(0)
-        if(ogl::UseDeprecatedPath())
-        {
-            str += " - deprecated path";
-        }
-        else
-        {
-            str += " - new path";
-        }
-#endif
+		str += PN_git_commitish_string;
 
         version->SetValue(str.c_str());
     }

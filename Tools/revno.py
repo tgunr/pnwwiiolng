@@ -1,94 +1,116 @@
-﻿#! /bin/env python
-##################################################
-# Script to generate a C file listing the current
-# revision of a given source repository.
-# -- Written for Python 3.0
-#
-# TODO: Was sloppily rewritten because of our
-# switch to git. It works just fine, but it really
-# needs to be cleaned up.
+﻿#!/bin/env python
 
-revisionFile = "WW2/src/client_revision.h"
-revisionNo = "GIT_COMMIT_NO"
-revisionString = "GIT_COMMIT_STR"
+### Define some constants
+version_info_file = "WW2/proj/versionNo.h"
+revision_file_in  = "WW2/src/build_info.cpp.in"
+revision_file_out = "build_info.cpp"
 
-#### Invoke a command and return the output
-def output_from_command(cmd):
-#{
-	""" Return the standard output from a command as a string. """
-	#try:
-	import subprocess
-	import sys
+### General imports
+import os, sys, tempfile, getpass, time
 
-	rawout = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).communicate()
-	if sys.version_info[0] < 3:
-		outstr = str(rawout[0])
-	else:
-		outstr = str(rawout[0], sys.stdout.encoding)
-	result = outstr.strip('\n')
-	return result
-	#except:
-	#	raise Exception("Error occurred trying to run: "+cmd)
-#}
+### Entry point
+def main():
+    if len(sys.argv) < 3:
+        sys.exit("Usage: %s <build type> <output path>" % sys.argv[0])
 
-#### Command line arguments: revno.py [<TopLevelPath>]
-# Assume 0 or 1 argument;
-#  0 arguments: Use the current working directory.
-#  1 argument : Assumed to be the path to the top of the repository.
+    repo_path = os.path.realpath(os.path.dirname(sys.path[0]))
+    git_command = "git -c color.ui=never -C %s" % repo_path
+    build_type = sys.argv[1]
+    output_directory = os.path.realpath(sys.argv[2])
+    version_value = get_version_value(os.path.realpath(os.path.join(repo_path, version_info_file)))
+    git_commit = get_command_output("%s rev-parse HEAD" % git_command)
+    git_commitish = get_command_output("%s rev-parse --short HEAD" % git_command)
+    git_state = "clean" if len(get_command_output("%s status --porcelain" % git_command)) == 0 else "dirty"
+    host_platform = "Mac" if sys.platform == 'darwin' else ("PC" if sys.platform == 'win32' else "Linux")
 
-from sys import argv, exit
-if len(argv) == 1:
-	path = "./"
-elif len(argv) == 2:
-	path = argv[1]
-	path = path.replace("\\", "/")
-	if path.endswith("/") == False:
-		path += "/"
-else:
-	exit("Usage: %s [repository path]" % (argv[0]))
+    if build_type != 'client' and build_type != 'host':
+        sys.exit("Build type must be 'client' or 'host'")
 
-#### Subversion client instanation.
-# The Python SVN hooks are required.
-# http://pysvn.tigris.org/
-#  -> Downloads
-#  -> Extension
+    replacements = {
+        'DATETIME':          time.strftime('%a %b %d, %Y %H:%M:%S %Z'),
+        'INPUT_FILE_NAME':   os.path.basename(revision_file_in),
+        'OUTPUT_FILE_NAME':  revision_file_out,
+        'PLATFORM':          host_platform,
+        'BUILD_TYPE':        build_type,
+        'CURRENT_USER':      getpass.getuser(),
+        'BUILD_HOST':        get_command_output("hostname"),
+        'GIT_ROOT':          repo_path,
+        'PRODUCT_VERSION':   version_value,
+        'GIT_COMMIT':        git_commit,
+        'GIT_COMMITISH':     git_commitish,
+        'GIT_STATE':         git_state,
+    }
 
-revNo = int(output_from_command("git log -n 1 --pretty=format:\"%h\"").replace('"', ''), 16)
-revStr = output_from_command("git rev-parse --short HEAD")
+    configure_file(os.path.join(repo_path, revision_file_in), os.path.join(output_directory, revision_file_out), replacements)
+    print("Wrote build information to " + os.path.join(output_directory, revision_file_out))
+    if sys.platform == 'darwin' and os.environ.get('BUILT_PRODUCTS_DIR') != None and build_type == 'client':
+        update_infoplist(replacements)
+        print("Updated Mac Info.plist")
 
-#### Check existing header file for revision number
-storedNo = 0
-storedStr = ""
-try:
-	# Open the client_revision file
-	with open(path + revisionFile, 'r') as f:
-		# Read thru the lines.
-		defines = [line for line in f if line.startswith("#define")]
-		for line in defines:
-			cols = line.split(" ")
-			if cols[1] == revisionNo:
-				storedNo = int(cols[2].strip(), 16)
-			elif cols[1] == revisionString:
-				storedStr = cols[2].strip()[1:-1] # Strip quotes.
-except (IOError):
-	# We can ignore file not found errors.
-	pass
+### Subroutine for running commands
+def get_command_output(cmd):
+    import shlex, subprocess
+    
+    rawdata = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE).communicate()[0]
+    if sys.version_info[0] < 3:
+        return str(rawdata).strip('\n')
+    else:
+        return str(rawdata, sys.stdout.encoding).strip('\n')
 
-#### Compare header file with actual revision number.
-# If the file doesn't exist, or if it exists and
-# has a different revision number than the working copy,
-# we need to recreate the header file.
+### Subroutine for atomically replacing a file, with Windows being a giant pain
+def replace_file_atomic(src, dst):
+    # Because atomic writes are only a solved problem in Python 3.3+, shenanigans!
+    if sys.version_info[0] > 3 or (sys.version_info[0] == 3 and sys.version_info[1] >= 3):
+        # 3.3+, use the supported API for the purpose
+        os.replace(src, dst)
+    elif sys.platform == 'win32':
+        # Windows < 3.3, haul in the pain-in-the-rear Win32 API
+        import win32api, win32con
+        win32api.MoveFileEx(src, dst, win32con.MOVEFILE_REPLACE_EXISTING)
+    else:
+        # Non-Windows < 3.3, use the perfectly good semantics POSIX guarantees but Windows is stupid about
+        os.rename(src, dst)
 
-if storedNo != revNo or storedStr != revStr:
-	# Different revision numbers, update the revision file.
-	with open(path + revisionFile, 'w') as f:
-		f.write("#pragma once\n// CLIENT REVISION NUMBER, DO NOT CHECK IN\n")
-		f.write("#define " + revisionNo + " 0x%0.7x" % revNo + "\n")
-		f.write("#define " + revisionString + " \"" + revStr + "\"\n")
-	print("Rebuilding client_revision.h for commit %s" % (revStr))
-else:
-	# Same same, just print a helpful note.
-	print("client_revision.h upto date for commit %s" % (revStr))
+### Perform replacement substitutions on a file atomically
+def configure_file(src, dst, substitutions):
+    with tempfile.NamedTemporaryFile(mode='w', delete=False) as ftmp:
+        with open(src, 'r') as fin:
+            for line in fin:
+                for replKey, replVal in substitutions.iteritems():
+                    line = line.replace(r'${%s}' % replKey, replVal)
+                ftmp.write(line)
+        ftmp.close()
+        replace_file_atomic(ftmp.name, dst)
 
-import sys
-sys.exit(0)
+### Update the Mac Info.plist file
+def update_infoplist(substitutions):
+    infoplist_path = os.path.join(
+        os.environ.get("BUILT_PRODUCTS_DIR"),
+        os.environ.get("WRAPPER_NAME"),
+        "Contents/Info.plist"
+    )
+    plist_subs = {
+        'GitShaHash': substitutions['GIT_COMMITISH'], 'GitState': substitutions['GIT_STATE'],
+        'CFBundleShortVersionString': substitutions['PRODUCT_VERSION'], 'CFBundleVersion': substitutions['PRODUCT_VERSION']
+    }
+    for pkey, pval in plist_subs.iteritems():
+        get_command_output('plutil -replace "%s" -string "%s" "%s"' % (pkey, pval, infoplist_path))
+    get_command_output('plutil -convert xml1 "%s"' % infoplist_path)
+
+### Use the preprocessor to pull the version number from the version file
+def get_version_value(version_info_file_path):
+    # Once again Windows insists on making things difficult. Since there's no
+    # way to redirect stdin into CL.EXE, we just use the completely pointless
+    # and wasteful temp file on all platforms.
+    version_expansions = "PN_WW2_PRODUCT_NO.PN_WW2_VERSION_NO.PN_WW2_PATCH_NO.PN_WW2_BUILD_NO"
+    with tempfile.NamedTemporaryFile(mode='w', bufsize=0) as ftmp:
+        ftmp.write(version_expansions + "\n") ; ftmp.flush()
+        if sys.platform == 'win32':
+            version_value = get_command_output('cl.exe /EP /FI "%s" /TP "%s"' % (version_info_file_path, ftmp.name))
+        else:
+            version_value = get_command_output('clang -E -P -include "%s" -x c++ "%s"' % (version_info_file_path, ftmp.name))
+    return version_value.replace(' ', '')
+
+### Let Python have "forward declarations" etc.
+if __name__=="__main__":
+   main()

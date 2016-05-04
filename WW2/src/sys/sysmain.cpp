@@ -534,7 +534,7 @@ struct LANGANDCODEPAGE
 			cpuspeed = (UINT32)GetCPUSpeed();
 		}
 
-		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs"), filename, pFFI, WWII::gitCommitStr);
+		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs"), filename, pFFI, PN_git_commitish_string);
 		Write_Debug(UTF8(txt));
 
 		GlobalMemoryStatus(&memstat);

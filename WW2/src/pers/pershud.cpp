@@ -2,7 +2,7 @@
 
 #include "phui/GraphicsContext.h"
 #include "libxml/tree.h"
-
+#include "build_info.hpp"
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "pers/pershud.h"
@@ -433,9 +433,9 @@ void GameInfoView::DisplayInfo()
 	Min = trnTODGetMinuteFromTimeOfDay(TOD);
 
 	DrawString(L"%ls: %.0f ", strings["hud.gameinfo.fps"].c_str(), gFPS);
-#if RELEASE_CLIENT == 0
-	DrawString("commit %s\n", WWII::gitCommitStr);
-#else
+#ifdef DEBUG
+	DrawString(L"commit %s\n", PN_git_commitish_string);
+#endif
 	DrawString(L"%ls: %02d:%02d\n", strings["hud.gameinfo.time"].c_str(), Hour, Min);
 
 	if(persIsPersonaVehicleType(VEH_TYPE_FLOATER))
@@ -446,15 +446,13 @@ void GameInfoView::DisplayInfo()
 
 	DrawString(L"%ls: %ls\n", strings["hud.gameinfo.icon"].c_str(), strings[modeKey].c_str());
 
-#if defined(BETA_RELEASE)
+#ifdef DEBUG
 	DrawString(L"%ls\n", clientGetNetworkState().c_str());
-#endif
 
 #ifdef VEHICLES_GAME_INFO
 	DrawString("%s\n", vehVehiclesGameInfo().c_str());
 #endif
 
-#if RELEASE_CLIENT == 0
 	DrawString("MSPF = %.0f\n", 1000.0f/gFPS);
 
 	UINT32	points, lines, triangles, vertices;
@@ -474,10 +472,7 @@ void GameInfoView::DisplayInfo()
 	DrawString("%s\n", txt);
 	speedgrassGetStats(txt);
 	DrawString("%s\n", txt);
-#endif
-#endif
 
-#if platOS == OS_WIN32 && (!defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0)
 	std::vector<std::wstring> nvHistory = updtGetNvHistory();
 	for ( auto it = nvHistory.begin(); it != nvHistory.end(); ++it )
 	{
