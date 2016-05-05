@@ -1,6 +1,6 @@
 # Configures the compiler for building the host given the target environment etc.
 
-IF (MSVC)
+IF ( MSVC )
 
     INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../proj/win )
 
@@ -34,12 +34,12 @@ IF (MSVC)
 
 ELSE()
     
-    IF ( NOT CMAKE_COMPILER_ID MATCHES Clang )
+    IF ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang )
         # Use cheap list of stupid options for GCC
         ADD_COMPILE_OPTIONS( "-Winvalid-pch" "-Wno-array-bounds" )
         ADD_COMPILE_OPTIONS( "-Wno-strict-aliasing" "-Wno-unused-result" "-Wno-unknown-pragmas" )
         ADD_COMPILE_OPTIONS( "-Wall" "-Wshadow" "-Wno-deprecated" )
-    ELSE ()
+    ELSE()
         # Every warning ever, then shut off the ones we don't want
         ADD_COMPILE_OPTIONS( "-Weverything" )
         ADD_COMPILE_OPTIONS( "-Wno-double-promotion" "-Wno-cstring-format-directive" )
@@ -58,6 +58,7 @@ ELSE()
         ADD_COMPILE_OPTIONS( "-Wno-objc-missing-property-synthesis" )
         ADD_COMPILE_OPTIONS( "-Wno-gnu-conditional-omitted-operand" "-Wno-old-style-cast" )
         ADD_COMPILE_OPTIONS( "-Wno-documentation-unknown-command" "-Wno-reserved-id-macro" )
+        ADD_COMPILE_OPTIONS( "-Wno-date-time" )
     ENDIF()
     
     ADD_COMPILE_OPTIONS( "-fstack-protector-all" "-fno-rtti" )
