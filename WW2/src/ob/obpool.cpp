@@ -258,10 +258,8 @@ static void FreeQueuedObjects()
 
         if(o->modelInstance)
         {
-#ifndef ANDREWTEST
             delete o->modelInstance;
             o->modelInstance = nullptr;
-#endif
         }
 
         listDeleteOBJECT(o);
