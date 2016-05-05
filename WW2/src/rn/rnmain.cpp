@@ -52,10 +52,6 @@
 #include "ui/uiDotCommands.h"
 #include "map/mapArenaDescription.h"
 
-#if platOS == OS_WIN32 && defined(PERFORMANCE_ENTER_EXIT)
-#include "syspee.h"
-#endif
-
 #include "shader/glsl.h"
 
 #if platOS == OS_WIN32
