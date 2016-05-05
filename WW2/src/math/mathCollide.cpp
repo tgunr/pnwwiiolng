@@ -14,11 +14,7 @@
 #define IS_SMALL(x) x < 1e-7 && x > -1e-7
 
 #ifdef MATHCOLLIDE_INLINE
-    #if platOS == OS_MACOS
-        #define INLINE inline
-    #else
-        #define INLINE __forceinline
-    #endif
+    #define INLINE inline
 #else
     #define INLINE
 #endif

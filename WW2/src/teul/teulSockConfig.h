@@ -9,29 +9,24 @@
 // Originating Programmer: Martin Poulin
 
 #if platOS == OS_WIN32
+
 	#define socklen_t SINT32 FAR
 	#define sockval_t SINT32 FAR
 
-#elif platOS == OS_MACOS
+#else
+
 	#include <signal.h>
 	#include <sys/ioctl.h>
 	#include <fcntl.h>
 	#include <unistd.h>
-	#define sockval_t SINT32
-	#define INVALID_SOCKET -1
-	#define SOCKET_ERROR -1
+	#define sockval_t int
 	#define closesocket close
 	#define ioctlsocket ioctl
 
-#elif platOS == OS_LINUX
-	#define sockval_t char
-	#define SOCKET_ERROR -1
-	#define closesocket close
-
-	#define ioctlsocket ioctl
-
-	#define INVALID_SOCKET -1
-
-#else
-#error "No definition for your platform!"
 #endif
+
+#define INVALID_SOCKET  -1
+#define SOCKET_ERROR -1
+typedef int				SOCKET;
+#define PRF_SOCKET "%d"
+#define PRA_SOCKET(s) int(s)

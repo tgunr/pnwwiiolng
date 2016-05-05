@@ -5,7 +5,6 @@
 #include <sys/stat.h>
 #include "cfgPrefs.h"
 #import <Cocoa/Cocoa.h>
-#include "endianess.h"
 
 LOGICAL cursorHidden = false;
 

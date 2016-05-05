@@ -761,7 +761,6 @@ struct eqstr
 	}
 };
 
-#if platOS == OS_MACOS
 using CharPSet = std::unordered_set<const char*, ConstCharHasher, eqstr>;
 static CharPSet* RoadTextureNames = nullptr;
 
@@ -790,11 +789,9 @@ static void initRoadTextureNames()
 	RoadTextureNames->insert("terrain\\brdg\\tangray1");
 	RoadTextureNames->insert("terrain\\brdg\\urbanroad1");
 }
-#endif
 
 static bool isRoadTexture( int texid )
 {
-#if platOS == OS_MACOS
 	TEXTURE* tp = oglGetTextureData(texid);
 	bool res = tp!=nullptr && RoadTextureNames->find( tp->name ) != RoadTextureNames->end();
 	if ( res )
@@ -802,9 +799,6 @@ static bool isRoadTexture( int texid )
 		//printf("%s\n",tp->name);
 	}
 	return res;
-#else
-	return false;
-#endif
 }
 
 #define LOOK_FOR_DEGENERATE_TRIANGLES 0
@@ -821,12 +815,10 @@ static bool ReadVertexList(void)
 	OBJECT*				lpobj					= nullptr;
 	piUNIFIED_VERTEX*	vertices				= nullptr;
 
-#if platOS == OS_MACOS
 	if ( RoadTextureNames == nullptr )
 	{
 		initRoadTextureNames();
 	}
-#endif
 
 	length = (int)s_chunk->next - 4;
 
@@ -2332,18 +2324,7 @@ static void changeMaterials( OBJECT* obj )
 }
 #endif
 
-#define xSHOWLDMSGS 1
-#if platOS == OS_MACOS
-#define OutputDebugStringA(x) printf(x)
-//#undef Write_Debug
-//#define Write_Debug DoOutputX
-
-void DoOutputX(const char* str, ...)
-{
-	printf( "%s\n", str);
-}
-
-#endif
+#define SHOWLDMSGS 1
 
 #ifdef SHOWLDMSGS
 # define LDWrite_Debug(fmt, ...) dbugLog(_FLD, fmt, ## __VA_ARGS__);

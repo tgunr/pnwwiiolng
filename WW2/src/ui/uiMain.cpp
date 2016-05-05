@@ -97,11 +97,6 @@
 //#define UI_CFONT_NAME "simhei.ttf"
 #define UI_FONT_NAME "wqy-zenhei.ttf"
 
-#ifdef TESTMAC
-//extern "C" void spawningin();
-//extern "C" void spawningout();
-#endif
-
 /************************************************************************************************
 	piGraphicsContext
 *************************************************************************************************/
@@ -1175,10 +1170,6 @@ void uiGameToUI()
 
 	// run any scenario specific dot commands associated with despawning
 	SCEN_MGR->RunCommands(TUT_EVENT_DESPAWN);
-
-#ifdef TESTMAC
-//  spawningout();
-#endif
 
 	if(SCEN_MGR->IsActive() && SCEN_MGR->HasFlag(ScenarioManager::RESPAWN_ME))
 	{

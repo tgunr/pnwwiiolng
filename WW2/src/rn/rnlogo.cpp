@@ -59,10 +59,6 @@ static const char* _stdSplashScreen = "data/screens/splashscreen43.bmp";
 static const char* _wideLoadingScreen = "data/screens/loadingscreen69.bmp";
 static const char* _stdLoadingScreen = "data/screens/loadingscreen43.bmp";
 
-#ifdef TESTMAC
-std::string currentLoadString;
-#endif
-
 /************************************************************************************************
 	rnlogoInit
 *************************************************************************************************/
@@ -217,10 +213,6 @@ void rnUpdateLoadingEnd()
 	gAppPrefs->ReplaceOrAddLong(CFG_APP_LOADTIME, _totalloadtime);
 }
 
-#ifdef TESTMAC
-//void memtestnote();
-#endif
-
 /************************************************************************************************
 	rnlogoUpdateStatus
 *************************************************************************************************/
@@ -236,10 +228,6 @@ void rnlogoUpdateStatus(const char* str, ...)
 		char buf[128];
 		vsnprintf(buf, 127, str, marker);
 		va_end(marker);
-#ifdef TESTMAC
-//    currentLoadString = buf;
-//    memtestnote();
-#endif
 		_status->SetValue((uiLocString(buf)).c_str());
 	}
 	rnUpdateLoadingScreen();

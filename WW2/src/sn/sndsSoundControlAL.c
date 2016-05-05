@@ -59,7 +59,7 @@ LOGICAL sndsPlatformInit(void)
 
 	// EAX extension stuff would go here
 
-	#if platOS == OS_MACOS
+#if platOS == OS_MACOS
 	alDopplerFactor(1);				// current OpenAL used on Mac OS X has doppler issues...
 	alDopplerVelocity(340.0);		// so let it stay at its defaults. Working with Apple on this issue
 
@@ -75,7 +75,7 @@ LOGICAL sndsPlatformInit(void)
 		alEnable(ALC_CONVERT_DATA_UPON_LOADING);
 	else
 		alDisable(ALC_CONVERT_DATA_UPON_LOADING);
-	#endif
+#endif
 
 	alGenSources(MAX_ALSRCS, alSrc);
 

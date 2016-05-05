@@ -90,27 +90,14 @@ struct GFX_FORMATS
 
 static LOGICAL reduceTextures = FALSE;
 
-#ifdef TESTMAC
-extern "C" void startcollection(const char* f);
-extern "C" void stopcollection();
-#endif
-
 int ldpixLoadImageFileToSurface(const char* Filename, UINT32 TransparentColor, UINT32 Flags)
 {
-#ifdef TESTMAC
-//  startcollection(Filename);
-#endif
-
   SINT32 texid = _loadImageFileToSurface(Filename, TransparentColor, Flags);
 
     if(!(Flags & LDPIX_NO_TEXTURE_GENERATE))
     {
         piGetTextureHandle(texid, 0);
     }
-
-#ifdef TESTMAC
-//  stopcollection();
-#endif
 
 	return texid;
 }

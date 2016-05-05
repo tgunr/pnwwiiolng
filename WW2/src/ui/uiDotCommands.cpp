@@ -7222,9 +7222,6 @@ static int dot_texinfo(const char* line)
         case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:   s= "GL_COMPRESSED_RGBA_S3TC_DXT5_EXT"; bytes=4;
           break;
       }
-#if platOS == OS_MACOS
-      printf("%4d %50s [%4d x %4d x %1d = %'12d, (%s)]\n", i, textureName.c_str(), W, H, bytes, W*H*bytes, s);
-#endif
       Write_Debug("%4d %50s [%4ld x %4ld x %1d = %'12ld, (%s)]\n", i, textureName.c_str(),  W, H, bytes, W*H*bytes, s);
     }
   }

@@ -80,7 +80,6 @@ CWW2Shader::CWW2Shader(const SCHAR* shader, SINT32 shaderType)
 //////////////////////////////////////////////////////////////////////
 CWW2Shader::~CWW2Shader()
 {
- #if platOS != OS_MACOS // this gets call from static destructor long after everything has been uninitialized
 	if(isProgram())
     {
         killProgram();
@@ -91,7 +90,6 @@ CWW2Shader::~CWW2Shader()
         cgDestroyContext(m_cgContext);
         m_cgContext = NULL;
     }
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////

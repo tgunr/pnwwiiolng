@@ -836,10 +836,6 @@ void _RenderDeprecated()
 {
     const bool render = uiInGame() && (Online ? g_bVehicleAttached : TRUE);
 
-#if platOS == OS_MACOS
-	//render = !ddpAppHidden();
-#endif
-
 	if(render)
 	{
         // Once per frame frustum setup for culling
@@ -861,10 +857,6 @@ void _RenderDeprecated()
     gmlpHandleFieldOfView();
 
     const bool bRender = uiInGame() && (Online ? g_bVehicleAttached : TRUE);
-
-#if platOS == OS_MACOS
-	//bRender = !ddpAppHidden();
-#endif
 
 	if(bRender)
 	{

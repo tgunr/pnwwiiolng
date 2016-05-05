@@ -926,11 +926,7 @@ float ha, ha2, dec, lat, lon, alt, az;
 
 	lpd->x = dec;
 
-#if platOS == OS_MACOS
 	if (!std::isnan(lpd->x) && isfinite(lpd->x))
-#else
-	if (!_isnan(lpd->x) && _finite(lpd->x))
-#endif
 	{
 		while (lpd->x < 0)
 		{
@@ -948,11 +944,7 @@ float ha, ha2, dec, lat, lon, alt, az;
 	}
 
 	lpd->y = lon - ha - ha2;
-#if platOS == OS_MACOS
 	if (!std::isnan(lpd->y) && isfinite(lpd->y))
-#else
-	if (!_isnan(lpd->y) && _finite(lpd->y))
-#endif
 	{
 		while(lpd->y < 0)
 		{
@@ -970,11 +962,7 @@ float ha, ha2, dec, lat, lon, alt, az;
 	}
 
 	lpd->z -= az;
-#if platOS == OS_MACOS
 	if (!std::isnan(lpd->z) && isfinite(lpd->z))
-#else
-	if (!_isnan(lpd->z) && _finite(lpd->z))
-#endif
 	{
 		while (lpd->z < 0)
 		{

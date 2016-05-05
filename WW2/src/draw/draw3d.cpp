@@ -591,9 +591,7 @@ LOGICAL draw3dGizmoLine(FLOAT64VECTOR const* inV1, FLOAT64VECTOR const* inV2, pi
 	return(TRUE);
 }
 
-#ifdef _MWERKS
 #pragma mark -
-#endif
 
 /************************************************************************************************
 	draw3dWorldDebug

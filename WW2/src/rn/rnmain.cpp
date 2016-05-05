@@ -56,8 +56,6 @@
 
 #if platOS == OS_WIN32
 #include <direct.h>
-#elif platOS == OS_MACOS
-#include <Carbon/Carbon.h>
 #endif
 #include "math/math3d.h"
 #include "comm/commClientMessages.h"

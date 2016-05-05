@@ -40,10 +40,7 @@
 #include "weap/weapList.h"
 #include "parse/countryCodes.h"
 #include "strt/strtDTL.h"
-
-#if platOS != OS_MACOS
-	#include "str/stringLib.h"
-#endif
+#include "str/stringLib.h"
 
 enum
 {

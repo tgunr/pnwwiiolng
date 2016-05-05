@@ -6454,9 +6454,7 @@ void trncdResetFXDamageFlags()
     }
 }
 
-#ifdef _MWERKS
 #pragma mark -
-#endif
 // new collider stuff
 
 /************************************************************************************************
