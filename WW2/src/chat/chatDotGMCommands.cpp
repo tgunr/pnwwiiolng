@@ -651,15 +651,6 @@ public:
 			return;
 		}
 
-		if ( strcasecmp(args[0], "kfs1") == 0 )
-		{
-			if ( (rand() & 1) == 0 )
-				player.message(LSTR_ERROR, LSTR_GENERIC, "KFS1 isn't lost.");
-			else
-				player.message(LSTR_ERROR, LSTR_GENERIC, "No need, I already know exactly where he is. If you need to know, I'll send you a message.");
-			return;
-		}
-
 		// Locate the user
 		Player* subject = PlayerInterface::Lookup(args[0]);
 
