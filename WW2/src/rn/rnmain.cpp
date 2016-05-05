@@ -1164,30 +1164,13 @@ LOGICAL rnmainMoveView(FLOAT64 PosX, FLOAT64 PosY)
 
 static void PrintDateTime(void)
 {
-#if platOS == OS_WIN32
-SYSTEMTIME	SystemTime;
+    char buf[256] = {0};
+    struct tm t;
+    time_t p = time(nullptr);
 
-	GetLocalTime(&SystemTime);
-	Write_Debug("Date and time: %d/%d/%d %d:%02d:%02d",
-				SystemTime.wMonth,
-				SystemTime.wDay,
-				SystemTime.wYear,
-				SystemTime.wHour,
-				SystemTime.wMinute,
-				SystemTime.wSecond);
-#elif platOS == OS_MACOS
-DateTimeRec	time;
-	GetTime(&time);
-	Write_Debug("Date and time: %d/%d/%d %d:%02d:%02d",
-				time.month,
-				time.day,
-				time.year,
-				time.hour,
-				time.minute,
-				time.second);
-#else
-	Write_Debug("Normally, you'd see date and time printed here. Take care of this, programmer...");
-#endif
+    localtime_r(&p, &t);
+    strftime(buf, 255, "Date and time: %F %T %z", &t);
+    Write_Debug("%s", buf);
 }
 
 

@@ -1362,46 +1362,8 @@ typedef LOGICAL (*piDRAW_OBJECTS)(void);
 	#define DIError(code)   code
 #endif
 
-#if platOS == OS_WIN32
-inline SINT32 piReadTimeStamp32(void)
-{
-SINT32	value;
-	__asm
-	{
-		push eax
-		push edx
-		rdtsc
-		mov value, eax
-		pop edx
-		pop eax
-	}
-
-	return(value);
-}
-
-inline __int64 piReadTimeStamp64(void)
-{
-__int64		value;
-	__asm
-	{
-		push eax
-		push ebx
-		push edx
-		rdtsc
-		lea ebx, DWORD PTR value
-		mov [ebx], eax
-		mov [ebx+4], edx
-		pop edx
-		pop ebx
-		pop eax
-	}
-
-	return(value);
-}
-#else
 #define piReadTimeStamp32 GetMicroSeconds
 #define piReadTimeStamp64 GetMicroSeconds
-#endif
 
 extern SINT32 piFloatLikeLong(FLOAT32 f);
 extern FLOAT32 piLongLikeFloat(SINT32 l);

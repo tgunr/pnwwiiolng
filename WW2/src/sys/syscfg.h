@@ -139,7 +139,8 @@ typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #include "pi/pi.h"
 
-#endif
+extern UINT64 GetMicroSeconds(void);
 
 #endif
 
+#endif
