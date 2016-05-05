@@ -1565,7 +1565,7 @@ ServerInterface::LookupByPlayerID(UINT32 id)
 UINT32
 serverGetAuthIP()
 {
-	if ( useAuthServer == false )
+	if ( !useAuthServer )
 		return 0;
 
 	const char* authName = cv_authHost.GetString();
@@ -1573,18 +1573,8 @@ serverGetAuthIP()
 		LogAbort("Missing AUTH_ADDRESS");
 
 	UINT32 address = Teul::GetSingleIP(authName);	// Returns malloc'd pointer!
-	if ( address == 0 )
-	{
-		if ( useAuthServer == true )
-		{
-			LogAbort("Unable to resolve auth address '%s'", authName);
-			/* ABORTED */
-		}
-
-		dbugLog(_FLN, "Couldn't resolve auth address '%s', ignoring", authName);
-		return 0;
-	}
-
+	
+	ABORT_IF_EX(address == 0, "Unable to resolve auth address '%s'", authName);
 	return address;
 }
 
