@@ -18,12 +18,12 @@
 // Player killed themselves.
 
 static void
-_doSuicide(const Player& idiotPlayer, const Scoring::Sortie& idiotSortie)
+_doSuicide(const Player& deadPlayer, const Scoring::Sortie& idiotSortie)
 {
 #ifdef BETA_RELEASE
 	///TODO:134:REMOVE
 	char explanation[81];
-	sprintf(explanation, "%s killed by self or AI.", idiotPlayer.callsign());
+	strprintf(explanation, "%s killed by self or AI.", deadPlayer.callsign());
 	chatSendBroadcastAll(LSTR_BETA, LSTR_GENERIC, explanation);
 #endif
 }
