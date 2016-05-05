@@ -229,12 +229,7 @@ public:
 						 piVECTOR* Vel,
 						 OBJECT * CollideObject);
 
-// CodeWarrior doesn't like this declaration...
-#if platOS == OS_MACOS
 	LOGICAL StopEffect(SINT32 HandleNum);
-#else
-	LOGICAL CFXApp::StopEffect(SINT32 HandleNum);
-#endif
 
 private:
 	CFXParticle FXParticle;
