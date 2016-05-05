@@ -362,6 +362,7 @@ BOOL				bOsVersionInfo;
 #define DIV 1024
 
 int GetCpuid(void)
+UINT64 GetMicroSeconds(void)
 {
 int CPUType;
 
@@ -393,6 +394,13 @@ int CPUType;
 		Write_Debug("This is not a Pentium family processor.\n");
 
 	return(CPUType);
+    LARGE_INTEGER result, freq;
+    
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&result);
+    result.QuadPart *= 1000000;
+    result.QuadPart /= freq.QuadPart;
+    return result.QuadPart;
 }
 
 #pragma optimize("", off)
