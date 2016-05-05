@@ -1,3 +1,4 @@
+## Begin original module leader and license:
 # - Find MySQL
 # Find the MySQL includes and client library
 # This module defines
@@ -9,11 +10,13 @@
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+## End original module leader and license
 
-SET(MYSQL_FOUND 0)
+SET( MYSQL_FOUND 0 )
 
-IF (PN_USE_SYSTEM_MYSQL)
-
+# OS X has no embedded prebuilts; always use system version there
+IF ( PN_USE_SYSTEM_MYSQL OR APPLE )
+    # Original module's search-the-system logic goes until the end of this block
 	IF (WIN32)
 		STRING(REGEX REPLACE "\\+" "/" SystemDrive "$ENV{SystemDrive}")
 		STRING(REGEX REPLACE "\\+" "/" ProgramFiles "$ENV{ProgramFiles}")
@@ -132,34 +135,24 @@ IF (PN_USE_SYSTEM_MYSQL)
 		)
 		SET(MYSQL_LIBRARIES ${MYSQL_LIBRARIES} dl)
 	ENDIF ()
-ELSE ()
-	FIND_PATH(
-		MYSQL_INCLUDE_DIR
-		NAMES "mysql.h"
-		PATHS
-				${LIBRARIES_DIR}/mysql/include
-	)
-
-	IF (WIN32)
-		FIND_LIBRARY(
-			MYSQL_LIBRARIES
-			NAMES "libmysql" "mysqlclient"
-			PATHS
-				${LIBRARIES_DIR}/mysql/lib/win${CMAKE_BITNESS}
+ELSE()
+    # Our use-embedded-library logic
+	FIND_PATH( MYSQL_INCLUDE_DIR NAMES "mysql.h" PATHS ${LIBRARIES_DIR}/mysql/include )
+	IF ( WIN32 )
+		FIND_LIBRARY( MYSQL_LIBRARIES
+			NAMES libmysql mysqlclient
+			PATHS ${LIBRARIES_DIR}/mysql/lib/win${CMAKE_BITNESS}
 		)
-	ELSE ()
-		FIND_LIBRARY(
-			MYSQL_LIBRARIES
+	ELSE()
+		FIND_LIBRARY( MYSQL_LIBRARIES
 			NAMES mysqlclient_r libmysqlclient_r
-			PATHS
-				${LIBRARIES_DIR}/mysql/lib/lin${CMAKE_BITNESS}
+			PATHS ${LIBRARIES_DIR}/mysql/lib/lin${CMAKE_BITNESS}
 		)
-		SET(MYSQL_LIBRARIES ${MYSQL_LIBRARIES} dl)
-	ENDIF ()
+		SET( MYSQL_LIBRARIES ${MYSQL_LIBRARIES} dl )
+	ENDIF()
+ENDIF()
 
-ENDIF ()
+INCLUDE( FindPackageHandleStandardArgs )
+FIND_PACKAGE_HANDLE_STANDARD_ARGS( MySQL DEFAULT_MSG MYSQL_LIBRARIES MYSQL_INCLUDE_DIR )
 
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(MySQL DEFAULT_MSG MYSQL_LIBRARIES MYSQL_INCLUDE_DIR)
-
-MARK_AS_ADVANCED(MYSQL_INCLUDE_DIR MYSQL_LIBRARIES)
+MARK_AS_ADVANCED( MYSQL_INCLUDE_DIR MYSQL_LIBRARIES )

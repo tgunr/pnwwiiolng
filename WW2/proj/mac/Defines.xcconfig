@@ -22,7 +22,7 @@
 // doesn't matter, but it does read more like what's intended.)
 
 // Platform
-WW2_DEFINES_Platform        = _MACOSX=1 platOS=OS_MACOS XP_MAC XP_UNIX              // We're on Mac, duh
+WW2_DEFINES_Platform        = platOS=OS_MACOS XP_MAC XP_UNIX _MACOSX                // We're on Mac, duh
 
 // Common macros in all modes
 WW2_DEFINES_Common_03       = $(WW2_DEFINES_Common_04) EVENT_LOG                    // enable various logging things
@@ -59,7 +59,7 @@ WW2_DEFINES_Development_02  = $(WW2_DEFINES_Development_03) CONNECTION_TEST_BUIL
 WW2_DEFINES_Development_01  = $(WW2_DEFINES_Development_02) DEV_BUILD               // various extra debugging
 
 // GM mode
-WW2_DEFINES_GM_01           = $(WW2_DEFINES_GM_02) ENABLE_FLOATERS                  // enable buzzard and several other things
+WW2_DEFINES_GM_01           = $(WW2_DEFINES_GM_02) ENABLE_FLOATERS                  // enable buzzard
 
 // Release mode
 WW2_DEFINES_Release_02      = $(WW2_DEFINES_Release_02) NDEBUG
