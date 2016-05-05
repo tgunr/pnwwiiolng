@@ -86,27 +86,6 @@ struct
 }
 
 /*
- * Very Fast Assembly, Low Precision Sqrt of float fx
- */
-#if platOS == OS_WIN32
-INLINE float math3dFastAsmSqrt(float fx)
-{
-	__asm
-	{
-		mov eax,	fx
-		sub eax,	FP_ONE
-		sar eax,	1
-		add eax,	FP_ONE
-		mov [fx],	eax
-	}
-
-	return fx;
-}
-#else
-#define math3dFastAsmSqrt(fx)	(float)sqrt(fx)
-#endif
-
-/*
  * Fast, Low Precision Normalize of vector v
  */
 INLINE piVECTOR* math3dFastNormalize(piVECTOR* lpa)
