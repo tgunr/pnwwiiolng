@@ -2118,7 +2118,7 @@ SINT32			RecoilNum = 0;
 	{
 		for (i=0;i<VEH_MAX_MOUNTS;i++)
 		{
-			// ghost fire can only occur for player's vehicle if he doesn't control that position
+			// ghost fire can only occur for player's vehicle if they don't control that position
 			if (Vehicle->ModelData != nullptr)
 			{
 				if (!(Vehicle->ModelData->FireMask & (1 << i)))

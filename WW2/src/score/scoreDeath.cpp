@@ -77,7 +77,7 @@ _areaKillNotice(const Scoring::Sortie& victim, const Scoring::Sortie& killer)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Notify a player he got a kill.
+// Notify a player they got a kill.
 
 static void
 _playerKillNotice(const Scoring::Sortie& victim, const Scoring::Sortie& killer, const bool friendlyFire)

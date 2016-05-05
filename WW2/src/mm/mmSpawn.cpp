@@ -501,7 +501,7 @@ mmProcessPostExpired(const MM_POST_EXPIRED& expiry)
 
 	player->cancelWeapon(false);
 
-	//If he canceled it, we don't want to tell him about it.  That would
+	//If they canceled it, we don't want to tell them about it.  That would
 	//	be redundant now, wouldn't it? :)
 	if ( player->isSpawned() == false &&  expiry.cancelled == false )
 	{

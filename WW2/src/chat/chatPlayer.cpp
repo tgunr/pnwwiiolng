@@ -1627,7 +1627,7 @@ Player::SetWeapon(const WEAPON_SPEC& toWeapon)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Sever this player's recruiter link to all the players he is
+// Sever this player's recruiter link to all the players they are
 // currently recruiting (if any) and notify them
 
 void
@@ -2239,7 +2239,7 @@ Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 					: _countryNameAdj[country()]
 					;
 
-	// He's not in a facility, ergo at the map
+	// They're not in a facility, ergo at the map
 	if ( !missionID() )
 	{
 		snprintf(into, MAX_MESSAGE_LENGTH, "%s brigade scrn", affiliation);
@@ -2264,7 +2264,7 @@ Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 		strcat(into, "unknown");
 	strcat(into, " mission " );
 
-	// He's started the spawning process
+	// They've started the spawning process
 	UINT32 cellIP = getCellHost();
 	if ( cellIP == 0 )
 	{
@@ -2275,7 +2275,7 @@ Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 	else
 	{
 		strcat(into, chatMakeTempString("cell#%u", (cellIP & 0xff)));
-		// He may not have finished spawning
+		// They may not have finished spawning
 		if ( !isSpawned() )
 		{
 			strcat(into, " spawning ");

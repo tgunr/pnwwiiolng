@@ -1835,7 +1835,7 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 	}
 
 	// At this stage, we should detach from our reinforcement if we
-	// are still attached to him so that he will resupply
+	// are still attached to them so that they will resupply
 	detachReinforcement();
 
 	// Detach the multicrew

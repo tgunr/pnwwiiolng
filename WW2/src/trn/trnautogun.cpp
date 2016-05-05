@@ -1820,8 +1820,8 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 
 	// here are the target selection rules:
 	//
-	// first find a visible target, if found, shoot him
-	// otherwise see if there's a no-vis target, if found, aim at him but don't shoot
+	// first find a visible target, if found, shoot them
+	// otherwise see if there's a no-vis target, if found, aim at them but don't shoot
 	if (frametime - AG->NextTargetSelectTime > _TARGET_SELECTION_TIME)
 	{
 		AG->LastTarget = AG->Target;

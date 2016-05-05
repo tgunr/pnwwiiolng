@@ -1274,10 +1274,10 @@ SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 
 		/* taking this out unless I see a problem
 		// there is now hulking for hulks sake; ie we do it if we see some significant damage just for pure gameplay fun
-		// so don't kill the guy because we're spicing the game up; this call was simply an insurance call anyway
+		// so don't kill the play because we're spicing the game up; this call was simply an insurance call anyway
 		// root problems for the player not dying ought to be fixed instead
 
-        if(veh->ModelData)  // and make sure the guy freaking dies if he's not already, sure there's plenty of other hoops I'll have to jump through
+        if(veh->ModelData)  // and make sure the player freaking dies if they're not already, sure there's plenty of other hoops I'll have to jump through
         {
 	        veh->ModelData->VehicleIsDead = TRUE;
 	        persKillCrew();
@@ -1445,7 +1445,7 @@ SINT32 vehVisDamageUnHulkVehicle(vehVehicle* veh)
     {
         vehAnimChangeVehicleStateByName(veh, (UCHAR*)"crashexplosion", TRUE);
 
-        if(veh->ModelData)  // and make sure the guy freaking dies if he's not already, sure there's plenty of other hoops I'll have to jump through
+        if(veh->ModelData)  // and make sure the player freaking dies if they're not already, sure there's plenty of other hoops I'll have to jump through
         {
 	        veh->ModelData->VehicleIsDead = TRUE;
 	        persKillCrew();

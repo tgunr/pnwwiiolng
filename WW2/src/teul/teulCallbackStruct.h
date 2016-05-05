@@ -13,7 +13,7 @@ all of the  communication parameters, and references to the specific routines
 that manipulate it (packer, send, callback, error handler, etc..).  By
 combining this all into one object we save ourselves a lot of repetitive work.
 The developer no longer has to worry about all the parameters after an object
-is initialized unless he needs to change them (typically these do not change).
+is initialized unless they need to change them (typically these do not change).
 
 	This is critical for acknowledged messages.  The point of an acknowledged
 message is that if it times out the sending application can decide weather to

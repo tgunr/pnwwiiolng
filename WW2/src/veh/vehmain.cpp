@@ -4092,7 +4092,7 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 	if (Vehicle == nullptr || Vehicle->ModelData == nullptr)
 		return 0;
 
-	if (persIsCrewDead()) // The navy regrets to inform you that your son is dead because he was stupid.
+	if (persIsCrewDead())
 		return 0;
 
 	trnCDTerrainObject* TO, *ClosestTO, *ResupplyTO;
@@ -4767,7 +4767,7 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 				}
 				else
 				{
-					// player is not shooting him/herself, and
+					// player is not shooting themselves, and
 					// the hit target is of the same country
 					return 0;
 				}
@@ -6502,7 +6502,7 @@ static void vehmainSpawn()
 
 	persAttachPlayerToVehicle(pVehicle, 0);
 
-	// now ensure he's in the correct position to start with
+	// now ensure they're in the correct position to start with
 	persSetPersonaPosition(0);
 
 	// reset any old vehicle settings as needed

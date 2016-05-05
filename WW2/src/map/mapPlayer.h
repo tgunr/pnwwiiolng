@@ -326,7 +326,7 @@ public:
 	bool			m_requestedCapacity : 1;	// True when capacity has been requested.
 	bool			m_receivedCapacity : 1;		// True when we've received a capacity reply
 	bool			m_needsChatSync:1;			// Needs to be sync'd with chat
-	bool			m_promoted : 1; 			// If his last mission gave a promotion
+	bool			m_promoted : 1; 			// If their last mission gave a promotion
 	bool			m_clientActivated : 1;		// Has the client been activated yet?
 	bool			m_xferedToChat : 1;			// Has the client completed chat transfer yet?
 	bool			m_allowPollVote : 1;		// Defaults to no
