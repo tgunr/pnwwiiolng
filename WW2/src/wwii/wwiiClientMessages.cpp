@@ -225,7 +225,8 @@ wwiiQueuedSend_WWII_ERROR_INFO(WWII_ERROR_INFO* info)
 	if ( ! errInfo->clientTime )        errInfo->clientTime         = teulTime();
 	if ( ! errInfo->hostTime )          errInfo->hostTime           = errInfo->clientTime - lastClientTime + lastHostTime;
 	if ( ! errInfo->hostIP )            errInfo->hostIP             = lastHostIP;
-	if ( ! errInfo->clientSourceCommit) errInfo->clientSourceCommit = WWII::gitCommitNo;
+	// TODO: Reassociate this with sane, since commit hashes in Git are not numbers (no, they're not hex values either)
+	if ( ! errInfo->clientSourceCommit) errInfo->clientSourceCommit = 0;
 
 	return 0;
 }
