@@ -352,129 +352,27 @@ BOOL				bOsVersionInfo;
 	return(TRUE);
 }
 
+UINT64 GetMicroSeconds(void)
+{
+    LARGE_INTEGER result, freq;
+    
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&result);
+    result.QuadPart *= 1000000;
+    result.QuadPart /= freq.QuadPart;
+    return result.QuadPart;
+}
+
 #ifdef EVENT_LOG
 
-#define cpuid __asm _emit 0x0f __asm _emit 0xa2
-
 #define DIV 1024
-
-int GetCpuid(void)
-{
-int CPUType;
-
-	__asm
-	{
-		cpuid
-		cpuid
-		cpuid
-		cpuid
-
-		__asm mov CPUType, eax	; Move result of CPUID to CPU variable
-	}
-
-	_asm
-	{
-		_emit 0x0f			; CPUID (00001111 10100010) - This is a Pentium
-							; specific instruction which gets information on the
-		_emit 0xa2			; processor. A Pentium family processor should set
-							; bits 11-8 of eax to 5.
-
-		mov CPUType, eax	; Move result of CPUID to CPU variable
-	}
-
-	CPUType = (CPUType >> 8) & 0x000f;
-
-	if (CPUType == 5)
-		Write_Debug("This is a Pentium family processor.\n");
-	else
-		Write_Debug("This is not a Pentium family processor.\n");
-
-	return(CPUType);
-}
-
-#pragma optimize("", off)
-
-FLOAT32 GetCPUSpeed(void)
-{
-	FLOAT32 speed;
-	LARGE_INTEGER	count1, count2, freq;
-	__int64			count, rdcount, rdcount1, rdcount2;
-	HANDLE			hprocess, hthread;
-
-	hprocess = GetCurrentProcess();
-	if (SetPriorityClass(hprocess, REALTIME_PRIORITY_CLASS))
-	{
-		Write_Debug("Process priority: REALTIME_PRIORITY_CLASS");
-	}
-	else
-	if (SetPriorityClass(hprocess, HIGH_PRIORITY_CLASS))
-	{
-		Write_Debug("Process priority: HIGH_PRIORITY_CLASS");
-	}
-	else
-	{
-		Write_Debug("Process priority: NORMAL_PRIORITY_CLASS");
-	}
-
-	hthread = GetCurrentThread();
-	if (SetThreadPriority(hthread, THREAD_PRIORITY_TIME_CRITICAL))
-	{
-		Write_Debug("Thread priority: THREAD_PRIORITY_TIME_CRITICAL");
-	}
-	else
-	if (SetThreadPriority(hthread, THREAD_PRIORITY_HIGHEST))
-	{
-		Write_Debug("Thread priority: THREAD_PRIORITY_HIGHEST");
-	}
-	else
-	if (SetThreadPriority(hthread, THREAD_PRIORITY_ABOVE_NORMAL))
-	{
-		Write_Debug("Thread priority: THREAD_PRIORITY_ABOVE_NORMAL");
-	}
-	else
-	{
-		Write_Debug("Thread priority: THREAD_PRIORITY_NORMAL");
-	}
-
-	speed = 0.0f;
-	if (QueryPerformanceCounter(&count1))
-	{
-		rdcount1 = piReadTimeStamp64();
-		__asm
-		{
-			mov ecx, 2585000
-			mov eax, 0
-begin:
-			mov ebx, eax
-			dec ebx
-			inc eax
-			dec ecx
-			jne begin
-		}
-
-		rdcount2 = piReadTimeStamp64();
-		QueryPerformanceCounter(&count2);
-		rdcount = rdcount2 - rdcount1;
-		count = count2.QuadPart - count1.QuadPart;
-		QueryPerformanceFrequency(&freq);
-		speed = (FLOAT32)((FLOAT64)freq.LowPart / (FLOAT64)count * (FLOAT64)rdcount / 1000000.0);
-		Write_Debug("CPU speed calculated to be %f MHz", speed);
-	}
-
-	SetThreadPriority(hthread, THREAD_PRIORITY_NORMAL);
-	SetPriorityClass(hprocess, NORMAL_PRIORITY_CLASS);
-
-	return(speed);
-}
-
-#pragma optimize("", on)
 
 static BOOL DisplayInformation(void)
 {
 TCHAR        txt[512], filename[256];
 char		divisor[]="K";
 BOOL        retval=FALSE;
-DWORD       Nothing, VSize, Len, cpuspeed;
+DWORD       Nothing, VSize, Len;
 LPVOID      pVersion=nullptr;
 char*		pFFI;
 MEMORYSTATUS	memstat;
@@ -525,8 +423,6 @@ struct LANGANDCODEPAGE
 			Write_Debug("Problem with VerQueryValue");
 			break;
 		}
-
-		cpuspeed = (UINT32)GetCPUSpeed();
 
 		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs"), filename, pFFI, WWII::gitCommitStr);
 		Write_Debug(UTF8(txt));
@@ -1085,8 +981,6 @@ int		screenmode;
 	{
 		return(FALSE);
 	}
-
-//	char * ptr = 0; *ptr = 0; // simulated crash
 
 	ddpDrawNotActive(TRUE);
 	ddpDisableScreenSaver(TRUE);
