@@ -1245,7 +1245,7 @@ _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const 
 
 	auto& ah = *player.m_antiHack;
 
-	if ( ah.m_lastSpeedhackBlip > teulTime() - 30 && abs(ah.m_lastSpeedhackDelta - sample->delta) < 100 )
+	if ( ah.m_lastSpeedhackBlip > teulTime() - 30 && std::abs(ah.m_lastSpeedhackDelta - sample->delta) < 100 )
 		return;
 
 	++ah.m_numBlips;

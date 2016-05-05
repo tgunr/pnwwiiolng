@@ -239,7 +239,7 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 bool
 FacilityStruct::canABSupply(WWII_SIDE forSide) const
 {
-	return ( this != nullptr && isOpen() == true && side == forSide && cp->side == forSide );
+	return ( isOpen() == true && side == forSide && cp->side == forSide );
 }
 
 //////////////////////////////////////////////////////////////////////
