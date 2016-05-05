@@ -62,14 +62,13 @@ extern ObjectiveStats g_objectiveStats;
 DBHANDLE dbh;
 DBCONNECTION dbConnection;
 
-#ifdef BETA_RELEASE
+#ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
+    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
-	//#define DEF_ERR_LEVEL Debug::ERR_NOTE
+    #define DEF_ERR_FLAGS STD_ERR
 #endif
-
-#define DEF_ERR_FLAGS 0
 
 const char* HostLanguage = "en";
 
@@ -492,6 +491,8 @@ int
 main(int argc, const char* argv[])
 {
 	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {});
+	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
 	HostLanguage = cv_stratLanguage.GetString();
 
