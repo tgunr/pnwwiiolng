@@ -14,7 +14,9 @@ SIGNTOOL_PATH = "C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\v7.1A\\Bin\\s
 KEYFILE_PATH = "C:\\Users\\Playnet-BuildPC\\Documents\\codesigning.pfx"
 
 def main():
+    remark(sys.argv, False)
     args = parse_args()
+    remark(args, args.VS)
     if type(args.ksrc) != str:
         key = args.ksrc.read()
         args.ksrc.close()
@@ -24,17 +26,26 @@ def main():
     for operand in args.operands:
         if args.SIGN:
             if args.level == True:
-                print("Signing %s" % operand)
-            sign_file(operand, args.TOOL, args.KEYFILE, args.DESC, key, args.level)
+                remark("Signing %s" % operand, args.VS)
+            sign_file(operand, args.TOOL, args.KEYFILE, args.DESC, key, args.level, args.VS)
             if args.level == True:
-                print("Timestamping %s" % operand)
-            timestamp_file(operand, args.TOOL, args.level)
+                remark("Timestamping %s" % operand, args.VS)
+            timestamp_file(operand, args.TOOL, args.level, args.VS)
         if not args.NOVERIFY:
             if args.level == True:
-                print("Verifying %s" % operand)
-            verify_file(operand, args.TOOL, args.level)
-                
-def sign_file(file, TOOL, KEYFILE, DESC, KEY, LEVEL):
+                remark("Verifying %s" % operand, args.VS)
+            verify_file(operand, args.TOOL, args.level, args.VS)
+
+def remark(msg, VS):
+    if type(msg) != str:
+        msg = str(msg)
+    if VS == True:
+        for l in msg.split('\n'):
+            print(l.strip())
+    else:
+        print(msg)
+
+def sign_file(file, TOOL, KEYFILE, DESC, KEY, LEVEL, VS):
     cmdargs = [
         TOOL, 'sign',
         '/f', KEYFILE, # Key file
@@ -49,14 +60,16 @@ def sign_file(file, TOOL, KEYFILE, DESC, KEY, LEVEL):
         cmdargs += ['/q']
     cmdargs += [file]
     if LEVEL == True:
-        print(' '.join(cmdargs))
+        remark(' '.join(cmdargs), VS)
     (output, status) = run_command(cmdargs)
     if status != 0:
-        print("Signing failed:")
-        print(output)
+        remark("Signing failed:", VS)
+        remark(output, VS)
         sys.exit(status)
+    elif LEVEL == True:
+        remark(output, VS)
 
-def timestamp_file(file, TOOL, LEVEL):
+def timestamp_file(file, TOOL, LEVEL, VS):
     import random
     
     MAX_TRIES = 3
@@ -86,18 +99,20 @@ def timestamp_file(file, TOOL, LEVEL):
             cmdargs += ['/q']
         cmdargs += [file]
         if LEVEL == True:
-            print(' '.join(cmdargs))
+            remark(' '.join(cmdargs), VS)
         (output, status) = run_command(cmdargs)
         if status == 0:
             success = True
             break
         # Most likely timestamping timed out, keep going
     if success is False:
-        print("Timestamping failed:")
-        print(output)
+        remark("Timestamping failed:", VS)
+        remark(output, VS)
         sys.exit(status)
+    elif LEVEL == True:
+        remark(output, VS)
 
-def verify_file(file, TOOL, LEVEL):
+def verify_file(file, TOOL, LEVEL, VS):
     cmdargs = [
         TOOL, 'verify',
         '/pa', # Verify against plain Authenticode
@@ -109,12 +124,14 @@ def verify_file(file, TOOL, LEVEL):
         cmdargs += ['/q']
     cmdargs += [file]
     if LEVEL == True:
-        print(' '.join(cmdargs))
+        remark(' '.join(cmdargs), VS)
     (output, status) = run_command(cmdargs)
     if status != 0:
-        print("Verification failed:")
-        print(output)
+        remark("Verification failed:", VS)
+        remark(output, VS)
         sys.exit(status)
+    elif LEVEL == True:
+        remark(output, VS)
 
 def parse_args():
     import argparse
@@ -124,7 +141,7 @@ def parse_args():
         description='Code signing wrapper for Playnet projects on Windows',
         epilog='Each item is signed and verified sequentially.'
     )
-    main_opt_parser.set_defaults(level=None, TOOL=SIGNTOOL_PATH, KEYFILE=KEYFILE_PATH)
+    main_opt_parser.set_defaults(level=None, TOOL=SIGNTOOL_PATH, KEYFILE=KEYFILE_PATH, VS=False)
     
     # Common options
     main_opts = main_opt_parser.add_argument_group(title='General options')
@@ -133,6 +150,7 @@ def parse_args():
     main_opts.add_argument('/TOOL', action='store', help='Alternate signtool.exe path')
     main_opts.add_argument('/QUIET', action='store_false', dest='level', help="No output")
     main_opts.add_argument('/VERBOSE', action='store_true', dest='level', help="Lots of output")
+    main_opts.add_argument('/VS', action='store_true',help='Reformat output for Visual Studio')
     main_opts.add_argument('operands', action='store', nargs='+', help='Files to process')
     
     # Commands and options
