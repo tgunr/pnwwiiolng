@@ -1,5 +1,3 @@
-#!/bin/env python
-
 ################################################################################
 ### On OS X, Xcode handles the whole mess of code signing issues on its own.
 ### However, on Windows, Visual Studio still doesn't have any innate support for
