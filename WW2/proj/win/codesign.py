@@ -167,14 +167,14 @@ def parse_args():
     return main_opt_parser.parse_args()
 
 def run_command(args):
-    import shlex, subprocess
+    import subprocess
     
-    with subprocess.Popen(args, stdout=subprocess.PIPE) as proc:
+    with subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as proc:
         rawdata = proc.communicate()[0]
         if sys.version_info[0] < 3:
-            return (str(rawdata).strip('\n'), proc.returncode)
+            return (str(rawdata).strip(), proc.returncode)
         else:
-            return (str(rawdata, sys.stdout.encoding).strip('\n'), proc.returncode)
+            return (str(rawdata, sys.stdout.encoding).strip(), proc.returncode)
 
 if __name__=="__main__":
    main()
