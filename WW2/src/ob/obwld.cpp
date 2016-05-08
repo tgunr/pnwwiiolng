@@ -852,6 +852,10 @@ logTimerBeginExtMacro(parseWor);
 		return (FALSE);
 logTimerEndExtMacro(parseWor);
 
+    if (DebugBuildingMDLFilesOnly) {
+        fprintf(stderr, "Done building MDL files. Bailing out.");
+        exit(0);
+    }
 	T2 = timeGetTime();
 	Write_Debug ("*****************Total time loading blitzwor.csv file: %u milliseconds", T2-T1);
 

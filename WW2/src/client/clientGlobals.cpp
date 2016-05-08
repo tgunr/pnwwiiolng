@@ -281,6 +281,10 @@ SINT8            gAuthServer[128]; // Authentication server to be used
 SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 SINT8            gClientV[32]; // Version to submit
 
+#ifdef DEBUG
+LOGICAL          DebugBuildingMDLFilesOnly = false;
+#endif
+
 #ifdef BETA_RELEASE
 	LOGICAL			gCheckPlanarPlacement;
 	UINT32			gPersDecalOverride;

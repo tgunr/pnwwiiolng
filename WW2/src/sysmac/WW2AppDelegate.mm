@@ -525,7 +525,12 @@ extern NSString *WebActionOriginalURLKey;
     cfgPrefsLoad();
     
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
-    if(GameServerIP[0])
+    // Or, if we're only here to build MDLs.
+    if(GameServerIP[0]
+#ifdef DEBUG
+        || DebugBuildingMDLFilesOnly
+#endif
+    )
     {
         state = WAIT_APPLE_EVT;
         [self launchOffline:self];
