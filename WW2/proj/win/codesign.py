@@ -49,6 +49,7 @@ def sign_file(file, TOOL, KEYFILE, DESC, KEY, LEVEL, VS):
     cmdargs = [
         TOOL, 'sign',
         '/f', KEYFILE, # Key file
+        '/fd', 'sha256', # SHA256 signature
         '/d', DESC, # Item description
         '/du', 'http://battlegroundeurope.net', # Item URL
         '/p', KEY, # Key password
