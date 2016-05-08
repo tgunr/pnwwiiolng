@@ -89,6 +89,7 @@ def timestamp_file(file, TOOL, LEVEL, VS):
     for ntries in range(3):
         while value in tried:
             value = random.SystemRandom().randrange(0, len(servers))
+        tried += [value]
         cmdargs = [
             TOOL, 'timestamp',
             '/tr', servers[value], # Use modern timestamp
