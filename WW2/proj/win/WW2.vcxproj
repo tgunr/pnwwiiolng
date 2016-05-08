@@ -525,6 +525,12 @@
     <PreBuildEvent>
       <Message>Generate client_revision.h</Message>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>python "$(SolutionDir)\WW2\proj\win\codesign.py" /VS /SIGN /DESC "World War II Online" /PASS:HERE PNww2/pn-codesign /VERBOSE $(TargetPath)</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Code signing executable</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">
     <Midl>
