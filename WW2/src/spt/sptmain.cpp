@@ -2991,7 +2991,7 @@ bool sptCollideWithCluster(OBJECT* o,
         }
 
         counter++;
-        
+
         relativepos = tree->worldpos - WorldOriginOffset;
 
         dist.x = relativepos.x() - p1->x;
@@ -3578,6 +3578,7 @@ unsigned int sptAddTreeCommand(int base, const Vec3f& pos, bool FromHeightMap, f
         dotcommands.push_back(id);
     }
 
+	// Removed in new code?
     if(tree->IsCollidable())
     {
         float objpos[3], dimension[3], euler[3];
@@ -4071,6 +4072,8 @@ void sptFreeTrees(TDTL_TREES* trees)
                 Tree* t = (Tree*)(*itr);
                 remove.push_back(*itr);
             }
+
+            octet.clear();
         }
     }
 

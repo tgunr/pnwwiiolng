@@ -1293,7 +1293,7 @@ void CTree::SetupFrondGeometryDeprecated()
 
     for(int i = 0; i < fronds.m_nNumLods; i++)
     {
-        if(fronds.m_pStripLengths[i][0] == 0)
+        if(fronds.m_pNumStrips[i] == 0 || fronds.m_pStripLengths[i][0] == 0)
             continue;
 
         if(fronds.m_pNumStrips[i] == 1)
@@ -1416,7 +1416,7 @@ void CTree::SetupFrondGeometry()
 
     for(int i = 0; i < fronds.m_nNumLods; i++)
     {
-        if(fronds.m_pStripLengths[i][0] == 0)
+        if(fronds.m_pNumStrips[i] == 0 || fronds.m_pStripLengths[i][0] == 0)
             continue;
 
         if(fronds.m_pNumStrips[i] == 1)
@@ -2558,8 +2558,7 @@ Description:
 ------------------------------------------------------------------------*/
 void CTree::SetAlphaRef(float alpharef, int type)
 {
-    AlphaFunc* af = NULL;
-    
+    AlphaFunc* af = nullptr;
     if(type == TREE_BRANCHES)
         af = dynamic_cast<AlphaFunc*>(branchmaterial->GetRenderState(RS_ALPHAFUNC));
     else if(type == TREE_FRONDS)
