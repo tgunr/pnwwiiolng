@@ -73,7 +73,9 @@ static void _insertStratUpdate(STRAT_UPDATE* stratUpdate)
 {
 	ABORT_IF(stratUpdate == nullptr);
 
-	if (s_stratUpdateList.empty() || s_stratUpdateList.front()->updateTime >= stratUpdate->updateTime)
+	// if this belongs at the beginning, make sure it isn't already there first
+	if (s_stratUpdateList.empty() || (s_stratUpdateList.front() != stratUpdate &&
+		s_stratUpdateList.front()->updateTime >= stratUpdate->updateTime))
 	{
 		s_stratUpdateList.push_front(stratUpdate);
 		return;
@@ -82,7 +84,11 @@ static void _insertStratUpdate(STRAT_UPDATE* stratUpdate)
 	{
 		if (it->updateTime > stratUpdate->updateTime)
 			continue;
-		stratUpdate->link(it->m_next);
+
+		// protect against the case that this method is called more than once for the same stratUpdate
+		if (it->m_next != stratUpdate)
+			stratUpdate->link(it->m_next);
+
 		return;
 	}
 
