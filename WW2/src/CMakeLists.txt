@@ -165,6 +165,19 @@ SET_PROPERTY(TARGET OMGgen PROPERTY FOLDER "Tools")
 
 ######################################################################
 #### Libraries.
+ADD_LIBRARY(libb64
+    ${LIBRARIES_DIR}/libb64/libb64-1.2/src/cdecode.c
+    	${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/cdecode.h
+    		${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/decode.h
+    ${LIBRARIES_DIR}/libb64/libb64-1.2/src/cencode.c
+    	${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/cencode.h
+    		${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/encode.h
+)
+SET_PROPERTY(TARGET libb64 PROPERTY COMPILE_DEFINITIONS IN_BUILDING_LIBIRC=1)
+SET_PROPERTY(TARGET libb64 PROPERTY FOLDER "Libs")
+IF(WIN32 OR WIN64)
+    SET_TARGET_PROPERTIES(libb64 PROPERTIES COMPILE_FLAGS "${CXX_COMPILE_FLAGS} /W1")
+ENDIF( )
 
 ADD_LIBRARY(ircclient
     libircclient/src/libircclient.cpp
@@ -710,7 +723,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
     )
     ADD_PCH(${CHAT_HOST_EXE})
     SET_PROPERTY(TARGET ${CHAT_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_CHAT_HOST)
-    TARGET_LINK_LIBRARIES(${CHAT_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+    TARGET_LINK_LIBRARIES(${CHAT_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient libb64)
     SET_PROPERTY(TARGET ${CHAT_HOST_EXE} PROPERTY FOLDER "Hosts")
 
     ######################################################################

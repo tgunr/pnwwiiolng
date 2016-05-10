@@ -50,6 +50,7 @@
 #include "client/ww2client.h"
 #include "teul/teulPacket.h"
 #include "client/GameClient.h"
+#include "str/stringLib.h"
 
 ///TEMPORARY
 #include "map/mapAWS.h"
@@ -87,12 +88,42 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 	outGoingMessage.m_handle = 0;
 	outGoingMessage.m_country = 0;
 
-	outGoingMessage.m_length = strlen(message);
+    /*
+        We want to output the following with every message:
+            - Platform ID  (platOS)
+                OS_WIN32	1
+                OS_MACOS	2
+                OS_LINUX	3
+            - OS Version
+            - Client Version
+     */
+    ChatClientInfo clientInfo;
+    char *clientStr = clientInfo.encode();
+    
+	outGoingMessage.m_length = strlen(message) + strlen(clientStr) + 2;
 
-	if (outGoingMessage.m_length >= MAX_MESSAGE_LENGTH)
-		outGoingMessage.m_length = MAX_MESSAGE_LENGTH-1;
-
-	strncpy((char*)outGoingMessage.m_message, message, outGoingMessage.m_length + 1);
+    // Truncate the chat text only if needed
+    size_t truncated_len = strlen(message);
+	if (truncated_len >= MAX_IRC_LEN)
+    {
+        truncated_len = MAX_IRC_LEN - strlen(message);
+		outGoingMessage.m_length -= truncated_len;
+    }
+    
+    char *nextCopy = outGoingMessage.m_message;
+    
+    // Add marker for start of client info
+    *nextCopy++ = 0x01;
+    
+    // Copy in client info
+    strsafecpy((char *)nextCopy, clientStr, strlen(clientStr));
+    nextCopy += strlen(clientStr)-1;
+    
+    // Add separator marker for start of message
+    *nextCopy++ = 0x01;
+    
+    // copy in chat info
+	strsafecpy(nextCopy, message, truncated_len + 1);
 
 	// Let chat know what you targetted last for use with dot commands
 	outGoingMessage.m_uiTarget = _lastTargetFullObjID;

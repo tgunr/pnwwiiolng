@@ -157,6 +157,28 @@ DotCommand::vectorize(char* source, ARGV& dest, int maxArguments, bool translate
 	return (int)dest.size();
 }
 
+#if 0
+//////////////////////////////////////////////////////////////////////
+// Append an integer passed in to the string destination provided
+void DotCommand::catIntToText(const UINT32 value, char *dest) const
+{
+   char istring[MAX_INT_REP+1];
+
+   // skip to the null character
+   while (*dest++ != 0);
+
+   // append the integer 
+   sprintf(istring, "%u", value);
+
+   dbugLog(_FLD, "Appending value %u to istring: %s", value, istring);
+
+   istring[MAX_INT_REP] = 0;  // be safe before cat
+   strcat(dest, istring);
+
+   dbugLog(_FLD, "Just appended %s to location %p and result is %s", istring, dest, dest);
+}
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // Set the current availability mode
 // Availabilities are:
@@ -387,6 +409,7 @@ DotCommandIndex::lookup(const std::string& target, bool cleanMatchOnly) const
 void
 DotCommandIndex::add(DotCommand* dotCommand)
 {
+	dbugLog(_FLD, "Registering dotCommand: %s", dotCommand->command());
 	betaLog(_FLI, "Registering dotCommand: %s", dotCommand->command());
 
 	if ( lookup(dotCommand->m_command, TRUE) != nullptr )

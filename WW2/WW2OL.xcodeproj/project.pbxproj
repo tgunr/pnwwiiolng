@@ -429,6 +429,7 @@
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
 		47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B0ED240E9A66A40089DCC4 /* libteulKit.a */; };
 		E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96991C6D729D00D5EC52 /* WebKit.framework */; };
+		E91BFEFB1CCB97E90003614E /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E91BFEFA1CCB97E90003614E /* libb64.a */; };
 		E9320E991C95FC2C003E8048 /* local2.tkt in Resources */ = {isa = PBXBuildFile; fileRef = E9320E971C95FC2C003E8048 /* local2.tkt */; };
 		E9320E9A1C95FC2C003E8048 /* local.tkt in Resources */ = {isa = PBXBuildFile; fileRef = E9320E981C95FC2C003E8048 /* local.tkt */; };
 		E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
@@ -1426,6 +1427,7 @@
 		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
 		8D0C4E970486CD37000505A6 /* World War II Online Beta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online Beta.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		E91BFEFA1CCB97E90003614E /* libb64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libb64.a; path = lib/mac/libb64.a; sourceTree = "<group>"; };
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E9320E971C95FC2C003E8048 /* local2.tkt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = local2.tkt; sourceTree = "<group>"; };
 		E9320E981C95FC2C003E8048 /* local.tkt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = local.tkt; sourceTree = "<group>"; };
@@ -1574,6 +1576,7 @@
 				0863B35010619AC8005FDF19 /* libspeedtreemac.a in Frameworks */,
 				08DDF926106928D800720B71 /* libmacode.a in Frameworks */,
 				08744F51107BF96D009DB5AF /* liblua5.1.a in Frameworks */,
+				E91BFEFB1CCB97E90003614E /* libb64.a in Frameworks */,
 				08744F53107BF977009DB5AF /* libtolua++.a in Frameworks */,
 				087286DF10D1B23B00456009 /* libimapmac.a in Frameworks */,
 				08F41C5612D39B7B0001C6F5 /* libfreetype2.a in Frameworks */,
@@ -3020,6 +3023,7 @@
 		20286C32FDCF999611CA2CEA /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				E91BFEFA1CCB97E90003614E /* libb64.a */,
 				FA05B0811C8D3E1800CDE30C /* libgranny2.a */,
 				FA13BB391C87649000095818 /* AGL.framework */,
 				FA13BB3A1C87649000095818 /* Cocoa.framework */,
