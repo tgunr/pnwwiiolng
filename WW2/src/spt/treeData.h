@@ -6,8 +6,6 @@
 #include "math/Matrixf.h"
 #include "ogl/oglVertexBuffer.h"
 #include "physics/colliderMain.h"
-#include "physics/physicsTypes.h"
-#include "math/mathUnitConversion.h"
 
 #include <string>
 #include <vector>
@@ -54,17 +52,19 @@ struct Tree
 #endif
 
     unsigned short isbush_isclutter_base;
-    unsigned char rot_angle;
+    unsigned short rot_angle;
 
     TDTL_TREES* octet;
 
     float distance;
+    float radius;
 
-    Vec3f worldpos;
+    Vec3d worldpos;
     Vec4f rotation;
 
     // In case multiple collision objects
-    std::vector<Quat> quat;
+    std::vector<Matrixf> collidemat;
+    std::vector<Matrixf> collidematinv;
 
     OBJECT* o;
 
@@ -75,31 +75,52 @@ struct Tree
     unsigned char branchalpha;
     unsigned char leafalphas[2];
 
+    std::vector<dGeomID> transform;
+
+#ifdef SPATIAL_DB
+    void* sdbInfo;
+    float smallradius;
+#endif
+
     Tree()
     {
         octet = nullptr;
         o = nullptr;
         rot_angle = 0;
+        radius = 0.0f;
         distance = 0.0f;
         octet = 0;
         isbush_isclutter_base = 0;
+#ifdef SPATIAL_DB
+        sdbInfo = nullptr;
+        smallradius=0.0f;
+#endif
     }
 
     ~Tree()
     {
+        if(!transform.empty())
+        {
+            for(unsigned int i = 0; i < transform.size(); i++)
+            {
+                dGeomDestroy(transform[i]);
+            }
+            
+            transform.clear();
+        }
     }
 };
 
-extern void treeDataInit(const char* path, CSpeedWind* wind);
-extern void treeDataFreeTree(Tree* t);
-extern void treeDataFreeTree(unsigned int id);
-extern void treeDataKill();
-extern void treeClampBaseIfNecessary(int& base);
+void treeDataInit(const char* path, CSpeedWind* wind);
+void treeDataFreeTree(Tree* t);
+void treeDataFreeTree(unsigned int id);
+void treeDataKill();
+void treeClampBaseIfNecessary(int& base);
 
-extern unsigned int treeDataGetBaseSize();
-extern int treeDataGetTotalTrees();
-extern CTree* treeDataGetBaseTree(int base);
-extern Tree* treeDataGetFreeTree();
-extern const std::vector<float>& treeDataGetBillboardTexCoords();
-extern oglVertexBuffer* treeDataGetVBO();
-extern bool treeDataIsValid(unsigned int address);
+unsigned int treeDataGetBaseSize();
+int treeDataGetTotalTrees();
+CTree* treeDataGetBaseTree(int base);
+Tree* treeDataGetFreeTree();
+const std::vector<float>& treeDataGetBillboardTexCoords();
+oglVertexBuffer* treeDataGetVBO();
+bool treeDataIsValid(unsigned int address);

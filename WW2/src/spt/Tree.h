@@ -295,9 +295,7 @@ public:
     {
         TREE_BRANCHES,
         TREE_FRONDS,
-        TREE_LEAVES,
-        TREE_BILLBOARDS,
-        HORIZ_BILLBOARDS
+        TREE_LEAVES
     };
 
     CTree();
@@ -332,7 +330,6 @@ public:
     float GetRockScalar() {return leafRockScalar;}
     float GetRustleScalar() {return leafRustleScalar;}
     float GetScale() {return scale;}
-    float GetRadius() {return radius;}
 
     void StartBillboardType();
     void EndBillboardType();
@@ -348,7 +345,9 @@ public:
     void SetLeafDiffuseScale();
     void SetLeafCameraAngle(const float& pitch, const float& azimuth);
 
+#if USE_STATESET
     void SetAlphaRef(float alpharef, int type);
+#endif
     void SetBranchParamBlock(const Vec3f& position, const Vec4f& rotation);
     void SetLeafParamBlock(const Vec3f& position, const Vec4f& rotation);
     void SetFrondParamBlock(const Vec3f& position, const Vec4f& rotation);
@@ -413,7 +412,6 @@ protected:
     float leafRockScalar;
     float leafRustleScalar;
     float scale;
-    float radius;
 
     int branchvboid;
     int frondvboid;
