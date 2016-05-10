@@ -34,12 +34,11 @@ Description:
 #include "pers/persmain.h"
 #include "math/matheul.h"
 #include "sdm/sdmDefines.h"
-#include "fx/fxSnd.h"
-#include "ogl/oglTextureObject.h"
 
-#if USE_STATESET
-#include "ogl/oglShadow.h"
-#endif
+#include <map>
+#include <vector>
+#include <string>
+#include <algorithm>
 
 #ifdef SPATIAL_DB
 #include "SpatialDB.h"
@@ -198,19 +197,6 @@ static bool firsttime = true;
 
 static CSpeedWind* speedwind = nullptr;
 
-const int numRotations = 12;
-static int rotations[numRotations] = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330};
-
-/*---------------------------------------------------------------------
-Function: GET_TREE_RADIUS
-Description:
----------------------------------------------------------------------*/
-inline float GET_TREE_RADIUS(Tree* t)
-{
-    int base = GET_BASE(t->isbush_isclutter_base);
-    return treeDataGetBaseTree(base)->GetRadius();
-}
-
 /*---------------------------------------------------------------------
 Function: initializeWind
 Description:
@@ -233,7 +219,7 @@ static bool initializeWind(const std::string& path)
         return false;
     }
 
-    char* data = (char*)memAlloc(size);
+    char* data = new char[size];
     fioRead(fd, data, size);
     fioClose(fd);
 
@@ -242,13 +228,10 @@ static bool initializeWind(const std::string& path)
         speedwind = new CSpeedWind;
     }
 
-    if(!speedwind->Load(data, size))
-    {
-        memFree(data);
-        return false;
-    }
-
-    memFree(data);
+	bool result = speedwind->Load(data, size);
+	delete[] data;
+	if ( result )
+		return false;
 
     windRustleAngles.resize(speedwind->GetNumLeafAngleMatrices());
     windRockAngles.resize(speedwind->GetNumLeafAngleMatrices());
@@ -300,26 +283,22 @@ static void InitBillboardUniforms(glslProgram* pgm)
 }
 
 /*---------------------------------------------------------------------
-Function: LoadHorizontalghaderOff
+Function: LoadHorizontalBillboardShaderOff
 Description:
 ---------------------------------------------------------------------*/
-#if(0)
 static bool LoadHorizontalBillboardShaderOff()
 {
     return true;
 }
-#endif
 
 /*---------------------------------------------------------------------
 Function: LoadBillboardShaderOff
 Description:
 ---------------------------------------------------------------------*/
-#if(0)
 static bool LoadBillboardShaderOff()
 {
     return true;
 }
-#endif
 
 /*---------------------------------------------------------------------
 Function: CreateBillboardUniformsOn
@@ -403,6 +382,8 @@ Description:
 bool sptmainInit()
 {
     vislimit2 = VisLimit * VisLimit;
+
+    sptExitApp();
 
     initializeWind("terrain/trees4.2/");
     treeDataInit("terrain/trees4.2/", speedwind);
@@ -630,7 +611,7 @@ inline static bool fovCheck(Tree* tree, const Vec3f& relativepos)
 {
     float x, y, z, zz;
 
-    float radius = GET_TREE_RADIUS(tree);
+    float radius = tree->radius;
 
     float tx = relativepos.x();
     float ty = relativepos.y();
@@ -693,7 +674,7 @@ static inline void AddToDrawList(Tree* tree, bool reflection = false, bool shado
     }
 
     Vec3f relativepos;
-    relativepos = tree->worldpos - Vec3f((float)WorldOriginOffset.x, (float)WorldOriginOffset.y, (float)WorldOriginOffset.z);
+    relativepos = tree->worldpos - WorldOriginOffset;
 
     basetree->SetTreePosition(relativepos.x(), relativepos.y(), relativepos.z());
 
@@ -787,7 +768,7 @@ static inline void AddToDrawList(Tree* tree, bool reflection = false, bool shado
             float* p = &billboards[base][bbdata];
 
             Billboard& billboard = basetree->GetBillboard();
-            billboard.update(p, relativepos, DEG_TO_RAD(rotations[tree->rot_angle]), fadeout, scale);
+            billboard.update(p, relativepos, DEG_TO_RAD((float)tree->rot_angle), fadeout, scale);
 
             int idx = billboardindices[base].size() - 6;
 
@@ -904,7 +885,7 @@ inline static void Treecull(TERRAIN_DETAIL* dtl, int r, int c, unsigned int mask
             {
                 static BoundingSphere bs;
 
-                bs.set(relativepos, GET_TREE_RADIUS(t));//t->radius);
+                bs.set(relativepos, t->radius);
 
                 if(reflectionPolytope.contains(bs))
                 {
@@ -916,7 +897,7 @@ inline static void Treecull(TERRAIN_DETAIL* dtl, int r, int c, unsigned int mask
             {
                 static BoundingSphere bs;
 
-                bs.set(relativepos, GET_TREE_RADIUS(t));
+                bs.set(relativepos, t->radius);
 
                 if(!ShadowMap::GetInstance().cull(bs))
                 {
@@ -1276,7 +1257,8 @@ inline static void sptDrawBillboardsDeprecated(int pass)
             CTree* tree = treeDataGetBaseTree(i);
             // Billboards may be on separate textures in the future.
             tree->StartBillboardType();
-            tree->SetAlphaRef(84.0f, CTree::TREE_BILLBOARDS);
+
+            unsigned int size = 4 * billboards[i].size() / stride;
 
             ogl::SetVertexPointer(4, GL_FLOAT, stride, &billboards[i][0]);
             ogl::SetTextureUnitCoordPointer(GL_TEXTURE0, 4, GL_FLOAT, stride, &billboards[i][4]);
@@ -1356,7 +1338,8 @@ inline static void sptDrawHorizBillboardsDeprecated()
 
             CTree* tree = treeDataGetBaseTree(i);
             tree->StartHorizBillboardType();
-            tree->SetAlphaRef(84.0f, CTree::HORIZ_BILLBOARDS);
+
+            unsigned int size = 4 * horizbillboards[i].size() / stride;
 
             // Position and fade
             ogl::SetVertexPointer(4, GL_FLOAT, stride, &horizbillboards[i][0]);
@@ -1445,9 +1428,7 @@ inline static void sptDrawBranches()
                 continue;
             }
 
-            relativepos.x() = t->worldpos.x() - (float)WorldOriginOffset.x;
-            relativepos.y() = t->worldpos.y() - (float)WorldOriginOffset.y;
-            relativepos.z() = t->worldpos.z() - (float)WorldOriginOffset.z;
+            relativepos = t->worldpos - WorldOriginOffset;
 
             basetree->AddBranchDraw(t,
                                     Vec4f(relativepos, t->branchalpha * colorONEOVER255),
@@ -1541,9 +1522,7 @@ inline static void sptDrawFronds()
                 continue;
             }
 
-            relativepos.x() = t->worldpos.x() - (float)WorldOriginOffset.x;
-            relativepos.y() = t->worldpos.y() - (float)WorldOriginOffset.y;
-            relativepos.z() = t->worldpos.z() - (float)WorldOriginOffset.z;
+            relativepos = t->worldpos - WorldOriginOffset;
 
             basetree->AddFrondDraw(t,
                                    Vec4f(relativepos, t->frondalpha * colorONEOVER255),
@@ -1639,9 +1618,7 @@ inline static void sptDrawLeaves()
                 continue;
             }
 
-            relativepos.x() = t->worldpos.x() - (float)WorldOriginOffset.x;
-            relativepos.y() = t->worldpos.y() - (float)WorldOriginOffset.y;
-            relativepos.z() = t->worldpos.z() - (float)WorldOriginOffset.z;
+            relativepos = t->worldpos - WorldOriginOffset;
 
             if(t->leaflods[0])
             {
@@ -1764,22 +1741,28 @@ inline static void sptDrawLeavesDeprecated()
                 continue;
             }
 
-            relativepos.x() = t->worldpos.x() - (float)WorldOriginOffset.x;
-            relativepos.y() = t->worldpos.y() - (float)WorldOriginOffset.y;
-            relativepos.z() = t->worldpos.z() - (float)WorldOriginOffset.z;
+            relativepos = t->worldpos - WorldOriginOffset;
 
             basetree->SetLeafParamBlock(relativepos, t->rotation);
 
             if(t->leaflods[0])
             {
+#if USE_STATESET
                 basetree->SetAlphaRef(IS_BUSH(t->isbush_isclutter_base) ? 84.0f : t->leafalphas[0], CTree::TREE_LEAVES);
-                totaltriangles += basetree->DrawLeavesDeprecated(t, 0);
+#else
+                oglSetRenderState(oglRENDERSTATE_ALPHAREF, IS_BUSH(t->isbush_isclutter_base) ? 84 : FloatToInt(t->leafalphas[0]));
+#endif
+                totaltriangles += basetree->DrawLeavesDeprecated(t, 0); 
             }
 
             if(t->leaflods[1])
             {
+#if USE_STATESET
                 basetree->SetAlphaRef(IS_BUSH(t->isbush_isclutter_base) ? 84.0f : t->leafalphas[1], CTree::TREE_LEAVES);
-                totaltriangles += basetree->DrawLeavesDeprecated(t, 1);
+#else
+                oglSetRenderState(oglRENDERSTATE_ALPHAREF, IS_BUSH(t->isbush_isclutter_base) ? 84 : FloatToInt(t->leafalphas[1]));
+#endif
+                totaltriangles += basetree->DrawLeavesDeprecated(t, 1); 
             }
         }
 
@@ -1856,13 +1839,14 @@ inline static void sptDrawFrondsDeprecated()
                 continue;
             }
 
-            relativepos.x() = t->worldpos.x() - (float)WorldOriginOffset.x;
-            relativepos.y() = t->worldpos.y() - (float)WorldOriginOffset.y;
-            relativepos.z() = t->worldpos.z() - (float)WorldOriginOffset.z;
-
+            relativepos = t->worldpos - WorldOriginOffset;
             basetree->SetFrondParamBlock(relativepos, t->rotation);
 
+#if USE_STATESET
             basetree->SetAlphaRef(t->frondalpha, CTree::TREE_FRONDS);
+#else
+            oglSetRenderState(oglRENDERSTATE_ALPHAREF, FloatToInt(t->frondalpha));
+#endif
 
             totaltriangles += basetree->DrawFrondsDeprecated(t);
         }
@@ -1928,12 +1912,16 @@ inline static void sptDrawBranchesDeprecated()
                 continue;
             }
 
-            relativepos.x() = t->worldpos.x() - (float)WorldOriginOffset.x;
-            relativepos.y() = t->worldpos.y() - (float)WorldOriginOffset.y;
-            relativepos.z() = t->worldpos.z() - (float)WorldOriginOffset.z;
+            relativepos = t->worldpos - WorldOriginOffset;
 
-            basetree->SetAlphaRef(t->branchalpha, CTree::TREE_BRANCHES);
+
+#if USE_STATESET
             basetree->SetBranchParamBlock(relativepos, t->rotation);
+            basetree->SetAlphaRef(t->branchalpha, CTree::TREE_BRANCHES);
+#else
+            oglSetRenderState(oglRENDERSTATE_ALPHAREF, FloatToInt(t->branchalpha));
+            basetree->SetBranchParamBlock(relativepos, t->rotation);
+#endif
 
             totaltriangles += basetree->DrawBranchesDeprecated(t);
         }
@@ -2034,7 +2022,7 @@ void drawTreeBoundingBoxes()
         for(unsigned int i = 0; i < threeD[base].size(); i++)
         {
             Tree* t = threeD[base][i];
-            float radius = GET_TREE_RADIUS(t);
+            float radius = t->radius;
 
             // Use these for drawing different bounding boxes (not with radius) if need be.
             float x1 = box[0];
@@ -2045,9 +2033,7 @@ void drawTreeBoundingBoxes()
             float y2 = box[4];
             float z2 = box[5];
 
-            relativepos.x() = t->worldpos.x() - (float)WorldOriginOffset.x;
-            relativepos.y() = t->worldpos.y() - (float)WorldOriginOffset.y;
-            relativepos.z() = t->worldpos.z() - (float)WorldOriginOffset.z;
+            relativepos = t->worldpos - WorldOriginOffset;
 
             // Face 1
             piVECTOR a1 = {relativepos.x() - radius, relativepos.y() - radius, relativepos.z()};
@@ -2126,7 +2112,7 @@ void drawCollisionCylinders()
             Tree* t = threeD[base][j];
 
             Matrixf rot;
-            rot.makeRotate(DEG_TO_RAD(rotations[t->rot_angle]), Vec3f(0, 0, -1));
+            rot.makeRotate(DEG_TO_RAD(t->rot_angle), Vec3f(0, 0, -1));
 
             for(int i = 0; i < treeDataGetBaseTree(base)->GetNumCollisionObjects(); i++)
             {
@@ -2135,7 +2121,7 @@ void drawCollisionCylinders()
                 if(type != CSpeedTreeRT::CO_CAPSULE)
                     continue;
 
-                if(t->quat.empty())
+                if(t->collidemat.empty())
                     continue;
 
                 // ww2 coordinate system bs.
@@ -2159,9 +2145,7 @@ void drawCollisionCylinders()
                 float radius = dimensions[0];
                 float height = dimensions[1];
 
-                relativepos.x() = t->worldpos.x() - (float)WorldOriginOffset.x;
-                relativepos.y() = t->worldpos.y() - (float)WorldOriginOffset.y;
-                relativepos.z() = t->worldpos.z() - (float)WorldOriginOffset.z;
+                relativepos = t->worldpos - WorldOriginOffset + pp;
 
                 m._41 = relativepos.x();
                 m._42 = relativepos.y();
@@ -2523,6 +2507,8 @@ void sptDisplayDeprecated()
     {
         if(numbillboards > 0 || numhorizbillboards > 0)
         {
+            oglSetRenderState(oglRENDERSTATE_ALPHAREF, 84);
+
             if(numbillboards > 0 && drawbillboards)
             {
                 UpdateBillboardDataDeprecated(0);
@@ -2679,7 +2665,9 @@ Description:
 ---------------------------------------------------------------------*/
 void sptGetStats(char stats[])
 {
-    sprintf(stats,
+    unsigned int size = treeDataGetBaseSize();
+
+    sprintf(stats, 
             "TREES: Total %d Drawn %d 3D = %d 2D = %d Triangles %d",
             treeDataGetTotalTrees(),
             number3dtrees + numbillboards + numhorizbillboards,
@@ -2722,50 +2710,6 @@ void sptExitApp()
 
     dotcommands.clear();
     treeDataKill();
-
-    for(size_t i = 0; i < MAX_TREE_TYPES; i++)
-    {
-        if(billboards[i].capacity())
-        {
-            billboards[i].FreeData();
-        }
-    }
-
-    for(size_t i = 0; i < MAX_TREE_TYPES; i++)
-    {
-        if(horizbillboards[i].capacity())
-        {
-            horizbillboards[i].FreeData();
-        }
-    }
-
-    for(size_t i = 0; i < MAX_TREE_TYPES; i++)
-    {
-        if(billboardindices[i].capacity())
-        {
-            billboardindices[i].FreeData();
-        }
-    }
-
-    for(size_t i = 0; i < MAX_TREE_TYPES; i++)
-    {
-        if(horizbillboardindices[i].capacity())
-        {
-            horizbillboardindices[i].FreeData();
-        }
-    }
-
-    if(TreeCollider)
-    {
-        delete TreeCollider;
-        TreeCollider = nullptr;
-    }
-
-    if(speedwind)
-    {
-        delete speedwind;
-        speedwind = nullptr;
-    }
 }
 
 /*---------------------------------------------------------------------
@@ -2811,6 +2755,12 @@ bool sptCollideWithTree(unsigned int address,
 
     Vec3f relativepos;
 
+    if ( count != tree->collidematinv.size() )
+    {
+        Write_Debug("Base tree collision objects count != tree collidematinv matrix count!");
+        return false;
+    }
+
     for(unsigned int i = 0; i < count; i++)
     {
         basetree->GetCollisionObject(i, type, (float*)&pos, dimension, euler);
@@ -2837,9 +2787,7 @@ bool sptCollideWithTree(unsigned int address,
         // Rotate point to match tree rotation
         math3dMultiplyRotation(&pos, &pos, &rot);
 
-        relativepos.x() = tree->worldpos.x() - (float)WorldOriginOffset.x;
-        relativepos.y() = tree->worldpos.y() - (float)WorldOriginOffset.y;
-        relativepos.z() = tree->worldpos.z() - (float)WorldOriginOffset.z;
+        relativepos = tree->worldpos - WorldOriginOffset;
 
         // Move point to world
         pos.x += relativepos.x();
@@ -2853,12 +2801,8 @@ bool sptCollideWithTree(unsigned int address,
         // Point is at origin. Some trees are angled or 'slanted'
         // Orient ray along the z axis. This matrix has the euler angles oriented
         // to the tree rotation
-        Matrixf mat;
-        mat.makeRotate(tree->quat[i]);
-        Matrixf inv = mat.inverse(mat);
-
         piMATRIX m;
-        inv.get(m);
+        tree->collidematinv[i].get(m);
 
         math3dMultiplyRotation(&raystart, &raystart, &m);
         math3dMultiplyRotation(&rayend, &rayend, &m);
@@ -2886,8 +2830,7 @@ bool sptCollideWithTree(unsigned int address,
             // Bring to origin
             mathSubVectors(&raystart, collidePt, &pos);
 
-            mat.get(m);
-
+            tree->collidemat[i].get(m);
             // Rotate
             math3dMultiplyRotation(&raystart, &raystart, &m);
             // Translate back
@@ -3049,9 +2992,7 @@ bool sptCollideWithCluster(OBJECT* o,
 
         counter++;
 
-        relativepos.x() = tree->worldpos.x() - (float)WorldOriginOffset.x;
-        relativepos.y() = tree->worldpos.y() - (float)WorldOriginOffset.y;
-        relativepos.z() = tree->worldpos.z() - (float)WorldOriginOffset.z;
+        relativepos = tree->worldpos - WorldOriginOffset;
 
         dist.x = relativepos.x() - p1->x;
         dist.y = relativepos.y() - p1->y;
@@ -3065,7 +3006,7 @@ bool sptCollideWithCluster(OBJECT* o,
 
         float radius2 = r1 < r2 ? r1 : r2;
 
-        if(math3dFastSqrt(radius2) > (GET_TREE_RADIUS(tree) + 1.0f))
+        if(math3dFastSqrt(radius2) > (tree->radius + 1.0f))
         {
             ++find;
             continue;
@@ -3129,7 +3070,7 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
     x += WorldOriginOffset.x;
     y += WorldOriginOffset.y;
 
-    o->mat._43 = trnmainHeightAt(&trndtl[static_cast<int>(o->trnum)], x, y);
+    o->mat._43 = trnmainHeightAt(&trndtl[o->trnum], x, y);
 
     float highz = 10000.0f;
     float lowz = -10000.0f;
@@ -3263,7 +3204,7 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
             lowz = z;
         }
 
-        unsigned int address = sptAddTree(o, types[ii] - 1, &trndtl[static_cast<int>(o->trnum)], pos64, false, changecluster);
+        unsigned int address = sptAddTree(o, types[ii] - 1, &trndtl[o->trnum], pos64, false, changecluster);
 
         if(address == 0)
         {
@@ -3274,7 +3215,7 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
 
         if(!IS_BUSH(t->isbush_isclutter_base))
         {
-            bb.expandBy(BoundingSphere(Vec3f(pos->x, pos->y, z), GET_TREE_RADIUS(t)));
+            bb.expandBy(BoundingSphere(Vec3f(pos->x, pos->y, z), t->radius));
         }
     }
 
@@ -3637,9 +3578,9 @@ unsigned int sptAddTreeCommand(int base, const Vec3f& pos, bool FromHeightMap, f
         dotcommands.push_back(id);
     }
 
+	// Removed in new code?
     if(tree->IsCollidable())
     {
-#if(0)
         float objpos[3], dimension[3], euler[3];
         CSpeedTreeRT::ECollisionObjectType type;
 
@@ -3702,7 +3643,6 @@ unsigned int sptAddTreeCommand(int base, const Vec3f& pos, bool FromHeightMap, f
 
             t->transform.push_back(transform);
         }
-#endif
     }
 
     Tree* t = (Tree*)(id);
@@ -3752,7 +3692,8 @@ void determineCollisionMatrix(Tree* tree)
     int numCollObjects = basetree->GetNumCollisionObjects();
     int numCapsules = basetree->GetNumCapsuleCollisionObjects();
 
-    tree->quat.reserve(numCapsules); // mucho faster to reserve
+    tree->collidemat.reserve(numCapsules); // mucho faster to reserve
+    tree->collidematinv.reserve(numCapsules);
 
     for(int i = 0; i < numCollObjects; i++)
     {
@@ -3763,11 +3704,13 @@ void determineCollisionMatrix(Tree* tree)
             continue;
         }
 
-        Matrixf mat = basetree->euler[i] * rot;
-        Quat q;
-        q = mat.getRotate();
+        tree->collidemat.push_back(basetree->euler[i] * rot);
 
-        tree->quat.push_back(q);
+        piMATRIX inv;
+
+        tree->collidemat[i].get(inv);
+        math3dInvertMatrix(&inv, &inv);
+        tree->collidematinv.push_back(Matrixf(inv));
     }
 }
 
@@ -3775,6 +3718,10 @@ void determineCollisionMatrix(Tree* tree)
 Function: sptAddTree
 Description:
 ---------------------------------------------------------------------*/
+
+const int numRotations = 12;
+static int rotations[numRotations] = { 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330 };
+
 unsigned int sptAddTree(OBJECT* o,
                         int base,
                         TERRAIN_DETAIL* dtl,
@@ -3788,6 +3735,9 @@ unsigned int sptAddTree(OBJECT* o,
         return 0;
 
     treeClampBaseIfNecessary(base);
+
+    float box[6];
+    treeDataGetBaseTree(base)->GetBoundingBox(box);
 
     tree->o = o;
 
@@ -3811,11 +3761,40 @@ unsigned int sptAddTree(OBJECT* o,
     if(isclutter)
         SET_IS_CLUTTER(tree->isbush_isclutter_base, 0x1);
 
+    float cx = (box[3] - box[0]);
+    float cy = (box[4] - box[1]);
+    float cz = (box[5] - box[2]);
+
+    // Center point is at base of tree
+    tree->radius = std::max(cz, std::max(cx, cy));
+
+#ifdef SPATIAL_DB
+    if(base == 4 || base == 5 || base == 21)
+    {
+        tree->smallradius = std::max(cx, cy);
+    }
+    else if ( IS_BUSH(tree->isbush_isclutter_base ) )
+    {
+        tree->smallradius = std::max(cx, cy) * 0.5;
+    }
+    else if ( IS_CLUTTER(tree->isbush_isclutter_base ) )
+    {
+        tree->smallradius = std::max(cx, cy);
+    }
+    else
+    {
+        tree->smallradius = std::max(cx, cy) * 0.3;
+    }
+#endif
+
+    // 'Random'/seed rotation based on position
+    //tree->rot_angle = (unsigned int)(7159 * (pos.x - (int)pos.x) + 15137 * (pos.y - (int)pos.y)) % 360;
+
     unsigned int randm = (unsigned int)((int)pos.x * 7159 + (int)pos.y * 15137);
-    tree->rot_angle = randm % numRotations;
+    tree->rot_angle = rotations[randm % numRotations];
 
     // For billboards
-    float radians = DEG_TO_RAD((float)rotations[tree->rot_angle]);
+    float radians = DEG_TO_RAD((float)tree->rot_angle);
 
     tree->rotation.x() = sin(radians);
     tree->rotation.y() = cos(radians);
@@ -3831,11 +3810,6 @@ unsigned int sptAddTree(OBJECT* o,
     {
         if(!(o->flag3 & OBJECT_TREE_CLUSTER))
         {
-            CTree* tt = treeDataGetBaseTree(base);
-
-            float box[6];
-            tt->GetBoundingBox(box);
-
             o->bbox[0].x = box[0];
             o->bbox[0].y = box[1];
             o->bbox[0].z = box[2];
@@ -3846,12 +3820,12 @@ unsigned int sptAddTree(OBJECT* o,
             o->pos.x -= (o->bbox[0].x + o->bbox[1].x) * 0.5f;
             o->pos.y -= (o->bbox[0].y + o->bbox[1].y) * 0.5f;
 
-            o->maxrad = tt->GetRadius();
+            o->maxrad = tree->radius;
             o->treeID = (unsigned int)tree;
         }
     }
 
-    tree->worldpos.set((float)pos.x, (float)pos.y, (float)pos.z);
+    tree->worldpos.set(pos);
 
     if(!determineOctet(tree, dtl))
     {
@@ -3930,6 +3904,8 @@ bool sptInTreeBBox(const piVECTOR& pos, FLOAT32 altRadius)
             continue;
         }
 
+        CTree* basetree = treeDataGetBaseTree(base);
+
         for(unsigned int j = 0; j < threeD[base].size(); j++)
         {
             Tree* t = threeD[base][j];
@@ -3937,9 +3913,7 @@ bool sptInTreeBBox(const piVECTOR& pos, FLOAT32 altRadius)
             if(IS_BUSH(t->isbush_isclutter_base))
                 continue;
 
-            relativepos.x() = t->worldpos.x() - (float)WorldOriginOffset.x;
-            relativepos.y() = t->worldpos.y() - (float)WorldOriginOffset.y;
-            relativepos.z() = t->worldpos.z() - (float)WorldOriginOffset.z;
+            relativepos = t->worldpos - WorldOriginOffset;
 
             // Bring to origin
             p.set(pos.x, pos.y, relativepos.z());
@@ -3947,7 +3921,7 @@ bool sptInTreeBBox(const piVECTOR& pos, FLOAT32 altRadius)
             mathSubVectors(&p, &p, (piVECTOR*)relativepos.ptr());
 
 			// if we passed in an alternate radius, use that otherwise use the tree's radius
-			FLOAT32 radius = (altRadius) ? altRadius : GET_TREE_RADIUS(t);
+			FLOAT32 radius = (altRadius) ? altRadius : t->radius;
 
             if(math3dFastSqrt(math3dDotProduct(&p, &p)) < radius)
             {
@@ -3993,9 +3967,7 @@ bool sptIsRadiusInTreeBBox(const piVECTOR& pos, float radius)
             if(IS_BUSH(t->isbush_isclutter_base))
                 continue;
 
-            relativepos.x() = t->worldpos.x() - (float)WorldOriginOffset.x;
-            relativepos.y() = t->worldpos.y() - (float)WorldOriginOffset.y;
-            relativepos.z() = t->worldpos.z() - (float)WorldOriginOffset.z;
+            relativepos = t->worldpos - WorldOriginOffset;
 
             for(unsigned int q = 0; q < count; q++)
             {
@@ -4087,9 +4059,9 @@ void sptFreeTrees(TDTL_TREES* trees)
 {
     std::vector<unsigned int> remove;
 
-    for(int i = 0; i < SDM_SUPERCELL_OCTETS_XY; i++)
+    for(int i = SDM_SUPERCELL_OCTETS_XY; i != 0; --i)
     {
-        TDTL_TREES& octet = trees[i];
+        TDTL_TREES& octet = trees[i - 1];
 
         if(!octet.empty())
         {
@@ -4097,6 +4069,7 @@ void sptFreeTrees(TDTL_TREES* trees)
 
             for(; itr != octet.end(); ++itr)
             {
+                Tree* t = (Tree*)(*itr);
                 remove.push_back(*itr);
             }
 
