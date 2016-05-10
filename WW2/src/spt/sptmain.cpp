@@ -230,7 +230,7 @@ static bool initializeWind(const std::string& path)
 
 	bool result = speedwind->Load(data, size);
 	delete[] data;
-	if ( result )
+	if ( ! result )
 		return false;
 
     windRustleAngles.resize(speedwind->GetNumLeafAngleMatrices());
