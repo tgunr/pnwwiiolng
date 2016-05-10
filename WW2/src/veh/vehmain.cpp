@@ -3588,36 +3588,36 @@ UINT32 vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach)
 	*/
 
 	if(vehmainIsDeployed() && VehicleData->MultiCrewPos < 2)
-    {
-        // Request a server tracked object (STO) from the host
-        WorldPosition_m position(Vehicle->PosData.Pos);
+	{
+		// Request a server tracked object (STO) from the host
+		WorldPosition_m position(Vehicle->PosData.Pos);
 
 		vehVehiclePositionData* p = &Vehicle->PosData;
-        AttitudeVector attitude((FLOAT32)p->Att.Roll, (FLOAT32)p->Att.Pitch, (FLOAT32)p->Att.Yaw);
+		AttitudeVector attitude((FLOAT32)p->Att.Roll, (FLOAT32)p->Att.Pitch, (FLOAT32)p->Att.Yaw);
 
-        VehicleSTO vehicle(0, Vehicle->VehicleType, position, attitude);
+		VehicleSTO vehicle(0, Vehicle->VehicleType, position, attitude);
 
-	    _setVehicleDeployedState(IDE_VEHICLE_UNDEPLOYED);
-	    _resetBombBayDoors();
-        vehicle.request(PlayerClient()->ChatConnection());
-    }
+		_setVehicleDeployedState(IDE_VEHICLE_UNDEPLOYED);
+		_resetBombBayDoors();
+		vehicle.request(PlayerClient()->ChatConnection());
+	}
 	else if(persIsPersonaVehicleType(VEH_TYPE_GROUND) && Vehicle->isHulked() && vehmainCanSTO())
-    {
-      if (Vehicle->VehicleDeadTime == 0) //vehExitVehicle was not called before, so request an STO was not send also
-      {
-        // Can hulk if ground, vehicle is actually hulked and meet same requirements
-        // as STO for vehicles.
+	{
+		if (Vehicle->VehicleDeadTime == 0) //vehExitVehicle was not called before, so request an STO was not send also
+		{
+		// Can hulk if ground, vehicle is actually hulked and meet same requirements
+		// as STO for vehicles.
 
-        // Request a server tracked object (STO) from the host
-        WorldPosition_m position(Vehicle->PosData.Pos);
+		// Request a server tracked object (STO) from the host
+		WorldPosition_m position(Vehicle->PosData.Pos);
 
-        vehVehiclePositionData* p = &Vehicle->PosData;
-        AttitudeVector attitude((FLOAT32)p->Att.Roll, (FLOAT32)p->Att.Pitch, (FLOAT32)p->Att.Yaw);
+		vehVehiclePositionData* p = &Vehicle->PosData;
+		AttitudeVector attitude((FLOAT32)p->Att.Roll, (FLOAT32)p->Att.Pitch, (FLOAT32)p->Att.Yaw);
 
-        HulkSTO hulk(0, Vehicle->VehicleType, position, attitude);
-        hulk.request(PlayerClient()->ChatConnection());
-      }
-    }
+		HulkSTO hulk(0, Vehicle->VehicleType, position, attitude);
+		hulk.request(PlayerClient()->ChatConnection());
+		}
+	}
 
 	// make sure this is off
 	//PlayerClient()->EnableDespawnTimer(false);
