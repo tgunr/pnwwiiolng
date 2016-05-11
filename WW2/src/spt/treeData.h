@@ -108,7 +108,11 @@ struct Tree
             
             transform.clear();
         }
+		detach();
     }
+
+	void attach(OBJECT&);
+	void detach(void);
 };
 
 void treeDataInit(const char* path, CSpeedWind* wind);

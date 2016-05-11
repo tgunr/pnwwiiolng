@@ -197,6 +197,45 @@ static bool firsttime = true;
 
 static CSpeedWind* speedwind = nullptr;
 
+//---------------------------------------------------------------------
+
+void Tree::attach(OBJECT& o) {
+	detach();
+	this->o = &o;
+
+#if DEBUG_WW2
+	// Make sure we're not adding trees to the treemap twice.
+	auto rng = objectTreeMap.equal_range(&o);
+	for ( auto it = rng.first ; it != rng.second ; ++it ) {
+		assert ( it->second != this );
+	}
+#endif
+
+	objectTreeMap.insert(std::make_pair(&o, this));
+}
+
+
+void Tree::detach(void) {
+	if ( ! o )
+		return;
+
+	// Make sure we're not removing trees to the treemap twice.
+	auto rng = objectTreeMap.equal_range(o);
+	for ( auto it = rng.first ; it != rng.second ; ++it ) {
+		if ( it->second != this ) continue;
+
+		objectTreeMap.erase(it);
+
+		if ( o->treeID == (UINT32)this )
+			o->treeID = (UINT32)nullptr;
+		return;
+	}
+
+	// If we didn't return during the loop,
+	// we didn't find this tree in the map.
+	assert ( false );
+}
+
 /*---------------------------------------------------------------------
 Function: initializeWind
 Description:
@@ -3302,37 +3341,20 @@ Description:
 ---------------------------------------------------------------------*/
 void sptFreeTreeByObject(OBJECT* key)
 {
-    if(objectTreeMap.empty())
-    {
-        return;
-    }
+	if ( objectTreeMap.empty() )
+		return;
 
-    TreeMap::iterator itr = objectTreeMap.find(key);
+	auto rng = objectTreeMap.equal_range(key);
+	for ( auto it = rng.first ; it != rng.second ; ++it ) {
+		// Removing the tree will automatically remove the node in the tree map.
+		auto free = it++ ;
+		sptFreeTreeByID((unsigned int)free->second);
+	}
 
-    if(itr == objectTreeMap.end())
-        return;
+	key->flag2 &= ~OBJECT_SPEEDTREE;
+	key->flag3 &= ~OBJECT_TREE_CLUSTER;
 
-    TreeMap::iterator free;
-
-    while(itr != objectTreeMap.end())
-    {
-        if(key != itr->first)
-        {
-            break;
-        }
-
-        sptFreeTreeByID((unsigned int)itr->second);
-
-        free = itr;
-        ++itr;
-
-        objectTreeMap.erase(free);
-    }
-
-    key->flag2 &= ~OBJECT_SPEEDTREE;
-    key->flag3 &= ~OBJECT_TREE_CLUSTER;
-
-    cullnecessary = true;
+	cullnecessary = true;
 }
 
 /*---------------------------------------------------------------------
@@ -3739,7 +3761,8 @@ unsigned int sptAddTree(OBJECT* o,
     float box[6];
     treeDataGetBaseTree(base)->GetBoundingBox(box);
 
-    tree->o = o;
+	if ( o )
+		tree->attach(*o);
 
     if(!gCustomTerrain)
     {
@@ -3834,11 +3857,6 @@ unsigned int sptAddTree(OBJECT* o,
     }
 
     determineCollisionMatrix(tree);
-
-    if(o)
-    {
-        objectTreeMap.insert(std::make_pair(o, tree));
-    }
 
     return (unsigned int)tree;
 }
