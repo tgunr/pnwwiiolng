@@ -287,16 +287,15 @@ LOGICAL trnGetStratData(SINT16 scx, SINT16 scy, SINT32 id, SINT32* country, SINT
 
 SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 level)
 {
-	if(country == -1 || level == -1)
+	if ( country == -1 || level == -1 )
 		trnGetStratData(td->scx, td->scy, bid, &country, &level);
 
-	if ( bid > td->bldHash.maxBldID)
-	{
+	if ( 0 < bid || bid > td->bldHash.maxBldID ) {
 		Write_Log(LOG_COMM, LOG_INFO, "access to bad bid %d ( > %d)", bid, td->bldHash.maxBldID);
 		return -EINVAL;
 	}
 
-	if(!td->bldHash.building) return -1;
+	if ( ! td->bldHash.building ) return -1;
 
 	if ( country >= 0)
 	{
@@ -344,7 +343,7 @@ SINT32 trnUpdateStratData(TERRAIN_DETAIL* td, OBJECT* lpobj, SINT32 bid, LOGICAL
 	if ( bid == 0)
 		return -EINVAL;
 
-	if ( td == nullptr || td->bldHash.building == nullptr || bid > td->bldHash.maxBldID)
+	if ( td == nullptr || td->bldHash.building == nullptr || 0 < bid || bid > td->bldHash.maxBldID)
 		return -EINVAL;
 
 	if (bid < 0)

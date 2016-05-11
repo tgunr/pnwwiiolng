@@ -32,8 +32,8 @@ struct STRAT_BUILDING
 
 struct STRAT_BUILDING_HASH
 {
-	SINT32 maxBldID;						// max bid in the array
-	STRAT_BUILDING* building;			// pointer to an array of buildings
+	SINT32 maxBldID = 0; // max bid in the array
+	STRAT_BUILDING* building = nullptr; // pointer to an array of buildings
 };
 
 struct STRAT_BUILDING_ARRAY
