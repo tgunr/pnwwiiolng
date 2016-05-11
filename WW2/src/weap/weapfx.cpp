@@ -572,11 +572,11 @@ static bool _drawMuzzleFlash(OBJECT* o)
 
 static bool _updateDebris(OBJECT* o)
 {
-	// Only display for 5 seconds (soundID good enough to use for this)
-	if(frametime - o->soundID > 5000)
+	// Only display for 5 seconds
+	if(frametime - o->createtime > 5000.0f)
 	{
-		o->soundID = 0;
-		o->treeID = 0;
+		o->createtime = 0;
+		o->updatecallback = 0;
 		o->updatecallback = nullptr; // Removes from obmainUpdate
 		fxUtlSetMatrixInTree(o, &IdentityMatrix);
 		obmainMoveToNotObjectTree(o);
@@ -587,13 +587,13 @@ static bool _updateDebris(OBJECT* o)
 	}
 
 	// Tree id used for time update
-	int timediff = frametime - o->treeID;
+	int timediff = frametime - o->updatetime;
 	float time = (float)timediff * 0.001f;
 	static float drag = 0.0f;
 
-	fxUtlApplyDrag(&o->vel, &drag, (float*)(&o->treeID));
+	fxUtlApplyDrag(&o->vel, &drag, (float*)(&o->updatetime));
 
-	o->treeID = frametime;
+	o->updatetime = frametime;
 
 	piMATRIX matRotX = IdentityMatrix;
 	piMATRIX matRotY = IdentityMatrix;
@@ -770,8 +770,8 @@ UINT32 _CreateDebris(weapAmmo const* pAmmo,
 	// Add to normal render system for proper sorting
 	obmainMoveToObjectTree(o);
 
-	o->soundID = frametime; // Using this for create time
-	o->treeID = frametime; // Using this for update time
+	o->createtime = frametime; // Using this for create time
+	o->updatetime = frametime; // Using this for update time
 
 	weapfxGetObjectPosition(pFast, &vecPos);
 
@@ -2120,7 +2120,7 @@ UINT32 _CreateMuzzleFlash(weapAmmo const* pAmmo, OBJECT* o, const FLOAT64VECTOR*
 				  0;
 	fx->vel.set(v.x, v.y, -v.z);
 
-	fx->soundID = frametime;
+	fx->createtime = frametime;
 
 	// Increment by 90 degrees for a reason. Render object will display 'planes'
 	static int rotate[] = {0, 90, 180, 270};

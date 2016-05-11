@@ -245,7 +245,9 @@ struct OBJECT
 	UINT32				flags;			// Object flags 1
 	UINT32				flag2;			// Object flags 2
     UINT32              flag3;          // Object flags 3
-    UINT32              treeID;         // ID of speedtree object
+    UINT32              treeID = 0;     // ID of speedtree object
+	float               createtime;     // When an FX was created.
+	float               updatetime;     // When an FX was last updated.
 	void*				lpspare;		// Object spare pointer
 
 	piMATRIX			mat;			// Rotation/transformation matrix
@@ -320,6 +322,7 @@ struct OBJECT
 	piINDICES*			pttris;			// Tesselation indices                  REMOVE
 #endif
 
+	// TODO: Currently doubles up as a TerrainTile pointer...
     SINT32              soundID;        // Sound associated with this object.
 
 /*
