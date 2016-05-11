@@ -3345,7 +3345,7 @@ void sptFreeTreeByObject(OBJECT* key)
 		return;
 
 	auto rng = objectTreeMap.equal_range(key);
-	for ( auto it = rng.first ; it != rng.second ; ++it ) {
+	for ( auto it = rng.first ; it != rng.second ; ) {
 		// Removing the tree will automatically remove the node in the tree map.
 		auto free = it++ ;
 		sptFreeTreeByID((unsigned int)free->second);
