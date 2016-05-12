@@ -938,23 +938,19 @@ _recvMessage(ACTION_OBJECT* const a)
 
 	// Pull out client header information
 	char *p = message.m_message;
-	dbugLog(_FLD, "Processing received chat msg: %s - size %d", p, strlen(p));
+	// Don't write control characters to the debug log file
+	//dbugLog(_FLD, "Processing received chat msg: %s - size %d", p, strlen(p));
 	if (*p == 0x01)
 	{
 		// message looks like this:
 		// 0     1           13    14
 		// {0x01}AJFK3dej30fh{0x01}<chat text>
 		// mark start, find end
-		char *start = ++p;
-		while (*p != 0x01 && *p != 0 && static_cast<size_t>(p - start) < MAX_MESSAGE_LENGTH)
-			p++;
-		if ((p - start) > MAX_MESSAGE_LENGTH)
-		{
+		p = strchr(p, '\x01');
+		if (!p) {
 			dbugLog(_FLA, "Client chat packet received with no terminating null");
 			return a->offset;
-		}
-		else if (*p != 0)
-		{
+		} else if (*p != nullptr) {
 			// null terminate the client info string, overwrite the 0x01 header terminator
 			*p++ = 0;
 			char *endStartMsg = p;
@@ -964,7 +960,7 @@ _recvMessage(ACTION_OBJECT* const a)
 			message.clientInfo.decode(start);
 
 			// remove it from the message - source is null terminated, limit to max IRC length
-			strsafecpy(message.m_message, endStartMsg, MAX_IRC_LEN);
+			strlcpy(message.m_message, endStartMsg, MAX_IRC_LEN);
 			message.m_length -= (endStartMsg - message.m_message);
 			dbugLog(_FLD, "Message after client header removed: %s length - %d", start, message.m_length);
 		}
@@ -976,8 +972,8 @@ _recvMessage(ACTION_OBJECT* const a)
 	}
 	else
 	{
-		// Are we talking to an old client?  No control information
-		dbugLog(_FLW, "No client information control header found, ignoring!!");
+		// Not a command that has control information
+		//dbugLog(_FLW, "No client information control header found, ignoring!!");
 	}
 
 	// Prevent them typing carriage returns
