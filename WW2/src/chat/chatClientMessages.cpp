@@ -50,7 +50,6 @@
 #include "client/ww2client.h"
 #include "teul/teulPacket.h"
 #include "client/GameClient.h"
-#include "str/stringLib.h"
 
 ///TEMPORARY
 #include "map/mapAWS.h"
@@ -88,11 +87,15 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 	outGoingMessage.m_handle = 0;
 	outGoingMessage.m_country = 0;
 
+	outGoingMessage.m_length = strlen(message);
+
+	if (outGoingMessage.m_length >= MAX_MESSAGE_LENGTH)
+		outGoingMessage.m_length = MAX_MESSAGE_LENGTH-1;
+
+	strncpy((char*)outGoingMessage.m_message, message, outGoingMessage.m_length + 1);
+
 	// Let chat know what you targetted last for use with dot commands
 	outGoingMessage.m_uiTarget = _lastTargetFullObjID;
-
-	strlcpy(outGoingMessage.m_message, message, sizeof(outGoingMessage.m_message));
-	outGoingMessage.m_length = strlen(outGoingMessage.m_message);
 
 	return teulSend(teulIndex, _SEND_CLIENT_MESSAGE, &outGoingMessage);
 }
