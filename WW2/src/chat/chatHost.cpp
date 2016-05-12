@@ -102,14 +102,13 @@ extern void chatRegisterDotCommands();
 
 #define CHAT_TIMEOUT 500000
 
-#ifdef CLOSED_BETA
+#ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
+    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
-	//#define DEF_ERR_LEVEL Debug::ERR_NOTE
+    #define DEF_ERR_FLAGS STD_ERR
 #endif
-
-#define DEF_ERR_FLAGS STD_ERR
 
 typedef bool (TUNE_COMMAND_CALLBACK)(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
 
@@ -3563,7 +3562,7 @@ int
 main(int argc, const char* argv[])
 {
 	Server::InitializeProcess(g_serverName, CHAT_HOST, _errorFunction, _killFunction, argc, argv, {});
-	dbugSetWriteLevel(Debug::ERR_WARN | DEF_ERR_FLAGS);
+	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
 	chatReadHostLocFile();

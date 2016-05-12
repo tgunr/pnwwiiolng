@@ -2,7 +2,7 @@
 #define MyAppVersion GetFileVersion("current/WW2.exe")
 
 #define MyAppNameRoot "Battleground Europe"
-#define MyAppName "Battleground Europe - Beta"
+#define MyAppName "Battleground Europe - 1.35 Beta"
 #define MyAppPublisher "Playnet Inc."
 #define MyAppURL "http://www.battlegroundeurope.net/"
 #define MyAppExeName "Playgate.exe"

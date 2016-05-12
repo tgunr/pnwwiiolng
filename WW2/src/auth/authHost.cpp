@@ -38,6 +38,14 @@
 #include "teul/teulAuthServer.h"
 #include "teul/teulEndpoint.h"
 
+#ifdef DEBUG
+	#define DEF_ERR_LEVEL Debug::ERR_DBUG
+    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
+#else
+	#define DEF_ERR_LEVEL Debug::ERR_INFO
+    #define DEF_ERR_FLAGS STD_ERR
+#endif
+
 // Support this version at least.
 #define COMPATABILITY_LEVEL 0x010120
 
@@ -861,8 +869,8 @@ int
 main(int argc, const char* argv[])
 {
 	Server::InitializeProcess(g_serverName, AUTH_HOST, _errorFunction, nullptr, argc, argv, {});
-	dbugSetWriteLevel(Debug::ERR_WARN | STD_ERR);
-	dbugSetLogLevel(Debug::ERR_INFO | STD_ERR);
+	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
 #ifdef BLOCK_AN_ADDRESS
 	teulGetHost(BLOCK_ADDRESS, &blockedIP);

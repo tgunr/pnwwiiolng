@@ -1,0 +1,6 @@
+framework module MJTFoundation {
+  umbrella header "MJTFoundation.h"
+
+  export *
+  module * { export * }
+}

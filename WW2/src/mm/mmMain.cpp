@@ -95,14 +95,13 @@ const char* g_serverName = "mmhostd";
 //broadcast stuff
 #define		CLIENT_TIMEOUT	500000
 
-#ifdef CLOSED_BETA
+#ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
+    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
-	//#define DEF_ERR_LEVEL Debug::ERR_NOTE
+    #define DEF_ERR_FLAGS STD_ERR
 #endif
-
-#define DEF_ERR_FLAGS 0
 
 extern void mapPlayerInit();
 
@@ -1083,6 +1082,8 @@ main(int argc, const char* argv[])
 			}
 		}
 	});
+    dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+    dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
 	ABORT_IF(cv_appID.GetUint32() == 0 || cv_appID.GetUint32() > 255);
 
@@ -1100,9 +1101,7 @@ main(int argc, const char* argv[])
 
 	HostLanguage = cv_stratLanguage.GetString();
 
-	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | DEF_ERR_FLAGS));
-	dbugSetLogLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
-	dbugLog(_FLN, "Map/Mission Host starting. Compiled %s at %s. AppID is %u", __DATE__, __TIME__, g_appID);
+	dbugLog(_FLN, "Map/Mission Host starting. Compiled %s at %s. AppID is %u", __DATE__, __TIME__, cv_appID.GetUint32());
 
 	_authHost = serverGetAuthIP();
 	myMaxUsers = serverGetMaxClusterUsers();
