@@ -14,12 +14,13 @@
 using namespace Chat;
 
 //////////////////////////////////////////////////////////////////////
-// Pack the version 2 management structure
+// Pack the version 3 management structure
 
 SINT32
-ManagementLogin2::packer(LOGICAL mode, ACTION_OBJECT* a)
+ManagementLogin3::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
 	a->packer(mode, &m_version);
 	a->packer(mode, &m_wantHandle);
+	a->packer(mode, &m_country);
 	return a->offset;
 }

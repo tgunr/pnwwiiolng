@@ -16,6 +16,7 @@ namespace Chat
 		enum
 		{
 			LOGIN2_Y = 123,
+			LOGIN3_Y = 124,
 		};
 	}
 }

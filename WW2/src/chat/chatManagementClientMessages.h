@@ -11,4 +11,4 @@ SINT32 chatInstallClientManagementCallbacks();
 
 //Logs into the chat server to do management stuff
 bool chatSendManagementLogin2(SINT32 chatIndex, const char* gameName);
-
+bool chatSendManagementLogin3(SINT32 chatIndex, const char* gameName, UINT16 country);
