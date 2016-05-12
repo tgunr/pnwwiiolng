@@ -16,4 +16,4 @@ Property* chatFindProperty(const struct FULL_OBJ_ID& id);
 
 bool chatGetWWIIConfig(void);
 
-UINT32 chatGetPermissionNames(const PermissionMask& mask, std::string &into, UINT32 fromIndex);
+UINT32 chatGetPermissionNames(const PermissionMask& mask, char* into, UINT32 fromIndex);

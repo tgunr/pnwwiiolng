@@ -61,7 +61,6 @@
 #include "chat/chatTimeInterval.h"
 #include "chat/chatTuneToChannel.h"
 #include "chat/chatUnitMotds.h"
-#include "chat/chatClientMessages.h"
 #include "dbse/dbseClient.h"
 #include "inst/instHostInstance.h"
 #include "server/serverCodeEnum.h"
@@ -1031,7 +1030,6 @@ chatReportPlaceHolder(Player* player, CHANNEL_TYPE type)
 bool
 _dotCommand(Player& player, Chat::ClientMessage* message)
 {
-	dbugLog(_FLD, "Is this a dot command?");
 	if ( message->m_message[0] != '.' && message->m_message[0] != '/' )
 		return false;
 	if ( message->m_message[0] == message->m_message[1] )
@@ -1040,8 +1038,6 @@ _dotCommand(Player& player, Chat::ClientMessage* message)
 		return false;
 	if ( message->m_message[0] == '/' && message->m_message[1] && message->m_message[2] == '!' )
 		return false;
-
-	dbugLog(_FLD, "Yes, dot command - convert to slash and go look it up");
 
 	if ( message->m_message[0] != '/' )
 		message->m_message[0] = '/';
@@ -3558,14 +3554,6 @@ _runHost()
 	}
 }
 
-UINT32 serverStartTime;
-
-UINT32 serverUpTimeMinutes()
-{
-        UINT32 secs = teulTime() - serverStartTime;
-        return secs / 60;
-}
-
 //////////////////////////////////////////////////////////////////////
 //
 
@@ -3688,8 +3676,6 @@ main(int argc, const char* argv[])
 	teulSyncClock();
 
 	nextSpamTime = teulClock64 + 1000;
-
-        serverStartTime = teulTime();
 
 	// Load the MOTDs in
 	chatLoadMotds();

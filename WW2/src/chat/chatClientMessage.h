@@ -10,7 +10,6 @@
 
 #include "chat/chatDefines.h"
 #include "wwii/wwiiFullObjID.h"
-#include "chat/chatClientMessages.h"
 
 namespace Chat
 {
@@ -30,9 +29,6 @@ namespace Chat
 
 		// Packer
 		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
-        
-        // not actually sent, used by chat host
-        ChatClientInfo clientInfo;
 	};
 }
 

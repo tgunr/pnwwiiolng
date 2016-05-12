@@ -1621,22 +1621,9 @@ Player::SetSquadInvite(SquadInvite* invite)
 void
 Player::SetWeapon(const WEAPON_SPEC& toWeapon)
 {
-	dbugLog(_FLD, "Weapon was %d.%d.%d.%d", m_weapon.wType, m_weapon.wClass, m_weapon.wCategory, m_weapon.wCountry);
 	m_weapon = toWeapon;
-	dbugLog(_FLD, "Weapon is now %d.%d.%d.%d", m_weapon.wType, m_weapon.wClass, m_weapon.wCategory, m_weapon.wCountry);
 
 	m_isBuzzard = (m_weapon.wCategory == 4 && m_weapon.wClass == 9 && (m_weapon.wType == 4 || m_weapon.wType == 5));
-}
-
-void Player::GetWeaponStr(std::string &str) const
-{
-	str.append(std::to_string(m_weapon.wType));
-	str.append(".");
-	str.append(std::to_string(m_weapon.wClass));
-	str.append(".");
-	str.append(std::to_string(m_weapon.wCategory));
-	str.append(".");
-	str.append(std::to_string(m_weapon.wCountry));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2236,14 +2223,14 @@ Player::validatePreference(UINT32 prefId, UINT32 request) const
 // Describe the whereabouts of a player
 
 void
-Player::whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const
+Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 {
-	char tmpbuf[MAX_MESSAGE_LENGTH+1];
+	assert(into != nullptr);
 
 	if ( noSide() )
 	{
-		into.append("PersonaScrn");
-		into.append(lastPosition("last near", x, y, true));
+		strcpy(into, "PersonaScrn");
+		strcat(into, lastPosition("last near", x, y, true));
 		return;
 	}
 
@@ -2254,69 +2241,69 @@ Player::whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const
 
 	// He's not in a facility, ergo at the map
 	if ( !missionID() )
-	{	
-		snprintf(tmpbuf, sizeof(tmpbuf), "%s brigade scrn", affiliation);
-		into.append(tmpbuf);
-		into.append(lastPosition("last near", x, y, true));
+	{
+		snprintf(into, MAX_MESSAGE_LENGTH, "%s brigade scrn", affiliation);
+		strcat(into, lastPosition("last near", x, y, true));
 		return;
 	}
 
-	into.append(affiliation);
-	into.append(" ");
+	strcpy(into, affiliation);
+	strcat(into, " ");
 
 	HCUnit* unit = HCUnit::Lookup(brigadeID());
 	if ( unit != nullptr )
 	{
-		into.append(unit->name());
-		into.append(" ");
+		strcat(into, unit->name());
+		strcat(into, " ");
 	}
 
 	ChatMission* mission = chatFindMission(missionID());
 	if ( mission )
-		into.append(Chat::Name(mission->leader()).c_str());
+		strcat(into, Chat::Name(mission->leader()).c_str());
 	else
-		into.append("unknown");
-	into.append(" mission ");
+		strcat(into, "unknown");
+	strcat(into, " mission " );
 
 	// He's started the spawning process
 	UINT32 cellIP = getCellHost();
 	if ( cellIP == 0 )
 	{
-		into.append(originCP());
-		into.append(" mission room");
-		into.append(lastPosition("last posn. ", x, y, false));
+		strcat(into, originCP());
+		strcat(into, " mission room");
+		strcat(into, lastPosition("last posn. ", x, y, false));
 	}
 	else
 	{
-		into.append(chatMakeTempString("cell#%u", (cellIP & 0xff)));
+		strcat(into, chatMakeTempString("cell#%u", (cellIP & 0xff)));
 		// He may not have finished spawning
 		if ( !isSpawned() )
 		{
-			into.append(" spawning ");
-			into.append(originCP());
+			strcat(into, " spawning ");
+			strcat(into, originCP());
 		}
 		else
 		{
 			if ( sortieID() == 0 )
-				into.append("?missingsortieid?");
+				strcat(into, "?missingsortieid?");
 			else
-				into.append(chatMakeTempString("sortie #%u", sortieID()));
+				strcat(into, chatMakeTempString("sortie #%u", sortieID()));
 
 			if ( isBuzzard() )
-				into.append(" buzzard");
-			into.append(lastPosition("near ", x, y, false));
+				strcat(into, " buzzard");
+			strcat(into, lastPosition("near ", x, y, false));
 			if ( lastCP() == nullptr || lastCP()->Matches(originCpID()) == false )
 			{
-				into.append(" origin: ");
-				into.append(originCP());
+				strcat(into, " origin: ");
+				strcat(into, originCP());
 			}
 		}
 	}
 
 	if ( isSpawned() && m_impl->m_lastPing > 0 )
 	{
-		snprintf(tmpbuf, sizeof(tmpbuf), " ping:%ums", m_impl->m_lastPing);
-		into.append(tmpbuf);
+		char ping[20];
+		strprintf(ping, " ping:%ums", m_impl->m_lastPing);
+		strcat(into, ping);
 	}
 }
 

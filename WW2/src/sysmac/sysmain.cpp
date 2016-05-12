@@ -96,7 +96,7 @@ int sysmain()
 #ifdef IS_DEBUG
         if ( frames % 100 == 0 )
         {
-            printf( "%.1f\n", 1000.0/gFPS );
+            //printf( "%.1f\n", 1000.0/gFPS );
         }
 #endif
     }

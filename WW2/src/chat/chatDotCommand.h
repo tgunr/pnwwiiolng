@@ -13,8 +13,6 @@
 #include "chat/chatGroupsType.h"
 #include "chat/chatLStringIDs.h"
 
-#define MAX_INT_REP  10
-
 const PermissionMask NO_MASK = 0;
 const PermissionMask ALL_MASK = ~0ULL;
 
@@ -46,7 +44,6 @@ private:
 	DotUsage& operator = (const DotUsage& rhs);
 	DotUsage(const DotUsage& rhs);
 
-
 public:
 	bool isHidden() const;
 };
@@ -72,8 +69,6 @@ public:
 protected:
 	Usages m_usages;
 	CHAT_GROUPS m_groups;
-
-//	void catIntToText(UINT32 value, char *dest) const;
 
 private:
 	DotCommand(const DotCommand& rhs);

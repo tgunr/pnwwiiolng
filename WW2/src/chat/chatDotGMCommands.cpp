@@ -1747,9 +1747,12 @@ public:
 } dotPInfo;
 
 void
-_addStr(std::string & dest, const char* src)
+_addStr(char* dest, const char* src)
 {
-	dest.append(src);
+	char* p = dest;
+	while ( *p ) p++;					// Seek to EOS
+	if ( p != dest ) *(p++) = ' ';		// Add space except at BOS
+	strcpy(p, src);					// Copy second string here
 }
 
 static const char*
@@ -1818,13 +1821,14 @@ DotPInfo::actionWith(Player& player, Chat::ClientMessage* message, char* argumen
 void
 Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, bool includePermissions) const
 {
-	std::string response;
+	char response[MAX_MESSAGE_LENGTH + 1];
 	char buf[128+1];
+	response[0] = '\0';
 	buf[0] = '\0';
 
 	if ( player.isPlaynet() )
 	{
-		snprintf(buf, sizeof(buf), "Pid#%u", playerID());
+		strprintf(buf, "Pid#%u", playerID());
 		_addStr(response, buf);
 	}
 
@@ -1834,7 +1838,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		_addStr(response, "in:none");
 	else
 	{
-		snprintf(buf, sizeof(buf), "in:%llu", player.instance().id());
+		strprintf(buf, "in:%llu", player.instance().id());
 		_addStr(response, buf);
 	}
 
@@ -1843,17 +1847,18 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		const char* squadName = chatGetSquadCallsign(squadID());
 		if ( squadName != nullptr && squadRank() > 0 )
 		{
-			snprintf(buf, sizeof(buf), "%s:%s"
-				, chatGetSquadRankName(squadRank())
-				, squadName);
+			strprintf(buf
+							, "%s:%s"
+								, chatGetSquadRankName(squadRank())
+								, squadName);
 		}
 		else if ( squadRank() == 0 && player.isPlaynet() )
 		{
-			snprintf(buf, sizeof(buf), "Sqd:%s (UNRANKED!)", squadName);
+			strprintf(buf, "Sqd:%s (UNRANKED!)", squadName);
 		}
 		else if ( player.isPlaynet() )
 		{
-			snprintf(buf, sizeof(buf), "Sqd#%u(NO DATA)", squadID());
+			strprintf(buf, "Sqd#%u(NO DATA)", squadID());
 		}
 		else
 		{
@@ -1880,7 +1885,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		}
 		else if ( player.isPlaynet() )
 		{
-			snprintf(buf, sizeof(buf), "B#%u:UNK", brigadeID());
+			strprintf(buf, "B#%u:UNK", brigadeID());
 			_addStr(response, buf);
 		}
 	}
@@ -1890,14 +1895,14 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		RANK_NO erank = effectiveRank();
 		const Rank* myRank = Rank::lookup(erank);
 		if ( myRank != nullptr )
-			snprintf(buf, sizeof(buf)
+			strprintf(buf
 						, "R#%u(%s/%s)"
 							, erank
 							, _rankType(myRank->type())
 							, rankNames[erank]
 							);
 		else if ( player.isPlaynet() )
-			snprintf(buf, sizeof(buf), "R#%u(INVALID)", erank);
+			strprintf(buf, "R#%u(INVALID)", erank);
 		_addStr(response, buf);
 	}
 
@@ -1911,9 +1916,9 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		char oic[21];
 		HCUnit* unit = HCUnit::Lookup(leadingBrigade());
 		if ( unit )
-			snprintf(oic, sizeof(buf), "OIC:%s", unit->callsign());
+			strprintf(oic, "OIC:%s", unit->callsign());
 		else if ( player.isPlaynet() )
-			snprintf(oic, sizeof(buf), "OIC:#%u", leadingBrigade());
+			strprintf(oic, "OIC:#%u", leadingBrigade());
 		_addStr(response, "OIC");
 	}
 	if ( permissions(ALLIED_COMMAND_STAFF) )
@@ -1929,11 +1934,11 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 	if ( player.isPlaynet() )
 	{
 		char permissionsHex[64];
-		snprintf(permissionsHex, sizeof(permissionsHex), "PM: %016llx", permissionMask());
+		sprintf(permissionsHex, "PM: %016llx", permissionMask());
 		_addStr(response, permissionsHex);
 	}
 
-	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response.c_str());
+	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response);
 
 	if ( includePermissions )
 	{
@@ -1953,7 +1958,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 			{
 				if ( index == 0 )
 					lstrID = LSTR_TEXT_END;
-				player.message(LSTR_NONE, lstrID, response.c_str());
+				player.message(LSTR_NONE, lstrID, response);
 			}
 		}
 		while ( index > 0 );
@@ -1963,7 +1968,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 
 	whereabouts(response, x, y);
 
-	player.message(LSTR_NONE, LSTR_GENERIC, response.c_str(), nullptr);
+	player.message(LSTR_NONE, LSTR_GENERIC, response, nullptr);
 
 	return;
 }

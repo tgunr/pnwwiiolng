@@ -332,23 +332,31 @@ chatdbListTasks()
 // Return the list of permissions for a given mask value
 
 UINT32
-chatGetPermissionNames(const PermissionMask& mask, std::string &into, UINT32 from)
+chatGetPermissionNames(const PermissionMask& mask, char* into, UINT32 from)
 {
 	bool matched = (from != 0);
+	char* cutoff = into + MAX_MESSAGE_LENGTH - 4;
 	PermissionMask bit = 1ULL << from;
 	for ( UINT32 i = from; i < 64; ++i, bit <<= 1 )
 	{
 		if ( (mask & bit) == 0ULL )
 			continue;
+		if ( into + permissionNames[i].size() > cutoff )
+		{
+			*into = 0;
+			return i;
+		}
 		if ( matched == true )
 		{
-			into.append(", ");
+			*(into++) = ',';
+			*(into++) = ' ';
 		}
 		else
 			matched = true;
-		for ( const char* p = permissionNames[i].c_str(); *p != 0; ++p )
-			into.append(std::to_string(tolower(*p)));
+		for ( const char* p = permissionNames[i].c_str(); *p != 0; ++p, ++into )
+			*into = tolower(*p);
 	}
+	*into = 0;
 	return 0;
 }
 
