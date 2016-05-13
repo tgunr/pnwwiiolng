@@ -285,13 +285,12 @@ LOGICAL trnGetStratData(SINT16 scx, SINT16 scy, SINT32 id, SINT32* country, SINT
 	return result;
 }
 
-SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 level)
-{
+SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 level) {
 	if ( country == -1 || level == -1 )
 		trnGetStratData(td->scx, td->scy, bid, &country, &level);
 
-	if ( 0 < bid || bid > td->bldHash.maxBldID ) {
-		Write_Log(LOG_COMM, LOG_INFO, "access to bad bid %d ( > %d)", bid, td->bldHash.maxBldID);
+	if ( 0 > bid || bid >= td->bldHash.maxBldID ) {
+		Write_Log(LOG_COMM, LOG_INFO, "access to bad bid %d ( >= %d)", bid, td->bldHash.maxBldID);
 		return -EINVAL;
 	}
 
@@ -338,49 +337,40 @@ SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 le
 
 SINT32 trnUpdateStratData(TERRAIN_DETAIL* td, OBJECT* lpobj, SINT32 bid, LOGICAL loaded)
 {
-	SINT32 i;
-
-	if ( bid == 0)
+	if ( bid == 0 ) // TODO: Why can't it be zero?
+		return -EINVAL;
+	if ( td == nullptr || td->bldHash.building == nullptr )
 		return -EINVAL;
 
-	if ( td == nullptr || td->bldHash.building == nullptr || 0 < bid || bid > td->bldHash.maxBldID)
-		return -EINVAL;
-
-	if (bid < 0)
-	{
-		if (lpobj == nullptr || loaded == TRUE)
+	if ( bid < 0 ) {
+		if ( lpobj == nullptr || loaded == TRUE )
 			return -EINVAL;
 
-		for (i = 0; i <= td->bldHash.maxBldID;i++)
-		{
-			if (td->bldHash.building[i].pobj == lpobj)
-				break;
+		for ( int i = 0 ; i < td->bldHash.maxBldID ; ++i ) {
+			if ( td->bldHash.building[i].pobj != lpobj )
+				continue;			
+			bid = i;
+			break;
 		}
-
-		if ( i > td->bldHash.maxBldID)
-			return -ENOENT;
-
-		bid = i;
-
 	}
+
+	if ( 0 > bid || bid >= td->bldHash.maxBldID ) {
+		Write_Log(LOG_COMM, LOG_INFO, "access to bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
+		return -EINVAL;
+	}
+
 
 	td->bldHash.building[bid].loaded = loaded;
 
-    if(loaded && td->bldHash.building[bid].isBuilder)
-    {
-        trnSetBuilderFlag(td->scx, td->scy, bid);
-    }
+	if ( loaded && td->bldHash.building[bid].isBuilder )
+		trnSetBuilderFlag(td->scx, td->scy, bid);
 
-	if (loaded)
-	{
+	if ( loaded ) {
 		trnUpdateObjectStatus(td->scx, td->scy, bid);
-
 //		trnUpdateObjectStatus(td->scx,td->scy,bid,-1,td->bldHash.building[bid].level);
 		td->bldHash.building[bid].pobj = lpobj;
-	}
-	else
+	} else
 		td->bldHash.building[bid].pobj = nullptr;
-
 
 	return 0;
 }
