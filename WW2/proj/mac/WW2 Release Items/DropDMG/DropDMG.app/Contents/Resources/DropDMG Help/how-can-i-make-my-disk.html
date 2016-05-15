@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+<title>How can I make my disk images download properly?</title><!-- MJT_HEAD_PLACEHOLDER --></head>
+<body class="docframe">
+<span class="navigation-bar"><span class="navigation-group"><a href="./why-don-t-the-icons-app.html" class="navigation-link">Previous</a>&nbsp;<a href="./why-doesn-t-my-serial-n.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./frequently-asked-questi.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+<hr class="navigation-bar-separator" />
+<a name="help-anchor-how-can-i-make-my-disk"></a><div class="section" id="how-can-i-make-my-disk">
+<h1><a class="toc-backref" href="./frequently-asked-questi.html#id151">6.3   How can I make my disk images download properly?</a></h1>
+<p>Some Web servers have trouble handling plain <tt>.dmg</tt> files, because
+they don’t know what kind of file they are. When people download the
+<tt>.dmg</tt> file, it can open in the Web browser instead of mounting
+automatically. Or, with a bzip2-compressed image, Safari will change the
+file extension from <tt>.dmg</tt> to <tt>.dmg.bz2</tt>, which causes the OS to
+think the file is damaged. In order to prevent these problems, make sure
+that your Web server uses the correct MIME type for <tt>.dmg</tt> files. If
+you administer an Apache-based server, you can ensure this by adding
+this line:</p>
+<pre>
+AddType application/x-apple-diskimage .dmg
+</pre>
+<p>to your <tt>.htaccess</tt> file.</p>
+</div>
+<hr class="navigation-bar-separator" />
+<span class="navigation-bar"><span class="navigation-group"><a href="./why-don-t-the-icons-app.html" class="navigation-link">Previous</a>&nbsp;<a href="./why-doesn-t-my-serial-n.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./frequently-asked-questi.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+</body>
+</html>

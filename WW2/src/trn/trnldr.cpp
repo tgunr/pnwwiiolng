@@ -3168,9 +3168,8 @@ TERRAIN_DETAIL*	td;
             td->m_trees = nullptr;
         }
 
-		if ( td->bldHash.building != nullptr)
-		{
-			memFree(td->bldHash.building);
+		if ( td->bldHash.building ) {
+			delete[] td->bldHash.building;
 			td->bldHash.building = nullptr;
 		}
 
@@ -3823,9 +3822,8 @@ TERRAIN_DETAIL*	td;
 		trndtl[sc].trnstate.nextstate[i] = 0;
 	}
 
-	if ( td->bldHash.building != nullptr)
-	{
-		memFree(td->bldHash.building);
+	if ( td->bldHash.building ) {
+		delete[] td->bldHash.building;
 		td->bldHash.building = nullptr;
 	}
 

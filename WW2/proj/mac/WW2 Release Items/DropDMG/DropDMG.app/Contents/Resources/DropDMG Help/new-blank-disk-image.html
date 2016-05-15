@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+<title>New Blank Disk Image…</title><!-- MJT_HEAD_PLACEHOLDER --></head>
+<body class="docframe">
+<span class="navigation-bar"><span class="navigation-group"><a href="./new-from-folder-file.html" class="navigation-link">Previous</a>&nbsp;<a href="./convert-image-archive.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./the-file-menu.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+<hr class="navigation-bar-separator" />
+<a name="help-anchor-new-blank-disk-image"></a><div class="section" id="new-blank-disk-image">
+<h1><a class="toc-backref" href="./the-file-menu.html#id109">4.2.2   New Blank Disk Image…</a></h1>
+<p>This creates an empty disk image with the specified format and size and mounts
+it in the Finder. The blank disk image acts as a virtual disk. Applications can
+directly read and write to files stored on the disk image, but the files
+disappear when you eject the disk image. Double-click the disk image file to
+make its contents accessible again.</p>
+<p>By setting the disk image to be encrypted, your virtual disk can act as a mini
+FileVault. When using <a href="http://support.apple.com/kb/ht4790" target="_top">FileVault</a>, your
+entire drive (Mac OS X 10.7) or home folder (Mac OS X 10.6 and earlier) is
+encrypted. This is slow, makes your data more susceptible to corruption, and (on
+Mac OS X 10.6 and earlier) limits the ability to back up and recover files using
+<a href="http://www.apple.com/macosx/what-is-macosx/time-machine.html" target="_top">Time Machine</a>.
+Disk images created by DropDMG use the same encryption technology as FileVault,
+and they avoid FileVault’s drawbacks by only encrypting the files that you
+choose.</p>
+<dl>
+<dt>Image Format</dt>
+<dd>Blank disk images can be created in <tt>.dmg</tt>, <tt>.sparseimage</tt>, and
+<tt>.sparsebundle</tt> formats. For more information, see <a href="./format.html">Format</a> section.</dd>
+<dt>Encryption</dt>
+<dd>The encryption can be None, 128-bit AES, or 256-bit AES. For more
+information on the encryption types, see the <a href="./encryption.html">Encryption</a> section. You can
+use the <strong>From Configuration</strong> pop-down menu to quickly enter a passphrase
+saved in the keychain.</dd>
+<dt>Volume Size</dt>
+<dd>This is the maximum capacity of the blank disk image. For <tt>.dmg</tt> files,
+this is also how much space the disk image will take up. Sparse disk images
+will consume less disk space, depending on how much of the capacity you use.</dd>
+<dt>Volume Name</dt>
+<dd>The name of the virtual disk, as shown in the <strong>Devices</strong> section of the
+Finder’s sidebar. This need not necessarily be the same as the name of the
+disk image file, which is set in the <strong>Save As</strong> field.</dd>
+</dl>
+<p><img alt="new blank disk image" height="539" src="images/new-blank-disk-image.png" width="617" /></p>
+</div>
+<hr class="navigation-bar-separator" />
+<span class="navigation-bar"><span class="navigation-group"><a href="./new-from-folder-file.html" class="navigation-link">Previous</a>&nbsp;<a href="./convert-image-archive.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./the-file-menu.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+</body>
+</html>

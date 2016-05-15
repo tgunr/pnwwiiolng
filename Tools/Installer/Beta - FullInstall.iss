@@ -2,7 +2,7 @@
 #define MyAppVersion GetFileVersion("current/WW2.exe")
 
 #define MyAppNameRoot "Battleground Europe"
-#define MyAppName "Battleground Europe - Beta"
+#define MyAppName "Battleground Europe - 1.35 Beta"
 #define MyAppPublisher "Playnet Inc."
 #define MyAppURL "http://www.battlegroundeurope.net/"
 #define MyAppExeName "Playgate.exe"
@@ -12,6 +12,8 @@
 #define WW2ModsDir "ww2mods"
 
 [Setup]
+SignTool=signtool /fd sha256 /d $qBattleground Europe$q /du $qhttp://www.battlegroundeurope.com$q $f
+
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+<title>Create OS X Install Disk</title><!-- MJT_HEAD_PLACEHOLDER --></head>
+<body class="docframe">
+<span class="navigation-bar"><span class="navigation-group"><a href="./burn.html" class="navigation-link">Previous</a>&nbsp;<a href="./join-files.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./the-file-menu.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+<hr class="navigation-bar-separator" />
+<a name="help-anchor-create-os-x-install-dis"></a><div class="section" id="create-os-x-install-dis">
+<h1><a class="toc-backref" href="./the-file-menu.html#id117">4.2.10   Create OS X Install Disk</a></h1>
+<p>Once you’ve downloaded the Mac OS X installer from the Mac App Store, this
+command helps you to create an installation disk. This makes it possible to
+re-install OS X, install it in a virtual machine, or to install it on a
+different Mac without having to download it again. Additionally, if there are
+problems with a Mac’s hard drive, you may not be able to boot it and access the
+installer or recovery partition, but you will still be able to reinstall from
+the install disk that you create here. You can also use it as an emergency disk
+to boot a Mac and repair or reformat its hard drive, or to restore from a Time
+Machine backup.</p>
+<p>It is recommended that you create your install disk <em>before</em> running the OS X
+installer, as the installer may delete itself (which would require you to
+download it again).</p>
+<p><strong>Preparing the Install Disk</strong></p>
+<ul class="simple">
+<li>To create an install disk using a spare hard drive, USB flash drive, or
+SD card, connect or insert the disk and use the Finder to rename it to
+<tt>Installer</tt>. This disk will be completely erased and replaced by the
+Mac OS X installer.</li>
+<li>You can also create an install disk image, for use with virtualization
+software or for later <a href="./restoring-files-and-dis.html">restoration</a> to a disk. Use DropDMG’s <a href="./new-blank-disk-image.html">New Blank
+Disk Image…</a> command to create a disk image in <strong>Sparse Bundle</strong> format
+with a <strong>DVD+R DL</strong> volume size. The name of the blank disk image should
+be <tt>Installer.sparsebundle</tt>. After using <tt>createinstallmedia</tt> below,
+you can optionally <a href="./convert-image-archive.html">convert</a> the sparse bundle to a compressed disk
+image format.</li>
+</ul>
+<p>Then follow the instructions below for the version of Mac OS X that are you are
+installing:</p>
+<p><strong>El Capitan (10.11)</strong></p>
+<ol class="arabic">
+<li><p>From the Finder’s <strong>Go</strong> menu, choose <strong>Utilities</strong>, then open the
+Terminal application.</p>
+</li>
+<li><p>Copy and paste these two commands into Terminal and press Return.</p>
+<pre>
+cd /Applications/Install\ OS\ X\ El\ Capitan.app/Contents/Resources/
+sudo ./createinstallmedia --volume /Volumes/Installer/ --applicationpath ../../ --nointeraction
+</pre>
+</li>
+<li><p>Enter your Mac OS X admin password.</p>
+</li>
+</ol>
+<p><strong>Yosemite (10.10)</strong></p>
+<ol class="arabic">
+<li><p>From the Finder’s <strong>Go</strong> menu, choose <strong>Utilities</strong>, then open the
+Terminal application.</p>
+</li>
+<li><p>Copy and paste these two commands into Terminal and press Return.</p>
+<pre>
+cd /Applications/Install\ OS\ X\ Yosemite.app/Contents/Resources/
+sudo ./createinstallmedia --volume /Volumes/Installer/ --applicationpath ../../
+</pre>
+</li>
+<li><p>Enter your Mac OS X admin password. You may also need to type <strong>Y</strong> to
+confirm that you want to erase the disk.</p>
+</li>
+</ol>
+<p><strong>Mavericks (10.9)</strong></p>
+<ol class="arabic" start="2">
+<li><p>From the Finder’s <strong>Go</strong> menu, choose <strong>Utilities</strong>, then open the
+Terminal application.</p>
+</li>
+<li><p>Copy and paste these two commands into Terminal and press Return.</p>
+<pre>
+cd /Applications/Install\ OS\ X\ Mavericks.app/Contents/Resources/
+sudo ./createinstallmedia --volume /Volumes/Installer/ --applicationpath ../../
+</pre>
+</li>
+<li><p>Enter your Mac OS X admin password. You may also need to type <strong>Y</strong> to
+confirm that you want to erase the disk.</p>
+</li>
+</ol>
+<p><strong>Mountain Lion or Lion</strong></p>
+<p>If you purchased Mac OS X 10.7 or 10.8 from the Mac App Store, DropDMG will help
+you burn an OS X install DVD. A dual-layer DVD (a.k.a. DVD+R DL) is required.</p>
+</div>
+<hr class="navigation-bar-separator" />
+<span class="navigation-bar"><span class="navigation-group"><a href="./burn.html" class="navigation-link">Previous</a>&nbsp;<a href="./join-files.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./the-file-menu.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+</body>
+</html>

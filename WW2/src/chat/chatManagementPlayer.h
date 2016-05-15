@@ -16,7 +16,7 @@ public:
 	static void Initialize();
 
 public:
-	ManagementPlayer(SINT32 teulIndex, const char* withGameName);
+	ManagementPlayer(SINT32 teulIndex, const char* withGameName, UINT16 withCountry);
 	virtual ~ManagementPlayer();
 
 	virtual bool isManager() const override { return true; }

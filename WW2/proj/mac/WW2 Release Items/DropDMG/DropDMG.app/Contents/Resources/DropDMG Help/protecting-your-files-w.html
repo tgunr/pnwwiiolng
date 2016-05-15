@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+<title>Protecting Your Files With Encryption</title><!-- MJT_HEAD_PLACEHOLDER --></head>
+<body class="docframe">
+<span class="navigation-bar"><span class="navigation-group"><a href="./making-images-with-back.html" class="navigation-link">Previous</a>&nbsp;<a href="./transferring-files-secu.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./using-dropdmg.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+<hr class="navigation-bar-separator" />
+<a name="help-anchor-protecting-your-files-w"></a><div class="section" id="protecting-your-files-w">
+<h1><a class="toc-backref" href="./using-dropdmg.html#id97">3.7   Protecting Your Files With Encryption</a></h1>
+<p>Apple’s <a href="http://support.apple.com/kb/ht4790" target="_top">FileVault</a> encrypts
+your whole hard drive (Mac OS X 10.7) or home folder (Mac OS X 10.6 and
+earlier). This is overkill for many users, needlessly slowing access to files
+and increasing the risk of data corruption. Additionally, whole drive encryption
+does not secure your files from other user accounts on the same Mac.</p>
+<p>DropDMG lets you use the same encryption technology to protect a select group of
+files from prying eyes. Each group of files is stored on an encrypted disk
+image. Each disk image can hold as many or as few files as you want and can have
+its own passphrase. The files will be secure if your hard drive is stolen or if
+you send the disk image across a network. The files will be searchable via
+Spotlight after you’ve entered the passphrase.</p>
+<dl>
+<dt>To create an encrypted disk image</dt>
+<dd>Choose <a href="./new-blank-disk-image.html">New Blank Disk Image…</a> from <a href="./the-file-menu.html">the File menu</a>. Set an encryption
+level and passphrase. A white volume icon will appear in the Finder. You can
+move existing files onto the disk image or create new ones there.</dd>
+<dt>To lock your encrypted files</dt>
+<dd>Click the eject button next to the white volume icon in the Finder’s sidebar.</dd>
+<dt>To access your encrypted files</dt>
+<dd>Double-click the disk image file. Mac OS X will ask for the passphrase, and
+it can optionally remember it in the keychain. DropDMG’s <a href="./mount-image.html">Mount Image…</a>
+command provides additional options.</dd>
+</dl>
+<p><em>Tip:</em> You can save time by creating a Login Item to make some encrypted files
+available whenever you log into your Mac. Choose <strong>System Preferences…</strong> from
+the Apple menu. Click on <strong>Accounts</strong>, and then select your account. Then click
+<strong>Login Items</strong>. Drag your <tt>.dmg</tt> file into the list. Now, whenever you log
+into your Mac, it will mount the disk image.</p>
+<p><em>Tip:</em> If you copied existing files to the encrypted disk image, you may want to
+remove any traces of the unencrypted files from your drive. To do this, put the
+originals in the trash and choose <strong>Finder ‣ Secure Empty Trash…</strong> or use the
+<strong>Erase Free Space…</strong> button in Disk Utility.</p>
+</div>
+<hr class="navigation-bar-separator" />
+<span class="navigation-bar"><span class="navigation-group"><a href="./making-images-with-back.html" class="navigation-link">Previous</a>&nbsp;<a href="./transferring-files-secu.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./using-dropdmg.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+</body>
+</html>

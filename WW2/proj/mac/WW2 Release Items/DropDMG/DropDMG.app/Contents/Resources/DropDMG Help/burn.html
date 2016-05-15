@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+<title>Burn…</title><!-- MJT_HEAD_PLACEHOLDER --></head>
+<body class="docframe">
+<span class="navigation-bar"><span class="navigation-group"><a href="./verify-image.html" class="navigation-link">Previous</a>&nbsp;<a href="./create-os-x-install-dis.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./the-file-menu.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+<hr class="navigation-bar-separator" />
+<a name="help-anchor-burn"></a><div class="section" id="burn">
+<h1><a class="toc-backref" href="./the-file-menu.html#id116">4.2.9   Burn…</a></h1>
+<p>This command lets you burn files and folders to CD, DVD, or Blu-ray. This
+requires an internal or external drive that supports Mac OS X disc burning. You
+can continue to use DropDMG to create other disk images or archives while a disc
+is burning, and if you have multiple optical drives you can even burn more than
+one disc at a time.</p>
+<p><img alt="burn window" height="358" src="images/burn-window.png" width="514" /></p>
+<p>When you choose to burn a disk image file (rather than a regular file or a
+folder), you have two options:</p>
+<dl>
+<dt>Burn contents of disk images</dt>
+<dd><p class="-first">This makes the contents of the burned disc look like the contents of the
+disk image. The volume name of the mounted disk image becomes the name of
+the disc. If the disk image is a device image that contains multiple
+partitions, then the burned disc will have multiple partitions. This is
+useful when:</p>
+<ul class="-last simple">
+<li>You want the burned disc to contain the contents of the disk image,
+not the disk image file itself. The contents of the burned disc will
+<em>not</em> be compressed or encrypted.</li>
+<li>The disk image is segmented, and you want to join the segments and
+burn them onto a single disc.</li>
+</ul>
+</dd>
+<dt>Burn disk images as files</dt>
+<dd><p class="-first">This burns a disc whose content is the single disk image file. The name of
+the disc is the file’s name, without the extension. This is useful when:</p>
+<ul class="-last simple">
+<li>You want the burned disc to contain a single file, the disk
+image. If the disk image file was compressed or encrypted, so
+will be the burned file.</li>
+<li>The disk image is segmented, and you want to burn each segment
+to a different disc.</li>
+</ul>
+</dd>
+</dl>
+<p><img alt="burn file folder disk image" height="507" src="images/burn-file-folder-disk-image.png" width="617" /></p>
+<p><strong>Keyboard Shortcuts</strong></p>
+<p>As a shortcut to choosing <strong>Burn…</strong> from the <strong>File</strong> menu, you can hold down
+the Shift key while dragging and dropping a folder onto the <a href="./dropdmg-window.html">DropDMG window</a> or
+DropDMG’s Dock icon. If you want to burn an disk images as files, hold down the
+Shift <em>and</em> Option keys.</p>
+<p><strong>Command-line</strong></p>
+<p>You can also initiate burns from Terminal:</p>
+<pre>
+dropdmg --burn-image ~/Desktop/Image.dmg
+dropdmg --burn-file ~/Desktop/Folder
+</pre>
+<p><strong>Appending to CDs</strong></p>
+<p>When burning a CD, check the <strong>Leave disc appendable</strong> box after inserting the
+blank disc. DropDMG will leave the disc “open” after burning so that you can
+burn additional files to the same disc under a new session, space permitting.</p>
+<p><strong>Custom Disc Icons</strong></p>
+<p>To burn a disc with a custom volume icon, see <a href="./custom-volume-icon.html">Burning a CD or DVD-ROM With a
+Custom Icon</a>.</p>
+</div>
+<hr class="navigation-bar-separator" />
+<span class="navigation-bar"><span class="navigation-group"><a href="./verify-image.html" class="navigation-link">Previous</a>&nbsp;<a href="./create-os-x-install-dis.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./the-file-menu.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+</body>
+</html>
