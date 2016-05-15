@@ -689,8 +689,6 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
             map/mapHCUnitLocations.h
         strt/strtChatTypes.cpp
             strt/strtChatTypes.h
-        strt/strtSyncSupportMessages.cpp
-            strt/strtSyncSupportMessages.h
         wwii/wwiiHCUnits.cpp
             wwii/wwiiHCUnits.h
         wwii/wwiiSquads.cpp
