@@ -4,7 +4,7 @@
 #define PN_WW2_PRODUCT_NO 1
 #define PN_WW2_VERSION_NO 35
 #define PN_WW2_PATCH_NO   0
-#define PN_WW2_BUILD_NO   14
+#define PN_WW2_BUILD_NO   255
 ////////// End of don't-reformat section
 
 // Because cpp(1) is painful
