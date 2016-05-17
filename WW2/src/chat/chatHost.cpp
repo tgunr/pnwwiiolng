@@ -2282,6 +2282,10 @@ chatRouteSideMessage(WWII_SIDE toSide
 void
 chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample& sample)
 {
+	// TEMP/HACK: This message is occurring far too often, and it's a little
+	// too late to fix it properly. For now, we're just going to ignore it.
+	return;
+
 	static std::map<playerid_t, std::pair<UINT32, TeulDeltaMS>> reports;
 	auto it = reports.find(player.playerID());
 	const UINT32 lastReport = (it != reports.end()) ? it->second.first : 0;

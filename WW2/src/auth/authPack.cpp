@@ -104,8 +104,29 @@ SINT32 authPackAPP_LAUNCH_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUN
 	offset = teulPackUINT32(mode,data,offset,&request->appVersion,0);
 
 	offset = teulPackSINT32(mode,data,offset,&request->cdKeySize,0);
-	offset = teulPackVoid(mode,data,offset,&(request->cdKey),request->cdKeySize);
-	request->cdKey[request->cdKeySize] = '\0';
+	
+	// Ugly hack: The size sent by the client can't be trusted; we'll get a
+	// nasty buffer overflow if we use an invalid size. However, always
+	// packing/unpacking MAX_PARAM (as similarly done by the username and
+	// password packers above) would break all teul clients using this packet,
+	// requiring new versions of Playgate and the Mac client at minimum. By just
+	// clamping the size actually read, we maintain compatibility while still
+	// avoiding the overflow. Note that if a packet legitimately has a cdKeySize
+	// that's greater than MAX_PARAM (rather than it being a crypto error), the
+	// remaining fields in the packet will be corrupted, but this happening is
+	// already an invalid data condition so we don't care, and doing it
+	// "properly" is just more trouble than its worth when this is already a
+	// major design flaw. Note also "MAX_PARAM - 1", because also unlike the
+	// un/pw fields, cdKey is not defined with +1 bytes as its size in the
+	// APP_LAUNCH_REQ structure. We use both min() and max() because the size is
+	// signed and therefore may be less than zero (which, when the value reaches
+	// memcpy(), will result in an attempt to copy gigabytes of memory!).
+	SINT32 safeSize = std::min(MAX_PARAM - 1, std::max(0, request->cdKeySize));
+	offset = teulPackVoid(mode,data,offset,&(request->cdKey),safeSize);
+	// Truncate both the decided safe size and the end of the buffer, for
+	// excessive safety.
+	request->cdKey[safeSize] = '\0';
+	request->cdKey[MAX_PARAM - 1] = '\0';
 
 	UINT32 ignore = (UINT32)request->ignoreMinorUpdates;
 	offset = teulPackUINT32(mode,data,offset,&ignore,0);
