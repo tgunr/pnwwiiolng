@@ -8,34 +8,9 @@
 #include "ui/uiMain.h"
 #include "phui/IMEControl.h"
 
-//#if platOS == OS_WIN32
-//#include <VersionHelpers.h>
-//#endif
-// VersionHelpers.h isn't found with XP toolset, reproduce what's needed here
-#define VERSIONHELPERAPI inline bool
-
-VERSIONHELPERAPI
-IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor)
-{
-	OSVERSIONINFOEXW osvi = { sizeof(osvi), 0, 0, 0, 0,{ 0 }, 0, 0 };
-	DWORDLONG        const dwlConditionMask = VerSetConditionMask(
-		VerSetConditionMask(
-			VerSetConditionMask(
-				0, VER_MAJORVERSION, VER_GREATER_EQUAL),
-			VER_MINORVERSION, VER_GREATER_EQUAL),
-		VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
-
-	osvi.dwMajorVersion = wMajorVersion;
-	osvi.dwMinorVersion = wMinorVersion;
-	osvi.wServicePackMajor = wServicePackMajor;
-
-	return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR, dwlConditionMask) != FALSE;
-}
-VERSIONHELPERAPI
-IsWindowsVistaOrGreater()
-{
-	return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA), LOBYTE(_WIN32_WINNT_VISTA), 0);
-}
+#if platOS == OS_WIN32
+#include <VersionHelpers.h>
+#endif
 
 // Definition from Win98DDK version of IMM.H
 typedef struct tagINPUTCONTEXT2 {
