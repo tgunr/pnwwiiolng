@@ -3880,7 +3880,7 @@
 				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online Beta";
+				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -3937,7 +3937,7 @@
 				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online Beta";
+				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -4012,7 +4012,7 @@
 				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online Beta";
+				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Development;
@@ -4078,7 +4078,7 @@
 				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online Beta";
+				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
 			name = GM;
