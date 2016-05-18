@@ -9,15 +9,13 @@
 
 namespace Chat
 {
-	struct ManagementLogin3
+	struct ManagementLogin2
 	{
-		ManagementLogin3() : m_version(1), m_wantHandle(0ULL), m_country(0) {}
+		ManagementLogin2() : m_version(1), m_wantHandle(0ULL) {}
 
 		UINT16		m_version;
 		// Desired username.
 		ChatHandle	m_wantHandle;
-		// Desired persona (0 for none).
-		UINT16		m_country;
 
 		// Server-side login function
 		bool Login(SINT32 teulIndex);
