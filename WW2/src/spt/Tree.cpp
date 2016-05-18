@@ -1,8 +1,10 @@
 #include <syscfg.h> // Path is project specific.
 #pragma warning(disable:4786)
 
-#include "spt/Tree.h"
-#include "spt/Random.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include "Tree.h"
+#include "Random.h"
 #include "ld/lddds.h"
 #include "include/vars.h"
 #include "fio/fio.h"
@@ -19,7 +21,6 @@
 #include "ogl/oglMaterial.h"
 #include "ogl/oglTextureObject.h"
 #include "ob/obdraw.h"
-#include "shader/glslUniformBlock.h"
 
 #if USE_STATESET
 #include "ogl/States.h"
@@ -204,19 +205,19 @@ bool CTree::LoadSPTFile(const char* filename,
 		return false;
 	}
 
-	unsigned char* block = (unsigned char*)memAlloc(numbytes);
+	unsigned char* block = new unsigned char[numbytes];
 
     fioRead(fd, block, numbytes);
 	fioClose(fd);
 
-    if(!CSpeedTreeRT::LoadTree(block, numbytes))
+	bool result = CSpeedTreeRT::LoadTree(block, numbytes);
+	delete[] block;
+
+	if ( ! result )
     {
         Write_Log(LOG_OLD, LOG_WARN, CSpeedTreeRT::GetCurrentError());
         return false;
     }
-
-    memFree(block);
-
     SetBranchLightingMethod(CSpeedTreeRT::LIGHT_DYNAMIC);
     SetLeafLightingMethod(CSpeedTreeRT::LIGHT_DYNAMIC);
     SetFrondLightingMethod(CSpeedTreeRT::LIGHT_DYNAMIC);
@@ -242,16 +243,6 @@ bool CTree::LoadSPTFile(const char* filename,
     CSpeedTreeRT::SetLodLimits(n, f);
     SetLeafRockingState(true);
     SetDropToBillboard(true);
-
-    float box[6];
-    GetBoundingBox(box);
-
-    float cx = (box[3] - box[0]);
-    float cy = (box[4] - box[1]);
-    float cz = (box[5] - box[2]);
-
-    // Center point is at base of tree
-    radius = std::max(cz, std::max(cx, cy));
 
     // Some collision trees have angled cylinders. Determine matrix once during init.
     for(int i = 0; i < GetNumCollisionObjects(); i++)
@@ -805,24 +796,24 @@ void CTree::AddBranchDraw(const Tree* tree, const Vec4f& pos, const Vec4f& rot)
 
     if(tree->branchlod < b.m_nNumLods)
     {
-        if(b.m_pNumStrips[static_cast<int>(tree->branchlod)] > 0)
+        if(b.m_pNumStrips[tree->branchlod] > 0)
         {
             if(tree->branchlod < MAX_LODS)
             {
-                if(data[static_cast<int>(tree->branchlod)].empty())
-                    data[static_cast<int>(tree->branchlod)].resize(2048);
+                if(data[tree->branchlod].empty())
+                    data[tree->branchlod].resize(2048);
 
-                if(BranchCount[static_cast<int>(tree->branchlod)] >= 1024)
+                if(BranchCount[tree->branchlod] >= 1024)
                 {
                     PushBranches();
                 }
 
-                int idx = BranchCount[static_cast<int>(tree->branchlod)] * 2;
+                int idx = BranchCount[tree->branchlod] * 2;
 
-                data[static_cast<int>(tree->branchlod)][idx + 0] = rot;
-                data[static_cast<int>(tree->branchlod)][idx + 1] = pos;
+                data[tree->branchlod][idx + 0] = rot;
+                data[tree->branchlod][idx + 1] = pos;
 
-                BranchCount[static_cast<int>(tree->branchlod)]++;
+                BranchCount[tree->branchlod]++;
             }
         }
     }
@@ -845,24 +836,24 @@ void CTree::AddFrondDraw(const Tree* tree, const Vec4f& pos, const Vec4f& rot)
 
     if(tree->frondlod < f.m_nNumLods)
     {
-        if(f.m_pNumStrips[static_cast<int>(tree->frondlod)] > 0)
+        if(f.m_pNumStrips[tree->frondlod] > 0)
         {
             if(tree->frondlod < MAX_LODS)
             {
-                if(data[static_cast<int>(tree->frondlod)].empty())
-                    data[static_cast<int>(tree->frondlod)].resize(2048);
+                if(data[tree->frondlod].empty())
+                    data[tree->frondlod].resize(2048);
 
-                if(FrondCount[static_cast<int>(tree->frondlod)] >= 1024)
+                if(FrondCount[tree->frondlod] >= 1024)
                 {
                     PushFronds();
             }
 
-                int idx = FrondCount[static_cast<int>(tree->frondlod)] * 2;
+                int idx = FrondCount[tree->frondlod] * 2;
 
-                data[static_cast<int>(tree->frondlod)][idx + 0] = rot;
-                data[static_cast<int>(tree->frondlod)][idx + 1] = pos;
+                data[tree->frondlod][idx + 0] = rot;
+                data[tree->frondlod][idx + 1] = pos;
 
-                FrondCount[static_cast<int>(tree->frondlod)]++;
+                FrondCount[tree->frondlod]++;
         }
     }
 }
@@ -2560,15 +2551,14 @@ void CTree::SetBranchParamBlock(const Vec3f& position, const Vec4f& rotation)
 }
 #endif
 
+#if USE_STATESET
 /*------------------------------------------------------------------------
 Function: SetAlphaRef
 Description:
 ------------------------------------------------------------------------*/
 void CTree::SetAlphaRef(float alpharef, int type)
 {
-#if USE_STATESET
     AlphaFunc* af = nullptr;
-
     if(type == TREE_BRANCHES)
         af = dynamic_cast<AlphaFunc*>(branchmaterial->GetRenderState(RS_ALPHAFUNC));
     else if(type == TREE_FRONDS)
@@ -2581,37 +2571,8 @@ void CTree::SetAlphaRef(float alpharef, int type)
         af->SetRefValue(alpharef * colorONEOVER255);
         af->apply();
     }
-#else
-
-    glslProgram* pgm = nullptr;
-
-    if(type == TREE_BRANCHES)
-        pgm = branchmaterial->GetProgram();
-
-    if(type == TREE_FRONDS)
-        pgm = frondmaterial->GetProgram();
-
-    if(type == TREE_LEAVES)
-        pgm = leafmaterial->GetProgram();
-
-    if(type == TREE_BILLBOARDS)
-        pgm = billboardmaterial->GetProgram();
-
-    if(type == HORIZ_BILLBOARDS)
-        pgm = horizbillboardmaterial->GetProgram();
-
-    if(pgm)
-    {
-        glslUniform* u = pgm->GetUniform("alphatest");
-
-        if(u)
-        {
-            u->Set(alpharef * colorONEOVER255);
-            pgm->Apply(*u);
-        }
-    }
-#endif
 }
+#endif
 
 #if USE_STATESET
 /*------------------------------------------------------------------------

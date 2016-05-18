@@ -199,11 +199,11 @@ void chatCreatePlayer(PlayerStatusNode* psn, struct Chat::PlayerInfo* playerInfo
 //////////////////////////////////////////////////////////////////////
 // Common management login functionality to both formats.
 
-static Player* _loginManagerAccount(const char* source, SINT32 teulIndex, const Chat::Name& gameName)
+static Player* _loginManagerAccount(const char* source, SINT32 teulIndex, const Chat::Name& gameName, UINT16 country)
 {
-	dbugLog(_FLI, "t:%d %s requesting name '%s'", teulIndex, source, gameName.c_str());
+	dbugLog(_FLI, "t:%d %s requesting name '%s' persona %hu", teulIndex, source, gameName.c_str(), country);
 
-	Player* player = new ManagementPlayer(teulIndex, gameName.c_str());
+	Player* player = new ManagementPlayer(teulIndex, gameName.c_str(), country);
 	if ( player == nullptr )
 		throw std::runtime_error("Out of memory for new player");		///Terminal
 
@@ -215,7 +215,7 @@ static Player* _loginManagerAccount(const char* source, SINT32 teulIndex, const 
 }
 
 IRCPlayer::IRCPlayer(const char* nick)
-	: ManagementPlayer(-1, nick)
+	: ManagementPlayer(-1, nick, 0)
 	, m_lastChannel("")
 	, m_channels()
 {
@@ -230,7 +230,7 @@ IRCPlayer::IRCPlayer(const char* nick)
 // Version 2 Management clients
 
 bool
-Chat::ManagementLogin2::Login(SINT32 teulIndex)
+Chat::ManagementLogin3::Login(SINT32 teulIndex)
 {
 	static const ChatHandle autoHandle = chatGetHandle("auto");
 	Chat::Name gameName;
@@ -251,7 +251,7 @@ Chat::ManagementLogin2::Login(SINT32 teulIndex)
 		if ( player != nullptr )
 			throw std::domain_error("name in use");
 
-		player = _loginManagerAccount("ManagementLogin2", teulIndex, gameName);
+		player = _loginManagerAccount("ManagementLogin2", teulIndex, gameName, this->m_country);
 
 		player->activate(teulIndex, nullptr);
 

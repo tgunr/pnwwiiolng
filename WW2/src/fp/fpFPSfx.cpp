@@ -84,9 +84,9 @@ void fpFPSfxKill()
 
 bool _updateShell(OBJECT* o)
 {
-    // Only display for 3 seconds (soundID good enough to use for this)
+    // Only display for 3 seconds
     // Position below trooper feet
-    if((o->loc.z > -o->mat._43) || (frametime - o->soundID > 3000))
+    if((o->loc.z > -o->mat._43) || (frametime - o->createtime > 3000.0f))
     {
         FLOAT64VECTOR pos;
         pos.x = o->mat._41 + WorldOriginOffset.x;
@@ -95,8 +95,8 @@ bool _updateShell(OBJECT* o)
 
         fxSndAddFiniteWorldSound("sounds/casing.wav", 5, 50, IDE_TP_PRIORITY_LOW, pos);
 
-        o->soundID = 0;
-        o->treeID = 0;
+        o->createtime = 0.0f;
+        o->updatetime = 0.0f;
         o->updatecallback = nullptr; // Removes from obmainUpdate
         fxUtlSetMatrixInTree(o, &IdentityMatrix);
         obmainMoveToNotObjectTree(o);
@@ -107,13 +107,13 @@ bool _updateShell(OBJECT* o)
     }
 
     // Tree id used for time update
-    int timediff = frametime - o->treeID;
+    int timediff = frametime - o->updatetime;
     float time = (float)timediff * 0.001f;
     static float drag = 0.0f;
 
-    fxUtlApplyDrag(&o->vel, &drag, (float*)(&o->treeID));
+    fxUtlApplyDrag(&o->vel, &drag, &o->updatetime);
 
-    o->treeID = frametime;
+    o->updatetime = frametime;
 
     piMATRIX matRotX = IdentityMatrix;
     piMATRIX matRotY = IdentityMatrix;
@@ -246,8 +246,8 @@ UINT32 fpFPSfxEjectShell(piVECTOR& gundir,
         fx->updatecallback = _updateShell;
         obmainAddForUpdateCallback(fx);
 
-        fx->soundID = frametime; // Using this for create time
-        fx->treeID = frametime; // Using this for update time
+        fx->createtime = frametime;
+        fx->updatetime = frametime;
 
         // Add to normal render system for proper sorting
         obmainMoveToObjectTree(fx);

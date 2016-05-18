@@ -69,20 +69,32 @@ static STRAT_UPDATE* _convoyUpdate;
 //////////////////////////////////////////////////////////////////////
 //Inserts a updateTime into the stratUpdatelist
 
-static void _insertStratUpdate(STRAT_UPDATE* stratUpdate)
-{
-	ABORT_IF(stratUpdate == nullptr);
+static void _insertStratUpdate(STRAT_UPDATE* stratUpdate) {
+	ABORT_IF ( stratUpdate == nullptr );
 
-	if (s_stratUpdateList.empty() || s_stratUpdateList.front()->updateTime >= stratUpdate->updateTime)
-	{
+	if ( s_stratUpdateList.empty() || s_stratUpdateList.front()->updateTime >= stratUpdate->updateTime ) {
+		if ( s_stratUpdateList.front() == stratUpdate ) {
+			dbugLog(_FLM, "Attempted to re-add strat update [%d : %d] @ %d",
+			        stratUpdate->type, stratUpdate->value, stratUpdate->updateTime);
+			return;
+		}
+
 		s_stratUpdateList.push_front(stratUpdate);
 		return;
 	}
-	for (auto it = s_stratUpdateList.rbegin(), end = s_stratUpdateList.rend(); it != end; ++it)
-	{
-		if (it->updateTime > stratUpdate->updateTime)
+
+	for ( auto it = s_stratUpdateList.rbegin() ; it != s_stratUpdateList.rend() ; ++it ) {
+		if ( it->updateTime > stratUpdate->updateTime )
 			continue;
+
+		if ( it->m_next == stratUpdate ) {
+			dbugLog(_FLM, "Attempted to re-add strat update [%d : %d] @ %d",
+			        stratUpdate->type, stratUpdate->value, stratUpdate->updateTime);
+			return;
+		}
+		
 		stratUpdate->link(it->m_next);
+
 		return;
 	}
 
