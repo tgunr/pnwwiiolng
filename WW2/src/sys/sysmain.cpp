@@ -89,8 +89,6 @@ static void AddArchives();
 #define USE_REFERENCE_RASTERIZER
 #undef	USE_REFERENCE_RASTERIZER
 
-extern char RegionSuffix[];
-
 void decompressStatus (SINT32 archive_index)
 {
 	if (archive_index < 0)
@@ -802,7 +800,7 @@ struct LANGANDCODEPAGE
 			cpuspeed = (UINT32)GetCPUSpeed();
 		}
 
-		usprintf(txt, 511, _T("Product: %s\r\nVersion: %s\r\nRevision: %u"), filename, pFFI, WWII::svnRevisionNo);
+		usprintf(txt, 511, _T("Product: %s\r\nVersion: %s\r\Commit: %s"), filename, pFFI, WWII::gitCommitStr);
 		Write_Debug(UTF8(txt));
 
 		GlobalMemoryStatus(&memstat);

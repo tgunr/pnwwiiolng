@@ -43,6 +43,9 @@
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"
 
+// Undefine to have enemy reports remain local to individual missions.
+#define TARGET_SHARE_CONTACTS 1
+
 typedef std::map<UINT32, ChatMission*> CHAT_MISSIONS;
 typedef std::set<UINT32> MISSION_STATUSES;
 

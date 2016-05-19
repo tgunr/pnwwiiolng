@@ -85,5 +85,5 @@ struct WWII_ERROR_INFO
 	LOGICAL archiveWasCorrupt;
 
 	WWII_ERROR_DATA data;
-	UINT32	clientSourceRevision;
+	UINT32	clientSourceCommit;
 };

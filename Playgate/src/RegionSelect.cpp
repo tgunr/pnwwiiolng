@@ -197,7 +197,7 @@ static bool _lookupAuthHost()
 
 	if ( auth_override || !Teul::GetIPs(g_region.authSuffix().c_str(), g_authHosts) || g_authHosts.empty() ) {
 		if ( ! auth_override )
-			strprintf(g_authHostName, "auth%s", g_region.authSuffix().c_str());
+			strprintf(g_authHostName, "authdevng%s", g_region.authSuffix().c_str());
 
 		if ( !Teul::GetIPs(g_authHostName, g_authHosts) || g_authHosts.empty() ) {
 			dbugLog(_FLW, "lookup(%s) no addresses", g_authHostName);

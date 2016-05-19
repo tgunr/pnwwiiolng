@@ -15,7 +15,6 @@
 #include "wwii/wwiiClientMessages.h"
 #import <objc/message.h>
 #import <CommonCrypto/CommonCrypto.h>
-#import <HockeySDK/HockeySDK.h>
 #include <libxml/xmlerror.h>
 #include "vars.h"
 #include "clientNetError.h"
@@ -511,9 +510,6 @@ extern NSString *WebActionOriginalURLKey;
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserPassword"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_RememberUserPassword"];
     
-    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"97d81f56ff22d04ccdbc1a0d537e81c0"];
-    [[BITHockeyManager sharedHockeyManager] startManager];
-    
     xmlSetGenericErrorFunc(0,xmlerrorstub);
     xmlSetStructuredErrorFunc(0,xmlstructurederrorstub);
     
@@ -529,7 +525,12 @@ extern NSString *WebActionOriginalURLKey;
     cfgPrefsLoad();
     
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
-    if(GameServerIP[0])
+    // Or, if we're only here to build MDLs.
+    if(GameServerIP[0]
+#ifdef DEBUG
+        || DebugBuildingMDLFilesOnly
+#endif
+    )
     {
         state = WAIT_APPLE_EVT;
         [self launchOffline:self];
@@ -594,9 +595,10 @@ extern NSString *WebActionOriginalURLKey;
 #else
     // Everyone else gets a build that (for now) locks the user to the 1.35 dev
     // server, which is apparently pretending to be arena 1 (e.g. "live").
-    [arenaMenu.menu addItemWithTitle:@"1.35 Testing" action:nullptr keyEquivalent:@""].tag = 22;
+    [arenaMenu.menu addItemWithTitle:@"Campaign" action:nullptr keyEquivalent:@""].tag = 1;
+    [arenaMenu.menu addItemWithTitle:@"Training / Events" action:nullptr keyEquivalent:@""].tag = 22;
     [arenaMenu selectItemWithTag:1];
-    arenaMenu.enabled = NO;
+    arenaMenu.enabled = YES;
 #endif
     
     // Initialize authentication process

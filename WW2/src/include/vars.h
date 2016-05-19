@@ -287,6 +287,10 @@ extern SINT8            gAuthServer[128]; // Authentication server to be used
 extern SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 extern SINT8            gClientV[32]; // Version to submit
 
+#ifdef DEBUG
+extern LOGICAL          DebugBuildingMDLFilesOnly;
+#endif
+
 #ifdef BETA_RELEASE
 	extern LOGICAL			gCheckPlanarPlacement;
 	extern UINT32			gPersDecalOverride;
@@ -298,8 +302,8 @@ static inline bool IN_COMBAT(SINT32 t) { return (frametime - combattime) <= t; }
 
 namespace WWII
 {
-	extern const unsigned int svnRevisionNo;
-	extern const char* const svnRevisionStr;
+	extern const unsigned int gitCommitNo;
+	extern const char* const gitCommitStr;
 }
 
 #endif

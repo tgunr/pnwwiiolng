@@ -109,6 +109,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 	dbugLog(_FLW,"adding buildings to sc %d:%d",sx,sy);
 #endif
 
+	// TODO: Is there any reason this isn't a vector?
 	std::map<SINT16, STRAT_BUILDING> bldgMap;
 
 	for (SINT32 i = 0; i< facTable->numFacilities; ++i)
@@ -184,16 +185,16 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 		}
 	}
 
-	if (bldHash)
-	{
+	if ( bldHash ) {
 		const size_t maxBldgId = (size_t)(bldgMap.rbegin()->first) + 1;
 
 		bldHash->maxBldID = maxBldgId;
+		
+		delete[] bldHash->building;
+		bldHash->building = new STRAT_BUILDING[maxBldgId];
 
-		bldHash->building = (STRAT_BUILDING*)memAlloc(maxBldgId * sizeof(STRAT_BUILDING));
-
-		for ( auto it = bldgMap.begin(), end = bldgMap.end(); it != end; ++it )
-		{
+		for ( auto it = bldgMap.begin(), end = bldgMap.end(); it != end; ++it ) {
+			assert ( 0 < it->first && it->first < maxBldgId );
 			bldHash->building[it->first] = it->second;
 		}
 	}

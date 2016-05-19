@@ -102,14 +102,13 @@ extern void chatRegisterDotCommands();
 
 #define CHAT_TIMEOUT 500000
 
-#ifdef CLOSED_BETA
+#ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
+    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
-	//#define DEF_ERR_LEVEL Debug::ERR_NOTE
+    #define DEF_ERR_FLAGS STD_ERR
 #endif
-
-#define DEF_ERR_FLAGS STD_ERR
 
 typedef bool (TUNE_COMMAND_CALLBACK)(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
 
@@ -2283,6 +2282,10 @@ chatRouteSideMessage(WWII_SIDE toSide
 void
 chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample& sample)
 {
+	// TEMP/HACK: This message is occurring far too often, and it's a little
+	// too late to fix it properly. For now, we're just going to ignore it.
+	return;
+
 	static std::map<playerid_t, std::pair<UINT32, TeulDeltaMS>> reports;
 	auto it = reports.find(player.playerID());
 	const UINT32 lastReport = (it != reports.end()) ? it->second.first : 0;
@@ -3563,7 +3566,7 @@ int
 main(int argc, const char* argv[])
 {
 	Server::InitializeProcess(g_serverName, CHAT_HOST, _errorFunction, _killFunction, argc, argv, {});
-	dbugSetWriteLevel(Debug::ERR_WARN | DEF_ERR_FLAGS);
+	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
 	chatReadHostLocFile();

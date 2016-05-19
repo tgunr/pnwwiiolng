@@ -165,6 +165,13 @@ stratEngagementObjectivesQuota(UINT32 attackLimit)
 	return (UINT32) result;
 }
 
+bool stratCountsAsEngagement(const CPStruct& target) {
+	static const char* function = "countsAsEngagement" ;
+	lua_getglobal(L, function) ;
+	tolua_pushusertype(L, (void*)&const_cast<CPStruct&>(target), "CPStruct") ;
+	return _getNumber(function, 1) != 0 ;
+}
+
 UINT32
 stratResupplyTime(const WEAPON_SPEC& weapon, StratHCUnit* unit, FacilityStruct* facility, UINT32 resupplyTimer)
 {

@@ -904,7 +904,8 @@ static LOGICAL CopyObjectToPool(OBJECT* lpobj, POOLOBJHDR** lpret)
 	if (lpobj->comment != nullptr)
 	{
 		elemsize = (strlen(lpobj->comment) + 1 + 3) & ~3;	// fast 4 byte align (+3&~3)
-		memcpy(ptr, lpobj->comment, elemsize);
+        memset(ptr, 0, elemsize);
+        strlcpy(reinterpret_cast<char *>(ptr), lpobj->comment, elemsize);
 		lppool->comment = offset;
 		offset += elemsize;
 		ptr += elemsize;

@@ -26,6 +26,8 @@ Description:
 static std::string directory = "C:/3rdparty/SpeedTreeRT_SDK_v4.1_Full/Bin/Data/TreeModels.SouthCarolina/";
 #endif
 
+static bool _initialized = false;
+
 static std::vector<TreeData*> treedata;
 static std::vector<CTree*> basetrees;
 static std::map<std::string, CTree*> treecache;
@@ -48,9 +50,7 @@ static Tree activetreesH;
 static Tree activetreesT;
 #endif
 
-#if USE_PREALLOCATED_TREES
 static void addToFreeList(Tree* t);
-#endif
 
 /*-----------------------------------------------------------------
  Function: treeDataVBO
@@ -73,6 +73,8 @@ bool _treename(XMLLoader* loader, xmlNode* node, bool first, void* userData)
 
         TreeData* td = new TreeData;
         td->name = (const char*)s;
+
+        typedef std::vector<TreeData *> *p;
 
         treedata.push_back(td);
 
@@ -210,7 +212,6 @@ static void _createCollider(CTree* tree)
 Module: loadDirectory
 Description: For Debugging usage in loading SpeedTree demo trees
 ------------------------------------------------------------------------*/
-#if(0)
 static void loadDirectory(const std::string& dir)
 {
 #if platOS == OS_WIN32
@@ -245,7 +246,6 @@ static void loadDirectory(const std::string& dir)
 
 #endif
 }
-#endif
 
 /*------------------------------------------------------------------------
 Module: loadTrees
@@ -396,10 +396,12 @@ static void addToFreeList(Tree* t)
     freetreesH.next = t;
     t->prev = &freetreesH;
 
+    t->dead = false;
     t->o = nullptr;
     t->octet = nullptr;
+    t->lodlevel = -1;
     t->collidemat.clear();
-    t->isbush_isclutter_base = 0;
+    t->collidematinv.clear();
 
     t->next = n;
     n->prev = t;
@@ -434,6 +436,7 @@ static void addToActiveList(Tree* t)
 
     n->prev = t;
     t->next = n;
+    t->dead = false;
 }
 #endif // USE_PREALLOCATED_TREES
 
@@ -566,26 +569,4 @@ void treeDataKill()
 
     texCoordOffset = 0;
     totaltrees = 0;
-
-    vbo = nullptr;
-
-#if USE_PREALLOCATED_TREES
-    Tree* n = activetreesH.next;
-
-    while(n != &activetreesT)
-    {
-        Tree* t = n;
-        n = n->next;
-        delete t;
-    }
-
-    n = freetreesH.next;
-
-    while(n != &freetreesT)
-    {
-        Tree* t = n;
-        n = n->next;
-        delete t;
-    }
-#endif
 }

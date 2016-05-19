@@ -128,13 +128,12 @@ UINT32 numberOfUpdatesBehind = 0;
 UINT32 numVehiclesReported = 0;
 #endif
 
-//ERR_NOTE
-#define DEF_ERR_FLAGS	0
-
-#ifdef BETA_RELEASE
-# define BETAassert(x) assert(x)
+#ifdef DEBUG
+	#define DEF_ERR_LEVEL Debug::ERR_DBUG
+    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
 #else
-# define BETAassert(x)
+	#define DEF_ERR_LEVEL Debug::ERR_INFO
+    #define DEF_ERR_FLAGS STD_ERR
 #endif
 
 PLAYERS g_players;
@@ -2979,8 +2978,8 @@ main(const int argc, const char* argv[])
 		{ "-db", "Deprecated.", false, [](const char*) {} },
 		{ "--reserved", "Flag cell as reserved for recordings.", false, [](const char*) { g_serverReserved = true; } }
 	});
-	dbugSetWriteLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
-	dbugSetLogLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
+	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
 	threadsReadDBEnvironment();
 	threadsSetup();

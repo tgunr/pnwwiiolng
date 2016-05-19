@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="default.css" type="text/css" />
+<title>Always run with root access</title><!-- MJT_HEAD_PLACEHOLDER --></head>
+<body class="docframe">
+<span class="navigation-bar"><span class="navigation-group"><a href="./temporary-options.html" class="navigation-link">Previous</a>&nbsp;<a href="./use-less-temporary-disk.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./advanced.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+<hr class="navigation-bar-separator" />
+<a name="help-anchor-always-run-with-root-ac"></a><div class="section" id="always-run-with-root-ac">
+<h1><a class="toc-backref" href="./advanced.html#id142">5.4.2   Always run with root access</a></h1>
+<dl>
+<dt>If you downloaded DropDMG direct from C-Command</dt>
+<dd><p class="-first">Normally, if DropDMG does not have the privileges that it needs in order to
+create a disk image or archive, it will prompt you to authenticate by entering
+an administrator password. This authentication lasts for a few minutes, or until
+you quit DropDMG (whichever happens first).</p>
+<p>If <strong>Always run with root access</strong> is checked, DropDMG will retain administrator
+access—even between launches. This saves you from the trouble of having to keep
+entering your password, and it makes it easier to run DropDMG unattended (for
+example, as part of an automated, scheduled backup). However, this is a
+<em>potential security risk</em>. Anyone with access to your copy of DropDMG will be
+able to access and modify any file on your Mac.</p>
+<p class="-last"><em>Note:</em> In order to use <strong>Always run with root access</strong>, the DropDMG application
+must be installed on your Mac’s startup volume.</p>
+</dd>
+<dt>If you purchased DropDMG from Apple’s Mac App Store</dt>
+<dd><p class="-first">In order to create a disk image or archive from certain files, DropDMG will
+need root access. You can give DropDMG this access by opening the Terminal
+application and entering these commands:</p>
+<pre>
+F=/Applications/DropDMG.app/Contents/Frameworks/MJTFoundation.framework
+sudo chmod u+s &quot;$F/Versions/A/auth-tool&quot;
+sudo chown root &quot;$F/Versions/A/auth-tool&quot;
+</pre>
+<p>It will ask for your administrator password. This is a <em>potential security
+risk</em>. Anyone with access to your copy of DropDMG will be able to access and
+modify any file on your Mac. You can remove the root access by entering these
+commands in Terminal:</p>
+<pre class="-last">
+F=/Applications/DropDMG.app/Contents/Frameworks/MJTFoundation.framework    
+sudo chmod u-s &quot;$F/Versions/A/auth-tool&quot;
+</pre>
+</dd>
+</dl>
+</div>
+<hr class="navigation-bar-separator" />
+<span class="navigation-bar"><span class="navigation-group"><a href="./temporary-options.html" class="navigation-link">Previous</a>&nbsp;<a href="./use-less-temporary-disk.html" class="navigation-link">Next</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><span class="navigation-group"><a href="./advanced.html" class="navigation-link">Up</a></span><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="index.html" target="_top">Table of Contents</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/manual/" target="_top">DropDMG 3.2.9 Manual</a><span class="navigation-group-separator">&nbsp;&nbsp;</span><a class="navigation-link" href="http://c-command.com/dropdmg/support/" target="_top">Technical Support</a></span>
+</body>
+</html>

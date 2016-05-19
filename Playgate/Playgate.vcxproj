@@ -141,6 +141,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
+    <PostBuildEvent>
+      <Command>python "$(SolutionDir)\WW2\proj\win\codesign.py" /VS /SIGN /DESC "World War II Online" /PASS:HERE PNww2/pn-codesign /VERBOSE $(TargetPath)</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Code Signing executable</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Antihack.cpp" />

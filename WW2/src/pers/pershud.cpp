@@ -431,10 +431,11 @@ void GameInfoView::DisplayInfo()
 	trnTODGetTimeOfDay(&TOD);
 	Hour = trnTODGetHourFromTimeOfDay(TOD);
 	Min = trnTODGetMinuteFromTimeOfDay(TOD);
-#if !defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0
-	DrawString(L"%ls: %.0f rev %u\n", strings["hud.gameinfo.fps"].c_str(), gFPS, WWII::svnRevisionNo);
+
+	DrawString(L"%ls: %.0f ", strings["hud.gameinfo.fps"].c_str(), gFPS);
+#if RELEASE_CLIENT == 0
+	DrawString("commit %s\n", WWII::gitCommitStr);
 #else
-	DrawString(L"%ls: %.0f\n", strings["hud.gameinfo.fps"].c_str(), gFPS);
 	DrawString(L"%ls: %02d:%02d\n", strings["hud.gameinfo.time"].c_str(), Hour, Min);
 
 	if(persIsPersonaVehicleType(VEH_TYPE_FLOATER))
@@ -454,25 +455,25 @@ void GameInfoView::DisplayInfo()
 #endif
 
 #if RELEASE_CLIENT == 0
- 	DrawString("MSPF = %.0f\n", 1000.0f/gFPS);
+	DrawString("MSPF = %.0f\n", 1000.0f/gFPS);
 
-    UINT32	points, lines, triangles, vertices;
+	UINT32	points, lines, triangles, vertices;
 
-    piGetRenderStats(&points, &lines, &triangles, &vertices);
+	piGetRenderStats(&points, &lines, &triangles, &vertices);
 
-    SINT32 total, displayed;
+	SINT32 total, displayed;
 
-    obcsGetObjectCullStats(&total, &displayed);
+	obcsGetObjectCullStats(&total, &displayed);
 
-    DrawString("OBJECTS: total = %d displayed = %d\n", total, displayed);
-    DrawString("TRIANGLES: %d\n", triangles);
-    DrawString("DRAW CALLS: %.0f\n", GLCounter::instance().getRecentTotal());
+	DrawString("OBJECTS: total = %d displayed = %d\n", total, displayed);
+	DrawString("TRIANGLES: %d\n", triangles);
+	DrawString("DRAW CALLS: %.0f\n", GLCounter::instance().getRecentTotal());
 
 	static char txt[150];
-    sptGetStats(txt);
-    DrawString("%s\n", txt);
-    speedgrassGetStats(txt);
-    DrawString("%s\n", txt);
+	sptGetStats(txt);
+	DrawString("%s\n", txt);
+	speedgrassGetStats(txt);
+	DrawString("%s\n", txt);
 #endif
 #endif
 

@@ -44,7 +44,10 @@
 #include "trn/speedgrass.h"
 #include "trn/trnRadClutter.h"
 #include "sdm/StratDB.h"
+
+#define GLOBALS
 #include "trn/trnvars.h"
+#undef GLOBALS
 
 #ifdef SPATIAL_DB
 #include "SpatialDB.h"
@@ -63,28 +66,6 @@
 #endif
 
 #include "wwii/wwiiCovert.h"
-
-/***********
-START VARS
-***********/
-LOGICAL           TerrainLightingUpdate, TerrainStable;
-LOGICAL           loading;
-SINT8             mapname[64];
-SINT32            deftexid, trnlod;
-FLOAT32           xstep, ystep, xmult, horizon;
-TERRAIN_DETAIL    trndtl[NUM_TERRAIN_RECTANGLES];
-INT32VECTOR       WorldOriginOffset; // the current offset from the absolute origin
-DEMHDR            hdr;
-TRN_OBJECT_NOTIFY creation;
-TRN_OBJECT_NOTIFY deletion;
-LOGICAL activeTerrainDetail[NUM_TERRAIN_RECTANGLES] = { FALSE, FALSE, FALSE, FALSE, FALSE,
-                                                        FALSE,  TRUE,  TRUE,  TRUE, FALSE,
-                                                        FALSE,  TRUE,  TRUE,  TRUE, FALSE,
-                                                        FALSE,  TRUE,  TRUE,  TRUE, FALSE,
-                                                        FALSE, FALSE, FALSE, FALSE, FALSE };
-/***********
-END VARS
-***********/
 
 static Covert<LOGICAL> g_trnmainDraw = TRUE;
 static Covert<LOGICAL> g_drawOctetTriangles = FALSE;
@@ -304,18 +285,16 @@ LOGICAL trnGetStratData(SINT16 scx, SINT16 scy, SINT32 id, SINT32* country, SINT
 	return result;
 }
 
-SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 level)
-{
-	if(country == -1 || level == -1)
+SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 level) {
+	if ( country == -1 || level == -1 )
 		trnGetStratData(td->scx, td->scy, bid, &country, &level);
 
-	if ( bid > td->bldHash.maxBldID)
-	{
-		Write_Log(LOG_COMM, LOG_INFO, "access to bad bid %d ( > %d)", bid, td->bldHash.maxBldID);
+	if ( 0 > bid || bid >= td->bldHash.maxBldID ) {
+		Write_Log(LOG_COMM, LOG_INFO, "trnSetStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
 		return -EINVAL;
 	}
 
-	if(!td->bldHash.building) return -1;
+	if ( ! td->bldHash.building ) return -1;
 
 	if ( country >= 0)
 	{
@@ -358,49 +337,40 @@ SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 le
 
 SINT32 trnUpdateStratData(TERRAIN_DETAIL* td, OBJECT* lpobj, SINT32 bid, LOGICAL loaded)
 {
-	SINT32 i;
-
-	if ( bid == 0)
+	if ( bid == 0 ) // TODO: Why can't it be zero?
+		return -EINVAL;
+	if ( td == nullptr || td->bldHash.building == nullptr )
 		return -EINVAL;
 
-	if ( td == nullptr || td->bldHash.building == nullptr || bid > td->bldHash.maxBldID)
-		return -EINVAL;
-
-	if (bid < 0)
-	{
-		if (lpobj == nullptr || loaded == TRUE)
+	if ( bid < 0 ) {
+		if ( lpobj == nullptr || loaded == TRUE )
 			return -EINVAL;
 
-		for (i = 0; i <= td->bldHash.maxBldID;i++)
-		{
-			if (td->bldHash.building[i].pobj == lpobj)
-				break;
+		for ( int i = 0 ; i < td->bldHash.maxBldID ; ++i ) {
+			if ( td->bldHash.building[i].pobj != lpobj )
+				continue;			
+			bid = i;
+			break;
 		}
-
-		if ( i > td->bldHash.maxBldID)
-			return -ENOENT;
-
-		bid = i;
-
 	}
+
+	if ( 0 > bid || bid >= td->bldHash.maxBldID ) {
+		Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
+		return -EINVAL;
+	}
+
 
 	td->bldHash.building[bid].loaded = loaded;
 
-    if(loaded && td->bldHash.building[bid].isBuilder)
-    {
-        trnSetBuilderFlag(td->scx, td->scy, bid);
-    }
+	if ( loaded && td->bldHash.building[bid].isBuilder )
+		trnSetBuilderFlag(td->scx, td->scy, bid);
 
-	if (loaded)
-	{
+	if ( loaded ) {
 		trnUpdateObjectStatus(td->scx, td->scy, bid);
-
 //		trnUpdateObjectStatus(td->scx,td->scy,bid,-1,td->bldHash.building[bid].level);
 		td->bldHash.building[bid].pobj = lpobj;
-	}
-	else
+	} else
 		td->bldHash.building[bid].pobj = nullptr;
-
 
 	return 0;
 }
@@ -3679,29 +3649,45 @@ LOGICAL trnGetWorldOriginOffset(FLOAT64VECTOR* retWorldOriginOffset)
 // and if it is, adjust it (and the world) so that it is no longer too far
 //
 // returns a TRUE if an adjustment happened, otherwise a FALSE
-LOGICAL trnCheckAndAdjustCameraPositionWithOriginOffset(piVECTOR* pos) {
-	_CameraAdjustment = { 0.0f, 0.0f, 0.0f };
+LOGICAL trnCheckAndAdjustCameraPositionWithOriginOffset(piVECTOR * CameraPos)
+{
+LOGICAL		RetVal;
+LOGICAL		PositionOk;
+piVECTOR	CameraAdjustment;
 
-	if ( fabs(pos->x) > MAX_CAMERA_OFFSET )
-		_CameraAdjustment.x = pos->x;
-	if ( fabs(pos->y) > MAX_CAMERA_OFFSET )
-		_CameraAdjustment.y = pos->y;
+	CameraAdjustment.x = CameraAdjustment.y = CameraAdjustment.z = 0;
 
-	if ( _CameraAdjustment.x != 0.0f || _CameraAdjustment.y != 0.0f ) {
-		_TerrainMoved = true ;
-		return true;
+	PositionOk = TRUE;
+
+	if (fabs(CameraPos->x) > MAX_CAMERA_OFFSET)
+	{
+		CameraAdjustment.x = CameraPos->x;
+		PositionOk = FALSE;
 	}
 
-	return false;
+	if (fabs(CameraPos->y) > MAX_CAMERA_OFFSET)
+	{
+		CameraAdjustment.y = CameraPos->y;
+		PositionOk = FALSE;
+	}
+
+	RetVal = FALSE;
+	if (PositionOk == FALSE)
+	{
+		RetVal = TRUE;
+
+		_TerrainMoved = TRUE;
+
+		_CameraAdjustment = CameraAdjustment;
+	}
+
+	return RetVal;
 }
 
 UINT32 trnUpdateTerrainOriginOffset(LOGICAL force)
 {
 	if (_TerrainMoved || force)
 	{
-		Write_Debug("Moving world offset: [%d:%d] + [%lf:%lf]",
-		            WorldOriginOffset.x, WorldOriginOffset.y,
-		            _CameraAdjustment.x, _CameraAdjustment.y);
 
 		mathSubVectors(&WorldOriginOffset,&WorldOriginOffset,&_CameraAdjustment);
 
@@ -3712,8 +3698,6 @@ UINT32 trnUpdateTerrainOriginOffset(LOGICAL force)
 		// now adjust the terrain
 		trnmainAdjustTerrainSections(&_CameraAdjustment);
 		trncdAdjustTerrainObjects(&_CameraAdjustment);
-
-		_CameraAdjustment.x = _CameraAdjustment.y = _CameraAdjustment.z = 0.0f;
 
 		_TerrainMoved = FALSE;
 

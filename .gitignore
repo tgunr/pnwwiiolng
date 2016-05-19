@@ -1630,5 +1630,6 @@ xcuserdata/
 
 ww2mods
 WW2Archives
-opt
-playbuilder
+base64
+depend
+libb64.a

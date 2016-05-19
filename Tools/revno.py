@@ -1,26 +1,34 @@
-#! /bin/env python
+﻿#! /bin/env python
 ##################################################
 # Script to generate a C file listing the current
 # revision of a given source repository.
-# -- Written for Python 2.7
-# -- Requires PySVN extensions
+# -- Written for Python 3.0
 #
+# TODO: Was sloppily rewritten because of our
+# switch to git. It works just fine, but it really
+# needs to be cleaned up.
 
 revisionFile = "WW2/src/client_revision.h"
-revisionDefine = "SVN_REVISION_NO"
-revisionString = "SVN_REVISION_STR"
-pathDefine = "SVN_PATH_STR"
+revisionNo = "GIT_COMMIT_NO"
+revisionString = "GIT_COMMIT_STR"
 
 #### Invoke a command and return the output
 def output_from_command(cmd):
 #{
 	""" Return the standard output from a command as a string. """
-	try:
-		import subprocess
-		result = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).communicate()[0]
-		return result
-	except:
-		raise Exception("Error occurred trying to run: "+cmd)
+	#try:
+	import subprocess
+	import sys
+
+	rawout = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE).communicate()
+	if sys.version_info[0] < 3:
+		outstr = str(rawout[0])
+	else:
+		outstr = str(rawout[0], sys.stdout.encoding)
+	result = outstr.strip('\n')
+	return result
+	#except:
+	#	raise Exception("Error occurred trying to run: "+cmd)
 #}
 
 #### Command line arguments: revno.py [<TopLevelPath>]
@@ -45,61 +53,12 @@ else:
 #  -> Downloads
 #  -> Extension
 
-usePySVN = 0
-url = None
-rev = None
-suburl = None
-
-#### Get working copy info.
-# Look up SVN information about the path given
-
-def pysvnQuery(path):
-#{
-	""" Get details of a repository using PySVN. """
-	global url, rev, suburl
-
-	import pysvn
-	client = pysvn.Client()
-
-	info = client.info(path)
-	repos = info.repos + "/"
-	url = info.url.replace(repos, "")
-	rev = info.revision.number
-	suburl = url.replace("branches", "").replace("tags", "").replace("/", "")
-#}
-
-#### Get working copy info.
-# Look up SVN information using a shell query.
-
-def shellQuery(path):
-#{
-	""" Get details of a repository using svn info. """
-	global url, rev, suburl
-
-	info = output_from_command("svn info %s" % path)
-
-	import re
-	repos = re.search(r"^Repository Root:\s*(\S+)", info, flags=re.MULTILINE).group(1).strip()
-	url = re.search(r"^URL:\s*"+repos+r"/*(\S+)", info, flags=re.MULTILINE).group(1).strip()
-	url = url.replace(repos, "")
-	suburl = url.replace("branches", "").replace("tags", "").split("/")[0]
-
-	rev = int(re.search(r"^Revision: (\d+)", info, flags=re.MULTILINE).group(1))
-#}
+revNo = int(output_from_command("git log -n 1 --pretty=format:\"%h\"").replace('"', ''), 16)
+revStr = output_from_command("git describe")
 
 #### Check existing header file for revision number
-
-storedRev = 0
+storedNo = 0
 storedStr = ""
-
-try:
-	pysvnQuery(path)
-	if url == None:
-		shellQuery(path)
-except:
-	rev = 1000
-	subUrl = "internal"
-
 try:
 	# Open the client_revision file
 	with open(path + revisionFile, 'r') as f:
@@ -107,10 +66,10 @@ try:
 		defines = [line for line in f if line.startswith("#define")]
 		for line in defines:
 			cols = line.split(" ")
-			if cols[1] == revisionDefine:
-				storedRev = int(cols[2].strip())
+			if cols[1] == revisionNo:
+				storedNo = int(cols[2].strip(), 16)
 			elif cols[1] == revisionString:
-				storedStr = cols[2].strip()
+				storedStr = cols[2].strip()[1:-1] # Strip quotes.
 except (IOError):
 	# We can ignore file not found errors.
 	pass
@@ -120,18 +79,16 @@ except (IOError):
 # has a different revision number than the working copy,
 # we need to recreate the header file.
 
-revStr = '"' + str(rev) + '"'
-if rev != storedRev or storedStr != revStr:
+if storedNo != revNo or storedStr != revStr:
 	# Different revision numbers, update the revision file.
 	with open(path + revisionFile, 'w') as f:
 		f.write("#pragma once\n// CLIENT REVISION NUMBER, DO NOT CHECK IN\n")
-		f.write("#define " + revisionDefine + " " + str(rev) + "\n")
-		f.write("#define " + revisionString + " " + revStr + "\n")
-		f.write("#define " + pathDefine + " \"" + str(suburl) + "\"\n")
-	print("Rebuilding client_revision.h for %s revision %u" % (suburl, rev))
+		f.write("#define " + revisionNo + " 0x%0.7x" % revNo + "\n")
+		f.write("#define " + revisionString + " \"" + revStr + "\"\n")
+	print("Rebuilding client_revision.h for commit %s" % (revStr))
 else:
 	# Same same, just print a helpful note.
-	print("client_revision.h upto date for %s revision %u" % (suburl, rev))
+	print("client_revision.h upto date for commit %s" % (revStr))
 
 import sys
 sys.exit(0)

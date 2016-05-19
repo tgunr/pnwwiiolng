@@ -708,7 +708,7 @@ bool fpTPSDeathCamera(piVECTOR* pos, piVECTOR* aim)
 
 		// set out camera pivot point callback
 		persSetExternalCameraPivot(fpTPSDeathPivot);
-		persSetExternalCameraTarget(3600.0f, 0.0f, 0.0f, 300.0f);
+        persSetExternalCameraTarget(PI, 0.0f, 0.0f, 10.0f);
 
 		_nextUpdate = 0;
 		_startFall = aboveGround;
