@@ -1424,7 +1424,7 @@
 		0DDF00A508578C460027461D /* libjs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjs.a; path = lib/mac/libjs.a; sourceTree = SOURCE_ROOT; };
 		47B0ED240E9A66A40089DCC4 /* libteulKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libteulKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
-		8D0C4E970486CD37000505A6 /* World War II Online Beta.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online Beta.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E9320E971C95FC2C003E8048 /* local2.tkt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = local2.tkt; sourceTree = "<group>"; };
@@ -2981,7 +2981,7 @@
 		195DF8CFFE9D517E11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D0C4E970486CD37000505A6 /* World War II Online Beta.app */,
+				8D0C4E970486CD37000505A6 /* World War II Online.app */,
 				47B0ED240E9A66A40089DCC4 /* libteulKit.a */,
 				080C7E841062F011000A242F /* libmaclib.a */,
 				E97C76351C8513EB00875F44 /* libevent.a */,
@@ -3280,7 +3280,7 @@
 			name = WW2OL;
 			productInstallPath = "$(HOME)/Applications";
 			productName = WW2OL;
-			productReference = 8D0C4E970486CD37000505A6 /* World War II Online Beta.app */;
+			productReference = 8D0C4E970486CD37000505A6 /* World War II Online.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E97C76341C8513EB00875F44 /* event */ = {
