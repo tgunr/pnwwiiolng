@@ -18,8 +18,8 @@
 //////////////////////////////////////////////////////////////////////
 // ManagementPlayer constructor
 
-ManagementPlayer::ManagementPlayer(SINT32 newIndex, const char* withGameName , UINT16 withCountry)
-	: Player(Chat::ManagementIDAllocator::AllocateID(this), true) // May throw runtime_error
+ManagementPlayer::ManagementPlayer(SINT32 newIndex, const char* withGameName)
+	: Player(Chat::ManagementIDAllocator::AllocateID(this), true)		// May throw runtime_error
 {
 	m_teulIndex = newIndex;
 
@@ -31,20 +31,10 @@ ManagementPlayer::ManagementPlayer(SINT32 newIndex, const char* withGameName , U
 	m_gmHide = true;
 	m_playerMask = 0xffffffffffffffffLL;
 	m_permissionMask = m_playerMask;
+
 	m_chatPermissions = &nullChatPermissions;
+
 	m_initialized = true;
-
-	// Do this after setting m_initialized 'cause it's a little hacky anyway and
-	// not sure if SetInstance and SetCountry might depend on it.
-	if (withCountry != 0 && withCountry < MAX_COUNTRIES) {
-		SetInstance(Instance::g_invalid) ;
-		wwiiPlayer::SetCountry(static_cast<WWII_COUNTRY>(withCountry), wwiiSide(withCountry));
-		m_originCpID = nullObjID;
-	}
-	dbugLog(_FLI, "t:%d p:%u c:%s MANAGEMENT LOGIN(%u, %u)"
-			, teulIndex(), playerID(), callsign()
-			, side(), country()) ;
-
 }
 
 //////////////////////////////////////////////////////////////////////
