@@ -11,9 +11,9 @@
 #include "chat/chatManagementConstants.h"
 #include "wwii/wwiiCallbacks.h"
 
-static SINT32 _recvManagementLogin3(ACTION_OBJECT* const a)
+static SINT32 _recvManagementLogin2(ACTION_OBJECT* const a)
 {
-	Chat::ManagementLogin3 login;
+	Chat::ManagementLogin2 login;
 	login.packer(TEUL_UNPACK, a);
 
 	login.Login(a->teulIndex);
@@ -26,7 +26,7 @@ chatInstallHostManagementCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::Management::CallbackX)
 
-		REGISTER_RECEIVER(Chat::Management::LOGIN3_Y, _recvManagementLogin3);
+		REGISTER_RECEIVER(Chat::Management::LOGIN2_Y, _recvManagementLogin2);
 
 	END_CALLBACK_REGISTRATION
 }
