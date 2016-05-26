@@ -155,12 +155,9 @@ void cnvyCreateConvoy(WWII_SIDE side, WWII_COUNTRY country, LinkStruct* link, UI
 		if (_convoyUpdate->updateTime > newConvoy->arrivalTime)
 		{
 			// Pull the node out, adjust the time and reposition it.
-			StratUpdateList::iterator it(_convoyUpdate->m_next), end(s_stratUpdateList.end());
 			_convoyUpdate->unlink();
 			_convoyUpdate->updateTime = newConvoy->arrivalTime;
-			while (it != end && it->updateTime < _convoyUpdate->updateTime)
-				++it;
-			_convoyUpdate->link(it);
+			_insertStratUpdate(_convoyUpdate);
 		}
 	}
 	else
@@ -450,7 +447,7 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 	//If we have updates
 	while (!s_stratUpdateList.empty())
 	{
-		auto update = s_stratUpdateList.front();
+		STRAT_UPDATE* update = s_stratUpdateList.front();
 		if (update->updateTime > currentTime)
 			break;
 		update->unlink();
@@ -542,7 +539,7 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 			{
 				//Let the convoy system know there aren't any updates
 				_convoyUpdate = nullptr;
-				update->updateTime = 0;
+				RETURN_UPDATE;
 			}
 
 		break;
