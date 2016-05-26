@@ -78,7 +78,7 @@ static void _insertStratUpdate(STRAT_UPDATE* stratUpdate) {
 
 		if ( it->m_next == stratUpdate )
 			dbugLog(_FLM, "Attempted to re-add strat update [%d : %d] @ %d",
-				stratUpdate->type, stratUpdate->value, stratUpdate->updateTime);
+			        stratUpdate->type, stratUpdate->value, stratUpdate->updateTime);
 		else
 			stratUpdate->link(it->m_next);
 
