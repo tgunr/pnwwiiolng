@@ -1040,7 +1040,7 @@ strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 	StratHCUnit* const brigade = StratHCUnit::Lookup(brigadeID);
 	ABORT_IF(brigade == nullptr);
 	if ( brigade->isTrainingUnit() )
-		return true;
+		return false;
 
 	if ( !brigade->isBrigade() )
 	{
@@ -1069,7 +1069,7 @@ strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 	if ( brigade->parent()->offMap() )
 	{
 		betaLog(_FLN, "hcu:%u reformation failed -- parent is off-map", brigadeID);
-		return true;
+		return false;
 	}
 
 	dbugLog(_FLI, "hcu:%u reforming to parent:%u at:%s", brigadeID, brigade->parentID(), brigade->parent()->homeCP()->name);
