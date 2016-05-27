@@ -216,6 +216,7 @@ extern bool strtDeployDivision(HCUnit* division, CPStruct* cp, bool transferSupp
 
 extern void strtInitializeHCUnits();
 
+/// @return If calling this function caused the brigade to deploy.
 extern bool strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* fromEvent=nullptr);
 
 //tolua_end

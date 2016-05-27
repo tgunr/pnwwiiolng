@@ -590,9 +590,14 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 		case STRAT_REFORM_BRIGADE:
 			// Redeploy a brigade to its division
 			dbugLog(_FLI, "hcu:%u reforming brigade", (UINT32)update->value);
-			strtReformBrigade((UINT32)update->value, update);
-
-			finish_update();
+			// HACK: If successful, this will call StratHCUnit::deploy(), which will in
+			// turn "cancel" the event that triggered deploy(), freeing it. Since we're
+			// using preallocated memory, the result isn't a nice immediate crash but
+			// shenanigans down the road from having the same pointer get allocated twice.
+			if ( ! strtReformBrigade((UINT32)update->value, update) )
+				finish_update();
+			else
+				update = nullptr;
 		break;
 
 		default:
