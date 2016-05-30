@@ -129,6 +129,9 @@ SINT32 vehIconKill(void)
 
 LOGICAL vehIconCanSeeHandle(struct vehVehicle* Vehicle)
 {
+#ifdef AIMING_WEAPONS
+    return TRUE;
+#endif
 #ifdef BETA_RELEASE
 #ifndef DONTSHOWNME
 	if(Online && !(Vehicle->Flags & VEH_FLAGS_IS_CLONE) && !SCEN_MGR->IsActive())
