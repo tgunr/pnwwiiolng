@@ -355,7 +355,7 @@ _recvBuildingVisLevels(ACTION_OBJECT* const a)
 	UCHAR* const src = a->packed;
 	UCHAR* const endPtr = src + a->sizeInBytes();
 
-	for ( UCHAR* ptr = src; src < endPtr; )
+	for ( UCHAR* ptr = src; ptr < endPtr; )
 	{
 		SupercellVislevelXfer& xfer = *(SupercellVislevelXfer*)ptr;
 		const size_t size = xfer.size_bytes();

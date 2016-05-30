@@ -33,12 +33,15 @@ WW2_DEFINES_Common_01       = $(WW2_DEFINES_Common_02) xSPATIAL_DB              
 WW2_DEFINES_Local_01        = $(WW2_DEFINES_Local_02) AIMING_WEAPONS
 
 // Debug flags common to development and debug; debug is always a subset of dev
+WW2_DEFINES_Debug_05        = $(WW2_DEFINES_Debug_06) BETA_RELEASE                  // enable BETA features
 WW2_DEFINES_Debug_04        = $(WW2_DEFINES_Debug_05) ENABLE_FLOATERS               // enable buzzard etc for debug builds as well as GM
 WW2_DEFINES_Debug_03        = $(WW2_DEFINES_Debug_04) RELEASE_CLIENT=1              // not a release client, but we act like one anyway
 WW2_DEFINES_Debug_02        = $(WW2_DEFINES_Debug_03) IS_DEBUG DEBUG _DEBUG
 WW2_DEFINES_Debug_01        = $(WW2_DEFINES_Debug_02) DONT_USE_COVERT               // disable bad tricks for masking memory values
 
 // Development mode
+WW2_DEFINES_Development_10  = $(WW2_DEFINES_Development_11) BETA_RELEASE            // enable BETA features
+WW2_DEFINES_Development_09  = $(WW2_DEFINES_Development_10) RELEASE_CLIENT=1        // not a release client but we act like one anyway
 WW2_DEFINES_Development_08  = $(WW2_DEFINES_Development_09) EXTREME_DEBUG           // debug debug debug
 WW2_DEFINES_Development_07  = $(WW2_DEFINES_Development_08) TEUL_DEBUG              // hey look some other debugging
 WW2_DEFINES_Development_06  = $(WW2_DEFINES_Development_07) USE_SCENARIO_MAP        // some weird things in dot_tspawn
