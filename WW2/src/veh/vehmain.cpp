@@ -2646,7 +2646,10 @@ vehType * VehicleType;
 		return 0;
 	}
 
-	if(Vehicle->isHulked())
+    *Thickness = 1000000;
+    return 0;
+
+    if(Vehicle->isHulked())
 	{
 		*Thickness = 1000000;
 		return 0;

@@ -1224,7 +1224,7 @@ UCHAR* VarContents1;
 			if (BufferPtr != nullptr)
 			{
 				CurrentVehicle->DamageArmorThickness[CurrentVehicle->NumDamageObjects] =
-							(FLOAT32)(atof((char*)BufferPtr) / 1000.0); // thickness is in mm, need it in meters
+							(FLOAT32)(atof((char*)BufferPtr) / 100.0); // thickness is in mm, need it in meters
 
 				BufferPtr = (UCHAR*)strtok(nullptr,",");
 
