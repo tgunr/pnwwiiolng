@@ -29,6 +29,9 @@ WW2_DEFINES_Common_03       = $(WW2_DEFINES_Common_04) EVENT_LOG                
 WW2_DEFINES_Common_02       = $(WW2_DEFINES_Common_03) xGENICONS=1                  // DON'T enable icon generation, whatever that is
 WW2_DEFINES_Common_01       = $(WW2_DEFINES_Common_02) xSPATIAL_DB                  // DON'T enable spatial database, whatever that is
 
+// Local flags, subset of debug
+WW2_DEFINES_Local_01        = $(WW2_DEFINES_Local_02) AIMING_WEAPONS
+
 // Debug flags common to development and debug; debug is always a subset of dev
 WW2_DEFINES_Debug_04        = $(WW2_DEFINES_Debug_05) ENABLE_FLOATERS               // enable buzzard etc for debug builds as well as GM
 WW2_DEFINES_Debug_03        = $(WW2_DEFINES_Debug_04) RELEASE_CLIENT=1              // not a release client, but we act like one anyway
@@ -53,6 +56,7 @@ WW2_DEFINES_Release_02      = $(WW2_DEFINES_Release_02) NDEBUG
 WW2_DEFINES_Release_01      = $(WW2_DEFINES_Release_03) RELEASE_CLIENT=1            // definitely a release client
 
 // "Gatherers"
+WW2_DEFINES_Local           = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Debug_01) $(WW2_DEFINES_Development_01) $(WW2_DEFINES_Local_01)
 WW2_DEFINES_Development     = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Debug_01) $(WW2_DEFINES_Development_01)
 WW2_DEFINES_Debug           = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Debug_01)
 WW2_DEFINES_Release         = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Release_01)
