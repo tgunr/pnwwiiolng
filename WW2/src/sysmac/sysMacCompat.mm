@@ -1,6 +1,8 @@
 /* $Id: sysMacCompat.mm 2136 2009-11-16 03:27:03Z ahwulf@CRS $ */
 //#include <Carbon/Carbon.h>
 
+#include <CoreFoundation/CoreFoundation.h>
+
 #include "sysmac/syscfg.h"
 #include "vars.h"
 
@@ -34,6 +36,30 @@ void chAppDir()
     @autoreleasepool {
         chdir([NSBundle mainBundle].resourcePath.fileSystemRepresentation);
     }
+}
+
+char GetOSMajorVersion()
+{
+    NSOperatingSystemVersion sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
+    return static_cast<char>(sysVer.majorVersion);
+}
+
+char GetOSMinorVersion()
+{
+    NSOperatingSystemVersion sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
+    return static_cast<char>(sysVer.minorVersion);
+}
+
+char GetOSRevision()
+{
+    NSOperatingSystemVersion sysVer = [[NSProcessInfo processInfo] operatingSystemVersion];
+    return static_cast<char>(sysVer.patchVersion);
+}
+
+char GetOSBuild()
+{
+    // No build info
+    return 0;
 }
 
 const char* macPreferencesPath()
