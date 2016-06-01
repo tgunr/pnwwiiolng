@@ -28,8 +28,6 @@ enum STRAT_UPDATE_TYPE
 ,	MAX_STRAT_UPDATE_TYPE
 };
 
-//This is the item that is on the list that
-struct STRAT_UPDATE;
 struct STRAT_UPDATE : public IntrusiveList<STRAT_UPDATE>::Node
 {
 	STRAT_UPDATE() : updateTime(0), type(MAX_STRAT_UPDATE_TYPE), value(0), data(nullptr)

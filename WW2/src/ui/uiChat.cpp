@@ -264,6 +264,8 @@ void uiChatPrintUILocLine(int icons[CHATICON_MAX], unsigned int color, const cha
 			while((index = format.find(placeHolder)) >= 0)
 				format.replace(index, 3, arg);
 		}
+		else
+			break; // reached null
 	}
 
 	va_start( marker, key ); /* Initialize variable arguments. */

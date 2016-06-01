@@ -41,7 +41,7 @@ IF ( USE_SSE2 )
 ENDIF ()
 
 # Additional baseline compiler flags.
-SET(_DIAGNOSTIC_FLAGS "-Werror -Wno-strict-aliasing -Wno-unused-result -Wno-unknown-pragmas")
+SET(_DIAGNOSTIC_FLAGS "-Wno-strict-aliasing -Wno-unused-result -Wno-unknown-pragmas")
 IF ( PN_NICE_STACKS )
 	IF ( IS_CLANG )
 		SET(_DIAGNOSTIC_FLAGS "${_DIAGNOSTIC_FLAGS} -fno-optimize-sibling-calls")

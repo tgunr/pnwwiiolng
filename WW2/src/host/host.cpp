@@ -962,8 +962,6 @@ hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide)
 	if ( PN_UNLIKELY(it == occupancyMap.end()) )
 		return;
 
-	Scoring::Packet<Scoring::Capture> packet;
-
 	for ( auto inIt = it->second.occupants.begin(), inEnd = it->second.occupants.end(); inIt != inEnd; ++inIt )
 	{
 		HostVehicle* const veh = *inIt;
@@ -974,6 +972,9 @@ hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide)
 		for ( auto pit = veh->players().begin(), pend = veh->players().end(); pit != pend; ++pit )
 		{
 			Player* const player = *pit;
+
+			dbugLog(_FLD, "Processing player %s (%d) for scoring: ", Chat::Name(player->chatHandle()).c_str(), player->playerID());
+
 			if ( player->active == false || player->exitState == PEXIT_DEAD || player->teulIndex() < 0 || player->vehicle == nullptr )
 			{
 				continue;
@@ -982,6 +983,8 @@ hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide)
 			// Give to cappers
 			if ( player->side() == forSide )
 			{
+				dbugLog(_FLD, "Crediting player %s (%d) with capture", Chat::Name(player->chatHandle()).c_str(), player->playerID());
+				Scoring::Packet<Scoring::Capture> packet;
 				Scoring::Actor actCapper(player->vehicle, player);
 				Scoring::Capture evtCapture(actCapper, buildingID, forSide);
 				packet.setData(evtCapture);

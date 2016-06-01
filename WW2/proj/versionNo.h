@@ -3,7 +3,7 @@
 ////////// These lines can be automated as long as you don't change the format
 #define PN_WW2_PRODUCT_NO 1
 #define PN_WW2_VERSION_NO 35
-#define PN_WW2_PATCH_NO   1
+#define PN_WW2_PATCH_NO   2
 #define PN_WW2_BUILD_NO   255
 ////////// End of don't-reformat section
 

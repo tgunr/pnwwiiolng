@@ -54,7 +54,7 @@ else:
 #  -> Extension
 
 revNo = int(output_from_command("git log -n 1 --pretty=format:\"%h\"").replace('"', ''), 16)
-revStr = output_from_command("git describe")
+revStr = output_from_command("git rev-parse --short HEAD")
 
 #### Check existing header file for revision number
 storedNo = 0

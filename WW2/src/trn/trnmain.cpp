@@ -310,7 +310,8 @@ SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 le
 
 			if (blist == nullptr)
 			{
-				rnmainListText("Invalid building message");
+				// Temporarily silenced until we figure out the cause.
+				//rnmainListText("Invalid building message");
 				Write_Debug("Invalid building message in recvWorldUpdate, "
 							"supercell x=%d,y=%d,building id = %d",
 								td->scx,td->scy,
