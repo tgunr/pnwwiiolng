@@ -18,7 +18,7 @@ namespace WWII
 				PrivateBcast = 6666					// server<->server backbone
 			,	InternalAuth = 6002					// Auth<->server interface
 			,	DebugWebServer = 6080				// Debugging web interface
-			,	ChatManagement = 27019				// For rosterClient
+			,	ChatManagement = 6066				// For rosterClient
 			,	LuaInterface = 6050					// For Lua interface
 			,	ServerPeering = 6090				// For server<->server mesh.
 
