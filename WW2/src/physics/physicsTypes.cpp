@@ -1824,16 +1824,6 @@ int physicsCollider::createMeshFromObject(OBJECT* Object, bool addTransform)
 	{
 		return -1;
 	}
-
-	if(Object->flag2 & OBJECT_SPEEDTREE)
-	{
-		bool stop = true;
-	}
-
-	if(!(Object->flags & OBJECT_COLLISION))
-	{
-		bool stop = true;
-	}
 	*/
 
 	/*

@@ -5957,15 +5957,7 @@ FLOAT64 gr2ModelGetModelRotationDiff(gr2Model* model, FLOAT64 angle)
 {
 	/*
 	FLOAT64 adjAngle = angle;// + 90;
-
-	if(adjAngle > 180.0f && adjAngle < 210.0f)
-		bool stop = true;
-
 	FLOAT64 diff = fabs(adjAngle - model->modelTwist);
-
-	if(diff > 300.0f && diff < 310.0f)
-		bool stop = true;
-
 	return diff;
 	*/
 	return 0.0f;
