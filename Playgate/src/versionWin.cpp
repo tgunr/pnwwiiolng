@@ -21,7 +21,7 @@
 #define _tcslen	strlen
 #endif
 
-static bool GetFileVersion(TCHAR* const buffer, const size_t bufferSize, TCHAR* const filename);
+bool GetFileVersion(TCHAR* const buffer, const size_t bufferSize, const TCHAR* const filename);
 static void chopOffRevision(TCHAR* fileversion);
 
 void versionWinExec(const char* FileName)
@@ -131,7 +131,7 @@ SINT32 versionWinGetVersion(SINT32 AppId, UINT32 MaxVer, UINT32 *CurrentVer, cha
 	return NumberOfMatches;
 }
 
-bool GetFileVersion(TCHAR* const dest, const size_t destSize, TCHAR* const filename)
+bool GetFileVersion(TCHAR* const dest, const size_t destSize, const TCHAR* const filename)
 {
 	// Initialize dest as empty string.
 	dest[0] = 0;
