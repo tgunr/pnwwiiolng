@@ -428,7 +428,7 @@ UINT32 vehInit(void)
     if (!IS_OFFLINE)
     {
         size_t cnt = sizeof(g_vehicles);
-        memset( g_vehicles, cnt, 0xff ); // damn cheaters hopefully choke on this
+        memset( reinterpret_cast<void *>(&g_vehicles[0]), cnt, 0xff ); // damn cheaters hopefully choke on this
     }
 
 	vehAnimInit();

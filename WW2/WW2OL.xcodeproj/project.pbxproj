@@ -706,7 +706,6 @@
 		081049AB103DD1D50065E0E2 /* ww2imap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ww2imap.cpp; sourceTree = "<group>"; };
 		081049AC103DD1D50065E0E2 /* ww2imap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ww2imap.h; sourceTree = "<group>"; };
 		081049C7103DD2310065E0E2 /* defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defs.h; sourceTree = "<group>"; };
-		081049C9103DD2310065E0E2 /* endianess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endianess.h; sourceTree = "<group>"; };
 		081049D6103DD2310065E0E2 /* mobileSpawnEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mobileSpawnEnums.h; sourceTree = "<group>"; };
 		081049DC103DD2310065E0E2 /* systypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systypes.h; sourceTree = "<group>"; };
 		081049DD103DD2310065E0E2 /* vars.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vars.h; sourceTree = "<group>"; };
@@ -1885,7 +1884,6 @@
 			isa = PBXGroup;
 			children = (
 				081049C7103DD2310065E0E2 /* defs.h */,
-				081049C9103DD2310065E0E2 /* endianess.h */,
 				081049D6103DD2310065E0E2 /* mobileSpawnEnums.h */,
 				081049DC103DD2310065E0E2 /* systypes.h */,
 				081049DD103DD2310065E0E2 /* vars.h */,
