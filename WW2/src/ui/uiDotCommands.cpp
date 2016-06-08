@@ -1882,7 +1882,7 @@ static SINT32 dot_allinf(const char*)
 
 	int ccount = 4;
 
-	char* countries[] =
+	const char* countries[] =
 	{
 		"uk",
 		"fr",
@@ -1892,7 +1892,7 @@ static SINT32 dot_allinf(const char*)
 
 	int tcount = 10;
 
-	char* troops[] =
+	const char* troops[] =
 	{
 		"rifle",
 		"-smg",
@@ -1906,7 +1906,7 @@ static SINT32 dot_allinf(const char*)
 		"-bar"			// US Only
 	};
 
-	char* paras[] =
+	const char* paras[] =
 	{
 		"-para-rfl",
 		"-para-smg",
@@ -2003,7 +2003,7 @@ static SINT32 dot_decal(const char* line)
 //////////////////////////////////////////////////////////////////////
 static SINT32 dot_gr2debug(const char* line)
 {
-	char* flags[] =
+	const char* flags[] =
 	{
 		"model",
 		"collider",
@@ -2015,9 +2015,9 @@ static SINT32 dot_gr2debug(const char* line)
 		"fpsfall",
 	};
 
-	char flag[80+1];
+	char flag[80 + 1] = {0};
 
-	int argc = sscanf(line, "%*s %80s", (char*)&flag);
+	int argc = sscanf(line, "%*s %80s", &flag[0]);
 
 	if(argc)
 	{
@@ -7323,7 +7323,7 @@ static int dot_texinfo(const char* line)
       }
 
       int format = (int) F, bytes = 1;
-      char* s = "OTHER";
+      const char* s = "OTHER";
       switch(format)
       {
         case GL_ALPHA8_EXT:                      s= "GL_ALPHA8_EXT"                  ;

@@ -133,7 +133,7 @@ int dbugGetErrno(void);
 int _dbugLog(const char* filename, int lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
 
 // dbugWrite: Same as dbugLog but has its own logging level. Don't know why this exists.
-SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
+SINT32 _dbugWrite(const char* filename, SINT32 lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
 
 // LogAbort: Fire a ERR_FATAL and abort()
 [[noreturn]] void _LogAbort(const char* filename, unsigned int lineno, UINT32 errType, const char* assertion, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(5,6);
