@@ -15,6 +15,16 @@
 #include "LoginData.h"
 #include "Playgate.h"
 
+#ifdef IGNORE_REGISTRY
+#include "wwii/wwiiUTF.h"
+
+// HACK: In versionWin.cpp
+extern bool GetFileVersion(TCHAR* const dest, const size_t destSize, const TCHAR* const filename);
+// HACK: launchAppWin.cpp
+extern SINT32 _FillInParamValues(const APP_LAUNCH *AppLaunch, const TCHAR* path, const TCHAR* Params, TCHAR* FilledInParams, size_t FIPSize);
+bool launchApplication(const TCHAR* exeFile, const TCHAR* parameters, std::wstring path);
+#endif
+
 #define		MAX_REG_KEY		256
 #define		MAX_URL			256
 
@@ -37,7 +47,9 @@ static TEUL_CALLBACK*  _GetGameList;
 static TEUL_CALLBACK*  _LoginXchg;
 
 static APP_LAUNCH _AppLaunch;
+#ifndef IGNORE_REGISTRY
 static char		_SavedRegistryKey[MAX_REG_KEY];
+#endif
 static UINT32     _NumberOfOldVersions;
 static char      _DownloadPage[MAX_URL];
 const char* userName;
@@ -125,6 +137,25 @@ UINT32         CurrentVer;
 	LaunchRequest.appVersion = 0;//AppVerify->appVersionMax;
 	LaunchRequest.oVersion = 2;
 
+#ifdef IGNORE_REGISTRY
+	// Access Window's version information for the executable.
+	TCHAR buffer[256+1];
+	if ( !GetFileVersion(buffer, sizeof(buffer), (g_exePath + g_exeName).c_str()) ) {
+		LaunchRequest.status = -1;
+		return 0;
+	}
+
+	char verStr[25 + 1];
+	WWII::ConvertChars(buffer, verStr, sizeof(verStr));
+	teulGetHost(verStr, &LaunchRequest.appVersion);
+
+	if ( commSend(_LaunchReq, &LaunchRequest) < 0 ) {
+		playgate.SetStatus(GetLoc(AUTH_LAUNCH_FAIL), AppError);
+		return 0;
+	}
+
+	return 1;
+#else
 	_NumberOfOldVersions = 0;
 
 	if (_SavedRegistryKey[0] != '\0')
@@ -163,6 +194,7 @@ UINT32         CurrentVer;
 	}
 
 	return 1;
+#endif
 }
 
 bool launchRequestGameList()
@@ -278,7 +310,16 @@ static SINT32 _ReceiveAppLaunch(ACTION_OBJECT *Action)
 
 	playgate.SetStatus(GetLoc(INFO_LAUNCH), AppProgress);
 
+#ifdef IGNORE_REGISTRY
+	std::wstring param_pattern = L"-serverip $QUAD -serverport $PORT -serverotp $OTP -side $SESSIONID";
+	TCHAR c_params[500]; // HACK
+	_FillInParamValues(&AppLaunch, g_exePath.c_str(), param_pattern.c_str(), c_params, sizeof(c_params) / sizeof(TCHAR));
+	std::wstring params(c_params + (L" " + g_exeParams));
+
+	launchApplication((g_exePath + L"/" + g_exeName).c_str(), params.c_str(), g_exePath.c_str());
+#else
 	launchAppWin(&AppLaunch, _SavedRegistryKey);
+#endif
 
 	_CleanUpLaunchData();
 
@@ -350,7 +391,9 @@ extern SINT32 launchInstallCallbacks(void)
 
 static void _CleanUpLaunchData(void)
 {
+#ifndef IGNORE_REGISTRY
 	_SavedRegistryKey[0] = '\0';
+#endif
 }
 
 static SINT32 _errorFunc(ACTION_OBJECT *Action)

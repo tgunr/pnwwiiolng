@@ -72,18 +72,20 @@ static inline void _copyPathToString(const char* name, std::wstring& to, wchar_t
 bool
 registryGetPaths(std::wstring& exePath, std::wstring& dataPath)
 {
-	exePath = dataPath = L"";
-
 	wchar_t wBuffer[MAX_PATH+1];
 	wBuffer[0] = 0;
 	const wchar_t* PATH_KEY = L"Path";
+#ifdef IGNORE_REGISTRY
+	GetCurrentDirectory(MAX_PATH, wBuffer);
+#else
 	if ( !_readWideKey(g_registryKeyW, PATH_KEY, wBuffer) || wBuffer[0] == 0 )
 	{
 		dbugLog(_FLA, "Unable to access %s\\%ls", g_registryKey, PATH_KEY);
 		return false;
 	}
-
-	_copyPathToString("Path", exePath, wBuffer);
+#endif
+	if ( exePath.length() == 0 )
+		_copyPathToString("Path", exePath, wBuffer);
 
 	// Ask Windows where the users documents folder is; oh, and create it if it doesn't exist
 	// because we'll be needing it.
@@ -94,10 +96,15 @@ registryGetPaths(std::wstring& exePath, std::wstring& dataPath)
 		return false;
 	}
 
-	_copyPathToString("CSIDL_PERSONAL", dataPath, wBuffer);
+	if ( dataPath.length() == 0 )
+		_copyPathToString("CSIDL_PERSONAL", dataPath, wBuffer);
 
+#ifdef IGNORE_REGISTRY
+	_copyPathToString("DataPath", dataPath, L"Battleground Europe");
+#else
 	// Now query HKLM\Software\Playnet\apps\appidN\instanceN\Data for the name of the game folder.
 	wBuffer[0] = 0;
+
 	const wchar_t* DATA_KEY = L"version";
 	if ( !_readWideKey(g_registryKeyW, DATA_KEY, wBuffer) || wBuffer[0] == 0 )
 	{
@@ -106,6 +113,7 @@ registryGetPaths(std::wstring& exePath, std::wstring& dataPath)
 	}
 
 	_copyPathToString("DataPath", dataPath, wBuffer);
+#endif
 
 	// make sure it exists
 	_wmkdir(dataPath.c_str());

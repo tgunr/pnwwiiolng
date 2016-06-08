@@ -13,8 +13,6 @@ IF ( NOT PN_BUILD_TYPE )
 	set(PN_BUILD_TYPE "Dev")
 ENDIF ( NOT PN_BUILD_TYPE )
 
-SET(PN_APP_ID ${PN_BETA_APPID})
-
 set(BUILDNAME ${PN_BUILD_TYPE})
 IF ( PN_BUILD_TYPE STREQUAL "Dev" )
 	# Developer build for internal use.
@@ -31,13 +29,11 @@ ELSEIF ( PN_BUILD_TYPE STREQUAL "RC" )
 ELSEIF ( PN_BUILD_TYPE STREQUAL "Live" )
 	# Public release for Playnet.
 	set(OPTIMIZATION 4)
-	set(PN_APP_ID ${PN_RELEASE_APPID})
 	add_definitions(-DPUBLIC_RELEASE)
 ELSEIF ( PN_BUILD_TYPE STREQUAL "China" )
 	# Public release for Happyoo.
 	set(BUILDNAME "Zhongguo")
 	set(OPTIMIZATION 4)
-	set(PN_APP_ID ${PN_RELEASE_APPID})
 	set(CHINA 1)
 	add_definitions(-DHAPPYOO=1 -DCHINA=1 -DPUBLIC_RELEASE)
 ELSEIF ( PN_BUILD_TYPE STREQUAL "ChinaBeta" )

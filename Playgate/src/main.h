@@ -34,6 +34,8 @@ extern HINSTANCE hMainInstance;
 extern char szVersion[];
 extern char szVersionString[];
 
+#define IGNORE_REGISTRY 1
+
 typedef std::vector<UINT32> IP_LIST;
 extern IP_LIST	g_authHosts;
 extern UINT16	g_authPort;
@@ -41,7 +43,11 @@ extern SINT32 webID; //used for web downloads
 extern UINT32 webURL;
 extern UINT32 g_playgateVersion;
 extern std::wstring g_exePath, g_dataPath;
+extern std::wstring g_exeName, g_exeParams;
 extern SINT32 g_sessionID;
 extern UINT32 g_gameAppID;
-extern char g_registryKey[];
-extern wchar_t g_registryKeyW[];
+
+#ifndef IGNORE_REGISTRY
+	extern char g_registryKey[];
+	extern wchar_t g_registryKeyW[];
+#endif

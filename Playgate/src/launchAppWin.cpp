@@ -61,7 +61,11 @@ _FillInParamValue(const APP_LAUNCH *AppLaunch, const TCHAR* path, const TCHAR* P
 	return Length;
 }
 
-static SINT32
+// HACK
+#ifndef IGNORE_REGISTRY
+static
+#endif
+SINT32
 _FillInParamValues(const APP_LAUNCH *AppLaunch, const TCHAR* path, const TCHAR* Params, TCHAR* FilledInParams, size_t FIPSize)
 {
 	UINT32 otp = AppLaunch->otp ;
