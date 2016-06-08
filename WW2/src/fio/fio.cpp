@@ -38,9 +38,12 @@ void fioInit()
 	ustrcpy(path, _T("."));
 
 #if GREEN_INSTALL != 1
-    SHGetFolderPath(nullptr, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, nullptr, 0, path);
+	SHGetFolderPath(nullptr, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, nullptr, 0, path);
 
 	base = sysregGetInstallValue(_T("Version"));
+	// HACK: Put in the default location if an installation doesn't exit.
+	if ( base == nullptr )
+		base = L"Battleground Europe";
 #endif // GREEN_INSTALL != 1
 
 #ifdef _UNICODE
