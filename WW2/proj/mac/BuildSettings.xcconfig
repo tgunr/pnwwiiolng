@@ -35,6 +35,8 @@ GCC_ENABLE_PASCAL_STRINGS = NO                              // Don't allow \p fo
 RUN_CLANG_STATIC_ANALYZER = NO                              // Don't run the static analyzer if not explicitly requested
 CLANG_STATIC_ANALYZER_MODE_ON_ANALYZE_ACTION = deep         // Do deep analysis when explicitly requested
 CLANG_STATIC_ANALYZER_MODE = shallow                        // Do shallow analysis the rest of the time
+ENABLE_NS_ASSERTIONS = YES                                  // Enable assertions from Objective-C code
+ENABLE_STRICT_OBJC_MSGSEND = YES                            // Enforce good typing in use of objc_msgSend()
 
 // Settings for Development configuration - please keep this in sync with Debug
 GCC_UNROLL_LOOPS_Development            = NO                // Don't unroll loops
