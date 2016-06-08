@@ -101,21 +101,6 @@ void clientErrorLog(const char* const fmt, ...)
 // default player info
 static Teul::PlayerIdent _defaultPlayerIdent;
 
-///TODO:PERSIST: You can take this out at some point.
-#if platOS != OS_WIN32
-#define MessageBoxA(_X_, _err_, _title_, _Y_) fprintf(stderr, "\n%s\n\n%s\nTerminating.\n", _title_, _err_)
-#endif
-
-#define INCOMPLETE_WORK(_str_) { MessageBoxA(nullptr, \
-		"###################################\n\n" \
-		"You are seeing this because of an error\n" \
-		"error for which no behavior is defined.\n\n" \
-		"###################################\n\n" \
-		"The error was: " _str_ "\n\n" \
-		"Please report this error to support@playnet.com.\n\n" \
-		"###################################", \
-		"### Unhandled network error ####", MB_ICONEXCLAMATION|MB_OK); exit(-1); }
-
 /************************************************************************************************
 	_yield()
 	Pause long enough for the OS to do stuff like, oh, receive packets,
@@ -617,12 +602,7 @@ int Client::Login(unsigned int host, short port, bool wantChat)
 		if(!ConnectToChatHost(true))
 		{
 			///TODO:PERSIST: connect.login.chat.timeout is the wrong error.
-			// Note: This looks like the last use of INCOMPLETE WORK,
-			// so remove the macro too when you fix it :)
-#pragma message("//////////////////////////////////////////////////")
-#pragma message("INCOMPLETE_WORK still used in ww2client.cpp when !ConnectToChatHost(true). Ticket #6186")
-#pragma message("//////////////////////////////////////////////////")
-            INCOMPLETE_WORK("Unable to connect to chat host");
+            throw ClientNetError("connect.login.chat.timeout");
 		}
 	}
 	else
