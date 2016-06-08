@@ -117,7 +117,7 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	char* data = (char*)memAlloc(fileSize + 1);
 	if ( PN_UNLIKELY(data == nullptr) )
 	{
-		DEBUG_ERR("Unable to allocate %u bytes of memory for loading %s.", fileSize + 1);
+		DEBUG_ERR("Unable to allocate %u bytes of memory for loading %s.", fileSize + 1, filename);
 		fiodClose(fd);
 		return false;
 	}
@@ -127,14 +127,14 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 
 	if ( PN_UNLIKELY(bytesRead < 0) )
 	{
-		DEBUG_ERR("Read error reading %u bytes from %s.", bytesRead, filename);
+		DEBUG_ERR("Read error reading %zu bytes from %s.", bytesRead, filename);
 		memFree(data);
 		return false;
 	}
 
 	if ( PN_UNLIKELY(bytesRead != fileSize) )
 	{
-		DEBUG_ERR("Read error reading %s, got %u bytes instead of %u.", filename, bytesRead, fileSize);
+		DEBUG_ERR("Read error reading %s, got %zu bytes instead of %u.", filename, bytesRead, fileSize);
 	}
 
 	data[bytesRead] = 0;
