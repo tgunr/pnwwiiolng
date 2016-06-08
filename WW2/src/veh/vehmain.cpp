@@ -4544,7 +4544,9 @@ static void _FindNearbyFacilities(vehVehicle* Vehicle)
 		report.altitude = (UINT32)((pos.z() > 0) ? pos.z() : 0.0);
 		report.speed = (UINT32)mathExactVectorLength(&Vehicle->ModelData->VehicleVel);
 
-		strtSendEnemyReport(PlayerClient()->CellConnection(), &report);
+        if (Online) {
+            strtSendEnemyReport(PlayerClient()->CellConnection(), &report);
+        }
 	}
 }
 
