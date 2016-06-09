@@ -105,7 +105,6 @@ const char* g_serverName = "mmhostd";
 
 extern void mapPlayerInit();
 
-UINT32 g_appID = APP_ID;
 UINT32 myMaxUsers;
 
 UINT32 hostAddress = 0;
@@ -670,7 +669,7 @@ _handleSIGUSR1(SINT32 k)
 
 	//Reconnect to the authHost
 	SINT32 retval = authGameInit(Server::localHost, WWII::Net::Ports::MapHost,
-											_authHost, WWII::Net::Ports::InternalAuth, g_appID, HOST_VERSION,
+											_authHost, WWII::Net::Ports::InternalAuth, cv_appID.GetUint32(), HOST_VERSION,
 											HOST_VERSION, Teul::MaxClusterUsers,
 											_acceptLogin, _authErrorFunction);
 	if ( retval < 0)
@@ -1130,7 +1129,7 @@ main(int argc, const char* argv[])
 					, WWII::Net::Ports::MapHost
 					, _authHost
 					, WWII::Net::Ports::InternalAuth
-					, g_appID
+					, cv_appID.GetUint32()
 					, HOST_VERSION
 					, HOST_VERSION
 					, Teul::MaxClusterUsers

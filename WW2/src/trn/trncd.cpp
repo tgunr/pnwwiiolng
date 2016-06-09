@@ -5869,9 +5869,6 @@ UINT32 trnUpdateObjectStatus(SINT32 x, SINT32 y, UINT32 id, SINT32 country, SINT
 					TO->FirstUpdate = 0;
 				}
 
-				//if(country >= 1 && country <= 4)
-				//	bool stop = true;
-
 				TO->Country = country;
 				_SetTOObjectCountry(TO->TerrainObject,country,0);
 			}

@@ -1241,11 +1241,6 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 	static const UINT32 PRIVATE_SUBNET = 0xC0A80000;	// 192.168.*.*
 	static const UINT32 PRIVATE_SUBMASK = 0xFFFF0000;
 	UINT32 destAddress = bestServer.ipAddress;
-	// Change the destination address if we have a local address to mask it to
-	if ( (destAddress & PRIVATE_SUBMASK) != PRIVATE_SUBNET )
-	{
-		destAddress = localNet | (destAddress & 0xff);
-	}
 
 	//hack since teulGetAddress sucks
 	teulGetAddress(request.appVersion, appVer, sizeof(appVer) - 1);

@@ -370,8 +370,6 @@ UINT32 dimainVKToIAC(UINT32 uVK)
 
 			if(vk != VK_PROCESSKEY)
 				return dimainVKToIAC(vk);
-
-			bool stop = true;
 		}
     default:            return 0;
     }

@@ -510,8 +510,6 @@ static LOGICAL _CenterVisualDamage(OBJECT* obj, UINT32 user)
 			pverts->y -= offset.y;
 			pverts->z -= offset.z;
 
-			bool stop = true;
-
 			pverts++;
 		}
 	}
@@ -1204,9 +1202,6 @@ static SINT32 vehUpdate1stPersonVehicle(vehVehicle* CurrentVehicle)
 	Vec3d myPos = Vec3d(CurrentVehicle->ModelData->VehiclePos);
 	Vec3d myPosDiff = myPos - myLastPos;
 	double distance = myPosDiff.length();
-
-	if(myLastPos.length2() && distance > 10.0f)
-		bool stop = true;
 
 	myLastPos = myPos;
 #endif

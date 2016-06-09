@@ -73,7 +73,7 @@ CFG_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION", "Enable compression when co
 
 CFG_STRING(clusterName, nullptr, "WWII_CLUSTER", true, "Short-name for this cluster, e.g. 'dev'");
 CFG_UINT(arenaID, nullptr, "ARENA_ID", "Numeric ID for this arena.");
-CFG_UINT(appID, nullptr, "APP_ID", "App ID for this server - 1 being release, 12 being beta.");
+CFG_UINT(appID, "1", "APP_ID", "App ID for this server - 1 being release, 12 being beta.");
 CFG_ADDR(ircServer, "", "WWII_IRC_SERVER", false, "Address of the IRC server. If not defined, disables IRC.");
 CFG_STRING(ircPassword, "blooGit", "WWII_IRC_PASSWD", true, "Server-password for the IRC server.");
 CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", "Port to connect to the IRC server on.");

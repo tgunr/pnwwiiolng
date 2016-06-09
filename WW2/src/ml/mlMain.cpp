@@ -4793,18 +4793,6 @@ UINT32 mlIsTailWheelLocked(void)
 	return VehicleData->TailWheelLocked;
 }
 
-#if(0)
-static LOGICAL _findterrainobject(struct OBJECT* o, void* found)
-{
-	if((o->flags & OBJECT_TERRAIN))
-	{
-		bool stop = true;
-	}
-
-	return TRUE;
-}
-#endif
-
 //#define TO_COLLIDE_LIST_DEBUG
 
 struct TOPair

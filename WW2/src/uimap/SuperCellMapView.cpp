@@ -528,9 +528,6 @@ void SuperCellMapView::SetPositionXY(float x, float y, bool recalcPan)
 	_posx = x;
 	_posy = y;
 
-	//if(!_posx || !_posy)
-	//	bool stop = true;
-
 	if(recalcPan && (_panx || _pany))
 		SetPanPositionXY(_panx, _pany, _stoppanscale);
 }
@@ -566,9 +563,6 @@ void SuperCellMapView::SetPanPositionXY(float x, float y, float s)
 
 	if(_scacross != _panscale)
 	{
-		//if(_panscale < _scacross)
-		//	bool stop = true;
-
 		_panstop = _pantime + PAN_TIME_HEIGHT;
 	}
 	else

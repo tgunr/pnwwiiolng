@@ -977,10 +977,8 @@ JS_FUNCTION_DEF(jsGame, saveconvergence)
 		//JS_ValueToInt32(ctx, argv[0], &category);
 		jsvehtype = phui::js::Cast<jsVehtype*>(ctx, argv[0]);
 
-#if TICKET_6310 // Asserts here. Bad data.
 		if(argc > 1) JS_ValueToInt32(ctx, argv[1], &value);
 		if(argc > 2) JS_ValueToInt32(ctx, argv[2], &isDirty);
-#endif
 	}
 
 	// create our pref key
