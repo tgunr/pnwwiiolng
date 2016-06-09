@@ -236,7 +236,7 @@ void PlayerLayer::RenderSuperCells(SuperCellMapView* mv, int scx1, int scy1, int
 			: SuperCellMapView::MapObject()
 			, _handle(handle) , _nextsquadcheck(0), _lastupdatetime(0)
 			, _x(0), _y(0), _z(0)
-			, _maxDraw(1000.0f), _type(0), _class(0), _dead(false), _showinfo(false)
+			, _maxDraw(100000.0f), _type(0), _class(0), _dead(false), _showinfo(false)
 			,  _inmissionupdate(false), _issamemission(false), _players(layer)
 
 {
