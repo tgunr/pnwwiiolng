@@ -582,7 +582,8 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 
 	if (deletion != nullptr)
 	{
-		switch(lpobj->modelInstance->GetModelType())
+    UINT32 mType = lpobj->modelInstance->GetModelType();
+		switch(mType)
 		{
 		case ModelTypes::CLOUD:
 
@@ -595,7 +596,9 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 		}
 
 		deletion(lpobj, 0, 0, 0, nullptr);
-		trnUpdateStratData(td, lpobj, -1, FALSE);
+
+    if (mType != ModelTypes::TERRAIN_OBJECT && mType != ModelTypes::TERRAIN_TILE)
+      trnUpdateStratData(td, lpobj, -1, FALSE); // DEV-731 - could be called to update building model types only
 	}
 
 	obpoolFreeObjectCallback(lpobj);
@@ -1147,7 +1150,7 @@ STRT_DTL_HEADER		sdh;
 
 				td->numFacilities = sdh.numFacilities;
 
-				td->facTable = sdmCreateFacilityTable(td->pfac, td->numFacilities, td->numCPs);
+				td->facTable = sdmCreateFacilityTable(td->pfac, td->numFacilities, td->pcp, td->numCPs);
 			}
 
 			if (sdh.numBuildings > 0)
