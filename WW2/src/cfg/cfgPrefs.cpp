@@ -159,7 +159,7 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.pponok",				nullptr,						cfgPARAM_UINT,		1,		0,	1, true	},
 	{"app.macsound",			nullptr,						cfgPARAM_UINT,		1,		0,	1, true	},
 	{"app.inflodmod",			&gTrooperMOD,				cfgPARAM_FLOAT,		1,		0,	4, true	},
-	{"app.conv",				&Convergence,				cfgPARAM_UINT,		1,		0,	800, true },
+	{"app.conv",				&Convergence,				cfgPARAM_UINT,		1,		0,	1500, true },
 	{"app.aimScalar",			&aimMouse,					cfgPARAM_FLOAT,		1,		0, 8, true }
 	// add more vars here
 };
