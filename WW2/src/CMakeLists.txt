@@ -24,7 +24,10 @@ PROJECT( WW2GameHosts LANGUAGES C CXX )
 #SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 #SET( CMAKE_CXX_STANDARD 14 )
 # Unfortunately, the above doesn't work until CMake 3.1
-ADD_COMPILE_OPTIONS( "-std=gnu++14" )
+#ADD_COMPILE_OPTIONS( "-std=gnu++14" )
+# And unfortunately, that doesn't work either because it breaks pure-C files
+SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14" CACHE STRING "" FORCE )
+SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11" CACHE STRING "" FORCE )
 
 ####################################
 ## Determine bitness
