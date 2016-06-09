@@ -182,7 +182,7 @@ SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
 ## instancing library for hosts that deal with instances (all but strat)
 ADD_LIBRARY( instancing STATIC
     chat/chatLocalizedMessage.cpp chat/chatLocalizedMessage.h chat/chatDefines.h
-    inst/instHost.cpp inst/instHost.h inst/instDescriptor.h
+    inst/instHost.cpp inst/instHost.h inst/instDescriptor.h inst/instPackers.cpp
     wwii/wwiiPlayer.cpp wwii/wwiiPlayer.h
     mm/mmEnums.h auth/authDispatch.h
     miss/missFlags.h wwii/wwiiBranchEnums.h
@@ -288,13 +288,13 @@ MACRO( ADD_HOST_TARGET Name )
         MESSAGE( FATAL_ERROR "1 ${HOST_TARGET_Usage}" )
     ENDIF()
     ADD_EXECUTABLE( "${Name}" ${HOST_TARGET_ARG_SOURCES} )
-    TARGET_LINK_LIBRARIES( "${Name}" teulserver wwiilib ircclient ${MYSQL_LIBRARIES} )
     IF ( HOST_TARGET_ARG_INSTANCING )
         TARGET_LINK_LIBRARIES( "${Name}" instancing )
     ENDIF()
     IF ( HOST_TARGET_ARG_LUA )
         TARGET_LINK_LIBRARIES( "${Name}" ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
     ENDIF()
+    TARGET_LINK_LIBRARIES( "${Name}" ircclient wwiilib teulserver ${MYSQL_LIBRARIES} )
     IF ( NOT "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" STREQUAL "" )
         SET_PROPERTY( TARGET "${Name}" PROPERTY COMPILE_DEFINITIONS "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" )
     ENDIF()
