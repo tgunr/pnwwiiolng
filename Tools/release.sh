@@ -3,9 +3,9 @@
 WW2ROOT=$(dirname $0)/..
 WW2MODS="$WW2ROOT/opt/ww2mods"
 WW2ARCHIVES="$WW2ROOT/WW2Archives"
-INSTALLER="$WW2ROOT/Tools/Installer"
+INSTALLER="$WW2ROOT/Installer"
 DEBUGDIR="$WW2ROOT/build/client/Debug/Bin"
-LIBDIR="$WW2ROOT/Tools/Installer/libs"
+LIBDIR="$WW2ROOT/Installer/libs"
 RELEASEDIR="$WW2ROOT/build/client/Release/Bin"
 #RELEASELIBDIR="$WW2ROOT/Build/lib/Win32/Release"
 PRODUCTS="WW2.exe Playgate.exe Settings.exe"
