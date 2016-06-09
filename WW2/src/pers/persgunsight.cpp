@@ -3236,7 +3236,11 @@ void persGunsightDrawFPSScope(int type)
     case BRITISH_PARA_NOPACK:
     case BRITISH_PARA_PACK_SELF:
         {
+#if AIMING_WEAPONS
+            _drawscope(_britscope, 2.5f);
+#else
             _drawscope(_britscope, 1.0f);
+#endif
             break;
         }
     case AMERICAN_INFANTRY:
@@ -3244,7 +3248,11 @@ void persGunsightDrawFPSScope(int type)
 			if(fpsTrooper.activeWeaponNumber >= 0 && fpsTrooper.weaponPositionModel[fpsTrooper.activeWeaponNumber] == BAZOOKA)
 				_drawscope(_bazookascope, 1.0f, true);
 			else
-				_drawscope(_yankscope, 1.0f);
+#if AIMING_WEAPONS
+                _drawscope(_yankscope, 2.5f);
+#else
+            _drawscope(_yankscope, 1.0f);
+#endif
 
             break;
         }
@@ -3253,7 +3261,11 @@ void persGunsightDrawFPSScope(int type)
 			if(fpsTrooper.activeWeaponNumber >= 0 && fpsTrooper.weaponPositionModel[fpsTrooper.activeWeaponNumber] == BAZOOKA)
 				_drawscope(_bazookascope, 1.0f, true);
 			else
-				_drawscope(_frenchscope, 1.0f);
+#if AIMING_WEAPONS
+                _drawscope(_frenchscope, 2.5f);
+#else
+            _drawscope(_frenchscope, 1.0f);
+#endif
 
             break;
         }
@@ -3263,7 +3275,11 @@ void persGunsightDrawFPSScope(int type)
     case FRENCH_PARA_NOPACK:
     case FRENCH_PARA_PACK_SELF:
         {
+#if AIMING_WEAPONS
+            _drawscope(_frenchscope, 2.5f);
+#else
             _drawscope(_frenchscope, 1.0f);
+#endif
             break;
         }
     case GERMAN_INFANTRY:
@@ -3273,7 +3289,11 @@ void persGunsightDrawFPSScope(int type)
     case GERMAN_PARA_NOPACK:
     case GERMAN_PARA_PACK_SELF:
         {
+#if AIMING_WEAPONS
+            _drawscope(_germanscope, 2.5f);
+#else
             _drawscope(_germanscope, 1.0f);
+#endif
             break;
         }
     default:
