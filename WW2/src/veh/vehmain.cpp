@@ -2646,8 +2646,10 @@ vehType * VehicleType;
 		return 0;
 	}
 
+#if AIMING_WEAPONS
     *Thickness = 1000000;
     return 0;
+#endif
 
     if(Vehicle->isHulked())
 	{
