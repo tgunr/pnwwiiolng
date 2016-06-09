@@ -138,11 +138,7 @@ public:
 	// Function for setting a covert variable
 	valuetype Set(const valuetype& rhs)
 	{
-#if (defined(WIN32) || defined(WIN64)) && defined(DEBUG_WW2)
-		UINT64 t = __rdtsc();			// We need a UINT64 workspace
-#else
-		UINT64 t; // Deliberately not initialized.
-#endif
+		UINT64 t = ((uint64_t)rand() << 32) | rand(); // Deliberately not initialized.
 
 		// Bit-copy RHS into the top of 't', leaving the
 		// pre-existing stack-derived "crap" in the lower bits.
