@@ -521,7 +521,7 @@ static void _drawBlackoutIfNecessary()
     }
 
     // G's on aircraft
-    if(p->BlackoutPercent >= 0.99f)
+    if(p->BlackoutPercent >= 6.99f)
     {
         if(!starttimer)
         {
