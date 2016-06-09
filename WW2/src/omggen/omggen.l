@@ -62,7 +62,8 @@ IF\ \(					{ yy_push_state(IF_COND); g_condition = ""; }
 <IF_COND>\(				{ yy_push_state(IF_COND); g_condition.push_back('('); }
 <IF_COND>\)				{
 	yy_pop_state();
-	if (yy_top_state() != IF_COND) {
+	/* A bug in flex will crash if yy_top_state() is called in INITIAL */
+	if (yy_start_stack_ptr == 0 || yy_top_state() != IF_COND) {
 		while (g_condition.empty() == false && isspace(g_condition.back())) {
 			g_condition.resize(g_condition.size() - 1);
 		}
