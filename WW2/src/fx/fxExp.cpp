@@ -845,6 +845,9 @@ LOGICAL _UpdateShake(SINT32 iID)
 {
     SINT32 iIndex = iID - 1;
 
+#ifdef AIMING_WEAPONS
+    return FALSE;
+#endif
     if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
         return FALSE;
 
@@ -883,6 +886,9 @@ LOGICAL _DrawShockWave(SINT32 iID)
 {
     SINT32 iIndex = iID - 1;
 
+#ifdef AIMING_WEAPONS
+    return FALSE;
+#endif
     if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
         return FALSE;
 
@@ -972,6 +978,9 @@ void _UpdateShockWave(SINT32 iID)
 {
     SINT32 iIndex = iID - 1;
 
+#ifdef AIMING_WEAPONS
+    return;
+#endif
     if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
         return;
 
