@@ -6744,7 +6744,12 @@ UINT32 _ReadBumpAndFrictionTable(void)
 		{
 			continue;
 		}
-		_BAFData[Position].BumpHeight = (FLOAT32)atof((char*)BufferPtr);
+#if AIMING_WEAPONS
+        _BAFData[Position].BumpHeight = 0.0;
+#else
+        _BAFData[Position].BumpHeight = (FLOAT32)atof((char*)BufferPtr);
+#endif
+        ;
 
 		BufferPtr = (UCHAR*)strtok(nullptr,",");
 		if (BufferPtr == nullptr)
