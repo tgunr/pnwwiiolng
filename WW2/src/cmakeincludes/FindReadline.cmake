@@ -41,7 +41,7 @@ STRING( REGEX MATCHALL "[0-9A-Fa-f][0-9A-Fa-f]"
 SET( readline_version_result "" )
 FOREACH( readline_version_num IN LISTS readline_version_nums )
     STRING( REGEX REPLACE "^0+" "" readline_version_num "${readline_version_num}" )
-    STRING( APPEND readline_version_result ".${readline_version_num}" )
+    SET( readline_version_result "${readline_version_result}.${readline_version_num}" )
 ENDFOREACH()
 STRING( SUBSTRING "${readline_version_result}" 1 -1 READLINE_VERSION_STRING )
 # End the silly

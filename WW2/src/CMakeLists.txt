@@ -5,7 +5,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
 ####################################
 ## Initial CMake config
 ENABLE_TESTING()
-SET( CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes" )
+SET( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes;${CMAKE_MODULE_PATH}" )
 IF ( NOT UNIX AND NOT APPLE AND NOT WIN32 )
     MESSAGE( FATAL_ERROR "Unknown build environment, not continuing" )
 ENDIF()
