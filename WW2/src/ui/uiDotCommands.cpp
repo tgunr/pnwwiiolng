@@ -7143,79 +7143,6 @@ static int dot_version(const char* line)
 }
 #endif
 
-#if defined(ENABLE_VOICE_COMMS)
-#include "voice/VoiceRats.h"
-#include "RakNetTypes.h"
-
-static int dot_voice(const char* line)
-{
-	int playerSide = wwiiSide(PlayerClient()->PersonaSelected().m_countryID);
-	int playerCountry = PlayerClient()->PersonaSelected().m_countryID;
-
-	if((playerSide == 0) || (playerCountry == 0))
-	{
-		uiChatPrintLine("Voice comms not available at this time.");
-		return DC_HANDLED;
-	}
-
-	std::string playerSideName = (playerSide == 1) ? "ALLIED" : "AXIS";
-
-	if(VoiceCommsOn)
-	{
-		VoiceCommsOn = false;
-		uiChatPrintLine("Voice communications OFF.");
-	}
-	else
-	{
-		uiChatPrintLine("Voice communications: ON.");
-		VoiceMgr * mgr1 = new VoiceMgr();
-		mgr = mgr1;
-		mgr -> start();
-		uiChatPrintLine("Joining channel: %s ...", playerSideName.c_str());
-		// Default to Voice Activated Detection (VAD)
-	}
-
-	return DC_HANDLED;
-}
-
-static int dot_voicechannel(const char* line)
-{
-	int chan = 0;
-	int argc = sscanf(line, "%*s %1d", &chan);
-	std::string chanName = (chan == 1) ? "ALLIED" : "AXIS";
-
-	int playerSide = wwiiSide(PlayerClient()->PersonaSelected().m_countryID);
-	int playerCountry = PlayerClient()->PersonaSelected().m_countryID;
-	std::string playerSideName = (playerSide == 1) ? "ALLIED" : "AXIS";
-
-	if((playerSide == 0) || (playerCountry == 0))
-	{
-		uiChatPrintLine("Voice comms not available at this time.");
-		return DC_HANDLED;
-	}
-
-
-	if(VoiceCommsOn)
-	{
-		uiChatPrintLine("You (%s) have requested to join channel: %s ...", playerSideName.c_str(), chanName.c_str());
-		if(chan == playerSide)
-		{
-			// Set up a RakVoice connection
-			// Set up a RakVoice channel
-			uiChatPrintLine("Joining channel: %s ...", chanName.c_str());
-			// Default to Voice Activated Detection (VAD)
-		}
-		else
-			uiChatPrintLine("You do not have permission to do that! (Side mismatch)");
-	}
-	else
-		uiChatPrintLine("You do not have permission to do that! (Voice comms currently OFF)");
-
-	return DC_HANDLED;
-
-}
-#endif //ENABLE_VOICE_COMMS
-
 static int dot_vcache(const char* line)
 {
 	UINT32 mode = gVCache;
@@ -7967,11 +7894,6 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(vcache, false);
 	ADD_DOT_COMMAND(vehprint, false);
 	ADD_DOT_COMMAND(benchinfantry, false);
-
-#if defined(ENABLE_VOICE_COMMS)
-	ADD_DOT_COMMAND(voice, false);
-	ADD_DOT_COMMAND(voicechannel, false);
-#endif
 
 #if RELEASE_CLIENT == 0
 	ADD_DOT_COMMAND(dev, false);
