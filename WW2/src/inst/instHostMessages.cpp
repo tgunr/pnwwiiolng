@@ -458,7 +458,7 @@ RecordPopulations()
 
 	// Use a ThreadTextQuery to batch up the inserts and then commit them
 	// in the background through a worker thread.
-	ThreadTextQuery query(DBThread::Audit, "INSERT INTO instance_populations VALUES","");
+	ThreadTextQuery query(DBThread::Audit, "INSERT IGNORE INTO instance_populations VALUES","");
 	char entry[128];
 	for ( auto it = g_hostInstanceUIDs.begin(); it != g_hostInstanceUIDs.end(); ++it )
 	{
