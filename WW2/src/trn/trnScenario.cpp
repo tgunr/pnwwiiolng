@@ -2846,6 +2846,7 @@ void TerrainScenario::LoadBuildings()
                     if(damage)
                     {
                         OBJECT* o = obmainFindTopmostObject(name.c_str());
+                        assert(o);
                         damageObject(o);
                     }
 
