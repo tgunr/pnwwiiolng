@@ -3836,19 +3836,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				OTHER_LDFLAGS = "-bind_at_load";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SYMROOT = proj/mac/build;
-				VALID_ARCHS = i386;
 			};
 			name = Release;
 		};
@@ -3893,19 +3881,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				OTHER_LDFLAGS = "-bind_at_load";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SYMROOT = proj/mac/build;
-				VALID_ARCHS = i386;
 			};
 			name = Debug;
 		};
@@ -3968,19 +3944,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				OTHER_LDFLAGS = "-bind_at_load";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SYMROOT = proj/mac/build;
-				VALID_ARCHS = i386;
 			};
 			name = Development;
 		};
@@ -4034,19 +3998,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				OTHER_LDFLAGS = "-bind_at_load";
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				SYMROOT = proj/mac/build;
-				VALID_ARCHS = i386;
 			};
 			name = GM;
 		};
