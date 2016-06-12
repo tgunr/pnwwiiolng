@@ -1073,7 +1073,8 @@ LOGICAL trnmainAddObject(SINT8* objname,
                          SINT32 sc,
 						 bool nonPlanarBase,
 						 const SDM_ObjInfo& objInfo,
-                         TERRAIN_DETAIL* terrainDetail)
+                         TERRAIN_DETAIL* terrainDetail,
+                         SINT8** objRefName)
 {
     extern void trnopSetSC(int sc);
 
@@ -1161,7 +1162,9 @@ LOGICAL trnmainAddObject(SINT8* objname,
 	sprintf(newname, "%s_%d_%d", newname, (int)pos->x, (int)pos->y);
     assert(strlen(newname) < sizeof(newobj->name) );
 	strcpy(newobj->name, newname);
+    *objRefName = newobj->name;
 
+    
 #ifdef TERRAIN_EDITOR
 	Write_Debug("Object renamed: %s", newname);
 #endif
@@ -1797,6 +1800,9 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 			{
 				trnldrReleaseSupercell(i);
+                
+                // this process can take a long time, make sure we are attending to the network.
+                teulUpdateTransport();
 			}
 		}
 

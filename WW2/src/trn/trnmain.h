@@ -40,6 +40,7 @@
 		TERRAIN_INFO	trinfo[MAX_TERRAIN_EDIT_LIST];	// used triangle information
 		SINT16			tobndx;							// object slot counter
 		SDM_ObjInfo		trnobj[MAX_TERRAIN_OCTETS * MAX_TRNOBJ_OCTET];	// objects in this super cell
+        SINT8*          trnobjRefs[MAX_TERRAIN_OCTETS * MAX_TRNOBJ_OCTET]; // references for quicker unload
 		UINT32*			toldflags;						// object loaded flags
 
 		// strat pointers
@@ -102,7 +103,8 @@
                              SINT32 sc,
 							 bool nonPlanarBase,
 							 const SDM_ObjInfo& objInfo,
-                             TERRAIN_DETAIL* td
+                             TERRAIN_DETAIL* td,
+                             SINT8** objRefName
                              );
 
 	extern LOGICAL trnmainSetObjectCreationCallback(TRN_OBJECT_NOTIFY callback);

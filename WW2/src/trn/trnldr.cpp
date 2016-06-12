@@ -607,8 +607,7 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 
 static LOGICAL ReleaseSupercellObjects(TERRAIN_DETAIL* td)
 {
-SINT32		i;//, place=0;
-SINT8		filename[_MAX_PATH];
+    SINT32		i;//, place=0;
 
 	if (td == nullptr)
 	{
@@ -619,25 +618,28 @@ SINT8		filename[_MAX_PATH];
 
 	for (i=0; i < td->tobndx; i++)
 	{
-	SCHAR*		ptr;
-	OBJECT*	lpobj;
+        OBJECT*	lpobj;
+        SCHAR*  pFn;
+        
+        if (td->trnobjRefs[i] != nullptr)
+        {
 
-		sprintf(filename, "%s_%d_%d", td->trnobj[i].objname, (int)td->trnobj[i].pos.x, (int)td->trnobj[i].pos.y);
+            pFn = td->trnobjRefs[i];
 
-		// strip off the directory subname
-		ptr = strrchr(filename,'\\');
-		if (ptr != nullptr)
-		{
-			strcpy(filename,++ptr);
-		}
-
-		lpobj = obmainFindTopmostObject(filename);
-		if (!trnldrReleaseTerrainObject(lpobj, td))
-		{
+            lpobj = obmainFindTopmostObject(pFn);
+            if (lpobj == nullptr)
+            {
+                dbugLog(_FLW, "Topmost object not found for %s.", td->trnobjRefs[i]);
+            
+            }
+            else if (!trnldrReleaseTerrainObject(lpobj, td))
+            {
 #if RELEASE_CLIENT == 0
-			//Write_Debug("ReleaseSupercellObjects for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
+                Write_Debug("ReleaseSupercellObjects for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
 #endif
-		}
+            }
+        }
+
 	}
 
     logTimerEndMacro();
@@ -679,7 +681,9 @@ TRNSTATEBLOCK*	tsb;
 		lpobj = obmainFindTopmostObject(filename);
 		if (!trnldrReleaseTerrainObject(lpobj, td))
 		{
+#if RELEASE_CLIENT == 0
 			Write_Debug("ReleaseSupercellObjectsSequenced for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
+#endif
 		}
 
 		return(FALSE);
@@ -2233,7 +2237,9 @@ static LOGICAL LoadObjects(SINT32 sc)
 								td->trnobj[i].ortdrg & 0xf,
                                 sc,
 								td->trnobj[i].flags & TRNOBJ_NON_PLANAR_BASE,
-                                td->trnobj[i],td))
+                                td->trnobj[i],
+                                td,
+                                &td->trnobjRefs[i]))
 			{
 				KillObject = TRUE;
 			}
@@ -2298,7 +2304,9 @@ static LOGICAL		trip;
 								td->trnobj[i].ortdrg & 0xf,
                                 sc,
 								td->trnobj[i].flags & TRNOBJ_NON_PLANAR_BASE,
-								td->trnobj[i],td))
+								td->trnobj[i],
+                                td,
+                                &td->trnobjRefs[i]))
 			{
 				KillObject = TRUE;
 			}
