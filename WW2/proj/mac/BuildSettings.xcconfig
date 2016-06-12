@@ -72,6 +72,11 @@ GCC_OPTIMIZATION_LEVEL_Release          = fast              // Optimize for size
 DEBUG_INFORMATION_FORMAT_Release        = dwarf-with-dsym   // Keep debugging information separate
 STRIP_INSTALLED_PRODUCT_Release         = YES               // Do strip the built binary
 
+// Settings for GM configuration - always identical to release but have to be specified explicitly due to Xcode limitations
+GCC_UNROLL_LOOPS_GM                     = $(GCC_UNROLL_LOOPS_Release)
+GCC_OPTIMIZATION_LEVEL_GM               = $(GCC_OPTIMIZATION_LEVEL_Release)
+DEBUG_INFORMATION_FORMAT_GM             = $(DEBUG_INFORMATION_FORMAT_Release)
+STRIP_INSTALLED_PRODUCT_GM              = $(STRIP_INSTALLED_PRODUCT_Release)
 
 // Gather the config-specific settings
 GCC_UNROLL_LOOPS = $(GCC_UNROLL_LOOPS_$(CONFIGURATION))
