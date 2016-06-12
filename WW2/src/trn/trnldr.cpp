@@ -638,6 +638,10 @@ static LOGICAL ReleaseSupercellObjects(TERRAIN_DETAIL* td)
                 Write_Debug("ReleaseSupercellObjects for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
 #endif
             }
+			else
+			{
+				td->trnobjRefs[i] = nullptr;
+			}
         }
 
 	}
