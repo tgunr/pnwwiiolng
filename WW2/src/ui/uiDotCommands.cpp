@@ -3980,33 +3980,6 @@ static SINT32 dot_tspawn(const char* input)
     if(!input || *input == 0)
         return DC_HANDLED;
 
-#if USE_SCENARIO_MAP
-    if(strstr(input, "-deletebuildings"))
-    {
-	if(!instances.empty())
-	{
-            omap::iterator itr = instances.begin();
-
-		    for(; itr != instances.end(); ++itr)
-			{
-				if((*itr)->modelInstance->GetModelType() != ModelTypes::TERRAIN_TILE)
-				{
-					trncdRemoveTerrainObject(*itr, 0, 0, 0, nullptr);
-					obpoolFreeObjectCallback(*itr);
-					remove.push_back(itr);
-				}
-		    }
-
-            for(unsigned int i = 0; i < remove.size(); i++)
-            {
-                instances.erase(remove[i]);
-            }
-
-            buildingobj = nullptr;
-		    trndtl[12].terrain->flag2 &= ~OBJECT_VISIBLE;
-	    }
-    }
-#else
 	if(!instances.empty())
 	{
         omap::iterator itr = instances.begin();
@@ -4020,7 +3993,6 @@ static SINT32 dot_tspawn(const char* input)
         buildingobj = nullptr;
 		trndtl[12].terrain->flag2 &= ~OBJECT_VISIBLE;
 	}
-#endif
 
     piVECTOR rotxyz;
     rotxyz.set(0, 0, 0);
@@ -4032,10 +4004,6 @@ static SINT32 dot_tspawn(const char* input)
     if(p)
     {
         fields = sscanf(p, "%*s %f %f %f", &rotxyz.x, &rotxyz.y, &rotxyz.z);
-
-#if USE_SCENARIO_MAP
-        std::swap(rotxyz.y, rotxyz.z);
-#endif
 
         rotxyz.x = DEG_TO_RAD(rotxyz.x);
         rotxyz.y = DEG_TO_RAD(rotxyz.y);
@@ -4052,20 +4020,6 @@ static SINT32 dot_tspawn(const char* input)
     if(p)
     {
         fields = sscanf(p, "%*s %f %f %f", &posxyz.x, &posxyz.y, &posxyz.z);
-
-#if USE_SCENARIO_MAP
-        std::swap(posxyz.y, posxyz.z);
-
-        colliderQuery::CollisionList collisions;
-        posxyz.z += 10.0f;
-
-        CollideDown(Vec3d(posxyz), collisions);
-
-        if(!collisions.empty())
-        {
-            posxyz.z = -collisions[0].pos.z();
-    }
-#endif
     }
 
     transform._41 = posxyz.x;
@@ -4079,9 +4033,7 @@ static SINT32 dot_tspawn(const char* input)
         return DC_HANDLED;
     }
 
-#if USE_SCENARIO_MAP
     Write_Debug("[%s] x = %f y = %f z = %f", model, posxyz.x, posxyz.y, posxyz.z);
-#endif
 
     std::string topmodel = model;
 
@@ -4092,7 +4044,6 @@ static SINT32 dot_tspawn(const char* input)
 		return DC_HANDLED;
 	}
 
-#if !(USE_SCENARIO_MAP)
     if(masterModel->modelType == ModelTypes::TERRAIN_TILE)
     {
         // Z fighting
@@ -4101,7 +4052,6 @@ static SINT32 dot_tspawn(const char* input)
         transform._43 -= 1.0f;
 #endif
     }
-#endif
 
     int sx, sy, r, c;
     persGetMySupercellAndOctet(sx, sy, r, c);

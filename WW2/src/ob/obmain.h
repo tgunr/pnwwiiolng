@@ -306,22 +306,6 @@ struct OBJECT
     float reflectiondist;
     float shadowdist;
 
-#if NEW_OBJECT_MEM
-    bool valid;
-#endif
-
-#if defined(NOT_USED_OBJECT_VARIABLES)
-	UINT16 numttris;		// Number of tesselation indices        REMOVE
-    piVECTOR acc;			// Change in movement speed
-    piVECTOR dir;			// Direction facing or moving
-    UINT32 gfxmodes;		// Graphics modes
-    int pmapid;			// Parent environment map texture id
-    const piQUAT* tangent;
-	DeprecatedDrawCallback userdraw;   // Callback for userdraw objects
-    UINT16 maxnumverts; // Hack for terrain loader changing numverts
-	piINDICES*			pttris;			// Tesselation indices                  REMOVE
-#endif
-
 	// TODO: Currently doubles up as a TerrainTile pointer...
     SINT32              soundID;        // Sound associated with this object.
 
