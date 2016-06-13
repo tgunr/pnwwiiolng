@@ -3,7 +3,7 @@
 #define USE_LENS_FLARE
 //#undef USE_LENS_FLARE
 
-#define RAIN_CLOUD_HEIGHT       800.0f // Approx height of vertices in the .FLT file
+#define RAIN_CLOUD_HEIGHT      2000.0f // Approx height of vertices in the .FLT file
 #define INTEROPLATE_DIST        500.0f // WAG
 #define START_SUNSHINE_HEIGHT   RAIN_CLOUD_HEIGHT + INTEROPLATE_DIST
 #define MIN_FOG_SCALE           1.0f//0.5f
