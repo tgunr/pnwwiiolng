@@ -2297,13 +2297,6 @@ void gr2PhysicsModel::UpdateBones2()
 	Matrixf transform;
 	Vec3d position;
 
-	static int hits = 0;
-
-	hits++;
-
-	if(hits == 2)
-		bool stop = true;
-
 	// reset each update so we always have the current count
 	_enabledBones = 0;
 

@@ -1964,26 +1964,6 @@ void locInitStrings(bool force)
 			xmlHashScan((xmlHashTablePtr)pDtd->entities, (xmlHashScanner)locProcessEntity, &_inputkeys);
 			xmlFreeDtd(pDtd);
 		}
-
-		/* see whats in the file
-		int fd = fioOpen(path.c_str());
-		if(fd > -1)
-		{
-			int size = fioFileSize(path.c_str());
-			if(size > 0)
-			{
-				char* buffer = new char[size+1];
-				buffer[size] = '\0';
-
-				if(fioRead(fd, buffer, size) == size)
-					bool stop = true;
-
-				delete [] buffer;
-			}
-
-			fioClose(fd);
-		}
-		*/
 	}
 
 	xmlCleanupInputCallbacks();

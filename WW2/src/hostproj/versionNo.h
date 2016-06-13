@@ -32,14 +32,7 @@
 # else	// TEST_RELEASE
 #  define PUBLIC_RELEASE
 # endif // TEST_RELEASE
-# ifndef APP_ID
-#  define APP_ID 12
-# endif
-#elif defined(DEBUG_BUILD) || defined(PUBLIC_RELEASE)
-# ifndef APP_ID
-#  define APP_ID 12
-# endif
-#else
+#elif ! (defined(DEBUG_BUILD) || defined(PUBLIC_RELEASE))
 # error "No build type defined"
 #endif
 
