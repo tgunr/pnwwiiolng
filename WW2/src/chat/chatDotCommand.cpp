@@ -185,20 +185,21 @@ DotCommand::setAvailability(char level)
 	break;
 
 	case 'C':
-	default:
-		// CRS only
-		if (level != 'C') {
-#ifdef DEBUG
-    		dbugLog(_FLF, "%s has unrecognized availability level %c, bailing out", command(), level);
-#else
-    		dbugLog(_FLA, "%s has unrecognized availability level %c", command(), level);
-#endif
-    	} else {
-    		dbugLog(_FLD, "%s restricted to CRS by permission" , command());
-    	}
+		dbugLog(_FLD, "%s restricted to CRS by permission" , command());
 		m_public = false;
 		m_playnetOnly = true;
-	break;
+		break;
+	default:
+#ifdef DEBUG
+		LogAbort("'%s' command has unrecognized availability level %c", command(), level);
+#else
+		dbugLog(_FLA, "'%s' command has unrecognized availability level %c", command(), level);
+#endif
+		// If we somehow deployed with an invalid command, at least mark it as Playnet-only
+		// to limit its potential use as much as possible.
+		m_public = false;
+		m_playnetOnly = true;
+		break;
 	}
 }
 
