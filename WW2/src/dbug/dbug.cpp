@@ -275,7 +275,7 @@ void DebugLogger::initialize(SINT32 logType_, Debug::ERROR_TYPE level_, SINT32 f
 	initialized = true;
 }
 
-#if AS_SERVER
+#if AS_SERVER && platOS != OS_WIN32
 static void
 _handleSIGUSR2(SINT32)
 {
@@ -301,7 +301,7 @@ _handleSIGUSR2(SINT32)
 }
 #endif
 
-#if AS_SERVER
+#if AS_SERVER && platOS != OS_WIN32
 
 #include <execinfo.h>
 
@@ -411,7 +411,7 @@ void dbugInit(SINT32 logType, const char* const filename)
 
 	_logger.initialize(logType, level, file, filename);
 
-#if AS_SERVER
+#if AS_SERVER && platOS != OS_WIN32
 	signal(SIGUSR2, _handleSIGUSR2);
 	signal(SIGPIPE, SIG_IGN);
 

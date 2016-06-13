@@ -195,7 +195,7 @@ _getHostIPAddresses()
 
 SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 {
-#if platBuild == TEUL_SERVER
+#if platBuild == TEUL_SERVER && platOS != OS_WIN32
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
