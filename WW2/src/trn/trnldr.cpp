@@ -654,7 +654,6 @@ static LOGICAL ReleaseSupercellObjects(TERRAIN_DETAIL* td)
 static LOGICAL ReleaseSupercellObjectsSequenced(SINT32 sc)
 {
 SINT32		i;
-SINT8		filename[_MAX_PATH];
 TERRAIN_DETAIL*	td;
 TRNSTATEBLOCK*	tsb;
 
@@ -670,24 +669,30 @@ TRNSTATEBLOCK*	tsb;
 
 	while (FindObjectsInOctetSCUnloading((UINT32*)&i, sc, (UINT32*)&tsb->varone, hyster, hysterFar ))
 	{
-	SCHAR*		ptr;
-	OBJECT*	lpobj;
+		OBJECT*	lpobj;
+		SCHAR*  pFn;
 
-		sprintf(filename, "%s_%d_%d", td->trnobj[i].objname, (int)td->trnobj[i].pos.x, (int)td->trnobj[i].pos.y);
-
-		// strip off the directory subname
-		ptr = strrchr(filename,'\\');
-		if (ptr != nullptr)
+		if (td->trnobjRefs[i] != nullptr)
 		{
-			strcpy(filename,++ptr);
-		}
 
-		lpobj = obmainFindTopmostObject(filename);
-		if (!trnldrReleaseTerrainObject(lpobj, td))
-		{
+			pFn = td->trnobjRefs[i];
+
+			lpobj = obmainFindTopmostObject(pFn);
+			if (lpobj == nullptr)
+			{
+				dbugLog(_FLW, "Topmost object not found for %s.", td->trnobjRefs[i]);
+
+			}
+			else if (!trnldrReleaseTerrainObject(lpobj, td))
+			{
 #if RELEASE_CLIENT == 0
-			Write_Debug("ReleaseSupercellObjectsSequenced for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
+				Write_Debug("ReleaseSupercellObjectsSequenced for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
 #endif
+			}
+			else
+			{
+				td->trnobjRefs[i] = nullptr;
+			}
 		}
 
 		return(FALSE);
