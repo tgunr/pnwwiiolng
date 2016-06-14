@@ -1340,6 +1340,16 @@ _StratMessageQue*	PrevStratMsg;
                 {
                     TO->LOD[i]->flag2 |= OBJECT_AIRRAIDSIREN;
                 }
+                else
+                {
+                  if (TO->ObjId.objClass == CLASS_FACILITY && TO->DamageLevel != FB_CLOSED_VISLEVEL &&
+                      (TO->ObjId.objType == FACILITY_ARMYBASE || 
+                       TO->ObjId.objType == FACILITY_NAVALBASE || 
+                       TO->ObjId.objType == FACILITY_AIRBASE))
+                  {
+                    TO->LOD[i]->flag2 |= OBJECT_AIRRAIDSIREN;
+                  }
+                }
 
 				TO->LODSavedMin[i] = Obj->minlod;
 				TO->LODSavedMax[i] = Obj->maxlod;
