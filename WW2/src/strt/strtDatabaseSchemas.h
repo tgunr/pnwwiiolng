@@ -185,7 +185,7 @@ static const char* revisions[] =
 ,	// Revision 15: Add weapon spec column to vehicle table so we don't have to keep calculating it.
 	//{
 		"ALTER TABLE `wwiionline`.`wwii_vehtype` ADD COLUMN `weapon_spec` INT(11) UNSIGNED DEFAULT NULL"
-	,	"UPDATE `wwiionline`.`wwii_vehtype` SET `weapon_spec` = wwii.f_weapon_spec(countryid, categoryid, classid, vehtype_oid)"
+	,	"UPDATE `wwiionline`.`wwii_vehtype` SET `weapon_spec` = wwii.f_weapon_spec(countryid, categoryid, classid, typeid)"
 	,	"ALTER TABLE `wwiionline`.`wwii_vehtype` MODIFY COLUMN `weapon_spec` INT(11) UNSIGNED NOT NULL"
 	,	"ALTER TABLE `wwiionline`.`wwii_vehtype` ADD INDEX `vt_os` (weapon_spec)"
 	,	nullptr

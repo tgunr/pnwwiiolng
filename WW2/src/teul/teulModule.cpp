@@ -202,7 +202,7 @@ SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	dbugWrite(_FLN,"intitializing teul module verion: %x",Teul::VersionString);
+	dbugWrite(_FLN, "intitializing teul module version: %s", Teul::VersionString);
 
 	extern void teulInitSend();
 	extern void teulInitModRecv();

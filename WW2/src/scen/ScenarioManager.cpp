@@ -4147,12 +4147,6 @@ void ScenarioManager::LoadObjects(UINT32 loadFlags)
 {
 	for(size_t i = 0; i < objects.size(); i++)
 	{
-        /*
-            TBD: This is currently a NOP, what was actually indended?  To call Stop()?
-		if(strcasecmp(objects[i]->name.c_str(), "riverrun") == 0)
-			bool stop = true;
-         */
-        
 		LoadObject(objects[i], loadFlags);
 	}
 

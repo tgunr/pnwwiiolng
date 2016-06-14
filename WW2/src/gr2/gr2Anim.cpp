@@ -9509,9 +9509,6 @@ void gr2AnimTwist::Calculate2(FLOAT64 delta, gr2AnimTrooper* model)
 				diff -= 360.0f;
 		}
 
-		if(diff)
-			bool stop = true;
-
 		absdiff = fabs(diff);
 
 		fpTPSMotionType lastMotion = model->currentMotion;

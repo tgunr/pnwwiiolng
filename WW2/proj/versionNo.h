@@ -5,6 +5,9 @@
 #define PN_WW2_VERSION_NO 35
 #define PN_WW2_PATCH_NO   2
 #define PN_WW2_BUILD_NO   255
+
+// Used in sysreg.cpp for retrieving info from the registry.
+#define PN_WW2_INSTALL_ID Auth::Apps::LIVE_APP_ID
 ////////// End of don't-reformat section
 
 // Because cpp(1) is painful

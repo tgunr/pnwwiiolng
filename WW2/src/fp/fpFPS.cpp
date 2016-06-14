@@ -5922,10 +5922,6 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 			collider.groundMisses		= 0;
 		}
 	}
-	else if(!SuperFloat)
-	{
-		bool stop = true;
-	}
 
 	// calculate which ppos we need to tell the host about
 	if(Online && _lastCheck != frametime && ppoHit != _ppoLastHit)
