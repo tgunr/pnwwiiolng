@@ -2327,7 +2327,7 @@ RDPInfo::Transcribe()
 		if ( firstCountry == false )
 			m_detail += ";  ";
 
-		sprintf(buf, "%s cycle %u at %u%%", _countryNameAdj[i], m_cycle[i], m_percent[i]);
+		strprintf(buf, "%s Tier %u at %u%%", _countryNameAdj[i], m_cycle[i], m_percent[i]);
 		m_detail += buf;
 		if ( factoryDamageFactor[i] == 0.0 )
 			m_detail += ", factories at full";
@@ -2335,7 +2335,7 @@ RDPInfo::Transcribe()
 			m_detail += ", factories disabled";
 		else
 		{
-			sprintf(buf, ", factories at %u%%", 100 - (UINT32)(factoryDamageFactor[i] * 100));
+			strprintf(buf, ", factories at %u%%", 100 - (UINT32)(factoryDamageFactor[i] * 100));
 			m_detail += buf;
 		}
 		double penalty = stratRDPSupplyPenalty((WWII_COUNTRY)i) - 1.0;
@@ -2344,7 +2344,7 @@ RDPInfo::Transcribe()
 			double percent = fabs(penalty * 100.0);
 			if ( percent < 0.01 )
 				percent = 0.01;
-			sprintf(buf, ", resupply %0.2g%% %s", percent, (penalty > 0 ? "slower" : "faster"));
+			strprintf(buf, ", resupply %0.2g%% %s", percent, (penalty > 0 ? "slower" : "faster"));
 			m_detail += buf;
 		}
 

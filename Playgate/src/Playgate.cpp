@@ -38,10 +38,13 @@ HANDLE		hLogonAttemptMutex;
 bool		g_tryLogonAttempt = false;
 
 std::wstring g_dataPath, g_exePath;
+std::wstring g_exeName = L"ww2.exe", g_exeParams;
 
 UINT32 g_gameAppID;
+#ifndef IGNORE_REGISTRY
 char g_registryKey[256]; // Where the registry values are located.
 wchar_t g_registryKeyW[256];
+#endif
 UINT32 g_playgateVersion;
 SINT32 g_arenaID, g_sessionID;
 
@@ -259,11 +262,30 @@ namespace {
 	class CommandLineParser : public CCommandLineInfo {
 	public:
 		virtual void ParseParam(LPCTSTR lpszParam, BOOL bFlag, BOOL bLast) {
-			// HACK: Assume only argument is auth server.
-			ASSERT ( bLast == true ) ;
-			// HACK: Just modify the existing global to changes to the overall
-			// program minimal for the time being.
-			sprintf_s(g_authHostName, 256, "%s", CT2A(lpszParam)) ;
+			// HACK: Not being particularly robust since only devs & GMs will ever use this.
+
+			std::wstring param(lpszParam);
+
+			std::wstring var(param.begin(), param.begin()+param.find_first_of('='));
+			std::wstring val(param.begin()+param.find_first_of('=')+1, param.end());
+
+			if ( var == L"authhost" )
+				sprintf_s(g_authHostName, 256, "%s", (const char*)CT2A(lpszParam)) ;
+			else if ( var == L"path" )
+				g_exePath = val;
+			else if ( var == L"data" )
+				g_dataPath = val;
+			else if ( var == L"game" )
+				g_exeName = val;
+			else if ( var == L"params" )
+				g_exeParams = val;
+			else {
+				std::wstring msg(L"Invalid parameter \'");
+				msg += lpszParam;
+				msg += L"\' passed into Playgate.";
+				MessageBox(nullptr, L"Invalid Parameters", msg.c_str(), MB_ICONEXCLAMATION | MB_OK);
+				exit(0);
+			}
 		}
 	} ;
 }
@@ -276,10 +298,12 @@ BOOL CPlaygateApp::InitInstance()
 	// OGS: First things first, determine what kind of client we are.
 	// If the version number ends in .255 we are appID 1, otherwise we're beta.
 	g_gameAppID = Auth::Apps::LIVE_APP_ID;
+#ifndef IGNORE_REGISTRY
 	if (strstr(STRVER, ".255") == nullptr)
 		g_gameAppID = Auth::Apps::BETA_APP_ID;
 	_snprintf(g_registryKey, 255, "Software\\Playnet\\apps\\appid%u\\instance1", g_gameAppID);
 	WWII::ConvertChars(g_registryKey, g_registryKeyW, sizeof(g_registryKeyW));
+#endif
 
 	LocInit();
 	

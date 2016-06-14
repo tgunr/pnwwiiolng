@@ -52,11 +52,6 @@ public:
 			if(it->second > 1)
 				possibles[it->first] = it->second;
 		}
-
-		if(!possibles.empty())
-		{
-			bool stop = true;
-		}
 	}
 };
 
