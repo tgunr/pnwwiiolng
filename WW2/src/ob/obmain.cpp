@@ -1045,25 +1045,16 @@ OBJECT* obmainGetNextTopmostObject(OBJECT* lpobj)
 	return lpobj->next;
 }
 
-OBJECT* obmainFindTopmostObject(const char* name)
-{
-	OBJECT*    lpobj;
+OBJECT* obmainFindTopmostObject(const char* name) {
+	for ( OBJECT* obj = topmostlist.next ; obj != nullptr ; obj = obj->next ) {
+		// This list should only contain top-most objects.
+		assert ( (obj->flag2 & OBJECT_TOPMOST) );
 
-	lpobj = (OBJECT*)topmostlist.next;
-	while (lpobj != nullptr)
-	{
-		// This list should only contain top most - abort if not
-		ABORT_IF( (lpobj->flag2 & OBJECT_TOPMOST) == 0 );
-
-		if (strcasecmp(lpobj->name, name) == 0)
-		{
-			break;
-		}
-
-		lpobj = (OBJECT*)lpobj->next;
+		if ( strcasecmp(obj->name, name) == 0 )
+			return obj;
 	}
 
-	return(lpobj);
+	return nullptr;
 }
 
 OBJECT* obmainGetFirstSubobject(OBJECT* lpmain)

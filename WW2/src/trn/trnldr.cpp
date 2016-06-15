@@ -605,100 +605,55 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 	return(TRUE);
 }
 
-static LOGICAL ReleaseSupercellObjects(TERRAIN_DETAIL* td)
-{
-	SINT32		i;//, place=0;
-
-	if (td == nullptr)
-	{
-		return(FALSE);
-	}
+static void ReleaseSupercellObjects(TERRAIN_DETAIL* td) {
+	if ( td == nullptr )
+		return
 
 	logTimerBeginMacro();
 
-	for (i=0; i < td->tobndx; i++)
-	{
-		OBJECT*	lpobj;
-		SCHAR*  pFn;
-        
-		if (td->trnobjRefs[i] != nullptr)
-		{
-
-			pFn = td->trnobjRefs[i];
-
-			lpobj = obmainFindTopmostObject(pFn);
-			if (lpobj == nullptr)
-			{
+	for ( int i = 0; i < td->tobndx; ++i ) {
+		if (td->trnobjRefs[i] != nullptr) {
+			OBJECT* lpobj = obmainFindTopmostObject(td->trnobjRefs[i]);
+			if ( lpobj == nullptr ) {
 				dbugLog(_FLW, "Topmost object not found for %s.", td->trnobjRefs[i]);
-            
+			} else if ( ! trnldrReleaseTerrainObject(lpobj, td) ) {
+				dbugLog(_FLW, "ReleaseSupercellObjects for supercell %d could not find object '%s' to remove.", td->terrain->trnum, td->trnobjRefs[i]);
 			}
-			else if (!trnldrReleaseTerrainObject(lpobj, td))
-			{
-#if RELEASE_CLIENT == 0
-				Write_Debug("ReleaseSupercellObjects for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
-#endif
-			}
-			else
-			{
-				td->trnobjRefs[i] = nullptr;
-			}
+			
+			td->trnobjRefs[i] = nullptr;
 		}
-
 	}
 
 	logTimerEndMacro();
-
-	return(TRUE);
 }
 
-static LOGICAL ReleaseSupercellObjectsSequenced(SINT32 sc)
-{
-	SINT32		i;
-	TERRAIN_DETAIL*	td;
-	TRNSTATEBLOCK*	tsb;
+static bool ReleaseSupercellObjectsSequenced(SINT32 sc) {
+	TERRAIN_DETAIL* td = &trndtl[sc];
+	TRNSTATEBLOCK* tsb = &td->trnstate;
 
-	td = &trndtl[sc];
-	tsb = &td->trnstate;
-
-	FLOAT32 horizon, hyster, hysterFar;
-
+	FLOAT32 horizon;
 	trnmainGetHorizon(&horizon);
-	hyster = horizon * 1.1f;	// Hysterisis
-	hyster *= hyster;			// To avoid sqrt
-	hysterFar = hyster * 10.0f;
 
-	while (FindObjectsInOctetSCUnloading((UINT32*)&i, sc, (UINT32*)&tsb->varone, hyster, hysterFar ))
-	{
-		OBJECT*	lpobj;
-		SCHAR*  pFn;
+	FLOAT32 hyster = horizon * 1.1f; // Hysterisis
+	hyster *= hyster;
+	FLOAT32 hysterFar = hyster * 10.0f;
 
-		if (td->trnobjRefs[i] != nullptr)
-		{
+	// Was originally a while loop that would return false after the first iteration?
+	UINT32 i;
+	if ( ! FindObjectsInOctetSCUnloading(&i, sc, (UINT32*)&tsb->varone, hyster, hysterFar) )
+		return true;
 
-			pFn = td->trnobjRefs[i];
-
-			lpobj = obmainFindTopmostObject(pFn);
-			if (lpobj == nullptr)
-			{
-				dbugLog(_FLW, "Topmost object not found for %s.", td->trnobjRefs[i]);
-
-			}
-			else if (!trnldrReleaseTerrainObject(lpobj, td))
-			{
-#if RELEASE_CLIENT == 0
-				Write_Debug("ReleaseSupercellObjectsSequenced for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
-#endif
-			}
-			else
-			{
-				td->trnobjRefs[i] = nullptr;
-			}
-		}
-
-		return(FALSE);
+	if ( td->trnobjRefs[i] != nullptr ) {
+		OBJECT* lpobj = obmainFindTopmostObject(td->trnobjRefs[i]);
+		if ( lpobj == nullptr )
+			dbugLog(_FLW, "Topmost object not found for %s.", td->trnobjRefs[i]);
+		else if ( ! trnldrReleaseTerrainObject(lpobj, td) )
+			dbugLog(_FLW, "ReleaseSupercellObjectsSequenced for supercell %d could not find object '%s' to remove.", td->terrain->trnum, td->trnobjRefs[i]);
+			
+		td->trnobjRefs[i] = nullptr;
 	}
 
-	return(TRUE);
+	return false;
 }
 
 LOGICAL trnldrLoadNormals(OBJECT* tt, short normals[SUPERCELL_SIZE_XY])

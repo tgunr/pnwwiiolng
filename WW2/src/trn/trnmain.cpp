@@ -1059,108 +1059,84 @@ static LOGICAL SetHeight(SINT16* retd, SINT32 d)
 }
 #endif
 
-LOGICAL trnmainAddObject(SINT8* objname,
-                         piVECTOR* pos,
-                         OBJECT* lpmain,
-						 SINT32 StratSuperCellX,
-                         SINT32 StratSuperCellY,
-                         UINT32 StratId,
-						 REL_OBJ_ID * ObjId,
-						 SINT32 drag,
-                         SINT32 roughness,
-                         SINT32 style,
-                         SINT32 orientation,
-                         SINT32 sc,
-						 bool nonPlanarBase,
-						 const SDM_ObjInfo& objInfo,
-                         TERRAIN_DETAIL* terrainDetail,
-                         SINT8** objRefName)
-{
-	extern void trnopSetSC(int sc);
+LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
+                         SINT32 StratSuperCellX, SINT32 StratSuperCellY, UINT32 StratId,
+                         REL_OBJ_ID * ObjId,
+                         SINT32 drag, SINT32 roughness,
+                         SINT32 style, SINT32 orientation, SINT32 sc, bool nonPlanarBase,
+                         const SDM_ObjInfo& objInfo, TERRAIN_DETAIL* terrainDetail,
+                         const char** objRefName) {
+	assert ( loading && ! roughness && ! style );
 
-	SINT8				newname[_MAX_PATH];
-	SINT8*				ptr;
-	piVECTOR			newatt;
-	OBJECT*				masterObj;
-	OBJECT*				newobj;
-
-	FLOAT64VECTOR	WorldOriginOffset;
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-
-	assert(loading && !roughness && !style);
-
+	char newname[_MAX_PATH];
 	lstrcpy(newname, TERRAIN_PREPATH);
 	lstrcpy(newname + sizeof(TERRAIN_PREPATH) - 1, objname);
 
 	PoolModel* poolModel = obmgrGetPoolModel(objInfo.objname);
-	assert(poolModel);
+	assert ( poolModel );
 
 	// Ticket# 4583. Set for correct DTL selection for tree placements
+	extern void trnopSetSC(int sc);
 	trnopSetSC(sc);
 
-	if(poolModel->IsStaticTerrainModel())
-	{
-		piMATRIX	worldTransform = objInfo.transform;
+	if ( poolModel->IsStaticTerrainModel() ) {
+		FLOAT64VECTOR WorldOriginOffset;
+		trnGetWorldOriginOffset(&WorldOriginOffset);
 
+		piMATRIX worldTransform = objInfo.transform;
 		worldTransform._41 -= (float)WorldOriginOffset.x;
 		worldTransform._42 -= (float)WorldOriginOffset.y;
 		worldTransform._43 -= (float)WorldOriginOffset.z;
 
 		obmgrCreateModelInstance(newname, worldTransform, true);
-	}
-	else if(!obmgrCreateModelInstance(newname))
-	{
-		return(FALSE);
+	} else if ( ! obmgrCreateModelInstance(newname) ) {
+		return FALSE;
 	}
 
-	ptr = strrchr(objname, '\\');
+	const char* ptr = strrchr(objname, '\\');
 	if (ptr != nullptr)
-	{
 		strcpy(newname, ++ptr);
-	}
 	else
 		strcpy(newname, objname);
 
+	OBJECT* masterObj, *newobj;
 	masterObj = newobj = obmainFindTopmostObject(newname);
 	assert(masterObj);
 
 	UINT32 flags = OBJECT_TERRAIN_OBJECT;
 
-	if(orientation != 0)
+	if ( orientation != 0 )
 		flags |= OBJECT_IS_ROTATED;
-	if(StratId != 0)
+	if ( StratId != 0 )
 		flags |= OBJECT_STRAT_OBJECT;
 
-	if (!obmainSetFlag2InObjectTree(newobj, flags))
-		return(FALSE);
+	if ( ! obmainSetFlag2InObjectTree(newobj, flags) )
+		return FALSE;
 
+	piVECTOR newatt;
 	newatt.x = newatt.y = 0.0f;
 	newatt.z = (FLOAT32)orientation * (PI * 0.25f);
 	newobj->att = newatt;
 
 	newobj->trnum = sc;
 
-	if(poolModel->IsStaticTerrainModel())
-	{
+	if ( poolModel->IsStaticTerrainModel() ) {
 		obmgrHandleSpecialObjects(newobj);
 
-		if(poolModel->hastrees)
+		if ( poolModel->hastrees )
 			trnopHandleSpeedTree(newobj->child);
 	}
 
-	if(!poolModel->IsStaticTerrainModel())
-	{
+	if ( ! poolModel->IsStaticTerrainModel() ) {
 		// translate the object to its new position
-		if (!trnopOrientSubobjects(newobj, pos, nonPlanarBase))
-		{
+		if ( ! trnopOrientSubobjects(newobj, pos, nonPlanarBase) ) {
 			obpoolFreeObjectCallback(newobj);
-
-			return(FALSE);
+			return FALSE;
 		}
 	}
 
 	sprintf(newname, "%s_%d_%d", newname, (int)pos->x, (int)pos->y);
-	assert(strlen(newname) < sizeof(newobj->name) );
+	assert ( strlen(newname) < sizeof(newobj->name) );
 	strcpy(newobj->name, newname);
 	*objRefName = newobj->name;
 
@@ -1169,10 +1145,9 @@ LOGICAL trnmainAddObject(SINT8* objname,
 #endif
 
 	// temporary hack for the terrain collision detection routines
-	//
 
 	// In trnmainAddObject
-	if (1)
+	//if (1)
 	{
 		trncdAddTerrainObject(newobj, StratSuperCellX, StratSuperCellY, StratId, ObjId);
 		TERRAIN_DETAIL* td = trnGetTerainDetail((SINT16)StratSuperCellX, (SINT16)StratSuperCellY);
@@ -1225,7 +1200,7 @@ LOGICAL trnmainAddObject(SINT8* objname,
 #endif
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 /*
