@@ -607,62 +607,62 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 
 static LOGICAL ReleaseSupercellObjects(TERRAIN_DETAIL* td)
 {
-    SINT32		i;//, place=0;
+	SINT32		i;//, place=0;
 
 	if (td == nullptr)
 	{
 		return(FALSE);
 	}
 
-    logTimerBeginMacro();
+	logTimerBeginMacro();
 
 	for (i=0; i < td->tobndx; i++)
 	{
-        OBJECT*	lpobj;
-        SCHAR*  pFn;
+		OBJECT*	lpobj;
+		SCHAR*  pFn;
         
-        if (td->trnobjRefs[i] != nullptr)
-        {
+		if (td->trnobjRefs[i] != nullptr)
+		{
 
-            pFn = td->trnobjRefs[i];
+			pFn = td->trnobjRefs[i];
 
-            lpobj = obmainFindTopmostObject(pFn);
-            if (lpobj == nullptr)
-            {
-                dbugLog(_FLW, "Topmost object not found for %s.", td->trnobjRefs[i]);
+			lpobj = obmainFindTopmostObject(pFn);
+			if (lpobj == nullptr)
+			{
+				dbugLog(_FLW, "Topmost object not found for %s.", td->trnobjRefs[i]);
             
-            }
-            else if (!trnldrReleaseTerrainObject(lpobj, td))
-            {
+			}
+			else if (!trnldrReleaseTerrainObject(lpobj, td))
+			{
 #if RELEASE_CLIENT == 0
-                Write_Debug("ReleaseSupercellObjects for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
+				Write_Debug("ReleaseSupercellObjects for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
 #endif
-            }
+			}
 			else
 			{
 				td->trnobjRefs[i] = nullptr;
 			}
-        }
+		}
 
 	}
 
-    logTimerEndMacro();
+	logTimerEndMacro();
 
 	return(TRUE);
 }
 
 static LOGICAL ReleaseSupercellObjectsSequenced(SINT32 sc)
 {
-SINT32		i;
-TERRAIN_DETAIL*	td;
-TRNSTATEBLOCK*	tsb;
+	SINT32		i;
+	TERRAIN_DETAIL*	td;
+	TRNSTATEBLOCK*	tsb;
 
 	td = &trndtl[sc];
 	tsb = &td->trnstate;
 
-    FLOAT32 horizon, hyster, hysterFar;
+	FLOAT32 horizon, hyster, hysterFar;
 
-    trnmainGetHorizon(&horizon);
+	trnmainGetHorizon(&horizon);
 	hyster = horizon * 1.1f;	// Hysterisis
 	hyster *= hyster;			// To avoid sqrt
 	hysterFar = hyster * 10.0f;

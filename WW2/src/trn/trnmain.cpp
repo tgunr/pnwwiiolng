@@ -1076,7 +1076,7 @@ LOGICAL trnmainAddObject(SINT8* objname,
                          TERRAIN_DETAIL* terrainDetail,
                          SINT8** objRefName)
 {
-    extern void trnopSetSC(int sc);
+	extern void trnopSetSC(int sc);
 
 	SINT8				newname[_MAX_PATH];
 	SINT8*				ptr;
@@ -1095,10 +1095,10 @@ LOGICAL trnmainAddObject(SINT8* objname,
 	PoolModel* poolModel = obmgrGetPoolModel(objInfo.objname);
 	assert(poolModel);
 
-    // Ticket# 4583. Set for correct DTL selection for tree placements
-    trnopSetSC(sc);
+	// Ticket# 4583. Set for correct DTL selection for tree placements
+	trnopSetSC(sc);
 
-    if(poolModel->IsStaticTerrainModel())
+	if(poolModel->IsStaticTerrainModel())
 	{
 		piMATRIX	worldTransform = objInfo.transform;
 
@@ -1124,15 +1124,15 @@ LOGICAL trnmainAddObject(SINT8* objname,
 	masterObj = newobj = obmainFindTopmostObject(newname);
 	assert(masterObj);
 
-    UINT32 flags = OBJECT_TERRAIN_OBJECT;
+	UINT32 flags = OBJECT_TERRAIN_OBJECT;
 
-    if(orientation != 0)
-        flags |= OBJECT_IS_ROTATED;
-    if(StratId != 0)
-        flags |= OBJECT_STRAT_OBJECT;
+	if(orientation != 0)
+		flags |= OBJECT_IS_ROTATED;
+	if(StratId != 0)
+		flags |= OBJECT_STRAT_OBJECT;
 
 	if (!obmainSetFlag2InObjectTree(newobj, flags))
-        return(FALSE);
+		return(FALSE);
 
 	newatt.x = newatt.y = 0.0f;
 	newatt.z = (FLOAT32)orientation * (PI * 0.25f);
@@ -1144,9 +1144,9 @@ LOGICAL trnmainAddObject(SINT8* objname,
 	{
 		obmgrHandleSpecialObjects(newobj);
 
-        if(poolModel->hastrees)
-            trnopHandleSpeedTree(newobj->child);
-    }
+		if(poolModel->hastrees)
+			trnopHandleSpeedTree(newobj->child);
+	}
 
 	if(!poolModel->IsStaticTerrainModel())
 	{
@@ -1160,11 +1160,10 @@ LOGICAL trnmainAddObject(SINT8* objname,
 	}
 
 	sprintf(newname, "%s_%d_%d", newname, (int)pos->x, (int)pos->y);
-    assert(strlen(newname) < sizeof(newobj->name) );
+	assert(strlen(newname) < sizeof(newobj->name) );
 	strcpy(newobj->name, newname);
-    *objRefName = newobj->name;
+	*objRefName = newobj->name;
 
-    
 #ifdef TERRAIN_EDITOR
 	Write_Debug("Object renamed: %s", newname);
 #endif
@@ -1800,9 +1799,9 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 			{
 				trnldrReleaseSupercell(i);
-                
-                // this process can take a long time, make sure we are attending to the network.
-                teulUpdateTransport();
+				// This process can take a long time, so attend to the network so the host
+				// doesn't think we've lost connection.
+				teulUpdateTransport();
 			}
 		}
 
