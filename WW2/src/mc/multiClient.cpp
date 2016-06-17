@@ -1168,7 +1168,7 @@ static int visbit_cmd(int argc, char* argv[])
 
 static int kill_cmd(int argc, char* argv[])
 {
-	multiClientKill();
+	multiClientKill(false);
 	return 1;
 }
 

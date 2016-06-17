@@ -428,6 +428,7 @@
 		0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A308578C460027461D /* libHIDUtilities.a */; };
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
 		47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B0ED240E9A66A40089DCC4 /* libteulKit.a */; };
+		75B0CAD51D13A668009FDE5C /* multiClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 75B0CAD21D13A668009FDE5C /* multiClient.cpp */; };
 		E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96991C6D729D00D5EC52 /* WebKit.framework */; };
 		E9320E991C95FC2C003E8048 /* local2.tkt in Resources */ = {isa = PBXBuildFile; fileRef = E9320E971C95FC2C003E8048 /* local2.tkt */; };
 		E9320E9A1C95FC2C003E8048 /* local.tkt in Resources */ = {isa = PBXBuildFile; fileRef = E9320E981C95FC2C003E8048 /* local.tkt */; };
@@ -1423,6 +1424,9 @@
 		0DDF00A308578C460027461D /* libHIDUtilities.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHIDUtilities.a; path = lib/mac/libHIDUtilities.a; sourceTree = SOURCE_ROOT; };
 		0DDF00A508578C460027461D /* libjs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjs.a; path = lib/mac/libjs.a; sourceTree = SOURCE_ROOT; };
 		47B0ED240E9A66A40089DCC4 /* libteulKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libteulKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		75B0CAD21D13A668009FDE5C /* multiClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = multiClient.cpp; sourceTree = "<group>"; };
+		75B0CAD31D13A668009FDE5C /* multiClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multiClient.h; sourceTree = "<group>"; };
+		75B0CAD41D13A668009FDE5C /* multiClientHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multiClientHelp.h; sourceTree = "<group>"; };
 		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
 		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
@@ -2910,6 +2914,7 @@
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				75B0CAD11D13A668009FDE5C /* mc */,
 				0834F1D1104586AA00E75B52 /* versionNo.h */,
 				E97C763D1C85146A00875F44 /* event */,
 				08E5E55513E855A100A5034D /* ez */,
@@ -3052,6 +3057,16 @@
 				089FB52614194F2200EBEB5F /* Carbon.framework */,
 			);
 			name = lib;
+			sourceTree = "<group>";
+		};
+		75B0CAD11D13A668009FDE5C /* mc */ = {
+			isa = PBXGroup;
+			children = (
+				75B0CAD21D13A668009FDE5C /* multiClient.cpp */,
+				75B0CAD31D13A668009FDE5C /* multiClient.h */,
+				75B0CAD41D13A668009FDE5C /* multiClientHelp.h */,
+			);
+			path = mc;
 			sourceTree = "<group>";
 		};
 		E9320E961C95FBEB003E8048 /* Test */ = {
@@ -3485,6 +3500,7 @@
 				08104915103DD0320065E0E2 /* fpTPSdata.cpp in Sources */,
 				08104916103DD0320065E0E2 /* fpTPSPhysics.cpp in Sources */,
 				0810494A103DD0AF0065E0E2 /* DataFx.cpp in Sources */,
+				75B0CAD51D13A668009FDE5C /* multiClient.cpp in Sources */,
 				0810494B103DD0AF0065E0E2 /* EmitterMgr.cpp in Sources */,
 				0810494C103DD0AF0065E0E2 /* fxAmb.cpp in Sources */,
 				0810494E103DD0AF0065E0E2 /* fxBlt.cpp in Sources */,
