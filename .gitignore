@@ -1633,3 +1633,8 @@ WW2Archives
 base64
 depend
 libb64.a
+WW2/binaries
+CMakeFiles
+*.cmake
+Makefile
+compile_commands.json
