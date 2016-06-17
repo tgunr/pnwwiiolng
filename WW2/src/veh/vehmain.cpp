@@ -7027,9 +7027,9 @@ std::string& vehVehiclesGameInfo()
 			++numVehiclesDisplayed;
 		}
 
-		char buffer[255+1];
+		char buffer[256] = {0};
 
-		snprintf(buffer, 255, "Vehicles: %u of %u  Received: %u of %u  Possible: %u\n",
+		strprintf(buffer, "Vehicles: %u of %u  Received: %u of %zu  Possible: %u\n",
 			numVehiclesDisplayed,
 			maxVehiclesDisplayed,
 			numVehiclesWorldUpdate,

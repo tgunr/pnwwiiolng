@@ -1923,7 +1923,7 @@ static SINT32 dot_allinf(const char*)
 
 		for(int t = 0; t < tcount; t++)
 		{
-			sprintf(buffer, "vspawn %s%s %d %d 0", country, troops[t], x, y);
+			strprintf(buffer, "vspawn %s%s %d %d 0", country, troops[t], x, y);
 			dot_vspawn(buffer);
 
 			x += offset;
@@ -1937,7 +1937,7 @@ static SINT32 dot_allinf(const char*)
 			// chute version
 			if(paras[t])
 			{
-				sprintf(buffer, "vspawn %s%s %d %d 0", country, paras[t], x, y);
+				strprintf(buffer, "vspawn %s%s %d %d 0", country, paras[t], x, y);
 				dot_vspawn(buffer);
 			}
 
@@ -1952,7 +1952,7 @@ static SINT32 dot_allinf(const char*)
 			// no chute version
 			if(paras[t])
 			{
-				sprintf(buffer, "vspawn %s%s %d %d 0 altmodel", country, paras[t], x, y);
+				strprintf(buffer, "vspawn %s%s %d %d 0 altmodel", country, paras[t], x, y);
 				dot_vspawn(buffer);
 			}
 

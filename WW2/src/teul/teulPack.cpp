@@ -21,7 +21,7 @@ static size_t _packBytes(size_t offset, UCHAR* const buffer, UCHAR* const value,
 	if (significantBytes < 1)
 	{
 		if (significantBytes != 0) {
-			dbugWrite(_FLA, "invalid significantBytes = %d\n", significantBytes);
+			dbugWrite(_FLA, "invalid significantBytes = %zu\n", significantBytes);
 			return (size_t)-EINVAL;
 		}
 		return offset;
