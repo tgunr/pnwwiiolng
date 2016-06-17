@@ -30,6 +30,7 @@ WW2_DEFINES_Common_02       = $(WW2_DEFINES_Common_03) xGENICONS=1              
 WW2_DEFINES_Common_01       = $(WW2_DEFINES_Common_02) xSPATIAL_DB                  // DON'T enable spatial database, whatever that is
 
 // Local flags, subset of debug
+WW2_DEFINES_Local_02        = $(WW2_DEFINES_Local_03) MULTI_CLIENT
 WW2_DEFINES_Local_01        = $(WW2_DEFINES_Local_02) AIMING_WEAPONS
 
 // Debug flags common to development and debug; debug is always a subset of dev
