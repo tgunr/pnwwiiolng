@@ -1,5 +1,6 @@
 #include <syscfg.h> // Path is project specific.
 
+#include "cfg/cfgPrefs.h"
 #include "chat/chatBrigadeControl.h"
 #include "chat/chatClientMessages.h"
 #include "chat/chatDefines.h"
@@ -99,6 +100,7 @@
 #include "weap/weapammo.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiServerTrackedObject.h"
+#include "mc/multiclient.h"
 
 extern void clientErrorLog(const char* const format, ...);
 namespace Chat { extern HostCommands g_hostDotCommands; }
@@ -412,7 +414,6 @@ static SINT32 dot_help(const wchar_t* line)
 	return result;
 }
 
-#ifdef MULTI_CLIENT
 // multi client command is a public release command via this project because we
 // want to run it with as much speed as possible; think of it as a buzzard client
 
@@ -425,12 +426,10 @@ static SINT32 dot_mc(const wchar_t* line)
 	const wchar_t* ptr = line + 3;
 
 	// run the command
-	multiClientExecuteCommand((char*)UTF8(ptr), true);
+	multiClientExecuteCommand((char*)UTF8(ptr));
 
 	return DC_HANDLED;
 }
-
-#endif
 
 /************************************************************************************************
 	ConvergenceCmd
@@ -460,8 +459,8 @@ static SINT32 dot_conv(const wchar_t* line)
 
 	if(argc > 0)
 	{
-		if(range > 800)
-			range = 800;
+		if(range > 1500)
+			range = 1500;
 		else if(range < 100)
 			range = 100;
 
@@ -502,13 +501,6 @@ static SINT32 dot_conv(const wchar_t* line)
 	{
 		if(vtype && vtype->Type == VEH_TYPE_AIR)
 		{
-			// Build setting name unique to vehicle ID"
-			UINT16 key = vtype->WeaponSpec.asUINT16();
-
-			char buff[256] = {'\0'};
-			sprintf(buff, "convergence.%d", (SINT32)key);
-
-			SINT32 range = cfgPrefsGetInt(buff, (SINT32)Convergence);
 
 			uiChatPrintLine("%s %s %dm.",(const char*)vtype->Description, uiLocString("dotcom.conv.currentlyset").c_str(), range);
 		}
@@ -7932,9 +7924,7 @@ void uiDotCommandsInit()
 
 	// public dot commands
 	ADD_DOT_COMMAND(help, false);
-#ifdef MULTI_CLIENT
 	ADD_DOT_COMMAND(mc, false);
-#endif
 	ADD_DOT_COMMAND(conv, false);
 	ADD_DOT_COMMAND(emote, false);
 	ADD_DOT_COMMAND(em, false);
