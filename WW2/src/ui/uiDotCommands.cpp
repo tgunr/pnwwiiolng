@@ -414,6 +414,7 @@ static SINT32 dot_help(const wchar_t* line)
 	return result;
 }
 
+#ifdef MULTI_CLIENT
 // multi client command is a public release command via this project because we
 // want to run it with as much speed as possible; think of it as a buzzard client
 
@@ -430,6 +431,7 @@ static SINT32 dot_mc(const wchar_t* line)
 
 	return DC_HANDLED;
 }
+#endif
 
 /************************************************************************************************
 	ConvergenceCmd
@@ -7924,7 +7926,9 @@ void uiDotCommandsInit()
 
 	// public dot commands
 	ADD_DOT_COMMAND(help, false);
+#ifdef MULTI_CLIENT
 	ADD_DOT_COMMAND(mc, false);
+#endif
 	ADD_DOT_COMMAND(conv, false);
 	ADD_DOT_COMMAND(emote, false);
 	ADD_DOT_COMMAND(em, false);
