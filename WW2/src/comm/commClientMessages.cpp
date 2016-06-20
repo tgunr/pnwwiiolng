@@ -190,7 +190,7 @@ static SINT32 _recvWorldUpdate( ACTION_OBJECT* const a )
 	if(Online)
 	{
 #endif
-	dbugWrite(_FLWS, "index: %d time: %llu", a->teulIndex, teulClock64);
+//	dbugWrite(_FLWS, "index: %d time: %llu", a->teulIndex, teulClock64);
 	a->offset = commRecvWorldUpdateData(a->teulIndex, a->packed, a->offset, a->sizeInBytes());
 #ifdef MULTI_CLIENT
 	}

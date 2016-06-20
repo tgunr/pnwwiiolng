@@ -154,7 +154,7 @@ teulAllocSystemCallback(Teul::CallbackInit* const ci)
 void
 TEUL_CALLBACK::Release()
 {
-	dbugLog(_FLI, "cb:%u,%u freeing callback", callX(), callY());
+//	dbugLog(_FLI, "cb:%u,%u freeing callback", callX(), callY());
 
 	memFree(this);
 	s_callbackArray[callX()][callY()] = nullptr;
@@ -210,7 +210,7 @@ _doAction(ENDPOINT& endpoint
 
 	TIMER_STOP("doact:start")
 
-	dbugLog(_FLD, "t:%d executing callback x:%d(%s) y:%d(%s) size:%d", endpoint.teulIndex(), callback.callX(), callback.callXName(), callback.callY(), callback.callYName(), dataSize_bytes);
+//	dbugLog(_FLD, "t:%d executing callback x:%d(%s) y:%d(%s) size:%d", endpoint.teulIndex(), callback.callX(), callback.callXName(), callback.callY(), callback.callYName(), dataSize_bytes);
 
 	TIMER_START
 	const SINT32 retval = callback.recvAction()(&actionObj);

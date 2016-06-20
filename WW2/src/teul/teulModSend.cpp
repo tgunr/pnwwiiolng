@@ -65,7 +65,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 		return -ETEUL_CB_CONN_DEAD;
 	}
 
-	dbugLog(_FLD, "t:%d sending callback x:%d(%s) y:%d(%s)", endpoint.teulIndex(), callback.callX(), callback.callXName(), callback.callY(), callback.callYName());
+//	dbugLog(_FLD, "t:%d sending callback x:%d(%s) y:%d(%s)", endpoint.teulIndex(), callback.callX(), callback.callXName(), callback.callY(), callback.callYName());
 	
 	if ( PN_UNLIKELY(callback.m_sendAction == nullptr) )
 	{
