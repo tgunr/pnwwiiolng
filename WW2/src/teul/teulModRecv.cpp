@@ -397,7 +397,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET " (li:%llu)"
 					, endpoint.teulIndex()
 					, remoteIP, newEndpoint->fromPort()
-					, localIP, newEndpoint->localAddress()
+					, localIP, newEndpoint->localPort()
 					, newEndpoint->teulIndex()
 					, PRA_SOCKET(newSock)
 					, (teulClock64 - _lastIdle)
