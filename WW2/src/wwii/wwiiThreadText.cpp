@@ -108,7 +108,7 @@ ThreadTextQuery::addEntry(const char* const entry)
 
 	// Are we about to fill the buffer?
 	size_t len = strlen(entry);
-	if ( noRoomFor(len) )
+	if ( noRoomFor(len + 1) ) // Account for separator
 	{
 		// No space in the buffer for this many bytes,
 		// so commit immediately.
@@ -118,7 +118,7 @@ ThreadTextQuery::addEntry(const char* const entry)
 	if ( m_length == 0 )
 	{
 		// No current buffer, allocate one and copy the prefix into it.
-		m_length = strlcpy(m_statement, m_prefix, TEXT_POOL_SIZE - 1);
+		m_length = strlcpy(m_statement, m_prefix, sizeof(m_statement));
 		m_commitFrom = teulClock64;
 	}
 	else
@@ -127,12 +127,15 @@ ThreadTextQuery::addEntry(const char* const entry)
 		m_statement[m_length++] = separator();
 	}
 
-	if ( noRoomFor(len) )
+	if ( noRoomFor(len) ) {
+		dbugLog(_FLF, "Data too long for ThreadTextQuery - need %zu bytes to add entry %s, but buffer length %zu has only %zu available (current string is %s)", len, entry,
+sizeof(m_statement), roomLeft(), m_statement);
 		throw std::domain_error("Data too long for ThreadTextQuery");
+    }
 
 	// Copy the data over, no need to worry about buffer size because
 	// we've already validated that it fits.
-	strcpy(m_statement + m_length, entry);
+	strlcpy(m_statement + m_length, entry, sizeof(m_statement)); // And yet, we do the safe thing anyway, because, you know, safety?
 
 	m_length += len;
 }
