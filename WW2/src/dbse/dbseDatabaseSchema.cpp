@@ -6,13 +6,17 @@
 namespace DB
 {
 
+#if 0
 static const char* const SchemaTable = "schema_info";
 static const char* const SchemaVersion = "version_no";
+#endif
 
 Schema::Schema(DBHANDLE& dbh_, const char* const database_)
+#if 0
 	: m_dbh(dbh_)
 	, m_database(database_)
 	, m_schemaVersion(0)
+#endif
 {
 }
 

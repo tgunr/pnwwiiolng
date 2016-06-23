@@ -476,7 +476,7 @@ chatRequestSquad(UINT32 squadID, Player* player)
 	if ( entry == nullptr ) entry = list.find(player->matchHandle());
 	if ( entry == nullptr )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s sq:%u unable to find this player in his squad", player->teulIndex(), player->playerID(), player->callsign(), squadID);
+		dbugLog(_FLA, "t:%d p:%u c:%s sq:%u unable to find this player in their squad", player->teulIndex(), player->playerID(), player->callsign(), squadID);
 		// Squad may not have finished loading yet.
 		return;
 	}

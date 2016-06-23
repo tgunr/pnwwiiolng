@@ -13,7 +13,6 @@ typedef UINT32 DWORD;
 
 // TODO: Why are there so many different names for this?
 #define stricmp strcasecmp
-#define _stricmp strcasecmp
 #define strcmpi strcasecmp
 #define strnicmp strncasecmp
 

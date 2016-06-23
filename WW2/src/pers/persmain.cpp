@@ -5029,13 +5029,13 @@ UINT32 _DoGroundResupplyCheck(void)
 
 	// is the resupply vehicle valid
 	if(!VehicleResupplier ||																		// we don't have a resupplier available
-	  (!confirmedValid &&																			// we didn't get him directly from the list
-	  (!vehValid(VehicleResupplier) ||																// he's not a valid vehicle anymore
-	   !_IsValidResupplyVehicle(_Persona.VehicleAttached, VehicleResupplier, &supplierPos))))		// he's not a valid resupplier
+	  (!confirmedValid &&																			// we didn't get them directly from the list
+	  (!vehValid(VehicleResupplier) ||																// they're not a valid vehicle anymore
+	   !_IsValidResupplyVehicle(_Persona.VehicleAttached, VehicleResupplier, &supplierPos))))		// they're not a valid resupplier
 	{
 		if(!STOResupplier)
 		{
-			// we did have a resupplier, but he's no longer valid
+			// we did have a resupplier, but they're no longer valid
 			// so we prevent resupplier for a while
 			if(VehicleResupplier)
 				_resupplyBreak = frametime + _resupplyPause;
@@ -5145,7 +5145,7 @@ UINT32 _DoStaticResupplyCheck(void)
 	// is the resupply building valid
 	if(!CurrentResupplier || !_IsValidResupplyBuilding(CurrentResupplier))
 	{
-		// we did have a resupplier, but he's no longer valid
+		// we did have a resupplier, but they're no longer valid
 		// so we prevent resupplier for a while
 		if(CurrentResupplier)
 			_resupplyBreak = frametime + _resupplyPause;
@@ -5306,10 +5306,10 @@ LOGICAL _IsValidResupplyVehicle(const vehVehicle* player, const vehVehicle* resu
 	{
 		// we have a possible resupply truck
 
-		// first lets make sure he hasn't fired for at least resupply tick time
+		// first lets make sure they haven't fired for at least resupply tick time
 		if(frametime > (resupplier->LastFireTime + _resupplyTick))
 		{
-			// lets check to see if he's close enough
+			// lets check to see if they're close enough
 			FLOAT64VECTOR vecDistance, vecPersona;
 
 			vecPersona.x = _Persona.VehicleAttached->ModelData->VehiclePos.x;
@@ -5325,18 +5325,18 @@ LOGICAL _IsValidResupplyVehicle(const vehVehicle* player, const vehVehicle* resu
 			{
 				if(player->RideVehicleHostIndex && player->RideVehicleHostIndex == resupplier->VehicleHostIndex)
 				{
-					// we're riding this resupply truck, ignore his motion
+					// we're riding this resupply truck, ignore their motion
 					return 1;
 				}
 				else
 				{
-					// lets check his velocity; must be zero
+					// lets check their velocity; must be zero
 					const FLOAT64VECTOR& vehVelocity = resupplier->PosData.Vel;
 					if(mathExactVectorLength(&vehVelocity) < .5f)
 					{
-						// let's make sure he hasn't moved
+						// let's make sure they haven't moved
 						if(!POS_VALID(*lastPos) || !POS_MOVED(*lastPos, resupplier->PosData.Pos))
-							return 1; // he isn't moving, hasn't fire or moved and is close enough, good supplier
+							return 1; // they aren't moving, haven't fire or moved, and are close enough, good supplier
 					}
 				}
 			}
@@ -5437,7 +5437,7 @@ LOGICAL _IsValidResupplyBuilding(StratDB::StratObject* resupplier)
 
 	// ok, lets check our distance to it
 
-	// lets check to see if he's close enough
+	// lets check to see if they're close enough
 	FLOAT64VECTOR vecDistance, resupplyPos;
 	FLOAT64 radius = 0;
 

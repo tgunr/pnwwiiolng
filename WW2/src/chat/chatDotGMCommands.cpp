@@ -651,15 +651,6 @@ public:
 			return;
 		}
 
-		if ( strcasecmp(args[0], "kfs1") == 0 )
-		{
-			if ( (rand() & 1) == 0 )
-				player.message(LSTR_ERROR, LSTR_GENERIC, "KFS1 isn't lost.");
-			else
-				player.message(LSTR_ERROR, LSTR_GENERIC, "No need, I already know exactly where he is. If you need to know, I'll send you a message.");
-			return;
-		}
-
 		// Locate the user
 		Player* subject = PlayerInterface::Lookup(args[0]);
 
@@ -872,13 +863,13 @@ public:
 		// I want to know if the sender is currently afk'd
 		target->notifyOtherIfAFK(player);
 
-		// Mark the user as grabbed by me and me as in communication with him
+		// Mark the user as grabbed by me and me as in communication with them
 		player.grab(target);
 
 		// Tell me that we were successful
 		player.message(LSTR_NOTE, LSTR_HAVE_GRABBED, target->callsign(), nullptr);
 
-		// Now let the subject know what is happening to him
+		// Now let the subject know what is happening to them
 		const char* grabber = player.callsign();
 
 #ifdef PUBLIC_RELEASE

@@ -78,14 +78,6 @@ typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 # define usleep(n) Sleep((n))
 #endif
 
-#if _MSC_VER >= 1500
-// Visual Studio 9
-#else
-#ifndef vsnprintf
-#define vsnprintf _vsnprintf
-#endif
-#endif // _MSC_VER >= 1500
-
 #ifndef strcasecmp
 #define strcasecmp _stricmp
 #endif

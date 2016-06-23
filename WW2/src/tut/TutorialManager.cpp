@@ -215,7 +215,7 @@ void TutorialManager::Update()
 	}
 
 	// go through and kill all handlers that have been flagged to be killed
-	// they are flagged when called; its up to he script to re-add it if needed
+	// they are flagged when called; its up to the script to re-add it if needed
 	if(!_garbage.empty())
 	{
 		for(int i = 0; i < (int)_garbage.size(); i++)

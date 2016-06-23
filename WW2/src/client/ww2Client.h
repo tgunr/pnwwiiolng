@@ -417,9 +417,9 @@ enum MSG_WAIT
 ,	CHAT_CONNECTION_WAIT
 ,	CELL_CONNECTION_WAIT
 
-// ^-- Insert stuff up here, idiot --^
+// ^-- Insert stuff up here --^
 ,	MAX_MSG_WAIT
-// X-- No, don't insert stuff down here, Salad. --X //
+// X-- No, don't insert stuff down here. --X //
 };
 
 	int WaitForMessage(MSG_WAIT msg, int timeout);

@@ -137,7 +137,7 @@ public:
 												// automatically displaced from leadership
 
 	UINT32			m_leaderLockFrom;			// When a leader performs an action
-	UINT32			m_leaderLockFor;			// (contact report, orders) he's safe
+	UINT32			m_leaderLockFor;			// (contact report, orders) they're safe
 												// aproximately until from+for
 	mutable UINT32	m_leaderDisplaced;			// When previous leader was displaced
 

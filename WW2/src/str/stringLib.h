@@ -11,8 +11,6 @@
 
 #if platOS == OS_LINUX
 #define __USE_GNU 1
-#else
-#define USE_LOCAL_STRNLEN
 #endif
 
 #if platOS == OS_WIN32 && !defined(strcasecmp)
@@ -27,12 +25,10 @@
 #endif
 
 #ifndef WIN32
-# define _strlwr(n) strlwr((n))
-# define _strupr(n) strupr((n))
-# ifndef _stricmp
-#  define _stricmp(x,y) stricmp(x,y)
-# endif
-# define _strnicmp(x,y,len) strnicmp(x,y,len)
+# define _strlwr(n) strlwr(n)
+# define _strupr(n) strupr(n)
+# define _stricmp(x,y) strcasecmp(x,y)
+# define _strnicmp(x,y,len) strncasecmp(x,y,len)
 #else
 # define strlwr(n) _strlwr(n)
 # define strupr(n) _strupr(n)

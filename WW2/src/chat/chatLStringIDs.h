@@ -326,7 +326,7 @@ enum LSTRING_ID
 ,	LSTR_RECRUITER_UNAVAILABLE		// Your recruiter '%s' is no-longer available/logged out
 ,	LSTR_SQUAD_RECRUITED_BY_RECRUITER	// {recruit} has been recruited to your squad by {recruiter}!
 ,	LSTR_SQUAD_REMOVED_LAPSED		// Your membership of '%s' has expired (you were not promoted)
-,	LSTR_SQUAD_RECRUIT_LAPSED		// '%s' has been removed from the squad because he was not promoted
+,	LSTR_SQUAD_RECRUIT_LAPSED		// '%s' has been removed from the squad because they were not promoted
 ,	LSTR_TAKELEAD_USAGE, LSTR_TAKELEAD_DETAIL
 ,	LSTR_ALREADY_LEADER				// You are already mission leader.
 ,	LSTR_NO_AFK_TAKELEAD			// You can't takelead while you are AFK

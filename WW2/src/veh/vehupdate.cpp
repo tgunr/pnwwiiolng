@@ -825,7 +825,9 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 			// Send them our teulClock64
 			teulSyncClock();
 			cub.size = teulPackUINT64(TEUL_PACK, cub.data, cub.size, &teulClock64, 0);
-			teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub);
+            if (Online) { // wait until here to check this in case all that junk above actually does something to game state
+                teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub);
+            }
 		}
 	}
 	else
@@ -2118,7 +2120,7 @@ SINT32			RecoilNum = 0;
 	{
 		for (i=0;i<VEH_MAX_MOUNTS;i++)
 		{
-			// ghost fire can only occur for player's vehicle if he doesn't control that position
+			// ghost fire can only occur for player's vehicle if they don't control that position
 			if (Vehicle->ModelData != nullptr)
 			{
 				if (!(Vehicle->ModelData->FireMask & (1 << i)))

@@ -279,7 +279,7 @@ struct FPSProneCollider : public FPSCollider
 
 // flagged to true if we determined that we ran into an enemy vehicle
 // if it's true, fpMain will call mlDetermineInfantryCollisions again
-// and kill the trooper if he's inside of an enemy vehicle after movement is complete
+// and kill the trooper if they're inside of an enemy vehicle after movement is complete
 static UINT32				vehicleCollideCheckNeeded;
 #ifdef STOP_FIRING_INSIDE
 static UINT32				fpsHitVehicleThisFrame;
@@ -3755,8 +3755,8 @@ fpFPSPoses fpFPSGetPlayerPose()
 	return POSE_STAND;
 }
 
-// this adds error to the fire angle based on the speed of the trooper, his pose,
-// and eventually his ATP level
+// this adds error to the fire angle based on the speed of the trooper, their pose,
+// and eventually their ATP level
 //
 // this returns the number of degrees of error induced by the human holding the gun
 
@@ -11957,7 +11957,7 @@ void fpFPSResupplySelf (const wchar_t* from)
 	static SINT32 lastResupplyTime;
 
 	// FIXME .. this needs to be made more generic, but going in this way because I have 3 hours to do it
-	// check to see if this is a HC officer .. if he is, I'm getting lashed, not resupplied
+	// check to see if this is a HC officer .. if they are, I'm getting lashed, not resupplied
 	//if (gr2AnimIsVehicleHC(vehicle))
 	//{
 		//fpFPSStartEmote ("attention", "", TRUE);

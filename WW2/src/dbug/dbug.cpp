@@ -15,6 +15,9 @@
 #include "include/defs.h"
 #include "teul/teulTime.h"
 #include <locale.h>
+#if platBuild == TEUL_SERVER
+#include "wwii/wwiiThreads.h"
+#endif
 
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
@@ -22,7 +25,7 @@
 #ifdef HAVE_SIGNAL_H
 # include <signal.h>
 #endif
-#if platOS == OS_LINUX
+#if AS_SERVER
 #include "hostproj/revision.h"
 #endif
 #ifdef HAVE_SYS_TIME_H
@@ -48,9 +51,7 @@ extern ConfigPath cv_defaultLogPath;
 # define _O_TRUNC O_TRUNC
 #endif
 
-#if platOS == OS_MACOS
-	#define PMODE S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
-#elif platOS == OS_WIN32
+#if platOS == OS_WIN32
 	#define PMODE (_S_IREAD | _S_IWRITE)
 #else
 	#define PMODE S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
@@ -186,8 +187,7 @@ _openDbugFile(const char* const srcFile_)
 
 	_qualifyFilename(srcFile_, filename, sizeof(filename));
 
-#if !defined(DEV_BUILD) || platOS != OS_MACOS
-	if (PN_UNLIKELY(srcFile_ != nullptr))
+	if (PN_LIKELY(srcFile_ != nullptr))
 	{
 		int oflags = _O_CREAT|_O_WRONLY|_O_TRUNC;
 
@@ -218,9 +218,6 @@ _openDbugFile(const char* const srcFile_)
 	} else {
 		file = OS_FILENO(stderr);
     }
-#else
-    file = OS_FILENO(stderr);
-#endif
 
 	return file;
 }
@@ -278,7 +275,7 @@ void DebugLogger::initialize(SINT32 logType_, Debug::ERROR_TYPE level_, SINT32 f
 	initialized = true;
 }
 
-#if platOS == OS_LINUX
+#if AS_SERVER && platOS != OS_WIN32
 static void
 _handleSIGUSR2(SINT32)
 {
@@ -304,7 +301,7 @@ _handleSIGUSR2(SINT32)
 }
 #endif
 
-#if platOS == OS_LINUX
+#if AS_SERVER && platOS != OS_WIN32
 
 #include <execinfo.h>
 
@@ -396,13 +393,9 @@ void dbugInit(SINT32 logType, const char* const filename)
 	level = Debug::ERR_DBUG;
 	g_logDebug = true;
 
-#if defined(DEV_BUILD) && platOS == OS_MACOS
-    logType = LOG_TO_FILE;
-#elif platOS != OS_LINUX
 	if ( logType != LOG_OFF) {
 		logType = LOG_TO_FILE;
     }
-#endif
 
 	switch(logType)
 	{
@@ -418,7 +411,7 @@ void dbugInit(SINT32 logType, const char* const filename)
 
 	_logger.initialize(logType, level, file, filename);
 
-#if platOS == OS_LINUX
+#if AS_SERVER && platOS != OS_WIN32
 	signal(SIGUSR2, _handleSIGUSR2);
 	signal(SIGPIPE, SIG_IGN);
 
@@ -631,7 +624,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		struct tm tmStruct;
 		struct tm* tm = localtime_r(&now, &tmStruct);
 #endif
-		len = _logger.formatText(CARRIAGE_RETURN "%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] "
+		len = _logger.formatText("%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] "
 								, errorTypes[_logger.errType]
 								, tm->tm_year + 1900
 								, tm->tm_mon + 1
@@ -643,6 +636,9 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 								, _logger.file()
 								, _logger.lineno);
 		_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, _logger.text(), len, false);
+        if ( ((flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR)) && !(flags & BARE_DEBUG) ) {
+            fprintf(stderr, "%s", _logger.text());
+        }
 	}
 
 	const char* text = nullptr;
@@ -651,29 +647,25 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	else
 	{
 		len = _logger.vformatText(fmt, args);
-		if ( len == (size_t)~0 )
-		{
-			text = "[ERROR]";
+		if ( len == (size_t)~0 ) {
+			text = "[ERROR]\n";
 			len = strlen(text);
-		}
-		else
+		} else {
+            len = _logger.formatText("%s\n", _logger.text());
 			text = _logger.text();
+        }
 	}
 
 	if ( PN_UNLIKELY(len == 0) )
 	{
-		text = "[nullptr]";
+		text = "[nullptr]\n";
 		len = strlen(text);
 	}
 
 	_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, text, len, true);
 
-	if ( (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR) )
-	{
-		if ( flags & BARE_DEBUG )
-			printf("%s", text);
-		else
-			printf("%s%s", CARRIAGE_RETURN, text);
+	if ( (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR) ) {
+        fprintf(stderr, "%s", text);
 	}
 
 	_levelHandler(_logger.errType, text);
@@ -717,7 +709,7 @@ SINT32 _dbugLog(const char* const filename, const SINT32 lineno, const UINT32 er
 }
 
 //_dbugWrite: same as above for dbugWrite
-SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, const char* fmt, ...)
+SINT32 _dbugWrite(const char* filename, SINT32 lineno, UINT32 errType, const char* fmt, ...)
 {
 	va_list args;
 
@@ -783,6 +775,9 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 #else
 	if ( PN_LIKELY(_logger.isInitialized()) )
 	{
+#if platBuild == TEUL_SERVER
+        threadsLogging();
+#endif
 		if ( assertion_ != nullptr && *assertion_ != 0 )
 			_dbugLog(file_, line_, error_, "ASSERTION: %s", assertion_);
 		_dbugLogPrivate(FALSE, file_, line_, error_, fmt_, args);

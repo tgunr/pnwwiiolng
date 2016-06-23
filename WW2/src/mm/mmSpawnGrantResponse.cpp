@@ -165,7 +165,7 @@ _getBestCell(const MM_SPAWN_GRANT_RESPONSE& grant, const Player* const commander
 }
 
 //////////////////////////////////////////////////////////////////////
-// Send the spawn-in map data to the commander & his crew.
+// Send the spawn-in map data to the commander & their crew.
 
 static void
 _sendMapData(Player* const player)

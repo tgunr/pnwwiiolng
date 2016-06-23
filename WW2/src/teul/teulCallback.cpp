@@ -106,7 +106,7 @@ teulAllocCALLBACKi(Teul::CallbackInit* const ci)
 // the main differentiation is that system callbacks are reinstalled
 // in the teulClient (AKA teulKit) and teulServer and provide the
 // base functionality of teul.  The User callbacks are usable by
-// the application programmer for his application.
+// the application programmer for their application.
 
 // this allocates User Callbacks
 TEUL_CALLBACK*

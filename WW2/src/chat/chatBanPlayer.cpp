@@ -108,7 +108,7 @@ _banSuccess(void* data)
 	}
 	else
 	{
-		// Tell the banee he's banned
+		// Tell the banee they're banned
 		Player* const player = PlayerInterface::Lookup(ban->m_handle);
 		if ( player != nullptr )
 			player->message(LSTR_WARNING, LSTR_ACCOUNT_SUSPENDED_NOTICE, chatTimeInterval(ban->m_duration), ban->m_message.c_str());

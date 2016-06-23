@@ -51,9 +51,11 @@ public:
 	Schema& operator=(const Schema& rhs) = delete;	// Do not use!
 
 private:
+#if 0
 	class DBHANDLE& m_dbh;
 	const char* const m_database;
 	unsigned int m_schemaVersion;
+#endif
 };
 
 }

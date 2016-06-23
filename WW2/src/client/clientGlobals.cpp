@@ -111,7 +111,7 @@ SINT8			ServerApID[64];		// program apId
 SINT8			ServerData[64];		// data passed from auth server
 SINT8			ServerProtocol[64]; // connection protocol
 SINT8			BypassString[64];
-LOGICAL			WantedUserLogEnabled;	// If the user wants the log enabled
+LOGICAL			WantedUserLogEnabled = TRUE;	// If the user wants the log enabled
 SCHAR			WantedVideoCard[64];// desired video card name
 SCHAR			WantedVideoResolution[32];// desired video resolution
 SCHAR			WantedSoundCard[64];// desired sound card name

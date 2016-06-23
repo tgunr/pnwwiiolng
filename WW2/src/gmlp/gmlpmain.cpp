@@ -85,11 +85,6 @@
 #include "maptools/GenerateIcons.h"
 #include "sdm/BuildTerrain.h"
 
-#if defined(ENABLE_VOICE_COMMS)
-#include "voice/VoiceRats.h"
-#include "RakNetTypes.h"
-#endif
-
 #ifdef MULTI_CLIENT
 #include "mc/multiClient.h"
 #endif
@@ -619,14 +614,6 @@ void _UpdateInit(void)
 	if (Online == 1)
 	{
 		PlayerClient()->Update();
-
-// Voice Communications
-#if defined(ENABLE_VOICE_COMMS)
-	if(VoiceCommsOn && mgr != nullptr)
-	{
-		mgr->checkvoiceconnections();
-	}
-#endif
 
 		teulUpdateTransport(); // process any new messages
 

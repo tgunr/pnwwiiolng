@@ -1253,19 +1253,6 @@ piTexCoordConstPtr	ptu;
 
     if(!lpobj) return TRUE;
 
-#if ANDREW_TEST
-	stage = 1;
-    texid = lpobj->texid;
-
-	while (stage < gMaxTextureUnits && obdrawFindMultiTextureById(texid, &offset))
-	{
-        oglSetActiveTextureStage(stage);
-
-        piSetTextureMatrix(&MultiTextureInfo[offset].MultiTextureMatrix);
-	    stage += 1;
-	    texid = MultiTextureInfo[offset].MultiTextureId;
-	}
-#else
 	ptu = lpobj->ImmutableTexCoords();
 
 	texid = lpobj->texid;
@@ -1336,7 +1323,6 @@ piTexCoordConstPtr	ptu;
 		stage += 1;
 		texid = MultiTextureInfo[offset].MultiTextureId;
 	}
-#endif
 
 	return(TRUE);
 }
@@ -1721,36 +1707,6 @@ static bool _initWaterRefractionFBO()
 }
 #endif
 
-#if ANDREW_TEST
-static void InitShaderForAndrew()
-{
-    // This setup has been offloaded to a file in ca2.
-    glslProgram* pgm = GLSL.loadProgram("multitexture", nullptr, nullptr);
-
-    pgm->AddShader(GLSL.loadFragmentShader("fx/shaders/GLSL/utility/fogutility.frag").get());
-    pgm->AddShader(GLSL.loadFragmentShader("fx/shaders/GLSL/utility/lightutility.frag").get());
-    pgm->AddShader(GLSL.loadVertexShader("fx/shaders/GLSL/multitexture/multi.vert").get());
-    pgm->AddShader(GLSL.loadFragmentShader("fx/shaders/GLSL/multitexture/multi.frag").get());
-
-    pgm->GetOrCreateUniform("src1", glslUniform::SAMPLER_2D);
-    pgm->GetOrCreateUniform("src2", glslUniform::SAMPLER_2D);
-    pgm->GetOrCreateUniform("src3", glslUniform::SAMPLER_2D);
-
-    pgm->GetUniform("src1")->Set(0);
-    pgm->GetUniform("src2")->Set(1);
-    pgm->GetUniform("src3")->Set(2);
-
-    pgm->GetUniform("src1")->SetOneTimeApply(true);
-    pgm->GetUniform("src2")->SetOneTimeApply(true);
-    pgm->GetUniform("src3")->SetOneTimeApply(true);
-
-    glslLoadGlobalUniforms(pgm);
-
-    pgm->Apply();
-    ProgramState::Bind(0);
-}
-#endif
-
 Texture* obdrawGetSceneTexture()
 {
     return _sceneRTT.get();
@@ -1921,11 +1877,6 @@ LOGICAL obdrawInit(void)
 #else
     if(!ogl::UseDeprecatedPath())
         _initSceneFBO();
-#endif
-
-#if ANDREW_TEST
-    if(ogl::UseDeprecatedPath())
-        InitShaderForAndrew();
 #endif
 
     return(TRUE);
@@ -4849,7 +4800,6 @@ inline void _drawMultiTexture()
             _unsetStates(last);
             _setStates(o);
 
-#if !ANDREW_TEST
             if(!(o->meshContext && (o->flag2 & OBJECT_USEBUFFERS)))
             {
                 // Has at least 3 textures
@@ -4864,7 +4814,6 @@ inline void _drawMultiTexture()
                     }
                 }
             }
-#endif
             o->material->Apply();
         }
 

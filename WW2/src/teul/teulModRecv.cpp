@@ -630,7 +630,7 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 		if ( rxSize <= 0 )
 			break;
 
-#if platOS == OS_LINUX
+#if AS_SERVER
 		// ignore packets we broadcast..
 		if ( endpoint.protocol == PROTOCOL_UDB && (dgram->sockAddress.sin_addr.s_addr & 0xff000000) == (Server::myInterface.addr[0].naddr & 0xff000000) )
 		{
@@ -1489,9 +1489,7 @@ _isValidSynData(const Teul::PacketHeader* const header, size_t payloadSize)
 static bool
 _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 {
-#if !defined(__APPLE__)
 	static_assert( sizeof(Teul::PacketHeader::tag_t) == sizeof(endpoint.m_impl->recvTag), "Endpoint and Packet disagree on size of packet tags" );
-#endif
 
 	const Teul::PacketHeader::tag_t prevTag = (Teul::PacketHeader::tag_t)endpoint.m_impl->recvTag;
 	const Teul::PacketHeader::tag_t expectTag = prevTag + (Teul::PacketHeader::tag_t)1;

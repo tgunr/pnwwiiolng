@@ -8,7 +8,7 @@
 /*
 	Main "persona" handling routines
 
-	The "Persona" is the point of view of the player, the "state" he's in, etc
+	The "Persona" is the point of view of the player, the "state" they're in, etc
 	It is usually attached to a vehicle of some sort
 
 	Originating Programmer: Jonathan Hoof

@@ -2346,9 +2346,9 @@ void DoOutputX(const char* str, ...)
 #endif
 
 #ifdef SHOWLDMSGS
-# define LDWrite_Debug(...) WriteToConsole(__VA_ARGS__); Write_Debug(__VA_ARGS__)
+# define LDWrite_Debug(fmt, ...) dbugLog(_FLD, fmt, ## __VA_ARGS__);
 #else
-# define LDWrite_Debug(...)
+# define LDWrite_Debug(fmt, ...)
 #endif
 
 static OBJECT* _fltLoad(const char* const name, const float scale, const int reduce)

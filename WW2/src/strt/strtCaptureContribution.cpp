@@ -148,7 +148,7 @@ FacilityStruct::setCaptureProgress(FLOAT32 newValue, const Strat::CaptureContrib
 		else
 		{
 			SINT32 rate = 1;
-			FLOAT32 absDelta = abs(delta);
+			FLOAT32 absDelta = std::abs(delta);
 			if ( absDelta > 5 )
 				rate = 3;
 			else if ( absDelta >= 0.5 )

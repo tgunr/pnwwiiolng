@@ -517,8 +517,8 @@ BrigadeController::assignOIC(UINT32 action, Player* player, const ChatHandle& sp
 	player->SetLeadingBrigade(unit().unitID());
 
 	// Note: we put the player into the command position first so that when
-	// we send this notification out, he's included in the active officer list
-	// and thus gets the feedback message too
+	// we send this notification out, they're included in the active officer list
+	// and thus get the feedback message too
 	_noticeToSide(BrigadeControl::_APPOINTED, action, unit(), oicHandle(), sponsor);
 
 	cancelVote();
@@ -623,7 +623,7 @@ BrigadeController::requestNominate(Player* sponsor, const ChatHandle& officerHan
 	if ( nominee->leadingBrigade() )
 		throw BCERR_PLAYER_IS_ALREADY_OIC;
 
-	// Make sure he's not being nominated or removed from another brigade
+	// Make sure they're not being nominated or removed from another brigade
 	for ( auto it = controllers.begin(), end = controllers.end(); it != end; ++it )
 	{
 		BrigadeController* bc = it->second;
@@ -741,8 +741,7 @@ BrigadeController::requestResign(Player* player)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Brigade owner wishes to supplant another player controlling his
-// unit
+// Brigade owner wishes to supplant another player controlling their unit
 
 void
 BrigadeController::requestReplace(Player* player, const ChatHandle& officer)
@@ -816,7 +815,7 @@ BrigadeController::requestMove(Player* player, const FULL_OBJ_ID& destination, c
 	checkOIC(true);
 
 	bool isHCStaff = player->isActiveCommander();
-	// OIC can only move his own brigade or his division
+	// OIC can only move their own brigade or their division
 	if ( !isHCStaff && unit().unitID() != player->leadingBrigade() )
 	{
 		HCUnit* playerUnit = HCUnit::Lookup(player->leadingBrigade());
@@ -835,7 +834,7 @@ BrigadeController::requestMove(Player* player, const FULL_OBJ_ID& destination, c
 	if ( from != unit().homeCPID() )
 		throw BCERR_ALREADY_MOVED;
 
-	// If the brigade has an OIC and you aren't him...
+	// If the brigade has an OIC and you aren't them...
 	if ( oic() && !player->hasHandle(oicHandle()) )
 		throw BCERR_BRIGADE_HAS_OIC;
 
@@ -902,7 +901,7 @@ BrigadeController::requestAttack(Player* player, FULL_OBJ_ID& target)
 			throw BCERR_NOT_FRONTLINE;
 	}
 
-	// If the brigade has an OIC and you aren't him...
+	// If the brigade has an OIC and you aren't them...
 	if ( oic() && !player->hasHandle(oicHandle()) )
 		throw BCERR_BRIGADE_HAS_OIC;
 
@@ -951,7 +950,7 @@ BrigadeController::requestDefend(Player* player, FULL_OBJ_ID& target)
 	else if ( player->side() == AXIS && (property->m_flags & CP_AXIS_OBJECTIVES) )
 		throw BCERR_ALREADY_OBJECTIVE;
 
-	// If the brigade has an OIC and you aren't him...
+	// If the brigade has an OIC and you aren't them...
 	if ( oic() && !player->hasHandle(oicHandle()) )
 		throw BCERR_BRIGADE_HAS_OIC;
 
@@ -991,7 +990,7 @@ BrigadeController::requestClear(Player* player, FULL_OBJ_ID& target)
 			throw BCERR_CANT_CANX_DEFEND;
 	}
 
-	// If the brigade has an OIC and you aren't him...
+	// If the brigade has an OIC and you aren't them...
 	if ( oic() && !player->hasHandle(oicHandle()) )
 		throw BCERR_BRIGADE_HAS_OIC;
 
@@ -1383,7 +1382,7 @@ BrigadeController::processElectionExpired()
 	vote()->m_voteMode = Vote::OFFER;
 	vote()->m_closeAt = teulTime() + host_config.oic.offerTime_s;
 
-	// Notify the nominee that he has the opportunity
+	// Notify the nominee that they have the opportunity
 	_noticeToOfficers(BrigadeControl::_OFFERING
 						, vote()->m_forAction, 0, VP_NONE, unit(), nominee->chatHandle(), vote()->m_sponsor
 						, host_config.oic.offerTime_s, nullObjID, nominee);

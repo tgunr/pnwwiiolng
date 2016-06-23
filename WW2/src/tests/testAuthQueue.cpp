@@ -116,18 +116,18 @@ private: bool AddPlayer(UINT32 arenaID, const playerid_t playerNo, bool isPremiu
 
 			Auth::ClientData* cdata = GetCData(arenaID, playerNo, isPremium);
 
-			// Make sure he isn't already indexed.
+			// Make sure they aren't already indexed.
 			if ( ArenaIndexed(arenaID) )
 			{
 				CRITICAL( Equals(NumEntriesForPlayer(arenas[arenaID].m_premium, cdata), 1) == IsLt );
 				CRITICAL( Equals(NumEntriesForPlayer(arenas[arenaID].m_nonPremium, cdata), 1) == IsLt );
 			}
 
-			// Add him
+			// Add them
 			CRITICAL( ExpectTrue( Auth::Queue::AddPlayer(arenaID, GetCData(arenaID, playerNo, isPremium), isPremium) ) );
 			CRITICAL( ArenaIndexed(arenaID) );
 
-			// Make sure he IS indexed.
+			// Make sure they ARE indexed.
 			if ( isPremium )
 			{
 				CRITICAL( Equals(NumEntriesForPlayer(arenas[arenaID].m_premium, cdata), 1) == IsEqual );
@@ -307,7 +307,7 @@ public: virtual bool Run() override
 			ExpectEqual( UpdatesQueued(), 1 );
 			sendQueue.clear();
 
-			// Verify that we can remove him.
+			// Verify that we can remove them.
 			ExpectTrue( Auth::Queue::RemovePlayer(arenaID, cdata, true, false) );
 
 			// Verify that this did not clear the arenas tables, and the arena is still indexed.
@@ -325,8 +325,8 @@ public: virtual bool Run() override
 
 		END_TEST_STAGE( "First player/premium" )
 
-		// Verify that if we add a premium player, we can't remove him
-		// from the non-premium queue, but we can remove him from the premium queue.
+		// Verify that if we add a premium player, we can't remove them
+		// from the non-premium queue, but we can remove them from the premium queue.
 		START_TEST_STAGE( "Add player/premium, remove player/non-premium, remove player/premium" );
 			UINT32 arenaID = 2;
 			Auth::ClientData* cdata = GetCData(arenaID, 1, true);
@@ -362,7 +362,7 @@ public: virtual bool Run() override
 			ExpectEqual( UpdatesQueued(), 0 );
 
 			// Remove the middle player from the second arena's non-premium queue
-			// and check that he does not generate any updates (he's not head
+			// and check that they do not generate any updates (they're not head
 			// of the queue).
 			Auth::ClientData* cdata = GetCData(2, 2, false);
 			CRITICAL( ExpectEqual( NumEntriesForPlayer(arenas[2].m_nonPremium, cdata), 1 ) );
@@ -444,7 +444,7 @@ public: virtual bool Run() override
 
 			CRITICAL( ExpectEqual( UpdatesQueued(), 1 ) );
 
-			// This guy has been waiting nearly as long as the first guy, so his
+			// This player has been waiting nearly as long as the first, so their
 			// wait time should be _DEFAULT_WAIT_TIME_S - 1.
 			if ( !ExpectUpdate(0, arenaID, 3, premiums, 1, _DEFAULT_WAIT_TIME_S - 1) )
 				return false;
@@ -484,8 +484,8 @@ public: virtual bool Run() override
 			// Should be 3 updates on the queue.
 			CRITICAL( ExpectEqual( UpdatesQueued(), 3 ) );
 			ExpectUpdate(0, arenaID, 1, premiums, 1, waited - _DEFAULT_WAIT_TIME_S * 2);
-			ExpectUpdate(1, arenaID, 2, premiums, 2, waited * 2 - _DEFAULT_WAIT_TIME_S);	// He's been waiting one wait
-			ExpectUpdate(2, arenaID, 3, premiums, 3, waited * 3);							// He hasn't.
+			ExpectUpdate(1, arenaID, 2, premiums, 2, waited * 2 - _DEFAULT_WAIT_TIME_S);	// They've been waiting one wait
+			ExpectUpdate(2, arenaID, 3, premiums, 3, waited * 3);							// They haven't.
 
 			AdvanceClock_s(_DEFAULT_WAIT_TIME_S);
 			header.m_modified = true;
@@ -495,8 +495,8 @@ public: virtual bool Run() override
 			// Should be 3 updates on the queue.
 			CRITICAL( ExpectEqual( UpdatesQueued(), 3 ) );
 			ExpectUpdate(0, arenaID, 1, premiums, 1, _DEFAULT_WAIT_TIME_S - 1);
-			ExpectUpdate(1, arenaID, 2, premiums, 2, waited * 2 - _DEFAULT_WAIT_TIME_S * 2);	// He's been waiting two waits
-			ExpectUpdate(2, arenaID, 3, premiums, 3, waited * 3 - _DEFAULT_WAIT_TIME_S);		// He's been waiting one
+			ExpectUpdate(1, arenaID, 2, premiums, 2, waited * 2 - _DEFAULT_WAIT_TIME_S * 2);	// They've been waiting two waits
+			ExpectUpdate(2, arenaID, 3, premiums, 3, waited * 3 - _DEFAULT_WAIT_TIME_S);		// They've been waiting one
 
 		END_TEST_STAGE( "Validate position and wait times." )
 

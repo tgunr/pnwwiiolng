@@ -1692,13 +1692,11 @@ static LOGICAL ApplyFallEffects(OBJECT* pObject, fpPersonData* pPersonData, FLOA
 			{
 				// splat
 				Damage = 1.0;
-#pragma message("TBD: Should fallType be set to FPS_FALL_HURT?")
-//				fallType = FPS_FALL_HURT;
+                // fallType = FPS_FALL_NORMAL_HURT; // See DEV-781
 			}
 		}
 	}
-	else
-	if (fpFPSIsSwimming())
+	else if (fpFPSIsSwimming())
 	{
 		Damage = DetermineFallEffect(Distance, fpFALL_DISTANCE_WATER_HURT_MIN, fpFALL_DISTANCE_WATER_HURT_MAX);
 		if (Damage == 0.0)
