@@ -2368,8 +2368,8 @@ _dotSetRDP(char* arguments, OOBMessage& message)
 	WWII_COUNTRY country = static_cast<WWII_COUNTRY>(strtoul(args[0], nullptr, 10));
 	unsigned int cycle = static_cast<unsigned int>(strtoul(args[1], nullptr, 10));
 	unsigned int percent = static_cast<unsigned int>(strtoul(args[2], nullptr, 10));
-	if ( WWII_NO_COUNTRY <= country || country >= MAX_COUNTRIES ||
-	     cycle > 32 || percent > 5000 ) {
+	
+	if ( WWII_NO_COUNTRY == country || country >= MAX_COUNTRIES ) {
 		BETAMSG("Invalid data");
 		return FALSE;
 	}
