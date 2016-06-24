@@ -67,6 +67,9 @@ CFG_PATH(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true, "Name of th
 
 CFG_ADDR(wwiiDBAddress, nullptr, "WWII_DB_ADDRESS", true, "IP address of the MySQL Database.");
 CFG_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true, "Default schema for game data.");
+CFG_STRING(wwiiDBPassword, "", "WWII_DB_PASSWD", true, "Password to use for the game database.");
+CFG_STRING(wwiiDBUser, "wwiiol", "WWII_DB_USER", true, "Username when connecting to the game database.");
+CFG_STRING(wwiiDBPort, "3306", "WWII_DB_PORT", true, "Port of the game MySQL server if not default.");
 CFG_ADDR(dbsePrimaryAddress, nullptr, "DBSE_PRIMARY_ADDRESS", true, "IP address dbd clients will reach the dbd on.");
 CFG_UINT(dbseConnectionTimeout_ms, "3000", "DBSE_CONNECTION_TIMEOUT_MS", "Time in miliseconds before database proxy connections timeout.");
 CFG_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION", "Enable compression when communicating with the MySQL server");
@@ -75,18 +78,18 @@ CFG_STRING(clusterName, nullptr, "WWII_CLUSTER", true, "Short-name for this clus
 CFG_UINT(arenaID, nullptr, "ARENA_ID", "Numeric ID for this arena.");
 CFG_UINT(appID, nullptr, "APP_ID", "App ID for this server - 1 being release, 12 being beta.");
 CFG_ADDR(ircServer, "", "WWII_IRC_SERVER", false, "Address of the IRC server. If not defined, disables IRC.");
-CFG_STRING(ircPassword, "blooGit", "WWII_IRC_PASSWD", true, "Server-password for the IRC server.");
+CFG_STRING(ircPassword, "", "WWII_IRC_PASSWD", true, "Server-password for the IRC server.");
 CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", "Port to connect to the IRC server on.");
 CFG_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL", true, "URL to prefix authentication error URLs with.");
 CFG_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true, "Network address (/24) for the cluster. Server's will map their last octets (x.x.x.N) into this network for inter-host communications.");
 
 CFG_ADDR(authHost, "auth.playnet.com", "AUTH_ADDRESS", true, "Host name or IP Address of the authentication server.");
 CFG_ADDR(authdbAddress, nullptr, "AUTH_DB", true, "Address of the MySQL server hosting the auth database.");
-CFG_STRING(authdbPort, "", "AUTH_DB_PORT", true, "Port of the Auth MySQL server if not default.");
+CFG_STRING(authdbPort, "3306", "AUTH_DB_PORT", true, "Port of the Auth MySQL server if not default.");
 #if defined( HAPPYOO )
-CFG_STRING(authdbPassword, "m4nd0l1n", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
+CFG_STRING(authdbPassword, "", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
 #else
-CFG_STRING(authdbPassword, "scalar449", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
+CFG_STRING(authdbPassword, "", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
 #endif
 CFG_STRING(authdbSchema, "auth", "AUTH_DB_SCHEMA", true, "Schema to use for auth data.");
 CFG_STRING(authdbUser, "authuser", "AUTH_DB_USER", true, "Username when connecting to the auth database.");
