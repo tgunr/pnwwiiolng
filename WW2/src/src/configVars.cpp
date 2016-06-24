@@ -78,7 +78,7 @@ CFG_STRING(clusterName, nullptr, "WWII_CLUSTER", true, "Short-name for this clus
 CFG_UINT(arenaID, nullptr, "ARENA_ID", "Numeric ID for this arena.");
 CFG_UINT(appID, nullptr, "APP_ID", "App ID for this server - 1 being release, 12 being beta.");
 CFG_ADDR(ircServer, "", "WWII_IRC_SERVER", false, "Address of the IRC server. If not defined, disables IRC.");
-CFG_STRING(ircPassword, "", "WWII_IRC_PASSWD", true, "Server-password for the IRC server.");
+CFG_STRING(ircPassword, "", "WWII_IRC_PASSWD", false, "Server-password for the IRC server.");
 CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", "Port to connect to the IRC server on.");
 CFG_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL", true, "URL to prefix authentication error URLs with.");
 CFG_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true, "Network address (/24) for the cluster. Server's will map their last octets (x.x.x.N) into this network for inter-host communications.");
