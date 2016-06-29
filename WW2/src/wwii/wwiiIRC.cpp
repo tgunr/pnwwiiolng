@@ -477,7 +477,7 @@ wwiiIRCDefaultConnect(irc_session_t* session, const char* event, const char* ori
 	wwiiIRCDumpEvent(session, event, origin, params, count);
 
 	// First, request operator mode.
-	irc_send_raw(session, "oper god crummy");
+	//irc_send_raw(session, "oper god crummy");
 
 	irc.m_joined = false;
 
