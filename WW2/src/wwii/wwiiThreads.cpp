@@ -152,9 +152,9 @@ threadsReadDBEnvironment()
 
 	strcpy(dbConnection.host, db);
 	strcpy(dbConnection.dbName, cv_wwiiDBDefaultSchema.GetString());
-	strcpy(dbConnection.username, "wwiiol");
-	strcpy(dbConnection.password, "freebird");
-	strcpy(dbConnection.port, "");
+	strcpy(dbConnection.username, cv_wwiiDBUser.GetString());
+	strcpy(dbConnection.password, cv_wwiiDBPassword.GetString());
+	strcpy(dbConnection.port, cv_wwiiDBPort.GetString());
 
 	return true;
 }
