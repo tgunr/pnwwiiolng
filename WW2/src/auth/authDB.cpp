@@ -738,15 +738,15 @@ bool authInitGameEntry(GAME& gameEntry)
 //////////////////////////////////////////////////////////////////////
 void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_INFO& pci)
 {
-	SCHAR	statement[8000+1];
+	char	statement[8000+1];
 	char	cardName[MAX_OGL_CARD_NAME*2 + 1];
 	char	vendor[MAX_OGL_VENDOR_NAME*2 + 1];
 	char	descs[MAX_COMPRESSED_TEXTURE*5 + 1]; // %4x + " "
 	char    cpuManufacturer[sizeof(CPUFeatures)*2 + 1];
-	char    cpuBrandName[sizeof(CPUFeatures)*2 + 1]
-	SCHAR	soundCard[MAX_MIX_NAME*2 + 1];
-	SCHAR	exts[1024+1];
-	SCHAR*	p;
+	char    cpuBrandName[sizeof(CPUFeatures)*2 + 1];
+	char	soundCard[MAX_MIX_NAME*2 + 1];
+	char	exts[1024+1];
+	char*	p;
 	UINT32	i;
 	UINT32	numCompTextures;
 	const PLAY_OGL& ogl = pci.video.ogl;
@@ -759,25 +759,25 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 
 	try
 	{
-		strlcpy(statement, ogl.cardName, MAX_OGL_CARD_NAME - 1);
+		strncpy(statement, ogl.cardName, MAX_OGL_CARD_NAME);
 		mysql_real_escape_string(dbh, cardName, statement, strlen(statement));
 
-		strlcpy(statement, ogl.vendor, MAX_OGL_VENDOR_NAME - 1);
+		strncpy(statement, ogl.vendor, MAX_OGL_VENDOR_NAME);
 		mysql_real_escape_string(dbh, vendor, statement, strlen(statement));
         
-        strlcpy(statement, cpu.manufacturer, std::min(sizeof(statement), sizeof(cpu.manufacturer)));
+        strncpy(statement, cpu.manufacturer, std::min(sizeof(statement), sizeof(cpu.manufacturer)) - 1);
         mysql_real_escape_string(dbh, cpuManufacturer, statement, strlen(statement));
         
-        strlcpy(statement, cpu.brandName, std::min(sizeof(statement), sizeof(cpu.brandName)));
+        strncpy(statement, cpu.brandName, std::min(sizeof(statement), sizeof(cpu.brandName)) - 1);
         mysql_real_escape_string(dbh, cpuBrandName, statement, strlen(statement));
         
 		if ( pci.sound.isValid )
 		{
-			strlcpy(statement, mix.szPname, MAX_MIX_NAME - 1);
+			strncpy(statement, mix.szPname, MAX_MIX_NAME);
 			statement[MAX_MIX_NAME] = 0;
 			mysql_real_escape_string(dbh, soundCard, statement, strlen(statement));
 		} else {
-			strlcpy(soundCard, "*none*", MAX_MIX_NAME - 1);
+			strncpy(soundCard, "*none*", MAX_MIX_NAME);
 		}
 
 		descs[0] = 0;
