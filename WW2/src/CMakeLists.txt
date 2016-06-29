@@ -395,7 +395,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
             chat/chatRosterClient.cpp
         )
         ADD_PCH(chatClient)
-        TARGET_LINK_LIBRARIES(chatClient libwwii teulserver)
+        TARGET_LINK_LIBRARIES(chatClient libwwii teulserver mysqlclient)
         SET_PROPERTY(TARGET chatClient PROPERTY FOLDER "Tools")
 
         # Provide access to the LuaVMs.
