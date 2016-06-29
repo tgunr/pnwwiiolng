@@ -2365,18 +2365,11 @@ _dotSetRDP(char* arguments, OOBMessage& message)
 		return FALSE;
 	}
 
-	WWII_COUNTRY country = WWII_COUNTRY(atoi(args[0]));
-	SINT32 cycle = atoi(args[1]);
-	SINT32 percent = atoi(args[2]);
-	if (
-		country == WWII_NO_COUNTRY
-		|| country >= MAX_COUNTRIES
-		|| cycle < 1
-		|| cycle > 32
-		|| percent < 0
-		|| percent > 5000
-		)
-	{
+	WWII_COUNTRY country = static_cast<WWII_COUNTRY>(strtoul(args[0], nullptr, 10));
+	unsigned int cycle = static_cast<unsigned int>(strtoul(args[1], nullptr, 10));
+	unsigned int percent = static_cast<unsigned int>(strtoul(args[2], nullptr, 10));
+	
+	if ( WWII_NO_COUNTRY == country || country >= MAX_COUNTRIES ) {
 		BETAMSG("Invalid data");
 		return FALSE;
 	}
