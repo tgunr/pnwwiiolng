@@ -156,7 +156,7 @@ struct FE_POST_EXPIRED
 	WEAPON_SERIAL weaponSerial;
 };
 
-//This message asks a front end if he wants a player to join his posted
+//This message asks a front end if they want a player to join their posted
 //	vehicle
 struct FE_JOIN_PERM_REQUEST
 {
@@ -207,7 +207,7 @@ public:
 };
 #pragma pack(pop)
 
-//Used by the mmHost to notify a commander that his crew has bailed
+//Used by the mmHost to notify a commander that their crew has bailed
 struct FE_CREW_BAILED
 {
 	UINT32 joinRequestID;

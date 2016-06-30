@@ -449,7 +449,7 @@ protected:
 	bool			m_feReady		: 1;
 	bool			m_rxAllHQ		: 1;
 	bool			m_grabbed		: 1;
-	bool			m_isSpawned		: 1;	// True when we know he's spawned
+	bool			m_isSpawned		: 1;	// True when we know they've spawned
 	bool			m_onCommandList	: 1;	// True when we are on the command list
 	bool			m_noWho			: 1;	// True when they turn "who" off.
 	bool			m_noEnemyChat	: 1;	// True disable enemy chat receipt

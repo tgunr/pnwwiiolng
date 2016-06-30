@@ -57,7 +57,7 @@ namespace Teul
 }
 
 // the time that a player may be on the exit server holder
-// before he is sent back to the auth Host
+// before they're sent back to the auth Host
 static const UINT32 PLAYER_TIMEOUT = 3 * 60 * 1000;	// 4 minutes
 static const SINT32 PLAYER_XFER_TIMEOUT = 30 * 1000;	// 30 seconds
 

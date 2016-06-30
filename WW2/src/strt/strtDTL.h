@@ -14,16 +14,7 @@
 #include "wwii/wwiiTypes.h"
 #include "wwii/wwiiFullObjID.h"
 
-#if platOS == OS_MACOS
-	#pragma options align=packed
-#elif platOS == OS_WIN32
-	#pragma pack(push, 1)
-#elif platOS == OS_LINUX
-	#pragma pack(push, 1)
-#else
-	#error No packing specified
-#endif
-
+#pragma pack(push, 1)
 
 //tolua_begin
 
@@ -293,10 +284,4 @@ struct WAYPOINT
 
 };
 
-#if platOS == OS_MACOS
-	#pragma options align=reset
-#elif platOS == OS_WIN32
-	#pragma pack(pop)
-#elif platOS == OS_LINUX
-	#pragma pack(pop)
-#endif
+#pragma pack(pop)

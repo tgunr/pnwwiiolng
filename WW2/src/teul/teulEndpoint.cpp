@@ -9,7 +9,7 @@
 //
 // Originating Programmer: Martin Poulin
 
-#if platOS == OS_LINUX
+#if platOS == OS_LINUX || platOS == OS_MACOS
 	#include <sys/socket.h>
 	#include <netinet/in.h>
 	#include <netinet/tcp.h>
@@ -18,12 +18,6 @@
 	#include <sys/ioctl.h>
 	#include <limits.h>
 	#include <sys/types.h>
-#elif platOS == OS_MACOS
-	#include <sys/types.h>
-	#include <netinet/in.h>
-	#include <netinet/tcp.h>
-	#include <sys/socket.h>
-	#include <arpa/inet.h>
 #elif platOS == OS_WIN32
 	#include <sys/types.h>
 	#include <winsock2.h>
@@ -43,6 +37,14 @@
 #include "teul/teulTime.h"
 #include "teul/teulUtils.h"
 #include "teul/teulVersion.h"
+#include "include/pnThread.h"
+
+// Tie the vtable for PNThread down; this needs a better home
+PNThread::~PNThread()
+{
+    cancel();
+    join();
+}
 
 //#define DEBUG_ENCRYPTION
 //#define DEBUG_CONNECTIONS
@@ -644,7 +646,7 @@ Teul::GetErrorName(SINT32 error)
 #if EWOULDBLOCK != EAGAIN
 	ErrorCase( EWOULDBLOCK );
 #endif
-#if platOS == OS_LINUX
+#if platOS == OS_LINUX || platOS == OS_MACOS
 	ErrorCase( ESHUTDOWN );
 	ErrorCase( EHOSTDOWN );
 #endif

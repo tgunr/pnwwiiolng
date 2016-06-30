@@ -396,7 +396,7 @@ enum LSTRING_ID
 
 // 360
 ,	LSTR_SQUAD_REMOVED_LAPSED		// Your membership of '%s' has expired (you were not promoted)
-,	LSTR_SQUAD_RECRUIT_LAPSED		// '%s' has been removed from the squad because he was not promoted
+,	LSTR_SQUAD_RECRUIT_LAPSED		// '%s' has been removed from the squad because they were not promoted
 ,	LSTR_TAKELEAD_USAGE, LSTR_TAKELEAD_DETAIL
 ,	LSTR_ALREADY_LEADER				// You are already mission leader.
 ,	LSTR_NO_AFK_TAKELEAD			// You can't takelead while you are AFK

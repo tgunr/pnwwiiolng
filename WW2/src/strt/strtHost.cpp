@@ -59,7 +59,9 @@
 
 extern ObjectiveStats g_objectiveStats;
 
+extern DBHANDLE dbh;
 DBHANDLE dbh;
+extern DBCONNECTION dbConnection;
 DBCONNECTION dbConnection;
 
 #ifdef DEBUG
@@ -485,7 +487,7 @@ _housekeeping()
 //////////////////////////////////////////////////////////////////////////
 // Main entry point.
 
-const char* g_serverName = "stratd";
+static const char* g_serverName = "stratd";
 
 int
 main(int argc, const char* argv[])

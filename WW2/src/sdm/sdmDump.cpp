@@ -7,6 +7,9 @@
 #include "include/defs.h"
 #include "strt/strtDTL.h"
 #include "wwii/wwiiTypes.h"
+#include "dbse/dbseConnection.h"
+
+DBCONNECTION dbConnection;
 
 static void
 _dumpFile()

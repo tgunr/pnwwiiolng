@@ -367,7 +367,7 @@ _tellSponsor(UINT32 sponsor, const Player* player, LSTRING_ID messageID, const C
 }
 
 //////////////////////////////////////////////////////////////////////
-// Add a player to a mission, send him all the waypoints
+// Add a player to a mission, send them all the waypoints
 
 void
 chatMissionAddPlayer(Player* player, UINT32 missionID, UINT32 sponsor)

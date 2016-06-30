@@ -110,7 +110,7 @@ public:
 	//! Display the contextual help for this client.
 	//! @param[in]	player		Player to test.
 	//! @return false if no permission.
-	//! @note client is not const because we may send data to him.
+	//! @note client is not const because we may send data to them.
 	virtual bool help(Player& player) const;
 
 	//! Virtual function that implements the actual command for "/command <something...>".

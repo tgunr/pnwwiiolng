@@ -70,10 +70,6 @@
             argument = "-datadir $(SRCROOT)/../opt/ww2mods/DATA/"
             isEnabled = "YES">
          </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-ticket local2.tkt"
-            isEnabled = "NO">
-         </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>

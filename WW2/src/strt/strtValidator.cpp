@@ -17,6 +17,9 @@
 #include "strt/strtFacilityStruct.h"
 #include "strt/strtObjectStruct.h"
 #include "teul/teulTime.h"
+#include "dbse/dbseConnection.h"
+
+DBCONNECTION dbConnection;
 
 typedef struct
 {

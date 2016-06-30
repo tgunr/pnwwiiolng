@@ -11,11 +11,7 @@ class PNThread
 
 public:
 	PNThread() : m_thread(), m_started(false), m_cancelled(false) {}
-	virtual ~PNThread()
-	{
-		cancel();
-		join();
-	}
+	virtual ~PNThread();
 
 	void start()
 	{

@@ -174,7 +174,7 @@ struct MM_SPAWN_CANCEL
 	WEAPON_SERIAL weaponSerial;
 };
 
-//Message telling the map server to tell the commander front end that his
+//Message telling the map server to tell the commander front end that their
 //	crew has bailed
 struct MM_CREW_BAILED
 {

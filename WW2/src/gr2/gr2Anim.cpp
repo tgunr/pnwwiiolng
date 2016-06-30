@@ -456,7 +456,7 @@ static void _addInfantryLODs(gr2AnimTrooper* anim, SINT32 modelIndex, SINT32 fil
 					case TPS_LOD_2: lod->maxVis = 8; break;
 					case TPS_LOD_3: lod->maxVis = 20; break;
 					case TPS_LOD_4: lod->maxVis = 40; break;
-					case TPS_LOD_5: lod->maxVis = 0; lod->minVis = 40; break; // vary low poly; don't let us get to close to him
+					case TPS_LOD_5: lod->maxVis = 0; lod->minVis = 40; break; // vary low poly; don't let us get to close to them
 				}
 
 				gr2Model* model = anim->model.AddModel(modelIndex, lod);

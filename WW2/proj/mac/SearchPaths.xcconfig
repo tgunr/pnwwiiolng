@@ -11,6 +11,7 @@
 // Warnings.xcconfig for information on why it looks like this.
 
 // Header search paths matching both #include <> and #include ""
+HEADER_SERACH_PATHS_16      = $(HEADER_SEARCH_PATHS_17) "$(DERIVED_SOURCES_DIR)"
 HEADER_SEARCH_PATHS_15      = $(HEADER_SEARCH_PATHS_16) "$(SRCROOT)/../Libraries/libb64/libb64-1.2/include"
 HEADER_SEARCH_PATHS_14      = $(HEADER_SEARCH_PATHS_15) "$(SRCROOT)/../Libraries/libevent/OSX-Code"
 HEADER_SEARCH_PATHS_13      = $(HEADER_SEARCH_PATHS_14) "$(SRCROOT)/../Libraries/libevent/include"
@@ -62,3 +63,6 @@ FRAMEWORK_SEARCH_PATHS      = $(inherited) $(FRAMEWORK_SEARCH_PATHS_01)
 LIBRARY_SEARCH_PATHS_01     = $(LIBRARY_SEARCH_PATHS_02) "$(SRCROOT)/lib/mac"/**
 
 LIBRARY_SEARCH_PATHS        = $(inherited) $(LIBRARY_SEARCH_PATHS_01)
+
+// Encode use of USER_HEADER_SEARCH_PATHS - this should be off but for now we need it.
+ALWAYS_SEARCH_USER_PATHS = YES

@@ -74,10 +74,11 @@ static std::mutex dbconnMutex;
 DB::handle_t*
 dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnect)
 {
-	if ( connection.host == nullptr ) return nullptr;
-	if ( connection.dbName == nullptr ) return nullptr;
-	if ( connection.username == nullptr ) return nullptr;
-	if ( connection.password == nullptr ) return nullptr;
+    threadLog(_FLD, "Getting thread connection to host '%s' database '%s' user '%s'", connection.host, connection.dbName, connection.username);
+	if ( connection.host[0] == 0 ) return nullptr;
+	if ( connection.dbName[0] == 0 ) return nullptr;
+	if ( connection.username[0] == 0 ) return nullptr;
+	if ( connection.password[0] == 0 ) return nullptr;
 
 	DB::handle_t* newConn = nullptr;
 	std::this_thread::sleep_for(std::chrono::microseconds(250));
@@ -88,7 +89,7 @@ dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnec
 
 	if ( report )
 	{
-		dbugLog(_FLI, "Connection to host '%s' database '%s' user '%s' password '%s' reconnect '%s' %s."
+		threadLog(_FLI, "Connection to host '%s' database '%s' user '%s' password '%s' reconnect '%s' %s."
 						, connection.host, connection.dbName
 						, connection.username, connection.password
 						, (autoReconnect ? "auto" : "manual")

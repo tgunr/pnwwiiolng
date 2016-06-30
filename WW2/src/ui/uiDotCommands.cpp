@@ -1882,7 +1882,7 @@ static SINT32 dot_allinf(const char*)
 
 	int ccount = 4;
 
-	char* countries[] =
+	const char* countries[] =
 	{
 		"uk",
 		"fr",
@@ -1892,7 +1892,7 @@ static SINT32 dot_allinf(const char*)
 
 	int tcount = 10;
 
-	char* troops[] =
+	const char* troops[] =
 	{
 		"rifle",
 		"-smg",
@@ -1906,7 +1906,7 @@ static SINT32 dot_allinf(const char*)
 		"-bar"			// US Only
 	};
 
-	char* paras[] =
+	const char* paras[] =
 	{
 		"-para-rfl",
 		"-para-smg",
@@ -2003,7 +2003,7 @@ static SINT32 dot_decal(const char* line)
 //////////////////////////////////////////////////////////////////////
 static SINT32 dot_gr2debug(const char* line)
 {
-	char* flags[] =
+	const char* flags[] =
 	{
 		"model",
 		"collider",
@@ -2015,9 +2015,9 @@ static SINT32 dot_gr2debug(const char* line)
 		"fpsfall",
 	};
 
-	char flag[80+1];
+	char flag[80 + 1] = {0};
 
-	int argc = sscanf(line, "%*s %80s", (char*)&flag);
+	int argc = sscanf(line, "%*s %80s", &flag[0]);
 
 	if(argc)
 	{
@@ -3980,33 +3980,6 @@ static SINT32 dot_tspawn(const char* input)
     if(!input || *input == 0)
         return DC_HANDLED;
 
-#if USE_SCENARIO_MAP
-    if(strstr(input, "-deletebuildings"))
-    {
-	if(!instances.empty())
-	{
-            omap::iterator itr = instances.begin();
-
-		    for(; itr != instances.end(); ++itr)
-			{
-				if((*itr)->modelInstance->GetModelType() != ModelTypes::TERRAIN_TILE)
-				{
-					trncdRemoveTerrainObject(*itr, 0, 0, 0, nullptr);
-					obpoolFreeObjectCallback(*itr);
-					remove.push_back(itr);
-				}
-		    }
-
-            for(unsigned int i = 0; i < remove.size(); i++)
-            {
-                instances.erase(remove[i]);
-            }
-
-            buildingobj = nullptr;
-		    trndtl[12].terrain->flag2 &= ~OBJECT_VISIBLE;
-	    }
-    }
-#else
 	if(!instances.empty())
 	{
         omap::iterator itr = instances.begin();
@@ -4020,7 +3993,6 @@ static SINT32 dot_tspawn(const char* input)
         buildingobj = nullptr;
 		trndtl[12].terrain->flag2 &= ~OBJECT_VISIBLE;
 	}
-#endif
 
     piVECTOR rotxyz;
     rotxyz.set(0, 0, 0);
@@ -4032,10 +4004,6 @@ static SINT32 dot_tspawn(const char* input)
     if(p)
     {
         fields = sscanf(p, "%*s %f %f %f", &rotxyz.x, &rotxyz.y, &rotxyz.z);
-
-#if USE_SCENARIO_MAP
-        std::swap(rotxyz.y, rotxyz.z);
-#endif
 
         rotxyz.x = DEG_TO_RAD(rotxyz.x);
         rotxyz.y = DEG_TO_RAD(rotxyz.y);
@@ -4052,20 +4020,6 @@ static SINT32 dot_tspawn(const char* input)
     if(p)
     {
         fields = sscanf(p, "%*s %f %f %f", &posxyz.x, &posxyz.y, &posxyz.z);
-
-#if USE_SCENARIO_MAP
-        std::swap(posxyz.y, posxyz.z);
-
-        colliderQuery::CollisionList collisions;
-        posxyz.z += 10.0f;
-
-        CollideDown(Vec3d(posxyz), collisions);
-
-        if(!collisions.empty())
-        {
-            posxyz.z = -collisions[0].pos.z();
-    }
-#endif
     }
 
     transform._41 = posxyz.x;
@@ -4079,9 +4033,7 @@ static SINT32 dot_tspawn(const char* input)
         return DC_HANDLED;
     }
 
-#if USE_SCENARIO_MAP
     Write_Debug("[%s] x = %f y = %f z = %f", model, posxyz.x, posxyz.y, posxyz.z);
-#endif
 
     std::string topmodel = model;
 
@@ -4092,7 +4044,6 @@ static SINT32 dot_tspawn(const char* input)
 		return DC_HANDLED;
 	}
 
-#if !(USE_SCENARIO_MAP)
     if(masterModel->modelType == ModelTypes::TERRAIN_TILE)
     {
         // Z fighting
@@ -4101,7 +4052,6 @@ static SINT32 dot_tspawn(const char* input)
         transform._43 -= 1.0f;
 #endif
     }
-#endif
 
     int sx, sy, r, c;
     persGetMySupercellAndOctet(sx, sy, r, c);
@@ -7143,79 +7093,6 @@ static int dot_version(const char* line)
 }
 #endif
 
-#if defined(ENABLE_VOICE_COMMS)
-#include "voice/VoiceRats.h"
-#include "RakNetTypes.h"
-
-static int dot_voice(const char* line)
-{
-	int playerSide = wwiiSide(PlayerClient()->PersonaSelected().m_countryID);
-	int playerCountry = PlayerClient()->PersonaSelected().m_countryID;
-
-	if((playerSide == 0) || (playerCountry == 0))
-	{
-		uiChatPrintLine("Voice comms not available at this time.");
-		return DC_HANDLED;
-	}
-
-	std::string playerSideName = (playerSide == 1) ? "ALLIED" : "AXIS";
-
-	if(VoiceCommsOn)
-	{
-		VoiceCommsOn = false;
-		uiChatPrintLine("Voice communications OFF.");
-	}
-	else
-	{
-		uiChatPrintLine("Voice communications: ON.");
-		VoiceMgr * mgr1 = new VoiceMgr();
-		mgr = mgr1;
-		mgr -> start();
-		uiChatPrintLine("Joining channel: %s ...", playerSideName.c_str());
-		// Default to Voice Activated Detection (VAD)
-	}
-
-	return DC_HANDLED;
-}
-
-static int dot_voicechannel(const char* line)
-{
-	int chan = 0;
-	int argc = sscanf(line, "%*s %1d", &chan);
-	std::string chanName = (chan == 1) ? "ALLIED" : "AXIS";
-
-	int playerSide = wwiiSide(PlayerClient()->PersonaSelected().m_countryID);
-	int playerCountry = PlayerClient()->PersonaSelected().m_countryID;
-	std::string playerSideName = (playerSide == 1) ? "ALLIED" : "AXIS";
-
-	if((playerSide == 0) || (playerCountry == 0))
-	{
-		uiChatPrintLine("Voice comms not available at this time.");
-		return DC_HANDLED;
-	}
-
-
-	if(VoiceCommsOn)
-	{
-		uiChatPrintLine("You (%s) have requested to join channel: %s ...", playerSideName.c_str(), chanName.c_str());
-		if(chan == playerSide)
-		{
-			// Set up a RakVoice connection
-			// Set up a RakVoice channel
-			uiChatPrintLine("Joining channel: %s ...", chanName.c_str());
-			// Default to Voice Activated Detection (VAD)
-		}
-		else
-			uiChatPrintLine("You do not have permission to do that! (Side mismatch)");
-	}
-	else
-		uiChatPrintLine("You do not have permission to do that! (Voice comms currently OFF)");
-
-	return DC_HANDLED;
-
-}
-#endif //ENABLE_VOICE_COMMS
-
 static int dot_vcache(const char* line)
 {
 	UINT32 mode = gVCache;
@@ -7323,7 +7200,7 @@ static int dot_texinfo(const char* line)
       }
 
       int format = (int) F, bytes = 1;
-      char* s = "OTHER";
+      const char* s = "OTHER";
       switch(format)
       {
         case GL_ALPHA8_EXT:                      s= "GL_ALPHA8_EXT"                  ;
@@ -7973,11 +7850,6 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(vcache, false);
 	ADD_DOT_COMMAND(vehprint, false);
 	ADD_DOT_COMMAND(benchinfantry, false);
-
-#if defined(ENABLE_VOICE_COMMS)
-	ADD_DOT_COMMAND(voice, false);
-	ADD_DOT_COMMAND(voicechannel, false);
-#endif
 
 #if RELEASE_CLIENT == 0
 	ADD_DOT_COMMAND(dev, false);

@@ -1,5 +1,10 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6.4)
+## Declare the CMake version requirement
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
+
+## Declare the project
 PROJECT(GameHosts)
+
+
 SET(CMAKE_CXX_STANDARD 14)
 
 # This will determine bitness, amongst other things.
@@ -403,14 +408,14 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
             chat/chatRosterClient.cpp
         )
         ADD_PCH(chatClient)
-        TARGET_LINK_LIBRARIES(chatClient libwwii teulserver)
+        TARGET_LINK_LIBRARIES(chatClient libwwii teulserver ${MYSQL_LIBRARIES})
         SET_PROPERTY(TARGET chatClient PROPERTY FOLDER "Tools")
 
         # Provide access to the LuaVMs.
         ADD_EXECUTABLE(luaClient
             src/luaClient.cpp
         )
-        TARGET_LINK_LIBRARIES(luaClient libwwii teulserver readline ncurses)
+        TARGET_LINK_LIBRARIES(luaClient libwwii teulserver readline ncurses ${MYSQL_LIBRARIES})
         SET_PROPERTY(TARGET luaClient PROPERTY FOLDER "Tools")
     ENDIF( )
 
@@ -419,7 +424,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
     ADD_EXECUTABLE(checkGameName
         src/checkGameName.cpp
     )
-    TARGET_LINK_LIBRARIES(checkGameName libwwii teulserver)
+    TARGET_LINK_LIBRARIES(checkGameName libwwii teulserver ${MYSQL_LIBRARIES})
     SET_PROPERTY(TARGET checkGameName PROPERTY FOLDER "Tools")
 
     # In theory, SDM pre-parser. In practice? Deletes SDM files that don't
@@ -433,7 +438,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
         ${PCH_INCLUDE_HEADERS}
         sdm/sdmConfigVars.h
     )
-    TARGET_LINK_LIBRARIES(sdmpp libwwii teulserver)
+    TARGET_LINK_LIBRARIES(sdmpp libwwii teulserver ${MYSQL_LIBRARIES})
     SET_PROPERTY(TARGET sdmpp PROPERTY FOLDER "Tools")
 
     # Analyze SDM files
@@ -442,7 +447,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
         sdm/sdmDump.cpp
         ${PCH_INCLUDE_HEADERS}
     )
-    TARGET_LINK_LIBRARIES(sdmDump libwwii teulserver)
+    TARGET_LINK_LIBRARIES(sdmDump libwwii teulserver ${MYSQL_LIBRARIES})
     SET_PROPERTY(TARGET sdmDump PROPERTY FOLDER "Tools")
 
     # Reads SDM files and imports portions of them into the game database.
@@ -490,7 +495,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
     )
     ADD_PCH(stratValidator)
     SET_PROPERTY(TARGET stratValidator PROPERTY COMPILE_DEFINITIONS CHECK_SUPPLY=1)
-    TARGET_LINK_LIBRARIES(stratValidator libwwii teulserver event)
+    TARGET_LINK_LIBRARIES(stratValidator libwwii teulserver event ${MYSQL_LIBRARIES})
     SET_PROPERTY(TARGET stratValidator PROPERTY FOLDER "Tools")
 ENDIF( )
 
@@ -537,7 +542,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
     )
     #ADD_PCH(${CONTROLLER_HOST_EXE})
     SET_PROPERTY(TARGET ${CONTROLLER_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_CONTROLLER_HOST)
-    TARGET_LINK_LIBRARIES(${CONTROLLER_HOST_EXE} libwwii teulserver)
+    TARGET_LINK_LIBRARIES(${CONTROLLER_HOST_EXE} libwwii teulserver ${MYSQL_LIBRARIES})
     SET_PROPERTY(TARGET ${CONTROLLER_HOST_EXE} PROPERTY FOLDER "Hosts")
 
     # Primarily communications-oriented server, the chat host.
@@ -1191,73 +1196,73 @@ ENDIF( )
 ######################################################################
 #### Test Module(s)
 
-ADD_EXECUTABLE(testAuthConnect
-    tests/testAuthConnect.cpp
-
-    ${PCH_INCLUDE_HEADERS}
-)
-TARGET_LINK_LIBRARIES(testAuthConnect libwwii teulserver)
-SET_PROPERTY(TARGET testAuthConnect PROPERTY FOLDER "Test")
-
-IF( NOT PN_CLUSTER STREQUAL "Auth")
+#ADD_EXECUTABLE(testAuthConnect
+#    tests/testAuthConnect.cpp
+#
+#    ${PCH_INCLUDE_HEADERS}
+#)
+#TARGET_LINK_LIBRARIES(testAuthConnect libwwii teulserver)
+#SET_PROPERTY(TARGET testAuthConnect PROPERTY FOLDER "Test")
+#
+#IF( NOT PN_CLUSTER STREQUAL "Auth")
     # Builds a single executable that runs all of the unit tests;
     # The install process will not execute unless all tests complete.
-    ADD_EXECUTABLE(testUnits
-        tests/testUnits.cpp
-            tests/testUnits.h
-        tests/testTeulBits.cpp
-        tests/testAuthQueue.cpp auth/authClientData.cpp
-        tests/testChatHandle.cpp
-        tests/testFullObjID.cpp
-        tests/testCommandWithArgs.cpp
-        tests/testCovert.cpp
-        tests/testLocalizedMessage.cpp
-        tests/testInplaceVector.cpp
-        tests/testPackers.cpp   comm/commPackers.cpp
-        tests/testChatMissionStatus.cpp wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChat.cxx
-        tests/testHostGridCell.cpp host/hostGridCell.cpp
-        tests/testSupercellVislevelXfer.cpp
-        tests/testPersonaXfer.cpp
-        tests/testCryptographer.cpp
-        tests/testXYZTuple.cpp
-        tests/testTeulPacket.cpp
-
-        ${PCH_INCLUDE_HEADERS}
-        tests/testSuite.h
-        tests/testUnits.h
-    )
-    ADD_PCH(testUnits)
-    SET_PROPERTY(TARGET testUnits PROPERTY COMPILE_DEFINITIONS ENABLE_TESTS)
-    SET_PROPERTY(TARGET testUnits PROPERTY FOLDER "Test")
-    TARGET_LINK_LIBRARIES(testUnits libwwii teulserver)
-
-    ADD_TEST(testUnits ${EXECUTABLE_OUTPUT_PATH}/testUnits)
-ENDIF( )
+#    ADD_EXECUTABLE(testUnits
+#        tests/testUnits.cpp
+#        tests/testUnits.h
+#        tests/testTeulBits.cpp
+#        tests/testAuthQueue.cpp auth/authClientData.cpp
+#        tests/testChatHandle.cpp
+#        tests/testFullObjID.cpp
+#        tests/testCommandWithArgs.cpp
+#        tests/testCovert.cpp
+#        tests/testLocalizedMessage.cpp
+#        tests/testInplaceVector.cpp
+#        tests/testPackers.cpp   comm/commPackers.cpp
+#        tests/testChatMissionStatus.cpp wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChat.cxx
+#        tests/testHostGridCell.cpp host/hostGridCell.cpp
+#        tests/testSupercellVislevelXfer.cpp
+#        tests/testPersonaXfer.cpp
+#        tests/testCryptographer.cpp
+#        tests/testXYZTuple.cpp
+#        tests/testTeulPacket.cpp
+#
+#        ${PCH_INCLUDE_HEADERS}
+#        tests/testSuite.h
+#        tests/testUnits.h
+#    )
+#    ADD_PCH(testUnits)
+#    SET_PROPERTY(TARGET testUnits PROPERTY COMPILE_DEFINITIONS ENABLE_TESTS)
+#    SET_PROPERTY(TARGET testUnits PROPERTY FOLDER "Test")
+#    TARGET_LINK_LIBRARIES(testUnits libwwii teulserver)
+#
+#    ADD_TEST(testUnits ${EXECUTABLE_OUTPUT_PATH}/testUnits)
+#ENDIF( )
 
 ######################################################################
 #### Module for testing teulKit functionality
 
-IF( NOT PN_CLUSTER STREQUAL "Auth")
-    ADD_EXECUTABLE(testTeul
-        tests/testTeul.cpp
-        
-        ${PCH_INCLUDE_HEADERS}
-        teul/teulExceptions.h
-        teul/teulKit.h
-        teul/teulEndpoint.h
-        teul/teulEndpointImpl.h
-        teul/teulPacket.h
-        teul/teulPacketHeader.h
-        wwii/wwiiCallbacks.h
-        tests/testTeulTest.h
-        tests/testTeulClient.h
-        tests/testTeulServer.h
-        teul/teulVersion.h
-        teul/teulConnectionInstruction.h
-    )
-    TARGET_LINK_LIBRARIES(testTeul teulserver libwwii)
-    SET_PROPERTY(TARGET testTeul PROPERTY FOLDER "Test")
-ENDIF( )
+#IF( NOT PN_CLUSTER STREQUAL "Auth")
+#    ADD_EXECUTABLE(testTeul
+#        tests/testTeul.cpp
+#        
+#        ${PCH_INCLUDE_HEADERS}
+#        teul/teulExceptions.h
+#        teul/teulKit.h
+#        teul/teulEndpoint.h
+#        teul/teulEndpointImpl.h
+#        teul/teulPacket.h
+#        teul/teulPacketHeader.h
+#        wwii/wwiiCallbacks.h
+#        tests/testTeulTest.h
+#        tests/testTeulClient.h
+#        tests/testTeulServer.h
+#        teul/teulVersion.h
+#        teul/teulConnectionInstruction.h
+#    )
+#    TARGET_LINK_LIBRARIES(testTeul teulserver libwwii)
+#    SET_PROPERTY(TARGET testTeul PROPERTY FOLDER "Test")
+#ENDIF( )
 
 ######################################################################
 #### Build files.

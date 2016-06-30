@@ -505,7 +505,7 @@ public:
 			// You're here, so we tell the sender that we're sending your message.
 			dest->notifyOtherIfAFK(player);
 
-			// Show me how its going to look to him
+			// Show me how its going to look to them
 			if ( player.isHiddenFrom(dest) == false )
 			{
 				try

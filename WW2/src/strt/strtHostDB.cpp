@@ -828,7 +828,7 @@ strtdbFetchLuaScript(const char* name, std::string& obj)
 void
 strtdbSaveConfigVar(const char* name, const char* value)
 {
-	DBSimpleQuery(dbh, "UPDATE host_config SET value = '%s' WHERE variableName = '%s'", value, name);
+	DBSimpleQuery(dbh, "UPDATE wwiionline.wwii_config SET value = '%s' WHERE variableName = '%s'", value, name);
 }
 
 //////////////////////////////////////////////////////////////////////

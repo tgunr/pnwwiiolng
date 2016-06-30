@@ -49,10 +49,6 @@ Hideaway* checksum;
 static LOGICAL abcd();
 #endif
 
-#if platOS == OS_WIN32 && defined(PERFORMANCE_ENTER_EXIT)
-#include "syspee.h"
-#endif
-
 #define RELEASE_ALLOW_WINDOW
 #undef RELEASE_ALLOW_WINDOW
 
@@ -1036,10 +1032,6 @@ static void HandleHackID()
 // This is the actual winmain
  int WINAPI WinMainX(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-#if platOS == OS_WIN32 && defined(PERFORMANCE_ENTER_EXIT)
-char	filename[_MAX_PATH];
-#endif
-
 char	logfilename[_MAX_PATH];
 int		x, y, w, h, wh, xy;
 int		bpp, hdw, stencil, wnd;
@@ -1050,16 +1042,6 @@ RECT	rect;
 #ifdef DIRECT3D
 int		screenmode;
 #endif	// DIRECT3D
-
-#if platOS == OS_WIN32 && defined(PERFORMANCE_ENTER_EXIT)
-	if (GetModuleFileName(nullptr, filename, sizeof(filename)))
-	{
-		if (!syspeeParseMapFunction(filename))
-		{
-			return(FALSE);
-		}
-	}
-#endif
 
 //CW can't do a nameless union initialization
     memset(&IdentityMatrix, 0, sizeof(piMATRIX));
@@ -1522,10 +1504,6 @@ int		screenmode;
 	GameInProgress = 0;
 
 	memKill();
-
-#if platOS == OS_WIN32 && defined(PERFORMANCE_ENTER_EXIT)
-	syspeeKill();
-#endif
 
 	Close_Debug();
 

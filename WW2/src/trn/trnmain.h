@@ -40,6 +40,7 @@
 		TERRAIN_INFO	trinfo[MAX_TERRAIN_EDIT_LIST];	// used triangle information
 		SINT16			tobndx;							// object slot counter
 		SDM_ObjInfo		trnobj[MAX_TERRAIN_OCTETS * MAX_TRNOBJ_OCTET];	// objects in this super cell
+		const char* trnobjRefs[MAX_TERRAIN_OCTETS * MAX_TRNOBJ_OCTET]; // references for quicker unload
 		UINT32*			toldflags;						// object loaded flags
 
 		// strat pointers
@@ -88,22 +89,13 @@
 	extern LOGICAL trnmainAddToObject(OBJECT* newobj, OBJECT* lpobj, SINT32 poly, SINT32 tonum, SINT32 drag, SINT32 roughness, SINT32 style, SINT32 orientation);
 	extern LOGICAL trnmainDrawObject(OBJECT* lpobj);
 	extern LOGICAL trnmainGetMapName(SINT8* mapname);
-	extern LOGICAL trnmainAddObject(SINT8* objname,
-                             piVECTOR* pos,
-                             OBJECT* lpmain,
-                             SINT32 StratSuperCellX,
-                             SINT32 StratSuperCellY,
-                             UINT32 StratId,
-							 REL_OBJ_ID * ObjId,
-                             SINT32 drag,
-                             SINT32 roughness,
-                             SINT32 style,
-                             SINT32 orientation,
-                             SINT32 sc,
-							 bool nonPlanarBase,
-							 const SDM_ObjInfo& objInfo,
-                             TERRAIN_DETAIL* td
-                             );
+	extern LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
+	                                SINT32 StratSuperCellX, SINT32 StratSuperCellY, UINT32 StratId,
+	                                REL_OBJ_ID * ObjId,
+	                                SINT32 drag, SINT32 roughness,
+	                                SINT32 style, SINT32 orientation, SINT32 sc, bool nonPlanarBase,
+	                                const SDM_ObjInfo& objInfo, TERRAIN_DETAIL* td,
+	                                const char** objRefName);
 
 	extern LOGICAL trnmainSetObjectCreationCallback(TRN_OBJECT_NOTIFY callback);
 	extern LOGICAL trnmainSetObjectDeletionCallback(TRN_OBJECT_NOTIFY callback);

@@ -1148,11 +1148,7 @@ void uiGameToUI()
 
 	if(Online)
 	{
-#ifndef USE_SCENARIOS
-		if(!training)
-#endif
-
-		PlayerClient()->OnDespawn();
+        PlayerClient()->OnDespawn();
 
 		/*
 		// if we get to here and we're still connected, disconnect us

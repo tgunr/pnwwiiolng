@@ -705,7 +705,6 @@ void GameClient::ActivateMap()
 
 		if(spawnStatus == SPAWN_PENDING)
 		{
-#pragma message ("TBD: do something here?")
 			jsclient->RunScript("onspawnerror()");
 		}
 	}

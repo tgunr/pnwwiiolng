@@ -1,13 +1,13 @@
-# Check which platform we're running
-
+# Determine bitness
 IF (CMAKE_SIZEOF_VOID_P EQUAL 4)
 	SET(CMAKE_BITNESS 32)
 ELSEIF (CMAKE_SIZEOF_VOID_P EQUAL 8)
 	SET(CMAKE_BITNESS 64)
 ELSE ()
-	MESSAGE(FATAL_ERROR "CMAKE_SIZEOF_VOID_P is ${CMAKE_SIZEOF_VOID_P} which is a bit size I don't know how to handle.")
-ENDIF ( )
+	MESSAGE(FATAL_ERROR "Unknown CMAKE_SIZEOF_VOID_P value ${CMAKE_SIZEOF_VOID_P}")
+ENDIF ()
 
+# Determine platform
 IF (WIN32)
 	SET(CMAKE_PLAT "win")
 	SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)

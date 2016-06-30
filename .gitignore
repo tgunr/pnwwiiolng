@@ -1227,6 +1227,7 @@ WW2/lib/win/osg8
 WW2/macbuild.txt
 WW2/proj/host
 WW2/proj/mac/build
+WW2/proj/mac/WW2 Release Items/DropDMG/DropDMG.app
 WW2/proj/versionNo_2.h
 WW2/proj/win/*.aps
 WW2/proj/win/*.eto

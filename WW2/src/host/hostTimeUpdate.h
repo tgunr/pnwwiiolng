@@ -29,7 +29,7 @@ struct TimeUpdate
 		a->packer(mode, rain);
 	}
 
-	UINT16	gametime;
+	UINT32	gametime;
 	UINT8	factor;
 	UINT8	weather;
 	UINT8	rain;

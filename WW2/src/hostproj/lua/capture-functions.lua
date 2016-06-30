@@ -251,7 +251,7 @@ function P.findPrimaryContributor(history)
 			-- If we don't have a last hope yet, this guy will do.
 			lastHope = entry
 		end
-		-- Now check if he is still here and so viable for actually winning.
+		-- Now check if they're still here and so viable for actually winning.
 		if entry.updated >= updateCutoff and entry.contribs >= contributor.contribs then
 			if entry.contribs > contributor.contribs then
 				-- I have more contributions than you, I win

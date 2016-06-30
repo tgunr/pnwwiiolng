@@ -53,4 +53,3 @@ static const bool useAuthServer = false;
 #else
 static const bool useAuthServer = true;
 #endif
-
