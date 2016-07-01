@@ -607,7 +607,7 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 
 static void ReleaseSupercellObjects(TERRAIN_DETAIL* td) {
 	if ( td == nullptr )
-		return
+        return;
 
 	logTimerBeginMacro();
 
