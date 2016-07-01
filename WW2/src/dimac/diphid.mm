@@ -483,6 +483,7 @@ LOGICAL dipSetupJoystick(void)
                             _StickElements[i].iac = IAC_JOYSTICK_ROTX[idx];
                             break;
                         case kHIDUsage_GD_Ry:
+                        case kHIDUsage_GD_Dial:
                             _StickElements[i].type = HID_AXIS;
                             _StickElements[i].iac = IAC_JOYSTICK_ROTY[idx];
                             break;
@@ -496,6 +497,8 @@ LOGICAL dipSetupJoystick(void)
                                 _StickElements[i].iac = IAC_JOYSTICK_POV_N[idx][povnum];
                                 povnum++;
                             }
+                            break;
+                        default:
                             break;
                     }
 					// calibrate
