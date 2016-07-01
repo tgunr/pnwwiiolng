@@ -15,6 +15,7 @@
 #include "ob/obdraw.h"
 #include "math/math3d.h"
 #include "trn/trncloud.h"
+#include "trn/trnsky.h"
 #include "str/strpool.h"
 #include "trn/trnop.h"
 #include "trn/trngrass.h"
@@ -270,7 +271,19 @@ struct	OBJECT*	obmgrCreateModelInstance(const char* modelName, const piMATRIX& t
 	if(poolModel->node == 0)	poolModel->load();
 	if(poolModel->node == 0)	return 0;
 
-	topInstanceNode = poolModel->CreateInstance(transform)->rootObject;
+    // HACK: DEV-787 ==>>
+    piMATRIX matMove = transform;
+
+    if (poolModel->modelType == ModelTypes::CLOUD && poolModel->node->name[0] == 'r')
+    {
+        matMove = IdentityMatrix;
+        matMove._43 -= RAIN_CLOUD_HEIGHT_OFFSET;
+
+        math3dMatrixMultiply(&matMove, &transform, &matMove);
+    }
+    // <<== HACK: DEV-787
+
+	topInstanceNode = poolModel->CreateInstance(matMove)->rootObject;
 	//if(handleSpecialObjects)	HandleSpecialObjects(topInstanceNode);
 
 	return topInstanceNode;
