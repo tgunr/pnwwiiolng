@@ -39,7 +39,7 @@ sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, CP* cons
 	table->facility = facility;
 	table->numFacilities = numFacilities + numCPs;
 
-	for ( int i = 0; i < numCPs; ++i ) {
+	for ( SINT32 i = 0; i < numCPs; ++i ) {
 		facility[i].id = cps[i].oid.id;
 		facility[i].bidList.bid = (SINT16*)bidList;
 		facility[i].bidList.numBuildings = 0;
@@ -47,7 +47,7 @@ sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, CP* cons
 		bidList += BuildingTableSize;
 	}
 
-	for ( int i = 0, j = 0; i < numFacilities; ++i, ++j ) {
+	for ( SINT32 i = 0, j = numCPs; i < numFacilities; ++i, ++j ) {
 		facility[j].id = fac[i].oid.id;
 		facility[j].bidList.bid = (SINT16*)bidList;
 		facility[j].bidList.numBuildings = 0;
