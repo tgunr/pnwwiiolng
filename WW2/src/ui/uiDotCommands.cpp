@@ -7472,7 +7472,8 @@ static int dot_vehprint(const char* line)
 // Used for .report and .bug, which need extra tinkering before the command is sent.
 static int dot_clientinfo_command(const wchar_t *line)
 {
-    swprintf(_LastCommand, sizeof(_LastCommand), L"\x01%s\x01%ls", ChatClientInfo().encode(), line);
+    char *encodedText = ChatClientInfo().encode();
+    swprintf(_LastCommand, sizeof(_LastCommand), L"\x01%s\x01.%ls", encodedText, line);
     return DC_PASS_USE_LAST;
 }
 
