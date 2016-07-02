@@ -732,9 +732,11 @@ public:
 		player.GetWeaponStr(info);
 		info.append(",");
                 player.whereabouts(info, player.lastX(), player.lastY());
+		info.append(",");
+		info.append(systemInfo.c_str());
 
                 dbugLog(_FLI, "!BUG|%s|%s|%s|%s", player.callsign(), systemInfo.c_str(), arguments, info.c_str());
-                chatdbRecordEvent("BUG", player.callsign(), systemInfo.c_str(), arguments, info.c_str());
+                chatdbRecordEvent("BUG", player.callsign(), command(), arguments, info.c_str());
 
                 std::string reply(arguments);
                 reply += " ";
