@@ -478,9 +478,7 @@
 		FA13BB421C87649000095818 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3B1C87649000095818 /* IOKit.framework */; };
 		FA13BB431C87649000095818 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3C1C87649000095818 /* OpenAL.framework */; };
 		FA13BB441C87649000095818 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3D1C87649000095818 /* OpenGL.framework */; };
-		FA13BB451C87649000095818 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3E1C87649000095818 /* QuickTime.framework */; };
 		FA13BB461C87649000095818 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3F1C87649000095818 /* Security.framework */; };
-		FA13BB4A1C8764BB00095818 /* libcrypto.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB481C8764BB00095818 /* libcrypto.tbd */; };
 		FA13BB4B1C8764BB00095818 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB491C8764BB00095818 /* libz.tbd */; };
 		FA13BB4F1C87650800095818 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB4E1C87650800095818 /* libxml2.tbd */; };
 		FA13BB511C87CF8500095818 /* libglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB501C87CF8500095818 /* libglew.a */; };
@@ -1370,7 +1368,6 @@
 		08977E1C134D007B00C9DCFE /* sneaky.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sneaky.h; sourceTree = "<group>"; };
 		08977E1D134D007B00C9DCFE /* sneaky.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sneaky.cpp; sourceTree = "<group>"; };
 		0898699D13A2BB4C00D643A0 /* libotmac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libotmac.a; path = lib/mac/libotmac.a; sourceTree = "<group>"; };
-		089FB52614194F2200EBEB5F /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		08A428C012C93A490041B628 /* oglTextureObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oglTextureObject.cpp; sourceTree = "<group>"; };
 		08A428C112C93A490041B628 /* oglTextureObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = oglTextureObject.h; sourceTree = "<group>"; };
 		08A43F081092021000B13339 /* glplat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glplat.h; sourceTree = "<group>"; };
@@ -1510,7 +1507,6 @@
 		FA13BB3B1C87649000095818 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		FA13BB3C1C87649000095818 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		FA13BB3D1C87649000095818 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		FA13BB3E1C87649000095818 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = System/Library/Frameworks/QuickTime.framework; sourceTree = SDKROOT; };
 		FA13BB3F1C87649000095818 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		FA13BB481C8764BB00095818 /* libcrypto.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcrypto.tbd; path = usr/lib/libcrypto.tbd; sourceTree = SDKROOT; };
 		FA13BB491C8764BB00095818 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -1548,14 +1544,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA13BB4F1C87650800095818 /* libxml2.tbd in Frameworks */,
-				FA13BB4A1C8764BB00095818 /* libcrypto.tbd in Frameworks */,
 				FA13BB4B1C8764BB00095818 /* libz.tbd in Frameworks */,
 				FA13BB401C87649000095818 /* AGL.framework in Frameworks */,
 				FA13BB411C87649000095818 /* Cocoa.framework in Frameworks */,
 				FA13BB421C87649000095818 /* IOKit.framework in Frameworks */,
 				FA13BB431C87649000095818 /* OpenAL.framework in Frameworks */,
 				FA13BB441C87649000095818 /* OpenGL.framework in Frameworks */,
-				FA13BB451C87649000095818 /* QuickTime.framework in Frameworks */,
 				FA13BB461C87649000095818 /* Security.framework in Frameworks */,
 				E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */,
 				082CF80E1202241200A60CC2 /* CoreAudio.framework in Frameworks */,
@@ -3025,7 +3019,6 @@
 				FA13BB3B1C87649000095818 /* IOKit.framework */,
 				FA13BB3C1C87649000095818 /* OpenAL.framework */,
 				FA13BB3D1C87649000095818 /* OpenGL.framework */,
-				FA13BB3E1C87649000095818 /* QuickTime.framework */,
 				FA13BB3F1C87649000095818 /* Security.framework */,
 				0898699D13A2BB4C00D643A0 /* libotmac.a */,
 				FA13BB501C87CF8500095818 /* libglew.a */,
@@ -3048,7 +3041,6 @@
 				FA13BB481C8764BB00095818 /* libcrypto.tbd */,
 				FA13BB491C8764BB00095818 /* libz.tbd */,
 				FA13BB4E1C87650800095818 /* libxml2.tbd */,
-				089FB52614194F2200EBEB5F /* Carbon.framework */,
 			);
 			name = lib;
 			sourceTree = "<group>";

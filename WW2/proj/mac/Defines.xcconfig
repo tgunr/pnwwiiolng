@@ -37,8 +37,8 @@ WW2_DEFINES_Debug_02        = $(WW2_DEFINES_Debug_03) IS_DEBUG DEBUG _DEBUG
 WW2_DEFINES_Debug_01        = $(WW2_DEFINES_Debug_02) DONT_USE_COVERT               // disable bad tricks for masking memory values
 
 // Development mode
-WW2_DEFINES_Development_20  = $(WW2_DEFINES_Development_21) EVENT_LOG_EXTREME       // EXTREEEEEEME event logs!
-//WW2_DEFINES_Development_20  = $(WW2_DEFINES_Development_21) EVENT_LOG_TIMES         // More logged timers using a different mechanism (Windows Only)
+WW2_DEFINES_Development_21  = $(WW2_DEFINES_Development_22) EVENT_LOG_EXTREME       // EXTREEEEEEME event logs!
+WW2_DEFINES_Development_20  = $(WW2_DEFINES_Development_21) EVENT_LOG_TIMES         // More logged timers using a different mechanism
 WW2_DEFINES_Development_19  = $(WW2_DEFINES_Development_20) DEBUG_REDUCTION         // Report on size reduction during texture loading
 WW2_DEFINES_Development_18  = $(WW2_DEFINES_Development_19) VEHICLES_GAME_INFO      // Show a bunch of stuff about vehicle updates
 WW2_DEFINES_Development_17  = $(WW2_DEFINES_Development_18) UPDATE_HISTORY_DEBUG    // Show a bunch of stuff about world updates
