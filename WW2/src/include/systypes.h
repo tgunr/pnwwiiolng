@@ -48,7 +48,12 @@
 #elif platOS == OS_MACOS || platOS == OS_LINUX
 
 	#include <sys/types.h>
+
+    #if platOS == OS_MACOS
 	#include <malloc/malloc.h>
+    #elif platOS == OS_LINUX
+    #include <malloc.h>
+    #endif
 
 //tolua_begin
 	// Logical types

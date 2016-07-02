@@ -636,9 +636,9 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 								, _logger.file()
 								, _logger.lineno);
 		_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, _logger.text(), len, false);
-        if ( ((flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR)) && !(flags & BARE_DEBUG) ) {
-            fprintf(stderr, "%s", _logger.text());
-        }
+		if ( ((flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR)) && !(flags & BARE_DEBUG) ) {
+			fprintf(stderr, "%s", _logger.text());
+		}
 	}
 
 	const char* text = nullptr;
@@ -649,11 +649,14 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		len = _logger.vformatText(fmt, args);
 		if ( len == (size_t)~0 ) {
 			text = "[ERROR]\n";
-			len = strlen(text);
 		} else {
-            len = _logger.formatText("%s\n", _logger.text());
-			text = _logger.text();
-        }
+			_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, _logger.text(), len, true);
+			if ( ((flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR)) ) {
+				fprintf(stderr, "%s", _logger.text());
+			}
+			text = "\n";
+        	}
+		len = strlen(text);
 	}
 
 	if ( PN_UNLIKELY(len == 0) )
@@ -665,7 +668,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, text, len, true);
 
 	if ( (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR) ) {
-        fprintf(stderr, "%s", text);
+		fprintf(stderr, "%s", text);
 	}
 
 	_levelHandler(_logger.errType, text);

@@ -13,6 +13,7 @@
 #include <mysql.h>
 #include <signal.h>
 #include <mutex>
+#include <sstream>
 
 #include "dbse/dbseConnection.h"
 #include "dbse/dbseWrapper.h"

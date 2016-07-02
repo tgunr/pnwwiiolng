@@ -224,16 +224,19 @@ authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch
 		return WEB_ERR_INTERNAL;
 	}
 
-	char buffer[512];
-	wwiiEscapeString(username);
-	wwiiEscapeString(password);
+    char ubuffer[16*2+1] = {0};
+	mysql_real_escape_string(dbh, ubuffer, username.c_str(), username.length());
+    char pbuffer[80*2+1] = {0};
+	mysql_real_escape_string(dbh, pbuffer, password.c_str(), password.length());
+	char buffer[512] = {0};
 
 	UINT32 len = strprintf(buffer
 					, "CALL `auth`.`p_authenticate_user_for_arena`('%s','%s',%u)"
-						, username.c_str()
-						, password.c_str()
+						, ubuffer
+						, pbuffer
 						, request.arenaID
 						);
+
 	if ( len >= sizeof(buffer) - 1 )
 	{
 		dbugLog(_FLW, "t:%d c:%s ip:%s arena:%u plat:%u login attempt produces overlong query (%u bytes)"
@@ -326,15 +329,17 @@ Auth::LoginRequest::validate(SINT32 teulIndex, Auth::ClientData& cdata)
 		authdbLogBadPlayername(cdata.address, username, "illegal password");
 		return WEB_ERR_INTERNAL;
 	}
-
-	char buffer[512];
-	wwiiEscapeString(username);
-	wwiiEscapeString(password);
+    
+    char ubuffer[16*2+1] = {0};
+	mysql_real_escape_string(dbh, ubuffer, username.c_str(), username.length());
+    char pbuffer[80*2+1] = {0};
+	mysql_real_escape_string(dbh, pbuffer, password.c_str(), password.length());
+	char buffer[512] = {0};
 
 	UINT32 len = strprintf(buffer
 					, "CALL `auth`.`p_get_user_subscriptions`('%s','%s')"
-						, username.c_str()
-						, password.c_str()
+						, ubuffer
+						, pbuffer
 						);
 	if ( len >= sizeof(buffer) - 1 )
 	{
@@ -733,15 +738,15 @@ bool authInitGameEntry(GAME& gameEntry)
 //////////////////////////////////////////////////////////////////////
 void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_INFO& pci)
 {
-	SCHAR	statement[8000+1];
-	SCHAR	cardName[MAX_OGL_CARD_NAME*2 + 1];
-	SCHAR	vendor[MAX_OGL_VENDOR_NAME*2 + 1];
-	SCHAR	descs[MAX_COMPRESSED_TEXTURE*5 + 1]; // %4x + " "
-	std::string cpuManufacturer;
-	std::string cpuBrandName;
-	SCHAR	soundCard[MAX_MIX_NAME*2 + 1];
-	SCHAR	exts[1024+1];
-	SCHAR*	p;
+	char	statement[8000+1];
+	char	cardName[MAX_OGL_CARD_NAME*2 + 1];
+	char	vendor[MAX_OGL_VENDOR_NAME*2 + 1];
+	char	descs[MAX_COMPRESSED_TEXTURE*5 + 1]; // %4x + " "
+	char    cpuManufacturer[sizeof(CPUFeatures)*2 + 1];
+	char    cpuBrandName[sizeof(CPUFeatures)*2 + 1];
+	char	soundCard[MAX_MIX_NAME*2 + 1];
+	char	exts[1024+1];
+	char*	p;
 	UINT32	i;
 	UINT32	numCompTextures;
 	const PLAY_OGL& ogl = pci.video.ogl;
@@ -754,32 +759,26 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 
 	try
 	{
-		// These values might not be MySQL safe, so escape 'em
-		// I would have used strnlen but redhat 6 didn't appear to provide it
-		// This convoluted method of copying the data was intended to protect
-		// us from malicious data being sent up by the user...
 		strncpy(statement, ogl.cardName, MAX_OGL_CARD_NAME);
-		statement[MAX_OGL_CARD_NAME] = 0;
-		mysql_escape_string(cardName, statement, strlen(statement));
+		mysql_real_escape_string(dbh, cardName, statement, strlen(statement));
 
 		strncpy(statement, ogl.vendor, MAX_OGL_VENDOR_NAME);
-		statement[MAX_OGL_VENDOR_NAME] = 0;
-		mysql_escape_string(vendor, statement, strlen(statement));
-
-		cpuManufacturer = cpu.manufacturer;
-		cpuBrandName = cpu.brandName;
-
-		wwiiEscapeString(cpuManufacturer);
-		wwiiEscapeString(cpuBrandName);
-
+		mysql_real_escape_string(dbh, vendor, statement, strlen(statement));
+        
+        strncpy(statement, cpu.manufacturer, std::min(sizeof(statement), sizeof(cpu.manufacturer)) - 1);
+        mysql_real_escape_string(dbh, cpuManufacturer, statement, strlen(statement));
+        
+        strncpy(statement, cpu.brandName, std::min(sizeof(statement), sizeof(cpu.brandName)) - 1);
+        mysql_real_escape_string(dbh, cpuBrandName, statement, strlen(statement));
+        
 		if ( pci.sound.isValid )
 		{
 			strncpy(statement, mix.szPname, MAX_MIX_NAME);
 			statement[MAX_MIX_NAME] = 0;
-			mysql_escape_string(soundCard, statement, strlen(statement));
-		}
-		else
+			mysql_real_escape_string(dbh, soundCard, statement, strlen(statement));
+		} else {
 			strncpy(soundCard, "*none*", MAX_MIX_NAME);
+		}
 
 		descs[0] = 0;
 		// Check we can trust the data
@@ -853,8 +852,8 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 					, ((pci.sound.isValid) ? mix.wMid : 0)
 					, ((pci.sound.isValid) ? mix.wPid : 0)
 
-					, cpuManufacturer.c_str()
-					, cpuBrandName.c_str()
+					, cpuManufacturer
+					, cpuBrandName
 
 					, (unsigned int)cpu.model
 					, (unsigned int)cpu.family
@@ -876,7 +875,7 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 					, cpu.speed
 					);
 
-		mysql_escape_string(statement, cdata.m_username.c_str(), MAX_HANDLE_LEN * 2 + 1);
+		mysql_real_escape_string(dbh, statement, cdata.m_username.c_str(), MAX_HANDLE_LEN * 2 + 1);
 		DBSimpleQuery(dbh, "UPDATE `auth`.`auth_customer` SET `flags` = (`flags` | 2) WHERE `username` = '%s'", statement);
 	}
 	catch (std::exception& e)
@@ -1007,10 +1006,13 @@ authdbLogBadPlayername(UINT32 ip, const std::string& username, std::string reaso
 {
 	try
 	{
-		if ( username == "blitz" )
-			return;
-		wwiiEscapeString(reason);
-		DBQuery q(dbh, "INSERT INTO `auth`.`auth_illegal_users` (`recorded`, `ip`, `username`, `reason`) VALUES (NOW(), %u, '%s', '%s')", ip, username.c_str(), reason.c_str());
+	    std::string realUsername;
+	    realUsername.resize(username.length() * 2 + 1);
+	    mysql_real_escape_string(dbh, &realUsername[0], username.c_str(), username.length());
+	    std::string realReason;
+	    realReason.resize(reason.length() * 2 + 1);
+	    mysql_real_escape_string(dbh, &realReason[0], reason.c_str(), reason.length());
+		DBQuery q(dbh, "INSERT INTO `auth`.`auth_illegal_users` (`recorded`, `ip`, `username`, `reason`) VALUES (NOW(), %u, '%s', '%s')", ip, realUsername.c_str(), realReason.c_str());
 	}
 	catch ( std::exception& e )
 	{
