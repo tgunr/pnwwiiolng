@@ -324,8 +324,8 @@ _configureEndpointSocket(ENDPOINT& endpoint)
 		// Listening sockets need to re-allow use of the address on close.
 		if ( endpoint.state() == IS_LISTENING )
 			evutil_make_listen_socket_reuseable(endpoint.socket);
-#if platOS != OS_WIN32
-        setsockopt(endpoint.socket, SOL_SOCKET, SO_NOSIGPIPE, (const int[]){ 0 }, sizeof(int));
+#if platOS == OS_MACOS
+        setsockopt(endpoint.socket, SOL_SOCKET, SO_NOSIGPIPE, (const int[]){ 1 }, sizeof(int));
 #endif
 	}
 	else if ( endpoint.protocol == PROTOCOL_UDB )

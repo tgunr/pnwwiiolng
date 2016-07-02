@@ -14,6 +14,9 @@
 #include "wwii/wwiiNetPorts.h"
 #include "src/controllerGameProcess.h"
 #include "server/serverInitializeProcess.h"
+#include "dbse/dbseConnection.h"
+
+DBCONNECTION dbConnection;
 
 #if platOS == OS_WIN32
 #include <winsock2.h>

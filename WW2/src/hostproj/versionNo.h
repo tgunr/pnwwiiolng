@@ -26,9 +26,6 @@
 # define SINGLE_CELL_HOST
 #endif
 
-// HACK: No more APP_ID garbage.
-#undef APP_ID
-#define APP_ID 1
 
 #ifdef BETA_RELEASE
 static const bool isBETA_RELEASE = true;
