@@ -7473,7 +7473,11 @@ static int dot_vehprint(const char* line)
 static int dot_clientinfo_command(const wchar_t *line)
 {
     char *encodedText = ChatClientInfo().encode();
+#if platOS == OS_WIN32
+	swprintf(_LastCommand, sizeof(_LastCommand), L"\x01%S\x01.%ls", encodedText, line);
+#else
     swprintf(_LastCommand, sizeof(_LastCommand), L"\x01%s\x01.%ls", encodedText, line);
+#endif
     return DC_PASS_USE_LAST;
 }
 
