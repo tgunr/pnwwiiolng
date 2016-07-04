@@ -455,7 +455,7 @@ mapCheckSideCounts()
 
 #if defined(BETA_RELEASE) || defined(PUBLIC_RELEASE)
 		DBThread::Do(DBThread::Audit
-			, "INSERT INTO player_counts"
+			, "INSERT IGNORE INTO player_counts"
 					" (stamp,undecided,allied,axis,spawned_allied,spawned_axis,allied_favor,axis_favor,delay)"
 				"VALUES"
 					" (now(),%u,%u,%u,%u,%u,%d,%d,%u)"

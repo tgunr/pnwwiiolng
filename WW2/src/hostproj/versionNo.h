@@ -26,15 +26,6 @@
 # define SINGLE_CELL_HOST
 #endif
 
-#if defined(CLOSED_BETA) || defined(TEST_RELEASE) || defined(OPEN_BETA)
-# ifndef TEST_RELEASE
-#  define BETA_RELEASE
-# else	// TEST_RELEASE
-#  define PUBLIC_RELEASE
-# endif // TEST_RELEASE
-#elif ! (defined(DEBUG_BUILD) || defined(PUBLIC_RELEASE))
-# error "No build type defined"
-#endif
 
 #ifdef BETA_RELEASE
 static const bool isBETA_RELEASE = true;
@@ -53,3 +44,4 @@ static const bool useAuthServer = false;
 #else
 static const bool useAuthServer = true;
 #endif
+

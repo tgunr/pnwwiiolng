@@ -355,9 +355,15 @@ SINT32 trnUpdateStratData(TERRAIN_DETAIL* td, OBJECT* lpobj, SINT32 bid, LOGICAL
 		}
 	}
 
-	if ( 0 > bid || bid >= td->bldHash.maxBldID ) {
-		// TEMP: This is triggering so often that it will occasionally affect performance.
-		//Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
+	if ( bid < 0 ) {
+		Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (<0) - model type %d - model name %s", 
+		          bid, lpobj->modelInstance == nullptr ? -1 : lpobj->modelInstance->GetModelType(),
+		          lpobj->name);
+		return -EINVAL;
+	}
+
+	if ( bid >= td->bldHash.maxBldID ) {
+		Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
 		return -EINVAL;
 	}
 
