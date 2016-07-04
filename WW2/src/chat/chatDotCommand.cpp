@@ -428,7 +428,7 @@ DotCommandIndex::add(DotCommand* dotCommand)
 
 	// Now add to the database incase it's not already there
 	std::string desc = dotCommand->description();
-	wwiiEscapeString(desc);
+        DBThread::EscapeString(desc);
 
 	DBThread::Do(DBThread::Default
 				, "INSERT IGNORE INTO chat_commands"

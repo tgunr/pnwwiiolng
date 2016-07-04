@@ -284,7 +284,8 @@ public:
 		target->message(LSTR_WARNING, LSTR_GM_MOVED_YOU, args[1]);
 
 		std::string note = args[1];
-		wwiiEscapeString(note);
+                DBThread::EscapeString(note);
+
 		if ( note.length() > 400 )
 			note.resize(400);
 		DBThread::Do(DBThread::Default, "CALL wwii.p_add_player_note('%s', %u, 3, '%s')", target->callsign(), player.playerID(), note.c_str());
@@ -938,7 +939,8 @@ public:
 		_smite(target);
 
 		std::string sqlReason = (reason ? reason : "<no reason given>");
-		wwiiEscapeString(sqlReason);
+                DBThread::EscapeString(sqlReason);
+
 		DBThread::Do(DBThread::Default, "CALL `wwii`.`p_add_player_note`('%s',%u,4,'%s')", target->callsign(), player.playerID(), sqlReason.c_str());
 	}
 } dotKick;
@@ -2721,7 +2723,7 @@ public:
 		if ( args.size() > 1 )
 		{
 			std::string note = args[1];
-			wwiiEscapeString(note);
+                        DBThread::EscapeString(note);
 
 			if ( note.length() > 399 )
 			{
@@ -2778,7 +2780,8 @@ public:
 
 		// Add the relevant note
 		std::string note = args[1];
-		wwiiEscapeString(note);
+                DBThread::EscapeString(note);
+
 		if ( note.length() > 400 )
 			note.resize(400);
 		DBThread::Do(DBThread::Default, "CALL wwii.p_add_player_note('%s', %u, 3, '%s')", target->callsign(), player.playerID(), note.c_str());

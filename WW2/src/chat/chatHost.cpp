@@ -1408,7 +1408,8 @@ chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageI
 	if ( allowDotCommands )
 	{
 		std::string msgText = inMessage->m_message;
-		wwiiEscapeString(msgText);
+                DBThread::EscapeString(msgText);
+
 		DBThread::Do(DBThread::Audit, "INSERT INTO `audit`.`chat_messages` (player_id, message) VALUES (%u, '%s')", player->playerID(), msgText.c_str());
 
 		_radioSnoop(player, inMessage);
