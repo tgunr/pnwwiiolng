@@ -215,7 +215,7 @@ Supercell::initialize(SINT16 scx, SINT16 scy, const char* filename)
 	_initLinks(this, filename);
 
 	// Initialize the facility and building tables
-	facilityTable = sdmCreateFacilityTable(sdmGetFACILITYArray(), numFacilities, nullptr, numCPs);
+	facilityTable = sdmCreateFacilityTable(sdmGetFACILITYArray(), numFacilities, sdmGetCPArray(), numCPs);
 	if ( facilityTable != nullptr )
 	{
 		UINT32 errors = 0;

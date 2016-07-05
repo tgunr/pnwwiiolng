@@ -460,6 +460,11 @@ CP* sdmGetNextCP(void)
 	return &cpList[currentCP++];
 }
 
+CP* sdmGetCPArray(void)
+{
+    return cpList;
+}
+
 UINT16 sdmGetNumFACILITY(void)
 {
 	return header.numFacilities;

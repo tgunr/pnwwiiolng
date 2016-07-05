@@ -39,15 +39,12 @@ sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, CP* cons
 	table->facility = facility;
 	table->numFacilities = numFacilities + numCPs;
 
-	// TEMP/HACK: The server currently passes in nullptr for this new param pending review.
-	if ( cps != nullptr ) {
-		for ( SINT32 i = 0; i < numCPs; ++i ) {
-			facility[i].id = cps[i].oid.id;
-			facility[i].bidList.bid = (SINT16*)bidList;
-			facility[i].bidList.numBuildings = 0;
+	for ( SINT32 i = 0; i < numCPs; ++i ) {
+		facility[i].id = cps[i].oid.id;
+		facility[i].bidList.bid = (SINT16*)bidList;
+		facility[i].bidList.numBuildings = 0;
 
-			bidList += BuildingTableSize;
-		}
+		bidList += BuildingTableSize;
 	}
 
 	for ( SINT32 i = 0, j = numCPs; i < numFacilities; ++i, ++j ) {
