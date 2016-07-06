@@ -444,7 +444,9 @@ SINT32
 StratCommand::send()
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::EXCHANGE_SCMD_Y), *this);
-	return serverSendPacketToType(outgoing, STRAT_HOST);
+    if (serverSendPacketToType(outgoing, STRAT_HOST))
+        return 0;
+    return -EINVAL;
 }
 
 //////////////////////////////////////////////////////////////////////
