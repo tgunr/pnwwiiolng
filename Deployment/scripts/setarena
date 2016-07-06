@@ -1,0 +1,4 @@
+#!/bin/sh
+/bin/cp -f /usr/local/etc/wwiiolrc_base /usr/local/etc/wwiiolrc
+/bin/echo "export ARENA_ID=\"$1\"" >> /usr/local/etc/wwiiolrc
+. /usr/local/etc/wwiiolrc

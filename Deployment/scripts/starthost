@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# Start the designated host process for this machine
+# Depends on presence of /home/wwiiol/etc/berole.rc
+#
+
+RCFILE='/home/wwiiol/etc/berole.rc'
+
+# Make sure the RC file exists
+if [ ! -r $RCFILE ]; then
+ echo "Missing/unreadable $RCFILE"
+ exit 0
+fi
+
+role=`cat $RCFILE`
+if [ "x$role" = "x" ]; then
+ echo "Invalid $RCFILE - no host role assigned"
+ exit 0
+fi
+
+echo "Starting $role"
+sleep 2
+sudo -u wwiiol /playnet/bin/clustercontrol start $role -db
+sleep 3
+

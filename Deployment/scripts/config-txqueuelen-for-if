@@ -1,0 +1,33 @@
+#! /bin/bash
+# Configure txqueuelen for an interface.
+# Usage: IFACE="..." LEN="..." config-txqueuelen-for-if
+
+if [ $(id -u) -ne 0 ] ; then
+  echo "ERROR: Must be root."
+  exit 1
+fi
+
+if [ -z ${IFACE} -o -z ${LEN} ] ; then
+  echo "USAGE: ${0} IFACE='eth0|eth1|...' LEN='packetCount'"
+  exit 2
+fi
+
+if [ ${LEN} -lt 0 ] ; then
+  echo "ERROR: LEN must be a numeric value"
+  exit 3
+fi
+if [ ${LEN} -lt 1000 ] ; then
+  echo "ERROR: Len must be at least 1000"
+  exit 4
+fi
+
+# Check what the kernel is configured to support
+kernFile=/proc/sys/net/core/netdev_max_backlog
+kernValue=$(cat ${kernFile})
+if [ ${LEN} -gt ${kernValue} ] ; then
+  echo "* Raising ${kernFile} to match [was ${kernValue}]"
+  echo ${LEN} >${kernFile} 
+fi
+
+ifconfig ${IFACE} txqueuelen ${LEN}
+
