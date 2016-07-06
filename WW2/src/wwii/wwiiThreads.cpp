@@ -359,19 +359,21 @@ DBThreadQuery::Queue()
 void
 DBThread::EscapeString(DB::handle_t* conn, std::string& text)
 {
-    char tempBuff[text.length()*2+1];
+    char *tempBuff = new char[text.length()*2+1];
     mysql_real_escape_string(conn, tempBuff, text.c_str(), text.length());
     text = tempBuff;
+    delete tempBuff;
 }
 
 void
 DBThread::EscapeString(std::string& text)
 {
-    char tempBuff[text.length()*2+1];
+    char *tempBuff = new char[text.length()*2+1];
     dbQueue.doLocked([&] {
         mysql_real_escape_string(dbThread[0].getConn(), tempBuff, text.c_str(), text.length());
     });
     text = tempBuff;
+    delete tempBuff;
 }
 
 

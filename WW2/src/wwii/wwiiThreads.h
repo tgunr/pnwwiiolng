@@ -72,6 +72,8 @@ public:
 	virtual void run() override;
 };
 
+#define MYSQL_ESC_QUERY_VAR_MAX_LEN   512
+
 namespace DBThread
 {
 	typedef enum { Audit, Auth, Chat, Game, Player, Squad, Sys, Wwii, WwiiOnline, NumDBNos, Default = WwiiOnline } DBNo;

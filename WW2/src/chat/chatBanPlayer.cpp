@@ -126,6 +126,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 	char* p = nullptr;
 	Chat::Name name(ban.m_handle);
 	Chat::Name issuer(ban.m_issuerHandle);
+	char    *message = nullptr;
 
 	try
 	{
@@ -133,9 +134,9 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 		threadLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, issuer.c_str(), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, name.c_str());
 
-		char    message[strlen(ban.m_message.c_str())*2 + 1];
+		message = new char[strlen(ban.m_message.c_str())*2 + 1];
         	mysql_real_escape_string(conn, message, ban.m_message.c_str(), ban.m_message.length());
-
+		
 		// p_ban_player ( playerID, banFor, banBy, reason ) returns either
 		// 0, <reason>
 		// 1, <#bans>
@@ -144,6 +145,9 @@ _processBan(DB::handle_t* conn, BAN& ban)
 		p = threadsPrintf(QRY_CALL_BAN_PLAYER, name.c_str(), ban.m_duration, ban.m_issuer, message);
 		DBQuery q(conn, p);
 
+		delete message;
+		message = nullptr;
+	
 		playerid_t playerID = 0;
 		if ( q.HasRows() && q.FetchRow() )
 			playerID = q.Row().NextUInt();
@@ -161,6 +165,9 @@ _processBan(DB::handle_t* conn, BAN& ban)
 	}
 	catch (std::exception& e)
 	{
+		if (message != nullptr)
+			delete message;
+
 		ban.m_message = e.what();
 		threadCallback(_banFail, &ban);
 		threadLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, name.c_str(), e.what());
