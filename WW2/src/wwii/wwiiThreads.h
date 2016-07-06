@@ -75,6 +75,10 @@ public:
 namespace DBThread
 {
 	typedef enum { Audit, Auth, Chat, Game, Player, Squad, Sys, Wwii, WwiiOnline, NumDBNos, Default = WwiiOnline } DBNo;
+
+	// Escape function to be used prior to adding a query
+	extern void EscapeString(DB::handle_t* conn, std::string& text);
+	extern void EscapeString(std::string& text);
 	// Build a query in a textAlloc and format it for me.
 	extern void Do(const DBNo db_, const char* queryFormat, ...);
 	// Pre-formatted textAlloc query

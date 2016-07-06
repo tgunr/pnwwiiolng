@@ -475,7 +475,10 @@ JS_FUNCTION_DEF(jsClient, sendchatmessage)
 		// this allows us to localize host commands on the
 		// client
 		if(Online && result == DC_PASS_USE_LAST)
+        {
 			msg = uiDotCommandLast();
+            cmsg = uiUTF16toUTF8(msg);
+        }
 	}
 
 	unsigned int txmask = 0;

@@ -5406,6 +5406,12 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 				}
 			}
 		}
+        else
+        {
+            // When we have no collider hits we don't want system thinking our current position is ground
+            // reset it.
+            _collider.groundHit.z	= 0;
+        }
 
 		if(!cHitCount)
 			lastNormal.set(0,0,0);

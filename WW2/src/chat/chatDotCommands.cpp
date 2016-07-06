@@ -40,6 +40,7 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiRank.h"
+#include "weap/weapSpec.h"
 
 //////////////////////////////////////////////////////////////////////
 // Private variables
@@ -59,6 +60,7 @@
 
 static const UCHAR PRIVATE_CHAN_ICON = 15;
 
+extern UINT32 serverUpTimeMinutes();
 
 //////////////////////////////////////////////////////////////////////
 //// Private helper functions
@@ -689,6 +691,124 @@ public:
 } dotOrders;
 
 //////////////////////////////////////////////////////////////////////
+// Player bug submission
+//////////////////////////////////////////////////////////////////////
+
+//! @internal
+class DotBug : public DotCommand
+{
+public:
+        DotBug() : DotCommand("bug", "Submit a bug/problem/feedback report"
+                                                                , NO_MASK, LSTR_BUG_USAGE, LSTR_BUG_DETAIL
+                                                                ) { }
+        virtual void actionWith(Player& player, Chat::ClientMessage* message, SCHAR* arguments) const  override
+        {
+
+		// Client Information header contains client platform, OS version, and application version info
+		std::string systemInfo;
+		systemInfo.append("Platform=");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_PLATFORM]));
+		systemInfo.append(",OSVer=");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION+1]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION+2]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION+3]));
+		systemInfo.append(",ClientVer=");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_VERSION]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_VERSION+1]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_VERSION+2]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_VERSION+3]));
+		systemInfo.append(",uptime=");
+		systemInfo.append(std::to_string(serverUpTimeMinutes()));
+		systemInfo.append("min");
+
+		std::string info;
+		player.GetWeaponStr(info);
+		info.append(",");
+                player.whereabouts(info, player.lastX(), player.lastY());
+		info.append(",");
+		info.append(systemInfo.c_str());
+
+                dbugLog(_FLI, "!BUG|%s|%s|%s|%s", player.callsign(), systemInfo.c_str(), arguments, info.c_str());
+                chatdbRecordEvent("BUG", player.callsign(), command(), arguments, info.c_str());
+
+                std::string reply(arguments);
+                reply += " ";
+                reply += info;
+
+                Chat::LocalizedMessage lmsg(LSTR_BUG, LSTR_REPORTING, player.callsign(), reply.c_str());
+                const char* ircMessage = chatLString(lmsg);
+                wwiiIRCChannelMessage("-sys", ircMessage);
+                chatBroadcastLocMessage(commandList.begin(), commandList.end(), lmsg, [] (wwiiPlayer* const& subject) { return subject->isEffectiveGM(); });
+
+                player.message(LSTR_NOTE, LSTR_REPORTED, nullptr, nullptr);
+
+                return;
+        }
+} dotBug;
+
+//////////////////////////////////////////////////////////////////////
+// uptime command
+//////////////////////////////////////////////////////////////////////
+
+//! @internal
+class DotUptime: public DotCommand
+{
+public:
+        DotUptime() : DotCommand("uptime", "Report number of minutes the system has been running"
+                                                                , NO_MASK, LSTR_UPTIME_USAGE, LSTR_UPTIME_DETAIL
+                                                                ) { }
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
+        {
+		int totalMins = serverUpTimeMinutes();
+		int days = totalMins / (60 * 24);
+		totalMins -= days * 60 * 24;
+		int hours = totalMins / 60;
+		totalMins -= hours * 60;
+		int mins = totalMins;
+
+		std::string timeStr;
+		timeStr.append("Running for ");
+		if (days > 0)
+		{
+			timeStr.append(std::to_string(days));
+			timeStr.append(" day");
+			if (days > 1)
+				timeStr.append("s");
+			timeStr.append(" ");
+		}
+		if (hours > 0)
+		{
+			timeStr.append(std::to_string(hours));
+			timeStr.append(" hour");
+			if (hours > 1)
+				timeStr.append("s");
+			timeStr.append(" ");
+		}
+		if (mins > 0)
+		{
+			timeStr.append(std::to_string(mins));
+			timeStr.append(" minute");
+			if (mins > 1)
+				timeStr.append("s");
+			timeStr.append(" ");
+		}
+
+                dbugLog(_FLI, "!UPTIME: %s", timeStr.c_str());
+		player.message(LSTR_NONE, LSTR_GENERIC, timeStr.c_str());
+
+                return;
+        }
+} dotUptime;
+
+
+//////////////////////////////////////////////////////////////////////
 // Player report submission
 //////////////////////////////////////////////////////////////////////
 
@@ -696,22 +816,21 @@ public:
 class DotReport : public DotCommand
 {
 public:
-	DotReport() : DotCommand("report", "Submit a bug/problem/feedback report"
+	DotReport() : DotCommand("report", "Report suspiscious player activity"
 								, NO_MASK, LSTR_REPORT_USAGE, LSTR_REPORT_DETAIL
 								) { }
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, SCHAR* arguments) const  override
 	{
-		SCHAR info[MAX_MESSAGE_LENGTH + 1];
-
 		if ( !player.isPlaynet() && !player.isEffectiveGM() && _featureLockedM(player, REPORT_TIME_LIMIT_M) )
 			return;
 
-		info[0] = '[';
-		player.whereabouts(info+1, player.lastX(), player.lastY());
-		strcat(info, "]");
+		std::string info;
+		info.append("[");
+		player.whereabouts(info, player.lastX(), player.lastY());
+		info.append("]");
 
-		dbugLog(_FLI, "!REPORT:%s:.%s:%s %s", player.callsign(), command(), arguments, info);
-		chatdbRecordEvent("RPRT", player.callsign(), command(), arguments, info);
+		dbugLog(_FLI, "!REPORT:%s:.%s:%s %s", player.callsign(), command(), arguments, info.c_str());
+		chatdbRecordEvent("RPRT", player.callsign(), command(), arguments, info.c_str());
 
 		std::string reply(arguments);
 		reply += " ";

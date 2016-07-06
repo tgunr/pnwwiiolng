@@ -1621,13 +1621,26 @@ Player::SetSquadInvite(SquadInvite* invite)
 void
 Player::SetWeapon(const WEAPON_SPEC& toWeapon)
 {
+	dbugLog(_FLD, "Weapon was %d.%d.%d.%d", m_weapon.wType, m_weapon.wClass, m_weapon.wCategory, m_weapon.wCountry);
 	m_weapon = toWeapon;
+	dbugLog(_FLD, "Weapon is now %d.%d.%d.%d", m_weapon.wType, m_weapon.wClass, m_weapon.wCategory, m_weapon.wCountry);
 
 	m_isBuzzard = (m_weapon.wCategory == 4 && m_weapon.wClass == 9 && (m_weapon.wType == 4 || m_weapon.wType == 5));
 }
 
+void Player::GetWeaponStr(std::string &str) const
+{
+	str.append(std::to_string(m_weapon.wType));
+	str.append(".");
+	str.append(std::to_string(m_weapon.wClass));
+	str.append(".");
+	str.append(std::to_string(m_weapon.wCategory));
+	str.append(".");
+	str.append(std::to_string(m_weapon.wCountry));
+}
+
 //////////////////////////////////////////////////////////////////////
-// Sever this player's recruiter link to all the players they are
+// Sever this player's recruiter link to all the players he is
 // currently recruiting (if any) and notify them
 
 void
@@ -2223,14 +2236,14 @@ Player::validatePreference(UINT32 prefId, UINT32 request) const
 // Describe the whereabouts of a player
 
 void
-Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
+Player::whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const
 {
-	assert(into != nullptr);
+	char tmpbuf[MAX_MESSAGE_LENGTH+1];
 
 	if ( noSide() )
 	{
-		strcpy(into, "PersonaScrn");
-		strcat(into, lastPosition("last near", x, y, true));
+		into.append("PersonaScrn");
+		into.append(lastPosition("last near", x, y, true));
 		return;
 	}
 
@@ -2239,71 +2252,71 @@ Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 					: _countryNameAdj[country()]
 					;
 
-	// They're not in a facility, ergo at the map
+	// He's not in a facility, ergo at the map
 	if ( !missionID() )
-	{
-		snprintf(into, MAX_MESSAGE_LENGTH, "%s brigade scrn", affiliation);
-		strcat(into, lastPosition("last near", x, y, true));
+	{	
+		snprintf(tmpbuf, sizeof(tmpbuf), "%s brigade scrn", affiliation);
+		into.append(tmpbuf);
+		into.append(lastPosition("last near", x, y, true));
 		return;
 	}
 
-	strcpy(into, affiliation);
-	strcat(into, " ");
+	into.append(affiliation);
+	into.append(" ");
 
 	HCUnit* unit = HCUnit::Lookup(brigadeID());
 	if ( unit != nullptr )
 	{
-		strcat(into, unit->name());
-		strcat(into, " ");
+		into.append(unit->name());
+		into.append(" ");
 	}
 
 	ChatMission* mission = chatFindMission(missionID());
 	if ( mission )
-		strcat(into, Chat::Name(mission->leader()).c_str());
+		into.append(Chat::Name(mission->leader()).c_str());
 	else
-		strcat(into, "unknown");
-	strcat(into, " mission " );
+		into.append("unknown");
+	into.append(" mission ");
 
-	// They've started the spawning process
+	// He's started the spawning process
 	UINT32 cellIP = getCellHost();
 	if ( cellIP == 0 )
 	{
-		strcat(into, originCP());
-		strcat(into, " mission room");
-		strcat(into, lastPosition("last posn. ", x, y, false));
+		into.append(originCP());
+		into.append(" mission room");
+		into.append(lastPosition("last posn. ", x, y, false));
 	}
 	else
 	{
-		strcat(into, chatMakeTempString("cell#%u", (cellIP & 0xff)));
-		// They may not have finished spawning
+		into.append(chatMakeTempString("cell#%u", (cellIP & 0xff)));
+		// He may not have finished spawning
 		if ( !isSpawned() )
 		{
-			strcat(into, " spawning ");
-			strcat(into, originCP());
+			into.append(" spawning ");
+			into.append(originCP());
 		}
 		else
 		{
 			if ( sortieID() == 0 )
-				strcat(into, "?missingsortieid?");
+				into.append("?missingsortieid?");
 			else
-				strcat(into, chatMakeTempString("sortie #%u", sortieID()));
+				into.append(chatMakeTempString("sortie #%u", sortieID()));
 
 			if ( isBuzzard() )
-				strcat(into, " buzzard");
-			strcat(into, lastPosition("near ", x, y, false));
+				into.append(" buzzard");
+			into.append(lastPosition("near ", x, y, false));
 			if ( lastCP() == nullptr || lastCP()->Matches(originCpID()) == false )
 			{
-				strcat(into, " origin: ");
-				strcat(into, originCP());
+				into.append(" origin: ");
+				into.append(originCP());
 			}
 		}
 	}
 
 	if ( isSpawned() && m_impl->m_lastPing > 0 )
 	{
-		char ping[20];
-		strprintf(ping, " ping:%ums", m_impl->m_lastPing);
-		strcat(into, ping);
+		snprintf(tmpbuf, sizeof(tmpbuf), " ping:%ums", m_impl->m_lastPing);
+		into.append(tmpbuf);
 	}
 }
 

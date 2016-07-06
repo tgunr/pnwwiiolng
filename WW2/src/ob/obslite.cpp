@@ -29,16 +29,12 @@ MATERIAL*		lpmats;
 piMATERIAL*		lpmaterial;
 OBJECT*			lpobj;
 DYNALITE*		lplight;
-#ifdef EVENT_LOG_TIMES
-LARGE_INTEGER count1, count2;
-static __int64	count=0;
-static int		number=0;
-#endif
 
 #ifdef EVENT_LOG_TIMES
-	if (!QueryPerformanceCounter(&count1))
-	{
-	}
+static UINT64 count = 0;
+static int number = 0;
+
+UINT64 beginhere = GetMicroSeconds();
 #endif
 
 	amb = piGetAmbLight();
@@ -263,17 +259,12 @@ static int		number=0;
 	}
 
 #ifdef EVENT_LOG_TIMES
-	if (QueryPerformanceCounter(&count2))
-	{
-		count += count2.QuadPart - count1.QuadPart;
-		if (++number == 256)
-		{
-			QueryPerformanceFrequency(&count2);
-			Write_Debug("Average static lighting time: %d us", (DWORD)(count / number) * 1000 / (DWORD)(count2.LowPart / 1000));
-			number = 0;
-			count = 0;
-		}
-	}
+    count += GetMicroSeconds() - beginhere;
+    if ((++number % 256) == 0)
+    {
+        Write_Debug("Average static lighting time: %lu us", count);
+        count = 0;
+    }
 #endif
 
 	return(TRUE);

@@ -610,7 +610,7 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 
 static void ReleaseSupercellObjects(TERRAIN_DETAIL* td) {
 	if ( td == nullptr )
-		return
+        return;
 
 	logTimerBeginMacro();
 
@@ -4207,20 +4207,6 @@ LOGICAL trnldrModifySupercell(SINT32 sc)
 //LOGICAL			retval=TRUE;
 TERRAIN_DETAIL*	td;
 
-#ifdef EVENT_LOG_TIMES
-LARGE_INTEGER norm_count1, norm_count2;
-static __int64    count=0;
-#endif //EVENT_LOG_TIMES
-
-
-
-#ifdef EVENT_LOG_TIMES
-	if (!QueryPerformanceCounter(&norm_count1))
-	{
-		//Error
-	}
-#endif //EVENT_LOG_TIMES
-
 	td = &trndtl[sc];
 
 	if (loading)
@@ -4308,15 +4294,6 @@ static __int64    count=0;
 	loading = FALSE;
 
 	td->trnstate.state = TRN_STATE_WAIT;
-
-#ifdef EVENT_LOG_TIMES
-	if (QueryPerformanceCounter(&norm_count2))
-	{
-		count += norm_count2.QuadPart - norm_count1.QuadPart;
-		QueryPerformanceFrequency(&norm_count2);
-		count = 0;
-	}
-#endif //EVENT_LOG_TIMES
 
 	return(TRUE);
 }

@@ -18,10 +18,10 @@ static UINT32 g_numVars = 0;
 
 //////////////////////////////////////////////////////////////////////
 // Function for mysql-escaping a string
-
 void
 wwiiEscapeString(std::string& text)
 {
+    
     for ( UINT32 n = 0; n < text.length(); ++n )
     {
         switch ( text[n] )

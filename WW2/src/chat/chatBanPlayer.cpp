@@ -133,15 +133,15 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 		threadLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, issuer.c_str(), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, name.c_str());
 
-		std::string message(ban.m_message);
-		wwiiEscapeString(message);
+		char    message[strlen(ban.m_message.c_str())*2 + 1];
+        	mysql_real_escape_string(conn, message, ban.m_message.c_str(), ban.m_message.length());
 
 		// p_ban_player ( playerID, banFor, banBy, reason ) returns either
 		// 0, <reason>
 		// 1, <#bans>
 		static const char QRY_CALL_BAN_PLAYER[] = "CALL wwii.p_ban_player ('%s', %u, %u, '%s')";
 
-		p = threadsPrintf(QRY_CALL_BAN_PLAYER, name.c_str(), ban.m_duration, ban.m_issuer, message.c_str());
+		p = threadsPrintf(QRY_CALL_BAN_PLAYER, name.c_str(), ban.m_duration, ban.m_issuer, message);
 		DBQuery q(conn, p);
 
 		playerid_t playerID = 0;

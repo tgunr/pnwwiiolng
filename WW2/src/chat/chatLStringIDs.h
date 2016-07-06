@@ -30,6 +30,7 @@ enum LSTRING_ID
 ,	LSTR_BOOT_REMINDER			// You have boot channel off
 ,	LSTR_USER_UNAVAILABLE		// User %s unavailable
 
+// 10
 ,	LSTR_HAVE_GRABBED			// You have grabbed by %s
 ,	LSTR_BEEN_GRABBED			// You have been grabbed %s
 ,	LSTR_BEEN_GRABBED_MSG		// You have been grabbed by %s: %s
@@ -41,6 +42,7 @@ enum LSTRING_ID
 ,	LSTR_HAVE_UNDOGGED			// You have un-grabbed %s.
 ,	LSTR_BEEN_UNDOGGED			// You have been released by Duty Officer %s.
 
+// 20
 ,	LSTR_GENERIC					// %s
 ,	LSTR_BEEN_KICKED				// The Game Manager has killed you.
 ,	LSTR_BEEN_KICKED_MSG			// Kicked by Game Manager: %s
@@ -52,6 +54,7 @@ enum LSTRING_ID
 ,	LSTR_IGNORING				// Ignoring %s
 ,	LSTR_GM						// GM
 
+// 30
 ,	LSTR_GM_ON					// GM mode on
 ,	LSTR_GM_OFF					// GM mode off
 ,	LSTR_HAVE_KICKED_MSG		// Have kicked %s - %s.
@@ -63,6 +66,7 @@ enum LSTRING_ID
 ,	LSTR_NOW_SPARE				// Was report help
 ,	LSTR_REPORTED				// Reported: %s
 
+// 40
 ,	LSTR_REPORT					// REPORT
 ,	LSTR_COMMANDS_LOGGED		// All GM commands are logged.
 ,	LSTR_SELECT_FACILITY		// %s: Must select a facility first
@@ -74,6 +78,7 @@ enum LSTRING_ID
 ,	LSTR_LABELLED_GENERIC		// %s: %s
 ,	LSTR_BETA					// BETA
 
+// 50
 ,	LSTR_SELECT_SIDE			// You must select a side first.
 ,	LSTR_NOBODY_GRABBED			// You don't have anyone .grab'd?
 ,	LSTR_USAGE					// USAGE
@@ -82,37 +87,51 @@ enum LSTRING_ID
 ,	LSTR_AFK_DETAIL
 ,	LSTR_ALL_USAGE,		LSTR_ALL_DETAIL
 ,	LSTR_ALLIED_USAGE,	LSTR_ALLIED_DETAIL
+
+// 60
 ,	LSTR_AXIS_USAGE,	LSTR_AXIS_DETAIL
 ,	LSTR_CRS_USAGE,		LSTR_CRS_DETAIL
 ,	LSTR_GM_USAGE,		LSTR_GM_DETAIL
 ,	LSTR_GMMODE_USAGE,	LSTR_GMMODE_DETAIL
 ,	LSTR_GRAB_USAGE,	LSTR_GRAB_DETAIL
+
+// 70
 ,	LSTR_HC_STAFF_USAGE, LSTR_HC_STAFF_DETAIL
 ,	LSTR_HC_USAGE,		LSTR_HC_DETAIL
 ,	LSTR_HCOFF_USAGE,	LSTR_HCOFF_DETAIL
 ,	LSTR_HCON_USAGE,	LSTR_HCON_DETAIL
 ,	LSTR_HELP_USAGE,	LSTR_HELP_DETAIL
+
+// 80
 ,	LSTR_HQOFF_USAGE,	LSTR_HQOFF_DETAIL
 ,	LSTR_HQON_USAGE,	LSTR_HQON_DETAIL
 ,	LSTR_KICK_USAGE,	LSTR_KICK_DETAIL
 ,	LSTR_KICKALL_USAGE,	LSTR_KICKALL_DETAIL
 ,	LSTR_M_USAGE,		LSTR_M_DETAIL
+
+// 90
 ,	LSTR_N_USAGE,		LSTR_N_DETAIL
 ,	LSTR_PINFO_USAGE,	LSTR_PINFO_DETAIL
 ,	LSTR_REPORT_USAGE,	LSTR_REPORT_DETAIL
 ,	LSTR_ROSTER_USAGE,	LSTR_ROSTER_DETAIL
 ,	LSTR_SYS_USAGE,		LSTR_SYS_DETAIL
+
+// 100
 ,	LSTR_SYSMOTD_STAFF_USAGE,	LSTR_SYSMOTD_STAFF_DETAIL
 ,	LSTR_SYSMOTD_USAGE,	LSTR_SYSMOTD_DETAIL
 ,	LSTR_UNGRAB_USAGE,	LSTR_UNGRAB_DETAIL
 ,	LSTR_WARN_USAGE,	LSTR_WARN_DETAIL
 ,	LSTR_WARNALL_USAGE,	LSTR_WARNALL_DETAIL
+
+// 110
 ,	LSTR_WHO_USAGE,		LSTR_WHO_DETAIL
 ,	LSTR_CPDUMP_USAGE,	LSTR_CPDUMP_DETAIL
 ,	LSTR_CPINFO_USAGE,	LSTR_CPINFO_DETAIL
 ,	LSTR_OWN_USAGE,		LSTR_OWN_DETAIL
 ,	LSTR_HC_OFF
 ,	LSTR_HC_ON
+
+// 120
 ,	LSTR_GRABBED_ALREADY			// Can't grab while grabbed
 ,	LSTR_GRABBED_RELEASING			// Releasing current .grab
 ,	LSTR_NO_SUCH_COMMAND			// No such .comand: %s
@@ -120,12 +139,18 @@ enum LSTRING_ID
 ,	LSTR_FBS_USAGE,		LSTR_FBS_DETAIL
 ,	LSTR_SPECIFY_TOWN
 ,	LSTR_DELAY_USAGE,	LSTR_DELAY_DETAIL
-,	LSTR_FALLBACK_USAGE,	LSTR_FALLBACK_DETAIL
+,	LSTR_FALLBACK_USAGE
+
+// 130
+,	LSTR_FALLBACK_DETAIL
 ,	LSTR_HOLD_USAGE,	LSTR_HOLD_DETAIL
 ,	LSTR_RESYNC_USAGE,	LSTR_RESYNC_DETAIL
 ,	LSTR_FIND_USAGE,	LSTR_FIND_DETAIL
 ,	LSTR_FRIENDS_USAGE,	LSTR_FRIENDS_DETAIL
-,	LSTR_OVERRUN_USAGE,	LSTR_OVERRUN_DETAIL
+,	LSTR_OVERRUN_USAGE
+
+// 140
+,	LSTR_OVERRUN_DETAIL
 ,	LSTR_OVERRUN_EXPIRED			// OVERRUN report has expired or already been dealt with
 ,	LSTR_CMD_SUCCESS				// %s at %s completed.
 ,	LSTR_CMD_ALLOWED				// %s at %s requested.
@@ -135,6 +160,8 @@ enum LSTRING_ID
 ,	LSTR_ABS_NOT_LINKED				// No supply links to armybases in %s.
 ,	LSTR_NO_CONTENTION				// %s is not contested.
 ,	LSTR_ALREADY_REPORTING			// %s is already reporting %s.
+
+// 150
 ,	LSTR_OTHER_ORDERS				// %s already has other orders.
 ,	LSTR_CMD_FAILED					// '%s' failed at %s.
 ,	LSTR_ALREADY_VOTED				// You have already voted on that item.
@@ -145,6 +172,8 @@ enum LSTRING_ID
 ,	LSTR_NO_SUCH_ORDER				// '%s' does not exist or has expired.
 ,	LSTR_ORDER_IN_PROGRESS			// %s: '%s' order is being issued.
 ,	LSTR_NO_ATTACK					// %s not reporting under attack
+
+// 160
 ,	LSTR_NO_OVERRUN					// %s not reporting overrun
 ,	LSTR_SEL_TARGET					// Please select a target on the map first.
 ,	LSTR_TARGET_CP					// Target must be a CP (town or bridge).
@@ -155,6 +184,8 @@ enum LSTRING_ID
 ,	LSTR_NO_OBJECTIVE				// No objective assigned to %s.
 ,	LSTR_FRIENDLY_TOWN				// %s: is not enemy held.
 ,	LSTR_CAUTION					// Caution symbol
+
+// 170
 ,	LSTR_CAPTURE_ORDERS				// Orders issued to take %s
 ,	LSTR_AUTODEFENSE_ORDERS			// Orders issued to defend %s
 ,	LSTR_OBJECTIVE_WITHDRAWING		// %s objective is being withdrawn
@@ -164,12 +195,16 @@ enum LSTRING_ID
 ,	LSTR_NOWHO_USAGE, LSTR_NOWHO_DETAIL
 ,	LSTR_NOWHO_OFF					// Now visible to .who
 ,	LSTR_NOWHO_ON					// Now hidden from .who
+
+// 180
 ,	LSTR_NO_CHANNELS_FOR_AREA		// No channels available for area chat.
 ,	LSTR_OBJECTIVES_USAGE, LSTR_OBJECTIVES_DETAIL
 ,	LSTR_NOECHAT_USAGE, LSTR_NOECHAT_DETAIL
 ,	LSTR_NOECHAT_ON, LSTR_NOECHAT_OFF
 ,	LSTR_AWAITING_CONFIRMATION		// Acknowledged - waiting for confirmation
 ,	LSTR_ATTACK_USAGE, LSTR_ATTACK_DETAIL
+
+// 190
 ,	LSTR_DEFEND_USAGE, LSTR_DEFEND_DETAIL
 ,	LSTR_CLEAR_USAGE, LSTR_CLEAR_DETAIL
 ,	LSTR_KICKING_ALL				// Sending .kick to ALL players
@@ -178,6 +213,8 @@ enum LSTRING_ID
 ,	LSTR_ALLIED						// ALLIED (with HQ + ALLIED icons)
 ,	LSTR_AXIS						// AXIS (with HQ + AXIS icons)
 ,	LSTR_ATTACK_ORDERS				// Orders to attack (e.g. bridge)
+
+// 200
 ,	LSTR_DEFEND_ORDERS				// Bridge defense orders
 ,	LSTR_CLEAR_TOO_SOON				// Cannot cancel %s attack for %s.
 ,	LSTR_SIGNED_ON					// %s has logged in.
@@ -187,6 +224,8 @@ enum LSTRING_ID
 ,	LSTR_INVALID_RANK
 ,	LSTR_NO_ACTIVE_MISSIONS			// No active missions here
 ,	LSTR_WHISPER_USAGE, LSTR_WHISPER_DETAIL
+
+// 210
 ,	LSTR_YELL_USAGE, LSTR_YELL_DETAIL
 ,	LSTR_NOT_ACTIVE_HC
 ,	LSTR_ACTION_LIMITED
@@ -195,6 +234,8 @@ enum LSTRING_ID
 ,	LSTR_FRIENDS_ERROR
 ,	LSTR_OFFLINE_LIST				// Offline: %s
 ,	LSTR_ONLINE_LIST				// Online: %s
+
+// 220
 ,	LSTR_TX_NO_BRIGADE				// No brigade, no brigade channel
 ,	LSTR_TX_NO_MISSION				// No mission, no mission channel
 ,	LSTR_TX_NO_MISSION_CITYS		// No mission, no city channel
@@ -205,6 +246,8 @@ enum LSTRING_ID
 ,	LSTR_TX_CH_RX_ONLY				// %s channel is RX only
 ,	LSTR_TX_NO_SIDE					// No side, no side channels
 ,	LSTR_HELP_CHANNEL_GREETING		// Welcome to the help channel.
+
+// 230
 ,	LSTR_LOCAL_TIME					// Local Time: %s
 ,	LSTR_SERVER_TIME				// Server Time: %s
 ,	LSTR_INFO_BRIDGE_ATTACK			// "%s: Attack/Destroy"
@@ -215,6 +258,8 @@ enum LSTRING_ID
 ,	LSTR_INFO_CITY_DEFEND_FALL		// "%s: Defend from fallback positions"
 ,	LSTR_INFO_CITY_DEFEND			// "%s: Defend against capture"
 ,	LSTR_INFO_CITY_CONTESTED		// "%s is under contention"
+
+// 240
 ,	LSTR_INFO_NEW_OBJECTIVE			// "Newly issued objective"
 ,	LSTR_INFO_OBJECTIVE_PLACED		// Objectived was placed %sh, %sm ago"
 ,	LSTR_MOTD						// "MOTD"
@@ -223,6 +268,8 @@ enum LSTRING_ID
 ,	LSTR_NOT_BRIGADE_LEADER			// Must be a brigade leader to use that command
 ,	LSTR_GAME_COMING_DOWN_IN		// Game coming down in %s
 ,	LSTR_ORDERS_USAGE, LSTR_ORDERS_DETAIL
+
+// 250
 ,	LSTR_NOT_ON_MISSION
 ,	LSTR_NOT_MISSION_LEADER
 ,	LSTR_NO_STANDING_ORDERS
@@ -232,6 +279,8 @@ enum LSTRING_ID
 ,	LSTR_NO_TRAINERS				// No trainers online.
 ,	LSTR_TRAINERS_USAGE, LSTR_TRAINERS_DETAIL
 ,	LSTR_MISSION_CLOSED
+
+// 260
 ,	LSTR_UNKNOWN_COMMAND			// Unknown command '%s'
 ,	LSTR_HCLIST_USAGE, LSTR_HCLIST_DETAIL
 ,	LSTR_SQUAD_DISBANDED			// %s has disbanded %s.
@@ -241,6 +290,8 @@ enum LSTRING_ID
 ,	LSTR_PROMO_TO_MEMBER			// *%s has promoted %s to member.
 ,	LSTR_PROMO_TO_STAFFER			// *%s has promoted %s to staffer.
 ,	LSTR_PROMO_TO_XO				// *%s has promoted %s to XO.
+
+// 270
 ,	LSTR_PROMO_TO_CO				// *%s has promoted %s to CO.
 ,	LSTR_DEMO_TO_MEMBER				// *%s has demoted %s to member.
 ,	LSTR_DEMO_TO_STAFFER			// *%s has demoted %s to staffer.
@@ -251,6 +302,8 @@ enum LSTRING_ID
 ,	LSTR_USER_ALREADY_IN_SQUAD		// %s is already in a squad.
 ,	LSTR_SQUAD_KICK					// %s has been removed from the squad by %s.
 ,	LSTR_SQUAD_LEAVER				// %s has left the squad.
+
+// 280
 ,	LSTR_SQUAD						// SQUAD
 ,	LSTR_SQUAD_ELECTION				// CO election in progress. Votes: %u. Candidates: %s
 ,	LSTR_SQUAD_NOT_VOTED			// You haven't voted yet
@@ -260,6 +313,8 @@ enum LSTRING_ID
 ,	LSTR_SQUAD_VOTE_FAIL_LEAVER		// Vote failed, nominee left squad
 ,	LSTR_VOTECO_USAGE, LSTR_VOTECO_DETAIL
 ,	LSTR_PLAYER_NOT_IN_SQUAD		// Player %s is not in your squad.
+
+// 290
 ,	LSTR_SQUAD_VOTE_CLOSED			// Squad has already voted. Voting next allowed in %s.
 ,	LSTR_SQUAD_ALREADY_VOTED
 ,	LSTR_SQUAD_VOTE_REGISTERED
@@ -270,6 +325,8 @@ enum LSTRING_ID
 ,	LSTR_EXPECTED_DOWNTIME			// *Expected downtime: %s.
 ,	LSTR_MISSION
 ,	LSTR_MOBILE_SPAWN_AVAILABLE		// %s has deployed a mobile spawn for this mission.
+
+// 300
 ,	LSTR_MOBILE_SPAWN_UNAVAILABLE	// mobile spawn is no-longer available.
 ,	LSTR_SQUAD_NOT_VOTING			// Your squad is not currently running a vote.
 ,	LSTR_VOTING_ALREADY_ENABLED		// Voting is already enabled.
@@ -278,7 +335,10 @@ enum LSTRING_ID
 ,	LSTR_CO_DISABLED_ELECTIONS		// %s has disabled Squad-CO elections for %s.
 ,	LSTR_VOTING_DISABLED			// Elections have been disabled by the CO.
 ,	LSTR_MOVEBRIGADE_USAGE, LSTR_MOVEBRIGADE_DETAIL
-,	LSTR_MOVEDIVISION_USAGE, LSTR_MOVEDIVISION_DETAIL
+,	LSTR_MOVEDIVISION_USAGE
+
+// 310
+, 	LSTR_MOVEDIVISION_DETAIL
 ,	LSTR_UNIT_ALREADY_AT			// %s is already at %s.
 ,	LSTR_INTERNAL_ERROR				// Unknown error
 ,	LSTR_UNIT_MOVE_FAILED			// Couldn't move unit
@@ -287,6 +347,8 @@ enum LSTRING_ID
 ,	LSTR_NEW_LEADER					// %s is now leading the mission.
 ,	LSTR_MAKELEADER_USAGE, LSTR_MAKELEADER_DETAIL
 ,	LSTR_NOT_ON_SAME_MISSION
+
+// 320
 ,	LSTR_CANT_VERB_SELF				// Can't %s yourself.
 ,	LSTR_NEWLEADER_1
 ,	LSTR_NEWLEADER_2
@@ -297,6 +359,8 @@ enum LSTRING_ID
 ,	LSTR_HQU_FAILED_CONTACT
 ,	LSTR_HQU_FAILED_ABS
 ,	LSTR_HQU_FAILED_NAVAL
+
+// 330
 ,	LSTR_HQU_FAILED_AIR
 ,	LSTR_HQU_FAILED_FRONTLINE
 ,	LSTR_NEWLEADER_5
@@ -305,6 +369,8 @@ enum LSTRING_ID
 ,	LSTR_BACKUPLEADER_USAGE, LSTR_BACKUPLEADER_DETAIL
 ,	LSTR_NEWLEADER_6
 ,	LSTR_LEADER_USAGE, LSTR_LEADER_DETAIL
+
+// 340
 ,	LSTR_LEADER_STATE_ON			// You will accept automatic leader promotes
 ,	LSTR_LEADER_STATE_OFF			// You won't accept automatic leader promotes
 ,	LSTR_NOT_ACCEPTING				// %s is not accepting leader promotes.
@@ -315,6 +381,8 @@ enum LSTRING_ID
 ,	LSTR_FRIEND_ADDED				// '%s' added to friends
 ,	LSTR_FRIEND_REMOVED				// '%s' removed from friends
 ,	LSTR_ALREADY_FRIENDS			// '%s' already in your friends list
+
+// 350
 ,	LSTR_FRIENDS_LIST_FULL			// Your friends list is full, remove someone first.
 ,	LSTR_IGNORE_LIST_FULL			// Your ignore list is full, remove someone first.
 ,	LSTR_SQUAD_RECRUITING_ENABLED	// Recruiting has been enabled by %s.
@@ -325,6 +393,8 @@ enum LSTRING_ID
 ,	LSTR_RECRUIT_CHANGED_SIDE		// Your recruit '%s' has changed sides
 ,	LSTR_RECRUITER_UNAVAILABLE		// Your recruiter '%s' is no-longer available/logged out
 ,	LSTR_SQUAD_RECRUITED_BY_RECRUITER	// {recruit} has been recruited to your squad by {recruiter}!
+
+// 360
 ,	LSTR_SQUAD_REMOVED_LAPSED		// Your membership of '%s' has expired (you were not promoted)
 ,	LSTR_SQUAD_RECRUIT_LAPSED		// '%s' has been removed from the squad because they were not promoted
 ,	LSTR_TAKELEAD_USAGE, LSTR_TAKELEAD_DETAIL
@@ -333,12 +403,17 @@ enum LSTRING_ID
 ,	LSTR_USURPED					// Your lead has been usurped.
 ,	LSTR_USURPING					// You are usurping leader
 ,	LSTR_CANNOT_TAKELEAD			// You cannot takelead from %s for %s.
-,	LSTR_MLIST_USAGE, LSTR_MLIST_DETAIL
+,	LSTR_MLIST_USAGE
+
+// 370
+, 	LSTR_MLIST_DETAIL
 ,	LSTR_TIME_USAGE, LSTR_TIME_DETAIL
 ,	LSTR_IGNORE_USAGE, LSTR_IGNORE_DETAIL
 ,	LSTR_STATUS_USAGE, LSTR_STATUS_DETAIL
 ,	LSTR_VOTING_USAGE, LSTR_VOTING_DETAIL
 ,	LSTR_NO_FALLBACK_UNIT			// '%s' cannot fallback: not a brigade.
+
+// 380
 ,	LSTR_NO_FALLBACK_DEST			// '%s' cannot fallback: no fallback destination.
 ,	LSTR_BASE_OVERRUN				// '%s' is reporting overrun
 ,	LSTR_FALLBACK_ISSUED			// '%s' issued fallback
@@ -349,6 +424,8 @@ enum LSTRING_ID
 ,	LSTR_ANTI_ADDICTION_HOUR3		// 3rd hour
 ,	LSTR_ANTI_ADDICTION_TIRED1		// 4th hour
 ,	LSTR_ANTI_ADDICTION_TIRED2		// 5th hour
+
+// 390
 ,	LSTR_ANTI_ADDICTION_PENALTY		// 6th hour (penalty time)
 ,	LSTR_ANTI_ADDICTION_PREFIX		// Prefix for anti-addiction messages.
 ,	LSTR_HQU_FAILED_NFL				// Can't move a unit into a non-factory-linked pocket
@@ -357,32 +434,32 @@ enum LSTRING_ID
 ,	LSTR_HQU_FAILED_PREM_SURDR		// Cannot surrender prematurely (move off-map above %s%% inf)
 ,	LSTR_HQU_FAILED_ENEMY_DEPOT		// Must control the depot at both ends of the link
 ,	LSTR_HQU_FAILED_ENEMY_FB		// FB blocking movement
-
 ,	LSTR_ERROR_VERB_SUBJECT			// There was a problem trying to '%s' player %s.
 ,	LSTR_ACCOUNT_SUSPENDED_NOTICE	// Your account has been suspended (banned) for %s! <%s>
+
+// 400
 ,	LSTR_LIMITED_DAMAGE_ENABLED		// All damage is limited to 1 joule of damage.
 ,	LSTR_CRS_MOTD					// [CRS:MOTD] %s
 ,	LSTR_GM_MOTD					// [GM:MOTD] %s
-
 ,	LSTR_CANT_START_SOFTCAP_NOW		// Not enough hardcap AOs to start a softcap.
 ,	LSTR_CANT_ISSUE_HF_ORDERS_FOR	// Can't issue hold/fallback orders for another %s.
 ,	LSTR_FALLBACK_SURRENDER_IN		// %s fallback in %s.
 ,	LSTR_HOLDFALL_ORDER_FAILED		// '%s' order failed to execute.
-
 ,	LSTR_NUKEPERSONAS_USAGE,	LSTR_NUKEPERSONAS_DETAIL
 ,	LSTR_PERSONAS_NUKED				// You asked, we deleted.
 
+// 410
 ,	LSTR_RESETSTRAT_USAGE,	LSTR_RESETSTRAT_DETAIL
 ,	LSTR_RESETSTRAT_5MINUTE_LIMIT	// Cannot restart strat more than once every 5 minutes.
 ,	LSTR_RESETSTRAT_ACK			// Acknowledge you typed /restartstrat but so must someone else
 ,	LSTR_RESETSTRAT_SYS			// SYSTEM: %s typed /restartstrat, need confirmation from another player.
 ,	LSTR_RESETSTRAT_SELF_APPROVAL	// You can't approve your own restartstrat.
 ,	LSTR_RESETSTRAT_APPROVED		// '%s' has approved a strat server restart.
-
 ,	LSTR_BUZZARDSPAWN_USAGE,	LSTR_BUZZARDSPAWN_DETAIL
 ,	LSTR_ALREADY_SPAWNED			// Can't do that while spawned.
-,	LSTR_PLAYER_NOT_SPAWNED_YET		// Player '%s' hasn't spawned yet during this session.
 
+// 420
+,	LSTR_PLAYER_NOT_SPAWNED_YET		// Player '%s' hasn't spawned yet during this session.
 ,	LSTR_NO_HELP					// No help for that command.
 ,	LSTR_INVALID_TIME				// Invalid time: %s
 ,	LSTR_TRAINER_LIST				// Trainers: %s
@@ -394,15 +471,19 @@ enum LSTRING_ID
 ,	LSTR_KICKBAN_PLAYER				// Kicking '%s' from server.
 ,	LSTR_BAN_ONLINE_PLAYER			// '%s' is currently online. Use '/kick' to disconnect them.
 
+// 430
 ,	LSTR_BAN_USAGE,				LSTR_BAN_DETAIL
 ,	LSTR_BUMP_USAGE,			LSTR_BUMP_DETAIL
+
 ,	LSTR_ONLY_WHILE_BUZZARD			// Sorry, you can only do that while flying a buzzard.
 ,	LSTR_PLAYER_NOT_SPAWNED_NOW		// Player '%s' is not currently spawned.
 ,	LSTR_CANT_BUMP_BUZZARD			// You can't bump another buzzard
 ,	LSTR_BUMP_75M_LIMIT				// Must be within 75m of the target.
 ,	LSTR_GM_MOVED_YOU				// You have been forcibly moved by a Game Manager: %s.
+,	LSTR_DESPAWNALL_USAGE
 
-,	LSTR_DESPAWNALL_USAGE,		LSTR_DESPAWNALL_DETAIL
+// 440
+,	LSTR_DESPAWNALL_DETAIL
 ,	LSTR_DESPAWN_YOU				// Individual despawn
 ,	LSTR_DESPAWN_ALL				// All players being despawned
 
@@ -412,9 +493,11 @@ enum LSTRING_ID
 ,	LSTR_LASTCAP_NO_MATCH			// No captures matching that query.
 ,	LSTR_DB_QUERY_FAILED			// '%s' database query failed. Please try again later.
 
-,	LSTR_LASTDEATH_USAGE,		LSTR_LASTDEATH_DETAIL
-,	LSTR_LAST_DEATHS				// Last 5 deaths of '%s'
+,	LSTR_LASTDEATH_USAGE
 
+// 450
+,	LSTR_LASTDEATH_DETAIL
+,	LSTR_LAST_DEATHS				// Last 5 deaths of '%s'
 ,	LSTR_MAKECO_USAGE,			LSTR_MAKECO_DETAIL
 ,	LSTR_PLAYER_NOT_IN_A_SQUAD		// Player '%s' is not currently in a squad.
 ,	LSTR_PLAYER_ALREADY_CO			// Player '%s' is already the Commanding Officer of '%s' squad.
@@ -422,13 +505,16 @@ enum LSTRING_ID
 ,	LSTR_SQUAD_CO_ONLINE			// Squad %s CO %s is online.
 ,	LSTR_MAKECO_USE_FORCE			// Squad has a CO, use -force to promote.
 ,	LSTR_SQUAD_MAKECO_APPOINTED		// %s has been appointed CO of %s squad by a game manager.
+
+// 460
 ,	LSTR_MAKECO_APPOINTED			// You have appointed %s as the Commanding officer of %s squad.
 ,	LSTR_ALL_CHAT_PERMS_RELOADED	// All chat permissions reloaded.
 ,	LSTR_PLAYER_CHAT_PERMS_RELOADED	// Player '%s' chat permissions reloaded.
-
 ,	LSTR_SHUTDOWN_STOP_USAGE,	LSTR_SHUTDOWN_STOP_DETAIL
 ,	LSTR_SHUTDOWN_IN_USAGE,		LSTR_SHUTDOWN_IN_USAGE1, LSTR_SHUTDOWN_IN_USAGE2
 ,	LSTR_SHUTDOWN_DOWNTIME_USAGE, LSTR_SHUTDOWN_DOWNTIME_DETAIL
+
+// 470
 ,	LSTR_UNKNOWN_SHUTDOWN_COMMAND	// Unrecognized /shutdown subcommand '%s'.
 ,	LSTR_SHUTDOWN_WARNING,	LSTR_SHUTDOWN_USAGE, LSTR_SHUTDOWN_DETAIL
 ,	LSTR_SHUTDOWN_LIMITS			// Shutdown must be between %s minutes and %s hours.
@@ -436,34 +522,51 @@ enum LSTRING_ID
 ,	LSTR_SHUTDOWN_ANNOUNCEMENT		// [*] Game Server will be coming down in %s: %s. [*]
 ,	LSTR_SNOOP_USAGE,			LSTR_SNOOP_DETAIL
 ,	LSTR_NOT_SNOOPING				// You aren't %sing on anyone.
+
+// 480
 ,	LSTR_CURRENT_SNOOP				// You are currently /%sing on %s.
 ,	LSTR_USE_SNOOP_OFF				// Use '/%s off' first to end current snoop on %s.
 ,	LSTR_NO_SNOOP_RATS				// Can't snoop on staff.
 ,	LSTR_PNOTE_USAGE,			LSTR_PNOTE_DETAIL
+
 ,	LSTR_NO_PNOTES_FOUND			// No notes found on %s's record.
 ,	LSTR_PNOTE_TOO_LONG				// Invalid note: cannot be more than 399 bytes long.
 ,	LSTR_WARN_ALL_PLAYERS			// ALL PLAYERS: %s
 ,	LSTR_UNIT_HAS_NO_HOME			// %s: Unassigned.
-,	LSTR_LASTMOVE_USAGE,		LSTR_LASTMOVE_DETAIL
+,	LSTR_LASTMOVE_USAGE
+
+// 490
+,	LSTR_LASTMOVE_DETAIL
 ,	LSTR_NO_MOVES_FOUND
 ,	LSTR_LISTCOS_USAGE,			LSTR_LISTCOS_DETAIL
-,	LSTR_LISTSQUAD_USAGE,		LSTR_LISTSQUAD_DETAIL
+,	LSTR_LISTSQUAD_USAGE
+,	LSTR_LISTSQUAD_DETAIL
 ,	LSTR_NO_SUCH_SQUAD				// Squad %s doesn't exist.
 ,	LSTR_ARENALOCK_USAGE,		LSTR_ARENALOCK_DETAIL
-,	LSTR_DUMPRESUPLY_USAGE,		LSTR_DUMPRESUPLY_DETAIL
+,	LSTR_DUMPRESUPLY_USAGE
+
+// 500
+,	LSTR_DUMPRESUPLY_DETAIL
 ,	LSTR_PWNCP_USAGE,			LSTR_PWNCP_DETAIL
 ,	LSTR_RDP_USAGE,				LSTR_RDP_DETAIL
+
 ,	LSTR_REDEPLOY_USAGE,		LSTR_REDEPLOY_DETAIL
 ,	LSTR_SETTIME_USAGE,			LSTR_SETTIME_DETAIL
-,	LSTR_NEXTMOVE_USAGE,		LSTR_NEXTMOVE_DETAIL
+,	LSTR_NEXTMOVE_USAGE
+
+// 510
+,	LSTR_NEXTMOVE_DETAIL
 ,	LSTR_RENAMESQUAD_USAGE,		LSTR_RENAMESQUAD_DETAIL
 ,	LSTR_SQUAD_ALREADY_EXISTS		// Squad '%s' already exists.
 ,	LSTR_INVALID_SQUAD_NAME			// '%s' is not a valid name for a squad.
+
 ,	LSTR_SQUAD_OLD_AND_NEW_SAME		// Old and new name are the same.
 ,	LSTR_IGNORE_SYSTEM1				// Can't ignore system
 ,	LSTR_IGNORE_SYSTEM2				// Can't ignore system
 ,	LSTR_FRIEND_SYSTEM				// Can't /friend system
 ,	LSTR_FRIEND_IGNORE_RDP			// Can't %s RDP.
+
+// 520
 ,	LSTR_SOCIAL_LIMIT_OF_10			// Limit of 10 names at a time.
 ,	LSTR_GRIDSNAPSHOT_USAGE,	LSTR_GRIDSNAPSHOT_DETAIL
 ,	LSTR_SHUTDOWN_CANCELLED			// Game server shutdown has been cancelled!
@@ -472,6 +575,8 @@ enum LSTRING_ID
 ,	LSTR_SHUTDOWN_NOW				// [X] GAME SERVER COMING DOWN NOW: You have %s seconds to despawn [X]
 ,	LSTR_MOTD_STRING				// MOTD: %s
 ,	LSTR_LISTOIC_USAGE,			LSTR_LISTOIC_DETAIL
+
+// 530
 ,	LSTR_NO_OICS					// No brigades have active OICs at this time.
 ,	LSTR_PINFO_LOGGING_INOUT		// Player %s is logging in/out
 ,	LSTR_PINFO_NOT_ON_CELLS			// Player %s not found on cell hosts.
@@ -481,6 +586,8 @@ enum LSTRING_ID
 ,	LSTR_MSP_USAGE,				LSTR_MSP_DETAIL
 ,	LSTR_MSP_FROM_MAP				// To use /%s from the map screen you must have spawned first.
 ,	LSTR_MSP_REMINDER				// REMINDER: /%s is not a release feature and is a testing tool only.
+
+// 540
 ,	LSTR_MSP_FAILED					// Unable to place MSP for some reason.
 ,	LSTR_MSP_DMG_IGNORED			// Damage to MSP ignored, it's already dead.
 ,	LSTR_STO_DMG_THRESHOLD			// %s to server tracked object below object's %s joules threshold
@@ -490,6 +597,8 @@ enum LSTRING_ID
 ,	LSTR_CHECKSTOS_USAGE,		LSTR_CHECKSTOS_DETAIL
 ,	LSTR_CHECKSTOS_OK				// All the STOs were fine
 ,	LSTR_CHECKSTOS_CANCELLED		// We cancelled these stos: %s.
+
+// 550
 ,	LSTR_LISTSTOS_USAGE,		LSTR_LISTSTOS_DETAIL
 ,	LSTR_LISTSTOS_NONE				// No stos to list
 ,	LSTR_LISTSTOS_LIST				// STOs: %s
@@ -497,6 +606,8 @@ enum LSTRING_ID
 ,	LSTR_SPAM_CLEAR					// Clearing the spam can.
 ,	LSTR_SPAM_START_USAGE,		LSTR_SPAM_START_DETAIL
 ,	LSTR_SPAM_INTERVAL_MIN			// Minimum 30s between repetitions
+
+// 560
 ,	LSTR_SPAM_OPENING				// Opening spam can %s times %s between each repetition.
 ,	LSTR_SPAM_CLOSEING				// Closeing the can
 ,	LSTR_SPAM_ADDED					// Added: %s
@@ -507,6 +618,8 @@ enum LSTRING_ID
 ,	LSTR_KILLED_BY_BUILDING			// Killed by building %s destruction [%s]
 ,	LSTR_ENTERED_BUILDING			// You have entered %s.
 ,	LSTR_ENTERED_UNKNOWN_BUILDING	// You have entered unknown building %s.
+
+// 570
 ,	LSTR_LEFT_BUILDING				// You have left the building.
 ,	LSTR_BDESEL_REFUSED_ID0			// Brigade selection refused: Brigade ID of zero (0).
 ,	LSTR_BDESEL_REFUSED_PERSONA		// Brigade selection refused without a persona selected first.
@@ -517,6 +630,8 @@ enum LSTRING_ID
 ,	LSTR_FRIENDLY_FIRE				// FRIENDLY FIRE kill on %s!
 ,	LSTR_KILLED_A_DEV				// Player %s has killed developer %s!
 ,	LSTR_TOO_MANY_AOS				// Too many Attack Objectives: One will be withdrawn in %u minutes unless one is removed manually.
+
+// 580
 ,	LSTR_CANNOT_USE_BRIDGE			// Target cannot be a bridge.
 ,	LSTR_INVALID_CP_NAME			// Unrecognized CP name '%s'.
 ,	LSTR_ALLIED_FBS					// Allied FBs: %s
@@ -529,18 +644,18 @@ enum LSTRING_ID
 ,	LSTR_CRS_MSG					// [CRS:%s] %s
 ,	LSTR_GM_MSG						// [GM:%s] %s
 
+// 590
 ,	LSTR_LAST_KILLS					// Last 5 kills for %s this campaign:
-
 ,	LSTR_GRIDSNAPSHOT_ENABLED		// Grid snapshots enabled
 ,	LSTR_GRIDSNAPSHOT_DISABLED		// Grid snapshots disabled
 ,	LSTR_GRIDSNAPSHOT_FULL			// Grid snapshots set to FULL
-
 ,	LSTR_LASTKILLS_USAGE,		LSTR_LASTKILLS_DETAIL
 ,	LSTR_ONLY_WHILE_SPAWNED			// Sorry, you can only do that while you are spawned.
 ,	LSTR_SCMD_NO_BDE_LINK			// Ground brigades must have a direct link to their objective.
 ,	LSTR_SCMD_NO_DIV_LINK			// Ground divisions require one or more divisional members to have a link.
-
 ,	LSTR_HOLD_AT_ALL_COSTS			// Hold %s at all costs!
+
+// 600
 ,	LSTR_FALLBACK_START				// Defenders at %s begin falling back to more secure positions.
 ,	LSTR_PLAYER_ALT_F4ED			// %s has alt-f4ed.
 ,	LSTR_OBJECT_DESTROYED			// %s destroyed.
@@ -551,6 +666,8 @@ enum LSTRING_ID
 ,	LSTR_FORCED_OWNERSHIP			// *FORCED* ownership of {1} to {2}
 ,	LSTR_CHANGED_OWNERSHIP			// Changed ownership of {1} to {2}
 ,	LSTR_GM_CHANGED_OWNERSHIP		// GM changed ownership of %s to %s.
+
+// 610
 ,	LSTR_NO_FACILIITIES_CHANGED		// No failities at %s changed.
 ,	LSTR_STRAT_EXITED				// Strat server exiting
 ,	LSTR_STRAT_STARTING				// Strat server starting
@@ -560,6 +677,8 @@ enum LSTRING_ID
 ,	LSTR_CMD_ONCE_PER_MINUTE		// {1} limited to once per minute.
 ,	LSTR_BROADCAST_USAGE,		LSTR_BROADCAST_DETAIL
 ,	LSTR_CP_REBROADCAST
+
+// 620
 ,	LSTR_CEASEFIRE_ON				// [!] Cease fire no killing [!]
 ,	LSTR_NO_LINK_TO_BRIGADE			// No link to brigade
 ,	LSTR_BASE_CAPTURED				// {1} has been captured.
@@ -569,12 +688,18 @@ enum LSTRING_ID
 ,	LSTR_OPS_CHANNEL_NOTE			// Reminder: "ops" channel is for ops.
 ,	LSTR_KILLED_BY_DEV				// When Rats Attack: {2} killed by {1}.
 ,	LSTR_RAT_KILLED_RAT				// Rat killed rat: {2} killed {1}.
-,	LSTR_OICNOM_USAGE, LSTR_OICNOM_DETAIL
+,	LSTR_OICNOM_USAGE
+
+// 630
+, 	LSTR_OICNOM_DETAIL
 ,	LSTR_OICVOL_USAGE, LSTR_OICVOL_DETAIL
 ,	LSTR_OICVETO_USAGE, LSTR_OICVETO_DETAIL
 ,	LSTR_OICRES_USAGE, LSTR_OICRES_DETAIL
 ,	LSTR_OICREM_USAGE, LSTR_OICREM_DETAIL
-,	LSTR_RESET_RADIO_USAGE, LSTR_RESET_RADIO_DETAIL
+,	LSTR_RESET_RADIO_USAGE
+
+// 640
+, 	LSTR_RESET_RADIO_DETAIL
 ,	LSTR_RESET_RADIO_DONE
 ,	LSTR_WOULD_HAVE_SCORED
 
@@ -586,6 +711,8 @@ enum LSTRING_ID
 ,	LSTR_MISSION_POST_DENIED
 ,	LSTR_MPD_EXISTING_MISSION		// Already have an active mission
 ,	LSTR_MPD_NO_BRIGADE				// You don't have a brigade selected
+
+// 650
 ,	LSTR_MPD_RANK_AD				// Insufficient rank - go buy it!
 ,	LSTR_MPD_RANK_NO_AD				// Insufficient rank, but we <3 you
 ,	LSTR_MPD_INVALID_FAC			// Invalid origin facility: {1}
@@ -600,13 +727,24 @@ enum LSTRING_ID
 ,	LSTR_CP_SURRENDER_IN_HOURS		// {1} will surrender in {2} hours.
 ,	LSTR_CP_SURRENDER_IN_MINS		// {1} will surrender in {2} minutes.
 
+// 660
 ,	LSTR_SOLDIERS_NEEDED_AT			// INTEL: Soldiers needed at {1}
 ,	LSTR_SOLDIERS_NEEDED_AT_AND		// INTEL: Soldiers needed at {1} and {2}.
-,	LSTR_THREAT_REPORT				// Threat Report: {1}
+,	LSTR_THREAT_REPORT			// Threat Report: {1}
+,	LSTR_KILL_AWARD_TO			// Kill awarded to {1}.
+,	LSTR_ASSIST_AWARD			// Assist on {1} (killed by {2}).
 
-,	LSTR_KILL_AWARD_TO				// Kill awarded to {1}.
-,	LSTR_ASSIST_AWARD				// Assist on {1} (killed by {2}).
+// NOTE: ui.dtd files have 665 and 666 defined
+// 665 = <!ENTITY loc.host.665 "Game channel unavailable: you&#39;re not in a game.">
+// 666 = <!ENTITY loc.host.666 "Team channel unavailable: you&#39;re not on a team.">
+//     skipping to give time to resolve if these should exist
 
+,	LSTR_BUG = 667				// BUG REPORT
+,	LSTR_BUG_USAGE,	LSTR_BUG_DETAIL
+    
+// 670
+,   LSTR_UPTIME_USAGE, LSTR_UPTIME_DETAIL
+    
 ,	MAX_LSTRING_IDS
 };
 

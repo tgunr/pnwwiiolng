@@ -60,6 +60,7 @@
 #include "chat/chatWaypointExchg.h"
 #include "chat/chatWaypoints.h"
 #include "chat/chatWhoList.h"
+#include "chat/chatClientMessages.h"
 #include "host/hostConstants.h"
 #include "host/hostTimeUpdate.h"
 #include "inst/instHost.h"
@@ -935,8 +936,50 @@ _recvMessage(ACTION_OBJECT* const a)
 	message.m_country = player.country();
 	message.m_handle = player.chatHandle();
 
+	// Pull out client header information
+	char *p = message.m_message;
+	if (*p == 0x01)
+	{
+		// message looks like this:
+		// 0     1           13    14
+		// {0x01}AJFK3dej30fh{0x01}<chat text>
+		// mark start, find end
+		char *start = ++p;
+
+		p = strchr(p, '\x01');
+		if (!p) {
+
+			dbugLog(_FLA, "Client chat packet received with no terminating control character");
+			return a->offset;
+		}
+		else if (*p != 0)
+		{
+			// null terminate the client info string, overwrite the 0x01 header terminator
+			*p++ = 0;
+
+			// decode it
+			message.clientInfo.decode(start);
+
+			// remove it from the message - source is null terminated, limit to max IRC length
+			strsafecpy(message.m_message, p, MAX_IRC_LEN);
+
+			message.m_length -= (p - message.m_message);
+		}
+		else
+		{
+			dbugLog(_FLA, "Didn't find terminating control character, aborting");
+			return a->offset;
+		}
+	}
+	else
+	{
+		// Are we talking to an old client?  No control information
+		dbugLog(_FLD, "No client header found in chat message: %s length - %d", message.m_message, message.m_length);
+	}
+
+
 	// Prevent them typing carriage returns
-	for ( char*p = message.m_message; *p != 0; ++p )
+	for ( p = message.m_message; *p != 0; ++p )
 	{
 		if ( *p == '\n' || *p == '\r' )
 			*p = ' ';

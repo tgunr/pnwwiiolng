@@ -284,7 +284,8 @@ public:
 		target->message(LSTR_WARNING, LSTR_GM_MOVED_YOU, args[1]);
 
 		std::string note = args[1];
-		wwiiEscapeString(note);
+                DBThread::EscapeString(note);
+
 		if ( note.length() > 400 )
 			note.resize(400);
 		DBThread::Do(DBThread::Default, "CALL wwii.p_add_player_note('%s', %u, 3, '%s')", target->callsign(), player.playerID(), note.c_str());
@@ -938,7 +939,8 @@ public:
 		_smite(target);
 
 		std::string sqlReason = (reason ? reason : "<no reason given>");
-		wwiiEscapeString(sqlReason);
+                DBThread::EscapeString(sqlReason);
+
 		DBThread::Do(DBThread::Default, "CALL `wwii`.`p_add_player_note`('%s',%u,4,'%s')", target->callsign(), player.playerID(), sqlReason.c_str());
 	}
 } dotKick;
@@ -1738,12 +1740,9 @@ public:
 } dotPInfo;
 
 void
-_addStr(char* dest, const char* src)
+_addStr(std::string & dest, const char* src)
 {
-	char* p = dest;
-	while ( *p ) p++;					// Seek to EOS
-	if ( p != dest ) *(p++) = ' ';		// Add space except at BOS
-	strcpy(p, src);					// Copy second string here
+	dest.append(src);
 }
 
 static const char*
@@ -1812,14 +1811,13 @@ DotPInfo::actionWith(Player& player, Chat::ClientMessage* message, char* argumen
 void
 Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, bool includePermissions) const
 {
-	char response[MAX_MESSAGE_LENGTH + 1];
+	std::string response;
 	char buf[128+1];
-	response[0] = '\0';
 	buf[0] = '\0';
 
 	if ( player.isPlaynet() )
 	{
-		strprintf(buf, "Pid#%u", playerID());
+		snprintf(buf, sizeof(buf), "Pid#%u", playerID());
 		_addStr(response, buf);
 	}
 
@@ -1829,7 +1827,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		_addStr(response, "in:none");
 	else
 	{
-		strprintf(buf, "in:%llu", player.instance().id());
+		snprintf(buf, sizeof(buf), "in:%llu", player.instance().id());
 		_addStr(response, buf);
 	}
 
@@ -1838,18 +1836,17 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		const char* squadName = chatGetSquadCallsign(squadID());
 		if ( squadName != nullptr && squadRank() > 0 )
 		{
-			strprintf(buf
-							, "%s:%s"
-								, chatGetSquadRankName(squadRank())
-								, squadName);
+			snprintf(buf, sizeof(buf), "%s:%s"
+				, chatGetSquadRankName(squadRank())
+				, squadName);
 		}
 		else if ( squadRank() == 0 && player.isPlaynet() )
 		{
-			strprintf(buf, "Sqd:%s (UNRANKED!)", squadName);
+			snprintf(buf, sizeof(buf), "Sqd:%s (UNRANKED!)", squadName);
 		}
 		else if ( player.isPlaynet() )
 		{
-			strprintf(buf, "Sqd#%u(NO DATA)", squadID());
+			snprintf(buf, sizeof(buf), "Sqd#%u(NO DATA)", squadID());
 		}
 		else
 		{
@@ -1876,7 +1873,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		}
 		else if ( player.isPlaynet() )
 		{
-			strprintf(buf, "B#%u:UNK", brigadeID());
+			snprintf(buf, sizeof(buf), "B#%u:UNK", brigadeID());
 			_addStr(response, buf);
 		}
 	}
@@ -1886,14 +1883,14 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		RANK_NO erank = effectiveRank();
 		const Rank* myRank = Rank::lookup(erank);
 		if ( myRank != nullptr )
-			strprintf(buf
+			snprintf(buf, sizeof(buf)
 						, "R#%u(%s/%s)"
 							, erank
 							, _rankType(myRank->type())
 							, rankNames[erank]
 							);
 		else if ( player.isPlaynet() )
-			strprintf(buf, "R#%u(INVALID)", erank);
+			snprintf(buf, sizeof(buf), "R#%u(INVALID)", erank);
 		_addStr(response, buf);
 	}
 
@@ -1907,9 +1904,9 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		char oic[21];
 		HCUnit* unit = HCUnit::Lookup(leadingBrigade());
 		if ( unit )
-			strprintf(oic, "OIC:%s", unit->callsign());
+			snprintf(oic, sizeof(buf), "OIC:%s", unit->callsign());
 		else if ( player.isPlaynet() )
-			strprintf(oic, "OIC:#%u", leadingBrigade());
+			snprintf(oic, sizeof(buf), "OIC:#%u", leadingBrigade());
 		_addStr(response, "OIC");
 	}
 	if ( permissions(ALLIED_COMMAND_STAFF) )
@@ -1925,11 +1922,11 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 	if ( player.isPlaynet() )
 	{
 		char permissionsHex[64];
-		sprintf(permissionsHex, "PM: %016llx", permissionMask());
+		snprintf(permissionsHex, sizeof(permissionsHex), "PM: %016llx", permissionMask());
 		_addStr(response, permissionsHex);
 	}
 
-	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response);
+	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response.c_str());
 
 	if ( includePermissions )
 	{
@@ -1949,7 +1946,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 			{
 				if ( index == 0 )
 					lstrID = LSTR_TEXT_END;
-				player.message(LSTR_NONE, lstrID, response);
+				player.message(LSTR_NONE, lstrID, response.c_str());
 			}
 		}
 		while ( index > 0 );
@@ -1959,7 +1956,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 
 	whereabouts(response, x, y);
 
-	player.message(LSTR_NONE, LSTR_GENERIC, response, nullptr);
+	player.message(LSTR_NONE, LSTR_GENERIC, response.c_str(), nullptr);
 
 	return;
 }
@@ -2726,7 +2723,7 @@ public:
 		if ( args.size() > 1 )
 		{
 			std::string note = args[1];
-			wwiiEscapeString(note);
+                        DBThread::EscapeString(note);
 
 			if ( note.length() > 399 )
 			{
@@ -2783,7 +2780,8 @@ public:
 
 		// Add the relevant note
 		std::string note = args[1];
-		wwiiEscapeString(note);
+                DBThread::EscapeString(note);
+
 		if ( note.length() > 400 )
 			note.resize(400);
 		DBThread::Do(DBThread::Default, "CALL wwii.p_add_player_note('%s', %u, 3, '%s')", target->callsign(), player.playerID(), note.c_str());
