@@ -1707,10 +1707,8 @@ _dotFallback(char* arguments, OOBMessage& message)
 	bool testOnly = ( arguments == nullptr || *arguments != '!' );
 	SCMD_RESULT result = cp->issueFallback(message.m_side, testOnly, message.m_originatorID);
 
-	chatSendSCMDResult(message.m_originatorID
-						, SC_FALLBACK, cp->fullObjID
-						, result
-						);
+	chatSendSCMDResult(message.m_originatorID, SC_FALLBACK, cp->fullObjID, message.m_side, result);
+
 	return TRUE;
 }
 
@@ -1817,10 +1815,8 @@ _dotHoldAtAllCosts(char* arguments, OOBMessage& message)
 	bool execute = ( arguments != nullptr && *arguments == '!' );
 	SCMD_RESULT result = cp->holdAtAllCosts(message.m_side, execute);
 
-	chatSendSCMDResult(message.m_originatorID
-						, SC_HOLD, cp->fullObjID
-						, result
-						);
+	chatSendSCMDResult(message.m_originatorID, SC_HOLD, cp->fullObjID, message.m_side, result);
+
 	return TRUE;
 }
 
@@ -1840,10 +1836,7 @@ _dotOverrun(char* arguments, OOBMessage& message)
 
 	SCMD_RESULT result = cp->overrun(message.m_side);
 
-	chatSendSCMDResult(message.m_originatorID
-						, SC_OVERRUN, cp->fullObjID
-						, result
-						);
+	chatSendSCMDResult(message.m_originatorID, SC_OVERRUN, cp->fullObjID, message.m_side, result);
 
 	return TRUE;
 }
