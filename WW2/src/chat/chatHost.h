@@ -14,6 +14,13 @@
 #include "chat/chatPrototypes.h"
 #include "wwii/wwiiOwnershipEnums.h"
 #include "chat/chatDebugConditions.h"
+#include "chat/chatCommandWithArgs.h"
+
+#define PREP_CHAT_MSG(varname, fmt, ...) \
+        char varname[MAX_MESSAGE_LENGTH+1]; \
+        snprintf(varname, MAX_MESSAGE_LENGTH, fmt, ##__VA_ARGS__);
+#define FORMAT_CHAT_MSG(varname, fmt, ...) \
+        snprintf(varname, MAX_MESSAGE_LENGTH, fmt, ##__VA_ARGS__);
 
 class Player;
 struct FULL_OBJ_ID;
@@ -102,6 +109,4 @@ SINT32 chatGetShutdownTimeRemaining();	// Returns -1 if no shutdown pending.
 void chatSendAllMessage(const ChatHandle& handle, const char* message, UINT32 messageID);
 
 void chatSetHCMotd(const char* callsign, const char* motd, WWII_SIDE forSide);
-
-const char* chatMakeTempString(const char* fmt, ...);
 

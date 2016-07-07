@@ -109,7 +109,8 @@ _executeBan(Player& player, const ARGV& argv, bool kick)
 		return;
 	}
 
-	player.gmNote("GM", (kick) ? "kickban" : "ban", argv[0], chatMakeTempString("%s %s", argv[1], argv[2]));
+	PREP_CHAT_MSG(msg, "%s %s", argv[1], argv[2]);
+	player.gmNote("GM", (kick) ? "kickban" : "ban", argv[0], msg);
 
 	Player* subject = PlayerInterface::Lookup(argv[0]);
 	if ( kick )
@@ -290,7 +291,8 @@ public:
 			note.resize(400);
 		DBThread::Do(DBThread::Default, "CALL wwii.p_add_player_note('%s', %u, 3, '%s')", target->callsign(), player.playerID(), note.c_str());
 
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s bumping %s: %s", player.callsign(), target->callsign(), args[1]));
+		PREP_CHAT_MSG(cmsg, "%s bumping %s: %s", player.callsign(), target->callsign(), args[1]);
+		chatDispatchGMMessage("INFO", cmsg);
 	}
 } dotBump;
 
@@ -359,7 +361,8 @@ public:
 		}
 
 		player.gmNote("GM", command(), args[0], args[1]);
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s /buzzardspawning %s: %s", player.callsign(), target->callsign(), args[1]));
+		PREP_CHAT_MSG(cmsg, "%s /buzzardspawning %s: %s", player.callsign(), target->callsign(), args[1]);
+		chatDispatchGMMessage("INFO", cmsg);
 
 		Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::BUZZARD_SPAWN_Y));
 		outgoing.construct<BuzzardSpawn>(player.playerID(), true, location);
@@ -484,7 +487,8 @@ public:
 		if (subject->matchHandle() != player.matchHandle())
 		{
 			// No point logging self-reviews.
-			chatDispatchGMMessage("INFO", chatMakeTempString("%s /chatlog'ing %s: %s", player.callsign(), subject->callsign(), args[1]));
+			PREP_CHAT_MSG(cmsg, "%s /chatlog'ing %s: %s", player.callsign(), subject->callsign(), args[1]);
+			chatDispatchGMMessage("INFO", cmsg);
 			player.gmNote("GM", command(), arguments, nullptr);
 		}
 
@@ -856,10 +860,12 @@ public:
 			chatReleaseGrab(player);
 		}
 
+		char cmsg[MAX_MESSAGE_LENGTH+1];
 		if ( args.size() > 1 && args[1][0] != 0 )
-			chatDispatchGMMessage("INFO", chatMakeTempString("%s grabbing %s: %s", player.callsign(), target->callsign(), args[1]));
+			snprintf(cmsg, MAX_MESSAGE_LENGTH, "%s grabbing %s: %s", player.callsign(), target->callsign(), args[1]);
 		else
-			chatDispatchGMMessage("INFO", chatMakeTempString("%s grabbing %s", player.callsign(), target->callsign()));
+			snprintf(cmsg, MAX_MESSAGE_LENGTH, "%s grabbing %s", player.callsign(), target->callsign());
+		chatDispatchGMMessage("INFO", cmsg);
 
 		// I want to know if the sender is currently afk'd
 		target->notifyOtherIfAFK(player);
@@ -920,7 +926,8 @@ public:
 			return;
 		}
 
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s kicking %s: %s", player.callsign(), target->callsign(), reasonText));
+		PREP_CHAT_MSG(cmsg, "%s kicking %s: %s", player.callsign(), target->callsign(), reasonText);
+		chatDispatchGMMessage("INFO", cmsg);
 
 		// If the victim is afk, it'd be fun to know
 		target->notifyOtherIfAFK(player);
@@ -997,7 +1004,8 @@ public:
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		player.gmNote("GM", command(), arguments, nullptr);
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s forcing all players to despawn: %s", player.callsign(), arguments));
+		PREP_CHAT_MSG(cmsg, "%s forcing all players to despawn: %s", player.callsign(), arguments);
+		chatDispatchGMMessage("INFO", cmsg);
 
 		UINT32 affected = 0;
 
@@ -1011,7 +1019,8 @@ public:
 				++affected;
 		}
 
-		player.message(LSTR_NOTE, LSTR_GENERIC, chatMakeTempString("%u %s affected.", affected, (affected != 1) ? "players" : "player"));
+		FORMAT_CHAT_MSG(cmsg, "%u %s affected.", affected, (affected != 1) ? "players" : "player");
+		player.message(LSTR_NOTE, LSTR_GENERIC, cmsg);
 	}
 } dotDespawnAll;
 
@@ -1125,15 +1134,15 @@ public:
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
-		const char* clause = "";
-
+		char clause[MAX_MESSAGE_LENGTH+1];
+		clause[0] = '\0';
 		Property* property = chatFindProperty(player.uiTarget());
 		if ( property != nullptr )
 		{
 			if ( property->IsCP() )
-				clause = chatMakeTempString("WHERE cp_oid = %u", property->OID());
+				snprintf(clause, MAX_MESSAGE_LENGTH, "WHERE cp_oid = %u", property->OID());
 			else if ( property->IsFacility() )
-				clause = chatMakeTempString("WHERE facility_oid = %u", property->OID());
+				snprintf(clause, MAX_MESSAGE_LENGTH, "WHERE facility_oid = %u", property->OID());
 			player.gmNote("GM", command(), property->Name(), nullptr);
 		}
 		else
@@ -1144,7 +1153,8 @@ public:
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
-		const char* clause = "";
+		char clause[MAX_MESSAGE_LENGTH+1];
+		clause[0] = '\0';
 
 		if ( strncasecmp(arguments, "glob", 4) == 0 || strcasecmp(arguments, "all") == 0 )
 		{
@@ -1157,12 +1167,12 @@ public:
 		if ( i == ALLIED )
 		{
 			player.gmNote("GM", command(), "allied", nullptr);
-			clause = "AND ctry IN (1,2,3,7,8)";
+			snprintf(clause, MAX_MESSAGE_LENGTH, "AND ctry IN (1,2,3,7,8)");
 		}
 		else if ( i == AXIS )
 		{
 			player.gmNote("GM", command(), "axis", nullptr);
-			clause = "AND ctry IN (4,5,6)";
+			snprintf(clause, MAX_MESSAGE_LENGTH,  "AND ctry IN (4,5,6)");
 		}
 		else
 		{
@@ -1170,13 +1180,13 @@ public:
 			if ( i > WWII_NO_COUNTRY )
 			{
 				player.gmNote("GM", command(), _countryName[i], nullptr);
-				clause = chatMakeTempString("AND ctry = %u", i);
+				snprintf(clause, MAX_MESSAGE_LENGTH, "AND ctry = %u", i);
 			}
 			else
 			{
 				Chat::Name callsign(chatGetHandle(arguments));
 				player.gmNote("GM", command(), callsign.c_str(), nullptr);
-				clause = chatMakeTempString("AND call = '%s'", callsign.c_str());
+				snprintf(clause, MAX_MESSAGE_LENGTH, "AND call = '%s'", callsign.c_str());
 			}
 		}
 
@@ -1494,18 +1504,35 @@ public:
 
 		const Squad& squad = list->squad();
 		std::string response = "";
-		response += chatMakeTempString("Sq#%u %s: %s. Online: %u/%u.\n"
-									, squad.squadID()
-									, squad.callsign().c_str()
-									, squad.name().c_str()
-									, list->online()
-									, list->members().size()
-									);
-		response += chatMakeTempString("Created: %s by %s. ", chatTimeString(squad.created()), Chat::Name(squad.creatorHandle()).c_str());
-		response += chatMakeTempString("CO: %s. ", Chat::Name(squad.coHandle()).c_str());
-		response += chatMakeTempString("R: %s. ", squad.recruiting() ? "Yes" : "No");
-		response += chatMakeTempString("V: %s. ", squad.recruiting() ? "Yes" : "No");
-		response += chatMakeTempString("URL: %s", squad.homepage().c_str());
+		response += "Sq#";
+		response += std::to_string(squad.squadID());
+		response += " ";
+		response += squad.callsign();
+		response += ": ";
+		response += squad.name();
+		response += ". Online: ";
+
+		response += std::to_string(list->online());
+		response += "/";
+		response += std::to_string(list->members().size());
+		response += ".\n";
+		response += "Created: ";
+		response += chatTimeString(squad.created());
+		response += " by ";
+		response.append(Chat::Name(squad.creatorHandle()));
+		response += ". ";
+		response += "CO: ";
+		response.append(Chat::Name(squad.coHandle()));
+		response += ". ";
+		response += "R: ";
+		response += (squad.recruiting() ? "Yes" : "No");
+		response += ". ";
+		response += "V: ";
+		response += (squad.votingEnabled() ? "Yes" : "No");
+		response += ". ";
+		response += "URL: ";
+		response += squad.homepage();
+
 		player.message(LSTR_NOTE, LSTR_GENERIC, response.c_str());
 
 		if ( !listAll && list->online() == 0 )
@@ -2298,7 +2325,8 @@ public:
 			else
 			{
 				///LOCALIZE
-				chatDispatchGMMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s", player.callsign(), target->callsign()));
+				PREP_CHAT_MSG(cmsg, "%s is no-longer snooping on %s", player.callsign(), target->callsign());
+				chatDispatchGMMessage("INFO", cmsg);
 				player.m_snoopOn = nullptr;
 				target->m_snoopBy = nullptr;
 			}
@@ -2333,7 +2361,8 @@ public:
 			throw Chat::LStringErr(LSTR_NO_SNOOP_RATS);
 
 		///LOCALIZE
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s snooping on %s: %s", player.callsign(), target->callsign(), argv[1]));
+		PREP_CHAT_MSG(cmsg, "%s snooping on %s: %s", player.callsign(), target->callsign(), argv[1]);
+		chatDispatchGMMessage("INFO", cmsg);
 
 		chatSendChatLog(target->playerID(), player.matchHandle());
 
@@ -2379,7 +2408,8 @@ public:
 				action(player, message);
 			else
 			{
-				chatDispatchCRSMessage("INFO", chatMakeTempString("%s is no-longer crssnooping on %s", player.callsign(), target->callsign()));
+				PREP_CHAT_MSG(cmsg, "%s is no-longer crssnooping on %s", player.callsign(), target->callsign());
+				chatDispatchCRSMessage("INFO", cmsg);
 				player.m_crsSnoopOn = nullptr;
 				target->m_crsSnoopBy = nullptr;
 			}
@@ -2417,7 +2447,8 @@ public:
 		player.gmNote("CRS", command(), arguments, nullptr);
 
 		///LOCALIZE
-		chatDispatchCRSMessage("INFO", chatMakeTempString("%s crsSnooping on %s", player.callsign(), target->callsign()));
+		PREP_CHAT_MSG(cmsg, "%s crsSnooping on %s", player.callsign(), target->callsign());
+		chatDispatchCRSMessage("INFO", cmsg);
 
 		chatSendChatLog(target->playerID(), player.matchHandle());
 
@@ -2585,7 +2616,8 @@ public:
 			return;
 
 		///LOCALIZE
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s noted %s: %s", player->callsign(), Chat::Name(m_handle).c_str(), m_text.c_str()));
+		PREP_CHAT_MSG(cmsg, "%s noted %s: %s", player->callsign(), Chat::Name(m_handle).c_str(), m_text.c_str());
+		chatDispatchGMMessage("INFO", cmsg);
 	}
 
 	virtual void Failure() override
@@ -2770,7 +2802,8 @@ public:
 		player.gmNote("GM", command(), args[0], args[1]);
 
 		///LOCALIZE
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s warning %s: %s", player.callsign(), target->callsign(), args[1]));
+		PREP_CHAT_MSG(cmsg, "%s warning %s: %s", player.callsign(), target->callsign(), args[1]);
+		chatDispatchGMMessage("INFO", cmsg);
 
 		target->notifyOtherIfAFK(player);
 

@@ -452,9 +452,8 @@ protected:
 		chatRenameSquad(m_from, m_to);
 
 		///LOCALIZE
-		const char* message =
-			chatMakeTempString("%s has renamed squad '%s' to '%s'.", player->callsign(), m_from.c_str(), m_to.c_str());
-		chatDispatchGMMessage("INFO", message);
+		PREP_CHAT_MSG(cmsg, "%s has renamed squad '%s' to '%s'.", player->callsign(), m_from.c_str(), m_to.c_str());
+		chatDispatchGMMessage("INFO", cmsg);
 	}
 
 	virtual void Failure() override
