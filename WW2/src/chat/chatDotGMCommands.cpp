@@ -1519,10 +1519,10 @@ public:
 		response += "Created: ";
 		response += chatTimeString(squad.created());
 		response += " by ";
-		response.append(Chat::Name(squad.creatorHandle()));
+		response.append(Chat::Name(squad.creatorHandle()).c_str());
 		response += ". ";
 		response += "CO: ";
-		response.append(Chat::Name(squad.coHandle()));
+		response.append(Chat::Name(squad.coHandle()).c_str());
 		response += ". ";
 		response += "R: ";
 		response += (squad.recruiting() ? "Yes" : "No");
