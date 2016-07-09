@@ -125,7 +125,7 @@ _checkLeadership(UINT32 squadID, RANK_NO oldRank, RANK_NO newRank, SINT32 teulIn
 static void
 _checkExistingSquad(const Chat::Name& gameName)
 {
-	DBQuery q(dbh, "SELECT squadID FROM wwii_squads WHERE LOWER(short_name) = LOWER('%s') LIMIT 1", gameName.c_str());
+	DBQuery q(dbh, "SELECT squadID FROM wwii_squads WHERE disbanded = 0 AND LOWER(short_name) = LOWER('%s') LIMIT 1", gameName.c_str());
 	if ( q.HasRows() )
 		throw SquadError("Squad already exists", SQR_SQUAD_EXISTS);
 }
@@ -141,7 +141,10 @@ _checkReservedSquad(const Chat::Name& gameName)
 static UINT32
 _createSquad(UINT32 ownerID, UINT32* members, const Chat::Name& shortName, const char* fullName, SINT32 teulIndex)
 {
-	DBQuery q(dbh, "INSERT INTO wwii_squads (creatorid, short_name, name, password, description, active, recruiting, voting, disbanded, created)"
+    //DEV-560 - before creating new squad, delete disbanded squad with the same name
+    DBQuery qDel(dbh, "DELETE FROM wwii_squads WHERE disbanded = 1 AND LOWER(short_name) = LOWER('%s')", shortName.c_str());
+    
+    DBQuery q(dbh, "INSERT INTO wwii_squads (creatorid, short_name, name, password, description, active, recruiting, voting, disbanded, created)"
 					" VALUES (%u, '%s', '%s', '', '', 1, 1, 1, 0, now())"
 					, ownerID, shortName.c_str(), fullName);
 	UINT32 squadID = q.LastInsertID();
