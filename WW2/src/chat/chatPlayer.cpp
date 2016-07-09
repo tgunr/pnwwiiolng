@@ -1558,9 +1558,15 @@ Player::SetSpawned(bool newValue)
 		chatSendBandwidthNotice(*this, getPreference(CPR_UPDATE_MODE));
 
 		if ( m_snoopBy != nullptr )
-			chatDispatchGMMessage("SNOOP", chatMakeTempString("Snooped player %s is spawning", callsign()));
+		{
+			PREP_CHAT_MSG(cmsg, "Snooped player %s is spawning", callsign());
+			chatDispatchGMMessage("SNOOP", cmsg);
+		}
 		else if ( m_crsSnoopBy != nullptr )
-			chatDispatchCRSMessage("SNOOP", chatMakeTempString("CRSSnooped player %s is spawning", callsign()));
+		{
+			PREP_CHAT_MSG(cmsg, "CRSSnooped player %s is spawning", callsign());
+			chatDispatchCRSMessage("SNOOP", cmsg);
+		}
 	}
 	else
 	{
@@ -2288,7 +2294,8 @@ Player::whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const
 	}
 	else
 	{
-		into.append(chatMakeTempString("cell#%u", (cellIP & 0xff)));
+		into.append("cell#");
+		into.append(std::to_string((cellIP & 0xff)));
 		// He may not have finished spawning
 		if ( !isSpawned() )
 		{
@@ -2300,7 +2307,10 @@ Player::whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const
 			if ( sortieID() == 0 )
 				into.append("?missingsortieid?");
 			else
-				into.append(chatMakeTempString("sortie #%u", sortieID()));
+			{
+				into.append("sortie #");
+				into.append(std::to_string(sortieID()));
+			}
 
 			if ( isBuzzard() )
 				into.append(" buzzard");

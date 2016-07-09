@@ -55,7 +55,6 @@ static SQUAD_LISTS g_squads;
 static SQUAD_NAMES g_squadNames;
 static std::mutex _namesMutex;
 
-extern const char* chatMakeTempString(const char* fmt, ...);
 extern void chatSendCOAppointment(UINT32 squadID, const ChatHandle& handle);
 
 //////////////////////////////////////////////////////////////////////

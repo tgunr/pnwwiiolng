@@ -86,19 +86,19 @@ _banSuccess(void* data)
 	if ( issuer != nullptr )
 	{
 		// Tell the issuer they were successful
-		const char* p;
 		Chat::Name banned(ban->m_handle);
+		char msg[MAX_MESSAGE_LENGTH+1];
 		if ( ban->m_duration == 0 )
-			p = chatMakeTempString("%s has force-kicked %s: %s", issuer->callsign(), banned.c_str(), ban->m_message.c_str());
+			snprintf(msg, MAX_MESSAGE_LENGTH, "%s has force-kicked %s: %s", issuer->callsign(), banned.c_str(), ban->m_message.c_str());
 		else
-			p = chatMakeTempString("%s has issued a %s ban(#%u) on %s: %s"
+			snprintf(msg, MAX_MESSAGE_LENGTH, "%s has issued a %s ban(#%u) on %s: %s"
 						, issuer->callsign()
 						, chatTimeInterval(ban->m_duration)
 						, ban->m_banNo
 						, banned.c_str()
 						, ban->m_message.c_str()
 			);
-		chatDispatchGMMessage("INFO", p);
+		chatDispatchGMMessage("INFO", msg);
 	}
 
 	if ( ban->m_duration == 0 )

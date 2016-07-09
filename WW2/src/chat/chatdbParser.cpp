@@ -43,7 +43,7 @@ chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool /*sendMembers*/)
 	{
 		DBQuery q(dbh,
 					"SELECT s.short_name, s.name"
-							", cr.callsign, unix_timestamp(s.created)"
+							", cr.callsign, co.callsign, unix_timestamp(s.created)"
 							", s.flags, s.voting, s.recruiting"
 							", s.rookie_days, s.last_joined, s.last_joiner"
 							", s.description, s.motd, s.homepage"
@@ -52,7 +52,8 @@ chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool /*sendMembers*/)
 							", s.slogan"
 						" FROM wwii_squads s"
 							" LEFT JOIN wwii_player cr ON (s.creatorID = cr.playerID)"
-						" WHERE s.squadID = %u"
+							" LEFT JOIN wwii_player co ON (s.squadid = co.squadid)"
+						" WHERE s.squadID = %u AND co.squad_rank = 5"
 							" LIMIT 1"
 							, squadID);
 
@@ -68,6 +69,7 @@ chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool /*sendMembers*/)
 		squad.m_name = row.NextString();
 
 		squad.m_creatorHandle = chatGetHandle(row.NextString());
+		squad.m_coHandle = chatGetHandle(row.NextString());
 		squad.m_created = row.NextUInt();
 
 		squad.m_flags = row.NextUInt();
