@@ -10656,8 +10656,12 @@ LOGICAL fpFPSRideUnrideVehicle ()
 			}
 		}
 
-		fpsTrooper.lastUnrideTime = frametime;
-
+        // Don't want to track unride time on ships otherwise we won't collide with them when boarding!
+        if (FPSRideVehicle->VehicleType->Type != VEH_TYPE_SEA)
+            fpsTrooper.lastUnrideTime = frametime;
+        else
+            fpsTrooper.lastUnrideTime = 0;
+        
 		return TRUE;
 	}
 
@@ -10916,8 +10920,8 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 				break;
 				case VEH_TYPE_SEA:
 				{
-					offset.x = player->ModelData->VehiclePos.x - rideVehicle->PosData.Pos.x;
-					offset.y = player->ModelData->VehiclePos.y - rideVehicle->PosData.Pos.y;
+                    offset.x = player->ModelData->VehiclePos.x - rideVehicle->PosData.Pos.x;
+                    offset.y = player->ModelData->VehiclePos.y - rideVehicle->PosData.Pos.y;
 					offset.z = player->ModelData->VehiclePos.z - rideVehicle->PosData.Pos.z;
 				}
 				break;
@@ -10925,7 +10929,7 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 
 			if(player)
 			{
-				mathVectorMultiply64(&offset, &offset, &rideVehicle->PosData.AttMat);
+                mathVectorMultiply64(&offset, &offset, &rideVehicle->PosData.AttMat);
 
 				player->ModelData->VehiclePos.x = rideVehicle->PosData.Pos.x + offset.x;
 				player->ModelData->VehiclePos.y = rideVehicle->PosData.Pos.y + offset.y;
