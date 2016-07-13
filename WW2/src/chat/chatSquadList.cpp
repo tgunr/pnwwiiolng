@@ -55,7 +55,6 @@ static SQUAD_LISTS g_squads;
 static SQUAD_NAMES g_squadNames;
 static std::mutex _namesMutex;
 
-extern const char* chatMakeTempString(const char* fmt, ...);
 extern void chatSendCOAppointment(UINT32 squadID, const ChatHandle& handle);
 
 //////////////////////////////////////////////////////////////////////
@@ -1246,7 +1245,7 @@ chatFetchSquadInfo(UINT32 squadID)
 class SquadNamesQuery : public DBThreadQuery
 {
 public:
-	SquadNamesQuery() : DBThreadQuery(DBThread::Default, "SquadNamesQuery", "SELECT short_name FROM wwii_squads", DBThreadQuery::_IMMEDIATE) {}
+	SquadNamesQuery() : DBThreadQuery(DBThread::Default, "SquadNamesQuery", "SELECT short_name FROM wwii_squads WHERE disbanded = 0", DBThreadQuery::_IMMEDIATE) {}
 
 protected:
 	virtual void Success() override;

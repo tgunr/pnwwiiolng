@@ -18,7 +18,7 @@
 SINT32 chatInstallStratSupportCallbacks(void);
 
 // Send an SCMD result to an incoming oob message
-bool chatSendSCMDResult(SINT32 playerID, SCMD_ENUM command, FULL_OBJ_ID cp, SCMD_RESULT result, UINT32 data = 0);
+bool chatSendSCMDResult(SINT32 playerID, SCMD_ENUM command, FULL_OBJ_ID cp, WWII_SIDE side, SCMD_RESULT result, UINT32 data = 0);
 
 //tolua_begin
 UINT32 chatGetPopulation(WWII_SIDE side);

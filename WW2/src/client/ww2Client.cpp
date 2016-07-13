@@ -2906,7 +2906,7 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	char dbugFileName[21];
 	if(clientinited) return 0;
 
-#ifdef CONNECTION_TEST_BUILD
+#if defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
 	static const int DBUGLOG_MODE = LOG_TO_FILE;
 #else
 	static const int DBUGLOG_MODE = LOG_OFF;

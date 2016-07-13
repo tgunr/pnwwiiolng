@@ -526,7 +526,8 @@ public:
 		if ( player.isHiddenFrom(dest) )
 		{
 			player.gmNote("GM", "/gmm", dest->callsign(), args[1]);
-			chatDispatchGMMessage("GMM", chatMakeTempString("%s->%s %s", player.callsign(), dest->callsign(), args[1]));
+			PREP_CHAT_MSG(cmsg, "%s->%s %s", player.callsign(), dest->callsign(), args[1])
+			chatDispatchGMMessage("GMM", cmsg);
 			dest->message(LSTR_GM, LSTR_GENERIC, args[1], nullptr);
 		}
 		else

@@ -839,6 +839,9 @@ CPStruct::executeFallback()
 SCMD_RESULT
 CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
 {
+    //HACK: DEV-824 - .hold command temporary disabled
+    return SCMD_ERROR;
+
 	if ( side != issuer )
 		return SCMD_WRONG_SIDE;
 

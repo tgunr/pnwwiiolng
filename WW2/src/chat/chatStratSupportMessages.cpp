@@ -150,6 +150,7 @@ bool
 chatSendSCMDResult(SINT32 playerID
 					, SCMD_ENUM command
 					, FULL_OBJ_ID cp
+                    , WWII_SIDE side
 					, SCMD_RESULT result
 					, UINT32 data
 					)
@@ -159,7 +160,7 @@ chatSendSCMDResult(SINT32 playerID
 		StratCommand scmd(playerID
 							, command
 							, cp
-							, WWII_NO_SIDE
+							, side
 							, result
 							);
 		scmd.m_data = data;
