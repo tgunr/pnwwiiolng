@@ -34,11 +34,6 @@
 #include <unistd.h>
 #endif
 
-#if platOS == OS_MACOS
-#include <mach/clock.h>
-#include <mach/mach.h>
-#endif
-
 #include <atomic>
 
 TeulTimeMS teulClock64;
@@ -53,42 +48,29 @@ UINT32 teulClockTime;
 void
 teulSyncClock(void)
 {
-    
-    // Each platform has its own version of a monotonic clock
-#if platOS == OS_MACOS || platOS == OS_LINUX
-    
-    timespec currentTimeTS;
-    
-#if platOS == OS_MACOS
-    
-    clock_serv_t cclock;
-    mach_timespec_t mts;
-    
-    host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
-    clock_get_time(cclock, &mts);
-    mach_port_deallocate(mach_task_self(), cclock);
-    currentTimeTS.tv_sec = static_cast<__darwin_time_t>(mts.tv_sec);
-    currentTimeTS.tv_nsec = mts.tv_nsec;
-    
-#elif platOS == OS_LINUX
-    
-    clock_gettime(CLOCK_MONOTONIC, &currentTimeTS);
-
-#endif
-    
-    teulClock64 = (static_cast<TeulTimeMS>(currentTimeTS.tv_sec) * 1000ULL) +
-    (static_cast<TeulTimeMS>(currentTimeTS.tv_nsec) / 1000000ULL);
-    teulClockTime = (UINT32)currentTimeTS.tv_sec;
-
+#if platOS == OS_LINUX || platOS == OS_MACOS
+	struct timeval tv;
+	gettimeofday(&tv, nullptr);
+	const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL);
+	if ( PN_LIKELY(newTimeMS > teulClock64) )
+	{
+		teulClock64 = newTimeMS;
+		teulClockTime = (UINT32)tv.tv_sec;
+	}
+	else if (PN_UNLIKELY(newTimeMS < teulClock64))
+	{
+		teulClock64++;
+		teulClockTime = teulClock64 / 1000ULL;
+	}
 #elif platOS == OS_WIN32
+	static const DWORD  BaseClockTime = timeGetTime();
+	static const TeulTimeMS BaseClock64 = time(nullptr) * 1000ULL + BaseClockTime % 1000ULL;
 
-    teulClock64 = GetTickCount64();
-    teulClockTime = (UINT32)(teulClock64 / 1000LL);
-
+	teulClock64 = BaseClock64 + (timeGetTime() - BaseClockTime);
+	teulClockTime = (UINT32)(teulClock64 / 1000LL);
 #else
 #pragma error("No teulSyncClock implementation for this platform")
 #endif
-
 }
 
 // wrapper for inet_ntoa.
