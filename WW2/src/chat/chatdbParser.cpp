@@ -43,7 +43,7 @@ chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool /*sendMembers*/)
 	{
 		DBQuery q(dbh,
 					"SELECT s.short_name, s.name"
-							", cr.callsign, unix_timestamp(s.created)"
+							", cr.callsign, co.callsign, unix_timestamp(s.created)"
 							", s.flags, s.voting, s.recruiting"
 							", s.rookie_days, s.last_joined, s.last_joiner"
 							", s.description, s.motd, s.homepage"
@@ -52,7 +52,8 @@ chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool /*sendMembers*/)
 							", s.slogan"
 						" FROM wwii_squads s"
 							" LEFT JOIN wwii_player cr ON (s.creatorID = cr.playerID)"
-						" WHERE s.squadID = %u"
+							" LEFT JOIN wwii_player co ON (s.squadid = co.squadid)"
+						" WHERE s.squadID = %u AND co.squad_rank = 5"
 							" LIMIT 1"
 							, squadID);
 
@@ -68,6 +69,7 @@ chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool /*sendMembers*/)
 		squad.m_name = row.NextString();
 
 		squad.m_creatorHandle = chatGetHandle(row.NextString());
+		squad.m_coHandle = chatGetHandle(row.NextString());
 		squad.m_created = row.NextUInt();
 
 		squad.m_flags = row.NextUInt();
@@ -125,7 +127,7 @@ _checkLeadership(UINT32 squadID, RANK_NO oldRank, RANK_NO newRank, SINT32 teulIn
 static void
 _checkExistingSquad(const Chat::Name& gameName)
 {
-	DBQuery q(dbh, "SELECT squadID FROM wwii_squads WHERE LOWER(short_name) = LOWER('%s') LIMIT 1", gameName.c_str());
+	DBQuery q(dbh, "SELECT squadID FROM wwii_squads WHERE disbanded = 0 AND LOWER(short_name) = LOWER('%s') LIMIT 1", gameName.c_str());
 	if ( q.HasRows() )
 		throw SquadError("Squad already exists", SQR_SQUAD_EXISTS);
 }
@@ -141,7 +143,10 @@ _checkReservedSquad(const Chat::Name& gameName)
 static UINT32
 _createSquad(UINT32 ownerID, UINT32* members, const Chat::Name& shortName, const char* fullName, SINT32 teulIndex)
 {
-	DBQuery q(dbh, "INSERT INTO wwii_squads (creatorid, short_name, name, password, description, active, recruiting, voting, disbanded, created)"
+    //DEV-560 - before creating new squad, delete disbanded squad with the same name
+    DBQuery qDel(dbh, "DELETE FROM wwii_squads WHERE disbanded = 1 AND LOWER(short_name) = LOWER('%s')", shortName.c_str());
+    
+    DBQuery q(dbh, "INSERT INTO wwii_squads (creatorid, short_name, name, password, description, active, recruiting, voting, disbanded, created)"
 					" VALUES (%u, '%s', '%s', '', '', 1, 1, 1, 0, now())"
 					, ownerID, shortName.c_str(), fullName);
 	UINT32 squadID = q.LastInsertID();

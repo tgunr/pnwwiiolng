@@ -238,7 +238,7 @@ LOGICAL			SupportDXT5;				// DXT5 Interpolated alpha
 piMATRIX			IdentityMatrix;
 
 LOGICAL			VehicleObjectAnalysis;		// "Gizmos and Whizbangs"
-LOGICAL			WantDataDir;				// Want to run out of data directory
+LOGICAL			WantDataDir = FALSE;		// Want to run out of data directory
 LOGICAL			HasKeyFile;					// Have key file to enable special features
 LOGICAL			SuperTroop;					// SuperTroop!
 LOGICAL			SuperFloat;					// SuperFloat!
@@ -259,7 +259,7 @@ LOGICAL			gCellClientActive;
 LOGICAL          gWaterShadersEnabled;
 
 LOGICAL			disableButtonInput, disableAxisInput;
-LOGICAL			OpenConsole;
+LOGICAL			OpenConsole = TRUE;
 LOGICAL			SquadInvites;
 UINT32			OverrideSpawner;
 UINT32			gRegion; // used for china localizations and other functionality differences

@@ -329,25 +329,29 @@ void chatFreePlayer(Player* player)
 
 	if ( player->m_snoopBy )
 	{
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [subject disconnected]", player->m_snoopBy->callsign(), player->callsign()));
+		PREP_CHAT_MSG(cmsg, "%s is no-longer snooping on %s [subject disconnected]", player->m_snoopBy->callsign(), player->callsign());
+		chatDispatchGMMessage("INFO", cmsg);
 		player->m_snoopBy->m_snoopOn = nullptr;
 		player->m_snoopBy = nullptr;
 	}
 	if ( player->m_snoopOn )
 	{
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_snoopOn->callsign()));
+		PREP_CHAT_MSG(cmsg, "%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_snoopOn->callsign());
+		chatDispatchGMMessage("INFO", cmsg);
 		player->m_snoopOn->m_snoopBy = nullptr;
 		player->m_snoopOn = nullptr;
 	}
 	if ( player->m_crsSnoopBy )
 	{
-		chatDispatchCRSMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [subject disconnected]", player->m_crsSnoopBy->callsign(), player->callsign()));
+		PREP_CHAT_MSG(cmsg, "%s is no-longer snooping on %s [subject disconnected]", player->m_crsSnoopBy->callsign(), player->callsign());
+		chatDispatchCRSMessage("INFO", cmsg);
 		player->m_crsSnoopBy->m_crsSnoopOn = nullptr;
 		player->m_crsSnoopBy = nullptr;
 	}
 	if ( player->m_crsSnoopOn )
 	{
-		chatDispatchCRSMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_crsSnoopOn->callsign()));
+		PREP_CHAT_MSG(cmsg, "%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_crsSnoopOn->callsign());
+		chatDispatchCRSMessage("INFO", cmsg);
 		player->m_crsSnoopOn->m_crsSnoopBy = nullptr;
 		player->m_crsSnoopOn = nullptr;
 	}

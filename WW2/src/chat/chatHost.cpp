@@ -290,32 +290,6 @@ IRCPlayer::describeTo(const Player& player, const FLOAT64& /*x*/, const FLOAT64&
 }
 
 //////////////////////////////////////////////////////////////////////
-// Build a temporary string, basically a wrapper for sprintf that
-// helps us avoid having to continually allocate new buffers
-
-const char*
-chatMakeTempString(const char* fmt, ...)
-{
-	va_list args;
-
-	static int bufNo = 0;
-	static char buffer[4][MAX_MESSAGE_LENGTH + 1];
-
-	if (bufNo > 3)
-		bufNo = 0;
-
-	buffer[bufNo][0] = 0;
-
-	if (fmt != nullptr) {
-		va_start(args, fmt);
-		vsnprintf(buffer[bufNo], MAX_MESSAGE_LENGTH, fmt, args);
-		va_end(args);
-	}
-
-	return buffer[bufNo++];
-}
-
-//////////////////////////////////////////////////////////////////////
 
 SINT32
 chatGetShutdownTimeRemaining()
@@ -743,7 +717,8 @@ Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
 	break;
 	}
 
-	chatDispatchGMMessage("HOST", chatMakeTempString("%s %s client-mod detected", callsign.c_str(), type));
+	PREP_CHAT_MSG(message, "%s %s client-mod detected", callsign.c_str(), type);
+	chatDispatchGMMessage("HOST", message);
 
 	dbugLog(_FLN, "!HACK:%s:%s", callsign.c_str(), type);
 	chatdbRecordEvent("HACK", callsign.c_str(), type, "", "");
@@ -861,7 +836,8 @@ _snoop(const char* type, Player* player, Player* snooper, const char* to, const 
 	if ( snooper == nullptr || player == nullptr || snooper == player )
 		return;
 
-	snooper->message(LSTR_GM, LSTR_LABELLED_GENERIC, chatMakeTempString("%s->%s", player->callsign(), to), text);
+	PREP_CHAT_MSG(msg, "%s->%s", player->callsign(), to)
+	snooper->message(LSTR_GM, LSTR_LABELLED_GENERIC, msg, text);
 	chatdbRecordEvent(type, player->callsign(), "(snoop)", to, text);
 }
 
@@ -2656,7 +2632,7 @@ static void _countUserSides()
 
 	if ( (UINT32)std::abs((SINT32)(newCount - lastCount)) >= gap && lastNotice <= teulTime() - 300 )
 	{
-		const char* update = chatMakeTempString("Update: %u players [%u allied, %u axis]", newCount, _sideCount[ALLIED], _sideCount[AXIS]);
+		PREP_CHAT_MSG(update, "Update: %u players [%u allied, %u axis]", newCount, _sideCount[ALLIED], _sideCount[AXIS]);
 		wwiiIRCChannelMessage("-sys", update);
 		lastNotice = teulTime();
 		lastCount = newCount;
