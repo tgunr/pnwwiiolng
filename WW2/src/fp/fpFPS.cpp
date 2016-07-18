@@ -3547,9 +3547,11 @@ void fpFPSGetEyeMatrix (piMATRIX* pMatrix)
 	eyeMatrix._41 = 0.0f + (FLOAT32)fpsTrooper.leanHorizCurrent;
 	eyeMatrix._42 = 0.0f;
 	eyeMatrix._43 = TROOPER_STAND_EYE_HEIGHT + fpFPSGetHeight() + (FLOAT32)fpsTrooper.leanVertCurrent;
-
-	if (fpsTrooper.parachuteOpen)
-		eyeMatrix._42 = -0.2f;
+     
+    if (fpsTrooper.parachuteOpen) {
+        eyeMatrix._42 = -0.16f;
+        eyeMatrix._43 += 0.19f;
+    }
 
 	if (stateFlags & STATE_SIT)
 		eyeMatrix._42 = -fpsTrooper.eyeRideDisplacement;
