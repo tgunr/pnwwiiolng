@@ -365,8 +365,12 @@ static bool _connectClientToGameNetwork()
 		UINT32 appversion = 0;
 
 		rnlogoUpdateStatus("loading.network");
-
-		teulGetHost(STRVER, &appversion);
+        
+        if (gClientV[0] != 0) {
+            teulGetHost(gClientV, &appversion);
+        } else {
+            teulGetHost(STRVER, &appversion);
+        }
 
 		if ( teulMaskNetworkAddress(0) == 0 )
 			teulSetNetworkMask(GameHost);
