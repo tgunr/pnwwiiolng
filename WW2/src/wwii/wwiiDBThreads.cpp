@@ -130,8 +130,7 @@ DBThreadQuery::Execute(UINT32 threadNo, DB::handle_t* conn, DBThread::DBNo* last
 	}
 	catch ( std::logic_error& e )
 	{
-		// For now treat all DB errors as fatal
-		threadLog(_FLF, "dbq:%u query %s q:[%s] failed: %s", threadNo, Name(), Statement(), e.what());
+		threadLog(_FLW, "dbq:%u query %s q:[%s] failed: %s", threadNo, Name(), Statement(), e.what());
 
 		if ( m_immediate )
 			Failure();
