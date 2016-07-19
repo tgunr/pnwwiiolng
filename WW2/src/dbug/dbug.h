@@ -17,7 +17,11 @@
 	#include "dbug/dbugWErrno.h"
 #endif
 
+#if defined(DEBUG) || defined(ALPHA_RELEASE)
 #define  _FL __FILE__, __LINE__
+#else
+#define  _FL "", 0
+#endif
 
 namespace Debug
 {
