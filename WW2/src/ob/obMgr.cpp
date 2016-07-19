@@ -1798,7 +1798,7 @@ void PoolModel::LoadMDL(const char* path)
 		if(!subModelReference.poolModel)
 		{
 			Write_Debug("Instance model %s not found!", subModelFileName.c_str());
-			piExitProgram(__FILE__, __LINE__, "Instance model not found!");
+			piExitProgram(_FL, "Instance model not found!");
 		}
 
 		subModelReferences.push_back(subModelReference);
@@ -1916,7 +1916,7 @@ void PoolModel::ProcessTerrainObjectCollisionData(OBJECT* o)
 	{
 		std::string	errorMessage = modelname;
 		errorMessage.append(".flt: too many collidable LODs found!");
-		piExitProgram(__FILE__, __LINE__, errorMessage.c_str());
+		piExitProgram(_FL, errorMessage.c_str());
 	}
 
 	if(collideBranches.empty())	ldmdlProcessBranchCollisionData(o->child);
@@ -2047,7 +2047,7 @@ void PoolModel::RebuildMDL()
 	if(!topmostObj)
 	{
 		Write_Debug("Error loading FLT file for %s", fltPath.c_str());
-		piExitProgram(__FILE__, __LINE__, "MDLreb failed");
+		piExitProgram(_FL, "MDLreb failed");
 	}
 
 	SetModelType();
@@ -2123,7 +2123,7 @@ void PoolModel::SaveMDL(const POOLOBJHDR* poolobjhdr,
 	hfile = fioOpenWrite(mdlpath.c_str());
 	if(hfile == -1)
 	{
-		piExitProgram(__FILE__, __LINE__, "Could not create .mdl file!");
+		piExitProgram(_FL, "Could not create .mdl file!");
 	}
 
 	fioPuts(hfile, PLAYNET_COMPANY);
@@ -2322,7 +2322,7 @@ void PoolModel::CollectModelReferences(OBJECT* o)
 				if(!subModelReference.poolModel)
 				{
 					Write_Debug("Instance model %s not found!", modelName.c_str());
-					piExitProgram(__FILE__, __LINE__, "Instance model not found!");
+					piExitProgram(_FL, "Instance model not found!");
 				}
 
 				memcpy(&subModelReference.transform, &o->mat, sizeof(piMATRIX));					// This object also carries the transform matrix.
@@ -2700,7 +2700,7 @@ void PoolModel::CheckModelSanity()	const
 			modelname.find("muzzleflash")	== std::string::npos	)
 		{
 			Write_Log(LOG_FPS, LOG_INFO, "Empty model: %s", modelname.c_str());
-			piExitProgram(__FILE__, __LINE__, "Empty model found!");
+			piExitProgram(_FL, "Empty model found!");
 		}
 	}
 #endif	// #ifdef BETA_RELEASE

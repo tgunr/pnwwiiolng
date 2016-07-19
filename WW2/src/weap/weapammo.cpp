@@ -4073,7 +4073,7 @@ static LOGICAL _DoProjectileUpdate(weapAmmo* Ammo, FLOAT64VECTOR const* PrevPos,
 				if(!vehVehicleInList(Vehicle)) // extra level of validity checking
 				{
 #ifdef BETA_RELEASE
-					piExitProgram(__FILE__, __LINE__, "corrupt collide list");
+					piExitProgram(_FL, "corrupt collide list");
 #endif
 					break; // something's hosed let's just break out
 				}

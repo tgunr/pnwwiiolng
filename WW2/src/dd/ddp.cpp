@@ -1022,7 +1022,7 @@ LOGICAL ddpFlip(void)
 			}
 			else
 			{
-				////piExitProgram(__FILE__, __LINE__, "User exit requested!");
+				////piExitProgram(_FL, "User exit requested!");
 				running = FALSE;
 				break;
 			}

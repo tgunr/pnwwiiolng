@@ -1503,7 +1503,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 							Vehicle->VehicleType->Description);
 					Write_Log(LOG_VEHICLE,LOG_WARN,s);
 
-					piExitProgram(__FILE__, __LINE__,s);
+					piExitProgram(_FL,s);
 
 				}
 			}
@@ -1525,7 +1525,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 							Vehicle->VehicleType->Description);
 					Write_Log(LOG_VEHICLE,LOG_WARN,s);
 
-					piExitProgram(__FILE__, __LINE__,s);
+					piExitProgram(_FL,s);
 
 				}
 			}
@@ -1547,7 +1547,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 							Vehicle->VehicleType->Description);
 					Write_Log(LOG_VEHICLE,LOG_WARN,s);
 
-					piExitProgram(__FILE__, __LINE__,s);
+					piExitProgram(_FL,s);
 
 
 
@@ -1573,7 +1573,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 								Vehicle->VehicleType->Description);
 						Write_Log(LOG_VEHICLE,LOG_WARN,s);
 
-						piExitProgram(__FILE__, __LINE__,s);
+						piExitProgram(_FL,s);
 
 					}
 				}
@@ -1598,7 +1598,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 							Vehicle->VehicleType->Description);
 					Write_Log(LOG_VEHICLE,LOG_WARN,s);
 
-					piExitProgram(__FILE__, __LINE__,s);
+					piExitProgram(_FL,s);
 
 				}
 			}
@@ -1796,7 +1796,7 @@ UINT32 _DoWingVortexState(vehVehicle*pVeh,
 
 			Write_Log(LOG_VEHICLE,LOG_WARN, s);
 
-			piExitProgram(__FILE__, __LINE__, s);
+			piExitProgram(_FL, s);
         }
     }
 

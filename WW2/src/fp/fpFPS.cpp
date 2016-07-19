@@ -982,7 +982,7 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 		char errorMessage[255];
 
 		snprintf (errorMessage, 254, "fpFPSLoadModels: fpFPSAttachWeapon failed %d", currentWeaponModel);
-		piExitProgram (__FILE__, __LINE__, errorMessage);
+		piExitProgram (_FL, errorMessage);
 	}
 
 	fpFPSStartAnimationState (currentWeaponModel, IDLE);

@@ -292,7 +292,7 @@ void logTimerReset()
 		{
 			char s[32];
 			snprintf(s, 31, "callcount for %s is %d!", timer->funcname, timer->callcount);
-			piExitProgram(__FILE__, __LINE__, s);
+			piExitProgram(_FL, s);
 		}
 
 		timer->callcount = 0;
@@ -333,7 +333,7 @@ void logTimerBegin(const char* parent, const char* child, int* timerid)
 		if(*timerid > -1 && *timerid < MAX_TIMERS)
 			timer = &logTimers[*timerid];
 		else
-			piExitProgram(__FILE__, __LINE__, "Invalid timerid!");
+			piExitProgram(_FL, "Invalid timerid!");
 	}
 
 	if(timer)
@@ -344,7 +344,7 @@ void logTimerBegin(const char* parent, const char* child, int* timerid)
 		timer->callcount++;
 	}else
 	{
-		piExitProgram(__FILE__, __LINE__, "Ran out of logTimers!");
+		piExitProgram(_FL, "Ran out of logTimers!");
 	}
 }
 

@@ -167,7 +167,7 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
  #endif // TEUL_SERVER
 	{
 #if platBuild != TEUL_SERVER && !defined(CMDLINE_CLIENT)
-		piExitProgram(__FILE__,__LINE__,"Weapon Lists did not initialize");
+		piExitProgram(_FL,"Weapon Lists did not initialize");
 #endif
 		DEBUG_FATAL("WEAPON_LISTS DID NOT INITIALIZE!!!");
 		return false;

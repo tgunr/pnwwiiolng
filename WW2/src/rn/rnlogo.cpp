@@ -188,7 +188,7 @@ void rnUpdateLoadingScreen ()
 	// This block of code allows us to terminate the program during the loading screen display
 	// Also, during Debugging, Alt+Tab works correctly (if not a full screen app)
 	if (!running)
-		piExitProgram(__FILE__, __LINE__, "Exit requested during startup");
+		piExitProgram(_FL, "Exit requested during startup");
 }
 
 /************************************************************************************************

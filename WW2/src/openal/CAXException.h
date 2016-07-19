@@ -190,8 +190,8 @@ class CAXException
       DebugMessageN5("ca_require_noerr: [%s, %d] (goto %s;) %s:%d", \
 #errorCode, evalOnceErrorCode, \
 #exceptionLabel, \
-      __FILE__, \
-      __LINE__); \
+      "", \
+      0); \
       goto exceptionLabel; \
     } \
   } while ( 0 )
@@ -204,8 +204,8 @@ class CAXException
     { \
       DebugMessageN4("ca_verify_noerr: [%s, %d] %s:%d", \
 #errorCode, evalOnceErrorCode, \
-      __FILE__, \
-      __LINE__); \
+      "", \
+      0); \
     } \
   } while ( 0 )
 
@@ -214,8 +214,8 @@ class CAXException
   { \
     DebugMessageN3("ca_debug_string: %s %s:%d", \
     message, \
-    __FILE__, \
-    __LINE__); \
+    "", \
+    0); \
   } while ( 0 )
 
 #define ca_verify(assertion) \
@@ -225,8 +225,8 @@ class CAXException
     { \
       DebugMessageN3("ca_verify: %s %s:%d", \
 #assertion, \
-      __FILE__, \
-      __LINE__); \
+      "", \
+      0); \
     } \
   } while ( 0 )
 
@@ -238,8 +238,8 @@ class CAXException
       DebugMessageN4("ca_require: %s %s %s:%d", \
 #assertion, \
 #exceptionLabel, \
-      __FILE__, \
-      __LINE__); \
+      "", \
+      0); \
       goto exceptionLabel; \
     } \
   } while ( 0 )
@@ -251,8 +251,8 @@ class CAXException
     { \
       DebugMessageN3("ca_check: %s %s:%d", \
 #assertion, \
-      __FILE__, \
-      __LINE__); \
+      "", \
+      0); \
     } \
   } while ( 0 )
 

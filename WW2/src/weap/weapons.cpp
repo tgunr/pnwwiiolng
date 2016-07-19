@@ -171,7 +171,7 @@ SINT32 weaponsInit(void)
                                 sprintf(s, "ghostammotype %s not found", VarContents);
                                 Write_Debug(s);
 #if defined(BETA_RELEASE) && !defined (_DEBUG) && (platOS == OS_WIN32) // temp define until they fix the data
-                                piExitProgram(__FILE__, __LINE__, s);
+                                piExitProgram(_FL, s);
 #endif
                             }
 
@@ -194,7 +194,7 @@ SINT32 weaponsInit(void)
                                 sprintf(s, "ammotype %s not found", VarContents);
                                 Write_Debug(s);
 #if defined(BETA_RELEASE) && !defined (_DEBUG) && (platOS == OS_WIN32) // temp define until they fix the data
-                               piExitProgram(__FILE__, __LINE__, s);
+                               piExitProgram(_FL, s);
 #endif
                             }
 

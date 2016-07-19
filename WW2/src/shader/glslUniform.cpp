@@ -1560,7 +1560,7 @@ void glslUniform::Apply(GLint location) const
         }
     default:
         {
-            Write_Log(LOG_OLD, LOG_WARN, "ERROR: %s %s", __FILE__,  __LINE__);
+            Write_Log(LOG_OLD, LOG_WARN, "ERROR: %s %s", _FL);
             break;
         }
     }
