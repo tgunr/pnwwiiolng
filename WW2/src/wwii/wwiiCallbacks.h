@@ -77,7 +77,7 @@
 } while(false)
 
 //! Terminate registration block.
-#if defined(DBEUG) || defined(ALPHA_RELEASE)
+#if defined(DEBUG) || defined(ALPHA_RELEASE)
 #define END_CALLBACK_REGISTRATION \
 		dbugLog(_FLI, "%s: done", __FUNCTION__); \
 		dbugSetErrno(0); \
