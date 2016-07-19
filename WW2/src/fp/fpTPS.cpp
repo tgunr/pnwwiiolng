@@ -272,7 +272,7 @@ LOGICAL fpTPSLoad (void)
 
 					snprintf (errorMessage, 254, "ERROR loading blend %s", fpTPSTwitchFiles[i][j]);
 					Write_Log (LOG_FPS, LOG_INFO, "%s", errorMessage);
-					piExitProgram (__FILE__, __LINE__, errorMessage);
+					piExitProgram (_FL, errorMessage);
 				}
 			}
 			else
@@ -346,7 +346,7 @@ LOGICAL fpTPSLoad (void)
 
 				snprintf (errorMessage, 254, "ERROR finding patch %s", fpTPSPatchTextureNames[i]);
 				Write_Log (LOG_FPS, LOG_INFO, "%s", errorMessage);
-				piExitProgram (__FILE__, __LINE__, errorMessage);
+				piExitProgram (_FL, errorMessage);
 			}
 		}
 		else
@@ -374,7 +374,7 @@ LOGICAL fpTPSLoad (void)
 
 		snprintf (errorMessage, 254, "ERROR too many faces in face file .. %d > %d", fpTPSNumFaces, MAX_FACES);
 		Write_Log (LOG_FPS, LOG_INFO, "%s", errorMessage);
-		piExitProgram (__FILE__, __LINE__, errorMessage);
+		piExitProgram (_FL, errorMessage);
 	}
 	memcpy (fpTPSFaceTexIDs, faceIDs, sizeof(SINT32)*fpTPSNumFaces);
 	*/

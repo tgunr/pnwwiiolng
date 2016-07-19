@@ -121,7 +121,7 @@ LOGICAL obmainMoveToNotObjectTree(OBJECT* lpobj)
 #if defined(BETA_RELEASE) && (platOS == OS_MACOS)
 // doesn't work anymore since goddamn shawnce changed the application loop
 //	if(!pthread_main_np())
-//		piExitProgram(__FILE__, __LINE__, "Adding object outside main thread!");
+//		piExitProgram(_FL, "Adding object outside main thread!");
 #endif
 
 	if (lpobj == nullptr)
@@ -147,7 +147,7 @@ LOGICAL obmainMoveToObjectTree(OBJECT* lpobj)
 {
 #if defined(BETA_RELEASE) && (platOS == OS_MACOS)
 //	if(!pthread_main_np())
-//		piExitProgram(__FILE__, __LINE__, "Adding object outside main thread!");
+//		piExitProgram(_FL, "Adding object outside main thread!");
 #endif
 
 	if (lpobj == nullptr)
@@ -2291,12 +2291,12 @@ OBJECT* _newObject(UINT32 obtype)
 		break;
 
 		default:
-			piExitProgram(__FILE__, __LINE__, "Unexpected object flags");
+			piExitProgram(_FL, "Unexpected object flags");
 		break;
 	}
 
 	if (PN_UNLIKELY(!lpobj))
-		piExitProgram(__FILE__, __LINE__, "Out of memory");
+		piExitProgram(_FL, "Out of memory");
 
 	lpobj->matid = -1;
 	lpobj->texid = -1;
@@ -2635,7 +2635,7 @@ LOGICAL obmainValidateObject(OBJECT* lpobj)
 #if(0)
     if(!isValid)
 	{
-		piExitProgram(__FILE__, __LINE__, "Invalid object found!");
+		piExitProgram(_FL, "Invalid object found!");
 	}
 #endif
 

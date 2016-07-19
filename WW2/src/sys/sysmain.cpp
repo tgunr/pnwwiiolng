@@ -1574,7 +1574,7 @@ int _matherr(struct _exception* except)
 			sprintf(s, "math err type: %d, func: %s, args: %f, %f", except->type, except->name,
 													(float)except->arg1, (float)except->arg2);
 			rnmainListText(s);
-            //piExitProgram(__FILE__,__LINE__,s);
+            //piExitProgram(_FL,s);
 		break;
 
 		default:

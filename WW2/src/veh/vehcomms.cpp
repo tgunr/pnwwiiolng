@@ -56,12 +56,12 @@ UINT32 vehcommSendVehicleRequest(SINT32 VehicleType, WEAPON_SERIAL const* pWeapo
 UINT32 vehcommProcessVehicleRequestResponse( VEHICLE_REPLY const* Reply)
 {
     if(Reply == nullptr)
-		piExitProgram(__FILE__, __LINE__,"[vehcommProcessVehicleRequestResponse] Reply == nullptr");
+		piExitProgram(_FL,"[vehcommProcessVehicleRequestResponse] Reply == nullptr");
 
 	const WEAPON* const pWeapon = weapLookup(Reply->spec);
 
     if(pWeapon == nullptr)
-        piExitProgram(__FILE__, __LINE__,"[vehcommProcessVehicleRequestResponse] pWeapon == nullptr");
+        piExitProgram(_FL,"[vehcommProcessVehicleRequestResponse] pWeapon == nullptr");
 
 	vehmainSpawnVehicle(Reply);
 

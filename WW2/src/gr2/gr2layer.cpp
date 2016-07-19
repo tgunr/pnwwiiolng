@@ -379,7 +379,7 @@ static void _byteAlignCheck(size_t size, const char* type)
 	{
 		char buf[256];
 		snprintf(buf, 255, "%s is not byte aligned: size(%ld) %% multiple(%d) = %ld bytes leftover", type, size, GR2_MEMORY_MULTIPLE, (size % GR2_MEMORY_MULTIPLE));
-		piExitProgram(__FILE__, __LINE__, buf);
+		piExitProgram(_FL, buf);
 	}
 }
 #endif//GR2_MEMORY_PAD
@@ -392,7 +392,7 @@ void gr2Init (void)
 
 /*	if(!GrannyVersionsMatch)
 	{
-		piExitProgram(__FILE__, __LINE__, "The Granny DLL currently loaded doesn't match the .h file used during compilation");
+		piExitProgram(_FL, "The Granny DLL currently loaded doesn't match the .h file used during compilation");
 	}*/
 
 	Callback.Function = gr2Error;
@@ -733,7 +733,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	{
 		char errMsg[255];
 		sprintf (errMsg, "gr2LoadModel: failed to load model %s", modelFile);
-		piExitProgram (__FILE__, __LINE__, errMsg);
+		piExitProgram (_FL, errMsg);
 	}
 
 	//if (fileInfo->ModelCount != 1)
@@ -788,7 +788,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	if(!newModel)
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Failed to allocate memory for model %s", modelFile);
-		piExitProgram (__FILE__, __LINE__, "gr2LoadModel: Failed to allocate memory for model");
+		piExitProgram (_FL, "gr2LoadModel: Failed to allocate memory for model");
 		return nullptr;
 	}
 
@@ -800,7 +800,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	if (grannyModel->Skeleton->BoneCount > MAX_GR2_BONE_COUNT)
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Bone count too high (%d > %d) for %s", grannyModel->Skeleton->BoneCount, MAX_GR2_BONE_COUNT, modelFile);
-		piExitProgram (__FILE__, __LINE__, "gr2LoadModel: Bonecount too high");
+		piExitProgram (_FL, "gr2LoadModel: Bonecount too high");
 		return nullptr;
 	}
 
@@ -922,14 +922,14 @@ static SINT32 createTexture (granny_texture* grannyTexture)
 
 		if (!piIsTexture(texid, 0))
 		{
-			piExitProgram (__FILE__, __LINE__, "createTexture: failed to piCreateRawTexture");
+			piExitProgram (_FL, "createTexture: failed to piCreateRawTexture");
 		}
 
 		piSetTextureName(texid, texname);
 
 		if (!piLockTextureMemorySurface(texid, 0, &pisd))
 		{
-			piExitProgram (__FILE__, __LINE__, "createTexture: failed to piLockTextureMemorySurface");
+			piExitProgram (_FL, "createTexture: failed to piLockTextureMemorySurface");
 		}
 
 #if platOS == OS_WIN32
@@ -941,17 +941,17 @@ static SINT32 createTexture (granny_texture* grannyTexture)
 
 		if (!imgData)
 		{
-			piExitProgram (__FILE__, __LINE__, "createTexture: failed to allocate temporary memory for texture image");
+			piExitProgram (_FL, "createTexture: failed to allocate temporary memory for texture image");
 		}
 
 		if (!GrannyCopyTextureImage(grannyTexture, 0, 0, layout, grannyTexture->Width, grannyTexture->Height, grannyTexture->Width*3, imgData))
 		{
-			piExitProgram (__FILE__, __LINE__, "createTexture: failed in GrannyCopyTextureImage");
+			piExitProgram (_FL, "createTexture: failed in GrannyCopyTextureImage");
 		}
 
 		if (!ldpixCopyBitsToSurface(imgData, 0, grannyTexture->Width, grannyTexture->Height, &pisd, colorMAGENTA))
 		{
-			piExitProgram (__FILE__, __LINE__, "createTexture: failed in ldpixCopyBitsToSurface");
+			piExitProgram (_FL, "createTexture: failed in ldpixCopyBitsToSurface");
 		}
 
 		piUnlockTextureMemorySurface(texid, 0);
@@ -1202,7 +1202,7 @@ gr2Animation* gr2LoadAnimation (const SCHAR* animationFile, SINT32 useCache)
 	if (!newAnimation)
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Failed to allocate memory for animation %s", animationFile);
-		piExitProgram (__FILE__, __LINE__, "gr2LoadAnimation: Failed to allocate memory for animation");
+		piExitProgram (_FL, "gr2LoadAnimation: Failed to allocate memory for animation");
 		return nullptr;
 	}
 
@@ -1252,7 +1252,7 @@ gr2Animation* gr2LoadAnimation (const SCHAR* animationFile, SINT32 useCache)
 					newEvent = _gr2EventPool.Pop();
 
 					if(!newEvent)
-						piExitProgram (__FILE__, __LINE__, "gr2LoadAnimation: Failed to allocate memory for event");
+						piExitProgram (_FL, "gr2LoadAnimation: Failed to allocate memory for event");
 
 					sscanf(buf, "%d %f %32s", &newEvent->eventType, &newEvent->eventTime, newEvent->eventData);
 
@@ -1308,7 +1308,7 @@ LOGICAL gr2AttachModel (gr2Model* model, const SCHAR* attachBone, gr2Model* atta
 	else
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "Bone %s not found in model %s", attachBone, model->grannyModel->Name);
-		//piExitProgram (__FILE__, __LINE__, "gr2LoadModel: Failed to find bone for model");
+		//piExitProgram (_FL, "gr2LoadModel: Failed to find bone for model");
 		attached = false;
 	}
 
@@ -1319,7 +1319,7 @@ LOGICAL gr2AttachModel (gr2Model* model, const SCHAR* attachBone, gr2Model* atta
 	else
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "Bone %s not found in model %s", attachToBone, attachToModel->grannyModel->Name);
-		//piExitProgram (__FILE__, __LINE__, "gr2AttachModel: Failed to find bone for attach model");
+		//piExitProgram (_FL, "gr2AttachModel: Failed to find bone for attach model");
 		attached = false;
 	}
 
@@ -1408,7 +1408,7 @@ gr2Control* gr2PlayAnimation (gr2Model* model, gr2Animation* animation)
 
     if (!newControl)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2PlayAnimation: Failed to allocate memory for animation");
+		piExitProgram (_FL, "gr2PlayAnimation: Failed to allocate memory for animation");
 		return nullptr;
 	}
 
@@ -3361,7 +3361,7 @@ UINT32 gr2IsControlActive (gr2Control* gr2Control)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2IsControlActive: Nullptr Control");
+		piExitProgram (_FL, "gr2IsControlActive: Nullptr Control");
 		return FALSE;
 	}
 
@@ -3374,7 +3374,7 @@ UINT32 gr2IsControlComplete (gr2Control* gr2Control)
 
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2IsControlComplete: Nullptr Control");
+		piExitProgram (_FL, "gr2IsControlComplete: Nullptr Control");
 		return FALSE;
 	}
 
@@ -3393,7 +3393,7 @@ void gr2FreeAnimation (gr2Animation* anim)
 	/*
 	if (!anim)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2FreeAnimation: Nullptr anim");
+		piExitProgram (_FL, "gr2FreeAnimation: Nullptr anim");
 	}
 	*/
 
@@ -3440,7 +3440,7 @@ void gr2StopControl (gr2Control* gr2Control, LOGICAL immediate)
 
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2FreeControl: Null Control");
+		piExitProgram (_FL, "gr2FreeControl: Null Control");
 	}
 
 	if (immediate)
@@ -3514,7 +3514,7 @@ void gr2ControlSetLastFrame (gr2Control* gr2Control)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetLastFrame: Null Control");
+		piExitProgram (_FL, "gr2ControlSetLastFrame: Null Control");
 	}
 
 	GrannySetControlRawLocalClock(gr2Control->control, GrannyGetControlLocalDuration(gr2Control->control));
@@ -3524,7 +3524,7 @@ void gr2ControlSetLoopCount (gr2Control* gr2Control, SINT32 numLoops)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetLoopCount: Null Control");
+		piExitProgram (_FL, "gr2ControlSetLoopCount: Null Control");
 	}
 
 	if (numLoops)
@@ -3540,7 +3540,7 @@ void gr2ControlSetEaseInDuration (gr2Control* gr2Control, FLOAT32 time)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetEaseInDuration: Null Control");
+		piExitProgram (_FL, "gr2ControlSetEaseInDuration: Null Control");
 	}
 
 	gr2Control->easeInDuration = time;
@@ -3556,7 +3556,7 @@ void gr2ControlSetEaseOutDuration (gr2Control* gr2Control, FLOAT32 time)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetEaseOutDuration: Null Control");
+		piExitProgram (_FL, "gr2ControlSetEaseOutDuration: Null Control");
 	}
 
 	gr2Control->easeOutDuration = time;
@@ -3574,7 +3574,7 @@ void gr2ControlSetSpeed (gr2Control* gr2Control, FLOAT32 speed)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetSpeed: Null Control");
+		piExitProgram (_FL, "gr2ControlSetSpeed: Null Control");
 	}
 
 	GrannySetControlSpeed (gr2Control->control, speed);
@@ -3584,7 +3584,7 @@ void gr2ControlSetWeight (gr2Control* gr2Control, FLOAT32 weight)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetSpeed: Null Control");
+		piExitProgram (_FL, "gr2ControlSetSpeed: Null Control");
 	}
 
 	GrannySetControlWeight (gr2Control->control, weight);
@@ -3641,7 +3641,7 @@ void gr2SetModelRotation (gr2Model* model, piMATRIX* matrix)
 		if (!model->finalModelTransform)
 		{
 			Write_Log (LOG_FPS, LOG_INFO, "gr2SetModelRotation: Failed to allocate memory for final transform");
-			piExitProgram (__FILE__, __LINE__, "gr2SetModelRotation: Failed to allocate memory for final transform");
+			piExitProgram (_FL, "gr2SetModelRotation: Failed to allocate memory for final transform");
 		}
 
 		*(model->finalModelTransform) = IdentityMatrix;
@@ -3681,7 +3681,7 @@ void gr2GetModelFinalTransform (gr2Model* model, piMATRIX* matrix)
 		if (!model->finalModelTransform)
 		{
 			Write_Log (LOG_FPS, LOG_INFO, "gr2SetModelRotation: Failed to allocate memory for final transform");
-			piExitProgram (__FILE__, __LINE__, "gr2SetModelRotation: Failed to allocate memory for final transform");
+			piExitProgram (_FL, "gr2SetModelRotation: Failed to allocate memory for final transform");
 		}
 
 		*(model->finalModelTransform) = IdentityMatrix;
@@ -3705,7 +3705,7 @@ void gr2SetModelPosition (gr2Model* model, piVECTOR* position)
 		if (!model->finalModelTransform)
 		{
 			Write_Log (LOG_FPS, LOG_INFO, "gr2SetModelRotation: Failed to allocate memory for final transform");
-			piExitProgram (__FILE__, __LINE__, "gr2SetModelRotation: Failed to allocate memory for final transform");
+			piExitProgram (_FL, "gr2SetModelRotation: Failed to allocate memory for final transform");
 		}
 
 		*(model->finalModelTransform) = IdentityMatrix;
@@ -4220,7 +4220,7 @@ void gr2SetPositioningBone (gr2Model* model, SCHAR* boneName)
 	if(!(GrannyFindBoneByName(model->skeleton, boneName, &boneIndex)))
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2SetPositioningBone: Bone %s not found in model %s", model->grannyModel->Name, boneName);
-		piExitProgram (__FILE__, __LINE__, "gr2SetPositioningBone: Failed to find bone for model");
+		piExitProgram (_FL, "gr2SetPositioningBone: Failed to find bone for model");
 	}
 
 	model->rootPositioningBone = boneIndex;
@@ -4228,7 +4228,7 @@ void gr2SetPositioningBone (gr2Model* model, SCHAR* boneName)
 //	if(!(GrannyFindBoneByName(model->skeleton, "Bip01", &boneIndex)))
 //	{
 //		Write_Log (LOG_FPS, LOG_INFO, "gr2SetPositioningBone: Bone %s not found in model %s", model->grannyModel->Name, boneName);
-//		piExitProgram (__FILE__, __LINE__, "gr2SetPositioningBone: Failed to find bone for model");
+//		piExitProgram (_FL, "gr2SetPositioningBone: Failed to find bone for model");
 //	}
 
 //	model->movePositioningBone = boneIndex;
@@ -4704,7 +4704,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 			if (scanReturn != 2)
 			{
 				Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad anim line in blendfile %s", blendfile);
-				piExitProgram (__FILE__, __LINE__, "gr2LoadBlendedAnimation: Bad anim line in blendfile");
+				piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad anim line in blendfile");
 			}
 
 			ptr = strrchr(tString, '.');
@@ -4741,7 +4741,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 				if (scanReturn != 2)
 				{
 					Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad data line in animation %s", loadedMasks[numAnimFiles].animationFile);
-					//piExitProgram (__FILE__, __LINE__, "gr2LoadBlendedAnimation: Bad data line in animation");
+					//piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad data line in animation");
 					continue;
 				}
 
@@ -4763,7 +4763,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 	if (numAnimFiles < 1)
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: No animation files specified", loadedMasks[numAnimFiles].animationFile);
-		piExitProgram (__FILE__, __LINE__, "gr2LoadBlendedAnimation: No animation files specified");
+		piExitProgram (_FL, "gr2LoadBlendedAnimation: No animation files specified");
 	}
 #endif
 
@@ -4771,7 +4771,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 
 	if (!newBlend)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2LoadBlendedAnimation: failed to allocate memory for newBlend");
+		piExitProgram (_FL, "gr2LoadBlendedAnimation: failed to allocate memory for newBlend");
 	}
 
 	newBlend->mod1 = mod1;
@@ -4868,7 +4868,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 			if (scanReturn != 2)
 			{
 				Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad anim line in blendfile %s", blendfile);
-				piExitProgram (__FILE__, __LINE__, "gr2LoadBlendedAnimation: Bad anim line in blendfile");
+				piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad anim line in blendfile");
 			}
 
 			ptr = strrchr(tString, '.');
@@ -4905,7 +4905,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 				if (scanReturn != 2)
 				{
 					Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad data line in animation %s", loadedMasks[numAnimFiles].animationFile);
-					piExitProgram (__FILE__, __LINE__, "gr2LoadBlendedAnimation: Bad data line in animation");
+					piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad data line in animation");
 				}
 
 				if (boneWeight != loadedMasks[numAnimFiles].defaultWeight)
@@ -4920,14 +4920,14 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 	if (numAnimFiles < 1)
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: No animation files specified", loadedMasks[numAnimFiles].animationFile);
-		piExitProgram (__FILE__, __LINE__, "gr2LoadBlendedAnimation: No animation files specified");
+		piExitProgram (_FL, "gr2LoadBlendedAnimation: No animation files specified");
 	}
 
 	newBlend = _gr2BlendPool.Pop();
 
 	if (!newBlend)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2LoadBlendedAnimation: failed to allocate memory for newBlend");
+		piExitProgram (_FL, "gr2LoadBlendedAnimation: failed to allocate memory for newBlend");
 	}
 
 	newBlend->numBlends = std::min(numAnimFiles, GR2_MAX_ANIMS_PER_BLEND);
@@ -4973,7 +4973,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationXML(const SCHAR* blendfile, SINT32 bon
 	gr2AnimationBlend* newBlend = _gr2BlendPool.Pop();
 
 	if(!newBlend)
-		piExitProgram (__FILE__, __LINE__, "gr2LoadBlendedAnimationXML: failed to allocate memory for newBlend");
+		piExitProgram (_FL, "gr2LoadBlendedAnimationXML: failed to allocate memory for newBlend");
 
 	memset(newBlend->animations, 0, sizeof(gr2Animation*) * GR2_MAX_ANIMS_PER_BLEND);
 
@@ -5004,7 +5004,7 @@ gr2AnimationBlend* gr2CreateBlendedAnimation(const SCHAR* animFile, SINT32 boneC
 	gr2AnimationBlend* newBlend = _gr2BlendPool.Pop();
 
 	if (!newBlend)
-		piExitProgram (__FILE__, __LINE__, "gr2LoadBlendedAnimation: failed to allocate memory for newBlend");
+		piExitProgram (_FL, "gr2LoadBlendedAnimation: failed to allocate memory for newBlend");
 
 	newBlend->type = gr2AnimationBlend::BASE;
 	newBlend->numBlends = 0;
@@ -5018,7 +5018,7 @@ gr2AnimationBlend* gr2CreateBlendedAnimation(const SCHAR* animFile, SINT32 boneC
 		newBlend->numBlends = 1;
 
 		if (!newBlend->animations[0])
-			piExitProgram (__FILE__, __LINE__, "gr2CreateBlendedAnimation: Failed to load animation in DYNAMIC blend");
+			piExitProgram (_FL, "gr2CreateBlendedAnimation: Failed to load animation in DYNAMIC blend");
 
 		newBlend->animations[0]->mask = GrannyNewTrackMask(1.0f, boneCount);
 		newBlend->animations[0]->animType = GR2_ANIMATION_BASELOOP;

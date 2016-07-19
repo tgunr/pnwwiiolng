@@ -1221,7 +1221,7 @@ fpTPSWeaponType	fpTPSConvertWeaponTypes(fpFPSWeaponType type)
 	}
 
 	Write_Log (LOG_FPS, LOG_INFO, "fpTPSConvertWeaponTypes: Invalid weapon type passed %d!", type);
-	//piExitProgram (__FILE__, __LINE__, "fpTPSConvertWeaponTypes: Invalid weapon type passed" );
+	//piExitProgram (_FL, "fpTPSConvertWeaponTypes: Invalid weapon type passed" );
 
 	//dumb
 	return TPS_WEAPONTYPE_EMPTY;

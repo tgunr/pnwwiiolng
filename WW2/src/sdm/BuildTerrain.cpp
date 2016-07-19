@@ -279,7 +279,7 @@ static void MergeCPFdata()
 		if(cpCPF == chokepointCPFmap.end())
 		{
 			logFile << endl << "fatal error: facility(" << facCPF->fid.scx << "," << facCPF->fid.scy << "," << facCPF->fid.id << ") refers to inexistent CP!" << endl;
-			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+			piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 
 		strcpy(facSDM->fileName, facCPF->objname);
@@ -316,7 +316,7 @@ static void MergeCPFdata()
 		if(facCPF == facilityCPFmap.end())
 		{
 			logFile << endl << "fatal error: building(" << bldCPF->bid.scx << "," << bldCPF->bid.scy << "," << bldCPF->bid.id << ") refers to inexistent facility!" << endl;
-			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+			piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 
 		strcpy(bldSDM->fileName, bldCPF->objname);
@@ -365,14 +365,14 @@ static void MergeCPFdata()
 		else
 		{
 			//logFile << endl << "fatal error: link(" << linkCPF->lid.scx << "," << linkCPF->lid.scy << "," << linkCPF->lid.id << ") refers to inexistent firebase!" << endl;
-			//piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+			//piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 
 		BuildingCPFmap::iterator	startBldCPF	= buildingCPFmap.find(StratObjId(linkCPF->lbid.scx, linkCPF->lbid.scy, linkCPF->lbid.id));
 		if(startBldCPF == buildingCPFmap.end())
 		{
 			logFile << endl << "fatal error: link(" << linkCPF->lid.scx << "," << linkCPF->lid.scy << "," << linkCPF->lid.id << ") refers to inexistent start depot!" << endl;
-			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+			piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 
 		linkSDM->startDepotId.Populate(startBldCPF->second, linkCPF->lbid.id, CLASS_BUILDING, startBldCPF->second->btype);
@@ -381,7 +381,7 @@ static void MergeCPFdata()
 		if(endBldCPF == buildingCPFmap.end())
 		{
 			logFile << endl << "fatal error: link(" << linkCPF->lid.scx << "," << linkCPF->lid.scy << "," << linkCPF->lid.id << ") refers to inexistent end depot!" << endl;
-			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+			piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 		linkSDM->endDepotId.Populate(endBldCPF->second, endBldCPF->second->bid.id, CLASS_BUILDING, endBldCPF->second->btype);
 
@@ -391,7 +391,7 @@ static void MergeCPFdata()
 			if(wptCPF == waypointCPFmap.end())
 			{
 				logFile << endl << "fatal error: link(" << linkCPF->lid.scx << "," << linkCPF->lid.scy << "," << linkCPF->lid.id << ") refers to inexistent waypoint!" << endl;
-				piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+				piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 			}
 			float dx			= (float)(wptCPF->second.first->posx - endBldCPF->second->posx);
 			float dy			= (float)(wptCPF->second.first->posy - endBldCPF->second->posy);
@@ -450,14 +450,14 @@ static void MergeCPFdata()
 			if(linkIt == linkCPFmap.end())
 			{
 				logFile << endl << "fatal error: waypoint(" << wptCPF->wpid.scx << "," << wptCPF->wpid.scy << "," << wptCPF->wpid.id << ") refers to inexistent link!" << endl;
-				piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+				piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 			}
 
 			BuildingCPFmap::iterator	bldIt = buildingCPFmap.find(StratObjId(linkIt->second.first->lbid.scx, linkIt->second.first->lbid.scy, linkIt->second.first->lbid.id));
 			if(bldIt == buildingCPFmap.end())
 			{
 				logFile << endl << "fatal error: link(" << linkIt->second.first->lbid.scx << "," << linkIt->second.first->lbid.scy << "," << linkIt->second.first->lbid.id << ") refers to inexistent building!" << endl;
-				piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+				piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 			}
 
 			wptSDM->nextpt.Populate(bldIt->second, linkIt->second.first->lid.id, CLASS_LINK, 0);
@@ -1572,7 +1572,7 @@ void SuperCellTerrainData::WriteToSDM()
 	{
 		logFile << endl << "Fatal error: superCell(" << supercellX << "," << supercellY << "): too many terrain objects: " << totalObjectCount << endl;
 		logFile << "MAX_TRNOBJ_OCTET has to be increased.";
-		piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+		piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 	}
 
 
@@ -2812,7 +2812,7 @@ void BuildTerrain(bool mergeAll, short cellX, short cellY)
 	if(!trnldrReadHdrFile(headerFileName.c_str(), &terrainHeader))
 	{
 		logFile << "failed!";
-		piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+		piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 	}
 	else
         logFile << "done." << endl;

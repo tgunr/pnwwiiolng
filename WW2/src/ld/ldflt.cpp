@@ -1342,7 +1342,7 @@ static bool ReadMaterialTable(const char* name)
 	s_nummaterials = materialsLen / sizeof(fltMATERIAL);
 	if (s_nummaterials > MAX_FLT_MATERIALS)
 	{
-		Write_Debug("fltLoad failed at %s:%u", __FILE__, __LINE__);
+		Write_Debug("fltLoad failed at %s:%u", _FL);
 		return false;
 	}
 	if (s_nummaterials * sizeof(fltMATERIAL) != materialsLen)
@@ -2793,7 +2793,7 @@ OBJECT* ldfltLoad(const std::string& name, float scale, int reduce)
         char error[1024] ;
         sprintf(error, "Flt:%s\nError: %s (%s)", name.c_str(), e.m_problem.c_str(), e.m_doing.c_str()) ;
         Write_Debug("%s", error) ;
-        piExitProgram(__FILE__, __LINE__, error) ;
+        piExitProgram(_FL, error) ;
         return NULL ;
     }
 }

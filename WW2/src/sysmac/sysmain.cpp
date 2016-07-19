@@ -250,7 +250,7 @@ void sysmainAddArchives()
 
   if ( ! foundthem )
   {
-		piExitProgram(__FILE__, __LINE__, "No archives found");
+		piExitProgram(_FL, "No archives found");
   }
  */
 }

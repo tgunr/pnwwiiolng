@@ -293,7 +293,7 @@ int uiInit()
 
 	// this also sets the default font for _pictx
 	if(!uiSetFontSize(cfgPrefsGetInt(cfgPrefsGetGlobalName(cfgFONT_SIZE), UI_FONT_SIZE)))
-		piExitProgram(__FILE__,__LINE__,"default font not found!");
+		piExitProgram(_FL,"default font not found!");
 
 	uiSetToolTips(cfgPrefsGetBool(cfgPrefsGetGlobalName(cfgENABLE_TOOLTIPS), true));
 
@@ -2427,7 +2427,7 @@ static void _jserror(JSContext* cx, const char* message, JSErrorReport* report)
 
 	if(report->errorNumber == 137)
 	{
-		//piExitProgram(__FILE__,__LINE__, out.c_str());
+		//piExitProgram(_FL, out.c_str());
 	}
 }
 
@@ -3738,7 +3738,7 @@ JSBool jsTargetView::SetProperty(JSContext* ctx, int propid, jsval* val)
 static void _jsabort(const char* msg)
 {
 	uiConsoleprintf("JS ABORT: %s\n", msg);
-	piExitProgram(__FILE__, __LINE__, msg);
+	piExitProgram(_FL, msg);
 }
 
 void uiGC()
