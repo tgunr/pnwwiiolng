@@ -611,7 +611,7 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 
 	// Try to avoid malloc when possible.
 	if(PN_UNLIKELY(newModel == nullptr))
-		piExitProgram (__FILE__, __LINE__, "gr2AnimCreateModel: Failed to allocate memory for animModel");
+		piExitProgram (_FL, "gr2AnimCreateModel: Failed to allocate memory for animModel");
 
 	// get everything to a default state
 	newModel->Reset();
@@ -2846,7 +2846,7 @@ LOGICAL gr2AnimInit (void)
 		if(size % GR2_MEMORY_MULTIPLE > 0)
 		{
 			snprintf(buf, 255, "gr2AnimTrooper is not byte aligned: size(%ld) %% multiple(%d) = %ld bytes leftover", size, GR2_MEMORY_MULTIPLE, (size % GR2_MEMORY_MULTIPLE));
-			piExitProgram(__FILE__, __LINE__, buf);
+			piExitProgram(_FL, buf);
 		}
 
 #ifdef USE_CORPSES
@@ -2855,7 +2855,7 @@ LOGICAL gr2AnimInit (void)
 		if(size % GR2_MEMORY_MULTIPLE > 0)
 		{
 			snprintf(buf, 255, "Corpse is not byte aligned: size(%ld) %% multiple(%d) = %ld bytes leftover", size, GR2_MEMORY_MULTIPLE, (size % GR2_MEMORY_MULTIPLE));
-			piExitProgram(__FILE__, __LINE__, buf);
+			piExitProgram(_FL, buf);
 		}
 #endif // USE_CORPSES
 
@@ -4362,7 +4362,7 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 		Write_Log (LOG_FPS, LOG_INFO, "Weapon out of bounds! %d", weapon);
 		// for live this shouldn't be a CTD .. just set to weapon 0 (weapon 0 will always be a valid weapon)
 #ifdef BETA_RELEASE
-		piExitProgram (__FILE__, __LINE__, "Weapon out of bounds in animation flags");
+		piExitProgram (_FL, "Weapon out of bounds in animation flags");
 #else
 		weapon = 0;
 #endif

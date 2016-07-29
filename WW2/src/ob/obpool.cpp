@@ -123,7 +123,7 @@ LOGICAL obpoolInit(const char* name)
 logTimerBeginMacro();
 	if(SIZEOF_POOLOBJ != SIZEOF_POOLOBJ_DISK || SIZEOF_OBJDATA != SIZEOF_OBJDATA_DISK || SIZEOF_DOF != SIZEOF_DOF_DISK)
 	{ // object format sanity check
-		piExitProgram(__FILE__, __LINE__, "incorrect pool object size!");
+		piExitProgram(_FL, "incorrect pool object size!");
 		return FALSE;
 	}
 

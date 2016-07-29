@@ -6493,7 +6493,7 @@ static void vehmainSpawn()
 	pVehicle = vehFindVehicle(_vehicletospawn.hostIndex);
 
     if(pVehicle == nullptr)
-        piExitProgram(__FILE__,__LINE__,"[vehcommProcessVehicleRequestResponse] pVehicle == nullptr");
+        piExitProgram(_FL,"[vehcommProcessVehicleRequestResponse] pVehicle == nullptr");
 
 	pVehicle->WeaponSerial.source = _vehicletospawn.source;
 	pVehicle->WeaponSerial.serial = _vehicletospawn.hostIndex;
@@ -6555,7 +6555,7 @@ static void vehmainSpawn()
     // Check to make absolutely sure we aren't spawning as a floater
 	if(pVehicle && pVehicle->VehicleType && pVehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{
-  		piExitProgram(__FILE__, __LINE__, "");
+  		piExitProgram(_FL, "");
 	}
 #endif
 

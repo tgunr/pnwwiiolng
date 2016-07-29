@@ -20,7 +20,6 @@
 // this is the base height used .. changing this changes ALL heights, both
 // eye and arms.  Default should be 1.7f
 #define	TROOPER_STAND_EYE_HEIGHT	1.7f
-#define	TROOPER_PRONE_EYE_OFFSET	0.63f //HACK: DEV-790
 #define MIN_MOVE_DIFFERENCE			0.01
 #define	BINOCS_WEAPON_NUMBER		9
 #define BUILDTOOL_WEAPON_NUMBER		8

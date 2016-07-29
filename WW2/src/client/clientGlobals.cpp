@@ -111,7 +111,11 @@ SINT8			ServerApID[64];		// program apId
 SINT8			ServerData[64];		// data passed from auth server
 SINT8			ServerProtocol[64]; // connection protocol
 SINT8			BypassString[64];
+#if defined(DEBUG) || defined(ALPHA_RELEASE)
 LOGICAL			WantedUserLogEnabled = TRUE;	// If the user wants the log enabled
+#else
+LOGICAL			WantedUserLogEnabled = FALSE;	// If the user wants the log enabled
+#endif
 SCHAR			WantedVideoCard[64];// desired video card name
 SCHAR			WantedVideoResolution[32];// desired video resolution
 SCHAR			WantedSoundCard[64];// desired sound card name
@@ -259,7 +263,11 @@ LOGICAL			gCellClientActive;
 LOGICAL          gWaterShadersEnabled;
 
 LOGICAL			disableButtonInput, disableAxisInput;
+#if defined(DEBUG) || defined(ALPHA_RELEASE)
 LOGICAL			OpenConsole = TRUE;
+#else
+LOGICAL			OpenConsole = FALSE;
+#endif
 LOGICAL			SquadInvites;
 UINT32			OverrideSpawner;
 UINT32			gRegion; // used for china localizations and other functionality differences

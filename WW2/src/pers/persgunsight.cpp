@@ -1946,7 +1946,7 @@ piLVERTEX * Vertex;
 	{
 		Write_Debug("Attempted to display text string that was too long in rendering gunsight");
 		Write_Debug(" String = %s",TextString);
-		piExitProgram(__FILE__,__LINE__,"Gunsight render string too long");
+		piExitProgram(_FL,"Gunsight render string too long");
 	}
 
 	NumVerts = wcslen(TextString) * 6;

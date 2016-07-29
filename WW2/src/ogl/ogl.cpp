@@ -703,7 +703,7 @@ SINT32		retval, i, miplevels;
 // extra bit of validity checking now we have threading
 #if defined(BETA_RELEASE) && (platOS == OS_MACOS)
 //		if(!pthread_main_np())
-//			piExitProgram(__FILE__, __LINE__, "glGenTextures called outside main thread!");
+//			piExitProgram(_FL, "glGenTextures called outside main thread!");
 #endif
 
 			glGenTextures(1, (GLuint*)&textures[texid].genlist);
@@ -984,7 +984,7 @@ void oglUnloadTexture(SINT32 texid, SINT32 miplevel)
 // extra bit of validity checking now we have threading
 #if defined(BETA_RELEASE) && (platOS == OS_MACOS)
 //	if(!pthread_main_np())
-//		piExitProgram(__FILE__, __LINE__, "glDeleteTextures called outside main thread!");
+//		piExitProgram(_FL, "glDeleteTextures called outside main thread!");
 #endif
             if(textures[texid].newrelease)
             {
@@ -5798,7 +5798,7 @@ static SINT32 _GetNewTextureId(void)
 {
     if(g_freeTextures.empty())
     {
-	    piExitProgram(__FILE__,__LINE__, "Textures exhausted!");
+	    piExitProgram(_FL, "Textures exhausted!");
     }
 
     systhreadMutexLock(textureMutex);

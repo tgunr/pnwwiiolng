@@ -400,7 +400,7 @@ static bool _connectClientToGameNetwork()
 		fprintf(stderr, "NETWORK ERROR: %s", UTF8(message.c_str()));
 #endif
 
-		piExitProgram(__FILE__, __LINE__, UTF8(message.c_str()));
+		piExitProgram(_FL, UTF8(message.c_str()));
 		return false;
 	}
 

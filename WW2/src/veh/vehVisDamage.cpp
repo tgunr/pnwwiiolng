@@ -2033,7 +2033,7 @@ static void _CreateCrap(vehVehicle* veh, OBJECT* obj, const char* visdamgroup, L
 #ifdef BETA_RELEASE
 			char s[128];
 			snprintf(s, 127, "no inertia component called %s in mass file!", st->MassObject);
-			piExitProgram(__FILE__, __LINE__, s);
+			piExitProgram(_FL, s);
 #endif
 		}
 

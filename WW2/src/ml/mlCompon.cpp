@@ -576,7 +576,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 			{
 				char str[64];
 				snprintf(str, 63, "Component %s has rotational inertia but no mass!", CurrentComponent->ComponentName);
-				piExitProgram(__FILE__,__LINE__,str);
+				piExitProgram(_FL,str);
 			}
 		}
 	}

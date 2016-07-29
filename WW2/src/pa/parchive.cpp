@@ -864,7 +864,7 @@ static int validity_check(paTOC* member, unsigned char* data, unsigned char* src
 /*		char str[256];
 		snprintf(str, 255, "Validity check on archive %s failed",  member->pa->name);
 
-		piExitProgram(__FILE__, __LINE__, str);
+		piExitProgram(_FL, str);
 		*data = nullptr;
 */
 	}

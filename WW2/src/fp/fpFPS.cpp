@@ -982,7 +982,7 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 		char errorMessage[255];
 
 		snprintf (errorMessage, 254, "fpFPSLoadModels: fpFPSAttachWeapon failed %d", currentWeaponModel);
-		piExitProgram (__FILE__, __LINE__, errorMessage);
+		piExitProgram (_FL, errorMessage);
 	}
 
 	fpFPSStartAnimationState (currentWeaponModel, IDLE);
@@ -3553,10 +3553,6 @@ void fpFPSGetEyeMatrix (piMATRIX* pMatrix)
 
 	if (stateFlags & STATE_SIT)
 		eyeMatrix._42 = -fpsTrooper.eyeRideDisplacement;
-
-    if (stateFlags & STATE_EYE_PRONE)
-        eyeMatrix._42 = -TROOPER_PRONE_EYE_OFFSET;
-
 	// 0.05729576041450060899707537401941 is atan (1/1000) .. i.e. the granularity of the axis
 	// is 1 meter at 1000 meters
 
@@ -4330,9 +4326,6 @@ void fpFPSMoveModel()
 
 	eyePosition.z = eyeRotation._43 + fpFPSGetHeight() + (FLOAT32)vertShift;
 	//eyePosition.y += -2; // use this to see the 1st person stuff work in 3rd person
-
-    if (stateFlags & STATE_EYE_PRONE)
-        eyePosition.y -= TROOPER_PRONE_EYE_OFFSET;
 
 	gr2SetModelRotation (skeletonModel, &eyeRotation);
 	gr2SetModelPosition (skeletonModel, &eyePosition);
