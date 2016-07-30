@@ -54,7 +54,7 @@ function runEWSCheck(forSide, announceToSide)
 	if announceToSide == false then return true end
 	-- What prefix should the message have?
   	if intelSpamEnabled == true or host_config.arena.intermission > 0 then
-		sideMessage(forSide, message, name1, name2)
+      chatSendSideMessage(forSide, nullObjID, sideLString(forSide), message, name1, name2)
 	else
 		chatSendHCMessage(forSide, message, name1, name2)
 	end
