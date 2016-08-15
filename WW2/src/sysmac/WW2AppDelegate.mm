@@ -26,6 +26,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include "sysLaunchURL.h"
+#import <HockeySDK/HockeySDK.h>
 
 #define PLAYGATE_VERSION 0x01010109
 
@@ -254,11 +255,13 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
             break;
             
         case Auth::Apps::WEB_DOWNLOAD:
+            [[NSUserDefaults standardUserDefaults] setObject:gPlayGateAppDelegate.userName forKey:@"WW2.lastSuccessfulUsername"];
             [gPlayGateAppDelegate setAuthReply:reply];
             [gPlayGateAppDelegate changeState:WAIT_UPDATE];
             break;
             
         default: // anything else should be an app launch
+            [[NSUserDefaults standardUserDefaults] setObject:gPlayGateAppDelegate.userName forKey:@"WW2.lastSuccessfulUsername"];
             [gPlayGateAppDelegate setAuthReply:reply];
             [gPlayGateAppDelegate advanceState];
             break;
@@ -409,6 +412,7 @@ extern NSString *WebActionOriginalURLKey;
 
 - (IBAction)clearUserNameAndPassword:(id)sender
 {
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
     if ([sender isKindOfClass:[NSButton class]]) {
         // The request came from the "save password" checkbox. This method is
         // somewhat unfortunately named on that basis.
@@ -494,15 +498,32 @@ extern NSString *WebActionOriginalURLKey;
     }
 }
 
-// this delegate method is required
-- (void) showMainApplicationWindowForCrashManager:(id)crashManager
+- (NSString *)userIDForHockeyManager:(BITHockeyManager *)hockeyManager componentManager:(BITHockeyBaseManager *)componentManager
 {
-    // launch the main app window
-    [launcherWindow setTitle: [NSString stringWithFormat:@"%@ %s", [launcherWindow title], STRVER]];
+    return [[NSUserDefaults standardUserDefaults] stringForKey:@"WW2.lastSuccessfulUsername"] ?: @"";
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    // This sequence depends on certain implementation details of the
+    // BITCrashManager - in particular, that report metadata is processed
+    // synchronously during -startManager, that -userIDForHockeyManager is
+    // only called once per crash report, and only one crash report will be
+    // freshly processed at a time (versus needing to be sent). If these
+    // preconditions are violated (likely due to implementation changes in the
+    // SDK), the provided username of the player (if any) may be inaccurate.
+    // Not much of a big deal, is it?
+    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"97d81f56ff22d04ccdbc1a0d537e81c0" delegate:self];
+#if IS_DEBUG
+    [BITHockeyManager sharedHockeyManager].logLevel = BITLogLevelDebug;
+#endif
+    [BITHockeyManager sharedHockeyManager].disableFeedbackManager = YES;
+    [BITHockeyManager sharedHockeyManager].crashManager.autoSubmitCrashReport = YES;
+    [[BITHockeyManager sharedHockeyManager] startManager];
+    // This should no longer be needed, so try to maintain the "not logged in
+    // yet" state if we should crash before the next login.
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
+    
     dbugInit(LOG_TO_FILE, nullptr);
 
     // Wipe out any storage of insecure user info.
