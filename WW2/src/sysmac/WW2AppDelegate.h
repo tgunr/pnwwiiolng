@@ -8,6 +8,7 @@
 // TODO: Remove this
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
 
+@class WebView;
 @interface WW2AppDelegate : NSObject <NSTextFieldDelegate>
 {
     IBOutlet NSPopUpButton* soundType;
@@ -37,7 +38,7 @@
     IBOutlet NSWindow *statusWindow;
     IBOutlet NSTextField *userNameField;
     IBOutlet NSSecureTextField *passwordField;
-    IBOutlet id webView;
+    IBOutlet WebView *webView;
     IBOutlet NSButton *playOnlineButton;
     IBOutlet NSPopUpButton *arenaMenu;
     IBOutlet NSProgressIndicator *arenaLoadingIndicator;

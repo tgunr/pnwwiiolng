@@ -268,6 +268,37 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
     return 0;
 }
 
+// Cribbed definitions for using a small subset of WebKit's functionality
+// without being able to actually import its headers.
+@class WebView;
+@interface WebFrame
+- (void)loadRequest:(NSURLRequest *)request;
+- (void)loadHTMLString:(NSString *)string baseURL:(NSURL *)URL;
+@end
+@protocol WebFrameLoadDelegate <NSObject>
+@optional
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame;
+@end
+@protocol WebPolicyDecisionListener <NSObject>
+- (void)use;
+- (void)ignore;
+@end
+@protocol WebPolicyDelegate <NSObject>
+@optional
+- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request
+        frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener;
+- (void)webView:(WebView *)webView decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request
+        newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener;
+@end
+@interface WebView
+@property (nonatomic, readonly, strong) WebFrame *mainFrame;
+@property (nonatomic, assign) id <WebFrameLoadDelegate> frameLoadDelegate;
+@property (nonatomic, assign) id <WebPolicyDelegate> policyDelegate;
+@property (nonatomic) BOOL shouldCloseWithWindow;
+@end
+// End cribbing
+
+// Workaround for missing NSURLSession definitions in 32-bit macOS
 @interface __NSCFURLSessionTask : NSURLSessionTask
 @end
 
@@ -284,8 +315,9 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
 - (id)dataAckCompletion { return objc_getAssociatedObject(self, _cmd); }
 - (void)setDataAckCompletion:(id)arg { objc_setAssociatedObject(self, @selector(dataAckCompletion), arg, OBJC_ASSOCIATION_COPY); }
 @end
+// End workaround
 
-@interface WW2AppDelegate () <NSURLSessionDownloadDelegate>
+@interface WW2AppDelegate () <NSURLSessionDownloadDelegate, WebFrameLoadDelegate, WebPolicyDelegate, BITHockeyManagerDelegate>
 @end
 
 @implementation WW2AppDelegate
@@ -325,20 +357,21 @@ static NSString *placeholderHTML = @""
 @"</html>"
 ;
 
-- (void)webView:(id)sender didFinishLoadForFrame:(id)frame
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
     switch (staticLoadState) {
         case 0: { // loaded the static placeholder
             staticLoadState = 1;
             
-            NSURLRequest *playnetHome = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.wwiionline.com/pgservers.html"]];
-
-            ((void (*)(id, SEL, NSURLRequest *))objc_msgSend)(frame, @selector(loadRequest:), playnetHome);
+            NSURL * __nonnull playgateURL = reinterpret_cast<NSURL * __nonnull>([NSURL URLWithString:@"https://www.battlegroundeurope.com/pgservers.html"]);
+            NSURLRequest *playnetHome = [NSURLRequest requestWithURL:playgateURL];
+            
+            [frame loadRequest:playnetHome];
             break;
         }
         case 1: // loaded the webmap
             staticLoadState = 2;
-            ((void (*)(id, SEL, id))objc_msgSend)(sender, @selector(setFrameLoadDelegate:), nil);
+            sender.frameLoadDelegate = nil;
             break;
         case 2: // should never get here
             assert(false);
@@ -351,8 +384,8 @@ static NSString *placeholderHTML = @""
 
 extern NSString *WebActionOriginalURLKey;
 
-- (void)webView:(id)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
-        request:(NSURLRequest *)request frame:(id)frame decisionListener:(id)listener
+- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
+        request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener
 {
     if (staticLoadState > 0 &&
         ![request.URL.host isEqualToString:@"www.wwiionline.com"] &&
@@ -369,35 +402,31 @@ extern NSString *WebActionOriginalURLKey;
         if (originalURL) {
             [[NSWorkspace sharedWorkspace] openURL:originalURL];
         }
-        ((void (*)(id, SEL))objc_msgSend)(listener, @selector(ignore));
+        [listener ignore];
     } else {
-        ((void (*)(id, SEL))objc_msgSend)(listener, @selector(use));
+        [listener use];
     }
 }
 
-- (void)webView:(id)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation
-        request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id)listener
+- (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation
+        request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener
 {
     NSURL *originalURL = actionInformation[WebActionOriginalURLKey];
     
     if (originalURL) {
         [[NSWorkspace sharedWorkspace] openURL:originalURL];
     }
-    ((void (*)(id, SEL))objc_msgSend)(listener, @selector(ignore));
+    [listener ignore];
 }
 
 - (void)goHome
 {
     staticLoadState = 0;
     
-    // We can't actually import WebKit because the JSContext from phui conflicts
-    id frame = ((id (*)(id, SEL))objc_msgSend)(webView, @selector(mainFrame));
-    
-    ((void (*)(id, SEL, id))objc_msgSend)(webView, @selector(setFrameLoadDelegate:), self);
-    ((void (*)(id, SEL, id))objc_msgSend)(webView, @selector(setPolicyDelegate:), self);
-    
+    webView.frameLoadDelegate = self;
+    webView.policyDelegate = self;
     // Put a static placeholder into the webview until the load is done.
-    ((void (*)(id, SEL, NSString *, NSURL *))objc_msgSend)(frame, @selector(loadHTMLString:baseURL:), placeholderHTML, [[NSBundle mainBundle] resourceURL]);
+    [webView.mainFrame loadHTMLString:placeholderHTML baseURL:[NSBundle mainBundle].resourceURL];
 }
 
 // END WebView magic
@@ -560,8 +589,8 @@ extern NSString *WebActionOriginalURLKey;
     
     gPlayGateAppDelegate = self;
     
-    ((void (*)(id, SEL, id))objc_msgSend)(webView, @selector(setFrameLoadDelegate:), self);
-    ((void (*)(id, SEL, BOOL))objc_msgSend)(webView, @selector(setShouldCloseWithWindow:), YES);
+    webView.frameLoadDelegate = self;
+    webView.shouldCloseWithWindow = YES;
     
     [self goHome];
     
