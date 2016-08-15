@@ -246,12 +246,21 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
             [[clang::fallthrough]];
             
         case Auth::Apps::BROWSER:
-        case Auth::Apps::WEB_REDIRECT:
-            [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:reply->data]]];
-            gPlayGateAppDelegate.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorSilent userInfo:nil rootError:nil];
+        case Auth::Apps::WEB_REDIRECT: {
+            NSString *replyURLString = [NSString stringWithUTF8String:reply->data];
+            NSURL *replyURL = nil;
+            if (replyURLString) {
+                replyURL = [NSURL URLWithString:reinterpret_cast<NSString * __nonnull>(replyURLString)];
+            }
+            if (replyURL) {
+                [[NSWorkspace sharedWorkspace] openURL:reinterpret_cast<NSURL * __nonnull>(replyURL)];
+                gPlayGateAppDelegate.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorSilent userInfo:nil rootError:nil];
+            } else {
+                gPlayGateAppDelegate.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorBadPlayGateAE userInfo:nil rootError:nil];
+            }
             [gPlayGateAppDelegate advanceState];
             break;
-            
+        }
         case Auth::Apps::WEB_DOWNLOAD:
             [[NSUserDefaults standardUserDefaults] setObject:gPlayGateAppDelegate.userName forKey:@"WW2.lastSuccessfulUsername"];
             [gPlayGateAppDelegate setAuthReply:reply];
@@ -746,7 +755,7 @@ extern NSString *WebActionOriginalURLKey;
     NSMutableArray *results = [NSMutableArray array];
     
     for (NSDictionary *attrs in matches) {
-        [results addObject:attrs[(__bridge id)kSecAttrAccount]];
+        [results addObject:reinterpret_cast<id __nonnull>(attrs[(__bridge id)kSecAttrAccount])];
     }
     return results;
 }
@@ -1182,7 +1191,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     NSError *error = nil;
     NSURL *patchDir = [[NSFileManager defaultManager] URLForDirectory:NSItemReplacementDirectory
                                                              inDomain:NSUserDomainMask appropriateForURL:location create:YES error:&error];
-    NSURL *patchFile = [patchDir URLByAppendingPathComponent:downloadTask.originalRequest.URL.lastPathComponent isDirectory:NO];
+    NSURL *patchFile = [patchDir URLByAppendingPathComponent:reinterpret_cast<NSString * __nonnull>(downloadTask.originalRequest.URL.lastPathComponent) isDirectory:NO];
     
     if (!patchDir || !patchFile || ![[NSFileManager defaultManager] moveItemAtURL:location toURL:patchFile error:&error]) {
         self.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorDownloadFailed userInfo:error.userInfo rootError:error];
