@@ -856,12 +856,8 @@ extern NSString *WebActionOriginalURLKey;
         }
         accountData = CFBridgingRelease(_accountData);
         
-        NSString *accountPassword = [[NSString alloc] initWithData:accountData encoding:NSUTF8StringEncoding];
-        
         [self setUserName:accounts[0]];
-        [self setUserPassword:[self MD5digestForString:accountPassword]];
-        [accountPassword release]; // In theory we should really scribble over this
-        accountPassword = nil;
+        [self setUserPassword:[self MD5digestForString:accountData]];
         
         [userNameField setStringValue:accounts[0]];
         [passwordField setStringValue:@"__LOADEDFROMKEYCHAINANDLOOKSVALID__"];
@@ -909,7 +905,7 @@ extern NSString *WebActionOriginalURLKey;
             
             [self setUserName:[userNameField stringValue]];
             if (!_passwordEntryIsInitial) {
-                [self setUserPassword:[self MD5digestForString:[passwordField stringValue]]];
+                [self setUserPassword:[self MD5digestForString:[[passwordField stringValue] dataUsingEncoding:NSUTF8StringEncoding]]];
             }
             [[clang::fallthrough]];
             
@@ -1254,13 +1250,12 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     [NSApp terminate:self];
 }
 
-- (NSString*)MD5digestForString:(NSString *)string
+- (NSString*)MD5digestForString:(NSData *)rawString
 {
-    NSData *str = [string dataUsingEncoding:NSASCIIStringEncoding];
     NSMutableData *digestData = [NSMutableData dataWithLength:CC_MD5_DIGEST_LENGTH];
     unsigned char *digest = (unsigned char *)digestData.mutableBytes;
     
-    CC_MD5(str.bytes, str.length, digest);
+    CC_MD5(rawString.bytes, rawString.length, digest);
     return [NSString stringWithFormat:@"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
             digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7],
             digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]];

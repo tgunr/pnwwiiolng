@@ -116,7 +116,7 @@
 - (void)launchPatch;
 - (void)movePatchToTrash;
 - (void)setPlayGateStatus:(NSString*)status;
-- (NSString*)MD5digestForString:(NSString*)string;
+- (NSString*)MD5digestForString:(NSData*)rawString;
 - (void)setShowDownloadProgress:(BOOL)showDownloadProgress;
 - (BOOL)shouldUpdateStatus;
 
