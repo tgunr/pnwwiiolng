@@ -93,7 +93,7 @@ _callbackError(
             , dest.second
             , error);
 
-    NSUserNotification *notification = [[[NSUserNotification alloc] init] autorelease];
+    NSUserNotification *notification = [[NSUserNotification alloc] init];
     
     notification.title = @"Internal Networking Error";
     notification.informativeText = [NSString stringWithFormat:

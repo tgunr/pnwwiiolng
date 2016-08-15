@@ -92,11 +92,11 @@
 - (IBAction)refreshMenuChanged:(id)sender;
 - (IBAction)resolutionMenuChanged:(id)sender;
 
-@property(nonatomic,retain) NSURL *patchFileURL;
-@property(nonatomic,retain) NSError *error;
+@property(nonatomic,strong) NSURL *patchFileURL;
+@property(nonatomic,strong) NSError *error;
 @property(nonatomic,copy) NSString *userName;
 @property(nonatomic,copy) NSString *userPassword;
-@property(nonatomic,retain) NSURLSessionDownloadTask *patchDownloadTask;
+@property(nonatomic,strong) NSURLSessionDownloadTask *patchDownloadTask;
 
 - (void)setCaptureAllDisplays:(bool)x;
 - (void)setFSAA:(int)fs;

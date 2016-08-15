@@ -110,7 +110,7 @@ const char *GetCommandLine()
 
 void MacVideoInitializationFailed(const char* problem)
 {
-    NSUserNotification *notification = [[[NSUserNotification alloc] init] autorelease];
+    NSUserNotification *notification = [[NSUserNotification alloc] init];
     
     notification.title = @"Video Initialization Failed";
     notification.informativeText = [NSString stringWithFormat:

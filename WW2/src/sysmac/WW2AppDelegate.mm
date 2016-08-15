@@ -195,7 +195,7 @@ NSString * const PGteulErrorDomain = @"com.playnet.wwiiol.PGteulErrorDomain";
 
 + (instancetype)playgateErrorWithDomain:(NSString *)domain code:(int)code userInfo:(NSDictionary *)dict rootError:(NSError *)rootError
 {
-    NSMutableDictionary *udict = dict ? [[dict mutableCopy] autorelease] : [NSMutableDictionary dictionary];
+    NSMutableDictionary *udict = dict ? [dict mutableCopy] : [NSMutableDictionary dictionary];
     
     if (rootError) {
         udict[NSUnderlyingErrorKey] = rootError;
@@ -218,25 +218,23 @@ NSString * const PGteulErrorDomain = @"com.playnet.wwiiol.PGteulErrorDomain";
 
 static void teulConnectCallback(ENDPOINT& endpoint)
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    [gPlayGateAppDelegate teulConnect:endpoint.teulIndex()];
-    [pool release];
+    @autoreleasepool {
+        [gPlayGateAppDelegate teulConnect:endpoint.teulIndex()];
+    }
 }
 // SINT32 teulIndex, const UCHAR *const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error
 static void teulErrorCallback(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* object, SINT32 error)
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    [gPlayGateAppDelegate teulError:error];
-    [pool release];
+    @autoreleasepool {
+        [gPlayGateAppDelegate teulError:error];
+    }
 }
 
 SINT32 authVerifyApp(SINT32 teulIndex, APP_VERIFY* appVerify)
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    SINT32 result = [gPlayGateAppDelegate verifyApplication:appVerify];
-    [pool release];
-    
-    return result;
+    @autoreleasepool {
+        return [gPlayGateAppDelegate verifyApplication:appVerify];
+    }
 }
 
 SINT32 authLaunchApp(APP_LAUNCH* reply)
@@ -573,26 +571,25 @@ extern NSString *WebActionOriginalURLKey;
     
     [self updateLoginEnabled];
     
-    authServer = [[NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding] retain];
+    authServer = [NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding];
     if (gAuthServer[0]) {
-        [authServer release];
         authServer = [[NSString alloc] initWithUTF8String:gAuthServer];
     }
     authPort = DEFAULT_AUTH_PORT;
     
-    NSMutableParagraphStyle *style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+    NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     style.alignment = NSCenterTextAlignment;
-    style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+    style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     style.alignment = NSCenterTextAlignment;
 
-    NSAttributedString *str = [[[NSAttributedString alloc]
+    NSAttributedString *str = [[NSAttributedString alloc]
     	initWithString:playOnlineButton.title
         attributes:@{
           NSFontAttributeName: (NSFont * _Nonnull)playOnlineButton.font,
           NSParagraphStyleAttributeName: style,
           NSBaselineOffsetAttributeName: @(4.0),
-        }]
-    autorelease];
+        }
+    ];
     
     [playOnlineButton setAttributedTitle:str];
     
@@ -995,12 +992,11 @@ extern NSString *WebActionOriginalURLKey;
     launchRequest.sessionID = (UINT32)verifyInfo->sessionID;
     launchRequest.appID = verifyInfo->appID;
     
-    NSString* appVersion = [[NSString stringWithCString:STRVER encoding:NSUTF8StringEncoding] retain];
+    NSString* appVersion = [NSString stringWithCString:STRVER encoding:NSUTF8StringEncoding];
 
     /* command line version override - not sure this is needed, but putting it in anyway */
     if (gClientV[0]) {
-        [appVersion release];
-        appVersion = [[[NSString alloc] initWithUTF8String:gClientV] retain];
+        appVersion = [[NSString alloc] initWithUTF8String:gClientV];
     }
     
     if (appVersion != nil)
@@ -1156,7 +1152,6 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     [downloadProgressBar setDoubleValue:100.0];
     [downloadStatus setStringValue:NSLocalizedString(@"download completed", @"")];
     self.patchDownloadTask = nil;
-    [_patchDownloadSession release];
     _patchDownloadSession = nil;
     
     NSError *error = nil;
@@ -1191,19 +1186,19 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     [self movePatchToTrash];
     
-    NSString *rawPatchURL = [[[NSString alloc]
+    NSString *rawPatchURL = [[NSString alloc]
                               initWithBytesNoCopy:&authReply.data[0]
                               length:strnlen(&authReply.data[0], std::min<size_t>(static_cast<size_t>(authReply.dataSize), MAX_PARAM))
                               encoding:NSASCIIStringEncoding
-                              freeWhenDone:NO]
-                             autorelease];
+                              freeWhenDone:NO
+                            ];
     NSURL *patchURL = [NSURL URLWithString:rawPatchURL];
     NSURLSessionConfiguration *patchSessionConfig = [NSURLSessionConfiguration ephemeralSessionConfiguration];
     
     patchSessionConfig.timeoutIntervalForRequest = 60.0;
     patchSessionConfig.allowsCellularAccess = NO;
     
-    _patchDownloadSession = [[NSURLSession sessionWithConfiguration:patchSessionConfig delegate:self delegateQueue:[NSOperationQueue mainQueue]] retain];
+    _patchDownloadSession = [NSURLSession sessionWithConfiguration:patchSessionConfig delegate:self delegateQueue:[NSOperationQueue mainQueue]];
     self.patchDownloadTask = [_patchDownloadSession downloadTaskWithURL:patchURL];
     
     [self setPlayGateStatus:[NSString stringWithFormat:NSLocalizedString(@"Downloading: %@", @""), patchURL.lastPathComponent]];
@@ -1219,7 +1214,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     state = WAIT_PATCH_MOUNTED;
     [[NSWorkspace sharedWorkspace] openURL:self.patchFileURL];
     
-    NSAlert *notification = [[[NSAlert alloc] init] autorelease];
+    NSAlert *notification = [[NSAlert alloc] init];
     
     notification.messageText = NSLocalizedString(@"launch_patch_heading", @"Text titling the patch launch dialog");
     notification.informativeText = NSLocalizedString(@"launch_patch_message", @"Main text in the patch launch dialog");
@@ -1265,8 +1260,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     NSDate* now = [NSDate date];
     
     if ((lastStatusUpdateTime == nil) || ([now timeIntervalSinceDate:lastStatusUpdateTime] >= 0.25)) {
-        [lastStatusUpdateTime release];
-        lastStatusUpdateTime = [now retain];
+        lastStatusUpdateTime = now;
         return YES;
     } else {
         return NO;
@@ -1500,7 +1494,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 
 -(void)populateDisplayMenu
 {
-    NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"Displays"] autorelease];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"Displays"];
     NSMenuItem* selectItem = nil;
     
     CGDisplayCount 		displayCount;
@@ -1540,7 +1534,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
             title = [NSString stringWithFormat:@"%d", CGDisplayUnitNumber(displayID)];
         }
         
-        NSMenuItem *menuItem = [[[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""] autorelease];
+        NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""];
         
         [menuItem setTag:static_cast<NSInteger>(displayMask)];
         [menu addItem:menuItem];
@@ -1562,7 +1556,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 
 -(void)populateResolutionMenu
 {
-    NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"Display Resolution"] autorelease];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"Display Resolution"];
     NSArray* modes = (NSArray*)CGDisplayAvailableModes(CGOpenGLDisplayMaskToDisplayID(selectedMonitor));
     
     if (modes == nil) {
@@ -1599,7 +1593,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
                 
                 if (menuItem == nil)
                 {
-                    menuItem = [[[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""] autorelease];
+                    menuItem = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""];
                     
                     [menuItem setRepresentedObject:[NSMutableArray array]];
                     [menuItem setTag:width << 16 | height];
@@ -1654,13 +1648,13 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
         return;
     }
     
-    NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"Refresh Rate"] autorelease];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"Refresh Rate"];
     
     for (NSDictionary *mode in depthModes)
     {
         int rate = [mode[(__bridge NSString *)kCGDisplayRefreshRate] intValue];
         NSString *title = rate ? [NSString stringWithFormat:@"%d Hz", rate] : @"Fixed (LCD)";
-        NSMenuItem* menuItem = [[[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""] autorelease];
+        NSMenuItem* menuItem = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""];
         
         menuItem.representedObject = mode;
         menuItem.tag = rate;

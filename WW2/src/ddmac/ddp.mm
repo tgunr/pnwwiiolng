@@ -233,7 +233,7 @@ LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscree
     resetOGLAttributeValue(oglAttributes, NSOpenGLPFAColorSize, static_cast<NSOpenGLPixelFormatAttribute>(bpp));
     
     ddpView = [[NSOpenGLView alloc] initWithFrame:NSMakeRect(0, 0, width, height)
-                                      pixelFormat:[[[NSOpenGLPixelFormat alloc] initWithAttributes:oglAttributes] autorelease]];
+                                      pixelFormat:[[NSOpenGLPixelFormat alloc] initWithAttributes:oglAttributes]];
     context = ddpView.openGLContext;
     if (!context) {
         throw "Unable To Allocate OpenGL Window Context";
@@ -522,7 +522,7 @@ static NSURL *ddcapGenerateScreenshotURL(NSString *providedName)
                 return;
             }
         }
-        screenshotsDirectory = [screenshotsDir retain];
+        screenshotsDirectory = screenshotsDir;
         
         // Create a date formatter that includes full date and time info,
         // doesn't return "today" etc., and uses the user's formatting settings.
