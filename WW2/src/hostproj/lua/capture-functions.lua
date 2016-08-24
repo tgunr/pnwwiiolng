@@ -302,8 +302,52 @@ end
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
-function P.ProgressRateForPlayers(players)
+-- TODO: My Lua is garbage, so this needs to be cleaned up.
+function P.ProgressScaleForSide(side)
+	local axis = chatGetPopulation(AXIS)
+	local allied = chatGetPopulation(ALLIED)
 
+	local is_overpop
+	if ( side == AXIS )
+		is_overpop = (axis > allied)
+	else
+		is_overpop = (allied > axis)
+	end
+
+	local under = math.min(axis, allied)
+	local over = math.max(axis, allied)
+	local difference = over / under
+
+	--------
+	-- TODO: Need to go over these values with a Producer.
+	local max_scale = 2.0 -- Double/half capture speed at max under/overpop.
+
+	-- Scale between 20% and 100% overpop
+	local scale_start = 1.2
+	local scale_stop = 2.0
+
+	local scale
+
+	if ( difference < scale_start )
+		scale = 1
+	else if ( scale_stop < difference )
+		scale = max_scale
+	else
+		-- Map 1.0 to scale_start and max_scale to scale_stop
+		-- I think this is right? My linear algebra's a little rusty.
+		scale = 1.0 + ((max_scale - 1.0f) * ((difference - scale_start)/(scale_end - scale_start)))
+	end
+
+	if ( is_overpop )
+		return scale
+	else
+		return 1/scale
+	end
+end
+
+----------------
+
+function P.ProgressRateForPlayers(players, side)
 	local totalCapTicks = 100 * host_config.capture.tickInterval_s
 
 	-- No players, return the system uncap rate.
@@ -311,14 +355,14 @@ function P.ProgressRateForPlayers(players)
 		return totalCapTicks / P.autoUncapTime
 	end
 
+	local progress = totalCapTicks / P.captureTimeTable[players]
+
 	-- More than the max?
 	if players > P.maxCapContributors then
-		return totalCapTicks / P.minCaptureTime
+		progress = totalCapTicks / P.minCaptureTime
 	end
 
-	-- Calculate the rate per player to achieve target time.
-	return totalCapTicks / P.captureTimeTable[players]
-
+	return progress * P.ProgressScaleForSide(side)
 end
 
 ----------------------------------------------------------------------
@@ -328,7 +372,6 @@ end
 ----------------------------------------------------------------------
 
 function P.processFacility(facility, facilityData)
-
 	-- If the facility is no-longer capturable, then remove it from
 	-- the queue.
 
@@ -368,10 +411,9 @@ function P.processFacility(facility, facilityData)
 		-- we might not expect where nobody appears to be capping.
 
 		if capper.contrib ~= nil then
-
 			-- Increment progress.
-
-			newProgress = progress + P.ProgressRateForPlayers(cappers)
+			local side = capper.contrib:unit():side();
+			newProgress = progress + P.ProgressRateForPlayers(cappers, side)
 
 			-- Get printable name of the capper
 
@@ -388,16 +430,15 @@ function P.processFacility(facility, facilityData)
 		end
 
 	elseif progress > 0 and progress < 100 then
-
 		-- There were no cappers, and the facility has non-zero/non-complete progress.
 
 		local capper = P.findPrimaryContributor(facilityData.history.def)
+		local side = facility.side;
 
 		if defenders > 0 and capper.contrib ~= nil then
-
 			-- There were some defenders present
 
-			newProgress = progress - P.ProgressRateForPlayers(defenders)
+			newProgress = progress - P.ProgressRateForPlayers(defenders, side)
 
 			local playerList = P.getContributorList(facilityData.history.def)
 
@@ -407,12 +448,10 @@ function P.processFacility(facility, facilityData)
 					" => " .. newProgress .. "% players:"..defenders..playerList)
 
 			facility:setCaptureProgress(newProgress, capper.contrib)
-
 		elseif host_config:isArenaLocked(AL_CAPTURE) == false then
-
 			-- The building is unoccupied. Slowly "bleed off" the capture progress.
 
-			newProgress = progress - P.ProgressRateForPlayers(0)
+			newProgress = progress - P.ProgressRateForPlayers(0, side)
 			if newProgress < 0 then newProgress = 0 end
 
 			output(2, "f:"..facility.name.." no contributions "..newProgress.. "%")
@@ -428,13 +467,10 @@ function P.processFacility(facility, facilityData)
 
 			-- Reduce the progress.
 			facility:setCaptureProgress(newProgress, contrib)
-
 		end
-
 	end
 
 	facilityData.players = {}
-
 	return true
 end
 
