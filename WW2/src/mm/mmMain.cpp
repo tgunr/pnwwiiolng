@@ -1124,7 +1124,12 @@ main(int argc, const char* argv[])
 	mapPlayerInit();
 
 	dbugLog(_FLI, "Initializing auth");
-	SINT32 retval = authGameInit(
+	SINT32 retval = -1;
+
+	// Assume that auth is not up when the cluster is started (useful in development environment)
+	while ( retval < 0 )
+	{
+		retval = authGameInit(
 					Server::localHost
 					, WWII::Net::Ports::MapHost
 					, _authHost
@@ -1136,8 +1141,13 @@ main(int argc, const char* argv[])
 					, _acceptLogin
 					, _authErrorFunction
 				);
-	if ( retval < 0 )
-		LogAbort("%s authGameInit failed retval %d", __FUNCTION__, retval);
+		if ( retval < 0 )
+		{
+			// keep trying until we connect - at intervals
+			dbugLog(_FLA, "%s authGameInit failed retval %d", __FUNCTION__, retval);
+			usleep(10000);
+		}
+	}
 
 	authSetGameCapacity(0, 0, Server::myServerInfo.stats.arenaID, AL_INITIALIZING);
 
