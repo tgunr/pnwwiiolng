@@ -298,54 +298,48 @@ end
 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
+-- Calculate a scaling factor based on population
+--    NOTE: Overpopulated side currently gets no adverse scaling
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+
+function P.ProgressScaleForSide(side)
+	local underPopRateMap = {{0.4, 1.5}, {0.5, 1.4}, {0.6, 1.3}, {0.7, 1.2}, {0.8, 1.1}}
+
+	local axisPop = chatGetPopulation(AXIS)
+	local alliedPop = chatGetPopulation(ALLIED)
+
+	-- Return no scaling for the overpopulated side
+	if ( ((axisPop > alliedPop) && (side == AXIS) ) || ((alliedPop > axisPop) && (side == ALLIED))) then
+		return 1.0
+	end
+
+	local under = math.min(axisPop, alliedPop)
+	local over = math.max(axisPop, alliedPop)
+
+	-- protect against DIV0
+	if (over == 0) then
+		return 1.0
+	end
+
+	local perc = under / over
+
+	local rate = 1.0
+	for i = 1, #underPopRateMap, 1 do
+		if perc <= underPopRateMap[i][1] then
+			rate = underPopRateMap[i][2]
+			break
+		end
+	end
+
+	return rate
+end
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
 -- Calculate the cap/uncap points for a given number of players.
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
-
--- TODO: My Lua is garbage, so this needs to be cleaned up.
-function P.ProgressScaleForSide(side)
-	local axis = chatGetPopulation(AXIS)
-	local allied = chatGetPopulation(ALLIED)
-
-	local is_overpop
-	if ( side == AXIS )
-		is_overpop = (axis > allied)
-	else
-		is_overpop = (allied > axis)
-	end
-
-	local under = math.min(axis, allied)
-	local over = math.max(axis, allied)
-	local difference = over / under
-
-	--------
-	-- TODO: Need to go over these values with a Producer.
-	local max_scale = 2.0 -- Double/half capture speed at max under/overpop.
-
-	-- Scale between 20% and 100% overpop
-	local scale_start = 1.2
-	local scale_stop = 2.0
-
-	local scale
-
-	if ( difference < scale_start )
-		scale = 1
-	else if ( scale_stop < difference )
-		scale = max_scale
-	else
-		-- Map 1.0 to scale_start and max_scale to scale_stop
-		-- I think this is right? My linear algebra's a little rusty.
-		scale = 1.0 + ((max_scale - 1.0f) * ((difference - scale_start)/(scale_end - scale_start)))
-	end
-
-	if ( is_overpop )
-		return scale
-	else
-		return 1/scale
-	end
-end
-
-----------------
 
 function P.ProgressRateForPlayers(players, side)
 	local totalCapTicks = 100 * host_config.capture.tickInterval_s

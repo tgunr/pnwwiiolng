@@ -191,7 +191,8 @@ function maxCaptureObjectives (population)
    if population >= 230 then return 5 end   -- 10 total, 49 p/s/o
    if population >= 140 then return 4 end   -- 8 total, 50 p/s/o
    if population >=  95 then return 3 end   -- 6 total, 51 p/s/o
-   if population >=  42 then return 2 end   -- 4 total, 55 p/s/o
+--   if population >=  42 then return 2 end   -- 4 total, 55 p/s/o
+   if population >=  2 then return 2 end   -- 4 total, 55 p/s/o  TEST
    return 1  -- 2 total
 end
 
