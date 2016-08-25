@@ -302,7 +302,6 @@ end
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
--- TODO: My Lua is garbage, so this needs to be cleaned up.
 function P.ProgressScaleForSide(side)
 	local axis = chatGetPopulation(AXIS)
 	local allied = chatGetPopulation(ALLIED)
@@ -314,35 +313,29 @@ function P.ProgressScaleForSide(side)
 		is_overpop = (allied > axis)
 	end
 
+	-- Only act as a bonus to underpop, not a penalty to overpop
+	if ( is_overpop )
+		return 1
+
 	local under = math.min(axis, allied)
 	local over = math.max(axis, allied)
 	local difference = over / under
 
 	--------
-	-- TODO: Need to go over these values with a Producer.
-	local max_scale = 2.0 -- Double/half capture speed at max under/overpop.
-
-	-- Scale between 20% and 100% overpop
-	local scale_start = 1.2
-	local scale_stop = 2.0
-
-	local scale
-
-	if ( difference < scale_start )
-		scale = 1
-	else if ( scale_stop < difference )
-		scale = max_scale
-	else
-		-- Map 1.0 to scale_start and max_scale to scale_stop
-		-- I think this is right? My linear algebra's a little rusty.
-		scale = 1.0 + ((max_scale - 1.0f) * ((difference - scale_start)/(scale_end - scale_start)))
+	local adjustment = 0.0;
+	if ( difference > 1.6 )
+		adjustment = 0.5
+	else if ( difference > 1.5 )
+		adjustment = 0.4
+	else if ( difference > 1.4 )
+		adjustment = 0.3
+	else if ( difference > 1.3 )
+		adjustment = 0.2
+	else if ( difference > 1.2 )
+		adjustment = 0.1
 	end
 
-	if ( is_overpop )
-		return scale
-	else
-		return 1/scale
-	end
+	return 1 + adjustment
 end
 
 ----------------
