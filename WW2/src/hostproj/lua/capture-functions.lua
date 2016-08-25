@@ -310,7 +310,7 @@ function P.ProgressScaleForSide(side)
 	local alliedPop = chatGetPopulation(ALLIED)
 
 	-- Return no scaling for the overpopulated side
-	if ( ((axisPop > alliedPop) && (side == AXIS) ) || ((alliedPop > axisPop) && (side == ALLIED))) then
+	if ( ((axisPop > alliedPop) and (side == AXIS) ) or ((alliedPop > axisPop) and (side == ALLIED))) then
 		return 1.0
 	end
 
