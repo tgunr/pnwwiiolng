@@ -177,23 +177,18 @@ end
 --	return target
 --end
 
-function maxCaptureObjectives (population)
-  if population == nil then population = getLowerPopulation() end
+function maxCaptureObjectives()
+   local population = getLowerPopulation()
 
---  if population >= 360 then return 7 + math.floor((population - 360) / 50) end
---  if population >= 305 then return 6 end   -- 12 objectives total, 25.4 players/side/obj
---  if population >= 240 then return 5 end   -- 10 objectives total, 24.5 players/side/obj
---  if population >= 175 then return 4 end   -- 8 objectives total, 21 players/side/obj
---  if population >= 110 then return 3 end   -- 6 objectives total, 18 players/side/obj
-   if population >= 395 then return 8 + math.floor((population - 395) / 50) end
-   if population >= 340 then return 7 end   -- 14 total, 48 p/s/o
-   if population >= 285 then return 6 end   -- 12 total, 48 p/s/o
-   if population >= 230 then return 5 end   -- 10 total, 49 p/s/o
-   if population >= 140 then return 4 end   -- 8 total, 50 p/s/o
-   if population >=  95 then return 3 end   -- 6 total, 51 p/s/o
---   if population >=  42 then return 2 end   -- 4 total, 55 p/s/o
-   if population >=  2 then return 2 end   -- 4 total, 55 p/s/o  TEST
-   return 1  -- 2 total
+   if population >= 360 then return 8 + math.floor((population - 360) / 40) end
+   if population >= 240 then return 7 end
+   if population >= 200 then return 6 end
+   if population >= 160 then return 5 end
+   if population >= 120 then return 4 end
+   if population >=  80 then return 3 end
+--   if population >=  40 then return 2 end
+   if population >=  2 then return 2 end   FOR TEST PURPOSES
+   return 1
 end
 
 function countsAsEngagement(target)
