@@ -1634,3 +1634,7 @@ WW2Archives
 base64
 depend
 libb64.a
+WW2.VC.db
+WW2.VC.VC.opendb
+DebugInstance/Debug/DebugInstance.log
+DebugInstance/Debug/DebugInstance.tlog/DebugInstance.lastbuildstate
