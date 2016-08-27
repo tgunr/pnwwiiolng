@@ -9,13 +9,11 @@
 COPYING
 CVE-*
 INSTALL
-Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
 bissect*
 config.guess
-config.h
 config.h.in
 config.h.in~
 config.log
@@ -53,7 +51,6 @@ include/Makefile
 include/Makefile.in
 include/libxml/Makefile
 include/libxml/Makefile.in
-include/libxml/xmlversion.h
 install-sh
 libtool
 libxml-2.0-uninstalled.pc
