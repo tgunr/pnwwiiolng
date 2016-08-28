@@ -186,8 +186,7 @@ function maxCaptureObjectives()
    if population >= 160 then return 5 end
    if population >= 120 then return 4 end
    if population >=  80 then return 3 end
---   if population >=  40 then return 2 end
-   if population >=  2 then return 2 end --  FOR TEST PURPOSES
+   if population >=  40 then return 2 end
    return 1
 end
 
