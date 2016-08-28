@@ -542,12 +542,11 @@ function ProcessCaptureContributions()
 			-- Process the data.
 			if P.processFacility(facility, facilityData) == true then
 				-- Returns true when the facility wants another tick scheduling.
-				P.activeData[facility].nextTick = teulClockTime + host_config.capture.tickInterval_s
+				P.activeData[facility].nextTick = P.activeData[facility].nextTick + host_config.capture.tickInterval_s
 				P.resetCounters(P.activeData[facility])
 			end
 
 			numFacilitiesProcessed = numFacilitiesProcessed + 1
-
 		end
 	end
 
