@@ -1253,7 +1253,6 @@
     <ClInclude Include="..\..\src\strt\strtTypes.h" />
     <ClInclude Include="..\..\src\strt\strtUpdaterPack.h" />
     <ClInclude Include="..\..\src\strt\strtWOR.h" />
-    <ClInclude Include="..\..\src\sys\callstack.h" />
     <ClInclude Include="..\..\src\sys\crashhandler.h" />
     <ClInclude Include="..\..\src\sys\syscfg.h" />
     <ClInclude Include="..\..\src\sys\sysLaunchUrl.h" />
@@ -1841,7 +1840,6 @@
     <ClCompile Include="..\..\src\strt\strtClientMessages.cpp" />
     <ClCompile Include="..\..\src\strt\strtLua.cpp" />
     <ClCompile Include="..\..\src\strt\strtUpdaterPack.cpp" />
-    <ClCompile Include="..\..\src\sys\callstack.cpp" />
     <ClCompile Include="..\..\src\sys\crashhandler.cpp" />
     <ClCompile Include="..\..\src\sys\sysLaunchUrlWin.cpp" />
     <ClCompile Include="..\..\src\sys\sysmain.cpp" />
