@@ -729,6 +729,7 @@ RECT	rect;
 int		screenmode;
 #endif	// DIRECT3D
 
+	CheckWindows10();
 
     memset(&IdentityMatrix, 0, sizeof(piMATRIX));
 	IdentityMatrix.m[0][0] = IdentityMatrix.m[1][1] = 1.0;
@@ -1429,13 +1430,10 @@ char GetOSBuild()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	int result = 0;
-
-	CheckWindows10();
-
-	result = WinMainX(hInstance,hPrevInstance,lpCmdLine,nCmdShow);
-
+#ifdef CRASH_HANDLER
+	InstallCrashHandler();
 #endif
 
-	return result;
+	// Don't uninstall crash handler here, it can still catch stuff happening during teardown.
+	return WinMainX(hInstance,hPrevInstance,lpCmdLine,nCmdShow);
 }
