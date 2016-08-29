@@ -277,7 +277,6 @@ extern LOGICAL          EnableMouseClickToDamageBuildings;
 extern FLOAT32			gTrooperMOD; // LOD scaler mod from preferences
 extern LOGICAL          gCustomTerrain;
 extern UINT32			gEZMode;
-extern UINT32			GameInProgress; // 0 = not running, 1 = running, 2 = quitting
 
 extern UINT32			Convergence; // Global (default) Airplane gun convergence setting
 extern UINT32			CurrentConv; // Current airplane gun convergence setting

@@ -771,7 +771,6 @@ int		screenmode;
 	strcat(logfilename, ".log");
 	_unlink(logfilename);
 
-	GameInProgress = 1;
 #ifdef TERRAIN_EDITOR
 	WantedHelp = FALSE;
 	WantedWidth = 800;
@@ -1163,8 +1162,6 @@ int		screenmode;
 	// teulShutdownTransport();
 
 	// we're done
-	GameInProgress = 0;
-
 	memKill();
 
 	Close_Debug();
@@ -1252,11 +1249,13 @@ void sysmainQuit(void)
 {
 	cfgPrefsSave();
 
-	// declare an exit
-	GameInProgress = 2;
+    // Notify the ddp stuff
+	extern HWND myhwnd;
+	PostMessageA(myhwnd, WM_CLOSE, 0, 0);
 
 #if RELEASE_CLIENT == 1
-		exit(0);
+    // TODO: Is this really desirable behavior?
+    exit(0);
 #endif
 }
 

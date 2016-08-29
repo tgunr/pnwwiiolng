@@ -767,10 +767,6 @@ LOGICAL ddpUpdate(void)
 	// activate or deactivate the ime as needed
 	//imeUpdate();
 
-	// an exit was declared
-	if(GameInProgress == 2)
-		PostMessageA(myhwnd, WM_CLOSE, 0, 0);
-
 	return(TRUE);
 }
 
