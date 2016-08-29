@@ -843,14 +843,12 @@ int		screenmode;
 	UserLogEnabled = FALSE;
 #endif
 
-#if XAUDIO
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
     if(hr != S_OK)
     {
         Write_Debug("CoInitializeEx FAILED with error: %x", hr);
     }
-#endif
 
 	SetupFPU(true);
 	memInit();
@@ -1166,6 +1164,8 @@ int		screenmode;
 
 	Close_Debug();
 
+	CoUninitialize();
+
 	return(msg.wParam);
 }
 
@@ -1441,6 +1441,7 @@ char GetOSBuild()
 	return getVersionInfo().build;
 }
 
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	int result = 0;
@@ -1449,14 +1450,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	result = WinMainX(hInstance,hPrevInstance,lpCmdLine,nCmdShow);
 
-#ifdef BETA_RELEASE
-#define DONTCALL_COM_CLOSE
-#endif
-
-#if XAUDIO
-#ifndef DONTCALL_COM_CLOSE
-    CoUninitialize();
-#endif
 #endif
 
 	return result;
