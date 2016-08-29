@@ -41,10 +41,6 @@ extern void* Imagebase;
 Hideaway* checksum;
 #endif
 
-#ifdef BETA_RELEASE
-//	#pragma fenv_access (on)	// Disables optimization which could override the FPU/SSE2 mode changes
-#endif
-
 #ifndef BETA_RELEASE
 static LOGICAL abcd();
 #endif
@@ -733,9 +729,8 @@ RECT	rect;
 int		screenmode;
 #endif	// DIRECT3D
 
-//CW can't do a nameless union initialization
-    memset(&IdentityMatrix, 0, sizeof(piMATRIX));
 
+    memset(&IdentityMatrix, 0, sizeof(piMATRIX));
 	IdentityMatrix.m[0][0] = IdentityMatrix.m[1][1] = 1.0;
 	IdentityMatrix.m[2][2] = IdentityMatrix.m[3][3] = 1.0;
 
@@ -745,17 +740,7 @@ int		screenmode;
 	wwiiSendLog_WWII_ERR_INFO();
 
 	// delete the log files
-#ifndef WIN32
-# define _unlink(file) unlink(file)
-#endif
-
 	Fio::DeleteLogFile();
-
-
-	// Andrew's simulated crash
-	//int xxx=0;
-	//int yyy = 1/xxx;
-
 
 	// legacy sake
 	_unlink("ww2errinfo.log");
