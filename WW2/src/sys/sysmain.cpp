@@ -1093,17 +1093,6 @@ int		screenmode;
 #endif
 #endif
 
-#ifdef TERRAIN_EDITOR
-	WantedHelp = FALSE;
-	WantedWidth = 800;
-	WantedHeight = 600;
-	WantedBpp = TEX_BPP;
-	WantedAlpha = TEX_ALPHA;
-	WantedHdw = TRUE;
-	WantedStencil = 0;
-	WantedWindow = TRUE;
-	WantedUserLogEnabled = FALSE;
-#else
 	WantedHelp = FALSE;
 	WantedWidth = GetSystemMetrics(SM_CXSCREEN);
 	WantedHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -1120,7 +1109,6 @@ int		screenmode;
 	WantedUserLogEnabled = FALSE;
 	WantDataDir = TRUE;
 	HasKeyFile = FALSE;
-#endif
 #endif
 
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
@@ -1145,14 +1133,6 @@ int		screenmode;
 			y = HIWORD(xy);
 		}
 	}
-#ifdef TERRAIN_EDITOR
-	else
-	{
-		x = GetSystemMetrics(SM_CXFRAME);
-		y = GetSystemMetrics(SM_CYFRAME) +
-			GetSystemMetrics(SM_CYCAPTION);
-	}
-#endif
 
 #ifdef BETA_RELEASE
 	LogEnabled = TRUE;
@@ -1204,13 +1184,7 @@ int		screenmode;
 	HackID[0]=0;
 #endif
 
-#ifndef TERRAIN_EDITOR
 	// FIXME syscineWinMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-#endif
-
-#ifdef TERRAIN_EDITOR
-	WantedWindow = TRUE;
-#endif
 
 	if (WantedHelp)
 	{
@@ -1379,8 +1353,6 @@ int		screenmode;
 	PlayDemo	= FALSE;//TRUE;
 //	Online    = FALSE;
 	InFlight	= TRUE;//FALSE;
-
-//#ifdef TERRAIN_EDITOR
 
 #ifdef DONT_USE
 #if RELEASE_CLIENT != 0

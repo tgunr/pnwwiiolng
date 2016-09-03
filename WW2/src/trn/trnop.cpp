@@ -252,9 +252,7 @@ piMATRIX	mat;
 
 	if (!trnopCollideDown(&cpos, &poly, &pos))
 	{
-#ifdef TERRAIN_EDITOR
 		Write_Debug("OnGroundLODImplement: Could not find the ground for object '%s'", lpobj->name);
-#endif
 		return(FALSE);
 	}
 
@@ -332,10 +330,7 @@ piMATRIX	mat;
 
     if(!trnopCollideDownWithDTL(&cpos, &pos, &poly, _superCell))
 	{
-#ifdef TERRAIN_EDITOR
 		Write_Debug("OnGroundLODImplement: Could not find the ground for object '%s'", lpobj->name);
-#endif
-
 		return(FALSE);
 	}
 
@@ -389,9 +384,7 @@ OBJECT*	lpatt;
 
 static LOGICAL OnGroundLOD(OBJECT* lpobj, UINT32 lod)
 {
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Processing LOD %d for on ground", lod);
-#endif
 
 	if (lpobj->flags & OBJECT_LOD)
 	{
@@ -417,9 +410,7 @@ static LOGICAL PlaceOnGround(OBJECT* lpobj)
 {
 int			i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place on ground: %s", lpobj->name);
-#endif
 
 	for (i=1; i < 10; i++)
 	{
@@ -443,9 +434,7 @@ static LOGICAL PlaceRelativeToGround(OBJECT* lpobj)
 {
 int		i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place relative to ground: %s", lpobj->name);
-#endif
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, HeightPlaceLOD))
@@ -465,9 +454,7 @@ int		i;
 */
 static LOGICAL PlaceAbsolute(OBJECT* lpobj)
 {
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place absolute: %s", lpobj->name);
-#endif
 	return TRUE;
 }
 
@@ -516,9 +503,7 @@ piMATRIX	mat;
 OBJECT*	lpbase;
 
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Processing LOD %d for height conformance", lod);
-#endif
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
         if(lpobj->child->flag2 & OBJECT_IS_ROTATED)
@@ -543,10 +528,7 @@ OBJECT*	lpbase;
 		mat._43 = dz;
 		ApplyMatrixToObjectTree(lpobj->child, &mat);
 
-#ifdef TERRAIN_EDITOR
 		Write_Debug("HeightPlaceLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
-#endif
-
 		return(FALSE);
 	}
 
@@ -604,9 +586,7 @@ OBJECT*	lpbase;
 			}
 			else
 			{
-#ifdef TERRAIN_EDITOR
 				Write_Debug("HeightPlaceLOD: Could not find the ground for 'base' for object '%s'", lpobj->name);
-#endif
 			}
 		}
 	}
@@ -627,9 +607,7 @@ piMATRIX	mat;
 OBJECT*	lpbase, *lpnext;
 
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Processing LOD %d for height conformance", lod);
-#endif
 
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
@@ -655,10 +633,7 @@ OBJECT*	lpbase, *lpnext;
 		mat._43 = dz;
 		ApplyMatrixToObjectTree(lpobj->child, &mat);
 
-#ifdef TERRAIN_EDITOR
 		Write_Debug("HeightConformLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
-#endif
-
 		return(FALSE);
 	}
 
@@ -771,9 +746,7 @@ OBJECT*	lpbase, *lpnext;
 				}
 				else
 				{
-#ifdef TERRAIN_EDITOR
 					Write_Debug("HeightConformLOD: Could not find the ground for 'base' for subobject '%s'", lpnext->name);
-#endif
 				}
 			}
 		}
@@ -796,9 +769,7 @@ static LOGICAL PlaceHeightConform(OBJECT* lpobj)
 {
 int			i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place height conform: %s", lpobj->name);
-#endif
 
 	for (i=1; i < 10; i++)
 	{
@@ -877,14 +848,6 @@ SINT32		i, poly;
 	else
 	{
 		Write_Debug("Could not find the ground in OctetReplace (%s)", lpobj->name);
-#ifdef TERRAIN_EDITOR
-		{
-		SINT8	txt[256];
-
-			sprintf(txt, "No ground, OctetReplace");
-			rnmainListText(txt);
-		}
-#endif
 	}
 
 	return (TRUE);
@@ -1014,10 +977,7 @@ piVECTOR	pos, cpos;
 piMATRIX	mat;
 OBJECT*	lpbase, *lpnext;
 
-
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Processing LOD %d for bottom conformance", lod);
-#endif
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
 		math3dVectorMultiply(&pos, &lpobj->child->pos, &lpobj->child->mat);
@@ -1033,10 +993,7 @@ OBJECT*	lpbase, *lpnext;
 		mat._43 = dz;
 		ApplyMatrixToObjectTree(lpobj->child, &mat);
 
-#ifdef TERRAIN_EDITOR
 		Write_Debug("BottomConformLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
-#endif
-
 		return(FALSE);
 	}
 
@@ -1080,9 +1037,7 @@ OBJECT*	lpbase, *lpnext;
 		lpnext = lpnext->attached;
 	}
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Elevating subobject by %f meters", dz / ScaleFactor);
-#endif
 
 	mat = IdentityMatrix;
 	mat._41 = 0.0f;
@@ -1112,9 +1067,7 @@ OBJECT*	lpbase, *lpnext;
 				}
 				else
 				{
-#ifdef TERRAIN_EDITOR
 					Write_Debug("BottomConformLOD: Could not find the ground for 'base' for subobject '%s'", lpnext->name);
-#endif
 				}
 			}
 		}
@@ -1138,10 +1091,7 @@ static LOGICAL PlaceBottomConform(OBJECT* lpobj)
 {
 SINT32		i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place bottom conform: %s", lpobj->name);
-#endif
-
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, BottomConformLOD))
@@ -1308,14 +1258,6 @@ FLOAT32 TempNum;
 	else
 	{
 		Write_Debug("Could not find the ground in ConformRadialLODIterate (%s)", lpobj->name);
-#ifdef TERRAIN_EDITOR
-		{
-		SINT8	txt[256];
-
-			sprintf(txt, "No ground, ConformRadialLODIterate");
-			rnmainListText(txt);
-		}
-#endif
 	}
 
 	return (TRUE);
@@ -1467,10 +1409,7 @@ OBJECT*	lpatt;
 
 static LOGICAL DownLOD(OBJECT* lpobj, UINT32 lod)
 {
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Processing LOD %d for down", lod);
-#endif
-
 	DownLODInterate(lpobj->child);
 
 	return(TRUE);
@@ -1486,10 +1425,7 @@ static LOGICAL PlaceDown(OBJECT* lpobj)
 {
 SINT32		i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place down: %s", lpobj->name);
-#endif
-
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, DownLOD))
@@ -1508,10 +1444,7 @@ static LOGICAL PlaceConformRadial(OBJECT* lpobj)
 {
 SINT32		i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place conform radial: %s", lpobj->name);
-#endif
-
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, ConformRadialLOD))
@@ -1589,10 +1522,7 @@ OBJECT*	lpatt;
 
 static LOGICAL RotateLOD(OBJECT* lpobj, UINT32 lod)
 {
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Processing LOD %d for rotate", lod);
-#endif
-
 	RotateLODInterate(lpobj->child);
 
 	return(TRUE);
@@ -1608,10 +1538,7 @@ static LOGICAL PlaceRotate(OBJECT* lpobj)
 {
 SINT32		i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place and rotate: %s", lpobj->name);
-#endif
-
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, RotateLOD))
@@ -1866,9 +1793,7 @@ OBJECT*			TempObj;
 	obplyrRotateAndTranslateObjectTree(lpobj, mat, translation);
 
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("trnopOrientSubobjects for '%s'", lpobj->name);
-#endif
 
 	// lpobj should point to a Topmost object
 	lpsub = nullptr;
@@ -1918,10 +1843,7 @@ OBJECT*			TempObj;
 			place = atoi(ptr);
 		}
 
-#ifdef TERRAIN_EDITOR
 		Write_Debug(" subobject '%s', place = %d", lpsub->name, place);
-#endif
-
 		switch (place)
 		{
 			case OBJVAL_ON_GROUND:

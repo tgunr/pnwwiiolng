@@ -853,7 +853,7 @@ STRT_DTL_HEADER		sdh;
 
 	ReadingSDM = TRUE;
 
-#if !defined(TERRAIN_EDITOR) && RELEASE_CLIENT == 0
+#if RELEASE_CLIENT == 0
 
 	if (hfile == -1)
 	{

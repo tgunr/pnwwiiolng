@@ -53,18 +53,6 @@
 #include "SpatialDB.h"
 #endif
 
-#ifdef TERRAIN_EDITOR
-#include "iop.h"
-#include "uitxpik.h"
-#include "uiedfnc.h"
-#include "uitele.h"
-#include "rn/rntext.h"
-#include "uitab.h"
-#include "uistretch.h"
-#include "ml/mltypes.h"
-#include "pers/persmain.h"
-#endif
-
 #include "wwii/wwiiCovert.h"
 
 static Covert<LOGICAL> g_trnmainDraw = TRUE;
@@ -410,11 +398,7 @@ int		i, j;
 
 	WorldOriginOffset.x = InitXOrigin;
 	WorldOriginOffset.y = InitYOrigin;
-#ifdef TERRAIN_EDITOR
 	WorldOriginOffset.z = 0;
-#else
-	WorldOriginOffset.z = 0;
-#endif
 
 	TerrainStable = TRUE;
 
@@ -426,16 +410,12 @@ int		i, j;
 	xstep *= 0.5f;
 	ystep *= 0.5f;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Terrain square dimensions: width = %f, height = %f", xstep / ScaleFactor, ystep / ScaleFactor);
-#endif
 
 	trnlod = 0;
 
 	horizon = 8000.0f * ScaleFactor;
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Terrain minimal horizons: %f", horizon / ScaleFactor);
-#endif
 
 	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
@@ -753,24 +733,22 @@ TERRAIN_DETAIL*	td;
 		return(FALSE);
 	}
 
-#ifdef DONT_USE
-#ifdef TERRAIN_EDITOR
+#ifdef DEBUG_WW2
 	if (strcmp(newobj->texname, lpobj->texname) == 0)
 	{
 		Write_Debug("Source and destination texture objects are the same: '%s'", newobj->texname);
+#ifdef DONT_USE
 		return(TRUE);
+#endif
 	}
-	else
-	if (strcmp(newobj->texname, "null1.bmp") == 0)
+	else if (strcmp(newobj->texname, "null1.bmp") == 0)
 	{
 		Write_Debug("Null texture object was destination");
 	}
-	else
-	if (strcmp(lpobj->texname, "null1.bmp") == 0)
+	else if (strcmp(lpobj->texname, "null1.bmp") == 0)
 	{
 		Write_Debug("Null texture object was source");
 	}
-#endif
 #endif
 
 	if (!loading)
@@ -779,9 +757,6 @@ TERRAIN_DETAIL*	td;
 		if (td->trindx < 0 || td->trindx >= MAX_TERRAIN_EDIT_LIST)
 		{
 			Write_Debug("Out of edit buffer space.");
-#ifdef TERRAIN_EDITOR
-			rnmainListText("Out of edit buffer space.");
-#endif
 			return(FALSE);
 		}
 	}
@@ -987,7 +962,7 @@ TERRAIN_DETAIL*	td;
 		}
 	}
 
-#ifdef TERRAIN_EDITOR
+#ifdef DEBUG_WW2
 	if (!loading)
 	{
 	int			i, num;
@@ -1144,9 +1119,7 @@ LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
 	strcpy(newobj->name, newname);
 	*objRefName = newobj->name;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Object renamed: %s", newname);
-#endif
 
 	// temporary hack for the terrain collision detection routines
 
@@ -2326,10 +2299,6 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	Mat._42 = -(FLOAT32)WorldOriginOffset.y;
 	Mat._43 = -(FLOAT32)WorldOriginOffset.z;
 	_SetTerrainMatricies(Mat);
-#endif
-
-#ifdef TERRAIN_EDITOR
-	uiteleSetCrossing(TRUE);
 #endif
 
 	updated = TRUE;
@@ -3696,19 +3665,6 @@ UINT32 trnUpdateTerrainOriginOffset(LOGICAL force)
 	return 0;
 }
 
-#ifdef TERRAIN_EDITOR
-LOGICAL trnmainSetTerrainOriginOffset(void)
-{
-	mlVehicleData*	VehicleData = persGetPersonaModelDataPtr();
-
-	VehicleData->VehiclePos.x = InitXOrigin;
-	VehicleData->VehiclePos.y = InitYOrigin;
-	VehicleData->VehiclePos.z = 500.0;
-
-	return(TRUE);
-}
-#endif
-
 LOGICAL trnmainWorldOriginMoved(void)
 {
 	return _WorldMoved;
@@ -3744,168 +3700,6 @@ static LOGICAL _DrawVertices(int type, OBJECT* lpobj)
 
 	return(TRUE);
 }
-
-#ifdef TERRAIN_EDITOR
-
-// FIXME (I'M SLOW!!)
-static LOGICAL NormalizeOctetsSlow(TERRAIN_DETAIL* td)
-{
-SINT32		i1, i2, j1, j2, n1, n2;
-OBJECT*	t1, *t2;
-piVERTEX*	po1, pv1;
-piVERTEX*	po2, pv2;
-
-	// Normalize normals between octets
-	t1 = td->terrain;
-	for (i1=0; i1 <= MAX_TERRAIN_TEXTURES; t1=td->txtobj[i1++])
-	{
-		if (t1 == nullptr ||
-			t1->flags & OBJECT_SKIPDRAWING ||
-			!(t1->flags & OBJECT_VISIBLE))
-		{
-			continue;
-		}
-
-		po1 = t1->pvorig;
-		pv1 = t1->pverts;
-		if (t1->numtris == 0)
-		{
-			continue;
-		}
-
-		n1 = t1->numverts;
-		for (j1=0; j1 < n1; j1++)
-		{
-			t2 = td->terrain;
-			for (i2=0; i2 <= MAX_TERRAIN_TEXTURES; t2=td->txtobj[i2++])
-			{
-				if (t2 == nullptr ||
-					t2->flags & OBJECT_SKIPDRAWING ||
-					!(t2->flags & OBJECT_VISIBLE))
-				{
-					continue;
-				}
-
-				po2 = t2->pvorig;
-				pv2 = t2->pverts;
-				if (t2->numtris == 0)
-				{
-					continue;
-				}
-
-				n2 = t2->numverts;
-				for (j2=0; j2 < n2; j2++)
-				{
-					if (po1[j1].x == po2[j2].x &&
-						po1[j1].y == po2[j2].y &&
-						po1[j1].z == po2[j2].z)
-					{
-						math3dAddVectors((piVECTOR*)&pv1[j1].nx, (piVECTOR*)&po1[j1].nx, (piVECTOR*)&po2[j2].nx);
-						pv2[j2].nx = pv1[j1].nx;
-						pv2[j2].ny = pv1[j1].ny;
-						pv2[j2].nz = pv1[j1].nz;
-					}
-				}
-			}
-		}
-	}
-
-	// Normalize normals between octets
-	t1 = td->terrain;
-	for (i1=0; i1 <= MAX_TERRAIN_TEXTURES; t1=td->txtobj[i1++])
-	{
-		if (t1 == nullptr ||
-			t1->flags & OBJECT_SKIPDRAWING ||
-			!(t1->flags & OBJECT_VISIBLE))
-		{
-			continue;
-		}
-
-		po1 = t1->pvorig;
-		pv1 = t1->pverts;
-		if (t1->numtris == 0)
-		{
-			continue;
-		}
-
-		n1 = t1->numverts;
-		for (j1=0; j1 < n1; j1++)
-		{
-			t2 = td->terrain;
-			for (i2=0; i2 <= MAX_TERRAIN_TEXTURES; t2=td->txtobj[i2++])
-			{
-				if (t2 == nullptr ||
-					t2->flags & OBJECT_SKIPDRAWING ||
-					!(t2->flags & OBJECT_VISIBLE))
-				{
-					continue;
-				}
-
-				po2 = t2->pvorig;
-				pv2 = t2->pverts;
-				if (t2->numtris == 0)
-				{
-					continue;
-				}
-
-				n2 = t2->numverts;
-				for (j2=0; j2 < n2; j2++)
-				{
-					if (po1[j1].x == po2[j2].x &&
-						po1[j1].y == po2[j2].y &&
-						po1[j1].z == po2[j2].z)
-					{
-						math3dFastNormalize((piVECTOR*)&pv1[j1].nx);
-						pv2[j2].nx = pv1[j1].nx;
-						pv2[j2].ny = pv1[j1].ny;
-						pv2[j2].nz = pv1[j1].nz;
-					}
-				}
-			}
-		}
-	}
-
-	return(TRUE);
-}
-
-LOGICAL trnmainUpdateNormals(void)
-{
-UINT16		i, j;
-TERRAIN_DETAIL*	td;
-
-	for (i = 0; i < NUM_TERRAIN_RECTANGLES; ++i)
-	{
-		td = &trndtl[i];
-
-		for (j=0; j < td->tricnt; j++)
-		{
-			if (td->txtobj[j]->flags & OBJECT_VISIBLE)
-			{
-				if (!ldmdlCalcNormals(td->txtobj[j]) ||
-					!ldmdlGetBounds(td->txtobj[j]))
-				{
-					return(FALSE);
-				}
-			}
-		}
-
-#ifdef TERRAIN_EDITOR
-		Write_Debug("Normals for %d updated", i);
-#endif
-
-#ifdef DONT_USE
-		if (!NormalizeOctetsSlow(td))
-		{
-			return(FALSE);
-		}
-#endif
-
-	}
-
-	return(TRUE);
-}
-
-#endif // TERRAIN_EDITOR
 
 LOGICAL trnFindStratBuildingByTO(BUILDING** const bld, trnCDTerrainObject* const TO)
 {
