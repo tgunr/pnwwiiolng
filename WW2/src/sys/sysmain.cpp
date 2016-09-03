@@ -715,6 +715,96 @@ static void HandleHackID()
 #endif
 //#endif
 
+struct WinVersionInfo {
+	char major;
+	char minor;
+	char rev;
+	char build;
+};
+
+// well known version numbers for each major system
+static WinVersionInfo winVersions[] = {
+	{ 5, 0, 21, 95 },  // 2k
+	{ 5, 1, 26, 0 },  // XP
+	{ 6, 0, 6, 0 },   // vista
+	{ 6, 0, 6, 2 },   // Vista SP2
+	{ 6, 1, 76, 1 },  // Win7
+	{ 6, 2, 92, 0 },  // Win8
+	{ 6, 3, 96, 0 },  // Win8 update1
+	{ 10,0,102,40 }   // Win10
+};
+
+static bool win10;
+
+static void CheckWindows10()
+{
+	HKEY hKey;
+	LONG res;
+	win10 = false;
+
+	res = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"), 0, KEY_QUERY_VALUE, &hKey);
+	if (res == ERROR_SUCCESS)
+	{
+		DWORD dwType = REG_SZ;
+		char prodName[300];
+		DWORD len = 300;
+		res = RegQueryValueEx(hKey, _T("ProductName"), NULL, &dwType, (LPBYTE)&prodName, &len);
+		if (res == ERROR_SUCCESS)
+		{
+			//LPWSTR
+			//WideCharToMultiByte
+			std::wstring pname = reinterpret_cast<LPWSTR>(prodName);
+			std::wstring search = L"10";
+			if (pname.find(search) != -1)
+			{
+				win10 = true;
+			}
+		}
+
+	}
+
+}
+
+WinVersionInfo &getVersionInfo()
+{
+	if (win10)
+		return winVersions[7];
+	else if (IsWindows8Point1OrGreater())
+		return winVersions[6];
+	else if (IsWindows8OrGreater())
+		return winVersions[5];
+	else if (IsWindows7OrGreater())
+		return winVersions[4];
+	else if (IsWindowsVistaSP2OrGreater())
+		return winVersions[3];
+	else if (IsWindowsVistaOrGreater())
+		return winVersions[2];
+	else if (IsWindowsXPOrGreater())
+		return winVersions[1];
+	else
+		return winVersions[0];
+}
+
+char GetOSMajorVersion()
+{
+	return getVersionInfo().major;
+}
+
+char GetOSMinorVersion()
+{
+	return getVersionInfo().minor;
+}
+
+char GetOSRevision()
+{
+	return getVersionInfo().rev;
+}
+
+char GetOSBuild()
+{
+	return getVersionInfo().build;
+}
+
 // This is the actual winmain
  int WINAPI WinMainX(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -1336,97 +1426,6 @@ void sysSetMousePosition(int x, int y)
 {
 	SetCursorPos(WantedX + x, WantedY + y);
 }
-
-struct WinVersionInfo {
-	char major;
-	char minor;
-	char rev;
-	char build;
-};
-
-// well known version numbers for each major system
-WinVersionInfo winVersions[] = {
-	{ 5, 0, 21, 95},  // 2k
-	{ 5, 1, 26, 0 },  // XP
-	{ 6, 0, 6, 0 },   // vista
-	{ 6, 0, 6, 2 },   // Vista SP2
-	{ 6, 1, 76, 1 },  // Win7
-	{ 6, 2, 92, 0 },  // Win8
-	{ 6, 3, 96, 0 },  // Win8 update1
-	{ 10,0,102,40 }   // Win10
-};
-
-bool win10;
-
-void CheckWindows10()
-{
-	HKEY hKey;
-	LONG res;
-	win10 = false;
-
-	res = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"), 0, KEY_QUERY_VALUE, &hKey);
-	if (res == ERROR_SUCCESS)
-	{
-		DWORD dwType = REG_SZ;
-		char prodName[300];
-		DWORD len = 300;
-		res = RegQueryValueEx(hKey, _T("ProductName"), NULL, &dwType, (LPBYTE)&prodName, &len);
-		if (res == ERROR_SUCCESS)
-		{
-			//LPWSTR
-			//WideCharToMultiByte
-			std::wstring pname = reinterpret_cast<LPWSTR>(prodName);
-			std::wstring search = L"10";
-			if (pname.find(search) != -1)
-			{
-				win10 = true;
-			}
-		}
-
-	}
-
-}
-
-WinVersionInfo &getVersionInfo()
-{
-	if (win10)
-		return winVersions[7];
-	else if (IsWindows8Point1OrGreater())
-		return winVersions[6];
-	else if (IsWindows8OrGreater())
-		return winVersions[5];
-	else if (IsWindows7OrGreater())
-		return winVersions[4];
-	else if (IsWindowsVistaSP2OrGreater())
-		return winVersions[3];
-	else if (IsWindowsVistaOrGreater())
-		return winVersions[2];
-	else if (IsWindowsXPOrGreater())
-		return winVersions[1];
-	else
-		return winVersions[0];
-}
-
-char GetOSMajorVersion()
-{
-	return getVersionInfo().major;
-}
-
-char GetOSMinorVersion()
-{
-	return getVersionInfo().minor;
-}
-
-char GetOSRevision()
-{
-	return getVersionInfo().rev;
-}
-
-char GetOSBuild()
-{
-	return getVersionInfo().build;
-}
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
