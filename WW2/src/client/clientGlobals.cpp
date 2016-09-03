@@ -110,7 +110,7 @@ SINT8			ServerApID[64];		// program apId
 SINT8			ServerData[64];		// data passed from auth server
 SINT8			ServerProtocol[64]; // connection protocol
 SINT8			BypassString[64];
-#if defined(DEBUG) || defined(ALPHA_RELEASE)
+#if defined(DEBUG_WW2) || defined(ALPHA_RELEASE)
 LOGICAL			WantedUserLogEnabled = TRUE;	// If the user wants the log enabled
 #else
 LOGICAL			WantedUserLogEnabled = FALSE;	// If the user wants the log enabled
@@ -288,7 +288,7 @@ SINT8            gAuthServer[128]; // Authentication server to be used
 SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 SINT8            gClientV[32]; // Version to submit
 
-#ifdef DEBUG
+#ifdef DEBUG_WW2
 LOGICAL          DebugBuildingMDLFilesOnly = false;
 #endif
 

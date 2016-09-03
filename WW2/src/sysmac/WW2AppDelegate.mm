@@ -550,7 +550,7 @@ extern NSString *WebActionOriginalURLKey;
     // SDK), the provided username of the player (if any) may be inaccurate.
     // Not much of a big deal, is it?
     [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"97d81f56ff22d04ccdbc1a0d537e81c0" delegate:self];
-#if IS_DEBUG
+#ifdef DEBUG_WW2
     [BITHockeyManager sharedHockeyManager].logLevel = BITLogLevelDebug;
 #endif
     [BITHockeyManager sharedHockeyManager].disableFeedbackManager = YES;
@@ -584,7 +584,7 @@ extern NSString *WebActionOriginalURLKey;
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
     // Or, if we're only here to build MDLs.
     if(GameServerIP[0]
-#ifdef DEBUG
+#ifdef DEBUG_WW2
         || DebugBuildingMDLFilesOnly
 #endif
     )
@@ -741,7 +741,7 @@ extern NSString *WebActionOriginalURLKey;
     
     result = SecItemCopyMatching((__bridge CFDictionaryRef)keychainAccountsQuery, &_matches);
     if (result != noErr && result != errSecItemNotFound) {
-#if IS_DEBUG
+#ifdef DEBUG_WW2
         NSLog(@"Error copying matching items from keychain: %@, %d", keychainAccountsQuery, (int)result);
 #endif
         return @[];
@@ -775,7 +775,7 @@ extern NSString *WebActionOriginalURLKey;
         
         if (result != noErr/* && result != errSecItemNotFound*/) {
             // Not much we can really do about it...
-#if IS_DEBUG
+#ifdef DEBUG_WW2
             NSLog(@"FAILED TO DELETE ITEMS FROM KEYCHAIN! Match: %@, result %ld", keychainDeleteQuery, result);
 #endif
         }
@@ -809,7 +809,7 @@ extern NSString *WebActionOriginalURLKey;
     
     result = SecItemAdd((__bridge CFDictionaryRef)keychainUpdateQuery, nullptr);
     if (result != noErr) {
-#if IS_DEBUG
+#ifdef DEBUG_WW2
         NSLog(@"Failed to save password to keychain: %@, %ld", keychainUpdateQuery, result);
 #endif
         rememberUserPassword = NO;
@@ -830,7 +830,7 @@ extern NSString *WebActionOriginalURLKey;
         NSArray *accounts = [self allKeychainAccountNames];
         
         if (accounts.count > 1) {
-#if IS_DEBUG
+#ifdef DEBUG_WW2
             NSLog(@"Too many results in keychain! %@", accounts);
 #endif
             [self removeAllKeychainEntries];
@@ -857,7 +857,7 @@ extern NSString *WebActionOriginalURLKey;
         
         result = SecItemCopyMatching((__bridge CFDictionaryRef)keychainAccountsQuery, &_accountData);
         if (result != noErr) {
-#if IS_DEBUG
+#ifdef DEBUG_WW2
             NSLog(@"Got error trying to get account data? %@, %d\n", keychainAccountsQuery, (int)result);
 #endif
             [self removeAllKeychainEntries];
@@ -1075,7 +1075,7 @@ extern NSString *WebActionOriginalURLKey;
             if (! isteulInitialized) {
                 ww2::Client::Init();
                 
-#if IS_DEBUG
+#ifdef DEBUG_WW2
                 dbugSetWriteLevel(Debug::ERR_DBUG);
                 dbugSetLogLevel(Debug::ERR_DBUG);
 #else
