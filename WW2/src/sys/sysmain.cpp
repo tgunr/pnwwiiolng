@@ -848,7 +848,6 @@ int		screenmode;
 	_unlink(logfilename);
 
 #ifdef TERRAIN_EDITOR
-	WantedHelp = FALSE;
 	WantedWidth = 800;
 	WantedHeight = 600;
 	WantedBpp = TEX_BPP;
@@ -858,7 +857,6 @@ int		screenmode;
 	WantedWindow = TRUE;
 	WantedUserLogEnabled = FALSE;
 #else
-	WantedHelp = FALSE;
 	WantedWidth = GetSystemMetrics(SM_CXSCREEN);
 	WantedHeight = GetSystemMetrics(SM_CYSCREEN);
 	WantedBpp = TEX_BPP;
@@ -963,15 +961,6 @@ int		screenmode;
 #ifdef TERRAIN_EDITOR
 	WantedWindow = TRUE;
 #endif
-
-	if (WantedHelp)
-	{
-		TCHAR  HelpInfo[512];
-
-		LoadString(hInstance, IDS_HELPINFO, HelpInfo, 512);
-		MessageBox(nullptr, HelpInfo, _T("WW2 Online Help"), MB_OK|MB_ICONINFORMATION);
-		return(0);
-	}
 
 #ifdef DONT_USE
 	if (!syshsCheckHdwSfw(FALSE))

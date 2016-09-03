@@ -87,7 +87,6 @@ extern UINT32			MaxUserClipPlanes;
 extern UINT32			MaxTextureWidth;
 extern UINT32			MaxTextureHeight;
 
-extern LOGICAL          WantedHelp;			// asked for commandline help
 extern UINT32			WindowAdapter;		// desired adapter
 extern UINT32			WindowDeviceType;	// desired device type
 extern UINT32			WindowRefreshRate;	// desired refresh rate

@@ -1410,6 +1410,7 @@
     <ClInclude Include="..\..\src\inst\instTypes.h" />
     <ClInclude Include="..\..\src\ime\IMEClient.h" />
     <ClInclude Include="..\..\src\ime\imeMain.h" />
+    <ClInclude Include="resource.h" />
     <CustomBuildStep Include="..\..\src\sqlite\sqlite3.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuildStep>

@@ -81,7 +81,6 @@ UINT32			MaxUserClipPlanes;
 UINT32			MaxTextureWidth;
 UINT32			MaxTextureHeight;
 
-LOGICAL          WantedHelp;			// asked for commandline help
 UINT32			WindowAdapter;		// desired adapter
 UINT32			WindowDeviceType;	// desired device type
 UINT32			WindowRefreshRate;	// desired refresh rate

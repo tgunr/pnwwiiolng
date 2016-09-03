@@ -1641,6 +1641,7 @@
     <ClInclude Include="..\..\src\omg\omgChat.hxx">
       <Filter>omg\Generated Headers</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
