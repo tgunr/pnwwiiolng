@@ -178,14 +178,15 @@ LOGICAL Open_Debug(const char* filename)
 	if (filename == nullptr)
 		return(FALSE);
 
-    strcpy(ofn, filename);
+	ofp = stderr;
+/*	strcpy(ofn, filename);
 #ifdef _DEBUG
 	strcat(ofn, "_Debug");
 #endif
 	strcat(ofn, ".log");
 
 	ofp = fioUserFile(ofn, "w");
-
+*/
 	if ( ofp == nullptr )
 		return FALSE;
 
@@ -211,35 +212,23 @@ void Close_Debug(void)
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 {
+#ifdef DEBUG_WW2
 	if(logLevel < level || !(system & logMask) || str == nullptr) return;
 	if ( ofp == nullptr )
 	{
-		vprintf(str, marker);
-		printf("\n");
+		vprintf_s(str, marker);
+		printf_s("\n");
 	}
 	else
 	{
-#ifdef DEBUG_WW2
-		char buf[255+1];
+		char buf[256] = {0};
 
-		_vsnprintf(buf, 255, str, marker);
-		// Since its on the stack:
-		// any string longer >= 255 chars will not be null terminated
-		buf[255] = 0;
-
-		// log system always uses ascii
+		strprintf(buf, str, marker);
 		OutputDebugStringA(buf);
 		OutputDebugStringA("\r\n");
-
-		fprintf(ofp, "%s\r\n", buf);
-		fflush(ofp);
-
-#else
-		vfprintf(ofp, str, marker);
-		fprintf(ofp, "\r\n");
-		fflush(ofp);
-#endif
+		vfprintf_s(ofp, str, marker);
 	}
+#endif
 }
 
 #endif // OS_WIN32
