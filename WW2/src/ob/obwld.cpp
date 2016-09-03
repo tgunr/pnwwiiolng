@@ -352,9 +352,7 @@ static bool LoadModel(int numargs, FUNCARGS* args)
 static bool LoadCockpitModel(int numargs, FUNCARGS* args)
 {
 	rnlogoUpdateStatus("loading.vehicles");
-	if(g_bBuildMDLS)	obmgrAddModelToPool(args[0].svalue, true);
-	else	obmgrAddModelToPool(args[0].svalue, false);
-
+	obmgrAddModelToPool(args[0].svalue, g_bBuildMDLS);
 	return TRUE;
 }
 
