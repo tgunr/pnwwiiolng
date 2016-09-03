@@ -811,11 +811,11 @@ SuperCellMapView::Renderer::Renderer() : enabled(true), minscale(.1f), maxscale(
 		_loadthread = new LoadThread(this);
 		_loadthread->start();
 		while(!_loadthread->isRunning()){
-#if PLAT_OS == OS_WIN32
+#if platOS == OS_WIN32
             SwitchToThread();
-#elif PLAT_OS == OS_MACOS
+#elif platOS == OS_MACOS
             pthread_yield_np();
-#elif PLAT_OS == OS_LINUX
+#elif platOS == OS_LINUX
             pthread_yield();
 #else
 #error "Oops"
