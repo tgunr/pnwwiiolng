@@ -51,8 +51,8 @@
 
 #endif // VS_2005
 
-#define   swprintf   _snwprintf
-#define	  vswprintf	 _vsnwprintf
+#define   swprintf   swprintf_s
+#define	  vswprintf	 vswprintf_s
 
 #if _MSC_VER < 1800 // visual studio 2013 defines this in stdlib.h
 static inline unsigned long long strtoull(const char* const src_, const char* const, unsigned int)
