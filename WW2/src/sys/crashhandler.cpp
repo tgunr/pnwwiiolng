@@ -536,8 +536,6 @@ void InstallCrashHandler()
 	// preferably using GetProcAddress() to call the newer routine instead when available.
 	wchar_t *basePath = nullptr;
 	HRESULT result = SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_SIMPLE_IDLIST | KF_FLAG_CREATE, nullptr, &basePath);
-	//wchar_t *basePath = CoTaskMemAlloc(MAX_PATH);
-	//HRESULT res = SHGetFolderPath(nullptr, CSIDL_APPDATA | CSIDL_FLAG_CREATE, nullptr, SHGFP_TYPE_CURRENT, basePath);
 
 	if (SUCCEEDED(result)) {
 		std::wstring dataPath(basePath);
@@ -548,7 +546,12 @@ void InstallCrashHandler()
 		// find path the same way the rest of the app does, once the rest of the app doesn't
 		// do it completely wrong. Don't forget that mngopt and fio must be initialized before
 		// using fioCfg*() calls, so this code may have to be moved to WinMainX().
-		dataPath += L"\\Playnet\\World War II Online\\Crash Logs";  // PathAppend() has buffer overflow, PathCchAppendEx() is Win8+
+		// This loop recursively ensures the existence of the directories along the chosen path, such as it is.
+		for (const std::wstring &component : std::vector<std::wstring>{ L"Playnet", L"World War II Online", L"Crash Logs" }) {
+			dataPath += L"\\" + component;
+			CreateDirectory(dataPath.c_str(), nullptr); // we don't care if this fails
+		}
+		//dataPath += L"\\Playnet\\World War II Online\\Crash Logs";
 
 		// Allocate the context for the crash handler.
 		gCrashContext = std::make_unique<CrashHandlerContext>();
