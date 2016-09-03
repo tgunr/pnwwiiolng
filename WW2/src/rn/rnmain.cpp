@@ -238,12 +238,6 @@ static LOGICAL SetupVariables(void)
 		return(FALSE);
 	}
 
-    // Temp for now until added to configuration
-#if platOS != OS_MACOS
-	OS_MKDIR(PREPATH);
-	fiodSetPrepath(PREPATH);
-#endif
-
 	rnlogoInit();
 
 	piSetAmbLight(piRGBA_MAKE(51, 51, 51, 255));
