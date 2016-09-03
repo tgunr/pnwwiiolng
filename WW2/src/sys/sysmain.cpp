@@ -221,7 +221,7 @@ void GetFileVersion(const TCHAR** ppFFI)
 			break;
 		}
 
-		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), (LPVOID*)ptranslate->wLanguage, (PUINT)ptranslate->wCodePage);
+		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), ptranslate->wLanguage, ptranslate->wCodePage);
 		if (!VerQueryValue(pVersion, txt, (LPVOID*)&pFFI, (PUINT)&Len))
 		{
 			Write_Debug("Problem with VerQueryValue");
@@ -522,7 +522,7 @@ struct LANGANDCODEPAGE
 			break;
 		}
 
-		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), (LPVOID*)ptranslate->wLanguage, (PUINT)ptranslate->wCodePage);
+		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), ptranslate->wLanguage, ptranslate->wCodePage);
 		if (!VerQueryValue(pVersion, txt, (LPVOID*)&pFFI, (PUINT)&Len))
 		{
 			Write_Debug("Problem with VerQueryValue");
@@ -534,7 +534,7 @@ struct LANGANDCODEPAGE
 			cpuspeed = (UINT32)GetCPUSpeed();
 		}
 
-		usprintf(txt, 511, _T("Product: %s\r\nVersion: %s\r\Commit: %s"), filename, pFFI, WWII::gitCommitStr);
+		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs"), filename, pFFI, WWII::gitCommitStr);
 		Write_Debug(UTF8(txt));
 
 		GlobalMemoryStatus(&memstat);
