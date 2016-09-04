@@ -159,6 +159,21 @@ static std::wstring GenerateRandomString()
 	return result;
 }
 
+// Quickie util to encapsulate crash-safe path building, since std::wstring et al can allocate memory
+template <size_t N>
+static void crash_mkpath(wchar_t(&dest)[N], const wchar_t *base, ...) // __attribute__((sentinel))
+{
+	const wchar_t *piece = nullptr;
+	va_list args;
+	va_start(args, base);
+	wcsncpy_s(dest, base, _TRUNCATE);
+	wcsncat_s(dest, L"\\", _TRUNCATE);
+	while ((piece = va_arg(args, const wchar_t *)) != nullptr) {
+		wcsncat_s(dest, piece, _TRUNCATE);
+	}
+	va_end(args);
+}
+
 #pragma endregion
 //////////////////////////////////////////////////////////////////////////////
 
@@ -213,18 +228,8 @@ static void crash_wdprintf(int fd, const wchar_t * const format, ...)
 	va_end(args);
 }
 
-// Quickie util to encapsulate crash-safe path building, since std::wstring et al can allocate memory
-template <size_t N>
-static void crash_mkpath(wchar_t(&dest)[N], const wchar_t *base, ...) // __attribute__((sentinel))
 {
-	const wchar_t *piece = nullptr;
 	va_list args;
-	va_start(args, base);
-	wcsncpy_s(dest, base, _TRUNCATE);
-	wcsncat_s(dest, L"\\", _TRUNCATE);
-	while ((piece = va_arg(args, const wchar_t *)) != nullptr) {
-		wcsncat_s(dest, piece, _TRUNCATE);
-	}
 	va_end(args);
 }
 
