@@ -13,6 +13,7 @@
 
 #ifdef EVENT_LOG
 
+static std::mutex logLock;
 #ifdef DEBUG_WW2
 static UINT32 logMask = LOG_ALL;
 static SINT32 logLevel = LOG_INFO;
@@ -61,10 +62,13 @@ void Write_Log(UINT32 system, SINT32 level, const char* str, ...)
 
 void Enable_Log(UINT32 system, LOGICAL enable)
 {
-	if(enable)
+	std::lock_guard<std::mutex> guard(logLock);
+
+	if (enable) {
 		logMask |= system;
-	else
+	} else {
 		logMask &= ~system;
+	}
 }
 
 /************************************************************************************************
@@ -73,6 +77,8 @@ void Enable_Log(UINT32 system, LOGICAL enable)
 
 void Set_Log_Level(SINT32 level)
 {
+	std::lock_guard<std::mutex> guard(logLock);
+
 	logLevel = level;
 }
 
@@ -170,8 +176,7 @@ void Close_Debug(void)
 
 #include "include/vars.h"
 
-static char					ofn[_MAX_PATH];
-static FILE*				ofp = nullptr;
+static FILE *ofp = nullptr;
 
 /************************************************************************************************
 	Open_Debug
@@ -179,24 +184,24 @@ static FILE*				ofp = nullptr;
 
 LOGICAL Open_Debug(const char* filename)
 {
-	if (filename == nullptr)
-		return(FALSE);
+	if (filename == nullptr) {
+		return false;
+	}
 
-	ofp = stderr;
-/*	strcpy(ofn, filename);
-#ifdef _DEBUG
-	strcat(ofn, "_Debug");
-#endif
-	strcat(ofn, ".log");
+	{
+		std::lock_guard<std::mutex> guard(logLock);
 
-	ofp = fioUserFile(ofn, "w");
-*/
-	if ( ofp == nullptr )
-		return FALSE;
+		if (ofp != nullptr) {
+			return true;
+		}
+		ofp = fioUserFile((std::string(filename) + ".log").c_str(), "w");
+		if (ofp == nullptr) {
+			return false;
+		}
+	}
 
 	Write_Debug("\r\nDebug Message System Open.\r\n");
-
-	return TRUE;
+	return true;
 }
 
 /************************************************************************************************
@@ -205,9 +210,12 @@ LOGICAL Open_Debug(const char* filename)
 
 void Close_Debug(void)
 {
-	if ( ofp != nullptr )
+	std::lock_guard<std::mutex> guard(logLock);
+
+	if (ofp != nullptr) {
 		fclose(ofp);
-	ofp = nullptr;
+		ofp = nullptr;
+	}
 }
 
 /************************************************************************************************
@@ -216,23 +224,33 @@ void Close_Debug(void)
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 {
-#ifdef DEBUG_WW2
-	if(logLevel < level || !(system & logMask) || str == nullptr) return;
-	if ( ofp == nullptr )
-	{
-		vprintf_s(str, marker);
-		printf_s("\n");
-	}
-	else
-	{
-		char buf[256] = {0};
+	std::lock_guard<std::mutex> guard(logLock);
 
-		strprintf(buf, str, marker);
-		OutputDebugStringA(buf);
-		OutputDebugStringA("\r\n");
-		vfprintf_s(ofp, str, marker);
+	if (logLevel < level || (system & logMask) == 0 || str == nullptr) {
+		return;
 	}
+
+	// There's no OutputDebugFormat(), so we fake vasprintf()
+	size_t len = static_cast<size_t>(_vscprintf(str, marker));
+	if (len >= INT_MAX) { return; }
+	std::unique_ptr<char[]> buf = std::make_unique<char[]>(len + 1);
+	vsnprintf_s(buf.get(), len + 1, _TRUNCATE, str, marker);
+
+#ifdef DEBUG_WW2
+	// Output to debugger always
+	OutputDebugStringA(buf.get());
+	OutputDebugStringA("\r\n");
+
+	// Output to stderr always
+	fprintf_s(stderr, "%s\n", buf.get());
+	fflush(stderr);
 #endif
+
+	// Output to file, if any
+	if (ofp != nullptr) {
+		fprintf_s(ofp, "%s\n", buf.get());
+		fflush(ofp);
+	}
 }
 
 #endif // OS_WIN32
