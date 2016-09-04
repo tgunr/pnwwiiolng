@@ -178,12 +178,13 @@ static void crash_mkpath(wchar_t(&dest)[N], const wchar_t *base, ...) // __attri
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
-// Logging utilities
+// Formatting Utilities
 //
-// These logging utilities really should be crash-time only, but unfortunately we can't rely on
-// the dbug system etc. to be set up properly yet so instead these very limited utilities are used
-// during crash processing as well.
-#pragma region Logging Utilities
+// At crash time it is not safe to use any of the usual standard library routines for dealing
+// with strings easily, such as swprintf_s(). But using them is extremely convenient and makes
+// the code much more readable. So these are simple, minimalistic implementations of
+// printf()-like routines.
+#pragma region Formatting Utilities
 
 static void crash_write_str(int fd, const wchar_t *s) { _write(fd, s, wcslen(s) * sizeof(wchar_t)); }
 
@@ -233,6 +234,15 @@ static void crash_wdprintf(int fd, const wchar_t * const format, ...)
 	va_end(args);
 }
 
+#pragma endregion
+
+//////////////////////////////////////////////////////////////////////////////
+// Logging utilities
+//
+// These logging utilities really should be crash-time only, but unfortunately we can't rely on
+// the dbug system etc. to be set up properly yet so instead these very limited utilities are used
+// during crash processing as well.
+#pragma region Logging Utilities
 // Can't rely on the normal logging subsystem at crash time
 // TODO: Integrate this with a future improvement on dbugLog() so we don't end up with
 //       yet ANOTHER random logging system floating around disconnected from all the rest.
