@@ -449,7 +449,7 @@ static bool CrashReportingCallback(
 		crash_wdprintf(fd, L"OS: Windows %s (%s)\n", context->windowsVersion.c_str(), context->windowsBuild.c_str());
 		crash_wdprintf(fd, L"Manufacturer: %s\n", context->machineManufacturer);
 		crash_wdprintf(fd, L"Model: %s\n", context->machineModel);
-		crash_wdprintf(fd, L"Date: %U\n", static_cast<uint64_t>(time(nullptr)));
+		crash_wdprintf(fd, L"Date: %U\n", static_cast<uint64_t>(_time64(nullptr)));
 		crash_wdprintf(fd, L"CrashReporter Key: %s\n", L"00000000-0000-0000-000000000000"); // TODO: Get a real device ID, MS provides one in the API somewhere
 		crash_wdprintf(fd, L"\n");
 		crash_wdprintf(fd, L"MinidumpContainer");
