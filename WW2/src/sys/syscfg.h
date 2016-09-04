@@ -15,7 +15,6 @@
 #define _GDI32_
 
 #define NO_DEBUG_WRITE
-#pragma warning (disable: 4800) // shut the #$!@ up
 
 #include "include/platforms.h"
 
