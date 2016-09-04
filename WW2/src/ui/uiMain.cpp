@@ -1741,13 +1741,6 @@ static size_t fioFileSizeCallback(const char* name)
 
 static int cfgOpenCallback(const char* name)
 {
-#if platOS == OS_MACOS
-
-  if ( strcmp("file:///etc/xml/catalog", name)==0) // suddenly mac tries to open this - missing .dtd?
-  {
-	return -1;
-  }
-#endif
 	std::string path = munge_filename(name);
 	int fd = fiocfgOpen(path.c_str(), true);
 	return fd;
