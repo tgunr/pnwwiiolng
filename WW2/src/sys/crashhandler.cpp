@@ -404,11 +404,11 @@ static void PullMotherboardData(CrashHandlerContext &context)
 		SUCCEEDED(pLoc->ConnectServer(_bstr_t(L"ROOT\\CIMV2"), nullptr, nullptr, 0, 0, 0, 0, &pSvc)) &&
 		SUCCEEDED(CoSetProxyBlanket(pSvc, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, nullptr, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE)) &&
 		SUCCEEDED(pSvc->ExecQuery(bstr_t("WQL"), bstr_t("SELECT * FROM Win32_ComputerSystem"), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator1)) &&
-		SUCCEEDED(pEnumerator1->Next(WBEM_INFINITE, 1, &pclsObj1, &uReturn1)) && uReturn1 != WBEM_S_FALSE &&
+		SUCCEEDED(pEnumerator1->Next(WBEM_INFINITE, 1, &pclsObj1, &uReturn1)) && uReturn1 > 0 &&
 		SUCCEEDED(pclsObj1->Get(L"Manufacturer", 0, &vtManuProp, nullptr, nullptr)) &&
 		SUCCEEDED(pclsObj1->Get(L"Model", 0, &vtModelProp, nullptr, nullptr)) &&
 		SUCCEEDED(pSvc->ExecQuery(bstr_t("WQL"), bstr_t("SELECT * FROM Win32_OperatingSystem"), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator2)) &&
-		SUCCEEDED(pEnumerator2->Next(WBEM_INFINITE, 1, &pclsObj2, &uReturn2)) && uReturn2 != WBEM_S_FALSE &&
+		SUCCEEDED(pEnumerator2->Next(WBEM_INFINITE, 1, &pclsObj2, &uReturn2)) && uReturn2 > 0 &&
 		SUCCEEDED(pclsObj2->Get(L"Version", 0, &vtVersProp, nullptr, nullptr)) &&
 		SUCCEEDED(pclsObj2->Get(L"BuildNumber", 0, &vtBuildProp, nullptr, nullptr))
 	) {
