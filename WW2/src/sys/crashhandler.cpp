@@ -347,7 +347,7 @@ static bool AppendRequestFile(std::wstring &body, const std::wstring &boundary, 
 		return false;
 	}
 
-	std::wstring::size_type pos = path.find_last_of(L"/");
+	std::wstring::size_type pos = path.find_last_of(L"\\");
 	std::wstring filename;
 	if (pos == std::wstring::npos) { filename = path; }
 	else { filename = path.substr(pos + 1); }
