@@ -417,7 +417,7 @@ static void PullMotherboardData(CrashHandlerContext &context)
 		context.windowsVersion = vtVersProp.bstrVal;
 		context.windowsBuild = vtBuildProp.bstrVal;
 	} else {
-		crash_log(L"Note: Failed grabbing the machine's data");
+		crash_log(L"Note: Failed grabbing the machine's data\n");
 	}
 }
 
@@ -454,7 +454,7 @@ static bool CrashReportingCallback(
 		crash_wdprintf(fd, L"\n");
 		crash_wdprintf(fd, L"MinidumpContainer");
 	} else {
-		crash_log(L"Warning: Failed to create container at %s", pathBuffer);
+		crash_log(L"Warning: Failed to create container at %s\n", pathBuffer);
 	}
 
 	crash_mkpath(pathBuffer, dumpPath, minidumpID, L".dmp.metadata");
@@ -465,7 +465,7 @@ static bool CrashReportingCallback(
 		crash_wdprintf(fd, L"contact=%s\n", L"");
 		crash_wdprintf(fd, L"description=%s\n", L"");
 	} else {
-		crash_log(L"Warning: Failed to create metadata file at %s", pathBuffer);
+		crash_log(L"Warning: Failed to create metadata file at %s\n", pathBuffer);
 	}
 
 	return false; // Pass it on to the OS (otherwise user won't see anything at all)
@@ -645,7 +645,7 @@ void InstallCrashHandler()
 			gCrashContext.get(), // Callback context (pull the raw pointer)
 			google_breakpad::ExceptionHandler::HANDLER_ALL // Handler types (we want all types)
 		));
-		crash_log(L"Installed Breakpad exception handler, now trapping crashes. Log path is %S\n", dataPath.c_str());
+		crash_log(L"Installed Breakpad exception handler, now trapping crashes. Log path is %s\n", dataPath.c_str());
 
 		ProcessExistingReports(dataPath);
 	}
