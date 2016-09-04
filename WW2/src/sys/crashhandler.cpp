@@ -331,7 +331,7 @@ static bool AppendRequestFile(std::wstring &body, const std::wstring &boundary, 
 {
 	std::ifstream f(path, std::ios::binary);
 
-	if (f.bad()) {
+	if (f.fail()) {
 		crash_log(L"Failed to open path %s, can't send this crash log\n", path.c_str());
 		return false;
 	}
@@ -342,7 +342,7 @@ static bool AppendRequestFile(std::wstring &body, const std::wstring &boundary, 
 	std::unique_ptr<char[]> data = std::make_unique<char[]>(len);
 	f.read(data.get(), len);
 
-	if (f.bad() || !f.eof()) {
+	if (f.fail()) {
 		crash_log(L"Failed to read from %s, can't send this crash log\n", path.c_str());
 		return false;
 	}
