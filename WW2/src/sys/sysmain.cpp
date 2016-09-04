@@ -941,6 +941,14 @@ int		screenmode;
 	// look up the product region (us/china)
 	_lookupProductRegion();
 
+	// Pull in the commandline arguments early so that builds
+	// which rely upon a DataPath being set will have it for
+	// use in cfgPrefsLoad().
+	if (!mngoptParse(""))
+	{
+		return(0);
+	}
+
 	// we then try to load wwiiol.xml variables
 	// eventually this call will replace the above call
 	if(!cfgPrefsLoad())
@@ -950,6 +958,8 @@ int		screenmode;
 
 	// This call* must* follow the call to cfgLoadGlobals
 	// Command line options always override configuration file values
+	// But since we needed to parse these above also, the eaiest way
+	// around the chicken-and-egg problem is to just do this twice.
 	if (!mngoptParse(""))
 	{
 		return(0);
