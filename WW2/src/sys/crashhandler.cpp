@@ -186,38 +186,80 @@ static void crash_mkpath(wchar_t(&dest)[N], const wchar_t *base, ...) // __attri
 // printf()-like routines.
 #pragma region Formatting Utilities
 
-static void crash_write_str(int fd, const wchar_t *s) { _write(fd, s, wcslen(s) * sizeof(wchar_t)); }
-
+static void crash_write_raw(int fd, bool wide, const wchar_t *s, size_t n);
+static void crash_write_str(int fd, bool wide, const wchar_t *s);
 template <typename T, typename = typename std::enable_if<std::is_integral<T>::value>::type>
-static void crash_write_int(int fd, T l, unsigned int base)
+static void crash_write_int(int fd, bool wide, T l, unsigned int base);
+static void crash_wdprintfv(int fd, bool wide, const wchar_t * const format, va_list args);
+static void crash_wdprintf(int fd, const wchar_t * const format, ...);
+static void crash_dprintf(int fd, const wchar_t * const format, ...);
+
+static void crash_write_raw(int fd, bool wide, const wchar_t *s, size_t n)
 {
-	wchar_t buf[64] = { 0 }, *bptr = &buf[64]; // enough to hold a 64-bit value and then some
-	if (l == 0) { crash_write_str(fd, L"0"); }
-	else if (std::is_signed<T>::value && l < 0) { crash_write_str(fd, L"-"); l = static_cast<T>(-static_cast<std::make_signed<T>::type>(l)); }
-	for (; l && bptr >= &buf[0]; l /= base, --bptr) { *bptr = L"0123456789abcdef"[l % base]; }
-	crash_write_str(fd, bptr);
+	if (wide) {
+		// Wide output requested. Write the bytes out directly without interpretation.
+		_write(fd, s, n * sizeof(wchar_t));
+	} else {
+		// Output to an ASCII descriptor requested.
+		//
+		// Since it's unsafe to rely on std::codecvt<> or wcstomb() at crash-time due to use of global
+		// state and possible allocation), we do a "poor man's" version here, displaying ASCII characters
+		// as-is and fudging anything else as raw bytes. (Anything else would be major overkill.)
+		for (size_t i = 0; i < n; ++i) {
+			if (s[i] < 0x007f) {
+				_write(fd, &s[i], 1); // EXTREMELY INEFFICIENT, but simple and works.
+			} else {
+				// Actually, this is even less efficient than the other, it'll call right back into here.
+				crash_wdprintf(fd, L"\\x{%x}", static_cast<unsigned int>(s[i]));
+			}
+		}
+	}
+}
+
+static void crash_write_str(int fd, bool wide, const wchar_t *s)
+{
+	crash_write_raw(fd, wide, s, wcslen(s));
+}
+
+template <typename T, typename>
+static void crash_write_int(int fd, bool wide, T l, unsigned int base)
+{
+	wchar_t buf[64] = { 0 };
+	wchar_t *bptr = &buf[62];
+
+	if (l == 0) {
+		crash_write_raw(fd, wide, L"0", 1);
+	} else if (std::is_signed<T>::value && l < 0) {
+		crash_write_raw(fd, wide, L"-", 1);
+		l = static_cast<T>(-static_cast<std::make_signed<T>::type>(l));
+	}
+	for (; l && bptr >= &buf[0]; l /= base, --bptr) {
+		*bptr = L"0123456789abcdef"[l % base];
+	}
+	crash_write_str(fd, wide, bptr + 1);
 }
 
 // A quickie version of printf that can only do very basic formats.
-static void crash_wdprintfv(int fd, const wchar_t * const format, va_list args)
+static void crash_wdprintfv(int fd, bool wide, const wchar_t * const format, va_list args)
 {
 	const wchar_t *ptr = format;
 	while (ptr && *ptr) {
 		if (*ptr++ == L'%') {
-			if (!*ptr) { crash_write_str(fd, L"%");  break; }
+			if (!*ptr) { crash_write_raw(fd, wide, L"%", 1);  break; }
 			switch (*ptr++) {
-			case L's': crash_write_str(fd, va_arg(args, const wchar_t *)); break;
-			case L'x': crash_write_int(fd, va_arg(args, uint32_t), 16); break;
-			case L'u': crash_write_int(fd, va_arg(args, uint32_t), 10); break;
-			case L'd': crash_write_int(fd, va_arg(args, int32_t), 10); break;
-			case L'X': crash_write_int(fd, va_arg(args, unsigned long), 16); break; // NON-STANDARD printf() FORMAT
-			case L'U': crash_write_int(fd, va_arg(args, unsigned long), 10); break; // NON-STANDARD printf() FORMAT
-			case L'D': crash_write_int(fd, va_arg(args, long), 10); break;  // NON-STANDARD printf() FORMAT
-			case L'%': crash_write_str(fd, L"%"); break;
-			default: _write(fd, ptr - 2, sizeof(wchar_t) * 2); break;
+				case L's': crash_write_str(fd, wide, va_arg(args, const wchar_t *)); break;
+				case L'x': crash_write_int(fd, wide, va_arg(args, uint32_t), 16); break;
+				case L'u': crash_write_int(fd, wide, va_arg(args, uint32_t), 10); break;
+				case L'd': crash_write_int(fd, wide, va_arg(args, int32_t), 10); break;
+				case L'X': crash_write_int(fd, wide, va_arg(args, uint64_t), 16); break; // Not a standard printf() format
+				case L'U': crash_write_int(fd, wide, va_arg(args, uint64_t), 10); break; // Not a standard printf() format
+				case L'D': crash_write_int(fd, wide, va_arg(args, int64_t), 10); break; // Not a standard printf() format
+				case L'%': crash_write_raw(fd, wide, L"%", 1); break;
+				default: crash_write_raw(fd, wide, ptr - 2, 2); break;
 			}
+		} else {
+			crash_write_raw(fd, wide, ptr - 1, 1);
 		}
-		else { _write(fd, ptr - 1, sizeof(wchar_t)); }
 	}
 }
 
@@ -225,12 +267,15 @@ static void crash_wdprintf(int fd, const wchar_t * const format, ...)
 {
 	va_list args;
 	va_start(args, format);
-	crash_wdprintfv(fd, format, args);
+	crash_wdprintfv(fd, true, format, args);
 	va_end(args);
 }
 
+static void crash_dprintf(int fd, const wchar_t * const format, ...)
 {
 	va_list args;
+	va_start(args, format);
+	crash_wdprintfv(fd, false, format, args);
 	va_end(args);
 }
 
@@ -243,20 +288,26 @@ static void crash_wdprintf(int fd, const wchar_t * const format, ...)
 // the dbug system etc. to be set up properly yet so instead these very limited utilities are used
 // during crash processing as well.
 #pragma region Logging Utilities
+
+#ifdef DEBUG_WW2
+
 // Can't rely on the normal logging subsystem at crash time
 // TODO: Integrate this with a future improvement on dbugLog() so we don't end up with
 //       yet ANOTHER random logging system floating around disconnected from all the rest.
-#ifdef DEBUG_WW2
 static void crash_log(const wchar_t * const format, ...)
 {
 	va_list args;
 	va_start(args, format);
-	crash_write_str(_fileno(stderr), L"Crash handler: ");
-	crash_wdprintfv(_fileno(stderr), format, args);
+	crash_dprintf(_fileno(stderr), L"Crash handler: ");
+	crash_wdprintfv(_fileno(stderr), false, format, args);
 	va_end(args);
 }
+
 #else
+
+// In release mode we don't log.
 #define crash_log(f, ...)
+
 #endif
 
 #pragma endregion
