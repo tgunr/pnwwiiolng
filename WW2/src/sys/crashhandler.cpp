@@ -327,7 +327,7 @@ static void AppendRequestParam(std::wstring &body, const std::wstring &boundary,
 	body += value + L"\r\n";
 }
 
-static bool AppendRequestFile(std::wstring &body, const std::wstring &boundary, const std::wstring &param, const std::wstring &path)
+static bool AppendRequestFile(std::wstring &body, const std::wstring &boundary, const std::wstring &param, const std::wstring &path, bool istext)
 {
 	std::ifstream f(path, std::ios::binary);
 
@@ -354,15 +354,21 @@ static bool AppendRequestFile(std::wstring &body, const std::wstring &boundary, 
 
 	body += L"--" + boundary + L"\r\n";
 	body += L"Content-Disposition: form-data; name=\"" + param + L"\"; filename=\"" + filename + L"\"\r\n";
-	body += L"Content-Type: application/octet-stream\r\n";
-	body += L"Content-Transfer-Encoding: base64\r\n";
+	body += L"Content-Type: " + std::wstring(istext ? L"text/plain" : L"application/octet-stream") + L"\r\n";
+	if (!istext) { body += L"Content-Transfer-Encoding: base64\r\n"; }
 	body += L"\r\n";
 
-	DWORD codedLength = 0;
-	CryptBinaryToString(reinterpret_cast<BYTE *>(data.get()), len, CRYPT_STRING_BASE64, nullptr, &codedLength);
-	body += L"Content-Length: " + std::to_wstring(codedLength) + L"\r\n";
-	body.resize(body.length() + codedLength);
-	CryptBinaryToString(reinterpret_cast<BYTE *>(data.get()), len, CRYPT_STRING_BASE64, &body[body.length() - codedLength], &codedLength);
+	if (istext) {
+		body += std::wstring(reinterpret_cast<const wchar_t *>(data.get()), len >> 1);
+	} else {
+		DWORD codedLength = 0;
+		CryptBinaryToString(reinterpret_cast<BYTE *>(data.get()), len, CRYPT_STRING_BASE64, nullptr, &codedLength);
+		body += L"Content-Length: " + std::to_wstring(codedLength) + L"\r\n";
+		body.resize(body.length() + codedLength);
+		CryptBinaryToString(reinterpret_cast<BYTE *>(data.get()), len, CRYPT_STRING_BASE64, &body[body.length() - codedLength], &codedLength);
+	}
+	body += L"\r\n";
+
 	return true;
 }
 
@@ -504,10 +510,10 @@ static void SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 	std::wstring multipartBoundary = GenerateRandomString<24>();
 	std::wstring contentTypeHeader = L"Content-Type: multipart/form-data; boundary=" + multipartBoundary + L"\r\n";
 	std::wstring requestBody;
-	if (!AppendRequestFile(requestBody, multipartBoundary, L"log", report + L".container")) {
+	if (!AppendRequestFile(requestBody, multipartBoundary, L"log", report + L".container", true)) {
 		return;
 	}
-	if (!AppendRequestFile(requestBody, multipartBoundary, L"attachment0", report)) {
+	if (!AppendRequestFile(requestBody, multipartBoundary, L"attachment0", report, false)) {
 		return;
 	}
 	AppendRequestParam(requestBody, multipartBoundary, L"description", L""); // TODO fill these in from .metadata
