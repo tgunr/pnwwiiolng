@@ -907,6 +907,13 @@ int		screenmode;
 #endif
 
 #ifdef BETA_RELEASE
+	if (OpenConsole)
+	{
+		AllocConsole();
+		freopen("CONOUT$", "wb", stdout);
+		freopen("CONOUT$", "wb", stderr);
+	}
+
 	LogEnabled = TRUE;
 	UserLogEnabled = WantedUserLogEnabled;
 	Open_Debug(SYS_TITLE);
@@ -984,13 +991,6 @@ int		screenmode;
 	AddArchives();
 #endif // FRES
 #else
-
-	if(OpenConsole)
-	{
-		AllocConsole();
-		freopen( "CONOUT$", "wb", stdout);
-		freopen( "CONOUT$", "wb", stderr);
-	}
 
 	if(WantDataDir)
 	{
