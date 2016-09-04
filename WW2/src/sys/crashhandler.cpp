@@ -585,8 +585,8 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 		if (fileInfo.cFileName[0] == L'.') {
 			continue;
 		}
-		if ((fileInfo.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) != 0 && ends_with(fileInfo.cFileName, L".dmp")) {
-			possiblyValidReports.push_back(fileInfo.cFileName);
+		if (ends_with(fileInfo.cFileName, L".dmp")) {
+			possiblyValidReports.push_back(dataPath + std::wstring(L"\\") + fileInfo.cFileName);
 		}
 	} while (FindNextFile(hFile, &fileInfo));
 	FindClose(hFile);
