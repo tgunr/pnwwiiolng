@@ -550,7 +550,7 @@ static void _getSystemDetails(char* into, size_t sizeofInto)
 	sysregGetHKeyDword(HKEY_LOCAL_MACHINE, HKLM_CPU0, _T("~Mhz"), &cpuMhz);
 	sysregGetHKeyDword(HKEY_LOCAL_MACHINE, HKLM_CPU0, _T("FeatureSet"), &cpuFlags);
 
-	snprintf(into, sizeofInto - 1, "Win %u %x %u %s", sysInfo.dwNumberOfProcessors, cpuFlags, cpuMhz, UTF8(cpuName));
+	sprintf_s(into, sizeofInto, "Win %u %x %u %s", sysInfo.dwNumberOfProcessors, cpuFlags, cpuMhz, UTF8(cpuName));
 
 	///TODO: Would be /really/ nice to add total memory and graphics card data.
 #elif platOS == OS_MACOS
@@ -564,8 +564,6 @@ static void _getSystemDetails(char* into, size_t sizeofInto)
 #else
 	strlcpy(into, "Linux <unimplemented>", sizeofInto);
 #endif
-	// snprintf doesn't guarantee a null terminator
-	into[sizeofInto - 1] = 0;
 }
 
 
