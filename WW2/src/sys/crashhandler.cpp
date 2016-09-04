@@ -441,7 +441,7 @@ static bool CrashReportingCallback(
 	wchar_t pathBuffer[MAX_PATH] = { 0 };
 	FD fd;
 
-	crash_mkpath(pathBuffer, dumpPath, minidumpID, L".dmp.container");
+	crash_mkpath(pathBuffer, dumpPath, minidumpID, L".dmp.container", nullptr);
 	if (fd._wsopen_s(pathBuffer, _O_WRONLY | _O_CREAT | _O_EXCL | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE)) {
 		// Write out the container format HockeyApp's custom upload API expects
 		crash_wdprintf(fd, L"Package: com.playnet.wwiiol\n"); // TODO: Hardcoding the macOS client's bundle ID is probably not quite right
@@ -457,7 +457,7 @@ static bool CrashReportingCallback(
 		crash_log(L"Warning: Failed to create container at %s\n", pathBuffer);
 	}
 
-	crash_mkpath(pathBuffer, dumpPath, minidumpID, L".dmp.metadata");
+	crash_mkpath(pathBuffer, dumpPath, minidumpID, L".dmp.metadata", nullptr);
 	if (fd._wsopen_s(pathBuffer, _O_WRONLY | _O_CREAT | _O_EXCL | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE)) {
 		// TODO: Write out stuff like player ID, callsign, etc.
 		crash_wdprintf(fd, L"userId=%s\n", L"");
