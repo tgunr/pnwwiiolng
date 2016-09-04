@@ -609,6 +609,16 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 
 void InstallCrashHandler()
 {
+#ifdef DEBUG_WW2
+	// Normally this will be done by WinMain() if WantedConsole is set, but for the crash
+	// handler's logging system, that happens too late. If WantedConsole was set,
+	// AllocConsole() will fail harmlessly later. In non-debug builds, the logging from the
+	// crash handler will never be interesting or desired.
+	AllocConsole();
+	freopen("CONOUT$", "wb", stdout);
+	freopen("CONOUT$", "wb", stderr);
+#endif
+
 	// Note: SHGetKnownFolderPath() is not available before Vista. If XP support is ever added
 	// back in, this will need to be replaced with the SHGetFolderPath() call shown below,
 	// preferably using GetProcAddress() to call the newer routine instead when available.
