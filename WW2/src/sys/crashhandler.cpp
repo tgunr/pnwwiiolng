@@ -6,22 +6,6 @@
 #ifdef CRASH_HANDLER
 
 //////////////////////////////////////////////////////////////////////////////
-// Configuration
-//
-// These are things we might tweak - note that because this is a really cheap implementation, we
-// separate out all the URL components (like http:// vs https://) with individual vars here.
-#pragma region Configuration
-
-static const std::wstring HockeyApp_appIkey = L"97d81f56ff22d04ccdbc1a0d537e81c0";
-static const bool HockeyApp_SSL = true;
-static const std::wstring HockeyApp_serverName = L"sdk.hockeyapp.net";
-static const std::wstring HockeyApp_apiPath = L"/api/2/apps/" + HockeyApp_appIkey + L"/crashes/upload";
-static const std::wstring HockeyApp_userAgent = L"HockeySDK/0.1 (Windows custom)";
-
-#pragma endregion
-//////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////
 // Includes
 //
 // All the various includes that are not needed if the CRASH_HANDLER flag is disabled - that's
@@ -44,6 +28,23 @@ static const std::wstring HockeyApp_userAgent = L"HockeySDK/0.1 (Windows custom)
 #include "versionNo.h"
 #include "client_revision.h"
 #include "client/windows/handler/exception_handler.h"
+
+#pragma endregion
+//////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////
+// Configuration
+//
+// These are things we might tweak - note that because this is a really cheap implementation, we
+// separate out all the URL components (like http:// vs https://) with individual vars here.
+#pragma region Configuration
+
+static const std::wstring HockeyApp_appIkey = L"11c7ac3fb886457eb6f56b266ff52ba3";
+static const INTERNET_PORT HockeyApp_serverPort = INTERNET_DEFAULT_HTTPS_PORT;
+static const bool HockeyApp_SSL = true;
+static const std::wstring HockeyApp_serverName = L"sdk.hockeyapp.net";
+static const std::wstring HockeyApp_apiPath = L"/api/2/apps/" + HockeyApp_appIkey + L"/crashes/upload";
+static const std::wstring HockeyApp_userAgent = L"HockeySDK/0.1 (Windows custom)";
 
 #pragma endregion
 //////////////////////////////////////////////////////////////////////////////
