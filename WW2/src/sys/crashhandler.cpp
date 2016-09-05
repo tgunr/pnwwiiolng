@@ -103,6 +103,21 @@ struct unique_HINTERNET { // unique_ptr requires the base type and HINTERNET doe
 	explicit operator bool() const { return h != nullptr; }
 	void reset(HINTERNET p = nullptr) { if (h) { InternetCloseHandle(h); } h = p; }
 };
+
+// Winreg RAII helper
+struct unique_HKEY {
+	HKEY h;
+	unique_HKEY() : h(nullptr) {}
+	unique_HKEY(HKEY h_) : h(h_) {}
+	unique_HKEY(const unique_HKEY &) = delete;
+	unique_HKEY &operator=(const unique_HKEY &) = delete;
+	~unique_HKEY() { if (h) { RegCloseKey(h); } }
+	operator HKEY() const { return h; }
+	explicit operator bool() const { return h != nullptr; }
+	void reset(HKEY p = nullptr) { if (h) { RegCloseKey(h); } h = p; }
+	HKEY *operator&() { reset(nullptr); return &h; }
+};
+
 #pragma endregion
 //////////////////////////////////////////////////////////////////////////////
 
@@ -118,6 +133,7 @@ struct unique_HINTERNET { // unique_ptr requires the base type and HINTERNET doe
 struct CrashHandlerContext
 {
 	std::unique_ptr<google_breakpad::ExceptionHandler> crashHandler;
+	std::wstring installationId;
 	std::wstring machineModel; // All that WMI stuff is DEFINITELY not crash-safe, but std::wstring::c_str() is
 	std::wstring machineManufacturer; // All that WMI stuff is DEFINITELY not crash-safe, but std::wstring::c_str() is
 	std::wstring windowsVersion; // All that WMI stuff is DEFINITELY not crash-safe, but std::wstring::c_str() is
@@ -423,6 +439,54 @@ static void PullMotherboardData(CrashHandlerContext &context)
 	}
 }
 
+static void GenerateOrLoadInstallationId(CrashHandlerContext &context)
+{
+	context.installationId = L"00000000-0000-0000-0000-000000000000";
+
+	// Not using the functions in sys/sysreg.cpp because they're dangerously outdated
+	LSTATUS result = ERROR_SUCCESS;
+	unique_HKEY key;
+	DWORD valueLength = 0;
+
+	result = RegCreateKeyEx(HKEY_CURRENT_USER, L"SOFTWARE\\Playnet\\WWIIOL\\Config", 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &key, nullptr);
+	if (result != ERROR_SUCCESS) {
+		crash_log(L"Failed to open registry key for installation GUID, using none\n");
+		return;
+	}
+
+	result = RegQueryValueEx(key, L"InstallationGuid", nullptr, nullptr, nullptr, &valueLength);
+	if (result == ERROR_FILE_NOT_FOUND) {
+		GUID newId;
+		wchar_t buffer[48] = {0};
+
+		crash_log(L"No registry value for this installation. Creating new GUID.\n");
+		CoCreateGuid(&newId);
+		_snwprintf_s(buffer, _TRUNCATE, L"%08X-%04hX-%04hX-%04hX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
+			newId.Data1, newId.Data2, newId.Data3, (newId.Data4[0] << 8) | newId.Data4[1],
+			newId.Data4[2], newId.Data4[3], newId.Data4[4], newId.Data4[5], newId.Data4[6], newId.Data4[7]
+		);
+		result = RegSetValueEx(key, L"InstallationGuid", 0, REG_SZ, reinterpret_cast<BYTE *>(&buffer[0]), wcslen(buffer) * sizeof(wchar_t) + 1);
+		if (result == ERROR_SUCCESS) {
+			context.installationId = buffer;
+		} else {
+			crash_log(L"Failed to save new installation GUID to registry, not using\n");
+		}
+		return;
+	} else if (result != ERROR_SUCCESS) {
+		crash_log(L"Failed to get installation GUID key, using none\n");
+		return;
+	}
+
+	std::unique_ptr<wchar_t[]> data = std::make_unique<wchar_t[]>(valueLength + 1); // This will overestimate because length is in bytes
+
+	result = RegQueryValueEx(key, L"InstallationGuid", nullptr, nullptr, reinterpret_cast<BYTE *>(data.get()), &valueLength);
+	if (result != ERROR_SUCCESS) {
+		crash_log(L"Failed to get installation GUID key value, using none\n");
+		return;
+	}
+	context.installationId = data.get();
+}
+
 #pragma endregion
 //////////////////////////////////////////////////////////////////////////////
 
@@ -453,7 +517,7 @@ static bool CrashReportingCallback(
 		crash_wdprintf(fd, L"Manufacturer: %s\n", context->machineManufacturer);
 		crash_wdprintf(fd, L"Model: %s\n", context->machineModel);
 		crash_wdprintf(fd, L"Date: %U\n", static_cast<uint64_t>(_time64(nullptr)));
-		crash_wdprintf(fd, L"CrashReporter Key: %s\n", L"00000000-0000-0000-000000000000"); // TODO: Get a real device ID, MS provides one in the API somewhere
+		crash_wdprintf(fd, L"CrashReporter Key: %s\n", context->installationId.c_str());
 		crash_wdprintf(fd, L"\n");
 		crash_wdprintf(fd, L"MinidumpContainer");
 	} else {
@@ -696,8 +760,9 @@ void InstallCrashHandler()
 		// Allocate the context for the crash handler.
 		gCrashContext = std::make_unique<CrashHandlerContext>();
 
-		// Grab the Windows version and motherboard data now, since we won't be able to later.
+		// Grab the Windows version and motherboard data and installation ID now, since we won't be able to later.
 		PullMotherboardData(*gCrashContext);
+		GenerateOrLoadInstallationId(*gCrashContext);
 
 		// Breakpad is installed here. The check for "did crashes happen in the last run?" is elsewhere.
 		gCrashContext->crashHandler.reset(new google_breakpad::ExceptionHandler(
