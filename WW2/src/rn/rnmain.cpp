@@ -424,7 +424,6 @@ LOGICAL rnmainInit(void)
 
     uiSoundInit();
 	uiInit();
-	//cfgPrefsLoad(); // now called from sysmain > WinMain
 	dimainInit();
 
 #if platOS == OS_WIN32

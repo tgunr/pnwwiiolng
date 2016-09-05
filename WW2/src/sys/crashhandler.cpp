@@ -42,6 +42,7 @@ static const std::wstring HockeyApp_userAgent = L"HockeySDK/0.1 (Windows custom)
 #include <locale>
 #include <codecvt>
 #include "versionNo.h"
+#include "client_revision.h"
 #include "client/windows/handler/exception_handler.h"
 
 #pragma endregion
@@ -445,8 +446,9 @@ static bool CrashReportingCallback(
 	if (fd._wsopen_s(pathBuffer, _O_WRONLY | _O_CREAT | _O_EXCL | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE)) {
 		// Write out the container format HockeyApp's custom upload API expects
 		crash_wdprintf(fd, L"Package: com.playnet.wwiiol\n"); // TODO: Hardcoding the macOS client's bundle ID is probably not quite right
-		crash_wdprintf(fd, L"Version: " STRPRODUCTVER "\n");
-		crash_wdprintf(fd, L"OS: Windows %s (%s)\n", context->windowsVersion.c_str(), context->windowsBuild.c_str());
+		crash_wdprintf(fd, L"Version Code: " GIT_COMMIT_STR "\n");
+		crash_wdprintf(fd, L"Version Name: " STRPRODUCTVER "\n");
+		crash_wdprintf(fd, L"Windows: %s (%s)\n", context->windowsVersion.c_str(), context->windowsBuild.c_str());
 		crash_wdprintf(fd, L"Manufacturer: %s\n", context->machineManufacturer);
 		crash_wdprintf(fd, L"Model: %s\n", context->machineModel);
 		crash_wdprintf(fd, L"Date: %U\n", static_cast<uint64_t>(_time64(nullptr)));
