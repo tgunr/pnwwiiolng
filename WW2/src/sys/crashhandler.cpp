@@ -556,7 +556,7 @@ static bool SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 // call the report sender for each one.
 #pragma region Report Sender Thread
 
-static void SendExistingReports(const std::vector<std::wstring> reports)
+static void SendExistingReports(const std::vector<std::pair<std::wstring, FILETIME>> reports)
 {
 	unique_HINTERNET base = InternetOpen(HockeyApp_userAgent.c_str(), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 
@@ -565,14 +565,38 @@ static void SendExistingReports(const std::vector<std::wstring> reports)
 		return;
 	}
 
-	for (const std::wstring &report : reports) {
-		SendExistingReport(base, report);
+	// Note: This calculation is EXTREMELY EXTREMELY WRONG. THIS IS NOT SEVEN DAYS BY ANY
+	// STRETCH OF ANYONE'S IMAGINATION, nor is it intended to be representative of anything
+	// other than a quick back-of-the-envelope calculation for the convenience of this very
+	// immature implementation. Anyone who uses this as an example of how to do anything is
+	// extremely wrong and should be chastised appropriately.
+	__time64_t oneWeekAgo = _time64(nullptr) - (86400 * 7); // Oh and did I mention, THIS IS EXTREMELY WRONG!!!!
+	LONGLONG ll = (oneWeekAgo * 10000000ULL) + 116444736000000000ULL;
+	FILETIME ftOneWeekAgo = { static_cast<DWORD>(ll), static_cast<DWORD>(ll >> 32) };
+
+	for (const std::pair<std::wstring, FILETIME> &report : reports) {
+		bool succeeded = SendExistingReport(base, report.first);
+
+		// In a more mature implementation, one would store a retry count per-log and respond
+		// to different errors (such as "no network available" etc.) intelligently. However,
+		// this is not a mature implementation and we want to avoid filling the user's hard
+		// drive, so we use the much simpler algorithm of "if it was sent, delete it instantly,
+		// and if it wasn't, delete it if it's more than 7 days old".
+		if (succeeded || CompareFileTime(&ftOneWeekAgo, &report.second) > 0) {
+			_wunlink(report.first.c_str());
+			_wunlink((report.first + L".container").c_str());
+			_wunlink((report.first + L".metadata").c_str());
+		}
 	}
 }
 
 static void ProcessExistingReports(const std::wstring &dataPath)
 {
-	std::vector<std::wstring> possiblyValidReports;
+	std::unordered_map<std::wstring, std::pair<std::wstring, FILETIME>> rawDumpPaths;
+	std::unordered_map<std::wstring, std::wstring> containerPaths;
+	std::unordered_map<std::wstring, std::wstring> metadataPaths;
+
+	std::vector<std::pair<std::wstring, FILETIME>> possiblyValidReports;
 
 	HANDLE hFile = nullptr;
 	WIN32_FIND_DATA fileInfo;
@@ -585,15 +609,43 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 		if (fileInfo.cFileName[0] == L'.') {
 			continue;
 		}
-		if (ends_with(fileInfo.cFileName, L".dmp")) {
-			possiblyValidReports.push_back(dataPath + std::wstring(L"\\") + fileInfo.cFileName);
-		}
+		std::wstring filename = fileInfo.cFileName;
+
+		if (ends_with(filename, L".dmp.container")) {
+			containerPaths[filename.substr(0, filename.length() - wcslen(L".dmp.container"))] = filename;
+		} else if (ends_with(filename, L".dmp.metadata")) {
+			metadataPaths[filename.substr(0, filename.length() - wcslen(L".dmp.metadata"))] = filename;
+		} else if (ends_with(filename, L".dmp")) {
+			rawDumpPaths[filename.substr(0, filename.length() - wcslen(L".dmp"))] = { filename, fileInfo.ftCreationTime };
+		} 
 	} while (FindNextFile(hFile, &fileInfo));
+
 	FindClose(hFile);
 	if (GetLastError() != ERROR_NO_MORE_FILES) {
 		crash_log(L"Warning: Failed enumerating crash files\n");
 		return;
 	}
+
+	for (const std::pair<std::wstring, std::pair<std::wstring, FILETIME>> &kv : rawDumpPaths) {
+		if (containerPaths.find(kv.first) == containerPaths.end() || metadataPaths.find(kv.first) == metadataPaths.end()) {
+			// Invalid log (missing auxiliary data). Remove it, ignoring errors.
+			crash_log(L"Note: Log missing its container or metadata: %s (%s)\n", kv.second.first.c_str(), kv.first.c_str());
+			_wunlink((dataPath + L"\\" + kv.second.first).c_str());
+			_wunlink((dataPath + L"\\" + kv.second.first + L".container").c_str());
+			_wunlink((dataPath + L"\\" + kv.second.first + L".metadata").c_str());
+		} else {
+			crash_log(L"Valid log (has its auxiliaries): %s (%s)\n", kv.second.first.c_str(), kv.first.c_str());
+			possiblyValidReports.push_back({ dataPath + L"\\" + kv.second.first, kv.second.second });
+			containerPaths.erase(kv.first);
+			metadataPaths.erase(kv.first);
+		}
+	}
+	
+	// Any items left in rawDumpPaths or metadataPaths are orphans (not matching any container)
+	crash_log(L"Removing %u leftover metadata files\n", metadataPaths.size());
+	for (const std::pair<std::wstring, std::wstring> &kv : metadataPaths) { _wunlink((dataPath + L"\\" + kv.second).c_str()); }
+	crash_log(L"Removing %u leftover container files\n", containerPaths.size());
+	for (const std::pair<std::wstring, std::wstring> &kv : containerPaths) { _wunlink((dataPath + L"\\" + kv.second).c_str()); }
 
 	std::thread(SendExistingReports, std::move(possiblyValidReports)).detach();
 }
