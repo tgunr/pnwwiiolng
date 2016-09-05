@@ -140,10 +140,10 @@ static bool ends_with(const std::wstring &s, const std::wstring &suffix)
 }
 
 template <size_t characters>
-static std::wstring GenerateRandomString()
+static std::string GenerateRandomString()
 {
 	static_assert(characters % sizeof(unsigned int) == 0, "Must be an even number of unsigned ints");
-	std::wstring result;
+	std::string result;
 
 	// Officially a multipart boundary may consist of DIGIT / ALPHA / '()+_,-./:=?, but for simplicity we
 	// just Base64-encode some random values. This maximizes effective use of the entropy in the values.
@@ -154,9 +154,9 @@ static std::wstring GenerateRandomString()
 	}
 	// Encode to Base64
 	DWORD encodedBufferLen = 0; // Unfortunately CryptBinaryToString() won't truncate for us
-	CryptBinaryToString(reinterpret_cast<BYTE *>(valueBuffer.get()), characters, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, nullptr, &encodedBufferLen);
+	CryptBinaryToStringA(reinterpret_cast<BYTE *>(valueBuffer.get()), characters, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, nullptr, &encodedBufferLen);
 	result.resize(encodedBufferLen);
-	CryptBinaryToString(reinterpret_cast<BYTE *>(valueBuffer.get()), characters * 3 / 4, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, &result[0], &encodedBufferLen);
+	CryptBinaryToStringA(reinterpret_cast<BYTE *>(valueBuffer.get()), characters * 3 / 4, CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF, &result[0], &encodedBufferLen);
 	result.resize(characters); // Chop to only as many as requested, more efficient than substr()
 	return result;
 }
@@ -321,15 +321,15 @@ static void crash_log(const wchar_t * const format, ...)
 // Utilities for adding information to the HTTP request used by the crash sender
 #pragma region HTTP Request Utilities
 
-static void AppendRequestParam(std::wstring &body, const std::wstring &boundary, const std::wstring &param, const std::wstring &value)
+static void AppendRequestParam(std::string &body, const std::string &boundary, const std::string &param, const std::string &value)
 {
-	body += L"--" + boundary + L"\r\n";
-	body += L"Content-Disposition: form-data; name=\"" + param + L"\"\r\n";
-	body += L"\r\n";
-	body += value + L"\r\n";
+	body += "--" + boundary + "\r\n";
+	body += "Content-Disposition: form-data; name=\"" + param + "\"\r\n";
+	body += "\r\n";
+	body += value + "\r\n";
 }
 
-static bool AppendRequestFile(std::wstring &body, const std::wstring &boundary, const std::wstring &param, const std::wstring &path, bool istext)
+static bool AppendRequestFile(std::string &body, const std::string &boundary, const std::string &param, const std::wstring &path, bool istext)
 {
 	std::ifstream f(path, std::ios::binary);
 
@@ -350,26 +350,26 @@ static bool AppendRequestFile(std::wstring &body, const std::wstring &boundary, 
 	}
 
 	std::wstring::size_type pos = path.find_last_of(L"\\");
-	std::wstring filename;
-	if (pos == std::wstring::npos) { filename = path; }
-	else { filename = path.substr(pos + 1); }
+	std::wstring wfilename;
+	if (pos == std::wstring::npos) { wfilename = path; }
+	else { wfilename = path.substr(pos + 1); }
+	std::string filename = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(wfilename);
 
-	body += L"--" + boundary + L"\r\n";
-	body += L"Content-Disposition: form-data; name=\"" + param + L"\"; filename=\"" + filename + L"\"\r\n";
-	body += L"Content-Type: " + std::wstring(istext ? L"text/plain" : L"application/octet-stream") + L"\r\n";
-	if (!istext) { body += L"Content-Transfer-Encoding: base64\r\n"; }
-	body += L"\r\n";
+	body += "--" + boundary + "\r\n";
+	body += "Content-Disposition: form-data; name=\"" + param + "\"; filename=\"" + filename + "\"\r\n";
 
 	if (istext) {
-		body += std::wstring(reinterpret_cast<const wchar_t *>(data.get()), len >> 1);
+		// We could use ";charset=UTF-16LE" here and avoid the conversion, but it's not clear from
+		// RFC7578 that that'd actually work (it states that many implementations assume a default encoding).
+		body += "Content-Type: text/plain\r\n";
+		body += "\r\n";
+		body += std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(std::wstring(reinterpret_cast<const wchar_t *>(data.get()), len >> 1));
 	} else {
-		DWORD codedLength = 0;
-		CryptBinaryToString(reinterpret_cast<BYTE *>(data.get()), len, CRYPT_STRING_BASE64, nullptr, &codedLength);
-		body += L"Content-Length: " + std::to_wstring(codedLength) + L"\r\n";
-		body.resize(body.length() + codedLength);
-		CryptBinaryToString(reinterpret_cast<BYTE *>(data.get()), len, CRYPT_STRING_BASE64, &body[body.length() - codedLength], &codedLength);
+		body += "Content-Type: application/octet-stream\r\n";
+		body += "\r\n";
+		body.append(data.get(), len);
 	}
-	body += L"\r\n";
+	body += "\r\n";
 
 	return true;
 }
@@ -510,26 +510,25 @@ static void SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 		return;
 	}
 
-	std::wstring multipartBoundary = GenerateRandomString<24>();
-	std::wstring contentTypeHeader = L"Content-Type: multipart/form-data; boundary=" + multipartBoundary + L"\r\n";
-	std::wstring requestBody;
-	if (!AppendRequestFile(requestBody, multipartBoundary, L"log", report + L".container", true)) {
+	// Because we need to send binary data and Base64 is not possible in multipart/form-data
+	// parts, we must encode the actual request body as a direct UTF-8 byte stream. We take
+	// shameless advantage of std::string's ability to handle arbitrary bytes (including NUL).
+	std::string multipartBoundary = "------------------" + GenerateRandomString<24>();
+	std::string contentTypeHeader = "Content-Type: multipart/form-data; boundary=" + multipartBoundary + "\r\n";
+	std::string requestBody;
+	if (!AppendRequestFile(requestBody, multipartBoundary, "log", report + L".container", true)) {
 		return;
 	}
-	if (!AppendRequestFile(requestBody, multipartBoundary, L"attachment0", report, false)) {
+	if (!AppendRequestFile(requestBody, multipartBoundary, "attachment0", report, false)) {
 		return;
 	}
-	AppendRequestParam(requestBody, multipartBoundary, L"description", L""); // TODO fill these in from .metadata
-	AppendRequestParam(requestBody, multipartBoundary, L"userId", L""); // TODO fill these in from .metadata
-	AppendRequestParam(requestBody, multipartBoundary, L"contact", L""); // TODO fill these in from .metadata
-	requestBody += L"--" + multipartBoundary + L"--\r\n";
+	AppendRequestParam(requestBody, multipartBoundary, "description", ""); // TODO fill these in from .metadata
+	AppendRequestParam(requestBody, multipartBoundary, "userId", ""); // TODO fill these in from .metadata
+	AppendRequestParam(requestBody, multipartBoundary, "contact", ""); // TODO fill these in from .metadata
+	requestBody += "--" + multipartBoundary + "--\r\n";
 
-#ifdef DEBUG_WW2
-	crash_log(L"Final request body:\n%s\n", requestBody.c_str());
-#endif
-
-	std::string rawBody = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(requestBody);
-	if (!HttpSendRequest(req, contentTypeHeader.c_str(), -1, const_cast<char *>(rawBody.c_str()), rawBody.length())) {
+	// Use ASCII variant so we don't have to do an extra conversion on the multipart boundary just for the header here.
+	if (!HttpSendRequestA(req, contentTypeHeader.c_str(), -1, const_cast<char *>(requestBody.c_str()), requestBody.length())) {
 		crash_log(L"Failed in HttpSendRequest(), can't send this crash log at this time.\n");
 		return;
 	}
