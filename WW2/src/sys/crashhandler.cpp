@@ -486,8 +486,7 @@ static bool CrashReportingCallback(
 
 static void SendExistingReport(const unique_HINTERNET &base, const std::wstring &report)
 {
-	INTERNET_PORT port = HockeyApp_SSL ? INTERNET_DEFAULT_HTTPS_PORT : INTERNET_DEFAULT_HTTP_PORT;
-	unique_HINTERNET conn = InternetConnect(base, HockeyApp_serverName.c_str(), port, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 0);
+	unique_HINTERNET conn = InternetConnect(base, HockeyApp_serverName.c_str(), HockeyApp_serverPort, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 0);
 
 	if (!conn) {
 		crash_log(L"Failed in InternetConnect(), can't send this crash log at this time.\n");
