@@ -25,6 +25,9 @@ Libraries/*.pdb
 Libraries/*.sbr
 Libraries/*.suo
 Libraries/*.user
+Libraries/breakpad/src/client/windows/Debug
+Libraries/breakpad/src/client/windows/Release
+Libraries/breakpad/src/**/testdata
 Libraries/BuildLog.htm
 Libraries/OpenThreads/*.aps
 Libraries/OpenThreads/*.eto
