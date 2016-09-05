@@ -484,13 +484,13 @@ static bool CrashReportingCallback(
 // HockeyApp server to present a crash to the dashboard.
 #pragma region Report Sender
 
-static void SendExistingReport(const unique_HINTERNET &base, const std::wstring &report)
+static bool SendExistingReport(const unique_HINTERNET &base, const std::wstring &report)
 {
 	unique_HINTERNET conn = InternetConnect(base, HockeyApp_serverName.c_str(), HockeyApp_serverPort, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 0);
 
 	if (!conn) {
 		crash_log(L"Failed in InternetConnect(), can't send this crash log at this time.\n");
-		return;
+		return false;
 	}
 
 	DWORD flags =
@@ -506,7 +506,7 @@ static void SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 
 	if (!req) {
 		crash_log(L"Failed in HttpOpenRequest(), can't send this crash log at this time.\n");
-		return;
+		return false;
 	}
 
 	// Because we need to send binary data and Base64 is not possible in multipart/form-data
@@ -516,10 +516,10 @@ static void SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 	std::string contentTypeHeader = "Content-Type: multipart/form-data; boundary=" + multipartBoundary + "\r\n";
 	std::string requestBody;
 	if (!AppendRequestFile(requestBody, multipartBoundary, "log", report + L".container", true)) {
-		return;
+		return false;
 	}
 	if (!AppendRequestFile(requestBody, multipartBoundary, "attachment0", report, false)) {
-		return;
+		return false;
 	}
 	AppendRequestParam(requestBody, multipartBoundary, "description", ""); // TODO fill these in from .metadata
 	AppendRequestParam(requestBody, multipartBoundary, "userId", ""); // TODO fill these in from .metadata
@@ -529,23 +529,22 @@ static void SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 	// Use ASCII variant so we don't have to do an extra conversion on the multipart boundary just for the header here.
 	if (!HttpSendRequestA(req, contentTypeHeader.c_str(), -1, const_cast<char *>(requestBody.c_str()), requestBody.length())) {
 		crash_log(L"Failed in HttpSendRequest(), can't send this crash log at this time.\n");
-		return;
+		return false;
 	}
 
 	DWORD status_code = 0, status_code_len = sizeof(status_code);
 	if (!HttpQueryInfo(req, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &status_code, &status_code_len, 0)) {
 		crash_log(L"Failed in HttpQueryInfo(), can't send this crash log at this time.\n");
-		return;
+		return false;
 	}
 
 	if (status_code != 201) { // Server responds with 201 Created on success
 		crash_log(L"Failed because status code %u is not 201, can't send this crash log at this time.\n", status_code);
-		return;
+		return false;
 	}
 
-#ifdef DEBUG_WW2
 	crash_log(L"Successfully sent crash log.\n");
-#endif
+	return true;
 }
 #pragma endregion
 //////////////////////////////////////////////////////////////////////////////
