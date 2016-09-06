@@ -39,7 +39,7 @@ int   i;
 
 	for (i=0 ; i < NUMFLAREGFX ; i++)
 	{
-		sprintf(texname, "flare%d.bmp", i+1);
+		strprintf(texname, "flare%d.bmp", i+1);
 		flareid[i] = ldpixLoadImageFileToSurface(texname, colorBLACK, LDPIX_NONE);
 		if (!piIsTexture(flareid[i], 0))
 		{

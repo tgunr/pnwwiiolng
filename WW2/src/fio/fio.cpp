@@ -1,4 +1,5 @@
 #include <syscfg.h> // Path is project specific.
+#include <codecvt>
 #include "VersionNo.h"
 #include "fio/fio.h"
 #include "fio/fiod.h"
@@ -30,52 +31,27 @@ void fioInit()
 	*UserDataPath = 0;
 
 #if platOS == OS_WIN32
+	
+	// default to current directory
+	std::wstring path = L".";
 
-	TCHAR path[_MAX_PATH];
-	const TCHAR* base = nullptr;
-
-	// default to this directory
-	ustrcpy(path, _T("."));
-
-#if GREEN_INSTALL != 1
-	SHGetFolderPath(nullptr, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, nullptr, 0, path);
-
-	base = sysregGetInstallValue(_T("Version"));
-	// HACK: Put in the default location if an installation doesn't exit.
-	if ( base == nullptr )
-		base = L"Battleground Europe";
-#endif // GREEN_INSTALL != 1
-
-#ifdef _UNICODE
-	// setup path
-	strcpy(UserDataPath, UTF8(path));
-	strcat(UserDataPath, "\\");
-
-	if(base)
-	{
-		strcat(UserDataPath, UTF8(base));
-		strcat(UserDataPath, "\\");
+	// TODO: Use FOLDERID_RoamingAppData instead
+	wchar_t *docsPath = nullptr;
+	if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_SIMPLE_IDLIST | KF_FLAG_CREATE, nullptr, &docsPath))) {
+		path = docsPath;
+		CoTaskMemFree(docsPath);
 	}
 
-#if GREEN_INSTALL != 1
-	// make the directory
-	OS_WMKDIR(UTF16(UserDataPath));
-#endif // GREEN_INSTALL != 1
-#else
+	// HACK: Put in the default location if an installation doesn't exist.
+	path += L"\\";
+	path += (sysregGetInstallValue(_T("Version")) ? sysregGetInstallValue(_T("Version")) : L"Battleground Europe");
+	path += L"\\";
 
-	// UserDataPath is an ascii string
-	strcpy(UserDataPath, path);
-	strcat(UserDataPath, "\\");
+	// Ensure our subdirectory exists
+	CreateDirectory(path.c_str(), nullptr);
 
-	if(base)
-	{
-		strcat(UserDataPath, base);
-		strcat(UserDataPath, "\\");
-	}
-
-	// make the directory
-    OS_MKDIR(UserDataPath);
-#endif // _UNICODE
+	// Save it off as an ASCII path
+	strcpy_s(UserDataPath, std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(path).c_str());
 
 #endif // OS_WIN32
 }

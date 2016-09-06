@@ -53,7 +53,6 @@ static constexpr size_t sizeof_a(T (&)[N]) { return N; }
 
 //  lowercase ONLY!
 static GVAR vars[] = {
-    NULL_KEY_DEF("help", WantedHelp),
     INT_KEY_DEF("width", WantedWidth),
     INT_KEY_DEF("height", WantedHeight),
     INT_KEY_DEF("bpp", WantedBpp),
@@ -89,7 +88,7 @@ static GVAR vars[] = {
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
     STRING_KEY_DEF("datadir", DataPath),
-#ifdef DEBUG
+#ifdef DEBUG_WW2
     NULL_KEY_DEF("buildmdlonly", DebugBuildingMDLFilesOnly),
 #endif
     { nullptr, ENULL, { nullptr }, 0 },

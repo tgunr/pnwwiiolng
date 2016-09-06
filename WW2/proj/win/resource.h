@@ -1,8 +1,7 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by WW2.rc
 //
-#define IDS_HELPINFO                    1
 #define ID_MS_QUIT                      3
 #define IDC_UI_STRATEGIC                3
 #define ID_MS_ONLINE                    4

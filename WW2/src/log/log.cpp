@@ -13,9 +13,14 @@
 
 #ifdef EVENT_LOG
 
-
-static UINT32 logMask=0;
-static SINT32 logLevel=0;
+static std::mutex logLock;
+#ifdef DEBUG_WW2
+static UINT32 logMask = LOG_ALL;
+static SINT32 logLevel = LOG_INFO;
+#else
+static UINT32 logMask = 0;
+static SINT32 logLevel = 0;
+#endif
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker);
 
@@ -57,10 +62,13 @@ void Write_Log(UINT32 system, SINT32 level, const char* str, ...)
 
 void Enable_Log(UINT32 system, LOGICAL enable)
 {
-	if(enable)
+	std::lock_guard<std::mutex> guard(logLock);
+
+	if (enable) {
 		logMask |= system;
-	else
+	} else {
 		logMask &= ~system;
+	}
 }
 
 /************************************************************************************************
@@ -69,6 +77,8 @@ void Enable_Log(UINT32 system, LOGICAL enable)
 
 void Set_Log_Level(SINT32 level)
 {
+	std::lock_guard<std::mutex> guard(logLock);
+
 	logLevel = level;
 }
 
@@ -166,8 +176,7 @@ void Close_Debug(void)
 
 #include "include/vars.h"
 
-static char					ofn[_MAX_PATH];
-static FILE*				ofp = nullptr;
+static FILE *ofp = nullptr;
 
 /************************************************************************************************
 	Open_Debug
@@ -175,23 +184,24 @@ static FILE*				ofp = nullptr;
 
 LOGICAL Open_Debug(const char* filename)
 {
-	if (filename == nullptr)
-		return(FALSE);
+	if (filename == nullptr) {
+		return false;
+	}
 
-    strcpy(ofn, filename);
-#ifdef _DEBUG
-	strcat(ofn, "_Debug");
-#endif
-	strcat(ofn, ".log");
+	{
+		std::lock_guard<std::mutex> guard(logLock);
 
-	ofp = fioUserFile(ofn, "w");
-
-	if ( ofp == nullptr )
-		return FALSE;
+		if (ofp != nullptr) {
+			return true;
+		}
+		ofp = fioUserFile((std::string(filename) + ".log").c_str(), "w");
+		if (ofp == nullptr) {
+			return false;
+		}
+	}
 
 	Write_Debug("\r\nDebug Message System Open.\r\n");
-
-	return TRUE;
+	return true;
 }
 
 /************************************************************************************************
@@ -200,9 +210,12 @@ LOGICAL Open_Debug(const char* filename)
 
 void Close_Debug(void)
 {
-	if ( ofp != nullptr )
+	std::lock_guard<std::mutex> guard(logLock);
+
+	if (ofp != nullptr) {
 		fclose(ofp);
-	ofp = nullptr;
+		ofp = nullptr;
+	}
 }
 
 /************************************************************************************************
@@ -211,34 +224,32 @@ void Close_Debug(void)
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 {
-	if(logLevel < level || !(system & logMask) || str == nullptr) return;
-	if ( ofp == nullptr )
-	{
-		vprintf(str, marker);
-		printf("\n");
+	std::lock_guard<std::mutex> guard(logLock);
+
+	if (logLevel < level || (system & logMask) == 0 || str == nullptr) {
+		return;
 	}
-	else
-	{
+
+	// There's no OutputDebugFormat(), so we fake vasprintf()
+	size_t len = static_cast<size_t>(_vscprintf(str, marker));
+	if (len >= INT_MAX) { return; }
+	std::unique_ptr<char[]> buf = std::make_unique<char[]>(len + 1);
+	vsnprintf_s(buf.get(), len + 1, _TRUNCATE, str, marker);
+
 #ifdef DEBUG_WW2
-		char buf[255+1];
+	// Output to debugger always
+	OutputDebugStringA(buf.get());
+	OutputDebugStringA("\r\n");
 
-		_vsnprintf(buf, 255, str, marker);
-		// Since its on the stack:
-		// any string longer >= 255 chars will not be null terminated
-		buf[255] = 0;
-
-		// log system always uses ascii
-		OutputDebugStringA(buf);
-		OutputDebugStringA("\r\n");
-
-		fprintf(ofp, "%s\r\n", buf);
-		fflush(ofp);
-
-#else
-		vfprintf(ofp, str, marker);
-		fprintf(ofp, "\r\n");
-		fflush(ofp);
+	// Output to stderr always
+	fprintf_s(stderr, "%s\n", buf.get());
+	fflush(stderr);
 #endif
+
+	// Output to file, if any
+	if (ofp != nullptr) {
+		fprintf_s(ofp, "%s\n", buf.get());
+		fflush(ofp);
 	}
 }
 
@@ -539,7 +550,7 @@ static void _getSystemDetails(char* into, size_t sizeofInto)
 	sysregGetHKeyDword(HKEY_LOCAL_MACHINE, HKLM_CPU0, _T("~Mhz"), &cpuMhz);
 	sysregGetHKeyDword(HKEY_LOCAL_MACHINE, HKLM_CPU0, _T("FeatureSet"), &cpuFlags);
 
-	snprintf(into, sizeofInto - 1, "Win %u %x %u %s", sysInfo.dwNumberOfProcessors, cpuFlags, cpuMhz, UTF8(cpuName));
+	sprintf_s(into, sizeofInto, "Win %u %x %u %s", sysInfo.dwNumberOfProcessors, cpuFlags, cpuMhz, UTF8(cpuName));
 
 	///TODO: Would be /really/ nice to add total memory and graphics card data.
 #elif platOS == OS_MACOS
@@ -553,8 +564,6 @@ static void _getSystemDetails(char* into, size_t sizeofInto)
 #else
 	strlcpy(into, "Linux <unimplemented>", sizeofInto);
 #endif
-	// snprintf doesn't guarantee a null terminator
-	into[sizeofInto - 1] = 0;
 }
 
 

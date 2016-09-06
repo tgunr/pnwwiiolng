@@ -14,8 +14,6 @@
 #include "fio/fio.h"
 
 #if platOS == OS_WIN32
-#include "crashhandler.h"
-
 extern HWND			myhwnd;
 extern LOGICAL		running;
 #endif
@@ -762,10 +760,6 @@ void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 	FILE* fp = Fio::OpenLogFile();
 
 #if platOS == OS_WIN32
-#ifdef CRASH_HANDLER
-
-	nonExceptionErrorReport(file,line,MessageString==0?"":MessageString);
-#endif
 	running = 0;
 
 #if defined(DEBUG_WW2) || defined(BETA_RELEASE)
@@ -781,23 +775,8 @@ void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 #endif
 	PostMessageA(myhwnd, WM_CLOSE, 0, 0);
 #endif
-
-#ifndef CRASH_HANDLER
-	if ( fp != nullptr )
-		fprintf(fp, "Exited Program: file: %s, line: %d, App Version: %s\n", file, line, STRPRODUCTVER);
-	printf("Exited Program: file: %s, line: %d, App Version: %s\n", file, line, STRPRODUCTVER);
-	if(MessageString)
-	{
-		if ( fp != nullptr )
-			fprintf(fp, "Message string: %s\n", MessageString);
-		printf("Message string: %s\n", MessageString);
-	}
-	if ( fp != nullptr )
-		fclose(fp);
-
-#endif
-
-	exit(0);
+    
+	abort(); // Abort raises SIGABRT, which will be trapped by the crash handler
 }
 
 extern SINT32	frametime;

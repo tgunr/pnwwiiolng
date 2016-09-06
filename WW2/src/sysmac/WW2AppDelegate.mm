@@ -26,6 +26,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include "sysLaunchURL.h"
+#import <HockeySDK/HockeySDK.h>
 
 #define PLAYGATE_VERSION 0x01010109
 
@@ -194,7 +195,7 @@ NSString * const PGteulErrorDomain = @"com.playnet.wwiiol.PGteulErrorDomain";
 
 + (instancetype)playgateErrorWithDomain:(NSString *)domain code:(int)code userInfo:(NSDictionary *)dict rootError:(NSError *)rootError
 {
-    NSMutableDictionary *udict = dict ? [[dict mutableCopy] autorelease] : [NSMutableDictionary dictionary];
+    NSMutableDictionary *udict = dict ? [dict mutableCopy] : [NSMutableDictionary dictionary];
     
     if (rootError) {
         udict[NSUnderlyingErrorKey] = rootError;
@@ -217,25 +218,23 @@ NSString * const PGteulErrorDomain = @"com.playnet.wwiiol.PGteulErrorDomain";
 
 static void teulConnectCallback(ENDPOINT& endpoint)
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    [gPlayGateAppDelegate teulConnect:endpoint.teulIndex()];
-    [pool release];
+    @autoreleasepool {
+        [gPlayGateAppDelegate teulConnect:endpoint.teulIndex()];
+    }
 }
 // SINT32 teulIndex, const UCHAR *const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error
 static void teulErrorCallback(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* object, SINT32 error)
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    [gPlayGateAppDelegate teulError:error];
-    [pool release];
+    @autoreleasepool {
+        [gPlayGateAppDelegate teulError:error];
+    }
 }
 
 SINT32 authVerifyApp(SINT32 teulIndex, APP_VERIFY* appVerify)
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    SINT32 result = [gPlayGateAppDelegate verifyApplication:appVerify];
-    [pool release];
-    
-    return result;
+    @autoreleasepool {
+        return [gPlayGateAppDelegate verifyApplication:appVerify];
+    }
 }
 
 SINT32 authLaunchApp(APP_LAUNCH* reply)
@@ -247,18 +246,29 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
             [[clang::fallthrough]];
             
         case Auth::Apps::BROWSER:
-        case Auth::Apps::WEB_REDIRECT:
-            [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:reply->data]]];
-            gPlayGateAppDelegate.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorSilent userInfo:nil rootError:nil];
+        case Auth::Apps::WEB_REDIRECT: {
+            NSString *replyURLString = [NSString stringWithUTF8String:reply->data];
+            NSURL *replyURL = nil;
+            if (replyURLString) {
+                replyURL = [NSURL URLWithString:reinterpret_cast<NSString * __nonnull>(replyURLString)];
+            }
+            if (replyURL) {
+                [[NSWorkspace sharedWorkspace] openURL:reinterpret_cast<NSURL * __nonnull>(replyURL)];
+                gPlayGateAppDelegate.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorSilent userInfo:nil rootError:nil];
+            } else {
+                gPlayGateAppDelegate.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorBadPlayGateAE userInfo:nil rootError:nil];
+            }
             [gPlayGateAppDelegate advanceState];
             break;
-            
+        }
         case Auth::Apps::WEB_DOWNLOAD:
+            [[NSUserDefaults standardUserDefaults] setObject:gPlayGateAppDelegate.userName forKey:@"WW2.lastSuccessfulUsername"];
             [gPlayGateAppDelegate setAuthReply:reply];
             [gPlayGateAppDelegate changeState:WAIT_UPDATE];
             break;
             
         default: // anything else should be an app launch
+            [[NSUserDefaults standardUserDefaults] setObject:gPlayGateAppDelegate.userName forKey:@"WW2.lastSuccessfulUsername"];
             [gPlayGateAppDelegate setAuthReply:reply];
             [gPlayGateAppDelegate advanceState];
             break;
@@ -267,6 +277,37 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
     return 0;
 }
 
+// Cribbed definitions for using a small subset of WebKit's functionality
+// without being able to actually import its headers.
+@class WebView;
+@interface WebFrame
+- (void)loadRequest:(NSURLRequest *)request;
+- (void)loadHTMLString:(NSString *)string baseURL:(NSURL *)URL;
+@end
+@protocol WebFrameLoadDelegate <NSObject>
+@optional
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame;
+@end
+@protocol WebPolicyDecisionListener <NSObject>
+- (void)use;
+- (void)ignore;
+@end
+@protocol WebPolicyDelegate <NSObject>
+@optional
+- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request
+        frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener;
+- (void)webView:(WebView *)webView decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request
+        newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener;
+@end
+@interface WebView
+@property (nonatomic, readonly, strong) WebFrame *mainFrame;
+@property (nonatomic, assign) id <WebFrameLoadDelegate> frameLoadDelegate;
+@property (nonatomic, assign) id <WebPolicyDelegate> policyDelegate;
+@property (nonatomic) BOOL shouldCloseWithWindow;
+@end
+// End cribbing
+
+// Workaround for missing NSURLSession definitions in 32-bit macOS
 @interface __NSCFURLSessionTask : NSURLSessionTask
 @end
 
@@ -283,8 +324,9 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
 - (id)dataAckCompletion { return objc_getAssociatedObject(self, _cmd); }
 - (void)setDataAckCompletion:(id)arg { objc_setAssociatedObject(self, @selector(dataAckCompletion), arg, OBJC_ASSOCIATION_COPY); }
 @end
+// End workaround
 
-@interface WW2AppDelegate () <NSURLSessionDownloadDelegate>
+@interface WW2AppDelegate () <NSURLSessionDownloadDelegate, WebFrameLoadDelegate, WebPolicyDelegate, BITHockeyManagerDelegate>
 @end
 
 @implementation WW2AppDelegate
@@ -324,20 +366,21 @@ static NSString *placeholderHTML = @""
 @"</html>"
 ;
 
-- (void)webView:(id)sender didFinishLoadForFrame:(id)frame
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
     switch (staticLoadState) {
         case 0: { // loaded the static placeholder
             staticLoadState = 1;
             
-            NSURLRequest *playnetHome = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.wwiionline.com/pgservers.html"]];
-
-            ((void (*)(id, SEL, NSURLRequest *))objc_msgSend)(frame, @selector(loadRequest:), playnetHome);
+            NSURL * __nonnull playgateURL = reinterpret_cast<NSURL * __nonnull>([NSURL URLWithString:@"https://www.battlegroundeurope.com/pgservers.html"]);
+            NSURLRequest *playnetHome = [NSURLRequest requestWithURL:playgateURL];
+            
+            [frame loadRequest:playnetHome];
             break;
         }
         case 1: // loaded the webmap
             staticLoadState = 2;
-            ((void (*)(id, SEL, id))objc_msgSend)(sender, @selector(setFrameLoadDelegate:), nil);
+            sender.frameLoadDelegate = nil;
             break;
         case 2: // should never get here
             assert(false);
@@ -350,8 +393,8 @@ static NSString *placeholderHTML = @""
 
 extern NSString *WebActionOriginalURLKey;
 
-- (void)webView:(id)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
-        request:(NSURLRequest *)request frame:(id)frame decisionListener:(id)listener
+- (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
+        request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener
 {
     if (staticLoadState > 0 &&
         ![request.URL.host isEqualToString:@"www.wwiionline.com"] &&
@@ -368,35 +411,31 @@ extern NSString *WebActionOriginalURLKey;
         if (originalURL) {
             [[NSWorkspace sharedWorkspace] openURL:originalURL];
         }
-        ((void (*)(id, SEL))objc_msgSend)(listener, @selector(ignore));
+        [listener ignore];
     } else {
-        ((void (*)(id, SEL))objc_msgSend)(listener, @selector(use));
+        [listener use];
     }
 }
 
-- (void)webView:(id)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation
-        request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id)listener
+- (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation
+        request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener
 {
     NSURL *originalURL = actionInformation[WebActionOriginalURLKey];
     
     if (originalURL) {
         [[NSWorkspace sharedWorkspace] openURL:originalURL];
     }
-    ((void (*)(id, SEL))objc_msgSend)(listener, @selector(ignore));
+    [listener ignore];
 }
 
 - (void)goHome
 {
     staticLoadState = 0;
     
-    // We can't actually import WebKit because the JSContext from phui conflicts
-    id frame = ((id (*)(id, SEL))objc_msgSend)(webView, @selector(mainFrame));
-    
-    ((void (*)(id, SEL, id))objc_msgSend)(webView, @selector(setFrameLoadDelegate:), self);
-    ((void (*)(id, SEL, id))objc_msgSend)(webView, @selector(setPolicyDelegate:), self);
-    
+    webView.frameLoadDelegate = self;
+    webView.policyDelegate = self;
     // Put a static placeholder into the webview until the load is done.
-    ((void (*)(id, SEL, NSString *, NSURL *))objc_msgSend)(frame, @selector(loadHTMLString:baseURL:), placeholderHTML, [[NSBundle mainBundle] resourceURL]);
+    [webView.mainFrame loadHTMLString:placeholderHTML baseURL:[NSBundle mainBundle].resourceURL];
 }
 
 // END WebView magic
@@ -409,6 +448,7 @@ extern NSString *WebActionOriginalURLKey;
 
 - (IBAction)clearUserNameAndPassword:(id)sender
 {
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
     if ([sender isKindOfClass:[NSButton class]]) {
         // The request came from the "save password" checkbox. This method is
         // somewhat unfortunately named on that basis.
@@ -494,15 +534,32 @@ extern NSString *WebActionOriginalURLKey;
     }
 }
 
-// this delegate method is required
-- (void) showMainApplicationWindowForCrashManager:(id)crashManager
+- (NSString *)userIDForHockeyManager:(BITHockeyManager *)hockeyManager componentManager:(BITHockeyBaseManager *)componentManager
 {
-    // launch the main app window
-    [launcherWindow setTitle: [NSString stringWithFormat:@"%@ %s", [launcherWindow title], STRVER]];
+    return [[NSUserDefaults standardUserDefaults] stringForKey:@"WW2.lastSuccessfulUsername"] ?: @"";
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    // This sequence depends on certain implementation details of the
+    // BITCrashManager - in particular, that report metadata is processed
+    // synchronously during -startManager, that -userIDForHockeyManager is
+    // only called once per crash report, and only one crash report will be
+    // freshly processed at a time (versus needing to be sent). If these
+    // preconditions are violated (likely due to implementation changes in the
+    // SDK), the provided username of the player (if any) may be inaccurate.
+    // Not much of a big deal, is it?
+    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"97d81f56ff22d04ccdbc1a0d537e81c0" delegate:self];
+#ifdef DEBUG_WW2
+    [BITHockeyManager sharedHockeyManager].logLevel = BITLogLevelDebug;
+#endif
+    [BITHockeyManager sharedHockeyManager].disableFeedbackManager = YES;
+    [BITHockeyManager sharedHockeyManager].crashManager.autoSubmitCrashReport = YES;
+    [[BITHockeyManager sharedHockeyManager] startManager];
+    // This should no longer be needed, so try to maintain the "not logged in
+    // yet" state if we should crash before the next login.
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
+    
     dbugInit(LOG_TO_FILE, nullptr);
 
     // Wipe out any storage of insecure user info.
@@ -527,7 +584,7 @@ extern NSString *WebActionOriginalURLKey;
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
     // Or, if we're only here to build MDLs.
     if(GameServerIP[0]
-#ifdef DEBUG
+#ifdef DEBUG_WW2
         || DebugBuildingMDLFilesOnly
 #endif
     )
@@ -541,8 +598,8 @@ extern NSString *WebActionOriginalURLKey;
     
     gPlayGateAppDelegate = self;
     
-    ((void (*)(id, SEL, id))objc_msgSend)(webView, @selector(setFrameLoadDelegate:), self);
-    ((void (*)(id, SEL, BOOL))objc_msgSend)(webView, @selector(setShouldCloseWithWindow:), YES);
+    webView.frameLoadDelegate = self;
+    webView.shouldCloseWithWindow = YES;
     
     [self goHome];
     
@@ -552,26 +609,25 @@ extern NSString *WebActionOriginalURLKey;
     
     [self updateLoginEnabled];
     
-    authServer = [[NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding] retain];
+    authServer = [NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding];
     if (gAuthServer[0]) {
-        [authServer release];
         authServer = [[NSString alloc] initWithUTF8String:gAuthServer];
     }
     authPort = DEFAULT_AUTH_PORT;
     
-    NSMutableParagraphStyle *style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+    NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     style.alignment = NSCenterTextAlignment;
-    style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+    style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     style.alignment = NSCenterTextAlignment;
 
-    NSAttributedString *str = [[[NSAttributedString alloc]
+    NSAttributedString *str = [[NSAttributedString alloc]
     	initWithString:playOnlineButton.title
         attributes:@{
           NSFontAttributeName: (NSFont * _Nonnull)playOnlineButton.font,
           NSParagraphStyleAttributeName: style,
           NSBaselineOffsetAttributeName: @(4.0),
-        }]
-    autorelease];
+        }
+    ];
     
     [playOnlineButton setAttributedTitle:str];
     
@@ -685,7 +741,7 @@ extern NSString *WebActionOriginalURLKey;
     
     result = SecItemCopyMatching((__bridge CFDictionaryRef)keychainAccountsQuery, &_matches);
     if (result != noErr && result != errSecItemNotFound) {
-#if IS_DEBUG
+#ifdef DEBUG_WW2
         NSLog(@"Error copying matching items from keychain: %@, %d", keychainAccountsQuery, (int)result);
 #endif
         return @[];
@@ -699,7 +755,7 @@ extern NSString *WebActionOriginalURLKey;
     NSMutableArray *results = [NSMutableArray array];
     
     for (NSDictionary *attrs in matches) {
-        [results addObject:attrs[(__bridge id)kSecAttrAccount]];
+        [results addObject:reinterpret_cast<id __nonnull>(attrs[(__bridge id)kSecAttrAccount])];
     }
     return results;
 }
@@ -719,7 +775,7 @@ extern NSString *WebActionOriginalURLKey;
         
         if (result != noErr/* && result != errSecItemNotFound*/) {
             // Not much we can really do about it...
-#if IS_DEBUG
+#ifdef DEBUG_WW2
             NSLog(@"FAILED TO DELETE ITEMS FROM KEYCHAIN! Match: %@, result %ld", keychainDeleteQuery, result);
 #endif
         }
@@ -753,7 +809,7 @@ extern NSString *WebActionOriginalURLKey;
     
     result = SecItemAdd((__bridge CFDictionaryRef)keychainUpdateQuery, nullptr);
     if (result != noErr) {
-#if IS_DEBUG
+#ifdef DEBUG_WW2
         NSLog(@"Failed to save password to keychain: %@, %ld", keychainUpdateQuery, result);
 #endif
         rememberUserPassword = NO;
@@ -774,7 +830,7 @@ extern NSString *WebActionOriginalURLKey;
         NSArray *accounts = [self allKeychainAccountNames];
         
         if (accounts.count > 1) {
-#if IS_DEBUG
+#ifdef DEBUG_WW2
             NSLog(@"Too many results in keychain! %@", accounts);
 #endif
             [self removeAllKeychainEntries];
@@ -801,7 +857,7 @@ extern NSString *WebActionOriginalURLKey;
         
         result = SecItemCopyMatching((__bridge CFDictionaryRef)keychainAccountsQuery, &_accountData);
         if (result != noErr) {
-#if IS_DEBUG
+#ifdef DEBUG_WW2
             NSLog(@"Got error trying to get account data? %@, %d\n", keychainAccountsQuery, (int)result);
 #endif
             [self removeAllKeychainEntries];
@@ -809,12 +865,8 @@ extern NSString *WebActionOriginalURLKey;
         }
         accountData = CFBridgingRelease(_accountData);
         
-        NSString *accountPassword = [[NSString alloc] initWithData:accountData encoding:NSUTF8StringEncoding];
-        
         [self setUserName:accounts[0]];
-        [self setUserPassword:[self MD5digestForString:accountPassword]];
-        [accountPassword release]; // In theory we should really scribble over this
-        accountPassword = nil;
+        [self setUserPassword:[self MD5digestForString:accountData]];
         
         [userNameField setStringValue:accounts[0]];
         [passwordField setStringValue:@"__LOADEDFROMKEYCHAINANDLOOKSVALID__"];
@@ -862,7 +914,7 @@ extern NSString *WebActionOriginalURLKey;
             
             [self setUserName:[userNameField stringValue]];
             if (!_passwordEntryIsInitial) {
-                [self setUserPassword:[self MD5digestForString:[passwordField stringValue]]];
+                [self setUserPassword:[self MD5digestForString:[[passwordField stringValue] dataUsingEncoding:NSUTF8StringEncoding]]];
             }
             [[clang::fallthrough]];
             
@@ -974,12 +1026,11 @@ extern NSString *WebActionOriginalURLKey;
     launchRequest.sessionID = (UINT32)verifyInfo->sessionID;
     launchRequest.appID = verifyInfo->appID;
     
-    NSString* appVersion = [[NSString stringWithCString:STRVER encoding:NSUTF8StringEncoding] retain];
+    NSString* appVersion = [NSString stringWithCString:STRVER encoding:NSUTF8StringEncoding];
 
     /* command line version override - not sure this is needed, but putting it in anyway */
     if (gClientV[0]) {
-        [appVersion release];
-        appVersion = [[[NSString alloc] initWithUTF8String:gClientV] retain];
+        appVersion = [[NSString alloc] initWithUTF8String:gClientV];
     }
     
     if (appVersion != nil)
@@ -1024,7 +1075,7 @@ extern NSString *WebActionOriginalURLKey;
             if (! isteulInitialized) {
                 ww2::Client::Init();
                 
-#if IS_DEBUG
+#ifdef DEBUG_WW2
                 dbugSetWriteLevel(Debug::ERR_DBUG);
                 dbugSetLogLevel(Debug::ERR_DBUG);
 #else
@@ -1135,13 +1186,12 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     [downloadProgressBar setDoubleValue:100.0];
     [downloadStatus setStringValue:NSLocalizedString(@"download completed", @"")];
     self.patchDownloadTask = nil;
-    [_patchDownloadSession release];
     _patchDownloadSession = nil;
     
     NSError *error = nil;
     NSURL *patchDir = [[NSFileManager defaultManager] URLForDirectory:NSItemReplacementDirectory
                                                              inDomain:NSUserDomainMask appropriateForURL:location create:YES error:&error];
-    NSURL *patchFile = [patchDir URLByAppendingPathComponent:downloadTask.originalRequest.URL.lastPathComponent isDirectory:NO];
+    NSURL *patchFile = [patchDir URLByAppendingPathComponent:reinterpret_cast<NSString * __nonnull>(downloadTask.originalRequest.URL.lastPathComponent) isDirectory:NO];
     
     if (!patchDir || !patchFile || ![[NSFileManager defaultManager] moveItemAtURL:location toURL:patchFile error:&error]) {
         self.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorDownloadFailed userInfo:error.userInfo rootError:error];
@@ -1170,19 +1220,19 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     [self movePatchToTrash];
     
-    NSString *rawPatchURL = [[[NSString alloc]
+    NSString *rawPatchURL = [[NSString alloc]
                               initWithBytesNoCopy:&authReply.data[0]
                               length:strnlen(&authReply.data[0], std::min<size_t>(static_cast<size_t>(authReply.dataSize), MAX_PARAM))
                               encoding:NSASCIIStringEncoding
-                              freeWhenDone:NO]
-                             autorelease];
+                              freeWhenDone:NO
+                            ];
     NSURL *patchURL = [NSURL URLWithString:rawPatchURL];
     NSURLSessionConfiguration *patchSessionConfig = [NSURLSessionConfiguration ephemeralSessionConfiguration];
     
     patchSessionConfig.timeoutIntervalForRequest = 60.0;
     patchSessionConfig.allowsCellularAccess = NO;
     
-    _patchDownloadSession = [[NSURLSession sessionWithConfiguration:patchSessionConfig delegate:self delegateQueue:[NSOperationQueue mainQueue]] retain];
+    _patchDownloadSession = [NSURLSession sessionWithConfiguration:patchSessionConfig delegate:self delegateQueue:[NSOperationQueue mainQueue]];
     self.patchDownloadTask = [_patchDownloadSession downloadTaskWithURL:patchURL];
     
     [self setPlayGateStatus:[NSString stringWithFormat:NSLocalizedString(@"Downloading: %@", @""), patchURL.lastPathComponent]];
@@ -1198,7 +1248,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     state = WAIT_PATCH_MOUNTED;
     [[NSWorkspace sharedWorkspace] openURL:self.patchFileURL];
     
-    NSAlert *notification = [[[NSAlert alloc] init] autorelease];
+    NSAlert *notification = [[NSAlert alloc] init];
     
     notification.messageText = NSLocalizedString(@"launch_patch_heading", @"Text titling the patch launch dialog");
     notification.informativeText = NSLocalizedString(@"launch_patch_message", @"Main text in the patch launch dialog");
@@ -1209,13 +1259,12 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     [NSApp terminate:self];
 }
 
-- (NSString*)MD5digestForString:(NSString *)string
+- (NSString*)MD5digestForString:(NSData *)rawString
 {
-    NSData *str = [string dataUsingEncoding:NSASCIIStringEncoding];
     NSMutableData *digestData = [NSMutableData dataWithLength:CC_MD5_DIGEST_LENGTH];
     unsigned char *digest = (unsigned char *)digestData.mutableBytes;
     
-    CC_MD5(str.bytes, str.length, digest);
+    CC_MD5(rawString.bytes, rawString.length, digest);
     return [NSString stringWithFormat:@"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
             digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7],
             digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]];
@@ -1244,8 +1293,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     NSDate* now = [NSDate date];
     
     if ((lastStatusUpdateTime == nil) || ([now timeIntervalSinceDate:lastStatusUpdateTime] >= 0.25)) {
-        [lastStatusUpdateTime release];
-        lastStatusUpdateTime = [now retain];
+        lastStatusUpdateTime = now;
         return YES;
     } else {
         return NO;
@@ -1479,7 +1527,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 
 -(void)populateDisplayMenu
 {
-    NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"Displays"] autorelease];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"Displays"];
     NSMenuItem* selectItem = nil;
     
     CGDisplayCount 		displayCount;
@@ -1519,7 +1567,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
             title = [NSString stringWithFormat:@"%d", CGDisplayUnitNumber(displayID)];
         }
         
-        NSMenuItem *menuItem = [[[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""] autorelease];
+        NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""];
         
         [menuItem setTag:static_cast<NSInteger>(displayMask)];
         [menu addItem:menuItem];
@@ -1541,7 +1589,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 
 -(void)populateResolutionMenu
 {
-    NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"Display Resolution"] autorelease];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"Display Resolution"];
     NSArray* modes = (NSArray*)CGDisplayAvailableModes(CGOpenGLDisplayMaskToDisplayID(selectedMonitor));
     
     if (modes == nil) {
@@ -1578,7 +1626,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
                 
                 if (menuItem == nil)
                 {
-                    menuItem = [[[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""] autorelease];
+                    menuItem = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""];
                     
                     [menuItem setRepresentedObject:[NSMutableArray array]];
                     [menuItem setTag:width << 16 | height];
@@ -1633,13 +1681,13 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
         return;
     }
     
-    NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"Refresh Rate"] autorelease];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"Refresh Rate"];
     
     for (NSDictionary *mode in depthModes)
     {
         int rate = [mode[(__bridge NSString *)kCGDisplayRefreshRate] intValue];
         NSString *title = rate ? [NSString stringWithFormat:@"%d Hz", rate] : @"Fixed (LCD)";
-        NSMenuItem* menuItem = [[[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""] autorelease];
+        NSMenuItem* menuItem = [[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""];
         
         menuItem.representedObject = mode;
         menuItem.tag = rate;

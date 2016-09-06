@@ -29,7 +29,7 @@
 #include "pers/persmain.h"
 #include "veh/vehfx.h"
 
-#ifdef IS_DEBUG
+#ifdef DEBUG_WW2
 //#define ENGINE_DEBUG
 #endif
 

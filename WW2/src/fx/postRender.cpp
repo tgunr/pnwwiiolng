@@ -36,8 +36,10 @@ Description:
 -------------------------------------------------------------------*/
 void PostRenderKill()
 {
-    postrender->kill();
-    postrender = nullptr;
+	if (postrender) {
+		postrender->kill();
+		postrender = nullptr;
+	}
 }
 
 /*------------------------------------------------------------------

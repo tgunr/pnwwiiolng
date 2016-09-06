@@ -87,7 +87,6 @@ extern UINT32			MaxUserClipPlanes;
 extern UINT32			MaxTextureWidth;
 extern UINT32			MaxTextureHeight;
 
-extern LOGICAL          WantedHelp;			// asked for commandline help
 extern UINT32			WindowAdapter;		// desired adapter
 extern UINT32			WindowDeviceType;	// desired device type
 extern UINT32			WindowRefreshRate;	// desired refresh rate
@@ -277,7 +276,6 @@ extern LOGICAL          EnableMouseClickToDamageBuildings;
 extern FLOAT32			gTrooperMOD; // LOD scaler mod from preferences
 extern LOGICAL          gCustomTerrain;
 extern UINT32			gEZMode;
-extern UINT32			GameInProgress; // 0 = not running, 1 = running, 2 = quitting
 
 extern UINT32			Convergence; // Global (default) Airplane gun convergence setting
 extern UINT32			CurrentConv; // Current airplane gun convergence setting
@@ -287,7 +285,7 @@ extern SINT8            gAuthServer[128]; // Authentication server to be used
 extern SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 extern SINT8            gClientV[32]; // Version to submit
 
-#ifdef DEBUG
+#ifdef DEBUG_WW2
 extern LOGICAL          DebugBuildingMDLFilesOnly;
 #endif
 

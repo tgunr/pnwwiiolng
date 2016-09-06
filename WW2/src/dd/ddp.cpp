@@ -113,229 +113,6 @@ static void	OnSysKeyUp(UINT nChar, UINT nFlags);
 
 #define USE_NEWGL 0
 
-static int ExceptionHandler(int code, EXCEPTION_POINTERS* ep)
-{
-char*		pStr;
-DWORD		i;
-SYSTEMTIME	SystemTime;
-
-	FILE* ExceptionLog = Fio::OpenLogFile();
-	if ( ExceptionLog )
-	{
-		Write_Debug("Exception handler information...");
-
-	#ifdef EVENT_LOG
-		fprintf(ExceptionLog, "%s Logging Executable\n", SYS_TITLE);
-	#endif
-
-		fprintf(ExceptionLog, "Program compile time: %s %s\n", __DATE__, __TIME__);
-		Write_Debug("Program compile time: %s %s", __DATE__, __TIME__);
-
-		GetLocalTime(&SystemTime);
-		fprintf(ExceptionLog,"Date and time: %d/%d/%d %d:%02d:%02d\n",
-					SystemTime.wMonth,
-					SystemTime.wDay,
-					SystemTime.wYear,
-					SystemTime.wHour,
-					SystemTime.wMinute,
-					SystemTime.wSecond);
-
-		Write_Debug("Date and time: %d/%d/%d %d:%02d:%02d",
-					SystemTime.wMonth,
-					SystemTime.wDay,
-					SystemTime.wYear,
-					SystemTime.wHour,
-					SystemTime.wMinute,
-					SystemTime.wSecond);
-
-		fprintf(ExceptionLog, "Exception code: 0x%08x\n", code);
-		Write_Debug("Exception code: 0x%08x", code);
-
-		switch (code)
-		{
-		case STATUS_WAIT_0:
-			pStr = "Exception: STATUS_WAIT_0";
-			break;
-		case STATUS_ABANDONED_WAIT_0:
-			pStr = "Exception: STATUS_ABANDONED_WAIT_0";
-			break;
-		case STATUS_USER_APC:
-			pStr = "Exception: STATUS_USER_APC";
-			break;
-		case STATUS_TIMEOUT:
-			pStr = "Exception: STATUS_TIMEOUT";
-			break;
-		case STATUS_PENDING:
-			pStr = "Exception: STATUS_PENDING";
-			break;
-		case STATUS_SEGMENT_NOTIFICATION:
-			pStr = "Exception: STATUS_SEGMENT_NOTIFICATION";
-			break;
-		case STATUS_GUARD_PAGE_VIOLATION:
-			pStr = "Exception: STATUS_GUARD_PAGE_VIOLATION";
-			break;
-		case STATUS_DATATYPE_MISALIGNMENT:
-			pStr = "Exception: STATUS_DATATYPE_MISALIGNMENT";
-			break;
-		case STATUS_BREAKPOINT:
-			pStr = "Exception: STATUS_BREAKPOINT";
-			break;
-		case STATUS_SINGLE_STEP:
-			pStr = "Exception: STATUS_SINGLE_STEP";
-			break;
-		case STATUS_ACCESS_VIOLATION:
-			pStr = "Exception: STATUS_ACCESS_VIOLATION";
-			break;
-		case STATUS_IN_PAGE_ERROR:
-			pStr = "Exception: STATUS_IN_PAGE_ERROR";
-			break;
-		case STATUS_INVALID_HANDLE:
-			pStr = "Exception: STATUS_INVALID_HANDLE";
-			break;
-		case STATUS_NO_MEMORY:
-			pStr = "Exception: STATUS_NO_MEMORY";
-			break;
-		case STATUS_ILLEGAL_INSTRUCTION:
-			pStr = "Exception: STATUS_ILLEGAL_INSTRUCTION";
-			break;
-		case STATUS_NONCONTINUABLE_EXCEPTION:
-			pStr = "Exception: STATUS_NONCONTINUABLE_EXCEPTION";
-			break;
-		case STATUS_INVALID_DISPOSITION:
-			pStr = "Exception: STATUS_INVALID_DISPOSITION";
-			break;
-		case STATUS_ARRAY_BOUNDS_EXCEEDED:
-			pStr = "Exception: STATUS_ARRAY_BOUNDS_EXCEEDED";
-			break;
-		case STATUS_FLOAT_DENORMAL_OPERAND:
-			pStr = "Exception: STATUS_FLOAT_DENORMAL_OPERAND";
-			break;
-		case STATUS_FLOAT_DIVIDE_BY_ZERO:
-			pStr = "Exception: STATUS_FLOAT_DIVIDE_BY_ZERO";
-			break;
-		case STATUS_FLOAT_INEXACT_RESULT:
-			pStr = "Exception: STATUS_FLOAT_INEXACT_RESULT";
-			break;
-		case STATUS_FLOAT_INVALID_OPERATION:
-			pStr = "Exception: STATUS_FLOAT_INVALID_OPERATION";
-			break;
-		case STATUS_FLOAT_OVERFLOW:
-			pStr = "Exception: STATUS_FLOAT_OVERFLOW";
-			break;
-		case STATUS_FLOAT_STACK_CHECK:
-			pStr = "Exception: STATUS_FLOAT_STACK_CHECK";
-			break;
-		case STATUS_FLOAT_UNDERFLOW:
-			pStr = "Exception: STATUS_FLOAT_UNDERFLOW";
-			break;
-		case STATUS_INTEGER_DIVIDE_BY_ZERO:
-			pStr = "Exception: STATUS_INTEGER_DIVIDE_BY_ZERO";
-			break;
-		case STATUS_INTEGER_OVERFLOW:
-			pStr = "Exception: STATUS_INTEGER_OVERFLOW";
-			break;
-		case STATUS_PRIVILEGED_INSTRUCTION:
-			pStr = "Exception: STATUS_PRIVILEGED_INSTRUCTION";
-			break;
-		case STATUS_STACK_OVERFLOW:
-			pStr = "Exception: STATUS_STACK_OVERFLOW";
-			break;
-		case STATUS_CONTROL_C_EXIT:
-			pStr = "Exception: STATUS_CONTROL_C_EXIT";
-			break;
-		case STATUS_FLOAT_MULTIPLE_FAULTS:
-			pStr = "Exception: STATUS_FLOAT_MULTIPLE_FAULTS";
-			break;
-		case STATUS_FLOAT_MULTIPLE_TRAPS:
-			pStr = "Exception: STATUS_FLOAT_MULTIPLE_TRAPS";
-			break;
-		default:
-			pStr = "Unknown exception";
-			break;
-		}
-
-		fprintf(ExceptionLog, "%s\n", pStr);
-		Write_Debug("%s", pStr);
-
-		if (ep->ExceptionRecord->ExceptionFlags == EXCEPTION_NONCONTINUABLE)
-		{
-			fprintf(ExceptionLog, "Exception: noncontinuable\n");
-			Write_Debug("Exception: noncontinuable");
-		}
-		else
-		{
-			fprintf(ExceptionLog, "Exception: continuable\n");
-			Write_Debug("Exception: continuable");
-		}
-
-		fprintf(ExceptionLog, "Exception address: 0x%08x\n", ep->ExceptionRecord->ExceptionAddress);
-		Write_Debug("Exception address: 0x%08x", ep->ExceptionRecord->ExceptionAddress);
-
-		for (i=0; i < ep->ExceptionRecord->NumberParameters; i+=2)
-		{
-			fprintf(ExceptionLog, "Exception tried to: %s at address 0x%08x\n", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
-			Write_Debug("Exception tried to: %s at address 0x%08x", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
-		}
-
-		// Has registers
-		fprintf(ExceptionLog, "Exception Registers:\n");
-		Write_Debug("Exception Registers:");
-		if (ep->ContextRecord->ContextFlags & CONTEXT_SEGMENTS)
-		{
-			fprintf(ExceptionLog, "  DS: 0x%08x,  ES: 0x%08x,  FS: 0x%08x,  GS: 0x%08x\n",
-				ep->ContextRecord->SegDs,
-				ep->ContextRecord->SegEs,
-				ep->ContextRecord->SegFs,
-				ep->ContextRecord->SegGs);
-			Write_Debug("  DS: 0x%08x,  ES: 0x%08x,  FS: 0x%08x,  GS: 0x%08x",
-				ep->ContextRecord->SegDs,
-				ep->ContextRecord->SegEs,
-				ep->ContextRecord->SegFs,
-				ep->ContextRecord->SegGs);
-		}
-
-		if (ep->ContextRecord->ContextFlags & CONTEXT_INTEGER)
-		{
-			fprintf(ExceptionLog, " EBP: 0x%08x, ESP: 0x%08x,  SS: 0x%08x, EIP: 0x%08x\n",
-				ep->ContextRecord->Ebp,
-				ep->ContextRecord->Esp,
-				ep->ContextRecord->SegSs,
-				ep->ContextRecord->Eip);
-			Write_Debug(" EBP: 0x%08x, ESP: 0x%08x,  SS: 0x%08x, EIP: 0x%08x",
-				ep->ContextRecord->Ebp,
-				ep->ContextRecord->Esp,
-				ep->ContextRecord->SegSs,
-				ep->ContextRecord->Eip);
-		}
-
-		if (ep->ContextRecord->ContextFlags & CONTEXT_INTEGER)
-		{
-			fprintf(ExceptionLog, " ESI: 0x%08x, EDI: 0x%08x\n EAX: 0x%08x, EBX: 0x%08x, ECX: 0x%08x, EDX: 0x%08x\n",
-				ep->ContextRecord->Esi,
-				ep->ContextRecord->Edi,
-				ep->ContextRecord->Eax,
-				ep->ContextRecord->Ebx,
-				ep->ContextRecord->Ecx,
-				ep->ContextRecord->Edx);
-			Write_Debug(" ESI: 0x%08x, EDI: 0x%08x\r\n EAX: 0x%08x, EBX: 0x%08x, ECX: 0x%08x, EDX: 0x%08x",
-				ep->ContextRecord->Esi,
-				ep->ContextRecord->Edi,
-				ep->ContextRecord->Eax,
-				ep->ContextRecord->Ebx,
-				ep->ContextRecord->Ecx,
-				ep->ContextRecord->Edx);
-		}
-
-		// Has subsequent exception records (if present)
-		ep->ExceptionRecord->ExceptionRecord;
-
-		fflush(ExceptionLog);
-		fclose(ExceptionLog);
-	}
-
-	return(EXCEPTION_EXECUTE_HANDLER);
-}
-
 HINSTANCE ddpGetInstance(void)
 {
 	return (HINSTANCE)hinst;
@@ -990,10 +767,6 @@ LOGICAL ddpUpdate(void)
 	// activate or deactivate the ime as needed
 	//imeUpdate();
 
-	// an exit was declared
-	if(GameInProgress == 2)
-		PostMessageA(myhwnd, WM_CLOSE, 0, 0);
-
 	return(TRUE);
 }
 
@@ -1294,11 +1067,6 @@ UINT32 ddpEngine(LPVOID dummy)
 {
 LOGICAL		retval, *running;
 
-#if !defined(_DEBUG)
-	__try
-	{
-#endif
-
 	running = (LOGICAL*)dummy;
 
 	WantedHdw = FALSE;	//// TEMPORARY (until single pass (i.e. hardware driven) multi-texturing is working)
@@ -1338,14 +1106,6 @@ LOGICAL		retval, *running;
 			Sleep(1);
 		}
 	}
-
-#if !defined(_DEBUG)
-	}
-	__except(ExceptionHandler(GetExceptionCode(), GetExceptionInformation()))
-	{
-		Write_Debug("Exception caught!");
-	}
-#endif
 
 	if (myhwnd != nullptr)
 	{

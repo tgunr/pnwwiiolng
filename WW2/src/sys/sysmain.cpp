@@ -41,10 +41,6 @@ extern void* Imagebase;
 Hideaway* checksum;
 #endif
 
-#ifdef BETA_RELEASE
-//	#pragma fenv_access (on)	// Disables optimization which could override the FPU/SSE2 mode changes
-#endif
-
 #ifndef BETA_RELEASE
 static LOGICAL abcd();
 #endif
@@ -225,7 +221,7 @@ void GetFileVersion(const TCHAR** ppFFI)
 			break;
 		}
 
-		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), (LPVOID*)ptranslate->wLanguage, (PUINT)ptranslate->wCodePage);
+		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), ptranslate->wLanguage, ptranslate->wCodePage);
 		if (!VerQueryValue(pVersion, txt, (LPVOID*)&pFFI, (PUINT)&Len))
 		{
 			Write_Debug("Problem with VerQueryValue");
@@ -246,266 +242,6 @@ void GetFileVersion(const TCHAR** ppFFI)
 }
 
 #include "sys/sysmainHackNonsense.h"
-
-int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep)
-{
-	const char* pStr;
-	const TCHAR* pFFI;
-	DWORD		i;
-	SYSTEMTIME	SystemTime;
-	WWII_ERROR_INFO errInfo;
-
-    ClipCursor(nullptr);
-
-	memset(&errInfo, 0x0, sizeof(errInfo));
-
-	if (!GameInProgress)
-	{
-		return(EXCEPTION_EXECUTE_HANDLER);
-	}
-
-	FILE* ExceptionLog = Fio::OpenLogFile();
-
-	if ( ExceptionLog )
-	{
-	Write_Debug("Exception handler information...");
-
-#ifdef EVENT_LOG
-	fprintf(ExceptionLog, "%s Logging Executable\n", SYS_TITLE);
-#endif
-
-    TCHAR filename[256];
-    memset(filename, 0, sizeof(filename));
-
-    GetModuleFileName(nullptr, filename, sizeof(filename));
-	fprintf(ExceptionLog, "%s\n", UTF8(filename));
-
-	GetFileVersion(&pFFI);
-	if (pFFI != nullptr)
-	{
-		fprintf(ExceptionLog, "File version: %s\n", UTF8(pFFI));
-	}
-	else
-	{
-		fprintf(ExceptionLog, "No file version info available\n");
-	}
-
-    fprintf(ExceptionLog, "Program compile time: %s %s\n", __DATE__, __TIME__);
-    Write_Debug("Program compile time: %s %s", __DATE__, __TIME__);
-
-    GetLocalTime(&SystemTime);
-	fprintf(ExceptionLog,"Date and time: %d/%d/%d %d:%02d:%02d\n",
-				SystemTime.wMonth,
-				SystemTime.wDay,
-				SystemTime.wYear,
-				SystemTime.wHour,
-				SystemTime.wMinute,
-				SystemTime.wSecond);
-
-	Write_Debug("Date and time: %d/%d/%d %d:%02d:%02d",
-				SystemTime.wMonth,
-				SystemTime.wDay,
-				SystemTime.wYear,
-				SystemTime.wHour,
-				SystemTime.wMinute,
-				SystemTime.wSecond);
-
-	fprintf(ExceptionLog, "Exception code: 0x%08x\n", code);
-	Write_Debug("Exception code: 0x%08x", code);
-
-	switch (code)
-	{
-	case STATUS_WAIT_0:
-		pStr = "Exception: STATUS_WAIT_0";
-		break;
-	case STATUS_ABANDONED_WAIT_0:
-		pStr = "Exception: STATUS_ABANDONED_WAIT_0";
-		break;
-	case STATUS_USER_APC:
-		pStr = "Exception: STATUS_USER_APC";
-		break;
-	case STATUS_TIMEOUT:
-		pStr = "Exception: STATUS_TIMEOUT";
-		break;
-	case STATUS_PENDING:
-		pStr = "Exception: STATUS_PENDING";
-		break;
-	case STATUS_SEGMENT_NOTIFICATION:
-		pStr = "Exception: STATUS_SEGMENT_NOTIFICATION";
-		break;
-	case STATUS_GUARD_PAGE_VIOLATION:
-		pStr = "Exception: STATUS_GUARD_PAGE_VIOLATION";
-		break;
-	case STATUS_DATATYPE_MISALIGNMENT:
-		pStr = "Exception: STATUS_DATATYPE_MISALIGNMENT";
-		break;
-	case STATUS_BREAKPOINT:
-		pStr = "Exception: STATUS_BREAKPOINT";
-		break;
-	case STATUS_SINGLE_STEP:
-		pStr = "Exception: STATUS_SINGLE_STEP";
-		break;
-	case STATUS_ACCESS_VIOLATION:
-		pStr = "Exception: STATUS_ACCESS_VIOLATION";
-		break;
-	case STATUS_IN_PAGE_ERROR:
-		pStr = "Exception: STATUS_IN_PAGE_ERROR";
-		break;
-	case STATUS_INVALID_HANDLE:
-		pStr = "Exception: STATUS_INVALID_HANDLE";
-		break;
-	case STATUS_NO_MEMORY:
-		pStr = "Exception: STATUS_NO_MEMORY";
-		break;
-	case STATUS_ILLEGAL_INSTRUCTION:
-		pStr = "Exception: STATUS_ILLEGAL_INSTRUCTION";
-		break;
-	case STATUS_NONCONTINUABLE_EXCEPTION:
-		pStr = "Exception: STATUS_NONCONTINUABLE_EXCEPTION";
-		break;
-	case STATUS_INVALID_DISPOSITION:
-		pStr = "Exception: STATUS_INVALID_DISPOSITION";
-		break;
-	case STATUS_ARRAY_BOUNDS_EXCEEDED:
-		pStr = "Exception: STATUS_ARRAY_BOUNDS_EXCEEDED";
-		break;
-	case STATUS_FLOAT_DENORMAL_OPERAND:
-		pStr = "Exception: STATUS_FLOAT_DENORMAL_OPERAND";
-		break;
-	case STATUS_FLOAT_DIVIDE_BY_ZERO:
-		pStr = "Exception: STATUS_FLOAT_DIVIDE_BY_ZERO";
-		break;
-	case STATUS_FLOAT_INEXACT_RESULT:
-		pStr = "Exception: STATUS_FLOAT_INEXACT_RESULT";
-		break;
-	case STATUS_FLOAT_INVALID_OPERATION:
-		pStr = "Exception: STATUS_FLOAT_INVALID_OPERATION";
-		break;
-	case STATUS_FLOAT_OVERFLOW:
-		pStr = "Exception: STATUS_FLOAT_OVERFLOW";
-		break;
-	case STATUS_FLOAT_STACK_CHECK:
-		pStr = "Exception: STATUS_FLOAT_STACK_CHECK";
-		break;
-	case STATUS_FLOAT_UNDERFLOW:
-		pStr = "Exception: STATUS_FLOAT_UNDERFLOW";
-		break;
-	case STATUS_INTEGER_DIVIDE_BY_ZERO:
-		pStr = "Exception: STATUS_INTEGER_DIVIDE_BY_ZERO";
-		break;
-	case STATUS_INTEGER_OVERFLOW:
-		pStr = "Exception: STATUS_INTEGER_OVERFLOW";
-		break;
-	case STATUS_PRIVILEGED_INSTRUCTION:
-		pStr = "Exception: STATUS_PRIVILEGED_INSTRUCTION";
-		break;
-	case STATUS_STACK_OVERFLOW:
-		pStr = "Exception: STATUS_STACK_OVERFLOW";
-		break;
-	case STATUS_CONTROL_C_EXIT:
-		pStr = "Exception: STATUS_CONTROL_C_EXIT";
-		break;
-	case STATUS_FLOAT_MULTIPLE_FAULTS:
-		pStr = "Exception: STATUS_FLOAT_MULTIPLE_FAULTS";
-		break;
-	case STATUS_FLOAT_MULTIPLE_TRAPS:
-		pStr = "Exception: STATUS_FLOAT_MULTIPLE_TRAPS";
-		break;
-	default:
-		pStr = "Unknown exception";
-		break;
-	}
-
-	fprintf(ExceptionLog, "%s\n", pStr);
-	Write_Debug("%s", pStr);
-
-	if (ep->ExceptionRecord->ExceptionFlags == EXCEPTION_NONCONTINUABLE)
-	{
-		fprintf(ExceptionLog, "Exception: noncontinuable\n");
-		Write_Debug("Exception: noncontinuable");
-	}
-	else
-	{
-		fprintf(ExceptionLog, "Exception: continuable\n");
-		Write_Debug("Exception: continuable");
-	}
-
-	fprintf(ExceptionLog, "Exception address: 0x%08x\n", ep->ExceptionRecord->ExceptionAddress);
-	Write_Debug("Exception address: 0x%08x", ep->ExceptionRecord->ExceptionAddress);
-
-	for (i=0; i < ep->ExceptionRecord->NumberParameters; i+=2)
-	{
-		fprintf(ExceptionLog, "Exception tried to: %s at address 0x%08x\n", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
-		Write_Debug("Exception tried to: %s at address 0x%08x", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
-	}
-
-	// Has registers
-	fprintf(ExceptionLog, "Exception Registers:\n");
-	Write_Debug("Exception Registers:");
-	if (ep->ContextRecord->ContextFlags & CONTEXT_SEGMENTS)
-	{
-		fprintf(ExceptionLog, "  DS: 0x%08x,  ES: 0x%08x,  FS: 0x%08x,  GS: 0x%08x\n",
-			ep->ContextRecord->SegDs,
-			ep->ContextRecord->SegEs,
-			ep->ContextRecord->SegFs,
-			ep->ContextRecord->SegGs);
-		Write_Debug("  DS: 0x%08x,  ES: 0x%08x,  FS: 0x%08x,  GS: 0x%08x",
-			ep->ContextRecord->SegDs,
-			ep->ContextRecord->SegEs,
-			ep->ContextRecord->SegFs,
-			ep->ContextRecord->SegGs);
-	}
-
-	if (ep->ContextRecord->ContextFlags & CONTEXT_INTEGER)
-	{
-		fprintf(ExceptionLog, " EBP: 0x%08x, ESP: 0x%08x,  SS: 0x%08x, EIP: 0x%08x\n",
-			ep->ContextRecord->Ebp,
-			ep->ContextRecord->Esp,
-			ep->ContextRecord->SegSs,
-			ep->ContextRecord->Eip);
-		Write_Debug(" EBP: 0x%08x, ESP: 0x%08x,  SS: 0x%08x, EIP: 0x%08x",
-			ep->ContextRecord->Ebp,
-			ep->ContextRecord->Esp,
-			ep->ContextRecord->SegSs,
-			ep->ContextRecord->Eip);
-	}
-
-	if (ep->ContextRecord->ContextFlags & CONTEXT_INTEGER)
-	{
-		fprintf(ExceptionLog, " ESI: 0x%08x, EDI: 0x%08x\n EAX: 0x%08x, EBX: 0x%08x, ECX: 0x%08x, EDX: 0x%08x\n",
-			ep->ContextRecord->Esi,
-			ep->ContextRecord->Edi,
-			ep->ContextRecord->Eax,
-			ep->ContextRecord->Ebx,
-			ep->ContextRecord->Ecx,
-			ep->ContextRecord->Edx);
-		Write_Debug(" ESI: 0x%08x, EDI: 0x%08x\r\n EAX: 0x%08x, EBX: 0x%08x, ECX: 0x%08x, EDX: 0x%08x",
-			ep->ContextRecord->Esi,
-			ep->ContextRecord->Edi,
-			ep->ContextRecord->Eax,
-			ep->ContextRecord->Ebx,
-			ep->ContextRecord->Ecx,
-			ep->ContextRecord->Edx);
-	}
-
-	// Has subsequent exception records (if present)
-	ep->ExceptionRecord->ExceptionRecord;
-
-	fprintf(ExceptionLog, Detect::strings[1]);
-
-	fflush(ExceptionLog);
-	fclose(ExceptionLog);
-	}
-
-	errInfo.errorType = WW_ERR_EXCEPTION;
-	errInfo.data.exceptInfo.exceptionCode = code;
-	errInfo.data.exceptInfo.exceptionAddr = (UINT32)ep->ExceptionRecord->ExceptionAddress;
-
-	wwiiLog_WWII_ERR_INFO(&errInfo);
-
-	return(EXCEPTION_EXECUTE_HANDLER);
-}
-
 
 BOOL GetWindowsVersion(DWORD* MajorVersion, DWORD* MinorVersion)
 {
@@ -786,7 +522,7 @@ struct LANGANDCODEPAGE
 			break;
 		}
 
-		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), (LPVOID*)ptranslate->wLanguage, (PUINT)ptranslate->wCodePage);
+		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), ptranslate->wLanguage, ptranslate->wCodePage);
 		if (!VerQueryValue(pVersion, txt, (LPVOID*)&pFFI, (PUINT)&Len))
 		{
 			Write_Debug("Problem with VerQueryValue");
@@ -798,7 +534,7 @@ struct LANGANDCODEPAGE
 			cpuspeed = (UINT32)GetCPUSpeed();
 		}
 
-		usprintf(txt, 511, _T("Product: %s\r\nVersion: %s\r\Commit: %s"), filename, pFFI, WWII::gitCommitStr);
+		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs"), filename, pFFI, WWII::gitCommitStr);
 		Write_Debug(UTF8(txt));
 
 		GlobalMemoryStatus(&memstat);
@@ -824,56 +560,6 @@ struct LANGANDCODEPAGE
 
 #endif	//	EVENT_LOG
 #endif	//	OS_WIN32
-
-static void IsValidExit(void)
-{
-const TCHAR* pFFI;
-SYSTEMTIME	SystemTime;
-
-	if (!GameInProgress)
-	{
-		return;
-	}
-
-	//FILE* ValidExitLog = Fio::OpenLogFile();
-
-	Write_Debug("Abort handler information...");
-    ClipCursor(nullptr);
-
-	GetFileVersion(&pFFI);
-	if (pFFI != nullptr)
-	{
-		//fprintf(ValidExitLog, "File version: %s\n", UTF8(pFFI));
-	}
-	else
-	{
-		//fprintf(ValidExitLog, "No file version info available\n");
-	}
-
-	GetLocalTime(&SystemTime);
-	/*
-	fprintf(ValidExitLog,"Date and time: %d/%d/%d %d:%02d:%02d\n",
-				SystemTime.wMonth,
-				SystemTime.wDay,
-				SystemTime.wYear,
-				SystemTime.wHour,
-				SystemTime.wMinute,
-				SystemTime.wSecond);
-*/
-	Write_Debug("Date and time: %d/%d/%d %d:%02d:%02d",
-				SystemTime.wMonth,
-				SystemTime.wDay,
-				SystemTime.wYear,
-				SystemTime.wHour,
-				SystemTime.wMinute,
-				SystemTime.wSecond);
-
-	//fprintf(ValidExitLog, SYS_TITLE " aborted via improper means\n");
-	Write_Debug(SYS_TITLE " aborted via improper means");
-
-	//fflush(ValidExitLog);
-	//fclose(ValidExitLog);
-}
 
 //////////////////////////////////////////////////////////////////////
 // void _lookupRegion(void)
@@ -1029,6 +715,96 @@ static void HandleHackID()
 #endif
 //#endif
 
+struct WinVersionInfo {
+	char major;
+	char minor;
+	char rev;
+	char build;
+};
+
+// well known version numbers for each major system
+static WinVersionInfo winVersions[] = {
+	{ 5, 0, 21, 95 },  // 2k
+	{ 5, 1, 26, 0 },  // XP
+	{ 6, 0, 6, 0 },   // vista
+	{ 6, 0, 6, 2 },   // Vista SP2
+	{ 6, 1, 76, 1 },  // Win7
+	{ 6, 2, 92, 0 },  // Win8
+	{ 6, 3, 96, 0 },  // Win8 update1
+	{ 10,0,102,40 }   // Win10
+};
+
+static bool win10;
+
+static void CheckWindows10()
+{
+	HKEY hKey;
+	LONG res;
+	win10 = false;
+
+	res = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"), 0, KEY_QUERY_VALUE, &hKey);
+	if (res == ERROR_SUCCESS)
+	{
+		DWORD dwType = REG_SZ;
+		char prodName[300];
+		DWORD len = 300;
+		res = RegQueryValueEx(hKey, _T("ProductName"), NULL, &dwType, (LPBYTE)&prodName, &len);
+		if (res == ERROR_SUCCESS)
+		{
+			//LPWSTR
+			//WideCharToMultiByte
+			std::wstring pname = reinterpret_cast<LPWSTR>(prodName);
+			std::wstring search = L"10";
+			if (pname.find(search) != -1)
+			{
+				win10 = true;
+			}
+		}
+
+	}
+
+}
+
+WinVersionInfo &getVersionInfo()
+{
+	if (win10)
+		return winVersions[7];
+	else if (IsWindows8Point1OrGreater())
+		return winVersions[6];
+	else if (IsWindows8OrGreater())
+		return winVersions[5];
+	else if (IsWindows7OrGreater())
+		return winVersions[4];
+	else if (IsWindowsVistaSP2OrGreater())
+		return winVersions[3];
+	else if (IsWindowsVistaOrGreater())
+		return winVersions[2];
+	else if (IsWindowsXPOrGreater())
+		return winVersions[1];
+	else
+		return winVersions[0];
+}
+
+char GetOSMajorVersion()
+{
+	return getVersionInfo().major;
+}
+
+char GetOSMinorVersion()
+{
+	return getVersionInfo().minor;
+}
+
+char GetOSRevision()
+{
+	return getVersionInfo().rev;
+}
+
+char GetOSBuild()
+{
+	return getVersionInfo().build;
+}
+
 // This is the actual winmain
  int WINAPI WinMainX(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -1043,9 +819,9 @@ RECT	rect;
 int		screenmode;
 #endif	// DIRECT3D
 
-//CW can't do a nameless union initialization
-    memset(&IdentityMatrix, 0, sizeof(piMATRIX));
+	CheckWindows10();
 
+    memset(&IdentityMatrix, 0, sizeof(piMATRIX));
 	IdentityMatrix.m[0][0] = IdentityMatrix.m[1][1] = 1.0;
 	IdentityMatrix.m[2][2] = IdentityMatrix.m[3][3] = 1.0;
 
@@ -1055,17 +831,7 @@ int		screenmode;
 	wwiiSendLog_WWII_ERR_INFO();
 
 	// delete the log files
-#ifndef WIN32
-# define _unlink(file) unlink(file)
-#endif
-
 	Fio::DeleteLogFile();
-
-
-	// Andrew's simulated crash
-	//int xxx=0;
-	//int yyy = 1/xxx;
-
 
 	// legacy sake
 	_unlink("ww2errinfo.log");
@@ -1081,20 +847,7 @@ int		screenmode;
 	strcat(logfilename, ".log");
 	_unlink(logfilename);
 
-	atexit(IsValidExit);
-
-	GameInProgress = 1;
-
-#ifdef CRASH_HANDLER
-#ifdef CRASHOLA
-	//int xxx=0; int yyyy=12/xxx;
-	//throw "barf";
-	//throw std::exception("Problem");
-#endif
-#endif
-
 #ifdef TERRAIN_EDITOR
-	WantedHelp = FALSE;
 	WantedWidth = 800;
 	WantedHeight = 600;
 	WantedBpp = TEX_BPP;
@@ -1104,7 +857,6 @@ int		screenmode;
 	WantedWindow = TRUE;
 	WantedUserLogEnabled = FALSE;
 #else
-	WantedHelp = FALSE;
 	WantedWidth = GetSystemMetrics(SM_CXSCREEN);
 	WantedHeight = GetSystemMetrics(SM_CYSCREEN);
 	WantedBpp = TEX_BPP;
@@ -1155,6 +907,13 @@ int		screenmode;
 #endif
 
 #ifdef BETA_RELEASE
+	if (OpenConsole)
+	{
+		AllocConsole();
+		freopen("CONOUT$", "wb", stdout);
+		freopen("CONOUT$", "wb", stderr);
+	}
+
 	LogEnabled = TRUE;
 	UserLogEnabled = WantedUserLogEnabled;
 	Open_Debug(SYS_TITLE);
@@ -1165,14 +924,12 @@ int		screenmode;
 	UserLogEnabled = FALSE;
 #endif
 
-#if XAUDIO
     HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
     if(hr != S_OK)
     {
         Write_Debug("CoInitializeEx FAILED with error: %x", hr);
     }
-#endif
 
 	SetupFPU(true);
 	memInit();
@@ -1184,6 +941,14 @@ int		screenmode;
 	// look up the product region (us/china)
 	_lookupProductRegion();
 
+	// Pull in the commandline arguments early so that builds
+	// which rely upon a DataPath being set will have it for
+	// use in cfgPrefsLoad().
+	if (!mngoptParse(""))
+	{
+		return(0);
+	}
+
 	// we then try to load wwiiol.xml variables
 	// eventually this call will replace the above call
 	if(!cfgPrefsLoad())
@@ -1193,6 +958,8 @@ int		screenmode;
 
 	// This call* must* follow the call to cfgLoadGlobals
 	// Command line options always override configuration file values
+	// But since we needed to parse these above also, the eaiest way
+	// around the chicken-and-egg problem is to just do this twice.
 	if (!mngoptParse(""))
 	{
 		return(0);
@@ -1211,15 +978,6 @@ int		screenmode;
 #ifdef TERRAIN_EDITOR
 	WantedWindow = TRUE;
 #endif
-
-	if (WantedHelp)
-	{
-		TCHAR  HelpInfo[512];
-
-		LoadString(hInstance, IDS_HELPINFO, HelpInfo, 512);
-		MessageBox(nullptr, HelpInfo, _T("WW2 Online Help"), MB_OK|MB_ICONINFORMATION);
-		return(0);
-	}
 
 #ifdef DONT_USE
 	if (!syshsCheckHdwSfw(FALSE))
@@ -1243,13 +1001,6 @@ int		screenmode;
 	AddArchives();
 #endif // FRES
 #else
-
-	if(OpenConsole)
-	{
-		AllocConsole();
-		freopen( "CONOUT$", "wb", stdout);
-		freopen( "CONOUT$", "wb", stderr);
-	}
 
 	if(WantDataDir)
 	{
@@ -1289,13 +1040,6 @@ int		screenmode;
 #ifdef OPENGL3D
 	ddpSetInstance(hInstance);
 #endif	// OPENGL3D
-
-#ifndef CRASH_HANDLER
-#if !defined(DEBUG_WW2)
-	__try
-	{
-#endif
-#endif
 
 #ifndef BETA_RELEASE
     if(abcd())
@@ -1478,16 +1222,6 @@ int		screenmode;
 
 #endif	// DONT_USE_THREAD
 
-#ifndef CRASH_HANDLER
-#if !defined(DEBUG_WW2)
-	}
-	__except(sysmainExceptionHandler(GetExceptionCode(), GetExceptionInformation()))
-	{
-		Write_Debug("Exception handled!");
-	}
-#endif
-#endif
-
 	fioaKill(); // make sure no fio calls after this!
 
 #ifdef DIRECT3D
@@ -1501,11 +1235,11 @@ int		screenmode;
 	// teulShutdownTransport();
 
 	// we're done
-	GameInProgress = 0;
-
 	memKill();
 
 	Close_Debug();
+
+	CoUninitialize();
 
 	return(msg.wParam);
 }
@@ -1590,11 +1324,13 @@ void sysmainQuit(void)
 {
 	cfgPrefsSave();
 
-	// declare an exit
-	GameInProgress = 2;
+    // Notify the ddp stuff
+	extern HWND myhwnd;
+	PostMessageA(myhwnd, WM_CLOSE, 0, 0);
 
 #if RELEASE_CLIENT == 1
-		exit(0);
+    // TODO: Is this really desirable behavior?
+    exit(0);
 #endif
 }
 
@@ -1690,117 +1426,12 @@ void sysSetMousePosition(int x, int y)
 	SetCursorPos(WantedX + x, WantedY + y);
 }
 
-struct WinVersionInfo {
-	char major;
-	char minor;
-	char rev;
-	char build;
-};
-
-// well known version numbers for each major system
-WinVersionInfo winVersions[] = {
-	{ 5, 0, 21, 95},  // 2k
-	{ 5, 1, 26, 0 },  // XP
-	{ 6, 0, 6, 0 },   // vista
-	{ 6, 0, 6, 2 },   // Vista SP2
-	{ 6, 1, 76, 1 },  // Win7
-	{ 6, 2, 92, 0 },  // Win8
-	{ 6, 3, 96, 0 },  // Win8 update1
-	{ 10,0,102,40 }   // Win10
-};
-
-bool win10;
-
-void CheckWindows10()
-{
-	HKEY hKey;
-	LONG res;
-	win10 = false;
-
-	res = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"), 0, KEY_QUERY_VALUE, &hKey);
-	if (res == ERROR_SUCCESS)
-	{
-		DWORD dwType = REG_SZ;
-		char prodName[300];
-		DWORD len = 300;
-		res = RegQueryValueEx(hKey, _T("ProductName"), NULL, &dwType, (LPBYTE)&prodName, &len);
-		if (res == ERROR_SUCCESS)
-		{
-			//LPWSTR
-			//WideCharToMultiByte
-			std::wstring pname = reinterpret_cast<LPWSTR>(prodName);
-			std::wstring search = L"10";
-			if (pname.find(search) != -1)
-			{
-				win10 = true;
-			}
-		}
-
-	}
-
-}
-
-WinVersionInfo &getVersionInfo()
-{
-	if (win10)
-		return winVersions[7];
-	else if (IsWindows8Point1OrGreater())
-		return winVersions[6];
-	else if (IsWindows8OrGreater())
-		return winVersions[5];
-	else if (IsWindows7OrGreater())
-		return winVersions[4];
-	else if (IsWindowsVistaSP2OrGreater())
-		return winVersions[3];
-	else if (IsWindowsVistaOrGreater())
-		return winVersions[2];
-	else if (IsWindowsXPOrGreater())
-		return winVersions[1];
-	else
-		return winVersions[0];
-}
-
-char GetOSMajorVersion()
-{
-	return getVersionInfo().major;
-}
-
-char GetOSMinorVersion()
-{
-	return getVersionInfo().minor;
-}
-
-char GetOSRevision()
-{
-	return getVersionInfo().rev;
-}
-
-char GetOSBuild()
-{
-	return getVersionInfo().build;
-}
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	int result = 0;
-
-	CheckWindows10();
-
-#ifndef CRASH_HANDLER
-	result = WinMainX(hInstance,hPrevInstance,lpCmdLine,nCmdShow);
-#else
-	result = crashhandler(hInstance,hPrevInstance,lpCmdLine,nCmdShow);
+#ifdef CRASH_HANDLER
+	InstallCrashHandler();
 #endif
 
-#ifdef BETA_RELEASE
-#define DONTCALL_COM_CLOSE
-#endif
-
-#if XAUDIO
-#ifndef DONTCALL_COM_CLOSE
-    CoUninitialize();
-#endif
-#endif
-
-	return result;
+	// Don't uninstall crash handler here, it can still catch stuff happening during teardown.
+	return WinMainX(hInstance,hPrevInstance,lpCmdLine,nCmdShow);
 }
