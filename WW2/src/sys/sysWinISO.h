@@ -6,6 +6,9 @@
 
 // You need to make this the last thing you #include
 #include <algorithm>
+
+#if platOS == OS_WIN32
+
 #include <direct.h>
 
 #define OS_ALLOCA(...) _malloca(__VA_ARGS__)
@@ -41,3 +44,27 @@
 #define snprintf _snprintf
 #define swprintf swprintf_s
 #define	vswprintf vswprintf_s
+
+#else
+
+// Provide the passthrough defines for non-Windows platforms
+#define OS_ALLOCA(...) ::alloca(__VA_ARGS__)
+#define OS_OPEN(...) ::open(__VA_ARGS__)
+#define OS_CLOSE(...) ::close(__VA_ARGS__)
+#define OS_WOPEN(...) wopen(__VA_ARGS__)
+#define OS_DUP(...) ::dup(__VA_ARGS__)
+#define OS_FDOPEN(...) fdopen(__VA_ARGS__)
+#define OS_READ(...) ::read(__VA_ARGS__)
+#define OS_WRITE(...) ::write(__VA_ARGS__)
+#define OS_LSEEK(...) ::lseek(__VA_ARGS__)
+#define OS_MKDIR(...) mkdir(__VA_ARGS__)
+#define OS_WMKDIR(...) wmkdir(__VA_ARGS__)  // wide version
+#define OS_CHDIR(f) chdir(f)
+#define OS_CREAT(f,p) ::creat(f,p)
+#define OS_WCREAT(f,p) wcreat(f,p)  // wide version
+#define OS_FILENO(f) fileno(f)
+#define OS_ACCESS(...) ::access(__VA_ARGS__)
+#define OS_WACCESS(...) waccess(__VA_ARGS__)
+#define OS_CLOSESOCKET(...) close(__VA_ARGS__)
+
+#endif
