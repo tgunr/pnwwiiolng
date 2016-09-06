@@ -10,6 +10,9 @@ die() {
 shaHash=$( xcrun git -c color.ui=never rev-parse HEAD )
 [ $? -eq 0 ] || die "git rev-parse failed"
 
+shortShaHash=$( xcrun git -c color.ui=never rev-parse --short HEAD )
+[ $? -eq 0 ] || die "git rev-parse --short failed"
+
 state=$( xcrun git -c color.ui=never status --porcelain -uno | wc -l )
 [ $? -eq 0 ] || die "git status failed"
 [ $state -eq 0 ] && status=clean || status=dirty
@@ -25,7 +28,7 @@ INFO="${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Contents/Info.plist"
 plutil -replace GitShaHash -string "$shaHash" "$INFO"
 plutil -replace GitState -string "$status" "$INFO"
 plutil -replace CFBundleShortVersionString -string "$version" "$INFO"
-plutil -replace CFBundleVersion -string "$version" "$INFO"
+plutil -replace CFBundleVersion -string "$shortShaHash" "$INFO"
 
 # For some reason, defaults now forces binary plist format. Not good for an Info.plist
 plutil -convert xml1 "$INFO"
