@@ -36,8 +36,8 @@
 #ifdef ANTIHACK
 #include "tools/diddle.h"
 
-extern HideawayStorage* storage1;
-extern void* Imagebase;
+HideawayStorage* storage1;
+void* Imagebase;
 Hideaway* checksum;
 #endif
 
@@ -1430,6 +1430,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
 #ifdef CRASH_HANDLER
 	InstallCrashHandler();
+#endif
+
+#ifdef ANTIHACK
+	// HACK: Used to be in the old crashhandler() function in basically this position.
+	HideawayStorage st1;
+	storage1 = &st1;
+	Imagebase = (void*) &__ImageBase;
 #endif
 
 	// Don't uninstall crash handler here, it can still catch stuff happening during teardown.
