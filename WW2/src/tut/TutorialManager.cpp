@@ -474,6 +474,9 @@ TutorialHandler* TutorialManager::AddAreaHandler(const char* callback, const cha
 
 		handler->data.l.coords.push_back(minpt);
 		handler->data.l.coords.push_back(maxpt);
+
+        handler->data.i = 0;
+        handler->data.l.d = 0;
 	}
 
 	return handler;
