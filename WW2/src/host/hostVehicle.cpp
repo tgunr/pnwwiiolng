@@ -80,11 +80,12 @@ HostVehicleImpl::reset()
 void
 HostVehicleImpl::resetCaptureTick()
 {
-	TeulTimeMS tickInterval = (TeulTimeMS)host_config.capture.tickInterval_s * 1000;
+	// make up for fact we are sending 10 times per second and being off just slightly will result in a late arrival
+	TeulTimeMS tickInterval = (TeulTimeMS)host_config.capture.tickInterval_s * 1000 - 100;
 	// We need some kind of minimum interval, I chose 250ms.
 	if ( tickInterval == 0 )
 		tickInterval = 250;
-	m_nextCaptureTick = teulClock64 + tickInterval;
+	m_nextCaptureTick += tickInterval;
 }
 
 //////////////////////////////////////////////////////////////////////

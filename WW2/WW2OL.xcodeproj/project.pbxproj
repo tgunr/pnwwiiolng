@@ -3294,8 +3294,19 @@
 			attributes = {
 				LastUpgradeCheck = 0720;
 				TargetAttributes = {
+					080C7E831062F011000A242F = {
+						DevelopmentTeam = J63A54QWD2;
+					};
+					47B0ED230E9A66A40089DCC4 = {
+						DevelopmentTeam = J63A54QWD2;
+					};
+					8D0C4E890486CD37000505A6 = {
+						DevelopmentTeam = J63A54QWD2;
+						ProvisioningStyle = Manual;
+					};
 					E97C76341C8513EB00875F44 = {
 						CreatedOnToolsVersion = 7.2.1;
+						DevelopmentTeam = J63A54QWD2;
 					};
 				};
 			};

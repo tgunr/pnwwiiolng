@@ -36,8 +36,8 @@
 #ifdef ANTIHACK
 #include "tools/diddle.h"
 
-extern HideawayStorage* storage1;
-extern void* Imagebase;
+HideawayStorage* storage1;
+void* Imagebase;
 Hideaway* checksum;
 #endif
 
@@ -818,6 +818,13 @@ RECT	rect;
 #ifdef DIRECT3D
 int		screenmode;
 #endif	// DIRECT3D
+
+#ifdef ANTIHACK
+	// HACK: Used to be in the old crashhandler() function in basically this position.
+	HideawayStorage st1;
+	storage1 = &st1;
+	Imagebase = (void*) &__ImageBase;
+#endif
 
 	CheckWindows10();
 

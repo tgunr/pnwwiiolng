@@ -331,6 +331,11 @@ function getPopulation ()
   return chatGetPopulation(ALLIED) + chatGetPopulation(AXIS)
 end
 
+gluehelp['getLowerPopulation'] = "() Returns the lower of the two sides' population"
+function getLowerPopulation()
+  return math.min(chatGetPopulation(ALLIED), chatGetPopulation(AXIS))
+end
+
 ----------------------------------------------------------------------
 -- Wrappers for manipulating brigades and divisions
 ----------------------------------------------------------------------

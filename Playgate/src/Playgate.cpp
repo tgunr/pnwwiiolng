@@ -269,8 +269,8 @@ namespace {
 			std::wstring var(param.begin(), param.begin()+param.find_first_of('='));
 			std::wstring val(param.begin()+param.find_first_of('=')+1, param.end());
 
-			if ( var == L"authhost" )
-				sprintf_s(g_authHostName, 256, "%s", (const char*)CT2A(lpszParam)) ;
+            if (var == L"authhost")
+                WWII::ConvertChars(val.c_str(), g_authHostName, sizeof(g_authHostName));
 			else if ( var == L"path" )
 				g_exePath = val;
 			else if ( var == L"data" )
