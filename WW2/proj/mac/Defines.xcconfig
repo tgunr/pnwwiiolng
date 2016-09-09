@@ -31,7 +31,7 @@ WW2_DEFINES_Common_01       = $(WW2_DEFINES_Common_02) xSPATIAL_DB              
 
 // Debug flags common to development and debug; debug is always a subset of dev
 WW2_DEFINES_Debug_05        = $(WW2_DEFINES_Debug_06) BETA_RELEASE                  // enable BETA features
-WW2_DEFINES_Debug_04        = $(WW2_DEFINES_Debug_05) ENABLE_FLOATERS               // enable buzzard etc for debug builds as well as GM
+WW2_DEFINES_Debug_04        = $(WW2_DEFINES_Debug_05) GM_RELEASE                    // enable buzzard etc for debug builds as well as GM
 WW2_DEFINES_Debug_03        = $(WW2_DEFINES_Debug_04) RELEASE_CLIENT=1              // not a release client, but we act like one anyway
 WW2_DEFINES_Debug_02        = $(WW2_DEFINES_Debug_03) IS_DEBUG DEBUG _DEBUG DEBUG_WW2
 WW2_DEFINES_Debug_01        = $(WW2_DEFINES_Debug_02) DONT_USE_COVERT               // disable bad tricks for masking memory values
@@ -59,7 +59,7 @@ WW2_DEFINES_Development_02  = $(WW2_DEFINES_Development_03) CONNECTION_TEST_BUIL
 WW2_DEFINES_Development_01  = $(WW2_DEFINES_Development_02) DEV_BUILD               // various extra debugging
 
 // GM mode
-WW2_DEFINES_GM_01           = $(WW2_DEFINES_GM_02) ENABLE_FLOATERS                  // enable buzzard and several other things
+WW2_DEFINES_GM_01           = $(WW2_DEFINES_GM_02) GM_RELEASE                       // enable buzzard and several other things
 
 // Release mode
 WW2_DEFINES_Release_02      = $(WW2_DEFINES_Release_02) NDEBUG

@@ -84,7 +84,7 @@ UINT32	bitFields[12] =
 // this is the big granddaddy structure to hold all of the state and info needed for a
 // third person model
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 static FLOAT32		LODForceValue;
 #endif
 
@@ -836,7 +836,7 @@ LOGICAL gr2AnimUpdateModel (OBJECT* pObject, LOGICAL isFPS)
 	//fpTPSLODType lastLOD = model->currentLOD;
 
 	// determine LOD
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 	if (LODForceValue) {
 		gr2AnimUpdateLOD(model, LODForceValue);
 	} else
@@ -5102,7 +5102,7 @@ void gr2AnimUpdateSurfaceID(gr2AnimTrooper* model)
 	model->nextSurfaceCheck = frametime + 250;
 }
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 void gr2AnimForceLOD (FLOAT32 lodValue)
 {
 	LODForceValue = lodValue;

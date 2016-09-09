@@ -508,7 +508,7 @@ static UINT32 _TraverseAndSetupColorCoding(OBJECT * Object,UINT32 UseAlpha,vehVe
 static void _LeakTest(void);
 #endif
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 static UINT32 _DoEyeOperations(mlVehicleData* VehicleData);
 #endif
 
@@ -1302,7 +1302,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 
 	vehVehicle* playerVehicle = VehicleData->VehicleMasterPtr;
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 	if(SuperFloat || playerVehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{
 		_DoEyeOperations(VehicleData);
@@ -1315,7 +1315,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 
 		return 0;
 	}
-#endif // ENABLE_FLOATERS
+#endif // GM_RELEASE
 
 	//if(NumTics)
 	//	_UpdateMovingParts(VehicleData,(FLOAT64)(NumTics*TicTime));
@@ -10269,7 +10269,7 @@ LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total)
 	return TRUE;
 }
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 
 // more hacked stuff before the rats abandon the ship...
 static FLOAT64	profileFlightVelocity;						// double precision is so 1337!!1
@@ -10503,7 +10503,7 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 	return 0;
 }
 
-#endif // ENABLE_FLOATERS
+#endif // GM_RELEASE
 
 #ifdef __MWERKS__
 #pragma mark -

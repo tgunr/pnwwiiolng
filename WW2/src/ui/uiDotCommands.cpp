@@ -176,7 +176,7 @@ static void _HitmapName(OBJECT* obj, void* p);
 
 SINT32 dot_move(const char* line);
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 void vehmainToggleLOD (void);
 #endif
 
@@ -5577,7 +5577,7 @@ static SINT32 dot_speed(const char*)
 
 
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 
 /************************************************************************************************
 	MoveCmd
@@ -5962,7 +5962,7 @@ static SINT32 dot_vehlod(const char* line)
 	return DC_HANDLED;
 }
 
-#endif // ENABLE_FLOATERS
+#endif // GM_RELEASE
 
 
 
@@ -7861,7 +7861,7 @@ void uiDotCommandsInit()
 #endif
 
 	// floater commands
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 	ADD_DOT_COMMAND(move, false);
 	ADD_DOT_COMMAND(follow, false);
 	ADD_DOT_COMMAND(inflod, false);
