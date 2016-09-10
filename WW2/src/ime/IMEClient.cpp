@@ -1497,93 +1497,42 @@ void IMEClient::SetDescription()
 {
 	strings[IME_STRING_DESC] = L"";
 
-	if(IsTIP())
+	if (IsTIP()) {
 		tsfSink.GetDescription();
-
-	if(strings[IME_STRING_DESC].size())
-		return;
-
-	// try the IMM api 1st
-	TCHAR description[255+1];
-	DWORD dsize = ImmGetDescription(currentLocale, description, 255);
-
-	if(dsize)
-	{
-		//description = new TCHAR[dsize+1];
-
-		//if(description)
-		//{
-			//memset(description, 0, sizeof(description));
-
-			//if(ImmGetDescription(currentLocale, description, dsize) > 0)
-				strings[IME_STRING_DESC] = description;
-
-			//delete[] description;
-		//}
 	}
 
-	if(strings[IME_STRING_DESC].size())
+	if (strings[IME_STRING_DESC].size()) {
 		return;
-
-	// that didn't work, lets try to find the layout display name
-	TCHAR localeName[KL_NAMELENGTH];
-	localeName[0] = 0;
-
-	// get the localename
-	if(GetKeyboardLayoutName(localeName))
-	{
-		//TCHAR description[255+1];
-		TCHAR key[256];
-
-		usprintf(key, 255, _T("SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts\\%ls"), localeName);
-
-		// first we'll see if it has a layout display indirect string
-		if(sysregGetHKeyText(HKEY_LOCAL_MACHINE, key, _T("Layout Display Name"), description))
-		{
-			TCHAR display[256];
-			if(SHLoadIndirectString(description, display, 255, nullptr) == S_OK && display[0] != L'@')
-				strings[IME_STRING_DESC] = display;
-		}
-
-		// that didn't work, lets try the layout text
-		if(strings[IME_STRING_DESC].empty())
-		{
-			if(sysregGetHKeyText(HKEY_LOCAL_MACHINE, key, _T("Layout Text"), description))
-				strings[IME_STRING_DESC] = description;
-		}
 	}
 
-	if(strings[IME_STRING_DESC].size())
-		return;
+	TCHAR localeName[KL_NAMELENGTH] = {0};
+
+	strings[IME_STRING_DESC].assign(ImmGetDescription(currentLocale, nullptr, 0) + 1, L'\0'); // get needed size
+	strings[IME_STRING_DESC].resize(ImmGetDescription(currentLocale, &strings[IME_STRING_DESC][0], strings[IME_STRING_DESC].length())); // get actual string
+	if (strings[IME_STRING_DESC].length() == 0 && GetKeyboardLayoutName(localeName) != 0) {
+		std::wstring displayName, key = std::wstring(L"SYSTEM\\CurrentControlSet\\Control\\Keyboard Layouts\\") + localeName, indirectName(512, L'\0');
+		if (sysregGetHKeyText(HKEY_LOCAL_MACHINE, key.c_str(), L"Layout Display Name", displayName)) {
+			if (SHLoadIndirectString(displayName.c_str(), &indirectName[0], 512, nullptr) == S_OK && indirectName[0] != L'@') {
+				strings[IME_STRING_DESC] = std::wstring(indirectName.c_str(), wcslen(indirectName.c_str()));
+				return;
+			} else if (sysregGetHKeyText(HKEY_LOCAL_MACHINE, key.c_str(), L"Layout Text", strings[IME_STRING_DESC])) {
+				return;
+			}
+		}
+	}
 
 	// everything else failed, lets just set something based on the language of the current locale
-	switch ( GETPRIMLANG() )
-	{
-		// Simplified Chinese
+	switch (GETPRIMLANG()) {
 		case LANG_CHINESE:
-			switch ( GETSUBLANG() )
-			{
-				case SUBLANG_CHINESE_SIMPLIFIED:
-					strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_CHS];
-					break;
-				case SUBLANG_CHINESE_TRADITIONAL:
-					strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_CHT];
-					break;
-				default:	// unsupported sub-language
-					strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_NON_IME];
-					break;
+			switch (GETSUBLANG()) {
+				case SUBLANG_CHINESE_SIMPLIFIED: strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_CHS]; break;
+				case SUBLANG_CHINESE_TRADITIONAL: strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_CHT]; break;
+				default: strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_NON_IME]; break; // unsupported sub-language
 			}
 			break;
-		// Korean
-		case LANG_KOREAN:
-			strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_KOREAN];
-			break;
-		// Japanese
-		case LANG_JAPANESE:
-			strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_JAPANESE];
-			break;
-		default:
-			strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_NON_IME];
+		case LANG_KOREAN: strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_KOREAN]; break;
+		case LANG_JAPANESE: strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_JAPANESE]; break;
+		default: strings[IME_STRING_DESC] = g_aszIndicator[INDICATOR_NON_IME]; break;
 	}
 }
 
