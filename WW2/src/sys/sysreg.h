@@ -1,17 +1,10 @@
 #pragma once
 
-#include "tchar.h"
+#define REG_KEY_MAIN	L"Software\\" SYS_REGISTRY_NAME L"\\Config"
+#define REG_MAIN_LOC  	L"MAIN_LOC"
+#define REG_MAIN_SIZE  	L"MAIN_SIZE"
 
-#define REG_KEY_MAIN				_T("Software\\") SYS_REGISTRY_NAME _T("\\Config")
-#define REG_MAIN_LOC  				_T("MAIN_LOC")
-#define REG_MAIN_SIZE  				_T("MAIN_SIZE")
-
-extern BOOL sysregGetKeyText(const TCHAR* keyloc, const TCHAR* keyname, TCHAR* keytext);
-extern BOOL sysregGetKeyDword(const TCHAR* keyloc, const TCHAR* keyname, DWORD* keydword);
-extern BOOL sysregSetKeyText(const TCHAR* keyloc, const TCHAR* keyname, const TCHAR* keytext);
-extern BOOL sysregSetKeyDword(const TCHAR* keyloc, const TCHAR* keyname, const DWORD* keydword);
-extern BOOL sysregGetHKeyDword(HKEY HKey, const TCHAR* keyloc, const TCHAR* keyname, DWORD* keydword);
-extern BOOL sysregGetHKeyText(HKEY HKey, const TCHAR* keyloc, const TCHAR* keyname, TCHAR* keytext);
-
-extern const TCHAR* sysregGetInstallValue(const TCHAR* Key);
-
+extern BOOL sysregGetHKeyText(HKEY HKey, const WCHAR *keyloc, const WCHAR *keyname, std::wstring &keytext);
+extern BOOL sysregGetHKeyDword(HKEY HKey, const WCHAR *keyloc, const WCHAR *keyname, DWORD *keyword);
+extern BOOL sysregSetHKeyText(HKEY HKey, const WCHAR *keyloc, const WCHAR *keyname, const WCHAR *keytext);
+extern BOOL sysregSetHKeyDword(HKEY HKey, const WCHAR *keyloc, const WCHAR *keyname, DWORD keydword);
