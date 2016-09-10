@@ -42,10 +42,10 @@ void fioInit()
 		CoTaskMemFree(docsPath);
 	}
 
-	// HACK: Put in the default location if an installation doesn't exist.
-	path += L"\\";
-	path += (sysregGetInstallValue(_T("Version")) ? sysregGetInstallValue(_T("Version")) : L"Battleground Europe");
-	path += L"\\";
+	// This used to look in the registry, but it turns out the installer never sets anything interesting for
+	// the registry key in question in the first place, so heck with it, just hardcode the name until it gets
+	// moved to the proper place.
+	path += L"\\Battleground Europe\\";
 
 	// Ensure our subdirectory exists
 	CreateDirectory(path.c_str(), nullptr);

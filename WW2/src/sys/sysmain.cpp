@@ -559,30 +559,6 @@ struct LANGANDCODEPAGE
 #endif	//	EVENT_LOG
 #endif	//	OS_WIN32
 
-//////////////////////////////////////////////////////////////////////
-// void _lookupRegion(void)
-//
-// Determine the appID from the build's version number and check the registry for that appID
-// to see if which product region (e.g. us or china) we are supposed to be using.
-//////////////////////////////////////////////////////////////////////
-
-static void _lookupProductRegion()
-{
-#if GREEN_INSTALL == 1
-	gLanguage = gRegion = IDE_LANGUAGE_CHINESE;
-#else
-	// set our defaults
-	gLanguage = gRegion = IDE_LANGUAGE_ENGLISH;
-
-	const TCHAR* region = sysregGetInstallValue(_T("Region"));
-
-	if(region && (!ustrcmp(region, _T("china")) || !ustrcmp(region, _T("cn")) || !ustrcmp(region, _T("zh"))))
-		gLanguage = gRegion = IDE_LANGUAGE_CHINESE;
-#endif // GREEN_INSTALL == 1
-
-	// uncomment to force chinese
-	//gLanguage = gRegion = IDE_LANGUAGE_CHINESE;
-}
 
 //////////////////////////////////////////////////////////////////////
 //	void SetupFPU(bool enableExceptions)
@@ -933,8 +909,11 @@ int		screenmode;
 	dx3dinfoGetAdaptersAndModes(nullptr, nullptr);
 #endif	// DIRECT3D
 
-	// look up the product region (us/china)
-	_lookupProductRegion();
+	// A registry key used to be consulted for this, but the installer never sets anything interesting for
+	// that key, so we just assume it's the value it will always be. Honestly, if this actually did change
+	// there's a lot else that would have to change anyhow.
+	gLanguage = IDE_LANGUAGE_ENGLISH;
+	gRegion = IDE_LANGUAGE_ENGLISH;
 
 	// Pull in the commandline arguments early so that builds
 	// which rely upon a DataPath being set will have it for
