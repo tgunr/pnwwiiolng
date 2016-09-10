@@ -355,8 +355,6 @@ BOOL				bOsVersionInfo;
 #if platOS == OS_WIN32
 #ifdef EVENT_LOG
 
-#define REG_KEY_MAIN				_T("Software\\") SYS_REGISTRY_NAME _T("\\Config")
-
 #define cpuid __asm _emit 0x0f __asm _emit 0xa2
 
 #define DIV 1024
@@ -879,7 +877,6 @@ int		screenmode;
 	x = ((rect.right - rect.left) - WantedWidth) / 2;
 	y = ((rect.bottom - rect.top) - WantedHeight) / 2;
 
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
 	if (sysregGetKeyDword(REG_KEY_MAIN, REG_MAIN_SIZE, (DWORD*)&wh) &&
 		sysregGetKeyDword(REG_KEY_MAIN, REG_MAIN_LOC, (DWORD*)&xy))
 	{
