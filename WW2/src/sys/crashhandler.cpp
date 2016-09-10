@@ -27,6 +27,8 @@
 #include <codecvt>
 #include "versionNo.h"
 #include "client_revision.h"
+#include "sys/sysreg.h"
+#include "unique_opaque_ptr.hpp"
 #include "client/windows/handler/exception_handler.h"
 
 #pragma endregion
@@ -91,32 +93,7 @@ struct CCom {
 	CCom &operator=(CCom &&) = delete;
 };
 
-// WinInet RAII helper
-struct unique_HINTERNET { // unique_ptr requires the base type and HINTERNET doesn't have one
-	HINTERNET h;
-	unique_HINTERNET() : h(nullptr) {}
-	unique_HINTERNET(HINTERNET h_) : h(h_) {}
-	unique_HINTERNET(const unique_HINTERNET &) = delete;
-	unique_HINTERNET &operator=(const unique_HINTERNET &) = delete;
-	~unique_HINTERNET() { if (h) { InternetCloseHandle(h); } }
-	operator HINTERNET() const { return h; }
-	explicit operator bool() const { return h != nullptr; }
-	void reset(HINTERNET p = nullptr) { if (h) { InternetCloseHandle(h); } h = p; }
-};
-
-// Winreg RAII helper
-struct unique_HKEY {
-	HKEY h;
-	unique_HKEY() : h(nullptr) {}
-	unique_HKEY(HKEY h_) : h(h_) {}
-	unique_HKEY(const unique_HKEY &) = delete;
-	unique_HKEY &operator=(const unique_HKEY &) = delete;
-	~unique_HKEY() { if (h) { RegCloseKey(h); } }
-	operator HKEY() const { return h; }
-	explicit operator bool() const { return h != nullptr; }
-	void reset(HKEY p = nullptr) { if (h) { RegCloseKey(h); } h = p; }
-	HKEY *operator&() { reset(nullptr); return &h; }
-};
+DEFINE_UNIQUE_OPAQUE_PTR_WITH_DELETER(HINTERNET, InternetCloseHandle);
 
 #pragma endregion
 //////////////////////////////////////////////////////////////////////////////
@@ -442,20 +419,8 @@ static void PullMotherboardData(CrashHandlerContext &context)
 static void GenerateOrLoadInstallationId(CrashHandlerContext &context)
 {
 	context.installationId = L"00000000-0000-0000-0000-000000000000";
-
-	// Not using the functions in sys/sysreg.cpp because they're dangerously outdated
-	LSTATUS result = ERROR_SUCCESS;
-	unique_HKEY key;
-	DWORD valueLength = 0;
-
-	result = RegCreateKeyEx(HKEY_CURRENT_USER, L"SOFTWARE\\Playnet\\WWIIOL\\Config", 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &key, nullptr);
-	if (result != ERROR_SUCCESS) {
-		crash_log(L"Failed to open registry key for installation GUID, using none\n");
-		return;
-	}
-
-	result = RegQueryValueEx(key, L"InstallationGuid", nullptr, nullptr, nullptr, &valueLength);
-	if (result == ERROR_FILE_NOT_FOUND) {
+	// TODO: Improve sysregGetHKeyText() to restore distinguishing between "no such key" and other errors
+	if (!sysregGetHKeyText(HKEY_CURRENT_USER, REG_KEY_MAIN, L"InstallationGuid", context.installationId)) {
 		GUID newId;
 		wchar_t buffer[48] = {0};
 
@@ -465,26 +430,12 @@ static void GenerateOrLoadInstallationId(CrashHandlerContext &context)
 			newId.Data1, newId.Data2, newId.Data3, (newId.Data4[0] << 8) | newId.Data4[1],
 			newId.Data4[2], newId.Data4[3], newId.Data4[4], newId.Data4[5], newId.Data4[6], newId.Data4[7]
 		);
-		result = RegSetValueEx(key, L"InstallationGuid", 0, REG_SZ, reinterpret_cast<BYTE *>(&buffer[0]), wcslen(buffer) * sizeof(wchar_t) + 1);
-		if (result == ERROR_SUCCESS) {
-			context.installationId = buffer;
-		} else {
+		if (!sysregSetHKeyText(HKEY_CURRENT_USER, REG_KEY_MAIN, L"InstallationGuid", buffer)) {
 			crash_log(L"Failed to save new installation GUID to registry, not using\n");
 		}
-		return;
-	} else if (result != ERROR_SUCCESS) {
-		crash_log(L"Failed to get installation GUID key, using none\n");
+		context.installationId = buffer;
 		return;
 	}
-
-	std::unique_ptr<wchar_t[]> data = std::make_unique<wchar_t[]>(valueLength + 1); // This will overestimate because length is in bytes
-
-	result = RegQueryValueEx(key, L"InstallationGuid", nullptr, nullptr, reinterpret_cast<BYTE *>(data.get()), &valueLength);
-	if (result != ERROR_SUCCESS) {
-		crash_log(L"Failed to get installation GUID key value, using none\n");
-		return;
-	}
-	context.installationId = data.get();
 }
 
 #pragma endregion
