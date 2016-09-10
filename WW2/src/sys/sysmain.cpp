@@ -352,7 +352,6 @@ BOOL				bOsVersionInfo;
 	return(TRUE);
 }
 
-#if platOS == OS_WIN32
 #ifdef EVENT_LOG
 
 #define cpuid __asm _emit 0x0f __asm _emit 0xa2
@@ -557,8 +556,6 @@ struct LANGANDCODEPAGE
 }
 
 #endif	//	EVENT_LOG
-#endif	//	OS_WIN32
-
 
 //////////////////////////////////////////////////////////////////////
 //	void SetupFPU(bool enableExceptions)
@@ -1033,14 +1030,13 @@ int		screenmode;
 #endif	//	EVENT_LOG
 
 #ifdef EVENT_LOG
-#if platOS == OS_WIN32
 	GetWindowsVersion(nullptr, nullptr);
 
 	if (!DisplayInformation())
 	{
 		return(0);
 	}
-#endif	//	OS_WIN32
+
 	Enable_Log(LOG_ALL, WantedUserLogEnabled); // back to user setting
 	if (g_log_comm || g_log_fps || g_log_weap)
 	{
