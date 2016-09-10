@@ -1065,6 +1065,7 @@
     <ClInclude Include="..\..\src\include\platforms.h" />
     <ClInclude Include="..\..\src\include\precompile_includes.h" />
     <ClInclude Include="..\..\src\include\systypes.h" />
+    <ClInclude Include="..\..\src\include\unique_opaque_ptr.hpp" />
     <ClInclude Include="..\..\src\inst\instAction.h" />
     <ClInclude Include="..\..\src\maptools\GenerateIcons.h" />
     <ClInclude Include="..\..\src\map\mapSupercellVislevelXfer.h" />
