@@ -847,13 +847,6 @@ int		screenmode;
 	_unlink("ww2exit.log");
 	_unlink("ww2stat.log");
 
-	strcpy(logfilename, SYS_TITLE);
-#ifdef _DEBUG
-	strcat(logfilename, "_Debug");
-#endif
-	strcat(logfilename, ".log");
-	_unlink(logfilename);
-
 #ifdef TERRAIN_EDITOR
 	WantedWidth = 800;
 	WantedHeight = 600;
