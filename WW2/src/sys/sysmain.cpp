@@ -877,18 +877,16 @@ int		screenmode;
 	x = ((rect.right - rect.left) - WantedWidth) / 2;
 	y = ((rect.bottom - rect.top) - WantedHeight) / 2;
 
-	if (sysregGetKeyDword(REG_KEY_MAIN, REG_MAIN_SIZE, (DWORD*)&wh) &&
-		sysregGetKeyDword(REG_KEY_MAIN, REG_MAIN_LOC, (DWORD*)&xy))
+	// Note: This is an appropriate use of the registry: a user preference it doesn't hurt to lose - Gadget
+	if (sysregGetKeyDword(REG_KEY_MAIN, REG_MAIN_SIZE, (DWORD*)&wh) && sysregGetKeyDword(REG_KEY_MAIN, REG_MAIN_LOC, (DWORD*)&xy))
 	{
-		if (320 <= LOWORD(wh) &&
-			240 <= HIWORD(wh))
+		if (320 <= LOWORD(wh) && 240 <= HIWORD(wh))
 		{
 			WantedWidth = LOWORD(wh);
 			WantedHeight = HIWORD(wh);
 		}
 
-		if (rect.right > (LOWORD(xy) + LOWORD(wh)) &&
-			rect.bottom > (HIWORD(xy) + HIWORD(wh)))
+		if (rect.right > (LOWORD(xy) + LOWORD(wh)) && rect.bottom > (HIWORD(xy) + HIWORD(wh)))
 		{
 			x = LOWORD(xy);
 			y = HIWORD(xy);
