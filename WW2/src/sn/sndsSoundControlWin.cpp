@@ -7,7 +7,6 @@
 #include <math.h>
 #include <windowsx.h>
 #include <process.h>
-#include "sys/sysreg.h"
 #include "include/vars.h"
 #include "pi/piinfo.h" // for device ids
 #include "cfg/cfgPrefs.h"
@@ -54,9 +53,6 @@ static LPDIRECTSOUND3DLISTENER8 g_lpListener8 = nullptr;
 static int                      dsnumdrivers = 0;
 static int                      curdriver = 0;
 static SNDDETDRIVERS            dsdrivers[MAXENUMDRIVERS];
-
-#define REG_KEY_CFG			    _T("Software\\") SYS_REGISTRY_NAME _T("\\Config")
-#define REG_AUDIO  	            _T("Audio")
 
 #if(0)
 static BOOL dsEnumDrivers(void);
@@ -1023,7 +1019,6 @@ int   i;
 		if (curdriver >= 0)
 		{
 			dsguid = (LPGUID)&dsdrivers[curdriver].Guid;
-			//sysregSetKeyText(REG_KEY_CFG, REG_AUDIO, dsdrivers[curdriver].DriverDescription);
 
 			Write_Log(LOG_SOUND, LOG_WARN, "Using %s", dsdrivers[curdriver].DriverDescription);
 		}
