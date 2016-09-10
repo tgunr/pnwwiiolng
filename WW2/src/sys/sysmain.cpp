@@ -526,10 +526,7 @@ struct LANGANDCODEPAGE
 			break;
 		}
 
-		if (1)//!sysregGetHKeyDword(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", "~MHz", &cpuspeed))
-		{
-			cpuspeed = (UINT32)GetCPUSpeed();
-		}
+		cpuspeed = (UINT32)GetCPUSpeed();
 
 		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs"), filename, pFFI, WWII::gitCommitStr);
 		Write_Debug(UTF8(txt));
@@ -779,7 +776,6 @@ char GetOSBuild()
 // This is the actual winmain
  int WINAPI WinMainX(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-char	logfilename[_MAX_PATH];
 int		x, y, w, h, wh, xy;
 int		bpp, hdw, stencil, wnd;
 MSG		msg;
@@ -851,7 +847,8 @@ int		screenmode;
 	y = ((rect.bottom - rect.top) - WantedHeight) / 2;
 
 	// Note: This is an appropriate use of the registry: a user preference it doesn't hurt to lose - Gadget
-	if (sysregGetKeyDword(REG_KEY_MAIN, REG_MAIN_SIZE, (DWORD*)&wh) && sysregGetKeyDword(REG_KEY_MAIN, REG_MAIN_LOC, (DWORD*)&xy))
+	if (sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, (DWORD*)&wh) &&
+		sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, (DWORD*)&xy))
 	{
 		if (320 <= LOWORD(wh) && 240 <= HIWORD(wh))
 		{
@@ -1027,9 +1024,6 @@ int		screenmode;
 
 	Write_Debug("Command line: %s", GetCommandLine());
 
-#endif	//	EVENT_LOG
-
-#ifdef EVENT_LOG
 	GetWindowsVersion(nullptr, nullptr);
 
 	if (!DisplayInformation())
