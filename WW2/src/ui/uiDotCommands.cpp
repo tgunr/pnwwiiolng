@@ -5635,34 +5635,6 @@ SINT32 dot_move(const char* line)
 	return DC_HANDLED;
 }
 
-//////////////////////////////////////////////////////////////////////
-//	ProfileFlight
-//////////////////////////////////////////////////////////////////////
-
-static SINT32 dot_profileflight(const char* args)
-{
-	FLOAT32	profilingDurationInMinutes	= 6.0f;
-
-	if(!OverrideSpawner)
-	{
-		rnmainListText("Please spawn a buzzard with nospawn enabled for profiling.");
-		return DC_HANDLED;
-	}
-
-	ARGV argv(args, 2, true);
-	// First argument is our function name
-	const wchar_t* profileName = (argv.argc > 1) ? argv[1].c_str() : L"default";
-
-	rnmainListText("Started %ls profiling for the duration of %.1f minute(s) ...", profileName, profilingDurationInMinutes);
-	dot_move("move N51.13.00 E4.11.00 100");
-	mlSetProfileFlight();
-#ifdef BETA_RELEASE
-	logInitProfiling(uiUTF16toUTF8(profileName), profilingDurationInMinutes);
-#endif
-
-	return DC_HANDLED;
-}
-
 #ifdef BETA_RELEASE
 //////////////////////////////////////////////////////////////////////
 //	CheckPlacement
@@ -7866,7 +7838,6 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(follow, false);
 	ADD_DOT_COMMAND(inflod, false);
 	ADD_DOT_COMMAND(vehlod, false);
-	ADD_DOT_COMMAND(profileflight, false);
 #endif
 
 	// beta release commands

@@ -10271,14 +10271,6 @@ LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total)
 
 #ifdef GM_RELEASE
 
-// more hacked stuff before the rats abandon the ship...
-static FLOAT64	profileFlightVelocity;						// double precision is so 1337!!1
-
-void mlSetProfileFlight()
-{
-	profileFlightVelocity = 200;
-}
-
 // hacked floating eye controller
 static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 {
@@ -10354,12 +10346,6 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 		if (dipKEYDOWN(buffer,DIK_UP)) 	(trooper) ? Delta.y -= Speed: Delta.y += Speed;
 		if (dipKEYDOWN(buffer,DIK_S))	(trooper) ? Delta.y += Speed: Delta.y -= Speed;
 		if (dipKEYDOWN(buffer,DIK_DOWN)) (trooper) ? Delta.y += Speed: Delta.y -= Speed;
-
-		if(profileFlightVelocity != 0.0)
-		{
-			VehicleData->VehicleRealAtt.Yaw = mlDEG_TO_RAD(81.6);
-			Delta.y += profileFlightVelocity;
-		}
 
 		FLOAT64 rotation = 145.0f;
 

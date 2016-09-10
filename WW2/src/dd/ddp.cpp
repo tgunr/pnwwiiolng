@@ -725,10 +725,6 @@ LOGICAL ddpUpdate(void)
 		return(FALSE);
 	}
 
-#ifdef BETA_RELEASE
-	logUpdateProfiling();
-#endif	// #ifdef BETA_RELEASE
-
 	if (resetfps)
 	{
 		starttime = timeGetTime();

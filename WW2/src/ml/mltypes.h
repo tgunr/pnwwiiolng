@@ -749,6 +749,4 @@ extern void mlSetRudderPosition(FLOAT64);
 extern void mlSetThrottlePosition(FLOAT64);
 extern void mlSetReportRangeAndTime(FLOAT32, SINT32);
 
-extern void mlSetProfileFlight();
-
 extern BumpAndFrictionData* mlGetScenarioBumpinessAndFriction(double x, double y, int id);
