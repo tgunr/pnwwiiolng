@@ -116,10 +116,6 @@ static void getWispIntesity(const OBJECT* o, const FLOAT64VECTOR& Pos, float* In
 #include "ui/uiChat.h"
 static UINT32 AddCloudWisps(void)
 {
-#ifdef TERRAIN_EDITOR
-	return(0);
-#endif
-
     static SINT32 _LastUpdateTime;
 	if (frametime - _LastUpdateTime < _WISP_INTERVAL && _LastUpdateTime != 0)
 	{
