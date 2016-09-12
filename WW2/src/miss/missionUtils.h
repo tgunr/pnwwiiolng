@@ -1,4 +1,3 @@
-#pragma once
 // Created: Tue Jan 30 12:13:33 2001
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -7,8 +6,6 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-extern struct FULL_OBJ_ID* populateFullObjID(struct FULL_OBJ_ID* foid, SINT32 sx, SINT32 sy, struct REL_OBJ_ID roid);
+#pragma once
 
-extern void printMissionSummary(struct MISSION_SUMMARY* summary);
-
-extern void printFULL_OBJ_ID(struct FULL_OBJ_ID* fullObjID);
+extern FULL_OBJ_ID* populateFullObjID(FULL_OBJ_ID* foid, SINT32 sx, SINT32 sy, REL_OBJ_ID roid);
