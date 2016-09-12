@@ -20,16 +20,16 @@ namespace Debug
 {
 	enum
 	{
-		ERR_FATAL	= 	0,		// fatal error detected, exit program
-		ERR_ABORT,				// error detected, operation aborted
-		ERR_MINOR,				// error detected, routine recovered, operation continues
-		ERR_WARN,				// possible error detected, operation continues
-		ERR_NOTE,				// normal but significant
-		ERR_INFO,					// informational message
-		ERR_DBUG					// debug level message
-	,	ERROR_TYPE_SIZE
+		ERR_FATAL = 0,		// fatal error detected, exit program
+		ERR_ABORT,			// error detected, operation aborted
+		ERR_MINOR,			// error detected, routine recovered, operation continues
+		ERR_WARN,			// possible error detected, operation continues
+		ERR_NOTE,			// normal but significant
+		ERR_INFO,			// informational message
+		ERR_DBUG,			// debug level message
 	};
 	using ERROR_TYPE = UINT32;
+	using ERROR_HANDLER = void(*)(void);
 }
 
 #define STD_ERR				0x0010	// mirror significant output to stderr
@@ -51,22 +51,6 @@ namespace Debug
 // directly to a file only.
 #define LOG_TO_FILE 1
 #define LOG_OFF	-1
-
-// Each ERROR_TYPE is associated with a syslog error level on linux
-//
-//	ERR_FATAL	= LOG_EMRG	-fatal error, system is unusable
-//	ERR_ERRALERT	= LOG_ALERT	-action should be taken immediately
-//	ERR_ABORT	= LOG_CRIT	-error condition, operation aborted
-//	ERR_MINOR	= LOG_ERR	-error detected, routine recovered, operation continues
-//	ERR_WARN	= LOG_WARN	-possible error detected, operation continues
-//	ERR_NOTE		= LOG_NOTE	-normal but significant
-//	ERR_INFO		= LOG_INFO	-informational message
-//	ERR_DBUG		= LOG_DEBUG	-debug level message
-
-namespace Debug
-{
-	using ERROR_HANDLER = void(*)(void);
-}
 
 // dbugInit: sets the current error level to ERR_INFO, opens the debug file, and initializes
 // the error object. The log type parameter of dbugInit can take any of the log facilities from
