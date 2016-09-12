@@ -8,14 +8,7 @@
 // Originating Programmer: Marty Poulin
 
 #include <cstdarg>
-
-#ifndef EWOULDBLOCK
-	#include	<errno.h>
-#endif
-
-#if platOS == OS_WIN32
-	#include "dbug/dbugWErrno.h"
-#endif
+#include <errno.h>
 
 #if defined(DEBUG) || defined(ALPHA_RELEASE)
 #define  _FL __FILE__, __LINE__
