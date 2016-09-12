@@ -46,33 +46,6 @@ namespace Debug
 #define _FLI _FL, Debug::ERR_INFO
 #define _FLD _FL, Debug::ERR_DBUG
 
-// same as above but no extra formating
-#define _FLFB _FL, (Debug::ERR_FATAL | BARE_DEBUG)
-#define _FLAB _FL, (Debug::ERR_ABORT | BARE_DEBUG)
-#define _FLMB _FL, (Debug::ERR_MINOR | BARE_DEBUG)
-#define _FLWB _FL, (Debug::ERR_WARN | BARE_DEBUG)
-#define _FLNB _FL, (Debug::ERR_NOTE | BARE_DEBUG)
-#define _FLIB _FL, (Debug::ERR_INFO | BARE_DEBUG)
-#define _FLDB _FL, (Debug::ERR_DBUG | BARE_DEBUG)
-
-// make go to stderr
-#define _FLFS _FL, (Debug::ERR_FATAL | STD_ERR)
-#define _FLAS _FL, (Debug::ERR_ABORT | STD_ERR)
-#define _FLMS _FL, (Debug::ERR_MINOR | STD_ERR)
-#define _FLWS _FL, (Debug::ERR_WARN | STD_ERR)
-#define _FLNS _FL, (Debug::ERR_NOTE | STD_ERR)
-#define _FLIS _FL, (Debug::ERR_INFO | STD_ERR)
-#define _FLDS _FL, (Debug::ERR_DBUG | STD_ERR)
-
-// same as above but no extra formating
-#define _FLFSB _FL, (Debug::ERR_FATAL | STD_ERR | BARE_DEBUG)
-#define _FLASB _FL, (Debug::ERR_ABORT | STD_ERR | BARE_DEBUG)
-#define _FLMSB _FL, (Debug::ERR_MINOR | STD_ERR | BARE_DEBUG)
-#define _FLWSB _FL, (Debug::ERR_WARN | STD_ERR | BARE_DEBUG)
-#define _FLNSB _FL, (Debug::ERR_NOTE | STD_ERR | BARE_DEBUG)
-#define _FLISB _FL, (Debug::ERR_INFO | STD_ERR | BARE_DEBUG)
-#define _FLDSB _FL, (Debug::ERR_DBUG | STD_ERR | BARE_DEBUG)
-
 // the log type parameter of dbugInit can take any of the log facilities from
 // syslog including LOG_LOCAL0-7 or be set to LOG_TO_FILE to log
 // directly to a file only.
