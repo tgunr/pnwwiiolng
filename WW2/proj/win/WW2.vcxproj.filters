@@ -1642,6 +1642,9 @@
       <Filter>omg\Generated Headers</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiPPOLoader.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2681,6 +2684,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\ob\obinfo.cpp">
       <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiPPOLoader.cpp">
+      <Filter>wwii</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

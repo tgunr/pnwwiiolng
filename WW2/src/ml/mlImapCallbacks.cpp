@@ -23,7 +23,7 @@
 #include <math.h>
 #include "wwii/wwiiPPOLoader.h"
 #include "fx/fxSnd.h"
-#include "GameClient.h"
+#include "client/GameClient.h"
 #include "weap/weapSpec.h"
 
 extern std::vector<PPOSpec *> activePPOList;

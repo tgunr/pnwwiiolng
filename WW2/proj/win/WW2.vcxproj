@@ -1361,6 +1361,7 @@
     <ClInclude Include="..\..\src\wwii\wwiiOwnershipEnums.h" />
     <ClInclude Include="..\..\src\wwii\wwiiPack.h" />
     <ClInclude Include="..\..\src\wwii\wwiiPermissions.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiPPOLoader.h" />
     <ClInclude Include="..\..\src\wwii\wwiiRoomLists.h" />
     <ClInclude Include="..\..\src\wwii\wwiiServerTrackedObject.h" />
     <ClInclude Include="..\..\src\wwii\wwiiServerTrackedObjectPacker.h" />
@@ -1934,6 +1935,7 @@
     <ClCompile Include="..\..\src\wwii\wwiiHCUnitsCommon.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiLua.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiOpinionPoll.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiPPOLoader.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiServerTrackedObject.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiServerTrackedObjectPacker.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiSquads.cpp" />

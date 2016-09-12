@@ -34,7 +34,7 @@
 #include "client/GameClient.h"
 #include "wwii/wwiiPPOLoader.h"
 #include "wwii/wwiiServerTrackedObject.h"
-#include "GameClient.h"
+#include "client/GameClient.h"
 #include "weap/weapSpec.h"
 
 // WWIIOL specific.

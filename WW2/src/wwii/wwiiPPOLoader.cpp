@@ -285,7 +285,7 @@ bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, in
 	for (size_t i=0; i < tlist.size(); i++)
 	{
 		// String in format Nc/Nt  (Class/Type)
-		char tempClassName[tlist[i].size()+1];
+		char *tempClassName = new char[tlist[i].size()+1];
 		strlcpy(tempClassName, tlist[i].c_str(), tlist[i].size());
 		
 		char *pClass = strtok(tempClassName, "/");
@@ -314,6 +314,8 @@ bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, in
 				}
 			}	
 		}
+
+        delete tempClassName;
 	}
 
 	return retVal;
