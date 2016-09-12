@@ -36,7 +36,7 @@ namespace Debug
 #define BARE_DEBUG			0x0080	// no extra formating, basically printf
 #define LOG_ALL_TO_STDERR	0x0100	// ALL logging to stderr
 
-// always use these macro's in place of Full functions so filename and number and errType are set.
+// always use these macros in place of Full functions so filename and number and errType are set.
 // basic parameter macros for dbugLog
 #define _FLF _FL, Debug::ERR_FATAL
 #define _FLA _FL, Debug::ERR_ABORT

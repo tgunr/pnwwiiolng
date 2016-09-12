@@ -1,6 +1,5 @@
-#include <syscfg.h> // Path is project specific.
 // This module provides support utilities used in
-// all API's to support debugging and error handling's.
+// all APIs to support debugging and error handling.
 //
 // Copyright 1999 Playnet Inc, All rights reserved
 // Not to be distributed in API form except as part of a compiled
@@ -10,6 +9,7 @@
 
 #include "dbug/dbugInternal.h"
 
+#include <syscfg.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include "include/defs.h"
