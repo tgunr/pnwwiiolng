@@ -7,6 +7,8 @@
 //	------------------------------	Exposed entities
 //tolua_begin
 
+#define MAX_PPOS 20
+
 // Intermission statuses
 enum
 {
@@ -124,10 +126,10 @@ struct cfSQUAD
 
 struct cfSTO
 {
-	UINT32	damageThreshold;	//!< UMS Damage threshold and capacity
-	UINT32	damageCapacity;		//!< UMS Damage capacity
-	UINT32	fruPlaceCooldown_s; //!< Cooldown from placing one FRU to the next.
-	UINT32	fruDeathCooldown_s; //!< Cooldown on replacing a destroyed FRU.
+	UINT32	damageThreshold[MAX_PPOS];	//!< PPO Damage threshold
+	UINT32	damageCapacity[MAX_PPOS];	//!< PPO Damage capacity
+	UINT32	fruPlaceCooldown_s[MAX_PPOS];	//!< Cooldown from placing one PPO to the next
+	UINT32	fruDeathCooldown_s[MAX_PPOS];	//!< Cooldown on replacing a destroyed PPO
 	UINT16	hulkLifetime_m;		//!< Hulk lifetime and population limits
 	UINT16	hulkLimitPerCell; 	//!< Max hulks per grid cell
 	UINT16	hulkLimitPerArea;	//!< Max hulks per group of grid cells

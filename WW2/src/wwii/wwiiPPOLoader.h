@@ -2,8 +2,6 @@
 
 #include "xml/XMLLoader2.h"
 
-#define MAX_PPOS 20   // just so we don't have to update this every time we add a new ppo
-
 struct PPOSpec
 {
 	SINT32 id; // terrain sto type id
@@ -33,9 +31,9 @@ struct PPOSpec
 	FLOAT32 maxSpeed;		// threshold in meters per second <=
 	std::vector<std::string> badTextures; // textures we can't build on
 	std::vector<std::string> okTextures; // textures we can build on
-        TeulTimeMS timeout;  // time in milliseconds object can stay alive in the world
-        UINT64 damageThreshold;  // threshold damage a single event must cause to accumulate total damage
-        UINT64 damageCapacity;  // maximum damage a PPO can withstand before being considered "killed"
+	TeulTimeMS timeout;  // time in milliseconds object can stay alive in the world
+	UINT64 damageThreshold;  // threshold damage a single event must cause to accumulate total damage
+	UINT64 damageCapacity;  // maximum damage a PPO can withstand before being considered "killed"
 	bool spawnable; // true = PPO is spawnable, false = not spawnable
 	std::vector<std::string> allowSpawn; // The listed vehicle class/types are allowed to spawn
 	std::vector<std::string> denySpawn; // The listed vehicle classes are denied the ability to spawn from ppo.

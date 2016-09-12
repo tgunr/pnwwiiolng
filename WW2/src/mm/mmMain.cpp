@@ -87,8 +87,11 @@
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiSortieManager.h"
 #include "wwii/wwiiThreads.h"
+#include "wwii/wwiiPPOLoader.h"
 
 const char* g_serverName = "mmhostd";
+
+static PPOSpecLoader specLoader;
 
 #define CHECKSUM_POLL_INTERVAL	300000	// Every 5 minutes
 
@@ -1104,6 +1107,8 @@ main(int argc, const char* argv[])
 
 	_authHost = serverGetAuthIP();
 	myMaxUsers = serverGetMaxClusterUsers();
+
+        specLoader.loadSpecMap();
 
 	wwiiIRCInitialize(Server::localHost, false);
 	wwiiIRCActivate(false);

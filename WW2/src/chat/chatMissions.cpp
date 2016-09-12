@@ -1155,7 +1155,12 @@ ChatMission::addMSPWaypoint(const ChatHandle& ownerCall, FLOAT64 x, FLOAT64 y, F
 
 	m_stoUID = stoId;
 
-	setFRUCooldown(host_config.sto.fruPlaceCooldown_s);
+	ServerTrackedObject* sto = ServerTrackedObject::lookup(stoId);
+	if (sto != nullptr)
+	{
+		fru().subtype(sto->subType());
+		setFRUCooldown(host_config.sto.fruPlaceCooldown_s[sto->subType()-1]);
+	}
 
 	flagForStatusUpdate();
 }
@@ -1168,6 +1173,7 @@ ChatMission::removeMSPWaypoint(UINT32, bool byPlayer)
 
 	removeSTO();
 
+	fru().subtype(0);
 	fru().active(false);
 	fru().creator(0ULL);
 

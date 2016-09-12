@@ -71,6 +71,9 @@ static void             fpFPSVerticalAxisLook (SINT32 param, UINT32 data);
 static void             fpFPSHorizAxisLook (SINT32 param, UINT32 data);
 static void             fpFPSAdjustAngles (FLOAT32 deltaTime, FLOAT64 minSpeed, FLOAT64 maxSpeed, FLOAT64* xAngle, FLOAT64 xTarget);
 
+
+extern void fpPPOReset();
+
 #define TESTING_SCOPE
 #undef TESTING_SCOPE
 //#define TESTING
@@ -322,7 +325,7 @@ static bool				fireDown = false;
 static UINT32			controlStateFlags;
 
 static fpsInfantryTypes	currentArms;
-static fpsWeaponTypes	currentWeaponModel;
+fpsWeaponTypes	currentWeaponModel;
 static fpsWeaponTypes	lastWeaponModel;
 
 static FLOAT64			aimVertAngle, aimVertAngleOffset;	// + is down, - is up.
@@ -1674,13 +1677,9 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				fpsTrooper.activeWeaponNumber = fpsTrooper.nextWeaponNumber;
 				fpsTrooper.nextWeaponNumber = -1;
 
-				if(fpsWeapons[currentWeaponModel].placedObject)
+				if (currentWeaponModel == BUILD_TOOL)
 				{
-					// we piggy back on this variable to get the type (kind of a hack)
-					SINT32 type = (SINT32)currentGameWeapon->NumRoundsAmmoLeft[0];
-
-					// create a new ppo
-					fpPPOCreate(type);
+					fpPPOReset();
 				}
 
 				if(fpsWeapons[currentWeaponModel].clipBullets == -1)

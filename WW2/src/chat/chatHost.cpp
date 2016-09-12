@@ -88,6 +88,7 @@
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiServerTrackedObject.h"
 #include "wwii/wwiiThreads.h"
+#include "wwii/wwiiPPOLoader.h"
 
 extern UINT32 serverGetAuthIP();
 
@@ -204,6 +205,8 @@ FLOAT32 _avgMessageLength=0;
 
 // Commonly used channels so we don't have to keep finding them
 Chat::Channel* adminChannel = nullptr;
+
+static PPOSpecLoader specLoader;
 
 UINT32 g_shutdownLockAt = 0;
 UINT32 g_shutdownDowntime = 0;
@@ -3607,7 +3610,7 @@ main(int argc, const char* argv[])
 	chatInitDB();
 
 	chatGetWWIIConfig();
-	chatLoadPPOXML();
+	specLoader.loadSpecMap();
 
 	chatSetUnitMotd(SYSTEM_MOTD_UNIT, DEFAULT_SYS_MOTD);
 	chatSetUnitMotd(ALLIED, DEFAULT_ALLIED_HC_MOTD);

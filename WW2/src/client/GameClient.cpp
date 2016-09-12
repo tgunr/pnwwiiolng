@@ -67,6 +67,7 @@
 #include "omg/omgChat.hxx"
 #include "strt/strtEventTypes.h"
 #include "strt/strtCPFlags.h"
+#include "wwii/wwiiServerTrackedObject.h"
 
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags);
 
@@ -1142,19 +1143,16 @@ void GameClient::ProcessMissionStatus(const Chat::MissionStatus* ms)
 
 	SINT32 remaining = SINT32(ms->fru().cooldownRemaining());
 
-	PPOSpec* fruSpec = fpPPOGetSpec(FRU_INDEX);
-	if(!fruSpec) return;
-
 	if(remaining > 0)
 	{
-		fruSpec->coolDownEnd = frametime + remaining;
-
 		// now see if we are currently building an fru
 		// interrupt if we are because there was a mission state change
 		PlayerPlacedObject* ppo = fpPPOGet();
 
-		if(ppo && ppo->spec->id == FRU_INDEX)
+		if(ppo && ppo->spec->stotype == ServerTrackedObject::_UMS)
 		{
+            ppo->spec->coolDownEnd = frametime + remaining;
+            
 			if(ppo->buildAt > 0)
 				ppo->Interrupt();
 

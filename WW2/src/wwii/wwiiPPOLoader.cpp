@@ -1,12 +1,14 @@
 #include <syscfg.h> // Path is project specific.
+#include <cstring>
 
 #include "xml/XMLLoader2.h"
 #include "cfg/cfgPrefs.h"
 #include "wwii/wwiiPPOLoader.h"
+#include "wwii/wwiiServerTrackedObject.h"
 
 #define PPO_SPEC "vehicles/ground/groundman/ppo.xml"
 
-#define XML_TAG_HANDLER_IMPL(handler) bool PPOSpecLoader::handler(xmlNode* node, bool first = true, void* userData = nullptr)
+#define XML_TAG_HANDLER_IMPL(handler) bool PPOSpecLoader::handler(xmlNode* node, bool first, void* userData)
 
 PPOSpecLoader::PPOSpecLoader() : XMLLoader2<PPOSpecLoader>(PPO_SPEC)
 {
@@ -87,10 +89,10 @@ XML_TAG_HANDLER_IMPL(DoPPO)
 		ProcessChildren(node, &spec);
 
 		// get the next available id (1 based)
-		spec.id = _specMap->size() + 1;
+		spec.id = static_cast<SINT32>(_ppoSpecMap.size()) + 1;
 
 		// save our spec in the map
-		(*_specMap)[spec.id] = spec;
+		_ppoSpecMap[spec.id] = spec;
 	}
 
 	return false;
@@ -244,19 +246,20 @@ bool PPOSpecLoader::checkDelimitedField(std::string name, std::string value,
 	bool retVal = checkDelimitedField(name, value, check, temp);
 	if (retVal)
 	{
-		for (int i=0; i < temp.size(); i++)
+		for (size_t i=0; i < temp.size(); i++)
 		{
 			bitfield |= (1<<(UINT32)atoi(temp[i].c_str()));
 		}
 	}
+	return retVal;
 }
 
 PPOSpec* PPOSpecLoader::ppoGetSpec(int subtype)
 {
 	if(_ppoSpecMap.empty())
-		_loadSpecMap();
+		loadSpecMap();
 
-	PPO_SPEC_MAP::iterator found = _ppoSpecMap.find(subtype);
+	std::map<int,PPOSpec>::iterator found = _ppoSpecMap.find(subtype);
 
 	if(found != _ppoSpecMap.end())
 		return &found->second;
@@ -264,20 +267,23 @@ PPOSpec* PPOSpecLoader::ppoGetSpec(int subtype)
 	return nullptr;
 }
 
-bool PPOSpecLoader::checkList(std::vector<std::string> & list, int vehclass, int vehtype, bool allowed, bool setValue)
+bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, int vehtype, bool allowed, bool setValue)
 {
 	bool retVal = allowed;
 
 	// first lets see if this vehicle class/type is being spacifically mentioned
-	for (int i=0; i < list.size(); i++)
+	for (size_t i=0; i < tlist.size(); i++)
 	{
 		// String in format Nc/Nt  (Class/Type)
-		char *pClass = strtok(list[i].c_str(), "/");
+		char tempClassName[tlist[i].size()+1];
+		strlcpy(tempClassName, tlist[i].c_str(), tlist[i].size());
+		
+		char *pClass = strtok(tempClassName, "/");
 		char *pType = strtok( nullptr, "/" );
 		if (pClass != nullptr)
 		{
 			// check if veh class matches spec
-			int nClass = atoi(pClass)
+			int nClass = atoi(pClass);
 			if (nClass == vehclass)
 			{
 				// if no veh type is specified, its a generic "applies to all"
@@ -332,7 +338,7 @@ bool PPOSpecLoader::getAllowedPPOs(int vehclass, int vehtype, std::vector<PPOSpe
 	{
 		bool allow = false;
 
-		if (it->second.stotype != ServerTrackedObject._UMS ||
+		if (it->second.stotype != ServerTrackedObject::_UMS ||
 			!nofrus	)
 		{
 			// first check to see what is allowed

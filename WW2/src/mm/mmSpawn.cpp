@@ -38,6 +38,9 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiServerTypeEnums.h"	// For CELL_HOST
 #include "wwii/wwiiSortieManager.h"
+#include "wwii/wwiiPPOLoader.h"
+
+extern PPOSpecLoader specLoader;
 
 extern SortieManager g_sortieReturns;
 
@@ -424,6 +427,10 @@ mmProcessPostAccept(Player& player, const MM_POST_ACCEPT& post, UINT32 acceptTyp
 		// Dorothy allows any vehicle to spawn through a mobile spawn
 #if !defined(DOROTHY)
 		if ( player.weapon().spec.wCategory == _INFANTRY )
+#else
+		// let ppo subtype/id and weapon class determine spawn ability
+		if ( specLoader.ppoIsSpawnAllowed(player.mission().fru().subtype, 
+			player.weapon().spec.wClass, player.weapon().spec.wType))
 #endif
 			mobileSpawnAvailable = player.mission()->isMobileSpawnAvailable();
 	}

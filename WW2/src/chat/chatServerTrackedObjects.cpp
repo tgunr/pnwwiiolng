@@ -31,21 +31,9 @@
 #include "chat/chatHostMessages.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiConfigVars.h"
+#include "wwii/wwiiPPOLoader.h"
 
-struct PPOConfig
-{
-	PPOConfig(TeulTimeMS _timeout = 0ULL, UINT64 _threshold = 0ULL, UINT64 _capacity = 0ULL)
-		: m_timeout(_timeout)
-		, m_damageThreshold(_threshold)
-		, m_damageCapacity(_capacity)
-		{}
-
-	TeulTimeMS		m_timeout;
-	UINT64			m_damageThreshold;
-	UINT64			m_damageCapacity;
-};
-
-std::vector<PPOConfig> ppoConfigs;
+extern PPOSpecLoader specLoader;
 
 //////////////////////////////////////////////////////////////////////
 // Handle a delete request from a client.
@@ -294,7 +282,7 @@ UMSSTO::applyJoules(const SINT64& joules, Player* const player)
 		ChatMission* const mission = chatFindMission(missionID());
 		if ( mission )
 		{
-			mission->setFRUCooldown(host_config.sto.fruDeathCooldown_s);
+			mission->setFRUCooldown(host_config.sto.fruDeathCooldown_s[m_subtype-1]);
 			mission->removeMSPWaypoint(uid(), true);
 		}
 	}
@@ -528,12 +516,22 @@ ServerSTO::_audit(ServerSTO::EventType eventType)
 STODamage::STODamage(UINT16 subType)
 	: m_threshold(0ULL), m_capacity(0ULL), m_accumulated(0ULL)
 {
-	if ( subType <= 0 || subType >= ppoConfigs.size() )
-		return;
+	PPOSpec* config = specLoader.ppoGetSpec(subType);
 
-	const PPOConfig& config = ppoConfigs[subType];
-	m_threshold = config.m_damageThreshold;
-	m_capacity = config.m_damageCapacity;
+	// grab damage/capacity first grap from config
+	if (config != nullptr)
+	{
+		if (m_threshold == 0)
+			m_threshold = config.damageThreshold;
+		if (m_capacity == 0)
+			m_capacity = config.damageCapacity;
+	}
+
+	// grab damage/capacity override from host config
+	if (host_config.sto.damageThreshold[subType-1] > 0)
+		m_threshold = host_config.sto.damageThreshold[subType-1];
+	if (host_config.sto.damageCapacity[subType-1] > 0)
+		m_capacity = host_config.sto.damageCapacity[subType - 1];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -578,13 +576,8 @@ UMSSTO::UMSSTO(UINT16 withSubType, const WorldPosition_m& withPosition, const At
 
 UMSSTO::UMSSTO(ACTION_OBJECT* const a)
 	: ServerSTO(a)
-	, m_damage(host_config.sto.damageThreshold, host_config.sto.damageCapacity)
+	, m_damage(m_subType)
 {
-	if ( m_subType > 0 && m_subType < ppoConfigs.size() )
-	{
-		m_damage = STODamage(m_subType);
-	}
-
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -600,9 +593,11 @@ PPOSTO::PPOSTO(ACTION_OBJECT* const a)
 {
 	m_occupants.clear();
 	m_lifespan = 0;
-	m_maxLife = ppoConfigs[0].m_timeout;
-	if ( m_subType > 0 && m_subType < ppoConfigs.size() )
-		m_maxLife = ppoConfigs[m_subType].m_timeout;
+	PPOSpec* config = specLoader.ppoGetSpec(m_subType);
+	if (config != nullptr)
+	{
+		m_maxLife = config.m_timeout;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -736,135 +731,6 @@ public:
 	}
 } dotListSTOs;
 
-//////////////////////////////////////////////////////////////////////
-// PPO.xml parsing/handling.
-
-#include "tinyxml/tinyxml.h"
-
-//////////////////////////////////////////////////////////////////////
-// Get the config parameters we understand.
-
-static PPOConfig
-_getConfig(const TiXmlNode* const parent, const PPOConfig defaultConfig)
-{
-	if ( parent == nullptr )
-		return defaultConfig;
-
-	static const char* const timeoutAttributeName = "timeout-minutes";
-	static const char* const dmgThresholdName = "damage-threshold";
-	static const char* const dmgCapacityName = "damage-capacity";
-
-	PPOConfig config(defaultConfig);
-
-	// Look through the <param>s for <param name='timeout-minutes'/>
-	for ( auto	node = parent->FirstChild("param")
-		;		node != nullptr
-		;		node = node->NextSibling("param")
-		)
-	{
-		auto param = node->ToElement();
-		if ( strcasecmp(param->Attribute("name"), timeoutAttributeName) == 0 )
-		{
-			const char* const valueStr = param->Attribute("value");
-			if ( valueStr != nullptr && isdigit(*valueStr) )
-			{
-				config.m_timeout = (TeulTimeMS)(strtof(valueStr, nullptr) * 60.0 * 1000.0);
-			}
-		}
-		else if ( strcasecmp(param->Attribute("name"), dmgThresholdName) == 0 )
-		{
-			const char* const valueStr = param->Attribute("value");
-			if ( valueStr != nullptr && isdigit(*valueStr) )
-			{
-				config.m_damageThreshold = strtoull(valueStr, nullptr, 10);
-			}
-		}
-		else if ( strcasecmp(param->Attribute("name"), dmgCapacityName) == 0 )
-		{
-			const char* const valueStr = param->Attribute("value");
-			if ( valueStr != nullptr && isdigit(*valueStr) )
-			{
-				config.m_damageCapacity = strtoull(valueStr, nullptr, 10);
-			}
-		}
-	}
-
-	return config;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Set up everything we need for STOs.
-
-void
-chatLoadPPOXML()
-{
-	std::string xmlFile = cv_dataDir.GetString();
-	xmlFile += "/ppo.xml";
-
-	try
-	{
-		TiXmlDocument doc(xmlFile.c_str());
-		if ( doc.LoadFile() == false )
-			throw std::runtime_error("Unable to load ppo.xml");
-
-		const TiXmlNode* const root = doc.FirstChild("ppos");
-		if ( root == nullptr )
-			throw std::runtime_error("Unable to find <ppos> container in ppo.xml");
-
-		dbugLog(_FLI, "ppo: reading file %s", xmlFile.c_str());
-
-		// Get the default timeout-minutes value from the <defaults> tag.
-		PPOConfig defaultConfig = _getConfig(root->FirstChild("defaults"), PPOConfig());
-		dbugLog(_FLIB, " defaults timeout:%llums, dmgThresh:%lluj, dmgCap:%lluj", defaultConfig.m_timeout, defaultConfig.m_damageThreshold, defaultConfig.m_damageCapacity);
-
-		ppoConfigs.clear();
-
-		// Make the array 1-based.
-		ppoConfigs.push_back(defaultConfig);
-
-		// Now read through the <ppo> objects in order and determine the timeouts.
-		for ( auto node = root->FirstChild("ppo")
-			; node != nullptr
-			; node = node->NextSibling("ppo")
-			)
-		{
-			PPOConfig config;
-
-			try
-			{
-				auto ppo = node->ToElement();
-
-				const char* const name = ppo->Attribute("name");
-				const char* const desc = ppo->Attribute("description");
-				const char* const type = ppo->Attribute("sto-type");
-
-				UINT32 stoType = strtoul(type, nullptr, 10);
-
-				dbugLog(_FLI, "ppo:%u.%u %s %s [sto-type:%s]", stoType, static_cast<UINT32>(ppoConfigs.size() + 1U), name, desc, type);
-
-				if ( stoType == 0 )
-				{
-					throw std::domain_error("Ignoring type 0");
-				}
-
-				// Look up the <param name='timeout-minutes'/> or use the default
-				config = _getConfig(ppo, defaultConfig);
-				dbugLog(_FLIB, " timeout: %llums dmgThresh:%lluj dmgCap: %lluj", config.m_timeout, config.m_damageThreshold, config.m_damageCapacity);
-		}
-			catch ( std::domain_error& e )
-		{
-				dbugLog(_FLIB, " *%s", e.what());
-		}
-
-			ppoConfigs.push_back(config);
-	}
-	}
-	catch ( std::exception& e )
-	{
-		dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what());
-	}
-}
-
 class DotLoadPPOXml : public DotCommand
 {
 public:
@@ -880,7 +746,7 @@ public:
 
 	virtual void action(Player& /*player*/, Chat::ClientMessage* /*message*/) const override
 	{
-		chatLoadPPOXML();
+		specLoader.loadSpecMap();
 	}
 } dotLoadPPOXml;
 

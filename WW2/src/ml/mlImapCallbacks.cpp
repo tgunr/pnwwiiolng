@@ -21,9 +21,15 @@
 #include <iostream>
 #include <sstream>
 #include <math.h>
-
+#include "wwii/wwiiPPOLoader.h"
 #include "fx/fxSnd.h"
+#include "GameClient.h"
+#include "weap/weapSpec.h"
 
+extern std::vector<PPOSpec *> activePPOList;
+extern UINT16 activePPOIndex;
+extern GameClient* PlayerClient();
+extern PPOSpecLoader specLoader;
 
 //static FLOAT64 _LastAutopilotThrottlePos;
 
@@ -674,22 +680,6 @@ UINT32 mlToggleTowbar(SINT32 Param,UINT32 Id,UINT32 Detach)
 	return 0;
 }
 
-UINT32 mlToggleMobileSpawn(SINT32 Param, UINT32 Id, UINT32 Detach)
-{
-	mlToggleBombBayDoor(Param, Id, Detach);
-	return 0;
-}
-
-static void _soundkill(void* data)
-{
-	SINT32* id = (SINT32*)data;
-
-	if(id == nullptr)
-		return;
-
-	*id = 0;
-}
-
 static void _buildFRU(JSContext* ctx, UINT32 argc, jsval* argv)
 {
 	PlayerPlacedObject* ppo = fpPPOGet();
@@ -702,6 +692,59 @@ static void _buildFRU(JSContext* ctx, UINT32 argc, jsval* argv)
 		if(!build || !ppo->Build())
 			fpPPOSet(nullptr);
 	}
+}
+
+UINT32 mlToggleMobileSpawn(SINT32 Param, UINT32 Id, UINT32 Detach)
+{
+        static WEAPON_SPEC troop = NULL_WEAP_SPEC;
+        static bool firsttime = true;
+
+        if(firsttime)
+        {
+                firsttime = false;
+                troop = weapCreateSpec("GV_troop.1");
+        }
+
+        mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
+        vehType* vtype = VehicleData->VehicleMasterPtr->VehicleType;
+
+        PlayerPlacedObject* ppo = fpPPOGet();
+
+        if(ppo)
+        {
+        	if(ppo->valid)
+		{
+			uiCallJS("buildirp", _buildFRU, 0);
+		}
+		else
+		{
+			fpPPOAlert();
+			fpPPOSet(nullptr);
+		}
+	}
+	else
+    {
+        // only allow FRUs for infrantry when mission leader
+        bool allowFrus = vtype->WeaponSpec.wClass != troop.wClass || (Online && PlayerClient()->IsMissionLeader());
+
+		// make sure this class/type has ppo types available to it
+		if (specLoader.getAllowedPPOs(vtype->WeaponSpec.wClass, vtype->WeaponSpec.wType, activePPOList, allowFrus))
+        {
+            vehmainFRUBuild();
+        }
+    }
+
+	return 0;
+}
+
+static void _soundkill(void* data)
+{
+	SINT32* id = (SINT32*)data;
+
+	if(id == nullptr)
+		return;
+
+	*id = 0;
 }
 
 UINT32 mlToggleBombBayDoor(SINT32 Param,UINT32 Id,UINT32 Detach)
@@ -719,36 +762,6 @@ UINT32 mlToggleBombBayDoor(SINT32 Param,UINT32 Id,UINT32 Detach)
 	if(VehicleData->BombBayMaxOpenSpeed && !VehicleData->BombBayDoor && (Speed > VehicleData->BombBayMaxOpenSpeed))
 	{
 		return 0;
-	}
-
-	vehType* vtype = VehicleData->VehicleMasterPtr->VehicleType;
-
-	WEAPON_SPEC truck = weapCreateSpec("GV_truck.1");
-
-	// are we a truck
-	if(vtype->WeaponSpec.wCategory == truck.wCategory && vtype->WeaponSpec.wClass == truck.wClass)
-	{
-		PlayerPlacedObject* ppo = fpPPOGet();
-
-		if(ppo)
-		{
-			if(ppo->valid)
-			{
-				uiCallJS("buildirp", _buildFRU, 0);
-			}
-			else
-			{
-				fpPPOAlert();
-				fpPPOSet(nullptr);
-			}
-		}
-		else
-		{
-			vehmainFRUBuild();
-		}
-
-		if(Online)
-			return 0;
 	}
 
 	VehicleData->BombBayDoor = !VehicleData->BombBayDoor;

@@ -264,6 +264,9 @@ extern SINT32 _CurrentHitmapObjectDisplay;
 
 #endif // BETA_RELEASE
 
+extern std::vector<PPOSpec *> activePPOList;
+extern UINT16 activePPOIndex;
+
 static bool g_canDeployMobileSpawn = false;
 
 extern void vehloadKill();
@@ -5313,10 +5316,9 @@ PlayerPlacedObject* vehmainFRUBuild()
 		return nullptr;
 	}
 
-	PlayerPlacedObject* fru = fpPPOCreate(FRU_INDEX);
+	PlayerPlacedObject* fru = fpPPOCreate(activePPOList[activePPOIndex]->id);
 
 	// set our callbacks
-	//fru->SetValidityCallback(vehmainFRUCheck);
 	fru->SetExecuteCallback(vehmainFRUExecute);
 
 	// for vehicles, fail on validity checks
@@ -5328,18 +5330,6 @@ PlayerPlacedObject* vehmainFRUBuild()
 		fpPPOAlert();
 		return nullptr;
 	}
-
-	// start building the irp if we're not a trooper
-	/*
-	if(veh->VehicleType->Type != VEH_TYPE_PERSON)
-	{
-		if(!fru->Build())
-		{
-			fpPPOAlert();
-			return nullptr;
-		}
-	}
-	*/
 
 	return fru;
 }
@@ -5885,45 +5875,30 @@ bool vehmainRemoveSTO(UINT32 id)
 
 void _updateMobileSpawn()
 {
-    // If we are deploying and have not received a GRANTED from the host within a
-    // timeout period, tell host to undeploy (took too long)
-    if(_isDeployingTimeout())
-    {
-        vehHandleMobileSpawnUpdate(MSDR_LAPSED);
-        vehmainUndeployVehicleForMobileSpawn();
-        return;
-    }
-
-    if(!vehmainIsDeployed())
-    {
-		_checkMobileSpawnAbility();
-        return;
-    }
-
-	/* new mobile spawn functionality
-	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle();
-
-	if(veh && veh->StateAnimation.enumDeployedState == IDE_VEHICLE_DEPLOYED && vehmainIsMobileSpawn())
+	// If we are deploying and have not received a GRANTED from the host within a
+	// timeout period, tell host to undeploy (took too long)
+	if(_isDeployingTimeout())
 	{
-		FLOAT32 buildTime = (FLOAT32)((frametime - veh->deployedTimeout) / (FLOAT32)MOBILE_DEPLOYED_TIMEOUT);
-
-		char script[25+1];
-		sprintf(script, "game.ondeploybuild(%.2f)", buildTime);
-
-		// update the deployment timer
-		uiRunScript(script);
+		vehHandleMobileSpawnUpdate(MSDR_LAPSED);
+		vehmainUndeployVehicleForMobileSpawn();
+		return;
 	}
-	*/
 
-    // Send updates to the host periodically
-    if(frametime - g_mobileUpdateTimer < MOBILE_SPAWN_UPDATE_TIMER)
-    {
-        return;
-    }
+	if(!vehmainIsDeployed())
+	{
+		_checkMobileSpawnAbility();
+		return;
+	}
+
+	// Send updates to the host periodically
+	if(frametime - g_mobileUpdateTimer < MOBILE_SPAWN_UPDATE_TIMER)
+	{
+		return;
+	}
 
 	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle();
 
-    g_mobileUpdateTimer = frametime;
+	g_mobileUpdateTimer = frametime;
 
 	MSPAWN_RESULT permission = _canWeDeploy(veh, false);
 	if(permission != MSDR_GRANTED)
@@ -5934,27 +5909,12 @@ void _updateMobileSpawn()
 		return;
 	}
 
-	/* new mobile spawn functionality
-	if(vehmainIsMobileSpawn() && _isDeployedTimeout())
-	{
-		// our build timer has completed, undeploy and leave an sto UMS
-		mlToggleMobileSpawn(1, IMAP_MOBILE_SPAWN, 0);
+	piVECTOR spawnPos;
+
+	// Get position of the vehicle mobile spawn object
+	if(_getVehicleSpawnObjectPosition(veh, &spawnPos) != 0)
 		return;
-	}
-	*/
 
-    piVECTOR spawnPos;
-
-    // Get position of the vehicle mobile spawn object
-    if(_getVehicleSpawnObjectPosition(veh, &spawnPos) != 0)
-        return;
-
-///FIXME: This functionality is no-longer supported.
-/*
-    // Send position to host
-    ClientMobileSpawnUpdate cmsu(MSST_DEPLOYED, spawnPos.x, spawnPos.y, spawnPos.z);
-	cmsu.send(PlayerClient()->CellConnection());
-*/
 }
 
 /************************************************************************************************
@@ -5962,17 +5922,10 @@ void _updateMobileSpawn()
 *************************************************************************************************/
 void _setVehicleDeployedState(DEPLOYEDSTATE enumState)
 {
-    vehVehicle*veh = persGetPersonaVehiclePtr();
-    if(!veh) return;
+	vehVehicle*veh = persGetPersonaVehiclePtr();
+	if(!veh) return;
 
-	/* new mobile spawn functionality
-	if(enumState == IDE_VEHICLE_DEPLOYED)
-		uiRunScript("game.ondeploystate(true)"); // if we're deployed, tell the ui
-	else
-		uiRunScript("game.ondeploystate(false)"); // all other cases, say we're not
-	*/
-
-    veh->StateAnimation.enumDeployedState = enumState;
+	veh->StateAnimation.enumDeployedState = enumState;
 }
 
 /************************************************************************************************

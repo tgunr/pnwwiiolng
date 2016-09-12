@@ -36,9 +36,12 @@
 #include "weap/weapSpawnXML.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiConfigVars.h"
+#include "fio/fiod.h"                                           // for fiodGetPrepath()
 
 extern ConfigBool cv_stratIgnoreErrors;
 extern ConfigPath cv_blitzworPath;
+
+static SpawnLoader spawnLoader;
 
 namespace Strat
 {
@@ -1095,7 +1098,10 @@ strtInitializeStratData()
 
 #ifdef IS_STRAT_HOST
 	// Load the virtual spawn classes.
-	weapLoadSpawnXML();
+	std::string filename(fiodGetPrepath());
+	filename += "/xml/spawn.xml";
+	SpawnLoader spawnLoader(filename.c_str());
+	spawnLoader.load();
 #endif
 
 	totalCPs = 0;

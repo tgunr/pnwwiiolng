@@ -316,12 +316,6 @@ ADD_LIBRARY(libwwii
         weap/weapParser.h
     weap/weapSpec.cpp
         weap/weapSpec.h
-    tinyxml/tinystr.cpp
-        tinyxml/tinystr.h
-    tinyxml/tinyxml.cpp
-        tinyxml/tinyxml.h
-    tinyxml/tinyxmlerror.cpp
-    tinyxml/tinyxmlparser.cpp
     tut/tutGroupProgress.cpp
         tut/tutGroupProgress.h
     wwii/wwiiCommandLineArgs.cpp
@@ -728,7 +722,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
     )
     ADD_PCH(${CHAT_HOST_EXE})
     SET_PROPERTY(TARGET ${CHAT_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_CHAT_HOST)
-    TARGET_LINK_LIBRARIES(${CHAT_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient libb64)
+    TARGET_LINK_LIBRARIES(${CHAT_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient libb64 libxml2)
     SET_PROPERTY(TARGET ${CHAT_HOST_EXE} PROPERTY FOLDER "Hosts")
 
     ######################################################################
@@ -1012,7 +1006,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
     )
     ADD_PCH(${MAP_HOST_EXE})
     SET_PROPERTY(TARGET ${MAP_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_MAP_HOST)
-    TARGET_LINK_LIBRARIES(${MAP_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+    TARGET_LINK_LIBRARIES(${MAP_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient libxml2)
     SET_PROPERTY(TARGET ${MAP_HOST_EXE} PROPERTY FOLDER "Hosts")
 
     ######################################################################
@@ -1187,7 +1181,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
     ENDIF( )
     SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY DEPENDS ${TOLUAPP_EXECUTABLE} ${TOLUAPP_LIBRARIES})
     SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY GENERATED true)
-    TARGET_LINK_LIBRARIES(${STRAT_HOST_EXE} libwwii ${MYSQL_LIBRARIES} teulserver ircclient ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
+    TARGET_LINK_LIBRARIES(${STRAT_HOST_EXE} libwwii ${MYSQL_LIBRARIES} teulserver ircclient ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} libxml2)
     SET_PROPERTY(TARGET ${STRAT_HOST_EXE} PROPERTY FOLDER "Hosts")
 
     TARGET_INCLUDE_DIRECTORIES(${_LUA_HOST} PRIVATE ${TOLUAPP_INCLUDE_DIR})
