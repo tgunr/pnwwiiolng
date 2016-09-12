@@ -51,7 +51,7 @@ const char* errorTypes[] = {
 	"W",		// possible error detected, operation continues
 	"N",		// note, operation continues
 	"I",		// informational message
-	"D"		// debug level message
+	"D",		// debug level message
 };
 
 //static SINT32	theError = 0;
@@ -59,7 +59,6 @@ static size_t _fileSize = 0;
 static void _levelHandler(UINT32 errType, const char* const text);
 
 
-static const char _CLOSE_MSG[] = CARRIAGE_RETURN "Debug Message System Closed." CARRIAGE_RETURN;
 
 // Global boolean that controls whether or not 'D'ebug level messages will be logged.
 // Exposed globally so it can be tested before prior to performing otherwise expensive
