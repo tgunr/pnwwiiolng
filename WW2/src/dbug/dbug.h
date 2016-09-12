@@ -111,9 +111,6 @@ SINT32 _dbugWrite(const char* filename, SINT32 lineno, UINT32 errType, FORMAT_AR
     #define betaLog(m, fmt, ...)
 #endif
 
-// This is set to true when the dbug library is logging _FLD messages
-extern bool g_logDebug;
-
 #ifndef FRONT_END
     #define DEBUG_ERR(fmt, ...) dbugLog(_FLA, fmt, ## __VA_ARGS__)
     #define DEBUG_FATAL(fmt, ...) LogAbort(fmt, ## __VA_ARGS__)
