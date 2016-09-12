@@ -242,7 +242,7 @@ void PlayerPlacedObject::UpdateColliders()
 	position.y() += forward.y;
 	position.z() += forward.z;
 
-	Vec3d& adjust = spec->rayAdjust;
+	Vec3d adjust(spec->rayAdjust);
 
 	if(spec->rotation)
 	{

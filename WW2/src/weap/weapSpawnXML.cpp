@@ -15,16 +15,20 @@
 #include "weap/weapList.h"					// For weaponClass[]
 #include "weap/weapSpawnXML.h"				// Our header file
 #include "wwii/wwiiHash.h"					// for unordered_map
+#include "weap/weapSpec.h"
 
-#define XML_TAG_HANDLER_IMPL(handler) bool PPOSpecLoader::handler(xmlNode* node, bool first = true, void* userData = nullptr)
+#define XML_TAG_HANDLER_IMPL(handler) bool SpawnLoader::handler(xmlNode* node, bool first, void* userData)
 
-SpawnLoader::SpawnLoader(char *xmlFile) : XMLLoader2<SpawnLoader>(xmlFile)
+#define SPAWN_SPEC    "/xml/spawn.xml"
+
+SpawnLoader::SpawnLoader() : XMLLoader2<SpawnLoader>(SPAWN_SPEC)
 {
         AddHandler("building", &SpawnLoader::DoBuilding, this);
         AddHandler("dof", &SpawnLoader::DoDof, this);
         AddHandler("class", &SpawnLoader::DoClass, this);
         AddHandler("weapon", &SpawnLoader::DoWeapon, this);
 
+	weaponList = nullptr;
 	fail = false;
 }
 
@@ -49,13 +53,13 @@ XML_TAG_HANDLER_IMPL(DoBuilding)
 
 			weapAddClass(classSpec.wClass, buildingName);
 
-			weaponList = g_weaponSpawns[classSpec.wClass];
-			if ( weaponList.empty() == false )
+			weaponList = &g_weaponSpawns[classSpec.wClass];
+			if ( weaponList->empty() == false )
 				throw std::domain_error("weaponSpawnList for vClass already populated");
 
 			classes.clear();
 
-                	ProcessChildren(node, &defaults);
+                	ProcessChildren(node, nullptr);
 
 
 		}
@@ -71,7 +75,7 @@ XML_TAG_HANDLER_IMPL(DoBuilding)
 XML_TAG_HANDLER_IMPL(DoDof)
 {
         if(first)
-                ProcessChildren(node, &defaults);
+                ProcessChildren(node, nullptr);
 
         return false;
 }
@@ -91,7 +95,7 @@ XML_TAG_HANDLER_IMPL(DoWeapon)
 				fail = true;
 			}
 			else
-				weaponList[weap->spec()] = weap;
+				(*weaponList)[weap->spec()] = weap;
 		}
 	}
         return false;
@@ -99,6 +103,7 @@ XML_TAG_HANDLER_IMPL(DoWeapon)
 
 XML_TAG_HANDLER_IMPL(DoClass)
 {
+	
         if(first)
 	{
 		char *elText;
@@ -130,7 +135,7 @@ XML_TAG_HANDLER_IMPL(DoClass)
 						; ++it
 					)
 					{
-						weaponList.insert(*it);
+						weaponList->insert(*it);
 					}
 				}
 
@@ -162,12 +167,10 @@ void SpawnLoader::load()
 		fail = false;
 
 		// Get the base path name
-		spawnLoader.Load();
+		Load();
 	}
 	catch ( std::exception& e )
 	{
 		LogAbort("%s: %s", __FUNCTION__, e.what());
 	}
-
-	return true;
 }

@@ -1098,9 +1098,6 @@ strtInitializeStratData()
 
 #ifdef IS_STRAT_HOST
 	// Load the virtual spawn classes.
-	std::string filename(fiodGetPrepath());
-	filename += "/xml/spawn.xml";
-	SpawnLoader spawnLoader(filename.c_str());
 	spawnLoader.load();
 #endif
 

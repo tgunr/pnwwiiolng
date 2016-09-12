@@ -13,6 +13,8 @@
 //
 
 #include "xml/XMLLoader2.h"
+#include "weap/weapList.h"
+#include "weap/weapSpec.h"
 
 class SpawnLoader : public XMLLoader2<SpawnLoader>
 {
@@ -34,7 +36,7 @@ public:
 
 private:
 
-	WEAPON_LIST& weaponList;
+	WEAPON_LIST *weaponList;
 	std::set<WEAPON_SPEC> classes;
 	WEAPON_LIST::iterator it;
 	bool fail;

@@ -8,6 +8,8 @@
 #include "fio/fio.h"
 #include "str/stringLib.h"
 
+void fioXmlRegisterInputCallbacks();
+
 /************************************************************************************************
 	XMLLoader2
 *************************************************************************************************/
@@ -285,9 +287,11 @@ XMLLoader2<T>::XMLLoader2(const char* path, int flags, bool uiFio) :
     _path(path),
     _handlerReturnScope(NODE)
 {
+#if platBuild != TEUL_SERVER
 	if(_uiFio)
 		xmlRegisterUIFIO();
 	else
+#endif
 		fioXmlRegisterInputCallbacks();
 }
 
@@ -444,9 +448,11 @@ void XMLLoader2<T>::Reset()
 	Finish();
 
 	// re-init the io callbacks
+#if platBuild != TEUL_SERVER
 	if(_uiFio)
 		xmlRegisterUIFIO();
 	else
+#endif
 		fioXmlRegisterInputCallbacks();
 
 	// reset the private data

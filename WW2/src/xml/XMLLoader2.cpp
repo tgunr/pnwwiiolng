@@ -1,6 +1,13 @@
 #include <syscfg.h> // Path is project specific.
 #include "xml/XMLLoader2.h"
+
+#if platBuild != TEUL_SERVER
 #include "ui/uiMain.h" // for ui fio callbacks
+#endif
+
+#if platOS!=OS_WIN32
+#define stricmp strcasecmp
+#endif
 
 const char* xmlTrimString(const char* value)
 {
@@ -69,6 +76,7 @@ const char* xmlGetStringFromNode(xmlNode* node, const char* attribute)
 	return (xmlGetNodeValue(node, XML_DATA_STRING, &str, attribute)) ? str: "";
 }
 
+#if platBuild != TEUL_SERVER
 // lame match functions are everywhere
 static int xmlinputmatch(const char* filename) { return 1; }
 
@@ -79,3 +87,4 @@ void xmlRegisterUIFIO()
 									  (xmlInputReadCallback)fioCallbacks.read,
 									  (xmlInputCloseCallback)fioCallbacks.close);
 }
+#endif

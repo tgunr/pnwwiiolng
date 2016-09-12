@@ -135,6 +135,7 @@ struct MissionStatus
 	{
 		FRU(TeulTimeMS& parent)
 			: VarGroup(parent)
+			, subtype(this)
 			, active(this)
 			, nextPlaceAvail(this)
 			, position(this)
@@ -143,6 +144,7 @@ struct MissionStatus
 		FRU& operator = (const FRU& rhs);
 		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;
 		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;
+		WWII::SyncVar<SINT32, 0> subtype;
 		WWII::SyncVar<bool, 0> active;
 		WWII::SyncVar<Teul::NetTimeMS, 0> nextPlaceAvail;
 		WWII::SyncVar<WorldPosition_m, 0> position;

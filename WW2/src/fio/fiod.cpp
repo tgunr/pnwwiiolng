@@ -955,6 +955,16 @@ const char sep = '/';
     
 #endif
 
+#if platBuild == TEUL_SERVER && platOS != OS_WIN32
+#include "libxml/xmlIO.h"
+
+static int xmlinputmatch(const char* filename) { return 1; }
+
+void fioXmlRegisterInputCallbacks()
+{
+	xmlRegisterInputCallbacks(xmlinputmatch, (xmlInputOpenCallback)fiodOpen, (xmlInputReadCallback)fiodRead, (xmlInputCloseCallback)fiodClose);
+}
+#endif
 
 #if platOS == OS_MACOS
 

@@ -11,7 +11,7 @@ struct PPOSpec
 	SINT32 stotype; // sto type attribute
 
 	std::string modelName; // which visual model to use
-	Vec3d rayAdjust; // how much to adjust the ray colliders by
+	FLOAT64VECTOR rayAdjust; // how much to adjust the ray colliders by
 	double avoidance; // buffer in meters to add to the avoidance box
 	double rayTolerance; // ray tolerance; angle between corner and center ray normals allowed
 	double tiltTolerance; // tilt tolerance; tilt allowed from straight up

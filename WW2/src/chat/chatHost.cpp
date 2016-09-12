@@ -206,7 +206,7 @@ FLOAT32 _avgMessageLength=0;
 // Commonly used channels so we don't have to keep finding them
 Chat::Channel* adminChannel = nullptr;
 
-static PPOSpecLoader specLoader;
+PPOSpecLoader specLoader;
 
 UINT32 g_shutdownLockAt = 0;
 UINT32 g_shutdownDowntime = 0;

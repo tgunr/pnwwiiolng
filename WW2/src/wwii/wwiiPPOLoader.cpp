@@ -1,5 +1,6 @@
 #include <syscfg.h> // Path is project specific.
 #include <cstring>
+#include <string.h>
 
 #include "xml/XMLLoader2.h"
 #include "cfg/cfgPrefs.h"
@@ -9,6 +10,11 @@
 #define PPO_SPEC "vehicles/ground/groundman/ppo.xml"
 
 #define XML_TAG_HANDLER_IMPL(handler) bool PPOSpecLoader::handler(xmlNode* node, bool first, void* userData)
+
+#if platOS!=OS_WIN32
+#define stricmp strcasecmp
+#define strlcpy strncpy
+#endif
 
 PPOSpecLoader::PPOSpecLoader() : XMLLoader2<PPOSpecLoader>(PPO_SPEC)
 {
@@ -116,7 +122,11 @@ XML_TAG_HANDLER_IMPL(DoParam)
 			x = y = z = 0.0f;
 
 			if(sscanf(value.c_str(), "%f,%f,%f", &x, &y, &z) == 3)
-				spec->rayAdjust.set((double)x, (double)y, (double)z);
+			{
+				spec->rayAdjust.x = x;
+				spec->rayAdjust.y = y;
+				spec->rayAdjust.z = z;
+			}
 		}
 		else if(!stricmp(name.c_str(), "avoidance"))
 		{

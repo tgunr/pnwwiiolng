@@ -10,7 +10,6 @@ INCLUDE_DIRECTORIES(
 	${MYSQL_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/libircclient/include
 	${CMAKE_CURRENT_SOURCE_DIR}/libevent/include
-	${CMAKE_CURRENT_SOURCE_DIR}/libxml2/include
 )
 
 # Platform specifics.
@@ -26,7 +25,7 @@ ELSE()
 	INCLUDE ( cmakeincludes/ConfigGCC.cmake )
 
 	# Raknet is in /playnet/wiiol/lib.
-	LINK_DIRECTORIES ( ${CMAKE_CURRENT_SOURCE_DIR_BINARY_DIR} /playnet/wwiiol/lib )
+	LINK_DIRECTORIES ( ${CMAKE_CURRENT_SOURCE_DIR_BINARY_DIR} /playnet/wwiiol/lib)
 
 ENDIF()
 
