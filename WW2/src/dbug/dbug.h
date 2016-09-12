@@ -68,17 +68,8 @@ void dbugSetLogLevel(Debug::ERROR_TYPE level);
 // the Microsoft debugger through the SetDebugErrorLevel function.
 void dbugSetWriteLevel(Debug::ERROR_TYPE level);
 
-// dbugSetErrno: sets Errno. Error numbers adhere to errno.h. Under win32 "dbugWErrno.h"
-// may also be included to map windows socket errors to Unix errno.  Additional errors beyond
-// those covered in errno.h and dbugWErrno.h must be added to debugExtErrno.h and must adhere to
-// windows error code conventions to eliminate problems with compatibility.
-void dbugSetErrno( int err);
-
-// dbugGetErrno: returns the current error number.  Error numbers adhere to errno.h.  Under
-// win32 "dbugWErrno.h" may also be included to map windows socket errors to Unix errno.
-// Additional errors beyond those covered in errno.h and dbugWErrno.h must be added to
-// debugExtErrno.h and must adhere to windows error code conventions to eliminate problems
-// with compatibility.
+// dbugSetErrno and dbugGetErrno: Pointless wrappers around errno
+void dbugSetErrno(int err);
 int dbugGetErrno(void);
 
 // dbugLog: if the current filename, lineno or string is nullptr then it sets these members. The
