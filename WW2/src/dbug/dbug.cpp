@@ -15,63 +15,34 @@
 #include "include/defs.h"
 #include "teul/teulTime.h"
 #include <locale.h>
+#include <mutex>
+
 #if platBuild == TEUL_SERVER
 #include "wwii/wwiiThreads.h"
-#endif
-
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
-#ifdef HAVE_SIGNAL_H
-# include <signal.h>
-#endif
-#if AS_SERVER
 #include "hostproj/revision.h"
-#endif
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-
-#if platBuild == TEUL_SERVER
 #include "teul/teulConfigVar.h"
 extern ConfigPath cv_defaultLogPath;
+static const char _OPEN_MSG[] = "Playnet Server Log File. Rev: " REPOSITORY_INFO "\n";
+static const char _CLOSE_MSG[] = "\nPlayer Server Log File Closed.\n";
+#else
+static const char _OPEN_MSG[] = "Debug Message System Open.\n";
+static const char _CLOSE_MSG[] = "\nDebug Message System Closed.\n";
 #endif
 
-#if platOS == OS_WIN32
-	#include <io.h>
-	#include <winsock2.h>
-	#define wErrno WSAGetLastError()
-	#define wSetErrno WSASetLastError
-#pragma comment(lib, "ws2_32.lib")
-#endif
-
-#if !defined(_MSC_VER)
+#if platOS != OS_WIN32
+# include <unistd.h>
+# include <signal.h>
+# include <sys/time.h>
 # define _O_CREAT O_CREAT
 # define _O_WRONLY O_WRONLY
 # define _O_TRUNC O_TRUNC
-#endif
-
-#if platOS == OS_WIN32
-	#define PMODE (_S_IREAD | _S_IWRITE)
+# define PMODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
 #else
-	#define PMODE S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
+# include <io.h>
+# include <winsock2.h>
+# pragma comment(lib, "ws2_32.lib")
+# define PMODE (_S_IREAD | _S_IWRITE)
 #endif
-
-// set max file size to 50M for roll over to new log
-static const size_t MAX_FILE_SIZE = 50 * 1000 * 1024;
-// Set a maximum of 5 files
-static const size_t MAX_FILE_NUM = 5;
-
-#if	platOS == OS_WIN32
-	#define vsnprintf _vsnprintf
-	#define snprintf _snprintf
-	#define CARRIAGE_RETURN "\r\n"
-#else
-	#define CARRIAGE_RETURN "\n"
-#endif
-
-static const SINT32 _stdErrFileNo = OS_FILENO(stderr);
-static DebugLogger _logger;
 
 const char* errorTypes[] = {
 	"F",		// fatal error detected, exit program
@@ -87,11 +58,6 @@ const char* errorTypes[] = {
 static size_t _fileSize = 0;
 static void _levelHandler(UINT32 errType, const char* const text);
 
-#if defined(REPOSITORY_INFO)
-static const char _OPEN_MSG[] = "Playnet Server Log File. Rev: " REPOSITORY_INFO CARRIAGE_RETURN;
-#else
-static const char _OPEN_MSG[] = "DebugMessage System Open." CARRIAGE_RETURN;
-#endif
 
 static const char _CLOSE_MSG[] = CARRIAGE_RETURN "Debug Message System Closed." CARRIAGE_RETURN;
 
@@ -100,7 +66,6 @@ static const char _CLOSE_MSG[] = CARRIAGE_RETURN "Debug Message System Closed." 
 // message constructions.
 bool g_logDebug = true;
 
-#include <mutex>
 static std::mutex s_dbugInitMutex;
 static bool s_dbugInitialized = false;
 
