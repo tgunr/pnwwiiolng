@@ -955,7 +955,7 @@ const char sep = '/';
     
 #endif
 
-#if platBuild == TEUL_SERVER && platOS != OS_WIN32
+#if platBuild == TEUL_SERVER
 #include "libxml/xmlIO.h"
 
 static int xmlinputmatch(const char* filename) { return 1; }

@@ -1150,7 +1150,11 @@ main(int argc, const char* argv[])
 		{
 			// keep trying until we connect - at intervals
 			dbugLog(_FLA, "%s authGameInit failed retval %d", __FUNCTION__, retval);
-			usleep(10000);
+#if platOS == OS_WIN32
+			Sleep(10000);
+#else
+            usleep(10000);
+#endif
 		}
 	}
 

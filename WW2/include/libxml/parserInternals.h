@@ -1,10 +1,12 @@
 /*
- * parserInternals.h : internals routines exported by the parser.
+ * Summary: internals routines and limits exported by the parser.
+ * Description: this module exports a number of internal parsing routines
+ *              they are not really all intended for applications but
+ *              can prove useful doing low level processing.
  *
- * See Copyright for the status of this software.
+ * Copy: See Copyright for the status of this software.
  *
- * daniel@veillard.com
- *
+ * Author: Daniel Veillard
  */
 
 #ifndef __XML_PARSER_INTERNALS_H__
@@ -22,18 +24,60 @@ extern "C" {
 /**
  * xmlParserMaxDepth:
  *
- * arbitrary depth limit for the XML documents that we allow to 
- * process. This is not a limitation of the parser but a safety 
- * boundary feature.
+ * arbitrary depth limit for the XML documents that we allow to
+ * process. This is not a limitation of the parser but a safety
+ * boundary feature, use XML_PARSE_HUGE option to override it.
  */
 XMLPUBVAR unsigned int xmlParserMaxDepth;
 
- /**
-  * XML_MAX_NAMELEN:
-  *
-  * Identifiers can be longer, but this will be more costly
-  * at runtime.
-  */
+/**
+ * XML_MAX_TEXT_LENGTH:
+ *
+ * Maximum size allowed for a single text node when building a tree.
+ * This is not a limitation of the parser but a safety boundary feature,
+ * use XML_PARSE_HUGE option to override it.
+ * Introduced in 2.9.0
+ */
+#define XML_MAX_TEXT_LENGTH 10000000
+
+/**
+ * XML_MAX_NAME_LENGTH:
+ *
+ * Maximum size allowed for a markup identitier
+ * This is not a limitation of the parser but a safety boundary feature,
+ * use XML_PARSE_HUGE option to override it.
+ * Note that with the use of parsing dictionaries overriding the limit
+ * may result in more runtime memory usage in face of "unfriendly' content
+ * Introduced in 2.9.0
+ */
+#define XML_MAX_NAME_LENGTH 50000
+
+/**
+ * XML_MAX_DICTIONARY_LIMIT:
+ *
+ * Maximum size allowed by the parser for a dictionary by default
+ * This is not a limitation of the parser but a safety boundary feature,
+ * use XML_PARSE_HUGE option to override it.
+ * Introduced in 2.9.0
+ */
+#define XML_MAX_DICTIONARY_LIMIT 10000000
+
+/**
+ * XML_MAX_LOOKUP_LIMIT:
+ *
+ * Maximum size allowed by the parser for ahead lookup
+ * This is an upper boundary enforced by the parser to avoid bad
+ * behaviour on "unfriendly' content
+ * Introduced in 2.9.0
+ */
+#define XML_MAX_LOOKUP_LIMIT 10000000
+
+/**
+ * XML_MAX_NAMELEN:
+ *
+ * Identifiers can be longer, but this will be more costly
+ * at runtime.
+ */
 #define XML_MAX_NAMELEN 100
 
 /**
@@ -46,7 +90,7 @@ XMLPUBVAR unsigned int xmlParserMaxDepth;
 
 /************************************************************************
  *									*
- * UNICODE version of the macros.      					*
+ * UNICODE version of the macros.					*
  *									*
  ************************************************************************/
 /**
@@ -142,7 +186,7 @@ XMLPUBVAR unsigned int xmlParserMaxDepth;
  *
  * Always false (all combining chars > 0xff)
  */
-#define IS_COMBINING_CH(c) 0 
+#define IS_COMBINING_CH(c) 0
 
 /**
  * IS_EXTENDER:
@@ -183,7 +227,7 @@ XMLPUBVAR unsigned int xmlParserMaxDepth;
  * Macro to check the following production in the XML spec:
  *
  *
- * [84] Letter ::= BaseChar | Ideographic 
+ * [84] Letter ::= BaseChar | Ideographic
  */
 #define IS_LETTER(c) (IS_BASECHAR(c) || IS_IDEOGRAPHIC(c))
 
@@ -195,6 +239,26 @@ XMLPUBVAR unsigned int xmlParserMaxDepth;
  *
  */
 #define IS_LETTER_CH(c) xmlIsBaseChar_ch(c)
+
+/**
+ * IS_ASCII_LETTER:
+ * @c: an xmlChar value
+ *
+ * Macro to check [a-zA-Z]
+ *
+ */
+#define IS_ASCII_LETTER(c)	(((0x41 <= (c)) && ((c) <= 0x5a)) || \
+				 ((0x61 <= (c)) && ((c) <= 0x7a)))
+
+/**
+ * IS_ASCII_DIGIT:
+ * @c: an xmlChar value
+ *
+ * Macro to check [0-9]
+ *
+ */
+#define IS_ASCII_DIGIT(c)	((0x30 <= (c)) && ((c) <= 0x39))
+
 /**
  * IS_PUBIDCHAR:
  * @c:  an UNICODE value (int)
@@ -220,7 +284,7 @@ XMLPUBVAR unsigned int xmlParserMaxDepth;
  *
  * Skips the end of line chars.
  */
-#define SKIP_EOL(p) 							\
+#define SKIP_EOL(p)							\
     if (*(p) == 0x13) { p++ ; if (*(p) == 0x10) p++; }			\
     if (*(p) == 0x10) { p++ ; if (*(p) == 0x13) p++; }
 
@@ -257,25 +321,25 @@ XMLPUBFUN int XMLCALL                   xmlIsLetter     (int c);
 /**
  * Parser context.
  */
-XMLPUBFUN xmlParserCtxtPtr XMLCALL	
+XMLPUBFUN xmlParserCtxtPtr XMLCALL
 			xmlCreateFileParserCtxt	(const char *filename);
-XMLPUBFUN xmlParserCtxtPtr XMLCALL	
+XMLPUBFUN xmlParserCtxtPtr XMLCALL
 			xmlCreateURLParserCtxt	(const char *filename,
 						 int options);
-XMLPUBFUN xmlParserCtxtPtr XMLCALL	
+XMLPUBFUN xmlParserCtxtPtr XMLCALL
 			xmlCreateMemoryParserCtxt(const char *buffer,
 						 int size);
-XMLPUBFUN xmlParserCtxtPtr XMLCALL	
+XMLPUBFUN xmlParserCtxtPtr XMLCALL
 			xmlCreateEntityParserCtxt(const xmlChar *URL,
 						 const xmlChar *ID,
 						 const xmlChar *base);
-XMLPUBFUN int XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlSwitchEncoding	(xmlParserCtxtPtr ctxt,
 						 xmlCharEncoding enc);
-XMLPUBFUN int XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlSwitchToEncoding	(xmlParserCtxtPtr ctxt,
 					 xmlCharEncodingHandlerPtr handler);
-XMLPUBFUN int XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlSwitchInputEncoding	(xmlParserCtxtPtr ctxt,
 						 xmlParserInputPtr input,
 					 xmlCharEncodingHandlerPtr handler);
@@ -284,168 +348,151 @@ XMLPUBFUN int XMLCALL
 /* internal error reporting */
 XMLPUBFUN void XMLCALL
 			__xmlErrEncoding	(xmlParserCtxtPtr ctxt,
-						 xmlParserErrors error,
+						 xmlParserErrors xmlerr,
 						 const char *msg,
 						 const xmlChar * str1,
 						 const xmlChar * str2);
 #endif
-/**
- * Entities
- */
-XMLPUBFUN void XMLCALL			
-			xmlHandleEntity		(xmlParserCtxtPtr ctxt,
-						 xmlEntityPtr entity);
 
 /**
  * Input Streams.
  */
-XMLPUBFUN xmlParserInputPtr XMLCALL	
+XMLPUBFUN xmlParserInputPtr XMLCALL
 			xmlNewStringInputStream	(xmlParserCtxtPtr ctxt,
 						 const xmlChar *buffer);
-XMLPUBFUN xmlParserInputPtr XMLCALL	
+XMLPUBFUN xmlParserInputPtr XMLCALL
 			xmlNewEntityInputStream	(xmlParserCtxtPtr ctxt,
 						 xmlEntityPtr entity);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlPushInput		(xmlParserCtxtPtr ctxt,
 						 xmlParserInputPtr input);
-XMLPUBFUN xmlChar XMLCALL			
+XMLPUBFUN xmlChar XMLCALL
 			xmlPopInput		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlFreeInputStream	(xmlParserInputPtr input);
-XMLPUBFUN xmlParserInputPtr XMLCALL	
+XMLPUBFUN xmlParserInputPtr XMLCALL
 			xmlNewInputFromFile	(xmlParserCtxtPtr ctxt,
 						 const char *filename);
-XMLPUBFUN xmlParserInputPtr XMLCALL	
+XMLPUBFUN xmlParserInputPtr XMLCALL
 			xmlNewInputStream	(xmlParserCtxtPtr ctxt);
 
 /**
  * Namespaces.
  */
-XMLPUBFUN xmlChar * XMLCALL		
+XMLPUBFUN xmlChar * XMLCALL
 			xmlSplitQName		(xmlParserCtxtPtr ctxt,
 						 const xmlChar *name,
 						 xmlChar **prefix);
-XMLPUBFUN xmlChar * XMLCALL		
-			xmlNamespaceParseNCName	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlChar * XMLCALL		
-			xmlNamespaceParseQName	(xmlParserCtxtPtr ctxt,
-						 xmlChar **prefix);
-XMLPUBFUN xmlChar * XMLCALL		
-			xmlNamespaceParseNSDef	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlChar * XMLCALL		
-			xmlParseQuotedString	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
-			xmlParseNamespace	(xmlParserCtxtPtr ctxt);
 
 /**
  * Generic production rules.
  */
-XMLPUBFUN xmlChar * XMLCALL		
-			xmlScanName		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN const xmlChar * XMLCALL		
+XMLPUBFUN const xmlChar * XMLCALL
 			xmlParseName		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlChar * XMLCALL		
+XMLPUBFUN xmlChar * XMLCALL
 			xmlParseNmtoken		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlChar * XMLCALL		
+XMLPUBFUN xmlChar * XMLCALL
 			xmlParseEntityValue	(xmlParserCtxtPtr ctxt,
 						 xmlChar **orig);
-XMLPUBFUN xmlChar * XMLCALL		
+XMLPUBFUN xmlChar * XMLCALL
 			xmlParseAttValue	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlChar * XMLCALL		
+XMLPUBFUN xmlChar * XMLCALL
 			xmlParseSystemLiteral	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlChar * XMLCALL		
+XMLPUBFUN xmlChar * XMLCALL
 			xmlParsePubidLiteral	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseCharData	(xmlParserCtxtPtr ctxt,
 						 int cdata);
-XMLPUBFUN xmlChar * XMLCALL		
+XMLPUBFUN xmlChar * XMLCALL
 			xmlParseExternalID	(xmlParserCtxtPtr ctxt,
 						 xmlChar **publicID,
 						 int strict);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseComment		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN const xmlChar * XMLCALL		
+XMLPUBFUN const xmlChar * XMLCALL
 			xmlParsePITarget	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParsePI		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseNotationDecl	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseEntityDecl	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN int XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlParseDefaultDecl	(xmlParserCtxtPtr ctxt,
 						 xmlChar **value);
-XMLPUBFUN xmlEnumerationPtr XMLCALL	
+XMLPUBFUN xmlEnumerationPtr XMLCALL
 			xmlParseNotationType	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlEnumerationPtr XMLCALL	
+XMLPUBFUN xmlEnumerationPtr XMLCALL
 			xmlParseEnumerationType	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN int XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlParseEnumeratedType	(xmlParserCtxtPtr ctxt,
 						 xmlEnumerationPtr *tree);
-XMLPUBFUN int XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlParseAttributeType	(xmlParserCtxtPtr ctxt,
 						 xmlEnumerationPtr *tree);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseAttributeListDecl(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlElementContentPtr XMLCALL	
+XMLPUBFUN xmlElementContentPtr XMLCALL
 			xmlParseElementMixedContentDecl
 						(xmlParserCtxtPtr ctxt,
 						 int inputchk);
-XMLPUBFUN xmlElementContentPtr XMLCALL	
+XMLPUBFUN xmlElementContentPtr XMLCALL
 			xmlParseElementChildrenContentDecl
 						(xmlParserCtxtPtr ctxt,
 						 int inputchk);
-XMLPUBFUN int XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlParseElementContentDecl(xmlParserCtxtPtr ctxt,
 						 const xmlChar *name,
 						 xmlElementContentPtr *result);
-XMLPUBFUN int XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlParseElementDecl	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseMarkupDecl	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN int XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlParseCharRef		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlEntityPtr XMLCALL		
+XMLPUBFUN xmlEntityPtr XMLCALL
 			xmlParseEntityRef	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseReference	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParsePEReference	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseDocTypeDecl	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN const xmlChar * XMLCALL		
+#ifdef LIBXML_SAX1_ENABLED
+XMLPUBFUN const xmlChar * XMLCALL
 			xmlParseAttribute	(xmlParserCtxtPtr ctxt,
 						 xmlChar **value);
-XMLPUBFUN const xmlChar * XMLCALL		
+XMLPUBFUN const xmlChar * XMLCALL
 			xmlParseStartTag	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseEndTag		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+#endif /* LIBXML_SAX1_ENABLED */
+XMLPUBFUN void XMLCALL
 			xmlParseCDSect		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseContent		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseElement		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlChar * XMLCALL		
+XMLPUBFUN xmlChar * XMLCALL
 			xmlParseVersionNum	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlChar * XMLCALL		
+XMLPUBFUN xmlChar * XMLCALL
 			xmlParseVersionInfo	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN xmlChar * XMLCALL		
+XMLPUBFUN xmlChar * XMLCALL
 			xmlParseEncName		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN const xmlChar * XMLCALL		
+XMLPUBFUN const xmlChar * XMLCALL
 			xmlParseEncodingDecl	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN int XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlParseSDDecl		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseXMLDecl		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseTextDecl	(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseMisc		(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlParseExternalSubset	(xmlParserCtxtPtr ctxt,
 						 const xmlChar *ExternalID,
-						 const xmlChar *SystemID); 
+						 const xmlChar *SystemID);
 /**
  * XML_SUBSTITUTE_NONE:
  *
@@ -469,15 +516,8 @@ XMLPUBFUN void XMLCALL
  *
  * Both general and parameter entities need to be substituted.
  */
-#define XML_SUBSTITUTE_BOTH 	3
+#define XML_SUBSTITUTE_BOTH	3
 
-XMLPUBFUN xmlChar * XMLCALL
-		xmlDecodeEntities		(xmlParserCtxtPtr ctxt,
-						 int len,
-						 int what,
-						 xmlChar end,
-						 xmlChar  end2,
-						 xmlChar end3);
 XMLPUBFUN xmlChar * XMLCALL
 		xmlStringDecodeEntities		(xmlParserCtxtPtr ctxt,
 						 const xmlChar *str,
@@ -515,7 +555,6 @@ XMLPUBFUN int XMLCALL			xmlStringCurrentChar	(xmlParserCtxtPtr ctxt,
 						 const xmlChar *cur,
 						 int *len);
 XMLPUBFUN void XMLCALL			xmlParserHandlePEReference(xmlParserCtxtPtr ctxt);
-XMLPUBFUN void XMLCALL			xmlParserHandleReference(xmlParserCtxtPtr ctxt);
 XMLPUBFUN int XMLCALL			xmlCheckLanguageID	(const xmlChar *lang);
 
 /*
@@ -544,6 +583,7 @@ XMLPUBFUN htmlParserCtxtPtr XMLCALL	htmlCreateFileParserCtxt(const char *filenam
  * Specific function to keep track of entities references
  * and used by the XSLT debugger.
  */
+#ifdef LIBXML_LEGACY_ENABLED
 /**
  * xmlEntityReferenceFunc:
  * @ent: the entity
@@ -556,8 +596,38 @@ XMLPUBFUN htmlParserCtxtPtr XMLCALL	htmlCreateFileParserCtxt(const char *filenam
 typedef	void	(*xmlEntityReferenceFunc)	(xmlEntityPtr ent,
 						 xmlNodePtr firstNode,
 						 xmlNodePtr lastNode);
-  
+
 XMLPUBFUN void XMLCALL		xmlSetEntityReferenceFunc	(xmlEntityReferenceFunc func);
+
+XMLPUBFUN xmlChar * XMLCALL
+			xmlParseQuotedString	(xmlParserCtxtPtr ctxt);
+XMLPUBFUN void XMLCALL
+                        xmlParseNamespace       (xmlParserCtxtPtr ctxt);
+XMLPUBFUN xmlChar * XMLCALL
+			xmlNamespaceParseNSDef	(xmlParserCtxtPtr ctxt);
+XMLPUBFUN xmlChar * XMLCALL
+			xmlScanName		(xmlParserCtxtPtr ctxt);
+XMLPUBFUN xmlChar * XMLCALL
+			xmlNamespaceParseNCName	(xmlParserCtxtPtr ctxt);
+XMLPUBFUN void XMLCALL	xmlParserHandleReference(xmlParserCtxtPtr ctxt);
+XMLPUBFUN xmlChar * XMLCALL
+			xmlNamespaceParseQName	(xmlParserCtxtPtr ctxt,
+						 xmlChar **prefix);
+/**
+ * Entities
+ */
+XMLPUBFUN xmlChar * XMLCALL
+		xmlDecodeEntities		(xmlParserCtxtPtr ctxt,
+						 int len,
+						 int what,
+						 xmlChar end,
+						 xmlChar  end2,
+						 xmlChar end3);
+XMLPUBFUN void XMLCALL
+			xmlHandleEntity		(xmlParserCtxtPtr ctxt,
+						 xmlEntityPtr entity);
+
+#endif /* LIBXML_LEGACY_ENABLED */
 
 #ifdef IN_LIBXML
 /*

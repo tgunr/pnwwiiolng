@@ -11,8 +11,11 @@
 
 #define XML_TAG_HANDLER_IMPL(handler) bool PPOSpecLoader::handler(xmlNode* node, bool first, void* userData)
 
-#if platOS!=OS_WIN32
+#if platOS != OS_WIN32
 #define stricmp strcasecmp
+#endif
+
+#if platBuild == TEUL_SERVER
 #define strlcpy strncpy
 #endif
 
