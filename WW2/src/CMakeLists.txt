@@ -163,7 +163,7 @@ ENDMACRO()
 ADD_OMG_TARGET(omg/omgMissionSortieData)
 ADD_OMG_TARGET(omg/omgChat)
 
-IF(NOT MSVC)
+IF(NOT MSVC AND NOT PN_CLUSTER STREQUAL "rPI")
     SET_TARGET_PROPERTIES(OMGgen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
 ENDIF( )
 SET_PROPERTY(TARGET OMGgen PROPERTY FOLDER "Tools")
