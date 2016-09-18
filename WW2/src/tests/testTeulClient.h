@@ -182,6 +182,7 @@ struct ClientRole : public Role
 		outgoing.m_type = type;
 		outgoing.m_size = rand();
 		outgoing.m_count = 64 + rand() % 64;
+        memset(outgoing.m_data, 0, sizeof(outgoing.m_data));
 
 		if ( (EchoPacketHeader::s_requested % 1000) == 0 )
 		{

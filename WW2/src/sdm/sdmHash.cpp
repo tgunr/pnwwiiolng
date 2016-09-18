@@ -185,7 +185,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 //				Write_Debug("adding %d buildings to sc:%d,%d cell:%d,%d"
 //							,cell->numBuildings,sx,sy,x,y);
 				dst.numBuildings = src.size();
-				const size_t dataSize = sizeof(dst.bid) * dst.numBuildings;
+				const size_t dataSize = sizeof(*dst.bid) * dst.numBuildings;
 				dst.bid = static_cast<decltype(dst.bid)>(memAlloc(dataSize));
 				memcpy(dst.bid, src.data(), dataSize);
 			}
