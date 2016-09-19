@@ -154,7 +154,7 @@ static SINT32 _packVehicleCommon(LOGICAL mode, UCHAR* const data, SINT32 offset,
 	return offset;
 }
 
-#if platBuild == TEUL_CLIENT && !defined(RELEASE_CLIENT)
+#if platBuild == TEUL_CLIENT && defined(DEBUG_WW2)
 struct NewVehicleHistory
 {
 	TeulTimeMS	receivedAt;
