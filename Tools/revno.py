@@ -17,10 +17,10 @@ def main():
     git_command = "git -c color.ui=never -C %s" % repo_path
     build_type = sys.argv[1]
     output_directory = os.path.realpath(sys.argv[2])
-    version_value = get_version_value(os.path.realpath(os.path.join(repo_path, version_info_file)))
     git_commit = get_command_output("%s rev-parse HEAD" % git_command)
     git_commitish = get_command_output("%s rev-parse --short HEAD" % git_command)
     git_state = "clean" if len(get_command_output("%s status --porcelain" % git_command)) == 0 else "dirty"
+    version_value = get_version_value(os.path.realpath(os.path.join(repo_path, version_info_file))).strip()
     host_platform = "Mac" if sys.platform == 'darwin' else ("PC" if sys.platform == 'win32' else "Linux")
 
     if build_type != 'client' and build_type != 'host':
@@ -29,12 +29,12 @@ def main():
     replacements = {
         'DATETIME':          time.strftime('%a %b %d, %Y %H:%M:%S %Z'),
         'INPUT_FILE_NAME':   os.path.basename(revision_file_in),
-        'OUTPUT_FILE_NAME':  revision_file_out,
+        'OUTPUT_FILE_NAME':  revision_file_out.replace("\\", "\\\\"),
         'PLATFORM':          host_platform,
         'BUILD_TYPE':        build_type,
         'CURRENT_USER':      getpass.getuser(),
-        'BUILD_HOST':        get_command_output("hostname"),
-        'GIT_ROOT':          repo_path,
+        'BUILD_HOST':        get_command_output("hostname").strip(),
+        'GIT_ROOT':          repo_path.replace("\\", "\\\\"),
         'PRODUCT_VERSION':   version_value,
         'GIT_COMMIT':        git_commit,
         'GIT_COMMITISH':     git_commitish,
@@ -51,7 +51,11 @@ def main():
 def get_command_output(cmd):
     import shlex, subprocess
     
-    rawdata = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE).communicate()[0]
+    if sys.platform == 'win32':
+        posix_parse = False
+    else:
+        posix_parse = True
+    rawdata = subprocess.Popen(shlex.split(cmd, False, posix_parse), stdout=subprocess.PIPE).communicate()[0]
     if sys.version_info[0] < 3:
         return str(rawdata).strip('\n')
     else:
@@ -73,11 +77,11 @@ def replace_file_atomic(src, dst):
 
 ### Perform replacement substitutions on a file atomically
 def configure_file(src, dst, substitutions):
-    with tempfile.NamedTemporaryFile(mode='w', delete=False) as ftmp:
-        with open(src, 'r') as fin:
+    with tempfile.NamedTemporaryFile(mode='wt', delete=False) as ftmp:
+        with open(src, 'rt') as fin:
             for line in fin:
                 for replKey, replVal in substitutions.iteritems():
-                    line = line.replace(r'${%s}' % replKey, replVal)
+                    line = line.replace(r'${%s}' % replKey, replVal.replace("\r\n", "\n"))
                 ftmp.write(line)
         ftmp.close()
         replace_file_atomic(ftmp.name, dst)
@@ -102,12 +106,18 @@ def get_version_value(version_info_file_path):
     # Once again Windows insists on making things difficult. Since there's no
     # way to redirect stdin into CL.EXE, we just use the completely pointless
     # and wasteful temp file on all platforms.
-    version_expansions = "PN_WW2_PRODUCT_NO.PN_WW2_VERSION_NO.PN_WW2_PATCH_NO.PN_WW2_BUILD_NO"
-    with tempfile.NamedTemporaryFile(mode='w', bufsize=0) as ftmp:
-        ftmp.write(version_expansions + "\n") ; ftmp.flush()
-        if sys.platform == 'win32':
-            version_value = get_command_output('cl.exe /EP /FI "%s" /TP "%s"' % (version_info_file_path, ftmp.name))
-        else:
+    if sys.platform == 'win32':
+        version_expansions = "PN_WW2_PRODUCT_NO . PN_WW2_VERSION_NO . PN_WW2_PATCH_NO . PN_WW2_BUILD_NO"
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as ftmp:
+            ftmp.write(version_expansions)
+            ftmp.close()
+            raw_version_value = get_command_output('cl.exe /nologo /EP /FI %s /TP %s' % (version_info_file_path, ftmp.name)).strip()
+            os.remove(ftmp.name)
+            version_value = raw_version_value.replace('#pragma once', '')
+    else:
+        version_expansions = "PN_WW2_PRODUCT_NO.PN_WW2_VERSION_NO.PN_WW2_PATCH_NO.PN_WW2_BUILD_NO"
+        with tempfile.NamedTemporaryFile(mode='w', bufsize=0) as ftmp:
+            ftmp.write(version_expansions + "\n") ; ftmp.flush()
             version_value = get_command_output('clang -E -P -include "%s" -x c++ "%s"' % (version_info_file_path, ftmp.name))
     return version_value.replace(' ', '')
 
