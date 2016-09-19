@@ -7,6 +7,9 @@ IF ( UNIX AND NOT CNL )
  MESSAGE(SEND_ERROR "ncurses library not found")
 ENDIF ()
 
+# Need Python for revno.py
+FIND_PACKAGE( PythonInterp 2.7 REQUIRED )
+
 # Include our macros etc
 find_package(MySQL REQUIRED)
 
