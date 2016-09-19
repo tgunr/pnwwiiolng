@@ -28,13 +28,17 @@
     Commit:     ${GIT_COMMITISH} (${GIT_COMMIT}) - ${GIT_STATE}
 */
 
+// Because otherwise MSVC cries like a whiny baby about PCH.
+// This does not need to be here for any actual reason whatsoever.
+#include "syscfg.h"
+
 #include "build_info.hpp"
 #include "platforms.h"
 
 // __attribute__((used)) prevents the compiler from dead-stripping these values
 // under Clang/GCC. With MSVC we have to use the much more annoying #pragma.
 #if __is_MSVC()
-#define __used_variable__(x) __pragma(comment(linker, "/include:_" #x)) x
+#define __used_variable__(x) x //__pragma(comment(linker, "/include:" #x)) x
 #else
 #define __used_variable__(x) __attribute__((used)) x
 #endif
