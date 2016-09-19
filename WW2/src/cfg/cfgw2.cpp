@@ -161,11 +161,12 @@ FILE*	ConfigFile;
 	{
 		// try up a directory if not found
 #if platOS != OS_WIN32
-		strcpy(NewName, "../");   // grrrrrrrrrr!
-#else
-		strcpy(NewName, "..\\");
-#endif
+		strlcpy(NewName, "../", 256);   // grrrrrrrrrr!
 		strlcat(NewName, ConfigName, 256);
+#else
+		strcpy_s(NewName, "..\\");
+		strcat_s(NewName, ConfigName);
+#endif
 		ConfigFile = fopen(NewName, "rt");
 
 		if (nullptr == ConfigFile)
