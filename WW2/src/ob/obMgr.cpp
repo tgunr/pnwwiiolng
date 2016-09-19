@@ -1663,7 +1663,7 @@ void PoolModel::load()
 	if(fioQuery() == ISDIRECTORY && ModelNeedsRebuild(path.c_str()))
 	{
 #ifndef COLLECT_TEXTURE_STATS
-		sprintf(s, "%4d: RebuildMDL: %s\n", ++loadcounter, path.c_str());OutputDebugStringA(s);
+		dbugLog(_FLD, "%4d: RebuildMDL: %s\n", ++loadcounter, path.c_str());
 #endif
 		this->RebuildMDL();
     }

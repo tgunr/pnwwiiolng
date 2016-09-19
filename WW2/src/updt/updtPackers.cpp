@@ -154,13 +154,7 @@ static SINT32 _packVehicleCommon(LOGICAL mode, UCHAR* const data, SINT32 offset,
 	return offset;
 }
 
-#if platBuild == TEUL_CLIENT && (!defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0)
-# define UPDATE_HISTORY_DEBUG
-#else
-# undef UPDATE_HISTORY_DEBUG
-#endif
-
-#if defined(UPDATE_HISTORY_DEBUG)
+#if platBuild == TEUL_CLIENT && !defined(RELEASE_CLIENT)
 struct NewVehicleHistory
 {
 	TeulTimeMS	receivedAt;
@@ -250,7 +244,6 @@ _recordNewHistoryEntry(const SHARED_VEHICLE_INFO* const vehInfo, const ChatHandl
 
 static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset, SHARED_VEHICLE_INFO* const vehInfo, SINT32 size, const WORLD_UPDATE* const wu)
 {
-//static SINT32 count = 0;
 	offset = wwiiPackWeaponSpec(mode, data, offset, &vehInfo->spec(), 0);
 	if ( mode == TEUL_UNPACK )
 	{
@@ -336,11 +329,9 @@ static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset,
 
 	offset = wwiiPackBrigadeID(mode, data, offset, vehInfo->brigadeID, 0);
 
-#if defined(UPDATE_HISTORY_DEBUG)
+#if platBuild == TEUL_CLIENT && !defined(RELEASE_CLIENT)
 	_recordNewHistoryEntry(vehInfo, packedCallsign);
 #endif
-
-//	dbugWrite(_FLASB, "\n%d:****ONE_TIME callsign: %s\n", count++, vehInfo->callsign);
 
 	return offset;
 }

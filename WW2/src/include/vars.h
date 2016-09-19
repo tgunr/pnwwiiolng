@@ -298,10 +298,4 @@ extern LOGICAL          DebugBuildingMDLFilesOnly;
 
 static inline bool IN_COMBAT(SINT32 t) { return (frametime - combattime) <= t; }
 
-namespace WWII
-{
-	extern const unsigned int gitCommitNo;
-	extern const char* const gitCommitStr;
-}
-
 #endif

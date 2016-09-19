@@ -418,8 +418,8 @@ void GameInfoView::DrawSelf()
 /************************************************************************************************
 	DisplayInfo
 *************************************************************************************************/
-#if platOS == OS_WIN32 && (!defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0)
-	extern std::vector<std::wstring> updtGetNvHistory();
+#ifdef DEBUG_WW2
+extern std::vector<std::wstring> updtGetNvHistory();
 #endif
 
 void GameInfoView::DisplayInfo()
@@ -433,7 +433,7 @@ void GameInfoView::DisplayInfo()
 	Min = trnTODGetMinuteFromTimeOfDay(TOD);
 
 	DrawString(L"%ls: %.0f ", strings["hud.gameinfo.fps"].c_str(), gFPS);
-#ifdef DEBUG
+#ifdef DEBUG_WW2
 	DrawString(L"commit %s\n", PN_git_commitish_string);
 #endif
 	DrawString(L"%ls: %02d:%02d\n", strings["hud.gameinfo.time"].c_str(), Hour, Min);
@@ -446,7 +446,7 @@ void GameInfoView::DisplayInfo()
 
 	DrawString(L"%ls: %ls\n", strings["hud.gameinfo.icon"].c_str(), strings[modeKey].c_str());
 
-#ifdef DEBUG
+#ifdef DEBUG_WW2
 	DrawString(L"%ls\n", clientGetNetworkState().c_str());
 
 #ifdef VEHICLES_GAME_INFO
