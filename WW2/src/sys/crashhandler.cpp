@@ -1,4 +1,3 @@
-//#define _WIN32_DCOM
 #include <syscfg.h>
 #include <Windows.h>
 #include <string>
@@ -688,9 +687,6 @@ void InstallCrashHandler()
 	}
 #endif
 
-	// Note: SHGetKnownFolderPath() is not available before Vista. If XP support is ever added
-	// back in, this will need to be replaced with the SHGetFolderPath() call shown below,
-	// preferably using GetProcAddress() to call the newer routine instead when available.
 	wchar_t *basePath = nullptr;
 	HRESULT result = SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_SIMPLE_IDLIST | KF_FLAG_CREATE, nullptr, &basePath);
 
@@ -708,7 +704,6 @@ void InstallCrashHandler()
 			dataPath += L"\\" + component;
 			CreateDirectory(dataPath.c_str(), nullptr); // we don't care if this fails
 		}
-		//dataPath += L"\\Playnet\\World War II Online\\Crash Logs";
 
 		// Allocate the context for the crash handler.
 		gCrashContext = std::make_unique<CrashHandlerContext>();
@@ -728,8 +723,7 @@ void InstallCrashHandler()
 		crash_log(L"Installed Breakpad exception handler, now trapping crashes. Log path is %s\n", dataPath.c_str());
 
 		ProcessExistingReports(dataPath);
-	}
-	else {
+	} else {
 		crash_log(L"Failed to find %APPDATA%\\Roaming, crash handler not installed.\n");
 	}
 }
