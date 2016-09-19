@@ -11,8 +11,8 @@
 // identity. In the future it may also contain settings pertaining to excluding
 // or including the archives in code signing.
 
-CODE_SIGN_IDENTITY_Development = Mac Developer
-CODE_SIGN_IDENTITY_Debug = Mac Developer
+CODE_SIGN_IDENTITY_Development = 
+CODE_SIGN_IDENTITY_Debug =
 CODE_SIGN_IDENTITY_Release = Developer ID Application
 CODE_SIGN_IDENTITY_GM = $(CODE_SIGN_IDENTITY_Release)
 CODE_SIGN_IDENTITY = $(CODE_SIGN_IDENTITY_$(CONFIGURATION))

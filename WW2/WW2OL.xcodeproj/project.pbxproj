@@ -487,7 +487,6 @@
 		FA3B631B1D613BA500A5A810 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; };
 		FA3B631C1D613BB400A5A810 /* HockeySDK.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FA5CDD491CD8BA6D00F93668 /* build_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA3D8BA81C8BF201002C5119 /* build_info.cpp */; };
-		FA78BDEC1D9082FA0042FBF0 /* Defines.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = FA78BDEB1D9082FA0042FBF0 /* Defines.xcconfig */; };
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
 		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
 /* End PBXBuildFile section */
@@ -3349,7 +3348,6 @@
 				FA37D7531C937F8F00013187 /* Localizable.strings in Resources */,
 				FA13BB1B1C875F6800095818 /* placeholder-title.png in Resources */,
 				FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */,
-				FA78BDEC1D9082FA0042FBF0 /* Defines.xcconfig in Resources */,
 				FA37D74F1C937F6E00013187 /* MainMenu.nib in Resources */,
 				FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */,
 			);
