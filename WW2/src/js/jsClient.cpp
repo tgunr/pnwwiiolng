@@ -786,7 +786,7 @@ JS_FUNCTION_DEF(jsClient, createmission)
 	post.subType = (SINT8)subtype;
 	post.origin = *jsorigin->stratobj->FullObjID();
 	post.target = *jstarget->stratobj->FullObjID();
-	post.descSize = strlen(missiondesc.c_str());
+	post.descSize = static_cast<SINT16>(strlen(missiondesc.c_str()));
 	strncpy(post.desc,missiondesc.c_str(), MapMiss::MISSION_DESC_LENGTH);
 
 	*rval = INT_TO_JSVAL(0); // trying
