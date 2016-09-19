@@ -307,10 +307,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
     <CustomBuildStep>
       <Command>
@@ -388,10 +388,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -465,10 +465,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -543,10 +543,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -621,10 +621,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>python "$(SolutionDir)\WW2\proj\win\codesign.py" /VS /SIGN /DESC "World War II Online" /PASS:HERE PNww2/pn-codesign /VERBOSE $(TargetPath)</Command>
@@ -702,10 +702,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
@@ -774,10 +774,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
@@ -846,10 +846,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
@@ -918,10 +918,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -981,17 +981,6 @@
     <ClInclude Include="..\..\src\client\clientStrtQueue.h" />
     <ClInclude Include="..\..\src\client\GameClient.h" />
     <ClInclude Include="..\..\src\client\ww2Client.h" />
-    <ClInclude Include="..\..\src\client_revision.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='China|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\..\src\comm\commClientMessages.h" />
     <ClInclude Include="..\..\src\comm\commConstants.h" />
     <ClInclude Include="..\..\src\comm\commPackers.h" />
@@ -1988,6 +1977,7 @@
     <ClCompile Include="..\..\src\scen\ScenarioManager.cpp" />
     <ClCompile Include="..\..\src\scen\scenLua.cpp" />
     <ClCompile Include="..\..\src\scen\scenMain.cpp" />
+    <ClCompile Include="build_info.cpp" />
   </ItemGroup>
   <ItemGroup>
     <OMGGen Include="..\..\src\omg\omgChat.omg" />
