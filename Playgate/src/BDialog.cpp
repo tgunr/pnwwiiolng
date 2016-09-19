@@ -37,7 +37,7 @@ void CBDialog::Localize(UINT itemId, UINT locID) const
 		else
 		{
 			wchar_t versionNo[81];
-			swprintf(versionNo, 80, L"%s", STRVER);
+			swprintf(versionNo, 80, L"%hs", STRVER);
 			item->SetWindowText(versionNo);
 		}
 	}
