@@ -23,10 +23,11 @@
 	#define closesocket close
 	#define ioctlsocket ioctl
 
+	#define INVALID_SOCKET  -1
+	#define SOCKET_ERROR -1
+	typedef int				SOCKET;
+
 #endif
 
-#define INVALID_SOCKET  -1
-#define SOCKET_ERROR -1
-typedef int				SOCKET;
 #define PRF_SOCKET "%d"
 #define PRA_SOCKET(s) int(s)
