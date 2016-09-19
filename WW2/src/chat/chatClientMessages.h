@@ -1,7 +1,5 @@
 #pragma once
 
-#include "versionNo.h"
-
 #define BUFFERSIZE 16
 
 #include <b64/encode.h>
