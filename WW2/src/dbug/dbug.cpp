@@ -347,7 +347,7 @@ void dbugDumpBacktrace(int signum)
 		return;
 	}
 
-	_report(fd, "BACKTRACE [Rev %s, %u functions]:\n", PN_git_commitish_string, numAddrs);
+	_report(fd, "BACKTRACE [Rev unknown, %u functions]:\n", numAddrs);
 
 	backtrace_symbols_fd(backtraceAddrs, numAddrs, fd);
 
