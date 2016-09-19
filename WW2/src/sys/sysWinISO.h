@@ -13,7 +13,7 @@
 
 #define OS_ALLOCA(...) _malloca(__VA_ARGS__)
 #define OS_CLOSE(...) _close(__VA_ARGS__)
-#define OS_OPEN(...) _open(__VA_ARGS__)
+#define OS_OPEN(fdp, path, oflag, cmode) _sopen_s(fdp, path, oflag, _SH_DENYRW, cmode)
 #define OS_WOPEN(...) _wopen(__VA_ARGS__)
 #define OS_DUP(...) _dup(__VA_ARGS__)
 #define OS_FDOPEN(...) _fdopen(__VA_ARGS__)
@@ -49,7 +49,7 @@
 
 // Provide the passthrough defines for non-Windows platforms
 #define OS_ALLOCA(...) ::alloca(__VA_ARGS__)
-#define OS_OPEN(...) ::open(__VA_ARGS__)
+#define OS_OPEN(fdp, path, oflag, cmode) ({ *fdp = open(path, oflag, cmode); (*fdp == -1 ? 1 : 0); })
 #define OS_CLOSE(...) ::close(__VA_ARGS__)
 #define OS_WOPEN(...) wopen(__VA_ARGS__)
 #define OS_DUP(...) ::dup(__VA_ARGS__)
