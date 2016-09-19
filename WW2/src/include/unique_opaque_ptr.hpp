@@ -3,11 +3,11 @@
 // RAII helpers for opaque pointers
 template <typename TOpaque>
 struct opaque_ptr_traits final {
-	static inline void destroy(TOpaque value); // wish this could error in compiler instead of linker
+	static inline void destroy(TOpaque value) noexcept; // wish this could error in compiler instead of linker
 };
 #define DEFINTE_OPAQUE_PTR_DELETER(ptrtype, deleterfunc) \
 template <> struct opaque_ptr_traits<ptrtype> { \
-	static inline void destroy(ptrtype value) { \
+	static inline void destroy(ptrtype value) noexcept { \
 		if (value) { \
 			deleterfunc(value); \
 		} \
