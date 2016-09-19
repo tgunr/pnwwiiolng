@@ -212,6 +212,8 @@ ENDIF( )
 # TeulServer library - this is a baseline library that provides
 # teulKit services and the cluster's "server" API.
 ADD_LIBRARY(teulserver
+    build_info.cpp build_info.stamp
+
     server/server.cpp
         server/server.h
             server/serverReleaseTypeEnum.h
@@ -303,7 +305,6 @@ SET_PROPERTY(TARGET instancing PROPERTY FOLDER "Libs")
 # Common-to-all WWII library, provides all the basics like ChatHandle functions,
 # weapon list, database operations, wwii_config, etc.
 ADD_LIBRARY(libwwii
-    build_info.cpp build_info.stamp
     chat/chatHandle.cpp
         chat/chatHandle.h
         chat/chatName.h
