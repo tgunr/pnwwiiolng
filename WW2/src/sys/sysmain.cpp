@@ -28,6 +28,7 @@
 #include "include/vars.h"
 #include "locl/loclApp.h"
 #include "sn/sndsSoundTypes.h"
+#include "build_info.hpp"
 
 #ifdef CRASH_HANDLER
 #include "sys/crashhandler.h"
