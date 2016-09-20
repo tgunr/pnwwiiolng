@@ -65,14 +65,20 @@
 #endif
 
 // Known operating systems
-#define	OS_WIN32	1
-#define	OS_MACOS	2
-#define	OS_LINUX	3
-#define OS_MAX_PLAT	4
+#define OS_WIN32    1
+#define OS_MACOS    2
+#define OS_LINUX    3
+#define OS_MAX_PLAT 4
 
 // Used by platBuild
-#define TEUL_CLIENT		0
-#define	TEUL_SERVER		1
+#define BUILD_CLIENT 0
+#define BUILD_SERVER 1
+
+#ifdef AS_SERVER
+#define platBuild BUILD_SERVER
+#else
+#define platBuild BUILD_CLIENT
+#endif
 
 #if defined(WIN32) || defined(WIN64)
 
