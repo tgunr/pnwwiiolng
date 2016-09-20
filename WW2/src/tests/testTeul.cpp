@@ -94,41 +94,15 @@ namespace Config
 	static size_t iterFactor = 1;
 }
 
-//////////////////////////////////////////////////////////////////////
-#if platOS == OS_WIN32
-// Windows support.
-// This app is primarily developed for Linux, but the whole point of
-// teulKit is that it's cross-platform, so this code should largely
-// be able to run on both platforms.
-//
-// Naturally, there are a few minor differences here and there...
-
 #if platBuild != TEUL_SERVER
-	// Under Linux, this is supplied by libteulserver.
-	#include "teul/teulConnectionInstruction.h"
-	SINT32
-	Teul::ConnectionInstruction::receive(SINT32 teulIndex)
-	{
-		throw Teul::IndexError(teulIndex, "Unexpected connection instruction received.\n", m_hostIP);
-	}
-#endif
-// End of windows support section.
-#elif platOS == OS_MACOS
-// Mac support.
+
 #include "teul/teulConnectionInstruction.h"
 SINT32
 Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 {
-	throw Teul::IndexError(teulIndex, "Unexpected connection instruction received.\n", m_hostIP);
+    throw Teul::IndexError(teulIndex, "Unexpected connection instruction received.\n", m_hostIP);
 }
 
-// End of mac support.
-#elif platOS == OS_LINUX
-// Linux support.
-
-// End of linux support.
-#else
-	#error("You need a -DplatOS=OS_... for your platform.")
 #endif
 
 //////////////////////////////////////////////////////////////////////

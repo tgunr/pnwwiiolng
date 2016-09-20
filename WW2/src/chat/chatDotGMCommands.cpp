@@ -10,7 +10,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
 #include "server/serverReleaseTypeEnum.h"
 #include "server/serverInterface.h"
 

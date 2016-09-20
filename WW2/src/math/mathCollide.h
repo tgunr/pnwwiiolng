@@ -27,11 +27,7 @@ extern SINT32 mathRayToCylinder(piVECTOR const*startP,      // IN
 
 #define MATHCOLLIDE_INLINE
 
-#if platOS == OS_MACOS
-    #define INLINE inline
-#else
-    #define INLINE __forceinline
-#endif
+#define INLINE inline
 
 #include "math/mathCollide.cpp"
 

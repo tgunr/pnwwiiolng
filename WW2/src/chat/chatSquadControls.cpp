@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatdbClientMessages.h"
 #include "chat/chatList.h"
 #include "chat/chatMissionInviteMsg.h"

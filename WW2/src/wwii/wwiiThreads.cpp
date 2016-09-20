@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include <mysql.h>
 #include <signal.h>
 #include <mutex>

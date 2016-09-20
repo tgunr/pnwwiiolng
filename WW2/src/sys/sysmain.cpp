@@ -28,6 +28,7 @@
 #include "include/vars.h"
 #include "locl/loclApp.h"
 #include "sn/sndsSoundTypes.h"
+#include "build_info.hpp"
 
 #ifdef CRASH_HANDLER
 #include "sys/crashhandler.h"
@@ -424,7 +425,7 @@ struct LANGANDCODEPAGE
 			break;
 		}
 
-		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs"), filename, pFFI, WWII::gitCommitStr);
+		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs"), filename, pFFI, PN_git_commitish_string);
 		Write_Debug(UTF8(txt));
 
 		GlobalMemoryStatus(&memstat);

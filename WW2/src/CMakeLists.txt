@@ -64,7 +64,6 @@ SET(PCH_INCLUDE_HEADERS
     dbug/dbug.h
     chat/chatHandle.h
     mem/mem.h
-    hostproj/versionNo.h
     include/precompile_includes.h
     inst/instDescriptor.h
     wwii/wwiiPlayer.h
@@ -91,6 +90,23 @@ SET(PCH_INCLUDE_HEADERS
     teul/teulEndpoint.h
     chat/chatLStringIDs.h
 )
+
+# Run revno.py to get build_info.cpp
+# Use BYPRODUCTS for the real result and a symbolic (fake) OUTPUT so the script
+# runs always; easiest way to avoid the run-when-needed default behaviors.
+ADD_CUSTOM_COMMAND(
+    OUTPUT build_info.stamp
+    BYPRODUCTS build_info.cpp
+    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/build_info.cpp.in
+    COMMAND
+        ${PYTHON_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../Tools/revno.py
+        host
+        ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generating build information"
+    VERBATIM
+)
+SET_SOURCE_FILES_PROPERTIES( build_info.stamp PROPERTIES SYMBOLIC TRUE )
 
 ######################################################################
 
@@ -196,6 +212,8 @@ ENDIF( )
 # TeulServer library - this is a baseline library that provides
 # teulKit services and the cluster's "server" API.
 ADD_LIBRARY(teulserver
+    build_info.cpp build_info.stamp
+
     server/server.cpp
         server/server.h
             server/serverReleaseTypeEnum.h
@@ -286,7 +304,7 @@ SET_PROPERTY(TARGET instancing PROPERTY FOLDER "Libs")
 
 # Common-to-all WWII library, provides all the basics like ChatHandle functions,
 # weapon list, database operations, wwii_config, etc.
-ADD_LIBRARY(libwwii 
+ADD_LIBRARY(libwwii
     chat/chatHandle.cpp
         chat/chatHandle.h
         chat/chatName.h

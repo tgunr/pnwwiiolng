@@ -9,7 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include <map>
-#include "versionNo.h"
 #include "wwii/wwiiPlayer.h"
 #include "wwii/wwiiExitCodes.h"
 #include "wwii/wwiiPermissions.h"

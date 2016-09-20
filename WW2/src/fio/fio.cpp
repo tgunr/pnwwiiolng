@@ -552,20 +552,6 @@ size_t fioGetLine(int fd, char* string, size_t length)
       string[i] = 0;
       return(i+1);
     }
-
-#if platOS == OS_MACOS
-// mac newlines, ugh
-   	if(string[i] == '\r'){
-    	char c = '\0';
-	  	if(fioRead(fd, &c, 1) == 1 ){
-	  		fioSeek(fd,-1,SEEK_CUR);
-	  		if(c != '\n'){
-	  			string[i] = '\0';
-	  			return (i+1);
-	  		}
-	  	}
-	}
-#endif
   }
 
   if (i < length)

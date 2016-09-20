@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"						// For version dependent code
-
 #include "chat/chatBailSTO.h"
 #include "chat/chatServerTrackedObjects.h"				// Our header file
 #include "wwii/wwiiServerTrackedObject.h"

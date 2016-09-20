@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include <set>
 
 #include "chat/chatBrigadeMove.h"

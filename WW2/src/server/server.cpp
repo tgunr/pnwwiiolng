@@ -9,9 +9,7 @@
 
 #include <queue>
 #include <atomic>
-
-#include "versionNo.h"
-
+#include "build_info.hpp"
 #include "mem/mem.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
@@ -928,8 +926,6 @@ serverEnableDebugWebServer(SERVER_TYPE serverType)
 //////////////////////////////////////////////////////////////////////
 // Simple URL to test the server is running.
 
-#include "revision.h"
-
 static void
 _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 {
@@ -939,7 +935,7 @@ _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 	teulGetAddress(stats.address, ip, sizeof(ip));
 
 	char buffer[1024];
-	const int len = sprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"" REPOSITORY_INFO "\"}\r\n"
+	const int len = sprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s\"}\r\n"
 						, Teul::GetAppName()
 						, ip
 						, stats.arenaID
@@ -947,6 +943,7 @@ _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 						, stats.status
 						, stats.maxPlayers()
 						, stats.numPlayers()
+                        , PN_git_commitish_string
 						);
 	send(fd, buffer, len, 0);
 }

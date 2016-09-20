@@ -18,9 +18,6 @@ typedef std::map<int, ref_ptr<Texture> > ldTextureMap;
 static ldTextureMap* Textures = new ldTextureMap(); // crash on exit on Mac avoided
 
 extern Image* ReadDDSFile(const std::string& name);
-#if platOS != OS_MACOS
-extern Image* ReadPNGFile(const std::string& name);
-#endif
 extern Image* ReadTGAFile(const std::string& name);
 extern Image* ReadBMPFile(const std::string& name, unsigned int transparentColor);
 

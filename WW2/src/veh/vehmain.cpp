@@ -96,11 +96,6 @@
 #include "strt/strtClientMessages.h"
 #include "strt/strtCPFlags.h"
 
-#ifdef TESTMAC
-//extern "C" void spawningin();
-//extern "C" void spawningout();
-#endif
-
 #include "wwii/wwiiOhYeahCodes.h"
 
 #define REPORT_ENEMIES
@@ -4862,10 +4857,6 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 
 	return 0;
 }
-
-#ifdef __MWERKS__
-#pragma mark -
-#endif
 
 /************************************************************************************************
 	vehFindInertiaComponent

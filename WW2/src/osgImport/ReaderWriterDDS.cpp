@@ -611,10 +611,6 @@ Image* ReadDDSFile(const std::string& name)
 
     unsigned char* imageData = new unsigned char [size];
 
-#ifdef TESTMAC
-//  printf("%60s: %'12d [%4dx%4d=%2d]\n",name.c_str(), size, s, t, r);
-#endif
-
     if(!imageData)
     {
         fioClose(fd);

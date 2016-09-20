@@ -3951,11 +3951,7 @@ static UINT32 _DrawRedoutBlackoutOld(void)
 		}
 		else
 		{
-#if platOS == OS_MACOS
-			Color = piRGBA(Red,Green,Blue,fmin(AlphaValue, 0.75));
-#else
 			Color = piRGBA(Red,Green,Blue, std::min(AlphaValue, 0.75f));
-#endif
 			draw2dTransparentRectangle(0,0,piGetWidth(),piGetHeight(),zdepthLAYER7,Color);
 		}
 	}
@@ -4429,7 +4425,7 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 		return 0;
 	}
 
-    Write_Debug( "Damage %f position %u location %u atponly %u\n", Damage, Position, Location, ATPOnly );
+    dbugLog(_FLD, "Damage %f position %u location %u atponly %u\n", Damage, Position, Location, ATPOnly);
 
 	persPersonaHealth& Health = _PersonaHealth[Position];
 	if (Location == PERS_HITLOCATION_HEAD)
@@ -4609,7 +4605,6 @@ FLOAT32 Pitch;
 		Volume *= persHatchVolumeMultiplier(PosNum);
 
 		// handle engine
-#if platOS != OS_MACOS
 		FLOAT32 TempNum;
 
 		TempNum = (1.0f - _Persona.VehicleAttached->EngineIdleVolume) *
@@ -4619,7 +4614,6 @@ FLOAT32 Pitch;
 		TempNum = (1.0f - _Persona.VehicleAttached->EnginePowerVolume) *
 					(CrewData->EngineFullPowerVol[PosNum]) + (1.0f - CrewData->EngineFullPowerVol[PosNum]);
 		Volume *= TempNum;
-#endif
 
 	}
 	fxSndSetExternalVolume(Volume);

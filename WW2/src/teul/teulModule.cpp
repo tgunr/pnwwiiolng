@@ -403,9 +403,7 @@ _connectSocket(ENDPOINT& endpoint)
 		endpoint.lastDataRecv.makeCurrent();
 		endpoint.lastDataSent.makeCurrent();
 
-#if platOS == OS_LINUX || platOS == OS_MACOS
 		assert( endpoint.m_impl->pollSlot() < 0 );
-#endif
 
 		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " connecting on %s:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
 

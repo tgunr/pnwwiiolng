@@ -7,9 +7,9 @@
 //
 // Originating Programmer: Martin Poulin
 
-#include "dbug/dbugInternal.h"
-
 #include <syscfg.h>
+#include "dbug/dbugInternal.h"
+#include "build_info.hpp"
 #include <fcntl.h>
 #include <sys/stat.h>
 #include "include/defs.h"
@@ -19,7 +19,6 @@
 
 #if platBuild == TEUL_SERVER
 #include "wwii/wwiiThreads.h"
-#include "hostproj/revision.h"
 #include "teul/teulConfigVar.h"
 extern ConfigPath cv_defaultLogPath;
 static const char _OPEN_MSG[] = "Playnet Server Log File. Rev: " REPOSITORY_INFO "\n";
@@ -314,7 +313,7 @@ void dbugDumpBacktrace(int signum)
 		return;
 	}
 
-	_report(fd, "BACKTRACE [Rev " REPOSITORY_INFO ", %u functions]:\n", numAddrs);
+	_report(fd, "BACKTRACE [Rev unknown, %u functions]:\n", numAddrs);
 
 	backtrace_symbols_fd(backtraceAddrs, numAddrs, fd);
 

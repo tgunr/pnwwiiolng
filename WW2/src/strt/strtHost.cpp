@@ -7,12 +7,10 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
 #include "hostproj/hostversion.h"
-#include "hostproj/revision.h"
 
 #include <signal.h>  //to catch SIGHUPS with
-
+#include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatStratSupportMessages.h"
 #include "chat/chatSupportRPCMessages.h"
@@ -150,7 +148,6 @@ static void _mapErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 
 
 static void _describeBuildConfigurationToLogFile()
 {
-	dbugLog(_FLI, REPOSITORY_INFO " HOST FLAGS:");
 
 #if defined(DEV_BUILD)
 	dbugLog(_FLIB, "DEV_BUILD");
@@ -172,6 +169,7 @@ static void _describeBuildConfigurationToLogFile()
 #endif
 #if defined(HAPPYOO)
 	dbugLog(_FLIB, " HAPPYOO");
+	dbugLog(_FLI, "%s HOST FLAGS:", PN_git_commitish_string);
 #endif
 #if defined(TRAINING_SERVER)
 	dbugLog(_FLIB, " TRAINING_SERVER");

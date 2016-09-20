@@ -963,13 +963,9 @@ struct piMATERIAL
 
 };
 
-#if platOS == OS_WIN32
-#pragma pack(push, 1)
-#endif
+#pragma pack(push)
+#pragma pack(1)
 
-#if platOS == OS_MACOS
-#pragma options align=packed
-#endif
 struct piRGBQUAD
 {
 	UCHAR	rgbRed;
@@ -1031,13 +1027,7 @@ struct piBITMAPFILEHEADER
 	#define BI_BITFIELDS 3
 #endif
 
-#if platOS == OS_WIN32
 #pragma pack(pop)
-#endif
-
-#if platOS == OS_MACOS
-#pragma options align=reset
-#endif
 
 struct MATERIAL
 {

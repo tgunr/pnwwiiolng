@@ -90,11 +90,14 @@ static std::vector<SINT32> g_textureIndex;
 
 static std::deque<TEXTURE *> g_freeTextures;
 
-// Defines
-#define DDP_REVERSE_GL_COLORS
+// Why does OS X need RGBA? The image loaders don't appear to be endian-specific.
+// TODO: Investigate this - Gadget
 #if platOS == OS_MACOS
-#undef DDP_REVERSE_GL_COLORS
-#include <pthread.h>
+#define DDP_GL_FORMAT_NORMAL GL_RGBA
+#define DDP_GL_FORMAT_MIP3 GL_RGB
+#else
+#define DDP_GL_FORMAT_NORMAL GL_BGRA_EXT
+#define DDP_GL_FORMAT_MIP3 GL_BGR
 #endif
 
 #define OGL_EVENT_LOG
@@ -749,26 +752,14 @@ SINT32		retval, i, miplevels;
 
 		if (textures[texid].comp[miplevel] != textures[texid].format[miplevel])
 		{
-#ifdef DDP_REVERSE_GL_COLORS
 			glTexImage2D(GL_TEXTURE_2D, miplevel,
                          textures[texid].format[miplevel],
 						 textures[texid].po2width[miplevel],
                          textures[texid].po2height[miplevel],
 						 0,
-                         textures[texid].comp[miplevel] == 3 ? GL_BGR_EXT : GL_BGRA_EXT,
+                         textures[texid].comp[miplevel] == 3 ? DDP_GL_FORMAT_MIP3 : DDP_GL_FORMAT_NORMAL,
 						 GL_UNSIGNED_BYTE,
                          textures[texid].lpsurf[miplevel]);
-#else
-			glTexImage2D(GL_TEXTURE_2D,
-                         miplevel,
-                         textures[texid].format[miplevel],
-						 textures[texid].po2width[miplevel],
-                         textures[texid].po2height[miplevel],
-						 0,
-                         textures[texid].comp[miplevel] == 3 ? GL_RGB : GL_RGBA,
-						 GL_UNSIGNED_BYTE,
-                         textures[texid].lpsurf[miplevel]);
-#endif
 		}
 
 		if (!HandleGLError(TRUE))
@@ -863,26 +854,14 @@ SINT32		retval, i, miplevels;
 					Write_Debug("Found an active mip level with a nullptr surface pointer!");
 				}
 
-#ifdef DDP_REVERSE_GL_COLORS
 				glTexImage2D(GL_TEXTURE_2D, i,
                              textures[texid].format[i],
 							 textures[texid].po2width[i],
                              textures[texid].po2height[i],
 							 0,
-                             textures[texid].comp[i] == 3 ? GL_BGR_EXT : GL_BGRA_EXT,
+                             textures[texid].comp[i] == 3 ? DDP_GL_FORMAT_MIP3 : DDP_GL_FORMAT_NORMAL,
 							 GL_UNSIGNED_BYTE,
                              textures[texid].lpsurf[i]);
-#else
-				glTexImage2D(GL_TEXTURE_2D,
-                             i,
-                             textures[texid].format[i],
-							 textures[texid].po2width[i],
-                             textures[texid].po2height[i],
-							 0,
-                             textures[texid].comp[i] == 3 ? GL_RGB : GL_RGBA,
-							 GL_UNSIGNED_BYTE,
-                             textures[texid].lpsurf[i]);
-#endif
 				if (!HandleGLError(TRUE))
 				{
 					Write_Debug("GL error encountered in oglGetTextureHandle for texture %d/%d", texid, i);
@@ -4634,7 +4613,6 @@ SINT32 oglGetTextureUVColor(UINT32* pColor,
         return -1;
     }
 
-//#if platOS != OS_MACOS
 	if(lpTex->format[iMipLevel] == GL_COMPRESSED_RGB_S3TC_DXT1_EXT)
 	{
         SINT32		xa, ya, xb, yb;
@@ -4658,7 +4636,6 @@ SINT32 oglGetTextureUVColor(UINT32* pColor,
         uColor = GetColorFromDXT3Block(yb * 4 + xb, (UINT8*)pisd.Surface + (ya * (iWidth / 4) + xa) * 16);
     }
 	else
-//#endif
 	{
         uAlphaMask = pisd.PixelFormat.dwRGBAlphaBitMask;
 
@@ -5610,10 +5587,6 @@ void oglDrawScene(UINT32 mode,
 	_RenderScene
 *************************************************************************************************/
 
-#ifdef TESTMAC
-//extern "C" void collectvertexptrs(void*p,unsigned int sz);
-#endif
-
 static void RenderScene(const oglTVERTEX& pv, int stride, int count, const void* indices)
 {
 	oglUpdateRenderIndexStats(GL_TRIANGLES, count, count);
@@ -5662,9 +5635,6 @@ static void _RenderScene(oglPRIMITIVETYPE oglt, oglVERTEXTYPE oglvt, UINT32 Vert
 	    // Vertex
 	    if (vertex)
 	    {
-#ifdef TESTMAC
-//        collectvertexptrs(vertex,VertexCount);
-#endif
 		    ogl::SetVertexPointer(3, GL_FLOAT, vertexStride, vertex);
 	    }
 

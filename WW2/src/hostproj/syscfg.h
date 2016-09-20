@@ -29,8 +29,7 @@
 // Tell FIOD that we need extra help
 #define LIMITED_FIO	1
 
-#include "hostproj/versionNo.h"
-#include "versionNo.h"
+#include "hostproj/hostBuildOptions.h"
 
 #include "include/platforms.h"	// includes precompile_includes.h
 

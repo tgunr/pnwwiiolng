@@ -5035,9 +5035,7 @@ LOGICAL gr2RemoveAllBlendedAnimations (gr2Model* model, FLOAT32 easeOutOverrideT
 		return TRUE;
 
 	GR2_BLEND_MAP::iterator it = model->blends->begin();
-#if platOS == OS_MACOS
 	std::vector<gr2AnimationBlend*> blendsToKill;
-#endif
 
 	gr2AnimationBlend* curBlend = nullptr;
 	gr2ControlBlend* curControl = nullptr;
@@ -5091,58 +5089,34 @@ LOGICAL gr2RemoveAllBlendedAnimations (gr2Model* model, FLOAT32 easeOutOverrideT
 			else
 			{
 				// clear immediately
-#if platOS == OS_MACOS
 				blendsToKill.push_back(curBlend);
-#else
-				Write_Log (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  CLEAR", curBlend, curBlend->blendFile);
-
-				for (int j = 0; j < curBlend->numBlends; j++)
-				{
-//					GrannyEaseControlOut(&model->blendControls[i].controls[j], model->blendControls[i].easeOutDuration)
-					gr2StopControl (&curControl->controls[j], TRUE);
-				}
-
-				if(curControl->killCallback)
-					curControl->killCallback(curControl->killData);
-
-				// we don't free the blended animation because that is done at game exit
-				gr2FreeBlendedControl(curControl);
-
-				it = model->blends->erase(it);
-#endif
 			}
 		}
 	}
 
-#if platOS == OS_MACOS
-	if(!blendsToKill.empty())
-	{
-		for(int i = 0; i < (int)blendsToKill.size(); ++i)
-		{
-			it = model->blends->find(blendsToKill[i]);
+    for (gr2AnimationBlend *killable : blendsToKill) {
+        it = model->blends->find(killable);
 
-			curBlend = it->first;
-			curControl = it->second;
+        curBlend = it->first;
+        curControl = it->second;
 
-			Write_Log (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  CLEAR", curBlend, curBlend->blendFile);
+        Write_Log (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  CLEAR", curBlend, curBlend->blendFile);
 
-			for (int j = 0; j < curBlend->numBlends; j++)
-			{
-				// GrannyEaseControlOut(&model->blendControls[i].controls[j], model->blendControls[i].easeOutDuration)
-				gr2StopControl (&curControl->controls[j], TRUE);
-			}
+        for (int j = 0; j < curBlend->numBlends; j++)
+        {
+            // GrannyEaseControlOut(&model->blendControls[i].controls[j], model->blendControls[i].easeOutDuration)
+            gr2StopControl (&curControl->controls[j], TRUE);
+        }
 
-			if(curControl->killCallback)
-				curControl->killCallback(curControl->killData);
+        if(curControl->killCallback)
+            curControl->killCallback(curControl->killData);
 
-			// we don't free the blended animation because that is done at game exit
-			gr2FreeBlendedControl(curControl);
+        // we don't free the blended animation because that is done at game exit
+        gr2FreeBlendedControl(curControl);
 
-			// delete it from the map
-			model->blends->erase(it);
-		}
-	}
-#endif
+        // delete it from the map
+        model->blends->erase(it);
+    }
 
 	gr2UpdateBlendEvents(model);
 

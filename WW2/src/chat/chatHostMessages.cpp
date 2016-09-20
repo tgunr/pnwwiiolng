@@ -7,8 +7,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
-
 #include "chat/chatBrigadeControl.h"
 #include "chat/chatBrigadeControlList.h"
 #include "chat/chatBrigadeMove.h"

@@ -56,8 +56,6 @@
 
 #if platOS == OS_WIN32
 #include <direct.h>
-#elif platOS == OS_MACOS
-#include <Carbon/Carbon.h>
 #endif
 #include "math/math3d.h"
 #include "comm/commClientMessages.h"
@@ -409,10 +407,18 @@ static bool _connectClientToGameNetwork()
 // Init everything for rendering
 LOGICAL rnmainInit(void)
 {
-#ifdef EVENT_LOG_TIMES
-	srand(0);
-#else
-	srand(timeGetTime());
+#if platOS == OS_WIN32
+    // OS X and Linux auto-seed the PRNG. Windows, being a backwards OS in need
+    // of assistance, doesn't. Therefore, we borrow Windows' equivalent of
+    // arc4random() to seed the useless LCRG until we can replace all uses of
+    // rand() in the code outright.
+    //
+    // Oh, and by the way, seeding rand() with the current time is the worst
+    // idea ever conceived even if you're NOT looking for cryptographically
+    // secure values. Just don't do that. Please.
+    unsigned int value;
+    rand_s(&value);
+    srand(value);
 #endif
 
 	rnlogoSplash();

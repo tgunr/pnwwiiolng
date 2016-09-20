@@ -947,10 +947,6 @@ void Texture::applyTexImage2D_load(GLenum target, const Image* image, GLsizei in
     {
         glPixelStorei(GL_UNPACK_CLIENT_STORAGE_APPLE,GL_TRUE);
         glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_PRIORITY,0.0f);
-
-        #ifdef GL_TEXTURE_STORAGE_HINT_APPLE
-            //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_STORAGE_HINT_APPLE , GL_STORAGE_CACHED_APPLE);
-        #endif
     }
 
 #if platOS == OS_MACOS
@@ -1704,16 +1700,8 @@ void Texture::Extensions::TexParameterIuiv(GLenum target, GLenum pname, const GL
     }
 }
 
-#ifdef TESTMAC
-extern "C" void startcollection(const char* f);
-extern "C" void stopcollection();
-#endif
-
 void Texture::Extensions::CompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data) const
 {
-#ifdef TESTMAC
-  //startcollection(nullptr);
-#endif
   if(glCompressedTexImage2D)
     {
         glCompressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data);
@@ -1722,10 +1710,6 @@ void Texture::Extensions::CompressedTexImage2D(GLenum target, GLint level, GLenu
     {
         //notify(WARN)<<"Error: glCompressedTexImage2D not supported by OpenGL driver"<<std::endl;
     }
-#ifdef TESTMAC
-  //stopcollection();
-#endif
-
 }
 
 void Texture::Extensions::CompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid* data) const

@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"						// For version dependent code
-
 #include "strt/strtFacilityStruct.h"		// Facility
 #include "strt/strtHostDB.h"				// strtSaveObject
 #include "strt/strtObjectStruct.h"			// ObjectStruct definition

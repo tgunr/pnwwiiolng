@@ -1,11 +1,12 @@
 #pragma once
 
-#include "versionNo.h"
-
 #define BUFFERSIZE 16
 
 #include <b64/encode.h>
 #include <b64/decode.h>
+#if !defined(AS_SERVER)
+#include "versionNo.h"
+#endif
 
 // Created: Wed Jul 26 11:00:52 2000
 //

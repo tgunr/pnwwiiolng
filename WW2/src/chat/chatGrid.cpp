@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"						// For version dependent code
-
 #include <set>
 #include <stack>
 #include <algorithm>
