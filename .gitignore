@@ -1641,3 +1641,4 @@ depend
 libb64.a
 DebugInstance/Debug/DebugInstance.log
 DebugInstance/Debug/DebugInstance.tlog/DebugInstance.lastbuildstate
+WW2/proj/win/build_info.cpp
