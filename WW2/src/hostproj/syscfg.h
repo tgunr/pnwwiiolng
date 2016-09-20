@@ -12,9 +12,6 @@
 
 #include "hostproj/config.h"
 
-// Disable dbugWrite in all host processes
-#define NO_DEBUG_WRITE	1
-
 // Tell FIOD that we need extra help
 #define LIMITED_FIO	1
 
@@ -33,7 +30,6 @@ namespace Teul
 }
 
 #include <signal.h>
-//#include <atomic>
 
 #include "inst/instDescriptor.h"
 #include "wwii/wwiiPlayer.h"
