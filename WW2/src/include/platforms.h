@@ -88,7 +88,10 @@
 
 #include <io.h>
 #include <time.h>
-static inline struct tm *localtime_r(const time_t *t, struct tm *b) { localtime_s(b, t); return b; }
+static inline struct tm *localtime_r(const time_t *t, struct tm *b) {
+    localtime_s(b, t);
+    return b;
+}
 #endif
 
 #include "include/precompile_includes.h"
