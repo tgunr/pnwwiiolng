@@ -387,9 +387,9 @@ static bool _connectClientToGameNetwork()
 	}
 
 	// Wipe these variables out.
-	GameHost = rand();
-	GameOTP = rand();
-	GamePort = (UINT16)rand();
+	GameHost = static_cast<UINT32>(random());
+	GameOTP = static_cast<UINT32>(random());
+	GamePort = static_cast<UINT16>(random());
 
 	return true;
 }
