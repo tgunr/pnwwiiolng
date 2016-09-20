@@ -96,6 +96,12 @@ static inline struct tm *localtime_r(const time_t *t, struct tm *b) {
     localtime_s(b, t);
     return b;
 }
+
+static inline long random() {
+    unsigned int value;
+    rand_s(&value);
+    return value; // Win32 is ILP64 means this returns enough entropy for a long
+}
 #endif
 
 #include "include/precompile_includes.h"
