@@ -61,7 +61,7 @@ public:
 
 typedef teul_network_object<SwingMeter> SWING_METER_MSG;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 namespace Map
 {
 	extern void BroadcastSwingMeter();

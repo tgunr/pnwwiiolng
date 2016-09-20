@@ -78,7 +78,7 @@ teulCloseAllEndpoints(const SINT32 errorCode)
 
 	Teul::ENDPOINT_LIST eps = idleEndpoints;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	// Make a copy.
 	if ( errorCode != 0 )
 	{

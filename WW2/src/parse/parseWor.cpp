@@ -11,7 +11,7 @@
 #include "mem/mem.h"
 #include <map>
 
-#if platBuild != TEUL_SERVER && !defined(CMDLINE_CLIENT)
+#if platBuild != BUILD_SERVER && !defined(CMDLINE_CLIENT)
 #include "pi/pi.h"
 #endif
 
@@ -23,7 +23,7 @@
 #include "weap/weapList.h"
 #include "teul/teulKit.h"
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	#include "fio/fioDefs.h"
 	#include "fio/fiod.h"
 	#include "str/stringLib.h"
@@ -67,7 +67,7 @@ static PARSE_CALLBACK	_stratCallbacks[] = {{"cp",			_fillCp}
 											,{"depot_link",	_fillDepotLink}
 											,{"",			nullptr}};
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 static bool doNothing(SINT32 numArgss, FUNCARGS* args) { return true; }
 
 static PARSE_CALLBACK  blank[]={{"backdrop",				doNothing},
@@ -160,13 +160,13 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 	atexit(parseWorKill);
 
 #ifndef VALIDATOR
- #if platBuild == TEUL_SERVER
+ #if platBuild == BUILD_SERVER
 	if ( !weapHasInitialized() && !weapListInit(cv_thblitzPath.GetString()) )
  #else
 	if ( !weapListInit("th_blitz/weapon") )
- #endif // TEUL_SERVER
+ #endif // BUILD_SERVER
 	{
-#if platBuild != TEUL_SERVER && !defined(CMDLINE_CLIENT)
+#if platBuild != BUILD_SERVER && !defined(CMDLINE_CLIENT)
 		piExitProgram(_FL,"Weapon Lists did not initialize");
 #endif
 		DEBUG_FATAL("WEAPON_LISTS DID NOT INITIALIZE!!!");
@@ -176,7 +176,7 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 
 	strncpy(_fileName, levelfile, PN_MAX_PATH);
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	world = blank;
 #endif
 

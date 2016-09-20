@@ -46,7 +46,7 @@
 #include <sys/socket.h>
 #endif
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 #include "server/serverInterfaceDescription.h"
 #include "teul/teulConfigVar.h"
 extern ConfigStr cv_defaultInterface;
@@ -69,7 +69,7 @@ extern void teulInitEndpoints(ERROR_FUNCTION* const);
 //////////////////////////////////////////////////////////////////////
 // Retrieve a list of the IP addresses this host has on eth0.
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 static void
 _getHostIPAddresses()
 {
@@ -195,7 +195,7 @@ _getHostIPAddresses()
 
 SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 {
-#if platBuild == TEUL_SERVER && platOS != OS_WIN32
+#if platBuild == BUILD_SERVER && platOS != OS_WIN32
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
@@ -214,7 +214,7 @@ SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 	teulSyncClock();
 	lastUpdateTime = teulClock64;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	_getHostIPAddresses();
 #endif
 
@@ -223,7 +223,7 @@ SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 
 typedef std::vector<UINT32> ADDRESS_LIST;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 void
 teulGetAddresses(ADDRESS_LIST& addresses)
 {
@@ -286,7 +286,7 @@ teulModShutdown(void)
 static void
 _setEndpointPeerState(ENDPOINT& endpoint)
 {
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	if ( endpoint.protocol == PROTOCOL_UDB || endpoint.protocol == PROTOCOL_CTRL || endpoint.state() == IS_LISTENING )
 		endpoint.m_peer = true;
 	else if ( endpoint.protocol == PROTOCOL_TCP && (static_cast<UINT32>(endpoint.destPort() - WWII::Net::Ports::ServerPeering) < (UINT32)MAX_SERVER_TYPE) )

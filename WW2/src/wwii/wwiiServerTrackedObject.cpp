@@ -20,7 +20,7 @@
 // what the next STO UID should be. On the client, which shouldn't
 // really be creating STO UIDs except in offline mode,
 // it can just be a UINT32
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 # include "wwii/wwiiSerialNumber.h"
   static SerialNumber stoUniqueID("sto_uid", HOST_STO_SERIAL_START, 100, 0x7fffffff);	// max is 2^31 - 1
 #else
@@ -155,7 +155,7 @@ ServerTrackedObject::addToIndex(ServerTrackedObject* sto)
 	{
 		sto->m_uid = static_cast<UINT32>(++stoUniqueID);
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 		// local client sto ids range from 1 and 99
 		if(Online)
 		{
@@ -271,7 +271,7 @@ void wwiiExpireSTOs()
 		it = stoMap.find(expired[i]);
 		if ( it == stoMap.end() )
 		{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 			LogAbort("stoMap is corrupt: could not re-find sto#%u", expired[i]);
 #else
 			continue;
@@ -281,7 +281,7 @@ void wwiiExpireSTOs()
 		ServerTrackedObject* const sto = it->second;
 		if ( sto->activated() )
 		{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 			dbugLog(_FLD, "sto:%u expired, deactivating", sto->uid());
 #endif
 			sto->deactivate();

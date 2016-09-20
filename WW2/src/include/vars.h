@@ -1,7 +1,7 @@
 #pragma once
 
-#if platBuild == TEUL_SERVER
-static_assert( platBuild != TEUL_SERVER, "Can't include vars.h in a server build." );
+#if platBuild == BUILD_SERVER
+static_assert( platBuild != BUILD_SERVER, "Can't include vars.h in a server build." );
 #else
 
 #include "pi/pi.h"

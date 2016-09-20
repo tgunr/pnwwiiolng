@@ -44,7 +44,7 @@ SINT32 strtPackInit(void)
 
 	_objectsPerSupercellResponse=(512 - _sizeOfObjectHeader) / _sizeOfObject;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 #ifdef DEBUG
 	dbugLog(_FLD,"Header size:%d\nObject size: %d\nObjects/SupercellResponse: %d\n",_sizeOfObjectHeader,_sizeOfObject,_objectsPerSupercellResponse);
 #endif

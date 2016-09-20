@@ -128,7 +128,7 @@ public:
 	//! @param[in]	directAddr		IP of the destination host (or 0)
 	SINT32 broadcast(SINT32 broadcastIndex, SINT32 directAddr=0)
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		if ( directAddr == 0 || directAddr == -1 )
 			return teulSend(broadcastIndex, callback(), this);
 		else

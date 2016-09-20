@@ -5,7 +5,7 @@
 #include <map>
 #include <set>
 
-#if platOS != OS_LINUX && platBuild != TEUL_SERVER
+#if platOS != OS_LINUX && platBuild != BUILD_SERVER
 # include "pi/pi.h"
 # include "include/vars.h"
 #endif
@@ -40,7 +40,7 @@
 #endif
 
 #if platOS == OS_WIN32
-# if platBuild == TEUL_SERVER
+# if platBuild == BUILD_SERVER
 char DataPath[MAX_PATH] = "c:\\playnet\\data\\" ;
 # endif
 #endif
@@ -114,7 +114,7 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 
 	char buffer[PATH_MAX + 1];
 
-#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
+#if platBuild == BUILD_CLIENT && platOS == OS_WIN32
 	if(userdir)
 	{
 		// no bounds checking here, nice
@@ -284,7 +284,7 @@ static bool _mapFile(IO::MappedFile& ioMap, const char* name, bool userdir, wcha
 {
 	char buffer[PATH_MAX + 1];
 
-#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
+#if platBuild == BUILD_CLIENT && platOS == OS_WIN32
 	if(userdir)
 	{
 		// no bounds checking here, nice
@@ -484,7 +484,7 @@ LOGICAL fiodAccess(const char* filename, bool userdir)
 {
 	char	fullpath[PATH_MAX];
 
-#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
+#if platBuild == BUILD_CLIENT && platOS == OS_WIN32
 	if(userdir)
 	{
 		lstrcpy(fullpath, UserDataPath);
@@ -518,7 +518,7 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 	SINT32	retval;
 	struct	stat	buffer;
 
-#if platOS == OS_WIN32 && platBuild != TEUL_SERVER
+#if platOS == OS_WIN32 && platBuild != BUILD_SERVER
 	if(userdir)
 	{
 		lstrcpy(fullpath, UserDataPath);
@@ -596,7 +596,7 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
 {
   char  fullpath[PATH_MAX];
 
-#if platOS == OS_WIN32 && platBuild != TEUL_SERVER
+#if platOS == OS_WIN32 && platBuild != BUILD_SERVER
   if(userdir)
   {
 		// Make sure directorys are created since some filenames contain directory paths.
@@ -958,7 +958,7 @@ SINT32 fiocfgFileSize(const char* filename, bool)
 	return(-1);
 }
 
-#elif platOS != OS_LINUX && platBuild != TEUL_SERVER
+#elif platOS != OS_LINUX && platBuild != BUILD_SERVER
 
 void fiocfgMkDir(const char* path, bool userdir)
 {
