@@ -446,7 +446,7 @@ static void _shutdownCellConnection(Client* const client, SINT32 teulIndex)
 	throws ClientNetError
 *************************************************************************************************/
 
-int Client::Login(const char* hostname, short port, bool wantChat)
+int Client::Login(const char* hostname, UINT16 port, bool wantChat)
 {
 	unsigned int host = 0;
 	teulGetHost(hostname, &host);
@@ -536,7 +536,7 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 }
 
 #include "include/vars.h"
-int Client::Login(unsigned int host, short port, bool wantChat)
+int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 {
     int retval = -EINVAL;
     
@@ -1160,7 +1160,7 @@ ww2::HostState* Client::GetHostStateByType(int type)
 	SetPlayerIdent
 *************************************************************************************************/
 
-void Client::SetPlayerIdent(int playerID, int otp, unsigned int appVersion)
+void Client::SetPlayerIdent(playerid_t playerID, UINT32 otp, unsigned int appVersion)
 {
 	_classdata->playerIdent.m_playerID		= playerID;
 	_classdata->playerIdent.m_otp			= otp;
