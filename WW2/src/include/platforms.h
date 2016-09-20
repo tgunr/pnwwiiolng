@@ -56,14 +56,6 @@
 #include <sys/param.h>
 #endif
 
-#ifndef platOS
-# error "No platform defined by compiler"
-#endif
-
-#if defined(__BIG_ENDIAN__)
-#error This is a big endian platform and is unsupported.
-#endif
-
 // Known operating systems
 #define OS_WIN32    1
 #define OS_MACOS    2
@@ -74,10 +66,22 @@
 #define BUILD_CLIENT 0
 #define BUILD_SERVER 1
 
-#ifdef AS_SERVER
-#define platBuild BUILD_SERVER
-#else
-#define platBuild BUILD_CLIENT
+#ifndef platOS
+# error "No platform defined by compiler"
+#endif
+
+#ifndef platBuild
+# error "No build defined by compiler"
+#endif
+
+#if defined(__BIG_ENDIAN__)
+#error This is a big endian platform and is unsupported.
+#endif
+
+#if !defined(AS_SERVER) && platBuild == BUILD_SERVER
+# define AS_SERVER
+#elif !defined(AS_CLIENT) && platBuild == BUILD_CLIENT
+# define AS_CLIENT
 #endif
 
 #if defined(WIN32) || defined(WIN64)
