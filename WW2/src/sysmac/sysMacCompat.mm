@@ -5,6 +5,9 @@
 
 #include "sysmac/syscfg.h"
 #include "vars.h"
+#include "ddp.h"
+#include "rnmain.h"
+#include "rnlogo.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -121,4 +124,23 @@ void MacVideoInitializationFailed(const char* problem)
         problem
     ];
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+}
+
+void PostModalErrorDialog(const char *title, const char *message)
+{
+    NSAlert *alert = [[NSAlert alloc] init];
+    
+    alert.messageText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:title] ?: @""); // Force-unwrap those optionals!
+    alert.informativeText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:message] ?: @"");
+    alert.alertStyle = NSAlertStyleCritical;
+    bool wasFullscreen = !WantedWindow;
+    if (wasFullscreen) {
+        ddpTemporarilyEscapeFullscreen(true);
+    }
+    rnUpdateLoadingScreen();
+    [alert runModal];
+    if (wasFullscreen) {
+        ddpTemporarilyEscapeFullscreen(false);
+    }
+    rnUpdateLoadingScreen();
 }
