@@ -757,7 +757,7 @@ void piSetTextureMatrix(const piMATRIX* newtexmat)
 
 void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 {
-	FILE* fp = Fio::OpenLogFile();
+	Fio::OpenLogFile();
 
 #if platOS == OS_WIN32
 	running = 0;

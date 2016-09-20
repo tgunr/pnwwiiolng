@@ -288,6 +288,22 @@ void ddpSetFullScreen(LOGICAL fullscreen)
     ddpRefreshGLViewport(WantedWidth, WantedHeight);
 }
 
+void ddpTemporarilyEscapeFullscreen(bool begin)
+{
+    // This is a TERRIBLE solution, for the record. It's just a quick hack that works for now.
+    // TODO: Clean this up with something sane.
+    static NSRect oldWinRect;
+    
+    if (begin) {
+        oldWinRect = winRect;
+        winRect = fullRect;
+        ddpSetFullScreen(false);
+    } else {
+        winRect = oldWinRect;
+        ddpSetFullScreen(true);
+    }
+}
+
 void ddpSetupGL(int w, int h)
 {
 	[nsOpenGlContext makeCurrentContext];

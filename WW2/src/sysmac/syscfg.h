@@ -11,10 +11,6 @@
 #include <cmath>
 #include <libkern/OSByteOrder.h>
 
-#define TEUL_CLIENT	0
-#define TEUL_SERVER	1
-#define platBuild TEUL_CLIENT
-
 #define FRONT_END
 #define _UNICODE
 

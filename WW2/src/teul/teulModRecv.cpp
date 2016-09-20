@@ -370,7 +370,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		newEndpoint->setConnected();
 		newEndpoint->m_parent = &endpoint;
 		newEndpoint->socket = newSock;
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		newEndpoint->m_peer = (endpoint.localPort() == WWII::Net::Ports::ServerPeering + Server::myServerInfo.stats.type);
 #else
 		newEndpoint->m_peer = false;
@@ -1083,7 +1083,7 @@ _pollSocketsInner(const TeulTimeMS& remainder)
 
 	if ( eventHandles.empty() )
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		// Server wants us to spend time in the loop.
 		if ( remainder > 0 )
 			std::this_thread::sleep_for(std::chrono::milliseconds(remainder));
@@ -1415,7 +1415,7 @@ _pollSetIsEmpty()
 }
 #endif
 
-#if platOS != OS_WIN32 || platBuild == TEUL_SERVER
+#if platOS != OS_WIN32 || platBuild == BUILD_SERVER
 static void
 _pollSockets(const TeulTimeMS& duration_)
 {
@@ -1439,7 +1439,7 @@ _pollSockets(const TeulTimeMS& duration_)
 }
 #endif
 
-#if platOS == OS_WIN32 && platBuild != TEUL_SERVER
+#if platOS == OS_WIN32 && platBuild != BUILD_SERVER
 static void
 _pollSockets(const TeulTimeMS& duration_)
 {

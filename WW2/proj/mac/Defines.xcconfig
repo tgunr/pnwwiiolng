@@ -22,7 +22,7 @@
 // doesn't matter, but it does read more like what's intended.)
 
 // Platform
-WW2_DEFINES_Platform        = _MACOSX=1 platOS=OS_MACOS XP_MAC XP_UNIX              // We're on Mac, duh
+WW2_DEFINES_Platform        = _MACOSX=1 platOS=OS_MACOS platBuild=BUILD_CLIENT XP_MAC XP_UNIX   // We're on Mac, duh
 
 // Common macros in all modes
 WW2_DEFINES_Common_03       = $(WW2_DEFINES_Common_04) EVENT_LOG                    // enable various logging things

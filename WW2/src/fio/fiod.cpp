@@ -8,7 +8,7 @@
 #include <map>
 #include <set>
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 # include "pi/pi.h"
 # include "include/vars.h"
 #endif
@@ -36,7 +36,7 @@
 # define os_file_path(x) (x)
 #endif
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 #include "wwii/wwiiConfigVars.h"
 # define DataPath cv_dataDir.GetString()
 #endif
@@ -141,7 +141,7 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 
 	char buffer[PATH_MAX + 1];
 
-#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
+#if platBuild == BUILD_CLIENT && platOS == OS_WIN32
 	if(userdir)
 	{
 		// no bounds checking here, nice
@@ -404,7 +404,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 	char* mem = (char*)memAlloc(allocSize);
 	if ( PN_UNLIKELY(mem == nullptr) )
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		LogAbort("out of memory opening %s", asciiPath);
 #else
 		Write_Log(LOG_ALL, LOG_FATAL, "out of memory opening %s", asciiPath);
@@ -448,7 +448,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 	catch ( const char* cause )
 	{
 		// Report
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		dbugLog(_FLD, "fiod:%s:%s", cause, asciiPath);
 #else
 		Write_Log(LOG_OLD, LOG_INFO, "fiod:%s:%s", cause, asciiPath);
@@ -579,7 +579,7 @@ void fiodSetPrepath(char* newpath)
     if (!OriginalPrepath) {
         OriginalPrepath = strdup(DataPath);
     }
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
     cv_dataDir.SetString(newPath);
 #else
 	strsafecpy(DataPath, newpath);
@@ -590,7 +590,7 @@ void fiodSetPrepath(char* newpath)
 //////////////////////////////////////////////////////////////////////
 // Create a directory within prefix space
 //
-#if platBuild == TEUL_CLIENT
+#if platBuild == BUILD_CLIENT
 void fiodmkdir(const char* path)
 {
 	char fullPath[PATH_MAX];
@@ -620,7 +620,7 @@ LOGICAL fiodAccess(const char* filename, bool userdir)
 {
 	char	fullpath[PATH_MAX];
 
-#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
+#if platBuild == BUILD_CLIENT && platOS == OS_WIN32
 	if(userdir)
 	{
 		pathprintf(fullpath, UserDataPath, filename);
@@ -652,7 +652,7 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 	SINT32	retval;
 	struct	stat	buffer;
 
-#if platOS == OS_WIN32 && platBuild != TEUL_SERVER
+#if platOS == OS_WIN32 && platBuild != BUILD_SERVER
 	if(userdir)
 	{
 		pathprintf(fullpath, UserDataPath, filename);
@@ -726,7 +726,7 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
 {
   char  fullpath[PATH_MAX];
 
-#if platOS == OS_WIN32 && platBuild != TEUL_SERVER
+#if platOS == OS_WIN32 && platBuild != BUILD_SERVER
   if(userdir)
   {
 		// Make sure directorys are created since some filenames contain directory paths.
@@ -1038,7 +1038,7 @@ SINT32 fiocfgFileSize(const char* filename, bool)
 	return(-1);
 }
 
-#elif platOS != OS_LINUX && platBuild != TEUL_SERVER
+#elif platOS != OS_LINUX && platBuild != BUILD_SERVER
 
 void fiocfgMkDir(const char* path, bool userdir)
 {

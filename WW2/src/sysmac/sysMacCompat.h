@@ -43,6 +43,7 @@ extern "C"
 #endif
 
 extern void MacVideoInitializationFailed(const char* problem);
+extern void PostModalErrorDialog(const char *title, const char *message);
 
 extern void chAppDir();
 extern const char *macPreferencesPath();
@@ -54,10 +55,10 @@ extern UINT64 GetMicroSeconds(void);
 extern UINT64 GetMillisecondTick();
 extern UINT32 timeGetTime(void);
     
-    extern char GetOSMajorVersion();
-    extern char GetOSMinorVersion();
-    extern char GetOSRevision();
-    extern char GetOSBuild();
+extern char GetOSMajorVersion();
+extern char GetOSMinorVersion();
+extern char GetOSRevision();
+extern char GetOSBuild();
     
 #ifdef __cplusplus
 }

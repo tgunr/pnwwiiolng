@@ -17,7 +17,7 @@
 #include <locale.h>
 #include <mutex>
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 #include "wwii/wwiiThreads.h"
 #include "teul/teulConfigVar.h"
 extern ConfigPath cv_defaultLogPath;
@@ -83,7 +83,7 @@ _dbugSetErr(SINT32 err)
 //////////////////////////////////////////////////////////////////////
 // Rename a file 'xxx.N.log' to 'xxx.M.log'
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 static void
 _roll(const char* const filename, const int baseNum)
 {
@@ -110,7 +110,7 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
 		strncpy(output, filename, outputSize);
 	else
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		const char* const defaultPath = cv_defaultLogPath.GetString();
 #else
 		const char* const defaultPath = getenv("DEFAULT_LOGDIR");
@@ -154,7 +154,7 @@ _openDbugFile(const char* const srcFile_)
 	{
 		int oflags = _O_CREAT|_O_WRONLY|_O_TRUNC;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		for ( int i = MAX_FILE_NUM; i >= 0; --i )
 		{
 			_roll(filename, i);
@@ -741,7 +741,7 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 #else
 	if ( PN_LIKELY(_logger.isInitialized()) )
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
         threadsLogging();
 #endif
 		if ( assertion_ != nullptr && *assertion_ != 0 )

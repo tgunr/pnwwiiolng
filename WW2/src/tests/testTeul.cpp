@@ -94,7 +94,7 @@ namespace Config
 	static size_t iterFactor = 1;
 }
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 
 #include "teul/teulConnectionInstruction.h"
 SINT32
@@ -791,7 +791,7 @@ _doCryptTests()
 int
 main(int argc, const char* const argv[])
 {
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	Teul::ConfigVar::InitializeConfigVars();
 #endif
 

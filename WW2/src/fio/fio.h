@@ -17,7 +17,7 @@ enum
 	FIOA_FD_START = (1 << 17),
 };
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 namespace Fio
 {
 	// Name of our log file

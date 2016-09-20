@@ -5,8 +5,6 @@
 
 #if platOS == OS_WIN32
 
-#define platBuild TEUL_CLIENT
-
 // Windows defines
 #define OPENGL3D	1
 #define WIN32_LEAN_AND_MEAN

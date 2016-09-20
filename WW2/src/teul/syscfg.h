@@ -16,13 +16,6 @@
 	//#define FORCE_DEBUG
 #endif
 
-#define TEUL_CLIENT	0
-#define TEUL_SERVER	1
-
-#if !defined(platBuild)
-# define platBuild TEUL_CLIENT
-#endif
-
 #include "include/platforms.h"
 
 #include "teul/teulBasic.h"

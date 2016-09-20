@@ -372,34 +372,24 @@ static bool _connectClientToGameNetwork()
 	catch (ClientNetError& e)
 	{
 		const char* key = e.What();
-		const std::wstring& message = uiLocString(key);
 
 		rnlogoUpdateStatus(key);
 
 #if platOS == OS_WIN32
-		// character 0 will be a '?' if the uiLocString lookup failed
-		// this can happen if a non ui loc string was passed to the
-		// ClientNetError constructor
-		MessageBox(nullptr, message.c_str(), uiLocString("connect.popup.title").c_str(), MB_OK | MB_TOPMOST);
-
-		// launch the browser with a local html page
-		// describing what to do next
-		// once the mac implementation of this
-		// function is done, it can be moved
-		// outside of the this #if block
-		syslaunchurl("neterror.html", 1);
+		MessageBox(nullptr, uiLocString(key).c_str(), uiLocString("connect.popup.title").c_str(), MB_OK | MB_TOPMOST);
+#elif platOS == OS_MACOS
+        PostModalErrorDialog(uiLocString2("connect.popup.title").c_str(), uiLocString2(key).c_str());
 #else
 		fprintf(stderr, "NETWORK ERROR: %s", UTF8(message.c_str()));
 #endif
-
-		piExitProgram(_FL, UTF8(message.c_str()));
-		return false;
+		//piExitProgram(_FL, UTF8(message.c_str()));
+        return false;
 	}
 
 	// Wipe these variables out.
-	GameHost = rand();
-	GameOTP = rand();
-	GamePort = (UINT16)rand();
+	GameHost = static_cast<UINT32>(random());
+	GameOTP = static_cast<UINT32>(random());
+	GamePort = static_cast<UINT16>(random());
 
 	return true;
 }

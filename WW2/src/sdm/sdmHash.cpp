@@ -132,7 +132,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 	{
 		if (! _addBuildingToFacTable(facTable, bd[i]))
 		{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 			const BUILDING& building = bd[i];
 			strtDataErrorParentFacility(building.name, building.fileName, sx, sy, building.oid.id, static_cast<UINT16>(i), building.pid.id);
 #else

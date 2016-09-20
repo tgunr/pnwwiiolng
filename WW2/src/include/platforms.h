@@ -56,23 +56,33 @@
 #include <sys/param.h>
 #endif
 
+// Known operating systems
+#define OS_WIN32    1
+#define OS_MACOS    2
+#define OS_LINUX    3
+#define OS_MAX_PLAT 4
+
+// Used by platBuild
+#define BUILD_CLIENT 0
+#define BUILD_SERVER 1
+
 #ifndef platOS
 # error "No platform defined by compiler"
+#endif
+
+#ifndef platBuild
+# error "No build defined by compiler"
 #endif
 
 #if defined(__BIG_ENDIAN__)
 #error This is a big endian platform and is unsupported.
 #endif
 
-// Known operating systems
-#define	OS_WIN32	1
-#define	OS_MACOS	2
-#define	OS_LINUX	3
-#define OS_MAX_PLAT	4
-
-// Used by platBuild
-#define TEUL_CLIENT		0
-#define	TEUL_SERVER		1
+#if !defined(AS_SERVER) && platBuild == BUILD_SERVER
+# define AS_SERVER
+#elif !defined(AS_CLIENT) && platBuild == BUILD_CLIENT
+# define AS_CLIENT
+#endif
 
 #if defined(WIN32) || defined(WIN64)
 
@@ -82,7 +92,16 @@
 
 #include <io.h>
 #include <time.h>
-static inline struct tm *localtime_r(const time_t *t, struct tm *b) { localtime_s(b, t); return b; }
+static inline struct tm *localtime_r(const time_t *t, struct tm *b) {
+    localtime_s(b, t);
+    return b;
+}
+
+static inline long random() {
+    unsigned int value;
+    rand_s(&value);
+    return value; // Win32 is ILP64 means this returns enough entropy for a long
+}
 #endif
 
 #include "include/precompile_includes.h"

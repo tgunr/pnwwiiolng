@@ -194,7 +194,7 @@ public:
 
 	// Private host functions
 private:
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 
 	SINT32 _create(Player*);
 	SINT32 _delete(Player*);
