@@ -319,13 +319,7 @@ void StratDB::InitDisplayNames()
 	_nameMap.clear();
     _cpnameList.clear();
 
-	// if chinese, use chinese, otherwise use english (for now)
-	int use = (gLanguage == 5) ? 5: 0;
-
-	std::string path = "languages/";
-	path += g_szLanguages[use];
-	path += "/strat.xml";
-
+	std::string path = std::string("languages/") + g_szLanguages[0] + "/strat.xml";
 	DisplayNameLoader loader(path.c_str());
 	loader.Load();
 

@@ -7,17 +7,13 @@
 
 int piTextureAtlasSet::loadAtlas(std::string const& name)
 {
-	// some atlas images are region specific
-	const char* regional = fioGetRegionalPath(name.c_str());
-
-	int texid = ldpixLoadImageFileToSurface(regional, colorMAGENTA | colorALPHA100, LDPIX_NONE);
+	int texid = ldpixLoadImageFileToSurface(name.c_str(), colorMAGENTA | colorALPHA100, LDPIX_NONE);
 	if(texid < 0) return -1;
 
 	std::string atlasName = name;
 	atlasName.erase(atlasName.find_last_of('.'));
 	atlasName += ".atlas";
 
-	// both regional and non-regional images use the same atlas definition
 	int fd = fioOpen(atlasName.c_str());
 	if(fd < 0) return -1;
 

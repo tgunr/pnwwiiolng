@@ -55,7 +55,6 @@ namespace Fio
 
 	extern void fioClose(int fd);
 
-	extern const char* fioGetRegionalPath(const char* p);
 	extern LOGICAL fioAccess(const char* filename);
 	extern LOGICAL fioModified(SINT32* modified, const char* filename);
 	extern int 	fioEOF(int fd);

@@ -361,10 +361,6 @@ int uiInit()
 	_despawnTab		= 0;
 	_despawnReset	= true;
 
-	// force it to chinese is region is china
-	if(gRegion == 5 && gLanguage != gRegion)
-		cfgPrefsSetGlobal(cfgLANGUAGE_CHOICE, &gRegion);
-
 	return 0;
 }
 
@@ -1786,31 +1782,6 @@ static std::string munge_filename(const char* name)
 	{
 		path = "fonts/";
 		path += name;
-	}
-	//else if(gRegion != IDE_LANGUAGE_ENGLISH && (ext == ".bmp" || ext == ".dds")) // check for any other language
-	else if(gRegion == IDE_LANGUAGE_CHINESE && (ext == ".bmp" || ext == ".dds")) // only check chinese for now
-	{
-		// lets see if we have any localized images; not done for english
-		std::string filename = path.substr(0, path.size() - 4);
-
-		filename += ".dds";
-
-		const char* regional = fioGetRegionalPath(filename.c_str());
-
-		if(fioAccess(regional))
-		{
-			path = regional;
-		}
-		else
-		{
-			filename.erase(filename.end() - 4, filename.end());
-			filename += ".bmp";
-
-			regional = fioGetRegionalPath(filename.c_str());
-
-			if(fioAccess(regional))
-				path = regional;
-		}
 	}
 
 	return path;

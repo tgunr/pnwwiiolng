@@ -498,22 +498,19 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 	{
 		snprintf(filename, 255, "%s%s%s", GR2DATA_PREPATH, basename, GRANNY_EXTENSION);
 
-		// some troopers have regional specific models
-		const char* regional = fioGetRegionalPath(filename);
-
-		fileSize = fioFileSize(regional);
+		fileSize = fioFileSize(filename);
 
 		if(static_cast<int>(fileSize) < 0)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to size file %s (probably file not found)!", regional);
+			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to size file %s (probably file not found)!", filename);
 			return nullptr;
 		}
 
-		stream = fioOpen(regional);
+		stream = fioOpen(filename);
 
 		if(stream < 0)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to open %s!", regional);
+			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to open %s!", filename);
 			return nullptr;
 		}
 
@@ -521,7 +518,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		if(!buffer)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to allocate read buffer for %s", regional);
+			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to allocate read buffer for %s", filename);
 			return nullptr;
 		}
 
@@ -529,7 +526,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		if(readSize != fileSize)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Bytes read != bytes in file (%d != %d) in file %s", readSize, fileSize, regional);
+			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Bytes read != bytes in file (%d != %d) in file %s", readSize, fileSize, filename);
 			memFree (buffer);
 			return nullptr;
 		}
@@ -545,7 +542,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		if(!fileInfo)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to get model data out of %s!", regional);
+			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to get model data out of %s!", filename);
 			GrannyFreeFile(loadedFile);
 			return nullptr;
 		}

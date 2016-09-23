@@ -230,56 +230,6 @@ void fioClose(int fd)
 }
 
 /************************************************************************************************
-	fioGetRegionPath
-*************************************************************************************************/
-
-const char* fioGetRegionalPath(const char* p)
-{
-	// chinese specific for now; someday we may have other regions
-	// these ids correlate to the language ids in loclApp.h but I didn't
-	// want to include that here
-	if(gRegion == 5 && p && *p)
-	{
-		// lets see if we have a localized version
-		static std::string path;
-
-		const char* extension = strstr(p, ".");
-		path = p;
-
-		if(extension)
-		{
-			// strip out extension
-			path = path.substr(0, path.size() - 4);
-		}
-
-		switch(gRegion)
-		{
-			/*
-			case 1:	path += "_it";		break;
-			case 2:	path += "_fr";		break;
-			case 3:	path += "_de";		break;
-			case 4:	path += "_es";		break;
-			*/
-			case 5:	path += "_zh";		break; // chinese
-		}
-
-		if(extension)
-			path += extension;
-
-		// DATA/Terrain/BLD/uk-1.dds
-		// becomes
-		// DATA/Terrain/BLD/uk-1_zh.dds
-		// if found, its returned
-
-		if(fioAccess(path.c_str()))
-			return path.c_str();
-	}
-
-	// return the original path;
-	return p;
-}
-
-/************************************************************************************************
 	fioAccess
 *************************************************************************************************/
 

@@ -508,29 +508,7 @@ static void _SetupFlagObject(OBJECT& Object)
 {
 	// UINT32 flagnum forces overflow on values less than '0'.
 	const UINT32 FlagNum = Object.name[4] - '0';
-	if (FlagNum < _MAX_COUNTRIES && Object.texid > 0)
-	{
-		// This is ugly; hack for now
-		if(gRegion == 5) // chinese
-		{
-			// Load new textures
-			std::string path = oglGetTextureData(Object.texid)->name;
-			path += ".dds";
-
-			const char* regionalPath = fioGetRegionalPath(path.c_str());
-
-			int id = ldpixLoadImageFileToSurface(regionalPath, 0, LDPIX_MIPMAP);
-
-			if(id > 0 && id != Object.texid)
-			{
-				// If id is valid then free
-				piFreeMipTextures(Object.texid);
-
-				// update the obj tex id
-				Object.texid = id;
-			}
-		}
-
+	if (FlagNum < _MAX_COUNTRIES && Object.texid > 0) {
 		_CountryTexIds[FlagNum] = Object.texid;
 	}
 }

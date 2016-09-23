@@ -503,15 +503,6 @@ bool cfgPrefsSetGlobal(_cfgPARAMS key, void* value, bool update)
 
 		if(success)
 		{
-			if ( lang != 5 && gLanguage == 5 && update ) // only true if chinese in language popup and we just switched to it
-			{
-				//cfgPrefsSetInt(_prefDetails[cfgLANGUAGE_CHOICE].name, 5);
-				//*(unsigned int*)_prefDetails[cfgLANGUAGE_CHOICE].var = 5;
-				_restartNeeded = true;
-				cfgPrefsSave();
-				return success;
-			}
-
 			if(_prefDetails[key].dynamic) // if its dynamic we try to special process it
 					cfgPrefsProcessGlobal(key);
 			else if(update) // if its not dynamic and we were told to update, then a restart is needed

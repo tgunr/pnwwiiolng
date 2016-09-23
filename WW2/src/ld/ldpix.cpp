@@ -203,11 +203,9 @@ SINT32		t1, t2, t3, t4;
 		return(-1);
 	}
 
-    const char* regionPath = fioGetRegionalPath(tmpname);
-
     if(GfxFormats[i].Routine == ldLoadTexture)
     {
-        return ldLoadTexture(regionPath, TransparentColor, Flags);
+        return ldLoadTexture(tmpname, TransparentColor, Flags);
     }
 
 #ifdef TEX_FILE_SUPPORT
@@ -263,7 +261,7 @@ SINT32		t1, t2, t3, t4;
 	Write_Debug ("Times:\n\t\tInit: %10d", t2-t1);
 #endif
 
-	texid = GfxFormats[i].Routine(regionPath, TransparentColor, WantFlags);
+	texid = GfxFormats[i].Routine(tmpname, TransparentColor, WantFlags);
 
 #ifdef LOAD_TIMER
 	t3 = piReadTimeStamp32();
@@ -272,7 +270,7 @@ SINT32		t1, t2, t3, t4;
 
 	if (!piIsTexture(texid, 0))
 	{
-        Write_Debug("Failed loading %s", regionPath);
+        Write_Debug("Failed loading %s", tmpname);
 		return(-1);
 	}
 
