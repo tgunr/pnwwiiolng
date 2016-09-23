@@ -505,7 +505,7 @@ int main(int argc, const char* argv[])
 
 	if ( g_shuttingDown == false )
 	{
-		dbugLog(_FLAS, "exited event_base_dispatch without being flagged as shutting down.");
+		dbugLog(_FLA, "exited event_base_dispatch without being flagged as shutting down.");
 		g_shuttingDown = true;
 	}
 

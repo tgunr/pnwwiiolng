@@ -838,13 +838,10 @@ _scPass2_linkSetup(Supercell& sc)
 		firebase->link = newLink;
 		newLink->firebase = firebase;
 #ifdef HEAVY_DEBUG
-		if ( g_logDebug )
-		{
-			dbugLog(_FLD,"link %s to %s " PRF_FULL_OBJ_ID " is associated with firebase %s " PRF_FULL_OBJ_ID ""
-					, start->name, end->name, PRA_FULL_OBJ_ID(newLink->fullObjID)
-					, firebase->name, PRA_FULL_OBJ_ID(firebase->fullObjID)
-					);
-		}
+        dbugLog(_FLD,"link %s to %s " PRF_FULL_OBJ_ID " is associated with firebase %s " PRF_FULL_OBJ_ID ""
+                , start->name, end->name, PRA_FULL_OBJ_ID(newLink->fullObjID)
+                , firebase->name, PRA_FULL_OBJ_ID(firebase->fullObjID)
+                );
 #endif // HEAVY_DEBUG
 
 		if (!strtInitLinkfromWOR(*newLink))
@@ -1726,14 +1723,14 @@ strtReportDataErrors()
 {
 	UINT32 errors = 0;
 
-	dbugLog(_FLIB, "\n");
+	dbugLog(_FLI, "\n");
 
 //	const UINT32 errorLimit = cv_stratErrorLimit().GetUint32();
 	for ( UINT32 i = 0; i < MAX_ERR_CODES; ++i )
 	{
 		if ( curTestLevel >= errorInfo[i].level && errorList[i].empty() == false )
 		{
-			dbugLog(_FLIB, "\n============================================================================\n"
+			dbugLog(_FLI, "\n============================================================================\n"
 							"[%s] "
 							"%s"
 							"\n============================================================================\n"
@@ -1767,7 +1764,7 @@ strtReportDataErrors()
 
 				if ( list.size() + detail.size() > 77 )
 				{
-					dbugLog(_FLAB, "  %s\n", list.c_str());
+					dbugLog(_FLA, "  %s\n", list.c_str());
 					list = "";
 				}
 
@@ -1778,8 +1775,8 @@ strtReportDataErrors()
 			}
 
 			if ( list.empty() == false )
-				dbugLog(_FLAB, "  %s\n", list.c_str());
-			dbugLog(_FLIB, "\n");
+				dbugLog(_FLA, "  %s\n", list.c_str());
+			dbugLog(_FLI, "\n");
 		}
 	}
 

@@ -689,7 +689,7 @@ _sendDispatch(Auth::Dispatch& dispatch, UINT32 otp, UINT32 clientIP, SINT32 teul
 					);
 
 	if ( teulSend(teulIndex, authDISPATCH, &dispatch) > 0)
-		dbugLog(_FLNB," sent otp %u to game on %d", dispatch.m_OTP, teulIndex);
+		dbugLog(_FLN," sent otp %u to game on %d", dispatch.m_OTP, teulIndex);
 	else
 		dbugLog(_FLA,"something went wrong with sending dispatch to game");
 }
@@ -1640,8 +1640,7 @@ authGetGameList(const SINT32 teulIndex)
 		// Check for expired or not populated first
 		if ( cache.m_goodUntil < teulTime() )
 		{
-			if ( g_logDebug )
-				dbugLog(_FLD, "t:%d expiring gamelist cache entry", teulIndex);
+			dbugLog(_FLD, "t:%d expiring gamelist cache entry", teulIndex);
 			*it = caches.back();
 			caches.pop_back();
 			continue;
@@ -1653,8 +1652,7 @@ authGetGameList(const SINT32 teulIndex)
 			continue;
 		}
 
-		if ( g_logDebug )
-			dbugLog(_FLD, "t:%d found cached gamelist entry", teulIndex);
+		dbugLog(_FLD, "t:%d found cached gamelist entry", teulIndex);
 		return &cache.m_list;
 	}
 

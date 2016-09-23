@@ -288,8 +288,6 @@ wwiiPlayer::log(const char* msg) const
 void
 wwiiPlayer::log(const char* file, int lineno, unsigned int errType, const char* mask, ...) const
 {
-	if ( errType == Debug::ERR_DBUG && !g_logDebug ) return;
-
 	static char buf[512];
 
 	va_list args;

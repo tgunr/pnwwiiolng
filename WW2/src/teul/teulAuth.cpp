@@ -185,7 +185,7 @@ _processLoginData(const UINT32 ipAddress, const PLAYER_LOGIN login, const OTP_NO
 
 	if ( login.appVersion != otpNode->appVersion )
 	{
-		dbugLog(_FLWB, "version mismatch");
+		dbugLog(_FLW, "version mismatch");
 		dbugLog(_FLW,"this version = %x, otp appVersion is %x, login version is %x"
 				, _thisVersion, otpNode->appVersion, login.appVersion);
 		return -Teul::Errors::LoginFail_Client;
@@ -369,20 +369,17 @@ authAcceptPlayer(const SINT32 teulIndex, const playerid_t playerIP, PLAYER_LOGIN
 		return retval;
 	}
 
-	if ( g_logDebug )
-	{
-		char playerAddress[32];
-		teulGetAddress(playerIP, playerAddress, sizeof(playerAddress));
-		dbugLog(_FLD, "t:%d p:%u c:%s otp:%u validated, sending auth CLIENT_ENTER ar:%u ip:%u(%s)"
-						, teulIndex
-						, dispatch.m_customerID
-						, dispatch.m_callsign
-						, dispatch.m_OTP
-						, Server::myServerInfo.stats.arenaID
-						, playerIP
-						, playerAddress
-						);
-	}
+    char playerAddress[32];
+    teulGetAddress(playerIP, playerAddress, sizeof(playerAddress));
+    dbugLog(_FLD, "t:%d p:%u c:%s otp:%u validated, sending auth CLIENT_ENTER ar:%u ip:%u(%s)"
+                    , teulIndex
+                    , dispatch.m_customerID
+                    , dispatch.m_callsign
+                    , dispatch.m_OTP
+                    , Server::myServerInfo.stats.arenaID
+                    , playerIP
+                    , playerAddress
+                    );
 
 	authSendClientAction(_authConnection, Server::myServerInfo.stats.arenaID, dispatch.m_customerID, CLIENT_ENTER, playerIP);
 
@@ -554,14 +551,11 @@ OTP_NODE::OTP_NODE(Auth::Dispatch& dispatch_, bool fromAuth_)
 	assert( _otps.find(OTP) == _otps.end() );
 	_otps[OTP] = this;
 
-	if ( g_logDebug )
-	{
-		static const size_t MAX_IP_LEN = 64;
-		char ip[MAX_IP_LEN+1], version[MAX_IP_LEN];
-		teulGetAddress(address, ip, MAX_IP_LEN);
-		teulGetAddress(appVersion, version, MAX_IP_LEN);
-		dbugLog(_FLD, "p:%u c:%s otp:%u ptr:%p ip:%s appVersion:%s +ALLOC {%" PRSizeT ",%" PRSizeT ",%" PRSizeT "}", customerID, handle, OTP, this, ip, version, _otps.size(), _pendingOtps.size(), _custOtps.size());
-	}
+    static const size_t MAX_IP_LEN = 64;
+    char ip[MAX_IP_LEN+1], version[MAX_IP_LEN];
+    teulGetAddress(address, ip, MAX_IP_LEN);
+    teulGetAddress(appVersion, version, MAX_IP_LEN);
+    dbugLog(_FLD, "p:%u c:%s otp:%u ptr:%p ip:%s appVersion:%s +ALLOC {%" PRSizeT ",%" PRSizeT ",%" PRSizeT "}", customerID, handle, OTP, this, ip, version, _otps.size(), _pendingOtps.size(), _custOtps.size());
 }
 
 static void

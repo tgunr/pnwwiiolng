@@ -373,10 +373,7 @@ wwiiPlayer::SetInstance(const Instance::Descriptor& toInstance)
 void
 wwiiPlayer::SetCountry(WWII_COUNTRY toCountry, WWII_SIDE toSide)
 {
-	if ( g_logDebug )
-	{
-		log(_FLD, "setCountry([%u,%u]=>[%u,%u])", country(), side(), toCountry, toSide);
-	}
+    log(_FLD, "setCountry([%u,%u]=>[%u,%u])", country(), side(), toCountry, toSide);
 
 	const bool swapInstanceSide = ( toSide != side() && instance().isValid() && m_hostInstance );
 	if ( swapInstanceSide )

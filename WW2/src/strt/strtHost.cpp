@@ -150,35 +150,35 @@ static void _describeBuildConfigurationToLogFile()
 {
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLIB, "DEV_BUILD");
+	dbugLog(_FLI, "DEV_BUILD");
 #endif
 #if defined(BETA_RELEASE)
-	dbugLog(_FLIB, " BETA_RELEASE");
+	dbugLog(_FLI, " BETA_RELEASE");
 #endif
 #if defined(TEST_RELEASE)
-	dbugLog(_FLIB, " TEST_RELEASE");
+	dbugLog(_FLI, " TEST_RELEASE");
 #endif
 #if defined(OPEN_BETA)
-	dbugLog(_FLIB, " OPEN_BETA");
+	dbugLog(_FLI, " OPEN_BETA");
 #endif
 #if defined(CLOSED_BETA)
-	dbugLog(_FLIB, " CLOSED_BETA");
+	dbugLog(_FLI, " CLOSED_BETA");
 #endif
 #if defined(FRES)
-	dbugLog(_FLIB, " FRES");
+	dbugLog(_FLI, " FRES");
 #endif
 #if defined(HAPPYOO)
-	dbugLog(_FLIB, " HAPPYOO");
+	dbugLog(_FLI, " HAPPYOO");
 	dbugLog(_FLI, "%s HOST FLAGS:", PN_git_commitish_string);
 #endif
 #if defined(TRAINING_SERVER)
-	dbugLog(_FLIB, " TRAINING_SERVER");
+	dbugLog(_FLI, " TRAINING_SERVER");
 #endif
 #if defined(PUBLIC_RELEASE)
-	dbugLog(_FLIB, " PUBLIC_RELEASE");
+	dbugLog(_FLI, " PUBLIC_RELEASE");
 #endif
 
-	dbugLog(_FLIB, ".");
+	dbugLog(_FLI, ".");
 }
 
 //////////////////////////////////////////////////////////////////////////

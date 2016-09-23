@@ -582,8 +582,7 @@ public:
 		if (!allow(player)) return false;
 		player.message(LSTR_USAGE, LSTR_GENERIC, "'/debug <condition> on|off'");
 		player.message(LSTR_DETAIL, LSTR_GENERIC, "Sets or clears a debug logging condition on the chat host.");
-		player.message(LSTR_DETAIL, LSTR_GENERIC, "Conditions are: debug, radios, squads, personas and chat.");
-		player.message(LSTR_NOTE, LSTR_GENERIC, "Condition 'debug' is a master setting for all other conditions.");
+		player.message(LSTR_DETAIL, LSTR_GENERIC, "Conditions are: radios, squads, personas and chat.");
 		return true;
 	}
 
@@ -600,7 +599,6 @@ public:
 		static std::map<std::string, bool*> conditions;
 		if (conditions.empty())
 		{
-			conditions["debug"] = &g_logDebug;
 			conditions["radios"] = &g_debugRadios;
 			conditions["squads"] = &g_debugSquads;
 			conditions["personas"] = &g_debugPersonas;

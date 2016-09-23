@@ -515,7 +515,7 @@ CHATDB_SQUAD_XCHG::receive(SINT32 /*teulIndex*/, CHATDB_SQUAD_XCHG& incoming)
 		return -EINVAL;
 	}
 
-	if ( g_logDebug & g_debugSquads )
+	if ( g_debugSquads )
 	{
 		Chat::Name co(squad.coHandle()), creator(squad.creatorHandle());
 		dbugLog(_FLD, "sq:%u received info short:%s name:%s co:%s creator:%s", squad.squadID(), squad.callsign().c_str(), squad.name().c_str(), co.c_str(), creator.c_str());
@@ -675,8 +675,8 @@ _autoUpdateSquadlist(SquadList& list)
 		++synced;
 	}
 
-	if ( g_logDebug && g_debugSquads )
-		dbugLog(_FLDB, ", %u synced", synced);
+	if ( g_debugSquads )
+		dbugLog(_FLD, ", %u synced", synced);
 
 	// If nobody got missed, then we can forget these updates
 	if ( !outOfSync )
@@ -1369,9 +1369,8 @@ chatUpdateRecruiterList(const Player* player, bool recruiting, SquadList* list)
 		if ( !list->squad().recruiting() )
 			throw "Squad has recruiting disabled";
 
-		if ( g_logDebug )
-			dbugLog(_FLD, "t:%d p:%u c:%s adding to recruiter list"
-							, player->teulIndex(), player->playerID(), player->callsign());
+        dbugLog(_FLD, "t:%d p:%u c:%s adding to recruiter list"
+                        , player->teulIndex(), player->playerID(), player->callsign());
 
 		g_recruiters.insert(player);
 	}
@@ -1380,9 +1379,8 @@ chatUpdateRecruiterList(const Player* player, bool recruiting, SquadList* list)
 		RECRUITERS::iterator it = g_recruiters.find(player);
 		if ( it != g_recruiters.end() )
 		{
-			if ( g_logDebug )
-				dbugLog(_FLD, "t:%d p:%u c:%s removing from recruiter list: %s"
-								, player->teulIndex(), player->playerID(), player->callsign(), e);
+            dbugLog(_FLD, "t:%d p:%u c:%s removing from recruiter list: %s"
+                            , player->teulIndex(), player->playerID(), player->callsign(), e);
 			g_recruiters.erase(it);
 		}
 	}

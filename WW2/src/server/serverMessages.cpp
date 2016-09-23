@@ -164,19 +164,16 @@ _recvPlayerMirror(ACTION_OBJECT* const a)
 	mirror.packer(TEUL_UNPACK, a);
 	Server::PersonaMirrorReply reply(mirror);
 
-	if ( g_logDebug )
-	{
-		char remoteServerAddress[64];
-		teulGetAddress(a->fromAddress, remoteServerAddress, sizeof(remoteServerAddress));
-		dbugLog(_FLI, "xfer:%llu(%s) p:%u c:%s otp:%u received player mirror for ip:%s"
-					, mirror.xferID()
-					, remoteServerAddress
-					, mirror.dispatch().m_customerID
-					, mirror.dispatch().m_callsign
-					, mirror.dispatch().m_OTP
-					, teulGetAddress(mirror.dispatch().m_clientIP)
-					);
-	}
+    char remoteServerAddress[64];
+    teulGetAddress(a->fromAddress, remoteServerAddress, sizeof(remoteServerAddress));
+    dbugLog(_FLD, "xfer:%llu(%s) p:%u c:%s otp:%u received player mirror for ip:%s"
+                , mirror.xferID()
+                , remoteServerAddress
+                , mirror.dispatch().m_customerID
+                , mirror.dispatch().m_callsign
+                , mirror.dispatch().m_OTP
+                , teulGetAddress(mirror.dispatch().m_clientIP)
+                );
 
 	const SINT32 result = mirror.onReceive(a->teulIndex);
 

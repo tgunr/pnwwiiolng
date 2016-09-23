@@ -32,7 +32,7 @@ namespace Timers
 		dbugLog(_FLI, "Timers:"); \
 		for ( size_t i = 0; i < Timers::timings.size(); ++i ) \
 		{ \
-			dbugLog(_FLIB, " %s:%llu", Timers::timings[i].first, Timers::timings[i].second); \
+			dbugLog(_FLI, " %s:%llu", Timers::timings[i].first, Timers::timings[i].second); \
 		} \
 		Timers::nextReport = teulClock64 + _interval; \
 		TIMER_RESET \

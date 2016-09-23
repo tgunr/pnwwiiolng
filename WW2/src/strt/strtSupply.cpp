@@ -630,20 +630,17 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 	bool trickleEnabled = supplyEnabled && host_config.supply.trickleEnabled;
 	const UINT32 trickleSlices = host_config.supply.trickleSlices;
 
-	if ( g_logDebug )
-	{
-		char buffer[256];
-		sprintf(buffer, "hcu:%u(%s) %s supply in %um over %um [supply:%u, trickle:%u, slices:%u]"
-						, unitID(), callsign()
-						, (isTransfer) ? "transfering" : "restarting"
-						, delay / 60, window / 60
-						, supplyEnabled, trickleEnabled, trickleSlices
-						);
-		dbugLog(_FLD, "%s", buffer);
+    char buffer[256];
+    sprintf(buffer, "hcu:%u(%s) %s supply in %um over %um [supply:%u, trickle:%u, slices:%u]"
+                    , unitID(), callsign()
+                    , (isTransfer) ? "transfering" : "restarting"
+                    , delay / 60, window / 60
+                    , supplyEnabled, trickleEnabled, trickleSlices
+                    );
+    dbugLog(_FLD, "%s", buffer);
 #ifdef BETA_RELEASE
-		chatSendBroadcast(Chat::_HCUNIT, Instance::_CAMPAIGN, unitID(), LSTR_NOTE, LSTR_GENERIC, buffer);
+    chatSendBroadcast(Chat::_HCUNIT, Instance::_CAMPAIGN, unitID(), LSTR_NOTE, LSTR_GENERIC, buffer);
 #endif
-	}
 
 	if ( isTransfer )
 	{

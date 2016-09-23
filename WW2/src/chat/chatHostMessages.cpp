@@ -193,17 +193,14 @@ _recvGCIMessage(ACTION_OBJECT* const a)
 		return -EINVAL;
 	auto& gciMessage = a->read<Chat::GCIMessage>();
 
-	if ( g_logDebug )
-	{
-		if ( g_debugChat )
-			dbugLog(_FLD, "gci:%u side:%u fac:" PRF_FULL_OBJ_ID " cp:" PRF_FULL_OBJ_ID " name:%s"
-							, gciMessage.gci
-							, gciMessage.side
-							, PRA_FULL_OBJ_ID(gciMessage.facility)
-							, PRA_FULL_OBJ_ID(gciMessage.where)
-							, gciMessage.name
-							);
-	}
+    if ( g_debugChat )
+        dbugLog(_FLD, "gci:%u side:%u fac:" PRF_FULL_OBJ_ID " cp:" PRF_FULL_OBJ_ID " name:%s"
+                        , gciMessage.gci
+                        , gciMessage.side
+                        , PRA_FULL_OBJ_ID(gciMessage.facility)
+                        , PRA_FULL_OBJ_ID(gciMessage.where)
+                        , gciMessage.name
+                        );
 
 	chatRouteGCIMessage(gciMessage, g_messageID++);
 

@@ -813,7 +813,7 @@ chatLoadPPOXML()
 
 		// Get the default timeout-minutes value from the <defaults> tag.
 		PPOConfig defaultConfig = _getConfig(root->FirstChild("defaults"), PPOConfig());
-		dbugLog(_FLIB, " defaults timeout:%llums, dmgThresh:%lluj, dmgCap:%lluj", defaultConfig.m_timeout, defaultConfig.m_damageThreshold, defaultConfig.m_damageCapacity);
+		dbugLog(_FLI, " defaults timeout:%llums, dmgThresh:%lluj, dmgCap:%lluj", defaultConfig.m_timeout, defaultConfig.m_damageThreshold, defaultConfig.m_damageCapacity);
 
 		ppoConfigs.clear();
 
@@ -847,11 +847,11 @@ chatLoadPPOXML()
 
 				// Look up the <param name='timeout-minutes'/> or use the default
 				config = _getConfig(ppo, defaultConfig);
-				dbugLog(_FLIB, " timeout: %llums dmgThresh:%lluj dmgCap: %lluj", config.m_timeout, config.m_damageThreshold, config.m_damageCapacity);
+				dbugLog(_FLI, " timeout: %llums dmgThresh:%lluj dmgCap: %lluj", config.m_timeout, config.m_damageThreshold, config.m_damageCapacity);
 		}
 			catch ( std::domain_error& e )
 		{
-				dbugLog(_FLIB, " *%s", e.what());
+				dbugLog(_FLI, " *%s", e.what());
 		}
 
 			ppoConfigs.push_back(config);

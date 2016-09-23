@@ -79,10 +79,7 @@ WeapJoinRequestNode::WeapJoinRequestNode(UINT32 playerID, const ChatHandle& hand
 
 	memset(&m_capacityRequest, 0, sizeof(m_capacityRequest));
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "p:%u c:%s ptr:%p +ALLOC WeapJoinRequestNode", m_playerID, Chat::Name(m_handle).c_str(), this);
-	}
+    dbugLog(_FLD, "p:%u c:%s ptr:%p +ALLOC WeapJoinRequestNode", m_playerID, Chat::Name(m_handle).c_str(), this);
 
 	_register();
 }
@@ -102,10 +99,7 @@ WeapJoinRequestNode::~WeapJoinRequestNode()
 
 	_unregister();
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "p:%u c:%s ptr:%p -REL", m_playerID, Chat::Name(m_handle).c_str(), this);
-	}
+    dbugLog(_FLD, "p:%u c:%s ptr:%p -REL", m_playerID, Chat::Name(m_handle).c_str(), this);
 
 	m_playerID = 0;
 	m_handle = 0ULL;
@@ -206,9 +200,8 @@ JOIN_LIST::Add(WeapJoinRequestNode* node)
 		m_list.push_back(node);
 		node->m_joinList = this;
 
-		if ( g_logDebug )
-			dbugLog(_FLD, "p:%u c:%s ptr:%p list:%p Added Node (%" PRSizeT ")"
-							, node->m_playerID, Chat::Name(node->m_handle).c_str(), node, this, m_list.size());
+        dbugLog(_FLD, "p:%u c:%s ptr:%p list:%p Added Node (%" PRSizeT ")"
+                        , node->m_playerID, Chat::Name(node->m_handle).c_str(), node, this, m_list.size());
 	}
 	catch ( const char* error )
 	{
@@ -244,9 +237,8 @@ JOIN_LIST::Extract(WeapJoinRequestNode* node)
 			m_list[i] = m_list.back();
 			m_list.resize(m_list.size() - 1);
 
-			if ( g_logDebug )
-				dbugLog(_FLD, "p:%u c:%s ptr:%p list:%p Removed Node [%" PRSizeT "]"
-								, node->m_playerID, Chat::Name(node->m_handle).c_str(), node, this, m_list.size());
+            dbugLog(_FLD, "p:%u c:%s ptr:%p list:%p Removed Node [%" PRSizeT "]"
+                            , node->m_playerID, Chat::Name(node->m_handle).c_str(), node, this, m_list.size());
 
 			return;
 		}

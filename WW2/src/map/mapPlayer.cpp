@@ -568,14 +568,13 @@ Player::SetGroups(const char* groupList)
 		// Update our permissions
 		m_permissions = chatGroupPermissionsForGroups(m_groups);
 
-		if ( g_logDebug )
-			log(_FLD, "groups: %s perm:%llx max army/air/sea/squad:%u/%u/%u/%u"
-						, groupList
-						, m_permissions->m_permissionMask
-						, m_permissions->m_limitRank[BRANCH_LAND]
-						, m_permissions->m_limitRank[BRANCH_AIR]
-						, m_permissions->m_limitRank[BRANCH_SEA]
-						, m_permissions->m_limitSquadRank);
+        log(_FLD, "groups: %s perm:%llx max army/air/sea/squad:%u/%u/%u/%u"
+                    , groupList
+                    , m_permissions->m_permissionMask
+                    , m_permissions->m_limitRank[BRANCH_LAND]
+                    , m_permissions->m_limitRank[BRANCH_AIR]
+                    , m_permissions->m_limitRank[BRANCH_SEA]
+                    , m_permissions->m_limitSquadRank);
 	}
 
 	// Update my rank restrictions
@@ -2240,24 +2239,21 @@ _isEffectRepair(STRAT_DAMAGE_EFFECT effect)
 void
 Player::addStratHit(const MissionDamageEvent& mde)
 {
-	if ( g_logDebug )
-		dbugLog(_FLD, "t:%d p:%u c:%s received MDE for target %lld type %d"
-						, teulIndex(), playerID(), callsign()
-						, mde.m_targetID
-						, mde.m_targetType
-						);
+    dbugLog(_FLD, "t:%d p:%u c:%s received MDE for target %lld type %d"
+                    , teulIndex(), playerID(), callsign()
+                    , mde.m_targetID
+                    , mde.m_targetType
+                    );
 
 	// Make sure we understand this packet
 	if ( mde.m_effectType <= SDE_INVALID )
 	{
-		if ( g_logDebug )
-			dbugLog(_FLDB, " invalid");
+        dbugLog(_FLD, " invalid");
 		return;
 	}
 	if ( mde.m_effectType >= SDE_NUM_EFFECTS )
 	{
-		if ( g_logDebug )
-			dbugLog(_FLDB, " unknown effect");
+        dbugLog(_FLD, " unknown effect");
 		return;
 	}
 
@@ -2266,8 +2262,7 @@ Player::addStratHit(const MissionDamageEvent& mde)
 	auto it = record.find(mde.m_targetID);
 	if ( it != record.end() && it->second >= teulTime() )
 	{
-		if ( g_logDebug )
-			dbugLog(_FLDB, " duplicate");
+        dbugLog(_FLD, " duplicate");
 		return;
 	}
 	record[mde.m_targetID] = teulTime() + host_config.score.stratDmgInterval_s;

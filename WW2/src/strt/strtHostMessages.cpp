@@ -762,13 +762,10 @@ _recvMMSpawnCancel(ACTION_OBJECT* const a)
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &spawnCancel, sizeof(MM_SPAWN_CANCEL));
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "p:%u v:%u spawnCancel: %d:%d:%d:%d:%d %d:%d:%d:%d"
-						, spawnCancel.customerID, spawnCancel.weaponSerial.serial
-						, spawnCancel.weaponSerial.source.cell.ox, spawnCancel.weaponSerial.source.cell.oy, spawnCancel.weaponSerial.source.id, spawnCancel.weaponSerial.source.objClass, spawnCancel.weaponSerial.source.objType
-						, spawnCancel.weaponSerial.spec.wCountry, spawnCancel.weaponSerial.spec.wCategory, spawnCancel.weaponSerial.spec.wClass, spawnCancel.weaponSerial.spec.wType);
-	}
+    dbugLog(_FLD, "p:%u v:%u spawnCancel: %d:%d:%d:%d:%d %d:%d:%d:%d"
+                    , spawnCancel.customerID, spawnCancel.weaponSerial.serial
+                    , spawnCancel.weaponSerial.source.cell.ox, spawnCancel.weaponSerial.source.cell.oy, spawnCancel.weaponSerial.source.id, spawnCancel.weaponSerial.source.objClass, spawnCancel.weaponSerial.source.objType
+                    , spawnCancel.weaponSerial.spec.wCountry, spawnCancel.weaponSerial.spec.wCategory, spawnCancel.weaponSerial.spec.wClass, spawnCancel.weaponSerial.spec.wType);
 
 	strtProcessSpawnCancel(&spawnCancel);
 
@@ -1037,8 +1034,7 @@ AttackOrder::process()
 		break;
 		}
 	}
-	if ( g_logDebug )
-		dbugLog(_FLDB, " result: %u", m_result);
+	dbugLog(_FLD, " result: %u", m_result);
 
 	// Send back the response
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::ATTACK_ORDER_Y), *this);

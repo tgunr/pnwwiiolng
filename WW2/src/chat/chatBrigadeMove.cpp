@@ -89,7 +89,7 @@ chatUpdateHCUnitLocations()
 			continue;
 		if ( hculUpdate.send(player->teulIndex()) < 0 )
 		{
-			betaLog(_FLIB, "<FAIL");
+			betaLog(_FLI, "<FAIL");
 		}
 	}
 

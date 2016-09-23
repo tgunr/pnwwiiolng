@@ -231,8 +231,8 @@ _expireTurretBits(struct TURRET_STRUCT* turret)
 		if ( (turret->valid & mask) && turret->clock64[i] <= bestBefore )
 		{
 #ifdef NEVER
-			dbugLog(_FLDB,"turret invalid: %x mask %x",turret->valid, tmpMask);
-			dbugLog(_FLDB,"turret invalid: %d, stamp %llu now %llu",i, turret->timeStamp[i], teulClock64);
+			dbugLog(_FLD,"turret invalid: %x mask %x",turret->valid, tmpMask);
+			dbugLog(_FLD,"turret invalid: %d, stamp %llu now %llu",i, turret->timeStamp[i], teulClock64);
 #endif
 			turret->valid &= ~mask;
 			turret->clock64[i] = teulClock64;
@@ -574,7 +574,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 
 	if ( player->vehicle != vref )
 	{
-		dbugLog(_FLAS,"t:%d p:%u c:%s v:%u _recvUpdateInfo: ERROR player=%p"
+		dbugLog(_FLA,"t:%d p:%u c:%s v:%u _recvUpdateInfo: ERROR player=%p"
 					, player->teulIndex(), player->playerID(), player->callsign(), vref->index
 					, player);
 		return offset;
@@ -1296,8 +1296,7 @@ _recvResupplyAccepted(ACTION_OBJECT* const a)
 	HostVehicle* vehicle = hostFindVehicleLocal(incoming.m_supplierID);
 	if ( vehicle == nullptr || vehicle->isRemote() == true )
 		return a->offset;
-	if ( g_logDebug )
-		dbugLog(_FLD, "v:%u supply to %s acknowledged", incoming.m_supplierID, Chat::Name(incoming.m_recipient).c_str());
+    dbugLog(_FLD, "v:%u supply to %s acknowledged", incoming.m_supplierID, Chat::Name(incoming.m_recipient).c_str());
 	vehicle->scoreResupply(incoming.m_recipient);
 
 	return a->offset;
@@ -1380,7 +1379,7 @@ commInstallHostCallbacks(void)
 	_registerInterHostCallbacks();
 	wwiiRegisterPlayerMessageCallback();
 
-	dbugLog(_FLNS, "installed commHostCallbacks");
+	dbugLog(_FLN, "installed commHostCallbacks");
 
 	return 0;
 }

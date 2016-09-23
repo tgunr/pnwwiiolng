@@ -678,17 +678,14 @@ extern const char* const channelTypeName[];
 void
 Player::detuneAllRadios()
 {
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s DETUNE", teulIndex(), playerID(), callsign());
+    dbugLog(_FLD, "t:%d p:%u c:%s DETUNE", teulIndex(), playerID(), callsign());
 
-		for ( UINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
-		{
-			auto& cnode = this->getChannelSub(i);
-			dbugLog(_FLDB, " radio%u:{chan:%p, type:%u[%s], subs:%" PRSizeT "}"
-							, i, cnode.channel(), cnode.type(), channelTypeName[cnode.type()], (cnode.channel() ? cnode.channel()->numSubscribers() : 0));
-		}
-	}
+    for ( UINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
+    {
+        auto& cnode = this->getChannelSub(i);
+        dbugLog(_FLD, " radio%u:{chan:%p, type:%u[%s], subs:%" PRSizeT "}"
+            , i, cnode.channel(), cnode.type(), channelTypeName[cnode.type()], (cnode.channel() ? cnode.channel()->numSubscribers() : 0));
+    }
 
 	for ( UINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
 		detuneRadio(i);
@@ -2080,7 +2077,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 		}
 	}
 
-	if ( g_logDebug & g_debugPersonas )
+	if ( g_debugPersonas )
 	{
 		WEAPON_SPEC ws = m_weapon;
 		dbugLog(_FLD, "t:%d p:%u c:%s update c:%u, b:%u, br:%u, m:%u, or:" PRF_FULL_OBJ_ID ", ob:" PRF_FULL_OBJ_ID " spawned:%d weap:" PRF_WEAPON_SPEC ""
@@ -2411,18 +2408,15 @@ _populateAWSReply(Player& player, const AWS::Request& request, const AWS_GRID& g
 		++populatedRows;
 	}
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s %s aws request [%u-%u,%u] data:%s rows:%u, cells:%u"
-						, player.teulIndex()
-						, player.playerID()
-						, player.callsign()
-						, (isAllied ? "allied" : "axis")
-						, static_cast<UINT32>(request.m_startCol), static_cast<UINT32>(request.m_startCol) + AWS::MAX_COLUMNS, static_cast<UINT32>(request.m_row)
-						, (reply.m_hasData ? "yes" : "no")
-						, populatedRows, populatedCells
-						);
-	}
+    dbugLog(_FLD, "t:%d p:%u c:%s %s aws request [%u-%u,%u] data:%s rows:%u, cells:%u"
+                    , player.teulIndex()
+                    , player.playerID()
+                    , player.callsign()
+                    , (isAllied ? "allied" : "axis")
+                    , static_cast<UINT32>(request.m_startCol), static_cast<UINT32>(request.m_startCol) + AWS::MAX_COLUMNS, static_cast<UINT32>(request.m_row)
+                    , (reply.m_hasData ? "yes" : "no")
+                    , populatedRows, populatedCells
+                    );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2559,27 +2553,24 @@ chatUpdateAWSSnapshot()
 		return;
 	nextCheck = teulClock64 + (AWS::UPDATE_INTERVAL_S * 1000);
 
-	if ( g_logDebug )
-	{
-		const AWS_GRID& awsSnapshot = g_awsSnapshots[Instance::_CAMPAIGN];
-		const AWS_GRID& awsGrid = g_awsGrids[Instance::_CAMPAIGN];
-		UINT16 oldX = 0, oldY = 0;
-		UINT16 newX = 0, newY = 0;
-		if ( awsSnapshot.empty() == false )
-		{
-			oldX = awsSnapshot.begin()->first & 0xff;
-			oldY = awsSnapshot.begin()->first >> 16;
-		}
-		if ( awsGrid.empty() == false )
-		{
-			newX = awsGrid.begin()->first & 0xff;
-			newY = awsGrid.begin()->first >> 16;
-		}
-		dbugLog(_FLD, "Updating aws grid: Old grid %" PRSizeT " entries starting %hu,%hu; New grid %" PRSizeT " entries starting %hu,%hu"
-						, awsSnapshot.size(), oldX, oldY
-						, awsGrid.size(), newX, newY
-						);
-	}
+    const AWS_GRID& awsSnapshot = g_awsSnapshots[Instance::_CAMPAIGN];
+    const AWS_GRID& awsGrid = g_awsGrids[Instance::_CAMPAIGN];
+    UINT16 oldX = 0, oldY = 0;
+    UINT16 newX = 0, newY = 0;
+    if ( awsSnapshot.empty() == false )
+    {
+        oldX = awsSnapshot.begin()->first & 0xff;
+        oldY = awsSnapshot.begin()->first >> 16;
+    }
+    if ( awsGrid.empty() == false )
+    {
+        newX = awsGrid.begin()->first & 0xff;
+        newY = awsGrid.begin()->first >> 16;
+    }
+    dbugLog(_FLD, "Updating aws grid: Old grid %" PRSizeT " entries starting %hu,%hu; New grid %" PRSizeT " entries starting %hu,%hu"
+                    , awsSnapshot.size(), oldX, oldY
+                    , awsGrid.size(), newX, newY
+                    );
 
 	for (auto it = g_awsGrids.begin(), end = g_awsGrids.end(); it != end; ++it)
 	{

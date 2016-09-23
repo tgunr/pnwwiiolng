@@ -206,8 +206,7 @@ MOBILE_SPAWN_WAYPOINT::receive(SINT32 teulIndex, MOBILE_SPAWN_WAYPOINT& incoming
 
 	if ( wp.m_deployed )
 	{
-		if ( g_logDebug )
-			dbugLog(_FLD, "mswp add m:%u p:%u c:%s sto:%u", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_stoUID);
+        dbugLog(_FLD, "mswp add m:%u p:%u c:%s sto:%u", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_stoUID);
 		// Request for* where* we want the MSP deployed
 		missAddMobileSpawn(wp.m_missionID, wp.m_playerID, wp.m_ownerCall, wp.m_x, wp.m_y, wp.m_z, wp.m_stoUID);
 	}
@@ -280,15 +279,12 @@ _recvMapPersonaUpdate(ACTION_OBJECT* const a)
 		return -EINVAL;
 	}
 
-	if ( g_logDebug )
-	{
-		player->log(_FLD, "mpu isSquad:%c[%u/%llu/%s] isDecal:%c(%u)"
-							, (update.m_isSquadUpdate ? 'y':'n')
-							, update.m_squadID, update.m_squadHandle, Chat::Name(update.m_squadHandle).c_str()
-							, (update.m_isDecalUpdate ? 'y':'n')
-							, update.m_decal
-							);
-	}
+    player->log(_FLD, "mpu isSquad:%c[%u/%llu/%s] isDecal:%c(%u)"
+                        , (update.m_isSquadUpdate ? 'y':'n')
+                        , update.m_squadID, update.m_squadHandle, Chat::Name(update.m_squadHandle).c_str()
+                        , (update.m_isDecalUpdate ? 'y':'n')
+                        , update.m_decal
+                        );
 
 	if ( update.m_isSquadUpdate )
 	{

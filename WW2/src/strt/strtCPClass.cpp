@@ -585,13 +585,13 @@ _checkUnit(StratHCUnit* unit, const CPStruct* cp)
 	// Ensure we rout parents first.
 	if ( nullptr != unit->parent() && cp == unit->parent()->homeCP() )
 		_checkUnit(unit->parent(), cp);
-	dbugLog(_FLIB, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
+	dbugLog(_FLI, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
 	if ( unit->canDeployTo(cp) )
-		dbugLog(_FLIB, "ok ");
+		dbugLog(_FLI, "ok ");
 	else if ( !unit->rout() )
-		dbugLog(_FLIB, "FAILED ");
+		dbugLog(_FLI, "FAILED ");
 	else
-		dbugLog(_FLIB, "routed ");
+		dbugLog(_FLI, "routed ");
 }
 
 void
@@ -605,7 +605,7 @@ CPStruct::checkHCUnits()
 	{
 		_checkUnit((StratHCUnit*)it->second, this);
 	}
-	dbugLog(_FLIB, "End");
+	dbugLog(_FLI, "End");
 }
 
 //////////////////////////////////////////////////////////////////////

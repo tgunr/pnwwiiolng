@@ -329,9 +329,6 @@ threadsCallNextCallback()
 void
 threadLog(const char* file, UINT32 line, UINT32 level, const char* fmt, ...)
 {
-	if ( g_logDebug == false && level == Debug::ERR_DBUG )
-		return;
-
 	THREAD_LOG* entry = new THREAD_LOG(file, line, level);
 
 	va_list args;

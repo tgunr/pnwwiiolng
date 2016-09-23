@@ -425,7 +425,7 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 	if ( result.second == true && server.stats.address == Server::myServerInfo.stats.address )
 	{
 		server.stats.addPlayer();
-		dbugLog(_FLWB, " numPlayers now %d, m_players size %" PRSizeT "", server.stats.numPlayers(), server.m_players.size());
+		dbugLog(_FLW, " numPlayers now %d, m_players size %" PRSizeT "", server.stats.numPlayers(), server.m_players.size());
 	}
 
 	return retval;
@@ -736,7 +736,7 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 
 	if (PN_UNLIKELY(_createPersonaFn == nullptr))
 	{
-		dbugLog(_FLAS, "some brain surgeon didn't install the _create persona handler");
+		dbugLog(_FLA, "some brain surgeon didn't install the _create persona handler");
 		return nullptr;
 	}
 

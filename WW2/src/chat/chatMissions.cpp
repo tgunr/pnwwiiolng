@@ -301,8 +301,7 @@ chatMessageMissionChannel(UINT32 missionID, Chat::LocalizedMessage& lmsg)
 void
 ChatMission::message(LSTRING_ID prefix, LSTRING_ID messageID, const char* arg1/*=NULL*/, const char* arg2/*=NULL*/)
 {
-	if ( g_logDebug )
-		dbugLog(_FLD, "m:%u sending mission channel message %d.%d", missionID(), prefix, messageID);
+    dbugLog(_FLD, "m:%u sending mission channel message %d.%d", missionID(), prefix, messageID);
 
 	Chat::LocalizedMessage loc(prefix, messageID, arg1, arg2);
 	chatBroadcastLocMessage(m_members.begin(), m_members.end(), loc);
@@ -417,7 +416,7 @@ chatMissionRemovePlayer(Player* player, UINT32 missionID, UINT32 sponsor)
 	dbugLog(_FLI, "m:%u p:%u c:%s left mission [%" PRSizeT " remaining]", missionID, player->playerID(), player->callsign(), mission->m_members.size());
 	if ( mission->m_members.empty() || mission->m_members.size() == 0 )
 	{
-		dbugLog(_FLNB, " *deleting");
+		dbugLog(_FLN, " *deleting");
 		g_missions.erase(missionID);
 		delete mission;
 		return;
@@ -1025,10 +1024,7 @@ ChatMission::sendUpdates()
 			)
 		{
 			update.m_handle = *it;
-#ifdef CLOSED_BETA
-			if ( g_logDebug )
-				dbugLog(_FLDB, "-%s ", Chat::Name(update.m_handle).c_str());
-#endif
+			betaLog(_FLD, "-%s ", Chat::Name(update.m_handle).c_str());
 			m_mmu.add(update);
 		}
 		m_removes.clear();
@@ -1040,10 +1036,7 @@ ChatMission::sendUpdates()
 		; ++it
 		)
 	{
-#ifdef CLOSED_BETA
-		if ( g_logDebug )
-			dbugLog(_FLDB, "*%s ", Chat::Name(it->first).c_str());
-#endif
+        betaLog(_FLD, "*%s ", Chat::Name(it->first).c_str());
 
 		Player* const player = it->second;
 		if ( player )
@@ -1068,14 +1061,11 @@ ChatMission::sendUpdates()
 			if ( player == nullptr || player->teulIndex() < 0 )
 				continue;
 
-#ifdef CLOSED_BETA
-			if ( g_logDebug )
-				dbugLog(_FLDB, ">%d:%u:%s "
-								, player->teulIndex()
-								, player->playerID()
-								, player->callsign()
-								);
-#endif
+            dbugLog(_FLD, ">%d:%u:%s "
+                            , player->teulIndex()
+                            , player->playerID()
+                            , player->callsign()
+                            );
 
 			if ( m_mmu.send(player->teulIndex()) >= 0 )
 				++updatesSent;
@@ -1116,7 +1106,7 @@ chatSendMissionUpdates()
 		++it;
 
 		const UINT32 updatesSentThisMission = mission.sendUpdates();
-		if ( updatesSentThisMission && g_logDebug )
+		if ( updatesSentThisMission )
 		{
 			betaLog(_FLD, "m:%u sent %u updates", mission.missionID(), updatesSentThisMission);
 		}

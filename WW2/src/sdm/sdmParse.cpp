@@ -236,7 +236,7 @@ _reportTranslationFails(const char* listType, TRANSLATION_FAILS& fails)
 	while ( (++it) != fails.end() )
 	{
 		fprintf(stderr, ", %s", (*it).c_str());
-		dbugLog(_FLAB, ", %s", (*it).c_str());
+		dbugLog(_FLA, ", %s", (*it).c_str());
 	}
 	fprintf(stderr, "\n\n");
 

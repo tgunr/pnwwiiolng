@@ -287,7 +287,7 @@ Brigade::updateDestinations()
 		dbugLog(_FLI, "brig:%d missions: ", brigadeID());
 		for ( it = m_missionList.begin(); it != m_missionList.end(); ++it )
 		{
-			dbugLog(_FLIB, "%c%d:%s[%d] "
+			dbugLog(_FLI, "%c%d:%s[%d] "
 							, ((it == m_missionPartitionIt) ? '*' : '+')
 							, (*it)->missionID(), (*it)->targetCP()->name, _isObjectiveMission(*it));
 		}

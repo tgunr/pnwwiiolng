@@ -453,7 +453,7 @@ _joinVehicle(Player& player, const VEHICLE_REQUEST& vRequest)
 	HostVehicle* const vehicle = hostFindVehicleLocal(vRequest.weapon.serial);
 	if (vehicle == nullptr)
 	{
-		dbugLog(_FLAS,"couldnt find or allocate vehicle %d for player id:%d"
+		dbugLog(_FLA,"couldnt find or allocate vehicle %d for player id:%d"
 					, vRequest.weapon.serial, player.playerID());
 		return -EINVAL;
 	}
@@ -585,7 +585,7 @@ Player::Player(const Server::PersonaXfer& personaXfer)
 	{
 		this->m_playerID = personaXfer.dispatch().m_customerID;
 		this->m_teulIndex = -EINVAL;
-		dbugLog(_FLAS, "%s", e.what());
+		dbugLog(_FLA, "%s", e.what());
 		throw std::runtime_error("persona create failed");		///Terminal
 	}
 
@@ -2464,20 +2464,16 @@ hostActivateVehicle(HostVehicle* newVehicle, bool checkPlayers)
 
 	if ( newVehicle->isRemote() == true )
 	{
-		if ( g_logDebug )
-			dbugLog(_FLD, "v:%u activating remote vehicle", newVehicle->index);
+        dbugLog(_FLD, "v:%u activating remote vehicle", newVehicle->index);
 	}
 	else
 	{
-		if ( g_logDebug )
-		{
-			const SHARED_VEHICLE_INFO& info = newVehicle->vehicleData;
-			dbugLog(_FLI, "p:%u,%u c:%s v:%u activating local vehicle at %d.%d.%d"
-							, newVehicle->seats[0], newVehicle->seats[1]
-							, info.callsign, newVehicle->index
-							, newVehicle->x_cm(), newVehicle->y_cm(), newVehicle->z_cm()
-							);
-		}
+        const SHARED_VEHICLE_INFO& info = newVehicle->vehicleData;
+        dbugLog(_FLI, "p:%u,%u c:%s v:%u activating local vehicle at %d.%d.%d"
+                        , newVehicle->seats[0], newVehicle->seats[1]
+                        , info.callsign, newVehicle->index
+                        , newVehicle->x_cm(), newVehicle->y_cm(), newVehicle->z_cm()
+                        );
 	}
 
 	newVehicle->setActive(true);
@@ -2557,7 +2553,7 @@ _releaseVehicle(VEHICLE_HOLDER* const vehicleHold, FULL_OBJ_ID toFacility)
 {
 	if (PN_UNLIKELY(vehicleHold == nullptr))
 	{
-		dbugLog(_FLAS,"_releaseVehicle: ERROR vehicleHold = null!!");
+		dbugLog(_FLA,"_releaseVehicle: ERROR vehicleHold = null!!");
 		return;
 	}
 

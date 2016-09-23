@@ -298,15 +298,12 @@ HostVehicle::acceptResupply(UINT32 fromSerial, const ChatHandle& fromHandle, Hos
 	// Remember the last people to resupply me.
 	m_impl->m_lastResupplier = fromSerial;
 
-	if ( g_logDebug )
-	{
-		Player* vehCommander = activeCommander();
-		UINT32 id = (vehCommander != nullptr) ? vehCommander->playerID() : 0;
-		dbugLog(_FLD, "p:%u c:%s v:%u accepting resupply from %s"
-						, id, callsign(), index
-						, Chat::Name(fromHandle).c_str()
-						);
-	}
+    Player* vehCommander = activeCommander();
+    UINT32 id = (vehCommander != nullptr) ? vehCommander->playerID() : 0;
+    dbugLog(_FLD, "p:%u c:%s v:%u accepting resupply from %s"
+                    , id, callsign(), index
+                    , Chat::Name(fromHandle).c_str()
+                    );
 
 	commSendClientResupplyIssue(this, fromSerial, fromHandle);
 
@@ -595,10 +592,9 @@ HostVehicle::interruptCapture()
 void
 HostVehicle::setInstance(const Instance::Descriptor& _instance)
 {
-	if ( g_logDebug )
-		dbugLog(_FLI, "v:%u setting instance %u.%u.%llu.%llu"
-					, index
-					, _instance.category(), _instance.type(), _instance.handle(), _instance.id());
+    dbugLog(_FLD, "v:%u setting instance %u.%u.%llu.%llu"
+                , index
+                , _instance.category(), _instance.type(), _instance.handle(), _instance.id());
 	m_instance = _instance;
 }
 

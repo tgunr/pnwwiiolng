@@ -1709,20 +1709,20 @@ FacilityStruct::updateSupplyLinks()
 			// make sure the link to us is open and was closed (we dont increment for already open links)
 			if ( m_incomingLink->isEnabled() == false )
 			{
-				dbugLog(_FLIB, "c%d ", cp->numOpenLinks);
+				dbugLog(_FLI, "c%d ", cp->numOpenLinks);
 				cp->numOpenLinks++;
 			}
 
 			// make sure the link to them is open and was closed (we dont increment for already open links)
 			if ( m_outgoingLink->isEnabled() == false )
 			{
-				dbugLog(_FLIB, "e%d ", endDepot.cp->numOpenLinks);
+				dbugLog(_FLI, "e%d ", endDepot.cp->numOpenLinks);
 				endDepot.cp->numOpenLinks++;
 
 				_updateSupplyAndLinkStatus(endDepot.CP());
 			}
 
-			dbugLog(_FLIB,"%s now has  %d open links and other link CP %s has %d open links state %i:%i"
+			dbugLog(_FLI,"%s now has  %d open links and other link CP %s has %d open links state %i:%i"
 				, cp->name, cp->numOpenLinks
 				, endDepot.cp->name
 				, endDepot.cp->numOpenLinks
@@ -1746,20 +1746,20 @@ FacilityStruct::updateSupplyLinks()
 			// make sure the link to them was open  (we dont decrement for already closed links)
 			if( m_incomingLink->isEnabled() )
 			{
-				dbugLog(_FLIB, "c%d ", cp->numOpenLinks);
+				dbugLog(_FLI, "c%d ", cp->numOpenLinks);
 				cp->numOpenLinks--;
 			}
 
 			// make sure the link to them was open  (we dont decrement for already closed links)
 			if( endDepot.m_incomingLink->isEnabled() )
 			{
-				dbugLog(_FLIB, "e%d ", endDepot.cp->numOpenLinks);
+				dbugLog(_FLI, "e%d ", endDepot.cp->numOpenLinks);
 				endDepot.cp->numOpenLinks--;
 
 				_updateSupplyAndLinkStatus(endDepot.CP());
 			}
 
-			dbugLog(_FLIB,"%s now has  %d open links and other link CP %s has %d open links state %i:%i"
+			dbugLog(_FLI,"%s now has  %d open links and other link CP %s has %d open links state %i:%i"
 				, cp->name, cp->numOpenLinks
 				, endDepot.cp->name
 				, endDepot.cp->numOpenLinks
@@ -1806,13 +1806,10 @@ strtResetMonkeyHead(ObjectStruct& object, UINT32 visLevel)
 void
 strtCloseBase(FacilityStruct& facility)
 {
-	if ( g_logDebug )
-	{
-		dbugLog(_FLI, "Closing facility %s " PRF_FULL_OBJ_ID ""
-				, facility.name
-				, PRA_FULL_OBJ_ID(facility.fullObjID)
-				);
-	}
+    dbugLog(_FLD, "Closing facility %s " PRF_FULL_OBJ_ID ""
+            , facility.name
+            , PRA_FULL_OBJ_ID(facility.fullObjID)
+            );
 
 	//Set the flag on the facility indicating its closed
 	facility.setOpen(false);
@@ -1830,10 +1827,7 @@ strtCloseBase(FacilityStruct& facility)
 void
 strtOpenBase(FacilityStruct& facility)
 {
-	if ( g_logDebug )
-	{
-		dbugLog(_FLI, "Opening facility %s " PRF_FULL_OBJ_ID "", facility.name, PRA_FULL_OBJ_ID(facility.fullObjID));
-	}
+    dbugLog(_FLD, "Opening facility %s " PRF_FULL_OBJ_ID "", facility.name, PRA_FULL_OBJ_ID(facility.fullObjID));
 
 	//Set the flag on the facility indicating its open
 	facility.setOpen(true);
@@ -2090,7 +2084,7 @@ _allBrigadesCanFallback(const CPStruct* cp, UINT32 playerID)
 //////////////////////////////////////////////////////////////////////
 // Process a fallback query/executation order
 
-#define FALLBACK_ASSERT(_result_, _x_) if ( (_x_) ) { dbugLog(_FLIB, #_result_ ": " #_x_); return (_result_); }
+#define FALLBACK_ASSERT(_result_, _x_) if ( (_x_) ) { dbugLog(_FLI, #_result_ ": " #_x_); return (_result_); }
 
 UINT32
 strtFallback(CPStruct* cp, WWII_SIDE forSide, FALLBACK_MODE mode, UINT32 playerID)
