@@ -17,12 +17,8 @@ public:
     LOGICAL get3DString(const WCHAR* pszText, UINT32 uColor, piLVERTEX* plVertices, SINT32 iNumVertices);
     SINT32 getTextureId();
 
-    FontAdaptor( FTFontWestern* f );
-    virtual ~FontAdaptor()
-    {
-        if(font)
-            delete font;
-    }
+    FontAdaptor(std::unique_ptr<FTFontWestern> &&f);
+    virtual ~FontAdaptor() {}
 private:
-    FTFontWestern* font;
+    std::unique_ptr<FTFontWestern> font;
 };

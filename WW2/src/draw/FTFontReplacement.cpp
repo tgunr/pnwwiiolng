@@ -592,7 +592,7 @@ SINT32 FontAdaptor::getTextureId()
 
 // ------------------------------------------------------------------
 
-FontAdaptor::FontAdaptor(FTFontWestern* f)
-: font(f)
+FontAdaptor::FontAdaptor(std::unique_ptr<FTFontWestern> &&f)
+    : font(std::move(f))
 {
 }
