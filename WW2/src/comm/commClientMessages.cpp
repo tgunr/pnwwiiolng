@@ -104,7 +104,7 @@ static SINT32 _recvPlayerExit(ACTION_OBJECT* const a)
 
 	clientForcedCellExit(a->teulIndex,pe.exitCode);
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 #pragma message "move to clientForcedCellExit?"
 	// OGS: Probably not, because that would cause a feedback loop.
 	commSendPlayerExit(a->teulIndex,  PDEST_MAP, pe.exitCode, pe.facility);

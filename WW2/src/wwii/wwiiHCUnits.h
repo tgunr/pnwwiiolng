@@ -63,12 +63,7 @@ public:
 
 public:
 	// Get the homeCPID by unpacking from an action object
-	void setHomeCPID(const FULL_OBJ_ID& newHomeCPID)
-#if defined(CMDLINE_CLIENT)
-	{	m_homeCPID = newHomeCPID; }
-#else
-	;
-#endif
+	void setHomeCPID(const FULL_OBJ_ID& newHomeCPID);
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 //tolua_begin
 

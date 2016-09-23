@@ -38,12 +38,10 @@
 #include "wwii/wwiiThreads.h"
 #include "teul/teulPacket.h"
 #else	// g++ under fedora doesn't like #else if ...
-# if !defined(CMDLINE_CLIENT)
-#  include "include/vars.h"
-#  include "client/GameClient.h"
-#  include "client/ClientSquad.h"
-# endif
-# include "client/ww2HostState.h"
+#include "include/vars.h"
+#include "client/GameClient.h"
+#include "client/ClientSquad.h"
+#include "client/ww2HostState.h"
 #endif
 #include "wwii/wwiiPackBool.h"
 #include "include/wthrTimeFactors.h"

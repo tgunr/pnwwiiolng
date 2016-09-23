@@ -160,7 +160,7 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 
 	UINT32 maskedAddr = teulMaskNetworkAddress(activate.hostIP);
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 	lastHostTime = activate.hostTime;
 	lastClientTime = teulTime();
 	lastHostIP = maskedAddr;
@@ -185,7 +185,7 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 
 #include "versionNo.h"
 #include "include/vars.h"
@@ -450,7 +450,7 @@ static void _mangleString(char* inStr, int underscore)
 		}
 	}
 }
-#endif // FRONT_END
+#endif // platBuild == BUILD_CLIENT
 
 SINT32
 wwiiSendWWII_ERROR_INFO(SINT32 connection, WWII_ERROR_INFO* info)
@@ -841,7 +841,7 @@ bool wwiiIncrementHits()
 	return true;
 }
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 /************************************************************************************************
 	wwiiServiceQueue_WWII_ERROR_INFO
 *************************************************************************************************/

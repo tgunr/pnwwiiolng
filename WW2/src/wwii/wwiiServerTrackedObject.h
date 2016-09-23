@@ -213,7 +213,7 @@ public:
 public:
 	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 	//! Client function: Ask the host to create an instance of this STO.
 	virtual void request(SINT32 chatIndex);
 #endif

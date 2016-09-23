@@ -186,7 +186,7 @@ SINT32 chatSendMotdRequest(SINT32 teulIndex, UINT32 id)
 }
 
 // FIXME - remove this when time is right!
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 LOGICAL chatSendLocality(SINT32 teulIndex, UINT32 vehicleHostIndex, const FLOAT64& rawX, const FLOAT64& rawY, const FLOAT64& rawZ, FULL_OBJ_ID nearestCP)
 {
 	static SINT32 lastTeulIndex = -1;
@@ -531,7 +531,7 @@ SINT32 EditString::receive(SINT32 teulIndex)
 SINT32
 _recvServerTrackedObjects(ACTION_OBJECT* const a)
 {
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 	// How many STOs are there?
 	UINT32 count = 0;
 	a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &count, 8);

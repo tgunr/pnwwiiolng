@@ -194,7 +194,7 @@ static SINT32 _recvFEJoinPermRequest(ACTION_OBJECT* const a)
 	dbugWrite(_FLN,"join vehicle requested by %u:%s\n"
 					,joinPermRequest.joinRequestID, chatGetCallsign(joinPermRequest.chatHandle));
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 #warning "move"
 	mmSendAcceptCrew(a->teulIndex, joinPermRequest.joinRequestID);
 #endif

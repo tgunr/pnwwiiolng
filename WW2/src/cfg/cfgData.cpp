@@ -5,7 +5,7 @@
 #endif
 
 // This file used in settings.exe too
-#ifdef FRONT_END
+#if platBuild != BUILD_SERVER
 #include "pi/pi.h"
 #else
 #define piRGBA_MAKE(r, g, b, a) ((unsigned int) (((a) << 24) | ((r) << 0) | ((g) << 8) | ((b) << 16)))

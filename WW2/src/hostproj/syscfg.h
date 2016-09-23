@@ -18,7 +18,7 @@
 #include "hostproj/hostBuildOptions.h"
 #include "include/platforms.h"	// includes precompile_includes.h
 
-#if !defined(AS_SERVER) || defined(AS_CLIENT)
+#if platBuild != BUILD_SERVER
 #error "Why are you building the host project without AS_SERVER?"
 #endif
 

@@ -629,7 +629,7 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 		if ( rxSize <= 0 )
 			break;
 
-#if AS_SERVER
+#if platBuild == BUILD_SERVER
 		// ignore packets we broadcast..
 		if ( endpoint.protocol == PROTOCOL_UDB && (dgram->sockAddress.sin_addr.s_addr & 0xff000000) == (Server::myInterface.addr[0].naddr & 0xff000000) )
 		{
@@ -1509,7 +1509,7 @@ _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 	return true;
 }
 
-#if defined(AS_SERVER)
+#if platBuild == BUILD_SERVER
 static void
 _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 {

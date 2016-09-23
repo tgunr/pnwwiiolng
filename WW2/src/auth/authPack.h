@@ -9,7 +9,7 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 
 SINT32 authPackSERVER_LOAD(LOGICAL mode, UCHAR* data, SINT32 offset, struct AUTH_SERVER_LOAD* object, SINT32 size);
 

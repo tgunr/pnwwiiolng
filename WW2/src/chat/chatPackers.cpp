@@ -29,13 +29,13 @@
 #include "wwii/wwiiPack.h"
 #include "wwii/wwiiPackString.h"
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 # include "chat/chatSideMessage.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 #include "chat/chatPlayerInfo.h"
 SINT32
 Chat::PlayerInfo::packer(LOGICAL mode, ACTION_OBJECT* const a)
@@ -208,7 +208,7 @@ Chat::Locality::packer(LOGICAL mode, ACTION_OBJECT* a)
 //////////////////////////////////////////////////////////////////////
 // Network constructor for a Chat::SideMessage
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 Chat::SideMessage::SideMessage(ACTION_OBJECT* const a)
 	: m_type(static_cast<SIDE_MESSAGE_TYPE>(0))
 	, m_side(WWII_NO_SIDE)

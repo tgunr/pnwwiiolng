@@ -8,7 +8,6 @@
 // Windows defines
 #define OPENGL3D	1
 #define WIN32_LEAN_AND_MEAN
-#define FRONT_END
 #define _CRT_RAND_S
 #define _GDI32_
 

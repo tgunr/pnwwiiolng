@@ -106,7 +106,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 	return packedSizeBits;
 }
 
-#if defined(AS_SERVER)
+#if platBuild == BUILD_SERVER
 SINT32
 ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 {
@@ -317,7 +317,7 @@ Teul::Packet::send(ENDPOINT& endpoint)
 
 	header().m_tag = ++endpoint.m_impl->sentTag;
 
-#if !defined(AS_SERVER)
+#if platBuild == BUILD_CLIENT
 	teulSyncClock();
 	header().m_tick = (Teul::PacketHeader::tick_t)teulClock64;
 #else

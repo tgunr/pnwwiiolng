@@ -1908,7 +1908,7 @@ WINGDIAPI void APIENTRY glVertex4sv (const GLshort* v);
 WINGDIAPI void APIENTRY glVertexPointer (GLint size, GLenum type, GLsizei stride, const GLvoid* pointer);
 WINGDIAPI void APIENTRY glViewport (GLint x, GLint y, GLsizei width, GLsizei height);
 
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 #if platOS == OS_MACOS
 #include <OpenGL/glu.h>
 #else

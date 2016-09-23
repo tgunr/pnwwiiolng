@@ -78,12 +78,6 @@
 #error This is a big endian platform and is unsupported.
 #endif
 
-#if !defined(AS_SERVER) && platBuild == BUILD_SERVER
-# define AS_SERVER
-#elif !defined(AS_CLIENT) && platBuild == BUILD_CLIENT
-# define AS_CLIENT
-#endif
-
 #if defined(WIN32) || defined(WIN64)
 
 #ifndef NOMINMAX

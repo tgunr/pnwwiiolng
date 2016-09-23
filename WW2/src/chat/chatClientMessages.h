@@ -4,7 +4,7 @@
 
 #include <b64/encode.h>
 #include <b64/decode.h>
-#if !defined(AS_SERVER)
+#if platBuild == BUILD_CLIENT
 #include "versionNo.h"
 #endif
 
@@ -73,7 +73,7 @@ struct ChatClientInfo
     // Message Header sent with every chat message indicating the client specific information
     ChatClientInfo() {
         
-#if !defined(AS_SERVER)
+#if platBuild == BUILD_CLIENT
             m_clientInfo[INFO_OFFSET_PLATFORM] = platOS;
             m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION] = GetOSMajorVersion();
             m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION+1] = GetOSMinorVersion();

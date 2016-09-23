@@ -11,7 +11,6 @@
 #include <cmath>
 #include <libkern/OSByteOrder.h>
 
-#define FRONT_END
 #define _UNICODE
 
 #ifndef RELEASE_CLIENT
