@@ -478,12 +478,14 @@ _cleanUpJoinNode(WeapJoinRequestNode* joinNode)
 			dbugLog(_FLA,"illegal node state JOIN_LIST_FREE on spawnCancel of id %d",joinNode->m_playerID);
 			break;
 		case JOIN_LIST::_FACILITY:
+		{
             const FULL_OBJ_ID& fid = joinNode->m_joinList->m_facility->fullObjID;
             dbugLog(_FLD, "deleting join %p id %d post from facility " PRF_FULL_OBJ_ID ""
                     , joinNode, joinNode->m_playerID
                     , PRA_FULL_OBJ_ID(fid)
                     );
 			break;
+		}
 		case JOIN_LIST::_POST_JOIN_REQ:
 		case JOIN_LIST::_POST_CREW:
 		{
