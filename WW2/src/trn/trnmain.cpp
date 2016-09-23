@@ -962,48 +962,6 @@ TERRAIN_DETAIL*	td;
 		}
 	}
 
-#ifdef DEBUG_WW2
-	if (!loading)
-	{
-	int			i, num;
-
-		num = 0;
-		td = &trndtl[lpobj->trnum];
-		lpobj = td->terrain;
-		if (lpobj != nullptr)
-		{
-			num += 1;
-			nv = 0;
-			nt = 0;
-			for (i=0; i < MAX_TERRAIN_TEXTURES; lpobj=td->txtobj[i++])
-			{
-				if (lpobj == nullptr)
-				{
-					continue;
-				}
-
-				num += 1;
-				nv += lpobj->numverts;
-				nt += lpobj->numtris;
-			}
-
-			// Only if some objects were not nullptr
-			if (num != 0)
-			{
-				if (nv < SUPERCELL_OCTETS_XY * NUM_VERTICES_PER_OCTET)
-				{
-					Write_Debug("Number of vertices in %04x_%04x at %d is incorrect: %d, %d", td->scx, td->scy, td->terrain->trnum, nv, SUPERCELL_OCTETS_XY * NUM_VERTICES_PER_OCTET);
-				}
-
-				if (nt < SUPERCELL_OCTETS_XY * NUM_TRIANGLES_PER_OCTET)
-				{
-					Write_Debug("Number of triangles in %04x_%04x at %d is incorrect: %d, %d", td->scx, td->scy, td->terrain->trnum, nt, SUPERCELL_OCTETS_XY * NUM_TRIANGLES_PER_OCTET);
-				}
-			}
-		}
-	}
-#endif
-
 	return(TRUE);
 }
 

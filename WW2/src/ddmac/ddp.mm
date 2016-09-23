@@ -354,10 +354,6 @@ LOGICAL	ddpUpdate()
     }
 #endif
     
-#ifdef BETA_RELEASE
-	logUpdateProfiling();
-#endif
-    
 	if (resetfps)
 	{
 		tottime = static_cast<UINT32>(frametime);
