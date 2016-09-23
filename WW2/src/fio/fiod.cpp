@@ -32,7 +32,7 @@
 # endif
 #endif
 
-#if LIMITED_FIO
+#if platBuild == BUILD_SERVER
 # define os_file_path(x) (x)
 #endif
 
@@ -100,7 +100,7 @@ static std::basic_string<ValueType> safe_os_file_path(const std::basic_string<Va
     return result;
 }
 
-#ifndef LIMITED_FIO
+#if platBuild == BUILD_CLIENT
 
 static char* os_file_path(char* path)
 {
@@ -557,7 +557,7 @@ size_t fiodFileSize(const char* name, bool userdir)
 //////////////////////////////////////////////////////////////////////
 // Returns a pointer to the path prefix
 
-#ifndef LIMITED_FIO
+#if platBuild == BUILD_CLIENT
 static char *OriginalPrepath = nullptr;
 #endif
 
@@ -569,7 +569,7 @@ const char* fiodGetPrepath(void)
 //////////////////////////////////////////////////////////////////////
 // Changes the path prefix
 
-#ifndef LIMITED_FIO
+#if platBuild == BUILD_CLIENT
 void fiodSetPrepath(char* newpath)
 {
 	if (newpath == nullptr) {
@@ -581,11 +581,7 @@ void fiodSetPrepath(char* newpath)
     if (!OriginalPrepath) {
         OriginalPrepath = strdup(DataPath);
     }
-#if platBuild == BUILD_SERVER
-    cv_dataDir.SetString(newPath);
-#else
 	strsafecpy(DataPath, newpath);
-#endif
 }
 #endif
 
@@ -773,8 +769,7 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
     return fd;
 }
 
-// The host uses "LIMITED_FIO"
-#ifdef LIMITED_FIO
+#if platBuild == BUILD_SERVER
 size_t fiodGetString(int fd, char* string, size_t length)
 {
 	FILE_MAP::iterator it = s_fileMap.find(fd);

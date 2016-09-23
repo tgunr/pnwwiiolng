@@ -11,10 +11,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "hostproj/config.h"
-
-// Tell FIOD that we need extra help
-#define LIMITED_FIO	1
-
 #include "hostproj/hostBuildOptions.h"
 #include "include/platforms.h"	// includes precompile_includes.h
 

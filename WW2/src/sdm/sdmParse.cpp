@@ -14,7 +14,7 @@
 #include "mem/mem.h"
 #include "sdm/sdmParse.h"
 #include "fio/fio.h"
-#if defined(LIMITED_FIO) && LIMITED_FIO != 0
+#if platBuild == BUILD_SERVER
 # include "fio/fioDefs.h"
 # include "fio/fiod.h"
 #endif

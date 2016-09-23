@@ -19,7 +19,7 @@
 #include "parse/parseIO.h"
 #include "str/stringLib.h"
 
-#ifdef LIMITED_FIO
+#if platBuild == BUILD_SERVER
 	#include "fio/fioDefs.h"
 	#include "fio/fiod.h"
 #else

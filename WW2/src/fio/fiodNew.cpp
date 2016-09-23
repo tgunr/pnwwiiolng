@@ -45,7 +45,7 @@ char DataPath[MAX_PATH] = "c:\\playnet\\data\\" ;
 # endif
 #endif
 
-#ifndef LIMITED_FIO
+#if platBuild == BUILD_CLIENT
  static char* os_file_path(char* path);
  static wchar_t* os_file_path(wchar_t* path);
 #else
@@ -442,7 +442,7 @@ const char* fiodGetPrepath(void)
 //////////////////////////////////////////////////////////////////////
 // Changes the path prefix
 
-#ifndef LIMITED_FIO
+#if platBuild == BUILD_CLIENT
 void fiodSetPrepath(char* newpath)
 {
 	if(newpath != NULL)
@@ -645,8 +645,7 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
 	return OS_OPEN(os_file_path(fullpath), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
 }
 
-// The host uses "LIMITED_FIO"
-#ifdef LIMITED_FIO
+#if platBuild == BUILD_SERVER
 size_t fiodGetString(int fd, char* string, size_t length)
 {
 	IO::MappedFile* state = _lookupFileState(fd) ;
@@ -848,7 +847,7 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	os_file_path
 *************************************************************************************************/
 
-#ifndef LIMITED_FIO
+#if platBuild == BUILD_CLIENT
 static char* os_file_path(char* path)
 {
 	char* s = path;
