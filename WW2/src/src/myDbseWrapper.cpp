@@ -29,32 +29,40 @@ static DB::handle_t*
 _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 {
 	// Make sure MySQL is initialized and construct a connection structure.
+	printf("_doMyConnect about to call mysql_init\n");
 	DB::handle_t* tempConn = mysql_init(nullptr);
 	if (tempConn == nullptr)
 	{
+		printf("_mysql_init failed\n");
 		dbugLog(_FLA, "mysql_init() failed!");
 		return(nullptr);
 	}
 
+	printf("_mysql_init succeeded\n");
 	// Attempt to establish the connection
 	auto flags = CLIENT_MULTI_STATEMENTS | CLIENT_MULTI_RESULTS;
 	if ( cv_mysqlCompression.GetBool() )
 		flags |= CLIENT_COMPRESS;
 
+	printf("cv_mysqlCompression done\n");
 	if ( mysql_real_connect(tempConn, connection.host, connection.username, connection.password, connection.dbName, 0, nullptr, flags) == nullptr )
 	{
+		printf("mysql_real_connect failed\n");
 		threadLog(_FLA, "mysql_real_connect failed:\nError %u (%s) \n", mysql_errno(tempConn), mysql_error(tempConn));
 		threadLog(_FLA, "using host %s name %s password %s dbname %s"
 						, connection.host, connection.username, connection.password, connection.dbName);
 		return(nullptr);
 	}
 
+	printf("mysql_real_connect succeeded\n");
 #if MYSQL_VERSION_ID >= 50003
 	// Enable automatic reconnection
+	printf("mysql_options for reconnect\n");
 	my_bool reconnect = (autoReconnect) ? 1 : 0;
 	mysql_options(tempConn, MYSQL_OPT_RECONNECT, &reconnect);
 #endif
 
+	printf("mysql_set_character_set coming\n");
 	if ( mysql_set_character_set(tempConn, "utf8") != 0 )
 	{
 		threadLog(_FLA, "set names failed");
@@ -62,6 +70,7 @@ _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 		return nullptr;
 	}
 
+	printf("mysql_set_character_set done\n");
 //	mysql_set_character_set(tempConn, "utf8");
 
 	return(tempConn);
@@ -74,6 +83,8 @@ static std::mutex dbconnMutex;
 DB::handle_t*
 dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnect)
 {
+	printf("Here dbseGetConnection: host-%s, db-%s, user-%s, pass%s\n",
+		connection.host, connection.dbName, connection.username,connection.password);
     threadLog(_FLD, "Getting thread connection to host '%s' database '%s' user '%s'", connection.host, connection.dbName, connection.username);
 	if ( connection.host[0] == 0 ) return nullptr;
 	if ( connection.dbName[0] == 0 ) return nullptr;
@@ -83,6 +94,7 @@ dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnec
 	DB::handle_t* newConn = nullptr;
 	std::this_thread::sleep_for(std::chrono::microseconds(250));
 	{
+		printf("Here dbseGetConnection about to lock\n");
 		std::lock_guard<std::mutex> dbconnLock(dbconnMutex);
 		newConn = _doMyConnect(connection, autoReconnect);
 	}
