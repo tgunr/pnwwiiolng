@@ -226,7 +226,8 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	int fd = OS_WOPEN(widePath, O_RDONLY | O_BINARY);
 	recordRef(widePath);
 #else
-	int fd = OS_OPEN(os_file_path(asciiPath), O_RDONLY | O_BINARY);
+	int fd = -1;
+    OS_OPEN(&fd, os_file_path(asciiPath), O_RDONLY | O_BINARY, 0);
 	recordRef(widePath);
 #endif
 	if ( PN_UNLIKELY(fd < 0) )
@@ -424,7 +425,8 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		fd = OS_WOPEN(widePath, O_RDONLY | O_BINARY);
 		recordRef(widePath);
 #else
-		fd = OS_OPEN(os_file_path(asciiPath), O_RDONLY | O_BINARY);
+		fd = -1;
+        OS_OPEN(&fd, os_file_path(asciiPath), O_RDONLY | O_BINARY, 0);
 		recordRef(widePath);
 #endif
 		if ( fd < 0 )
@@ -764,8 +766,11 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
   else
 #endif
 	  pathprintf(fullpath, DataPath, filename);
-
-	return OS_OPEN(os_file_path(fullpath), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
+    
+    int fd = -1;
+    
+	OS_OPEN(&fd, os_file_path(fullpath), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
+    return fd;
 }
 
 // The host uses "LIMITED_FIO"
@@ -1000,7 +1005,7 @@ size_t fiocfgOpen(const char* filename, bool)
 
 	stat(fullpath, &st);
 	if(S_ISREG(st.st_mode))
-		hfile = OS_OPEN(fullpath, O_RDONLY | O_BINARY);
+		OS_OPEN(&hfile, fullpath, O_RDONLY | O_BINARY, 0);
 
 	return(hfile);
 }
@@ -1013,7 +1018,7 @@ size_t fiocfgOpenWrite(const char* filename, bool)
 	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
 	os_file_path(fullpath);
 
-	hfile = OS_OPEN(fullpath, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
+	OS_OPEN(&hfile, fullpath, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
 
 	return(hfile);
 }
