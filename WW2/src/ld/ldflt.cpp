@@ -1583,28 +1583,21 @@ static bool ReadTextureReference(void)
 	// Check for normal map
 	str = filename;
 	str += "_normal.dds";
-
-	if(fioAccess(str.c_str()))
-	{
+    
+    int fd = -1;
+    
+    if ((fd = fioOpen(str.c_str())) != -1) {
 		_textureflags2[numtexrefs] |= OBJECT_NORMALMAP;
-	}
-
-	// New normal mapping tool outputs _nrm.dds
-	str = filename;
-	str += "_nrm.dds";
-
-	if(fioAccess(str.c_str()))
-	{
-		_textureflags2[numtexrefs] |= OBJECT_NORMALMAP;
+		fioClose(fd); // Hacky because this is very bad code design, this is a quick fix
 	}
 
 	// Check for specular map
 	str = filename;
 	str += "_spec.dds";
 
-	if(fioAccess(str.c_str()))
-	{
+	if ((fd = fioOpen(str.c_str()) != -1) {
 		_textureflags3[numtexrefs] |= OBJECT_SPECULARMAP;
+		fioClose(fd); // Hacky because this is very bad code design, this is a quick fix
 	}
 
 	str = filename;
