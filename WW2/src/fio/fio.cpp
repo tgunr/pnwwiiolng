@@ -3,6 +3,7 @@
 #include "VersionNo.h"
 #include "fio/fio.h"
 #include "fio/fiod.h"
+#include "fio/fioa.h"
 #include "include/vars.h"
 #include "ui/uiUTF.h"
 #include "mem/mem.h"
@@ -12,10 +13,6 @@
 #include <shlobj.h>
 #include <io.h>
 #include "sys/sysreg.h"
-#endif
-
-#ifndef FIO_NO_ARCHIVE
-#include "fio/fioa.h"
 #endif
 
 #define MAX_FIO_STACK 64
@@ -148,11 +145,9 @@ int fioOpen(const char* const filename)
        	default:
 			fd = fiodOpen(fn);
        	break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
 			fd = fioaOpen(fn);
        	break;
-#endif
     }
 
     return fd;
@@ -194,11 +189,9 @@ int fioOpenWrite(const char* filename)
 		case ISDIRECTORY:
 			fd = fiodOpenWrite(filename);
 		break;
-#ifndef FIO_NO_ARCHIVE
 		case ISARCHIVE:
 		    fd = fioaOpenWrite(filename);
 		break;
-#endif
 	}
 
     return fd;
@@ -221,11 +214,9 @@ void fioClose(int fd)
         default:
             fiodClose(fd);
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             fioaClose(fd);
 		break;
-#endif
     }
 }
 
@@ -249,11 +240,9 @@ LOGICAL fioAccess(const char* filename)
         default:
             return(fiodAccess(filename));
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             return fioaAccess(filename);
 		break;
-#endif
     }
 }
 
@@ -302,11 +291,9 @@ int fioEOF(int fd)
         default:
             return(fiodEOF(fd));
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             return fioaEOF(fd);
 		break;
-#endif
     }
 }
 
@@ -333,11 +320,9 @@ size_t fioFileSize(const char* name)
         default:
             return(fiodFileSize(name));
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             return fioaFileSize(name);
 		break;
-#endif
     }
 }
 
@@ -365,7 +350,6 @@ SINT32 fioQuery()
 
 SINT32 fioDescriptorType(int fd)
 {
-	static_assert(FIOA_FD_START > FIOD_FD_START, "FIOA fds must be bigger than FIOD fds.");
 	if(fd < 0) return -1;
 	if(fd >= FIOA_FD_START)
 		return ISARCHIVE;
@@ -391,11 +375,9 @@ size_t fioSeek(int fd, size_t offset, int from)
         default:
             return(fiodSeek(fd, offset,from));
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             return fioaSeek(fd, offset,from);
       	break;
-#endif
     }
 }
 
@@ -418,11 +400,9 @@ size_t fioRead(int fd, void* dptr, size_t length)
         default:
             return(fiodRead(fd, dptr,length));
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             return fioaRead(fd, dptr,length);
 		break;
-#endif
     }
 }
 
@@ -441,11 +421,9 @@ size_t fioMap(int fd, const void*& data)
 		default:
 			return fiodMap(fd, data);
 		break;
-#ifndef FIO_NO_ARCHIVE
 		case ISARCHIVE:
 			return fioaMap(fd, data);
 		break;
-#endif
 	}
 }
 
@@ -467,11 +445,9 @@ size_t fioWrite(int fd, const void* dptr, size_t length)
         default:
             return(fiodWrite(fd, dptr,length));
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             return fioaWrite(fd, dptr,length);
 		break;
-#endif
     }
 }
 

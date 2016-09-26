@@ -9,8 +9,6 @@
 
 enum
 {
-	FIOD_FD_START = (1 << 16),
-	FIOA_FD_START = (1 << 17),
 };
 
 #if platBuild != BUILD_SERVER

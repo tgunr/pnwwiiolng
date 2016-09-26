@@ -1,5 +1,10 @@
 #pragma once
 
+enum
+{
+	FIOA_FD_START = (1 << 17),
+};
+
 extern int fioaAddArchive(const char* archive);
 extern void fioaKill();
 
