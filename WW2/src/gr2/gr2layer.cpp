@@ -4588,33 +4588,23 @@ void createMeshTextures(gr2MeshData* data, bool wantNormals)
 
 gr2AnimationBlend* gr2LoadBlendedAnimation(const SCHAR* blendfile, SINT32 boneCount)
 {
-	char path[MAX_GR2_PATH_SIZE+1];
+    std::string path = GR2DATA_PREPATH + std::string(blendfile);
+	gr2AnimationBlend *blend = nullptr;
+    
+	// strip extension, if any
+	path = path.substr(0, path.rfind(".")); // substr(0,npos) == entire string
 
-	// setup the expected path
-	snprintf(path, MAX_GR2_PATH_SIZE, "%s%s", GR2DATA_PREPATH, blendfile);
-
-	// strip off the extension if found
-	char* extension = strchr(path, '.');
-	if(extension) *extension = 0;
-
-	// try the xml version of the file
-	snprintf(path, MAX_GR2_PATH_SIZE, "%s.xml", path);
-
-	if(GR2_USE_XML_BLENDS && fioAccess(path))
-		return gr2LoadBlendedAnimationXML(path, boneCount);
-
-	// strip off the extension if found
-	extension = strchr(path, '.');
-	if(extension) *extension = 0;
-
-	// try the .txt version of the file
-	snprintf(path, MAX_GR2_PATH_SIZE, "%s.txt", path);
-
-	if(fioAccess(path))
-		return gr2LoadBlendedAnimationTXT(path, boneCount);
-
-	// blend file not found
-	return nullptr;
+    // try the xml version of the file first
+#if GR2_USE_XML_BLENDS
+    blend = gr2LoadBlendedAnimationXML((path + ".xml").c_str(), boneCount);
+#endif
+	
+	// if it failed or wasn't requested, try the .txt version of the file
+	if (!blend) {
+        blend = gr2LoadBlendedAnimationTXT((path + ".txt").c_str(), boneCount);
+    }
+    
+    return blend;
 }
 
 static SINT32 _translateBoneIndex(SINT32 bone)
