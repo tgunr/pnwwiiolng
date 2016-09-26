@@ -161,9 +161,6 @@ LOGICAL fpTPSLoad (void)
 	// idle animations
 	memset(fpTPSNumIdleAnims, 0, sizeof (fpTPSNumIdleAnims));
 
-	UINT32 usedBlends = 0;
-	UINT32 unusedBlends = 0;
-
 	TPS_BLEND_MAP::iterator foundBlend;
 
 	// tps blends
@@ -175,32 +172,22 @@ LOGICAL fpTPSLoad (void)
 			{
 				for (l=0; l < TPS_POINTTYPE_NUM_TYPES; l++)
 				{
-					bool exists = false;
-					bool added	= false;
+					const char* key = fpTPSCreateBlendKey(i, j, k, l, TPS_BLENDTYPE_TPS);
+					gr2AnimationBlend *blend = gr2LoadBlendedAnimation(key, boneCount);
+					
+					if (blend) {
+					    UINT64 blendID = fpTPSCreateBlendID(i, j, k, l, TPS_BLENDTYPE_TPS);
 
-					const char* key = fpTPSCreateBlendKey(i, j, k, l, TPS_BLENDTYPE_TPS, &exists);
-
-					if(exists)
-					{
-						UINT64 blendID = fpTPSCreateBlendID(i, j, k, l, TPS_BLENDTYPE_TPS);
-
-						foundBlend = _fpTPSAnimLib.find(blendID);
-
-						if(foundBlend == _fpTPSAnimLib.end())
-						{
-							_fpTPSAnimLib[blendID] = gr2LoadBlendedAnimation((SCHAR*)key, boneCount);
-							added = true;
+						if (_fpTPSAnimLib.find(blendID) == _fpTPSAnimLib.end()) {
+							_fpTPSAnimLib[blendID] = blend;
+						} else {
+						    gr2FreeBlendedAnimation(blend);
+						    dbugLog(_FLD, "Unused blend (this is bloating loading time): %s", key);
 						}
 					}
-
-					if(added)
-						usedBlends++;
-					else
-						unusedBlends++;
 				}
 			}
 		}
-
 		rnUpdateLoadingScreen();
 	}
 
@@ -213,32 +200,23 @@ LOGICAL fpTPSLoad (void)
             {
                 for (l=0; l < TPS_POINTTYPE_NUM_TYPES; l++)
                 {
-                    bool exists = false;
-                    bool added	= false;
+                    const char* key = fpTPSCreateBlendKey(i, j, k, l, TPS_BLENDTYPE_FPS);
+					gr2AnimationBlend *blend = gr2LoadBlendedAnimation(key, boneCount);
 
-                    const char* key = fpTPSCreateBlendKey(i, j, k, l, TPS_BLENDTYPE_FPS, &exists);
-
-                    if(exists)
-                    {
+                    if (blend) {
                         UINT64 blendID = fpTPSCreateBlendID(i, j, k, l, TPS_BLENDTYPE_FPS);
 
-                        foundBlend = _fpTPSAnimLib.find(blendID);
-
-                        if(foundBlend == _fpTPSAnimLib.end())
-                        {
-                            _fpTPSAnimLib[blendID] = gr2LoadBlendedAnimation((SCHAR*)key, boneCount);
-                            added = true;
+                        if(_fpTPSAnimLib.find(blendID) == _fpTPSAnimLib.end()) {
+                            _fpTPSAnimLib[blendID] = blend;
+                        } else {
+						    gr2FreeBlendedAnimation(blend);
+                            dbugLog(_FLD, "Unused blend (this is bloating loading time): %s", key);
                         }
-                    }
 
-                    if(added)
-                        usedBlends++;
-                    else
-                        unusedBlends++;
+                    }
                 }
             }
         }
-
         rnUpdateLoadingScreen();
     }
 
@@ -568,20 +546,17 @@ void fpTPSDumpStates()
 }
 #endif
 
-const char* fpTPSCreateBlendKey(int pose, int move, int weap, int point, int type, bool* exists)
+const char* fpTPSCreateBlendKey(int pose, int move, int weap, int point, int type)
 {
 	static char key[128+1];
 
 	const char* weapStr = (type == TPS_BLENDTYPE_FPS) ? fpFPSWeaponKeyStrings[weap] : fpTPSWeaponKeyStrings[weap];
 
-	snprintf(key, 128, "gr2Data\\TPS\\blends\\%s_%s_%s_%s.txt",
-					fpTPSPoseKeyStrings[pose],
-					fpTPSMoveKeyStrings[move],
-					weapStr,
-					fpTPSPointKeyStrings[point]);
-
-	if(exists)
-		*exists = (fioAccess(key)) ? true: false;
+	strprintf(key, "gr2Data\\TPS\\blends\\%s_%s_%s_%s.txt",
+	    fpTPSPoseKeyStrings[pose],
+		fpTPSMoveKeyStrings[move],
+		weapStr,
+		fpTPSPointKeyStrings[point]);
 
 	return strstr(key, "T");
 }
