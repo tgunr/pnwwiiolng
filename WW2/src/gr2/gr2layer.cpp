@@ -1232,40 +1232,37 @@ gr2Animation* gr2LoadAnimation (const SCHAR* animationFile, SINT32 useCache)
 
 		snprintf(evtFile, 255, "%s%s%s", GR2DATA_PREPATH, animationFile, ".evt");
 
-		if(fioAccess(evtFile))
-		{
-			SINT32 evtFileID = fioOpen(evtFile);
+        SINT32 evtFileID = fioOpen(evtFile);
 
-			if(evtFileID >= 0)
-			{
-				GR2_EVENT_LIST events;
+        if(evtFileID >= 0)
+        {
+            GR2_EVENT_LIST events;
 
-				gr2Event* newEvent = nullptr;
+            gr2Event* newEvent = nullptr;
 
-		//		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Loading event data for animation %s", animationFile);
+    //		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Loading event data for animation %s", animationFile);
 
-				while(fioGetLine(evtFileID, buf, 255) != 0)
-				{
-					newEvent = _gr2EventPool.Pop();
+            while(fioGetLine(evtFileID, buf, 255) != 0)
+            {
+                newEvent = _gr2EventPool.Pop();
 
-					if(!newEvent)
-						piExitProgram (_FL, "gr2LoadAnimation: Failed to allocate memory for event");
+                if(!newEvent)
+                    piExitProgram (_FL, "gr2LoadAnimation: Failed to allocate memory for event");
 
-					sscanf(buf, "%d %f %32s", &newEvent->eventType, &newEvent->eventTime, newEvent->eventData);
+                sscanf(buf, "%d %f %32s", &newEvent->eventType, &newEvent->eventTime, newEvent->eventData);
 
-					events.push_back(newEvent);
+                events.push_back(newEvent);
 
-					if(events.size() >= MAX_NUM_ANIM_EVENTS)
-						break;
-				}
+                if(events.size() >= MAX_NUM_ANIM_EVENTS)
+                    break;
+            }
 
-				_animEvents[newAnimation->animation] = events;
+            _animEvents[newAnimation->animation] = events;
 
-				foundEvents = _animEvents.find(newAnimation->animation);
+            foundEvents = _animEvents.find(newAnimation->animation);
 
-				fioClose(evtFileID);
-			}
-		}
+            fioClose(evtFileID);
+        }
 	}
 
 	if(foundEvents != _animEvents.end())
@@ -4325,19 +4322,16 @@ static SINT32 loadSubMaterial(granny_variant& data)
 		strcat(texname, ".dds");
 
 		// if a file exists, try to load it
-		if(fioAccess(texname))
-		{
-			texid = ldddsLoadDDSTexture(texname, GL_TEXTURE_2D, 0);
+        texid = ldddsLoadDDSTexture(texname, GL_TEXTURE_2D, 0);
 
-			if(piIsTexture(texid, 0))
-			{
-				char* ptr = strrchr(texname, '.');
-				if(ptr != nullptr) *ptr = 0;
+        if(piIsTexture(texid, 0))
+        {
+            char* ptr = strrchr(texname, '.');
+            if(ptr != nullptr) *ptr = 0;
 
-				// make sure and set our name so other models can use it to
-				piSetTextureName(texid, texname);
-			}
-		}
+            // make sure and set our name so other models can use it to
+            piSetTextureName(texid, texname);
+        }
 	}
 
 	return texid;
@@ -4360,19 +4354,16 @@ static SINT32 loadSubMaterial(granny_texture* texture)
 		strcat(texname, ".dds");
 
 		// if a file exists, try to load it
-		if(fioAccess(texname))
-		{
-			texid = ldddsLoadDDSTexture(texname, GL_TEXTURE_2D, 0);
+        texid = ldddsLoadDDSTexture(texname, GL_TEXTURE_2D, 0);
 
-			if(piIsTexture(texid, 0))
-			{
-				char* ptr = strrchr(texname, '.');
-				if(ptr != nullptr) *ptr = 0;
+        if(piIsTexture(texid, 0))
+        {
+            char* ptr = strrchr(texname, '.');
+            if(ptr != nullptr) *ptr = 0;
 
-				// make sure and set our name so other models can use it to
-				piSetTextureName(texid, texname);
-			}
-		}
+            // make sure and set our name so other models can use it to
+            piSetTextureName(texid, texname);
+        }
 	}
 
 	return texid;
@@ -4427,13 +4418,10 @@ static SINT32 loadMaterials(granny_material* material, bool& hasNormals)
 				snprintf(filename, 511, "%s.dds", texname);
 
 				// if a file exists, try to load it
-				if(fioAccess(filename))
-				{
-					specular = ldddsLoadDDSTexture(filename, GL_TEXTURE_2D, 0);
+                specular = ldddsLoadDDSTexture(filename, GL_TEXTURE_2D, 0);
 
-					if(piIsTexture(specular, 0))
-						piSetTextureName(specular, texname);
-				}
+                if(piIsTexture(specular, 0))
+                    piSetTextureName(specular, texname);
 			}
 
 			dt->specularMap = specular;
@@ -4456,13 +4444,10 @@ static SINT32 loadMaterials(granny_material* material, bool& hasNormals)
 				snprintf(filename, 511, "%s.dds", texname);
 
 				// if a file exists, try to load it
-				if(fioAccess(filename))
-				{
-					normal = ldddsLoadDDSTexture(filename, GL_TEXTURE_2D, 0);
+                normal = ldddsLoadDDSTexture(filename, GL_TEXTURE_2D, 0);
 
-					if(piIsTexture(normal, 0))
-						piSetTextureName(normal, texname);
-				}
+                if(piIsTexture(normal, 0))
+                    piSetTextureName(normal, texname);
 			}
 
 			dt->normalMap = normal;
