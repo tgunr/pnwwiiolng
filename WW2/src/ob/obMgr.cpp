@@ -2182,8 +2182,8 @@ void PoolModel::SaveMDL(const POOLOBJHDR* poolobjhdr,
 	obpoolSavePoolCallback((POOLOBJHDR*)poolobjhdr, hfile);
 
 	// fill in length
-	length = fioSeek(hfile, 0, fioSEEK_CUR);
-	fioSeek(hfile, 4, fioSEEK_SET);
+	length = fioSeek(hfile, 0, SEEK_CUR);
+	fioSeek(hfile, 4, SEEK_SET);
 
 	// This is now delayed until* after* successful file creation.
 	fioPuts(hfile, OBJECTFILE_VERSION);

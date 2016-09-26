@@ -93,7 +93,7 @@ char	FileNameBuffer[MAX_PATH],
 			_MessageTable = (char **)memAlloc((HighestStringNumber + 1) * sizeof(char*));
 		}
 
-		fioSeek(FileID, 0, fioSEEK_SET);
+		fioSeek(FileID, 0, SEEK_SET);
 
 		for(i = 0;; )
 		{

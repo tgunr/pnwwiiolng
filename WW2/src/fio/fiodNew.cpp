@@ -379,11 +379,11 @@ size_t fiodSeek(int fd, size_t offset, int from)
 	{
 		switch (from)
 		{
-		case fioSEEK_CUR:
+		case SEEK_CUR:
 			return state->seekCur(offset);
-		case fioSEEK_SET:
+		case SEEK_SET:
 			return state->seekSet(offset);
-		case fioSEEK_END:
+		case SEEK_END:
 			return state->seekEnd(offset);
 		default:
 			return (size_t)-1;

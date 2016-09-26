@@ -319,13 +319,13 @@ namespace Fiod
 			char* newPtr = nullptr;
 			switch ( from )
 			{
-			case fioSEEK_SET:
+			case SEEK_SET:
 				newPtr = basePtr + offset;
 			break;
-			case fioSEEK_CUR:
+			case SEEK_CUR:
 				newPtr = curPtr + offset;
 			break;
-			case fioSEEK_END:
+			case SEEK_END:
 				newPtr = endPtr + offset;
 			break;
 			}

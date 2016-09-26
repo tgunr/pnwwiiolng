@@ -171,8 +171,8 @@ SINT32		t1, t2, t3, t4, t5;
  	Write_Debug ("\t\t\t\tOpen: %10d", t2-t1);
 #endif
 
-	length = fioSeek(stream, 0, fioSEEK_END) - sizeof(piBITMAPFILEHEADER);
-	fioSeek(stream, 0, fioSEEK_SET);
+	length = fioSeek(stream, 0, SEEK_END) - sizeof(piBITMAPFILEHEADER);
+	fioSeek(stream, 0, SEEK_SET);
 	if (sizeof(piBITMAPFILEHEADER) != fioRead(stream, &bfh, sizeof(piBITMAPFILEHEADER)))
 	{
 		fioClose(stream);

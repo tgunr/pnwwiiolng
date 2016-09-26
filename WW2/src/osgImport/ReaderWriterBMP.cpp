@@ -130,8 +130,8 @@ static unsigned char* bmp_load(int fd,
                                unsigned int transparentColor)
 {
     // actual file size
-    size_t actFileSize = fioSeek(fd, 0, fioSEEK_END);
-    fioSeek(fd, 0, fioSEEK_SET);
+    size_t actFileSize = fioSeek(fd, 0, SEEK_END);
+    fioSeek(fd, 0, SEEK_SET);
 
     bool swap;
 
@@ -316,12 +316,12 @@ static unsigned char* bmp_load(int fd,
         }
     }
 
-    size_t Where = fioSeek(fd, 0, fioSEEK_CUR);
+    size_t Where = fioSeek(fd, 0, SEEK_CUR);
     if (Where != bmp.imageOffset)
     {
         // this can happen because we don't fully parse v4/v5 headers
         Write_Debug("BMP streampos out-of-sync where = %d imageOffset = %d", Where, bmp.imageOffset);
-        fioSeek(fd, bmp.imageOffset, fioSEEK_SET);
+        fioSeek(fd, bmp.imageOffset, SEEK_SET);
     }
 
     /*

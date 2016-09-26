@@ -7,10 +7,6 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-#define fioSEEK_SET   SEEK_SET
-#define fioSEEK_CUR   SEEK_CUR
-#define fioSEEK_END   SEEK_END
-
 enum
 {
 	FIOD_FD_START = (1 << 16),

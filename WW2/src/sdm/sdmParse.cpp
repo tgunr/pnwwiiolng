@@ -259,7 +259,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	//get the starting position of cpf data
 	SINT32 sdmLength = _getTerrainFileLength(fd);
-	fiodSeek(fd, sdmLength + (SINT32)sizeof(TERRAINFILE), fioSEEK_SET);
+	fiodSeek(fd, sdmLength + (SINT32)sizeof(TERRAINFILE), SEEK_SET);
 
 	if ( PN_UNLIKELY(fiodRead(fd,&header,sizeof(STRT_DTL_HEADER)) != (int)sizeof(STRT_DTL_HEADER)) )
 	{
