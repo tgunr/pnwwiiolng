@@ -20,7 +20,6 @@
 #include <sys/sendfile.h>
 #endif
 
-#include <event2/event.h>
 #if platOS == OS_WIN32
 # pragma comment(lib, "event.lib")
 # pragma comment(lib, "ws2_32.lib")
@@ -81,8 +80,10 @@ _establishListenSocket(const unsigned short port_)
 	}
 
 	// Allow re-use of the socket so server down/up doesn't cause a problem.
-	evutil_make_listen_socket_reuseable(sock);
-	evutil_make_socket_closeonexec(sock);
+#if platOS != OS_WIN32 // Windows does not use the same meanings for these
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const int []){ 1 }, sizeof(int));
+    fcntl(sock, F_SETFL, fcntl(sock, F_GETFL) | O_CLOEXEC);
+#endif
 
 	// Describe our end of the socket we want:
 	//  IPv4 (AF_INET), all addresses (INADDR_ANY) and the specified port.
@@ -106,8 +107,6 @@ _establishListenSocket(const unsigned short port_)
 		OS_CLOSESOCKET(sock);
 		return listenResult;
 	}
-
-	evutil_make_listen_socket_reuseable(sock);
 
 	printf("uWebServer socket:%u listening on port %u\n", sock, port_);
 

@@ -11,7 +11,6 @@
 
 #include <fcntl.h>
 #include <signal.h>
-#include <event2/event.h>
 
 #include "mem/mem.h"
 #include "teul/teulBasic.h"
@@ -310,8 +309,9 @@ static const size_t UdpSndBufSize = 64 * 1024;
 static void
 _configureEndpointSocket(ENDPOINT& endpoint)
 {
-	evutil_make_socket_nonblocking(endpoint.socket);
-	evutil_make_socket_closeonexec(endpoint.socket);
+#if platOS != OS_WIN32 // Windows does not use the same meanings for these
+    fcntl(endpoint.socket, F_SETFL, fcntl(endpoint.socket, F_GETFL) | O_NONBLOCK | O_CLOEXEC);
+#endif
 
 	endpoint.setRcvBufferSize( endpoint.protocol == PROTOCOL_TCP ? TcpRcvBufSize : UdpRcvBufSize );
 	endpoint.setSndBufferSize( endpoint.protocol == PROTOCOL_TCP ? TcpSndBufSize : UdpSndBufSize );
@@ -322,10 +322,13 @@ _configureEndpointSocket(ENDPOINT& endpoint)
 		endpoint.setNagleEnabled(false);
 
 		// Listening sockets need to re-allow use of the address on close.
-		if ( endpoint.state() == IS_LISTENING )
-			evutil_make_listen_socket_reuseable(endpoint.socket);
+		if ( endpoint.state() == IS_LISTENING ) {
+#if platOS != OS_WIN32 // Windows does not use the same meaning for this
+            setsockopt(endpoint.socket, SOL_SOCKET, SO_REUSEADDR, (const int []){ 1 }, sizeof(int));
+#endif
+        }
 #if platOS == OS_MACOS
-        setsockopt(endpoint.socket, SOL_SOCKET, SO_NOSIGPIPE, (const int[]){ 1 }, sizeof(int));
+        setsockopt(endpoint.socket, SOL_SOCKET, SO_NOSIGPIPE, (const int []){ 1 }, sizeof(int));
 #endif
 	}
 	else if ( endpoint.protocol == PROTOCOL_UDB )
