@@ -15,6 +15,8 @@ namespace Teul
 		class Server : public PNThread
 		{
 		public:
+			typedef void (*VirtualFileHandler)(SOCKET /*fd*/, const char* /*path*/, const char* /*args*/);
+
 			Server()
 				: PNThread()
 				, m_rootPath("")
@@ -25,7 +27,6 @@ namespace Teul
 				{
 				}
 
-		public:
 			void start(const char* const rootPath_, const unsigned short port_)
 			{
 				ABORT_IF(isStarted());
@@ -33,25 +34,9 @@ namespace Teul
 				m_port = port_;
 				PNThread::start();
 			}
-
-		private:
-			std::string m_rootPath;
-		private:
-			unsigned short m_port;
-		private:
-			std::mutex m_config_mutex;
-		private:
-			std::atomic<SOCKET> m_listenSock;
-
-		public:
 			const std::string& rootPath() const { return m_rootPath; }
-		public:
 			unsigned short port() const { return m_port; }
-
-		public:
 			virtual void run() override;
-
-		public:
 			virtual void onCancel() override
 			{
 				// If we aren't the ones cancelling the thread, do nothing.
@@ -63,18 +48,19 @@ namespace Teul
 					OS_CLOSESOCKET(socket);
 				std::this_thread::yield();
 			}
-		public:
-			typedef void (*VirtualFileHandler)(SOCKET /*fd*/, const char* /*path*/, const char* /*args*/);
-		private:
-			typedef std::unordered_map< std::string, std::pair<VirtualFileHandler /*handler*/, std::string /*description*/> > VirtualFileHandlers;
-			VirtualFileHandlers m_virtualFileHandlers;
-		private:
-			std::string m_resourceList;
-
-		public:
 			void addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_);
 
-		private:
+
+        private:
+			typedef std::unordered_map< std::string, std::pair<VirtualFileHandler /*handler*/, std::string /*description*/> > VirtualFileHandlers;
+
+			std::string m_rootPath;
+			unsigned short m_port;
+			std::mutex m_config_mutex;
+			std::atomic<SOCKET> m_listenSock;
+			VirtualFileHandlers m_virtualFileHandlers;
+			std::string m_resourceList;
+
 			void processHTTPRequest(const SOCKET fd, char* const request);
 		};
 
