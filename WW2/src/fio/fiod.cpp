@@ -956,7 +956,7 @@ const char sep = '/';
 #endif
 
 
-#if platOS == OS_MACOS
+#if platOS == OS_MACOS && platBuild == BUILD_CLIENT
 
 size_t fiocfgRead(int fd, void* dptr, size_t length)
 {
