@@ -205,45 +205,42 @@ LOGICAL fpTPSLoad (void)
 	}
 
 	// weapon blends
-	if(true)
-	{
-		for (i=0; i < TPS_POSETYPE_NUM_TYPES; i++)
-		{
-			for (j=0; j < TPS_MOVETYPE_NUM_TYPES; j++)
-			{
-				for (k=0; k < NUM_WEAPONS; k++)
-				{
-					for (l=0; l < TPS_POINTTYPE_NUM_TYPES; l++)
-					{
-						bool exists = false;
-						bool added	= false;
+    for (i=0; i < TPS_POSETYPE_NUM_TYPES; i++)
+    {
+        for (j=0; j < TPS_MOVETYPE_NUM_TYPES; j++)
+        {
+            for (k=0; k < NUM_WEAPONS; k++)
+            {
+                for (l=0; l < TPS_POINTTYPE_NUM_TYPES; l++)
+                {
+                    bool exists = false;
+                    bool added	= false;
 
-						const char* key = fpTPSCreateBlendKey(i, j, k, l, TPS_BLENDTYPE_FPS, &exists);
+                    const char* key = fpTPSCreateBlendKey(i, j, k, l, TPS_BLENDTYPE_FPS, &exists);
 
-						if(exists)
-						{
-							UINT64 blendID = fpTPSCreateBlendID(i, j, k, l, TPS_BLENDTYPE_FPS);
+                    if(exists)
+                    {
+                        UINT64 blendID = fpTPSCreateBlendID(i, j, k, l, TPS_BLENDTYPE_FPS);
 
-							foundBlend = _fpTPSAnimLib.find(blendID);
+                        foundBlend = _fpTPSAnimLib.find(blendID);
 
-							if(foundBlend == _fpTPSAnimLib.end())
-							{
-								_fpTPSAnimLib[blendID] = gr2LoadBlendedAnimation((SCHAR*)key, boneCount);
-								added = true;
-							}
-						}
+                        if(foundBlend == _fpTPSAnimLib.end())
+                        {
+                            _fpTPSAnimLib[blendID] = gr2LoadBlendedAnimation((SCHAR*)key, boneCount);
+                            added = true;
+                        }
+                    }
 
-						if(added)
-							usedBlends++;
-						else
-							unusedBlends++;
-					}
-				}
-			}
+                    if(added)
+                        usedBlends++;
+                    else
+                        unusedBlends++;
+                }
+            }
+        }
 
-			rnUpdateLoadingScreen();
-		}
-	}
+        rnUpdateLoadingScreen();
+    }
 
 	// mixins
 	for (i=0; i < TPS_POSETYPE_NUM_TYPES; i++)
