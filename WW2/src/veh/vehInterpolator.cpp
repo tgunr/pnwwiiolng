@@ -19,6 +19,192 @@ InterpolatorBase::InterpolatorBase(vehVehicle* v) :
 {
 }
 
+//==============================================================================
+
+InfantryPredictor::InfantryPredictor(vehVehicle* v)
+: InterpolatorBase(v) {
+	prev_msg.frametime = curr_msg.frametime = -1;
+}
+
+//------------------------------------------------------------------------------
+
+void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametime) {
+	prev_msg = curr_msg;
+
+	curr_msg.timestamp = timestamp;
+	curr_msg.frametime = frametime;
+	curr_msg.pos = _vehicle->PosData.Pos;
+	curr_msg.vel = _vehicle->PosData.Vel;
+	curr_msg.vel.x = -_vehicle->PosData.Vel.x;        // Weird math stuff is due to some
+	curr_msg.dir.x = -sin(_vehicle->PosData.Att.Yaw); // sort of hack in how infantry
+	curr_msg.dir.y = -cos(_vehicle->PosData.Att.Yaw); // positions are handled.
+	curr_msg.dir.z = 0;
+	curr_msg.speed = mathExactVectorLength(&curr_msg.vel);
+
+	// Our prediction is always based on the latest information.
+	pred_pos = curr_msg;
+
+	if ( prev_msg.frametime == -1 ) {
+		// This is the first update we've received
+		pred_pos = real_pos = prev_msg = curr_msg;
+	} else if ( curr_msg.timestamp < prev_msg.timestamp ) {
+		// Because the timestamp is sent over the network as,
+		// a uint16, it will rollover every ~65 seconds.
+		typedef decltype(SHARED_VEHICLE_INFO::posTimeStamp) RolloverType;
+		prev_msg.timestamp -= std::numeric_limits<RolloverType>::max();
+		real_pos.timestamp -= std::numeric_limits<RolloverType>::max();
+	}
+
+	// Correct the timestamp if our earlier messages were lagging behind.
+	if ( curr_msg.timestamp < real_pos.timestamp )
+		real_pos.timestamp = curr_msg.timestamp;
+
+	UpdateInterpolation();
+}
+
+//------------------------------------------------------------------------------
+
+const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frametime) {
+	if ( frametime == real_pos.frametime )
+		return real_pos;
+	FrameTime frames = (frametime - real_pos.frametime);
+
+	// Update our predicted position.
+	{
+		double dt = (frametime - pred_pos.frametime) / 1000.0;
+		pred_pos.pos += pred_pos.vel * dt;
+
+		// TODO: Collision.
+
+		pred_pos.frametime = frametime;
+		pred_pos.timestamp += frames;
+	}
+
+	// Update the real position.
+	if ( frametime < interp_end ) {
+		// TODO: This is still mostly from the old interpolator and could use some cleanup.
+		double t = (double)(frametime - interp_end) / (double)(interp_end - interp_beg);
+		assert ( 0.0 <= t && t <= 1.0 );
+		if ( t < 0.0 ) t = 0.0;
+		if ( t > 1.0 ) t = 1.0;
+
+		real_pos.pos = spline.InterpolatePoint(t);
+
+		FLOAT64VECTOR vel = spline.InterpolateDt(t);
+		mathScaleVector(&vel, &vel, 1000.0/(interp_end - interp_beg));
+		FLOAT64VECTOR dir = vel;
+		mathNormalize(&dir);
+
+		double speed = mathExactVectorLength2(&vel);
+		if ( speed <= 0.5 * 0.5 )
+			dir = pred_pos.dir;
+		real_pos.vel = vel;
+		real_pos.dir = dir;
+
+		FLOAT64VECTOR delta;
+		mathSubVectors(&delta, &prev_msg.pos, &curr_msg.pos);
+		if ( mathExactVectorLength2(&delta) < .01 ) { // Just rotation
+			real_pos.dir = pred_pos.dir;
+			real_pos.vel.x = real_pos.vel.y = real_pos.vel.z = 0;
+		} else if ( mathVectDotProduct(&curr_msg.dir, &curr_msg.vel) < .42 ) { // HACK: Strafing
+			real_pos.dir = pred_pos.dir;
+		}
+
+		real_pos.speed = mathExactVectorLength(&real_pos.vel);
+	} else
+		real_pos = pred_pos;
+
+	// TODO: Collision.
+	// TODO: Gravity.
+
+	// Override motion flags to match what the player's seeing.
+	gr2AnimBitPacker flags(curr_msg.animationFlags);
+	if ( flags.movement <= TPS_MOVETYPE_IDLE && real_pos.speed >= .1 ) {
+		if ( flags.pose == TPS_POSETYPE_STAND ) {
+			if ( real_pos.speed > 6.0 ) // TODO: Match this with an actual constant.
+				flags.movement = TPS_MOVETYPE_SPRINT;
+			else if ( real_pos.speed = 0.1 )
+				flags.movement = TPS_MOVETYPE_FORWARD;
+			else
+				flags.movement = TPS_MOVETYPE_STILL;
+		}
+	}
+
+	real_pos.animationFlags = flags.pack();
+
+
+	real_pos.frametime = frametime;
+	real_pos.timestamp += frames;
+
+	return real_pos;
+}
+
+//------------------------------------------------------------------------------
+
+void InfantryPredictor::Copy(vehVehicle* v, UINT32 flags) {
+	InfantryPredictor* from = dynamic_cast<InfantryPredictor*>(&v->interpolator);
+
+	if ( ! from )
+		return;
+
+	prev_msg = from->prev_msg;
+	curr_msg = from->curr_msg;
+	pred_pos = from->pred_pos;
+	real_pos = from->real_pos;
+
+	prev_msg.animationFlags = curr_msg.animationFlags =
+	pred_pos.animationFlags = real_pos.animationFlags = flags;
+
+	prev_msg.pos = curr_msg.pos =
+	pred_pos.pos = real_pos.pos = v->PosData.Pos;
+
+	FLOAT64VECTOR dir = { -sin(v->PosData.Att.Yaw), -cos(v->PosData.Att.Yaw), 0.0 };
+	prev_msg.dir = curr_msg.dir =
+	pred_pos.dir = real_pos.dir = dir;
+
+	_vehicle->GetAnim()->twist.predictedYaw = v->GetAnim()->twist.predictedYaw;
+}
+
+//------------------------------------------------------------------------------
+
+void InfantryPredictor::UpdateInterpolation(void) {
+	// If the messages are more than this many frames off,
+	// consider just skipping interpolation entirely.
+	const FrameTime interp_cutoff = 500;
+	if ( curr_msg.timestamp - prev_msg.timestamp > interp_cutoff ) {
+		// TODO: Consider still interpolating if the positions aren't too far off.
+		real_pos = pred_pos;
+		return;
+	}
+
+	// Make the real and predicted positions match in this many frames:
+	const FrameTime interp_time = 200;
+
+	const Update& from = real_pos;
+	Update to = curr_msg;
+	// We're smoothing from the on-client position, so adjust the time accordingly.
+	to.pos += to.dir * ((interp_time - (to.frametime - from.frametime)) / 1000.0);
+
+	const double dt = interp_time / 1000.0;
+	FLOAT64VECTOR v1, v2;
+	if ( mathExactVectorLength2(&from.vel) > .001) {
+		mathScaleVector(&v1, &from.vel, dt);
+	} else {
+		mathScaleVector(&v1, &from.dir, .001);
+	}
+	if(mathExactVectorLength2(&to.vel) > .001) {
+		mathScaleVector(&v2, &to.vel, dt);
+	} else {
+		mathScaleVector(&v2, &to.dir, .001);
+	}
+
+	spline.SetControlPointsWithDt(from.pos, v1, to.pos, v2);
+
+	interp_beg = from.frametime;
+	interp_end = interp_beg + interp_time;
+}
+
+//==============================================================================
 
 InfantryInterpolator::InfantryInterpolator(vehVehicle* v) : InterpolatorBase(v),
 	_dead(false),
