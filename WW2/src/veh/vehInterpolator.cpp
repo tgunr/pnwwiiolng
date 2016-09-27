@@ -144,7 +144,7 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 		if ( flags.pose == TPS_POSETYPE_STAND ) {
 			if ( real_pos.speed > 6.0 ) // TODO: Match this with an actual constant.
 				flags.movement = TPS_MOVETYPE_SPRINT;
-			else if ( real_pos.speed = 0.1 )
+			else if ( real_pos.speed > 0.1 )
 				flags.movement = TPS_MOVETYPE_FORWARD;
 			else
 				flags.movement = TPS_MOVETYPE_STILL;
