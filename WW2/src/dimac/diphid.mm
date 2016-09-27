@@ -613,7 +613,10 @@ static void realDipSendCocoaKeyboardMouseEvents()
 
         if (cursorHidden && ((mousex < 100 || mousex > (ddpGetWidth() - 100)) || (mousey < 100 || mousey > (ddpGetHeight() - 100))))
         {
-            CGPoint c = { static_cast<CGFloat>(ddpGetWidth() / 2), static_cast<CGFloat>(ddpGetHeight() / 2) };
+            
+            CGPoint c = {
+                static_cast<CGFloat>(ddpGetCenterX()),
+                static_cast<CGFloat>(ddpGetCenterY()) };
             
             CGAssociateMouseAndMouseCursorPosition(false);
             /* Why is this here? We aren't posting a synthetic event, that's in
@@ -629,8 +632,8 @@ static void realDipSendCocoaKeyboardMouseEvents()
             //);
             CGWarpMouseCursorPosition(c);
             CGAssociateMouseAndMouseCursorPosition(true); 
-            lastmousex = ddpGetWidth() / 2;
-            lastmousey = ddpGetHeight() / 2;
+            lastmousex = static_cast<int>(c.x);
+            lastmousey = static_cast<int>(c.y);
         }
         else
         {

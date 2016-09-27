@@ -26,6 +26,8 @@ void	ddpResetFPS();
 void	ddpCapture();
 int		ddpGetWidth();
 int		ddpGetHeight();
+int     ddpGetCenterX();
+int     ddpGetCenterY();
 UINT32	ddpGetClockTime(UINT32 * Time);
 UINT32	ddpGetTotTime(UINT32 * TotTime);
 
