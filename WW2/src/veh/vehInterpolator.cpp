@@ -8,6 +8,25 @@
 #include "math/mathvect.h"
 #include "fp/fpTPSdata.h"
 
+bool DualInterpolator::use_new = false;
+
+void DualInterpolator::Copy(vehVehicle* v, UINT32 flags) {
+	DualInterpolator* other = dynamic_cast<DualInterpolator*>(&v->interpolator);
+	if ( ! other ) return;
+	_new.CopyImpl(v, &other->_new, flags);
+	_old.CopyImpl(v, &other->_old, flags);
+}
+
+namespace {
+	// Copies position-related data.
+	void CopyPositionData(DualInterpolator::Update& lhs, const DualInterpolator::Update& rhs) {
+		lhs.pos = rhs.pos;
+		lhs.dir = rhs.dir;
+		lhs.vel = rhs.vel;
+		lhs.speed = rhs.speed;
+	}
+}
+
 /************************************************************************************************
 	vehInterpolator
 *************************************************************************************************/
@@ -43,7 +62,7 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 	curr_msg.animationFlags = _vehicle->PosData.animationFlags;
 
 	// Our prediction is always based on the latest information.
-	pred_pos = curr_msg;
+	CopyPositionData(pred_pos, curr_msg);
 
 	if ( prev_msg.frametime == -1 ) {
 		// This is the first update we've received
@@ -70,10 +89,9 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 	if ( frametime == real_pos.frametime )
 		return real_pos;
 
-	// Update our predicted position.
+	// Update our predicted position before doing anything else.
 	{
-		double dt = (frametime - pred_pos.frametime) / 1000.0;
-		pred_pos.pos += pred_pos.vel * dt;
+		pred_pos.pos += pred_pos.vel * ((frametime - pred_pos.frametime) / 1000.0);
 
 		// TODO: Collision.
 
@@ -82,9 +100,9 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 	}
 
 	// Update the real position.
-	if ( false ){//frametime < interp_end ) {
-		// TODO: This is still mostly from the old interpolator and could use some cleanup.
-		double t = (double)(frametime - interp_end) / (double)(interp_end - interp_beg);
+	// TODO: A lot of this is still mostly from the old interpolator and could use some cleanup.
+	if ( frametime < interp_end ) {
+		double t = (double)(frametime - interp_beg) / (double)(interp_end - interp_beg);
 		assert ( 0.0 <= t && t <= 1.0 );
 		if ( t < 0.0 ) t = 0.0;
 		if ( t > 1.0 ) t = 1.0;
@@ -93,27 +111,29 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 
 		FLOAT64VECTOR vel = spline.InterpolateDt(t);
 		mathScaleVector(&vel, &vel, 1000.0/(interp_end - interp_beg));
+
 		FLOAT64VECTOR dir = vel;
 		mathNormalize(&dir);
 
 		double speed = mathExactVectorLength2(&vel);
-		if ( speed <= 0.5 * 0.5 )
-			dir = pred_pos.dir;
-		real_pos.vel = vel;
-		real_pos.dir = dir;
-
-		FLOAT64VECTOR delta;
-		mathSubVectors(&delta, &prev_msg.pos, &curr_msg.pos);
-		if ( mathExactVectorLength2(&delta) < .01 ) { // Just rotation
-			real_pos.dir = pred_pos.dir;
-			real_pos.vel.x = real_pos.vel.y = real_pos.vel.z = 0;
-		} else if ( mathVectDotProduct(&curr_msg.dir, &curr_msg.vel) < .42 ) { // HACK: Strafing
-			real_pos.dir = pred_pos.dir;
+		if ( speed < 0.1 ) { // HACK: To avoid twitchiness
+			vel = { 0.0, 0.0, 0.0 };
+			speed = 0.0;
+			dir = curr_msg.dir;
 		}
 
-		real_pos.speed = mathExactVectorLength(&real_pos.vel);
-	} else
-		real_pos = pred_pos;
+		real_pos.vel = vel;
+		real_pos.speed = speed;
+		// If the last message has us not going somewhat forward, respect that orientation.
+		// TODO: We should use a proper constant to determine what counts as strafing.
+		if ( mathVectDotProduct(&curr_msg.dir, &curr_msg.vel) < .42 )
+			real_pos.dir = curr_msg.dir;
+		else
+			real_pos.dir = dir;
+	} else {
+		// When we're done with interpolation, keep following the prediction.
+		CopyPositionData(real_pos, pred_pos);
+	}
 
 	// TODO: Collision.
 	// TODO: Gravity.
@@ -140,9 +160,7 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 				flags.point = TPS_POINTTYPE_RELAXED;
 		}
 	}
-
 	real_pos.animationFlags = flags.pack();
-
 
 	real_pos.frametime = frametime;
 	real_pos.timestamp += (frametime - real_pos.frametime);
@@ -158,6 +176,10 @@ void InfantryPredictor::Copy(vehVehicle* v, UINT32 flags) {
 	if ( ! from )
 		return;
 
+	CopyImpl(v, from, flags);
+}
+
+void InfantryPredictor::CopyImpl(vehVehicle* v, InfantryPredictor* from, UINT32 flags) {
 	prev_msg = from->prev_msg;
 	curr_msg = from->curr_msg;
 	pred_pos = from->pred_pos;
@@ -179,14 +201,7 @@ void InfantryPredictor::Copy(vehVehicle* v, UINT32 flags) {
 //------------------------------------------------------------------------------
 
 void InfantryPredictor::UpdateInterpolation(void) {
-	// If the messages are more than this many frames off,
-	// consider just skipping interpolation entirely.
-	const FrameTime interp_cutoff = 500;
-	if ( curr_msg.timestamp - prev_msg.timestamp > interp_cutoff ) {
-		// TODO: Consider still interpolating if the positions aren't too far off.
-		real_pos = pred_pos;
-		return;
-	}
+	// TODO: Consider skipping interpolation if extreme lag is going on.
 
 	// Make the real and predicted positions match in this many frames:
 	const FrameTime interp_time = 200;
@@ -194,7 +209,7 @@ void InfantryPredictor::UpdateInterpolation(void) {
 	const Update& from = real_pos;
 	Update to = curr_msg;
 	// We're smoothing from the on-client position, so adjust the time accordingly.
-	to.pos += to.dir * ((interp_time - (to.frametime - from.frametime)) / 1000.0);
+	to.pos += to.vel * ((interp_time - (to.frametime - from.frametime)) / 1000.0);
 
 	const double dt = interp_time / 1000.0;
 	FLOAT64VECTOR v1, v2;
@@ -333,6 +348,8 @@ void InfantryInterpolator::UpdateSpline(FLOAT64VECTOR const& frompos, FLOAT64VEC
 
 InterpolatorBase::Update const& InfantryInterpolator::Interpolate(int frametime)
 {
+	return _to;
+
 	if(_from.frametime == 0 || _to.frametime == 0) return _cur; // _dead
 	if(_interpolatetime == frametime) return _cur;
 
@@ -450,17 +467,20 @@ InterpolatorBase::Update const& InfantryInterpolator::Interpolate(int frametime)
 	return _cur;
 }
 
-void InfantryInterpolator::Copy(vehVehicle* v, UINT32 flags)
-{
-	InfantryInterpolator* from	= dynamic_cast<InfantryInterpolator*>(&v->interpolator);
+void InfantryInterpolator::Copy(vehVehicle* v, UINT32 flags) {
+	InfantryInterpolator* from = dynamic_cast<InfantryInterpolator*>(&v->interpolator);
 
-	if(!from) return;
+	if ( ! from ) return;
 
+	CopyImpl(v, from, flags);
+}
+
+void InfantryInterpolator::CopyImpl(vehVehicle* v, InfantryInterpolator* from, UINT32 flags) {
 	_from					= from->GetFrom();
 	_cur					= from->GetCur();
 	_to						= from->GetTo();
 	_next					= from->GetNext();
-	_lastUpdateYaw			= v->PosData.Att.Yaw;
+	//_lastUpdateYaw			= v->PosData.Att.Yaw;
 
 	_from.animationFlags	= flags;
 	_cur.animationFlags		= flags;

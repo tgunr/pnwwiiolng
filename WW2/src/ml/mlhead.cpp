@@ -457,6 +457,10 @@ UINT32 mlGetHeadPos(FLOAT64VECTOR* Displacement, FLOAT64ATT* AttChange,
 	mlToggleMouseLookadPos
 *************************************************************************************************/
 
+// HACK/DEBUGGING
+#include <veh/vehInterpolator.h>
+#include <ui/uiChat.h>
+
 UINT32 mlToggleMouseLook(SINT32 keyState, UINT32 functionNum, UINT32 unused)
 {
 	if(keyState)
@@ -464,6 +468,12 @@ UINT32 mlToggleMouseLook(SINT32 keyState, UINT32 functionNum, UINT32 unused)
 		_mouseLook = !_mouseLook;
 		mlCenterMouseLook();
 		TUT_MGR->DoEvent(TUT_EVENT_INPUT, &functionNum, &keyState);
+
+		// Only toggle when turning off.
+		if ( !_mouseLook ) {
+			DualInterpolator::use_new = !DualInterpolator::use_new;
+			uiChatPrintLine("Using %s interpolator", DualInterpolator::use_new ? "new" : "old");
+		}
 	}
 
 	return 0;
