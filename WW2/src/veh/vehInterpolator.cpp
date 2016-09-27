@@ -37,9 +37,10 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 	curr_msg.vel = _vehicle->PosData.Vel;
 	curr_msg.vel.x = -_vehicle->PosData.Vel.x;        // Weird math stuff is due to some
 	curr_msg.dir.x = -sin(_vehicle->PosData.Att.Yaw); // sort of hack in how infantry
-	curr_msg.dir.y = -cos(_vehicle->PosData.Att.Yaw); // positions are handled.
+	curr_msg.dir.y = -cos(_vehicle->PosData.Att.Yaw); // position/direction is handled.
 	curr_msg.dir.z = 0;
 	curr_msg.speed = mathExactVectorLength(&curr_msg.vel);
+	curr_msg.animationFlags = _vehicle->PosData.animationFlags;
 
 	// Our prediction is always based on the latest information.
 	pred_pos = curr_msg;
@@ -47,6 +48,7 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 	if ( prev_msg.frametime == -1 ) {
 		// This is the first update we've received
 		pred_pos = real_pos = prev_msg = curr_msg;
+		real_pos.frametime = -1; // HACK: To guarantee Interpolate() is called on our first update.
 	} else if ( curr_msg.timestamp < prev_msg.timestamp ) {
 		// Because the timestamp is sent over the network as,
 		// a uint16, it will rollover every ~65 seconds.
@@ -67,7 +69,6 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 	if ( frametime == real_pos.frametime )
 		return real_pos;
-	FrameTime frames = (frametime - real_pos.frametime);
 
 	// Update our predicted position.
 	{
@@ -77,11 +78,11 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 		// TODO: Collision.
 
 		pred_pos.frametime = frametime;
-		pred_pos.timestamp += frames;
+		pred_pos.timestamp += (frametime - pred_pos.frametime);
 	}
 
 	// Update the real position.
-	if ( frametime < interp_end ) {
+	if ( false ){//frametime < interp_end ) {
 		// TODO: This is still mostly from the old interpolator and could use some cleanup.
 		double t = (double)(frametime - interp_end) / (double)(interp_end - interp_beg);
 		assert ( 0.0 <= t && t <= 1.0 );
@@ -128,13 +129,23 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 			else
 				flags.movement = TPS_MOVETYPE_STILL;
 		}
+		if ( flags.pose == TPS_POSETYPE_PRONE && real_pos.speed >= 1.0f ) {
+			// Don't allow fast crawling
+			flags.pose = TPS_POSETYPE_CROUCH;
+			flags.movement = TPS_MOVETYPE_FORWARD;
+		} else {
+			flags.movement = TPS_MOVETYPE_FORWARD;
+
+			if ( flags.pose == TPS_POSETYPE_PRONE )
+				flags.point = TPS_POINTTYPE_RELAXED;
+		}
 	}
 
 	real_pos.animationFlags = flags.pack();
 
 
 	real_pos.frametime = frametime;
-	real_pos.timestamp += frames;
+	real_pos.timestamp += (frametime - real_pos.frametime);
 
 	return real_pos;
 }
