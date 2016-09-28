@@ -57,7 +57,10 @@ struct PlayerPlacedObject
 	PPOCallback validityCallback;
 };
 
+extern void fpPPOInitiateBuildAction(UINT32 & state, UINT32 & control, SINT32 & stance);
+
 extern PlayerPlacedObject* fpPPOCreate(int type, bool save = true);
+extern void fpPPOSwitchPPO(bool adjust);
 extern bool fpPPOReady(int type);
 extern PPOSpec* fpPPOGetSpec(int type);
 extern void fpPPOSetSpec(int type);
@@ -67,7 +70,7 @@ extern void fpPPOResetMaterial();
 extern void fpPPOSet(PlayerPlacedObject* to);
 extern PlayerPlacedObject* fpPPOGet();
 extern bool fpPPOUpdate();
-extern void fpPPOKill();
-extern void fpPPOCancel();
+extern void fpPPOKill(bool release = true);
+extern void fpPPOCancel(bool release = true);
 extern void fpPPOAlert(const char* key, ...);
 extern void fpPPOAlert(const wchar_t* message = nullptr);

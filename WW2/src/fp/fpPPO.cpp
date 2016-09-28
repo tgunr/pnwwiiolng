@@ -855,7 +855,7 @@ bool PlayerPlacedObject::Update()
 
 		UpdateColliders();
 
-		if(CalculatePlacement(pos, att))
+		if(CalculatePlacement(pos, att) && obj != nullptr)
 			ogrpMoveAndRotateObjectGroup(obj, &pos, &att);
 
 		if(frametime <= spec->coolDownEnd)
@@ -1033,8 +1033,42 @@ bool PlayerPlacedObject::Modified()
 	return false;
 }
 
+void fpPPOInitiateBuildAction(UINT32 & state, UINT32 & control, SINT32 & stance)
+{
+    PlayerPlacedObject* ppo = fpPPOGet();
+    
+    if(ppo)
+    {
+        Write_Log (LOG_FPS, LOG_INFO, "Building ppo!");
+        
+        if(ppo->Build())
+        {
+            state &= static_cast<UINT32>(~STATE_HOLD_FIRE);
+            control &= static_cast<UINT32>(~FPS_FIRE);
+            
+            stance = fpFPSGetPlayerPose();
+            
+            if(stance != POSE_CROUCH)
+            {
+                control |= static_cast<UINT32>(FPS_CROUCH);
+                control &= static_cast<UINT32>(~FPS_PRONE);
+            }
+            
+            if(stance == POSE_TRANSITION)
+                stance = POSE_CROUCH;
+        }
+    }
+    
+    //fpsTrooper.firedWeapon = 1;
+
+}
+
 void fpPPOSet(PlayerPlacedObject* to)
 {
+    // do nothing if already set
+    if (to != nullptr && to == _placedObject)
+        return;
+    
 	if(_placedObject)
 		delete _placedObject;
 
@@ -1057,7 +1091,7 @@ void fpPPOSwitchPPO(bool adjust)
 	{
 		
 		if (_placedObject)
-			fpPPOKill();
+			fpPPOKill(false);
 
 		if (adjust)
 		{
@@ -1132,18 +1166,19 @@ bool fpPPOUpdate()
 	return false;
 }
 
-void fpPPOKill()
+void fpPPOKill(bool release)
 {
-	fpPPOCancel();
+	fpPPOCancel(release);
 	fpPPOSet(nullptr);
 }
 
-void fpPPOCancel()
+void fpPPOCancel(bool release)
 {
 	if(_placedObject)
 	{
 		_placedObject->Interrupt();
-		fpFPSCancelPPO();
+        if (release)
+            fpFPSCancelPPO();
 	}
 }
 

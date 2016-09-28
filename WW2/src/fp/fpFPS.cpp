@@ -6946,7 +6946,11 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 			}
 			break;
 		case IMAP_HOLD_FP_DEPLOY:
-			if (param && mobile && !CBLOCK(CB_DEPLOY) && fpsTrooper.wading <= MAX_WADING_PRONE)
+            if (currentWeaponModel == BUILD_TOOL)
+            {
+                fpPPOInitiateBuildAction(stateFlags, controlStateFlags, _ppoLastStance);
+            }
+			else if (param && mobile && !CBLOCK(CB_DEPLOY) && fpsTrooper.wading <= MAX_WADING_PRONE)
 			{
 				if(deployOK == -1)
 					deployOK = (fpsCheckDeploy()) ? 1 : 0;
@@ -6956,6 +6960,7 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 					controlStateFlags &= ~FPS_AUTORUN;
 					fpFPSDeployChange();
 				}
+                
 			}
 			break;
 		case IMAP_HOLD_FP_FORWARD:
@@ -8761,31 +8766,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 #endif
 		if (currentWeaponModel == BUILD_TOOL)
 		{
-			PlayerPlacedObject* ppo = fpPPOGet();
-
-			if(ppo)
-			{
-				Write_Log (LOG_FPS, LOG_INFO, "Building ppo!");
-
-				if(ppo->Build())
-				{
-					stateFlags &= ~STATE_HOLD_FIRE;
-					controlStateFlags &= ~FPS_FIRE;
-
-					_ppoLastStance = fpFPSGetPlayerPose();
-
-					if(_ppoLastStance != POSE_CROUCH)
-					{
-						controlStateFlags |= FPS_CROUCH;
-						controlStateFlags &= ~FPS_PRONE;
-					}
-
-					if(_ppoLastStance == POSE_TRANSITION)
-						_ppoLastStance = POSE_CROUCH;
-				}
-			}
-
-			//fpsTrooper.firedWeapon = 1;
+            fpPPOSwitchPPO(true);
 		}
 		else if ((currentWeaponModel == AMMO) && (!resupplyTarget))
 		{

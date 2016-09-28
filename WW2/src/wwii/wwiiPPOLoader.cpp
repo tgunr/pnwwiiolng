@@ -19,7 +19,7 @@
 #define strlcpy strncpy
 #endif
 
-PPOSpecLoader::PPOSpecLoader() : XMLLoader2<PPOSpecLoader>(PPO_SPEC)
+PPOSpecLoader::PPOSpecLoader() : XMLLoader2<PPOSpecLoader>()
 {
 	AddHandler("defaults", &PPOSpecLoader::DoDefaults, this);
 	AddHandler("ppo", &PPOSpecLoader::DoPPO, this);
@@ -29,6 +29,8 @@ PPOSpecLoader::PPOSpecLoader() : XMLLoader2<PPOSpecLoader>(PPO_SPEC)
 void PPOSpecLoader::loadSpecMap()
 {
 	_ppoSpecMap.clear();
+	SetPath(PPO_SPEC);
+	fioXmlRegisterInputCallbacks();
 	Load();
 }
 
@@ -288,8 +290,9 @@ bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, in
 	for (size_t i=0; i < tlist.size(); i++)
 	{
 		// String in format Nc/Nt  (Class/Type)
-		char *tempClassName = new char[tlist[i].size()+1];
-		strlcpy(tempClassName, tlist[i].c_str(), tlist[i].size());
+		size_t nmSize = tlist[i].size()+1;
+		char *tempClassName = new char[nmSize];
+		strlcpy(tempClassName, tlist[i].c_str(), nmSize);
 		
 		char *pClass = strtok(tempClassName, "/");
 		char *pType = strtok( nullptr, "/" );
