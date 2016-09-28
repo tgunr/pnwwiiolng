@@ -60,22 +60,25 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 
 	// Our prediction is always based on the latest information.
 	CopyPositionData(pred_pos, curr_msg);
+	pred_pos.animationFlags = curr_msg.animationFlags;
 
 	if ( prev_msg.frametime == -1 ) {
 		// This is the first update we've received
 		pred_pos = real_pos = prev_msg = curr_msg;
 		real_pos.frametime = -1; // HACK: To guarantee Interpolate() is called on our first update.
 	} else if ( curr_msg.timestamp < prev_msg.timestamp ) {
-		// Because the timestamp is sent over the network as,
+		// Because the timestamp is sent over the network as
 		// a uint16, it will rollover every ~65 seconds.
 		typedef decltype(SHARED_VEHICLE_INFO::posTimeStamp) RolloverType;
 		prev_msg.timestamp -= std::numeric_limits<RolloverType>::max();
 		real_pos.timestamp -= std::numeric_limits<RolloverType>::max();
 	}
 
-	// Correct the timestamp if our earlier messages were lagging behind.
+	// Correct the timestamps if our earlier messages were lagging behind.
 	if ( curr_msg.timestamp < real_pos.timestamp )
 		real_pos.timestamp = curr_msg.timestamp;
+	if ( curr_msg.timestamp < pred_pos.timestamp )
+		pred_pos.timestamp = curr_msg.timestamp;
 
 	UpdateInterpolation();
 }
@@ -116,19 +119,19 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 		if ( speed < 0.1 ) { // HACK: To avoid twitchiness
 			vel = { 0.0, 0.0, 0.0 };
 			speed = 0.0;
-			dir = curr_msg.dir;
+			dir = pred_pos.dir;
 		}
 		// HACK: Something isn't being calculated correctly.
 		else {
-			speed = curr_msg.speed;
+			speed = pred_pos.speed;
 		}
 
 		real_pos.vel = vel;
 		real_pos.speed = speed;
 		// If the last message has us not going somewhat forward, respect that orientation.
 		// TODO: We should use a proper constant to determine what counts as strafing.
-		if ( mathVectDotProduct(&curr_msg.dir, &curr_msg.vel) < .42 )
-			real_pos.dir = curr_msg.dir;
+		if ( mathVectDotProduct(&pred_pos.dir, &pred_pos.vel) < .42 )
+			real_pos.dir = pred_pos.dir;
 		else
 			real_pos.dir = dir;
 	} else {
@@ -140,7 +143,7 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 	// TODO: Gravity.
 
 	// Override motion flags to match what the player's seeing.
-	gr2AnimBitPacker flags(curr_msg.animationFlags);
+	gr2AnimBitPacker flags(pred_pos.animationFlags);
 	if ( flags.movement <= TPS_MOVETYPE_IDLE && real_pos.speed >= .1 ) {
 		if ( flags.pose == TPS_POSETYPE_STAND ) {
 			if ( real_pos.speed > 6.0 ) // TODO: Match this with an actual constant.
@@ -163,8 +166,10 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 	}
 	real_pos.animationFlags = flags.pack();
 
-	real_pos.frametime = frametime;
-	real_pos.timestamp += (frametime - real_pos.frametime);
+	// We should now match the predicted position (although
+	// we may actually be slightly different due to smoothing).
+	real_pos.frametime = pred_pos.frametime;
+	real_pos.timestamp = pred_pos.timestamp;
 
 	return real_pos;
 }
@@ -199,10 +204,32 @@ void InfantryPredictor::Copy(vehVehicle* v, UINT32 flags) {
 void InfantryPredictor::UpdateInterpolation(void) {
 	// TODO: Consider skipping interpolation if extreme lag is going on.
 
+	// NOTE: We *should* technically check for collisions in our predicted path,
+	// but we check for collisions in the Interpolate() method already (both
+	// predicted and real). This just leaves the possibility of this position
+	// being on the opposite side of a wall, and the interpolated time is so
+	// small that that's not worth addressing unless we actually see reports of
+	// that sort of thing come in.
+
+	// If the message was sent just as they started moving, the soldier will
+	// slowly walk based on the slower speed used in the prediction, then
+	// rubber-band to the proper position once the next message is received.
+	//
+	// To help with this, we give our prediction a little boost if the
+	// difference when they suddenly accelerate.
+	const double diff_threshhold = 1.25;
+	if ( prev_msg.speed == 0.0 || curr_msg.speed / prev_msg.speed > diff_threshhold ) {
+		double new_speed = curr_msg.speed * 1.15;
+		// TODO: Cap so we don't go above sprint speed.
+		pred_pos.vel = *mathNormalize(&pred_pos.vel) * new_speed;
+		pred_pos.speed = new_speed;
+	}
+
 	const Update& from = real_pos;
-	Update to = curr_msg;
-	// We're smoothing from the on-client position, so adjust the time accordingly.
-	to.pos += to.vel * ((interp_time - (to.frametime - from.frametime)) / 1000.0);
+	Update to = pred_pos;
+	
+	double pred_time_passed = ((interp_time - (to.frametime - from.frametime)) / 1000.0);
+	to.pos += to.vel * pred_time_passed;
 
 	const double dt = interp_time / 1000.0;
 	FLOAT64VECTOR v1, v2;
