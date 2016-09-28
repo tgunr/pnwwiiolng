@@ -63,7 +63,6 @@ public:
 	void SetFlags(UINT32 flags_) override { real_pos.animationFlags = flags_; }
 
 	void Copy(vehVehicle* v, UINT32 flags) override;
-	void CopyImpl(vehVehicle* v, InfantryPredictor* from, UINT32 flags);
 private:
 	void UpdateInterpolation(void);
 
@@ -87,7 +86,6 @@ public:
 	void NewPosDataUpdate(int timestamp_, int frametime_) override;
 	Update const& Interpolate(int frametime_) override;
 	void Copy(vehVehicle* v_, UINT32 flags_) override;
-	void CopyImpl(vehVehicle* v, InfantryInterpolator* from, UINT32 flags);
 	void SetFlags(UINT32 flags_) override { _cur.animationFlags = flags_; }
 
 	bool Rollover() const { return _rollover; }
@@ -128,32 +126,5 @@ protected:
 	bool _dead;
 };
 
-//==============
-
-class DualInterpolator : public InterpolatorBase {
-public:
-	DualInterpolator(vehVehicle* v = nullptr) : InterpolatorBase(v), _new(v), _old(v) {}
-
-	void NewPosDataUpdate(int timestamp_, int frametime_) override {
-		_new.NewPosDataUpdate(timestamp_, frametime_);
-		_old.NewPosDataUpdate(timestamp_, frametime_);
-	}
-	Update const& Interpolate(int f) override {
-		const Update& unew = _new.Interpolate(f);
-		const Update& uold = _old.Interpolate(f);
-
-		if ( use_new ) return unew;
-		else return uold;
-	}
-	void Copy(vehVehicle* v, UINT32 flags) override ;
-
-	static bool use_new;
-private:
-	InfantryPredictor _new;
-	InfantryInterpolator _old;
-};
-
-//==============
-
 // type used by vehicle member variables
-typedef DualInterpolator vehInterpolator;
+typedef InfantryPredictor vehInterpolator;

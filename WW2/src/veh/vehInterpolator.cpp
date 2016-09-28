@@ -8,18 +8,9 @@
 #include "math/mathvect.h"
 #include "fp/fpTPSdata.h"
 
-bool DualInterpolator::use_new = false;
-
-void DualInterpolator::Copy(vehVehicle* v, UINT32 flags) {
-	DualInterpolator* other = dynamic_cast<DualInterpolator*>(&v->interpolator);
-	if ( ! other ) return;
-	_new.CopyImpl(v, &other->_new, flags);
-	_old.CopyImpl(v, &other->_old, flags);
-}
-
 namespace {
 	// Copies position-related data.
-	void CopyPositionData(DualInterpolator::Update& lhs, const DualInterpolator::Update& rhs) {
+	void CopyPositionData(vehInterpolator::Update& lhs, const vehInterpolator::Update& rhs) {
 		lhs.pos = rhs.pos;
 		lhs.dir = rhs.dir;
 		lhs.vel = rhs.vel;
@@ -182,14 +173,9 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 
 void InfantryPredictor::Copy(vehVehicle* v, UINT32 flags) {
 	InfantryPredictor* from = dynamic_cast<InfantryPredictor*>(&v->interpolator);
-
 	if ( ! from )
 		return;
 
-	CopyImpl(v, from, flags);
-}
-
-void InfantryPredictor::CopyImpl(vehVehicle* v, InfantryPredictor* from, UINT32 flags) {
 	prev_msg = from->prev_msg;
 	curr_msg = from->curr_msg;
 	pred_pos = from->pred_pos;
@@ -479,10 +465,6 @@ void InfantryInterpolator::Copy(vehVehicle* v, UINT32 flags) {
 
 	if ( ! from ) return;
 
-	CopyImpl(v, from, flags);
-}
-
-void InfantryInterpolator::CopyImpl(vehVehicle* v, InfantryInterpolator* from, UINT32 flags) {
 	_from					= from->GetFrom();
 	_cur					= from->GetCur();
 	_to						= from->GetTo();
