@@ -163,7 +163,7 @@ ENDMACRO()
 ADD_OMG_TARGET(omg/omgMissionSortieData)
 ADD_OMG_TARGET(omg/omgChat)
 
-IF(NOT MSVC AND NOT PN_CLUSTER STREQUAL "rPI")
+IF(NOT MSVC AND NOT PN_CLUSTER STREQUAL "rPI" AND NOT PN_CLUSTER STREQUAL "rPI3" )
     SET_TARGET_PROPERTIES(OMGgen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
 ENDIF( )
 SET_PROPERTY(TARGET OMGgen PROPERTY FOLDER "Tools")
@@ -251,6 +251,8 @@ ADD_LIBRARY(teulserver
     wwii/wwiiConfig.cpp
         wwii/wwiiConfig.h
         wwii/wwiiConfigMap.h
+    src/pnThread.cpp
+        include/pnThread.h
 
     ${PCH_INCLUDE_HEADERS}
     dbug/dbugInternal.h

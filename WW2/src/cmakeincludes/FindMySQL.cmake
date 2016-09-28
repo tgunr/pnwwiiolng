@@ -15,7 +15,7 @@ SET(MYSQL_FOUND 0)
 IF (PN_USE_SYSTEM_MYSQL)
         MESSAGE(STATUS "Using System Mysql")
 
-	IF ( PN_CLUSTER STREQUAL "rPI" )
+	IF ( PN_CLUSTER STREQUAL "rPI" OR PN_CLUSTER STREQUAL "rPI3" )
         	MESSAGE(STATUS "Looking for Mysql on rPI")
                 FIND_PATH(
                         MYSQL_INCLUDE_DIR

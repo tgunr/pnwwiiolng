@@ -13,32 +13,18 @@ public:
 	PNThread() : m_thread(), m_started(false), m_cancelled(false) {}
 	virtual ~PNThread();
 
-	void start()
-	{
-		if (!m_cancelled && !m_started.exchange(true))
-			m_thread = std::move(std::thread([this] { run(); }));
-	}
+	void start();
+
 	//! Cancel thread and return whether or not we performed cancellation.
 	//! @return true if we changed the cancellation state.
-	bool cancel()
-	{
-		bool wasCancelledBefore = m_cancelled.exchange(true);
-		if (!wasCancelledBefore)
-			onCancel();
-		return !wasCancelledBefore;
-	}
+	bool cancel();
 
 	//! behavior for handling with cancellation.
 	virtual void onCancel()
 	{
 	}
 
-	void join()
-	{
-		if (isRunning()) {
-			m_thread.join();
-		}
-	}
+	void join();
 
 	bool isStarted() const { return m_started; }
 	bool isRunning() const { return m_thread.joinable(); }

@@ -922,7 +922,7 @@ serverEnableDebugWebServer(SERVER_TYPE serverType)
 	UINT16 port = WWII::Net::Ports::DebugWebServer + static_cast<UINT16>(serverType);
 	Teul::uWeb::s_debugServer.start(cv_teulWebPath.GetString(), port);
 
-//	atexit(_killDebugWebServer);
+	atexit(_killDebugWebServer);
 }
 
 //////////////////////////////////////////////////////////////////////

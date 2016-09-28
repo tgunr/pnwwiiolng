@@ -7,9 +7,10 @@ IF ( HAVE_STD_CPP11 )
 ELSE ()
     MESSAGE(FATAL_ERROR "Compiler doesn't support -std=c++14")
 ENDIF ()
+
 SET(_LANGUAGE_FLAGS "${_LANGUAGE_FLAGS} -Winvalid-pch -Wno-array-bounds")
 
-IF ( PN_CLUSTER STREQUAL "rPI" )
+IF ( PN_CLUSTER STREQUAL "rPI" OR PN_CLUSTER STREQUAL "rPI3" )
 
 ELSE ()
 # SSE for everyone.
@@ -21,8 +22,8 @@ ENDIF ()
 SET(USE_SSE2 1)
 ENDIF ()
 
-IF ( PN_CLUSTER STREQUAL "rPI" )
-	SET(ARCHITECTURE "-march=armv6zk -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard ${ARCHITECTURE}")
+IF ( PN_CLUSTER STREQUAL "rPI3" OR PN_CLUSTER STREQUAL "rPI" )
+	SET(ARCHITECTURE "${ARCHITECTURE}")
 	MESSAGE(STATUS "rPI compiler settings chosen")
 ELSEIF ( PN_BUILD_TYPE STREQUAL "Auth" OR PN_CLUSTER STREQUAL "Auth" )
 	SET(ARCHITECTURE "-march=opteron ${ARCHITECTURE}")
@@ -146,7 +147,7 @@ ELSE ()
 ENDIF ()
 
 #IF ( PN_BUILD_32BIT )
-IF ( NOT PN_CLUSTER STREQUAL "rPI" )
+IF ( NOT PN_CLUSTER STREQUAL "rPI" AND NOT PN_CLUSTER STREQUAL "rPI3")
 	SET(CMAKE_CXX_FLAGS "-m32")
 ENDIF ()
 #ELSE ()
@@ -154,6 +155,7 @@ ENDIF ()
 #ENDIF ()
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wshadow -Wno-deprecated -pthread -fno-rtti -std=c++14")
+
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -LANG:libc_in_namespace_std=OFF -LANG:std=ON")
 set(CMAKE_CXX_FLAGS_DEBUG "-DDEBUG=1 -ggdb -DDEBUG_WW2=1") # -D_FORTIFY_SOURCE=2")
 set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG=1 -g0")

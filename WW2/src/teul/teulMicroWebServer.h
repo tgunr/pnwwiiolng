@@ -26,6 +26,8 @@ namespace Teul
 				}
 
 		public:
+			 virtual ~Server() {}
+		public:
 			void start(const char* const rootPath_, const unsigned short port_)
 			{
 				ABORT_IF(isStarted());
