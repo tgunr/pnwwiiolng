@@ -1094,7 +1094,7 @@ void fpPPOReset()
 	bool allowFrus = vtype->WeaponSpec.wClass != troop.wClass || (Online && PlayerClient()->IsMissionLeader());
 
     // make sure this class/type has ppo types available to it
-    if (specLoader.getAllowedPPOs(vtype->WeaponSpec.wClass, vtype->WeaponSpec.wType, activePPOList, allowFrus))
+    if (specLoader.getAllowedPPOs(vtype->WeaponSpec.wClass, vtype->WeaponSpec.wType, activePPOList, !allowFrus))
 	{
 		fpPPOSwitchPPO(false);
 	}	
