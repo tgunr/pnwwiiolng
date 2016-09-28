@@ -59,6 +59,7 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 	curr_msg.dir.y = -cos(_vehicle->PosData.Att.Yaw); // position/direction is handled.
 	curr_msg.dir.z = 0;
 	curr_msg.speed = mathExactVectorLength(&curr_msg.vel);
+	_lastUpdateYaw = _vehicle->PosData.Att.Yaw;
 	curr_msg.animationFlags = _vehicle->PosData.animationFlags;
 
 	// Our prediction is always based on the latest information.
