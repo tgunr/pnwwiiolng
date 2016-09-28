@@ -40,6 +40,11 @@ InterpolatorBase::InterpolatorBase(vehVehicle* v) :
 
 //==============================================================================
 
+namespace {
+	// Make the real and predicted positions match in this many frames:
+	const InfantryPredictor::FrameTime interp_time = 200;
+}
+
 InfantryPredictor::InfantryPredictor(vehVehicle* v)
 : InterpolatorBase(v) {
 	prev_msg.frametime = curr_msg.frametime = -1;
@@ -58,8 +63,8 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 	curr_msg.dir.x = -sin(_vehicle->PosData.Att.Yaw); // sort of hack in how infantry
 	curr_msg.dir.y = -cos(_vehicle->PosData.Att.Yaw); // position/direction is handled.
 	curr_msg.dir.z = 0;
-	curr_msg.speed = mathExactVectorLength(&curr_msg.vel);
 	_lastUpdateYaw = _vehicle->PosData.Att.Yaw;
+	curr_msg.speed = mathExactVectorLength(&curr_msg.vel);
 	curr_msg.animationFlags = _vehicle->PosData.animationFlags;
 
 	// Our prediction is always based on the latest information.
@@ -111,7 +116,7 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 		real_pos.pos = spline.InterpolatePoint(t);
 
 		FLOAT64VECTOR vel = spline.InterpolateDt(t);
-		mathScaleVector(&vel, &vel, 1000.0/(interp_end - interp_beg));
+		mathScaleVector(&vel, &vel, 1000.0/interp_time);
 
 		FLOAT64VECTOR dir = vel;
 		mathNormalize(&dir);
@@ -121,6 +126,10 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 			vel = { 0.0, 0.0, 0.0 };
 			speed = 0.0;
 			dir = curr_msg.dir;
+		}
+		// HACK: Something isn't being calculated correctly.
+		else {
+			speed = curr_msg.speed;
 		}
 
 		real_pos.vel = vel;
@@ -203,9 +212,6 @@ void InfantryPredictor::CopyImpl(vehVehicle* v, InfantryPredictor* from, UINT32 
 
 void InfantryPredictor::UpdateInterpolation(void) {
 	// TODO: Consider skipping interpolation if extreme lag is going on.
-
-	// Make the real and predicted positions match in this many frames:
-	const FrameTime interp_time = 200;
 
 	const Update& from = real_pos;
 	Update to = curr_msg;
