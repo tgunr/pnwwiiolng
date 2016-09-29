@@ -439,7 +439,6 @@ static ScenarioVolume* _volumeCollider = nullptr;
 static bool _candeploy(int direction);
 static void _calculateConvergenceAngle(int weaponIndex = -1); // 0 - 9
 static void _selectBestAmmo(SINT32 weaponNumber, weapWeapon* weapon);
-static void _updateFPSColliders();
 
 // weapon lag
 static void _updateWeaponLag(float deltaTime);
@@ -4915,6 +4914,19 @@ void fpFPSSetSteepness(FLOAT32 s)
 
 //#define SPAM_CHATBOX
 
+void InitColliderGeometry(void) {
+	static bool initialized = false;
+	if ( ! initialized ) {
+		_standCollider.addGeomToCollideWith((dGeomID)colliderWorldSpace());
+		_kneelCollider.addGeomToCollideWith((dGeomID)colliderWorldSpace());
+		_proneCollider.addGeomToCollideWith((dGeomID)colliderWorldSpace());
+
+		_updateFPSColliders();
+
+		initialized = true;
+	}
+}
+
 void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 {
 	// no need to do this if we're not in game
@@ -4923,15 +4935,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 	static int _lastCheck = 0;
 
-	// initialize some stuff
-	if(_lastCheck == 0)
-	{
-		_standCollider.addGeomToCollideWith((dGeomID)colliderWorldSpace());
-		_kneelCollider.addGeomToCollideWith((dGeomID)colliderWorldSpace());
-		_proneCollider.addGeomToCollideWith((dGeomID)colliderWorldSpace());
-
-		_updateFPSColliders();
-	}
+	InitColliderGeometry();
 
 	if(stateFlags & STATE_SWIMMING)
 		fpsTrooper.riverExit = TRUE;
@@ -13581,12 +13585,20 @@ dGeomID _createFPSCapsuleTest(dSpaceID space, double length, double radius, doub
 	return capsule;
 }
 
+// !!!HACK!!! - vehInterpolator
+fpFPSPoses HACK_forced_pose = POSE_NUM_POSES;
 
-void _updateFPSColliders()
+void _updateFPSColliders(void)
 {
 	_collider.collider = nullptr;
 
-	switch(fpFPSGetPlayerPose())
+	fpFPSPoses pose;
+	if ( HACK_forced_pose == POSE_NUM_POSES )
+		pose = fpFPSGetPlayerPose();
+	else
+		pose = HACK_forced_pose;
+
+	switch(pose)
 	{
 		case POSE_STAND:
 			_collider.collider = &_standCollider;
@@ -13649,14 +13661,24 @@ FPSCollider::FPSCollider() : colliderQuery()
 	//setNormalFilter(0.0f, 0.0f, 1.0f);
 }
 
+Vec3d* HACK_forced_pos = nullptr;
+
 void FPSCollider::Update(double deltaTime)
 {
-	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == nullptr) return;
+	Vec3d pos;
+	Matrixd attitude;
 
-	// setup rays
-	Vec3d pos				= Vec3d(player->ModelData->VehiclePos);
-	Matrixd attitude		= Matrixd(player->ModelData->VehicleAttMat);
+	if ( HACK_forced_pos == nullptr ) {
+		vehVehicle* player = persGetPersonaVehiclePtr();
+		if(player == nullptr) return;
+
+		// setup rays
+		pos				= Vec3d(player->ModelData->VehiclePos);
+		attitude		= Matrixd(player->ModelData->VehicleAttMat);
+	} else {
+		pos = *HACK_forced_pos;
+		attitude = IdentityMatrix;
+	}
 
 	// convert to the physical world
 	pos = physicsGameToPhysical(pos);

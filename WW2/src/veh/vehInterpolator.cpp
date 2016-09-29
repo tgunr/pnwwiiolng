@@ -1,12 +1,14 @@
 #include <syscfg.h> // Path is project specific.
-
-#include <math.h>
-
-#include "gr2/gr2Anim.h"
 #include "veh/vehInterpolator.h"
+
+#include <cmath>
+
+#include <fp/fpTPSdata.h>
+#include <fp/fpFPS.h>
+#include <gr2/gr2Anim.h>
+#include <math/mathvect.h>
+
 #include "veh/vehmain.h"
-#include "math/mathvect.h"
-#include "fp/fpTPSdata.h"
 
 namespace {
 	// Copies position-related data.
@@ -85,23 +87,100 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 
 //------------------------------------------------------------------------------
 
+// !!!HACK!!!
+// This is all really horrible and I'm not proud to write it, but the logic for
+// this stuff is spread over so many places and makes so many assumptions that
+// it would take ages to try to decouple it from the player-controlled soldier,
+// and writing something new just isn't on the table right now.
+namespace {
+	// NOTE: Largely taken from fpFPSAreaChecks().
+	void CheckHeight(InterpolatorBase::Update& update, fpTPSPoseType pose) {
+		// HACK: Guarantee the FPS colliders have been set up.
+		InitColliderGeometry();
+
+		{
+			switch ( pose ) {
+			case TPS_POSETYPE_PRONE:
+				HACK_forced_pose = POSE_PRONE; break;
+			case TPS_POSETYPE_CROUCH:
+				HACK_forced_pose = POSE_CROUCH; break;
+			case TPS_POSETYPE_STAND:
+			default:
+				HACK_forced_pose = POSE_STAND; break;
+			}
+
+			_updateFPSColliders();
+
+			HACK_forced_pose = POSE_NUM_POSES;
+		}
+
+		FPSColliderData& coldata = fpFPSGetCollider();
+		assert ( coldata.collider );
+		FPSCollider& col = *coldata.collider;
+
+		{
+			Vec3d pos = update.pos;
+			HACK_forced_pos = &pos;
+			col.Update(0);
+			HACK_forced_pos = nullptr;
+		}
+
+		const Vec3d up = Vec3d(0.0,0.0,1.0);
+
+		if ( col.findCollisions(true) ) {
+			const colliderQuery::CollisionList& hits = col.getCollisions();
+			const colliderQuery::Collision* best = nullptr;
+			const colliderQuery::Collision* walk = nullptr;
+
+			for ( auto it = hits.begin() ; it != hits.end() ; ++it ) {
+				const colliderQuery::Collision& hit = *it;
+				UINT32 collideBits	= dGeomGetCollideBits(hit.g1);
+				UINT32 categoryBits = dGeomGetCategoryBits(hit.g2);
+
+				const colliderQuery::Collision* best = nullptr;
+				auto CollisionFound =
+				[&best] (const colliderQuery::Collision& c) {
+					if ( best == nullptr || c.pos.z() > best->pos.z() )
+						best = &c;
+				};
+
+				switch ( collideBits ) {
+				case FALL_COLLIDER:
+					if ( (up * hit.normal) < 0 )
+						continue;
+					if ( colliderIsType(categoryBits, COLLIDER_VEHICLE_MASK) ||
+					     colliderIsType(categoryBits, COLLIDER_WALK) )
+						continue; // Don't let other entities mess with our prediction.
+					CollisionFound(hit);
+					break;
+				default:
+					// For now, we're only concerned about clipping into the ground.
+					break;
+				}
+
+				if ( best )
+					update.pos.z = best->pos.z();
+			}
+		}
+
+		// Reset the collider just in case code elsewhere doesn't.
+		_updateFPSColliders();
+	}
+}
+
+//--------------
+
 const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 	if ( frametime == real_pos.frametime )
 		return real_pos;
 
-	// Update our predicted position before doing anything else.
-	{
-		pred_pos.pos += pred_pos.vel * ((frametime - pred_pos.frametime) / 1000.0);
+	pred_pos.pos += pred_pos.vel * ((frametime - pred_pos.frametime) / 1000.0);
+	// TODO: Collision.
+	pred_pos.frametime = frametime;
+	pred_pos.timestamp += (frametime - pred_pos.frametime);
 
-		// TODO: Collision.
-
-		pred_pos.frametime = frametime;
-		pred_pos.timestamp += (frametime - pred_pos.frametime);
-	}
-
-	// Update the real position.
-	// TODO: A lot of this is still mostly from the old interpolator and could use some cleanup.
 	if ( frametime < interp_end ) {
+		// TODO: A lot of this is still mostly from the old interpolator and could use some cleanup.
 		double t = (double)(frametime - interp_beg) / (double)(interp_end - interp_beg);
 		assert ( 0.0 <= t && t <= 1.0 );
 		if ( t < 0.0 ) t = 0.0;
@@ -129,21 +208,25 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 		real_pos.vel = vel;
 		real_pos.speed = speed;
 		// If the last message has us not going somewhat forward, respect that orientation.
-		// TODO: We should use a proper constant to determine what counts as strafing.
+		// TODO: We should use a proper constant to determine where "strafing" begins.
 		if ( mathVectDotProduct(&pred_pos.dir, &pred_pos.vel) < .42 )
 			real_pos.dir = pred_pos.dir;
 		else
 			real_pos.dir = dir;
 	} else {
-		// When we're done with interpolation, keep following the prediction.
 		CopyPositionData(real_pos, pred_pos);
 	}
 
-	// TODO: Collision.
-	// TODO: Gravity.
+	gr2AnimBitPacker flags(pred_pos.animationFlags);
+
+	// Collisions are best addressed through the predictions, but our height isn't
+	// actually handled with any of that. The bit of lag isn't actually that big of
+	// a deal except when going up slopes since we'll visibly clip into the floor
+	// before the up-to-date height gets sent to us.
+	CheckHeight(real_pos, (fpTPSPoseType)flags.pose);
+	// TODO: Gravity prediction.
 
 	// Override motion flags to match what the player's seeing.
-	gr2AnimBitPacker flags(pred_pos.animationFlags);
 	if ( flags.movement <= TPS_MOVETYPE_IDLE && real_pos.speed >= .1 ) {
 		if ( flags.pose == TPS_POSETYPE_STAND ) {
 			if ( real_pos.speed > 6.0 ) // TODO: Match this with an actual constant.
@@ -166,8 +249,8 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 	}
 	real_pos.animationFlags = flags.pack();
 
-	// We should now match the predicted position (although
-	// we may actually be slightly different due to smoothing).
+	// We should now match the predicted position, although it
+	// may actually be slightly different due to smoothing.
 	real_pos.frametime = pred_pos.frametime;
 	real_pos.timestamp = pred_pos.timestamp;
 
@@ -204,13 +287,6 @@ void InfantryPredictor::Copy(vehVehicle* v, UINT32 flags) {
 void InfantryPredictor::UpdateInterpolation(void) {
 	// TODO: Consider skipping interpolation if extreme lag is going on.
 
-	// NOTE: We *should* technically check for collisions in our predicted path,
-	// but we check for collisions in the Interpolate() method already (both
-	// predicted and real). This just leaves the possibility of this position
-	// being on the opposite side of a wall, and the interpolated time is so
-	// small that that's not worth addressing unless we actually see reports of
-	// that sort of thing come in.
-
 	// If the message was sent just as they started moving, the soldier will
 	// slowly walk based on the slower speed used in the prediction, then
 	// rubber-band to the proper position once the next message is received.
@@ -230,6 +306,8 @@ void InfantryPredictor::UpdateInterpolation(void) {
 	
 	double pred_time_passed = ((interp_time - (to.frametime - from.frametime)) / 1000.0);
 	to.pos += to.vel * pred_time_passed;
+
+	// TODO: Deal with collisions so we don't predict ourselves through a wall.
 
 	const double dt = interp_time / 1000.0;
 	FLOAT64VECTOR v1, v2;
