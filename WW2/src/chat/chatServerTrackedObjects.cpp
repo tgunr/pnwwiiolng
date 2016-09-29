@@ -597,6 +597,11 @@ PPOSTO::PPOSTO(ACTION_OBJECT* const a)
 	if (config != nullptr)
 	{
 		m_maxLife = config->timeout;
+		dbugLog(_FLW, "PPO max life set to %llu for subtype %d", m_maxLife, m_subType);
+	}
+	else
+	{
+		dbugLog(_FLW, "PPO Spec not found for subtype %d", m_subType);
 	}
 }
 

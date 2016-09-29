@@ -6,6 +6,7 @@
 #include "cfg/cfgPrefs.h"
 #include "wwii/wwiiPPOLoader.h"
 #include "wwii/wwiiServerTrackedObject.h"
+#include "dbug/dbug.h"
 
 #define PPO_SPEC "vehicles/ground/groundman/ppo.xml"
 
@@ -28,10 +29,12 @@ PPOSpecLoader::PPOSpecLoader() : XMLLoader2<PPOSpecLoader>()
 
 void PPOSpecLoader::loadSpecMap()
 {
+        dbugLog(_FLD, "Loading PPO specifications...");
 	_ppoSpecMap.clear();
 	SetPath(PPO_SPEC);
 	fioXmlRegisterInputCallbacks();
 	Load();
+        dbugLog(_FLD, "Done loading PPO specifications, %d loaded.", _ppoSpecMap.size());
 }
 
 // tag handlers
