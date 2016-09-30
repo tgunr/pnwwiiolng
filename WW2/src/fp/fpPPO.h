@@ -59,7 +59,11 @@ struct PlayerPlacedObject
 
 extern void fpPPOInitiateBuildAction(UINT32 & state, UINT32 & control, SINT32 & stance);
 
-extern PlayerPlacedObject* fpPPOCreate(int type, bool save = true);
+extern PlayerPlacedObject* fpPPOCreate(int type,
+                                       PPOCallback updateCB = nullptr,
+                                       PPOCallback executeCB = nullptr,
+                                       PPOCallback validityCB = nullptr, bool save = true);
+
 extern void fpPPOSwitchPPO(bool adjust);
 extern bool fpPPOReady(int type);
 extern PPOSpec* fpPPOGetSpec(int type);
