@@ -979,14 +979,14 @@ bool PlayerPlacedObject::Execute()
 		if(Online)
 		{
 			// create a ppo sto
-			PlayerPlacedSTO sto(0, spec->id, position, attitude);
+			PlayerPlacedSTO sto(0, spec->id, position, attitude, spec->stotype);
 
 			// send the request to the host
 			sto.request(PlayerClient()->ChatConnection());
 		}
 		else
 		{
-			PlayerPlacedSTO* sto = new PlayerPlacedSTO(0, spec->id, position, attitude);
+			PlayerPlacedSTO* sto = new PlayerPlacedSTO(0, spec->id, position, attitude, spec->stotype);
 			ServerTrackedObject::addToIndex(sto);
 			trnCDUpdateCollideLists(true);
 			//sto->Sink();
@@ -1344,6 +1344,16 @@ const char* PlayerPlacedSTO::model() const
 		return spec->modelName.c_str();
 
 	return "";
+}
+
+const char* MobileSpawnSTO::model() const
+{
+    PPOSpec* spec = specLoader.ppoGetSpec(m_subType);
+    
+    if(spec)
+        return spec->modelName.c_str();
+    
+    return "";
 }
 
 void PlayerPlacedSTO::Sink()

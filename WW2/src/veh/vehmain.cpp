@@ -5319,17 +5319,24 @@ PlayerPlacedObject* vehmainFRUBuild()
 	PlayerPlacedObject* fru = fpPPOCreate(activePPOList[activePPOIndex]->id);
 
 	// set our callbacks
-	fru->SetExecuteCallback(vehmainFRUExecute);
+    if (fru != nullptr)
+    {
+        fru->SetExecuteCallback(vehmainFRUExecute);
 
-	// for vehicles, fail on validity checks
-	//fru->failOnInvalid = (veh->VehicleType->Type != VEH_TYPE_PERSON);
+        // for vehicles, fail on validity checks
+        //fru->failOnInvalid = (veh->VehicleType->Type != VEH_TYPE_PERSON);
 
-	// do one update to check our current validity
-	if(fpPPOUpdate())
-	{
-		fpPPOAlert();
-		return nullptr;
-	}
+        // do one update to check our current validity
+        if(fpPPOUpdate())
+        {
+            fpPPOAlert();
+            return nullptr;
+        }
+    }
+    else
+    {
+        dbugLog(_FLW, "Failed to create fru - fpPPOCreate for index %d and id %d", activePPOIndex, activePPOList[activePPOIndex]->id);
+    }
 
 	return fru;
 }

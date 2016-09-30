@@ -696,23 +696,23 @@ static void _buildFRU(JSContext* ctx, UINT32 argc, jsval* argv)
 
 UINT32 mlToggleMobileSpawn(SINT32 Param, UINT32 Id, UINT32 Detach)
 {
-        static WEAPON_SPEC troop = NULL_WEAP_SPEC;
-        static bool firsttime = true;
+    static WEAPON_SPEC troop = NULL_WEAP_SPEC;
+    static bool firsttime = true;
 
-        if(firsttime)
-        {
-                firsttime = false;
-                troop = weapCreateSpec("GV_troop.1");
-        }
+    if(firsttime)
+    {
+        firsttime = false;
+        troop = weapCreateSpec("GV_troop.1");
+    }
 
-        mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
-        vehType* vtype = VehicleData->VehicleMasterPtr->VehicleType;
+    mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
+    vehType* vtype = VehicleData->VehicleMasterPtr->VehicleType;
 
-        PlayerPlacedObject* ppo = fpPPOGet();
+    PlayerPlacedObject* ppo = fpPPOGet();
 
-        if(ppo)
-        {
-        	if(ppo->valid)
+    if(ppo)
+    {
+        if(ppo->valid)
 		{
 			uiCallJS("buildirp", _buildFRU, 0);
 		}
