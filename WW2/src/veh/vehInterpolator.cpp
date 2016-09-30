@@ -128,21 +128,18 @@ namespace {
 		const Vec3d up = Vec3d(0.0,0.0,1.0);
 
 		if ( col.findCollisions(true) ) {
-			const colliderQuery::CollisionList& hits = col.getCollisions();
 			const colliderQuery::Collision* best = nullptr;
-			const colliderQuery::Collision* walk = nullptr;
+			auto CollisionFound =
+				[&best] (const colliderQuery::Collision& c) {
+				if ( best == nullptr || c.pos.z() > best->pos.z() )
+					best = &c;
+			};
 
+			const colliderQuery::CollisionList& hits = col.getCollisions();
 			for ( auto it = hits.begin() ; it != hits.end() ; ++it ) {
 				const colliderQuery::Collision& hit = *it;
 				UINT32 collideBits	= dGeomGetCollideBits(hit.g1);
 				UINT32 categoryBits = dGeomGetCategoryBits(hit.g2);
-
-				const colliderQuery::Collision* best = nullptr;
-				auto CollisionFound =
-				[&best] (const colliderQuery::Collision& c) {
-					if ( best == nullptr || c.pos.z() > best->pos.z() )
-						best = &c;
-				};
 
 				switch ( collideBits ) {
 				case FALL_COLLIDER:
@@ -157,10 +154,10 @@ namespace {
 					// For now, we're only concerned about clipping into the ground.
 					break;
 				}
-
-				if ( best )
-					update.pos.z = best->pos.z();
 			}
+
+			if ( best )
+				update.pos.z = best->pos.z();
 		}
 
 		// Reset the collider just in case code elsewhere doesn't.
