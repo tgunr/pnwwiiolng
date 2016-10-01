@@ -1595,7 +1595,7 @@ static bool ReadTextureReference(void)
 	str = filename;
 	str += "_spec.dds";
 
-	if ((fd = fioOpen(str.c_str()) != -1) {
+	if ((fd = fioOpen(str.c_str())) != -1) {
 		_textureflags3[numtexrefs] |= OBJECT_SPECULARMAP;
 		fioClose(fd); // Hacky because this is very bad code design, this is a quick fix
 	}
