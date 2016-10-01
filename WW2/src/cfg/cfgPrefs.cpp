@@ -77,7 +77,6 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.shademode",			&ShadeMode,					cfgPARAM_UINT,		1,		0,	0, false },
 	{"app.bdithering",			&bDithering,				cfgPARAM_BOOLEAN,	1,		0,	1, false	},
 	{"app.bspecular",			&WantSpecularMaps,			cfgPARAM_BOOLEAN,	1,		0,	1, false	},
-	{"app.texturereduction",	&TextureReduction,			cfgPARAM_BOOLEAN,	1,		0,	1, false	},
 	{"app.sound",				&WantedSoundCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedSoundCard)-1, true	},
 	{"app.bsoundenable",		&bSoundEnable,				cfgPARAM_BOOLEAN,	0,		0,	1, true	},
 	{"app.b3dsoundenable",		&b3DSoundEnable,			cfgPARAM_BOOLEAN,	0,		0,	1, true	},
@@ -996,7 +995,6 @@ void cfgPrefsSetDefaults()
 
 	// Always use multitexture
 	MultiTextureEnable = TRUE;
-	TextureReduction = FALSE;
 
 	TextureMagFilter    = piTEXTUREMAG_DEFAULT;				// texture mag filter
 	TextureMinFilter    = piTEXTUREMIN_DEFAULT;				// texture min filter
@@ -1117,11 +1115,6 @@ void cfgPrefsProcessGlobal(_cfgPARAMS key)
 			radclutterDirty();
 			break;
 		}
-		case cfgTEXTURE_REDUCTION:
-		{
-			ldpixSetTextureReduction(TextureReduction);
-		}
-		break;
 		case cfgVIDEO_CARD_RESOLUTION:
 		{
 			cfgPrefsSetResolution();

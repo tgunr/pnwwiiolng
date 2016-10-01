@@ -193,8 +193,6 @@ extern SINT32           nErrorCode;         // Set to any user specified error c
 extern SINT32			TexBpp;
 extern SINT32			TexAlpha;
 
-extern LOGICAL			TextureReduction;	// force texture reduction
-
 extern UINT32			DamageLevel;
 
 extern FLOAT32			FrameFactor;		// Based on FPS, helper ratio

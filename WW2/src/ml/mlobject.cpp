@@ -2429,8 +2429,6 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 		strcpy((char*)s,(char*)ObjectName);
 		strcat((char*)s,"_vcpit");
 
-        ldpixSetTextureReduction(FALSE);
-
 		if(obmgrCreateModelInstance((char*)s))
 		{
 			lstrcpy(LocalObjectName, (char*)s);
@@ -2465,8 +2463,6 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 
 			}
 		}
-
-        ldpixSetTextureReduction(TextureReduction);
 
 		ogrpSetObjectAndSubtreeAsCockpit(Object);
 		ogrpHideObjectAndSubtree(Object);

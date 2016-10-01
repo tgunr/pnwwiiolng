@@ -33,7 +33,3 @@ extern void ldpixInvertImage(int bits, int width, int height, UCHAR* inbits);
 extern void ldpixScaleImage(piPIXELFORMAT* pixformat, int inwidth, int inheight, int inpitch, UCHAR* inbits,
 						 int outwidth, int outheight, int outpitch, UCHAR* outbits);
 extern LOGICAL ldpixCopySurfaceToSurface(piSURFACEDESC* lppisd1, piSURFACEDESC* lppisd2);
-
-extern void ldpixSetTextureReduction(LOGICAL);
-extern LOGICAL ldpixGetTextureReduction();
-
