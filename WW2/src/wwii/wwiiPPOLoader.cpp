@@ -285,9 +285,42 @@ PPOSpec* PPOSpecLoader::ppoGetSpec(int subtype)
 	return nullptr;
 }
 
+bool PPOSpecLoader::checkType(const char *pType, int vehtype, bool & retVal, bool setValue)
+{
+	bool done = true;
+
+	// if no veh type is specified, its a generic "applies to all"
+	if (pType == nullptr)
+	{
+		dbugLog(_FLD, "Don't have type specified, returning %d", setValue);
+		retVal = setValue;
+	}
+	else
+	{
+		dbugLog(_FLD, "Have a type, check type match");
+		// veh type is specified, make sure it matches
+		int nType = atoi(pType);	
+		if (nType == vehtype)
+		{
+			dbugLog(_FLD, "Types match, returning %d", setValue);
+			retVal = setValue;
+		}
+		else
+		{
+			dbugLog(_FLD, "Types don't match, returning %d", retVal);
+			done = false;
+		}
+	}
+
+	return done;
+}	
+
 bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, int vehtype, bool allowed, bool setValue)
 {
 	bool retVal = allowed;
+
+	dbugLog(_FLD, "checkList(list:%d, vehclass=%d, vehtype=%d, allowed=%d, setValue=%d",
+		tlist.size(), vehclass, vehtype, allowed, setValue);
 
 	// first lets see if this vehicle class/type is being spacifically mentioned
 	for (size_t i=0; i < tlist.size(); i++)
@@ -296,35 +329,37 @@ bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, in
 		size_t nmSize = tlist[i].size()+1;
 		char *tempClassName = new char[nmSize];
 		strlcpy(tempClassName, tlist[i].c_str(), nmSize);
-		
+	
+		dbugLog(_FLD, "tempClassName = %s", tempClassName);
+	
 		char *pClass = strtok(tempClassName, "/");
 		char *pType = strtok( nullptr, "/" );
 		if (pClass != nullptr)
 		{
+			dbugLog(_FLD, "pClass = %s", pClass);
+
 			// check if veh class matches spec
 			int nClass = atoi(pClass);
 			if (nClass == vehclass)
 			{
-				// if no veh type is specified, its a generic "applies to all"
-				if (pType == nullptr)
-				{
-					retVal = setValue;
+				dbugLog(_FLD, "nClass = %d", nClass);
+
+				if (checkType(pType, vehtype, retVal, setValue))
 					break;
-				}
-				else
-				{
-					// veh type is specified, make sure it matches
-					int nType = atoi(pType);	
-					if (nType == vehtype)
-					{
-						retVal = setValue;
-						break;
-					}
-				}
 			}	
+			else
+			{
+				dbugLog(_FLD, "Class doesn't match, returning %d", retVal);
+			}
+		}
+		else
+		{
+			dbugLog(_FLD, "No class parsed from list");
+			if (checkType(pType, vehtype, retVal, setValue))
+				break;
 		}
 
-        delete tempClassName;
+		delete tempClassName;
 	}
 
 	return retVal;
@@ -332,19 +367,32 @@ bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, in
 
 bool PPOSpecLoader::ppoIsSpawnAllowed(int pposubtype, int vehclass, int vehtype)
 {
+	dbugLog(_FLD, "ppoIsSpawnAllowed( pposubtype = %d, vehclas = %d, vehtype = %d", pposubtype, vehclass, vehtype);
 	bool retVal = false;
 
 	PPOSpec *ppo = ppoGetSpec(pposubtype);
 	if (ppo != nullptr)
 	{
+		dbugLog(_FLD, "Found spec %s, spawnable flag %d", ppo->name.c_str(), ppo->spawnable);
 		if (ppo->spawnable)
 		{
 			// first scan through the allow list
 			retVal = checkList(ppo->allowSpawn, vehclass, vehtype, retVal, true);
+
+			dbugLog(_FLD, "checkList returned %d for allowSpawn check", retVal);
+
 			// then override with any in the deny list
 			retVal = checkList(ppo->denySpawn, vehclass, vehtype, retVal, false);
+
+			dbugLog(_FLD, "checkList returned %d for denySpawn check", retVal);
 		}
 	}
+	else
+	{
+		dbugLog(_FLW, "Unable to match a spec to subtype %d", pposubtype);
+	}
+
+	dbugLog(_FLD, "Spawn allowed flag: %d", retVal);
 
 	return retVal;
 }

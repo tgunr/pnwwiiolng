@@ -90,5 +90,5 @@ private:
 		identified, otherwise return its current value.
 	*/
 	bool checkList(std::vector<std::string> & list, int vehclass, int vehtype, bool allowed, bool setValue);
-
+	bool checkType(const char *pType, int vehtype, bool & retVal, bool setValue);
 };
