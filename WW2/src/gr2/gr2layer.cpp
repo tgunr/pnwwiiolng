@@ -4586,7 +4586,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimation(const SCHAR* blendfile, SINT32 boneCo
 	
 	// if it failed or wasn't requested, try the .txt version of the file
 	if (!blend) {
-        blend = gr2LoadBlendedAnimationTXT((path + ".txt").c_str(), boneCount);
+        blend = gr2LoadBlendedAnimationTXT(const_cast<char *>((path + ".txt").c_str()), boneCount);
     }
     
     return blend;

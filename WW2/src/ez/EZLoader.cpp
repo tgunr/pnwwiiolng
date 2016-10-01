@@ -414,7 +414,7 @@ public:
 	{
         if (!XMLLoader2::Load(userData)) {
             // Fallback on failure instead of using the dangerous access(2) call
-            exPath = ezFallbackPath;
+            ezPath = ezFallbackPath;
     		SetPath(ezPath.c_str());
     		return XMLLoader2::Load(userData);
     	}
