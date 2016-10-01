@@ -71,15 +71,6 @@ int _loadImageFileToSurface(const char* Filename, UINT32 TransparentColor, UINT3
 	int			newwidth, newheight;
 	TEXTURE*	lptex;
 	int			mip_texid;
-	//static int	count;
-
-#ifdef LOAD_TIMER
-SINT32		t1, t2, t3, t4;
-#endif
-
-#ifdef LOAD_TIMER
-	t1 = piReadTimeStamp32();
-#endif
 
 	bool WantMipmap = (Flags & LDPIX_MIPMAP) != 0;
 	bool WantDXT = (Flags & LDPIX_NO_DXT) == 0;
