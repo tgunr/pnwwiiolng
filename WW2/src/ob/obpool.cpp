@@ -137,10 +137,6 @@ logTimerBeginMacro();
 		return(FALSE);
 	}
 
-#ifdef CONVERSION_PROGRAM
-	return TRUE;
-#endif
-
 logTimerBeginExtMacro(obwldInit);
 	if (!obwldInit(name))
 	{

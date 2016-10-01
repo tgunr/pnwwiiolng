@@ -1,7 +1,5 @@
 #pragma once
 
-//#define	LOAD_TIMER			1
-
 #define ALPHA_FILE_FOUND    -20
 
 // if the total texture memory is lower than this number, it forces reduction on the top level
