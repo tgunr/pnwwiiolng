@@ -505,14 +505,14 @@ _getHandle(ChatMission& mission, const Waypoint& waypoint)
 // Request a mobile spawn from the MMHost
 
 void
-ChatMission::sendMobileSpawn(UINT32 playerID, const ChatHandle& handle, FLOAT64 x, FLOAT64 y, FLOAT64 z, bool deployed, UINT32 stosUID)
+ChatMission::sendMobileSpawn(UINT32 playerID, const ChatHandle& handle, FLOAT64 x, FLOAT64 y, FLOAT64 z, bool deployed, UINT32 stosUID, SINT32 stoSubType)
 {
-	dbugLog(_FLD, "mswp %s m:%u p:%u sto:%u @ %0.3g,%0.3g,%0.3g", (deployed ? "cre" : "del"), missionID(), playerID, stosUID, x, y, z);
+	dbugLog(_FLD, "mswp %s m:%u p:%u sto:%u stoSubType:%d @ %0.3g,%0.3g,%0.3g", (deployed ? "cre" : "del"), missionID(), playerID, stosUID, stoSubType, x, y, z);
 
 	ENDPOINT* const endpoint = serverPeerEndpointByType(MAP_HOST);
 	if ( endpoint != nullptr )
 	{
-		MobileSpawnWaypoint wp(missionID(), playerID, handle, x, y, z, deployed, stosUID, 0);
+		MobileSpawnWaypoint wp(missionID(), playerID, handle, x, y, z, deployed, stosUID, stoSubType, 0);
 		MOBILE_SPAWN_WAYPOINT packet(wp);
 		packet.send(*endpoint);
 	}
@@ -573,7 +573,7 @@ ChatMission::removeWaypoint(const ChatHandle& handle, bool byPlayer)
 	if ( byPlayer && handle == _getMSPHandle() )
 	{
 		betaLog(_FLD, "m:%u removing MSPAWN waypoint", missionID());
-		sendMobileSpawn(0, waypoint.playerHandle(), (FLOAT32)waypoint.x(), (FLOAT32)waypoint.y(), 0.0f, false, 0);
+		sendMobileSpawn(0, waypoint.playerHandle(), (FLOAT32)waypoint.x(), (FLOAT32)waypoint.y(), 0.0f, false, 0, 0);
 	}
 
 	dbugLog(_FLD, "m:%u removing waypoint %llu[%s]", missionID(), waypoint.handle(), Chat::Name(waypoint.handle()).c_str());

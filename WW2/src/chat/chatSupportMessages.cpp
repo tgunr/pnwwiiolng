@@ -207,9 +207,9 @@ MOBILE_SPAWN_WAYPOINT::receive(SINT32 teulIndex, MOBILE_SPAWN_WAYPOINT& incoming
 	if ( wp.m_deployed )
 	{
 		if ( g_logDebug )
-			dbugLog(_FLD, "mswp add m:%u p:%u c:%s sto:%u", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_stoUID);
+			dbugLog(_FLD, "mswp add m:%u p:%u c:%s sto:%u stoSubType:%d", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_stoUID, wp.m_stoSubType);
 		// Request for* where* we want the MSP deployed
-		missAddMobileSpawn(wp.m_missionID, wp.m_playerID, wp.m_ownerCall, wp.m_x, wp.m_y, wp.m_z, wp.m_stoUID);
+		missAddMobileSpawn(wp.m_missionID, wp.m_playerID, wp.m_ownerCall, wp.m_x, wp.m_y, wp.m_z, wp.m_stoUID, wp.m_stoSubType);
 	}
 	else
 	{

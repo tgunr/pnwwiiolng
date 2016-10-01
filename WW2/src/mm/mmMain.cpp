@@ -91,7 +91,7 @@
 
 const char* g_serverName = "mmhostd";
 
-static PPOSpecLoader specLoader;
+PPOSpecLoader specLoader;
 
 #define CHECKSUM_POLL_INTERVAL	300000	// Every 5 minutes
 
