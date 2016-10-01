@@ -34,8 +34,8 @@ InterpolatorBase::InterpolatorBase(vehVehicle* v) :
 //==============================================================================
 
 namespace {
-	// Make the real and predicted positions match in this many frames:
-	const InfantryPredictor::FrameTime interp_time = 200;
+	// Make the real and predicted positions match in this many milliseconds.
+	const InfantryPredictor::FrameTime interp_time = 300;
 }
 
 InfantryPredictor::InfantryPredictor(vehVehicle* v)
@@ -156,7 +156,7 @@ namespace {
 				}
 			}
 
-			if ( best )
+			if ( best && best->pos.z() > update.pos.z )
 				update.pos.z = best->pos.z();
 		}
 
