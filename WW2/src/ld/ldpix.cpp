@@ -30,29 +30,26 @@ struct GFX_FORMATS
 {
 	char  Extension[5];
 	LoadFileToSurface Routine;
-
-} GfxFormats[]={
-                {"dds", ldLoadTexture},
- //               {"3df",ld3dfLoad3DFFileToSurface},
-                {"bmp",ldbmpLoadBMPFileToSurface},
- //               {"iff",ldlbmLoadLBMFileToSurface},
-//                {"jpg",ldjpgLoadJPGFileToSurface},
- //               {"lbm",ldlbmLoadLBMFileToSurface},
-                {"pcx",ldpcxLoadPCXFileToSurface},
- //               {"ppm",ldppmLoadPPMFileToSurface},
-                {"png", ldLoadTexture},
- //               {"rgb",ldrgbLoadRGBFileToSurface},
- //               {"tga",ldtgaLoadTGAFileToSurface},
- //               {"tif",ldtifLoadTIFFFileToSurface},
- //               {"tiff",ldtifLoadTIFFFileToSurface},
-                {"",nullptr}
-               };
-
-static LOGICAL reduceTextures = FALSE;
+} GfxFormats[] = {
+    {"dds", ldLoadTexture},
+    //{"3df",ld3dfLoad3DFFileToSurface},
+    {"bmp",ldbmpLoadBMPFileToSurface},
+    //{"iff",ldlbmLoadLBMFileToSurface},
+    //{"jpg",ldjpgLoadJPGFileToSurface},
+    //{"lbm",ldlbmLoadLBMFileToSurface},
+    //{"pcx",ldpcxLoadPCXFileToSurface},
+    //{"ppm",ldppmLoadPPMFileToSurface},
+    {"png", ldLoadTexture},
+    //{"rgb",ldrgbLoadRGBFileToSurface},
+    //{"tga",ldtgaLoadTGAFileToSurface},
+    //{"tif",ldtifLoadTIFFFileToSurface},
+    //{"tiff",ldtifLoadTIFFFileToSurface},
+    {"",nullptr}
+};
 
 int ldpixLoadImageFileToSurface(const char* Filename, UINT32 TransparentColor, UINT32 Flags)
 {
-  SINT32 texid = _loadImageFileToSurface(Filename, TransparentColor, Flags);
+    SINT32 texid = _loadImageFileToSurface(Filename, TransparentColor, Flags);
 
     if(!(Flags & LDPIX_NO_TEXTURE_GENERATE))
     {
