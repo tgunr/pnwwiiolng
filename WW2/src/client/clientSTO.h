@@ -256,7 +256,7 @@ public:
 
 protected:
 	// which model to use
-	virtual const char* model() const { return "msp"; }
+    virtual const char* model() const;
 
 //private:
 	//int flagTextures[4];

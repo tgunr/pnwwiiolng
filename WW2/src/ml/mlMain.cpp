@@ -74,6 +74,7 @@
 #include "ez/EZManager.h"
 #include "veh/vehAnimEnum.h"
 #include "fp/fpFPSdata.h"
+#include "fp/fpPPO.h"
 
 #ifdef GR2_BLEND_EDITOR
 #include "gr2/gr2Anim.h"
@@ -513,8 +514,6 @@ static void _LeakTest(void);
 #ifdef ENABLE_FLOATERS
 static UINT32 _DoEyeOperations(mlVehicleData* VehicleData);
 #endif
-
-extern void fpPPOSwitchPPO();
 
 extern UINT32 _AdjustVelAndRotVel(mlVehicleData*, FLOAT64VECTOR* Vel,
 							   FLOAT64ATT* AttVel,
@@ -1759,7 +1758,8 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 				if (VehicleData->CycleAmmo != 0 ||
 					TempNum != VehicleData->LastPlayerPos)
 				{
-					if (currentWeaponModel == BUILD_TOOL)
+                    // We need to check to see if a PPO is active
+					if (fpPPOGet() != nullptr)
 					{
 						fpPPOSwitchPPO(true);
 					}

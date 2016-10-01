@@ -976,20 +976,45 @@ bool PlayerPlacedObject::Execute()
 	    WorldPosition_m position(finalPos.x(), finalPos.y(), finalPos.z());
 		AttitudeVector attitude(finalAtt.x, finalAtt.y, finalAtt.z);
 
+        vehVehicle* player = persGetPersonaVehiclePtr();
 		if(Online)
 		{
-			// create a ppo sto
-			PlayerPlacedSTO sto(0, spec->id, position, attitude);
+         
+            if (spec->stotype != ServerTrackedObject::_UMS)
+            {
+                // create a ppo sto
+                PlayerPlacedSTO sto(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype));
 
-			// send the request to the host
-			sto.request(PlayerClient()->ChatConnection());
+                // send the request to the host
+                sto.request(PlayerClient()->ChatConnection());
+            }
+            else
+            {
+                // create a ppo sto
+                MobileSpawnSTO sto(0, static_cast<UINT16>(spec->id), position, attitude, (UINT32)player->Country);
+                
+                // send the request to the host
+                sto.request(PlayerClient()->ChatConnection());
+                
+            }
 		}
 		else
 		{
-			PlayerPlacedSTO* sto = new PlayerPlacedSTO(0, spec->id, position, attitude);
-			ServerTrackedObject::addToIndex(sto);
-			trnCDUpdateCollideLists(true);
-			//sto->Sink();
+            
+            if (spec->stotype != ServerTrackedObject::_UMS)
+            {
+                PlayerPlacedSTO* sto = new PlayerPlacedSTO(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype));
+                ServerTrackedObject::addToIndex(sto);
+                trnCDUpdateCollideLists(true);
+                //sto->Sink();
+            }
+            else
+            {
+                MobileSpawnSTO* sto = new MobileSpawnSTO(0, static_cast<UINT16>(spec->id), position, attitude, (UINT32)player->Country);
+                ServerTrackedObject::addToIndex(sto);
+                trnCDUpdateCollideLists(true);
+                //sto->Sink();
+            }
 		}
 
 		// fru's are shared and get their cool down from the host
@@ -1090,8 +1115,14 @@ void fpPPOSwitchPPO(bool adjust)
 	if (activePPOList.size() > 1)
 	{
 		
+        PPOCallback up = nullptr, ex = nullptr, val = nullptr;
 		if (_placedObject)
+        {
+            up = _placedObject->updateCallback;
+            ex = _placedObject->executeCallback;
+            val = _placedObject->validityCallback;
 			fpPPOKill(false);
+        }
 
 		if (adjust)
 		{
@@ -1099,7 +1130,7 @@ void fpPPOSwitchPPO(bool adjust)
 				activePPOIndex = 0;
 		}
 
-		fpPPOSet(fpPPOCreate(activePPOList[activePPOIndex]->id));
+		fpPPOSet(fpPPOCreate(activePPOList[activePPOIndex]->id, up, ex, val));
 
 	}
 }
@@ -1244,7 +1275,7 @@ void fpPPOCreateMaterial()
 	}
 }
 
-PlayerPlacedObject* fpPPOCreate(int type,  bool save)
+PlayerPlacedObject* fpPPOCreate(int type,  PPOCallback updateCB, PPOCallback executeCB, PPOCallback validityCB, bool save)
 {
 	static int _lastType = -1;
 
@@ -1284,6 +1315,10 @@ PlayerPlacedObject* fpPPOCreate(int type,  bool save)
 		delete ppo;
 		ppo = nullptr;
 	}
+
+    ppo->SetUpdateCallback(updateCB);
+    ppo->SetExecuteCallback(executeCB);
+    ppo->SetValidityCallback(validityCB);
 
 	if(save)
 		fpPPOSet(ppo);
@@ -1344,6 +1379,16 @@ const char* PlayerPlacedSTO::model() const
 		return spec->modelName.c_str();
 
 	return "";
+}
+
+const char* MobileSpawnSTO::model() const
+{
+    PPOSpec* spec = specLoader.ppoGetSpec(m_subType);
+    
+    if(spec)
+        return spec->modelName.c_str();
+    
+    return "";
 }
 
 void PlayerPlacedSTO::Sink()

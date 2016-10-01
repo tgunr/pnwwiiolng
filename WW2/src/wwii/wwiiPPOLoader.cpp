@@ -84,8 +84,8 @@ XML_TAG_HANDLER_IMPL(DoPPO)
 			spec.denySpawn.push_back(defaults.denySpawn[i]);
 
 		for(size_t i = 0; i < defaults.allowPlace.size(); i++)
-			spec.badTextures.push_back(defaults.badTextures[i]);
-
+			spec.allowPlace.push_back(defaults.allowPlace[i]);
+		
 		for(size_t i = 0; i < defaults.denyPlace.size(); i++)
 			spec.denyPlace.push_back(defaults.denyPlace[i]);
 
