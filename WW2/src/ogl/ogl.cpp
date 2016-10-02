@@ -168,7 +168,7 @@ static UINT32	    sourceBlend;
 static UINT32	    destinationBlend;
 static UINT32		_AlphaFunc;
 
-static GLenum crtMode = 0;
+static GLenum crtMode = GL_MODELVIEW;
 
 static FLOAT32		_AlphaRef;
 
