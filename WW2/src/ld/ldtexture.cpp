@@ -83,8 +83,6 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
 {
     int texid = -1;
 
-    oglSetActiveTextureStage(0);
-
     std::string str = name;
 
     // Remove extension
@@ -112,6 +110,8 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
     }
 
     img->setFileName(name);
+
+    oglSetActiveTextureStage(0);
 
     ref_ptr<Texture> tex = new Texture2D;
 
