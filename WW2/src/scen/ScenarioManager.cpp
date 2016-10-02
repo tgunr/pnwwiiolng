@@ -2577,9 +2577,10 @@ const char* ScenarioManager::MapPath(const char* file, const char* ender)
 
 	if(ender)
 		mapPath += ender;
-
-	if(!fioAccess(mapPath.c_str()))
-	{
+    
+    int fd = fioOpen(mapPath.c_str());
+    
+    if (fd == -1) {
 		std::string tempPath;
 
 		for(size_t i = 0; i < mapPaths.size(); i++)
@@ -2594,12 +2595,14 @@ const char* ScenarioManager::MapPath(const char* file, const char* ender)
 			if(ender)
 				tempPath += ender;
 
-			if(fioAccess(tempPath.c_str()))
-			{
+			if ((fd = fioOpen(tempPath.c_str())) != -1) {
+			    fioClose(fd);
 				mapPath = tempPath;
 				break;
 			}
 		}
+	} else {
+	    fioClose(fd);
 	}
 
 	return mapPath.c_str();
@@ -3154,27 +3157,24 @@ void ScenarioManager::SetupTerrainPaths(const char* check)
 	mapPath += check;
 	mapPath += "/parent.txt";
 
-	if(fioAccess(mapPath.c_str()))
-	{
-		// lookup the parent
-		int fd = fioOpen(mapPath.c_str());
+    // lookup the parent
+    int fd = fioOpen(mapPath.c_str());
 
-		if(fd >= 0)
-		{
-			char parent[31+1];
-			parent[0] = 0;
+    if(fd >= 0)
+    {
+        char parent[31+1];
+        parent[0] = 0;
 
-			if(fioGetString(fd, parent, 31))
-			{
-				mapPaths.push_back(parent);
+        if(fioGetString(fd, parent, 31))
+        {
+            mapPaths.push_back(parent);
 
-				// look up its parent
-				SetupTerrainPaths(parent);
-			}
+            // look up its parent
+            SetupTerrainPaths(parent);
+        }
 
-			fioClose(fd);
-		}
-	}
+        fioClose(fd);
+    }
 }
 
 const char* ScenarioManager::CustomTerrainMap()

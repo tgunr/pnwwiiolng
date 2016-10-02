@@ -221,32 +221,6 @@ void fioClose(int fd)
 }
 
 /************************************************************************************************
-	fioAccess
-*************************************************************************************************/
-
-LOGICAL fioAccess(const char* filename)
-{
-    switch(fio_switch)
-    {
-		case ISUSERDIRECTORY:
-		{
-			fiodSetPrepath(UserDataPath);
-			LOGICAL result = fiodAccess(filename);
-			fiodSetPrepath(nullptr);
-			return result;
-		}
-		break;
-        case ISDIRECTORY:
-        default:
-            return(fiodAccess(filename));
-		break;
-        case ISARCHIVE:
-            return fioaAccess(filename);
-		break;
-    }
-}
-
-/************************************************************************************************
 	fioModified
 *************************************************************************************************/
 

@@ -136,18 +136,18 @@ static void loadXML(const char* path)
     dir += "Christmas_Tree/trees.xml";
 #else
 
-    if(gCustomTerrain)
-    {
+    if(gCustomTerrain) {
         dir = SCEN_MGR->MapPath("trees.xml");
-
-        if(!fioAccess(dir.c_str()))
-        {
+        
+        int fd = fioOpen(dir.c_str());
+        
+        if (fd == -1) {
             dir = path;
             dir += "trees.xml";
+        } else {
+            fioClose(fd);
         }
-    }
-    else
-    {
+    } else {
         dir += "trees.xml";
     }
 #endif

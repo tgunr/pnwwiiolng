@@ -2329,39 +2329,30 @@ LOGICAL PoolModel::ModelNeedsRebuild(const char* path)
 
 	if (fioQuery() == ISARCHIVE) return FALSE;
 
+    std::string mdlpath = path;
 
-	if(fioAccess(path))
-	{
-		std::string mdlpath = path;
+    size_t ext = mdlpath.rfind('.');
+    if(ext != std::string::npos) mdlpath.erase(ext);
 
-		size_t ext = mdlpath.rfind('.');
-		if(ext != std::string::npos) mdlpath.erase(ext);
+    std::string fltpath(mdlpath);
+    fltpath += ".flt";
+    mdlpath += ".mdl";
 
-		std::string fltpath(mdlpath);
-		fltpath += ".flt";
-        mdlpath += ".mdl";
-
-		if(!fiodAccess(mdlpath.c_str()))
-			return TRUE;
-
-		fd = fiodOpen(mdlpath.c_str(), false, sizeof(mdlHeader));
-		if(fd < 0) return TRUE;
+    fd = fiodOpen(mdlpath.c_str(), false, sizeof(mdlHeader));
+    if(fd < 0) return TRUE;
 
     fiodRead( fd, &mdlHeader.company, sizeof(short) );
     fiodRead( fd, &mdlHeader.filetype, sizeof(short) );
     fiodRead( fd, &mdlHeader.version, sizeof(short) );
 
-		fiodClose(fd);
+    fiodClose(fd);
 
-		if(mdlHeader.version != OBJECTFILE_VERSION) return TRUE;
+    if(mdlHeader.version != OBJECTFILE_VERSION) return TRUE;
 
-		fiodModified(&fltmod, fltpath.c_str());
-		fiodModified(&mdlmod, mdlpath.c_str());
+    fiodModified(&fltmod, fltpath.c_str());
+    fiodModified(&mdlmod, mdlpath.c_str());
 
-		return (fltmod > mdlmod);
-	}
-
-	return TRUE;
+    return (fltmod > mdlmod);
 }
 
 

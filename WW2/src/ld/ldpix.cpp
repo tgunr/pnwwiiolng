@@ -104,24 +104,16 @@ int _loadImageFileToSurface(const char* Filename, UINT32 TransparentColor, UINT3
 	for (i=0; GfxFormats[i].Routine; i++)
 	{
 		strncpy(tmpname + suffixOffset, GfxFormats[i].Extension, sizeof(tmpname) - suffixOffset);
-
-		if (fioAccess(tmpname))
-		{
-			break;
-		}
-	}
-
-	if (GfxFormats[i].Routine == nullptr)
-	{
-		Write_Debug("Texture file not found: %s", localname);
-		return(-1);
-	}
-
-    if(GfxFormats[i].Routine == ldLoadTexture) {
-        return ldLoadTexture(tmpname, TransparentColor, Flags);
-    } else {
-        assert(false);
+        if(GfxFormats[i].Routine == ldLoadTexture) {
+            texid = ldLoadTexture(tmpname, TransparentColor, Flags);
+            if (piIsTexture(texid, 0)) {
+                return texid;
+            }
+        } else {
+            assert(false);
+        }
     }
+    return -1;
 }
 
 LOGICAL ldpixCopyBitsToSurface(UCHAR* bits, int bitsPitch, int width, int height, piSURFACEDESC* lppisd, UINT32 TransparentColor)

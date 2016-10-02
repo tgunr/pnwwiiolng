@@ -518,14 +518,8 @@ Image* ReadBMPFile(const std::string& name, unsigned int transparentColor)
     std::string alphapath = name.substr(0, name.length() - 4); //-4 = ".ext"
 	alphapath += "_alpha.bmp";
 
-    if(!fioAccess(alphapath.c_str()))
-        return img.release();
-
     fd = fioOpen(alphapath.c_str());
-
-    if(fd < 0)
-    {
-        Write_Debug("[ReadBMPFile] cannot open %s", alphapath.c_str());
+    if(fd < 0) {
         return img.release();
     }
 

@@ -47,7 +47,6 @@ extern FILE* fioUserFile(const char* filename, const char* mode);
 
 extern void fioClose(int fd);
 
-extern LOGICAL fioAccess(const char* filename);
 extern LOGICAL fioModified(SINT32* modified, const char* filename);
 extern int 	fioEOF(int fd);
 extern size_t 	fioFileSize(const char* name);

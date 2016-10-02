@@ -32,7 +32,7 @@ extern void fiocfgMkDir(const char* path, bool userdir = false);
 #if platOS == OS_WIN32
     #define fiocfgOpen fiodOpen
     #define fiocfgOpenWrite fiodOpenWrite
-    #define fiocfgAccess fiodAccess
+    LOGICAL fiocfgAccess(const char* filename, bool userdir = false);
     #define fiocfgModified fiodModified
     #define fiocfgFileSize fiodFileSize
 #else

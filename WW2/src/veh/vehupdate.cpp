@@ -2499,11 +2499,11 @@ void _playWeaponFireSound(SCHAR* sound,
     {
         *p = 0;
         strcat(distSound, "_distant.wav");
-
-        if(fioAccess(distSound))
-        {
-            hasDistant = TRUE;
-        }
+        
+        int fd = fioOpen(distSound);
+        
+        fioClose(fd);
+        hasDistant = (fd != -1);
     }
 
     _GetSoundDistance(&fMin, &fMax, &type);

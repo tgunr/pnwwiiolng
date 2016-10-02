@@ -614,43 +614,12 @@ void fiodmkdir(const char* path)
 #if platOS == OS_WIN32
 // WIN versions
 
-LOGICAL fiodAccess(const char* filename, bool userdir)
-{
-	char	fullpath[PATH_MAX];
-
-#if platBuild == BUILD_CLIENT && platOS == OS_WIN32
-	if(userdir)
-	{
-		pathprintf(fullpath, UserDataPath, filename);
-
-		bool success = false;
-
-		wchar_t widePath[PATH_MAX+1];
-
-		if(WWIIConvert(fullpath, widePath))
-			success = OS_WACCESS(os_file_path(widePath), 0) == 0;
-
-		if(success)
-		{
-			return TRUE;
-		}
-
-		// Else fall through normally
-	}
-#endif
-
-	pathprintf(fullpath, DataPath, filename);
-
-	return (OS_ACCESS(os_file_path(fullpath), 0) == 0);
-}
-
 LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 {
 	char	fullpath[PATH_MAX];
 	SINT32	retval;
 	struct	stat	buffer;
 
-#if platOS == OS_WIN32 && platBuild != BUILD_SERVER
 	if(userdir)
 	{
 		pathprintf(fullpath, UserDataPath, filename);
@@ -669,7 +638,6 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 		}
 		// Else fall through normally
 	}
-#endif
 
 	pathprintf(fullpath, DataPath, filename);
 	retval = stat(os_file_path(fullpath), &buffer);
@@ -685,13 +653,6 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 #else
 
 // Mac versions
-
-LOGICAL fiodAccess(const char* filename, bool /* userdir */)
-{
-  char fullpath[1024];
-  pathprintf(fullpath, DataPath, filename);
-  return(OS_ACCESS(os_file_path(fullpath), 0) == 0);
-}
 
 LOGICAL fiodModified(SINT32* modified, const char* filename, bool /* userdir */)
 {
@@ -972,8 +933,12 @@ LOGICAL fiocfgAccess(const char* filename, bool)
 {
 	char	fullpath[_MAX_PATH];
 	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
-
-	return(OS_ACCESS(os_file_path(fullpath), 0) == 0);
+    int fd = -1;
+    if (OS_OPEN(&fd, os_file_path(fullpath), O_RDONLY, 0) != -1) {
+        OS_CLOSE(fd);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 LOGICAL fiocfgModified(SINT32* modified, const char* filename)
@@ -1039,6 +1004,22 @@ SINT32 fiocfgFileSize(const char* filename, bool)
 }
 
 #elif platOS != OS_LINUX && platBuild != BUILD_SERVER
+
+LOGICAL fiocfgAccess(const char* filename, bool userdir)
+{
+    if (userdir) {
+        fiodSetPrepath(UserDataPath);
+    }
+
+    int fd = fiodOpen(filename, true);
+    
+    fiodClose(fd);
+
+    if (userdir) {
+        fiodSetPrepath(nullptr);
+    }
+    return fd != -1;
+}
 
 void fiocfgMkDir(const char* path, bool userdir)
 {

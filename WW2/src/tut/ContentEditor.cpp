@@ -49,30 +49,25 @@ bool ContentEditor::Script::Load(std::string& path)
 	std::string fullPath = CONTENT_EDITOR_SCRIPT_RPATH;
 	fullPath += path;
 
-	if(fioAccess(fullPath.c_str()))
-	{
-		int fd = fioOpen(fullPath.c_str());
-		if(fd > -1)
-		{
-			size_t size = fioFileSize(fullPath.c_str());
-			if(size > 0)
-			{
-				char* buffer = new char[size+1];
-				buffer[size] = '\0';
+    int fd = fioOpen(fullPath.c_str());
+    if(fd > -1)
+    {
+        size_t size = fioFileSize(fullPath.c_str());
+        if(size > 0)
+        {
+            std::unique_ptr<char[]> buffer = std::make_unqiue<char[]>(size+1);
+            buffer[size] = '\0';
 
-				if(fioRead(fd, buffer, size) == size)
-				{
-					filename = path;
-					script = buffer;
-					loaded = true;
-				}
+            if(fioRead(fd, buffer.get(), size) == size)
+            {
+                filename = path;
+                script = buffer.get();
+                loaded = true;
+            }
+        }
 
-				delete [] buffer;
-			}
-
-			fioClose(fd);
-		}
-	}
+        fioClose(fd);
+    }
 
 	return loaded;
 }
