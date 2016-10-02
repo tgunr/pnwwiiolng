@@ -25,7 +25,7 @@ static SINT32 fio_switch;
 
 void fioInit()
 {
-	*UserDataPath = 0;
+    memset(UserDataPath, 0, sizeof(UserDataPath));
 
 #if platOS == OS_WIN32
 	
