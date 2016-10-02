@@ -1199,6 +1199,11 @@ bool fpPPOUpdate()
 
 void fpPPOKill(bool release)
 {
+    if (release)
+    {
+        activePPOIndex = 0;
+        activePPOList.clear();
+    }
 	fpPPOCancel(release);
 	fpPPOSet(nullptr);
 }

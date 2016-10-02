@@ -264,6 +264,7 @@ bool PPOSpecLoader::checkDelimitedField(std::string name, std::string value,
 	bool retVal = checkDelimitedField(name, value, check, temp);
 	if (retVal)
 	{
+		bitfield = 0;  // first clear out the field first, we might be overriding defaults
 		for (size_t i=0; i < temp.size(); i++)
 		{
 			bitfield |= (1<<(UINT32)atoi(temp[i].c_str()));
