@@ -2265,34 +2265,6 @@ void piGraphicsContext::SetTexture(int texid) { if(texid > -1) piSetActiveTextur
 void piGraphicsContext::EnableTexture() { piEnableTexture(); }
 void piGraphicsContext::DisableTexture() { piDisableTexture(); }
 void piGraphicsContext::PopState() { GLGraphicsContext::PopState(); piDisableTexture(); }
-#if(0)
-void piGraphicsContext::SetColor(float r, float g, float b, float a)
-{
-	oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(r, g, b, a));
-}
-
-void piGraphicsContext::DrawQuad(const float* coords, const float* uv)
-{
-	if(uv)
-		ogl::SetTextureUnitCoordPointer(GL_TEXTURE0, 2, GL_FLOAT, 0, (void*)&uv[0]);
-
-	ogl::SetVertexPointer(2, GL_FLOAT, 0, (void*)&coords[0]);
-	ogl::DrawArrays(GL_QUADS, 0, 4);
-}
-
-void piGraphicsContext::DrawLineStrip(int count, const float* coords, bool closed)
-{
-	ogl::SetVertexPointer(2, GL_FLOAT, 0, (void*)&coords[0]);
-	ogl::DrawArrays(closed ? GL_LINE_LOOP : GL_LINE_STRIP, 0, count);
-}
-
-void piGraphicsContext::DrawLineStrip(int count, float const* coords, bool closed, float width)
-{
-	glLineWidth((GLfloat)width);
-	DrawLineStrip(count, coords, closed);
-	glLineWidth(1.0f);
-}
-#endif
 
 int uiConsoleprintf(const char* text, ...)
 {

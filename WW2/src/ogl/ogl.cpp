@@ -1571,9 +1571,6 @@ LOGICAL oglSetMaterialName(SINT32 matid, const char* name)
 		return(FALSE);
 	}
 
-#ifdef DONT_USE
-	materials[matid].name = memAlloc(strlen(name) + 1);
-#endif
 	strcpy(materials[matid].name, name);
 
 	return(TRUE);
@@ -2300,7 +2297,7 @@ GLenum		mode;
 		Write_Debug(" GL error in oglSetViewportDimensions");
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -4285,9 +4282,6 @@ UINT32*		lptr, color = 0;
 SINT32		width, height, x, y, stride;
 UINT32		AlphaBits, AlphaShift, AlphaMask;
 FLOAT32		uf, vf;
-#ifdef DONT_USE
-FLOAT64		ui, vi;
-#endif
 TEXTURE*	lptex;
 piSURFACEDESC	pisd;
 
@@ -4295,19 +4289,6 @@ piSURFACEDESC	pisd;
 	{
 		return(FALSE);
 	}
-
-#ifdef DONT_USE
-	uf = (FLOAT32)modf(u, &ui);
-	vf = (FLOAT32)modf(v, &vi);
-	if (uf < 0.0f)
-	{
-		uf = 1.0f + uf;
-	}
-	if (vf < 0.0f)
-	{
-		vf = 1.0f + vf;
-	}
-#endif
 
 	uf = u - (FLOAT32)floor(u);
 	vf = v - (FLOAT32)floor(v);
@@ -4447,9 +4428,6 @@ UINT32*		lptr, color;
 SINT32		width, height, x, y, stride;
 UINT32		AlphaBits, AlphaShift, AlphaMask;
 FLOAT32		uf, vf;
-#ifdef DONT_USE
-double		ui, vi;
-#endif
 TEXTURE*	lptex;
 void*	lpdds;
 oglSURFACEDESC sd;
@@ -4458,19 +4436,6 @@ oglSURFACEDESC sd;
 	{
 		return(FALSE);
 	}
-
-#ifdef DONT_USE
-	uf = (FLOAT32)modf(u, &ui);
-	vf = (FLOAT32)modf(v, &vi);
-	if (uf < 0.0f)
-	{
-		uf = 1.0f + uf;
-	}
-	if (vf < 0.0f)
-	{
-		vf = 1.0f + vf;
-	}
-#endif
 
 	uf = u - (FLOAT32)floor(u);
 	vf = v - (FLOAT32)floor(v);
@@ -5279,14 +5244,6 @@ LOGICAL oglReleaseLight(SINT32 numlight)
 	oglSetLightState(numlight, FALSE);
 
 	numlights--;
-
-#ifdef DONT_USE
-	if (numlight < numlights)
-	{
-		memcpy(&lights[numlight], &lights[numlight + 1], (numlights - numlight) * sizeof(lights[numlight]));
-	}
-#endif
-
 	return(TRUE);
 }
 
