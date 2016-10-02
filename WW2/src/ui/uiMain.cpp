@@ -2308,25 +2308,21 @@ int uiConsoleprintf(const char* text, ...)
 	vsnprintf(buf, sizeof(buf) - 1, text, marker);
 	va_end(marker);
 
-	int len = 0;//printf("%s\n", buf);
-
+	int len = 0;
 	std::string out = buf;
 
 	if(!out.empty())
 	{
 		out.insert(0, "CONSOLE: ");
-
-		if(out[out.size()  - 1] != '\n')
-			out += "\n";
-
+        while (out.size() && out[out.size() - 1] == '\n') {
+            out.resize(out.size() - 1);
+        }
 		Write_Log(LOG_CONSOLE, LOG_INFO, out.c_str());
-
+        out += "\n";
 		if(display) display->AddText(out.c_str());
-
-		len = out.size();
+		return static_cast<int>(out.size());
 	}
-
-	return len;
+    return 0;
 }
 
 const wchar_t* uiUTF8toUTF16(const char* text)

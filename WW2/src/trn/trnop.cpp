@@ -384,7 +384,7 @@ OBJECT*	lpatt;
 
 static LOGICAL OnGroundLOD(OBJECT* lpobj, UINT32 lod)
 {
-	Write_Debug("Processing LOD %d for on ground", lod);
+	//Write_Debug("Processing LOD %d for on ground", lod);
 
 	if (lpobj->flags & OBJECT_LOD)
 	{
@@ -503,7 +503,7 @@ piMATRIX	mat;
 OBJECT*	lpbase;
 
 
-	Write_Debug("Processing LOD %d for height conformance", lod);
+	//Write_Debug("Processing LOD %d for height conformance", lod);
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
         if(lpobj->child->flag2 & OBJECT_IS_ROTATED)
@@ -607,7 +607,7 @@ piMATRIX	mat;
 OBJECT*	lpbase, *lpnext;
 
 
-	Write_Debug("Processing LOD %d for height conformance", lod);
+	//Write_Debug("Processing LOD %d for height conformance", lod);
 
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
@@ -977,7 +977,7 @@ piVECTOR	pos, cpos;
 piMATRIX	mat;
 OBJECT*	lpbase, *lpnext;
 
-	Write_Debug("Processing LOD %d for bottom conformance", lod);
+	//Write_Debug("Processing LOD %d for bottom conformance", lod);
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
 		math3dVectorMultiply(&pos, &lpobj->child->pos, &lpobj->child->mat);
@@ -1409,7 +1409,7 @@ OBJECT*	lpatt;
 
 static LOGICAL DownLOD(OBJECT* lpobj, UINT32 lod)
 {
-	Write_Debug("Processing LOD %d for down", lod);
+	//Write_Debug("Processing LOD %d for down", lod);
 	DownLODInterate(lpobj->child);
 
 	return(TRUE);
@@ -1425,7 +1425,7 @@ static LOGICAL PlaceDown(OBJECT* lpobj)
 {
 SINT32		i;
 
-	Write_Debug("Place down: %s", lpobj->name);
+	//Write_Debug("Place down: %s", lpobj->name);
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, DownLOD))
@@ -1444,7 +1444,7 @@ static LOGICAL PlaceConformRadial(OBJECT* lpobj)
 {
 SINT32		i;
 
-	Write_Debug("Place conform radial: %s", lpobj->name);
+	//Write_Debug("Place conform radial: %s", lpobj->name);
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, ConformRadialLOD))
@@ -1522,7 +1522,7 @@ OBJECT*	lpatt;
 
 static LOGICAL RotateLOD(OBJECT* lpobj, UINT32 lod)
 {
-	Write_Debug("Processing LOD %d for rotate", lod);
+	//Write_Debug("Processing LOD %d for rotate", lod);
 	RotateLODInterate(lpobj->child);
 
 	return(TRUE);
@@ -1793,7 +1793,7 @@ OBJECT*			TempObj;
 	obplyrRotateAndTranslateObjectTree(lpobj, mat, translation);
 
 
-	Write_Debug("trnopOrientSubobjects for '%s'", lpobj->name);
+	//Write_Debug("trnopOrientSubobjects for '%s'", lpobj->name);
 
 	// lpobj should point to a Topmost object
 	lpsub = nullptr;
@@ -1843,7 +1843,7 @@ OBJECT*			TempObj;
 			place = atoi(ptr);
 		}
 
-		Write_Debug(" subobject '%s', place = %d", lpsub->name, place);
+		//Write_Debug(" subobject '%s', place = %d", lpsub->name, place);
 		switch (place)
 		{
 			case OBJVAL_ON_GROUND:

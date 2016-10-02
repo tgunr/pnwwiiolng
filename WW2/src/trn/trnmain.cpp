@@ -741,9 +741,9 @@ TERRAIN_DETAIL*	td;
 		return(TRUE);
 #endif
 	}
-	else if (strcmp(newobj->texname, "null1.bmp") == 0)
+	else if (strcmp(newobj->texname, "null1.bmp") == 0 && strlen(lpobj->texname) > 0)
 	{
-		Write_Debug("Null texture object was destination");
+		Write_Debug("Null texture object was destination of source %s", lpobj->texname);
 	}
 	else if (strcmp(lpobj->texname, "null1.bmp") == 0)
 	{
@@ -1077,7 +1077,7 @@ LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
 	strcpy(newobj->name, newname);
 	*objRefName = newobj->name;
 
-	Write_Debug("Object renamed: %s", newname);
+	//Write_Debug("Object renamed: %s", newname);
 
 	// temporary hack for the terrain collision detection routines
 

@@ -917,7 +917,7 @@ LOGICAL trncdAddTerrainObject(OBJECT* Object,SINT32 SuperCellX, SINT32 SuperCell
     BUILDING_PARAMS* Params;
     SINT32 DamThreshold;
 
-    Write_Debug("Adding overall object %s",Object->name);
+    //Write_Debug("Adding overall object %s",Object->name);
 	if (Object != nullptr)
 	{
 		DamThreshold = 0;
@@ -1137,7 +1137,7 @@ _StratMessageQue*	PrevStratMsg;
 		return;
 	}
 
-	Write_Debug("Adding Object %s, top level %s",Object->name,TopObject->name);
+	//Write_Debug("Adding Object %s, top level %s",Object->name,TopObject->name);
 
     mapOBJList::iterator I = mapOBJ.find(Object);
 
@@ -1179,9 +1179,8 @@ _StratMessageQue*	PrevStratMsg;
 	{
 		if(!TO->CollisionObject)
 		{
-			Write_Debug("Cannot find damage collision object for object %s, using entire object tree instead",
-							TO->TerrainObject->name);
-		TO->DamageCollisionObject = Object;
+			//Write_Debug("Cannot find damage collision object for object %s, using entire object tree instead", TO->TerrainObject->name);
+			TO->DamageCollisionObject = Object;
 		}
 		else
 		{
@@ -1192,8 +1191,7 @@ _StratMessageQue*	PrevStratMsg;
 
 	if (TO->CollisionObject == nullptr)
 	{
-		Write_Debug("Cannot find collision object for object %s, using entire object tree instead",
-						TO->TerrainObject->name);
+		//Write_Debug("Cannot find collision object for object %s, using entire object tree instead", TO->TerrainObject->name);
 		TO->CollisionObject = Object;
 	}
 

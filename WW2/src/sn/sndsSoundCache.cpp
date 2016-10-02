@@ -208,14 +208,14 @@ static LPSOUNDCACHE _preloadSoundCache(const SCHAR* name)
 
 	if(!sndsPlatformLoadSound(&sc->theSound))
 	{
-        Write_Log(LOG_SOUND, LOG_WARN, "** FAILED ** to load %s", name);
+        Write_Log(LOG_SOUND, LOG_WARN, "FAILED to load %s", name);
 		FreeSound(sc);
 		return FALSE;
 	}
 
     g_hashSnd.insert(std::make_pair(name, sc));
 
-        Write_Log(LOG_SOUND, LOG_INFO, "** PLEASE CACHE %s **", name);
+    //Write_Log(LOG_SOUND, LOG_INFO, "** PLEASE CACHE %s **", name);
 
     return sc;
 #endif

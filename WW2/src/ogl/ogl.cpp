@@ -264,7 +264,7 @@ SINT32		enumber;
 				break;
 			}
 
-			Write_Debug("GL error 0x%04x encountered\r\n %s", enumber, ptr);
+			Write_Debug("GL error 0x%04x encountered\n %s", enumber, ptr);
 		}
 
 		bError = FALSE;
@@ -1626,7 +1626,7 @@ SINT32 oglCreateMaterial(LPVOID lpmat)
 		return(-1);
 	}
 
-	Write_Debug("CreateMaterial: id=%d", matid);
+	//Write_Debug("CreateMaterial: id=%d", matid);
 
 	materials[matid].matid = matid;
 	materials[matid].numuses += 1;

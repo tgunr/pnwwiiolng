@@ -1434,7 +1434,7 @@ SINT32		count;
 
 	if (count == 0)
 	{
-		Write_Debug("Texture index was not found: %d", txndx);
+		//Write_Debug("Texture index was not found: %d", txndx);
 	}
 
 	return(count);

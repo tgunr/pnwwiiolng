@@ -467,16 +467,18 @@ Image* ReadBMPFile(const std::string& name, unsigned int transparentColor)
     int s, t;
     int internalFormat;
 
-    Write_Log(LOG_TEXTURE, LOG_INFO, "[ReadBMPFile] Reading image %s", name.c_str());
-
     int fd = -1;
     fd = fioOpen(name.c_str());
 
     if(fd < 0)
     {
-        Write_Debug("[ReadBMPFile] cannot open %s", name.c_str());
+        if (errno != ENOENT) {
+            Write_Debug("[ReadBMPFile] cannot open %s", name.c_str());
+        }
         return nullptr;
     }
+
+    Write_Log(LOG_TEXTURE, LOG_INFO, "[ReadBMPFile] Reading image %s", name.c_str());
 
     unsigned char* imageData = bmp_load(fd, s, t, internalFormat, transparentColor);
 
