@@ -4260,9 +4260,9 @@ void loadTextures(granny_file_info* fileInfo, const char* path)
 				createTexture(fileInfo->Textures[i]);
 			}
 		}
-		else
+		else if (fileInfo->Textures[i]->TextureType != GrannyColorMapTextureType || fileInfo->Textures[i]->ImageCount > 0)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "whoa, what kind of texture is this?!?");
+			Write_Log (LOG_FPS, LOG_INFO, "What kind of texture is this? It's index %d and looks like %d", i, fileInfo->Textures[i]->TextureType);
 			//return nullptr;
 		}
 	}
