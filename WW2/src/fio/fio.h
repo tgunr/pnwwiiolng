@@ -7,11 +7,6 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-enum
-{
-};
-
-#if platBuild != BUILD_SERVER
 namespace Fio
 {
 	// Name of our log file
@@ -85,5 +80,3 @@ extern void fioWritef(int fd, const FLOAT32* fp, int numfloats);
 extern void fioWrited(int fd, const FLOAT64* dp, int numdoubles);
 
 extern void fioXmlRegisterInputCallbacks();
-
-#endif
