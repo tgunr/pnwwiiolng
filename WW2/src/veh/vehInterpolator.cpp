@@ -92,9 +92,9 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 // this stuff is spread over so many places and makes so many assumptions that
 // it would take ages to try to decouple it from the player-controlled soldier,
 // and writing something new just isn't on the table right now.
+// NOTE: Largely taken from fpFPSAreaChecks().
 namespace {
-	// NOTE: Largely taken from fpFPSAreaChecks().
-	void CheckHeight(InterpolatorBase::Update& update, fpTPSPoseType pose) {
+	void CheckCollisions(InterpolatorBase::Update& update, fpTPSPoseType pose) {
 		// HACK: Guarantee the FPS colliders have been set up.
 		InitColliderGeometry();
 
@@ -126,38 +126,93 @@ namespace {
 		}
 
 		const Vec3d up = Vec3d(0.0,0.0,1.0);
+		Vec3d dir = update.vel;
+		dir.z() = 0.0; // Vertical motion is much more simple.
 
 		if ( col.findCollisions(true) ) {
-			const colliderQuery::Collision* best = nullptr;
-			auto CollisionFound =
-				[&best] (const colliderQuery::Collision& c) {
-				if ( best == nullptr || c.pos.z() > best->pos.z() )
-					best = &c;
-			};
+			const colliderQuery::Collision* best_floor = nullptr;
+			Vec3d push(0.0, 0.0, 0.0);
 
 			const colliderQuery::CollisionList& hits = col.getCollisions();
 			for ( auto it = hits.begin() ; it != hits.end() ; ++it ) {
 				const colliderQuery::Collision& hit = *it;
-				UINT32 collideBits	= dGeomGetCollideBits(hit.g1);
-				UINT32 categoryBits = dGeomGetCategoryBits(hit.g2);
+				UINT32 collide_bits = dGeomGetCollideBits(hit.g1);
+				UINT32 category_bits = dGeomGetCategoryBits(hit.g2);
 
-				switch ( collideBits ) {
+				switch ( collide_bits ) {
+				case WADE_COLLIDER:
+					// We don't simulate gravity right now, so this doesn't matter on our end.
+					continue;
 				case FALL_COLLIDER:
 					if ( (up * hit.normal) < 0 )
 						continue;
-					if ( colliderIsType(categoryBits, COLLIDER_VEHICLE_MASK) ||
-					     colliderIsType(categoryBits, COLLIDER_WALK) )
+					if ( colliderIsType(category_bits, COLLIDER_VEHICLE_MASK) ||
+					     colliderIsType(category_bits, COLLIDER_WALK) )
 						continue; // Don't let other entities mess with our prediction.
-					CollisionFound(hit);
+
+					if ( (best_floor == nullptr || hit.pos.z() > best_floor->pos.z()) &&
+					     // Only count if it forces us out of the ground.
+					     hit.pos.z() > update.pos.z ) {
+						best_floor = &hit;
+					}
 					break;
+				case CAGE_COLLIDER: {
+					// Scenario-only colliders.
+					if ( colliderIsType(category_bits, COLLIDER_BLOCK) ||
+					     colliderIsType(category_bits, COLLIDER_VOLUME) )
+						continue;
+
+					// If we're not really moving, don't bother to check collisions.
+					if ( dir.length2() < 0.001 )
+						continue;
+
+					double angle = dir * hit.normal;
+
+					// Lower is more forgiving, 1 means must be flat.
+					const double flat_threshold = 0.6;
+
+					// Ignore normals facing the wrong direction.
+					if ( angle > 0.1 )
+						continue;
+					// Ignore relatively flat slopes.
+					if ( up * hit.normal >= flat_threshold )
+						continue;
+					// Just ignoring downward-facing normals for the predcitor.
+					if ( hit.normal.z() < 0 )
+						continue;
+
+					dGeomID geom = dGeomTransformGetGeom(hit.g1);
+					int type = dGeomGetClass(geom);
+
+					Vec3d this_push = hit.normal;
+					this_push.z() = 0; // Again, height is handled differently.
+					this_push.normalize();
+					this_push *= hit.depth;
+
+					// We don't bother to check for conflicting push directions since we're relying
+					// on the other client somewhat to handle the heavy lifting until we can get to
+					// generalizing the collision/gravity code.
+
+					if ( abs(this_push.x()) > abs(push.x()) )
+						push.x() = this_push.x();
+					if ( abs(this_push.y() > abs(push.y())) )
+						push.y() = this_push.y();
+
+					break;
+				}
 				default:
-					// For now, we're only concerned about clipping into the ground.
-					break;
+					continue;
 				}
 			}
 
-			if ( best && best->pos.z() > update.pos.z )
-				update.pos.z = best->pos.z();
+			if ( best_floor )
+				update.pos.z = best_floor->pos.z();
+
+			if ( push.length2() != 0.0 ) {
+				Vec3d pos = update.pos;
+				pos += push;
+				update.pos = {pos.x(), pos.y(), pos.z()};
+			}
 		}
 
 		// Reset the collider just in case code elsewhere doesn't.
@@ -171,8 +226,10 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 	if ( frametime == real_pos.frametime )
 		return real_pos;
 
+	gr2AnimBitPacker flags(pred_pos.animationFlags);
+
 	pred_pos.pos += pred_pos.vel * ((frametime - pred_pos.frametime) / 1000.0);
-	// TODO: Collision.
+	CheckCollisions(pred_pos, (fpTPSPoseType)flags.pose);
 	pred_pos.frametime = frametime;
 	pred_pos.timestamp += (frametime - pred_pos.frametime);
 
@@ -214,13 +271,11 @@ const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frameti
 		CopyPositionData(real_pos, pred_pos);
 	}
 
-	gr2AnimBitPacker flags(pred_pos.animationFlags);
-
 	// Collisions are best addressed through the predictions, but our height isn't
 	// actually handled with any of that. The bit of lag isn't actually that big of
 	// a deal except when going up slopes since we'll visibly clip into the floor
 	// before the up-to-date height gets sent to us.
-	CheckHeight(real_pos, (fpTPSPoseType)flags.pose);
+	CheckCollisions(real_pos, (fpTPSPoseType)flags.pose);
 	// TODO: Gravity prediction.
 
 	// Override motion flags to match what the player's seeing.
@@ -304,8 +359,6 @@ void InfantryPredictor::UpdateInterpolation(void) {
 	double pred_time_passed = ((interp_time - (to.frametime - from.frametime)) / 1000.0);
 	to.pos += to.vel * pred_time_passed;
 
-	// TODO: Deal with collisions so we don't predict ourselves through a wall.
-
 	const double dt = interp_time / 1000.0;
 	FLOAT64VECTOR v1, v2;
 	if ( mathExactVectorLength2(&from.vel) > .001) {
@@ -318,6 +371,11 @@ void InfantryPredictor::UpdateInterpolation(void) {
 	} else {
 		mathScaleVector(&v2, &to.dir, .001);
 	}
+
+	// TODO: It's very unlikely, but we may end up on the other
+	// side of a wall/floor after the interp_time has passed.
+	gr2AnimBitPacker flags(to.animationFlags);
+	CheckCollisions(to, (fpTPSPoseType)flags.pose);
 
 	spline.SetControlPointsWithDt(from.pos, v1, to.pos, v2);
 
