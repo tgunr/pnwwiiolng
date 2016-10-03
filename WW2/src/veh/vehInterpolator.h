@@ -51,6 +51,32 @@ protected:
 	FLOAT64 _lastUpdateYaw;
 };
 
+class InfantryPredictor : public InterpolatorBase {
+public:
+	typedef int Timestamp; // The time on the other client.
+	typedef int FrameTime; // The time on this end.
+
+	InfantryPredictor(vehVehicle* v = nullptr);
+
+	void NewPosDataUpdate(Timestamp timestamp, FrameTime frametime) override;
+	const Update& Interpolate(FrameTime frametime) override;
+	void SetFlags(UINT32 flags_) override { real_pos.animationFlags = flags_; }
+
+	void Copy(vehVehicle* v, UINT32 flags) override;
+private:
+	void UpdateInterpolation(void);
+
+	// Updates based on the last info received
+	Update prev_msg, curr_msg;
+	// The predicted and real positions.
+	// Real may lag behind slightly to keep motion smooth.
+	Update pred_pos, real_pos;
+
+	// Used to smooth the transition when updates are received.
+	FrameTime interp_beg, interp_end;
+	CubicSpline spline;
+};
+
 class InfantryInterpolator : public InterpolatorBase
 {
 public:
@@ -101,4 +127,4 @@ protected:
 };
 
 // type used by vehicle member variables
-typedef InfantryInterpolator vehInterpolator;
+typedef InfantryPredictor vehInterpolator;

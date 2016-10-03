@@ -422,6 +422,16 @@ void sysGetMousePosition(SINT32 *x, SINT32 *y)
 #pragma mark - GETTERS AND STATS -
 ////////////////////////////////////////////////////////////////////////////////
 
+int ddpGetCenterX()
+{
+    return static_cast<int>([[ddpWin screen] frame].origin.x + ([[ddpWin screen] frame].size.width / 2));
+}
+
+int ddpGetCenterY()
+{
+    return static_cast<int>([[ddpWin screen] frame].origin.y + ([[ddpWin screen] frame].size.height / 2));
+}
+
 int ddpGetWidth()
 {
 	return static_cast<int>(ddpRect.size.width);
