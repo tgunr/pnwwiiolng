@@ -880,9 +880,15 @@ extern NSString *WebActionOriginalURLKey;
 - (void)advanceState
 {
     if (self.error != nil) {
-        if (self.error.localizedDescription) {
+        if (![self.error.domain isEqualToString:PGErrorDomain] || self.error.code != PGErrorSilent) {
             NSAlert *alert = [NSAlert alertWithError:self.error];
             
+            alert.messageText = NSLocalizedString(@"An error occurred while logging in!", @"Auth error");
+            if ([self.error.domain isEqualToString:NSPOSIXErrorDomain]) {
+                alert.informativeText = @(strerror(self.error.code));
+            } else {
+                alert.informativeText = self.error.localizedDescription;
+            }
             [alert runModal];
         }
         
@@ -1007,7 +1013,7 @@ extern NSString *WebActionOriginalURLKey;
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (isConnectedToAuthenticationServer) {
-            self.error = [NSError playgateErrorWithDomain:PGteulErrorDomain code:err userInfo:nil rootError:nil];
+            self.error = [NSError playgateErrorWithDomain:NSPOSIXErrorDomain code:err userInfo:nil rootError:nil];
             [self advanceState];
         }
     });
