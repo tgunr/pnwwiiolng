@@ -20,11 +20,6 @@
 #include "comm/commPlaygateMessages.h"
 
 #include "wwii/wwiiCallbacks.h"
-#include "sysmac/locIDs.h"
-#include <Foundation/Foundation.h>
-
-//static TEUL_CALLBACK*	_APP_VERIFY;
-//static TEUL_CALLBACK*	_APP_LAUNCH;
 
 static SINT32 _errorFunc(ACTION_OBJECT *Action);
 
@@ -58,7 +53,7 @@ _recvAPP_VERIFY(ACTION_OBJECT* const a)
 
 static SINT32 _recvAPP_LAUNCH(ACTION_OBJECT* const a)
 {
-APP_LAUNCH app;
+    APP_LAUNCH app;
 
 	a->offset = authPackAPP_LAUNCH(TEUL_UNPACK, a->packed, a->offset, &app, 0);
 
@@ -79,28 +74,11 @@ _callbackError(
                , const SINT32 error
                )
 {
-    /*
-     TBD - this is all just temporary to get a build going that is close to 1.34
-     
-     */
-    
-    static char errorText[500];
     const std::pair<UINT32, UINT16>& dest = Teul::GetRemote(teulIndex);
-
-    sprintf(errorText, "ERROR: TeulIndex-%d, Address-%s, Dest-%u, Error-%d",
-            teulIndex
-            , teulGetAddress(dest.first)
-            , dest.second
-            , error);
-
-    NSUserNotification *notification = [[NSUserNotification alloc] init];
     
-    notification.title = @"Internal Networking Error";
-    notification.informativeText = [NSString stringWithFormat:
-        @"ERROR: TeulIndex-%d, Address-%s, Dest-%u, Error-%d",
+    dbugLog(_FLA, "ERROR: TeulIndex-%d, Address-%s, Dest-%u, Error-%d",
         teulIndex, teulGetAddress(dest.first), dest.second, error
-    ];
-    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+    );
 }
 
 //////////////////////////////////////////////////////////////////////
