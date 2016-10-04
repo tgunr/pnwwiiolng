@@ -1145,7 +1145,7 @@ main(int argc, const char* argv[])
 		{
 			// keep trying until we connect - at intervals
 			dbugLog(_FLA, "%s authGameInit failed retval %d", __FUNCTION__, retval);
-			usleep(10000);
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 	}
 
