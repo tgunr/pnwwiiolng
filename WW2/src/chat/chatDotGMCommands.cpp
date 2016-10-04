@@ -1912,7 +1912,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 						, "R#%u(%s/%s)"
 							, erank
 							, _rankType(myRank->type())
-							, rankNames[erank]
+							, rankNames[erank].c_str()
 							);
 		else if ( player.isPlaynet() )
 			strprintf(buf, "R#%u(INVALID)", erank);
@@ -2154,7 +2154,7 @@ public:
 						" WHERE p.playerID = %u AND p.countryid = %u and p.branchid = %u and r.rankid = %u"
 						, rankNo, player.playerID(), player.country(), player.branch(), rankNo);
 
-		player.message(LSTR_NOTE, LSTR_RANK_SET, rankNames[rankNo]);
+		player.message(LSTR_NOTE, LSTR_RANK_SET, rankNames[rankNo].c_str());
 	}
 } dotSetRank;
 
