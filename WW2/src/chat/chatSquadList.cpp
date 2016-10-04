@@ -142,8 +142,8 @@ public:
 		{
 			const Result& result = m_results[i];
 			ChatHandle handle = result.m_handle;
-			const UINT32& playerID = result.m_playerID;
-			const UINT32& rank = result.m_rank;
+			const UINT32 playerID = result.m_playerID;
+			const UINT32 rank = result.m_rank;
 			UINT32 joined = result.m_joined;
 
 			if ( rank <= 0 )
@@ -536,7 +536,6 @@ CHATDB_SQUAD_XCHG::receive(SINT32 /*teulIndex*/, CHATDB_SQUAD_XCHG& incoming)
 
 	// No existing entry so lets grease this pig
 	g_squads[squad.squadID()] = SquadList(squad);
-	list = chatFindSquadList(squad.squadID());
 
 	chatRequestSquadMemberList(squad.squadID());
 
