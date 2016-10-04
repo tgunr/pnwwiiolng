@@ -12,13 +12,15 @@
 #pragma error "Must have included platform.h first"
 #endif
 
+#include "str/stringLib.h"
+
 #if platOS == OS_WIN32
 #define vsnprintf _vsnprintf
 #endif
 
-static const UINT32 DBUG_FLAG_MASK = 0xfffffff0;	// flags mask
-static const UINT32 DBUG_MAX_STRING = 4224;
-static const UINT32 DBUG_MAX_PATH = 128;
+constexpr UINT32 DBUG_FLAG_MASK = 0xfffffff0;	// flags mask
+constexpr UINT32 DBUG_MAX_STRING = 4224;
+constexpr UINT32 DBUG_MAX_PATH = 128;
 
 class DebugLogger
 {

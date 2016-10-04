@@ -89,7 +89,7 @@ UINT32 chatGetStratAddr(void);
 bool chatRouteSideMessage(WWII_SIDE toSide
 						, LSTRING_ID prefix
 						, LSTRING_ID message
-						, const struct FULL_OBJ_ID objectiveID
+						, const FULL_OBJ_ID objectiveID
 						, const char* arg1
 						, const char* arg2
 						);

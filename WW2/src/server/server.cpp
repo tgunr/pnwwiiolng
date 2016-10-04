@@ -40,7 +40,6 @@
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointImpl.h"
-#include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
 #include "teul/teulServer.h"
@@ -68,7 +67,7 @@ extern void serverInitializePeering();
 extern void serverConnectPeer(const UINT32 ip, const SERVER_TYPE type);
 extern void serverDisconnectPeer(Server::ServerInfo* server);
 
-const char* g_serverTypes[MAX_SERVER_TYPE] =
+const char* g_serverTypes[MAX_SERVER_TYPE + 1] =
 {
 	"controller"
 ,	"auth"
@@ -78,6 +77,7 @@ const char* g_serverTypes[MAX_SERVER_TYPE] =
 ,	"map"
 ,	"cell"
 ,	"EXIT"
+,   "unknown"
 };
 
 class ServerManager : public ServerInterface
@@ -1565,6 +1565,9 @@ ServerInterface::LookupByPlayerID(UINT32 id)
 UINT32
 serverGetAuthIP()
 {
+#if PN_DISABLE_AUTH
+	return 0;
+#else
 	if ( useAuthServer == false )
 		return 0;
 
@@ -1572,20 +1575,15 @@ serverGetAuthIP()
 	if ( !authName || !*authName )
 		LogAbort("Missing AUTH_ADDRESS");
 
-	UINT32 address = Teul::GetSingleIP(authName);	// Returns malloc'd pointer!
+	UINT32 address = Teul::GetSingleIP(authName);
 	if ( address == 0 )
 	{
-		if ( useAuthServer == true )
-		{
-			LogAbort("Unable to resolve auth address '%s'", authName);
-			/* ABORTED */
-		}
-
-		dbugLog(_FLN, "Couldn't resolve auth address '%s', ignoring", authName);
-		return 0;
+		LogAbort("Unable to resolve auth address '%s'", authName);
+		/* ABORTED */
 	}
 
 	return address;
+#endif
 }
 
 SINT32
@@ -1860,7 +1858,7 @@ void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SI
 }
 #endif
 
-NORETURN_FN void _help(const char* argv[], const Server::CommandLineOptions& cliOptions)
+[[noreturn]] void _help(const char* argv[], const Server::CommandLineOptions& cliOptions)
 {
 	printf("Usage: %s [arguments | --help]\n", argv[0]);
 	for (size_t i = 0; i < cliOptions.size(); ++i)
@@ -1874,9 +1872,9 @@ NORETURN_FN void _help(const char* argv[], const Server::CommandLineOptions& cli
 	exit(0);
 }
 
-void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
+void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
 {
-	Server::serverType = serverType;
+	Server::serverType = serverType_;
 	Teul::SetAppName(appName);
 
 	// Windows requires us to enable networking (WSAStartup) early on

@@ -109,7 +109,7 @@ namespace Debug
 void dbugInit(int logType, const char* filename);
 
 // dbugClose: closes the debug file and cleans up.
-void dbugClose(void);
+void dbugClose();
 
 // dbugSetLogLevel: set the current debug level for display of log messages.
 void dbugSetLogLevel(Debug::ERROR_TYPE level);
@@ -122,14 +122,14 @@ void dbugSetWriteLevel(Debug::ERROR_TYPE level);
 // may also be included to map windows socket errors to Unix errno.  Additional errors beyond
 // those covered in errno.h and dbugWErrno.h must be added to debugExtErrno.h and must adhere to
 // windows error code conventions to eliminate problems with compatibility.
-void dbugSetErrno( int err);
+void dbugSetErrno(int err);
 
 // dbugGetErrno: returns the current error number.  Error numbers adhere to errno.h.  Under
 // win32 "dbugWErrno.h" may also be included to map windows socket errors to Unix errno.
 // Additional errors beyond those covered in errno.h and dbugWErrno.h must be added to
 // debugExtErrno.h and must adhere to windows error code conventions to eliminate problems
 // with compatibility.
-int dbugGetErrno(void);
+int dbugGetErrno();
 
 // dbugLog: if the current filename, lineno or string is nullptr then it sets these members. The
 // parameters are output as a string to the debug file depending on the debug level selected and

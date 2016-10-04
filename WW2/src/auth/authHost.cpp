@@ -1465,10 +1465,8 @@ authEstablishServer(const SINT32 teulIndex, AUTH_GAME_INIT& gInit)
 	//Place the server onto the server list for the game entry we either found
 	//	or created
 	SERVER* oldServer = game->server();
-	if ( oldServer && oldServer != newServer )
-	{
-		delete game->server();
-	}
+	if ( oldServer != newServer )
+		delete oldServer;
 
 	game->server(newServer);
 

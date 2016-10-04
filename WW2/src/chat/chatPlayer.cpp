@@ -326,8 +326,7 @@ Player::~Player()
 		m_tunes = nullptr;
 	}
 
-	if ( m_impl )
-		delete m_impl;
+	delete m_impl;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1074,7 +1073,7 @@ public:
 	PlayerGroupQuery(const playerid_t _playerID)
 		: DBThreadQuery(DBThread::Default, "PlayerGroupQuery", DBThreadQuery::_IMMEDIATE
 							, "SELECT v.group_oid"
-								" FROM auth.v_player_active_groups v"
+								" FROM `auth`.`v_player_active_groups` v"
 								" WHERE v.playerid = %u AND v.arenaid = %u"
 									, _playerID
 									, Server::myServerInfo.stats.arenaID
@@ -1416,7 +1415,7 @@ Player::SetMission(UINT32 toMissionID)
 // Set when to send the next reminder not to spam the help channel
 
 void
-Player::SetTimer(const char* timer, const TeulTimeMS& time)
+Player::SetTimer(const char* timer, const TeulTimeMS time)
 {
 	m_impl->m_timers[timer] = time;
 }

@@ -12,7 +12,7 @@
 
 static const int INVALID_GRID_COORD = 0x7fffffff;
 
-class MissionMember
+class MissionMember final
 {
 public:
 	MissionMember(ChatHandle handle=0LL, RANK_NO rank=0, SINT32 x=INVALID_GRID_COORD, SINT32 y=INVALID_GRID_COORD, WEAPON_SPEC weapon=NULL_WEAP_SPEC)

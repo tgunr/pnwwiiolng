@@ -495,7 +495,7 @@ chatSendPopulation()
 // Ask the mission host to cancel a particular mission
 
 SINT32
-chatSendMissionDeleteRequest(const UINT32& missionID)
+chatSendMissionDeleteRequest(UINT32 missionID)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MISSION_DELETION_Y), missionID);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -ENOTCONN;
@@ -1111,7 +1111,7 @@ _recvTutProgress(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Instance the ThreadTextQuery class for aggregating
 
-const char* const _PROGRESS_UPDATE_PREFIX = "INSERT INTO wwii.training_progress(player_id,group_name,progress)VALUES";
+const char* const _PROGRESS_UPDATE_PREFIX = "INSERT INTO `wwii`.`training_progress`(player_id,group_name,progress)VALUES";
 const char* const _PROGRESS_UPDATE_SUFFIX = "ON DUPLICATE KEY UPDATE player_id=values(player_id),group_name=values(group_name),progress=values(progress)";
 
 static ThreadTextQuery _progressUpdates(DBThread::Default, _PROGRESS_UPDATE_PREFIX, _PROGRESS_UPDATE_SUFFIX);

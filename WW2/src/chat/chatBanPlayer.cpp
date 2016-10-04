@@ -135,7 +135,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 		threadLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, issuer.c_str(), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, name.c_str());
 
 		message = new char[strlen(ban.m_message.c_str())*2 + 1];
-        	mysql_real_escape_string(conn, message, ban.m_message.c_str(), ban.m_message.length());
+		mysql_real_escape_string(conn, message, ban.m_message.c_str(), ban.m_message.length());
 		
 		// p_ban_player ( playerID, banFor, banBy, reason ) returns either
 		// 0, <reason>

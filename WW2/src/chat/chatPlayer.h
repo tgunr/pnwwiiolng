@@ -221,7 +221,7 @@ public:
 	// Change the personas mission ID
 	void SetMission(UINT32 missionID);
 
-	void SetTimer(const char* name, const TeulTimeMS& time);
+	void SetTimer(const char* name, const TeulTimeMS time);
 
 	// Change the noEnemyChat flag
 	void SetNoEnemyChat(bool state) { m_noEnemyChat = state; }
@@ -329,11 +329,11 @@ public:
 	bool isBuzzard() const { return m_isBuzzard; }
 	virtual bool isManager() const { return false; }
 	bool isSpawned() const { return m_isSpawned; }	///TODO:134: Move to wwiiPlayer, replace with permissions(IS_SPAWNED)
-	const TeulTimeMS& joinedMission() const { return m_joinedMission; }
+	TeulTimeMS joinedMission() const { return m_joinedMission; }
 	UINT32 joinedSquad() const { return (squadID() > 0) ? m_joinedSquad : 0; }
 	const Property* lastCP() const { return m_lastCP; }
 	UINT32 lastMessageID() const { return m_lastMessageID; }
-	const TeulTimeMS& lastSquadInfoMS() const { return m_lastSquadInfo_ms; }
+	TeulTimeMS lastSquadInfoMS() const { return m_lastSquadInfo_ms; }
 	const FLOAT64& lastX() const { return m_lastX; }
 	const FLOAT64& lastY() const { return m_lastY; }
 	const FLOAT64& lastZ() const { return m_lastZ; }
@@ -344,7 +344,7 @@ public:
 	bool noWho() const { return m_noWho; }
 	FULL_OBJ_ID objectiveCpID() const { return m_objectiveCpID; }
 	FULL_OBJ_ID originCpID() const { return m_originCpID; }
-//	const ChatHandle squadHandle() const { return m_squadHandle; }
+//	ChatHandle squadHandle() const { return m_squadHandle; }
 	SquadInvite* squadInvite() { return m_squadInvite; }
 	const SquadInvite* squadInvite() const { return m_squadInvite; }
 	bool rejectLead() const;

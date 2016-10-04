@@ -23,6 +23,6 @@ enum SERVER_TYPE
 	MAX_SERVER_TYPE,
 };
 
-extern const char* g_serverTypes[MAX_SERVER_TYPE];
+extern const char* g_serverTypes[MAX_SERVER_TYPE + 1];
 
 //tolua_end

@@ -1912,7 +1912,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 						, "R#%u(%s/%s)"
 							, erank
 							, _rankType(myRank->type())
-							, rankNames[erank].c_str()
+							, rankNames[erank]
 							);
 		else if ( player.isPlaynet() )
 			strprintf(buf, "R#%u(INVALID)", erank);

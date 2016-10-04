@@ -27,7 +27,6 @@ void chatDeleteMission(UINT32 missionID);
 void chatMissionChannelEmpty(UINT32 missionID);
 
 void chatSetMissionOrders(UINT32 missionID, const std::string& orders, bool lockLeader);
-const char* chatGetMissionOrders(UINT32 missionID);
 void chatMessageMissionChannel(UINT32 missionID, Chat::LocalizedMessage& lmsg);
 void chatMissionAddPlayer(Player* player, UINT32 missionID, UINT32 sponsor);
 void chatMissionRemovePlayer(Player* player, UINT32 missionID, UINT32 sponsor);
