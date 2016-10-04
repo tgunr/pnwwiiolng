@@ -251,8 +251,6 @@ ADD_LIBRARY(teulserver
     wwii/wwiiConfig.cpp
         wwii/wwiiConfig.h
         wwii/wwiiConfigMap.h
-    src/pnThread.cpp
-        include/pnThread.h
 
     ${PCH_INCLUDE_HEADERS}
     dbug/dbugInternal.h
