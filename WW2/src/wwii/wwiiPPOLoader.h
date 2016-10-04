@@ -44,6 +44,20 @@ struct PPOSpec
 class PPOSpecLoader : public XMLLoader2<PPOSpecLoader>
 {
 public:
+	
+	// NOTE: This order must track what is in the vehicle/ground/groundman/ppo.xml file
+	enum
+	{
+		_PPO_IFP = 1 								//!< "Removal" stub.
+		,	_PPO_GE									//!<Object representing a vehicle.
+		,	_PPO_FMS								//!< Fire ordnance.
+		,	_PPO_AFRU								//!< Dead vehicle.
+		,	_PPO_CFRU								//!< Graphical effect (e.g. smoke).
+		,	_PPO_SANDBAGS							//!< Dynamically placed terrain object.
+		,	_PPO_TANKTRAP							//!< Player placed object; built on terrain sto.
+	};
+
+public:
 
 	PPOSpecLoader();
 	virtual ~PPOSpecLoader() { }

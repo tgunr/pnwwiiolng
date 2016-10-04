@@ -88,6 +88,7 @@
 #include "weap/weapammo.h"
 #include "weap/weapList.h"
 #include "weap/weapons.h"
+#include "wwii/wwiiPPOLoader.h"
 
 // WWIIOL specific.
 #include "client/clientStrtQueue.h"
@@ -3890,24 +3891,44 @@ vehVehicle* VehicleSTO::getVehicle()
 void MobileSpawnSTO::preProcess()
 {
 	PlayerPlacedSTO::preProcess();
-
-	if(_to)
-		trnFXSetCountryFlags(_to, (SINT32)flags());
 }
 
 void MobileSpawnSTO::postProcess()
 {
 	PlayerPlacedSTO::postProcess();
-
-	if(_to)
-	{
-		trnCDTerrainObject* TO = trncdFindTerrainObject(_to->child);
-
-		// flags is used to pass the country for mobilespawn stos
-		if(TO)
-			TO->Country = (SINT32)flags();
-	}
 }
+
+void PlayerPlacedSTO::preProcess()
+{
+    TerrainSTO::preProcess();
+    
+    if (type() == ServerTrackedObject::_UMS || subType() == PPOSpecLoader::_PPO_AFRU)
+    {
+        if(_to)
+            trnFXSetCountryFlags(_to, (SINT32)flags());
+    }
+}
+
+void PlayerPlacedSTO::postProcess()
+{
+    TerrainSTO::postProcess();
+    
+    if (type() == ServerTrackedObject::_UMS || subType() == PPOSpecLoader::_PPO_AFRU)
+    {
+        if(_to)
+        {
+            trnCDTerrainObject* TO = trncdFindTerrainObject(_to->child);
+            
+            // flags is used to pass the country for mobilespawn stos
+            if(TO)
+                TO->Country = (SINT32)flags();
+        }
+    }
+}
+
+
+
+
 
 BailoutSTO::~BailoutSTO()
 {
@@ -5322,7 +5343,8 @@ PlayerPlacedObject* vehmainFRUBuild()
 	// set our callbacks
     if (fru != nullptr)
     {
-        fru->SetExecuteCallback(vehmainFRUExecute);
+        // should just let this call the defaul execute, should be good enough
+        //fru->SetExecuteCallback(vehmainFRUExecute);
 
         // for vehicles, fail on validity checks
         //fru->failOnInvalid = (veh->VehicleType->Type != VEH_TYPE_PERSON);
@@ -5342,6 +5364,8 @@ PlayerPlacedObject* vehmainFRUBuild()
 	return fru;
 }
 
+// I fail to see why this is even need
+#if 0
 bool vehmainFRUExecute()
 {
     SINT32 *coolDownEnd = &globalMSCoolDownEnd;
@@ -5398,6 +5422,7 @@ bool vehmainFRUExecute()
 
 	return false;
 }
+#endif
 
 /************************************************************************************************
 	vehHandleMobileSpawnUpdate

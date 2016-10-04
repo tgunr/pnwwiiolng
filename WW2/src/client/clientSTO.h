@@ -207,9 +207,11 @@ class PlayerPlacedSTO : public TerrainSTO
 {
 public:
 	//! Constructor for building a request instance
-	PlayerPlacedSTO(UINT32 id, UINT16 subType, const WorldPosition_m& position, const AttitudeVector& attitude, UINT16 type = _PPO)
+	PlayerPlacedSTO(UINT32 id, UINT16 subType, const WorldPosition_m& position, const AttitudeVector& attitude, UINT16 type = _PPO, UINT32 country = 0)
 		: TerrainSTO(id, subType, position, attitude, type), _lastUpdate(0)
-		{}
+		{
+            m_flags = country;
+        }
 
 	//! Build an ums instance from a network stream
 	PlayerPlacedSTO(ACTION_OBJECT* const a)
@@ -220,6 +222,9 @@ public:
 	virtual bool applyJoules(const SINT64& joules, class Player* player = nullptr);
 	virtual bool load();
 
+    virtual void preProcess();
+    virtual void postProcess();
+    
 	void Sink();
 	void Update();
 
@@ -236,11 +241,10 @@ class MobileSpawnSTO : public PlayerPlacedSTO
 public:
 	//! Constructor for building a request instance
 	MobileSpawnSTO(UINT32 id, UINT16 subType, const WorldPosition_m& position, const AttitudeVector& attitude, UINT32 country = 0)
-		: PlayerPlacedSTO(id, subType, position, attitude, _UMS)
+		: PlayerPlacedSTO(id, subType, position, attitude, _UMS, country)
 	{
 		//flagTextures[0] = flagTextures[1] = flagTextures[2] = flagTextures[3] = -1;
 		_collisionGrace = 20000;
-		m_flags = country;
 	}
 
 	//! Build an ums instance from a network stream

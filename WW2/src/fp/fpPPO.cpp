@@ -1000,7 +1000,7 @@ bool PlayerPlacedObject::Execute()
             if (spec->stotype != ServerTrackedObject::_UMS)
             {
                 // create a ppo sto
-                PlayerPlacedSTO sto(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype));
+                PlayerPlacedSTO sto(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype), (UINT32)player->Country);
 
                 // send the request to the host
                 sto.request(PlayerClient()->ChatConnection());
@@ -1020,7 +1020,7 @@ bool PlayerPlacedObject::Execute()
             
             if (spec->stotype != ServerTrackedObject::_UMS)
             {
-                PlayerPlacedSTO* sto = new PlayerPlacedSTO(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype));
+                PlayerPlacedSTO* sto = new PlayerPlacedSTO(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype), (UINT32)player->Country);
                 ServerTrackedObject::addToIndex(sto);
                 trnCDUpdateCollideLists(true);
                 //sto->Sink();
