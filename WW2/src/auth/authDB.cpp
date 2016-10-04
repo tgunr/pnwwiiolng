@@ -120,10 +120,10 @@ void authInitDB(void)
 
 	// Populate the connection info structure.
 	teulGetAddress(dbIp, dbConnection.host, sizeof(dbConnection.host));
-	strcpy(dbConnection.dbName, cv_authdbSchema.GetString());
-	strcpy(dbConnection.username, cv_authdbUser.GetString());
-	strcpy(dbConnection.password, cv_authdbPassword.GetString());
-	strcpy(dbConnection.port, cv_authdbPort.GetString());
+	strsafecpy(dbConnection.dbName, cv_authdbSchema.GetString());
+	strsafecpy(dbConnection.username, cv_authdbUser.GetString());
+	strsafecpy(dbConnection.password, cv_authdbPassword.GetString());
+	strsafecpy(dbConnection.port, cv_authdbPort.GetString());
 
 	if ( dbh.connect(dbConnection) == false )
 		LogAbort("Unable to initialize auth database connection - check grants for %s on %s", dbConnection.username, dbConnection.host);
@@ -624,7 +624,7 @@ _getAppManifest()
 				teulGetHost(row[1], &vers_mans[i].newNo);
 				vers_mans[i].platform = (SINT32)atol(row[2]);
 				vers_mans[i].isfile = _findIsFile(row[3][0]);
-				strncpy(vers_mans[i].location, row[4], URL_STRING_MAX);
+				strsafecpy(vers_mans[i].location, row[4]);
 
 				if (vers_mans[i].isfile == ISFILE_FILE)
 				{
@@ -640,9 +640,9 @@ _getAppManifest()
 						vers_mans[i].protocol = DEF_PROTOCOL;
 					}
 
-					strncpy(vers_mans[i].ftpURL, row[7], URL_STRING_MAX);
-					strncpy(vers_mans[i].ftpDir, row[8], URL_STRING_MAX);
-					strncpy(vers_mans[i].ftpFile, row[9], URL_STRING_MAX);
+					strsafecpy(vers_mans[i].ftpURL, row[7]);
+					strsafecpy(vers_mans[i].ftpDir, row[8]);
+					strsafecpy(vers_mans[i].ftpFile, row[9]);
 				}
 			}
 		}
@@ -675,7 +675,7 @@ _getPlayerTable(GAME& gameEntry)
 		if ( q.HasRows() == false || q.FetchRow() == false )
 			throw std::invalid_argument("couldn't find game entry");
 
-		strncpy(gameEntry.playerTable, q.Row()[0], MAX_DESCRIPTION);
+		strsafecpy(gameEntry.playerTable, q.Row()[0]);
 
 		dbugLog(_FLI, "arena:%d game:%d setting playerTable to %s", gameEntry.arenaID, gameEntry.gameID, gameEntry.playerTable);
 		return true;
@@ -759,25 +759,25 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 
 	try
 	{
-		strncpy(statement, ogl.cardName, MAX_OGL_CARD_NAME);
+		strsafecpy(statement, ogl.cardName);
 		mysql_real_escape_string(dbh, cardName, statement, strlen(statement));
 
-		strncpy(statement, ogl.vendor, MAX_OGL_VENDOR_NAME);
+		strsafecpy(statement, ogl.vendor);
 		mysql_real_escape_string(dbh, vendor, statement, strlen(statement));
         
-        strncpy(statement, cpu.manufacturer, std::min(sizeof(statement), sizeof(cpu.manufacturer)) - 1);
+        strsafecpy(statement, cpu.manufacturer);
         mysql_real_escape_string(dbh, cpuManufacturer, statement, strlen(statement));
         
-        strncpy(statement, cpu.brandName, std::min(sizeof(statement), sizeof(cpu.brandName)) - 1);
+        strsafecpy(statement, cpu.brandName);
         mysql_real_escape_string(dbh, cpuBrandName, statement, strlen(statement));
         
 		if ( pci.sound.isValid )
 		{
-			strncpy(statement, mix.szPname, MAX_MIX_NAME);
+			strsafecpy(statement, mix.szPname);
 			statement[MAX_MIX_NAME] = 0;
 			mysql_real_escape_string(dbh, soundCard, statement, strlen(statement));
 		} else {
-			strncpy(soundCard, "*none*", MAX_MIX_NAME);
+			strsafecpy(soundCard, "*none*");
 		}
 
 		descs[0] = 0;

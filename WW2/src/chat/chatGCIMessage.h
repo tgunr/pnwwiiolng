@@ -24,8 +24,7 @@ namespace Chat
 		GCIMessage(GCI_TYPE gci_, WWII_SIDE side_, const FULL_OBJ_ID cp_, const FULL_OBJ_ID fac_, const char* name_)
 			: gci(gci_), side(side_), where(cp_), facility(fac_)
 		{
-			strncpy(name, name_, sizeof(name) - 1);
-			name[sizeof(name)-1] = 0;
+			strsafecpy(name, name_);
 		}
 
 		// Members
@@ -39,4 +38,3 @@ namespace Chat
 #pragma pack(pop)
 
 void chatSendGCIMessage(GCI_TYPE gci_, WWII_SIDE side_, const class CPStruct& cp, const FULL_OBJ_ID facID);
-

@@ -89,9 +89,9 @@ _banSuccess(void* data)
 		Chat::Name banned(ban->m_handle);
 		char msg[MAX_MESSAGE_LENGTH+1];
 		if ( ban->m_duration == 0 )
-			snprintf(msg, MAX_MESSAGE_LENGTH, "%s has force-kicked %s: %s", issuer->callsign(), banned.c_str(), ban->m_message.c_str());
+			strprintf(msg, "%s has force-kicked %s: %s", issuer->callsign(), banned.c_str(), ban->m_message.c_str());
 		else
-			snprintf(msg, MAX_MESSAGE_LENGTH, "%s has issued a %s ban(#%u) on %s: %s"
+			strprintf(msg, "%s has issued a %s ban(#%u) on %s: %s"
 						, issuer->callsign()
 						, chatTimeInterval(ban->m_duration)
 						, ban->m_banNo

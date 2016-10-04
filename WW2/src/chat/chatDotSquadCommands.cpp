@@ -52,7 +52,7 @@ _validateSquadName(const char* name)
 	Chat::Name unpacked(handle);
 	if ( unpacked != name )
 		return 0LL;
-	int len = strlen(name);
+	size_t len = strlen(name);
 	if ( len < 2 || len > Squad::SHORT_NAME_LEN )
 		return 0LL;
 
