@@ -254,7 +254,6 @@ mapInitDB()
 void
 mapCloseDB()
 {
-	wwiiFreeRanks();
 	dbh.disconnect();
 }
 
