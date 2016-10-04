@@ -250,6 +250,7 @@ SINT32
 chatInstallClientCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
+	{
 
 		REGISTER_SENDER(Chat::CLIENT_MESSAGE_Y, _sendMessage, CHAT_SEND_CLIENT_MESSAGE) ;
 
@@ -258,7 +259,7 @@ chatInstallClientCallbacks(void)
 		REGISTER_RECEIVER(Chat::CLIENT_GCI_MESSAGE_Y, _recvGCIMessage) ;
 		REGISTER_RECEIVER(Chat::LOCALIZED_MESSAGE_Y, _recvLocalisedMessage) ;
 		REGISTER_RECEIVER(Chat::CMD_LIST_Y, _recvCommandList) ;
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 
