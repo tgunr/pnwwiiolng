@@ -93,7 +93,7 @@
 		dbugSetErrno(0); \
 		return 0; \
 	} \
-	catch (std::exception& e) \
+	catch (std::exception&) \
 	{ \
 		LogAbort("network error"); \
 		return -EINVAL; \
