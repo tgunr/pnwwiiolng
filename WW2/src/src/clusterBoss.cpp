@@ -15,5 +15,5 @@ int main(int argc, const char* argv[])
 	Cluster::Config::Load();
 
 //	auto noopCallbackFn = [](SINT32 /* teulIndex */, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/) {};
-//	teulInitTransport(LOG_TO_FILE, "clusterboss", noopCallbackFn, noopCallbackFn);
+//	teulInitTransport(LogMode::TO_FILE, "clusterboss", noopCallbackFn, noopCallbackFn);
 }
