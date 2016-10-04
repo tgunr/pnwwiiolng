@@ -105,7 +105,7 @@ _callbackError(
 bool
 commInit(void)
 {
-	if (teulInitTransport(LOG_TO_FILE, "PlayGATE", _teulKitError, nullptr))
+	if (teulInitTransport(LogMode::TO_FILE, "PlayGATE", _teulKitError, nullptr))
 		return false;
 
 #ifdef DEBUG
@@ -253,7 +253,7 @@ commSend(TEUL_CALLBACK* object, void*  data)
 #include "teul/teulConnectionInstruction.h"
 
 int
-Teul::ConnectionInstruction::receive(SINT32 teulIndex)
+Teul::ConnectionInstruction::receive(SINT32 /*teulIndex*/)
 {
 	return -EINVAL;
 }

@@ -427,7 +427,7 @@ _initializeLibEvent()
 // and on the server acquires and interface to communicate to the teulModule.
 // it also records the users default error and kill functions.
 SINT32
-teulInitTransport(SINT32 logType
+teulInitTransport(LogMode logType
 					, const char* name
 					, ERROR_FUNCTION* errorFnPtr
 					, void (*killFnPtr)(int)

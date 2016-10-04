@@ -80,11 +80,8 @@ namespace Debug
 #define _FLISB _FL, (Debug::ERR_INFO | STD_ERR | BARE_DEBUG)
 #define _FLDSB _FL, (Debug::ERR_DBUG | STD_ERR | BARE_DEBUG)
 
-// the log type parameter of dbugInit can take any of the log facilities from
-// syslog including LOG_LOCAL0-7 or be set to LOG_TO_FILE to log
-// directly to a file only.
-#define LOG_TO_FILE 1
-#define LOG_OFF	-1
+// Whether debugging is enabled or not.
+enum class LogMode { OFF, TO_FILE };
 
 // Each ERROR_TYPE is associated with a syslog error level on linux
 //
@@ -103,10 +100,8 @@ namespace Debug
 }
 
 // dbugInit: sets the current error level to ERR_INFO, opens the debug file, and initializes
-// the error object. The log type parameter of dbugInit can take any of the log facilities from
-// syslog including LOG_LOCAL0-7 or be set to LOG_TO_FILE to log
-// directly to a file only.
-void dbugInit(int logType, const char* filename);
+// the error object.
+void dbugInit(LogMode logMode, const char* filename);
 
 // dbugClose: closes the debug file and cleans up.
 void dbugClose();

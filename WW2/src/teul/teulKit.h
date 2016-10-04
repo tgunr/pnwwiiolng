@@ -25,7 +25,7 @@ namespace Teul { }
 //	errorFnPtr is for the user error routine, use null if not required.
 //	killFnPtr is the function that is called for cleanup when teul encounters
 //	an unrecoverable error.
-SINT32 teulInitTransport(SINT32 logType
+SINT32 teulInitTransport(LogMode logType
 						, const char* name
 						, ERROR_FUNCTION* errorFnPtr
 						, void (*killFnPtr)(int /*signo*/)

@@ -2906,9 +2906,9 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	if(clientinited) return 0;
 
 #if defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
-	static const int DBUGLOG_MODE = LOG_TO_FILE;
+	static const LogMode DBUGLOG_MODE = LogMode::TO_FILE;
 #else
-	static const int DBUGLOG_MODE = LOG_OFF;
+	static const LogMode DBUGLOG_MODE = LogMode::OFF;
 #endif
 
 	// update our default player info data

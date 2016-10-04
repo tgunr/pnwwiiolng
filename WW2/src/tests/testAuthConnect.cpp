@@ -85,7 +85,7 @@ main(int argc, char* argv[])
 {
 	Teul::ConfigVar::InitializeConfigVars();
 
-	teulInitTransport(LOG_TO_FILE, "./testAuthConnect", nullptr, nullptr);
+	teulInitTransport(LogMode::TO_FILE, "./testAuthConnect", nullptr, nullptr);
 
 	teulSyncClock();
 

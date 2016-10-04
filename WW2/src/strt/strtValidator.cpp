@@ -149,13 +149,13 @@ main (int argc, char** argv)
 	switch(level)
 	{
 	case 0:
-		dbugInit(LOG_TO_FILE,"./FatalErrors");
+		dbugInit(LogMode::TO_FILE, "./FatalErrors");
 		break;
 	case 1:
-		dbugInit(LOG_TO_FILE,"./Warnings");
+		dbugInit(LogMode::TO_FILE, "./Warnings");
 		break;
 	default:
-		dbugInit(LOG_TO_FILE,"./validator");
+		dbugInit(LogMode::TO_FILE, "./validator");
 		break;
 	}
 

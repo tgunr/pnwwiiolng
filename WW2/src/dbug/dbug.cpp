@@ -228,14 +228,12 @@ _openDbugFile(const char* const srcFile_)
 
 static void
 _dbugOut(const SINT32		file
-			, const SINT32		logType
-			, const SINT32		// errType
-			, const SINT32		// flags
-			, const char*		outString
-			, const size_t		length
-			, const	bool		rollover)
+			, const LogMode	logMode
+			, const char*	outString
+			, const size_t	length
+			, const	bool	rollover) noexcept
 {
-	if (logType != LOG_TO_FILE || file < 0)
+	if ( logMode != LogMode::TO_FILE || file < 0 )
 		return;
 
 	size_t retval = OS_WRITE(file, outString, (unsigned long)length);
@@ -246,33 +244,33 @@ _dbugOut(const SINT32		file
 	if ( PN_UNLIKELY(rollover && _fileSize >= MAX_FILE_SIZE) )
 	{
 		OS_CLOSE(file);
-		_logger.dbugfile = _openDbugFile(_logger.program());
+		_logger.m_dbugfile = _openDbugFile(_logger.program());
 	}
 }
 
-void DebugLogger::initialize(SINT32 logType_, Debug::ERROR_TYPE level_, SINT32 file_, const char* program_)
+void DebugLogger::initialize(LogMode logMode, Debug::ERROR_TYPE level, SINT32 file, const char* program) noexcept
 {
-	logType = logType_;
-	dbugfile = file_;
+	m_logMode = logMode;
+	m_dbugfile = file;
 	if ( isInitialized() == false )
 	{
-		logLevel = static_cast<Debug::ERROR_TYPE>(level_ & ~DBUG_FLAG_MASK);
-		writeLevel = logLevel;
-		logFlags = 0;
-		writeFlags = 0;
+		m_logLevel = static_cast<Debug::ERROR_TYPE>(level & ~DBUG_FLAG_MASK);
+		m_writeLevel = m_logLevel;
+		m_logFlags = 0;
+		m_writeFlags = 0;
 	}
 
-	err = 0;
+	m_err = 0;
 
 	// transient error flags
-	errType = Debug::ERR_ABORT;
-	lineno = -1;
+	m_errType = Debug::ERR_ABORT;
+	m_lineno = -1;
 
-	setProgram(program_);
+	setProgram(program);
 	setFileName(nullptr);		// Don't have an open file.
 	setText(nullptr);
 
-	initialized = true;
+	m_initialized = true;
 }
 
 #if AS_SERVER && platOS != OS_WIN32
@@ -326,7 +324,7 @@ static void _report(const int fd, const char* const fmt, const int num)
 
 void dbugDumpBacktrace(int signum)
 {
-	if ( _logger.isInitialized() == false || _logger.logType != LOG_TO_FILE )
+	if ( _logger.isInitialized() == false || _logger.logMode != LogMode::TO_FILE )
 		return;
 	const int fd = _logger.dbugfile;
 	if ( fd < 0 )
@@ -378,7 +376,7 @@ _setSignal(int signum, void (*handler)(int))
 // dbugInit: sets the current error level to ERR_INFO, opens the debug
 // file, and initializes the error object.
 
-void dbugInit(SINT32 logType, const char* const filename)
+void dbugInit(LogMode logMode, const char* const filename)
 {
 	std::lock_guard<std::mutex> mutexLock(s_dbugInitMutex);
 	if ( s_dbugInitialized )
@@ -393,23 +391,17 @@ void dbugInit(SINT32 logType, const char* const filename)
 	level = Debug::ERR_DBUG;
 	g_logDebug = true;
 
-	if ( logType != LOG_OFF) {
-		logType = LOG_TO_FILE;
-    }
-
-	switch(logType)
+	switch(logMode)
 	{
-	case LOG_TO_FILE:
+	case LogMode::TO_FILE:
 		file = _openDbugFile(filename);
 		break;
-	case LOG_OFF:
+	case LogMode::OFF:
 		file = -1;
 		break;
-	default:
-		LogAbort("Invalid initial state for logging subsystem.");
 	}
 
-	_logger.initialize(logType, level, file, filename);
+	_logger.initialize(logMode, level, file, filename);
 
 #if AS_SERVER && platOS != OS_WIN32
 	signal(SIGUSR2, _handleSIGUSR2);
@@ -451,20 +443,19 @@ void dbugClose(void)
 	_logger.close();
 }
 
-void DebugLogger::close()
+void DebugLogger::close() noexcept
 {
-	if ( logType != LOG_TO_FILE )
+	if ( m_logMode != LogMode::TO_FILE )
 		return;
 
-	if ( dbugfile < 0 )
+	if ( m_dbugfile < 0 )
 		return;
 
-	_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, 0, _CLOSE_MSG, sizeof(_CLOSE_MSG)-1, false);
+	_dbugOut(_logger.m_dbugfile, _logger.m_logMode, _CLOSE_MSG, sizeof(_CLOSE_MSG)-1, false);
 
-	if ( dbugfile > _stdErrFileNo )
-		OS_CLOSE(_logger.dbugfile);
-
-	_logger.dbugfile = -1;
+	if ( m_dbugfile > _stdErrFileNo )
+		OS_CLOSE(_logger.m_dbugfile);
+	_logger.m_dbugfile = -1;
 }
 
 // dbugSetErrLevel: set the current debug level for display of error messages
@@ -483,7 +474,7 @@ void dbugSetWriteLevel(Debug::ERROR_TYPE level)
 	if ( _logger.isInitialized() == false )
 		return;
 
-	_logger.writeFlags = flags;
+	_logger.m_writeFlags = flags;
 
 	switch(level)
 	{
@@ -494,7 +485,7 @@ void dbugSetWriteLevel(Debug::ERROR_TYPE level)
 	case Debug::ERR_NOTE:
 	case Debug::ERR_INFO:
 	case Debug::ERR_DBUG:
-		_logger.writeLevel = level;
+		_logger.m_writeLevel = level;
 		break;
 	default:
 		return;
@@ -525,7 +516,7 @@ void dbugSetLogLevel(Debug::ERROR_TYPE level)
 	if ( _logger.isInitialized() == false )
 		return;
 
-	_logger.logFlags = flags;
+	_logger.m_logFlags = flags;
 
 	switch(level)
 	{
@@ -536,7 +527,7 @@ void dbugSetLogLevel(Debug::ERROR_TYPE level)
 	case Debug::ERR_NOTE:
 	case Debug::ERR_INFO:
 	case Debug::ERR_DBUG:
-		_logger.logLevel = level;
+		_logger.m_logLevel = level;
 		break;
 	default:
 		return;
@@ -579,30 +570,30 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	UINT32 minLevel;
 
 	if ( PN_UNLIKELY(_logger.isInitialized() == false) )
-		_logger.initialize(LOG_TO_FILE,  Debug::ERR_INFO, _stdErrFileNo, "not_initialized");
+		_logger.initialize(LogMode::TO_FILE,  Debug::ERR_INFO, _stdErrFileNo, "not_initialized");
 
-	_logger.isLog = isLog;
+	_logger.m_isLog = isLog;
 
-	if (_logger.dbugfile < 0)
+	if (_logger.m_dbugfile < 0)
 		return 0;
 
 	if (isLog)
-		minLevel = _logger.logLevel;
+		minLevel = _logger.m_logLevel;
 	else
-		minLevel = _logger.writeLevel;
+		minLevel = _logger.m_writeLevel;
 
-	flags = (_logger.isLog) ? _logger.logFlags : _logger.writeFlags;
+	flags = (_logger.m_isLog) ? _logger.m_logFlags : _logger.m_writeFlags;
 	flags |= (errType & DBUG_FLAG_MASK);
-	_logger.flags = flags;
+	_logger.m_flags = flags;
 
 	if (PN_LIKELY(errType != Debug::ERR_FATAL))
-		_logger.errType = errType & ~DBUG_FLAG_MASK;
+		_logger.m_errType = errType & ~DBUG_FLAG_MASK;
 	else
-		_logger.errType = errType;
+		_logger.m_errType = errType;
 
-	_logger.err = dbugGetErrno();
+	_logger.m_err = dbugGetErrno();
 
-	if ( PN_LIKELY((_logger.errType != Debug::ERR_FATAL) && (_logger.errType > minLevel)) )
+	if ( PN_LIKELY((_logger.m_errType != Debug::ERR_FATAL) && (_logger.m_errType > minLevel)) )
 		return 0;
 
 	if ( (myName = strrchr(filename,'/')) != nullptr)
@@ -613,7 +604,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		myName = filename;
 
 	_logger.setFileName(myName);
-	_logger.lineno = lineno;
+	_logger.m_lineno = lineno;
 
 	if ( ! (flags & BARE_DEBUG) )
 	{
@@ -625,7 +616,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		struct tm* tm = localtime_r(&now, &tmStruct);
 #endif
 		len = _logger.formatText("%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] "
-								, errorTypes[_logger.errType]
+								, errorTypes[_logger.m_errType]
 								, tm->tm_year + 1900
 								, tm->tm_mon + 1
 								, tm->tm_mday
@@ -634,9 +625,9 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 								, tm->tm_sec
 								, (UINT32)(teulClock64 % 1000)
 								, _logger.file()
-								, _logger.lineno);
-		_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, _logger.text(), len, false);
-		if ( ((flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR)) && !(flags & BARE_DEBUG) ) {
+								, _logger.m_lineno);
+		_dbugOut(_logger.m_dbugfile, _logger.m_logMode, _logger.text(), len, false);
+		if ( ((flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.m_errType <= Debug::ERR_MINOR)) && !(flags & BARE_DEBUG) ) {
 			fprintf(stderr, "%s", _logger.text());
 		}
 	}
@@ -650,8 +641,8 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		if ( len == (size_t)~0 ) {
 			text = "[ERROR]\n";
 		} else {
-			_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, _logger.text(), len, true);
-			if ( ((flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR)) ) {
+			_dbugOut(_logger.m_dbugfile, _logger.m_logMode, _logger.text(), len, true);
+			if ( ((flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.m_errType <= Debug::ERR_MINOR)) ) {
 				fprintf(stderr, "%s", _logger.text());
 			}
 			text = "\n";
@@ -665,13 +656,13 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		len = strlen(text);
 	}
 
-	_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, text, len, true);
+	_dbugOut(_logger.m_dbugfile, _logger.m_logMode, text, len, true);
 
-	if ( (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR) ) {
+	if ( (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.m_errType <= Debug::ERR_MINOR) ) {
 		fprintf(stderr, "%s", text);
 	}
 
-	_levelHandler(_logger.errType, text);
+	_levelHandler(_logger.m_errType, text);
 
 	if (retval < 0)
 		return retval;
@@ -699,7 +690,7 @@ SINT32 _dbugLog(const char* const filename, const SINT32 lineno, const UINT32 er
 	}
 	else
 	{
-		if (!(errType != Debug::ERR_FATAL && (errType & ~DBUG_FLAG_MASK) > _logger.logLevel))
+		if (!(errType != Debug::ERR_FATAL && (errType & ~DBUG_FLAG_MASK) > _logger.m_logLevel))
 		{
 			va_list args;
 			va_start(args, fmt);
