@@ -303,7 +303,7 @@ DotCommand::allow(Player& player) const
 	for ( UINT32 i = 0; i < m_usages.size(); i++ )
 	{
 		if ( m_usages[i]->mask == NO_MASK || player.permissions(m_usages[i]->mask) )
-			return m_usages[i];
+			return m_usages[i].get();
 	}
 
 	dbugLog(_FLD, "Player with permissions %llx does not have permission to access command", player.m_permissionMask);
