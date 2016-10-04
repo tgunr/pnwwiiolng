@@ -1241,11 +1241,6 @@ public:
 		reset();
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
-	{
-        action(player, message) ;
-	}
-
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		const char* str;
