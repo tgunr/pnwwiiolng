@@ -100,7 +100,7 @@ chatFindProperty(const FULL_OBJ_ID id)
 	if ( it == _properties.end() )
 		return nullptr;
 
-	return it->second;
+	return it->second.get();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -166,7 +166,8 @@ chatdbLoadStratData()
 			oid = row.NextUInt();
 			row.NextString(name, sizeof(name));
 
-			new PropCP(fid, (WWII_COUNTRY)owner, name, (WWII_COUNTRY)controller, oid);
+			auto ptr = std::make_unique<PropCP>(fid, (WWII_COUNTRY)owner, name, (WWII_COUNTRY)controller, oid);
+			_properties[ptr->Key()] = std::move(ptr);
 			loadedCPs++;
 		}
 	}
@@ -199,7 +200,8 @@ chatdbLoadStratData()
 			oid = row.NextUInt();
 			row.NextString(name, sizeof(name));
 
-			new PropFacility(fid, (WWII_COUNTRY)owner, name, cpid, oid);
+			auto ptr = std::make_unique<PropFacility>(fid, (WWII_COUNTRY)owner, name, cpid, oid);
+			_properties[ptr->Key()] = std::move(ptr);
 
 			loadedFacs++;
 		}
@@ -262,7 +264,7 @@ _readPermissionNames()
 {
 	DBQuery qry(dbh, "SELECT `permissionid` - 1, `description` FROM `auth`.`wwii_permissions`");
 	if ( qry.HasRows() == false )
-		throw std::runtime_error("No rows returned from auth.wwii_permissions");	///Terminal
+		throw std::runtime_error("No rows returned from `auth`.`wwii_permissions`");	///Terminal
 	while ( qry.FetchRow() )
 	{
 		auto& row = qry.Row();
