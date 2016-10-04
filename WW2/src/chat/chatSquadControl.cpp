@@ -132,7 +132,7 @@ SquadControlResult::packer(LOGICAL mode, ACTION_OBJECT* a)
 extern TEUL_CALLBACK* CHAT_SQUAD_CONTROL;
 
 SINT32
-SquadControl::_sendBasic(SINT32 connection, UINT32 action, const ChatHandle& handle, const std::string& text)
+SquadControl::_sendBasic(SINT32 connection, UINT32 action, const ChatHandle handle, const std::string& text)
 {
 	if ( PN_UNLIKELY(connection < 0) )
 		return -EINVAL;

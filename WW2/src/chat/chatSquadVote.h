@@ -36,16 +36,16 @@ public:
 	UINT32		m_lead;
 	bool		m_colead;
 
-	void addVote(UINT32 squadID, const ChatHandle& voteBy, const ChatHandle& voteFor);
+	void addVote(UINT32 squadID, const ChatHandle voteBy, const ChatHandle voteFor);
 	void announce(UINT32 squadID, Player* player=nullptr);
 	void close(UINT32 duration=0);				// 0 = use default
 	void erase(UINT32 squadID);				// Close it and erase it
 	UINT32 expires() const;
-	bool hasVoted(const ChatHandle& voter) { return (m_votes && m_votes->find(voter) != m_votes->end()); }
+	bool hasVoted(const ChatHandle voter) { return (m_votes && m_votes->find(voter) != m_votes->end()); }
 	UINT32 nextStart() const;
 	void recount();
 	UINT64 winner(SquadList* list);
-	void withdraw(UINT32 squadID, const ChatHandle& voterHandle, SquadList* list);
+	void withdraw(UINT32 squadID, const ChatHandle voterHandle, SquadList* list);
 };
 
 SquadVote& chatGetSquadVote(UINT32 squadID);

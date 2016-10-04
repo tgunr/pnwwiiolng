@@ -362,7 +362,7 @@ strtEnemyLink(CPStruct& cp, bool state)
 // Validity checks on the supply links in a particular supercell
 
 void
-strtDataCantFindBuilding(const char* linkName, const char* role, const FULL_OBJ_ID& fid)
+strtDataCantFindBuilding(const char* linkName, const char* role, const FULL_OBJ_ID fid)
 {
 	char description[256];
 	strprintf(description, "%s (%d,%d:%u)", role, fid.cell.ox, fid.cell.oy, fid.id);
@@ -1133,7 +1133,7 @@ _getStratObject(const FULL_ID& index)
 }
 
 static FULL_OBJ_ID*
-_getStratObject(const FULL_OBJ_ID& obj)
+_getStratObject(const FULL_OBJ_ID obj)
 {
 	Supercell* sc = strtGetSupercell(obj.cell.ox >> 4, obj.cell.oy >> 4);
 	return sc ? sc->Ptr(obj.id) : nullptr;
@@ -1142,7 +1142,7 @@ _getStratObject(const FULL_OBJ_ID& obj)
 //////////////////////////////////////////////////////////////////////
 
 Supercell*
-strtGetSupercellFULL_OBJ_ID(const FULL_OBJ_ID& fullObjID)
+strtGetSupercellFULL_OBJ_ID(const FULL_OBJ_ID fullObjID)
 {
 	return strtGetSupercell(fullObjID.cell.ox >> 4, fullObjID.cell.oy >> 4);
 }
@@ -1169,13 +1169,13 @@ strtGetSupercellFromPosition_m(const SINT32 x_m, const SINT32 y_m)
 }
 
 FULL_OBJ_ID*
-strtGetFullObjID(const FULL_OBJ_ID& index)
+strtGetFullObjID(const FULL_OBJ_ID index)
 {
 	return _getStratObject(index);
 }
 
 CPStruct*
-strtGetCP(const FULL_OBJ_ID& index)
+strtGetCP(const FULL_OBJ_ID index)
 {
 	FULL_OBJ_ID* id = _getStratObject(index);
 	if (PN_LIKELY(id && id->objClass == CLASS_CP))
@@ -1184,7 +1184,7 @@ strtGetCP(const FULL_OBJ_ID& index)
 }
 
 CPStruct*
-strtGetCPorBridge(const FULL_OBJ_ID& index)
+strtGetCPorBridge(const FULL_OBJ_ID index)
 {
 	FULL_OBJ_ID* cp = _getStratObject(index);
 	if (PN_UNLIKELY(!cp))
@@ -1202,7 +1202,7 @@ strtGetCPorBridge(const FULL_OBJ_ID& index)
 }
 
 CPStruct*
-strtGetCPFromTarget(const FULL_OBJ_ID& index)
+strtGetCPFromTarget(const FULL_OBJ_ID index)
 {
 	FULL_OBJ_ID* target = _getStratObject(index);
 	while ( target != nullptr )
@@ -1221,7 +1221,7 @@ strtGetCPFromTarget(const FULL_OBJ_ID& index)
 }
 
 FacilityStruct*
-strtGetFacility(const FULL_OBJ_ID& index)
+strtGetFacility(const FULL_OBJ_ID index)
 {
 	FULL_OBJ_ID* fac = _getStratObject(index);
 	if (PN_LIKELY(fac && fac->objClass == CLASS_FACILITY))
@@ -1230,7 +1230,7 @@ strtGetFacility(const FULL_OBJ_ID& index)
 }
 
 ObjectStruct*
-strtGetObject(const FULL_OBJ_ID& index)
+strtGetObject(const FULL_OBJ_ID index)
 {
 	FULL_OBJ_ID* obj = _getStratObject(index);
 	if (PN_LIKELY(obj && obj->objClass == CLASS_BUILDING))
@@ -1238,7 +1238,7 @@ strtGetObject(const FULL_OBJ_ID& index)
 	return nullptr;
 }
 
-LinkStruct* strtGetLink(const FULL_OBJ_ID& index)
+LinkStruct* strtGetLink(const FULL_OBJ_ID index)
 {
 	FULL_OBJ_ID* link = _getStratObject(index);
 	if (PN_LIKELY(link && link->objClass == CLASS_LINK))

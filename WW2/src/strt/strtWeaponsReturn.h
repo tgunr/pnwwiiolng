@@ -15,7 +15,7 @@
 class WeaponsReturn
 {
 public:
-	WeaponsReturn(const UINT32 sortieID_, const FULL_OBJ_ID& rtbFacility, const UINT32 exitCode_, const bool isVehicleDead, const bool hasBeenHit, const bool rtbPromoted, const bool resupplyMission)
+	WeaponsReturn(const UINT32 sortieID_, const FULL_OBJ_ID rtbFacility, const UINT32 exitCode_, const bool isVehicleDead, const bool hasBeenHit, const bool rtbPromoted, const bool resupplyMission)
 		: m_sortieID(sortieID_), m_rtbFacility(rtbFacility), m_exitCode(exitCode_), m_isVehicleDead(isVehicleDead), m_hasBeenHit(hasBeenHit), m_rtbPromoted(rtbPromoted)
 		, m_resupplyMission(resupplyMission)
 		{}

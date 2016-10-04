@@ -81,7 +81,7 @@ _createMissionResults(const Player& player, MISSION_RESULTS& results)
 
 	results.sortieID = packet.sortie().sortieID();
 
-	const FULL_OBJ_ID& origin = packet.sortie().originFac();
+	const FULL_OBJ_ID origin = packet.sortie().originFac();
 	FacilityStruct* facility = strtGetFacility(origin);
 	if ( facility != nullptr )
 		side = facility->side;

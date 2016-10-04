@@ -1584,7 +1584,7 @@ Player::SetSpawned(bool newValue)
 }
 
 void
-Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle& handle, UINT32 joined)
+Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle handle, UINT32 joined)
 {
 	if ( m_squadID != toSquadID )
 		m_announcedToSquad = false;
@@ -1625,7 +1625,7 @@ Player::SetSquadInvite(SquadInvite* invite)
 // not it is a buzzard
 
 void
-Player::SetWeapon(const WEAPON_SPEC& toWeapon)
+Player::SetWeapon(const WEAPON_SPEC toWeapon)
 {
 	dbugLog(_FLD, "Weapon was %d.%d.%d.%d", m_weapon.wType, m_weapon.wClass, m_weapon.wCategory, m_weapon.wCountry);
 	m_weapon = toWeapon;
@@ -1943,13 +1943,13 @@ _nameForCP(const Property* nearCP, const Property* lastCP)
 
 void
 Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
-						, bool cpChanged, const FULL_OBJ_ID& nearCP
+						, bool cpChanged, const FULL_OBJ_ID nearCP
 						, UINT32 ride
-						, const FULL_OBJ_ID& nowInFacility
+						, const FULL_OBJ_ID nowInFacility
 						, UINT32 lastPing
 						, bool isOnAWS
 						, bool inCapBldg
-						, const FULL_OBJ_ID& capFac
+						, const FULL_OBJ_ID capFac
 						, SINT32 progress
 						)
 {
@@ -2652,7 +2652,7 @@ PlayerInterface::Lookup(UINT32 playerID)
 }
 
 Player*
-PlayerInterface::Lookup(const ChatHandle& handle)
+PlayerInterface::Lookup(const ChatHandle handle)
 {
 	PLAYER_INDEX::iterator it = playerIndex.find(chatGetLowercaseHandle(handle));
 	return ( it == playerIndex.end() ) ? nullptr : it->second;

@@ -22,7 +22,7 @@ bool chatSendSCMDResult(SINT32 playerID, SCMD_ENUM command, FULL_OBJ_ID cp, WWII
 
 //tolua_begin
 UINT32 chatGetPopulation(WWII_SIDE side);
-bool chatSendSideMessage(WWII_SIDE side, const FULL_OBJ_ID& objective, LSTRING_ID prefix, LSTRING_ID message, const char* arg1=nullptr, const char* arg2=nullptr);
+bool chatSendSideMessage(WWII_SIDE side, const FULL_OBJ_ID objective, LSTRING_ID prefix, LSTRING_ID message, const char* arg1=nullptr, const char* arg2=nullptr);
 bool chatSendHCMessage(WWII_SIDE side, LSTRING_ID message, const char* arg1=nullptr, const char* arg2=nullptr);
 //tolua_end
 

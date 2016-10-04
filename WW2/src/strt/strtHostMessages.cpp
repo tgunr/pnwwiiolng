@@ -1169,7 +1169,7 @@ strtHostInstallCallbacks(void)
 // Send a capture scoring notice to the cell hosts
 
 void
-strtSendCaptureScoreNotice(const FULL_OBJ_ID& fid, WWII_SIDE forSide)
+strtSendCaptureScoreNotice(const FULL_OBJ_ID fid, WWII_SIDE forSide)
 {
 	dbugLog(_FLI, "capscore: bld:%d,%d:%u side:%u", fid.cell.ox, fid.cell.oy, fid.id, forSide);
 	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureScore_Y));

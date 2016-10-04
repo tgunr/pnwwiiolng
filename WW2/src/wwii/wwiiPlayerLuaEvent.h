@@ -20,7 +20,7 @@ namespace Host
 		WEAPON_SPEC		m_weapon;		// Weapon they're after/using
 
 	public:
-		PlayerEvent(UINT32 _playerID, const ChatHandle& _handle, UINT32 _missionID, StratHCUnit* _unit, FacilityStruct* _facility, const WEAPON_SPEC& _weapon)
+		PlayerEvent(UINT32 _playerID, const ChatHandle _handle, UINT32 _missionID, StratHCUnit* _unit, FacilityStruct* _facility, const WEAPON_SPEC _weapon)
 			: m_playerID(_playerID)
 			, m_missionID(_missionID)
 			, m_handle(_handle)
@@ -36,7 +36,7 @@ namespace Host
 		UINT32 id() const { return m_playerID; }
 		UINT32 missionID() const { return m_missionID; }
 		const char* gamename() const { return m_gamename; }
-		const ChatHandle& handle() const { return m_handle; }
+		ChatHandle handle() const { return m_handle; }
 		StratHCUnit* unit() const { return (StratHCUnit*)m_unit; }
 		FacilityStruct* facility() const { return (FacilityStruct*)m_facility; }
 		WEAPON_SPEC weapon() const { return m_weapon; }

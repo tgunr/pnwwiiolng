@@ -26,7 +26,7 @@ namespace Scoring
 				, m_balance(Balance::Even)
 			{}
 
-	public: Actor(const instanceid_t& instID_, const playerid_t playerID_, const ChatHandle& handle_, const WEAPON_SPEC& weapon_, const sortieid_t sortieID_, SINT32 balance_)
+	public: Actor(const instanceid_t instID_, const playerid_t playerID_, const ChatHandle handle_, const WEAPON_SPEC weapon_, const sortieid_t sortieID_, SINT32 balance_)
 				: m_instID(instID_)
 				, m_weapon(weapon_)
 				, m_sortieID(sortieID_)
@@ -45,15 +45,15 @@ namespace Scoring
 		//! Construct from a wwiiPlayer.
 	public: Actor(const wwiiPlayer* const);
 
-	public: const instanceid_t& instID() const { return m_instID; }
+	public: instanceid_t instID() const { return m_instID; }
 	public: playerid_t playerID() const { return m_playerID; }
-	public: const ChatHandle& handle() const { return m_handle; }
+	public: const ChatHandle handle() const { return m_handle; }
 	public: sortieid_t sortieID() const { return m_sortieID; }
 	public: bool inCaptureBldg() const { return m_inCaptureBldg; }
 	public: SINT32 balance() const { return m_balance; }
-	public: const WEAPON_SPEC& weapon() const { return m_weapon; }
+	public: WEAPON_SPEC weapon() const { return m_weapon; }
 
-	public: void setSortie(const sortieid_t id_, const WEAPON_SPEC& spec_, const bool inCapture_)
+	public: void setSortie(const sortieid_t id_, const WEAPON_SPEC spec_, const bool inCapture_)
 	{
 		m_sortieID = id_;
 		m_weapon = spec_;

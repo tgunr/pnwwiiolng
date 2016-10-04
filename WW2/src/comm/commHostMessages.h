@@ -23,7 +23,7 @@ SINT32 commInstallHostCallbacks(void);
 
 SINT32 activateClient(SINT32 teulIndex);
 
-SINT32 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination, PLAYER_EXIT_CODE exitCode, const FULL_OBJ_ID& facility);
+SINT32 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination, PLAYER_EXIT_CODE exitCode, const FULL_OBJ_ID facility);
 
 void commDropPlayer(class Player& persona, const bool ignoredPriorKick);
 void commForcePlayerExit(class Player& persona, const char* reason, bool alert);
@@ -36,7 +36,7 @@ void commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer);
 
 // Function that dispatches a resupply issue to a client
 class HostVehicle;
-void commSendClientResupplyIssue(HostVehicle* vehicle, UINT32 fromSerial, const ChatHandle& fromHandle);
+void commSendClientResupplyIssue(HostVehicle* vehicle, UINT32 fromSerial, const ChatHandle fromHandle);
 
 namespace Chat { struct PlayerMove; }
 SINT32 commSendMove(SINT32 teulIndex, const Chat::PlayerMove& pos);

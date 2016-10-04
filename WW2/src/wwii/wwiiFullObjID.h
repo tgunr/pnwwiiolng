@@ -73,11 +73,11 @@ struct FULL_OBJ_ID
 	// so we need to eliminate the lower 4 bits in the comparison
 	bool sameCell(SINT16 x, SINT16 y) const { return (cell.ox>>4 == x>>4 && cell.oy>>4 == y>>4); }
 	bool sameCell(const OCTET_CELL& rhs) const { return sameCell(rhs.ox, rhs.oy); }
-	bool sameCell(const FULL_OBJ_ID& rhs) const { return sameCell(rhs.cell.ox, rhs.cell.oy); }
+	bool sameCell(const FULL_OBJ_ID rhs) const { return sameCell(rhs.cell.ox, rhs.cell.oy); }
 
-	bool operator == (const FULL_OBJ_ID& rhs) const { return id == rhs.id && sameCell(rhs); }
+	bool operator == (const FULL_OBJ_ID rhs) const { return id == rhs.id && sameCell(rhs); }
 //tolua_end
-	bool operator != (const FULL_OBJ_ID& rhs) const { return id != rhs.id || !sameCell(rhs); }
+	bool operator != (const FULL_OBJ_ID rhs) const { return id != rhs.id || !sameCell(rhs); }
 //tolua_begin
 
 	// Helper function for converting a fullObjID into a UINT64

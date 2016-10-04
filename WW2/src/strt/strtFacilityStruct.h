@@ -174,7 +174,7 @@ public:
 		return (isMilitaryFacility());
 	}
 
-	WeaponEntry* weaponEntry(const WEAPON_SPEC& weapon) const;
+	WeaponEntry* weaponEntry(const WEAPON_SPEC weapon) const;
 
 	// Track supply to see which facility is anchoring us to our TOE
 	// Depots can specify 'ignoreDepot' if they want to skip ownership and open

@@ -91,7 +91,7 @@ struct FE_POST_LIST_REQUEST
 //This message contains a list of posted vehicles at a facility
 struct FE_POST_LIST_RESPONSE
 {
-	FE_POST_LIST_RESPONSE(const FULL_OBJ_ID& _facility, SINT32 _numWeapons, COMMANDED_WEAPON* const _commandedWeapon)
+	FE_POST_LIST_RESPONSE(const FULL_OBJ_ID _facility, SINT32 _numWeapons, COMMANDED_WEAPON* const _commandedWeapon)
 		: facility(_facility), numWeapons(_numWeapons), commandedWeapon(_commandedWeapon) {}
 	FE_POST_LIST_RESPONSE()
 		: facility(nullObjID), numWeapons(0), commandedWeapon(nullptr) {}

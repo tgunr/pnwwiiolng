@@ -91,7 +91,7 @@ chatGetPopulation(WWII_SIDE side)
 static bool
 _sideMessage(SIDE_MESSAGE_TYPE type
 				, WWII_SIDE side
-				, const FULL_OBJ_ID& objective
+				, const FULL_OBJ_ID objective
 				, LSTRING_ID prefix
 				, LSTRING_ID message
 				, const char* arg1
@@ -122,7 +122,7 @@ _sideMessage(SIDE_MESSAGE_TYPE type
 // Send a message to one side, possibly limited to one CP
 
 bool
-chatSendSideMessage(WWII_SIDE side, const FULL_OBJ_ID& objective, LSTRING_ID prefix, LSTRING_ID message, const char* arg1, const char* arg2)
+chatSendSideMessage(WWII_SIDE side, const FULL_OBJ_ID objective, LSTRING_ID prefix, LSTRING_ID message, const char* arg1, const char* arg2)
 {
 	return _sideMessage(SM_SIDE, side, objective, prefix, message, arg1, arg2);
 }
@@ -241,7 +241,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 }
 
 BRIGADE_MOVE_RESULT
-BrigadeMove::process(const ChatHandle& mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM)
+BrigadeMove::process(const ChatHandle mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM)
 {
 	if ( unit == nullptr )
 	{

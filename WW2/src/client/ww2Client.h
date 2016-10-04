@@ -166,7 +166,7 @@ public:
 
 	virtual int RequestPersonaSummaries();
 	virtual int RequestMissionWeapList(FULL_OBJ_ID const&,  bool allweapons, bool isrefresh);
-	virtual int RequestMissionWeapPost(FULL_OBJ_ID const&, const WEAPON_SPEC&, bool immediatespawn);
+	virtual int RequestMissionWeapPost(FULL_OBJ_ID const&, const WEAPON_SPEC, bool immediatespawn);
 	virtual int RequestMissionDetail(int missionID, bool join);
 	virtual int RequestMissionLookup(int missionID); // isn't necessarily a mission in your brigade
 	virtual int RequestClientSpawn(WEAPON_SERIAL const&, bool wantMobileSpawn);
@@ -201,7 +201,7 @@ public:
 	virtual int SetWaypoint(Waypoint const&);
 	virtual int RemoveWaypoint(unsigned long long handle);
 	virtual void SetActiveWaypoint(unsigned long long handle = 0);
-	virtual const ChatHandle& ActiveWaypointHandle() const;
+	virtual ChatHandle ActiveWaypointHandle() const;
 	virtual	Waypoint ActiveWaypoint() const;
 	virtual bool IsMissionLeader() const;
 

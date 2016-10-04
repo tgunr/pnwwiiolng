@@ -1039,7 +1039,7 @@ void uiMapActivateWaypoint(const char* name)
 
 void uiMapAddWaypoint(const char* name, int type, int subtype, int x, int y, const char* notes)
 {
-	const ChatHandle& handle = chatGetHandle(name);
+	ChatHandle handle = chatGetHandle(name);
 	Waypoint waypoint(true, handle, handle, (WP_TYPE)type, subtype, x, y, 0, notes);
 	waypoint.setShared(false);
 	PlayerClient()->SetWaypoint(waypoint);

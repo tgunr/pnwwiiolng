@@ -59,13 +59,13 @@ bool weapHasInitialized(void);
 // Init the structures
 bool weapListInit(const char* theaterPath);
 
-static inline UINT32 weapClassIndex(const WEAPON_SPEC& spec)
+static inline UINT32 weapClassIndex(const WEAPON_SPEC spec)
 {
 	return (spec.wClass > 0) ? spec.wClass : ((UINT32)spec.wCategory << 8);
 }
 
 // return spawn list for the spec if available
-static inline WEAPON_LIST* weapFindSpawnList(const WEAPON_SPEC& spec)
+static inline WEAPON_LIST* weapFindSpawnList(const WEAPON_SPEC spec)
 {
 	WEAPON_SPAWNS::iterator it = g_weaponSpawns.find(weapClassIndex(spec));
 	return ( it != g_weaponSpawns.end() ) ? &(it->second) : nullptr;

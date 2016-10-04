@@ -68,7 +68,7 @@ struct WEAPON_SPEC
 	UINT32 asUINT32() const { return ((UINT32)wCountry << 24) | ((UINT32)wCategory << 16) | ((UINT32)wClass << 8) | (UINT32)wType; }
 	UINT16 asUINT16() const { return *(const UINT16*)this; }
 	//! Compare two weapon specs, but do it real cheap, because we do it frequently.
-	bool operator==(const WEAPON_SPEC& rhs) const { return this->asUINT16() == rhs.asUINT16(); }
+	bool operator==(const WEAPON_SPEC rhs) const { return this->asUINT16() == rhs.asUINT16(); }
 
 //tolua_end
 	//! Make network fly.
@@ -94,12 +94,12 @@ public:
 
 	//! Because != != !(=). For some reason.
 	//! (not-equals is not-equal-to not(equals))
-	bool operator!=(const WEAPON_SPEC& rhs) const { return this->asUINT16() != rhs.asUINT16(); }
+	bool operator!=(const WEAPON_SPEC rhs) const { return this->asUINT16() != rhs.asUINT16(); }
 
 	//! Does this weapon spec make my ass look thin?
-	bool operator<(const WEAPON_SPEC& rhs) const { return this->asUINT16() < rhs.asUINT16(); }
+	bool operator<(const WEAPON_SPEC rhs) const { return this->asUINT16() < rhs.asUINT16(); }
 	//! Does this weapon spec make my ass look fat?
-	bool operator>(const WEAPON_SPEC& rhs) const { return this->asUINT16() > rhs.asUINT16(); }
+	bool operator>(const WEAPON_SPEC rhs) const { return this->asUINT16() > rhs.asUINT16(); }
 //tolua_begin
 
 	//! Check for a null spec.
@@ -133,7 +133,7 @@ static inline const char* weapPrintSpecC(const WEAPON_SPEC* spec)
 //tolua_begin
 
 // find a weapon spec based on the weapon's name
-extern const WEAPON_SPEC& weapFindWeaponByName(const char* weaponName);
+extern WEAPON_SPEC weapFindWeaponByName(const char* weaponName);
 
 // create a spec from a string
 extern WEAPON_SPEC weapCreateSpec(const char* weapString);

@@ -110,7 +110,7 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 //  allows for host-side dot commands which have a
 //  higher degree of integration with the UI map.
 //////////////////////////////////////////////////
-void chatTargetSelection(const FULL_OBJ_ID& id)
+void chatTargetSelection(const FULL_OBJ_ID id)
 {
 	_lastTargetFullObjID = id;
 }

@@ -707,7 +707,7 @@ ObjectiveStats::save()
 
 void
 strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
-				, const ChatHandle& handle, UINT32 customerID, UINT32 missionID
+				, const ChatHandle handle, UINT32 customerID, UINT32 missionID
 				, const HCUnit* unit, UINT32 started, UINT32 seconds
 				, bool wasContested, bool tookControl, bool tookOwnership)
 {

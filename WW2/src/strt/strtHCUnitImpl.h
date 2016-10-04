@@ -55,7 +55,7 @@ public:
 
 	UINT32 nextServiceIn_s() const { return (UINT32)((m_nextServiceAt > teulClock64) ? (m_nextServiceAt - teulClock64) / 1000 : 0); }
 
-	static UINT32 ThrottleKey(const FacilityStruct* facility, const WEAPON_SPEC& spec)
+	static UINT32 ThrottleKey(const FacilityStruct* facility, const WEAPON_SPEC spec)
 	{
 		return ( facility->uOID << 16 ) | ( spec.asUINT16() & 0xffff );
 	}
@@ -64,12 +64,12 @@ public:
 	void decrementThrottle(UINT32 key);
 	void incrementThrottle(UINT32 key);
 
-//	void resetThrottleWindow(const FacilityStruct* facility, const WEAPON_SPEC& spec)
+//	void resetThrottleWindow(const FacilityStruct* facility, const WEAPON_SPEC spec)
 //	{
 //		m_throttles.erase(ThrottleKey(facility, spec));
 //	}
 
-	UINT32 throttles(const FacilityStruct* facility, const WEAPON_SPEC& spec) const
+	UINT32 throttles(const FacilityStruct* facility, const WEAPON_SPEC spec) const
 	{
 		THROTTLE_MAP::const_iterator it = m_throttles.find(ThrottleKey(facility, spec));
 		return ( it != m_throttles.end() ) ? it->second.Check() : 0;

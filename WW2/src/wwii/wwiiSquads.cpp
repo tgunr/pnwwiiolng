@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////
 // Default constructor
 
-Squad::Squad(UINT32 withSquadID, const ChatHandle& handle, const std::string& withName)
+Squad::Squad(UINT32 withSquadID, const ChatHandle handle, const std::string& withName)
 	: m_squadID(withSquadID)
 	, m_shortHandle(handle)
 	, m_creatorHandle(0LL)
@@ -120,7 +120,7 @@ Squad::setSquadNight(const char* string)
 //////////////////////////////////////////////////////////////////////
 // Default constructor
 
-Recruiter::Recruiter(const ChatHandle& withHandle, const Squad* squad)
+Recruiter::Recruiter(const ChatHandle withHandle, const Squad* squad)
 	: m_handle(withHandle)
 	, m_squadHandle(0LL)
 	, m_country(0)

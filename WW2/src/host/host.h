@@ -93,12 +93,12 @@ extern void hostForceVehExit(HostVehicle* vehicle);
 
 extern void hostDeleteToastVehicle(HostVehicle* vehicle);
 
-extern void hostBuildingVisLevelChange(class ObjectStruct* object, const instanceid_t& inInstance);
-extern void hostChangeFPSBuilding(Player* persona, const FULL_OBJ_ID& newBuildingID);
+extern void hostBuildingVisLevelChange(class ObjectStruct* object, const instanceid_t inInstance);
+extern void hostChangeFPSBuilding(Player* persona, const FULL_OBJ_ID newBuildingID);
 
 extern void* teulGetPersonaData(SINT32 teulIndex);
 static inline Player* hostGetPlayer(SINT32 teulIndex) { return (Player*)teulGetPersonaData(teulIndex); }
-extern void hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide);
+extern void hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID buildingID, WWII_SIDE forSide);
 extern void hostSendCaptureStatesToOccupants(const class CaptureState& incoming);
 
 #include "host/hostPlayers.h"

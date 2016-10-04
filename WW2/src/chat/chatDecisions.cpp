@@ -794,7 +794,7 @@ chatVoteFallback(Player* player, const char* id)
 //////////////////////////////////////////////////////////////////////
 
 bool
-chatStartHold(Player* player, const FULL_OBJ_ID& target)
+chatStartHold(Player* player, const FULL_OBJ_ID target)
 {
 	const Property* property = chatFindProperty(target);
 	if ( property == nullptr )
@@ -820,7 +820,7 @@ chatStartHold(Player* player, const FULL_OBJ_ID& target)
 //////////////////////////////////////////////////////////////////////
 
 bool
-chatStartFallback(Player* player, const FULL_OBJ_ID& target)
+chatStartFallback(Player* player, const FULL_OBJ_ID target)
 {
 	const Property* property = chatFindProperty(target);
 	if ( property == nullptr )
@@ -1040,7 +1040,7 @@ chatCheckDecisionQueues()
 //////////////////////////////////////////////////////////////////////
 
 static const PropCP*
-_checkObjectiveTarget(const FULL_OBJ_ID& fid, Player* player)
+_checkObjectiveTarget(const FULL_OBJ_ID fid, Player* player)
 {
 	if ( fid.id == 0 )
 	{
@@ -1076,7 +1076,7 @@ _checkObjectiveTarget(const FULL_OBJ_ID& fid, Player* player)
 //////////////////////////////////////////////////////////////////////
 
 bool
-chatVoteAttack(Player* player, const FULL_OBJ_ID& id)
+chatVoteAttack(Player* player, const FULL_OBJ_ID id)
 {
 	const PropCP* target = _checkObjectiveTarget(id, player);
 	if ( !target )
@@ -1099,7 +1099,7 @@ chatVoteAttack(Player* player, const FULL_OBJ_ID& id)
 //////////////////////////////////////////////////////////////////////
 
 bool
-chatVoteClear(Player* player, const FULL_OBJ_ID& id)
+chatVoteClear(Player* player, const FULL_OBJ_ID id)
 {
 	const PropCP* target = _checkObjectiveTarget(id, player);
 	if ( !target )
@@ -1122,7 +1122,7 @@ chatVoteClear(Player* player, const FULL_OBJ_ID& id)
 //////////////////////////////////////////////////////////////////////
 
 bool
-chatVoteDefend(Player* player, const FULL_OBJ_ID& id)
+chatVoteDefend(Player* player, const FULL_OBJ_ID id)
 {
 	const PropCP* target = _checkObjectiveTarget(id, player);
 	if ( !target )

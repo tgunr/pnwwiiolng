@@ -1082,7 +1082,7 @@ Player::saveMissionPacket()
 	dbugLog(_FLD, "p:%u m:%u v:%u saving mission results", playerID(), missionID(), sortieID());
 
 	UINT32 rtbFacilityOID = 0;
-	const FULL_OBJ_ID& rtbFacility = vehicle.rtbFacility();
+	const FULL_OBJ_ID rtbFacility = vehicle.rtbFacility();
 	if ( rtbFacility.id > 0 )
 	{
 		const FacilityStruct* const fac = strtGetFacility(rtbFacility);
@@ -1213,7 +1213,7 @@ mapLoadWeaponIndexes()
 // the chat host updates the rest.
 
 void
-HCUnit::setHomeCPID(const FULL_OBJ_ID& cpID)
+HCUnit::setHomeCPID(const FULL_OBJ_ID cpID)
 {
 	CPStruct* oldCP;
 	oldCP = strtGetCP(m_homeCPID);

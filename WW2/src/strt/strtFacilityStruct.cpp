@@ -369,7 +369,7 @@ CaptureState::populate(const class FacilityStruct* facility
 // replaces strtFindWeaponEntry
 
 WeaponEntry*
-FacilityStruct::weaponEntry(const WEAPON_SPEC& weapon) const
+FacilityStruct::weaponEntry(const WEAPON_SPEC weapon) const
 {
 	WEAPON_ENTRIES::const_iterator it = m_weaponEntries.find(weapon);
 	return ( it != m_weaponEntries.end() ) ? (it->second) : nullptr;

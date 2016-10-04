@@ -734,7 +734,7 @@ public:
 	// this scenario is completed
 	void SetComplete();
 	void SetConfig(const char* name, const char* value);
-	void SetRespawnWeapon(const WEAPON_SPEC& spec);
+	void SetRespawnWeapon(const WEAPON_SPEC spec);
 	bool Spawn(const vehType* vehtype);
 	bool Respawn();
 

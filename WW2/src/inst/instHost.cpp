@@ -189,7 +189,7 @@ namespace Instance
 {
 
 HostInstance*
-HostInstance::LookupByUID(const instanceid_t& uid)
+HostInstance::LookupByUID(const instanceid_t uid)
 {
 	INSTANCE_UIDS::iterator it = g_hostInstanceUIDs.find(uid);
 	return ( it != g_hostInstanceUIDs.end() ) ? it->second : nullptr;

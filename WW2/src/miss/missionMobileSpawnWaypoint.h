@@ -14,7 +14,7 @@
 struct MobileSpawnWaypoint
 {
 	MobileSpawnWaypoint() {}
-	MobileSpawnWaypoint(UINT32 missionID, UINT32 playerID, const ChatHandle& owner
+	MobileSpawnWaypoint(UINT32 missionID, UINT32 playerID, const ChatHandle owner
 						, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z
 						, bool deployed, UINT32 stoUID, UINT32 reason)
 		: m_missionID(missionID), m_playerID(playerID), m_ownerCall(owner)

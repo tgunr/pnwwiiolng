@@ -24,7 +24,7 @@ int Init(stratDatafn);
 void Kill();
 
 StratObject* FindStratObject(const sdm_full_obj_id&);
-StratObject* FindStratObject(const FULL_OBJ_ID&);
+StratObject* FindStratObject(const FULL_OBJ_ID);
 StratObject* FindStratObject(const char* cp, const char* fac = nullptr);
 
 // returns a list of objects with klass and type starting from start
@@ -125,7 +125,7 @@ typedef std::vector<UINT32> UnitList;
 
 	bool IsSpawnable() const;
 	bool IsDeepWaterPort() const;
-	bool IsRelated(const FULL_OBJ_ID& id) const;
+	bool IsRelated(const FULL_OBJ_ID id) const;
 	bool IsRelated(const StratDB::StratObject* strat) const;
 
 	StratDB::StratObject* GetLinkedDepot() const;

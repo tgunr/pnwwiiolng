@@ -282,7 +282,7 @@ Player::ableToPostIn(const Brigade& toBrigade) const
 // construct missions, so anyone doing so will have to call all
 // the right stuff...
 
-Mission::Mission(const instanceid_t& forInstanceID, const MISSION_SUMMARY& withSummary)
+Mission::Mission(const instanceid_t forInstanceID, const MISSION_SUMMARY& withSummary)
 	: m_takers(), m_spawner()
 {
 	dbugLog(_FLD, "ALLOC: +mission at %p in:%llu", this, forInstanceID);
@@ -909,7 +909,7 @@ MissionPacket::successfulDuration() const
 // for 1.2.5, this is simply, did they rtb and damage someone?
 
 bool
-MissionPacket::successful(const WEAPON_SPEC& weaponSpec) const
+MissionPacket::successful(const WEAPON_SPEC weaponSpec) const
 {
 	if ( weaponSpec.wType == 0 )
 		return false;

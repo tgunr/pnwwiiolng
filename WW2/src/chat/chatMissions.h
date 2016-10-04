@@ -34,5 +34,5 @@ void chatMissionRemovePlayer(Player* player, UINT32 missionID, UINT32 sponsor);
 void chatMissionOrders(const Player* player);
 void chatSendMissionUpdates();
 void chatMissionUpdateMember(Player* player);
-void chatSetMissionLeader(UINT32 missionID, const ChatHandle& leader, WWII_SIDE side, const UINT64& origin, const UINT64& objective);
+void chatSetMissionLeader(UINT32 missionID, const ChatHandle leader, WWII_SIDE side, const UINT64& origin, const UINT64& objective);
 bool chatShareWaypoint(Waypoint& waypoint, ChatMission* mission, WWII_SIDE side);

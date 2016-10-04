@@ -34,7 +34,7 @@ public:
 	// be marked for AWS.
 	void awsCheck();
 
-	void changeFPSBuilding(const FULL_OBJ_ID& newBuildingID, bool isInCaptureBuilding);
+	void changeFPSBuilding(const FULL_OBJ_ID newBuildingID, bool isInCaptureBuilding);
 
 	UINT16 getCurrentFramingMode();
 	UINT16 getPreferredFramingMode() { return m_framingMode; }
@@ -48,7 +48,7 @@ public:
 	void setFramingMode(UINT16 mode);
 	void setVehicle(HostVehicle* const vehicle_);
 
-	const FULL_OBJ_ID& fpsBuildingID() const { return m_fpsBuildingID; }
+	FULL_OBJ_ID fpsBuildingID() const { return m_fpsBuildingID; }
 
 public:
 	static SINT32 Create(const Server::PersonaLogin& xfer, class PlayerStatusNode& psn);

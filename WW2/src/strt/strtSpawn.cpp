@@ -156,7 +156,7 @@ _postWeapon(WeapJoinRequestNode* joinNode
 			, UINT32 supplyUnitID
 			, const PermissionMask& permMask
 			, UINT32 commander
-			, const ChatHandle& handle
+			, const ChatHandle handle
 			, bool isImmediateSpawn
 			, bool isMulticrew
 			)
@@ -289,7 +289,7 @@ _postWeapon(WeapJoinRequestNode* joinNode
 // pre-existing node.
 
 static WeapJoinRequestNode*
-_getNewJoinNode(UINT32 playerID, const ChatHandle& handle, UINT32 missionID)
+_getNewJoinNode(UINT32 playerID, const ChatHandle handle, UINT32 missionID)
 {
 	WeapJoinRequestNode* joinNode = WeapJoinRequestNode::Lookup(playerID);
 	if ( joinNode )
@@ -484,7 +484,7 @@ _cleanUpJoinNode(WeapJoinRequestNode* joinNode)
 		case JOIN_LIST::_FACILITY:
 			if ( g_logDebug )
 			{
-				const FULL_OBJ_ID& fid = joinNode->m_joinList->m_facility->fullObjID;
+				const FULL_OBJ_ID fid = joinNode->m_joinList->m_facility->fullObjID;
 				dbugLog(_FLD, "deleting join %p id %d post from facility " PRF_FULL_OBJ_ID ""
 						, joinNode, joinNode->m_playerID
 						, PRA_FULL_OBJ_ID(fid)
@@ -910,7 +910,7 @@ strtProcessSpawnCancel(MM_SPAWN_CANCEL* spawnCancel)
 // locate a spawn object for this weapon at that facility
 
 static FacilityStruct *
-_verifyRTBFacility(const WEAPON_SPEC& spec, const FULL_OBJ_ID& rtbFacility, const ChatHandle& handle)
+_verifyRTBFacility(const WEAPON_SPEC spec, const FULL_OBJ_ID rtbFacility, const ChatHandle handle)
 {
 	static const ChatHandle systemHandle = chatGetHandle("SYSTEM");
 	Chat::Name callsign((handle == 0ULL) ? systemHandle : handle);
@@ -1032,7 +1032,7 @@ POSTED_WEAPON::reReserve()
 
 #ifdef BETA_RELEASE
 void
-_reportWeaponStatus(const POSTED_WEAPON* currentWeapon, const WEAPON_SPEC& spec, bool rtbPromoted)
+_reportWeaponStatus(const POSTED_WEAPON* currentWeapon, const WEAPON_SPEC spec, bool rtbPromoted)
 {
 	if ( currentWeapon->m_status == POSTED_WEAPON::_SPAWNED )
 	{
@@ -1514,7 +1514,7 @@ strtInitializeVehicleAccessLevels()
 {
 	WEAPON fakeWeapon;
 
-	fakeWeapon.spec().wCountry = 1;
+	fakeWeapon.m_spec.wCountry = 1;
 
 	// For each access level, find the lowest rank
 	// that can access the weapon

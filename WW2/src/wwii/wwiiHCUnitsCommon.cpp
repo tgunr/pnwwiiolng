@@ -33,9 +33,9 @@ wwiiPackBrigadeID(LOGICAL mode, UCHAR* data, SINT32 offset, UINT32& brigadeID, S
 
 HCUnit::HCUnit(UINT32 withUnit, HCUNIT_TYPE withType, UINT32 withParent
 			, WWII_COUNTRY withCountry, BRANCH_ENUM withBranch, BRANCH_ENUM withMovementType, UCHAR withUnitClass
-			, const ChatHandle& withHandle
+			, const ChatHandle withHandle
 			, const char* withName, const char* nick, UINT8 Rank
-			, const FULL_OBJ_ID& home
+			, const FULL_OBJ_ID home
 			, const ChatHandle withOwner, RANK_NO withOwnerRank
 			)
 	: m_unitID(withUnit), m_type(withType), m_parentID(withParent)

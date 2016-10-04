@@ -176,7 +176,7 @@ RequestSelect(const Instance::Descriptor& instance, SINT32 mapConnection)
 }
 
 bool
-RequestSelect(UINT32 instCategory, UINT32 instType, const UINT64& instOwner, const instanceid_t& id, SINT32 mapConnection)
+RequestSelect(UINT32 instCategory, UINT32 instType, const UINT64 instOwner, const instanceid_t id, SINT32 mapConnection)
 {
 	Instance::Descriptor instance(instCategory, instType, instOwner, id);
 	return RequestSelect(instance, mapConnection);
@@ -193,7 +193,7 @@ RequestCreate(const Instance::Descriptor& instance, SINT32 mapConnection)
 }
 
 bool
-RequestCreate(UINT32 instCategory, UINT32 instType, const UINT64& instOwner, SINT32 mapConnection)
+RequestCreate(UINT32 instCategory, UINT32 instType, const UINT64 instOwner, SINT32 mapConnection)
 {
 	Instance::Descriptor instance(instCategory, instType, instOwner);
 	return RequestCreate(instance, mapConnection);

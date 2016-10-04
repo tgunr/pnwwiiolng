@@ -30,14 +30,14 @@ extern void strtResetObject(ObjectStruct& object);
 extern Supercell* strtGetSupercellFromPosition_cm(const SINT32 x_cm, const SINT32 y_cm);
 extern Supercell* strtGetSupercellFromPosition_m(const SINT32 x_m, const SINT32 y_m);
 extern Supercell* strtGetSupercell(const SINT16 x, const SINT16 y);
-extern Supercell* strtGetSupercellFULL_OBJ_ID(const FULL_OBJ_ID& fullObjID);
-extern CPStruct* strtGetCP(const FULL_OBJ_ID& index);
-extern CPStruct* strtGetCPorBridge(const FULL_OBJ_ID& index);
-extern FacilityStruct* strtGetFacility(const FULL_OBJ_ID& index);
-extern ObjectStruct* strtGetObject(const FULL_OBJ_ID& index);
-extern LinkStruct* strtGetLink(const FULL_OBJ_ID& index);
-extern FULL_OBJ_ID* strtGetFullObjID(const FULL_OBJ_ID& index);
-extern CPStruct* strtGetCPFromTarget(const FULL_OBJ_ID& index);
+extern Supercell* strtGetSupercellFULL_OBJ_ID(const FULL_OBJ_ID fullObjID);
+extern CPStruct* strtGetCP(const FULL_OBJ_ID index);
+extern CPStruct* strtGetCPorBridge(const FULL_OBJ_ID index);
+extern FacilityStruct* strtGetFacility(const FULL_OBJ_ID index);
+extern ObjectStruct* strtGetObject(const FULL_OBJ_ID index);
+extern LinkStruct* strtGetLink(const FULL_OBJ_ID index);
+extern FULL_OBJ_ID* strtGetFullObjID(const FULL_OBJ_ID index);
+extern CPStruct* strtGetCPFromTarget(const FULL_OBJ_ID index);
 
 //same as above, only using FULL_ID
 extern CPStruct* strtGetCP_FULL_ID(const FULL_ID& index);

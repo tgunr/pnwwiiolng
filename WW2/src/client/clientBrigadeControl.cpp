@@ -92,7 +92,7 @@ bool BrigadeControlRequest::volunteerOIC(SINT32 teulIndex, UINT32 brigade)
 // H/C: Client nominating an OIC
 // Brigade must be supplied to eliminate race conditions
 
-bool BrigadeControlRequest::nominateOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& nomineeHandle)
+bool BrigadeControlRequest::nominateOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle nomineeHandle)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(nomineeHandle)) )
 		return false;
@@ -107,7 +107,7 @@ bool BrigadeControlRequest::nominateOIC(SINT32 teulIndex, UINT32 brigade, const 
 //////////////////////////////////////////////////////////////////////
 // H/C: Client vetoing an OIC
 
-bool BrigadeControlRequest::vetoOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& onHandle)
+bool BrigadeControlRequest::vetoOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle onHandle)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(onHandle)) )
 		return false;
@@ -138,7 +138,7 @@ bool BrigadeControlRequest::resignOIC(SINT32 teulIndex, UINT32 brigade)
 // H/C: Client requesting to replace existing OIC (must be HC)
 // Handle is provided for race condition elimination
 
-bool BrigadeControlRequest::replaceOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& oldHandle)
+bool BrigadeControlRequest::replaceOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle oldHandle)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(oldHandle)) )
 		return false;
@@ -154,7 +154,7 @@ bool BrigadeControlRequest::replaceOIC(SINT32 teulIndex, UINT32 brigade, const C
 // H/C: Client requesting to remove existing OIC (must be HC)
 // Handle is provided for race condition elimination
 
-bool BrigadeControlRequest::removeOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& oicHandle)
+bool BrigadeControlRequest::removeOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle oicHandle)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(oicHandle)) )
 		return false;
@@ -170,7 +170,7 @@ bool BrigadeControlRequest::removeOIC(SINT32 teulIndex, UINT32 brigade, const Ch
 // H/C: Propose a brigade move; must specify the location you think you are
 // moving it from.
 
-bool BrigadeControlRequest::requestBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& destination, const FULL_OBJ_ID& origin)
+bool BrigadeControlRequest::requestBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const FULL_OBJ_ID origin)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
 		return false;
@@ -192,7 +192,7 @@ bool BrigadeControlRequest::requestBrigadeMove(SINT32 teulIndex, UINT32 brigade,
 // H/C: Propose a brigade move; must specify the location you think you are
 // moving it from.
 
-bool BrigadeControlRequest::vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& destination, const FULL_OBJ_ID& origin)
+bool BrigadeControlRequest::vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const FULL_OBJ_ID origin)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
 		return false;
@@ -213,7 +213,7 @@ bool BrigadeControlRequest::vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, co
 //////////////////////////////////////////////////////////////////////
 // H/C: Veto an objective (attack/defend/clear)
 
-bool BrigadeControlRequest::vetoObjective(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& target)
+bool BrigadeControlRequest::vetoObjective(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID target)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
 		return false;
@@ -231,7 +231,7 @@ bool BrigadeControlRequest::vetoObjective(SINT32 teulIndex, UINT32 brigade, cons
 	return send(teulIndex);
 }
 
-bool BrigadeControlRequest::requestAttack(SINT32 teulIndex, const FULL_OBJ_ID& destination)
+bool BrigadeControlRequest::requestAttack(SINT32 teulIndex, const FULL_OBJ_ID destination)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex)) )
 		return false;
@@ -248,7 +248,7 @@ bool BrigadeControlRequest::requestAttack(SINT32 teulIndex, const FULL_OBJ_ID& d
 	return send(teulIndex);
 }
 
-bool BrigadeControlRequest::requestDefend(SINT32 teulIndex, const FULL_OBJ_ID& destination)
+bool BrigadeControlRequest::requestDefend(SINT32 teulIndex, const FULL_OBJ_ID destination)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex)) )
 		return false;
@@ -265,7 +265,7 @@ bool BrigadeControlRequest::requestDefend(SINT32 teulIndex, const FULL_OBJ_ID& d
 	return send(teulIndex);
 }
 
-bool BrigadeControlRequest::requestClear(SINT32 teulIndex, const FULL_OBJ_ID& destination)
+bool BrigadeControlRequest::requestClear(SINT32 teulIndex, const FULL_OBJ_ID destination)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex)) )
 		return false;

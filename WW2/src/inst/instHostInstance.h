@@ -67,7 +67,7 @@ namespace Instance
 
 		const PLAYERS& players() const { return m_players; }
 		PLAYERS& players() { return m_players; }
-		const playerid_t& creator() const { return m_creator; }
+		playerid_t creator() const { return m_creator; }
 
 		// Member functions
 
@@ -86,7 +86,7 @@ namespace Instance
 		void setState(Instance::State newState);
 
 	public:
-		static HostInstance* LookupByUID(const instanceid_t& _uid);
+		static HostInstance* LookupByUID(const instanceid_t _uid);
 
 	private:
 		//! PlayerID of the player who created the instance (may differ from handle)

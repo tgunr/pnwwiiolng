@@ -15,7 +15,7 @@ class SquadInvite
 public:
 	static const UINT32 EXPIRY_MS = 3 * 60 * 1000;
 
-	SquadInvite(UINT32 squadID=0, const ChatHandle& from=0LL, RANK_NO rank=0)
+	SquadInvite(UINT32 squadID=0, const ChatHandle from=0LL, RANK_NO rank=0)
 		: m_squadID(squadID), m_from(from), m_expires(teulClock64 + EXPIRY_MS), m_rank(rank) {}
 	~SquadInvite() {}
 

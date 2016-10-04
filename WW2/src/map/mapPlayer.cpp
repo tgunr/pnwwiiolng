@@ -725,7 +725,7 @@ Player::calculateMissionResults(MM_PERS_STATE toState)
 		return false;
 	}
 
-	const FULL_OBJ_ID& origin = missionPacket().sortie().originFac();
+	const FULL_OBJ_ID origin = missionPacket().sortie().originFac();
 	const FacilityStruct* const facility = strtGetFacility(origin);
 	if ( facility == nullptr )
 	{
@@ -1165,7 +1165,7 @@ Player::onDespawn(SINT32 onTeulIndex)
 // Tell the player that their post [request] has been denied.
 
 void
-Player::postDenied(const WEAPON_SPEC& forWeapon, UINT32 forReasonCode, bool loseWeapon)
+Player::postDenied(const WEAPON_SPEC forWeapon, UINT32 forReasonCode, bool loseWeapon)
 {
 	BETAInfo(teulIndex());
 
@@ -1181,7 +1181,7 @@ Player::postDenied(const WEAPON_SPEC& forWeapon, UINT32 forReasonCode, bool lose
 // called by _recvMMFacilityCapacityResponse in strtMapMessages.cpp
 
 void
-Player::processCapacityResponse(const FULL_OBJ_ID& rtbFacility_, const WEAPON_SERIAL& reservedWeapon_, const bool vehicleDelivered_)
+Player::processCapacityResponse(const FULL_OBJ_ID rtbFacility_, const WEAPON_SERIAL& reservedWeapon_, const bool vehicleDelivered_)
 {
 	setReceivedCapacity(true);
 

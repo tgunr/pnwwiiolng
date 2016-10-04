@@ -742,7 +742,7 @@ int Client::RequestMissionWeapList(FULL_OBJ_ID const& fac, bool allweapons, bool
 	Client::RequestMissionWeapPost
 *************************************************************************************************/
 
-int Client::RequestMissionWeapPost(FULL_OBJ_ID const& fac, const WEAPON_SPEC& spec, bool immediatespawn)
+int Client::RequestMissionWeapPost(FULL_OBJ_ID const& fac, const WEAPON_SPEC spec, bool immediatespawn)
 {
 	return mmSendPostRequest(MapConnection(), fac, spec, (LOGICAL)immediatespawn);
 }
@@ -1033,7 +1033,7 @@ void Client::SetActiveWaypoint(ChatHandle handle)
 	TUT_MGR->DoEvent(TUT_EVENT_MAP, &type);
 }
 
-const ChatHandle& Client::ActiveWaypointHandle() const
+ChatHandle Client::ActiveWaypointHandle() const
 {
 	return _data->activewaypoint;
 }

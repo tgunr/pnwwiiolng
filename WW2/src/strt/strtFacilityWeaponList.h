@@ -76,7 +76,7 @@ public:
 		, _BDE_DISABLED					// Brigade is disabled by TOE.
 	};
 
-	FacilityWeaponList(UINT32 playerID = 0, const FULL_OBJ_ID& fullObjID = nullObjID, FacilityWeaponList::REASON_CODE status=FacilityWeaponList::_INVALID)
+	FacilityWeaponList(UINT32 playerID = 0, const FULL_OBJ_ID fullObjID = nullObjID, FacilityWeaponList::REASON_CODE status=FacilityWeaponList::_INVALID)
 		: m_status(status)
 		, m_playerID(playerID), m_fullObjID(fullObjID)
 		, m_numWeapons(0)

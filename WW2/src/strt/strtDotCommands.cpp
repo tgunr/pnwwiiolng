@@ -1982,7 +1982,7 @@ _dotObjectives(char* arguments, OOBMessage& message)
 // Set the target fields
 
 static void
-_setTarget(const FULL_OBJ_ID& id)
+_setTarget(const FULL_OBJ_ID id)
 {
 	targeted_cp = nullptr;
 	targeted_fac = nullptr;

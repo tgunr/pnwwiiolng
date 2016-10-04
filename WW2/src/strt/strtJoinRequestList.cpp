@@ -66,7 +66,7 @@ WeapJoinRequestNode::Lookup(UINT32 playerID)
 //////////////////////////////////////////////////////////////////////
 // Ctor for WeapJoinRequestNode
 
-WeapJoinRequestNode::WeapJoinRequestNode(UINT32 playerID, const ChatHandle& handle, UINT32 missionID)
+WeapJoinRequestNode::WeapJoinRequestNode(UINT32 playerID, const ChatHandle handle, UINT32 missionID)
 	: prev(nullptr), next(nullptr)
 	, m_joinList(nullptr)
 	, m_playerID(playerID)

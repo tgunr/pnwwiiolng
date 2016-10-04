@@ -242,7 +242,7 @@ public:
 	UINT32 flags() const { return m_flags; }
 	//! Returns the unique ID of the STO's instance.
 	//! @return unique ID of the instance.
-	const instanceid_t& instanceID() const { return m_instanceID; }
+	const instanceid_t instanceID() const { return m_instanceID; }
 	//! Return the attitude vector (if any).
 	//! @return Attitude/orientation vector.
 	const AttitudeVector& attitude() const { return m_attitude; }

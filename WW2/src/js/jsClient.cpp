@@ -1806,7 +1806,7 @@ JSBool jsClient::SetProperty(JSContext* ctx, int propid, jsval* val)
 	Looks up the weapon spec and checks if it is a valid vehicle that does not require
     ENABLE_FLOATERS.
 *************************************************************************************************/
-static bool _isRegularVehicle(const WEAPON_SPEC& spec)
+static bool _isRegularVehicle(const WEAPON_SPEC spec)
 {
 	const WEAPON* weapon = weapLookup(spec);
 

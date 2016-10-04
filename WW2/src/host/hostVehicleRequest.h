@@ -26,7 +26,7 @@ struct VehicleRequest
 {
 	//! MMHost constructor.
 	VehicleRequest(const instanceid_t instanceID, const struct MM_SPAWN_GRANT_RESPONSE& grant, const class Player& commander, const class Player* const crew);
-	VehicleRequest(const instanceid_t instanceID, sortieid_t serial, const WEAPON_SPEC& spec) noexcept
+	VehicleRequest(const instanceid_t instanceID, sortieid_t serial, const WEAPON_SPEC spec) noexcept
 		: m_instanceID(instanceID)
 		, m_weaponSerial()
 		, m_brigadeID(0)

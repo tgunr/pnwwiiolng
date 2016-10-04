@@ -48,12 +48,12 @@ struct GridKey
 	//! Constructor.
 	//! GridKeys are instance dependent so that STOs don't cross
 	//! instance boundaries.
-	GridKey(const instanceid_t& _instanceID, SINT32 x, SINT32 y)
+	GridKey(const instanceid_t _instanceID, SINT32 x, SINT32 y)
 		: m_instanceID(_instanceID), m_x(x), m_y(y)
 		{}
 	GridKey(UINT64 _key) : m_key(_key) {}
 
-	const instanceid_t& instanceID() const { return m_instanceID; }
+	instanceid_t instanceID() const { return m_instanceID; }
 	SINT32 X() const { return m_x; }
 	SINT32 Y() const { return m_y; }
 	const UINT64& key() const { return m_key; }

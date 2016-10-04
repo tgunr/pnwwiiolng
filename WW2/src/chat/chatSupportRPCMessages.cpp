@@ -28,7 +28,7 @@ Chat::Broadcast::send()
 }
 
 bool
-chatSendBroadcast(Chat::BCAST_TYPE type, const instanceid_t& instanceID, UINT64 targetID, LSTRING_ID prefix, LSTRING_ID message
+chatSendBroadcast(Chat::BCAST_TYPE type, const instanceid_t instanceID, UINT64 targetID, LSTRING_ID prefix, LSTRING_ID message
 						, const char* ptr0, const char* ptr1, const char* ptr2, const char* ptr3, const char* ptr4, const char* ptr5)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::BROADCAST_MESSAGE_Y));

@@ -1143,7 +1143,7 @@ void ScenarioManager::SetConfig(const char* name, const char* value)
 	TUT_MGR->DoEvent(TUT_EVENT_SET, name, value);
 }
 
-void ScenarioManager::SetRespawnWeapon(const WEAPON_SPEC& spec)
+void ScenarioManager::SetRespawnWeapon(const WEAPON_SPEC spec)
 {
 	_respawnWeapon = spec;
 }

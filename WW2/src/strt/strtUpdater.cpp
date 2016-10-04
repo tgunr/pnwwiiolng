@@ -92,7 +92,7 @@ _getDamageQueueEntry(const UINT64& objectKey, const WEAPON_SERIAL& weapon, const
 }
 
 void
-strtAccumulateDamageMessage(const FULL_OBJ_ID& object, const SINT64& damageJoules, UINT32 playerID, const WEAPON_SERIAL& serial)
+strtAccumulateDamageMessage(const FULL_OBJ_ID object, const SINT64& damageJoules, UINT32 playerID, const WEAPON_SERIAL& serial)
 {
 	ObjectStruct* const currentObject = strtGetObject(object);
 	if (currentObject == nullptr)

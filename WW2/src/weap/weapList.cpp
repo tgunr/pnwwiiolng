@@ -391,7 +391,7 @@ void weapListKill(void)
 #endif
 
 // Find the weapon spec of a weapon by its name
-const WEAPON_SPEC&
+WEAPON_SPEC
 weapFindWeaponByName(const char* name)
 {
 	if ( name == nullptr || *name == 0 )
@@ -421,7 +421,7 @@ weapLookupWeaponByIndex(UINT32 localIndex)
 }
 
 // Lookup the weapon with the fast index
-WEAPON* weapLookup(const WEAPON_SPEC& spec)
+WEAPON* weapLookup(const WEAPON_SPEC spec)
 {
 	WEAPON_LIST::iterator it = g_weaponList.find(spec);
 	return ( it != g_weaponList.end() ) ? it->second : nullptr;
@@ -440,7 +440,7 @@ _getAccessValue(const char* key)
 	return atoi(key+1);
 }
 
-WEAPON::WEAPON(const WEAPON_SPEC& withSpec
+WEAPON::WEAPON(const WEAPON_SPEC withSpec
 				, const char* Name, const char* withAccess
 				, UINT16 unitCount
 				, UINT32 lod_cm, UINT32 AlertDist, UINT32 Speed, UINT32 CVCValue

@@ -11,7 +11,7 @@ class StratHCUnit;
 
 extern UINT32 stratBridgeObjectiveLimit(void);
 extern UINT32 stratCaptureObjectiveLimit(void);
-extern UINT32 stratResupplyTime(const WEAPON_SPEC& weapon, StratHCUnit* unit, FacilityStruct* facility, UINT32 resupplyTimer);
+extern UINT32 stratResupplyTime(const WEAPON_SPEC weapon, StratHCUnit* unit, FacilityStruct* facility, UINT32 resupplyTimer);
 extern double stratRDPSupplyPenalty(WWII_COUNTRY forCountry);
 extern UINT32 stratEWSHighThreshold(void);
 extern UINT32 stratEngagementObjectivesQuota(UINT32 attackLimit);

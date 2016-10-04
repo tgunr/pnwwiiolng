@@ -6752,7 +6752,7 @@ static int dot_aion(const char* line)
 	Just remember not to share.
 *************************************************************************************************/
 
-//extern SINT32 mmSendDirectSpawn(SINT32 connection, const WEAPON_SPEC& weapon, const FLOAT64VECTOR* location);
+//extern SINT32 mmSendDirectSpawn(SINT32 connection, const WEAPON_SPEC weapon, const FLOAT64VECTOR* location);
 static SINT32 dot_dev(const char* line)
 {
 	const char* p = strchr(line, ' ');

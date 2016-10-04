@@ -28,7 +28,7 @@ static CONTRIBUTIONS		contributions;
 //	------------------------------	Declarations
 
 Strat::CaptureContribution::CaptureContribution(Strat::CaptureContributionEvent::Status withStatus
-					, FacilityStruct& forFacility, const ChatHandle& forHandle, UINT32 forPlayerID, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit)
+					, FacilityStruct& forFacility, const ChatHandle forHandle, UINT32 forPlayerID, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit)
 	: CaptureContributionEvent(withStatus, forFacility.uOID, forHandle, forPlayerID, forSortieID, forMissionID, forUnit.unitID())
 	, m_facility(&forFacility), m_unit(&forUnit)
 {
@@ -167,7 +167,7 @@ FacilityStruct::setCaptureProgress(FLOAT32 newValue, const Strat::CaptureContrib
 // Add a capture contribution to a facility
 
 void
-Strat::CaptureContribution::Queue(Status withStatus, FacilityStruct& forFacility, const ChatHandle& forHandle, UINT32 forPlayerID, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit)
+Strat::CaptureContribution::Queue(Status withStatus, FacilityStruct& forFacility, const ChatHandle forHandle, UINT32 forPlayerID, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit)
 {
 	if ( forFacility.isCaptureEnabled() == false )
 	{

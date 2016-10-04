@@ -2502,7 +2502,7 @@ vehVehicle*cur;
 	return FALSE;
 }
 
-vehVehicle*vehFindVehicleByChatHandle(const ChatHandle& chathandle)
+vehVehicle*vehFindVehicleByChatHandle(const ChatHandle chathandle)
 {
 	for ( vehVehicle* cur = getVehicleHead().getNext(); cur != nullptr; cur = cur->getNext())
 	{

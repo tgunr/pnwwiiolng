@@ -248,7 +248,7 @@ _findOrigin(const FacilityStruct* facility, UINT8 weaponCategory)
 // NOTE: Caller is responsible for ensuring player is not null
 
 bool
-mmDirectSpawn(Player& player, const WEAPON_SPEC& weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation)
+mmDirectSpawn(Player& player, const WEAPON_SPEC weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation)
 {
 	BETAInfo(player.teulIndex());
 

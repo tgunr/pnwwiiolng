@@ -21,7 +21,7 @@
 SINT32 chatInstallClientCallbacks(void);
 
 // Notify the chat host of a users ui-map target selection
-void chatTargetSelection(const struct FULL_OBJ_ID& id);
+void chatTargetSelection(const struct FULL_OBJ_ID id);
 
 FULL_OBJ_ID chatGetTargetSelection();
 

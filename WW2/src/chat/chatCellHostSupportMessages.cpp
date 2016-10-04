@@ -194,7 +194,7 @@ chatSendKickNotice(const playerid_t playerID, const SCHAR* callsign, const SCHAR
 }
 
 void
-Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport report)
+Chat::SendModReport(const ChatHandle handle, const Chat::ModReport report)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MOD_REPORT_Y));
 	outgoing.append(report);

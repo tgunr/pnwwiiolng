@@ -347,7 +347,7 @@ chatSetShutdownTime(UINT32 forTime, const char* caller)
 // Helper function that returns a property's name or prints the ox/oy/id
 
 const char*
-chatPropertyName(const FULL_OBJ_ID& id)
+chatPropertyName(const FULL_OBJ_ID id)
 {
 	Property* property = chatFindProperty(id);
 	if ( property != nullptr )
@@ -361,7 +361,7 @@ chatPropertyName(const FULL_OBJ_ID& id)
 
 // Variant for when you want the pointer yourself
 const char*
-chatPropertyName(const Property* property, const FULL_OBJ_ID& id)
+chatPropertyName(const Property* property, const FULL_OBJ_ID id)
 {
 	if ( property != nullptr )
 		return property->Name();
@@ -546,7 +546,7 @@ private:
 	}
 
 public:
-	Ban(const ChatHandle& handle_, UINT32 days_, bool kick_)
+	Ban(const ChatHandle handle_, UINT32 days_, bool kick_)
 		: m_handle(handle_)
 		, m_days(days_)
 		, m_start(teulTime() + _randomBanDelay())
@@ -628,7 +628,7 @@ _processDelayedBan()
 }
 
 static void
-_delayedBan(const ChatHandle& handle, UINT32 days, bool kick=true)
+_delayedBan(const ChatHandle handle, UINT32 days, bool kick=true)
 {
 	Ban ban(handle, days, kick);
 	dbugLog(_FLD, "c:%s will be banned for %u days in %u seconds.", Chat::Name(handle).c_str(), ban.m_days, ban.m_start - teulTime());
@@ -640,7 +640,7 @@ _delayedBan(const ChatHandle& handle, UINT32 days, bool kick=true)
 // Check if a player is online and if they have the CAN_BE_EJECTED flag
 
 static bool
-_isBanable(const ChatHandle& handle)
+_isBanable(const ChatHandle handle)
 {
 	const Player* player = PlayerInterface::Lookup(handle);
 	return ( player && player->permissions(CAN_BE_EJECTED) );
@@ -679,7 +679,7 @@ static DotDetectMe detectMe;
 #endif
 
 void
-Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
+Chat::SendModReport(const ChatHandle handle, const Chat::ModReport modType)
 {
 	Chat::Name callsign(handle);
 	const char* type = nullptr;
@@ -765,7 +765,7 @@ chatRouteGCIMessage(Chat::GCIMessage& message, UINT32 messageID)
 // Send an "all" message.
 
 void
-chatSendAllMessage(const ChatHandle& handle, const char* message, UINT32 messageID)
+chatSendAllMessage(const ChatHandle handle, const char* message, UINT32 messageID)
 {
 	Chat::HostMessage& msg = chatBuildHostMessage(handle, messageID, LOBBY_CHAN_ICON, message);
 	chatBroadcastHostMessage(playerIndex.begin(), playerIndex.end(), msg);
@@ -1523,7 +1523,7 @@ chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageI
 // bells, whistles and trimmings
 
 Chat::HostMessage&
-chatBuildHostMessage(const ChatHandle& senderID
+chatBuildHostMessage(const ChatHandle senderID
 					, UINT32 msgID
 					, UINT8 chanIcon
 					, const char* text
@@ -1560,7 +1560,7 @@ struct IsRat : public FilterFn
 ChatHandle IsRat::excludeID = 0LL;
 
 void
-chatDispatchCRSMessage(const SCHAR* source, const SCHAR* text, const ChatHandle& excludeID)
+chatDispatchCRSMessage(const SCHAR* source, const SCHAR* text, const ChatHandle excludeID)
 {
 	Chat::LocalizedMessage lmsg(LSTR_NONE, LSTR_CRS_MSG, source, text);
 
@@ -1581,7 +1581,7 @@ struct IsGM : public FilterFn
 ChatHandle IsGM::excludeID = 0LL;
 
 void
-chatDispatchGMMessage(const SCHAR* source, const SCHAR* text, const ChatHandle& excludeID)
+chatDispatchGMMessage(const SCHAR* source, const SCHAR* text, const ChatHandle excludeID)
 {
 	Chat::LocalizedMessage lmsg(LSTR_NONE, LSTR_GM_MSG, source, text);
 
@@ -1607,8 +1607,8 @@ chatDispatchHCText(WWII_SIDE side, const SCHAR* source, const SCHAR* text)
 struct IsActiveCommander : public FilterFn
 {
 	WWII_SIDE m_side;
-	const ChatHandle& m_exclude;
-	IsActiveCommander(WWII_SIDE side, const ChatHandle& exclude)
+	ChatHandle m_exclude;
+	IsActiveCommander(WWII_SIDE side, ChatHandle exclude)
 		: m_side(side), m_exclude(exclude) {}
 	bool operator()(const wwiiPlayer* wwiiPlayer) const
 	{
@@ -1625,7 +1625,7 @@ chatHCMessage(WWII_SIDE side, LSTRING_ID message, const char* const ptr0, const 
 }
 
 bool
-chatHCMessage(WWII_SIDE side, Chat::LocalizedMessage& lmsg, const ChatHandle& exclude)
+chatHCMessage(WWII_SIDE side, Chat::LocalizedMessage& lmsg, const ChatHandle exclude)
 {
 	const char* channel;
 	if ( side == ALLIED )
@@ -1787,7 +1787,7 @@ _getChannel(const ChannelID& id)
 	if ( id.Type() == NUMBERED_CHANNEL )
 	{
 		sprintf(channelName, "%llu", id.SubID());
-		const ChatHandle handle = chatGetHandle(channelName);
+		ChatHandle handle = chatGetHandle(channelName);
 		sprintf(channelName, "%llu", id.SubID());
 		return chatCreateChannel(id, channelName, handle);
 	}
@@ -1801,7 +1801,7 @@ _getChannel(const ChannelID& id)
 //////////////////////////////////////////////////////////////////////
 
 bool
-Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
+Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle handleID)
 {
 	ChannelID channelID((CHANNEL_TYPE)0);
 	Chat::Channel* tuneChannel = nullptr;
@@ -1957,7 +1957,7 @@ static bool _tuneGM(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32
 // Send a tune acknowledgment to the player
 
 bool
-Player::ackTuneHandle(UCHAR index, const ChatHandle& handleID)
+Player::ackTuneHandle(UCHAR index, const ChatHandle handleID)
 {
 	Chat::TuneToChannel tune(index, PRIVATE_CHANNEL, handleID, true, false);
 	if ( tune.send(teulIndex()) == false )
@@ -2025,7 +2025,7 @@ Player::tuneRadioToNamedChannel(UCHAR index, const char* const channelName)
 static inline bool _isANumber(const char* text) { while (isdigit(*text)) ++text; return (*text == 0); }
 
 bool
-Player::tuneRadioToHandle(UCHAR index, const ChatHandle& handleID)
+Player::tuneRadioToHandle(UCHAR index, const ChatHandle handleID)
 {
 	if ( handleID == 0 )
 	{
@@ -2209,8 +2209,8 @@ Chat::Broadcast::route()
 
 struct ObjectiveFilterFn : public FilterFn
 {
-	const FULL_OBJ_ID& m_objective;
-	ObjectiveFilterFn(const FULL_OBJ_ID& objective) : m_objective(objective) {}
+	const FULL_OBJ_ID m_objective;
+	ObjectiveFilterFn(const FULL_OBJ_ID objective) : m_objective(objective) {}
 	bool operator()(const wwiiPlayer* wwiiPlayer) const
 	{
 		const Player* player = static_cast<const Player*>(wwiiPlayer);
@@ -2227,7 +2227,7 @@ bool
 chatRouteSideMessage(WWII_SIDE toSide
 					, LSTRING_ID prefix
 					, LSTRING_ID message
-					, const FULL_OBJ_ID& objectiveID
+					, const FULL_OBJ_ID objectiveID
 					, const char* const arg1
 					, const char* const arg2
 					)
