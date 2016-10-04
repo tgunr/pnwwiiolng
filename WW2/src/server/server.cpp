@@ -1889,31 +1889,38 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERR
 			[&allOptions, argv](const char*) { _help(argv, allOptions); }
 		},
 		{
+			"--child", "Process should die when parent terminates.", false,
+#if platOS == OS_LINUX
+			[](const char*) { prctl(PR_SET_PDEATHSIG, SIGHUP); }
+#else
+			[](const char*) {}
+#endif
+		},
+		{
 			"--token", "Specify the controller connection token.", true,
 			[](const char* text) { s_controllerToken = strtoul(text, nullptr, 10); }
 		}
 	};
+	allOptions.insert(allOptions.end(), cliOptions.begin(), cliOptions.end());
 	for (int argn = 1; argn < argc; ++argn)
 	{
 		bool found = false;
-		if (strcmp(argv[argn], "--help") == 0 || strcmp(argv[argn], "-?") == 0)
-			_help(argv, cliOptions);
 
-		for (size_t i = 0; i < cliOptions.size(); ++i)
+		for (size_t i = 0; i < allOptions.size(); ++i)
 		{
-			if (strcmp(argv[argn], cliOptions[i].command) != 0)
+			if (strcmp(argv[argn], allOptions[i].command) != 0)
 				continue;
 			found = true;
 			const char* param = nullptr;
-			if (cliOptions[i].wantParameter)
+			if (allOptions[i].wantParameter)
 			{
 				if (++argn >= argc)
-					LogAbort("'%s' switch expects an argument", cliOptions[i].command);
+					LogAbort("'%s' switch expects an argument", allOptions[i].command);
 				param = argv[argn];
 				if (param[0] == '-')
-					LogAbort("'%s' switch expects an argument, got '%s'", cliOptions[i].command, argv[argn]);
+					LogAbort("'%s' switch expects an argument, got '%s'", allOptions[i].command, argv[argn]);
 			}
-			cliOptions[i].callback(param);
+			allOptions[i].callback(param);
 			break;
 		}
 		if (!found)
