@@ -1867,7 +1867,7 @@ chatBrigadeAttackOrderResponse(AttackOrder& order)
 				delay = delay * 2;
 			else if ( player && !player->leadingBrigade() )
 				delay = delay + delay / 2;
-			bc.voteFor(vote, action, order.m_target.Key(), handle, host_config.oic.moveVoteTime_s);
+			bc.voteFor(vote, action, order.m_target.Key(), handle, delay);
 			return;
 		}
 		_orderExecuted(order, handle, bc, action, vote);
