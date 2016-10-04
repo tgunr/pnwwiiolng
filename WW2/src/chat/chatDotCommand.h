@@ -42,10 +42,8 @@ public:
 		, detail(detailID)
 	{ }
 
-private:
-	DotUsage& operator = (const DotUsage& rhs);
-	DotUsage(const DotUsage& rhs);
-
+	DotUsage& operator = (const DotUsage& rhs) = delete;
+	DotUsage(const DotUsage& rhs) = delete;
 
 public:
 	bool isHidden() const;
@@ -68,7 +66,7 @@ public:
 	DotCommand* m_next;
 
 public:
-	typedef std::vector<const DotUsage*> Usages;
+	using Usages = std::vector<std::unique_ptr<DotUsage>>;
 protected:
 	Usages m_usages;
 	CHAT_GROUPS m_groups;
@@ -101,7 +99,7 @@ public:
 	//! Add a new usage to this dot Command.
 	void addUsage(const ChatHandle mask, LSTRING_ID usage, LSTRING_ID detail)
 	{
-		m_usages.push_back(new DotUsage(mask, usage, detail));
+		m_usages.emplace_back(std::make_unique<DotUsage>(mask, usage, detail));
 	}
 
 	//! Determine if a client has access to a dotCommand.
