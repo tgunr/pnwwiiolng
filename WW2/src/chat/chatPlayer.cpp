@@ -1614,8 +1614,7 @@ Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle handle, UIN
 void
 Player::SetSquadInvite(SquadInvite* invite)
 {
-	if ( m_squadInvite )
-		delete m_squadInvite;
+	delete m_squadInvite;
 	m_squadInvite = invite;
 }
 
