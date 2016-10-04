@@ -16,7 +16,7 @@ class HCUnitLocation
 {
 public:
 	// Constructors
-	HCUnitLocation(UINT32 unitID, const FULL_OBJ_ID& fid)
+	HCUnitLocation(UINT32 unitID, const FULL_OBJ_ID fid)
 		: m_unitID(unitID), m_homeCPID(fid)
 		{}
 	HCUnitLocation(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }

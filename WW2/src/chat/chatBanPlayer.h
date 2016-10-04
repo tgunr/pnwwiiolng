@@ -9,10 +9,10 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 // ban a player, if client is not null then the player is notified
-void chatBanPlayer(const ChatHandle& handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle& issuerHandle);
+void chatBanPlayer(const ChatHandle handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle issuerHandle);
 
 // force the smiting of a player who is not currently connected to chat (requires db lookup)
-void chatForceKickPlayer(const ChatHandle& handle, const char* message, UINT32 issuer, const ChatHandle& issuerHandle);
+void chatForceKickPlayer(const ChatHandle handle, const char* message, UINT32 issuer, const ChatHandle issuerHandle);
 
 // Thread for banning players
 void chatBanQueueThread();

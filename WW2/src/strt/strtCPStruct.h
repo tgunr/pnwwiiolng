@@ -250,7 +250,7 @@ public:
 	bool isFriendlyLinked() const { return m_friendlyLinked; }
 
 	LinkStruct* link(UINT32 i) const;
-	LinkStruct* linkTo(const FULL_OBJ_ID& rhs) const;
+	LinkStruct* linkTo(const FULL_OBJ_ID rhs) const;
 	LinkStruct* linkTo(const CPStruct* rhs) const;
 
 	UINT32 minimumObjectiveLifetime(UINT32 currentTime) const;

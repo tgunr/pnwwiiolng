@@ -24,7 +24,7 @@
 
 struct BAN
 {
-	BAN(const ChatHandle& handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle& issuerHandle)
+	BAN(const ChatHandle handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle issuerHandle)
 		: m_handle(handle), m_duration(duration), m_message(message), m_issuer(issuer), m_issuerHandle(issuerHandle)
 		, m_banNo(0), m_playerID(0)
 		{}
@@ -46,13 +46,13 @@ BAN_QUEUE banQueue;
 // of the banning but is not kicked.
 
 void
-chatBanPlayer(const ChatHandle& handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle& issuerHandle)
+chatBanPlayer(const ChatHandle handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle issuerHandle)
 {
 	banQueue.push_back(new BAN(handle, duration, message, issuer, issuerHandle));
 }
 
 void
-chatForceKickPlayer(const ChatHandle& handle, const char* message, UINT32 issuer, const ChatHandle& issuerHandle)
+chatForceKickPlayer(const ChatHandle handle, const char* message, UINT32 issuer, const ChatHandle issuerHandle)
 {
 	banQueue.push_back(new BAN(handle, 0, message, issuer, issuerHandle));
 }

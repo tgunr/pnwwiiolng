@@ -24,10 +24,10 @@ class PersonaUpdate
 {
 public:
 	PersonaUpdate(
-		const ChatHandle& handle, WWII_COUNTRY country, BRANCH_ENUM branch, RANK_NO rank
+		const ChatHandle handle, WWII_COUNTRY country, BRANCH_ENUM branch, RANK_NO rank
 		, const Instance::Descriptor& instance, UINT32 sortieID
-		, UINT32 brigade, UINT32 mission, const ChatHandle& leader
-		, const FULL_OBJ_ID& origin, const FULL_OBJ_ID& target, const PermissionMask& mask, const WEAPON_SPEC& weapon
+		, UINT32 brigade, UINT32 mission, const ChatHandle leader
+		, const FULL_OBJ_ID origin, const FULL_OBJ_ID target, const PermissionMask mask, const WEAPON_SPEC weapon
 		, bool isSpawned, bool badChecksum
 	);
 	PersonaUpdate(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }

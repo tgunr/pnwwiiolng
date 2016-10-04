@@ -30,7 +30,7 @@ chatGetMotd(UINT32 type)
 // Update an MOTD
 
 bool
-chatSetMotd(UINT32 type, const ChatHandle& submitter, const std::string& text)
+chatSetMotd(UINT32 type, const ChatHandle submitter, const std::string& text)
 {
 	if ( type >= MOTD::_MAX_TYPES )
 	{

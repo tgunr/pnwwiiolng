@@ -20,8 +20,8 @@ class BrigadeMove
 public:
 	BrigadeMove() : m_action(BMR_FAILED), m_brigadeID(0), m_delay(0), m_actionable(false) {}
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) { return (a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this))); }
-	BRIGADE_MOVE_RESULT process(const ChatHandle& mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM);
-	void process(const ChatHandle& playerHandle) const;
+	BRIGADE_MOVE_RESULT process(const ChatHandle mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM);
+	void process(const ChatHandle playerHandle) const;
 
 public:
 	BRIGADE_MOVE_RESULT	m_action;		// What we're doing

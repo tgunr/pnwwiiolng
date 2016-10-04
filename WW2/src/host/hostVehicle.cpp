@@ -46,7 +46,7 @@ std::map<ChatHandle, HostVehicle*> g_vehicleLookup;
 // Look up a vehicle by it's chat handle.
 
 HostVehicle*
-HostVehicle::Lookup(const ChatHandle& handle)
+HostVehicle::Lookup(const ChatHandle handle)
 {
 	auto it = g_vehicleLookup.find(handle);
 	return ( it != g_vehicleLookup.end() ? it->second : nullptr );
@@ -287,7 +287,7 @@ HostVehicle::initialize(VEHICLE_HOLDER* const _holder, HostVehicleImpl* const _i
 // Accept a resupply injection
 
 void
-HostVehicle::acceptResupply(UINT32 fromSerial, const ChatHandle& fromHandle, HostVehicle* fromVehicle, const UINT32 fromAddress)
+HostVehicle::acceptResupply(UINT32 fromSerial, const ChatHandle fromHandle, HostVehicle* fromVehicle, const UINT32 fromAddress)
 {
 	if ( players().empty() )
 	{
@@ -398,7 +398,7 @@ HostVehicle::commander() const
 // How many seconds before the vehicle can despawn?
 
 static UINT32
-_despawnTimeLimit(const WEAPON_SPEC& spec, bool isInBuilding)
+_despawnTimeLimit(const WEAPON_SPEC spec, bool isInBuilding)
 {
 	// Arena sets zero despawn time.
 	if ( host_config.isArenaOpen() == false )
@@ -515,7 +515,7 @@ PLAYER_LIST& HostVehicle::players()
 // Accumulate score for resupply actions
 
 void
-HostVehicle::scoreResupply(const ChatHandle& ofHandle)
+HostVehicle::scoreResupply(const ChatHandle ofHandle)
 {
 	for ( auto pit = players().begin(); pit != players().end(); ++pit )
 	{

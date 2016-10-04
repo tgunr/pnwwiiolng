@@ -33,7 +33,7 @@ chatGetAdminChannelID(void)
 
 // Get the ID of a specific brigade channel
 const ChannelID&
-chatGetBrigadeChannelID(const instanceid_t& instID, UINT32 brigadeID, WWII_SIDE side)
+chatGetBrigadeChannelID(const instanceid_t instID, UINT32 brigadeID, WWII_SIDE side)
 {
 	if ( brigadeID == 0 || !isValidSide(side) )
 		return id_brigade.Specify(instID, 0, side);
@@ -42,7 +42,7 @@ chatGetBrigadeChannelID(const instanceid_t& instID, UINT32 brigadeID, WWII_SIDE 
 
 // Get the ID of a channel corresponding to a specific mission
 const ChannelID&
-chatGetMissionChannelID(const instanceid_t& instID, UINT32 missionID, WWII_SIDE side)
+chatGetMissionChannelID(const instanceid_t instID, UINT32 missionID, WWII_SIDE side)
 {
 	if ( missionID == 0 || !isValidSide(side) )
 		return id_mission.Specify(instID, 0, side);
@@ -51,7 +51,7 @@ chatGetMissionChannelID(const instanceid_t& instID, UINT32 missionID, WWII_SIDE 
 
 // Get the channel corresponding to a specific side+squad
 const ChannelID&
-chatGetSquadChannelID(const instanceid_t& instID, UINT32 squadID, WWII_SIDE side)
+chatGetSquadChannelID(const instanceid_t instID, UINT32 squadID, WWII_SIDE side)
 {
 	if ( squadID == 0 || !isValidSide(side) )
 		return id_squad.Specify(instID, 0, side);
@@ -60,7 +60,7 @@ chatGetSquadChannelID(const instanceid_t& instID, UINT32 squadID, WWII_SIDE side
 
 // Find the "HQ" channel for a specific side
 const ChannelID&
-chatGetGCIChannelID(const instanceid_t& instID, WWII_SIDE side)
+chatGetGCIChannelID(const instanceid_t instID, WWII_SIDE side)
 {
 	if ( !isValidSide(side) )
 		return id_gci.Specify(instID, 0, side);
@@ -71,7 +71,7 @@ chatGetGCIChannelID(const instanceid_t& instID, WWII_SIDE side)
 // Translate a CP's full obj ID into a 48-bit key value,
 // and generate a side-specific channel ID for that key
 const ChannelID&
-chatGetCPChannelID(const instanceid_t& instID, const FULL_OBJ_ID& cpID, WWII_SIDE side)
+chatGetCPChannelID(const instanceid_t instID, const FULL_OBJ_ID cpID, WWII_SIDE side)
 {
 	if ( cpID.id == 0 || !isValidSide(side) )
 		return id_cp.Specify(instID, 0);
@@ -80,7 +80,7 @@ chatGetCPChannelID(const instanceid_t& instID, const FULL_OBJ_ID& cpID, WWII_SID
 
 // Get a channel ID for a numbered radio-station channel, side filtered
 const ChannelID&
-chatGetNumberedChannelID(const instanceid_t& instID, UINT32 stationID, WWII_SIDE side)
+chatGetNumberedChannelID(const instanceid_t instID, UINT32 stationID, WWII_SIDE side)
 {
 	if ( stationID < 1 || stationID >= CHAT_MAX_NUM_STATIONS )
 		return id_zero;
@@ -92,7 +92,7 @@ chatGetNumberedChannelID(const instanceid_t& instID, UINT32 stationID, WWII_SIDE
 }
 
 const ChannelID&
-chatGetSideChannelID(const instanceid_t& instID, SIDE_SUB_CHANNEL subChannel, WWII_SIDE side)
+chatGetSideChannelID(const instanceid_t instID, SIDE_SUB_CHANNEL subChannel, WWII_SIDE side)
 {
 	if ( !isValidSide(side) )
 		return id_side.Specify(instID, 0, side);

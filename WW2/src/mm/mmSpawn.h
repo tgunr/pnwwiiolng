@@ -74,5 +74,5 @@ extern bool mmProcessJoinListResponse(const struct MM_JOIN_LIST_RESPONSE& respon
 
 extern bool mmProcessLeaveListResponse(const struct MM_POST_INFO_RESPONSE& postInfoResponse);
 
-extern bool mmDirectSpawn(Player& player, const struct WEAPON_SPEC& weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation);
+extern bool mmDirectSpawn(Player& player, const struct WEAPON_SPEC weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation);
 

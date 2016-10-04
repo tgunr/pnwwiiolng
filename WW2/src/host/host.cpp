@@ -885,7 +885,7 @@ CaptureState::invert(const CaptureState& rhs)
 // kill any players in the building
 
 static void
-_killOccupants(const instanceid_t& instanceID, OCCUPANTS& occupants, UINT32 bySortieID, const char* byBuilding)
+_killOccupants(const instanceid_t instanceID, OCCUPANTS& occupants, UINT32 bySortieID, const char* byBuilding)
 {
 	if ( occupants.empty() )
 		return;
@@ -940,7 +940,7 @@ _killOccupants(const instanceid_t& instanceID, OCCUPANTS& occupants, UINT32 bySo
 }
 
 void
-hostBuildingVisLevelChange(ObjectStruct* object, const instanceid_t& inInstance)
+hostBuildingVisLevelChange(ObjectStruct* object, const instanceid_t inInstance)
 {
 	// Rebuild is not fatal, all other levels are
 	if ( object->visLevel() == VISLEVEL_NORMAL )
@@ -956,7 +956,7 @@ hostBuildingVisLevelChange(ObjectStruct* object, const instanceid_t& inInstance)
 // Award a capture point to all but one player inside a building
 
 void
-hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide)
+hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID buildingID, WWII_SIDE forSide)
 {
 	OCCUPANCY_MAP::iterator it = occupancyMap.find(buildingID.Key());
 	if ( PN_UNLIKELY(it == occupancyMap.end()) )
@@ -1081,7 +1081,7 @@ _checkPlayerForGuarding(Player* player, bool changingBuilding)
 // Set the current containing building for a vehicle.
 
 void
-HostVehicle::setInBuilding(const FULL_OBJ_ID& newBuildingID)
+HostVehicle::setInBuilding(const FULL_OBJ_ID newBuildingID)
 {
 	// Extract them from the occupancy map for the current building (if any)
 	if ( m_inBuilding != 0 && isRemote() == false )
@@ -1140,7 +1140,7 @@ HostVehicle::setInBuilding(const FULL_OBJ_ID& newBuildingID)
 // Move a players position to a different building
 
 void
-Player::changeFPSBuilding(const FULL_OBJ_ID& newBuildingID, bool inCaptureBuilding)
+Player::changeFPSBuilding(const FULL_OBJ_ID newBuildingID, bool inCaptureBuilding)
 {
 	if ( vehicle == nullptr )
 	{
@@ -3131,7 +3131,7 @@ main(const int argc, const char* argv[])
 	exitHandler();
 }
 
-void HCUnit::setHomeCPID(const FULL_OBJ_ID& id)
+void HCUnit::setHomeCPID(const FULL_OBJ_ID id)
 {
 	m_homeCPID = id;
 }

@@ -303,7 +303,7 @@ static bool queueCmd(int argc, char* argv[])
 	return queued;
 }
 
-static void personaFromSpec(const WEAPON_SPEC& spec, int& country, int& branch)
+static void personaFromSpec(const WEAPON_SPEC spec, int& country, int& branch)
 {
 	country	= spec.wCountry;
 	branch	= BRANCH_LAND;
@@ -399,7 +399,7 @@ static int client_login(int clientIndex, int country, int branch)
 	client_spawn
 *************************************************************************************************/
 
-static int client_spawn(int clientIndex, const WEAPON_SPEC& spec)
+static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 {
 	int country = -1;
 	int branch = -1;

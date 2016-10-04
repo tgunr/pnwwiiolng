@@ -26,7 +26,7 @@ static SQUAD_VOTES g_squadVotes;
 // Register a vote
 
 void
-SquadVote::addVote(UINT32 squadID, const ChatHandle& voteBy, const ChatHandle& voteFor)
+SquadVote::addVote(UINT32 squadID, const ChatHandle voteBy, const ChatHandle voteFor)
 {
 	if ( m_started == 0 )
 		startVote();
@@ -240,7 +240,7 @@ SquadVote::winner(SquadList* list)
 // Withdraw the vote of a squad member
 
 void
-SquadVote::withdraw(UINT32 squadID, const ChatHandle& handle, SquadList* list)
+SquadVote::withdraw(UINT32 squadID, const ChatHandle handle, SquadList* list)
 {
 	// Is the vote active?
 	if ( !m_started || m_closedUntil || !m_votes || !m_counts )

@@ -54,7 +54,7 @@ _audit(UINT32 squadID, UINT32 action
 // Kinda expensive - three database queries get queued up!
 
 static void
-_addSquadMember(SquadList* squadList, RANK_NO atRank, Player* addee, const ChatHandle& byHandle, bool recruited)
+_addSquadMember(SquadList* squadList, RANK_NO atRank, Player* addee, const ChatHandle byHandle, bool recruited)
 {
 	UINT32 squadID = squadList->squad().squadID();
 
@@ -76,11 +76,11 @@ _addSquadMember(SquadList* squadList, RANK_NO atRank, Player* addee, const ChatH
 // Remove a player from a squad
 
 static void
-_removeSquadMember(bool removeFromDB, SquadList* list, SquadMemberEntry* entry, const ChatHandle& byHandle
+_removeSquadMember(bool removeFromDB, SquadList* list, SquadMemberEntry* entry, const ChatHandle byHandle
 					, int lstringMsg, const char* param)
 {
 	Player* player = entry->player();
-	const ChatHandle& handle = entry->handle();
+	ChatHandle handle = entry->handle();
 
 	if ( player )
 	{
@@ -127,7 +127,7 @@ _removeSquadMember(bool removeFromDB, SquadList* list, SquadMemberEntry* entry, 
 }
 
 void
-SquadList::memberJoin(Player* player, const ChatHandle& handle, RANK_NO atRank, UINT32 joined, const char* recruitedBy, bool announceToSquad)
+SquadList::memberJoin(Player* player, const ChatHandle handle, RANK_NO atRank, UINT32 joined, const char* recruitedBy, bool announceToSquad)
 {
 	if ( announceToSquad )
 	{
@@ -286,7 +286,7 @@ _checkInSquad(const Player* player, RANK_NO minRank=0)
 // "this squad" vs "any squad"
 
 static Player*
-_checkForPlayer(const ChatHandle& handle, const Player* source, UINT32 requireSquad, UINT32 mySquad)
+_checkForPlayer(const ChatHandle handle, const Player* source, UINT32 requireSquad, UINT32 mySquad)
 {
 	if ( handle < 64 )
 		throw SQR_NO_SUCH_PLAYER;
@@ -320,7 +320,7 @@ _checkForPlayer(const ChatHandle& handle, const Player* source, UINT32 requireSq
 }
 
 static SquadMemberEntry*
-_checkSquadMember(Player* player, SquadList* list, const ChatHandle& handle, RANK_NO minRank=Squad::STAFFER)
+_checkSquadMember(Player* player, SquadList* list, const ChatHandle handle, RANK_NO minRank=Squad::STAFFER)
 {
 	if ( player->matchHandle() == handle )
 		throw SQR_CANT_DO_TO_SELF;
@@ -350,7 +350,7 @@ _checkEmptyPosition(RANK_NO rank, SquadList* squadList)
 
 	if ( rank != Squad::CO ) return;
 
-	const ChatHandle& handle = squadList->squad().coHandle();
+	ChatHandle handle = squadList->squad().coHandle();
 	if ( handle == 0LL ) return;
 
 	SquadMemberEntry* member = squadList->find(handle);
@@ -388,7 +388,7 @@ _decline(Player* player)
 // Send an update to the dbd and return SQR_IN_PROGRESS
 
 static UINT32
-_update(UINT32 cmd, UINT32 action, UINT32 squadID, const ChatHandle& handle, UCHAR val, UCHAR prev, const ChatHandle& originator, const std::string& text="", UINT32 coID=0, const UINT32* members=nullptr)
+_update(UINT32 cmd, UINT32 action, UINT32 squadID, const ChatHandle handle, UCHAR val, UCHAR prev, const ChatHandle originator, const std::string& text="", UINT32 coID=0, const UINT32* members=nullptr)
 {
 	SquadMemberUpdate smu;
 	smu.m_action = action;
@@ -456,7 +456,7 @@ chatSendSquadCreateRequest(SquadControl& request, Player* player)
 }
 
 void
-chatSendCOAppointment(UINT32 squadID, const ChatHandle& handle)
+chatSendCOAppointment(UINT32 squadID, const ChatHandle handle)
 {
 	_update(SquadControl::_INTERNAL, SquadMemberUpdate::_APPOINT, squadID, handle, Squad::CO, 0, 0LL);
 }
@@ -1006,7 +1006,7 @@ _processCreateReply(const SquadMemberUpdate& update, Player* orig, Player* /*tar
 static void
 _processKickReply(const SquadMemberUpdate& update, Player* orig, Player* /*target*/, SquadList* list)
 {
-	const ChatHandle& origHandle = orig ? orig->chatHandle() : systemHandleID;
+	ChatHandle origHandle = orig ? orig->chatHandle() : systemHandleID;
 	SquadMemberEntry* entry = list->find(update.m_handle);
 	if ( entry == nullptr ) throw SQR_NOT_IN_A_SQUAD;
 

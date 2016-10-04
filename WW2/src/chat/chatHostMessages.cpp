@@ -453,7 +453,7 @@ StratCommand::send()
 //
 
 bool
-chatSendStratCommand(SINT32 playerID, int cmd, const FULL_OBJ_ID& cp, WWII_SIDE side)
+chatSendStratCommand(SINT32 playerID, int cmd, const FULL_OBJ_ID cp, WWII_SIDE side)
 {
 	try
 	{
@@ -509,7 +509,7 @@ chatSendMissionDeleteRequest(const UINT32& missionID)
 // the move too, set actionable to true.
 
 void
-chatSendBrigadeMove(const ChatHandle& byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID& fid, bool isActionable)
+chatSendBrigadeMove(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID fid, bool isActionable)
 {
 	ENDPOINT* stratEndpoint = serverPeerEndpointByType(STRAT_HOST);
 	if (PN_LIKELY(stratEndpoint != nullptr)) {
@@ -638,7 +638,7 @@ chatSendBackupLeaderChange(UINT32 missionID, UINT32 playerID)
 // Request a change of leader
 
 void
-chatSendLeaderChange(UINT32 missionID, UINT32 playerID, const ChatHandle& handle, const ChatHandle& requester)
+chatSendLeaderChange(UINT32 missionID, UINT32 playerID, const ChatHandle handle, const ChatHandle requester)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y));
 	outgoing.construct<LeaderChange>(missionID, playerID, handle, requester, LeaderChange::_SUCCESS);
@@ -1181,7 +1181,7 @@ Chat::TuneToChannel::send(SINT32 connection)
 }
 
 SINT32
-chatSendUserNLA(SINT32 connection, UCHAR radioIndex, const ChatHandle& handleID)
+chatSendUserNLA(SINT32 connection, UCHAR radioIndex, const ChatHandle handleID)
 {
 	Chat::UserNLA userNLA;
 
@@ -1418,7 +1418,7 @@ _recvBroadcastMessage(ACTION_OBJECT* const a)
 }
 
 void
-chatSendMapPersonaUpdate(playerid_t playerID, bool isSquadUpdate, UINT32 squadID, const ChatHandle& squadHandle, bool isDecalUpdate, UINT32 decal)
+chatSendMapPersonaUpdate(playerid_t playerID, bool isSquadUpdate, UINT32 squadID, const ChatHandle squadHandle, bool isDecalUpdate, UINT32 decal)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MAP_PERSONA_UPDATE_Y));
 	outgoing.construct<MapPersonaUpdate>(squadHandle, isSquadUpdate, isDecalUpdate, playerID, squadID, decal);

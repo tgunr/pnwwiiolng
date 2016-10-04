@@ -319,7 +319,7 @@ CaptureAction::ChangeOwner()
 // Send a GCI Message to the chat host.
 
 void
-chatSendGCIMessage(GCI_TYPE gci_, WWII_SIDE side_, const CPStruct& cp_, const FULL_OBJ_ID& facID_)
+chatSendGCIMessage(GCI_TYPE gci_, WWII_SIDE side_, const CPStruct& cp_, const FULL_OBJ_ID facID_)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::GAME_GCI_MESSAGE_Y));
 	outgoing.construct<Chat::GCIMessage>(gci_, side_, cp_.fullObjID, facID_, cp_.name);

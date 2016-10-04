@@ -26,7 +26,7 @@ class Property
 public:
 	// Take the top 48 bits of the fullobjid
 	// this discards the class and type
-	Property(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char* name, UINT32 oid)
+	Property(const FULL_OBJ_ID id, WWII_COUNTRY owner, const char* name, UINT32 oid)
 		: m_fid(id)
 		, m_key(id.Key())
 		, m_name(name)
@@ -38,10 +38,10 @@ public:
 	// Destructor
 	virtual ~Property() { _properties.erase(m_key); }
 
-	const FULL_OBJ_ID& Fid() const { return m_fid; }
+	FULL_OBJ_ID Fid() const { return m_fid; }
 	UINT64 Key() const { return m_key; }
 	const char* Name() const { return m_name.c_str(); }
-	bool Matches(const FULL_OBJ_ID& rhs) const
+	bool Matches(const FULL_OBJ_ID rhs) const
 			{ return (m_key == rhs.Key()); }
 	bool Matches(const Property& rhs) const { return m_key == rhs.m_key; }
 	virtual Property* Parent() const { return nullptr; }
@@ -64,7 +64,7 @@ public:
 class PropCP : public Property
 {
 public:
-	PropCP(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char* name, WWII_COUNTRY controller, UINT32 oid)
+	PropCP(const FULL_OBJ_ID id, WWII_COUNTRY owner, const char* name, WWII_COUNTRY controller, UINT32 oid)
 		: Property(id, owner, name, oid)
 		, m_controller(controller)
 			{}
@@ -80,7 +80,7 @@ public:
 class PropFacility : public Property
 {
 public:
-	PropFacility(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char* name, const FULL_OBJ_ID& cp, UINT32 oid);
+	PropFacility(const FULL_OBJ_ID id, WWII_COUNTRY owner, const char* name, const FULL_OBJ_ID cp, UINT32 oid);
 
 	Property* parent() const { return (Property*)m_cp; }
 	virtual bool isCP() const { return false; }

@@ -12,7 +12,7 @@ void chatLoadMotds(void);
 void chatdbRecordEvent(const SCHAR* category, const SCHAR* callsign, const SCHAR* event, const SCHAR* parameter, const SCHAR* data);
 
 class Property;
-Property* chatFindProperty(const struct FULL_OBJ_ID& id);
+Property* chatFindProperty(const struct FULL_OBJ_ID id);
 
 bool chatGetWWIIConfig(void);
 

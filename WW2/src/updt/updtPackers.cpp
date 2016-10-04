@@ -205,7 +205,7 @@ std::vector<std::wstring> updtGetNvHistory()
 }
 
 static void
-_recordNewHistoryEntry(const SHARED_VEHICLE_INFO* const vehInfo, const ChatHandle& packedCallsign)
+_recordNewHistoryEntry(const SHARED_VEHICLE_INFO* const vehInfo, const ChatHandle packedCallsign)
 {
 	NewVehicleHistory entry;
 	entry.receivedAt = teulClock64;

@@ -477,7 +477,7 @@ static bool _fillSpawn(SINT32 /*numArgs*/, FUNCARGS* args)
 		WEAPON* weap = weapLookupWeaponByName(weapName);
 		if ( weap == nullptr || weap->spec().wType == 0 )
 			throw "weapon not found";
-		const WEAPON_SPEC& spec = weap->spec();
+		WEAPON_SPEC spec = weap->spec();
 		if ( mySpec.wCountry != spec.wCountry )
 			throw "country mismatch";
 		// Allow infantry to spawn at GV_ and AC_ spawners

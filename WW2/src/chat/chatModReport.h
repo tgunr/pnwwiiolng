@@ -16,5 +16,5 @@ namespace Chat
 		ModUnknown, ModUpdateSeq, ModUpdatePrime, ModTamper, ModResupply, ModDamned, ModHack, ModMax
 	};
 	typedef unsigned int ModReport;
-	void SendModReport(const ChatHandle& handle, const unsigned int report);
+	void SendModReport(const ChatHandle handle, const unsigned int report);
 }

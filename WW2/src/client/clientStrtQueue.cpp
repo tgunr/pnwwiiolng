@@ -130,7 +130,7 @@ void clientStrtCopyQuedData(TERRAIN_DETAIL* td)
 	clientApplyStratEventData
 *************************************************************************************************/
 
-void clientApplyStratEventData(const FULL_OBJ_ID& fid)
+void clientApplyStratEventData(const FULL_OBJ_ID fid)
 {
 	const int& sx = fid.cell.ox >> 4;
 	const int& sy = fid.cell.oy >> 4;

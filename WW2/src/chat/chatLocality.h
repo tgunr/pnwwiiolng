@@ -16,7 +16,7 @@ namespace Chat
 	// Notify the chat host of your location - deprecated.
 	struct Locality
 	{
-		Locality(const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, const FULL_OBJ_ID& nearCP)
+		Locality(const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, const FULL_OBJ_ID nearCP)
 			: m_x(x), m_y(y), m_z(z), m_nearCP(nearCP)
 			{}
 

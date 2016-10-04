@@ -173,7 +173,7 @@ bool stratCountsAsEngagement(const CPStruct& target) {
 }
 
 UINT32
-stratResupplyTime(const WEAPON_SPEC& weapon, StratHCUnit* unit, FacilityStruct* facility, UINT32 resupplyTimer)
+stratResupplyTime(const WEAPON_SPEC weapon, StratHCUnit* unit, FacilityStruct* facility, UINT32 resupplyTimer)
 {
 	static const char* function = "resupplyTimeFn";
 

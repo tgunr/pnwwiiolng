@@ -53,7 +53,7 @@ namespace Instance
 
 		UINT32 category() const { return m_category; }
 		UINT32 type() const { return m_type; }
-        const ChatHandle& handle() const { return um_ownerHandle ; }
+        ChatHandle handle() const { return um_ownerHandle ; }
         const UINT64& ownerID() const { return um_ownerID ; }
         const Instance::UniqueID& id() const { return m_id ; }
 

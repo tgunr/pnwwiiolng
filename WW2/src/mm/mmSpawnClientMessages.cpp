@@ -232,11 +232,11 @@ FE_CREW_BAILED crewBailed;
 //    proceed as though this was also a SpawnGrantRequest
 
 SINT32
-mmSendPostRequest(SINT32 connection, const FULL_OBJ_ID& facility, const WEAPON_SPEC& weapon, LOGICAL immediateSpawn)
+mmSendPostRequest(SINT32 connection, const FULL_OBJ_ID facility, const WEAPON_SPEC weapon, LOGICAL immediateSpawn)
 {
 	FE_POST_REQUEST postRequest;
 
-  postRequest.facility = facility;
+    postRequest.facility = facility;
 	postRequest.weapon = weapon;
 	postRequest.immediateSpawn = immediateSpawn;
 
@@ -249,7 +249,7 @@ mmSendPostRequest(SINT32 connection, const FULL_OBJ_ID& facility, const WEAPON_S
 // CAVEATS:
 //  - Facility is redundant since 1.19
 SINT32
-mmSendPostListRequest(SINT32 connection, const FULL_OBJ_ID& facility)
+mmSendPostListRequest(SINT32 connection, const FULL_OBJ_ID facility)
 {
 	FE_POST_LIST_REQUEST postListRequest;
 
@@ -326,7 +326,7 @@ mmSendClientSpawn(SINT32 connection, const WEAPON_SERIAL& weaponSerial, LOGICAL 
 
 //send a request for a direct spawn of a system weapon for command line client
 SINT32
-mmSendDirectSpawn(SINT32 connection, const WEAPON_SPEC& weapon, const FLOAT64VECTOR* location)
+mmSendDirectSpawn(SINT32 connection, const WEAPON_SPEC weapon, const FLOAT64VECTOR* location)
 {
 	Map::DirectSpawn request;
 	request.m_weapon = weapon;

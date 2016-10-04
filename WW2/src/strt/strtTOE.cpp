@@ -40,7 +40,7 @@ TOE_::TemplateHeader::Lookup(const char* id)
 }
 
 TOE_::TemplateHeader*
-TOE_::TemplateHeader::Lookup(const ChatHandle& handle)
+TOE_::TemplateHeader::Lookup(const ChatHandle handle)
 {
 	TOE_TEMPLATES::iterator it = toeTemplates.find(handle);
 	return (it != toeTemplates.end()) ? &it->second : nullptr;
@@ -50,7 +50,7 @@ TOE_::TemplateHeader::Lookup(const ChatHandle& handle)
 // First time initialization of a TOE header
 
 void
-TOE_::TemplateHeader::initialize(const ChatHandle& withHandle, const char* withName, UINT32 withCountry, UINT32 withBranch)
+TOE_::TemplateHeader::initialize(const ChatHandle withHandle, const char* withName, UINT32 withCountry, UINT32 withBranch)
 {
 	// If ID isn't null, we're already initialized
 	assert( m_handle == 0LL );
@@ -84,7 +84,7 @@ TOE_::TemplateHeader::setName(const char* newName)
 // Update or add a weapon entry and its capacity to this TOE
 
 void
-TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m)
+TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m)
 {
 	TOE_WEAPONS::iterator it = m_weapons.lower_bound(spec);
 	bool newWeapon = false;
@@ -268,7 +268,7 @@ strtLoadTOEWeaponTemplateHeader(const char* id, const char* name, UINT32 country
 // Update a vehicle entry within a TOE template and all of its subscribers
 
 void
-strtLoadTOEWeaponInstance(const char* id, const WEAPON_SPEC& spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m)
+strtLoadTOEWeaponInstance(const char* id, const WEAPON_SPEC spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m)
 {
 	assert( id != nullptr );
 

@@ -67,7 +67,7 @@ class Waypoint
 {
 	// Constructors/destructors
 public:
-	Waypoint(bool isLocal, const ChatHandle& withHandle, const ChatHandle& fromPlayerHandle, WP_TYPE withType, UINT32 withSubType, SINT32 atX, SINT32 atY, UINT32 whenPosted, const char* withNotes)
+	Waypoint(bool isLocal, const ChatHandle withHandle, const ChatHandle fromPlayerHandle, WP_TYPE withType, UINT32 withSubType, SINT32 atX, SINT32 atY, UINT32 whenPosted, const char* withNotes)
 		: m_local(isLocal)
 		, m_handle(withHandle)
 		, m_playerHandle(fromPlayerHandle)
@@ -120,7 +120,7 @@ public:
 	// Pack and unpack routine
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 	void setPosted(UINT32 postedTime) { m_local = false; m_posted = postedTime; }
-	void setHandle(const ChatHandle& toHandle) { m_handle = toHandle; }
+	void setHandle(const ChatHandle toHandle) { m_handle = toHandle; }
 	void setShared(bool toShared) { m_shared = toShared; }
 
 	// 'true' if anyone can post this type
@@ -143,8 +143,8 @@ public:
 	// Accessors
 public:
 	UINT32 local() const { return m_local; }
-	const ChatHandle& handle() const { return m_handle; }
-	const ChatHandle& playerHandle() const { return m_playerHandle; }
+	ChatHandle handle() const { return m_handle; }
+	ChatHandle playerHandle() const { return m_playerHandle; }
 	WP_TYPE type() const { return m_type; }
 	UINT32 subType() const { return m_subType; }
 	SINT32 x() const { return m_x; }

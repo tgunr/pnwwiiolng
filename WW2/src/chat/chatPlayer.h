@@ -48,7 +48,7 @@ public:
 	//// Try to keep the funtion list in alpha order
 	// Acknowledge channel tuned
 	// Channel is detuned if ack-send fails
-	bool ackTuneHandle(UCHAR index, const ChatHandle& handle);
+	bool ackTuneHandle(UCHAR index, const ChatHandle handle);
 
 	// Complete the process of connection
 	void activate(SINT32 newIndex, PlayerStatusNode* psn);
@@ -128,7 +128,7 @@ public:
 
 	bool ignoring(const Player* rhs) const { return ignoring(rhs->matchHandle()); }
 	bool ignoring(const Player& rhs) const { return ignoring(rhs.matchHandle()); }
-	bool ignoring(const ChatHandle& handle) const { return m_ignores.find(handle) != m_ignores.end(); }
+	bool ignoring(const ChatHandle handle) const { return m_ignores.find(handle) != m_ignores.end(); }
 
 	// Invalidate the group list forcibly
 	void invalidateGroups() { m_lastGroupRead = 0; }
@@ -198,9 +198,9 @@ public:
 
 	bool approveGCIMessage(UINT32 messageID, const Chat::GCIMessage& message, bool isGlobal);
 
-	void sendSquadCreateInvite(const ChatHandle& handle, const std::string& name, const ChatHandle& from, RANK_NO rank);
+	void sendSquadCreateInvite(const ChatHandle handle, const std::string& name, const ChatHandle from, RANK_NO rank);
 	void sendSquadInfo(class SquadList* list=nullptr);
-	bool sendSquadInvite(UINT32 squadID, const ChatHandle& from);
+	bool sendSquadInvite(UINT32 squadID, const ChatHandle from);
 
 	// Send a command to the strat host in the player's context
 	bool sendStratCommand(const char* string, const char* arguments, bool useMapTarget=true);
@@ -232,13 +232,13 @@ public:
 
 	void SetSpawned(bool newValue);
 
-	void SetSquad(UINT32 squadID, RANK_NO rank, const ChatHandle& handle, UINT32 joined=0);
+	void SetSquad(UINT32 squadID, RANK_NO rank, const ChatHandle handle, UINT32 joined=0);
 	void SetSquadInvite(SquadInvite* invite);
 
 	// Set the current UI Target CP/Facility ID
-	void SetUITarget(const FULL_OBJ_ID& to) { m_uiTarget = to; }
+	void SetUITarget(const FULL_OBJ_ID to) { m_uiTarget = to; }
 
-	void SetWeapon(const WEAPON_SPEC& weapon);
+	void SetWeapon(const WEAPON_SPEC weapon);
 
 	void GetWeaponStr(std::string &str) const;
 
@@ -260,14 +260,14 @@ public:
 	void tunePlaceHolder(UCHAR index, CHANNEL_TYPE);
 
 	// Tune a specific radio to the best match for a channel type/handle
-	bool tuneRadio(UCHAR index, CHANNEL_TYPE, const ChatHandle& handle);
+	bool tuneRadio(UCHAR index, CHANNEL_TYPE, const ChatHandle handle);
 
 	// Tune a specific radio to a specified channel
 	bool tuneRadioToChannel(UCHAR index, class Chat::Channel* channel, CHANNEL_TYPE type);
 
 	// Tune a specific radio to a channel-handle
 	// (determines if a named, numbered or player channel is required)
-	bool tuneRadioToHandle(UCHAR index, const ChatHandle& handle);
+	bool tuneRadioToHandle(UCHAR index, const ChatHandle handle);
 
 	// Tune a specific radio to a named channel
 	bool tuneRadioToNamedChannel(UCHAR index, const char* command);
@@ -290,7 +290,7 @@ public:
 	void updateGridPosition();
 
 	// Handle a new locality update
-	void updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z, bool cpChanged, const FULL_OBJ_ID& nearCP, UINT32 ride, const FULL_OBJ_ID& inFacility, UINT32 lastPing, bool onAWS, bool inCapBldg, const FULL_OBJ_ID& capFac, SINT32 progress);
+	void updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z, bool cpChanged, const FULL_OBJ_ID nearCP, UINT32 ride, const FULL_OBJ_ID inFacility, UINT32 lastPing, bool onAWS, bool inCapBldg, const FULL_OBJ_ID capFac, SINT32 progress);
 
 	void updatePermMask();
 
@@ -315,7 +315,7 @@ public:
 	const Chat::ChannelSubscription& getChannelSub(UINT32 index) const { return m_channels[index]; }
 	bool gmHide() const { return m_gmHide; }
 	UINT32 goneAFK() const { return m_goneAFK; }
-	const ChatHandle& grabbing() const { return m_grabbing; }
+	ChatHandle grabbing() const { return m_grabbing; }
 	SINT32 gridX() const { return m_gridX; }
 	SINT32 gridY() const { return m_gridY; }
 	bool haveChannels() const { return m_haveChannels; }
@@ -342,15 +342,15 @@ public:
 	bool checkTimerElapsed(const char*) const;			// Check if a timer is unset or has elapsed.
 	bool noEnemyChat() const { return m_noEnemyChat; }
 	bool noWho() const { return m_noWho; }
-	const FULL_OBJ_ID& objectiveCpID() const { return m_objectiveCpID; }
-	const FULL_OBJ_ID& originCpID() const { return m_originCpID; }
-//	const ChatHandle& squadHandle() const { return m_squadHandle; }
+	FULL_OBJ_ID objectiveCpID() const { return m_objectiveCpID; }
+	FULL_OBJ_ID originCpID() const { return m_originCpID; }
+//	const ChatHandle squadHandle() const { return m_squadHandle; }
 	SquadInvite* squadInvite() { return m_squadInvite; }
 	const SquadInvite* squadInvite() const { return m_squadInvite; }
 	bool rejectLead() const;
-	const ChatHandle& takenBy() const { return m_takenBy; }
-	const FULL_OBJ_ID& uiTarget() const { return m_uiTarget; }
-	const WEAPON_SPEC& weapon() const { return m_weapon; }
+	ChatHandle takenBy() const { return m_takenBy; }
+	FULL_OBJ_ID uiTarget() const { return m_uiTarget; }
+	WEAPON_SPEC weapon() const { return m_weapon; }
 
 	// Non-const accessors
 	Chat::ChannelSubscription& getChannelSub(UINT32 index) { return m_channels[index]; }
@@ -479,7 +479,7 @@ class PlayerInterface
 public:
 	static Player* Lookup(UINT32);
 	static Player* Lookup(SINT32 teulIndex) { return (Player*)teulGetPersonaData(teulIndex); }
-	static Player* Lookup(const ChatHandle&);
+	static Player* Lookup(const ChatHandle);
 	static Player* Lookup(const char* callsign) { return Lookup(chatGetLowercaseHandle(callsign)); }
 };
 

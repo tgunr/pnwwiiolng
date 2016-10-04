@@ -70,7 +70,7 @@ public:
 class Channel
 {
 public:
-	Channel(const ChannelID& channelID_, const char* const name_, const ChatHandle& handle_)
+	Channel(const ChannelID& channelID_, const char* const name_, const ChatHandle handle_)
 		: channelID(channelID_)
 		, m_name(name_)
 		, m_handle(handle_)

@@ -34,7 +34,7 @@ public:
 
 public:
 	// Con-/de-structors
-	ChatReport(UINT16 category=0, const std::string& report="", const ChatHandle& offender=0LL);
+	ChatReport(UINT16 category=0, const std::string& report="", const ChatHandle offender=0LL);
 	ChatReport(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 	~ChatReport() {}
 

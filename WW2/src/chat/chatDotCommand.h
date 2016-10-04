@@ -36,7 +36,7 @@ public:
 	const LSTRING_ID usage;
 	const LSTRING_ID detail;
 
-	DotUsage(const ChatHandle& newMask, LSTRING_ID usageID, LSTRING_ID detailID) :
+	DotUsage(const ChatHandle newMask, LSTRING_ID usageID, LSTRING_ID detailID) :
 		mask(newMask),
 		usage(usageID),
 		detail(detailID)
@@ -82,7 +82,7 @@ private:
 public:
 	//! Constructor.
 	DotCommand(const std::string& newCommand, const std::string& description
-				, const ChatHandle& mask, LSTRING_ID usage, LSTRING_ID detail, bool playnetOnly=false);
+				, const ChatHandle mask, LSTRING_ID usage, LSTRING_ID detail, bool playnetOnly=false);
 	virtual ~DotCommand() { };
 
 	//! Retrieves the master index of all dot commands.
@@ -99,7 +99,7 @@ public:
 	void addGroup(UINT32 id) { m_groups.insert(id); }
 
 	//! Add a new usage to this dot Command.
-	void addUsage(const ChatHandle& mask, LSTRING_ID usage, LSTRING_ID detail)
+	void addUsage(const ChatHandle mask, LSTRING_ID usage, LSTRING_ID detail)
 	{
 		m_usages.push_back(new DotUsage(mask, usage, detail));
 	}

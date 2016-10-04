@@ -38,7 +38,7 @@ public:
 	}
 
 public:
-	const ChatHandle& inviter() const { return m_inviter; }
+	ChatHandle inviter() const { return m_inviter; }
 	RANK_NO inviteRank() const { return m_myRank; }
 	UCHAR status() const { return m_status; }
 	const Squad& squad() const { return m_squad; }
@@ -46,7 +46,7 @@ public:
 
 	void setStatus(UCHAR newStatus) { m_status = newStatus; }
 	void setSquad(const Squad& toSquad) { m_squad = toSquad; }
-	void setInviter(const ChatHandle& from) { m_inviter = from; }
+	void setInviter(const ChatHandle from) { m_inviter = from; }
 	void setRank(RANK_NO rank) { m_myRank = rank; }
 
 public:

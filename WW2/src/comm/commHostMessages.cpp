@@ -90,7 +90,7 @@ static bool g_enablePacketSizeRecording = false;
 //
 
 SINT32
-commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination, PLAYER_EXIT_CODE exitCode, const FULL_OBJ_ID& facility)
+commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination, PLAYER_EXIT_CODE exitCode, const FULL_OBJ_ID facility)
 {
 	dbugLog(_FLN, "t:%d sending player exit %d dest %d to " PRF_FULL_OBJ_ID ""
 				, teulIndex
@@ -992,7 +992,7 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 
 struct ClientResupplyIssue
 {
-	ClientResupplyIssue(sortieid_t fromSerial, const ChatHandle& fromHandle) : m_fromSerial(fromSerial), m_fromHandle(fromHandle) {}
+	ClientResupplyIssue(sortieid_t fromSerial, const ChatHandle fromHandle) : m_fromSerial(fromSerial), m_fromHandle(fromHandle) {}
 	UINT32		m_fromSerial;
 	ChatHandle	m_fromHandle;
 };
@@ -1001,7 +1001,7 @@ struct ClientResupplyIssue
 //
 
 void
-commSendClientResupplyIssue(HostVehicle* vehicle, sortieid_t fromSerial, const ChatHandle& fromHandle)
+commSendClientResupplyIssue(HostVehicle* vehicle, sortieid_t fromSerial, const ChatHandle fromHandle)
 {
 	assert( vehicle->isRemote() == false );
 
@@ -1389,7 +1389,7 @@ commInstallHostCallbacks(void)
 // Send/receive resupply messages between cells
 
 void
-hostSendResupplyIssue(UINT32 cellIP, const sortieid_t& toSerial, const sortieid_t& fromSerial, const ChatHandle& fromHandle)
+hostSendResupplyIssue(UINT32 cellIP, const sortieid_t toSerial, const sortieid_t fromSerial, const ChatHandle fromHandle)
 {
 	assert( cellIP != 0 );
 	assert( toSerial != 0 );
@@ -1409,7 +1409,7 @@ hostSendResupplyIssue(UINT32 cellIP, const sortieid_t& toSerial, const sortieid_
 // Acknowledgment that someone received resupply
 
 void
-hostSendResupplyAccepted(UINT32 cellIP, const sortieid_t& sendTo, const ChatHandle& byHandle)
+hostSendResupplyAccepted(UINT32 cellIP, const sortieid_t sendTo, const ChatHandle byHandle)
 {
 	assert(cellIP != 0);
 

@@ -102,7 +102,7 @@ StratHCUnit::getSupplyPctg(WEAPON_CATEGORY cat) const
 // Needed for HCUnit
 
 void
-HCUnit::setHomeCPID(const FULL_OBJ_ID& destination)
+HCUnit::setHomeCPID(const FULL_OBJ_ID destination)
 {
 	m_homeCPID = destination;
 }
@@ -112,11 +112,11 @@ HCUnit::setHomeCPID(const FULL_OBJ_ID& destination)
 
 StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withParentID
 				, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
-				, const ChatHandle& withHandle, const char* withName, const char* withNick, UINT8 withRank
-				, const FULL_OBJ_ID& withHomeCPID
-				, const ChatHandle& withOwner, RANK_NO withOwnerRank
+				, const ChatHandle withHandle, const char* withName, const char* withNick, UINT8 withRank
+				, const FULL_OBJ_ID withHomeCPID
+				, const ChatHandle withOwner, RANK_NO withOwnerRank
 				, UINT32 withStartCpOID, UINT32 withFallbackCpOID
-				, UINT32 withLastMove, const ChatHandle& withLastMovedBy, UINT32 withNextMove
+				, UINT32 withLastMove, const ChatHandle withLastMovedBy, UINT32 withNextMove
 				, const char* withToeTemplate
 				)
 	: HCUnit(withUnitID, withTypeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCPID, withOwner, withOwnerRank)
@@ -255,14 +255,14 @@ StratHCUnit::save() const
 // Check for a TOE entry
 
 const TOE_::WeaponInstance*
-StratHCUnit::toeWeaponInstance(const WEAPON_SPEC& forWeapon) const
+StratHCUnit::toeWeaponInstance(const WEAPON_SPEC forWeapon) const
 {
 	TOE::const_iterator it = m_toe.find(forWeapon);
 	return ( it != m_toe.end() ) ? &(it->second) : nullptr;
 }
 
 TOE_::WeaponInstance*
-StratHCUnit::toeWeaponInstance(const WEAPON_SPEC& forWeapon)
+StratHCUnit::toeWeaponInstance(const WEAPON_SPEC forWeapon)
 {
 	TOE::iterator it = m_toe.find(forWeapon);
 	return ( it != m_toe.end() ) ? &(it->second) : nullptr;
@@ -1082,7 +1082,7 @@ strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 // Deliver a number of vehicles into this TOE
 
 bool
-StratHCUnit::depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allowOverstock, ResupplyTicket* const replaceTicket)
+StratHCUnit::depositWeapons(const WEAPON_SPEC spec, UINT16 numUnits, bool allowOverstock, ResupplyTicket* const replaceTicket)
 {
 	if ( allowOverstock && host_config.supply.overstockLimit == 0 )
 		allowOverstock = false;
@@ -1200,7 +1200,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allow
 // Specify a level for a particular vehicle
 
 bool
-StratHCUnit::initializeWeapon(const WEAPON_SPEC& spec, UINT16 numUnits)
+StratHCUnit::initializeWeapon(const WEAPON_SPEC spec, UINT16 numUnits)
 {
 	TOE_::WeaponInstance* const entry = toeWeaponInstance(spec);
 	if ( entry == nullptr )
@@ -1230,7 +1230,7 @@ StratHCUnit::pauseResupplyQueue(UINT32 seconds)
 // Deliver a number of vehicles into this TOE
 
 bool
-StratHCUnit::withdrawWeapons(const WEAPON_SPEC& spec, UINT16 numUnits)
+StratHCUnit::withdrawWeapons(const WEAPON_SPEC spec, UINT16 numUnits)
 {
 	if ( isTrainingUnit() )
 		return true;
@@ -1348,7 +1348,7 @@ StratHCUnit::checkThrottleWindows(const FacilityStruct* const facility) const
 // Check an individual throttle window
 
 UINT32
-StratHCUnit::checkThrottleWindow(const FacilityStruct* const facility, const WEAPON_SPEC& spec) const
+StratHCUnit::checkThrottleWindow(const FacilityStruct* const facility, const WEAPON_SPEC spec) const
 {
 	if ( host_config.supply.enabled == false || host_config.throttle.enabled == false )
 		return 0;

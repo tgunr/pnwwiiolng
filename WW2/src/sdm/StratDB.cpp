@@ -784,7 +784,7 @@ bool StratObject::IsDeepWaterPort() const
 	return false;
 }
 
-bool StratObject::IsRelated(const FULL_OBJ_ID& id) const
+bool StratObject::IsRelated(const FULL_OBJ_ID id) const
 {
 	return IsRelated(StratDB::FindStratObject(id));
 }
@@ -940,7 +940,7 @@ StratObject* StratDB::FindStratObject(const sdm_full_obj_id& fullid)
 	return it->second;
 }
 
-StratObject* StratDB::FindStratObject(const FULL_OBJ_ID& fullobjid)
+StratObject* StratDB::FindStratObject(const FULL_OBJ_ID fullobjid)
 {
 	return FindStratObject(*(sdm_full_obj_id*)&fullobjid);
 }

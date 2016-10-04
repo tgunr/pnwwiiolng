@@ -39,7 +39,7 @@ class ChannelID
 {
 public:
 	// Create a channel ID from a type, side and full object id
-	ChannelID(CHANNEL_TYPE _type, UINT32 _side, const FULL_OBJ_ID& _fid, const UINT64 _instID=0ULL)
+	ChannelID(CHANNEL_TYPE _type, UINT32 _side, const FULL_OBJ_ID _fid, const UINT64 _instID=0ULL)
 		: m_instID(_instID), m_type(_type), m_side(_side), m_id(_fid.Key()) {}
 
 	// Create a channel ID from a type, side and 32 bit id
@@ -54,7 +54,7 @@ public:
 
 	//// Accessors
 	// return the instance
-	const instanceid_t& InstID() const { return m_instID; }
+	instanceid_t InstID() const { return m_instID; }
 	// return the channel type
 	CHANNEL_TYPE Type() const { return (CHANNEL_TYPE) m_type; }
 	// return the side
@@ -65,7 +65,7 @@ public:
 	bool IsPlaceHolder() const { return (m_type > 0 && m_id == 0); }
 
 	// Change the side and id
-	ChannelID& Specify(const instanceid_t& instID, const UINT64& id, WWII_SIDE side=WWII_NO_SIDE) { m_instID = instID; m_side = side; m_id = id; return *this; }
+	ChannelID& Specify(const instanceid_t instID, const UINT64& id, WWII_SIDE side=WWII_NO_SIDE) { m_instID = instID; m_side = side; m_id = id; return *this; }
 
 	bool operator == (const ChannelID& rhs) const { return (m_instID == rhs.m_instID) & (m_type == rhs.m_type) & (m_side == rhs.m_side) & (m_id == rhs.m_id); }
 

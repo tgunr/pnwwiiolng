@@ -303,8 +303,8 @@ Scoring::Death::process(Player* const lhsPlayer)
 
 	const bool friendlyFire = (deadSortie->side() == killerSortie->side());
 
-	const WEAPON_SPEC& killerSpec = killerSortie->spec();
-	const WEAPON_SPEC& deadSpec = deadSortie->spec();
+	const WEAPON_SPEC killerSpec = killerSortie->spec();
+	const WEAPON_SPEC deadSpec = deadSortie->spec();
 	DBThread::Do(DBThread::Default
 		, "CALL wwii.p_add_kill"
 			"(%u, %u,%u,%u,%u, %u,%u,%u,%u, %u, %u,%u,%u,%u, %u,%u,%u,%u, 0, %d,%d,%d)"

@@ -24,8 +24,8 @@ static const int OOB_STRING_SIZE = OOB_STRING_LEN + 1;
 class OOBMessage
 {
 public:
-	OOBMessage(UINT32 playerID, UINT32 brigadeID, const ChatHandle& handleID, const char* command, const char* arguments
-				, const FULL_OBJ_ID& cpID, WWII_SIDE side, WWII_COUNTRY country);
+	OOBMessage(UINT32 playerID, UINT32 brigadeID, const ChatHandle handleID, const char* command, const char* arguments
+				, const FULL_OBJ_ID cpID, WWII_SIDE side, WWII_COUNTRY country);
 	OOBMessage();
 	OOBMessage(ACTION_OBJECT* const a);
 

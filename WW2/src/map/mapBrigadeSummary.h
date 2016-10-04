@@ -65,8 +65,8 @@ public:
 	// Create from scratch
 	BrigadeSummary(UINT32 withBrigadeID, UINT32 withParentID
 					, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
-					, const ChatHandle& withHandle, const char* withName, const char* withNick, UINT8 withRank
-					, FULL_OBJ_ID withHome=nullObjID, const ChatHandle& withOwner=0LL, RANK_NO withOwnerRank=0)
+					, const ChatHandle withHandle, const char* withName, const char* withNick, UINT8 withRank
+					, FULL_OBJ_ID withHome=nullObjID, const ChatHandle withOwner=0LL, RANK_NO withOwnerRank=0)
 		: HCUnit(withBrigadeID, HCU_BRIGADE, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
 				, withHandle, withName, withNick, withRank, withHome, withOwner, withOwnerRank)
 		, m_active(false), m_missions(0), m_players(0), m_officers(0), m_objectiveCPID(nullObjID), m_mobileSpawns(0), m_canPostHere(false)
@@ -91,7 +91,7 @@ public:
 	UINT16 missions() const { return m_missions; }
 	UINT16 players() const { return m_players; }
 	UINT16 officers() const { return m_officers; }
-	const FULL_OBJ_ID& objectiveCPID() const { return m_objectiveCPID; }
+	FULL_OBJ_ID objectiveCPID() const { return m_objectiveCPID; }
 
 	// Query: Is this brigade available for use at the moment?
 	bool isActive() const { return m_active; }
@@ -149,8 +149,8 @@ class BrigadeDetail : public BrigadeSummary
 public:
 	BrigadeDetail(UINT32 withBrigadeID, UINT32 withParentID
 					, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
-					, const ChatHandle& withHandle, const char* withName, const char* withNick, UINT8 withRank
-					, const FULL_OBJ_ID& withHomeCP, const ChatHandle& withOwner, RANK_NO withOwnerRank)
+					, const ChatHandle withHandle, const char* withName, const char* withNick, UINT8 withRank
+					, const FULL_OBJ_ID withHomeCP, const ChatHandle withOwner, RANK_NO withOwnerRank)
 		: BrigadeSummary(withBrigadeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCP, withOwner, withOwnerRank)
 			{ m_motd[0] = m_motto[0] = 0; }
 	BrigadeDetail(UINT32 withBrigadeID=0) : BrigadeSummary(withBrigadeID) { m_motd[0] = m_motto[0] = 0; }
@@ -159,7 +159,7 @@ public:
 	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) override;
 
 	// Helpers
-	const FULL_OBJ_ID& homeCPID() const { return m_homeCPID; }
+	FULL_OBJ_ID homeCPID() const { return m_homeCPID; }
 	ChatHandle officerHandle(UINT32 i) const { return ((i < officers()) ? m_officerHandles[i] : 0); }
 	ChatHandle officerRank(UINT32 i) const { return ((i < officers()) ? m_officerRanks[i] : 0); }
 

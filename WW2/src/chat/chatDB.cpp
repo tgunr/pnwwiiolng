@@ -92,7 +92,7 @@ chatLoadMotds()
 // Helper function for finding a particular property.
 
 Property*
-chatFindProperty(const FULL_OBJ_ID& id)
+chatFindProperty(const FULL_OBJ_ID id)
 {
 	PROPERTY_INDEX::iterator it;
 
@@ -107,7 +107,7 @@ chatFindProperty(const FULL_OBJ_ID& id)
 // Constructor for Facility properties; slightly more complex than
 // the others since it has to connect itself to its parent cp
 
-PropFacility::PropFacility(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char* name, const FULL_OBJ_ID& cpID, UINT32 oid)
+PropFacility::PropFacility(const FULL_OBJ_ID id, WWII_COUNTRY owner, const char* name, const FULL_OBJ_ID cpID, UINT32 oid)
 	: Property(id, owner, name, oid)
 	, m_cp(nullptr)
 {

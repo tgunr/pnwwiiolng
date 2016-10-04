@@ -52,7 +52,7 @@
 #include "wwii/wwiiThreads.h"
 
 extern void serverBroadcastClusterShutdown();
-extern void chatSendChatLog(const playerid_t& subjectID, const ChatHandle& requester);
+extern void chatSendChatLog(const playerid_t subjectID, const ChatHandle requester);
 
 //////////////////////////////////////////////////////////////////////
 // Private variables
@@ -377,7 +377,7 @@ public:
 //! @internal
 class ChatHistory : public DBThreadQuery
 {
-public:	ChatHistory(const playerid_t& playerID_, const ChatHandle& requester_)
+public:	ChatHistory(const playerid_t playerID_, const ChatHandle requester_)
 	: DBThreadQuery(DBThread::Audit, "ChatHistoryQuery", DBThreadQuery::_CALLBACK
 	, "SELECT logged, message FROM `audit`.`chat_messages`"
 	" WHERE player_id = %u"
@@ -443,7 +443,7 @@ public:
 };
 
 void
-	chatSendChatLog(const playerid_t& subjectID, const ChatHandle& requester)
+	chatSendChatLog(const playerid_t subjectID, const ChatHandle requester)
 {
 	(new ChatHistory(subjectID, requester))->Queue();
 }
@@ -475,7 +475,7 @@ public:
 			return;
 		}
 
-		const ChatHandle handle = chatGetHandle(args[0]);
+		ChatHandle handle = chatGetHandle(args[0]);
 		const Player* const subject = PlayerInterface::Lookup(handle);
 		if (subject == nullptr)
 		{
@@ -1058,7 +1058,7 @@ public:
 class LastCapQuery : public DBThreadQuery
 {
 public:
-	LastCapQuery(const ChatHandle& byMatchID, const char* clause)
+	LastCapQuery(const ChatHandle byMatchID, const char* clause)
 		: DBThreadQuery(DBThread::Default, "LastCapQuery", DBThreadQuery::_CALLBACK
 			, "SELECT * FROM `strat`.`v_last_captures` %s LIMIT 8", clause
 			)
@@ -1202,7 +1202,7 @@ public:
 class LastDeathsQuery : public DBThreadQuery
 {
 public:
-	LastDeathsQuery(const ChatHandle& requester, const ChatHandle& handleID)
+	LastDeathsQuery(const ChatHandle requester, const ChatHandle handleID)
 		: DBThreadQuery(DBThread::Default, "LastDeathsQuery", DBThreadQuery::_CALLBACK
 							, "CALL wwii.p_get_last_killers('%s')"
 								, Chat::Name(handleID).c_str())
@@ -1309,7 +1309,7 @@ public:
 class LastKillsQuery : public DBThreadQuery
 {
 public:
-	LastKillsQuery(const ChatHandle& requester, const ChatHandle& handleID)
+	LastKillsQuery(const ChatHandle requester, const ChatHandle handleID)
 		: DBThreadQuery(DBThread::Default, "LastKillsQuery", DBThreadQuery::_CALLBACK
 						, "CALL wwii.p_get_last_kills('%s')"
 							, Chat::Name(handleID).c_str())
@@ -1675,7 +1675,7 @@ public:
 class QueryPlayerInfo : public DBThreadQuery
 {
 public:
-	QueryPlayerInfo(const ChatHandle& byMatchID, const ChatHandle& handle)
+	QueryPlayerInfo(const ChatHandle byMatchID, const ChatHandle handle)
 		: DBThreadQuery(DBThread::Default, "QueryPlayerInfo", DBThreadQuery::_CALLBACK
 							, "CALL auth.p_get_player_details((SELECT playerid FROM wwiionline.wwii_player WHERE callsign = '%s'), %u)"
 								, Chat::Name(handle).c_str(), Server::myServerInfo.stats.arenaID
@@ -2574,7 +2574,7 @@ public:
 class PlayerNote : public DBThreadQuery
 {
 public:
-	PlayerNote(const ChatHandle& handle, UINT32 byPlayerID, const std::string& note, const char* orig)
+	PlayerNote(const ChatHandle handle, UINT32 byPlayerID, const std::string& note, const char* orig)
 		: DBThreadQuery(DBThread::Default, "PlayerNote", DBThreadQuery::_CALLBACK
 							, "CALL `wwii`.`p_add_player_note`('%s', %u, 1, '%s')", Chat::Name(handle).c_str(), byPlayerID, note.c_str())
 								, m_handle(handle), m_byPlayerID(byPlayerID), m_text(orig), m_err("")
@@ -2632,7 +2632,7 @@ public:
 class PlayerNoteQuery : public DBThreadQuery
 {
 public:
-	PlayerNoteQuery(const ChatHandle& handle, UINT32 byPlayerID)
+	PlayerNoteQuery(const ChatHandle handle, UINT32 byPlayerID)
 		: DBThreadQuery(DBThread::Default, "PlayerNoteQuery", DBThreadQuery::_CALLBACK
 						, "SELECT	n.description, n.note_at, n.note_end, n.callsign, n.note"
 			 				" FROM wwiionline.wwii_player p"

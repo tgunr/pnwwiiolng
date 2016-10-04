@@ -513,7 +513,7 @@ UINT32 	vehAdjustAnimationTime(void);
 
 UINT32 		vehGetVehicleHead(vehVehicle**);
 vehVehicle*	vehFindVehicle(UINT32 HostIndex);
-vehVehicle*	vehFindVehicleByChatHandle(const ChatHandle& chathandle);
+vehVehicle*	vehFindVehicleByChatHandle(const ChatHandle chathandle);
 LOGICAL vehValid(vehVehicle*);
 LOGICAL vehVehicleInList(vehVehicle*);
 int vehVehicleSpawned(const vehType* vtype, bool onlyPlayers = true); // how many of this vehicle type is spawned

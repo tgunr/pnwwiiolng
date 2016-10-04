@@ -78,7 +78,7 @@ Chat::LStringErr::LStringErr(const char* err, const char* arg)
 // Constructor
 
 DotCommand::DotCommand(const std::string& newCommand, const std::string& dotDescription
-						, const ChatHandle& mask, LSTRING_ID usage, LSTRING_ID detail
+						, const ChatHandle mask, LSTRING_ID usage, LSTRING_ID detail
 						, bool playnetOnly)
 	: m_command(newCommand)
 	, m_description(dotDescription)

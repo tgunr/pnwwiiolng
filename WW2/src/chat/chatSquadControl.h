@@ -30,37 +30,37 @@ public:
 	SINT32 receive(SINT32 teulIndex);
 	SINT32 send(SINT32 teulIndex);
 
-	SINT32 _sendBasic(SINT32 connection, UINT32 action, const ChatHandle& handle=0LL, const std::string& reason="");
+	SINT32 _sendBasic(SINT32 connection, UINT32 action, const ChatHandle handle=0LL, const std::string& reason="");
 
-	SINT32 sendCreate(SINT32 connection, const ChatHandle& handle, const std::string& squadName, const std::vector<ChatHandle>& players)
+	SINT32 sendCreate(SINT32 connection, const ChatHandle handle, const std::string& squadName, const std::vector<ChatHandle>& players)
 		{
 			m_players = players;
 			return _sendBasic(connection, _CREATE, handle, squadName);
 		}
 	SINT32 sendDisband(SINT32 connection)
 		{ return _sendBasic(connection, _DISBAND); }
-	SINT32 sendRecruit(SINT32 connection, const ChatHandle& handle)
+	SINT32 sendRecruit(SINT32 connection, const ChatHandle handle)
 		{ return _sendBasic(connection, _RECRUIT, handle); }
 	SINT32 sendAccept(SINT32 connection)
 		{ return _sendBasic(connection, _ACCEPT); }
 	SINT32 sendDecline(SINT32 connection)
 		{ return _sendBasic(connection, _DECLINE); }
-	SINT32 sendKick(SINT32 connection, const ChatHandle& handle, const std::string& reason)
+	SINT32 sendKick(SINT32 connection, const ChatHandle handle, const std::string& reason)
 		{ return _sendBasic(connection, _KICK, handle, reason); }
 	SINT32 sendLeave(SINT32 connection)
 		{ return _sendBasic(connection, _LEAVE); }
-	SINT32 sendPromote(SINT32 connection, const ChatHandle& handle)
+	SINT32 sendPromote(SINT32 connection, const ChatHandle handle)
 		{ return _sendBasic(connection, _PROMOTE, handle); }
-	SINT32 sendDemote(SINT32 connection, const ChatHandle& handle)
+	SINT32 sendDemote(SINT32 connection, const ChatHandle handle)
 		{ return _sendBasic(connection, _DEMOTE, handle); }
 	SINT32 sendText(SINT32 connection, UINT32 field, const std::string& text = "")
 		{
 			m_key = field;
 			return _sendBasic(connection, _TEXT, 0ULL, text);
 		}
-	SINT32 sendResign(SINT32 connection, const ChatHandle& handle)
+	SINT32 sendResign(SINT32 connection, const ChatHandle handle)
 		{ return _sendBasic(connection, _RESIGN, handle); }
-	SINT32 sendJoin(SINT32 connection, const ChatHandle& handle) // handle of the recruiter
+	SINT32 sendJoin(SINT32 connection, const ChatHandle handle) // handle of the recruiter
 		{ return _sendBasic(connection, _JOIN, handle); }
 	// The integer system packs the int ID and the value into one 46-bit handle
 	SINT32 sendInteger(SINT32 connection, UINT32 key, UINT32 value)
@@ -101,7 +101,7 @@ public:
 class SquadControlResult
 {
 public:
-	SquadControlResult(UINT32 result, UINT32 action=0, const ChatHandle& handle=0LL)
+	SquadControlResult(UINT32 result, UINT32 action=0, const ChatHandle handle=0LL)
 		: m_result(result), m_action(action), m_handle(handle) {}
 	SquadControlResult(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 	~SquadControlResult() {}

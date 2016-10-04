@@ -56,7 +56,7 @@ public: template<typename _Lhs, typename _Rhs> Equality Equals(const _Lhs& resul
 			if ( result > (const _Lhs)expect ) return IsGt;
 			return IsEqual;
 		}
-public: Equality Equals(const FULL_OBJ_ID& result, const FULL_OBJ_ID& expect) const
+public: Equality Equals(const FULL_OBJ_ID result, const FULL_OBJ_ID expect) const
 		{
 			snprintf(m_lhsVal, 64, "{%d,%d}.%u", result.cell.ox, result.cell.oy, result.id);
 			snprintf(m_rhsVal, 64, "{%d,%d}.%u", expect.cell.ox, expect.cell.oy, expect.id);

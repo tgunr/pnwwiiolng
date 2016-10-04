@@ -44,6 +44,6 @@ private:
 };
 
 // Process an incoming mobile spawn update packet
-extern void missMobileSpawnCancel(UINT32 missionID, const ChatHandle& ownerID, SINT32 x, SINT32 y);
-extern void missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle& handle, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, UINT32 stoUID);
+extern void missMobileSpawnCancel(UINT32 missionID, const ChatHandle ownerID, SINT32 x, SINT32 y);
+extern void missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle handle, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, UINT32 stoUID);
 

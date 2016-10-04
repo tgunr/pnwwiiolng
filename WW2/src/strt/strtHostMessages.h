@@ -66,7 +66,7 @@ extern void strtQueueVisLevelUpdate(class ObjectStruct*);
 extern void strtQueueFacilityStatus(class FacilityStruct*);
 extern void strtQueueCPStatus(class CPStruct*);
 
-extern void strtSendCaptureScoreNotice(const FULL_OBJ_ID& fid, WWII_SIDE forSide);
+extern void strtSendCaptureScoreNotice(const FULL_OBJ_ID fid, WWII_SIDE forSide);
 
 extern void strtSendCaptureState(const FacilityStruct* facility, WWII_SIDE forSide, SINT32 rate, bool spawnable);
 

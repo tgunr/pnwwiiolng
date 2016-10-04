@@ -9,5 +9,5 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 struct MOTD_REPLY& chatGetMotd(UINT32);
-bool chatSetMotd(UINT32, const ChatHandle& poster, const std::string&);
+bool chatSetMotd(UINT32, const ChatHandle poster, const std::string&);
 

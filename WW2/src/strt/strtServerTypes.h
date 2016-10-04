@@ -88,7 +88,7 @@ class WeapJoinRequestNode
 	public: static WeapJoinRequestNode* Lookup(UINT32 playerID);
 
 	// Ctor/Dtor
-	public: WeapJoinRequestNode(UINT32 playerID, const ChatHandle& handle, UINT32 missionID);
+	public: WeapJoinRequestNode(UINT32 playerID, const ChatHandle handle, UINT32 missionID);
 	public: ~WeapJoinRequestNode();
 
 	// Add this node to a list - automatically extracts itself

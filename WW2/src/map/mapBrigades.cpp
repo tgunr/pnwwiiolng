@@ -37,8 +37,8 @@ UINT64 lastBrigadeMovement = 0LL;			// How many times brigades have been moved
 
 Brigade::Brigade(UINT32 withBrigadeID, UINT32 withParentID
 				, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
-				, const ChatHandle& withHandle, const char* withName, const char* nick, UINT8 withRank
-				, const FULL_OBJ_ID& homeCP, const ChatHandle& withOwner, RANK_NO withOwnerRank)
+				, const ChatHandle withHandle, const char* withName, const char* nick, UINT8 withRank
+				, const FULL_OBJ_ID homeCP, const ChatHandle withOwner, RANK_NO withOwnerRank)
 		: BrigadeDetail(withBrigadeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
 						, withHandle, withName, nick, withRank, homeCP, withOwner, withOwnerRank)
 		, m_missionPartitionIt(m_missionList.end())

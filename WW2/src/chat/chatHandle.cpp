@@ -5067,7 +5067,7 @@ chatGetLowercaseHandle(ChatHandle handle)
 }
 
 bool
-chatGetCallsign(char* const callsign, const ChatHandle& srcHandle)
+chatGetCallsign(char* const callsign, const ChatHandle srcHandle)
 {
 	ChatHandle handle = (srcHandle & ~WIDE_HANDLE_BIT);
 	if ( PN_UNLIKELY(handle == 0) )
@@ -5098,7 +5098,7 @@ chatGetCallsign(char* const callsign, const ChatHandle& srcHandle)
 }
 
 bool
-chatGetCallsign(wchar_t* const callsign, const ChatHandle& srcHandle)
+chatGetCallsign(wchar_t* const callsign, const ChatHandle srcHandle)
 {
 	ChatHandle handle = (srcHandle & ~WIDE_HANDLE_BIT);
 	if ( PN_UNLIKELY(handle == 0) )
@@ -5129,7 +5129,7 @@ chatGetCallsign(wchar_t* const callsign, const ChatHandle& srcHandle)
 }
 
 const char*
-chatGetCallsign(const ChatHandle& handle)
+chatGetCallsign(const ChatHandle handle)
 {
 	static const size_t NumInstances = 16;	// must be a power of 2.
 	static Chat::Name callsigns[NumInstances];
@@ -5142,7 +5142,7 @@ chatGetCallsign(const ChatHandle& handle)
 }
 
 const wchar_t*
-chatGetWideCallsign(const ChatHandle& handle)
+chatGetWideCallsign(const ChatHandle handle)
 {
 	static const size_t NumInstances = 16;	// must be a power of 2.
 	static std::array<Chat::NameW, NumInstances> callsigns;
@@ -5175,7 +5175,7 @@ chatIsValidHandle(ChatHandle handle)
 	}
 	else
 	{
-		const ChatHandle unmaskedHandle = handle & ~WIDE_HANDLE_BIT;
+		ChatHandle unmaskedHandle = handle & ~WIDE_HANDLE_BIT;
 		if ( PN_UNLIKELY(unmaskedHandle < PLAIN_CHARACTERS) )
 			return false;	// Less than 1 character
 		if ( PN_UNLIKELY(unmaskedHandle >= (1ULL << ((MAX_WIDE_HANDLE_WCHARS * HANDLE_WCHAR_BITS) + HANDLE_PLAIN_BITS))) )
