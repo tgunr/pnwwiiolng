@@ -17,8 +17,8 @@ public:
 	SquadVote() : m_started(0), m_closedUntil(0), m_counts(nullptr), m_votes(nullptr), m_colead(false) {}
 	~SquadVote()
 	{
-		if ( m_votes ) delete m_votes;
-		if ( m_counts ) delete m_counts;
+		delete m_votes;
+		delete m_counts;
 	}
 
 public:

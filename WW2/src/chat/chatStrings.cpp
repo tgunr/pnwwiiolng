@@ -51,7 +51,7 @@ _editSideMotd(Player* player, UINT64 id, std::string& text)
 	if ( !chatSetMotd((UINT32)id, player->chatHandle(), text) )
 		return EditString::_INVALID;
 
-        DBThread::EscapeString(text);
+	DBThread::EscapeString(text);
 
 	static const char QRY_UPDATE_MOTD[] =
 		"INSERT INTO wwii_motd (type, added, added_by, motd) VALUES (%u,now(),%u,'%s')";
@@ -84,7 +84,7 @@ _editHCUnitMotd(Player* player, UINT32 id, std::string& text)
 		return EditString::_PERMISSION_DENIED;
 	}
 
-        DBThread::EscapeString(text);
+	DBThread::EscapeString(text);
 
 	// Trim "crap: " off the beginning of the existing MOTD
 	size_t n = text.find(": ");
