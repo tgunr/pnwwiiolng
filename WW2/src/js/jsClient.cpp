@@ -1800,6 +1800,7 @@ JSBool jsClient::SetProperty(JSContext* ctx, int propid, jsval* val)
 	return JS_TRUE;
 }
 
+#ifndef ENABLE_FLOATERS
 /************************************************************************************************
     _isRegularVehicle
 	Looks up the weapon spec and checks if it is a valid vehicle that does not require
@@ -1811,6 +1812,7 @@ static bool _isRegularVehicle(const WEAPON_SPEC& spec)
 
 	return !weapon || weapon->isPlayerWeapon();
 }
+#endif
 
 /************************************************************************************************
 	ProcessWeapList
