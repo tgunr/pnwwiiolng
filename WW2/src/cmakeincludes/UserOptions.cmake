@@ -1,5 +1,5 @@
 # Hide these options from the default CMake gui view.
-mark_as_advanced(ARCHITECTURE BUILDNAME OPTIMIZATION CMAKE_INSTALL_PREFIX)
+mark_as_advanced(ARCHITECTURE BUILDNAME OPTIMIZATION PN_APP_ID CMAKE_INSTALL_PREFIX PN_BETA_APPID PN_RELEASE_APPID)
 
 IF (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
 	SET(IS_CLANG TRUE)
@@ -19,6 +19,10 @@ OPTION( PN_MEM_DEBUG		"Enable debugging of memory usage" ON )
 
 OPTION( PN_DISABLE_AUTH		"Use auth-bypass only" OFF )
 OPTION( PN_DIFFERENT_PORTS	"Use different public-facing ports for game servers." ON )
+
+OPTION( PN_LUA_CLIENT		"Build lua client" OFF )
+
+OPTION( PN_USE_SYSTEM_MYSQL "Use system MySQL headers/libraries" OFF )
 
 IF ( HAVE_EXPERIMENTAL_STUFF )
 	OPTION( PN_EXPERIMENTAL		"Enable expirimental files" OFF )
@@ -46,14 +50,20 @@ ENDIF ()
 
 IF ( IS_CLANG OR NOT MSVC )
 	OPTION( PN_OMIT_FRAME_POINTER "Enable omit-frame pointer" ON )
+    OPTION( PN_PCH "Use Precompiled Header" ON )
+ENDIF ()
+
+IF ( NOT MSVC )
+	SET( PN_SANITIZER  "" CACHE STRING "Enable specific GCC/Clang sanitizer(s)" )
+ELSE ()
+	MARK_AS_ADVANCED(PN_SANITIZER)
 ENDIF ()
 
 IF ( IS_CLANG )
 	OPTION( PN_NICE_STACKS		 "Disable tail call elimination" OFF )
-	SET( PN_CLANG_SANITIZER  "" CACHE STRING "Enable specific clang sanitizer(s)" )
 	OPTION( PN_STATIC_ANALYZER	 "Static Analyzer" OFF )
 ELSE ()
-	mark_as_advanced(PN_NICE_STACKS PN_CLANG_SANITIZER PN_STATIC_ANALYZER)
+	mark_as_advanced(PN_NICE_STACKS PN_STATIC_ANALYZER)
 ENDIF ()
 
 IF ( !WIN32 )
@@ -71,3 +81,9 @@ ELSEIF ( PN_BUILD_TYPE MATCHES "Beta" )
 ELSE ()
 	SET ( PN_ENABLE_OPTS	3 CACHE STRING "Enable optimizations" )
 ENDIF ()
+
+
+# Control which game APP_ID the executables will target.
+SET ( PN_BETA_APPID "12" CACHE STRING "Beta AppID" )
+SET ( PN_RELEASE_APPID "1" CACHE STRING "Release AppID" )
+SET ( PN_APP_ID "${PN_BETA_APPID}" CACHE STRING "AppID for this build (${PN_BETA_APPID}=Beta, ${PN_RELEASE_APPID}=Release)" )
