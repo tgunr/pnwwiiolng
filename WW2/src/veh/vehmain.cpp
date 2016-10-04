@@ -270,6 +270,7 @@ extern UINT16 activePPOIndex;
 static bool g_canDeployMobileSpawn = false;
 
 extern void vehloadKill();
+extern SINT32 globalMSCoolDownEnd;
 
 static Covert<vehVehicle*> _VehicleHead = new vehVehicle();
 
@@ -5343,10 +5344,15 @@ PlayerPlacedObject* vehmainFRUBuild()
 
 bool vehmainFRUExecute()
 {
+    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
+    
 	PlayerPlacedObject* fru = fpPPOGet();
 
 	if(fru->valid)
 	{
+        if (fru->spec && fru->spec->stotype != ServerTrackedObject::_UMS)
+            coolDownEnd = &fru->spec->coolDownEnd;
+        
 		Vec3d finalPos = fru->finalPos;
 		piVECTOR finalAtt = fru->finalAtt;
 
@@ -5369,6 +5375,8 @@ bool vehmainFRUExecute()
 			trnCDUpdateCollideLists(true);
 			//sto->Sink();
 		}
+
+        *coolDownEnd = frametime + fru->spec->coolDown;
 
 		// handle troop specific stuff
 		fpFPSCancelPPO();

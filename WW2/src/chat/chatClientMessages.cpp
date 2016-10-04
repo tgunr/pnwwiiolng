@@ -296,10 +296,15 @@ _recvMOTD_Reply(ACTION_OBJECT* const a)
 }
 
 static SINT32
-_recvChatMissionStatus(ACTION_OBJECT* const a, Chat::MissionStatus& msg)
+_recvChatMissionStatus(ACTION_OBJECT* const a)
 {
-	///TODO:RAMP: Process the data.
-	clientProcessChatMissionStatus(a->teulIndex, &msg);
+    const TeulTimeMS ts = 0ULL;
+    static Chat::MissionStatus receiver;        // must either be allocated or static as later on game client will point to this for future reference, static for now since we are
+                                                // already riddled with statics, what is one more.
+    receiver.unpack(a, ts);
+    
+	clientProcessChatMissionStatus(a->teulIndex, &receiver);
+    
 	return a->offset;
 }
 
@@ -702,7 +707,7 @@ chatInstallClientCallbacks(void)
 
 		REGISTER_RECEIVER(Chat::HOLD_FALL_INFO_Y, _recvHoldFallInfo);
 
-		REGISTER_OMG_RECEIVER(Chat::MissionStatus, _recvChatMissionStatus);
+        REGISTER_RECEIVER(Chat::OMG_Y, _recvChatMissionStatus);
 
 		REGISTER_RECEIVER(Chat::CMD_LIST_Y, _recvDotCommandList);
 

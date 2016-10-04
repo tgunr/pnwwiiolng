@@ -65,6 +65,8 @@ static bool _inTargetFacilityRange(FLOAT32 distance, SINT32 side);
 static bool _checkFacilityRange(FLOAT32 distance, StratDB::StratObject* so, SINT32 side, bool friendly);
 static bool _fbCheck(vehVehicle* player, StratDB::StratObject* fac, FLOAT32 radius);
 
+SINT32 globalMSCoolDownEnd = 0;
+
 struct AddDrawCallback
 {
     OBJECT* o;
@@ -383,7 +385,12 @@ void PlayerPlacedObject::SetInvalid(const char* key, bool force)
 
 SINT32 PlayerPlacedObject::CoolDown()
 {
-	return spec->coolDownEnd;
+    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
+    
+    if (spec && spec->stotype != ServerTrackedObject::_UMS)
+        coolDownEnd = &spec->coolDownEnd;
+    
+	return *coolDownEnd;
 }
 
 bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool checksOnly)
@@ -818,6 +825,11 @@ bool PlayerPlacedObject::Update()
 	piVECTOR pos	= {0, 0, 0};
 	piVECTOR att	= {0, 0, 0};
 
+    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
+    
+    if (spec && spec->stotype != ServerTrackedObject::_UMS)
+        coolDownEnd = &spec->coolDownEnd;
+    
 	if(!lastUpdate)
 		lastUpdate = frametime;
 
@@ -858,7 +870,7 @@ bool PlayerPlacedObject::Update()
 		if(CalculatePlacement(pos, att) && obj != nullptr)
 			ogrpMoveAndRotateObjectGroup(obj, &pos, &att);
 
-		if(frametime <= spec->coolDownEnd)
+		if(frametime <= *coolDownEnd)
 		{
 			_fail = uiLocString("ppos.coolingdown");
 			valid = false;
@@ -873,10 +885,10 @@ bool PlayerPlacedObject::Update()
 		if(Modified())
 			ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
 
-		if(frametime <= spec->coolDownEnd) // we're cooling off
+		if(frametime <= *coolDownEnd) // we're cooling off
 		{
 			// we did our cool down start
-			SINT32 coolDownStart = spec->coolDownEnd - spec->coolDown;
+			SINT32 coolDownStart = *coolDownEnd - spec->coolDown;
 			SINT32 coolDownProgress = frametime - coolDownStart;
 
 			if(coolDownProgress < 0)
@@ -963,7 +975,12 @@ bool PlayerPlacedObject::Execute()
 {
 	Interrupt();
 
-	// might need to do a max object count here
+    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
+    
+    if (spec && spec->stotype != ServerTrackedObject::_UMS)
+        coolDownEnd = &spec->coolDownEnd;
+
+    // might need to do a max object count here
 	// if too many objects, make invalid
 
 	// if we have an execute callback and it returns false, then
@@ -1017,12 +1034,7 @@ bool PlayerPlacedObject::Execute()
             }
 		}
 
-		// fru's are shared and get their cool down from the host
-		if(!Online || spec->stotype != ServerTrackedObject::_UMS)
-		{
-			// we should apply non-shared cool downs here
-			spec->coolDownEnd = frametime + spec->coolDown;
-		}
+        *coolDownEnd = frametime + spec->coolDown;
 
 		// handle troop specific stuff
 		fpFPSCancelPPO();
@@ -1308,7 +1320,7 @@ PlayerPlacedObject* fpPPOCreate(int type,  PPOCallback updateCB, PPOCallback exe
 		if(ms)
 		{
 			SINT32 remaining	= SINT32(ms->fru().cooldownRemaining());
-			spec->coolDownEnd	= (remaining > 0) ? frametime + remaining : 0;
+			globalMSCoolDownEnd	= (remaining > 0) ? frametime + remaining : 0;
 		}
 	}
 

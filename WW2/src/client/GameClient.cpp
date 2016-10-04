@@ -75,6 +75,9 @@ using namespace ww2;
 
 static GameClient* _playerclient;
 
+extern PPOSpecLoader specLoader;
+extern SINT32 globalMSCoolDownEnd;
+
 /************************************************************************************************
 	GameClientLogin
 	throws ClientNetError
@@ -1147,16 +1150,15 @@ void GameClient::ProcessMissionStatus(const Chat::MissionStatus* ms)
 	{
 		// now see if we are currently building an fru
 		// interrupt if we are because there was a mission state change
-		PlayerPlacedObject* ppo = fpPPOGet();
-
-		if(ppo && ppo->spec->stotype == ServerTrackedObject::_UMS)
+        PPOSpec *spec = specLoader.ppoGetSpec(ms->fru().subtype.get());
+		if(spec && spec->stotype == ServerTrackedObject::_UMS)
 		{
-            ppo->spec->coolDownEnd = frametime + remaining;
             
-			if(ppo->buildAt > 0)
+            globalMSCoolDownEnd = frametime + remaining;
+            
+            PlayerPlacedObject* ppo = fpPPOGet();
+			if(ppo && ppo->buildAt > 0)
 				ppo->Interrupt();
-
-			uiGameEvent(GAMEEVENT_PPO, 1, "ppos.fru.built");
 		}
 	}
 }
