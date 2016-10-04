@@ -920,7 +920,7 @@ chatGridSnapshot()
 			continue;
 		if ( len == 0 )
 		{
-			len = sprintf(query, "INSERT INTO grid_snapshot (gx,gy,recorded,players,stos) VALUES ");
+			len = strprintf(query, "INSERT INTO grid_snapshot (gx,gy,recorded,players,stos) VALUES ");
 		}
 		else
 		{

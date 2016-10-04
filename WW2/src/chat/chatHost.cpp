@@ -254,7 +254,7 @@ IRCPlayer::message(int prefix, int messageID
 					, const char* ptr0, const char* ptr1, const char* ptr2, const char* ptr3, const char* ptr4, const char* ptr5) const
 {
 	char text[MAX_MESSAGE_LENGTH+1];
-	strcpy(text, chatLString((LSTRING_ID)prefix, (LSTRING_ID)messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5));
+	strsafecpy(text, chatLString((LSTRING_ID)prefix, (LSTRING_ID)messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5));
 
 	char* p = text;
 	do
@@ -1384,7 +1384,7 @@ chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageI
 	if ( allowDotCommands )
 	{
 		std::string msgText = inMessage->m_message;
-                DBThread::EscapeString(msgText);
+		DBThread::EscapeString(msgText);
 
 		DBThread::Do(DBThread::Audit, "INSERT INTO `audit`.`chat_messages` (player_id, message) VALUES (%u, '%s')", player->playerID(), msgText.c_str());
 
@@ -3669,7 +3669,7 @@ main(int argc, const char* argv[])
 
 	nextSpamTime = teulClock64 + 1000;
 
-        serverStartTime = teulTime();
+	serverStartTime = teulTime();
 
 	// Load the MOTDs in
 	chatLoadMotds();

@@ -1796,7 +1796,7 @@ _orderExecuted(AttackOrder& order, const ChatHandle handle, BrigadeController& b
 }
 
 //////////////////////////////////////////////////////////////////////
-// Attack propopsal
+// Attack proposal
 
 void
 chatBrigadeAttackOrderResponse(AttackOrder& order)

@@ -181,7 +181,7 @@ GAME::GAME()
 	,	m_lastIRCUsers(0)
 	,	m_lastIRCReport(0)
 {
-	strcpy(description, "UNKNOWN GAME");
+	strsafecpy(description, "UNKNOWN GAME");
 }
 
 GAME::GAME(const AUTH_GAME_INIT& gInit)
@@ -1084,7 +1084,7 @@ static void
 _noGameEntry(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_LAUNCH_REQ& request, APP_LAUNCH reply)
 {
 	char tmpStr[64+1];
-	strncpy(tmpStr, teulGetAddress(request.appVersion), 64);
+	strsafecpy(tmpStr, teulGetAddress(request.appVersion));
 	dbugLog(_FLW, "t:%d c:%s ip:%s arena:%u plat:%u app:%u ver:%s GAME entry NULL"
 			, teulIndex, request.username, ip, request.arenaID, platform, request.appID, tmpStr);
 
@@ -1314,7 +1314,7 @@ _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::Cli
 
 	char ip[64+1];
 	cdata.address = teulGetEndpointRemoteAddress(teulIndex);
-	strncpy(ip, teulGetAddress(cdata.address), 64);
+	strsafecpy(ip, teulGetAddress(cdata.address));
 
 	platform = cdata.platform;
 
@@ -1460,7 +1460,7 @@ authEstablishServer(const SINT32 teulIndex, AUTH_GAME_INIT& gInit)
 	teulSetPersonaData(teulIndex, newServer);
 
 	//Log the connection
-	strncpy(tmpStr, teulGetAddress(game->curHostVersion), 64);
+	strsafecpy(tmpStr, teulGetAddress(game->curHostVersion));
 
 	//Place the server onto the server list for the game entry we either found
 	//	or created

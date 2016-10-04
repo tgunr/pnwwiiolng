@@ -109,4 +109,3 @@ SINT32 chatGetShutdownTimeRemaining();	// Returns -1 if no shutdown pending.
 void chatSendAllMessage(const ChatHandle handle, const char* message, UINT32 messageID);
 
 void chatSetHCMotd(const char* callsign, const char* motd, WWII_SIDE forSide);
-
