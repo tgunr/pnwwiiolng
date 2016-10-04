@@ -22,15 +22,6 @@ void chatRemoveOICStatus(UINT32 brigadeID, const ChatHandle handle);
 class HCUnit;
 void chatAnnounceBrigadeMove(const HCUnit& unit, const FULL_OBJ_ID origin, const FULL_OBJ_ID destination, ChatHandle byHandle);
 
-// Request an attack/clear vote
-void chatBrigadeObjectiveProposal(class Player* player, FULL_OBJ_ID destination, bool attack);
-
-// Announce placement of an AO
-void chatBrigadeObjectivePlaced(class Player* player, const FULL_OBJ_ID target, WWII_SIDE side);
-
-// Announce removal of an AO
-void chatBrigadeObjectiveRemoved(class Player* player, const FULL_OBJ_ID target, WWII_SIDE side);
-
 // Handle the arrival of an Attack Order result
 void chatBrigadeAttackOrderResponse(struct AttackOrder& incoming);
 

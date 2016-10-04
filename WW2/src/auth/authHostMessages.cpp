@@ -187,7 +187,7 @@ _recvClearLoginTable(ACTION_OBJECT* const a)
 
 	if (clearLoginTable.init == 1)
 	{
-		dbugLog(_FLN,"t:%d received login initialization message", a->teulIndex);
+		dbugLog(_FLN, "t:%d received login initialization message", a->teulIndex);
 		authResetConnectInfo(1);
 	}
 

@@ -169,14 +169,6 @@ chatReceiveSTO(UINT16 type, ACTION_OBJECT* const a)
 	}
 }
 
-bool
-chatAddServerTrackedObject(ServerTrackedObject* sto)
-{
-	if ( ServerTrackedObject::addToIndex(sto) != ServerTrackedObject::_ADD_SUCCESS )
-		return false;
-	return true;
-}
-
 void
 chatRemoveServerTrackedObject(UINT32 stoUID)
 {
@@ -505,7 +497,7 @@ void
 ServerSTO::_audit(ServerSTO::EventType eventType)
 {
 	DBThread::Do(DBThread::Audit
-				, "INSERT INTO audit.sto_history"
+				, "INSERT INTO `audit`.`sto_history`"
 					" VALUES (%u,%llu,'%s',%llu,%u,%u,%u,%u,%f,%f,%f,%f,%f,%f,%u,%u)"
 					, (UINT32)uid()
 					, (UINT64)teulClock64

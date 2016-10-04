@@ -270,9 +270,8 @@ static void weapListClear(FacilityWeaponList*);
 
 Client::Client()
 {
-	_classdata = new ClientClassData;
-	_data = new ClientData;
-	memset(_data, 0x0, sizeof(*_data));
+	_classdata = new ClientClassData{};
+	_data = new ClientData{};
 	_data->id = clientid++;
 	_data->hitsPrime = 127979;
 

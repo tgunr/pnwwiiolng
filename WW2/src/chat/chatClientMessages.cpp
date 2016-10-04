@@ -89,8 +89,8 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 
 	outGoingMessage.m_length = strlen(message);
 
-	if (outGoingMessage.m_length >= MAX_MESSAGE_LENGTH)
-		outGoingMessage.m_length = MAX_MESSAGE_LENGTH-1;
+	if ( outGoingMessage.m_length >= MAX_MESSAGE_LENGTH )
+		outGoingMessage.m_length = MAX_MESSAGE_LENGTH - 1;
 
 	strncpy((char*)outGoingMessage.m_message, message, outGoingMessage.m_length + 1);
 
@@ -163,7 +163,7 @@ SINT32 chatTuneRadioToHandle(SINT32 teulIndex, UCHAR radioIndex, ChatHandle hand
 
 	TUT_MGR->DoEvent(TUT_EVENT_CHANNEL, &radioIndex, &tune.m_type);
 
-	return teulSend(teulIndex,_FE_TUNE_TO_CHANNEL,&tune);
+	return teulSend(teulIndex, _FE_TUNE_TO_CHANNEL, &tune);
 }
 
 //This function tells the server to toggle receiving for the radio channel
@@ -173,7 +173,7 @@ SINT32 chatUpdateChannelStatus(SINT32 teulIndex, UCHAR radioIndex, bool receiveS
 {
 	Chat::UpdateChannel updateChannel(radioIndex, receiveStatus);
 
-	return teulSend(teulIndex,_SEND_UPDATE_CHANNEL,&updateChannel);
+	return teulSend(teulIndex, _SEND_UPDATE_CHANNEL, &updateChannel);
 }
 
 //This function sends a message to the server to be distributed on the
@@ -262,7 +262,7 @@ static SINT32 _sendLocality(ACTION_OBJECT* const a)
 
 static SINT32 _sendSquadControl(ACTION_OBJECT* const a)
 {
-	return ((SquadControl*)a->localRawData)-> packer(TEUL_PACK, a);
+	return ((SquadControl*)a->localRawData)->packer(TEUL_PACK, a);
 }
 
 static SINT32 _sendServerTrackedObject(ACTION_OBJECT* const a)
@@ -586,7 +586,7 @@ _recvHoldFallInfo(ACTION_OBJECT* const a)
 	// use fullobjid to find cp name and use this for eventid
 	StratDB::StratObject* strat = StratDB::FindStratObject(incoming.m_fullObjID);
 
-	if(strat)
+	if ( strat )
 		eventId = strat->DisplayName(); //swprintf(eventId, MAX_HANDLE_WSIZE-1, L"%ls", strat->DisplayName());
 
 	chatGetCallsign(requester, incoming.m_requester);

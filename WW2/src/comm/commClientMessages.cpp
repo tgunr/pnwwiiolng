@@ -130,8 +130,7 @@ SINT32 g_averagePing = 0;
 
 SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32 offset, const SINT32 size_bytes)
 {
-	WORLD_UPDATE wu;
-	memset(&wu, 0, sizeof(WORLD_UPDATE));
+	WORLD_UPDATE wu{};
 
 	// #1 unpack the header.
 	wu.header = *(WORLD_UPDATE::Header*)(data);

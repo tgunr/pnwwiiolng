@@ -87,6 +87,7 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiServerTrackedObject.h"
+#include "wwii/wwiiServerTypeEnums.h"
 #include "wwii/wwiiThreads.h"
 
 extern UINT32 serverGetAuthIP();
@@ -2272,15 +2273,14 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 	const UINT32 lastReport = (it != reports.end()) ? it->second.first : 0;
 	const TeulDeltaMS lastDelta = (it != reports.end()) ? it->second.second : 0;
 
-	if ( lastReport > teulTime() - 60 && abs(sample.delta - lastDelta) <= 120 )
+	if ( lastReport > teulTime() - 60 && std::abs(sample.delta - lastDelta) <= 120 )
 		return;
 
 	/* According to new types list: CONTROLLER_HOST = 0U, AUTH_HOST, DBD_HOST, STRAT_HOST, CHAT_HOST, MAP_HOST, CELL_HOST  */
-	static const char* const hostNames[] = { "controller", "auth", "dbd", "strat", "chat", "map", "cell", "exit", "unknown" };
 	char hostname[64];
 	char report[256];
 
-	strprintf(hostname, "%shost:%s", hostNames[source], player.callsign());
+	strprintf(hostname, "%shost:%s", g_serverTypes[source], player.callsign());
 	strprintf(report, "Client clock anomaly: delta of %lldms (%s), drift %.6g", sample.delta, sample.delta < 0 ? "fast" : "slow", sample.ratio);
 	chatDispatchGMMessage(hostname, report);
 	reports[player.playerID()] = std::make_pair(teulTime(), sample.delta);
@@ -2288,7 +2288,7 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 	player.log(_FLW, "%s, host:%llu, client:%llu", report, sample.host_ms, sample.client_ms);
 
 	strprintf(report , "{\"src\":\"%s\",\"elapsed\":{\"host\":%llu,\"client\":%llu},\"delta\":%llu,\"ratio\",\"%0.8g\"}",
-	          hostNames[source],
+	          g_serverTypes[source],
 	          sample.host_ms, sample.client_ms,
 	          sample.delta, sample.ratio);
 	chatdbRecordEvent("HACK", player.callsign(), "speedhack", report, "");

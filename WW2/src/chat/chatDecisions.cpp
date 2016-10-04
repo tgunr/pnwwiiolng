@@ -341,7 +341,7 @@ _haveOpening(Player* player, WWII_SIDE side)
 static bool
 _voted(Player* player, const StratDecision* decision)
 {
-	register ChatHandle handle = player->matchHandle();
+	ChatHandle handle = player->matchHandle();
 
 	for ( UINT32 i = 0; i < decision->m_voters.size(); ++i )
 	{
@@ -695,7 +695,10 @@ _validVoter(Player* player, StratDecision* decision)
 	if ( _voted(player, decision) )
 		return false;
 
-	if ( player->inFacility() && memcmp(&player->originCpID(), &decision->m_property->m_fid, sizeof(FULL_OBJ_ID)) == 0 )
+	auto cmp = [](const FULL_OBJ_ID& lhs, const FULL_OBJ_ID&rhs) -> bool {
+		return memcmp(&lhs, &rhs, sizeof(lhs)) == 0;
+	};
+	if ( player->inFacility() && cmp(player->originCpID(), decision->m_property->m_fid) )
 		return true;
 
 	player->message(LSTR_CAUTION, LSTR_MUST_ISSUE_FROM, decision->m_property->Name(), decision->m_property->Name());

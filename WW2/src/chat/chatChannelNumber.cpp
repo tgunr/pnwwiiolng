@@ -102,4 +102,3 @@ chatGetSideChannelID(const instanceid_t instID, SIDE_SUB_CHANNEL subChannel, WWI
 
 	return id_side.Specify(instID, subChannel, side);
 }
-

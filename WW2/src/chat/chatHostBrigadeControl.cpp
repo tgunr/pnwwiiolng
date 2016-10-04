@@ -468,11 +468,8 @@ void
 BrigadeController::cancelVote()
 {
 	// Delete the vote
-	if ( m_vote )
-	{
-		delete m_vote;
-		m_vote = nullptr;
-	}
+	delete m_vote;
+	m_vote = nullptr;
 
 	// Remove this brigade from the list of pending elections
 	elections.erase(unit().unitID());

@@ -143,8 +143,8 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
         return;
 
 	// Already qualified.
-	if ( filename[0] == '.' || filename[0] == '/' || filename[0] == '\\' || filename[1] == ':')
-		strncpy(output, filename, outputSize);
+	if ( filename[0] == '.' || filename[0] == '/' || filename[0] == '\\' || filename[1] == ':' )
+		strsafecpy(output, filename, outputSize);
 	else
 	{
 #if platBuild == TEUL_SERVER

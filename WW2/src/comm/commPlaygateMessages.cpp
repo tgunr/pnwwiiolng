@@ -48,10 +48,10 @@ _connectionOpened(ENDPOINT& endpoint)
 
 static void
 _networkError(
-	SINT32 teulIndex
-	, const UCHAR* const data
-	, SINT32 size
-	, const TEUL_CALLBACK* object
+	SINT32 /*teulIndex*/
+	, const UCHAR* const /*data*/
+	, SINT32 /*size*/
+	, const TEUL_CALLBACK* /*object*/
 	, SINT32 error
 	)
 {
@@ -69,10 +69,10 @@ _networkError(
 
 static void
 _teulKitError(
-	SINT32 teulIndex
-	, const UCHAR* const data
-	, SINT32 size
-	, const TEUL_CALLBACK* object
+	SINT32 /*teulIndex*/
+	, const UCHAR* const /*data*/
+	, SINT32 /*size*/
+	, const TEUL_CALLBACK* /*object*/
 	, SINT32 error
 	)
 {
@@ -85,9 +85,9 @@ _teulKitError(
 static void
 _callbackError(
 	const SINT32 teulIndex
-	, const UCHAR* const data
-	, const SINT32 size
-	, const TEUL_CALLBACK* object
+	, const UCHAR* const /*data*/
+	, const SINT32 /*size*/
+	, const TEUL_CALLBACK* /*object*/
 	, const SINT32 error
 	)
 {

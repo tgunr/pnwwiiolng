@@ -79,7 +79,6 @@ public:
 		, m_expireAt(0)
 		, m_subscribers()
 		{
-			m_subscribers.clear();
 		}
 
 	Channel() = delete;
@@ -94,9 +93,9 @@ public:
 	UINT32			m_missionID;
 	TeulTimeMS		m_expireAt;
 
-	public:		typedef std::set<Chat::ChannelSubscription*> Subscribers;
+	public:		using Subscribers = std::set<Chat::ChannelSubscription*>;
 
-	public:		const Subscribers& subscribers() const { return m_subscribers; }
+	public:		const Subscribers& subscribers() const noexcept { return m_subscribers; }
 
 	friend class Chat::ChannelSubscription;
 	//! Add cnode to the subscribers list, does not modify cnode.
@@ -104,9 +103,9 @@ public:
 	//! Remove cnode from the subscribers list, does not modify cnode.
 	private:	void removeSubscriber(Chat::ChannelSubscription& cnode);
 
-	public:		size_t numSubscribers() const { return m_subscribers.size(); }
+	public:		size_t numSubscribers() const noexcept { return m_subscribers.size(); }
 
-	public:		CHANNEL_TYPE type() const { return channelID.Type(); }
+	public:		CHANNEL_TYPE type() const noexcept { return channelID.Type(); }
 
 	private:	Subscribers		m_subscribers;		// Players tuned to channel.
 };

@@ -39,7 +39,7 @@ _audit(UINT32 squadID, UINT32 action
 		, std::string text="")
 {
 	if ( !text.empty() )
-                DBThread::EscapeString(text);
+	DBThread::EscapeString(text);
 
 	DBThread::Do(DBThread::Default
 		, "INSERT LOW_PRIORITY INTO wwii_squad_audit"
@@ -279,7 +279,7 @@ _checkInSquad(const Player* player, RANK_NO minRank=0)
 
 //////////////////////////////////////////////////////////////////////
 // Check for an online player
-// -- if source is non-null, that source can see the cilent,
+// -- if source is non-null, that source can see the client,
 // -- if requireSquad is zero, checks they are not in a squad,
 // -- if requireSquad is non-zero, checks they are in that squad
 // If requireSquad fails, mySquad is used to differ between
@@ -416,7 +416,7 @@ _update(UINT32 cmd, UINT32 action, UINT32 squadID, const ChatHandle handle, UCHA
 // Process a create request
 
 static UINT32
-_processCreate(SquadControl& request, Player* player, SquadList* /*squadList*/)
+_processCreate(SquadControl& request, Player* player)
 {
 	// Trash any invite we have
 	_decline(player);
@@ -769,7 +769,7 @@ _processText(SquadControl& request, Player* player, SquadList* squadList)
 	break;
 	}
 
-        DBThread::EscapeString(request.m_text);
+	DBThread::EscapeString(request.m_text);
 
 	DBThread::Do(DBThread::Default
 					, "UPDATE wwii_squads SET %s = '%s' WHERE squadid = %u"
@@ -939,11 +939,6 @@ SquadControl::receive(SINT32 teulIndex)
 		if ( player->squadID() )
 		{
 			squadList = chatFindSquadList(player->squadID());
-			if ( squadList == nullptr )
-			{
-				player->log(_FLA, "sq:%u No squad list?", player->squadID());
-				throw SQR_SQUAD_UNAVAILABLE;
-			}
 		}
 
 		player->log(_FLI, "squadControl: %s %s[%u] %s[%llx]"
@@ -951,9 +946,18 @@ SquadControl::receive(SINT32 teulIndex)
 							, _control(m_action), m_action
 							, _subject, m_handle);
 
+		if ( m_action != SquadControl::_CREATE )
+		{
+			if ( squadList == nullptr )
+			{
+				player->log(_FLA, "sq:%u No squad list?", player->squadID());
+				throw SQR_SQUAD_UNAVAILABLE;
+			}
+		}
+
 		switch ( m_action )
 		{
-		case SquadControl::_CREATE:		reply.m_result = _processCreate(*this, player, squadList); break;
+		case SquadControl::_CREATE:		reply.m_result = _processCreate(*this, player); break;
 		case SquadControl::_DISBAND:	reply.m_result = _processDisband(*this, player, squadList); break;
 		case SquadControl::_RECRUIT:	reply.m_result = _processRecruit(*this, player, squadList); break;
 		case SquadControl::_ACCEPT:		reply.m_result = _processAccept(*this, player, squadList); break;
@@ -997,7 +1001,7 @@ SquadControl::receive(SINT32 teulIndex)
 }
 
 static void
-_processCreateReply(const SquadMemberUpdate& update, Player* orig, Player* /*target*/, SquadList* /*list*/)
+_processCreateReply(const SquadMemberUpdate& update, Player* orig)
 {
 	bool created = (update.m_action == SquadMemberUpdate::_CREATE);
 	throw chatProcessSquadCreateReply(created, update.m_originator, orig);
@@ -1131,7 +1135,7 @@ SquadMemberUpdate::receive(SINT32 teulIndex)
 
 		switch ( m_cmd )
 		{
-		case SquadControl::_CREATE:		_processCreateReply(*this, orig, targ, list); break;
+		case SquadControl::_CREATE:		_processCreateReply(*this, orig); break;
 		case SquadControl::_KICK:		_processKickReply(*this, orig, targ, list); break;
 		case SquadControl::_LEAVE:		_processLeaveReply(*this, orig, targ, list); break;
 		case SquadControl::_PROMOTE:	_processPromoteReply(*this, orig, targ, list); break;

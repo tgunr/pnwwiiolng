@@ -78,7 +78,7 @@ Chat::LStringErr::LStringErr(const char* err, const char* arg)
 // Constructor
 
 DotCommand::DotCommand(const std::string& newCommand, const std::string& dotDescription
-						, const ChatHandle mask, LSTRING_ID usage, LSTRING_ID detail
+						, const PermissionMask mask, LSTRING_ID usage, LSTRING_ID detail
 						, bool playnetOnly)
 	: m_command(newCommand)
 	, m_description(dotDescription)
@@ -207,6 +207,7 @@ DotCommand::setAvailability(char level)
 	break;
 
 	case 'C':
+		// CRS only
 		dbugLog(_FLD, "%s restricted to CRS by permission" , command());
 		m_public = false;
 		m_playnetOnly = true;
@@ -629,8 +630,7 @@ DotCommandIndex::readPermissions()
 void
 DotCommandIndex::buildCommandListPacket()
 {
-	if ( g_commandListPacket )
-		delete g_commandListPacket;
+	delete g_commandListPacket;
 
 	g_commandListPacket = new Teul::Packet(Teul::PacketId(CHAT_X, Chat::CMD_LIST_Y));
 	g_commandListPacket->setUnencrypted();

@@ -145,7 +145,7 @@ public:
 	,	REQ_REMOVE				// Want to remove an OIC
 	,	REQ_MOVE				// Move a brigade
 	,	REQ_ATTACK				// Attack a target
-	,	REQ_CLEAR				// Clear an dattack or defend objective
+	,	REQ_CLEAR				// Clear an attack or defend objective
 	,	REQ_DEFEND				// Defend a target
 
 	,	MAX_BC_REQ_CODES		// Maximum brigade control request codes
