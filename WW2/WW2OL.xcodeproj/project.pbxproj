@@ -1427,7 +1427,6 @@
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E94156AF1D259A0300C0565B /* libb64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libb64.a; path = lib/mac/libb64.a; sourceTree = "<group>"; };
-		E97C76281C84CD0700875F44 /* locIDs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = locIDs.h; sourceTree = "<group>"; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
 		E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader2.cpp; sourceTree = "<group>"; };
 		E97C76351C8513EB00875F44 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2479,7 +2478,6 @@
 				08104D51103DFBE90065E0E2 /* authClientMessages.cpp */,
 				08104D52103DFBE90065E0E2 /* main.m */,
 				08104D55103DFBE90065E0E2 /* syscfg.h */,
-				E97C76281C84CD0700875F44 /* locIDs.h */,
 				08104D56103DFBE90065E0E2 /* sysLaunchUrl.h */,
 				08104D57103DFBE90065E0E2 /* sysMacCompat.h */,
 				08104D58103DFBE90065E0E2 /* sysMacCompat.mm */,
