@@ -88,7 +88,7 @@ UINT32 Listing::s_listingID = 0;
     // Packer for a BasicStatus
     
     SINT32
-    BasicStatus::packer(LOGICAL mode, ACTION_OBJECT* a)
+    BasicStatus::packer(LOGICAL mode, ACTION_OBJECT* const a)
     {
         static const SINT32 _SIDE_BITS = 12 ;
         
