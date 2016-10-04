@@ -114,8 +114,6 @@ namespace Chat
 		inline bool operator != (const value_type* rhs) const { return !operator==(rhs); }
 		inline bool operator != (const self_type& rhs) const { return !operator==(rhs); }
 
-		inline void packRaw(unsigned int mode, ACTION_OBJECT* a) { a->packBytes(mode, m_name, sizeof(m_name)); }
-
 		template<typename... Args> int format(const value_type* format, Args...);
 	};
 

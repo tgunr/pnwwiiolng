@@ -15,6 +15,7 @@
 #include "wwii/wwiiOwnershipEnums.h"	// For WWII_SIDE
 #include "wwii/wwiiFullObjID.h"			// For FULL_OBJ_ID
 #include "chat/chatGCITypes.h"
+#include "str/stringLib.h"
 
 #pragma pack(push, 1)
 namespace Chat
