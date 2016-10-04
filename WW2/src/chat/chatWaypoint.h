@@ -8,6 +8,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include "str/stringLib.h"
+
 //////////////////////////////////////////////////////////////////////
 // Defined waypoint base-types
 
@@ -63,7 +65,7 @@ static const UINT32 MAX_WP_HANDLE_LEN = MAX_HANDLE_LEN;
 static const UINT32 MAX_WP_HANDLE_BITS = GAME_HANDLE_BITS;
 static const UINT32 CONTACT_REPORT_LIFETIME_S = 7 * 60;		// 7 minutes
 
-class Waypoint
+class Waypoint final
 {
 	// Constructors/destructors
 public:
@@ -78,8 +80,7 @@ public:
 		, m_posted((whenPosted) ? whenPosted: (UINT32)teulTime())
 		, m_shared(true)
 		{
-			strncpy(m_notes, withNotes, MAX_WP_NOTE_LENGTH);
-			m_notes[MAX_WP_NOTE_LENGTH] = 0;
+			strsafecpy(m_notes, withNotes);
 		}
 
 	Waypoint()
@@ -91,9 +92,9 @@ public:
 		, m_x(0)
 		, m_y(0)
 		, m_posted((UINT32)teulTime())
+		, m_notes{}
 		, m_shared(true)
 		{
-			m_notes[0] = 0;
 		}
 
 	// Network constructor
@@ -106,6 +107,7 @@ public:
 		, m_x(0)
 		, m_y(0)
 		, m_posted((UINT32)teulTime())
+		, m_notes{}
 		, m_shared(true)
 		{
 			a->offset = packer(TEUL_UNPACK, a);
