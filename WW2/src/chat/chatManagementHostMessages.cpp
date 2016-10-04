@@ -25,8 +25,8 @@ SINT32
 chatInstallHostManagementCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::Management::CallbackX)
-
+	{
 		REGISTER_RECEIVER(Chat::Management::LOGIN2_Y, _recvManagementLogin2);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::Management::CallbackX)
 }

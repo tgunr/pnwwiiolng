@@ -660,7 +660,7 @@ SINT32
 chatInstallClientCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
-
+	{
 		REGISTER_SENDER(Chat::CLIENT_MESSAGE_Y, _sendMessage, _SEND_CLIENT_MESSAGE);
 		REGISTER_SENDER(Chat::FE_TUNE_TO_CHANNEL_Y, _sendTuneToChannel, _FE_TUNE_TO_CHANNEL);
 		REGISTER_SENDER(Chat::UPDATE_CHANNEL_Y, _sendUpdateChannel, _SEND_UPDATE_CHANNEL);
@@ -705,7 +705,7 @@ chatInstallClientCallbacks(void)
 		REGISTER_OMG_RECEIVER(Chat::MissionStatus, _recvChatMissionStatus);
 
 		REGISTER_RECEIVER(Chat::CMD_LIST_Y, _recvDotCommandList);
-
-END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 

@@ -398,8 +398,10 @@ static SINT32
 _registerStratCallback(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
+	{
 		REGISTER_SENDER(STRAT_EVENTS_Y, Strat::Events::SendFunction, Strat::Events::Callback);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Comm::CallbackX);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -430,7 +432,7 @@ mmHostInstallCallbacks(void)
 	Scoring::InstallCallbacks();
 
 	BEGIN_CALLBACK_REGISTRATION(MM::CallbackX)
-
+	{
 		REGISTER_RECEIVER(MM::FE_POST_REQ_Y, _recvFEPostRequest);
 		REGISTER_SENDER(MM::FE_POST_ACCEPT_Y, _sendFEPostAccept, MM_SEND_FE_POST_ACCEPT);
 		REGISTER_SENDER(MM::FE_POST_DENY_Y, _sendFEPostDeny, MM_SEND_FE_POST_DENY);
@@ -450,7 +452,7 @@ mmHostInstallCallbacks(void)
 		REGISTER_SENDER(MM::FE_CREW_BAILED_Y, _sendFECrewBailed, MM_SEND_FE_CREW_BAILED);
 		REGISTER_RECEIVER(MM::DIRECT_SPAWN_Y, _recvDirectSpawn);
 		REGISTER_RECEIVER(MM::DO_DESPAWN_Y, _recvDoDespawn);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(MM::CallbackX)
 }
 

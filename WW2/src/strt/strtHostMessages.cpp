@@ -1116,8 +1116,10 @@ static SINT32
 _registerInterHostCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Host::CallbackX)
+	{
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLua);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Host::CallbackX);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1130,7 +1132,7 @@ strtHostInstallCallbacks(void)
 	_registerInterHostCallbacks();
 
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
-
+	{
 		REGISTER_RECEIVER(STRT_MM_POST_LIST_Y, _recvMMPostListRequest);
 		REGISTER_RECVSEND(STRT_MM_SPAWN_GRANT_Y, _recvMMSpawnGrantRequest, _sendMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT);
 		REGISTER_RECVSEND(STRT_MM_POST_INFO_Y, _recvMMPostInfoRequest, _sendMMPostInfoResponse, _XCHG_MM_POST_INFO);
@@ -1161,8 +1163,8 @@ strtHostInstallCallbacks(void)
 		REGISTER_RECEIVER(STRT_ATTACK_ORDER_Y, _recvAttackOrder);
 
 		REGISTER_RECEIVER(STRT_FACILITY_WEAP_LIST_Y, _recvWeaponListRequest);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////

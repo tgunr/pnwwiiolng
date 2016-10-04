@@ -1924,7 +1924,7 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERR
 
 	memInit();
 
-	SINT32 retval = teulInitTransport(LOG_TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
+	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
 

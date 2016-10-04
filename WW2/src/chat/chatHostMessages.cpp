@@ -1599,18 +1599,22 @@ static SINT32
 _registerMMCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Map::CallbackX)
+	{
 		REGISTER_MSG_SENDER(Map::HC_UNIT_LOCATIONS_Y, HC_UNIT_LOCATIONS);
 		REGISTER_RECEIVER(Map::TUT_PROGRESS_Y, _recvTutProgress);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Map::CallbackX)
 }
 
 static SINT32
 _registerStratCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
+	{
 		REGISTER_RECEIVER(STRT_BROADCAST_TIME_UPDATE_Y, _recvTimeUpdate);
 		REGISTER_RECEIVER(STRT_UPDATE_Y, _recvStratUpdates);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 
 SINT32
@@ -1622,7 +1626,7 @@ chatInstallHostCallbacks()
 	wwiiRegisterPlayerMessageCallback();
 
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
-
+	{
 		REGISTER_RECEIVER(Chat::FOUND_USER_Y, _recvFoundUser);
 		REGISTER_RECEIVER(Chat::CLIENT_MESSAGE_Y, _recvMessage);
 		REGISTER_RECEIVER(Chat::UPDATE_CHANNEL_Y, _recvUpdateChannel);
@@ -1684,6 +1688,6 @@ chatInstallHostCallbacks()
 		REGISTER_RECEIVER(Chat::ATTACK_ORDER_Y, _recvAttackOrder);
 		REGISTER_RECEIVER(Chat::HOST_LOCALITY_UPDATES_Y, _recvLocalityUpdates);
 		REGISTER_OMG_RECEIVER(Chat::CellHostUpdate, _recvCellHostUpdate);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }

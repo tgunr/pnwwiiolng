@@ -379,7 +379,7 @@ SINT32 commInstallClientCallbacks(void)
 		return retval;
 
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
-
+	{
 		REGISTER_RECEIVER(WORLD_UPDATE_Y, _recvWorldUpdate);
 		REGISTER_RECEIVER(GRANT_VEHICLE_JOIN_Y, _recvVehicleAcknowledge);
 		REGISTER_RECEIVER(HOST_HIT_Y, _recvHostVehicleHit);
@@ -404,7 +404,7 @@ SINT32 commInstallClientCallbacks(void)
 		REGISTER_RECEIVER(CAPTURE_STATE_Y, _recvCaptureState);
 		REGISTER_MSG_RECEIVER(DEATH_BY_BUILDING_Y, DEATH_BY_BUILDING);
 		REGISTER_RECEIVER(STRAT_EVENTS_Y, _recvStratEvents);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Comm::CallbackX)
 }
 

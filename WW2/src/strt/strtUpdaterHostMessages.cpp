@@ -109,16 +109,20 @@ static SINT32
 _registerClientXCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
+	{
 		REGISTER_RECEIVER(DAMAGE_LIST_Y, _recvHitList);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Comm::CallbackX)
 }
 
 static SINT32
 _registerStrtUpdaterXCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
+	{
 		REGISTER_RECEIVER(STRT_DAMAGE_Y, _recvHitList);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 
 SINT32

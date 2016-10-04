@@ -320,7 +320,9 @@ SINT32
 InstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Scoring::CallbackX)
+	{
 		REGISTER_RECEIVER(Scoring::EVENT_Y, _recvEvent);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Scoring::CallbackX);
 }
 }

@@ -433,10 +433,12 @@ SINT32
 InstallHostCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Instance::INST_X)
+	{
 		REGISTER_RECVSEND(Instance::INST_XCHG_LISTING_Y, _recvInstanceRequest, _sendInstanceListing, _XCHG_LISTING);
 		REGISTER_RECVSEND(Instance::INST_XCHG_SELECT_Y, _recvInstanceSelect, _sendInstanceSelect, _XCHG_SELECT);
 		REGISTER_RECVSEND(Instance::INST_XCHG_CREATE_Y, _recvInstanceCreate, _sendInstanceCreated, _XCHG_CREATE);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Instance::INST_X)
 }
 
 //////////////////////////////////////////////////////////////////////

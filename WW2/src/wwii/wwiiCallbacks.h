@@ -33,15 +33,19 @@
 //! Begin registration of a callback set for a given CallbackX group.
 #if defined(DEBUG) || defined(ALPHA_RELEASE)
 #define BEGIN_CALLBACK_REGISTRATION(callX)	\
+    constexpr auto initial_call_X = callX; \
     CallbackRegister cbr(callX, TEUL_PACKET_NAMES ? #callX : ""); \
 	try	\
 	{ \
-	dbugLog(_FLI, "%s: installing " #callX " callbacks", __FUNCTION__);
+	dbugLog(_FLI, "%s: installing " #callX " callbacks", __FUNCTION__); \
+    do  // force single/compound statement
 #else
 #define BEGIN_CALLBACK_REGISTRATION(callX)	\
+    constexpr auto initial_call_X = callX; \
     CallbackRegister cbr(callX, TEUL_PACKET_NAMES ? #callX : ""); \
 	try	\
-	{
+	{ \
+    do  // force single/compound statement
 #endif
 
 //! Register a sender function.
@@ -78,7 +82,9 @@
 
 //! Terminate registration block.
 #if defined(DEBUG) || defined(ALPHA_RELEASE)
-#define END_CALLBACK_REGISTRATION \
+#define END_CALLBACK_REGISTRATION(end_call_X) \
+		while ( false ); \
+        static_assert(initial_call_X == end_call_X, "END_CALLBACK_REGISTRATION X mismatch"); \
 		dbugLog(_FLI, "%s: done", __FUNCTION__); \
 		dbugSetErrno(0); \
 		return 0; \
@@ -89,7 +95,9 @@
 		return -EINVAL; \
 	}
 #else
-#define END_CALLBACK_REGISTRATION \
+#define END_CALLBACK_REGISTRATION(end_call_X) \
+		while ( false ); \
+        static_assert(initial_call_X == end_call_X, "END_CALLBACK_REGISTRATION X mismatch"); \
 		dbugSetErrno(0); \
 		return 0; \
 	} \
@@ -139,4 +147,3 @@ private:
 private:
 	static Teul::CallbackInit	sm_ci;		// Defined in wwiiCallbacks.cpp
 };
-

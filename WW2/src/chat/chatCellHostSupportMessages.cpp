@@ -167,16 +167,16 @@ SINT32
 chatInstallCellHostSupportCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
-
-//		REGISTER_SENDER(Chat::GAME_DIRECT_MESSAGE_Y, _sendDirectMessage, _SEND_DIRECT_MESSAGE);
+	{
+		//		REGISTER_SENDER(Chat::GAME_DIRECT_MESSAGE_Y, _sendDirectMessage, _SEND_DIRECT_MESSAGE);
 
 		REGISTER_RECEIVER(Chat::SMITE_USER_Y, _recvSmiteUser);
 		REGISTER_RECEIVEOBJ(Chat::LOCATE_USER_Y, CHAT_LOC_USER, _recvLocateUser);
 
 		// Send/receive bandwidth notices
 		REGISTER_SENDRECV(Chat::BANDWIDTH_NOTICE_Y, _sendBandwidthNotice, _recvBandwidthNotice, _XCHG_BANDWIDTH_NOTICE);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 
 bool

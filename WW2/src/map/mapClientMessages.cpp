@@ -487,7 +487,7 @@ Tutorial::GroupProgress::send(SINT32 chatIndex)
 SINT32 mapInstallClientCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Map::CallbackX)
-
+	{
 		REGISTER_SENDER(Map::EXIT_WWIIOL_Y, _sendExitWWIIOL, MAP_SEND_EXIT_WWIIOL);
 
 		REGISTER_RECEIVER(Map::XCHG_HCUNIT_LIST_Y, _recvHCUnitList);
@@ -512,6 +512,6 @@ SINT32 mapInstallClientCallbacks(void)
 
 		// The big packet of strat data we get when we spawn.
 		REGISTER_RECEIVER(Map::BUILDING_VISLEVELS_Y, _recvBuildingVisLevels);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Map::CallbackX)
 }
