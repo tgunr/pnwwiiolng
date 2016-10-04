@@ -111,16 +111,10 @@ SquadVote::close(UINT32 duration)
 
 	m_started = 0;
 	m_closedUntil = teulTime() + duration;
-	if ( m_counts )
-	{
-		delete m_counts;
-		m_counts = nullptr;
-	}
-	if ( m_votes )
-	{
-		delete m_votes;
-		m_votes = nullptr;
-	}
+	delete m_counts;
+	m_counts = nullptr;
+	delete m_votes;
+	m_votes = nullptr;
 	recount();
 }
 
@@ -189,11 +183,9 @@ SquadVote::startVote()
 {
 	m_closedUntil = 0;
 	m_started = teulTime();
-	if ( m_counts )
-		delete m_counts;
+	delete m_counts;
 	m_counts = new COUNTS;
-	if ( m_votes )
-		delete m_votes;
+	delete m_votes;
 	m_votes = new VOTES;
 	m_leader = 0LL;
 	m_lead = 0;
