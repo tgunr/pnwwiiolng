@@ -22,10 +22,10 @@ SINT32 dbseRecvHandshake(ACTION_OBJECT* a, Dbse::Handshake&);
 SINT32 dbseInstallClientCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(DBSE_GENERAL_X)
-
+	{
 		REGISTER_RECEIVEOBJ(DBSE_SERVER_HANDSHAKE_Y, Dbse::Handshake, dbseRecvHandshake);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(DBSE_GENERAL_X)
 }
 
 SINT32 dbseSendHandshake(SINT32 teulIndex, UINT32 arena)

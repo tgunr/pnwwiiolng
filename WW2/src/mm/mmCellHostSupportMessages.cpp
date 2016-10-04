@@ -23,9 +23,9 @@ SINT32
 mmCellHostSupportCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(MM::CallbackX)
-
+	{
 		REGISTER_RECEIVER(MM::WEAPONS_HANDOFF_Y, Host::VehicleRequest::_recvCallback);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(MM::CallbackX);
 }
 

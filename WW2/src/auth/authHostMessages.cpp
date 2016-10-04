@@ -302,7 +302,7 @@ authSendPlayerInQueue(Auth::ClientData* cdata, UINT32 position, UINT32 waitTime)
 SINT32 authHostInstallCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Auth::CallbackX)
-
+	{
 		REGISTER_RECEIVER(ARENA_REQ_Y, _recvARENA_REQ);
 		REGISTER_RECEIVER(APP_LAUNCH_REQ_Y, _recvAPP_LAUNCH_REQ);
 		REGISTER_RECEIVER(AUTH_GAME_INIT_Y, _recvGAME_INIT); //	ci->error =		_hostRecvAuthHelloError;
@@ -326,7 +326,6 @@ SINT32 authHostInstallCallbacks(void)
 		REGISTER_SENDRECV(APP_XCHG_GAME_LIST_Y, _sendGameList, _recvGameListRequest, _XCHG_GAME_LIST2);
 		REGISTER_SENDRECV(AUTH_XCHG_LOGIN_Y, _sendAuthLoginReply, _recvAuthLoginRequest, _XCHG_AUTH_LOGIN);
 		REGISTER_SENDER(AUTH_QUEUE_POSITION_Y, _sendAuthQueuePosition, _SEND_QUEUE_POSITION);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Auth::CallbackX)
 }
-

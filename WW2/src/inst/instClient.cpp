@@ -216,10 +216,12 @@ SINT32
 InstallClientCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Instance::INST_X)
+	{
 		REGISTER_SENDRECV(Instance::INST_XCHG_LISTING_Y, _sendListingRequest, _recvInstanceListing, _XCHG_LISTING);
 		REGISTER_SENDRECV(Instance::INST_XCHG_SELECT_Y, _sendSelect, _recvSelect, _XCHG_SELECT);
 		REGISTER_SENDRECV(Instance::INST_XCHG_CREATE_Y, _sendCreate, _recvCreate, _XCHG_CREATE);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Instance::INST_X)
 }
 
 }

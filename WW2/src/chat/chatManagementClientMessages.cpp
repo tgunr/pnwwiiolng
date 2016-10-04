@@ -36,8 +36,9 @@ static SINT32 _sendManagementLogin2(ACTION_OBJECT* const a)
 SINT32 chatInstallClientManagementCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::Management::CallbackX)
+	{
 
 		REGISTER_SENDER(Chat::Management::LOGIN2_Y, _sendManagementLogin2, CHAT_SEND_MANAGEMENT_LOGIN2) ;
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::Management::CallbackX)
 }

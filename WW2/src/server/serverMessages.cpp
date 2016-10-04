@@ -225,6 +225,7 @@ SINT32
 serverInitCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
+	{
 		REGISTER_SENDRECV(PLAYER_MIRROR_Y, _sendPlayerMirror, _recvPlayerMirror, PLAYER_MIRROR_CB);
 		PLAYER_MIRROR_CB->error = _persXferError;
 
@@ -239,7 +240,7 @@ serverInitCallbacks(void)
 		REGISTER_RECEIVER(PLAYER_UPDATE_Y, _recvPlayerUpdate);
 
 		REGISTER_RECEIVER(HOST_CONFIG_Y, _recvHostConfig);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Teul::Serv::CallbackX);
 }
 

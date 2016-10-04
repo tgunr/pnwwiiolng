@@ -328,7 +328,7 @@ SINT32
 chatInstallSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
-
+	{
 		// Send only
 		REGISTER_SENDER(Chat::PERSONA_UPDATE_Y, _sendPersonaUpdate, _SEND_PERSONA_UPDATE);
 		REGISTER_SENDER(Chat::SERVER_INFO_Y, _sendServerInfo, _SEND_SERVER_INFO);
@@ -347,7 +347,7 @@ chatInstallSupportCallbacks()
 
 		REGISTER_RECEIVER(Chat::MAP_PERSONA_UPDATE_Y, _recvMapPersonaUpdate);
 		REGISTER_RECEIVER(Chat::MAP_REFRESH_PLAYER_Y, _recvRefreshPlayer);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 

@@ -129,6 +129,7 @@ struct ServerRole : public Role
 	virtual int RegisterCallbacks() override
 	{
 		BEGIN_CALLBACK_REGISTRATION(Role::Test_X)
+		{
 			REGISTER_RECVSEND(Role::Hello_Y, recvHello, sendHello, s_cbHello);
 
 			REGISTER_RECVSEND(Role::HelloRel_Y, recvHello, sendHello, s_cbRelHello);
@@ -144,7 +145,8 @@ struct ServerRole : public Role
 			REGISTER_RECEIVEOBJ(Role::ObjTest_Y, TestObject, recvTestObject);
 
 			REGISTER_RECEIVER(Role::Spam_Y, [](ACTION_OBJECT* a) { return a->offset; });
-		END_CALLBACK_REGISTRATION
+		}
+		END_CALLBACK_REGISTRATION(Role::Test_X)
 	}
 
 	//////////////////////////////////////////////////////////////
