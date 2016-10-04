@@ -2,10 +2,12 @@
 
 MARK_AS_ADVANCED(CNL LIBEVENT_FOUND LIBEVENT_INCLUDE_DIR)
 
-FIND_LIBRARY(CNL NAMES ncurses)
-IF ( UNIX AND NOT CNL )
- MESSAGE(SEND_ERROR "ncurses library not found")
-ENDIF ()
+IF ( PN_LUA_CLIENT )
+	FIND_LIBRARY(CNL NAMES ncurses)
+	IF ( NOT CNL )
+	 MESSAGE(SEND_ERROR "ncurses library not found")
+	ENDIF ()
+ENDIF ( )
 
 # Include our macros etc
 find_package(MySQL REQUIRED)

@@ -1,8 +1,10 @@
 # Configures the compiler for building the host given the target environment etc.
 
 # Specify include directories.
+# "." must come before hostproj so that GCC finds the .gch file before the .h file
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_SOURCE_DIR}
+	.
 	${CMAKE_CURRENT_SOURCE_DIR}/hostproj
 	${CMAKE_CURRENT_SOURCE_DIR}/include
 	${CMAKE_CURRENT_SOURCE_DIR}/mem
@@ -65,3 +67,5 @@ ELSE ( )
 ENDIF ( )
 
 ADD_DEFINITIONS("-DAS_SERVER=1")
+
+ADD_DEFINITIONS("-DAPP_ID=${PN_APP_ID}")
