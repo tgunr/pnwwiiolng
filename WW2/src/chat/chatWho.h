@@ -27,7 +27,7 @@ enum
 
 namespace Chat
 {
-class Who
+class Who final
 {
 public:
 	Who()
