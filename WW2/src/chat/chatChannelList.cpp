@@ -29,10 +29,11 @@ struct ChannelHash
 	UINT64 operator()(const ChannelID& channelID) const { return channelID.HashValue(); }
 };
 
-typedef std::unordered_map<ChannelID, Chat::Channel*, ChannelHash> CHANNEL_INDEX;
-CHANNEL_INDEX _channelIndex;
+using CHANNEL_INDEX = std::unordered_map<ChannelID, std::unique_ptr<Chat::Channel>, ChannelHash>;
+static CHANNEL_INDEX _channelIndex;
 
-static CHANNEL_INDEX _tentativeChannels;
+using TENTATIVE_INDEX = std::unordered_map<ChannelID, Chat::Channel*, ChannelHash>;
+static TENTATIVE_INDEX _tentativeChannels;
 
 // Register a new chat channel
 Chat::Channel*
@@ -45,7 +46,7 @@ chatCreateChannel(const ChannelID& channelID, const char* const name, ChatHandle
 	}
 
 	// Check to see if channel already exists.
-	if ( _channelIndex.find(channelID) != _channelIndex.end() )
+	if ( chatFindChannel(channelID) )
 	{
 		LogAbort("ch:%llu.%u.%u.%llu attempting to re-create existing channel"
 					, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID());
@@ -53,13 +54,14 @@ chatCreateChannel(const ChannelID& channelID, const char* const name, ChatHandle
 
 	Chat::Name chName(chHandle);
 	dbugLog(_FLD, "Creating ch:%llu.%u.%u.%llu %s: %s [%s]", channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID(), chanTypeName[channelID.Type()], name, chName.c_str());
-	Chat::Channel* const channel = new Chat::Channel(channelID, name, chHandle);
+	_channelIndex.emplace(channelID, std::make_unique<Chat::Channel>(channelID, name, chHandle));
 
-	_channelIndex[channelID] = channel;
-
+	// Some channels are peristent while others can be deleted if there are no users
+	// on them for a given period of time.
+	auto channel = chatFindChannel(channelID);
 	switch ( channel->type() )
 	{
-	// Channels which don't get deleted.
+	// Persistent channels.
 	case BRIGADE_CHANNEL:
 	case GCI_CHANNEL:
 	case ADMIN_CHANNEL:
@@ -67,6 +69,7 @@ chatCreateChannel(const ChannelID& channelID, const char* const name, ChatHandle
 	case SIDE_HELP_CHANNEL:
 	case SIDE_OPS_CHANNEL:
 	break;
+	// Channels that require a population.
 	default:
 		_tentativeChannels[channelID] = channel;
 	break;
@@ -111,9 +114,7 @@ chatDestroyChannel(const ChannelID channelID)
 
 	_tentativeChannels.erase(channelID);
 
-	Chat::Channel* const channel = it->second;
 	_channelIndex.erase(it);
-	delete channel;
 
 	dbugLog(_FLI, "ch:%llu.%u.%u.%llu freed channel, numChannels now %" PRSizeT ""
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID(), _channelIndex.size());
@@ -125,18 +126,19 @@ Chat::Channel*
 chatFindChannel(const ChannelID& id)
 {
 	CHANNEL_INDEX::iterator it = _channelIndex.find(id);
-	return ( it != _channelIndex.end() ) ? it->second : nullptr;
+	return ( it != _channelIndex.end() ) ? it->second.get() : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
-// Delete channels nobody is using.
+// Delete channels nobody is using. A maximum of one channel will be
+// deleted per call.
 
 void
 chatDeleteUnusedChannels()
 {
-	for ( auto it = _tentativeChannels.begin(), end = _tentativeChannels.end(); it != end; ++it )
+	for ( auto&& it : _tentativeChannels )
 	{
-		Chat::Channel* const channel = it->second;
+		auto channel = it.second;
 		if ( channel == nullptr )
 			LogAbort("dead channel in list");
 
@@ -147,11 +149,10 @@ chatDeleteUnusedChannels()
 			continue;
 		}
 
-		const ChannelID channelID = it->first;
-
+		const ChannelID channelID = it.first;
 		if ( channel->m_expireAt == 0 )
 		{
-			static const TeulTimeMS FiveMinutes_ms = (5 * 60) * 1000;
+			constexpr TeulTimeMS FiveMinutes_ms = (5 * 60) * 1000;
 			channel->m_expireAt = teulClock64 + FiveMinutes_ms;
 			dbugLog(_FLD, "ch:%llu.%u.%u.%llu marking for expiration"
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
@@ -160,9 +161,7 @@ chatDeleteUnusedChannels()
 		}
 
 		if ( channel->m_expireAt > teulClock64 )
-		{
 			continue;
-		}
 
 		dbugLog(_FLM, "ch:%llu.%u.%u.%llu expired and empty, deleting"
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()

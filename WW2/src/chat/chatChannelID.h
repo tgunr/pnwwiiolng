@@ -43,35 +43,37 @@ public:
 		: m_instID(_instID), m_type(_type), m_side(_side), m_id(_fid.Key()) {}
 
 	// Create a channel ID from a type, side and 32 bit id
-	ChannelID(CHANNEL_TYPE _type, UINT32 _side, UINT32 _id, const UINT64 _instID=0ULL)
+	constexpr ChannelID(CHANNEL_TYPE _type, UINT32 _side, UINT32 _id, const UINT64 _instID=0ULL) noexcept
 		: m_instID(_instID), m_type(_type), m_side(_side), m_id((UINT64)_id) {}
 
 	// Create a channel ID from a type and 32 bit id - i.e. side zero
-	ChannelID(CHANNEL_TYPE _type, UINT32 _id)
+	constexpr ChannelID(CHANNEL_TYPE _type, UINT32 _id) noexcept
 		: m_instID(0), m_type(_type), m_side(0), m_id((UINT64)_id) {}
 
-	ChannelID(CHANNEL_TYPE _type) : m_instID(0ULL), m_type(_type), m_side(0), m_id(0) {}
+	constexpr ChannelID(CHANNEL_TYPE _type) noexcept
+		: m_instID(0ULL), m_type(_type), m_side(0), m_id(0) {}
 
 	//// Accessors
 	// return the instance
-	instanceid_t InstID() const { return m_instID; }
+	constexpr instanceid_t InstID() const noexcept { return m_instID; }
 	// return the channel type
-	CHANNEL_TYPE Type() const { return (CHANNEL_TYPE) m_type; }
+	constexpr CHANNEL_TYPE Type() const noexcept { return (CHANNEL_TYPE) m_type; }
 	// return the side
-	WWII_SIDE Side() const { return (WWII_SIDE) m_side; }
+	constexpr WWII_SIDE Side() const noexcept { return (WWII_SIDE) m_side; }
 	// return the type-specific id as a 64bit value
-	const UINT64& SubID() const { return m_id; }
+	constexpr const UINT64& SubID() const noexcept { return m_id; }
 
-	bool IsPlaceHolder() const { return (m_type > 0 && m_id == 0); }
+	constexpr bool IsPlaceHolder() const noexcept { return (m_type > 0 && m_id == 0); }
 
 	// Change the side and id
-	ChannelID& Specify(const instanceid_t instID, const UINT64& id, WWII_SIDE side=WWII_NO_SIDE) { m_instID = instID; m_side = side; m_id = id; return *this; }
+	ChannelID& Specify(const instanceid_t instID, const UINT64 id, WWII_SIDE side=WWII_NO_SIDE) { m_instID = instID; m_side = side; m_id = id; return *this; }
 
-	bool operator == (const ChannelID& rhs) const { return (m_instID == rhs.m_instID) & (m_type == rhs.m_type) & (m_side == rhs.m_side) & (m_id == rhs.m_id); }
+	constexpr bool operator == (const ChannelID& rhs) const noexcept
+	{ return (m_instID == rhs.m_instID) & (m_type == rhs.m_type) & (m_side == rhs.m_side) & (m_id == rhs.m_id); }
 
-	bool IsSet() const { return (m_instID | m_type | m_side | m_id) != 0; }
+	constexpr bool IsSet() const noexcept { return (m_instID | m_type | m_side | m_id) != 0; }
 
-	UINT64 HashValue() const
+	constexpr UINT64 HashValue() const noexcept
 	{
 		return (m_instID << 4 | (UINT64)m_type << 32 | (UINT64)m_side) ^ m_id;
 	}
