@@ -4845,7 +4845,7 @@ static const int s_wideCharacterMap[65536] =
 // Denote a handle as being simple characters
 
 static void
-_plainHandle(ChatHandle& handle)
+_plainHandle(ChatHandle& handle) noexcept
 {
 	handle &= ~WIDE_HANDLE_BIT;
 }
@@ -4854,7 +4854,7 @@ _plainHandle(ChatHandle& handle)
 // Denote a handle as containing wide characters
 
 static void
-_wideHandle(ChatHandle& handle)
+_wideHandle(ChatHandle& handle) noexcept
 {
 	handle |= WIDE_HANDLE_BIT;
 }
@@ -4875,7 +4875,7 @@ chatGetHandleCharacterSymbol(const wchar_t character)
 
 template<typename _CharType>
 static void
-_plainEncode(const _CharType* const callsign, ChatHandle& handle)
+_plainEncode(const _CharType* const callsign, ChatHandle& handle) noexcept
 {
 	size_t i;
 	for ( i = 0; callsign[i] && i < MAX_HANDLE_WLEN; ++i )
@@ -4898,7 +4898,7 @@ _plainEncode(const _CharType* const callsign, ChatHandle& handle)
 }
 
 static void
-_wideEncode(const wchar_t* const callsign, ChatHandle& handle)
+_wideEncode(const wchar_t* const callsign, ChatHandle& handle) noexcept
 {
 	ChatHandle code = 1;
 	int bits = 0;
@@ -5155,7 +5155,7 @@ chatGetWideCallsign(const ChatHandle handle)
 }
 
 bool
-chatIsValidHandle(ChatHandle handle)
+chatIsValidHandle(ChatHandle handle) noexcept
 {
 	if ( false == chatIsWideCallsign(handle) )
 	{
