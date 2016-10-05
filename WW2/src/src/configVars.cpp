@@ -276,6 +276,18 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 				break;
 			}
 		}
+
+		if ( !configEntries.m_foundGeneralFile && !configEntries.m_foundOSFile )
+		{
+#if defined(WIN32) && defined(UNICODE)
+			_ftprintf(stderr, _T("NOTE: Could not find '%s' or '%s' config files, using defaults.\n"),
+				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+#else
+			fprintf(stderr, "NOTE: Could not find '%s' or '%s' config files, using defaults.\n",
+				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+#endif
+		}
+
 		configEntries.m_read = true;
 	}
 
