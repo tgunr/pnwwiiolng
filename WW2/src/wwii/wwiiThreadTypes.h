@@ -18,35 +18,34 @@
 template<typename _DataType>
 class ConditionQueue
 {
+public:
+	using QUEUE = std::queue<_DataType*>;
+
+private:
 	std::mutex				m_mutex;
 	std::condition_variable	m_condition;
-	std::atomic<bool>		m_destructing;
+	std::atomic<bool>		m_destructing { false };
+	QUEUE m_queue;
+	unsigned long long m_hits { 0 };
+	size_t m_maxSize { 0 };
 
 public:
-	typedef std::queue<_DataType*> QUEUE;
-
-public:
-	ConditionQueue() : m_mutex(), m_condition(), m_destructing(false), m_queue(), m_hits(0LL), m_maxSize(0) {}
-	~ConditionQueue()
+	~ConditionQueue() noexcept
 	{
 		destroy();
-		std::this_thread::yield();
-		m_mutex.lock();
-		m_mutex.unlock();
+		std::lock_guard<std::mutex> lock(m_mutex);
+		while (!m_queue.empty()) {
+			auto p = m_queue.front();
+			m_queue.pop();
+			delete p;
+		}
 	}
 
-	QUEUE m_queue;
-	unsigned long long m_hits;
-	size_t m_maxSize;
-
-	void destroy()
+	void destroy() noexcept
 	{
-		if ( !m_destructing ) {
+		if ( !m_destructing )
 			m_destructing = true;
-			m_mutex.lock();
-			m_condition.notify_all();
-			m_mutex.unlock();
-		}
+		m_condition.notify_all();
 	}
 
 	void doLocked(std::function<void(void)> lambda)
@@ -55,10 +54,10 @@ public:
 		lambda();
 	}
 
-	bool isValid() const { return !m_destructing; }
+	bool isValid() const noexcept { return !m_destructing; }
 
 	// Non-blocking lock attempt.
-	bool tryGetNext(_DataType** data)
+	bool tryGetNext(_DataType** data) noexcept
 	{
 		std::unique_lock<std::mutex> lock(m_mutex, std::try_to_lock);
 		if ( m_destructing || lock.owns_lock() == false )
@@ -74,15 +73,17 @@ public:
 	}
 
 	// Blocking lock attempt
-	_DataType* getNext()
+	_DataType* getNext() noexcept
 	{
 		// Wait until empty is false
 		std::unique_lock<std::mutex> lock(m_mutex);
 		m_condition.wait(lock, [=] () {
 			return m_destructing || !m_queue.empty();
 		});
-		if ( m_destructing )
+		if ( m_destructing ) {
+			destroy();
 			return nullptr;
+		}
 
 		_DataType* data = m_queue.front();
 		m_queue.pop();
@@ -92,11 +93,31 @@ public:
 
 	void push_back(_DataType* data)
 	{
+		if ( PN_UNLIKELY(m_destructing) )
+			return;
 		std::lock_guard<std::mutex> lock(m_mutex);
 		m_queue.push(data);
 		++m_hits;
 		if ( m_queue.size() > m_maxSize )
 			m_maxSize = m_queue.size();
 		m_condition.notify_one();
+	}
+
+	auto size() noexcept
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		return m_queue.size();
+	}
+
+	auto maxSize() noexcept
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		return m_maxSize;
+	}
+
+	auto hits() noexcept
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		return m_hits;
 	}
 };

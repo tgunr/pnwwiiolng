@@ -37,14 +37,6 @@
 #include "teul/teulTime.h"
 #include "teul/teulUtils.h"
 #include "teul/teulVersion.h"
-#include "include/pnThread.h"
-
-// Tie the vtable for PNThread down; this needs a better home
-PNThread::~PNThread()
-{
-    cancel();
-    join();
-}
 
 //#define DEBUG_ENCRYPTION
 //#define DEBUG_CONNECTIONS

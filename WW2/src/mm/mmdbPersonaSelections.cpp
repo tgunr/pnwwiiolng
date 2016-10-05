@@ -137,14 +137,8 @@ _saveSelections(DB::handle_t* conn)
 // Thread that periodically saves personas
 
 void
-PersonaSelectionThread::run()
+PersonaSelectionThread::dbrun()
 {
-	DB::handle_t* conn = threadsOpenDBConnection(true);
-	if ( conn == nullptr )
-	{
-		LogAbort("spt: Unable to open database connection");
-	}
-
 	threadLog(_FLM, "Persona-selections thread active");
 
 	while ( !isCancelled() )
@@ -160,8 +154,8 @@ PersonaSelectionThread::run()
 			continue;
 
 		// Wake the connection up
-		mysql_ping(conn);
+		mysql_ping(m_conn);
 
-		_saveSelections(conn);
+		_saveSelections(m_conn);
 	}
 }

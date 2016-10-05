@@ -82,11 +82,11 @@
 #include "weap/weapList.h"
 #include "wwii/wwiiActivate.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiHostMessages.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiSortieManager.h"
-#include "wwii/wwiiThreads.h"
 
 const char* g_serverName = "mmhostd";
 

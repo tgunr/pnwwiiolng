@@ -1,4 +1,4 @@
-#include <syscfg.h>
+#include <syscfg.h> // Path is project specific.
 // Created: Tue Oct  7 16:59:22 CDT 2008
 //
 // Pack routines for instancing
@@ -8,13 +8,13 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "teul/teulPackers.h"
-#include "wwii/wwiiPack.h"
-#include "inst/instTypes.h"
-#include "inst/instDescriptor.h"
 #include "inst/instBasicStatus.h"
 #include "inst/instClientStatus.h"
+#include "inst/instDescriptor.h"
 #include "inst/instListing.h"
+#include "inst/instTypes.h"
+#include "teul/teulPackers.h"
+#include "wwii/wwiiPack.h"
 
 namespace Instance
 {

@@ -20,7 +20,7 @@ extern bool hostSendVehicleBroadcast(UCHAR* buffer, SINT32 size);
 extern void hostSendResupplyIssue(UINT32 cellIP, const sortieid_t toVehicle, const sortieid_t fromSerial, const ChatHandle fromHandle);
 extern void hostSendResupplyAccepted(UINT32 cellIP, const sortieid_t sendTo, const ChatHandle byHandle);
 
-// Determine if a vehicle is in the synched queue.
+// Determine if a vehicle is in the synced queue.
 extern bool hostNeedVehicleFirstTime(UINT32 vehicleID);
 
 // Force me to re-send FIRST_TIMEs for everyone.

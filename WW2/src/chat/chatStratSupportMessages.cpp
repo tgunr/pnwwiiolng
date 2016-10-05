@@ -30,8 +30,8 @@
 #include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiHCUnits.h"
-#include "wwii/wwiiThreads.h"
 
 static TEUL_CALLBACK* _SEND_SCMD_RESULT;
 static TEUL_CALLBACK* _SEND_SIDE_MESSAGE;

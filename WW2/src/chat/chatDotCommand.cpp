@@ -23,7 +23,7 @@
 #include "chat/chatTimeInterval.h"
 #include "include/mydbQuery.h"
 #include "teul/teulTime.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "teul/teulPacket.h"	// For the all-commands list.
 #include "chat/chatDotCommandList.h"

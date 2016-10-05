@@ -98,7 +98,7 @@ extern void gmMessage(const char* message);
 extern const char* getCallsign(unsigned long long);
 
 $#include "include/luaGlue.h"
-$#include "wwii/wwiiThreads.h"
+$#include "wwii/wwiiDBThreads.h"
 
 extern void dbDo(const char* msg);
 $#define dbDo(c) DBThread::Do(DBThread::Default, "%s", c)

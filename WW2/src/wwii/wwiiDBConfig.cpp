@@ -155,7 +155,7 @@ dbGetWWIIConfig(DBHANDLE& dbh)
 	{
 		if ( g_numVars == 0 )
 		{
-			ThreadTextQuery qry(DBThread::Game, "INSERT IGNORE INTO `wwiionline`.`wwii_config` (variableName,value,lastModified,description) VALUES", "");
+			ThreadTextQuery qry(DBThread::Default, "INSERT IGNORE INTO `wwiionline`.`wwii_config` (variableName,value,lastModified,description) VALUES", "");
 			// Count the number of variables we have
 			for ( g_numVars = 0; configMap[g_numVars].type < MAX_WWII_CONFIG_TYPES; g_numVars++ )
 			{
@@ -178,7 +178,7 @@ dbGetWWIIConfig(DBHANDLE& dbh)
 		if ( q.Rows() == 0 )
 			return false;
 
-		ThreadTextQuery qry(DBThread::Game, "DELETE FROM `wwiionline`.`wwii_config` WHERE `variableName` IN (", ")");
+		ThreadTextQuery qry(DBThread::Default, "DELETE FROM `wwiionline`.`wwii_config` WHERE `variableName` IN (", ")");
 		while ( q.FetchRow() )
 		{
 			const DBRow& row = q.Row();

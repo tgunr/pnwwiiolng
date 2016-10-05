@@ -15,6 +15,9 @@
 // Disable dbugWrite in all host processes
 #define NO_DEBUG_WRITE	1
 
+#define NOGDI
+#define WIN32_LEAN_AND_MEAN
+
 // Legacy definition of platBuild
 #if !defined(platBuild)
 # if defined(AS_SERVER)

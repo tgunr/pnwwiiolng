@@ -16,6 +16,7 @@
 #include "chat/chatHost.h"
 #include "chat/chatLStringIDs.h"
 #include "chat/chatName.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiThreadTypes.h"
@@ -39,7 +40,12 @@ struct BAN
 	playerid_t	m_playerID;
 };
 typedef ConditionQueue<BAN> BAN_QUEUE;
-BAN_QUEUE banQueue;
+static BAN_QUEUE banQueue;
+struct BanThread : public DBThread::Thread
+{
+	virtual void dbrun() override;
+};
+static BanThread _banThread;
 
 //////////////////////////////////////////////////////////////////////
 // Ban a player -- if player is not null then the player is notified
@@ -180,28 +186,31 @@ _processBan(DB::handle_t* conn, BAN& ban)
 //////////////////////////////////////////////////////////////////////
 // Thread for processing bans
 
-void chatBanQueueThread()
+void BanThread::dbrun()
 {
-	static DB::handle_t* conn = threadsOpenDBConnection(false);
-	if ( conn == nullptr )
-	{
-		threadLog(_FLA, "bqt: Unable to open database connection");
-		return;
-	}
-
 	threadLog(_FLI, "Ban Queue Thread active");
 
-	threadIgnoreSIGPIPE();
-
-	for ( ; ; )
+	while ( !isCancelled() )
 	{
 		auto ban = banQueue.getNext();
-		if (ban == nullptr)
-			break;
-		_processBan(conn, *ban);
+		if (ban)
+			_processBan(m_conn, *ban);
 	}
+}
 
-	threadsCloseDBConnection(conn);
+//////////////////////////////////////////////////////////////////////
+// start the ban player thread
 
-	return;
+void chatStartBanThread()
+{
+	_banThread.start();
+}
+
+//////////////////////////////////////////////////////////////////////
+// stop the ban thread
+
+void chatCancelBanThread()
+{
+	_banThread.cancel();
+	banQueue.destroy();
 }

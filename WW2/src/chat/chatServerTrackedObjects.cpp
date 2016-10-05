@@ -29,8 +29,8 @@
 #include "wwii/wwiiConfig.h"
 #include "inst/instTypes.h"
 #include "chat/chatHostMessages.h"
-#include "wwii/wwiiThreads.h"
 #include "wwii/wwiiConfigVars.h"
+#include "wwii/wwiiDBThreads.h"
 
 struct PPOConfig
 {

@@ -24,7 +24,7 @@ class FillPersonaDataQuery : public DBThreadQuery
 public:
 	FillPersonaDataQuery(const Player* player)
 		: DBThreadQuery(DBThread::Default, "FillPersonaDataQuery", DBThreadQuery::_CALLBACK, 1
-							, "CALL auth.p_persona_refresh(%u, %u)"
+							, "CALL `auth`.`p_persona_refresh`(%u, %u)"
 								, player->personaID()
 								, Server::myServerInfo.stats.arenaID
 								)

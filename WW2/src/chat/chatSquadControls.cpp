@@ -24,7 +24,7 @@
 #include "chat/chatSaveChannels.h"
 #include "teul/teulKit.h"
 #include "wwii/wwiiSquads.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 
 static char _originator[MAX_HANDLE_SIZE], _subject[MAX_HANDLE_SIZE];
 
