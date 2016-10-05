@@ -484,7 +484,7 @@ _registerPeeringCallbacks()
 	{
 		REGISTER_RECEIVEOBJ(PEER_HELLO_Y, PeerHello, _onPeerHello);
 	}
-	END_CALLBACK_REGISTRATION(Teul::Serv::CallbackX);
+	END_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
