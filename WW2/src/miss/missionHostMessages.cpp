@@ -161,7 +161,7 @@ _createMissionResults(const Player& player, MISSION_RESULTS& results)
 	{
 		auto dr = sortie->m_typesInteractedWith;
 		const size_t types = std::min((size_t)dr.size(), (size_t)MapMiss::MAX_HIT_ARRAY);
-		results.numHits = types;
+		results.numHits = static_cast<UINT16>(types);
 		UINT32 i = 0;
 		for ( auto it = dr.begin(); it != dr.end() && i < types; ++it, ++i )
 		{

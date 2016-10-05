@@ -203,7 +203,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 		bldHash->building = new STRAT_BUILDING[maxBldgId];
 
 		for ( auto it = bldgMap.begin(), end = bldgMap.end(); it != end; ++it ) {
-			assert ( 0 < it->first && it->first < maxBldgId );
+			assert ( 0 < it->first && (size_t)it->first < (size_t)maxBldgId );
 			bldHash->building[it->first] = it->second;
 		}
 	}
