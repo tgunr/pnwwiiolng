@@ -63,13 +63,13 @@ struct weapWeapon
 
 	weapWeapon()
 		: WeaponType(nullptr)
+		, BeltSequence{}
 		, LastFireTime(0.0f)
 		, ReloadStartTime(0.0f)
 		, WeaponFireType(0)
 		, Displacement(0.0f)
+		, BeltName{}
 	{
-		memset(BeltSequence, 0x0, sizeof(BeltSequence));
-		memset(BeltName, 0x0, sizeof(BeltName));
 	}
 };
 struct vehVehicle;

@@ -1,5 +1,5 @@
 //#define _WIN32_DCOM
-#include <syscfg.h>
+#include <syscfg.h> // Path is project specific.
 #include <Windows.h>
 #include <string>
 

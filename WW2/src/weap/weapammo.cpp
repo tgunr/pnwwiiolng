@@ -626,7 +626,7 @@ logTimerBeginMacro();
                     break;
                     case WEAP_AMMOVAR_HITEFFECT_TYPE:
                         {
-                            strncpy(AmmoType->hiteffect, (char*)VarContents, 31);
+                            strsafecpy(AmmoType->hiteffect, (char*)VarContents);
                             break;
                         }
 					case WEAP_AMMOVAR_MODELCMX:
@@ -3448,8 +3448,8 @@ static UINT32 _DoShapedCharge(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FLOAT6
 	AmmoType.ExplosiveEnergy = Ammo->AmmoType->ExplosiveEnergy;
 	AmmoType.Diameter = Ammo->AmmoType->Diameter;
 	AmmoType.SubType = Ammo->AmmoType->SubType;
-	strncpy(AmmoType.ExplosionNameFar, Ammo->AmmoType->ExplosionNameFar,  63);
-    strncpy(AmmoType.ExplosionNameNear,Ammo->AmmoType->ExplosionNameNear, 63);
+	strsafecpy(AmmoType.ExplosionNameFar, Ammo->AmmoType->ExplosionNameFar);
+	strsafecpy(AmmoType.ExplosionNameNear,Ammo->AmmoType->ExplosionNameNear);
 
 	ShapeChargeAmmo.AmmoType = &AmmoType;
 
@@ -4051,8 +4051,7 @@ static LOGICAL _DoProjectileUpdate(weapAmmo* Ammo, FLOAT64VECTOR const* PrevPos,
 
 	if(oldPos == newPos)	return false;
 
-	FASTCOLLIDE CollideList[_MAX_NUM_OF_COLLISIONS];
-	memset(CollideList, 0x0, sizeof(CollideList));
+	FASTCOLLIDE CollideList[_MAX_NUM_OF_COLLISIONS]{};
 
 	UINT32 NumCollisions = _GetProjectileCollisions(Ammo, Ammo->Flags, CollideList, _MAX_NUM_OF_COLLISIONS, &oldPos, &newPos, DeltaTime, CurrentTime);
 	if(NumCollisions <= 0)

@@ -462,9 +462,8 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 		Write_Debug("Unable to allocate memory for autogun");
 		return FALSE;
 	}
-	memset(AG,0,sizeof(trnAutoGun));
 
-	AG->Weapon = new weapWeapon;
+	AG->Weapon = new weapWeapon{};
 	if (AG->Weapon == nullptr)
 	{
 		Write_Debug("Unable to allocate weapon space memory for autogun");

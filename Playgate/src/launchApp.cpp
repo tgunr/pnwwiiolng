@@ -123,8 +123,10 @@ static SINT32 _RecievePlayGateOk(ACTION_OBJECT *a)
 SINT32 launchAppVerify(SINT32 Connection, APP_VERIFY *AppVerify)
 {
 APP_LAUNCH_REQ LaunchRequest;
+#ifndef IGNORE_REGISTRY
 SINT32         NumberOfInstances;
 UINT32         CurrentVer;
+#endif
 
 	loginData.GetUsernameAsUTF8(LaunchRequest.username, sizeof(LaunchRequest.username));
 	loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password)-1);

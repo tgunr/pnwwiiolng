@@ -268,10 +268,10 @@ wwiiPlayer::SetDispatch(const Auth::Dispatch& rhs, UINT32 overridingCustomerID)
 {
 	m_dispatch.m_customerID = (overridingCustomerID) ? overridingCustomerID : rhs.m_customerID;
 	m_dispatch.m_OTP = rhs.m_OTP;
-	strncpy(m_dispatch.m_callsign, rhs.m_callsign, sizeof(m_dispatch.m_callsign));
-	m_dispatch.m_callsign[sizeof(m_dispatch.m_callsign) - 1] = 0;
 	m_dispatch.m_clientIP = rhs.m_clientIP;
 	m_dispatch.m_appVersion = rhs.m_appVersion;
+	m_dispatch.m_platform = rhs.m_platform;
+	strsafecpy(m_dispatch.m_callsign, rhs.m_callsign);
 }
 
 //////////////////////////////////////////////////////////////////////

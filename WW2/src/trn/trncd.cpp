@@ -755,9 +755,8 @@ static UINT32 _GetNewCDTerrainObject(trnCDTerrainObject** TerrainObject)
     {
         *TerrainObject = freeToObjects.front();
         freeToObjects.pop_front();
-    }
-
-	memset(*TerrainObject, 0, sizeof(trnCDTerrainObject));
+		memset(*TerrainObject, 0, sizeof(trnCDTerrainObject));
+	}
 
 	if(_AddToListHead(*TerrainObject) == 1)
 	{
@@ -6252,7 +6251,7 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
         return FALSE;
 
 	piVECTOR OldPos,NewPos;
-	FASTCOLLIDE CollisionList[32];
+	FASTCOLLIDE CollisionList[32]{};
 	FASTCOLLIDE * CollideListPtr;
 	UINT32 TempNum;
 	UINT32 NumCollides;
@@ -6268,8 +6267,6 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
 
 	TempNum = 32;
 	CollideListPtr = CollisionList;
-
-	memset (CollisionList, 0, sizeof (CollisionList));
 
 	NumCollides = 0;
 

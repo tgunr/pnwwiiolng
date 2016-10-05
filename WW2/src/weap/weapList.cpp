@@ -203,10 +203,6 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 {
 	WEAPON_SPEC weap = NULL_WEAP_SPEC;
 	SINT32 wType;
-	char sCountry[WEAP_IDENT_SIZE+1]
-		,sCategory[WEAP_IDENT_SIZE+1]
-		,sClass[MAX_CLASS_NAME_LEN]
-		;
 
 	const char* const sType = strstr(weapString, ".");
 
@@ -224,16 +220,13 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 	if (tempString < weapString)
 		return NULL_WEAP_SPEC;
 
-	memset(sClass,0,MAX_CLASS_NAME_LEN);
-	memset(sCountry,0,WEAP_IDENT_SIZE+1);
-	memset(sCategory,0,WEAP_IDENT_SIZE+1);
-
+	char sClass[MAX_CLASS_NAME_LEN + 1] = "";
 	if (tempString != nullptr)
 	{
 		tempString++;
 
 		size_t sClassLen = sType - tempString;
-		strncpy(sClass, tempString, std::min(sizeof(sClass), sClassLen));
+		strncpy(sClass, tempString, std::min(sizeof(sClass) - 1, sClassLen));
 
 		if (! strncmp(sClass,"null",MAX_CLASS_NAME_LEN) )
 			weap.wClass = 0;
@@ -243,13 +236,15 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 		tempString -= WEAP_IDENT_SIZE;
 		if (tempString >= weapString)
 		{
-			memcpy(sCategory,tempString,WEAP_IDENT_SIZE);
+			char sCategory[WEAP_IDENT_SIZE + 1] = "";
+			memcpy(sCategory, tempString, WEAP_IDENT_SIZE);
 			weap.wCategory = weapFindCategory(sCategory).wCategory;
 
 			tempString -= WEAP_IDENT_SIZE;
 			if (tempString >= weapString)
 			{
-				memcpy(sCountry,tempString,WEAP_IDENT_SIZE);
+				char sCountry[WEAP_IDENT_SIZE + 1] = "";
+				memcpy(sCountry, tempString, WEAP_IDENT_SIZE);
 				weap.wCountry = weapFindCountryFromCode(sCountry).wCountry;
 			}
 		}
@@ -258,15 +253,15 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 	}
 	else
 	{
-		size_t sClassLen = sType - weapString;
+		size_t sClassLen = std::min((size_t)(sType - weapString), sizeof(sClass) - 1);
 		strncpy(sClass, weapString, sClassLen);
+		sClass[sClassLen] = 0;
 		weap.wClass = weapFindClass(sClass).wClass;
 		weap.wCategory = 0;
 		weap.wCountry = 0;
 
 		return weap;
 	}
-
 }
 
 WEAPON_SPEC
@@ -461,8 +456,8 @@ WEAPON::WEAPON(const WEAPON_SPEC withSpec
 	, alertDist2((UINT64)AlertDist * (UINT64)AlertDist)
 	, m_modified(false)
 {
-	strncpy(name, Name, MAX_WEAP_NAME_LEN);
-	strncpy(fullName, Name, MAX_WEAP_NAME_LEN);
+	strsafecpy(name, Name);
+	strsafecpy(fullName, Name);
 	strlwr(name);
 
 	memset(bias, 0, sizeof(bias));

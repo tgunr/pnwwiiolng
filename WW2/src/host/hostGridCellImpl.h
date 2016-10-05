@@ -52,11 +52,7 @@ class Cell
 {
 public:
 	Cell(const Key& key, CellHash& inHash);
-#ifndef ENABLE_TESTS
-	~Cell();
-#else
 	virtual ~Cell();
-#endif
 
 public:
 	/// Time unoccupied cells hang around after emptying.

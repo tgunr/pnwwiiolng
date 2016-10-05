@@ -611,7 +611,7 @@ static void _calculateCamPos(Vec3d& camPos, Vec3d& lookAt, UINT32 maxLOS)
 	if(strcmp(lastDebug, debug))
 	{
 		uiChatPrintLine(debug);
-		strncpy(lastDebug, debug, 255);
+		strsafecpy(lastDebug, debug);
 	}
 	*/
 }

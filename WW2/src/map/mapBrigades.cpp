@@ -155,7 +155,7 @@ Brigade::addPlayer(Player* const player)
 
 	// Ok - this is where they should be added then
 	m_currentMembers.insert(it, std::make_pair(player->playerID(), player));
-	m_players = m_currentMembers.size();
+	m_players = (UINT16)m_currentMembers.size();
 
 	// Are they an officer?
 	if ( player->useRank().commissioned() )
@@ -188,7 +188,7 @@ Brigade::removePlayer(Player* const player)
 	m_currentMembers.erase(player->playerID());
 	m_currentOfficers.erase(player);
 
-	m_players = (m_currentMembers.empty()) ? 0 : m_currentMembers.size();
+	m_players = (UINT16)m_currentMembers.size();
 	updateOfficers();
 }
 

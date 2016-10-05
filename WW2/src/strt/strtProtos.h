@@ -5,7 +5,6 @@ class Brigade;
 class CPStruct;
 class EWSReport;
 class FacilityStruct;
-struct FULL_OBJ_ID;
 class HCUnit;
 class LinkStruct;
 class ObjectStruct;

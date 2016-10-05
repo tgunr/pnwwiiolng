@@ -290,48 +290,14 @@ struct	OBJECT*	obmgrCreateModelInstance(const char* modelName, const piMATRIX& t
 }
 
 
-/************************************************************************************************
-	PoolNode
-*************************************************************************************************/
-PoolNode::PoolNode()
+PoolNode::~PoolNode() noexcept
 {
-	parent = nullptr;
-	sibling = nullptr;
-	child = nullptr;
-	attached = nullptr;
-
-	memset(name, 0, sizeof(char)*32);
-	flags = 0;
-	flag2 = 0;
-    flag3 = 0;
-    vboid = -1;
-
-	objdata = nullptr;
-	vertices = nullptr;
-	indices = nullptr;
-	faceNormals = nullptr;
-	collisionNormals = nullptr;
-	dof = nullptr;
-	comment = nullptr;
-	texid = matid = -1;
-
-	meshContext = nullptr;
-    material = nullptr;
-	collider = nullptr;
-}
-
-PoolNode::~PoolNode()
-{
-	if(collider)
-		delete collider;
+	delete collider;
 
 // This is a bit recursive, but we're not using too much stack space here
-	if(sibling)
-		delete sibling;
-	if(attached)
-		delete attached;
-	if(child)
-		delete child;
+	delete sibling;
+	delete attached;
+	delete child;
 
 	if(objdata)
 		memFree(objdata);
@@ -347,8 +313,7 @@ PoolNode::~PoolNode()
 		memFree(dof);
 
 #if(0) //strpool
-	if(comment)
-		delete [] comment;
+	delete [] comment;
 #endif
 
 	if(meshContext)
@@ -862,7 +827,7 @@ void PoolNode::load(PoolModel* model, int fd)
 // still be the same total number of function calls, just less stack space used.
 	if(siblingOffset)
 	{
-		node = new PoolNode;
+		node = new PoolNode{};
 		node->parent = parent;
 
 		sibling = node;
@@ -871,7 +836,7 @@ void PoolNode::load(PoolModel* model, int fd)
 
 	if(attachedOffset)
 	{
-		node = new PoolNode;
+		node = new PoolNode{};
 		node->parent = (parent->attached == this) ? parent : this;
 
 		attached = node;
@@ -880,7 +845,7 @@ void PoolNode::load(PoolModel* model, int fd)
 
 	if(childOffset)
 	{
-		node = new PoolNode;
+		node = new PoolNode{};
 		node->parent = this;
 
 		child = node;
@@ -1224,7 +1189,7 @@ void PoolNode::load(PoolModel* model, int fd)
 // still be the same total number of function calls, just less stack space used.
 	if(siblingOffset)
 	{
-		node = new PoolNode;
+		node = new PoolNode{};
 		node->parent = parent;
 
 		sibling = node;
@@ -1233,7 +1198,7 @@ void PoolNode::load(PoolModel* model, int fd)
 
 	if(attachedOffset)
 	{
-		node = new PoolNode;
+		node = new PoolNode{};
 		node->parent = (parent->attached == this) ? parent : this;
 
 		attached = node;
@@ -1242,7 +1207,7 @@ void PoolNode::load(PoolModel* model, int fd)
 
 	if(childOffset)
 	{
-		node = new PoolNode;
+		node = new PoolNode{};
 		node->parent = this;
 
 		child = node;
@@ -1813,7 +1778,7 @@ void PoolModel::LoadMDL(const char* path)
 
     this->bounds.set(bounds[0], bounds[1]);
 
-	node = new PoolNode;
+	node = new PoolNode{};
 	node->load(this, fd);
 
     if(modelType == ModelTypes::CLOUD)

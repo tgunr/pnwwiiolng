@@ -927,7 +927,7 @@ MissionPacket::successful(const WEAPON_SPEC weaponSpec) const
 	if ( scoring().kills() > 0 )
 		return true;
 
-	// Vehicles that don't neccessarily get a kill
+	// Vehicles that don't necessarily get a kill
 	if ( weaponSpec.wClass == weap_bomber.wClass || weaponSpec.wClass == weap_truck.wClass )
 		return true;
 
@@ -1798,7 +1798,7 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 		post.brigadeID = unit->unitID();
 		post.missionType = SYSTEM_MISSION;
 		post.postedByID = 1;
-		strcpy(post.posterCallsign, "SYSTEM");
+		strsafecpy(post.posterCallsign, "SYSTEM");
 		post.postedAt = teulTime();
 		post.postAt = teulTime();
 		post.launchAt = teulTime();

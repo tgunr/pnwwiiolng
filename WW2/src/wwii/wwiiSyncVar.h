@@ -42,10 +42,10 @@ public:
 		++m_members;
 	}
 
-	const TeulTimeMS& lastModified() const { return m_lastModified; }
+	TeulTimeMS lastModified() const { return m_lastModified; }
 
 	//! Function to pack member SyncVars, implemented by derived classes.
-	void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPacked, UINT32& changes)
+	void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS lastPacked, UINT32& changes)
 	{
 		return (mode == TEUL_PACK) ? groupPack(a, lastPacked, changes) : groupUnpack(a, lastPacked, changes);
 	}

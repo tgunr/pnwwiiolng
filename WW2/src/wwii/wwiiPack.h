@@ -9,14 +9,14 @@
 
 extern SINT32 wwiiPackBrigadeID(LOGICAL mode, UCHAR* const data, SINT32 offset, UINT32& brigadeID, SINT32 size=0);
 
-extern SINT32 wwiiPackFullObjID(LOGICAL mode, UCHAR* data, SINT32 offset, struct FULL_OBJ_ID* const object, SINT32 /*size*/);
+extern SINT32 wwiiPackFullObjID(LOGICAL mode, UCHAR* data, SINT32 offset, FULL_OBJ_ID* const object, SINT32 /*size*/);
 
 static inline SINT32 wwiiPackCountry(LOGICAL mode, UCHAR* const data, SINT32 offset, WWII_COUNTRY* country, SINT32 /*size*/)
 {
 	return teulPackUINT32(mode, data, offset, (UINT32*)country, 4);
 }
 
-extern SINT32 wwiiPackWeaponSpec(LOGICAL mode, UCHAR* data, SINT32 offset, struct WEAPON_SPEC* const object, SINT32 /*size*/);
+extern SINT32 wwiiPackWeaponSpec(LOGICAL mode, UCHAR* data, SINT32 offset, WEAPON_SPEC* const object, SINT32 /*size*/);
 
 extern SINT32 wwiiPackWeaponSerial(LOGICAL mode, UCHAR* data, SINT32 offset, struct WEAPON_SERIAL* const object, SINT32 /*size*/);
 

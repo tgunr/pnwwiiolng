@@ -331,7 +331,7 @@ bool jsContent::GetData(const char* path, jsContentData* data, bool match)
 			char buf[MAX_CONTENT_VALUE+1];
 			wchar_t wbuf[MAX_CONTENT_VALUE+1];
 
-			strncpy(buf, data->body.c_str(), MAX_CONTENT_VALUE);
+			strsafecpy(buf, data->body.c_str());
 
 			if(!WWII::ConvertChars(buf, wbuf, sizeof(wbuf)))
 				return false;

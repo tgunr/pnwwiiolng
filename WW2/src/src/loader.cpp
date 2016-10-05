@@ -184,10 +184,10 @@ _ircSendMessage(const char* channel, const char* message)
 	char channelName[128];
 	if ( channel[0] == '-' )
 	{
-		sprintf(channelName, "#%s%s", cv_clusterName.GetString(), channel);
+		strprintf(channelName, "#%s%s", cv_clusterName.GetString(), channel);
 	}
 	else
-		strcpy(channelName, channel);
+		strsafecpy(channelName, channel);
 
 	irc_cmd_msg(ircSession, channelName, message);
 }
@@ -199,12 +199,12 @@ _ircStart()
 		return;
 
 	char message[80 + sizeof(g_origin)];
-	sprintf(message, "%s terrain: importing new terrain from %s", cv_clusterName.GetString(), g_origin);
+	strprintf(message, "%s terrain: importing new terrain from %s", cv_clusterName.GetString(), g_origin);
 	_ircSendMessage("-sys,#servers", message);
 }
 
 static void
-_ircFinish(const TeulTimeMS& timeTaken)
+_ircFinish(TeulTimeMS timeTaken)
 {
 	if ( ircThread == nullptr || ircSession == nullptr || ircConnected == false )
 		return;

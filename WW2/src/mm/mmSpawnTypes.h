@@ -180,7 +180,7 @@ struct FE_JOIN_PERM_KILL
 struct FE_CLIENT_SPAWN
 {
 	WEAPON_SERIAL	weaponSerial;
-	UCHAR			wantMobileSpawn;
+	bool			wantMobileSpawn;
 };
 
 //This is the notification that the front end gets when it is spawning

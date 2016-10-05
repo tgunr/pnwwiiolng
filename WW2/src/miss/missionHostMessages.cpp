@@ -275,8 +275,6 @@ MissionDetail::populate(const Mission* mission, bool isCurrent, bool isLeader, U
 {
 	MissionSynopsis::populate(mission, isCurrent, isLeader, mission->numTakers());
 	strsafecpy(m_desc, mission->m_desc);
-//	strncpy(m_desc, mission->m_desc, MISSION_DESC_LENGTH);
-//	m_desc[MISSION_DESC_LENGTH] = 0;
 	m_timeLaunch = std::max(mission->summary().timeLaunch, withLaunchDelay);
 	m_brigadeID = mission->brigade()->brigadeID();
 }

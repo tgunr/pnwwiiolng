@@ -342,7 +342,7 @@ strtSyncCPs(UINT32 address, UINT16 port, Supercell* sc)
 		//Make the message
 		for ( i = 0, f = startID; i < syncCPs.numEntries; ++i, ++f)
 		{
-			register CPStruct* cp = &sc->cps[f];
+			CPStruct* cp = &sc->cps[f];
 			syncCPs.info[i].uOID = cp->uOID;
 			syncCPs.info[i].owner = (UCHAR) cp->country;
 			syncCPs.info[i].control = (UCHAR) cp->controllingCountry;

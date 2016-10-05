@@ -110,10 +110,9 @@ bool KeymapView::MakeFocus(bool focus)
 void KeymapView::DrawSelf()
 {
 	char lookup[MAX_LOOKUP+1];
-	imap_keymap keymap;
+	imap_keymap keymap{};
 
 	// make sure we're starting from scratch
-	memset(&keymap, 0x0, sizeof(imap_keymap));
 	*lookup = 0;
 
 	if(isaxis && keyidx == 0)

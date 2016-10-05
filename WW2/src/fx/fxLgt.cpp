@@ -59,9 +59,6 @@ LOGICAL fxLgtInit()
     if(g_lpLgts == nullptr)
         return FALSE;
 
-//	Uneccessary -- memAlloc = calloc
-//    memset(g_lpLgts, 0, sizeof(FXLIGHTS) * DEF_FXLGT_MAX_LIGHTS);
-
     memset(&g_lgtHead, 0, sizeof(FXLIGHTS));
     memset(&g_lgtTail, 0, sizeof(FXLIGHTS));
 

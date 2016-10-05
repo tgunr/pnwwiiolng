@@ -467,7 +467,7 @@ EWSReport::EWSReport(UINT32 weaponSerial, FacilityStruct* facility, UINT8 side, 
 	, m_side(side)
 	, m_weapCategory(weapCategory)
 {
-	register CPStruct* cp = m_facility->cp;
+	CPStruct* cp = m_facility->cp;
 	assert(cp != nullptr);
 
 	// Adjust the facility counters
@@ -490,7 +490,7 @@ EWSReport::EWSReport(UINT32 weaponSerial, FacilityStruct* facility, UINT8 side, 
 
 EWSReport::~EWSReport()
 {
-	register CPStruct* cp = m_facility->cp;
+	CPStruct* cp = m_facility->cp;
 	assert(cp != nullptr);
 
 	dbugLog(_FLD, "ews: deleting report for %d at %s", m_weapon, cp->name);

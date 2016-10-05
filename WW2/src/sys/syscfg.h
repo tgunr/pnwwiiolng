@@ -1,4 +1,3 @@
-
 #ifndef PN_PROJECT_SYSCFG_H
 #define PN_PROJECT_SYSCFG_H 1
 // Can't use a pragma guard, because there are multiple syscfgs.

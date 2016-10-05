@@ -64,7 +64,7 @@ _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 
 //	mysql_set_character_set(tempConn, "utf8");
 
-	return(tempConn);
+	return tempConn;
 }
 
 // ------ Public Functions

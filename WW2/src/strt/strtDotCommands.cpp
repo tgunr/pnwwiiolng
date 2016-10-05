@@ -1289,36 +1289,36 @@ _dotDebugSupply(char* arguments, OOBMessage& message)
 static LOGICAL
 _dotForceFBs(char* arguments, OOBMessage& message)
 {
-	LOGICAL doAll = FALSE;					// Whether or not to do all firebases
-	LOGICAL opening = TRUE;				// Open is the default
-	UINT32 affected = 0;					// How many FBs we affected
+	bool doAll = false;					// Whether or not to do all firebases
+	bool opening = true;				// Open is the default
+	UINT32 affected = 0;				// How many FBs we affected
 	CPStruct* cp;
 	FacilityStruct* fb;
 
 	if ( arguments != nullptr && strcasecmp(arguments, "all") == 0 )
 	{
 		cp = strtGetCPList();
-		doAll = TRUE;
+		doAll = true;
 	}
 	else
 	{
 		cp = _getCPByArguments(arguments, message, false);
 		if ( cp == nullptr )
-			return FALSE;
+			return false;
 	}
 
 	if ( tolower(message.m_text[0]) == 'c' )
-		opening = FALSE;
+		opening = false;
 
 	if ( arguments && strcmp(arguments, "all") == 0 )
 	{
-		doAll = TRUE;
+		doAll = true;
 	}
 
 	for (; cp != nullptr; cp = cp->next )
 	{
 		// Find all matching CPs (or 'all' cps)
-		if ( doAll == FALSE && strcasecmp(arguments, cp->name) != 0 )
+		if ( doAll == false && arguments && strcasecmp(arguments, cp->name) != 0 )
 			continue;
 
 		for ( fb = cp->facilityTypeIndex[FACILITY_FIREBASE]; fb != nullptr; fb = fb->typeNext )
@@ -2205,8 +2205,8 @@ _dotRunLua(char* arguments, OOBMessage& message)
 	{
 		static const UINT32 FILENAME_SIZE = 160;
 		char filename[FILENAME_SIZE+1];
-		if ( publicMode ) snprintf(filename, FILENAME_SIZE, "%s" "/public/%s.lua", cv_luaPath.GetString(), script);
-		else snprintf(filename, FILENAME_SIZE, "%s" "/%s.lua", cv_luaPath.GetString(), script);
+		if ( publicMode ) strprintf(filename, "%s" "/public/%s.lua", cv_luaPath.GetString(), script);
+		else strprintf(filename, "%s" "/%s.lua", cv_luaPath.GetString(), script);
 		success = Lua::RunScript(filename);
 	}
 

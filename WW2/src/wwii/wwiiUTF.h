@@ -66,22 +66,22 @@ namespace WWII
 	//! @param[in]	sizeofTarget_inBytes	Size of 'target' in bytes (not wchars) including terminating zero.
 	//! @return false if source contains invalid characters or target is not large enough to contain UTF8 encoded version of source.
 	//! @warning sizeOfTarget is in BYTES and must include the terminating zero.
-	extern bool ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_inBytes);
+	extern bool ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_inBytes) noexcept;
 
 	//! Convert a UTF8 char* string to UTF16/32 wchar_t* characters.
 	//! @param[in]	source		Pointer to source string.
 	//! @param[out]	target		Pointer to destination buffer.
 	//! @param[in]	sizeofTarget_inBytes	Size of 'target' in bytes (not wchars) including terminating zero.
 	//! @return false if source contains invalid characters or target is not large enough to contain wchart_t encoded version of source.
-	extern bool ConvertChars(const char* source, wchar_t* target, size_t sizeofTarget_inBytes);
+	extern bool ConvertChars(const char* source, wchar_t* target, size_t sizeofTarget_inBytes) noexcept;
 
 	//! Check if a UTF8 sequence of characters is legal.
 	//! @param[in] source		Pointer to characters.
 	//! @return true/false whether source points to a valid UTF8 character.
-	extern bool IsLegalUTF8(const char* source);
+	extern bool IsLegalUTF8(const char* source) noexcept;
 
 	//! Advances "source" beyond any leading whitespace.
 	//! @param	source			References a pointer to the source character string. The specified pointer is modified.
 	//! @return false if we reach an invalid character/sequence.
-	extern bool SkipWhitespace(const char*& source);
+	extern bool SkipWhitespace(const char*& source) noexcept;
 }

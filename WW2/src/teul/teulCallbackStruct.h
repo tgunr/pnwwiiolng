@@ -61,7 +61,7 @@ struct TEUL_CALLBACK
 	ACTION_FN	m_recvAction;		// how to receive data
 
 	UINT8			m_callX;		// the X and Y position in the callback matrix
-	UINT8           m_callY;        // the developer gets a pointer to obj,
+	UINT8			m_callY;		// the developer gets a pointer to obj,
 
 	const char      *m_callXName;
 	const char      *m_callYName;

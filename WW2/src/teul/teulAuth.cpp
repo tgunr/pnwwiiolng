@@ -163,14 +163,14 @@ static inline void
 _populateDispatch(UINT32 ipAddress, const PLAYER_LOGIN& login, const OTP_NODE* otpNode, Auth::Dispatch& dispatch)
 {
 	dispatch.m_customerID = otpNode->customerID;
-	strncpy(dispatch.m_callsign, otpNode->handle, sizeof(dispatch.m_callsign));
 	dispatch.m_clientIP = ipAddress;
 	dispatch.m_OTP = login.OTP;
 	dispatch.m_appVersion = login.appVersion;
+	strsafecpy(dispatch.m_callsign, otpNode->handle);
 }
 
 //////////////////////////////////////////////////////////////////////
-// Handle a regular initial login and populate the data as neccessary
+// Handle a regular initial login and populate the data as necessary
 
 static SINT32
 _processLoginData(const UINT32 ipAddress, const PLAYER_LOGIN login, const OTP_NODE* otpNode, Auth::Dispatch& dispatch)
@@ -512,7 +512,7 @@ SINT32 _openSend(APID appID, UINT32 arenaID, UINT32 hostVersion, UINT32 authHost
 	game.maxUsers = maxUsers;
 	game.port = localPort;
 	game.ipAddress = localAddress;
-	strcpy(game.hello,"Hello!");
+	strsafecpy(game.hello, "Hello!");
 
 	_authConnection = teulOpenSend(_authHost, _authPort, _authOpened, CONNECT_TIMEOUT, PROTOCOL_TCP, _authErrorFn);
 	_timeOpen.makeCurrent();

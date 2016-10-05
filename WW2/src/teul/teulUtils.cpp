@@ -107,7 +107,7 @@ const char*
 teulGetAddress(const UINT32 host, char* buffer, const size_t bufferSize)
 {
 	const char* p = teulGetAddress(host);
-	strncpy(buffer, p, bufferSize);
+	strsafecpy(buffer, p, bufferSize);
 	return buffer;
 }
 #endif

@@ -17,7 +17,7 @@ var files = [
 ] ;
 
 function rxStatus(data) {
- var types = [ 'Auth', 'Cell', 'Map', 'Chat' ] ;
+ var types = [ 'Controller', 'Auth', 'Dbd', 'Strat', 'Chat', 'Map', 'Cell', ] ;
  var str = "" ;
  var myHost = types[data.type] ;
  $('#html-list').html('') ;

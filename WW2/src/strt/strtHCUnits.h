@@ -15,7 +15,6 @@
 
 class CPStruct;
 struct STRAT_UPDATE;
-struct WEAPON_SPEC;
 class FacilityStruct;
 class LinkStruct;
 struct POSTED_WEAPON;

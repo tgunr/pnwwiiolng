@@ -2,7 +2,6 @@
 // Wrapper functions for C->Lua function calls.
 
 // Queries
-struct WEAPON_SPEC;
 class FacilityStruct;
 class CPStruct;
 class StratHCUnit;

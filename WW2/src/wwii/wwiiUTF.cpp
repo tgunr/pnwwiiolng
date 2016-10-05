@@ -99,7 +99,7 @@ static const UTF8 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC 
 /* --------------------------------------------------------------------- */
 
 bool
-WWII::ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_InBytes)
+WWII::ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_InBytes) noexcept
 {
 	assert( source != nullptr );
 	assert( target != nullptr );
@@ -177,7 +177,7 @@ WWII::ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_InBy
  */
 
 bool
-WWII::IsLegalUTF8(const char* const source)
+WWII::IsLegalUTF8(const char* const source) noexcept
 {
 	const int length = WWII::BytesFromCharacter[(UTF8)*source];
 	UTF8 a;
@@ -210,7 +210,7 @@ WWII::IsLegalUTF8(const char* const source)
 // If we advance to an invalid character, returns false.
 
 bool
-WWII::SkipWhitespace(const char*& source)
+WWII::SkipWhitespace(const char*& source) noexcept
 {
 	assert( source != nullptr );
 
@@ -229,7 +229,7 @@ WWII::SkipWhitespace(const char*& source)
 /* --------------------------------------------------------------------- */
 
 bool
-WWII::ConvertChars(const char* source, wchar_t* target, size_t sizeofTarget_InBytes)
+WWII::ConvertChars(const char* source, wchar_t* target, size_t sizeofTarget_InBytes) noexcept
 {
 	assert( source != nullptr );
 	assert( target != nullptr );

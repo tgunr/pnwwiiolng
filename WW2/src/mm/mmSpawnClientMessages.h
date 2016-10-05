@@ -43,7 +43,7 @@ extern SINT32 mmSendJoinPermKill(SINT32 connection, UINT32 joinRequestID);
 extern SINT32 mmSendVehicleCancel(SINT32 connection, const WEAPON_SERIAL& weaponSerial);
 
 //this function sends a client spawn
-extern SINT32 mmSendClientSpawn(SINT32 connection, const WEAPON_SERIAL& weaponSerial, LOGICAL wantMobileSpawn);
+extern SINT32 mmSendClientSpawn(SINT32 connection, const WEAPON_SERIAL& weaponSerial, bool wantMobileSpawn);
 
 //this function sends for a list of joiners (crew) and puts the commander lists for
 //joiners to see.

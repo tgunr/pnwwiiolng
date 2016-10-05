@@ -4660,10 +4660,8 @@ static SINT32 dot_builder(const char* line)
     }
     else
     {
-        char buff[32];
-        memset(buff, 0, 32);
-
-        sprintf(buff, id < 10 ? "builder00%d" : id < 20 ? "builder0%d" : "builder%d", id);
+		char buff[32]{};
+        strprintf(buff, id < 10 ? "builder00%d" : id < 20 ? "builder0%d" : "builder%d", id);
 
         func = "onbuilder('";
         func += buff;
@@ -5330,15 +5328,14 @@ typedef struct
 
 static void _ValidateVehHit(vehType const* vehtype)
 {
+	if(!vehtype) return;
+
 	OBJECT* PlaneObject = nullptr, *hitmap, *obj;
-	char str[256] = "\0";
-	hitmapNameList list;
+	char str[256] = { 0 };
+	hitmapNameList list{};
 	int fd, i;
 	FILE* f;
 	LOGICAL found;
-
-	if(!vehtype) return;
-	memset(&list, 0x0, sizeof(list));
 
 	obmgrCreateModelInstance((char*)vehtype->Shape);
 	PlaneObject = obmainFindNamedObject((char*)vehtype->Shape);
@@ -5415,14 +5412,13 @@ static void _ValidateVehHit(vehType const* vehtype)
 
 static void _ValidateVehCmp(vehType const* vehtype)
 {
-	char str[256] = "\0";
-	hitmapNameList list;
+	if (!vehtype) return;
+
+	char str[256] = { 0 };
+	hitmapNameList list{};
 	int fd, i;
 	FILE* f;
 	LOGICAL found;
-
-	if(!vehtype) return;
-	memset(&list, 0x0, sizeof(list));
 
 	snprintf(str, 255, "%s.validcmp", vehtype->Id);
 	f = fopen(str, "w");

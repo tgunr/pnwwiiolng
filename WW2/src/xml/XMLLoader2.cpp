@@ -4,18 +4,13 @@
 
 const char* xmlTrimString(const char* value)
 {
-	static char buffer[MAX_XML_TRIM_SIZE+1];
-	static char* trimmed;
+	static char buffer[MAX_XML_TRIM_SIZE + 1]{};
 
-	memset(buffer, 0, MAX_XML_TRIM_SIZE+1);
-
-	if(value && strlen(value))
-		strncpy(buffer, value, MAX_XML_TRIM_SIZE);
-
-	trimmed = buffer;
-
-	//return rmlead(rmtrail(trimmed));
-	return trimmed;
+	if (value && value[0]) {
+		strsafecpy(buffer, value);
+		return rmlead(rmtrail(buffer));
+	}
+	return "";
 }
 
 bool xmlGetNodeValue(xmlNode* node, XML_DATA_TYPE type, void* value, const char* attribute)

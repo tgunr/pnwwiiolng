@@ -208,6 +208,7 @@ static void _createCollider(CTree* tree)
     }
 }
 
+#ifndef VIEW_DEMO_TREES
 /*------------------------------------------------------------------------
 Module: loadDirectory
 Description: For Debugging usage in loading SpeedTree demo trees
@@ -246,6 +247,7 @@ static void loadDirectory(const std::string& dir)
 
 #endif
 }
+#endif
 
 /*------------------------------------------------------------------------
 Module: loadTrees

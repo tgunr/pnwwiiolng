@@ -1099,9 +1099,9 @@ LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
 
 	const char* ptr = strrchr(objname, '\\');
 	if (ptr != nullptr)
-		strcpy(newname, ++ptr);
+		strsafecpy(newname, ++ptr);
 	else
-		strcpy(newname, objname);
+		strsafecpy(newname, objname);
 
 	OBJECT* masterObj, *newobj;
 	masterObj = newobj = obmainFindTopmostObject(newname);
@@ -1139,7 +1139,7 @@ LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
 		}
 	}
 
-	sprintf(newname, "%s_%d_%d", newname, (int)pos->x, (int)pos->y);
+	strprintf(newname, "%s_%d_%d", newname, (int)pos->x, (int)pos->y);
 	assert ( strlen(newname) < sizeof(newobj->name) );
 	strcpy(newobj->name, newname);
 	*objRefName = newobj->name;

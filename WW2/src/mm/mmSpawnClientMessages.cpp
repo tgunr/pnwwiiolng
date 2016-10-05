@@ -251,10 +251,7 @@ mmSendPostRequest(SINT32 connection, const FULL_OBJ_ID facility, const WEAPON_SP
 SINT32
 mmSendPostListRequest(SINT32 connection, const FULL_OBJ_ID facility)
 {
-	FE_POST_LIST_REQUEST postListRequest;
-
-	postListRequest.facility = facility;
-
+	FE_POST_LIST_REQUEST postListRequest{ facility };
 	return teulSend(connection, MM_SEND_FE_POST_LIST_REQ, &postListRequest);
 }
 
@@ -262,10 +259,7 @@ mmSendPostListRequest(SINT32 connection, const FULL_OBJ_ID facility)
 SINT32
 mmSendJoinRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial)
 {
-	FE_JOIN_REQUEST joinRequest;
-
-	joinRequest.weaponSerial = weaponSerial;
-
+	FE_JOIN_REQUEST joinRequest{ weaponSerial };
 	return teulSend(connection, MM_SEND_FE_JOIN_REQ, &joinRequest);
 }
 
@@ -285,10 +279,7 @@ mmSendRequestCrew(SINT32 connection, const WEAPON_SERIAL& weaponSerial, UINT32 n
 SINT32
 mmSendAcceptCrew(SINT32 connection, UINT32 joinRequestID)
 {
-	FE_CREW_ACCEPT joinPermResponse;
-
-	joinPermResponse.joinRequestID = joinRequestID;
-
+	FE_CREW_ACCEPT joinPermResponse{ joinRequestID };
 	return teulSend(connection, MM_SEND_FE_CREW_ACCEPT, &joinPermResponse);
 }
 
@@ -296,9 +287,7 @@ mmSendAcceptCrew(SINT32 connection, UINT32 joinRequestID)
 SINT32
 mmSendJoinPermKill(SINT32 connection, UINT32 joinRequestID)
 {
-	FE_JOIN_PERM_KILL killJoin;
-
-	killJoin.joinRequestID = joinRequestID;
+	FE_JOIN_PERM_KILL killJoin{ joinRequestID };
 	return teulSend(connection, MM_SEND_FE_JOIN_PERM_KILL, &killJoin);
 }
 
@@ -308,19 +297,16 @@ mmSendVehicleCancel(SINT32 connection, const WEAPON_SERIAL& weaponSerial)
 {
 	FE_POST_CANCEL cancelPost;
 
+	///TODO: What about cancelPost.facility?
 	cancelPost.weaponSerial = weaponSerial;
 	return teulSend(connection, MM_SEND_FE_POST_CANCEL, &cancelPost);
 }
 
 //this function sends a client spawn
 SINT32
-mmSendClientSpawn(SINT32 connection, const WEAPON_SERIAL& weaponSerial, LOGICAL wantMobileSpawn)
+mmSendClientSpawn(SINT32 connection, const WEAPON_SERIAL& weaponSerial, bool wantMobileSpawn)
 {
-	FE_CLIENT_SPAWN clientSpawn;
-
-	clientSpawn.weaponSerial = weaponSerial;
-	clientSpawn.wantMobileSpawn = wantMobileSpawn;
-
+	FE_CLIENT_SPAWN clientSpawn{ weaponSerial, wantMobileSpawn };
 	return teulSend(connection, MM_SEND_FE_CLIENT_SPAWN, &clientSpawn);
 }
 

@@ -471,10 +471,8 @@ UINT32 Size;
 	}
 
 	*EngineList = (mlEngineList*)memAlloc(sizeof(mlEngineList));
-	memset(*EngineList,0,sizeof(mlEngineList));
 	Size = NumEngineTypes * sizeof(mlEngineData);
 	(*EngineList)->EngineData = (mlEngineData*)memAlloc(Size);
-	memset((*EngineList)->EngineData,0,NumEngineTypes * sizeof(mlEngineData));
 	(*EngineList)->NumEngines = NumEngineTypes;
 
 	EngineListPos = -1;

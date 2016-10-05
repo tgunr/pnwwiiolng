@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-struct ACTION_OBJECT ;
-
 //! @namespace Instance
 //! @brief Components of the world-instancing system.
 

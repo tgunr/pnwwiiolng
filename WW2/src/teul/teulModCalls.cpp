@@ -512,9 +512,7 @@ _recvError(ACTION_OBJECT* const a)
 SINT32
 teulInitModCallbacks(void)
 {
-	Teul::CallbackInit ci;
-
-	memset(&ci, 0, sizeof(ci));
+	Teul::CallbackInit ci{};
 
 	ci.callX 		= Teul::Module::CallbackX;		// the X position in the callback matrix
 	ci.callXName	= TEUL_PACKET_NAMES ? "TMCALLBACKS_X" : "";

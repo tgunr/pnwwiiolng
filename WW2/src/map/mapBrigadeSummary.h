@@ -50,7 +50,7 @@ static const size_t MAX_LANGUAGES_PER_BRIGADE = 2;
 static const size_t MAX_BRIGADE_NOTES_LENGTH = 400;
 static const size_t MAX_BRIGADE_MOTTO_LENGTH = 40;
 
-// Take aprox 1078 / sizeof a packed brigade summaries
+// Take approx 1078 / sizeof a packed brigade summaries
 static const UINT32 MAX_LISTED_BRIGADES = 88;
 
 // The highest population rank a brigade can have - semi arbitrary number,
@@ -77,6 +77,7 @@ public:
 		, m_active(false), m_missions(0), m_players(0), m_officers(0), m_objectiveCPID(nullObjID), m_mobileSpawns(0), m_canPostHere(false)
 		{ m_languages[0] = 0; }
 
+	virtual ~BrigadeSummary() {}
 
 	// Create from the network
 	explicit BrigadeSummary(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
@@ -154,6 +155,7 @@ public:
 		: BrigadeSummary(withBrigadeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCP, withOwner, withOwnerRank)
 			{ m_motd[0] = m_motto[0] = 0; }
 	BrigadeDetail(UINT32 withBrigadeID=0) : BrigadeSummary(withBrigadeID) { m_motd[0] = m_motto[0] = 0; }
+	virtual ~BrigadeDetail() {}
 
 	// Packer
 	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) override;

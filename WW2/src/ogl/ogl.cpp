@@ -5856,7 +5856,6 @@ TEXTURE3D*		ptex;
 		return(-1);
 	}
 
-	memset(ptex, 0, sizeof(TEXTURE3D) * num);
 	memmove(ptex, texture3Ds, sizeof(TEXTURE3D) * numtexture3Ds);
 	memFree(texture3Ds);
 	texture3Ds = ptex;

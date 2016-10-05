@@ -360,10 +360,7 @@ _recvBuildingVisLevels(ACTION_OBJECT* const a)
 		SupercellVislevelXfer& xfer = *(SupercellVislevelXfer*)ptr;
 		const size_t size = xfer.size_bytes();
 		if ( size == 0 )
-		{
-			ptr = endPtr;
 			break;
-		}
 
 		ptr += size;
 
@@ -493,7 +490,7 @@ SINT32 mapInstallClientCallbacks(void)
 		REGISTER_RECEIVER(Map::XCHG_HCUNIT_LIST_Y, _recvHCUnitList);
 		REGISTER_RECEIVER(Map::ARENA_DESCRIPTION_Y, _recvArenaDescription);
 
-		REGISTER_SENDRECV(Map::XCHG_PERSONA_LIST_Y, _sendPersonaListRequest,_recvPersonaListResponse, _XCHG_PERSONA_LIST);
+		REGISTER_SENDRECV(Map::XCHG_PERSONA_LIST_Y, _sendPersonaListRequest, _recvPersonaListResponse, _XCHG_PERSONA_LIST);
 		REGISTER_SENDRECV(Map::XCHG_PERSONA_SELECT_Y, _sendPersonaSelectRequest, _recvPersonaSelectResponse, _XCHG_PERSONA_SELECT);
 		REGISTER_SENDRECV(Map::XCHG_BRIGADE_LIST_Y, _sendBrigadeListRequest, _recvBrigadeListResponse, _XCHG_BRIGADE_LIST);
 		REGISTER_SENDRECV(Map::XCHG_BRIGADE_SELECT_Y, _sendBrigadeSelectRequest, _recvBrigadeSelectResponse, _XCHG_BRIGADE_SELECT);

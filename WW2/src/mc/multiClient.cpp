@@ -236,7 +236,7 @@ void multiClientUpdate(int wait, bool force)
 		std::string& cmdToRun = _cmdQueue.front();
 
 		char line[255+1];
-		strncpy(line, cmdToRun.c_str(), 255);
+		strsafecpy(line, cmdToRun.c_str());
 
 		// run the command
 		multiClientExecuteCommand(line);
@@ -1189,7 +1189,7 @@ void multiClientInit()
 		ww2::Client::Init();
 
 	char buffer[256+1];
-	strncpy(buffer, "script mc.script q", 256);
+	strsafecpy(buffer, "script mc.script q");
 	multiClientExecuteCommand(buffer, true);
 }
 

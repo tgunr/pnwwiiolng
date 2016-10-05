@@ -1,4 +1,4 @@
-#include <syscfg.h>
+#include <syscfg.h> // Path is project specific.
 /*------------------------------------------------------------------------------------
 Module: glslShader.cpp
 Description:
@@ -168,10 +168,10 @@ void glslShader::CompileShader()
     temp.push_back( 0 );
     const char* s = &temp[0];
     glShaderSource(_shaderhandle, 1, &s, nullptr);
-#else    
+#else
     glShaderSource(_shaderhandle, 1, &sourceText, nullptr);
 #endif
-    
+
     glCompileShader(_shaderhandle);
     glGetShaderiv(_shaderhandle, GL_COMPILE_STATUS, &compiled);
 

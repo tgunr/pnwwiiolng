@@ -18,10 +18,7 @@ LOGICAL syslaunchurl(const char* url, LOGICAL local)
 	// make the url relative to that
 	if(local)
 	{
-		char path[PATH_SIZE+1];
-
-		memset(path, 0x0, sizeof(path));
-
+		char path[PATH_SIZE + 1] = { 0 };
 		if(_getcwd(path, PATH_SIZE))
 		{
 			destination = "file://";

@@ -10,7 +10,6 @@
 
 #include <mutex>
 
-#include "inst/instStateEnums.h"
 #include "inst/instHost.h"
 #include "inst/instHostInstance.h"
 #include "inst/instHostInstanceImpl.h"

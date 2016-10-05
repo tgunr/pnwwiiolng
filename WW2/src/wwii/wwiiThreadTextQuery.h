@@ -59,6 +59,7 @@ private:
 	size_t				m_length;
 	TeulTimeMS			m_commitFrom;	// Timestamp from which we decide whether commit maturity has been reached
 
+public:
 	ThreadTextQuery& operator = (const ThreadTextQuery& rhs) = delete;
 };
 

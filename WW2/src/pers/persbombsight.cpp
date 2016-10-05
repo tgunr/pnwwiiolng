@@ -318,9 +318,7 @@ static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, S
 	}
 
 
-	BSD = (BombSightData*)memAlloc(sizeof(BombSightData));
-	_Data = BSD;
-	memset(_Data,0,sizeof(BombSightData));
+	_Data = BSD = (BombSightData*)memAlloc(sizeof(BombSightData));
 
 	BSD->PivotDOF = PivotDOF;
 	BSD->AltPntDOF = AltPntDOF;

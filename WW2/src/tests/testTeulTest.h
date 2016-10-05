@@ -9,7 +9,7 @@ private:
 	bool m_explicitlySet;
 
 public:
-	typedef std::map<std::string /*name*/, TestItem*> Index;
+	using Index = std::map<std::string /*name*/, TestItem*>;
 	static Index s_index;
 
 public:
@@ -19,7 +19,7 @@ public:
 		, m_enabled(defaultEnabled)
 		, m_explicitlySet(false)
 		{
-			s_index.insert(std::make_pair(m_name, this));
+			s_index.emplace(m_name, this);
 		}
 
 	static TestItem* Lookup(const char* const name_)

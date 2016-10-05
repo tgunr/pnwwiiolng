@@ -37,14 +37,14 @@ namespace Mem
 		}
 
 		//! Free all of our existing allocations.
-		void Cleanup()
+		void Cleanup() noexcept
 		{
 			m_freeList.clear();
 			std::for_each(m_blocks.begin(), m_blocks.end(), [](Type* block) { memFree(block); });
 			m_blocks.clear();
 		}
 
-		~Pool()
+		~Pool() noexcept
 		{
 #if defined(MEMORY_DEBUG)
 			ABORT_IF(m_blocks.empty() == false);
@@ -94,7 +94,7 @@ namespace Mem
 		}
 
 		//! Return a New()'d allocation to the pool.
-		void Delete(Type* ptr)
+		void Delete(Type* ptr) noexcept
 		{
 			ptr->~Type();
 			Free(ptr);
