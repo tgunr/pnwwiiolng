@@ -37,6 +37,7 @@ registryGetSubKey(const char *SubKey, HKEY *Key)
 	return false;
 }
 
+#ifndef IGNORE_REGISTRY
 static bool
 _readWideKey(const wchar_t* SubKey, const wchar_t* Key, wchar_t* Value) 
 {
@@ -54,6 +55,7 @@ _readWideKey(const wchar_t* SubKey, const wchar_t* Key, wchar_t* Value)
 
 	return gotData;
 }
+#endif
 
 static inline void _copyPathToString(const char* name, std::wstring& to, wchar_t* from)
 {
