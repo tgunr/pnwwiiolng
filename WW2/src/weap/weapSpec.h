@@ -31,6 +31,7 @@ struct WEAPON_SPEC
 		wCountry = data >> 8;
 	}
 	WEAPON_SPEC(const WEAPON_SPEC& rhs) : wType(rhs.wType), wClass(rhs.wClass), wCategory(rhs.wCategory), wCountry(rhs.wCountry) {}
+//tolua_end
 	WEAPON_SPEC& operator=(WEAPON_SPEC rhs) {
 		wType = rhs.wType;
 		wClass = rhs.wClass;
@@ -38,6 +39,7 @@ struct WEAPON_SPEC
 		wCountry = rhs.wCountry;
 		return *this;
 	}
+//tolua_begin
 
 	WEAPON_SPEC(UINT32 country_, UINT32 category_, UINT32 class_, UINT32 type_)
 		: wType((UINT8)type_), wClass((UINT8)class_), wCategory((UINT8)category_), wCountry((UINT8)country_)

@@ -34,8 +34,6 @@ typedef std::map<WEAPON_SPEC, TOE_::WeaponInstance> TOE;
 
 extern void strtSaveTOESupplies();
 
-//tolua_begin
-
 namespace TOE_
 {
 
@@ -70,7 +68,6 @@ public:
 	static TemplateHeader* Lookup(const char* id);
 	static TemplateHeader* Lookup(const ChatHandle handle);
 
-//tolua_end
 private:
 	ChatHandle		m_handle;					// packed short name of the template
 	std::string		m_name;						// Longer name of the template
@@ -105,11 +102,9 @@ public:
 	UINT32 resupplyTime() const;
 
 private:
-//tolua_end
 	const WEAPON&	m_weapon;
 	UINT16			m_capacity;			// Automatic resupply level
 	UINT16			m_resupplyTime_m;		// Resupply Time (minutes) or 0 for default
-//tolua_begin
 };
 
 // Provides a specific instance of a use of a WeaponTemplate
@@ -172,7 +167,6 @@ public:
 	UINT16 throttleCapacity() const;
 
 private:
-//tolua_end
 	const WeaponTemplate& m_weaponTemplate;		// Template we're based on
 	StratHCUnit& m_unit;						// StratHCUnit we belong to
 
@@ -185,9 +179,6 @@ private:
 	bool		m_modified;						// The value it was before modifications
 
 	friend void ::strtSaveTOESupplies();
-//tolua_begin
 };
 
 } // namespace TOE
-
-//tolua_end
