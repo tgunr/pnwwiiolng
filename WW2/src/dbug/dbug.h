@@ -17,6 +17,14 @@
 	#include "dbug/dbugWErrno.h"
 #endif
 
+// Can't think of a better place for this.
+// Use to silence one or more warnings about unused parameters.
+template<typename T> constexpr void silence_unused_parameter_warning(T&& t) { void(std::forward<T>(t)); }
+template<typename T, typename... Args>
+constexpr void silence_unused_parameter_warning(T&& t, Args&&... args) {
+	(void)std::forward<T>(t), silence_unused_parameter_warning(std::forward<Args>(args)...);
+}
+
 #if defined(DEBUG) || defined(ALPHA_RELEASE)
 #define  _FL __FILE__, __LINE__
 #else
