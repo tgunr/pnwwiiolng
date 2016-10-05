@@ -215,7 +215,7 @@ void
 Auth::Dispatch::packer(unsigned int mode, ACTION_OBJECT* a)
 {
 	a->packer(mode, &m_customerID, 0);
-	a->packBytes(mode, m_callsign, sizeof(m_callsign));
+	a->bytePacker(mode, m_callsign, sizeof(m_callsign));
 	a->packer(mode, &m_clientIP, 0);
 	a->packer(mode, &m_OTP, 0);
 	a->packer(mode, &m_appVersion, 0);
