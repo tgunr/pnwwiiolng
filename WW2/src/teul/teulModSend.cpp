@@ -203,7 +203,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
 		// Anything but a partial send, the sender handles.
 		if ( PN_UNLIKELY(result < 0) )
-		{	
+		{
 			// If the error was the result of an interruption, then lets just queue the packet
 			// and give it a retry later on.
 			const SINT32 err = dbugGetErrno();
@@ -234,6 +234,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 #else
 	Teul::Packet* const copy = s_delayedPackets.New(packet);
 #endif
+	copy->sentBytes(packet.sentBytes());
 
 	m_impl->m_sendQueue.push_back(copy);
 
