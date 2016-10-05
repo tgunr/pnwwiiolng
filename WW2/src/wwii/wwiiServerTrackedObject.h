@@ -236,13 +236,13 @@ public:
 	const WorldPosition_m& position() const { return m_position; }
 	//! Get the creation timestamp.
 	//! @return millisecond timestamp of when the STO was created.
-	const TeulTimeMS& created() const { return m_created; }
+	TeulTimeMS created() const { return m_created; }
 	//! Get the client specific flags.
 	//! @return client-specific flags.
 	UINT32 flags() const { return m_flags; }
 	//! Returns the unique ID of the STO's instance.
 	//! @return unique ID of the instance.
-	const instanceid_t instanceID() const { return m_instanceID; }
+	instanceid_t instanceID() const { return m_instanceID; }
 	//! Return the attitude vector (if any).
 	//! @return Attitude/orientation vector.
 	const AttitudeVector& attitude() const { return m_attitude; }

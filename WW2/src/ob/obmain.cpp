@@ -2624,13 +2624,13 @@ void obmainCreateMutableCollisionNormals(OBJECT* lpobj)
 	obmainValidateObject
 *************************************************************************************************/
 
-LOGICAL obmainValidateObject(OBJECT* lpobj)
+bool obmainValidateObject(const OBJECT* lpobj) noexcept
 {
     if(!lpobj)
-        return FALSE;
+        return false;
 
     // disable to see if we've fixed root cause
-    LOGICAL	isValid = objectmap.find(lpobj) != objectmap.end();
+    bool isValid = objectmap.find((OBJECT*)lpobj) != objectmap.end();
 
 #if(0)
     if(!isValid)
@@ -2639,7 +2639,7 @@ LOGICAL obmainValidateObject(OBJECT* lpobj)
 	}
 #endif
 
-    return (isValid);
+    return isValid;
 }
 
 LOGICAL obmainGetScreenBBOX(OBJECT* lpobj, float& x, float& y, float &z, float& w, float& h)

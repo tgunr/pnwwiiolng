@@ -47,7 +47,7 @@ namespace Scoring
 
 	public: instanceid_t instID() const { return m_instID; }
 	public: playerid_t playerID() const { return m_playerID; }
-	public: const ChatHandle handle() const { return m_handle; }
+	public: ChatHandle handle() const { return m_handle; }
 	public: sortieid_t sortieID() const { return m_sortieID; }
 	public: bool inCaptureBldg() const { return m_inCaptureBldg; }
 	public: SINT32 balance() const { return m_balance; }

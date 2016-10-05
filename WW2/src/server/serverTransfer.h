@@ -67,11 +67,11 @@ namespace Server
 			TeulTimeMS			m_timestamp;
 
 		public:
-			const xferid_t&		xferID() const { return m_xferID; }
-			XferReason			reason() const { return (XferReason)m_reason; }
-			const UINT64&		source() const { return m_source; }
-			const UINT64&		dest() const { return m_dest; }
-			const TeulTimeMS&	timestamp() const { return m_timestamp; }
+			xferid_t		xferID() const { return m_xferID; }
+			XferReason		reason() const { return (XferReason)m_reason; }
+			UINT64			source() const { return m_source; }
+			UINT64			dest() const { return m_dest; }
+			TeulTimeMS		timestamp() const { return m_timestamp; }
 	};
 }
 

@@ -346,9 +346,9 @@ static SINT32 _recvMMFacilityCapacityResponse(ACTION_OBJECT* const a)
 //This function sends a request to post a weapon at a facility
 SINT32
 strtSendMMPostRequest(SINT32 connection, UINT32 customerID, const char* callsign
-					, UINT32 missionID, UINT32 brigadeID, const PermissionMask& permMask
+					, UINT32 missionID, UINT32 brigadeID, const PermissionMask permMask
 					, const FULL_OBJ_ID facility, WEAPON_SPEC weapon
-					, LOGICAL multicrew,LOGICAL immediateSpawn)
+					, LOGICAL multicrew, LOGICAL immediateSpawn)
 {
 	MM_POST_REQUEST postRequest;
 
