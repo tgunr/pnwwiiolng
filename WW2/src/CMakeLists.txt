@@ -1173,40 +1173,41 @@ ENDIF( )
 #TARGET_LINK_LIBRARIES(testAuthConnect libwwii teulserver)
 #SET_PROPERTY(TARGET testAuthConnect PROPERTY FOLDER "Test")
 #
-IF( NOT PN_CLUSTER STREQUAL "Auth")
-    # Builds a single executable that runs all of the unit tests;
-    # The install process will not execute unless all tests complete.
-    ADD_EXECUTABLE(testUnits
-        tests/testUnits.cpp
-            tests/testUnits.h
-        tests/testTeulBits.cpp
-        tests/testAuthQueue.cpp auth/authClientData.cpp
-        tests/testChatHandle.cpp
-        tests/testFullObjID.cpp
-        tests/testCommandWithArgs.cpp
-        tests/testCovert.cpp
-        tests/testLocalizedMessage.cpp
-        tests/testInplaceVector.cpp
-        tests/testPackers.cpp   comm/commPackers.cpp
-        tests/testChatMissionStatus.cpp wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChat.cxx
-        tests/testHostGridCell.cpp host/hostGridCell.cpp
-        tests/testSupercellVislevelXfer.cpp
-        tests/testPersonaXfer.cpp
-        tests/testCryptographer.cpp
-        tests/testXYZTuple.cpp
-        tests/testTeulPacket.cpp
-
-        ${PCH_INCLUDE_HEADERS}
-        tests/testSuite.h
-        tests/testUnits.h
-    )
-    ADD_PCH(testUnits)
-    SET_PROPERTY(TARGET testUnits PROPERTY COMPILE_DEFINITIONS ENABLE_TESTS)
-    SET_PROPERTY(TARGET testUnits PROPERTY FOLDER "Test")
-    TARGET_LINK_LIBRARIES(testUnits libwwii teulserver)
-
-    ADD_TEST(testUnits ${EXECUTABLE_OUTPUT_PATH}/testUnits)
-ENDIF( )
+#IF( NOT PN_CLUSTER STREQUAL "Auth")
+#    # Builds a single executable that runs all of the unit tests;
+#    # The install process will not execute unless all tests complete.
+#    ADD_EXECUTABLE(testUnits
+#        tests/testUnits.cpp
+#            tests/testUnits.h
+#        tests/testTeulBits.cpp
+#        tests/testAuthQueue.cpp auth/authClientData.cpp
+#        tests/testChatHandle.cpp
+#        tests/testFullObjID.cpp
+#        tests/testCommandWithArgs.cpp
+#        tests/testCovert.cpp
+#        tests/testLocalizedMessage.cpp
+#        tests/testInplaceVector.cpp
+#        tests/testPackers.cpp   comm/commPackers.cpp
+#        tests/testChatMissionStatus.cpp wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChat.cxx
+#        tests/testHostGridCell.cpp host/hostGridCell.cpp
+#        tests/testStrings.cpp
+#        tests/testSupercellVislevelXfer.cpp
+#        tests/testPersonaXfer.cpp
+#        tests/testCryptographer.cpp
+#        tests/testXYZTuple.cpp
+#        tests/testTeulPacket.cpp
+#
+#        ${PCH_INCLUDE_HEADERS}
+#        tests/testSuite.h
+#        tests/testUnits.h
+#    )
+#    ADD_PCH(testUnits)
+#    SET_PROPERTY(TARGET testUnits PROPERTY COMPILE_DEFINITIONS ENABLE_TESTS)
+#    SET_PROPERTY(TARGET testUnits PROPERTY FOLDER "Test")
+#    TARGET_LINK_LIBRARIES(testUnits libwwii teulserver)
+#
+#    ADD_TEST(testUnits ${EXECUTABLE_OUTPUT_PATH}/testUnits)
+#ENDIF( )
 
 ######################################################################
 #### Module for testing teulKit functionality
