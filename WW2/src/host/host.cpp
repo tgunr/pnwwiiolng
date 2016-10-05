@@ -107,12 +107,6 @@ namespace Host
 	Stats totalStats, currentStats;
 }
 
-#ifdef CLOSED_BETA
-	#define DEF_ERR_LEVEL Debug::ERR_DBUG
-#else
-	#define DEF_ERR_LEVEL Debug::ERR_INFO
-#endif
-
 #ifdef DEBUG_UPDATES
 UINT32 remoteVehicles = 0;
 UINT32 vehiclesSkipped = 0;
@@ -1064,16 +1058,20 @@ _isGuarding(Player* const player)
 static void
 _checkPlayerForGuarding(Player* player, bool changingBuilding)
 {
+	auto const vehicle = player->vehicle;
+	if ( PN_UNLIKELY(!vehicle) )
+		return;
+
 	// Are they inside a friendly spawnable?
 	const bool isGuarding = _isGuarding(player);
-	if ( player->vehicle && player->vehicle->m_guardingSince && (false == isGuarding || true == changingBuilding) )
+	if ( vehicle->m_guardingSince && (false == isGuarding || true == changingBuilding) )
 	{
 		_scoreGuarding(player);
 	}
 
-	if ( true == isGuarding && player->vehicle->m_guardingSince == 0 )
+	if ( true == isGuarding && vehicle->m_guardingSince == 0 )
 	{
-		player->vehicle->m_guardingSince = teulClock64;
+		vehicle->m_guardingSince = teulClock64;
 	}
 }
 

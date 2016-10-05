@@ -322,24 +322,6 @@ static void InitBillboardUniforms(glslProgram* pgm)
 }
 
 /*---------------------------------------------------------------------
-Function: LoadHorizontalBillboardShaderOff
-Description:
----------------------------------------------------------------------*/
-static bool LoadHorizontalBillboardShaderOff()
-{
-    return true;
-}
-
-/*---------------------------------------------------------------------
-Function: LoadBillboardShaderOff
-Description:
----------------------------------------------------------------------*/
-static bool LoadBillboardShaderOff()
-{
-    return true;
-}
-
-/*---------------------------------------------------------------------
 Function: CreateBillboardUniformsOn
 Description:
 ---------------------------------------------------------------------*/
@@ -2706,7 +2688,7 @@ void sptGetStats(char stats[])
 {
     unsigned int size = treeDataGetBaseSize();
 
-    sprintf(stats, 
+    sprintf(stats,
             "TREES: Total %d Drawn %d 3D = %d 2D = %d Triangles %d",
             treeDataGetTotalTrees(),
             number3dtrees + numbillboards + numhorizbillboards,

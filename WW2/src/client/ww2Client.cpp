@@ -801,7 +801,7 @@ BrigadeControlList* Client::LookupBrigadeOIC(int brigadeID) const
 
 int Client::RequestClientSpawn(WEAPON_SERIAL const& serial, bool wantMobileSpawn)
 {
-	return mmSendClientSpawn(MapConnection(), serial, (LOGICAL)wantMobileSpawn);
+	return mmSendClientSpawn(MapConnection(), serial, wantMobileSpawn);
 }
 
 /************************************************************************************************

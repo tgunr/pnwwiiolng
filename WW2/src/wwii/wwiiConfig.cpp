@@ -338,7 +338,7 @@ wwiiConfigSetSTRING(char* data, const char* const source, UINT64 max)
 	if ( *source == 0 )
 		return false;
 
-	strncpy(data, source, static_cast<size_t>(max));
+	strsafecpy(data, source, static_cast<size_t>(max));
 
 	return true;
 }

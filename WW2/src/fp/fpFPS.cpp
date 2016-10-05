@@ -899,7 +899,7 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 			if(fpsWeapons[weaponID].hiddenMeshes)
 			{
 				char line[128+1];
-				strncpy(line, fpsWeapons[weaponID].hiddenMeshes, 128);
+				strsafecpy(line, fpsWeapons[weaponID].hiddenMeshes);
 
 				char* meshName = strtok(line," ,");
 				while(meshName != nullptr)

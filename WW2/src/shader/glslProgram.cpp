@@ -1,4 +1,4 @@
-#include <syscfg.h>
+#include <syscfg.h> // Path is project specific.
 /*------------------------------------------------------------------------------------
 Module: glslProgram.cpp
 Description:
@@ -30,7 +30,7 @@ enum
 static std::set<std::string> BlockMap;
 static std::map<std::string, int> BaseID;
 
-typedef std::unordered_map<std::string, glslUniformBlock*> UniformBlockList;
+using UniformBlockList = std::unordered_map<std::string, glslUniformBlock*>;
 static UniformBlockList _uniformBlockList;
 
 /*------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ void glslProgramKill()
 Function: glslProgram::glslProgram()
 Description:
 -------------------------------------------------------------------------------------*/
-glslProgram::glslProgram() : 
+glslProgram::glslProgram() :
     _needsLink(true),
     _isLinked(false),
     _firsttime(true),
@@ -166,7 +166,7 @@ bool glslProgram::GetProgramInfoLog(std::string& result) const
 
     if(bufLen > 1)
     {
-        GLchar* infoLog = new GLchar[bufLen];
+        GLchar* infoLog = new GLchar[bufLen] {};
         glGetProgramInfoLog(_programhandle, bufLen, &strLen, infoLog);
 
         if(strLen > 0) result = infoLog;
@@ -197,7 +197,7 @@ void glslProgram::LinkProgram()
 
     if(!TransformFeedbackVaryings.empty())
     {
-	    glTransformFeedbackVaryings(_programhandle, 
+	    glTransformFeedbackVaryings(_programhandle,
                                     TransformFeedbackVaryings.size(),
                                     &TransformFeedbackVaryings[0],
                                     GL_INTERLEAVED_ATTRIBS);
@@ -256,7 +256,7 @@ void glslProgram::LinkProgram()
     {
         int blocks;
         glGetProgramiv(_programhandle, GL_ACTIVE_UNIFORM_BLOCKS, &blocks);
-        
+
         char blockname[256];
         char name[256];
         int base;
@@ -266,8 +266,8 @@ void glslProgram::LinkProgram()
         GLint blocksize;
 
         for(int i = 0; i < blocks; i++)
-        {    
-            glGetActiveUniformBlockName(_programhandle, i, 256, NULL, blockname);
+        {
+            glGetActiveUniformBlockName(_programhandle, i, 256, nullptr, blockname);
 
             Write_Debug("BLOCKNAME: %s", blockname);
 
@@ -279,7 +279,7 @@ void glslProgram::LinkProgram()
 
             index = glGetUniformBlockIndex(_programhandle, blockname);
             base = BaseID.find(blockname)->second;
-            
+
             // Associate base binding with this block
             glUniformBlockBinding(_programhandle, index, base);
 
@@ -302,7 +302,7 @@ void glslProgram::LinkProgram()
             u->SetBlockSize(blocksize);
 
             glGetActiveUniformBlockiv(_programhandle, index, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &numUniforms);
-            
+
             indices = new GLuint[numUniforms];
             glGetActiveUniformBlockiv(_programhandle, index, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, (GLint*)indices);
 
@@ -312,7 +312,7 @@ void glslProgram::LinkProgram()
 
             for(int j = 0; j < numUniforms; j++)
             {
-                glGetActiveUniformName(_programhandle, indices[j], 256, NULL, name);
+                glGetActiveUniformName(_programhandle, indices[j], 256, nullptr, name);
 
                 glGetActiveUniformsiv(_programhandle, 1, (GLuint*)&indices[j], GL_UNIFORM_OFFSET, &byteoffset);
                 glGetActiveUniformsiv(_programhandle, 1, (GLuint*)&indices[j], GL_UNIFORM_SIZE, &size);
@@ -349,7 +349,7 @@ void glslProgram::LinkProgram()
             if(loc != -1)
             {
                 // F-nvidia. Drivers do not follow GL spec.
-                // Uniform names associated with uniform blocks should have loc -1.  
+                // Uniform names associated with uniform blocks should have loc -1.
                 // Shaders will need to have block members start with "b_"
                 if(name[0] == 'b' && name[1] == '_')
                 {
@@ -415,7 +415,7 @@ Description:
 -------------------------------------------------------------------------------------*/
 void glslProgram::Apply(const ActiveVarInfo& info)
 {
-    if(info.uniform == NULL)
+    if(info.uniform == nullptr)
         return;
 
     logTimerBeginMacro();
@@ -521,7 +521,7 @@ void glslProgram::Apply()
         return;
     }
 
-    if(_needsLink) 
+    if(_needsLink)
     {
         CompileGLObjects();
     }
@@ -564,7 +564,7 @@ Description:
 -------------------------------------------------------------------------------------*/
 void glslProgram::RemoveUniformsIfNecessary()
 {
-    glslUniform* u = NULL;
+    glslUniform* u = nullptr;
 
     std::vector<ActiveVarInfoMap::iterator> remove;
 
@@ -615,7 +615,7 @@ Function: glslProgram::GetOrCreateUniform()
 Description:
 -------------------------------------------------------------------------------------*/
 glslUniform* glslProgram::GetOrCreateUniform(const std::string &name,
-                                             glslUniform::Type type, 
+                                             glslUniform::Type type,
                                              unsigned int numElements)
 {
     //Look for an appropriate uniform.
@@ -640,7 +640,7 @@ Description:
 void glslProgram::AddUniform(glslUniform* uniform)
 {
     if(uniform)
-    {        
+    {
         UniformList::iterator itr = _uniformList.find(uniform->GetName());
 
         if(itr == _uniformList.end())
@@ -677,6 +677,6 @@ glslUniform* glslProgram::GetUniform(const std::string &name)
         return itr->second;
     }
 
-    return NULL;
+    return nullptr;
 }
 

@@ -164,7 +164,8 @@ _getHostIPAddresses()
 	}
 
 	ABORT_IF_EX(preferredIf == nullptr
-				, "Unable to find eth0. If you need to specify an interface, set the environment variable 'ETH0' to the friendly name of the adapter.");
+				, "Unable to determine primary network adapter. "
+				  "If you need to specify an interface, set 'DEFAULT_IFACE' to the friendly name of the adapter.");
 
 	Server::myInterface.pid = static_cast<UINT32>(GetCurrentProcessId());
 
@@ -177,7 +178,7 @@ _getHostIPAddresses()
 		Server::myInterface.addr[ifNo].ip = ntohl(Server::myInterface.addr[0].naddr);
 
 		TCHAR addrString[128];
-		DWORD addrSize = sizeof(addrString);
+		DWORD addrSize = sizeof(addrString) / sizeof(TCHAR);
 		WSAAddressToString(address->Address.lpSockaddr, address->Address.iSockaddrLength, nullptr, addrString, &addrSize);
 
 		dbugLog(_FLI, "read index %u interface %ls, ip %s pid %u"

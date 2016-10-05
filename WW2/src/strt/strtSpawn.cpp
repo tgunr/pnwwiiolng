@@ -1667,6 +1667,8 @@ _returnLog(const POSTED_WEAPON* weapon, const char* message)
 static bool
 _returnToBrigade(POSTED_WEAPON* weapon)
 {
+	if ( !weapon || !weapon->m_facility )
+		return false;
 	FacilityStruct* supplyFacility = weapon->m_facility->supplyingFacility(*weapon->m_brigade, false);
 	if ( supplyFacility == nullptr )
 		return false;
@@ -1698,16 +1700,18 @@ _returnToBrigade(POSTED_WEAPON* weapon)
 // division rather than allowing easy div->bde oversupply in same-town
 
 static bool
-_returnToOrigin(POSTED_WEAPON* weapon)
+_returnToOrigin(POSTED_WEAPON& weapon)
 {
-	FacilityStruct* supplyFacility = weapon->m_facility->supplyingFacility(*weapon->m_supplyingBrigade, false);
-	if ( supplyFacility == nullptr )
+	if ( !weapon.m_facility )
 		return false;
-	if ( weapon->m_supplyingBrigade->depositWeapons(weapon->spec(), 1, true, weapon->m_resupplyTicket) == false )
+	FacilityStruct* supplyFacility = weapon.m_facility->supplyingFacility(*weapon.m_supplyingBrigade, false);
+	if ( !supplyFacility || !weapon.m_supplyingBrigade )
+		return false;
+	if ( weapon.m_supplyingBrigade->depositWeapons(weapon.spec(), 1, true, weapon.m_resupplyTicket) == false )
 		return false;
 
-	_returnLog(weapon, "returned to origin");
-	assert( weapon->m_resupplyTicket == nullptr );
+	_returnLog(&weapon, "returned to origin");
+	assert( weapon.m_resupplyTicket == nullptr );
 
 	return true;
 }
@@ -1809,7 +1813,7 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 		// After that, try to deliver it to your brigade at this
 		// location. If that fails, finally, "rescue" the equipment.
 
-		if ( _returnToOrigin(this) == true )
+		if ( _returnToOrigin(*this) == true )
 		{
 			TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
 			rescue = false;

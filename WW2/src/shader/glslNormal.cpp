@@ -1,4 +1,4 @@
-#include <syscfg.h>
+#include <syscfg.h> // Path is project specific.
 /*--------------------------------------------------------------------------------------
 Module: glslNormal.cpp
 Description:
@@ -35,7 +35,7 @@ Function: drawFPS
 Description:
 ---------------------------------------------------------------------------------------*/
 static inline void drawFPS(gr2Mesh* mesh, int numverts, short* indices, int count)
-{ 
+{
     oglRenderIndexScene(oglPT_TRIANGLELIST,
                         oglVT_TVERTEX,
                         (void*)mesh->PNGT(),

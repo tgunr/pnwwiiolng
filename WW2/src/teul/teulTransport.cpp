@@ -485,7 +485,7 @@ teulInitTransport(LogMode logType
 	return 0;
 }
 
-// Since we hae to ensure that callbacks happen in step with whatever
+// Since we have to ensure that callbacks happen in step with whatever
 // application is using teul, we have to make a call for that all to happen.
 // should be called once per game loop
 void
@@ -601,7 +601,7 @@ namespace Teul
 void SetAppName(const char* const name)
 {
 	memset(_appName, 0, sizeof(_appName));
-	strncpy(_appName, name, sizeof(_appName) - 1);
+	strsafecpy(_appName, name);
 }
 
 const char*

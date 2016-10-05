@@ -1806,10 +1806,6 @@ SINT32 trnopHandleSpeedTree(OBJECT* group)
         return -1;
     }
 
-    COLLISION collision;
-
-    memset(&collision, 0, sizeof(COLLISION));
-
     if(trndtl[_superCell].m_trees == nullptr)
     {
         return 0;

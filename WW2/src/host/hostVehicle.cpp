@@ -199,7 +199,7 @@ HostVehicle::checkLocality(Teul::Packet& packet)
 	if ( bldgChanged )
 	{
 		loc.m_inCaptureBldg = m_isInCaptureBuilding;
-		if ( loc.m_inCaptureBldg )
+		if ( loc.m_inCaptureBldg && m_inBuildingObject )
 		{
 			loc.m_captureFac = m_inBuildingObject->facility->fullObjID;
 			loc.m_progress = captureProgress;
@@ -680,8 +680,8 @@ HostVehicle::setVehicleKilled(sortieid_t bySortieID)
 	}
 
 	Scoring::Packet<Scoring::Death> packet;
-	Scoring::Actor actVictim(this);
-	Scoring::Actor actShooter;
+	Scoring::Actor actVictim{this};
+	Scoring::Actor actShooter{};
 	actShooter.setSortie(m_killedBySortieID, NULL_WEAP_SPEC, false);
 	if ( m_killedBySortieID != 0 )
 	{

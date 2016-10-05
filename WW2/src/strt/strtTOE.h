@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-struct WEAPON_SPEC;
-
 //tolua_begin
 
 extern void strtLoadTOEWeaponTemplateHeader(const char* id, const char* name, UINT32 country, UINT32 branch);

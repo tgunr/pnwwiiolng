@@ -68,9 +68,8 @@ class TerrainObjectRenderer::SuperCell : public SuperCellMapView::Renderer::Supe
 {
 public:
 	SuperCell(TerrainObjectRenderer* r, int x, int y) : SuperCellMapView::Renderer::SuperCell(r, x, y)
-		, _renderer(r), _displayList(0)
+		, celldata{}, _renderer{r}, _displayList{0}, _buckets{}
 	{
-		memset(&celldata,0x0,sizeof(celldata));
 	}
 
  	~SuperCell()

@@ -52,7 +52,7 @@ void _materialElements(xmlNodePtr root)
 
             if(str)
             {
-                strncpy(mat.name, (char*)str, 32);
+                strsafecpy(mat.name, (char*)str);
                 xmlFree(str);
             }
 
@@ -65,7 +65,7 @@ void _materialElements(xmlNodePtr root)
 
             if(str)
             {
-                strncpy(mat.texname, (char*)str, _MAX_PATH);
+                strsafecpy(mat.texname, (char*)str);
                 xmlFree(str);
             }
 
@@ -78,7 +78,7 @@ void _materialElements(xmlNodePtr root)
 
             if(str)
             {
-                strncpy(mat.alphaname, (char*)str, _MAX_PATH);
+                strsafecpy(mat.alphaname, (char*)str);
                 xmlFree(str);
             }
 

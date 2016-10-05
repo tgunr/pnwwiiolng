@@ -684,7 +684,7 @@ int draw3dSetWorldDebugLine(FLOAT64VECTOR const* v1, FLOAT64VECTOR const* v2, co
 
 	obj = &debugObjects[objID];
 	obj->type = DRAW3D_WORLD_LINE;
-	strncpy(obj->name, name, 31);
+	strsafecpy(obj->name, name);
 	obj->color = Color;
 	obj->alwaysOnTop = TRUE;
 	obj->flipZ = FALSE;

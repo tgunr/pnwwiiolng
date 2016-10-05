@@ -1,6 +1,6 @@
 #include <syscfg.h> // Path is project specific.
-#include "auth/authQueue.cpp"		// So we can derive from it.
 #include "auth/authClientData.h"
+#include "auth/authQueue.cpp"		// So we can derive from it.
 #include "tests/testUnits.h"
 
 // We need to simulate sending updates to players.
@@ -34,15 +34,15 @@ public:
 	static const size_t _MAX_ARENAS = 3;
 	static const size_t _MAX_PLAYERS = 9;
 private:
-	std::vector<Auth::ClientData*> m_cdatas;
+	std::vector<std::unique_ptr<Auth::ClientData>> m_cdatas;
 public:
 	Auth::ClientData* GetCData(UINT32 arenaID, const playerid_t playerNo, bool isPremium)
 	{
 		assert( arenaID >= 1 && arenaID <= _MAX_ARENAS );
 		assert( playerNo >= 1 && playerNo <= _MAX_PLAYERS );
-		Auth::ClientData* cdata = m_cdatas[ (arenaID - 1) * _MAX_PLAYERS + (playerNo - 1) ];
+		auto& cdata = m_cdatas[ (arenaID - 1) * _MAX_PLAYERS + (playerNo - 1) ];
 		cdata->isPremium = isPremium;
-		return cdata;
+		return cdata.get();
 	}
 
 public:
@@ -53,21 +53,17 @@ public:
 		{
 			for ( unsigned int playerNo = 1; playerNo < _MAX_PLAYERS + 1; ++ playerNo )
 			{
-				char username[16], password[16];
-				sprintf(username, "user%u-%u", arenaID, playerNo);
-				sprintf(password, "pass%u-%u", arenaID, playerNo);
-				Auth::ClientData* cdata = new Auth::ClientData(arenaID, 0, 0, 0, username, password);
+				char username[17], password[17];
+				strprintf(username, "user%u-%u", arenaID, playerNo);
+				strprintf(password, "pass%u-%u", arenaID, playerNo);
+				auto cdata = std::make_unique<Auth::ClientData>(arenaID, 0, 0, 0, username, password);
 				cdata->arenaID = arenaID;
-				m_cdatas.push_back(cdata);
+				m_cdatas.push_back(std::move(cdata));
 			}
 		}
 	}
 	~AuthQueueUnit()
 	{
-		for ( auto it = m_cdatas.begin(), end = m_cdatas.end(); it != end; ++it )
-		{
-			delete *it;
-		}
 	}
 
 protected:

@@ -162,7 +162,7 @@ public:
 	CPStruct* clearHolding()				{ return clearFlag(CP_STAT_OWN_HAAC); }
 	CPStruct* clearObjective(WWII_SIDE forSide);
 	CPStruct* clearOverrun()				{ return clearFlag(CP_STAT_OVERRUN); }
-	CPStruct* clearOverrunHistory()			{ if ( m_overruns != nullptr ) { delete m_overruns; m_overruns = nullptr; } return this; }
+	CPStruct* clearOverrunHistory()			{ delete m_overruns; m_overruns = nullptr; return this; }
 
 	CPStruct* endContention();
 

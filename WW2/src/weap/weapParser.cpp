@@ -92,7 +92,7 @@ std::vector<std::unique_ptr<WEAPON>> g_weaponPtrs;
 
 bool weapParseCountry(char* countryfile)
 {
-	strncpy(_fileName, countryfile, PN_MAX_PATH);
+	strsafecpy(_fileName, countryfile);
 
 	_userCallbacks[0].function = _fillCountry;
 
@@ -103,7 +103,7 @@ bool weapParseCountry(char* countryfile)
 
 bool weapParseClasses(char* classFile)
 {
-	strncpy(_fileName,classFile,PN_MAX_PATH);
+	strsafecpy(_fileName, classFile);
 
 	_userCallbacks[0].function = _fillClass;
 	_parseConstant = PARSE_CLASS;
@@ -113,7 +113,7 @@ bool weapParseClasses(char* classFile)
 
 bool weapParseWeapons(char* weapfile, SINT32 country, SINT32 category)
 {
-	strncpy(_fileName,weapfile,PN_MAX_PATH);
+	strsafecpy(_fileName, weapfile);
 
 	_userCallbacks[0].function = _fillWeapon;
 	_parseConstant = PARSE_WEAPON;
@@ -126,7 +126,7 @@ bool weapParseWeapons(char* weapfile, SINT32 country, SINT32 category)
 
 bool weapParseSpawn(char* weapfile, SINT32 country, SINT32 category)
 {
-	strncpy(_fileName,weapfile,PN_MAX_PATH);
+	strsafecpy(_fileName, weapfile);
 
 	_parseConstant = PARSE_SPAWN;
 
@@ -138,20 +138,20 @@ bool weapParseSpawn(char* weapfile, SINT32 country, SINT32 category)
 
 static bool _setSection(int /*numargs*/, FUNCARGS* args)
 {
-	strncpy(_section.name, args[0].svalue, sizeof(_section.name));
+	strsafecpy(_section.name, args[0].svalue);
 
 	switch (_parseConstant)
 	{
 	case PARSE_COUNTRY:
 		strlwr(_section.name);
 
-		strncpy(_userCallbacks[0].type, _section.name, MAX_FUNC_NAME);
+		strsafecpy(_userCallbacks[0].type, _section.name);
 
 		break;
 	case PARSE_CLASS:
 		strlwr(_section.name);
 
-		strncpy(_userCallbacks[0].type, _section.name,MAX_FUNC_NAME);
+		strsafecpy(_userCallbacks[0].type, _section.name);
 
 		_section.spec = weapFindCategory(_section.name);
 
@@ -164,7 +164,7 @@ static bool _setSection(int /*numargs*/, FUNCARGS* args)
 		// these define the list of known weapons.
 		strlwr(_section.name);
 
-		strncpy(_userCallbacks[0].type, _section.name,MAX_FUNC_NAME);
+		strsafecpy(_userCallbacks[0].type, _section.name);
 
 		// Populate the wClass
 		_section.spec = weapFindClass(_section.name);

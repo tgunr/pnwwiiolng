@@ -9,7 +9,7 @@
 
 #include "versionNo.h"
 #include "hostproj/hostversion.h"
-#include "hostproj/revision.h"
+#include "revision.h"
 
 #include <signal.h>  //to catch SIGHUPS with
 
@@ -59,9 +59,7 @@
 
 extern ObjectiveStats g_objectiveStats;
 
-extern DBHANDLE dbh;
 DBHANDLE dbh;
-extern DBCONNECTION dbConnection;
 DBCONNECTION dbConnection;
 
 #ifdef DEBUG
@@ -544,7 +542,7 @@ _housekeeping()
 //////////////////////////////////////////////////////////////////////////
 // Main entry point.
 
-static const char* g_serverName = "stratd";
+const char* g_serverName = "stratd";
 
 int
 main(int argc, const char* argv[])
@@ -570,12 +568,10 @@ main(int argc, const char* argv[])
 	if ( !stratStartLua() )
 		exit(0);
 
-#ifdef IS_STRAT_HOST
 	if (!strtInitDB())
 	{
 		LogAbort("Couldn't initialize database");
 	}
-#endif
 
 	StatsThread statsThread;
 	statsThread.start();
@@ -719,9 +715,7 @@ main(int argc, const char* argv[])
 
 	threadsLogging();
 
-#ifdef IS_STRAT_HOST
 	strtCloseDB();
-#endif
 	dbugLog(_FLN,"strat system shutting down");
 
 	Lua::Stop();

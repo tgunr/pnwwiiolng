@@ -88,7 +88,6 @@ wwiiReadHCUnits()
 		ChatHandle lastMovedBy;
 		UCHAR unitClass;
 
-
 		while (q.FetchRow())
 		{
 			DBRow& row = q.Row();

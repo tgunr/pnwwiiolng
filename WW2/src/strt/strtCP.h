@@ -18,7 +18,6 @@ class FacilityStruct;
 class ObjectStruct;
 struct CONVOYSTRUCT;
 struct WEAPON_SERIAL;
-struct FULL_OBJ_ID;
 class HCUnit;
 
 //This function initializes all the bases: ARMY, AIR, and NAVAL

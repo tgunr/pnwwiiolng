@@ -299,6 +299,7 @@ LOGICAL	success;
     {
         newSound = _freesounds.front();
         _freesounds.pop_front();
+		memset(newSound, 0, sizeof(*newSound));
     }
     else
     {
@@ -307,9 +308,7 @@ LOGICAL	success;
 
     if(newSound != nullptr)
     {
-        memset(newSound, 0, sizeof(snSound));
-
-        strncpy(newSound->name, lpCreate->pszName, MAX_SND_NAME_LENGTH - 1);
+        strsafecpy(newSound->name, lpCreate->pszName);
 
 		success = sndsApplyDefaultOptions(newSound);
 
@@ -343,7 +342,7 @@ LOGICAL	success;
 					ptr = file;
 				}
 
-				strncpy(newSound->file, ptr, SND_CHECK_FILE_LENGTH);
+				strsafecpy(newSound->file, ptr);
 				newSound->line = line;
 			}
 

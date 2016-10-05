@@ -755,6 +755,7 @@ void piSetTextureMatrix(const piMATRIX* newtexmat)
 	oglSetTextureMatrix(newtexmat);
 }
 
+NORETURN_FN
 void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 {
 	FILE* fp = Fio::OpenLogFile();

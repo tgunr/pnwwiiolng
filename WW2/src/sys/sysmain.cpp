@@ -221,7 +221,7 @@ void GetFileVersion(const TCHAR** ppFFI)
 			break;
 		}
 
-		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), ptranslate->wLanguage, ptranslate->wCodePage);
+		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), (UINT32)ptranslate->wLanguage, (UINT32)ptranslate->wCodePage);
 		if (!VerQueryValue(pVersion, txt, (LPVOID*)&pFFI, (PUINT)&Len))
 		{
 			Write_Debug("Problem with VerQueryValue");
@@ -522,7 +522,7 @@ struct LANGANDCODEPAGE
 			break;
 		}
 
-		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), ptranslate->wLanguage, ptranslate->wCodePage);
+		usprintf(txt, 511, _T("\\StringFileInfo\\%04x%04x\\ProductVersion"), (UINT32)ptranslate->wLanguage, (UINT32)ptranslate->wCodePage);
 		if (!VerQueryValue(pVersion, txt, (LPVOID*)&pFFI, (PUINT)&Len))
 		{
 			Write_Debug("Problem with VerQueryValue");

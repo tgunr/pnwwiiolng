@@ -429,7 +429,7 @@ JS_FUNCTION_DEF(jsClient, sendchatmessage)
 		else if(_chatRateSamples)
 		{
 			static int lastChat = 0;
-			static int chatSamples[CHAT_RATE_SAMPLES];
+			static int chatSamples[CHAT_RATE_SAMPLES]{};
 
 			if(_chatRateSamples > CHAT_RATE_SAMPLES)
 				_chatRateSamples = CHAT_RATE_SAMPLES;
@@ -777,8 +777,7 @@ JS_FUNCTION_DEF(jsClient, createmission)
 	std::string missiondesc = UTF8(wmissiondesc);
 	if(missiondesc.empty()) return JS_FALSE;
 
-	MISSION_POST_REQ post;
-	memset(&post, 0x0, sizeof(post));
+	MISSION_POST_REQ post{};
 
 //	WWII_SIDE playerside = weapLookupSide(jsclient->client->PersonaSelected().m_countryID);
 
@@ -786,8 +785,8 @@ JS_FUNCTION_DEF(jsClient, createmission)
 	post.subType = (SINT8)subtype;
 	post.origin = *jsorigin->stratobj->FullObjID();
 	post.target = *jstarget->stratobj->FullObjID();
-	post.descSize = strlen(missiondesc.c_str());
-	strncpy(post.desc,missiondesc.c_str(), MapMiss::MISSION_DESC_LENGTH);
+	post.descSize = static_cast<SINT16>(strlen(missiondesc.c_str()));
+	strsafecpy(post.desc, missiondesc.c_str());
 
 	*rval = INT_TO_JSVAL(0); // trying
 

@@ -206,7 +206,7 @@ static LPSOUNDCACHE _preloadSoundCache(const SCHAR* name)
 	    return FALSE;
     }
 
-    strncpy(sc->theSound.name, name, MAX_SND_NAME_LENGTH - 1);
+    strsafecpy(sc->theSound.name, name);
 
 	if(!sndsPlatformLoadSound(&sc->theSound))
 	{

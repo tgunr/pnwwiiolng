@@ -118,7 +118,7 @@ public:
 	PersonaSummaries() : m_error(false), m_count(0), m_callsign(0LL), m_chatPermissions(nullChatPermissions) { }
 	PersonaSummaries(ACTION_OBJECT* const a) : m_error(false), m_count(0), m_callsign(0LL), m_chatPermissions(), m_accountGoodUntil(0) { a->offset = packer(TEUL_UNPACK, a); }
 
-    SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
 	// Returns: error < 0  /  ok >= 0

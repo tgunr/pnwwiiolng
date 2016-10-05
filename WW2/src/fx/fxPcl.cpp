@@ -124,8 +124,6 @@ LOGICAL fxPclInit()
     if(particles == nullptr)
         return FALSE;
 
-//	Uneccessary -- memAlloc == calloc
-//    memset(particles, 0, sizeof(FXPARTICLE) * DEF_FXPCL_MAX_PARTICLES);
     memset(g_fxInitFuncs, 0, sizeof(FXINITFUNC) * IDE_NUMBER_OF_PARTICLES);
     memset(g_fxUpdateFuncs, 0, sizeof(FXUPDATEFUNC) * IDE_NUMBER_OF_PARTICLES);
 

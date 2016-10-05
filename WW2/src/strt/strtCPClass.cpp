@@ -1352,7 +1352,7 @@ CPStruct::startObjectiveExpiry(WWII_SIDE forSide, UINT32 delay)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Iterate across the supply centers and propogate supply links outward
+// Iterate across the supply centers and propagate supply links outward
 // from them to all same-side CPs within reach
 
 bool

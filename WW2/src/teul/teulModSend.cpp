@@ -115,12 +115,12 @@ ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 }
 #endif
 
+//////////////////////////////////////////////////////////////////////
 // Actually write data to a socket.
 
 SINT32
 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port)
 {
-
 	if ( protocol == PROTOCOL_TCP || protocol == PROTOCOL_CTRL )
 	{
 		// dbugLog(_FLD, "about to send sub-packet");

@@ -556,17 +556,14 @@ static bool DynamicLights(int numargs, FUNCARGS* args)
 
 static bool AddDynamicLight(int numargs, FUNCARGS* args)
 {
-UINT32   type;
-LIGHT   light;
-
-	type = FindConstant(args[1].svalue);
+	UINT32 type = FindConstant(args[1].svalue);
 	if (type == 0)
 	{
 		return(FALSE);
 	}
 
 	// init the light
-	memset(&light, 0, sizeof(LIGHT));
+	LIGHT light{};
 	strcpy(light.name, args[0].svalue);
 	light.flags = LITE_ON;
 	light.light.dltType = type;

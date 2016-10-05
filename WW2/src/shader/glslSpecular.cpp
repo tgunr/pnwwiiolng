@@ -1,4 +1,4 @@
-#include <syscfg.h>
+#include <syscfg.h> // Path is project specific.
 /*--------------------------------------------------------------------------------------
 Module: glslSpecular.cpp
 Description:

@@ -278,13 +278,13 @@ Player::selectPlayer(const playerid_t forPlayerID)
 		startTime = teulClock64;
 #endif
 
-		DBQuery q(dbh, "CALL auth.p_get_player_details(%u,%u)", forPlayerID, Server::myServerInfo.stats.arenaID);
+		DBQuery q(dbh, "CALL `auth`.`p_get_player_details`(%u,%u)", forPlayerID, Server::myServerInfo.stats.arenaID);
 
 #ifdef TIME_QUERIES
 		teulSyncClock();
 
 		if ( teulClock64 - entryTime > 500 || teulClock64 - startTime > 200 )
-			dbugLog(_FLW, "auth.p_get_player_details appears to be taking too long: apparent:%llums, actual:%llums"
+			dbugLog(_FLW, "`auth`.`p_get_player_details` appears to be taking too long: apparent:%llums, actual:%llums"
 							, teulClock64 - entryTime
 							, teulClock64 - startTime);
 #endif
@@ -300,7 +300,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 		if ( details.playerID != forPlayerID )
 			throw std::logic_error("get player info retrieved wrong player");
 		if ( details.callsign[0] == 0 )
-			throw std::logic_error("auth.p_get_player_details returned empty game name");
+			throw std::logic_error("`auth`.`p_get_player_details` returned empty game name");
 
 		SetPlayerID(details.playerID);			// Our playerID
 		m_customerID = details.customerID;		// Billing system ID
@@ -373,7 +373,7 @@ void
 mapSaveRank(const Player* player, bool immediate)
 {
 	static char buffer[181];
-	strprintf(buffer, "CALL wwii.p_increase_rank_score(%u,%u,%u,%u,%u,%u)"
+	strprintf(buffer, "CALL `wwii`.`p_increase_rank_score`(%u,%u,%u,%u,%u,%u)"
 							, (UINT32)player->playerID(), player->country(), player->branch()
 							, (UINT32)player->personaID(), (UINT32)player->realRank(), (UINT32)player->points());
 	dbugLog(_FLI, "t:%d p:%u c:%s %s", player->teulIndex(), player->playerID(), player->callsign(), buffer);
@@ -411,7 +411,7 @@ Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM bra
 	ExitBrigade(PERS_SELECTING_PERSONA);
 	try
 	{
-		static const char QRY_SELECT_PERSONA_DATA[] = "CALL wwii.p_get_persona_data(%u, %u, %u)";
+		static const char QRY_SELECT_PERSONA_DATA[] = "CALL `wwii`.`p_get_persona_data`(%u, %u, %u)";
 
 		DBQuery q(dbh, QRY_SELECT_PERSONA_DATA, playerID(), countryID, branchID);
 
@@ -556,7 +556,7 @@ bool mapFillPersonaData(Player* const player)
 	player->SetRank(0);
 
 	// Refresh information when processing a player's mission scoring packet
-	static const char QRY_SELECT_PERSONA_REFRESH[] = "CALL auth.p_persona_refresh(%u, %u)";
+	static const char QRY_SELECT_PERSONA_REFRESH[] = "CALL `auth`.`p_persona_refresh`(%u, %u)";
 
 	try
 	{
@@ -701,10 +701,10 @@ _errExit(const WWII_ERROR_INFO& info, const Player& player, const UINT32 platfor
 	}
 
 	std::string error = info.data.piExitInfo.errorMessage.string;
-//        DB::handle_t* conn = threadsOpenDBConnection(false);
-        DBThread::EscapeString(dbh, src);
-        DBThread::EscapeString(dbh, error);
-//        threadsCloseDBConnection(conn);
+//	DB::handle_t* conn = threadsOpenDBConnection(false);
+	DBThread::EscapeString(dbh, src);
+	DBThread::EscapeString(dbh, error);
+//	threadsCloseDBConnection(conn);
 
 	player.log(_FLN, "Received PIEXIT ver %s exit info type %u at %s:%u: %s"
 						, clientVersion, info.errorType
@@ -1149,7 +1149,7 @@ public:
 	TrainingQuery(const playerid_t playerID, SINT32 teulIndex)
 		: DBThreadQuery(DBThread::Default, "TrainingQuery", DBThreadQuery::_CALLBACK
 							,	"SELECT group_name, progress"
-								 " FROM wwii.training_progress p"
+								 " FROM `wwii`.`training_progress` p"
 								" WHERE p.player_id = %u LIMIT 64", playerID)
 		, m_playerID(playerID), m_teulIndex(teulIndex)
 		{}
@@ -1347,8 +1347,7 @@ public:
 				continue;
 			}
 
-			strncpy(unit->m_name, bdu.m_title, MAX_HCUNIT_NAME_LENGTH);
-			unit->m_name[MAX_HCUNIT_NAME_LENGTH] = 0;
+			strsafecpy(unit->m_name, bdu.m_title);
 			unit->m_owner = bdu.m_owner;
 			unit->m_ownerRank = bdu.m_ownerRank;
 

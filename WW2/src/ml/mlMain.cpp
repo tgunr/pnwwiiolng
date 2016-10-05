@@ -7841,9 +7841,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
         // (Eventually need to collide with short collide list)
         if((SINT32)Pos.z == 1)
         {
-            COLLISION c;
-
-            memset(&c, 0, sizeof(COLLISION));
+			COLLISION c{};
 
             c.newpos.x = (FLOAT32)(Pos.x - WorldOriginOffset.x);
             c.newpos.y = (FLOAT32)(Pos.y - WorldOriginOffset.y);
@@ -8262,7 +8260,7 @@ static UINT32 _DoVehicleCollision(mlVehicleData* VehicleData, FLOAT64 DeltaTime,
     FLOAT64VECTOR DeltaVel = {0, 0, 0};
 	piVECTOR Norm = {0, 0, 0};
 	piVECTOR TempPos = {0, 0, 0};
-	FASTCOLLIDE CollisionList[NUM_COLLISION_SLOTS];
+	FASTCOLLIDE CollisionList[NUM_COLLISION_SLOTS]{};
 	FASTCOLLIDE* CollideListPtr = nullptr;
 	UINT32 NumCollides = 0;
 	UINT32 CollideNum = 0;
@@ -8277,8 +8275,6 @@ static UINT32 _DoVehicleCollision(mlVehicleData* VehicleData, FLOAT64 DeltaTime,
 	if(VehicleObjectAnalysis && DisplayCollideLines && IsFirstTic)
 		draw3dLineDebug(V1, V2, colorBLUEALPHA);
 #endif
-
-    memset(CollisionList, 0, sizeof(FASTCOLLIDE) * NUM_COLLISION_SLOTS);
 
 	Vehicle = VehicleData->VehicleMasterPtr;
 	trnGetWorldOriginOffset(&WorldOffsetOrigin);

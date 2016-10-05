@@ -1520,7 +1520,7 @@ extern TEXTURE* piGetTextureData2(SINT32 texid);
 extern TEXTURE3D* piGetTexture3DData(SINT32 texid);
 
 extern void piCloseProgram(void);
-extern void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString);
+NORETURN_FN extern void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString);
 
 extern piMATRIX* piGetTextureMatrix(int unit = 0);
 

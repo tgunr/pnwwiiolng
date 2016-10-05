@@ -1144,7 +1144,7 @@ weapAmmoType * AmmoType;
 		return FALSE;
 	}
 
-	strncpy(_AmmoTypeName, Ptr1, 63);
+	strsafecpy(_AmmoTypeName, Ptr1);
 
 	if(AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO)
 		return TRUE;

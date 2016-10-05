@@ -48,8 +48,6 @@ static ref_ptr<RenderStateSet> depthpass;
 
 #include "fp/fpTPSdata.h"
 
-#include "str/stringLib.h"
-
 static char texname[512];
 
 #define GRANNY_VERSION(x,y) (GrannyProductMajorVersion >= x && GrannyProductMinorVersion >= y)
@@ -4577,8 +4575,7 @@ void createMeshTextures(gr2MeshData* data, bool wantNormals)
 		if(!data->pngt)
 		{
 			int vertexCount = GrannyGetMeshVertexCount(grannyMesh);
-			data->pngt = new piTVERTEX[vertexCount];
-			memset(data->pngt, 0, sizeof(piTVERTEX) * vertexCount);
+			data->pngt = new piTVERTEX[vertexCount]{};
 			GrannyCopyMeshVertices(grannyMesh, GrannyPNGT3332VertexType, data->pngt);
 		}
 
@@ -4662,7 +4659,7 @@ static const char* _translateAnimation(const char* animFile)
 
 gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount)
 {
-	animSpec loadedMasks[GR2_MAX_ANIMS_PER_BLEND];
+	animSpec loadedMasks[GR2_MAX_ANIMS_PER_BLEND]{};
 
 	char		buf[255];
 	char		tString[255];
@@ -4671,8 +4668,6 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 	SCHAR* ptr;
 	SINT32 i, j;
 	gr2AnimationBlend* newBlend;
-
-	memset (loadedMasks, 0, sizeof (loadedMasks));
 
 	SINT32 blendFileID = fioOpen(blendfile);
 	if (blendFileID == -1) return nullptr;

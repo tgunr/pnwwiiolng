@@ -603,8 +603,6 @@ void ldmdlTangentArray(const piVECTOR* vertex,      // IN
     piVECTOR* tan1 = (piVECTOR*)memAlloc(sizeof(piVECTOR) * vertexCount * 2);
     piVECTOR* tan2 = tan1 + vertexCount;
 
-    memset(tan1, 0, vertexCount * sizeof(piVECTOR) * 2);
-
     *tangent = (piQUAT*)memAlloc(sizeof(piQUAT) * vertexCount);
 
     SINT32 indice = 0;
@@ -726,9 +724,6 @@ piQUAT* ldmdlTangentArray3(OBJECT* o)
     piVECTOR*	tan1 = (piVECTOR*)memAlloc(sizeof(piVECTOR) * numverts * 2);
     piVECTOR*	tan2 = tan1 + numverts;
     piQUAT*		tangentData = (piQUAT*)memAlloc(sizeof(piQUAT) * numverts);
-
-
-    memset(tan1, 0, numverts * sizeof(piVECTOR) * 2);
 
     UINT16 i1, i2, i3;
 
@@ -881,8 +876,6 @@ void ldmdlTangentArray2(const piCVERTEX* vertex,       // IN
     piVECTOR* tan2 = tan1 + vertexCount;
 
     *tangent = (piQUAT*)memAlloc(sizeof(piQUAT) * vertexCount);
-
-    memset(tan1, 0, vertexCount * sizeof(piVECTOR) * 2);
 
     SINT32 indice = 0;
 

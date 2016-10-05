@@ -22,7 +22,7 @@ namespace Instance			//tolua_export
 	{
 	public:
 		BasicStatus(const Descriptor& _descriptor,
-			const UINT8 _capacity,
+			const UINT16 _capacity,
 			const UINT16 _gameTime_m,
 			const UINT32 _createdAt = teulClockTime,
 			const UINT32 _startedAt = 0,

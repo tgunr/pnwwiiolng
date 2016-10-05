@@ -7,8 +7,8 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-extern struct FULL_OBJ_ID* populateFullObjID(struct FULL_OBJ_ID* foid, SINT32 sx, SINT32 sy, struct REL_OBJ_ID roid);
+extern FULL_OBJ_ID* populateFullObjID(FULL_OBJ_ID* foid, SINT32 sx, SINT32 sy, struct REL_OBJ_ID roid);
 
 extern void printMissionSummary(struct MISSION_SUMMARY* summary);
 
-extern void printFULL_OBJ_ID(struct FULL_OBJ_ID* fullObjID);
+extern void printFULL_OBJ_ID(FULL_OBJ_ID* fullObjID);

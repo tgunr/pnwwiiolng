@@ -1313,7 +1313,6 @@ mlObjectTrackAnimation * TrackAnimation;
 	{
 
 		*TrackSectionList = (mlObjectTrackSection*)memAlloc(sizeof(mlObjectTrackSection) * *Count);
-		memset(*TrackSectionList,0,sizeof(mlObjectTrackSection) * *Count);
 
 		TrackSection = *TrackSectionList;
 		_SetupTracks(&TrackSection,Object,Object);
@@ -1328,7 +1327,6 @@ mlObjectTrackAnimation * TrackAnimation;
 	else
 	{
 		*TrackAnimationList = (mlObjectTrackAnimation*)memAlloc(sizeof(mlObjectTrackAnimation) * *AnimCount);
-		memset(*TrackAnimationList,0,sizeof(mlObjectTrackAnimation) * *AnimCount);
 
 		TrackAnimation = *TrackAnimationList;
 		_SetupTrackAnimations(&TrackAnimation,Object,Object);
@@ -1744,7 +1742,6 @@ UINT32 mlProcessContactPointObject(mlObjectData* ObjectData)
 
 	ObjectData->NumCollideObjects = NumCollideObjects;
 	ObjectData->CollidePntList = (mlObjectCollidePnt*)memAlloc(sizeof(mlObjectCollidePnt) * NumCollideObjects);
-	memset(ObjectData->CollidePntList,0,sizeof(mlObjectCollidePnt) * NumCollideObjects);
 
 	CurrentCollidePnt = ObjectData->CollidePntList;
 	_SetupCollisionObjects(&CurrentCollidePnt,LineCollideObject->child);
@@ -1767,7 +1764,6 @@ static UINT32 mlProcessHoistContactPointObject(mlObjectData* ObjectData)
 
 	ObjectData->NumHoistCollideObjects = NumCollideObjects;
 	ObjectData->HoistCollidePntList = (mlObjectCollidePnt*)memAlloc(sizeof(mlObjectCollidePnt) * NumCollideObjects);
-	memset(ObjectData->HoistCollidePntList,0,sizeof(mlObjectCollidePnt) * NumCollideObjects);
 
 	CurrentCollidePnt = ObjectData->HoistCollidePntList;
 	_SetupCollisionObjects(&CurrentCollidePnt,LineCollideObject->child);
@@ -2638,7 +2634,6 @@ if(!VehicleObjectAnalysis)
 
 
 	(*ObjectData)->WheelRadius = (FLOAT32*)memAlloc(sizeof(FLOAT32)*ML_MAX_GEARNUM);
-	memset((*ObjectData)->WheelRadius,0,sizeof(FLOAT32)*ML_MAX_GEARNUM);
 	_FindAllWheelRadius((*ObjectData)->PlaneObject,(*ObjectData));
 
 	if ((*ObjectData)->LoadoutLODObject != nullptr)
