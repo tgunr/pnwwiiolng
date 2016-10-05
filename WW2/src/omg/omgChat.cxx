@@ -1,6 +1,6 @@
 #include <syscfg.h> // path is project dependent
 // @file omgChat.cxx
-// @attention Automatically generated FROM C:/Dev/wwiiolng/WW2/src/omg/omgChat.omg
+// @attention Automatically generated FROM omgChat.omg
 // @attention Manual edits will be lost.
 
 #include "omgChat.hxx"
