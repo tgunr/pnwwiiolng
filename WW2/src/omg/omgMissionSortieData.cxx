@@ -1,6 +1,6 @@
 #include <syscfg.h> // path is project dependent
 // @file omgMissionSortieData.cxx
-// @attention Automatically generated FROM C:/Dev/wwiiolng/WW2/src/omg/omgMissionSortieData.omg
+// @attention Automatically generated FROM omgMissionSortieData.omg
 // @attention Manual edits will be lost.
 
 #include "omgMissionSortieData.hxx"

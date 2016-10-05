@@ -1,6 +1,6 @@
 #pragma once
 // @file omgMissionSortieData.hxx
-// @attention Automatically generated FROM C:/Dev/wwiiolng/WW2/src/omg/omgMissionSortieData.omg
+// @attention Automatically generated FROM omgMissionSortieData.omg
 // @attention Manual edits will be lost.
 
 #include "include/inplace_vector.h"
