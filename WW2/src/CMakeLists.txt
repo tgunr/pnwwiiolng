@@ -36,6 +36,7 @@ IF( PN_BUILD_TYPE MATCHES "Auth" OR PN_CLUSTER MATCHES "Auth" )
     SET(PN_MEM_DEBUG ON)
     SET(PN_STACK_PROTECT ON)
     SET(PN_TRACER ON)
+	SET(PN_LUA_CLIENT OFF)
 ENDIF( )
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/hostproj ${CMAKE_CURRENT_BINARY_DIR})
@@ -100,73 +101,35 @@ MESSAGE(STATUS "${PN_BUILD_TYPE}/${BUILDNAME} build. Opt:${OPTIMIZATION}, MEM:${
 #### Code Generators.
 
 SET(OMG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omg")
-SET(OMGGEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omggen")
+SET(OMG_OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omg")	# Should be CMAKE_CURRENT_BINARY_DIR
+FILE(MAKE_DIRECTORY ${OMG_OUT_DIR})
 
-# bison first, then flex.
-IF(WIN32)
-    SET(BISON_EXE "${OMGGEN_DIR}/win_bison.exe")
-    SET(FLEX_EXE "${OMGGEN_DIR}/win_flex.exe")
-ELSE( )
-    SET(BISON_EXE "bison")
-    SET(FLEX_EXE "flex")
-ENDIF( )
-
-ADD_CUSTOM_COMMAND(OUTPUT ${OMGGEN_DIR}/omggen.tab.cpp ${OMGGEN_DIR}/omggen.tab.h
-    PRE_BUILD
-    COMMAND ${BISON_EXE}
-    ARGS -o omggen.tab.cpp --defines=omggen.tab.h --report=all omggen.y
-    DEPENDS "${OMGGEN_DIR}/omggen.y"
-    MAIN_DEPENDENCY "${OMGGEN_DIR}/omggen.y"
-    COMMENT "[BISON] Building OMGGEN"
-    WORKING_DIRECTORY ${OMGGEN_DIR}
-)
-ADD_CUSTOM_COMMAND(OUTPUT ${OMGGEN_DIR}/omggen.yy.cpp ${OMGGEN_DIR}/omggen.yy.h
-    PRE_BUILD
-    COMMAND ${FLEX_EXE}
-    ARGS -o omggen.yy.cpp -B --nounistd --header-file=omggen.yy.h omggen.l
-    DEPENDS ${OMGGEN_DIR}/omggen.l ${OMGGEN_DIR}/omggen.tab.h
-    MAIN_DEPENDENCY "${OMGGEN_DIR}/omggen.l"
-    COMMENT "[FLEX] Building OMGGEN"
-    WORKING_DIRECTORY ${OMGGEN_DIR}
-)
-ADD_EXECUTABLE(OMGgen
-    ${OMGGEN_DIR}/omggen.tab.cpp
-        ${OMGGEN_DIR}/omggen.tab.h
-    ${OMGGEN_DIR}/omggen.yy.cpp
-        ${OMGGEN_DIR}/omggen.yy.h
-    ${OMGGEN_DIR}/omggen.cpp
-        ${OMGGEN_DIR}/omggen.h
-    ${OMGGEN_DIR}/omggen.y
-    ${OMGGEN_DIR}/omggen.l
-)
-IF(WIN32)
-    SET_PROPERTY(TARGET OMGgen PROPERTY COMPILE_DEFINITIONS __STDC_VERSION__=199901L)
-ENDIF()
+ADD_SUBDIRECTORY(omggen)
 
 MACRO(ADD_OMG_TARGET _TARGET)
-    SET(_TARGET_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/${_TARGET}")
+    SET(_TARGET_PREFIX "${OMG_OUT_DIR}/${_TARGET}")
+	SET(_SOURCE_PREFIX "${OMG_DIR}/${_TARGET}")
     GET_FILENAME_COMPONENT(_TARGET_PREFIX ${_TARGET_PREFIX} ABSOLUTE)
     GET_FILENAME_COMPONENT(_TARGET_PATH ${_TARGET_PREFIX}.omg DIRECTORY)
     GET_FILENAME_COMPONENT(_FILENAME ${_TARGET_PREFIX} NAME)
+	GET_FILENAME_COMPONENT(_SOURCE_PREFIX ${_SOURCE_PREFIX} ABSOLUTE)
+    GET_FILENAME_COMPONENT(_SOURCE_PATH ${_SOURCE_PREFIX}/${_TARGET}.omg DIRECTORY)
     ADD_CUSTOM_COMMAND(
         PRE_BUILD
         OUTPUT  ${_TARGET_PREFIX}.cxx ${_TARGET_PREFIX}.hxx
-        DEPENDS OMGgen ${_TARGET_PATH}/typedefs.omg ${_TARGET_PREFIX}.omg
-        MAIN_DEPENDENCY ${_TARGET_PREFIX}.omg
+        DEPENDS omggen ${_SOURCE_PATH}/typedefs.omg ${_SOURCE_PREIFX}.omg
+        MAIN_DEPENDENCY ${_SOURCE_PREFIX}.omg
         COMMENT "[OMG] ${_FILENAME}.omg"
-        COMMAND OMGgen
-        ARGS -D${_TARGET_PATH} --cxx=${_FILENAME}.cxx --hxx=${_FILENAME}.hxx ${_FILENAME}.omg
+        COMMAND omggen
+        ARGS -D${_TARGET_PATH} -I${OMG_DIR} --cxx=${_FILENAME}.cxx --hxx=${_FILENAME}.hxx ${_SOURCE_PREFIX}.omg
         WORKING_DIRECTORY ${_TARGET_PATH}
     )
 ENDMACRO()
 
-ADD_OMG_TARGET(omg/omgMissionSortieData)
-ADD_OMG_TARGET(omg/omgChat)
+ADD_OMG_TARGET(omgMissionSortieData)
+ADD_OMG_TARGET(omgChat)
 
-IF(NOT MSVC)
-    SET_TARGET_PROPERTIES(OMGgen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
-ENDIF( )
-SET_PROPERTY(TARGET OMGgen PROPERTY FOLDER "Tools")
+SET_PROPERTY(TARGET omggen PROPERTY FOLDER "Tools")
 
 ######################################################################
 #### Libraries.
@@ -412,11 +375,13 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
         SET_PROPERTY(TARGET chatClient PROPERTY FOLDER "Tools")
 
         # Provide access to the LuaVMs.
-        ADD_EXECUTABLE(luaClient
-            src/luaClient.cpp
-        )
-        TARGET_LINK_LIBRARIES(luaClient libwwii teulserver readline ncurses ${MYSQL_LIBRARIES})
-        SET_PROPERTY(TARGET luaClient PROPERTY FOLDER "Tools")
+		IF (PN_LUA_CLIENT)
+        	ADD_EXECUTABLE(luaClient
+            	src/luaClient.cpp
+        	)
+        	TARGET_LINK_LIBRARIES(luaClient libwwii teulserver readline ncurses ${MYSQL_LIBRARIES})
+        	SET_PROPERTY(TARGET luaClient PROPERTY FOLDER "Tools")
+		ENDIF ( )
     ENDIF( )
 
     # Tool for validating strings as possible gamenames.
@@ -484,6 +449,8 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
                     mm/mmEnums.h
         strt/strtData.cpp
             strt/strtData.h
+			wwii/wwiiConfigVars.h
+				teul/teulConfigVar.h
         strt/strtFacilityStruct.cpp
             strt/strtFacilityStruct.h
         strt/strtObjectStruct.cpp
@@ -503,36 +470,38 @@ ENDIF( )
 #### Server Processes
 
 # Authentication Server(auth host)
-ADD_EXECUTABLE(${AUTH_HOST_EXE}
-    auth/authClientData.cpp
-        auth/authClientData.h
-    auth/authDB.cpp
-        auth/authDB.h
-        auth/authDatabaseSchemas.h
-    auth/authHost.cpp
-        auth/authHost.h
-        auth/authGame.h
-    auth/authHostMessages.cpp
-        auth/authHostMessages.h
-        auth/authQueuePosition.h
-    auth/authOTP.cpp
-        auth/authOTP.h
-    auth/authQueue.cpp
-        auth/authQueue.h
-        wwii/wwiiRunningAverage.h
-    src/infoHostMessages.cpp
-        include/infoHostMessages.h
-    src/infoPack.cpp
-        include/infoPack.h
-    auth/authPack.cpp
-        auth/authPack.h
-    dbse/dbseDatabaseSchema.cpp
-        dbse/dbseDatabaseSchema.h
-    ${PCH_INCLUDE_HEADERS}
-)
-ADD_PCH(${AUTH_HOST_EXE})
-TARGET_LINK_LIBRARIES(${AUTH_HOST_EXE} teulserver libwwii ${MYSQL_LIBRARIES} ircclient)
-SET_PROPERTY(TARGET ${AUTH_HOST_EXE} PROPERTY FOLDER "Hosts")
+IF (NOT PN_DISABLE_AUTH)
+	ADD_EXECUTABLE(${AUTH_HOST_EXE}
+		auth/authClientData.cpp
+			auth/authClientData.h
+		auth/authDB.cpp
+			auth/authDB.h
+			auth/authDatabaseSchemas.h
+		auth/authHost.cpp
+			auth/authHost.h
+			auth/authGame.h
+		auth/authHostMessages.cpp
+			auth/authHostMessages.h
+			auth/authQueuePosition.h
+		auth/authOTP.cpp
+			auth/authOTP.h
+		auth/authQueue.cpp
+			auth/authQueue.h
+			wwii/wwiiRunningAverage.h
+		src/infoHostMessages.cpp
+			include/infoHostMessages.h
+		src/infoPack.cpp
+			include/infoPack.h
+		auth/authPack.cpp
+			auth/authPack.h
+		dbse/dbseDatabaseSchema.cpp
+			dbse/dbseDatabaseSchema.h
+		${PCH_INCLUDE_HEADERS}
+	)
+	ADD_PCH(${AUTH_HOST_EXE})
+	TARGET_LINK_LIBRARIES(${AUTH_HOST_EXE} teulserver libwwii ${MYSQL_LIBRARIES} ircclient)
+	SET_PROPERTY(TARGET ${AUTH_HOST_EXE} PROPERTY FOLDER "Hosts")
+ENDIF( )
 
 IF( NOT PN_CLUSTER STREQUAL "Auth" )
     ADD_EXECUTABLE(${CONTROLLER_HOST_EXE}
@@ -1172,21 +1141,21 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
             list/listCL.h
                 list/list.h
 
-        ${_LUA_HOST}Lua.cc
+        ${_LUA_CC}
 
         ${PCH_INCLUDE_HEADERS}
     )
     ADD_PCH(${STRAT_HOST_EXE})
     SET_PROPERTY(TARGET ${STRAT_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_STRAT_HOST LUA_MODULE_OPEN=tolua_stratd_open CHECK_SUPPLY=1)
-    SET_PROPERTY(TARGET ${_LUA_HOST} PROPERTY DEPENDS ${_LUA_HOST}Lua.cc)
+    SET_PROPERTY(TARGET ${_LUA_HOST} PROPERTY DEPENDS ${_LUA_CC})
     IF( NOT MSVC )
-        SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-unused -Wno-unused-function")
+        SET_PROPERTY(SOURCE ${_LUA_CC} PROPERTY COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-unused -Wno-unused-function")
     ELSE( )
-        SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS /W0)
-        SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS "/wd4480 /wd4800 /wd4305 /wd4505")
+        SET_PROPERTY(SOURCE ${_LUA_CC} PROPERTY COMPILE_FLAGS /W0)
+        SET_PROPERTY(SOURCE ${_LUA_CC} PROPERTY COMPILE_FLAGS "/wd4480 /wd4800 /wd4305 /wd4505")
     ENDIF( )
-    SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY DEPENDS ${TOLUAPP_EXECUTABLE} ${TOLUAPP_LIBRARIES})
-    SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY GENERATED true)
+    SET_PROPERTY(SOURCE ${_LUA_CC} PROPERTY DEPENDS ${TOLUAPP_EXECUTABLE} ${TOLUAPP_LIBRARIES})
+    SET_PROPERTY(SOURCE ${_LUA_CC} PROPERTY GENERATED true)
     TARGET_LINK_LIBRARIES(${STRAT_HOST_EXE} libwwii ${MYSQL_LIBRARIES} teulserver ircclient ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
     SET_PROPERTY(TARGET ${STRAT_HOST_EXE} PROPERTY FOLDER "Hosts")
 
@@ -1204,65 +1173,65 @@ ENDIF( )
 #TARGET_LINK_LIBRARIES(testAuthConnect libwwii teulserver)
 #SET_PROPERTY(TARGET testAuthConnect PROPERTY FOLDER "Test")
 #
-#IF( NOT PN_CLUSTER STREQUAL "Auth")
+IF( NOT PN_CLUSTER STREQUAL "Auth")
     # Builds a single executable that runs all of the unit tests;
     # The install process will not execute unless all tests complete.
-#    ADD_EXECUTABLE(testUnits
-#        tests/testUnits.cpp
-#        tests/testUnits.h
-#        tests/testTeulBits.cpp
-#        tests/testAuthQueue.cpp auth/authClientData.cpp
-#        tests/testChatHandle.cpp
-#        tests/testFullObjID.cpp
-#        tests/testCommandWithArgs.cpp
-#        tests/testCovert.cpp
-#        tests/testLocalizedMessage.cpp
-#        tests/testInplaceVector.cpp
-#        tests/testPackers.cpp   comm/commPackers.cpp
-#        tests/testChatMissionStatus.cpp wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChat.cxx
-#        tests/testHostGridCell.cpp host/hostGridCell.cpp
-#        tests/testSupercellVislevelXfer.cpp
-#        tests/testPersonaXfer.cpp
-#        tests/testCryptographer.cpp
-#        tests/testXYZTuple.cpp
-#        tests/testTeulPacket.cpp
-#
-#        ${PCH_INCLUDE_HEADERS}
-#        tests/testSuite.h
-#        tests/testUnits.h
-#    )
-#    ADD_PCH(testUnits)
-#    SET_PROPERTY(TARGET testUnits PROPERTY COMPILE_DEFINITIONS ENABLE_TESTS)
-#    SET_PROPERTY(TARGET testUnits PROPERTY FOLDER "Test")
-#    TARGET_LINK_LIBRARIES(testUnits libwwii teulserver)
-#
-#    ADD_TEST(testUnits ${EXECUTABLE_OUTPUT_PATH}/testUnits)
-#ENDIF( )
+    ADD_EXECUTABLE(testUnits
+        tests/testUnits.cpp
+            tests/testUnits.h
+        tests/testTeulBits.cpp
+        tests/testAuthQueue.cpp auth/authClientData.cpp
+        tests/testChatHandle.cpp
+        tests/testFullObjID.cpp
+        tests/testCommandWithArgs.cpp
+        tests/testCovert.cpp
+        tests/testLocalizedMessage.cpp
+        tests/testInplaceVector.cpp
+        tests/testPackers.cpp   comm/commPackers.cpp
+        tests/testChatMissionStatus.cpp wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChat.cxx
+        tests/testHostGridCell.cpp host/hostGridCell.cpp
+        tests/testSupercellVislevelXfer.cpp
+        tests/testPersonaXfer.cpp
+        tests/testCryptographer.cpp
+        tests/testXYZTuple.cpp
+        tests/testTeulPacket.cpp
+
+        ${PCH_INCLUDE_HEADERS}
+        tests/testSuite.h
+        tests/testUnits.h
+    )
+    ADD_PCH(testUnits)
+    SET_PROPERTY(TARGET testUnits PROPERTY COMPILE_DEFINITIONS ENABLE_TESTS)
+    SET_PROPERTY(TARGET testUnits PROPERTY FOLDER "Test")
+    TARGET_LINK_LIBRARIES(testUnits libwwii teulserver)
+
+    ADD_TEST(testUnits ${EXECUTABLE_OUTPUT_PATH}/testUnits)
+ENDIF( )
 
 ######################################################################
 #### Module for testing teulKit functionality
 
-#IF( NOT PN_CLUSTER STREQUAL "Auth")
-#    ADD_EXECUTABLE(testTeul
-#        tests/testTeul.cpp
-#        
-#        ${PCH_INCLUDE_HEADERS}
-#        teul/teulExceptions.h
-#        teul/teulKit.h
-#        teul/teulEndpoint.h
-#        teul/teulEndpointImpl.h
-#        teul/teulPacket.h
-#        teul/teulPacketHeader.h
-#        wwii/wwiiCallbacks.h
-#        tests/testTeulTest.h
-#        tests/testTeulClient.h
-#        tests/testTeulServer.h
-#        teul/teulVersion.h
-#        teul/teulConnectionInstruction.h
-#    )
-#    TARGET_LINK_LIBRARIES(testTeul teulserver libwwii)
-#    SET_PROPERTY(TARGET testTeul PROPERTY FOLDER "Test")
-#ENDIF( )
+IF( NOT PN_CLUSTER STREQUAL "Auth")
+    ADD_EXECUTABLE(testTeul
+        tests/testTeul.cpp
+        
+        ${PCH_INCLUDE_HEADERS}
+        teul/teulExceptions.h
+        teul/teulKit.h
+        teul/teulEndpoint.h
+        teul/teulEndpointImpl.h
+        teul/teulPacket.h
+        teul/teulPacketHeader.h
+        wwii/wwiiCallbacks.h
+        tests/testTeulTest.h
+        tests/testTeulClient.h
+        tests/testTeulServer.h
+        teul/teulVersion.h
+        teul/teulConnectionInstruction.h
+    )
+    TARGET_LINK_LIBRARIES(testTeul teulserver libwwii)
+    SET_PROPERTY(TARGET testTeul PROPERTY FOLDER "Test")
+ENDIF( )
 
 ######################################################################
 #### Build files.
@@ -1284,12 +1253,20 @@ SET_TARGET_PROPERTIES(envconfig PROPERTIES FOLDER "Tools")
 ###TODO: Should really be dependent on testUnits as described above. Duh.
 IF( NOT PN_CLUSTER STREQUAL "Auth")
     IF( NOT WIN32 )
-        INSTALL(TARGETS chatClient luaClient
+        INSTALL(TARGETS chatClient
             ARCHIVE DESTINATION lib
             LIBRARY DESTINATION lib
             RUNTIME DESTINATION bin
             COMPONENT cmdclients
         )
+		IF( NOT PN_LUA_CLIENT )
+			INSTALL(TARGETS chatClient
+				ARCHIVE DESTINATION lib
+				LIBRARY DESTINATION lib
+				RUNTIME DESTINATION bin
+				COMPONENT cmdclients
+			)
+		ENDIF( )
     ENDIF( )
     INSTALL(TARGETS checkGameName stratLoader sdmpp stratValidator
             ARCHIVE DESTINATION lib
@@ -1305,13 +1282,15 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
             COMPONENT game
     )
 ENDIF( )
-INSTALL(TARGETS
-            ${AUTH_HOST_EXE}
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION bin
-        COMPONENT auth
-)
+IF (NOT PN_DISABLE_AUTH)
+	INSTALL(TARGETS
+            	${AUTH_HOST_EXE}
+        	ARCHIVE DESTINATION lib
+        	LIBRARY DESTINATION lib
+        	RUNTIME DESTINATION bin
+        	COMPONENT auth
+	)
+ENDIF( )
 INSTALL(FILES
             environment.cfg
             environment.win.cfg

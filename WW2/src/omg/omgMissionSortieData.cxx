@@ -1,12 +1,12 @@
 #include <syscfg.h> // path is project dependent
 // @file omgMissionSortieData.cxx
-// @attention Automatically generated FROM omgMissionSortieData.omg
+// @attention Automatically generated FROM C:/Dev/wwiiolng/WW2/src/omg/omgMissionSortieData.omg
 // @attention Manual edits will be lost.
 
 #include "omgMissionSortieData.hxx"
 TEUL_CALLBACK* MM::SortieData::s_callback;
 
-bool MM::SortieData::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const
+bool MM::SortieData::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack) const
 {
 	UCHAR groupPresence{0};
 	SINT32 groupPresenceOffset = a->offset;
@@ -25,7 +25,7 @@ bool MM::SortieData::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPac
 	return (a->offset >= 0);
 }
 
-bool MM::SortieData::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)
+bool MM::SortieData::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack)
 {
 	UCHAR groupPresence(0);
 	a->unpack(groupPresence, 8);
@@ -43,12 +43,12 @@ bool MM::SortieData::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastP
 	return false;
 }
 
-bool MM::SortieData::pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const
+bool MM::SortieData::pack(ACTION_OBJECT* const a, TeulTimeMS lastPack) const
 {
 	return groupPack(a, lastPack) && (a->offset >= 0);
 }
 
-bool MM::SortieData::unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)
+bool MM::SortieData::unpack(ACTION_OBJECT* const a, TeulTimeMS lastPack)
 {
 	return groupUnpack(a, lastPack) && (a->offset >= 0);
 }
@@ -65,7 +65,7 @@ MM::SortieData::Sortie& MM::SortieData::Sortie::operator = (const MM::SortieData
 	return *this;
 }
 
-void MM::SortieData::Sortie::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const
+void MM::SortieData::Sortie::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const
 {
 	sortieID.pack(a, lastPack, changes, 0);
 	spawned_ms.pack(a, lastPack, changes, 1);
@@ -75,7 +75,7 @@ void MM::SortieData::Sortie::groupPack(ACTION_OBJECT* const a, const TeulTimeMS&
 	flags.pack(a, lastPack, changes, 5);
 }
 
-void MM::SortieData::Sortie::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void MM::SortieData::Sortie::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)
 {
 	sortieID.unpack(a, lastPack, changes, 0);
 	spawned_ms.unpack(a, lastPack, changes, 1);
@@ -97,7 +97,7 @@ MM::SortieData::Vehicle& MM::SortieData::Vehicle::operator = (const MM::SortieDa
 	return *this;
 }
 
-void MM::SortieData::Vehicle::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const
+void MM::SortieData::Vehicle::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const
 {
 	weaponSpec.pack(a, lastPack, changes, 0);
 	effectiveRank.pack(a, lastPack, changes, 1);
@@ -107,7 +107,7 @@ void MM::SortieData::Vehicle::groupPack(ACTION_OBJECT* const a, const TeulTimeMS
 	rtbFacility.pack(a, lastPack, changes, 5);
 }
 
-void MM::SortieData::Vehicle::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void MM::SortieData::Vehicle::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)
 {
 	weaponSpec.unpack(a, lastPack, changes, 0);
 	effectiveRank.unpack(a, lastPack, changes, 1);
@@ -128,7 +128,7 @@ MM::SortieData::Location& MM::SortieData::Location::operator = (const MM::Sortie
 	return *this;
 }
 
-void MM::SortieData::Location::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const
+void MM::SortieData::Location::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const
 {
 	x.pack(a, lastPack, changes, 0);
 	y.pack(a, lastPack, changes, 1);
@@ -137,7 +137,7 @@ void MM::SortieData::Location::groupPack(ACTION_OBJECT* const a, const TeulTimeM
 	nearCP.pack(a, lastPack, changes, 4);
 }
 
-void MM::SortieData::Location::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void MM::SortieData::Location::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)
 {
 	x.unpack(a, lastPack, changes, 0);
 	y.unpack(a, lastPack, changes, 1);
@@ -173,7 +173,7 @@ MM::SortieData::Scoring& MM::SortieData::Scoring::operator = (const MM::SortieDa
 	return *this;
 }
 
-void MM::SortieData::Scoring::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const
+void MM::SortieData::Scoring::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const
 {
 	hits.pack(a, lastPack, changes, 0);
 	kills.pack(a, lastPack, changes, 1);
@@ -198,7 +198,7 @@ void MM::SortieData::Scoring::groupPack(ACTION_OBJECT* const a, const TeulTimeMS
 	assists.pack(a, lastPack, changes, 20);
 }
 
-void MM::SortieData::Scoring::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void MM::SortieData::Scoring::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)
 {
 	hits.unpack(a, lastPack, changes, 0);
 	kills.unpack(a, lastPack, changes, 1);
@@ -227,37 +227,39 @@ TEUL_CALLBACK* MM::TestCond::s_callback;
 
 bool MM::TestCond::pack(ACTION_OBJECT* const a, SINT32 size) const
 {
-	a->pack(sortieID, 0);
-	a->pack(pilotID, 0);
-	a->pack(pilotName, 0);
-	a->pack(crewID, 0);
+	a->pack(sortieID);
+	a->pack(pilotID);
+	a->pack(pilotName);
+	a->pack(crewID);
 	if (crewID != 0) {
-		a->pack(crewHandle, 0);
+		a->pack(crewHandle);
 		if (crewHandle != 0) {
-			a->pack(crewDecal, 0);
+			a->pack(crewDecal);
 		}
-		ABORT_IF(components.size() >= 64);
-		UINT16 Component_count(components.size());
+		ABORT_IF(components.size() > 64);
+		UINT32 Component_count((UINT32)components.size());
 		a->pack(Component_count, 8);
 		for (UINT32 Component_idx = 0; Component_idx < Component_count; ++Component_idx) {
 			components[Component_idx].pack(a, 0);
 		}
 	}
+	a->packBytes(&array[0], sizeof(array));
+	a->pack(bitty, 24);
 	return (a->offset >= 0);
 }
 
 bool MM::TestCond::unpack(ACTION_OBJECT* const a, SINT32 size)
 {
-	a->unpack(sortieID, 0);
-	a->unpack(pilotID, 0);
-	a->unpack(pilotName, 0);
-	a->unpack(crewID, 0);
+	a->unpack(sortieID);
+	a->unpack(pilotID);
+	a->unpack(pilotName);
+	a->unpack(crewID);
 	if (crewID != 0) {
-		a->unpack(crewHandle, 0);
+		a->unpack(crewHandle);
 		if (crewHandle != 0) {
-			a->unpack(crewDecal, 0);
+			a->unpack(crewDecal);
 		}
-		UINT16 Component_count(0);
+		UINT32 Component_count{0};
 		a->unpack(Component_count, 8);
 		if (Component_count > 64) { a->offset = -EINVAL; return false; }
 		components.resize(Component_count);
@@ -265,34 +267,36 @@ bool MM::TestCond::unpack(ACTION_OBJECT* const a, SINT32 size)
 			components[Component_idx].unpack(a, 0);
 		}
 	}
+	a->unpackBytes(&array[0], sizeof(array));
+	a->unpack(bitty, 24);
 	return (a->offset >= 0);
 }
 
 bool MM::TestCond::Component::Id::pack(ACTION_OBJECT* const a, SINT32) const
 {
-	a->pack(idNo, 0);
+	a->pack(idNo);
 	if (idNo) {
-		a->pack(damage, 0);
+		a->packBytes(&damage[0], sizeof(damage));
 	}
 	return (a->offset >= 0);
 }
 
 bool MM::TestCond::Component::Id::unpack(ACTION_OBJECT* const a, SINT32)
 {
-	a->unpack(idNo, 0);
+	a->unpack(idNo);
 	if (idNo) {
-		a->unpack(damage, 0);
+		a->unpackBytes(&damage[0], sizeof(damage));
 	}
 	return (a->offset >= 0);
 }
 
 bool MM::TestCond::Component::pack(ACTION_OBJECT* const a, SINT32) const
 {
-	a->pack(id, 0);
-	a->pack(damage, 0);
+	a->pack(id);
+	a->pack(damage);
 	if (damage > 0) {
-		ABORT_IF(ids.size() >= 8);
-		UINT16 Id_count(ids.size());
+		ABORT_IF(ids.size() > 8);
+		UINT32 Id_count((UINT32)ids.size());
 		a->pack(Id_count, 8);
 		for (UINT32 Id_idx = 0; Id_idx < Id_count; ++Id_idx) {
 			ids[Id_idx].pack(a, 0);
@@ -303,10 +307,10 @@ bool MM::TestCond::Component::pack(ACTION_OBJECT* const a, SINT32) const
 
 bool MM::TestCond::Component::unpack(ACTION_OBJECT* const a, SINT32)
 {
-	a->unpack(id, 0);
-	a->unpack(damage, 0);
+	a->unpack(id);
+	a->unpack(damage);
 	if (damage > 0) {
-		UINT16 Id_count(0);
+		UINT32 Id_count{0};
 		a->unpack(Id_count, 8);
 		if (Id_count > 8) { a->offset = -EINVAL; return false; }
 		ids.resize(Id_count);

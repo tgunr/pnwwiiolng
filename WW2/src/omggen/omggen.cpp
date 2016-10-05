@@ -1,5 +1,11 @@
 // Object Model Generator v2
 
+#if defined(_MSC_VER)
+# define NORETURN_FN [[noreturn]]
+#else
+# define NORETURN_FN __attribute__ ((noreturn))
+#endif
+
 #include "omggen.h"
 #include "omggen.yy.h"
 #include "omggen.tab.h"
@@ -9,19 +15,14 @@
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
+#define NOGDI
 #include <Windows.h>
 #undef min
 #undef max
 #include <direct.h>
 #define chdir(dirname) _chdir(dirname)
+#define strcasecmp(x, y) _stricmp(x, y)
 #endif
-
-#if defined(_MSC_VER)
-# define NORETURN_FN __declspec(noreturn)
-#else
-# define NORETURN_FN __attribute__ ((noreturn))
-#endif
-
 
 long long leakCount = 0;
 static const char* s_exeName;
@@ -32,8 +33,10 @@ static FILE* s_cxx;
 
 static bool s_debug = false;
 static std::string s_namespace = "";
+static unsigned long s_clientType = 0;
 static std::string s_namespaceQual = "";
 static std::set<std::string> s_includes;
+static std::vector<std::string> s_includePaths;
 
 const char* g_currentFile = nullptr;
 
@@ -41,17 +44,18 @@ enum { MAX_MESSAGE_GROUPS = 32, MAX_GROUP_FIELDS = 32 };
 
 using TypeMap = std::vector<TypeDef>;
 static TypeMap s_typeMap = {
-	{ "UINT8", "", false, "" },
-	{ "SINT8", "", false, "" },
-	{ "UINT16", "", false, "" },
-	{ "SINT16", "", false, "" },
-	{ "UINT32", "", false, "" },
-	{ "SINT32", "", false, "" },
-	{ "UINT64", "", false, "" },
-	{ "SINT64", "", false, "" },
-	{ "FLOAT", "", false, "" },
-	{ "DOUBLE", "", false, "" },
-	{ "bool", "", false, "" },
+	{ "UINT8",  "",  8, false, "" },
+	{ "SINT8",  "",  8, false, "" },
+	{ "UINT16", "", 16, false, "" },
+	{ "SINT16", "", 16, false, "" },
+	{ "UINT32", "", 32, false, "" },
+	{ "SINT32", "", 32, false, "" },
+	{ "UINT64", "", 64, false, "" },
+	{ "SINT64", "", 64, false, "" },
+	{ "FLOAT",  "", 32, false, "" },
+	{ "DOUBLE", "", 64, false, "" },
+	{ "bool",   "",  1, false, "" },
+	{ "char",	"",  8, false, "" },
 };
 
 static unsigned int s_msgY;					// next msgY to assign.
@@ -65,11 +69,24 @@ struct Using
 	FILE*				m_fp;
 	int					m_lineNo;
 
-	Using(const char* filename, FILE* fp, int lineNo)
-		: m_filename(filename), m_fp(fp), m_lineNo(lineNo)
+	Using(std::string&& filename, FILE* fp, int lineNo)
+		: m_filename(std::move(filename)), m_fp(fp), m_lineNo(lineNo)
 	{ }
 };
 std::stack<Using>		s_usings;
+
+static void s_add_field_bits(const char*);
+struct FieldOption
+{
+	const char*			m_name;
+	bool				m_wantsArg;
+	///TODO: pointer to function that handles add_field_option
+	void(*m_argFn)(const char* value);
+};
+static const FieldOption s_fieldOptions[] = {
+	FieldOption{"bits", true, s_add_field_bits},
+};
+enum FieldOptions { Bits, Max };
 
 struct Node
 {
@@ -216,18 +233,24 @@ struct Field : public Node
 	const TypeDef*		m_typeDef;		// Variable type
 	size_t				m_size;			// bits, length, etc.
 	const char*			m_defaultValue;
+	size_t				m_dimensions;	// number of array dimensions
+	std::string			m_dimensionString;
 
 	Field(const TypeDef* typeDef, const char* name, Node* parent)
 		: Node(Node::Type::Field, name, parent) 
 		, m_typeDef(typeDef)
 		, m_size(0)
 		, m_defaultValue("")
+		, m_dimensions(0)
+		, m_dimensionString("")
 	{
 	}
 
 	void Emit(size_t indentLevel) const override;
 	void EmitPack(size_t indentLevel) const override;
 	void EmitUnpack(size_t indentLevel) const override;
+
+	bool IsArray() const { return m_dimensions > 0; }
 };
 
 struct Conditional : public Node
@@ -336,6 +359,7 @@ void yyerror(const char *s, ...)
 	fprintf(stderr, "\n");
 }
 
+NORETURN_FN
 void yyfatal(const char* s, ...)
 {
 	_reportLocation(stderr);
@@ -378,6 +402,12 @@ static const char* _getIndents(size_t indentLevel)
 	return s_indents + (MAX_INDENTS - std::min(indentLevel, MAX_INDENTS));
 }
 
+static size_t _getUniqueID()
+{
+	static size_t uniqueID = 0;
+	return ++uniqueID;
+}
+
 static void _endOfNode(Node::Type expectedType)
 {
 	if (s_currentNode == nullptr) {
@@ -402,6 +432,23 @@ static void _checkName(const char* name)
 
 //////////////////////////////////////////////////////////////////////
 
+void omg_namespace(const char* name)
+{
+	if ( !s_namespace.empty() )
+		yyfatal("Only one namespace definition allowed (%s)", name);
+	annotate("Setting namespace to '%s'", name);
+	s_namespace = name;
+	s_namespaceQual = name;
+	s_namespaceQual += "::";
+	s_msgY = 0;
+}
+
+void omg_client(unsigned long clientType)
+{
+	annotate("Client type is %d", clientType);
+	s_clientType = clientType;
+}
+
 void omg_enable_debug()
 {
 	s_debug = true;
@@ -414,17 +461,6 @@ void omg_type_decl(TypeDef&& typeDef)
 		yyfatal("redefinition of %s", typeDef.Name().c_str());
 	annotate("Added new type: %s", typeDef.Name().c_str());
 	s_typeMap.emplace_back(std::move(typeDef));
-}
-
-void omg_namespace(const char* name)
-{
-	if (!s_namespace.empty())
-		yyfatal("Only one namespace definition allowed (%s)", name);
-	annotate("Setting namespace to '%s'", name);
-	s_namespace = name;
-	s_namespaceQual = name;
-	s_namespaceQual += "::";
-	s_msgY = 0;
 }
 
 void omg_start_y(int value)
@@ -469,6 +505,11 @@ void omg_start_message(const char* name)
 	std::string constantsHeader = namespacePrefix + "/" + namespacePrefix + "Constants.h";
 	s_includes.insert(constantsHeader);
 	s_includes.insert("teul/teulPacket.h");
+}
+
+void omg_message_attr(unsigned long attrNo)
+{
+	annotate("wanted attribute %d for message", attrNo);
 }
 
 void omg_end_message()
@@ -530,6 +571,70 @@ void omg_start_field(const char* type, const char* name)
 	s_currentNode = field;
 	if (typeDef->Include().empty() == false)
 		s_includes.insert(typeDef->Include());
+}
+
+void omg_add_field_option(const char* optName, const char* optValue)
+{
+	int fieldOpt = -1;
+	for ( int i = 0; i < FieldOptions::Max; ++i ) {
+		if ( strcasecmp(optName, s_fieldOptions[i].m_name) == 0 ) {
+			fieldOpt = i;
+			break;
+		}
+	}
+	if ( fieldOpt == -1 ) {
+		yyfatal("Unrecognized field option '%s'.", optName);
+	}
+
+	const auto& option = s_fieldOptions[fieldOpt];
+	if ( option.m_wantsArg && optValue == nullptr )
+		yyfatal("%s expects a parameter.", option.m_name);
+	else if ( !option.m_wantsArg && optValue != nullptr )
+		yyfatal("%s does not take a parameter.", option.m_name);
+
+	option.m_argFn(optValue);
+}
+
+void s_add_field_bits(const char* sizeStr)
+{
+	assert(s_currentNode->m_type == Node::Type::Field);
+	Field* field = (Field*)s_currentNode;
+
+	long size = strtol(sizeStr, nullptr, 10);
+	if ( size <= 0 )
+		yyfatal("'%s': invalid 'bits=' value, \"%s\".", field->m_name.c_str(), sizeStr);
+
+	if ( field->m_typeDef->PassByRef() )
+		yyfatal("'%s': Cannot specify 'bits' for pass-by-reference types.", field->m_name.c_str());
+	if ( field->m_typeDef->WireBits() == 0 )
+		yyfatal("'%s': Cannot specify 'bits' for type '%s' with unknown size.",
+				field->m_name.c_str(), field->m_typeDef->Name().c_str());
+	if ( field->m_size != 0 )
+		yyfatal("'%s': Multiple 'bits=' values specified.", field->m_name.c_str());
+
+	if ( size >= (long)field->m_typeDef->WireBits() )
+		yyfatal("'%s': 'bits=%s' >= size of %s (%" PRSizeT " bits).",
+				field->m_name.c_str(), sizeStr, field->m_typeDef->Name().c_str(), field->m_typeDef->WireBits());
+
+	field->m_size = size;
+}
+
+void omg_field_dimension(const char* dim)
+{
+	assert(s_currentNode->m_type == Node::Type::Field);
+	Field* field = (Field*)s_currentNode;
+
+	if ( dim[0] == '-' )
+		yyfatal("Array dimension cannot be negative.");
+	if ( field->m_dimensions >= 1 )
+		yyfatal("'%s': Multiple dimensions not yet supported", field->m_name.c_str());
+
+	///TODO: Limit non-integer values to names we know about and can look up.
+	std::string dimStr = "[" + std::string(dim) + "]";
+	field->m_dimensionString.insert(0, dimStr);
+	field->m_dimensions++;
+
+	annotate("%s now has %u dimensions: %s", field->m_name.c_str(), field->m_dimensions, field->m_dimensionString.c_str());
 }
 
 void omg_end_field()
@@ -623,18 +728,22 @@ const char* omg_current_node_name()
 	return s_currentNode->m_name.c_str();
 }
 
-void omg_using(const char* filename)
+void omg_using(std::string filename)
 {
-	FILE* fp = fopen(filename, "r");
-	if (!fp) {
-		yyfatal("Unable to open USING file \"%s\".\n", filename);
-		return;
+	for (auto&& includePath : s_includePaths) {
+		std::string filePath = includePath + "/" + filename;
+		FILE* fp = fopen(filePath.c_str(), "r");
+		if (fp != nullptr) {
+			s_usings.top().m_lineNo = yylineno;
+			yypush_buffer_state(yy_create_buffer(fp, YY_BUF_SIZE));
+			s_usings.emplace(std::move(filePath), fp, 0);
+			g_currentFile = s_usings.top().m_filename.c_str();
+			yylineno = 1;
+			return;
+		}
 	}
-	s_usings.top().m_lineNo = yylineno;
-	yypush_buffer_state(yy_create_buffer(fp, YY_BUF_SIZE));
-	s_usings.emplace(filename, fp, 0);
-	g_currentFile = s_usings.top().m_filename.c_str();
-	yylineno = 1;
+	yyfatal("Unable to open USING file \"%s\".\n", filename);
+	return;
 }
 
 void omg_eof()
@@ -681,6 +790,8 @@ void omg_end_enum()
 	_endOfNode(Node::Type::Enumeration);
 }
 
+static std::vector<EnumValue*> s_enumValues;
+
 void omg_add_enum_value(const char* name)
 {
 	if (islower(name[0]) && name[0] != '_')
@@ -691,6 +802,7 @@ void omg_add_enum_value(const char* name)
 	Enumeration* enumeration = static_cast<Enumeration*>(s_currentNode);
 	assert(enumeration != nullptr);
 	EnumValue* value = new EnumValue(name, enumeration->m_count++, s_currentNode);
+	s_enumValues.push_back(value);
 
 	annotate("Adding ENUM %s value %d", s_currentNode->m_name.c_str(), name, value->m_value);
 }
@@ -830,7 +942,7 @@ void Message::EmitPacker() const
 	const char* param3;
 	if (IsDeltad()) {
 		EmitGroupPackers();
-		fingerprint = "ACTION_OBJECT* const a, const TeulTimeMS& lastPack";
+		fingerprint = "ACTION_OBJECT* const a, TeulTimeMS lastPack";
 		param3 = "lastPack";
 	} else {
 		fingerprint = "ACTION_OBJECT* const a, SINT32 size";
@@ -889,14 +1001,14 @@ void Message::EmitGroupPackers() const
 	HXX(
 		"\tenum { GroupPresenceBits = %" PRSizeT " };\n"
 		"\tconst TeulTimeMS& lastModified() const { return m_lastModified; }\n"
-		"\tbool groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const;\n"
-		"\tbool groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);\n"
+		"\tbool groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack) const;\n"
+		"\tbool groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack);\n"
 		, groupPresenceBits
 	);
 
 	// group pack delta function
 	CXX(
-		"bool %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const\n"
+		"bool %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack) const\n"
 		"{\n"
 		"\t%s groupPresence{0};\n"
 		"\tSINT32 groupPresenceOffset = a->offset;\n"
@@ -929,7 +1041,7 @@ void Message::EmitGroupPackers() const
 
 	// unpack delta function
 	CXX(
-		"bool %s::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)\n"
+		"bool %s::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack)\n"
 		"{\n"
 		"\t%s groupPresence(0);\n"
 		"\ta->unpack(groupPresence, %" PRSizeT ");\n"
@@ -1009,9 +1121,9 @@ void Group::Emit(size_t indentLevel) const
 		"\n"
 		);
 
-	HXX("%svoid groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;\n", _getIndents(indentLevel + 1));
+	HXX("%svoid groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const override;\n", _getIndents(indentLevel + 1));
 	CXX(
-		"void %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const\n"
+		"void %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const\n"
 		"{\n"
 		, GetQualifiedName().c_str()
 		);
@@ -1022,9 +1134,9 @@ void Group::Emit(size_t indentLevel) const
 	CXX("}\n"
 		"\n");
 
-	HXX("%svoid groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;\n", _getIndents(indentLevel + 1));
+	HXX("%svoid groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) override;\n", _getIndents(indentLevel + 1));
 	CXX(
-		"void %s::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)\n"
+		"void %s::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)\n"
 		"{\n"
 		, GetQualifiedName().c_str()
 		);
@@ -1059,17 +1171,37 @@ void Group::Emit(size_t indentLevel) const
 
 void Field::Emit(size_t indentLevel) const
 {
-	HXX("%s%s\t%s;\n", _getIndents(indentLevel), m_typeDef->DeclType().c_str(), m_name.c_str());
+	HXX("%s%s %s%s;\n",
+		_getIndents(indentLevel),
+		m_typeDef->DeclType().c_str(), m_name.c_str(), m_dimensionString.c_str());
 }
 
 void Field::EmitPack(size_t indentLevel) const
 {
-	CXX("%sa->pack(%s, %" PRSizeT ");\n", _getIndents(indentLevel), m_name.c_str(), m_size);
+	if ( !IsArray() ) {
+		if ( m_size )
+			CXX("%sa->pack(%s, %" PRSizeT ");\n", _getIndents(indentLevel), m_name.c_str(), m_size);
+		else
+			CXX("%sa->pack(%s);\n", _getIndents(indentLevel), m_name.c_str());
+	} else if ( !m_typeDef->PassByRef() )
+		CXX("%sa->packBytes(&%s[0], sizeof(%s));\n",
+			_getIndents(indentLevel), m_name.c_str(), m_name.c_str());
+	else
+		assert(!"shouldn't have reached here");
 }
 
 void Field::EmitUnpack(size_t indentLevel) const
 {
-	CXX("%sa->unpack(%s, %" PRSizeT ");\n", _getIndents(indentLevel), m_name.c_str(), m_size);
+	if ( !IsArray() ) {
+		if ( m_size ) {
+		CXX("%sa->unpack(%s, %" PRSizeT ");\n", _getIndents(indentLevel), m_name.c_str(), m_size);
+		} else
+			CXX("%sa->unpack(%s);\n", _getIndents(indentLevel), m_name.c_str());
+	} else if ( !m_typeDef->PassByRef() )
+		CXX("%sa->unpackBytes(&%s[0], sizeof(%s));\n",
+			_getIndents(indentLevel), m_name.c_str(), m_name.c_str());
+	else
+		assert(!"shouldn't have reached here");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1136,18 +1268,20 @@ void Array::Emit(size_t indentLevel) const
 
 uint16_t Array::GetPackBits() const
 {
-	if (isdigit(m_dimension[0])) {
-		long value = std::stol(m_dimension);
-		if (value < (1 << 8))
-			return 8;
-		else if (value < (1 << 16))
-			return 16;
-		else if (value < (1 << 24))
-			return 24;
-		else
-			yyfatal("ARRAY dimension too large: %s", m_dimension.c_str());
+	if ( !isdigit(m_dimension[0]) ) {
+		///TODO: Lookup the value.
+		return 16;
 	}
-	return 16;
+	long value = std::stol(m_dimension);
+	if (value < (1 << 8))
+		return 8;
+	else if (value < (1 << 16))
+		return 16;
+	else if (value < (1 << 24))
+		return 24;
+	else {
+		yyfatal("ARRAY dimension too large: %s", m_dimension.c_str());
+	}
 }
 
 void Array::EmitPack(size_t indentLevel) const
@@ -1157,8 +1291,8 @@ void Array::EmitPack(size_t indentLevel) const
 	std::string countVar = m_name + "_count";
 	std::string iterVar = m_name + "_idx";
 
-	CXX("%sABORT_IF(%s.size() >= %s);\n", indent, m_memberName.c_str(), m_dimension.c_str());
-	CXX("%sUINT16 %s(%s.size());\n", indent, countVar.c_str(), m_memberName.c_str());
+	CXX("%sABORT_IF(%s.size() > %s);\n", indent, m_memberName.c_str(), m_dimension.c_str());
+	CXX("%sUINT32 %s((UINT32)%s.size());\n", indent, countVar.c_str(), m_memberName.c_str());
 	CXX("%sa->pack(%s, %u);\n", indent, countVar.c_str(), packBits);
 
 	CXX("%sfor (UINT32 %s = 0; %s < %s; ++%s) {\n", indent, iterVar.c_str(), iterVar.c_str(), countVar.c_str(), iterVar.c_str());
@@ -1173,7 +1307,7 @@ void Array::EmitUnpack(size_t indentLevel) const
 	std::string countVar = m_name + "_count";
 	std::string iterVar = m_name + "_idx";
 
-	CXX("%sUINT16 %s(0);\n", indent, countVar.c_str());
+	CXX("%sUINT32 %s{0};\n", indent, countVar.c_str());
 	CXX("%sa->unpack(%s, %u);\n", indent, countVar.c_str(), packBits);
 	CXX("%sif (%s > %s) { a->offset = -EINVAL; return false; }\n", indent, countVar.c_str(), m_dimension.c_str());
 	CXX("%s%s.resize(%s);\n", indent, m_memberName.c_str(), countVar.c_str());
@@ -1385,6 +1519,27 @@ static bool _getWorkingDirectoryFromArg(const char* arg)
 	return true;
 }
 
+static bool _getIncludePathFromArg(const char* arg)
+{
+	if (strncmp(arg, "-I", 2) != 0)
+		return false;
+	const char* dirName = arg + 2;
+	if (!*dirName || isspace(*dirName)) {
+		fprintf(stderr, "ERROR: Missing include directory after '%s' (use '%spath not %s path).\n", arg, arg, arg);
+		exit(1);
+	}
+
+	struct stat buf;
+	if (stat(dirName, &buf) < 0) {
+		fprintf(stderr, "ERROR: Invalid/inaccessible path '%s'.\n", dirName);
+		exit(1);
+	}
+
+	s_includePaths.push_back(dirName);
+
+	return true;
+}
+
 NORETURN_FN void usage()
 {
 	fprintf(stderr, "Usage: [-Dworking_directory] [--cxx=file] [--hxx=file] %s <input file>\n", s_exeName);
@@ -1410,6 +1565,8 @@ int main(int argc, const char** argv)
 			s_debug = true;
 			continue;
 		}
+		if (_getIncludePathFromArg(arg))
+			continue;
 		if (arg[0] == '-') {
 			fprintf(stderr, "ERROR: Unrecognized command line option, '%s'\n", arg);
 			return 1;
@@ -1420,6 +1577,7 @@ int main(int argc, const char** argv)
 		}
 		g_currentFile = arg;
 	}
+	s_includePaths.push_back(".");
 
 	if (g_currentFile == nullptr) {
 		fprintf(stderr, "ERROR: No input filename specified.\n");

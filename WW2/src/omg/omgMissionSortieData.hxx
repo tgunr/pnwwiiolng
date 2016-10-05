@@ -1,6 +1,6 @@
 #pragma once
 // @file omgMissionSortieData.hxx
-// @attention Automatically generated FROM omgMissionSortieData.omg
+// @attention Automatically generated FROM C:/Dev/wwiiolng/WW2/src/omg/omgMissionSortieData.omg
 // @attention Manual edits will be lost.
 
 #include "include/inplace_vector.h"
@@ -31,12 +31,12 @@ struct SortieData
 
 	enum { GroupPresenceBits = 8 };
 	const TeulTimeMS& lastModified() const { return m_lastModified; }
-	bool groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const;
-	bool groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);
-	bool packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack) { return (mode == TEUL_PACK) ? pack(a, lastPack) : unpack(a, lastPack); }
-	bool pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const;
-	bool unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);
-	TeulTimeMS	m_lastModified;
+	bool groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack) const;
+	bool groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack);
+	bool packer(LOGICAL mode, ACTION_OBJECT* const a, TeulTimeMS lastPack) { return (mode == TEUL_PACK) ? pack(a, lastPack) : unpack(a, lastPack); }
+	bool pack(ACTION_OBJECT* const a, TeulTimeMS lastPack) const;
+	bool unpack(ACTION_OBJECT* const a, TeulTimeMS lastPack);
+	TeulTimeMS m_lastModified;
 
 	struct Sortie : public WWII::VarGroup
 	{
@@ -50,8 +50,8 @@ struct SortieData
 			, flags(this)
 		{}
 		Sortie& operator = (const Sortie& rhs);
-		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;
-		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;
+		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const override;
+		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) override;
 		WWII::SyncVar<UINT32, 0> sortieID;
 		WWII::SyncVar<Teul::NetTimeMS, 0> spawned_ms;
 		WWII::SyncVar<Teul::NetTimeMS, 0> despawned_ms;
@@ -74,8 +74,8 @@ struct SortieData
 			, rtbFacility(this)
 		{}
 		Vehicle& operator = (const Vehicle& rhs);
-		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;
-		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;
+		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const override;
+		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) override;
 		WWII::SyncVar<WEAPON_SPEC, 0> weaponSpec;
 		WWII::SyncVar<RANK_NO, 0> effectiveRank;
 		WWII::SyncVar<UINT8, 0> rtbState;
@@ -97,8 +97,8 @@ struct SortieData
 			, nearCP(this)
 		{}
 		Location& operator = (const Location& rhs);
-		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;
-		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;
+		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const override;
+		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) override;
 		WWII::SyncVar<SINT32, 0> x;
 		WWII::SyncVar<SINT32, 0> y;
 		WWII::SyncVar<SINT32, 0> z;
@@ -135,8 +135,8 @@ struct SortieData
 			, assists(this)
 		{}
 		Scoring& operator = (const Scoring& rhs);
-		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;
-		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;
+		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const override;
+		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) override;
 		WWII::SyncVar<UINT32, 0> hits;
 		WWII::SyncVar<UINT16, 0> kills;
 		WWII::SyncVar<UINT16, 0> captures;
@@ -178,26 +178,28 @@ struct TestCond
 		, pilotID()
 		, pilotName()
 		, crewID()
+		, array()
+		, bitty()
 	{
 	}
 
 	bool packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 size) { return (mode == TEUL_PACK) ? pack(a, size) : unpack(a, size); }
 	bool pack(ACTION_OBJECT* const a, SINT32 size) const;
 	bool unpack(ACTION_OBJECT* const a, SINT32 size);
-	UINT32	sortieID;
-	UINT32	pilotID;
-	ChatHandle	pilotName;
-	UINT32	crewID;
-	ChatHandle	crewHandle;
-	UINT8	crewDecal;
+	UINT32 sortieID;
+	UINT32 pilotID;
+	ChatHandle pilotName;
+	UINT32 crewID;
+	ChatHandle crewHandle;
+	UINT8 crewDecal;
 	struct Component
 	{
-		UINT8	id;
-		UINT8	damage;
+		UINT8 id;
+		UINT8 damage;
 		struct Id
 		{
-			UINT8	idNo;
-			UINT8	damage;
+			UINT8 idNo;
+			UINT8 damage[4];
 			bool pack(ACTION_OBJECT* const a, SINT32) const;
 			bool unpack(ACTION_OBJECT* const a, SINT32);
 		};
@@ -208,6 +210,8 @@ struct TestCond
 	};
 	using Components = WWII::inplace_vector<Component, 64>;
 	Components components;
+	UINT32 array[32];
+	UINT32 bitty;
 }; // end message TestCond
 
 
