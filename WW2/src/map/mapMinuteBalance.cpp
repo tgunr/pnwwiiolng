@@ -42,7 +42,7 @@ mapChargeMinutes()
 	try
 	{
 		ThreadTextQuery balanceQry(DBThread::Auth
-									, "UPDATE auth.auth_minute_balance"
+									, "UPDATE `auth`.`auth_minute_balance"
 											" SET balance=balance-1,modified=NOW()"
 											" WHERE customerid IN ("
 										, ") AND balance>0");

@@ -45,5 +45,6 @@ public:
 public:
 	operator const DB::handle_t* () const { return m_initialized ? m_conn : nullptr; }
 	operator DB::handle_t* () { return m_initialized ? m_conn : nullptr; }
+	operator bool() const noexcept { return m_initialized && m_conn;  }
 };
 

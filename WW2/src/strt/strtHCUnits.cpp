@@ -28,7 +28,7 @@
 #include "strt/strtWeaponEntry.h"
 #include "teul/teulTime.h"
 #include "wwii/wwiiConfig.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 
 UINT32 brigadeMoveTime_s;
 UINT32 brigadeFallbackTime_s;

@@ -14,7 +14,7 @@
 #include "map/mapPlayer.h"
 #include "wwii/wwiiAntiAddiction.h"			// Chinese anti-addiction code
 #include "wwii/wwiiConfig.h"
-#include "wwii/wwiiThreads.h"				// For threadDBSTatement
+#include "wwii/wwiiDBThreads.h"				// For threadDBSTatement
 
 #undef _IN_DEVELOPMENT
 
@@ -54,7 +54,7 @@ static void _saveMinorUsage(Player* player)
 	{
 		UINT32 accumulated = (teulTime() - player->timeIn) + played;
 		DBThread::Do(DBThread::Default
-			, "REPLACE INTO wwii.minor_usage (`playerid`,`seconds`,`expires`)"
+			, "REPLACE INTO `wwii`.`minor_usage`(`playerid`,`seconds`,`expires`)"
 				"VALUES(%u,%u,DATE_ADD(NOW(), INTERVAL %u MINUTE))"
 				, player->playerID()
 				, accumulated
@@ -180,7 +180,7 @@ mmCheckAddictionTimers()
 	static TeulTimeMS nextDelete = 0ULL;
 	if ( teulClock64 > nextDelete )
 	{
-		DBThread::Do(DBThread::Default, "DELETE FROM wwii.minor_usage WHERE expires <= NOW()");
+		DBThread::Do(DBThread::Default, "DELETE FROM `wwii`.`minor_usage` WHERE expires <= NOW()");
 		nextDelete = teulClock64 + (60 * 1000);
 	}
 

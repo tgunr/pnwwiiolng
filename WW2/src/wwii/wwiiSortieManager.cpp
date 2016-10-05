@@ -9,7 +9,7 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "wwii/wwiiSortieManager.h"				// Our header file
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 
 //////////////////////////////////////////////////////////////////////

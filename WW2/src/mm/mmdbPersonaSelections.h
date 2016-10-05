@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "include/pnThread.h"
+#include "wwii/wwiiDBThreads.h"
 
 class Player;
 
@@ -21,7 +21,7 @@ extern void* mmdbPersonaSelectionsThread(void*);
 // the save is committed to disk
 extern void mmdbSavePersonaSelection(const Player* player);
 
-struct PersonaSelectionThread : public PNThread
+struct PersonaSelectionThread : public DBThread::Thread
 {
-	virtual void run() override;
+	virtual void dbrun() override;
 };

@@ -26,7 +26,7 @@
 #include "teul/teulBasic.h"
 #include "weap/weapDefs.h"
 #include "weap/weapWeapon.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "host/hostVehicleRequest.h"
 #include "wwii/wwiiServerTypeEnums.h"
 
@@ -323,7 +323,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 
 	// Create the sortie record
 	DBThread::Do(DBThread::Default
-		, "CALL wwii.p_add_sortie("
+		, "CALL `wwii`.`p_add_sortie`("
 			" %u"
 			",%u,%u"
 			",%u,%u"

@@ -93,7 +93,7 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiRTBCodes.h"
 #include "wwii/wwiiSortieManager.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 
 extern SINT32 hostInstallAllCallbacks();

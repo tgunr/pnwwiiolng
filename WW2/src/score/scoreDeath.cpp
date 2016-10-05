@@ -12,7 +12,7 @@
 #include "score/scoreSortie.h"
 #include "weap/weapDefs.h"
 #include "wwii/wwiiConfig.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 
 //////////////////////////////////////////////////////////////////////
 // Player killed themselves.
@@ -306,7 +306,7 @@ Scoring::Death::process(Player* const lhsPlayer)
 	const WEAPON_SPEC killerSpec = killerSortie->spec();
 	const WEAPON_SPEC deadSpec = deadSortie->spec();
 	DBThread::Do(DBThread::Default
-		, "CALL wwii.p_add_kill"
+		, "CALL `wwii`.`p_add_kill`"
 			"(%u, %u,%u,%u,%u, %u,%u,%u,%u, %u, %u,%u,%u,%u, %u,%u,%u,%u, 0, %d,%d,%d)"
 			, killerSortie->sortieID()
 			, 0 /*enemy->m_crew[0]*/, 0 /*enemy->m_personas[0]*/, 0 /*enemy->m_crew[1]*/, 0 /*enemy->m_personas[1]*/

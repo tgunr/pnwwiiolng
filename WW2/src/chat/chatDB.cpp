@@ -18,7 +18,7 @@
 #include "wwii/wwiiRank.h"
 #include "chat/chatCellTypes.h"
 #include "chat/chatData.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "chat/chatMotds.h"
 #include "chat/chatHostMotds.h"

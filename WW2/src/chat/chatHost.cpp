@@ -88,7 +88,7 @@
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiServerTrackedObject.h"
 #include "wwii/wwiiServerTypeEnums.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 
 extern UINT32 serverGetAuthIP();
 

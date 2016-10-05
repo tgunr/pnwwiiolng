@@ -21,7 +21,7 @@
 #include "include/infoMessageTypes.h"
 #include "include/infoHostMessages.h"
 #include "include/mydbQuery.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "auth/authHost.h"
 #include "auth/authClientData.h"

@@ -22,33 +22,15 @@
 static void
 _callSuccess(void* const data)
 {
-	DBThreadQuery* const q = static_cast<DBThreadQuery*>(data);
-
+	std::unique_ptr<DBThreadQuery> q(static_cast<DBThreadQuery*>(data));
 	q->Success();
-
-	delete q;
 }
 
 static void
 _callFailure(void* data)
 {
-	DBThreadQuery* const q = static_cast<DBThreadQuery*>(data);
-
+	std::unique_ptr<DBThreadQuery> q(static_cast<DBThreadQuery*>(data));
 	q->Failure();
-
-	delete q;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Destructor
-
-DBThreadQuery::~DBThreadQuery()
-{
-	if ( m_query )
-	{
-		delete m_query;
-		m_query = nullptr;
-	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -106,19 +88,16 @@ DBThreadQuery::Execute(UINT32 threadNo, DB::handle_t* conn, DBThread::DBNo* last
 			*lastDb = m_db;
 		}
 
-		m_query = new DBQuery(conn, statement);
-		if ( !m_query )
-			throw std::logic_error("Failed to construct DBQuery");
+		m_query.reset(new DBQuery(conn, statement));
 
 		if ( m_immediate )
 			Success();
 		else
 		{
 			// Consume the query here and now, so we can
-			// hand the reult back to the parent thread.
+			// hand the result back to the parent thread.
 			const bool processed = Process(Query()->Rows());
-			delete m_query;
-			m_query = nullptr;
+			m_query.reset(nullptr);
 
 			if ( processed == true )
 				threadCallback(_callSuccess, this);
@@ -136,12 +115,7 @@ DBThreadQuery::Execute(UINT32 threadNo, DB::handle_t* conn, DBThread::DBNo* last
 			Failure();
 		else
 		{
-			if ( m_query )
-			{
-				delete m_query;
-				m_query = nullptr;
-			}
-
+			m_query.reset(nullptr);
 			threadCallback(_callFailure, this);
 		}
 	}
@@ -159,7 +133,7 @@ DBThreadQuery::Execute(UINT32 threadNo, DB::handle_t* conn, DBThread::DBNo* last
 // the last commit (or there has been no previous commit)
 
 bool
-ThreadTextQuery::commit(const TeulTimeMS& maxAge)
+ThreadTextQuery::commit(const TeulTimeMS maxAge)
 {
 	if ( (m_length == 0) | ((maxAge) & (m_commitFrom) & (m_commitFrom + maxAge > teulClock64)) )
 		return false;			// Buffer needs to mature for a while longer.
@@ -168,7 +142,7 @@ ThreadTextQuery::commit(const TeulTimeMS& maxAge)
 		throw std::domain_error("Too much data in ThreadTextQuery buffer to commit");
 
 	// Need to add the suffix.
-	strcpy(m_statement + m_length, m_suffix);
+	strncpy(m_statement + m_length, m_suffix, sizeof(m_statement) - m_length);
 
 #ifdef BETA_RELEASE
 	dbugLog(_FLD, "Committing: %s", m_statement);

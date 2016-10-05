@@ -17,6 +17,7 @@
 
 #include "dbse/dbseConnection.h"
 #include "dbse/dbseWrapper.h"
+#include "include/mydbQuery.h"
 #include "teul/teulConfigVar.h"
 #include "wwii/wwiidbConfigVars.h"
 #include "wwii/wwiiDBThreads.h"
@@ -38,24 +39,22 @@ struct THREAD_LOG
 };
 
 // Storing information about a DB helper thread
-class DBQueueThread : public PNThread
+class DBQueueThread : public DBThread::Thread
 {
 private:
-	DB::handle_t*		m_conn;
-	uint32_t			m_id;
+	uint32_t			m_id = 0;
 
 public:
-	DBQueueThread() : PNThread(), m_conn(nullptr), m_id(0) {}
-	~DBQueueThread();
-	
-	DB::handle_t*  getConn() {return m_conn;}
+	virtual ~DBQueueThread();
 
 	void start(uint32_t id_) {
 		m_id = id_ + 1;
 		PNThread::start();
 	}
 
-	virtual void run() override;
+	DB::handle_t* getConn() const { return m_conn; }
+
+	virtual void dbrun() override;
 };
 
 static const UINT32 NUM_HELPER_THREADS = 2;
@@ -65,8 +64,9 @@ static LOG_QUEUE logQueue;
 static size_t logQueueMax, logQueuePushes;
 static std::mutex logQueueMutex;
 
-static ConditionQueue<DBThreadQuery> dbQueue; 
-DBQueueThread dbThread[NUM_HELPER_THREADS]; 
+static ConditionQueue<DBThreadQuery> dbQueue;
+DBQueueThread dbThread[NUM_HELPER_THREADS];
+
 typedef std::pair<THREAD_CALLBACK*, void*> CALLBACK_INFO;
 typedef std::vector<CALLBACK_INFO*> CALLBACK_QUEUE;
 static CALLBACK_QUEUE callbackQueue;
@@ -75,25 +75,36 @@ static std::mutex callbackQueueMutex;
 
 extern DBCONNECTION dbConnection;
 
-void
-DBQueueThread::run()
-{
-	unsigned int threadId = m_id;
+//////////////////////////////////////////////////////////////////////
+// Wrapper for a DBThread::Thread's run function
 
+void DBThread::Thread::run()
+{
 	m_conn = threadsOpenDBConnection(true);
 	if ( m_conn == nullptr )
 	{
-		threadLog(_FLA, "dbc:%u Unable to obtain database connection", threadId);
+		threadLog(_FLA, "unable to connect to mysql database\n");
 		return;
 	}
 
-	threadLog(_FLI, "dbc:%u Connected to database", threadId);
-
 	threadIgnoreSIGPIPE();
+
+	dbrun();
+
+	threadsCloseDBConnection(m_conn);
+	mysql_thread_end();
+}
+
+void
+DBQueueThread::dbrun()
+{
+	const unsigned int threadId = m_id;
+
+	threadLog(_FLI, "dbc:%u Connected to database", threadId);
 
 	DBThread::DBNo dbNo = DBThread::Default;
 
-	for ( ; ; )
+	while ( !isCancelled() )
 	{
 		DBThreadQuery* query = dbQueue.getNext();
 		if ( query == nullptr )
@@ -101,37 +112,24 @@ DBQueueThread::run()
 		if ( query->Execute(threadId, m_conn, &dbNo) )
 			continue;
 
-		threadLog(_FLW, "dbc:%u reconnecting to database", threadId);
-
-		if ( m_conn != nullptr )
-			mysql_close(m_conn);
+		threadsCloseDBConnection(m_conn);
 		m_conn = nullptr;
 
-		do
-		{
+		while (!isCancelled() && m_conn == nullptr) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
+			threadLog(_FLW, "dbc:%u reconnecting to database", threadId);
 			m_conn = threadsOpenDBConnection(true);
 			if ( m_conn == nullptr )
 				threadLog(_FLA, "dbc:%u unable to reconnect to database", threadId);
-		} while ( m_conn == nullptr );
+		}
 
 		threadLog(_FLW, "dbc:%u reconnected to database", threadId);
-	}
-
-	if ( m_conn )
-	{
-		threadsCloseDBConnection(m_conn);
-		m_conn = nullptr;
 	}
 }
 
 DBQueueThread::~DBQueueThread()
 {
-	if ( m_conn != nullptr )
-	{
-		mysql_close(m_conn);
-		m_conn = nullptr;
-	}
+	dbQueue.destroy();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -151,11 +149,11 @@ threadsReadDBEnvironment()
 		LogAbort("Unable to read %s database address from %s", cv_wwiiDBAddress.GetName(), cv_wwiiDBAddress.GetEnvVarName() ? cv_wwiiDBAddress.GetEnvVarName() : "environment");
 #endif
 
-	strcpy(dbConnection.host, db);
-	strcpy(dbConnection.dbName, cv_wwiiDBDefaultSchema.GetString());
-	strcpy(dbConnection.username, cv_wwiiDBUser.GetString());
-	strcpy(dbConnection.password, cv_wwiiDBPassword.GetString());
-	strcpy(dbConnection.port, cv_wwiiDBPort.GetString());
+	strsafecpy(dbConnection.host, db);
+	strsafecpy(dbConnection.dbName, cv_wwiiDBDefaultSchema.GetString());
+	strsafecpy(dbConnection.username, cv_wwiiDBUser.GetString());
+	strsafecpy(dbConnection.password, cv_wwiiDBPassword.GetString());
+	strsafecpy(dbConnection.port, cv_wwiiDBPort.GetString());
 
 	return true;
 }
@@ -171,8 +169,7 @@ threadsOpenDBConnection(bool enableAutoCommit)
 	if ( newConn != nullptr )
 	{
 		mysql_select_db(newConn, dbConnection.dbName);
-
-		mysql_autocommit( newConn, (enableAutoCommit) ? 1 : 0 );
+		mysql_autocommit(newConn, (enableAutoCommit) ? 1 : 0);
 	}
 
 	return newConn;
@@ -239,13 +236,12 @@ threadsEnable()
 void
 threadsShutdown()
 {
-	dbQueue.destroy();
 	for ( UINT32 i = 0; i < NUM_HELPER_THREADS; ++i )
 	{
 		dbThread[i].cancel();
 	}
+	dbQueue.destroy();
 
-	std::this_thread::yield();
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 	// Clear out any pending threadLogs, but don't take too long at it
@@ -370,32 +366,11 @@ DBThread::EscapeString(std::string& text)
 {
     char *tempBuff = new char[text.length()*2+1];
     dbQueue.doLocked([&] {
+		///TODO: FIX: Conflicting access to the connection pointer
         mysql_real_escape_string(dbThread[0].getConn(), tempBuff, text.c_str(), text.length());
     });
     text = tempBuff;
     delete tempBuff;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-// Perform a query on an unformatted string.
-
-void
-DBThread::Do(const DBThread::DBNo db_, char* queryText)
-{
-	(new DBThreadQuery(db_, "DBThread::Do(q)", queryText, DBThreadQuery::_IMMEDIATE))->Queue();
-}
-
-//////////////////////////////////////////////////////////////////////
-// Threaded variation of a database query
-
-void
-DBThread::Do(const DBThread::DBNo db_, const char* queryFormat, ...)
-{
-	va_list args;
-	va_start(args, queryFormat);
-	(new DBThreadQuery(db_, "DBThread::Do(q)", DBThreadQuery::_IMMEDIATE, args, queryFormat))->Queue();
-	va_end(args);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -425,7 +400,7 @@ StatsThread::run()
 	threadLog(_FLI, "Stats thread active [thread #%u]", std::this_thread::get_id());
 
 	UINT32 count = 0;
-	for (;; )
+	for ( ; ; )
 	{
 		// sleep for 15,000 milliseconds (15 seconds).
 		for (uint32_t i = 0; i < 15 * 10; ++i) {
@@ -441,9 +416,9 @@ StatsThread::run()
 		try
 		{
 			dbQueue.doLocked([&] {
-				dbCurSize = dbQueue.m_queue.size();
-				dbMaxSize = dbQueue.m_maxSize;
-				dbUsed = dbQueue.m_hits - dbLastUsed;
+				dbCurSize = dbQueue.size();
+				dbMaxSize = dbQueue.maxSize();
+				dbUsed = dbQueue.hits() - dbLastUsed;
 				dbLastUsed += dbUsed;
 			});
 
