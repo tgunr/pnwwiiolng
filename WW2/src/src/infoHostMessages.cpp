@@ -98,6 +98,6 @@ infoInstallHostCallbacks(void)
 		REGISTER_RECEIVER(PLAY_INFO_SEND_Y, _recvPlayInfoSend);
 		REGISTER_SENDER(PLAY_INFO_REQ_RECV_Y, _sendPlayInfoReq, _INFO_REQ);
 	}
-	END_CALLBACK_REGISTRATION(PgInfo::CallbackX);
+	END_CALLBACK_REGISTRATION(PgInfo::CallbackX)
 }
 

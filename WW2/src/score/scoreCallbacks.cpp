@@ -323,6 +323,6 @@ InstallCallbacks()
 	{
 		REGISTER_RECEIVER(Scoring::EVENT_Y, _recvEvent);
 	}
-	END_CALLBACK_REGISTRATION(Scoring::CallbackX);
+	END_CALLBACK_REGISTRATION(Scoring::CallbackX)
 }
 }

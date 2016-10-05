@@ -1119,7 +1119,7 @@ _registerInterHostCallbacks()
 	{
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLua);
 	}
-	END_CALLBACK_REGISTRATION(Host::CallbackX);
+	END_CALLBACK_REGISTRATION(Host::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -401,7 +401,7 @@ _registerStratCallback(void)
 	{
 		REGISTER_SENDER(STRAT_EVENTS_Y, Strat::Events::SendFunction, Strat::Events::Callback);
 	}
-	END_CALLBACK_REGISTRATION(Comm::CallbackX);
+	END_CALLBACK_REGISTRATION(Comm::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
