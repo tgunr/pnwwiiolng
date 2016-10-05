@@ -94,7 +94,7 @@ _getPoolNo(size_t allocSize)
 void*
 wwiiPlayer::operator new(size_t actualSize)
 {
-	// Because wwiiPlayer is intended to be a base clase, we
+	// Because wwiiPlayer is intended to be a base class, we
 	// need to be aware that descendants may have different
 	// sizes; by normalizing the sizes to significant
 	// boundaries we can avoid pool fragmentation by sharing
@@ -108,44 +108,41 @@ wwiiPlayer::operator new(size_t actualSize)
 	StorageHeader* ptr = nullptr;
 
 	// We'll need a lock.
-	auto* lock = new std::lock_guard<std::mutex>(allocMutex);
-
-	// When the pool is empty, allocate a batch of objects.
-	if ( pool.empty() )
 	{
-		if ( pool.capacity() < _POOL_GROWTH_RATE )
-			pool.reserve(_POOL_GROWTH_RATE);
+		std::lock_guard<std::mutex> lock(allocMutex);
 
-		// calloc: so that we have pre-zero'd memory.
-		void* block = memCalloc(_CALLOC_RATE, allocSize);
-		_callocs++;
-		if ( block == nullptr )
+		// When the pool is empty, allocate a batch of objects.
+		if (pool.empty())
 		{
-			delete lock;
-			throw std::bad_alloc();
+			if (pool.capacity() < _POOL_GROWTH_RATE)
+				pool.reserve(_POOL_GROWTH_RATE);
+
+			// calloc: so that we have pre-zero'd memory.
+			void* block = memCalloc(_CALLOC_RATE, allocSize);
+			_callocs++;
+			if (block == nullptr)
+				throw std::bad_alloc();
+
+			_reserved += _CALLOC_RATE;
+
+			// Now we need to split this block up into units
+			// and feed them backwards onto the pool
+			for (UINT32 i = 1; i <= _CALLOC_RATE; ++i)
+			{
+				StorageHeader* alloc = (StorageHeader*)((char*)block + (_CALLOC_RATE - i) * allocSize);
+				pool.push_back(alloc);
+			}
 		}
 
-		_reserved += _CALLOC_RATE;
+		// Grab the last entry off the vector
+		ptr = pool.back();
+		pool.pop_back();
 
-		// Now we need to split this block up into units
-		// and feed them backwards onto the pool
-		for ( UINT32 i = 1; i <= _CALLOC_RATE; ++i )
-		{
-			StorageHeader* alloc = (StorageHeader*)((char*)block + (_CALLOC_RATE - i) * allocSize);
-			pool.push_back(alloc);
-		}
+		// Adjust counters
+		_reserved--;
+		_inUse++;
+		_news++;
 	}
-
-	// Grab the last entry off the vector
-	ptr = pool.back();
-	pool.pop_back();
-
-	// Adjust counters
-	_reserved--;
-	_inUse++;
-	_news++;
-
-	delete lock;
 
 	assert( ptr != nullptr );
 
