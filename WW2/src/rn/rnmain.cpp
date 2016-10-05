@@ -557,12 +557,15 @@ LOGICAL rnmainInit(void)
 		{
 			StratDB::StratObject* strat = StratDB::FindStratObject("Antwerp");
 			HCUnit* hcUnit = new HCUnit(WWII_ENGLAND, HCU_BRIGADE, 0, WWII_ENGLAND, BRANCH_LAND, BRANCH_LAND, 9, 0, "English Training Brigade", "1.uk", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
+			hcUnit->addToRegistry();
 
 			strat = StratDB::FindStratObject("Lier");
 			hcUnit = new HCUnit(WWII_FRANCE, HCU_BRIGADE, 0, WWII_FRANCE, BRANCH_LAND, BRANCH_LAND, 9, 0, "French Training Brigade", "1.fr", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
+			hcUnit->addToRegistry();
 
 			strat = StratDB::FindStratObject("Schilde");
 			hcUnit = new HCUnit(WWII_GERMANY, HCU_BRIGADE, 0, WWII_GERMANY, BRANCH_LAND, BRANCH_LAND, 9, 0, "German Training Brigade", "1.de", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
+			hcUnit->addToRegistry();
 		}
 		catch(std::runtime_error)
 		{

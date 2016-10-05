@@ -61,6 +61,8 @@ public:
 	// Create from network object
 	HCUnit(ACTION_OBJECT* const a);
 
+	void addToRegistry();
+
 public:
 	// Get the homeCPID by unpacking from an action object
 	void setHomeCPID(const FULL_OBJ_ID newHomeCPID)

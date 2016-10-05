@@ -199,6 +199,7 @@ HCUnitList::receive(SINT32 teulIndex)
 
 		// Constructed this way, the HCUnit will self-register itself into hcUnits.
 		HCUnit* hcUnit = new HCUnit(unit.unitID(), unit.type(), unit.parentID(), unit.country(), unit.branch(), unit.movementType(), unit.unitClass(), unit.handle(), unit.name(), unit.shortName(), unit.rank(), unit.homeCPID(), unit.owner(), unit.ownerRank());
+		hcUnit->addToRegistry();
 
 		// The client assigns decals to brigades, so we need to look the unit up and pass it to the decal
 		// code /once/ per HC Unit
