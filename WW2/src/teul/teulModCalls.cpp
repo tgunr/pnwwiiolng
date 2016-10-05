@@ -150,7 +150,7 @@ static UINT16
 _negotiateVersionNumber(UINT16 remoteVersion, const ENDPOINT* const endpoint)
 {
 	// Datagram delivery services don't use encryption.
-	if ( endpoint->protocol != PROTOCOL_TCP || endpoint->m_peer )
+	if ( !endpoint->isFromClient() )
 	{
 		dbugLog(_FLM, "t:%d non-client connection, disabling encryption", endpoint->teulIndex());
 		return 0;

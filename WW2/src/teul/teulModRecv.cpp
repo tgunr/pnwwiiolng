@@ -1514,7 +1514,7 @@ _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 static void
 _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 {
-	if ( endpoint.m_parent == nullptr )
+	if ( endpoint.m_parent == nullptr || !endpoint.isFromClient() )
 		return;
 
 	// The host assigns the created time when the TCP session is
@@ -1532,6 +1532,7 @@ _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 	const TeulTimeMS lastTick = (TeulTimeMS)endpoint.m_impl->m_lastPacketTick;
 	if ( newTick < lastTick )
 	{
+		// ensure the value can never be negative
 		const TeulTimeMS adjusted = newTick | (1ULL << (sizeof(header.m_tick) * 8));
 		newTick = adjusted;
 	}
