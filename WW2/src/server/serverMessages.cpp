@@ -241,6 +241,6 @@ serverInitCallbacks(void)
 
 		REGISTER_RECEIVER(HOST_CONFIG_Y, _recvHostConfig);
 	}
-	END_CALLBACK_REGISTRATION(Teul::Serv::CallbackX);
+	END_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
 }
 

@@ -303,7 +303,7 @@ HostInstallCallbacks(void)
 
 		REGISTER_SENDER(Map::TUT_PROGRESS_Y, _sendTutProgress, _SEND_TUT_PROGRESS);
 	}
-	END_CALLBACK_REGISTRATION(Map::CallbackX);
+	END_CALLBACK_REGISTRATION(Map::CallbackX)
 }
 
 }

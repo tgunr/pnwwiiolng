@@ -26,6 +26,6 @@ mmCellHostSupportCallbacks(void)
 	{
 		REGISTER_RECEIVER(MM::WEAPONS_HANDOFF_Y, Host::VehicleRequest::_recvCallback);
 	}
-	END_CALLBACK_REGISTRATION(MM::CallbackX);
+	END_CALLBACK_REGISTRATION(MM::CallbackX)
 }
 

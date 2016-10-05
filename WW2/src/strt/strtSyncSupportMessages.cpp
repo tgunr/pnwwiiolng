@@ -344,8 +344,8 @@ _recvTimeUpdate(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-static SINT32
-_registerStrtXCallbacks()
+SINT32
+strtSyncSupportInstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
 	{
@@ -356,14 +356,6 @@ _registerStrtXCallbacks()
 		REGISTER_RECEIVER(STRT_BROADCAST_CONFIG_UPDATE_Y, _recvConfigUpdate);
 		REGISTER_RECEIVER(STRT_BROADCAST_TIME_UPDATE_Y, _recvTimeUpdate);
 	}
-	END_CALLBACK_REGISTRATION(Strat::CallbackX);
-}
-
-SINT32
-strtSyncSupportInstallCallbacks(void)
-{
-	_registerStrtXCallbacks();
-
-	return 0;
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 
