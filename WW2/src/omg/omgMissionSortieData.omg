@@ -1,8 +1,12 @@
 NAMESPACE MM;
+CLIENT FRONTEND;		// These are messages delivered between WW2 client <-> Game Servers
 
 USING "typedefs.omg";
 
-MESSAGE SortieData
+// By default messages are assumed to be client->host, unidirectional.
+// If that's not true, you have to override the behavior with one or both of
+//  TOCLIENT TOHOST
+MESSAGE SortieData [ TOCLIENT ]
 {
 	// Describes an ongoing or completed sortie.
 
@@ -75,6 +79,7 @@ MESSAGE SortieData
 	}}
 };
 
+// MESSAGE TestCond [ TOSERVER ], default behavior so equivalent to:
 MESSAGE TestCond
 {
 	UINT32				sortieID;
@@ -94,10 +99,12 @@ MESSAGE TestCond
 				ARRAY Id[8] {
 					UINT8	idNo;
 					IF (idNo) {
-						UINT8	damage;
+						UINT8	damage[4];
 					}
 				}
 			}
 		}
 	}
+	UINT32				array[32];
+	UINT32				bitty bits=24;
 };
