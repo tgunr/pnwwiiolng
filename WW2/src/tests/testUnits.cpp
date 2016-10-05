@@ -235,6 +235,7 @@ main(int argc, char* argv[])
         enableTestDebug = true;
     }
 
+	Teul::InitializeWinsock();
 	Teul::ConfigVar::InitializeConfigVars();
     TestUnit::RunTests();
 
