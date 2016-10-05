@@ -6,6 +6,7 @@
 #include "processthreadsapi.h"
 #else
 #include <sys/wait.h>
+#include <spawn.h>
 #endif
 
 #include "teul/teulTime.h"
@@ -14,12 +15,14 @@
 extern bool g_shuttingDown;
 
 static TeulTimeMS s_processLaunchTimeout = 30 * 1000;
-static TeulTimeMS s_processShutdownTimeout = 5 * 1000;
+static TeulTimeMS s_processShutdownTimeout = 10 * 1000;
 
 // Launch singleton.
 GameProcess* GameProcess::s_processStarting = nullptr;
 
 static std::list<GameProcess> s_processes;
+
+static const char** s_savedEnvp = nullptr;
 
 //////////////////////////////////////////////////////////////////////
 // Helper to determine if a process is currently running.
@@ -34,7 +37,7 @@ bool GameProcess::IsRunning() const
 	return ( result != WAIT_OBJECT_0 && result != WAIT_FAILED );
 #else
 	int status = 0;
-	auto result = waitpid(m_processID, &status, WEXITED | WNOHANG);
+	auto result = waitpid(m_processID, &status, WNOHANG);
 	return ( result == 0 );
 #endif
 }
@@ -92,7 +95,7 @@ void GameProcess::OnStarting(processhandle_t processHandle_, UINT64 processID_)
 	s_processStarting = this;
 	++m_launchAttempts;
 
-	Log("onStarting");
+	Log("launched");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -291,41 +294,76 @@ bool GameProcess::CheckStatus()
 	return false;
 }
 
-static void _getCurrentProcessPath(char (& processPath)[PATH_MAX])
+template<size_t MaxPath>
+static void _getCurrentProcessPath(char (& processPath)[MaxPath])
 {
+	// request full path of current executable and then perform
+	// a basename on it to get the cwd.
 #if platOS == OS_WIN32
-	GetModuleFileNameA(NULL, processPath, sizeof(processPath) - 1);
+	GetModuleFileNameA(NULL, processPath, MaxPath - 1);
 #else
 	extern const char* g_argv0;
-	strncpy(processPath, g_argv0, sizeof(processPath) - 1);
+	strsafecpy(processPath, g_argv0);
 #endif
+	// terminate at the last path separator, otherwise it's just
+	// a filename and we use '.' as the path.
 	char* endCharacter = strrchr(processPath, '/');
 	if ( endCharacter != nullptr )
 		*(endCharacter) = 0;
 	else
-		strncpy(processPath, ".", sizeof(processPath) - 1);
+		strsafecpy(processPath, ".");
 }
+
+#if platOS != OS_WIN32
+static void _buildCommandLineArguments(const char* processName_, std::vector<const char*>& execArgs_, std::vector<std::string>& moreArgs_)
+{
+	std::string envSetting { processName_ };
+	envSetting += "_LAUNCHER";
+	const char* launcher = getenv(envSetting.c_str());
+	if ( !launcher || !*launcher )
+		return;
+
+	const char* start = launcher;
+	do
+	{
+		const char* end = strchr(start, ' ');
+		if ( end )
+		{
+			moreArgs_.emplace_back(start, end);
+			while ( *end == ' ' )
+				++end;
+		}
+		else
+		{
+			moreArgs_.emplace_back(start);
+		}
+		start = end;
+	} while ( start && *start );
+	std::vector<const char*> newArgs;
+	for_each(moreArgs_.begin(), moreArgs_.end(), [&](const std::string& str){ newArgs.push_back(str.c_str()); });
+	execArgs_.insert(execArgs_.begin(), newArgs.begin(), newArgs.end());
+}
+#endif
 
 static bool _spawnProcess(GameProcess* const starter_, const char* const processName_, processhandle_t& process_, UINT64& pid_, int errno_)
 {
-	char processPath[PATH_MAX];
-	processPath[sizeof(processPath) - 1] = 0;
-	_getCurrentProcessPath(processPath);
-	strncat(processPath, "/", sizeof(processPath) - 1);
-	strncat(processPath, processName_, sizeof(processPath) - 1);
+	char basePath[MAX_PATH]{};
+	_getCurrentProcessPath(basePath);
+
+	std::string processPath(basePath);
+	processPath += '/';
+	processPath += processName_;
 
 #if platOS == OS_WIN32
 	char cmdLine[] = "";
-	STARTUPINFOA sinf;
-	PROCESS_INFORMATION pinf;
-	memset(&sinf, 0, sizeof(sinf));
-	memset(&pinf, 0, sizeof(pinf));
+	STARTUPINFOA sinf{};
+	PROCESS_INFORMATION pinf{};
 
-	char pwd[PATH_MAX];
+	char pwd[MAX_PATH]{};
 	GetCurrentDirectoryA(sizeof(pwd), pwd);
 	sinf.lpTitle = const_cast<LPSTR>(starter_->ServerTypeName());
-	dbugLog(_FLD, "starting %s server %s", sinf.lpTitle, processPath);
-	if ( CreateProcessA(processPath, cmdLine, nullptr, nullptr, FALSE, CREATE_NEW_CONSOLE, nullptr, pwd, &sinf, &pinf) == TRUE )
+	dbugLog(_FLD, "starting %s server %s", sinf.lpTitle, processPath.c_str());
+	if ( CreateProcessA(processPath.c_str(), cmdLine, nullptr, nullptr, FALSE, CREATE_NEW_CONSOLE, nullptr, pwd, &sinf, &pinf) == TRUE )
 	{
 		CloseHandle(pinf.hThread);
 		process_ = (processhandle_t)pinf.hProcess;
@@ -333,33 +371,35 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 		return true;
 	}
 	errno_ = GetLastError();
-#else
-	const pid_t childPid = vfork();
-	switch ( childPid )
-	{
-	case -1:	// Error
-	break;
-	case 0:		// Child
-		{
-			fclose(stdin);
-			fclose(stdout);
-			fclose(stderr);
-			char* execArgs[2] = { processPath, nullptr };
-			int execResult = execv(processPath, execArgs);
-			dbugLog(_FLA, "failed to start %s, exec returned %d (%u)", processPath, execResult, errno);
-			// we're in a child process...
-			pthread_exit(nullptr);
-		}
-	break;
-	default:	// Parent getting PID
-		process_ = childPid;
-		pid_ = childPid;
-		return true;
-	break;
-	}
-	errno_ = errno;
-#endif
 	return false;
+#else
+	pid_t childPid{};
+	posix_spawn_file_actions_t file_actions{};
+	//posix_spawn_file_actions_addclose(&file_actions, STDIN_FILENO);
+	//posix_spawn_file_actions_addclose(&file_actions, STDOUT_FILENO);
+	//posix_spawn_file_actions_addclose(&file_actions, STDERR_FILENO);
+	std::vector<const char*> execArgs { processPath.c_str(), "--child", nullptr };
+	std::vector<std::string> moreArgs {};
+	_buildCommandLineArguments(processName_, execArgs, moreArgs);
+	dbugLog(_FLI, "launching");
+	for ( auto&& arg : execArgs ) {
+		if (arg)
+			dbugLog(_FLIB, " %s", arg);
+	}
+	int s = posix_spawn(&childPid, execArgs[0],
+				&file_actions, nullptr,
+				(char**)execArgs.data(), (char**)s_savedEnvp);
+	if (s != 0) {
+		errno_ = errno;
+		char error[512]{};
+		dbugLog(_FLA, "failed to start %s err %d: %s", processPath.c_str(), errno_, strerror_r(errno_, error, sizeof(error)));
+		return false;
+	}
+			
+	process_ = childPid;
+	pid_ = childPid;
+	return true;
+#endif
 }
 
 #if platOS == OS_WIN32
@@ -370,11 +410,12 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 
 namespace GameProcessManager
 {
-	void Initialize()
+	void Initialize(const char** envp)
 	{
 #if platOS != OS_WIN32
 		signal(SIGCHLD, SIG_IGN);
 #endif
+		s_savedEnvp = envp;
 	}
 
 	// Include this server in the launch list.
@@ -408,7 +449,7 @@ namespace GameProcessManager
 	}
 
 	// Check up on all processes.
-	bool Heartbeat()
+	bool Heartbeat(bool allowStarts)
 	{
 		teulSyncClock();
 
@@ -424,7 +465,7 @@ namespace GameProcessManager
 		for ( auto it = s_processes.begin(); it != s_processes.end(); )
 		{
 			auto& proc = (*(it++));
-			if ( proc.CheckStatus() )
+			if ( proc.CheckStatus() && allowStarts )
 			{
 				if ( starter == nullptr || proc.ServerType() < starter->ServerType() )
 					starter = &proc;
@@ -466,17 +507,15 @@ namespace GameProcessManager
 	void Shutdown()
 	{
 		// Ask all processes to stop.
-		for ( auto it = s_processes.begin(); it != s_processes.end(); ++it )
-		{
-			it->RequestDiscontinue();
-		}
+		for ( auto& proc : s_processes )
+			proc.RequestDiscontinue();
 
 		teulSyncClock();
-		const TeulTimeMS cutoff = teulClock64 + 10 * 1000;
-		while ( teulClock64 < cutoff  && Heartbeat() == true )
+		const TeulTimeMS cutoff = teulClock64 + s_processShutdownTimeout;
+		while ( teulClock64 < cutoff && Heartbeat(false) == true )
 		{
 			// Free up the CPU for a while.
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 			teulSyncClock();
 		}
 
