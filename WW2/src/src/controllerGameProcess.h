@@ -108,7 +108,7 @@ public:
 namespace GameProcessManager
 {
 	//! Tear up.
-	void Initialize();
+	void Initialize(const char** envp);
 
 	//! Ask the server manager to include a new server type.
 	//! @note Only one instance of each server per manager.
@@ -122,7 +122,7 @@ namespace GameProcessManager
 
 	//! Ask the server manager to do it's thing.
 	//! @return false when there are no processes to manage.
-	bool Heartbeat();
+	bool Heartbeat(bool allowStarts);
 
 	//! Shutdown.
 	void Shutdown();
