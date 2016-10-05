@@ -155,6 +155,8 @@ public:
 	UINT32 destAddress() const;
 	UINT16 destPort() const;
 
+	bool const isFromClient() const noexcept { return protocol == PROTOCOL_TCP && !m_peer; }
+
 private:
 	//! Write the actual data to the socket.
 	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port);
