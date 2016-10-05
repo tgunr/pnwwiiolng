@@ -147,7 +147,7 @@ NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, UINT32 err
 
 // Disable dbugLog() and dbugWrite() if respectively requested.
 #ifdef NO_DEBUG_LOG
-    #define dbugLog(m, fmt, ...)
+	#define dbugLog(m, fmt, ...) silence_unused_parameter_warning(m, fmt, ## __VA_ARGS__)
 #else
     #define dbugLog(m, fmt, ...) _dbugLog(m, fmt, ## __VA_ARGS__)
 #endif
