@@ -271,7 +271,7 @@ public:
 		return ( source != nullptr ) ? (FLOAT64)strtod(source, nullptr) : 0.0;
 	}
 
-	void NextWeaponSpec(struct WEAPON_SPEC& spec);
+	void NextWeaponSpec(WEAPON_SPEC& spec);
 
 protected:
 	// Constructor

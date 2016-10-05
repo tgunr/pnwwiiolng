@@ -365,25 +365,22 @@ Brigade::updateDestinations()
 //////////////////////////////////////////////////////////////////////
 // Update the officer count and lists
 
-static bool _rankCompare(const wwiiPlayer* lhs, const wwiiPlayer* rhs)
-{
-	return rhs->effectiveRank() < lhs->effectiveRank();
-}
-
 void
 Brigade::updateOfficers()
 {
-	m_officers = (m_currentOfficers.empty()) ? 0 : m_currentOfficers.size();
-	if ( officers() == 0 )
+	m_officers = (UINT16)m_currentOfficers.size();
+	if ( m_officers == 0 )
 		return;
 
 	wwiiPlayer* topOfficers[_MAX_OFFICERS];
 
-	partial_sort_copy(m_currentOfficers.begin(), m_currentOfficers.end(), &topOfficers[0], &topOfficers[_MAX_OFFICERS], _rankCompare);
+	partial_sort_copy(m_currentOfficers.begin(), m_currentOfficers.end(), std::begin(topOfficers), std::end(topOfficers), [](auto* lhs, auto* rhs) {
+		return rhs->effectiveRank() < lhs->effectiveRank();
+	});
 
-	for ( UINT32 i = 0; i < _MAX_OFFICERS; ++i )
+	for ( size_t i = 0; i < _MAX_OFFICERS; ++i )
 	{
-		if ( i < officers() )
+		if ( i < m_officers )
 		{
 			m_officerHandles[i] = topOfficers[i]->chatHandle();
 			m_officerRanks[i] = topOfficers[i]->effectiveRank();

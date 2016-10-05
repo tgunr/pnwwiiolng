@@ -113,7 +113,7 @@ static SocketToEndpoint socketToEndpoint;
 
 static TeulTimeMS	_lastIdle;
 
-static void	_pollSockets(const TeulTimeMS& duration_);
+static void	_pollSockets(TeulTimeMS duration_);
 
 static void	_routeCALLBACKs(ENDPOINT& inEndpoint);
 
@@ -438,15 +438,15 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 		else
 #endif
 		{
-		// When recv() returns 0, this indicates that the connection has closed.
-		// TeulKit doesn't distinguish between deliberate and fault-related
-		// closure; in both cases we notify the application of closure with
-		// an "error"; it is then left to the application to track whether
-		// it is important or not.
+			// When recv() returns 0, this indicates that the connection has closed.
+			// TeulKit doesn't distinguish between deliberate and fault-related
+			// closure; in both cases we notify the application of closure with
+			// an "error"; it is then left to the application to track whether
+			// it is important or not.
 
-		err = dbugGetErrno();
-		dbugLog(_FLN, "t:%d closing TCP socket %d end of stream (recv:0, errno:%d), time %llu",
-		        endpoint.teulIndex(), thesock, err, teulClock64);
+			err = dbugGetErrno();
+			dbugLog(_FLN, "t:%d closing TCP socket %d end of stream (recv:0, errno:%d), time %llu",
+					endpoint.teulIndex(), thesock, err, teulClock64);
 
 			// Tear down all of the teulkit abstractions over the socket and
 			// send notification to the application.
@@ -578,7 +578,8 @@ _recvfromStream(ENDPOINT& endpoint)
 			return retval;
 	}
 
-	if ( endpoint.m_readBufferUsed < endpoint.m_impl->m_curDatagram->m_size )
+	const UINT32 datagramSize = endpoint.m_impl->m_curDatagram->m_size;
+	if ( endpoint.m_readBufferUsed < datagramSize )
 	{
 		const SINT32 retval = _continuePacket(endpoint);
 		if ( retval <= 0 ) 
@@ -596,7 +597,7 @@ _recvfromStream(ENDPOINT& endpoint)
 #endif
 
 		// Don't pass here until we've read all of the payload.
-		if ( endpoint.m_readBufferUsed < endpoint.m_impl->m_curDatagram->m_size )
+		if ( endpoint.m_readBufferUsed < datagramSize )
 		{
 			return 0;
 		}
@@ -604,7 +605,6 @@ _recvfromStream(ENDPOINT& endpoint)
 
     dbugOutputPacket( endpoint, true, endpoint.m_impl->m_curDatagram->contents, endpoint.m_readBufferUsed );
 
-	const UINT32 datagramSize = endpoint.m_impl->m_curDatagram->m_size;
 	endpoint.m_impl->recvQueue.push_back(endpoint.m_impl->m_curDatagram);
 	endpoint.m_impl->m_curDatagram = nullptr;
 	endpoint.m_readBufferUsed = 0;
@@ -742,6 +742,7 @@ _handleReceive(ENDPOINT& endpoint)
 	if ( endRX - startRX > 1 )
 		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". rcvDatagram interval=%llums", endpoint.teulIndex(), PRA_SOCKET(sock), endRX - startRX);
 #endif
+
 	if ( PN_UNLIKELY(theErr < 0) )
 	{
 		theErr = dbugGetErrno();

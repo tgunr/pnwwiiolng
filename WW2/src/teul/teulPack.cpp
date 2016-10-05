@@ -608,13 +608,13 @@ Teul::ConnectionInstruction::packer(LOGICAL mode, ACTION_OBJECT* const a)
 }
 
 SINT32
-wwiiPackWeaponSpec(LOGICAL mode, UCHAR* const data, SINT32 offset, struct WEAPON_SPEC* const object, SINT32 /*size*/)
+wwiiPackWeaponSpec(LOGICAL mode, UCHAR* const data, SINT32 offset, WEAPON_SPEC* const object, SINT32 /*size*/)
 {
 	return teulPackUINT16(mode, data, offset, (UINT16*)object, 0);
 }
 
 SINT32
-wwiiPackWeaponSerial(LOGICAL mode, UCHAR* const data, SINT32 offset, struct WEAPON_SERIAL* const object, SINT32 /*size*/)
+wwiiPackWeaponSerial(LOGICAL mode, UCHAR* const data, SINT32 offset, WEAPON_SERIAL* const object, SINT32 /*size*/)
 {
 	offset = teulPackUINT32(mode, data, offset, &(object->serial), 0);
 	offset = wwiiPackFullObjID(mode, data, offset, &(object->source), 0);
@@ -697,7 +697,7 @@ wwiiPackString(LOGICAL mode, UCHAR* data, SINT32 offset, std::string& text, SINT
 }
 
 SINT32
-wwiiPackFullObjID(LOGICAL mode, UCHAR* const data, SINT32 offset, struct FULL_OBJ_ID* const object, SINT32 /*size*/)
+wwiiPackFullObjID(LOGICAL mode, UCHAR* const data, SINT32 offset, FULL_OBJ_ID* const object, SINT32 /*size*/)
 {
 	offset = teulPackUINT16(mode,data,offset,&(object->id),0);
 	if ( object->id != 0 )
