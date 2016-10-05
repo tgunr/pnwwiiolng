@@ -37,7 +37,7 @@ namespace Server
 			if ( auxSize > 0 )
 			{
 				assert( auxData != nullptr );
-				a->packBytes(mode, auxData, auxSize);
+				a->bytePacker(mode, auxData, auxSize);
 			}
 		}
 	};
