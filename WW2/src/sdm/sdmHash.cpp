@@ -118,6 +118,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 #endif
 
 	// TODO: Is there any reason this isn't a vector?
+	// kfsone: It's sparse because of the terrain editor
 	std::map<SINT16, STRAT_BUILDING> bldgMap;
 
 	for (SINT32 i = 0; i< facTable->numFacilities; ++i)
