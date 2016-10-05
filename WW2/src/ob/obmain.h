@@ -501,7 +501,7 @@ extern LOGICAL obmainSetObjectTreeMatrix(OBJECT * Obj,piMATRIX * Mat);
 extern void obmainCreateMutableSurfaceNormals(OBJECT*);
 extern void obmainCreateMutableCollisionNormals(OBJECT*);
 
-extern LOGICAL obmainValidateObject(OBJECT*); // last resort to track down garbage objects
+extern bool obmainValidateObject(const OBJECT*) noexcept;  // last resort to track down garbage objects
 
 // get a screen oriented bounding box for the object
 extern LOGICAL obmainGetScreenBBOX(OBJECT* lpob, float& x, float& y, float &z, float& w, float& h);

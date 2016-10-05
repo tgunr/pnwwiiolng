@@ -1047,9 +1047,8 @@ _endpointFDConnect(ENDPOINT& endpoint, const WSANETWORKEVENTS& eventData)
 static UINT64 g_idleInstance = 0;
 
 static void
-_pollSocketsInner(const TeulTimeMS& remainder)
+_pollSocketsInner(TeulTimeMS remainder)
 {
-
 	_lastPXferTotal = totalPacketsXfer;
 
 	// Make ourselves re-entrant by aborting if someone else comes along and
@@ -1364,7 +1363,7 @@ _pollSet(void)
 
 #if !defined(WINDOWS_VERSION)
 static void
-_pollSocketsInner(const TeulTimeMS& duration_)
+_pollSocketsInner(TeulTimeMS duration_)
 {
 	SINT32	retval = 0;
 
@@ -1418,7 +1417,7 @@ _pollSetIsEmpty()
 
 #if platOS != OS_WIN32 || platBuild == TEUL_SERVER
 static void
-_pollSockets(const TeulTimeMS& duration_)
+_pollSockets(TeulTimeMS duration_)
 {
 	//////////////////////////////////////// Unix version
 	if ( PN_UNLIKELY(_pollSetIsEmpty()) )
@@ -1442,7 +1441,7 @@ _pollSockets(const TeulTimeMS& duration_)
 
 #if platOS == OS_WIN32 && platBuild != TEUL_SERVER
 static void
-_pollSockets(const TeulTimeMS& duration_)
+_pollSockets(TeulTimeMS duration_)
 {
 	if ( _pollSetIsEmpty() )
 	{
@@ -1694,7 +1693,7 @@ teulIdleEndpoints()
 }
 
 SINT32
-teulModIdle(const TeulTimeMS& duration_)
+teulModIdle(const TeulTimeMS duration_)
 {
 	if ( duration_ == 0 )
 		std::this_thread::yield();

@@ -107,7 +107,7 @@ static inline const char* weapPrintFullName(const WEAPON_SPEC* spec)
 {
 	if ( spec == nullptr )
 		return "<null>";
-	WEAPON* weap = weapLookup(*spec);
+	const WEAPON* weap = weapLookup(*spec);
 	return ( weap == nullptr ) ? weapPrintSpecC(spec) : weap->fullName;
 }
 

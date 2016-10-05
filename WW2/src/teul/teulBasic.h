@@ -96,7 +96,7 @@ const char* teulGetAddress(const UINT32 host, char* buffer, const size_t bufferS
 //!							(non-blocking), a negative value specifies
 //!							wait forever.
 //! @ingroup not-thread-safe
-void teulUpdateTransport(const TeulTimeMS& duration_=0ULL);
+void teulUpdateTransport(const TeulTimeMS duration_=0ULL);
 
 //! Get the local address of a given teul index.
 //! @param[in]	teulIndex		Index of the connection to query.

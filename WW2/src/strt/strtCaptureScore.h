@@ -51,10 +51,9 @@ struct CaptureContributionEvent
 struct CaptureScore
 {
 	CaptureScore() {}
-	CaptureScore(const FULL_OBJ_ID fid_, const WWII_SIDE& side_) : m_fullObjID(fid_), m_side(side_) {}
+	CaptureScore(const FULL_OBJ_ID fid, const WWII_SIDE side) : m_fullObjID(fid), m_side(side) {}
 
 	FULL_OBJ_ID		m_fullObjID;
 	WWII_SIDE		m_side;
 };
 #pragma pack(pop)
-

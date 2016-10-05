@@ -117,7 +117,7 @@ static LOGICAL _GetSoundDistance(FLOAT32* pMin, FLOAT32* pMax, UINT32* pType);
 
 static void vehUpdateRideChanged(vehVehicle*, UINT32 newRideVehicleIdx);
 static void _processBuildingDamage (vehVehicle& Vehicle);
-static void _playWeaponFireSound(SCHAR* sound, OBJECT* o, FLOAT64VECTOR* pos, UINT32 type);
+static void _playWeaponFireSound(const SCHAR* sound, OBJECT* o, const FLOAT64VECTOR* pos, UINT32 type);
 
 UINT32 vehupdateCreatePlayerControlledVehicle(SINT32 VehicleNum,
 											  SINT32 VehicleIdNum,
@@ -2473,9 +2473,9 @@ UINT32 vehResupplyWeapons(struct vehVehicle* Vehicle)
 // Function: _playWeaponFireSound
 // Description:
 //////////////////////////////////////////////////////////////////////
-void _playWeaponFireSound(SCHAR* sound,
+void _playWeaponFireSound(const char* sound,
                           OBJECT* o,
-                          FLOAT64VECTOR* pos,
+                          const FLOAT64VECTOR* pos,
                           UINT32 type)
 {
     SINT32 ID = fxSndGetNewSound();
@@ -2483,51 +2483,31 @@ void _playWeaponFireSound(SCHAR* sound,
     if(ID < 0) return;
 
     FLOAT32 fMin, fMax;
+	_GetSoundDistance(&fMin, &fMax, &type);
 
     // Check if distance file exists.
-    SCHAR* p = nullptr;
-    static SCHAR distSound[128];
-    LOGICAL hasDistant = FALSE;
-  //  LOGICAL canPlayDistantSound = FALSE;
+	std::string distSound(sound);
+	auto p = distSound.rfind(".wav");
+	if (p != distSound.npos)
+	{
+		distSound.replace(distSound.begin() + p, distSound.end(), "_distant.wav");
+		if (fioAccess(distSound.c_str()))
+		{
+			piVECTOR v{ (FLOAT32)pos->x, (FLOAT32)pos->y, (FLOAT32)pos->z };
 
-    strncpy(distSound, sound, sizeof(distSound) - 1);
-	distSound[sizeof(distSound)-1] = 0;
+			math3dVectorMultiply(&v, &v, &o->mat);
 
-    p = strstr(distSound, ".wav");
+			FLOAT32 z = math3dDotProduct(&v, &playdir) + playtrans.z;
 
-    if(p)
-    {
-        *p = 0;
-        strcat(distSound, "_distant.wav");
+			if (z > fMax) return;
 
-        if(fioAccess(distSound))
-        {
-            hasDistant = TRUE;
-        }
-    }
-
-    _GetSoundDistance(&fMin, &fMax, &type);
-
-    if(hasDistant)
-    {
-        piVECTOR v;
-
-        v.x = (FLOAT32)pos->x;
-        v.y = (FLOAT32)pos->y;
-        v.z = (FLOAT32)pos->z;
-
-        math3dVectorMultiply(&v, &v, &o->mat);
-
-        FLOAT32 z = math3dDotProduct(&v, &playdir) + playtrans.z;
-
-        if(z > fMax) return;
-
-        if(z > fMax/4 && z <= fMax)
-        {
-            fMin = 150.0f;
-            sound = distSound;
-        }
-    }
+			if (z > fMax / 4 && z <= fMax)
+			{
+				fMin = 150.0f;
+				sound = distSound.c_str();
+			}
+		}
+	}
 
     fxSndSetSoundName(ID, sound);
     fxSndSetPriority(ID, IDE_TP_PRIORITY_HIGH);

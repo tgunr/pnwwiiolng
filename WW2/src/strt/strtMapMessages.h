@@ -15,9 +15,9 @@ extern SINT32 strtInstallMapCallbacks(void);
 //	it to reserve a weapon for a front end
 //This function sends a request to post a weapon at a facility
 extern SINT32 strtSendMMPostRequest(SINT32 connection, UINT32 customerID, const char* callsign
-						, UINT32 missionID, UINT32 brigadeID, const PermissionMask& permMask
+						, UINT32 missionID, UINT32 brigadeID, const PermissionMask permMask
 						, const FULL_OBJ_ID facility, WEAPON_SPEC weapon
-						, LOGICAL multicrew,LOGICAL immediateSpawn);
+						, LOGICAL multicrew, LOGICAL immediateSpawn);
 
 //This function sends a request to list all the posted weapons at a facility
 extern SINT32 strtSendMMPostListRequest(SINT32 connection, UINT32 customerID, const char* callsign, UINT32 missionID, UINT32 brigadeID, const FULL_OBJ_ID facility);

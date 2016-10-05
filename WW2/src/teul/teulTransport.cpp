@@ -489,7 +489,7 @@ teulInitTransport(LogMode logType
 // application is using teul, we have to make a call for that all to happen.
 // should be called once per game loop
 void
-teulUpdateTransport(const TeulTimeMS& duration_)
+teulUpdateTransport(const TeulTimeMS duration_)
 {
 	if (PN_UNLIKELY(_transportClosing))
 		return;

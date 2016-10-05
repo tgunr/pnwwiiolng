@@ -45,7 +45,7 @@ public:
 	sortieid_t lastHitBySortieID() const { return m_lastHitBySortieID; }
 	const TeulTimeMS& lastHitTime() const { return m_lastHitTime; }
 	bool isPlaynet() const { return m_isPlaynet; }
-	const FLOAT32& value() const { return m_value; }
+	FLOAT32 value() const { return m_value; }
 	FULL_OBJ_ID despawnedTo() const { return m_despawnedTo; }
 
 	const Player* pilot() const { return m_pilot; }

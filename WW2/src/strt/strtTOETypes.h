@@ -82,7 +82,6 @@ private:
 	// Which brigades/divisions are using us?
 	typedef std::set<StratHCUnit*> SUBSCRIBERS;
 	SUBSCRIBERS		m_subscribers;
-//tolua_begin
 };
 
 // Defines the structure which provides the background information for a particular
@@ -90,9 +89,10 @@ private:
 class WeaponTemplate
 {
 public:
-	WeaponTemplate(const WEAPON& withWeapon) : m_weapon(withWeapon), m_capacity(0) {}
+	WeaponTemplate() = delete;
+	WeaponTemplate(const WEAPON& withWeapon) : m_weapon(withWeapon), m_capacity(0), m_resupplyTime_m{0} {}
 
-	bool operator<(const WEAPON_SPEC rhs) const { return m_weapon.spec() < rhs; }
+	bool operator<(const WEAPON_SPEC& rhs) const { return m_weapon.spec() < rhs; }
 
 	void setCapacity(UINT32 newCapacity) { m_capacity = (UINT16)newCapacity; }
 	void setResupplyTime(UINT16 resupplyTime_m) { if ( resupplyTime_m != m_resupplyTime_m ) m_resupplyTime_m = resupplyTime_m; }
