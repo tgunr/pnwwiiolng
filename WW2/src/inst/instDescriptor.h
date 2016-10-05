@@ -18,10 +18,10 @@ namespace Instance
 	class Descriptor
 	{
 	public:
-        Descriptor(UINT32 _category, UINT32 _type, UINT64 _ownerID=0LL, UniqueID _id=0LL)
+        Descriptor(UINT32 _category, UINT32 _type, UINT64 _ownerID=0LL, instanceid_t _id=0LL)
         : m_id(_id), um_ownerID(_ownerID), m_category(_category), m_type(_type) {}
         Descriptor() : m_id(0LL), um_ownerHandle(0LL), m_category(0), m_type(0) {}
-        Descriptor(struct ACTION_OBJECT* a) ;
+        Descriptor(struct ACTION_OBJECT* a);
 
 		bool isValid() const { return category() != 0; }
 
@@ -32,18 +32,18 @@ namespace Instance
 			return (category() == rhs.category() && ((type() == rhs.type()) | (category() == 0)));
 		}
 
-        bool operator==(const Descriptor& rhs) const
-        {
-            return isInstanceOf(rhs) && ownerID() == rhs.ownerID() && id() == rhs.id() ;
-        }
+		bool operator==(const Descriptor& rhs) const
+		{
+			return isInstanceOf(rhs) && ownerID() == rhs.ownerID() && this->id() == rhs.id();
+		}
 
 		bool operator!=(const Descriptor& rhs) const
 		{
 			return !operator==(rhs);
 		}
 
-        bool operator==(const Instance::UniqueID& rhs) const { return id() == rhs ; }
-        bool operator!=(const Instance::UniqueID& rhs) const { return id() != rhs ; }
+		bool operator==(instanceid_t rhs) const { return this->id() == rhs; }
+		bool operator!=(instanceid_t rhs) const { return this->id() != rhs; }
 
 		bool operator<(const Instance::Descriptor& rhs) const;
 
@@ -51,17 +51,17 @@ namespace Instance
 
 		UINT32 category() const { return m_category; }
 		UINT32 type() const { return m_type; }
-        ChatHandle handle() const { return um_ownerHandle ; }
-        const UINT64& ownerID() const { return um_ownerID ; }
-        const Instance::UniqueID& id() const { return m_id ; }
+        ChatHandle handle() const { return um_ownerHandle; }
+        const UINT64& ownerID() const { return um_ownerID; }
+        instanceid_t id() const { return m_id; }
 
-		int packer(unsigned int mode, ACTION_OBJECT* a);
+		SINT32  packer(LOGICAL mode, ACTION_OBJECT* a);
 
 		//! Determine if this instance has strat.
 		bool hasStrat() const { return isCampaign(); }
 
 	private:
-        UniqueID	m_id ;				//!< Host-supplied, campaign-specific, unique ID.
+        instanceid_t	m_id;				//!< Host-supplied, campaign-specific, unique ID.
 
 	public:
         union
@@ -69,9 +69,9 @@ namespace Instance
             // Every instance belongs to someone, interpretation
             // of this field is category/type dependent. The host
             // doesn't read it.
-            UINT64		um_ownerID ;
-            ChatHandle	um_ownerHandle ;
-        } ;
+            UINT64		um_ownerID;
+            ChatHandle	um_ownerHandle;
+        };
 		UINT16			m_category;		// See Categories
 		UINT16			m_type;			// Client enumerated, per-category
 	};
