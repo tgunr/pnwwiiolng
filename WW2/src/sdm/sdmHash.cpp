@@ -11,6 +11,7 @@
 #include <array>
 
 #include "mem/mem.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtDTL.h"
 #include "sdm/sdmHash.h"
 

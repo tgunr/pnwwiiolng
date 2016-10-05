@@ -20,6 +20,8 @@
 #include "strt/strtCP.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtData.h"
+#include "strt/strtDataErrorInfo.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtDB.h"
 #include "strt/strtFacilityStruct.h"
 #include "strt/strtFB.h"
@@ -65,222 +67,6 @@ const UINT32 objectiveFlags[MAX_SIDES] = {
 ,	CP_AXIS_OBJECTIVES
 ,	0
 };
-
-static UINT32 curTestLevel = 0;
-
-enum
-{
-	ERR_WRONG_SUPERCELL
-,	ERR_CANT_FIND_PARENT_FACILITY
-,	ERR_LINK_START_MULTIPLE_LINKS
-,	ERR_NO_CAPTURE_TABLE
-,	ERR_ZERO_LINKS
-,	ERR_ZERO_ILINKS
-,	ERR_ZERO_OLINKS
-,	ERR_MISMATCH_LINKS
-,	ERR_NULL_ILINK
-,	ERR_NULL_OLINK
-,	ERR_FB_BOTH_CHECK
-,	ERR_FB_DAMAGEABLE_SPAWN
-,	ERR_FB_DIVISOR
-,	ERR_FB_NO_LINK
-,	ERR_FB_NO_MATE
-,	ERR_AB_BOTH_CHECK
-,	ERR_AF_NO_SPAWN
-,	ERR_CP_NO_OWNABLES
-,	ERR_DEFINED_CONTESTED
-,	ERR_OBJ_NOT_IN_BLITZWOR
-,	ERR_CANT_FIND_LINK_BUILDING
-,	ERR_LINK_START_DEPOT_LINK
-,	ERR_LINK_END_DEPOT_LINK
-,	ERR_LINK_FIREBASE
-,	ERR_FB_ZERO_OBJECTS
-,	ERR_MULT_CAP_OBJECTS
-
-,	MAX_ERR_CODES
-};
-
-struct ErrorInfo
-{
-	const char*	name;				// Name for blitzWor
-	const char* text;				// Descriptive text.
-	UINT32		level;				// Error level
-	bool		canIgnore;			// Can ignore minor ones
-};
-
-ErrorInfo errorInfo[MAX_ERR_CODES] =
-{
-	{
-		"wrong-supercell"
-		, "The following entities have been displaced from their original SUPERCELL during the BuildTerrain process. This will prevent the building from participating in strat (e.g. finding its parent facility)"
-		, 1
-		, false
-	}
-,	{
-		"no-parent-fac"
-		, "The following BUILDINGs referred to FACILITYs that could not be found - this can caused by placing a building in a different supercell to their parent facility or when a building instance has become detached from its strat data."
-		, 1
-		, false
-	}
-,	{
-		"link-start-mult"
-		, "The following link-start depots were associated with multiple links!"
-		, 1
-		, false
-	}
-,	{
-		"no-cap-table"
-		, "The following facilities did not contain any capturable buildings. Capturable state is determined by the word 'cap' in the flags (11th) column of the building's entry in blitzWor.csv. Can occur if the host's blitzWor is out of data."
-		, 1
-		, true
-	}
-,	{
-		"zero-links"
-		, "Some DEPOT faclities did not have any LINKs (incoming OR outgoing) - this is normally the case for edge-of-map depots"
-		, 0
-		, true
-	}
-,	{
-		"zero-in-links"
-		, "Some DEPOT facilities had outgoing LINKs but were missing /incoming/ LINKs - this is a CRITICAL data error"
-		, 0
-		, false
-	}
-,	{
-		"zero-out-links"
-		, "Some DEPOT facilities had incoming LINKs but were missing /outgoing/ LINKs - this is a CRITICAL data error"
-		, 0
-		, false
-	}
-,	{
-		"mismatch-links"
-		, "Some DEPOT facilities did not have a matching number of incoming vs outgoing LINKs - the code depends on reciprocating and matching LINKs, so this is a CRITICAL data error"
-		, 0
-		, false
-	}
-,	{
-		"null-in-link"
-		, "Some DEPOT facilities had a NULL incoming LINK - this is a CRITICAL data error since code assumes valid LINKs"
-		, 0
-		, false
-	}
-,	{
-		"null-out-link"
-		, "Some DEPOT facilities had a NULL outgoing LINK - this is a CRITICAL data error since code assumes valid LINKs"
-		, 0
-		, false
-	}
-,	{
-		"fb-both-check"
-		, "Some firebases do not have spawn objects for* both* infantry and ground units"
-		, 0
-		, true
-	}
-,	{
-		"fb-dmg-spawn"
-		, "Some firebases had a damageable spawn object - this is a SIGNIFICANT data error"
-		, 0
-		, false
-	}
-,	{
-		"fb-divisor"
-		, "The following firebases have an object count which does not divide evenly into 100 - this is a MAJOR data error"
-		, 0
-		, false
-	}
-,	{
-		"fb-no-link"
-		, "The following firebases do not appear to have a LINK associated with them - this is potentially a SIGNIFICANT data error"
-		, 0
-		, false
-	}
-,	{
-		"fb-no-mate"
-		, "These firebases did not appear to be accompanied by a reciprocating 'mate' fb - this is a CRITICAL data error, since the code assumes all Firebases are paired"
-		, 0
-		, false
-	}
-,	{
-		"ab-both-check"
-		, "The following ARMYBASE facilities do not have INFANTRY and VEHICLE spawn objects - this is normal for newer CPs and the Zeelands. The validator does /not/ read spawn.xml"
-		, 0
-		, true
-	}
-,	{
-		"af-no-spawn"
-		, "These AIRFIELD facilities do not have an AIRCRAFT spawn object"
-		, 0
-		, true
-	}
-,	{
-		"cp-no-caps"
-		, "The following CPs did not have any non-firebase facilities associated with them - this should never happen to a CP in the playspace"
-		, 1
-		, true
-	}
-,	{
-		"cp-defined-contested"
-		, "These CPs have member facilities that are defined in data as belonging to a different side than the CP itself. This can causes unpredictable behavior when the strat server starts up."
-		, 1
-		, true
-	}
-,	{
-		"obj-unused"
-		, "The following buildings are objects that are not described in blitzWor. If the object is no-longer used, please add an \"Ignore,objectname,obj-unused\" entry to blitzWor.csv"
-		, 0
-		, true
-	}
-,	{
-		"link-no-bldg"
-		, "The following LINKs referenced buildings that could not be found in the specified supercell. (N,N:N is ox,oy:ID)"
-		, 0
-		, false
-	}
-,	{
-		"link-bad-start"
-		, "The following LINKs found a startDepot with a facility who's outgoingLink is NULL"
-		, 0
-		, false
-	}
-,	{
-		"link-bad-end"
-		, "The following LINKs found an endDepot with a facility who's incomingLink is NULL"
-		, 0
-		, false
-	}
-,	{
-		"link-bad-fb"
-		, "The following links had invalid firebase IDs that could not be found."
-		, 0
-		, false
-	}
-,	{
-		"fb-no-bldg"
-		, "The following firebases appear to have no buildings/objects associated with them."
-		, 0
-		, false
-	}
-,	{
-		"fac-mult-cap"
-		, "The following BUILDINGs conflicted with an existing capture object for their parent facility."
-		, 1
-		, true
-	}
-};
-
-static std::map<std::string, std::string> errorList[MAX_ERR_CODES];
-
-//////////////////////////////////////////////////////////////////////
-// Add an error list entry for an object, if it isn't ignoring the
-// given error.
-
-void strtAddErrorListEntry(int errorNo, const char* objectName, const char* entryName, const char* entryData)
-{
-	if ( errorInfo[errorNo].canIgnore && parseIsObjectIgnoringError(objectName, errorInfo[errorNo].name) )
-		return;
-
-	errorList[errorNo][entryName] = entryData;
-}
 
 //////////////////////////////////////////////////////////////////////
 // Filename string pool definitions
@@ -358,17 +144,6 @@ strtEnemyLink(CPStruct& cp, bool state)
 	}
 }
 
-//////////////////////////////////////////////////////////////////////
-// Validity checks on the supply links in a particular supercell
-
-void
-strtDataCantFindBuilding(const char* linkName, const char* role, const FULL_OBJ_ID fid)
-{
-	char description[256];
-	strprintf(description, "%s (%d,%d:%u)", role, fid.cell.ox, fid.cell.oy, fid.id);
-	errorList[ERR_CANT_FIND_LINK_BUILDING][linkName] = description;
-}
-
 static inline void
 _checkSupplyLinksIn(const Supercell& sc)
 {
@@ -391,7 +166,7 @@ _checkSupplyLinksIn(const Supercell& sc)
 								, newLink->fullObjID.cell.oy
 								, newLink->fullObjID.id
 								, facility.name);
-				errorList[ERR_LINK_START_DEPOT_LINK][newLink->name] = buffer;
+				g_dataErrors.emplace(ERR_LINK_START_DEPOT_LINK, newLink->name, buffer);
 			}
 		}
 		else
@@ -412,7 +187,7 @@ _checkSupplyLinksIn(const Supercell& sc)
 								, newLink->fullObjID.cell.oy
 								, newLink->fullObjID.id
 								, facility.name);
-				errorList[ERR_LINK_END_DEPOT_LINK][newLink->name] = buffer;
+				g_dataErrors.emplace(ERR_LINK_END_DEPOT_LINK, newLink->name, buffer);
 			}
 		}
 		else
@@ -523,7 +298,7 @@ _supercellCheck(const char* typeName, const char* name, const Supercell& sc, int
 	strprintf(entity, "%s '%s' from %d.%d", typeName, name, sc.x, sc.y);
 	strprintf(expected, "sdm puts it in %d.%d", actualScx, actualScy);
 
-	errorList[ERR_WRONG_SUPERCELL][entity] = expected;
+	g_dataErrors.emplace(ERR_WRONG_SUPERCELL, entity, expected);
 
 	return false;
 }
@@ -647,18 +422,6 @@ _scPass1_facs(Supercell& sc)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Report an error finding the parent facility for a building
-
-void
-strtDataErrorParentFacility(const char* buildingName, const char* filename, SINT32 scx, SINT32 scy, UINT16 bid, UINT16 bno, UINT16 fid)
-{
-	char description[256];
-	strprintf(description, "%s sc:%d,%d bid:%d bldg:%d fid:%d"
-				, filename, scx, scy, bid, bno, fid);
-	errorList[ERR_CANT_FIND_PARENT_FACILITY][buildingName] = description;
-}
-
-//////////////////////////////////////////////////////////////////////
 // First pass initialization of building objects
 //  - Make sure the necessary parent CP is initialized (see pass1 facs)
 //	- Add parent linkage
@@ -698,7 +461,7 @@ _scPass1_objs(Supercell& sc)
 								, parentFacility->m_captureBuilding->name
 								, parentFacility->m_captureBuilding->filename
 								);
-				errorList[ERR_MULT_CAP_OBJECTS][newObject->name] = error;
+				g_dataErrors.emplace(ERR_MULT_CAP_OBJECTS, newObject->name, error);
 			}
 			else
 			{
@@ -808,7 +571,7 @@ _scPass2_linkSetup(Supercell& sc)
 			std::string links = start->m_outgoingLink->name;
 			links += "/";
 			links += newLink->name;
-			errorList[ERR_LINK_START_MULTIPLE_LINKS][start->name] = links;
+			g_dataErrors.emplace(ERR_LINK_START_MULTIPLE_LINKS, start->name, std::move(links));
 			continue;
 		}
 		if ( end->m_incomingLink != nullptr )
@@ -833,7 +596,7 @@ _scPass2_linkSetup(Supercell& sc)
 				continue;
 			char buffer[256];
 			sprintf(buffer, "%d,%d:%u", newLink->firebaseID.cell.ox, newLink->firebaseID.cell.oy, newLink->firebaseID.id);
-			errorList[ERR_LINK_FIREBASE][newLink->name] = buffer;
+			g_dataErrors.emplace(ERR_LINK_FIREBASE, newLink->name, buffer);
 			continue;
 		}
 
@@ -1126,7 +889,7 @@ strtInitializeStratData()
 }
 
 static FULL_OBJ_ID*
-_getStratObject(const FULL_ID& index)
+_getStratObject(const FULL_ID index)
 {
 	Supercell* sc = strtGetSupercell(index.sx, index.sy);
 	return sc ? sc->Ptr(index.id) : nullptr;
@@ -1489,15 +1252,13 @@ _spawnsSeaVehicles(FacilityStruct* facility)
 //	1.  Link must have a valid starting and ending Depot
 //	2.  Each depot must have no more than one incoming and one outgoing link
 bool
-strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
+strtVerifyStratSystem(CPStruct* cpList, UINT32 curTestLevel)
 {
 	if (cpList == nullptr)
 	{
 		dbugLog(_FLA,"CP List is null, strat system is not initialized");
 		return false;
 	}
-
-	curTestLevel = testLevel;
 
 	CPStruct* currentCP;
 	FacilityStruct* fac;
@@ -1585,12 +1346,12 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 					}
 					else if ( fac->m_incomingLink == nullptr )
 					{
-						errorList[ERR_ZERO_ILINKS][fac->name] = "";
+						g_dataErrors.emplace(ERR_ZERO_ILINKS, fac->name, "");
 						retval = false;
 					}
 					else if ( fac->m_outgoingLink == nullptr )
 					{
-						errorList[ERR_ZERO_OLINKS][fac->name] = "";
+						g_dataErrors.emplace(ERR_ZERO_OLINKS, fac->name, "");
 						retval = false;
 					}
 				break;
@@ -1608,7 +1369,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 					}
 					if ( fac->numObjects == 0 )
 					{
-						errorList[ERR_FB_ZERO_OBJECTS][fac->name] = "";
+						g_dataErrors.emplace(ERR_FB_ZERO_OBJECTS, fac->name, "");
 						retval = false;
 						break;
 					}
@@ -1620,7 +1381,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 						{
 							if ( strstr(it->filename, "spawn") != nullptr && it->m_maxDamageJoules > 0 )
 							{
-								errorList[ERR_FB_DAMAGEABLE_SPAWN][fac->name] = "";
+								g_dataErrors.emplace(ERR_FB_DAMAGEABLE_SPAWN, fac->name, "");
 								tainted = true;
 								retval = false;
 							}
@@ -1633,13 +1394,13 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 						capacity /= fac->numObjects;
 						if ( capacity != (UINT64)fac->maxCapacity() && (!tainted || curTestLevel > 0) )
 						{
-							errorList[ERR_FB_DIVISOR][fac->name] = "";
+							g_dataErrors.emplace(ERR_FB_DIVISOR, fac->name, "");
 							retval = false;
 						}
 					}
 					if (fac->link == nullptr)
 					{
-						errorList[ERR_FB_NO_LINK][fac->name] = "";
+						g_dataErrors.emplace(ERR_FB_NO_LINK, fac->name, "");
 						retval = false;
 					}
 					else
@@ -1647,7 +1408,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 						// Check for matching firebase
 						if (!_checkFirebasePair(*fac))
 						{
-							errorList[ERR_FB_NO_MATE][fac->name] = "";
+							g_dataErrors.emplace(ERR_FB_NO_MATE, fac->name, "");
 							retval = false;
 						}
 					}
@@ -1713,79 +1474,13 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 		}
 	}
 
-	if ( strtReportDataErrors() > 0 )
+	if ( strtReportDataErrors(curTestLevel) > 0 )
 		retval = false;
 
 	if ( cv_stratIgnoreErrors.GetBool() )
 		return true;
 
-	curTestLevel = 0;
 	return retval;
-}
-
-UINT32
-strtReportDataErrors()
-{
-	UINT32 errors = 0;
-
-	dbugLog(_FLIB, "\n");
-
-//	const UINT32 errorLimit = cv_stratErrorLimit().GetUint32();
-	for ( UINT32 i = 0; i < MAX_ERR_CODES; ++i )
-	{
-		if ( curTestLevel >= errorInfo[i].level && errorList[i].empty() == false )
-		{
-			dbugLog(_FLIB, "\n============================================================================\n"
-							"[%s] "
-							"%s"
-							"\n============================================================================\n"
-							, (errorInfo[i].canIgnore ? errorInfo[i].name : "CRITICAL")
-							, errorInfo[i].text);
-
-			std::string list = "";
-			std::string detail = "";
-			std::map<std::string, std::string>::iterator it;
-			UINT32 reportNo = 0;
-			for ( it = errorList[i].begin(); it != errorList[i].end(); ++it, ++reportNo )
-			{
-				if ( list.empty() == false )
-					list += ", ";
-
-//				if ( errorLimit > 0 && curTestLevel > 0 && errorList[i].size() > errorLimit + 10 && reportNo >= errorLimit )
-//				{
-//					char conclusion[80];
-//					sprintf(conclusion, "{ %u more occurances skipped }", (UINT32)(errorList[i].size() - reportNo));
-//					list += conclusion;
-//					break;
-//				}
-
-				detail = it->first;
-				if ( it->second.empty() == false )
-				{
-					detail += " [";
-					detail += it->second.c_str();
-					detail += "]";
-				}
-
-				if ( list.size() + detail.size() > 77 )
-				{
-					dbugLog(_FLAB, "  %s\n", list.c_str());
-					list = "";
-				}
-
-				list += detail;
-
-				if ( errorInfo[i].canIgnore == false )
-					++errors;
-			}
-
-			if ( list.empty() == false )
-				dbugLog(_FLAB, "  %s\n", list.c_str());
-			dbugLog(_FLIB, "\n");
-		}
-	}
-
-	return errors;
 }
 
 static bool _isSpawnObject(ObjectStruct* object)
@@ -2366,7 +2061,7 @@ _findFirebaseArmybase(FacilityStruct* fb)
 {
 	if ( fb->link == nullptr )
 	{
-		errorList[ERR_FB_NO_LINK][fb->name] = "";
+		g_dataErrors.emplace(ERR_FB_NO_LINK, fb->name, "");
 		return false;
 	}
 
@@ -2650,7 +2345,7 @@ CPStruct*
 strtGetCPByOID(UINT16 uOID)
 {
 #ifdef DEBUG
-	if ( uOID > MAX_CP_LIST_OIDS )
+	if ( uOID >= MAX_CP_LIST_OIDS )
 	{
 		dbugLog(_FLA, "out-of-bounds cp OID request: #%u", uOID);
 		return nullptr;
@@ -2705,7 +2400,7 @@ FacilityStruct*
 strtGetFacilityByOID(UINT16 uOID)
 {
 #ifdef DEBUG
-	if ( uOID > MAX_FACILITY_LIST_OIDS )
+	if ( uOID >= MAX_FACILITY_LIST_OIDS )
 	{
 		dbugLog(_FLA, "out-of-bounds facility OID request: #%u", uOID);
 		return nullptr;

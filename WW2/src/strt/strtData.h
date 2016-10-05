@@ -81,8 +81,6 @@ extern FacilityStruct* strtGetFacilityByOID(UINT16 uOID);
 // Locate the next facility, starting at uStartOID, which matches the string name
 extern FacilityStruct* strtNextMatchingFacility(const char*, UINT16);
 
-extern UINT32 strtReportDataErrors();
-
 extern UINT32 g_maxCPOID;
 
 //tolua_end
