@@ -63,6 +63,7 @@
 #include "server/serverServerInfo.h"
 #include "server/serverInitializeProcess.h"
 #include "strt/strtData.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtDB.h"
 #include "strt/strtEvents.h"
 #include "strt/strtIO.h"
@@ -1163,7 +1164,7 @@ main(int argc, const char* argv[])
 		LogAbort("Couldn't initialize database!");
 
 	mapCPList = strtImportStratData();
-	strtReportDataErrors();
+	strtReportDataErrors(0);
 	if (!mapCPList)
 		LogAbort("Unable to initialize Strat System");
 

@@ -15,6 +15,7 @@
 #include "strt/strtFB.h"
 #include "strt/strtMain.h"
 #include "strt/strtData.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtHostMessages.h"
 #include "strt/strtSupply.h"
 #include "strt/strtSpawn.h"
@@ -244,7 +245,7 @@ strtInitializeStratSystem()
 	_cpList = strtImportStratData();
 	if (_cpList == nullptr)
 	{
-		strtReportDataErrors();
+		strtReportDataErrors(0);
 		fprintf(stderr,"Strat system failed to initialize, /tmp/strt*.log\n");
 		LogAbort("Strat System failed to initialize");
 		exit(1);

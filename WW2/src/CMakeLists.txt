@@ -330,6 +330,9 @@ ADD_LIBRARY(libwwii
                 wwii/wwiiTypes.h
     src/wthrTime.cpp
         include/wthrTime.h
+	strt/strtDataErrors.cpp
+		strt/strtDataErrors.h
+		strt/strtDataErrorInfo.h
     strt/strtSupercell.cpp
         strt/strtSupercell.h
         strt/strtSupercells.h

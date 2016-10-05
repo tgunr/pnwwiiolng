@@ -9,6 +9,7 @@
 // Supporting Programmer:  Marty "Vandal" Poulin
 
 #include "strt/strtData.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtIO.h"
 #include "strt/strtSpawn.h"
 #include "strt/strtFB.h"
@@ -166,7 +167,7 @@ main (int argc, char** argv)
 	cpList = strtImportStratData();
 	if ( cpList == nullptr)
 	{
-		strtReportDataErrors();
+		strtReportDataErrors(0);
 		dbugLog(_FLA,"[X][X][X] Strat System would not init [X][X][X]");
 		exit(1);
 	}

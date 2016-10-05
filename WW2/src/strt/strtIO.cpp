@@ -16,6 +16,7 @@
 #include "strt/strtProtos.h"
 #include "strt/strtServerTypes.h"
 #include "strt/strtCPStruct.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtFacilityStruct.h"
 #include "strt/strtObjectStruct.h"
 #include "strt/strtLinkStruct.h"
@@ -302,8 +303,10 @@ _readSupercells()
 
 	importList.close();
 
-	if ( errors == true )
+	if ( errors == true ) {
+		strtReportDataErrors(3);
 		dbugLog(_FLA, "Errors loading supercell data");
+	}
 
 	sdmFinish();
 }

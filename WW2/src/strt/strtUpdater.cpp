@@ -20,6 +20,7 @@
 #include "strt/strtConstants.h"
 #include "strt/strtDamageQueueEntry.h"
 #include "strt/strtData.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtHack.h"
 #include "strt/strtIO.h"
 #include "strt/strtSyncSupportMessages.h"
@@ -72,7 +73,7 @@ strtUpdaterInit()
 
 	strtFakeBridges(_cpList);
 
-	strtReportDataErrors();
+	strtReportDataErrors(0);
 }
 
 DAMAGE_QUEUE_ENTRY&
