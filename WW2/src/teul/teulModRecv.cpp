@@ -863,6 +863,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 #if defined(POLLRDHUP)
 		if ( PN_UNLIKELY((revents & POLLRDHUP) != 0) )
 		{
+			dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " remote disconnected", endpoint.teulIndex(), PRA_SOCKET(sock));
 			teulClose(endpoint, Teul::Closing::RemoteDisc);
 			continue;
 		}
