@@ -385,22 +385,10 @@ void dbugInit(LogMode logMode, const char* const filename)
 
 	setlocale(LC_CTYPE, "");
 
-	SINT32 file;
-	Debug::ERROR_TYPE level;
-
-	level = Debug::ERR_DBUG;
+	Debug::ERROR_TYPE level = Debug::ERR_DBUG;
 	g_logDebug = true;
 
-	switch(logMode)
-	{
-	case LogMode::TO_FILE:
-		file = _openDbugFile(filename);
-		break;
-	case LogMode::OFF:
-		file = -1;
-		break;
-	}
-
+	SINT32 file = (logMode == LogMode::TO_FILE) ? _openDbugFile(filename) : -1;
 	_logger.initialize(logMode, level, file, filename);
 
 #if AS_SERVER && platOS != OS_WIN32
@@ -729,7 +717,7 @@ void _levelHandler(UINT32 errType, const char* const text)
 //////////////////////////////////////////////////////////////////////
 // "Pretty" logging routine.
 
-[[noreturn]] void
+NORETURN_FN void
 _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char* assertion_, const char* fmt_, ...)
 {
 	va_list args;

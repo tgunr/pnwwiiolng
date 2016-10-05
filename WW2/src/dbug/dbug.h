@@ -135,7 +135,7 @@ int _dbugLog(const char* filename, int lineno, UINT32 errType, FORMAT_ARG(0) con
 SINT32 _dbugWrite(const char* filename, SINT32 lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
 
 // LogAbort: Fire a ERR_FATAL and abort()
-[[noreturn]] void _LogAbort(const char* filename, unsigned int lineno, UINT32 errType, const char* assertion, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(5,6);
+NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, UINT32 errType, const char* assertion, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(5,6);
 
 // Disable dbugLog() and dbugWrite() if respectively requested.
 #ifdef NO_DEBUG_LOG
