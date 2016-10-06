@@ -21,7 +21,7 @@
 #include "wwii/wwiiThreads.h"
 #include "teul/teulConfigVar.h"
 extern ConfigPath cv_defaultLogPath;
-static const char _OPEN_MSG[] = "Playnet Server Log File. Rev: " REPOSITORY_INFO "\n";
+static const char _OPEN_MSG[] = "Playnet Server Log File.\n";
 static const char _CLOSE_MSG[] = "\nPlayer Server Log File Closed.\n";
 #else
 static const char _OPEN_MSG[] = "Debug Message System Open.\n";
@@ -180,8 +180,13 @@ _openDbugFile(const char* const srcFile_)
 		OS_OPEN(&file, ofn, oflags, PMODE);
 		_fileSize = 0;
 
-		if ( file >= 0 )
+		if ( file >= 0 ) {
 			_fileSize += OS_WRITE(file, _OPEN_MSG, sizeof(_OPEN_MSG) - 1);
+            // TODO: Replace with a platform-independent routine using asprintf()/_vscprintf() to make std::strings
+            char buf[1024] = {0};
+            strprintf(buf, "Version: %s (%s, %s)\n", PN_product_version_string, PN_git_commitish_string, PN_build_platform_string);
+			_fileSize += OS_WRITE(file, buf, strlen(buf));
+        }
 	} else {
 		file = STDERR_FILENO;
     }
