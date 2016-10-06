@@ -1238,10 +1238,7 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 
 	// Get the local network address excluding the last octet.
 	const UINT32 localAddress = teulGetEndpointLocalAddress(teulIndex);
-	const UINT32 localNet = localAddress & ~0xff;
 
-	static const UINT32 PRIVATE_SUBNET = 0xC0A80000;	// 192.168.*.*
-	static const UINT32 PRIVATE_SUBMASK = 0xFFFF0000;
 	UINT32 destAddress = bestServer.ipAddress;
 
 	//hack since teulGetAddress sucks
