@@ -36,6 +36,7 @@
 
 ////////// PLAYNET INCLUDES GO AFTER HERE
 
+#include "include/strprintf.h"
 #include "include/defs.h"
 #include "dbug/dbug.h"
 #include "dbug/dbugExtErrors.h"
