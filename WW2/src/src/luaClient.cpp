@@ -495,9 +495,11 @@ _recvLuaPacket(ACTION_OBJECT* const a)
 static SINT32
 _registerCallbacks()
 {
-	BEGIN_CALLBACK_REGISTRATION((UCHAR)Host::CallbackX)
+	BEGIN_CALLBACK_REGISTRATION(Host::CallbackX)
+	{
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLuaPacket);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Host::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
