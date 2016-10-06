@@ -21,7 +21,6 @@
 #include "ob/obc.h"
 #include "ob/obmain.h"
 #include "str/strpool.h"
-#include "sys/sysWinISO.h"
 #include "ld/lddds.h"
 #include <assert.h>
 #include "sysmain.h"

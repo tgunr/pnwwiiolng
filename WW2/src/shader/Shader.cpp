@@ -15,12 +15,8 @@
 
 #include <string>
 
-#include "sys/sysWinISO.h"			// Must be the last thing you include
-
-#if(1)
 #define CG_VERSION      _T("1, 2, 0, 0")
 #define CGGL_VERSION   _T("1, 2, 0, 0")
-#endif
 
 static void _cgErrorCallback();
 

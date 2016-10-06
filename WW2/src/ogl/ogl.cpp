@@ -31,7 +31,6 @@
 #include <queue>
 
 #include "math/Matrixf.h"
-#include "sys/sysWinISO.h"	// Must be the last thing we include
 #include "ogl/GLCounter.h"
 
 /************************

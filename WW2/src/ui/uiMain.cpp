@@ -91,8 +91,6 @@
 #include "ime/imeMain.h"
 #endif
 
-#include "sys/sysWinISO.h"
-
 //#define UI_FONT_NAME "arialbd.ttf"
 //#define UI_CFONT_NAME "simhei.ttf"
 #define UI_FONT_NAME "wqy-zenhei.ttf"

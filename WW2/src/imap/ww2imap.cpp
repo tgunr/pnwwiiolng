@@ -16,7 +16,6 @@
 #include "ml/mlhead.h"
 #include "pers/pershud.h"
 #include "ui/uiMain.h"
-#include "sys/sysWinISO.h"
 #include "weap/weapList.h"
 #include "xml/XMLLoader2.h"
 #include "cfg/cfgPrefs.h"

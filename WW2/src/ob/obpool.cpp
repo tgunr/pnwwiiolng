@@ -17,7 +17,6 @@
 #include "fx/FXInterface.h"
 #include "trn/trngrass.h"
 #include "spt/sptmain.h"
-#include "sys/sysWinISO.h"
 #include <assert.h>
 #include "ob/obMgr.h"
 #include "ogl/oglMesh.h"

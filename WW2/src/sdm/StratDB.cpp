@@ -14,8 +14,6 @@
 #include "client/clientStrtQueue.h"
 #include "ui/uiChat.h"
 
-#include "sys/sysWinISO.h"
-
 using namespace StratDB;
 
 /************************************************************************************************

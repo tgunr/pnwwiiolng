@@ -21,8 +21,6 @@
 
 #include "xml/XMLLoader2.h"
 
-#include "sys/sysWinISO.h"
-
 #define	FPS_DIR		"FPS\\"
 
 #define FPS_DATA_DIR		"vehicles\\ground\\groundman\\"
