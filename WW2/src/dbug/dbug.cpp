@@ -21,10 +21,10 @@
 #include "wwii/wwiiThreads.h"
 #include "teul/teulConfigVar.h"
 extern ConfigPath cv_defaultLogPath;
-static const char _OPEN_MSG[] = "Playnet Server Log File.\n";
+static const char _OPEN_MSG[] = "Playnet Server Log File.";
 static const char _CLOSE_MSG[] = "\nPlayer Server Log File Closed.\n";
 #else
-static const char _OPEN_MSG[] = "Debug Message System Open.\n";
+static const char _OPEN_MSG[] = "Debug Message System Open.";
 static const char _CLOSE_MSG[] = "\nDebug Message System Closed.\n";
 #endif
 
@@ -179,14 +179,6 @@ _openDbugFile(const char* const srcFile_)
 
 		OS_OPEN(&file, ofn, oflags, PMODE);
 		_fileSize = 0;
-
-		if ( file >= 0 ) {
-			_fileSize += OS_WRITE(file, _OPEN_MSG, sizeof(_OPEN_MSG) - 1);
-            // TODO: Replace with a platform-independent routine using asprintf()/_vscprintf() to make std::strings
-            char buf[1024] = {0};
-            strprintf(buf, "Version: %s (%s, %s)\n", PN_product_version_string, PN_git_commitish_string, PN_build_platform_string);
-			_fileSize += OS_WRITE(file, buf, strlen(buf));
-        }
 	} else {
 		file = STDERR_FILENO;
     }
@@ -412,6 +404,11 @@ void dbugInit(SINT32 logType, const char* const filename)
 		teulClockTime = (UINT32)tv.tv_sec;
 	}
 #endif
+
+    if ( file >= 0 ) {
+        dbugLog(_FLM, "%s", _OPEN_MSG);
+        dbugLog(_FLM, "Version: %s (%s, %s)", PN_product_version_string, PN_git_commitish_string, PN_build_platform_string);
+    }
 }
 
 // dbugClose: closes the debug file and cleans up.
