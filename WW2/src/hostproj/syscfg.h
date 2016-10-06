@@ -10,7 +10,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "hostproj/config.h"
+#include "config.h"
 
 // Disable dbugWrite in all host processes
 #define NO_DEBUG_WRITE	1
