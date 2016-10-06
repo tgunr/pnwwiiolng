@@ -1159,7 +1159,7 @@ ChatMission::addMSPWaypoint(const ChatHandle& ownerCall, FLOAT64 x, FLOAT64 y, F
 	if (sto != nullptr)
 	{
 		fru().subtype(sto->subType());
-		setFRUCooldown(host_config.sto.fruPlaceCooldown_s[sto->subType()-1]);
+		setFRUCooldown(host_config.sto.placeCooldown_s[sto->subType()-1]);
 	}
 
 	flagForStatusUpdate();

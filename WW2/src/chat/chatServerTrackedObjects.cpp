@@ -282,7 +282,7 @@ UMSSTO::applyJoules(const SINT64& joules, Player* const player)
 		ChatMission* const mission = chatFindMission(missionID());
 		if ( mission )
 		{
-			mission->setFRUCooldown(host_config.sto.fruDeathCooldown_s[m_subType-1]);
+			mission->setFRUCooldown(host_config.sto.deathCooldown_s[m_subType-1]);
 			mission->removeMSPWaypoint(uid(), true);
 		}
 	}
@@ -585,7 +585,6 @@ UMSSTO::UMSSTO(ACTION_OBJECT* const a)
 
 PPOSTO::PPOSTO(ACTION_OBJECT* const a)
 	: ServerSTO(a)
-//	, m_damage(host_config.sto.ppoDamageThreshold, host_config.sto.ppoDamageCapacity)
 	, m_damage(m_subType)
 	, m_occupants(8)
 	, m_maxLife(0ULL)

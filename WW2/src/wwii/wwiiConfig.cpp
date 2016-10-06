@@ -12,6 +12,7 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiConfigMap.h"
 #include <limits.h>
+#include "wwii/wwiiPPOLoader.h"
 
 //Country names that match up with the country codes
 const char* _countryName[MAX_COUNTRIES] =
@@ -171,40 +172,40 @@ WWII_CONFIG_MAP configMap[] =
 
 // NOTE: would have preferred a map here but since its packed and sent over the network that wouldn't work (plus we'd have to change the way this struct is initialized.
 //       THIS INDEX ORDER MUST MATCH THE ppo.xml ORDER!!  So add new PPOs to the end of the list
-,	{ "sto.inf.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[0],		0,		"15000","Cumulative joules damage to destroy an Infantry Fighting Position" }
-,	{ "sto.inf.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[0],		0,		"1000",	"Minimum joules for damage to be applied to an Infantry Fighting Position" }
-,	{ "sto.inf.fruDeathCooldownS",		TYPE_INT,	&host_config.sto.fruDeathCooldown_s[0],		0,		"120",	"Seconds after an Infantry Fighting Position is destroyed before anything else can be placed" }
-,	{ "sto.inf.fruPlaceCooldownS",		TYPE_INT,	&host_config.sto.fruPlaceCooldown_s[0],		0,		"60",	"Seconds after placing an Infantry Fighting Position before another PPO can be placed" }
+,	{ "sto.ifp.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[0],		0,		"0",	"Cumulative joules damage to destroy an Infantry Fighting Position" }
+,	{ "sto.ifp.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[0],		0,		"0",	"Minimum joules for damage to be applied to an Infantry Fighting Position" }
+,	{ "sto.ifp.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[0],		0,		"120",	"Seconds after an Infantry Fighting Position is destroyed before anything else can be placed" }
+,	{ "sto.ifp.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[0],		0,		"60",	"Seconds after placing an Infantry Fighting Position before another PPO can be placed" }
 
-,	{ "sto.ge.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[1],		0,		"15000","Cumulative joules damage to destroy a gun emplacement" }
+,	{ "sto.ge.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[1],		0,		"250000000","Cumulative joules damage to destroy a gun emplacement" }
 ,	{ "sto.ge.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[1],		0,		"1000",	"Minimum joules for damage to be applied to a gun emplacement" }
-,	{ "sto.ge.fruDeathCooldownS",		TYPE_INT,	&host_config.sto.fruDeathCooldown_s[1],		0,		"120",	"Seconds after a gun emplacement is destroyed before anything else can be placed" }
-,	{ "sto.ge.fruPlaceCooldownS",		TYPE_INT,	&host_config.sto.fruPlaceCooldown_s[1],		0,		"60",	"Seconds after placing a gun emplacement before another PPO can be placed" }
+,	{ "sto.ge.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[1],		0,		"120",	"Seconds after a gun emplacement is destroyed before anything else can be placed" }
+,	{ "sto.ge.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[1],		0,		"60",	"Seconds after placing a gun emplacement before another PPO can be placed" }
 
-,	{ "sto.afru.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[2],		0,		"15000","Cumulative joules damage to destroy an ammo-only FRU" }
-,	{ "sto.afru.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[2],		0,		"1000",	"Minimum joules for damage to be applied to a city-only FRU" }
-,	{ "sto.afru.fruDeathCooldownS",		TYPE_INT,	&host_config.sto.fruDeathCooldown_s[2],		0,		"120",	"Seconds after an ammo-only FRU is destroyed before anything else can be placed" }
-,	{ "sto.afru.fruPlaceCooldownS",		TYPE_INT,	&host_config.sto.fruPlaceCooldown_s[2],		0,		"60",	"Seconds after placing an ammo-only FRU before another PPO can be placed" }
+,	{ "sto.fmsp.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[2],		0,		"250000000","Cumulative joules damage to destroy a fortified mobile spawn" }
+,	{ "sto.fmsp.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[2],		0,		"1000",	"Minimum joules for damage to be applied to a fortified mobile spawn" }
+,	{ "sto.fmsp.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[2],		0,		"120",	"Seconds after fortified MS is destroyed before anything else can be placed" }
+,	{ "sto.fmsp.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[2],		0,		"60",	"Seconds after placing fortified MS before another PPO can be placed" }
 
-,	{ "sto.fmsp.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[3],		0,		"60000","Cumulative joules damage to destroy a fortified mobile spawn" }
-,	{ "sto.fmsp.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[3],		0,		"1000",	"Minimum joules for damage to be applied to a fortified mobile spawn" }
-,	{ "sto.fmsp.fruDeathCooldownS",		TYPE_INT,	&host_config.sto.fruDeathCooldown_s[3],		0,		"120",	"Seconds after fortified MS is destroyed before anything else can be placed" }
-,	{ "sto.fmsp.fruPlaceCooldownS",		TYPE_INT,	&host_config.sto.fruPlaceCooldown_s[3],		0,		"60",	"Seconds after placing fortified MS before another PPO can be placed" }
+,	{ "sto.afru.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[3],		0,		"15000","Cumulative joules damage to destroy an ammo-only FRU" }
+,	{ "sto.afru.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[3],		0,		"1000",	"Minimum joules for damage to be applied to a city-only FRU" }
+,	{ "sto.afru.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[3],		0,		"120",	"Seconds after an ammo-only FRU is destroyed before anything else can be placed" }
+,	{ "sto.afru.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[3],		0,		"60",	"Seconds after placing an ammo-only FRU before another PPO can be placed" }
 
 ,	{ "sto.cfru.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[4],		0,		"15000","Cumulative joules damage to destroy a city mobile spawn" }
 ,	{ "sto.cfru.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[4],		0,		"1000",	"Minimum joules for damage to be applied to a city mobile spawn" }
-,	{ "sto.cfru.fruDeathCooldownS",		TYPE_INT,	&host_config.sto.fruDeathCooldown_s[4],		0,		"120",	"Seconds after city MS is destroyed before anything else can be placed" }
-,	{ "sto.cfru.fruPlaceCooldownS",		TYPE_INT,	&host_config.sto.fruPlaceCooldown_s[4],		0,		"60",	"Seconds after placing city MS before another PPO can be placed" }
+,	{ "sto.cfru.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[4],		0,		"120",	"Seconds after city MS is destroyed before anything else can be placed" }
+,	{ "sto.cfru.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[4],		0,		"60",	"Seconds after placing city MS before another PPO can be placed" }
 
-,	{ "sto.sbag.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[5],		0,		"15000","Cumulative joules damage to destroy a sand bag" }
-,	{ "sto.sbag.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[5],		0,		"1000",	"Minimum joules for damage to be applied to a sand bag" }
-,	{ "sto.sbag.fruDeathCooldownS",		TYPE_INT,	&host_config.sto.fruDeathCooldown_s[5],		0,		"120",	"Seconds after sand bag is destroyed before anything else can be placed" }
-,	{ "sto.sbag.fruPlaceCooldownS",		TYPE_INT,	&host_config.sto.fruPlaceCooldown_s[5],		0,		"60",	"Seconds after placing sand bag before another PPO can be placed" }
+,	{ "sto.sbag.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[5],		0,		"10000","Cumulative joules damage to destroy a sand bag" }
+,	{ "sto.sbag.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[5],		0,		"5000",	"Minimum joules for damage to be applied to a sand bag" }
+,	{ "sto.sbag.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[5],		0,		"120",	"Seconds after sand bag is destroyed before anything else can be placed" }
+,	{ "sto.sbag.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[5],		0,		"60",	"Seconds after placing sand bag before another PPO can be placed" }
 
 ,	{ "sto.ttrap.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[6],		0,		"15000","Cumulative joules damage to destroy a tank trap" }
-,	{ "sto.ttrap.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[6],		0,		"1000",	"Minimum joules for damage to be applied to a tank trap" }
-,	{ "sto.ttrap.fruDeathCooldownS",	TYPE_INT,	&host_config.sto.fruDeathCooldown_s[6],		0,		"120",	"Seconds after a tank trap is destroyed before anything else can be placed" }
-,	{ "sto.ttrap.fruPlaceCooldownS",	TYPE_INT,	&host_config.sto.fruPlaceCooldown_s[6],		0,		"60",	"Seconds after placing a tank trap before another PPO can be placed" }
+,	{ "sto.ttrap.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[6],		0,		"5000",	"Minimum joules for damage to be applied to a tank trap" }
+,	{ "sto.ttrap.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[6],		0,		"120",	"Seconds after a tank trap is destroyed before anything else can be placed" }
+,	{ "sto.ttrap.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[6],		0,		"60",	"Seconds after placing a tank trap before another PPO can be placed" }
 
 
 ,	{ "sto.hulkLifetime",			TYPE_SINT,	&host_config.sto.hulkLifetime_m,		0,		"30",	"Maximum lifetime of an STO Hulk (minutes)" }

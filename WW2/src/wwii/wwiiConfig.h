@@ -128,8 +128,8 @@ struct cfSTO
 {
 	UINT32	damageThreshold[MAX_PPOS];	//!< PPO Damage threshold
 	UINT32	damageCapacity[MAX_PPOS];	//!< PPO Damage capacity
-	UINT32	fruPlaceCooldown_s[MAX_PPOS];	//!< Cooldown from placing one PPO to the next
-	UINT32	fruDeathCooldown_s[MAX_PPOS];	//!< Cooldown on replacing a destroyed PPO
+	UINT32	placeCooldown_s[MAX_PPOS];	//!< Cooldown from placing one PPO to the next
+	UINT32	deathCooldown_s[MAX_PPOS];	//!< Cooldown on replacing a destroyed PPO
 	UINT16	hulkLifetime_m;		//!< Hulk lifetime and population limits
 	UINT16	hulkLimitPerCell; 	//!< Max hulks per grid cell
 	UINT16	hulkLimitPerArea;	//!< Max hulks per group of grid cells
