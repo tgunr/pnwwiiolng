@@ -5343,12 +5343,6 @@ PlayerPlacedObject* vehmainFRUBuild()
 	// set our callbacks
     if (fru != nullptr)
     {
-        // should just let this call the defaul execute, should be good enough
-        //fru->SetExecuteCallback(vehmainFRUExecute);
-
-        // for vehicles, fail on validity checks
-        //fru->failOnInvalid = (veh->VehicleType->Type != VEH_TYPE_PERSON);
-
         // do one update to check our current validity
         if(fpPPOUpdate())
         {
@@ -5363,66 +5357,6 @@ PlayerPlacedObject* vehmainFRUBuild()
 
 	return fru;
 }
-
-// I fail to see why this is even need
-#if 0
-bool vehmainFRUExecute()
-{
-    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
-    
-	PlayerPlacedObject* fru = fpPPOGet();
-
-	if(fru->valid)
-	{
-        if (fru->spec && fru->spec->stotype != ServerTrackedObject::_UMS)
-            coolDownEnd = &fru->spec->coolDownEnd;
-        
-		Vec3d finalPos = fru->finalPos;
-		piVECTOR finalAtt = fru->finalAtt;
-
-	    WorldPosition_m position(finalPos.x(), finalPos.y(), finalPos.z());
-		AttitudeVector attitude(finalAtt.x, finalAtt.y, finalAtt.z);
-		vehVehicle* player = persGetPersonaVehiclePtr();
-
-		if(Online)
-		{
-			// create a ppo sto
-			MobileSpawnSTO sto(0, fru->spec->id, position, attitude, (UINT32)player->Country);
-
-			// send the request to the host
-			sto.request(PlayerClient()->ChatConnection());
-		}
-		else
-		{
-			MobileSpawnSTO* sto = new MobileSpawnSTO(0, fru->spec->id, position, attitude, (UINT32)player->Country);
-			ServerTrackedObject::addToIndex(sto);
-			trnCDUpdateCollideLists(true);
-			//sto->Sink();
-		}
-
-        *coolDownEnd = frametime + fru->spec->coolDown;
-
-		// handle troop specific stuff
-		fpFPSCancelPPO();
-
-		// temp string buffer
-		char nkey[50+1];
-
-		// create name key based on id
-		snprintf(nkey, 50, "ppos.ob%d", fru->spec->id);
-
-		const std::wstring& name = uiLocString(nkey);
-
-		fpPPOAlert("ppos.built", name.c_str());
-	}
-	else
-	{
-		fpPPOAlert();
-	}
-
-	return false;
-}
-#endif
 
 /************************************************************************************************
 	vehHandleMobileSpawnUpdate
