@@ -71,6 +71,12 @@
 #pragma warning( 1 : 4102 )	// unreferenced local label
 #pragma warning( 1 : 4121 )	// packing caution
 
+#ifndef NOMINMAX
+#define NOMINMAX 1
+#endif
+
+#define _CRT_RAND_S
+
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -80,10 +86,6 @@
 //////////////////////////////////////////////////////////////////////////////
 // Windows-specific things
 #if platOS == OS_WIN32
-
-#ifndef NOMINMAX
-#define NOMINMAX 1
-#endif
 
 #include <io.h>
 #include <time.h>

@@ -9,6 +9,8 @@
 #define NOMINMAX 1
 #endif
 
+#define _CRT_RAND_S
+
 #ifndef _SECURE_ATL
 #define _SECURE_ATL 1
 #endif

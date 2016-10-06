@@ -78,7 +78,7 @@ static void
 _dbugSetErr(SINT32 err)
 {
 #if platOS == OS_WIN32
-	wSetErrno(err);
+	WSASetLastError(err);
 #else
 	errno = err;
 #endif
@@ -519,7 +519,7 @@ void dbugSetErrno(SINT32 err)
 SINT32	dbugGetErrno(void)
 {
 #if platOS == OS_WIN32
-	return wErrno;
+	return WSAGetLastError();
 #else
     return errno;
 #endif
@@ -709,7 +709,7 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 	const size_t roughSize = vsnprintf(_logger.m_text, sizeof(_logger.m_text), fmt_, args);
 	va_end(args);
 	const size_t maxSize = roughSize + 256 + strlen(assertion_);
-	char* message = (char*)OS_ALLOCA(maxSize * sizeof(char));
+	char* message = (char*)calloc(maxSize, sizeof(char));
 	if ( PN_UNLIKELY(message == nullptr) )
 	{
 		MessageBoxA(0, "OUT OF MEMORY", "OUT OF MEMORY", MB_ICONERROR | MB_OK | MB_APPLMODAL);
@@ -727,6 +727,7 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 		sprintf_s(message, maxSize, "File: %s\nLine: %u\nError: %s\n", file_, line_, _logger.m_text);
 	}
 	MessageBoxA(0, message, caption, MB_OK | MB_ICONERROR | MB_APPLMODAL);
+	free(message);
 
 #if defined(_DEBUG)
 	__debugbreak();

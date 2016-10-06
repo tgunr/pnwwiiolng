@@ -3450,12 +3450,16 @@ SINT32 HostState::ErrorActions(SINT32 error)
 		break;
 		case ETEUL_CB_REQ_DATA:
 		case ECONNREFUSED:
+#ifdef EPFNOSUPPORT
 		case EPFNOSUPPORT:
+#endif
 		case EAFNOSUPPORT:
 		case ENETDOWN:
 		case ENETUNREACH:
 		case ENETRESET:
+#ifdef EHOSTDOWN
 		case EHOSTDOWN:
+#endif
 		case EHOSTUNREACH:
 		case ETEUL_SERVER_SHUTDOWN:
 			return alABORT;
