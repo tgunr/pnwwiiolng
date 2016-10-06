@@ -117,7 +117,7 @@ MACRO(ADD_OMG_TARGET _TARGET)
     ADD_CUSTOM_COMMAND(
         PRE_BUILD
         OUTPUT  ${_TARGET_PREFIX}.cxx ${_TARGET_PREFIX}.hxx
-        DEPENDS omggen ${_SOURCE_PATH}/typedefs.omg ${_SOURCE_PREIFX}.omg
+        DEPENDS omggen ${OMG_DIR}/typedefs.omg ${_SOURCE_PREFIX}.omg
         MAIN_DEPENDENCY ${_SOURCE_PREFIX}.omg
         COMMENT "[OMG] ${_FILENAME}.omg"
         COMMAND omggen
