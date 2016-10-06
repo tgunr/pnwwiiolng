@@ -389,21 +389,9 @@ void dbugInit(SINT32 logType, const char* const filename)
 	{
 		LogAbort("Unable to install signal handlers.");
 	}
-
-	static struct timeval tv;
-	gettimeofday(&tv, nullptr);
-	const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
-	if ( newTimeMS < teulClock64 )
-	{
-		teulClock64++;
-		tv.tv_sec = (teulClock64 / 1000LL);
-	}
-	else
-	{
-		teulClock64 = newTimeMS;
-		teulClockTime = (UINT32)tv.tv_sec;
-	}
 #endif
+    
+    teulSyncClock();
 
     if ( file >= 0 ) {
         dbugLog(_FLM, "%s", _OPEN_MSG);
