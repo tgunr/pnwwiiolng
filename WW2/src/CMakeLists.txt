@@ -1233,7 +1233,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
         teul/teulVersion.h
         teul/teulConnectionInstruction.h
     )
-    TARGET_LINK_LIBRARIES(testTeul teulserver libwwii)
+    TARGET_LINK_LIBRARIES(testTeul teulserver libwwii ${MYSQL_LIBRARIES})
     SET_PROPERTY(TARGET testTeul PROPERTY FOLDER "Test")
 ENDIF( )
 
