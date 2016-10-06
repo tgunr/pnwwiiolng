@@ -347,7 +347,7 @@ static void _buildCommandLineArguments(const char* processName_, std::vector<con
 
 static bool _spawnProcess(GameProcess* const starter_, const char* const processName_, processhandle_t& process_, UINT64& pid_, int errno_)
 {
-	char basePath[MAX_PATH]{};
+	char basePath[PATH_MAX]{};
 	_getCurrentProcessPath(basePath);
 
 	std::string processPath(basePath);
@@ -359,7 +359,7 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 	STARTUPINFOA sinf{};
 	PROCESS_INFORMATION pinf{};
 
-	char pwd[MAX_PATH]{};
+	char pwd[PATH_MAX]{};
 	GetCurrentDirectoryA(sizeof(pwd), pwd);
 	sinf.lpTitle = const_cast<LPSTR>(starter_->ServerTypeName());
 	dbugLog(_FLD, "starting %s server %s", sinf.lpTitle, processPath.c_str());
