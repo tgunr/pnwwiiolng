@@ -158,10 +158,10 @@ ENDPOINT::_dbugOutputPacket( bool isRecv, const uint8_t *input, size_t packetByt
 		}
 
 	if (!isRecv)
-		dbugLog(_FLD, "Sending MSG (%d bytes): SourcePort %d DestPort %d IP %s Sent Dump:\n-->%s",
+		dbugLog(_FLD, "Sending MSG (%" PRSizeT " bytes): SourcePort %d DestPort %d IP %s Sent Dump:\n-->%s",
 		        packetBytes, destPort(), fromPort(), teulGetAddress(fromAddress()), debugBuff.get());
 	else
-		dbugLog(_FLD, "Receiving MSG (%d bytes): SourcePort %d DestPort %d IP %s Recv Dump:\n<--%s",
+		dbugLog(_FLD, "Receiving MSG (%" PRSizeT " bytes): SourcePort %d DestPort %d IP %s Recv Dump:\n<--%s",
 		        packetBytes, destPort(), fromPort(), teulGetAddress(fromAddress()), debugBuff.get());
 }
 
