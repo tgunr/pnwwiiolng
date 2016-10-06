@@ -424,11 +424,13 @@ mmProcessPostAccept(Player& player, const MM_POST_ACCEPT& post, UINT32 acceptTyp
 
 	if ( player.mission() )
 	{
+		// NOTE: I have strong feelings this code doesn't accomplish anything, but not going to take it out yet
 		// Dorothy allows any vehicle to spawn through a mobile spawn
 #if !defined(DOROTHY)
 		// let ppo subtype/id and weapon class determine spawn ability
-		if ( specLoader.ppoIsSpawnAllowed(player.mission().fru().subtype, 
-			player.weapon().spec.wClass, player.weapon().spec.wType))
+		MobileSpawn& spawner = player.mission()->spawner();
+        	if ( specLoader.ppoIsSpawnAllowed(spawner.m_stoSubType,
+                        player.weapon().spec.wClass, player.weapon().spec.wType))
 #endif
 			mobileSpawnAvailable = player.mission()->isMobileSpawnAvailable();
 		dbugLog(_FLI, "Mobile Spawn available flag = %d", mobileSpawnAvailable);
