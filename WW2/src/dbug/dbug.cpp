@@ -41,7 +41,14 @@ static const char _CLOSE_MSG[] = "\nDebug Message System Closed.\n";
 # include <winsock2.h>
 # pragma comment(lib, "ws2_32.lib")
 # define PMODE (_S_IREAD | _S_IWRITE)
+# define STDERR_FILENO 2
 #endif
+
+static const size_t MAX_FILE_NUM = 5;
+static const size_t MAX_FILE_SIZE = 50 * 1000 * 1024;
+
+static SINT32 _stdErrFileNo = -1;
+static DebugLogger _logger;
 
 const char* errorTypes[] = {
 	"F",		// fatal error detected, exit program
@@ -53,11 +60,8 @@ const char* errorTypes[] = {
 	"D",		// debug level message
 };
 
-//static SINT32	theError = 0;
 static size_t _fileSize = 0;
 static void _levelHandler(UINT32 errType, const char* const text);
-
-
 
 // Global boolean that controls whether or not 'D'ebug level messages will be logged.
 // Exposed globally so it can be tested before prior to performing otherwise expensive
@@ -173,13 +177,13 @@ _openDbugFile(const char* const srcFile_)
 			_fileNumber = 0;
 #endif
 
-		file = OS_OPEN(ofn, oflags, PMODE);
+		OS_OPEN(&file, ofn, oflags, PMODE);
 		_fileSize = 0;
 
 		if ( file >= 0 )
 			_fileSize += OS_WRITE(file, _OPEN_MSG, sizeof(_OPEN_MSG) - 1);
 	} else {
-		file = OS_FILENO(stderr);
+		file = STDERR_FILENO;
     }
 
 	return file;
@@ -347,7 +351,8 @@ void dbugInit(SINT32 logType, const char* const filename)
 	if ( s_dbugInitialized )
 		return;
 	s_dbugInitialized = true;
-
+    
+    _stdErrFileNo = STDERR_FILENO;
 	setlocale(LC_CTYPE, "");
 
 	SINT32 file;
