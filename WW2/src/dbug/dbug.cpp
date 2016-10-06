@@ -26,7 +26,7 @@
 # include <signal.h>
 #endif
 #if AS_SERVER
-#include "hostproj/revision.h"
+#include "revision.h"
 #endif
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
@@ -248,10 +248,10 @@ _dbugOut(const SINT32		file
 	}
 }
 
-void DebugLogger::initialize(LogMode logMode, Debug::ERROR_TYPE level, SINT32 file, const char* program) noexcept
+void DebugLogger::initialize(LogMode logMode, Debug::ERROR_TYPE level, SINT32 fd, const char* programName) noexcept
 {
 	m_logMode = logMode;
-	m_dbugfile = file;
+	m_dbugfile = fd;
 	if ( isInitialized() == false )
 	{
 		m_logLevel = static_cast<Debug::ERROR_TYPE>(level & ~DBUG_FLAG_MASK);
@@ -266,7 +266,7 @@ void DebugLogger::initialize(LogMode logMode, Debug::ERROR_TYPE level, SINT32 fi
 	m_errType = Debug::ERR_ABORT;
 	m_lineno = -1;
 
-	setProgram(program);
+	setProgram(programName);
 	setFileName(nullptr);		// Don't have an open file.
 	setText(nullptr);
 
@@ -285,13 +285,13 @@ _handleSIGUSR2(SINT32)
 	// safe as long as we dont use dbugSetLogLevel at same time elsewhere
 	if ( !g_logDebug )
 	{
-		oldLevel = _logger.logLevel;
-		_logger.logLevel = Debug::ERR_DBUG;
+		oldLevel = _logger.m_logLevel;
+		_logger.m_logLevel = Debug::ERR_DBUG;
 		g_logDebug = true;
 	}
 	else if ( oldLevel != Debug::ERR_DBUG )
 	{
-		_logger.logLevel = oldLevel;
+		_logger.m_logLevel = oldLevel;
 		g_logDebug = false;
 	}
 
@@ -324,9 +324,9 @@ static void _report(const int fd, const char* const fmt, const int num)
 
 void dbugDumpBacktrace(int signum)
 {
-	if ( _logger.isInitialized() == false || _logger.logMode != LogMode::TO_FILE )
+	if ( _logger.isInitialized() == false || _logger.m_logMode != LogMode::TO_FILE )
 		return;
-	const int fd = _logger.dbugfile;
+	const int fd = _logger.m_dbugfile;
 	if ( fd < 0 )
 		return;
 
