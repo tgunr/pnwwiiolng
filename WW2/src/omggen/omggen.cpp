@@ -1346,7 +1346,9 @@ static void _emitHeaderMast()
 {
 	HXX("#pragma once\n");
 	HXX("// @file %s\n", s_hxxFilename.c_str());
-	HXX("// @attention Automatically generated FROM %s\n", g_currentFile);
+	const char* filename = strrchr(g_currentFile, '/');
+	filename = (filename) ? filename + 1 : g_currentFile;
+	HXX("// @attention Automatically generated FROM %s\n", filename);
 	HXX("// @attention Manual edits will be lost.\n");
 	HXX("\n");
 }
@@ -1404,7 +1406,9 @@ static void _emitSourceMast()
 {
 	CXX("#include <syscfg.h> // path is project dependent\n");
 	CXX("// @file %s\n", s_cxxFilename.c_str());
-	CXX("// @attention Automatically generated FROM %s\n", g_currentFile);
+	const char* filename = strrchr(g_currentFile, '/');
+	filename = (filename) ? filename + 1 : g_currentFile;
+	CXX("// @attention Automatically generated FROM %s\n", filename);
 	CXX("// @attention Manual edits will be lost.\n");
 	CXX("\n");
 }
