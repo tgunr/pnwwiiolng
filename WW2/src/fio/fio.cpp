@@ -662,21 +662,13 @@ namespace Fio
 
 	//////////////////////////////////////////////////////////////////////
 	// Return the name of the standard log file.
-
    const char* LogFileName() { return "WW2_Log.txt"; }
 
 	//////////////////////////////////////////////////////////////////////
-	// Return a FILE* to either the unified log file or, if unable to
-	// open it, stderr (since much of our code assumes this function
-	// returns a valid FILE handle)
-
+	// Return a FILE* to either the unified log file
 	FILE* OpenLogFile(void)
 	{
-		FILE* fp = fioUserFile(Fio::LogFileName(), "a");
-		// If that fails, return stderr
-		if ( PN_UNLIKELY(fp == nullptr) )
-			return OS_FDOPEN(OS_DUP(OS_FILENO(stderr)), "a");
-		return fp;
+		return fioUserFile(Fio::LogFileName(), "a");
 	}
 
 	void DeleteLogFile()
