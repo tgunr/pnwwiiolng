@@ -448,28 +448,6 @@ SINT32	i;
 		return(FALSE);
 	}
 
-#ifdef USE_VSS
-	{
-	SINT8		work[512], curpath[_MAX_PATH], workpath[_MAX_PATH], batchfile[_MAX_PATH];
-
-		GetCurrentDirectory(_MAX_PATH, curpath);
-		sprintf(work, "%s", PREPATH);
-		strcpy(work, &work[1]);
-		sprintf(workpath, "%s%s%s", curpath, work, TERRAIN_PREPATH);
-		SetCurrentDirectory(workpath);
-
-		strcpy(batchfile, ".\\");
-		strcat(batchfile, VSS_SUBDIRECTORY);
-
-		if (OS_ACCESS(batchfile, 00) != 0)
-		{
-			OS_MKDIR(batchfile);
-		}
-
-		SetCurrentDirectory(curpath);
-	}
-#endif
-
 	return(TRUE);
 }
 
