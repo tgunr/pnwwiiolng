@@ -10,10 +10,6 @@
 #ifndef _DEBUG
 	#define NO_DEBUG_WRITE
 	#define NO_DEBUG_LOG
-//	#define FORCE_DEBUG
-#else
-	#define NO_DEBUG_WRITE
-	//#define FORCE_DEBUG
 #endif
 
 #include "include/platforms.h"
