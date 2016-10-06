@@ -24,7 +24,7 @@ struct EndpointImpl;
 #ifdef TEUL_DETAIL_OUTPUT
 #define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )     ep._dbugOutputPacket ( bIsRecv, reinterpret_cast<const uint8_t *>(bpInput), static_cast<size_t>(szBytes) );
 #else
-#define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )
+#define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes ) silence_unused_parameter_warning(ep, bIsRecv, bpInput, szBytes)
 #endif
 
 struct 	ENDPOINT
