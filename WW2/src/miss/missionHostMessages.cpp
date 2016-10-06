@@ -430,7 +430,7 @@ mmSendMissionResults(Player& player)
 		)
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s processing post accept for pre-reserved %s"
-						, player.teulIndex(), player.playerID(), player.callsign(), weapPrintName(&results.rtbReservedWeapon.spec));
+						, player.teulIndex(), player.playerID(), player.callsign(), weapPrintName(results.rtbReservedWeapon.spec));
 		memset(&fakeAccept, 0, sizeof(fakeAccept));
 
 		fakeAccept.facility = results.rtbFacility;

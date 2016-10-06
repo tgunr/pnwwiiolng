@@ -342,7 +342,7 @@ _recvVehicleJoinRequest(ACTION_OBJECT* const a)
 				, player.playerID()
 				, localVehicleRequest.weapon.serial
 				, localVehicleRequest.station
-				, weapPrintName(&localVehicleRequest.weapon.spec)
+				, weapPrintName(localVehicleRequest.weapon.spec)
 				, PRA_WEAPON_SPEC(localVehicleRequest.weapon.spec)
 				);
 

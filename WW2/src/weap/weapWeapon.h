@@ -95,19 +95,15 @@ extern WEAPON* weapLookup(const WEAPON_SPEC spec);
 // Look up the weapon by the local index
 extern WEAPON* weapLookupWeaponByIndex(UINT32 localIndex);
 
-static inline const char* weapPrintName(const WEAPON_SPEC* spec)
+static inline const char* weapPrintName(const WEAPON_SPEC spec)
 {
-	if ( spec == nullptr )
-		return "<null>";
-	WEAPON* weap = weapLookup(*spec);
+	const WEAPON* weap = weapLookup(spec);
 	return ( weap == nullptr ) ? weapPrintSpecC(spec) : weap->name;
 }
 
-static inline const char* weapPrintFullName(const WEAPON_SPEC* spec)
+static inline const char* weapPrintFullName(const WEAPON_SPEC spec)
 {
-	if ( spec == nullptr )
-		return "<null>";
-	const WEAPON* weap = weapLookup(*spec);
+	const WEAPON* weap = weapLookup(spec);
 	return ( weap == nullptr ) ? weapPrintSpecC(spec) : weap->fullName;
 }
 

@@ -252,7 +252,7 @@ _recordNewHistoryEntry(const SHARED_VEHICLE_INFO* const vehInfo, const ChatHandl
 static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset, SHARED_VEHICLE_INFO* const vehInfo, SINT32 size, const WORLD_UPDATE* const wu)
 {
 //static SINT32 count = 0;
-	offset = wwiiPackWeaponSpec(mode, data, offset, &vehInfo->spec(), 0);
+	offset = wwiiPackWeaponSpec(mode, data, offset, &vehInfo->wSerial.spec, 0);
 	if ( mode == TEUL_UNPACK )
 	{
 		vehInfo->country = vehInfo->spec().wCountry;

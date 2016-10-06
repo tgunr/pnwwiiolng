@@ -198,7 +198,7 @@ _postWeapon(WeapJoinRequestNode* joinNode
 	{
 		dbugLog(_FLA, "p:%u c:%s hc:%u sup:%u requested non-toe weapon: %s"
 						, commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID
-						, weapPrintName(&weapon));
+						, weapPrintName(weapon));
 		return nullptr;
 	}
 
@@ -339,7 +339,7 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 						, Chat::Name(request.handle).c_str()
 						, request.brigadeID
 						, request.missionID
-						, weapPrintName(&request.weapon)
+						, weapPrintName(request.weapon)
 						, facility->name
 						);
 
@@ -378,14 +378,14 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 
 		if ( !postedWeapon )
 		{
-			TELL_TESTER(request.customerID, "request for %s at %s denied", weapPrintFullName(&request.weapon), facility->name);
+			TELL_TESTER(request.customerID, "request for %s at %s denied", weapPrintFullName(request.weapon), facility->name);
 			delete joinNode;
 			throw PostRequestFail("no posted weapon", SPAWN_WEAPON_NOT_AT_FACILITY);
 		}
 
 		TELL_TESTER(request.customerID, "posted #%u %s at %s"
 					, postedWeapon->serial()
-					, weapPrintFullName(&request.weapon)
+					, weapPrintFullName(request.weapon)
 					, facility->name
 					);
 
@@ -407,7 +407,7 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 						, Chat::Name(request.handle).c_str()
 						, request.brigadeID
 						, request.missionID
-						, weapPrintName(&request.weapon)
+						, weapPrintName(request.weapon)
 						, facility->name
 						, e.code()
 						, e.what()
@@ -722,13 +722,13 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 		case POSTED_WEAPON::_RESERVED:
 			betaLog(_FLD, "v:%u received spawnRequest for reserved %s"
 						, serial
-						, weapPrintName(&currentWeapon->spec())
+						, weapPrintName(currentWeapon->spec())
 						);
 			break;
 		case POSTED_WEAPON::_POSTED:
 			betaLog(_FLD, "v:%u received spawnRequest for new %s"
 						, serial
-						, weapPrintName(&currentWeapon->spec())
+						, weapPrintName(currentWeapon->spec())
 						);
 			break;
 		case POSTED_WEAPON::_SPAWNED:
@@ -756,7 +756,7 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	TELL_TESTER(currentWeapon->m_commander
 				, "v#%u spawning %s at %s"
 				, serial
-				, weapPrintFullName(&currentWeapon->spec())
+				, weapPrintFullName(currentWeapon->spec())
 				, currentWeapon->m_facility->name
 				);
 
@@ -1008,7 +1008,7 @@ POSTED_WEAPON::reReserve()
 						, m_facility->name
 						);
 
-		chatSendLocalizedMessage(m_commander, LSTR_NOTE, LSTR_RESERVED_AT, weapPrintFullName(&spec()), m_facility->name);
+		chatSendLocalizedMessage(m_commander, LSTR_NOTE, LSTR_RESERVED_AT, weapPrintFullName(spec()), m_facility->name);
 
 		return true;
 	}
@@ -1052,7 +1052,7 @@ _reportWeaponStatus(const POSTED_WEAPON* currentWeapon, const WEAPON_SPEC spec, 
 		TELL_TESTER(currentWeapon->m_commander, "You returned %s%s and your %s was %s"
 						, RTBstate
 						, (rtbPromoted) ? "*" : ""
-						, weapPrintFullName(&spec)
+						, weapPrintFullName(spec)
 						, deadOrAlive
 						);
 	}
@@ -1229,7 +1229,7 @@ strtExpireWeapon(POSTED_WEAPON& weapon)
 {
 	assert( weapon.m_facility != nullptr );
 
-	dbugLog(_FLI, "c:%s v:%u expiring %s", Chat::Name(weapon.m_handle).c_str(), weapon.m_weaponSerial.serial, weapPrintName(&weapon.spec()));
+	dbugLog(_FLI, "c:%s v:%u expiring %s", Chat::Name(weapon.m_handle).c_str(), weapon.m_weaponSerial.serial, weapPrintName(weapon.spec()));
 
 	strtSendPostExpired(weapon.m_commander, weapon.m_weaponSerial, false);
 
@@ -1866,7 +1866,7 @@ POSTED_WEAPON::spawn()
 	{
 		dbugLog(_FLW, "v:%u can't grant request for %s at %s - no spawn entry"
 						, m_weaponSerial.serial
-						, weapPrintName(&spec())
+						, weapPrintName(spec())
 						, m_facility->name
 						);
 		return false;
@@ -1910,7 +1910,7 @@ POSTED_WEAPON::spawn()
 
 	dbugLog(_FLI, "v:%u spawn()d %s at %s - %s"
 					, m_weaponSerial.serial
-					, weapPrintName(&spec())
+					, weapPrintName(spec())
 					, m_facility->name
 					, ((reinforcementExpired) ? "reinforced" : "standing reinf")
 					);

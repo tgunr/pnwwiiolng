@@ -508,7 +508,7 @@ hostJoinVehicle(Player& player, const VEHICLE_REQUEST& vRequest)
 	{
 		dbugLog(_FLA, "NOT GOOD: %u attempted join of %s(%d) failed, got %d: sending back to map"
 						, player.playerID()
-						, weapPrintName(&vRequest.weapon.spec)
+						, weapPrintName(vRequest.weapon.spec)
 						, vRequest.weapon.serial
 						, retval
 						);

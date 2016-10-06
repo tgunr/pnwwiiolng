@@ -121,14 +121,10 @@ extern WEAPON_SPEC NULL_WEAP_SPEC; // removed const to work with broken MW Linke
 #define PRF_WEAPON_SPEC "%u:%u:%u:%u"
 #define PRA_WEAPON_SPEC(s) (s).wCountry, (s).wCategory, (s).wClass, (s).wType
 
-static inline const char* weapPrintSpecC(const WEAPON_SPEC* spec)
+static inline const char* weapPrintSpecC(const WEAPON_SPEC spec)
 {
-	if (PN_UNLIKELY(spec == nullptr))
-		return "<null>";
-
-	static char buffer[24];
-	sprintf(buffer, "" PRF_WEAPON_SPEC "", PRA_WEAPON_SPEC(*spec));
-
+	thread_local char buffer[24];
+	strprintf(buffer, "" PRF_WEAPON_SPEC "", PRA_WEAPON_SPEC(spec));
 	return buffer;
 }
 

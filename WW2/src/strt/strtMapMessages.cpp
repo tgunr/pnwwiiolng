@@ -453,7 +453,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 						, player.missionID()
 						, player.brigadeID()
 						, spawnGrantRequest.weaponSerial.serial
-						, weapPrintName(&spawnGrantRequest.weaponSerial.spec)
+						, weapPrintName(spawnGrantRequest.weaponSerial.spec)
 						, PRA_FULL_OBJ_ID(spawnGrantRequest.weaponSerial.source)
 						);
 

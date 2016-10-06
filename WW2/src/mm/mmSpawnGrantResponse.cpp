@@ -316,7 +316,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 						, commander->squadID(), Chat::Name(commander->squadHandle()).c_str()
 						, ((crew) ? crew->teulIndex() : 0), grant.crew, ((crew) ? crew->callsign() : "n/a")
 						, instance.category(), instance.type(), instance.handle(), instance.id()
-						, weapPrintName(&spec), commander->weapon().serial
+						, weapPrintName(spec), commander->weapon().serial
 						, x, y, z
 						);
 	}

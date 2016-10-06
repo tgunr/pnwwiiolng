@@ -728,7 +728,7 @@ static SINT32 _recvMMPostCancel(ACTION_OBJECT* const a)
 
 	LogAbort("postCancel: " PRF_WEAPON_SERIAL " %s"
 					, PRA_WEAPON_SERIAL(postCancel.weaponSerial)
-					, weapPrintName(&postCancel.weaponSerial.spec)
+					, weapPrintName(postCancel.weaponSerial.spec)
 					);
 
 	return a->offset;

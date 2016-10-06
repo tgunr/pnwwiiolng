@@ -1091,7 +1091,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC spec, UINT16 numUnits, bool allowO
 	if ( offMap() || isTrainingUnit() )
 	{
 		dbugLog(_FLD, "hcu:%u(%s) weap:%s num:%u ignoring -- unit is offmap"
-						, unitID(), callsign(), weapPrintName(&spec), numUnits);
+						, unitID(), callsign(), weapPrintName(spec), numUnits);
 		return false;
 	}
 
@@ -1099,7 +1099,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC spec, UINT16 numUnits, bool allowO
 	if ( numUnits == 0 )
 	{
 		dbugLog(_FLW, "hcu:%u(%s) weap:%s trying to deposit 0 units"
-						, unitID(), callsign(), weapPrintName(&spec));
+						, unitID(), callsign(), weapPrintName(spec));
 		return false;
 	}
 
@@ -1107,7 +1107,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC spec, UINT16 numUnits, bool allowO
 	if ( entry == nullptr )
 	{
 		dbugLog(_FLA, "hcu:%u(%s) weap:%s weapon not in TOE"
-						, unitID(), callsign(), weapPrintName(&spec));
+						, unitID(), callsign(), weapPrintName(spec));
 		return false;
 	}
 
@@ -1115,7 +1115,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC spec, UINT16 numUnits, bool allowO
 	if ( entry->present() >= overstockLimit )
 	{
 		betaLog(_FLI, "hcu:%u(%s) weap:%s equipment pool at/over max oversupply limit (%u/%u->%u)"
-						, unitID(), callsign(), weapPrintName(&spec)
+						, unitID(), callsign(), weapPrintName(spec)
 						, entry->present(), entry->capacity(), overstockLimit
 						);
 		return false;
@@ -1124,7 +1124,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC spec, UINT16 numUnits, bool allowO
 	if ( allowOverstock == false && entry->present() >= entry->capacity() )
 	{
 		betaLog(_FLI, "hcu:%u(%s) weap:%s equipment pool at capacity (%u/%u)"
-						, unitID(), callsign(), weapPrintName(&spec)
+						, unitID(), callsign(), weapPrintName(spec)
 						, entry->present(), entry->capacity()
 						);
 		return false;
@@ -1141,7 +1141,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC spec, UINT16 numUnits, bool allowO
 		newPresent = entry->present();
 
 	dbugLog(_FLD, "hcu:%u(%s) weap:%s deposit:%u %u=>%u"
-					, unitID(), callsign(), weapPrintName(&spec), numUnits
+					, unitID(), callsign(), weapPrintName(spec), numUnits
 					, entry->present(), newPresent
 					);
 
@@ -1237,27 +1237,27 @@ StratHCUnit::withdrawWeapons(const WEAPON_SPEC spec, UINT16 numUnits)
 
 	if ( numUnits == 0 )
 	{
-		dbugLog(_FLW, "hcu:%u weap:%s trying to withdraw 0 units", unitID(), weapPrintName(&spec));
+		dbugLog(_FLW, "hcu:%u weap:%s trying to withdraw 0 units", unitID(), weapPrintName(spec));
 		return false;
 	}
 
 	TOE_::WeaponInstance* const entry = toeWeaponInstance(spec);
 	if ( entry == nullptr )
 	{
-		dbugLog(_FLA, "hcu:%u weap:%s weapon not in TOE", unitID(), weapPrintName(&spec));
+		dbugLog(_FLA, "hcu:%u weap:%s weapon not in TOE", unitID(), weapPrintName(spec));
 		return false;
 	}
 
 	if ( entry->present() <= 0 )
 	{
-		dbugLog(_FLA, "hcu:%u weap:%s equipment pool already empty", unitID(), weapPrintName(&spec));
+		dbugLog(_FLA, "hcu:%u weap:%s equipment pool already empty", unitID(), weapPrintName(spec));
 		return false;
 	}
 
 	UINT32 newPresent = (numUnits < entry->present()) ? entry->present() - numUnits : 0;
 
 	dbugLog(_FLD, "hcu:%u weap:%s withdraw:%u %u=>%u"
-					, unitID(), weapPrintName(&spec), numUnits
+					, unitID(), weapPrintName(spec), numUnits
 					, entry->present(), newPresent
 					);
 
