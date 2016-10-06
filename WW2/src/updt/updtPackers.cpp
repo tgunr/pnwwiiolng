@@ -87,11 +87,11 @@ UPDATE_FRAMING framings[NUM_FRAMING_MODES] =
 */
 UpdateFraming framings[UpdateFraming::_MODES] =
 {
-	{ 56,	UpdateFraming::_LARGE,	125, 10, "um:0 Low Vis/Laggy" }
-,	{ 72,	UpdateFraming::_LARGE,	125, 16, "um:1 Med Vis 56Kbps" }
-, 	{ 88,	UpdateFraming::_LARGE,	100, 20, "um:2 High Vis 72Kbps" }
-, 	{ 112,	UpdateFraming::_LARGE,	100, 28, "um:3 Extreme Vis 89Kbps" }
-, 	{ 127,	UpdateFraming::_LARGE,	125, 32, "um:4 GM Vis 100Kbps" }
+	{ 88,  UpdateFraming::_LARGE, 125, 20, "um:0 88 Limit 20/Update" }
+,	{ 112, UpdateFraming::_LARGE, 125, 28, "um:1 112 Limit 28/Update" }
+, 	{ 128, UpdateFraming::_LARGE, 125, 32, "um:2 128 Limit 32/Update" }
+, 	{ 146, UpdateFraming::_LARGE, 125, 36, "um:3 146 Limit 36/Update" }
+, 	{ 184, UpdateFraming::_LARGE, 125, 48, "um:4 184 Limit 48/Update" }
 };
 
 #if platBuild != TEUL_SERVER

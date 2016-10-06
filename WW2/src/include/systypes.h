@@ -96,14 +96,35 @@
 
 #else
 #error "platform not defined for systypes.h!"
-#endif // OS_MACOS
+#endif
 
-struct FLOAT64VECTOR
-{
+//==============================================================================
+
+struct FLOAT64VECTOR {
 	FLOAT64 x;
 	FLOAT64 y;
 	FLOAT64 z;
 };
+
+//--------------
+
+inline FLOAT64VECTOR operator + (const FLOAT64VECTOR& v1, const FLOAT64VECTOR& v2)
+{ return { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z }; }
+
+inline FLOAT64VECTOR& operator += (FLOAT64VECTOR& v1, const FLOAT64VECTOR& v2)
+{ v1 = v1 + v2; return v1; }
+
+//--------------
+
+inline FLOAT64VECTOR operator * (const FLOAT64VECTOR& v, double s)
+{ return { v.x * s, v.y * s, v.z * s };
+}
+
+inline FLOAT64VECTOR& operator *= (FLOAT64VECTOR& v, double s)
+{ v = v * s; return v; }
+
+
+//==============================================================================
 
 struct FLOAT32VECTOR
 {
