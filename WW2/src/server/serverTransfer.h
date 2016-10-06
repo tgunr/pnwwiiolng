@@ -13,7 +13,7 @@ namespace Server
 {
 	class Transfer
 	{
-		public: using xferid_t = unsigned long long;
+		public: using xferid_t = UINT64;
 		public: enum class XferReason : UINT32 { Login, Update, Relogin, Reassign, Mirror, Exit, MaxReasons };
 
 		private: static xferid_t g_xferID;
