@@ -66,12 +66,7 @@ ELSE ()
 	mark_as_advanced(PN_NICE_STACKS PN_STATIC_ANALYZER)
 ENDIF ()
 
-IF ( !WIN32 )
-	OPTION( PN_BUILD_32BIT		"Enable 32-bit build" OFF )
-ELSE ()
-	SET(PN_BUILD_32BIT "OFF")
-	MARK_AS_ADVANCED(PN_BUILD_32BIT)
-ENDIF ()
+OPTION( PN_BUILD_32BIT		"Enable 32-bit build" OFF )
 
 # User-settable option for enabling optimizations.
 IF ( PN_BUILD_TYPE MATCHES "Dev" OR CMAKE_BUILD_TYPE MATCHES "Debug" )
