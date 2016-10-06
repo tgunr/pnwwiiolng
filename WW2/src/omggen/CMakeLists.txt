@@ -13,7 +13,7 @@ ELSE ( )
 ENDIF ( )
 
 SET(OMGGEN_TAB_CPP "${CMAKE_CURRENT_BINARY_DIR}/omggen.tab.cpp")
-SET(OMGGEN_TAB_H "${CMAKE_CURRENT_BINARY_DIR}/omggen.tab.H")
+SET(OMGGEN_TAB_H "${CMAKE_CURRENT_BINARY_DIR}/omggen.tab.h")
 SET(OMGGEN_YY_CPP "${CMAKE_CURRENT_BINARY_DIR}/omggen.yy.cpp")
 SET(OMGGEN_YY_H "${CMAKE_CURRENT_BINARY_DIR}/omggen.yy.h")
 
@@ -50,7 +50,7 @@ ADD_EXECUTABLE(
 IF ( MSVC )
 	SET(CMAKE_CXX_FLAGS "/Ox /MP /MT /EHsc")
 ELSE ( )
-	SET(CMAKE_CXX_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security")
+	SET(CMAKE_CXX_FLAGS "-std=c++14 -O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security")
 ENDIF ( )
 
 IF ( WIN32 )

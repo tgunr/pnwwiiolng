@@ -12,6 +12,7 @@
 
 #include <stack>
 #include <string>
+#include <sys/stat.h>
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -742,7 +743,7 @@ void omg_using(std::string filename)
 			return;
 		}
 	}
-	yyfatal("Unable to open USING file \"%s\".\n", filename);
+	yyfatal("Unable to open USING file \"%s\".\n", filename.c_str());
 	return;
 }
 

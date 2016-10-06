@@ -10,6 +10,7 @@
 #include <set>
 #include <utility>
 #include <algorithm>
+#include <string>
 
 #if defined(_MSC_VER)
 #define strdup(...) _strdup(__VA_ARGS__)
