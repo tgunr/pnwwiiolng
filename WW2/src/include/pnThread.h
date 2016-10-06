@@ -20,7 +20,7 @@ public:
 	void start()
 	{
 		if (!m_cancelled && !m_started.exchange(true))
-			m_thread = std::move(std::thread([this] { run(); }));
+			m_thread = std::thread([this] { run(); });
 	}
 
 	//! Cancel thread and return whether or not we performed cancellation.

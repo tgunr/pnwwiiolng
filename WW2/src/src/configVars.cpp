@@ -222,8 +222,9 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 				break;
 			}
 		}
-		if ( it == configEntries.end() )
-			configEntries.emplace_back(std::move(ConfigEntry(name, equals, value, eol)));
+		if ( it == configEntries.end() ) {
+			configEntries.emplace_back(ConfigEntry(name, equals, value, eol));
+		}
 		file.skipline();
 	}
 }
