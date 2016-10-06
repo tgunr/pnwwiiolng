@@ -10,6 +10,10 @@
 #include <queue>
 #include <atomic>
 
+#if platOS == OS_LINUX
+#include <sys/prctl.h>
+#endif
+
 #include "versionNo.h"
 
 #include "mem/mem.h"
