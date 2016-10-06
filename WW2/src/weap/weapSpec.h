@@ -135,6 +135,9 @@ static inline const char* weapPrintSpecC(const WEAPON_SPEC* spec)
 // find a weapon spec based on the weapon's name
 extern const WEAPON_SPEC& weapFindWeaponByName(const char* weaponName);
 
+// this function is called from lua scripts for ingame tutorials/training
+extern WEAPON_SPEC weapCreateSpec(UINT32 country_, UINT32 category_, UINT32 class_, UINT32 type_);
+
 // create a spec from a string
 extern WEAPON_SPEC weapCreateSpec(const char* weapString);
 
