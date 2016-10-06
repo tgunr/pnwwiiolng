@@ -546,17 +546,22 @@ SINT32	dbugGetErrno(void)
 #endif
 }
 
+#if platOS == OS_WIN32	// should really be a check for 'basename'
+const char* basename(const char* const filepath) noexcept
+{
+	const char* slash = strrchr(filepath, '\\');
+	if (PN_UNLIKELY(!slash))
+		slash = strrchr(filepath, '/');
+	return PN_LIKELY(slash) ? slash + 1 : filepath;
+}
+#endif
+
 // _dbugLogPrivate: if the current filename, lineno or string is nullptr then it
 // sets these members.  The parameters are output as a string to the debug
 // file depending on the debug level selected and the current error type.
 static inline SINT32
 _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, const UINT32 errType, const char* const fmt, va_list args)
 {
-	size_t len = 0;
-	SINT32	retval = 0, flags;
-	const char* myName;
-	UINT32 minLevel;
-
 	if ( PN_UNLIKELY(_logger.isInitialized() == false) )
 		_logger.initialize(LogMode::TO_FILE,  Debug::ERR_INFO, _stdErrFileNo, "not_initialized");
 
@@ -565,12 +570,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	if (_logger.m_dbugfile < 0)
 		return 0;
 
-	if (isLog)
-		minLevel = _logger.m_logLevel;
-	else
-		minLevel = _logger.m_writeLevel;
-
-	flags = (_logger.m_isLog) ? _logger.m_logFlags : _logger.m_writeFlags;
+	UINT32 flags = (_logger.m_isLog) ? _logger.m_logFlags : _logger.m_writeFlags;
 	flags |= (errType & DBUG_FLAG_MASK);
 	_logger.m_flags = flags;
 
@@ -581,19 +581,14 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 
 	_logger.m_err = dbugGetErrno();
 
+	const UINT32 minLevel = isLog ? _logger.m_logLevel : _logger.m_writeLevel;
 	if ( PN_LIKELY((_logger.m_errType != Debug::ERR_FATAL) && (_logger.m_errType > minLevel)) )
 		return 0;
 
-	if ( (myName = strrchr(filename,'/')) != nullptr)
-		myName++;
-	else if ( (myName = strrchr(filename,'\\')) != nullptr)
-		myName++;
-	else
-		myName = filename;
-
-	_logger.setFileName(myName);
+	_logger.setFileName(basename(filename));
 	_logger.m_lineno = lineno;
 
+	size_t len = 0;
 	if ( ! (flags & BARE_DEBUG) )
 	{
 		time_t now = (time_t)(teulClock64 / 1000);
@@ -652,10 +647,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 
 	_levelHandler(_logger.m_errType, text);
 
-	if (retval < 0)
-		return retval;
-	else
-		return (SINT32)len;
+	return (SINT32)len;
 }
 
 // dbugLog: if the current filename, lineno or string is nullptr then it
