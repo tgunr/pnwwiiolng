@@ -85,7 +85,6 @@
 //tolua_end
 
 	#define APIENTRY
-	#define PN_MAX_PATH		260
 
 	typedef LOGICAL (*SYS_DDINITFUNC)(void);
 	typedef LOGICAL (*SYS_D3DINITFUNC)(void);
