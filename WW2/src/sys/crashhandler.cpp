@@ -687,18 +687,6 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 
 void InstallCrashHandler()
 {
-#if defined(DEBUG_WW2) || defined(GM_RELEASE)
-	// Normally this will be done by WinMain() if OpenConsole is set, but for the crash
-	// handler's logging system, that happens too late. If OpenConsole was set,
-	// AllocConsole() will fail harmlessly later. In non-debug builds, the logging from the
-	// crash handler will never be interesting or desired.
-	if (OpenConsole) {
-		AllocConsole();
-		freopen("CONOUT$", "wb", stdout);
-		freopen("CONOUT$", "wb", stderr);
-	}
-#endif
-
 	wchar_t *basePath = nullptr;
 	HRESULT result = SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_SIMPLE_IDLIST | KF_FLAG_CREATE, nullptr, &basePath);
 
