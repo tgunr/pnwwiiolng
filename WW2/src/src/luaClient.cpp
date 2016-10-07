@@ -29,9 +29,6 @@
 #include "teul/teulPacket.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiNetPorts.h"
-#include "dbse/dbseConnection.h"
-
-DBCONNECTION dbConnection;
 
 #include <readline/readline.h>
 #include <readline/history.h>

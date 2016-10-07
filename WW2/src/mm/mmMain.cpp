@@ -1096,7 +1096,6 @@ main(int argc, const char* argv[])
 	// Utterly lock the arena.
 	host_config.arena.lock = ~0;
 
-	threadsReadDBEnvironment();
 	mapThreadsSetup();
 
 	HostLanguage = cv_stratLanguage.GetString();

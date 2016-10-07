@@ -20,9 +20,6 @@
 #include "sdm/sdmpp.h"
 #include "sdm/sdmParse.h"
 #include "include/defs.h"
-#include "dbse/dbseConnection.h"
-
-DBCONNECTION dbConnection;
 
 #include "sdm/sdmConfigVars.h"
 

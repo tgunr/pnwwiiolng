@@ -30,8 +30,6 @@
 #include "chat/chatHostPlayerIndex.h"
 #include "chat/chatLStringErr.h"
 
-extern DBHANDLE& chatdbGetDBH();
-
 static Teul::Packet* g_commandListPacket = nullptr;
 
 DotCommand* g_commands;
@@ -556,7 +554,7 @@ DotCommandIndex::readPermissions()
 	dbugLog(_FLI, "Reading new permissions");
 	try
 	{
-		DBQuery dbq(chatdbGetDBH(), "SELECT cc.command, cc.availability FROM chat_commands cc");
+		DBQuery dbq(dbh, "SELECT cc.command, cc.availability FROM chat_commands cc");
 		while ( dbq.FetchRow() )
 		{
 			DBRow& row = dbq.Row();
@@ -585,11 +583,11 @@ DotCommandIndex::readPermissions()
 		UINT32 lastCmd = 0;
 		DotCommand* dc = nullptr;
 
-		DBQuery dbq(chatdbGetDBH()
-						, "SELECT cc.cmd_oid, cc.command, cgc.group_oid"
-		  					" FROM	chat_commands cc, chat_group_cmds cgc"
-		 					" WHERE	cc.cmd_oid = cgc.cmd_oid AND cc.availability != 'E'"
-							" ORDER BY cc.cmd_oid");
+		DBQuery dbq(dbh,
+					"SELECT cc.cmd_oid, cc.command, cgc.group_oid"
+						" FROM	chat_commands cc, chat_group_cmds cgc"
+						" WHERE	cc.cmd_oid = cgc.cmd_oid AND cc.availability != 'E'"
+						" ORDER BY cc.cmd_oid");
 		while ( dbq.FetchRow() )
 		{
 			DBRow& row = dbq.Row();

@@ -14,8 +14,6 @@
 #include "chat/chatName.h"
 #include "dbse/dbseHandle.h"
 
-extern DBHANDLE dbh;
-
 #if defined(IS_MAP_HOST)
 # include "map/mapBrigades.h"
 #elif defined(IS_STRAT_HOST)

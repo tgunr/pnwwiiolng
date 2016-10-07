@@ -35,9 +35,6 @@ extern bool threadsLogging();
 // Process the next callback on the queue
 extern void threadsCallNextCallback();
 
-// Prepare the dbConnection structure from the environment
-extern bool threadsReadDBEnvironment();
-
 // Open a new database connection in a thread-safe way
 extern DB::handle_t* threadsOpenDBConnection(bool enableAutoCommit);
 

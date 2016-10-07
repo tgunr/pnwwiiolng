@@ -885,7 +885,7 @@ main(int argc, const char* argv[])
 	authInitDB();
 
     dbugLog(_FLN, "setting up database threads");
-    
+
 	threadsSetup();
 
 	dbugLog(_FLN,"installing callbacks");

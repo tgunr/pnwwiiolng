@@ -3595,7 +3595,6 @@ main(int argc, const char* argv[])
 	wwiiIRCRegisterCommand("who", _ircdotPassthru);
 	wwiiIRCRegisterCommand("wtf", _ircdotPassthru);
 
-	threadsReadDBEnvironment();
 	chatThreadsSetup();
 
 	// Initialize dbse callbacks

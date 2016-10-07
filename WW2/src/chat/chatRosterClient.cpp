@@ -22,7 +22,6 @@
 #include "teul/teulNetworkArray.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiPack.h"
-#include "dbse/dbseConnection.h"
 
 extern void rosterMessage(Chat::LocalizedMessage& lmsg) ;
 
@@ -36,8 +35,6 @@ static UINT32 _chatIPAddress=0;
 static UINT16 _chatPort=0;
 static UINT32 _chatOTP=0;
 static UINT32 _chatReconects = 0;
-
-DBCONNECTION dbConnection;
 
 static void _chatClientConnectFunction(ENDPOINT&);
 void _chatClientErrorFunction (SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);

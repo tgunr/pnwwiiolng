@@ -13,10 +13,7 @@
 // if no errorFnPtr is defined errors are ignored.
 bool dbseInit(void);
 
-SINT32 dbseClose(void);
-
 // a wrapper for teulSend, dbse manages the actual connection
 // index and may need to return a specific error when no connection
 // is available.
-
 SINT32 dbseSend(struct TEUL_CALLBACK* action, void*object);

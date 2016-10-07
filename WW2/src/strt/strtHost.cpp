@@ -17,8 +17,6 @@
 #include "chat/chatStratSupportMessages.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "cnvy/cnvyMain.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseHandle.h"
 #include "include/arenaLockEnums.h"
 #include "sdm/sdmConfigVars.h"
 #include "server/serverCodeEnum.h"
@@ -58,9 +56,6 @@
 #include "strt/strtHostLua.h"
 
 extern ObjectiveStats g_objectiveStats;
-
-DBHANDLE dbh;
-DBCONNECTION dbConnection;
 
 #ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
@@ -555,7 +550,6 @@ main(int argc, const char* argv[])
 
 	_describeBuildConfigurationToLogFile();
 
-	threadsReadDBEnvironment();
 	threadsSetup();
 
 	teulSyncClock();

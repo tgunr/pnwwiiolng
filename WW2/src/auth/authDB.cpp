@@ -12,8 +12,7 @@
 #include "teul/teulBasic.h"
 #include "teul/teulConfigVar.h"
 #include "auth/authTypes.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseWrapper.h"
+#include "dbse/dbseHandle.h"
 #include "auth/authDB.h"
 #include "mem/mem.h"
 #include "str/stringLib.h"
@@ -100,33 +99,22 @@ static struct apps_holder* apps = config.apps;
 
 static APP_TABLE appTable;
 
-DBHANDLE dbh;
-
 typedef std::map<UINT32, std::string> ARENA_ALIASES;
 static ARENA_ALIASES g_arenaAliases;
 
-DBCONNECTION dbConnection;
-
 //////////////////////////////////////////////////////////////////////
 //connect function
-void authInitDB(void)
+
+extern void dbseSetDatabase(const ConfigAddr& addr, const ConfigAddr& port, const ConfigStr& schema, const ConfigStr& user, const ConfigStr& password);
+
+void
+authInitDB(void)
 {
-	// Look up the cannonical name/address of the auth database
-	// and resolve it to an IP
-	UINT32 dbIp = Teul::GetSingleIP(cv_authdbAddress.GetString());
-	if ( dbIp == 0 )
-		LogAbort("Invalid %s: %s (unable to resolve)"
-					, cv_authdbAddress.GetEnvVarName(), cv_authdbAddress.GetString());
+	// Auth has its own database to talk to.
+	dbseSetDatabase(cv_authdbAddress, cv_authdbSchema, cv_authdbUser, cv_authdbPassword, cv_authdbPort);
 
-	// Populate the connection info structure.
-	teulGetAddress(dbIp, dbConnection.host, sizeof(dbConnection.host));
-	strsafecpy(dbConnection.dbName, cv_authdbSchema.GetString());
-	strsafecpy(dbConnection.username, cv_authdbUser.GetString());
-	strsafecpy(dbConnection.password, cv_authdbPassword.GetString());
-	strsafecpy(dbConnection.port, cv_authdbPort.GetString());
-
-	if ( dbh.connect(dbConnection) == false )
-		LogAbort("Unable to initialize auth database connection - check grants for %s on %s", dbConnection.username, dbConnection.host);
+	if ( !dbh.connect() )
+		LogAbort("Couldn't connect to database");
 
 	DB::Schema updater(dbh, "auth");
 	updater.Update(revisions);

@@ -12,8 +12,7 @@
 
 #include "auth/authPlayerDetails.h"
 #include "chat/chatGroupPermissionTypes.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseWrapper.h"
+#include "dbse/dbseHandle.h"
 #include "include/arenaLockEnums.h"
 #include "include/mydbQuery.h"
 #include "map/mapArenaDescription.h"
@@ -56,9 +55,6 @@ struct DB_PERM_STRUCT
 };
 
 //static VEH_LIST_STRUCT _vehList;
-DBHANDLE dbh;
-
-DBCONNECTION dbConnection;
 
 extern SwingMeter g_swingMeter;
 
@@ -180,7 +176,7 @@ _readArenaDescription()
 static void
 _connectGameDB()
 {
-	if ( dbh.connect(dbConnection) == false )
+	if ( dbh.connect() == false )
 		LogAbort("unable to connect to game database -- aborting");
 
 	DBSimpleQuery(dbh,

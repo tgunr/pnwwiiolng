@@ -24,8 +24,6 @@
 #include "comm/commConstants.h"
 #include "comm/commHostMessages.h"
 #include "comm/commTypes.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseWrapper.h"
 #include "host/hostAntiHack.h"
 #include "host/hostAutomation.h"
 #include "host/hostCellNet.h"
@@ -97,8 +95,6 @@
 #include "wwii/wwiiThreadText.h"
 
 extern SINT32 hostInstallAllCallbacks();
-
-DBCONNECTION dbConnection;
 
 extern std::map<ChatHandle, HostVehicle*> g_vehicleLookup;
 
@@ -2982,7 +2978,6 @@ main(const int argc, const char* argv[])
 	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
-	threadsReadDBEnvironment();
 	threadsSetup();
 
 	dbugLog(_FLN, "Cell Host starting. Compiled %s at %s ===", __DATE__, __TIME__);

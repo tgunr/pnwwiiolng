@@ -20,8 +20,6 @@
 #include "wwii/wwiiConfig.h"
 #include "include/mydbQuery.h"
 
-extern DBHANDLE dbh;
-
 // TOE templates.
 TOE_TEMPLATES toeTemplates;
 

@@ -52,13 +52,9 @@
 
 #include "str/stringLib.h"
 #include "sdm/sdmLoad.h"
-#include "dbse/dbseWrapper.h"
-#include "dbse/dbseConnection.h"
+#include "dbse/dbseHandle.h"
 #include "sdm/sdmParse.h"
 #include "include/mydbQuery.h"
-
-DBHANDLE dbh;
-extern DBCONNECTION dbConnection;
 
 static char _statement[4096];
 static char g_name[MAX_STRT_NAME_LENGTH], g_fileName[MAX_OBJNAME_LENGTH];
@@ -1149,7 +1145,7 @@ dbseInitStratLoader()
 {
 	// Please don't ask why... There was a good reason for this, though. -OGS
 	dbh.disconnect();
-	if ( dbh.connect(dbConnection) == false )
+	if ( dbh.connect() == false )
 		return -1;
 
 	// Because we are wielding Latin1 characters for now,

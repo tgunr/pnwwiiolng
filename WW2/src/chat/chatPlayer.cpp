@@ -63,8 +63,6 @@
 
 static HANDLES _spawning;
 
-extern DBHANDLE& chatdbGetDBH();
-
 typedef std::unordered_map< UINT32, std::set<UINT32> > RECRUITS;
 static RECRUITS _recruits;
 

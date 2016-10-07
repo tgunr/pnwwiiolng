@@ -16,8 +16,7 @@
 #include "wwii/wwiiThreadTypes.h"
 #include "wwii/wwiiSerialNumber.h"
 
-#include "dbse/dbseClient.h"
-#include "dbse/dbseWrapper.h"
+#include "dbse/dbseHandle.h"
 #include "include/mydbQuery.h"
 #include "strt/strtdbSaveWorld.h"
 #include "strt/strtCPStruct.h"
@@ -72,8 +71,6 @@ public:
 static QUEUE objQueue, weaponQueue;
 
 bool _queueEnabled = false;
-
-extern DBHANDLE dbh;
 
 UINT32 g_gameDay;
 

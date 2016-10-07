@@ -15,7 +15,6 @@
 #include <mutex>
 #include <sstream>
 
-#include "dbse/dbseConnection.h"
 #include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
 #include "teul/teulConfigVar.h"
@@ -72,8 +71,6 @@ typedef std::vector<CALLBACK_INFO*> CALLBACK_QUEUE;
 static CALLBACK_QUEUE callbackQueue;
 static size_t cbQueueMax, cbQueuePushes;
 static std::mutex callbackQueueMutex;
-
-extern DBCONNECTION dbConnection;
 
 //////////////////////////////////////////////////////////////////////
 // Wrapper for a DBThread::Thread's run function
@@ -133,42 +130,15 @@ DBQueueThread::~DBQueueThread()
 }
 
 //////////////////////////////////////////////////////////////////////
-// Read the database environment from a given parameter
-
-bool
-threadsReadDBEnvironment()
-{
-	const char* db = cv_wwiiDBAddress.GetString();
-
-	// Under Windows, we'll assume you mean "this machine".
-#if platOS == OS_WIN32
-	if ( db == nullptr || *db == 0 )
-		db = "127.0.0.1";
-#else
-	if ( !db || *db == 0 )
-		LogAbort("Unable to read %s database address from %s", cv_wwiiDBAddress.GetName(), cv_wwiiDBAddress.GetEnvVarName() ? cv_wwiiDBAddress.GetEnvVarName() : "environment");
-#endif
-
-	strsafecpy(dbConnection.host, db);
-	strsafecpy(dbConnection.dbName, cv_wwiiDBDefaultSchema.GetString());
-	strsafecpy(dbConnection.username, cv_wwiiDBUser.GetString());
-	strsafecpy(dbConnection.password, cv_wwiiDBPassword.GetString());
-	strsafecpy(dbConnection.port, cv_wwiiDBPort.GetString());
-
-	return true;
-}
-
-//////////////////////////////////////////////////////////////////////
 // Thread-safe db connection opener
 
 DB::handle_t*
 threadsOpenDBConnection(bool enableAutoCommit)
 {
-	DB::handle_t* newConn = dbseGetConnection(dbConnection, false);
+	DB::handle_t* newConn = dbseGetConnection(false);
 
 	if ( newConn != nullptr )
 	{
-		mysql_select_db(newConn, dbConnection.dbName);
 		mysql_autocommit(newConn, (enableAutoCommit) ? 1 : 0);
 	}
 

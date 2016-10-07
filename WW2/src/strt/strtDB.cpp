@@ -12,8 +12,7 @@
 #include "strt/strtProtos.h"
 
 #include "wwii/wwiiDBConfig.h"
-#include "dbse/dbseWrapper.h"
-#include "dbse/dbseConnection.h"
+#include "dbse/dbseHandle.h"
 #include "include/mydbQuery.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtData.h"
@@ -29,9 +28,6 @@
 //#define HEAVY_DEBUG
 
 typedef void (_PROCESSOR)(DBRow&, void*, UINT32 oid);
-
-extern DBHANDLE dbh;
-extern DBCONNECTION dbConnection;
 
 extern void strtInitializeVehicleAccessLevels();
 
@@ -54,7 +50,7 @@ strtInitDB()
 	bool retval = true;
 
 	if ( !dbh.connected() )
-		dbh.connect(dbConnection);
+		dbh.connect();
 
 #ifdef IS_STRAT_HOST
 	_updateDatabaseSchema();

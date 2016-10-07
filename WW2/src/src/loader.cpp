@@ -16,7 +16,6 @@
 
 #include "sdm/sdmLoad.h"
 #include "teul/teulTime.h"
-#include "dbse/dbseConnection.h"
 #include "dbse/dbseHandle.h"
 #include "wwii/wwiiThreads.h"
 
@@ -33,7 +32,6 @@ static char g_origin[80] = "private";
 
 struct stat statBuf;
 
-DBCONNECTION dbConnection;
 extern DBHANDLE dbHandle;
 
 class IrcThread : public PNThread
@@ -430,8 +428,6 @@ main(int argc,char** argv)
 	_ircStart();
 	teulSyncClock();
 	TeulTimeMS started = teulClock64;
-
-	threadsReadDBEnvironment();
 
 	if ( dbseInitStratLoader() < 0 )
 		LogAbort("Database (%s:%s) connection failed.", cv_wwiiDBAddress.GetString(), cv_wwiiDBDefaultSchema.GetString());

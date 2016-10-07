@@ -9,7 +9,7 @@
 
 #include "versionNo.h"
 
-#include "dbse/dbseConnection.h"
+#include "dbse/dbseHandle.h"
 #include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
 #include "wwii/wwiiDBConfig.h"
@@ -22,10 +22,6 @@
 #include "wwii/wwiiThreadText.h"
 #include "chat/chatMotds.h"
 #include "chat/chatHostMotds.h"
-
-DBCONNECTION dbConnection;
-DBHANDLE dbh;
-extern DBHANDLE& chatdbGetDBH() { return dbh; }
 
 PROPERTY_INDEX _properties;
 
@@ -292,7 +288,7 @@ void chatInitDB()
 
 	try
 	{
-		if ( dbh.connect(dbConnection) == false )
+		if ( dbh.connect() == false )
 			throw std::runtime_error("database connection failed");
 
 		wwiiReadHCUnits();

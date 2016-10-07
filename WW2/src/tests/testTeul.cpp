@@ -872,7 +872,3 @@ main(int argc, const char* const argv[])
 
 	return result;
 }
-
-// To satfisy the linker requirements
-#include "dbse/dbseConnection.h"
-DBCONNECTION dbConnection;

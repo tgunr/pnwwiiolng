@@ -28,7 +28,6 @@
 #include "strt/strtSupply.h"
 #include "strt/strtSpawn.h"
 #include "chat/chatStratSupportMessages.h"
-#include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
 #include "strt/strtDB.h"
 #include "strt/strtHostDB.h"

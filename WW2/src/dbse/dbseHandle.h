@@ -37,7 +37,7 @@ public:
 
 public:
 	//! Connect to a given database, returns true if successful.
-	bool connect(const struct DBCONNECTION& connectionInfo);
+	bool connect();
 
 	//! Close connection to the given database.
 	void disconnect();
@@ -48,3 +48,4 @@ public:
 	operator bool() const noexcept { return m_initialized && m_conn;  }
 };
 
+extern DBHANDLE dbh;
