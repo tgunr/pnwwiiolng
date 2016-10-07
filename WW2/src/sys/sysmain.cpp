@@ -678,17 +678,26 @@ char GetOSBuild()
 	MSG		msg;
 	RECT	rect;
 
-#if defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
-	static const int DBUGLOG_MODE = LOG_TO_FILE;
-#else
-	static const int DBUGLOG_MODE = LOG_OFF;
-#endif
+	// Pull in the commandline arguments early so that builds
+	// which rely upon a DataPath being set will have it for
+	// use in cfgPrefsLoad(), and so OpenConsole is available now
+	if (!mngoptParse("")) {
+		return 0;
+	}
 
-	dbugInit(DBUGLOG_MODE, "wwiiClient");
 #if defined(CLOSED_BETA) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
+	static const int DBUGLOG_MODE = LOG_TO_FILE;
+	dbugInit(DBUGLOG_MODE, "wwiiClient");
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
+	if (OpenConsole) {
+		AllocConsole();
+		freopen("CONOUT$", "wb", stdout);
+		freopen("CONOUT$", "wb", stderr);
+	}
 #else
+	static const int DBUGLOG_MODE = LOG_OFF;
+	dbugInit(DBUGLOG_MODE, "wwiiClient");
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
 #endif
@@ -765,14 +774,7 @@ char GetOSBuild()
 		}
 	}
 
-#ifdef BETA_RELEASE
-	if (OpenConsole)
-	{
-		AllocConsole();
-		freopen("CONOUT$", "wb", stdout);
-		freopen("CONOUT$", "wb", stderr);
-	}
-
+#if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
 	LogEnabled = TRUE;
 	UserLogEnabled = WantedUserLogEnabled;
 	Open_Debug(SYS_TITLE);
@@ -802,14 +804,6 @@ char GetOSBuild()
 	// there's a lot else that would have to change anyhow.
 	gLanguage = IDE_LANGUAGE_ENGLISH;
 	gRegion = IDE_LANGUAGE_ENGLISH;
-
-	// Pull in the commandline arguments early so that builds
-	// which rely upon a DataPath being set will have it for
-	// use in cfgPrefsLoad().
-	if (!mngoptParse(""))
-	{
-		return(0);
-	}
 
 	// we then try to load wwiiol.xml variables
 	// eventually this call will replace the above call
