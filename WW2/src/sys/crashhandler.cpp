@@ -320,7 +320,9 @@ static void AppendRequestParam(std::string &body, const std::string &boundary, c
 	body += value + "\r\n";
 }
 
-static bool AppendRequestFile(std::string &body, const std::string &boundary, const std::string &param, const std::wstring &path, bool istext)
+enum class FileKind { ASCII, Wide, Binary };
+
+static bool AppendRequestFile(std::string &body, const std::string &boundary, const std::string &param, const std::wstring &path, FileKind kind)
 {
 	std::ifstream f(path, std::ios::binary);
 
@@ -349,16 +351,27 @@ static bool AppendRequestFile(std::string &body, const std::string &boundary, co
 	body += "--" + boundary + "\r\n";
 	body += "Content-Disposition: form-data; name=\"" + param + "\"; filename=\"" + filename + "\"\r\n";
 
-	if (istext) {
-		// We could use ";charset=UTF-16LE" here and avoid the conversion, but it's not clear from
-		// RFC7578 that that'd actually work (it states that many implementations assume a default encoding).
-		body += "Content-Type: text/plain\r\n";
-		body += "\r\n";
-		body += std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(std::wstring(reinterpret_cast<const wchar_t *>(data.get()), len >> 1));
-	} else {
-		body += "Content-Type: application/octet-stream\r\n";
-		body += "\r\n";
-		body.append(data.get(), len);
+	switch (kind) {
+		case FileKind::Wide:
+			// We could use ";charset=UTF-16LE" here and avoid the conversion, but it's not clear from
+			// RFC7578 that that'd actually work (it states that many implementations assume a default encoding).
+			body += "Content-Type: text/plain\r\n";
+			body += "\r\n";
+			body += std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(std::wstring(reinterpret_cast<const wchar_t *>(data.get()), len >> 1));
+			break;
+		case FileKind::ASCII:
+			body += "Content-Type: text/plain\r\n";
+			body += "\r\n";
+			body += std::string(data.get(), len);
+			break;
+		case FileKind::Binary:
+			body += "Content-Type: application/octet-stream\r\n";
+			body += "\r\n";
+			body.append(data.get(), len);
+			break;
+		default:
+			assert(false);
+			abort();
 	}
 	body += "\r\n";
 
@@ -422,14 +435,14 @@ static void GenerateOrLoadInstallationId(CrashHandlerContext &context)
 		GUID newId;
 		wchar_t buffer[48] = {0};
 
-		dbugLog(_FLN, "No registry value for this installation. Creating new GUID.\n");
+		dbugLog(_FLN, "No registry value for this installation. Creating new GUID.");
 		CoCreateGuid(&newId);
 		_snwprintf_s(buffer, _TRUNCATE, L"%08X-%04hX-%04hX-%04hX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
 			newId.Data1, newId.Data2, newId.Data3, (newId.Data4[0] << 8) | newId.Data4[1],
 			newId.Data4[2], newId.Data4[3], newId.Data4[4], newId.Data4[5], newId.Data4[6], newId.Data4[7]
 		);
 		if (!sysregSetHKeyText(HKEY_CURRENT_USER, REG_KEY_MAIN, L"InstallationGuid", buffer)) {
-			dbugLog(_FLM, "Failed to save new installation GUID to registry, not using\n");
+			dbugLog(_FLM, "Failed to save new installation GUID to registry, not using");
 		}
 		context.installationId = buffer;
 		return;
@@ -528,10 +541,10 @@ static bool SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 	std::string multipartBoundary = "------------------" + GenerateRandomString<24>();
 	std::string contentTypeHeader = "Content-Type: multipart/form-data; boundary=" + multipartBoundary + "\r\n";
 	std::string requestBody;
-	if (!AppendRequestFile(requestBody, multipartBoundary, "log", report + L".container", true)) {
+	if (!AppendRequestFile(requestBody, multipartBoundary, "log", report + L".container", FileKind::Wide)) {
 		return false;
 	}
-	if (!AppendRequestFile(requestBody, multipartBoundary, "attachment0", report, false)) {
+	if (!AppendRequestFile(requestBody, multipartBoundary, "attachment0", report, FileKind::Binary)) {
 		return false;
 	}
 	AppendRequestParam(requestBody, multipartBoundary, "description", ""); // TODO fill these in from .metadata
@@ -635,19 +648,19 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 
 	FindClose(hFile);
 	if (GetLastError() != ERROR_NO_MORE_FILES) {
-		crash_log(L"Warning: Failed enumerating crash files\n");
+		dbugLog(_FLW, "Failed enumerating crash files");
 		return;
 	}
 
 	for (const std::pair<std::wstring, std::pair<std::wstring, FILETIME>> &kv : rawDumpPaths) {
 		if (containerPaths.find(kv.first) == containerPaths.end() || metadataPaths.find(kv.first) == metadataPaths.end()) {
 			// Invalid log (missing auxiliary data). Remove it, ignoring errors.
-			crash_log(L"Note: Log missing its container or metadata: %s (%s)\n", kv.second.first.c_str(), kv.first.c_str());
+			dbugLog(_FLW, "Log missing its container or metadata: %s (%s)", kv.second.first.c_str(), kv.first.c_str());
 			_wunlink((dataPath + L"\\" + kv.second.first).c_str());
 			_wunlink((dataPath + L"\\" + kv.second.first + L".container").c_str());
 			_wunlink((dataPath + L"\\" + kv.second.first + L".metadata").c_str());
 		} else {
-			crash_log(L"Valid log (has its auxiliaries): %s (%s)\n", kv.second.first.c_str(), kv.first.c_str());
+			dbugLog(_FLI, "Valid log (has its auxiliaries): %s (%s)", kv.second.first.c_str(), kv.first.c_str());
 			possiblyValidReports.push_back({ dataPath + L"\\" + kv.second.first, kv.second.second });
 			containerPaths.erase(kv.first);
 			metadataPaths.erase(kv.first);
