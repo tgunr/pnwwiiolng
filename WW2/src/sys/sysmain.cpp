@@ -671,16 +671,34 @@ char GetOSBuild()
 }
 
 // This is the actual winmain
- int WINAPI WinMainX(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-int		x, y, w, h, wh, xy;
-int		bpp, hdw, stencil, wnd;
-MSG		msg;
-RECT	rect;
+	int		x, y, w, h, wh, xy;
+	int		bpp, hdw, stencil, wnd;
+	MSG		msg;
+	RECT	rect;
 
+#if defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
+	static const int DBUGLOG_MODE = LOG_TO_FILE;
+#else
+	static const int DBUGLOG_MODE = LOG_OFF;
+#endif
+
+	dbugInit(DBUGLOG_MODE, "wwiiClient");
+#if defined(CLOSED_BETA) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
+	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
+	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
+#else
+	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
+	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
+#endif
+
+#ifdef CRASH_HANDLER
+	InstallCrashHandler();
+#endif
 
 #ifdef DIRECT3D
-int		screenmode;
+	int		screenmode;
 #endif	// DIRECT3D
 
 #ifdef ANTIHACK
@@ -1245,14 +1263,4 @@ void sysGetMousePosition(int* x, int* y)
 void sysSetMousePosition(int x, int y)
 {
 	SetCursorPos(WantedX + x, WantedY + y);
-}
-
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
-#ifdef CRASH_HANDLER
-	InstallCrashHandler();
-#endif
-
-	// Don't uninstall crash handler here, it can still catch stuff happening during teardown.
-	return WinMainX(hInstance,hPrevInstance,lpCmdLine,nCmdShow);
 }
