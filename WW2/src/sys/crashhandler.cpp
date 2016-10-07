@@ -285,9 +285,8 @@ static void crash_dprintf(int fd, const wchar_t * const format, ...)
 
 #if defined(DEBUG_WW2) || defined(GM_RELEASE)
 
-// Can't rely on the normal logging subsystem at crash time
-// TODO: Integrate this with a future improvement on dbugLog() so we don't end up with
-//       yet ANOTHER random logging system floating around disconnected from all the rest.
+// Can't rely on the normal logging subsystem at crash time. This minimal logger
+// is guaranteed to work.
 static void crash_log(const wchar_t * const format, ...)
 {
 	va_list args;
@@ -326,7 +325,7 @@ static bool AppendRequestFile(std::string &body, const std::string &boundary, co
 	std::ifstream f(path, std::ios::binary);
 
 	if (f.fail()) {
-		crash_log(L"Failed to open path %s, can't send this crash log\n", path.c_str());
+		dbugLog(_FLW, "Failed to open path %s, can't send this crash log", path.c_str());
 		return false;
 	}
 
@@ -337,7 +336,7 @@ static bool AppendRequestFile(std::string &body, const std::string &boundary, co
 	f.read(data.get(), len);
 
 	if (f.fail()) {
-		crash_log(L"Failed to read from %s, can't send this crash log\n", path.c_str());
+		dbugLog(_FLW, "Failed to read from %s, can't send this crash log", path.c_str());
 		return false;
 	}
 
@@ -423,14 +422,14 @@ static void GenerateOrLoadInstallationId(CrashHandlerContext &context)
 		GUID newId;
 		wchar_t buffer[48] = {0};
 
-		crash_log(L"No registry value for this installation. Creating new GUID.\n");
+		dbugLog(_FLN, "No registry value for this installation. Creating new GUID.\n");
 		CoCreateGuid(&newId);
 		_snwprintf_s(buffer, _TRUNCATE, L"%08X-%04hX-%04hX-%04hX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
 			newId.Data1, newId.Data2, newId.Data3, (newId.Data4[0] << 8) | newId.Data4[1],
 			newId.Data4[2], newId.Data4[3], newId.Data4[4], newId.Data4[5], newId.Data4[6], newId.Data4[7]
 		);
 		if (!sysregSetHKeyText(HKEY_CURRENT_USER, REG_KEY_MAIN, L"InstallationGuid", buffer)) {
-			crash_log(L"Failed to save new installation GUID to registry, not using\n");
+			dbugLog(_FLM, "Failed to save new installation GUID to registry, not using\n");
 		}
 		context.installationId = buffer;
 		return;
@@ -503,7 +502,7 @@ static bool SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 	unique_HINTERNET conn = InternetConnect(base, HockeyApp_serverName.c_str(), HockeyApp_serverPort, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 0);
 
 	if (!conn) {
-		crash_log(L"Failed in InternetConnect(), can't send this crash log at this time.\n");
+		dbugLog(_FLW, "Failed in InternetConnect(), can't send the crash log %S at this time.", report.c_str());
 		return false;
 	}
 
@@ -519,7 +518,7 @@ static bool SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 	unique_HINTERNET req = HttpOpenRequestW(conn, L"POST", HockeyApp_apiPath.c_str(), nullptr, nullptr, acceptTypes, flags, 0);
 
 	if (!req) {
-		crash_log(L"Failed in HttpOpenRequest(), can't send this crash log at this time.\n");
+		dbugLog(_FLW, "Failed in HttpOpenRequest(), can't send the crash log %S at this time.", report.c_str());
 		return false;
 	}
 
@@ -542,22 +541,22 @@ static bool SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 
 	// Use ASCII variant so we don't have to do an extra conversion on the multipart boundary just for the header here.
 	if (!HttpSendRequestA(req, contentTypeHeader.c_str(), -1, const_cast<char *>(requestBody.c_str()), requestBody.length())) {
-		crash_log(L"Failed in HttpSendRequest(), can't send this crash log at this time.\n");
+		dbugLog(_FLW, "Failed in HttpSendRequest(), can't send the crash log %S at this time.", report.c_str());
 		return false;
 	}
 
 	DWORD status_code = 0, status_code_len = sizeof(status_code);
 	if (!HttpQueryInfo(req, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &status_code, &status_code_len, 0)) {
-		crash_log(L"Failed in HttpQueryInfo(), can't send this crash log at this time.\n");
+		dbugLog(_FLW, "Failed in HttpQueryInfo(), can't send the crash log %S at this time.", report.c_str());
 		return false;
 	}
 
 	if (status_code != 201) { // Server responds with 201 Created on success
-		crash_log(L"Failed because status code %u is not 201, can't send this crash log at this time.\n", status_code);
+		dbugLog(_FLW, "Failed because status code %u is not 201, can't send the crash log %S at this time.", status_code, report.c_str());
 		return false;
 	}
 
-	crash_log(L"Successfully sent crash log.\n");
+	dbugLog(_FLN, "Successfully sent crash log %S", report.c_str());
 	return true;
 }
 #pragma endregion
@@ -575,7 +574,7 @@ static void SendExistingReports(const std::vector<std::pair<std::wstring, FILETI
 	unique_HINTERNET base = InternetOpen(HockeyApp_userAgent.c_str(), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 
 	if (!base) {
-		crash_log(L"Failed in InternetOpen(), can't send crash logs at this time.\n");
+		dbugLog(_FLW, "Failed in InternetOpen(), can't send crash logs at this time.");
 		return;
 	}
 
@@ -656,9 +655,9 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 	}
 	
 	// Any items left in rawDumpPaths or metadataPaths are orphans (not matching any container)
-	crash_log(L"Removing %u leftover metadata files\n", metadataPaths.size());
+	dbugLog(_FLI, "Removing %u leftover metadata files", metadataPaths.size());
 	for (const std::pair<std::wstring, std::wstring> &kv : metadataPaths) { _wunlink((dataPath + L"\\" + kv.second).c_str()); }
-	crash_log(L"Removing %u leftover container files\n", containerPaths.size());
+	dbugLog(_FLI, "Removing %u leftover container files", containerPaths.size());
 	for (const std::pair<std::wstring, std::wstring> &kv : containerPaths) { _wunlink((dataPath + L"\\" + kv.second).c_str()); }
 
 	std::thread(SendExistingReports, std::move(possiblyValidReports)).detach();
@@ -720,11 +719,11 @@ void InstallCrashHandler()
 			gCrashContext.get(), // Callback context (pull the raw pointer)
 			google_breakpad::ExceptionHandler::HANDLER_ALL // Handler types (we want all types)
 		));
-		crash_log(L"Installed Breakpad exception handler, now trapping crashes. Log path is %s\n", dataPath.c_str());
+		dbugLog(_FLN, "Installed Breakpad exception handler, now trapping crashes. Log path is %S", dataPath.c_str());
 
 		ProcessExistingReports(dataPath);
 	} else {
-		crash_log(L"Failed to find %APPDATA%\\Roaming, crash handler not installed.\n");
+		dbugLog(_FLM, "Failed to find %APPDATA%\\Roaming, crash handler not installed.");
 	}
 }
 
