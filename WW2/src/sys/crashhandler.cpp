@@ -388,6 +388,10 @@ static bool AppendRequestFile(std::string &body, const std::string &boundary, co
 // things like mess with COM objects since that's the only way to get the data.
 #pragma region Information Gathering Utilities
 
+#define PullFailure(fmt, ...) do { dbugLog(_FLA, fmt, ## __VA_ARGS__); return; } while (0)
+#define PullFailureIf(cond, fmt, ...) do { if ((cond)) { PullFailure(fmt, ## __VA_ARGS__); } } while (0)
+#define PullFailureIfNotSucceed(fmt, ...) PullFailureIf(!SUCCEEDED(result.Error()), "Failed with %S in crash handler: " fmt, result.ErrorMessage(), ## __VA_ARGS__)
+
 #pragma comment(lib, "wbemuuid.lib")
 static void PullMotherboardData(CrashHandlerContext &context)
 {
@@ -403,28 +407,52 @@ static void PullMotherboardData(CrashHandlerContext &context)
 	IWbemClassObjectPtr pclsObj1, pclsObj2;
 	ULONG uReturn1 = WBEM_S_FALSE, uReturn2 = WBEM_S_FALSE;
 	_variant_t vtManuProp, vtModelProp, vtVersProp, vtBuildProp;
+	_com_error result(ERROR_SUCCESS);
 
-	if (com &&
-		SUCCEEDED(CoInitializeSecurity(nullptr, -1, nullptr, nullptr, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE, nullptr)) &&
-		SUCCEEDED(pLoc.CreateInstance(CLSID_WbemLocator)) &&
-		SUCCEEDED(pLoc->ConnectServer(_bstr_t(L"ROOT\\CIMV2"), nullptr, nullptr, 0, 0, 0, 0, &pSvc)) &&
-		SUCCEEDED(CoSetProxyBlanket(pSvc, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, nullptr, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE)) &&
-		SUCCEEDED(pSvc->ExecQuery(bstr_t("WQL"), bstr_t("SELECT * FROM Win32_ComputerSystem"), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator1)) &&
-		SUCCEEDED(pEnumerator1->Next(WBEM_INFINITE, 1, &pclsObj1, &uReturn1)) && uReturn1 > 0 &&
-		SUCCEEDED(pclsObj1->Get(L"Manufacturer", 0, &vtManuProp, nullptr, nullptr)) &&
-		SUCCEEDED(pclsObj1->Get(L"Model", 0, &vtModelProp, nullptr, nullptr)) &&
-		SUCCEEDED(pSvc->ExecQuery(bstr_t("WQL"), bstr_t("SELECT * FROM Win32_OperatingSystem"), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator2)) &&
-		SUCCEEDED(pEnumerator2->Next(WBEM_INFINITE, 1, &pclsObj2, &uReturn2)) && uReturn2 > 0 &&
-		SUCCEEDED(pclsObj2->Get(L"Version", 0, &vtVersProp, nullptr, nullptr)) &&
-		SUCCEEDED(pclsObj2->Get(L"BuildNumber", 0, &vtBuildProp, nullptr, nullptr))
-	) {
-		context.machineManufacturer = vtManuProp.bstrVal;
-		context.machineModel = vtModelProp.bstrVal;
-		context.windowsVersion = vtVersProp.bstrVal;
-		context.windowsBuild = vtBuildProp.bstrVal;
-	} else {
-		crash_log(L"Note: Failed grabbing the machine's data\n");
-	}
+	PullFailureIf(!com, "Failed to initialize COM in crash handler");
+	
+	result = _com_error(CoInitializeSecurity(nullptr, -1, nullptr, nullptr, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE, nullptr));
+	PullFailureIfNotSucceed("Initializing COM security");
+
+	result = _com_error(pLoc.CreateInstance(CLSID_WbemLocator));
+	PullFailureIfNotSucceed("Creating CLSID_WbemLocator instance");
+
+	result = _com_error(pLoc->ConnectServer(_bstr_t(L"ROOT\\CIMV2"), nullptr, nullptr, 0, 0, 0, 0, &pSvc));
+	PullFailureIfNotSucceed("Connecting Locator to ROOT\\CIMV2");
+
+	result = _com_error(CoSetProxyBlanket(pSvc, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, nullptr, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE));
+	PullFailureIfNotSucceed("Setting COM proxy blanket");
+
+	result = _com_error(pSvc->ExecQuery(bstr_t("WQL"), bstr_t("SELECT * FROM Win32_ComputerSystem"), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator1));
+	PullFailureIfNotSucceed("Executing SELECT * FROM Win32_ComputerSystem");
+
+	result = _com_error(pEnumerator1->Next(WBEM_INFINITE, 1, &pclsObj1, &uReturn1));
+	PullFailureIfNotSucceed("Stepping first enumerator");
+	PullFailureIf(uReturn1 <= 0, "No results in first enumerator for crash handler");
+
+	result = _com_error(pclsObj1->Get(L"Manufacturer", 0, &vtManuProp, nullptr, nullptr));
+	PullFailureIfNotSucceed("Get Manufacturer variant value from first enumerator");
+
+	result = _com_error(pclsObj1->Get(L"Model", 0, &vtModelProp, nullptr, nullptr));
+	PullFailureIfNotSucceed("Get Model variant value from first enumerator");
+
+	result = _com_error(pSvc->ExecQuery(bstr_t("WQL"), bstr_t("SELECT * FROM Win32_OperatingSystem"), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator2));
+	PullFailureIfNotSucceed("Executing SELECT * FROM Win32_OperatingSystem");
+
+	result = _com_error(pEnumerator2->Next(WBEM_INFINITE, 1, &pclsObj2, &uReturn2));
+	PullFailureIfNotSucceed("Stepping second enumerator");
+	PullFailureIf(uReturn2 <= 0, "No results in second enumerator for crash handler");
+
+	result = _com_error(pclsObj2->Get(L"Version", 0, &vtVersProp, nullptr, nullptr));
+	PullFailureIfNotSucceed("Get Version variant value from second enumerator");
+
+	result = _com_error(pclsObj2->Get(L"BuildNumber", 0, &vtBuildProp, nullptr, nullptr));
+	PullFailureIfNotSucceed("Get BuildNumber variant value from second enumerator");
+
+	context.machineManufacturer = vtManuProp.bstrVal;
+	context.machineModel = vtModelProp.bstrVal;
+	context.windowsVersion = vtVersProp.bstrVal;
+	context.windowsBuild = vtBuildProp.bstrVal;
 }
 
 static void GenerateOrLoadInstallationId(CrashHandlerContext &context)
