@@ -348,16 +348,9 @@ public:
 		}
 
 		FLOAT64VECTOR location;
-		static const ChatHandle snail = chatGetLowercaseHandle("snail");
-		if (player.matchHandle() == snail && (target->playerID() == 3204 || target->playerID() == 833))
-		{
-			location.x = location.y = location.z = 0;
-		} else
-		{
-			location.x = target->lastX();
-			location.y = target->lastY();
-			location.z = target->lastZ();
-		}
+        location.x = target->lastX();
+        location.y = target->lastY();
+        location.z = target->lastZ();
 
 		player.gmNote("GM", command(), args[0], args[1]);
 		PREP_CHAT_MSG(cmsg, "%s /buzzardspawning %s: %s", player.callsign(), target->callsign(), args[1]);
