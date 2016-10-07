@@ -698,9 +698,7 @@ int		screenmode;
 
 	// setup the user data path
 	fioInit();
-
-	wwiiSendLog_WWII_ERR_INFO();
-
+	
 	// delete the log files
 	Fio::DeleteLogFile();
 
@@ -815,15 +813,6 @@ int		screenmode;
 	HandleHackID();
 #else
 	HackID[0]=0;
-#endif
-
-	// FIXME syscineWinMain(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-
-#ifdef DONT_USE
-	if (!syshsCheckHdwSfw(FALSE))
-	{
-		return(0);
-	}
 #endif
 
 #ifndef BETA_RELEASE

@@ -503,7 +503,6 @@ LOGICAL gmlpMainUpdate(void)
     	logTimerCallVoid(PostRenderUpdate);
     }
 
-	wwiiServiceQueue_WWII_ERROR_INFO(); // send any errors to server
 	clientSendPendingSTOJoules();		// send any pending STO damage messages
 
 	// close the game loop
