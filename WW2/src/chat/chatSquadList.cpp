@@ -162,7 +162,7 @@ public:
 								, m_squadID, playerID, Chat::Name(handle).c_str());
 				joined = teulTime();
 				DBThread::Do(DBThread::Default
-								, "UPDATE LOW_PRIORITY wwii_player"
+								, "UPDATE wwii_player"
 								   " SET squad_joined=NOW()"
 					 			" WHERE playerID=%u AND squadid=%u AND squad_joined is NULL"
 									, playerID, m_squadID

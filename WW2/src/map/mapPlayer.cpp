@@ -1546,7 +1546,7 @@ Player::SetSideLock()
 						);
 
 		DBThread::Do(DBThread::Default
-			, "UPDATE LOW_PRIORITY wwii_player"
+			, "UPDATE wwii_player"
 				" SET lockside = %u, locktime = %ld, modified = now()"
 				" WHERE playerid = %u AND lockside < 3"
 					" AND (lockside != %u OR locktime < %ld)"

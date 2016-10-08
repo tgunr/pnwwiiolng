@@ -177,14 +177,14 @@ OPINION_CHOICE_MSG::receive(SINT32 teulIndex, OPINION_CHOICE_MSG& incoming)
 		return 0;
 
 	DBThread::Do(DBThread::Default
-		, "UPDATE LOW_PRIORITY wwii_player SET last_poll = %u WHERE playerid = %u AND last_poll < %u"
+		, "UPDATE wwii_player SET last_poll = %u WHERE playerid = %u AND last_poll < %u"
 			, player->m_lastPoll
 			, player->playerID()
 			, player->m_lastPoll
 	);
 
 	DBThread::Do(DBThread::Default
-		, "UPDATE LOW_PRIORITY wwii_poll_entry SET votes = votes + 1 WHERE pollid = %u AND entryid = %u"
+		, "UPDATE wwii_poll_entry SET votes = votes + 1 WHERE pollid = %u AND entryid = %u"
 			, player->m_lastPoll
 			, data.choice()
 	);
