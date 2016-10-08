@@ -701,7 +701,11 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 	dbugLog(_FLI, "Removing %u leftover container files", containerPaths.size());
 	for (const std::pair<std::wstring, std::wstring> &kv : containerPaths) { _wunlink((dataPath + L"\\" + kv.second).c_str()); }
 
+#if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
+	std::thread(SendExistingReports, std::move(possiblyValidReports)).join();
+#else
 	std::thread(SendExistingReports, std::move(possiblyValidReports)).detach();
+#endif
 }
 
 #pragma endregion

@@ -685,7 +685,7 @@ char GetOSBuild()
 		return 0;
 	}
 
-#if defined(CLOSED_BETA) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
+#if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
 	static const int DBUGLOG_MODE = LOG_TO_FILE;
 	dbugInit(DBUGLOG_MODE, "wwiiClient");
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
