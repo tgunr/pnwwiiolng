@@ -327,7 +327,7 @@ static bool AppendRequestFile(std::string &body, const std::string &boundary, co
 	std::ifstream f(path, std::ios::binary);
 
 	if (f.fail()) {
-		dbugLog(_FLW, "Failed to open path %s, can't send this crash log", path.c_str());
+		dbugLog(_FLW, "Failed to open path %S, can't send this crash log", path.c_str());
 		return false;
 	}
 
@@ -338,7 +338,7 @@ static bool AppendRequestFile(std::string &body, const std::string &boundary, co
 	f.read(data.get(), len);
 
 	if (f.fail()) {
-		dbugLog(_FLW, "Failed to read from %s, can't send this crash log", path.c_str());
+		dbugLog(_FLW, "Failed to read from %S, can't send this crash log", path.c_str());
 		return false;
 	}
 
@@ -683,12 +683,12 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 	for (const std::pair<std::wstring, std::pair<std::wstring, FILETIME>> &kv : rawDumpPaths) {
 		if (containerPaths.find(kv.first) == containerPaths.end() || metadataPaths.find(kv.first) == metadataPaths.end()) {
 			// Invalid log (missing auxiliary data). Remove it, ignoring errors.
-			dbugLog(_FLW, "Log missing its container or metadata: %s (%s)", kv.second.first.c_str(), kv.first.c_str());
+			dbugLog(_FLW, "Log missing its container or metadata: %S (%S)", kv.second.first.c_str(), kv.first.c_str());
 			_wunlink((dataPath + L"\\" + kv.second.first).c_str());
 			_wunlink((dataPath + L"\\" + kv.second.first + L".container").c_str());
 			_wunlink((dataPath + L"\\" + kv.second.first + L".metadata").c_str());
 		} else {
-			dbugLog(_FLI, "Valid log (has its auxiliaries): %s (%s)", kv.second.first.c_str(), kv.first.c_str());
+			dbugLog(_FLI, "Valid log (has its auxiliaries): %S (%S)", kv.second.first.c_str(), kv.first.c_str());
 			possiblyValidReports.push_back({ dataPath + L"\\" + kv.second.first, kv.second.second });
 			containerPaths.erase(kv.first);
 			metadataPaths.erase(kv.first);
