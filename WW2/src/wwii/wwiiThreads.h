@@ -10,10 +10,10 @@
 #include "include/pnThread.h"
 #include "dbse/dbseHandle.h"
 
-typedef struct st_mysql MYSQL;
+using MYSQL = struct st_mysql;
 class DBQuery;
 
-typedef void (THREAD_CALLBACK)(void*);
+using THREAD_CALLBACK = void(*)(void*);
 
 //////////////////////////////////////////////////////////////////////
 // Threads-system calls ("threads")
@@ -54,7 +54,7 @@ extern void threadLog(const char* file, unsigned int line, unsigned int level, c
 #endif
 
 // Add a callback to the thread queue
-extern void threadCallback(THREAD_CALLBACK* fn, void*);
+extern void threadCallback(THREAD_CALLBACK fn, void*);
 
 // Escape a string for mysql/js usage
 extern void wwiiEscapeString(std::string& text);

@@ -1,7 +1,7 @@
 #pragma once
 
-typedef LOGICAL (*DDWND_DDRENDERFUNC)(void);
-typedef LOGICAL (*DDWND_D3DRENDERFUNC)(void);
+using DDWND_DDRENDERFUNC = LOGICAL(*)(void);
+using DDWND_D3DRENDERFUNC = LOGICAL(*)(void);
 
 extern LOGICAL cursorHidden;
 

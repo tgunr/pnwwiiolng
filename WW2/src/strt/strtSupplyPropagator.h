@@ -86,9 +86,9 @@ private:
 
 private:
 	// List of CPs waiting to be visited.
-	typedef std::deque<CPStruct*> OPEN_SET;
+	using OPEN_SET = std::deque<CPStruct*>;
 	// List of CPs that have been visited.
-	typedef std::unordered_set<CPStruct*> CLOSED_SET;
+	using CLOSED_SET = std::unordered_set<CPStruct*>;
 
 	WWII_SIDE	m_side;
 	OPEN_SET	m_openSet;

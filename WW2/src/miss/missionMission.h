@@ -160,5 +160,5 @@ public:
 	MobileSpawn			m_spawner;
 };
 
-typedef Mission MISSION;
+using MISSION = Mission;
 

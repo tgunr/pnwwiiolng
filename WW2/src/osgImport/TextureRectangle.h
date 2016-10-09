@@ -130,7 +130,7 @@ class TextureRectangle : public Texture
 
         ref_ptr<SubloadCallback> _subloadCallback;
 
-        typedef buffered_value<unsigned int> ImageModifiedCount;
+        using ImageModifiedCount = buffered_value<unsigned int>;
         mutable ImageModifiedCount _modifiedCount;
 };
 

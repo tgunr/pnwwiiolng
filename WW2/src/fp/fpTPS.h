@@ -28,7 +28,7 @@ enum fpHitLocations
 	FP_HIT_LOCATION_NUM
 };
 
-typedef std::map<UINT64, gr2AnimationBlend*> TPS_BLEND_MAP;
+using TPS_BLEND_MAP = std::map<UINT64, gr2AnimationBlend*>;
 
 extern fpHitLocations	fpHitMap[60];
 

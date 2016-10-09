@@ -184,8 +184,8 @@ DBQuery::_query(const char* statement, size_t stlen)
 //////////////////////////////////////////////////////////////////////
 // Constructor (with a query)
 
-DBQuery::DBQuery(DBHANDLE& dbh, const char* query, ...) :
-	m_conn(dbh),
+DBQuery::DBQuery(DBHANDLE& conn, const char* query, ...) :
+	m_conn(conn),
 	m_result(nullptr),
 	m_executed(false),
 	m_error(0),
@@ -198,7 +198,7 @@ DBQuery::DBQuery(DBHANDLE& dbh, const char* query, ...) :
 	m_row(nullptr)
 {
 	if ( m_conn == nullptr )
-		throw std::domain_error("NULL dbh");
+		throw std::domain_error("NULL conn");
 
 	if ( query == nullptr )
 		throw std::invalid_argument("query == NULL");

@@ -33,6 +33,6 @@ public:
 										// otherwise it will only test the move for validity
 };
 
-typedef teul_network_msg<BrigadeMove> BRIGADE_MOVE_MSG;
+using BRIGADE_MOVE_MSG = teul_network_msg<BrigadeMove>;
 
 void chatSendBrigadeMoveResult(BRIGADE_MOVE_MSG& outgoing);

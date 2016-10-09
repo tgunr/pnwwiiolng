@@ -19,5 +19,5 @@ public:
 	~DBSquad() {}
 };
 
-typedef teul_network_object<DBSquad> CHATDB_SQUAD_XCHG;
+using CHATDB_SQUAD_XCHG = teul_network_object<DBSquad>;
 

@@ -22,13 +22,13 @@ namespace Instance
 
 	//! @brief Functor that takes a HostInstance reference and returns a new HostInstanceImpl
 	//! or derived object.
-	typedef HostInstanceImpl* (HostInstanceImplFactory) (HostInstance&);
+	using HostInstanceImplFactory = HostInstanceImpl*(*)(HostInstance&);
 
 	//! @brief Function to register your host-specific class' new functions.
-	void RegisterHostInstanceImplFactory(HostInstanceImplFactory* factory);
+	void RegisterHostInstanceImplFactory(HostInstanceImplFactory factory);
 
 	//! @brief The host-specific instance implementation object factory.
-	extern HostInstanceImplFactory* s_implFactory;
+	extern HostInstanceImplFactory s_implFactory;
 
 	class HostInstance : public BasicStatus
 	{

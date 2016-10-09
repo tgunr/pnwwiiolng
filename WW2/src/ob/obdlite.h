@@ -7,7 +7,7 @@
 #define LITE_LFMEDIUM     0x00000004
 #define LITE_LFBRIGHT     0x00000008
 
-typedef LOGICAL (*DYNALITE_UPDATE)(struct LIGHT* light);
+using DYNALITE_UPDATE = LOGICAL(*)(struct LIGHT* light);
 
 struct DYNALITE
 {

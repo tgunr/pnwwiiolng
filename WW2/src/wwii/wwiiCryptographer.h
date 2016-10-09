@@ -16,8 +16,8 @@ template<bool Encrypting>
 class Cryptographer
 {
 public:
-	typedef unsigned long long SeedType;
-	typedef unsigned char ByteType;
+	using SeedType = unsigned long long;
+	using ByteType = unsigned char;
 
 public:
 	//! Default constructor.

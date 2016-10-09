@@ -59,7 +59,7 @@ struct gr2Animation;
 struct gr2AnimationBlend;
 class gr2Object;
 
-typedef void (*GR2_EVENTHANDLER)(OBJECT* pObject, gr2Model* model, SINT32 eventID);
+using GR2_EVENTHANDLER = void(*)(OBJECT* pObject, gr2Model* model, SINT32 eventID);
 
 // gr2 type definitions
 #include "gr2/gr2layerTypes.h"

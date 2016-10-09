@@ -12,9 +12,9 @@ namespace Teul
 	struct PacketHeader
 	{
 	public:
-		typedef	unsigned char	tag_t;		// Used for the tag.
-		typedef	unsigned short	tick_t;	// Tick transport.
-		typedef	unsigned char	callxy_t;	// For callback X/Y values.
+		using tag_t = unsigned char;		// Used for the tag.
+		using tick_t = unsigned short;	    // Tick transport.
+		using callxy_t = unsigned char;	    // For callback X/Y values.
 	public:
 		UINT32 packetType() const { return m_prefix[0] >> 4; }
 		void packetType(UINT32 type_) { m_prefix[0] = ((UCHAR)type_ << 4) | (m_prefix[0] & 0x0f); }

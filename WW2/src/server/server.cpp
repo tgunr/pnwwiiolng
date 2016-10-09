@@ -116,18 +116,18 @@ namespace Server
 	bool	broadcastConnected = false;
 }
 
-ERROR_FUNCTION* 	extErrorFn;
+ERROR_FUNCTION 	extErrorFn;
 
 using TransferQueue = std::deque<Server::Transfer*>;
 static TransferQueue s_transferQueue;
 
 static Server::ServerInfo* _exitServer = nullptr;
 
-static CREATE_PERSONA_FUNCTION* _createPersonaFn;
-static RELEASE_PERSONA_FUNCTION* _releasePersonaFn;
-static ACTIVATE_PLAYER_FUNCTION* _activatePlayerFn;
-static EXIT_PERSONA_FUNCTION* _exitPersonaFn;
-static EXIT_CLUSTER_FUNCTION* _exitClusterFn;
+static CREATE_PERSONA_FUNCTION _createPersonaFn;
+static RELEASE_PERSONA_FUNCTION _releasePersonaFn;
+static ACTIVATE_PLAYER_FUNCTION _activatePlayerFn;
+static EXIT_PERSONA_FUNCTION _exitPersonaFn;
+static EXIT_CLUSTER_FUNCTION _exitClusterFn;
 
 PLAYERID_HASH ServerInterface::s_byPlayerID;
 PLAYERIDX_MAP ServerInterface::s_byTeulIndex;
@@ -135,16 +135,16 @@ PLAYERIDX_MAP ServerInterface::s_byTeulIndex;
 static Server::ServerInfo* _myServerInfo = nullptr;
 static TeulTimeMS _nextHeartbeat = 0ULL, _nextUpdate;
 
-static SERVER_UPDATE* _enterCallback= nullptr;
-static SERVER_UPDATE* _leaveCallback = nullptr;
-static SERVER_UPDATE* _statusCallback= nullptr;
+static SERVER_UPDATE _enterCallback= nullptr;
+static SERVER_UPDATE _leaveCallback = nullptr;
+static SERVER_UPDATE _statusCallback= nullptr;
 
 static std::set<Server::ServerInfo*> s_activeServerList;
 
 static SINT32 _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType releaseType);
 
 // move players from one server list to another and update state
-extern ERROR_FUNCTION* 	extErrorFn;
+extern ERROR_FUNCTION 	extErrorFn;
 static ENDPOINT* s_broadcastEndpoint = nullptr;
 
 // Connection to the controller process.
@@ -961,15 +961,15 @@ _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 SINT32
 serverInit(UINT32 appVersion
 				, SERVER_TYPE serverType, UINT32 exitDestType
-				, SERVER_UPDATE* enterCallback
-				, SERVER_UPDATE* leaveCallback
-				, SERVER_UPDATE* statusCallback
-				, CREATE_PERSONA_FUNCTION*	createPersonaFn
-				, RELEASE_PERSONA_FUNCTION* releasePersonaFn
-				, ACTIVATE_PLAYER_FUNCTION* activatePlayerFn
-				, EXIT_PERSONA_FUNCTION* exitPersonaFn
-				, EXIT_CLUSTER_FUNCTION* exitClusterFn
-				, ERROR_FUNCTION* errorFunction)
+				, SERVER_UPDATE enterCallback
+				, SERVER_UPDATE leaveCallback
+				, SERVER_UPDATE statusCallback
+				, CREATE_PERSONA_FUNCTION createPersonaFn
+				, RELEASE_PERSONA_FUNCTION releasePersonaFn
+				, ACTIVATE_PLAYER_FUNCTION activatePlayerFn
+				, EXIT_PERSONA_FUNCTION exitPersonaFn
+				, EXIT_CLUSTER_FUNCTION exitClusterFn
+				, ERROR_FUNCTION errorFunction)
 {
 	if ( Server::myServerInfo.stats.arenaID == 0 )
 	{
@@ -1876,7 +1876,7 @@ void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SI
 	exit(0);
 }
 
-void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
+void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERROR_FUNCTION errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
 {
 	Server::serverType = serverType_;
 	Teul::SetAppName(appName);

@@ -111,7 +111,7 @@ struct trnAutoGunType
 
 };
 
-typedef struct SpawnData
+struct SpawnData
 {
     std::map<UINT32, std::vector<OBJECT*> > classToObject;
     std::string buildingname;
@@ -158,8 +158,7 @@ typedef struct SpawnData
             classToObject.insert(make_pair(key, v));
         }
     }
-
-} SpawnData;
+};
 
 namespace StratDB { class StratObject; }
 
@@ -452,10 +451,9 @@ struct trnAutoGun
 // new collider stuff
 struct trncdDTLCollider;
 struct TERRAIN_DETAIL;
-typedef struct trncdDTLCollider* trncdDTLColliderRef;
 
-extern trncdDTLColliderRef trncdDTLColliderAlloc(struct TERRAIN_DETAIL*);
-extern void trncdDTLColliderFree(trncdDTLColliderRef);
+extern trncdDTLCollider* trncdDTLColliderAlloc(struct TERRAIN_DETAIL*);
+extern void trncdDTLColliderFree(trncdDTLCollider*);
 
 extern SINT32 trncdCollideWithBaseTerrain(FASTCOLLIDE* collisionList, SINT32 maxcol, piVECTOR const* start, piVECTOR const* end);
 extern SINT32 trnSetBuilderFlag(SINT32 x, SINT32 y, UINT32 iID);

@@ -15,8 +15,8 @@ namespace Scoring
 	template<class _EventClass>
 	class Packet : public Teul::Packet
 	{
-	public: typedef Scoring::Packet<_EventClass> selftype;
-	public: typedef _EventClass eventtype;
+	public: using selftype = Scoring::Packet<_EventClass>;
+	public: using eventtype = _EventClass;
 
 		//! Default constructor: Create a Teul::Packet with our
 		//! callback and a payload size that carries our event.

@@ -40,14 +40,14 @@ _defaultHostInstanceImplFactory(Instance::HostInstance& _inst)
 	return new Instance::HostInstanceImpl(_inst);
 }
 
-Instance::HostInstanceImplFactory* Instance::s_implFactory = _defaultHostInstanceImplFactory;
+Instance::HostInstanceImplFactory Instance::s_implFactory = _defaultHostInstanceImplFactory;
 
 //////////////////////////////////////////////////////////////////////
 // Function to register a derived HostInstanceImpl's instead of the
 // base class new function.
 
 void
-Instance::RegisterHostInstanceImplFactory(Instance::HostInstanceImplFactory* factory)
+Instance::RegisterHostInstanceImplFactory(Instance::HostInstanceImplFactory factory)
 {
 	Instance::s_implFactory = factory;
 }

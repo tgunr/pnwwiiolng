@@ -8,7 +8,7 @@
 
 namespace ogl
 {
-	typedef	UINT16	VertexIdx;
+	using VertexIdx = UINT16;
 
 	struct RawVertex
 	{
@@ -57,7 +57,7 @@ namespace ogl
 
 	UINT32	VertexElementSize(UINT32 vertexType);
 
-  typedef std::multimap<size_t,VertexIdx> RawVertexIndexer;
+  using RawVertexIndexer = std::multimap<size_t,VertexIdx>;
 
 	class MeshContext;
 

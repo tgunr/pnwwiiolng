@@ -21,7 +21,7 @@ struct POSTED_WEAPON;
 class StratHCUnitImpl;
 class ResupplyTicket;
 
-typedef std::list<POSTED_WEAPON*> POSTED_WEAPON_LIST;
+using POSTED_WEAPON_LIST = std::list<POSTED_WEAPON*>;
 
 //  ----------------------------------------  Variables
 //tolua_begin

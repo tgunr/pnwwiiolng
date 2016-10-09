@@ -25,7 +25,7 @@
 
 class SquadInvite;
 class PlayerStatusNode;
-typedef std::set<ChatHandle> HANDLES;
+using HANDLES = std::set<ChatHandle>;
 namespace Chat
 {
 	class PersonaUpdate;

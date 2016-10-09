@@ -322,12 +322,12 @@ extern ServerTrackedObject* wwiiGetSTO(UINT32 uid);
 //! Walk the STO lists for entries that have expired
 extern void wwiiExpireSTOs();
 
-typedef void (STO_ITERATOR) (ServerTrackedObject&);
-typedef bool (STO_COOKIE_ITERATOR) (ServerTrackedObject& sto, void* cookie);
+using STO_ITERATOR = void(*)(ServerTrackedObject&);
+using STO_COOKIE_ITERATOR = bool(*)(ServerTrackedObject& sto, void* cookie);
 
 //! Patrol function.
-extern void wwiiForEachSTO(STO_ITERATOR&);
-extern bool wwiiForEachSTO(STO_COOKIE_ITERATOR&, void* cookie = nullptr);
+extern void wwiiForEachSTO(STO_ITERATOR);
+extern bool wwiiForEachSTO(STO_COOKIE_ITERATOR, void* cookie = nullptr);
 
 // return a count of the specified type or of all types
 extern UINT32 wwiiCountSTOs(UINT16 type = 0, UINT16 subtype = 0);

@@ -228,7 +228,7 @@ mapInitDB()
 		retval = false;
 	}
 
-	wwiiReadRanks(dbh);
+	wwiiReadRanks();
 
 #if !defined(DEV_BUILD) && !defined(FRES)
 	mapPollChecksums(true);

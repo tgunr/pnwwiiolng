@@ -1524,9 +1524,9 @@ authValidatePlayer(UINT32 /*ipAddress*/, PLAYER_LOGIN& /*loginData*/, Auth::Disp
 
 SINT32
 authInitAccept(UINT32 /*appVersion*/
-				, PLAYER_ACCEPT_FUNCTION* /*loginAcceptFn*/
-				, PLAYER_RELEASE_FUNCTION* /*releaseFn*/
-				, ERROR_FUNCTION* /*externErrorFn*/)
+				, PLAYER_ACCEPT_FUNCTION /*loginAcceptFn*/
+				, PLAYER_RELEASE_FUNCTION /*releaseFn*/
+				, ERROR_FUNCTION /*externErrorFn*/)
 {
 	return -EINVAL;
 }

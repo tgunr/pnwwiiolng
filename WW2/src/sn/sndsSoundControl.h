@@ -19,9 +19,6 @@
 #define DEF_MODE_HEADRELATIVE   0x00000001
 #define DEF_MODE_DISABLE        0x00000002
 
-typedef struct snSound* snSoundPtr;
-typedef struct SNDSCREATE* LPSNDSCREATE;
-
 // Return maximum number of sounds allowed by the sound card
 extern UINT32 sndsGetMaxNumberOfSounds();
 
@@ -64,9 +61,9 @@ extern void sndsUpdateSounds(void);
 
 #ifdef SOUND_DEBUG
 	#define sndsLoadSound(a)   sndsLoadSoundDebug(a, _FL)
-	extern snSound * sndsLoadSoundDebug(LPCREATE lpCreate, SCHAR* file, SINT32 line);
+	extern snSound * sndsLoadSoundDebug(SNDSCREATE* lpCreate, SCHAR* file, SINT32 line);
 #else
-	extern snSound * sndsLoadSound(LPSNDSCREATE lpCreate);
+	extern snSound * sndsLoadSound(SNDSCREATE* lpCreate);
 #endif
 
 // creates a new snSound item and loads the sound buffer with the waveform
@@ -234,18 +231,18 @@ LOGICAL sndsApply3D(snSound* snd);
 extern LOGICAL sndsCommitDeferredSettings();
 extern LOGICAL sndsSetListener3DPos(struct piVECTOR* pPos, UINT32 uApply);
 extern LOGICAL sndsSetListener3DVel(struct piVECTOR* pVel, UINT32 uApply);
-extern LOGICAL sndsSetMaxDistance(snSoundPtr lpSound, FLOAT32 fMax, UINT32 uApply);
-extern LOGICAL sndsSetMinDistance(snSoundPtr lpSound, FLOAT32 fMin, UINT32 uApply);
+extern LOGICAL sndsSetMaxDistance(snSound* lpSound, FLOAT32 fMax, UINT32 uApply);
+extern LOGICAL sndsSetMinDistance(snSound* lpSound, FLOAT32 fMin, UINT32 uApply);
 extern LOGICAL sndsSetOrientation(struct piVECTOR* pFront, struct piVECTOR* pTop, UINT32 uApply);
-extern LOGICAL sndsSetSound3DMode(snSoundPtr lpSound, UINT32 uMode, UINT32 uApply);
-extern LOGICAL sndsSetSound3DPos(snSoundPtr lpSound, struct piVECTOR* pPos, UINT32 uApply);
-extern LOGICAL sndsSetSound3DVel(snSoundPtr lpSound, struct piVECTOR* pVel, UINT32 uApply);
-extern LOGICAL sndsSetConeAngles(snSoundPtr lpSound,
+extern LOGICAL sndsSetSound3DMode(snSound* lpSound, UINT32 uMode, UINT32 uApply);
+extern LOGICAL sndsSetSound3DPos(snSound* lpSound, struct piVECTOR* pPos, UINT32 uApply);
+extern LOGICAL sndsSetSound3DVel(snSound* lpSound, struct piVECTOR* pVel, UINT32 uApply);
+extern LOGICAL sndsSetConeAngles(snSound* lpSound,
                                  UINT32 uIn,
                                  UINT32 uOut,
                                  UINT32 uApply);
-extern LOGICAL sndsSetConeOrientation(snSoundPtr lpSound, struct piVECTOR* pVec, UINT32 uApply);
-extern LOGICAL sndsGetVolume(snSoundPtr lpSound, SINT32* pVolume);
+extern LOGICAL sndsSetConeOrientation(snSound* lpSound, struct piVECTOR* pVec, UINT32 uApply);
+extern LOGICAL sndsGetVolume(snSound* lpSound, SINT32* pVolume);
 
 // functions to be defined later:
 // -  pitch bending

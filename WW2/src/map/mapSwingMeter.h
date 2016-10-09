@@ -59,7 +59,7 @@ public:
 	static const SINT32 MIN_SWING = 0-MAX_SWING;
 };
 
-typedef teul_network_object<SwingMeter> SWING_METER_MSG;
+using SWING_METER_MSG = teul_network_object<SwingMeter>;
 
 #if platBuild == TEUL_SERVER
 namespace Map

@@ -7,7 +7,7 @@ struct DrawIcons
 	piUV* uv;
 };
 
-typedef struct DrawIcons* drawIconRef;
+using drawIconRef = struct DrawIcons*;
 
 drawIconRef drawIconLoad(const char* iconFile);
 void drawIconKill(drawIconRef);

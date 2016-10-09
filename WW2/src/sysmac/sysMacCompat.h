@@ -6,7 +6,7 @@
 
 #include "include/sysTypes.h"
 
-typedef UINT32 DWORD;
+using DWORD = UINT32;
 
 #define _isnan std::isnan
 #define _finite std::isfinite

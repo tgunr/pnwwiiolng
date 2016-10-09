@@ -22,7 +22,7 @@ class Matrixf
 {
     public:
 
-        typedef float value_type;
+        using value_type = float;
 
         inline Matrixf() { makeIdentity(); }
         inline Matrixf( const Matrixf& mat) { set(mat.ptr()); }

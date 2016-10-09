@@ -276,9 +276,9 @@ snSound*	listSound;
 // it is also a convienent place to put possible resource optomisations such as deleting sounds which have
 // finished playing (and are not looping), or doing performance monitoring, etc.
 #ifdef SOUND_DEBUG
-	snSound * sndsLoadSoundDebug(LPSNDSCREATE lpCreate, SCHAR* file, SINT32 line)
+	snSound * sndsLoadSoundDebug(SNDSCREATE* lpCreate, SCHAR* file, SINT32 line)
 #else
-	snSound * sndsLoadSound(LPSNDSCREATE lpCreate)
+	snSound * sndsLoadSound(SNDSCREATE* lpCreate)
 #endif
 {
 snSound* newSound = nullptr;

@@ -18,10 +18,10 @@ class ResupplyTicket;
 // A docket is a collection of resupply tickets. They are stored individually
 // but are best processed by collating the individual entries by weap_spec
 // into a RESUPPLY_MANIFEST
-typedef std::list<ResupplyTicket*> RESUPPLY_DOCKET;
-typedef std::map< UINT32, RESUPPLY_DOCKET > RESUPPLY_QUEUE;
-typedef std::map<WEAPON_SPEC, UINT32> RESUPPLY_MANIFEST;
-typedef std::list<ResupplyTicket*> TRANSFERS;
+using RESUPPLY_DOCKET = std::list<ResupplyTicket*>;
+using RESUPPLY_QUEUE = std::map< UINT32, RESUPPLY_DOCKET >;
+using RESUPPLY_MANIFEST = std::map<WEAPON_SPEC, UINT32>;
+using TRANSFERS = std::list<ResupplyTicket*>;
 
 //////////////////////////////////////////////////////////////////////
 // The actual impl
@@ -129,7 +129,7 @@ public:
 		UINT32			m_ends;	// When this throttle expires
 		mutable UINT32	m_used;	// Number of this throttle in use
 	};
-	typedef std::map<UINT32, Throttle> THROTTLE_MAP;
+	using THROTTLE_MAP = std::map<UINT32, Throttle>;
 	THROTTLE_MAP	m_throttles;
 #endif
 };

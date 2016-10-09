@@ -74,7 +74,7 @@
 
 	};
 
-	typedef LOGICAL (*TRN_OBJECT_NOTIFY)(struct OBJECT* lpobj, SINT32 scx, SINT32 scy, UINT32 id, REL_OBJ_ID * ObjId);
+	using TRN_OBJECT_NOTIFY = LOGICAL(*)(struct OBJECT* lpobj, SINT32 scx, SINT32 scy, UINT32 id, REL_OBJ_ID * ObjId);
 
 	extern LOGICAL trnmainInit(SINT8* name, FLOAT32 xorigin, FLOAT32 yorigin);
 	extern void trnmainKill(void);

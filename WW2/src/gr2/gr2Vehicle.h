@@ -18,13 +18,13 @@ class gr2Vehicle;
 struct gr2TurretSpec;
 struct VEHICLE_UPDATE_HEADER;
 
-typedef gr2Vehicle* (*GR2_VEHICLE_CREATOR)(vehVehicle* v, OBJECT* o);
+using GR2_VEHICLE_CREATOR = gr2Vehicle*(*)(vehVehicle* v, OBJECT* o);
 
 class gr2Vehicle : public gr2GameObject
 {
 public:
 
-	typedef std::map<std::string, GR2_VEHICLE_CREATOR> CreatorMap;
+	using CreatorMap = std::map<std::string, GR2_VEHICLE_CREATOR>;
 
 	enum GR2_VEHICLE_TURRET_AXIS
 	{
@@ -46,7 +46,7 @@ public:
 		gr2TurretSpec* spec; // holds traverse and elevation specs
 	};
 
-	typedef std::vector<gr2Turret> gr2TurretList;
+	using gr2TurretList = std::vector<gr2Turret>;
 
 	gr2Vehicle(vehVehicle* vehicle, OBJECT* pObject);
 	gr2Vehicle(vehVehicle* vehicle, OBJECT* pObject, const char* skeletonFile, bool skeletonIsLOD = true);

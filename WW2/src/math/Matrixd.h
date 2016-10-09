@@ -22,7 +22,7 @@ class Matrixd
 {
     public:
 
-        typedef double value_type;
+        using value_type = double;
 
         inline Matrixd() { makeIdentity(); }
         inline Matrixd( const Matrixd& mat) { set(mat.ptr()); }

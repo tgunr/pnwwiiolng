@@ -156,7 +156,7 @@ private:
 	void _unregister();
 };
 
-typedef std::list<POSTED_WEAPON*> POSTED_WEAPON_LIST;
+using POSTED_WEAPON_LIST = std::list<POSTED_WEAPON*>;
 
 //tolua_begin
 

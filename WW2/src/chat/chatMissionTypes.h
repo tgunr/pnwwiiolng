@@ -23,10 +23,10 @@ public:
 	~ChatMission();
 
 public:
-	typedef std::unordered_map<UINT32,Player*> MEMBERS;
-	typedef std::unordered_map<ChatHandle,Waypoint> WAYPOINTS;
-	typedef std::unordered_map<ChatHandle,Player*> MEMBER_UPDATES;
-	typedef std::unordered_set<ChatHandle> MEMBER_REMOVES;
+	using MEMBERS = std::unordered_map<UINT32,Player*>;
+	using WAYPOINTS = std::unordered_map<ChatHandle,Waypoint>;
+	using MEMBER_UPDATES = std::unordered_map<ChatHandle,Player*>;
+	using MEMBER_REMOVES = std::unordered_set<ChatHandle>;
 
 public:
 	void addMemberRemoval(Player* player);

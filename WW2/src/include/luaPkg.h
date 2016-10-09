@@ -3,7 +3,7 @@
 
 class FacilityStruct;
 
-typedef std::map<UINT32, HCUnit*>::iterator HCUIDX_ITERATOR;
+using HCUIDX_ITERATOR = std::map<UINT32, HCUnit*>::iterator;
 
 //tolua_begin
 FacilityStruct* strtGetFacilityByName(const char* name);

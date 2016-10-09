@@ -12,7 +12,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-typedef std::map<std::string, std::string> ARENA_VARS;
+using ARENA_VARS = std::map<std::string, std::string>;
 
 class ArenaDescription : public ARENA_VARS
 {

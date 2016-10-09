@@ -21,14 +21,14 @@
 
     // for compatibility with gl.h headers that don't support VBO,
     #if defined(_WIN64)
-        typedef __int64 GLintptrARB;
-        typedef __int64 GLsizeiptrARB;
+        using GLintptrARB = __int64;
+        using GLsizeiptrARB = __int64;
     #elif defined(__ia64__) || defined(__x86_64__)
-        typedef long int GLintptrARB;
-        typedef long int GLsizeiptrARB;
+        using GLintptrARB = long int;
+        using GLsizeiptrARB = long int;
     #else
-        typedef int GLintptrARB;
-        typedef int GLsizeiptrARB;
+        using GLintptrARB = int;
+        using GLsizeiptrARB = int;
     #endif
 
     #define GL_ARRAY_BUFFER_ARB               0x8892
@@ -170,8 +170,8 @@ protected:
 
     virtual ~BufferObject();
 
-    typedef buffered_value<GLuint> GLObjectList;
-    typedef buffered_value<unsigned int> CompiledList;
+    using GLObjectList = buffered_value<GLuint>;
+    using CompiledList = buffered_value<unsigned int>;
 
     mutable GLObjectList _bufferObjectList;
     mutable CompiledList _compiledList;
@@ -188,7 +188,7 @@ public:
 
     PixelBufferObject(Image* image=0);
 
-    typedef std::pair< BufferEntry, Image* > BufferEntryImagePair;
+    using BufferEntryImagePair = std::pair<BufferEntry, Image*>;
 
     void setImage(Image* image);
 
@@ -261,7 +261,7 @@ protected:
 
     BufferEntry _bufferData;
 
-    typedef buffered_value<unsigned int> ModeList;
+    using ModeList = buffered_value<unsigned int>;
 
     mutable ModeList _mode;
 };

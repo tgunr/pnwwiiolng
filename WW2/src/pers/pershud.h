@@ -72,7 +72,7 @@ protected:
 	float _maxx,_miny;
 
 	int language;
-	typedef std::map<std::string,std::wstring> StringCache;
+	using StringCache = std::map<std::string,std::wstring>;
 	StringCache strings;
 };
 
@@ -149,7 +149,7 @@ public:
 		virtual bool Update();
 	};
 
-	typedef std::vector<HUDObject*> HUDObjectList;
+	using HUDObjectList = std::vector<HUDObject*>;
 
 	PersHUDManager()
 	{

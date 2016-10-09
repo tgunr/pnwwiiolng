@@ -60,7 +60,7 @@ enum
 // And so we can tell how big the list is :)
 ,	SC_NUM_COMMANDS
 };
-typedef UINT32 SCMD_ENUM;
+using SCMD_ENUM = UINT32;
 
 // Result codes for strat commands
 enum
@@ -92,7 +92,7 @@ enum
 // And finally:
 ,	SCMD_ERROR						// Must always be the last
 };
-typedef UINT32 SCMD_RESULT;
+using SCMD_RESULT = UINT32;
 
 enum
 {
@@ -133,5 +133,5 @@ public:
 	bool describe() const;
 };
 
-typedef std::pair<UINT32,UINT32> POPULATION;
+using POPULATION = std::pair<UINT32,UINT32>;
 

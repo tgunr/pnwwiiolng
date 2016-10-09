@@ -34,7 +34,7 @@ TEUL_CALLBACK*			CLUSTER_SHUTDOWN_CB;
 // move players from one server list to another and update state
 extern SINT32 serverUpdatePlayer(const Server::PlayerStatusUpdate* const update);
 
-extern ERROR_FUNCTION*	extErrorFn;
+extern ERROR_FUNCTION	extErrorFn;
 
 static SINT32
 _recvPlayerUpdate(ACTION_OBJECT* const a)

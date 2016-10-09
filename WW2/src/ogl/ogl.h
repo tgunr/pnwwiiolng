@@ -6,7 +6,7 @@
 #include "ogl/ogldefs.h"
 #include "math/Matrixf.h"
 
-	typedef LOGICAL (*DRAW_OBJECTS)(void);
+	using DRAW_OBJECTS = LOGICAL(*)(void);
 
 	// We need version 1.3 or better
 	// Settle for 1.1 for now until Apple extensions are working

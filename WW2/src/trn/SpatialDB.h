@@ -27,7 +27,7 @@ enum SDB_Flags
 
 };
 
-typedef struct SDB_Box2D
+struct SDB_Box2D
 {
     FLOAT32 min_x, min_y, max_x, max_y;
     bool inited;
@@ -53,7 +53,7 @@ typedef struct SDB_Box2D
         min_x += dx; max_x += dx;
         min_y += dy; max_y += dy;
     }
-} SDB_Box2D;
+};
 
 void SDB_Empty_Supercell( TERRAIN_DETAIL* terrainDetail );
 

@@ -17,8 +17,8 @@ namespace StratDB
 
 class StratObject;
 
-typedef std::vector<StratObject*> StratObjList;
-typedef int (*stratDatafn)(int scx, int scy, sdm_strat_data*);
+using StratObjList = std::vector<StratObject*>;
+using stratDatafn = int(*)(int scx, int scy, sdm_strat_data*);
 
 int Init(stratDatafn);
 void Kill();
@@ -111,8 +111,8 @@ public:
 	void SetIndex(unsigned int i) { _index = i; }
 	unsigned int GetIndex() const { return _index; }
 
-typedef std::vector<StratObject*> ChildList;
-typedef std::vector<UINT32> UnitList;
+using ChildList = std::vector<StratObject*>;
+using UnitList = std::vector<UINT32>;
 
 	ChildList ChildStratObjects() const;
 

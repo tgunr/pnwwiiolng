@@ -131,8 +131,6 @@ public:
 	FacilityStruct() : CSAFE_FacilityStruct(), m_weaponEntries() {}
 	~FacilityStruct();
 
-	typedef std::map<WEAPON_SPEC, WeaponEntry*> WEAPON_ENTRIES;
-
 	enum { StratClass = CLASS_FACILITY };
 
 public:
@@ -195,8 +193,6 @@ public:
 	// Update all supply links of this facility
 	void updateSupplyLinks();
 
-	const WEAPON_ENTRIES& weaponEntries() const { return m_weaponEntries; }
-
 	// Capture Functions
 	void setCaptureDisabled();
 	void setCapturePending();
@@ -214,6 +210,9 @@ public:
 	FLOAT32 getCaptureProgress() const { return m_captureProgress; }
 
 //tolua_end
+
+	using WEAPON_ENTRIES = std::map<WEAPON_SPEC, WeaponEntry*>;
+	const WEAPON_ENTRIES& weaponEntries() const { return m_weaponEntries; }
 
 private:
 	WEAPON_ENTRIES	m_weaponEntries;

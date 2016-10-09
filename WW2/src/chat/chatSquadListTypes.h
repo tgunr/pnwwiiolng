@@ -44,7 +44,7 @@ protected:
 	friend class SquadList;
 };
 
-typedef std::unordered_map<ChatHandle,SquadMemberEntry> SQUAD_MEMBERS;
+using SQUAD_MEMBERS = std::unordered_map<ChatHandle,SquadMemberEntry>;
 
 class SquadList
 {

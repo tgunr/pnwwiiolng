@@ -51,7 +51,7 @@
 # define PATH_SEP_CHAR '\\' 
 # define PATH_SEP_WCHAR L'\\'
 
-typedef HANDLE imf_handle_t;
+using imf_handle_t = HANDLE;
 static const imf_handle_t IMF_INVALID_HANDLE = INVALID_HANDLE_VALUE;
 
 #elif defined(__APPLE__)
@@ -62,7 +62,7 @@ static const imf_handle_t IMF_INVALID_HANDLE = INVALID_HANDLE_VALUE;
 # define PATH_SEP_CHAR '/'
 # define PATH_SEP_WCHAR L'/'
 
-typedef int imf_handle_t;
+using imf_handle_t = int;
 static const imf_handle_t IMF_INVALID_HANDLE = -1;
 
 #elif defined(__GNUC__)
@@ -73,7 +73,7 @@ static const imf_handle_t IMF_INVALID_HANDLE = -1;
 # define PATH_SEP_CHAR '/'
 # define PATH_SEP_WCHAR L'/'
 
-typedef int imf_handle_t;
+using imf_handle_t = int;
 static const imf_handle_t IMF_INVALID_HANDLE = -1;
 
 #endif

@@ -59,7 +59,7 @@ namespace Teul
 
 static ENDPOINT_LIST _freeEndpoints;
 
-static ERROR_FUNCTION* _endpointErrorFn;
+static ERROR_FUNCTION _endpointErrorFn;
 
 extern void teulReleaseDatagram(struct DATA_GRAM*);
 
@@ -437,7 +437,7 @@ ENDPOINT::initialize(SINT32 i)
 // Initialize the endpoint system.
 
 void
-teulInitEndpoints(ERROR_FUNCTION* const endpointErrorFn)
+teulInitEndpoints(ERROR_FUNCTION const endpointErrorFn)
 {
 	_endpointErrorFn = endpointErrorFn;
 	_teulConnects = 0;
@@ -731,7 +731,7 @@ ENDPOINT::setSndBufferSize(UINT32 newSize)
 void
 ENDPOINT::doError(const SINT32 error, void* data)
 {
-	ERROR_FUNCTION* errorFunction = this->errorFn;
+	ERROR_FUNCTION errorFunction = this->errorFn;
 	if ( this->m_parent != nullptr && ((state() == IS_OPENING) | (errorFunction == nullptr)) )
 		errorFunction = this->m_parent->errorFn;
 

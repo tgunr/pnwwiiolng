@@ -76,4 +76,4 @@ protected:
 	UCHAR		m_visibility;
 };
 
-typedef teul_network_array<MultiCrewEntry> MULTI_CREW_LIST;
+using MULTI_CREW_LIST = teul_network_array<MultiCrewEntry>;

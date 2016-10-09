@@ -96,8 +96,8 @@ public:
 	WSAEVENT			eventObject;			// really a WSAEVENT/ HANDLE
 #endif
 
-	CONNECT_FUNCTION*	connectFn;				// Connect function.
-	ERROR_FUNCTION*		errorFn;				// Error function.
+	CONNECT_FUNCTION	connectFn;				// Connect function.
+	ERROR_FUNCTION		errorFn;				// Error function.
 
 public:
 	//! Notify our application of a connection accepted.

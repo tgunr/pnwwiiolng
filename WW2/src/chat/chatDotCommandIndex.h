@@ -14,8 +14,8 @@
 
 class DotCommand;
 
-typedef std::vector<DotCommand*> DOT_INDEX;
-typedef std::map<const std::string, const DotCommand*> DOT_ALIASES;
+using DOT_INDEX = std::vector<DotCommand*>;
+using DOT_ALIASES = std::map<const std::string, const DotCommand*>;
 
 class DotCommandIndex : public DOT_INDEX
 {

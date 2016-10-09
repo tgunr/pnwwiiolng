@@ -81,4 +81,4 @@ public:
 	std::string		m_notes;
 };
 
-typedef teul_network_object<ChatReport> CHAT_REPORT;
+using CHAT_REPORT = teul_network_object<ChatReport>;

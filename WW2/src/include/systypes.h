@@ -86,12 +86,12 @@
 
 	#define APIENTRY
 
-	typedef LOGICAL (*SYS_DDINITFUNC)(void);
-	typedef LOGICAL (*SYS_D3DINITFUNC)(void);
-	typedef LOGICAL (*SYS_DDRENDERFUNC)(void);
-	typedef LOGICAL (*SYS_D3DRENDERFUNC)(void);
-	typedef void (*SYS_DDKILLFUNC)(void);
-	typedef void (*SYS_D3DKILLFUNC)(void);
+	using SYS_DDINITFUNC = LOGICAL(*)(void);
+	using SYS_D3DINITFUNC = LOGICAL(*)(void);
+	using SYS_DDRENDERFUNC = LOGICAL(*)(void);
+	using SYS_D3DRENDERFUNC = LOGICAL(*)(void);
+	using SYS_DDKILLFUNC = void(*)(void);
+	using SYS_D3DKILLFUNC = void(*)(void);
 
 #else
 #error "platform not defined for systypes.h!"

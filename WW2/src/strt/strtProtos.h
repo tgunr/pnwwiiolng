@@ -13,8 +13,8 @@ class Supercell;
 class WeaponEntry;
 class WeaponUpdate;
 
-typedef UINT32 OBJECTTYPE;
-typedef UINT32 CP_STATUS_FLAGS;
-typedef UINT32 SCMD_ENUM;
-typedef UINT32 SCMD_RESULT;
-typedef UINT32 FALLBACK_MODE;
+using OBJECTTYPE = UINT32;
+using CP_STATUS_FLAGS = UINT32;
+using SCMD_ENUM = UINT32;
+using SCMD_RESULT = UINT32;
+using FALLBACK_MODE = UINT32;

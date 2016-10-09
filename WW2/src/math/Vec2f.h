@@ -27,7 +27,7 @@ class Vec2f
 public:
 
     /** Type of Vec class.*/
-    typedef float value_type;
+    using value_type = float;
 
     /** Number of vector components. */
     enum { num_components = 2 };

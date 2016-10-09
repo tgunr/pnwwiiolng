@@ -159,7 +159,7 @@ void physicsRemoveAllObjects(bool includeOwned)
     _objects.clear();
 }
 
-physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER* filter, void* const data)
+physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER filter, void* const data)
 {
 	if(filter)
 	{
@@ -176,7 +176,7 @@ physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER* filter, void* const data)
 	return nullptr;
 }
 
-bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER* filter, void* const data)
+bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER filter, void* const data)
 {
 	if(filter)
 	{

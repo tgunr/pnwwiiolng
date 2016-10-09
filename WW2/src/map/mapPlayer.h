@@ -31,7 +31,7 @@ namespace Server
 }
 
 #include "wwii/wwiiHash.h"
-typedef std::unordered_map<UINT64, UINT32> SORTIE_DAMAGE_HISTORY;
+using SORTIE_DAMAGE_HISTORY = std::unordered_map<UINT64, UINT32>;
 
 class FacilityStruct;
 class Brigade;

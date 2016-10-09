@@ -6491,7 +6491,7 @@ static void drawOctetDebug(TERRAIN_DETAIL*, int ox, int oy, int trinum, piVECTOR
 	trncdDTLColliderAlloc
 *************************************************************************************************/
 
-trncdDTLColliderRef trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
+trncdDTLCollider* trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
 {
 	if(td == nullptr) return nullptr;
 	if(td->trindx != SUPERCELL_OCTETS_XY)
@@ -6501,7 +6501,7 @@ trncdDTLColliderRef trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
 		piExitProgram(_FL, s);
 	}
 
-	trncdDTLColliderRef ref = (trncdDTLColliderRef)memAlloc(sizeof(trncdDTLCollider));
+	auto* ref = (trncdDTLCollider*)memAlloc(sizeof(trncdDTLCollider));
 
 	if(ref)
 	{
@@ -6530,7 +6530,7 @@ trncdDTLColliderRef trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
 	trncdDTLColliderFree
 *************************************************************************************************/
 
-void trncdDTLColliderFree(trncdDTLColliderRef ref)
+void trncdDTLColliderFree(trncdDTLCollider* ref)
 {
 	if(ref)
 		memFree(ref);

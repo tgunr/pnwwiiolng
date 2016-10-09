@@ -25,6 +25,8 @@
 
 struct JOIN_LIST;
 
+using CPSET = std::set<CPStruct*>;
+
 //tolua_begin
 
 // Maximum CPs in the strat system
@@ -67,8 +69,6 @@ struct JOIN_LIST;
 #define 	SPAWN_TIMEOUT_CONTESTED 1800
 
 #define 	FAC_OPEN_FLAG	0x80
-
-typedef std::set<CPStruct*> CPSET;
 
 //The timefactors we have
 enum STRAT_TIMEFACTOR

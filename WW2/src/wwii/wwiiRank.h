@@ -51,4 +51,4 @@ public:
 	UINT8			m_type;
 };
 
-extern void wwiiReadRanks(class DBHANDLE& dbh);
+extern void wwiiReadRanks();

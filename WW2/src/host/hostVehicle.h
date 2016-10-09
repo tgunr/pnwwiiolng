@@ -22,7 +22,7 @@ public:
 };
 
 class Viewing;
-typedef std::vector<Viewing> Viewings;
+using Viewings = std::vector<Viewing>;
 
 class HostVehicleImpl;
 struct WEAPON;

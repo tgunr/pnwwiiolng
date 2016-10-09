@@ -31,7 +31,7 @@ struct HIT_VEHICLE_NODE;
 struct WEAP_BIAS;
 struct UPDATE_LIST;
 
-typedef std::list<Player*> PLAYER_LIST;
+using PLAYER_LIST = std::list<Player*>;
 
 struct VEHICLE_HOLDER
 {

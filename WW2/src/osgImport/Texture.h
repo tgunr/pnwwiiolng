@@ -631,11 +631,11 @@ class Texture : public Referenced
                 GLint   _maxTextureSize;
                 GLint   _numTextureUnits;
 
-                typedef void (* CompressedTexImage2DArbProc) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data);
-                typedef void (* CompressedTexSubImage2DArbProc) (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid* data);
-                typedef void (* GetCompressedTexImageArbProc) (GLenum target, GLint level, GLvoid* data);
-                typedef void (* TexParameterIivProc)(GLenum target, GLenum pname, const GLint* data);
-                typedef void (* TexParameterIuivProc)(GLenum target, GLenum pname, const GLuint* data);
+                using CompressedTexImage2DArbProc = void(*)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data);
+                using CompressedTexSubImage2DArbProc = void(*)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid* data);
+                using GetCompressedTexImageArbProc = void(*)(GLenum target, GLint level, GLvoid* data);
+                using TexParameterIivProc = void(*)(GLenum target, GLenum pname, const GLint* data);
+                using TexParameterIuivProc = void(*)(GLenum target, GLenum pname, const GLuint* data);
         };
 
         /** Gets the extension for the specified context. Creates the
@@ -715,7 +715,7 @@ class Texture : public Referenced
         /** Returns -1 if* this < *rhs, 0 if* this==*rhs, 1 if* this>*rhs. */
         int compareTextureObjects(const Texture& rhs) const;
 
-        typedef buffered_value<unsigned int> TexParameterDirtyList;
+        using TexParameterDirtyList = buffered_value<unsigned int>;
         mutable TexParameterDirtyList _texParametersDirtyList;
         mutable TexParameterDirtyList _texMipmapGenerationDirtyList;
 
@@ -843,8 +843,8 @@ class Texture : public Referenced
             double      _timeStamp;
         };
 
-        typedef std::list<ref_ptr<TextureObject> > TextureObjectList;
-        typedef buffered_object<TextureObjectList> TextureObjectListMap;
+        using TextureObjectList = std::list<ref_ptr<TextureObject> >;
+        using TextureObjectListMap = buffered_object<TextureObjectList>;
 
         /** Takes the active texture objects from the Texture and places them
           * in the specified TextureObjectListMap. */
@@ -878,7 +878,7 @@ class Texture : public Referenced
 
     protected:
 
-        typedef buffered_object<ref_ptr<TextureObject> >  TextureObjectBuffer;
+        using TextureObjectBuffer = buffered_object<ref_ptr<TextureObject>>;
         mutable TextureObjectBuffer _textureObjectBuffer;
 };
 

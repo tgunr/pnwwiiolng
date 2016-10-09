@@ -64,9 +64,9 @@ namespace Teul
 				std::this_thread::yield();
 			}
 		public:
-			typedef void (*VirtualFileHandler)(SOCKET /*fd*/, const char* /*path*/, const char* /*args*/);
+			using VirtualFileHandler = void(*)(SOCKET /*fd*/, const char* /*path*/, const char* /*args*/);
 		private:
-			typedef std::unordered_map< std::string, std::pair<VirtualFileHandler /*handler*/, std::string /*description*/> > VirtualFileHandlers;
+			using VirtualFileHandlers = std::unordered_map< std::string, std::pair<VirtualFileHandler /*handler*/, std::string /*description*/> >;
 			VirtualFileHandlers m_virtualFileHandlers;
 		private:
 			std::string m_resourceList;

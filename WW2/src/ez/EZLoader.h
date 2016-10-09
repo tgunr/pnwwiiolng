@@ -34,7 +34,7 @@ public:
 	XML_TAG_HANDLER(DoBlocks);
 	XML_TAG_HANDLER(DoTurret);
 
-	typedef std::map<SINT32, EZLevel> EZ_LEVEL_MAP;
+	using EZ_LEVEL_MAP = std::map<SINT32, EZLevel>;
 
 	// levels we have loaded
 	EZ_LEVEL_MAP levels;

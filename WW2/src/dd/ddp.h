@@ -11,17 +11,17 @@
 		Constants and typedefs
 	*/
 
-	typedef LOGICAL (*DDWND_DDINITFUNC)(void);
-	typedef LOGICAL (*DDWND_D3DINITFUNC)(void);
-	typedef LOGICAL (*DDWND_DDRENDERFUNC)(void);
-	typedef LOGICAL (*DDWND_D3DRENDERFUNC)(void);
+	using DDWND_DDINITFUNC = LOGICAL(*)(void);
+	using DDWND_D3DINITFUNC = LOGICAL(*)(void);
+	using DDWND_DDRENDERFUNC = LOGICAL(*)(void);
+	using DDWND_D3DRENDERFUNC = LOGICAL(*)(void);
 
-	typedef void (*DDWND_DDKILLFUNC)(void);
-	typedef void (*DDWND_D3DKILLFUNC)(void);
+	using DDWND_DDKILLFUNC = void(*)(void);
+	using DDWND_D3DKILLFUNC = void(*)(void);
 
-	typedef void (*DDWND_MOUSEFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
-	typedef void (*DDWND_TIMERFUNC)(WPARAM wparam, LPARAM lparam);
-	typedef void (*DDWND_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
+	using DDWND_MOUSEFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
+	using DDWND_TIMERFUNC = void(*)(WPARAM wparam, LPARAM lparam);
+	using DDWND_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
 	// flags to indicate mode of operation
 	#define DDWND_FULLSCREEN    0x00000001

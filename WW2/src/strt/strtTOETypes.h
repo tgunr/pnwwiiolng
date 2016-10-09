@@ -24,13 +24,13 @@ namespace TOE_
 }
 
 // Template organization
-typedef std::map<WEAPON_SPEC, TOE_::WeaponTemplate> TOE_WEAPONS;
-typedef std::map<ChatHandle, TOE_::TemplateHeader> TOE_TEMPLATES;
+using TOE_WEAPONS = std::map<WEAPON_SPEC, TOE_::WeaponTemplate>;
+using TOE_TEMPLATES = std::map<ChatHandle, TOE_::TemplateHeader>;
 
 extern TOE_TEMPLATES toeTemplates;
 
 // Per-brigade weapon lists
-typedef std::map<WEAPON_SPEC, TOE_::WeaponInstance> TOE;
+using TOE = std::map<WEAPON_SPEC, TOE_::WeaponInstance>;
 
 extern void strtSaveTOESupplies();
 
@@ -77,7 +77,7 @@ private:
 	UINT32			m_totalCapacity;			// Sum of capacities
 
 	// Which brigades/divisions are using us?
-	typedef std::set<StratHCUnit*> SUBSCRIBERS;
+	using SUBSCRIBERS = std::set<StratHCUnit*>;
 	SUBSCRIBERS		m_subscribers;
 };
 

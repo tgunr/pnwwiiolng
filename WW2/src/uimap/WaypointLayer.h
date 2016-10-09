@@ -41,7 +41,7 @@ public:
 	virtual void RenderSuperCells(SuperCellMapView*, int scx1, int scy1, int scx2, int scy2);
 	virtual SuperCell* NewSuperCell(Renderer* r, int scx, int scy) { return 0; }
 
-	typedef std::map<ChatHandle, phui::ref_ptr<WaypointMapObject> > WaypointMap;
+	using WaypointMap = std::map<ChatHandle, phui::ref_ptr<WaypointMapObject>>;
 	WaypointMap _waypoints;
 	int _waypointtexid ,_contacttexid, _markertexid;
 

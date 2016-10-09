@@ -13,7 +13,7 @@
 
 class Matrixf;
 
-typedef LOGICAL (*USERDRAWFUNC)(LOGICAL IsBeforeStage);
+using USERDRAWFUNC = LOGICAL(*)(LOGICAL IsBeforeStage);
 
 extern void obdrawWireframeObject(OBJECT* lpobj, UINT32 color);
 extern void obdrawObjectBoundingBox(OBJECT* lpobj, UINT32 color);

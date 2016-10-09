@@ -43,16 +43,16 @@ namespace ModelTypes
 
 namespace	ogl{class StaticBuffer;}
 
-typedef std::vector<MATERIAL> MODELMATERIALS;
+using MODELMATERIALS = std::vector<MATERIAL>;
 inline bool operator == (const MATERIAL &a, const MATERIAL &b) { return !memcmp(&a, &b, sizeof(MATERIAL)); }
 
-typedef std::map<std::string, PoolModel*> PoolMap;
-typedef struct
+using PoolMap = std::map<std::string, PoolModel*>;
+struct SubModelReference
 {
 	PoolModel*	poolModel;
 	piMATRIX	transform;
 	bool		placeOntoMasterObject;
-}SubModelReference;
+};
 
 struct PoolNode;
 struct POOLOBJHDR;
@@ -109,7 +109,7 @@ struct PoolNode
 
 class oglVertexBuffer;
 
-typedef std::set<std::string> TextureRefSet;
+using TextureRefSet = std::set<std::string>;
 
 // the "pool model object"
 struct PoolModel

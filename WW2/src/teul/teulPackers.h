@@ -280,14 +280,14 @@ namespace Teul
 template<typename _Type>
 struct Packer
 {
-	typedef	_Type valuetype;
-	typedef Packer<valuetype> selftype;
+	using value_type = _Type;
+	using self_type = Packer<value_type>;
 
-	valuetype m_value;
+	value_type m_value;
 
-	operator valuetype () const { return m_value; }
-	const valuetype& operator()() const { return m_value; }
-	valuetype& operator()() { return m_value; }
+	operator value_type () const { return m_value; }
+	const value_type& operator()() const { return m_value; }
+	value_type& operator()() { return m_value; }
 
 	//! Pack or unpack data.
 	//! @param[in]	mode		TEUL_PACK / TEUL_UNPACK

@@ -139,7 +139,7 @@ struct mlBuoyancyData
 
 struct fpPersonData;
 
-typedef struct mlVehicleData
+struct mlVehicleData
 {
 	UCHAR 	VehicleName[80];
 	UCHAR 	VehicleObjectName[80];
@@ -490,7 +490,7 @@ typedef struct mlVehicleData
 	FLOAT32 StaticFrictionMod;
 	FLOAT32 DynamicFrictionMod;
 
-} *mlVehicleRef;
+};
 
 extern UINT32 mlInit(void);
 extern UINT32 mlUpdate(mlVehicleData * VehicleData,OBJECT * VehicleObject);

@@ -112,7 +112,7 @@ struct TutorialHandler
 
 	struct HandlerLocation
 	{
-		typedef std::vector<Vec3d> COORDINATES;
+		using COORDINATES = std::vector<Vec3d>;
 
 		COORDINATES coords; // our world positions
 		float d;			// location radius or buffer
@@ -150,10 +150,10 @@ struct TutorialHandler
 	HandlerData data;
 }; // tolua_export
 
-typedef std::map<std::string,TutorialHandler> TutorialHandlerMap;
-typedef std::map<std::string,int> TutorialTimerMap;
-typedef std::map<std::string,UINT64> TutorialCompletionMap;
-typedef std::vector<std::string> TutorialHandlerGarbage;
+using TutorialHandlerMap = std::map<std::string,TutorialHandler>;
+using TutorialTimerMap = std::map<std::string,int>;
+using TutorialCompletionMap = std::map<std::string,UINT64>;
+using TutorialHandlerGarbage = std::vector<std::string>;
 
 /************************************************************************************************
 	TutorialManager

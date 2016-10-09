@@ -145,7 +145,7 @@ struct mlObjectData
 	static void Release(mlObjectData* object);
 };
 
-typedef void (*mlForEachCallback)(struct OBJECT*, void*);
+using mlForEachCallback = void(*)(struct OBJECT*, void*);
 struct vehVehicle;
 struct vehType;
 

@@ -56,7 +56,7 @@ public:
 
 //tolua_end
 public:
-	typedef std::vector<const ObjectStruct*> PORTALS;
+	using PORTALS = std::vector<const ObjectStruct*>;
 	const PORTALS& portals() const { return m_portals; }
 
 protected:

@@ -194,7 +194,7 @@ extern int vehtypeInit();
 extern int vehtypeKill();
 
 struct _xmlNode;
-typedef void (*vehTypeXMLHandler)(vehType*, _xmlNode*);
+using vehTypeXMLHandler = void(*)(vehType*, _xmlNode*);
 
 extern void vehTypeRegisterXMLHandler(const char* xmlTag, vehTypeXMLHandler);
 

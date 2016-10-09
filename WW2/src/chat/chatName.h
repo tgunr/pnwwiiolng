@@ -117,8 +117,8 @@ namespace Chat
 		template<typename... Args> int format(const value_type* format, Args...);
 	};
 
-	typedef BasicName<char> Name;
-	typedef BasicName<wchar_t> NameW;
+	using Name = BasicName<char>;
+	using NameW = BasicName<wchar_t>;
 
 	template<> inline bool BasicName<char>::operator == (const char* rhs) const { return strcmp(m_name, rhs) == 0; }
 	template<> inline bool BasicName<char>::operator == (const BasicName<char>& rhs) const { return strcmp(m_name, rhs.m_name) == 0; }

@@ -12,4 +12,4 @@
 #include "teul/teulNetworkArray.h"
 #include "chat/chatWho.h"
 
-typedef teul_network_array<Chat::Who> CHAT_WHO_LIST;
+using CHAT_WHO_LIST = teul_network_array<Chat::Who>;

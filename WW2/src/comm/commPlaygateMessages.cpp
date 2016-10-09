@@ -223,8 +223,8 @@ TEUL_CALLBACK*
 commInstallMessage(
 	UCHAR MessageGroup
 	, UCHAR MessageNumber
-	, ACTION_REF SendFunc
-	, ACTION_REF ReceiveFunc
+	, ACTION SendFunc
+	, ACTION ReceiveFunc
 	)
 {
 	Teul::CallbackInit ci;
@@ -235,7 +235,7 @@ commInstallMessage(
 	ci.recvAction    = ReceiveFunc;
 	ci.error         = _callbackError;
 
-	return (teulAllocCallback(&ci));
+	return teulAllocCallback(&ci);
 }
 
 //////////////////////////////////////////////////////////////////////

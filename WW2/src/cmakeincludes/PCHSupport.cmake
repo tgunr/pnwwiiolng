@@ -25,40 +25,42 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
             ${TOLUAPP_LIBRARIES}
 			${PCHSourceDir}/${PCHSourceFile}
 			hostproj/${_LUA_HOST}.pkg
-			hostproj/hostversion.h
-			include/platforms.h
-			inst/instDescriptor.h
-			wwii/wwiiPlayer.h
-			server/serverIndexes.h
-			wwii/wwiiIRC.h
-			server/serverPeers.h
-			wwii/wwiiServerTypeEnums.h
-			teul/teulConfigVar.h
-			include/precompile_includes.h
-			sys/sysWinISO.h
-			include/systypes.h
-			include/defs.h
-			dbug/dbug.h
-			dbug/dbugExtErrors.h
-			wwii/wwiiHash.h
 			chat/chatHandle.h
-			wwii/wwiiOwnershipEnums.h
-			wwii/wwiiTypes.h
-			wwii/wwiiBranchEnums.h
-			teul/teulTime.h
-			teul/teulClosingEnums.h
-			teul/teulKit.h
-			teul/teulBasic.h
-			teul/teulPackers.h
-			wwii/wwiiFullObjID.h
-			weap/weapSpec.h
-			wwii/wwiiPermissions.h
-			inst/instTypes.h
-			teul/teulPacket.h
-			weap/weapWeapon.h
-			teul/teulEndpoint.h
 			chat/chatLStringIDs.h
+			dbug/dbugExtErrors.h
+			dbug/dbug.h
+			hostproj/hostversion.h
+			include/defs.h
+			include/platforms.h
+			include/precompile_includes.h
+			include/systypes.h
+			inst/instDescriptor.h
+			inst/instTypes.h
+			server/serverIndexes.h
+			server/serverPeers.h
 			str/stringLib.h
+			strt/strtCPStruct.h
+			strt/strtFacilityStruct.h
+			sys/sysWinISO.h
+			teul/teulBasic.h
+			teul/teulClosingEnums.h
+			teul/teulConfigVar.h
+			teul/teulEndpoint.h
+			teul/teulKit.h
+			teul/teulPackers.h
+			teul/teulPacket.h
+			teul/teulTime.h
+			weap/weapSpec.h
+			weap/weapWeapon.h
+			wwii/wwiiBranchEnums.h
+			wwii/wwiiFullObjID.h
+			wwii/wwiiHash.h
+			wwii/wwiiIRC.h
+			wwii/wwiiOwnershipEnums.h
+			wwii/wwiiPermissions.h
+			wwii/wwiiPlayer.h
+			wwii/wwiiServerTypeEnums.h
+			wwii/wwiiTypes.h
 	)
 ENDIF( )
 

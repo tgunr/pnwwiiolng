@@ -34,8 +34,8 @@ static const TeulTimeMS LoginInterval_ms = 5 * 60 * 1000;
 static SINT32 _authConnection;
 static UINT32 _thisVersion;
 
-static PLAYER_ACCEPT_FUNCTION* _playerAcceptFn = nullptr;
-static PLAYER_RELEASE_FUNCTION* _playerReleaseFn = nullptr;
+static PLAYER_ACCEPT_FUNCTION _playerAcceptFn = nullptr;
+static PLAYER_RELEASE_FUNCTION _playerReleaseFn = nullptr;
 
 static LOGICAL _authIsOpen;
 
@@ -47,7 +47,7 @@ static OTPS _custOtps;
 // OTPs that haven't logged in yet.
 static std::vector<OTP_NODE*> _pendingOtps;
 
-static ERROR_FUNCTION* _externalErrorFn;
+static ERROR_FUNCTION _externalErrorFn;
 
 static LOGICAL _authInited = FALSE;
 
@@ -94,8 +94,8 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 				, APID appID, UINT32 appVersion
 				, UINT32 hostVersion
 				, UINT32 maxUsers
-				, PLAYER_ACCEPT_FUNCTION* acceptFn
-				, ERROR_FUNCTION* externErrorFn)
+				, PLAYER_ACCEPT_FUNCTION acceptFn
+				, ERROR_FUNCTION externErrorFn)
 {
 	SINT32 retval;
 
@@ -311,9 +311,9 @@ authValidatePlayer(const UINT32 ipAddress, PLAYER_LOGIN& login, Auth::Dispatch& 
 
 SINT32
 authInitAccept(UINT32 appVersion
-				, PLAYER_ACCEPT_FUNCTION* loginAcceptFn
-				, PLAYER_RELEASE_FUNCTION* releaseFn
-				, ERROR_FUNCTION* externErrorFn)
+				, PLAYER_ACCEPT_FUNCTION loginAcceptFn
+				, PLAYER_RELEASE_FUNCTION releaseFn
+				, ERROR_FUNCTION externErrorFn)
 {
 	_playerAcceptFn = loginAcceptFn;
 	_playerReleaseFn = releaseFn;

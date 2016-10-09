@@ -49,7 +49,7 @@ public:
 	bool isHidden() const;
 };
 
-typedef std::vector<const char*> ARGV;	//!< Vector of arguments.
+using ARGV = std::vector<const char*>;	//!< Vector of arguments.
 
 //////////////////////////////////////////////////////////////////////
 //! DotCommand class. Encapsulates a constructor which defines the

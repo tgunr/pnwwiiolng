@@ -22,8 +22,8 @@ public:
 	}
 
 public:
-	typedef std::map<ChatHandle,UINT32> COUNTS;
-	typedef std::map<ChatHandle,ChatHandle> VOTES;
+	using COUNTS = std::map<ChatHandle,UINT32>;
+	using VOTES = std::map<ChatHandle,ChatHandle>;
 
 private:
 	void startVote();

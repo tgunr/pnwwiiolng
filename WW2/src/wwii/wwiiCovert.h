@@ -122,8 +122,8 @@ class Covert
 #endif
 
 public:
-	typedef Tp value_type;
-	typedef Covert<value_type> self_type;
+	using value_type = Tp;
+	using self_type = Covert<value_type>;
 
 #ifdef RELOCATING_COVERT
 	UINT64& Deref() noexcept { return *m_data; }

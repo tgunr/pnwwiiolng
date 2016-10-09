@@ -11,4 +11,4 @@
 #include "teul/teulNetworkArray.h"			// For teul_network_array
 #include "wwii/wwiiSquads.h"				// For Recruiter
 
-typedef teul_network_array<Recruiter> RECRUITER_LIST;
+using RECRUITER_LIST = teul_network_array<Recruiter>;

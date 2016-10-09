@@ -65,7 +65,7 @@ strtInitDB()
 		dbugLog(_FLA, "No configuration from database");
 
 #ifdef IS_STRAT_HOST
-	wwiiReadRanks(dbh);
+	wwiiReadRanks();
 
 	strtInitializeVehicleAccessLevels();
 #endif

@@ -23,8 +23,8 @@
 
 #define MAX_DAMAGE_SOUND_QUE 64
 
-typedef bool (*ExternalCameraAdjust)(piVECTOR*, piVECTOR*);
-typedef bool (*ExternalCameraPivot)(piVECTOR*, piMATRIX*);
+using ExternalCameraAdjust = bool(*)(piVECTOR*, piVECTOR*);
+using ExternalCameraPivot = bool(*)(piVECTOR*, piMATRIX*);
 
 struct persPositionDataElement {
 	UINT32	ordnanceNum;

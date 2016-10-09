@@ -14,8 +14,8 @@
 
 class Mission;
 class CPStruct;
-typedef std::vector<Mission*> BrigadeMissions;
-typedef std::map<UINT32,UINT64> BRIGADE_MOVEMENTS;
+using BrigadeMissions = std::vector<Mission*>;
+using BRIGADE_MOVEMENTS = std::map<UINT32,UINT64>;
 extern BRIGADE_MOVEMENTS brigadeMovements;
 extern UINT64 lastBrigadeMovement;				// How many times brigades have been moved
 
@@ -71,7 +71,7 @@ public:
 	CPStruct*		m_objective;
 };
 
-typedef std::set<Brigade*> BRIGADES;
+using BRIGADES = std::set<Brigade*>;
 
 extern BRIGADES g_brigades[MAX_COUNTRIES][MAX_BRANCHES];
 

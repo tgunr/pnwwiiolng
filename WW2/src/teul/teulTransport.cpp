@@ -36,8 +36,8 @@
 	#include <ws2tcpip.h>
 #endif
 
-extern SINT32 teulModStartup(ERROR_FUNCTION*);
-extern SINT32 teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION* connectFn, ERROR_FUNCTION* errorFn);
+extern SINT32 teulModStartup(ERROR_FUNCTION);
+extern SINT32 teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn);
 
 SCHAR* teulModuleName;
 SCHAR* teulAppName;
@@ -169,10 +169,10 @@ teulGetPersonaData(const SINT32 teulIndex)
 SINT32
 _openListen(const UINT32 ipAddress
 			, const UINT16 portNumber
-			, CONNECT_FUNCTION* acceptFnPtr
+			, CONNECT_FUNCTION acceptFnPtr
 			, const SINT32 timeout
 			, const PROTOCOL protocol
-			, ERROR_FUNCTION* errorFnPtr
+			, ERROR_FUNCTION errorFnPtr
 			)
 {
 	SINT32 retval;
@@ -207,10 +207,10 @@ _openListen(const UINT32 ipAddress
 // called when a connection is made to the listening socket, and hence a new
 // connection is created.  pass nullptr if you do not want this notification
 SINT32 teulOpenListen(const UINT16 portNumber
-					, CONNECT_FUNCTION* acceptFnPtr
+					, CONNECT_FUNCTION acceptFnPtr
 					, const SINT32 timeout
 					, const PROTOCOL protocol
-					, ERROR_FUNCTION* errorFnPtr
+					, ERROR_FUNCTION errorFnPtr
 					)
 {
 	if (PN_UNLIKELY(_transportClosing))
@@ -234,9 +234,9 @@ SINT32 teulOpenListen(const UINT16 portNumber
 // called when a connection is made to the listening socket, and hence a new
 // connection is created.  pass nullptr if you do not want this notification
 bool teulOpenListenInterface(const UINT16 portNumber
-					, CONNECT_FUNCTION* acceptFnPtr
+					, CONNECT_FUNCTION acceptFnPtr
 					, const SINT32 timeout
-					, ERROR_FUNCTION* errorFnPtr
+					, ERROR_FUNCTION errorFnPtr
 					)
 {
 	if (PN_UNLIKELY(_transportClosing))
@@ -269,10 +269,10 @@ bool teulOpenListenInterface(const UINT16 portNumber
 // connection is created.  pass nullptr if you do not want this notification
 SINT32 teulOpenListenHost(const UINT32 ipAddress
 					, const UINT16 portNumber
-					, CONNECT_FUNCTION* acceptFnPtr
+					, CONNECT_FUNCTION acceptFnPtr
 					, const SINT32 timeout
 					, const PROTOCOL protocol
-					, ERROR_FUNCTION* errorFnPtr
+					, ERROR_FUNCTION errorFnPtr
 					)
 {
 	if (PN_UNLIKELY(_transportClosing))
@@ -322,10 +322,10 @@ teulMaskNetworkAddress(UINT32 address)
 SINT32
 teulOpenSend(UINT32 host
 			, const UINT16 portNumber
-			, CONNECT_FUNCTION* connectFnPtr
+			, CONNECT_FUNCTION connectFnPtr
 			, const SINT32 timeout
 			, const PROTOCOL protocol
-			, ERROR_FUNCTION* errorFnPtr)
+			, ERROR_FUNCTION errorFnPtr)
 {
 	if (PN_UNLIKELY(_transportClosing))
 		return -EDEADLK;
@@ -429,7 +429,7 @@ _initializeLibEvent()
 SINT32
 teulInitTransport(LogMode logType
 					, const char* name
-					, ERROR_FUNCTION* errorFnPtr
+					, ERROR_FUNCTION errorFnPtr
 					, void (*killFnPtr)(int)
 					, Teul::LoggingFn const logFnPtr)
 {

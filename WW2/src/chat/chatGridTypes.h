@@ -14,10 +14,10 @@
 class Player;
 class ServerTrackedObject;
 
-typedef std::set<class ServerSTO*> STOS;
-typedef std::vector<ServerSTO*> STO_BATCH;
+using STOS = std::set<class ServerSTO*>;
+using STO_BATCH = std::vector<ServerSTO*>;
 
-typedef std::vector<const PLAYERS*> PLAYERS_ARRAY;
+using PLAYERS_ARRAY = std::vector<const PLAYERS*>;
 
 class STOBatch
 {

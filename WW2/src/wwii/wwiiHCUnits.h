@@ -17,7 +17,7 @@
 #include "chat/chatHandle.h"
 
 class HCUnit;
-typedef std::map<UINT32,HCUnit*> HCUNIT_INDEX;
+using HCUNIT_INDEX = std::map<UINT32,HCUnit*>;
 
 //tolua_begin
 enum HCUNIT_TYPE

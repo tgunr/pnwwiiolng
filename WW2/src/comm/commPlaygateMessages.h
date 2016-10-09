@@ -8,8 +8,8 @@ bool commInit(void);
 // Install a particular callback.
 TEUL_CALLBACK* commInstallMessage(UCHAR MessageGroup,
                                             UCHAR MessageNumber,
-                                            ACTION* SendFunc,
-                                            ACTION* ReceiveFunc);
+                                            ACTION SendFunc,
+                                            ACTION ReceiveFunc);
 // Process network updates
 bool commUpdate(void);
 // Shutdown teulKit.

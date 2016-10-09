@@ -37,7 +37,7 @@ namespace Scoring
 	//! @brief Un-attributed Event comprising event type and instance.
 	class EventBase
 	{
-	public:	typedef Scoring::Actor LhsType;
+	public:	using LhsType = Scoring::Actor;
 	public:	EventBase() : m_type(Events::Invalid), m_lhs() {}
 	public: EventBase(const Events::Type type_, const LhsType& lhs_)
 				: m_type(type_), m_lhs(lhs_)
@@ -60,8 +60,8 @@ namespace Scoring
 	template<typename RhsType_>
 	class Event : public EventBase
 	{
-	public: typedef RhsType_ RhsType;
-	public: typedef Event<RhsType> SelfType;
+	public: using RhsType = RhsType_;
+	public: using SelfType = Event<RhsType>;
 
 	public:
 		//! Default constructor.
@@ -93,9 +93,9 @@ namespace Scoring
 	class name_ : public Scoring::Event<RhsType_> \
 	{ \
 	public:	static const Scoring::Events::Type Type = Events :: name_; \
-	public: typedef Scoring::Actor LhsType; \
-	public: typedef RhsType_ RhsType; \
-	public: typedef Scoring::Event<RhsType> EventType; \
+	public: using LhsType = Scoring::Actor; \
+	public: using RhsType = RhsType_; \
+	public: using EventType = Scoring::Event<RhsType>; \
 	public: bool process(Player* const player);
 
 #define END_SCORING_EVENT( )	};

@@ -588,8 +588,8 @@ public:
 		FPS = 1
 	};
 
-	typedef std::vector<int> BLEND_STATES;
-	typedef std::vector<FLOAT32> BLEND_WEIGHTS;
+	using BLEND_STATES = std::vector<int>;
+	using BLEND_WEIGHTS = std::vector<FLOAT32>;
 
 	bool selected;
 	bool modified; // have we been modified?

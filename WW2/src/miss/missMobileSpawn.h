@@ -39,7 +39,7 @@ public:
 	UINT32				m_vehicleID;		//!< ID of vehicle we are attached to or 0.
 
 private:
-	typedef std::unordered_map<UINT32, UINT32> SPAWNEES;
+	using SPAWNEES = std::unordered_map<UINT32, UINT32>;
 	mutable SPAWNEES	m_spawnees;
 };
 

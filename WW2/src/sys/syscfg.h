@@ -21,15 +21,15 @@
 #undef PostMessage
 
 // Project defines - Non-Specific
-typedef LOGICAL(*SYS_DDINITFUNC)(void);
-typedef LOGICAL(*SYS_D3DINITFUNC)(void);
-typedef LOGICAL(*SYS_DDRENDERFUNC)(void);
-typedef LOGICAL(*SYS_D3DRENDERFUNC)(void);
-typedef void(*SYS_DDKILLFUNC)(void);
-typedef void(*SYS_D3DKILLFUNC)(void);
-typedef void(*SYS_MOUSEFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
-typedef void(*SYS_TIMERFUNC)(WPARAM wparam, LPARAM lparam);
-typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
+using SYS_DDINITFUNC = LOGICAL(*)(void);
+using SYS_D3DINITFUNC = LOGICAL(*)(void);
+using SYS_DDRENDERFUNC = LOGICAL(*)(void);
+using SYS_D3DRENDERFUNC = LOGICAL(*)(void);
+using SYS_DDKILLFUNC = void(*)(void);
+using SYS_D3DKILLFUNC = void(*)(void);
+using SYS_MOUSEFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
+using SYS_TIMERFUNC = void(*)(WPARAM wparam, LPARAM lparam);
+using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #define MAXENUMDRIVERS		32
 #define MAXMIPLEVELS		12

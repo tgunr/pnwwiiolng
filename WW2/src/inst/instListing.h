@@ -63,7 +63,7 @@ namespace Instance
 	public:
 
 		// expose this so we can use the begin and end calls without warnings
-		typedef std::vector<Instance::ClientStatus> Results;
+		using Results = std::vector<Instance::ClientStatus>;
 
 		////// Ctor/Dtor
 		Listing() : m_results(), m_requestID(0), m_result(_BAD_DATA), m_complete(false) {}

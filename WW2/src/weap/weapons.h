@@ -38,7 +38,7 @@ enum
 };
 
 
-typedef void (*WEAP_FIRE_CALLBACK)(struct weapWeapon * Weapon);
+using WEAP_FIRE_CALLBACK = void(*)(struct weapWeapon * Weapon);
 
 struct weapWeapon
 {

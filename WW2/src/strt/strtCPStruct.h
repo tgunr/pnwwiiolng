@@ -20,17 +20,17 @@ class EWSReport;
 struct WEAPON_SERIAL;
 class StratHCUnit;
 
-typedef HCUNIT_INDEX::iterator HCUIDX_ITERATOR;
-
-//tolua_begin
+using HCUIDX_ITERATOR = HCUNIT_INDEX::iterator;
 
 // Unit describing a player's request: <PlayerID,TimeStamp>
-typedef std::pair<UINT32,UINT32> PLAYER_REQUESTS;
+using PLAYER_REQUESTS = std::pair<UINT32,UINT32>;
 // This would be a queue if they weren't bugged under rh6
-typedef std::vector<UINT32> OVERRUNS;
-typedef std::map<UINT32,EWSReport*> EWSREPORTS;
-typedef std::vector<PLAYER_REQUESTS> HISTORY;
-typedef std::map<Brigade*,UINT32> ACTIVE_BRIGADES;
+using OVERRUNS = std::vector<UINT32>;
+using EWSREPORTS = std::map<UINT32,EWSReport*>;
+using HISTORY = std::vector<PLAYER_REQUESTS>;
+using ACTIVE_BRIGADES = std::map<Brigade*,UINT32>;
+
+//tolua_begin
 
 // External data structures
 extern const UINT32 attackFlags[MAX_SIDES];
@@ -290,12 +290,13 @@ public:
 	// Check and update the friendly link status
 	void updateFriendlyLinkStatus();
 
-public:
-	typedef std::set<LinkStruct*> LINKS;
+//tolua_end
+	using LINKS = std::set<LinkStruct*>;
 
 public:
 	LINKS				m_links;
 
+//tolua_begin
 	// Cached responses for .own messages for various sides;
 	std::string 		ownMessage[MAX_SIDES];
 

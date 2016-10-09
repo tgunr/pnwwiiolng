@@ -62,4 +62,4 @@ private:
 											// >0 to indicate squad creation rank
 };
 
-typedef teul_network_object<SquadMsg> SQUAD_MSG;
+using SQUAD_MSG = teul_network_object<SquadMsg>;

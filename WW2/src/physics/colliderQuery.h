@@ -51,7 +51,7 @@ public:
 		void sortByDepthAndGeom();
 	};
 
-	typedef std::vector<dGeomID> dGeomList;
+	using dGeomList = std::vector<dGeomID>;
 
 	colliderQuery::CollisionList& getCollisions(bool sorted = true); // all contacts
 	bool getCollisions(CollisionList&) const;

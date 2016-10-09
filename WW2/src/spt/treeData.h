@@ -24,7 +24,7 @@
 
 class CTree;
 
-typedef struct TreeData
+struct TreeData
 {
     std::string name;
 
@@ -41,8 +41,7 @@ typedef struct TreeData
         nearlod = 0;
         farlod = 0;
     }
-
-} TreeData;
+};
 
 struct Tree
 {

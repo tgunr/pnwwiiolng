@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-typedef std::vector<const char*> ARGV;
+using ARGV = std::vector<const char*>;
 
 // Fetch the friends list for a player in the background
 void chatFetchFriendsAndIgnoreList(class Player* player);

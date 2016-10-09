@@ -66,7 +66,7 @@ static std::mutex logQueueMutex;
 static ConditionQueue<DBThreadQuery> dbQueue;
 DBQueueThread dbThread[NUM_HELPER_THREADS];
 
-using CALLBACK_INFO = std::pair<THREAD_CALLBACK*, void*>;
+using CALLBACK_INFO = std::pair<THREAD_CALLBACK, void*>;
 using CALLBACK_QUEUE = std::vector<CALLBACK_INFO*>;
 static CALLBACK_QUEUE callbackQueue;
 static size_t cbQueueMax, cbQueuePushes;
@@ -347,7 +347,7 @@ DBThread::EscapeString(std::string& text)
 // Add a callback to be invoked inside the main thread
 
 void
-threadCallback(THREAD_CALLBACK* fn, void* param)
+threadCallback(THREAD_CALLBACK fn, void* param)
 {
 	std::lock_guard<std::mutex> lock(callbackQueueMutex);
 	callbackQueue.push_back(new CALLBACK_INFO(fn, param));

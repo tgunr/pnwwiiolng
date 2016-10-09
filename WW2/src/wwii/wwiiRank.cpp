@@ -102,7 +102,7 @@ Rank::setSize(size_t num)
 // so that we can build a complete tree in a single pass.
 
 void
-wwiiReadRanks(DBHANDLE& dbh)
+wwiiReadRanks()
 {
 	try
 	{

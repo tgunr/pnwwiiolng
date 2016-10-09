@@ -23,7 +23,7 @@ namespace Teul
 
 		ACTION_FN	sendAction;		//! Function for sending data or NULL.
 		ACTION_FN	recvAction;		//! Function for receiving data or NULL.
-		ERROR_FUNCTION* error;	//! Error function.
+		ERROR_FUNCTION error;	//! Error function.
 
 		UCHAR		callX;			//! X position in the callback matrix.
 		UCHAR		callY;			//! Y position in the callback matrix.

@@ -292,7 +292,7 @@ void chatInitDB()
 			throw std::runtime_error("database connection failed");
 
 		wwiiReadHCUnits();
-		wwiiReadRanks(dbh);
+		wwiiReadRanks();
 
 		_readPermissionNames();
 		chatdbLoadStratData();

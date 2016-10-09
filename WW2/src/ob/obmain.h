@@ -135,26 +135,26 @@ struct LISTHEADER;
 #define DOF_ONE_TRANS_AXIS				0x00000200	// at least one tranlation axis
 #define DOF_FREE_MEMORY					0x00000400  // new HACK to stop leak
 
-typedef LOGICAL (*DeprecatedDrawCallback)(struct OBJECT* lpobj);
-typedef LOGICAL (*PROCESSCALLBACK)(struct OBJECT* lplod, UINT32 user);
-typedef LOGICAL (*FINDCALLBACK)(struct OBJECT* lplod, void* userdata);
+using DeprecatedDrawCallback = LOGICAL(*)(struct OBJECT* lpobj);
+using PROCESSCALLBACK = LOGICAL(*)(struct OBJECT* lplod, UINT32 user);
+using FINDCALLBACK = LOGICAL(*)(struct OBJECT* lplod, void* userdata);
 
-typedef bool (*CullCallback)(struct OBJECT* o);
-typedef bool (*UpdateCallback)(struct OBJECT* o);
-typedef bool (*DrawCallback)(struct OBJECT* o);
-typedef bool (*KillCallback)(struct OBJECT* o);
+using CullCallback = bool(*)(struct OBJECT* o);
+using UpdateCallback = bool(*)(struct OBJECT* o);
+using DrawCallback = bool(*)(struct OBJECT* o);
+using KillCallback = bool(*)(struct OBJECT* o);
 
 #ifdef __cplusplus
 
 #include "ob/stride_ptr.h"
 
 // "smart" strided pointers
-typedef stride_ptr<piVECTOR> 				piVectorPtr;
-typedef stride_ptr<piVECTOR const> 			piVectorConstPtr;
-typedef stride_ptr<piVERTEX_COLOR> 			piVertexColorPtr;
-typedef stride_ptr<piVERTEX_COLOR const> 	piVertexColorConstPtr;
-typedef stride_ptr<piUV> 					piTexCoordPtr;
-typedef stride_ptr<piUV const> 				piTexCoordConstPtr;
+using piVectorPtr = stride_ptr<piVECTOR>;
+using piVectorConstPtr = stride_ptr<piVECTOR const>;
+using piVertexColorPtr = stride_ptr<piVERTEX_COLOR>;
+using piVertexColorConstPtr = stride_ptr<piVERTEX_COLOR const>;
+using piTexCoordPtr = stride_ptr<piUV>;
+using piTexCoordConstPtr = stride_ptr<piUV const>;
 
 struct piStridedVertexConstPtr
 {
@@ -231,7 +231,7 @@ namespace ogl	{class MeshContext;}
 
 struct OBJECT
 {
-	typedef	char	Name[64];
+	using Name = char[64];
 
 	struct OBJECT*	prev;			// Previous object in list
 	struct OBJECT*	next;			// Next object in list
@@ -411,9 +411,9 @@ struct OBJECT
 #endif
 };
 
-typedef OBJECT DOFOBJECT;
-typedef OBJECT LODOBJECT;
-typedef OBJECT GROUPOBJECT;
+using DOFOBJECT = OBJECT;
+using LODOBJECT = OBJECT;
+using GROUPOBJECT = OBJECT;
 
 extern struct OBJECT* obmainGetNewObject();
 extern struct OBJECT* obmainGetNewNotObject(UINT32 obtype);

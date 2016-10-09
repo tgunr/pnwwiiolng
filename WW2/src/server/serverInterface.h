@@ -14,8 +14,8 @@ class wwiiPlayer;
 class Player;
 
 // Map of players by ID
-typedef std::unordered_map<playerid_t /*playerID*/, class PlayerStatusNode*> PLAYERID_HASH;
-typedef std::map<UINT32 /*teulIndex*/, class PlayerStatusNode*> PLAYERIDX_MAP;
+using PLAYERID_HASH = std::unordered_map<playerid_t /*playerID*/, class PlayerStatusNode*>;
+using PLAYERIDX_MAP = std::map<UINT32 /*teulIndex*/, class PlayerStatusNode*>;
 
 class ServerInterface
 {

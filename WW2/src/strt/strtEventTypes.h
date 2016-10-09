@@ -59,7 +59,7 @@ public:
 class EventPacket
 {
 private:
-	typedef WWII::inplace_vector<Strat::Event, Strat::Event::MaxPerPacket> Events;
+	using Events = WWII::inplace_vector<Strat::Event, Strat::Event::MaxPerPacket>;
 	Events m_events;
 
 public:

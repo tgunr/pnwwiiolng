@@ -35,5 +35,5 @@ struct MobileSpawnWaypoint
 	UINT32		m_reason;					// MSPAWN_RESULT code.
 };
 
-typedef teul_network_object<MobileSpawnWaypoint> MOBILE_SPAWN_WAYPOINT;
+using MOBILE_SPAWN_WAYPOINT = teul_network_object<MobileSpawnWaypoint>;
 

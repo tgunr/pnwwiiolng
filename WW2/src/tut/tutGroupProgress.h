@@ -41,7 +41,7 @@ namespace Tutorial
 namespace Tutorial
 {
 	// For the host
-	typedef std::vector<GroupProgress> GroupProgressBatch;
+	using GroupProgressBatch = std::vector<GroupProgress>;
 }
 
 namespace Map

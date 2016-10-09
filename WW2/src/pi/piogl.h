@@ -748,7 +748,7 @@ struct piUNIFIED_VERTEX
 	UINT32		color;
 	FLOAT32		tu, tv;
 };
-typedef struct piUNIFIED_VERTEX piCVERTEX;
+using piCVERTEX = piUNIFIED_VERTEX;
 
 struct piGVERTEX
 {
@@ -934,10 +934,10 @@ struct piSURFACEDESC
 	piPIXELFORMAT	PixelFormat;	// pixel format description of the surface
 };
 
-typedef UINT32 piMATERIALHANDLE;
-typedef UINT32 piTEXTUREHANDLE;
+using piMATERIALHANDLE = UINT32;
+using piTEXTUREHANDLE = UINT32;
 
-typedef UINT32 piCOLOR;
+using piCOLOR = UINT32;
 
 #define piRGBA_GETALPHA(rgb)		(((rgb) >> 24) & 0xff)
 #define piRGBA_GETRED(rgb)			(((rgb) >> 0) & 0xff)
@@ -1302,7 +1302,7 @@ struct piSTRIDEDDATA
 };
 
 
-typedef LOGICAL (*piDRAW_OBJECTS)(void);
+using piDRAW_OBJECTS = LOGICAL(*)(void);
 
 #define piLIGHTING_DEFAULT			1
 
