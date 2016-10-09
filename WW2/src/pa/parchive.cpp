@@ -30,14 +30,14 @@
 #define PA_TOC_SIZE 8192
 #define PA_MAX_ARC 64
 
-typedef struct
+struct parcHead
 {
 	int magic;
 	int version;
 	unsigned char md5[16];
-} parcHead;
+};
 
-typedef struct
+struct paMemberHead
 {
 	char name[PA_MAX_NAME+1];
 	unsigned int filelen;
@@ -46,16 +46,16 @@ typedef struct
 	unsigned int flags;
 	unsigned int seed;
 	unsigned char md5[16];
-} paMemberHead;
+};
 
-typedef struct
+struct parc
 {
 	FILE* f;
 	char name[PA_MAX_NAME+1];
 	int updatemd5;
-} parc;
+};
 
-typedef struct
+struct paTOC
 {
 	parc* pa;
 	char name[PA_MAX_NAME+1];
@@ -65,9 +65,9 @@ typedef struct
 	unsigned int crc;
 	unsigned int flags;
 	unsigned int seed;
-} paTOC;
+};
 
-struct tagpaFILE
+struct paFILE
 {
 	parc arc[PA_MAX_ARC];
 

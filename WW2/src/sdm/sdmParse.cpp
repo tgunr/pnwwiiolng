@@ -23,22 +23,19 @@
 #include "sdm/sdmConfigVars.h"
 
 // Instead of importing pi.h and its baggage
-typedef struct
+struct piVECTOR
 {
- FLOAT32   x;
- FLOAT32   y;
- FLOAT32   z;
-
-} piVECTOR, *piLPVECTOR;
+	FLOAT32 x, y, z;
+};
 
 #include "trn/trntypes.h"
 
 // Translate CP/Facility names.
-typedef std::map<const std::string,const std::string> TRANSLATIONS;
+using TRANSLATIONS = std::map<const std::string,const std::string>;
 static TRANSLATIONS s_translations;
 
 // Errors translating CPs/Facilities
-typedef std::set<std::string> TRANSLATION_FAILS;
+using TRANSLATION_FAILS = std::set<std::string>;
 static TRANSLATION_FAILS* s_cpTranslationFails, *s_facilityTranslationFails;
 static bool s_translationsRequired = false;
 static const char* s_translationLanguage = "en";

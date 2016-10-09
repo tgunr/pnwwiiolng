@@ -31,8 +31,8 @@ extern SINT32	LoadingScreen;
 #endif
 
 /* for looking for duplicat textures
-typedef std::pair<std::string,UINT32> TextureSig;
-typedef std::map<TextureSig,UINT32> TextureCountMap;
+using TextureSig = std::pair<std::string,UINT32>;
+using TextureCountMap = std::map<TextureSig,UINT32>;
 
 class TextureCountReporter : public TextureCountMap
 {
@@ -58,7 +58,7 @@ public:
 static TextureCountReporter tcounts;
 */
 
-typedef int (*LoadFileToSurface)(const char* Filename, UINT32 TransparentColor, UINT32 WantFlags);
+using LoadFileToSurface = int (*)(const char* Filename, UINT32 TransparentColor, UINT32 WantFlags);
 
 static int _loadImageFileToSurface(const char* name, UINT32 transcolor, UINT32 flags);
 

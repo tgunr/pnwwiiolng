@@ -406,7 +406,7 @@ mapFindBrigade(UINT32 brigadeID)
 //////////////////////////////////////////////////////////////////////
 // Update the status of all brigades with missions at a particular CP
 
-typedef std::set<Brigade*> BRIGADE_SET;
+using BRIGADE_SET = std::set<Brigade*>;
 
 void
 mapUpdateBrigadesWithMissionsAt(const CPStruct* cp)

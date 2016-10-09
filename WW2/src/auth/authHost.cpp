@@ -127,7 +127,7 @@ static bool readDBRequired = false;
 static bool _running = true;
 
 #include <map>
-typedef std::map<UINT32, GAME*> GameIndex;
+using GameIndex = std::map<UINT32, GAME*>;
 static GameIndex gameIndex;
 
 //////////////////////////////////////////////////////////////////////
@@ -1625,7 +1625,7 @@ authGetGameList(const SINT32 teulIndex)
 	const std::vector<UCHAR>& clientSubs = data->m_subscribedArenaIDs;
 #endif
 
-	typedef std::vector<GameListCache> CACHES;
+	using CACHES = std::vector<GameListCache>;
 	static CACHES caches;
 
 	CACHES::iterator it = caches.begin();

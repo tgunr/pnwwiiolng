@@ -4801,7 +4801,7 @@ struct TOPair
 	FLOAT64 distance;
 };
 
-typedef std::list<TOPair> TOList;
+using TOList = std::list<TOPair>;
 
 static bool to_sort(const TOPair& a, const TOPair& b)
 {
@@ -4895,16 +4895,16 @@ static bool _killODETOCollider(trnCDTerrainObject* TO)
 
 #ifdef PARALLEL_BUILDER
 
-typedef struct Temp_Info
+struct Temp_Info
 {
     dSpaceID space;
     bool addBoxCollider;
     trnCDTerrainObject* TO;
     UINT32 odecat;
     Temp_Info( trnCDTerrainObject*o, UINT32 cat, bool addbox, dSpaceID sid ) { TO=o; odecat=cat; addBoxCollider=addbox; space = sid; }
-} Temp_Info;
+};
 
-typedef std::vector<Temp_Info> TEMP_VECTOR;
+using TEMP_VECTOR = std::vector<Temp_Info>;
 
 #endif
 

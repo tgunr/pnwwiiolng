@@ -36,7 +36,7 @@
 #include "SpatialDB.h"
 #endif
 
-typedef std::stack< TDTL_TREES* > TREE_POOL;
+using TREE_POOL = std::stack<TDTL_TREES*>;
 static TREE_POOL _treePool;
 
 #include "shader/glslWater.h"

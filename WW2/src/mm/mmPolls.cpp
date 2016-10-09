@@ -15,7 +15,7 @@
 
 //////////////////////////////////////////////////////////////////////
 
-typedef std::map<UINT32,OpinionPoll> _POLLS;
+using _POLLS = std::map<UINT32,OpinionPoll>;
 static _POLLS polls;
 static UINT32 g_maxPoll = 0;
 static std::mutex _pollsLock;

@@ -18,7 +18,7 @@
 #include "wwii/wwiiConfig.h"
 
 #include "wwii/wwiiHash.h"
-typedef std::unordered_map<UINT32,SquadVote> SQUAD_VOTES;
+using SQUAD_VOTES = std::unordered_map<UINT32,SquadVote>;
 
 static SQUAD_VOTES g_squadVotes;
 

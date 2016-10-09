@@ -51,7 +51,7 @@ struct PeerHello
 
 // There are going to be very few of these, probably 3-4,
 // so just store them as a vector.
-typedef std::vector<ServerConnection> ServerConnections;
+using ServerConnections = std::vector<ServerConnection>;
 static ServerConnections s_connections;
 static SINT32 s_peeringIndex = -1;
 

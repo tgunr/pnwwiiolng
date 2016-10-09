@@ -182,8 +182,8 @@ static bool _holddowncursor;
 static phui::View* _terminal;
 static jsGame* _jsgame;
 static phui::View* _spawnscreen;
-typedef std::unordered_map<std::string, std::wstring> LocMap;
-typedef std::unordered_map<std::string, std::string> InputMap;
+using LocMap = std::unordered_map<std::string, std::wstring>;
+using InputMap = std::unordered_map<std::string, std::string>;
 static LocMap _locstrings;	// all translation strings; language with english fallback
 static InputMap _inputkeys;	// english only keys for input device names and functions
 static void _jsabort(const char*);
@@ -1023,7 +1023,7 @@ void uiIMEMessageProc(const MSG& m)
 }
 #endif
 
-typedef std::unordered_map<std::string, int> TexMapType;
+using TexMapType = std::unordered_map<std::string, int>;
 
 static TexMapType _texmap;
 

@@ -59,7 +59,7 @@ public:
 	SuperCellMapView::Renderer* _renderer;
 	bool _done;
 
-	typedef std::vector<SuperCell*> SuperCellList;
+	using SuperCellList = std::vector<SuperCell*>;
 	SuperCellList _cells;
 };
 

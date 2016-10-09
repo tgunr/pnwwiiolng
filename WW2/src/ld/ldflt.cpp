@@ -2305,7 +2305,7 @@ static bool ReadPopExtension(void)
 
 #ifdef MAP_MATS
 // this doesn't work
-typedef std::map<std::string,std::string> MaterialMapper;
+using MaterialMapper = std::map<std::string,std::string>;
 extern MaterialMapper materialMap;
 
 static void changeMaterials( OBJECT* obj )

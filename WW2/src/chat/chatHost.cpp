@@ -112,8 +112,6 @@ extern void chatRegisterDotCommands();
     #define DEF_ERR_FLAGS STD_ERR
 #endif
 
-typedef bool (TUNE_COMMAND_CALLBACK)(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
-
 #if defined(DEV_BUILD)
 # define DEFAULT_SYS_MOTD		"MOTD: Internal Dev Cluster"
 #elif defined(CLOSED_BETA)
@@ -214,28 +212,31 @@ static UINT32 g_finalShutdownTime = 0;
 
 // Dot command list at end of file to avoid prototyping
 
-static bool _tuneHQ(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
-static bool _tuneOrigin(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
-static bool _tuneGM(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
+static bool _tuneHQ(Player& player, UCHAR index);
+static bool _tuneOrigin(Player& player, UCHAR index);
+static bool _tuneGM(Player& player, UCHAR index);
 extern bool chatUpdateHCUnitLocations();
 
 struct TUNE_COMMAND
 {
-	const SCHAR*	string;
-	ChatHandle	matchHandle;
-	UINT32		length;
-	UINT32		index;
-	TUNE_COMMAND_CALLBACK* callback;
-	PermissionMask	perm;
+	using CALLBACK = bool(*)(Player& player, UCHAR index);
+
+	ChatHandle			matchHandle_;
+	CALLBACK			callback_;
+	PermissionMask		perms_;
+
+	TUNE_COMMAND(const char* name, CALLBACK callback, PermissionMask perms=0ULL)
+		: matchHandle_(chatGetLowercaseHandle(name))
+		, callback_(callback)
+		, perms_(perms)
+	{}
 };
 
-static TUNE_COMMAND _tuneCommand[] = {
-								 {"hq",0,0,0,_tuneHQ,0}
-								 ,{"origin",0,0,0,_tuneOrigin,0}
-								 ,{"gm",0,0,0,_tuneGM,GAME_MANAGER}
-								};
-
-static const UINT32 NUM_TUNE_COMMANDS = sizeof(_tuneCommand) / sizeof(TUNE_COMMAND);
+static std::vector<TUNE_COMMAND> _tuneCommands = {
+	TUNE_COMMAND("hq", _tuneHQ),
+	TUNE_COMMAND("origin", _tuneOrigin),
+	TUNE_COMMAND("gm", _tuneGM, GAME_MANAGER)
+};
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -386,7 +387,7 @@ chatSystemMessage(LSTRING_ID messageID, const char* const ptr0, const char* cons
 //////////////////////////////////////////////////////////////////////
 // Implementation for HCUnitBroadcast...
 
-typedef std::vector<UINT32> SUBORDINATES;
+using SUBORDINATES = std::vector<UINT32>;
 static SUBORDINATES _currentUnits;
 
 //////////////////////////////////////////////////////////////////////
@@ -560,7 +561,7 @@ public:
 	UINT32			m_kickTime;
 };
 
-typedef std::vector<Ban> DELAYED_BANS;
+using DELAYED_BANS = std::vector<Ban>;
 static DELAYED_BANS _delayedBans;
 
 static void
@@ -1920,30 +1921,30 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle handleID)
 
 //Look for an hq tune
 //This temporary measure allows someone to tune to the hq channel
-static bool _tuneHQ(Player* player, UCHAR /*index*/, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneHQ(Player& player, UCHAR /*index*/)
 {
-	player->SetHqOff(false);
+	player.SetHqOff(false);
 	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static bool _tuneOrigin(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneOrigin(Player& player, UCHAR index)
 {
 	// Remove any pre-existing origin tune
-	player->detuneChannelsByType(ORIGIN_CP_CHANNEL);
+	player.detuneChannelsByType(ORIGIN_CP_CHANNEL);
 	// And now tune this one
-	return player->tuneRadio(index, ORIGIN_CP_CHANNEL, 0);
+	return player.tuneRadio(index, ORIGIN_CP_CHANNEL, 0);
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static bool _tuneGM(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneGM(Player& player, UCHAR index)
 {
-	if ( !player->isGM() )
+	if ( !player.isGM() )
 		return false;
 
-	dbugLog(_FLI, "tuning %s to GM channel", player->callsign());
+	dbugLog(_FLI, "tuning %s to GM channel", player.callsign());
 
 	if ( adminChannel == nullptr )
 	{
@@ -1951,7 +1952,7 @@ static bool _tuneGM(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32
 		return false;
 	}
 
-	return player->tuneRadioToChannel(index, adminChannel, adminChannel->type());
+	return player.tuneRadioToChannel(index, adminChannel, adminChannel->type());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1972,20 +1973,6 @@ Player::ackTuneHandle(UCHAR index, const ChatHandle handleID)
 }
 
 //////////////////////////////////////////////////////////////////////
-
-static inline TUNE_COMMAND*
-_getTuneByName(const char* name)
-{
-	ChatHandle handle = chatGetLowercaseHandle(name);
-	for ( UINT32 i = 0; i < NUM_TUNE_COMMANDS; ++i )
-	{
-		if ( _tuneCommand[i].matchHandle == handle )
-			return &_tuneCommand[i];
-	}
-	return nullptr;
-}
-
-//////////////////////////////////////////////////////////////////////
 // Determine whether a named channel exists with the given name
 // and whether the player has permissions to tune it
 
@@ -1995,24 +1982,25 @@ Player::tuneRadioToNamedChannel(UCHAR index, const char* const channelName)
 	if ( channelName == nullptr )
 		return false;
 
-	TUNE_COMMAND* const tuneCommand = _getTuneByName(channelName);
-	if ( ! tuneCommand )
+	auto channelHandle = chatGetLowercaseHandle(channelName);
+	auto it = std::find_if(_tuneCommands.begin(), _tuneCommands.end(),
+			[=](const auto& cmd) { return cmd.matchHandle_ == channelHandle; });
+	if ( it == _tuneCommands.end() )
 		return false;
+
+	const auto& tuneCommand = *it;
 
 	detuneRadio(index);
 
-	if ( !isPlaynet()
-		&& tuneCommand->perm != 0
-		&& (permissions(tuneCommand->perm)) == 0
-		)
+	if ( !isPlaynet() && tuneCommand.perms_ && !permissions(tuneCommand.perms_) )
 	{
 		dbugLog(_FLW, "%s does not have permission to tune to %s"
 						, callsign()
-						, tuneCommand->string);
+						, channelName);
 		return false;
 	}
 
-	return tuneCommand->callback(this, index, channelName, tuneCommand->index);
+	return tuneCommand.callback_(*this, index);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2525,13 +2513,6 @@ static void
 _dataInit(void)
 {
 	chatInitPlayerLists();
-
-	for ( size_t i = 0; i < (size_t)NUM_TUNE_COMMANDS; i++)
-	{
-		_tuneCommand[i].length = (UINT32)strlen(_tuneCommand[i].string);
-		_tuneCommand[i].index = i;
-		_tuneCommand[i].matchHandle = chatGetLowercaseHandle(_tuneCommand[i].string);
-	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2774,8 +2755,8 @@ _houseKeeping()
 		return false;
 
 	// nullptr TERMINATED List of functions to call
-	typedef bool (HOUSEKEEPING)(void);
-	HOUSEKEEPING* housekeeping[] =
+	using HOUSEKEEPING = bool(*)(void);
+	static HOUSEKEEPING housekeeping[] =
 	{
 		chatSaveLogRecords
 	,	Chat::CommitProgressUpdates
@@ -3090,7 +3071,7 @@ _extractUserName(const char* ircName, std::string& name)
 //////////////////////////////////////////////////////////////////////
 // Manage the list of IRC Players.
 
-typedef std::map<ChatHandle, IRCPlayer*> IRC_PLAYERS;
+using IRC_PLAYERS = std::map<ChatHandle, IRCPlayer*>;
 static IRC_PLAYERS ircPlayers;
 
 static IRCPlayer*

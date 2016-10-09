@@ -256,7 +256,7 @@ _vehicleIsCurrentlyInList(UINT32 index, HostVehicle& myVehicle)
 // Add the vehicles from a given grid node into our vis list.
 
 // Vehicles we know to have riders.
-typedef std::unordered_map< UINT32 /*carrierIndex*/, SINT32 /*riderCount or -1*/ > CARRIERS;
+using CARRIERS = std::unordered_map< UINT32 /*carrierIndex*/, SINT32 /*riderCount or -1*/ >;
 
 static bool
 _addCellNodesToVisList(HostVehicle& myVehicle, const Grid::VehicleSet& vehicles, CARRIERS& carriers)

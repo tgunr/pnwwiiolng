@@ -403,7 +403,7 @@ _recordPacketSize(UINT32 size)
 {
 	static UINT32 maxSize = 0;
 	static UINT32 minSize = 0;
-	typedef std::map<SINT32,UINT32> SIZES;
+	using SIZES = std::map<SINT32,UINT32>;
 	static SIZES sizes;
 	static UINT32 packets = 0;
 	static UINT64 totalBits = 0LL;

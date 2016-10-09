@@ -124,7 +124,7 @@ strAdd(char* dest, char* src)
 #include <set>
 #include "wwii/wwiiThreadTextQuery.h"
 
-typedef std::map< std::string, std::set<UINT32> > SAVE_SET;
+using SAVE_SET = std::map<std::string, std::set<UINT32>>;
 static SAVE_SET _cpSaves, _facSaves, _objOwnSaves, _objMaxSaves, _objStateSaves;
 
 static void
@@ -234,7 +234,7 @@ _commitObject(ObjectStruct* obj)
 	obj->modified = false;
 }
 
-typedef std::vector<UINT16> _SAVE_IDS;
+using _SAVE_IDS = std::vector<UINT16>;
 
 static void
 _saveRows(const char* table, const char* field, UINT64 value, const char* idField, _SAVE_IDS& ids)

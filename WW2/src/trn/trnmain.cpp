@@ -76,7 +76,7 @@ static std::map<int, OBJECT*> ShadowObject;
 static int mapindex = 0;
 
 // typedefs
-typedef struct tag_CHAOTICSEEDTYPE
+struct _CHAOTICSEEDTYPE
 {
 	FLOAT64 X;
 	FLOAT64 Y;
@@ -86,8 +86,7 @@ typedef struct tag_CHAOTICSEEDTYPE
 	FLOAT64 A;
 	FLOAT64 B;
 	FLOAT64 C;
-
-} _CHAOTICSEEDTYPE;
+};
 
 
 // defines

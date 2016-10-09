@@ -40,7 +40,7 @@ static PLAYER_RELEASE_FUNCTION* _playerReleaseFn = nullptr;
 static LOGICAL _authIsOpen;
 
 // The complete list of all current OTPs.
-typedef std::unordered_map<UINT32, OTP_NODE*> OTPS;
+using OTPS = std::unordered_map<UINT32, OTP_NODE*>;
 static OTPS _otps;
 // OTPs that have logged in, by customerID.
 static OTPS _custOtps;

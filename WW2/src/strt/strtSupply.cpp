@@ -35,7 +35,7 @@
 #include "wwii/wwiiConfig.h"
 
 // This is the list of units which are pending resupply
-typedef std::set<StratHCUnit*> CONSUMERS;
+using CONSUMERS = std::set<StratHCUnit*>;
 static CONSUMERS _resupplyConsumers;
 
 struct ResupplyTicketStore

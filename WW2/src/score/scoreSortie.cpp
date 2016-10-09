@@ -9,10 +9,10 @@
 #include "map/mapPlayer.h"
 #include "weap/weapWeapon.h"
 
-typedef std::unordered_map<UINT32 /*sortieID*/, Scoring::Sortie*> SortieTable;
+using SortieTable = std::unordered_map<UINT32 /*sortieID*/, Scoring::Sortie*>;
 static SortieTable sorties;
 
-typedef std::queue<Scoring::Sortie*> ExpiryList;
+using ExpiryList = std::queue<Scoring::Sortie*>;
 static ExpiryList expiringSorties;
 
 //////////////////////////////////////////////////////////////////////

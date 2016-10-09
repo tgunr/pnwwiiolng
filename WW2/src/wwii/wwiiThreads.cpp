@@ -58,7 +58,7 @@ public:
 
 static const UINT32 NUM_HELPER_THREADS = 2;
 
-typedef std::vector<THREAD_LOG*> LOG_QUEUE;
+using LOG_QUEUE = std::vector<THREAD_LOG*>;
 static LOG_QUEUE logQueue;
 static size_t logQueueMax, logQueuePushes;
 static std::mutex logQueueMutex;
@@ -66,8 +66,8 @@ static std::mutex logQueueMutex;
 static ConditionQueue<DBThreadQuery> dbQueue;
 DBQueueThread dbThread[NUM_HELPER_THREADS];
 
-typedef std::pair<THREAD_CALLBACK*, void*> CALLBACK_INFO;
-typedef std::vector<CALLBACK_INFO*> CALLBACK_QUEUE;
+using CALLBACK_INFO = std::pair<THREAD_CALLBACK*, void*>;
+using CALLBACK_QUEUE = std::vector<CALLBACK_INFO*>;
 static CALLBACK_QUEUE callbackQueue;
 static size_t cbQueueMax, cbQueuePushes;
 static std::mutex callbackQueueMutex;

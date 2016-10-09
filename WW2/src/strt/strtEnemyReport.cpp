@@ -34,7 +34,7 @@ static const UINT32 EWS_MIN_TIMEOUT = 60;			// ~1 minute
 static const UINT32 EWS_SHORT_TIMEOUT = 120;		// ~2 minutes
 static const UINT32 EWS_MAIN_TIMEOUT = 4 * 60;		// ~4 minutes
 
-typedef std::set<UINT16> CHANGED_CPS;
+using CHANGED_CPS = std::set<UINT16>;
 static CHANGED_CPS _changedCPs;
 
 /*
@@ -48,7 +48,7 @@ class EWSScoreCompare
 */
 
 #ifdef MAINTAIN_ACTIVE_EWS_LIST
-typedef std::set<CPStruct*> ACTIVE_EWS;
+using ACTIVE_EWS = std::set<CPStruct*>;
 static ACTIVE_EWS g_activeEws;
 #endif
 

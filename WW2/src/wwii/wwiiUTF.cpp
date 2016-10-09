@@ -38,8 +38,8 @@
 
 #include "wwii/wwiiUTF.h"				// Our header file
 
-typedef unsigned long UTF32;
-typedef unsigned char UTF8;
+using UTF32 = unsigned long;
+using UTF8 = unsigned char;
 
 static const int halfShift	= 10; /* used for shifting by 10 bits */
 

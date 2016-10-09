@@ -76,20 +76,20 @@ FILE* weaplogFile;
 #define _MAX_NUM_OF_COLLISIONS 32
 #define MAX_TORPEDO_DROP_SPEED 75
 
-typedef struct tagTracerFX
+struct TracerFX
 {
 	FLOAT64VECTOR OldPos;
 	FLOAT64VECTOR NewPos;
 	FLOAT32 Diameter;
-} TracerFX;
+};
 
-typedef struct
+struct shrapTarget
 {
 	FLOAT64VECTOR	targetPos;
 	FLOAT64			radius;
 	void*			target;
 	FLOAT32			maxDist2;
-} shrapTarget;
+};
 
 // Ammo variable types
 enum

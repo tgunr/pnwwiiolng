@@ -567,8 +567,8 @@ Lua::Results()
 
 class HCUnit;
 class StratHCUnit;
-typedef std::map<UINT32, HCUnit*> HCUNIT_INDEX;
-typedef HCUNIT_INDEX::iterator HCUIDX_ITERATOR;
+using HCUNIT_INDEX = std::map<UINT32, HCUnit*>;
+using HCUIDX_ITERATOR = HCUNIT_INDEX::iterator;
 
 UINT16 getHCiID(const HCUIDX_ITERATOR* it)
 {

@@ -48,7 +48,7 @@
 
 #define TIME_INCREMENT 0.1
 
-typedef struct
+struct BombsightData
 {
 	OBJECT* PivotDOF;
 	OBJECT* AltPntDOF;
@@ -66,8 +66,7 @@ typedef struct
 	FLOAT32 altRate, speedRate;
 
 	LOGICAL useEnglish;
-
-} BombSightData;
+};
 
 static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, SINT32 type);
 static FLOAT32 _CalcBombAngle(FLOAT32 Alt,FLOAT32 InSpeed,weapAmmoType * AmmoType);

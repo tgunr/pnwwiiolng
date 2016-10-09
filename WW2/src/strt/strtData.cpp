@@ -71,7 +71,7 @@ const UINT32 objectiveFlags[MAX_SIDES] = {
 //////////////////////////////////////////////////////////////////////
 // Filename string pool definitions
 
-typedef std::unordered_map<UINT64, std::vector<std::unique_ptr<std::string>>> FilenamePool;
+using FilenamePool = std::unordered_map<UINT64, std::vector<std::unique_ptr<std::string>>>;
 FilenamePool g_filenamePool;
 
 //////////////////////////////////////////////////////////////////////

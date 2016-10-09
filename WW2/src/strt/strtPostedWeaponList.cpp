@@ -39,7 +39,7 @@
 
 static SerialNumber serialCounter("weaponserial", 1, 250, 0x3fffffff);
 
-typedef std::map<UINT32, POSTED_WEAPON*> POSTED_WEAPONS;
+using POSTED_WEAPONS = std::map<UINT32, POSTED_WEAPON*>;
 static POSTED_WEAPONS postedWeapons;
 
 //////////////////////////////////////////////////////////////////////

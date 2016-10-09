@@ -27,7 +27,7 @@
 
 //#define HEAVY_DEBUG
 
-typedef void (_PROCESSOR)(DBRow&, void*, UINT32 oid);
+using _PROCESSOR = void(*)(DBRow&, void*, UINT32 oid);
 
 extern void strtInitializeVehicleAccessLevels();
 
@@ -196,7 +196,7 @@ _processLink(DBRow& row, void* data, UINT32 oid)
 }
 
 static void
-_initAllEntries(const char* query, _PROCESSOR* processFn)
+_initAllEntries(const char* query, _PROCESSOR processFn)
 {
 	SINT32 scx = 0, scy = 0;
 	UINT32 id = 0;

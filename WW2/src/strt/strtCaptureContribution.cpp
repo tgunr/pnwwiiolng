@@ -19,8 +19,8 @@
 #include <set>
 #include <queue>
 
-typedef std::set<FacilityStruct*> ACTIVE_FACILITIES;
-typedef std::queue<Strat::CaptureContribution> CONTRIBUTIONS;
+using ACTIVE_FACILITIES = std::set<FacilityStruct*>;
+using CONTRIBUTIONS = std::queue<Strat::CaptureContribution>;
 
 static ACTIVE_FACILITIES	activeFacilities;
 static CONTRIBUTIONS		contributions;

@@ -53,8 +53,8 @@ struct IRCChannel
 	bool m_newChannel;
 };
 
-typedef std::vector<std::string> _MODES;
-typedef std::map<std::string, IRCChannel> _CHANNELS;
+using _MODES = std::vector<std::string>;
+using _CHANNELS = std::map<std::string, IRCChannel>;
 
 namespace Teul { extern const char* GetAppName(); }
 
@@ -88,7 +88,7 @@ struct IRCImpl : public IRC, public PNThread
 	_CHANNELS			m_channels;
 
 	// Dot command index
-	typedef std::map<std::string, irc_dotcmd_t> DOTS;
+	using DOTS = std::map<std::string, irc_dotcmd_t>;
 	DOTS			m_dots;
 
 	std::set<std::string>	m_ignores;
@@ -188,7 +188,7 @@ _terminate(const char* reason)
 //////////////////////////////////////////////////////////////////////
 // IRC-aware signal handler
 
-typedef void (*SignalHandler)(int);
+using SignalHandler = void(*)(int);
 #if !defined(HAVE_SIGACTION)
 struct sigaction { SignalHandler sa_handler; };
 #endif

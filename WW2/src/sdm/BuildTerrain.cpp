@@ -47,17 +47,17 @@ using namespace std;
 #include <sys/stat.h>
 #include <dirent.h>
 
-typedef struct WIN32_FIND_DATAA
+struct WIN32_FIND_DATAA
 {
 	struct dirent* ent;
 	char cFileName[256];
-} WIN32_FIND_DATAA;
+};
 
-typedef struct HANDLE
+struct HANDLE	///TODO: This seems like a REALLY bad name.
 {
   DIR* dir;
   const char* pattern;
-} HANDLE;
+};
 
 static bool endsmatch( const char* s, const char* m )
 {
@@ -850,7 +850,7 @@ public:
 
 	private:
 
-		typedef multimap<const PoolModel*, TerrainObject*>	ObjectList;
+		using ObjectList = std::multimap<const PoolModel*, TerrainObject*>;
 
 		struct Octet
 		{
@@ -916,7 +916,7 @@ public:
 		void WriteToSDM();
 };
 
-typedef std::set<SuperCellTerrainData::TerrainObject*> ToDeleteTerrainObjects;
+using ToDeleteTerrainObjects = std::set<SuperCellTerrainData::TerrainObject*>;
 static ToDeleteTerrainObjects TerrainObjectsToDelete;
 
 void TerrainPosition::Set(const Vec3f& absolutePos)
@@ -2749,7 +2749,7 @@ static void BuildSDM(int cellX, int cellY)
 
 void PrintModelPerformanceSeverity(fstream& logFile)
 {
-	typedef multimap<float, const PoolModel*>	RemodelingPriorities;
+	using RemodelingPriorities = std::multimap<float, const PoolModel*>;
 	RemodelingPriorities						remodelingPriorities;
 
 

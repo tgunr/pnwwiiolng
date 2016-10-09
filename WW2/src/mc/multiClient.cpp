@@ -29,17 +29,17 @@
 #define DEFAULT_HOST			"192.168.0.83"
 #define DEG_TO_RAD(x) ((x) * PI / 180.0)
 
-typedef int (*interp_cmd)(int argc, char* argv[]);
+using interp_cmd = int (*)(int argc, char* argv[]);
 
-typedef struct
+struct interp_cmd_lookupg
 {
 	const char* name;
 	interp_cmd cmd;
 	const char* help;
 	bool queue;
-} interp_cmd_lookup;
+};
 
-typedef std::deque<std::string> QUEUED_CMDS;
+using QUEUED_CMDS = std::deque<std::string>;
 static QUEUED_CMDS _cmdQueue;
 
 static int spawn_cmd	(int argc, char* argv[]);
@@ -184,7 +184,7 @@ protected:
 
 MultiClient* get_client(int i);
 
-typedef std::map<int, MultiClient*> ClientMap;
+using ClientMap = std::map<int, MultiClient*>;
 static ClientMap clients;
 
 /************************************************************************************************

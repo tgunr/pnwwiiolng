@@ -83,11 +83,11 @@ struct POOL_OBJECT_TO_DIRECTORY
 };
 
 // Callback definitions for scanning object types.
-typedef LOGICAL (*SCANOBJECT)(OBJECT* lpobj, POOLOBJHDR** lphdr);
-typedef LOGICAL (*SCANPOOL)(POOLOBJHDR* lphdr, OBJECT** lpobj);
+using SCANOBJECT = LOGICAL(*)(OBJECT* lpobj, POOLOBJHDR** lphdr);
+using SCANPOOL = LOGICAL(*)(POOLOBJHDR* lphdr, OBJECT** lpobj);
 
-typedef LOGICAL (*SCANPOOLTOFILE)(POOLOBJHDR* lphdr, int hfile, UINT32* pool);
-typedef LOGICAL (*SCANFILETOPOOL)(POOLOBJHDR* lphdr, int hfile, UINT32* pool);
+using SCANPOOLTOFILE = LOGICAL(*)(POOLOBJHDR* lphdr, int hfile, UINT32* pool);
+using SCANFILETOPOOL = LOGICAL(*)(POOLOBJHDR* lphdr, int hfile, UINT32* pool);
 
 //static SINT8		pathname[256];
 static SINT32		numobjects;

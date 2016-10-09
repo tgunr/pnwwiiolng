@@ -145,20 +145,20 @@ static SINT32 iterationTime = -1, iterationLast = -1;
 */
 
 #include <unordered_map>
-typedef std::unordered_map<sortieid_t, class HostVehicle*> VEHICLE_HASH;
+using VEHICLE_HASH = std::unordered_map<sortieid_t, class HostVehicle*>;
 static VEHICLE_HASH _vehicleHash;
 
-typedef std::vector<HostVehicle*> VEHICLES;
+using VEHICLES = std::vector<HostVehicle*>;
 
 // Tracking of players in a given building
-typedef std::set<HostVehicle*> OCCUPANTS;
+using OCCUPANTS = std::set<HostVehicle*>;
 struct Occupancy
 {
 	Occupancy() : object(nullptr), occupants() {}
 	ObjectStruct*	object;
 	OCCUPANTS		occupants;
 };
-typedef std::unordered_map<ChatHandle, Occupancy> OCCUPANCY_MAP;
+using OCCUPANCY_MAP = std::unordered_map<ChatHandle, Occupancy>;
 static OCCUPANCY_MAP occupancyMap;
 
 // Set this to true to prevent logins to the server.

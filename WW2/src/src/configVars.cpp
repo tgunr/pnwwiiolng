@@ -152,7 +152,7 @@ struct ConfigEntry
 	}
 };
 
-typedef std::vector<ConfigEntry> CONFIG_ENTRIES;
+using CONFIG_ENTRIES = std::vector<ConfigEntry>;
 struct ConfigEntries : public CONFIG_ENTRIES
 {
 	ConfigEntries() : CONFIG_ENTRIES(), m_read(false), m_foundGeneralFile(false), m_foundOSFile(false)
@@ -305,7 +305,7 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 // Registry of all the known config vars.
 
 #include <set>
-typedef std::set<Teul::ConfigVar*> ConfigVars;
+using ConfigVars = std::set<Teul::ConfigVar*>;
 
 static ConfigVars& _getConfigVars()
 {

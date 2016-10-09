@@ -979,7 +979,7 @@ struct FullVehicle
 };
 
 // The free list.
-typedef std::vector<FullVehicle*> FREE_VEHICLES;
+using FREE_VEHICLES = std::vector<FullVehicle*>;
 static FREE_VEHICLES _freeVehicles;
 static std::vector<FullVehicle*> _allocations;
 

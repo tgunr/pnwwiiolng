@@ -20,7 +20,7 @@
 
 FxData _fxdata;
 
-typedef std::map<std::string, EFFECT *> effectMap;
+using effectMap = std::map<std::string, EFFECT *>;
 static effectMap _effect;
 
 static SINT32 xmlinputmatch(const SCHAR* name) {return 1;}

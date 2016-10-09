@@ -148,7 +148,7 @@ static unsigned int id = 1;
 
 static std::map<std::string, WaveData*> cache;
 
-typedef std::map<unsigned int, struct Emitters*> EmitterMap;
+using EmitterMap = std::map<unsigned int, struct Emitters*>;
 
 static EmitterMap emitters;
 

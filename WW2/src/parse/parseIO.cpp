@@ -54,7 +54,7 @@ static char _fileName[PN_MAX_PATH];
 static ARG_KEY_HEAD _defaultKeys;
 
 #include <set>
-typedef std::set< std::pair<std::string, std::string> > IGNORE_LIST;
+using IGNORE_LIST = std::set<std::pair<std::string, std::string>>;
 static IGNORE_LIST _ignoreList;
 
 static ARG_LIST* paramGetArgList(char* src)

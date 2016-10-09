@@ -1872,12 +1872,12 @@ static LOGICAL _CollideOnCallback(OBJECT* obj, UINT32 user)
 	_CreateCrapCallback
 *************************************************************************************************/
 
-typedef struct
+struct crapcallbackdata
 {
 	vehVehicle* veh;
 	LOGICAL Explode;
 	const char* visdamgroup;
-} crapcallbackdata;
+};
 
 static LOGICAL _CreateCrapCallback(OBJECT* obj, UINT32 user)
 {

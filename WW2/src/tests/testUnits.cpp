@@ -10,7 +10,7 @@
 
 bool enableTestDebug = false;
 
-typedef std::vector<TestUnit*> TestIndex;
+using TestIndex = std::vector<TestUnit*>;
 // We have to make sure this gets instantiated before we try to use it,
 // otherwise it may get instantiated after we've populated it and cleared.
 static TestIndex& tests()

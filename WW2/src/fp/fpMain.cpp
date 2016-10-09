@@ -106,8 +106,8 @@ static piVECTOR	_CageEdgesProne[10] = {
 #define fpFALL_DISTANCE_WATER_HURT_MIN	12
 #define fpFALL_DISTANCE_WATER_HURT_MAX	20
 
-typedef std::pair<int, int> FPAdjustKey;
-typedef std::map<FPAdjustKey, float> FPAdjustments;
+using FPAdjustKey = std::pair<int, int>;
+using FPAdjustments = std::map<FPAdjustKey, float>;
 
 static FPAdjustments _fpsAdjustments;
 static FPAdjustments _tpsAdjustments;

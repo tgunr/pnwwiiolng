@@ -28,7 +28,7 @@
 #endif
 
 // UID-based lookup table for STOs
-typedef std::map<UINT32,ServerTrackedObject*> STO_MAP;
+using STO_MAP = std::map<UINT32,ServerTrackedObject*>;
 static STO_MAP stoMap;
 
 //////////////////////////////////////////////////////////////////////

@@ -222,7 +222,7 @@ SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 	return 0;
 }
 
-typedef std::vector<UINT32> ADDRESS_LIST;
+using ADDRESS_LIST = std::vector<UINT32>;
 
 #if platBuild == TEUL_SERVER
 void

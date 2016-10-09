@@ -28,7 +28,7 @@
 #include "wwii/wwiiThreads.h"
 
 #include <unordered_map>
-typedef std::unordered_map<UINT32, bool> SYNCHED_VEHICLES;
+using SYNCHED_VEHICLES = std::unordered_map<UINT32, bool>;
 static SYNCHED_VEHICLES g_synched;
 
 static Teul::Packet vehicleBroadcasts(Teul::PacketId(Comm::CallbackX, BCAST_VEH_UPDATE_Y));

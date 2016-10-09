@@ -599,14 +599,14 @@ OSStatus OpenALAudio::stopSound(snSound* snd)
 
 //---------------------------------------
 
-typedef struct                                    /* WAV File-header */
+struct WAVFileHdr_Struct                          /* WAV File-header */
 {
   ALubyte  Id[4];
   ALsizei  Size;
   ALubyte  Type[4];
-} WAVFileHdr_Struct;
+};
 
-typedef struct                                    /* WAV Fmt-header */
+struct WAVFmtHdr_Struct                           /* WAV Fmt-header */
 {
   ALushort Format;
   ALushort Channels;
@@ -614,15 +614,15 @@ typedef struct                                    /* WAV Fmt-header */
   ALuint   BytesPerSec;
   ALushort BlockAlign;
   ALushort BitsPerSample;
-} WAVFmtHdr_Struct;
+};
 
-typedef struct                                    /* WAV FmtEx-header */
+struct WAVFmtExHdr_Struct                         /* WAV FmtEx-header */
 {
   ALushort Size;
   ALushort SamplesPerBlock;
-} WAVFmtExHdr_Struct;
+};
 
-typedef struct                                    /* WAV Smpl-header */
+struct WAVSmplHdr_Struct                          /* WAV Smpl-header */
 {
   ALuint   Manufacturer;
   ALuint   Product;
@@ -642,13 +642,13 @@ typedef struct                                    /* WAV Smpl-header */
     ALuint Fraction;
     ALuint Count;
   }      Loop[1];
-} WAVSmplHdr_Struct;
+};
 
-typedef struct                                    /* WAV Chunk-header */
+struct WAVChunkHdr_Struct                         /* WAV Chunk-header */
 {
   ALubyte  Id[4];
   ALuint   Size;
-} WAVChunkHdr_Struct;
+};
 
 void SwapWords(unsigned int* puint);
 void SwapBytes(unsigned short* pshort);

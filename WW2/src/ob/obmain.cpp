@@ -38,7 +38,7 @@
 #include <pthread.h>
 #endif
 
-typedef std::unordered_set<OBJECT*> ObjectSet;
+using ObjectSet = std::unordered_set<OBJECT*>;
 
 static ObjectSet objectmap;
 static ObjectSet updatecallbacks;

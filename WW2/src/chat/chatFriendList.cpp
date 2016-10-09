@@ -16,7 +16,7 @@
 #include "include/mydbQuery.h"
 #include "wwii/wwiiDBThreads.h"
 
-typedef std::vector<const char*> ARGV;
+using ARGV = std::vector<const char*>;
 
 //	------------------------------	Classes
 

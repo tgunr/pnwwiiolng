@@ -20,7 +20,7 @@
 
 static void un_rle(SINT16 inlen, SINT16* indata, SINT16* outlen, SINT16* outdata);
 
-typedef size_t (READFN)(int, void*, size_t);
+using READFN = size_t(*)(int, void*, size_t);
 
 static SINT8   readc(int fd, READFN* const);
 static SINT16  reads(int fd, READFN* const);

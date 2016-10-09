@@ -58,7 +58,7 @@ static Mem::Pool<STRAT_UPDATE, 4096> s_stratUpdatePool;
 static UINT32 freeConvoys=MAXCONVOYS, numConvoys=0;
 static CONVOYSTRUCT* freeConvoyList;
 static CONVOYSTRUCT* dispatchedConvoyList;
-typedef IntrusiveList<STRAT_UPDATE> StratUpdateList;
+using StratUpdateList = IntrusiveList<STRAT_UPDATE>;
 static StratUpdateList s_stratUpdateList;
 static STRAT_UPDATE* _convoyUpdate;
 

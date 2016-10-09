@@ -43,12 +43,12 @@
 
 static size_t _teulConnects;
 
-typedef WWII::inplace_vector<ENDPOINT, Teul::MaxConnections> ENDPOINT_ARRAY;
-typedef WWII::inplace_vector<EndpointImpl, Teul::MaxConnections> ENDPOINT_IMPL_ARRAY;
+using ENDPOINT_ARRAY = WWII::inplace_vector<ENDPOINT, Teul::MaxConnections>;
+using ENDPOINT_IMPL_ARRAY = WWII::inplace_vector<EndpointImpl, Teul::MaxConnections>;
 ENDPOINT_ARRAY _endpoints;
 static ENDPOINT_IMPL_ARRAY _endpointImpls;
 
-typedef std::vector<ENDPOINT*> ENDPOINT_VEC;
+using ENDPOINT_VEC = std::vector<ENDPOINT*>;
 static ENDPOINT_VEC _deadEndpoints;
 
 using namespace Teul;

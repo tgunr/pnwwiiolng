@@ -72,8 +72,8 @@ static float sizescale[16] =
     1, 1, 1, 1
 };
 
-typedef std::map<std::string, Patch*> GrassPatchMap;
-typedef std::map<size_t, CollideQue*> GrassCollideQue;
+using GrassPatchMap = std::map<std::string, Patch*>;
+using GrassCollideQue = std::map<size_t, CollideQue*>;
 
 static GrassCollideQue collideque;
 static GrassPatchMap grasspatch;

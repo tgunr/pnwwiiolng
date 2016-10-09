@@ -53,7 +53,7 @@
 #include "SpatialDB.h"
 #endif
 
-typedef std::map<OBJECT*, trnCDTerrainObject *> mapOBJList;
+using mapOBJList = std::map<OBJECT*, trnCDTerrainObject *>;
 mapOBJList mapOBJ; // All objects associated with a TO
 
 //#define xANDREWCOLLISIONTESTS
@@ -62,19 +62,19 @@ mapOBJList mapOBJ; // All objects associated with a TO
 
 static LOGICAL g_bCheckTreeBox;
 
-typedef struct tagTERRAINID
+struct TERRAINID
 {
     SINT32 x;
     SINT32 y;
     UINT32 stratID;
-} TERRAINID;
+};
 
-typedef std::map<TERRAINID, trnCDTerrainObject *> mapTOList;
+using mapTOList = std::map<TERRAINID, trnCDTerrainObject *>;
 
 static mapTOList mapTO; // Non spawn objects
 static mapTOList mapSpawnTO; // Spawn objects only
 
-typedef std::set<trnCDTerrainObject*> ODEQueueSet;
+using ODEQueueSet = std::set<trnCDTerrainObject*>;
 static ODEQueueSet odeQueue;
 
 static bool _updateCollideLists = false;
@@ -83,7 +83,7 @@ static bool _updateCollideLists = false;
 static std::unordered_set<std::string> _buildingsWithSpawnData;
 
 // Mapping of dof names to the weapon specs allowed to spawn there.
-typedef std::map<std::string, std::vector<UINT32> > dofToWeapSpecs;
+using dofToWeapSpecs = std::map<std::string, std::vector<UINT32>>;
 static std::map<std::string, dofToWeapSpecs> _buildingToDofToClass;
 
 
@@ -133,18 +133,17 @@ bool trnCDTerrainObject::IsCollidable(UINT32 cflags)
 // terrain object collision detection stuff
 
 
-typedef struct tagStratMessageQue
+struct _StratMessageQue
 {
-	struct tagStratMessageQue* prev;
-	struct tagStratMessageQue* next;
+	_StratMessageQue* prev;
+	_StratMessageQue* next;
 
 	SINT32 scx;
 	SINT32 scy;
 	UINT32 Id;
 	SINT32 Country;
 	SINT32 VisLevel;
-
-} _StratMessageQue;
+};
 
 // This was decreased from 24000 because
 // we load in a lot fewer terrain objects now.
@@ -6460,18 +6459,18 @@ void trncdResetFXDamageFlags()
 	trncdDTLCollider
 *************************************************************************************************/
 
-typedef struct trncdDTLCollider
+struct trncdDTLCollider
 {
 	UCHAR IsReplacementOctet[SUPERCELL_OCTETS_XY];
 	OBJECT* txtobj[SUPERCELL_OCTETS_XY];
-} trncdDTLCollider;
+};
 
-typedef struct
+struct collideGrid
 {
 	float originX, originY; // bottom left
 	float cellSizeX, cellSizeY;
 	int   numcols, numrows;
-} collideGrid;
+};
 
 static int collideWithSuperCell(TERRAIN_DETAIL* td, FASTCOLLIDE* collisionList, SINT32 maxcols,
 									piVECTOR const* start, piVECTOR const* end);

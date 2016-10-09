@@ -92,10 +92,10 @@ public:
 	void save();
 
 private:
-	typedef std::set<UINT32> UIDS;
-	typedef std::map<UINT64,UIDS> VALUE_MAP;
-	typedef std::map<UINT32,VALUE_MAP> CATEGORY_MAP;
-	typedef std::map<UINT32,CATEGORY_MAP> TYPE_MAP;
+	using UIDS = std::set<UINT32>;
+	using VALUE_MAP = std::map<UINT64,UIDS>;
+	using CATEGORY_MAP = std::map<UINT32,VALUE_MAP>;
+	using TYPE_MAP = std::map<UINT32,CATEGORY_MAP>;
 
 	void _entry(UINT32 type, UINT32 uid) { m_type = type; m_uid = uid; }
 

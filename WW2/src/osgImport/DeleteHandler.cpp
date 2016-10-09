@@ -26,7 +26,7 @@ DeleteHandler::~DeleteHandler()
 
 void DeleteHandler::flush()
 {
-    typedef std::list<const Referenced*> DeletionList;
+	using DeletionList = std::list<const Referenced*>;
     DeletionList deletionList;
 
     {
@@ -63,7 +63,7 @@ void DeleteHandler::flushAll()
     int temp_numFramesToRetainObjects = _numFramesToRetainObjects;
     _numFramesToRetainObjects = 0;
 
-    typedef std::list<const Referenced*> DeletionList;
+	using DeletionList = std::list<const Referenced*>;
     DeletionList deletionList;
 
     {

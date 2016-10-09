@@ -81,35 +81,34 @@ enum
 static ref_ptr<oglMaterial> basictexture;
 static ref_ptr<oglMaterial> basiccolor;
 
-struct tagGSCommandList;
-typedef LOGICAL (GunFileReadFunc)(struct tagGSCommandList * GSCL,SINT8* Params);
-typedef LOGICAL (GunFileDisplayFunc)(void*  Data);
-typedef LOGICAL (GunFileKillFunc)(void*  Data);
+struct GSCommandList;
+using GunFileReadFunc = LOGICAL(*)(GSCommandList * GSCL,SINT8* Params);
+using GunFileDisplayFunc = LOGICAL(*)(void*  Data);
+using GunFileKillFunc = LOGICAL(*)(void*  Data);
 
 // structs
-typedef struct tagpersGunsightRangeTable
+struct persGunsightRangeTable
 {
 	FLOAT32 TimeToDist[RANGETABLE_NUMELEMENTS];
 	FLOAT32 ProjectileDrop[RANGETABLE_NUMELEMENTS];
 	FLOAT32 AimAngle[RANGETABLE_NUMELEMENTS];
-} persGunsightRangeTable;
+};
 
-typedef struct tagGunfileLookup
+struct GunfileLookup
 {
 	SINT8 CommandName[32];
 	GunFileReadFunc* ReadFunction;
 	GunFileDisplayFunc* DisplayFunction;
 	GunFileKillFunc* KillFunction;
-} GunfileLookup;
+};
 
-typedef struct tagGunfileElement
+struct GunfileElement
 {
 	SINT32 CommandCode;
 	void*  Data;
+};
 
-} GunfileElement;
-
-typedef struct tagGSCommandList
+struct GSCommandList
 {
 	GunfileElement GE[MAX_GUNFILE_ELEMENTS];
 	SINT32 GECounter;
@@ -123,9 +122,9 @@ typedef struct tagGSCommandList
 	LOGICAL GunSightTiltsToAim;
 
 	OBJECT * ViewDOF;
-} GSCommandList;
+};
 
-typedef struct
+struct GSLadderInfo
 {
 	UINT32 type;
 	SINT32 dir;
@@ -133,7 +132,7 @@ typedef struct
 	FLOAT32 inputMin;
 	FLOAT32 inputMax;
 	FLOAT32 len;
-} GSLadderInfo;
+};
 
 // variables
 static UCHAR _LadderTypeNames[GL_LADDER_TYPE_MAX][32] = { "none", "vertical", "horizontal" };

@@ -82,11 +82,11 @@ UINT32 vehNotTracked = 0;
 UINT32 unexpectedErrors = 0;
 #endif
 
-typedef struct
+struct IconRank
 {
 	const char* name;
 	UINT32 Rank;
-} IconRank;
+};
 
 static const IconRank _SpecialRanks[] =
 {

@@ -137,34 +137,34 @@ struct animSpec
 	float		tracks[255];		//bone number is index
 };
 
-typedef GR2_POOL<gr2Model> GR2_MODEL_POOL;
+using GR2_MODEL_POOL = GR2_POOL<gr2Model>;
 static GR2_MODEL_POOL _gr2ModelPool = GR2_MODEL_POOL(2000, 32, GR2_MODEL_POOL::NEW);
 
-//typedef GR2_POOL<gr2AnimModel> GR2_ANIMMODEL_POOL;
+//using GR2_ANIMMODEL_POOL = GR2_POOL<gr2AnimModel>;
 //static GR2_ANIMMODEL_POOL _gr2AnimModelPool = GR2_ANIMMODEL_POOL(2000, 32, GR2_ANIMMODEL_POOL::NEW);
 
-typedef GR2_POOL<gr2Mesh> GR2_MESH_POOL;
+using GR2_MESH_POOL = GR2_POOL<gr2Mesh>;
 static GR2_MESH_POOL _gr2MeshPool = GR2_MESH_POOL(2500, 32, GR2_MESH_POOL::NEW);
 
-typedef GR2_POOL<gr2Animation> GR2_ANIMATION_POOL;
+using GR2_ANIMATION_POOL = GR2_POOL<gr2Animation>;
 static GR2_ANIMATION_POOL _gr2AnimationPool = GR2_ANIMATION_POOL(2500);
 
-typedef GR2_POOL<gr2AnimationBlend> GR2_BLEND_POOL;
+using GR2_BLEND_POOL = GR2_POOL<gr2AnimationBlend>;
 static GR2_BLEND_POOL _gr2BlendPool = GR2_BLEND_POOL(1500);
 
-typedef GR2_POOL<gr2ControlBlend> GR2_CONBLEND_POOL;
+using GR2_CONBLEND_POOL = GR2_POOL<gr2ControlBlend>;
 static GR2_CONBLEND_POOL _gr2BlendControlPool = GR2_CONBLEND_POOL(300);
 
-typedef GR2_POOL<gr2Control> GR2_CONTROL_POOL;
+using GR2_CONTROL_POOL = GR2_POOL<gr2Control>;
 static GR2_CONTROL_POOL _gr2ControlPool;
 
-typedef GR2_POOL<gr2QueuedEvent> GR2_QEVENT_POOL;
+using GR2_QEVENT_POOL = GR2_POOL<gr2QueuedEvent>;
 static GR2_QEVENT_POOL _gr2QueuedEventPool;
 
-typedef GR2_POOL<gr2Event> GR2_EVENT_POOL;
+using GR2_EVENT_POOL = GR2_POOL<gr2Event>;
 static GR2_EVENT_POOL _gr2EventPool;
 
-typedef std::map<std::string,granny_file_info*> GR2_FILE_CACHE;
+using GR2_FILE_CACHE = std::map<std::string,granny_file_info*>;
 static GR2_FILE_CACHE _fileCache;
 
 #define		UNUSED_TRACK_VALUE	-999.0
@@ -175,8 +175,8 @@ static GR2_ANIM_EVENTS _animEvents;
 // end blending stuff
 
 
-typedef std::pair<granny_mesh*,granny_skeleton*> MeshDataKey;
-typedef std::map<MeshDataKey,gr2MeshData*> MeshDataMap;
+using MeshDataKey = std::pair<granny_mesh*,granny_skeleton*>;
+using MeshDataMap = std::map<MeshDataKey,gr2MeshData*>;
 static MeshDataMap _meshDataMap;
 
 // end rotation matrix crap

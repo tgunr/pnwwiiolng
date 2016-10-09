@@ -30,13 +30,13 @@
 
 static std::set<SINT32> _waterids;
 
-typedef struct tagWATERFBO
+struct WATERFBO
 {
     SINT32 id;
     SINT32 depth;
     SINT32 w;
     SINT32 h;
-} WATERFBO;
+};
 
 // Defines
 #define NUM_WATER_TEXTURES		8

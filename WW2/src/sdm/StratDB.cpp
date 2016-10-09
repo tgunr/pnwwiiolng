@@ -32,9 +32,9 @@ static bool operator < (const sdm_lookup_id& a, const sdm_lookup_id& b)
 	return a.id < b.id;
 }
 
-typedef std::pair<int,int> supercell_id;
-typedef std::map<sdm_lookup_id, StratObject*> StratObjectMap;
-typedef std::vector<StratObject*> BuildingList;
+using supercell_id = std::pair<int,int>;
+using StratObjectMap = std::map<sdm_lookup_id, StratObject*>;
+using BuildingList = std::vector<StratObject*>;
 
 struct supercell
 {
@@ -63,12 +63,12 @@ protected:
 	std::vector<StratObject*> _buildings;
 };
 
-typedef std::map<supercell_id, supercell> SuperCellMap;
-typedef std::map<sdm_lookup_id, StratObject::ChildList> ChildMap;
-typedef std::map<sdm_lookup_id, sdm_depot> LinkMap;
-typedef std::map<supercell_id, StratDB::StratObjList> StratObjListMap;
-typedef std::map<std::string, std::wstring> DisplayNameMap;
-typedef std::vector<CPListItem*> CPNameList;
+using SuperCellMap = std::map<supercell_id, supercell>;
+using ChildMap = std::map<sdm_lookup_id, StratObject::ChildList>;
+using LinkMap = std::map<sdm_lookup_id, sdm_depot>;
+using StratObjListMap = std::map<supercell_id, StratDB::StratObjList>;
+using DisplayNameMap = std::map<std::string, std::wstring>;
+using CPNameList = std::vector<CPListItem*>;
 
 static int (*_get_strat_data)(int scx, int scy, sdm_strat_data*);
 

@@ -108,7 +108,7 @@ static POLL_STRUCT pollData;
 
 // To save ourselves having to look up endpoints later...
 #include <map>
-typedef std::map<SINT32, ENDPOINT*> SocketToEndpoint;
+using SocketToEndpoint = std::map<SINT32, ENDPOINT*>;
 static SocketToEndpoint socketToEndpoint;
 
 static TeulTimeMS	_lastIdle;

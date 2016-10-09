@@ -31,8 +31,8 @@ static const size_t _ROUNDING = 1023;
 static const UINT32 _MAX_POOLS = 3;
 
 static std::mutex allocMutex;
-typedef UINT64 StorageHeader;
-typedef	std::vector<UINT64*> Pool;
+using StorageHeader = UINT64;
+using Pool = std::vector<UINT64*>;
 static UINT32 _callocs = 0;
 static UINT32 _reserved = 0;
 static UINT32 _inUse = 0;

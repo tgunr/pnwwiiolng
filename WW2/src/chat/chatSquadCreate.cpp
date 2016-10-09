@@ -32,7 +32,7 @@ struct SQUAD_REQUEST
 	std::set<ChatHandle>	agreed;	// Which players have agreed
 };
 
-typedef std::unordered_map<ChatHandle,SQUAD_REQUEST> SQUAD_REQUESTS;
+using SQUAD_REQUESTS = std::unordered_map<ChatHandle,SQUAD_REQUEST>;
 
 extern UINT32 chatSendSquadCreateRequest(SquadControl& control, Player* player);
 

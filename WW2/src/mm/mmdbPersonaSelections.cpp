@@ -23,9 +23,9 @@
 //////////////////////////////////////////////////////////////////////
 
 // PERSONA_SELECTIONS are personaID->brigadeID
-typedef std::unordered_map<UINT32,UINT32> _PERSONA_SELECTIONS;
-typedef std::unordered_set<UINT32> _PERSONAS;
-typedef std::unordered_map<UINT32,_PERSONAS> _BRIGADE_PERSONAS;
+using _PERSONA_SELECTIONS = std::unordered_map<UINT32,UINT32>;
+using _PERSONAS = std::unordered_set<UINT32>;
+using _BRIGADE_PERSONAS = std::unordered_map<UINT32,_PERSONAS>;
 
 static _PERSONA_SELECTIONS _selections;
 

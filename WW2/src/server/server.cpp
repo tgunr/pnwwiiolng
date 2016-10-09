@@ -118,7 +118,7 @@ namespace Server
 
 ERROR_FUNCTION* 	extErrorFn;
 
-typedef std::deque<Server::Transfer*> TransferQueue;
+using TransferQueue = std::deque<Server::Transfer*>;
 static TransferQueue s_transferQueue;
 
 static Server::ServerInfo* _exitServer = nullptr;

@@ -27,7 +27,7 @@
 
 static bool g_weaponListIsInitialized;
 
-typedef std::map<UINT32, WEAPON*> WEAPON_INDEXES;
+using WEAPON_INDEXES = std::map<UINT32, WEAPON*>;
 static WEAPON_INDEXES s_weaponIndexes;
 
 const char* facilityTypeName[] = {	"NONE",
@@ -110,7 +110,7 @@ extern std::vector<std::unique_ptr<WEAPON>> g_weaponPtrs;
 WEAPON_SPAWNS g_weaponSpawns;
 
 // Weapons indexed by name
-typedef std::unordered_map<std::string,WEAPON*> WEAPON_NAME_INDEX;
+using WEAPON_NAME_INDEX = std::unordered_map<std::string,WEAPON*>;
 static WEAPON_NAME_INDEX weaponNameIndex;
 
 bool weapHasInitialized()

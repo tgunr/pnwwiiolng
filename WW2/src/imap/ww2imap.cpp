@@ -123,7 +123,7 @@ static int curFuncLang = -1;
 static int _defaultcfml;
 static int _turretAndMouseLookUseSameKeymap;
 
-typedef std::map<int, int> ImapIndexMap;
+using ImapIndexMap = std::map<int, int>;
 static std::map<int,ImapIndexMap> _imapIndexMap;
 
 // load imap presets

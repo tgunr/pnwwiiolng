@@ -63,10 +63,10 @@
 
 static HANDLES _spawning;
 
-typedef std::unordered_map< UINT32, std::set<UINT32> > RECRUITS;
+using RECRUITS = std::unordered_map< UINT32, std::set<UINT32>>;
 static RECRUITS _recruits;
 
-typedef std::unordered_set< UINT32 > PLAYERIDS;
+using PLAYERIDS = std::unordered_set<UINT32>;
 static PLAYERIDS _logins;
 #ifdef RECORD_LOGOUTS
 static PLAYERIDS _logouts;
@@ -81,8 +81,8 @@ struct AWS_READING
 	UINT16	allied;
 	UINT16	axis;
 };
-typedef std::map<UINT32, AWS_READING> AWS_GRID;
-typedef std::map<instanceid_t, AWS_GRID> AWS_INSTANCES;
+using AWS_GRID = std::map<UINT32, AWS_READING>;
+using AWS_INSTANCES = std::map<instanceid_t, AWS_GRID>;
 AWS_INSTANCES g_awsGrids, g_awsSnapshots;
 
 // Decal saving

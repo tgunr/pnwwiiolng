@@ -38,7 +38,7 @@ struct APP_TABLE_ENTRY
 	SCHAR	description[MAX_DESCRIPTION+1];
 };
 
-typedef std::vector<APP_TABLE_ENTRY> APP_TABLE;
+using APP_TABLE = std::vector<APP_TABLE_ENTRY>;
 
 struct apps_holder
 {
@@ -99,7 +99,7 @@ static struct apps_holder* apps = config.apps;
 
 static APP_TABLE appTable;
 
-typedef std::map<UINT32, std::string> ARENA_ALIASES;
+using ARENA_ALIASES = std::map<UINT32, std::string>;
 static ARENA_ALIASES g_arenaAliases;
 
 //////////////////////////////////////////////////////////////////////

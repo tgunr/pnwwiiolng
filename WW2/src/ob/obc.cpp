@@ -156,7 +156,7 @@ void _materialElements(xmlNodePtr root)
 
 #ifdef MAP_MATS
 
-typedef std::map<std::string,std::string> MaterialMapper;
+using MaterialMapper = std::map<std::string,std::string>;
 MaterialMapper materialMap;
 
 void _materialMapTree(xmlNodePtr root)
@@ -384,7 +384,7 @@ MATERIAL*	lpmats;
 	{
         size_t code = SuperFastHash((const char*)&lpmaterial->material, sizeof(piMATERIAL));
 
-        typedef std::map<size_t, int> Duplicate;
+		using Duplicate = std::map<size_t, int>;
         static Duplicate duplicate;
         Duplicate::iterator itr = duplicate.find(code);
 

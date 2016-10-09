@@ -40,10 +40,10 @@
 
 #include "include/logging.h"
 
-typedef std::map<UINT32,Mission*> MissionIndex;
+using MissionIndex = std::map<UINT32,Mission*>;
 
-typedef std::vector<Mission*> InstanceMissions;
-typedef std::map< instanceid_t, InstanceMissions > InstanceMissionIndex;
+using InstanceMissions = std::vector<Mission*>;
+using InstanceMissionIndex = std::map<instanceid_t, InstanceMissions>;
 
 extern const std::string& sdmTranslateName(const std::string& from);
 

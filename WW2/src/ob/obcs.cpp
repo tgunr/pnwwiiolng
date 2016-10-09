@@ -40,7 +40,7 @@
 
 static Covert<LOGICAL> _doCull(TRUE);
 
-typedef std::vector<SORTHEADER*> SortVector;
+using SortVector = std::vector<SORTHEADER*>;
 
 static void*         sortedlisttail;			// the end of the sorted list
 static void*			unsortedlisttail;			// the end of the unsorted list

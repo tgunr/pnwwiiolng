@@ -44,10 +44,10 @@
 
 static const UINT32 SQUAD_UPDATE_INTERVAL_MS = 5 * 1000;
 
-typedef std::unordered_map<UINT32,SquadList> SQUAD_LISTS;
-typedef std::unordered_map<ChatHandle,ChatHandle> SQUAD_NAMES;
+using SQUAD_LISTS = std::unordered_map<UINT32,SquadList>;
+using SQUAD_NAMES = std::unordered_map<ChatHandle,ChatHandle>;
 
-typedef std::set<const Player*> RECRUITERS;
+using RECRUITERS = std::set<const Player*>;
 static RECRUITERS g_recruiters;
 
 static SQUAD_LISTS g_squads;
@@ -217,7 +217,7 @@ static bool
 _requestPending(UINT32 squadID)
 {
 	static const UINT32 PENDING_DURATION_S = 15;
-	typedef std::vector< std::pair<UINT32,UINT32> > GUARD;
+	using GUARD = std::vector<std::pair<UINT32, UINT32>>;
 	static GUARD guard;
 	GUARD::iterator it;
 
@@ -1167,7 +1167,7 @@ SquadMemberEntry::teulIndex() const
 static bool
 _exclusiveSquadFetch(UINT32 squadID)
 {
-	typedef std::vector< std::pair<UINT32,UINT32> > _FETCHES;
+	using _FETCHES = std::vector<std::pair<UINT32,UINT32>>;
 	_FETCHES fetches;
 	_FETCHES::iterator it;
 
@@ -1418,7 +1418,7 @@ chatRequestRecruiter(Player* player, UCHAR language)
 	RECRUITER_LIST outgoing;
 	RECRUITERS::const_iterator it;
 
-	typedef std::multimap<UINT32, Recruiter> RECRUITER_WEIGHTING;
+	using RECRUITER_WEIGHTING = std::multimap<UINT32, Recruiter>;
 	RECRUITER_WEIGHTING dupes, spares;
 	std::set<UINT32> listedSquads;
 

@@ -115,7 +115,7 @@ static UINT32 _vCacheTries = 0;
 #endif
 
 #ifdef CLIENT_VEHICLE_CACHING
-typedef std::map<ChatHandle, vehVehicle*> VEHICLE_READY_MAP;
+using VEHICLE_READY_MAP = std::map<ChatHandle, vehVehicle*>;
 
 // map of players we just popped off the vis list
 // we let them linger in case they pop back on quick enough
@@ -123,7 +123,7 @@ static VEHICLE_READY_MAP _readyMap;
 #endif
 
 #ifdef REPORT_ENEMIES
-typedef std::map<SINT32, FLOAT32> ENEMY_REPORTS;
+using ENEMY_REPORTS = std::map<SINT32, FLOAT32>;
 #endif
 
 //static vehVehicle _VehicleHead; // head of linked list
@@ -131,7 +131,7 @@ typedef std::map<SINT32, FLOAT32> ENEMY_REPORTS;
 // used offline and ignored online
 static std::queue<vehVehicle*> g_freeVeh;
 
-typedef std::set<VehicleSTO*> HULK_SET;
+using HULK_SET = std::set<VehicleSTO*>;
 static HULK_SET _hulkqueue;
 
 // used offline and ignored online
@@ -151,8 +151,8 @@ static FLOAT32 _bailoutLife = 0;
 
 static void vehmainSpawn();
 
-typedef std::list<Vehicle::Hit> VEHICLE_HITS;
-typedef std::vector<Vehicle::Hit> VEHICLE_HIT_LIST;
+using VEHICLE_HITS = std::list<Vehicle::Hit>;
+using VEHICLE_HIT_LIST = std::vector<Vehicle::Hit>;
 
 static VEHICLE_HITS _DeferredHitMessages;
 
@@ -1792,12 +1792,12 @@ static UINT32 _GetNewVehicle(vehVehicle** VehiclePtr) // VEHSTUFF
 #define xDELETE_IMMEDIATELY
 #define DELETE_VEHICLES_DELAY_TIME 10000
 
-typedef struct TempSave
+struct TempSave
 {
     vehVehicle* vehicle;
     SINT32 timeToRemove;
 
-    TempSave(vehVehicle* v, SINT32 t )
+    TempSave(vehVehicle* v, SINT32 t)
     {
         vehicle = v;
         timeToRemove = t + DELETE_VEHICLES_DELAY_TIME;
@@ -1807,7 +1807,7 @@ typedef struct TempSave
         vehicle = nullptr;
         timeToRemove = 0;
     }
-} TempSave;
+};
 
 static std::map<vehVehicle*,TempSave> TempSaveVehicles;
 
@@ -6949,8 +6949,8 @@ ChatHandle vehLastInfantryDamaged()
 
 static WORLD_UPDATE _lastWorldUpdate;
 
-typedef std::map<UINT32 /*vehicleIndex*/, UINT32 /*numUpdates*/ > UPDATES_PER_VEHICLE;
-typedef std::map< UINT32 /* second */, UPDATES_PER_VEHICLE > UPDATES_HISTORY;
+using UPDATES_PER_VEHICLE = std::map<UINT32 /*vehicleIndex*/, UINT32 /*numUpdates*/ >;
+using UPDATES_HISTORY = std::map< UINT32 /* second */, UPDATES_PER_VEHICLE >;
 static UPDATES_HISTORY s_updateHistory;
 
 /* On processing an update for a given vehicle ... */

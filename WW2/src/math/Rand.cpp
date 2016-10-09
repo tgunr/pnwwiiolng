@@ -48,7 +48,7 @@
 // GCC at -O3 optimization so try your options and see what's best for you
 //
 
-//typedef unsigned int uint32;
+//using uint32 = unsigned int;
 
 #define N        (624)       // length of state vector
 #define M        (397)       // a period parameter

@@ -46,7 +46,7 @@ static bool _fillFacility(SINT32 numArgs, FUNCARGS* args);
 static bool _fillDepotLink(SINT32 numArgs, FUNCARGS* args);
 static bool _fillCpObject(SINT32 numArgss, FUNCARGS* args);
 
-typedef std::map<const std::string, void*> ObjMap;
+using ObjMap = std::map<const std::string, void*>;
 
 struct SECTION_HEADER
 {

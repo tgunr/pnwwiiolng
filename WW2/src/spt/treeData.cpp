@@ -74,8 +74,6 @@ bool _treename(XMLLoader* loader, xmlNode* node, bool first, void* userData)
         TreeData* td = new TreeData;
         td->name = (const char*)s;
 
-        typedef std::vector<TreeData *> *p;
-
         treedata.push_back(td);
 
         XML_PROCESS_CHILDREN(td);
@@ -234,8 +232,6 @@ static void loadDirectory(const std::string& dir)
                 td->name = name;
                 td->nearlod = 100.0f;
                 td->farlod = 150.0f;
-
-                typedef std::vector<TreeData *> *p;
 
                 treedata.push_back(td);
             }

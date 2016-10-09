@@ -1087,7 +1087,7 @@ void fxHitSetAttachedObject(SINT32 iID, OBJECT* lpObj)
 
     if(lpHit->lpObj)
     {
-        typedef std::pair<void* , SINT32> ins;
+		using ins = std::pair<void* , SINT32>;
 
         lpHit->mapIter = g_mappedHits.insert(ins((void*)lpHit->lpObj, iID));
 

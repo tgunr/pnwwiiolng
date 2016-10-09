@@ -38,7 +38,7 @@
 #include "spt/sptmain.h"
 #endif
 
-typedef struct tagCLUTTER
+struct CLUTTER
 {
     bool kill;
 
@@ -58,8 +58,7 @@ typedef struct tagCLUTTER
 	piMATRIX ObjMatrix;
 
     char grassid[64];
-
-} CLUTTER;
+};
 
 #include <algorithm>
 
@@ -69,7 +68,7 @@ using ClutterHash = std::unordered_set<std::string>;
 static ClutterHash keys;
 #define max_clutter_per_octet 64
 
-typedef std::multimap<std::string, CLUTTER*> ClutterMap;
+using ClutterMap = std::multimap<std::string, CLUTTER*>;
 static ClutterMap cluttermap;
 
 static SINT32 _GetRandomNumberFromSeed(SINT32* Seed);

@@ -16,8 +16,8 @@
 #include "mech/MechGyros.h"
 #include "mech/MechTurretMotor.h"
 
-typedef gr2GameObject* (*GR2_MODULE_CREATOR)(gr2ModuleSpec*);
-typedef std::map<std::string, GR2_MODULE_CREATOR> CreatorMap;
+using GR2_MODULE_CREATOR = gr2GameObject* (*)(gr2ModuleSpec*);
+using CreatorMap = std::map<std::string, GR2_MODULE_CREATOR>;
 
 // local variables
 

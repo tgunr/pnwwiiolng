@@ -26,7 +26,7 @@
 #include "scen/ScenarioManager.h"
 #include "ez/EZManager.h"
 
-typedef struct tagvehCntrlCommandListElement
+struct vehCntrlCommandListElement
 {
 	UCHAR CommandName[32];
 	UINT32 CommandId;
@@ -37,7 +37,7 @@ typedef struct tagvehCntrlCommandListElement
 	// next parameters have to be last
 	UINT32 Enabled[ML_MAX_CREW_POSITIONS];
 	UINT32 ExecutionTime;
-} vehCntrlCommandListElement;
+};
 
 UINT32 _ProcessCallback(SINT32 InParameter,UINT32 Id,UINT32 Detach);
 static vehCntrlCommandListElement* _LookupElement(UINT32 Id);

@@ -103,11 +103,11 @@ static LOGICAL _processMonkeyhead(FacilityStruct* facility, WWII_COUNTRY country
 //	contention flag, opens all the bases and links
 static LOGICAL _changeLinks(BRIDGE_ENTRY* linkList, bool closed);
 
-typedef std::vector<ObjectStruct*> FACTORIES;
+using FACTORIES = std::vector<ObjectStruct*>;
 static FACTORIES _factories;
 FLOAT64 factoryDamageFactor[MAX_COUNTRIES];
 
-typedef std::map<FacilityStruct*, UINT32> REPAIR_QUEUE;
+using REPAIR_QUEUE = std::map<FacilityStruct*, UINT32>;
 static REPAIR_QUEUE _repairQueue;
 
 //////////////////////////////////////////////////////////////////////

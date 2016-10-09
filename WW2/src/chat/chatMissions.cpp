@@ -46,8 +46,8 @@
 // Undefine to have enemy reports remain local to individual missions.
 #define TARGET_SHARE_CONTACTS 1
 
-typedef std::map<UINT32, ChatMission*> CHAT_MISSIONS;
-typedef std::set<UINT32> MISSION_STATUSES;
+using CHAT_MISSIONS = std::map<UINT32, ChatMission*>;
+using MISSION_STATUSES = std::set<UINT32>;
 
 CHAT_MISSIONS g_missions;
 MISSION_STATUSES g_statuses;
@@ -672,7 +672,7 @@ ChatMission::expireWaypoints()
 // Easter eggs for certain mission leaders
 
 static bool LEADER_EGGS_ENABLED = true;
-typedef std::map<ChatHandle, std::string> EGGS;
+using EGGS = std::map<ChatHandle, std::string>;
 static EGGS eggs;
 
 static UINT32 nextEggFetch = 0;

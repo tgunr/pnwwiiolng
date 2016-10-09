@@ -170,7 +170,7 @@ public:
 	sdm_replacement_octet_data celldata;
 	TerrainObjectRenderer* _renderer;
 	GLuint _displayList;
-	typedef std::map<int, phui::ref_ptr<RenderBucket> > BucketMap;
+	using BucketMap = std::map<int, phui::ref_ptr<RenderBucket>>;
 	BucketMap _buckets;
 };
 

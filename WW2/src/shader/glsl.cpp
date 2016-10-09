@@ -32,25 +32,22 @@ Description: Wrapper for creating vertex/frag shaders
 
 static bool ShaderReload = false;
 
-typedef struct tagShaderData
+struct ShaderData
 {
-    tagShaderData(const char* path, glslShader* sh)
+    ShaderData(const char* path, glslShader* sh)
+		: name(path), shader(sh)
     {
-        name = path;
-        shader = sh;
-
         fioModified(&then, path);
         now = then;
     }
 
     std::string name;
+    glslShader* shader;
     int then;
     int now;
-    glslShader* shader;
+};
 
-} ShaderData;
-
-typedef std::set<ShaderData *> ShaderMap;
+using ShaderMap = std::set<ShaderData *>;
 static ShaderMap _shaders;
 
 #endif // BETA_RELEASE

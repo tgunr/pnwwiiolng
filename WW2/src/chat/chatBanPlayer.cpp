@@ -39,7 +39,7 @@ struct BAN
 	UINT32		m_banNo;
 	playerid_t	m_playerID;
 };
-typedef ConditionQueue<BAN> BAN_QUEUE;
+using BAN_QUEUE = ConditionQueue<BAN>;
 static BAN_QUEUE banQueue;
 struct BanThread : public DBThread::Thread
 {

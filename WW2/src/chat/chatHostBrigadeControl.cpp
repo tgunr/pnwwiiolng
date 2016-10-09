@@ -37,12 +37,12 @@
 
 class BrigadeController;
 
-typedef std::map<UINT32, BrigadeController*> CONTROLLERS;
+using CONTROLLERS = std::map<UINT32, BrigadeController*>;
 static CONTROLLERS controllers;
-typedef std::set<UINT32> ELECTIONS;
+using ELECTIONS = std::set<UINT32>;
 static ELECTIONS elections;
 
-typedef std::vector<BrigadeController*> BRIGADE_UPDATES;
+using BRIGADE_UPDATES = std::vector<BrigadeController*>;
 
 //////////////////////////////////////////////////////////////////////
 // The brigade controller class itself

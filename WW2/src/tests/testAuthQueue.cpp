@@ -10,7 +10,7 @@ struct QueueInfo
 	UINT32 position;
 	UINT32 waitTime;
 };
-typedef std::vector<QueueInfo> SendQueue;
+using SendQueue = std::vector<QueueInfo>;
 static SendQueue sendQueue;
 size_t UpdatesQueued() { return sendQueue.empty() ? 0 : sendQueue.size(); }
 

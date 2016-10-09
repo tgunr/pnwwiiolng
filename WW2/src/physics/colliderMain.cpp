@@ -68,7 +68,7 @@ dSpaceID colliderWorldSpace() { return _odeWorldSpace; }
 dSpaceID colliderDynamicSpace(){ return _odeDynamicSpace; }
 
 #include <map>
-typedef std::map<std::pair<int,int>, dSpaceID> SpaceMap;
+using SpaceMap = std::map<std::pair<int,int>, dSpaceID>;
 
 SpaceMap _superCellSpaceMap;
 SpaceMap _scenarioSpaceMap;

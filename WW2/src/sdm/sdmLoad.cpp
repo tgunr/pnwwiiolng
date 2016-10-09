@@ -59,7 +59,7 @@
 static char _statement[4096];
 static char g_name[MAX_STRT_NAME_LENGTH], g_fileName[MAX_OBJNAME_LENGTH];
 
-typedef struct CPWITHID
+struct CPWITHID
 {
 	struct CPWITHID* next;
 	struct CPWITHID* prev;
@@ -73,12 +73,12 @@ typedef struct CPWITHID
 	WWII_COUNTRY	controller;
 	UINT32		numLinks;
 	SINT32		absx, absy;
-} CPWITHID;
+};
 static CPWITHID* cps;
 static CPWITHID* lastCW;
 static UINT32 uMaxCPOID;
 
-typedef struct FACWITHID
+struct FACWITHID
 {
 	struct FACWITHID* next;
 	struct FACWITHID* prev;
@@ -90,30 +90,30 @@ typedef struct FACWITHID
 	LOGICAL		bIsCurrent;
 	WWII_COUNTRY owner;
 	SINT32		absx, absy;
-} FACWITHID;
+};
 static FACWITHID* facs;
 static FACWITHID* lastFW;
 static UINT32 uMaxFacOID;
 
-typedef struct BUILDWITHID
+struct BUILDWITHID
 {
 	struct BUILDWITHID* next;
 	struct BUILDWITHID* prev;
 	SINT32		oid;
 	BUILDING	object;
 	SINT32	ox, oy;
-} BUILDWITHID;
+};
 static BUILDWITHID* builds;
 static BUILDWITHID* lastBW;
 static UINT32 uNumBuilds;
 
-typedef struct DLINKWITHID
+struct DLINKWITHID
 {
 	struct DLINKWITHID* next;
 	struct DLINKWITHID* prev;
 	SINT32		oid;
 	DEPOT_LINK	object;
-} DLINKWITHID;
+};
 static DLINKWITHID* dlinks;
 static DLINKWITHID* lastDLW;
 static UINT32 uNumDlinks;

@@ -11,7 +11,7 @@
 
 static char EMPTY_STR[] = "";
 
-typedef std::unordered_set<std::string> StringSet;
+using StringSet = std::unordered_set<std::string>;
 
 static StringSet strings;
 #ifdef STRPOOL_DEBUG

@@ -17,10 +17,10 @@
 *************************************************************************************************/
 
 // Map of most recent vis level vs super-cell specific building ID.
-//typedef std::map< UINT32 /* Building ID */, Strat::EventData /* strat info */ > BuildingStatus;
+//using BuildingStatus = std::map<UINT32 /* Building ID */, Strat::EventData /* strat info */>;
 
 // Map of supercell <-> BuildingStatus map.
-//typedef std::map< std::pair<int /*scx*/, int /*scy*/>, BuildingStatus > CellBuildingStatus;
+//using CellBuildingStatus = std::map<std::pair<int /*scx*/, int /*scy*/>, BuildingStatus>;
 
 //! All pending entities.
 //static CellBuildingStatus _statusMap;

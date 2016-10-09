@@ -24,7 +24,7 @@
 TOE_TEMPLATES toeTemplates;
 
 // TOE_::WeaponInstances that need saving and the original number of units
-typedef std::vector< std::pair<TOE_::WeaponInstance*,UINT16> > TOE_SAVE_LIST;
+using TOE_SAVE_LIST = std::vector<std::pair<TOE_::WeaponInstance*,UINT16>>;
 TOE_SAVE_LIST toeSaveList;
 
 //////////////////////////////////////////////////////////////////////

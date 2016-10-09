@@ -26,12 +26,11 @@
 
 #include "fio/fio.h"
 
-// NOTICE ON WIN32:
-// typedef DWORD unsigned long;
+// NOTICE ON WIN32: DWORD <=> unsigned long
 // sizeof(DWORD) = 4
 
-typedef unsigned int UI32;
-typedef int I32;
+using UI32 = unsigned int;
+using I32 = int;
 
 struct  DDCOLORKEY
 {

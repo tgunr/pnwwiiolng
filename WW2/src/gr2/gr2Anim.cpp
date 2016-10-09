@@ -109,11 +109,11 @@ static void _drawfpscollider();
 // gr2AnimTrooper used to be defined here
 // moved it to the header for easier member access
 
-typedef GR2_POOL<gr2AnimTrooper> GR2_TROOPER_POOL;
+using GR2_TROOPER_POOL = GR2_POOL<gr2AnimTrooper>;
 static GR2_TROOPER_POOL _gr2TrooperPool = GR2_TROOPER_POOL(128, 32, GR2_TROOPER_POOL::NEW);
 
 #ifdef USE_CORPSES
-typedef GR2_POOL<Corpse> GR2_CORPSE_POOL;
+using GR2_CORPSE_POOL = GR2_POOL<Corpse>;
 static GR2_CORPSE_POOL _gr2CorpsePool = GR2_CORPSE_POOL(32, 32, GR2_CORPSE_POOL::NEW);
 #endif
 
@@ -192,10 +192,10 @@ struct gr2AnimMotionBase
 	}
 };
 
-typedef GR2_POOL<RayColliders> GR2_RAY_POOL;
+using GR2_RAY_POOL = GR2_POOL<RayColliders>;
 static GR2_RAY_POOL _gr2RayPool = GR2_RAY_POOL(128);
 
-typedef std::map<gr2AnimTrooper*,RayColliders*> GR2RayMap;
+using GR2RayMap = std::map<gr2AnimTrooper*,RayColliders*>;
 
 static void gr2AnimHandleAttack(gr2AnimTrooper* model, int pose, int move, int point, int weapon);
 static void gr2AnimHandlePoseChange(gr2AnimTrooper* model, int pose, int move, int point, int weapon);

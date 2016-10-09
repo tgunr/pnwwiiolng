@@ -324,7 +324,7 @@ float FTFontWestern::Advance(const wchar_t* str)
 
 #define ALT_DRAW_TEXT
 
-typedef struct FLPoint { float x,y; } FLPoint;
+struct FLPoint { float x,y; };
 
 template<class T>
 void FTFontWestern::RenderText( const T* str, int len )

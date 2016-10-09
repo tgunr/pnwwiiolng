@@ -200,7 +200,7 @@ struct dotCmdInfo
     bool key;				// requires a key file
 };
 
-typedef std::map<std::wstring, dotCmdInfo> dotCmdMap;
+using dotCmdMap = std::map<std::wstring, dotCmdInfo>;
 static dotCmdMap _dotCommands;
 //------------------------------------------------------
 
@@ -218,7 +218,7 @@ static dotCmdMap _dotCommands;
 	Return value is the number of* arguments* excluding the presumed command.
  ************************************************************************************************/
 
-typedef std::vector<std::wstring> ARGV_BASE;
+using ARGV_BASE = std::vector<std::wstring>;
 struct ARGV : public ARGV_BASE
 {
 	ARGV(const char* source, UINT32 maxArguments, bool fillLastArgument);
@@ -3964,7 +3964,7 @@ static OBJECT* buildingobj = nullptr;
 
 static SINT32 dot_tspawn(const char* input)
 {
-    typedef std::set<OBJECT*> omap;
+    using omap = std::set<OBJECT*>;
 
 	static omap instances;
     std::vector<omap::iterator> remove;
@@ -5315,12 +5315,12 @@ void _PrintVehHitmap(vehType const* vehtype )
 	return;
 }
 
-typedef struct
+struct hitmapNameList
 {
 	int num;
 	char* name[256];
 	LOGICAL infile[256];
-} hitmapNameList;
+};
 
 /************************************************************************************************
 	_ValidateVehHitmap

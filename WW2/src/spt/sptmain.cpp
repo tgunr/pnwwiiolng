@@ -142,7 +142,7 @@ private:
 #define VisLimit    3200.0f
 
 static std::map<int, float *> windMatrices;      // vector of float pointers storing wind matrices for each matrix defined by SpeedWind
-typedef std::multimap<OBJECT*, Tree*> TreeMap;
+using TreeMap = std::multimap<OBJECT*, Tree*>;
 static TreeMap objectTreeMap;
 
 static std::vector<float> windRustleAngles;     // table of leaf rustle angles shared by all base trees

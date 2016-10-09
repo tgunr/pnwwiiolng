@@ -33,7 +33,7 @@ struct WorldForce
 	SINT32 expires;
 };
 
-typedef std::vector<WorldForce> WorldForces;
+using WorldForces = std::vector<WorldForce>;
 
 static dWorld* _odeWorld;
 static double _odeStepSize;

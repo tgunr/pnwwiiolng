@@ -28,8 +28,8 @@ class gr2PhysicsModel;
 #define ITOM(x) ((x)*0.0254f)			// inches to meters
 #define DEG(x) mlDEG_TO_RAD((double)x)	// degrees to radians
 
-typedef void (*jointParam)(dJointID, int param, double value);
-//typedef std::set<gr2PhysicsModel*> ModelList;
+using jointParam =  void (*)(dJointID, int param, double value);
+//using ModelList = std::set<gr2PhysicsModel*>;
 //static ModelList _models;
 
 static OBJECT* gr2PhysicsGetModelNode();

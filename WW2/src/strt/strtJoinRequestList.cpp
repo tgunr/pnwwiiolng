@@ -17,7 +17,7 @@
 //#include "cnvy/cnvyMain.h"
 #include "strt/strtHostMessages.h"
 
-typedef std::map<UINT32, WeapJoinRequestNode*> JOIN_MAP;
+using JOIN_MAP = std::map<UINT32, WeapJoinRequestNode*>;
 static JOIN_MAP joinMap;
 
 //////////////////////////////////////////////////////////////////////

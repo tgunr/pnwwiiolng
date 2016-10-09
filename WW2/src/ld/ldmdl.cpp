@@ -31,14 +31,14 @@ static LOGICAL	IsMergableBranchTopNode(OBJECT* node);
 
 static bool _reduceModel = false;
 
-typedef struct normalsListItem
+struct normalsListItem
 {
 	normalsListItem*	next;
 	OBJECT*		lpobj;
 	OBJECT*		lpatt;
 	SINT32			vcnt;
 
-} *lpnormalsListItem;
+}
 
 normalsListItem*		normalsList;
 
@@ -2204,7 +2204,7 @@ static LOGICAL IsMergableBranchTopNode(OBJECT* node)
 
 inline bool operator==(const piUNIFIED_VERTEX &a, const piUNIFIED_VERTEX &b) { return !memcmp(&a, &b, sizeof(piUNIFIED_VERTEX)); }
 
-typedef std::multimap<size_t,ogl::VertexIdx> UniVertexIndexer;
+using UniVertexIndexer = std::multimap<size_t,ogl::VertexIdx>;
 
 //////////////////////////////////////////////////////////////////////
 //	ldmdlIndexVertices

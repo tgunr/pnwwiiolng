@@ -71,8 +71,8 @@ struct GridKey
 // STL hash functor for the GridKey class.
 namespace std { template<> struct hash<GridKey> { UINT64 operator()(const GridKey& key) const { return (key.instanceID() << 5) ^ key.key(); } }; }
 
-typedef std::unordered_map<GridKey, class ChatGrid*> _CHAT_GRID;
-typedef std::set<class ChatGrid*> _GRIDS;
+using _CHAT_GRID = std::unordered_map<GridKey, class ChatGrid*>;
+using _GRIDS = std::set<class ChatGrid*>;
 
 static ChatGrid* _getGrid(const GridKey& key);
 
@@ -155,7 +155,7 @@ private:
 
 static _CHAT_GRID _gridIndex;
 
-typedef std::stack<ChatGrid*> _FREE_GRIDS;
+using _FREE_GRIDS = std::stack<ChatGrid*>;
 static _FREE_GRIDS _freeGrids;
 
 static STOBatch _stoBatch;

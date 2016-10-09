@@ -14,10 +14,10 @@
 
 //	------------------------------	Declarations
 
-typedef std::queue<playerid_t> ID_QUEUE;
+using ID_QUEUE = std::queue<playerid_t>;
 static ID_QUEUE freeIDs;
 
-typedef std::map<playerid_t, Player*> IN_USE;
+using IN_USE = std::map<playerid_t, Player*>;
 static IN_USE inUse;
 
 static const playerid_t MIN_MANAGEMENT_ID = (playerid_t) -100100;

@@ -964,14 +964,14 @@ _pollChecksums()
 class Housekeeper
 {
 public:
-	typedef void (FUNCTION)(void);
+	using FUNCTION = void(*)(void);
 
 private:
-	FUNCTION**		m_functions;
+	FUNCTION*		m_functions;
 	UINT32			m_state;
 
 public:
-	Housekeeper(FUNCTION** functions)
+	Housekeeper(FUNCTION* functions)
 		: m_functions(functions)
 		, m_state(0)
 		{
@@ -1010,7 +1010,7 @@ extern void mapExpireSorties();
 static bool
 _housekeeping()
 {
-	static Housekeeper::FUNCTION* functions[] =
+	static Housekeeper::FUNCTION functions[] =
 	{
 		_fullCheck
 	,	_commitSorties
@@ -1025,7 +1025,7 @@ _housekeeping()
 	,	mmCheckAddictionTimers
 	,	Instance::RecordPopulations
 	,	_logWWIIPlayerStats
-	,	(Housekeeper::FUNCTION*)chatHousekeepGroupPermissions
+	,	[](){ chatHousekeepGroupPermissions(); }
 	,	mapExpireSorties
 	,	mapRequestBrigadeDetailsUpdate
 	,	_checkForUpdatedMissionLists
@@ -1250,7 +1250,7 @@ main(int argc, const char* argv[])
 		threadsCallNextCallback();
 		threadsLogging();
 
-		static Housekeeper::FUNCTION* functions[] =
+		static Housekeeper::FUNCTION functions[] =
 		{
 			mapSendChatUpdates
 		,	mapProcessLogins

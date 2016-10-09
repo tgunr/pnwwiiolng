@@ -25,7 +25,7 @@
 #include "chat/chatHostBrigadeControl.h"
 #include "wwii/wwiiConfig.h"
 
-typedef std::map<UINT32,UINT32> LAST_MOVEMENTS;
+using LAST_MOVEMENTS = std::map<UINT32,UINT32>;
 static LAST_MOVEMENTS lastMovements;
 bool g_newLocations = false;
 
