@@ -97,9 +97,9 @@ struct persGunsightRangeTable
 struct GunfileLookup
 {
 	SINT8 CommandName[32];
-	GunFileReadFunc* ReadFunction;
-	GunFileDisplayFunc* DisplayFunction;
-	GunFileKillFunc* KillFunction;
+	GunFileReadFunc ReadFunction;
+	GunFileDisplayFunc DisplayFunction;
+	GunFileKillFunc KillFunction;
 };
 
 struct GunfileElement
@@ -3186,7 +3186,7 @@ void persGunsightDrawFPSScope(int type)
 	{
         if(InstView.GE[i].CommandCode)
         {
-            GunFileDisplayFunc* f = Lookup[InstView.GE[i].CommandCode].DisplayFunction;
+            GunFileDisplayFunc f = Lookup[InstView.GE[i].CommandCode].DisplayFunction;
 
             if(f && f == _DisplayMagLine)
             {
@@ -3264,7 +3264,7 @@ void persGunsightDrawOverlay()
 	{
         if(GunSightView.GE[i].CommandCode)
         {
-            GunFileDisplayFunc* f = Lookup[GunSightView.GE[i].CommandCode].DisplayFunction;
+            GunFileDisplayFunc f = Lookup[GunSightView.GE[i].CommandCode].DisplayFunction;
 
             if(f && f == _DisplayMagLine)
             {

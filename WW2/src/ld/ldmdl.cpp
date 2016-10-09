@@ -38,7 +38,7 @@ struct normalsListItem
 	OBJECT*		lpatt;
 	SINT32			vcnt;
 
-}
+};
 
 normalsListItem*		normalsList;
 

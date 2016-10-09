@@ -48,7 +48,7 @@
 
 #define TIME_INCREMENT 0.1
 
-struct BombsightData
+struct BombSightData
 {
 	OBJECT* PivotDOF;
 	OBJECT* AltPntDOF;
