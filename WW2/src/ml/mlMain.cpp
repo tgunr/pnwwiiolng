@@ -486,7 +486,7 @@ static UINT32 _DoODEVehicleCollision(mlVehicleData * VehicleData, FLOAT64 DeltaT
 
 static UINT32 mlDetermineVehicleCollisions(mlVehicleData * VehicleData, FLOAT64 DeltaTime);
 
-static SINT32 mlVehicleUpdateRide(mlVehicle* VehicleData);
+static SINT32 mlVehicleUpdateRide(mlVehicleData* VehicleData);
 
 #if(0)
 static SINT32 _radioStatic(trnCDTerrainObject* t);
@@ -8972,7 +8972,7 @@ static SINT32 mlVehicleHandleTurretConvergence(mlVehicleData* VehicleData)
 	mlVehicleUpdateRide
 *************************************************************************************************/
 
-SINT32 mlVehicleUpdateRide(mlVehicle* VehicleData)
+SINT32 mlVehicleUpdateRide(mlVehicleData* VehicleData)
 {
 	vehVehicle* Vehicle = VehicleData->VehicleMasterPtr;
 
@@ -9038,7 +9038,7 @@ static LOGICAL mlSafeToUnhoist(vehVehicle* Vehicle)
 	mlVehicleToggleHoist
 *************************************************************************************************/
 
-SINT32 mlVehicleToggleHoist(mlVehicle* VehicleData)
+SINT32 mlVehicleToggleHoist(mlVehicleData* VehicleData)
 {
 	vehVehicle* CurrentVehicle;
 	vehVehicle* PlayerVehicle = VehicleData->VehicleMasterPtr;
@@ -9180,7 +9180,7 @@ static vehVehicle* mlFindShipUnderVehicle(vehVehicle* Vehicle)
 	mlVehicleRideTransport
 *************************************************************************************************/
 
-SINT32 mlVehicleRideTransport(mlVehicle* VehicleData)
+SINT32 mlVehicleRideTransport(mlVehicleData* VehicleData)
 {
 	vehVehicle* RideVehicle;
 	vehVehicle* PlayerVehicle = VehicleData->VehicleMasterPtr;

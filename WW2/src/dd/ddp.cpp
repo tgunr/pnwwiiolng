@@ -2159,7 +2159,7 @@ static void glScreenCapture()
 	capSave(bitmap, WantedWidth, WantedHeight, fileName);
 }
 
-LOGICAL ddcapStart
+LOGICAL ddcapStart()
 {
 	glScreenCapture();
 	return TRUE;

@@ -709,14 +709,14 @@ extern SINT32 mlSetRangeReadout(FLOAT32 Range);
 extern SINT32 mlSetBombsightReadoutEnglish(FLOAT32 Alt, FLOAT32 TAS);
 extern SINT32 mlSetBombsightReadoutMKS(FLOAT32 Alt, FLOAT32 TAS);
 
-extern SINT32 mlVehicleAddImpulse(mlVehicleRef, FLOAT64VECTOR const* Pos, FLOAT64VECTOR const* Impulse);
+extern SINT32 mlVehicleAddImpulse(mlVehicleData*, FLOAT64VECTOR const* Pos, FLOAT64VECTOR const* Impulse);
 
 extern UINT32 mlToggleHoist(SINT32 Param,UINT32 Id,UINT32 Detach);
 extern UINT32 mlAdjustWinch(SINT32 Param,UINT32 Id,UINT32 Detach);
 extern UINT32 mlRideTransport(SINT32 Param,UINT32 Id,UINT32 Detach);
 
-extern SINT32 mlVehicleToggleHoist(mlVehicleRef);
-extern SINT32 mlVehicleRideTransport(mlVehicleRef);
+extern SINT32 mlVehicleToggleHoist(mlVehicleData*);
+extern SINT32 mlVehicleRideTransport(mlVehicleData*);
 
 extern void mlRemoveComponent(mlVehicleData*, mlComponent*, LOGICAL ParentRemoved);
 
@@ -730,7 +730,7 @@ extern UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 extern UINT32 mlInfantryUpdate(mlVehicleData* VehicleData, SINT32 TicTime);
 extern SINT32 mlInfantryInsideVehicleCheck (mlVehicleData* pVehicleData, piVECTOR* eyePoint);
 
-extern SINT32 mlVehicleUpdate(mlVehicleRef vehRef);
+extern SINT32 mlVehicleUpdate(mlVehicleData* vehRef);
 
 struct ptkQuaternion;
 extern SINT32 mlQuaternionToVehAttMat(struct ptkQuaternion const*, FLOAT64ATT*,piMATRIX*);

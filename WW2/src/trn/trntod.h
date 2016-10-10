@@ -22,4 +22,4 @@ UINT32 trnTODSetDayOfMonth(UINT32 DayOfMonth);
 UINT32 trnTODGetTimeMultiplier(FLOAT32 * Multiplier);
 UINT32 trnTODSetTimeMultiplier(FLOAT32 Multiplier);
 
-SINT32 trntodTimeOfDayHasChanged;
+extern SINT32 trntodTimeOfDayHasChanged;

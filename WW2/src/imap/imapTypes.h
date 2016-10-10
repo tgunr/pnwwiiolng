@@ -160,7 +160,7 @@ using imapKeymapRef = struct imap_keymap_list*;
 
 ///	Callback for imapInstallControlCallback.
 // 	Function signature inherited from old imap code for compatability.
-iusing imapControlCallback = unsigned int(*)(int param, unsigned int functionCode, unsigned int callbackinfo);
+using imapControlCallback = unsigned int(*)(int param, unsigned int functionCode, unsigned int callbackinfo);
 
 /// Read callback for imapInstallCallbacks.
 using imapReadCallback = int (*)(void* userdata, int numbytes, void* buf);

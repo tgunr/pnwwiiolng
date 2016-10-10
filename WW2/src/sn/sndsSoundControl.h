@@ -52,13 +52,15 @@ extern void sndsUpdateSounds();
 //
 // it also handles starting delayed sounds if the time to play them has elapsed
 //
-// it is also a convienent place to put possible resource optomisations such as deleting sounds which have
+// it is also a convenient place to put possible resource optimizations such as deleting sounds which have
 // finished playing (and are not looping), or doing performance monitoring, etc.
 
 //extern LOGICAL sndsCanCreateNewSound();
 
 // this enforces whatever rules we have regarding max number of sounds playing at one time
 
+struct snSound;
+struct SNDSCREATE;
 #ifdef SOUND_DEBUG
 	#define sndsLoadSound(a)   sndsLoadSoundDebug(a, _FL)
 	extern snSound * sndsLoadSoundDebug(SNDSCREATE* lpCreate, SCHAR* file, SINT32 line);
@@ -134,7 +136,7 @@ extern LOGICAL sndsSetVolume(snSound* whichSound, FLOAT64 newVolume);
 // unpredictable effects.
 // Note that other factors (such as distance attenuation) can impact the volume
 // which is ultimately applied to the sound.  Therefore using this function will
-// effect an immeadiate volume change always, but the actual volume may
+// effect an immediate volume change always, but the actual volume may
 // be different if distance attenuation is active
 // return values:	1 if value was set
 //					0 if value was not set
@@ -146,7 +148,7 @@ extern LOGICAL sndsSetPanPosition(snSound* whichSound, short panPosition);
 // be remixed with this command.
 // Note that other factors (such as 3D panning) can impact the pan
 // which is ultimately applied to the sound.  Therefore using this function will
-// effect an immeadiate pan change always, but the actual pan may
+// effect an immediate pan change always, but the actual pan may
 // be different if 3D pan is active
 // return values:	1 if value was set
 //					0 if value was not set
