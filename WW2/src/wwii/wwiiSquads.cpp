@@ -57,7 +57,7 @@ Squad::Squad(UINT32 withSquadID, const ChatHandle& handle, const std::string& wi
 // Packer
 
 SINT32
-Squad::packer(LOGICAL mode, ACTION_OBJECT* a)
+Squad::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_squadID, 0);
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_shortHandle, 0);
@@ -146,7 +146,7 @@ Recruiter::Recruiter(const ChatHandle& withHandle, const Squad* squad)
 // Packer
 
 SINT32
-Recruiter::packer(LOGICAL mode, ACTION_OBJECT* a)
+Recruiter::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, 0);
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_squadHandle, 0);

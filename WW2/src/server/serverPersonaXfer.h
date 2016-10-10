@@ -42,7 +42,7 @@ namespace Server
 		const Auth::Dispatch& dispatch() const { return data.dispatch; }
 
 		public: virtual SINT32 onComplete(SINT32 /* result */) const override { return -EINVAL; }
-		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a) override
+		public: virtual void packer(PackMode mode, ACTION_OBJECT* const a) override
 		{
 			Transfer::packer(mode, a);
 			data.packer(mode, a);

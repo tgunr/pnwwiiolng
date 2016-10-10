@@ -95,7 +95,7 @@ _errorSYN_CALLBACK(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*
 //////////////////////////////////////////////////////////////////////
 
 static SINT32
-_packSYN_TOKEN( LOGICAL mode, UCHAR* const data, SINT32 offset, struct SYN_TOKEN_STRUCT* const tokenRef, SINT32 /*size*/)
+_packSYN_TOKEN( PackMode mode, UCHAR* const data, SINT32 offset, struct SYN_TOKEN_STRUCT* const tokenRef, SINT32 /*size*/)
 {
 	offset = teulPackUINT16(mode, data, offset, &tokenRef->version, 0);
 	offset = teulPackUINT32(mode, data, offset, &tokenRef->timeout, 24);
@@ -201,7 +201,7 @@ _actionRecvSYN_TOKEN(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 
 static SINT32
-_packSYN_ACK_TOKEN(LOGICAL mode, UCHAR* const data, SINT32 offset, struct SYN_TOKEN_STRUCT* tokenRef, SINT32 /*size*/)
+_packSYN_ACK_TOKEN(PackMode mode, UCHAR* const data, SINT32 offset, struct SYN_TOKEN_STRUCT* tokenRef, SINT32 /*size*/)
 {
 	offset = teulPackUINT16(mode, data, offset, &tokenRef->version, 0);
 	offset = teulPackUINT32(mode, data, offset, &tokenRef->timeout, 24);
@@ -399,7 +399,7 @@ _actionRecvFYN_ACK_TOKEN(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 
 static SINT32
-_packKLIVE_TOKEN (LOGICAL mode, UCHAR* const data, SINT32 offset, KDATA* kt, SINT32 /*size*/)
+_packKLIVE_TOKEN (PackMode mode, UCHAR* const data, SINT32 offset, KDATA* kt, SINT32 /*size*/)
 {
 	return teulPackUCHAR(mode, data, offset, &kt->random, 8);
 }
@@ -407,7 +407,7 @@ _packKLIVE_TOKEN (LOGICAL mode, UCHAR* const data, SINT32 offset, KDATA* kt, SIN
 //////////////////////////////////////////////////////////////////////
 
 static SINT32
-_packKLIVE_ACK_TOKEN(LOGICAL mode,  UCHAR* const data, SINT32 offset, KDATA* kt, SINT32 /*size*/)
+_packKLIVE_ACK_TOKEN(PackMode mode,  UCHAR* const data, SINT32 offset, KDATA* kt, SINT32 /*size*/)
 {
 	return _packKLIVE_TOKEN(mode, data, offset, kt, 0);
 }

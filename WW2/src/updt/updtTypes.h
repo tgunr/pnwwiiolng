@@ -278,7 +278,7 @@ struct WORLD_UPDATE
 
 #endif
 
-	SINT32	packRemoveList(LOGICAL mode, ACTION_OBJECT* const a);
+	SINT32	packRemoveList(PackMode mode, ACTION_OBJECT* const a);
 };
 
 // if a fireTimeStamp is valid and hapened btween updateSent and now

@@ -24,7 +24,7 @@ public:
 	SquadMsg(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_status, 0);
 		if ( m_status > LIST_ONLY )

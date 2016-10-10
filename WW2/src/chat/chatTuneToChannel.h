@@ -31,7 +31,7 @@ namespace Chat
 		bool			m_tx;				// Is transmit enabled?
 
 		// Common members
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 		// Host functions
 		bool send(SINT32 connection);

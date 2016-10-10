@@ -20,5 +20,5 @@ struct ChatServerInfo
 	UINT16	m_port;			// Port of the chat server
 
 	// Member functions
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 };

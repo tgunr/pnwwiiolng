@@ -21,7 +21,7 @@ struct TimeUpdate
 	TimeUpdate() : gametime(0), factor(0), weather(0), rain(0) {}
 	TimeUpdate(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 
-	void packer(LOGICAL mode, ACTION_OBJECT* const a)
+	void packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		a->packer(mode, gametime);
 		a->packer(mode, factor);

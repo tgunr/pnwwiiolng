@@ -10,6 +10,8 @@
 
 #include "dbug/dbug.h"
 
+using PackMode = UINT32;
+
 //	The following routines pack and unpack the cross platform basic data types defined in teul.
 //	Extended types and structures should be packed with user defined routines that use these to
 // 	pack the individual elements.
@@ -23,39 +25,39 @@
 //		 bits significant and are packed.data
 
 //! Pack/unpack a signed value held in a 32-bit store.
-SINT32 teulPackSINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SINT32* const idata, SINT32 significantbits);
+SINT32 teulPackSINT32(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, SINT32* const idata, SINT32 significantbits);
 
 //! Pack/unpack a signed value held in a 16-bit store.
-SINT32 teulPackSINT16(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SINT16* const idata, SINT32 significantbits);
+SINT32 teulPackSINT16(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, SINT16* const idata, SINT32 significantbits);
 
 //! Pack/unpack an unsigned value held in a 32-bit store.
-SINT32 teulPackUINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT32* const idata, SINT32 significantbits);
+SINT32 teulPackUINT32(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, UINT32* const idata, SINT32 significantbits);
 
 //! Pack/unpack an unsigned value held in a 16-bit store.
-SINT32 teulPackUINT16(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT16* const idata, SINT32 significantbits);
+SINT32 teulPackUINT16(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, UINT16* const idata, SINT32 significantbits);
 
 //! Pack/unpack a signed value held in a 8-bit store.
-SINT32 teulPackSCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SCHAR* const idata, SINT32 significantbits);
+SINT32 teulPackSCHAR(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, SCHAR* const idata, SINT32 significantbits);
 
 //! Pack/unpack an unsigned value held in a 8-bit store.
-SINT32 teulPackUCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UCHAR* const idata, SINT32 significantbits);
+SINT32 teulPackUCHAR(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, UCHAR* const idata, SINT32 significantbits);
 
 //! Pack/unpack a value stored as a 32-bit float.
-SINT32 teulPackFLOAT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, FLOAT32* const idata, SINT32 significantbits);
+SINT32 teulPackFLOAT32(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, FLOAT32* const idata, SINT32 significantbits);
 
 //! Pack/unpack a value stored as a 64-bit float.
-SINT32 teulPackFLOAT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, FLOAT64* const idata, SINT32 significantbits);
+SINT32 teulPackFLOAT64(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, FLOAT64* const idata, SINT32 significantbits);
 
 //! Pack/unpack a signed value held in a 64-bit store.
-SINT32 teulPackSINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SINT64* const idata, SINT32 significantbits);
+SINT32 teulPackSINT64(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, SINT64* const idata, SINT32 significantbits);
 
 //! Pack/unpack an unsigned value held in a 64-bit store.
-SINT32 teulPackUINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT64* const idata, SINT32 significantbits);
+SINT32 teulPackUINT64(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, UINT64* const idata, SINT32 significantbits);
 
 // byte pack routine used only when you know the other side takes care of endian
 // or the data is byte format (UCHAR but 'NOT' UNICODE).
 // [size]  in bytes.
-SINT32 teulPackVoid(LOGICAL mode , UCHAR* const buffer, SINT32 bitoffset, void* const anything, SINT32 size);
+SINT32 teulPackVoid(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, void* const anything, SINT32 size);
 
 // converts bit offsets to actual size in bytes
 namespace Teul
@@ -78,13 +80,13 @@ namespace Teul
 }
 
 #define DEF_PACKER(_typename, _functor) \
-	void packer(LOGICAL _mode, _typename _data, SINT32 bits=0)	\
+	void packer(PackMode _mode, _typename _data, SINT32 bits=0)	\
 	{\
 		this->offset = _functor(_mode, this->packed, this->offset, _data, bits); \
 	}
 
 #define DEF_PACKREF(_typename, _functor) \
-	void packer(LOGICAL _mode, _typename& _data, SINT32 bits=0) \
+	void packer(PackMode _mode, _typename& _data, SINT32 bits=0) \
 	{ \
 		this->offset = _functor(_mode, this->packed, this->offset, &_data, bits); \
 	} \
@@ -129,8 +131,8 @@ struct ACTION_OBJECT
 		, endpoint(nullptr), m_client(nullptr)
 	{}
 
-	void packer(LOGICAL mode, bool& value, SINT32 sb = 1) { return (mode == TEUL_PACK) ? pack(value, sb) : unpack(value, sb); }
-	void packBytes(LOGICAL mode, void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(mode, this->packed, this->offset, byteStream, numBytes); }
+	void packer(PackMode mode, bool& value, SINT32 sb = 1) { return (mode == TEUL_PACK) ? pack(value, sb) : unpack(value, sb); }
+	void packBytes(PackMode mode, void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(mode, this->packed, this->offset, byteStream, numBytes); }
 
 	//! @brief Check that the packed data stream has enough bytes to populate an object type.
 	template<class Typename_>
@@ -151,7 +153,7 @@ struct ACTION_OBJECT
 	}
 
 	template<class _Class>
-	SINT32 packClass(LOGICAL mode)
+	SINT32 packClass(PackMode mode)
 	{
 		_Class* classInstance = (_Class*) this->localRawData;	 // Type cast readability
 		return classInstance->packer(mode, this);
@@ -160,7 +162,7 @@ struct ACTION_OBJECT
 	//! Pack data directly.
 	/// NOT READY FOR USE.
 	template<typename _Type>
-	void copy(LOGICAL mode, _Type& instance_)
+	void copy(PackMode mode, _Type& instance_)
 	{
 		static const size_t bytes = sizeof(_Type);
 
@@ -177,8 +179,8 @@ struct ACTION_OBJECT
 			memcpy(&instance_, streamPtr, bytes);
 	}
 
-	void packSecondsDelta(LOGICAL mode, UINT32& time, SINT32 sizeBits=0);
-	void packChatHandle(LOGICAL mode, ChatHandle* const handle) { this->offset = teulPackUINT64(mode, this->packed, this->offset, (UINT64*)handle, GAME_HANDLE_BITS); }
+	void packSecondsDelta(PackMode mode, UINT32& time, SINT32 sizeBits=0);
+	void packChatHandle(PackMode mode, ChatHandle* const handle) { this->offset = teulPackUINT64(mode, this->packed, this->offset, (UINT64*)handle, GAME_HANDLE_BITS); }
 
 	// Size is in bytes which discards 3 significant bits of data and means that
 	// we can't accurately identify the case where there are less than 7 bits of
@@ -267,7 +269,7 @@ struct ACTION_OBJECT
 	}
 };
 
-SINT32 teulPackSecondsDelta(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT32* timer, SINT32 size=0);
+SINT32 teulPackSecondsDelta(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, UINT32* timer, SINT32 size=0);
 
 namespace Teul
 {
@@ -292,7 +294,7 @@ struct Packer
 	//! @param[in]	a			Pointer to action object describing data stream.
 	//! @param[in]	bits		Maximum bits to pack (where honored).
 
-	void packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 bits=0)
+	void packer(PackMode mode, ACTION_OBJECT* const a, SINT32 bits=0)
 	{
 		a->packer(mode, m_value, bits);
 	}

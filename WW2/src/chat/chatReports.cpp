@@ -38,7 +38,7 @@ ChatReport::ChatReport(UINT16 category, const std::string& report, const ChatHan
 }
 
 SINT32
-ChatReport::packer(LOGICAL mode, ACTION_OBJECT* a)
+ChatReport::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_status, 4);
 	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_category, 4);

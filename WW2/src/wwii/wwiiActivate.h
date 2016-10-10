@@ -34,7 +34,7 @@ struct WWII_ACTIVATE
 	UINT32		otp;
 	UCHAR		pkey[80];
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)(&serverType), 8);
 		a->packer(mode, port);

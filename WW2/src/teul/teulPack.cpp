@@ -64,7 +64,7 @@ static size_t _unpackBytes(const size_t offset, UCHAR* const buffer, UCHAR* cons
 }
 
 // Note: teulPackVoid caveat: last argument is size in BYTES not bits
-SINT32 teulPackVoid(const LOGICAL mode, UCHAR* const buffer, const SINT32 bitOffset, void* const anything, SINT32 size)
+SINT32 teulPackVoid(const PackMode mode, UCHAR* const buffer, const SINT32 bitOffset, void* const anything, SINT32 size)
 {
 	const SINT32 totalBits = bitOffset + (size<<3);
 
@@ -198,7 +198,7 @@ _unpackBits (UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 
 }
 
 SINT32
-teulPackSINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT32* const idata, SINT32 significantBits)
+teulPackSINT32(PackMode mode, UCHAR* const buffer, SINT32 bitOffset, SINT32* const idata, SINT32 significantBits)
 {
 	UINT32 xdata;
 
@@ -224,7 +224,7 @@ teulPackSINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT32* cons
 }
 
 SINT32
-teulPackSINT16(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT16* const idata, SINT32 significantBits)
+teulPackSINT16(PackMode mode, UCHAR* const buffer, SINT32 bitOffset, SINT16* const idata, SINT32 significantBits)
 {
 	UINT32 xdata = (UINT32) (*idata);
 
@@ -254,7 +254,7 @@ teulPackSINT16(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT16* cons
 }
 
 SINT32
-teulPackUINT16 (LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UINT16* const idata, SINT32 significantBits)
+teulPackUINT16 (PackMode mode, UCHAR* const buffer, SINT32 bitOffset, UINT16* const idata, SINT32 significantBits)
 {
 	UINT32 xdata = (UINT32) *idata;
 
@@ -272,7 +272,7 @@ teulPackUINT16 (LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UINT16* con
 }
 
 SINT32
-teulPackFLOAT32 (LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, FLOAT32* const idata, SINT32 /* significantBits */)
+teulPackFLOAT32 (PackMode mode, UCHAR* const buffer, SINT32 bitOffset, FLOAT32* const idata, SINT32 /* significantBits */)
 {
 	if (mode == TEUL_PACK)
 		return _packBits(buffer, bitOffset, (UINT32*) idata, 32, 32);
@@ -282,7 +282,7 @@ teulPackFLOAT32 (LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, FLOAT32* c
 
 
 SINT32
-teulPackUINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UINT64* const idata, SINT32 significantBits)
+teulPackUINT64(PackMode mode, UCHAR* const buffer, SINT32 bitOffset, UINT64* const idata, SINT32 significantBits)
 {
 	if (significantBits < 1 || significantBits > 64)
 		significantBits = 64;
@@ -317,7 +317,7 @@ teulPackUINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UINT64* cons
 }
 
 SINT32
-teulPackSINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT64* const idata, SINT32 significantBits)
+teulPackSINT64(PackMode mode, UCHAR* const buffer, SINT32 bitOffset, SINT64* const idata, SINT32 significantBits)
 {
 	assert(significantBits != 1);
 	if (significantBits < 1 || significantBits > 64)
@@ -358,7 +358,7 @@ teulPackSINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT64* cons
 }
 
 SINT32
-teulPackUINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 significantBits)
+teulPackUINT32(PackMode mode, UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 significantBits)
 {
 	if (significantBits < 1 || significantBits > 32)
 		significantBits = 32;
@@ -371,7 +371,7 @@ teulPackUINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UINT32* cons
 
 
 SINT32
-teulPackFLOAT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, FLOAT64* const idata, SINT32 significantBits)
+teulPackFLOAT64(PackMode mode, UCHAR* const buffer, SINT32 bitOffset, FLOAT64* const idata, SINT32 significantBits)
 {
 #ifdef OMG_THIS_DOESNT_WORK_WHEN_BITOFFSET_IS_NON_ZERO
 	static const SINT32 numbytes = sizeof(FLOAT64), numBits = numbytes << 3;
@@ -428,7 +428,7 @@ teulPackFLOAT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, FLOAT64* co
 }
 
 SINT32
-teulPackSCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SCHAR* const idata, SINT32 significantBits)
+teulPackSCHAR(PackMode mode, UCHAR* const buffer, SINT32 bitOffset, SCHAR* const idata, SINT32 significantBits)
 {
 	assert(significantBits != 1);
 	if (significantBits < 1 || significantBits > 8)
@@ -447,7 +447,7 @@ teulPackSCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SCHAR* const 
 }
 
 SINT32
-teulPackUCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UCHAR* const idata, SINT32 significantBits)
+teulPackUCHAR(PackMode mode, UCHAR* const buffer, SINT32 bitOffset, UCHAR* const idata, SINT32 significantBits)
 {
 	SINT32 byteOffset;
 
@@ -502,7 +502,7 @@ teulPackUCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UCHAR* const 
 // Pack a PLAYER_LOGIN structure.
 
 SINT32
-PLAYER_LOGIN::packer(LOGICAL mode, UCHAR* const message, SINT32 offset)
+PLAYER_LOGIN::packer(PackMode mode, UCHAR* const message, SINT32 offset)
 {
 	UINT32 Len = AUTH_SEQ_SIZE;
 
@@ -518,7 +518,7 @@ PLAYER_LOGIN::packer(LOGICAL mode, UCHAR* const message, SINT32 offset)
 // Pack a time-in-seconds delta
 
 void
-ACTION_OBJECT::packSecondsDelta(LOGICAL mode, UINT32& time, SINT32 sizeBits /* = 0 */)
+ACTION_OBJECT::packSecondsDelta(PackMode mode, UINT32& time, SINT32 sizeBits /* = 0 */)
 {
 	UINT32 delta = 0;
 	if ( mode == TEUL_PACK )
@@ -529,7 +529,7 @@ ACTION_OBJECT::packSecondsDelta(LOGICAL mode, UINT32& time, SINT32 sizeBits /* =
 }
 
 SINT32
-teulPackSecondsDelta(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT32* const timer, SINT32 size)
+teulPackSecondsDelta(PackMode mode, UCHAR* const buffer, SINT32 bitoffset, UINT32* const timer, SINT32 size)
 {
 	UINT32 delta = 0;
 	if ( mode == TEUL_PACK )
@@ -541,7 +541,7 @@ teulPackSecondsDelta(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT32
 }
 
 SINT32
-wwiiPackText(LOGICAL mode, UCHAR* const data, SINT32 offset, char* const text, SINT32 maxLen)
+wwiiPackText(PackMode mode, UCHAR* const data, SINT32 offset, char* const text, SINT32 maxLen)
 {
 	UINT32 len = 0;
 	UINT32 lenBits;
@@ -585,7 +585,7 @@ Teul::ConnectionInstruction::ConnectionInstruction(ACTION_OBJECT* const a)
 }
 
 SINT32
-Teul::ConnectionInstruction::packer(LOGICAL mode, ACTION_OBJECT* const a)
+Teul::ConnectionInstruction::packer(PackMode mode, ACTION_OBJECT* const a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_role, 8);
 	a->packer(mode, m_hostIP);
@@ -608,13 +608,13 @@ Teul::ConnectionInstruction::packer(LOGICAL mode, ACTION_OBJECT* const a)
 }
 
 SINT32
-wwiiPackWeaponSpec(LOGICAL mode, UCHAR* const data, SINT32 offset, struct WEAPON_SPEC* const object, SINT32 /*size*/)
+wwiiPackWeaponSpec(PackMode mode, UCHAR* const data, SINT32 offset, struct WEAPON_SPEC* const object, SINT32 /*size*/)
 {
 	return teulPackUINT16(mode, data, offset, (UINT16*)object, 0);
 }
 
 SINT32
-wwiiPackWeaponSerial(LOGICAL mode, UCHAR* const data, SINT32 offset, struct WEAPON_SERIAL* const object, SINT32 /*size*/)
+wwiiPackWeaponSerial(PackMode mode, UCHAR* const data, SINT32 offset, struct WEAPON_SERIAL* const object, SINT32 /*size*/)
 {
 	offset = teulPackUINT32(mode, data, offset, &(object->serial), 0);
 	offset = wwiiPackFullObjID(mode, data, offset, &(object->source), 0);
@@ -642,7 +642,7 @@ WEAPON_SPEC::unpack(ACTION_OBJECT* a, SINT32)
 // Pack a std::string.
 
 SINT32
-wwiiPackString(LOGICAL mode, UCHAR* data, SINT32 offset, std::string& text, SINT32 maxLen)
+wwiiPackString(PackMode mode, UCHAR* data, SINT32 offset, std::string& text, SINT32 maxLen)
 {
 	if ( offset < 0 || maxLen < 0 )
 		return -EINVAL;
@@ -697,7 +697,7 @@ wwiiPackString(LOGICAL mode, UCHAR* data, SINT32 offset, std::string& text, SINT
 }
 
 SINT32
-wwiiPackFullObjID(LOGICAL mode, UCHAR* const data, SINT32 offset, struct FULL_OBJ_ID* const object, SINT32 /*size*/)
+wwiiPackFullObjID(PackMode mode, UCHAR* const data, SINT32 offset, struct FULL_OBJ_ID* const object, SINT32 /*size*/)
 {
 	offset = teulPackUINT16(mode,data,offset,&(object->id),0);
 	if ( object->id != 0 )

@@ -44,7 +44,7 @@ public:
 	WorldPosition_m() : m_x(0.0), m_y(0.0), m_z(0.0) {}
 
 public:
-	void packer(LOGICAL mode, ACTION_OBJECT* a, SINT32 = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
+	void packer(PackMode mode, ACTION_OBJECT* a, SINT32 = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
 	void pack(ACTION_OBJECT* const a, SINT32 = 0) const;
 	void unpack(ACTION_OBJECT* const a, SINT32 = 0);
 
@@ -78,7 +78,7 @@ public:
 	AttitudeVector() : m_x(0.0f), m_y(0.0f), m_z(0.0f) {}
 
 public:
-	void packer(LOGICAL mode, ACTION_OBJECT* a, SINT32 = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
+	void packer(PackMode mode, ACTION_OBJECT* a, SINT32 = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
 	void pack(ACTION_OBJECT* const a, SINT32 = 0) const;
 	void unpack(ACTION_OBJECT* const a, SINT32 = 0);
 
@@ -211,7 +211,7 @@ public:
 	};
 
 public:
-	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	virtual SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 #ifdef FRONT_END
 	//! Client function: Ask the host to create an instance of this STO.
@@ -312,7 +312,7 @@ private:
 // Functions
 
 //! Pack the type of an STO only.
-extern SINT32 wwiiPackServerTrackedObjectType(LOGICAL mode, UCHAR* buffer, SINT32 offset, UINT16* type, SINT32 size);
+extern SINT32 wwiiPackServerTrackedObjectType(PackMode mode, UCHAR* buffer, SINT32 offset, UINT16* type, SINT32 size);
 
 //! Remove an STO by its UID.
 extern void wwiiRemoveSTO(UINT32 uid);

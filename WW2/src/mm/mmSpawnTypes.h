@@ -194,7 +194,7 @@ public:
 					, UCHAR _decal = 0
 					, bool isHighCommander = false, bool isBuilder = false, bool isMissionleader = false);
 	FESpawnNotify(ACTION_OBJECT* const a);
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	WEAPON_SERIAL	weaponSerial;	// What you're spawning

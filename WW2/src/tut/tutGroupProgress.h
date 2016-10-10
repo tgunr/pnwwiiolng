@@ -24,7 +24,7 @@ namespace Tutorial
 		GroupProgress(ChatHandle _handle=0LL, UINT64 _flags=0LL) : m_groupHandle(_handle), m_flags(_flags) {}
 		GroupProgress(ACTION_OBJECT* const a);
 
-		void packer(LOGICAL mode, ACTION_OBJECT* a);
+		void packer(PackMode mode, ACTION_OBJECT* a);
 
 		//// CLIENT:
 		// Send this progress to the host.

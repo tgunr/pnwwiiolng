@@ -71,11 +71,11 @@ public:
 		}
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
-	SINT32 CREATE_packer(LOGICAL mode, ACTION_OBJECT* a);
-	SINT32 handle_packer(LOGICAL mode, ACTION_OBJECT* a);
-	SINT32 text_packer(LOGICAL mode, ACTION_OBJECT* a);
-	SINT32 int_packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
+	SINT32 CREATE_packer(PackMode mode, ACTION_OBJECT* a);
+	SINT32 handle_packer(PackMode mode, ACTION_OBJECT* a);
+	SINT32 text_packer(PackMode mode, ACTION_OBJECT* a);
+	SINT32 int_packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	// Number of players required to create a squad
@@ -107,7 +107,7 @@ public:
 	~SquadControlResult() {}
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	SINT32 receive(SINT32 teulIndex);
 	SINT32 send(SINT32 teulIndex);
 

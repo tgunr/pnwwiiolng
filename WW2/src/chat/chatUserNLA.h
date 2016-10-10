@@ -17,6 +17,6 @@ namespace Chat
 		ChatHandle	handle;
 
 		// Member functions
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	};
 }

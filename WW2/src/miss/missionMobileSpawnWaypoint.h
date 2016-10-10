@@ -24,7 +24,7 @@ struct MobileSpawnWaypoint
 		, m_reason(reason)
 		{}
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) { return a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { return a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
 
 	UINT32		m_missionID;				// ID of the mission
 	UINT32		m_playerID;

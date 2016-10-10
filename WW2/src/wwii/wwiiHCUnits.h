@@ -69,7 +69,7 @@ public:
 #else
 	;
 #endif
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 //tolua_begin
 
 	// Destructor -- remove me from the hcUnits table if I'm not a clone
@@ -193,7 +193,7 @@ public:
 	HCUnitList() : m_listStart(true), m_listEnd(true), m_count(0) { }
 	HCUnitList(ACTION_OBJECT* const a);
 	~HCUnitList() { }
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
 	// Returns: error < 0  /  ok >= 0

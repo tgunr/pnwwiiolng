@@ -9,7 +9,7 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 static inline SINT32
-wwiiPackBool(LOGICAL mode, UCHAR* data, SINT32 offset, bool& value)
+wwiiPackBool(PackMode mode, UCHAR* data, SINT32 offset, bool& value)
 {
 	if ( mode == TEUL_PACK )
 	{

@@ -35,7 +35,7 @@ static STO_MAP stoMap;
 // STO base class pack routine
 
 SINT32
-wwiiPackServerTrackedObjectType(LOGICAL mode, UCHAR* const buffer, SINT32 offset, UINT16* const type, SINT32 /*size*/)
+wwiiPackServerTrackedObjectType(PackMode mode, UCHAR* const buffer, SINT32 offset, UINT16* const type, SINT32 /*size*/)
 {
 	return teulPackUINT16(mode, buffer, offset, type, 4);
 }
@@ -43,7 +43,7 @@ wwiiPackServerTrackedObjectType(LOGICAL mode, UCHAR* const buffer, SINT32 offset
 // My poor, poor STO packer. I blame Ramp for how complicated and
 // messy it has gotten =/
 SINT32
-ServerTrackedObject::packer(LOGICAL mode, ACTION_OBJECT* const a)
+ServerTrackedObject::packer(PackMode mode, ACTION_OBJECT* const a)
 {
 	a->offset = wwiiPackServerTrackedObjectType(mode, a->packed, a->offset, &m_type, 0);
 

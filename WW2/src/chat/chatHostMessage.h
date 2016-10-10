@@ -31,7 +31,7 @@ namespace Chat
 		const char* msg;			// Pointer to the message
 
 		// Member functions
-		SINT32 packer(LOGICAL MODE, ACTION_OBJECT* a);
+		SINT32 packer(PackMode MODE, ACTION_OBJECT* a);
 	};
 }
 

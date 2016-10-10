@@ -82,7 +82,7 @@ public:
 	explicit BrigadeSummary(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 	// Pack/unpack routine
-	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	virtual SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	//// ---- Member Functions ---- ////
 
@@ -126,7 +126,7 @@ public:
 	BrigadeSummaries() : m_error(false), m_count(0) { }
 	BrigadeSummaries(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
-    SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+    SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
 	// Returns: error < 0  /  ok >= 0
@@ -156,7 +156,7 @@ public:
 	BrigadeDetail(UINT32 withBrigadeID=0) : BrigadeSummary(withBrigadeID) { m_motd[0] = m_motto[0] = 0; }
 
 	// Packer
-	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) override;
+	virtual SINT32 packer(PackMode mode, ACTION_OBJECT* a) override;
 
 	// Helpers
 	const FULL_OBJ_ID& homeCPID() const { return m_homeCPID; }
@@ -202,7 +202,7 @@ public:
 	SINT32 receive(SINT32 teulIndex);
 
 	// Packer
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	//// ---- Member variables ---- ////
 public:

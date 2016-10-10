@@ -22,7 +22,7 @@ namespace Vehicle
 			, m_timestamp(teulClock64)
 			{ packer(TEUL_UNPACK, a); }
 
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 		UINT32				m_shooter;		///< Host index of the shooter.
 		UINT32				m_target;		///< Host index of the victim.

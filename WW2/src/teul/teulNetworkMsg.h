@@ -169,7 +169,7 @@ public:
 
 private:
 	//! Pack/Unpack data.
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* const a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		// Pack the head information
 		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_action, 8);
@@ -190,5 +190,5 @@ class teul_empty_msg
 public:
 	teul_empty_msg() {}
 	teul_empty_msg(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
-	SINT32 packer(LOGICAL /*mode*/, ACTION_OBJECT* const a) { return a->offset; }
+	SINT32 packer(PackMode /*mode*/, ACTION_OBJECT* const a) { return a->offset; }
 };

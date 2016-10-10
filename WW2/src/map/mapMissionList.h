@@ -57,7 +57,7 @@ public:
 	void populate(const Mission*, bool, bool, UINT32);
 
 	/// Pack/unpack routine.
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	//// ---- Member Functions ---- ////
 
@@ -107,7 +107,7 @@ public:
 	MissionList() : m_status(MLR_ERROR), m_listStart(true), m_listEnd(true), m_count(0) { }
 	MissionList(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 	~MissionList() { }
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
 	// Returns: error < 0  /  ok >= 0

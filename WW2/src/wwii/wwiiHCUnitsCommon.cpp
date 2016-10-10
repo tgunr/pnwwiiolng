@@ -24,7 +24,7 @@ static HCUNIT_HANDLES hcUnitsByHandle;
 // Pack a brigade ID
 
 SINT32
-wwiiPackBrigadeID(LOGICAL mode, UCHAR* data, SINT32 offset, UINT32& brigadeID, SINT32 /*size*/)
+wwiiPackBrigadeID(PackMode mode, UCHAR* data, SINT32 offset, UINT32& brigadeID, SINT32 /*size*/)
 {
 	return teulPackUINT32(mode, data, offset, &brigadeID, 16);
 }
@@ -157,7 +157,7 @@ HCUnit::canUseOrigin(int facilityType) const
 // HCUnit Packer
 
 SINT32
-HCUnit::packer(LOGICAL mode, ACTION_OBJECT* a)
+HCUnit::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_unitID);
 	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_parentID);
@@ -254,7 +254,7 @@ HCUnitList::HCUnitList(ACTION_OBJECT* const a)
 // Packer for the list of HCUnits
 
 SINT32
-HCUnitList::packer(LOGICAL mode, ACTION_OBJECT* a)
+HCUnitList::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_listStart, 1);	//
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_listEnd, 1);	// 8-bits

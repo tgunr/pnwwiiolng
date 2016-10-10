@@ -822,7 +822,7 @@ void Message::EmitConstructor() const
 void Message::EmitPacker() const
 {
 	if (m_child == nullptr) {
-		HXX("\tbool packer(LOGICAL /*mode*/, ACTION_OBJECT* /*a*/, SINT32 /*size*/) { return true; }\n");
+		HXX("\tbool packer(PackMode /*mode*/, ACTION_OBJECT* /*a*/, SINT32 /*size*/) { return true; }\n");
 		return;
 	}
 
@@ -836,7 +836,7 @@ void Message::EmitPacker() const
 		fingerprint = "ACTION_OBJECT* const a, SINT32 size";
 		param3 = "size";
 	}
-	HXX("\tbool packer(LOGICAL mode, %s) { return (mode == TEUL_PACK) ? pack(a, %s) : unpack(a, %s); }\n", fingerprint, param3, param3);
+	HXX("\tbool packer(PackMode mode, %s) { return (mode == TEUL_PACK) ? pack(a, %s) : unpack(a, %s); }\n", fingerprint, param3, param3);
 	HXX("\tbool pack(%s) const;\n", fingerprint);
 	HXX("\tbool unpack(%s);\n", fingerprint);
 

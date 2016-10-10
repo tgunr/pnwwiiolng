@@ -57,7 +57,7 @@ namespace AWS
 		// Create me from a network packer
 		Request(ACTION_OBJECT* const a);
 
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 		// Send me to the chat host - returns false on failure.
 		bool send(SINT32 chatConnection);
@@ -110,7 +110,7 @@ namespace AWS
 			}
 		Grid(ACTION_OBJECT* const a);
 
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 		// Bottom left of the view
 		UINT16		m_row, m_startCol;

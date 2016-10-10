@@ -40,7 +40,7 @@ public:
 
 	// Member functions
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	SINT32 receive(SINT32 teulIndex);
 	void setError(UINT32 toError) { m_error = toError; m_text = ""; }
 

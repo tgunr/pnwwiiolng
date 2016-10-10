@@ -32,7 +32,7 @@ public:
 
 	NewMission(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* const a) { return teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
+	SINT32 packer(PackMode mode, ACTION_OBJECT* const a) { return teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
 
 	Mission* post();					// execution function if appropriate
 

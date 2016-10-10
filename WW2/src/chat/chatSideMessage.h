@@ -22,7 +22,7 @@ namespace Chat
 		SideMessage(ACTION_OBJECT* const a);
 		~SideMessage() {}
 
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 		SIDE_MESSAGE_TYPE	m_type;			// Type of message - side, hc, etc...
 		WWII_SIDE			m_side;			// 0 or side to restrict message to

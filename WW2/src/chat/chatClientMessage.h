@@ -29,7 +29,7 @@ namespace Chat
 		FULL_OBJ_ID	m_uiTarget;	// CP or Facility targetted in UI
 
 		// Packer
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
         
         // not actually sent, used by chat host
         ChatClientInfo clientInfo;

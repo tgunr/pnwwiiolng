@@ -118,7 +118,7 @@ public:
 	// Functions
 public:
 	// Pack and unpack routine
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	void setPosted(UINT32 postedTime) { m_local = false; m_posted = postedTime; }
 	void setHandle(const ChatHandle& toHandle) { m_handle = toHandle; }
 	void setShared(bool toShared) { m_shared = toShared; }
