@@ -122,7 +122,7 @@ public:
 
 	// Code that actually handles the SCMD result;
 	// eventually this should exist on both sides of the connection
-	void process(void);
+	void process();
 
 	~StratCommand() { }
 

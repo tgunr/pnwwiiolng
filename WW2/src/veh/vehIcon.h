@@ -53,15 +53,15 @@ enum
 
 struct vehVehicle;
 
-extern SINT32 	vehIconInit(void);
-extern SINT32 	vehIconKill(void);
-extern SINT32 	vehIconUpdate(struct vehVehicle*);
-extern SINT32 	vehIconDrawDeprecated(void);
-extern SINT32	vehIconMode(void);
-extern SINT32 	vehIconDraw2DRank(UINT32 Rank, SINT32 x, SINT32 y, LOGICAL colorIcon);
-extern LOGICAL	vehIconCanSeeHandle(struct vehVehicle*);
-extern UINT32	vehIconColor(struct vehVehicle*);
-extern void	vehIconColor3f(struct vehVehicle*, float* r, float* g, float* b);
-extern void	vehSetIconMode(SINT32 mode);
-extern void	vehIconSetPulsate(struct vehVehicle*, SINT32 duration); // pulses the icon for a period of time; duration is in ms
-extern void vehIconDraw();
+SINT32 	vehIconInit();
+SINT32 	vehIconKill();
+SINT32 	vehIconUpdate(struct vehVehicle*);
+SINT32 	vehIconDrawDeprecated();
+SINT32	vehIconMode();
+SINT32 	vehIconDraw2DRank(UINT32 Rank, SINT32 x, SINT32 y, LOGICAL colorIcon);
+LOGICAL	vehIconCanSeeHandle(struct vehVehicle*);
+UINT32	vehIconColor(struct vehVehicle*);
+void	vehIconColor3f(struct vehVehicle*, float* r, float* g, float* b);
+void	vehSetIconMode(SINT32 mode);
+void	vehIconSetPulsate(struct vehVehicle*, SINT32 duration); // pulses the icon for a period of time; duration is in ms
+void vehIconDraw();

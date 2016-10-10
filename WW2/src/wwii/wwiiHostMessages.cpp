@@ -73,7 +73,7 @@ static SINT32 _recvAbortedApp(ACTION_OBJECT* const a)
 }
 
 SINT32
-wwiiHostInstallCallbacks(void)
+wwiiHostInstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(WWII_X)
 	{

@@ -9,7 +9,7 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-extern SINT32 strtPackInit(void);
+extern SINT32 strtPackInit();
 extern SINT32 strtPackHitList(LOGICAL mode, UCHAR* data, SINT32 offset, struct CP_HIT_HEADER* hh,  SINT32 size);
 extern SINT32 strtPackOwnershipUpdate(LOGICAL mode, UCHAR* data, SINT32 offset, struct OWNERSHIP_UPDATE* object, SINT32 size);
 extern SINT32 strtPackSyncCPs(LOGICAL mode, UCHAR* message, SINT32 offset, struct STRT_SYNC_CPS* object, SINT32 size);

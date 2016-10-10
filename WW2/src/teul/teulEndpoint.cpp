@@ -371,7 +371,7 @@ teulRemoveEndpoint(ENDPOINT* inEndpoint)
 // Transfer dead endpoints to the free endpoint list.
 
 void
-teulKillDeadEndpoints(void)
+teulKillDeadEndpoints()
 {
 	if ( _deadEndpoints.empty() )
 	{
@@ -459,7 +459,7 @@ teulInitEndpoints(ERROR_FUNCTION const endpointErrorFn)
 }
 
 void
-teulCleanupEndpoints(void)
+teulCleanupEndpoints()
 {
 	teulKillDeadEndpoints();
 

@@ -9,7 +9,7 @@
 
 #include "wwii/wwiiRTBCodes.h"
 
-extern SINT32 strtInstallMapCallbacks(void);
+extern SINT32 strtInstallMapCallbacks();
 
 //this function sends a message from the MMhost to the strat system telling
 //	it to reserve a weapon for a front end

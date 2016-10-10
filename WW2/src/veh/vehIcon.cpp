@@ -83,7 +83,7 @@ static void   _HandleIconMode(vehVehicle* CurrentVehicle, LOGICAL& DrawRangeCirc
 	vehIconInit
 *************************************************************************************************/
 
-SINT32 vehIconInit(void)
+SINT32 vehIconInit()
 {
 	ldpixSetTextureReduction(FALSE);
 
@@ -111,7 +111,7 @@ SINT32 vehIconInit(void)
 	vehIconKill
 *************************************************************************************************/
 
-SINT32 vehIconKill(void)
+SINT32 vehIconKill()
 {
 	if (piIsTexture(_IconRangeCircleTexId, 0))
 		piFreeMipTextures(_IconRangeCircleTexId);
@@ -344,7 +344,7 @@ SINT32 vehIconUpdate(vehVehicle* Vehicle)
 	vehIconDraw
 *************************************************************************************************/
 
-SINT32 vehIconDrawDeprecated(void)
+SINT32 vehIconDrawDeprecated()
 {
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 	if (!PlayerVehicle)	return 0;
@@ -471,7 +471,7 @@ void vehIconDraw()
 	vehIconMode
 *************************************************************************************************/
 
-SINT32 vehIconMode(void)
+SINT32 vehIconMode()
 {
 	return _IconMode;
 }

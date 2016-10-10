@@ -213,7 +213,7 @@ bool ClientListing::receive() const
 // Early setup of all the instancing system needs.
 
 SINT32
-InstallClientCallbacks(void)
+InstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Instance::INST_X)
 	{

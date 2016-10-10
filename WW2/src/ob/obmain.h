@@ -448,7 +448,7 @@ extern struct OBJECT*	obmainFindNamedObject(const char* name);
 extern struct OBJECT*	obmainFindGroupObject(const char* name);
 extern struct OBJECT*	obmainFindChildObject(const char* group, const char* name);
 extern struct OBJECT*	obmainFindChildFromObject(struct OBJECT* lpgrp, const char* name);
-extern struct OBJECT*	obmainGetFirstTopmostObject(void);
+extern struct OBJECT*	obmainGetFirstTopmostObject();
 extern struct OBJECT*	obmainGetNextTopmostObject(struct OBJECT* lpobj);
 extern struct OBJECT*	obmainFindTopmostObject(const char* name);
 extern struct OBJECT*	obmainGetFirstSubobject(struct OBJECT* lpmain);
@@ -472,9 +472,9 @@ extern LOGICAL		obmainCreateObjectFull(struct OBJECT** newobj, const char* name,
 extern LOGICAL		obmainSnapObjectToXYGrid(struct OBJECT* Object, FLOAT32 GridSize, UINT32 UseObjectMatrix);
 extern LOGICAL		obmainSnapObjectTreeToXYGrid(struct OBJECT* Object,FLOAT32 GridSize,UINT32 UseObjectMatrix);
 
-extern LOGICAL		obmainInit(void);
-extern void		obmainKill(void);
-extern LOGICAL		obmainUpdate(void);
+extern LOGICAL		obmainInit();
+extern void		obmainKill();
+extern LOGICAL		obmainUpdate();
 
 extern LOGICAL obmainGetBoundingBoxMax(FLOAT32* pfLeft,
 								FLOAT32* pfTop,

@@ -18,11 +18,11 @@ using USERDRAWFUNC = LOGICAL(*)(LOGICAL IsBeforeStage);
 extern void obdrawWireframeObject(OBJECT* lpobj, UINT32 color);
 extern void obdrawObjectBoundingBox(OBJECT* lpobj, UINT32 color);
 extern LOGICAL obdrawDrawSingleObject(OBJECT* lpobj);
-extern LOGICAL obdrawInit(void);
-extern void obdrawKill(void);
+extern LOGICAL obdrawInit();
+extern void obdrawKill();
 extern void obdrawObjects();
 extern LOGICAL obdrawObjectsDeprecated();
-extern LOGICAL obdrawUpdateObjectLOD(void);
+extern LOGICAL obdrawUpdateObjectLOD();
 extern LOGICAL obdrawStraightAhead(piVECTOR* pos, piVECTOR* rot, float dist, UINT32 color);
 extern LOGICAL obdrawProcessLODCallback(OBJECT* lplod, UINT32 user,piVECTOR* InPos,
 								 LOGICAL ReLight,FLOAT32 Radius,LOGICAL * LODChanged);

@@ -206,7 +206,7 @@ void persHUDHideHUD(bool close)
 	persHudReceivedUpdate
 *************************************************************************************************/
 
-void persHudReceivedUpdate(void)
+void persHudReceivedUpdate()
 {
 	SINT32 i;
 	static SINT32 _LastUpdateTime;

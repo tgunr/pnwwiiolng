@@ -60,7 +60,7 @@ void chatRouteMessage(
 		, bool allowDotCommands
 		);
 
-UINT32 nextMessageID(void);
+UINT32 nextMessageID();
 
 void chatDispatchCRSMessage(const SCHAR* source, const SCHAR* text, const ChatHandle excludeID=0LL);
 
@@ -84,7 +84,7 @@ void chatSmiteHandle(const char* handle);
 // of the grab no-longer being in game.
 void chatReleaseGrab(Player& player);
 
-UINT32 chatGetStratAddr(void);
+UINT32 chatGetStratAddr();
 
 bool chatRouteSideMessage(WWII_SIDE toSide
 						, LSTRING_ID prefix

@@ -151,8 +151,8 @@ extern char BuzzardFollowVehicle[256];
 extern FLOAT32 BuzzardFollowDistance;
 
 
-extern UINT32 _ReadAmmoTypes(void);
-extern UINT32 _ReadBumpAndFrictionTable(void);
+extern UINT32 _ReadAmmoTypes();
+extern UINT32 _ReadBumpAndFrictionTable();
 
 enum UI_COMMAND_TYPE
 {
@@ -177,7 +177,7 @@ static void _HitmapName(OBJECT* obj, void* p);
 SINT32 dot_move(const char* line);
 
 #ifdef ENABLE_FLOATERS
-void vehmainToggleLOD (void);
+void vehmainToggleLOD();
 #endif
 
 static wchar_t _LastCommand[256];

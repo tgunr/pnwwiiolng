@@ -27,7 +27,7 @@ UINT32 persHUDToggleGameInfo(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZ
 UINT32 persHUDToggleReadout(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero);
 // tolua_end
 
-void persHudReceivedUpdate(void);
+void persHudReceivedUpdate();
 
 // tolua_begin
 // used by the tutorial system to control hud behavior

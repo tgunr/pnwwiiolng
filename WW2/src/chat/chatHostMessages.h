@@ -20,7 +20,7 @@ extern const char* g_countries[];
 extern const char* g_sides[];
 
 //This function installs all the host callbacks
-SINT32 chatInstallHostCallbacks(void);
+SINT32 chatInstallHostCallbacks();
 
 //Sends a userNLA to the front end.  I should be using more of these
 //	functions, but you know how it goes.  I didn't come up with this method of

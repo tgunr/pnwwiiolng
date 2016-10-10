@@ -374,7 +374,7 @@ bool weapListInit(const char* theaterPath)
 	return true;
 }
 
-void weapListKill(void)
+void weapListKill()
 {
 	g_weaponList.clear();
 	g_weaponSpawns.clear();

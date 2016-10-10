@@ -12,7 +12,7 @@
 	Rev 0.1  11/16/99
  */
 
-SINT32 commPackInit(void);
+SINT32 commPackInit();
 
 SINT32 commPackPLAYER_LOGIN(LOGICAL mode, UCHAR* const data,
 							 SINT32 offset, struct PLAYER_LOGIN* object, SINT32 size);

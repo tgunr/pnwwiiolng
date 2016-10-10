@@ -624,7 +624,7 @@ _recvMissionDamageEvent(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //Install all the map callbacks
 SINT32
-strtInstallMapCallbacks(void)
+strtInstallMapCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
 	{

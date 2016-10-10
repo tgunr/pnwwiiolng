@@ -61,12 +61,12 @@ enum ENUM_TERRAIN_COLOR
 };
 
 	extern LOGICAL trnskyInit(const SINT8* name, SINT32 mesh, FLOAT32 scale);
-	extern LOGICAL trnskyUpdate(void);
-	extern LOGICAL trnskyDrawDeprecated(void);
+	extern LOGICAL trnskyUpdate();
+	extern LOGICAL trnskyDrawDeprecated();
     extern void trnskyDraw();
-	extern void trnskyKill(void);
-	extern LIGHT* trnskyGetSunSource(void);
-	extern LIGHT* trnskyGetMoonSource(void);
+	extern void trnskyKill();
+	extern LIGHT* trnskyGetSunSource();
+	extern LIGHT* trnskyGetMoonSource();
 
     extern FLOAT32 trnskyGetColor(SINT32 i);
     extern FLOAT32 trnskyGetAltitude();

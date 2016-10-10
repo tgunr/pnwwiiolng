@@ -74,8 +74,8 @@ struct weapWeapon
 };
 struct vehVehicle;
 
-extern SINT32 weaponsInit(void);
-extern UINT32 weaponsKill(void);
+extern SINT32 weaponsInit();
+extern UINT32 weaponsKill();
 extern UINT32 weapInitializeWeapon(weapWeapon * Weapon,weaponType * WeaponType);
 extern UINT32 weapFindWeaponTypeByName(weaponType ** WeaponType,UCHAR * WeaponName);
 extern UINT32 weapCreateWeaponByName(weapWeapon * Weapon,

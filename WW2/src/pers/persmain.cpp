@@ -176,8 +176,8 @@ extern char lastbuffer[256];
 
 static ref_ptr<oglMaterial> basiccolor;
 
-static UINT32 _UpdateHeadAndView(void);
-static void _InstallViewControlCallbacks(void);
+static UINT32 _UpdateHeadAndView();
+static void _InstallViewControlCallbacks();
 static UINT32 _GetExternalCameraPosAndAtt(piVECTOR * Pos,piVECTOR * Att);
 static UINT32 _GetInternalCameraPosAndAtt(piVECTOR * Pos,piVECTOR * Att);
 static UINT32 _SlewView(SINT32 Param,UINT32 Id,UINT32 Detach);
@@ -191,29 +191,29 @@ static UINT32 _SetInstrumentsView(SINT32 Param, UINT32 Id, UINT32 Detach);
 static UINT32 _SetGunsightsView(SINT32 Param, UINT32 Id, UINT32 Detach);
 static UINT32 _SetInstrumentView(UINT32 ViewNum);
 static UINT32 _SetGunsightView(UINT32 ViewNum);
-static UINT32 _SetNormalInternalView(void);
+static UINT32 _SetNormalInternalView();
 static LOGICAL _DrawGunsightTree(OBJECT * Object,SINT32 DoSibs);
 
 static UINT32 _UpdateExternalCameraTarget(bool start = false);
-static UINT32 _UpdateCockpitCameraPos(void);
-static UINT32 _UpdatePersonaHealths(void);
-static UINT32 _UpdatePersonaSounds(void);
+static UINT32 _UpdateCockpitCameraPos();
+static UINT32 _UpdatePersonaHealths();
+static UINT32 _UpdatePersonaSounds();
 static LOGICAL _CheckForBlocks(UINT32 Type,SINT32 Position);
-static LOGICAL _BlockView(void);
+static LOGICAL _BlockView();
 
 static UINT32 _SetGunsightToUserDraw(OBJECT * Object,UINT32 IncludeSibs);
 static LOGICAL _DrawGunsightObject(OBJECT * Object);
 
 #if(0)
-static UINT32 _DrawRedoutBlackoutOld(void);
+static UINT32 _DrawRedoutBlackoutOld();
 #endif
-static UINT32 _DrawRedoutBlackoutNew(void);
-static UINT32 _CheckUnderground(void);
+static UINT32 _DrawRedoutBlackoutNew();
+static UINT32 _CheckUnderground();
 
-static int _DoResupplyCheck(void);
-static UINT32 _DoScenarioResupplyCheck(void);
-static UINT32 _DoGroundResupplyCheck(void);
-static UINT32 _DoStaticResupplyCheck(void);
+static int _DoResupplyCheck();
+static UINT32 _DoScenarioResupplyCheck();
+static UINT32 _DoGroundResupplyCheck();
+static UINT32 _DoStaticResupplyCheck();
 LOGICAL _IsValidResupplyVehicle(const vehVehicle* player, const vehVehicle* resupplier, FLOAT64VECTOR* lastPos);
 LOGICAL _IsValidResupplyBuilding(StratDB::StratObject* resupplier);
 StratDB::StratObject* _LookupResupplyBuilding();
@@ -357,7 +357,7 @@ vehVehicle* playerGetVehicle()
 	return persGetPersonaVehiclePtr();
 }
 
-UINT32 persInit(void)
+UINT32 persInit()
 {
 	_ExternalFieldOfView = DEFAULT_EXTERN_FOV;
 
@@ -435,7 +435,7 @@ UINT32 persInit(void)
 	return 0;
 }
 
-UINT32 persKill(void)
+UINT32 persKill()
 {
 	persmsgKill();
 
@@ -448,7 +448,7 @@ UINT32 persKill(void)
 	return 0;
 }
 
-UINT32 persUpdate(void)
+UINT32 persUpdate()
 {
 	// update the player's vehicle controls (hack for now)
 	if (_Persona.VehicleAttached != nullptr)
@@ -577,7 +577,7 @@ static UINT32 _SetFinalExtFOVandFog(FLOAT32 efov)
 }
 
 // FIXME - the results of this function aren't used
-static UINT32 _UpdateCockpitCameraPos(void)
+static UINT32 _UpdateCockpitCameraPos()
 {
 piVECTOR Pos;
 
@@ -1028,7 +1028,7 @@ OBJECT * ObjAtt;
 
 
 #if USE_STATESET
-LOGICAL persDrawGunsight(void)
+LOGICAL persDrawGunsight()
 {
 	// so _DrawStats gets cleared
 	persPrepGunsightDraw();
@@ -1087,7 +1087,7 @@ LOGICAL persDrawGunsight(void)
 	return TRUE;
 }
 #else
-LOGICAL persDrawGunsight(void)
+LOGICAL persDrawGunsight()
 {
 	// so _DrawStats gets cleared
 	persPrepGunsightDraw();
@@ -1163,7 +1163,7 @@ LOGICAL persDrawGunsight(void)
 }
 #endif
 
-static LOGICAL _BlockView(void)
+static LOGICAL _BlockView()
 {
 piMATRIX SavedViewMat;
 piVECTOR V1,V2,V3,V4;
@@ -1946,7 +1946,7 @@ UINT32 persGetCameraPosAndAtt(piVECTOR * Pos,piVECTOR * Att)
 	return 0;
 }
 
-static UINT32 _UpdateHeadAndView(void)
+static UINT32 _UpdateHeadAndView()
 {
 mlVehicleData * VehicleData;
 piMATRIX * Mat;
@@ -2446,7 +2446,7 @@ UINT32 persDetachFromVehicle(vehVehicle* Vehicle)
 	return 0;
 }
 
-UINT32 persDetachPersona(void)
+UINT32 persDetachPersona()
 {
 	_Persona.PersonaPosition = nullptr;
 	_Persona.PersonaBodyDOF = nullptr;
@@ -2976,7 +2976,7 @@ static UINT32 _SetExtFOV(SINT32 Param, UINT32 Id, UINT32 Detach)
 	return 0;
 }
 
-FLOAT32 persGetFogScaleMultiplier(void)
+FLOAT32 persGetFogScaleMultiplier()
 {
 	return _FogScaleMultiplier;
 }
@@ -3164,7 +3164,7 @@ UINT32 persAdjustExternalFixedCamera(piVECTOR* Adjustment)
 	return 0;
 }
 
-static void _InstallViewControlCallbacks(void)
+static void _InstallViewControlCallbacks()
 {
 	if (_Persona.VehicleAttached && _Persona.VehicleAttached->VehicleType &&
 		_Persona.VehicleAttached->VehicleType->Type != VEH_TYPE_FLOATER)
@@ -3204,7 +3204,7 @@ static void _InstallViewControlCallbacks(void)
 	imapInstallControlCallback(IMAP_MOM_UI_MAP_ZOOMOUT,uiMapScaleAllMaps);
 }
 
-UINT32 persPersonaIsCreatedOnHost(void)
+UINT32 persPersonaIsCreatedOnHost()
 {
 
 	_Persona.PersonaInstalledOnHost = 1;
@@ -3214,7 +3214,7 @@ UINT32 persPersonaIsCreatedOnHost(void)
 	return 0;
 }
 
-UINT32 persIsPersonaCreated(void)
+UINT32 persIsPersonaCreated()
 {
 	return _Persona.PersonaInstalledOnHost;
 }
@@ -3265,7 +3265,7 @@ UINT32 persGetPlayerVelocity(piVECTOR * Vel)
 	return 0;
 }
 
-static UINT32 _SetNormalInternalView(void)
+static UINT32 _SetNormalInternalView()
 {
 FLOAT32		horizon;
 FLOAT32		fov;
@@ -3468,7 +3468,7 @@ UINT32 persGetCrewDeadForKillScore(UINT32 Position)
 	return 0;
 }
 
-UINT32 persResetVehicleG(void)
+UINT32 persResetVehicleG()
 {
 	_VehicleG = 1.0;
 
@@ -3489,7 +3489,7 @@ UINT32 persSetVehicleG(FLOAT32 VehicleG, vehVehicle* Vehicle)
 	return 0;
 }
 
-static UINT32 _UpdatePersonaHealths(void)
+static UINT32 _UpdatePersonaHealths()
 {
 	UINT32 i;
 	FLOAT32 Delta;
@@ -3886,7 +3886,7 @@ UINT32 persGetMaxBrainOxy(FLOAT32 * MaxBrainOxy, FLOAT32* BlackoutFullPercent)
 	return 0;
 }
 
-UINT32 persDrawRedoutBlackout(void)
+UINT32 persDrawRedoutBlackout()
 {
 	piSetRenderState(piRENDERSTATE_LIGHTING, FALSE);
 
@@ -3910,7 +3910,7 @@ UINT32 persDrawRedoutBlackout(void)
 }
 
 #if(0)
-static UINT32 _DrawRedoutBlackoutOld(void)
+static UINT32 _DrawRedoutBlackoutOld()
 {
 	static UINT32 Color;
 	static FLOAT32 Red,Green,Blue;
@@ -3992,7 +3992,7 @@ static UINT32 _DrawRedoutBlackoutOld(void)
 #endif
 
 // uses the multiplier blend mode
-static UINT32 _DrawRedoutBlackoutNew(void)
+static UINT32 _DrawRedoutBlackoutNew()
 {
 	UINT32 Color;
 	FLOAT32 Red,Green,Blue;
@@ -4135,7 +4135,7 @@ static UINT32 _DrawRedoutBlackoutNew(void)
 	return 0;
 }
 
-static UINT32 _CheckUnderground(void)
+static UINT32 _CheckUnderground()
 {
 
 	// and, of course, disable visibility if the camera goes underground
@@ -4171,7 +4171,7 @@ static UINT32 _CheckUnderground(void)
 	return 0;
 }
 
-UINT32 persUpdateCockpitSmoke(void)
+UINT32 persUpdateCockpitSmoke()
 {
 	if (_CameraMode == _EXTERNAL_CAMERA)
 	{
@@ -4525,7 +4525,7 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 	return 0;
 }
 
-UINT32 _UpdatePersonaSounds(void)
+UINT32 _UpdatePersonaSounds()
 {
 FLOAT32 Volume;
 vehVehicle* Vehicle;
@@ -4906,7 +4906,7 @@ FLOAT32 Damage;
 #define POS_MOVED(pos,chk) (((pos).x != (chk).x) || ((pos).y != (chk).y) || ((pos).z != (chk).z))
 #define POS_RESET(pos) ((pos).x = (pos).y = (pos).z = 0)
 
-int _DoResupplyCheck(void)
+int _DoResupplyCheck()
 {
 	// only check every once in a while (host determined)
 	if(frametime < _resupplyCheck)
@@ -4985,7 +4985,7 @@ static bool _findResupplyFRU(ServerTrackedObject& sto, void* cookie)
 	return false;
 }
 
-UINT32 _DoGroundResupplyCheck(void)
+UINT32 _DoGroundResupplyCheck()
 {
 	static vehVehicle* VehicleResupplier = nullptr;
 
@@ -5130,7 +5130,7 @@ UINT32 _DoGroundResupplyCheck(void)
 	return GAMEEVENT_RESUPPLY_READY;
 }
 
-UINT32 _DoStaticResupplyCheck(void)
+UINT32 _DoStaticResupplyCheck()
 {
 	static StratDB::StratObject* CurrentResupplier = nullptr;
 
@@ -5222,7 +5222,7 @@ UINT32 _DoStaticResupplyCheck(void)
 	return GAMEEVENT_RESUPPLY_READY;
 }
 
-UINT32 _DoScenarioResupplyCheck(void)
+UINT32 _DoScenarioResupplyCheck()
 {
 	// if we made it this far, there was a valid building near enough to us;
 	// by valid, we mean same side
@@ -5483,7 +5483,7 @@ LOGICAL persIsTired()
 	return (_Persona.breathID > 0);
 }
 
-void persResetHealths(void)
+void persResetHealths()
 {
 	for (int i = 0 ; i < ML_MAX_CREW_POSITIONS ; ++i )
 		_PersonaHealth[i].clear();
@@ -5503,7 +5503,7 @@ void persShakeHead(const char* message)
 	}
 }
 
-void persKillCrew(void)
+void persKillCrew()
 {
 	if(vehmainHasBailedOut())
 		return;
@@ -5529,12 +5529,12 @@ void persKillCrew(void)
 	fpPPOCancel();
 }
 
-bool persAllowHUDUpdate(void)
+bool persAllowHUDUpdate()
 {
 	return (_Persona.BlackoutPercent <= 0.3f);
 }
 
-bool persCanVehicleExit(void)
+bool persCanVehicleExit()
 {
 	if (PN_UNLIKELY(!_Persona.VehicleAttached))
 		return false;
@@ -5565,7 +5565,7 @@ bool persCanVehicleExit(void)
 	return true;
 }
 
-bool persIsCrewDead(void)
+bool persIsCrewDead()
 {
 	if (PN_UNLIKELY(!_Persona.VehicleAttached))
 		return false;

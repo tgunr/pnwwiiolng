@@ -75,12 +75,12 @@ static LOGICAL _LeaveStub(vehVehicle* Vehicle, vehanimVehicleStateType* StateTyp
 #include "fx2/effect.h"
 #endif
 
-UINT32 vehAnimInit(void)
+UINT32 vehAnimInit()
 {
 	return 0;
 }
 
-UINT32 vehAnimKill(void)
+UINT32 vehAnimKill()
 {
 	return 0;
 }

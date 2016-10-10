@@ -36,7 +36,7 @@ static LOGICAL g_noLog = FALSE;
 // Function: GetNewSound
 // Description:
 ////////////////////////////////////////////////////////
-static SOUNDCACHE* GetNewSound(void)
+static SOUNDCACHE* GetNewSound()
 {
     // Not an error
     if(bSoundEnable == FALSE)
@@ -110,7 +110,7 @@ static SOUNDCACHE* FindNamedSound(SCHAR* pszName)
 // Function: sndsInitCache
 // Desctiption:
 //////////////////////////////////////////
-LOGICAL sndsInitCache(void)
+LOGICAL sndsInitCache()
 {
     numsndused = 0;
     numsounds = MINSOUNDCACHE;
@@ -129,7 +129,7 @@ LOGICAL sndsInitCache(void)
 // Function: sndsEmptyCache
 // Desctiption:
 //////////////////////////////////////////
-LOGICAL sndsEmptyCache(void)
+LOGICAL sndsEmptyCache()
 {
     // Not an error
     if(bSoundEnable == FALSE)
@@ -165,7 +165,7 @@ LOGICAL sndsEmptyCache(void)
 // Function: sndsKillCache
 // Desctiption:
 //////////////////////////////////////////
-void sndsKillCache(void)
+void sndsKillCache()
 {
     // Not an error
     if(bSoundEnable == FALSE)

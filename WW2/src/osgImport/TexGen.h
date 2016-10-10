@@ -30,7 +30,7 @@ class TexGen
     public :
 
         TexGen();
-        virtual ~TexGen( void );
+        virtual ~TexGen();
 
         virtual bool isTextureAttribute() const { return true; }
 

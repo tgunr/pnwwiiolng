@@ -299,7 +299,8 @@ authSendPlayerInQueue(Auth::ClientData* cdata, UINT32 position, UINT32 waitTime)
 }
 
 //This function installs our two callbacks
-SINT32 authHostInstallCallbacks(void)
+SINT32
+authHostInstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Auth::CallbackX)
 	{

@@ -126,7 +126,7 @@ _registerStrtUpdaterXCallbacks()
 }
 
 SINT32
-strtUpdateHostInstallCallbacks(void)
+strtUpdateHostInstallCallbacks()
 {
 	if ( _registerClientXCallbacks() < 0 )
 		return -EINVAL;

@@ -23,7 +23,7 @@
 static SINT32 _sizeOfObject = 0;
 static SINT32 _sizeOfObjectHeader = 0;
 static SINT32 _objectsPerSupercellResponse;
-SINT32 strtPackInit(void)
+SINT32 strtPackInit()
 {
 	UCHAR dummyBuffer[Teul::MaxPacket];
 	UINT16 dummyUINT16=0;

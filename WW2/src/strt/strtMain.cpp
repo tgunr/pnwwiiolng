@@ -194,13 +194,13 @@ strtBroadcastCPs(void)
 }
 
 CPStruct*
-strtGetCPList(void)
+strtGetCPList()
 {
 	return _cpList;
 }
 
 Supercell*
-strtGetCellList(void)
+strtGetCellList()
 {
 	return _supercellList;
 }

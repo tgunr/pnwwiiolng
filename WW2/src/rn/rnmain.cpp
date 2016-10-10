@@ -108,7 +108,7 @@
 #define FRAMEFACTOR_MINFPS	15
 #define FRAMEFACTOR_MINVAL	0.1f
 
-static void PrintDateTime(void);
+static void PrintDateTime();
 
 static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UINT32* cookie);
 static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, UINT32* otp);
@@ -126,7 +126,7 @@ extern SINT32 DefaultMaterialId;
 
 static piVECTOR			lastpos, lastrot;
 
-LOGICAL rnmainSetDefaultRenderStates(void)
+LOGICAL rnmainSetDefaultRenderStates()
 {
 #if USE_STATESET
     States::InitDefaultAttributes();
@@ -228,7 +228,7 @@ LOGICAL		retval=FALSE;
 	return(TRUE);
 }
 
-static LOGICAL SetupVariables(void)
+static LOGICAL SetupVariables()
 {
 	FogStart = piFloatLikeLong(piLongLikeFloat(FogStart) * ScaleFactor * (FLOAT32)_WORLD_VIEW_SCALE_FACTOR);
 	FogEnd   = piFloatLikeLong(piLongLikeFloat(FogEnd) * ScaleFactor * (FLOAT32)_WORLD_VIEW_SCALE_FACTOR);
@@ -407,7 +407,7 @@ static bool _connectClientToGameNetwork()
 }
 
 // Init everything for rendering
-LOGICAL rnmainInit(void)
+LOGICAL rnmainInit()
 {
 #ifdef EVENT_LOG_TIMES
 	srand(0);
@@ -710,7 +710,7 @@ LOGICAL rnmainGetDefaultFogAttributes(UINT32 * OutFogColor, FLOAT32 * OutFogStar
 	return TRUE;
 }
 
-LOGICAL rnmainFOVChange(void)
+LOGICAL rnmainFOVChange()
 {
 	if (FieldOfView < 15.0f)
 	{
@@ -766,7 +766,7 @@ LOGICAL rnmainFOVChange(void)
 }
 
 // Kill the render engine
-LOGICAL rnmainKill(void)
+LOGICAL rnmainKill()
 {
 #ifdef MULTI_CLIENT
 	multiClientKill(true);
@@ -989,7 +989,7 @@ void rnmainSetViewMatrix2(piMATRIX* view)
     piSetCockpitViewMatrix(&mat);
 }
 
-static void RotateTranslatePlayer(void)
+static void RotateTranslatePlayer()
 {
 piMATRIX    mat,mat1,mat2,mat4;
 piMATRIX	DistortionMat;
@@ -1073,7 +1073,7 @@ piVECTOR	Att;
 	piSetCockpitViewMatrix(&mat);
 }
 
-void rnmainResetPlayer(void)
+void rnmainResetPlayer()
 {
 piMATRIX    mat;
 
@@ -1111,7 +1111,7 @@ void rnmainMovePlayer(piVECTOR* lppos)
 	lastpos.z = lppos->z * ScaleFactor;
 }
 
-void rnUpdateView(void)
+void rnUpdateView()
 {
 	if (ft50msticks != 0)
 	{
@@ -1165,7 +1165,7 @@ LOGICAL rnmainMoveView(FLOAT64 PosX, FLOAT64 PosY)
 	return(TRUE);
 }
 
-static void PrintDateTime(void)
+static void PrintDateTime()
 {
 #if platOS == OS_WIN32
 SYSTEMTIME	SystemTime;

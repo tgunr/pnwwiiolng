@@ -147,7 +147,7 @@ public:
     }
 
     /** Length squared of the vector = vec . vec */
-    inline value_type length2( void ) const
+    inline value_type length2() const
     {
         return _v[0]*_v[0] + _v[1]*_v[1];
     }

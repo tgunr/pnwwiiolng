@@ -15,7 +15,7 @@ OpenALAudio* audio;
 void soundsTest();
 void test(const char* name);
 
-LOGICAL sndsPlatformInit(void)
+LOGICAL sndsPlatformInit()
 {
     SHOW_DEBUG( mDebugStream = fopen("/Users/awulf/XCode/test.log", "w");
 
@@ -36,7 +36,7 @@ LOGICAL sndsPlatformInit(void)
     return TRUE;
 }
 
-LOGICAL sndsPlatformKill(void)
+LOGICAL sndsPlatformKill()
 {
     SHOW_DEBUG( fprintf( mDebugStream, "sndsPlatformKill()\n" ); fflush( mDebugStream ); fclose( mDebugStream ); )
 
@@ -53,7 +53,7 @@ LOGICAL sndsPlatformKill(void)
     return TRUE;
 }
 
-UINT32 sndsGetMaxNumberOfSounds(void)
+UINT32 sndsGetMaxNumberOfSounds()
 {
     return MaxNumberOfSounds;
 }
@@ -80,7 +80,7 @@ LOGICAL sndsPlatformDriverConfig(void* hints)
     return TRUE; // not called
 }
 
-LOGICAL sndsPlatformReset(void)
+LOGICAL sndsPlatformReset()
 {
     return TRUE; // PC only
 }

@@ -1366,7 +1366,7 @@ _registerClientCallbacks()
 //
 
 SINT32
-commInstallHostCallbacks(void)
+commInstallHostCallbacks()
 {
 	SINT32 retval;
 

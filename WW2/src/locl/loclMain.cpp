@@ -160,7 +160,7 @@ const WCHAR* loclGetLocalizationStringByID(SINT32 MessageID)
 // loclGetLanguageID
 // This function returns an SINT32 for the currently installed
 // language identifier.
-SINT32 loclGetLanguageID(void)
+SINT32 loclGetLanguageID()
 {
 	return _LanguageInUse;
 }
@@ -168,12 +168,12 @@ SINT32 loclGetLanguageID(void)
 // loclGetLanguageName
 // This function returns an SCHAR* for the currently installed
 // language name.
-SCHAR* loclGetLanguageName(void)
+SCHAR* loclGetLanguageName()
 {
 	return _LanguageName;
 }
 
-LOGICAL locl_Message_Table_Kill(void)
+LOGICAL locl_Message_Table_Kill()
 {
 SINT32	i;
 

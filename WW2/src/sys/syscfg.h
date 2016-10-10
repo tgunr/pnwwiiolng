@@ -21,12 +21,12 @@
 #undef PostMessage
 
 // Project defines - Non-Specific
-using SYS_DDINITFUNC = LOGICAL(*)(void);
-using SYS_D3DINITFUNC = LOGICAL(*)(void);
-using SYS_DDRENDERFUNC = LOGICAL(*)(void);
-using SYS_D3DRENDERFUNC = LOGICAL(*)(void);
-using SYS_DDKILLFUNC = void(*)(void);
-using SYS_D3DKILLFUNC = void(*)(void);
+using SYS_DDINITFUNC = LOGICAL(*)();
+using SYS_D3DINITFUNC = LOGICAL(*)();
+using SYS_DDRENDERFUNC = LOGICAL(*)();
+using SYS_D3DRENDERFUNC = LOGICAL(*)();
+using SYS_DDKILLFUNC = void(*)();
+using SYS_D3DKILLFUNC = void(*)();
 using SYS_MOUSEFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 using SYS_TIMERFUNC = void(*)(WPARAM wparam, LPARAM lparam);
 using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);

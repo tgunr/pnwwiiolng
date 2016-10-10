@@ -93,7 +93,7 @@ HWND				myhwnd;
 	Static functions
 */
 static LRESULT CALLBACK			WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
-static void UpdateTimes(void);
+static void UpdateTimes();
 
 static LOGICAL OnEraseBkgnd(HDC hDC);
 static LOGICAL OnNcActivate(LOGICAL bActive);
@@ -113,7 +113,7 @@ static void	OnSysKeyUp(UINT nChar, UINT nFlags);
 
 #define USE_NEWGL 0
 
-HINSTANCE ddpGetInstance(void)
+HINSTANCE ddpGetInstance()
 {
 	return (HINSTANCE)hinst;
 }
@@ -123,7 +123,7 @@ void ddpSetInstance(HINSTANCE hnewInst)
 	hinst = hnewInst;
 }
 
-LOGICAL ddpInit(void)
+LOGICAL ddpInit()
 {
 	state = TRUE;
 	delay = 0;
@@ -151,7 +151,7 @@ LOGICAL ddpInit(void)
 }
 
 #if(0)
-static void DisplayLastError(void)
+static void DisplayLastError()
 {
 LPVOID lpMsgBuf;
 
@@ -375,7 +375,7 @@ static LOGICAL oglBegin(HWND hwnd)
 	return (FALSE);
 }
 
-static void oglEnd(void)
+static void oglEnd()
 {
 	if (myhdc && myhrc)
 	{
@@ -391,7 +391,7 @@ static void oglEnd(void)
 	}
 }
 
-void ddpKill(void)
+void ddpKill()
 {
     // This function is called recursively with Alt-F4
     static LOGICAL alreadykilled = 0;
@@ -688,7 +688,7 @@ RECT		rect, wrect;
 	return(TRUE);
 }
 
-LOGICAL ddpUpdate(void)
+LOGICAL ddpUpdate()
 {
 #ifdef DONT_USE
 	if (!state)
@@ -770,7 +770,7 @@ LOGICAL ddpUpdate(void)
 	return(TRUE);
 }
 
-LOGICAL ddpFlip(void)
+LOGICAL ddpFlip()
 {
 	if (myhdc && myhrc)
 	{
@@ -909,7 +909,7 @@ LOGICAL		olddss = dss;
 	return(olddss);
 }
 
-static void UpdateTimes(void)
+static void UpdateTimes()
 {
 /*
 UINT32	ticks;
@@ -945,7 +945,7 @@ UINT32	ticks;
 	framecount += 1;
 }
 
-SINT32 ddpGetTotalPaints(void)
+SINT32 ddpGetTotalPaints()
 {
 	return(framecount);
 }
@@ -1999,7 +1999,7 @@ DEVMODE			testmode, presentmode;
 	return(TRUE);
 }
 
-void ddpResetDisplay(void)
+void ddpResetDisplay()
 {
 	ChangeDisplaySettingsEx(displaydevice.DeviceName, nullptr, nullptr, 0, nullptr);
 }
@@ -2009,7 +2009,7 @@ LOGICAL ddpDrawToScreen(LPVOID lpdds)
 	return(TRUE);
 }
 
-DWORD GetMillisecondTick(void)
+DWORD GetMillisecondTick()
 {
 	SINT32					deltaQueryTime, deltaGetTime;
 	_LARGE_INTEGER			frequency			= {0};
@@ -2159,10 +2159,10 @@ static void glScreenCapture()
 	capSave(bitmap, WantedWidth, WantedHeight, fileName);
 }
 
-LOGICAL ddcapStart(void)
+LOGICAL ddcapStart
 {
 	glScreenCapture();
-	return(TRUE);
+	return TRUE;
 }
 
 

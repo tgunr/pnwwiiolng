@@ -559,7 +559,7 @@ size_t fiodFileSize(const char* name, bool userdir)
 static char *OriginalPrepath = nullptr;
 #endif
 
-const char* fiodGetPrepath(void)
+const char* fiodGetPrepath()
 {
 	return(DataPath);
 }

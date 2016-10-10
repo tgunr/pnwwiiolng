@@ -52,7 +52,7 @@ static bool UseRedirectToLFE = false;
 
 struct WaveData
 {
-    WaveData(void) : data(nullptr) {}
+    WaveData() : data(nullptr) {}
 
     CWaveFile wave;
     unsigned char* data;

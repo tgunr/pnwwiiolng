@@ -164,7 +164,7 @@ _recvBandwidthNotice(ACTION_OBJECT* const a)
 
 //This function installs all the host callbacks
 SINT32
-chatInstallCellHostSupportCallbacks(void)
+chatInstallCellHostSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
 	{

@@ -14,5 +14,5 @@ extern TEUL_CALLBACK*	PERSONA_EXIT_CB;
 extern TEUL_CALLBACK*	PLAYER_MIRROR_CB;
 extern TEUL_CALLBACK*	CLUSTER_SHUTDOWN_CB;
 
-SINT32 serverInitCallbacks(void);
+SINT32 serverInitCallbacks();
 

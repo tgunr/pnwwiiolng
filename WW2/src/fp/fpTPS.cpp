@@ -59,7 +59,7 @@ extern void rnUpdateLoadingScreen();
 // loads models with instantiate set to 0
 // loads animations into appropriate place
 // ANYTHING added here will need a cleanup in the kill function
-LOGICAL fpTPSLoad (void)
+LOGICAL fpTPSLoad()
 {
 	int			i, j, k, l;
 	static int			boneCount;
@@ -389,7 +389,7 @@ LOGICAL fpTPSLoad (void)
 }
 
 // kill the TPS system
-void fpTPSKill (void)
+void fpTPSKill()
 {
 	TPS_BLEND_MAP::iterator it = _fpTPSAnimLib.begin();
 

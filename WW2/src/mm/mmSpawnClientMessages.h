@@ -21,7 +21,7 @@ struct WEAPON_SERIAL;
 struct FLOAT64VECTOR;
 
 //Callback installer
-extern SINT32 mmClientInstallCallbacks(void);
+extern SINT32 mmClientInstallCallbacks();
 
 //this function sends the post request to the mmhost
 extern SINT32 mmSendPostRequest(SINT32 connection, const FULL_OBJ_ID facility, const WEAPON_SPEC weapon

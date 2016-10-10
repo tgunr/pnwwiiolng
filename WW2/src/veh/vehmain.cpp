@@ -206,10 +206,10 @@ UINT32 _UpdateVehicleBoundingBox(mlObjectData* ObjectData,OBJECT * PlaneObject);
 static UINT32 _UpdateVehicleBoundingBox1(mlObjectData* ObjectData,OBJECT * PlaneObject,UINT32* FirstBBox);
 
 static UINT32 _CheckAndUpdateHitmap(vehVehicle* CurrentVehicle);
-static UINT32 _ClearAllVehicles(void);
+static UINT32 _ClearAllVehicles();
 
 #if(0)
-static LOGICAL _CanPlayerExit(void);
+static LOGICAL _CanPlayerExit();
 #endif
 
 #if(0)
@@ -294,7 +294,7 @@ static inline OBJECTDOF* _getVehicleSpawnObjectDof(vehVehicle* veh)
 // sets up important damage array by reading its component file
 // also sets total mass for each vehicle (hack for concussion damage)
 
-static void _ReadComponentFiles(void)
+static void _ReadComponentFiles()
 {
 	int i, k;
 	vehType* veh;
@@ -410,7 +410,7 @@ static void _ReadComponentFiles(void)
 logTimerEndMacro();
 }
 
-UINT32 vehInit(void)
+UINT32 vehInit()
 {
 	if(vehtypeInit() !=0 ) return 1;
 
@@ -446,7 +446,7 @@ UINT32 vehInit(void)
 	return 0;
 }
 
-UINT32 vehKill(void)
+UINT32 vehKill()
 {
 vehVehicle*CurrentVehicle, *NextVehicle;
 
@@ -783,7 +783,7 @@ static void _ResetVehicleLODs(vehVehicle* v, bool resetLOD)
 	v->MinVehicleLOD = -1;
 }
 
-static UINT32 _UpdateVehicleLODs(void)
+static UINT32 _UpdateVehicleLODs()
 
 {
 	if (ft500mscount == 0) return 0;
@@ -1324,7 +1324,7 @@ static void _HitMessageUpdate()
 	vehUpdate
 *************************************************************************************************/
 
-UINT32 vehUpdate(void)
+UINT32 vehUpdate()
 {
 	if(_spawnvehicle)
     {
@@ -3493,7 +3493,7 @@ LOGICAL vehmainHasBailedOut()
 	return (_bailoutTime > 0) ? TRUE: FALSE;
 }
 
-LOGICAL _CanPlayerExit(void)
+LOGICAL _CanPlayerExit()
 {
 	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
 	if (Vehicle == nullptr || Vehicle->ModelData == nullptr) return FALSE;
@@ -4015,7 +4015,7 @@ const vehType* BailoutSTO::VTYPE(vehVehicle* v)
 	return vt;
 }
 
-static UINT32 _ClearAllVehicles(void)
+static UINT32 _ClearAllVehicles()
 {
 	bool scenario = SCEN_MGR->IsActive();
 
@@ -4309,7 +4309,7 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 	return 0;
 }
 
-UINT32 vehAdjustAnimationTime(void)
+UINT32 vehAdjustAnimationTime()
 {
 	if (getVehicleHead().getNext() != nullptr)
 	{

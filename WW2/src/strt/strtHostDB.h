@@ -30,10 +30,10 @@ extern void strtSaveCP(CPStruct* cp);
 extern void strtSaveFacility(FacilityStruct* facility);
 
 extern void strtdbSaveGameWorld(CPStruct* cp);
-extern void strtdbPopulateVehTypesTable(void);
-extern void strtdbReadVehicleAccess(void);
-extern void strtdbSaveVehicleCVCs(void);
-extern void strtdbSaveVehicleAccess(void);
+extern void strtdbPopulateVehTypesTable();
+extern void strtdbReadVehicleAccess();
+extern void strtdbSaveVehicleCVCs();
+extern void strtdbSaveVehicleAccess();
 extern void strtSaveFactoryOutput(ObjectStruct* factory);
 extern bool strtdbFetchLuaScript(const char* name, std::string& obj);
 extern void strtdbSaveConfigVar(const char* name, const char* value);

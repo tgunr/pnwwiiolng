@@ -42,7 +42,7 @@ static phui::View* _status;
 static SINT32 _startloadtime;
 static SINT32 _totalloadtime = 10000*60;
 
-extern void UpdateGameClocks(void);
+extern void UpdateGameClocks();
 static bool _keyEntered();
 static bool _isWidescreen();
 
@@ -67,7 +67,7 @@ std::string currentLoadString;
 	rnlogoInit
 *************************************************************************************************/
 
-LOGICAL rnlogoInit(void)
+LOGICAL rnlogoInit()
 {
 	_keyEntered(); // eat any events that may be in the queue
 
@@ -126,7 +126,7 @@ LOGICAL rnlogoInit(void)
 	rnlogoRender
 *************************************************************************************************/
 
-LOGICAL rnlogoRender(void)
+LOGICAL rnlogoRender()
 {
 	piSetDDRender(nullptr);
 
@@ -142,7 +142,7 @@ LOGICAL rnlogoRender(void)
 	rnlogoKill
 *************************************************************************************************/
 
-void rnlogoKill(void)
+void rnlogoKill()
 {
 
 #if (platOS == OS_WIN32) && (RELEASE_CLIENT != 0)

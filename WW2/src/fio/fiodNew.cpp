@@ -434,7 +434,7 @@ size_t fiodFileSize(const char* name, bool userdir)
 //////////////////////////////////////////////////////////////////////
 // Returns a pointer to the path prefix
 
-const char* fiodGetPrepath(void)
+const char* fiodGetPrepath()
 {
 	return(DataPath);
 }

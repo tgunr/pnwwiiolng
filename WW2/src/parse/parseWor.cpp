@@ -111,7 +111,7 @@ static char _fileName[PN_MAX_PATH];
 extern SINT32 LoadingScreen;
 #endif
 
-void parseWorKill(void)
+void parseWorKill()
 {
 	for(UINT32 i = 0; _stratSections[i].name[0] != 0;i++)
 	{

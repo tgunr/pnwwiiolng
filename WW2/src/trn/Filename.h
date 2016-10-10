@@ -34,17 +34,17 @@ public:
         CFilename(const char* pFilename) : std::string(pFilename)    { }
         CFilename(std::string strFilename) :std::string(strFilename) { }
 
-		CFilename GetExtension(void);      // if filename is "/idv/code/file.cpp", it returns "cpp"
-		CFilename GetPath(void);           // if filename is "/idv/code/file.cpp", it returns "/idv/code"
-		CFilename NoExtension(void);       // if filename is "/idv/code/file.cpp", it returns "/idv/code/file"
-		CFilename NoPath(void);            // if filename is "/idv/code/file.cpp", it returns "file.cpp"
+		CFilename GetExtension();      // if filename is "/idv/code/file.cpp", it returns "cpp"
+		CFilename GetPath();           // if filename is "/idv/code/file.cpp", it returns "/idv/code"
+		CFilename NoExtension();       // if filename is "/idv/code/file.cpp", it returns "/idv/code/file"
+		CFilename NoPath();            // if filename is "/idv/code/file.cpp", it returns "file.cpp"
 };
 
 
 //////////////////////////////////////////////////////////////////////
 //	CFilename::GetExtension
 
-inline CFilename CFilename::GetExtension(void)
+inline CFilename CFilename::GetExtension()
 {
 	std::string strExtension;
 
@@ -63,7 +63,7 @@ inline CFilename CFilename::GetExtension(void)
 //////////////////////////////////////////////////////////////////////
 //	CFilename::GetPath
 
-inline CFilename CFilename::GetPath(void)
+inline CFilename CFilename::GetPath()
 {
 	char szPath[1024];
 
@@ -87,7 +87,7 @@ inline CFilename CFilename::GetPath(void)
 //////////////////////////////////////////////////////////////////////
 //	CFilename::NoExtension
 
-inline CFilename CFilename::NoExtension(void)
+inline CFilename CFilename::NoExtension()
 {
 	char szExtension[1024];
 
@@ -110,7 +110,7 @@ inline CFilename CFilename::NoExtension(void)
 //////////////////////////////////////////////////////////////////////
 //	CFilename::NoPath
 
-inline CFilename CFilename::NoPath(void)
+inline CFilename CFilename::NoPath()
 {
 	char szPath[1024];
 

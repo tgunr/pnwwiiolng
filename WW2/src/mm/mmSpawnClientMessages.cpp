@@ -336,7 +336,7 @@ void mmSendDespawn(Teul::Connection* conn)
 }
 
 SINT32
-mmClientInstallCallbacks(void)
+mmClientInstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(MM::CallbackX)
 	{

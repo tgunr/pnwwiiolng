@@ -252,7 +252,7 @@ namespace Teul
 #endif
 
 SINT32
-teulModShutdown(void)
+teulModShutdown()
 {
 	using namespace Teul;
 	for ( auto it = idleEndpoints.begin(), end = idleEndpoints.end(); it != end; )

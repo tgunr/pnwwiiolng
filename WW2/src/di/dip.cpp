@@ -69,7 +69,7 @@ LOGICAL CALLBACK DIEnumDevicesProc(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 }
 
 
-LOGICAL dipInit(void)
+LOGICAL dipInit()
 {
 HRESULT				dirval;
 
@@ -136,7 +136,7 @@ HRESULT				dirval;
 
 
 // Always unacquire the device before calling Release().
-void dipKillKeyboard(void)
+void dipKillKeyboard()
 {
 	if (lpkbd != nullptr)
 	{
@@ -148,7 +148,7 @@ void dipKillKeyboard(void)
 
 
 // Always unacquire the device before calling Release().
-void dipKillMouse(void)
+void dipKillMouse()
 {
 	if (lpmd != nullptr)
 	{
@@ -171,7 +171,7 @@ static void KillJoystick(SINT32 number)
 
 
 // Always unacquire the device before calling Release().
-void dipKillJoystick(void)
+void dipKillJoystick()
 {
 SINT32		i;
 
@@ -183,7 +183,7 @@ SINT32		i;
 
 
 // Always unacquire the device before calling Release().
-void dipKill(void)
+void dipKill()
 {
 	if (lpdi != nullptr)
 	{
@@ -200,7 +200,7 @@ void dipKill(void)
 
 
 // At certain times the devices might need to be unacquired (but not "killed")
-void dipUnacquireKeyboard(void)
+void dipUnacquireKeyboard()
 {
 HRESULT	result;
 
@@ -216,7 +216,7 @@ HRESULT	result;
 
 
 // At certain times the devices might need to be unacquired (but not "killed")
-void dipUnacquireMouse(void)
+void dipUnacquireMouse()
 {
 HRESULT	result;
 
@@ -232,7 +232,7 @@ HRESULT	result;
 
 
 // At certain times the devices might need to be unacquired (but not "killed")
-void dipUnacquireJoystick(void)
+void dipUnacquireJoystick()
 {
 HRESULT	result;
 SINT32		i;
@@ -252,7 +252,7 @@ SINT32		i;
 
 
 // At certain times the devices might need to be unacquired (but not "killed")
-void dipUnacquire(void)
+void dipUnacquire()
 {
 	if (lpdi != nullptr)
 	{
@@ -264,7 +264,7 @@ void dipUnacquire(void)
 
 
 // At certain times, the devices might need to be acquired
-LOGICAL dipAcquireKeyboard(void)
+LOGICAL dipAcquireKeyboard()
 {
 LOGICAL	retval=TRUE;
 HRESULT	result;
@@ -284,7 +284,7 @@ HRESULT	result;
 
 
 // At certain times, the devices might need to be acquired
-LOGICAL dipAcquireMouse(void)
+LOGICAL dipAcquireMouse()
 {
 LOGICAL	retval=TRUE;
 HRESULT	result;
@@ -304,7 +304,7 @@ HRESULT	result;
 
 
 // At certain times, the devices might need to be acquired
-LOGICAL dipAcquireJoystick(void)
+LOGICAL dipAcquireJoystick()
 {
 LOGICAL	retval=TRUE;
 HRESULT	result;
@@ -328,7 +328,7 @@ SINT32		i;
 
 
 // At certain times, the devices might need to be acquired
-LOGICAL dipAcquire(void)
+LOGICAL dipAcquire()
 {
 	if (lpdi != nullptr)
 	{
@@ -344,7 +344,7 @@ LOGICAL dipAcquire(void)
 }
 
 
-LOGICAL dipSetupKeyboard(void)
+LOGICAL dipSetupKeyboard()
 {
 	HRESULT dirval;
 	DIPROPDWORD dipdw;
@@ -406,7 +406,7 @@ LOGICAL dipSetupKeyboard(void)
 }
 
 
-LOGICAL dipSetupMouse(void)
+LOGICAL dipSetupMouse()
 {
 	HRESULT dirval;
 	DIPROPDWORD dipdw;
@@ -784,7 +784,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
 }
 
 
-LOGICAL dipSetupJoystick(void)
+LOGICAL dipSetupJoystick()
 {
 #if(1)
     numjsd = 0;;
@@ -1138,7 +1138,7 @@ static SINT32		retry[MAX_JOYSTICKS];
 }
 
 
-SINT32 dipGetNumberJoysticks(void)
+SINT32 dipGetNumberJoysticks()
 {
 	return(numjsd);
 }

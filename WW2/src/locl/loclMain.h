@@ -127,10 +127,10 @@ extern const WCHAR* loclGetLocalizationStringByID(SINT32 MessageID);
 
 // This function returns an SINT32 for the currently installed
 // language identifier
-extern SINT32 loclGetLanguageID(void);
+extern SINT32 loclGetLanguageID();
 
 //This function returns a signed character string with the Language Name.
-extern SCHAR* loclGetLanguageName(void);
+extern SCHAR* loclGetLanguageName();
 
 //This function frees the memory in the message table.
-extern LOGICAL locl_Message_Table_Kill(void);
+extern LOGICAL locl_Message_Table_Kill();

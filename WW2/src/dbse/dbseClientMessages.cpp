@@ -19,7 +19,7 @@ SINT32 dbseRecvHandshake(ACTION_OBJECT* a, Dbse::Handshake&);
 // --->error functions
 
 //Installs the client callbacks
-SINT32 dbseInstallClientCallbacks(void)
+SINT32 dbseInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(DBSE_GENERAL_X)
 	{

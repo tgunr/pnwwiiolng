@@ -219,9 +219,9 @@ static void _RenderScene3D(oglPRIMITIVETYPE oglt, oglVERTEXTYPE oglvt, UINT32 Ve
 							void* color, SINT32 colorStride, void* tex, SINT32 texStride, void* index);
 static void RenderScene(const oglTVERTEX& pv, int stride, int count, const void* indices);
 
-static SINT32 _GetNewTextureId(void);
-static SINT32 _GetNewTexture3DId(void);
-static SINT32 _GetNewMaterialId(void);
+static SINT32 _GetNewTextureId();
+static SINT32 _GetNewTexture3DId();
+static SINT32 _GetNewMaterialId();
 
 static void _GetOpenGLState(oglRENDERSTATETYPES state);
 
@@ -285,7 +285,7 @@ unsigned int oglGetTextureName(int id)
     return textures[id].genlist;
 }
 
-LOGICAL oglSetupRC(void)
+LOGICAL oglSetupRC()
 {
     oglSetRenderState(oglRENDERSTATE_CULLMODE, piCULLMODE_DEFAULT);
     oglSetRenderState(oglRENDERSTATE_FILLMODE, piFILL_SOLID);
@@ -569,7 +569,7 @@ TEXTURE* lptex;
 	return(TRUE);
 }
 
-void oglUpdateTextures(void)
+void oglUpdateTextures()
 {
 }
 
@@ -641,7 +641,7 @@ SINT32 oglGetTextureMipmapLevel(SINT32 texid)
 	return(textures[texid].miplevels);
 }
 
-LOGICAL oglReleaseTextureHandles(void)
+LOGICAL oglReleaseTextureHandles()
 {
 	return TRUE;
 }
@@ -1216,7 +1216,7 @@ void oglDisableTexture()
     TextureState::Disable();
 }
 
-LOGICAL oglDisableTexture3D(void)
+LOGICAL oglDisableTexture3D()
 {
 	return(TRUE);
 }
@@ -1743,7 +1743,7 @@ LOGICAL oglAddMaterialReference(SINT32 matid)
 	return TRUE;
 }
 
-LOGICAL oglDisableMaterial(void)
+LOGICAL oglDisableMaterial()
 {
     extern SINT32 DefaultMaterialId;
 
@@ -1755,7 +1755,7 @@ LOGICAL oglDisableMaterial(void)
 /*
  * Matrices
 */
-piMATRIX* oglGetProjectionMatrix(void)
+piMATRIX* oglGetProjectionMatrix()
 {
 	return(&projection);
 }
@@ -1886,7 +1886,7 @@ void oglGetModelViewProjectionMatrix(Matrixf& mvp)
     mvp = Matrixf(modelview) * Matrixf(projection);
 }
 
-piMATRIX* oglGetWorldMatrix(void)
+piMATRIX* oglGetWorldMatrix()
 {
 	return(&world);
 }
@@ -1982,7 +1982,7 @@ void oglSetWorldMatrix(const piMATRIX* newworld)
     }
 }
 
-piMATRIX* oglGetViewMatrix(void)
+piMATRIX* oglGetViewMatrix()
 {
 	return(&view);
 }
@@ -2363,7 +2363,7 @@ static LOGICAL ParseExtensions(char* tp)
 	return(TRUE);
 }
 
-static LOGICAL _internalOglInit(void)
+static LOGICAL _internalOglInit()
 {
     SINT8*		tp;
     const SINT8 * ptr;
@@ -2647,7 +2647,7 @@ static inline void _initializationError(const char* problem)
 #endif
 }
 
-LOGICAL oglInit(void)
+LOGICAL oglInit()
 {
 	try
 	{
@@ -2660,7 +2660,7 @@ LOGICAL oglInit(void)
 	return FALSE;
 }
 
-void oglKill(void)
+void oglKill()
 {
 SINT32		i;
 SINT32		total, free;
@@ -2806,7 +2806,7 @@ GLbitfield	clrbits=0;
 }
 
 
-SINT32 oglGetNumberVertices(void)
+SINT32 oglGetNumberVertices()
 {
 #ifdef USE_EXECUTE_BUFFERS
 	return(curd3ddesc.dwMaxVertexCount);
@@ -3617,7 +3617,7 @@ void oglSetRenderState(oglRENDERSTATETYPES enumStateType, UINT32 uState)
 }
 #endif
 
-LOGICAL oglDisplayRenderStates(void)
+LOGICAL oglDisplayRenderStates()
 {
 SINT32		i;
 
@@ -3632,7 +3632,7 @@ SINT32		i;
 	return(TRUE);
 }
 
-void oglResetRenderStats(void)
+void oglResetRenderStats()
 {
 	totdraw			= 0;
 	totdrawindex	= 0;
@@ -3657,12 +3657,12 @@ void oglGetRenderTypes(UINT32* draw, UINT32* drawindex)
 	*drawindex	= totdrawindex;
 }
 
-void oglResetRenderBuckets(void)
+void oglResetRenderBuckets()
 {
 	memset(renderbuckets, 0, sizeof(UINT32) * MAX_RENDER_BUCKETS);
 }
 
-void oglResetRenderIndexBuckets(void)
+void oglResetRenderIndexBuckets()
 {
 	memset(renderindexbuckets, 0, sizeof(UINT32) * MAX_RENDER_BUCKETS);
 }
@@ -3693,7 +3693,7 @@ void oglUpdateRenderIndexBuckets(UINT32 PrimitiveCount)
 	}
 }
 
-void oglDisplayRenderBuckets(void)
+void oglDisplayRenderBuckets()
 {
 #ifdef OGL_EVENT_LOG
 SINT32		i, num, tottriangles, totrunning, totpaints, halfpaints;
@@ -3723,7 +3723,7 @@ SINT32		i, num, tottriangles, totrunning, totpaints, halfpaints;
 #endif	// OGL_EVENT_LOG
 }
 
-void oglDisplayRenderIndexBuckets(void)
+void oglDisplayRenderIndexBuckets()
 {
 #ifdef OGL_EVENT_LOG
 SINT32		i, num, tottriangles, totrunning, totpaints, halfpaints;
@@ -3769,7 +3769,7 @@ LOGICAL oglSetVertexSource(SINT32 srcid, UINT32 Stride, UINT32 FVF)
 	return(FALSE);
 }
 
-LOGICAL oglResetVertexSource(void)
+LOGICAL oglResetVertexSource()
 {
 	return(FALSE);
 }
@@ -3805,7 +3805,7 @@ LOGICAL oglSetIndexSource(SINT32 srcid, UINT32 base)
 	return(FALSE);
 }
 
-LOGICAL oglResetIndexSource(void)
+LOGICAL oglResetIndexSource()
 {
 	return(FALSE);
 }
@@ -3920,12 +3920,12 @@ UINT32	PrimitiveCount=(UINT32)-1;
 	return(TRUE);
 }
 
-LOGICAL oglBeginScene(void)
+LOGICAL oglBeginScene()
 {
 	return(TRUE);
 }
 
-LOGICAL oglEndScene(void)
+LOGICAL oglEndScene()
 {
 	return(TRUE);
 }
@@ -4703,7 +4703,7 @@ SINT32 oglGetTextureUVColor(UINT32* pColor,
     return 0;
 }
 
-piMATRIX* oglGetCockpitViewMatrix(void)
+piMATRIX* oglGetCockpitViewMatrix()
 {
 	return(&cockpitview);
 }
@@ -4745,7 +4745,7 @@ LOGICAL oglMaterialHasSpecular(SINT32 matid)
 	return(TRUE);
 }
 
-piMATRIX* oglGetUnscaledViewMatrix(void)
+piMATRIX* oglGetUnscaledViewMatrix()
 {
 	return &piMatUnscaledView;
 }
@@ -5356,7 +5356,7 @@ SINT32 oglGetLights(LIGHT** lplight)
 	oglGetAmbLight
 *************************************************************************************************/
 
-oglCOLOR oglGetAmbLight(void)
+oglCOLOR oglGetAmbLight()
 {
 #if USE_STATESET
     LightModel* lm = dynamic_cast<LightModel*>(States::GetDefaultAttribute(RS_LIGHTMODEL));
@@ -5794,7 +5794,7 @@ static void _RenderScene3D(oglPRIMITIVETYPE oglt, oglVERTEXTYPE oglvt, UINT32 Ve
 	_GetNewTextureId
 *************************************************************************************************/
 
-static SINT32 _GetNewTextureId(void)
+static SINT32 _GetNewTextureId()
 {
     if(g_freeTextures.empty())
     {
@@ -5835,7 +5835,7 @@ SINT32 oglGetNewTextureID()
 	_GetNewTexture3DId
 *************************************************************************************************/
 
-static SINT32 _GetNewTexture3DId(void)
+static SINT32 _GetNewTexture3DId()
 {
 SINT32			i, num;
 TEXTURE3D*		ptex;
@@ -5868,7 +5868,7 @@ TEXTURE3D*		ptex;
 	_GetNewMaterialId
 *************************************************************************************************/
 
-static SINT32 _GetNewMaterialId(void)
+static SINT32 _GetNewMaterialId()
 {
 SINT32			i;
 SINT32			num;

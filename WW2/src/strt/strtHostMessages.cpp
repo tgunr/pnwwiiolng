@@ -1127,7 +1127,7 @@ _registerInterHostCallbacks()
 
 //Installs our callbacks
 SINT32
-strtHostInstallCallbacks(void)
+strtHostInstallCallbacks()
 {
 	_registerInterHostCallbacks();
 

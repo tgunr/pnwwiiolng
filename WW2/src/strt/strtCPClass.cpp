@@ -614,7 +614,7 @@ CPStruct::checkHCUnits()
 // Check whether the flags say we're under attack or not
 
 CPStruct*
-CPStruct::checkForUnderAttack(void)
+CPStruct::checkForUnderAttack()
 {
 	///TODO: Differentiate between "people here" and "under attack"
 	if ( flags & CP_EWS_FLAG_MASK )

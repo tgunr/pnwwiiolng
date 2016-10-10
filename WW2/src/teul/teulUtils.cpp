@@ -46,7 +46,7 @@ UINT32 teulClockTime;
 // teulTime is just teulClock64 / 1000)
 
 void
-teulSyncClock(void)
+teulSyncClock()
 {
 #if platOS == OS_LINUX || platOS == OS_MACOS
 	struct timeval tv;

@@ -1241,7 +1241,7 @@ strtExpireWeapon(POSTED_WEAPON& weapon)
 // load TOE templates, etc.
 
 void
-strtInitSpawn(void)
+strtInitSpawn()
 {
 #if defined(IS_STRAT_HOST)
 	// Make sure all the vehicles we know about are now in the database.

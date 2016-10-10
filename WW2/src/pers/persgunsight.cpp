@@ -226,12 +226,12 @@ static LOGICAL _SetRangeAngleMin(void*  Data);
 static LOGICAL _SetRangeAngleMax(void*  Data);
 static LOGICAL _SetRangeReadout(void*  Data);
 
-static LOGICAL _RenderTextVertices(void);
-static LOGICAL _RenderLineVertices(void);
+static LOGICAL _RenderTextVertices();
+static LOGICAL _RenderLineVertices();
 
 static LOGICAL _KillGeneric(void*  Data);
 
-static FLOAT32 _ComputeShotAngle(void);
+static FLOAT32 _ComputeShotAngle();
 #if(0)
 static FLOAT32 _ComputeShotDrop(FLOAT32 Range,persGunsightRangeTable * RT);
 #endif
@@ -292,7 +292,7 @@ static GunfileLookup Lookup[MAX_GUNFILE_COMMANDS] =
 	persGunsightInit
 *************************************************************************************************/
 
-LOGICAL persGunsightInit(void)
+LOGICAL persGunsightInit()
 {
 	memset(&GunSightView, 0x0, sizeof(GSCommandList));
 	memset(&InstView, 0x0, sizeof(GSCommandList));
@@ -369,7 +369,7 @@ LOGICAL persGunsightInit(void)
 	persGunsightKill
 *************************************************************************************************/
 
-LOGICAL persGunsightKill(void)
+LOGICAL persGunsightKill()
 {
 	_ClearGunfileData(&GunSightView);
 	_ClearGunfileData(&InstView);
@@ -389,7 +389,7 @@ LOGICAL persGunsightKill(void)
 	persGunsightUpdate
 *************************************************************************************************/
 
-LOGICAL persGunsightUpdate(void)
+LOGICAL persGunsightUpdate()
 {
 	static SINT32 _LastUpdateTime;
 	FLOAT32 DeltaTime;
@@ -1735,7 +1735,7 @@ static LOGICAL _KillGeneric(void*  Data)
 	return TRUE;
 }
 
-LOGICAL persPrepGunsightDraw(void)
+LOGICAL persPrepGunsightDraw()
 {
 
 	_DrawStats = FALSE;
@@ -1798,7 +1798,7 @@ LOGICAL persGunsightDraw(OBJECT* DOF, UINT32 IsInstrumentView)
 	return TRUE;
 }
 
-static LOGICAL _RenderTextVertices(void)
+static LOGICAL _RenderTextVertices()
 {
 piLVERTEX* Vertex;
 SINT32 NumVerts;
@@ -1845,7 +1845,7 @@ SINT32 i;
 	return TRUE;
 }
 
-static LOGICAL _RenderLineVertices(void)
+static LOGICAL _RenderLineVertices()
 {
 piLVERTEX* Vertex;
 SINT32 NumVerts;
@@ -1886,7 +1886,7 @@ SINT32 i;
 	return TRUE;
 }
 
-static FLOAT32 _ComputeShotAngle(void)
+static FLOAT32 _ComputeShotAngle()
 {
 FLOAT32 Angle,Angle1,Angle2;
 FLOAT32 Delta;
@@ -2074,7 +2074,7 @@ LOGICAL persLoadInstGunsight(SINT8* FileName)
 	return _ReadGunfileData(&InstView,FileName);
 }
 
-LOGICAL persClearGunsights(void)
+LOGICAL persClearGunsights()
 {
 	_ClearGunfileData(&GunSightView);
 	_ClearGunfileData(&InstView);
@@ -2149,7 +2149,7 @@ LOGICAL persGunsightAlignDOF(piMATRIX * RetMatrix, OBJECT * AlignedObject, OBJEC
 	return TRUE;
 }
 
-LOGICAL persUpdateGunsightView(void)
+LOGICAL persUpdateGunsightView()
 {
 	if(GunSightView.ViewDOF)
 		_UpdateView(&GunSightView);
@@ -2157,7 +2157,7 @@ LOGICAL persUpdateGunsightView(void)
 	return TRUE;
 }
 
-LOGICAL persUpdateInstGunsightView(void)
+LOGICAL persUpdateInstGunsightView()
 {
 	if(InstView.ViewDOF)
 		_UpdateView(&InstView);
@@ -2175,7 +2175,7 @@ static LOGICAL _UpdateView(GSCommandList * GSCL)
 }
 
 // called when the player's vehicle goes away
-LOGICAL persGunsightClearData(void)
+LOGICAL persGunsightClearData()
 {
 	GunSightView.ViewDOF = nullptr;
 	InstView.ViewDOF = nullptr;
@@ -2836,7 +2836,7 @@ static FLOAT32 _GetCurrentViewBearing()
 	persGunsightGetRange
 *************************************************************************************************/
 
-FLOAT32 persGunsightGetRange(void)
+FLOAT32 persGunsightGetRange()
 {
 	return _StatsRange;
 }

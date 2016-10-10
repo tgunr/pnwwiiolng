@@ -22,14 +22,14 @@
 // Return maximum number of sounds allowed by the sound card
 extern UINT32 sndsGetMaxNumberOfSounds();
 
-extern LOGICAL sndsInit(void);
+extern LOGICAL sndsInit();
 // calls any platform-specific system initialization for sounds, allocates
 // structures and global variables. This should only be called once during
 // a program's execution
 // return values:   1 if no errors occurred during startup
 //					0 if startup failed for any reason
 
-extern LOGICAL sndsKill(void);
+extern LOGICAL sndsKill();
 // calls any platform-specific shutdown for sounds, deallocates structures and
 // resets any global variables. This should only be called after snInit has been
 // called. Any sound calls made after snKill will automatically fail.
@@ -39,13 +39,13 @@ extern LOGICAL sndsKill(void);
 extern LOGICAL sndsDriverConfig( void* obj );
 // handles any (temporary) UI config of sound driver issues
 
-extern LOGICAL sndsReset(void);
+extern LOGICAL sndsReset();
 // resets entire sound system to initialization state. All buffers are cleared and
 // freed, all currently playing sounds are stopped.
 // return values:	1 if no errors occurred during reset
 //					0 if reset failed for any reason
 
-extern void sndsUpdateSounds(void);
+extern void sndsUpdateSounds();
 
 // this loops through the linked list of sounds, updating 3D effects such as volume3D/pan3D/freqShift3D
 // according to the listener pos/vel and each sound pos/vel
@@ -55,7 +55,7 @@ extern void sndsUpdateSounds(void);
 // it is also a convienent place to put possible resource optomisations such as deleting sounds which have
 // finished playing (and are not looping), or doing performance monitoring, etc.
 
-//extern LOGICAL sndsCanCreateNewSound(void);
+//extern LOGICAL sndsCanCreateNewSound();
 
 // this enforces whatever rules we have regarding max number of sounds playing at one time
 
@@ -255,4 +255,4 @@ extern LOGICAL sndsGetVolume(snSound* lpSound, SINT32* pVolume);
 // definitions for platform specific functions - description found in the non-platform version unless specified otherwise
 
 // this is for debugging purposes-walks sound list and Write_Debug's the contents
-extern void sndsWalkSoundList(void);
+extern void sndsWalkSoundList();

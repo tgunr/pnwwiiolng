@@ -125,7 +125,7 @@ extern UINT32 OverrideSpawner;
 #endif
 
 // Static functions
-static SINT32 _GetChaoticNumber(void)
+static SINT32 _GetChaoticNumber()
 {
 FLOAT64		X,Y,Z;
 SINT16		ReturnNum;
@@ -147,7 +147,7 @@ SINT16		ReturnNum;
 	return ((SINT32)ReturnNum);
 }
 
-static LOGICAL _SeedChaoticNumberGenerator(void)
+static LOGICAL _SeedChaoticNumberGenerator()
 {
 _CHAOTICSEEDTYPE Seed;
 SINT32	i;
@@ -2335,7 +2335,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 }
 
 #if(0)
-static LOGICAL FogUpdate(void)
+static LOGICAL FogUpdate()
 {
 int			i, j, k, num, spec;
 FLOAT32		dmin, dmax, idmm, d, x, y, z;
@@ -2434,7 +2434,7 @@ OBJECT*	tt;
 #endif
 
 #if(0)
-static LOGICAL WaveUpdate(void)
+static LOGICAL WaveUpdate()
 {
 SINT32		i, j, num;
 UINT32		color;
@@ -2551,7 +2551,7 @@ bool trnmainIsReplacement(const FLOAT64VECTOR& pos)
     return false;
 }
 
-LOGICAL trnmainUpdate(void)
+LOGICAL trnmainUpdate()
 {
 	SINT32			paints;
 	UINT32			tod;
@@ -2612,7 +2612,7 @@ LOGICAL trnmainUpdate(void)
 	return TRUE;
 }
 
-LOGICAL trnmainLODChange(void)
+LOGICAL trnmainLODChange()
 {
 	trnlod += 1;
 	if (trnlod >= 3)
@@ -3421,7 +3421,7 @@ void trnmainGetShadowReceivers(std::map<int, std::vector<piVECTOR> >& octets,
     objects = ShadowObject;
 }
 
-SINT32 trnmainGetNumDrawnTriangles(void)
+SINT32 trnmainGetNumDrawnTriangles()
 {
 	return(NumDrawnTriangles);
 }
@@ -3434,7 +3434,7 @@ LOGICAL trnmainSetLightingUpdate(LOGICAL newLightingUpdate)
 	return(TRUE);
 }
 
-void trnmainKill(void)
+void trnmainKill()
 {
 int		i;
     trndataKill();
@@ -3694,7 +3694,7 @@ UINT32 trnUpdateTerrainOriginOffset(LOGICAL force)
 }
 
 #ifdef TERRAIN_EDITOR
-LOGICAL trnmainSetTerrainOriginOffset(void)
+LOGICAL trnmainSetTerrainOriginOffset()
 {
 	mlVehicleData*	VehicleData = persGetPersonaModelDataPtr();
 
@@ -3706,7 +3706,7 @@ LOGICAL trnmainSetTerrainOriginOffset(void)
 }
 #endif
 
-LOGICAL trnmainWorldOriginMoved(void)
+LOGICAL trnmainWorldOriginMoved()
 {
 	return _WorldMoved;
 }
@@ -3834,7 +3834,7 @@ piVERTEX*	po2, pv2;
 	return(TRUE);
 }
 
-LOGICAL trnmainUpdateNormals(void)
+LOGICAL trnmainUpdateNormals()
 {
 UINT16		i, j;
 TERRAIN_DETAIL*	td;

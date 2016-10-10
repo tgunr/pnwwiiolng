@@ -132,7 +132,7 @@ struct DOF
 #endif
 
 extern LOGICAL	obpoolInit(const SINT8* name);
-extern void 	obpoolKill(void);
+extern void 	obpoolKill();
 extern void obpoolUpdate();
 extern void obpoolFreeObjectFinish();
 
@@ -144,7 +144,7 @@ extern LOGICAL	obpoolPoolOffsetsCallback(POOLOBJHDR* lpgrp, POOLOBJHDR* lpparent
 extern SINT32	obpoolGetObjects(POOLOBJ* *lpobj);
 extern LOGICAL	obpoolGetObjectSize(int* objsize, OBJECT* lpobj);
 
-extern POOLOBJHDR* obpoolGetNewObject(void);
+extern POOLOBJHDR* obpoolGetNewObject();
 extern POOLOBJHDR* obpoolFindNamedObject(SINT8* name);
 extern POOLOBJHDR* obpoolCopyObject(POOLOBJ* lpcopy);
 extern POOLOBJHDR* obpoolCopyNamedObject(SINT8* name);

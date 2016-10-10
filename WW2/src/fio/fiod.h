@@ -3,7 +3,7 @@
 
 namespace IO { class MappedFile; }
 
-extern const char* fiodGetPrepath(void);
+extern const char* fiodGetPrepath();
 extern void fiodSetPrepath(char* newpath);
 
 extern bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize=nullptr);

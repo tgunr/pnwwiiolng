@@ -9,8 +9,8 @@ struct SORTHEADER
 	short       layer;
 };
 
-extern LOGICAL obcsInit(void);
-extern void obcsKill(void);
+extern LOGICAL obcsInit();
+extern void obcsKill();
 extern void obcsSetIgnoreAdsOnCull(LOGICAL ignore);
 extern void obcsDoCull(LOGICAL bOn);
 
@@ -21,19 +21,19 @@ extern LOGICAL obcsBubbleSortObjects(int numobjects, struct OBJECT* lpobjorig, p
 extern LOGICAL obcsSortObjectsByTexture(struct OBJECT* lpobjorig);
 extern LOGICAL obcsSortObjectTriangles(struct OBJECT* lpobj);
 extern void obcsAddToUnsortedList(SORTHEADER* lpsort);
-extern SORTHEADER* obcsGetNextSortItem(void);
+extern SORTHEADER* obcsGetNextSortItem();
 extern void obcsToggleAdCount();
-extern void obcsResetSortedList(void);
-extern void obcsResetUnsortedList(void);
-extern void obcsResetSortedCockpitList(void);
-extern void obcsResetUnsortedCockpitList(void);
+extern void obcsResetSortedList();
+extern void obcsResetUnsortedList();
+extern void obcsResetSortedCockpitList();
+extern void obcsResetUnsortedCockpitList();
 extern void obcsResetWater();
 extern void obcsResetMultiTexture();
 
-extern SORTHEADER* obcsGetSortedList(void);
-extern SORTHEADER* obcsGetUnsortedList(void);
-extern SORTHEADER* obcsGetSortedCockpitList(void);
-extern SORTHEADER* obcsGetUnsortedCockpitList(void);
+extern SORTHEADER* obcsGetSortedList();
+extern SORTHEADER* obcsGetUnsortedList();
+extern SORTHEADER* obcsGetSortedCockpitList();
+extern SORTHEADER* obcsGetUnsortedCockpitList();
 extern SORTHEADER* obcsGetWaterList();
 extern SORTHEADER* obcsGetMultiTextureList();
 

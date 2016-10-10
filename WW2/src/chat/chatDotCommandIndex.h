@@ -42,7 +42,7 @@ public:
 	bool process(Player& player, struct Chat::ClientMessage* message) const;
 
 	// Flush and load permission sets
-	void readPermissions(void);
+	void readPermissions();
 
 protected:
 	//! [Re]Build the Teul::Packet with the list of dot commands.

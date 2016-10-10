@@ -368,7 +368,7 @@ static SINT32 _recvGameTimeUpdate(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-SINT32 commInstallClientCallbacks(void)
+SINT32 commInstallClientCallbacks()
 {
 	SINT32 retval;
 

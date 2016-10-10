@@ -1195,7 +1195,7 @@ chatSendUserNLA(SINT32 connection, UCHAR radioIndex, const ChatHandle handleID)
 }
 
 UINT32
-nextMessageID(void)
+nextMessageID()
 {
 	return g_messageID++;
 }

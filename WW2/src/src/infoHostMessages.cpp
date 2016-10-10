@@ -91,7 +91,7 @@ _sendPlayInfoReq(ACTION_OBJECT* const a)
 // Install the callbacks for the playgate messages
 
 SINT32
-infoInstallHostCallbacks(void)
+infoInstallHostCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(PgInfo::CallbackX)
 	{

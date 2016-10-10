@@ -395,7 +395,7 @@ _recvDoDespawn(struct ACTION_OBJECT* const a)
 }
 
 static SINT32
-_registerStratCallback(void)
+_registerStratCallback()
 {
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
 	{
@@ -425,7 +425,7 @@ Host::VehicleRequest::send(const Server::ServerInfo* server)
 
 //Installs the host callbacks
 SINT32
-mmHostInstallCallbacks(void)
+mmHostInstallCallbacks()
 {
 	_registerStratCallback();
 

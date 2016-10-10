@@ -617,7 +617,7 @@ _commandFailed(const Property* property, WWII_SIDE side)
 // Function for processing an incoming strat command packet (i.e. a result)
 
 void
-StratCommand::process(void)
+StratCommand::process()
 {
 	Player* player = PlayerInterface::Lookup(m_issuer);
 	Property* property = nullptr;

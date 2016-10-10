@@ -784,7 +784,7 @@ namespace Fio
 	// open it, stderr (since much of our code assumes this function
 	// returns a valid FILE handle)
 
-	FILE* OpenLogFile(void)
+	FILE* OpenLogFile()
 	{
 		FILE* fp = fioUserFile(Fio::LogFileName(), "a");
 		// If that fails, return stderr

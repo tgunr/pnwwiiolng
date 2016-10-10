@@ -422,7 +422,7 @@ void dbugInit(LogMode logMode, const char* const filename)
 }
 
 // dbugClose: closes the debug file and cleans up.
-void dbugClose(void)
+void dbugClose()
 {
 	g_logDebug = false;
 	if ( _logger.isInitialized() == false )
@@ -537,7 +537,7 @@ void dbugSetErrno(SINT32 err)
 // socket errors to unix errno.  Additional errors beyond those covered in
 // errno.h and dbugWErrno.h must be added to debugExtErrno.h and must adhear
 // to windows error code conventions to eliminate problems with compataibility.
-SINT32	dbugGetErrno(void)
+SINT32	dbugGetErrno()
 {
 #if platOS == OS_WIN32
 	return wErrno;

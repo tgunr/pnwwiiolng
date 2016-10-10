@@ -361,7 +361,7 @@ BOOL				bOsVersionInfo;
 
 #define DIV 1024
 
-int GetCpuid(void)
+int GetCpuid()
 {
 int CPUType;
 
@@ -397,7 +397,7 @@ int CPUType;
 
 #pragma optimize("", off)
 
-FLOAT32 GetCPUSpeed(void)
+FLOAT32 GetCPUSpeed()
 {
 	FLOAT32 speed;
 	LARGE_INTEGER	count1, count2, freq;
@@ -472,7 +472,7 @@ begin:
 
 #pragma optimize("", on)
 
-static BOOL DisplayInformation(void)
+static BOOL DisplayInformation()
 {
 TCHAR        txt[512], filename[256];
 char		divisor[]="K";
@@ -562,7 +562,7 @@ struct LANGANDCODEPAGE
 #endif	//	OS_WIN32
 
 //////////////////////////////////////////////////////////////////////
-// void _lookupRegion(void)
+// void _lookupRegion()
 //
 // Determine the appID from the build's version number and check the registry for that appID
 // to see if which product region (e.g. us or china) we are supposed to be using.
@@ -1320,7 +1320,7 @@ int _matherr(struct _exception* except)
 #endif // BETA_RELEASE
 #endif // USE_MATH_ERR
 
-void sysmainQuit(void)
+void sysmainQuit()
 {
 	cfgPrefsSave();
 

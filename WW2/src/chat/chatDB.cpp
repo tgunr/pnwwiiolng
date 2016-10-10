@@ -295,7 +295,7 @@ void chatInitDB()
 }
 
 LOGICAL
-chatCloseDB(void)
+chatCloseDB()
 {
 	dbh.disconnect();
 	return TRUE;

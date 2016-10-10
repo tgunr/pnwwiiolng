@@ -2833,7 +2833,7 @@ SINT32 gr2AnimDeathFlags()
 
 extern void rnlogoUpdateStatus(const char*, ...);
 
-LOGICAL gr2AnimInit (void)
+LOGICAL gr2AnimInit()
 {
 	if(animInited) return TRUE;
 
@@ -2973,7 +2973,7 @@ LOGICAL gr2AnimInit (void)
     return TRUE;
 }
 
-void gr2AnimKill (void)
+void gr2AnimKill()
 {
 	_gr2TrooperPool.Free();
 
@@ -5362,7 +5362,7 @@ void gr2AnimSetWeaponFireTime (OBJECT* pObject, SINT32 time)
 }
 
 #ifdef BETA_RELEASE
-void gr2ToggleStateTest (void)
+void gr2ToggleStateTest()
 {
 	stateTestFlag = !stateTestFlag;
 }

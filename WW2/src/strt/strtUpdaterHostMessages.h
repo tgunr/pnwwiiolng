@@ -8,8 +8,8 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 //Installs the callbacks
-extern SINT32 strtUpdateHostInstallCallbacks(void);
+SINT32 strtUpdateHostInstallCallbacks();
 
 //Sends a status packet to the FE
 struct STRAT_STATUS_PACKET;
-extern SINT32 strtSendStatusPacket(SINT32 teulIndex, STRAT_STATUS_PACKET* packet);
+SINT32 strtSendStatusPacket(SINT32 teulIndex, STRAT_STATUS_PACKET* packet);

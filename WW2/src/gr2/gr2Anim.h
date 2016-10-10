@@ -502,8 +502,8 @@ extern bool gr2AnimCullCallback (OBJECT* pObject);
 extern LOGICAL gr2AnimIsDead (OBJECT* pObject, LOGICAL* isDead);
 extern SINT32 gr2AnimDeathFlags();
 
-extern LOGICAL	gr2AnimInit (void);
-extern void	gr2AnimKill (void);
+extern LOGICAL	gr2AnimInit ();
+extern void	gr2AnimKill ();
 
 extern LOGICAL gr2AnimKillObject (OBJECT* pObject);
 extern LOGICAL gr2AnimInitShadow(OBJECT* pObject);

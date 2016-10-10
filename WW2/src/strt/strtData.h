@@ -67,7 +67,7 @@ extern bool strtInitObjectfromWOR(ObjectStruct& object);
 extern bool strtInitLinkfromWOR(LinkStruct& link);
 
 // get the total cps that are loaded
-extern UINT32 strtNumCPs(void);
+extern UINT32 strtNumCPs();
 
 extern CPStruct* strtGetCPByName(const char* name);
 

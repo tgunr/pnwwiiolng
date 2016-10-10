@@ -1,6 +1,6 @@
 #pragma once
 
-extern UINT32 trnCloudUpdate(void);
+UINT32 trnCloudUpdate();
 
-extern void trnCloudRegisterCloudInstance(struct OBJECT* topNode);
-extern void trnCloudDeRegisterCloudInstance(struct OBJECT* topNode);
+void trnCloudRegisterCloudInstance(struct OBJECT* topNode);
+void trnCloudDeRegisterCloudInstance(struct OBJECT* topNode);

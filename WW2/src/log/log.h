@@ -46,7 +46,7 @@ extern void Set_Log_Level(SINT32 level);
 
 extern LOGICAL	Open_Debug(const char* filename);
 extern void Write_Debug(const char* str, ...); // equivalent to LOG_OLD, LOG_INFO
-extern void Close_Debug(void);
+extern void Close_Debug();
 
 extern UINT32 Log_System_Mask(const char* system);
 extern const char* Log_System_Name(UINT32 mask);

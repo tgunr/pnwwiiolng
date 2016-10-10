@@ -854,7 +854,7 @@ void ReadoutView::DrawRankIcon(SINT32 Rank)
 	mlSetNormalReadout
 *************************************************************************************************/
 
-SINT32 mlSetNormalReadout(void)
+SINT32 mlSetNormalReadout()
 {
 	_ReadoutType = _READOUT_NORMAL;
 	return 0;

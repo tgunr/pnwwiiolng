@@ -247,7 +247,7 @@ _extractPlayerFromVehiclesList(Player& player, HostVehicle& vehicle)
 // return the IP address of the current strat host
 
 UINT32
-hostGetStratAddress(void)
+hostGetStratAddress()
 {
 	return _stratHost;
 }
@@ -2227,7 +2227,7 @@ _sendNextUpdate(HostVehicle* const vehicle)
 // Central server loop.
 
 extern void
-_runHost(void)
+_runHost()
 {
 //	Teul::housekeeper cpEventsHousekeeper(Strat::Events::Publish, 100);
 

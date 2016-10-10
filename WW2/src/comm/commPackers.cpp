@@ -16,7 +16,7 @@
 #include "updt/updtVehicleHit.h"
 #include "wwii/wwiiPack.h"
 
-SINT32 commPackInit(void)
+SINT32 commPackInit()
 {
 	return 0;
 }

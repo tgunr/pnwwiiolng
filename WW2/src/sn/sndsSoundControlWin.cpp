@@ -59,7 +59,7 @@ static SNDDETDRIVERS            dsdrivers[MAXENUMDRIVERS];
 #define REG_AUDIO  	            _T("Audio")
 
 #if(0)
-static BOOL dsEnumDrivers(void);
+static BOOL dsEnumDrivers();
 static LOGICAL sndsPlatformInitListener();
 #endif
 
@@ -82,7 +82,7 @@ static inline void _soundError(const char* description)
 // Function: sndsPlatformInit
 // Description:
 ////////////////////////////////////////////////
-LOGICAL sndsPlatformInit(void)
+LOGICAL sndsPlatformInit()
 {
 #if XAUDIO
     return AudioInit();
@@ -281,7 +281,7 @@ LOGICAL sndsPlatformInitListener()
 // Function: sndsPlatformKill
 // Description:
 /////////////////////////////////////
-LOGICAL sndsPlatformKill(void)
+LOGICAL sndsPlatformKill()
 {
 #if XAUDIO
     AudioKill();
@@ -494,7 +494,7 @@ LOGICAL sndsPlatformFreeSound(snSound* whichSound)
 	return(TRUE);
 }
 
-LOGICAL sndsPlatformReset(void)
+LOGICAL sndsPlatformReset()
 {
 	// not implemented yet
 	return FALSE;
@@ -1069,7 +1069,7 @@ static BOOL CALLBACK EnumDriverCallback(LPGUID lpGuid, const TCHAR* lpDriverDesc
 #endif
 
 #if(0)
-static BOOL dsEnumDrivers(void)
+static BOOL dsEnumDrivers()
 {
 #if XAUDIO
 #else

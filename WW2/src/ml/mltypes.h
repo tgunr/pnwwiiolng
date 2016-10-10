@@ -492,9 +492,9 @@ struct mlVehicleData
 
 };
 
-extern UINT32 mlInit(void);
+extern UINT32 mlInit();
 extern UINT32 mlUpdate(mlVehicleData * VehicleData,OBJECT * VehicleObject);
-extern UINT32 mlKill(void);
+extern UINT32 mlKill();
 
 extern UINT32 mlInitVehicleData(mlVehicleData * VehicleData);
 extern UINT32 mlKillVehicleData(mlVehicleData * VehicleData);
@@ -601,7 +601,7 @@ extern UINT32 mlRightBrakeFunction(SINT32 Param, UINT32 Id,UINT32 Detach);
 
 extern UINT32 mlToggleTailWheelLock(SINT32 Param, UINT32 Id, UINT32 Detach);
 
-extern UINT32 mlIsTailWheelLocked(void);
+extern UINT32 mlIsTailWheelLocked();
 
 extern UINT32 mlGetRandomHitSound(const char ** HitSoundName,
 								   FLOAT32 * MinVolume,
@@ -671,8 +671,8 @@ extern UINT32 mlCheckRemovedObjectOnCollisionList(trnCDTerrainObject * TO);
 
 extern LOGICAL mlGetPrimaryPickleSetting(SINT32 * Pickle);
 extern LOGICAL mlGetSecondaryPickleSetting(SINT32 * Pickle);
-extern LOGICAL mlResetPrimaryPickleSetting(void);
-extern LOGICAL mlResetSecondaryPickleSetting(void);
+extern void mlResetPrimaryPickleSetting();
+extern void mlResetSecondaryPickleSetting();
 extern LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total);
 
 #ifdef VEHICLE_OBJECT_ANALYSIS
@@ -704,7 +704,7 @@ extern void mlCalcObjectRotationalInertia(OBJECT* obj, FLOAT64 mass, FLOAT64 I[3
 // mlReadout
 extern LOGICAL mlSetTorpedoReadout(FLOAT32 relBearing, FLOAT32 angleOff, FLOAT32 range, FLOAT32 speed, FLOAT32 depth,
 							FLOAT32 fireAngle, FLOAT32 leadAngle, FLOAT32 travelTime, LOGICAL ConvertToEnglishUnits);
-extern SINT32 mlSetNormalReadout(void);
+extern SINT32 mlSetNormalReadout();
 extern SINT32 mlSetRangeReadout(FLOAT32 Range);
 extern SINT32 mlSetBombsightReadoutEnglish(FLOAT32 Alt, FLOAT32 TAS);
 extern SINT32 mlSetBombsightReadoutMKS(FLOAT32 Alt, FLOAT32 TAS);

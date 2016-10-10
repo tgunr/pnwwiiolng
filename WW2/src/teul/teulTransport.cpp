@@ -504,13 +504,13 @@ teulUpdateTransport(const TeulTimeMS duration_)
 	teulModIdle(duration_);
 
 #if platBuild == TEUL_SERVER
-	extern void serverUpdate(void);
+	extern void serverUpdate();
 	serverUpdate();
 #endif
 }
 
 // close all connections and the debugger. (teul go bye bye)
-void teulCloseTransport(void)
+void teulCloseTransport()
 {
 	if(! _transportInited || _transportClosing)
 		return;
@@ -518,7 +518,7 @@ void teulCloseTransport(void)
 	_transportClosing = TRUE;
 
 #if platBuild == TEUL_SERVER
-	extern void serverFree(void);
+	extern void serverFree();
 	serverFree();
 #endif
 

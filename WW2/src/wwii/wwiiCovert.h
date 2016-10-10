@@ -57,7 +57,7 @@ class Covert
 public:
 	Tp value;
 	Tp Set(const Tp& rhs) noexcept { value = rhs; return value;}
-	Tp Get(void) const noexcept { return value; }
+	Tp Get() const noexcept { return value; }
 
 	Covert(const Tp& rhs) noexcept : value(rhs) {}
 	Covert() noexcept : value(0) {}
@@ -163,7 +163,7 @@ public:
 	}
 
 	// Function for fetching a "covert" variable
-	value_type Get(void) const
+	value_type Get() const
 	{
 		// Decrypt the value.
 		UINT64 t = (Deref() ^ ~m_mask);

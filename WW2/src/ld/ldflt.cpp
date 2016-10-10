@@ -356,7 +356,7 @@ static UINT32 CreateColor(int colorindex)
 	return(rgba);
 }
 
-static bool ReadHeader(void)
+static bool ReadHeader()
 {
 	fltHEADER* header;
 	if ( !localBufferUseObject(header) )
@@ -445,7 +445,7 @@ static bool CreateLevel(OBJECT** lpnewobj)
 	return true;
 }
 
-static bool ReadGroup(void)
+static bool ReadGroup()
 {
 	fltGROUP* group;
 	if ( !localBufferUseObject(group) )
@@ -524,7 +524,7 @@ static bool ReadGroup(void)
 }
 
 
-static bool ReadVertexPalette(void)
+static bool ReadVertexPalette()
 {
 	fltVERTEXPALETTE* vp;
 
@@ -813,7 +813,7 @@ static bool isRoadTexture( int texid )
 #include "SuperFastHash.h"
 #endif
 
-static bool ReadVertexList(void)
+static bool ReadVertexList()
 {
 	void*				pdata					= nullptr;
 	fltCHUNK*			pchunk					= nullptr;
@@ -1321,7 +1321,7 @@ static bool ReadVertexList(void)
 }
 
 
-static bool ReadMatrix(void)
+static bool ReadMatrix()
 {
 	if (!localBufferCopyObject(&s_matrixRecord))
 		return false;
@@ -1511,7 +1511,7 @@ static bool ReadMaterialPalette(const char* name)
 }
 
 
-static bool ReadColorPalette(void)
+static bool ReadColorPalette()
 {
 	size_t length = s_chunk->next - 4;
 	fltCOLORPALETTE* colorpal;
@@ -1540,7 +1540,7 @@ static bool ReadColorPalette(void)
 }
 
 
-static bool ReadTextureReference(void)
+static bool ReadTextureReference()
 {
 	char filename[256];
 	filename[0] = '\0';
@@ -1632,7 +1632,7 @@ static bool ReadTextureReference(void)
 	return true;
 }
 
-static bool ReadFace(void)
+static bool ReadFace()
 {
 	if (!localBufferUseObject(s_face))
 		return false;
@@ -1695,7 +1695,7 @@ static bool ReadFace(void)
 }
 
 
-static bool ReadLOD(void)
+static bool ReadLOD()
 {
 	fltLOD* lod;
 	if (!localBufferUseObject(lod))
@@ -1744,7 +1744,7 @@ static bool ReadLOD(void)
 }
 
 
-static bool ReadObject(void)
+static bool ReadObject()
 {
 	if (!localBufferCopyObject(&object))
 		return false;
@@ -1777,7 +1777,7 @@ static bool ReadObject(void)
 }
 
 
-static bool ReadExtension(void)
+static bool ReadExtension()
 {
 	fltEXTENSION*  ext;
 	if (!localBufferUseObject(ext))
@@ -1794,7 +1794,7 @@ static bool ReadExtension(void)
 	return true;
 }
 
-static bool ReadDOF(void)
+static bool ReadDOF()
 {
 	OBJECT*	lpobj;
 
@@ -1942,7 +1942,7 @@ static bool ReadDOF(void)
 	return true;
 }
 
-static bool ReadTextComment(void)
+static bool ReadTextComment()
 {
 	char*	thisTextComment = 0;
 	SINT32	len;
@@ -2044,7 +2044,7 @@ static bool ReadTextComment(void)
 	return true;
 }
 
-static bool ReadLongID(void)
+static bool ReadLongID()
 {
 	size_t len = size_t(s_chunk->next - 4);
 	SCHAR	oldname[32];
@@ -2126,7 +2126,7 @@ static bool ReadLongID(void)
 	return true;
 }
 
-static bool ReadPushLevel(void)
+static bool ReadPushLevel()
 {
 	level += 1;
 	if (level >= MAX_LEVELS)
@@ -2143,7 +2143,7 @@ static bool ReadPushLevel(void)
 }
 
 
-static bool ReadPopLevel(void)
+static bool ReadPopLevel()
 {
 	if (vlistlevel == level)
 	{
@@ -2264,7 +2264,7 @@ static bool ReadPopLevel(void)
 }
 
 
-static bool ReadPushSubface(void)
+static bool ReadPushSubface()
 {
 	facelayer += 1;
 
@@ -2274,7 +2274,7 @@ static bool ReadPushSubface(void)
 }
 
 
-static bool ReadPopSubface(void)
+static bool ReadPopSubface()
 {
 	facelayer -= 1;
 
@@ -2284,7 +2284,7 @@ static bool ReadPopSubface(void)
 }
 
 
-static bool ReadPushExtension(void)
+static bool ReadPushExtension()
 {
 	extlevel += 1;
 
@@ -2294,7 +2294,7 @@ static bool ReadPushExtension(void)
 }
 
 
-static bool ReadPopExtension(void)
+static bool ReadPopExtension()
 {
 	extlevel -= 1;
 

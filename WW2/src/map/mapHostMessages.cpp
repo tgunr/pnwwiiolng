@@ -277,7 +277,7 @@ SendTutProgressBatch(SINT32 teulIndex, Tutorial::GroupProgressBatch& batch)
 // Installs our callbacks
 
 SINT32
-HostInstallCallbacks(void)
+HostInstallCallbacks()
 {
 	wwiiRegisterPlayerMessageCallback();
 

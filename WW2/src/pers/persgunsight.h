@@ -2,12 +2,12 @@
 
 class Texture;
 
-extern LOGICAL persGunsightInit(void);
-extern LOGICAL persGunsightKill(void);
+extern LOGICAL persGunsightInit();
+extern LOGICAL persGunsightKill();
 
-extern LOGICAL persGunsightUpdate(void);
+extern LOGICAL persGunsightUpdate();
 
-extern LOGICAL persPrepGunsightDraw(void);
+extern LOGICAL persPrepGunsightDraw();
 extern LOGICAL persGunsightDraw(OBJECT * DOF,UINT32 IsInstrumentView);
 
 extern UINT32 persGunsightRangeInc(SINT32 Param,UINT32 Id,UINT32 Detach);
@@ -28,14 +28,14 @@ extern UINT32 persResetGunsightAdjust(FLOAT32);
 
 extern LOGICAL persLoadGunsight(SINT8* FileName);
 extern LOGICAL persLoadInstGunsight(SINT8* FileName);
-extern LOGICAL persClearGunsights(void);
+extern LOGICAL persClearGunsights();
 
 extern LOGICAL persGunSightSetBaseFOV(FLOAT32 FOV);
 extern LOGICAL persAlignGunsight(OBJECT * AlignObj,OBJECT * ViewDOF,FLOAT32 AlignmentRange);
 extern LOGICAL persAlignInstGunsight(OBJECT * AlignObj,OBJECT * ViewDOF,FLOAT32 AlignmentRange);
-extern LOGICAL persUpdateGunsightView(void);
-extern LOGICAL persUpdateInstGunsightView(void);
-extern LOGICAL persGunsightClearData(void);
+extern LOGICAL persUpdateGunsightView();
+extern LOGICAL persUpdateInstGunsightView();
+extern LOGICAL persGunsightClearData();
 extern LOGICAL persGunsightGetInstFieldOfView(FLOAT32* FOV);
 extern LOGICAL persGunsightGetGunSightFieldOfView(FLOAT32* FOV);
 extern LOGICAL persGunsightCalcSightAngle(FLOAT32 * ReturnAngle,SINT8* AmmoName,FLOAT32 Range);
@@ -48,7 +48,7 @@ extern void persGunsightDrawOverlay();
 
 extern FLOAT32 persGunsightConvergenceRange();
 
-extern FLOAT32 persGunsightGetRange(void);
+extern FLOAT32 persGunsightGetRange();
 
 #if USE_STATESET
 Texture* persGunSightGetOverlayTexture();

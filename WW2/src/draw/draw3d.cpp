@@ -744,7 +744,7 @@ int draw3dFindDebugObject(const char* name)
 	draw3dRemoveAllDebugObjects
 *************************************************************************************************/
 
-void draw3dRemoveAllDebugObjects(void)
+void draw3dRemoveAllDebugObjects()
 {
 	int i;
 

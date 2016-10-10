@@ -118,7 +118,7 @@ static void	_pollSockets(TeulTimeMS duration_);
 static void	_routeCALLBACKs(ENDPOINT& inEndpoint);
 
 #if defined(NIX_VERSION)
-static void _pollSet(void);
+static void _pollSet();
 #endif
 
 static const socklen_t SockAddrLen = sizeof(struct sockaddr_in);
@@ -204,7 +204,7 @@ teulReleaseDatagram(DATA_GRAM* gram)
 //////////////////////////////////////////////////////////////////////
 // Initialize module
 
-void teulInitModRecv(void)
+void teulInitModRecv()
 {
 #if defined(NIX_VERSION)
 	dbugLog(_FLI, "FD_SETSIZE = %u, sizeof(fd_set) = %" PRSizeT ", MAX_POLL_FD = %" PRSizeT, FD_SETSIZE, sizeof(fd_set), POLL_STRUCT::CAPACITY);
@@ -1324,7 +1324,7 @@ void teulMRecvAddToPoll(ENDPOINT& endpoint)
 
 #if defined(NIX_VERSION)
 static void
-_pollSet(void)
+_pollSet()
 {
 	pollData.m_count = 0;
 	pollData.m_size = 0;

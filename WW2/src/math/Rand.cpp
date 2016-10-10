@@ -73,15 +73,15 @@ void seedMT( unsigned int seed )
 {
 	seedMT(seed, _state, _next, _left);
 }
-unsigned int reloadMT( void )
+unsigned int reloadMT()
 {
 	return reloadMT(_state, _next, _left);
 }
-unsigned int randomMT( void )
+unsigned int randomMT()
 {
 	return randomMT(_state, _next, _left);
 }
-float frandomMT( void )
+float frandomMT()
 {
 	return frandomMT(_state, _next, _left);
 }

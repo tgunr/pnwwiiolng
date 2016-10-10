@@ -31,7 +31,7 @@ class Intro
 		}
 
 	//! User implemented: somewhere to provide a reference to the Teul Callback for this object.
-	public: static TEUL_CALLBACK* Callback(void);
+	public: static TEUL_CALLBACK* Callback();
 
 	///! User implemented: Routine for serializing/deserializing this data.
 	public: bool packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 size);

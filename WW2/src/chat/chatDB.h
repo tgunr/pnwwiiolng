@@ -7,8 +7,8 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-void chatInitDB(void);
-void chatLoadMotds(void);
+void chatInitDB();
+void chatLoadMotds();
 void chatdbRecordEvent(const SCHAR* category, const SCHAR* callsign, const SCHAR* event, const SCHAR* parameter, const SCHAR* data);
 
 class Property;

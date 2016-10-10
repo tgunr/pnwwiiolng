@@ -38,7 +38,7 @@ char lastbuffer[MAX_KEYS];
 
 LOGICAL ProcessKeyboardInput();
 
-UINT32 imaphackDoKeyboardInputs(void)
+UINT32 imaphackDoKeyboardInputs()
 {
 	if (!ProcessKeyboardInput())
 	{

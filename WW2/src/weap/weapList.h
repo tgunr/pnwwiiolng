@@ -54,7 +54,7 @@ extern WEAPON_CLASS weaponClass[MAX_WEAP_CLASSES];
 //tolua_begin
 
 // returns true once weapListInit() has been called once
-bool weapHasInitialized(void);
+bool weapHasInitialized();
 
 // Init the structures
 bool weapListInit(const char* theaterPath);
@@ -88,7 +88,7 @@ extern WEAPON_SPEC weapAssociateIndex(const char* weapName, UINT32 localIndex);
 // Add a class to the class index.
 extern void weapAddClass(UINT32 classIndex, const std::string& className);
 
-extern void weapListKill(void);
+extern void weapListKill();
 
 extern void weapAddWeaponIndex(WEAPON* weapon);
 

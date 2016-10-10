@@ -329,7 +329,7 @@ UINT32 weapFindAmmoTypeByName(weapAmmoType ** AmmoType,UCHAR * VarContents)
 	return 0;
 }
 
-UINT32 _ReadAmmoTypes(void)
+UINT32 _ReadAmmoTypes()
 {
 	int AmmoListFile = 0;
 	int CurrentAmmoFile = 0;
@@ -694,7 +694,7 @@ static UINT32 weapAmmoApplyDamageToVehicleComponent(weapAmmo* Ammo, vehVehicle* 
 static UINT32 weapAmmoApplyDamageToObject(weapAmmo* Ammo, const FLOAT64& Energy, trnCDTerrainObject* TO, vehVehicle* InShooterVehicle);
 
 // init
-static UINT32 _ReadBallisticChart(void);
+static UINT32 _ReadBallisticChart();
 
 // ammo list
 static UINT32 _GetNewAmmo(weapAmmo ** AmmoPtr);
@@ -752,7 +752,7 @@ static LOGICAL 	_StickTorpedoToWater(weapAmmo* Ammo);
 	weapAmmoInit
 *************************************************************************************************/
 
-UINT32 weapAmmoInit(void)
+UINT32 weapAmmoInit()
 {
 	SINT32 i;
 
@@ -815,7 +815,7 @@ UINT32 weapAmmoInit(void)
 	weapAmmoKill
 *************************************************************************************************/
 
-UINT32 weapAmmoKill(void)
+UINT32 weapAmmoKill()
 {
 	weapAmmo * CurrentAmmo = nullptr;
     weapAmmo* NextAmmo = nullptr;
@@ -867,7 +867,7 @@ UINT32 weapAmmoKill(void)
 	weapAmmoKillAllAmmo
 *************************************************************************************************/
 
-UINT32 weapAmmoKillAllAmmo(void)
+UINT32 weapAmmoKillAllAmmo()
 {
 	weapAmmo* Ammo = nullptr;
 	weapAmmo* NextAmmo = nullptr;
@@ -946,7 +946,7 @@ void weapAmmoSetFuzeInterval(FLOAT32 interval)
 	weapAmmoGetFuzeInterval
 *************************************************************************************************/
 
-FLOAT32 weapAmmoGetFuzeInterval(void)
+FLOAT32 weapAmmoGetFuzeInterval()
 {
 	return VarFuzeInterval;
 }
@@ -957,7 +957,7 @@ FLOAT32 weapAmmoGetFuzeInterval(void)
 	weapUpdate
 *************************************************************************************************/
 
-UINT32 weapUpdate(void)
+UINT32 weapUpdate()
 {
 	weapAmmo* CurrentAmmo = nullptr;
     weapAmmo* NextAmmo = nullptr;
@@ -1098,7 +1098,7 @@ UINT32 weapAmmoSetRoundPos(piVECTOR* Pos)
 	weapDrawTracers
 *************************************************************************************************/
 
-LOGICAL weapDrawTracers(void)
+LOGICAL weapDrawTracers()
 {
 	FLOAT32 MinU = 0,MinV = 0,MaxU = 0,MaxV = 0;
 	FLOAT32 Len = 0;
@@ -2351,7 +2351,7 @@ static UINT32 weapAmmoApplyDamageToObject(weapAmmo* Ammo, const FLOAT64& Energy,
 	_ReadBallisticChart
 *************************************************************************************************/
 
-static UINT32 _ReadBallisticChart(void)
+static UINT32 _ReadBallisticChart()
 {
 	int CurrentFile = 0;
 	FLOAT32 LastMachNum = 0,CurrentMachNum = 0;

@@ -15,7 +15,7 @@
 #include "chat/chatLStringIDs.h"
 
 //Installs the callbacks
-SINT32 chatInstallStratSupportCallbacks(void);
+SINT32 chatInstallStratSupportCallbacks();
 
 // Send an SCMD result to an incoming oob message
 bool chatSendSCMDResult(SINT32 playerID, SCMD_ENUM command, FULL_OBJ_ID cp, WWII_SIDE side, SCMD_RESULT result, UINT32 data = 0);

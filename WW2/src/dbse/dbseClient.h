@@ -11,9 +11,9 @@
 
 // initializes all standard dbse callbacks and launches update threads if necessary.
 // if no errorFnPtr is defined errors are ignored.
-bool dbseInit(void);
+bool dbseInit();
 
 // a wrapper for teulSend, dbse manages the actual connection
 // index and may need to return a specific error when no connection
 // is available.
-SINT32 dbseSend(struct TEUL_CALLBACK* action, void*object);
+SINT32 dbseSend(struct TEUL_CALLBACK* action, void* object);

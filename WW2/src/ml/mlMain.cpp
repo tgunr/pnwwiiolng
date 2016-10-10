@@ -404,7 +404,7 @@ static std::map<std::string, BumpAndFrictionData*> _hashBAF;
 
 static UINT32 _ClearVehicleData(mlVehicleData * VehicleData);
 static UINT32 _ShutDownSoundsAndFx(mlVehicleData* VehicleData);
-UINT32 _ReadBumpAndFrictionTable(void);
+UINT32 _ReadBumpAndFrictionTable();
 
 static UINT32 _UpdateAirfoilComponent(mlComponent * Component, mlVehicleData * VehicleData,FLOAT64 DeltaTime);
 static UINT32 _UpdateHaulPoint(mlComponent * Component,
@@ -505,7 +505,7 @@ static LOGICAL mlHoistCollideRoundWithTerrain(piVECTOR const* OldPos, piVECTOR c
 static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData);
 static UINT32 _TraverseAndSetupColorCoding(OBJECT * Object,UINT32 UseAlpha,vehVehicle* Vehicle,
 										   UINT32 CurrentHitmapObjectDisplay);
-static void _LeakTest(void);
+static void _LeakTest();
 #endif
 
 #ifdef ENABLE_FLOATERS
@@ -543,7 +543,7 @@ static void _CheckForSecondaryVehicleKill (mlVehicleData* pVehicleData, mlCompon
 /************************************************************************************************
 	mlMain
 *************************************************************************************************/
-UINT32 mlInit(void)
+UINT32 mlInit()
 {
 	_ReadBumpAndFrictionTable();
 
@@ -589,7 +589,7 @@ UINT32 mlUpdate(mlVehicleData * VehicleData,OBJECT * VehicleObject)
 	return 0;
 }
 
-UINT32 mlKill(void)
+UINT32 mlKill()
 {
 	return 0;
 }
@@ -2385,24 +2385,20 @@ FLOAT64VECTOR VehicleVelocity;
 	return 0;
 }
 
-UINT32 mlResetPositionState(void)
+void mlResetPositionState()
 {
 	// add stuff here to reset when a position change happens
 	mlPrimaryTriggerDown(0, IMAP_HOLD_MAINTRIGGER, 0);
 	mlSecondaryTriggerDown(0, IMAP_HOLD_SECONDTRIGGER, 0);
-
-	return 0;
 }
 
 
-UINT32 mlResetControlStuff(void)
+void mlResetControlStuff()
 {
 	_StickXPos = 0.0;
 	_StickYPos = 0.0;
 	_RudderPos = 0.0;
 	_ThrottlePos = 0.0;
-
-	return 0;
 }
 
 UINT32 _ProcessControlInputs(UINT32 DeltaTime,mlVehicleData * VehicleData)
@@ -4786,7 +4782,7 @@ UINT32 mlSetStarterOff(UINT32 EngineNumber)
 }
 
 
-UINT32 mlIsTailWheelLocked(void)
+UINT32 mlIsTailWheelLocked()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
@@ -6674,7 +6670,7 @@ UINT32 Intersects;
 	return 0;
 }
 
-UINT32 _ReadBumpAndFrictionTable(void)
+UINT32 _ReadBumpAndFrictionTable()
 {
 	static UCHAR Buffer[512];
 	SINT32 FileNum;
@@ -10039,7 +10035,7 @@ UINT32 i;
 	_LeakTest
 *************************************************************************************************/
 
-static void _LeakTest(void)
+static void _LeakTest()
 {
 	FLOAT64VECTOR WorldOriginOffset;
 	FASTCOLLIDE CollideList[32], *CollideListPtr;

@@ -482,7 +482,8 @@ Tutorial::GroupProgress::send(SINT32 chatIndex)
 
 //////////////////////////////////////////////////////////////////////
 
-SINT32 mapInstallClientCallbacks(void)
+SINT32
+mapInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Map::CallbackX)
 	{

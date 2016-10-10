@@ -430,7 +430,7 @@ Listing::populate(wwiiPlayer* const player, const ListingRequest& request)
 // Set up the callbacks.
 
 SINT32
-InstallHostCallbacks(void)
+InstallHostCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Instance::INST_X)
 	{

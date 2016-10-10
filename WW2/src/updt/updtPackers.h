@@ -15,7 +15,7 @@
 extern SINT32 	sizeOfOneTime;
 extern SINT32 	sizeOfFirstTime;
 
-extern SINT32	updtPackInit(void);
+extern SINT32	updtPackInit();
 
 extern SINT32 updtPackWORLD_UPDATE(const LOGICAL mode , UCHAR* data, SINT32 offset, struct WORLD_UPDATE* const wu, SINT32 size);
 

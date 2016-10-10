@@ -153,7 +153,7 @@ public:
 	UINT16 getPlayers(WWII_SIDE forSide=WWII_NO_SIDE, WEAPON_CATEGORY forWeap=_NO_CATEGORY) const
 											{ return m_players[forSide][forWeap]; }
 
-	CPStruct* clearAlerts(void)				{ _changeFlags(flags&~_alertFlags()); return this;}
+	CPStruct* clearAlerts()				{ _changeFlags(flags&~_alertFlags()); return this;}
 	CPStruct* clearFlag(UINT32 flag) { _changeFlags(flags&~flag); return this; }
 
 	CPStruct* clearFallback()				{ m_fallback = WWII_NO_SIDE; m_fallbackTime = 0; return clearFlag(CP_STAT_FALLBACK); }
@@ -165,9 +165,9 @@ public:
 	CPStruct* endContention();
 
 	bool isAttackObjective(WWII_SIDE forSide) const { return ( (flags & attackFlags[forSide]) != 0 ); }
-	bool isBridge(void) const { return (fullObjID.objType == CP_BRIDGE); }
+	bool isBridge() const { return (fullObjID.objType == CP_BRIDGE); }
 	bool isCaptureObjective(WWII_SIDE forSide) const { return ( isCity() && isAttackObjective(forSide) ); }
-	bool isCity(void) const { return (fullObjID.objType != CP_BRIDGE); }
+	bool isCity() const { return (fullObjID.objType != CP_BRIDGE); }
 	bool isDefendObjective(WWII_SIDE forSide) const { return (flags & defendFlags[forSide]) != 0; }
 	bool isFallingBack()					const { return (flags & CP_STAT_FALLBACK) != 0; }
 	bool isFallingBack(WWII_SIDE forSide)	const { return ( isFallingBack() && m_fallback == forSide ); }
@@ -183,7 +183,7 @@ public:
 	CPStruct* setAttackObjective(bool modifyObjectiveList=false, HCUnit* unit=nullptr);
 	CPStruct* setDefendObjective(WWII_SIDE forSide, bool modifyObjectiveList=false);
 	CPStruct* setFlag(UINT32 flag)	{ _changeFlags(flags|flag); return this; }
-	CPStruct* checkForUnderAttack(void);
+	CPStruct* checkForUnderAttack();
 
 	bool isSurrendering() const { return ( flags & CP_STAT_SURRENDER_CANDIDATE ) != 0; }
 	CPStruct* setSurrender(bool state) { if ( state ) _changeFlags(flags|CP_STAT_SURRENDER_CANDIDATE); else  _changeFlags(flags&(~CP_STAT_SURRENDER_CANDIDATE)); return this; }

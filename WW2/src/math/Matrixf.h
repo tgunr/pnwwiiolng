@@ -250,7 +250,7 @@ class Matrixf
         void orthoNormalize(const Matrixf& rhs);
 
         //basic utility functions to create new matrices
-        static inline Matrixf identity( void );
+        static inline Matrixf identity();
         static inline Matrixf scale( const Vec3f& sv);
         static inline Matrixf scale( const Vec3d& sv);
         static inline Matrixf scale( value_type sx, value_type sy, value_type sz);
@@ -390,7 +390,7 @@ class Matrixf
 };
 
 //static utility methods
-inline Matrixf Matrixf::identity(void)
+inline Matrixf Matrixf::identity()
 {
     Matrixf m;
     m.makeIdentity();

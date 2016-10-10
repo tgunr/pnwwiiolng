@@ -7,7 +7,7 @@ extern "C"
 #endif
 
 int sysmain();
-void sysmainQuit(void);
+void sysmainQuit();
 void sysGetMousePosition(int*,int*);
 void sysSetMousePosition(int, int);
 void sysmainCommandLine(int arg, const char** argv);

@@ -102,7 +102,7 @@ UINT32 g_hostUpdateInterval;
 //////////////////////////////////////////////////////////////////////
 // Initialization for the update packing system.
 
-SINT32	updtPackInit(void)
+SINT32	updtPackInit()
 {
 	return 0;
 }

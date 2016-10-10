@@ -50,7 +50,7 @@ CPStruct* _cpList;
 LOGICAL _stratAddressReceived = FALSE;
 
 static void
-_flushDamageQueue(void)
+_flushDamageQueue()
 {
 	if ( damageQueue.empty() )
 		return;

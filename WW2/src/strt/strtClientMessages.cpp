@@ -32,8 +32,8 @@ static SINT32 _sendEnemySpotted(ACTION_OBJECT* const a)
 }
 
 //Installs all the client callbacks
-extern SINT32
-strtInstallClientCallbacks(void)
+SINT32
+strtInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
 	{

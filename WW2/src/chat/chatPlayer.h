@@ -59,7 +59,7 @@ public:
 	WWII_SIDE activeCommandSide() const;
 
 	// Add them to the command list
-	void addToCommandList(void);
+	void addToCommandList();
 
 	// Announce the player to their squad channel
 	void announceToSquadChannel();
@@ -188,10 +188,10 @@ public:
 	void removeFromAWS();
 
 	// Remove them from the command list
-	void removeFromCommandList(void);
+	void removeFromCommandList();
 
 	// Remove them from the chat grid
-	void removeFromGrid(void);
+	void removeFromGrid();
 
 	// Send a hostmessage to the player
 	SINT32 send(const Chat::HostMessage& message);

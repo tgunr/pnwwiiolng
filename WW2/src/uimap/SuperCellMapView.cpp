@@ -132,7 +132,7 @@ SuperCellMapView::~SuperCellMapView()
 
 #define ZOOM_SCALE 100.0f
 
-void SuperCellMapView::DrawSelf(void)
+void SuperCellMapView::DrawSelf()
 {
 	if(_autoscale && frametime >= _autoscaletime)
 	{

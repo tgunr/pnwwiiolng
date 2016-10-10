@@ -7,9 +7,7 @@
 //
 // Originating Programmer: Eric Hall
 
-//CONNECTION_STATUS connected;
-//UINT32	theHost;
 //install database client general callbacks
-SINT32 dbseInstallClientCallbacks(void);
+SINT32 dbseInstallClientCallbacks();
 
 SINT32 dbseSendHandshake(SINT32 teulIndex, UINT32 arena);

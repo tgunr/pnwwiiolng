@@ -383,7 +383,7 @@ static void _byteAlignCheck(size_t size, const char* type)
 #endif//GR2_MEMORY_PAD
 #endif//BETA_RELEASE
 
-void gr2Init (void)
+void gr2Init()
 {
 	granny_log_callback Callback;
 //	FLOAT32		threshold;
@@ -1275,7 +1275,7 @@ gr2Animation* gr2LoadAnimation (const SCHAR* animationFile, SINT32 useCache)
 	return newAnimation;
 }
 
-void gr2DoneLoadingModels (void)
+void gr2DoneLoadingModels()
 {
 	// nothing until the cache shows up later
 	// this is where I can close file sections I no longer need
@@ -2076,7 +2076,7 @@ LOGICAL gr2RenderDamageModel (gr2Model* currentModel)
 	return TRUE;
 }
 
-void gr2ToggleAnimOutput (void)
+void gr2ToggleAnimOutput()
 {
 	animOutput = !animOutput;
 }
@@ -3568,7 +3568,7 @@ void gr2ControlSetEaseOutDuration (gr2Control* gr2Control, FLOAT32 time)
 //	GrannyEaseControlOut (gr2Control->control, time);
 }
 
-void gr2ControlSetSpeed (gr2Control* gr2Control, FLOAT32 speed)
+void gr2ControlSetSpeed(gr2Control* gr2Control, FLOAT32 speed)
 {
 	if (!gr2Control)
 	{
@@ -3578,7 +3578,7 @@ void gr2ControlSetSpeed (gr2Control* gr2Control, FLOAT32 speed)
 	GrannySetControlSpeed (gr2Control->control, speed);
 }
 
-void gr2ControlSetWeight (gr2Control* gr2Control, FLOAT32 weight)
+void gr2ControlSetWeight(gr2Control* gr2Control, FLOAT32 weight)
 {
 	if (!gr2Control)
 	{
@@ -3588,7 +3588,7 @@ void gr2ControlSetWeight (gr2Control* gr2Control, FLOAT32 weight)
 	GrannySetControlWeight (gr2Control->control, weight);
 }
 
-void gr2Kill (void)
+void gr2Kill()
 {
 	GR2_ANIM_EVENTS::iterator ait = _animEvents.begin();
 
@@ -5330,7 +5330,7 @@ void gr2BlendControlRemoveWhenDone (gr2Model* model, gr2AnimationBlend* animatio
 }
 
 #ifdef BETA_RELEASE
-void gr2ToggleColTest (void)
+void gr2ToggleColTest()
 {
 	colTestFlag = !colTestFlag;
 

@@ -104,7 +104,7 @@ enum class LogMode { OFF, TO_FILE };
 
 namespace Debug
 {
-	using ERROR_HANDLER = void(*)(void);
+	using ERROR_HANDLER = void(*)();
 }
 
 // dbugInit: sets the current error level to ERR_INFO, opens the debug file, and initializes

@@ -157,7 +157,7 @@ logTimerEndMacro();
 	obpoolKill
 *************************************************************************************************/
 // Free all pool objects and free the list.
-void obpoolKill(void)
+void obpoolKill()
 {
 	POOLOBJHDR*	lpobj, *next;
 
@@ -311,7 +311,7 @@ LOGICAL obpoolFreeObjectCallback(OBJECT* lpgrp)
 	obpoolGetNewObject
 *************************************************************************************************/
 // Get a new pool object
-POOLOBJHDR* obpoolGetNewObject(void)
+POOLOBJHDR* obpoolGetNewObject()
 {
 POOLOBJHDR*    lphdr;
 

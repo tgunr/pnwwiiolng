@@ -514,7 +514,7 @@ _recvError(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 
 SINT32
-teulInitModCallbacks(void)
+teulInitModCallbacks()
 {
 	Teul::CallbackInit ci{};
 

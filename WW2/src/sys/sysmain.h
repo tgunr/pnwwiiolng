@@ -10,7 +10,7 @@ using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
 extern LOGICAL sysmainGetExecutableStamp(SCHAR* szTimeStamp, SINT32 maxLength);
 extern int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep);
-extern void sysmainQuit(void);
+extern void sysmainQuit();
 
 extern void sysmainSetKeyboard(SYS_KEYBOARDFUNC KeyboardRoute);
 extern BOOL sysmainSetTimer(SYS_TIMERFUNC newfunc);

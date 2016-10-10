@@ -438,11 +438,11 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 			_insertStratUpdate(update);
 			update = nullptr;
 		};
-		auto finish_update = [&update] (void) {
+		auto finish_update = [&update] () {
 			_releaseStratUpdate(update);
 			update = nullptr;
 		};
-		auto update_handled = [&update] (void) -> bool { return update == nullptr; };
+		auto update_handled = [&update] () -> bool { return update == nullptr; };
 
 		switch (update->type)
 		{

@@ -26,7 +26,7 @@ static ChannelID id_side(SIDE_GENERAL_CHANNEL);
 
 // Get the ID of the "admin" (GM) channel
 const ChannelID&
-chatGetAdminChannelID(void)
+chatGetAdminChannelID()
 {
 	return id_admin;
 }

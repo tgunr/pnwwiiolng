@@ -271,7 +271,7 @@ _playerDeleteAuth(PlayerStatusNode* psn)
 }
 
 static void
-_sendHeartBeat(void)
+_sendHeartBeat()
 {
 	if ( PN_UNLIKELY(_myServerInfo == nullptr || Server::broadcastIndex < 0) )
 		return;
@@ -832,7 +832,7 @@ _releaseFn(SINT32 teulIndex, UINT32 customerID, UINT32 otp, Server::ReleaseType 
 }
 
 static void
-_timeOutPlayers(void)
+_timeOutPlayers()
 {
 	std::set<PlayerStatusNode*> timeouts = _exitServer->m_players;
 	for ( auto& psn : timeouts )
@@ -855,7 +855,7 @@ _timeOutPlayers(void)
 }
 
 static void
-_timeOutXfers(void)
+_timeOutXfers()
 {
 	const TeulTimeMS cutoff = teulClock64 - PLAYER_XFER_TIMEOUT;
 
@@ -1026,7 +1026,7 @@ serverInit(UINT32 appVersion
 }
 
 void
-serverFree(void)
+serverFree()
 {
 	_leaveCallback = nullptr;
 
@@ -1166,7 +1166,7 @@ serverBroadcastClusterShutdown()
 }
 
 void
-serverUpdate(void)
+serverUpdate()
 {
 	static bool inUpdate = false;
 	if ( (_myServerInfo == nullptr) | (inUpdate) )

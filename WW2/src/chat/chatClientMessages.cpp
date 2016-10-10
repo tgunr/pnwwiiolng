@@ -657,7 +657,7 @@ _recvDotCommandList(ACTION_OBJECT* const a)
 //Installs the client callbacks
 
 SINT32
-chatInstallClientCallbacks(void)
+chatInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
 	{

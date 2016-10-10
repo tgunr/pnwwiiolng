@@ -881,7 +881,7 @@ logTimerEndExtMacro(parseWor);
 
 }
 
-void obwldKill(void)
+void obwldKill()
 {
 	trnmainKill();
 
@@ -890,13 +890,13 @@ void obwldKill(void)
     Write_Log(LOG_OLD, LOG_INFO, "[obwldKill]");
 }
 
-LOGICAL obwldUpdate(void)
+LOGICAL obwldUpdate()
 {
 	return(TRUE);
 }
 
 #ifdef USE_SHADOWS
-LOGICAL obwldPredrawUpdate(void)
+LOGICAL obwldPredrawUpdate()
 {
 	if (!obdshadUpdate())
 	{

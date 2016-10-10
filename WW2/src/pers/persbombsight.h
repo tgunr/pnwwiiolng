@@ -11,10 +11,10 @@ enum
 	persBombsight
 *************************************************************************************************/
 
-extern LOGICAL persBombsightInit(void);
-extern LOGICAL persBombsightUpdate(void);
-extern LOGICAL persBombsightKill(void);
-extern LOGICAL persClearBombsight(void);
+extern LOGICAL persBombsightInit();
+extern LOGICAL persBombsightUpdate();
+extern LOGICAL persBombsightKill();
+extern LOGICAL persClearBombsight();
 extern LOGICAL persBombsightSetup(SINT32 Type,SINT8* MountName, void*  InVehicleData);
 
 extern UINT32 persBombsightSpeedInc(SINT32 Param,UINT32 Id,UINT32 Detach);

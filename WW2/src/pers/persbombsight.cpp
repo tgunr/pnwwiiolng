@@ -83,7 +83,7 @@ static SINT32 _AdjustAltDir;
 	persBombsightInit
 *************************************************************************************************/
 
-LOGICAL persBombsightInit(void)
+LOGICAL persBombsightInit()
 {
 	return TRUE;
 }
@@ -92,7 +92,7 @@ LOGICAL persBombsightInit(void)
 	persBombsightUpdate
 *************************************************************************************************/
 
-LOGICAL persBombsightUpdate(void)
+LOGICAL persBombsightUpdate()
 {
 	switch(_BombsightType)
 	{
@@ -109,7 +109,7 @@ LOGICAL persBombsightUpdate(void)
 	persBombsightKill
 *************************************************************************************************/
 
-LOGICAL persBombsightKill(void)
+LOGICAL persBombsightKill()
 {
 	persClearBombsight();
 	return TRUE;
@@ -119,7 +119,7 @@ LOGICAL persBombsightKill(void)
 	persClearBombsight
 *************************************************************************************************/
 
-LOGICAL persClearBombsight(void)
+LOGICAL persClearBombsight()
 {
 	if (_Data != nullptr)
 	{

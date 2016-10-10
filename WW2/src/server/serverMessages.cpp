@@ -222,7 +222,7 @@ _recvHostConfig(ACTION_OBJECT* const a)
 }
 
 SINT32
-serverInitCallbacks(void)
+serverInitCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
 	{

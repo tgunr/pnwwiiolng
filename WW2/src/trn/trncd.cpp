@@ -198,7 +198,7 @@ static UINT32 _SetDamageLevel(OBJECT* Object,UINT32 DamageLevel);
 static UINT32 _SetTOObjectCountry(OBJECT * Object, SINT32 Country, UINT32 IncludeSibs);
 static UINT32 _AddStratMsgToQue(SINT32 scx,SINT32 scy,UINT32 Id,SINT32 Country,SINT32 VisLevel);
 
-static _StratMessageQue * _GetNewStratMsg(void);
+static _StratMessageQue * _GetNewStratMsg();
 static UINT32 _FreeStratMsg(_StratMessageQue * StratMsg);
 static UINT32 _RemoveStratMsgFromList(_StratMessageQue * StratMsg);
 static UINT32 _AddStratMsgToFreeList(_StratMessageQue * StratMsg);
@@ -237,7 +237,7 @@ static void HighliteView(piVECTOR* pv, DWORD color)
 
 #endif
 
-static _StratMessageQue * _GetNewStratMsg(void)
+static _StratMessageQue * _GetNewStratMsg()
 {
 _StratMessageQue * StratMsg;
 
@@ -560,7 +560,7 @@ static void _ScanAndSetupFlags(OBJECT* Object)
 	while (Object != nullptr);
 }
 
-UINT32 trncdInit(void)
+UINT32 trncdInit()
 {
 	trnmainSetObjectCreationCallback(trncdAddTerrainObject);
 	trnmainSetObjectDeletionCallback(trncdRemoveTerrainObject);
@@ -605,7 +605,7 @@ UINT32 trncdInit(void)
 	return 0;
 }
 
-UINT32 trncdKill(void)
+UINT32 trncdKill()
 {
     if(!mapTO.empty())
     {
@@ -6192,12 +6192,12 @@ LOGICAL trncdCollideDownMediumList(piVECTOR* OldPos, piVECTOR* NewPos, UINT32 Fl
 	return(FALSE);
 }
 
-UINT32 trncdGetNumTOs(void)
+UINT32 trncdGetNumTOs()
 {
 	return _NumTO;
 }
 
-UINT32 trncdUpdateStratMsgQue(void)
+UINT32 trncdUpdateStratMsgQue()
 {
 _StratMessageQue * StratMsg;
 _StratMessageQue * PrevStratMsg;

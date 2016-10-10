@@ -20,7 +20,7 @@ namespace Scoring
 }
 
 SINT32
-mmCellHostSupportCallbacks(void)
+mmCellHostSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(MM::CallbackX)
 	{

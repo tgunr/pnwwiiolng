@@ -683,7 +683,7 @@ _handleSIGUSR1(SINT32 k)
 //////////////////////////////////////////////////////////////////////
 
 SINT32
-mapGetStratIndex(void)
+mapGetStratIndex()
 {
 	return _stratIndex;
 }
@@ -719,7 +719,7 @@ _checkStratMaster()
 //////////////////////////////////////////////////////////////////////
 
 static void
-_updateMasterInfo(void)
+_updateMasterInfo()
 {
 	// Check to see if the chat host master has changed
 	_checkChatMaster();
@@ -964,7 +964,7 @@ _pollChecksums()
 class Housekeeper
 {
 public:
-	using FUNCTION = void(*)(void);
+	using FUNCTION = void(*)();
 
 private:
 	FUNCTION*		m_functions;

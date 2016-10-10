@@ -836,7 +836,7 @@ int Client::RequestMissionList()
 	return missionlist.send(MapConnection());
 }
 
-int Client::RequestQuickMissionList(void) {
+int Client::RequestQuickMissionList() {
 	_data->missionListUpdate = 0;
 	MissionList missionlist;
 	return missionlist.sendQuick(MapConnection());

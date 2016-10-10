@@ -16,12 +16,12 @@ struct DYNALITE
 	SINT32				numlight;
 };
 
-extern LOGICAL obdliteInit(void);
+extern LOGICAL obdliteInit();
 extern int obdliteGetLights(DYNALITE** lplite);
-extern void obdliteKill(void);
+extern void obdliteKill();
 extern LIGHT* obdliteFindDynaLight(const char* name);
 extern LOGICAL obdliteAddDynaLite(LIGHT* light, DYNALITE_UPDATE updfunc);
 extern LOGICAL obdliteSetDynaLite(LIGHT* light);
 extern LOGICAL obdliteSetDynaState(LIGHT* light, LOGICAL state);
 extern LOGICAL obdliteChangeFunction(const char* name, DYNALITE_UPDATE updfunc);
-extern LOGICAL obdliteDynaLiteUpdate(void);
+extern LOGICAL obdliteDynaLiteUpdate();

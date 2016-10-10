@@ -48,7 +48,7 @@ public:
 		m_condition.notify_all();
 	}
 
-	void doLocked(std::function<void(void)> lambda)
+	void doLocked(std::function<void()> lambda)
 	{
 		std::unique_lock<std::mutex> lock(m_mutex);
 		lambda();

@@ -134,7 +134,7 @@ public:
         CVec3       Midpoint(const CVec3& cVec) const;
         float       MinAxis( ) const;
         bool        RoughlyEqual(const CVec3& cVec) const;
-        CVec        ToVec(void) const;
+        CVec        ToVec() const;
 
         //  mutators
         void        Normalize( );
@@ -687,7 +687,7 @@ __inline bool CVec3::RoughlyEqual(const CVec3& cVec) const
 }
 
 // ToVec
-__inline CVec CVec3::ToVec(void) const
+__inline CVec CVec3::ToVec() const
 {
     return CVec(m_afData[0], m_afData[1], m_afData[2]);
 }

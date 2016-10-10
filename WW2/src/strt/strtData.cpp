@@ -94,7 +94,7 @@ _filenamePool(const char* filename)
 }
 
 UINT32
-strtNumCPs(void)
+strtNumCPs()
 {
 	return totalCPs;
 }

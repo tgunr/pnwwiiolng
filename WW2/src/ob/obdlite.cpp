@@ -22,7 +22,7 @@ static DYNALITE*    dynalites;
 #define UPDATE_TOD_DELTA	(4 * 60)
 
 
-LOGICAL obdliteInit(void)
+LOGICAL obdliteInit()
 {
 	numdynalites = 0;
 	availdynalites = MINDYNALITES;
@@ -52,7 +52,7 @@ int obdliteGetLights(DYNALITE** lplite)
 	return(numdynalites);
 }
 
-void obdliteKill(void)
+void obdliteKill()
 {
 	if (dynalites != nullptr)
 	{
@@ -205,7 +205,7 @@ int   i;
 	return(FALSE);
 }
 
-LOGICAL obdliteDynaLiteUpdate(void)
+LOGICAL obdliteDynaLiteUpdate()
 {
 int   i;
 

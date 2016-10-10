@@ -1035,7 +1035,7 @@ OBJECT*    lpobj;
 	return(nullptr);
 }
 
-OBJECT* obmainGetFirstTopmostObject(void)
+OBJECT* obmainGetFirstTopmostObject()
 {
 	return (OBJECT*)topmostlist.next;
 }
@@ -1617,7 +1617,7 @@ int obmainGetObjects(LISTHEADER** lplist)
 	return(NumObjUsed);
 }
 
-LOGICAL obmainInit(void)
+LOGICAL obmainInit()
 {
 	NumObjUsed = 0;
 
@@ -1642,7 +1642,7 @@ LOGICAL obmainInit(void)
 
 extern void ldfltKill() ;	// It's only used here, so why pollute namespaces with it?
 
-void obmainKill(void)
+void obmainKill()
 {
 	OBJECT*	lpobj, *prev, *next;
 
@@ -1681,7 +1681,7 @@ void obmainKill(void)
     Write_Log(LOG_OLD, LOG_INFO, "[obmainKill]");
 }
 
-LOGICAL obmainUpdate(void)
+LOGICAL obmainUpdate()
 {
 	if (!obwldUpdate())
 		return FALSE;

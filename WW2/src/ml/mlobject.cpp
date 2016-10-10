@@ -2237,7 +2237,7 @@ OBJECT * ObjSib;
 }
 
 #include "trn/trnsky.h"
-UINT32 mlDrawProps(void)
+UINT32 mlDrawProps()
 {
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 

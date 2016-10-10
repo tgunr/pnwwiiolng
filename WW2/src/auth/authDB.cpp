@@ -108,7 +108,7 @@ static ARENA_ALIASES g_arenaAliases;
 extern void dbseSetDatabase(const ConfigAddr& addr, const ConfigAddr& port, const ConfigStr& schema, const ConfigStr& user, const ConfigStr& password);
 
 void
-authInitDB(void)
+authInitDB()
 {
 	// Auth has its own database to talk to.
 	dbseSetDatabase(cv_authdbAddress, cv_authdbSchema, cv_authdbUser, cv_authdbPassword, cv_authdbPort);
@@ -647,7 +647,7 @@ _getAppManifest()
 
 //////////////////////////////////////////////////////////////////////
 void
-authInitApps(void)
+authInitApps()
 {
 	_getAppTable();
 	_getAppManifest();

@@ -108,7 +108,7 @@ UINT32 teulGetEndpointLocalAddress(SINT32 teulIndex);
 UINT32 teulGetEndpointRemoteAddress(SINT32 teulIndex);
 
 // close all connections and the debugger. (teul go bye bye)
-void teulCloseTransport(void);
+void teulCloseTransport();
 
 //! Associate local application data with a connection.
 void teulSetPersonaData(const SINT32 teulIndex, void* personaData);

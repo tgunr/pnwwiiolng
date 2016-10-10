@@ -103,7 +103,7 @@ _callbackError(
 // Initialize Playgate's comm functions (network transport).
 
 bool
-commInit(void)
+commInit()
 {
 	if (teulInitTransport(LogMode::TO_FILE, "PlayGATE", _teulKitError, nullptr))
 		return false;
@@ -126,7 +126,7 @@ commInit(void)
 // Shutdown the network transport.
 
 void
-commKill(void)
+commKill()
 {
 	// If we have an active connection, shut it down.
 	commCloseConnection();
@@ -209,11 +209,11 @@ commCloseConnection()
 // Process network updates. Returns false if there are no connections.
 
 bool
-commUpdate(void)
+commUpdate()
 {
 	teulUpdateTransport(5);
 
-	return ( _haveOpenConnection() );
+	return _haveOpenConnection();
 }
 
 //////////////////////////////////////////////////////////////////////

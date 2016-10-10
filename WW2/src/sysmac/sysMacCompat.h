@@ -50,9 +50,9 @@ extern const char *macPreferencesPath();
 extern void SetCommandLine(int argc, const char** argv);
 extern const char *GetCommandLine();
 
-extern UINT64 GetMicroSeconds(void);
+extern UINT64 GetMicroSeconds();
 extern UINT64 GetMillisecondTick();
-extern UINT32 timeGetTime(void);
+extern UINT32 timeGetTime();
     
     extern char GetOSMajorVersion();
     extern char GetOSMinorVersion();

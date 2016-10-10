@@ -93,13 +93,13 @@
 #include "GenerateIcons.h"
 #endif
 
-static void _UpdateInit(void);
-static void _UpdateWorld(void);
-static void _PreRenderUpdateDeprecated(void);
+static void _UpdateInit();
+static void _UpdateWorld();
+static void _PreRenderUpdateDeprecated();
 static void _RenderDeprecated();
-static void _PostRenderUpdateDeprecated(void);
-static void _UpdateKill(void);
-void UpdateGameClocks(void);
+static void _PostRenderUpdateDeprecated();
+static void _UpdateKill();
+void UpdateGameClocks();
 static LOGICAL _PostExternalDrawFunc(LOGICAL IsBeforeStage);
 static LOGICAL _PostInternalDrawFunc(LOGICAL IsBeforeStage);
 static LOGICAL _PostUnsortedDrawFunc(LOGICAL IsBeforeStage);
@@ -171,7 +171,7 @@ static void preload_sdms()
 #endif
 }
 
-LOGICAL gmlpMainInit(void)
+LOGICAL gmlpMainInit()
 {
     ShadowMap::GetInstance().init();
     ShadowMap::GetInstance().setPolygonOffset(Vec2f(8, 4));
@@ -470,7 +470,7 @@ static void PostRenderUpdate()
 #endif
 }
 
-LOGICAL gmlpMainUpdate(void)
+LOGICAL gmlpMainUpdate()
 {
 //	static UINT32 First = 1;
 
@@ -553,7 +553,7 @@ LOGICAL gmlpMainUpdate(void)
 	return TRUE;
 }
 
-LOGICAL gmlpMainKill(void)
+LOGICAL gmlpMainKill()
 {
     Write_Debug("[gmlpMainKill] Begin");
 
@@ -607,7 +607,7 @@ LOGICAL gmlpMainKill(void)
 //extern void mapProcessSuperCellVislevels();
 
 // initializes stuff for the main update loop
-void _UpdateInit(void)
+void _UpdateInit()
 {
 	UpdateGameClocks(); // adjust the internal game clocks
 
@@ -629,7 +629,7 @@ void _UpdateInit(void)
 
 #include "client/clientStrtQueue.h"
 
-void _UpdateWorld(void)
+void _UpdateWorld()
 {
 #ifdef BETA_RELEASE
 #ifdef GENICONS
@@ -671,7 +671,7 @@ void _UpdateWorld(void)
 }
 
 #if USE_STATESET
-void _PreRenderUpdateDeprecated(void)
+void _PreRenderUpdateDeprecated()
 {
 #ifdef USE_SHADOWS
 	obwldPredrawUpdate();
@@ -744,7 +744,7 @@ void _PreRenderUpdateDeprecated(void)
 }
 #else
 // update stuff to occur before the actual scene render
-void _PreRenderUpdateDeprecated(void)
+void _PreRenderUpdateDeprecated()
 {
 #ifdef USE_SHADOWS
 	logTimerCallVoid(obwldPredrawUpdate);
@@ -938,7 +938,7 @@ void _RenderDeprecated()
 #endif
 
 // update stuff to occure after the actual scene render
-void _PostRenderUpdateDeprecated(void)
+void _PostRenderUpdateDeprecated()
 {
 	piVECTOR	Pos;
 	piVECTOR	Att;
@@ -990,14 +990,14 @@ void _PostRenderUpdateDeprecated(void)
 }
 
 // any kill functions necessary at end of cycle
-void _UpdateKill(void)
+void _UpdateKill()
 {
 }
 
 //=============================================
 
 // updates the millisecond game clock
-void UpdateGameClocks(void)
+void UpdateGameClocks()
 {
 	static UINT64 starttime = GetMillisecondTick() - 1;
 	const UINT64 newFrametime = GetMillisecondTick();
@@ -1024,7 +1024,7 @@ void UpdateGameClocks(void)
 }
 
 
-UINT32 gmlpHandleFieldOfView(void)
+UINT32 gmlpHandleFieldOfView()
 {
 FLOAT32 ZBufferStart;
 //FLOAT32 ZBufferEnd;
@@ -1100,7 +1100,7 @@ static LOGICAL _PostInternalDrawFunc(LOGICAL IsBeforeStage)
 imap_queue_entry* imapqueue;
 UINT32 imapqueuesize;
 
-void gmlpProcessInputs(void)
+void gmlpProcessInputs()
 {
 	CHAR_INPUT* input;
 	SINT32 count;

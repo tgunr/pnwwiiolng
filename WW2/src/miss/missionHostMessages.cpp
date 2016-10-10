@@ -619,7 +619,7 @@ _installStratCallbacks()
 }
 
 SINT32
-missionHostInstallCallbacks(void)
+missionHostInstallCallbacks()
 {
 	_installStratCallbacks();
 

@@ -162,8 +162,8 @@ private:
 	UINT8			m_side;				// Side of report
 	UINT8			m_weapCategory;		// Category of weapon in report
 
-	void _incPresence(void);			// Increase presence counts
-	void _decPresence(void);			// Decrease presence counts
+	void _incPresence();				// Increase presence counts
+	void _decPresence();				// Decrease presence counts
 //tolua_begin
 
 public:

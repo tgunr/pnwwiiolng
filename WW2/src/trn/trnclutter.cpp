@@ -77,12 +77,12 @@ static UINT32 _AddClutterToFreeList(CLUTTER * Clutter);
 #if(0)
 static UINT32 _FreeClutter(CLUTTER * Clutter);
 #endif
-static CLUTTER * _GetNewClutter(void);
+static CLUTTER * _GetNewClutter();
 #if(0)
 static void FreeClutter();
 #endif
 
-static UINT32 _RepopulateArray(void);
+static UINT32 _RepopulateArray();
 
 static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX,SINT32 PosY, SINT32* ClutterDensity);
 
@@ -110,12 +110,12 @@ static UINT32 _AddClutterToFreeList(CLUTTER* c)
     return 0;
 }
 
-UINT32 trnClutterInit(void)
+UINT32 trnClutterInit()
 {
 	return 0;
 }
 
-UINT32 trnClutterKill(void)
+UINT32 trnClutterKill()
 {
     trnClutterReset();
     ClutterMap::iterator itr = cluttermap.begin();
@@ -136,7 +136,7 @@ static void FreeClutter()
 }
 #endif
 
-UINT32 trnClutterUpdate(void)
+UINT32 trnClutterUpdate()
 {
     if(!uiInGame())
         return 0;
@@ -232,7 +232,7 @@ static void ClearClutter(const std::string& key)
 #endif
 }
 
-UINT32 trnClutterReset(void)
+UINT32 trnClutterReset()
 {
     ClutterHash::iterator itr = keys.begin();
 
@@ -334,7 +334,7 @@ static void GetGridCenter(int grid, const Vec3d& pos, Vec3d& center)
     }
 }
 
-static UINT32 _RepopulateArray(void)
+static UINT32 _RepopulateArray()
 {
     if(!_drawclutter)
     {

@@ -116,7 +116,7 @@ static SINT32 _recvMessage(ACTION_OBJECT* const a)
 
 // Initiate a connection to the chat host
 static void
-_connectToChatHost(void)
+_connectToChatHost()
 {
 	_chatClientConnected = FALSE;
 
@@ -244,7 +244,7 @@ _recvCommandList(ACTION_OBJECT* const a)
 
 //Installs the client callbacks
 SINT32
-chatInstallClientCallbacks(void)
+chatInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
 	{

@@ -16,7 +16,7 @@
 
 #include "comm/commTypes.h"
 
-SINT32 commInstallHostCallbacks(void);
+SINT32 commInstallHostCallbacks();
 // installs callbacks for the host system
 // no return value or arguments
 // should be called only once

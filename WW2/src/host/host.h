@@ -72,8 +72,8 @@ extern SINT32 updateBcastRecv, updateBcastSend;
 extern MY_SERVER_INFO msi;
 extern LOGICAL serverResync;
 
-extern SINT32 hostGetMapConnection(void);
-extern UINT32 hostGetStratAddress(void);
+extern SINT32 hostGetMapConnection();
+extern UINT32 hostGetStratAddress();
 
 extern void	hostActivateVehicle(HostVehicle* newVehicle, bool checkPlayers);
 extern HostVehicle* hostFindVehicleLocal( UINT32 indexValue );

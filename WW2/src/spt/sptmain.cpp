@@ -215,7 +215,7 @@ void Tree::attach(OBJECT& o) {
 }
 
 
-void Tree::detach(void) {
+void Tree::detach() {
 	if ( ! o )
 		return;
 

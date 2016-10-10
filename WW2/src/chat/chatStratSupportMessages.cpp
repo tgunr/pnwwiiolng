@@ -277,7 +277,7 @@ BrigadeMove::process(const ChatHandle mover, const char* callsign, StratHCUnit* 
 //////////////////////////////////////////////////////////////////////
 //This function installs all the host callbacks
 SINT32
-chatInstallStratSupportCallbacks(void)
+chatInstallStratSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(CHAT_X)
 	{

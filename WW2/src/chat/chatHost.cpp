@@ -2511,7 +2511,7 @@ _personaErrorFunction (SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*s
 //Initializes all the global data structures, etc.
 
 static void
-_dataInit(void)
+_dataInit()
 {
 	chatInitPlayerLists();
 }
@@ -2756,7 +2756,7 @@ _houseKeeping()
 		return false;
 
 	// nullptr TERMINATED List of functions to call
-	using HOUSEKEEPING = bool(*)(void);
+	using HOUSEKEEPING = bool(*)();
 	static HOUSEKEEPING housekeeping[] =
 	{
 		chatSaveLogRecords

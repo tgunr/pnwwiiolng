@@ -48,7 +48,7 @@ static std::deque<snSound*> _freesounds;
 // ------------------------------------------------------------
 // externally visible functions
 // ------------------------------------------------------------
-LOGICAL sndsInit(void)
+LOGICAL sndsInit()
 {
 #if platOS == OS_MACOS
     b3DSoundEnable = TRUE;
@@ -84,7 +84,7 @@ LOGICAL sndsInit(void)
 // return values:   0 if no errors occurred during startup
 //					1 if startup failed for any reason
 
-LOGICAL sndsKill(void)
+LOGICAL sndsKill()
 {
 	if (bSoundEnable == FALSE)
 	{
@@ -129,7 +129,7 @@ LOGICAL sndsDriverConfig(void* obj)
 // return values:   0 if no errors occurred during shutdown
 //					1 if shutdown failed for any reason
 
-LOGICAL sndsReset(void)
+LOGICAL sndsReset()
 {
 LOGICAL		retval;
 snSound*		eachSound;
@@ -172,7 +172,7 @@ snSound*		eachSound;
 // return values:	0 if no errors occurred during reset
 //					1 if reset failed for any reason
 
-void sndsUpdateSounds(void)
+void sndsUpdateSounds()
 {
 snSound*	listSound;
 
