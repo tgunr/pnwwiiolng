@@ -14,6 +14,4 @@ void chatdbRecordEvent(const SCHAR* category, const SCHAR* callsign, const SCHAR
 class Property;
 Property* chatFindProperty(const struct FULL_OBJ_ID id);
 
-bool chatGetWWIIConfig(void);
-
 UINT32 chatGetPermissionNames(const PermissionMask& mask, std::string &into, UINT32 fromIndex);

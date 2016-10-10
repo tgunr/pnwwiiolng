@@ -83,6 +83,7 @@
 #include "teul/teulTickSample.h"
 #include "versionNo.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiDBConfig.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
@@ -3586,7 +3587,7 @@ main(int argc, const char* argv[])
 	// Connect to the database
 	chatInitDB();
 
-	chatGetWWIIConfig();
+	dbGetWWIIConfig();
 	chatLoadPPOXML();
 
 	chatSetUnitMotd(SYSTEM_MOTD_UNIT, DEFAULT_SYS_MOTD);

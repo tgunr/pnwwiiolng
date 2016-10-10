@@ -220,15 +220,6 @@ chatdbLoadStratData()
 
 //////////////////////////////////////////////////////////////////////
 
-bool
-chatGetWWIIConfig(void)
-{
-	dbGetWWIIConfig(dbh);
-	return true;
-}
-
-//////////////////////////////////////////////////////////////////////
-
 void chatdbRecordEvent(const SCHAR* category
 						, const SCHAR* callsign
 						, const SCHAR* event
