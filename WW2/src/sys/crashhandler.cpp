@@ -1,5 +1,4 @@
-//#define _WIN32_DCOM
-#include <syscfg.h> // Path is project specific.
+#include <syscfg.h>
 #include <Windows.h>
 #include <string>
 
@@ -27,6 +26,8 @@
 #include <codecvt>
 #include "versionNo.h"
 #include "client_revision.h"
+#include "sys/sysreg.h"
+#include "unique_opaque_ptr.hpp"
 #include "client/windows/handler/exception_handler.h"
 
 #pragma endregion
@@ -91,32 +92,7 @@ struct CCom {
 	CCom &operator=(CCom &&) = delete;
 };
 
-// WinInet RAII helper
-struct unique_HINTERNET { // unique_ptr requires the base type and HINTERNET doesn't have one
-	HINTERNET h;
-	unique_HINTERNET() : h(nullptr) {}
-	unique_HINTERNET(HINTERNET h_) : h(h_) {}
-	unique_HINTERNET(const unique_HINTERNET &) = delete;
-	unique_HINTERNET &operator=(const unique_HINTERNET &) = delete;
-	~unique_HINTERNET() { if (h) { InternetCloseHandle(h); } }
-	operator HINTERNET() const { return h; }
-	explicit operator bool() const { return h != nullptr; }
-	void reset(HINTERNET p = nullptr) { if (h) { InternetCloseHandle(h); } h = p; }
-};
-
-// Winreg RAII helper
-struct unique_HKEY {
-	HKEY h;
-	unique_HKEY() : h(nullptr) {}
-	unique_HKEY(HKEY h_) : h(h_) {}
-	unique_HKEY(const unique_HKEY &) = delete;
-	unique_HKEY &operator=(const unique_HKEY &) = delete;
-	~unique_HKEY() { if (h) { RegCloseKey(h); } }
-	operator HKEY() const { return h; }
-	explicit operator bool() const { return h != nullptr; }
-	void reset(HKEY p = nullptr) { if (h) { RegCloseKey(h); } h = p; }
-	HKEY *operator&() { reset(nullptr); return &h; }
-};
+DEFINE_UNIQUE_OPAQUE_PTR_WITH_DELETER(HINTERNET, InternetCloseHandle);
 
 #pragma endregion
 //////////////////////////////////////////////////////////////////////////////
@@ -307,11 +283,10 @@ static void crash_dprintf(int fd, const wchar_t * const format, ...)
 // during crash processing as well.
 #pragma region Logging Utilities
 
-#ifdef DEBUG_WW2
+#if defined(DEBUG_WW2) || defined(GM_RELEASE)
 
-// Can't rely on the normal logging subsystem at crash time
-// TODO: Integrate this with a future improvement on dbugLog() so we don't end up with
-//       yet ANOTHER random logging system floating around disconnected from all the rest.
+// Can't rely on the normal logging subsystem at crash time. This minimal logger
+// is guaranteed to work.
 static void crash_log(const wchar_t * const format, ...)
 {
 	va_list args;
@@ -323,7 +298,7 @@ static void crash_log(const wchar_t * const format, ...)
 
 #else
 
-// In release mode we don't log.
+// In pure-release mode we don't log.
 #define crash_log(f, ...)
 
 #endif
@@ -345,12 +320,14 @@ static void AppendRequestParam(std::string &body, const std::string &boundary, c
 	body += value + "\r\n";
 }
 
-static bool AppendRequestFile(std::string &body, const std::string &boundary, const std::string &param, const std::wstring &path, bool istext)
+enum class FileKind { ASCII, Wide, Binary };
+
+static bool AppendRequestFile(std::string &body, const std::string &boundary, const std::string &param, const std::wstring &path, FileKind kind)
 {
 	std::ifstream f(path, std::ios::binary);
 
 	if (f.fail()) {
-		crash_log(L"Failed to open path %s, can't send this crash log\n", path.c_str());
+		dbugLog(_FLW, "Failed to open path %S, can't send this crash log", path.c_str());
 		return false;
 	}
 
@@ -361,7 +338,7 @@ static bool AppendRequestFile(std::string &body, const std::string &boundary, co
 	f.read(data.get(), len);
 
 	if (f.fail()) {
-		crash_log(L"Failed to read from %s, can't send this crash log\n", path.c_str());
+		dbugLog(_FLW, "Failed to read from %S, can't send this crash log", path.c_str());
 		return false;
 	}
 
@@ -374,16 +351,27 @@ static bool AppendRequestFile(std::string &body, const std::string &boundary, co
 	body += "--" + boundary + "\r\n";
 	body += "Content-Disposition: form-data; name=\"" + param + "\"; filename=\"" + filename + "\"\r\n";
 
-	if (istext) {
-		// We could use ";charset=UTF-16LE" here and avoid the conversion, but it's not clear from
-		// RFC7578 that that'd actually work (it states that many implementations assume a default encoding).
-		body += "Content-Type: text/plain\r\n";
-		body += "\r\n";
-		body += std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(std::wstring(reinterpret_cast<const wchar_t *>(data.get()), len >> 1));
-	} else {
-		body += "Content-Type: application/octet-stream\r\n";
-		body += "\r\n";
-		body.append(data.get(), len);
+	switch (kind) {
+		case FileKind::Wide:
+			// We could use ";charset=UTF-16LE" here and avoid the conversion, but it's not clear from
+			// RFC7578 that that'd actually work (it states that many implementations assume a default encoding).
+			body += "Content-Type: text/plain\r\n";
+			body += "\r\n";
+			body += std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(std::wstring(reinterpret_cast<const wchar_t *>(data.get()), len >> 1));
+			break;
+		case FileKind::ASCII:
+			body += "Content-Type: text/plain\r\n";
+			body += "\r\n";
+			body += std::string(data.get(), len);
+			break;
+		case FileKind::Binary:
+			body += "Content-Type: application/octet-stream\r\n";
+			body += "\r\n";
+			body.append(data.get(), len);
+			break;
+		default:
+			assert(false);
+			abort();
 	}
 	body += "\r\n";
 
@@ -400,6 +388,10 @@ static bool AppendRequestFile(std::string &body, const std::string &boundary, co
 // things like mess with COM objects since that's the only way to get the data.
 #pragma region Information Gathering Utilities
 
+#define PullFailure(fmt, ...) do { dbugLog(_FLA, fmt, ## __VA_ARGS__); return; } while (0)
+#define PullFailureIf(cond, fmt, ...) do { if ((cond)) { PullFailure(fmt, ## __VA_ARGS__); } } while (0)
+#define PullFailureIfNotSucceed(fmt, ...) PullFailureIf(!SUCCEEDED(result.Error()), "Failed with %S in crash handler: " fmt, result.ErrorMessage(), ## __VA_ARGS__)
+
 #pragma comment(lib, "wbemuuid.lib")
 static void PullMotherboardData(CrashHandlerContext &context)
 {
@@ -415,76 +407,74 @@ static void PullMotherboardData(CrashHandlerContext &context)
 	IWbemClassObjectPtr pclsObj1, pclsObj2;
 	ULONG uReturn1 = WBEM_S_FALSE, uReturn2 = WBEM_S_FALSE;
 	_variant_t vtManuProp, vtModelProp, vtVersProp, vtBuildProp;
+	_com_error result(ERROR_SUCCESS);
 
-	if (com &&
-		SUCCEEDED(CoInitializeSecurity(nullptr, -1, nullptr, nullptr, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE, nullptr)) &&
-		SUCCEEDED(pLoc.CreateInstance(CLSID_WbemLocator)) &&
-		SUCCEEDED(pLoc->ConnectServer(_bstr_t(L"ROOT\\CIMV2"), nullptr, nullptr, 0, 0, 0, 0, &pSvc)) &&
-		SUCCEEDED(CoSetProxyBlanket(pSvc, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, nullptr, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE)) &&
-		SUCCEEDED(pSvc->ExecQuery(bstr_t("WQL"), bstr_t("SELECT * FROM Win32_ComputerSystem"), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator1)) &&
-		SUCCEEDED(pEnumerator1->Next(WBEM_INFINITE, 1, &pclsObj1, &uReturn1)) && uReturn1 > 0 &&
-		SUCCEEDED(pclsObj1->Get(L"Manufacturer", 0, &vtManuProp, nullptr, nullptr)) &&
-		SUCCEEDED(pclsObj1->Get(L"Model", 0, &vtModelProp, nullptr, nullptr)) &&
-		SUCCEEDED(pSvc->ExecQuery(bstr_t("WQL"), bstr_t("SELECT * FROM Win32_OperatingSystem"), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator2)) &&
-		SUCCEEDED(pEnumerator2->Next(WBEM_INFINITE, 1, &pclsObj2, &uReturn2)) && uReturn2 > 0 &&
-		SUCCEEDED(pclsObj2->Get(L"Version", 0, &vtVersProp, nullptr, nullptr)) &&
-		SUCCEEDED(pclsObj2->Get(L"BuildNumber", 0, &vtBuildProp, nullptr, nullptr))
-	) {
-		context.machineManufacturer = vtManuProp.bstrVal;
-		context.machineModel = vtModelProp.bstrVal;
-		context.windowsVersion = vtVersProp.bstrVal;
-		context.windowsBuild = vtBuildProp.bstrVal;
-	} else {
-		crash_log(L"Note: Failed grabbing the machine's data\n");
-	}
+	PullFailureIf(!com, "Failed to initialize COM in crash handler");
+	
+	result = _com_error(CoInitializeSecurity(nullptr, -1, nullptr, nullptr, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE, nullptr));
+	PullFailureIfNotSucceed("Initializing COM security");
+
+	result = _com_error(pLoc.CreateInstance(CLSID_WbemLocator));
+	PullFailureIfNotSucceed("Creating CLSID_WbemLocator instance");
+
+	result = _com_error(pLoc->ConnectServer(_bstr_t(L"ROOT\\CIMV2"), nullptr, nullptr, 0, 0, 0, 0, &pSvc));
+	PullFailureIfNotSucceed("Connecting Locator to ROOT\\CIMV2");
+
+	result = _com_error(CoSetProxyBlanket(pSvc, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, nullptr, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE));
+	PullFailureIfNotSucceed("Setting COM proxy blanket");
+
+	result = _com_error(pSvc->ExecQuery(bstr_t("WQL"), bstr_t("SELECT * FROM Win32_ComputerSystem"), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator1));
+	PullFailureIfNotSucceed("Executing SELECT * FROM Win32_ComputerSystem");
+
+	result = _com_error(pEnumerator1->Next(WBEM_INFINITE, 1, &pclsObj1, &uReturn1));
+	PullFailureIfNotSucceed("Stepping first enumerator");
+	PullFailureIf(uReturn1 <= 0, "No results in first enumerator for crash handler");
+
+	result = _com_error(pclsObj1->Get(L"Manufacturer", 0, &vtManuProp, nullptr, nullptr));
+	PullFailureIfNotSucceed("Get Manufacturer variant value from first enumerator");
+
+	result = _com_error(pclsObj1->Get(L"Model", 0, &vtModelProp, nullptr, nullptr));
+	PullFailureIfNotSucceed("Get Model variant value from first enumerator");
+
+	result = _com_error(pSvc->ExecQuery(bstr_t("WQL"), bstr_t("SELECT * FROM Win32_OperatingSystem"), WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &pEnumerator2));
+	PullFailureIfNotSucceed("Executing SELECT * FROM Win32_OperatingSystem");
+
+	result = _com_error(pEnumerator2->Next(WBEM_INFINITE, 1, &pclsObj2, &uReturn2));
+	PullFailureIfNotSucceed("Stepping second enumerator");
+	PullFailureIf(uReturn2 <= 0, "No results in second enumerator for crash handler");
+
+	result = _com_error(pclsObj2->Get(L"Version", 0, &vtVersProp, nullptr, nullptr));
+	PullFailureIfNotSucceed("Get Version variant value from second enumerator");
+
+	result = _com_error(pclsObj2->Get(L"BuildNumber", 0, &vtBuildProp, nullptr, nullptr));
+	PullFailureIfNotSucceed("Get BuildNumber variant value from second enumerator");
+
+	context.machineManufacturer = vtManuProp.bstrVal;
+	context.machineModel = vtModelProp.bstrVal;
+	context.windowsVersion = vtVersProp.bstrVal;
+	context.windowsBuild = vtBuildProp.bstrVal;
 }
 
 static void GenerateOrLoadInstallationId(CrashHandlerContext &context)
 {
 	context.installationId = L"00000000-0000-0000-0000-000000000000";
-
-	// Not using the functions in sys/sysreg.cpp because they're dangerously outdated
-	LSTATUS result = ERROR_SUCCESS;
-	unique_HKEY key;
-	DWORD valueLength = 0;
-
-	result = RegCreateKeyEx(HKEY_CURRENT_USER, L"SOFTWARE\\Playnet\\WWIIOL\\Config", 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &key, nullptr);
-	if (result != ERROR_SUCCESS) {
-		crash_log(L"Failed to open registry key for installation GUID, using none\n");
-		return;
-	}
-
-	result = RegQueryValueEx(key, L"InstallationGuid", nullptr, nullptr, nullptr, &valueLength);
-	if (result == ERROR_FILE_NOT_FOUND) {
+	// TODO: Improve sysregGetHKeyText() to restore distinguishing between "no such key" and other errors
+	if (!sysregGetHKeyText(HKEY_CURRENT_USER, REG_KEY_MAIN, L"InstallationGuid", context.installationId)) {
 		GUID newId;
 		wchar_t buffer[48] = {0};
 
-		crash_log(L"No registry value for this installation. Creating new GUID.\n");
+		dbugLog(_FLN, "No registry value for this installation. Creating new GUID.");
 		CoCreateGuid(&newId);
 		_snwprintf_s(buffer, _TRUNCATE, L"%08X-%04hX-%04hX-%04hX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX",
 			newId.Data1, newId.Data2, newId.Data3, (newId.Data4[0] << 8) | newId.Data4[1],
 			newId.Data4[2], newId.Data4[3], newId.Data4[4], newId.Data4[5], newId.Data4[6], newId.Data4[7]
 		);
-		result = RegSetValueEx(key, L"InstallationGuid", 0, REG_SZ, reinterpret_cast<BYTE *>(&buffer[0]), wcslen(buffer) * sizeof(wchar_t) + 1);
-		if (result == ERROR_SUCCESS) {
-			context.installationId = buffer;
-		} else {
-			crash_log(L"Failed to save new installation GUID to registry, not using\n");
+		if (!sysregSetHKeyText(HKEY_CURRENT_USER, REG_KEY_MAIN, L"InstallationGuid", buffer)) {
+			dbugLog(_FLM, "Failed to save new installation GUID to registry, not using");
 		}
-		return;
-	} else if (result != ERROR_SUCCESS) {
-		crash_log(L"Failed to get installation GUID key, using none\n");
+		context.installationId = buffer;
 		return;
 	}
-
-	std::unique_ptr<wchar_t[]> data = std::make_unique<wchar_t[]>(valueLength + 1); // This will overestimate because length is in bytes
-
-	result = RegQueryValueEx(key, L"InstallationGuid", nullptr, nullptr, reinterpret_cast<BYTE *>(data.get()), &valueLength);
-	if (result != ERROR_SUCCESS) {
-		crash_log(L"Failed to get installation GUID key value, using none\n");
-		return;
-	}
-	context.installationId = data.get();
 }
 
 #pragma endregion
@@ -553,7 +543,7 @@ static bool SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 	unique_HINTERNET conn = InternetConnect(base, HockeyApp_serverName.c_str(), HockeyApp_serverPort, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 0);
 
 	if (!conn) {
-		crash_log(L"Failed in InternetConnect(), can't send this crash log at this time.\n");
+		dbugLog(_FLW, "Failed in InternetConnect(), can't send the crash log %S at this time.", report.c_str());
 		return false;
 	}
 
@@ -569,7 +559,7 @@ static bool SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 	unique_HINTERNET req = HttpOpenRequestW(conn, L"POST", HockeyApp_apiPath.c_str(), nullptr, nullptr, acceptTypes, flags, 0);
 
 	if (!req) {
-		crash_log(L"Failed in HttpOpenRequest(), can't send this crash log at this time.\n");
+		dbugLog(_FLW, "Failed in HttpOpenRequest(), can't send the crash log %S at this time.", report.c_str());
 		return false;
 	}
 
@@ -579,10 +569,10 @@ static bool SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 	std::string multipartBoundary = "------------------" + GenerateRandomString<24>();
 	std::string contentTypeHeader = "Content-Type: multipart/form-data; boundary=" + multipartBoundary + "\r\n";
 	std::string requestBody;
-	if (!AppendRequestFile(requestBody, multipartBoundary, "log", report + L".container", true)) {
+	if (!AppendRequestFile(requestBody, multipartBoundary, "log", report + L".container", FileKind::Wide)) {
 		return false;
 	}
-	if (!AppendRequestFile(requestBody, multipartBoundary, "attachment0", report, false)) {
+	if (!AppendRequestFile(requestBody, multipartBoundary, "attachment0", report, FileKind::Binary)) {
 		return false;
 	}
 	AppendRequestParam(requestBody, multipartBoundary, "description", ""); // TODO fill these in from .metadata
@@ -592,22 +582,22 @@ static bool SendExistingReport(const unique_HINTERNET &base, const std::wstring 
 
 	// Use ASCII variant so we don't have to do an extra conversion on the multipart boundary just for the header here.
 	if (!HttpSendRequestA(req, contentTypeHeader.c_str(), -1, const_cast<char *>(requestBody.c_str()), requestBody.length())) {
-		crash_log(L"Failed in HttpSendRequest(), can't send this crash log at this time.\n");
+		dbugLog(_FLW, "Failed in HttpSendRequest(), can't send the crash log %S at this time.", report.c_str());
 		return false;
 	}
 
 	DWORD status_code = 0, status_code_len = sizeof(status_code);
 	if (!HttpQueryInfo(req, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &status_code, &status_code_len, 0)) {
-		crash_log(L"Failed in HttpQueryInfo(), can't send this crash log at this time.\n");
+		dbugLog(_FLW, "Failed in HttpQueryInfo(), can't send the crash log %S at this time.", report.c_str());
 		return false;
 	}
 
 	if (status_code != 201) { // Server responds with 201 Created on success
-		crash_log(L"Failed because status code %u is not 201, can't send this crash log at this time.\n", status_code);
+		dbugLog(_FLW, "Failed because status code %u is not 201, can't send the crash log %S at this time.", status_code, report.c_str());
 		return false;
 	}
 
-	crash_log(L"Successfully sent crash log.\n");
+	dbugLog(_FLN, "Successfully sent crash log %S", report.c_str());
 	return true;
 }
 #pragma endregion
@@ -625,7 +615,7 @@ static void SendExistingReports(const std::vector<std::pair<std::wstring, FILETI
 	unique_HINTERNET base = InternetOpen(HockeyApp_userAgent.c_str(), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 
 	if (!base) {
-		crash_log(L"Failed in InternetOpen(), can't send crash logs at this time.\n");
+		dbugLog(_FLW, "Failed in InternetOpen(), can't send crash logs at this time.");
 		return;
 	}
 
@@ -686,19 +676,19 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 
 	FindClose(hFile);
 	if (GetLastError() != ERROR_NO_MORE_FILES) {
-		crash_log(L"Warning: Failed enumerating crash files\n");
+		dbugLog(_FLW, "Failed enumerating crash files");
 		return;
 	}
 
 	for (const std::pair<std::wstring, std::pair<std::wstring, FILETIME>> &kv : rawDumpPaths) {
 		if (containerPaths.find(kv.first) == containerPaths.end() || metadataPaths.find(kv.first) == metadataPaths.end()) {
 			// Invalid log (missing auxiliary data). Remove it, ignoring errors.
-			crash_log(L"Note: Log missing its container or metadata: %s (%s)\n", kv.second.first.c_str(), kv.first.c_str());
+			dbugLog(_FLW, "Log missing its container or metadata: %S (%S)", kv.second.first.c_str(), kv.first.c_str());
 			_wunlink((dataPath + L"\\" + kv.second.first).c_str());
 			_wunlink((dataPath + L"\\" + kv.second.first + L".container").c_str());
 			_wunlink((dataPath + L"\\" + kv.second.first + L".metadata").c_str());
 		} else {
-			crash_log(L"Valid log (has its auxiliaries): %s (%s)\n", kv.second.first.c_str(), kv.first.c_str());
+			dbugLog(_FLI, "Valid log (has its auxiliaries): %S (%S)", kv.second.first.c_str(), kv.first.c_str());
 			possiblyValidReports.push_back({ dataPath + L"\\" + kv.second.first, kv.second.second });
 			containerPaths.erase(kv.first);
 			metadataPaths.erase(kv.first);
@@ -706,12 +696,16 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 	}
 	
 	// Any items left in rawDumpPaths or metadataPaths are orphans (not matching any container)
-	crash_log(L"Removing %u leftover metadata files\n", metadataPaths.size());
+	dbugLog(_FLI, "Removing %u leftover metadata files", metadataPaths.size());
 	for (const std::pair<std::wstring, std::wstring> &kv : metadataPaths) { _wunlink((dataPath + L"\\" + kv.second).c_str()); }
-	crash_log(L"Removing %u leftover container files\n", containerPaths.size());
+	dbugLog(_FLI, "Removing %u leftover container files", containerPaths.size());
 	for (const std::pair<std::wstring, std::wstring> &kv : containerPaths) { _wunlink((dataPath + L"\\" + kv.second).c_str()); }
 
+#if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
+	std::thread(SendExistingReports, std::move(possiblyValidReports)).join();
+#else
 	std::thread(SendExistingReports, std::move(possiblyValidReports)).detach();
+#endif
 }
 
 #pragma endregion
@@ -725,19 +719,6 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 
 void InstallCrashHandler()
 {
-#ifdef DEBUG_WW2
-	// Normally this will be done by WinMain() if WantedConsole is set, but for the crash
-	// handler's logging system, that happens too late. If WantedConsole was set,
-	// AllocConsole() will fail harmlessly later. In non-debug builds, the logging from the
-	// crash handler will never be interesting or desired.
-	AllocConsole();
-	freopen("CONOUT$", "wb", stdout);
-	freopen("CONOUT$", "wb", stderr);
-#endif
-
-	// Note: SHGetKnownFolderPath() is not available before Vista. If XP support is ever added
-	// back in, this will need to be replaced with the SHGetFolderPath() call shown below,
-	// preferably using GetProcAddress() to call the newer routine instead when available.
 	wchar_t *basePath = nullptr;
 	HRESULT result = SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_SIMPLE_IDLIST | KF_FLAG_CREATE, nullptr, &basePath);
 
@@ -755,7 +736,6 @@ void InstallCrashHandler()
 			dataPath += L"\\" + component;
 			CreateDirectory(dataPath.c_str(), nullptr); // we don't care if this fails
 		}
-		//dataPath += L"\\Playnet\\World War II Online\\Crash Logs";
 
 		// Allocate the context for the crash handler.
 		gCrashContext = std::make_unique<CrashHandlerContext>();
@@ -772,12 +752,11 @@ void InstallCrashHandler()
 			gCrashContext.get(), // Callback context (pull the raw pointer)
 			google_breakpad::ExceptionHandler::HANDLER_ALL // Handler types (we want all types)
 		));
-		crash_log(L"Installed Breakpad exception handler, now trapping crashes. Log path is %s\n", dataPath.c_str());
+		dbugLog(_FLN, "Installed Breakpad exception handler, now trapping crashes. Log path is %S", dataPath.c_str());
 
 		ProcessExistingReports(dataPath);
-	}
-	else {
-		crash_log(L"Failed to find %APPDATA%\\Roaming, crash handler not installed.\n");
+	} else {
+		dbugLog(_FLM, "Failed to find %APPDATA%\\Roaming, crash handler not installed.");
 	}
 }
 

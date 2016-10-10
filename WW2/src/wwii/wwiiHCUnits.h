@@ -64,12 +64,7 @@ public:
 
 public:
 	// Get the homeCPID by unpacking from an action object
-	void setHomeCPID(const FULL_OBJ_ID newHomeCPID)
-#if defined(CMDLINE_CLIENT)
-	{	m_homeCPID = newHomeCPID; }
-#else
-	;
-#endif
+	void setHomeCPID(const FULL_OBJ_ID newHomeCPID);
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 //tolua_begin
 
@@ -102,7 +97,7 @@ public:
 	void getDescriptor(std::string& into) const
 	{
 		into = m_name;
-#if defined(DEV_BUILD) || platBuild == TEUL_SERVER
+#if defined(DEV_BUILD) || platBuild == BUILD_SERVER
 		into += " (";
 		into += m_callsign;
 		into += ")";
@@ -204,13 +199,13 @@ public:
 	LOGICAL			m_listStart;						// True if this is the start of list
 	LOGICAL			m_listEnd;							// True if this is the end of the list
 	UCHAR			m_count;							// Number of units described
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	HCUnit*			m_units[MAX_HCUNITS_PER_LIST];		// Pointers to units
 #else
 	HCUnit			m_units[MAX_HCUNITS_PER_LIST];		// Array of units
 #endif
 };
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 extern bool wwiiReadHCUnits();
 #endif

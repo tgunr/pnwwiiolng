@@ -205,26 +205,23 @@ bool luaRunScript(const char* script, lua_State* L)
 	}
 
 	// load up the script
-	if(fioAccess(path.c_str()))
-	{
-		int fd = fioOpen(path.c_str());
-		if(fd > -1)
-		{
-			size_t size = fioFileSize(path.c_str());
-			if(size > 0)
-			{
-				char* buffer = new char[size+1];
-				buffer[size] = '\0';
+    int fd = fioOpen(path.c_str());
+    if(fd > -1)
+    {
+        size_t size = fioFileSize(path.c_str());
+        if(size > 0)
+        {
+            char* buffer = new char[size+1];
+            buffer[size] = '\0';
 
-				if(fioRead(fd, buffer, size) == size)
-					success = luaRunObject(path.c_str(), buffer, L);
+            if(fioRead(fd, buffer, size) == size)
+                success = luaRunObject(path.c_str(), buffer, L);
 
-				delete [] buffer;
-			}
+            delete [] buffer;
+        }
 
-			fioClose(fd);
-		}
-	}
+        fioClose(fd);
+    }
 
 	if(success)
 	{

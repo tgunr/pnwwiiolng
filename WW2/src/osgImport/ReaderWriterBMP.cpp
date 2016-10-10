@@ -130,8 +130,8 @@ static unsigned char* bmp_load(int fd,
                                unsigned int transparentColor)
 {
     // actual file size
-    size_t actFileSize = fioSeek(fd, 0, fioSEEK_END);
-    fioSeek(fd, 0, fioSEEK_SET);
+    size_t actFileSize = fioSeek(fd, 0, SEEK_END);
+    fioSeek(fd, 0, SEEK_SET);
 
     bool swap;
 
@@ -316,12 +316,12 @@ static unsigned char* bmp_load(int fd,
         }
     }
 
-    size_t Where = fioSeek(fd, 0, fioSEEK_CUR);
+    size_t Where = fioSeek(fd, 0, SEEK_CUR);
     if (Where != bmp.imageOffset)
     {
         // this can happen because we don't fully parse v4/v5 headers
         Write_Debug("BMP streampos out-of-sync where = %d imageOffset = %d", Where, bmp.imageOffset);
-        fioSeek(fd, bmp.imageOffset, fioSEEK_SET);
+        fioSeek(fd, bmp.imageOffset, SEEK_SET);
     }
 
     /*
@@ -467,16 +467,18 @@ Image* ReadBMPFile(const std::string& name, unsigned int transparentColor)
     int s, t;
     int internalFormat;
 
-    Write_Log(LOG_TEXTURE, LOG_INFO, "[ReadBMPFile] Reading image %s", name.c_str());
-
     int fd = -1;
     fd = fioOpen(name.c_str());
 
     if(fd < 0)
     {
-        Write_Debug("[ReadBMPFile] cannot open %s", name.c_str());
+        if (errno != ENOENT) {
+            Write_Debug("[ReadBMPFile] cannot open %s", name.c_str());
+        }
         return nullptr;
     }
+
+    Write_Log(LOG_TEXTURE, LOG_INFO, "[ReadBMPFile] Reading image %s", name.c_str());
 
     unsigned char* imageData = bmp_load(fd, s, t, internalFormat, transparentColor);
 
@@ -518,14 +520,8 @@ Image* ReadBMPFile(const std::string& name, unsigned int transparentColor)
     std::string alphapath = name.substr(0, name.length() - 4); //-4 = ".ext"
 	alphapath += "_alpha.bmp";
 
-    if(!fioAccess(alphapath.c_str()))
-        return img.release();
-
     fd = fioOpen(alphapath.c_str());
-
-    if(fd < 0)
-    {
-        Write_Debug("[ReadBMPFile] cannot open %s", alphapath.c_str());
+    if(fd < 0) {
         return img.release();
     }
 

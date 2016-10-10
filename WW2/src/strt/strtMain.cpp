@@ -23,7 +23,6 @@
 #include "strt/strtHostDB.h"
 #include "wwii/wwiiConfig.h"
 //#include "cnvy/cnvyMain.h"
-#include "versionNo.h"
 #include "strt/strtCPClass.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtFacilityStruct.h"

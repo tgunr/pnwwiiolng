@@ -1,4 +1,3 @@
-#pragma once
 // Created: Tue Jan 30 12:13:33 2001
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -6,6 +5,8 @@
 // compiled library.
 //
 // Originating Programmer: Brian "Stick" Duelm
+
+#pragma once
 
 extern FULL_OBJ_ID* populateFullObjID(FULL_OBJ_ID* foid, SINT32 sx, SINT32 sy, struct REL_OBJ_ID roid);
 

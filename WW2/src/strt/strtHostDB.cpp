@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "strt/strtDB.h"
 #include "strt/strtHostDB.h"
 #include "wwii/wwiiThreads.h"
@@ -427,7 +425,7 @@ strtdbPopulateVehTypesTable()
 								, weap.name
 								, spec.asUINT32()
 								);
-		dbugLog(_FLIB, "%s", buf);
+		dbugLog(_FLI, "%s", buf);
 		inserts += buf;
 
 		snprintf(buf, _BUF_SIZE, (needInsert ? ",%u" : "%u"), spec.asUINT32());

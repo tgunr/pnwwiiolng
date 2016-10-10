@@ -16,7 +16,7 @@
 #include "wwii/wwiiOpinionPoll.h"
 #include "fio/fio.h"
 
-#include "client_revision.h"
+#include "build_info.hpp"
 
 // WWIIOL-specific.
 #include "wwii/wwiiHCUnits.h"
@@ -28,9 +28,6 @@
 #include "map/mapSwingMeter.h"
 #include "chat/chatRecruiterList.h"
 #include "chat/chatMissionInviteMsg.h"
-
-const unsigned int WWII::gitCommitNo = GIT_COMMIT_NO;
-const char* const WWII::gitCommitStr = GIT_COMMIT_STR;
 
 namespace Chat
 {

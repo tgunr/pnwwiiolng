@@ -429,9 +429,6 @@ static void _buzzer()
 void uiChatPrintLineMessageLoc(int loc, int prefix, int message
 								, const wchar_t* const arg1, const wchar_t* const arg2, const wchar_t* const arg3, const wchar_t* const arg4, const wchar_t* const arg5, const wchar_t* const arg6)
 {
-	if(prefix == LSTR_BETA && gRegion == 5) // no beta messages for chinese, requested by peter
-		return;
-
 	unsigned int color = colorGREENALPHA;	// Default color
 	int side = 0;
 	int icons[CHATICON_MAX] = {-1,-1,-1};

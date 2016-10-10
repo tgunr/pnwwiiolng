@@ -4,13 +4,9 @@
 
 #if platOS == OS_WIN32
 
-#define platBuild TEUL_CLIENT
-
 // Windows defines
 #define OPENGL3D	1
 #define WIN32_LEAN_AND_MEAN
-#define FRONT_END
-#define _CRT_RAND_S
 #define _GDI32_
 
 #define NO_DEBUG_WRITE
@@ -138,7 +134,8 @@ using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #include "pi/pi.h"
 
-#endif
+extern UINT64 GetMicroSeconds(void);
 
 #endif
 
+#endif

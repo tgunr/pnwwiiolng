@@ -404,15 +404,12 @@ mmProcessPostAccept(Player& player, const MM_POST_ACCEPT& post, UINT32 acceptTyp
 	player.m_weapOrigin = post.facility;
 	player.m_wantMobileSpawn = false;
 
-	if ( g_logDebug )
-	{
-		FacilityStruct* facility = strtGetFacility(post.facility);
-		dbugLog(_FLD, "t:%d p:%u c:%s reserved %s#%d [" PRF_WEAPON_SPEC "] at %s [" PRF_FULL_OBJ_ID "]"
-						, player.teulIndex(), player.playerID(), player.callsign()
-						, weapPrintName(player.weapon().spec), post.weaponSerial.serial, PRA_WEAPON_SPEC(player.weapon().spec)
-						, facility->name, PRA_FULL_OBJ_ID(post.facility)
-						);
-	}
+    FacilityStruct* facility = strtGetFacility(post.facility);
+    dbugLog(_FLD, "t:%d p:%u c:%s reserved %s#%d [" PRF_WEAPON_SPEC "] at %s [" PRF_FULL_OBJ_ID "]"
+                    , player.teulIndex(), player.playerID(), player.callsign()
+                    , weapPrintName(player.weapon().spec), post.weaponSerial.serial, PRA_WEAPON_SPEC(player.weapon().spec)
+                    , facility->name, PRA_FULL_OBJ_ID(post.facility)
+                    );
 
 	if ( post.multicrew )
 		reservationType = MM_VEH_WAITING_CREW;

@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "host/hostFraming.h"
 #include "host/host.h"
 #include "host/hostPlayer.h"
@@ -103,8 +101,7 @@ Player::setFramingMode(UINT16 newMode)
 	if ( vehicle != nullptr )
 	{
 		vehicle->selectBestFramingMode();
-		if ( g_logDebug )
-			dbugLog(_FLD, "t:%d p:%u c:%s v:%u best framing mode %u", teulIndex(), playerID(), callsign(), vehicle->index, vehicle->framingMode);
+        dbugLog(_FLD, "t:%d p:%u c:%s v:%u best framing mode %u", teulIndex(), playerID(), callsign(), vehicle->index, vehicle->framingMode);
 	}
 }
 

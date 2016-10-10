@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "include/mydbQuery.h"
 #include <mysql.h>
 #include "teul/teulTime.h"
@@ -69,10 +67,7 @@ DBThreadQuery::Execute(UINT32 threadNo, DB::handle_t* conn, DBThread::DBNo* last
 	// statement string, we need to make our own copy of the statement.
 	const char* const statement = _skipExclamationInStatement(Statement());
 
-#ifdef DEV_BUILD
-	if ( g_logDebug )
-		threadLog(_FLD, "dbq:%u db:[%s] execute %s: q:[%s]", threadNo, dbName[m_db], Name(), statement);
-#endif
+    threadLog(_FLD, "dbq:%u db:[%s] execute %s: q:[%s]", threadNo, dbName[m_db], Name(), statement);
 
 	bool successful = false;
 

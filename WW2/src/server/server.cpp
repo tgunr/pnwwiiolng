@@ -9,13 +9,10 @@
 
 #include <queue>
 #include <atomic>
-
 #if platOS == OS_LINUX
 #include <sys/prctl.h>
 #endif
-
-#include "versionNo.h"
-
+#include "build_info.hpp"
 #include "mem/mem.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
@@ -431,7 +428,7 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 	if ( result.second == true && server.stats.address == Server::myServerInfo.stats.address )
 	{
 		server.stats.addPlayer();
-		dbugLog(_FLWB, " numPlayers now %d, m_players size %" PRSizeT "", server.stats.numPlayers(), server.m_players.size());
+		dbugLog(_FLW, " numPlayers now %d, m_players size %" PRSizeT "", server.stats.numPlayers(), server.m_players.size());
 	}
 
 	return retval;
@@ -742,7 +739,7 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 
 	if (PN_UNLIKELY(_createPersonaFn == nullptr))
 	{
-		dbugLog(_FLAS, "some brain surgeon didn't install the _create persona handler");
+		dbugLog(_FLA, "some brain surgeon didn't install the _create persona handler");
 		return nullptr;
 	}
 
@@ -932,8 +929,6 @@ serverEnableDebugWebServer(SERVER_TYPE serverType)
 //////////////////////////////////////////////////////////////////////
 // Simple URL to test the server is running.
 
-#include "revision.h"
-
 static void
 _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 {
@@ -943,7 +938,7 @@ _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 	teulGetAddress(stats.address, ip, sizeof(ip));
 
 	char buffer[1024];
-	const int len = sprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"" REPOSITORY_INFO "\"}\r\n"
+	const int len = sprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s\"}\r\n"
 						, Teul::GetAppName()
 						, ip
 						, stats.arenaID
@@ -951,6 +946,7 @@ _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 						, stats.status
 						, stats.maxPlayers()
 						, stats.numPlayers()
+                        , PN_git_commitish_string
 						);
 	send(fd, buffer, len, 0);
 }
@@ -1572,20 +1568,16 @@ serverGetAuthIP()
 #if PN_DISABLE_AUTH
 	return 0;
 #else
-	if ( useAuthServer == false )
+	if ( !useAuthServer )
 		return 0;
 
 	const char* authName = cv_authHost.GetString();
 	if ( !authName || !*authName )
 		LogAbort("Missing AUTH_ADDRESS");
 
-	UINT32 address = Teul::GetSingleIP(authName);
-	if ( address == 0 )
-	{
-		LogAbort("Unable to resolve auth address '%s'", authName);
-		/* ABORTED */
-	}
-
+	UINT32 address = Teul::GetSingleIP(authName);	// Returns malloc'd pointer!
+	
+	ABORT_IF_EX(address == 0, "Unable to resolve auth address '%s'", authName);
 	return address;
 #endif
 }

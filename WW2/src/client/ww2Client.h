@@ -127,8 +127,8 @@ public:
 	virtual ~Client();
 
 	// Login throws ClientNetError if there's a problem
-	int Login(const char* hostname, short port=0, bool wantchat=false);
-	int Login(unsigned int host, short port=0, bool wantchat=false);
+	int Login(const char* hostname, UINT16 port=0, bool wantchat=false);
+	int Login(unsigned int host, UINT16 port=0, bool wantchat=false);
 
 	int Logout();
 
@@ -149,7 +149,7 @@ public:
 
 	// set our host connection player login info; if you don't call this
 	// the client gets inited with whats in _defaultPlayerIdent
-	void SetPlayerIdent(int playerID, int otp, unsigned int appVersion);
+	void SetPlayerIdent(playerid_t playerID, UINT32 otp, unsigned int appVersion);
 	void SetCellIdent(int hostIP, int port);
 
 	// updates

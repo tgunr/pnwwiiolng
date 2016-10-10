@@ -79,8 +79,8 @@ static GameClient* _playerclient;
 	throws ClientNetError
 *************************************************************************************************/
 
-int GameClientLogin(unsigned int host, int playerID, int otp,
-							unsigned int appVersion, short port)
+int GameClientLogin(unsigned int host, playerid_t playerID, UINT32 otp,
+							unsigned int appVersion, UINT16 port)
 {
 #if platOS == OS_MACOS
 	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);

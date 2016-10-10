@@ -681,50 +681,9 @@ static LOGICAL _ReadGunfileData(GSCommandList * GSCL,SINT8 * FileName)
     std::string str = FileName;
     std::replace(str.begin(), str.end(), '\\', '/');
 
-    bool usedirectory = false;
     int state = fioQuery();
 
-#ifdef BETA_RELEASE
-
-#define PATH "gunsights/"
-
-    int pos =  str.find_last_of('/'); // filename
-    pos = str.find_last_of('/', pos - 1); // directory
-
-    std::string name;
-
-    if(pos != std::string::npos)
-    {
-        name = str.substr(pos + 1, str.length() - pos);
-    }
-
-    if(!name.empty())
-    {
-        std::string path = PATH;
-        path += name;
-
-        // Force directory reading
-        fioSet(ISDIRECTORY);
-
-        // Test if local file is present for beta testers
-        if(fioAccess(path.c_str()))
-        {
-            str = path;
-            usedirectory = true;
-        }
-
-        fioSet(state);
-    }
-
-#endif
-
-    if(usedirectory)
-        fioSet(ISDIRECTORY);
-
     GunFile = fioOpen(str.c_str());
-
-    fioSet(state);
-
 	if (GunFile == -1)
 	{
 		Write_Debug("Failed attempt to read gunsight file %s",FileName);

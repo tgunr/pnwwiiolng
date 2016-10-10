@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"					// For version dependent code
-
 #include "chat/chatLStringIDs.h"
 #include "host/hostPlayers.h"			// for g_players
 #include "map/mapPlayer.h"

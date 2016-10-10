@@ -246,7 +246,7 @@ wwiiConfigSetINT(UINT32* data, const char* const source, UINT64 max)
 {
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 
@@ -271,7 +271,7 @@ wwiiConfigSetSINT(UINT16* data, const char* const source, UINT64 max)
 	UINT32 value;
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 
@@ -301,7 +301,7 @@ wwiiConfigSetFLOAT(FLOAT32* data, const char* const source, UINT64 /*max*/)
 {
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 
@@ -323,13 +323,13 @@ wwiiConfigSetSTRING(char* data, const char* const source, UINT64 max)
 {
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 
 	if ( max == 0 )
 	{
-		dbugLog(_FLAS, "supplied 0 as string maxlength");
+		dbugLog(_FLA, "supplied 0 as string maxlength");
 		return false;
 	}
 
@@ -348,7 +348,7 @@ wwiiConfigSetBOOL(UCHAR* data, const char* const source, UINT64 /*max*/)
 {
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 
@@ -367,7 +367,7 @@ wwiiConfigSetBYTE(UCHAR* data, const char* const source, UINT64 max)
 {
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 

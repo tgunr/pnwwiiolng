@@ -47,11 +47,7 @@
 
 #define MAX_DRAW_PRIMITIVES  1000
 
-#if platOS == OS_MACOS
-    #define INLINE inline
-#else
-    #define INLINE __forceinline
-#endif
+#define INLINE inline
 
 #include <vector>
 

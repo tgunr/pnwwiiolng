@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include <set>
 
 #include "chat/chatBrigadeMove.h"
@@ -755,7 +753,7 @@ StratHCUnit::findFallback() const
 
 	if ( offMap() )
 	{
-		dbugLog(_FLIB, "offmaps don't fallback");
+		dbugLog(_FLI, "offmaps don't fallback");
 		return nullptr;
 	}
 
@@ -766,7 +764,7 @@ StratHCUnit::findFallback() const
 			&& canDeployTo(fallbackCP())
 		)
 	{
-		dbugLog(_FLIB, "fallback CP %s is valid", fallbackCP()->name);
+		dbugLog(_FLI, "fallback CP %s is valid", fallbackCP()->name);
 		return fallbackCP();
 	}
 
@@ -785,19 +783,19 @@ StratHCUnit::findFallback() const
 		link = *it;
 		CPStruct* cp = link->endDepot->cp;
 
-		dbugLog(_FLIB, "%s? ", cp->name);
+		dbugLog(_FLI, "%s? ", cp->name);
 
 		// Priority 2: DivHQ
 		if ( parentCP == cp )
 		{
-			dbugLog(_FLIB, "has division!");
+			dbugLog(_FLI, "has division!");
 			return parentCP;
 		}
 
 		const bool isSupplied = cp->isSupplied();
 		if ( hadSupply == true && isSupplied == false )
 		{
-			dbugLog(_FLIB, "<supply ");
+			dbugLog(_FLI, "<supply ");
 			continue;
 		}
 
@@ -805,7 +803,7 @@ StratHCUnit::findFallback() const
 		BRIGADE_MOVE_RESULT bmrResult = deployPermission(cp, false);
 		if ( BMR_APPROVED != bmrResult )
 		{
-			dbugLog(_FLIB, "Xrules[%u] ", bmrResult);
+			dbugLog(_FLI, "Xrules[%u] ", bmrResult);
 			continue;
 		}
 
@@ -814,16 +812,16 @@ StratHCUnit::findFallback() const
 		// Priority 3: DivHQ + 1
 		if ( false == divisionLink && true == hadDivisionLink )
 		{
-			dbugLog(_FLIB, "no-divlink ");
+			dbugLog(_FLI, "no-divlink ");
 			continue;
 		}
 
-		dbugLog(_FLIB, "%d[%c] ", link->distance, (divisionLink ? 'Y' : 'n'));
+		dbugLog(_FLI, "%d[%c] ", link->distance, (divisionLink ? 'Y' : 'n'));
 
 		// Show less interest in contested towns when an uncontested town is available.
 		if ( candidate != nullptr && true == cp->isContested() && false == candidate->endDepot->cp->isContested() )
 		{
-			dbugLog(_FLIB, "<contested ");
+			dbugLog(_FLI, "<contested ");
 			continue;
 		}
 
@@ -832,7 +830,7 @@ StratHCUnit::findFallback() const
 		// brigade or it is towards a friendly brigade.
 		if ( nullptr == candidate || (divisionLink && !hadDivisionLink) || (isSupplied && !hadSupply) || _preferableFallback(candidate, link) )
 		{
-			dbugLog(_FLIB, "candidate ");
+			dbugLog(_FLI, "candidate ");
 			candidate = link;
 			hadDivisionLink = divisionLink;
 			hadSupply = isSupplied;
@@ -841,11 +839,11 @@ StratHCUnit::findFallback() const
 
 	if ( candidate == nullptr )
 	{
-		dbugLog(_FLIB, "no fallback options");
+		dbugLog(_FLI, "no fallback options");
 		return nullptr;
 	}
 
-	dbugLog(_FLIB, "Using %s", candidate->endDepot->cp->name);
+	dbugLog(_FLI, "Using %s", candidate->endDepot->cp->name);
 
 	return candidate->endDepot->cp;
 }

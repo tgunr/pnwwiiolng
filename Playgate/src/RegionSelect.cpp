@@ -207,7 +207,7 @@ static bool _lookupAuthHost()
 	// Copy the list to a permanent home
 	dbugLog(_FLI, "lookup(%s) gave", g_authHostName);
 	for ( auto ip : g_authHosts ) {
-		dbugLog(_FLIB, " %s", teulGetAddress(ip));
+		dbugLog(_FLI, " %s", teulGetAddress(ip));
 	}
 
 	return true;

@@ -29,8 +29,6 @@ static std::queue<SOUNDCACHE*> g_sndFree;
 using SoundCacheHash = std::unordered_map<std::string, SOUNDCACHE*>;
 static SoundCacheHash g_hashSnd;
 
-static LOGICAL g_noLog = FALSE;
-
 #if !defined(XAUDIO)
 ////////////////////////////////////////////////////////
 // Function: GetNewSound
@@ -210,17 +208,14 @@ static SOUNDCACHE* _preloadSoundCache(const SCHAR* name)
 
 	if(!sndsPlatformLoadSound(&sc->theSound))
 	{
-        Write_Log(LOG_SOUND, LOG_WARN, "** FAILED ** to load %s", name);
+        Write_Log(LOG_SOUND, LOG_WARN, "FAILED to load %s", name);
 		FreeSound(sc);
 		return FALSE;
 	}
 
     g_hashSnd.insert(std::make_pair(name, sc));
 
-    if(!g_noLog)
-    {
-        Write_Log(LOG_SOUND, LOG_INFO, "** PLEASE CACHE %s **", name);
-    }
+    //Write_Log(LOG_SOUND, LOG_INFO, "** PLEASE CACHE %s **", name);
 
     return sc;
 #endif
@@ -258,22 +253,13 @@ LOGICAL sndsPreloadSoundCache(const SCHAR* name, float maxattenuation)
     if(pos != -1)
     {
         str.replace(pos, 9, "_trail.wav");
-
-        if(fioAccess(str.c_str()))
-        {
-            if(!AudioLoadSound(str))
-                return FALSE;
-        }
+        AudioLoadSound(str);
     }
 
     return TRUE;
 #else
 
-    g_noLog = TRUE;
-
     SOUNDCACHE* sc1 = _preloadSoundCache(str.c_str());
-
-    g_noLog = FALSE;
 
     if(!sc1) return FALSE;
 
@@ -281,48 +267,8 @@ LOGICAL sndsPreloadSoundCache(const SCHAR* name, float maxattenuation)
     SINT32 pos = str.find(".wav");
     str.replace(pos, 9, "_trail.wav");
 
-    LOGICAL found = FALSE;
-
-    // For external debuggin
-#ifdef BETA_RELEASE
-    // Check if there is a sound directory first
-    SINT32 fioSwitch = fioQuery();
-
-    if(fioSwitch == ISARCHIVE)
-    {
-        fioSet(ISDIRECTORY);
-
-        found = fioAccess(str.c_str());
-
-        if(!found)
-        {
-            fioSet(ISARCHIVE);
-            found = fioAccess(str.c_str());
-        }
-    }
-    else
-    {
-        found = fioAccess(str.c_str());
-    }
-
-    fioSet(fioSwitch);
-
-#else
-    found = fioAccess(str.c_str());
-#endif
-
-    if(!found)
-        return TRUE;
-
-    g_noLog = TRUE;
-
-    SOUNDCACHE* sc2 = _preloadSoundCache(str.c_str());
-
-    g_noLog = FALSE;
-
-    if(!sc2) return FALSE;
-
-    sc1->theSound.hasTrail = true;
+    SOUNDCACHE *sc2 = _preloadSoundCache(str.c_str());
+    sc1->theSound.hasTrail = (sc2 != nullptr);
 
     return TRUE;
 #endif // XAUDIO

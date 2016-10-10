@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "teul/teulKit.h"
 #include "wwii/wwiiPack.h"
 #include "chat/chatBrigadeMove.h"
@@ -91,7 +89,7 @@ chatUpdateHCUnitLocations()
 			continue;
 		if ( hculUpdate.send(player->teulIndex()) < 0 )
 		{
-			betaLog(_FLIB, "<FAIL");
+			betaLog(_FLI, "<FAIL");
 		}
 	}
 

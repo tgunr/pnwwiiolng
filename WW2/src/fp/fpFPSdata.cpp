@@ -21,8 +21,6 @@
 
 #include "xml/XMLLoader2.h"
 
-#include "sys/sysWinISO.h"
-
 #define	FPS_DIR		"FPS\\"
 
 #define FPS_DATA_DIR		"vehicles\\ground\\groundman\\"
@@ -310,6 +308,7 @@ static void _fpFPSReadVisualLoadouts();
 
 static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 {
+    bool hasWarned = false;
 	std::string weapFileName(FPS_WEAP_DATA_DIR);
 	weapFileName += filename;
 
@@ -535,29 +534,17 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 		else if (stricmp(buf, "incConvDists") == 0)
 			fpsWeapons[weapon].incSightDists = (SINT32) atol (varData);
 
-		/*
-		else if (stricmp(buf, "convDist1") == 0)
-			fpsWeapons[weapon].sightDists[0] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist2") == 0)
-			fpsWeapons[weapon].sightDists[1] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist3") == 0)
-			fpsWeapons[weapon].sightDists[2] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist4") == 0)
-			fpsWeapons[weapon].sightDists[3] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist5") == 0)
-			fpsWeapons[weapon].sightDists[4] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist6") == 0)
-			fpsWeapons[weapon].sightDists[5] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist7") == 0)
-			fpsWeapons[weapon].sightDists[6] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist8") == 0)
-			fpsWeapons[weapon].sightDists[7] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist9") == 0)
-			fpsWeapons[weapon].sightDists[8] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist10") == 0)
-			fpsWeapons[weapon].sightDists[9] = (FLOAT32) atof (varData);
-		*/
-
+		else if (stricmp(buf, "convDist1") == 0 || stricmp(buf, "convDist2") == 0 ||
+                 stricmp(buf, "convDist3") == 0 || stricmp(buf, "convDist4") == 0 ||
+                 stricmp(buf, "convDist5") == 0 || stricmp(buf, "convDist6") == 0 ||
+                 stricmp(buf, "convDist7") == 0 || stricmp(buf, "convDist8") == 0 ||
+                 stricmp(buf, "convDist9") == 0 || stricmp(buf, "convDist10") == 0) {
+            if (!hasWarned) {
+                Write_Log(LOG_FPS, LOG_WARN, "Data file %s is still using old convDistN, consider updating with startConvDists/incConvDists", filename);
+                hasWarned = true;
+            }
+        }
+        
 		else if (stricmp(buf, "dryFireSound") == 0)
 			fpsWeapons[weapon].dryFireSound = (SCHAR*) strpool (varData);
 		else if (stricmp(buf, "dryFireSoundLength") == 0)

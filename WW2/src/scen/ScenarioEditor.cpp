@@ -43,31 +43,24 @@ bool TafatEditor::TafatScript::Load(std::string& path)
 	std::string fullPath = TAFAT_SCRIPT_RPATH;
 	fullPath += path;
 
-	if(fioAccess(fullPath.c_str()))
-	{
-		int fd = fioOpen(fullPath.c_str());
-		if(fd > -1)
-		{
-			size_t size = fioFileSize(fullPath.c_str());
-			if(size > 0)
-			{
-				char* buffer = new char[size+1];
-				buffer[size] = '\0';
+    int fd = fioOpen(fullPath.c_str());
+    if(fd > -1)
+    {
+        size_t size = fioFileSize(fullPath.c_str());
+        if(size > 0)
+        {
+            std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size+1);
+            buffer[size] = '\0';
 
-				if(fioRead(fd, buffer, size) == size)
-				{
-					filename = path;
-					script = buffer;
-					loaded = true;
-				}
-
-				delete [] buffer;
-			}
-
-			fioClose(fd);
-		}
-	}
-
+            if(fioRead(fd, buffer.get(), size) == size)
+            {
+                filename = path;
+                script = buffer.get();
+                loaded = true;
+            }
+        }
+        fioClose(fd);
+    }
 	return loaded;
 }
 

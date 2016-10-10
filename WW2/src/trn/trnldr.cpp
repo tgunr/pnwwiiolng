@@ -448,28 +448,6 @@ SINT32	i;
 		return(FALSE);
 	}
 
-#ifdef USE_VSS
-	{
-	SINT8		work[512], curpath[_MAX_PATH], workpath[_MAX_PATH], batchfile[_MAX_PATH];
-
-		GetCurrentDirectory(_MAX_PATH, curpath);
-		sprintf(work, "%s", PREPATH);
-		strcpy(work, &work[1]);
-		sprintf(workpath, "%s%s%s", curpath, work, TERRAIN_PREPATH);
-		SetCurrentDirectory(workpath);
-
-		strcpy(batchfile, ".\\");
-		strcat(batchfile, VSS_SUBDIRECTORY);
-
-		if (OS_ACCESS(batchfile, 00) != 0)
-		{
-			OS_MKDIR(batchfile);
-		}
-
-		SetCurrentDirectory(curpath);
-	}
-#endif
-
 	return(TRUE);
 }
 
@@ -853,7 +831,7 @@ STRT_DTL_HEADER		sdh;
 
 	ReadingSDM = TRUE;
 
-#if !defined(TERRAIN_EDITOR) && RELEASE_CLIENT == 0
+#if RELEASE_CLIENT == 0
 
 	if (hfile == -1)
 	{
@@ -1434,7 +1412,7 @@ SINT32		count;
 
 	if (count == 0)
 	{
-		Write_Debug("Texture index was not found: %d", txndx);
+		//Write_Debug("Texture index was not found: %d", txndx);
 	}
 
 	return(count);

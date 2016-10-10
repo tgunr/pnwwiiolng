@@ -123,9 +123,3 @@ logTimerEndExtMacro(x)
 #define logTimerCallVoid(x)  x()
 #define logTimerCallArgs(x, ...) x(__VA_ARGS__)
 #endif //#ifdef USE_LOG_TIMER
-
-
-#ifdef BETA_RELEASE
-extern void logInitProfiling(const char* const profileName, FLOAT32 profilingDuration);
-extern void logUpdateProfiling();
-#endif // BETA_RELEASE

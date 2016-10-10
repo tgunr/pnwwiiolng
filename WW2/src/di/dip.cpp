@@ -35,7 +35,6 @@ static int numjoysticks = 0;
 
 
 static UINT32 DIDeviceDetails(UINT32 dwDevType);
-extern BOOL GetWindowsVersion(DWORD* MajorVersion, DWORD* MinorVersion);
 
 #ifdef UNUSED
 static LOGICAL FindDeviceType(UINT16 devtype, LPGUID* lpguid)
@@ -437,14 +436,7 @@ LOGICAL dipSetupMouse()
 	}
 
 	// Set the cooperative level
-	DWORD MajorVersion, MinorVersion;
-	GetWindowsVersion(&MajorVersion, &MinorVersion);
-
-    if(MajorVersion >= 5 && MinorVersion > 0)
-		dirval = DIError(lpmd->SetCooperativeLevel(myhwnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE));
-	else
-		dirval = DIError(lpmd->SetCooperativeLevel(myhwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE));
-
+	dirval = DIError(lpmd->SetCooperativeLevel(myhwnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE));
  	if (dirval != DI_OK)
 	{
 		Write_Debug("SetCooperativeLevel for mouse failed");

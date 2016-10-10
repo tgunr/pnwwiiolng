@@ -176,7 +176,7 @@ static void _HitmapName(OBJECT* obj, void* p);
 
 SINT32 dot_move(const char* line);
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 void vehmainToggleLOD();
 #endif
 
@@ -5573,7 +5573,7 @@ static SINT32 dot_speed(const char*)
 
 
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 
 /************************************************************************************************
 	MoveCmd
@@ -5627,34 +5627,6 @@ SINT32 dot_move(const char* line)
 
 
 	VehicleData->RenderPos = VehicleData->VehiclePos = pos;
-
-	return DC_HANDLED;
-}
-
-//////////////////////////////////////////////////////////////////////
-//	ProfileFlight
-//////////////////////////////////////////////////////////////////////
-
-static SINT32 dot_profileflight(const char* args)
-{
-	FLOAT32	profilingDurationInMinutes	= 6.0f;
-
-	if(!OverrideSpawner)
-	{
-		rnmainListText("Please spawn a buzzard with nospawn enabled for profiling.");
-		return DC_HANDLED;
-	}
-
-	ARGV argv(args, 2, true);
-	// First argument is our function name
-	const wchar_t* profileName = (argv.argc > 1) ? argv[1].c_str() : L"default";
-
-	rnmainListText("Started %ls profiling for the duration of %.1f minute(s) ...", profileName, profilingDurationInMinutes);
-	dot_move("move N51.13.00 E4.11.00 100");
-	mlSetProfileFlight();
-#ifdef BETA_RELEASE
-	logInitProfiling(uiUTF16toUTF8(profileName), profilingDurationInMinutes);
-#endif
 
 	return DC_HANDLED;
 }
@@ -5958,7 +5930,7 @@ static SINT32 dot_vehlod(const char* line)
 	return DC_HANDLED;
 }
 
-#endif // ENABLE_FLOATERS
+#endif // GM_RELEASE
 
 
 
@@ -7218,9 +7190,6 @@ static int dot_texinfo(const char* line)
         case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:   s= "GL_COMPRESSED_RGBA_S3TC_DXT5_EXT"; bytes=4;
           break;
       }
-#if platOS == OS_MACOS
-      printf("%4d %50s [%4d x %4d x %1d = %'12d, (%s)]\n", i, textureName.c_str(), W, H, bytes, W*H*bytes, s);
-#endif
       Write_Debug("%4d %50s [%4ld x %4ld x %1d = %'12ld, (%s)]\n", i, textureName.c_str(),  W, H, bytes, W*H*bytes, s);
     }
   }
@@ -7857,12 +7826,11 @@ void uiDotCommandsInit()
 #endif
 
 	// floater commands
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 	ADD_DOT_COMMAND(move, false);
 	ADD_DOT_COMMAND(follow, false);
 	ADD_DOT_COMMAND(inflod, false);
 	ADD_DOT_COMMAND(vehlod, false);
-	ADD_DOT_COMMAND(profileflight, false);
 #endif
 
 	// beta release commands

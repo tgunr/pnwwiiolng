@@ -50,10 +50,6 @@ static std::deque<snSound*> _freesounds;
 // ------------------------------------------------------------
 LOGICAL sndsInit()
 {
-#if platOS == OS_MACOS
-    b3DSoundEnable = TRUE;
-#endif
-
 	if (bSoundEnable == FALSE)
 	{
 		Write_Log(LOG_SOUND, LOG_INFO, "Sounds have been disabled in the config file");

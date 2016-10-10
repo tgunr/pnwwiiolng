@@ -7,8 +7,6 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcast.h"
 #include "chat/chatHandle.h"
 #include "chat/chatSupportMessages.h"
@@ -124,7 +122,7 @@ _validBrigadeOrigin(const HCUnit* unit, const FacilityStruct* facility)
 
 	if ( unit->canUseOrigin(facility->type) == false )
 	{
-		dbugLog(_FLIB, " CANT USE ORIGIN");
+		dbugLog(_FLI, " CANT USE ORIGIN");
 		return false;
 	}
 
@@ -132,7 +130,7 @@ _validBrigadeOrigin(const HCUnit* unit, const FacilityStruct* facility)
 	// a combat depot origin?
 	if ( facility->getSupplyingUnit(unit, bcp) == 0 )
 	{
-		dbugLog(_FLIB, " NO SUP UNIT");
+		dbugLog(_FLI, " NO SUP UNIT");
 		return false;
 	}
 
@@ -943,10 +941,7 @@ _sendTimeUpdates(UINT32 now)
 
 	UINT32 timeout = now - (host_config.mission.timeOut_m * 60);
 
-#if defined(DEV_BUILD)
-	if ( g_logDebug )
-		betaLog(_FLD, "sendTimeUpdates");
-#endif
+    betaLog(_FLD, "sendTimeUpdates");
 
 	// We may delete the mission while we're iterating, so make sure
 	// the iterator iterates before we obliterate
@@ -955,12 +950,7 @@ _sendTimeUpdates(UINT32 now)
 		mission = it->second;
 		++it;
 
-#if defined(DEV_BUILD)
-		if ( g_logDebug )
-		{
-			betaLog(_FLDB, " #%u[act:%u,og:%u,nt:%u]", mission->missionID(), mission->active(), mission->ongoing(), mission->numTakers());
-		}
-#endif
+        betaLog(_FLD, " #%u[act:%u,og:%u,nt:%u]", mission->missionID(), mission->active(), mission->ongoing(), mission->numTakers());
 
 		if ( mission->spawner().isActive() )
 		{
@@ -1081,7 +1071,7 @@ _createMission(instanceid_t instanceID
 					);
 
 		{
-			dbugLog(_FLIB, " origin: " PRF_FULL_OBJ_ID ", targ: " PRF_FULL_OBJ_ID ""
+			dbugLog(_FLI, " origin: " PRF_FULL_OBJ_ID ", targ: " PRF_FULL_OBJ_ID ""
 							, PRA_FULL_OBJ_ID(summary.origin)
 							, PRA_FULL_OBJ_ID(summary.target)
 							);
@@ -1195,18 +1185,15 @@ missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 co
 
 	player->ExitMission();
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s Mission Post: "
-			"brig:%d mt:%d " PRF_FULL_OBJ_ID " -> " PRF_FULL_OBJ_ID " [%s]"
-						, player->teulIndex(), player->playerID(), player->callsign()
-						, player->brigadeID()
-						, request.missionType
-						, PRA_FULL_OBJ_ID(request.origin)
-						, PRA_FULL_OBJ_ID(request.target)
-						, request.desc
-						);
-	}
+    dbugLog(_FLD, "t:%d p:%u c:%s Mission Post: "
+        "brig:%d mt:%d " PRF_FULL_OBJ_ID " -> " PRF_FULL_OBJ_ID " [%s]"
+                    , player->teulIndex(), player->playerID(), player->callsign()
+                    , player->brigadeID()
+                    , request.missionType
+                    , PRA_FULL_OBJ_ID(request.origin)
+                    , PRA_FULL_OBJ_ID(request.target)
+                    , request.desc
+                    );
 
 	FacilityStruct* postingFacility;
 	UINT32 now = teulTime();

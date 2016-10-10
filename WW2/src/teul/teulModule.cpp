@@ -11,7 +11,6 @@
 
 #include <fcntl.h>
 #include <signal.h>
-#include <event2/event.h>
 
 #include "mem/mem.h"
 #include "teul/teulBasic.h"
@@ -46,7 +45,7 @@
 #include <sys/socket.h>
 #endif
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 #include "server/serverInterfaceDescription.h"
 #include "teul/teulConfigVar.h"
 extern ConfigStr cv_defaultInterface;
@@ -69,7 +68,7 @@ extern void teulInitEndpoints(ERROR_FUNCTION const);
 //////////////////////////////////////////////////////////////////////
 // Retrieve a list of the IP addresses this host has on eth0.
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 static void
 _getHostIPAddresses()
 {
@@ -196,7 +195,7 @@ _getHostIPAddresses()
 
 SINT32 teulModStartup(ERROR_FUNCTION errFnPtr)
 {
-#if platBuild == TEUL_SERVER && platOS != OS_WIN32
+#if platBuild == BUILD_SERVER && platOS != OS_WIN32
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
@@ -215,7 +214,7 @@ SINT32 teulModStartup(ERROR_FUNCTION errFnPtr)
 	teulSyncClock();
 	lastUpdateTime = teulClock64;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	_getHostIPAddresses();
 #endif
 
@@ -224,7 +223,7 @@ SINT32 teulModStartup(ERROR_FUNCTION errFnPtr)
 
 using ADDRESS_LIST = std::vector<UINT32>;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 void
 teulGetAddresses(ADDRESS_LIST& addresses)
 {
@@ -287,7 +286,7 @@ teulModShutdown()
 static void
 _setEndpointPeerState(ENDPOINT& endpoint)
 {
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	if ( endpoint.protocol == PROTOCOL_UDB || endpoint.protocol == PROTOCOL_CTRL || endpoint.state() == IS_LISTENING )
 		endpoint.m_peer = true;
 	else if ( endpoint.protocol == PROTOCOL_TCP && (static_cast<UINT32>(endpoint.destPort() - WWII::Net::Ports::ServerPeering) < (UINT32)MAX_SERVER_TYPE) )
@@ -311,8 +310,9 @@ static const size_t UdpSndBufSize = 64 * 1024;
 static void
 _configureEndpointSocket(ENDPOINT& endpoint)
 {
-	evutil_make_socket_nonblocking(endpoint.socket);
-	evutil_make_socket_closeonexec(endpoint.socket);
+#if platOS != OS_WIN32 // Windows does not use the same meanings for these
+    fcntl(endpoint.socket, F_SETFL, fcntl(endpoint.socket, F_GETFL) | O_NONBLOCK | O_CLOEXEC);
+#endif
 
 	endpoint.setRcvBufferSize( endpoint.protocol == PROTOCOL_TCP ? TcpRcvBufSize : UdpRcvBufSize );
 	endpoint.setSndBufferSize( endpoint.protocol == PROTOCOL_TCP ? TcpSndBufSize : UdpSndBufSize );
@@ -323,10 +323,13 @@ _configureEndpointSocket(ENDPOINT& endpoint)
 		endpoint.setNagleEnabled(false);
 
 		// Listening sockets need to re-allow use of the address on close.
-		if ( endpoint.state() == IS_LISTENING )
-			evutil_make_listen_socket_reuseable(endpoint.socket);
+		if ( endpoint.state() == IS_LISTENING ) {
+#if platOS != OS_WIN32 // Windows does not use the same meaning for this
+            setsockopt(endpoint.socket, SOL_SOCKET, SO_REUSEADDR, (const int []){ 1 }, sizeof(int));
+#endif
+        }
 #if platOS == OS_MACOS
-        setsockopt(endpoint.socket, SOL_SOCKET, SO_NOSIGPIPE, (const int[]){ 1 }, sizeof(int));
+        setsockopt(endpoint.socket, SOL_SOCKET, SO_NOSIGPIPE, (const int []){ 1 }, sizeof(int));
 #endif
 	}
 	else if ( endpoint.protocol == PROTOCOL_UDB )
@@ -404,9 +407,7 @@ _connectSocket(ENDPOINT& endpoint)
 		endpoint.lastDataRecv.makeCurrent();
 		endpoint.lastDataSent.makeCurrent();
 
-#if platOS == OS_LINUX || platOS == OS_MACOS
 		assert( endpoint.m_impl->pollSlot() < 0 );
-#endif
 
 		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " connecting on %s:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
 
@@ -620,13 +621,7 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 		return;
 	}
 
-#if platOS == OS_WIN32
-	Teul::g_logFnPtr("t:%d closing code:%u", inEndpoint.teulIndex(), code);
-#endif
-#if platOS == OS_LINUX || platOS == OS_MACOS
-	if ( g_logDebug )
-		dbugLog(_FLN, "t:%d closing [%u] st:%u cl:%s", inEndpoint.teulIndex(), code, inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
-#endif
+	dbugLog(_FLD, "t:%d closing [%u] st:%u cl:%s", inEndpoint.teulIndex(), code, inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
 	if ( inEndpoint.state() < IS_CLOSING || inEndpoint.m_closed == false )
 		inEndpoint.doError(ENOTCONN);
 

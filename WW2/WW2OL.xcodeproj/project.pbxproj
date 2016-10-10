@@ -232,7 +232,7 @@
 		08104D4D103DFBA10065E0E2 /* stringLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D47103DFBA10065E0E2 /* stringLib.cpp */; };
 		08104D4E103DFBA10065E0E2 /* striws.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D49103DFBA10065E0E2 /* striws.cpp */; };
 		08104D4F103DFBA10065E0E2 /* strpool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D4B103DFBA10065E0E2 /* strpool.cpp */; };
-		08104D61103DFBE90065E0E2 /* authClientMessages.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08104D51103DFBE90065E0E2 /* authClientMessages.mm */; };
+		08104D61103DFBE90065E0E2 /* authClientMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D51103DFBE90065E0E2 /* authClientMessages.cpp */; };
 		08104D65103DFBE90065E0E2 /* sysmain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D59103DFBE90065E0E2 /* sysmain.cpp */; };
 		08104D66103DFBE90065E0E2 /* sysMovieMac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D5C103DFBE90065E0E2 /* sysMovieMac.cpp */; };
 		08104D67103DFBE90065E0E2 /* systhreadmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D5E103DFBE90065E0E2 /* systhreadmac.cpp */; };
@@ -486,6 +486,7 @@
 		FA37D7531C937F8F00013187 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FA37D7511C937F8F00013187 /* Localizable.strings */; };
 		FA3B631B1D613BA500A5A810 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; };
 		FA3B631C1D613BB400A5A810 /* HockeySDK.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FA5CDD491CD8BA6D00F93668 /* build_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA3D8BA81C8BF201002C5119 /* build_info.cpp */; };
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
 		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
 /* End PBXBuildFile section */
@@ -706,7 +707,6 @@
 		081049AB103DD1D50065E0E2 /* ww2imap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ww2imap.cpp; sourceTree = "<group>"; };
 		081049AC103DD1D50065E0E2 /* ww2imap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ww2imap.h; sourceTree = "<group>"; };
 		081049C7103DD2310065E0E2 /* defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defs.h; sourceTree = "<group>"; };
-		081049C9103DD2310065E0E2 /* endianess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endianess.h; sourceTree = "<group>"; };
 		081049D6103DD2310065E0E2 /* mobileSpawnEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mobileSpawnEnums.h; sourceTree = "<group>"; };
 		081049DC103DD2310065E0E2 /* systypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systypes.h; sourceTree = "<group>"; };
 		081049DD103DD2310065E0E2 /* vars.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vars.h; sourceTree = "<group>"; };
@@ -1049,7 +1049,7 @@
 		08104D4A103DFBA10065E0E2 /* striws.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = striws.h; sourceTree = "<group>"; };
 		08104D4B103DFBA10065E0E2 /* strpool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = strpool.cpp; sourceTree = "<group>"; };
 		08104D4C103DFBA10065E0E2 /* strpool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strpool.h; sourceTree = "<group>"; };
-		08104D51103DFBE90065E0E2 /* authClientMessages.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = authClientMessages.mm; sourceTree = "<group>"; };
+		08104D51103DFBE90065E0E2 /* authClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = authClientMessages.cpp; sourceTree = "<group>"; };
 		08104D52103DFBE90065E0E2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		08104D55103DFBE90065E0E2 /* syscfg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syscfg.h; sourceTree = "<group>"; };
 		08104D56103DFBE90065E0E2 /* sysLaunchUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysLaunchUrl.h; sourceTree = "<group>"; };
@@ -1427,7 +1427,6 @@
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E94156AF1D259A0300C0565B /* libb64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libb64.a; path = lib/mac/libb64.a; sourceTree = "<group>"; };
-		E97C76281C84CD0700875F44 /* locIDs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = locIDs.h; sourceTree = "<group>"; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
 		E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader2.cpp; sourceTree = "<group>"; };
 		E97C76351C8513EB00875F44 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1519,11 +1518,13 @@
 		FA37D7551C937F9800013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		FA3B631A1D613BA500A5A810 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = proj/mac/HockeySDK.framework; sourceTree = "<group>"; };
 		FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CodeSigning.xcconfig; path = proj/mac/CodeSigning.xcconfig; sourceTree = "<group>"; };
-		FA3D8BA81C8BF201002C5119 /* Defines.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Defines.xcconfig; path = proj/mac/Defines.xcconfig; sourceTree = "<group>"; };
+		FA3D8BA81C8BF201002C5119 /* build_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = build_info.cpp; path = "${DERIVED_FILES_DIR}/build_info.cpp"; sourceTree = "<absolute>"; };
 		FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = SearchPaths.xcconfig; path = proj/mac/SearchPaths.xcconfig; sourceTree = "<group>"; };
 		FA3D8BAA1C8BF201002C5119 /* Warnings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = proj/mac/Warnings.xcconfig; sourceTree = "<group>"; };
 		FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = BuildSettings.xcconfig; path = proj/mac/BuildSettings.xcconfig; sourceTree = "<group>"; };
 		FA56129A1C9E4E9B001FAFCB /* compiler_check.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = compiler_check.h; sourceTree = "<group>"; };
+		FA5CDD461CD339D100F93668 /* build_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = build_info.hpp; path = src/build_info.hpp; sourceTree = "<group>"; };
+		FA78BDEB1D9082FA0042FBF0 /* Defines.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Defines.xcconfig; path = proj/mac/Defines.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1885,7 +1886,6 @@
 			isa = PBXGroup;
 			children = (
 				081049C7103DD2310065E0E2 /* defs.h */,
-				081049C9103DD2310065E0E2 /* endianess.h */,
 				081049D6103DD2310065E0E2 /* mobileSpawnEnums.h */,
 				081049DC103DD2310065E0E2 /* systypes.h */,
 				081049DD103DD2310065E0E2 /* vars.h */,
@@ -2475,10 +2475,9 @@
 				FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */,
 				0863B36E10619D66005FDF19 /* clientGlobals.cpp */,
 				0834F1D61045888700E75B52 /* sysWinISO.h */,
-				08104D51103DFBE90065E0E2 /* authClientMessages.mm */,
+				08104D51103DFBE90065E0E2 /* authClientMessages.cpp */,
 				08104D52103DFBE90065E0E2 /* main.m */,
 				08104D55103DFBE90065E0E2 /* syscfg.h */,
-				E97C76281C84CD0700875F44 /* locIDs.h */,
 				08104D56103DFBE90065E0E2 /* sysLaunchUrl.h */,
 				08104D57103DFBE90065E0E2 /* sysMacCompat.h */,
 				08104D58103DFBE90065E0E2 /* sysMacCompat.mm */,
@@ -3125,11 +3124,13 @@
 		FA3D8BB11C8BF5CC002C5119 /* Config */ = {
 			isa = PBXGroup;
 			children = (
+				FA3D8BA81C8BF201002C5119 /* build_info.cpp */,
 				FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */,
 				FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */,
-				FA3D8BA81C8BF201002C5119 /* Defines.xcconfig */,
+				FA78BDEB1D9082FA0042FBF0 /* Defines.xcconfig */,
 				FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */,
 				FA3D8BAA1C8BF201002C5119 /* Warnings.xcconfig */,
+				FA5CDD461CD339D100F93668 /* build_info.hpp */,
 			);
 			name = Config;
 			sourceTree = "<group>";
@@ -3215,7 +3216,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 080C7E971062F021000A242F /* Build configuration list for PBXNativeTarget "maclib" */;
 			buildPhases = (
-				08D29A8913D9D71C00BA4D58 /* ShellScript */,
 				080C7E801062F011000A242F /* Headers */,
 				080C7E811062F011000A242F /* Sources */,
 				080C7E821062F011000A242F /* Frameworks */,
@@ -3352,19 +3352,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		08D29A8913D9D71C00BA4D58 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "python ../Tools/revno.py ..\n\n";
-		};
 		0D3AF74508FC457800621A78 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3374,10 +3361,11 @@
 			);
 			name = "Run Script";
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/build_info.cpp",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "${SRCROOT}/proj/mac/correct-info-plist.sh";
+			shellScript = "python ${SRCROOT}/../Tools/revno.py client \"${DERIVED_FILES_DIR}\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3656,7 +3644,7 @@
 				08104D4D103DFBA10065E0E2 /* stringLib.cpp in Sources */,
 				08104D4E103DFBA10065E0E2 /* striws.cpp in Sources */,
 				08104D4F103DFBA10065E0E2 /* strpool.cpp in Sources */,
-				08104D61103DFBE90065E0E2 /* authClientMessages.mm in Sources */,
+				08104D61103DFBE90065E0E2 /* authClientMessages.cpp in Sources */,
 				08104D65103DFBE90065E0E2 /* sysmain.cpp in Sources */,
 				08104D66103DFBE90065E0E2 /* sysMovieMac.cpp in Sources */,
 				08104D67103DFBE90065E0E2 /* systhreadmac.cpp in Sources */,
@@ -3757,6 +3745,7 @@
 				08977DDE134CFB8500C9DCFE /* ScenarioManager.cpp in Sources */,
 				08977E08134CFF6C00C9DCFE /* scenMain.cpp in Sources */,
 				08977E11134CFF9F00C9DCFE /* scenLua.cpp in Sources */,
+				FA5CDD491CD8BA6D00F93668 /* build_info.cpp in Sources */,
 				08977E19134D004300C9DCFE /* Texture2DArray.cpp in Sources */,
 				08977E1E134D007B00C9DCFE /* sneaky.cpp in Sources */,
 				08477139135E279F00325E43 /* trnScenario.cpp in Sources */,

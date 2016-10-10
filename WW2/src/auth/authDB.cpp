@@ -476,7 +476,7 @@ static bool _initAppInfoTable(GAME& gameEntry)
 	SCHAR statement[512];
 	SINT32 i, platform;
 
-	for ( i = 0;i < OS_MAX_PLAT; i++)
+	for ( i = 0; i < OS_MAX_PLAT; i++)
 	{
 		gameEntry.appInfo[i].max = gameEntry.curHostVersion;
 		gameEntry.appInfo[i].min = gameEntry.curHostVersion;

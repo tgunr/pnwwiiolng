@@ -31,7 +31,6 @@
 #include <queue>
 
 #include "math/Matrixf.h"
-#include "sys/sysWinISO.h"	// Must be the last thing we include
 #include "ogl/GLCounter.h"
 
 /************************
@@ -90,11 +89,14 @@ static std::vector<SINT32> g_textureIndex;
 
 static std::deque<TEXTURE *> g_freeTextures;
 
-// Defines
-#define DDP_REVERSE_GL_COLORS
+// Why does OS X need RGBA? The image loaders don't appear to be endian-specific.
+// TODO: Investigate this - Gadget
 #if platOS == OS_MACOS
-#undef DDP_REVERSE_GL_COLORS
-#include <pthread.h>
+#define DDP_GL_FORMAT_NORMAL GL_RGBA
+#define DDP_GL_FORMAT_MIP3 GL_RGB
+#else
+#define DDP_GL_FORMAT_NORMAL GL_BGRA_EXT
+#define DDP_GL_FORMAT_MIP3 GL_BGR
 #endif
 
 #define OGL_EVENT_LOG
@@ -165,7 +167,7 @@ static UINT32	    sourceBlend;
 static UINT32	    destinationBlend;
 static UINT32		_AlphaFunc;
 
-static GLenum crtMode = 0;
+static GLenum crtMode = GL_MODELVIEW;
 
 static FLOAT32		_AlphaRef;
 
@@ -233,7 +235,7 @@ SINT32		enumber;
 
 	while ((enumber = glGetError()) != GL_NO_ERROR)
 	{
-	char*	ptr;
+		const char* ptr;
 
 		if (bMessage)
 		{
@@ -261,7 +263,7 @@ SINT32		enumber;
 				break;
 			}
 
-			Write_Debug("GL error 0x%04x encountered\r\n %s", enumber, ptr);
+			Write_Debug("GL error 0x%04x encountered\n %s", enumber, ptr);
 		}
 
 		bError = FALSE;
@@ -749,26 +751,14 @@ SINT32		retval, i, miplevels;
 
 		if (textures[texid].comp[miplevel] != textures[texid].format[miplevel])
 		{
-#ifdef DDP_REVERSE_GL_COLORS
 			glTexImage2D(GL_TEXTURE_2D, miplevel,
                          textures[texid].format[miplevel],
 						 textures[texid].po2width[miplevel],
                          textures[texid].po2height[miplevel],
 						 0,
-                         textures[texid].comp[miplevel] == 3 ? GL_BGR_EXT : GL_BGRA_EXT,
+                         textures[texid].comp[miplevel] == 3 ? DDP_GL_FORMAT_MIP3 : DDP_GL_FORMAT_NORMAL,
 						 GL_UNSIGNED_BYTE,
                          textures[texid].lpsurf[miplevel]);
-#else
-			glTexImage2D(GL_TEXTURE_2D,
-                         miplevel,
-                         textures[texid].format[miplevel],
-						 textures[texid].po2width[miplevel],
-                         textures[texid].po2height[miplevel],
-						 0,
-                         textures[texid].comp[miplevel] == 3 ? GL_RGB : GL_RGBA,
-						 GL_UNSIGNED_BYTE,
-                         textures[texid].lpsurf[miplevel]);
-#endif
 		}
 
 		if (!HandleGLError(TRUE))
@@ -863,26 +853,14 @@ SINT32		retval, i, miplevels;
 					Write_Debug("Found an active mip level with a nullptr surface pointer!");
 				}
 
-#ifdef DDP_REVERSE_GL_COLORS
 				glTexImage2D(GL_TEXTURE_2D, i,
                              textures[texid].format[i],
 							 textures[texid].po2width[i],
                              textures[texid].po2height[i],
 							 0,
-                             textures[texid].comp[i] == 3 ? GL_BGR_EXT : GL_BGRA_EXT,
+                             textures[texid].comp[i] == 3 ? DDP_GL_FORMAT_MIP3 : DDP_GL_FORMAT_NORMAL,
 							 GL_UNSIGNED_BYTE,
                              textures[texid].lpsurf[i]);
-#else
-				glTexImage2D(GL_TEXTURE_2D,
-                             i,
-                             textures[texid].format[i],
-							 textures[texid].po2width[i],
-                             textures[texid].po2height[i],
-							 0,
-                             textures[texid].comp[i] == 3 ? GL_RGB : GL_RGBA,
-							 GL_UNSIGNED_BYTE,
-                             textures[texid].lpsurf[i]);
-#endif
 				if (!HandleGLError(TRUE))
 				{
 					Write_Debug("GL error encountered in oglGetTextureHandle for texture %d/%d", texid, i);
@@ -1592,9 +1570,6 @@ LOGICAL oglSetMaterialName(SINT32 matid, const char* name)
 		return(FALSE);
 	}
 
-#ifdef DONT_USE
-	materials[matid].name = memAlloc(strlen(name) + 1);
-#endif
 	strcpy(materials[matid].name, name);
 
 	return(TRUE);
@@ -1647,7 +1622,7 @@ SINT32 oglCreateMaterial(LPVOID lpmat)
 		return(-1);
 	}
 
-	Write_Debug("CreateMaterial: id=%d", matid);
+	//Write_Debug("CreateMaterial: id=%d", matid);
 
 	materials[matid].matid = matid;
 	materials[matid].numuses += 1;
@@ -2321,7 +2296,7 @@ GLenum		mode;
 		Write_Debug(" GL error in oglSetViewportDimensions");
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -4306,9 +4281,6 @@ UINT32*		lptr, color = 0;
 SINT32		width, height, x, y, stride;
 UINT32		AlphaBits, AlphaShift, AlphaMask;
 FLOAT32		uf, vf;
-#ifdef DONT_USE
-FLOAT64		ui, vi;
-#endif
 TEXTURE*	lptex;
 piSURFACEDESC	pisd;
 
@@ -4316,19 +4288,6 @@ piSURFACEDESC	pisd;
 	{
 		return(FALSE);
 	}
-
-#ifdef DONT_USE
-	uf = (FLOAT32)modf(u, &ui);
-	vf = (FLOAT32)modf(v, &vi);
-	if (uf < 0.0f)
-	{
-		uf = 1.0f + uf;
-	}
-	if (vf < 0.0f)
-	{
-		vf = 1.0f + vf;
-	}
-#endif
 
 	uf = u - (FLOAT32)floor(u);
 	vf = v - (FLOAT32)floor(v);
@@ -4468,9 +4427,6 @@ UINT32*		lptr, color;
 SINT32		width, height, x, y, stride;
 UINT32		AlphaBits, AlphaShift, AlphaMask;
 FLOAT32		uf, vf;
-#ifdef DONT_USE
-double		ui, vi;
-#endif
 TEXTURE*	lptex;
 void*	lpdds;
 oglSURFACEDESC sd;
@@ -4479,19 +4435,6 @@ oglSURFACEDESC sd;
 	{
 		return(FALSE);
 	}
-
-#ifdef DONT_USE
-	uf = (FLOAT32)modf(u, &ui);
-	vf = (FLOAT32)modf(v, &vi);
-	if (uf < 0.0f)
-	{
-		uf = 1.0f + uf;
-	}
-	if (vf < 0.0f)
-	{
-		vf = 1.0f + vf;
-	}
-#endif
 
 	uf = u - (FLOAT32)floor(u);
 	vf = v - (FLOAT32)floor(v);
@@ -4634,7 +4577,6 @@ SINT32 oglGetTextureUVColor(UINT32* pColor,
         return -1;
     }
 
-//#if platOS != OS_MACOS
 	if(lpTex->format[iMipLevel] == GL_COMPRESSED_RGB_S3TC_DXT1_EXT)
 	{
         SINT32		xa, ya, xb, yb;
@@ -4658,7 +4600,6 @@ SINT32 oglGetTextureUVColor(UINT32* pColor,
         uColor = GetColorFromDXT3Block(yb * 4 + xb, (UINT8*)pisd.Surface + (ya * (iWidth / 4) + xa) * 16);
     }
 	else
-//#endif
 	{
         uAlphaMask = pisd.PixelFormat.dwRGBAlphaBitMask;
 
@@ -5302,14 +5243,6 @@ LOGICAL oglReleaseLight(SINT32 numlight)
 	oglSetLightState(numlight, FALSE);
 
 	numlights--;
-
-#ifdef DONT_USE
-	if (numlight < numlights)
-	{
-		memcpy(&lights[numlight], &lights[numlight + 1], (numlights - numlight) * sizeof(lights[numlight]));
-	}
-#endif
-
 	return(TRUE);
 }
 
@@ -5610,10 +5543,6 @@ void oglDrawScene(UINT32 mode,
 	_RenderScene
 *************************************************************************************************/
 
-#ifdef TESTMAC
-//extern "C" void collectvertexptrs(void*p,unsigned int sz);
-#endif
-
 static void RenderScene(const oglTVERTEX& pv, int stride, int count, const void* indices)
 {
 	oglUpdateRenderIndexStats(GL_TRIANGLES, count, count);
@@ -5662,9 +5591,6 @@ static void _RenderScene(oglPRIMITIVETYPE oglt, oglVERTEXTYPE oglvt, UINT32 Vert
 	    // Vertex
 	    if (vertex)
 	    {
-#ifdef TESTMAC
-//        collectvertexptrs(vertex,VertexCount);
-#endif
 		    ogl::SetVertexPointer(3, GL_FLOAT, vertexStride, vertex);
 	    }
 

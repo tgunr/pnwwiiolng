@@ -36,7 +36,7 @@ extern LOGICAL	fpTPSLoad ();
 extern void	fpTPSKill ();
 
 // using tps weapon types
-extern const char* fpTPSCreateBlendKey(int pose, int move, int weap, int point, int type, bool* exists = nullptr);
+extern const char* fpTPSCreateBlendKey(int pose, int move, int weap, int point, int type);
 extern UINT64 fpTPSCreateBlendID(int pose, int move, int weap, int point, int type = 0);
 extern gr2AnimationBlend* fpTPSGetBlend(int pose, int move, int weap, int point, int type = 0);
 

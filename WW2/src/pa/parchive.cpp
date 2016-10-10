@@ -154,11 +154,6 @@ int	paOpen(paFILE* pf, const char* archivename, const char* mode)
 		{
 			pf->arc[i].f = fopen(archivename, mode);
 
-      /* saves vm but takes too damn long to load now
-#if platOS == OS_MACOS
-      fcntl(pf->arc[i].f->_file,F_NOCACHE);
-#endif
-       */
 			if(pf->arc[i].f != nullptr)
 			{
 				strncpy(pf->arc[i].name, archivename, PA_MAX_NAME);
@@ -391,11 +386,7 @@ static int paUpdateTOC(paFILE* pf)
 			curtoc += numtoc[i];
 		}
 
-#if platOS == OS_MACOS
-		mergesort(pf->toc, pf->numtoc, sizeof(paTOC), toc_compare);
-#else
         qsort(pf->toc, pf->numtoc, sizeof(paTOC), toc_compare);
-#endif
 	}
 
 	for(i = 0; i < tocidx; i++)

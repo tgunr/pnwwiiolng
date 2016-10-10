@@ -1,6 +1,5 @@
-#include <syscfg.h> // Path is project specific.
 // This module provides support utilities used in
-// all API's to support debugging and error handling's.
+// all APIs to support debugging and error handling.
 //
 // Copyright 1999 Playnet Inc, All rights reserved
 // Not to be distributed in API form except as part of a compiled
@@ -8,69 +7,47 @@
 //
 // Originating Programmer: Martin Poulin
 
+#include <syscfg.h>
 #include "dbug/dbugInternal.h"
-
+#include "build_info.hpp"
 #include <fcntl.h>
 #include <sys/stat.h>
 #include "include/defs.h"
 #include "teul/teulTime.h"
 #include <locale.h>
-#if platBuild == TEUL_SERVER
+#include <mutex>
+
+#if platBuild == BUILD_SERVER
 #include "wwii/wwiiThreads.h"
-#endif
-
-#ifdef HAVE_UNISTD_H
-# include <unistd.h>
-#endif
-#ifdef HAVE_SIGNAL_H
-# include <signal.h>
-#endif
-#if AS_SERVER
-#include "revision.h"
-#endif
-#ifdef HAVE_SYS_TIME_H
-#include <sys/time.h>
-#endif
-
-#if platBuild == TEUL_SERVER
 #include "teul/teulConfigVar.h"
 extern ConfigPath cv_defaultLogPath;
+static const char _OPEN_MSG[] = "Playnet Server Log File.";
+static const char _CLOSE_MSG[] = "\nPlayer Server Log File Closed.\n";
+#else
+static const char _OPEN_MSG[] = "Debug Message System Open.";
+static const char _CLOSE_MSG[] = "\nDebug Message System Closed.\n";
 #endif
 
-#if platOS == OS_WIN32
-	#include <io.h>
-	#include <winsock2.h>
-	#define wErrno WSAGetLastError()
-	#define wSetErrno WSASetLastError
-#pragma comment(lib, "ws2_32.lib")
-#endif
-
-#if !defined(_MSC_VER)
+#if platOS != OS_WIN32
+# include <unistd.h>
+# include <signal.h>
+# include <sys/time.h>
 # define _O_CREAT O_CREAT
 # define _O_WRONLY O_WRONLY
 # define _O_TRUNC O_TRUNC
-#endif
-
-#if platOS == OS_WIN32
-	#define PMODE (_S_IREAD | _S_IWRITE)
+# define PMODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)
 #else
-	#define PMODE S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
+# include <io.h>
+# include <winsock2.h>
+# pragma comment(lib, "ws2_32.lib")
+# define PMODE (_S_IREAD | _S_IWRITE)
+# define STDERR_FILENO 2
 #endif
 
-// set max file size to 50M for roll over to new log
-static const size_t MAX_FILE_SIZE = 50 * 1000 * 1024;
-// Set a maximum of 5 files
 static const size_t MAX_FILE_NUM = 5;
+static const size_t MAX_FILE_SIZE = 50 * 1000 * 1024;
 
-#if	platOS == OS_WIN32
-	#define vsnprintf _vsnprintf
-	#define snprintf _snprintf
-	#define CARRIAGE_RETURN "\r\n"
-#else
-	#define CARRIAGE_RETURN "\n"
-#endif
-
-static const SINT32 _stdErrFileNo = OS_FILENO(stderr);
+static SINT32 _stdErrFileNo = -1;
 static DebugLogger _logger;
 
 const char* errorTypes[] = {
@@ -80,27 +57,17 @@ const char* errorTypes[] = {
 	"W",		// possible error detected, operation continues
 	"N",		// note, operation continues
 	"I",		// informational message
-	"D"		// debug level message
+	"D",		// debug level message
 };
 
-//static SINT32	theError = 0;
 static size_t _fileSize = 0;
 static void _levelHandler(UINT32 errType, const char* const text);
-
-#if defined(REPOSITORY_INFO)
-static const char _OPEN_MSG[] = "Playnet Server Log File. Rev: " REPOSITORY_INFO CARRIAGE_RETURN;
-#else
-static const char _OPEN_MSG[] = "DebugMessage System Open." CARRIAGE_RETURN;
-#endif
-
-static const char _CLOSE_MSG[] = CARRIAGE_RETURN "Debug Message System Closed." CARRIAGE_RETURN;
 
 // Global boolean that controls whether or not 'D'ebug level messages will be logged.
 // Exposed globally so it can be tested before prior to performing otherwise expensive
 // message constructions.
 bool g_logDebug = true;
 
-#include <mutex>
 static std::mutex s_dbugInitMutex;
 static bool s_dbugInitialized = false;
 
@@ -111,7 +78,7 @@ static void
 _dbugSetErr(SINT32 err)
 {
 #if platOS == OS_WIN32
-	wSetErrno(err);
+	WSASetLastError(err);
 #else
 	errno = err;
 #endif
@@ -120,7 +87,7 @@ _dbugSetErr(SINT32 err)
 //////////////////////////////////////////////////////////////////////
 // Rename a file 'xxx.N.log' to 'xxx.M.log'
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 static void
 _roll(const char* const filename, const int baseNum)
 {
@@ -147,7 +114,7 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
 		strsafecpy(output, filename, outputSize);
 	else
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		const char* const defaultPath = cv_defaultLogPath.GetString();
 #else
 		const char* const defaultPath = getenv("DEFAULT_LOGDIR");
@@ -191,7 +158,7 @@ _openDbugFile(const char* const srcFile_)
 	{
 		int oflags = _O_CREAT|_O_WRONLY|_O_TRUNC;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		for ( int i = MAX_FILE_NUM; i >= 0; --i )
 		{
 			_roll(filename, i);
@@ -210,13 +177,10 @@ _openDbugFile(const char* const srcFile_)
 			_fileNumber = 0;
 #endif
 
-		file = OS_OPEN(ofn, oflags, PMODE);
+		OS_OPEN(&file, ofn, oflags, PMODE);
 		_fileSize = 0;
-
-		if ( file >= 0 )
-			_fileSize += OS_WRITE(file, _OPEN_MSG, sizeof(_OPEN_MSG) - 1);
 	} else {
-		file = OS_FILENO(stderr);
+		file = STDERR_FILENO;
     }
 
 	return file;
@@ -273,7 +237,7 @@ void DebugLogger::initialize(LogMode logMode, Debug::ERROR_TYPE level, SINT32 fd
 	m_initialized = true;
 }
 
-#if AS_SERVER && platOS != OS_WIN32
+#if platBuild == BUILD_SERVER && platOS != OS_WIN32
 static void
 _handleSIGUSR2(SINT32)
 {
@@ -299,7 +263,7 @@ _handleSIGUSR2(SINT32)
 }
 #endif
 
-#if AS_SERVER && platOS != OS_WIN32
+#if platBuild == BUILD_SERVER && platOS != OS_WIN32
 
 #include <execinfo.h>
 
@@ -348,7 +312,7 @@ void dbugDumpBacktrace(int signum)
 		return;
 	}
 
-	_report(fd, "BACKTRACE [Rev " REPOSITORY_INFO ", %u functions]:\n", numAddrs);
+	_report(fd, "BACKTRACE [Rev unknown, %u functions]:\n", numAddrs);
 
 	backtrace_symbols_fd(backtraceAddrs, numAddrs, fd);
 
@@ -382,7 +346,8 @@ void dbugInit(LogMode logMode, const char* const filename)
 	if ( s_dbugInitialized )
 		return;
 	s_dbugInitialized = true;
-
+    
+    _stdErrFileNo = STDERR_FILENO;
 	setlocale(LC_CTYPE, "");
 
 	Debug::ERROR_TYPE level = Debug::ERR_DBUG;
@@ -391,7 +356,7 @@ void dbugInit(LogMode logMode, const char* const filename)
 	SINT32 file = (logMode == LogMode::TO_FILE) ? _openDbugFile(filename) : -1;
 	_logger.initialize(logMode, level, file, filename);
 
-#if AS_SERVER && platOS != OS_WIN32
+#if platBuild == BUILD_SERVER && platOS != OS_WIN32
 	signal(SIGUSR2, _handleSIGUSR2);
 	signal(SIGPIPE, SIG_IGN);
 
@@ -404,21 +369,14 @@ void dbugInit(LogMode logMode, const char* const filename)
 	{
 		LogAbort("Unable to install signal handlers.");
 	}
-
-	static struct timeval tv;
-	gettimeofday(&tv, nullptr);
-	const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
-	if ( newTimeMS < teulClock64 )
-	{
-		teulClock64++;
-		tv.tv_sec = (teulClock64 / 1000LL);
-	}
-	else
-	{
-		teulClock64 = newTimeMS;
-		teulClockTime = (UINT32)tv.tv_sec;
-	}
 #endif
+    
+    teulSyncClock();
+
+    if ( file >= 0 ) {
+        dbugLog(_FLM, "%s", _OPEN_MSG);
+        dbugLog(_FLM, "Version: %s (%s, %s)", PN_product_version_string, PN_git_commitish_string, PN_build_platform_string);
+    }
 }
 
 // dbugClose: closes the debug file and cleans up.
@@ -540,7 +498,7 @@ void dbugSetErrno(SINT32 err)
 SINT32	dbugGetErrno()
 {
 #if platOS == OS_WIN32
-	return wErrno;
+	return WSAGetLastError();
 #else
     return errno;
 #endif
@@ -592,12 +550,8 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	if ( ! (flags & BARE_DEBUG) )
 	{
 		time_t now = (time_t)(teulClock64 / 1000);
-#if platOS == OS_WIN32
-		struct tm* tm = localtime(&now);
-#else
 		struct tm tmStruct;
 		struct tm* tm = localtime_r(&now, &tmStruct);
-#endif
 		len = _logger.formatText("%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] "
 								, errorTypes[_logger.m_errType]
 								, tm->tm_year + 1900
@@ -722,7 +676,7 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 	const size_t roughSize = vsnprintf(_logger.m_text, sizeof(_logger.m_text), fmt_, args);
 	va_end(args);
 	const size_t maxSize = roughSize + 256 + strlen(assertion_);
-	char* message = (char*)OS_ALLOCA(maxSize * sizeof(char));
+	char* message = (char*)calloc(maxSize, sizeof(char));
 	if ( PN_UNLIKELY(message == nullptr) )
 	{
 		MessageBoxA(0, "OUT OF MEMORY", "OUT OF MEMORY", MB_ICONERROR | MB_OK | MB_APPLMODAL);
@@ -740,6 +694,7 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 		sprintf_s(message, maxSize, "File: %s\nLine: %u\nError: %s\n", file_, line_, _logger.m_text);
 	}
 	MessageBoxA(0, message, caption, MB_OK | MB_ICONERROR | MB_APPLMODAL);
+	free(message);
 
 #if defined(_DEBUG)
 	__debugbreak();
@@ -749,7 +704,7 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 #else
 	if ( PN_LIKELY(_logger.isInitialized()) )
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
         threadsLogging();
 #endif
 		if ( assertion_ != nullptr && *assertion_ != 0 )

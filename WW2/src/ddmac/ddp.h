@@ -37,6 +37,7 @@ void 	ddpHideCursor();
 
 void	ddpToggleWindowedMode();
 void	ddpSetFullScreen(LOGICAL);
+void    ddpTemporarilyEscapeFullscreen(bool begin);
 void	ddpHideApplication();
 void	ddpShowApplication();
 

@@ -14,7 +14,7 @@
 #include "mem/mem.h"
 #include "sdm/sdmParse.h"
 #include "fio/fio.h"
-#if defined(LIMITED_FIO) && LIMITED_FIO != 0
+#if platBuild == BUILD_SERVER
 # include "fio/fioDefs.h"
 # include "fio/fiod.h"
 #endif
@@ -233,7 +233,7 @@ _reportTranslationFails(const char* listType, TRANSLATION_FAILS& fails)
 	while ( (++it) != fails.end() )
 	{
 		fprintf(stderr, ", %s", (*it).c_str());
-		dbugLog(_FLAB, ", %s", (*it).c_str());
+		dbugLog(_FLA, ", %s", (*it).c_str());
 	}
 	fprintf(stderr, "\n\n");
 
@@ -256,7 +256,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	//get the starting position of cpf data
 	SINT32 sdmLength = _getTerrainFileLength(fd);
-	fiodSeek(fd, sdmLength + (SINT32)sizeof(TERRAINFILE), fioSEEK_SET);
+	fiodSeek(fd, sdmLength + (SINT32)sizeof(TERRAINFILE), SEEK_SET);
 
 	if ( PN_UNLIKELY(fiodRead(fd,&header,sizeof(STRT_DTL_HEADER)) != (int)sizeof(STRT_DTL_HEADER)) )
 	{

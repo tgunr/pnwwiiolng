@@ -8,14 +8,7 @@
 // Originating Programmer: Marty Poulin
 
 #include <cstdarg>
-
-#ifndef EWOULDBLOCK
-	#include	<errno.h>
-#endif
-
-#if platOS == OS_WIN32
-	#include "dbug/dbugWErrno.h"
-#endif
+#include <errno.h>
 
 // Can't think of a better place for this.
 // Use to silence one or more warnings about unused parameters.
@@ -35,23 +28,23 @@ namespace Debug
 {
 	enum
 	{
-		ERR_FATAL	= 	0,		// fatal error detected, exit program
-		ERR_ABORT,				// error detected, operation aborted
-		ERR_MINOR,				// error detected, routine recovered, operation continues
-		ERR_WARN,				// possible error detected, operation continues
-		ERR_NOTE,				// normal but significant
-		ERR_INFO,					// informational message
-		ERR_DBUG					// debug level message
-	,	ERROR_TYPE_SIZE
+		ERR_FATAL = 0,		// fatal error detected, exit program
+		ERR_ABORT,			// error detected, operation aborted
+		ERR_MINOR,			// error detected, routine recovered, operation continues
+		ERR_WARN,			// possible error detected, operation continues
+		ERR_NOTE,			// normal but significant
+		ERR_INFO,			// informational message
+		ERR_DBUG,			// debug level message
 	};
 	using ERROR_TYPE = UINT32;
+	using ERROR_HANDLER = void(*)(void);
 }
 
 #define STD_ERR				0x0010	// mirror significant output to stderr
 #define BARE_DEBUG			0x0080	// no extra formating, basically printf
 #define LOG_ALL_TO_STDERR	0x0100	// ALL logging to stderr
 
-// always use these macro's in place of Full functions so filename and number and errType are set.
+// always use these macros in place of Full functions so filename and number and errType are set.
 // basic parameter macros for dbugLog
 #define _FLF _FL, Debug::ERR_FATAL
 #define _FLA _FL, Debug::ERR_ABORT
@@ -60,33 +53,6 @@ namespace Debug
 #define _FLN _FL, Debug::ERR_NOTE
 #define _FLI _FL, Debug::ERR_INFO
 #define _FLD _FL, Debug::ERR_DBUG
-
-// same as above but no extra formating
-#define _FLFB _FL, (Debug::ERR_FATAL | BARE_DEBUG)
-#define _FLAB _FL, (Debug::ERR_ABORT | BARE_DEBUG)
-#define _FLMB _FL, (Debug::ERR_MINOR | BARE_DEBUG)
-#define _FLWB _FL, (Debug::ERR_WARN | BARE_DEBUG)
-#define _FLNB _FL, (Debug::ERR_NOTE | BARE_DEBUG)
-#define _FLIB _FL, (Debug::ERR_INFO | BARE_DEBUG)
-#define _FLDB _FL, (Debug::ERR_DBUG | BARE_DEBUG)
-
-// make go to stderr
-#define _FLFS _FL, (Debug::ERR_FATAL | STD_ERR)
-#define _FLAS _FL, (Debug::ERR_ABORT | STD_ERR)
-#define _FLMS _FL, (Debug::ERR_MINOR | STD_ERR)
-#define _FLWS _FL, (Debug::ERR_WARN | STD_ERR)
-#define _FLNS _FL, (Debug::ERR_NOTE | STD_ERR)
-#define _FLIS _FL, (Debug::ERR_INFO | STD_ERR)
-#define _FLDS _FL, (Debug::ERR_DBUG | STD_ERR)
-
-// same as above but no extra formating
-#define _FLFSB _FL, (Debug::ERR_FATAL | STD_ERR | BARE_DEBUG)
-#define _FLASB _FL, (Debug::ERR_ABORT | STD_ERR | BARE_DEBUG)
-#define _FLMSB _FL, (Debug::ERR_MINOR | STD_ERR | BARE_DEBUG)
-#define _FLWSB _FL, (Debug::ERR_WARN | STD_ERR | BARE_DEBUG)
-#define _FLNSB _FL, (Debug::ERR_NOTE | STD_ERR | BARE_DEBUG)
-#define _FLISB _FL, (Debug::ERR_INFO | STD_ERR | BARE_DEBUG)
-#define _FLDSB _FL, (Debug::ERR_DBUG | STD_ERR | BARE_DEBUG)
 
 // Whether debugging is enabled or not.
 enum class LogMode { OFF, TO_FILE };
@@ -121,17 +87,8 @@ void dbugSetLogLevel(Debug::ERROR_TYPE level);
 // the Microsoft debugger through the SetDebugErrorLevel function.
 void dbugSetWriteLevel(Debug::ERROR_TYPE level);
 
-// dbugSetErrno: sets Errno. Error numbers adhere to errno.h. Under win32 "dbugWErrno.h"
-// may also be included to map windows socket errors to Unix errno.  Additional errors beyond
-// those covered in errno.h and dbugWErrno.h must be added to debugExtErrno.h and must adhere to
-// windows error code conventions to eliminate problems with compatibility.
+// dbugSetErrno and dbugGetErrno: Pointless wrappers around errno
 void dbugSetErrno(int err);
-
-// dbugGetErrno: returns the current error number.  Error numbers adhere to errno.h.  Under
-// win32 "dbugWErrno.h" may also be included to map windows socket errors to Unix errno.
-// Additional errors beyond those covered in errno.h and dbugWErrno.h must be added to
-// debugExtErrno.h and must adhere to windows error code conventions to eliminate problems
-// with compatibility.
 int dbugGetErrno();
 
 // dbugLog: if the current filename, lineno or string is nullptr then it sets these members. The
@@ -173,10 +130,7 @@ NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, UINT32 err
     #define betaLog(m, fmt, ...)
 #endif
 
-// This is set to true when the dbug library is logging _FLD messages
-extern bool g_logDebug;
-
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
     #define DEBUG_ERR(fmt, ...) dbugLog(_FLA, fmt, ## __VA_ARGS__)
     #define DEBUG_FATAL(fmt, ...) LogAbort(fmt, ## __VA_ARGS__)
 #else

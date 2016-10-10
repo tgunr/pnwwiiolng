@@ -725,10 +725,6 @@ LOGICAL ddpUpdate()
 		return(FALSE);
 	}
 
-#ifdef BETA_RELEASE
-	logUpdateProfiling();
-#endif	// #ifdef BETA_RELEASE
-
 	if (resetfps)
 	{
 		starttime = timeGetTime();
@@ -1206,9 +1202,9 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				GetClientRect(hwnd, &rect);
 				ClientToScreen(hwnd, (LPPOINT)&rect);
 				xy = MAKELONG(rect.left, rect.top);
-				sysregSetKeyDword(REG_KEY_MAIN, REG_MAIN_LOC, &xy);
+				sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, xy);
 				wh = MAKELONG(rect.right, rect.bottom);
-				sysregSetKeyDword(REG_KEY_MAIN, REG_MAIN_SIZE, &wh);
+				sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, wh);
 			}
 		}
 		break;

@@ -11,8 +11,6 @@
 
 #include <stdexcept>
 
-#include "versionNo.h"
-
 #include "chat/chatDB.h"
 #include "chat/chatDotCommand.h"
 #include "chat/chatDotCommandIndex.h"

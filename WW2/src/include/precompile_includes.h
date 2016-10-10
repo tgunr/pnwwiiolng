@@ -1,5 +1,9 @@
 #pragma once
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 ////////// SYSTEM INCLUDES ONLY -- NO PLAYNET SPECIFICS
 
 #include <algorithm>
@@ -27,7 +31,11 @@
 #include <mutex>
 
 #if defined(HAVE_UNISTD_H)
-# include <unistd.h>
+#include <unistd.h>
+#endif
+
+#if defined(HAVE_SYS_PARAM_H)
+#include <sys/param.h>
 #endif
 
 ////////// PLAYNET SYSTYPES NEEDS TO GO HERE

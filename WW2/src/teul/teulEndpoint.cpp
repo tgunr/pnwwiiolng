@@ -70,7 +70,7 @@ teulCloseAllEndpoints(const SINT32 errorCode)
 
 	Teul::ENDPOINT_LIST eps = idleEndpoints;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	// Make a copy.
 	if ( errorCode != 0 )
 	{
@@ -623,7 +623,9 @@ Teul::GetErrorName(SINT32 error)
 	ErrorCase( ETEUL_ENOSPC_SEND_BUFFER );
 	ErrorCase( ETEUL_ENOSPC_SEND_SOCKET );
 	ErrorCase( ENETDOWN );
+#ifdef EPFNOSUPPORT
 	ErrorCase( EPFNOSUPPORT );
+#endif
 	ErrorCase( EAFNOSUPPORT );
 	ErrorCase( ENETUNREACH );
 	ErrorCase( EADDRINUSE );
@@ -638,8 +640,10 @@ Teul::GetErrorName(SINT32 error)
 #if EWOULDBLOCK != EAGAIN
 	ErrorCase( EWOULDBLOCK );
 #endif
-#if platOS == OS_LINUX || platOS == OS_MACOS
+#ifdef ESHUTDOWN
 	ErrorCase( ESHUTDOWN );
+#endif
+#ifdef EHOSTDOWN
 	ErrorCase( EHOSTDOWN );
 #endif
 	ErrorCase( EHOSTUNREACH );

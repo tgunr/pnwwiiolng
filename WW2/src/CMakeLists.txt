@@ -65,7 +65,6 @@ SET(PCH_INCLUDE_HEADERS
     dbug/dbug.h
     chat/chatHandle.h
     mem/mem.h
-    hostproj/versionNo.h
     include/precompile_includes.h
     inst/instDescriptor.h
     wwii/wwiiPlayer.h
@@ -92,6 +91,23 @@ SET(PCH_INCLUDE_HEADERS
     teul/teulEndpoint.h
     chat/chatLStringIDs.h
 )
+
+# Run revno.py to get build_info.cpp
+# Use BYPRODUCTS for the real result and a symbolic (fake) OUTPUT so the script
+# runs always; easiest way to avoid the run-when-needed default behaviors.
+ADD_CUSTOM_COMMAND(
+    OUTPUT build_info.stamp
+    BYPRODUCTS build_info.cpp
+    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/build_info.cpp.in
+    COMMAND
+        ${PYTHON_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../Tools/revno.py
+        host
+        ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Generating build information"
+    VERBATIM
+)
+SET_SOURCE_FILES_PROPERTIES( build_info.stamp PROPERTIES SYMBOLIC TRUE )
 
 ######################################################################
 
@@ -159,6 +175,8 @@ ENDIF( )
 # TeulServer library - this is a baseline library that provides
 # teulKit services and the cluster's "server" API.
 ADD_LIBRARY(teulserver
+    build_info.cpp build_info.stamp
+
     server/server.cpp
         server/server.h
             server/serverReleaseTypeEnum.h
@@ -249,7 +267,7 @@ SET_PROPERTY(TARGET instancing PROPERTY FOLDER "Libs")
 
 # Common-to-all WWII library, provides all the basics like ChatHandle functions,
 # weapon list, database operations, wwii_config, etc.
-ADD_LIBRARY(libwwii 
+ADD_LIBRARY(libwwii
     chat/chatHandle.cpp
         chat/chatHandle.h
         chat/chatName.h
@@ -513,7 +531,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
             src/controllerGameProcess.h
     )
     #ADD_PCH(${CONTROLLER_HOST_EXE})
-    SET_PROPERTY(TARGET ${CONTROLLER_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_CONTROLLER_HOST)
+    SET_PROPERTY(TARGET ${CONTROLLER_HOST_EXE} PROPERTY COMPILE_DEFINITIONS platBuild=BUILD_SERVER IS_CONTROLLER_HOST)
     TARGET_LINK_LIBRARIES(${CONTROLLER_HOST_EXE} libwwii teulserver ${MYSQL_LIBRARIES})
     SET_PROPERTY(TARGET ${CONTROLLER_HOST_EXE} PROPERTY FOLDER "Hosts")
 
@@ -699,7 +717,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
         ${PCH_INCLUDE_HEADERS}
     )
     ADD_PCH(${CHAT_HOST_EXE})
-    SET_PROPERTY(TARGET ${CHAT_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_CHAT_HOST)
+    SET_PROPERTY(TARGET ${CHAT_HOST_EXE} PROPERTY COMPILE_DEFINITIONS platBuild=BUILD_SERVER IS_CHAT_HOST)
     TARGET_LINK_LIBRARIES(${CHAT_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient libb64)
     SET_PROPERTY(TARGET ${CHAT_HOST_EXE} PROPERTY FOLDER "Hosts")
 
@@ -820,7 +838,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
         ${PCH_INCLUDE_HEADERS}
     )
     ADD_PCH(${CELL_HOST_EXE})
-    SET_PROPERTY(TARGET ${CELL_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_CELL_HOST)
+    SET_PROPERTY(TARGET ${CELL_HOST_EXE} PROPERTY COMPILE_DEFINITIONS platBuild=BUILD_SERVER IS_CELL_HOST)
     TARGET_LINK_LIBRARIES(${CELL_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
     SET_PROPERTY(TARGET ${CELL_HOST_EXE} PROPERTY FOLDER "Hosts")
 
@@ -983,7 +1001,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
         ${PCH_INCLUDE_HEADERS}
     )
     ADD_PCH(${MAP_HOST_EXE})
-    SET_PROPERTY(TARGET ${MAP_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_MAP_HOST)
+    SET_PROPERTY(TARGET ${MAP_HOST_EXE} PROPERTY COMPILE_DEFINITIONS platBuild=BUILD_SERVER IS_MAP_HOST)
     TARGET_LINK_LIBRARIES(${MAP_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
     SET_PROPERTY(TARGET ${MAP_HOST_EXE} PROPERTY FOLDER "Hosts")
 
@@ -1010,7 +1028,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
         ${PCH_INCLUDE_HEADERS}
     )
     ADD_PCH(${DBD_HOST_EXE})
-    SET_PROPERTY(TARGET ${DBD_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_DBD_HOST)
+    SET_PROPERTY(TARGET ${DBD_HOST_EXE} PROPERTY COMPILE_DEFINITIONS platBuild=BUILD_SERVER IS_DBD_HOST)
     TARGET_LINK_LIBRARIES(${DBD_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
     SET_PROPERTY(TARGET ${DBD_HOST_EXE} PROPERTY FOLDER "Hosts")
 
@@ -1149,7 +1167,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
         ${PCH_INCLUDE_HEADERS}
     )
     ADD_PCH(${STRAT_HOST_EXE})
-    SET_PROPERTY(TARGET ${STRAT_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_STRAT_HOST LUA_MODULE_OPEN=tolua_stratd_open CHECK_SUPPLY=1)
+    SET_PROPERTY(TARGET ${STRAT_HOST_EXE} PROPERTY COMPILE_DEFINITIONS platBuild=BUILD_SERVER IS_STRAT_HOST LUA_MODULE_OPEN=tolua_stratd_open CHECK_SUPPLY=1)
     SET_PROPERTY(TARGET ${_LUA_HOST} PROPERTY DEPENDS ${_LUA_CC})
     IF( NOT MSVC )
         SET_PROPERTY(SOURCE ${_LUA_CC} PROPERTY COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-unused -Wno-unused-function")

@@ -291,7 +291,7 @@ int* numComponents_ret)
     }
 
     if (header[0])               /* skip identification field */
-        fioSeek(fd, header[0], fioSEEK_CUR);
+        fioSeek(fd, header[0], SEEK_CUR);
 
     colormap = nullptr;
     if (header[1] == 1)          /* there is a colormap */
@@ -371,11 +371,11 @@ int* numComponents_ret)
             int x, y;
             unsigned char* buf;
             unsigned char* src;
-            size_t pos = fioSeek(fd, 0, fioSEEK_CUR);
-            size_t pos2 = fioSeek(fd, 0, fioSEEK_END);
+            size_t pos = fioSeek(fd, 0, SEEK_CUR);
+            size_t pos2 = fioSeek(fd, 0, SEEK_END);
             size_t size = pos2 - pos;
 
-            fioSeek(fd, pos, fioSEEK_SET);
+            fioSeek(fd, pos, SEEK_SET);
 
             buf = new unsigned char [size];
             if (buf == nullptr)

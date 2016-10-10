@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "map/mapPlayer.h"
 #include "miss/mission.h"
 #include "miss/missionTypes.h"

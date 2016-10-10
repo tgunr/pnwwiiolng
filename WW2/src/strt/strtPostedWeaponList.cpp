@@ -12,8 +12,6 @@
 // Originating Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Eric "Meat" Hall
 
-#include "versionNo.h"
-
 #include <list>
 #include <set>
 #include <algorithm>

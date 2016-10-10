@@ -1,7 +1,7 @@
 #pragma once
 
-#if platBuild == TEUL_SERVER
-static_assert( platBuild != TEUL_SERVER, "Can't include vars.h in a server build." );
+#if platBuild == BUILD_SERVER
+static_assert( platBuild != BUILD_SERVER, "Can't include vars.h in a server build." );
 #else
 
 #include "pi/pi.h"
@@ -193,8 +193,6 @@ extern SINT32           nErrorCode;         // Set to any user specified error c
 extern SINT32			TexBpp;
 extern SINT32			TexAlpha;
 
-extern LOGICAL			TextureReduction;	// force texture reduction
-
 extern UINT32			DamageLevel;
 
 extern FLOAT32			FrameFactor;		// Based on FPS, helper ratio
@@ -297,11 +295,5 @@ extern LOGICAL          DebugBuildingMDLFilesOnly;
 #endif	// #ifdef BETA_RELEASE
 
 static inline bool IN_COMBAT(SINT32 t) { return (frametime - combattime) <= t; }
-
-namespace WWII
-{
-	extern const unsigned int gitCommitNo;
-	extern const char* const gitCommitStr;
-}
 
 #endif

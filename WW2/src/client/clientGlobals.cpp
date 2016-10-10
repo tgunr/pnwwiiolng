@@ -191,8 +191,6 @@ SINT32           nErrorCode;         // Set to any user specified error code
 SINT32			TexBpp;
 SINT32			TexAlpha;
 
-LOGICAL			TextureReduction;	// force texture reduction
-
 UINT32			DamageLevel;
 
 FLOAT32			FrameFactor;		// Based on FPS, helper ratio

@@ -21,7 +21,6 @@
 #include "ob/obc.h"
 #include "ob/obmain.h"
 #include "str/strpool.h"
-#include "sys/sysWinISO.h"
 #include "ld/lddds.h"
 #include <assert.h>
 #include "sysmain.h"
@@ -761,7 +760,6 @@ struct eqstr
 	}
 };
 
-#if platOS == OS_MACOS
 using CharPSet = std::unordered_set<const char*, ConstCharHasher, eqstr>;
 static CharPSet* RoadTextureNames = nullptr;
 
@@ -790,11 +788,9 @@ static void initRoadTextureNames()
 	RoadTextureNames->insert("terrain\\brdg\\tangray1");
 	RoadTextureNames->insert("terrain\\brdg\\urbanroad1");
 }
-#endif
 
 static bool isRoadTexture( int texid )
 {
-#if platOS == OS_MACOS
 	TEXTURE* tp = oglGetTextureData(texid);
 	bool res = tp!=nullptr && RoadTextureNames->find( tp->name ) != RoadTextureNames->end();
 	if ( res )
@@ -802,9 +798,6 @@ static bool isRoadTexture( int texid )
 		//printf("%s\n",tp->name);
 	}
 	return res;
-#else
-	return false;
-#endif
 }
 
 #define LOOK_FOR_DEGENERATE_TRIANGLES 0
@@ -821,12 +814,10 @@ static bool ReadVertexList()
 	OBJECT*				lpobj					= nullptr;
 	piUNIFIED_VERTEX*	vertices				= nullptr;
 
-#if platOS == OS_MACOS
 	if ( RoadTextureNames == nullptr )
 	{
 		initRoadTextureNames();
 	}
-#endif
 
 	length = (int)s_chunk->next - 4;
 
@@ -1591,28 +1582,21 @@ static bool ReadTextureReference()
 	// Check for normal map
 	str = filename;
 	str += "_normal.dds";
-
-	if(fioAccess(str.c_str()))
-	{
+    
+    int fd = -1;
+    
+    if ((fd = fioOpen(str.c_str())) != -1) {
 		_textureflags2[numtexrefs] |= OBJECT_NORMALMAP;
-	}
-
-	// New normal mapping tool outputs _nrm.dds
-	str = filename;
-	str += "_nrm.dds";
-
-	if(fioAccess(str.c_str()))
-	{
-		_textureflags2[numtexrefs] |= OBJECT_NORMALMAP;
+		fioClose(fd); // Hacky because this is very bad code design, this is a quick fix
 	}
 
 	// Check for specular map
 	str = filename;
 	str += "_spec.dds";
 
-	if(fioAccess(str.c_str()))
-	{
+	if ((fd = fioOpen(str.c_str())) != -1) {
 		_textureflags3[numtexrefs] |= OBJECT_SPECULARMAP;
+		fioClose(fd); // Hacky because this is very bad code design, this is a quick fix
 	}
 
 	str = filename;
@@ -2332,18 +2316,7 @@ static void changeMaterials( OBJECT* obj )
 }
 #endif
 
-#define xSHOWLDMSGS 1
-#if platOS == OS_MACOS
-#define OutputDebugStringA(x) printf(x)
-//#undef Write_Debug
-//#define Write_Debug DoOutputX
-
-void DoOutputX(const char* str, ...)
-{
-	printf( "%s\n", str);
-}
-
-#endif
+#define SHOWLDMSGS 1
 
 #ifdef SHOWLDMSGS
 # define LDWrite_Debug(fmt, ...) dbugLog(_FLD, fmt, ## __VA_ARGS__);

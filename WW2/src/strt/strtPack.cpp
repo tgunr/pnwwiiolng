@@ -44,7 +44,7 @@ SINT32 strtPackInit()
 
 	_objectsPerSupercellResponse=(512 - _sizeOfObjectHeader) / _sizeOfObject;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 #ifdef DEBUG
 	dbugLog(_FLD,"Header size:%d\nObject size: %d\nObjects/SupercellResponse: %d\n",_sizeOfObjectHeader,_sizeOfObject,_objectsPerSupercellResponse);
 #endif
@@ -95,7 +95,7 @@ strtPackOwnershipUpdate(LOGICAL mode, UCHAR* data, SINT32 offset, OWNERSHIP_UPDA
 
 	offset = teulPackUINT32(mode, data, offset, &(object->flags), 0);
 
-	//dbugLog(_FLAB,"Ownership: %d\n\tx:%d\n\ty:%d\n\tid:%d\n\tcountry:%d\n\n",object->type, object->objectID.sx,object->objectID.sy,object->objectID.id,object->country);
+	//dbugLog(_FLA,"Ownership: %d\n\tx:%d\n\ty:%d\n\tid:%d\n\tcountry:%d\n\n",object->type, object->objectID.sx,object->objectID.sy,object->objectID.id,object->country);
 	return offset;
 }
 

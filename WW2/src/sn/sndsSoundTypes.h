@@ -2,7 +2,6 @@
 
 #if platOS == OS_MACOS
 #include "sn/SoundBuffer.h"
-#elif platOS == OS_WIN32
 #endif
 
 #include "pi/pi.h"		// For piVector.

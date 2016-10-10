@@ -15,12 +15,8 @@
 
 #include <string>
 
-#include "sys/sysWinISO.h"			// Must be the last thing you include
-
-#if(1)
 #define CG_VERSION      _T("1, 2, 0, 0")
 #define CGGL_VERSION   _T("1, 2, 0, 0")
-#endif
 
 static void _cgErrorCallback();
 
@@ -80,7 +76,6 @@ CWW2Shader::CWW2Shader(const SCHAR* shader, SINT32 shaderType)
 //////////////////////////////////////////////////////////////////////
 CWW2Shader::~CWW2Shader()
 {
- #if platOS != OS_MACOS // this gets call from static destructor long after everything has been uninitialized
 	if(isProgram())
     {
         killProgram();
@@ -91,7 +86,6 @@ CWW2Shader::~CWW2Shader()
         cgDestroyContext(m_cgContext);
         m_cgContext = NULL;
     }
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////

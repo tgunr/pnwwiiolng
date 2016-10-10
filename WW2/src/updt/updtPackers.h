@@ -24,7 +24,7 @@ extern SINT32 updtPushCpControlChange(struct OWNERSHIP_UPDATE* update);
 
 extern SINT32 updtPushCpLevelChange(struct VISLEVEL_UPDATE* update);
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 class Player;
 extern SINT32 updtPackEvents(LOGICAL mode, UCHAR* const message, SINT32 offset, class Player* player, SINT32 size);
 

@@ -40,10 +40,7 @@
 #include "weap/weapList.h"
 #include "parse/countryCodes.h"
 #include "strt/strtDTL.h"
-
-#if platOS != OS_MACOS
-	#include "str/stringLib.h"
-#endif
+#include "str/stringLib.h"
 
 enum
 {
@@ -171,9 +168,7 @@ static bool _setSection(int /*numargs*/, FUNCARGS* args)
 
 		if (_section.spec.isNull())
 		{
-#ifdef FRONT_END
-			Write_Debug("invlid class name %s",_section.name);
-#endif // FRONT_END
+			dbugLog(_FLW, "invlid class name %s",_section.name);
 			return false;
 		}
 
@@ -323,7 +318,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 	static const SINT32 _NUM_SPECS = sizeof(argSpec)/sizeof(ARG_SPEC);
 	WEAPON_SPEC thisSpec = NULL_WEAP_SPEC;
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 	bool fNext = false, eNext = false;
 #endif
 
@@ -344,7 +339,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 									);
 		g_weaponPtrs.emplace_back(weapon);
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 		SINT32 i, bIndex;
 		WEAPON_SPEC biasSpec;
 
@@ -434,7 +429,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 	}
 	catch ( std::exception& e )
 	{
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what());
 #else
 		dbugLog(_FLA, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what());
@@ -442,7 +437,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 	}
 	catch ( const char* reason )
 	{
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason);
 #else
 		dbugLog(_FLA, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason);
@@ -493,7 +488,7 @@ static bool _fillSpawn(SINT32 /*numArgs*/, FUNCARGS* args)
 	}
 	catch ( const char* reason )
 	{
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason);
 		return false;
 #else

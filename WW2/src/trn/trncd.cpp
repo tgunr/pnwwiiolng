@@ -212,10 +212,6 @@ SINT32 trncdReplacementTileTextureID() { return _NullTexId; }
 
 static LOGICAL g_bIgnoreTreeCollide = FALSE;
 
-#ifdef TERRAIN_EDITOR
-SINT32 _CollisionTriCnt;
-#endif
-
 #ifndef _DEBUG
 
 #define OutlineTriangle(a, b, c)
@@ -511,29 +507,7 @@ static void _SetupFlagObject(OBJECT& Object)
 {
 	// UINT32 flagnum forces overflow on values less than '0'.
 	const UINT32 FlagNum = Object.name[4] - '0';
-	if (FlagNum < _MAX_COUNTRIES && Object.texid > 0)
-	{
-		// This is ugly; hack for now
-		if(gRegion == 5) // chinese
-		{
-			// Load new textures
-			std::string path = oglGetTextureData(Object.texid)->name;
-			path += ".dds";
-
-			const char* regionalPath = fioGetRegionalPath(path.c_str());
-
-			int id = ldpixLoadImageFileToSurface(regionalPath, 0, LDPIX_MIPMAP);
-
-			if(id > 0 && id != Object.texid)
-			{
-				// If id is valid then free
-				piFreeMipTextures(Object.texid);
-
-				// update the obj tex id
-				Object.texid = id;
-			}
-		}
-
+	if (FlagNum < _MAX_COUNTRIES && Object.texid > 0) {
 		_CountryTexIds[FlagNum] = Object.texid;
 	}
 }
@@ -828,9 +802,7 @@ static UINT32 _AddToListHead(trnCDTerrainObject* TO)
 LOGICAL trncdRemoveTerrainObject(OBJECT* Object, SINT32 DummyNum1, SINT32 DummyNum2, UINT32 Id,
 								 REL_OBJ_ID * ObjId)
 {
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Removing overall object %s",Object->name);
-#endif
 
 	if (Object != nullptr)
 	{
@@ -942,10 +914,8 @@ LOGICAL trncdAddTerrainObject(OBJECT* Object,SINT32 SuperCellX, SINT32 SuperCell
     SINT8 * ptr;
     BUILDING_PARAMS* Params;
     SINT32 DamThreshold;
-#ifdef TERRAIN_EDITOR
-    Write_Debug("Adding overall object %s",Object->name);
-#endif
 
+    //Write_Debug("Adding overall object %s",Object->name);
 	if (Object != nullptr)
 	{
 		DamThreshold = 0;
@@ -1036,17 +1006,13 @@ static UINT32 _RemoveTerrainObject(OBJECT* o)
 
     if(I == mapOBJ.end())
     {
-#ifdef TERRAIN_EDITOR
 		Write_Debug("Object being removed that isn't on the collide list!");
-#endif
         return 0;
     }
 
     trnCDTerrainObject* to;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("_RemoveTerrainObject: %s", o->name);
-#endif
 
     to = I->second;
 
@@ -1169,9 +1135,7 @@ _StratMessageQue*	PrevStratMsg;
 		return;
 	}
 
-#ifdef TERRAIN_EDITOR
-	Write_Debug("Adding Object %s, top level %s",Object->name,TopObject->name);
-#endif
+	//Write_Debug("Adding Object %s, top level %s",Object->name,TopObject->name);
 
     mapOBJList::iterator I = mapOBJ.find(Object);
 
@@ -1213,11 +1177,8 @@ _StratMessageQue*	PrevStratMsg;
 	{
 		if(!TO->CollisionObject)
 		{
-#ifdef TERRAIN_EDITOR
-			Write_Debug("Cannot find damage collision object for object %s, using entire object tree instead",
-							TO->TerrainObject->name);
-#endif
-		TO->DamageCollisionObject = Object;
+			//Write_Debug("Cannot find damage collision object for object %s, using entire object tree instead", TO->TerrainObject->name);
+			TO->DamageCollisionObject = Object;
 		}
 		else
 		{
@@ -1228,10 +1189,7 @@ _StratMessageQue*	PrevStratMsg;
 
 	if (TO->CollisionObject == nullptr)
 	{
-#ifdef TERRAIN_EDITOR
-		Write_Debug("Cannot find collision object for object %s, using entire object tree instead",
-						TO->TerrainObject->name);
-#endif
+		//Write_Debug("Cannot find collision object for object %s, using entire object tree instead", TO->TerrainObject->name);
 		TO->CollisionObject = Object;
 	}
 
@@ -2107,21 +2065,10 @@ piINDICES*		pt;
 piVECTOR*		lpcrnr;
 piMATRIX		InvMat;
 
-// The Terrain Editor uses this routine to find collisions
-// in octets that are terrain replacement tiles. The texture
-// objects that have the null1.bmp texture use this flag
-// (OBJECT_SKIPDRAWING) to keep the texture from drawing
-// but we still need collisions on these objects for the
-// Terrain Editor. I* think* this was done for a speed
-// optimization. If this causes trouble in the Terrain
-// Editor, then we may have to duplicate the entire routine
-// just to get the functionality we require. Kango
-#ifndef TERRAIN_EDITOR
 	if (lpobj->flags & OBJECT_SKIPDRAWING)
 	{
 		return FALSE;
 	}
-#endif
 
 	if (lpobj->flags & OBJECT_USEMATRIX)
 	{
@@ -2212,11 +2159,6 @@ piMATRIX		InvMat;
 				math3dScaleVector(&q, &m, d2 - d1);
 				math3dAddVectors(&tp, op, &q);
 
-// terrain editor uses some very long rays for collision for mouse tracking
-// and it creates objects on the fly which don't work too well with this bailout
-// since collision speed isn't essential for terrain editor, we don't use this
-// early out when in terrain editor mode
-#ifndef TERRAIN_EDITOR
 				m = q = tp;
 				m.x -= eps;
 				m.y -= eps;
@@ -2253,7 +2195,6 @@ piMATRIX		InvMat;
 				{
 					continue;
 				}
-#endif
 
 #ifdef CD_POLY_FENCE
 				// polygon fence algorithm
@@ -4995,9 +4936,6 @@ FASTCOLLIDE* CollideList;
 	CollideList = *CollisionList;
 	for (i=0; i < CurrentObject->numtris; i++, CurrentTri++, pcn+=3, psn++)
 	{
-#ifdef TERRAIN_EDITOR
-		_CollisionTriCnt++;
-#endif
 		// first step is to determine if line passes thru the plane of the triangle, and
 		// in the direction of the normal
 		// if not no collision
@@ -6450,9 +6388,7 @@ void trncdResetFXDamageFlags()
     }
 }
 
-#ifdef _MWERKS
 #pragma mark -
-#endif
 // new collider stuff
 
 /************************************************************************************************

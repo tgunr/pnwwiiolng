@@ -1799,11 +1799,11 @@ JSBool jsClient::SetProperty(JSContext* ctx, int propid, jsval* val)
 	return JS_TRUE;
 }
 
-#ifndef ENABLE_FLOATERS
+#ifndef GM_RELEASE
 /************************************************************************************************
     _isRegularVehicle
 	Looks up the weapon spec and checks if it is a valid vehicle that does not require
-    ENABLE_FLOATERS.
+    GM_RELEASE.
 *************************************************************************************************/
 static bool _isRegularVehicle(const WEAPON_SPEC spec)
 {
@@ -1832,7 +1832,7 @@ void jsClient::ProcessWeapList()
 
 		WeaponCounter counter = weaplist.m_counters[i];
 
-#ifndef ENABLE_FLOATERS
+#ifndef GM_RELEASE
 		if(false == _isRegularVehicle(weaplist.m_weapons[i])) {
 			counter.spawnable = WeaponCounter::NOT_PERMITTED;
 		}

@@ -58,10 +58,6 @@ static UINT32 IAC_JOYSTICK_POV_N[IAC_MAX_JOYSTICKS][IAC_JOYSTICK_POV_MAX]  =
 
 static LOGICAL AddToQueue(UINT32 iac, SINT32 count, LOGICAL state);
 
-#ifndef DEBUG_WW2
-#define IN_WINDOW_MOUSE
-#endif
-
 static void InitTrackIR();
 static void GetTrackIRInput();
 
@@ -92,9 +88,7 @@ SINT32 j;
 	}
 
 	dipSetupKeyboard();
-#ifdef IN_WINDOW_MOUSE
 	dipSetupMouse();
-#endif
 	dipSetupJoystick();
 
 	for(i = 0; i < NUM_IAC_QUEUE_ENTRIES; i++)

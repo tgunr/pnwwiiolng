@@ -20,7 +20,7 @@ namespace Instance
 				, UINT32 _createdAt, UINT32 _startedAt
 				, UINT16 _squadMates
 				)
-			: BasicStatus(_descriptor, _capacity, _gameTime_m, _createdAt, _startedAt)
+			: BasicStatus(_descriptor, static_cast<UINT8>(_capacity), _gameTime_m, _createdAt, _startedAt)
 			, m_squadMates(_squadMates)
 			{}
 		ClientStatus(const BasicStatus& rhs_, const UINT16 squadMates_)

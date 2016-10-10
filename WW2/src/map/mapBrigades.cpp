@@ -9,8 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Supporting Programmer: Patrick "thunder" Macgruder
 
-#include "versionNo.h"
-
 #include <stdexcept>
 #include <algorithm>
 
@@ -289,7 +287,7 @@ Brigade::updateDestinations()
 		dbugLog(_FLI, "brig:%d missions: ", brigadeID());
 		for ( it = m_missionList.begin(); it != m_missionList.end(); ++it )
 		{
-			dbugLog(_FLIB, "%c%d:%s[%d] "
+			dbugLog(_FLI, "%c%d:%s[%d] "
 							, ((it == m_missionPartitionIt) ? '*' : '+')
 							, (*it)->missionID(), (*it)->targetCP()->name, _isObjectiveMission(*it));
 		}

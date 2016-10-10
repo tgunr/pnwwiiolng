@@ -6,13 +6,8 @@
 	obpool
 *************************************************************************************************/
 // I can't believe that this wasn't in here already
-#if platOS == OS_MACOS
-	#pragma options align=packed
-#elif platOS == OS_WIN32
-	#pragma pack(push, 1)
-#else
-	#error No packing specified
-#endif
+#pragma pack(push)
+#pragma pack(1)
 
 #define MINPOOLOBJS 110000
 
@@ -123,13 +118,7 @@ struct DOF
 
 };
 
-
-
-#if platOS == OS_MACOS
-	#pragma options align=reset
-#elif platOS == OS_WIN32
-	#pragma pack(pop)
-#endif
+#pragma pack(pop)
 
 extern LOGICAL	obpoolInit(const SINT8* name);
 extern void 	obpoolKill();

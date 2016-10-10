@@ -276,7 +276,7 @@ _checkConnectTCP(ENDPOINT& endpoint)
 		getsockname(sock, (struct sockaddr*)&endpoint.localSockAddress, &len);
 		assert( len == SockAddrLen );
 		endpoint.setConnected();
-		dbugWrite(_FLAS,"opening socket %d error %d len %d retval =%d", endpoint.teulIndex(), error, len, retval);
+		dbugWrite(_FLA,"opening socket %d error %d len %d retval =%d", endpoint.teulIndex(), error, len, retval);
 		retval = PN_LIKELY(SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *SYN_TOKEN) : -EINVAL;
 		if (PN_UNLIKELY(retval < 0))
 			dbugLog(_FLA,"couldn't send to new connection %d socket %d error %d"
@@ -300,7 +300,7 @@ _checkConnectTCP(ENDPOINT& endpoint)
 				retval = PN_LIKELY(SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *SYN_TOKEN) : -EINVAL;
 				if ( retval < 0 )
 				{
-					dbugLog(_FLAS,"couldn't send to new connection %d socket %d error %d"
+					dbugLog(_FLA,"couldn't send to new connection %d socket %d error %d"
 								, endpoint.teulIndex(), endpoint.socket, retval);
 					teulClose(endpoint, Teul::Closing::ConnSend);
 				}
@@ -319,7 +319,7 @@ _checkConnectTCP(ENDPOINT& endpoint)
 		}
 		else
 		{
-			dbugLog(_FLAS,"t:%d opening socket %d error %d len %d retval = %d", endpoint.teulIndex(), sock, error, len, retval);
+			dbugLog(_FLA,"t:%d opening socket %d error %d len %d retval = %d", endpoint.teulIndex(), sock, error, len, retval);
 			dbugSetErrno(error);
 //			return -error;
 		}
@@ -356,8 +356,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 			continue;
 		}
 
-		if ( g_logDebug )
-			dbugLog(_FLN, "t:%d sock:" PRF_SOCKET " accepting connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
+		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " accepting connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
 
 		newEndpoint = teulCreateEndpoint(Teul::AnyIndex, false, endpoint.timeout, (PROTOCOL)endpoint.protocol);
 		if ( PN_UNLIKELY(newEndpoint == nullptr) )
@@ -371,7 +370,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		newEndpoint->setConnected();
 		newEndpoint->m_parent = &endpoint;
 		newEndpoint->socket = newSock;
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		newEndpoint->m_peer = (endpoint.localPort() == WWII::Net::Ports::ServerPeering + Server::myServerInfo.stats.type);
 #else
 		newEndpoint->m_peer = false;
@@ -630,7 +629,7 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 		if ( rxSize <= 0 )
 			break;
 
-#if AS_SERVER
+#if platBuild == BUILD_SERVER
 		// ignore packets we broadcast..
 		if ( endpoint.protocol == PROTOCOL_UDB && (dgram->sockAddress.sin_addr.s_addr & 0xff000000) == (Server::myInterface.addr[0].naddr & 0xff000000) )
 		{
@@ -650,7 +649,7 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 			dgram->m_size = dgramSize;
 
 			endpoint.m_impl->recvQueue.push_back(dgram);
-//			dbugWrite(_FLIB, " pushed %p to %p ", dgram, endpoint.m_impl->recvDataQue);
+//			dbugWrite(_FLI, " pushed %p to %p ", dgram, endpoint.m_impl->recvDataQue);
 			dgram = nullptr;
 		}
 
@@ -902,7 +901,7 @@ _checkEndpointState(ENDPOINT& endpoint)
 			if ( timeSinceLastKlive >= (TeulDeltaMS)(UINT64)endpoint.m_impl->kliveInterval )
 			{
 #if defined(DEBUG_CONNECTIONS)
-				dbugLog(_FLDB, " sending klive");
+				dbugLog(_FLD, " sending klive");
 #endif
 				const bool oldNagleValue = endpoint.setNagleEnabled(false);
 				const SINT32 sendResult = PN_LIKELY(KLIVE_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *KLIVE_TOKEN) : -EINVAL;
@@ -1085,7 +1084,7 @@ _pollSocketsInner(TeulTimeMS remainder)
 
 	if ( eventHandles.empty() )
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		// Server wants us to spend time in the loop.
 		if ( remainder > 0 )
 			std::this_thread::sleep_for(std::chrono::milliseconds(remainder));
@@ -1417,7 +1416,7 @@ _pollSetIsEmpty()
 }
 #endif
 
-#if platOS != OS_WIN32 || platBuild == TEUL_SERVER
+#if platOS != OS_WIN32 || platBuild == BUILD_SERVER
 static void
 _pollSockets(TeulTimeMS duration_)
 {
@@ -1441,7 +1440,7 @@ _pollSockets(TeulTimeMS duration_)
 }
 #endif
 
-#if platOS == OS_WIN32 && platBuild != TEUL_SERVER
+#if platOS == OS_WIN32 && platBuild != BUILD_SERVER
 static void
 _pollSockets(TeulTimeMS duration_)
 {
@@ -1511,7 +1510,7 @@ _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 	return true;
 }
 
-#if defined(AS_SERVER)
+#if platBuild == BUILD_SERVER
 static void
 _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 {

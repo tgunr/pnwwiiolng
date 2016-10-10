@@ -508,7 +508,7 @@ static UINT32 _TraverseAndSetupColorCoding(OBJECT * Object,UINT32 UseAlpha,vehVe
 static void _LeakTest();
 #endif
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 static UINT32 _DoEyeOperations(mlVehicleData* VehicleData);
 #endif
 
@@ -1302,7 +1302,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 
 	vehVehicle* playerVehicle = VehicleData->VehicleMasterPtr;
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 	if(SuperFloat || playerVehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{
 		_DoEyeOperations(VehicleData);
@@ -1315,7 +1315,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 
 		return 0;
 	}
-#endif // ENABLE_FLOATERS
+#endif // GM_RELEASE
 
 	//if(NumTics)
 	//	_UpdateMovingParts(VehicleData,(FLOAT64)(NumTics*TicTime));
@@ -2830,9 +2830,7 @@ if(VehicleData->VehicleMasterPtr->VehicleType->Type == VEH_TYPE_AIR)
 	return 0;
 }
 
-#ifdef __MWERKS__
 #pragma mark -
-#endif
 
 UINT32 mlUpdateComponent(mlComponent* Component, mlVehicleData* VehicleData, FLOAT64 DeltaTime, UINT32 PassNum,
 							FLOAT64VECTOR* SavedVehicleForce, FLOAT64VECTOR* TempNormForceSum)
@@ -4117,9 +4115,7 @@ FLOAT64 Density1 = 0,Density2 = 0;
 	return 0;
 }
 
-#ifdef __MWERKS__
 #pragma mark -
-#endif
 
 UINT32 mlGetElevatorDeflection(FLOAT64 * ReturnVal,FLOAT64 DeltaTime,mlVehicleData * VehicleData)
 {
@@ -8783,9 +8779,7 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 }
 
 
-#ifdef __MWERKS__
 #pragma mark -
-#endif
 
 /************************************************************************************************
 	mlVehicleHandleTurretConvergence
@@ -9615,9 +9609,7 @@ static LOGICAL mlCollideWithVehicle(vehVehicle* CurrentVehicle, piVECTOR const* 
 	return (NumCollisionSlotsLeft != 32);
 }
 
-#ifdef __MWERKS__
 #pragma mark -
-#endif
 
 #ifdef BETA_RELEASE
 
@@ -10132,9 +10124,7 @@ static void _LeakTest()
 
 #endif
 
-#ifdef __MWERKS__
 #pragma mark -
-#endif
 
 // change!
 // now returns true if it was able to tell, false if it wasn't
@@ -10250,15 +10240,7 @@ LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total)
 	return TRUE;
 }
 
-#ifdef ENABLE_FLOATERS
-
-// more hacked stuff before the rats abandon the ship...
-static FLOAT64	profileFlightVelocity;						// double precision is so 1337!!1
-
-void mlSetProfileFlight()
-{
-	profileFlightVelocity = 200;
-}
+#ifdef GM_RELEASE
 
 // hacked floating eye controller
 static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
@@ -10335,12 +10317,6 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 		if (dipKEYDOWN(buffer,DIK_UP)) 	(trooper) ? Delta.y -= Speed: Delta.y += Speed;
 		if (dipKEYDOWN(buffer,DIK_S))	(trooper) ? Delta.y += Speed: Delta.y -= Speed;
 		if (dipKEYDOWN(buffer,DIK_DOWN)) (trooper) ? Delta.y += Speed: Delta.y -= Speed;
-
-		if(profileFlightVelocity != 0.0)
-		{
-			VehicleData->VehicleRealAtt.Yaw = mlDEG_TO_RAD(81.6);
-			Delta.y += profileFlightVelocity;
-		}
 
 		FLOAT64 rotation = 145.0f;
 
@@ -10484,11 +10460,9 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 	return 0;
 }
 
-#endif // ENABLE_FLOATERS
+#endif // GM_RELEASE
 
-#ifdef __MWERKS__
 #pragma mark -
-#endif
 
 // handles the magical mystery rotational co-ordinate conversion
 

@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "include/logging.h"
 #include "map/mapPlayer.h"
 #include "miss/missionMission.h"
@@ -89,13 +87,12 @@ _sendVehicleToCell(const MM_SPAWN_GRANT_RESPONSE& grant, const Player& commander
 {
 	Host::VehicleRequest vr(commander.instance().id(), grant, commander, crew);
 
-	if ( g_logDebug )
-		dbugLog(_FLD, "v:%u sending vehicle to cell %s with players %u,%u"
-						, vr.m_weaponSerial.serial
-						, teulGetAddress(server->stats.address)
-						, vr.playerNo(0)
-						, vr.playerNo(1)
-						);
+    dbugLog(_FLD, "v:%u sending vehicle to cell %s with players %u,%u"
+                    , vr.m_weaponSerial.serial
+                    , teulGetAddress(server->stats.address)
+                    , vr.playerNo(0)
+                    , vr.playerNo(1)
+                    );
 
 	vr.send(server);
 }
@@ -307,19 +304,16 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 	const Mission* mission = commander->mission();
 	const WEAPON_SPEC& spec = commander->weapon().spec;
 
-	if ( g_logDebug )
-	{
-		auto& instance = commander->instance();
-		dbugLog(_FLD, "Notifying cell:%s spawning t:%d,p:%u,c:%s sq:%u(%s) ct:%d,cp:%u,cc:%s in:%u.%u.%llu.%llu %s#%d [%f/%f/%f]"
-						, teulGetAddress(grant.serverIP)
-						, commander->teulIndex(), grant.commander, commander->callsign()
-						, commander->squadID(), Chat::Name(commander->squadHandle()).c_str()
-						, ((crew) ? crew->teulIndex() : 0), grant.crew, ((crew) ? crew->callsign() : "n/a")
-						, instance.category(), instance.type(), instance.handle(), instance.id()
-						, weapPrintName(spec), commander->weapon().serial
-						, x, y, z
-						);
-	}
+    auto& instance = commander->instance();
+    dbugLog(_FLD, "Notifying cell:%s spawning t:%d,p:%u,c:%s sq:%u(%s) ct:%d,cp:%u,cc:%s in:%u.%u.%llu.%llu %s#%d [%f/%f/%f]"
+                    , teulGetAddress(grant.serverIP)
+                    , commander->teulIndex(), grant.commander, commander->callsign()
+                    , commander->squadID(), Chat::Name(commander->squadHandle()).c_str()
+                    , ((crew) ? crew->teulIndex() : 0), grant.crew, ((crew) ? crew->callsign() : "n/a")
+                    , instance.category(), instance.type(), instance.handle(), instance.id()
+                    , weapPrintName(spec), commander->weapon().serial
+                    , x, y, z
+                    );
 
 	// Create the sortie record
 	DBThread::Do(DBThread::Default

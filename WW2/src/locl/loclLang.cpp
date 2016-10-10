@@ -7,7 +7,7 @@
 #include "locl/loclLang.h"
 #include "mem/mem.h"
 
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 #include "fio/fiod.h"
 #endif
 
@@ -58,7 +58,7 @@ LOGICAL loclLangInit(ENUM_LANGUAGES enumLang)
         else
         {
 // Need front end defined, since this module is used for settings.exe
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
             Write_Debug("[loclLangInit] **Loading language table FAILED**");
 #endif
             return FALSE;
@@ -97,7 +97,7 @@ LANGTABLE* loclLangReadFile(SCHAR* pszPath)
 {
 	LANGTABLE* langTable = nullptr;
 
-/*#ifdef FRONT_END
+/*#if platBuild == BUILD_CLIENT
     LOGICAL langDirectory = FALSE;
 
 #ifdef BETA_RELEASE

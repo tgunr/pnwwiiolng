@@ -15,44 +15,4 @@
 #include <winsock2.h>
 #endif
 
-#if platOS == OS_MACOS
-	#include <sys/types.h>
-#endif
-
-#if !defined(WIN32) && !defined(WIN64)
-	#define SOCKET_ERROR -1
-	#define INVALID_SOCKET  -1
-	using SOCKET = int;
-	#define PRF_SOCKET "%d"
-	#define PRA_SOCKET(s) int(s)
-/*
-#if platOS == OS_FREEBSD
-	using sockval_t = SINT32;
-#endif
-*/
-
-#else // platOS != OS_WIN32
-	#define socklen_t SINT32 FAR
-	#define sockval_t SINT32 FAR
-	#if defined(_WIN64)
-	# define PRF_SOCKET "%llu"
-	#else
-	# define PRF_SOCKET "%u"
-	#endif
-	#define PRA_SOCKET(s) uintptr_t(s)
-#endif
-
-#if platOS == OS_MACOS
-	#include <signal.h>
-	#include <sys/ioctl.h>
-	#include <fcntl.h>
-	#include <unistd.h>
-	#define sockval_t SINT32
-
-#elif platOS == OS_LINUX
-	#ifndef sockval_t
-		#define sockval_t char
-	#endif
-
-#endif
-
+#include "teulSockConfig.h"

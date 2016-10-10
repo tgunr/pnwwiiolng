@@ -302,8 +302,7 @@ updtPatrolGridExpirations()
 		++it ;
 		if ( cell->expired() )
 		{
-			if ( g_logDebug )
-				dbugLog(_FLD, "g:%d,%d expiry time elapsed", cell->gridKey().x(), cell->gridKey().y()) ;
+            dbugLog(_FLD, "g:%d,%d expiry time elapsed", cell->gridKey().x(), cell->gridKey().y()) ;
 			gridHash.erase(cell->gridKey().key()) ;
 			cell->deactivate() ;
 			_freeGrids.push(cell) ;
@@ -325,13 +324,10 @@ HostVehicle::updateGridPosition()
 	if ( m_onGrid && newGX == m_gridX && newGY == m_gridY )
 		return ;
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "v:%u c:%s moved [%d,%d] -> [%d,%d]"
-						, index, callsign()
-						, m_gridX, m_gridY
-						, newGX, newGY) ;
-	}
+    dbugLog(_FLD, "v:%u c:%s moved [%d,%d] -> [%d,%d]"
+                    , index, callsign()
+                    , m_gridX, m_gridY
+                    , newGX, newGY) ;
 
 	WorldGrid* newGrid = _getGrid(GridKey(newGX, newGY)) ;
 	WorldGrid* oldGrid = (m_onGrid) ? oldGrid = _findGrid(GridKey(m_gridX, m_gridY)) : NULL ;
@@ -355,10 +351,9 @@ HostVehicle::removeFromGrid()
 		return ;
 	}
 
-	if ( g_logDebug )
-		dbugLog(_FLD, "v:%u c:%s removing from grid [%d,%d]"
-						, index, callsign()
-						, m_gridX, m_gridY) ;
+    dbugLog(_FLD, "v:%u c:%s removing from grid [%d,%d]"
+                    , index, callsign()
+                    , m_gridX, m_gridY) ;
 
 	WorldGrid* grid = _findGrid(GridKey(m_gridX, m_gridY)) ;
 	if ( grid != NULL )
@@ -406,10 +401,7 @@ updtGridGetVehiclesVector(const HostVehicle* vehicle, const SINT64& range, PLAYE
 		cells.push_back(&node->vehicles()) ;
 	}
 
-	if ( g_logDebug )
-	{
-		betaLog(_FLDB, " total: %u cells", cells.size()) ;
-	}
+    betaLog(_FLD, " total: %u cells", cells.size()) ;
 }
 
 // Structure indicates that I currently have you on my "vis list"

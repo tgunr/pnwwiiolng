@@ -11,7 +11,7 @@
 #include "mem/mem.h"
 #include <map>
 
-#if platBuild != TEUL_SERVER && !defined(CMDLINE_CLIENT)
+#if platBuild != BUILD_SERVER
 #include "pi/pi.h"
 #endif
 
@@ -23,7 +23,7 @@
 #include "weap/weapList.h"
 #include "teul/teulKit.h"
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	#include "fio/fioDefs.h"
 	#include "fio/fiod.h"
 	#include "str/stringLib.h"
@@ -67,7 +67,7 @@ static PARSE_CALLBACK	_stratCallbacks[] = {{"cp",			_fillCp}
 											,{"depot_link",	_fillDepotLink}
 											,{"",			nullptr}};
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 static bool doNothing(SINT32 numArgss, FUNCARGS* args) { return true; }
 
 static PARSE_CALLBACK  blank[]={{"backdrop",				doNothing},
@@ -107,7 +107,7 @@ static PARSE_CALLBACK  blank[]={{"backdrop",				doNothing},
 static UINT32 worFileLineNum;
 static char _fileName[PN_MAX_PATH];
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 extern SINT32 LoadingScreen;
 #endif
 
@@ -160,13 +160,13 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 	atexit(parseWorKill);
 
 #ifndef VALIDATOR
- #if platBuild == TEUL_SERVER
+ #if platBuild == BUILD_SERVER
 	if ( !weapHasInitialized() && !weapListInit(cv_thblitzPath.GetString()) )
  #else
 	if ( !weapListInit("th_blitz/weapon") )
- #endif // TEUL_SERVER
+ #endif // BUILD_SERVER
 	{
-#if platBuild != TEUL_SERVER && !defined(CMDLINE_CLIENT)
+#if platBuild != BUILD_SERVER
 		piExitProgram(_FL,"Weapon Lists did not initialize");
 #endif
 		DEBUG_FATAL("WEAPON_LISTS DID NOT INITIALIZE!!!");
@@ -176,11 +176,11 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 
 	strsafecpy(_fileName, levelfile);
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	world = blank;
 #endif
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 	LoadingScreen = 1;
 #endif
 
@@ -368,7 +368,7 @@ WEAPON_SPEC spec;
 
 	// Some mechanism may need to be used for the 64 bit ASCII to 64 bit integer conversion.
 	// The atoll function is not supported on the PC; however, _atoi64 is supported.
-#ifndef FRONT_END // max damage is not used on front end anyway
+#if platBuild == BUILD_SERVER // max damage is not used on front end anyway
 	thisParam->maxdamage		= strtoull(args[MAX_LM_ARG+0].svalue, nullptr, 10);
 #endif
 	thisParam->rpsrepair		= args[MAX_LM_ARG+1].dvalue;

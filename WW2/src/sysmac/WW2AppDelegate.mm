@@ -1770,34 +1770,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     // determine user's current language setting
     NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
     
-    NSArray* languages = [defs objectForKey:@"AppleLanguages"];
-    for(unsigned int i = 0; i < [languages count]; i++)
-    {
-        NSString* preferredLang = [languages objectAtIndex:i];
-        NSString* nsstr = [NSLocale canonicalLocaleIdentifierFromString: preferredLang];
-        
-        if([nsstr isEqualToString:@"en"])
-        {
-            gLanguage = (UINT32)IDE_LANGUAGE_ENGLISH;
-            break;
-        }else if([nsstr isEqualToString:@"it"])
-        {
-            gLanguage = (UINT32)IDE_LANGUAGE_ITALIAN;
-            break;
-        }else if([nsstr isEqualToString:@"fr"])
-        {
-            gLanguage =  (UINT32)IDE_LANGUAGE_FRENCH;
-            break;
-        }else if([nsstr isEqualToString:@"de"])
-        {
-            gLanguage =  (UINT32)IDE_LANGUAGE_GERMAN;
-            break;
-        }else if([nsstr isEqualToString:@"es"])
-        {
-            gLanguage =  (UINT32)IDE_LANGUAGE_SPANISH;
-            break;
-        }
-    }
+    gLanguage = static_cast<UINT32>(IDE_LANGUAGE_ENGLISH);
     cfgPrefsSetInt("app.language", static_cast<int>(gLanguage));
     cfgPrefsSave();
 }

@@ -121,7 +121,7 @@ _penaltyTime(Player* player, AAStatus* status, bool newHour)
 	static const UINT32 _WARNING_INTERVAL = (UINT32)(60 * host_config.arena.minutesPerAAHour * AntiAddiction::TIRED_WARNING_INTERVAL);
 	if ( status->m_state != AntiAddiction::_PENALTY_TIME || newHour )
 	{
-		DEV_LOG(_FLIB, " first notice");
+		DEV_LOG(_FLI, " first notice");
 		// First notice
 		chatSendLocalizedMessage(player->playerID(), LSTR_WARNING, LSTR_ANTI_ADDICTION_PENALTY);
 		status->m_state = AntiAddiction::_PENALTY_TIME;
@@ -130,7 +130,7 @@ _penaltyTime(Player* player, AAStatus* status, bool newHour)
 	}
 	else if ( teulTime() > status->m_lastNotice + _WARNING_INTERVAL )
 	{
-		DEV_LOG(_FLIB, " repeat notice");
+		DEV_LOG(_FLI, " repeat notice");
 		// Repeat notice
 		chatSendLocalizedMessage(player->playerID(), LSTR_WARNING, LSTR_ANTI_ADDICTION_PENALTY);
 		status->m_lastNotice = teulTime();
@@ -138,7 +138,7 @@ _penaltyTime(Player* player, AAStatus* status, bool newHour)
 	}
 	else
 	{
-		DEV_LOG(_FLIB, " already warned");
+		DEV_LOG(_FLI, " already warned");
 	}
 
 	return false;
@@ -153,7 +153,7 @@ _tiredTime(Player* player, AAStatus* status, bool newHour)
 	int messageID = LSTR_ANTI_ADDICTION_HOUR1 + (status->m_playedHours - 1);
 	if ( status->m_state != AntiAddiction::_TIRED_TIME  || newHour )
 	{
-		DEV_LOG(_FLIB, " notifying");
+		DEV_LOG(_FLI, " notifying");
 		// First notice
 		chatSendLocalizedMessage(player->playerID(), LSTR_CAUTION, (LSTRING_ID)messageID);
 		status->m_state = AntiAddiction::_TIRED_TIME;
@@ -162,7 +162,7 @@ _tiredTime(Player* player, AAStatus* status, bool newHour)
 	}
 	else
 	{
-		DEV_LOG(_FLIB, " no notice required");
+		DEV_LOG(_FLI, " no notice required");
 	}
 
 	return false;
@@ -201,7 +201,7 @@ mmCheckAddictionTimers()
 
 		if ( player->timeIn == 0 )
 		{
-			DEV_LOG(_FLIB, "not logged in yet (%u <= %u)", player->timeIn, teulTime());
+			DEV_LOG(_FLI, "not logged in yet (%u <= %u)", player->timeIn, teulTime());
 			continue;
 		}
 
@@ -213,12 +213,12 @@ mmCheckAddictionTimers()
 		bool stateChanged = false;
 		if ( playedHours >= AntiAddiction::PENALTY_HOUR )
 		{
-			DEV_LOG(_FLIB, "penalty time");
+			DEV_LOG(_FLI, "penalty time");
 			stateChanged = _penaltyTime(player, status, newHour);
 		}
 		else if ( playedHours >= AntiAddiction::TIRED_HOUR )
 		{
-			DEV_LOG(_FLIB, "tired time");
+			DEV_LOG(_FLI, "tired time");
 			stateChanged = _tiredTime(player, status, newHour);
 		}
 		else
@@ -229,14 +229,14 @@ mmCheckAddictionTimers()
 				chatSendLocalizedMessage(player->playerID(), LSTR_NOTE, (LSTRING_ID)noticeID);
 			}
 
-			DEV_LOG(_FLIB, "regular time");
+			DEV_LOG(_FLI, "regular time");
 		}
 
 		status->m_playedHours = playedHours;
 
 		if ( stateChanged || teulTime() >= status->m_nextSaveTime )
 		{
-			DEV_LOG(_FLIB, " saving");
+			DEV_LOG(_FLI, " saving");
 			_saveMinorUsage(player);
 		}
 	}

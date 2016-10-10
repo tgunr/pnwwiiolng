@@ -223,8 +223,8 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 			}
 		}
 		if ( it == configEntries.end() ) {
-			configEntries.emplace_back(ConfigEntry(name, equals, value, eol));
-		}
+			configEntries.emplace_back(name, equals, value, eol);
+        }
 		file.skipline();
 	}
 }

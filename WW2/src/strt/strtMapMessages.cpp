@@ -63,14 +63,11 @@ static SINT32 _recvMMPostAccept(ACTION_OBJECT* const a)
 	MM_POST_ACCEPT postAccept;
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postAccept, sizeof(MM_POST_ACCEPT));
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD,"c:%u postAccept " PRF_WEAPON_SERIAL " %d %d"
-						, postAccept.customerID
-						, PRA_WEAPON_SERIAL(postAccept.weaponSerial)
-						, postAccept.portal
-						, postAccept.immediateSpawn);
-	}
+    dbugLog(_FLD,"c:%u postAccept " PRF_WEAPON_SERIAL " %d %d"
+                    , postAccept.customerID
+                    , PRA_WEAPON_SERIAL(postAccept.weaponSerial)
+                    , postAccept.portal
+                    , postAccept.immediateSpawn);
 	//if (postAccept.portal == 0)
 		//postAccept.portal = 1;
 
@@ -572,15 +569,12 @@ SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 missionID
 	capacityRequest.facility = facility;
 	capacityRequest.rtb = rtb;
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "capacityRequest: %u:%u:%u @ " PRF_FULL_OBJ_ID " code:%u"
-					, capacityRequest.tag, capacityRequest.missionID
-					, capacityRequest.customerID
-					, PRA_FULL_OBJ_ID(capacityRequest.facility)
-					, capacityRequest.rtb
-					);
-	}
+    dbugLog(_FLD, "capacityRequest: %u:%u:%u @ " PRF_FULL_OBJ_ID " code:%u"
+                , capacityRequest.tag, capacityRequest.missionID
+                , capacityRequest.customerID
+                , PRA_FULL_OBJ_ID(capacityRequest.facility)
+                , capacityRequest.rtb
+                );
 
 	retval = teulSend(connection, _XCHG_MM_FACILITY_CAPACITY, &capacityRequest);
 

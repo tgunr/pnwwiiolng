@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
-
 #include "chat/chatBrigadeMove.h"
 #include "chat/chatConstants.h"
 #include "chat/chatSideMessage.h"

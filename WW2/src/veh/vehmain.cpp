@@ -96,11 +96,6 @@
 #include "strt/strtClientMessages.h"
 #include "strt/strtCPFlags.h"
 
-#ifdef TESTMAC
-//extern "C" void spawningin();
-//extern "C" void spawningout();
-#endif
-
 #include "wwii/wwiiOhYeahCodes.h"
 
 #define REPORT_ENEMIES
@@ -223,7 +218,7 @@ static SINT32 _NumVehicles = 0;
 
 static bool _findRTBFRU(ServerTrackedObject& sto, void* cookie);
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 static SINT32	disableVehLODs;
 #endif
 
@@ -428,7 +423,7 @@ UINT32 vehInit()
     if (!IS_OFFLINE)
     {
         size_t cnt = sizeof(g_vehicles);
-        memset( g_vehicles, cnt, 0xff ); // damn cheaters hopefully choke on this
+        memset( reinterpret_cast<void *>(&g_vehicles[0]), cnt, 0xff ); // damn cheaters hopefully choke on this
     }
 
 	vehAnimInit();
@@ -904,7 +899,7 @@ static UINT32 _UpdateVehicleLODs()
 			CurrentVehicle->MinVehicleLOD = 2;
 #endif
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 		// FIXME - not convinced MinVehicleLOD is used!
 		if (disableVehLODs)
 		{
@@ -929,7 +924,7 @@ static UINT32 _UpdateVehicleLODs()
 				}
 				if (Object != nullptr)
 				{
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 					if (disableVehLODs)
 					{
 						Object->minlod = 0.0f;
@@ -4865,10 +4860,6 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 	return 0;
 }
 
-#ifdef __MWERKS__
-#pragma mark -
-#endif
-
 /************************************************************************************************
 	vehFindInertiaComponent
 *************************************************************************************************/
@@ -5130,7 +5121,7 @@ int vehVehicleSpawned(const vehType* vtype, bool onlyPlayers)
 
 }
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 /************************************************************************************************
 	vehmainToggleLOD .. turns on and off LOD switches (off means all vehicles use LOD 0)
 *************************************************************************************************/
@@ -6553,7 +6544,7 @@ static void vehmainSpawn()
 	}
 #endif
 
-#ifndef ENABLE_FLOATERS
+#ifndef GM_RELEASE
     // Check to make absolutely sure we aren't spawning as a floater
 	if(pVehicle && pVehicle->VehicleType && pVehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{

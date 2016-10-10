@@ -2491,7 +2491,10 @@ void _playWeaponFireSound(const char* sound,
 	if (p != distSound.npos)
 	{
 		distSound.replace(distSound.begin() + p, distSound.end(), "_distant.wav");
-		if (fioAccess(distSound.c_str()))
+        int fd = fioOpen(distSound);
+        
+        fioClose(fd);
+		if (fd != -1)
 		{
 			piVECTOR v{ (FLOAT32)pos->x, (FLOAT32)pos->y, (FLOAT32)pos->z };
 

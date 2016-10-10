@@ -233,20 +233,31 @@ static void endianSwapBlock32(long* l, int  n)
 		endianSwap32((unsigned char*)l);
 }
 
+// Controls whether the format of the DDS is logged to the log system. TODO:
+// replace with a new logging subsystem when that's working. - Gadget
+//#define LOG_FORMATS
+#ifdef LOG_FORMATS
+#define Write_Format_Log(...) Write_Log(__VA_ARGS__)
+#else
+#define Write_Format_Log(...)
+#endif
+
 Image* ReadDDSFile(const std::string& name)
 {
     DDSURFACEDESC2 ddsd;
-
-    Write_Log(LOG_TEXTURE, LOG_INFO, "[ReadDDSFile] Reading image %s", name.c_str());
 
     int fd = -1;
     fd = fioOpen(name.c_str());
 
     if(fd < 0)
     {
-        Write_Debug("[ReadDDSFile] cannot open %s", name.c_str());
+        if (errno != ENOENT) {
+            Write_Debug("[ReadDDSFile] cannot open %s", name.c_str());
+        }
         return nullptr;
     }
+
+    //Write_Log(LOG_TEXTURE, LOG_INFO, "[ReadDDSFile] Reading image %s", name.c_str());
 
     char filecode[4];
 
@@ -371,7 +382,7 @@ Image* ReadDDSFile(const std::string& name)
                     f.pixelFormat    != UNSUPPORTED &&
                     f.dataType       != UNSUPPORTED)
                 {
-                    Write_Log(LOG_OLD, LOG_INFO, " format = %s", f.name);
+                    Write_Format_Log(LOG_OLD, LOG_INFO, " format = %s", f.name);
                     internalFormat = f.internalFormat;
                     pixelFormat    = f.pixelFormat;
                     dataType       = f.dataType;
@@ -381,7 +392,7 @@ Image* ReadDDSFile(const std::string& name)
                 else
                 {
                     fioClose(fd);
-                    Write_Log(LOG_OLD, LOG_WARN, "ERROR: format is not supported");
+                    Write_Format_Log(LOG_OLD, LOG_WARN, "ERROR: format is not supported");
                     return nullptr;
                 }
             }
@@ -401,31 +412,31 @@ Image* ReadDDSFile(const std::string& name)
 
         if(usingAlpha && ddsd.ddpfPixelFormat.dwLuminanceBitDepth == 8)
         {
-            Write_Log(LOG_OLD, LOG_INFO, "format = L4A4");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = L4A4");
             pixelFormat = GL_LUMINANCE4_ALPHA4; // invalid enumerant?
         }
         else if ( usingAlpha && ddsd.ddpfPixelFormat.dwLuminanceBitDepth == 32)
         {
-            Write_Log(LOG_OLD, LOG_INFO, "format = L16A16");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = L16A16");
             dataType = GL_UNSIGNED_SHORT;
         }
         else if ( !usingAlpha && ddsd.ddpfPixelFormat.dwLuminanceBitDepth == 16)
         {
-            Write_Log(LOG_OLD, LOG_INFO, "format = L16");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = L16");
             dataType = GL_UNSIGNED_SHORT;
         }
         else if(usingAlpha)
         {
-            Write_Log(LOG_OLD, LOG_WARN, "format = L8A8");
+            Write_Format_Log(LOG_OLD, LOG_WARN, "format = L8A8");
         }
         else
         {
-            Write_Log(LOG_OLD, LOG_WARN, "format = L8");
+            Write_Format_Log(LOG_OLD, LOG_WARN, "format = L8");
         }
     }
     else if(ddsd.ddpfPixelFormat.dwFlags & DDPF_ALPHA)
     {
-        Write_Log(LOG_OLD, LOG_WARN, "format = ALPHA");
+        Write_Format_Log(LOG_OLD, LOG_WARN, "format = ALPHA");
         internalFormat = GL_ALPHA;
         pixelFormat    = GL_ALPHA;
     }
@@ -436,7 +447,7 @@ Image* ReadDDSFile(const std::string& name)
         switch(ddsd.ddpfPixelFormat.dwFourCC)
         {
         case FOURCC_DXT1:
-            Write_Log(LOG_OLD, LOG_INFO, "format = DXT1");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = DXT1");
             if (usingAlpha)
             {
                 internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
@@ -450,29 +461,29 @@ Image* ReadDDSFile(const std::string& name)
             }
             break;
         case FOURCC_DXT3:
-            Write_Log(LOG_OLD, LOG_INFO, "format = DXT3");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = DXT3");
             internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
             pixelFormat    = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
             break;
         case FOURCC_DXT5:
-            Write_Log(LOG_OLD, LOG_INFO, "format = DXT5");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = DXT5");
             internalFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
             pixelFormat    = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
             break;
         case 0x00000024: // A16B16G16R16
-            Write_Log(LOG_OLD, LOG_INFO, "format = A16B16G16R16");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = A16B16G16R16");
             internalFormat = GL_RGBA;
             pixelFormat    = GL_RGBA;
             dataType       = GL_UNSIGNED_SHORT;
             break;
         case 0x00000071: // A16B16G16R16F
-            Write_Log(LOG_OLD, LOG_INFO, "format = A16B16G16R16F");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = A16B16G16R16F");
             internalFormat = GL_RGBA; // why no transparency?
             pixelFormat    = GL_RGBA;
             dataType       = GL_HALF_FLOAT_NV;
             break;
         case 0x0000006E: // Q16W16V16U16
-            Write_Log(LOG_OLD, LOG_INFO, "format = Q16W16V16U16");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = Q16W16V16U16");
             internalFormat = GL_RGBA;
             pixelFormat    = GL_RGBA;
             dataType       = GL_UNSIGNED_SHORT;
@@ -488,19 +499,19 @@ Image* ReadDDSFile(const std::string& name)
             return nullptr;
             break;
         case 0x00000072: // R32F
-            Write_Log(LOG_OLD, LOG_INFO, "format = R32F");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = R32F");
             internalFormat = GL_RGB;
             pixelFormat    = GL_RED;
             dataType       = GL_FLOAT;
             break;
         case 0x0000006F: // R16F
-            Write_Log(LOG_OLD, LOG_INFO, "format = R16F");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = R16F");
             internalFormat = GL_RGB;
             pixelFormat    = GL_RED;
             dataType       = GL_HALF_FLOAT_NV;
             break;
         case 0x00000074: // A32B32G32R32F
-            Write_Log(LOG_OLD, LOG_INFO, "format = A32B32G32R32F");
+            Write_Format_Log(LOG_OLD, LOG_INFO, "format = A32B32G32R32F");
             internalFormat = GL_RGBA;
             pixelFormat    = GL_RGBA;
             dataType       = GL_FLOAT;
@@ -609,10 +620,6 @@ Image* ReadDDSFile(const std::string& name)
     }
 
     unsigned char* imageData = new unsigned char [size];
-
-#ifdef TESTMAC
-//  printf("%60s: %'12d [%4dx%4d=%2d]\n",name.c_str(), size, s, t, r);
-#endif
 
     if(!imageData)
     {

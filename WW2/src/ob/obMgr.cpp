@@ -1602,14 +1602,6 @@ PoolModel::~PoolModel()
 
 static int loadcounter = 0;
 
-#if platOS == OS_MACOS
-#define OutputDebugStringA(x) printf("%s",x)
-#endif
-
-#ifdef TRACKER_OF_MEMORY
-extern bool recording;
-#endif
-
 #ifdef SUPPORT_WWO
 bool PoolModel::LoadWWO( std::string path )
 {
@@ -1635,16 +1627,10 @@ void PoolModel::load()
 
 	if(fioQuery() == ISDIRECTORY && ModelNeedsRebuild(path.c_str()))
 	{
-#ifdef TRACKER_OF_MEMORY
-    recording = true;
-#endif
 #ifndef COLLECT_TEXTURE_STATS
-		sprintf(s, "%4d: RebuildMDL: %s\n", ++loadcounter, path.c_str());OutputDebugStringA(s);
+		dbugLog(_FLD, "%4d: RebuildMDL: %s\n", ++loadcounter, path.c_str());
 #endif
 		this->RebuildMDL();
-#ifdef TRACKER_OF_MEMORY
-    recording = false;
-#endif
     }
 
 	LoadMDL(path.c_str());
@@ -1654,21 +1640,13 @@ void PoolModel::load()
 /************************************************************************************************
 	LoadMDL
 *************************************************************************************************/
-#ifdef TESTMAC
-//extern "C" void showmemstuff(const char*p);
-#endif
-
 void PoolModel::LoadMDL(const char* path)
 {
 	int fd = fioOpen(path);
 	if(fd < 0) return;
 
 
-#ifdef TESTMAC
-//  showmemstuff(path);
-#endif
-
-  // HACK: this is for texture loading only. Texture data must be held for
+    // HACK: this is for texture loading only. Texture data must be held for
     // buildings that use the alpha collider. Otherwise, the data can be freed
     // after the texture has been created. This saves quite a bit of memory. When
     // the paper buildings (alpha collider buildings) are redone where they no
@@ -1799,9 +1777,6 @@ void PoolModel::LoadMDL(const char* path)
  	}
 
 	fioClose(fd);
-#ifdef TESTMAC
-//  showmemstuff(nullptr);
-#endif
 
   /* I now create the pool node's collider at runtime if needed in
   // physicsCreateObjectCollider; it check's if the modelNode has a collider or not
@@ -2172,8 +2147,8 @@ void PoolModel::SaveMDL(const POOLOBJHDR* poolobjhdr,
 	obpoolSavePoolCallback((POOLOBJHDR*)poolobjhdr, hfile);
 
 	// fill in length
-	length = fioSeek(hfile, 0, fioSEEK_CUR);
-	fioSeek(hfile, 4, fioSEEK_SET);
+	length = fioSeek(hfile, 0, SEEK_CUR);
+	fioSeek(hfile, 4, SEEK_SET);
 
 	// This is now delayed until* after* successful file creation.
 	fioPuts(hfile, OBJECTFILE_VERSION);
@@ -2319,39 +2294,30 @@ LOGICAL PoolModel::ModelNeedsRebuild(const char* path)
 
 	if (fioQuery() == ISARCHIVE) return FALSE;
 
+    std::string mdlpath = path;
 
-	if(fioAccess(path))
-	{
-		std::string mdlpath = path;
+    size_t ext = mdlpath.rfind('.');
+    if(ext != std::string::npos) mdlpath.erase(ext);
 
-		size_t ext = mdlpath.rfind('.');
-		if(ext != std::string::npos) mdlpath.erase(ext);
+    std::string fltpath(mdlpath);
+    fltpath += ".flt";
+    mdlpath += ".mdl";
 
-		std::string fltpath(mdlpath);
-		fltpath += ".flt";
-        mdlpath += ".mdl";
-
-		if(!fiodAccess(mdlpath.c_str()))
-			return TRUE;
-
-		fd = fiodOpen(mdlpath.c_str(), false, sizeof(mdlHeader));
-		if(fd < 0) return TRUE;
+    fd = fiodOpen(mdlpath.c_str(), false, sizeof(mdlHeader));
+    if(fd < 0) return TRUE;
 
     fiodRead( fd, &mdlHeader.company, sizeof(short) );
     fiodRead( fd, &mdlHeader.filetype, sizeof(short) );
     fiodRead( fd, &mdlHeader.version, sizeof(short) );
 
-		fiodClose(fd);
+    fiodClose(fd);
 
-		if(mdlHeader.version != OBJECTFILE_VERSION) return TRUE;
+    if(mdlHeader.version != OBJECTFILE_VERSION) return TRUE;
 
-		fiodModified(&fltmod, fltpath.c_str());
-		fiodModified(&mdlmod, mdlpath.c_str());
+    fiodModified(&fltmod, fltpath.c_str());
+    fiodModified(&mdlmod, mdlpath.c_str());
 
-		return (fltmod > mdlmod);
-	}
-
-	return TRUE;
+    return (fltmod > mdlmod);
 }
 
 

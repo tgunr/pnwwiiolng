@@ -7,8 +7,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
-
 #include "strt/strtProtos.h"
 
 #include "wwii/wwiiDBConfig.h"

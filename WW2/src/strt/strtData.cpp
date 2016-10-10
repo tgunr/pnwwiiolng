@@ -12,8 +12,6 @@
 // Originating Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Marty "Vandal" Poulin
 
-#include "versionNo.h"
-
 #include "map/mapConstants.h"
 #include "parse/parseWor.h"
 #include "sdm/sdmConfigVars.h"
@@ -603,13 +601,10 @@ _scPass2_linkSetup(Supercell& sc)
 		firebase->link = newLink;
 		newLink->firebase = firebase;
 #ifdef HEAVY_DEBUG
-		if ( g_logDebug )
-		{
-			dbugLog(_FLD,"link %s to %s " PRF_FULL_OBJ_ID " is associated with firebase %s " PRF_FULL_OBJ_ID ""
-					, start->name, end->name, PRA_FULL_OBJ_ID(newLink->fullObjID)
-					, firebase->name, PRA_FULL_OBJ_ID(firebase->fullObjID)
-					);
-		}
+        dbugLog(_FLD,"link %s to %s " PRF_FULL_OBJ_ID " is associated with firebase %s " PRF_FULL_OBJ_ID ""
+                , start->name, end->name, PRA_FULL_OBJ_ID(newLink->fullObjID)
+                , firebase->name, PRA_FULL_OBJ_ID(firebase->fullObjID)
+                );
 #endif // HEAVY_DEBUG
 
 		if (!strtInitLinkfromWOR(*newLink))

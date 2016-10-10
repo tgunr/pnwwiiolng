@@ -69,8 +69,7 @@ _recvPlayInfoSend(ACTION_OBJECT* const a)
 		return -EINVAL;
 	}
 
-	if ( g_logDebug )
-		dbugLog(_FLD, "t:%d c:%s received playinfosend", a->teulIndex, cdata->m_username.c_str());
+    dbugLog(_FLD, "t:%d c:%s received playinfosend", a->teulIndex, cdata->m_username.c_str());
 
 	// Do something with the data
 	authdbStoreComputerInfo(*cdata, info);

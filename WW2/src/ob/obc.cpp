@@ -480,7 +480,6 @@ char str[32];
 	// program. We don't want that to happen.
 	texid = tv->texid;
 
-#ifndef CONVERSION_PROGRAM
     if(!piIsTexture(texid, 0))
 	{
 		texid = piGetMaterialTexId(matid);
@@ -489,7 +488,6 @@ char str[32];
 	}
 
 	tv->texid = texid;
-#endif
 
 	numverts = piGetNumberVertices();
 	if (numverts == 0 || numverts < tv->numverts)

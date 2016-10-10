@@ -81,7 +81,6 @@
 #include "teul/teulPacket.h"
 #include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
-#include "versionNo.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBConfig.h"
 #include "wwii/wwiiHCUnits.h"
@@ -948,8 +947,7 @@ _distributeChannelMessage(Chat::HostMessage& message, Chat::Channel& channel, Pl
 		}
 	}
 
-	if ( g_logDebug )
-		dbugLog(_FLDB, " [%" PRSizeT " recipients]", indexes.size());
+    dbugLog(_FLD, " [%" PRSizeT " recipients]", indexes.size());
 
 	chatBroadcastHostMessage(indexes.begin(), indexes.end(), message);
 }
@@ -1888,7 +1886,7 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle handleID)
 	if ( channelID.IsPlaceHolder() )
 	{
 		if ( g_debugRadios )
-			dbugLog(_FLDB, " [placeholder]");
+			dbugLog(_FLD, " [placeholder]");
 		tunePlaceHolder(index, type);
 		return true;
 	}
@@ -2452,11 +2450,11 @@ _personaRelease(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType rel
 
 	if ( psn->localInfo != nullptr )
 	{
-		dbugLog(_FLNB, " *freeing");
+		dbugLog(_FLN, " *freeing");
 		chatFreePlayer((Player*)psn->localInfo);
 	}
 	else
-		dbugLog(_FLNB, " no player to free");
+		dbugLog(_FLN, " no player to free");
 
 	return 0;
 
@@ -2691,8 +2689,7 @@ _refreshDefaultSquad()
 	}
 	else
 	{
-		if ( g_logDebug )
-			dbugLog(_FLDB, ": not loaded.");
+		dbugLog(_FLD, ": not loaded.");
 	}
 }
 

@@ -10,7 +10,7 @@
 #include "mem/mem.h"
 #include "include/defs.h"
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 #include "include/vars.h"
 #include "rn/rnlogo.h"
 #endif
@@ -19,14 +19,14 @@
 #include "parse/parseIO.h"
 #include "str/stringLib.h"
 
-#ifdef LIMITED_FIO
+#if platBuild == BUILD_SERVER
 	#include "fio/fioDefs.h"
 	#include "fio/fiod.h"
 #else
 	#include "fio/fio.h"
 #endif
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 extern SINT32	LoadingScreen;
 #endif
 
@@ -216,7 +216,7 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 
 	*lineCounter = 0;
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 	if ( LoadingScreen )
 	{
 		rnUpdateLoadingScreen();

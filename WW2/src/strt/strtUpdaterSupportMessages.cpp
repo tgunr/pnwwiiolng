@@ -57,8 +57,7 @@ _recvEnemySpotted(ACTION_OBJECT* const a)
 	if ( a->offset < 0 )
 		return a->offset;
 
-	if ( g_logDebug )
-		dbugLog(_FLD,"t:%d received enemy report for vehicle " PRF_WEAPON_SERIAL "", a->teulIndex, PRA_WEAPON_SERIAL(report.enemyReported));
+    dbugLog(_FLD,"t:%d received enemy report for vehicle " PRF_WEAPON_SERIAL "", a->teulIndex, PRA_WEAPON_SERIAL(report.enemyReported));
 
 	return serverSendPacketToType(outgoing, STRAT_HOST);
 }

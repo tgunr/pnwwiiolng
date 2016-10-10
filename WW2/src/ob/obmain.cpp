@@ -34,10 +34,6 @@
 
 #include "spt/sptmain.h"
 
-#if platOS == OS_MACOS
-#include <pthread.h>
-#endif
-
 using ObjectSet = std::unordered_set<OBJECT*>;
 
 static ObjectSet objectmap;

@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
-
 #include <algorithm>
 
 #if platOS != OS_WIN32
@@ -333,6 +331,7 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 		if ( facility->isOpen() == false )
 			throw PostRequestFail("facility closed", SPAWN_FACILITY_CLOSED);
 
+<<<<<<< HEAD
 		if ( g_logDebug )
 			dbugLog(_FLD, "p:%u c:%s br:%u m:%u post request %s @ %s"
 						, request.customerID
@@ -342,6 +341,16 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 						, weapPrintName(request.weapon)
 						, facility->name
 						);
+=======
+        dbugLog(_FLD, "p:%u c:%s br:%u m:%u post request %s @ %s"
+                    , request.customerID
+                    , Chat::Name(request.handle).c_str()
+                    , request.brigadeID
+                    , request.missionID
+                    , weapPrintName(&request.weapon)
+                    , facility->name
+                    );
+>>>>>>> feature/DEV-762_HockeyApp
 
 		UINT32 supplyUnitID = strtGetSupplyingUnit(*facility, request.brigadeID);
 		if ( supplyUnitID == 0 )
@@ -436,8 +445,7 @@ MM_POSTED_WEAPON::copy(const POSTED_WEAPON& rhs)
 void
 POSTED_WEAPON::detachCrewAndJoiners(bool includeCommander)
 {
-	if ( g_logDebug )
-		dbugLog(_FLD, "p:%u v:%u deleting %s crew (crew:%p, join:%p)", m_commander, serial(), (includeCommander ? "all" : "joined"), &m_crewList, &m_joinList);
+    dbugLog(_FLD, "p:%u v:%u deleting %s crew (crew:%p, join:%p)", m_commander, serial(), (includeCommander ? "all" : "joined"), &m_crewList, &m_joinList);
 
 	if ( includeCommander )
 	{
@@ -482,15 +490,13 @@ _cleanUpJoinNode(WeapJoinRequestNode* joinNode)
 			dbugLog(_FLA,"illegal node state JOIN_LIST_FREE on spawnCancel of id %d",joinNode->m_playerID);
 			break;
 		case JOIN_LIST::_FACILITY:
-			if ( g_logDebug )
-			{
-				const FULL_OBJ_ID fid = joinNode->m_joinList->m_facility->fullObjID;
-				dbugLog(_FLD, "deleting join %p id %d post from facility " PRF_FULL_OBJ_ID ""
-						, joinNode, joinNode->m_playerID
-						, PRA_FULL_OBJ_ID(fid)
-						);
-			}
+            const FULL_OBJ_ID fid = joinNode->m_joinList->m_facility->fullObjID;
+            dbugLog(_FLD, "deleting join %p id %d post from facility " PRF_FULL_OBJ_ID ""
+                    , joinNode, joinNode->m_playerID
+                    , PRA_FULL_OBJ_ID(fid)
+                    );
 			break;
+		}
 		case JOIN_LIST::_POST_JOIN_REQ:
 		case JOIN_LIST::_POST_CREW:
 		{

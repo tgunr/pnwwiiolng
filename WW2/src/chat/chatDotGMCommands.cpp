@@ -10,7 +10,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
 #include "server/serverReleaseTypeEnum.h"
 #include "server/serverInterface.h"
 
@@ -351,16 +350,9 @@ public:
 		}
 
 		FLOAT64VECTOR location;
-		static const ChatHandle snail = chatGetLowercaseHandle("snail");
-		if (player.matchHandle() == snail && (target->playerID() == 3204 || target->playerID() == 833))
-		{
-			location.x = location.y = location.z = 0;
-		} else
-		{
-			location.x = target->lastX();
-			location.y = target->lastY();
-			location.z = target->lastZ();
-		}
+        location.x = target->lastX();
+        location.y = target->lastY();
+        location.z = target->lastZ();
 
 		player.gmNote("GM", command(), args[0], args[1]);
 		PREP_CHAT_MSG(cmsg, "%s /buzzardspawning %s: %s", player.callsign(), target->callsign(), args[1]);
@@ -585,8 +577,7 @@ public:
 		if (!allow(player)) return false;
 		player.message(LSTR_USAGE, LSTR_GENERIC, "'/debug <condition> on|off'");
 		player.message(LSTR_DETAIL, LSTR_GENERIC, "Sets or clears a debug logging condition on the chat host.");
-		player.message(LSTR_DETAIL, LSTR_GENERIC, "Conditions are: debug, radios, squads, personas and chat.");
-		player.message(LSTR_NOTE, LSTR_GENERIC, "Condition 'debug' is a master setting for all other conditions.");
+		player.message(LSTR_DETAIL, LSTR_GENERIC, "Conditions are: radios, squads, personas and chat.");
 		return true;
 	}
 
@@ -603,7 +594,6 @@ public:
 		static std::map<std::string, bool*> conditions;
 		if (conditions.empty())
 		{
-			conditions["debug"] = &g_logDebug;
 			conditions["radios"] = &g_debugRadios;
 			conditions["squads"] = &g_debugSquads;
 			conditions["personas"] = &g_debugPersonas;

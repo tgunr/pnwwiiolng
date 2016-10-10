@@ -124,7 +124,7 @@ weapLoadSpawnXML()
 					// Weapons can be specified individually
 					if ( strcasecmp(elType, "weapon") == 0 )
 					{
-						dbugLog(_FLIB, "weapon:%s ", elText);
+						dbugLog(_FLI, "weapon:%s ", elText);
 						WEAPON* weap = weapLookupWeaponByName(elText);
 						if ( weap == nullptr )
 						{
@@ -155,7 +155,7 @@ weapLoadSpawnXML()
 					classes.insert(spec);
 
 					// Stack it up for later consumption
-					dbugLog(_FLIB, "class:%s ", elText);
+					dbugLog(_FLI, "class:%s ", elText);
 
 					// Now add the spawnlist for all spawn lists of this class into our list
 					for ( auto spawn = g_weaponSpawns.begin(), end = g_weaponSpawns.end(); spawn != end; ++spawn )
@@ -172,7 +172,7 @@ weapLoadSpawnXML()
 						}
 					}
 
-					dbugLog(_FLIB, ", ");
+					dbugLog(_FLI, ", ");
 				}
 			}
 

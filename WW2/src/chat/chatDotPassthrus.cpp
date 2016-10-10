@@ -11,8 +11,6 @@
 
 #include <stdexcept>
 
-#include "versionNo.h"
-
 #include "chat/chatPlayer.h"
 #include "chat/chatDotCommand.h"
 #include "chat/chatHostMessages.h"

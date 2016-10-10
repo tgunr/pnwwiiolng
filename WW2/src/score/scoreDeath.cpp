@@ -255,7 +255,7 @@ _awardAssists(Scoring::Sortie& deadSortie, Scoring::Sortie& killerSortie)
 bool
 Scoring::Death::process(Player* const lhsPlayer)
 {
-	dbugLog(_FLIB, " death");	///TODO:134:REMOVE
+	dbugLog(_FLI, " death");	///TODO:134:REMOVE
 
 	// We need to look up the sortie on which the player died.
 	Scoring::Sortie* const deadSortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());

@@ -91,7 +91,7 @@ static SINT32 _sendPlayerExit(ACTION_OBJECT* const a)
 {
 	PLAYER_EXIT* const pe = (PLAYER_EXIT*) a->localRawData;
 
-	dbugWrite(_FLAS,"sending player exit %d dest %d",pe->destination,pe->exitCode);
+	dbugWrite(_FLA,"sending player exit %d dest %d",pe->destination,pe->exitCode);
 
 	return commPackPlayerExit(TEUL_PACK, a->packed, a->offset, pe, 0);
 }
@@ -100,11 +100,11 @@ static SINT32 _recvPlayerExit(ACTION_OBJECT* const a)
 {
 	PLAYER_EXIT pe;
 	a->offset = commPackPlayerExit(TEUL_UNPACK, a->packed, a->offset, &pe, 0);
-	dbugWrite(_FLAS, "received player exit destination %d", pe.destination);
+	dbugWrite(_FLA, "received player exit destination %d", pe.destination);
 
 	clientForcedCellExit(a->teulIndex,pe.exitCode);
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 #pragma message "move to clientForcedCellExit?"
 	// OGS: Probably not, because that would cause a feedback loop.
 	commSendPlayerExit(a->teulIndex,  PDEST_MAP, pe.exitCode, pe.facility);
@@ -189,7 +189,7 @@ static SINT32 _recvWorldUpdate( ACTION_OBJECT* const a )
 	if(Online)
 	{
 #endif
-	dbugWrite(_FLWS, "index: %d time: %llu", a->teulIndex, teulClock64);
+	dbugWrite(_FLW, "index: %d time: %llu", a->teulIndex, teulClock64);
 	a->offset = commRecvWorldUpdateData(a->teulIndex, a->packed, a->offset, a->sizeInBytes());
 #ifdef MULTI_CLIENT
 	}
@@ -204,7 +204,7 @@ static SINT32 _recvHostVehicleHit( ACTION_OBJECT* const a )
 	vehProcessVehicleHit(hit);
 
 	// fill out the local vehicle data from this information.
-	dbugWrite(_FLAS,"Vehicle Hit: from %d sent %llu numcomponentshit %zu\n"
+	dbugWrite(_FLA,"Vehicle Hit: from %d sent %llu numcomponentshit %zu\n"
 				, hit.m_shooter, hit.m_timestamp, hit.m_components.size());
 
 	return a->offset;

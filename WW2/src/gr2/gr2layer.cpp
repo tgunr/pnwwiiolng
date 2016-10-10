@@ -496,22 +496,19 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 	{
 		snprintf(filename, 255, "%s%s%s", GR2DATA_PREPATH, basename, GRANNY_EXTENSION);
 
-		// some troopers have regional specific models
-		const char* regional = fioGetRegionalPath(filename);
-
-		fileSize = fioFileSize(regional);
+		fileSize = fioFileSize(filename);
 
 		if(static_cast<int>(fileSize) < 0)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to size file %s (probably file not found)!", regional);
+			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to size file %s (probably file not found)!", filename);
 			return nullptr;
 		}
 
-		stream = fioOpen(regional);
+		stream = fioOpen(filename);
 
 		if(stream < 0)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to open %s!", regional);
+			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to open %s!", filename);
 			return nullptr;
 		}
 
@@ -519,7 +516,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		if(!buffer)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to allocate read buffer for %s", regional);
+			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to allocate read buffer for %s", filename);
 			return nullptr;
 		}
 
@@ -527,7 +524,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		if(readSize != fileSize)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Bytes read != bytes in file (%d != %d) in file %s", readSize, fileSize, regional);
+			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Bytes read != bytes in file (%d != %d) in file %s", readSize, fileSize, filename);
 			memFree (buffer);
 			return nullptr;
 		}
@@ -543,7 +540,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		if(!fileInfo)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to get model data out of %s!", regional);
+			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to get model data out of %s!", filename);
 			GrannyFreeFile(loadedFile);
 			return nullptr;
 		}
@@ -1233,40 +1230,37 @@ gr2Animation* gr2LoadAnimation (const SCHAR* animationFile, SINT32 useCache)
 
 		snprintf(evtFile, 255, "%s%s%s", GR2DATA_PREPATH, animationFile, ".evt");
 
-		if(fioAccess(evtFile))
-		{
-			SINT32 evtFileID = fioOpen(evtFile);
+        SINT32 evtFileID = fioOpen(evtFile);
 
-			if(evtFileID >= 0)
-			{
-				GR2_EVENT_LIST events;
+        if(evtFileID >= 0)
+        {
+            GR2_EVENT_LIST events;
 
-				gr2Event* newEvent = nullptr;
+            gr2Event* newEvent = nullptr;
 
-		//		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Loading event data for animation %s", animationFile);
+    //		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Loading event data for animation %s", animationFile);
 
-				while(fioGetLine(evtFileID, buf, 255) != 0)
-				{
-					newEvent = _gr2EventPool.Pop();
+            while(fioGetLine(evtFileID, buf, 255) != 0)
+            {
+                newEvent = _gr2EventPool.Pop();
 
-					if(!newEvent)
-						piExitProgram (_FL, "gr2LoadAnimation: Failed to allocate memory for event");
+                if(!newEvent)
+                    piExitProgram (_FL, "gr2LoadAnimation: Failed to allocate memory for event");
 
-					sscanf(buf, "%d %f %32s", &newEvent->eventType, &newEvent->eventTime, newEvent->eventData);
+                sscanf(buf, "%d %f %32s", &newEvent->eventType, &newEvent->eventTime, newEvent->eventData);
 
-					events.push_back(newEvent);
+                events.push_back(newEvent);
 
-					if(events.size() >= MAX_NUM_ANIM_EVENTS)
-						break;
-				}
+                if(events.size() >= MAX_NUM_ANIM_EVENTS)
+                    break;
+            }
 
-				_animEvents[newAnimation->animation] = events;
+            _animEvents[newAnimation->animation] = events;
 
-				foundEvents = _animEvents.find(newAnimation->animation);
+            foundEvents = _animEvents.find(newAnimation->animation);
 
-				fioClose(evtFileID);
-			}
-		}
+            fioClose(evtFileID);
+        }
 	}
 
 	if(foundEvents != _animEvents.end())
@@ -4264,9 +4258,9 @@ void loadTextures(granny_file_info* fileInfo, const char* path)
 				createTexture(fileInfo->Textures[i]);
 			}
 		}
-		else
+		else if (fileInfo->Textures[i]->TextureType != GrannyColorMapTextureType || fileInfo->Textures[i]->ImageCount > 0)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "whoa, what kind of texture is this?!?");
+			Write_Log (LOG_FPS, LOG_INFO, "What kind of texture is this? It's index %d and looks like %d", i, fileInfo->Textures[i]->TextureType);
 			//return nullptr;
 		}
 	}
@@ -4326,19 +4320,16 @@ static SINT32 loadSubMaterial(granny_variant& data)
 		strcat(texname, ".dds");
 
 		// if a file exists, try to load it
-		if(fioAccess(texname))
-		{
-			texid = ldddsLoadDDSTexture(texname, GL_TEXTURE_2D, 0);
+        texid = ldddsLoadDDSTexture(texname, GL_TEXTURE_2D, 0);
 
-			if(piIsTexture(texid, 0))
-			{
-				char* ptr = strrchr(texname, '.');
-				if(ptr != nullptr) *ptr = 0;
+        if(piIsTexture(texid, 0))
+        {
+            char* ptr = strrchr(texname, '.');
+            if(ptr != nullptr) *ptr = 0;
 
-				// make sure and set our name so other models can use it to
-				piSetTextureName(texid, texname);
-			}
-		}
+            // make sure and set our name so other models can use it to
+            piSetTextureName(texid, texname);
+        }
 	}
 
 	return texid;
@@ -4361,19 +4352,16 @@ static SINT32 loadSubMaterial(granny_texture* texture)
 		strcat(texname, ".dds");
 
 		// if a file exists, try to load it
-		if(fioAccess(texname))
-		{
-			texid = ldddsLoadDDSTexture(texname, GL_TEXTURE_2D, 0);
+        texid = ldddsLoadDDSTexture(texname, GL_TEXTURE_2D, 0);
 
-			if(piIsTexture(texid, 0))
-			{
-				char* ptr = strrchr(texname, '.');
-				if(ptr != nullptr) *ptr = 0;
+        if(piIsTexture(texid, 0))
+        {
+            char* ptr = strrchr(texname, '.');
+            if(ptr != nullptr) *ptr = 0;
 
-				// make sure and set our name so other models can use it to
-				piSetTextureName(texid, texname);
-			}
-		}
+            // make sure and set our name so other models can use it to
+            piSetTextureName(texid, texname);
+        }
 	}
 
 	return texid;
@@ -4428,13 +4416,10 @@ static SINT32 loadMaterials(granny_material* material, bool& hasNormals)
 				snprintf(filename, 511, "%s.dds", texname);
 
 				// if a file exists, try to load it
-				if(fioAccess(filename))
-				{
-					specular = ldddsLoadDDSTexture(filename, GL_TEXTURE_2D, 0);
+                specular = ldddsLoadDDSTexture(filename, GL_TEXTURE_2D, 0);
 
-					if(piIsTexture(specular, 0))
-						piSetTextureName(specular, texname);
-				}
+                if(piIsTexture(specular, 0))
+                    piSetTextureName(specular, texname);
 			}
 
 			dt->specularMap = specular;
@@ -4457,13 +4442,10 @@ static SINT32 loadMaterials(granny_material* material, bool& hasNormals)
 				snprintf(filename, 511, "%s.dds", texname);
 
 				// if a file exists, try to load it
-				if(fioAccess(filename))
-				{
-					normal = ldddsLoadDDSTexture(filename, GL_TEXTURE_2D, 0);
+                normal = ldddsLoadDDSTexture(filename, GL_TEXTURE_2D, 0);
 
-					if(piIsTexture(normal, 0))
-						piSetTextureName(normal, texname);
-				}
+                if(piIsTexture(normal, 0))
+                    piSetTextureName(normal, texname);
 			}
 
 			dt->normalMap = normal;
@@ -4588,33 +4570,23 @@ void createMeshTextures(gr2MeshData* data, bool wantNormals)
 
 gr2AnimationBlend* gr2LoadBlendedAnimation(const SCHAR* blendfile, SINT32 boneCount)
 {
-	char path[MAX_GR2_PATH_SIZE+1];
+    std::string path = GR2DATA_PREPATH + std::string(blendfile);
+	gr2AnimationBlend *blend = nullptr;
+    
+	// strip extension, if any
+	path = path.substr(0, path.rfind(".")); // substr(0,npos) == entire string
 
-	// setup the expected path
-	snprintf(path, MAX_GR2_PATH_SIZE, "%s%s", GR2DATA_PREPATH, blendfile);
-
-	// strip off the extension if found
-	char* extension = strchr(path, '.');
-	if(extension) *extension = 0;
-
-	// try the xml version of the file
-	snprintf(path, MAX_GR2_PATH_SIZE, "%s.xml", path);
-
-	if(GR2_USE_XML_BLENDS && fioAccess(path))
-		return gr2LoadBlendedAnimationXML(path, boneCount);
-
-	// strip off the extension if found
-	extension = strchr(path, '.');
-	if(extension) *extension = 0;
-
-	// try the .txt version of the file
-	snprintf(path, MAX_GR2_PATH_SIZE, "%s.txt", path);
-
-	if(fioAccess(path))
-		return gr2LoadBlendedAnimationTXT(path, boneCount);
-
-	// blend file not found
-	return nullptr;
+    // try the xml version of the file first
+#if GR2_USE_XML_BLENDS
+    blend = gr2LoadBlendedAnimationXML((path + ".xml").c_str(), boneCount);
+#endif
+	
+	// if it failed or wasn't requested, try the .txt version of the file
+	if (!blend) {
+        blend = gr2LoadBlendedAnimationTXT(const_cast<char *>((path + ".txt").c_str()), boneCount);
+    }
+    
+    return blend;
 }
 
 static SINT32 _translateBoneIndex(SINT32 bone)
@@ -5030,9 +5002,7 @@ LOGICAL gr2RemoveAllBlendedAnimations (gr2Model* model, FLOAT32 easeOutOverrideT
 		return TRUE;
 
 	GR2_BLEND_MAP::iterator it = model->blends->begin();
-#if platOS == OS_MACOS
 	std::vector<gr2AnimationBlend*> blendsToKill;
-#endif
 
 	gr2AnimationBlend* curBlend = nullptr;
 	gr2ControlBlend* curControl = nullptr;
@@ -5086,58 +5056,34 @@ LOGICAL gr2RemoveAllBlendedAnimations (gr2Model* model, FLOAT32 easeOutOverrideT
 			else
 			{
 				// clear immediately
-#if platOS == OS_MACOS
 				blendsToKill.push_back(curBlend);
-#else
-				Write_Log (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  CLEAR", curBlend, curBlend->blendFile);
-
-				for (int j = 0; j < curBlend->numBlends; j++)
-				{
-//					GrannyEaseControlOut(&model->blendControls[i].controls[j], model->blendControls[i].easeOutDuration)
-					gr2StopControl (&curControl->controls[j], TRUE);
-				}
-
-				if(curControl->killCallback)
-					curControl->killCallback(curControl->killData);
-
-				// we don't free the blended animation because that is done at game exit
-				gr2FreeBlendedControl(curControl);
-
-				it = model->blends->erase(it);
-#endif
 			}
 		}
 	}
 
-#if platOS == OS_MACOS
-	if(!blendsToKill.empty())
-	{
-		for(int i = 0; i < (int)blendsToKill.size(); ++i)
-		{
-			it = model->blends->find(blendsToKill[i]);
+    for (gr2AnimationBlend *killable : blendsToKill) {
+        it = model->blends->find(killable);
 
-			curBlend = it->first;
-			curControl = it->second;
+        curBlend = it->first;
+        curControl = it->second;
 
-			Write_Log (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  CLEAR", curBlend, curBlend->blendFile);
+        Write_Log (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  CLEAR", curBlend, curBlend->blendFile);
 
-			for (int j = 0; j < curBlend->numBlends; j++)
-			{
-				// GrannyEaseControlOut(&model->blendControls[i].controls[j], model->blendControls[i].easeOutDuration)
-				gr2StopControl (&curControl->controls[j], TRUE);
-			}
+        for (int j = 0; j < curBlend->numBlends; j++)
+        {
+            // GrannyEaseControlOut(&model->blendControls[i].controls[j], model->blendControls[i].easeOutDuration)
+            gr2StopControl (&curControl->controls[j], TRUE);
+        }
 
-			if(curControl->killCallback)
-				curControl->killCallback(curControl->killData);
+        if(curControl->killCallback)
+            curControl->killCallback(curControl->killData);
 
-			// we don't free the blended animation because that is done at game exit
-			gr2FreeBlendedControl(curControl);
+        // we don't free the blended animation because that is done at game exit
+        gr2FreeBlendedControl(curControl);
 
-			// delete it from the map
-			model->blends->erase(it);
-		}
-	}
-#endif
+        // delete it from the map
+        model->blends->erase(it);
+    }
 
 	gr2UpdateBlendEvents(model);
 

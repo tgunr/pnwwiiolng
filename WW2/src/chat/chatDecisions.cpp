@@ -11,8 +11,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatPlayer.h"
 #include "chat/chatDB.h"
 #include "chat/chatDecisions.h"

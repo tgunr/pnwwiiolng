@@ -68,11 +68,9 @@ LOGICAL rntextLocInit()
         fioRead(hHandle, &g_Layout[i], sizeof(LOCFONTLAYOUT));
         fioClose(hHandle);
 
-		ldpixSetTextureReduction(FALSE);
         g_iTextIDS[i] = ldpixLoadImageFileToSurface(g_pFontPCXNames[i],
                                                     uColor,
                                                     LDPIX_NO_DXT);
-      	ldpixSetTextureReduction(TextureReduction);
 
         if(!piLockTextureMemorySurface(g_iTextIDS[i], 0, &g_ddText[i]))
         {

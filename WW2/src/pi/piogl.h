@@ -1,7 +1,7 @@
 #pragma once
 
-#if platBuild == TEUL_SERVER
-static_assert( platBuild != TEUL_SERVER, "Can't include piogl.h in a server build." );
+#if platBuild == BUILD_SERVER
+static_assert( platBuild != BUILD_SERVER, "Can't include piogl.h in a server build." );
 #endif
 
 #include "gl/glew.h"
@@ -963,13 +963,9 @@ struct piMATERIAL
 
 };
 
-#if platOS == OS_WIN32
-#pragma pack(push, 1)
-#endif
+#pragma pack(push)
+#pragma pack(1)
 
-#if platOS == OS_MACOS
-#pragma options align=packed
-#endif
 struct piRGBQUAD
 {
 	UCHAR	rgbRed;
@@ -1031,13 +1027,7 @@ struct piBITMAPFILEHEADER
 	#define BI_BITFIELDS 3
 #endif
 
-#if platOS == OS_WIN32
 #pragma pack(pop)
-#endif
-
-#if platOS == OS_MACOS
-#pragma options align=reset
-#endif
 
 struct MATERIAL
 {
@@ -1362,46 +1352,8 @@ using piDRAW_OBJECTS = LOGICAL(*)();
 	#define DIError(code)   code
 #endif
 
-#if platOS == OS_WIN32
-inline SINT32 piReadTimeStamp32()
-{
-SINT32	value;
-	__asm
-	{
-		push eax
-		push edx
-		rdtsc
-		mov value, eax
-		pop edx
-		pop eax
-	}
-
-	return(value);
-}
-
-inline __int64 piReadTimeStamp64()
-{
-__int64		value;
-	__asm
-	{
-		push eax
-		push ebx
-		push edx
-		rdtsc
-		lea ebx, DWORD PTR value
-		mov [ebx], eax
-		mov [ebx+4], edx
-		pop edx
-		pop ebx
-		pop eax
-	}
-
-	return(value);
-}
-#else
 #define piReadTimeStamp32 GetMicroSeconds
 #define piReadTimeStamp64 GetMicroSeconds
-#endif
 
 extern SINT32 piFloatLikeLong(FLOAT32 f);
 extern FLOAT32 piLongLikeFloat(SINT32 l);

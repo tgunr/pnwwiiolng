@@ -1583,7 +1583,6 @@
     <ClInclude Include="..\..\src\ogl\GLCounter.h">
       <Filter>ogl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\client_revision.h" />
     <ClInclude Include="..\..\src\dbug\dbugExtErrors.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -1642,6 +1641,9 @@
       <Filter>omg\Generated Headers</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\src\include\unique_opaque_ptr.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2682,6 +2684,7 @@
     <ClCompile Include="..\..\src\ob\obinfo.cpp">
       <Filter>ob</Filter>
     </ClCompile>
+    <ClCompile Include="build_info.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\cursor.cur">

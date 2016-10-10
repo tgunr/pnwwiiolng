@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #ifndef SINGLE_CELL_HOST
 # define NEW_BCODE
 #endif

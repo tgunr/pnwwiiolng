@@ -24,11 +24,6 @@ class CSpeedWind;
 #include "trnvars.h"
 #include "persmain.h"
 
-#if platOS == OS_MACOS
-#undef NDEBUG
-#include <assert.h>
-#endif
-
 bool SDB_DrawDebugFlag=TRUE; // dont release this!
 
 static SpatialDatabase database;

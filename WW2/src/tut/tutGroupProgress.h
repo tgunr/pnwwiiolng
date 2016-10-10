@@ -37,7 +37,7 @@ namespace Tutorial
 	};
 }
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 namespace Tutorial
 {
 	// For the host

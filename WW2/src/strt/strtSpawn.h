@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
-
 // Chat macros
 #ifdef BETA_RELEASE
 # define TELL_TESTER(id, ...)	\

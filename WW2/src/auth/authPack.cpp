@@ -197,7 +197,7 @@ SINT32 authPackAPP_LAUNCH(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH* 
 	return offset;
 }
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 
 SINT32 authPackSERVER_LOAD(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_SERVER_LOAD* object, SINT32 /*size*/)
 {
@@ -212,7 +212,7 @@ SINT32 authPackSERVER_LOAD(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_SERVER
 }
 
 void
-Auth::Dispatch::packer(unsigned int mode, ACTION_OBJECT* a)
+Auth::Dispatch::packer(const unsigned int mode, ACTION_OBJECT* const a)
 {
 	a->packer(mode, &m_customerID, 0);
 	a->bytePacker(mode, m_callsign, sizeof(m_callsign));

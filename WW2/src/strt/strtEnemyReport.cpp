@@ -10,8 +10,6 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include "versionNo.h"
-
 #include "chat/chatGCIMessage.h"
 #include "chat/chatGCITypes.h"
 #include "chat/chatSupportRPCMessages.h"

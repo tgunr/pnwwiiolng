@@ -7,8 +7,6 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include "versionNo.h"
-
 #include "dbse/dbseHandle.h"
 #include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"

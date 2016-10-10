@@ -9,6 +9,9 @@ IF ( PN_LUA_CLIENT )
 	ENDIF ()
 ENDIF ( )
 
+# Need Python for revno.py
+FIND_PACKAGE( PythonInterp 2.7 REQUIRED )
+
 # Include our macros etc
 find_package(MySQL REQUIRED)
 

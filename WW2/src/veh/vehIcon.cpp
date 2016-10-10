@@ -85,14 +85,10 @@ static void   _HandleIconMode(vehVehicle* CurrentVehicle, LOGICAL& DrawRangeCirc
 
 SINT32 vehIconInit()
 {
-	ldpixSetTextureReduction(FALSE);
-
 	_IconRangeCircleTexId = ldpixLoadImageFileToSurface("iconring1.bmp", colorBLACK, LDPIX_NONE);
 	_RankIcons = drawIconLoad("gamerank");
 	_DeathIcon = drawIconLoad("\\ui\\uidata\\icons\\misc\\icon_death");
 	_ColorRankIcons = drawIconLoad("\\ui\\uidata\\chat\\commrank");
-
-	ldpixSetTextureReduction(TextureReduction);
 
 	imapInstallNonRemovableControlCallback(IMAP_CYCLE_ICON_MODE, _CycleIconMode);
 

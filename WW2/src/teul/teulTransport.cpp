@@ -227,7 +227,7 @@ SINT32 teulOpenListen(const UINT16 portNumber
 					);
 }
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 // opens a port for listening on all address associated with the specified interface. "eth0" only!
 // Assumes that all callbacks have been properly installed.  returns -error_number or 0 on success.
 // connection acceptFnPtr is an optional ptr to callback function which is
@@ -435,13 +435,13 @@ teulInitTransport(LogMode logType
 {
 	if ( _transportInited )
 	{
-		dbugWrite(_FLAS, "can't initialize teul transport twice, must close first");
+		dbugWrite(_FLA, "can't initialize teul transport twice, must close first");
 		return -EINVAL;
 	}
 
 	if ( _transportClosing )
 	{
-		dbugWrite(_FLAS, "can't initialize teul transport during shutdown");
+		dbugWrite(_FLA, "can't initialize teul transport during shutdown");
 		return -EDEADLK;
 	}
 
@@ -494,7 +494,7 @@ teulUpdateTransport(const TeulTimeMS duration_)
 	if (PN_UNLIKELY(_transportClosing))
 		return;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	ABORT_UNLESS_EX(_transportInited, "transport can't update without being initialized.");
 #else
 	if (PN_UNLIKELY(_transportInited == false))
@@ -503,7 +503,7 @@ teulUpdateTransport(const TeulTimeMS duration_)
 
 	teulModIdle(duration_);
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	extern void serverUpdate();
 	serverUpdate();
 #endif
@@ -517,7 +517,7 @@ void teulCloseTransport()
 
 	_transportClosing = TRUE;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	extern void serverFree();
 	serverFree();
 #endif

@@ -7,7 +7,6 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-#include "versionNo.h"
 #include "dbug/dbugExtErrors.h"
 #include "hostproj/hostversion.h"
 

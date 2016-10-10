@@ -1,0 +1,62 @@
+//
+//  build_info.cpp.in
+//  World War II Online
+//
+//  Created by Gwynne Raskind on 4/29/2016
+//  Copyright © 2016 Playnet, Inc.
+//
+
+// **************************************************
+// ${AUTOGENERATION_WARNING}
+// **************************************************
+
+/*
+    Remember - this information is overwritten by each individual build command,
+    on every platform. Even if you just hit Cmd-B in Xcode twice in a row (for
+    example), this info is generated twice. The generator does not check whether
+    the info is up to date or not. The commented version of the info is here for
+    informational and debugging purposes, not as a forensic aid. The only
+    forensic value comes from the information being embedded in a built binary
+    per the code below.
+
+    Timestamp:  ${DATETIME}
+    Files:      input '${INPUT_FILE_NAME}' output '${OUTPUT_FILE_NAME}'
+    Build:      ${PLATFORM} ${BUILD_TYPE}
+    Builder:    ${CURRENT_USER} on ${BUILD_HOST}
+    Location:   ${GIT_ROOT}
+    Version:    ${PRODUCT_VERSION}
+    Commit:     ${GIT_COMMITISH} (${GIT_COMMIT}) - ${GIT_STATE}
+*/
+
+// Because otherwise MSVC cries like a whiny baby about PCH.
+// This does not need to be here for any actual reason whatsoever.
+#include "syscfg.h"
+
+#include "build_info.hpp"
+#include "platforms.h"
+
+// __attribute__((used)) prevents the compiler from dead-stripping these values
+// under Clang/GCC. With MSVC we have to use the much more annoying #pragma.
+#if __is_MSVC()
+#define __used_variable__(x) x //__pragma(comment(linker, "/include:" #x)) x
+#else
+#define __used_variable__(x) __attribute__((used)) x
+#endif
+
+const char
+    * const __used_variable__(PN_build_datetime_string) = "${DATETIME}",
+    * const __used_variable__(PN_build_platform_string) = "${PLATFORM}",
+    * const __used_variable__(PN_build_type_string) = "${BUILD_TYPE}",
+    * const __used_variable__(PN_product_version_string) = "${PRODUCT_VERSION}",
+    * const __used_variable__(PN_git_commitish_string) = "${GIT_COMMITISH}"
+#if BUILD_INFO_SENSITIVE_INFO_AVAILABLE == 12345
+    ,
+    * const __used_variable__(PN_build_info_input_string) = "${INPUT_FILE_NAME}",
+    * const __used_variable__(PN_build_info_output_string) = "${OUTPUT_FILE_NAME}",
+    * const __used_variable__(PN_build_user_string) = "${CURRENT_USER}",
+    * const __used_variable__(PN_build_host_string) = "${BUILD_HOST}",
+    * const __used_variable__(PN_build_location_string) = "${GIT_ROOT}",
+    * const __used_variable__(PN_git_commit_string) = "${GIT_COMMIT}",
+    * const __used_variable__(PN_git_repository_state_string) = "${GIT_STATE}"
+#endif
+;

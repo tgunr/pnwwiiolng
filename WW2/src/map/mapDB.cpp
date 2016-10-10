@@ -7,9 +7,7 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-#include "versionNo.h"
-#include "revision.h"
-
+#include "build_info.hpp"
 #include "auth/authPlayerDetails.h"
 #include "chat/chatGroupPermissionTypes.h"
 #include "dbse/dbseHandle.h"
@@ -110,7 +108,7 @@ static void
 _setArenaDescriptionHostRevision()
 {
 	char hostRevision[200];
-	strprintf(hostRevision, "%s(%s)", REPOSITORY_INFO, cv_stratLanguage.GetString());
+	strprintf(hostRevision, "%s (%s)", PN_git_commitish_string, cv_stratLanguage.GetString());
 
 	std::string revision = hostRevision;
 	_removePrefix(revision, "branches/");

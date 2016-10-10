@@ -4,7 +4,8 @@
 #include "phui/View.h"
 #include "phui/DOM.h"
 
-#include"include/vars.h"
+#include "build_info.hpp"
+#include "include/vars.h"
 #include "js/jsPlayer.h"
 #include "js/jsGame.h"
 #include "js/jsStratDB.h"
@@ -203,7 +204,7 @@ jsGame::jsGame() : phui::js::Object(&jsclass, nullptr, nullptr,jsfunctions,jspro
 	getBuildInfo(hostversion);
 	DefineProperty("version", phui::js::ConstString(STRVER));
 	DefineProperty("buildinfo", phui::js::NewString(hostversion.c_str()));
-	DefineProperty("revision", phui::js::NewString(WWII::gitCommitStr));
+	DefineProperty("revision", phui::js::NewString(PN_git_commitish_string));
 	cps = new phui::js::Array;
 	keymaps = new phui::js::Array;
 	spawnablevehicles = new phui::js::Array;
