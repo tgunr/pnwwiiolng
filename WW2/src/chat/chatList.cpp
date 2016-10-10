@@ -85,7 +85,7 @@ _indexPlayer(Player* player)
 }
 
 void
-chatInitPlayerLists(void)
+chatInitPlayerLists()
 {
 	_sideCount[WWII_NO_SIDE] = 0;
 	_sideCount[AXIS] = 0;

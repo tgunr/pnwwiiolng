@@ -8,7 +8,7 @@ Description:
 #include "osgImport/ref_ptr.h"
 #include "draw/sneaky.h"
 
-typedef std::map<std::string, ref_ptr<oglTextureObject> > TboMap;
+using TboMap = std::map<std::string, ref_ptr<oglTextureObject>>;
 static TboMap tbos;
 
 /*--------------------------------------------------------------

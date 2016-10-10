@@ -15,7 +15,7 @@ static UINT32 _PrepSystemForWindTunnel(mlVehicleData * VehicleData);
 static UINT32 _OpenWindTunnelFile(mlVehicleData * VehicleData);
 static UINT32 _OutputBasicStats(mlVehicleData * VehicleData);
 static UINT32 _GenerateNewThrustCurve(mlVehicleData * VehicleData);
-static UINT32 _ReadThrustFile(void);
+static UINT32 _ReadThrustFile();
 static UINT32 _GenerateEnginePowerChart(mlVehicleData * VehicleData);
 static UINT32 _GenerateStallData(mlVehicleData * VehicleData);
 static UINT32 _GenerateTopSpeedData(mlVehicleData * VehicleData);
@@ -502,7 +502,7 @@ mlComponentListIterator it;
 	return 0;
 }
 
-static UINT32 _ReadThrustFile(void)
+static UINT32 _ReadThrustFile()
 {
 FILE* ThrustFile;
 

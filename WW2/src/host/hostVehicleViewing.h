@@ -83,5 +83,5 @@ public:
 };
 
 #include <vector>
-typedef std::vector<Viewing> Viewings;
+using Viewings = std::vector<Viewing>;
 

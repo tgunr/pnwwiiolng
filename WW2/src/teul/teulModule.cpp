@@ -64,7 +64,7 @@ enum { MAX_ACCEPT_BACKLOG = 1024 };
 
 TeulTimeMS lastUpdateTime;
 
-extern void teulInitEndpoints(ERROR_FUNCTION* const);
+extern void teulInitEndpoints(ERROR_FUNCTION const);
 
 //////////////////////////////////////////////////////////////////////
 // Retrieve a list of the IP addresses this host has on eth0.
@@ -164,7 +164,8 @@ _getHostIPAddresses()
 	}
 
 	ABORT_IF_EX(preferredIf == nullptr
-				, "Unable to find eth0. If you need to specify an interface, set the environment variable 'ETH0' to the friendly name of the adapter.");
+				, "Unable to determine primary network adapter. "
+				  "If you need to specify an interface, set 'DEFAULT_IFACE' to the friendly name of the adapter.");
 
 	Server::myInterface.pid = static_cast<UINT32>(GetCurrentProcessId());
 
@@ -177,7 +178,7 @@ _getHostIPAddresses()
 		Server::myInterface.addr[ifNo].ip = ntohl(Server::myInterface.addr[0].naddr);
 
 		TCHAR addrString[128];
-		DWORD addrSize = sizeof(addrString);
+		DWORD addrSize = sizeof(addrString) / sizeof(TCHAR);
 		WSAAddressToString(address->Address.lpSockaddr, address->Address.iSockaddrLength, nullptr, addrString, &addrSize);
 
 		dbugLog(_FLI, "read index %u interface %ls, ip %s pid %u"
@@ -193,7 +194,7 @@ _getHostIPAddresses()
 }
 #endif
 
-SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
+SINT32 teulModStartup(ERROR_FUNCTION errFnPtr)
 {
 #if platBuild == TEUL_SERVER && platOS != OS_WIN32
 	signal(SIGPIPE, SIG_IGN);
@@ -221,7 +222,7 @@ SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 	return 0;
 }
 
-typedef std::vector<UINT32> ADDRESS_LIST;
+using ADDRESS_LIST = std::vector<UINT32>;
 
 #if platBuild == TEUL_SERVER
 void
@@ -251,7 +252,7 @@ namespace Teul
 #endif
 
 SINT32
-teulModShutdown(void)
+teulModShutdown()
 {
 	using namespace Teul;
 	for ( auto it = idleEndpoints.begin(), end = idleEndpoints.end(); it != end; )
@@ -452,7 +453,7 @@ _bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
 
 // inActive : true if the TCP socket is to be used to send, false if used to listen/receive
 SINT32
-teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION* connectFn, ERROR_FUNCTION* errorFn)
+teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn)
 {
 	struct sockaddr_in sockAddress;
 	memset(&sockAddress, 0, sizeof(sockAddress));

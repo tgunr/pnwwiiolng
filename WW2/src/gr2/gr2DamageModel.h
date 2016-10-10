@@ -17,10 +17,10 @@ class gr2DamageComponent;
 class gr2DamageListener;
 struct gr2DamageModelSpec;
 
-typedef std::vector<gr2DamageComponent*> gr2ComponentsList;
-typedef std::vector<gr2DamageMap*> gr2DamageMapList;
-typedef std::vector<int> gr2MeshIndexList;
-typedef std::vector<gr2DamageListener*> gr2DamageListenerList;
+using gr2ComponentsList = std::vector<gr2DamageComponent*>;
+using gr2DamageMapList = std::vector<gr2DamageMap*>;
+using gr2MeshIndexList = std::vector<int>;
+using gr2DamageListenerList = std::vector<gr2DamageListener*>;
 
 class gr2DamageListener
 {

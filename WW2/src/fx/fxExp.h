@@ -85,7 +85,7 @@ struct FXEXPLOSION
 extern LOGICAL fxExpCreateGenericExp(FLOAT64VECTOR* pPos, FLOAT64 fEnergy);
 extern LOGICAL fxExpDraw(SINT32 iIndex);
 extern LOGICAL fxExpInit();
-extern LOGICAL fxExpKill();
+extern void fxExpKill();
 
 /////////////////////////////
 // void return functions

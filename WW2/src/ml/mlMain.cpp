@@ -404,7 +404,7 @@ static std::map<std::string, BumpAndFrictionData*> _hashBAF;
 
 static UINT32 _ClearVehicleData(mlVehicleData * VehicleData);
 static UINT32 _ShutDownSoundsAndFx(mlVehicleData* VehicleData);
-UINT32 _ReadBumpAndFrictionTable(void);
+UINT32 _ReadBumpAndFrictionTable();
 
 static UINT32 _UpdateAirfoilComponent(mlComponent * Component, mlVehicleData * VehicleData,FLOAT64 DeltaTime);
 static UINT32 _UpdateHaulPoint(mlComponent * Component,
@@ -486,7 +486,7 @@ static UINT32 _DoODEVehicleCollision(mlVehicleData * VehicleData, FLOAT64 DeltaT
 
 static UINT32 mlDetermineVehicleCollisions(mlVehicleData * VehicleData, FLOAT64 DeltaTime);
 
-static SINT32 mlVehicleUpdateRide(mlVehicleRef VehicleData);
+static SINT32 mlVehicleUpdateRide(mlVehicleData* VehicleData);
 
 #if(0)
 static SINT32 _radioStatic(trnCDTerrainObject* t);
@@ -505,7 +505,7 @@ static LOGICAL mlHoistCollideRoundWithTerrain(piVECTOR const* OldPos, piVECTOR c
 static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData);
 static UINT32 _TraverseAndSetupColorCoding(OBJECT * Object,UINT32 UseAlpha,vehVehicle* Vehicle,
 										   UINT32 CurrentHitmapObjectDisplay);
-static void _LeakTest(void);
+static void _LeakTest();
 #endif
 
 #ifdef ENABLE_FLOATERS
@@ -543,7 +543,7 @@ static void _CheckForSecondaryVehicleKill (mlVehicleData* pVehicleData, mlCompon
 /************************************************************************************************
 	mlMain
 *************************************************************************************************/
-UINT32 mlInit(void)
+UINT32 mlInit()
 {
 	_ReadBumpAndFrictionTable();
 
@@ -589,7 +589,7 @@ UINT32 mlUpdate(mlVehicleData * VehicleData,OBJECT * VehicleObject)
 	return 0;
 }
 
-UINT32 mlKill(void)
+UINT32 mlKill()
 {
 	return 0;
 }
@@ -2385,24 +2385,20 @@ FLOAT64VECTOR VehicleVelocity;
 	return 0;
 }
 
-UINT32 mlResetPositionState(void)
+void mlResetPositionState()
 {
 	// add stuff here to reset when a position change happens
 	mlPrimaryTriggerDown(0, IMAP_HOLD_MAINTRIGGER, 0);
 	mlSecondaryTriggerDown(0, IMAP_HOLD_SECONDTRIGGER, 0);
-
-	return 0;
 }
 
 
-UINT32 mlResetControlStuff(void)
+void mlResetControlStuff()
 {
 	_StickXPos = 0.0;
 	_StickYPos = 0.0;
 	_RudderPos = 0.0;
 	_ThrottlePos = 0.0;
-
-	return 0;
 }
 
 UINT32 _ProcessControlInputs(UINT32 DeltaTime,mlVehicleData * VehicleData)
@@ -4786,7 +4782,7 @@ UINT32 mlSetStarterOff(UINT32 EngineNumber)
 }
 
 
-UINT32 mlIsTailWheelLocked(void)
+UINT32 mlIsTailWheelLocked()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
@@ -4801,7 +4797,7 @@ struct TOPair
 	FLOAT64 distance;
 };
 
-typedef std::list<TOPair> TOList;
+using TOList = std::list<TOPair>;
 
 static bool to_sort(const TOPair& a, const TOPair& b)
 {
@@ -4895,16 +4891,16 @@ static bool _killODETOCollider(trnCDTerrainObject* TO)
 
 #ifdef PARALLEL_BUILDER
 
-typedef struct Temp_Info
+struct Temp_Info
 {
     dSpaceID space;
     bool addBoxCollider;
     trnCDTerrainObject* TO;
     UINT32 odecat;
     Temp_Info( trnCDTerrainObject*o, UINT32 cat, bool addbox, dSpaceID sid ) { TO=o; odecat=cat; addBoxCollider=addbox; space = sid; }
-} Temp_Info;
+};
 
-typedef std::vector<Temp_Info> TEMP_VECTOR;
+using TEMP_VECTOR = std::vector<Temp_Info>;
 
 #endif
 
@@ -6674,7 +6670,7 @@ UINT32 Intersects;
 	return 0;
 }
 
-UINT32 _ReadBumpAndFrictionTable(void)
+UINT32 _ReadBumpAndFrictionTable()
 {
 	static UCHAR Buffer[512];
 	SINT32 FileNum;
@@ -7841,9 +7837,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
         // (Eventually need to collide with short collide list)
         if((SINT32)Pos.z == 1)
         {
-            COLLISION c;
-
-            memset(&c, 0, sizeof(COLLISION));
+			COLLISION c{};
 
             c.newpos.x = (FLOAT32)(Pos.x - WorldOriginOffset.x);
             c.newpos.y = (FLOAT32)(Pos.y - WorldOriginOffset.y);
@@ -8262,7 +8256,7 @@ static UINT32 _DoVehicleCollision(mlVehicleData* VehicleData, FLOAT64 DeltaTime,
     FLOAT64VECTOR DeltaVel = {0, 0, 0};
 	piVECTOR Norm = {0, 0, 0};
 	piVECTOR TempPos = {0, 0, 0};
-	FASTCOLLIDE CollisionList[NUM_COLLISION_SLOTS];
+	FASTCOLLIDE CollisionList[NUM_COLLISION_SLOTS]{};
 	FASTCOLLIDE* CollideListPtr = nullptr;
 	UINT32 NumCollides = 0;
 	UINT32 CollideNum = 0;
@@ -8277,8 +8271,6 @@ static UINT32 _DoVehicleCollision(mlVehicleData* VehicleData, FLOAT64 DeltaTime,
 	if(VehicleObjectAnalysis && DisplayCollideLines && IsFirstTic)
 		draw3dLineDebug(V1, V2, colorBLUEALPHA);
 #endif
-
-    memset(CollisionList, 0, sizeof(FASTCOLLIDE) * NUM_COLLISION_SLOTS);
 
 	Vehicle = VehicleData->VehicleMasterPtr;
 	trnGetWorldOriginOffset(&WorldOffsetOrigin);
@@ -8980,7 +8972,7 @@ static SINT32 mlVehicleHandleTurretConvergence(mlVehicleData* VehicleData)
 	mlVehicleUpdateRide
 *************************************************************************************************/
 
-SINT32 mlVehicleUpdateRide(mlVehicleRef VehicleData)
+SINT32 mlVehicleUpdateRide(mlVehicleData* VehicleData)
 {
 	vehVehicle* Vehicle = VehicleData->VehicleMasterPtr;
 
@@ -9046,7 +9038,7 @@ static LOGICAL mlSafeToUnhoist(vehVehicle* Vehicle)
 	mlVehicleToggleHoist
 *************************************************************************************************/
 
-SINT32 mlVehicleToggleHoist(mlVehicleRef VehicleData)
+SINT32 mlVehicleToggleHoist(mlVehicleData* VehicleData)
 {
 	vehVehicle* CurrentVehicle;
 	vehVehicle* PlayerVehicle = VehicleData->VehicleMasterPtr;
@@ -9188,7 +9180,7 @@ static vehVehicle* mlFindShipUnderVehicle(vehVehicle* Vehicle)
 	mlVehicleRideTransport
 *************************************************************************************************/
 
-SINT32 mlVehicleRideTransport(mlVehicleRef VehicleData)
+SINT32 mlVehicleRideTransport(mlVehicleData* VehicleData)
 {
 	vehVehicle* RideVehicle;
 	vehVehicle* PlayerVehicle = VehicleData->VehicleMasterPtr;
@@ -10043,7 +10035,7 @@ UINT32 i;
 	_LeakTest
 *************************************************************************************************/
 
-static void _LeakTest(void)
+static void _LeakTest()
 {
 	FLOAT64VECTOR WorldOriginOffset;
 	FASTCOLLIDE CollideList[32], *CollideListPtr;
@@ -10217,40 +10209,29 @@ trnCDTerrainObject*	TO;
 	return TRUE;
 }
 
-LOGICAL mlGetPrimaryPickleSetting(SINT32 * Pickle)
+SINT32 mlGetPrimaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-
-	*Pickle = VehicleData->PicklePrimary;
-
-	return TRUE;
+	return VehicleData->PicklePrimary;
 }
 
-LOGICAL mlGetSecondaryPickleSetting(SINT32 * Pickle)
+SINT32 mlGetSecondaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
-	*Pickle = VehicleData->PickleSecondary;
-
-	return TRUE;
+	return VehicleData->PickleSecondary;
 }
 
-LOGICAL mlResetPrimaryPickleSetting(void)
+void mlResetPrimaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-
 	VehicleData->PicklePrimary = 0;
-
-	return TRUE;
 }
 
-LOGICAL mlResetSecondaryPickleSetting(void)
+void mlResetSecondaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-
 	VehicleData->PickleSecondary = 0;
-
-	return TRUE;
 }
 
 LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total)

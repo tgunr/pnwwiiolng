@@ -43,7 +43,7 @@ static void sndsDump(snSound* snd, const char* funcname);
 	sndsGetMaxNumberOfSounds
 *************************************************************************************************/
 
-UINT32 sndsGetMaxNumberOfSounds(void)
+UINT32 sndsGetMaxNumberOfSounds()
 {
  	return MaxNumberOfSounds;
 }
@@ -52,7 +52,7 @@ UINT32 sndsGetMaxNumberOfSounds(void)
 	sndsPlatformInit
 *************************************************************************************************/
 
-LOGICAL sndsPlatformInit(void)
+LOGICAL sndsPlatformInit()
 {
 	alutInit(0, NULL);
 	alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
@@ -86,7 +86,7 @@ LOGICAL sndsPlatformInit(void)
 	sndsPlatformKill
 *************************************************************************************************/
 
-LOGICAL sndsPlatformKill(void)
+LOGICAL sndsPlatformKill()
 {
 	alutExit();
 
@@ -97,7 +97,7 @@ LOGICAL sndsPlatformKill(void)
 	sndsPlatformReset
 *************************************************************************************************/
 
-LOGICAL sndsPlatformReset(void)
+LOGICAL sndsPlatformReset()
 {
 	return TRUE;
 }

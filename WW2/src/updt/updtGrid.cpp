@@ -19,30 +19,30 @@
 #include "strt/strtSupercell.h"
 #include "teul/teulTime.h"
 
-struct GridKey ;
+struct GridKey;
 
 struct GridKey
 {
-	GridKey(SINT32 x, SINT32 y) : m_x(x), m_y(y) {}
-	GridKey(UINT64 key) : m_key(key) {}
-	SINT32 x() const { return m_x ; }
-	SINT32 y() const { return m_y ; }
-	const UINT64& key() const { return m_key ; }
+	constexpr GridKey(SINT32 x, SINT32 y) : m_x(x), m_y(y) {}
+	constexpr GridKey(UINT64 key) : m_key(key) {}
+	constexpr SINT32 x() const { return m_x; }
+	constexpr SINT32 y() const { return m_y; }
+	constexpr const UINT64& key() const { return m_key; }
 
 	union
 	{
-		struct { SINT32 m_x, m_y ; } ;
-		UINT64 m_key ;
-	} ;
-} ;
+		struct { SINT32 m_x, m_y; };
+		UINT64 m_key;
+	};
+};
 
-typedef std::unordered_map<UINT64, class WorldGrid*> _WORLD_HASH ;
-typedef std::set<class WorldGrid*> _WORLD_GRIDS ;
-typedef std::stack<WorldGrid*> _FREE_STACK ;
+using _WORLD_HASH = std::unordered_map<UINT64, class WorldGrid*>;
+using _WORLD_GRIDS = std::set<class WorldGrid*>;
+using _FREE_STACK = std::stack<WorldGrid*>;
 
-typedef std::set<class HostVehicle*> _VEHICLE_LIST ;
+using _VEHICLE_LIST = std::set<class HostVehicle*>;
 
-static WorldGrid* _getGrid(const GridKey& key) ;
+static WorldGrid* _getGrid(const GridKey& key);
 
 //////////////////////////////////////////////////////////////////////
 // WorldGrid class

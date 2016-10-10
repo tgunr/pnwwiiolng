@@ -26,7 +26,7 @@
 #include "scen/ScenarioManager.h"
 #include "ez/EZManager.h"
 
-typedef struct tagvehCntrlCommandListElement
+struct vehCntrlCommandListElement
 {
 	UCHAR CommandName[32];
 	UINT32 CommandId;
@@ -37,7 +37,7 @@ typedef struct tagvehCntrlCommandListElement
 	// next parameters have to be last
 	UINT32 Enabled[ML_MAX_CREW_POSITIONS];
 	UINT32 ExecutionTime;
-} vehCntrlCommandListElement;
+};
 
 UINT32 _ProcessCallback(SINT32 InParameter,UINT32 Id,UINT32 Detach);
 static vehCntrlCommandListElement* _LookupElement(UINT32 Id);
@@ -282,7 +282,7 @@ UINT32 count;
 	return -1;
 }
 
-UINT32 vehCntrlInstallControlCallbacks(void)
+UINT32 vehCntrlInstallControlCallbacks()
 {
 UINT32 i;
 
@@ -354,14 +354,14 @@ UINT32 i;
 	return 0;
 }
 
-UINT32 vehCntrlInit(void)
+UINT32 vehCntrlInit()
 {
 	vehCntrlInstallControlCallbacks();
 
 	return 0;
 }
 
-UINT32 vehcntrlDisableAllControls(void)
+UINT32 vehcntrlDisableAllControls()
 {
 	// disable all controls
 	for (UINT32 i = 0; vehCntrlCommandList[i].CommandId != IMAP_NO_FUNCTION; i++)
@@ -375,7 +375,7 @@ UINT32 vehcntrlDisableAllControls(void)
 	return 0;
 }
 
-UINT32 vehcntrlBailout(void)
+UINT32 vehcntrlBailout()
 {
 	for (UINT32 i = 0; vehCntrlCommandList[i].CommandId != IMAP_NO_FUNCTION; i++)
 	{

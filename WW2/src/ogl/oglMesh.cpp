@@ -15,7 +15,7 @@ static Covert<bool> _draw = true;
 using namespace ogl;
 using namespace ogl::VertexAttributes;
 
-typedef std::map<unsigned int, unsigned int> VAOS;
+using VAOS = std::map<unsigned int, unsigned int>;
 static VAOS vaos;
 
 void oglMeshToggleDraw(bool draw)

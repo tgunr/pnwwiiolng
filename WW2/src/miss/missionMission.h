@@ -64,7 +64,7 @@ struct MISSION_C_STRUCTURE	// The "c" components of the mission structure that c
 class Mission : public MISSION_C_STRUCTURE
 {
 public:
-	Mission(const instanceid_t& instanceID, const MISSION_SUMMARY& withSummary); // Constructor
+	Mission(const instanceid_t instanceID, const MISSION_SUMMARY& withSummary); // Constructor
 	~Mission();
 
 	// Query operators
@@ -143,7 +143,7 @@ public:
 	FacilityStruct* originFac() { return m_originFac; }
 	bool ongoing() const { return m_isOngoing; }
 	playerid_t playerID() const { return m_playerID; }
-	const ChatHandle& posterHandle() const { return m_poster; }
+	ChatHandle posterHandle() const { return m_poster; }
 	WWII_SIDE side() const { return (WWII_SIDE)m_side; }
 	MobileSpawn& spawner() { return m_spawner; }
 	const MobileSpawn& spawner() const { return m_spawner; }
@@ -160,5 +160,5 @@ public:
 	MobileSpawn			m_spawner;
 };
 
-typedef Mission MISSION;
+using MISSION = Mission;
 

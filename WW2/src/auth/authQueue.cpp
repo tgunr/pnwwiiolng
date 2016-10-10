@@ -30,7 +30,7 @@ struct	PlayerEntry
 };
 
 // Queue of Player Entries
-typedef std::vector<PlayerEntry> PlayerQueue;
+using PlayerQueue = std::vector<PlayerEntry>;
 
 // Header for a particular queue
 struct	QueueHeader
@@ -54,7 +54,7 @@ struct ArenaQueues
 };
 
 // Arena<->Queue mapping
-typedef std::map<UINT32, ArenaQueues> Arenas;
+using Arenas = std::map<UINT32, ArenaQueues>;
 
 // Individual queues for paid / free customers.
 static Arenas arenas;

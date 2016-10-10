@@ -625,7 +625,7 @@ void Texture2DArray::allocateMipmap() const
     }
 }
 
-typedef buffered_value< ref_ptr<Texture2DArray::Extensions> > BufferedExtensions;
+using BufferedExtensions = buffered_value<ref_ptr<Texture2DArray::Extensions>>;
 static BufferedExtensions s_extensions;
 
 Texture2DArray::Extensions* Texture2DArray::getExtensions(unsigned int contextID,bool createIfNotInitalized)

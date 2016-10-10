@@ -9,7 +9,7 @@
 
 #include "versionNo.h"
 
-#include "dbse/dbseConnection.h"
+#include "dbse/dbseHandle.h"
 #include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
 #include "wwii/wwiiDBConfig.h"
@@ -18,14 +18,10 @@
 #include "wwii/wwiiRank.h"
 #include "chat/chatCellTypes.h"
 #include "chat/chatData.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "chat/chatMotds.h"
 #include "chat/chatHostMotds.h"
-
-DBCONNECTION dbConnection;
-DBHANDLE dbh;
-extern DBHANDLE& chatdbGetDBH() { return dbh; }
 
 PROPERTY_INDEX _properties;
 
@@ -92,7 +88,7 @@ chatLoadMotds()
 // Helper function for finding a particular property.
 
 Property*
-chatFindProperty(const FULL_OBJ_ID& id)
+chatFindProperty(const FULL_OBJ_ID id)
 {
 	PROPERTY_INDEX::iterator it;
 
@@ -100,14 +96,14 @@ chatFindProperty(const FULL_OBJ_ID& id)
 	if ( it == _properties.end() )
 		return nullptr;
 
-	return it->second;
+	return it->second.get();
 }
 
 //////////////////////////////////////////////////////////////////////
 // Constructor for Facility properties; slightly more complex than
 // the others since it has to connect itself to its parent cp
 
-PropFacility::PropFacility(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char* name, const FULL_OBJ_ID& cpID, UINT32 oid)
+PropFacility::PropFacility(const FULL_OBJ_ID id, WWII_COUNTRY owner, const char* name, const FULL_OBJ_ID cpID, UINT32 oid)
 	: Property(id, owner, name, oid)
 	, m_cp(nullptr)
 {
@@ -166,7 +162,8 @@ chatdbLoadStratData()
 			oid = row.NextUInt();
 			row.NextString(name, sizeof(name));
 
-			new PropCP(fid, (WWII_COUNTRY)owner, name, (WWII_COUNTRY)controller, oid);
+			auto ptr = std::make_unique<PropCP>(fid, (WWII_COUNTRY)owner, name, (WWII_COUNTRY)controller, oid);
+			_properties[ptr->Key()] = std::move(ptr);
 			loadedCPs++;
 		}
 	}
@@ -199,7 +196,8 @@ chatdbLoadStratData()
 			oid = row.NextUInt();
 			row.NextString(name, sizeof(name));
 
-			new PropFacility(fid, (WWII_COUNTRY)owner, name, cpid, oid);
+			auto ptr = std::make_unique<PropFacility>(fid, (WWII_COUNTRY)owner, name, cpid, oid);
+			_properties[ptr->Key()] = std::move(ptr);
 
 			loadedFacs++;
 		}
@@ -217,15 +215,6 @@ chatdbLoadStratData()
 	}
 
 	dbugLog(_FLI, "CPs:%d, Facs: %d", loadedCPs, loadedFacs);
-	return true;
-}
-
-//////////////////////////////////////////////////////////////////////
-
-bool
-chatGetWWIIConfig(void)
-{
-	dbGetWWIIConfig(dbh);
 	return true;
 }
 
@@ -262,7 +251,7 @@ _readPermissionNames()
 {
 	DBQuery qry(dbh, "SELECT `permissionid` - 1, `description` FROM `auth`.`wwii_permissions`");
 	if ( qry.HasRows() == false )
-		throw std::runtime_error("No rows returned from auth.wwii_permissions");	///Terminal
+		throw std::runtime_error("No rows returned from `auth`.`wwii_permissions`");	///Terminal
 	while ( qry.FetchRow() )
 	{
 		auto& row = qry.Row();
@@ -290,11 +279,11 @@ void chatInitDB()
 
 	try
 	{
-		if ( dbh.connect(dbConnection) == false )
+		if ( dbh.connect() == false )
 			throw std::runtime_error("database connection failed");
 
 		wwiiReadHCUnits();
-		wwiiReadRanks(dbh);
+		wwiiReadRanks();
 
 		_readPermissionNames();
 		chatdbLoadStratData();
@@ -306,7 +295,7 @@ void chatInitDB()
 }
 
 LOGICAL
-chatCloseDB(void)
+chatCloseDB()
 {
 	dbh.disconnect();
 	return TRUE;

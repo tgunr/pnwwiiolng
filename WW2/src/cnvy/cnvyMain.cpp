@@ -28,7 +28,6 @@
 #include "strt/strtSupply.h"
 #include "strt/strtSpawn.h"
 #include "chat/chatStratSupportMessages.h"
-#include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
 #include "strt/strtDB.h"
 #include "strt/strtHostDB.h"
@@ -59,7 +58,7 @@ static Mem::Pool<STRAT_UPDATE, 4096> s_stratUpdatePool;
 static UINT32 freeConvoys=MAXCONVOYS, numConvoys=0;
 static CONVOYSTRUCT* freeConvoyList;
 static CONVOYSTRUCT* dispatchedConvoyList;
-typedef IntrusiveList<STRAT_UPDATE> StratUpdateList;
+using StratUpdateList = IntrusiveList<STRAT_UPDATE>;
 static StratUpdateList s_stratUpdateList;
 static STRAT_UPDATE* _convoyUpdate;
 
@@ -439,11 +438,11 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 			_insertStratUpdate(update);
 			update = nullptr;
 		};
-		auto finish_update = [&update] (void) {
+		auto finish_update = [&update] () {
 			_releaseStratUpdate(update);
 			update = nullptr;
 		};
-		auto update_handled = [&update] (void) -> bool { return update == nullptr; };
+		auto update_handled = [&update] () -> bool { return update == nullptr; };
 
 		switch (update->type)
 		{

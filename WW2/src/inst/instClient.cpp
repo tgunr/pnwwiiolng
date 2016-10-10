@@ -176,7 +176,7 @@ RequestSelect(const Instance::Descriptor& instance, SINT32 mapConnection)
 }
 
 bool
-RequestSelect(UINT32 instCategory, UINT32 instType, const UINT64& instOwner, const instanceid_t& id, SINT32 mapConnection)
+RequestSelect(UINT32 instCategory, UINT32 instType, const UINT64 instOwner, const instanceid_t id, SINT32 mapConnection)
 {
 	Instance::Descriptor instance(instCategory, instType, instOwner, id);
 	return RequestSelect(instance, mapConnection);
@@ -193,7 +193,7 @@ RequestCreate(const Instance::Descriptor& instance, SINT32 mapConnection)
 }
 
 bool
-RequestCreate(UINT32 instCategory, UINT32 instType, const UINT64& instOwner, SINT32 mapConnection)
+RequestCreate(UINT32 instCategory, UINT32 instType, const UINT64 instOwner, SINT32 mapConnection)
 {
 	Instance::Descriptor instance(instCategory, instType, instOwner);
 	return RequestCreate(instance, mapConnection);
@@ -213,13 +213,15 @@ bool ClientListing::receive() const
 // Early setup of all the instancing system needs.
 
 SINT32
-InstallClientCallbacks(void)
+InstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Instance::INST_X)
+	{
 		REGISTER_SENDRECV(Instance::INST_XCHG_LISTING_Y, _sendListingRequest, _recvInstanceListing, _XCHG_LISTING);
 		REGISTER_SENDRECV(Instance::INST_XCHG_SELECT_Y, _sendSelect, _recvSelect, _XCHG_SELECT);
 		REGISTER_SENDRECV(Instance::INST_XCHG_CREATE_Y, _sendCreate, _recvCreate, _XCHG_CREATE);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Instance::INST_X)
 }
 
 }

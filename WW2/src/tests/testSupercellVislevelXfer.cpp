@@ -12,7 +12,7 @@ FacilityStruct::~FacilityStruct()
 {
 }
 
-typedef HostSupercellVislevelXfer testtype_t;
+using testtype_t = HostSupercellVislevelXfer;
 
 //////////////////////////////////////////////////////////////////////
 // Provides consistent baseline test conditions for each test.

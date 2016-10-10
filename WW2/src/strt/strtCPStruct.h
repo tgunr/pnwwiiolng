@@ -13,24 +13,22 @@
 #include "wwii/wwiiHCUnits.h"
 #include "strt/strtDTL.h"
 #include "weap/weapDefs.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 #include "strt/strtCPFlags.h"
 #include "inst/instDescriptor.h"
 
 class EWSReport;
 struct WEAPON_SERIAL;
-class StratHCUnit;
-
-typedef HCUNIT_INDEX::iterator HCUIDX_ITERATOR;
-
-//tolua_begin
 
 // Unit describing a player's request: <PlayerID,TimeStamp>
-typedef std::pair<UINT32,UINT32> PLAYER_REQUESTS;
+using PLAYER_REQUESTS = std::pair<UINT32,UINT32>;
 // This would be a queue if they weren't bugged under rh6
-typedef std::vector<UINT32> OVERRUNS;
-typedef std::map<UINT32,EWSReport*> EWSREPORTS;
-typedef std::vector<PLAYER_REQUESTS> HISTORY;
-typedef std::map<Brigade*,UINT32> ACTIVE_BRIGADES;
+using OVERRUNS = std::vector<UINT32>;
+using EWSREPORTS = std::map<UINT32,EWSReport*>;
+using HISTORY = std::vector<PLAYER_REQUESTS>;
+using ACTIVE_BRIGADES = std::map<Brigade*,UINT32>;
+
+//tolua_begin
 
 // External data structures
 extern const UINT32 attackFlags[MAX_SIDES];
@@ -155,21 +153,21 @@ public:
 	UINT16 getPlayers(WWII_SIDE forSide=WWII_NO_SIDE, WEAPON_CATEGORY forWeap=_NO_CATEGORY) const
 											{ return m_players[forSide][forWeap]; }
 
-	CPStruct* clearAlerts(void)				{ _changeFlags(flags&~_alertFlags()); return this;}
+	CPStruct* clearAlerts()				{ _changeFlags(flags&~_alertFlags()); return this;}
 	CPStruct* clearFlag(UINT32 flag) { _changeFlags(flags&~flag); return this; }
 
 	CPStruct* clearFallback()				{ m_fallback = WWII_NO_SIDE; m_fallbackTime = 0; return clearFlag(CP_STAT_FALLBACK); }
 	CPStruct* clearHolding()				{ return clearFlag(CP_STAT_OWN_HAAC); }
 	CPStruct* clearObjective(WWII_SIDE forSide);
 	CPStruct* clearOverrun()				{ return clearFlag(CP_STAT_OVERRUN); }
-	CPStruct* clearOverrunHistory()			{ if ( m_overruns != nullptr ) { delete m_overruns; m_overruns = nullptr; } return this; }
+	CPStruct* clearOverrunHistory()			{ delete m_overruns; m_overruns = nullptr; return this; }
 
 	CPStruct* endContention();
 
 	bool isAttackObjective(WWII_SIDE forSide) const { return ( (flags & attackFlags[forSide]) != 0 ); }
-	bool isBridge(void) const { return (fullObjID.objType == CP_BRIDGE); }
+	bool isBridge() const { return (fullObjID.objType == CP_BRIDGE); }
 	bool isCaptureObjective(WWII_SIDE forSide) const { return ( isCity() && isAttackObjective(forSide) ); }
-	bool isCity(void) const { return (fullObjID.objType != CP_BRIDGE); }
+	bool isCity() const { return (fullObjID.objType != CP_BRIDGE); }
 	bool isDefendObjective(WWII_SIDE forSide) const { return (flags & defendFlags[forSide]) != 0; }
 	bool isFallingBack()					const { return (flags & CP_STAT_FALLBACK) != 0; }
 	bool isFallingBack(WWII_SIDE forSide)	const { return ( isFallingBack() && m_fallback == forSide ); }
@@ -185,7 +183,7 @@ public:
 	CPStruct* setAttackObjective(bool modifyObjectiveList=false, HCUnit* unit=nullptr);
 	CPStruct* setDefendObjective(WWII_SIDE forSide, bool modifyObjectiveList=false);
 	CPStruct* setFlag(UINT32 flag)	{ _changeFlags(flags|flag); return this; }
-	CPStruct* checkForUnderAttack(void);
+	CPStruct* checkForUnderAttack();
 
 	bool isSurrendering() const { return ( flags & CP_STAT_SURRENDER_CANDIDATE ) != 0; }
 	CPStruct* setSurrender(bool state) { if ( state ) _changeFlags(flags|CP_STAT_SURRENDER_CANDIDATE); else  _changeFlags(flags&(~CP_STAT_SURRENDER_CANDIDATE)); return this; }
@@ -250,7 +248,7 @@ public:
 	bool isFriendlyLinked() const { return m_friendlyLinked; }
 
 	LinkStruct* link(UINT32 i) const;
-	LinkStruct* linkTo(const FULL_OBJ_ID& rhs) const;
+	LinkStruct* linkTo(const FULL_OBJ_ID rhs) const;
 	LinkStruct* linkTo(const CPStruct* rhs) const;
 
 	UINT32 minimumObjectiveLifetime(UINT32 currentTime) const;
@@ -290,12 +288,13 @@ public:
 	// Check and update the friendly link status
 	void updateFriendlyLinkStatus();
 
-public:
-	typedef std::set<LinkStruct*> LINKS;
+//tolua_end
+	using LINKS = std::set<LinkStruct*>;
 
 public:
 	LINKS				m_links;
 
+//tolua_begin
 	// Cached responses for .own messages for various sides;
 	std::string 		ownMessage[MAX_SIDES];
 

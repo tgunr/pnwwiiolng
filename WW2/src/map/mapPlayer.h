@@ -31,7 +31,7 @@ namespace Server
 }
 
 #include "wwii/wwiiHash.h"
-typedef std::unordered_map<UINT64, UINT32> SORTIE_DAMAGE_HISTORY;
+using SORTIE_DAMAGE_HISTORY = std::unordered_map<UINT64, UINT32>;
 
 class FacilityStruct;
 class Brigade;
@@ -163,11 +163,11 @@ public:
 
 	UINT32 nextLaunchTime() const;
 
-	void postDenied(const WEAPON_SPEC& weapon, UINT32 reasonCode, bool loseWeapon);
+	void postDenied(const WEAPON_SPEC weapon, UINT32 reasonCode, bool loseWeapon);
 
 	// Receive and interpret a capacity response
 	// calls evaluateMissionPacket()
-	void processCapacityResponse(const FULL_OBJ_ID&, const WEAPON_SERIAL&, const bool vehicleDelivered);
+	void processCapacityResponse(const FULL_OBJ_ID, const WEAPON_SERIAL&, const bool vehicleDelivered);
 
 	void saveMissionPacket();
 
@@ -202,7 +202,7 @@ public:
 	void SetRank(UINT8 level);
 	void SetSideLock();
 	void SetSquad(UINT32 newSquad) { m_squadID = newSquad; }
-	void SetSquadHandle(const ChatHandle& newHandle) { m_squadHandle = newHandle; }
+	void SetSquadHandle(const ChatHandle newHandle) { m_squadHandle = newHandle; }
 	void SetState(MM_PERS_STATE toState);
 	// Set the mission target
 	void SetTarget(const FacilityStruct* facility);

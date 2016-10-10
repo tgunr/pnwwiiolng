@@ -9,8 +9,8 @@ namespace Teul
 
 	struct NetTimeMS
 	{
-		typedef NetTimeMS self_type;
-		typedef TeulTimeMS value_type;
+		using self_type = NetTimeMS;
+		using value_type = TeulTimeMS;
 
 		value_type	m_time;
 

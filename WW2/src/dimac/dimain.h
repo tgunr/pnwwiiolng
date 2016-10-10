@@ -21,8 +21,8 @@ struct CHAR_INPUT
 #define _DIMAIN_INPUT_BUFFERSIZE	256
 #define NUM_SLIDERS_PER_JOYSTICK	2
 
-LOGICAL dimainInit(void);
-void dimainKill(void);
+LOGICAL dimainInit();
+void dimainKill();
 LOGICAL dimainGetInputs(imap_queue_entry** plpiac, UINT32* pnumentries);
 
 UINT32 dimainVKToIAC(UINT32 uVK);

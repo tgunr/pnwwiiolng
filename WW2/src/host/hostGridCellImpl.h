@@ -42,8 +42,8 @@ struct Key
 // Hash of Cells by location.
 // A hash exists for each world instance.
 
-typedef std::map<SINT16 /* x */, class Cell*> CellXHash;	// Hash of x -> cell*
-typedef std::map<SINT16 /* y */, CellXHash> CellHash;		// Hash of y -> { x -> cell* }
+using CellXHash = std::map<SINT16 /* x */, class Cell*>;	// Hash of x -> cell*
+using CellHash = std::map<SINT16 /* y */, CellXHash>;		// Hash of y -> { x -> cell* }
 
 //////////////////////////////////////////////////////////////////////
 /// Describes a cell (or node) within the grid system.
@@ -52,11 +52,7 @@ class Cell
 {
 public:
 	Cell(const Key& key, CellHash& inHash);
-#ifndef ENABLE_TESTS
-	~Cell();
-#else
 	virtual ~Cell();
-#endif
 
 public:
 	/// Time unoccupied cells hang around after emptying.
@@ -112,7 +108,7 @@ protected:
 };
 
 // Hash of CellHashes by instance ID.
-typedef std::unordered_map<instanceid_t, CellHash> InstanceHash;
+using InstanceHash = std::unordered_map<instanceid_t, CellHash>;
 
 //////////////////////////////////////////////////////////////////////
 // Functor for extracting a cell from it's neighbors.

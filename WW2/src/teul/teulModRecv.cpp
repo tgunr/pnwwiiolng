@@ -30,7 +30,7 @@
 #if defined(ENABLE_HOST_TIMERS)
 namespace Timers
 {
-	std::vector< std::pair< char*, UINT64 > > timings;
+	std::vector<std::pair<const char*, UINT64>> timings;
 	TeulTimeMS nextReport = 0ULL;
 }
 #endif
@@ -108,17 +108,17 @@ static POLL_STRUCT pollData;
 
 // To save ourselves having to look up endpoints later...
 #include <map>
-typedef std::map<SINT32, ENDPOINT*> SocketToEndpoint;
+using SocketToEndpoint = std::map<SINT32, ENDPOINT*>;
 static SocketToEndpoint socketToEndpoint;
 
 static TeulTimeMS	_lastIdle;
 
-static void	_pollSockets(const TeulTimeMS& duration_);
+static void	_pollSockets(TeulTimeMS duration_);
 
 static void	_routeCALLBACKs(ENDPOINT& inEndpoint);
 
 #if defined(NIX_VERSION)
-static void _pollSet(void);
+static void _pollSet();
 #endif
 
 static const socklen_t SockAddrLen = sizeof(struct sockaddr_in);
@@ -204,7 +204,7 @@ teulReleaseDatagram(DATA_GRAM* gram)
 //////////////////////////////////////////////////////////////////////
 // Initialize module
 
-void teulInitModRecv(void)
+void teulInitModRecv()
 {
 #if defined(NIX_VERSION)
 	dbugLog(_FLI, "FD_SETSIZE = %u, sizeof(fd_set) = %" PRSizeT ", MAX_POLL_FD = %" PRSizeT, FD_SETSIZE, sizeof(fd_set), POLL_STRUCT::CAPACITY);
@@ -438,15 +438,15 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 		else
 #endif
 		{
-		// When recv() returns 0, this indicates that the connection has closed.
-		// TeulKit doesn't distinguish between deliberate and fault-related
-		// closure; in both cases we notify the application of closure with
-		// an "error"; it is then left to the application to track whether
-		// it is important or not.
+			// When recv() returns 0, this indicates that the connection has closed.
+			// TeulKit doesn't distinguish between deliberate and fault-related
+			// closure; in both cases we notify the application of closure with
+			// an "error"; it is then left to the application to track whether
+			// it is important or not.
 
-		err = dbugGetErrno();
-		dbugLog(_FLN, "t:%d closing TCP socket %d end of stream (recv:0, errno:%d), time %llu",
-		        endpoint.teulIndex(), thesock, err, teulClock64);
+			err = dbugGetErrno();
+			dbugLog(_FLN, "t:%d closing TCP socket %d end of stream (recv:0, errno:%d), time %llu",
+					endpoint.teulIndex(), thesock, err, teulClock64);
 
 			// Tear down all of the teulkit abstractions over the socket and
 			// send notification to the application.
@@ -578,7 +578,8 @@ _recvfromStream(ENDPOINT& endpoint)
 			return retval;
 	}
 
-	if ( endpoint.m_readBufferUsed < endpoint.m_impl->m_curDatagram->m_size )
+	const UINT32 datagramSize = endpoint.m_impl->m_curDatagram->m_size;
+	if ( endpoint.m_readBufferUsed < datagramSize )
 	{
 		const SINT32 retval = _continuePacket(endpoint);
 		if ( retval <= 0 ) 
@@ -596,7 +597,7 @@ _recvfromStream(ENDPOINT& endpoint)
 #endif
 
 		// Don't pass here until we've read all of the payload.
-		if ( endpoint.m_readBufferUsed < endpoint.m_impl->m_curDatagram->m_size )
+		if ( endpoint.m_readBufferUsed < datagramSize )
 		{
 			return 0;
 		}
@@ -604,7 +605,6 @@ _recvfromStream(ENDPOINT& endpoint)
 
     dbugOutputPacket( endpoint, true, endpoint.m_impl->m_curDatagram->contents, endpoint.m_readBufferUsed );
 
-	const UINT32 datagramSize = endpoint.m_impl->m_curDatagram->m_size;
 	endpoint.m_impl->recvQueue.push_back(endpoint.m_impl->m_curDatagram);
 	endpoint.m_impl->m_curDatagram = nullptr;
 	endpoint.m_readBufferUsed = 0;
@@ -742,6 +742,7 @@ _handleReceive(ENDPOINT& endpoint)
 	if ( endRX - startRX > 1 )
 		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". rcvDatagram interval=%llums", endpoint.teulIndex(), PRA_SOCKET(sock), endRX - startRX);
 #endif
+
 	if ( PN_UNLIKELY(theErr < 0) )
 	{
 		theErr = dbugGetErrno();
@@ -862,6 +863,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 #if defined(POLLRDHUP)
 		if ( PN_UNLIKELY((revents & POLLRDHUP) != 0) )
 		{
+			dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " remote disconnected", endpoint.teulIndex(), PRA_SOCKET(sock));
 			teulClose(endpoint, Teul::Closing::RemoteDisc);
 			continue;
 		}
@@ -1047,9 +1049,8 @@ _endpointFDConnect(ENDPOINT& endpoint, const WSANETWORKEVENTS& eventData)
 static UINT64 g_idleInstance = 0;
 
 static void
-_pollSocketsInner(const TeulTimeMS& remainder)
+_pollSocketsInner(TeulTimeMS remainder)
 {
-
 	_lastPXferTotal = totalPacketsXfer;
 
 	// Make ourselves re-entrant by aborting if someone else comes along and
@@ -1323,7 +1324,7 @@ void teulMRecvAddToPoll(ENDPOINT& endpoint)
 
 #if defined(NIX_VERSION)
 static void
-_pollSet(void)
+_pollSet()
 {
 	pollData.m_count = 0;
 	pollData.m_size = 0;
@@ -1364,7 +1365,7 @@ _pollSet(void)
 
 #if !defined(WINDOWS_VERSION)
 static void
-_pollSocketsInner(const TeulTimeMS& duration_)
+_pollSocketsInner(TeulTimeMS duration_)
 {
 	SINT32	retval = 0;
 
@@ -1418,7 +1419,7 @@ _pollSetIsEmpty()
 
 #if platOS != OS_WIN32 || platBuild == TEUL_SERVER
 static void
-_pollSockets(const TeulTimeMS& duration_)
+_pollSockets(TeulTimeMS duration_)
 {
 	//////////////////////////////////////// Unix version
 	if ( PN_UNLIKELY(_pollSetIsEmpty()) )
@@ -1442,7 +1443,7 @@ _pollSockets(const TeulTimeMS& duration_)
 
 #if platOS == OS_WIN32 && platBuild != TEUL_SERVER
 static void
-_pollSockets(const TeulTimeMS& duration_)
+_pollSockets(TeulTimeMS duration_)
 {
 	if ( _pollSetIsEmpty() )
 	{
@@ -1514,7 +1515,7 @@ _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 static void
 _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 {
-	if ( endpoint.m_parent == nullptr )
+	if ( endpoint.m_parent == nullptr || !endpoint.isFromClient() )
 		return;
 
 	// The host assigns the created time when the TCP session is
@@ -1532,6 +1533,7 @@ _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 	const TeulTimeMS lastTick = (TeulTimeMS)endpoint.m_impl->m_lastPacketTick;
 	if ( newTick < lastTick )
 	{
+		// ensure the value can never be negative
 		const TeulTimeMS adjusted = newTick | (1ULL << (sizeof(header.m_tick) * 8));
 		newTick = adjusted;
 	}
@@ -1694,7 +1696,7 @@ teulIdleEndpoints()
 }
 
 SINT32
-teulModIdle(const TeulTimeMS& duration_)
+teulModIdle(const TeulTimeMS duration_)
 {
 	if ( duration_ == 0 )
 		std::this_thread::yield();

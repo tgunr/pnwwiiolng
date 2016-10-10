@@ -14,7 +14,7 @@ namespace Strat
 	};
 }
 
-void clientApplyStratEventData(const FULL_OBJ_ID&);
+void clientApplyStratEventData(const FULL_OBJ_ID);
 void clientApplyStratEventData(const Strat::EventData&);
 void clientStrtUpdateBuildings(struct TERRAIN_DETAIL*);
 UINT32 clientStrtFilterFlags(WWII_SIDE side, UINT32 flags);

@@ -30,14 +30,14 @@
 #define PA_TOC_SIZE 8192
 #define PA_MAX_ARC 64
 
-typedef struct
+struct parcHead
 {
 	int magic;
 	int version;
 	unsigned char md5[16];
-} parcHead;
+};
 
-typedef struct
+struct paMemberHead
 {
 	char name[PA_MAX_NAME+1];
 	unsigned int filelen;
@@ -46,16 +46,16 @@ typedef struct
 	unsigned int flags;
 	unsigned int seed;
 	unsigned char md5[16];
-} paMemberHead;
+};
 
-typedef struct
+struct parc
 {
 	FILE* f;
 	char name[PA_MAX_NAME+1];
 	int updatemd5;
-} parc;
+};
 
-typedef struct
+struct paTOC
 {
 	parc* pa;
 	char name[PA_MAX_NAME+1];
@@ -65,9 +65,9 @@ typedef struct
 	unsigned int crc;
 	unsigned int flags;
 	unsigned int seed;
-} paTOC;
+};
 
-struct tagpaFILE
+struct paFILE
 {
 	parc arc[PA_MAX_ARC];
 
@@ -213,7 +213,7 @@ int paFetchMember(paFILE* pf, const char* membername, unsigned char** data, size
 
 	pf->updatetoc = 0;
 
-	strncpy(name, membername, PA_MAX_NAME);
+	strsafecpy(name, membername);
 	fix_path_name(name);
 
 	member = (paTOC*) bsearch(name, pf->toc, pf->numtoc, sizeof(paTOC), toc_search);
@@ -315,7 +315,7 @@ int paAppendmember(paFILE* pf, const char* membername, const unsigned char* memb
 	// member header
 	fseek(f, 0, SEEK_END);
 
-	strncpy(memberhead.name, membername, 127);
+	strsafecpy(memberhead.name, membername);
 	fix_path_name(memberhead.name);
 
 	memberhead.filelen = writelen;
@@ -452,7 +452,7 @@ static int create_toc(parc* pa, paTOC** toc, int* numtoc)
 #ifdef PRINT_TOC_ENTRIES
       printf("%s [%d]\n",memberhead.name,memberhead.datalen);
 #endif
-			strncpy((*toc)[i].name, memberhead.name, PA_MAX_NAME);
+			strsafecpy((*toc)[i].name, memberhead.name);
 			(*toc)[i].pa = pa;
 			(*toc)[i].offset = ftell(pa->f);
 			(*toc)[i].datalen = memberhead.datalen;
@@ -534,7 +534,7 @@ static void fix_path_name(char* name)
 	}
     t[j] = '\0';
 
-    strncpy(name, t, PA_MAX_NAME);
+    strsafecpy(name, t, PA_MAX_NAME);
 }
 
 /************************************************************************************************

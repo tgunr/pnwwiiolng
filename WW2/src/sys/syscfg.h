@@ -1,4 +1,3 @@
-
 #ifndef PN_PROJECT_SYSCFG_H
 #define PN_PROJECT_SYSCFG_H 1
 // Can't use a pragma guard, because there are multiple syscfgs.
@@ -22,15 +21,15 @@
 #undef PostMessage
 
 // Project defines - Non-Specific
-typedef LOGICAL(*SYS_DDINITFUNC)(void);
-typedef LOGICAL(*SYS_D3DINITFUNC)(void);
-typedef LOGICAL(*SYS_DDRENDERFUNC)(void);
-typedef LOGICAL(*SYS_D3DRENDERFUNC)(void);
-typedef void(*SYS_DDKILLFUNC)(void);
-typedef void(*SYS_D3DKILLFUNC)(void);
-typedef void(*SYS_MOUSEFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
-typedef void(*SYS_TIMERFUNC)(WPARAM wparam, LPARAM lparam);
-typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
+using SYS_DDINITFUNC = LOGICAL(*)();
+using SYS_D3DINITFUNC = LOGICAL(*)();
+using SYS_DDRENDERFUNC = LOGICAL(*)();
+using SYS_D3DRENDERFUNC = LOGICAL(*)();
+using SYS_DDKILLFUNC = void(*)();
+using SYS_D3DKILLFUNC = void(*)();
+using SYS_MOUSEFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
+using SYS_TIMERFUNC = void(*)(WPARAM wparam, LPARAM lparam);
+using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #define MAXENUMDRIVERS		32
 #define MAXMIPLEVELS		12

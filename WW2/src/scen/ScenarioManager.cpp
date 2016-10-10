@@ -1143,7 +1143,7 @@ void ScenarioManager::SetConfig(const char* name, const char* value)
 	TUT_MGR->DoEvent(TUT_EVENT_SET, name, value);
 }
 
-void ScenarioManager::SetRespawnWeapon(const WEAPON_SPEC& spec)
+void ScenarioManager::SetRespawnWeapon(const WEAPON_SPEC spec)
 {
 	_respawnWeapon = spec;
 }
@@ -1198,8 +1198,7 @@ bool ScenarioManager::Spawn(const vehType* vehtype)
 		//uiConsoleprintf("SCENARIO: Spawning at %.2f, %.2f, %.2f", &at.x, &at.y, &at.z);
 		mlSetSpawnStuff(0,0,-1,1);
 		mlSetMobileSpawnStuff(0, at.x, at.y, at.z, yaw);
-		WEAPON_SERIAL blah;
-        memset(&blah, 0, sizeof(WEAPON_SERIAL));
+		WEAPON_SERIAL blah={0};
 		vehcommSendVehicleRequest(vehtype->VehicleTypeNum,&blah);
 	}
 
@@ -1555,7 +1554,7 @@ static content_command& _parse_command(std::string& command)
 {
 	static content_command cc;
 	static char buffer[128+1];
-	strncpy(buffer, command.c_str(), 128);
+	strsafecpy(buffer, command.c_str());
 
 	char* ptr = strchr(buffer, '.');
 
@@ -1626,7 +1625,7 @@ int ScenarioManager::AddContent(const char* line)
 	char data[255+1];
 
 	// copy the data inout buffer so we can manipulate it
-	strncpy(name, line, 255);
+	strsafecpy(name, line);
 
 	char* ptr = strchr(name, ' ');
 	if(ptr) *ptr = 0;
@@ -2189,7 +2188,7 @@ int ScenarioManager::AddContent(const char* line)
 		float z		= 0;
 
 		char color[10+1];
-		strncpy(color, "#FF0000", 10);
+		strsafecpy(color, "#FF0000");
 
 		if(sscanf(arguments.c_str(), "%255s %255s %f %f %f %10s", name, data, &x, &y, &z, color) >= 5)
 		{

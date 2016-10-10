@@ -85,14 +85,13 @@
 //tolua_end
 
 	#define APIENTRY
-	#define PN_MAX_PATH		260
 
-	typedef LOGICAL (*SYS_DDINITFUNC)(void);
-	typedef LOGICAL (*SYS_D3DINITFUNC)(void);
-	typedef LOGICAL (*SYS_DDRENDERFUNC)(void);
-	typedef LOGICAL (*SYS_D3DRENDERFUNC)(void);
-	typedef void (*SYS_DDKILLFUNC)(void);
-	typedef void (*SYS_D3DKILLFUNC)(void);
+	using SYS_DDINITFUNC = LOGICAL(*)();
+	using SYS_D3DINITFUNC = LOGICAL(*)();
+	using SYS_DDRENDERFUNC = LOGICAL(*)();
+	using SYS_D3DRENDERFUNC = LOGICAL(*)();
+	using SYS_DDKILLFUNC = void(*)();
+	using SYS_D3DKILLFUNC = void(*)();
 
 #else
 #error "platform not defined for systypes.h!"
@@ -158,8 +157,6 @@ using PermissionMask = UINT64;
 using TeulTimeMS = UINT64;
 //! Teul type for a millisecond delta (signed).
 using TeulDeltaMS = SINT64;
-
-namespace Instance { typedef UINT64 UniqueID ; }
 
 //! Index for a player ID
 using playerid_t = uint32_t;

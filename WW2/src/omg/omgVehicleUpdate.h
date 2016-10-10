@@ -32,7 +32,7 @@ class Update
 		}
 
 	//! User implemented: somewhere to provide a reference to the Teul Callback for this object.
-	public: static TEUL_CALLBACK* Callback(void);
+	public: static TEUL_CALLBACK* Callback();
 
 	//! Last modified time of the structure or a member var group.
 	protected: TeulTimeMS m_lastModified;

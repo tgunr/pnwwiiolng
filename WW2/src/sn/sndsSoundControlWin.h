@@ -6,37 +6,37 @@
 /////////////////////////////
 // UINT32 return functions
 /////////////////////////////
-extern UINT32 sndsGetMaxNumberOfSounds(void);
+UINT32 sndsGetMaxNumberOfSounds();
 
 /////////////////////////////
 // LOGICAL return functions
 /////////////////////////////
-extern LOGICAL sndsPlatformCommitDeferredSettings();
-extern LOGICAL sndsPlatformCreateSound(snSound* lpOld, snSound* lpNew);
-extern LOGICAL sndsPlatformDriverConfig(void* hints);
-extern LOGICAL	sndsPlatformDuplicateSound(snSound* to, const snSound* from);
-extern LOGICAL sndsPlatformFreeSound(snSound* snd);
-extern LOGICAL sndsPlatformGetVolume(snSound* snd, SINT32* vol);
-extern LOGICAL sndsPlatformInit(void);
-extern LOGICAL sndsPlatformIsPlaying(snSound* snd);
-extern LOGICAL sndsPlatformKill(void);
-extern LOGICAL sndsPlatformLoadSound(snSound* snd);
-extern LOGICAL sndsPlatformOverLimit(UINT32 numPlaying);
-extern LOGICAL sndsPlatformReloadSound(snSound* oldSound, snSound* newSound);
-extern LOGICAL sndsPlatformReset(void);
-extern LOGICAL sndsPlatformSetConeAngles(snSound* snd, UINT32 unused);
-extern LOGICAL sndsPlatformSetConeOrientation(snSound* snd, UINT32 unused);
-extern LOGICAL sndsPlatformSetCurrentPosition(snSound* snd);
-extern LOGICAL sndsPlatformSetFrequency(snSound* snd);
-extern LOGICAL sndsPlatformSetListener3DPos(piVECTOR* r, UINT32 unused);
-extern LOGICAL sndsPlatformSetListener3DVel(piVECTOR* v, UINT32 unused);
-extern LOGICAL sndsPlatformSetMaxDistance(snSound* snd, UINT32 unused);
-extern LOGICAL sndsPlatformSetMinDistance(snSound* snd, UINT32 unused);
-extern LOGICAL sndsPlatformSetOrientation(piVECTOR* at, piVECTOR* up, UINT32 unused);
-extern LOGICAL sndsPlatformSetPanPosition(snSound* snd);
-extern LOGICAL sndsPlatformSetSound3DPos(snSound* snd, UINT32 unused);
-extern LOGICAL sndsPlatformSetSound3DVel(snSound* snd, UINT32 unused);
-extern LOGICAL sndsPlatformSetSound3DMode(snSound* snd, UINT32 unused);
-extern LOGICAL sndsPlatformSetVolume(snSound* snd);
-extern LOGICAL sndsPlatformStartSound(snSound* snd);
-extern LOGICAL sndsPlatformStopSound(snSound* snd);
+LOGICAL sndsPlatformCommitDeferredSettings();
+LOGICAL sndsPlatformCreateSound(snSound* lpOld, snSound* lpNew);
+LOGICAL sndsPlatformDriverConfig(void* hints);
+LOGICAL	sndsPlatformDuplicateSound(snSound* to, const snSound* from);
+LOGICAL sndsPlatformFreeSound(snSound* snd);
+LOGICAL sndsPlatformGetVolume(snSound* snd, SINT32* vol);
+LOGICAL sndsPlatformInit();
+LOGICAL sndsPlatformIsPlaying(snSound* snd);
+void sndsPlatformKill();
+LOGICAL sndsPlatformLoadSound(snSound* snd);
+LOGICAL sndsPlatformOverLimit(UINT32 numPlaying);
+LOGICAL sndsPlatformReloadSound(snSound* oldSound, snSound* newSound);
+LOGICAL sndsPlatformReset();
+LOGICAL sndsPlatformSetConeAngles(snSound* snd, UINT32 unused);
+LOGICAL sndsPlatformSetConeOrientation(snSound* snd, UINT32 unused);
+LOGICAL sndsPlatformSetCurrentPosition(snSound* snd);
+LOGICAL sndsPlatformSetFrequency(snSound* snd);
+LOGICAL sndsPlatformSetListener3DPos(piVECTOR* r, UINT32 unused);
+LOGICAL sndsPlatformSetListener3DVel(piVECTOR* v, UINT32 unused);
+LOGICAL sndsPlatformSetMaxDistance(snSound* snd, UINT32 unused);
+LOGICAL sndsPlatformSetMinDistance(snSound* snd, UINT32 unused);
+LOGICAL sndsPlatformSetOrientation(piVECTOR* at, piVECTOR* up, UINT32 unused);
+LOGICAL sndsPlatformSetPanPosition(snSound* snd);
+LOGICAL sndsPlatformSetSound3DPos(snSound* snd, UINT32 unused);
+LOGICAL sndsPlatformSetSound3DVel(snSound* snd, UINT32 unused);
+LOGICAL sndsPlatformSetSound3DMode(snSound* snd, UINT32 unused);
+LOGICAL sndsPlatformSetVolume(snSound* snd);
+LOGICAL sndsPlatformStartSound(snSound* snd);
+LOGICAL sndsPlatformStopSound(snSound* snd);

@@ -11,18 +11,18 @@
 #include <vector>
 #include "wwii/wwiiHash.h"
 
-struct ActiveVarInfo 
+struct ActiveVarInfo
 {
     ActiveVarInfo() :
-        location(-1), 
-        type(glslUniform::UNDEFINED), 
+        location(-1),
+        type(glslUniform::UNDEFINED),
         size(-1),
         count(0)
     {
     }
 
     ActiveVarInfo(GLint l, GLenum t, GLint s) :
-        uniform(NULL),
+        uniform(nullptr),
         location(l),
         type(t),
         size(s),
@@ -72,16 +72,16 @@ public:
 
     GLhandleARB GetHandle() {return _programhandle;}
 
-    typedef std::vector<ref_ptr<glslShader> > ShaderList;
+    using ShaderList = std::vector<ref_ptr<glslShader>>;
 
-    typedef std::unordered_map<std::string, ActiveVarInfo> ActiveVarInfoMap;
+    using ActiveVarInfoMap = std::unordered_map<std::string, ActiveVarInfo>;
 
-    typedef std::unordered_map<std::string, GLuint> AttribBindingList;
+    using AttribBindingList = std::unordered_map<std::string, GLuint>;
 
-    typedef std::unordered_map<std::string, glslUniform*> UniformList;
+    using UniformList = std::unordered_map<std::string, glslUniform*>;
 
-    typedef std::pair<const glslUniform*, unsigned int> UniformModifiedCountPair;
-    typedef std::vector<UniformModifiedCountPair> LastAppliedUniformList;
+    using UniformModifiedCountPair = std::pair<const glslUniform*, unsigned int>;
+    using LastAppliedUniformList = std::vector<UniformModifiedCountPair>;
 
     const AttribBindingList& GetAttribBindingList() const {return _attribBindingList;}
 
@@ -92,15 +92,15 @@ public:
     inline bool UseShininess() {return useshininess;}
 
      inline GLint GetUniformLocation(const std::string& name) const
-    { 
-        ActiveVarInfoMap::const_iterator itr = _uniformInfoMap.find(name); 
-        return itr != _uniformInfoMap.end() ? itr->second.location : -1; 
+    {
+        ActiveVarInfoMap::const_iterator itr = _uniformInfoMap.find(name);
+        return itr != _uniformInfoMap.end() ? itr->second.location : -1;
     }
 
     inline GLint GetAttribLocation(const std::string& name) const
-    { 
-        ActiveVarInfoMap::const_iterator itr = _attribInfoMap.find(name); 
-        return itr != _attribInfoMap.end() ? itr->second.location : -1; 
+    {
+        ActiveVarInfoMap::const_iterator itr = _attribInfoMap.find(name);
+        return itr != _attribInfoMap.end() ? itr->second.location : -1;
     }
 
     inline const std::string& GetName() const {return _name;}

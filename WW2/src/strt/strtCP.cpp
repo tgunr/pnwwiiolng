@@ -103,11 +103,11 @@ static LOGICAL _processMonkeyhead(FacilityStruct* facility, WWII_COUNTRY country
 //	contention flag, opens all the bases and links
 static LOGICAL _changeLinks(BRIDGE_ENTRY* linkList, bool closed);
 
-typedef std::vector<ObjectStruct*> FACTORIES;
+using FACTORIES = std::vector<ObjectStruct*>;
 static FACTORIES _factories;
 FLOAT64 factoryDamageFactor[MAX_COUNTRIES];
 
-typedef std::map<FacilityStruct*, UINT32> REPAIR_QUEUE;
+using REPAIR_QUEUE = std::map<FacilityStruct*, UINT32>;
 static REPAIR_QUEUE _repairQueue;
 
 //////////////////////////////////////////////////////////////////////
@@ -1420,7 +1420,7 @@ _checkDamage(WWII_SIDE vehSide, ObjectStruct* object, const WEAPON_SERIAL& weapo
 // stratUpdater
 
 void
-strtDamage(const FULL_OBJ_ID& fullObjID, SINT64 damageJoules, const WEAPON_SERIAL& weapon, UINT32 playerID)
+strtDamage(const FULL_OBJ_ID fullObjID, SINT64 damageJoules, const WEAPON_SERIAL& weapon, UINT32 playerID)
 {
 	ObjectStruct*			object = nullptr;
 	UCHAR					prevVisLevel;
@@ -1879,7 +1879,7 @@ static LOGICAL _changeLinks(BRIDGE_ENTRY* linkList, bool closed)
 // Capture a facility and log the change and effect.
 
 void
-strtCaptureAndLog(FacilityStruct* facility, const ChatHandle& handle, UINT32 customerID, UINT32 missionID, const HCUnit* unit, UINT32 seconds)
+strtCaptureAndLog(FacilityStruct* facility, const ChatHandle handle, UINT32 customerID, UINT32 missionID, const HCUnit* unit, UINT32 seconds)
 {
 	if ( unit == nullptr )
 	{
@@ -1922,7 +1922,7 @@ strtCaptureAndLog(FacilityStruct* facility, const ChatHandle& handle, UINT32 cus
 
 /*
 static bool
-_fromInsideFacility(const FacilityStruct* facility, const FULL_OBJ_ID& buildingID, UINT32 customerID, const ChatHandle& handle)
+_fromInsideFacility(const FacilityStruct* facility, const FULL_OBJ_ID buildingID, UINT32 customerID, const ChatHandle handle)
 {
 	ObjectStruct* object = strtGetObject(buildingID);
 	if ( object == NULL || object->facility != facility )

@@ -22,9 +22,9 @@
 
 	};
 
-	typedef UINT32 oglMATERIALHANDLE;
-	typedef UINT32 oglTEXTUREHANDLE, *oglLPTEXTUREHANDLE;
-	typedef UINT32 oglCOLOR, *oglLPCOLOR;
+	using oglMATERIALHANDLE = UINT32;
+	using oglTEXTUREHANDLE = UINT32;
+	using oglCOLOR = UINT32;
 
 	enum
 	{

@@ -127,7 +127,7 @@ static bool readDBRequired = false;
 static bool _running = true;
 
 #include <map>
-typedef std::map<UINT32, GAME*> GameIndex;
+using GameIndex = std::map<UINT32, GAME*>;
 static GameIndex gameIndex;
 
 //////////////////////////////////////////////////////////////////////
@@ -181,7 +181,7 @@ GAME::GAME()
 	,	m_lastIRCUsers(0)
 	,	m_lastIRCReport(0)
 {
-	strcpy(description, "UNKNOWN GAME");
+	strsafecpy(description, "UNKNOWN GAME");
 }
 
 GAME::GAME(const AUTH_GAME_INIT& gInit)
@@ -885,7 +885,7 @@ main(int argc, const char* argv[])
 	authInitDB();
 
     dbugLog(_FLN, "setting up database threads");
-    
+
 	threadsSetup();
 
 	dbugLog(_FLN,"installing callbacks");
@@ -1084,7 +1084,7 @@ static void
 _noGameEntry(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_LAUNCH_REQ& request, APP_LAUNCH reply)
 {
 	char tmpStr[64+1];
-	strncpy(tmpStr, teulGetAddress(request.appVersion), 64);
+	strsafecpy(tmpStr, teulGetAddress(request.appVersion));
 	dbugLog(_FLW, "t:%d c:%s ip:%s arena:%u plat:%u app:%u ver:%s GAME entry NULL"
 			, teulIndex, request.username, ip, request.arenaID, platform, request.appID, tmpStr);
 
@@ -1238,10 +1238,7 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 
 	// Get the local network address excluding the last octet.
 	const UINT32 localAddress = teulGetEndpointLocalAddress(teulIndex);
-	const UINT32 localNet = localAddress & ~0xff;
 
-	static const UINT32 PRIVATE_SUBNET = 0xC0A80000;	// 192.168.*.*
-	static const UINT32 PRIVATE_SUBMASK = 0xFFFF0000;
 	UINT32 destAddress = bestServer.ipAddress;
 
 	//hack since teulGetAddress sucks
@@ -1314,7 +1311,7 @@ _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::Cli
 
 	char ip[64+1];
 	cdata.address = teulGetEndpointRemoteAddress(teulIndex);
-	strncpy(ip, teulGetAddress(cdata.address), 64);
+	strsafecpy(ip, teulGetAddress(cdata.address));
 
 	platform = cdata.platform;
 
@@ -1460,15 +1457,13 @@ authEstablishServer(const SINT32 teulIndex, AUTH_GAME_INIT& gInit)
 	teulSetPersonaData(teulIndex, newServer);
 
 	//Log the connection
-	strncpy(tmpStr, teulGetAddress(game->curHostVersion), 64);
+	strsafecpy(tmpStr, teulGetAddress(game->curHostVersion));
 
 	//Place the server onto the server list for the game entry we either found
 	//	or created
 	SERVER* oldServer = game->server();
-	if ( oldServer && oldServer != newServer )
-	{
-		delete game->server();
-	}
+	if ( oldServer != newServer )
+		delete oldServer;
 
 	game->server(newServer);
 
@@ -1529,9 +1524,9 @@ authValidatePlayer(UINT32 /*ipAddress*/, PLAYER_LOGIN& /*loginData*/, Auth::Disp
 
 SINT32
 authInitAccept(UINT32 /*appVersion*/
-				, PLAYER_ACCEPT_FUNCTION* /*loginAcceptFn*/
-				, PLAYER_RELEASE_FUNCTION* /*releaseFn*/
-				, ERROR_FUNCTION* /*externErrorFn*/)
+				, PLAYER_ACCEPT_FUNCTION /*loginAcceptFn*/
+				, PLAYER_RELEASE_FUNCTION /*releaseFn*/
+				, ERROR_FUNCTION /*externErrorFn*/)
 {
 	return -EINVAL;
 }
@@ -1630,7 +1625,7 @@ authGetGameList(const SINT32 teulIndex)
 	const std::vector<UCHAR>& clientSubs = data->m_subscribedArenaIDs;
 #endif
 
-	typedef std::vector<GameListCache> CACHES;
+	using CACHES = std::vector<GameListCache>;
 	static CACHES caches;
 
 	CACHES::iterator it = caches.begin();

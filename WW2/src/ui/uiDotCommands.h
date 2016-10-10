@@ -51,8 +51,8 @@ extern void uiDotCommandAddClone(int id);
 // we can continue on without interruption
 extern void uiClearSquadCommandTimeout();
 
-typedef int (*dotCmdFunctionA)(const char*);
-typedef int (*dotCmdFunctionW)(const wchar_t*);
+using dotCmdFunctionA = int(*)(const char*);
+using dotCmdFunctionW = int(*)(const wchar_t*);
 
 extern void uiDotCommandAdd(const char* cmdName, dotCmdFunctionA, bool key);
 extern void uiDotCommandAdd(const char* cmdName, dotCmdFunctionW, bool key);

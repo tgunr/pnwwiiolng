@@ -15,6 +15,7 @@
 #include "strt/strtFB.h"
 #include "strt/strtMain.h"
 #include "strt/strtData.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtHostMessages.h"
 #include "strt/strtSupply.h"
 #include "strt/strtSpawn.h"
@@ -175,31 +176,21 @@ strtMain(UINT32 currentTime)
 	return TRUE;
 }
 
-LOGICAL
-strtBroadcastCPs(void)
+void
+strtBroadcastCPs()
 {
-	CPStruct* cp;
-
-	if ( _cpList == nullptr )
-		return FALSE;
-
-	for ( cp = _cpList; cp != nullptr; cp = cp->next )
-	{
-		//Send the CP status
+	for ( auto cp = _cpList; cp != nullptr; cp = cp->next )
 		strtQueueCPStatus(cp);
-	}
-
-	return TRUE;
 }
 
 CPStruct*
-strtGetCPList(void)
+strtGetCPList()
 {
 	return _cpList;
 }
 
 Supercell*
-strtGetCellList(void)
+strtGetCellList()
 {
 	return _supercellList;
 }
@@ -244,7 +235,7 @@ strtInitializeStratSystem()
 	_cpList = strtImportStratData();
 	if (_cpList == nullptr)
 	{
-		strtReportDataErrors();
+		strtReportDataErrors(0);
 		fprintf(stderr,"Strat system failed to initialize, /tmp/strt*.log\n");
 		LogAbort("Strat System failed to initialize");
 		exit(1);

@@ -332,7 +332,7 @@ struct Role
 
 		// Initialize the teulKit transport, telling it how/where to log,
 		// and providing it with our custom error and shutdown handlers.
-		SINT32 ret = teulInitTransport(LOG_TO_FILE, moduleName, Role::transportErrorFn, nullptr);
+		SINT32 ret = teulInitTransport(LogMode::TO_FILE, moduleName, Role::transportErrorFn, nullptr);
 		if ( ret < 0 )
 			throw Teul::Error("teulInitTransport failed", ret);
 
@@ -872,4 +872,3 @@ main(int argc, const char* const argv[])
 
 	return result;
 }
-

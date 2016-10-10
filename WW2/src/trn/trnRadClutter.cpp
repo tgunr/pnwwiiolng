@@ -66,7 +66,7 @@ static std::set<std::string> radcluttermap_1;
 static std::set<std::string> radcluttermap_2;
 static std::set<std::string> radcluttermap_3;
 
-typedef std::map<size_t, Attributes*> AttributeMap;
+using AttributeMap = std::map<size_t, Attributes*>;
 static AttributeMap active;
 
 static void CheckMovement_1();

@@ -7,7 +7,7 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-extern SINT32 wwiiClientInstallCallbacks(void);
+extern SINT32 wwiiClientInstallCallbacks();
 
 extern SINT32 wwiiSendWWII_ERROR_INFO(SINT32 connection, struct WWII_ERROR_INFO* info);
 

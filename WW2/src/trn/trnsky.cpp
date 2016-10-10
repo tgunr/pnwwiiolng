@@ -81,12 +81,12 @@ static piVECTOR		_StarField[NUM_STARS];
 
 static LOGICAL _UpdateSunLight(LIGHT* light, const TERRAINSKY* s);
 static LOGICAL _UpdateMoonLight(LIGHT* light, const TERRAINSKY* s);
-static UINT32 _InitSun(void);
-static UINT32 _InitMoon(void);
-static UINT32 _UpdateFogSphere(void);
+static UINT32 _InitSun();
+static UINT32 _InitMoon();
+static UINT32 _UpdateFogSphere();
 static UINT32 _ColorObject(OBJECT * Object,UINT32 Color);
 static UINT32 _ColorSubObject(OBJECT * Object,UINT32 Color);
-static UINT32 _DrawStarsDeprecated(void);
+static UINT32 _DrawStarsDeprecated();
 
 static bool _moonfirsttime = true;
 static bool _sunfirsttime = true;
@@ -719,7 +719,7 @@ static inline float Interpolate(float fStart, float fEnd, float fPercent)
 	return fStart + (fEnd - fStart) * fPercent;
 }
 
-void computeFlareParameters(void)
+void computeFlareParameters()
 {
     // project the sun to the window
     Vec4f pos;
@@ -804,7 +804,7 @@ FLOAT32 trnskyGetAfterBright()
 }
 #endif
 
-static LOGICAL FogUpdate(void)
+static LOGICAL FogUpdate()
 {
 	int j, num;
 
@@ -823,7 +823,7 @@ static LOGICAL FogUpdate(void)
 	return(TRUE);
 }
 
-LOGICAL trnskyUpdate(void)
+LOGICAL trnskyUpdate()
 {
 SINT32		paints;
 piVECTOR	pos, rot;
@@ -1188,7 +1188,7 @@ void trnskyDraw()
     }
 }
 
-LOGICAL trnskyDrawDeprecated(void)
+LOGICAL trnskyDrawDeprecated()
 {
     if(gCustomTerrain)
     {
@@ -1527,7 +1527,7 @@ LOGICAL trnskyDrawDeprecated(void)
 }
 
 #if USE_STATESET
-static UINT32 _DrawStarsDeprecated(void)
+static UINT32 _DrawStarsDeprecated()
 {
 	static piLVERTEX Vertex[NUM_STARS];
 	UINT32		i, num;
@@ -1604,7 +1604,7 @@ static UINT32 _DrawStarsDeprecated(void)
 	return 0;
 }
 #else
-static UINT32 _DrawStarsDeprecated(void)
+static UINT32 _DrawStarsDeprecated()
 {
 	static piLVERTEX	Vertex[NUM_STARS];
 	UINT32		i, num;
@@ -1697,7 +1697,7 @@ static UINT32 _DrawStarsDeprecated(void)
 
 extern void LensFlareKill();
 
-void trnskyKill(void)
+void trnskyKill()
 {
     LensFlareKill();
 
@@ -1739,7 +1739,7 @@ void trnskyKill(void)
     oglFreeMipTextures(skyboxtextures[SKY_TOP]);
 }
 
-static UINT32 _InitSun(void)
+static UINT32 _InitSun()
 {
 LIGHT Light;
 
@@ -1785,12 +1785,12 @@ LIGHT Light;
 	return 0;
 }
 
-LIGHT* trnskyGetSunSource(void)
+LIGHT* trnskyGetSunSource()
 {
-	return(_SunLight);
+	return _SunLight;
 }
 
-static UINT32 _InitMoon(void)
+static UINT32 _InitMoon()
 {
     TERRAINSKY* s = trndataGetSkyData(_setting);
 
@@ -1836,7 +1836,7 @@ static UINT32 _InitMoon(void)
 	return 0;
 }
 
-LIGHT* trnskyGetMoonSource(void)
+LIGHT* trnskyGetMoonSource()
 {
 	return(_MoonLight);
 }
@@ -2663,7 +2663,7 @@ SINT32 trnskyGetFogOption()
     return _fogoption;
 }
 
-UINT32 _UpdateFogSphere(void)
+UINT32 _UpdateFogSphere()
 {
 FLOAT32 Alt, AltStep, InvFactor;
 UINT32 Poly;

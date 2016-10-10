@@ -6,7 +6,7 @@
 
 #include "include/sysTypes.h"
 
-typedef UINT32 DWORD;
+using DWORD = UINT32;
 
 #define _isnan std::isnan
 #define _finite std::isfinite
@@ -50,9 +50,9 @@ extern const char *macPreferencesPath();
 extern void SetCommandLine(int argc, const char** argv);
 extern const char *GetCommandLine();
 
-extern UINT64 GetMicroSeconds(void);
+extern UINT64 GetMicroSeconds();
 extern UINT64 GetMillisecondTick();
-extern UINT32 timeGetTime(void);
+extern UINT32 timeGetTime();
     
     extern char GetOSMajorVersion();
     extern char GetOSMinorVersion();

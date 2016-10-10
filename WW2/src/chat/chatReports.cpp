@@ -15,7 +15,7 @@
 #include "wwii/wwiiPack.h"
 #include "wwii/wwiiPackString.h"
 
-ChatReport::ChatReport(UINT16 category, const std::string& report, const ChatHandle& offender)
+ChatReport::ChatReport(UINT16 category, const std::string& report, const ChatHandle offender)
 	: m_hostID(0)
 	, m_time(0)
 	, m_category(category)

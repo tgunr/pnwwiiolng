@@ -17,7 +17,7 @@
 //#include "cnvy/cnvyMain.h"
 #include "strt/strtHostMessages.h"
 
-typedef std::map<UINT32, WeapJoinRequestNode*> JOIN_MAP;
+using JOIN_MAP = std::map<UINT32, WeapJoinRequestNode*>;
 static JOIN_MAP joinMap;
 
 //////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@ WeapJoinRequestNode::Lookup(UINT32 playerID)
 //////////////////////////////////////////////////////////////////////
 // Ctor for WeapJoinRequestNode
 
-WeapJoinRequestNode::WeapJoinRequestNode(UINT32 playerID, const ChatHandle& handle, UINT32 missionID)
+WeapJoinRequestNode::WeapJoinRequestNode(UINT32 playerID, const ChatHandle handle, UINT32 missionID)
 	: prev(nullptr), next(nullptr)
 	, m_joinList(nullptr)
 	, m_playerID(playerID)

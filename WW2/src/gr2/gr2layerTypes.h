@@ -38,7 +38,7 @@ public:
 	// you can assign a callback hook to process a poolObject
 	// at certain pool events as defined in the above enum HOOK
 	// this can be used to create or delete additional resources
-	typedef void (*INSTANCE_HOOK)(HOOK, T*);
+	using INSTANCE_HOOK = void(*)(HOOK, T*);
 
 	GR2_POOL(UINT32 is = 32, UINT32 bs = 32, STRATEGY s = ALLOC, INSTANCE_HOOK h = nullptr) :
         _maxout(0),
@@ -258,7 +258,7 @@ struct gr2BoneAdjust
 	Vec3f adjustment;
 };
 
-typedef std::vector<gr2Event*> GR2_EVENT_LIST;
+using GR2_EVENT_LIST = std::vector<gr2Event*>;
 
 struct gr2Animation
 {
@@ -277,7 +277,7 @@ struct gr2Animation
 #endif
 };
 
-typedef std::map<granny_animation*,GR2_EVENT_LIST> GR2_ANIM_EVENTS;
+using GR2_ANIM_EVENTS = std::map<granny_animation*,GR2_EVENT_LIST>;
 
 struct gr2Control
 {
@@ -342,7 +342,7 @@ struct gr2AnimationBlend
 // control blend .. list of controls, one per animation in the blend
 // note .. the control here is NOT a *, it's the real thing .. this is so I'm not continuously allocating
 
-typedef void (*CONTROL_CALLBACK)(void*);
+using CONTROL_CALLBACK = void(*)(void*);
 
 struct gr2ControlBlend
 {
@@ -366,7 +366,7 @@ struct gr2ControlBlend
 #endif
 };
 
-typedef std::vector<int> GR2_ID_LIST;
+using GR2_ID_LIST = std::vector<int>;
 
 struct gr2MeshData
 {
@@ -566,13 +566,13 @@ struct gr2Mesh
 };
 
 // some types used by gr2Model
-typedef std::map<gr2AnimationBlend*,gr2ControlBlend*> GR2_BLEND_MAP;
-typedef std::vector<gr2Mesh*> GR2_MESH_LIST;
-typedef std::vector<gr2Model*> GR2_MODEL_LIST;
-typedef std::vector<gr2QueuedEvent*> GR2_QEVENT_LIST;
-typedef std::vector<gr2BoneTwist> GR2_TWIST_LIST;
-typedef std::vector<gr2BoneAdjust> GR2_ADJUST_LIST;
-typedef gr2Model* GR2_LOD;
+using GR2_BLEND_MAP = std::map<gr2AnimationBlend*,gr2ControlBlend*>;
+using GR2_MESH_LIST = std::vector<gr2Mesh*>;
+using GR2_MODEL_LIST = std::vector<gr2Model*>;
+using GR2_QEVENT_LIST = std::vector<gr2QueuedEvent*>;
+using GR2_TWIST_LIST = std::vector<gr2BoneTwist>;
+using GR2_ADJUST_LIST = std::vector<gr2BoneAdjust>;
+using GR2_LOD = gr2Model*;
 
 // finally, define the model, which wraps it all up
 struct gr2Model
@@ -991,9 +991,9 @@ private:
 };
 #endif
 
-typedef gr2Model* gr2ModelRef;
-//typedef gr2AnimModel* gr2AnimModelRef;
-typedef gr2Control* gr2ControlRef;
-typedef gr2Animation* gr2AnimationRef;
-typedef gr2AnimationBlend* gr2AnimationBlendRef;
-typedef gr2ControlBlend* gr2ControlBlendRef;
+using gr2ModelRef = gr2Model*;
+//using gr2AnimModelRef = gr2AnimModel*;
+using gr2ControlRef = gr2Control*;
+using gr2AnimationRef = gr2Animation*;
+using gr2AnimationBlendRef = gr2AnimationBlend*;
+using gr2ControlBlendRef = gr2ControlBlend*;

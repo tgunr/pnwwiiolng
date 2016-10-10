@@ -18,10 +18,10 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 //Installs the chat callbacks for the client
-SINT32 chatInstallClientCallbacks(void);
+SINT32 chatInstallClientCallbacks();
 
 // Notify the chat host of a users ui-map target selection
-void chatTargetSelection(const struct FULL_OBJ_ID& id);
+void chatTargetSelection(const struct FULL_OBJ_ID id);
 
 FULL_OBJ_ID chatGetTargetSelection();
 

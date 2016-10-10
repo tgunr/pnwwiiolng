@@ -20,6 +20,7 @@
 #include "strt/strtConstants.h"
 #include "strt/strtDamageQueueEntry.h"
 #include "strt/strtData.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtHack.h"
 #include "strt/strtIO.h"
 #include "strt/strtSyncSupportMessages.h"
@@ -49,7 +50,7 @@ CPStruct* _cpList;
 LOGICAL _stratAddressReceived = FALSE;
 
 static void
-_flushDamageQueue(void)
+_flushDamageQueue()
 {
 	if ( damageQueue.empty() )
 		return;
@@ -72,7 +73,7 @@ strtUpdaterInit()
 
 	strtFakeBridges(_cpList);
 
-	strtReportDataErrors();
+	strtReportDataErrors(0);
 }
 
 DAMAGE_QUEUE_ENTRY&
@@ -92,7 +93,7 @@ _getDamageQueueEntry(const UINT64& objectKey, const WEAPON_SERIAL& weapon, const
 }
 
 void
-strtAccumulateDamageMessage(const FULL_OBJ_ID& object, const SINT64& damageJoules, UINT32 playerID, const WEAPON_SERIAL& serial)
+strtAccumulateDamageMessage(const FULL_OBJ_ID object, const SINT64 damageJoules, UINT32 playerID, const WEAPON_SERIAL& serial)
 {
 	ObjectStruct* const currentObject = strtGetObject(object);
 	if (currentObject == nullptr)

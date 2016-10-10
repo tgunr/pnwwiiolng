@@ -270,9 +270,8 @@ static void weapListClear(FacilityWeaponList*);
 
 Client::Client()
 {
-	_classdata = new ClientClassData;
-	_data = new ClientData;
-	memset(_data, 0x0, sizeof(*_data));
+	_classdata = new ClientClassData{};
+	_data = new ClientData{};
 	_data->id = clientid++;
 	_data->hitsPrime = 127979;
 
@@ -742,7 +741,7 @@ int Client::RequestMissionWeapList(FULL_OBJ_ID const& fac, bool allweapons, bool
 	Client::RequestMissionWeapPost
 *************************************************************************************************/
 
-int Client::RequestMissionWeapPost(FULL_OBJ_ID const& fac, const WEAPON_SPEC& spec, bool immediatespawn)
+int Client::RequestMissionWeapPost(FULL_OBJ_ID const& fac, const WEAPON_SPEC spec, bool immediatespawn)
 {
 	return mmSendPostRequest(MapConnection(), fac, spec, (LOGICAL)immediatespawn);
 }
@@ -802,7 +801,7 @@ BrigadeControlList* Client::LookupBrigadeOIC(int brigadeID) const
 
 int Client::RequestClientSpawn(WEAPON_SERIAL const& serial, bool wantMobileSpawn)
 {
-	return mmSendClientSpawn(MapConnection(), serial, (LOGICAL)wantMobileSpawn);
+	return mmSendClientSpawn(MapConnection(), serial, wantMobileSpawn);
 }
 
 /************************************************************************************************
@@ -837,7 +836,7 @@ int Client::RequestMissionList()
 	return missionlist.send(MapConnection());
 }
 
-int Client::RequestQuickMissionList(void) {
+int Client::RequestQuickMissionList() {
 	_data->missionListUpdate = 0;
 	MissionList missionlist;
 	return missionlist.sendQuick(MapConnection());
@@ -1033,7 +1032,7 @@ void Client::SetActiveWaypoint(ChatHandle handle)
 	TUT_MGR->DoEvent(TUT_EVENT_MAP, &type);
 }
 
-const ChatHandle& Client::ActiveWaypointHandle() const
+ChatHandle Client::ActiveWaypointHandle() const
 {
 	return _data->activewaypoint;
 }
@@ -2907,9 +2906,9 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	if(clientinited) return 0;
 
 #if defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
-	static const int DBUGLOG_MODE = LOG_TO_FILE;
+	static const LogMode DBUGLOG_MODE = LogMode::TO_FILE;
 #else
-	static const int DBUGLOG_MODE = LOG_OFF;
+	static const LogMode DBUGLOG_MODE = LogMode::OFF;
 #endif
 
 	// update our default player info data
@@ -2921,7 +2920,7 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	// go ahead and set the player ident info in it just to make sure
 	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
 
-	sprintf(dbugFileName, "wwiiClient.%u", playerID);
+	strprintf(dbugFileName, "wwiiClient.%u", playerID);
 	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
 
 	if(err > -1)

@@ -25,6 +25,8 @@
 
 struct JOIN_LIST;
 
+using CPSET = std::set<CPStruct*>;
+
 //tolua_begin
 
 // Maximum CPs in the strat system
@@ -68,8 +70,6 @@ struct JOIN_LIST;
 
 #define 	FAC_OPEN_FLAG	0x80
 
-typedef std::set<CPStruct*> CPSET;
-
 //The timefactors we have
 enum STRAT_TIMEFACTOR
 {
@@ -88,7 +88,7 @@ class WeapJoinRequestNode
 	public: static WeapJoinRequestNode* Lookup(UINT32 playerID);
 
 	// Ctor/Dtor
-	public: WeapJoinRequestNode(UINT32 playerID, const ChatHandle& handle, UINT32 missionID);
+	public: WeapJoinRequestNode(UINT32 playerID, const ChatHandle handle, UINT32 missionID);
 	public: ~WeapJoinRequestNode();
 
 	// Add this node to a list - automatically extracts itself
@@ -162,8 +162,8 @@ private:
 	UINT8			m_side;				// Side of report
 	UINT8			m_weapCategory;		// Category of weapon in report
 
-	void _incPresence(void);			// Increase presence counts
-	void _decPresence(void);			// Decrease presence counts
+	void _incPresence();				// Increase presence counts
+	void _decPresence();				// Decrease presence counts
 //tolua_begin
 
 public:

@@ -430,13 +430,15 @@ Listing::populate(wwiiPlayer* const player, const ListingRequest& request)
 // Set up the callbacks.
 
 SINT32
-InstallHostCallbacks(void)
+InstallHostCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Instance::INST_X)
+	{
 		REGISTER_RECVSEND(Instance::INST_XCHG_LISTING_Y, _recvInstanceRequest, _sendInstanceListing, _XCHG_LISTING);
 		REGISTER_RECVSEND(Instance::INST_XCHG_SELECT_Y, _recvInstanceSelect, _sendInstanceSelect, _XCHG_SELECT);
 		REGISTER_RECVSEND(Instance::INST_XCHG_CREATE_Y, _recvInstanceCreate, _sendInstanceCreated, _XCHG_CREATE);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Instance::INST_X)
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -458,7 +460,7 @@ RecordPopulations()
 
 	// Use a ThreadTextQuery to batch up the inserts and then commit them
 	// in the background through a worker thread.
-	ThreadTextQuery query(DBThread::Audit, "INSERT IGNORE INTO instance_populations VALUES","");
+	ThreadTextQuery query(DBThread::Audit, "INSERT IGNORE INTO `audit`.`instance_populations` VALUES","");
 	char entry[128];
 	for ( auto it = g_hostInstanceUIDs.begin(); it != g_hostInstanceUIDs.end(); ++it )
 	{

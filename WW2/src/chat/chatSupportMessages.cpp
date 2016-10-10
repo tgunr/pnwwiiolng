@@ -132,10 +132,10 @@ chatSendMissionDeletionNotice(const UINT32& missionID)
 // Constructor for a Chat::PersonaUpdate
 
 Chat::PersonaUpdate::PersonaUpdate(
-		const ChatHandle& handle, WWII_COUNTRY country, BRANCH_ENUM branch, RANK_NO rank
+		const ChatHandle handle, WWII_COUNTRY country, BRANCH_ENUM branch, RANK_NO rank
 		, const Instance::Descriptor& instance, const UINT32 sortieID
-		, UINT32 brigade, UINT32 mission, const ChatHandle& leader
-		, const FULL_OBJ_ID& origin, const FULL_OBJ_ID& target, const PermissionMask& mask, const WEAPON_SPEC& weapon
+		, UINT32 brigade, UINT32 mission, const ChatHandle leader
+		, const FULL_OBJ_ID origin, const FULL_OBJ_ID target, const PermissionMask mask, const WEAPON_SPEC weapon
 		, bool isSpawned, bool badChecksum
 	)
 	: m_instance(instance)
@@ -328,7 +328,7 @@ SINT32
 chatInstallSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
-
+	{
 		// Send only
 		REGISTER_SENDER(Chat::PERSONA_UPDATE_Y, _sendPersonaUpdate, _SEND_PERSONA_UPDATE);
 		REGISTER_SENDER(Chat::SERVER_INFO_Y, _sendServerInfo, _SEND_SERVER_INFO);
@@ -347,7 +347,7 @@ chatInstallSupportCallbacks()
 
 		REGISTER_RECEIVER(Chat::MAP_PERSONA_UPDATE_Y, _recvMapPersonaUpdate);
 		REGISTER_RECEIVER(Chat::MAP_REFRESH_PLAYER_Y, _recvRefreshPlayer);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 

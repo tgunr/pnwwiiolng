@@ -312,7 +312,7 @@ static const char* const msdrResults[MSPAWN_RESULT_MAX][2] =
 // Add a non-vehicle mobile spawn that has been instigated by the system
 
 void
-missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle& handle, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, UINT32 stoUID)
+missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle handle, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, UINT32 stoUID)
 {
 	MSPAWN_RESULT error = MSDR_FAILED;
 	try
@@ -359,7 +359,7 @@ missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle
 // Check and process a cancel instruction for a mobile spawn
 
 void
-missMobileSpawnCancel(UINT32 missionID, const ChatHandle& handle, SINT32 x, SINT32 y)
+missMobileSpawnCancel(UINT32 missionID, const ChatHandle handle, SINT32 x, SINT32 y)
 {
 	Mission* mission = mapFindMission(missionID);
 	if ( mission == nullptr )

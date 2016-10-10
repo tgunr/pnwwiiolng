@@ -36,7 +36,7 @@
 
 //#define CACHE_FPS_DATA
 
-typedef std::map<std::string, fpFPSTrooperLoadout> fpFPSLoadoutMap;
+using fpFPSLoadoutMap = std::map<std::string, fpFPSTrooperLoadout>;
 
 const SCHAR*						arms_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
 const SCHAR*						weap_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];

@@ -18,19 +18,19 @@
 //	midnight, which gives it a range of 0-86399
 
 //This function initializes all the time components
-extern void wthrInitTime(void);
+extern void wthrInitTime();
 
 //tolua_begin
 //This function returns the current time in the world
-extern UINT32 wthrGetGameTime(void);
+extern UINT32 wthrGetGameTime();
 extern void wthrSetGameTime(UINT32 gameTime);
 
 //Gets the current time factor
-extern UINT32 wthrGetTimeFactor(void);
+extern UINT32 wthrGetTimeFactor();
 //convert time to a string HH:MM
 extern const char* wthrConvertTimeToString(UINT32 _time);
 
-extern UINT32 wthrRealSecondsToHour(void);
+extern UINT32 wthrRealSecondsToHour();
 
 extern UINT32 wthrGetWeatherPattern();
 extern void wthrSetWeatherPattern(UINT32 pattern);

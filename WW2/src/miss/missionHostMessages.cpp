@@ -81,7 +81,7 @@ _createMissionResults(const Player& player, MISSION_RESULTS& results)
 
 	results.sortieID = packet.sortie().sortieID();
 
-	const FULL_OBJ_ID& origin = packet.sortie().originFac();
+	const FULL_OBJ_ID origin = packet.sortie().originFac();
 	FacilityStruct* facility = strtGetFacility(origin);
 	if ( facility != nullptr )
 		side = facility->side;
@@ -161,7 +161,7 @@ _createMissionResults(const Player& player, MISSION_RESULTS& results)
 	{
 		auto dr = sortie->m_typesInteractedWith;
 		const size_t types = std::min((size_t)dr.size(), (size_t)MapMiss::MAX_HIT_ARRAY);
-		results.numHits = types;
+		results.numHits = static_cast<UINT16>(types);
 		UINT32 i = 0;
 		for ( auto it = dr.begin(); it != dr.end() && i < types; ++it, ++i )
 		{
@@ -275,8 +275,6 @@ MissionDetail::populate(const Mission* mission, bool isCurrent, bool isLeader, U
 {
 	MissionSynopsis::populate(mission, isCurrent, isLeader, mission->numTakers());
 	strsafecpy(m_desc, mission->m_desc);
-//	strncpy(m_desc, mission->m_desc, MISSION_DESC_LENGTH);
-//	m_desc[MISSION_DESC_LENGTH] = 0;
 	m_timeLaunch = std::max(mission->summary().timeLaunch, withLaunchDelay);
 	m_brigadeID = mission->brigade()->brigadeID();
 }
@@ -432,7 +430,7 @@ mmSendMissionResults(Player& player)
 		)
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s processing post accept for pre-reserved %s"
-						, player.teulIndex(), player.playerID(), player.callsign(), weapPrintName(&results.rtbReservedWeapon.spec));
+						, player.teulIndex(), player.playerID(), player.callsign(), weapPrintName(results.rtbReservedWeapon.spec));
 		memset(&fakeAccept, 0, sizeof(fakeAccept));
 
 		fakeAccept.facility = results.rtbFacility;
@@ -614,23 +612,25 @@ static SINT32
 _installStratCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
+	{
 		REGISTER_RECEIVER(STRT_FACILITY_WEAP_LIST_Y, _recvWeapList);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 
 SINT32
-missionHostInstallCallbacks(void)
+missionHostInstallCallbacks()
 {
 	_installStratCallbacks();
 
 	BEGIN_CALLBACK_REGISTRATION(MISSION_X)
-
+	{
 		REGISTER_RECEIVER(FE_MISSION_POST_REQ_Y, _recvMISSION_POST_REQ);
 		REGISTER_RECEIVER(FE_MISSION_EXIT_Y, _recvMISSION_EXIT);
 		REGISTER_RECEIVER(FE_MISSION_WEP_LIST_REQ_Y, _recvWEP_LIST_REQ);
 
 		REGISTER_SENDER(FE_MISSION_POST_REPLY_Y, _sendMISSION_POST_REPLY, missSEND_POST_REPLY);
-		REGISTER_SENDER(FE_MISSION_CLIENT_WEP_LIST_Y , _sendWEP_LIST, missSEND_WEP_LIST);
+		REGISTER_SENDER(FE_MISSION_CLIENT_WEP_LIST_Y, _sendWEP_LIST, missSEND_WEP_LIST);
 		REGISTER_SENDER(FE_MISSION_ROOM_LIST_Y, _sendMISS_ROOM_LIST, missSEND_ROOM_LIST);
 		REGISTER_SENDER(FE_MISSION_LAUNCH_UPDATE_Y, _sendMISS_LAUNCH_UPDATE, missSEND_LAUNCH_UPDATE);
 		REGISTER_SENDRECV(FE_MISSION_RESULT_REPLY_Y, _sendMISSION_RESULTS, _recvMISSION_RESULTS_REQ, missSEND_RESULTS_REPLY);
@@ -644,6 +644,6 @@ missionHostInstallCallbacks(void)
 #endif // MULTIPLE_MISSION_HOSTS
 
 		REGISTER_RECEIVER(HOST_LOCK_MISSION_Y, _recvLockMission);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(MISSION_X)
 }

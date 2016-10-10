@@ -59,7 +59,7 @@ struct gr2Animation;
 struct gr2AnimationBlend;
 class gr2Object;
 
-typedef void (*GR2_EVENTHANDLER)(OBJECT* pObject, gr2Model* model, SINT32 eventID);
+using GR2_EVENTHANDLER = void(*)(OBJECT* pObject, gr2Model* model, SINT32 eventID);
 
 // gr2 type definitions
 #include "gr2/gr2layerTypes.h"
@@ -75,7 +75,7 @@ extern gr2AnimationBlend* gr2LoadBlendedAnimation(const SCHAR* blendfile, SINT32
 extern gr2AnimationBlend* gr2CreateBlendedAnimation(const SCHAR* animFile, SINT32 boneCount);
 
 // this lets me do the cleanup stage (GrannyFreeFileSection) for all of the open model files, getting some memory back
-extern void			gr2DoneLoadingModels (void);
+extern void			gr2DoneLoadingModels ();
 
 // attach bone attachBone in model to attachToBone in attachToModel (ex:  attach gunbone in kar98k to handbone in arms model)
 extern LOGICAL		gr2AttachModel (gr2Model* model, const SCHAR* attachBone, gr2Model* attachToModel, const SCHAR* attachToBone);
@@ -142,8 +142,8 @@ extern void			gr2FreeQueuedEvent(gr2QueuedEvent* evt);
 extern void			gr2UpdateModel(gr2Model* model, bool force = false, bool granular = true);
 //extern void			gr2UpdateModel(gr2AnimModel* model, bool force = false, bool granular = true);
 
-extern void			gr2Init (void);
-extern void			gr2Kill (void);
+extern void			gr2Init ();
+extern void			gr2Kill ();
 
 extern void			gr2SetModelRotation (gr2Model* model, union piMATRIX* matrix);
 extern void			gr2SetModelPosition (gr2Model* model, struct piVECTOR* position);

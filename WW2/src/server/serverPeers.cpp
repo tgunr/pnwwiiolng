@@ -51,7 +51,7 @@ struct PeerHello
 
 // There are going to be very few of these, probably 3-4,
 // so just store them as a vector.
-typedef std::vector<ServerConnection> ServerConnections;
+using ServerConnections = std::vector<ServerConnection>;
 static ServerConnections s_connections;
 static SINT32 s_peeringIndex = -1;
 
@@ -481,8 +481,10 @@ static SINT32
 _registerPeeringCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
+	{
 		REGISTER_RECEIVEOBJ(PEER_HELLO_Y, PeerHello, _onPeerHello);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////

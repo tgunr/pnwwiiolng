@@ -37,8 +37,8 @@ UINT64 lastBrigadeMovement = 0LL;			// How many times brigades have been moved
 
 Brigade::Brigade(UINT32 withBrigadeID, UINT32 withParentID
 				, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
-				, const ChatHandle& withHandle, const char* withName, const char* nick, UINT8 withRank
-				, const FULL_OBJ_ID& homeCP, const ChatHandle& withOwner, RANK_NO withOwnerRank)
+				, const ChatHandle withHandle, const char* withName, const char* nick, UINT8 withRank
+				, const FULL_OBJ_ID homeCP, const ChatHandle withOwner, RANK_NO withOwnerRank)
 		: BrigadeDetail(withBrigadeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
 						, withHandle, withName, nick, withRank, homeCP, withOwner, withOwnerRank)
 		, m_missionPartitionIt(m_missionList.end())
@@ -155,7 +155,7 @@ Brigade::addPlayer(Player* const player)
 
 	// Ok - this is where they should be added then
 	m_currentMembers.insert(it, std::make_pair(player->playerID(), player));
-	m_players = m_currentMembers.size();
+	m_players = (UINT16)m_currentMembers.size();
 
 	// Are they an officer?
 	if ( player->useRank().commissioned() )
@@ -188,7 +188,7 @@ Brigade::removePlayer(Player* const player)
 	m_currentMembers.erase(player->playerID());
 	m_currentOfficers.erase(player);
 
-	m_players = (m_currentMembers.empty()) ? 0 : m_currentMembers.size();
+	m_players = (UINT16)m_currentMembers.size();
 	updateOfficers();
 }
 
@@ -365,25 +365,22 @@ Brigade::updateDestinations()
 //////////////////////////////////////////////////////////////////////
 // Update the officer count and lists
 
-static bool _rankCompare(const wwiiPlayer* lhs, const wwiiPlayer* rhs)
-{
-	return rhs->effectiveRank() < lhs->effectiveRank();
-}
-
 void
 Brigade::updateOfficers()
 {
-	m_officers = (m_currentOfficers.empty()) ? 0 : m_currentOfficers.size();
-	if ( officers() == 0 )
+	m_officers = (UINT16)m_currentOfficers.size();
+	if ( m_officers == 0 )
 		return;
 
 	wwiiPlayer* topOfficers[_MAX_OFFICERS];
 
-	partial_sort_copy(m_currentOfficers.begin(), m_currentOfficers.end(), &topOfficers[0], &topOfficers[_MAX_OFFICERS], _rankCompare);
+	partial_sort_copy(m_currentOfficers.begin(), m_currentOfficers.end(), std::begin(topOfficers), std::end(topOfficers), [](auto* lhs, auto* rhs) {
+		return rhs->effectiveRank() < lhs->effectiveRank();
+	});
 
-	for ( UINT32 i = 0; i < _MAX_OFFICERS; ++i )
+	for ( size_t i = 0; i < _MAX_OFFICERS; ++i )
 	{
-		if ( i < officers() )
+		if ( i < m_officers )
 		{
 			m_officerHandles[i] = topOfficers[i]->chatHandle();
 			m_officerRanks[i] = topOfficers[i]->effectiveRank();
@@ -409,7 +406,7 @@ mapFindBrigade(UINT32 brigadeID)
 //////////////////////////////////////////////////////////////////////
 // Update the status of all brigades with missions at a particular CP
 
-typedef std::set<Brigade*> BRIGADE_SET;
+using BRIGADE_SET = std::set<Brigade*>;
 
 void
 mapUpdateBrigadesWithMissionsAt(const CPStruct* cp)

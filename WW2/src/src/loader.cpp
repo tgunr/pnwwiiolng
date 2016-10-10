@@ -16,7 +16,6 @@
 
 #include "sdm/sdmLoad.h"
 #include "teul/teulTime.h"
-#include "dbse/dbseConnection.h"
 #include "dbse/dbseHandle.h"
 #include "wwii/wwiiThreads.h"
 
@@ -33,7 +32,6 @@ static char g_origin[80] = "private";
 
 struct stat statBuf;
 
-DBCONNECTION dbConnection;
 extern DBHANDLE dbHandle;
 
 class IrcThread : public PNThread
@@ -184,10 +182,10 @@ _ircSendMessage(const char* channel, const char* message)
 	char channelName[128];
 	if ( channel[0] == '-' )
 	{
-		sprintf(channelName, "#%s%s", cv_clusterName.GetString(), channel);
+		strprintf(channelName, "#%s%s", cv_clusterName.GetString(), channel);
 	}
 	else
-		strcpy(channelName, channel);
+		strsafecpy(channelName, channel);
 
 	irc_cmd_msg(ircSession, channelName, message);
 }
@@ -199,12 +197,12 @@ _ircStart()
 		return;
 
 	char message[80 + sizeof(g_origin)];
-	sprintf(message, "%s terrain: importing new terrain from %s", cv_clusterName.GetString(), g_origin);
+	strprintf(message, "%s terrain: importing new terrain from %s", cv_clusterName.GetString(), g_origin);
 	_ircSendMessage("-sys,#servers", message);
 }
 
 static void
-_ircFinish(const TeulTimeMS& timeTaken)
+_ircFinish(TeulTimeMS timeTaken)
 {
 	if ( ircThread == nullptr || ircSession == nullptr || ircConnected == false )
 		return;
@@ -430,8 +428,6 @@ main(int argc,char** argv)
 	_ircStart();
 	teulSyncClock();
 	TeulTimeMS started = teulClock64;
-
-	threadsReadDBEnvironment();
 
 	if ( dbseInitStratLoader() < 0 )
 		LogAbort("Database (%s:%s) connection failed.", cv_wwiiDBAddress.GetString(), cv_wwiiDBDefaultSchema.GetString());

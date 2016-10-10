@@ -37,11 +37,11 @@ struct lessthanstr
   }
 };
 
-typedef std::map<const char*, ALBuffer, lessthanstr> BufferMap;
-typedef std::stack<ALSource> ALSourceStack;
-typedef std::queue<ALSource> ALSourceQueue;
-typedef std::deque<ALSource> ALSourceDeque;
-typedef std::stack<ALBuffer> ALBufferStack;
+using BufferMap = std::map<const char*, ALBuffer, lessthanstr>;
+using ALSourceStack = std::stack<ALSource>;
+using ALSourceQueue = std::queue<ALSource>;
+using ALSourceDeque = std::deque<ALSource>;
+using ALBufferStack = std::stack<ALBuffer>;
 
 #define MAX_AL_BUFFERS 1023
 #define MAX_AL_SOURCES 128

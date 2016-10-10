@@ -4,8 +4,7 @@
 	parchive
 *************************************************************************************************/
 
-struct tagpaFILE;
-typedef struct tagpaFILE paFILE;
+struct paFILE;
 
 paFILE* paAlloc();
 void paFree(paFILE*);

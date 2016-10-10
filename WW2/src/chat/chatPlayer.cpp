@@ -63,12 +63,10 @@
 
 static HANDLES _spawning;
 
-extern DBHANDLE& chatdbGetDBH();
-
-typedef std::unordered_map< UINT32, std::set<UINT32> > RECRUITS;
+using RECRUITS = std::unordered_map< UINT32, std::set<UINT32>>;
 static RECRUITS _recruits;
 
-typedef std::unordered_set< UINT32 > PLAYERIDS;
+using PLAYERIDS = std::unordered_set<UINT32>;
 static PLAYERIDS _logins;
 #ifdef RECORD_LOGOUTS
 static PLAYERIDS _logouts;
@@ -83,8 +81,8 @@ struct AWS_READING
 	UINT16	allied;
 	UINT16	axis;
 };
-typedef std::map<UINT32, AWS_READING> AWS_GRID;
-typedef std::map<instanceid_t, AWS_GRID> AWS_INSTANCES;
+using AWS_GRID = std::map<UINT32, AWS_READING>;
+using AWS_INSTANCES = std::map<instanceid_t, AWS_GRID>;
 AWS_INSTANCES g_awsGrids, g_awsSnapshots;
 
 // Decal saving
@@ -326,8 +324,7 @@ Player::~Player()
 		m_tunes = nullptr;
 	}
 
-	if ( m_impl )
-		delete m_impl;
+	delete m_impl;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1074,7 +1071,7 @@ public:
 	PlayerGroupQuery(const playerid_t _playerID)
 		: DBThreadQuery(DBThread::Default, "PlayerGroupQuery", DBThreadQuery::_IMMEDIATE
 							, "SELECT v.group_oid"
-								" FROM auth.v_player_active_groups v"
+								" FROM `auth`.`v_player_active_groups` v"
 								" WHERE v.playerid = %u AND v.arenaid = %u"
 									, _playerID
 									, Server::myServerInfo.stats.arenaID
@@ -1416,7 +1413,7 @@ Player::SetMission(UINT32 toMissionID)
 // Set when to send the next reminder not to spam the help channel
 
 void
-Player::SetTimer(const char* timer, const TeulTimeMS& time)
+Player::SetTimer(const char* timer, const TeulTimeMS time)
 {
 	m_impl->m_timers[timer] = time;
 }
@@ -1584,7 +1581,7 @@ Player::SetSpawned(bool newValue)
 }
 
 void
-Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle& handle, UINT32 joined)
+Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle handle, UINT32 joined)
 {
 	if ( m_squadID != toSquadID )
 		m_announcedToSquad = false;
@@ -1615,8 +1612,7 @@ Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle& handle, UI
 void
 Player::SetSquadInvite(SquadInvite* invite)
 {
-	if ( m_squadInvite )
-		delete m_squadInvite;
+	delete m_squadInvite;
 	m_squadInvite = invite;
 }
 
@@ -1625,7 +1621,7 @@ Player::SetSquadInvite(SquadInvite* invite)
 // not it is a buzzard
 
 void
-Player::SetWeapon(const WEAPON_SPEC& toWeapon)
+Player::SetWeapon(const WEAPON_SPEC toWeapon)
 {
 	dbugLog(_FLD, "Weapon was %d.%d.%d.%d", m_weapon.wType, m_weapon.wClass, m_weapon.wCategory, m_weapon.wCountry);
 	m_weapon = toWeapon;
@@ -1943,13 +1939,13 @@ _nameForCP(const Property* nearCP, const Property* lastCP)
 
 void
 Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
-						, bool cpChanged, const FULL_OBJ_ID& nearCP
+						, bool cpChanged, const FULL_OBJ_ID nearCP
 						, UINT32 ride
-						, const FULL_OBJ_ID& nowInFacility
+						, const FULL_OBJ_ID nowInFacility
 						, UINT32 lastPing
 						, bool isOnAWS
 						, bool inCapBldg
-						, const FULL_OBJ_ID& capFac
+						, const FULL_OBJ_ID capFac
 						, SINT32 progress
 						)
 {
@@ -2652,7 +2648,7 @@ PlayerInterface::Lookup(UINT32 playerID)
 }
 
 Player*
-PlayerInterface::Lookup(const ChatHandle& handle)
+PlayerInterface::Lookup(const ChatHandle handle)
 {
 	PLAYER_INDEX::iterator it = playerIndex.find(chatGetLowercaseHandle(handle));
 	return ( it == playerIndex.end() ) ? nullptr : it->second;

@@ -12,6 +12,7 @@
 #include "include/luaGlue.h"
 #include "wwii/wwiiIRC.h"
 #include "teul/teulConfigVar.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 
 extern std::vector<const char*> script_args;
 
@@ -66,7 +67,7 @@ _report(UINT32 level, const char* message, const char* file = _luaSubSystem.c_st
 				, message);
 }
 
-extern const char* chatGetCallsign(const ChatHandle&);
+extern const char* chatGetCallsign(const ChatHandle);
 const char* getCallsign(unsigned long long handle) { return chatGetCallsign((ChatHandle)handle); }
 
 //////////////////////////////////////////////////////////////////////
@@ -155,7 +156,7 @@ _callFunction(const char* fn, int nargs)
 }
 
 void
-Lua::CallInstanceFunction(const char* func, const instanceid_t& instID, const char* data)
+Lua::CallInstanceFunction(const char* func, const instanceid_t instID, const char* data)
 {
 	lua_getglobal(_luaVM, func);
 	if ( lua_isfunction(_luaVM, -1) != 1 )
@@ -173,7 +174,7 @@ Lua::CallInstanceFunction(const char* func, const instanceid_t& instID, const ch
 }
 
 void
-Lua::CallInstanceFunction(const char* func_, const instanceid_t& instID_, playerid_t playerID_, Instance::PlayerState* state_)
+Lua::CallInstanceFunction(const char* func_, const instanceid_t instID_, playerid_t playerID_, Instance::PlayerState* state_)
 {
 	lua_getglobal(_luaVM, func_);
 	if ( lua_isfunction(_luaVM, -1) != 1 )
@@ -564,11 +565,6 @@ Lua::Results()
 {
 	return _luaOutput;
 }
-
-class HCUnit;
-class StratHCUnit;
-typedef std::map<UINT32, HCUnit*> HCUNIT_INDEX;
-typedef HCUNIT_INDEX::iterator HCUIDX_ITERATOR;
 
 UINT16 getHCiID(const HCUIDX_ITERATOR* it)
 {

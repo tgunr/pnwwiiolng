@@ -31,8 +31,8 @@ struct PPOSpec
 	std::vector<std::string> okTextures; // textures we can build on
 };
 
-typedef std::map<int,PPOSpec> PPO_SPEC_MAP;
-typedef bool (*PPOCallback)();
+using PPO_SPEC_MAP = std::map<int,PPOSpec>;
+using PPOCallback = bool(*)();
 
 class PPOSpecLoader : public XMLLoader2<PPOSpecLoader>
 {

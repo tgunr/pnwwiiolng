@@ -185,15 +185,15 @@ extern "C" {
 // fills the buffer pointed to by buffer with single bits indicating that
 // the key is down. an 0x80 indicates down, 0x7f indicates up.
 LOGICAL dipGetKeyboardState(size_t bufsize, char * buffer);
-LOGICAL dipInit(void);
-LOGICAL dipSetupKeyboard(void);
-LOGICAL dipSetupMouse(void);
-LOGICAL dipSetupJoystick(void);
-void dipKill(void);
+LOGICAL dipInit();
+LOGICAL dipSetupKeyboard();
+LOGICAL dipSetupMouse();
+LOGICAL dipSetupJoystick();
+void dipKill();
 
-int dipHasKeyboard(void);
-int dipHasJoystick(void);
-int dipHasMouse(void);
+int dipHasKeyboard();
+int dipHasJoystick();
+int dipHasMouse();
 
 void checkIfInFront();
 

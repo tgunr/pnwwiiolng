@@ -59,7 +59,7 @@ namespace Instance
 	class ClientStatus;
 };
 
-typedef std::map<UINT32, jsMotd*> MotdList;
+using MotdList = std::map<UINT32, jsMotd*>;
 
 // Samples, Threshold, Penalty
 void setChatRateLimiting();

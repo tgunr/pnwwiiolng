@@ -496,8 +496,7 @@ int _luaSpawn(lua_State* L)
 					if(spawner) mlSetSpawnStuff(spawner->SupercellX(), spawner->SupercellY(), spawner->Id(), 1);
 				}
 
-				WEAPON_SERIAL blah;
-                memset(&blah, 0, sizeof(WEAPON_SERIAL));
+				WEAPON_SERIAL blah={0};
 				vehcommSendVehicleRequest(vtype->VehicleTypeNum, &blah);
 
 				// call spawner
@@ -566,8 +565,7 @@ int _luaSpawnAt(lua_State* L)
 				// do old game spawn stuff here
 				mlSetSpawnStuff(0, 0, -1, 1);
 				mlSetMobileSpawnStuff(0, x, y, z);
-				WEAPON_SERIAL blah;
-                memset(&blah, 0, sizeof(WEAPON_SERIAL));
+				WEAPON_SERIAL blah={0};
 				vehcommSendVehicleRequest(vtype->VehicleTypeNum, &blah);
 				// call spawner
 				success = 1;

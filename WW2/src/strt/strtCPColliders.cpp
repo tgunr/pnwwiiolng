@@ -40,7 +40,7 @@ public:
 	CPStruct*	cp;
 };
 
-typedef std::pair<SINT32, SINT32> ColliderKey;
+using ColliderKey = std::pair<SINT32, SINT32>;
 static const UINT32 COLLISION_GRID_SHIFT = 11;	// Each grid space is 2048^2m granularity
 static const SINT32 COLLISION_MARGIN = 2000;	// Extend each bounding box out this far from town
 
@@ -56,8 +56,8 @@ namespace std
 	};
 }
 
-typedef std::vector<CPCollider*> COLLIDERS;
-typedef std::unordered_map<ColliderKey, COLLIDERS> CP_MAP;
+using COLLIDERS = std::vector<CPCollider*>;
+using CP_MAP = std::unordered_map<ColliderKey, COLLIDERS>;
 static CP_MAP _cpMap;
 extern CPStruct* _cpList;
 

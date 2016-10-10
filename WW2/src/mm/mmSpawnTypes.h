@@ -91,7 +91,7 @@ struct FE_POST_LIST_REQUEST
 //This message contains a list of posted vehicles at a facility
 struct FE_POST_LIST_RESPONSE
 {
-	FE_POST_LIST_RESPONSE(const FULL_OBJ_ID& _facility, SINT32 _numWeapons, COMMANDED_WEAPON* const _commandedWeapon)
+	FE_POST_LIST_RESPONSE(const FULL_OBJ_ID _facility, SINT32 _numWeapons, COMMANDED_WEAPON* const _commandedWeapon)
 		: facility(_facility), numWeapons(_numWeapons), commandedWeapon(_commandedWeapon) {}
 	FE_POST_LIST_RESPONSE()
 		: facility(nullObjID), numWeapons(0), commandedWeapon(nullptr) {}
@@ -122,7 +122,7 @@ struct POSTED_WEAPON;
 
 struct MM_POSTED_WEAPON
 {
-	MM_POSTED_WEAPON(const WEAPON_SERIAL& _weaponSerial, SINT16 _portal, UINT32 _commander, UINT32 _missionID, UINT32 _crew)
+	MM_POSTED_WEAPON(const WEAPON_SERIAL _weaponSerial, SINT16 _portal, UINT32 _commander, UINT32 _missionID, UINT32 _crew)
 	: weaponSerial(_weaponSerial), portal(_portal), commander(_commander), missionID(_missionID), crew(_crew) {}
 	MM_POSTED_WEAPON()
 	: weaponSerial(NULL_WEAP_SERIAL), portal(0), commander(0), missionID(0), crew(0) {}
@@ -180,7 +180,7 @@ struct FE_JOIN_PERM_KILL
 struct FE_CLIENT_SPAWN
 {
 	WEAPON_SERIAL	weaponSerial;
-	UCHAR			wantMobileSpawn;
+	bool			wantMobileSpawn;
 };
 
 //This is the notification that the front end gets when it is spawning

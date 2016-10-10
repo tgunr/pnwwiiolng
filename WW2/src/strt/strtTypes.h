@@ -127,7 +127,7 @@ public:
         Copy(rhs);
 		return *this;
 	}
-    
+
 //tolua_begin
 
 public:

@@ -59,7 +59,7 @@ static SNDDETDRIVERS            dsdrivers[MAXENUMDRIVERS];
 #define REG_AUDIO  	            _T("Audio")
 
 #if(0)
-static BOOL dsEnumDrivers(void);
+static BOOL dsEnumDrivers();
 static LOGICAL sndsPlatformInitListener();
 #endif
 
@@ -82,7 +82,7 @@ static inline void _soundError(const char* description)
 // Function: sndsPlatformInit
 // Description:
 ////////////////////////////////////////////////
-LOGICAL sndsPlatformInit(void)
+LOGICAL sndsPlatformInit()
 {
 #if XAUDIO
     return AudioInit();
@@ -281,7 +281,7 @@ LOGICAL sndsPlatformInitListener()
 // Function: sndsPlatformKill
 // Description:
 /////////////////////////////////////
-LOGICAL sndsPlatformKill(void)
+void sndsPlatformKill()
 {
 #if XAUDIO
     AudioKill();
@@ -298,8 +298,6 @@ LOGICAL sndsPlatformKill(void)
         lpds = nullptr;
     }
 #endif
-
-	return TRUE;
 }
 
 LOGICAL sndsPlatformOverLimit(UINT32 numPlaying)
@@ -494,7 +492,7 @@ LOGICAL sndsPlatformFreeSound(snSound* whichSound)
 	return(TRUE);
 }
 
-LOGICAL sndsPlatformReset(void)
+LOGICAL sndsPlatformReset()
 {
 	// not implemented yet
 	return FALSE;
@@ -1069,7 +1067,7 @@ static BOOL CALLBACK EnumDriverCallback(LPGUID lpGuid, const TCHAR* lpDriverDesc
 #endif
 
 #if(0)
-static BOOL dsEnumDrivers(void)
+static BOOL dsEnumDrivers()
 {
 #if XAUDIO
 #else
@@ -1273,7 +1271,7 @@ LOGICAL sndsPlatformSetSound3DVel(snSound* sound, UINT32 uApply)
 // Function: sndsPlatformSetSound3DMode
 // Description: Set the sound mode.
 ////////////////////////////////////////////////////////
-LOGICAL sndsPlatformSetSound3DMode(snSoundPtr s, UINT32 uApply)
+LOGICAL sndsPlatformSetSound3DMode(snSound* s, UINT32 uApply)
 {
 #if XAUDIO
 #else
@@ -1338,7 +1336,7 @@ LOGICAL sndsPlatformCommitDeferredSettings()
 // Function: sndsPlatformSetMaxDistance
 // Description: Set maximum distance for sound buffer.
 //////////////////////////////////////////////////////////
-LOGICAL sndsPlatformSetMaxDistance(snSoundPtr s, UINT32 uApply)
+LOGICAL sndsPlatformSetMaxDistance(snSound* s, UINT32 uApply)
 {
 #if XAUDIO
     return TRUE;
@@ -1379,7 +1377,7 @@ LOGICAL sndsPlatformSetMaxDistance(snSoundPtr s, UINT32 uApply)
 // Function: sndsPlatformSetMinDistance
 // Description: Set minimum distance for sound buffer.
 //////////////////////////////////////////////////////////
-LOGICAL sndsPlatformSetMinDistance(snSoundPtr s, UINT32 uApply)
+LOGICAL sndsPlatformSetMinDistance(snSound* s, UINT32 uApply)
 {
 #if XAUDIO
     return TRUE;
@@ -1420,7 +1418,7 @@ LOGICAL sndsPlatformSetMinDistance(snSoundPtr s, UINT32 uApply)
 // Function: sndsPlatformSetConeAngles
 // Description: Set inside and outside volume cone angles.
 //////////////////////////////////////////////////////////
-LOGICAL sndsPlatformSetConeAngles(snSoundPtr sound, UINT32 uApply)
+LOGICAL sndsPlatformSetConeAngles(snSound* sound, UINT32 uApply)
 {
 #if XAUDIO
 #else
@@ -1459,7 +1457,7 @@ LOGICAL sndsPlatformSetConeAngles(snSoundPtr sound, UINT32 uApply)
 // Function: sndsPlatformSetConeOrientation
 // Description: Set inside and outside volume cone angles.
 //////////////////////////////////////////////////////////
-LOGICAL sndsPlatformSetConeOrientation(snSoundPtr sound, UINT32 uApply)
+LOGICAL sndsPlatformSetConeOrientation(snSound* sound, UINT32 uApply)
 {
 #if XAUDIO
 #else
@@ -1543,7 +1541,7 @@ LOGICAL sndsPlatformGetVolume(snSound* sound, SINT32* pVolume)
 // Function: sndsPlatformSetVolume
 // Description:
 //////////////////////////////////////////////////////////
-LOGICAL sndsPlatformSetVolume(snSoundPtr sound)
+LOGICAL sndsPlatformSetVolume(snSound* sound)
 {
 #if XAUDIO
     if(sound == nullptr)
@@ -1666,7 +1664,7 @@ LOGICAL sndsPlatformIsPlaying(snSound* sound)
 // Function: sndsPlatformSetCurrentPosition
 // Description:
 //////////////////////////////////////////////////////////
-LOGICAL sndsPlatformSetCurrentPosition(snSoundPtr sound)
+LOGICAL sndsPlatformSetCurrentPosition(snSound* sound)
 {
 #if XAUDIO
 #else
@@ -1875,7 +1873,7 @@ LOGICAL sndsPlatformStartSound(snSound* sound)
 // Function: sndsPlatformSetPanPosition
 // Description:
 //////////////////////////////////////////////////////////
-LOGICAL sndsPlatformSetPanPosition(snSoundPtr sound)
+LOGICAL sndsPlatformSetPanPosition(snSound* sound)
 {
 #if XAUDIO
 #else

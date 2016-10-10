@@ -32,9 +32,9 @@ void chatFetchSquadNames();
 void chatAddSquadName(const char* squadName);
 bool chatCheckForSquadName(const char* squadName);
 void chatRemoveSquadName(const char* squadName);
-void chatAddSquadName(const ChatHandle& handle);
-bool chatCheckForSquadName(const ChatHandle& handle);
-void chatRemoveSquadName(const ChatHandle& handle);
+void chatAddSquadName(const ChatHandle handle);
+bool chatCheckForSquadName(const ChatHandle handle);
+void chatRemoveSquadName(const ChatHandle handle);
 
 void chatRenameSquad(const Chat::Name& fromName, const Chat::Name& toName);
 

@@ -90,13 +90,12 @@ public:
 	RANK_NO	effectiveRank() const { return (m_realRank <= m_maxRank) ? m_realRank : m_maxRank; }
 	RANK_NO squadRank() const { return m_realSquadRank; }
 
-	const ChatHandle& chatHandle() const { return m_chatHandle; }
-	const ChatHandle& matchHandle() const { return m_matchHandle; }
-	const ChatHandle& squadHandle() const { return m_squadHandle; }
+	ChatHandle chatHandle() const { return m_chatHandle; }
+	ChatHandle matchHandle() const { return m_matchHandle; }
+	ChatHandle squadHandle() const { return m_squadHandle; }
 
 	UINT32 weaponSpecNo() const { return m_weaponSpecNo; }
-	const struct WEAPON_SPEC& weaponSpec() const { return *((const WEAPON_SPEC*)&m_weaponSpecNo); }
-	struct WEAPON_SPEC& weaponSpec() { return *((WEAPON_SPEC*)&m_weaponSpecNo); }
+	WEAPON_SPEC weaponSpec() const { return *((const WEAPON_SPEC*)&m_weaponSpecNo); }
 
 	const PermissionMask& permissionMask() const { return m_permissionMask; }
 
@@ -111,7 +110,7 @@ public:
 
 	//// Member functions
 public:
-	bool hasHandle(const ChatHandle& testHandle) const
+	bool hasHandle(const ChatHandle testHandle) const
 	{
 		return this->m_matchHandle == testHandle || this->m_chatHandle == testHandle;
 	}

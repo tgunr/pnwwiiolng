@@ -4,8 +4,8 @@
 #include "phui/FTFontReplacement.h"
 
 extern int rntextGetHeight(int Font);
-extern int rntextInit(void);
-extern void rntextKill(void);
+extern int rntextInit();
+extern void rntextKill();
 extern SINT32 rntextGetStringWidth(const WCHAR*, SINT32);
 extern LOGICAL rntext3DString(const WCHAR* pszText, UINT32 uColor, SINT32 iFont, struct piLVERTEX* plVertices, SINT32 iNumVertices);
 extern SINT32 rntextGetTexId(SINT32 iFont);

@@ -1809,7 +1809,7 @@ void GameClient::Edit(const char* type, const char* title, const char* value)
 //////////////////////////////////////////////////////////////////////
 // Deploy a HCUnit to a CP
 
-void HCUnit::setHomeCPID(const FULL_OBJ_ID& newHomeID)
+void HCUnit::setHomeCPID(const FULL_OBJ_ID newHomeID)
 {
 	// Is this actually a change?
 	if ( m_homeCPID == newHomeID)

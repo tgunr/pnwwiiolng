@@ -898,7 +898,7 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 			if(fpsWeapons[weaponID].hiddenMeshes)
 			{
 				char line[128+1];
-				strncpy(line, fpsWeapons[weaponID].hiddenMeshes, 128);
+				strsafecpy(line, fpsWeapons[weaponID].hiddenMeshes);
 
 				char* meshName = strtok(line," ,");
 				while(meshName != nullptr)
@@ -6162,14 +6162,14 @@ void fpFPSUpdateModels()
 	}
 }
 
-LOGICAL fpFPSIsExternalView (void)
+LOGICAL fpFPSIsExternalView()
 {
 	if (persIsInDeathCam())
 		return true;
 	return (fpGetFPPersonDataPtr()->Flags & fpFLAGS_FORCE_EXTERNAL);
 }
 
-LOGICAL fpFPSDraw (OBJECT* pObject, LOGICAL render)
+LOGICAL fpFPSDraw(OBJECT* pObject, LOGICAL render)
 {
 	// the next few calls have internal checks so they don't run more than once a frame
 	// we go ahead and let them run on both the shadow and non shadow runs so they
@@ -11394,7 +11394,7 @@ LOGICAL fpFPSIsTrooperSitting (OBJECT* pObject)
 }
 
 #if USE_STATESET
-void fpFPSDrawGunsight (void)
+void fpFPSDrawGunsight()
 {
     static SINT32 startSniperDelay = 0;
 	static SINT32 startSniperEndDelay = 0;
@@ -11513,7 +11513,7 @@ void fpFPSDrawGunsight (void)
 	}
 }
 #else
-void fpFPSDrawGunsight (void)
+void fpFPSDrawGunsight()
 {
     static SINT32 startSniperDelay = 0;
 	static SINT32 startSniperEndDelay = 0;
@@ -12379,7 +12379,7 @@ void fpFPSAdjustAngles (FLOAT32 deltaTime, FLOAT64 minSpeed, FLOAT64 maxSpeed, F
 
 }
 
-void fpFPSLeanOff (void)
+void fpFPSLeanOff()
 {
 	controlStateFlags &= ~(FPS_LEAN_RIGHT|FPS_LEAN_LEFT);
 	stat2Flags &= ~(STAT2_LEAN_LEFT|STAT2_LEAN_RIGHT);
@@ -12418,12 +12418,12 @@ FLOAT64 fpFPSGetBridgeDamage()
 	return fpsTrooper.bridgeDamageJoules;
 }
 
-FLOAT64 fpFPSGetBridgeRepair (void)
+FLOAT64 fpFPSGetBridgeRepair()
 {
 	return -fpsTrooper.bridgeRepairJoules;
 }
 
-FLOAT32 fpFPSGetConcussionMod (void)
+FLOAT32 fpFPSGetConcussionMod()
 {
 	return (fpsTrooper.concussionMod) ? (FLOAT32)fpsTrooper.concussionMod: 1.0f;
 }

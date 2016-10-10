@@ -47,7 +47,7 @@ class TexEnv
 
     protected :
 
-        virtual ~TexEnv( void );
+        virtual ~TexEnv();
 
         Mode        _mode;
         Vec4f   _color;

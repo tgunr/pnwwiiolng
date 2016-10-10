@@ -28,16 +28,17 @@ infoSendCompInfoRequest(SINT32 connection, const char* message)
 	COMPUTER_INFO_REQ req;
 
 	// Don't pass a NULL, pass an empty string.
-	assert( message != nullptr );
+	assert(message != nullptr);
 
 	strsafecpy(req.text, message);
-	req.size = strlen(req.text) + sizeof('\0');
+	req.size = (UINT16)strlen(req.text) + sizeof('\0');
 
 	return teulSend(connection, _INFO_REQ, &req);
 }
 
 //////////////////////////////////////////////////////////////////////
 // receive a "Playgate InfoSend" packet
+
 static SINT32
 _recvPlayInfoSend(ACTION_OBJECT* const a)
 {
@@ -79,6 +80,7 @@ _recvPlayInfoSend(ACTION_OBJECT* const a)
 
 //////////////////////////////////////////////////////////////////////
 // request a PlayGate info packet
+
 static SINT32
 _sendPlayInfoReq(ACTION_OBJECT* const a)
 {
@@ -89,13 +91,13 @@ _sendPlayInfoReq(ACTION_OBJECT* const a)
 // Install the callbacks for the playgate messages
 
 SINT32
-infoInstallHostCallbacks(void)
+infoInstallHostCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(PgInfo::CallbackX)
-
+	{
 		REGISTER_RECEIVER(PLAY_INFO_SEND_Y, _recvPlayInfoSend);
 		REGISTER_SENDER(PLAY_INFO_REQ_RECV_Y, _sendPlayInfoReq, _INFO_REQ);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(PgInfo::CallbackX)
 }
 

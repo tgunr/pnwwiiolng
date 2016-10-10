@@ -126,7 +126,7 @@ ChatHandleTestUnit::Run()
 
 		START_SUB_STAGE( "char->wide->char" )
 
-			strcpy(plainCallsign, FIRST_TEST);
+			strsafecpy(plainCallsign, FIRST_TEST);
 			WWII::ConvertChars(plainCallsign, wideCallsign, sizeof(wideCallsign));
 			plainCallsign[0] = 0;
 			WWII::ConvertChars(wideCallsign, plainCallsign, sizeof(plainCallsign));

@@ -25,7 +25,7 @@ struct CONVOYSTRUCT
 };
 
 //Initializes the convoy system
-void cnvyInit(void);
+void cnvyInit();
 
 //This is the call the Strat System will make to create a convoy.  It takes
 //	all the information to create a convoy and moves it to the appropriate

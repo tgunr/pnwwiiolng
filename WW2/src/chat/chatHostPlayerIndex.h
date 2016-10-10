@@ -7,6 +7,6 @@
 #include <unordered_map>
 
 class Player;
-typedef std::unordered_map<ChatHandle,Player*> PLAYER_INDEX;	// Players indexed by handle
+using PLAYER_INDEX = std::unordered_map<ChatHandle,Player*>;	// Players indexed by handle
 extern PLAYER_INDEX playerIndex;
 

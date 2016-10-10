@@ -102,7 +102,7 @@ UINT32 g_hostUpdateInterval;
 //////////////////////////////////////////////////////////////////////
 // Initialization for the update packing system.
 
-SINT32	updtPackInit(void)
+SINT32	updtPackInit()
 {
 	return 0;
 }
@@ -195,7 +195,7 @@ std::vector<std::wstring> updtGetNvHistory()
 	wchar_t buffer[128];
 	for ( auto it = nvHistory.begin(), end = nvHistory.end(); it != end; ++it )
 	{
-		swprintf(buffer, sizeof(buffer) - 1, L"[%08u] ", teulClock64 - it->receivedAt);
+		swprintf(buffer, sizeof(buffer) - 1, L"[%08llu] ", teulClock64 - it->receivedAt);
 		result = buffer;
 		result += it->description;
 		results.push_back(result);
@@ -205,7 +205,7 @@ std::vector<std::wstring> updtGetNvHistory()
 }
 
 static void
-_recordNewHistoryEntry(const SHARED_VEHICLE_INFO* const vehInfo, const ChatHandle& packedCallsign)
+_recordNewHistoryEntry(const SHARED_VEHICLE_INFO* const vehInfo, const ChatHandle packedCallsign)
 {
 	NewVehicleHistory entry;
 	entry.receivedAt = teulClock64;
@@ -252,7 +252,7 @@ _recordNewHistoryEntry(const SHARED_VEHICLE_INFO* const vehInfo, const ChatHandl
 static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset, SHARED_VEHICLE_INFO* const vehInfo, SINT32 size, const WORLD_UPDATE* const wu)
 {
 //static SINT32 count = 0;
-	offset = wwiiPackWeaponSpec(mode, data, offset, &vehInfo->spec(), 0);
+	offset = wwiiPackWeaponSpec(mode, data, offset, &vehInfo->wSerial.spec, 0);
 	if ( mode == TEUL_UNPACK )
 	{
 		vehInfo->country = vehInfo->spec().wCountry;
@@ -1151,7 +1151,7 @@ SINT32
 WORLD_UPDATE::packRemoveList(LOGICAL mode, ACTION_OBJECT* const a)
 {
 	a->packer(mode, numRemove, 8);
-	a->packBytes(mode, removeList, sizeof(*removeList) * numRemove);
+	a->bytePacker(mode, removeList, sizeof(*removeList) * numRemove);
 
 	return a->offset;
 }

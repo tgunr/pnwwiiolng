@@ -67,9 +67,9 @@ struct paTOC
 	unsigned int seed;
 };
 
-struct tagpaFILE
+struct paFILE
 {
-	~tagpaFILE()
+	~paFILE()
 	{
 		std::vector<FILE*>::iterator it = arcfiles.begin();
 		for(;it != arcfiles.end(); ++it)
@@ -99,7 +99,7 @@ paFILE* paArchive() { return gPArchive; }
 
 paFILE* paAlloc()
 {
-	gPArchive = new tagpaFILE;
+	gPArchive = new paFILE;
 	return gPArchive;
 }
 void paFree(paFILE* pf)

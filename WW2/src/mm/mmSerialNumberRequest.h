@@ -16,5 +16,4 @@ struct SerialNumberRequest
 	UINT32		serial;
 };
 
-typedef teul_network_object< teul_void_obj<SerialNumberRequest> > SERIAL_NUMBER_REQUEST;
-
+using SERIAL_NUMBER_REQUEST = teul_network_object<teul_void_obj<SerialNumberRequest>>;

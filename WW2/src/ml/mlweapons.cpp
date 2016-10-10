@@ -724,8 +724,7 @@ static void _HandlePickle(mlWeaponMount* Mount, UINT32* PrimaryTriggerDown, UINT
 		Mount->PickleMount != 0 &&
 		*PrimaryTriggerDown)
 	{
-		mlGetPrimaryPickleSetting(&Pickle);
-
+		Pickle = mlGetPrimaryPickleSetting();
 		if (Pickle == 0)
 			*PrimaryTriggerDown = 0;
 	}
@@ -734,8 +733,7 @@ static void _HandlePickle(mlWeaponMount* Mount, UINT32* PrimaryTriggerDown, UINT
 		Mount->PickleMount != 0 &&
 		*SecondaryTriggerDown)
 	{
-		mlGetSecondaryPickleSetting(&Pickle);
-
+		Pickle = mlGetSecondaryPickleSetting();
 		if (Pickle == 0)
 			*SecondaryTriggerDown = 0;
 	}
@@ -744,12 +742,10 @@ static void _HandlePickle(mlWeaponMount* Mount, UINT32* PrimaryTriggerDown, UINT
 		Mount->PickleMount != 0 &&
 		(*PrimaryTriggerDown || *SecondaryTriggerDown))
 	{
-		mlGetPrimaryPickleSetting(&Pickle);
-
+		Pickle = mlGetPrimaryPickleSetting();
 		if (Pickle == 0)
 		{
-			mlGetSecondaryPickleSetting(&Pickle);
-
+			Pickle = mlGetSecondaryPickleSetting();
 			if (Pickle == 0)
 			{
 				*PrimaryTriggerDown = 0;

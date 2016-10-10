@@ -24,7 +24,7 @@ struct EndpointImpl;
 #ifdef TEUL_DETAIL_OUTPUT
 #define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )     ep._dbugOutputPacket ( bIsRecv, reinterpret_cast<const uint8_t *>(bpInput), static_cast<size_t>(szBytes) );
 #else
-#define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )
+#define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes ) silence_unused_parameter_warning(ep, bIsRecv, bpInput, szBytes)
 #endif
 
 struct 	ENDPOINT
@@ -96,8 +96,8 @@ public:
 	WSAEVENT			eventObject;			// really a WSAEVENT/ HANDLE
 #endif
 
-	CONNECT_FUNCTION*	connectFn;				// Connect function.
-	ERROR_FUNCTION*		errorFn;				// Error function.
+	CONNECT_FUNCTION	connectFn;				// Connect function.
+	ERROR_FUNCTION		errorFn;				// Error function.
 
 public:
 	//! Notify our application of a connection accepted.
@@ -155,6 +155,8 @@ public:
 	UINT32 destAddress() const;
 	UINT16 destPort() const;
 
+	bool const isFromClient() const noexcept { return protocol == PROTOCOL_TCP && !m_peer; }
+
 private:
 	//! Write the actual data to the socket.
 	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port);
@@ -170,14 +172,14 @@ public:
 
 /* Endpoint functions */
 
-void		teulCleanupEndpoints(void);
+void		teulCleanupEndpoints();
 
 ENDPOINT* 	teulCreateEndpoint(SINT32 teulIndex, bool isListening, SINT32 timeout, PROTOCOL protocol);
 
 void		teulFreeEndpoint(ENDPOINT* theEndpoint);
 
 void		teulRemoveEndpoint(ENDPOINT* inEndpoint);
-void		teulKillDeadEndpoints(void);
+void		teulKillDeadEndpoints();
 
 // INTERNAL: Get the next free index.
 // Note: this value is incredibly transient.

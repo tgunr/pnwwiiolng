@@ -16,8 +16,8 @@ struct OBJECT;
 class gr2PhysicsModel;
 class gr2PhysicsBone;
 
-typedef gr2PhysicsBone* GR2PhysicsBoneRef;
-typedef std::vector<dGeomID> GR2GeomList;
+using GR2PhysicsBoneRef = gr2PhysicsBone*;
+using GR2GeomList = std::vector<dGeomID>;
 
 // these are not used yet, but will be
 
@@ -108,7 +108,7 @@ struct gr2ValueModel
 	}
 };
 
-typedef std::map<float*,gr2ValueModel> GR2ValueModelMap;
+using GR2ValueModelMap = std::map<float*,gr2ValueModel>;
 
 class gr2PhysicsBody : public physicsBodyBase
 {
@@ -433,10 +433,10 @@ public:
 		DS_DELETE
 	};
 
-	//typedef std::map<std::string,GR2PhysicsBoneRef> BoneMap;
-	typedef std::vector<gr2PhysicsBone*> BoneList;
-	typedef std::vector<gr2StaticBone*> StaticBoneList;
-	typedef std::vector<dJointID> JointList;
+	//using BoneMap = std::map<std::string,GR2PhysicsBoneRef>;
+	using BoneList = std::vector<gr2PhysicsBone*>;
+	using StaticBoneList = std::vector<gr2StaticBone*>;
+	using JointList = std::vector<dJointID>;
 
 	gr2PhysicsModel(int timeout = -1);
 	gr2PhysicsModel(gr2Model* model, OBJECT* ob = nullptr, int timeout = -1);

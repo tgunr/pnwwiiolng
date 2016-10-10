@@ -76,7 +76,7 @@ static std::map<int, OBJECT*> ShadowObject;
 static int mapindex = 0;
 
 // typedefs
-typedef struct tag_CHAOTICSEEDTYPE
+struct _CHAOTICSEEDTYPE
 {
 	FLOAT64 X;
 	FLOAT64 Y;
@@ -86,8 +86,7 @@ typedef struct tag_CHAOTICSEEDTYPE
 	FLOAT64 A;
 	FLOAT64 B;
 	FLOAT64 C;
-
-} _CHAOTICSEEDTYPE;
+};
 
 
 // defines
@@ -115,8 +114,6 @@ static OBJECT*				_ImportObjectList[MAX_IMPORT_OBJECTS];
 static SINT32				_CurrentImportObjectCount;
 static SINT32				NumDrawnTriangles;
 
-static LOGICAL				_DrawVertices(int type, OBJECT* lpobj);
-
 // static prototypes
 static LOGICAL RawUpdate(LOGICAL ForceCompleteReLoad);
 LOGICAL trnmainFindSupercell(SINT16* scx, SINT16* scy, piVECTOR* p);
@@ -128,7 +125,7 @@ extern UINT32 OverrideSpawner;
 #endif
 
 // Static functions
-static SINT32 _GetChaoticNumber(void)
+static SINT32 _GetChaoticNumber()
 {
 FLOAT64		X,Y,Z;
 SINT16		ReturnNum;
@@ -150,7 +147,7 @@ SINT16		ReturnNum;
 	return ((SINT32)ReturnNum);
 }
 
-static LOGICAL _SeedChaoticNumberGenerator(void)
+static LOGICAL _SeedChaoticNumberGenerator()
 {
 _CHAOTICSEEDTYPE Seed;
 SINT32	i;
@@ -1099,9 +1096,9 @@ LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
 
 	const char* ptr = strrchr(objname, '\\');
 	if (ptr != nullptr)
-		strcpy(newname, ++ptr);
+		strsafecpy(newname, ++ptr);
 	else
-		strcpy(newname, objname);
+		strsafecpy(newname, objname);
 
 	OBJECT* masterObj, *newobj;
 	masterObj = newobj = obmainFindTopmostObject(newname);
@@ -1139,7 +1136,7 @@ LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
 		}
 	}
 
-	sprintf(newname, "%s_%d_%d", newname, (int)pos->x, (int)pos->y);
+	strprintf(newname, "%s_%d_%d", newname, (int)pos->x, (int)pos->y);
 	assert ( strlen(newname) < sizeof(newobj->name) );
 	strcpy(newobj->name, newname);
 	*objRefName = newobj->name;
@@ -2338,7 +2335,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 }
 
 #if(0)
-static LOGICAL FogUpdate(void)
+static LOGICAL FogUpdate()
 {
 int			i, j, k, num, spec;
 FLOAT32		dmin, dmax, idmm, d, x, y, z;
@@ -2437,7 +2434,7 @@ OBJECT*	tt;
 #endif
 
 #if(0)
-static LOGICAL WaveUpdate(void)
+static LOGICAL WaveUpdate()
 {
 SINT32		i, j, num;
 UINT32		color;
@@ -2554,7 +2551,7 @@ bool trnmainIsReplacement(const FLOAT64VECTOR& pos)
     return false;
 }
 
-LOGICAL trnmainUpdate(void)
+LOGICAL trnmainUpdate()
 {
 	SINT32			paints;
 	UINT32			tod;
@@ -2615,7 +2612,7 @@ LOGICAL trnmainUpdate(void)
 	return TRUE;
 }
 
-LOGICAL trnmainLODChange(void)
+LOGICAL trnmainLODChange()
 {
 	trnlod += 1;
 	if (trnlod >= 3)
@@ -3424,7 +3421,7 @@ void trnmainGetShadowReceivers(std::map<int, std::vector<piVECTOR> >& octets,
     objects = ShadowObject;
 }
 
-SINT32 trnmainGetNumDrawnTriangles(void)
+SINT32 trnmainGetNumDrawnTriangles()
 {
 	return(NumDrawnTriangles);
 }
@@ -3437,7 +3434,7 @@ LOGICAL trnmainSetLightingUpdate(LOGICAL newLightingUpdate)
 	return(TRUE);
 }
 
-void trnmainKill(void)
+void trnmainKill()
 {
 int		i;
     trndataKill();
@@ -3697,7 +3694,7 @@ UINT32 trnUpdateTerrainOriginOffset(LOGICAL force)
 }
 
 #ifdef TERRAIN_EDITOR
-LOGICAL trnmainSetTerrainOriginOffset(void)
+LOGICAL trnmainSetTerrainOriginOffset()
 {
 	mlVehicleData*	VehicleData = persGetPersonaModelDataPtr();
 
@@ -3709,40 +3706,9 @@ LOGICAL trnmainSetTerrainOriginOffset(void)
 }
 #endif
 
-LOGICAL trnmainWorldOriginMoved(void)
+LOGICAL trnmainWorldOriginMoved()
 {
 	return _WorldMoved;
-}
-
-static LOGICAL _DrawVertices(int type, OBJECT* lpobj)
-{
-	if (lpobj->flags & OBJECT_INDEXED)
-	{
-		piSTRIDEDDATA sd;
-		lpobj->StridedRenderData(&sd);
-
-		if (!piRenderIndexScene((piPRIMITIVETYPE)type, piVT_VERTEX,
-								&sd, lpobj->numverts,
-								(UINT16*)lpobj->ptris,  lpobj->numtris * 3))
-		{
-			Write_Debug("piRenderIndexScene failed at entity %s (no lite)", lpobj->name);
-			return(FALSE);
-		}
-	}
-	else
-	{
-		piSTRIDEDDATA sd;
-		lpobj->StridedRenderData(&sd);
-
-		if (!piRenderStridedScene((piPRIMITIVETYPE)type, piVT_VERTEX,
-									&sd, lpobj->numverts))
-		{
-			Write_Debug("piRenderScene failed at entity %s (no lite)", lpobj->name);
-			return(FALSE);
-		}
-	}
-
-	return(TRUE);
 }
 
 #ifdef TERRAIN_EDITOR
@@ -3868,7 +3834,7 @@ piVERTEX*	po2, pv2;
 	return(TRUE);
 }
 
-LOGICAL trnmainUpdateNormals(void)
+LOGICAL trnmainUpdateNormals()
 {
 UINT16		i, j;
 TERRAIN_DETAIL*	td;

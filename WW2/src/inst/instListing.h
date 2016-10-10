@@ -10,8 +10,6 @@
 
 #include "inst/instClientStatus.h"
 #include "inst/instTypes.h"
-#include <vector>
-#include <stdexcept>
 
 // Used by the host.
 class wwiiPlayer;
@@ -42,15 +40,15 @@ namespace Instance
 	public:
         Result() : m_status(_BAD_DATA), m_descriptor(Descriptor()) {}
         Result(const Descriptor& _descriptor) : m_status(_BAD_DATA), m_descriptor(_descriptor) {}
-        Result(struct ACTION_OBJECT* a) ;
+        Result(ACTION_OBJECT* a) ;
         
-        int packer(unsigned int mode, struct ACTION_OBJECT* a) ;
+        int packer(unsigned int mode, ACTION_OBJECT* a);
         
-        ResultCodes status() const { return m_status ; }
-        const Descriptor& descriptor() const { return m_descriptor ; }
+        ResultCodes status() const { return m_status; }
+        const Descriptor& descriptor() const { return m_descriptor; }
         
-        ResultCodes		m_status ;
-        Descriptor		m_descriptor ;
+        ResultCodes		m_status;
+        Descriptor		m_descriptor;
 	};
 
 	// This is the stub class for handling requests for instance listings.
@@ -65,7 +63,7 @@ namespace Instance
 	public:
 
 		// expose this so we can use the begin and end calls without warnings
-		typedef std::vector<Instance::ClientStatus> Results;
+		using Results = std::vector<Instance::ClientStatus>;
 
 		////// Ctor/Dtor
 		Listing() : m_results(), m_requestID(0), m_result(_BAD_DATA), m_complete(false) {}

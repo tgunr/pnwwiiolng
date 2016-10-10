@@ -16,8 +16,7 @@
 #include "wwii/wwiiThreadTypes.h"
 #include "wwii/wwiiSerialNumber.h"
 
-#include "dbse/dbseClient.h"
-#include "dbse/dbseWrapper.h"
+#include "dbse/dbseHandle.h"
 #include "include/mydbQuery.h"
 #include "strt/strtdbSaveWorld.h"
 #include "strt/strtCPStruct.h"
@@ -73,8 +72,6 @@ static QUEUE objQueue, weaponQueue;
 
 bool _queueEnabled = false;
 
-extern DBHANDLE dbh;
-
 UINT32 g_gameDay;
 
 static SINT32
@@ -127,7 +124,7 @@ strAdd(char* dest, char* src)
 #include <set>
 #include "wwii/wwiiThreadTextQuery.h"
 
-typedef std::map< std::string, std::set<UINT32> > SAVE_SET;
+using SAVE_SET = std::map<std::string, std::set<UINT32>>;
 static SAVE_SET _cpSaves, _facSaves, _objOwnSaves, _objMaxSaves, _objStateSaves;
 
 static void
@@ -237,7 +234,7 @@ _commitObject(ObjectStruct* obj)
 	obj->modified = false;
 }
 
-typedef std::vector<UINT16> _SAVE_IDS;
+using _SAVE_IDS = std::vector<UINT16>;
 
 static void
 _saveRows(const char* table, const char* field, UINT64 value, const char* idField, _SAVE_IDS& ids)
@@ -670,7 +667,7 @@ ObjectiveStats::save()
 	dbugLog(_FLD, "Saving objective stats");
 
 	DBThread::Do(DBThread::Audit
-			, "INSERT INTO audit.objective_counts"
+			, "INSERT INTO `audit`.`objective_counts`"
 				" ( recorded"
 				 ", city_limit"
 				 ", allied_city_attacks"
@@ -707,7 +704,7 @@ ObjectiveStats::save()
 
 void
 strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
-				, const ChatHandle& handle, UINT32 customerID, UINT32 missionID
+				, const ChatHandle handle, UINT32 customerID, UINT32 missionID
 				, const HCUnit* unit, UINT32 started, UINT32 seconds
 				, bool wasContested, bool tookControl, bool tookOwnership)
 {
@@ -828,7 +825,7 @@ strtdbFetchLuaScript(const char* name, std::string& obj)
 void
 strtdbSaveConfigVar(const char* name, const char* value)
 {
-	DBSimpleQuery(dbh, "UPDATE wwiionline.wwii_config SET value = '%s' WHERE variableName = '%s'", value, name);
+	DBSimpleQuery(dbh, "UPDATE `wwiionline`.`wwii`_config` SET value = '%s' WHERE variableName = '%s'", value, name);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -837,7 +834,7 @@ strtdbSaveConfigVar(const char* name, const char* value)
 ///CAVEAT: Must be done before we load in the HCUnits.
 
 static const char* QRY_BOOTSTRAP_TOE_HEADERS =
-"INSERT INTO toe.headers"
+"INSERT INTO `toe`.`headers`"
 	"(id, name, country, branch)"
 " VALUES"
 	" ('ukgrdfor', 'BEF Ground Forces', 1, 1)"
@@ -865,7 +862,7 @@ strtdbLoadTOETemplates()
 
 		// Take the current database timestamp so that we can perform
 		// incremental reads in subsequent calls.
-		q.Query("SELECT COUNT(*), UNIX_TIMESTAMP(NOW()) FROM toe.headers t");
+		q.Query("SELECT COUNT(*), UNIX_TIMESTAMP(NOW()) FROM `toe`.`headers` t");
 		if ( q.Rows() == 0 || !q.FetchRow() )
 			throw "Failed reading 'now' from database";
 
@@ -883,8 +880,8 @@ strtdbLoadTOETemplates()
 
 		snprintf(statement, 500
 				, "SELECT DISTINCT t.id, t.name, t.country, t.branch"
-					" FROM toe.headers t"
-						" LEFT JOIN toe.vehicles v USING (id)"
+					" FROM `toe`.`headers` t"
+						" LEFT JOIN `toe`.`vehicles` v USING (id)"
 					" WHERE t.modified >= FROM_UNIXTIME(%u)"
 						" OR v.modified >= FROM_UNIXTIME(%u)"
 					" GROUP BY 1"
@@ -910,8 +907,8 @@ strtdbLoadTOETemplates()
 
 		strprintf(statement
 				, "SELECT v.id, vt.countryID, vt.categoryID, vt.classID, vt.typeID, v.capacity, v.resupply_time_m"
-					" FROM toe.headers t"
-						" JOIN toe.vehicles v USING (id)"
+					" FROM `toe`.`headers` t"
+						" JOIN `toe`.`vehicles` v USING (id)"
 							" JOIN wwii_vehtype vt USING (vehtype_oid)"
 					" WHERE vt.in_service=1 AND v.modified >= FROM_UNIXTIME(%u)"
 					" ORDER BY 1, 2"
@@ -962,7 +959,7 @@ strtdbRestoreTOESupplies()
 	try
 	{
 		DBQuery q(dbh, "SELECT s.unit_id, v.countryID, v.categoryID, v.classID, v.typeID, s.present, s.vehtype_oid"
-						" FROM toe.supply s JOIN wwii_vehtype v USING (vehtype_oid)"
+						" FROM `toe`.`supply` s JOIN wwii_vehtype v USING (vehtype_oid)"
 						" ORDER BY 1, 2");
 
 		StratHCUnit* unit = nullptr;
@@ -983,7 +980,7 @@ strtdbRestoreTOESupplies()
 			{
 				unit = StratHCUnit::Lookup(unitID);
 				if ( unit == nullptr )
-					dbugLog(_FLW, "toe.supply: unrecognized unit ID %u", unitID);
+					dbugLog(_FLW, "`toe`.`supply`: unrecognized unit ID %u", unitID);
 				lastUnitID = unitID;
 			}
 
@@ -994,7 +991,7 @@ strtdbRestoreTOESupplies()
 			// Set this as the initial value
 			if ( unit->initializeWeapon(spec, present) == false )
 			{
-				DBThread::Do(DBThread::Default, "DELETE LOW_PRIORITY IGNORE FROM toe.supply WHERE unit_id=%u AND vehtype_oid=%u", unitID, vehTypeOID);
+				DBThread::Do(DBThread::Default, "DELETE LOW_PRIORITY IGNORE FROM `toe`.`supply` WHERE unit_id=%u AND vehtype_oid=%u", unitID, vehTypeOID);
 			}
 		}
 	}
@@ -1005,7 +1002,7 @@ strtdbRestoreTOESupplies()
 
 	dbugLog(_FLI, "Saving initial TOE levels");
 	// Purge the old entries
-	DBSimpleQuery(dbh, "TRUNCATE toe.supply");
+	DBSimpleQuery(dbh, "TRUNCATE `toe`.`supply`");
 
 	char buffer[TEXT_POOL_SIZE+1];
 	UINT32 len = 0;

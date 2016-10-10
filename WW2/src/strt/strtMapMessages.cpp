@@ -346,9 +346,9 @@ static SINT32 _recvMMFacilityCapacityResponse(ACTION_OBJECT* const a)
 //This function sends a request to post a weapon at a facility
 SINT32
 strtSendMMPostRequest(SINT32 connection, UINT32 customerID, const char* callsign
-					, UINT32 missionID, UINT32 brigadeID, const PermissionMask& permMask
-					, const FULL_OBJ_ID& facility, WEAPON_SPEC weapon
-					, LOGICAL multicrew,LOGICAL immediateSpawn)
+					, UINT32 missionID, UINT32 brigadeID, const PermissionMask permMask
+					, const FULL_OBJ_ID facility, WEAPON_SPEC weapon
+					, LOGICAL multicrew, LOGICAL immediateSpawn)
 {
 	MM_POST_REQUEST postRequest;
 
@@ -373,7 +373,7 @@ strtSendMMPostRequest(SINT32 connection, UINT32 customerID, const char* callsign
 
 //This function sends a request to list all the posted weapons at a facility
 SINT32
-strtSendMMPostListRequest(SINT32 connection, UINT32 customerID, const char* callsign, UINT32 missionID, UINT32 brigadeID, const FULL_OBJ_ID& facility)
+strtSendMMPostListRequest(SINT32 connection, UINT32 customerID, const char* callsign, UINT32 missionID, UINT32 brigadeID, const FULL_OBJ_ID facility)
 {
 	SINT32 retval;
 	MM_POST_LIST_REQUEST postListRequest;
@@ -453,7 +453,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 						, player.missionID()
 						, player.brigadeID()
 						, spawnGrantRequest.weaponSerial.serial
-						, weapPrintName(&spawnGrantRequest.weaponSerial.spec)
+						, weapPrintName(spawnGrantRequest.weaponSerial.spec)
 						, PRA_FULL_OBJ_ID(spawnGrantRequest.weaponSerial.source)
 						);
 
@@ -495,7 +495,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 }
 
 SINT32
-strtSendMMPostInfoRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle& handle, LOGICAL join)
+strtSendMMPostInfoRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, LOGICAL join)
 {
 	MM_POST_INFO_REQUEST postInfoRequest;
 
@@ -507,7 +507,7 @@ strtSendMMPostInfoRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL&
 	return teulSend(connection, _XCHG_MM_POST_INFO, &postInfoRequest);
 }
 
-SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle& handle, LOGICAL join)
+SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, LOGICAL join)
 {
 	SINT32 retval;
 	MM_POST_INFO_REQUEST postInfoRequest;
@@ -543,7 +543,7 @@ strtSendMMPostCancel(SINT32 connection, const WEAPON_SERIAL& weaponSerial)
 }
 
 //This function sends a spawn cancel to the strat system
-SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, const FULL_OBJ_ID& facility, const WEAPON_SERIAL& weaponSerial)
+SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, const FULL_OBJ_ID facility, const WEAPON_SERIAL& weaponSerial)
 {
 	SINT32 retval;
 	MM_SPAWN_CANCEL spawnCancel;
@@ -561,7 +561,7 @@ SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, const FULL_OB
 }
 
 //This function sends a capacity request to the strat system
-SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 missionID, UINT32 customerID, const FULL_OBJ_ID& facility, CODE_RTB rtb)
+SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 missionID, UINT32 customerID, const FULL_OBJ_ID facility, CODE_RTB rtb)
 {
 	MM_CAPACITY_REQUEST capacityRequest;
 	SINT32 retval;
@@ -624,10 +624,10 @@ _recvMissionDamageEvent(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //Install all the map callbacks
 SINT32
-strtInstallMapCallbacks(void)
+strtInstallMapCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
-
+	{
 		REGISTER_SENDRECV(STRT_MM_POST_INFO_Y, _sendMMPostInfoRequest, _recvMMPostInfoResponse, _XCHG_MM_POST_INFO);
 		REGISTER_SENDRECV(STRT_MM_POST_LIST_Y, _sendMMPostListReq, PostListReply::Process, _SEND_MM_POST_LIST);
 		REGISTER_SENDRECV(STRT_MM_SPAWN_GRANT_Y, _sendMMSpawnGrantRequest, _recvMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT);
@@ -651,7 +651,7 @@ strtInstallMapCallbacks(void)
 		REGISTER_RECEIVER(STRT_MM_DAMAGE_EVENT_Y, _recvMissionDamageEvent);
 
 		REGISTER_MSG(STRT_MM_SERIAL_REQUEST_Y, SERIAL_NUMBER_REQUEST);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 

@@ -21,14 +21,14 @@ struct WEAPON_SERIAL;
 struct FLOAT64VECTOR;
 
 //Callback installer
-extern SINT32 mmClientInstallCallbacks(void);
+extern SINT32 mmClientInstallCallbacks();
 
 //this function sends the post request to the mmhost
-extern SINT32 mmSendPostRequest(SINT32 connection, const FULL_OBJ_ID& facility, const WEAPON_SPEC& weapon
+extern SINT32 mmSendPostRequest(SINT32 connection, const FULL_OBJ_ID facility, const WEAPON_SPEC weapon
 							, LOGICAL immediateSpawn);
 
 //this function sends the post list request to the mmhost
-extern SINT32 mmSendPostListRequest(SINT32 connection, const FULL_OBJ_ID& facility);
+extern SINT32 mmSendPostListRequest(SINT32 connection, const FULL_OBJ_ID facility);
 
 //this function sends the join request to the mmhost
 extern SINT32 mmSendJoinRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial);
@@ -43,13 +43,13 @@ extern SINT32 mmSendJoinPermKill(SINT32 connection, UINT32 joinRequestID);
 extern SINT32 mmSendVehicleCancel(SINT32 connection, const WEAPON_SERIAL& weaponSerial);
 
 //this function sends a client spawn
-extern SINT32 mmSendClientSpawn(SINT32 connection, const WEAPON_SERIAL& weaponSerial, LOGICAL wantMobileSpawn);
+extern SINT32 mmSendClientSpawn(SINT32 connection, const WEAPON_SERIAL& weaponSerial, bool wantMobileSpawn);
 
 //this function sends for a list of joiners (crew) and puts the commander lists for
 //joiners to see.
 extern SINT32 mmSendRequestCrew(SINT32 connection, const WEAPON_SERIAL& weaponSerial, UINT32 numCrewNeeded);
 
-extern SINT32 mmSendDirectSpawn(SINT32 connection, const WEAPON_SPEC& weapon, const FLOAT64VECTOR* location);
+extern SINT32 mmSendDirectSpawn(SINT32 connection, const WEAPON_SPEC weapon, const FLOAT64VECTOR* location);
 
 // tell the host we have despawned
 extern void mmSendDespawn(Teul::Connection* conn);

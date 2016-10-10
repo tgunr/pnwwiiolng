@@ -9,7 +9,7 @@
 
 #include "versionNo.h"
 #include "hostproj/hostversion.h"
-#include "hostproj/revision.h"
+#include "revision.h"
 
 #include <signal.h>  //to catch SIGHUPS with
 
@@ -17,8 +17,6 @@
 #include "chat/chatStratSupportMessages.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "cnvy/cnvyMain.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseHandle.h"
 #include "include/arenaLockEnums.h"
 #include "sdm/sdmConfigVars.h"
 #include "server/serverCodeEnum.h"
@@ -58,11 +56,6 @@
 #include "strt/strtHostLua.h"
 
 extern ObjectiveStats g_objectiveStats;
-
-extern DBHANDLE dbh;
-DBHANDLE dbh;
-extern DBCONNECTION dbConnection;
-DBCONNECTION dbConnection;
 
 #ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
@@ -544,7 +537,7 @@ _housekeeping()
 //////////////////////////////////////////////////////////////////////////
 // Main entry point.
 
-static const char* g_serverName = "stratd";
+const char* g_serverName = "stratd";
 
 int
 main(int argc, const char* argv[])
@@ -557,7 +550,6 @@ main(int argc, const char* argv[])
 
 	_describeBuildConfigurationToLogFile();
 
-	threadsReadDBEnvironment();
 	threadsSetup();
 
 	teulSyncClock();
@@ -570,12 +562,10 @@ main(int argc, const char* argv[])
 	if ( !stratStartLua() )
 		exit(0);
 
-#ifdef IS_STRAT_HOST
 	if (!strtInitDB())
 	{
 		LogAbort("Couldn't initialize database");
 	}
-#endif
 
 	StatsThread statsThread;
 	statsThread.start();
@@ -665,7 +655,7 @@ main(int argc, const char* argv[])
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
 
-	extern void serverOpenLuaClientInterface(void);
+	extern void serverOpenLuaClientInterface();
 	serverOpenLuaClientInterface();
 
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
@@ -719,9 +709,7 @@ main(int argc, const char* argv[])
 
 	threadsLogging();
 
-#ifdef IS_STRAT_HOST
 	strtCloseDB();
-#endif
 	dbugLog(_FLN,"strat system shutting down");
 
 	Lua::Stop();

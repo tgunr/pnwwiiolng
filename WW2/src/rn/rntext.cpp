@@ -12,13 +12,13 @@
 #include "ld/ldtexture.h"
 
 static int westernGetHeight(int f);
-static int westernInit(void);
-static void westernKill(void);
+static int westernInit();
+static void westernKill();
 static SINT32 westernGetStringWidth(const WCHAR*s, SINT32 f);
 static LOGICAL western3DString(const WCHAR* pszText, UINT32 uColor, SINT32 f, piLVERTEX* plVertices, SINT32 iNumVertices);
 static SINT32 westernGetTexId(SINT32 f);
-static int chinaInit(void);
-static void chinaKill(void);
+static int chinaInit();
+static void chinaKill();
 static int chinaGetHeight(int Font);
 #if(0)
 static int chinaGetWidth(const WCHAR* Text, int Font);
@@ -46,7 +46,7 @@ int rntextGetHeight(int Font)
     }
 }
 
-int rntextInit(void)
+int rntextInit()
 {
     isChina = gLanguage==5;
     if ( isChina )
@@ -59,7 +59,7 @@ int rntextInit(void)
     }
 }
 
-void rntextKill(void)
+void rntextKill()
 {
     if ( isChina )
     {
@@ -121,7 +121,7 @@ static int westernGetHeight(int f)
     return fa->getHeight();
 }
 
-static int westernInit(void)
+static int westernInit()
 {
     FTFontWestern* f = new FTFontWestern( );
     f->FaceSize( 26 );
@@ -133,7 +133,7 @@ static int westernInit(void)
     return 1;
 }
 
-static void westernKill(void)
+static void westernKill()
 {
     if(iconfontAdaptor)
         delete iconfontAdaptor;
@@ -172,7 +172,7 @@ static const SCHAR* FontDATName = "Fonts\\iconfont.dat";
 static SINT32 FontTexID = -1;
 static FONTLAYOUT FontLayout;
 
-static int chinaInit(void)
+static int chinaInit()
 {
 	if (textInitted)
 		return(TRUE);
@@ -198,7 +198,7 @@ static int chinaInit(void)
 	return(TRUE);
 }
 
-static void chinaKill(void)
+static void chinaKill()
 {
 	if(!textInitted)
 		return;

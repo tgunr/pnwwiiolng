@@ -4,8 +4,8 @@
 //
 //	  Originating Programmer: Jonathan Hoof
 
-extern LOGICAL gmlpMainInit(void); // initializes the main game loop
-extern LOGICAL gmlpMainUpdate(void); // updates the game
-extern LOGICAL gmlpMainKill(void); // cleans up after game loop shutdown
-extern UINT32 gmlpHandleFieldOfView(void);
-extern void gmlpProcessInputs(void); // check for keyboard/mouse etc inputs.
+LOGICAL gmlpMainInit(); // initializes the main game loop
+LOGICAL gmlpMainUpdate(); // updates the game
+LOGICAL gmlpMainKill(); // cleans up after game loop shutdown
+UINT32 gmlpHandleFieldOfView();
+void gmlpProcessInputs(); // check for keyboard/mouse etc inputs.

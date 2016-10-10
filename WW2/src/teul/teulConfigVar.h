@@ -128,9 +128,9 @@ namespace Teul
 // While that's not terribly complicated for any given compiler, it defeated
 // reasonable levels of readability to get it to work for all three platforms.
 
-typedef Teul::ConfigVar ConfigStr;
-typedef Teul::ConfigVar ConfigUint;
-typedef Teul::ConfigVar ConfigSint;
-typedef Teul::ConfigVar ConfigBool;
-typedef Teul::ConfigVar ConfigAddr;
-typedef Teul::ConfigVar ConfigPath;
+using ConfigStr = Teul::ConfigVar;
+using ConfigUint = Teul::ConfigVar;
+using ConfigSint = Teul::ConfigVar;
+using ConfigBool = Teul::ConfigVar;
+using ConfigAddr = Teul::ConfigVar;
+using ConfigPath = Teul::ConfigVar;

@@ -26,7 +26,7 @@
 #include "teul/teulBasic.h"
 #include "weap/weapDefs.h"
 #include "weap/weapWeapon.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "host/hostVehicleRequest.h"
 #include "wwii/wwiiServerTypeEnums.h"
 
@@ -316,14 +316,14 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 						, commander->squadID(), Chat::Name(commander->squadHandle()).c_str()
 						, ((crew) ? crew->teulIndex() : 0), grant.crew, ((crew) ? crew->callsign() : "n/a")
 						, instance.category(), instance.type(), instance.handle(), instance.id()
-						, weapPrintName(&spec), commander->weapon().serial
+						, weapPrintName(spec), commander->weapon().serial
 						, x, y, z
 						);
 	}
 
 	// Create the sortie record
 	DBThread::Do(DBThread::Default
-		, "CALL wwii.p_add_sortie("
+		, "CALL `wwii`.`p_add_sortie`("
 			" %u"
 			",%u,%u"
 			",%u,%u"

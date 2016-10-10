@@ -130,8 +130,7 @@ SINT32 g_averagePing = 0;
 
 SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32 offset, const SINT32 size_bytes)
 {
-	WORLD_UPDATE wu;
-	memset(&wu, 0, sizeof(WORLD_UPDATE));
+	WORLD_UPDATE wu{};
 
 	// #1 unpack the header.
 	wu.header = *(WORLD_UPDATE::Header*)(data);
@@ -369,7 +368,7 @@ static SINT32 _recvGameTimeUpdate(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-SINT32 commInstallClientCallbacks(void)
+SINT32 commInstallClientCallbacks()
 {
 	SINT32 retval;
 
@@ -380,7 +379,7 @@ SINT32 commInstallClientCallbacks(void)
 		return retval;
 
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
-
+	{
 		REGISTER_RECEIVER(WORLD_UPDATE_Y, _recvWorldUpdate);
 		REGISTER_RECEIVER(GRANT_VEHICLE_JOIN_Y, _recvVehicleAcknowledge);
 		REGISTER_RECEIVER(HOST_HIT_Y, _recvHostVehicleHit);
@@ -405,7 +404,7 @@ SINT32 commInstallClientCallbacks(void)
 		REGISTER_RECEIVER(CAPTURE_STATE_Y, _recvCaptureState);
 		REGISTER_MSG_RECEIVER(DEATH_BY_BUILDING_Y, DEATH_BY_BUILDING);
 		REGISTER_RECEIVER(STRAT_EVENTS_Y, _recvStratEvents);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Comm::CallbackX)
 }
 

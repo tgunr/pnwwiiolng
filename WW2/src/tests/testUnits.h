@@ -25,12 +25,12 @@ public: virtual void EndStage() {}
 	// The initial teulClock64 value we're planning to use.
 public: static TeulTimeMS BaseClock() { return 600000ULL; }
 	// Set the clock to a specific value.
-public: static void SetClock_ms(const TeulTimeMS& time_ms) { teulClock64 = time_ms; teulClockTime = (UINT32)(teulClock64 / 1000); }
+public: static void SetClock_ms(TeulTimeMS time_ms) { teulClock64 = time_ms; teulClockTime = (UINT32)(teulClock64 / 1000); }
 	// Set the teul clock back to its baseline value.
 public: static void ResetClock() { SetClock_ms(BaseClock()); }
 	// Advance the teul clock time by milliseconds or seconds.
-public: static void AdvanceClock_ms(const TeulTimeMS& step) { SetClock_ms(teulClock64 + step); }
-public:	static void AdvanceClock_s(const UINT32& step) { SetClock_ms(teulClock64 + (step * 1000)); }
+public: static void AdvanceClock_ms(TeulTimeMS step) { SetClock_ms(teulClock64 + step); }
+public:	static void AdvanceClock_s(UINT32 step) { SetClock_ms(teulClock64 + (step * 1000)); }
 
 	// Test helpers.
 public: template<typename _Container> size_t NumEntriesInContainer(const _Container& container) const { return (container.empty() ? 0 : container.size()); }
@@ -56,7 +56,7 @@ public: template<typename _Lhs, typename _Rhs> Equality Equals(const _Lhs& resul
 			if ( result > (const _Lhs)expect ) return IsGt;
 			return IsEqual;
 		}
-public: Equality Equals(const FULL_OBJ_ID& result, const FULL_OBJ_ID& expect) const
+public: Equality Equals(const FULL_OBJ_ID result, const FULL_OBJ_ID expect) const
 		{
 			snprintf(m_lhsVal, 64, "{%d,%d}.%u", result.cell.ox, result.cell.oy, result.id);
 			snprintf(m_rhsVal, 64, "{%d,%d}.%u", expect.cell.ox, expect.cell.oy, expect.id);

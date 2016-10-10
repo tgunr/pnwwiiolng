@@ -25,4 +25,4 @@ public:
 	SINT64		m_joules;					// Joules being done
 };
 
-typedef teul_network_array<STOJoules> STO_JOULES;
+using STO_JOULES = teul_network_array<STOJoules>;

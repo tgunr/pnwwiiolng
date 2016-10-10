@@ -187,7 +187,7 @@ private:
 
 public:
 
-	typedef std::map<std::string, TAG_HANDLER<T> > xmlTagHandlerMap;
+	using xmlTagHandlerMap = std::map<std::string, TAG_HANDLER<T>>;
 
 	XMLLoader2();
 	XMLLoader2(const char* path, int flags = XML_DEFAULT_FLAGS, bool uiFio = false);

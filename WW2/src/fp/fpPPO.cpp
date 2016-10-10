@@ -39,7 +39,7 @@
 
 #define PPO_SPEC "vehicles/ground/groundman/ppo.xml"
 
-typedef std::map<UINT32,SINT32> PPO_SINK_MAP;
+using PPO_SINK_MAP = std::map<UINT32,SINT32>;
 
 static int _badMat			= -1;
 static int _goodMat			= -1;

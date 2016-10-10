@@ -164,9 +164,9 @@ class XMLLoader;
  * the children are processed and false afterwards
  * this lets you "get ready" for child data
  */
-typedef bool (*xmlTagHandler)(XMLLoader*, xmlNode*, bool, void*);
-typedef std::map<std::string, xmlTagHandler> xmlTagHandlerMap;
-typedef std::map<std::string, void*> xmlDataMap;
+using xmlTagHandler = bool(*)(XMLLoader*, xmlNode*, bool, void*);
+using xmlTagHandlerMap = std::map<std::string, xmlTagHandler>;
+using xmlDataMap = std::map<std::string, void*>;
 
 class XMLLoader
 {

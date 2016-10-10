@@ -5,7 +5,7 @@ namespace WWII
 {
 
 bool
-VarGroup::pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked) const
+VarGroup::pack(ACTION_OBJECT* const a, const TeulTimeMS lastPacked) const
 {
 	if (m_lastModified < lastPacked)
 		return false;
@@ -26,7 +26,7 @@ VarGroup::pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked) const
 }
 
 bool
-VarGroup::unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked)
+VarGroup::unpack(ACTION_OBJECT* const a, const TeulTimeMS lastPacked)
 {
 	// Ensure a->offset is nicely rounded.
 	a->offset = (a->offset + 7) & ~7;

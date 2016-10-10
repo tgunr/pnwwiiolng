@@ -27,7 +27,7 @@ Description:
 
 static ParticleMgr* _particlemgr = nullptr;
 
-typedef std::set<TransformEffect*> TransformList;
+using TransformList = std::set<TransformEffect*>;
 static TransformEffect* TxEffects = nullptr;
 
 static TransformList updatelist;

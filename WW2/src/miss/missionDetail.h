@@ -29,5 +29,5 @@ public:
 	char			m_desc[MapMiss::MISSION_DESC_LENGTH+1];
 };
 
-typedef teul_network_msg<MissionDetail> MISSION_DETAIL;
+using MISSION_DETAIL = teul_network_msg<MissionDetail>;
 

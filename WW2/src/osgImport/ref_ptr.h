@@ -25,7 +25,7 @@ template<class T>
 class ref_ptr
 {
     public:
-        typedef T element_type;
+        using element_type = T;
 
         ref_ptr() : _ptr(nullptr) {}
         ref_ptr(T* ptr) : _ptr(ptr) { if (_ptr) _ptr->ref(); }

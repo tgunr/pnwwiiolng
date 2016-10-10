@@ -48,12 +48,12 @@ struct GridKey
 	//! Constructor.
 	//! GridKeys are instance dependent so that STOs don't cross
 	//! instance boundaries.
-	GridKey(const instanceid_t& _instanceID, SINT32 x, SINT32 y)
+	GridKey(const instanceid_t _instanceID, SINT32 x, SINT32 y)
 		: m_instanceID(_instanceID), m_x(x), m_y(y)
 		{}
 	GridKey(UINT64 _key) : m_key(_key) {}
 
-	const instanceid_t& instanceID() const { return m_instanceID; }
+	instanceid_t instanceID() const { return m_instanceID; }
 	SINT32 X() const { return m_x; }
 	SINT32 Y() const { return m_y; }
 	const UINT64& key() const { return m_key; }
@@ -71,8 +71,8 @@ struct GridKey
 // STL hash functor for the GridKey class.
 namespace std { template<> struct hash<GridKey> { UINT64 operator()(const GridKey& key) const { return (key.instanceID() << 5) ^ key.key(); } }; }
 
-typedef std::unordered_map<GridKey, class ChatGrid*> _CHAT_GRID;
-typedef std::set<class ChatGrid*> _GRIDS;
+using _CHAT_GRID = std::unordered_map<GridKey, class ChatGrid*>;
+using _GRIDS = std::set<class ChatGrid*>;
 
 static ChatGrid* _getGrid(const GridKey& key);
 
@@ -155,7 +155,7 @@ private:
 
 static _CHAT_GRID _gridIndex;
 
-typedef std::stack<ChatGrid*> _FREE_GRIDS;
+using _FREE_GRIDS = std::stack<ChatGrid*>;
 static _FREE_GRIDS _freeGrids;
 
 static STOBatch _stoBatch;
@@ -920,7 +920,7 @@ chatGridSnapshot()
 			continue;
 		if ( len == 0 )
 		{
-			len = sprintf(query, "INSERT INTO grid_snapshot (gx,gy,recorded,players,stos) VALUES ");
+			len = strprintf(query, "INSERT INTO grid_snapshot (gx,gy,recorded,players,stos) VALUES ");
 		}
 		else
 		{

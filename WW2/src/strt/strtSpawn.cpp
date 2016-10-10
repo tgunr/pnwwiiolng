@@ -156,7 +156,7 @@ _postWeapon(WeapJoinRequestNode* joinNode
 			, UINT32 supplyUnitID
 			, const PermissionMask& permMask
 			, UINT32 commander
-			, const ChatHandle& handle
+			, const ChatHandle handle
 			, bool isImmediateSpawn
 			, bool isMulticrew
 			)
@@ -198,7 +198,7 @@ _postWeapon(WeapJoinRequestNode* joinNode
 	{
 		dbugLog(_FLA, "p:%u c:%s hc:%u sup:%u requested non-toe weapon: %s"
 						, commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID
-						, weapPrintName(&weapon));
+						, weapPrintName(weapon));
 		return nullptr;
 	}
 
@@ -289,7 +289,7 @@ _postWeapon(WeapJoinRequestNode* joinNode
 // pre-existing node.
 
 static WeapJoinRequestNode*
-_getNewJoinNode(UINT32 playerID, const ChatHandle& handle, UINT32 missionID)
+_getNewJoinNode(UINT32 playerID, const ChatHandle handle, UINT32 missionID)
 {
 	WeapJoinRequestNode* joinNode = WeapJoinRequestNode::Lookup(playerID);
 	if ( joinNode )
@@ -339,7 +339,7 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 						, Chat::Name(request.handle).c_str()
 						, request.brigadeID
 						, request.missionID
-						, weapPrintName(&request.weapon)
+						, weapPrintName(request.weapon)
 						, facility->name
 						);
 
@@ -378,14 +378,14 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 
 		if ( !postedWeapon )
 		{
-			TELL_TESTER(request.customerID, "request for %s at %s denied", weapPrintFullName(&request.weapon), facility->name);
+			TELL_TESTER(request.customerID, "request for %s at %s denied", weapPrintFullName(request.weapon), facility->name);
 			delete joinNode;
 			throw PostRequestFail("no posted weapon", SPAWN_WEAPON_NOT_AT_FACILITY);
 		}
 
 		TELL_TESTER(request.customerID, "posted #%u %s at %s"
 					, postedWeapon->serial()
-					, weapPrintFullName(&request.weapon)
+					, weapPrintFullName(request.weapon)
 					, facility->name
 					);
 
@@ -407,7 +407,7 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 						, Chat::Name(request.handle).c_str()
 						, request.brigadeID
 						, request.missionID
-						, weapPrintName(&request.weapon)
+						, weapPrintName(request.weapon)
 						, facility->name
 						, e.code()
 						, e.what()
@@ -484,7 +484,7 @@ _cleanUpJoinNode(WeapJoinRequestNode* joinNode)
 		case JOIN_LIST::_FACILITY:
 			if ( g_logDebug )
 			{
-				const FULL_OBJ_ID& fid = joinNode->m_joinList->m_facility->fullObjID;
+				const FULL_OBJ_ID fid = joinNode->m_joinList->m_facility->fullObjID;
 				dbugLog(_FLD, "deleting join %p id %d post from facility " PRF_FULL_OBJ_ID ""
 						, joinNode, joinNode->m_playerID
 						, PRA_FULL_OBJ_ID(fid)
@@ -722,13 +722,13 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 		case POSTED_WEAPON::_RESERVED:
 			betaLog(_FLD, "v:%u received spawnRequest for reserved %s"
 						, serial
-						, weapPrintName(&currentWeapon->spec())
+						, weapPrintName(currentWeapon->spec())
 						);
 			break;
 		case POSTED_WEAPON::_POSTED:
 			betaLog(_FLD, "v:%u received spawnRequest for new %s"
 						, serial
-						, weapPrintName(&currentWeapon->spec())
+						, weapPrintName(currentWeapon->spec())
 						);
 			break;
 		case POSTED_WEAPON::_SPAWNED:
@@ -756,7 +756,7 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	TELL_TESTER(currentWeapon->m_commander
 				, "v#%u spawning %s at %s"
 				, serial
-				, weapPrintFullName(&currentWeapon->spec())
+				, weapPrintFullName(currentWeapon->spec())
 				, currentWeapon->m_facility->name
 				);
 
@@ -910,7 +910,7 @@ strtProcessSpawnCancel(MM_SPAWN_CANCEL* spawnCancel)
 // locate a spawn object for this weapon at that facility
 
 static FacilityStruct *
-_verifyRTBFacility(const WEAPON_SPEC& spec, const FULL_OBJ_ID& rtbFacility, const ChatHandle& handle)
+_verifyRTBFacility(const WEAPON_SPEC spec, const FULL_OBJ_ID rtbFacility, const ChatHandle handle)
 {
 	static const ChatHandle systemHandle = chatGetHandle("SYSTEM");
 	Chat::Name callsign((handle == 0ULL) ? systemHandle : handle);
@@ -1008,7 +1008,7 @@ POSTED_WEAPON::reReserve()
 						, m_facility->name
 						);
 
-		chatSendLocalizedMessage(m_commander, LSTR_NOTE, LSTR_RESERVED_AT, weapPrintFullName(&spec()), m_facility->name);
+		chatSendLocalizedMessage(m_commander, LSTR_NOTE, LSTR_RESERVED_AT, weapPrintFullName(spec()), m_facility->name);
 
 		return true;
 	}
@@ -1032,7 +1032,7 @@ POSTED_WEAPON::reReserve()
 
 #ifdef BETA_RELEASE
 void
-_reportWeaponStatus(const POSTED_WEAPON* currentWeapon, const WEAPON_SPEC& spec, bool rtbPromoted)
+_reportWeaponStatus(const POSTED_WEAPON* currentWeapon, const WEAPON_SPEC spec, bool rtbPromoted)
 {
 	if ( currentWeapon->m_status == POSTED_WEAPON::_SPAWNED )
 	{
@@ -1052,7 +1052,7 @@ _reportWeaponStatus(const POSTED_WEAPON* currentWeapon, const WEAPON_SPEC& spec,
 		TELL_TESTER(currentWeapon->m_commander, "You returned %s%s and your %s was %s"
 						, RTBstate
 						, (rtbPromoted) ? "*" : ""
-						, weapPrintFullName(&spec)
+						, weapPrintFullName(spec)
 						, deadOrAlive
 						);
 	}
@@ -1229,7 +1229,7 @@ strtExpireWeapon(POSTED_WEAPON& weapon)
 {
 	assert( weapon.m_facility != nullptr );
 
-	dbugLog(_FLI, "c:%s v:%u expiring %s", Chat::Name(weapon.m_handle).c_str(), weapon.m_weaponSerial.serial, weapPrintName(&weapon.spec()));
+	dbugLog(_FLI, "c:%s v:%u expiring %s", Chat::Name(weapon.m_handle).c_str(), weapon.m_weaponSerial.serial, weapPrintName(weapon.spec()));
 
 	strtSendPostExpired(weapon.m_commander, weapon.m_weaponSerial, false);
 
@@ -1241,7 +1241,7 @@ strtExpireWeapon(POSTED_WEAPON& weapon)
 // load TOE templates, etc.
 
 void
-strtInitSpawn(void)
+strtInitSpawn()
 {
 #if defined(IS_STRAT_HOST)
 	// Make sure all the vehicles we know about are now in the database.
@@ -1514,7 +1514,7 @@ strtInitializeVehicleAccessLevels()
 {
 	WEAPON fakeWeapon;
 
-	fakeWeapon.spec().wCountry = 1;
+	fakeWeapon.m_spec.wCountry = 1;
 
 	// For each access level, find the lowest rank
 	// that can access the weapon
@@ -1667,6 +1667,8 @@ _returnLog(const POSTED_WEAPON* weapon, const char* message)
 static bool
 _returnToBrigade(POSTED_WEAPON* weapon)
 {
+	if ( !weapon || !weapon->m_facility )
+		return false;
 	FacilityStruct* supplyFacility = weapon->m_facility->supplyingFacility(*weapon->m_brigade, false);
 	if ( supplyFacility == nullptr )
 		return false;
@@ -1698,16 +1700,18 @@ _returnToBrigade(POSTED_WEAPON* weapon)
 // division rather than allowing easy div->bde oversupply in same-town
 
 static bool
-_returnToOrigin(POSTED_WEAPON* weapon)
+_returnToOrigin(POSTED_WEAPON& weapon)
 {
-	FacilityStruct* supplyFacility = weapon->m_facility->supplyingFacility(*weapon->m_supplyingBrigade, false);
-	if ( supplyFacility == nullptr )
+	if ( !weapon.m_facility )
 		return false;
-	if ( weapon->m_supplyingBrigade->depositWeapons(weapon->spec(), 1, true, weapon->m_resupplyTicket) == false )
+	FacilityStruct* supplyFacility = weapon.m_facility->supplyingFacility(*weapon.m_supplyingBrigade, false);
+	if ( !supplyFacility || !weapon.m_supplyingBrigade )
+		return false;
+	if ( weapon.m_supplyingBrigade->depositWeapons(weapon.spec(), 1, true, weapon.m_resupplyTicket) == false )
 		return false;
 
-	_returnLog(weapon, "returned to origin");
-	assert( weapon->m_resupplyTicket == nullptr );
+	_returnLog(&weapon, "returned to origin");
+	assert( weapon.m_resupplyTicket == nullptr );
 
 	return true;
 }
@@ -1809,7 +1813,7 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 		// After that, try to deliver it to your brigade at this
 		// location. If that fails, finally, "rescue" the equipment.
 
-		if ( _returnToOrigin(this) == true )
+		if ( _returnToOrigin(*this) == true )
 		{
 			TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
 			rescue = false;
@@ -1862,7 +1866,7 @@ POSTED_WEAPON::spawn()
 	{
 		dbugLog(_FLW, "v:%u can't grant request for %s at %s - no spawn entry"
 						, m_weaponSerial.serial
-						, weapPrintName(&spec())
+						, weapPrintName(spec())
 						, m_facility->name
 						);
 		return false;
@@ -1906,7 +1910,7 @@ POSTED_WEAPON::spawn()
 
 	dbugLog(_FLI, "v:%u spawn()d %s at %s - %s"
 					, m_weaponSerial.serial
-					, weapPrintName(&spec())
+					, weapPrintName(spec())
 					, m_facility->name
 					, ((reinforcementExpired) ? "reinforced" : "standing reinf")
 					);

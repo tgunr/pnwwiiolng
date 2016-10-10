@@ -90,7 +90,7 @@ static bool g_enablePacketSizeRecording = false;
 //
 
 SINT32
-commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination, PLAYER_EXIT_CODE exitCode, const FULL_OBJ_ID& facility)
+commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination, PLAYER_EXIT_CODE exitCode, const FULL_OBJ_ID facility)
 {
 	dbugLog(_FLN, "t:%d sending player exit %d dest %d to " PRF_FULL_OBJ_ID ""
 				, teulIndex
@@ -342,7 +342,7 @@ _recvVehicleJoinRequest(ACTION_OBJECT* const a)
 				, player.playerID()
 				, localVehicleRequest.weapon.serial
 				, localVehicleRequest.station
-				, weapPrintName(&localVehicleRequest.weapon.spec)
+				, weapPrintName(localVehicleRequest.weapon.spec)
 				, PRA_WEAPON_SPEC(localVehicleRequest.weapon.spec)
 				);
 
@@ -403,7 +403,7 @@ _recordPacketSize(UINT32 size)
 {
 	static UINT32 maxSize = 0;
 	static UINT32 minSize = 0;
-	typedef std::map<SINT32,UINT32> SIZES;
+	using SIZES = std::map<SINT32,UINT32>;
 	static SIZES sizes;
 	static UINT32 packets = 0;
 	static UINT64 totalBits = 0LL;
@@ -992,7 +992,7 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 
 struct ClientResupplyIssue
 {
-	ClientResupplyIssue(sortieid_t fromSerial, const ChatHandle& fromHandle) : m_fromSerial(fromSerial), m_fromHandle(fromHandle) {}
+	ClientResupplyIssue(sortieid_t fromSerial, const ChatHandle fromHandle) : m_fromSerial(fromSerial), m_fromHandle(fromHandle) {}
 	UINT32		m_fromSerial;
 	ChatHandle	m_fromHandle;
 };
@@ -1001,7 +1001,7 @@ struct ClientResupplyIssue
 //
 
 void
-commSendClientResupplyIssue(HostVehicle* vehicle, sortieid_t fromSerial, const ChatHandle& fromHandle)
+commSendClientResupplyIssue(HostVehicle* vehicle, sortieid_t fromSerial, const ChatHandle fromHandle)
 {
 	assert( vehicle->isRemote() == false );
 
@@ -1310,7 +1310,7 @@ static SINT32
 _registerInterHostCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Host::CallbackX)
-
+	{
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::MovePlayer_Y, _recvMovePlayer);
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ForceDespawn_Y, _recvForceDespawn);
 
@@ -1318,8 +1318,8 @@ _registerInterHostCallbacks()
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::CaptureState_Y, _recvCaptureState);
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ResupplyIssue_Y, _recvResupplyIssue);
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ResupplyAccepted_Y, _recvResupplyAccepted);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Host::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1329,7 +1329,7 @@ static SINT32
 _registerClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
-
+	{
 		REGISTER_SENDER(GRANT_VEHICLE_JOIN_Y, _sendGrantVehicleJoin, _GRANT_VEHICLE_JOIN);
 		REGISTER_SENDER(ACTIVATE_CLIENT_Y, _sendClientActivate, _ACTIVATE_CLIENT);
 		REGISTER_SENDER(RESUPPLY_ISSUE_Y, _sendResupplyIssue, _XFER_RESUPPLY_ISSUE);
@@ -1358,15 +1358,15 @@ _registerClientCallbacks()
 		REGISTER_SENDER(GAME_TIME_UPDATE_Y, Host::TimeUpdate::SendFunction, Host::TimeUpdate::Callback);
 
 		REGISTER_RECEIVER(HOST_HIT_FWD_Y, commProcessApplyHit);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Comm::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
 SINT32
-commInstallHostCallbacks(void)
+commInstallHostCallbacks()
 {
 	SINT32 retval;
 
@@ -1389,7 +1389,7 @@ commInstallHostCallbacks(void)
 // Send/receive resupply messages between cells
 
 void
-hostSendResupplyIssue(UINT32 cellIP, const sortieid_t& toSerial, const sortieid_t& fromSerial, const ChatHandle& fromHandle)
+hostSendResupplyIssue(UINT32 cellIP, const sortieid_t toSerial, const sortieid_t fromSerial, const ChatHandle fromHandle)
 {
 	assert( cellIP != 0 );
 	assert( toSerial != 0 );
@@ -1409,7 +1409,7 @@ hostSendResupplyIssue(UINT32 cellIP, const sortieid_t& toSerial, const sortieid_
 // Acknowledgment that someone received resupply
 
 void
-hostSendResupplyAccepted(UINT32 cellIP, const sortieid_t& sendTo, const ChatHandle& byHandle)
+hostSendResupplyAccepted(UINT32 cellIP, const sortieid_t sendTo, const ChatHandle byHandle)
 {
 	assert(cellIP != 0);
 

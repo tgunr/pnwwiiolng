@@ -721,8 +721,8 @@ static int tolua_wwii_wwii_HCUnit_homeCPID00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'homeCPID'",NULL);
 #endif
   {
-   const FULL_OBJ_ID& tolua_ret = (const FULL_OBJ_ID&)  self->homeCPID();
-   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const FULL_OBJ_ID");
+   FULL_OBJ_ID tolua_ret = (FULL_OBJ_ID)  self->homeCPID();
+   tolua_pushusertype(tolua_S,(void*)&tolua_ret,"FULL_OBJ_ID");
   }
  }
  return 1;
@@ -825,7 +825,7 @@ static int tolua_wwii_wwii_HCUnit_owner00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'owner'",NULL);
 #endif
   {
-   const ChatHandle& tolua_ret = (const ChatHandle&)  self->owner();
+   const ChatHandle tolua_ret = (const ChatHandle)  self->owner();
    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const ChatHandle");
   }
  }
@@ -993,7 +993,7 @@ static int tolua_wwii_wwii_HCUnit_handle00(lua_State* tolua_S)
   if (!self) tolua_error(tolua_S,"invalid 'self' in function 'handle'",NULL);
 #endif
   {
-   const ChatHandle& tolua_ret = (const ChatHandle&)  self->handle();
+   const ChatHandle tolua_ret = (const ChatHandle)  self->handle();
    tolua_pushusertype(tolua_S,(void*)&tolua_ret,"const ChatHandle");
   }
  }

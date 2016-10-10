@@ -110,6 +110,8 @@ static inline void _report(const ACTION_OBJECT* const a, const char* const txt)
 {
 #ifdef DEBUG_CONNECTIONS
 	dbugLog(_FLD, "t:%d[%d] %s", a->teulIndex, (a->endpoint ? a->endpoint->teulIndex() : -999), txt);
+#else
+	silence_unused_parameter_warning(a, txt);
 #endif
 }
 
@@ -119,6 +121,8 @@ static inline void _status(const char* const doing, const char* const what, UINT
 	dbugLog(_FLD, "t:%d [%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%llx rxs=%16llx",
             endpoint->teulIndex(), doing, what, version, endpoint->m_impl->m_version, endpoint->m_impl->m_cryptVersion,
             endpoint->m_impl->m_txCrypt.seed(), endpoint->m_impl->m_rxCrypt.seed());
+#else
+	silence_unused_parameter_warning(doing, what, version, endpoint);
 #endif
 }
 
@@ -150,7 +154,7 @@ static UINT16
 _negotiateVersionNumber(UINT16 remoteVersion, const ENDPOINT* const endpoint)
 {
 	// Datagram delivery services don't use encryption.
-	if ( endpoint->protocol != PROTOCOL_TCP || endpoint->m_peer )
+	if ( !endpoint->isFromClient() )
 	{
 		dbugLog(_FLM, "t:%d non-client connection, disabling encryption", endpoint->teulIndex());
 		return 0;
@@ -510,11 +514,9 @@ _recvError(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 
 SINT32
-teulInitModCallbacks(void)
+teulInitModCallbacks()
 {
-	Teul::CallbackInit ci;
-
-	memset(&ci, 0, sizeof(ci));
+	Teul::CallbackInit ci{};
 
 	ci.callX 		= Teul::Module::CallbackX;		// the X position in the callback matrix
 	ci.callXName	= TEUL_PACKET_NAMES ? "TMCALLBACKS_X" : "";

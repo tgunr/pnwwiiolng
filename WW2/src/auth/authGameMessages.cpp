@@ -30,7 +30,7 @@ static TEUL_CALLBACK*	_INIT_LOGIN;
 static TEUL_CALLBACK*	_PLAYER_LOGIN;
 static TEUL_CALLBACK*	_PLAYER_LOGIN_REPLY;
 
-static ERROR_FUNCTION* _externalErrorFn;
+static ERROR_FUNCTION _externalErrorFn;
 
 
 //Callback function declaraton
@@ -48,7 +48,7 @@ static SINT32 _sendGameCapacity(ACTION_OBJECT* const a);
 static void _errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
 
 //This function installs our two callbacks
-SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
+SINT32 authInstallGameCallbacks(ERROR_FUNCTION externErrorFn)
 {
 	Teul::CallbackInit ci;
 

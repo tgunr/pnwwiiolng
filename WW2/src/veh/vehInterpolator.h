@@ -127,4 +127,4 @@ protected:
 };
 
 // type used by vehicle member variables
-typedef InfantryPredictor vehInterpolator;
+using vehInterpolator = InfantryPredictor;

@@ -10,6 +10,10 @@
 #include <queue>
 #include <atomic>
 
+#if platOS == OS_LINUX
+#include <sys/prctl.h>
+#endif
+
 #include "versionNo.h"
 
 #include "mem/mem.h"
@@ -40,7 +44,6 @@
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointImpl.h"
-#include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
 #include "teul/teulServer.h"
@@ -68,7 +71,7 @@ extern void serverInitializePeering();
 extern void serverConnectPeer(const UINT32 ip, const SERVER_TYPE type);
 extern void serverDisconnectPeer(Server::ServerInfo* server);
 
-const char* g_serverTypes[MAX_SERVER_TYPE] =
+const char* g_serverTypes[MAX_SERVER_TYPE + 1] =
 {
 	"controller"
 ,	"auth"
@@ -78,6 +81,7 @@ const char* g_serverTypes[MAX_SERVER_TYPE] =
 ,	"map"
 ,	"cell"
 ,	"EXIT"
+,   "unknown"
 };
 
 class ServerManager : public ServerInterface
@@ -112,18 +116,18 @@ namespace Server
 	bool	broadcastConnected = false;
 }
 
-ERROR_FUNCTION* 	extErrorFn;
+ERROR_FUNCTION 	extErrorFn;
 
-typedef std::deque<Server::Transfer*> TransferQueue;
+using TransferQueue = std::deque<Server::Transfer*>;
 static TransferQueue s_transferQueue;
 
 static Server::ServerInfo* _exitServer = nullptr;
 
-static CREATE_PERSONA_FUNCTION* _createPersonaFn;
-static RELEASE_PERSONA_FUNCTION* _releasePersonaFn;
-static ACTIVATE_PLAYER_FUNCTION* _activatePlayerFn;
-static EXIT_PERSONA_FUNCTION* _exitPersonaFn;
-static EXIT_CLUSTER_FUNCTION* _exitClusterFn;
+static CREATE_PERSONA_FUNCTION _createPersonaFn;
+static RELEASE_PERSONA_FUNCTION _releasePersonaFn;
+static ACTIVATE_PLAYER_FUNCTION _activatePlayerFn;
+static EXIT_PERSONA_FUNCTION _exitPersonaFn;
+static EXIT_CLUSTER_FUNCTION _exitClusterFn;
 
 PLAYERID_HASH ServerInterface::s_byPlayerID;
 PLAYERIDX_MAP ServerInterface::s_byTeulIndex;
@@ -131,16 +135,16 @@ PLAYERIDX_MAP ServerInterface::s_byTeulIndex;
 static Server::ServerInfo* _myServerInfo = nullptr;
 static TeulTimeMS _nextHeartbeat = 0ULL, _nextUpdate;
 
-static SERVER_UPDATE* _enterCallback= nullptr;
-static SERVER_UPDATE* _leaveCallback = nullptr;
-static SERVER_UPDATE* _statusCallback= nullptr;
+static SERVER_UPDATE _enterCallback= nullptr;
+static SERVER_UPDATE _leaveCallback = nullptr;
+static SERVER_UPDATE _statusCallback= nullptr;
 
 static std::set<Server::ServerInfo*> s_activeServerList;
 
 static SINT32 _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType releaseType);
 
 // move players from one server list to another and update state
-extern ERROR_FUNCTION* 	extErrorFn;
+extern ERROR_FUNCTION 	extErrorFn;
 static ENDPOINT* s_broadcastEndpoint = nullptr;
 
 // Connection to the controller process.
@@ -267,7 +271,7 @@ _playerDeleteAuth(PlayerStatusNode* psn)
 }
 
 static void
-_sendHeartBeat(void)
+_sendHeartBeat()
 {
 	if ( PN_UNLIKELY(_myServerInfo == nullptr || Server::broadcastIndex < 0) )
 		return;
@@ -828,7 +832,7 @@ _releaseFn(SINT32 teulIndex, UINT32 customerID, UINT32 otp, Server::ReleaseType 
 }
 
 static void
-_timeOutPlayers(void)
+_timeOutPlayers()
 {
 	std::set<PlayerStatusNode*> timeouts = _exitServer->m_players;
 	for ( auto& psn : timeouts )
@@ -851,7 +855,7 @@ _timeOutPlayers(void)
 }
 
 static void
-_timeOutXfers(void)
+_timeOutXfers()
 {
 	const TeulTimeMS cutoff = teulClock64 - PLAYER_XFER_TIMEOUT;
 
@@ -957,15 +961,15 @@ _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 SINT32
 serverInit(UINT32 appVersion
 				, SERVER_TYPE serverType, UINT32 exitDestType
-				, SERVER_UPDATE* enterCallback
-				, SERVER_UPDATE* leaveCallback
-				, SERVER_UPDATE* statusCallback
-				, CREATE_PERSONA_FUNCTION*	createPersonaFn
-				, RELEASE_PERSONA_FUNCTION* releasePersonaFn
-				, ACTIVATE_PLAYER_FUNCTION* activatePlayerFn
-				, EXIT_PERSONA_FUNCTION* exitPersonaFn
-				, EXIT_CLUSTER_FUNCTION* exitClusterFn
-				, ERROR_FUNCTION* errorFunction)
+				, SERVER_UPDATE enterCallback
+				, SERVER_UPDATE leaveCallback
+				, SERVER_UPDATE statusCallback
+				, CREATE_PERSONA_FUNCTION createPersonaFn
+				, RELEASE_PERSONA_FUNCTION releasePersonaFn
+				, ACTIVATE_PLAYER_FUNCTION activatePlayerFn
+				, EXIT_PERSONA_FUNCTION exitPersonaFn
+				, EXIT_CLUSTER_FUNCTION exitClusterFn
+				, ERROR_FUNCTION errorFunction)
 {
 	if ( Server::myServerInfo.stats.arenaID == 0 )
 	{
@@ -1022,7 +1026,7 @@ serverInit(UINT32 appVersion
 }
 
 void
-serverFree(void)
+serverFree()
 {
 	_leaveCallback = nullptr;
 
@@ -1162,7 +1166,7 @@ serverBroadcastClusterShutdown()
 }
 
 void
-serverUpdate(void)
+serverUpdate()
 {
 	static bool inUpdate = false;
 	if ( (_myServerInfo == nullptr) | (inUpdate) )
@@ -1565,6 +1569,9 @@ ServerInterface::LookupByPlayerID(UINT32 id)
 UINT32
 serverGetAuthIP()
 {
+#if PN_DISABLE_AUTH
+	return 0;
+#else
 	if ( useAuthServer == false )
 		return 0;
 
@@ -1572,20 +1579,15 @@ serverGetAuthIP()
 	if ( !authName || !*authName )
 		LogAbort("Missing AUTH_ADDRESS");
 
-	UINT32 address = Teul::GetSingleIP(authName);	// Returns malloc'd pointer!
+	UINT32 address = Teul::GetSingleIP(authName);
 	if ( address == 0 )
 	{
-		if ( useAuthServer == true )
-		{
-			LogAbort("Unable to resolve auth address '%s'", authName);
-			/* ABORTED */
-		}
-
-		dbugLog(_FLN, "Couldn't resolve auth address '%s', ignoring", authName);
-		return 0;
+		LogAbort("Unable to resolve auth address '%s'", authName);
+		/* ABORTED */
 	}
 
 	return address;
+#endif
 }
 
 SINT32
@@ -1821,7 +1823,7 @@ int main(int argc, const char* argv[])
 	Teul::SetAppName(g_serverName);
 	extern ERROR_FUNCTION serverErrorFunction;
 
-	if ( teulInitTransport(LOG_TO_FILE, g_serverName, serverErrorFunction, nullptr) < 0 )
+	if ( teulInitTransport(LogMode::TO_FILE, g_serverName, serverErrorFunction, nullptr) < 0 )
 		LogAbort("Can't init transport");
 
 	serverEnableDebugWebServer(g_hostType);
@@ -1848,7 +1850,7 @@ ServerBase::ServerBase(SERVER_TYPE serverType_, const char* serverName_)
 	memInit();
 
 	Teul::SetAppName(m_serverName);
-	if ( teulInitTransport(LOG_TO_FILE, m_serverName, s_ErrorDelegate, nullptr) < 0 )
+	if ( teulInitTransport(LogMode::TO_FILE, m_serverName, s_ErrorDelegate, nullptr) < 0 )
 		LogAbort("Can't initialize transport.");
 
 	serverInitAddresses();
@@ -1860,7 +1862,7 @@ void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SI
 }
 #endif
 
-NORETURN_FN void _help(const char* argv[], const Server::CommandLineOptions& cliOptions)
+[[noreturn]] void _help(const char* argv[], const Server::CommandLineOptions& cliOptions)
 {
 	printf("Usage: %s [arguments | --help]\n", argv[0]);
 	for (size_t i = 0; i < cliOptions.size(); ++i)
@@ -1874,9 +1876,9 @@ NORETURN_FN void _help(const char* argv[], const Server::CommandLineOptions& cli
 	exit(0);
 }
 
-void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
+void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERROR_FUNCTION errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
 {
-	Server::serverType = serverType;
+	Server::serverType = serverType_;
 	Teul::SetAppName(appName);
 
 	// Windows requires us to enable networking (WSAStartup) early on
@@ -1891,31 +1893,38 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERRO
 			[&allOptions, argv](const char*) { _help(argv, allOptions); }
 		},
 		{
+			"--child", "Process should die when parent terminates.", false,
+#if platOS == OS_LINUX
+			[](const char*) { prctl(PR_SET_PDEATHSIG, SIGHUP); }
+#else
+			[](const char*) {}
+#endif
+		},
+		{
 			"--token", "Specify the controller connection token.", true,
 			[](const char* text) { s_controllerToken = strtoul(text, nullptr, 10); }
 		}
 	};
+	allOptions.insert(allOptions.end(), cliOptions.begin(), cliOptions.end());
 	for (int argn = 1; argn < argc; ++argn)
 	{
 		bool found = false;
-		if (strcmp(argv[argn], "--help") == 0 || strcmp(argv[argn], "-?") == 0)
-			_help(argv, cliOptions);
 
-		for (size_t i = 0; i < cliOptions.size(); ++i)
+		for (size_t i = 0; i < allOptions.size(); ++i)
 		{
-			if (strcmp(argv[argn], cliOptions[i].command) != 0)
+			if (strcmp(argv[argn], allOptions[i].command) != 0)
 				continue;
 			found = true;
 			const char* param = nullptr;
-			if (cliOptions[i].wantParameter)
+			if (allOptions[i].wantParameter)
 			{
 				if (++argn >= argc)
-					LogAbort("'%s' switch expects an argument", cliOptions[i].command);
+					LogAbort("'%s' switch expects an argument", allOptions[i].command);
 				param = argv[argn];
 				if (param[0] == '-')
-					LogAbort("'%s' switch expects an argument, got '%s'", cliOptions[i].command, argv[argn]);
+					LogAbort("'%s' switch expects an argument, got '%s'", allOptions[i].command, argv[argn]);
 			}
-			cliOptions[i].callback(param);
+			allOptions[i].callback(param);
 			break;
 		}
 		if (!found)
@@ -1926,7 +1935,7 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERRO
 
 	memInit();
 
-	SINT32 retval = teulInitTransport(LOG_TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
+	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
 

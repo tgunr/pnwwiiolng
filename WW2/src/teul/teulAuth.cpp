@@ -34,20 +34,20 @@ static const TeulTimeMS LoginInterval_ms = 5 * 60 * 1000;
 static SINT32 _authConnection;
 static UINT32 _thisVersion;
 
-static PLAYER_ACCEPT_FUNCTION* _playerAcceptFn = nullptr;
-static PLAYER_RELEASE_FUNCTION* _playerReleaseFn = nullptr;
+static PLAYER_ACCEPT_FUNCTION _playerAcceptFn = nullptr;
+static PLAYER_RELEASE_FUNCTION _playerReleaseFn = nullptr;
 
 static LOGICAL _authIsOpen;
 
 // The complete list of all current OTPs.
-typedef std::unordered_map<UINT32, OTP_NODE*> OTPS;
+using OTPS = std::unordered_map<UINT32, OTP_NODE*>;
 static OTPS _otps;
 // OTPs that have logged in, by customerID.
 static OTPS _custOtps;
 // OTPs that haven't logged in yet.
 static std::vector<OTP_NODE*> _pendingOtps;
 
-static ERROR_FUNCTION* _externalErrorFn;
+static ERROR_FUNCTION _externalErrorFn;
 
 static LOGICAL _authInited = FALSE;
 
@@ -94,8 +94,8 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 				, APID appID, UINT32 appVersion
 				, UINT32 hostVersion
 				, UINT32 maxUsers
-				, PLAYER_ACCEPT_FUNCTION* acceptFn
-				, ERROR_FUNCTION* externErrorFn)
+				, PLAYER_ACCEPT_FUNCTION acceptFn
+				, ERROR_FUNCTION externErrorFn)
 {
 	SINT32 retval;
 
@@ -163,14 +163,14 @@ static inline void
 _populateDispatch(UINT32 ipAddress, const PLAYER_LOGIN& login, const OTP_NODE* otpNode, Auth::Dispatch& dispatch)
 {
 	dispatch.m_customerID = otpNode->customerID;
-	strncpy(dispatch.m_callsign, otpNode->handle, sizeof(dispatch.m_callsign));
 	dispatch.m_clientIP = ipAddress;
 	dispatch.m_OTP = login.OTP;
 	dispatch.m_appVersion = login.appVersion;
+	strsafecpy(dispatch.m_callsign, otpNode->handle);
 }
 
 //////////////////////////////////////////////////////////////////////
-// Handle a regular initial login and populate the data as neccessary
+// Handle a regular initial login and populate the data as necessary
 
 static SINT32
 _processLoginData(const UINT32 ipAddress, const PLAYER_LOGIN login, const OTP_NODE* otpNode, Auth::Dispatch& dispatch)
@@ -311,9 +311,9 @@ authValidatePlayer(const UINT32 ipAddress, PLAYER_LOGIN& login, Auth::Dispatch& 
 
 SINT32
 authInitAccept(UINT32 appVersion
-				, PLAYER_ACCEPT_FUNCTION* loginAcceptFn
-				, PLAYER_RELEASE_FUNCTION* releaseFn
-				, ERROR_FUNCTION* externErrorFn)
+				, PLAYER_ACCEPT_FUNCTION loginAcceptFn
+				, PLAYER_RELEASE_FUNCTION releaseFn
+				, ERROR_FUNCTION externErrorFn)
 {
 	_playerAcceptFn = loginAcceptFn;
 	_playerReleaseFn = releaseFn;
@@ -512,7 +512,7 @@ SINT32 _openSend(APID appID, UINT32 arenaID, UINT32 hostVersion, UINT32 authHost
 	game.maxUsers = maxUsers;
 	game.port = localPort;
 	game.ipAddress = localAddress;
-	strcpy(game.hello,"Hello!");
+	strsafecpy(game.hello, "Hello!");
 
 	_authConnection = teulOpenSend(_authHost, _authPort, _authOpened, CONNECT_TIMEOUT, PROTOCOL_TCP, _authErrorFn);
 	_timeOpen.makeCurrent();

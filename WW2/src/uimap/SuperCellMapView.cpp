@@ -59,7 +59,7 @@ public:
 	SuperCellMapView::Renderer* _renderer;
 	bool _done;
 
-	typedef std::vector<SuperCell*> SuperCellList;
+	using SuperCellList = std::vector<SuperCell*>;
 	SuperCellList _cells;
 };
 
@@ -132,7 +132,7 @@ SuperCellMapView::~SuperCellMapView()
 
 #define ZOOM_SCALE 100.0f
 
-void SuperCellMapView::DrawSelf(void)
+void SuperCellMapView::DrawSelf()
 {
 	if(_autoscale && frametime >= _autoscaletime)
 	{

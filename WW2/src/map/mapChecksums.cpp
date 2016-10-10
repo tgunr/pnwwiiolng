@@ -14,7 +14,7 @@
 
 //////////////////////////////////////////////////////////////////////
 
-typedef std::vector< std::pair<UINT32, UINT64> > CHECKSUMS;
+using CHECKSUMS = std::vector< std::pair<UINT32, UINT64>>;
 
 static std::mutex chMutex;
 static CHECKSUMS _checksums;

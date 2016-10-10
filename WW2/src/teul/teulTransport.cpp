@@ -36,8 +36,8 @@
 	#include <ws2tcpip.h>
 #endif
 
-extern SINT32 teulModStartup(ERROR_FUNCTION*);
-extern SINT32 teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION* connectFn, ERROR_FUNCTION* errorFn);
+extern SINT32 teulModStartup(ERROR_FUNCTION);
+extern SINT32 teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn);
 
 SCHAR* teulModuleName;
 SCHAR* teulAppName;
@@ -169,10 +169,10 @@ teulGetPersonaData(const SINT32 teulIndex)
 SINT32
 _openListen(const UINT32 ipAddress
 			, const UINT16 portNumber
-			, CONNECT_FUNCTION* acceptFnPtr
+			, CONNECT_FUNCTION acceptFnPtr
 			, const SINT32 timeout
 			, const PROTOCOL protocol
-			, ERROR_FUNCTION* errorFnPtr
+			, ERROR_FUNCTION errorFnPtr
 			)
 {
 	SINT32 retval;
@@ -207,10 +207,10 @@ _openListen(const UINT32 ipAddress
 // called when a connection is made to the listening socket, and hence a new
 // connection is created.  pass nullptr if you do not want this notification
 SINT32 teulOpenListen(const UINT16 portNumber
-					, CONNECT_FUNCTION* acceptFnPtr
+					, CONNECT_FUNCTION acceptFnPtr
 					, const SINT32 timeout
 					, const PROTOCOL protocol
-					, ERROR_FUNCTION* errorFnPtr
+					, ERROR_FUNCTION errorFnPtr
 					)
 {
 	if (PN_UNLIKELY(_transportClosing))
@@ -234,9 +234,9 @@ SINT32 teulOpenListen(const UINT16 portNumber
 // called when a connection is made to the listening socket, and hence a new
 // connection is created.  pass nullptr if you do not want this notification
 bool teulOpenListenInterface(const UINT16 portNumber
-					, CONNECT_FUNCTION* acceptFnPtr
+					, CONNECT_FUNCTION acceptFnPtr
 					, const SINT32 timeout
-					, ERROR_FUNCTION* errorFnPtr
+					, ERROR_FUNCTION errorFnPtr
 					)
 {
 	if (PN_UNLIKELY(_transportClosing))
@@ -269,10 +269,10 @@ bool teulOpenListenInterface(const UINT16 portNumber
 // connection is created.  pass nullptr if you do not want this notification
 SINT32 teulOpenListenHost(const UINT32 ipAddress
 					, const UINT16 portNumber
-					, CONNECT_FUNCTION* acceptFnPtr
+					, CONNECT_FUNCTION acceptFnPtr
 					, const SINT32 timeout
 					, const PROTOCOL protocol
-					, ERROR_FUNCTION* errorFnPtr
+					, ERROR_FUNCTION errorFnPtr
 					)
 {
 	if (PN_UNLIKELY(_transportClosing))
@@ -322,10 +322,10 @@ teulMaskNetworkAddress(UINT32 address)
 SINT32
 teulOpenSend(UINT32 host
 			, const UINT16 portNumber
-			, CONNECT_FUNCTION* connectFnPtr
+			, CONNECT_FUNCTION connectFnPtr
 			, const SINT32 timeout
 			, const PROTOCOL protocol
-			, ERROR_FUNCTION* errorFnPtr)
+			, ERROR_FUNCTION errorFnPtr)
 {
 	if (PN_UNLIKELY(_transportClosing))
 		return -EDEADLK;
@@ -427,9 +427,9 @@ _initializeLibEvent()
 // and on the server acquires and interface to communicate to the teulModule.
 // it also records the users default error and kill functions.
 SINT32
-teulInitTransport(SINT32 logType
+teulInitTransport(LogMode logType
 					, const char* name
-					, ERROR_FUNCTION* errorFnPtr
+					, ERROR_FUNCTION errorFnPtr
 					, void (*killFnPtr)(int)
 					, Teul::LoggingFn const logFnPtr)
 {
@@ -485,11 +485,11 @@ teulInitTransport(SINT32 logType
 	return 0;
 }
 
-// Since we hae to ensure that callbacks happen in step with whatever
+// Since we have to ensure that callbacks happen in step with whatever
 // application is using teul, we have to make a call for that all to happen.
 // should be called once per game loop
 void
-teulUpdateTransport(const TeulTimeMS& duration_)
+teulUpdateTransport(const TeulTimeMS duration_)
 {
 	if (PN_UNLIKELY(_transportClosing))
 		return;
@@ -504,13 +504,13 @@ teulUpdateTransport(const TeulTimeMS& duration_)
 	teulModIdle(duration_);
 
 #if platBuild == TEUL_SERVER
-	extern void serverUpdate(void);
+	extern void serverUpdate();
 	serverUpdate();
 #endif
 }
 
 // close all connections and the debugger. (teul go bye bye)
-void teulCloseTransport(void)
+void teulCloseTransport()
 {
 	if(! _transportInited || _transportClosing)
 		return;
@@ -518,7 +518,7 @@ void teulCloseTransport(void)
 	_transportClosing = TRUE;
 
 #if platBuild == TEUL_SERVER
-	extern void serverFree(void);
+	extern void serverFree();
 	serverFree();
 #endif
 
@@ -601,7 +601,7 @@ namespace Teul
 void SetAppName(const char* const name)
 {
 	memset(_appName, 0, sizeof(_appName));
-	strncpy(_appName, name, sizeof(_appName) - 1);
+	strsafecpy(_appName, name);
 }
 
 const char*

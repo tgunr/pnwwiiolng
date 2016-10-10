@@ -248,7 +248,7 @@ _findOrigin(const FacilityStruct* facility, UINT8 weaponCategory)
 // NOTE: Caller is responsible for ensuring player is not null
 
 bool
-mmDirectSpawn(Player& player, const WEAPON_SPEC& weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation)
+mmDirectSpawn(Player& player, const WEAPON_SPEC weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation)
 {
 	BETAInfo(player.teulIndex());
 
@@ -317,7 +317,7 @@ mmDirectSpawn(Player& player, const WEAPON_SPEC& weapon, bool setIdentity, bool 
 
 		SINT32 errType = (player.instance().isCampaign() ? Debug::ERR_MINOR : Debug::ERR_INFO);
 		player.log(_FL, errType, "m:%u weap:%s loc:%s(%g,%g,%g) direct spawn"
-							, weapon.wCountry, weapPrintName(&weapon)
+							, weapon.wCountry, weapPrintName(weapon)
 							, (useCustomLocation) ? "yes":"no"
 							, customLocation.x, customLocation.y, customLocation.z);
 
@@ -345,14 +345,14 @@ mmDirectSpawn(Player& player, const WEAPON_SPEC& weapon, bool setIdentity, bool 
 	catch ( const char* message )
 	{
 		player.log(_FLA, "m:%u weap:%s %s"
-							, weapon.wCountry, weapPrintName(&weapon)
+							, weapon.wCountry, weapPrintName(weapon)
 							, message);
 	}
 	catch ( std::exception &e )
 	{
 		player.log(_FLA, "m:%u weap:%s exception: %s"
 							, player.teulIndex(), player.playerID(), player.callsign()
-							, weapon.wCountry, weapPrintName(&weapon)
+							, weapon.wCountry, weapPrintName(weapon)
 							, e.what());
 	}
 
@@ -409,7 +409,7 @@ mmProcessPostAccept(Player& player, const MM_POST_ACCEPT& post, UINT32 acceptTyp
 		FacilityStruct* facility = strtGetFacility(post.facility);
 		dbugLog(_FLD, "t:%d p:%u c:%s reserved %s#%d [" PRF_WEAPON_SPEC "] at %s [" PRF_FULL_OBJ_ID "]"
 						, player.teulIndex(), player.playerID(), player.callsign()
-						, weapPrintName(&player.weapon().spec), post.weaponSerial.serial, PRA_WEAPON_SPEC(player.weapon().spec)
+						, weapPrintName(player.weapon().spec), post.weaponSerial.serial, PRA_WEAPON_SPEC(player.weapon().spec)
 						, facility->name, PRA_FULL_OBJ_ID(post.facility)
 						);
 	}
@@ -505,7 +505,7 @@ mmProcessPostExpired(const MM_POST_EXPIRED& expiry)
 	//	be redundant now, wouldn't it? :)
 	if ( player->isSpawned() == false &&  expiry.cancelled == false )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s sending post expired for %s", player->teulIndex(), player->playerID(), player->callsign(), weapPrintName(&expiry.weaponSerial.spec));
+		dbugLog(_FLD, "t:%d p:%u c:%s sending post expired for %s", player->teulIndex(), player->playerID(), player->callsign(), weapPrintName(expiry.weaponSerial.spec));
 		mmSendPostExpired(player->teulIndex(), expiry.weaponSerial);
 	}
 

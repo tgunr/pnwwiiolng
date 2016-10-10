@@ -6,7 +6,7 @@
 #include "ogl/ogldefs.h"
 #include "math/Matrixf.h"
 
-	typedef LOGICAL (*DRAW_OBJECTS)(void);
+	using DRAW_OBJECTS = LOGICAL(*)();
 
 	// We need version 1.3 or better
 	// Settle for 1.1 for now until Apple extensions are working
@@ -27,34 +27,34 @@
 	#include "ogl/oglvars.h"
 
 	// Prototypes
-	extern LOGICAL oglSetupRC(void);
+	extern LOGICAL oglSetupRC();
 	extern void	oglResize(GLsizei w, GLsizei h);
 	//extern LOGICAL oglDrawToScreen(SINT32 texid, LOGICAL stretch);
 
-	extern LOGICAL	oglInit(void);
+	extern LOGICAL	oglInit();
 	extern LOGICAL	oglClearPorts(piRECT rect, UINT32 targets);
 	extern LOGICAL	oglClearTargets(UINT32 targets);
 	extern LOGICAL	oglIsTexture(SINT32 texid, SINT32 miplevel);
 	extern LOGICAL oglIsTexture3D(SINT32 texid);
 	extern LOGICAL	oglTextureHasAlpha(SINT32 texid);
 	extern LOGICAL	oglAddTexRef(SINT32 texid);
-	extern void	oglUpdateTextures(void);
+	extern void	oglUpdateTextures();
 	extern LOGICAL	oglGetTextureMemory(SINT32* total, SINT32* free);
 	extern LOGICAL	oglProjectSceneOnTexture(SINT32 texid, SINT32 miplevel, DRAW_OBJECTS pDrawObjects);
-	extern LOGICAL	oglReleaseTextureHandles(void);
+	extern LOGICAL	oglReleaseTextureHandles();
 	extern void oglSetActiveTextureStage(SINT32 stage);
 	extern LOGICAL	oglSetActiveTexture(SINT32 stage, SINT32 texid);
 	extern LOGICAL oglSetActiveTexture3D(SINT32 stage, SINT32 texid);
 	extern void	oglDisableTexture();
     extern void	oglEnableTexture(GLenum tgt = GL_TEXTURE_2D);
 	extern void	oglSetMatrixMode(GLenum mode);
-	extern LOGICAL oglDisableTexture3D(void);
+	extern LOGICAL oglDisableTexture3D();
 	extern LOGICAL	oglLoadTexture(SINT32 texid, SINT32 miplevel);
 	extern LOGICAL	oglGetTextureFactors(SINT32 texid, SINT32 miplevel, FLOAT32* widthfactor, FLOAT32* heightfactor);
 	extern LOGICAL	oglIsMaterial(SINT32 matid);
 	extern LOGICAL	oglSetActiveMaterial(SINT32 matid);
 	extern LOGICAL oglAddMaterialReference(SINT32 matid);
-	extern LOGICAL	oglDisableMaterial(void);
+	extern LOGICAL	oglDisableMaterial();
 	extern LOGICAL	oglGetMaterialTexName(SINT32 matid, char* texname);
 	extern LOGICAL	oglSetFieldOfView(FLOAT32 fov, FLOAT32 zmin, FLOAT32 zmax);
 	extern LOGICAL	oglGetViewportDimensions(SINT32* x, SINT32* y, SINT32* width, SINT32* height, FLOAT32* znear, FLOAT32* zfar);
@@ -62,11 +62,11 @@
 	extern LOGICAL oglGetViewportZ(FLOAT32* znear, FLOAT32* zfar);
 	extern LOGICAL oglSetViewportZ(FLOAT32 znear, FLOAT32 zfar);
 	extern void oglSetRenderState(oglRENDERSTATETYPES StateType, UINT32 State);
-	extern LOGICAL	oglDisplayRenderStates(void);
+	extern LOGICAL	oglDisplayRenderStates();
 	extern LOGICAL oglReleaseLight(SINT32 numlight);
 	extern LOGICAL	oglSetLightState(SINT32 lightNum, UINT32 State);
-	extern LOGICAL	oglBeginScene(void);
-	extern LOGICAL	oglEndScene(void);
+	extern LOGICAL	oglBeginScene();
+	extern LOGICAL	oglEndScene();
 	extern LOGICAL oglGetTextureMemoryDescriptor(SINT32 texid, SINT32 miplevel, oglSURFACEDESC* lpsd);
 	extern LOGICAL	oglUpdateRenderStats(oglPRIMITIVETYPE oglt, UINT32 Count);
 	extern LOGICAL	oglRenderScene(oglPRIMITIVETYPE oglt, oglVERTEXTYPE oglvt, LPVOID lpVertices, UINT32 VertexCount);
@@ -79,7 +79,7 @@
 	extern LOGICAL	oglSetUnscaledViewMatrix(piMATRIX* lpNewView);
 	extern LOGICAL	oglSetColorAtTextureUV(SINT32 texid, SINT32 miplevel, FLOAT32 u, FLOAT32 v, UINT32 color);
 
-	extern SINT32	oglGetNumberVertices(void);
+	extern SINT32	oglGetNumberVertices();
 	extern LOGICAL oglGetTextureMemory(SINT32* total, SINT32* free);
 	extern SINT32	oglGetTextureMipmapLevel(SINT32 texid);
 	extern SINT32	oglGetNamedTexture(const char* name);
@@ -105,7 +105,7 @@
 	extern LOGICAL oglLockTexture(SINT32 texid, SINT32 miplevel, oglSURFACEDESC* lpsd);
 	extern LOGICAL oglUnlockTexture(SINT32 texid, SINT32 miplevel);
 
-	extern void oglKill(void);
+	extern void oglKill();
 	extern void oglSetMinTextureDim(SINT32 mintexdim);
     extern void oglDisableTexturesAboveAndIncluding(int unit);
 	extern void oglUnloadTexture(SINT32 texid, SINT32 miplevel);
@@ -114,14 +114,14 @@
 	extern void oglFreeTexture3D(SINT32 texid);
 	extern void oglFreeMipTextures(SINT32 texid);
 	extern void oglFreeMipTexture3Ds(SINT32 texid);
-	extern void oglResetRenderStats(void);
+	extern void oglResetRenderStats();
 	extern void oglGetRenderStats(UINT32* points, UINT32* lines, UINT32* triangles, UINT32* vertices);
 	extern void oglGetRenderTypes(UINT32* draw, UINT32* drawindex);
-	extern void oglResetRenderBuckets(void);
-	extern void oglResetRenderIndexBuckets(void);
+	extern void oglResetRenderBuckets();
+	extern void oglResetRenderIndexBuckets();
 	extern void oglUpdateRenderBuckets(UINT32 TriangleCount);
 	extern void oglUpdateRenderIndexBuckets(UINT32 TriangleCount);
-	extern void oglDisplayRenderBuckets(void);
+	extern void oglDisplayRenderBuckets();
 	extern void oglDisplayRenderIndexBuckets();
 	extern void oglFreeMaterial(SINT32 matid);
 	extern void oglSetAmbLight(oglCOLOR color);
@@ -160,7 +160,7 @@
 	extern SINT32 oglCreateVertexSource(char* name, UINT32 Length, UINT32 vertexformat);
 	extern LOGICAL oglIsVertexSource(SINT32 vertexid);
 	extern LOGICAL oglSetVertexSource(SINT32 srcid, UINT32 Stride, UINT32 FVF);
-	extern LOGICAL oglResetVertexSource(void);
+	extern LOGICAL oglResetVertexSource();
 	extern LOGICAL oglLockVertexSource(SINT32 srcid, UINT32 OffsetToLock, UINT32 SizeToLock, UINT8** ppbData, UINT32 Flags);
 	extern LOGICAL oglUnlockVertexSource(SINT32 srcid);
 	extern LOGICAL oglReleaseVertexSource(SINT32 srcid);
@@ -169,7 +169,7 @@
 	extern SINT32 oglCreateIndexSource(char* name, UINT32 Length, UINT32 indexformat);
 	extern LOGICAL oglIsIndexSource(SINT32 srcid);
 	extern LOGICAL oglSetIndexSource(SINT32 srcid, UINT32 base);
-	extern LOGICAL oglResetIndexSource(void);
+	extern LOGICAL oglResetIndexSource();
 	extern LOGICAL oglLockIndexSource(SINT32 srcid, UINT32 OffsetToLock, UINT32 SizeToLock, UINT8** ppbData, UINT32 Flags);
 	extern LOGICAL oglUnlockIndexSource(SINT32 srcid);
 	extern LOGICAL oglReleaseIndexSource(SINT32 srcid);
@@ -184,16 +184,16 @@
                                 FLOAT32 u,
                                 FLOAT32 v);
 
-	extern oglCOLOR	oglGetAmbLight(void);
+	extern oglCOLOR	oglGetAmbLight();
 
     extern void oglGetModelViewProjectionMatrix(Matrixf& mvp);
 
     extern const piMATRIX& oglGetModelViewMatrix();
-	extern piMATRIX* oglGetProjectionMatrix(void);
-	extern piMATRIX* oglGetWorldMatrix(void);
-	extern piMATRIX* oglGetViewMatrix(void);
-	extern piMATRIX* oglGetCockpitViewMatrix(void);
-	extern piMATRIX* oglGetUnscaledViewMatrix(void);
+	extern piMATRIX* oglGetProjectionMatrix();
+	extern piMATRIX* oglGetWorldMatrix();
+	extern piMATRIX* oglGetViewMatrix();
+	extern piMATRIX* oglGetCockpitViewMatrix();
+	extern piMATRIX* oglGetUnscaledViewMatrix();
 	extern FLOAT32 oglGetFieldOfViewZMin();
 	extern FLOAT32 oglGetFieldOfViewZMax();
 	extern LOGICAL oglGetWorldToScreen(double x, double y, double z, double& sx, double& sy, double& sz);

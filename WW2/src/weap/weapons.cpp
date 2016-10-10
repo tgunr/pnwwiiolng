@@ -71,7 +71,7 @@ UINT32 _NumWeaponTypes;
 weaponType * _WeaponList; // the ammo type list
 static std::vector<WEAP_FIRE_CALLBACK> _fireCallbacks; // list of callbacks to fire when a weapon is fire
 
-SINT32 weaponsInit(void)
+SINT32 weaponsInit()
 {
 	int WeaponListFile;
 	int CurrentWeaponFile;
@@ -282,7 +282,7 @@ UINT32 i;
 	return 0;
 }
 
-UINT32 weaponsKill(void)
+UINT32 weaponsKill()
 {
 	if (_WeaponList != nullptr)
 	{

@@ -113,7 +113,7 @@ extern LOGICAL fxPclDraw(SINT32 ID);
 extern LOGICAL fxPclDraw3D();
 extern LOGICAL fxPclInit();
 extern LOGICAL fxPclInitParticle(SINT32 iID);
-extern LOGICAL fxPclKill();
+extern void fxPclKill();
 
 extern void fxPclDetachAmmo(void const* pAmmo);
 extern void fxPclDetachObj(OBJECT* lpObj);

@@ -741,8 +741,7 @@ JS_FUNCTION_DEF(jsGame, spawn)
 		}
 	}
 
-    WEAPON_SERIAL blah;
-    memset(&blah, 0, sizeof(WEAPON_SERIAL));
+	WEAPON_SERIAL blah={0};
 	vehcommSendVehicleRequest(vehtype->VehicleTypeNum,&blah);
 
 	return JS_TRUE;
@@ -786,8 +785,7 @@ JS_FUNCTION_DEF(jsGame, spawnAt)
 			// do old game spawn stuff here
 			mlSetSpawnStuff(0, 0, -1, 1);
 			mlSetMobileSpawnStuff(0, at.x, at.y, at.z, yaw);
-			WEAPON_SERIAL blah;
-            memset(&blah, 0, sizeof(WEAPON_SERIAL));
+			WEAPON_SERIAL blah={0};
 			vehcommSendVehicleRequest(vehtype->VehicleTypeNum, &blah);
 		}
 

@@ -115,12 +115,12 @@ ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 }
 #endif
 
+//////////////////////////////////////////////////////////////////////
 // Actually write data to a socket.
 
 SINT32
 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port)
 {
-
 	if ( protocol == PROTOCOL_TCP || protocol == PROTOCOL_CTRL )
 	{
 		// dbugLog(_FLD, "about to send sub-packet");
@@ -203,7 +203,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
 		// Anything but a partial send, the sender handles.
 		if ( PN_UNLIKELY(result < 0) )
-		{	
+		{
 			// If the error was the result of an interruption, then lets just queue the packet
 			// and give it a retry later on.
 			const SINT32 err = dbugGetErrno();
@@ -234,6 +234,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 #else
 	Teul::Packet* const copy = s_delayedPackets.New(packet);
 #endif
+	copy->sentBytes(packet.sentBytes());
 
 	m_impl->m_sendQueue.push_back(copy);
 

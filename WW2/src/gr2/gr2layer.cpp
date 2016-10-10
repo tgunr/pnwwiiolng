@@ -48,8 +48,6 @@ static ref_ptr<RenderStateSet> depthpass;
 
 #include "fp/fpTPSdata.h"
 
-#include "str/stringLib.h"
-
 static char texname[512];
 
 #define GRANNY_VERSION(x,y) (GrannyProductMajorVersion >= x && GrannyProductMinorVersion >= y)
@@ -139,34 +137,34 @@ struct animSpec
 	float		tracks[255];		//bone number is index
 };
 
-typedef GR2_POOL<gr2Model> GR2_MODEL_POOL;
+using GR2_MODEL_POOL = GR2_POOL<gr2Model>;
 static GR2_MODEL_POOL _gr2ModelPool = GR2_MODEL_POOL(2000, 32, GR2_MODEL_POOL::NEW);
 
-//typedef GR2_POOL<gr2AnimModel> GR2_ANIMMODEL_POOL;
+//using GR2_ANIMMODEL_POOL = GR2_POOL<gr2AnimModel>;
 //static GR2_ANIMMODEL_POOL _gr2AnimModelPool = GR2_ANIMMODEL_POOL(2000, 32, GR2_ANIMMODEL_POOL::NEW);
 
-typedef GR2_POOL<gr2Mesh> GR2_MESH_POOL;
+using GR2_MESH_POOL = GR2_POOL<gr2Mesh>;
 static GR2_MESH_POOL _gr2MeshPool = GR2_MESH_POOL(2500, 32, GR2_MESH_POOL::NEW);
 
-typedef GR2_POOL<gr2Animation> GR2_ANIMATION_POOL;
+using GR2_ANIMATION_POOL = GR2_POOL<gr2Animation>;
 static GR2_ANIMATION_POOL _gr2AnimationPool = GR2_ANIMATION_POOL(2500);
 
-typedef GR2_POOL<gr2AnimationBlend> GR2_BLEND_POOL;
+using GR2_BLEND_POOL = GR2_POOL<gr2AnimationBlend>;
 static GR2_BLEND_POOL _gr2BlendPool = GR2_BLEND_POOL(1500);
 
-typedef GR2_POOL<gr2ControlBlend> GR2_CONBLEND_POOL;
+using GR2_CONBLEND_POOL = GR2_POOL<gr2ControlBlend>;
 static GR2_CONBLEND_POOL _gr2BlendControlPool = GR2_CONBLEND_POOL(300);
 
-typedef GR2_POOL<gr2Control> GR2_CONTROL_POOL;
+using GR2_CONTROL_POOL = GR2_POOL<gr2Control>;
 static GR2_CONTROL_POOL _gr2ControlPool;
 
-typedef GR2_POOL<gr2QueuedEvent> GR2_QEVENT_POOL;
+using GR2_QEVENT_POOL = GR2_POOL<gr2QueuedEvent>;
 static GR2_QEVENT_POOL _gr2QueuedEventPool;
 
-typedef GR2_POOL<gr2Event> GR2_EVENT_POOL;
+using GR2_EVENT_POOL = GR2_POOL<gr2Event>;
 static GR2_EVENT_POOL _gr2EventPool;
 
-typedef std::map<std::string,granny_file_info*> GR2_FILE_CACHE;
+using GR2_FILE_CACHE = std::map<std::string,granny_file_info*>;
 static GR2_FILE_CACHE _fileCache;
 
 #define		UNUSED_TRACK_VALUE	-999.0
@@ -177,8 +175,8 @@ static GR2_ANIM_EVENTS _animEvents;
 // end blending stuff
 
 
-typedef std::pair<granny_mesh*,granny_skeleton*> MeshDataKey;
-typedef std::map<MeshDataKey,gr2MeshData*> MeshDataMap;
+using MeshDataKey = std::pair<granny_mesh*,granny_skeleton*>;
+using MeshDataMap = std::map<MeshDataKey,gr2MeshData*>;
 static MeshDataMap _meshDataMap;
 
 // end rotation matrix crap
@@ -385,7 +383,7 @@ static void _byteAlignCheck(size_t size, const char* type)
 #endif//GR2_MEMORY_PAD
 #endif//BETA_RELEASE
 
-void gr2Init (void)
+void gr2Init()
 {
 	granny_log_callback Callback;
 //	FLOAT32		threshold;
@@ -1277,7 +1275,7 @@ gr2Animation* gr2LoadAnimation (const SCHAR* animationFile, SINT32 useCache)
 	return newAnimation;
 }
 
-void gr2DoneLoadingModels (void)
+void gr2DoneLoadingModels()
 {
 	// nothing until the cache shows up later
 	// this is where I can close file sections I no longer need
@@ -2078,7 +2076,7 @@ LOGICAL gr2RenderDamageModel (gr2Model* currentModel)
 	return TRUE;
 }
 
-void gr2ToggleAnimOutput (void)
+void gr2ToggleAnimOutput()
 {
 	animOutput = !animOutput;
 }
@@ -3570,7 +3568,7 @@ void gr2ControlSetEaseOutDuration (gr2Control* gr2Control, FLOAT32 time)
 //	GrannyEaseControlOut (gr2Control->control, time);
 }
 
-void gr2ControlSetSpeed (gr2Control* gr2Control, FLOAT32 speed)
+void gr2ControlSetSpeed(gr2Control* gr2Control, FLOAT32 speed)
 {
 	if (!gr2Control)
 	{
@@ -3580,7 +3578,7 @@ void gr2ControlSetSpeed (gr2Control* gr2Control, FLOAT32 speed)
 	GrannySetControlSpeed (gr2Control->control, speed);
 }
 
-void gr2ControlSetWeight (gr2Control* gr2Control, FLOAT32 weight)
+void gr2ControlSetWeight(gr2Control* gr2Control, FLOAT32 weight)
 {
 	if (!gr2Control)
 	{
@@ -3590,7 +3588,7 @@ void gr2ControlSetWeight (gr2Control* gr2Control, FLOAT32 weight)
 	GrannySetControlWeight (gr2Control->control, weight);
 }
 
-void gr2Kill (void)
+void gr2Kill()
 {
 	GR2_ANIM_EVENTS::iterator ait = _animEvents.begin();
 
@@ -4577,8 +4575,7 @@ void createMeshTextures(gr2MeshData* data, bool wantNormals)
 		if(!data->pngt)
 		{
 			int vertexCount = GrannyGetMeshVertexCount(grannyMesh);
-			data->pngt = new piTVERTEX[vertexCount];
-			memset(data->pngt, 0, sizeof(piTVERTEX) * vertexCount);
+			data->pngt = new piTVERTEX[vertexCount]{};
 			GrannyCopyMeshVertices(grannyMesh, GrannyPNGT3332VertexType, data->pngt);
 		}
 
@@ -4662,7 +4659,7 @@ static const char* _translateAnimation(const char* animFile)
 
 gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount)
 {
-	animSpec loadedMasks[GR2_MAX_ANIMS_PER_BLEND];
+	animSpec loadedMasks[GR2_MAX_ANIMS_PER_BLEND]{};
 
 	char		buf[255];
 	char		tString[255];
@@ -4671,8 +4668,6 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 	SCHAR* ptr;
 	SINT32 i, j;
 	gr2AnimationBlend* newBlend;
-
-	memset (loadedMasks, 0, sizeof (loadedMasks));
 
 	SINT32 blendFileID = fioOpen(blendfile);
 	if (blendFileID == -1) return nullptr;
@@ -5335,7 +5330,7 @@ void gr2BlendControlRemoveWhenDone (gr2Model* model, gr2AnimationBlend* animatio
 }
 
 #ifdef BETA_RELEASE
-void gr2ToggleColTest (void)
+void gr2ToggleColTest()
 {
 	colTestFlag = !colTestFlag;
 

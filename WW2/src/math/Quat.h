@@ -25,7 +25,7 @@ class Quat
 {
     public:
 
-        typedef double value_type;
+        using value_type = double;
 
         value_type  _v[4];    // a four-vector
 

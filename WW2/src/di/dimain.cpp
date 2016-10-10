@@ -65,7 +65,7 @@ static LOGICAL AddToQueue(UINT32 iac, SINT32 count, LOGICAL state);
 static void InitTrackIR();
 static void GetTrackIRInput();
 
-LOGICAL dimainInit(void)
+LOGICAL dimainInit()
 {
 SINT32 i;
 SINT32 j;
@@ -368,7 +368,7 @@ UINT32 dimainVKToIAC(UINT32 uVK)
     }
 }
 
-void dimainKill(void)
+void dimainKill()
 {
 	if(g_lpiac != nullptr)
 	{

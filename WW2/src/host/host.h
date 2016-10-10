@@ -31,7 +31,7 @@ struct HIT_VEHICLE_NODE;
 struct WEAP_BIAS;
 struct UPDATE_LIST;
 
-typedef std::list<Player*> PLAYER_LIST;
+using PLAYER_LIST = std::list<Player*>;
 
 struct VEHICLE_HOLDER
 {
@@ -72,8 +72,8 @@ extern SINT32 updateBcastRecv, updateBcastSend;
 extern MY_SERVER_INFO msi;
 extern LOGICAL serverResync;
 
-extern SINT32 hostGetMapConnection(void);
-extern UINT32 hostGetStratAddress(void);
+extern SINT32 hostGetMapConnection();
+extern UINT32 hostGetStratAddress();
 
 extern void	hostActivateVehicle(HostVehicle* newVehicle, bool checkPlayers);
 extern HostVehicle* hostFindVehicleLocal( UINT32 indexValue );
@@ -93,12 +93,12 @@ extern void hostForceVehExit(HostVehicle* vehicle);
 
 extern void hostDeleteToastVehicle(HostVehicle* vehicle);
 
-extern void hostBuildingVisLevelChange(class ObjectStruct* object, const instanceid_t& inInstance);
-extern void hostChangeFPSBuilding(Player* persona, const FULL_OBJ_ID& newBuildingID);
+extern void hostBuildingVisLevelChange(class ObjectStruct* object, const instanceid_t inInstance);
+extern void hostChangeFPSBuilding(Player* persona, const FULL_OBJ_ID newBuildingID);
 
 extern void* teulGetPersonaData(SINT32 teulIndex);
 static inline Player* hostGetPlayer(SINT32 teulIndex) { return (Player*)teulGetPersonaData(teulIndex); }
-extern void hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide);
+extern void hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID buildingID, WWII_SIDE forSide);
 extern void hostSendCaptureStatesToOccupants(const class CaptureState& incoming);
 
 #include "host/hostPlayers.h"

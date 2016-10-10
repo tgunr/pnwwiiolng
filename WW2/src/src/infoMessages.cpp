@@ -41,10 +41,12 @@ static SINT32 _recvInfoReq(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-SINT32 infoInstallCallbacks(void)
+SINT32 infoInstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(PgInfo::CallbackX)
+	{
 		REGISTER_SENDER(PLAY_INFO_SEND_Y, _SendInfo, infoSend);
 		REGISTER_RECEIVER(PLAY_INFO_REQ_RECV_Y, _recvInfoReq);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(PgInfo::CallbackX)
 }

@@ -63,6 +63,7 @@
 #include "server/serverServerInfo.h"
 #include "server/serverInitializeProcess.h"
 #include "strt/strtData.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtDB.h"
 #include "strt/strtEvents.h"
 #include "strt/strtIO.h"
@@ -82,11 +83,11 @@
 #include "weap/weapList.h"
 #include "wwii/wwiiActivate.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiHostMessages.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiSortieManager.h"
-#include "wwii/wwiiThreads.h"
 
 const char* g_serverName = "mmhostd";
 
@@ -682,7 +683,7 @@ _handleSIGUSR1(SINT32 k)
 //////////////////////////////////////////////////////////////////////
 
 SINT32
-mapGetStratIndex(void)
+mapGetStratIndex()
 {
 	return _stratIndex;
 }
@@ -718,7 +719,7 @@ _checkStratMaster()
 //////////////////////////////////////////////////////////////////////
 
 static void
-_updateMasterInfo(void)
+_updateMasterInfo()
 {
 	// Check to see if the chat host master has changed
 	_checkChatMaster();
@@ -963,14 +964,14 @@ _pollChecksums()
 class Housekeeper
 {
 public:
-	typedef void (FUNCTION)(void);
+	using FUNCTION = void(*)();
 
 private:
-	FUNCTION**		m_functions;
+	FUNCTION*		m_functions;
 	UINT32			m_state;
 
 public:
-	Housekeeper(FUNCTION** functions)
+	Housekeeper(FUNCTION* functions)
 		: m_functions(functions)
 		, m_state(0)
 		{
@@ -1009,7 +1010,7 @@ extern void mapExpireSorties();
 static bool
 _housekeeping()
 {
-	static Housekeeper::FUNCTION* functions[] =
+	static Housekeeper::FUNCTION functions[] =
 	{
 		_fullCheck
 	,	_commitSorties
@@ -1024,7 +1025,7 @@ _housekeeping()
 	,	mmCheckAddictionTimers
 	,	Instance::RecordPopulations
 	,	_logWWIIPlayerStats
-	,	(Housekeeper::FUNCTION*)chatHousekeepGroupPermissions
+	,	[](){ chatHousekeepGroupPermissions(); }
 	,	mapExpireSorties
 	,	mapRequestBrigadeDetailsUpdate
 	,	_checkForUpdatedMissionLists
@@ -1095,7 +1096,6 @@ main(int argc, const char* argv[])
 	// Utterly lock the arena.
 	host_config.arena.lock = ~0;
 
-	threadsReadDBEnvironment();
 	mapThreadsSetup();
 
 	HostLanguage = cv_stratLanguage.GetString();
@@ -1145,7 +1145,7 @@ main(int argc, const char* argv[])
 		{
 			// keep trying until we connect - at intervals
 			dbugLog(_FLA, "%s authGameInit failed retval %d", __FUNCTION__, retval);
-			usleep(10000);
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 	}
 
@@ -1163,7 +1163,7 @@ main(int argc, const char* argv[])
 		LogAbort("Couldn't initialize database!");
 
 	mapCPList = strtImportStratData();
-	strtReportDataErrors();
+	strtReportDataErrors(0);
 	if (!mapCPList)
 		LogAbort("Unable to initialize Strat System");
 
@@ -1250,7 +1250,7 @@ main(int argc, const char* argv[])
 		threadsCallNextCallback();
 		threadsLogging();
 
-		static Housekeeper::FUNCTION* functions[] =
+		static Housekeeper::FUNCTION functions[] =
 		{
 			mapSendChatUpdates
 		,	mapProcessLogins

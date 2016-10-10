@@ -1,3 +1,3 @@
 #pragma once
 
-extern UINT32 imaphackDoKeyboardInputs(void);
+extern UINT32 imaphackDoKeyboardInputs();

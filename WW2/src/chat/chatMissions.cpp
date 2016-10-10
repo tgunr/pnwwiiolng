@@ -46,8 +46,8 @@
 // Undefine to have enemy reports remain local to individual missions.
 #define TARGET_SHARE_CONTACTS 1
 
-typedef std::map<UINT32, ChatMission*> CHAT_MISSIONS;
-typedef std::set<UINT32> MISSION_STATUSES;
+using CHAT_MISSIONS = std::map<UINT32, ChatMission*>;
+using MISSION_STATUSES = std::set<UINT32>;
 
 CHAT_MISSIONS g_missions;
 MISSION_STATUSES g_statuses;
@@ -135,7 +135,7 @@ chatShareWaypoint(Waypoint& waypoint, ChatMission* const mission, WWII_SIDE side
 // Tell a mission who's leading it now
 
 void
-chatSetMissionLeader(UINT32 missionID, const ChatHandle& leader, WWII_SIDE side, const UINT64& origin, const UINT64& objective)
+chatSetMissionLeader(UINT32 missionID, const ChatHandle leader, WWII_SIDE side, const UINT64& origin, const UINT64& objective)
 {
 	ChatMission& mission = chatGetMission(missionID);
 
@@ -505,7 +505,7 @@ _getHandle(ChatMission& mission, const Waypoint& waypoint)
 // Request a mobile spawn from the MMHost
 
 void
-ChatMission::sendMobileSpawn(UINT32 playerID, const ChatHandle& handle, FLOAT64 x, FLOAT64 y, FLOAT64 z, bool deployed, UINT32 stosUID)
+ChatMission::sendMobileSpawn(UINT32 playerID, const ChatHandle handle, FLOAT64 x, FLOAT64 y, FLOAT64 z, bool deployed, UINT32 stosUID)
 {
 	dbugLog(_FLD, "mswp %s m:%u p:%u sto:%u @ %0.3g,%0.3g,%0.3g", (deployed ? "cre" : "del"), missionID(), playerID, stosUID, x, y, z);
 
@@ -562,7 +562,7 @@ ChatMission::addWaypoint(Waypoint& waypoint)
 // Remove a waypoint from the mission
 
 bool
-ChatMission::removeWaypoint(const ChatHandle& handle, bool byPlayer)
+ChatMission::removeWaypoint(const ChatHandle handle, bool byPlayer)
 {
 	WAYPOINTS::iterator it = m_waypoints.find(handle);
 	if ( it == m_waypoints.end() )
@@ -672,7 +672,7 @@ ChatMission::expireWaypoints()
 // Easter eggs for certain mission leaders
 
 static bool LEADER_EGGS_ENABLED = true;
-typedef std::map<ChatHandle, std::string> EGGS;
+using EGGS = std::map<ChatHandle, std::string>;
 static EGGS eggs;
 
 static UINT32 nextEggFetch = 0;
@@ -752,7 +752,7 @@ _egg(Player* const player)
 // Set the mission leader, send messages to players if neccessary
 
 void
-ChatMission::SetLeader(const ChatHandle& newLeaderHandle)
+ChatMission::SetLeader(const ChatHandle newLeaderHandle)
 {
 	static const UINT32 _NUM_TIPS = 6;
 	static const LSTRING_ID tips[_NUM_TIPS] = {
@@ -763,7 +763,7 @@ ChatMission::SetLeader(const ChatHandle& newLeaderHandle)
 	,	LSTR_NEWLEADER_5
 	,	LSTR_NEWLEADER_6
 	};
-	const ChatHandle matchHandle = chatGetLowercaseHandle(newLeaderHandle);
+	ChatHandle matchHandle = chatGetLowercaseHandle(newLeaderHandle);
 
 	// If the new leader is a previously displaced leader,
 	// remove their displacement flags.
@@ -1139,7 +1139,7 @@ chatSendMissionUpdates()
 }
 
 void
-ChatMission::addMSPWaypoint(const ChatHandle& ownerCall, FLOAT64 x, FLOAT64 y, FLOAT64 z, UINT32 stoId)
+ChatMission::addMSPWaypoint(const ChatHandle ownerCall, FLOAT64 x, FLOAT64 y, FLOAT64 z, UINT32 stoId)
 {
 	message(LSTR_MISSION, LSTR_MOBILE_SPAWN_AVAILABLE, Chat::Name(ownerCall).c_str());
 	Waypoint newWP(false, _getMSPHandle(), ownerCall

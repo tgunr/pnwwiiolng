@@ -32,12 +32,12 @@ struct MissionStatus
 
 	enum { GroupPresenceBits = 8 };
 	const TeulTimeMS& lastModified() const { return m_lastModified; }
-	bool groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const;
-	bool groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);
-	bool packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack) { return (mode == TEUL_PACK) ? pack(a, lastPack) : unpack(a, lastPack); }
-	bool pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const;
-	bool unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);
-	TeulTimeMS	m_lastModified;
+	bool groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack) const;
+	bool groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack);
+	bool packer(LOGICAL mode, ACTION_OBJECT* const a, TeulTimeMS lastPack) { return (mode == TEUL_PACK) ? pack(a, lastPack) : unpack(a, lastPack); }
+	bool pack(ACTION_OBJECT* const a, TeulTimeMS lastPack) const;
+	bool unpack(ACTION_OBJECT* const a, TeulTimeMS lastPack);
+	TeulTimeMS m_lastModified;
 
 	struct Header : public WWII::VarGroup
 	{
@@ -49,8 +49,8 @@ struct MissionStatus
 			, postedTime_ms(this)
 		{}
 		Header& operator = (const Header& rhs);
-		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;
-		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;
+		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const override;
+		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) override;
 		WWII::SyncVar<UINT32, 0> missionID;
 		WWII::SyncVar<UINT16, 0> brigadeID;
 		WWII::SyncVar<ChatHandle, 0> poster;
@@ -69,8 +69,8 @@ struct MissionStatus
 			, canMobileSpawn(this)
 		{}
 		Status& operator = (const Status& rhs);
-		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;
-		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;
+		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const override;
+		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) override;
 		WWII::SyncVar<bool, 0> isOpen;
 		WWII::SyncVar<bool, 0> isOngoing;
 		WWII::SyncVar<bool, 0> hasMobileSpawn;
@@ -88,8 +88,8 @@ struct MissionStatus
 			, inSupply(this)
 		{}
 		Origin& operator = (const Origin& rhs);
-		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;
-		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;
+		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const override;
+		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) override;
 		WWII::SyncVar<FULL_OBJ_ID, 0> cp;
 		WWII::SyncVar<FULL_OBJ_ID, 0> fac;
 		WWII::SyncVar<bool, 0> inSupply;
@@ -106,8 +106,8 @@ struct MissionStatus
 			, originLink(this)
 		{}
 		Target& operator = (const Target& rhs);
-		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;
-		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;
+		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const override;
+		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) override;
 		WWII::SyncVar<FULL_OBJ_ID, 0> cp;
 		WWII::SyncVar<FULL_OBJ_ID, 0> fac;
 		WWII::SyncVar<bool, 0> originLink;
@@ -123,8 +123,8 @@ struct MissionStatus
 			, backup(this)
 		{}
 		Lead& operator = (const Lead& rhs);
-		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;
-		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;
+		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const override;
+		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) override;
 		WWII::SyncVar<ChatHandle, 0> current;
 		WWII::SyncVar<ChatHandle, 0> backup;
 	} m_lead;
@@ -141,8 +141,8 @@ struct MissionStatus
 			, creator(this)
 		{}
 		FRU& operator = (const FRU& rhs);
-		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;
-		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;
+		void groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const override;
+		void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) override;
 		WWII::SyncVar<bool, 0> active;
 		WWII::SyncVar<Teul::NetTimeMS, 0> nextPlaceAvail;
 		WWII::SyncVar<WorldPosition_m, 0> position;
@@ -177,8 +177,8 @@ struct CellHostUpdate
 	bool packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 size) { return (mode == TEUL_PACK) ? pack(a, size) : unpack(a, size); }
 	bool pack(ACTION_OBJECT* const a, SINT32 size) const;
 	bool unpack(ACTION_OBJECT* const a, SINT32 size);
-	playerid_t	playerID;
-	UINT32	cellHost;
+	playerid_t playerID;
+	UINT32 cellHost;
 }; // end message CellHostUpdate
 
 

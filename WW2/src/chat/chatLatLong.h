@@ -32,7 +32,7 @@ public:
 							);
 	}
 
-	operator const char* (void) { return m_text; }
+	operator const char* () { return m_text; }
 
 public:
 	int		m_longdeg, m_longmin, m_longsec;

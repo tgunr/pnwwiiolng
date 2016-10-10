@@ -46,7 +46,7 @@ UINT32 wthrTimeFactors[HOURS_PER_DAY] =
 
 //This function initializes all the time components
 void
-wthrInitTime(void)
+wthrInitTime()
 {
 	//Set lastGameTime to midnight
 	_lastGameTime = 0;
@@ -56,7 +56,7 @@ wthrInitTime(void)
 
 //This function returns the current time in the world
 UINT32
-wthrGetGameTime(void)
+wthrGetGameTime()
 {
 	//Get the realTime
 	UINT32 currentRealTime = (UINT32) teulTime();
@@ -211,7 +211,7 @@ wthrSetFogPattern(UINT32 pattern)
 
 //Gets the current time factor
 UINT32
-wthrGetTimeFactor(void)
+wthrGetTimeFactor()
 {
 	if ( host_config.arena.fixedTimeFactor > 0 )
 		return host_config.arena.fixedTimeFactor;
@@ -221,7 +221,7 @@ wthrGetTimeFactor(void)
 
 // Determine the number of real seconds left until the end of the current hour
 UINT32
-wthrRealSecondsToHour(void)
+wthrRealSecondsToHour()
 {
 	UINT32 gameSecondsLeft = (SECONDS_PER_HOUR - (_lastGameTime % SECONDS_PER_HOUR));
 	return gameSecondsLeft / wthrTimeFactors[(_lastGameTime % SECONDS_PER_DAY) / SECONDS_PER_HOUR];

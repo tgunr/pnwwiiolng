@@ -78,10 +78,10 @@ struct vehVehicle;
 
 extern FLOAT32 G1MachChart[G1_CHART_NUM_DIVISIONS];
 
-UINT32 	weapAmmoInit(void);
-UINT32 	weapAmmoKill(void);
+UINT32 	weapAmmoInit();
+UINT32 	weapAmmoKill();
 
-UINT32	weapAmmoKillAllAmmo(void);
+UINT32	weapAmmoKillAllAmmo();
 void weapAmmoClearVehicle(vehVehicle* v);
 
 UINT32 	weapAmmoObjectCeasingToExist(struct OBJECT* Object);
@@ -91,13 +91,13 @@ struct weapAmmoType* 	weapFindAmmoTypeByIndex(UINT32 i);
 
 void weapAmmoSetTorpedoRunDepth(FLOAT32);
 void weapAmmoSetFuzeInterval(FLOAT32);
-FLOAT32 weapAmmoGetFuzeInterval(void);
+FLOAT32 weapAmmoGetFuzeInterval();
 
-UINT32 	weapUpdate(void);
+UINT32 	weapUpdate();
 UINT32 	weapUpdateVehicleHitmap(struct vehVehicle* InVehicle);
 
 UINT32  weapAmmoSetRoundPos(struct piVECTOR* Pos);
-LOGICAL weapDrawTracers(void);
+LOGICAL weapDrawTracers();
 
 UINT32 	weapFireRound(struct FLOAT64VECTOR* RecoilForce, struct weapAmmoType* AmmoType,
 						struct FLOAT64VECTOR* Pos, struct FLOAT64VECTOR* Vel,

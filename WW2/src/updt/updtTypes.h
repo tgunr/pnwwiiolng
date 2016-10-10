@@ -121,8 +121,7 @@ struct FIRE_STRUCT
 
 struct SHARED_VEHICLE_INFO
 {
-	const WEAPON_SPEC& spec() const { return wSerial.spec; }
-	WEAPON_SPEC& spec() { return wSerial.spec; }
+	WEAPON_SPEC spec() const { return wSerial.spec; }
 
 	TeulTimeMS			hostPosTimeStamp;
 

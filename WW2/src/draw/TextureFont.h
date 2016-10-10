@@ -14,7 +14,7 @@ struct CharData
 };
 
 #include <unordered_map>
-typedef std::unordered_map<int,CharData> CharDataMap;
+using CharDataMap = std::unordered_map<int,CharData>;
 
 class TextureFont
 {

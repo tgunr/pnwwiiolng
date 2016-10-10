@@ -83,7 +83,7 @@ public:
 	UINT32 size() const { return (m_games.empty() == false) ? (UINT32)m_games.size() : 0; }
 
 	static const UINT32 _MAX_GAMES = 15;
-	typedef std::vector<GameEntry> APP_GAMES;
+	using APP_GAMES = std::vector<GameEntry>;
 	APP_GAMES	m_games;
 	bool isPlaynet;
 };

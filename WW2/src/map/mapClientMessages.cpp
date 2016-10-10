@@ -199,6 +199,7 @@ HCUnitList::receive(SINT32 teulIndex)
 
 		// Constructed this way, the HCUnit will self-register itself into hcUnits.
 		HCUnit* hcUnit = new HCUnit(unit.unitID(), unit.type(), unit.parentID(), unit.country(), unit.branch(), unit.movementType(), unit.unitClass(), unit.handle(), unit.name(), unit.shortName(), unit.rank(), unit.homeCPID(), unit.owner(), unit.ownerRank());
+		hcUnit->addToRegistry();
 
 		// The client assigns decals to brigades, so we need to look the unit up and pass it to the decal
 		// code /once/ per HC Unit
@@ -360,10 +361,7 @@ _recvBuildingVisLevels(ACTION_OBJECT* const a)
 		SupercellVislevelXfer& xfer = *(SupercellVislevelXfer*)ptr;
 		const size_t size = xfer.size_bytes();
 		if ( size == 0 )
-		{
-			ptr = endPtr;
 			break;
-		}
 
 		ptr += size;
 
@@ -484,16 +482,17 @@ Tutorial::GroupProgress::send(SINT32 chatIndex)
 
 //////////////////////////////////////////////////////////////////////
 
-SINT32 mapInstallClientCallbacks(void)
+SINT32
+mapInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Map::CallbackX)
-
+	{
 		REGISTER_SENDER(Map::EXIT_WWIIOL_Y, _sendExitWWIIOL, MAP_SEND_EXIT_WWIIOL);
 
 		REGISTER_RECEIVER(Map::XCHG_HCUNIT_LIST_Y, _recvHCUnitList);
 		REGISTER_RECEIVER(Map::ARENA_DESCRIPTION_Y, _recvArenaDescription);
 
-		REGISTER_SENDRECV(Map::XCHG_PERSONA_LIST_Y, _sendPersonaListRequest,_recvPersonaListResponse, _XCHG_PERSONA_LIST);
+		REGISTER_SENDRECV(Map::XCHG_PERSONA_LIST_Y, _sendPersonaListRequest, _recvPersonaListResponse, _XCHG_PERSONA_LIST);
 		REGISTER_SENDRECV(Map::XCHG_PERSONA_SELECT_Y, _sendPersonaSelectRequest, _recvPersonaSelectResponse, _XCHG_PERSONA_SELECT);
 		REGISTER_SENDRECV(Map::XCHG_BRIGADE_LIST_Y, _sendBrigadeListRequest, _recvBrigadeListResponse, _XCHG_BRIGADE_LIST);
 		REGISTER_SENDRECV(Map::XCHG_BRIGADE_SELECT_Y, _sendBrigadeSelectRequest, _recvBrigadeSelectResponse, _XCHG_BRIGADE_SELECT);
@@ -512,6 +511,6 @@ SINT32 mapInstallClientCallbacks(void)
 
 		// The big packet of strat data we get when we spawn.
 		REGISTER_RECEIVER(Map::BUILDING_VISLEVELS_Y, _recvBuildingVisLevels);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Map::CallbackX)
 }

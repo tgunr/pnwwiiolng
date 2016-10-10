@@ -16,7 +16,7 @@
 struct gr2StateSpec;
 struct vehType;
 
-typedef std::vector<gr2StateSpec*> gr2StateSpecs;
+using gr2StateSpecs = std::vector<gr2StateSpec*>;
 gr2StateSpec* gr2CreateStateSpec(xmlNode* node);
 
 // base data specs
@@ -90,7 +90,7 @@ struct gr2DamageMapSpec
 	float armorClass;		// how good the armor is
 };
 
-typedef std::vector<gr2DamageMapSpec> gr2DamageMapSpecs;
+using gr2DamageMapSpecs = std::vector<gr2DamageMapSpec>;
 
 struct gr2DamageComponentSpec
 {
@@ -108,7 +108,7 @@ struct gr2DamageComponentSpec
 	std::vector<std::string> destroys; // what other components to destroy when we're destroyed
 };
 
-typedef std::vector<gr2DamageComponentSpec> gr2DamageComponentSpecs;
+using gr2DamageComponentSpecs = std::vector<gr2DamageComponentSpec>;
 
 // base state specs
 
@@ -189,11 +189,11 @@ struct gr2DamageStateSpec : gr2StateSpec
 	std::string component;
 };
 
-typedef std::vector<gr2LodSpec> gr2ModelSpecs;
-typedef std::map<std::string,gr2ModelSpecs> gr2ShapeSpecs;
-typedef std::pair<std::string,std::string> gr2ObjectConfigParam;
-//typedef std::vector<gr2ObjectConfigParam> gr2ObjectConfig;
-typedef std::vector<gr2TurretSpec> gr2TurretSpecs;
+using gr2ModelSpecs = std::vector<gr2LodSpec>;
+using gr2ShapeSpecs = std::map<std::string,gr2ModelSpecs>;
+using gr2ObjectConfigParam = std::pair<std::string,std::string>;
+//using gr2ObjectConfig = std::vector<gr2ObjectConfigParam>;
+using gr2TurretSpecs = std::vector<gr2TurretSpec>;
 
 // common data
 
@@ -316,8 +316,8 @@ struct gr2WeaponSpec
 	}
 };
 */
-//typedef std::vector<gr2WeaponSpec> gr2Loadout;
-typedef std::vector<gr2ModuleSpec> gr2Loadout;
+//using gr2Loadout = std::vector<gr2WeaponSpec>;
+using gr2Loadout = std::vector<gr2ModuleSpec>;
 
 struct gr2VehicleSpec
 {
@@ -352,9 +352,9 @@ struct gr2VehicleSpec
 	}
 };
 
-typedef std::map<std::string,gr2VehicleSpec*> gr2VehicleSpecMap;
-typedef std::map<std::string,gr2ModuleDataSpec*> gr2ModuleDataSpecMap;
-//typedef std::map<std::string,gr2WeaponDataSpec*> gr2WeaponDataSpecMap;
+using gr2VehicleSpecMap = std::map<std::string,gr2VehicleSpec*>;
+using gr2ModuleDataSpecMap = std::map<std::string,gr2ModuleDataSpec*>;
+//using gr2WeaponDataSpecMap = std::map<std::string,gr2WeaponDataSpec*>;
 
 void gr2InitData();
 void gr2KillData();

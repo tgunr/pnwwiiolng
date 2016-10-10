@@ -158,18 +158,18 @@ namespace Vehicle
 		UINT8				country() const { return intro().m_weaponSpec.wCountry; }
 		UINT8				side() const { return wwiiSide(country()); }
 		UINT32				oneTimeBits() const { return intro().m_oneTimeBits; }
-		const WEAPON_SPEC&	weaponSpec() const { return intro().m_weaponSpec; }
+		WEAPON_SPEC	        weaponSpec() const { return intro().m_weaponSpec; }
 		WEAPON_SPEC&		weaponSpec() { return intro().m_weaponSpec; }
 		UINT32				brigadeID() const { return intro().m_brigadeID; }
 		UCHAR				decal() const { return intro().m_decal; }
 		RANK_NO				rank() const { return intro().m_rank; }
 		UINT32				clientFlags1() const { return m_clientFlags1; }
 		UINT32				clientFlags2() const { return m_clientFlags2; }
-		const ChatHandle&	handle() const { return intro().m_handle; }
+		ChatHandle	        handle() const { return intro().m_handle; }
 		ChatHandle&			handle() { return intro().m_handle; }
 		UINT32				squadID() const { return intro().m_squadID; }
-		const ChatHandle&	squadHandle() const { return intro().m_squadHandle; }
-		ChatHandle			squadHandle() { return intro().m_squadHandle; }
+		ChatHandle	        squadHandle() const { return intro().m_squadHandle; }
+		ChatHandle&			squadHandle() { return intro().m_squadHandle; }
 
 		const FireData&		fireData() const { return m_fireData; }
 		FireData&			fireData() { return m_fireData; }

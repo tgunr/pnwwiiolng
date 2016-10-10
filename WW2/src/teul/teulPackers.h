@@ -130,7 +130,9 @@ struct ACTION_OBJECT
 	{}
 
 	void packer(LOGICAL mode, bool& value, SINT32 sb = 1) { return (mode == TEUL_PACK) ? pack(value, sb) : unpack(value, sb); }
-	void packBytes(LOGICAL mode, void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(mode, this->packed, this->offset, byteStream, numBytes); }
+	void bytePacker(LOGICAL mode, void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(mode, this->packed, this->offset, byteStream, numBytes); }
+	void packBytes(const void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(TEUL_PACK, this->packed, this->offset, (void*)byteStream, numBytes); }
+	void unpackBytes(void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(TEUL_UNPACK, this->packed, this->offset, byteStream, numBytes); }
 
 	//! @brief Check that the packed data stream has enough bytes to populate an object type.
 	template<class Typename_>
@@ -278,14 +280,14 @@ namespace Teul
 template<typename _Type>
 struct Packer
 {
-	typedef	_Type valuetype;
-	typedef Packer<valuetype> selftype;
+	using value_type = _Type;
+	using self_type = Packer<value_type>;
 
-	valuetype m_value;
+	value_type m_value;
 
-	operator valuetype () const { return m_value; }
-	const valuetype& operator()() const { return m_value; }
-	valuetype& operator()() { return m_value; }
+	operator value_type () const { return m_value; }
+	const value_type& operator()() const { return m_value; }
+	value_type& operator()() { return m_value; }
 
 	//! Pack or unpack data.
 	//! @param[in]	mode		TEUL_PACK / TEUL_UNPACK

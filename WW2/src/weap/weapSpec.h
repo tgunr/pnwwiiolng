@@ -31,6 +31,7 @@ struct WEAPON_SPEC
 		wCountry = data >> 8;
 	}
 	WEAPON_SPEC(const WEAPON_SPEC& rhs) : wType(rhs.wType), wClass(rhs.wClass), wCategory(rhs.wCategory), wCountry(rhs.wCountry) {}
+//tolua_end
 	WEAPON_SPEC& operator=(WEAPON_SPEC rhs) {
 		wType = rhs.wType;
 		wClass = rhs.wClass;
@@ -38,6 +39,7 @@ struct WEAPON_SPEC
 		wCountry = rhs.wCountry;
 		return *this;
 	}
+//tolua_begin
 
 	WEAPON_SPEC(UINT32 country_, UINT32 category_, UINT32 class_, UINT32 type_)
 		: wType((UINT8)type_), wClass((UINT8)class_), wCategory((UINT8)category_), wCountry((UINT8)country_)
@@ -68,7 +70,7 @@ struct WEAPON_SPEC
 	UINT32 asUINT32() const { return ((UINT32)wCountry << 24) | ((UINT32)wCategory << 16) | ((UINT32)wClass << 8) | (UINT32)wType; }
 	UINT16 asUINT16() const { return *(const UINT16*)this; }
 	//! Compare two weapon specs, but do it real cheap, because we do it frequently.
-	bool operator==(const WEAPON_SPEC& rhs) const { return this->asUINT16() == rhs.asUINT16(); }
+	bool operator==(const WEAPON_SPEC rhs) const { return this->asUINT16() == rhs.asUINT16(); }
 
 //tolua_end
 	//! Make network fly.
@@ -94,12 +96,12 @@ public:
 
 	//! Because != != !(=). For some reason.
 	//! (not-equals is not-equal-to not(equals))
-	bool operator!=(const WEAPON_SPEC& rhs) const { return this->asUINT16() != rhs.asUINT16(); }
+	bool operator!=(const WEAPON_SPEC rhs) const { return this->asUINT16() != rhs.asUINT16(); }
 
 	//! Does this weapon spec make my ass look thin?
-	bool operator<(const WEAPON_SPEC& rhs) const { return this->asUINT16() < rhs.asUINT16(); }
+	bool operator<(const WEAPON_SPEC rhs) const { return this->asUINT16() < rhs.asUINT16(); }
 	//! Does this weapon spec make my ass look fat?
-	bool operator>(const WEAPON_SPEC& rhs) const { return this->asUINT16() > rhs.asUINT16(); }
+	bool operator>(const WEAPON_SPEC rhs) const { return this->asUINT16() > rhs.asUINT16(); }
 //tolua_begin
 
 	//! Check for a null spec.
@@ -119,21 +121,17 @@ extern WEAPON_SPEC NULL_WEAP_SPEC; // removed const to work with broken MW Linke
 #define PRF_WEAPON_SPEC "%u:%u:%u:%u"
 #define PRA_WEAPON_SPEC(s) (s).wCountry, (s).wCategory, (s).wClass, (s).wType
 
-static inline const char* weapPrintSpecC(const WEAPON_SPEC* spec)
+static inline const char* weapPrintSpecC(const WEAPON_SPEC spec)
 {
-	if (PN_UNLIKELY(spec == nullptr))
-		return "<null>";
-
-	static char buffer[24];
-	sprintf(buffer, "" PRF_WEAPON_SPEC "", PRA_WEAPON_SPEC(*spec));
-
+	thread_local char buffer[24];
+	strprintf(buffer, "" PRF_WEAPON_SPEC "", PRA_WEAPON_SPEC(spec));
 	return buffer;
 }
 
 //tolua_begin
 
 // find a weapon spec based on the weapon's name
-extern const WEAPON_SPEC& weapFindWeaponByName(const char* weaponName);
+extern WEAPON_SPEC weapFindWeaponByName(const char* weaponName);
 
 // this function is called from lua scripts for ingame tutorials/training
 extern WEAPON_SPEC weapCreateSpec(UINT32 country_, UINT32 category_, UINT32 class_, UINT32 type_);

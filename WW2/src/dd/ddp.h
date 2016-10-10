@@ -11,17 +11,17 @@
 		Constants and typedefs
 	*/
 
-	typedef LOGICAL (*DDWND_DDINITFUNC)(void);
-	typedef LOGICAL (*DDWND_D3DINITFUNC)(void);
-	typedef LOGICAL (*DDWND_DDRENDERFUNC)(void);
-	typedef LOGICAL (*DDWND_D3DRENDERFUNC)(void);
+	using DDWND_DDINITFUNC = LOGICAL(*)();
+	using DDWND_D3DINITFUNC = LOGICAL(*)();
+	using DDWND_DDRENDERFUNC = LOGICAL(*)();
+	using DDWND_D3DRENDERFUNC = LOGICAL(*)();
 
-	typedef void (*DDWND_DDKILLFUNC)(void);
-	typedef void (*DDWND_D3DKILLFUNC)(void);
+	using DDWND_DDKILLFUNC = void(*)();
+	using DDWND_D3DKILLFUNC = void(*)();
 
-	typedef void (*DDWND_MOUSEFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
-	typedef void (*DDWND_TIMERFUNC)(WPARAM wparam, LPARAM lparam);
-	typedef void (*DDWND_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
+	using DDWND_MOUSEFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
+	using DDWND_TIMERFUNC = void(*)(WPARAM wparam, LPARAM lparam);
+	using DDWND_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
 	// flags to indicate mode of operation
 	#define DDWND_FULLSCREEN    0x00000001
@@ -49,11 +49,11 @@
 	#define DDWND_ALLOW_NULL	0x00000040
 	#define DDWND_ALLOW_ANY		0x0000007f
 
-	HINSTANCE	ddpGetInstance(void);
+	HINSTANCE	ddpGetInstance();
 	void		ddpSetInstance(HINSTANCE hnewInst);
 
-	LOGICAL		ddpInit(void);
-	void		ddpKill(void);
+	LOGICAL		ddpInit();
+	void		ddpKill();
 	UINT32		ddpEngine(LPVOID dummy);
 	UINT32		ddpEngineCycle(LPVOID dummy);
 
@@ -74,7 +74,7 @@
 	LOGICAL		ddpIsLocked();
 	LOGICAL		ddpDrawNotActive(LOGICAL newpna);
 	LOGICAL		ddpDisableScreenSaver(LOGICAL newss);
-	SINT32		ddpGetTotalPaints(void);
+	SINT32		ddpGetTotalPaints();
 	FLOAT32		ddpGetFPS();
 	FLOAT32		ddpGetInstantFPS();
 	void		ddpResetFPS();
@@ -96,9 +96,9 @@
 	// Set the screen to proper pixel depth and size requirements
 	LOGICAL		ddpChooseScreenFormat(HDC hdc, PIXELFORMATDESCRIPTOR* pfd);
 	LOGICAL		ddpSetDisplay(UINT32 flags);
-	void		ddpResetDisplay(void);
+	void		ddpResetDisplay();
 
-	LOGICAL		ddcapStart(void);
+	LOGICAL		ddcapStart();
 
 	void		ddpShowCursor();
 	void		ddpHideCursor();

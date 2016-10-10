@@ -111,7 +111,7 @@ unsigned int Texture::s_numberDeletedTextureInLastFrame = 0;
 
 unsigned int s_minimumNumberOfTextureObjectsToRetainInCache = 0;
 
-typedef buffered_value<ref_ptr<Texture::Extensions> > BufferedExtensions;
+using BufferedExtensions = buffered_value<ref_ptr<Texture::Extensions>>;
 static BufferedExtensions s_extensions;
 
 static ref_ptr<TextureObjectManager> s_textureObjectManager = new TextureObjectManager;

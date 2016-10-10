@@ -17,8 +17,7 @@
 #endif
 */
 
-struct tagpaFILE;
-typedef struct tagpaFILE paFILE;
+struct paFILE;
 
 PA_EXPORT paFILE* paArchive();
 

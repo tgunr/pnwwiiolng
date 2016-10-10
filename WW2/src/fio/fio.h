@@ -25,7 +25,7 @@ namespace Fio
 
 	// Open the standard logging file or return stderr.
 	// (guaranteed not to return nullptr)
-	extern FILE* OpenLogFile( void );
+	extern FILE* OpenLogFile();
 	extern void DeleteLogFile();
 }
 #endif

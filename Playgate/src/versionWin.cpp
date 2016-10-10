@@ -174,7 +174,7 @@ bool GetFileVersion(TCHAR* const dest, const size_t destSize, const TCHAR* const
 
 	TCHAR* ptrFVI;		// FileVersion info
 	TCHAR keyName[128];
-	usprintf(keyName, sizeof(keyName) - 1, _T("\\StringFileInfo\\%04x%04x\\FileVersion"), (LPVOID*)ptranslate->wLanguage, (PUINT)ptranslate->wCodePage);
+	usprintf(keyName, sizeof(keyName) - 1, _T("\\StringFileInfo\\%04x%04x\\FileVersion"), (UINT32)ptranslate->wLanguage, (UINT32)ptranslate->wCodePage);
 	if (!VerQueryValue(pVersion, keyName, (LPVOID*)&ptrFVI, (PUINT)&Len))
 	{
 		//Write_Debug("Problem with VerQueryValue");

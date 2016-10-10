@@ -258,7 +258,7 @@ JSBool jsPlayer::GetProperty(JSContext* ctx, int propid, jsval* val)
 				char name[30+1];
 				UINT32 weaponType = fpFPSGetHighlightedWeaponType();
 
-				strncpy(name, fpFPSWeaponKeyStrings[weaponType], 30);
+				strsafecpy(name, fpFPSWeaponKeyStrings[weaponType]);
 
 				switch(weaponType)
 				{

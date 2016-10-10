@@ -1672,7 +1672,7 @@ static int _backtofront(const void *a, const  void *b)
   return l->_distance2 > r->_distance2 ? -1 : (l->_distance2 < r->_distance2 ? 1 : 0);
 }
 
-typedef int		cmp_t(const void *, const void *);
+using cmp_t = int (*)(const void*, const void*);
 
 static void qsort2(void *p, size_t cnt, size_t sz, cmp_t c)
 {

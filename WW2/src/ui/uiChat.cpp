@@ -60,10 +60,10 @@
 /******** OBCENITY FILTER TYPES ********/
 
 // Structure that houses an obscenity filter rule.
-typedef RENS::wregex OBSCENITY_RULE;
+using OBSCENITY_RULE = RENS::wregex;
 
 // Vector of rules forms a filter.
-typedef std::vector<OBSCENITY_RULE> OBSCENITY_FILTER;
+using OBSCENITY_FILTER = std::vector<OBSCENITY_RULE>;
 
 // word filter loader
 class BadWordLoader : public XMLLoader2<BadWordLoader>

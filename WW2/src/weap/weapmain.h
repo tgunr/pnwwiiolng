@@ -1,4 +1,4 @@
 #pragma once
 // Weapons System Main Module
-extern UINT32 weapInit(void);
-extern UINT32 weapKill(void);
+UINT32 weapInit();
+UINT32 weapKill();

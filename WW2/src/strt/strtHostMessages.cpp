@@ -342,7 +342,7 @@ strtSyncCPs(UINT32 address, UINT16 port, Supercell* sc)
 		//Make the message
 		for ( i = 0, f = startID; i < syncCPs.numEntries; ++i, ++f)
 		{
-			register CPStruct* cp = &sc->cps[f];
+			CPStruct* cp = &sc->cps[f];
 			syncCPs.info[i].uOID = cp->uOID;
 			syncCPs.info[i].owner = (UCHAR) cp->country;
 			syncCPs.info[i].control = (UCHAR) cp->controllingCountry;
@@ -728,7 +728,7 @@ static SINT32 _recvMMPostCancel(ACTION_OBJECT* const a)
 
 	LogAbort("postCancel: " PRF_WEAPON_SERIAL " %s"
 					, PRA_WEAPON_SERIAL(postCancel.weaponSerial)
-					, weapPrintName(&postCancel.weaponSerial.spec)
+					, weapPrintName(postCancel.weaponSerial.spec)
 					);
 
 	return a->offset;
@@ -1116,8 +1116,10 @@ static SINT32
 _registerInterHostCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Host::CallbackX)
+	{
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLua);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Host::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1125,12 +1127,12 @@ _registerInterHostCallbacks()
 
 //Installs our callbacks
 SINT32
-strtHostInstallCallbacks(void)
+strtHostInstallCallbacks()
 {
 	_registerInterHostCallbacks();
 
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
-
+	{
 		REGISTER_RECEIVER(STRT_MM_POST_LIST_Y, _recvMMPostListRequest);
 		REGISTER_RECVSEND(STRT_MM_SPAWN_GRANT_Y, _recvMMSpawnGrantRequest, _sendMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT);
 		REGISTER_RECVSEND(STRT_MM_POST_INFO_Y, _recvMMPostInfoRequest, _sendMMPostInfoResponse, _XCHG_MM_POST_INFO);
@@ -1161,15 +1163,15 @@ strtHostInstallCallbacks(void)
 		REGISTER_RECEIVER(STRT_ATTACK_ORDER_Y, _recvAttackOrder);
 
 		REGISTER_RECEIVER(STRT_FACILITY_WEAP_LIST_Y, _recvWeaponListRequest);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
 // Send a capture scoring notice to the cell hosts
 
 void
-strtSendCaptureScoreNotice(const FULL_OBJ_ID& fid, WWII_SIDE forSide)
+strtSendCaptureScoreNotice(const FULL_OBJ_ID fid, WWII_SIDE forSide)
 {
 	dbugLog(_FLI, "capscore: bld:%d,%d:%u side:%u", fid.cell.ox, fid.cell.oy, fid.id, forSide);
 	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureScore_Y));

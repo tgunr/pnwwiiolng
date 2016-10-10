@@ -227,7 +227,7 @@ public:
 public:
     SINT32 GetFreeNode();
 	SINT32 GetTextureId(OBJECT * TopLevelObject,OBJECT * CollideObject);
-	SINT32 RemoveEarliestPockEntry(void);
+	SINT32 RemoveEarliestPockEntry();
 
 	LOGICAL StopEffect(SINT32 HandleNum);
 	LOGICAL ResetTextureToOriginalTree(OBJECT * Object,SCHAR* TexName);

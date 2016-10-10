@@ -26,43 +26,43 @@ const int GRIDS_SIZE = 100; // 100 meters per grid
 const int GRIDS_PER_SIDE = 800 /GRIDS_SIZE; // 100 meters per grid
 const int RECORDS_PER_CHUNK = 7;
 
-typedef struct SD_Record
+struct SD_Record
 {
     int minx, miny, maxx, maxy; // in 1/4 meters global resolution, ie [s]29.2 fixed point
     void* data; // tree or OBJECT or next
     unsigned short flags;
     short alt;    // meters, only used for debug display
-} SD_Record;
+};
 
-typedef struct SD_GridChunk
+struct SD_GridChunk
 {
     SD_Record* records[RECORDS_PER_CHUNK];
     SD_GridChunk* next;
-} SD_GridChunk;
+};
 
-typedef struct SD_Grid
+struct SD_Grid
 {
     SD_GridChunk* chunkPtr;
-} SD_Grid;
+};
 
-typedef struct SD_Octet
+struct SD_Octet
 {
     SD_Grid grids[GRIDS_PER_SIDE][GRIDS_PER_SIDE];
-} SD_Octet;
+};
 
-typedef struct SD_Supercell
+struct SD_Supercell
 {
     short supercellX, supercellY; // current mapping to this data structure
     SD_Octet octets[SDM_SUPERCELL_OCTETS_X][SDM_SUPERCELL_OCTETS_Y];
-} SD_Supercell;
+};
 
-typedef std::vector<SD_Record> SD_Record_Vector;
-typedef std::vector<SD_Record_Vector*> SD_Record_Vector_Vector;
+using SD_Record_Vector = std::vector<SD_Record>;
+using SD_Record_Vector_Vector = std::vector<SD_Record_Vector*>;
 
-typedef std::vector<SD_GridChunk> SD_GridChunk_Vector;
-typedef std::vector<SD_GridChunk_Vector*> SD_GridChunk_Vector_Vector;
+using SD_GridChunk_Vector = std::vector<SD_GridChunk>;
+using SD_GridChunk_Vector_Vector = std::vector<SD_GridChunk_Vector*>;
 
-typedef stdext::hash_map<std::pair<int,int>,SD_Supercell*> SD_SuperCellMap;
+using SD_SuperCellMap = std::unordered_map<std::pair<int,int>,SD_Supercell*>;
 
 
 class SpatialDatabase

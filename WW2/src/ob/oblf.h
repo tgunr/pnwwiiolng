@@ -13,6 +13,6 @@ struct FLARE
 };
 
 
-extern LOGICAL oblfInit(void);
-extern void  oblfUpdate(void);
-extern void oblfKill(void);
+extern LOGICAL oblfInit();
+extern void  oblfUpdate();
+extern void oblfKill();

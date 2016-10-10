@@ -48,7 +48,7 @@ static Vec3d _focusPos;// player ragdoll position
 static int _numFallSounds = 4;
 #endif
 
-typedef std::vector<fpTPSRagdoll*> RagdollList;
+using RagdollList = std::vector<fpTPSRagdoll*>;
 
 struct WeaponShape
 {
@@ -75,7 +75,7 @@ struct WeaponShape
 	std::vector<Link> links;
 };
 
-typedef std::map<std::pair<int, int>, WeaponShape> WeaponShapeMap;
+using WeaponShapeMap = std::map<std::pair<int, int>, WeaponShape>;
 
 static RagdollList _ragdolls;
 static WeaponShapeMap _weapShapes;
@@ -611,7 +611,7 @@ static void _calculateCamPos(Vec3d& camPos, Vec3d& lookAt, UINT32 maxLOS)
 	if(strcmp(lastDebug, debug))
 	{
 		uiChatPrintLine(debug);
-		strncpy(lastDebug, debug, 255);
+		strsafecpy(lastDebug, debug);
 	}
 	*/
 }

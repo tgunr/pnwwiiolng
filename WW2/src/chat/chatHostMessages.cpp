@@ -99,8 +99,6 @@
 #include "chat/chatPreference.h"
 #include "chat/chatCellXfer.h"
 
-typedef teul_network_object<MobileSpawnWaypoint> MOBILE_SPAWN_WAYPOINT;
-
 TEUL_CALLBACK*	CHAT_SEND_MESSAGE;
 TEUL_CALLBACK*	CHAT_XCHG_SERVER_TRACKED_OBJS;
 
@@ -453,7 +451,7 @@ StratCommand::send()
 //
 
 bool
-chatSendStratCommand(SINT32 playerID, int cmd, const FULL_OBJ_ID& cp, WWII_SIDE side)
+chatSendStratCommand(SINT32 playerID, int cmd, const FULL_OBJ_ID cp, WWII_SIDE side)
 {
 	try
 	{
@@ -495,7 +493,7 @@ chatSendPopulation()
 // Ask the mission host to cancel a particular mission
 
 SINT32
-chatSendMissionDeleteRequest(const UINT32& missionID)
+chatSendMissionDeleteRequest(UINT32 missionID)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MISSION_DELETION_Y), missionID);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -ENOTCONN;
@@ -509,7 +507,7 @@ chatSendMissionDeleteRequest(const UINT32& missionID)
 // the move too, set actionable to true.
 
 void
-chatSendBrigadeMove(const ChatHandle& byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID& fid, bool isActionable)
+chatSendBrigadeMove(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID fid, bool isActionable)
 {
 	ENDPOINT* stratEndpoint = serverPeerEndpointByType(STRAT_HOST);
 	if (PN_LIKELY(stratEndpoint != nullptr)) {
@@ -638,7 +636,7 @@ chatSendBackupLeaderChange(UINT32 missionID, UINT32 playerID)
 // Request a change of leader
 
 void
-chatSendLeaderChange(UINT32 missionID, UINT32 playerID, const ChatHandle& handle, const ChatHandle& requester)
+chatSendLeaderChange(UINT32 missionID, UINT32 playerID, const ChatHandle handle, const ChatHandle requester)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y));
 	outgoing.construct<LeaderChange>(missionID, playerID, handle, requester, LeaderChange::_SUCCESS);
@@ -1111,7 +1109,7 @@ _recvTutProgress(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Instance the ThreadTextQuery class for aggregating
 
-const char* const _PROGRESS_UPDATE_PREFIX = "INSERT INTO wwii.training_progress(player_id,group_name,progress)VALUES";
+const char* const _PROGRESS_UPDATE_PREFIX = "INSERT INTO `wwii`.`training_progress`(player_id,group_name,progress)VALUES";
 const char* const _PROGRESS_UPDATE_SUFFIX = "ON DUPLICATE KEY UPDATE player_id=values(player_id),group_name=values(group_name),progress=values(progress)";
 
 static ThreadTextQuery _progressUpdates(DBThread::Default, _PROGRESS_UPDATE_PREFIX, _PROGRESS_UPDATE_SUFFIX);
@@ -1181,7 +1179,7 @@ Chat::TuneToChannel::send(SINT32 connection)
 }
 
 SINT32
-chatSendUserNLA(SINT32 connection, UCHAR radioIndex, const ChatHandle& handleID)
+chatSendUserNLA(SINT32 connection, UCHAR radioIndex, const ChatHandle handleID)
 {
 	Chat::UserNLA userNLA;
 
@@ -1195,7 +1193,7 @@ chatSendUserNLA(SINT32 connection, UCHAR radioIndex, const ChatHandle& handleID)
 }
 
 UINT32
-nextMessageID(void)
+nextMessageID()
 {
 	return g_messageID++;
 }
@@ -1418,7 +1416,7 @@ _recvBroadcastMessage(ACTION_OBJECT* const a)
 }
 
 void
-chatSendMapPersonaUpdate(playerid_t playerID, bool isSquadUpdate, UINT32 squadID, const ChatHandle& squadHandle, bool isDecalUpdate, UINT32 decal)
+chatSendMapPersonaUpdate(playerid_t playerID, bool isSquadUpdate, UINT32 squadID, const ChatHandle squadHandle, bool isDecalUpdate, UINT32 decal)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MAP_PERSONA_UPDATE_Y));
 	outgoing.construct<MapPersonaUpdate>(squadHandle, isSquadUpdate, isDecalUpdate, playerID, squadID, decal);
@@ -1599,18 +1597,22 @@ static SINT32
 _registerMMCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Map::CallbackX)
+	{
 		REGISTER_MSG_SENDER(Map::HC_UNIT_LOCATIONS_Y, HC_UNIT_LOCATIONS);
 		REGISTER_RECEIVER(Map::TUT_PROGRESS_Y, _recvTutProgress);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Map::CallbackX)
 }
 
 static SINT32
 _registerStratCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
+	{
 		REGISTER_RECEIVER(STRT_BROADCAST_TIME_UPDATE_Y, _recvTimeUpdate);
 		REGISTER_RECEIVER(STRT_UPDATE_Y, _recvStratUpdates);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 
 SINT32
@@ -1622,7 +1624,7 @@ chatInstallHostCallbacks()
 	wwiiRegisterPlayerMessageCallback();
 
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
-
+	{
 		REGISTER_RECEIVER(Chat::FOUND_USER_Y, _recvFoundUser);
 		REGISTER_RECEIVER(Chat::CLIENT_MESSAGE_Y, _recvMessage);
 		REGISTER_RECEIVER(Chat::UPDATE_CHANNEL_Y, _recvUpdateChannel);
@@ -1684,6 +1686,6 @@ chatInstallHostCallbacks()
 		REGISTER_RECEIVER(Chat::ATTACK_ORDER_Y, _recvAttackOrder);
 		REGISTER_RECEIVER(Chat::HOST_LOCALITY_UPDATES_Y, _recvLocalityUpdates);
 		REGISTER_OMG_RECEIVER(Chat::CellHostUpdate, _recvCellHostUpdate);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }

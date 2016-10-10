@@ -62,7 +62,7 @@ public:
 	class MapObject;
 	class MapObjectList;
 	class Renderer;
-	typedef std::vector<phui::ref_ptr<Renderer> > RendererList;
+	using RendererList = std::vector<phui::ref_ptr<Renderer>>;
 
 	void AddRenderer(Renderer*);
 	RendererList RenderList() { return _renderers; }
@@ -160,8 +160,8 @@ public:
 	bool enabled;
 	float minscale, maxscale;
 
-	typedef std::pair<int,int> supercell_id;
-	typedef std::map<supercell_id, phui::ref_ptr<SuperCell> > SuperCellMap;
+	using supercell_id = std::pair<int,int>;
+	using SuperCellMap = std::map<supercell_id, phui::ref_ptr<SuperCell>>;
 	SuperCellMapView* _mv;
 
 	MapObjectList* MapObjects() { return _mapObjects.ptr(); }

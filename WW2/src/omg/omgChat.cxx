@@ -6,7 +6,7 @@
 #include "omgChat.hxx"
 TEUL_CALLBACK* Chat::MissionStatus::s_callback;
 
-bool Chat::MissionStatus::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const
+bool Chat::MissionStatus::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack) const
 {
 	UCHAR groupPresence{0};
 	SINT32 groupPresenceOffset = a->offset;
@@ -29,7 +29,7 @@ bool Chat::MissionStatus::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& la
 	return (a->offset >= 0);
 }
 
-bool Chat::MissionStatus::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)
+bool Chat::MissionStatus::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack)
 {
 	UCHAR groupPresence(0);
 	a->unpack(groupPresence, 8);
@@ -51,12 +51,12 @@ bool Chat::MissionStatus::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& 
 	return false;
 }
 
-bool Chat::MissionStatus::pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const
+bool Chat::MissionStatus::pack(ACTION_OBJECT* const a, TeulTimeMS lastPack) const
 {
 	return groupPack(a, lastPack) && (a->offset >= 0);
 }
 
-bool Chat::MissionStatus::unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)
+bool Chat::MissionStatus::unpack(ACTION_OBJECT* const a, TeulTimeMS lastPack)
 {
 	return groupUnpack(a, lastPack) && (a->offset >= 0);
 }
@@ -71,7 +71,7 @@ Chat::MissionStatus::Header& Chat::MissionStatus::Header::operator = (const Chat
 	return *this;
 }
 
-void Chat::MissionStatus::Header::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const
+void Chat::MissionStatus::Header::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const
 {
 	missionID.pack(a, lastPack, changes, 0);
 	brigadeID.pack(a, lastPack, changes, 1);
@@ -79,7 +79,7 @@ void Chat::MissionStatus::Header::groupPack(ACTION_OBJECT* const a, const TeulTi
 	postedTime_ms.pack(a, lastPack, changes, 3);
 }
 
-void Chat::MissionStatus::Header::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void Chat::MissionStatus::Header::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)
 {
 	missionID.unpack(a, lastPack, changes, 0);
 	brigadeID.unpack(a, lastPack, changes, 1);
@@ -97,7 +97,7 @@ Chat::MissionStatus::Status& Chat::MissionStatus::Status::operator = (const Chat
 	return *this;
 }
 
-void Chat::MissionStatus::Status::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const
+void Chat::MissionStatus::Status::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const
 {
 	isOpen.pack(a, lastPack, changes, 0);
 	isOngoing.pack(a, lastPack, changes, 1);
@@ -105,7 +105,7 @@ void Chat::MissionStatus::Status::groupPack(ACTION_OBJECT* const a, const TeulTi
 	canMobileSpawn.pack(a, lastPack, changes, 3);
 }
 
-void Chat::MissionStatus::Status::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void Chat::MissionStatus::Status::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)
 {
 	isOpen.unpack(a, lastPack, changes, 0);
 	isOngoing.unpack(a, lastPack, changes, 1);
@@ -122,14 +122,14 @@ Chat::MissionStatus::Origin& Chat::MissionStatus::Origin::operator = (const Chat
 	return *this;
 }
 
-void Chat::MissionStatus::Origin::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const
+void Chat::MissionStatus::Origin::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const
 {
 	cp.pack(a, lastPack, changes, 0);
 	fac.pack(a, lastPack, changes, 1);
 	inSupply.pack(a, lastPack, changes, 2);
 }
 
-void Chat::MissionStatus::Origin::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void Chat::MissionStatus::Origin::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)
 {
 	cp.unpack(a, lastPack, changes, 0);
 	fac.unpack(a, lastPack, changes, 1);
@@ -145,14 +145,14 @@ Chat::MissionStatus::Target& Chat::MissionStatus::Target::operator = (const Chat
 	return *this;
 }
 
-void Chat::MissionStatus::Target::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const
+void Chat::MissionStatus::Target::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const
 {
 	cp.pack(a, lastPack, changes, 0);
 	fac.pack(a, lastPack, changes, 1);
 	originLink.pack(a, lastPack, changes, 2);
 }
 
-void Chat::MissionStatus::Target::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void Chat::MissionStatus::Target::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)
 {
 	cp.unpack(a, lastPack, changes, 0);
 	fac.unpack(a, lastPack, changes, 1);
@@ -167,13 +167,13 @@ Chat::MissionStatus::Lead& Chat::MissionStatus::Lead::operator = (const Chat::Mi
 	return *this;
 }
 
-void Chat::MissionStatus::Lead::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const
+void Chat::MissionStatus::Lead::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const
 {
 	current.pack(a, lastPack, changes, 0);
 	backup.pack(a, lastPack, changes, 1);
 }
 
-void Chat::MissionStatus::Lead::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void Chat::MissionStatus::Lead::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)
 {
 	current.unpack(a, lastPack, changes, 0);
 	backup.unpack(a, lastPack, changes, 1);
@@ -189,7 +189,7 @@ Chat::MissionStatus::FRU& Chat::MissionStatus::FRU::operator = (const Chat::Miss
 	return *this;
 }
 
-void Chat::MissionStatus::FRU::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const
+void Chat::MissionStatus::FRU::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const
 {
 	active.pack(a, lastPack, changes, 0);
 	nextPlaceAvail.pack(a, lastPack, changes, 1);
@@ -197,7 +197,7 @@ void Chat::MissionStatus::FRU::groupPack(ACTION_OBJECT* const a, const TeulTimeM
 	creator.pack(a, lastPack, changes, 3);
 }
 
-void Chat::MissionStatus::FRU::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void Chat::MissionStatus::FRU::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)
 {
 	active.unpack(a, lastPack, changes, 0);
 	nextPlaceAvail.unpack(a, lastPack, changes, 1);
@@ -209,15 +209,15 @@ TEUL_CALLBACK* Chat::CellHostUpdate::s_callback;
 
 bool Chat::CellHostUpdate::pack(ACTION_OBJECT* const a, SINT32 size) const
 {
-	a->pack(playerID, 0);
-	a->pack(cellHost, 0);
+	a->pack(playerID);
+	a->pack(cellHost);
 	return (a->offset >= 0);
 }
 
 bool Chat::CellHostUpdate::unpack(ACTION_OBJECT* const a, SINT32 size)
 {
-	a->unpack(playerID, 0);
-	a->unpack(cellHost, 0);
+	a->unpack(playerID);
+	a->unpack(cellHost);
 	return (a->offset >= 0);
 }
 

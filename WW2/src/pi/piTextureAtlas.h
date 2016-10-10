@@ -18,6 +18,6 @@ public:
 	static piTextureAtlasSet* getInstance();
 
 protected:
-	typedef std::map<std::string, piTextureInfo> TextureMap;
+	using TextureMap = std::map<std::string, piTextureInfo>;
 	TextureMap _textureMap;
 };

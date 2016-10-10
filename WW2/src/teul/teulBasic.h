@@ -96,7 +96,7 @@ const char* teulGetAddress(const UINT32 host, char* buffer, const size_t bufferS
 //!							(non-blocking), a negative value specifies
 //!							wait forever.
 //! @ingroup not-thread-safe
-void teulUpdateTransport(const TeulTimeMS& duration_=0ULL);
+void teulUpdateTransport(const TeulTimeMS duration_=0ULL);
 
 //! Get the local address of a given teul index.
 //! @param[in]	teulIndex		Index of the connection to query.
@@ -108,7 +108,7 @@ UINT32 teulGetEndpointLocalAddress(SINT32 teulIndex);
 UINT32 teulGetEndpointRemoteAddress(SINT32 teulIndex);
 
 // close all connections and the debugger. (teul go bye bye)
-void teulCloseTransport(void);
+void teulCloseTransport();
 
 //! Associate local application data with a connection.
 void teulSetPersonaData(const SINT32 teulIndex, void* personaData);

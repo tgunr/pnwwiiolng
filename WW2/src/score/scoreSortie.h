@@ -37,16 +37,16 @@ public:
 	sortieid_t sortieID() const { return m_sortieID; }
 	playerid_t pilotID() const { return m_pilotID; }
 	UINT32 crewID() const { return m_crewID; }
-	const WEAPON_SPEC& spec() const { return m_spec; }
+	WEAPON_SPEC spec() const { return m_spec; }
 	CODE_RTB rtbCode() const { return m_rtbCode; }
 	const std::vector<HitEntry>& hitsTaken() const { return m_hitsTaken; }
-	const ChatHandle& chatHandle() const { return m_chatHandle; }
-	const ChatHandle& killedBy() const { return m_killedBy; }
+	ChatHandle chatHandle() const { return m_chatHandle; }
+	ChatHandle killedBy() const { return m_killedBy; }
 	sortieid_t lastHitBySortieID() const { return m_lastHitBySortieID; }
 	const TeulTimeMS& lastHitTime() const { return m_lastHitTime; }
 	bool isPlaynet() const { return m_isPlaynet; }
-	const FLOAT32& value() const { return m_value; }
-	const FULL_OBJ_ID& despawnedTo() const { return m_despawnedTo; }
+	FLOAT32 value() const { return m_value; }
+	FULL_OBJ_ID despawnedTo() const { return m_despawnedTo; }
 
 	const Player* pilot() const { return m_pilot; }
 	const Player* crew() const { return m_crew; }
@@ -63,11 +63,11 @@ public:
 
 	bool addHitBy(const Scoring::Actor& actor, const UINT64& joules_);
 	void addHitTo(const Scoring::Actor& actor, const UINT64& joules_);
-	void addKill(const sortieid_t sortieID_, const WEAPON_SPEC& spec_);
-	void addInteraction(const WEAPON_SPEC& spec_);
+	void addKill(const sortieid_t sortieID_, const WEAPON_SPEC spec_);
+	void addInteraction(const WEAPON_SPEC spec_);
 
 	//! Set the RTB code and destination of this sortie.
-	void setRTB(const CODE_RTB rtbCode_, const FULL_OBJ_ID& rtbDest_);
+	void setRTB(const CODE_RTB rtbCode_, const FULL_OBJ_ID rtbDest_);
 
 	//! Flag this sortie as having despawned.
 	void despawned();

@@ -34,7 +34,7 @@ TEUL_CALLBACK*			CLUSTER_SHUTDOWN_CB;
 // move players from one server list to another and update state
 extern SINT32 serverUpdatePlayer(const Server::PlayerStatusUpdate* const update);
 
-extern ERROR_FUNCTION*	extErrorFn;
+extern ERROR_FUNCTION	extErrorFn;
 
 static SINT32
 _recvPlayerUpdate(ACTION_OBJECT* const a)
@@ -222,9 +222,10 @@ _recvHostConfig(ACTION_OBJECT* const a)
 }
 
 SINT32
-serverInitCallbacks(void)
+serverInitCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
+	{
 		REGISTER_SENDRECV(PLAYER_MIRROR_Y, _sendPlayerMirror, _recvPlayerMirror, PLAYER_MIRROR_CB);
 		PLAYER_MIRROR_CB->error = _persXferError;
 
@@ -239,7 +240,7 @@ serverInitCallbacks(void)
 		REGISTER_RECEIVER(PLAYER_UPDATE_Y, _recvPlayerUpdate);
 
 		REGISTER_RECEIVER(HOST_CONFIG_Y, _recvHostConfig);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
 }
 

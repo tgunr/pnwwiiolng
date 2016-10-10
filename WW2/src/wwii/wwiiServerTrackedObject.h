@@ -236,13 +236,13 @@ public:
 	const WorldPosition_m& position() const { return m_position; }
 	//! Get the creation timestamp.
 	//! @return millisecond timestamp of when the STO was created.
-	const TeulTimeMS& created() const { return m_created; }
+	TeulTimeMS created() const { return m_created; }
 	//! Get the client specific flags.
 	//! @return client-specific flags.
 	UINT32 flags() const { return m_flags; }
 	//! Returns the unique ID of the STO's instance.
 	//! @return unique ID of the instance.
-	const instanceid_t& instanceID() const { return m_instanceID; }
+	instanceid_t instanceID() const { return m_instanceID; }
 	//! Return the attitude vector (if any).
 	//! @return Attitude/orientation vector.
 	const AttitudeVector& attitude() const { return m_attitude; }
@@ -322,12 +322,12 @@ extern ServerTrackedObject* wwiiGetSTO(UINT32 uid);
 //! Walk the STO lists for entries that have expired
 extern void wwiiExpireSTOs();
 
-typedef void (STO_ITERATOR) (ServerTrackedObject&);
-typedef bool (STO_COOKIE_ITERATOR) (ServerTrackedObject& sto, void* cookie);
+using STO_ITERATOR = void(*)(ServerTrackedObject&);
+using STO_COOKIE_ITERATOR = bool(*)(ServerTrackedObject& sto, void* cookie);
 
 //! Patrol function.
-extern void wwiiForEachSTO(STO_ITERATOR&);
-extern bool wwiiForEachSTO(STO_COOKIE_ITERATOR&, void* cookie = nullptr);
+extern void wwiiForEachSTO(STO_ITERATOR);
+extern bool wwiiForEachSTO(STO_COOKIE_ITERATOR, void* cookie = nullptr);
 
 // return a count of the specified type or of all types
 extern UINT32 wwiiCountSTOs(UINT16 type = 0, UINT16 subtype = 0);

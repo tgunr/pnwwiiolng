@@ -214,12 +214,12 @@ const SCHAR* fpTPSPointKeyStrings[TPS_POINTTYPE_NUM_TYPES] =
 
 TPSTypes tpsTypesMap;
 
-void fpTPSDataReadTPSFile (void);
-void fpTPSDataReadSurfaceFiles (void);
-void fpTPSDataReadHitLocation (SCHAR* data);
+void fpTPSDataReadTPSFile();
+void fpTPSDataReadSurfaceFiles();
+void fpTPSDataReadHitLocation(SCHAR* data);
 void fpTPSDataInitHitLocations();
 
-void fpTPSDataInit ()
+void fpTPSDataInit()
 {
 	//fpTPSSkeletonFile = TPS_DIR "troopskel";
 	fpTPSSkeletonFile = TPS_DIR "Inf_BaseSkeleton";
@@ -753,7 +753,7 @@ const char* fpTPSGetTypeNameFromValue(const char* type, int value)
 }
 
 
-void fpTPSDataReadTPSFile (void)
+void fpTPSDataReadTPSFile()
 {
 	SINT32	tpsDataFile;
 	static char	buf[255];
@@ -887,7 +887,7 @@ void fpTPSDataInitHitLocations()
 	gr2FreeModel(skeleton);
 }
 
-void fpTPSDataReadSurfaceFiles (void)
+void fpTPSDataReadSurfaceFiles()
 {
 	static char	buf[256];
 	static char	surfFileName[256];

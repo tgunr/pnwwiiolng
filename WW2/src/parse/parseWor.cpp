@@ -46,7 +46,7 @@ static bool _fillFacility(SINT32 numArgs, FUNCARGS* args);
 static bool _fillDepotLink(SINT32 numArgs, FUNCARGS* args);
 static bool _fillCpObject(SINT32 numArgss, FUNCARGS* args);
 
-typedef std::map<const std::string, void*> ObjMap;
+using ObjMap = std::map<const std::string, void*>;
 
 struct SECTION_HEADER
 {
@@ -111,7 +111,7 @@ static char _fileName[PN_MAX_PATH];
 extern SINT32 LoadingScreen;
 #endif
 
-void parseWorKill(void)
+void parseWorKill()
 {
 	for(UINT32 i = 0; _stratSections[i].name[0] != 0;i++)
 	{
@@ -174,7 +174,7 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 	}
 #endif //VALIDATOR
 
-	strncpy(_fileName, levelfile, PN_MAX_PATH);
+	strsafecpy(_fileName, levelfile);
 
 #if platBuild == TEUL_SERVER
 	world = blank;
@@ -187,7 +187,8 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 	return parseFile(_fileName, _stratCallbacks, world, &worFileLineNum);
 }
 
-static void _copyObjName(const char* sourceName, char* destName)
+template<size_t DestSize>
+static void _copyObjName(const char* sourceName, char (&destName)[DestSize])
 {
 	// If there is a directory separator, advance past it.
 	const char* p = strrchr(sourceName, '\\');
@@ -196,9 +197,11 @@ static void _copyObjName(const char* sourceName, char* destName)
 
 	// Trim off any trailing extension
 	p = strrchr(sourceName, '.');
-	size_t copyLen = (p) ? (p - sourceName) : MAX_OBJNAME_LENGTH;
-	strncpy(destName, sourceName, copyLen);
-	destName[copyLen] = 0;
+	assert( p > sourceName && "empty filename or filename ends with '\\'");
+	size_t len = p - sourceName;
+	assert( len < MAX_OBJNAME_LENGTH - 1 && "filename too long" );
+	strncpy(destName, sourceName, len);
+	destName[len] = 0;
 }
 
 template<typename _Type>

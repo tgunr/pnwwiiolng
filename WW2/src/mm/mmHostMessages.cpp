@@ -395,11 +395,13 @@ _recvDoDespawn(struct ACTION_OBJECT* const a)
 }
 
 static SINT32
-_registerStratCallback(void)
+_registerStratCallback()
 {
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
+	{
 		REGISTER_SENDER(STRAT_EVENTS_Y, Strat::Events::SendFunction, Strat::Events::Callback);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Comm::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -423,14 +425,14 @@ Host::VehicleRequest::send(const Server::ServerInfo* server)
 
 //Installs the host callbacks
 SINT32
-mmHostInstallCallbacks(void)
+mmHostInstallCallbacks()
 {
 	_registerStratCallback();
 
 	Scoring::InstallCallbacks();
 
 	BEGIN_CALLBACK_REGISTRATION(MM::CallbackX)
-
+	{
 		REGISTER_RECEIVER(MM::FE_POST_REQ_Y, _recvFEPostRequest);
 		REGISTER_SENDER(MM::FE_POST_ACCEPT_Y, _sendFEPostAccept, MM_SEND_FE_POST_ACCEPT);
 		REGISTER_SENDER(MM::FE_POST_DENY_Y, _sendFEPostDeny, MM_SEND_FE_POST_DENY);
@@ -450,7 +452,7 @@ mmHostInstallCallbacks(void)
 		REGISTER_SENDER(MM::FE_CREW_BAILED_Y, _sendFECrewBailed, MM_SEND_FE_CREW_BAILED);
 		REGISTER_RECEIVER(MM::DIRECT_SPAWN_Y, _recvDirectSpawn);
 		REGISTER_RECEIVER(MM::DO_DESPAWN_Y, _recvDoDespawn);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(MM::CallbackX)
 }
 

@@ -23,8 +23,8 @@
 
 #define MAX_DAMAGE_SOUND_QUE 64
 
-typedef bool (*ExternalCameraAdjust)(piVECTOR*, piVECTOR*);
-typedef bool (*ExternalCameraPivot)(piVECTOR*, piMATRIX*);
+using ExternalCameraAdjust = bool(*)(piVECTOR*, piVECTOR*);
+using ExternalCameraPivot = bool(*)(piVECTOR*, piMATRIX*);
 
 struct persPositionDataElement {
 	UINT32	ordnanceNum;
@@ -146,11 +146,11 @@ Player* playerGetPlayer();
 vehVehicle* playerGetVehicle();
 // end lua compatibility
 
-extern UINT32 persInit(void); // initializes the persona system
+extern UINT32 persInit(); // initializes the persona system
 
-extern UINT32 persKill(void); // kills the persona system
+extern UINT32 persKill(); // kills the persona system
 
-extern UINT32 persUpdate(void); // updater for the persona system
+extern UINT32 persUpdate(); // updater for the persona system
 
 // attaches the "persona" to a particular position on a particular vehicle
 extern UINT32 persAttachPlayerToVehicle(vehVehicle* Vehicle,UINT32 Position);
@@ -191,9 +191,9 @@ extern mlVehicleData* persGetPersonaModelDataPtr();
 extern UINT32 persDetachFromVehicle(vehVehicle* Vehicle);
 
 // detaches the persona from the currently attached vehicle, if attached
-extern UINT32 persDetachPersona(void);
+extern UINT32 persDetachPersona();
 
-extern UINT32 persUpdateCockpitSmoke(void);
+extern UINT32 persUpdateCockpitSmoke();
 
 extern UINT32 persToggleCamera();
 extern UINT32 persToggleInternalExternalViews(SINT32 Param,UINT32 Id,UINT32 Detach);
@@ -206,8 +206,8 @@ extern void persSetExternalCameraAdjuster(ExternalCameraAdjust a);
 extern void persSetExternalCameraPivot(ExternalCameraPivot p);
 extern bool persSubmergedDeathCamera(piVECTOR* pos, piVECTOR* aim);
 
-extern UINT32 persPersonaIsCreatedOnHost(void);
-extern UINT32 persIsPersonaCreated(void);
+extern UINT32 persPersonaIsCreatedOnHost();
+extern UINT32 persIsPersonaCreated();
 
 extern UINT32 persSetExternalLockedCamera(SINT32 Param,UINT32 Id,UINT32 Detach);
 extern UINT32 persSetExternalRubberBandCamera(SINT32 Param,UINT32 Id,UINT32 Detach);
@@ -225,7 +225,7 @@ extern UINT32 persGetHealthStats(FLOAT32 * BrainOxy,
 								  FLOAT32 * BloodLevel);
 extern UINT32 persGetMaxBrainOxy(FLOAT32 * MaxBrainOxy, FLOAT32* BlackoutFullPercent);
 
-extern UINT32 persDrawRedoutBlackout(void);
+extern UINT32 persDrawRedoutBlackout();
 extern UINT32 persGetControlStatus(FLOAT32 * StrengthControl, LOGICAL* ControlsDisabled);
 extern UINT32 persGetGDistortion(piMATRIX * RetMat);
 extern UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL ATPOnly);
@@ -236,18 +236,18 @@ extern UINT32 persAddHitSoundsForHitComponent(
 
 extern void persSetView(UINT32 type, UINT32 level);
 extern void persSetNormalView(FLOAT32 FieldOfView_);
-extern void persResetHealths(void);
+extern void persResetHealths();
 extern UINT32 persSetPersonaPositionCallback(SINT32 param, UINT32 id, UINT32 detach);
 extern void persShakeHead(const char* message = nullptr);
-extern void persKillCrew(void);
-extern bool persAllowHUDUpdate(void);
+extern void persKillCrew();
+extern bool persAllowHUDUpdate();
 
-extern bool persCanVehicleExit(void);
-extern bool persIsCrewDead(void);
-extern FLOAT32 persGetFogScaleMultiplier(void);
+extern bool persCanVehicleExit();
+extern bool persIsCrewDead();
+extern FLOAT32 persGetFogScaleMultiplier();
 
-extern LOGICAL persDrawGunsight(void);
-extern UINT32 persResetVehicleG(void);
+extern LOGICAL persDrawGunsight();
+extern UINT32 persResetVehicleG();
 extern UINT32 persGetCrewDeadForKillScore(UINT32 Position);
 
 extern void persSetPayAttentionFlag(UINT32 Position);

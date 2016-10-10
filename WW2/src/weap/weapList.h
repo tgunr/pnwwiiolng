@@ -36,12 +36,12 @@ struct WEAPON_CLASS
 //tolua_end
 
 // Weapons by spec
-typedef std::map<WEAPON_SPEC, WEAPON*> WEAPON_LIST;
+using WEAPON_LIST = std::map<WEAPON_SPEC, WEAPON*>;
 // g_weaponList defines ALL known vehicles, including unusable ones
 extern WEAPON_LIST g_weaponList;
 
 // Lists of WEAPON_ARRAYs by country+category+class
-typedef std::map<UINT32, WEAPON_LIST> WEAPON_SPAWNS;
+using WEAPON_SPAWNS = std::map<UINT32, WEAPON_LIST>;
 
 // g_weaponSpawns provides lists of which weapons can be spawned
 // by which category of spawner.
@@ -54,18 +54,18 @@ extern WEAPON_CLASS weaponClass[MAX_WEAP_CLASSES];
 //tolua_begin
 
 // returns true once weapListInit() has been called once
-bool weapHasInitialized(void);
+bool weapHasInitialized();
 
 // Init the structures
 bool weapListInit(const char* theaterPath);
 
-static inline UINT32 weapClassIndex(const WEAPON_SPEC& spec)
+static inline UINT32 weapClassIndex(const WEAPON_SPEC spec)
 {
 	return (spec.wClass > 0) ? spec.wClass : ((UINT32)spec.wCategory << 8);
 }
 
 // return spawn list for the spec if available
-static inline WEAPON_LIST* weapFindSpawnList(const WEAPON_SPEC& spec)
+static inline WEAPON_LIST* weapFindSpawnList(const WEAPON_SPEC spec)
 {
 	WEAPON_SPAWNS::iterator it = g_weaponSpawns.find(weapClassIndex(spec));
 	return ( it != g_weaponSpawns.end() ) ? &(it->second) : nullptr;
@@ -88,7 +88,7 @@ extern WEAPON_SPEC weapAssociateIndex(const char* weapName, UINT32 localIndex);
 // Add a class to the class index.
 extern void weapAddClass(UINT32 classIndex, const std::string& className);
 
-extern void weapListKill(void);
+extern void weapListKill();
 
 extern void weapAddWeaponIndex(WEAPON* weapon);
 

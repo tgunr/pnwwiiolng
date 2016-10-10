@@ -336,7 +336,7 @@ SINT32 _SortCompare(const void* o1, const void* o2)
 // Function: fxMgrKill
 // Description: Top level kill for FX.
 /////////////////////////////////////////////////
-LOGICAL fxMgrKill()
+void fxMgrKill()
 {
    // fxkill();
 
@@ -365,8 +365,6 @@ LOGICAL fxMgrKill()
     }
 
     Write_Log(LOG_OLD, LOG_INFO, "[fxMgrKill]");
-
-    return TRUE;
 }
 
 /////////////////////////////////////////////////

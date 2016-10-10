@@ -32,7 +32,7 @@ public:
 	void resetHitArray();
 
 	// Was the mission successful?
-	bool successful(const WEAPON_SPEC&) const;
+	bool successful(const WEAPON_SPEC) const;
 	bool successfulDuration() const;
 
 public:

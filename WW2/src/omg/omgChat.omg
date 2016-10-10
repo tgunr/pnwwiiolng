@@ -1,4 +1,5 @@
 NAMESPACE Chat;
+CLIENT FRONTEND;	// Messages between WW2Client and a server process.
 
 USING "typedefs.omg";
 

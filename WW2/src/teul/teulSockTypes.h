@@ -22,12 +22,12 @@
 #if !defined(WIN32) && !defined(WIN64)
 	#define SOCKET_ERROR -1
 	#define INVALID_SOCKET  -1
-	typedef int				SOCKET;
+	using SOCKET = int;
 	#define PRF_SOCKET "%d"
 	#define PRA_SOCKET(s) int(s)
 /*
 #if platOS == OS_FREEBSD
-	typedef SINT32 sockval_t;
+	using sockval_t = SINT32;
 #endif
 */
 

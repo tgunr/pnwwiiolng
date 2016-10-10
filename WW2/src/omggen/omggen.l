@@ -43,8 +43,11 @@ extern void yyaddcode(const char* text, std::string& into);
 "//".*
 
 	/* declaration keywords */
-DEBUG					return TKW_DEBUG;
 NAMESPACE				return TKW_NAMESPACE;
+CLIENT					return TKW_CLIENT;
+FRONTEND				return TKW_FRONTEND;
+SERVER					return TKW_SERVER;
+DEBUG					return TKW_DEBUG;
 START-Y					return TKW_START_Y;
 TYPE					return TKW_TYPE;
 AS						return TKW_AS;
@@ -57,7 +60,14 @@ ENUM					return TKW_ENUM;
 MESSAGE					return TKW_MESSAGE;
 GROUP					return TKW_GROUP;
 
+	/* field options */
+[Bb][Ii][Tt][Ss]		return TKW_FIELD_BITS;
+
 	/* message keywords */
+TOCLIENT				return TKW_TOCLIENT;
+TOHOST					return TKW_TOHOST;
+GMONLY					return TKW_GMONLY;
+INTERNAL				return TKW_INTERNAL;
 IF\ \(					{ yy_push_state(IF_COND); g_condition = ""; }
 <IF_COND>\(				{ yy_push_state(IF_COND); g_condition.push_back('('); }
 <IF_COND>\)				{
@@ -81,7 +91,7 @@ ARRAY					return TKW_ARRAY;
 
 	/* general types */
 [A-Za-z][A-Za-z0-9_]{64,}	{ yyfatal("Invalid identifier '%s'", yytext); }
-[A-Za-z][A-Za-z0-9_]*		{ yylval.sVal = strdup(yytext); return TIDENTIFIER; }
+[A-Za-z][A-Za-z0-9_]*		{ yylval.str = strdup(yytext); ++leakCount; return TIDENTIFIER; }
 -?[0-9]{21,}\.[0-9]\+		{ yyfatal("Invalid number '%s'", yytext); }
 -?[0-9]{21,}				{ yyfatal("Invalid number '%s'", yytext); }
 -?[0-9]\+\.[0-9]+\.			{ yyfatal("Invalid floating pointer number '%s'", yytext); }

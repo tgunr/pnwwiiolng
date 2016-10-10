@@ -61,10 +61,7 @@ OpinionPoll::addEntry(const char* newEntry)
 	if ( newEntry == nullptr )
 		*dest = 0;
 	else
-	{
-		strncpy(dest, newEntry, _MAX_STRING_LEN);
-		dest[_MAX_STRING_LEN] = 0;
-	}
+		strsafecpy(dest, newEntry, _MAX_STRING_LEN);
 }
 
 //////////////////////////////////////////////////////////////////////

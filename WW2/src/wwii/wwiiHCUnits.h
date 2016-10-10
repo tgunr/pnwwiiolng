@@ -10,14 +10,13 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include <map>
+
+#include "chat/chatHandle.h"
 #include "mm/mmEnums.h"
 #include "wwii/wwiiFullObjID.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 #include "wwii/wwiiOwnershipEnums.h"
-#include <map>
-#include "chat/chatHandle.h"
-
-class HCUnit;
-typedef std::map<UINT32,HCUnit*> HCUNIT_INDEX;
 
 //tolua_begin
 enum HCUNIT_TYPE
@@ -48,8 +47,8 @@ public:
 	// Create from scratch
 	HCUnit(UINT32 unit, HCUNIT_TYPE type, UINT32 parent
 			, WWII_COUNTRY country, BRANCH_ENUM branch, BRANCH_ENUM movementType, UCHAR unitClass
-			, const ChatHandle& handle, const char* name, const char* nick, UINT8 rank
-			, const FULL_OBJ_ID& home=nullObjID
+			, const ChatHandle handle, const char* name, const char* nick, UINT8 rank
+			, const FULL_OBJ_ID home=nullObjID
 			, const ChatHandle owner=0LL, RANK_NO ownerRank=0
 			);
 
@@ -61,9 +60,11 @@ public:
 	// Create from network object
 	HCUnit(ACTION_OBJECT* const a);
 
+	void addToRegistry();
+
 public:
 	// Get the homeCPID by unpacking from an action object
-	void setHomeCPID(const FULL_OBJ_ID& newHomeCPID)
+	void setHomeCPID(const FULL_OBJ_ID newHomeCPID)
 #if defined(CMDLINE_CLIENT)
 	{	m_homeCPID = newHomeCPID; }
 #else
@@ -83,15 +84,15 @@ public:
 	WWII_COUNTRY country() const { return m_countryID; }
 	WWII_SIDE side() const { return ( m_countryID == 4 ) ? AXIS : ALLIED; }
 	BRANCH_ENUM branch() const { return m_branchID; }
-	const FULL_OBJ_ID& homeCPID() const { return m_homeCPID; }
+	FULL_OBJ_ID homeCPID() const { return m_homeCPID; }
 	BRANCH_ENUM movementType() const { return m_movementType; }
 	const char* name() const { return m_name; }
-	const ChatHandle& owner() const { return m_owner; }
+	ChatHandle owner() const { return m_owner; }
 	RANK_NO ownerRank() const { return m_ownerRank; }
 	UINT8 rank() const { return m_rank; }
 	HCUNIT_TYPE type() const { return m_type; }
 	UCHAR unitClass() const { return m_unitClass; }
-	const ChatHandle& handle() const { return m_handle; }
+	ChatHandle handle() const { return m_handle; }
 	const char* callsign() const { return m_callsign; }
 	const char* shortName() const { return m_shortName; }
 
@@ -126,7 +127,7 @@ public:
 
 	bool isMarineUnit() const { return m_branchID == BRANCH_LAND && m_movementType == BRANCH_SEA; }
 
-	bool isOwner(const ChatHandle& candidate) const { return (chatGetLowercaseHandle(candidate) == chatGetLowercaseHandle(m_owner)); }
+	bool isOwner(const ChatHandle candidate) const { return (chatGetLowercaseHandle(candidate) == chatGetLowercaseHandle(m_owner)); }
 
 	bool isParatroopUnit() const { return m_branchID == BRANCH_LAND && m_movementType == BRANCH_AIR; }
 

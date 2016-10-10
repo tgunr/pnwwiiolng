@@ -28,7 +28,7 @@
 #endif
 
 // UID-based lookup table for STOs
-typedef std::map<UINT32,ServerTrackedObject*> STO_MAP;
+using STO_MAP = std::map<UINT32,ServerTrackedObject*>;
 static STO_MAP stoMap;
 
 //////////////////////////////////////////////////////////////////////
@@ -297,7 +297,7 @@ void wwiiExpireSTOs()
 // Apply a function across all current STOs.
 
 void
-wwiiForEachSTO(STO_ITERATOR& func)
+wwiiForEachSTO(STO_ITERATOR func)
 {
 	STO_MAP::iterator it = stoMap.begin();
 	while ( it != stoMap.end() )
@@ -313,7 +313,7 @@ wwiiForEachSTO(STO_ITERATOR& func)
 // Apply a function across all current STOs with handler function data
 
 bool
-wwiiForEachSTO(STO_COOKIE_ITERATOR& func, void* cookie)
+wwiiForEachSTO(STO_COOKIE_ITERATOR func, void* cookie)
 {
 	STO_MAP::iterator it = stoMap.begin();
 

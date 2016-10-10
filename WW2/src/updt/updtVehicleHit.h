@@ -53,7 +53,7 @@ namespace Vehicle
 			UINT64	m_damage;				///< Joules damage applied.
 		};
 
-		typedef WWII::inplace_vector<Vehicle::Hit::Component, VEH_MAX_OBJ_HIT> Components;
+		using Components = WWII::inplace_vector<Vehicle::Hit::Component, VEH_MAX_OBJ_HIT>;
 		Components			m_components;	///< Tracking of strikes to components.
 
 		// For tracking when we received hits.

@@ -10,10 +10,13 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "hostproj/config.h"
+#include "config.h"
 
 // Disable dbugWrite in all host processes
 #define NO_DEBUG_WRITE	1
+
+#define NOGDI
+#define WIN32_LEAN_AND_MEAN
 
 // Legacy definition of platBuild
 #if !defined(platBuild)

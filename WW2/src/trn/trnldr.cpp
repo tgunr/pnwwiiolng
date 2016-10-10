@@ -36,7 +36,7 @@
 #include "SpatialDB.h"
 #endif
 
-typedef std::stack< TDTL_TREES* > TREE_POOL;
+using TREE_POOL = std::stack<TDTL_TREES*>;
 static TREE_POOL _treePool;
 
 #include "shader/glslWater.h"
@@ -413,7 +413,7 @@ SINT32		i, j, k;
 	Write_Debug("Edit list has been minimized and ordered");
 }
 
-LOGICAL trnldrInit(void)
+LOGICAL trnldrInit()
 {
 SINT8	filename[MAX_PATH], mapname[64];
 SINT32	i;
@@ -473,7 +473,7 @@ SINT32	i;
 	return(TRUE);
 }
 
-void trnldrKill(void)
+void trnldrKill()
 {
 SINT32	i;
 
@@ -3175,7 +3175,7 @@ TERRAIN_DETAIL*	td;
 	return(retval);
 }
 
-LOGICAL trnldrUpdate(void)
+LOGICAL trnldrUpdate()
 {
 LOGICAL		retval;
 UINT32		start, elapse, numticks;
@@ -3396,7 +3396,7 @@ static SINT32		cell=0;
 	return(TRUE);
 }
 
-LOGICAL trnldrFinishUpdate(void)
+LOGICAL trnldrFinishUpdate()
 {
 LOGICAL		retval;
 SINT32		cell=0;
@@ -3452,7 +3452,7 @@ UINT32		iterations=0;
 	return(TRUE);
 }
 
-LOGICAL trnldrFinishUpdateRelocate(void)
+LOGICAL trnldrFinishUpdateRelocate()
 {
 LOGICAL		retval;
 SINT32		cell=0;

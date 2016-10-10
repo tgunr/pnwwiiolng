@@ -88,20 +88,6 @@ static inline struct tm *localtime_r(const time_t *t, struct tm *b) { localtime_
 #include "include/precompile_includes.h"
 #include "sys/sysWinISO.h"
 
-// snprintf wrapper
-template<size_t bufSize, typename... Args>
-UINT32 strprintf(char(&buf)[bufSize], const char* fmt, Args&&... args)
-{
-    return static_cast<UINT32>(snprintf(buf, bufSize, fmt, std::forward<Args>(args)...));
-}
-
-// Cross-platform path builder.
-template<size_t bufSize>
-UINT32 pathprintf(char (&buf)[bufSize], const char* lhs, const char* rhs)
-{
-	return strprintf<bufSize>(buf, "%s/%s", lhs, rhs);
-}
-
 #if defined(AS_SERVER)
 #ifndef PATH_MAX
 #define PATH_MAX 256

@@ -19,16 +19,11 @@
 #include "chat/chatSquadControlResults.h"
 #include "chat/chatSquadMemberUpdates.h"
 #include "chat/chatTypes.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseConstants.h"
 #include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
 #include "teul/teulEndpointDefs.h"
 #include "teul/teulKit.h"
 #include "teul/teulPackers.h"
-
-extern DBHANDLE dbh;
-extern DBCONNECTION dbConnection;
 
 //////////////////////////////////////////////////////////////////////
 // Read a squad's details

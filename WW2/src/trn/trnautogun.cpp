@@ -66,7 +66,7 @@ trnAutoGun _AutoGunHead;
 
 static LOGICAL _MoveGun(trnAutoGun * AG,piVECTOR* AimAtt);
 static LOGICAL _SetupElevAndTraverse(OBJECT * Object, piMATRIX * TravMat, piMATRIX * ElevMat);
-static LOGICAL _ReadAndSetupAutogunTypes(void);
+static LOGICAL _ReadAndSetupAutogunTypes();
 static LOGICAL _SetupWeapon(weapWeapon* Weapon,SINT8 * WeaponName, SINT8 * BeltFile);
 static LOGICAL _UpdateWeapon(trnAutoGun * AG);
 static LOGICAL _AimGunAtTargetPnt(trnAutoGun * AG,FLOAT64VECTOR * AimPnt);
@@ -79,7 +79,7 @@ static LOGICAL _FireInstantRoundAndGetDisplacement(trnAutoGun* AG,piVECTOR * Aim
 
 static bool _updateAI = true;
 
-LOGICAL trnInitAutogunSystem(void)
+LOGICAL trnInitAutogunSystem()
 {
 	_ReadAndSetupAutogunTypes();
 
@@ -88,7 +88,7 @@ LOGICAL trnInitAutogunSystem(void)
 	return TRUE;
 }
 
-static LOGICAL _ReadAndSetupAutogunTypes(void)
+static LOGICAL _ReadAndSetupAutogunTypes()
 {
     trnAutoGunType * AGT = nullptr;
     UINT32 Country = 0;
@@ -373,7 +373,7 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 }
 
 
-LOGICAL trnKillAutogunSystem(void)
+void trnKillAutogunSystem()
 {
 	// note: if there are any autoguns left to kill, we've got a problem
 	if (_AutoGunHead.next != nullptr)
@@ -382,20 +382,13 @@ LOGICAL trnKillAutogunSystem(void)
 		Write_Debug("Autoguns remaining after trnldrkill!!!!!");
 		Write_Debug("******************");
 	}
-
-	return TRUE;
 }
 
-LOGICAL trnKillAutogun(trnAutoGun** ppAutoGun)
+void trnKillAutogun(trnAutoGun** ppAutoGun)
 {
-trnAutoGun* pAutoGun = nullptr;
-
-	pAutoGun = *ppAutoGun;
-
+	trnAutoGun* pAutoGun = *ppAutoGun;
 	if (pAutoGun == nullptr)
-	{
-		return FALSE;
-	}
+		return;
 
 	if (pAutoGun->FireSoundId > 0)
 	{
@@ -417,8 +410,6 @@ trnAutoGun* pAutoGun = nullptr;
 
 	delete pAutoGun->Weapon;
 	memFree(pAutoGun);
-
-	return TRUE;
 }
 
 LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
@@ -462,9 +453,8 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 		Write_Debug("Unable to allocate memory for autogun");
 		return FALSE;
 	}
-	memset(AG,0,sizeof(trnAutoGun));
 
-	AG->Weapon = new weapWeapon;
+	AG->Weapon = new weapWeapon{};
 	if (AG->Weapon == nullptr)
 	{
 		Write_Debug("Unable to allocate weapon space memory for autogun");
@@ -671,7 +661,7 @@ void trnautogunToggleAI()
 #endif
 }
 
-LOGICAL trnUpdateAutoGuns(void)
+LOGICAL trnUpdateAutoGuns()
 {
     trnAutoGun* AG = nullptr;
     trnAutoGun* AGSaved = nullptr;

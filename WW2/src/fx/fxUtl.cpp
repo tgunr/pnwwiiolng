@@ -52,7 +52,7 @@ struct MATERIALPROP
 
 };
 
-typedef std::map<std::string, MATERIALPROP *> MaterialPropertiesMap;
+using MaterialPropertiesMap = std::map<std::string, MATERIALPROP *>;
 static MaterialPropertiesMap g_materialProperties;
 
 static SINT32 xmlinputmatch(const SCHAR* name) {return 1;}

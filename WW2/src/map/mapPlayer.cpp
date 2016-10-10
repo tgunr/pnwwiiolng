@@ -53,10 +53,10 @@
 #include "teul/teulUtils.h"
 #include "wwii/wwiiAntiAddiction.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiHash.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRTBCodes.h"
-#include "wwii/wwiiThreads.h"
 
 #include "include/logging.h"
 #include "teul/teulMicroWebServer.h"
@@ -455,7 +455,7 @@ mapCheckSideCounts()
 
 #if defined(BETA_RELEASE) || defined(PUBLIC_RELEASE)
 		DBThread::Do(DBThread::Audit
-			, "INSERT IGNORE INTO player_counts"
+			, "INSERT INTO `audit`.`player_counts`"
 					" (stamp,undecided,allied,axis,spawned_allied,spawned_axis,allied_favor,axis_favor,delay)"
 				"VALUES"
 					" (now(),%u,%u,%u,%u,%u,%d,%d,%u)"
@@ -725,7 +725,7 @@ Player::calculateMissionResults(MM_PERS_STATE toState)
 		return false;
 	}
 
-	const FULL_OBJ_ID& origin = missionPacket().sortie().originFac();
+	const FULL_OBJ_ID origin = missionPacket().sortie().originFac();
 	const FacilityStruct* const facility = strtGetFacility(origin);
 	if ( facility == nullptr )
 	{
@@ -1165,7 +1165,7 @@ Player::onDespawn(SINT32 onTeulIndex)
 // Tell the player that their post [request] has been denied.
 
 void
-Player::postDenied(const WEAPON_SPEC& forWeapon, UINT32 forReasonCode, bool loseWeapon)
+Player::postDenied(const WEAPON_SPEC forWeapon, UINT32 forReasonCode, bool loseWeapon)
 {
 	BETAInfo(teulIndex());
 
@@ -1181,7 +1181,7 @@ Player::postDenied(const WEAPON_SPEC& forWeapon, UINT32 forReasonCode, bool lose
 // called by _recvMMFacilityCapacityResponse in strtMapMessages.cpp
 
 void
-Player::processCapacityResponse(const FULL_OBJ_ID& rtbFacility_, const WEAPON_SERIAL& reservedWeapon_, const bool vehicleDelivered_)
+Player::processCapacityResponse(const FULL_OBJ_ID rtbFacility_, const WEAPON_SERIAL& reservedWeapon_, const bool vehicleDelivered_)
 {
 	setReceivedCapacity(true);
 

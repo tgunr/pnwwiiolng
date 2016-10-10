@@ -4,7 +4,7 @@
 #include "xml/XMLLoader2.h"
 
 // types
-typedef std::map<std::string,Scenario*> SCENARIO_MAP;
+using SCENARIO_MAP = std::map<std::string,Scenario*>;
 
 // local variables
 static SCENARIO_MAP _cache;

@@ -1,12 +1,12 @@
 #pragma once
 
 namespace Server { enum class ReleaseType; }
-typedef SINT32 (PLAYER_RELEASE_FUNCTION) ( SINT32 teulIndex, UINT32 customerID, UINT32 otp, Server::ReleaseType releaseType );
+using PLAYER_RELEASE_FUNCTION = SINT32(*)( SINT32 teulIndex, UINT32 customerID, UINT32 otp, Server::ReleaseType releaseType );
 
 SINT32 authInitAccept(UINT32 appVersion
-					, PLAYER_ACCEPT_FUNCTION* reloginAcceptFn
-					, PLAYER_RELEASE_FUNCTION* releaseFn
-					, ERROR_FUNCTION* externErrorFn);
+					, PLAYER_ACCEPT_FUNCTION reloginAcceptFn
+					, PLAYER_RELEASE_FUNCTION releaseFn
+					, ERROR_FUNCTION externErrorFn);
 
 bool authRecordDispatch(Auth::Dispatch* dispatch, bool fromAuth);
 

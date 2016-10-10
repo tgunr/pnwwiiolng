@@ -39,11 +39,11 @@ public:
 	UINT32				m_vehicleID;		//!< ID of vehicle we are attached to or 0.
 
 private:
-	typedef std::unordered_map<UINT32, UINT32> SPAWNEES;
+	using SPAWNEES = std::unordered_map<UINT32, UINT32>;
 	mutable SPAWNEES	m_spawnees;
 };
 
 // Process an incoming mobile spawn update packet
-extern void missMobileSpawnCancel(UINT32 missionID, const ChatHandle& ownerID, SINT32 x, SINT32 y);
-extern void missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle& handle, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, UINT32 stoUID);
+extern void missMobileSpawnCancel(UINT32 missionID, const ChatHandle ownerID, SINT32 x, SINT32 y);
+extern void missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle handle, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, UINT32 stoUID);
 

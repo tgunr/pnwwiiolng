@@ -14,7 +14,7 @@ Description:
 
 #include <map>
 
-typedef std::map<int, ref_ptr<Texture> > ldTextureMap;
+using ldTextureMap = std::map<int, ref_ptr<Texture>>;
 static ldTextureMap* Textures = new ldTextureMap(); // crash on exit on Mac avoided
 
 extern Image* ReadDDSFile(const std::string& name);

@@ -6,7 +6,7 @@
 // LOGICAL return functions.
 ////////////////////////////
 extern LOGICAL loclLangInit(ENUM_LANGUAGES enumLang);
-extern LOGICAL loclLangKill();
+extern void loclLangKill();
 extern LOGICAL loclGetString(ENUM_CATEGORIES e, UINT32 uID, const SCHAR** returnStr);
 
 ////////////////////////////

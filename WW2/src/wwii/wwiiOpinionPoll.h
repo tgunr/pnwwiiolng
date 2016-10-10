@@ -43,7 +43,7 @@ public:	// Members
 	char		m_strings[_MAX_STRINGS][_MAX_STRING_LEN];
 };
 
-typedef teul_network_object<OpinionPoll> OPINION_POLL_MSG;
+using OPINION_POLL_MSG = teul_network_object<OpinionPoll>;
 
 class OpinionChoice
 {
@@ -63,4 +63,4 @@ private:
 	UINT32		m_choice;
 };
 
-typedef teul_network_object<OpinionChoice> OPINION_CHOICE_MSG;
+using OPINION_CHOICE_MSG = teul_network_object<OpinionChoice>;

@@ -53,7 +53,7 @@
 #include "SpatialDB.h"
 #endif
 
-typedef std::map<OBJECT*, trnCDTerrainObject *> mapOBJList;
+using mapOBJList = std::map<OBJECT*, trnCDTerrainObject *>;
 mapOBJList mapOBJ; // All objects associated with a TO
 
 //#define xANDREWCOLLISIONTESTS
@@ -62,19 +62,19 @@ mapOBJList mapOBJ; // All objects associated with a TO
 
 static LOGICAL g_bCheckTreeBox;
 
-typedef struct tagTERRAINID
+struct TERRAINID
 {
     SINT32 x;
     SINT32 y;
     UINT32 stratID;
-} TERRAINID;
+};
 
-typedef std::map<TERRAINID, trnCDTerrainObject *> mapTOList;
+using mapTOList = std::map<TERRAINID, trnCDTerrainObject *>;
 
 static mapTOList mapTO; // Non spawn objects
 static mapTOList mapSpawnTO; // Spawn objects only
 
-typedef std::set<trnCDTerrainObject*> ODEQueueSet;
+using ODEQueueSet = std::set<trnCDTerrainObject*>;
 static ODEQueueSet odeQueue;
 
 static bool _updateCollideLists = false;
@@ -83,7 +83,7 @@ static bool _updateCollideLists = false;
 static std::unordered_set<std::string> _buildingsWithSpawnData;
 
 // Mapping of dof names to the weapon specs allowed to spawn there.
-typedef std::map<std::string, std::vector<UINT32> > dofToWeapSpecs;
+using dofToWeapSpecs = std::map<std::string, std::vector<UINT32>>;
 static std::map<std::string, dofToWeapSpecs> _buildingToDofToClass;
 
 
@@ -133,18 +133,17 @@ bool trnCDTerrainObject::IsCollidable(UINT32 cflags)
 // terrain object collision detection stuff
 
 
-typedef struct tagStratMessageQue
+struct _StratMessageQue
 {
-	struct tagStratMessageQue* prev;
-	struct tagStratMessageQue* next;
+	_StratMessageQue* prev;
+	_StratMessageQue* next;
 
 	SINT32 scx;
 	SINT32 scy;
 	UINT32 Id;
 	SINT32 Country;
 	SINT32 VisLevel;
-
-} _StratMessageQue;
+};
 
 // This was decreased from 24000 because
 // we load in a lot fewer terrain objects now.
@@ -199,7 +198,7 @@ static UINT32 _SetDamageLevel(OBJECT* Object,UINT32 DamageLevel);
 static UINT32 _SetTOObjectCountry(OBJECT * Object, SINT32 Country, UINT32 IncludeSibs);
 static UINT32 _AddStratMsgToQue(SINT32 scx,SINT32 scy,UINT32 Id,SINT32 Country,SINT32 VisLevel);
 
-static _StratMessageQue * _GetNewStratMsg(void);
+static _StratMessageQue * _GetNewStratMsg();
 static UINT32 _FreeStratMsg(_StratMessageQue * StratMsg);
 static UINT32 _RemoveStratMsgFromList(_StratMessageQue * StratMsg);
 static UINT32 _AddStratMsgToFreeList(_StratMessageQue * StratMsg);
@@ -238,7 +237,7 @@ static void HighliteView(piVECTOR* pv, DWORD color)
 
 #endif
 
-static _StratMessageQue * _GetNewStratMsg(void)
+static _StratMessageQue * _GetNewStratMsg()
 {
 _StratMessageQue * StratMsg;
 
@@ -561,7 +560,7 @@ static void _ScanAndSetupFlags(OBJECT* Object)
 	while (Object != nullptr);
 }
 
-UINT32 trncdInit(void)
+UINT32 trncdInit()
 {
 	trnmainSetObjectCreationCallback(trncdAddTerrainObject);
 	trnmainSetObjectDeletionCallback(trncdRemoveTerrainObject);
@@ -606,7 +605,7 @@ UINT32 trncdInit(void)
 	return 0;
 }
 
-UINT32 trncdKill(void)
+UINT32 trncdKill()
 {
     if(!mapTO.empty())
     {
@@ -755,9 +754,8 @@ static UINT32 _GetNewCDTerrainObject(trnCDTerrainObject** TerrainObject)
     {
         *TerrainObject = freeToObjects.front();
         freeToObjects.pop_front();
-    }
-
-	memset(*TerrainObject, 0, sizeof(trnCDTerrainObject));
+		memset(*TerrainObject, 0, sizeof(trnCDTerrainObject));
+	}
 
 	if(_AddToListHead(*TerrainObject) == 1)
 	{
@@ -6194,12 +6192,12 @@ LOGICAL trncdCollideDownMediumList(piVECTOR* OldPos, piVECTOR* NewPos, UINT32 Fl
 	return(FALSE);
 }
 
-UINT32 trncdGetNumTOs(void)
+UINT32 trncdGetNumTOs()
 {
 	return _NumTO;
 }
 
-UINT32 trncdUpdateStratMsgQue(void)
+UINT32 trncdUpdateStratMsgQue()
 {
 _StratMessageQue * StratMsg;
 _StratMessageQue * PrevStratMsg;
@@ -6252,7 +6250,7 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
         return FALSE;
 
 	piVECTOR OldPos,NewPos;
-	FASTCOLLIDE CollisionList[32];
+	FASTCOLLIDE CollisionList[32]{};
 	FASTCOLLIDE * CollideListPtr;
 	UINT32 TempNum;
 	UINT32 NumCollides;
@@ -6268,8 +6266,6 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
 
 	TempNum = 32;
 	CollideListPtr = CollisionList;
-
-	memset (CollisionList, 0, sizeof (CollisionList));
 
 	NumCollides = 0;
 
@@ -6463,18 +6459,18 @@ void trncdResetFXDamageFlags()
 	trncdDTLCollider
 *************************************************************************************************/
 
-typedef struct trncdDTLCollider
+struct trncdDTLCollider
 {
 	UCHAR IsReplacementOctet[SUPERCELL_OCTETS_XY];
 	OBJECT* txtobj[SUPERCELL_OCTETS_XY];
-} trncdDTLCollider;
+};
 
-typedef struct
+struct collideGrid
 {
 	float originX, originY; // bottom left
 	float cellSizeX, cellSizeY;
 	int   numcols, numrows;
-} collideGrid;
+};
 
 static int collideWithSuperCell(TERRAIN_DETAIL* td, FASTCOLLIDE* collisionList, SINT32 maxcols,
 									piVECTOR const* start, piVECTOR const* end);
@@ -6495,7 +6491,7 @@ static void drawOctetDebug(TERRAIN_DETAIL*, int ox, int oy, int trinum, piVECTOR
 	trncdDTLColliderAlloc
 *************************************************************************************************/
 
-trncdDTLColliderRef trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
+trncdDTLCollider* trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
 {
 	if(td == nullptr) return nullptr;
 	if(td->trindx != SUPERCELL_OCTETS_XY)
@@ -6505,7 +6501,7 @@ trncdDTLColliderRef trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
 		piExitProgram(_FL, s);
 	}
 
-	trncdDTLColliderRef ref = (trncdDTLColliderRef)memAlloc(sizeof(trncdDTLCollider));
+	auto* ref = (trncdDTLCollider*)memAlloc(sizeof(trncdDTLCollider));
 
 	if(ref)
 	{
@@ -6534,7 +6530,7 @@ trncdDTLColliderRef trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
 	trncdDTLColliderFree
 *************************************************************************************************/
 
-void trncdDTLColliderFree(trncdDTLColliderRef ref)
+void trncdDTLColliderFree(trncdDTLCollider* ref)
 {
 	if(ref)
 		memFree(ref);

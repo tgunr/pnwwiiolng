@@ -92,6 +92,7 @@ struct ClientRole : public Role
 	virtual int RegisterCallbacks() override
 	{
 		BEGIN_CALLBACK_REGISTRATION(Role::Test_X)
+		{
 			REGISTER_RECVSEND(Role::Hello_Y, recvHello, sendHello, s_cbHello);
 
 			REGISTER_RECVSEND(Role::HelloRel_Y, recvHello, sendHello, s_cbRelHello);
@@ -109,8 +110,8 @@ struct ClientRole : public Role
 			REGISTER_SENDER(Role::Unregistered_Y, CallbackRegister::NoDataHandler, s_cbUnregistered);
 
 			REGISTER_RECEIVER(Role::LargePacketAck_Y, recvLargePacketAck);
-
-		END_CALLBACK_REGISTRATION
+		}
+		END_CALLBACK_REGISTRATION(Role::Test_X)
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -182,7 +183,7 @@ struct ClientRole : public Role
 		outgoing.m_type = type;
 		outgoing.m_size = rand();
 		outgoing.m_count = 64 + rand() % 64;
-        memset(outgoing.m_data, 0, sizeof(outgoing.m_data));
+		memset(outgoing.m_data, 0, sizeof(outgoing.m_data));
 
 		if ( (EchoPacketHeader::s_requested % 1000) == 0 )
 		{

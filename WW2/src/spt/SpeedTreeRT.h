@@ -390,24 +390,24 @@ public:
         //  Memory management
 
 static  void          CALL_CONV SetAllocator(CSpeedTreeAllocator* pAllocator);
-static  size_t        CALL_CONV GetHeapUsage(void); // in bytes
+static  size_t        CALL_CONV GetHeapUsage(); // in bytes
         void*                   operator new(size_t sBlockSize);
         void*                   operator new[](size_t sBlockSize);
         void                    operator delete(void* pBlock);
         void                    operator delete[](void* pBlock);
 
 static  void          CALL_CONV SetMemoryPreference(EMemoryPreference eMemPref);
-static  EMemoryPreference CALL_CONV GetMemoryPreference(void);
+static  EMemoryPreference CALL_CONV GetMemoryPreference();
 
 
         ///////////////////////////////////////////////////////////////////////
         //  Specifying a tree model
 
         bool                    Compute(const float* pTransform = 0, unsigned int nSeed = 1, bool bCompositeStrips = true);
-        CSpeedTreeRT*           Clone(void) const;
-        const CSpeedTreeRT*     InstanceOf(void) const;
-        CSpeedTreeRT*           MakeInstance(void);
-        void                    DeleteTransientData(void);
+        CSpeedTreeRT*           Clone() const;
+        const CSpeedTreeRT*     InstanceOf() const;
+        CSpeedTreeRT*           MakeInstance();
+        void                    DeleteTransientData();
 
         bool                    LoadTree(const char* pFilename);
         bool                    LoadTree(const unsigned char* pBlock, unsigned int nNumBytes);
@@ -415,9 +415,9 @@ static  EMemoryPreference CALL_CONV GetMemoryPreference(void);
 
         void                    GetTreeSize(float& fSize, float& fVariance) const;
         void                    SetTreeSize(float fNewSize, float fNewVariance = 0.0f);
-        unsigned int            GetSeed(void) const;
+        unsigned int            GetSeed() const;
 
-        const float*            GetTreePosition(void) const;
+        const float*            GetTreePosition() const;
         void                    SetTreePosition(float x, float y, float z);
 
         void                    SetLeafTargetAlphaMask(unsigned char ucMask = 0x54);
@@ -427,16 +427,16 @@ static  EMemoryPreference CALL_CONV GetMemoryPreference(void);
         //  Lighting
 
         //  lighting style
-        ELightingMethod         GetBranchLightingMethod(void) const;
+        ELightingMethod         GetBranchLightingMethod() const;
         void                    SetBranchLightingMethod(ELightingMethod eMethod);
-        ELightingMethod         GetLeafLightingMethod(void) const;
+        ELightingMethod         GetLeafLightingMethod() const;
         void                    SetLeafLightingMethod(ELightingMethod eMethod);
-        ELightingMethod         GetFrondLightingMethod(void) const;
+        ELightingMethod         GetFrondLightingMethod() const;
         void                    SetFrondLightingMethod(ELightingMethod eMethod);
 
-        EStaticLightingStyle    GetStaticLightingStyle(void) const;
+        EStaticLightingStyle    GetStaticLightingStyle() const;
         void                    SetStaticLightingStyle(EStaticLightingStyle eStyle);
-        float                   GetLeafLightingAdjustment(void) const;
+        float                   GetLeafLightingAdjustment() const;
         void                    SetLeafLightingAdjustment(float fScalar);
 
         //  global lighting state
@@ -446,11 +446,11 @@ static  const float*  CALL_CONV GetLightAttributes(unsigned int nLightIndex);
 static  void          CALL_CONV SetLightAttributes(unsigned int nLightIndex, const float afLightAttributes[16]);
 
         //  materials
-        const float*            GetBranchMaterial(void) const;
+        const float*            GetBranchMaterial() const;
         void                    SetBranchMaterial(const float afMaterial[13]);
-        const float*            GetFrondMaterial(void) const;
+        const float*            GetFrondMaterial() const;
         void                    SetFrondMaterial(const float afMaterial[13]);
-        const float*            GetLeafMaterial(void) const;
+        const float*            GetLeafMaterial() const;
         void                    SetLeafMaterial(const float afMaterial[13]);
 
         //  shader lighting support
@@ -470,20 +470,20 @@ static  void          CALL_CONV GetCameraAngles(float& fAzimuth, float& fPitch);
 
 static  void          CALL_CONV SetTime(float fTime);
         void                    ComputeWindEffects(bool bBranches, bool bLeaves, bool bFronds = true);
-        void                    ResetLeafWindState(void);
+        void                    ResetLeafWindState();
 
-        bool                    GetLeafRockingState(void) const;
+        bool                    GetLeafRockingState() const;
         void                    SetLeafRockingState(bool bFlag);
         void                    SetNumLeafRockingGroups(unsigned int nRockingGroups);
 
-        EWindMethod             GetLeafWindMethod(void) const;
+        EWindMethod             GetLeafWindMethod() const;
         void                    SetLeafWindMethod(EWindMethod eMethod);
-        EWindMethod             GetBranchWindMethod(void) const;
+        EWindMethod             GetBranchWindMethod() const;
         void                    SetBranchWindMethod(EWindMethod eMethod);
-        EWindMethod             GetFrondWindMethod(void) const;
+        EWindMethod             GetFrondWindMethod() const;
         void                    SetFrondWindMethod(EWindMethod eMethod);
 
-        float                   GetWindStrength(void) const;
+        float                   GetWindStrength() const;
         float                   SetWindStrength(float fNewStrength, float fOldStrength = -1.0f, float fFrequencyTimeOffset = -1.0f);
         void                    SetWindStrengthAndLeafAngles(float fNewStrength, const float* pRockAngles = 0, const float* pRustleAngles = 0, unsigned int uiNumRockAngles = 0);
 
@@ -496,8 +496,8 @@ static  void          CALL_CONV SetWindMatrix(unsigned int nMatrixIndex, const f
         ///////////////////////////////////////////////////////////////////////
         //  LOD
 
-        void                    ComputeLodLevel(void);
-        float                   GetLodLevel(void) const;
+        void                    ComputeLodLevel();
+        float                   GetLodLevel() const;
         void                    SetLodLevel(float fLodLevel);
 static  void          CALL_CONV SetDropToBillboard(bool bFlag);
         void                    GetLodValues(SLodValues& sLodValues, float fLodLevel = -1.0f);
@@ -509,21 +509,21 @@ static  void          CALL_CONV SetDropToBillboard(bool bFlag);
         int                     GetDiscreteLeafLodLevel(float fLodLevel = -1.0f) const;
         int                     GetDiscreteFrondLodLevel(float fLodLevel = -1.0f) const;
 
-        int                     GetNumBranchLodLevels(void) const;
-        int                     GetNumLeafLodLevels(void) const;
-        int                     GetNumFrondLodLevels(void) const;
+        int                     GetNumBranchLodLevels() const;
+        int                     GetNumLeafLodLevels() const;
+        int                     GetNumFrondLodLevels() const;
 
 static  void          CALL_CONV SetHorzBillboardFadeAngles(float fStart, float fEnd); // in degrees
 static  void          CALL_CONV GetHorzBillboardFadeAngles(float& fStart, float& fEnd); // in degrees
-static  float         CALL_CONV GetHorzBillboardFadeValue(void); // 0.0 = transparent, 1.0 = opaque
+static  float         CALL_CONV GetHorzBillboardFadeValue(); // 0.0 = transparent, 1.0 = opaque
 
 
         ///////////////////////////////////////////////////////////////////////
         //  Geometry
 
-        void                    DeleteBranchGeometry(void);
-        void                    DeleteFrondGeometry(void);
-        void                    DeleteLeafGeometry(void);
+        void                    DeleteBranchGeometry();
+        void                    DeleteFrondGeometry();
+        void                    DeleteLeafGeometry();
         unsigned char*          GetFrondGeometryMapIndexes(int nLodLevel) const;
         const float*            GetLeafBillboardTable(unsigned int& nNumEntries) const;
         void                    GetGeometry(SGeometry& sGeometry, unsigned int uiBitVector = SpeedTree_AllGeometry);
@@ -539,7 +539,7 @@ static  void                    UpdateBillboardLighting(SGeometry::S360Billboard
 static  const char*             GetTextureLayerName(ETextureLayers eLayer);
         void                    SetLeafTextureCoords(unsigned int nLeafMapIndex, const float afTexCoords[8]);
         void                    SetFrondTextureCoords(unsigned int nFrondMapIndex, const float afTexCoords[8]);
-static  bool          CALL_CONV GetTextureFlip(void);
+static  bool          CALL_CONV GetTextureFlip();
 static  void          CALL_CONV SetTextureFlip(bool bFlag);
         void                    SetBranchTextureFilename(const char* pFilename);
         void                    SetLeafTextureFilename(unsigned int nLeafMapIndex, const char* pFilename);
@@ -550,10 +550,10 @@ static  void          CALL_CONV SetTextureFlip(bool bFlag);
         //  Statistics & information
 
 static  bool          CALL_CONV Authorize(const char* pKey);
-static  bool          CALL_CONV IsAuthorized(void);
-static  const char*   CALL_CONV GetCurrentError(void);
-static  void          CALL_CONV ResetError(void);
-static  const char*   CALL_CONV Version(void);
+static  bool          CALL_CONV IsAuthorized();
+static  const char*   CALL_CONV GetCurrentError();
+static  void          CALL_CONV ResetError();
+static  const char*   CALL_CONV Version();
 
         void                    GetBoundingBox(float afBounds[6]) const;
         int                     GetNumLeafTriangles(float fLodLevel = -1.0f);
@@ -564,8 +564,8 @@ static  const char*   CALL_CONV Version(void);
         ///////////////////////////////////////////////////////////////////////
         //  Collision objects
 
-    int                     GetNumCapsuleCollisionObjects(void); // added by playnet
-        int                     GetNumCollisionObjects(void);
+    int                     GetNumCapsuleCollisionObjects(); // added by playnet
+        int                     GetNumCollisionObjects();
         void                    GetCollisionObject(unsigned int nIndex, ECollisionObjectType& eType, float afPosition[3], float afDimensions[3], float afEulerAngles[3]);
         void                    ScaleCollisionObjects(float fScale);
 
@@ -573,13 +573,13 @@ static  const char*   CALL_CONV Version(void);
         ///////////////////////////////////////////////////////////////////////
         //  User Data
 
-        const char*             GetUserData(void) const;
+        const char*             GetUserData() const;
 
 private:
         CSpeedTreeRT(const CSpeedTreeRT* pOrig);
 
-        void                    ComputeLeafStaticLighting(void);
-        void                    ComputeSelfShadowTexCoords(void);
+        void                    ComputeLeafStaticLighting();
+        void                    ComputeSelfShadowTexCoords();
 static  void          CALL_CONV NotifyAllTreesOfEvent(int nMessage);
 static  void          CALL_CONV SetError(const char* pError);
 
@@ -607,7 +607,7 @@ static  void          CALL_CONV SetError(const char* pError);
         void                    SaveSupplementalLodInfo(CTreeFileAccess& cFile) const;
         void                    ParseSupplementalLodInfo(CTreeFileAccess& cFile);
 
-        void                    RecoverDeprecatedMaps(void);
+        void                    RecoverDeprecatedMaps();
 static  char*         CALL_CONV CopyUserData(const char* pData);
 
 
@@ -618,7 +618,7 @@ static  char*         CALL_CONV CopyUserData(const char* pData);
         void                    GetFrondGeometry(SGeometry& sGeometry);
         void                    GetLeafGeometry(SGeometry& sGeometry);
         void                    GetBillboardGeometry(SGeometry& sGeometry);
-        void                    SetupHorizontalBillboard(void);
+        void                    SetupHorizontalBillboard();
         float                   ComputeLodCurve(float fStart, float fEnd, float fPercent, bool bConcaveUp);
         float                   ComputeLodCurveBB(float fStart, float fEnd, float fPercent);
 
@@ -738,7 +738,7 @@ friend  class CSpeedWindDef;
         CSpeedWind&         operator=(const CSpeedWind& cRight);
 
         // parameter setting
-        void                Reset(void);
+        void                Reset();
         void                SetQuantities(int iNumWindMatrices, int iNumLeafAngles);
         void                SetWindResponse(float fResponse, float fReponseLimit);
         void                SetWindStrengthAndDirection(float fWindStrength, float fWindDirectionX, float fWindDirectionY, float fWindDirectionZ);
@@ -754,23 +754,23 @@ friend  class CSpeedWindDef;
         void                GetQuantities(int& iNumWindMatrices, int& iNumLeafAngles) const;
         void                GetWindResponse(float& fResponse, float& fReponseLimit) const;
         void                GetWindStrengthAndDirection(float& fWindStrength, float& fWindDirectionX, float& fWindDirectionY, float& fWindDirectionZ) const;
-        float               GetMaxBendAngle(void) const;
+        float               GetMaxBendAngle() const;
         void                GetExponents(float& fBranchExponent, float& fLeafExponent) const;
         void                GetGusting(float& fGustStrengthMin, float& fGustStrengthMax, float& fGustFrequency, float& fGustDurationMin, float& fGustDurationMax) const;
         void                GetBranchHorizontal(float& fLowWindAngle, float& fHighWindAngle, float& fLowWindSpeed, float& fHighWindSpeed) const;
         void                GetBranchVertical(float& fLowWindAngle, float& fHighWindAngle, float& fLowWindSpeed, float& fHighWindSpeed) const;
         void                GetLeafRocking(float& fLowWindAngle, float& fHighWindAngle, float& fLowWindSpeed, float& fHighWindSpeed) const;
         void                GetLeafRustling(float& fLowWindAngle, float& fHighWindAngle, float& fLowWindSpeed, float& fHighWindSpeed) const;
-        float               GetTime(void) const;
+        float               GetTime() const;
 
         // render interface
         void                Advance(float fCurrentTime, bool bUpdateMatrices = true, bool bUpdateLeafAngleMatrices = false, float fCameraX = 0.0f, float fCameraY = 0.0f, float fCameraZ = 1.0f);
-        void                UpdateSpeedTreeRT(void) const;
+        void                UpdateSpeedTreeRT() const;
         void                UpdateTree(CSpeedTreeRT* pTree) const;
-        float               GetFinalStrength(void);
-        unsigned int        GetNumWindMatrices(void) const;
+        float               GetFinalStrength();
+        unsigned int        GetNumWindMatrices() const;
         const float*        GetWindMatrix(unsigned int uiIndex) const;
-        unsigned int        GetNumLeafAngleMatrices(void) const;
+        unsigned int        GetNumLeafAngleMatrices() const;
         const float*        GetLeafAngleMatrix(unsigned int uiIndex) const;
         bool                GetRustleAngles(float* pAngles) const; // assumes pointer to already-allocated memory
         bool                GetRockAngles(float* pAngles) const; // assumes pointer to already-allocated memory
@@ -780,7 +780,7 @@ friend  class CSpeedWindDef;
         bool                Load(const char* pData, unsigned int uiNumBytes);
         bool                Save(const char* pFilename) const;
         const char*         Save(unsigned int& uiNumBytes) const;
-        const char*         GetFilename(void) const;
+        const char*         GetFilename() const;
 
         // blending SpeedWinds into this one
         void                InterpolateTarget(const CSpeedWind* pWind1, const CSpeedWind* pWind2, float fInterpolation);

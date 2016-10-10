@@ -22,7 +22,7 @@ public:
 };
 
 class Viewing;
-typedef std::vector<Viewing> Viewings;
+using Viewings = std::vector<Viewing>;
 
 class HostVehicleImpl;
 struct WEAPON;
@@ -30,7 +30,7 @@ struct WEAPON;
 namespace Grid { class Cell; }
 namespace Teul { class Packet; }
 
-extern const char* chatGetCallsign(const ChatHandle& handle);
+extern const char* chatGetCallsign(const ChatHandle handle);
 
 /// @class	HostVehicle
 /// @brief	Describes an avatar (infantry, vehicle, etc) in the game world.
@@ -40,12 +40,12 @@ extern const char* chatGetCallsign(const ChatHandle& handle);
 class HostVehicle
 {
 public:
-	static HostVehicle* Lookup(const ChatHandle& handle);
+	static HostVehicle* Lookup(const ChatHandle handle);
 
 public:
 	void initialize(struct VEHICLE_HOLDER* _holder, class HostVehicleImpl* impl, UINT32 index, const struct WEAPON_SERIAL& ws, const struct WEAPON* weapon);
 
-	void acceptResupply(UINT32 fromSerial, const ChatHandle& fromHandle, HostVehicle* fromVehicle, const UINT32 fromCellIP);
+	void acceptResupply(UINT32 fromSerial, const ChatHandle fromHandle, HostVehicle* fromVehicle, const UINT32 fromCellIP);
 	class Player* activeCommander() const;
 //	void addVisListRemove(struct GRID_HOLDER* const);
 
@@ -88,11 +88,11 @@ public:
 	MissionPacket& missionPacket() { return m_missionPacket; }
 	const MissionPacket& missionPacket() const { return m_missionPacket; }
 //	void removeVehicleFromVisList(HostVehicle* vehicle);
-	void scoreResupply(const ChatHandle& ofHandle);
+	void scoreResupply(const ChatHandle ofHandle);
 	void selectBestFramingMode();
 	void sendCaptureContribution(Player* player, UINT32 status);
 	void sendCaptureState(const class CaptureState& capState);
-	void setInBuilding(const FULL_OBJ_ID& newBuilding);
+	void setInBuilding(FULL_OBJ_ID newBuilding);
 	void setInCaptureBuilding(bool newValue);
 	void setNextUpdate(UINT32 delay) { m_nextUpdateClock = teulClock64 + delay; }
 	UINT32 getOneTimeBitsFor(const HostVehicle* rhs) const;
@@ -104,7 +104,7 @@ public:
 	WEAPON_SERIAL& serial() { return vehicleData.wSerial; }
 	WWII_SIDE side() const { return m_side; }
 	UINT32 sortieID() const { return index; }	// For now ...
-	const WEAPON_SPEC& spec() const { return serial().spec; }
+	WEAPON_SPEC spec() const { return serial().spec; }
 	UINT32 spawnedTime() const { return ( m_spawnTime > 0 ) ? teulTime() - m_spawnTime : m_spawnTime; }
 	UINT32 squadID() const { return vehicleData.squad; }
 	void updateStrat(bool forceFullUpdate);
@@ -132,7 +132,7 @@ public:
 
 public:
 	// Interface functions
-	const ChatHandle& chatHandle() const { return vehicleData.packedCallsign; }
+	ChatHandle chatHandle() const { return vehicleData.packedCallsign; }
 
 public:
 	void setActive(bool newState) { m_isActive = newState; }
@@ -145,7 +145,7 @@ public:
 
 	// Presence functions.
 public:
-	const instanceid_t& instID() const { return m_instance.id(); }
+	instanceid_t instID() const { return m_instance.id(); }
 	SINT32 x_cm() const { return vehicleData.position.x(); }
 	SINT32 y_cm() const { return vehicleData.position.y(); }
 	SINT32 z_cm() const { return vehicleData.position.z(); }

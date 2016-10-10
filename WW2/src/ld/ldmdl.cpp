@@ -31,14 +31,14 @@ static LOGICAL	IsMergableBranchTopNode(OBJECT* node);
 
 static bool _reduceModel = false;
 
-typedef struct normalsListItem
+struct normalsListItem
 {
 	normalsListItem*	next;
 	OBJECT*		lpobj;
 	OBJECT*		lpatt;
 	SINT32			vcnt;
 
-} *lpnormalsListItem;
+};
 
 normalsListItem*		normalsList;
 
@@ -603,8 +603,6 @@ void ldmdlTangentArray(const piVECTOR* vertex,      // IN
     piVECTOR* tan1 = (piVECTOR*)memAlloc(sizeof(piVECTOR) * vertexCount * 2);
     piVECTOR* tan2 = tan1 + vertexCount;
 
-    memset(tan1, 0, vertexCount * sizeof(piVECTOR) * 2);
-
     *tangent = (piQUAT*)memAlloc(sizeof(piQUAT) * vertexCount);
 
     SINT32 indice = 0;
@@ -726,9 +724,6 @@ piQUAT* ldmdlTangentArray3(OBJECT* o)
     piVECTOR*	tan1 = (piVECTOR*)memAlloc(sizeof(piVECTOR) * numverts * 2);
     piVECTOR*	tan2 = tan1 + numverts;
     piQUAT*		tangentData = (piQUAT*)memAlloc(sizeof(piQUAT) * numverts);
-
-
-    memset(tan1, 0, numverts * sizeof(piVECTOR) * 2);
 
     UINT16 i1, i2, i3;
 
@@ -881,8 +876,6 @@ void ldmdlTangentArray2(const piCVERTEX* vertex,       // IN
     piVECTOR* tan2 = tan1 + vertexCount;
 
     *tangent = (piQUAT*)memAlloc(sizeof(piQUAT) * vertexCount);
-
-    memset(tan1, 0, vertexCount * sizeof(piVECTOR) * 2);
 
     SINT32 indice = 0;
 
@@ -2211,7 +2204,7 @@ static LOGICAL IsMergableBranchTopNode(OBJECT* node)
 
 inline bool operator==(const piUNIFIED_VERTEX &a, const piUNIFIED_VERTEX &b) { return !memcmp(&a, &b, sizeof(piUNIFIED_VERTEX)); }
 
-typedef std::multimap<size_t,ogl::VertexIdx> UniVertexIndexer;
+using UniVertexIndexer = std::multimap<size_t,ogl::VertexIdx>;
 
 //////////////////////////////////////////////////////////////////////
 //	ldmdlIndexVertices

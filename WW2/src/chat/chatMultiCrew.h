@@ -18,11 +18,11 @@ public:
 	MultiCrewEntry()
 		: m_handle(0LL), m_weapon(), m_serial(0), m_attachedTo(0LL)
 		, m_isRemoval(false), m_isPilot(false), m_isAvailable(false), m_visibility(_MISSION) {}
-	MultiCrewEntry(const ChatHandle& withHandle)			// Removal
+	MultiCrewEntry(const ChatHandle withHandle)			// Removal
 		: m_handle(withHandle), m_weapon(), m_serial(0), m_attachedTo(0LL)
 		, m_isRemoval(true), m_isPilot(false), m_isAvailable(false), m_visibility(_PRIVATE) {}
-	MultiCrewEntry(const ChatHandle& withHandle, bool withIsPilot, bool withIsAvailable, UCHAR withVisibility
-					, const WEAPON_SPEC& withWeapon, UINT32 withSerial, const ChatHandle& withAttachedTo)
+	MultiCrewEntry(const ChatHandle withHandle, bool withIsPilot, bool withIsAvailable, UCHAR withVisibility
+					, const WEAPON_SPEC withWeapon, UINT32 withSerial, const ChatHandle withAttachedTo)
 		: m_handle(withHandle), m_weapon(withWeapon), m_serial(withSerial), m_attachedTo(withAttachedTo)
 		, m_isRemoval(false), m_isPilot(withIsPilot), m_isAvailable(withIsAvailable), m_visibility(withVisibility)
 		{}
@@ -36,10 +36,10 @@ public:
 	bool isPilot() const { return m_isPilot; }
 	bool isAvailable() const { return m_isAvailable; }
 	UCHAR visibility() const { return m_visibility; }
-	const ChatHandle& handle() const { return m_handle; }
-	const WEAPON_SPEC& weapon() const { return m_weapon; }
+	ChatHandle handle() const { return m_handle; }
+	WEAPON_SPEC weapon() const { return m_weapon; }
 	UINT32 serial() const { return m_serial; }
-	const ChatHandle& attachedTo() const { return m_attachedTo; }
+	ChatHandle attachedTo() const { return m_attachedTo; }
 
 public:
 	// True if the player has a vehicle reserved
@@ -76,4 +76,4 @@ protected:
 	UCHAR		m_visibility;
 };
 
-typedef teul_network_array<MultiCrewEntry> MULTI_CREW_LIST;
+using MULTI_CREW_LIST = teul_network_array<MultiCrewEntry>;

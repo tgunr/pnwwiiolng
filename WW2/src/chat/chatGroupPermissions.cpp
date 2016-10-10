@@ -25,7 +25,7 @@ const ChatPermissions nullChatPermissions;
 
 static const UINT16 _MAX_GROUP_OID = (UINT16)~0;
 
-typedef std::map<UINT16, ChatPermissions> GROUP_PERMISSIONS;
+using GROUP_PERMISSIONS = std::map<UINT16, ChatPermissions>;
 GROUP_PERMISSIONS g_groupPermissions;
 
 struct PermissionGroup
@@ -33,7 +33,7 @@ struct PermissionGroup
 	UINT32			m_lastUsed;
 	ChatPermissions	m_permissions;		// What this produces.
 };
-typedef std::map<CHAT_GROUPS, PermissionGroup> PERMISSION_GROUP_CACHE;
+using PERMISSION_GROUP_CACHE = std::map<CHAT_GROUPS, PermissionGroup>;
 PERMISSION_GROUP_CACHE g_pgc;
 
 //////////////////////////////////////////////////////////////////////

@@ -16,8 +16,8 @@
 #include "strt/strtChatTypes.h"
 
 OOBMessage
-::OOBMessage(UINT32 playerID, UINT32 brigadeID, const ChatHandle& handleID, const char* command, const char* arguments
-				, const FULL_OBJ_ID& cpID, WWII_SIDE side, WWII_COUNTRY country)
+::OOBMessage(UINT32 playerID, UINT32 brigadeID, const ChatHandle handleID, const char* command, const char* arguments
+				, const FULL_OBJ_ID cpID, WWII_SIDE side, WWII_COUNTRY country)
 	: m_originatorID(playerID)
 	, m_brigadeID(brigadeID)
 	, m_handleID(handleID)

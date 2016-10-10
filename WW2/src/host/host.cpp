@@ -24,8 +24,6 @@
 #include "comm/commConstants.h"
 #include "comm/commHostMessages.h"
 #include "comm/commTypes.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseWrapper.h"
 #include "host/hostAntiHack.h"
 #include "host/hostAutomation.h"
 #include "host/hostCellNet.h"
@@ -93,12 +91,10 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiRTBCodes.h"
 #include "wwii/wwiiSortieManager.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 
 extern SINT32 hostInstallAllCallbacks();
-
-DBCONNECTION dbConnection;
 
 extern std::map<ChatHandle, HostVehicle*> g_vehicleLookup;
 
@@ -106,12 +102,6 @@ namespace Host
 {
 	Stats totalStats, currentStats;
 }
-
-#ifdef CLOSED_BETA
-	#define DEF_ERR_LEVEL Debug::ERR_DBUG
-#else
-	#define DEF_ERR_LEVEL Debug::ERR_INFO
-#endif
 
 #ifdef DEBUG_UPDATES
 UINT32 remoteVehicles = 0;
@@ -155,20 +145,20 @@ static SINT32 iterationTime = -1, iterationLast = -1;
 */
 
 #include <unordered_map>
-typedef std::unordered_map<sortieid_t, class HostVehicle*> VEHICLE_HASH;
+using VEHICLE_HASH = std::unordered_map<sortieid_t, class HostVehicle*>;
 static VEHICLE_HASH _vehicleHash;
 
-typedef std::vector<HostVehicle*> VEHICLES;
+using VEHICLES = std::vector<HostVehicle*>;
 
 // Tracking of players in a given building
-typedef std::set<HostVehicle*> OCCUPANTS;
+using OCCUPANTS = std::set<HostVehicle*>;
 struct Occupancy
 {
 	Occupancy() : object(nullptr), occupants() {}
 	ObjectStruct*	object;
 	OCCUPANTS		occupants;
 };
-typedef std::unordered_map<ChatHandle, Occupancy> OCCUPANCY_MAP;
+using OCCUPANCY_MAP = std::unordered_map<ChatHandle, Occupancy>;
 static OCCUPANCY_MAP occupancyMap;
 
 // Set this to true to prevent logins to the server.
@@ -257,7 +247,7 @@ _extractPlayerFromVehiclesList(Player& player, HostVehicle& vehicle)
 // return the IP address of the current strat host
 
 UINT32
-hostGetStratAddress(void)
+hostGetStratAddress()
 {
 	return _stratHost;
 }
@@ -514,7 +504,7 @@ hostJoinVehicle(Player& player, const VEHICLE_REQUEST& vRequest)
 	{
 		dbugLog(_FLA, "NOT GOOD: %u attempted join of %s(%d) failed, got %d: sending back to map"
 						, player.playerID()
-						, weapPrintName(&vRequest.weapon.spec)
+						, weapPrintName(vRequest.weapon.spec)
 						, vRequest.weapon.serial
 						, retval
 						);
@@ -885,7 +875,7 @@ CaptureState::invert(const CaptureState& rhs)
 // kill any players in the building
 
 static void
-_killOccupants(const instanceid_t& instanceID, OCCUPANTS& occupants, UINT32 bySortieID, const char* byBuilding)
+_killOccupants(const instanceid_t instanceID, OCCUPANTS& occupants, UINT32 bySortieID, const char* byBuilding)
 {
 	if ( occupants.empty() )
 		return;
@@ -940,7 +930,7 @@ _killOccupants(const instanceid_t& instanceID, OCCUPANTS& occupants, UINT32 bySo
 }
 
 void
-hostBuildingVisLevelChange(ObjectStruct* object, const instanceid_t& inInstance)
+hostBuildingVisLevelChange(ObjectStruct* object, const instanceid_t inInstance)
 {
 	// Rebuild is not fatal, all other levels are
 	if ( object->visLevel() == VISLEVEL_NORMAL )
@@ -956,7 +946,7 @@ hostBuildingVisLevelChange(ObjectStruct* object, const instanceid_t& inInstance)
 // Award a capture point to all but one player inside a building
 
 void
-hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide)
+hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID buildingID, WWII_SIDE forSide)
 {
 	OCCUPANCY_MAP::iterator it = occupancyMap.find(buildingID.Key());
 	if ( PN_UNLIKELY(it == occupancyMap.end()) )
@@ -1064,16 +1054,20 @@ _isGuarding(Player* const player)
 static void
 _checkPlayerForGuarding(Player* player, bool changingBuilding)
 {
+	auto const vehicle = player->vehicle;
+	if ( PN_UNLIKELY(!vehicle) )
+		return;
+
 	// Are they inside a friendly spawnable?
 	const bool isGuarding = _isGuarding(player);
-	if ( player->vehicle && player->vehicle->m_guardingSince && (false == isGuarding || true == changingBuilding) )
+	if ( vehicle->m_guardingSince && (false == isGuarding || true == changingBuilding) )
 	{
 		_scoreGuarding(player);
 	}
 
-	if ( true == isGuarding && player->vehicle->m_guardingSince == 0 )
+	if ( true == isGuarding && vehicle->m_guardingSince == 0 )
 	{
-		player->vehicle->m_guardingSince = teulClock64;
+		vehicle->m_guardingSince = teulClock64;
 	}
 }
 
@@ -1081,7 +1075,7 @@ _checkPlayerForGuarding(Player* player, bool changingBuilding)
 // Set the current containing building for a vehicle.
 
 void
-HostVehicle::setInBuilding(const FULL_OBJ_ID& newBuildingID)
+HostVehicle::setInBuilding(const FULL_OBJ_ID newBuildingID)
 {
 	// Extract them from the occupancy map for the current building (if any)
 	if ( m_inBuilding != 0 && isRemote() == false )
@@ -1140,7 +1134,7 @@ HostVehicle::setInBuilding(const FULL_OBJ_ID& newBuildingID)
 // Move a players position to a different building
 
 void
-Player::changeFPSBuilding(const FULL_OBJ_ID& newBuildingID, bool inCaptureBuilding)
+Player::changeFPSBuilding(const FULL_OBJ_ID newBuildingID, bool inCaptureBuilding)
 {
 	if ( vehicle == nullptr )
 	{
@@ -2233,7 +2227,7 @@ _sendNextUpdate(HostVehicle* const vehicle)
 // Central server loop.
 
 extern void
-_runHost(void)
+_runHost()
 {
 //	Teul::housekeeper cpEventsHousekeeper(Strat::Events::Publish, 100);
 
@@ -2984,7 +2978,6 @@ main(const int argc, const char* argv[])
 	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
-	threadsReadDBEnvironment();
 	threadsSetup();
 
 	dbugLog(_FLN, "Cell Host starting. Compiled %s at %s ===", __DATE__, __TIME__);
@@ -3131,7 +3124,7 @@ main(const int argc, const char* argv[])
 	exitHandler();
 }
 
-void HCUnit::setHomeCPID(const FULL_OBJ_ID& id)
+void HCUnit::setHomeCPID(const FULL_OBJ_ID id)
 {
 	m_homeCPID = id;
 }

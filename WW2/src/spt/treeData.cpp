@@ -74,8 +74,6 @@ bool _treename(XMLLoader* loader, xmlNode* node, bool first, void* userData)
         TreeData* td = new TreeData;
         td->name = (const char*)s;
 
-        typedef std::vector<TreeData *> *p;
-
         treedata.push_back(td);
 
         XML_PROCESS_CHILDREN(td);
@@ -208,6 +206,7 @@ static void _createCollider(CTree* tree)
     }
 }
 
+#ifndef VIEW_DEMO_TREES
 /*------------------------------------------------------------------------
 Module: loadDirectory
 Description: For Debugging usage in loading SpeedTree demo trees
@@ -234,8 +233,6 @@ static void loadDirectory(const std::string& dir)
                 td->nearlod = 100.0f;
                 td->farlod = 150.0f;
 
-                typedef std::vector<TreeData *> *p;
-
                 treedata.push_back(td);
             }
 
@@ -246,6 +243,7 @@ static void loadDirectory(const std::string& dir)
 
 #endif
 }
+#endif
 
 /*------------------------------------------------------------------------
 Module: loadTrees

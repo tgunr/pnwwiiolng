@@ -575,7 +575,7 @@ void GenerateIcons::SaveToTexture(const char*name, int x, int y, int w, int h, d
 
 }
 
-typedef std::map<OBJECT*, trnCDTerrainObject *> mapOBJList;
+using mapOBJList = std::map<OBJECT*, trnCDTerrainObject *>;
 extern  mapOBJList mapOBJ; // All objects associated with a TO
 
 bool GenerateIcons::wantModel(UINT32 mt)

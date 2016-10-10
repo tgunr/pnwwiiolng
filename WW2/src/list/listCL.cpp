@@ -15,13 +15,6 @@
 
 static inline LOGICAL _listAddItemAfter(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node);
 
-/*
-static void breakHere(void)
-{
-	return;
-}
-*/
-
 static inline LOGICAL
 _listAddItemAfter(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node)
 {

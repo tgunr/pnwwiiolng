@@ -4,7 +4,7 @@ class DBHANDLE;
 
 namespace DB
 {
-typedef std::vector< std::vector<const char*> > Revisions;
+using Revisions = std::vector< std::vector<const char*>>;
 
 //! @class DB::Schema
 //! @brief Auto-manages database schema changes.

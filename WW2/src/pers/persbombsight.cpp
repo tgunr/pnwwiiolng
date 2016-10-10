@@ -48,7 +48,7 @@
 
 #define TIME_INCREMENT 0.1
 
-typedef struct
+struct BombSightData
 {
 	OBJECT* PivotDOF;
 	OBJECT* AltPntDOF;
@@ -66,8 +66,7 @@ typedef struct
 	FLOAT32 altRate, speedRate;
 
 	LOGICAL useEnglish;
-
-} BombSightData;
+};
 
 static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, SINT32 type);
 static FLOAT32 _CalcBombAngle(FLOAT32 Alt,FLOAT32 InSpeed,weapAmmoType * AmmoType);
@@ -84,7 +83,7 @@ static SINT32 _AdjustAltDir;
 	persBombsightInit
 *************************************************************************************************/
 
-LOGICAL persBombsightInit(void)
+LOGICAL persBombsightInit()
 {
 	return TRUE;
 }
@@ -93,7 +92,7 @@ LOGICAL persBombsightInit(void)
 	persBombsightUpdate
 *************************************************************************************************/
 
-LOGICAL persBombsightUpdate(void)
+LOGICAL persBombsightUpdate()
 {
 	switch(_BombsightType)
 	{
@@ -110,17 +109,16 @@ LOGICAL persBombsightUpdate(void)
 	persBombsightKill
 *************************************************************************************************/
 
-LOGICAL persBombsightKill(void)
+void persBombsightKill()
 {
 	persClearBombsight();
-	return TRUE;
 }
 
 /************************************************************************************************
 	persClearBombsight
 *************************************************************************************************/
 
-LOGICAL persClearBombsight(void)
+LOGICAL persClearBombsight()
 {
 	if (_Data != nullptr)
 	{
@@ -318,9 +316,7 @@ static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, S
 	}
 
 
-	BSD = (BombSightData*)memAlloc(sizeof(BombSightData));
-	_Data = BSD;
-	memset(_Data,0,sizeof(BombSightData));
+	_Data = BSD = (BombSightData*)memAlloc(sizeof(BombSightData));
 
 	BSD->PivotDOF = PivotDOF;
 	BSD->AltPntDOF = AltPntDOF;

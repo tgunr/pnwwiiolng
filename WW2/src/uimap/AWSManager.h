@@ -32,8 +32,8 @@ struct AWSGrid
 	SINT32 expires;
 };
 
-typedef std::map<UINT32,AWSGrid> GridMap;
-typedef std::map<UINT32,AWSGrid*> GridView;
+using GridMap = std::map<UINT32,AWSGrid>;
+using GridView = std::map<UINT32,AWSGrid*>;
 
 /************************************************************************************************
 	AWSManager

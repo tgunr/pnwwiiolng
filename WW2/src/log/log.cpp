@@ -168,7 +168,7 @@ LOGICAL Open_Debug(const char* filename)
 	return TRUE;
 }
 
-void Close_Debug(void)
+void Close_Debug()
 {
 }
 
@@ -208,7 +208,7 @@ LOGICAL Open_Debug(const char* filename)
 	Close_Debug
 *************************************************************************************************/
 
-void Close_Debug(void)
+void Close_Debug()
 {
 	std::lock_guard<std::mutex> guard(logLock);
 
@@ -265,7 +265,7 @@ static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 #define MAX_TIMERS 1024
 
 #if platOS == OS_WIN32
-extern FLOAT32 GetCPUSpeed(void);
+extern FLOAT32 GetCPUSpeed();
 #endif
 
 struct logTimer

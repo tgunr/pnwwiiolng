@@ -24,9 +24,9 @@ static SINT32 numsounds;
 static SINT32 numsndused;
 
 static SOUNDCACHE g_sndCache[MINSOUNDCACHE];
-static std::queue<LPSOUNDCACHE> g_sndFree;
+static std::queue<SOUNDCACHE*> g_sndFree;
 
-using SoundCacheHash = std::unordered_map<std::string, LPSOUNDCACHE>;
+using SoundCacheHash = std::unordered_map<std::string, SOUNDCACHE*>;
 static SoundCacheHash g_hashSnd;
 
 static LOGICAL g_noLog = FALSE;
@@ -36,7 +36,7 @@ static LOGICAL g_noLog = FALSE;
 // Function: GetNewSound
 // Description:
 ////////////////////////////////////////////////////////
-static LPSOUNDCACHE GetNewSound(void)
+static SOUNDCACHE* GetNewSound()
 {
     // Not an error
     if(bSoundEnable == FALSE)
@@ -48,7 +48,7 @@ static LPSOUNDCACHE GetNewSound(void)
         return nullptr;
     }
 
-    LPSOUNDCACHE lpS = g_sndFree.front();
+    SOUNDCACHE* lpS = g_sndFree.front();
 
     g_sndFree.pop();
 
@@ -60,7 +60,7 @@ static LPSOUNDCACHE GetNewSound(void)
 // Function: FreeSound
 // Description:
 ////////////////////////////////////////////////////////
-static LOGICAL FreeSound(LPSOUNDCACHE lpSnd)
+static LOGICAL FreeSound(SOUNDCACHE* lpSnd)
 {
     if(lpSnd == nullptr)
         return FALSE;
@@ -89,7 +89,7 @@ static LOGICAL FreeSound(LPSOUNDCACHE lpSnd)
 // Function: FindNamedSound
 // Description:
 ////////////////////////////////////////////////////////
-static LPSOUNDCACHE FindNamedSound(SCHAR* pszName)
+static SOUNDCACHE* FindNamedSound(SCHAR* pszName)
 {
     std::string szStr = pszName;
 
@@ -110,7 +110,7 @@ static LPSOUNDCACHE FindNamedSound(SCHAR* pszName)
 // Function: sndsInitCache
 // Desctiption:
 //////////////////////////////////////////
-LOGICAL sndsInitCache(void)
+LOGICAL sndsInitCache()
 {
     numsndused = 0;
     numsounds = MINSOUNDCACHE;
@@ -129,7 +129,7 @@ LOGICAL sndsInitCache(void)
 // Function: sndsEmptyCache
 // Desctiption:
 //////////////////////////////////////////
-LOGICAL sndsEmptyCache(void)
+LOGICAL sndsEmptyCache()
 {
     // Not an error
     if(bSoundEnable == FALSE)
@@ -165,7 +165,7 @@ LOGICAL sndsEmptyCache(void)
 // Function: sndsKillCache
 // Desctiption:
 //////////////////////////////////////////
-void sndsKillCache(void)
+void sndsKillCache()
 {
     // Not an error
     if(bSoundEnable == FALSE)
@@ -181,12 +181,12 @@ void sndsKillCache(void)
 // Function: _preloadSoundCache
 // Desctiption:
 //////////////////////////////////////////
-static LPSOUNDCACHE _preloadSoundCache(const SCHAR* name)
+static SOUNDCACHE* _preloadSoundCache(const SCHAR* name)
 {
 #if XAUDIO
     return nullptr;
 #else
-    LPSOUNDCACHE sc = FindNamedSound((char*)name);
+    SOUNDCACHE* sc = FindNamedSound((char*)name);
 
     if(sc != nullptr)
     {
@@ -206,7 +206,7 @@ static LPSOUNDCACHE _preloadSoundCache(const SCHAR* name)
 	    return FALSE;
     }
 
-    strncpy(sc->theSound.name, name, MAX_SND_NAME_LENGTH - 1);
+    strsafecpy(sc->theSound.name, name);
 
 	if(!sndsPlatformLoadSound(&sc->theSound))
 	{
@@ -271,7 +271,7 @@ LOGICAL sndsPreloadSoundCache(const SCHAR* name, float maxattenuation)
 
     g_noLog = TRUE;
 
-    LPSOUNDCACHE sc1 = _preloadSoundCache(str.c_str());
+    SOUNDCACHE* sc1 = _preloadSoundCache(str.c_str());
 
     g_noLog = FALSE;
 
@@ -316,7 +316,7 @@ LOGICAL sndsPreloadSoundCache(const SCHAR* name, float maxattenuation)
 
     g_noLog = TRUE;
 
-    LPSOUNDCACHE sc2 = _preloadSoundCache(str.c_str());
+    SOUNDCACHE* sc2 = _preloadSoundCache(str.c_str());
 
     g_noLog = FALSE;
 
@@ -361,7 +361,7 @@ LOGICAL sndsPreloadSoundCache(const SCHAR* name, float maxattenuation)
         }
     }
 
-    LPSOUNDCACHE sc = _preloadSoundCache(newSound->name);
+    SOUNDCACHE* sc = _preloadSoundCache(newSound->name);
 
     if(!sc)
     {
@@ -389,7 +389,7 @@ LOGICAL sndsReleaseSoundInCache(snSound* oldSound)
     return TRUE;
 #else
     LOGICAL bReturn = FALSE;
-    LPSOUNDCACHE lpSnd = nullptr;
+    SOUNDCACHE* lpSnd = nullptr;
 
     // Not an error
     if(bSoundEnable == FALSE)

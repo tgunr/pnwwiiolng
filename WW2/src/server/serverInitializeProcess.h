@@ -15,5 +15,5 @@ namespace Server
 	};
 
 	using CommandLineOptions = std::vector<CommandLineOption>;
-	void InitializeProcess(const char* appName, SERVER_TYPE type, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& commandLine);
+	void InitializeProcess(const char* appName, SERVER_TYPE type, ERROR_FUNCTION errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& commandLine);
 }

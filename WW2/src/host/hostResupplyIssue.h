@@ -3,7 +3,7 @@
 #pragma pack(push, 1)
 struct HostResupplyIssue
 {
-	HostResupplyIssue(const sortieid_t& toSerial, const sortieid_t& fromSerial, const ChatHandle& fromHandle)
+	HostResupplyIssue(const sortieid_t toSerial, const sortieid_t fromSerial, const ChatHandle fromHandle)
 		: m_toSerial(toSerial), m_fromSerial(fromSerial), m_fromHandle(fromHandle) {}
 
 	sortieid_t	m_toSerial;
@@ -15,7 +15,7 @@ struct HostResupplyIssue
 #pragma pack(push, 1)
 struct HostResupplyAccepted
 {
-	HostResupplyAccepted(const sortieid_t& supplierID, const ChatHandle& recipient)
+	HostResupplyAccepted(const sortieid_t supplierID, const ChatHandle recipient)
 		: m_supplierID(supplierID), m_recipient(recipient)
 		{}
 

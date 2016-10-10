@@ -74,7 +74,7 @@ public:
 		Vec3d position;
 	};
 
-	typedef std::vector<TafatEditor::TafatWaypoint> TafatWaypointList;
+	using TafatWaypointList = std::vector<TafatEditor::TafatWaypoint>;
 
 	struct TafatRoute
 	{
@@ -106,7 +106,7 @@ public:
 		TafatWaypointList waypoints;
 	};
 
-	typedef std::vector<TafatEditor::TafatRoute> TafatRouteList;
+	using TafatRouteList = std::vector<TafatEditor::TafatRoute>;
 
 	struct TafatRoutePlan
 	{

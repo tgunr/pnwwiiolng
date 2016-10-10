@@ -48,9 +48,9 @@ static const int SYS_MOTD_LEN = 160;
 bool chatSideMessage(WWII_SIDE, LSTRING_ID messageID, const char* ptr0="", const char* ptr1="", const char* ptr2="", const char* ptr3="", const char* ptr4="", const char* ptr5="");
 
 // Helper: Describe a property by name or co-ordinates if not found in lookup
-const char* chatPropertyName(const FULL_OBJ_ID& id);
-const char* chatPropertyName(const class Property* property, const FULL_OBJ_ID& id);
-Chat::HostMessage& chatBuildHostMessage(const ChatHandle& senderID, UINT32 msgID, UINT8 chanIcon, const char* msg);
+const char* chatPropertyName(const FULL_OBJ_ID id);
+const char* chatPropertyName(const class Property* property, const FULL_OBJ_ID id);
+Chat::HostMessage& chatBuildHostMessage(const ChatHandle senderID, UINT32 msgID, UINT8 chanIcon, const char* msg);
 
 //This is the logic that is run whenever someone sends a message to the host
 void chatRouteMessage(
@@ -60,15 +60,15 @@ void chatRouteMessage(
 		, bool allowDotCommands
 		);
 
-UINT32 nextMessageID(void);
+UINT32 nextMessageID();
 
-void chatDispatchCRSMessage(const SCHAR* source, const SCHAR* text, const ChatHandle& excludeID=0LL);
+void chatDispatchCRSMessage(const SCHAR* source, const SCHAR* text, const ChatHandle excludeID=0LL);
 
-void chatDispatchGMMessage(const SCHAR* source, const SCHAR* text, const ChatHandle& excludeID=0LL);
+void chatDispatchGMMessage(const SCHAR* source, const SCHAR* text, const ChatHandle excludeID=0LL);
 
 bool chatDispatchHCText(WWII_SIDE side, const SCHAR* source, const SCHAR* text);
 bool chatHCMessage(WWII_SIDE, LSTRING_ID, const char* ptr0="", const char* ptr1="", const char* ptr2="", const char* ptr3="", const char* ptr4="", const char* ptr5="");
-bool chatHCMessage(WWII_SIDE, Chat::LocalizedMessage&, const ChatHandle& exclude);
+bool chatHCMessage(WWII_SIDE, Chat::LocalizedMessage&, const ChatHandle exclude);
 
 bool chatSystemMessage(LSTRING_ID messageID, const char* ptr0="", const char* ptr1="", const char* ptr2="", const char* ptr3="", const char* ptr4="", const char* ptr5="");
 
@@ -84,12 +84,12 @@ void chatSmiteHandle(const char* handle);
 // of the grab no-longer being in game.
 void chatReleaseGrab(Player& player);
 
-UINT32 chatGetStratAddr(void);
+UINT32 chatGetStratAddr();
 
 bool chatRouteSideMessage(WWII_SIDE toSide
 						, LSTRING_ID prefix
 						, LSTRING_ID message
-						, const struct FULL_OBJ_ID& objectiveID
+						, const FULL_OBJ_ID objectiveID
 						, const char* arg1
 						, const char* arg2
 						);
@@ -106,7 +106,6 @@ bool chatSetShutdownDowntime(UINT32);
 void chatSetShutdownTime(UINT32, const char* caller);
 SINT32 chatGetShutdownTimeRemaining();	// Returns -1 if no shutdown pending.
 
-void chatSendAllMessage(const ChatHandle& handle, const char* message, UINT32 messageID);
+void chatSendAllMessage(const ChatHandle handle, const char* message, UINT32 messageID);
 
 void chatSetHCMotd(const char* callsign, const char* motd, WWII_SIDE forSide);
-

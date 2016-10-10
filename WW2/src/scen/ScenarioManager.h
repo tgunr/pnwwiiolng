@@ -21,9 +21,9 @@ struct vehType;
 struct vehVehicle;
 
 // ----------- types
-typedef std::vector<std::string> SCENPATH_LIST;
-typedef std::map<std::string,std::string> SCENCONF_MAP;
-typedef std::vector<Vec3d> SCENPOS_LIST;
+using SCENPATH_LIST = std::vector<std::string>;
+using SCENCONF_MAP = std::map<std::string,std::string>;
+using SCENPOS_LIST = std::vector<Vec3d>;
 
 /************************************************************************************************
 	ScenarioObject
@@ -144,7 +144,7 @@ struct ScenarioObject
 	void* resource;
 };
 
-typedef std::vector<ScenarioObject*> SCENOBJ_LIST;
+using SCENOBJ_LIST = std::vector<ScenarioObject*>;
 
 struct ScenarioWorldObject : public ScenarioObject
 {
@@ -169,7 +169,7 @@ struct ScenarioWorldObject : public ScenarioObject
 	FLOAT64ATT attitude;
 };
 
-typedef std::vector<ScenarioWorldObject*> SCENWOB_LIST;
+using SCENWOB_LIST = std::vector<ScenarioWorldObject*>;
 
 struct ScenarioCoast : public ScenarioObject
 {
@@ -377,7 +377,7 @@ struct ScenarioFirepoint : public ScenarioWorldObject
 	FLOAT32 vVariance;
 };
 
-typedef std::set<ScenarioSound*> SCENSND_LIST;
+using SCENSND_LIST = std::set<ScenarioSound*>;
 
 /************************************************************************************************
 	ScenarioWaypoint
@@ -421,7 +421,7 @@ struct ScenarioArea : public ScenarioObject
 	int plane;
 };
 
-typedef std::vector<ScenarioArea*> SCENAREA_LIST;
+using SCENAREA_LIST = std::vector<ScenarioArea*>;
 
 
 /************************************************************************************************
@@ -446,7 +446,7 @@ struct ScenarioVehicleMask : public ScenarioObject
 	WEAPON_SPEC spec;
 };
 
-typedef std::vector<ScenarioVehicleMask*> SCENVEH_LIST;
+using SCENVEH_LIST = std::vector<ScenarioVehicleMask*>;
 
 /************************************************************************************************
 	ScenarioBlock
@@ -474,7 +474,7 @@ struct ScenarioBlock : public ScenarioObject
 	Vec3d pt2;
 };
 
-typedef std::vector<ScenarioBlock> SCENBLOCK_LIST;
+using SCENBLOCK_LIST = std::vector<ScenarioBlock>;
 
 /************************************************************************************************
 	ScenarioVolume
@@ -504,7 +504,7 @@ struct ScenarioVolume : public ScenarioWorldObject
 	Vec3d dimensions;
 };
 
-typedef std::vector<ScenarioVolume> SCENVOL_LIST;
+using SCENVOL_LIST = std::vector<ScenarioVolume>;
 
 /************************************************************************************************
 	ScenarioBoundary
@@ -555,7 +555,7 @@ struct ScenarioEvent : public ScenarioObject
 	SINT32 runs; // number of runs
 };
 
-typedef std::vector<ScenarioEvent*> SCENEVT_LIST;
+using SCENEVT_LIST = std::vector<ScenarioEvent*>;
 
 /************************************************************************************************
 	ScenarioPermission
@@ -669,7 +669,7 @@ struct ScenarioPlayer
 	std::map<std::string, std::string> attributes;
 };
 
-typedef std::map<ChatHandle, ScenarioPlayer> SCENPLAYER_MAP;
+using SCENPLAYER_MAP = std::map<ChatHandle, ScenarioPlayer>;
 
 /************************************************************************************************
 	ScenarioManager
@@ -734,7 +734,7 @@ public:
 	// this scenario is completed
 	void SetComplete();
 	void SetConfig(const char* name, const char* value);
-	void SetRespawnWeapon(const WEAPON_SPEC& spec);
+	void SetRespawnWeapon(const WEAPON_SPEC spec);
 	bool Spawn(const vehType* vehtype);
 	bool Respawn();
 

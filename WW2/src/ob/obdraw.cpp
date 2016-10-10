@@ -728,7 +728,7 @@ UINT32			flags;
 }
 #endif
 
-static LOGICAL InitMultiTexture(void)
+static LOGICAL InitMultiTexture()
 {
 SINT32		i;
 
@@ -758,7 +758,7 @@ SINT32		i;
 	return(TRUE);
 }
 
-static void KillMultiTexture(void)
+static void KillMultiTexture()
 {
 SINT32		i;
 
@@ -1840,7 +1840,7 @@ static bool _initSceneFBO()
     return true;
 }
 
-LOGICAL obdrawInit(void)
+LOGICAL obdrawInit()
 {
     if (!obcsInit())
 	{
@@ -1882,7 +1882,7 @@ LOGICAL obdrawInit(void)
     return(TRUE);
 }
 
-void obdrawKill(void)
+void obdrawKill()
 {
     if(_surfaceFBO.valid())
     {

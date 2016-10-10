@@ -53,8 +53,8 @@ struct IRCChannel
 	bool m_newChannel;
 };
 
-typedef std::vector<std::string> _MODES;
-typedef std::map<std::string, IRCChannel> _CHANNELS;
+using _MODES = std::vector<std::string>;
+using _CHANNELS = std::map<std::string, IRCChannel>;
 
 namespace Teul { extern const char* GetAppName(); }
 
@@ -80,7 +80,7 @@ struct IRCImpl : public IRC, public PNThread
 	bool				m_initialized;
 	bool				m_active;
 	std::atomic<bool>	m_running;
-	bool				m_joined;			// Finished joining
+	std::atomic<bool>	m_joined;			// Finished joining
 	irc_session_t*		m_session;
 	std::string			m_app;
 	std::string			m_nick;
@@ -88,7 +88,7 @@ struct IRCImpl : public IRC, public PNThread
 	_CHANNELS			m_channels;
 
 	// Dot command index
-	typedef std::map<std::string, irc_dotcmd_t> DOTS;
+	using DOTS = std::map<std::string, irc_dotcmd_t>;
 	DOTS			m_dots;
 
 	std::set<std::string>	m_ignores;
@@ -121,6 +121,8 @@ IRCImpl::run()
 	m_running = false;
 	do
 	{
+		if ( isCancelled() )
+			break;
 		// If running didn't just get set to false, then we have been
 		// disconnected.
 		if ( m_running )
@@ -133,15 +135,15 @@ IRCImpl::run()
 			m_running = true;
 
 		irc.m_joined = false;
-			threadLog(_FLI, "IRC: Connecting %s:%u %s", cv_ircServer.GetString(), cv_ircPort.GetUint32(), m_nick.c_str());
+		threadLog(_FLI, "IRC: Connecting %s:%u %s", cv_ircServer.GetString(), cv_ircPort.GetUint32(), m_nick.c_str());
 		if ( irc_connect(m_session, cv_ircServer.GetString(), cv_ircPort.GetUint32(), ircPass, m_nick.c_str(), m_nick.c_str(), m_nick.c_str()) )
 		{
 			threadLog(_FLM, "IRC: Unable to connect: %s", irc_strerror(irc_errno(m_session)));
 			irc_disconnect(m_session);
-			irc.m_joined = true;
 		}
 		else
 		{
+			irc.m_joined = true;
 			std::this_thread::yield();
 			// Reset the backoff
 			backOff = 0;
@@ -151,6 +153,8 @@ IRCImpl::run()
 
 			// If the loop exits, cleanly disconnect.
 			irc_disconnect(m_session);
+
+			irc.m_joined = false;
 		}
 
 		std::this_thread::yield();
@@ -184,7 +188,7 @@ _terminate(const char* reason)
 //////////////////////////////////////////////////////////////////////
 // IRC-aware signal handler
 
-typedef void (*SignalHandler)(int);
+using SignalHandler = void(*)(int);
 #if !defined(HAVE_SIGACTION)
 struct sigaction { SignalHandler sa_handler; };
 #endif

@@ -11,5 +11,5 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 //Installs all the client callbacks
-extern SINT32 strtInstallClientCallbacks(void);
-extern SINT32 strtSendEnemyReport(SINT32 teulIndex, struct STRAT_ENEMY_REPORT* report);
+SINT32 strtInstallClientCallbacks();
+SINT32 strtSendEnemyReport(SINT32 teulIndex, struct STRAT_ENEMY_REPORT* report);

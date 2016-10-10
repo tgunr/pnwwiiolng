@@ -10,10 +10,9 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "wwii/wwiiSerialNumber.h"				// Our header file
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "include/mydbQuery.h"
-
-extern DBHANDLE dbh;
+#include "dbse/dbseHandle.h"
 
 SerialNumber::serialno_t
 SerialNumber::getNext()

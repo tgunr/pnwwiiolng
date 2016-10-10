@@ -16,7 +16,7 @@ namespace Teul
 	enum { RestrictedCallbackRange_X = 15 };
 }
 
-void teulFreeAllCallbacks(void);
+void teulFreeAllCallbacks();
 
 TEUL_CALLBACK* teulAllocSystemCallback(Teul::CallbackInit* ci );
 

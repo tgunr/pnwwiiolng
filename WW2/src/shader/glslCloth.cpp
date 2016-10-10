@@ -1,4 +1,4 @@
-#include <syscfg.h>
+#include <syscfg.h> // Path is project specific.
 /*-------------------------------------------------------------------------
 Module: glslCloth.cpp
 Description:
@@ -33,12 +33,12 @@ static int _material = -1;
 
 /*-------------------------------------------------------------------------
 Function: glslClothInit
-Description: 
+Description:
 --------------------------------------------------------------------------*/
 bool glslClothInit()
 {
     return true;
-        }
+}
 
 /*-------------------------------------------------------------------------
 Function: InitFlags
@@ -126,12 +126,12 @@ static inline void draw(OBJECT* o)
     {
         piDrawScene(piPT_TRIANGLELIST,
                     (float*)o->RenderPositions().ptr,
-                    (float*)o->RenderNormals().ptr, 
-                    (float*)o->RenderTexCoords().ptr, 
-                    nullptr, 
-                    (unsigned short*)o->ptris, 
-                    sizeof(piUNIFIED_VERTEX), 
-                    o->numverts, 
+                    (float*)o->RenderNormals().ptr,
+                    (float*)o->RenderTexCoords().ptr,
+                    nullptr,
+                    (unsigned short*)o->ptris,
+                    sizeof(piUNIFIED_VERTEX),
+                    o->numverts,
                     o->numtris * 3);
     }
 }

@@ -30,6 +30,8 @@
 #include "include/mydbQuery.h"
 #include "wwii/wwiiDBThreads.h"
 
+using Chat::ARGV;
+
 static SquadList*
 _findClientSquadList(const Player& player)
 {
@@ -52,7 +54,7 @@ _validateSquadName(const char* name)
 	Chat::Name unpacked(handle);
 	if ( unpacked != name )
 		return 0LL;
-	int len = strlen(name);
+	size_t len = strlen(name);
 	if ( len < 2 || len > Squad::SHORT_NAME_LEN )
 		return 0LL;
 
@@ -407,7 +409,7 @@ DotWho::action(Player& player, Chat::ClientMessage* /*message*/) const
 class SquadRename : public DBThreadQuery
 {
 public:
-	SquadRename(const ChatHandle& requester, const Chat::Name& from, const Chat::Name& to)
+	SquadRename(const ChatHandle requester, const Chat::Name& from, const Chat::Name& to)
 		: DBThreadQuery(DBThread::Default, "SquadRename", DBThreadQuery::_CALLBACK
 						, "UPDATE LOW_PRIORITY wwii_squads"
 						" SET short_name = '%s'"

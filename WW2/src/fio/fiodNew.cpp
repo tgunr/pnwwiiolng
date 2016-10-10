@@ -247,7 +247,7 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 //////////////////////////////////////////////////////////////////////
 
 #include "include/io_mapped_file.h"
-typedef std::map<int, IO::MappedFile*> IOMAPPED_FILES;
+using IOMAPPED_FILES = std::map<int, IO::MappedFile*>;
 static IOMAPPED_FILES s_filemap;
 
 //////////////////////////////////////////////////////////////////////
@@ -434,7 +434,7 @@ size_t fiodFileSize(const char* name, bool userdir)
 //////////////////////////////////////////////////////////////////////
 // Returns a pointer to the path prefix
 
-const char* fiodGetPrepath(void)
+const char* fiodGetPrepath()
 {
 	return(DataPath);
 }

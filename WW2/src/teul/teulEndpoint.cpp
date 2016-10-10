@@ -37,26 +37,18 @@
 #include "teul/teulTime.h"
 #include "teul/teulUtils.h"
 #include "teul/teulVersion.h"
-#include "include/pnThread.h"
-
-// Tie the vtable for PNThread down; this needs a better home
-PNThread::~PNThread()
-{
-    cancel();
-    join();
-}
 
 //#define DEBUG_ENCRYPTION
 //#define DEBUG_CONNECTIONS
 
 static size_t _teulConnects;
 
-typedef WWII::inplace_vector<ENDPOINT, Teul::MaxConnections> ENDPOINT_ARRAY;
-typedef WWII::inplace_vector<EndpointImpl, Teul::MaxConnections> ENDPOINT_IMPL_ARRAY;
+using ENDPOINT_ARRAY = WWII::inplace_vector<ENDPOINT, Teul::MaxConnections>;
+using ENDPOINT_IMPL_ARRAY = WWII::inplace_vector<EndpointImpl, Teul::MaxConnections>;
 ENDPOINT_ARRAY _endpoints;
 static ENDPOINT_IMPL_ARRAY _endpointImpls;
 
-typedef std::vector<ENDPOINT*> ENDPOINT_VEC;
+using ENDPOINT_VEC = std::vector<ENDPOINT*>;
 static ENDPOINT_VEC _deadEndpoints;
 
 using namespace Teul;
@@ -67,7 +59,7 @@ namespace Teul
 
 static ENDPOINT_LIST _freeEndpoints;
 
-static ERROR_FUNCTION* _endpointErrorFn;
+static ERROR_FUNCTION _endpointErrorFn;
 
 extern void teulReleaseDatagram(struct DATA_GRAM*);
 
@@ -166,10 +158,10 @@ ENDPOINT::_dbugOutputPacket( bool isRecv, const uint8_t *input, size_t packetByt
 		}
 
 	if (!isRecv)
-		dbugLog(_FLD, "Sending MSG (%d bytes): SourcePort %d DestPort %d IP %s Sent Dump:\n-->%s",
+		dbugLog(_FLD, "Sending MSG (%" PRSizeT " bytes): SourcePort %d DestPort %d IP %s Sent Dump:\n-->%s",
 		        packetBytes, destPort(), fromPort(), teulGetAddress(fromAddress()), debugBuff.get());
 	else
-		dbugLog(_FLD, "Receiving MSG (%d bytes): SourcePort %d DestPort %d IP %s Recv Dump:\n<--%s",
+		dbugLog(_FLD, "Receiving MSG (%" PRSizeT " bytes): SourcePort %d DestPort %d IP %s Recv Dump:\n<--%s",
 		        packetBytes, destPort(), fromPort(), teulGetAddress(fromAddress()), debugBuff.get());
 }
 
@@ -379,7 +371,7 @@ teulRemoveEndpoint(ENDPOINT* inEndpoint)
 // Transfer dead endpoints to the free endpoint list.
 
 void
-teulKillDeadEndpoints(void)
+teulKillDeadEndpoints()
 {
 	if ( _deadEndpoints.empty() )
 	{
@@ -445,7 +437,7 @@ ENDPOINT::initialize(SINT32 i)
 // Initialize the endpoint system.
 
 void
-teulInitEndpoints(ERROR_FUNCTION* const endpointErrorFn)
+teulInitEndpoints(ERROR_FUNCTION const endpointErrorFn)
 {
 	_endpointErrorFn = endpointErrorFn;
 	_teulConnects = 0;
@@ -467,7 +459,7 @@ teulInitEndpoints(ERROR_FUNCTION* const endpointErrorFn)
 }
 
 void
-teulCleanupEndpoints(void)
+teulCleanupEndpoints()
 {
 	teulKillDeadEndpoints();
 
@@ -739,7 +731,7 @@ ENDPOINT::setSndBufferSize(UINT32 newSize)
 void
 ENDPOINT::doError(const SINT32 error, void* data)
 {
-	ERROR_FUNCTION* errorFunction = this->errorFn;
+	ERROR_FUNCTION errorFunction = this->errorFn;
 	if ( this->m_parent != nullptr && ((state() == IS_OPENING) | (errorFunction == nullptr)) )
 		errorFunction = this->m_parent->errorFn;
 

@@ -21,10 +21,10 @@ class HostVehicle;
 #include <vector>
 #include <map>
 
-typedef std::vector<UINT32> REMOVE_LIST;
+using REMOVE_LIST = std::vector<UINT32>;
 
 // List of callsigns we've resupplied and when we resupplied them.
-typedef std::map<ChatHandle, UINT32> RESUPPLIES;
+using RESUPPLIES = std::map<ChatHandle, UINT32>;
 
 class CPStruct;
 

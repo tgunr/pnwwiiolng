@@ -24,17 +24,15 @@ namespace TOE_
 }
 
 // Template organization
-typedef std::map<WEAPON_SPEC, TOE_::WeaponTemplate> TOE_WEAPONS;
-typedef std::map<ChatHandle, TOE_::TemplateHeader> TOE_TEMPLATES;
+using TOE_WEAPONS = std::map<WEAPON_SPEC, TOE_::WeaponTemplate>;
+using TOE_TEMPLATES = std::map<ChatHandle, TOE_::TemplateHeader>;
 
 extern TOE_TEMPLATES toeTemplates;
 
 // Per-brigade weapon lists
-typedef std::map<WEAPON_SPEC, TOE_::WeaponInstance> TOE;
+using TOE = std::map<WEAPON_SPEC, TOE_::WeaponInstance>;
 
 extern void strtSaveTOESupplies();
-
-//tolua_begin
 
 namespace TOE_
 {
@@ -44,20 +42,20 @@ class TemplateHeader
 public:
 	TemplateHeader() : m_handle(0LL), m_name("undef"), m_country(0), m_branch(0), m_weapons(), m_totalCapacity(0), m_subscribers() {}
 
-	const ChatHandle& handle() const { return m_handle; }
+	ChatHandle handle() const { return m_handle; }
 	const std::string& name() const { return m_name; }
 	UINT32 country() const { return m_country; }
 	UINT32 branch() const { return m_branch; }
 	const TOE_WEAPONS& weapons() const { return m_weapons; }
 
 	// Only call the first time you're setting up
-	void initialize(const ChatHandle& handle, const char* name, UINT32 country, UINT32 branch);
+	void initialize(const ChatHandle handle, const char* name, UINT32 country, UINT32 branch);
 
 	// Update the name of this template
 	void setName(const char* name);
 
 	// Add or update the capacity of a weapon -- updates all subscribers
-	void updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m);
+	void updateWeapon(const WEAPON_SPEC spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m);
 
 	// Subscribe to this Template and have it populate your TOE
 	void subscribe(StratHCUnit* unit, TOE& toe);
@@ -68,9 +66,8 @@ public:
 	// Lookup functions
 public:
 	static TemplateHeader* Lookup(const char* id);
-	static TemplateHeader* Lookup(const ChatHandle& handle);
+	static TemplateHeader* Lookup(const ChatHandle handle);
 
-//tolua_end
 private:
 	ChatHandle		m_handle;					// packed short name of the template
 	std::string		m_name;						// Longer name of the template
@@ -80,9 +77,8 @@ private:
 	UINT32			m_totalCapacity;			// Sum of capacities
 
 	// Which brigades/divisions are using us?
-	typedef std::set<StratHCUnit*> SUBSCRIBERS;
+	using SUBSCRIBERS = std::set<StratHCUnit*>;
 	SUBSCRIBERS		m_subscribers;
-//tolua_begin
 };
 
 // Defines the structure which provides the background information for a particular
@@ -90,7 +86,8 @@ private:
 class WeaponTemplate
 {
 public:
-	WeaponTemplate(const WEAPON& withWeapon) : m_weapon(withWeapon), m_capacity(0) {}
+	WeaponTemplate() = delete;
+	WeaponTemplate(const WEAPON& withWeapon) : m_weapon(withWeapon), m_capacity(0), m_resupplyTime_m{0} {}
 
 	bool operator<(const WEAPON_SPEC& rhs) const { return m_weapon.spec() < rhs; }
 
@@ -98,18 +95,16 @@ public:
 	void setResupplyTime(UINT16 resupplyTime_m) { if ( resupplyTime_m != m_resupplyTime_m ) m_resupplyTime_m = resupplyTime_m; }
 //	void setAccess(UCHAR newAccess) { m_access = newAccess; }
 
-	const WEAPON_SPEC& spec() const { return m_weapon.spec(); }
+	WEAPON_SPEC spec() const { return m_weapon.spec(); }
 	const WEAPON& weapon() const { return m_weapon; }
 	UINT16 capacity() const { return m_capacity; }
 	UCHAR access() const { return (UCHAR)m_weapon.access(); }
 	UINT32 resupplyTime() const;
 
 private:
-//tolua_end
 	const WEAPON&	m_weapon;
 	UINT16			m_capacity;			// Automatic resupply level
 	UINT16			m_resupplyTime_m;		// Resupply Time (minutes) or 0 for default
-//tolua_begin
 };
 
 // Provides a specific instance of a use of a WeaponTemplate
@@ -127,7 +122,7 @@ public:
 
 	bool operator<(const WeaponInstance& rhs) const { return spec() < rhs.spec(); }
 	bool operator<(const WeaponTemplate& rhs) const { return spec() < rhs.spec(); }
-	bool operator<(const WEAPON_SPEC& rhs) const { return spec() < rhs; }
+	bool operator<(const WEAPON_SPEC rhs) const { return spec() < rhs; }
 
 	UCHAR access() const { return weaponTemplate().access(); }
 	UINT16 capacity() const { return weaponTemplate().capacity(); }
@@ -138,7 +133,7 @@ public:
 	UINT32 resupplyTime() const { return weaponTemplate().resupplyTime(); }
 	const WeaponTemplate& weaponTemplate() const { return m_weaponTemplate; }
 
-	const WEAPON_SPEC& spec() const { return weaponTemplate().spec(); }
+	WEAPON_SPEC spec() const { return weaponTemplate().spec(); }
 	const WEAPON& weapon() const { return weaponTemplate().weapon(); }
 	const StratHCUnit& unit() const { return m_unit; }
 	StratHCUnit& unit() { return m_unit; }
@@ -172,7 +167,6 @@ public:
 	UINT16 throttleCapacity() const;
 
 private:
-//tolua_end
 	const WeaponTemplate& m_weaponTemplate;		// Template we're based on
 	StratHCUnit& m_unit;						// StratHCUnit we belong to
 
@@ -185,9 +179,6 @@ private:
 	bool		m_modified;						// The value it was before modifications
 
 	friend void ::strtSaveTOESupplies();
-//tolua_begin
 };
 
 } // namespace TOE
-
-//tolua_end

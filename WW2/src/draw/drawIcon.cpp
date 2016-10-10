@@ -26,13 +26,13 @@ drawIconRef drawIconLoad(const char* iconFile)
 
 	if(ref)
 	{
-		snprintf(filename, 255, "%s.bmp", iconFile);
+		strprintf(filename, "%s.bmp", iconFile);
 		ref->texid = ldpixLoadImageFileToSurface(filename, colorMAGENTA | colorALPHA100, LDPIX_NONE);
 
         // ldpixLoadImageFileToSurface increments texture ref count if already loaded.
         //piAddTexRef(ref->texid);
 
-		snprintf(filename, 255, "%s.uv", iconFile);
+		strprintf(filename, "%s.uv", iconFile);
 		read_uv_file(filename, &ref->uv, &ref->numIcons);
 	}
 

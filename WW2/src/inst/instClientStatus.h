@@ -33,7 +33,7 @@ namespace Instance
 
 		UINT16 squadMates() const { return m_squadMates; }
 
-		virtual SINT32 packer(const unsigned int mode, ACTION_OBJECT* const a) override;
+		virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* const a) override;
 
 	private:
 		UINT16		m_squadMates;

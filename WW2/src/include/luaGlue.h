@@ -43,14 +43,14 @@ namespace Lua
 	extern bool RunObject(const char* name, std::string& object);
 	extern bool RunCode(std::string& code, const char* caller);
 
-	extern void CallInstanceFunction(const char* function, const instanceid_t& instID, const char* data);
-	extern void CallInstanceFunction(const char* function, const instanceid_t& instID, playerid_t playerID_, Instance::PlayerState* state);
+	extern void CallInstanceFunction(const char* function, const instanceid_t instID, const char* data);
+	extern void CallInstanceFunction(const char* function, const instanceid_t instID, playerid_t playerID_, Instance::PlayerState* state);
 
 	// Pre-compile a lua statement into a compiled chunk.
 	extern std::string CompileCode(std::string code, const char* name);
 
 	// Tell me what the last error was
-	typedef std::vector<std::string> SCRIPT_RESULTS;
+	using SCRIPT_RESULTS = std::vector<std::string>;
 	extern SCRIPT_RESULTS& Results();
 
 	////////// Functions for controlling lua states

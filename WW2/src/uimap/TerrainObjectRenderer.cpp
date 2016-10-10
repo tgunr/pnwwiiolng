@@ -68,9 +68,8 @@ class TerrainObjectRenderer::SuperCell : public SuperCellMapView::Renderer::Supe
 {
 public:
 	SuperCell(TerrainObjectRenderer* r, int x, int y) : SuperCellMapView::Renderer::SuperCell(r, x, y)
-		, _renderer(r), _displayList(0)
+		, celldata{}, _renderer{r}, _displayList{0}, _buckets{}
 	{
-		memset(&celldata,0x0,sizeof(celldata));
 	}
 
  	~SuperCell()
@@ -171,7 +170,7 @@ public:
 	sdm_replacement_octet_data celldata;
 	TerrainObjectRenderer* _renderer;
 	GLuint _displayList;
-	typedef std::map<int, phui::ref_ptr<RenderBucket> > BucketMap;
+	using BucketMap = std::map<int, phui::ref_ptr<RenderBucket>>;
 	BucketMap _buckets;
 };
 

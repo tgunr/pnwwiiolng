@@ -17,6 +17,14 @@
 	#include "dbug/dbugWErrno.h"
 #endif
 
+// Can't think of a better place for this.
+// Use to silence one or more warnings about unused parameters.
+template<typename T> constexpr void silence_unused_parameter_warning(T&& t) { void(std::forward<T>(t)); }
+template<typename T, typename... Args>
+constexpr void silence_unused_parameter_warning(T&& t, Args&&... args) {
+	(void)std::forward<T>(t), silence_unused_parameter_warning(std::forward<Args>(args)...);
+}
+
 #if defined(DEBUG) || defined(ALPHA_RELEASE)
 #define  _FL __FILE__, __LINE__
 #else
@@ -80,11 +88,8 @@ namespace Debug
 #define _FLISB _FL, (Debug::ERR_INFO | STD_ERR | BARE_DEBUG)
 #define _FLDSB _FL, (Debug::ERR_DBUG | STD_ERR | BARE_DEBUG)
 
-// the log type parameter of dbugInit can take any of the log facilities from
-// syslog including LOG_LOCAL0-7 or be set to LOG_TO_FILE to log
-// directly to a file only.
-#define LOG_TO_FILE 1
-#define LOG_OFF	-1
+// Whether debugging is enabled or not.
+enum class LogMode { OFF, TO_FILE };
 
 // Each ERROR_TYPE is associated with a syslog error level on linux
 //
@@ -99,17 +104,15 @@ namespace Debug
 
 namespace Debug
 {
-	using ERROR_HANDLER = void(*)(void);
+	using ERROR_HANDLER = void(*)();
 }
 
 // dbugInit: sets the current error level to ERR_INFO, opens the debug file, and initializes
-// the error object. The log type parameter of dbugInit can take any of the log facilities from
-// syslog including LOG_LOCAL0-7 or be set to LOG_TO_FILE to log
-// directly to a file only.
-void dbugInit(int logType, const char* filename);
+// the error object.
+void dbugInit(LogMode logMode, const char* filename);
 
 // dbugClose: closes the debug file and cleans up.
-void dbugClose(void);
+void dbugClose();
 
 // dbugSetLogLevel: set the current debug level for display of log messages.
 void dbugSetLogLevel(Debug::ERROR_TYPE level);
@@ -122,14 +125,14 @@ void dbugSetWriteLevel(Debug::ERROR_TYPE level);
 // may also be included to map windows socket errors to Unix errno.  Additional errors beyond
 // those covered in errno.h and dbugWErrno.h must be added to debugExtErrno.h and must adhere to
 // windows error code conventions to eliminate problems with compatibility.
-void dbugSetErrno( int err);
+void dbugSetErrno(int err);
 
 // dbugGetErrno: returns the current error number.  Error numbers adhere to errno.h.  Under
 // win32 "dbugWErrno.h" may also be included to map windows socket errors to Unix errno.
 // Additional errors beyond those covered in errno.h and dbugWErrno.h must be added to
 // debugExtErrno.h and must adhere to windows error code conventions to eliminate problems
 // with compatibility.
-int dbugGetErrno(void);
+int dbugGetErrno();
 
 // dbugLog: if the current filename, lineno or string is nullptr then it sets these members. The
 // parameters are output as a string to the debug file depending on the debug level selected and
@@ -140,11 +143,11 @@ int _dbugLog(const char* filename, int lineno, UINT32 errType, FORMAT_ARG(0) con
 SINT32 _dbugWrite(const char* filename, SINT32 lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
 
 // LogAbort: Fire a ERR_FATAL and abort()
-[[noreturn]] void _LogAbort(const char* filename, unsigned int lineno, UINT32 errType, const char* assertion, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(5,6);
+NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, UINT32 errType, const char* assertion, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(5,6);
 
 // Disable dbugLog() and dbugWrite() if respectively requested.
 #ifdef NO_DEBUG_LOG
-    #define dbugLog(m, fmt, ...)
+	#define dbugLog(m, fmt, ...) silence_unused_parameter_warning(m, fmt, ## __VA_ARGS__)
 #else
     #define dbugLog(m, fmt, ...) _dbugLog(m, fmt, ## __VA_ARGS__)
 #endif

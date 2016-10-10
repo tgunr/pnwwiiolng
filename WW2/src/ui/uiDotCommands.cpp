@@ -151,8 +151,8 @@ extern char BuzzardFollowVehicle[256];
 extern FLOAT32 BuzzardFollowDistance;
 
 
-extern UINT32 _ReadAmmoTypes(void);
-extern UINT32 _ReadBumpAndFrictionTable(void);
+extern UINT32 _ReadAmmoTypes();
+extern UINT32 _ReadBumpAndFrictionTable();
 
 enum UI_COMMAND_TYPE
 {
@@ -177,7 +177,7 @@ static void _HitmapName(OBJECT* obj, void* p);
 SINT32 dot_move(const char* line);
 
 #ifdef ENABLE_FLOATERS
-void vehmainToggleLOD (void);
+void vehmainToggleLOD();
 #endif
 
 static wchar_t _LastCommand[256];
@@ -200,7 +200,7 @@ struct dotCmdInfo
     bool key;				// requires a key file
 };
 
-typedef std::map<std::wstring, dotCmdInfo> dotCmdMap;
+using dotCmdMap = std::map<std::wstring, dotCmdInfo>;
 static dotCmdMap _dotCommands;
 //------------------------------------------------------
 
@@ -218,7 +218,7 @@ static dotCmdMap _dotCommands;
 	Return value is the number of* arguments* excluding the presumed command.
  ************************************************************************************************/
 
-typedef std::vector<std::wstring> ARGV_BASE;
+using ARGV_BASE = std::vector<std::wstring>;
 struct ARGV : public ARGV_BASE
 {
 	ARGV(const char* source, UINT32 maxArguments, bool fillLastArgument);
@@ -3964,7 +3964,7 @@ static OBJECT* buildingobj = nullptr;
 
 static SINT32 dot_tspawn(const char* input)
 {
-    typedef std::set<OBJECT*> omap;
+    using omap = std::set<OBJECT*>;
 
 	static omap instances;
     std::vector<omap::iterator> remove;
@@ -4660,10 +4660,8 @@ static SINT32 dot_builder(const char* line)
     }
     else
     {
-        char buff[32];
-        memset(buff, 0, 32);
-
-        sprintf(buff, id < 10 ? "builder00%d" : id < 20 ? "builder0%d" : "builder%d", id);
+		char buff[32]{};
+        strprintf(buff, id < 10 ? "builder00%d" : id < 20 ? "builder0%d" : "builder%d", id);
 
         func = "onbuilder('";
         func += buff;
@@ -5317,12 +5315,12 @@ void _PrintVehHitmap(vehType const* vehtype )
 	return;
 }
 
-typedef struct
+struct hitmapNameList
 {
 	int num;
 	char* name[256];
 	LOGICAL infile[256];
-} hitmapNameList;
+};
 
 /************************************************************************************************
 	_ValidateVehHitmap
@@ -5330,15 +5328,14 @@ typedef struct
 
 static void _ValidateVehHit(vehType const* vehtype)
 {
+	if(!vehtype) return;
+
 	OBJECT* PlaneObject = nullptr, *hitmap, *obj;
-	char str[256] = "\0";
-	hitmapNameList list;
+	char str[256] = { 0 };
+	hitmapNameList list{};
 	int fd, i;
 	FILE* f;
 	LOGICAL found;
-
-	if(!vehtype) return;
-	memset(&list, 0x0, sizeof(list));
 
 	obmgrCreateModelInstance((char*)vehtype->Shape);
 	PlaneObject = obmainFindNamedObject((char*)vehtype->Shape);
@@ -5415,14 +5412,13 @@ static void _ValidateVehHit(vehType const* vehtype)
 
 static void _ValidateVehCmp(vehType const* vehtype)
 {
-	char str[256] = "\0";
-	hitmapNameList list;
+	if (!vehtype) return;
+
+	char str[256] = { 0 };
+	hitmapNameList list{};
 	int fd, i;
 	FILE* f;
 	LOGICAL found;
-
-	if(!vehtype) return;
-	memset(&list, 0x0, sizeof(list));
 
 	snprintf(str, 255, "%s.validcmp", vehtype->Id);
 	f = fopen(str, "w");
@@ -6752,7 +6748,7 @@ static int dot_aion(const char* line)
 	Just remember not to share.
 *************************************************************************************************/
 
-//extern SINT32 mmSendDirectSpawn(SINT32 connection, const WEAPON_SPEC& weapon, const FLOAT64VECTOR* location);
+//extern SINT32 mmSendDirectSpawn(SINT32 connection, const WEAPON_SPEC weapon, const FLOAT64VECTOR* location);
 static SINT32 dot_dev(const char* line)
 {
 	const char* p = strchr(line, ' ');

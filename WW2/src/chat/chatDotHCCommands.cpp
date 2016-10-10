@@ -590,7 +590,7 @@ public:
 class LastMoves : public DBThreadQuery
 {
 public:
-	LastMoves(const ChatHandle& byMatchID, WWII_COUNTRY forCountry)
+	LastMoves(const ChatHandle byMatchID, WWII_COUNTRY forCountry)
 		: DBThreadQuery(DBThread::Default, "LastMoves", DBThreadQuery::_CALLBACK
 				,"SELECT	m.moved"
 					 ", u.name"
