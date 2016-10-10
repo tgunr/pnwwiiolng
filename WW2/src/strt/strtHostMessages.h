@@ -37,7 +37,7 @@ extern SINT32 strtSendMMJoinDeny(UINT32 crewID,UINT32 reasonCode);
 extern SINT32 strtSendMMJoinListResponse(UINT32 commandID, UINT32 crewID, ChatHandle crewHandle);
 
 // Process a capacity request and send the response
-extern LOGICAL strtReplyToCapacityRequest(SINT32 teulIndex, const MM_CAPACITY_REQUEST& request, FULL_OBJ_ID destFacility, bool vehicleDelivered);
+extern bool strtReplyToCapacityRequest(SINT32 teulIndex, const MM_CAPACITY_REQUEST& request, FULL_OBJ_ID destFacility, bool vehicleDelivered);
 
 //A lot smarter than the rest of the send functions, this function actually
 // breaks the CP, Facilty, or Building information inside this supercell

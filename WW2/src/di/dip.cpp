@@ -37,24 +37,6 @@ static int numjoysticks = 0;
 static UINT32 DIDeviceDetails(UINT32 dwDevType);
 extern BOOL GetWindowsVersion(DWORD* MajorVersion, DWORD* MinorVersion);
 
-#ifdef UNUSED
-static LOGICAL FindDeviceType(UINT16 devtype, LPGUID* lpguid)
-{
-SINT32		i;
-
-	for (i=0; i < numdidi; i++)
-	{
-		if ((UINT16)didi[i].dwDevType == devtype)
-		{
-			*lpguid = &didi[i].guidInstance;
-			return(TRUE);
-		}
-	}
-
-	return(FALSE);
-}
-#endif
-
 LOGICAL CALLBACK DIEnumDevicesProc(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 {
 	if (numdidi >= MAX_DIDEVICES)
@@ -84,7 +66,7 @@ HRESULT				dirval;
 	if (dirval != DI_OK)
 	{
 		Write_Debug("Could not create a direct input device");
-		return(FALSE);
+		return FALSE;
 	}
 
     dirval = lpdi->QueryInterface(IID_IDirectInputJoyConfig8, (void**)&joyconfig8);
@@ -119,7 +101,7 @@ HRESULT				dirval;
 	if (dirval != DI_OK)
 	{
 		Write_Debug("Enumeration of direct input devices failed");
-		return(FALSE);
+		return FALSE;
 	}
 
 	Write_Debug("Direct Input Devices");
@@ -131,7 +113,7 @@ HRESULT				dirval;
 
 	numjsd = 0;
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -279,7 +261,7 @@ HRESULT	result;
 		}
 	}
 
-	return(retval);
+	return retval;
 }
 
 
@@ -299,7 +281,7 @@ HRESULT	result;
 		}
 	}
 
-	return(retval);
+	return retval;
 }
 
 
@@ -323,7 +305,7 @@ SINT32		i;
 		}
 	}
 
-	return(retval);
+	return retval;
 }
 
 
@@ -336,11 +318,11 @@ LOGICAL dipAcquire(void)
 			!dipAcquireMouse() ||
 			!dipAcquireJoystick())
 		{
-			return(FALSE);
+			return FALSE;
 		}
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -355,7 +337,7 @@ LOGICAL dipSetupKeyboard(void)
 	if (dirval != DI_OK)
 	{
 		Write_Debug("CreateDevice for keyboard failed");
-		return(FALSE);
+		return FALSE;
 	}
 
 	dirval = DIError(lpd->QueryInterface(IID_IDirectInputDevice8, (void**)&lpkbd));
@@ -363,7 +345,7 @@ LOGICAL dipSetupKeyboard(void)
 	if (dirval != DI_OK)
 	{
 		Write_Debug("QueryInterface for keyboard failed");
-		return(FALSE);
+		return FALSE;
 	}
 
 	// Set the data format
@@ -371,7 +353,7 @@ LOGICAL dipSetupKeyboard(void)
  	if (dirval != DI_OK)
 	{
 		Write_Debug("SetDataFormat for keyboard failed");
-		return(FALSE);
+		return FALSE;
 	}
 
 	// Set the cooperative level
@@ -385,7 +367,7 @@ LOGICAL dipSetupKeyboard(void)
  	if (dirval != DI_OK)
 	{
 		Write_Debug("SetCooperativeLevel for keyboard failed");
-		return(FALSE);
+		return FALSE;
 	}
 
 	// Set the keyboard properties
@@ -399,10 +381,10 @@ LOGICAL dipSetupKeyboard(void)
 	if (dirval != DI_OK)
 	{
 		Write_Debug("SetProperty for keyboard failed");
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -417,7 +399,7 @@ LOGICAL dipSetupMouse(void)
 	if (dirval != DI_OK)
 	{
 		Write_Debug("CreateDevice for mouse failed");
-		return(FALSE);
+		return FALSE;
 	}
 
 	dirval = DIError(lpd->QueryInterface(IID_IDirectInputDevice8, (void**)&lpmd));
@@ -425,7 +407,7 @@ LOGICAL dipSetupMouse(void)
 	if (dirval != DI_OK)
 	{
 		Write_Debug("QueryInterface for mouse failed");
-		return(FALSE);
+		return FALSE;
 	}
 
 	// Set the data format
@@ -433,7 +415,7 @@ LOGICAL dipSetupMouse(void)
  	if (dirval != DI_OK)
 	{
 		Write_Debug("SetDataFormat for mouse failed");
-		return(FALSE);
+		return FALSE;
 	}
 
 	// Set the cooperative level
@@ -448,7 +430,7 @@ LOGICAL dipSetupMouse(void)
  	if (dirval != DI_OK)
 	{
 		Write_Debug("SetCooperativeLevel for mouse failed");
-		return(FALSE);
+		return FALSE;
 	}
 
 	// Set the mouse properties
@@ -462,7 +444,7 @@ LOGICAL dipSetupMouse(void)
 	if (dirval != DI_OK)
 	{
 		Write_Debug("SetProperty (buffer size) for mouse failed");
-		return(FALSE);
+		return FALSE;
 	}
 
 	// Set the mouse properties
@@ -472,28 +454,28 @@ LOGICAL dipSetupMouse(void)
 	if (dirval != DI_OK)
 	{
 		Write_Debug("SetProperty (axis mode) for mouse failed");
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
-static LOGICAL SetupJoystick(SINT32 number, LPGUID lpguid)
+static bool SetupJoystick(SINT32 number, LPGUID lpguid)
 {
-HRESULT					dirval;
-DIPROPDWORD				dipdw;
-DIPROPRANGE				diprg;
-DIPROPDWORD				didwd;
-LPDIRECTINPUTDEVICE8	lpd;
-DIDEVCAPS				didevcaps;
-LPDIRECTINPUTDEVICE8	lpjs;
+	HRESULT					dirval;
+	DIPROPDWORD				dipdw;
+	DIPROPRANGE				diprg;
+	DIPROPDWORD				didwd;
+	LPDIRECTINPUTDEVICE8	lpd;
+	DIDEVCAPS				didevcaps;
+	LPDIRECTINPUTDEVICE8	lpjs;
 
 	dirval = DIError(lpdi->CreateDevice(*lpguid, &lpd, nullptr));	// &GUID_Joystick
 	if (dirval != DI_OK)
 	{
 		Write_Debug("CreateDevice for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	dirval = DIError(lpd->QueryInterface(IID_IDirectInputDevice8, (void**)&lpjs));
@@ -501,7 +483,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
 	if (dirval != DI_OK)
 	{
 		Write_Debug("QueryInterface for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// Set the data format
@@ -509,7 +491,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK)
 	{
 		Write_Debug("SetDataFormat for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// Set the cooperative level
@@ -517,7 +499,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK)
 	{
 		Write_Debug("SetCooperativeLevel for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	memset(&didevcaps, 0, sizeof(DIDEVCAPS));
@@ -526,7 +508,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK)
 	{
 		Write_Debug("GetCapabilities for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// Set the joystick properties
@@ -541,7 +523,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
 	{
 		Write_Debug("SetProperty (buffer size) for joystick failed");
 #ifndef OPENGL3D
-		return(FALSE);
+		return false;
 #endif
 	}
 
@@ -557,7 +539,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (x range) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set X axis dead zone to 0% (handle at application layer)
@@ -571,7 +553,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (x deadzone) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set Y range
@@ -586,7 +568,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (y range) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set Y axis dead zone to 0% (handle at application layer)
@@ -600,7 +582,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (y deadzone) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set Z range
@@ -615,7 +597,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (z range) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set Z axis dead zone to 0% (handle at application layer)
@@ -629,7 +611,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (z deadzone) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set RX range
@@ -644,7 +626,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (rx range) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set RX axis dead zone to 0% (handle at application layer)
@@ -658,7 +640,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (rx deadzone) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set RY range
@@ -673,7 +655,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (ry range) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set RY axis dead zone to 0% (handle at application layer)
@@ -687,7 +669,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (ry deadzone) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set RZ range
@@ -702,7 +684,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (rz range) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set RZ axis dead zone to 0% (handle at application layer)
@@ -716,7 +698,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (rz deadzone) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set Slider(0) range
@@ -731,7 +713,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (slider 0 range) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set Slider(0) axis dead zone to 0% (handle at application layer)
@@ -745,7 +727,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (slider 0 deadzone) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set Slider(1) range
@@ -760,7 +742,7 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (slider 1 range) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	// set Slider(1) axis dead zone to 0% (handle at application layer)
@@ -774,13 +756,13 @@ LPDIRECTINPUTDEVICE8	lpjs;
  	if (dirval != DI_OK && dirval != DIERR_NOTFOUND)
 	{
 		Write_Debug("SetProperty (slider 1 deadzone) for joystick failed");
-		return(FALSE);
+		return false;
 	}
 
 	lpjsd[number] = lpjs;
 	lpjsguid[number] = lpguid;
 
-	return(TRUE);
+	return true;
 }
 
 
@@ -835,7 +817,7 @@ SINT32				i;
 	numjsd = number;
 #endif
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -845,7 +827,7 @@ HRESULT				dirval;
 
 	if (lpkbd == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	dirval = lpkbd->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), od, (LPDWORD)dwElements, 0);
@@ -860,7 +842,7 @@ HRESULT				dirval;
 		{
 			DIError(dirval);
 			Write_Debug("dipGetKeyboardData is continuing");
-			return(TRUE);
+			return TRUE;
 		}
 		else
 		{
@@ -868,10 +850,10 @@ HRESULT				dirval;
 			Write_Debug("GetDeviceData for keyboard failed");
 		}
 
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -881,7 +863,7 @@ HRESULT				dirval;
 
 	if (lpkbd == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	dirval = lpkbd->GetDeviceState(bufsize, buffer);
@@ -897,10 +879,10 @@ HRESULT				dirval;
 			Write_Debug("GetDeviceState for keyboard failed");
 		}
 
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -910,7 +892,7 @@ HRESULT				dirval;
 
 	if (lpmd == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	dirval = lpmd->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), od, (LPDWORD)dwElements, 0);
@@ -925,7 +907,7 @@ HRESULT				dirval;
 		{
 			DIError(dirval);
 			Write_Debug("dipGetMouseData is continuing");
-			return(TRUE);
+			return TRUE;
 		}
 		else
 		{
@@ -933,10 +915,10 @@ HRESULT				dirval;
 			Write_Debug("GetDeviceData for mouse failed");
 		}
 
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -946,7 +928,7 @@ HRESULT				dirval;
 
 	if (lpmd == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	dirval = lpmd->GetDeviceState(sizeof(DIMOUSESTATE), ms);
@@ -962,10 +944,10 @@ HRESULT				dirval;
 			Write_Debug("GetDeviceState for mouse failed");
 		}
 
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -978,7 +960,7 @@ static SINT32		retry[MAX_JOYSTICKS];
 	{
 		// Incase a joystick disappears during play, fake return of no data
 		*dwElements = 0;
-		return(TRUE);
+		return TRUE;
 	}
 
 	dirval = lpjsd[number]->Poll();
@@ -987,7 +969,7 @@ static SINT32		retry[MAX_JOYSTICKS];
 		if (dirval == DIERR_NOTACQUIRED || dirval == DIERR_INPUTLOST)
 		{
 			lpjsd[number]->Acquire();
-			return(FALSE);
+			return FALSE;
 		}
 		else
 		if (dirval == DIERR_UNPLUGGED)
@@ -1012,19 +994,19 @@ static SINT32		retry[MAX_JOYSTICKS];
 				lpjsd[number]->Unacquire();
 			}
 
-			return(FALSE);
+			return FALSE;
 		}
 		else
 		if (dirval != DI_BUFFEROVERFLOW)
 		{
 			DIError(dirval);
 			Write_Debug("Poll for joystick state failed");
-			return(FALSE);
+			return FALSE;
 		}
 		else
 		if (DIError(dirval) != DI_OK)
 		{
-			return(FALSE);
+			return FALSE;
 		}
 	}
 
@@ -1034,10 +1016,10 @@ static SINT32		retry[MAX_JOYSTICKS];
 	if (dirval != DI_OK && dirval != DI_BUFFEROVERFLOW)
 	{
 		Write_Debug("GetDeviceData for joystick failed");
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -1053,7 +1035,7 @@ UINT32		numelements, numused, num, count;
 		num = numelements - numused;
 		if (!GetJoystickData(i, &od[numused], &num))
 		{
-			return(FALSE);
+			return FALSE;
 		}
 
 		for (count=0; count < num; count++, numused++)
@@ -1064,7 +1046,7 @@ UINT32		numelements, numused, num, count;
 
 	*dwElements = numused;
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -1075,7 +1057,7 @@ static SINT32		retry[MAX_JOYSTICKS];
 
 	if (lpjsd[number] == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	dirval = lpjsd[number]->Poll();
@@ -1084,7 +1066,7 @@ static SINT32		retry[MAX_JOYSTICKS];
 		if (dirval == DIERR_NOTACQUIRED || dirval == DIERR_INPUTLOST)
 		{
 			lpjsd[number]->Acquire();
-			return(FALSE);
+			return FALSE;
 		}
 		else
 		if (dirval == DIERR_UNPLUGGED)
@@ -1109,19 +1091,19 @@ static SINT32		retry[MAX_JOYSTICKS];
 				lpjsd[number]->Unacquire();
 			}
 
-			return(FALSE);
+			return FALSE;
 		}
 		else
 		if (dirval != DI_BUFFEROVERFLOW)
 		{
 			DIError(dirval);
 			Write_Debug("Poll for joystick state failed");
-			return(FALSE);
+			return FALSE;
 		}
 		else
 		if (DIError(dirval) != DI_OK)
 		{
-			return(FALSE);
+			return FALSE;
 		}
 	}
 
@@ -1131,10 +1113,10 @@ static SINT32		retry[MAX_JOYSTICKS];
 	if (dirval != DI_OK && dirval != DI_BUFFEROVERFLOW)
 	{
 		Write_Debug("GetDeviceState for joystick failed");
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -1405,7 +1387,7 @@ SINT8*			ptxt;
 	{
     case DI_OK:
     {
-		return(retval);
+		return retval;
     }
     case DI_BUFFEROVERFLOW:
     {
@@ -1583,5 +1565,5 @@ SINT8*			ptxt;
 
 #endif
 
-    return(retval);
+    return retval;
 }

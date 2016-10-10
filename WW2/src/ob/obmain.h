@@ -137,7 +137,6 @@ struct LISTHEADER;
 
 typedef LOGICAL (*DeprecatedDrawCallback)(struct OBJECT* lpobj);
 typedef LOGICAL (*PROCESSCALLBACK)(struct OBJECT* lplod, UINT32 user);
-typedef LOGICAL (*FINDCALLBACK)(struct OBJECT* lplod, void* userdata);
 
 typedef bool (*CullCallback)(struct OBJECT* o);
 typedef bool (*UpdateCallback)(struct OBJECT* o);
@@ -462,7 +461,7 @@ extern LOGICAL		obmainFindCommentCallback(struct OBJECT* lpmain, char* comment, 
 extern LOGICAL		obmainFindCommentFirstPartCallback(struct OBJECT* lpmain, const char* comment, UINT32 user, PROCESSCALLBACK callback);
 extern LOGICAL		obmainFindObjectLOD(struct OBJECT* lpmain, int lod, PROCESSCALLBACK callback);
 extern LOGICAL		obmainFindObjectDamage(struct OBJECT* lpmain, int dmg, PROCESSCALLBACK callback);
-extern void			obmainFindCallback(struct OBJECT* lpmain, FINDCALLBACK callback, void* userdata);
+extern void			obmainFindCallback(struct OBJECT* lpmain, void(*callback)(OBJECT&, void*), void* userdata);
 extern struct OBJECT*	obmainCopyObjectFull(struct OBJECT* lpcopy);
 extern struct OBJECT*	obmainCopyObject(struct OBJECT* lpcopy);
 extern struct OBJECT*	obmainCopyNamedObject(char* name);
@@ -501,7 +500,7 @@ extern LOGICAL obmainSetObjectTreeMatrix(OBJECT * Obj,piMATRIX * Mat);
 extern void obmainCreateMutableSurfaceNormals(OBJECT*);
 extern void obmainCreateMutableCollisionNormals(OBJECT*);
 
-extern LOGICAL obmainValidateObject(OBJECT*); // last resort to track down garbage objects
+extern bool obmainValidateObject(const OBJECT*); // last resort to track down garbage objects
 
 // get a screen oriented bounding box for the object
 extern LOGICAL obmainGetScreenBBOX(OBJECT* lpob, float& x, float& y, float &z, float& w, float& h);

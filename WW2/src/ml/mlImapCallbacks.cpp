@@ -369,13 +369,12 @@ UINT32 mlTraverseTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 	if (VehicleData == nullptr) return 1;
-	UINT32 Position;
 	imap_callback_ext_data* extdata = (imap_callback_ext_data*)data;
 	FLOAT64 Delta, diff, dir;
 
 	//uiChatPrintLine("TurretTraverse: %d %u %u", Param, Id, data);
 
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	VehicleData->axisType = (extdata) ? extdata->axisType : IMAP_SYMMETRIC_AXIS;
 
@@ -545,12 +544,11 @@ UINT32 mlElevateTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 	if (VehicleData == nullptr) return 1;
-	UINT32 Position;
 	imap_callback_ext_data* extdata = (imap_callback_ext_data*)data;
 
 	//uiChatPrintLine("TurretElevate: %d %u %u", Param, Id, data);
 
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	VehicleData->axisType = (extdata) ? extdata->axisType : IMAP_SYMMETRIC_AXIS;
 
@@ -832,12 +830,11 @@ UINT32 mlToggleAuxSight(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-	UINT32 Position;
 	FLOAT64VECTOR TempPos;
 	UCHAR s[32];
 
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 	VehicleData->HatchOpen[Position] = !VehicleData->HatchOpen[Position];
 
 	sprintf((char*)s,"hatchstate%d",Position+1);
@@ -912,11 +909,10 @@ UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 	if(VehicleData == nullptr) return 0;
-	UINT32 Position;
 	FLOAT64VECTOR TempPos;
 	FLOAT64 Speed;
 
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	if(VehicleData->CanopyJammed[Position])
 	{
@@ -1376,10 +1372,9 @@ UINT32 mlAdjustWinch(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 	if (VehicleData == nullptr) return 1;
-	UINT32 Position;
 	SINT32 TurretNum;
 
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	TurretNum = VehicleData->VehicleMasterPtr->VehicleType->TurretAux[Position];
 	if(TurretNum > 0)

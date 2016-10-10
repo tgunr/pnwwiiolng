@@ -10,7 +10,7 @@
 	Rev 1  c2001
 */
 
-extern LOGICAL fpUpdatePerson(struct mlVehicleData* VehicleData, FLOAT64 DeltaTime);
+extern bool fpUpdatePerson(struct mlVehicleData* VehicleData, FLOAT64 DeltaTime);
 
 extern LOGICAL fpInit(struct vehVehicle*vehicle);
 extern LOGICAL fpKill(struct mlVehicleData* VehicleData);

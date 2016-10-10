@@ -198,7 +198,7 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 #define WW_ERR_MAX 10
 
 static SINT32 eventID;
-Covert<LOGICAL> archiveWasCorrupt;
+Covert<bool> archiveWasCorrupt;
 static WWII_ERROR_INFO errInfoQueue[WW_ERR_MAX];
 
 static WWII_ERROR_INFO* _getErrInfo();
@@ -218,7 +218,7 @@ wwiiQueuedSend_WWII_ERROR_INFO(WWII_ERROR_INFO* info)
 	*errInfo = *info;
 
 	if(errInfo->errorType == WW_ERR_VALIDITY_CHECK)
-		archiveWasCorrupt = 1;
+		archiveWasCorrupt = true;
 
 	errInfo->eventID = eventID++;
 	if ( ! errInfo->clientVersion )     errInfo->clientVersion      = _strVerToHex(STRVER);

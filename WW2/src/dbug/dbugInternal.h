@@ -74,7 +74,7 @@ public:
 	bool		initialized;
 	SINT32		dbugfile;
 	SINT32		logType;
-	LOGICAL		isLog;
+	bool		isLog;
 	UINT32		writeLevel;
 	UINT32		logLevel;
 	SINT32		writeFlags;

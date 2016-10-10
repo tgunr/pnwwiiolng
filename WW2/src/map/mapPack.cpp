@@ -14,6 +14,7 @@
 #include "mm/mmPack.h"
 #include "teul/teulPackers.h"
 #include "wwii/wwiiPack.h"
+#include "wwii/wwiiPackBool.h"
 #include "wwii/wwiiPackString.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -40,7 +41,7 @@ PersonaSummary::packer(PackMode mode, ACTION_OBJECT* a)
 SINT32
 PersonaSummaries::packer(PackMode mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_error, 1);
+	a->offset = wwiiPackBool(mode, a->packed, a->offset, m_error);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_count, 7);
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_callsign, 0);
 
@@ -107,7 +108,7 @@ BrigadeSummary::packer(PackMode mode, ACTION_OBJECT* a)
 SINT32
 BrigadeSummaries::packer(PackMode mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_error, 1);
+	a->offset = wwiiPackBool(mode, a->packed, a->offset, m_error);
 	if ( !m_error )
 	{
 		a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_count, 7);
@@ -195,8 +196,8 @@ MissionList::packer(PackMode mode, ACTION_OBJECT* a)
 		{
 			a->offset = m_missions[i].packer(mode, a);
 		}
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_listStart, 1);
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_listEnd, 1);
+		a->offset = wwiiPackBool(mode, a->packed, a->offset, m_listStart);
+		a->offset = wwiiPackBool(mode, a->packed, a->offset, m_listEnd);
 	}
 	else if ( mode == TEUL_UNPACK )
 	{
@@ -204,7 +205,7 @@ MissionList::packer(PackMode mode, ACTION_OBJECT* a)
 		m_count = 0;
 	}
 
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_canPost, 1);
+	a->offset = wwiiPackBool(mode, a->packed, a->offset, m_canPost);
 
 	a->offset = m_activeMission.packer(mode, a);
 

@@ -5911,7 +5911,7 @@ void oglLockState(SINT32 state, LOGICAL lock)
     g_statelocked[state] = lock;
 }
 
-void oglLockTextureState(LOGICAL lock)
+void oglLockTextureState(bool lock)
 {
     TextureState::Lock(lock);
 }

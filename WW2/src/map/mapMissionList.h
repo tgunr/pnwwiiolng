@@ -118,14 +118,13 @@ public:
 	SINT32 sendQuick(SINT32 teulIndex);
 
 	ML_RESULT		m_status;							// Status of the list
-	LOGICAL			m_listStart;						// True if this is the start of list
-	LOGICAL			m_listEnd;							// True if this is the end of the list
+	bool			m_listStart;						// True if this is the start of list
+	bool			m_listEnd;							// True if this is the end of the list
+	bool			m_canPost;							// Can I post here?
 	MissionSynopsis	m_missions[MAX_MISSIONS_PER_LIST];	// Array of missions
-	LOGICAL			m_canPost;							// Can I post here?
 	ActiveMission	m_activeMission;					// Details what mission, if any, you have active
 	UINT8			m_count;							// Number of missions described
 
 private:
 	SINT32 _sendResult(SINT32 teulIndex, ML_RESULT result) { m_status = result; return send(teulIndex); }
 };
-

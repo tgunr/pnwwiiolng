@@ -131,7 +131,7 @@
     extern void oglPushRenderState(UINT32 state);
     extern void oglPopRenderState(UINT32 state);
     extern void oglLockState(SINT32 state, LOGICAL lock);
-    extern void oglLockTextureState(LOGICAL lock);
+    extern void oglLockTextureState(bool lock);
     extern void oglLockMaterialState(LOGICAL lock);
     extern void oglGetPostRenderFilterTexture(GLuint* texid, GLenum* target);
     extern void oglLockWorldMatrix(LOGICAL lock);

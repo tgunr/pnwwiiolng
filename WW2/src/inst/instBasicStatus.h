@@ -59,7 +59,7 @@ namespace Instance			//tolua_export
         UINT32 runningForS() const { return (teulClockTime > startedAt()) ? (teulClockTime - startedAt()) : 0 ; }
         UINT32 remainingTimeS() const { return runningForS() < gameTime_m() ? gameTime_m() - runningForS() : 0 ; }
         
-        virtual SINT32 packer(unsigned int mode, struct ACTION_OBJECT* a) ;
+        virtual SINT32 packer(PackMode mode, struct ACTION_OBJECT* a) ;
         
         // Test if the game is full
         bool isFull() const { return allies() + axis() >= m_capacity ; }

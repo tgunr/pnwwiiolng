@@ -125,7 +125,7 @@ public:
 	SINT32 send(SINT32 teulIndex);		// host "send" function
 	SINT32 receive(SINT32 teulIndex);	// client/host receive function
 
-	LOGICAL			m_error;							// True error occured
+	bool			m_error;							// True error occured
 	UINT32			m_count;							// Number of summaries described
 	ChatHandle		m_callsign;							// Player's handle
 	PersonaSummary	m_summaries[MAX_PLAYER_PERSONAS];	// Array of summaries

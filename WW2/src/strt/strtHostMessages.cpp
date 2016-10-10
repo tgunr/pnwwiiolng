@@ -79,14 +79,13 @@ static	TEUL_CALLBACK* _SEND_MM_POST_DENY;
 static	TEUL_CALLBACK* _SEND_MM_JOIN_ACCEPT;
 static	TEUL_CALLBACK* _SEND_MM_JOIN_DENY;
 static	TEUL_CALLBACK* _XCHG_MM_SPAWN_GRANT;
-static	TEUL_CALLBACK* _XCHG_MM_POST_INFO;
 static	TEUL_CALLBACK* _XCHG_MM_CAPACITY;
 
 static	TEUL_CALLBACK* _SEND_SYNC_CPS;
 static	TEUL_CALLBACK* _SEND_SYNC_FACILITIES;
 static	TEUL_CALLBACK* _SEND_SYNC_BUILDINGS;
 
-static LOGICAL _allowSyncing = FALSE;
+static bool _allowSyncing = false;
 
 template <class Type>
 class SyncQueue : public std::vector<Type*>
@@ -122,7 +121,7 @@ static SyncQueue<ObjectStruct> _objectQueue;
 void
 strtAllowSyncing()
 {
-	_allowSyncing = TRUE;
+	_allowSyncing = true;
 }
 
 // When facility state data changes, we need to queue up the facility
@@ -498,7 +497,7 @@ SINT32 strtSyncObjects(UINT32 address, UINT16 port, Supercell* sc)
 	return fretval;
 }
 
-LOGICAL
+bool
 strtReplyToCapacityRequest(SINT32 teulIndex, const MM_CAPACITY_REQUEST& request, FULL_OBJ_ID destFacilityID, bool vehicleDelivered)
 {
 	MM_CAPACITY_RESPONSE response;
@@ -512,10 +511,10 @@ strtReplyToCapacityRequest(SINT32 teulIndex, const MM_CAPACITY_REQUEST& request,
 	if ((teulSend(teulIndex, _XCHG_MM_CAPACITY, &response)) < 0)
 	{
 		dbugLog(_FLA,"error sending capacity response");
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 static SINT32 _recvEnemyReport(ACTION_OBJECT* const a)
@@ -639,8 +638,8 @@ MM_SPAWN_GRANT_RESPONSE spawnGrantResponse;
 
 	betaLog(_FLD, "spawnGrantRequest: %d %d:%d:%d:%d:%d %d:%d:%d:%d", spawnGrantRequest.weaponSerial.serial, spawnGrantRequest.weaponSerial.source.cell.ox, spawnGrantRequest.weaponSerial.source.cell.oy, spawnGrantRequest.weaponSerial.source.id, spawnGrantRequest.weaponSerial.source.objClass, spawnGrantRequest.weaponSerial.source.objType, spawnGrantRequest.weaponSerial.spec.wCountry, spawnGrantRequest.weaponSerial.spec.wCategory, spawnGrantRequest.weaponSerial.spec.wClass, spawnGrantRequest.weaponSerial.spec.wType);
 
-	const LOGICAL success = strtProcessSpawnGrantRequest(spawnGrantRequest, spawnGrantResponse);
-	if ( success == TRUE )
+	const bool success = strtProcessSpawnGrantRequest(spawnGrantRequest, spawnGrantResponse);
+	if ( success )
 	{
 		//serious hack here!!!
 		MM_CAPACITY_REQUEST mmCapacityReq;
@@ -669,24 +668,6 @@ static SINT32 _sendMMSpawnGrantResponse(ACTION_OBJECT* const a)
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_SPAWN_GRANT_RESPONSE));
 }
 
-static SINT32 _recvMMPostInfoRequest(ACTION_OBJECT* const a)
-{
-	MM_POST_INFO_REQUEST postInfoRequest;
-	MM_POST_INFO_RESPONSE postInfoResponse;
-
-	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postInfoRequest, sizeof(MM_POST_INFO_REQUEST));
-
-	betaLog(_FLD, "p:%u postInfoRequest: " PRF_WEAPON_SERIAL " %u", postInfoRequest.customerID, PRA_WEAPON_SERIAL(postInfoRequest.weaponSerial), postInfoRequest.join);
-
-	if (strtProcessPostInfoRequest(postInfoRequest, postInfoResponse))
-	{
-		if ((teulSend(a->teulIndex, _XCHG_MM_POST_INFO, &postInfoResponse)) < 0)
-			dbugLog(_FLA,"Error sending spawn grant response");
-	}
-
-	return a->offset;
-}
-
 static SINT32
 _recvMMJoinListRequest(ACTION_OBJECT* const a)
 {
@@ -696,7 +677,7 @@ _recvMMJoinListRequest(ACTION_OBJECT* const a)
 
 	betaLog(_FLD, "p:%u joinListRequest " PRF_WEAPON_SERIAL " %s %u", request.customerID, PRA_WEAPON_SERIAL(request.weaponSerial), Chat::Name(request.handle).c_str(), request.join);
 
-	if ( strtProcessJoinListRequest(a->teulIndex, request) == false )
+	if ( !strtProcessJoinListRequest(a->teulIndex, request) )
 	{
 		betaLog(_FLD, "p:%u joinListRequest failed, sending deny", request.customerID);
 		strtSendMMJoinDeny(request.customerID, MM_JOIN_FAIL_CANT_FIND_POSTED_WEAPON);
@@ -734,11 +715,6 @@ static SINT32 _recvMMPostCancel(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-static SINT32 _sendMMPostInfoResponse(ACTION_OBJECT* const a)
-{
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_INFO_RESPONSE));
-}
-
 static SINT32 _recvWeaponsReturn(ACTION_OBJECT* const a)
 {
 	WeaponsReturn& incoming = *(WeaponsReturn*)(a->packed);
@@ -770,7 +746,7 @@ _recvMMSpawnCancel(ACTION_OBJECT* const a)
 						, spawnCancel.weaponSerial.spec.wCountry, spawnCancel.weaponSerial.spec.wCategory, spawnCancel.weaponSerial.spec.wClass, spawnCancel.weaponSerial.spec.wType);
 	}
 
-	strtProcessSpawnCancel(&spawnCancel);
+	strtProcessSpawnCancel(spawnCancel);
 
 	return a->offset;
 }
@@ -1133,7 +1109,6 @@ strtHostInstallCallbacks(void)
 
 		REGISTER_RECEIVER(STRT_MM_POST_LIST_Y, _recvMMPostListRequest);
 		REGISTER_RECVSEND(STRT_MM_SPAWN_GRANT_Y, _recvMMSpawnGrantRequest, _sendMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT);
-		REGISTER_RECVSEND(STRT_MM_POST_INFO_Y, _recvMMPostInfoRequest, _sendMMPostInfoResponse, _XCHG_MM_POST_INFO);
 		REGISTER_RECEIVER(STRT_MM_JOIN_LIST_Y, _recvMMJoinListRequest);
 		REGISTER_RECVSEND(STRT_MM_CAPACITY_Y, _recvMMCapacityRequest, _sendMMCapacityResponse, _XCHG_MM_CAPACITY);
 

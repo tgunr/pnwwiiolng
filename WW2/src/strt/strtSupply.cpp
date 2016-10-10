@@ -110,7 +110,7 @@ strtDisableDebugSupply()
 //////////////////////////////////////////////////////////////////////
 // Query supply debugging
 
-LOGICAL
+bool
 strtGetDebugSupply()
 {
 	return _debugSupplyEnabled;

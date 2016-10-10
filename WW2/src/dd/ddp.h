@@ -72,8 +72,8 @@
 	LOGICAL		ddpDraw();
 	LOGICAL		ddpIsAccessed();
 	LOGICAL		ddpIsLocked();
-	LOGICAL		ddpDrawNotActive(LOGICAL newpna);
-	LOGICAL		ddpDisableScreenSaver(LOGICAL newss);
+	void		ddpDrawNotActive(bool newdna);
+	void		ddpDisableScreenSaver(bool newss);
 	SINT32		ddpGetTotalPaints(void);
 	FLOAT32		ddpGetFPS();
 	FLOAT32		ddpGetInstantFPS();

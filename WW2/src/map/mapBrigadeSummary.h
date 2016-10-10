@@ -137,7 +137,7 @@ public:
 	void populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* player);
 
 public:
-	LOGICAL			m_error;							// True error occured
+	bool			m_error;							// True error occured
 	UINT32			m_count;							// Number of summaries described
 	BrigadeSummary	m_summaries[MAX_LISTED_BRIGADES];	// Array of summaries
 };

@@ -18,6 +18,7 @@
 #include "mm/mmSpawnTypes.h"
 #include "teul/teulPackers.h"
 #include "wwii/wwiiPack.h"
+#include "wwii/wwiiPackBool.h"
 
 SINT32
 mmPackPostedWeapon(PackMode mode, UCHAR* data, SINT32 offset, MM_POSTED_WEAPON* object, SINT32 /*size*/)
@@ -46,10 +47,10 @@ mmPackFEPostRequest(PackMode mode, UCHAR* data, SINT32 offset, FE_POST_REQUEST* 
 SINT32
 mmPackFEPostAccept(PackMode mode, UCHAR* data, SINT32 offset, FE_POST_ACCEPT* object, SINT32 /*size*/)
 {
-	offset = teulPackUINT32(mode,data, offset, (UINT32*)&(object->newVehicle), 0);
 	offset = wwiiPackWeaponSerial(mode, data, offset, &(object->weaponSerial), 0);
 	offset = teulPackSINT16(mode, data, offset, &(object->portal), 0);
-	offset = teulPackUINT32(mode, data, offset, &(object->mobileSpawnAvailable), 1);
+	offset = wwiiPackBool(mode,data, offset, object->newVehicle);
+	offset = wwiiPackBool(mode, data, offset, object->mobileSpawnAvailable);
 	return offset;
 }
 

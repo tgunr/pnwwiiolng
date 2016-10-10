@@ -1652,7 +1652,7 @@ OBJECT*	lpatt;
 }
 
 
-void trnopLoadTrees(LOGICAL bLoad)
+void trnopLoadTrees(bool bLoad)
 {
 #if defined(BETA_RELEASE)
     g_bLoadTrees = bLoad;

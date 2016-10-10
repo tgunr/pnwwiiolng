@@ -359,11 +359,11 @@ static UINT32			deathState;				// which death animation to play
 
 // these prevent/permit drawing of the various components .. tried to use enable/disable in granny
 // but that caused flashes
-static LOGICAL			showArms;
-static LOGICAL			showGun;
-static LOGICAL			showClip;
-static LOGICAL			showAux[NUM_WEAPONS][FPS_NUM_AUX_MODELS];
-static LOGICAL			rgRoundFired;
+static bool				showArms;
+static bool				showGun;
+static bool				showClip;
+static bool				showAux[NUM_WEAPONS][FPS_NUM_AUX_MODELS];
+static bool				rgRoundFired;
 static FLOAT64			fireStartTime;
 static FLOAT64			weaponChangeStartTime;
 static FLOAT32			deployStartTime;
@@ -373,7 +373,7 @@ static SINT32			lastInput;
 
 // when concentrating, no input is accepted
 // things like when you are firing or deploying/undeploying
-static LOGICAL			concentrating; // not yet used
+static bool				concentrating; // not yet used
 
 // capture table stuff
 
@@ -389,7 +389,7 @@ static fpTPSEmoteType	emoteType;
 static SINT32			shellEjectTime;
 
 // deployed state stuff
-static LOGICAL			deployedStateInitialized, deployNeedsDeployment, deployNeedsUndeployment;
+static bool				deployedStateInitialized, deployNeedsDeployment, deployNeedsUndeployment;
 static piVECTOR			deployPositionRaw, deployPosition;
 //static piVECTOR			deployModelPosition;
 static SINT32			groundMaterial;
@@ -404,7 +404,7 @@ static UINT32			resupplyTarget;
 static SINT32			resupplyTime;
 static SINT32			primaryWeaponStartAmmo;
 
-static LOGICAL			overSupplyWarning;
+static bool				overSupplyWarning;
 static piVECTOR			oversupplyPosition;
 
 static FPSColliderData	_collider;
@@ -423,8 +423,7 @@ static SINT32 fpsStartGrenadeThrowTime, fpsEndGrenadeThrowTime;
 
 // Sniper stuff
 
-static LOGICAL          scopeTimerSet;
-static LOGICAL          scopeUp;
+static bool				scopeUp;
 static FLOAT64          scopeDelay;
 
 static SINT32 _ppoLastStance = 0;
@@ -506,11 +505,8 @@ void fpFPSInit(vehVehicle*vehicle)
 	//persLoadInstGunsight("vehicles\\ground\\groundman\\4x_riflescope.gs");
 	persGunSightSetBaseFOV(fpsTrooper.defaultFOV);
 
-	scopeTimerSet = TRUE;
 	scopeDelay = 0.0f;
-	scopeUp = FALSE;
-
-
+	scopeUp = false;
 
 #if AIMING_WEAPONS
 	fpsTrooper.mouseGranularity = 0.01;
@@ -529,10 +525,10 @@ void fpFPSInit(vehVehicle*vehicle)
 	memset (weapAnims, 0, sizeof (gr2Animation*)*NUM_WEAPONS*NUM_WEAP_STATES);
 	memset (clipAnims, 0, sizeof (gr2Animation*)*NUM_WEAPONS*NUM_WEAP_STATES);
 
-	showArms = TRUE;
-	showGun = TRUE;
-	showClip = TRUE;
-	rgRoundFired = FALSE;
+	showArms = true;
+	showGun = true;
+	showClip = true;
+	rgRoundFired = false;
 
 	LOGICAL isParatroop = fpsTrooper.isParatroop.Get();
 	LOGICAL binocsEnabled = fpsTrooper.binocsEnabled.Get();
@@ -741,7 +737,7 @@ void fpFPSInit(vehVehicle*vehicle)
 		fpsTrooper.leanMaxSpeed = 10;
 	}
 
-	concentrating = 0;
+	concentrating = false;
 	fireStartTime = 0.0f;
 	fireUpdateNo = 0;
 
@@ -760,8 +756,8 @@ void fpFPSInit(vehVehicle*vehicle)
 	// reset auxillary stuff
 	for(int i = 0; i < NUM_WEAPONS; i++)
 	{
-		//showAux[i][FPS_AUX_RGCUP]						= 0;
-		//showAux[i][FPS_AUX_RGGRENADE]					= 0;
+		//showAux[i][FPS_AUX_RGCUP]						= false;
+		//showAux[i][FPS_AUX_RGGRENADE]					= false;
 		fpsWeapons[i].auxEnable[FPS_AUX_RGCUP]			= 0;
 		fpsWeapons[i].auxEnable[FPS_AUX_RGGRENADE]		= 0;
 	}
@@ -823,8 +819,8 @@ void fpFPSDetermineTrooperLoadout (vehVehicle*vehicle,
 
 			if(weapon.aux)
 			{
-				showAux[weaponArray[weapon.index]][FPS_AUX_RGCUP]						= 1;
-				showAux[weaponArray[weapon.index]][FPS_AUX_RGGRENADE]					= 1;
+				showAux[weaponArray[weapon.index]][FPS_AUX_RGCUP]						= true;
+				showAux[weaponArray[weapon.index]][FPS_AUX_RGGRENADE]					= true;
 				fpsWeapons[weaponArray[weapon.index]].auxAvailable[FPS_AUX_RGCUP]		= 1;
 				fpsWeapons[weaponArray[weapon.index]].auxAvailable[FPS_AUX_RGGRENADE]	= 1;
 			}
@@ -1098,7 +1094,7 @@ void fpFPSInitDeployedState()
 		fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGGRENADE] = 0;
 	}
 
-	deployedStateInitialized = TRUE;
+	deployedStateInitialized = true;
 }
 
 static fpsWeaponStates _determineNextRifleState()
@@ -1259,7 +1255,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 	}
 	else
 	{
-		deployedStateInitialized = FALSE;
+		deployedStateInitialized = false;
 	}
 
 	// have to pay attention to the gun while deploying
@@ -1696,9 +1692,9 @@ fpsWeaponStates fpFPSDetermineNextState ()
 					auxModel[i] = auxModels[currentWeaponModel][i];
 				}
 
-				showArms = TRUE;
-				showGun = TRUE;
-				showClip = TRUE;
+				showArms = true;
+				showGun = true;
+				showClip = true;
 
 				if (!fpFPSAttachWeapon (currentWeaponModel))
 				{
@@ -1744,9 +1740,9 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				aimError = (mathGetFloat32ChaoticNumber() - 0.5) * 6.0;
 				aimVertAngle += aimError;
 
-				showArms = FALSE;
-				showGun = FALSE;
-				showClip = FALSE;
+				showArms = false;
+				showGun = false;
+				showClip = false;
 
 				lastWeaponModel = currentWeaponModel;
 				currentWeaponModel = fpsTrooper.weaponPositionModel[fpsTrooper.nextWeaponNumber];
@@ -1776,10 +1772,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				((currentTime - currentGameWeapon->ReloadStartTime) > currentGameWeapon->WeaponType->ReloadTime))
 			{
 				currentGameWeapon->ReloadStartTime = 0;
-				if (fpsWeapons[currentWeaponModel].clipBullets > 0)
-					showGun = TRUE;
-				else
-					showGun = FALSE;
+				showGun = fpsWeapons[currentWeaponModel].clipBullets > 0;
 
 				stateFlags &= ~STATE_RELOADING;
 			}
@@ -1792,10 +1785,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				((currentTime - currentGameWeapon->ReloadStartTime) > currentGameWeapon->WeaponType->ReloadTime))
 			{
 				currentGameWeapon->ReloadStartTime = 0;
-				if (fpsWeapons[currentWeaponModel].clipBullets > 0)
-					showGun = TRUE;
-				else
-					showGun = FALSE;
+				showGun = fpsWeapons[currentWeaponModel].clipBullets > 0;
 
 				stateFlags &= ~STATE_RELOADING;
 			}
@@ -1822,10 +1812,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 					((currentTime - currentGameWeapon->ReloadStartTime) > currentGameWeapon->WeaponType->ReloadTime))
 				{
 					currentGameWeapon->ReloadStartTime = 0;
-					if (fpsWeapons[currentWeaponModel].clipBullets > 0)
-						showGun = TRUE;
-					else
-						showGun = FALSE;
+					showGun = fpsWeapons[currentWeaponModel].clipBullets > 0;
 
 					stateFlags &= ~STATE_RELOADING;
 				}
@@ -1909,12 +1896,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
                     }
                 }
 
-				if ((currentTime - currentGameWeapon->ReloadStartTime) < 0.5)
-				{
-					showClip = FALSE;
-				}
-				else
-					showClip = TRUE;
+				showClip = (currentTime - currentGameWeapon->ReloadStartTime) >= 0.5;
 			}
 			// else auto rifles fire as fast as you can pull the trigger
 
@@ -1968,12 +1950,12 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
 	if (deployNeedsDeployment)
 	{
-		deployNeedsDeployment = FALSE;
+		deployNeedsDeployment = false;
 
 		/*
 		if(stat2Flags & STAT2_POSE_CHANGE)
 		{
-			deployNeedsUndeployment = TRUE;
+			deployNeedsUndeployment = true;
 		}
 		else
 		{
@@ -2003,7 +1985,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
 	if (deployNeedsUndeployment)
 	{
-		deployNeedsUndeployment = FALSE;
+		deployNeedsUndeployment = false;
 		stateFlags |= STATE_DEPLOYING;
 		deployStartTime = frametime/1000.0f;
 
@@ -2363,7 +2345,7 @@ LOGICAL fpFPSWeaponStateCheck (fpsWeaponStates* newState)
 					currentGameWeapon->AmmoTypeInUse = 1;
 					fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGCUP] = 1;
 					fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGGRENADE] = 0;
-					rgRoundFired = FALSE;
+					rgRoundFired = false;
 				}
 			}
 		}
@@ -2649,7 +2631,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 			outDuration = 0;
 			inDuration = 1.0;
 			repeatCount = GrannyForever;
-			showGun = FALSE;
+			showGun = false;
 		}
         // HACK! It's the same behavior as the revolver, but keeping it separate, since it may
         // change
@@ -2728,7 +2710,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 			if (state == RELOAD)
 			{
 				repeatCount = GrannyForever;
-				//showGun = FALSE;
+				//showGun = false;
 			}
 			else
 			{
@@ -6274,9 +6256,9 @@ LOGICAL fpFPSDraw (OBJECT* pObject, LOGICAL render)
 	}
 
 #ifdef TESTING_FPS
-	static LOGICAL	debugDraw = 1;
+	const bool debugDraw = true;
 #else
-	static LOGICAL	debugDraw = 0;
+	const bool debugDraw = false;
 #endif
 
 	fpPersonData* personData = fpGetFPPersonDataPtr();
@@ -7748,12 +7730,12 @@ void fpFPSDeployChange ()
 {
 	if (!(stateFlags & STATE_DEPLOYED))
 	{
-		deployNeedsDeployment = TRUE;
+		deployNeedsDeployment = true;
 		stateFlags |= STATE_DEPLOYED;
 	}
 	else
 	{
-		deployNeedsUndeployment = TRUE;
+		deployNeedsUndeployment = true;
 	}
 }
 
@@ -9123,7 +9105,7 @@ void fpFPSFireRound (weapWeapon* weapon, piMATRIX* fireAtt, void* FireVehicle)
 	if (fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGGRENADE])
 	{
 		fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGGRENADE] = 0;
-		rgRoundFired = TRUE;
+		rgRoundFired = true;
 		/*
 		// update rifle clip ammo
 		if(currentGameWeapon->NumRoundsAmmoLeft[0] > 0)
@@ -10207,9 +10189,9 @@ void fpFPSKillTrooper ()
 	fpPersonData* personData = fpGetFPPersonDataPtr();
 	if(!personData) return;
 
-    showArms = FALSE;
-	showGun = FALSE;
-	showClip = FALSE;
+    showArms = false;
+	showGun = false;
+	showClip = false;
 
     heightAtDeath = fpFPSGetHeight();
 
@@ -10806,8 +10788,8 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 //		stat2Flags &= ~STAT2_NEEDS_RELOAD;
 
 		currentGameWeapon->ReloadStartTime = 0;
-		showClip = TRUE;
-		showGun = TRUE;
+		showClip = true;
+		showGun = true;
 
 		stateFlags |= STATE_NO_MOVEMENT | STATE_SIT;
 		stat2Flags = 0;
@@ -10832,7 +10814,7 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 		legsModel = legsModels[currentArms];
 
 		// this is added to fix a sit until we have all the set states. DEG
-        // showGun = FALSE;
+        // showGun = false;
 		// end of temp fix DEG.
 
 		if (!gr2AttachModel (legsModel, "Bip01", skeletonModel, "Bip01"))
@@ -10862,7 +10844,7 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 
 		targetPose = FPS_POSITION_STAND;
 		// this is added to fix a sit until we have all the set states. DEG
-        // showGun = TRUE;
+        // showGun = true;
 		// end of temp fix DEG.
 
 		vehVehicle* player = persGetPersonaVehiclePtr();
@@ -11415,7 +11397,7 @@ void fpFPSDrawGunsight (void)
 				(currentFPSstate == THROW)&&
 				(((frametime / 1000.0) - grenadeApperLapse) > fpsWeapons[currentWeaponModel].grenadeVisDelay ))
 			{
-				showGun = FALSE;
+				showGun = false;
 			}
 		}
 
@@ -11430,9 +11412,9 @@ void fpFPSDrawGunsight (void)
                 {
                     if(scopeUp)
                     {
-                        showArms = FALSE;
-				        showGun = FALSE;
-				        showClip = FALSE;
+                        showArms = false;
+				        showGun = false;
+				        showClip = false;
 
                         persGunsightDrawFPSScope((int)currentArms);
                     }
@@ -11451,13 +11433,13 @@ void fpFPSDrawGunsight (void)
 
                     if(delayseconds >= fpsWeapons[currentWeaponModel].sniperScopeDelay)
 				    {
-					    showArms = FALSE;
-					    showGun = FALSE;
-					    showClip = FALSE;
+					    showArms = false;
+					    showGun = false;
+					    showClip = false;
 
                         persGunsightDrawFPSScope((int)currentArms);
 
-                        scopeUp = TRUE;
+                        scopeUp = true;
 				    }
 
 					startSniperEndDelay = 0;
@@ -11481,10 +11463,10 @@ void fpFPSDrawGunsight (void)
 
                       if(delayseconds >= fpsWeapons[currentWeaponModel].sniperScopeEndDelay)
 				      {
-					    scopeUp = FALSE;
-						showArms = TRUE;
-						showGun = TRUE;
-						showClip = TRUE;
+					    scopeUp = false;
+						showArms = true;
+						showGun = true;
+						showClip = true;
                         startSniperEndDelay = 0;
                         startSniperDelay = 0;
 				     }
@@ -11494,10 +11476,10 @@ void fpFPSDrawGunsight (void)
 					{
 						startSniperDelay = 0;
                         startSniperEndDelay = 0;
-						scopeUp = FALSE;
-						showArms = TRUE;
-						showGun = TRUE;
-						showClip = TRUE;
+						scopeUp = false;
+						showArms = true;
+						showGun = true;
+						showClip = true;
 					}
 
 					startSniperDelay = 0;
@@ -11538,7 +11520,7 @@ void fpFPSDrawGunsight (void)
 				(currentFPSstate == THROW)&&
 				(((frametime / 1000.0) - grenadeApperLapse) > fpsWeapons[currentWeaponModel].grenadeVisDelay ))
 			{
-				showGun = FALSE;
+				showGun = false;
 			}
 		}
 
@@ -11553,9 +11535,9 @@ void fpFPSDrawGunsight (void)
                 {
                     if(scopeUp)
                     {
-                        showArms = FALSE;
-				        showGun = FALSE;
-				        showClip = FALSE;
+                        showArms = false;
+				        showGun = false;
+				        showClip = false;
 
                         persGunsightDrawFPSScope((int)currentArms);
                     }
@@ -11574,13 +11556,13 @@ void fpFPSDrawGunsight (void)
 
                     if(delayseconds >= fpsWeapons[currentWeaponModel].sniperScopeDelay)
 				    {
-					    showArms = FALSE;
-					    showGun = FALSE;
-					    showClip = FALSE;
+					    showArms = false;
+					    showGun = false;
+					    showClip = false;
 
                         persGunsightDrawFPSScope((int)currentArms);
 
-                        scopeUp = TRUE;
+                        scopeUp = true;
 				    }
 
 					startSniperEndDelay = 0;
@@ -11604,10 +11586,10 @@ void fpFPSDrawGunsight (void)
 
                       if(delayseconds >= fpsWeapons[currentWeaponModel].sniperScopeEndDelay)
 				      {
-					    scopeUp = FALSE;
-						showArms = TRUE;
-						showGun = TRUE;
-						showClip = TRUE;
+					    scopeUp = false;
+						showArms = true;
+						showGun = true;
+						showClip = true;
                         startSniperEndDelay = 0;
                         startSniperDelay = 0;
 				     }
@@ -11617,10 +11599,10 @@ void fpFPSDrawGunsight (void)
 					{
 						startSniperDelay = 0;
                         startSniperEndDelay = 0;
-						scopeUp = FALSE;
-						showArms = TRUE;
-						showGun = TRUE;
-						showClip = TRUE;
+						scopeUp = false;
+						showArms = true;
+						showGun = true;
+						showClip = true;
 					}
 
 					startSniperDelay = 0;
@@ -12004,7 +11986,7 @@ void fpFPSResupplySelf (const wchar_t* from)
 							oversupplyPosition.y = (FLOAT32)playerVehicle->ModelData->VehiclePos.y;
 
 							// reset the warning flag
-							overSupplyWarning = 0;
+							overSupplyWarning = false;
 
 							// we're done
 							break;
@@ -12564,9 +12546,9 @@ void fpFPSParachuteLanded()
 {
 	fpsTrooper.parachuteOKToOpen = FALSE;
 
-	showArms = TRUE;
-	showGun = TRUE;
-	showClip = TRUE;
+	showArms = true;
+	showGun = true;
+	showClip = true;
 
 	stateFlags &= ~(STATE_NO_MOVEMENT | STATE_EYE_MASK);
 
@@ -13322,7 +13304,7 @@ void fpFPSUpdateOverSupply(mlVehicleData* vd)
 		if(!overSupplyWarning)
 		{
 			uiGameEvent(GAMEEVENT_OVERSUPPLY_WARNING);
-			overSupplyWarning = 1;
+			overSupplyWarning = true;
 		}
 	}
 	else // we're within range
@@ -13330,7 +13312,7 @@ void fpFPSUpdateOverSupply(mlVehicleData* vd)
 		if(overSupplyWarning)
 		{
 			uiGameEvent(GAMEEVENT_OVERSUPPLY_INRANGE);
-			overSupplyWarning = 0;
+			overSupplyWarning = false;
 		}
 	}
 

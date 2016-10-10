@@ -1746,9 +1746,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 
 			// check for position switch or ordinance cycle and weapon groups active
 			{
-			SINT32 TempNum;
-
-				persGetPersonaPosition((UINT32*)&TempNum);
+				UINT32 TempNum = persGetPersonaPosition();
 
 				if (VehicleData->CycleAmmo != 0 ||
 					TempNum != VehicleData->LastPlayerPos)
@@ -1767,7 +1765,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 					}
 				}
 
-				persSetPositionOrdnanceNum (TempNum, VehicleData->OrdnanceSelected);
+				persSetPositionOrdnanceNum(TempNum, VehicleData->OrdnanceSelected);
 				VehicleData->LastPlayerPos = TempNum;
 			}
 
@@ -3302,7 +3300,6 @@ UINT32 MountFired = 0;
 mlWeaponMount * Mount = nullptr;
 weapWeapon * Weapon = nullptr;
 vehVehicle* Vehicle = nullptr;
-UINT32 Position = 0;
 
 	if (VehicleData->VehicleObjectData == nullptr)
 	{
@@ -3373,7 +3370,7 @@ UINT32 Position = 0;
 	}
 
 	Mount = (mlWeaponMount*)Component->SpecialData;
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	if(PassNum == 1)
 	{
@@ -4024,7 +4021,7 @@ static UINT32 _UpdateCrew(mlComponent * Component,mlVehicleData * VehicleData)
 			{
 				isDead = persGetCrewIsDead(CrewPosition);
 
-				persApplyDamage((FLOAT32)Component->NewDamage[i],CrewPosition,i, FALSE);
+				persApplyDamage(Component->NewDamage[i], CrewPosition, i, false);
 
 				if(!isDead) // if you're dead what do you care? :)
 				{
@@ -7170,19 +7167,17 @@ UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 									   FLOAT32 * DynamicFriction,
 									   FLOAT32 * RollCoefficientMult,
 									   SINT32 * InfSurfID,
-									   OBJECT * Object,
-									   LOGICAL FrictionMods)
+									   const OBJECT * Object,
+									   bool FrictionMods)
 {
-	LOGICAL		usingDefaultSurface = FALSE;
-
 	if (Object == nullptr)
-	{
 		return 1;
-	}
 
-    UCHAR * StringPtr = nullptr;
-	if(!obmainValidateObject(Object)) return 1;
+	if (!obmainValidateObject(Object)) return 1;
 
+	bool usingDefaultSurface = false;
+
+	UCHAR * StringPtr = nullptr;
 	if(Object->texname == nullptr || Object->texname[0] == '\0')
 	{
 		if(Object->matname == nullptr || Object->matname[0] == '\0')
@@ -7222,7 +7217,7 @@ UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 
     if(StringPtr == nullptr)
     {
-		usingDefaultSurface = TRUE;
+		usingDefaultSurface = true;
 
         hashFind = _hashBAF.find("default");
 
@@ -7246,7 +7241,7 @@ UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 
         if(hashFind == _hashBAF.end())
         {
-			usingDefaultSurface = TRUE;
+			usingDefaultSurface = true;
 
             hashFind = _hashBAF.find("default");
 
@@ -7817,7 +7812,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 	//uiConsoleprintf("SCENARIO: Updating terrain collide lists!");
 	_UpdateTerrainCollideLists(VehicleData,1);
 
-	fxAmbStop(FALSE);
+	fxAmbStop(false);
 
 	trnmainSetLightingUpdate(TRUE);
 	obdrawUpdateTerrainObjectLighting(TRUE);

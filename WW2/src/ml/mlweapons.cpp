@@ -428,7 +428,6 @@ UINT32 mlUpdateWeaponMount(FLOAT64VECTOR* Force, FLOAT64ATT* Torque,
 {
 	mlWeaponMount* Mount;
 	UINT32 MountFiring;
-	UINT32 Position;
 	UINT32 PrimaryTriggerDown, SecondaryTriggerDown;
 	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
 
@@ -446,7 +445,7 @@ UINT32 mlUpdateWeaponMount(FLOAT64VECTOR* Force, FLOAT64ATT* Torque,
 	PrimaryTriggerDown 	= VehicleData->PrimaryTriggerDown;
 	SecondaryTriggerDown= VehicleData->SecondaryTriggerDown;
 
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	*PrimaryIsFiring = *SecondaryIsFiring = 0;
 

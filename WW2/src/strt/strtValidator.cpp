@@ -90,7 +90,7 @@ static SINT32 _runFacility(FacilityStruct* const currentFacility, WWII_SIDE_ACC*
 }
 
 
-LOGICAL
+static bool
 _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 {
 	FILE* fp;
@@ -100,7 +100,7 @@ _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 	if (fp == nullptr)
 	{
 		dbugLog(_FLN,"Filename %s invalid", filename);
-		return FALSE;
+		return false;
 	}
 
 	CPStruct* cp;
@@ -131,7 +131,7 @@ _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 
 	fclose(fp);
 
-	return TRUE;
+	return true;
 }
 
 int

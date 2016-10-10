@@ -34,13 +34,12 @@ static LIGHT* g_lpMuzzle = nullptr;
 
 static piMATRIX* g_lpInvertView = nullptr;
 
-static LOGICAL _CheckForLight();
-static LOGICAL _DrawBombLight(FXLIGHTS* lpLgt);
-static LOGICAL _DrawMuzzleLight(FXLIGHTS* lpLgt);
-static LOGICAL _FreeLight(FXLIGHTS* lpLgt);
-static LOGICAL _FreeLightIfNecessary(FXLIGHTS* lpLgt);
-static LOGICAL _InitLights();
-static LOGICAL _ReleaseLight(FXLIGHTS* lpLgt);
+static void _DrawBombLight(FXLIGHTS* lpLgt);
+static void _DrawMuzzleLight(FXLIGHTS* lpLgt);
+static void _FreeLight(FXLIGHTS* lpLgt);
+static void _FreeLightIfNecessary(FXLIGHTS* lpLgt);
+static bool _InitLights();
+static void _ReleaseLight(FXLIGHTS* lpLgt);
 
 static void _InterpolateAttenuation(FXLIGHTS* lpLgt);
 static void _SetLightProperties(FXLIGHTS* lpLgt);
@@ -52,10 +51,7 @@ static void _UpdateLight(FXLIGHTS* lpLgt);
 /////////////////////////////////////////////////
 LOGICAL fxLgtInit()
 {
-    SINT32 i;
-
     g_lpLgts = (FXLIGHTS*)memAlloc(sizeof(FXLIGHTS) * DEF_FXLGT_MAX_LIGHTS);
-
     if(g_lpLgts == nullptr)
         return FALSE;
 
@@ -74,7 +70,7 @@ LOGICAL fxLgtInit()
     g_lgtFreeHead.next = &g_lgtFreeTail;
     g_lgtFreeTail.prev = &g_lgtFreeHead;
 
-    for(i = 0; i < DEF_FXLGT_MAX_LIGHTS; i++)
+    for(SINT32 i = 0; i < DEF_FXLGT_MAX_LIGHTS; i++)
     {
         g_lpLgts[i].iIndex = i;
         _FreeLight(&g_lpLgts[i]);
@@ -111,14 +107,12 @@ void fxLgtKill()
 // Function: _InitLights
 // Description:
 //////////////////////////////////////////
-LOGICAL _InitLights()
+bool _InitLights()
 {
     LIGHT initBombLight;
     LIGHT initMuzzleLight;
 
     memset(&initBombLight, 0, sizeof(LIGHT));
-
-    LOGICAL bReturn = TRUE;
 
     initBombLight.light.dltType = piLIGHT_POINT;
     initBombLight.light.dcvColor.r = 1.0f;
@@ -133,7 +127,7 @@ LOGICAL _InitLights()
 	strcpy(initBombLight.name, DEF_BOMB_NAME);
 
     if(!obdliteAddDynaLite(&initBombLight, fxLgtUpdateCallback))
-        return FALSE;
+        return false;
 
     g_lpLight = obdliteFindDynaLight(DEF_BOMB_NAME);
 
@@ -145,14 +139,14 @@ LOGICAL _InitLights()
     strcpy(initMuzzleLight.name, DEF_MUZZLE_NAME);
 
     if(!obdliteAddDynaLite(&initMuzzleLight, fxLgtUpdateCallback))
-        return FALSE;
+        return false;
 
     g_lpMuzzle = obdliteFindDynaLight(DEF_MUZZLE_NAME);
 
     // Set light initially to 'OFF'
     obdliteSetDynaState(g_lpMuzzle, FALSE);
 
-    return bReturn;
+    return true;
 }
 
 //////////////////////////////////////////
@@ -372,35 +366,31 @@ LOGICAL fxLgtDraw(SINT32 iIndex)
 // Function: _DrawBombLight
 // Description:
 //////////////////////////////////////////
-LOGICAL _DrawBombLight(FXLIGHTS* lpLgt)
+void _DrawBombLight(FXLIGHTS* lpLgt)
 {
     memcpy(&g_lpLight->light, &lpLgt->lgtLight, sizeof(piLIGHT));
 
     obdliteSetDynaLite(g_lpLight);
     obdliteSetDynaState(g_lpLight, TRUE);
-
-    return TRUE;
 }
 
 //////////////////////////////////////////
 // Function: _DrawMuzzleLight
 // Description:
 //////////////////////////////////////////
-LOGICAL _DrawMuzzleLight(FXLIGHTS* lpLgt)
+void _DrawMuzzleLight(FXLIGHTS* lpLgt)
 {
     memcpy(&g_lpMuzzle->light, &lpLgt->lgtLight, sizeof(piLIGHT));
 
     obdliteSetDynaLite(g_lpMuzzle);
     obdliteSetDynaState(g_lpMuzzle, TRUE);
-
-    return TRUE;
 }
 
 //////////////////////////////////////////
 // Function: _FreeLightIfNecessary
 // Description:
 //////////////////////////////////////////
-LOGICAL _FreeLightIfNecessary(FXLIGHTS* lpLgt)
+void _FreeLightIfNecessary(FXLIGHTS* lpLgt)
 {
     if(lpLgt != nullptr)
     {
@@ -431,85 +421,69 @@ LOGICAL _FreeLightIfNecessary(FXLIGHTS* lpLgt)
             break;
         }
     }
-
-    return TRUE;
 }
 
 //////////////////////////////////////////
 // Function: _FreeLight
 // Description:
 //////////////////////////////////////////
-LOGICAL _FreeLight(FXLIGHTS* lpLgt)
+void _FreeLight(FXLIGHTS* lpLgt)
 {
-    FXLIGHTS* lpPrev = nullptr;
-
     if(lpLgt == nullptr)
-        return FALSE;
+        return;
 
-    lpPrev = g_lgtFreeTail.prev;
+    FXLIGHTS* lpPrev = g_lgtFreeTail.prev;
 
     lpLgt->prev = lpPrev;
     lpLgt->next = &g_lgtFreeTail;
 
     lpPrev->next = lpLgt;
     g_lgtFreeTail.prev = lpLgt;
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Function: _ReleaseLight
 // Description:
 //////////////////////////////////////////////////////////////////////
-LOGICAL _ReleaseLight(FXLIGHTS* lpLgt)
+void _ReleaseLight(FXLIGHTS* lpLgt)
 {
-    FXLIGHTS* lpNext = nullptr;
-    FXLIGHTS* lpPrev = nullptr;
+	if (lpLgt == nullptr)
+		return;
 
-    if(lpLgt == nullptr)
-        return FALSE;
-
-    lpNext = lpLgt->next;
-    lpPrev = lpLgt->prev;
+    auto lpNext = lpLgt->next;
+    auto lpPrev = lpLgt->prev;
 
     if(lpNext == nullptr || lpPrev == nullptr)
-        return FALSE;
+        return;
 
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
     lpLgt->prev = nullptr;
     lpLgt->next = nullptr;
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Function: _CheckForLight
 // Description:
 //////////////////////////////////////////////////////////////////////
-LOGICAL _CheckForLight()
+static bool _CheckForLight()
 {
     if(g_lgtFreeHead.next == &g_lgtFreeTail)
     {
-        FXLIGHTS* lpLgt = nullptr;
-
         if(g_lgtTail.prev == &g_lgtHead)
-            return FALSE;
+            return false;
 
-        lpLgt = g_lgtTail.prev;
+        FXLIGHTS* lpLgt = g_lgtTail.prev;
 
-        if(!_ReleaseLight(lpLgt))
-            return FALSE;
-
-        if(!_FreeLight(lpLgt))
-            return FALSE;
+		_ReleaseLight(lpLgt);
+		_FreeLight(lpLgt);
     }
 
     if(g_lgtFreeHead.next == &g_lgtFreeTail)
-        return FALSE;
+        return false;
 
-    return TRUE;
+    return true;
 }
 
 //////////////////////////////////////////////////////////////////////

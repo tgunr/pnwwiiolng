@@ -14,7 +14,7 @@
 
 //Tools for opening and closing the DB connection
 extern bool strtInitDB();
-extern LOGICAL strtCloseDB();
+extern void strtCloseDB();
 
 extern void strtdbInitSupercells();
 

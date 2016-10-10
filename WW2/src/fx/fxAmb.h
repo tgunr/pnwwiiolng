@@ -135,7 +135,7 @@ extern void fxAmbSetNightTimes();
 extern void fxAmbSetRiverTimes();
 extern void fxAmbSetStartTimes();
 extern void fxAmbSetState();
-extern void fxAmbStop(LOGICAL bStop);
+extern void fxAmbStop(bool bStop);
 extern void fxAmbUpdate();
 extern void fxAmbDisable();
 extern void fxAmbEnable();

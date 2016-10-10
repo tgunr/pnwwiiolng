@@ -11,8 +11,7 @@ struct SORTHEADER
 
 extern LOGICAL obcsInit(void);
 extern void obcsKill(void);
-extern void obcsSetIgnoreAdsOnCull(LOGICAL ignore);
-extern void obcsDoCull(LOGICAL bOn);
+extern void obcsDoCull(bool bOn);
 
 extern int obcsCullAndSortObjects(int numobjects, struct OBJECT* lpobjorig);
 extern int obcsCullAndSortShadowObjects(int numobjects, OBJECT* lpobjorig, piVECTOR* lpdir);

@@ -168,7 +168,7 @@ void fxMgrFreeAll()
     if(bSoundEnable)
     {
         fxSndKill();
-        fxAmbStop(TRUE);
+        fxAmbStop(true);
     }
 
     fxMiscResetAll();
@@ -273,20 +273,19 @@ void fxMgrUpdateSound()
 {
     if(!bSoundEnable) return;
 
-    UINT32 position = 0;
-    persGetPersonaPosition(&position);
+    UINT32 position = persGetPersonaPosition();
 
     // We are dead.
     if(persGetCrewIsDead(position))
     {
         fxSndStopSoundsForThisPosition(position);
-        fxAmbStop(TRUE);
+        fxAmbStop(true);
     }
     else
     {
         // Well, it turns out we could be dead, but not really! &*#&@*#!
         fxSndResetSoundsForThisPosition(position);
-        fxAmbStop(FALSE);
+        fxAmbStop(false);
     }
 
     fxSndUpdate();

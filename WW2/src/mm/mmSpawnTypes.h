@@ -62,9 +62,9 @@ struct FE_POST_ACCEPT
 {
 	WEAPON_SERIAL	weaponSerial;	//The weapon serial, the bane of my
 									//	existence
-	LOGICAL			newVehicle;
 	SINT16			portal;
-	LOGICAL			mobileSpawnAvailable;
+	bool			newVehicle;
+	bool			mobileSpawnAvailable;
 };
 
 //The message from the front end that cancels a post

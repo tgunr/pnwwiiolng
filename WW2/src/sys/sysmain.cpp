@@ -1151,8 +1151,8 @@ int		screenmode;
 
 //	char * ptr = 0; *ptr = 0; // simulated crash
 
-	ddpDrawNotActive(TRUE);
-	ddpDisableScreenSaver(TRUE);
+	ddpDrawNotActive(true);
+	ddpDisableScreenSaver(true);
 
 	ddpSetDDInit(nullptr);//oglInit);
 	ddpSetDDRender(nullptr);//rnlogoRender);

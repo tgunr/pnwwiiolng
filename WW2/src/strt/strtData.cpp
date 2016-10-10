@@ -50,11 +50,11 @@ static UINT32 totalCPs;
 static UINT16 uMaxFacilityOID = 0;
 
 //local function to verify capture and spawn objects
-static LOGICAL _verifySubtypes(FacilityStruct* facility);
+static bool _verifySubtypes(FacilityStruct* facility);
 
 //More helper functions
 static void _calcCapacity(ObjectStruct& object);
-static LOGICAL _checkCPStatus(CPStruct* cpList);
+static void _checkCPStatus(CPStruct* cpList);
 
 // Bitmask flags for capture objectives
 const UINT32 attackFlags[MAX_SIDES] = { 0, CP_STAT_ALLIED_ATTACK_OBJ, CP_STAT_AXIS_ATTACK_OBJ, 0 };
@@ -1304,22 +1304,22 @@ strtResetObject(ObjectStruct& object)
 	object.save();
 }
 
-static LOGICAL _checkFirebasePair(FacilityStruct& firebase)
+static bool _checkFirebasePair(FacilityStruct& firebase)
 {
 	if (firebase.type != FACILITY_FIREBASE)
-		return FALSE;
+		return false;
 
 	if (firebase.link->endDepot->m_outgoingLink == nullptr)
 	{
 		dbugLog(_FLA,"%s: Firebase end depot %s doesn't have an outgoing link"
 					,firebase.name,firebase.link->endDepot->name);
-		return FALSE;
+		return false;
 	}
 
 	if (firebase.link->endDepot->m_outgoingLink->firebase == nullptr)
-		return FALSE;
+		return false;
 
-	return TRUE;
+	return true;
 }
 
 // Search the armybases of a facility's cp to see which is the
@@ -1392,96 +1392,63 @@ FacilityStruct::findLocalAB(WWII_SIDE favorSide) const
 }
 
 //returns TRUE if the facility can spawn ground vehicles
-static LOGICAL
-_spawnsGroundVehicles(FacilityStruct* facility)
+static bool
+_spawnsGroundVehicles(const FacilityStruct& facility)
 {
-	if (facility==nullptr)
-		return FALSE;
+	if ( facility.m_spawnsVehicles )
+		return true;
 
-	if ( facility->m_spawnsVehicles )
-		return TRUE;
-
-	ObjectStruct* currentObject;
-
-	for (	currentObject = facility->objectList
-		; currentObject!=nullptr
-		; currentObject=currentObject->next)
+	for ( auto obj = facility.objectList; obj; obj = obj->next )
 	{
-		if (	(currentObject->type == BUILDING_SPAWN)
-			&& (currentObject->spawnAbility.weap.wCategory == _GROUND_VEHICLE))
-			return TRUE;
-
+		if ( obj->type == BUILDING_SPAWN && obj->spawnAbility.weap.wCategory == _GROUND_VEHICLE )
+			return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 #ifdef STRAT_VALIDATOR
 //returns TRUE if the facility can spawn aircraft
-static LOGICAL
-_spawnsAircraft(FacilityStruct* facility)
+static bool
+_spawnsAircraft(const FacilityStruct& facility)
 {
-	if (facility==nullptr)
-		return FALSE;
-
-	ObjectStruct* currentObject;
-
-	for (	currentObject = facility->objectList
-		; currentObject!=nullptr
-		; currentObject=currentObject->next)
+	for ( auto obj = facility->objectList; obj; obj = obj->next )
 	{
-		if (	(currentObject->type == BUILDING_SPAWN)
-			&& (currentObject->spawnAbility.weap.wCategory == _AIRCRAFT))
-			return TRUE;
-
+		if ( obj->type == BUILDING_SPAWN && obj->spawnAbility.weap.wCategory == _AIRCRAFT )
+			return true;
 	}
 
-	return FALSE;
+	return false;
 }
 #endif
 
 //returns TRUE if the facility can spawn infantry
-static LOGICAL _spawnsInfantry(FacilityStruct* facility)
+static bool
+_spawnsInfantry(const FacilityStruct& facility)
 {
-	if (facility==nullptr)
-		return FALSE;
+	if ( facility.m_spawnsInf )
+		return true;
 
-	if ( facility->m_spawnsInf )
-		return TRUE;
-
-	ObjectStruct* currentObject;
-
-	for (	currentObject = facility->objectList
-		; currentObject!=nullptr
-		; currentObject=currentObject->next)
+	for ( auto obj = facility.objectList; obj; obj = obj->next )
 	{
-		if (	(currentObject->type == BUILDING_SPAWN)
-			&& (currentObject->spawnAbility.weap.wCategory == _INFANTRY))
-			return TRUE;
+		if ( obj->type == BUILDING_SPAWN && obj->spawnAbility.weap.wCategory == _INFANTRY )
+			return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 //returns TRUE if the facility can spawn sea vehicles
-static LOGICAL
-_spawnsSeaVehicles(FacilityStruct* facility)
+static bool
+_spawnsSeaVehicles(const FacilityStruct& facility)
 {
-	if (facility==nullptr)
-		return FALSE;
-
-	ObjectStruct* currentObject;
-
-	for (	currentObject = facility->objectList
-		; currentObject!=nullptr
-		; currentObject=currentObject->next)
+	for ( auto obj = facility.objectList; obj; obj = obj->next )
 	{
-		if ((currentObject->type == BUILDING_SPAWN) && (currentObject->spawnAbility.weap.wCategory == _SEA_VEHICLE))
-			return TRUE;
-
+		if ( obj->type == BUILDING_SPAWN && obj->spawnAbility.weap.wCategory == _SEA_VEHICLE )
+			return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 
@@ -1599,7 +1566,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 					if (curTestLevel >= 1)
 					{
 						//verify ground troops can spawn
-						if (!(_spawnsGroundVehicles(fac) && _spawnsInfantry(fac)))
+						if (!(_spawnsGroundVehicles(*fac) && _spawnsInfantry(*fac)))
 						//Print the log message if they can't
 						{
 							strtAddErrorListEntry(ERR_FB_BOTH_CHECK, fac->name, fac->name, "");
@@ -1656,7 +1623,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 					if (curTestLevel >= 1)
 					{
 						//verify ground troops can spawn
-						if (!(_spawnsGroundVehicles(fac) && _spawnsInfantry(fac)))
+						if (!(_spawnsGroundVehicles(*fac) && _spawnsInfantry(*fac)))
 						//Print the log message if they can't
 						{
 							strtAddErrorListEntry(ERR_AB_BOTH_CHECK, fac->name, fac->name, "");
@@ -1668,7 +1635,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 				case FACILITY_AIRBASE:
 					//verify aircraft can spawn
 					//Print the log message if they can't
-					if (!_spawnsAircraft(fac))
+					if (!_spawnsAircraft(*fac))
 					{
 						strtAddErrorListEntry(ERR_AF_NO_SPAWN, fac->name, fac->name, "");
 						retval = false;
@@ -1680,7 +1647,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 					{
 						//verify aircraft can spawn
 						//Print the log message if they can't
-						if (!_spawnsSeaVehicles(fac))
+						if (!_spawnsSeaVehicles(*fac))
 						{
 							dbugLog(_FLA,"%s: Navalbase cannot spawn sea vehicles",fac->name);
 							retval = false;
@@ -1809,10 +1776,10 @@ static bool _isSpawnObject(ObjectStruct* object)
 //Returns true if all buildings that are capture objects have the capture subtype
 //also checks spawn objects as well
 //returns false otherwise
-static LOGICAL _verifySubtypes(FacilityStruct* facility)
+static bool _verifySubtypes(FacilityStruct* facility)
 {
-LOGICAL retval=TRUE;
-ObjectStruct* currentObject;
+	bool retval = true;
+	ObjectStruct* currentObject;
 
 	if (facility==nullptr)
 	{
@@ -1833,7 +1800,7 @@ ObjectStruct* currentObject;
 								, currentObject->filename
 								, currentObject->type
 								, BUILDING_SPAWN);
-				retval = FALSE;
+				retval = false;
 			}
 		}
 		currentObject = currentObject->next;
@@ -2404,11 +2371,11 @@ _findFirebaseArmybase(FacilityStruct* fb)
 //		1. Ownership matches at least one of the owners of the CP
 //		2. Control makes sense given the ownership of the army bases* AND*
 //			whether they are open or closed
-static LOGICAL
+static void
 _checkCPStatus(CPStruct* cpList)
 {
 	if ( cpList == nullptr )
-		return FALSE;
+		return;
 
 	CPStruct* current;
 	FacilityStruct* facility;
@@ -2566,8 +2533,6 @@ _checkCPStatus(CPStruct* cpList)
 		}
 #endif
 	}
-
-	return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////

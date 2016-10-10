@@ -63,10 +63,9 @@ static UINT32 g_uRiverDelay = 0;
 
 static SINT32 g_iAmbDelay = 1;
 
-static LOGICAL g_bStopSounds = FALSE;
-static LOGICAL g_bFirstTime = TRUE;
-static LOGICAL g_oldCanopyExposed=TRUE;
-static LOGICAL g_oldHatchExposed=TRUE;
+static bool g_bStopSounds = false;
+static bool g_oldCanopyExposed = true;
+static bool g_oldHatchExposed = true;
 
 ///////////////////////////////////
 // Function: fxAmbInit
@@ -303,10 +302,11 @@ void fxAmbSetStartTimes()
     fxAmbSetCityTimes();
     fxAmbSetRiverTimes();
 
-    if(g_bFirstTime)
+	static bool started = false;
+    if(!started)
     {
-        g_bFirstTime = FALSE;
-        fxAmbStop(TRUE);
+		started = true;
+        fxAmbStop(true);
     }
 }
 
@@ -472,13 +472,10 @@ void fxAmbUpdate()
     // Only want ambient sounds if we are poking our head out.
     if(persIsPersonaVehicleType(VEH_TYPE_GROUND))
     {
-        UINT32 pos = 0;
-        persGetPersonaPosition(&pos);
-        LOGICAL canopyExposed = FALSE;
-        LOGICAL hatchExposed = FALSE;
+        UINT32 pos = persGetPersonaPosition();
 
-        canopyExposed = persIsCanopyExposed(pos);
-        hatchExposed = persIsHatchExposed(pos);
+        bool canopyExposed = persIsCanopyExposed(pos);
+        bool hatchExposed = persIsHatchExposed(pos);
 
         // Canopy open when previously closed
         if(canopyExposed && !g_oldCanopyExposed)
@@ -737,7 +734,7 @@ void fxAmbKill()
 
     if(!bSoundEnable) return;
 
-    fxAmbStop(TRUE);
+    fxAmbStop(true);
 
     lpReg = g_regCity.next;
 
@@ -778,7 +775,7 @@ void fxAmbKill()
 // Function: fxAmbStop
 // Description:
 ///////////////////////////////////
-void fxAmbStop(LOGICAL bStop)
+void fxAmbStop(bool bStop)
 {
     if(g_iAmbDelay == 0) return;
     if(!bSoundEnable) return;
@@ -810,7 +807,7 @@ void fxAmbPlayAmbientSound()
 
     if(g_bStopSounds)
     {
-        fxAmbStop(FALSE);
+        fxAmbStop(false);
     }
 
     if(g_uState & DEF_PLAY_NIGHT)

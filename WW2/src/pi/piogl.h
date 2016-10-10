@@ -1494,7 +1494,7 @@ extern void* piGetInstance(void);
 extern void piPostRenderFilterScene();
 
 extern void piLockState(SINT32 state, LOGICAL lock);
-extern void piLockTextureState(LOGICAL lock);
+extern void piLockTextureState(bool lock);
 extern void piLockMaterialState(LOGICAL lock);
 extern void piLockWorldMatrix(LOGICAL lock);
 extern void piLockViewMatrix(LOGICAL lock);

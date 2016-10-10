@@ -2133,18 +2133,16 @@ vehVehicle* persGetPersonaPilotedOnlineVehicle()
 	return nullptr;
 }
 
-UINT32 persGetPersonaPosition(UINT32 * Position)
+UINT32 persGetPersonaPosition()
 {
 	if(EZ_MGR)
 	{
 		// see if we have overriden the game position temporarily
 		SINT32 pos = EZ_MGR->GetGamePosition();
-		if(pos >= 0) return *Position = (UINT32)pos;
+		if(pos >= 0) return (UINT32)pos;
 	}
 
-	*Position = _Persona.Position;
-
-	return 0;
+	return _Persona.Position;
 }
 
 UINT32 persSetPersonaPositionCallback(SINT32 param,UINT32 id,UINT32 Detach)
@@ -3048,8 +3046,7 @@ bool _tpsCamera(piVECTOR* pos, piVECTOR* aim)
 		}
 		else
 		{
-			UINT32 seat = 0;
-			persGetPersonaPosition(&seat);
+			UINT32 seat = persGetPersonaPosition();
 			FLOAT64 traverse = -(vehicle->ModelData->TurretTraverse[seat] * 2.0f);
 
 			if(traverse)
@@ -4419,7 +4416,7 @@ piVECTOR Att;
 	return 0;
 }
 
-UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL ATPOnly)
+UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, bool ATPOnly)
 {
 	if(vehmainHasBailedOut())
 		return 0;
@@ -4429,12 +4426,12 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 		return 0;
 	}
 
-    Write_Debug( "Damage %f position %u location %u atponly %u\n", Damage, Position, Location, ATPOnly );
+    Write_Debug( "Damage %f position %u location %u atponly %u\n", Damage, Position, Location, ATPOnly);
 
 	persPersonaHealth& Health = _PersonaHealth[Position];
 	if (Location == PERS_HITLOCATION_HEAD)
 	{
-		if (ATPOnly == FALSE)
+		if (!ATPOnly)
 		{
 			Health.BrainOxyMaxLevel += (FLOAT32)Damage * _BRAIN_DAMAGE_PER_JOULE;
 			Health.BrainOxyLevel += (FLOAT32)Damage * _BRAIN_DAMAGE_PER_JOULE;
@@ -4463,7 +4460,7 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 	}
 	if (Location == PERS_HITLOCATION_TORSO)
 	{
-		if (ATPOnly == FALSE)
+		if (!ATPOnly)
 		{
 			Health.BloodLevel += (FLOAT32)Damage * _BLOOD_LOSS_PER_JOULE_TORSO;
 			Health.ATPMaxLevel += _ATP_INJURY_TORSO_PER_JOULE * (FLOAT32)Damage;
@@ -4482,7 +4479,7 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 	}
 	if (Location == PERS_HITLOCATION_ARMS)
 	{
-		if (ATPOnly == FALSE)
+		if (!ATPOnly)
 		{
 			Health.BloodLevel += (FLOAT32)Damage * _BLOOD_LOSS_PER_JOULE_ARMS;
 			Health.ATPMaxLevel += _ATP_INJURY_ARMS_PER_JOULE * (FLOAT32)Damage;
@@ -4501,7 +4498,7 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 	}
 	if (Location == PERS_HITLOCATION_LEGS)
 	{
-		if (ATPOnly == FALSE)
+		if (!ATPOnly)
 		{
 			Health.BloodLevel += (FLOAT32)Damage * _BLOOD_LOSS_PER_JOULE_LEGS;
 			Health.ATPMaxLevel += _ATP_INJURY_LEGS_PER_JOULE * (FLOAT32)Damage;
@@ -5793,50 +5790,50 @@ UINT32 persGetPositionOrdnanceNum (UINT32 position)
 	return _Persona.PositionData[position].ordnanceNum;
 }
 
-LOGICAL persIsCanopyExposed(UINT32 position)
+bool persIsCanopyExposed(UINT32 position)
 {
-	if(position >= ML_MAX_CREW_POSITIONS) return FALSE;
-	if(_Persona.VehicleAttached->ModelData->CrewData.AlwaysExposed[position]) return TRUE;
+	if(position >= ML_MAX_CREW_POSITIONS) return false;
+	if(_Persona.VehicleAttached->ModelData->CrewData.AlwaysExposed[position]) return true;
 
 	if(_Persona.VehicleAttached->ModelData->CrewData.ExposedByCanopy[position])
 		return persIsCanopyOpen(position);
 
-	return FALSE;
+	return false;
 }
 
-LOGICAL persIsHatchExposed(UINT32 position)
+bool persIsHatchExposed(UINT32 position)
 {
-	if(position >= ML_MAX_CREW_POSITIONS) return FALSE;
-	if(_Persona.VehicleAttached->ModelData->CrewData.AlwaysExposed[position]) return TRUE;
+	if(position >= ML_MAX_CREW_POSITIONS) return false;
+	if(_Persona.VehicleAttached->ModelData->CrewData.AlwaysExposed[position]) return true;
 
 	if(_Persona.VehicleAttached->ModelData->CrewData.ExposedByHatch[position])
 		return persIsHatchOpen(position);
 
-	return FALSE;
+	return false;
 }
 
-LOGICAL persIsCanopyOpen(UINT32 position)
+bool persIsCanopyOpen(UINT32 position)
 {
-	if(position >= ML_MAX_CREW_POSITIONS) return FALSE;
+	if(position >= ML_MAX_CREW_POSITIONS) return false;
 
 	if(_Persona.VehicleAttached->ModelData->CrewData.DefaultCanopyPosition[0] == 0)
 		return (_Persona.VehicleAttached->StateAnimation.CanopyPos[position] != 0);
 	else
 		return (_Persona.VehicleAttached->StateAnimation.CanopyPos[position] == 0);
 
-	return FALSE;
+	return true;
 }
 
-LOGICAL persIsHatchOpen(UINT32 position)
+bool persIsHatchOpen(UINT32 position)
 {
-	if(position >= ML_MAX_CREW_POSITIONS) return FALSE;
+	if(position >= ML_MAX_CREW_POSITIONS) return false;
 
 	if(_Persona.VehicleAttached->ModelData->CrewData.DefaultHatchPosition[0] == 0)
 		return (_Persona.VehicleAttached->StateAnimation.HatchPos[position] != 0);
 	else
 		return (_Persona.VehicleAttached->StateAnimation.HatchPos[position] == 0);
 
-	return FALSE;
+	return false;
 }
 
 FLOAT32 persCanopyVolumeMultiplier(UINT32 PosNum)

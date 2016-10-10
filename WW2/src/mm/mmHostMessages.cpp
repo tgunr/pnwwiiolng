@@ -48,7 +48,7 @@ TEUL_CALLBACK* Host::VehicleRequest::s_callback;
 
 //Sends a post Accept the front end on the connection
 SINT32
-mmSendPostAccept(SINT32 connection, WEAPON_SERIAL weaponSerial, LOGICAL newVehicle, SINT16 portal, bool mobileSpawnAvailable)
+mmSendPostAccept(SINT32 connection, WEAPON_SERIAL weaponSerial, bool newVehicle, SINT16 portal, bool mobileSpawnAvailable)
 {
 	FE_POST_ACCEPT postAccept;
 

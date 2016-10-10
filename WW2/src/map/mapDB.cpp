@@ -1001,7 +1001,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 	}
 	// Provide the callsign
 	m_callsign = player->chatHandle();
-	m_error = FALSE;
+	m_error = false;
 	if ( player->chatPermissions() == nullptr )
 		m_chatPermissions = nullChatPermissions;
 	else

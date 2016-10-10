@@ -77,11 +77,10 @@ strtInitDB()
 	return retval;
 }
 
-LOGICAL
+void
 strtCloseDB()
 {
 	dbh.disconnect();
-	return TRUE;
 }
 
 void

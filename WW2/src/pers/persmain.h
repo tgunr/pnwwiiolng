@@ -173,7 +173,7 @@ extern vehVehicle* persGetPersonaPilotedOnlineVehicle();
 extern OBJECT* persGetPersonaVehicleObjectDataPtr();
 
 // returns the current position number of the player
-extern UINT32 persGetPersonaPosition(UINT32 * Position);
+extern UINT32 persGetPersonaPosition();
 
 // sets the position number for the persona
 extern UINT32 persSetPersonaPosition(UINT32 InPosition);
@@ -228,7 +228,7 @@ extern UINT32 persGetMaxBrainOxy(FLOAT32 * MaxBrainOxy, FLOAT32* BlackoutFullPer
 extern UINT32 persDrawRedoutBlackout(void);
 extern UINT32 persGetControlStatus(FLOAT32 * StrengthControl, LOGICAL* ControlsDisabled);
 extern UINT32 persGetGDistortion(piMATRIX * RetMat);
-extern UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL ATPOnly);
+extern UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, bool ATPOnly);
 extern UINT32 persAddHitSoundsForHitComponent(
 								OBJECT * HitMapObject,
 								SINT32 NumHits,
@@ -269,10 +269,10 @@ extern bool persGetMySupercellAndOctet(int& sx, int& sy, int& r, int& c);
 extern void	persSetPositionOrdnanceNum (UINT32 position, UINT32 ordNum);
 extern UINT32	persGetPositionOrdnanceNum (UINT32 position);
 
-extern LOGICAL persIsCanopyOpen(UINT32 position);
-extern LOGICAL persIsHatchOpen(UINT32 position);
-extern LOGICAL persIsCanopyExposed(UINT32 position);
-extern LOGICAL persIsHatchExposed(UINT32 position);
+extern bool persIsCanopyOpen(UINT32 position);
+extern bool persIsHatchOpen(UINT32 position);
+extern bool persIsCanopyExposed(UINT32 position);
+extern bool persIsHatchExposed(UINT32 position);
 extern FLOAT32 persHatchVolumeMultiplier(UINT32 position);
 extern FLOAT32 persCanopyVolumeMultiplier(UINT32 position);
 
