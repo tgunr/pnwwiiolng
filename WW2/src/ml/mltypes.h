@@ -592,8 +592,8 @@ extern UINT32 mlElevateTurretSpeed(SINT32 Param, UINT32 Id, UINT32 Detach); // n
 
 extern UINT32 mlGetStarterOnInfo(mlVehicleData*, UINT32 * StarterOn,UINT32 EngineNumber);
 
-extern UINT32 mlResetPositionState(void);
-extern UINT32 mlResetControlStuff(void);
+extern void mlResetPositionState();
+extern void mlResetControlStuff();
 
 extern UINT32 mlResetVehiclePos(mlVehicleData * VehicleData);
 extern UINT32 mlLeftBrakeFunction(SINT32 Param, UINT32 Id,UINT32 Detach);
@@ -669,8 +669,8 @@ extern LOGICAL mlIsFPSOnWater(mlVehicleData * VehicleData, LOGICAL* onWater);
 extern UINT32 mlCheckForCollisionListUpdate(bool force = false);
 extern UINT32 mlCheckRemovedObjectOnCollisionList(trnCDTerrainObject * TO);
 
-extern LOGICAL mlGetPrimaryPickleSetting(SINT32 * Pickle);
-extern LOGICAL mlGetSecondaryPickleSetting(SINT32 * Pickle);
+extern SINT32 mlGetPrimaryPickleSetting();
+extern SINT32 mlGetSecondaryPickleSetting();
 extern void mlResetPrimaryPickleSetting();
 extern void mlResetSecondaryPickleSetting();
 extern LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total);

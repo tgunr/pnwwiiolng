@@ -10209,40 +10209,29 @@ trnCDTerrainObject*	TO;
 	return TRUE;
 }
 
-LOGICAL mlGetPrimaryPickleSetting(SINT32 * Pickle)
+SINT32 mlGetPrimaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-
-	*Pickle = VehicleData->PicklePrimary;
-
-	return TRUE;
+	return VehicleData->PicklePrimary;
 }
 
-LOGICAL mlGetSecondaryPickleSetting(SINT32 * Pickle)
+SINT32 mlGetSecondaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
-	*Pickle = VehicleData->PickleSecondary;
-
-	return TRUE;
+	return VehicleData->PickleSecondary;
 }
 
-LOGICAL mlResetPrimaryPickleSetting(void)
+void mlResetPrimaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-
 	VehicleData->PicklePrimary = 0;
-
-	return TRUE;
 }
 
-LOGICAL mlResetSecondaryPickleSetting(void)
+void mlResetSecondaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-
 	VehicleData->PickleSecondary = 0;
-
-	return TRUE;
 }
 
 LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total)
