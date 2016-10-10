@@ -287,21 +287,15 @@ int				expendable;
 	return TRUE;
 }
 
-LOGICAL fpKill(mlVehicleData* VehicleData)
+void fpKill(mlVehicleData& VehicleData)	///TODO: Convert to destructor?
 {
-	fpPersonData* PersonData;
-
-	if(VehicleData->PersonData != nullptr)
+	if(VehicleData.PersonData != nullptr)
 	{
-		PersonData = (fpPersonData*)VehicleData->PersonData;
-
-		memFree(VehicleData->PersonData);
-		VehicleData->PersonData = nullptr;
+		memFree(VehicleData.PersonData);
+		VehicleData.PersonData = nullptr;
 	}
 
-	fpFPSKill ();
-
-	return TRUE;
+	fpFPSKill();
 }
 
 /*

@@ -133,4 +133,4 @@ extern SINT32 loclGetLanguageID();
 extern SCHAR* loclGetLanguageName();
 
 //This function frees the memory in the message table.
-extern LOGICAL locl_Message_Table_Kill();
+extern void locl_Message_Table_Kill();

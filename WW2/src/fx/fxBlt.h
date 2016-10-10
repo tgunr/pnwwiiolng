@@ -123,7 +123,7 @@ extern LOGICAL fxBltHandleCollision(FASTCOLLIDE cldArray[],
                              SINT32 iIndex);
 extern LOGICAL fxBltInit();
 extern LOGICAL fxBltIsWater(FXBULLET* lpBlt);
-extern LOGICAL fxBltKill();
+extern void fxBltKill();
 extern LOGICAL fxBltPlayHitSound(FXBULLET* lpBlt);
 extern LOGICAL fxBltReleaseBullet(FXBULLET* lpBlt);
 extern LOGICAL fxBltSetBltValues(FXBULLET* lpBlt, FXBULLETCREATE* lpCreate);

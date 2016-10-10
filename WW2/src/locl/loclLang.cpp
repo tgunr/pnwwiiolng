@@ -73,7 +73,7 @@ LOGICAL loclLangInit(ENUM_LANGUAGES enumLang)
 // Function: loclLangKill
 // Description: Kill routine for loclLang.
 ///////////////////////////////////////////////////
-LOGICAL loclLangKill()
+void loclLangKill()
 {
 	/* no longer used
     SINT32 i;
@@ -87,8 +87,6 @@ LOGICAL loclLangKill()
         g_englishTable[i].next = nullptr;
     }
 	*/
-
-    return TRUE;
 }
 
 /////////////////////////////////////////////////////

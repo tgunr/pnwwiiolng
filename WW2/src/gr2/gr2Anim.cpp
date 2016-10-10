@@ -1812,10 +1812,10 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 	return TRUE;
 }
 
-LOGICAL gr2AnimKillObject (OBJECT* pObject)
+void gr2AnimKillObject(OBJECT& pObject)
 {
 	// stop any sounds
-	pObject->animModel->moveSound.Stop();
+	pObject.animModel->moveSound.Stop();
 
 	/*
 #ifdef USE_CORPSES
@@ -1857,10 +1857,8 @@ LOGICAL gr2AnimKillObject (OBJECT* pObject)
 #endif
 	*/
 
-	_freemodel(pObject->animModel);
-    pObject->animModel = nullptr;
-
-	return TRUE;
+	_freemodel(pObject.animModel);
+    pObject.animModel = nullptr;
 }
 
 LOGICAL gr2AnimDoWeaponCollision (OBJECT* pObject, piVECTOR* startPnt, piVECTOR* endPnt, SINT32* location, piVECTOR* collisionPnt)

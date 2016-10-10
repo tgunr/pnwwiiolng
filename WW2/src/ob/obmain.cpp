@@ -370,7 +370,7 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
 
 	if (lpobj->animModel != nullptr)
 	{
-		gr2AnimKillObject(lpobj);
+		gr2AnimKillObject(*lpobj);
 	}
 
     if(lpobj->meshContext)

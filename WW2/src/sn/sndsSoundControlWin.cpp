@@ -281,7 +281,7 @@ LOGICAL sndsPlatformInitListener()
 // Function: sndsPlatformKill
 // Description:
 /////////////////////////////////////
-LOGICAL sndsPlatformKill()
+void sndsPlatformKill()
 {
 #if XAUDIO
     AudioKill();
@@ -298,8 +298,6 @@ LOGICAL sndsPlatformKill()
         lpds = nullptr;
     }
 #endif
-
-	return TRUE;
 }
 
 LOGICAL sndsPlatformOverLimit(UINT32 numPlaying)

@@ -122,7 +122,7 @@ void fxHitFreeAll()
 // Function: fxHitKill
 // Description: Release all
 //////////////////////////////////////////////
-LOGICAL fxHitKill()
+void fxHitKill()
 {
     if(g_lpHits != nullptr)
     {
@@ -135,8 +135,6 @@ LOGICAL fxHitKill()
     memset(&g_hitTail, 0, sizeof(FXHIT));
     memset(&g_hitFreeHead, 0, sizeof(FXHIT));
     memset(&g_hitFreeTail, 0, sizeof(FXHIT));
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -766,7 +766,7 @@ LOGICAL rnmainFOVChange()
 }
 
 // Kill the render engine
-LOGICAL rnmainKill()
+void rnmainKill()
 {
 #ifdef MULTI_CLIENT
 	multiClientKill(true);
@@ -806,8 +806,6 @@ LOGICAL rnmainKill()
     glslKill();
 
     Write_Log(LOG_OLD, LOG_INFO, "[rnmainKill]");
-
-	return(TRUE);
 }
 
 void rnmainSetPlayerInfo(piVECTOR* lppos, piVECTOR* lprot)

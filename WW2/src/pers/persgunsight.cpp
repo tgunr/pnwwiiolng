@@ -369,7 +369,7 @@ LOGICAL persGunsightInit()
 	persGunsightKill
 *************************************************************************************************/
 
-LOGICAL persGunsightKill()
+void persGunsightKill()
 {
 	_ClearGunfileData(&GunSightView);
 	_ClearGunfileData(&InstView);
@@ -381,8 +381,6 @@ LOGICAL persGunsightKill()
     piFreeMipTextures(_britscope);
 	piFreeMipTextures(_bazookascope);
     piFreeMipTextures(_binocs);
-
-	return 0;
 }
 
 /************************************************************************************************

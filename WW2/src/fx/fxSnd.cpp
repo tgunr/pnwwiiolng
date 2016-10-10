@@ -78,9 +78,9 @@ static UINT32 _stopsoundposition[ML_MAX_CREW_POSITIONS] = {0};
 
 ////////////////////////////////
 // Function: fxSndKill
-// Description: Kill routinue
+// Description: Kill routine
 ////////////////////////////////
-LOGICAL fxSndKill()
+void fxSndKill()
 {
     memset(_stopsoundposition, 0, sizeof(UINT32) * ML_MAX_CREW_POSITIONS);
 
@@ -89,7 +89,7 @@ LOGICAL fxSndKill()
     FXSOUND* FREE = nullptr;
 
     if(!B)
-        return TRUE;
+        return;
 
     // Free all active sounds
     while(B != E)
@@ -99,8 +99,6 @@ LOGICAL fxSndKill()
 
         _freeSound(FREE->ID);
     }
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////

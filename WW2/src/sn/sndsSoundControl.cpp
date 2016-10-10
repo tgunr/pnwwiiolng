@@ -84,11 +84,11 @@ LOGICAL sndsInit()
 // return values:   0 if no errors occurred during startup
 //					1 if startup failed for any reason
 
-LOGICAL sndsKill()
+void sndsKill()
 {
 	if (bSoundEnable == FALSE)
 	{
-		return TRUE;
+		return;
 	}
 
     while(!_freesounds.empty())
@@ -102,13 +102,11 @@ LOGICAL sndsKill()
 	sndsKillCache();
 	sndsReset();
 
-	LOGICAL rval = sndsPlatformKill();
+	sndsPlatformKill();
 
     _sndsFreeRemainingSounds();
 
     Write_Log(LOG_OLD, LOG_INFO, "[sndsKill]");
-
-    return rval;
 }
 
 // does any driver configuration (such as on windows, enumerating sound drivers and picking

@@ -13,7 +13,7 @@
 extern LOGICAL fpUpdatePerson(struct mlVehicleData* VehicleData, FLOAT64 DeltaTime);
 
 extern LOGICAL fpInit(struct vehVehicle*vehicle);
-extern LOGICAL fpKill(struct mlVehicleData* VehicleData);
+extern void fpKill(struct mlVehicleData& VehicleData);	///TODO: Convert to destructor?
 extern LOGICAL fpProcessVehicleAnimationFlags(struct vehVehicle*vehicle);
 extern LOGICAL fpHandleProneTrooperPosition(struct OBJECT* pObject, struct vehVehiclePositionData * PosData);
 extern LOGICAL fpSetExternal(struct mlVehicleData * ModelData);

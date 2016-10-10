@@ -109,10 +109,9 @@ LOGICAL persBombsightUpdate()
 	persBombsightKill
 *************************************************************************************************/
 
-LOGICAL persBombsightKill()
+void persBombsightKill()
 {
 	persClearBombsight();
-	return TRUE;
 }
 
 /************************************************************************************************

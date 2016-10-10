@@ -92,21 +92,17 @@ LOGICAL rntextLocInit()
 // Function: rntextLocKill
 // Description: Kill routine for this module.
 /////////////////////////////////////////////
-LOGICAL rntextLocKill()
+void rntextLocKill()
 {
-    int i;
-
     if(g_bInitialized == FALSE)
-        return TRUE;
+        return;
 
-    for(i = 0; i < DEF_NUM_BITMAPS; i++)
+    for(int i = 0; i < DEF_NUM_BITMAPS; i++)
     {
         piFreeMipTextures(g_iTextIDS[i]);
     }
 
     g_bInitialized = FALSE;
-
-    return TRUE;
 }
 
 /////////////////////////////////////////////

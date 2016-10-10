@@ -172,7 +172,7 @@ void fxBltFreeAll()
 // Function: fxBltKill
 // Description: Release all
 //////////////////////////////////////////////
-LOGICAL fxBltKill()
+void fxBltKill()
 {
     if(g_blts != nullptr)
     {
@@ -185,8 +185,6 @@ LOGICAL fxBltKill()
     memset(&g_bltTail, 0, sizeof(FXBULLET));
     memset(&_freeH, 0, sizeof(FXBULLET));
     memset(&_freeT, 0, sizeof(FXBULLET));
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////

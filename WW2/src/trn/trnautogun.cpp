@@ -373,7 +373,7 @@ static LOGICAL _ReadAndSetupAutogunTypes()
 }
 
 
-LOGICAL trnKillAutogunSystem()
+void trnKillAutogunSystem()
 {
 	// note: if there are any autoguns left to kill, we've got a problem
 	if (_AutoGunHead.next != nullptr)
@@ -382,20 +382,13 @@ LOGICAL trnKillAutogunSystem()
 		Write_Debug("Autoguns remaining after trnldrkill!!!!!");
 		Write_Debug("******************");
 	}
-
-	return TRUE;
 }
 
-LOGICAL trnKillAutogun(trnAutoGun** ppAutoGun)
+void trnKillAutogun(trnAutoGun** ppAutoGun)
 {
-trnAutoGun* pAutoGun = nullptr;
-
-	pAutoGun = *ppAutoGun;
-
+	trnAutoGun* pAutoGun = *ppAutoGun;
 	if (pAutoGun == nullptr)
-	{
-		return FALSE;
-	}
+		return;
 
 	if (pAutoGun->FireSoundId > 0)
 	{
@@ -417,8 +410,6 @@ trnAutoGun* pAutoGun = nullptr;
 
 	delete pAutoGun->Weapon;
 	memFree(pAutoGun);
-
-	return TRUE;
 }
 
 LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)

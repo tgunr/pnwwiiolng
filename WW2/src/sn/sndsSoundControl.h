@@ -29,12 +29,10 @@ extern LOGICAL sndsInit();
 // return values:   1 if no errors occurred during startup
 //					0 if startup failed for any reason
 
-extern LOGICAL sndsKill();
+extern void sndsKill();
 // calls any platform-specific shutdown for sounds, deallocates structures and
 // resets any global variables. This should only be called after snInit has been
 // called. Any sound calls made after snKill will automatically fail.
-// return values:   1 if no errors occurred during shutdown
-//					0 if shutdown failed for any reason
 
 extern LOGICAL sndsDriverConfig( void* obj );
 // handles any (temporary) UI config of sound driver issues

@@ -394,7 +394,7 @@ static void oglEnd()
 void ddpKill()
 {
     // This function is called recursively with Alt-F4
-    static LOGICAL alreadykilled = 0;
+    static bool alreadykilled = false;
 
     if(alreadykilled)
     {
@@ -403,7 +403,7 @@ void ddpKill()
 
     ClipCursor(nullptr);
 
-    alreadykilled = 1;
+    alreadykilled = true;
 
 	imeKill();
 

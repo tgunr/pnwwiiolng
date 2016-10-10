@@ -2597,7 +2597,8 @@ UINT32 vehKillVehicle(vehVehicle* Vehicle)
 
 		if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		{
-			fpKill(Vehicle->ModelData);
+			if (Vehicle->ModelData)
+				fpKill(*Vehicle->ModelData);
 		}
 
 		mlKillVehicleData(Vehicle->ModelData);
@@ -2615,7 +2616,8 @@ UINT32 vehKillVehicle(vehVehicle* Vehicle)
 	{
 		if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		{
-			fpKill(Vehicle->ModelData);
+			if (Vehicle->ModelData)
+				fpKill(*Vehicle->ModelData);
 		}
 
 		mlKillVehicleData(Vehicle->ModelData);

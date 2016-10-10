@@ -3,7 +3,7 @@
 class Texture;
 
 extern LOGICAL persGunsightInit();
-extern LOGICAL persGunsightKill();
+extern void persGunsightKill();
 
 extern LOGICAL persGunsightUpdate();
 

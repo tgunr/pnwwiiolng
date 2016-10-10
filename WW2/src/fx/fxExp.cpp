@@ -132,7 +132,7 @@ void fxExpFreeAll()
 // Function: fxExpKill
 // Description: Release all
 //////////////////////////////////////////////
-LOGICAL fxExpKill()
+void fxExpKill()
 {
     if(g_lpExp != nullptr)
     {
@@ -145,8 +145,6 @@ LOGICAL fxExpKill()
     memset(&g_expTail, 0, sizeof(FXEXPLOSION));
     memset(&g_expFreeHead, 0, sizeof(FXEXPLOSION));
     memset(&g_expFreeTail, 0, sizeof(FXEXPLOSION));
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////

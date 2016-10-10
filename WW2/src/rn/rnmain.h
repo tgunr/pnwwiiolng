@@ -18,7 +18,7 @@
 
 	extern LOGICAL rnmainSetDefaultRenderStates();
 	extern LOGICAL rnmainInit();
-	extern LOGICAL rnmainKill();
+	extern void rnmainKill();
 	extern LOGICAL rnmainFOVChange();
 	extern LOGICAL rnmainListText(const char* text, ...);
 	extern LOGICAL rnmainListText(const wchar_t* text, ...);

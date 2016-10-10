@@ -173,15 +173,13 @@ SCHAR* loclGetLanguageName()
 	return _LanguageName;
 }
 
-LOGICAL locl_Message_Table_Kill()
+void locl_Message_Table_Kill()
 {
-SINT32	i;
-
     loclLangKill();
 
 	if(_MessageTable != nullptr)
 	{
-		for(i = 0; i <= HighestStringNumber; i++)
+		for(SINT32 i = 0; i <= HighestStringNumber; i++)
 		{
 			if(_MessageTable[i] != nullptr)
 			{
@@ -193,6 +191,4 @@ SINT32	i;
 		memFree(_MessageTable);
 		_MessageTable = nullptr;
 	}
-
-	return TRUE;
 }

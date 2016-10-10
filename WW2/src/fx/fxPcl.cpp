@@ -579,7 +579,7 @@ void fxPclFreeAll()
 // Function: fxPclKill
 // Description:
 //////////////////////////////////////////
-LOGICAL fxPclKill()
+void fxPclKill()
 {
     if(particles != nullptr)
     {
@@ -590,8 +590,6 @@ LOGICAL fxPclKill()
     // Set to nullptr in case of further updates.
     memset(&g_pclHead, 0, sizeof(FXPARTICLE));
     memset(&g_pclTail, 0, sizeof(FXPARTICLE));
-
-    return TRUE;
 }
 
 //////////////////////////////////////////

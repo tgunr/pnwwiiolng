@@ -13,7 +13,7 @@ enum
 
 extern LOGICAL persBombsightInit();
 extern LOGICAL persBombsightUpdate();
-extern LOGICAL persBombsightKill();
+extern void persBombsightKill();
 extern LOGICAL persClearBombsight();
 extern LOGICAL persBombsightSetup(SINT32 Type,SINT8* MountName, void*  InVehicleData);
 
