@@ -34,11 +34,12 @@ MobileSpawn::activate(
 	  Mission* const mission
 	, Player* const player
 	, UINT32 stoUID
+	, SINT32 stoSubType
 	, FLOAT64 x, FLOAT64 y, FLOAT64 z
 	, UINT32 vehicleID
 	)
 {
-	betaLog(_FLD, "msp: m:%u p:%u c:%s sto:%u activating", mission->missionID(), player->playerID(), player->callsign(), stoUID);
+	betaLog(_FLD, "msp: m:%u p:%u c:%s sto:%u stoST:%d activating", mission->missionID(), player->playerID(), player->callsign(), stoUID, stoSubType);
 
 	m_active = true;
 
@@ -46,6 +47,7 @@ MobileSpawn::activate(
 	chatGetCallsign(m_callsign, player->chatHandle());
 	m_handle = player->matchHandle();
 	m_stoUID = stoUID;
+	m_stoSubType = stoSubType;
 	m_x = x;
 	m_y = y;
 	m_z = z;
@@ -61,10 +63,10 @@ MobileSpawn::activate(
 void
 MobileSpawn::deactivate(MSPAWN_RESULT reason, UINT32 missionID)
 {
-	MobileSpawnWaypoint wp(missionID, m_playerID, m_handle, m_x, m_y, m_z, false, m_stoUID, reason);
+	MobileSpawnWaypoint wp(missionID, m_playerID, m_handle, m_x, m_y, m_z, false, m_stoUID, m_stoSubType, reason);
 	chatSendMissionMobileSpawnWaypoint(wp);
 
-	dbugLog(_FLI, "msp: m:%u p:%u sto:%u deactivating", missionID, m_playerID, m_stoUID);
+	dbugLog(_FLI, "msp: m:%u p:%u sto:%u stoSubType:%d deactivating", missionID, m_playerID, m_stoUID, m_stoSubType);
 
 	// Clear the instance specific data, but retain the positional data.
 	m_playerID = 0;
@@ -109,12 +111,12 @@ MobileSpawn::incrementSpawnees(const playerid_t forPlayer) const
 // Activate a mobile spawn
 
 bool
-Mission::activateMobileSpawn(Player* const player, UINT32 stoUID, FLOAT64 x, FLOAT64 y, FLOAT64 z)
+Mission::activateMobileSpawn(Player* const player, UINT32 stoUID, SINT32 stoSubType, FLOAT64 x, FLOAT64 y, FLOAT64 z)
 {
 	bool wasActive = spawner().isActive();
 
 	// - Activate the spawner
-	spawner().activate(this, player, stoUID, x, y, z);
+	spawner().activate(this, player, stoUID, stoSubType, x, y, z);
 
 	if ( !wasActive )
 	{
@@ -147,6 +149,7 @@ Mission::announceMobileSpawnSTO() const
 							, spawner().m_z
 							, true
 							, spawner().m_stoUID
+							, spawner().m_stoSubType
 							, MSDR_GRANTED
 							);
 	chatSendMissionMobileSpawnWaypoint(wp);
@@ -310,7 +313,7 @@ static const char* const msdrResults[MSPAWN_RESULT_MAX][2] =
 // Add a non-vehicle mobile spawn that has been instigated by the system
 
 void
-missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle handle, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, UINT32 stoUID)
+missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle handle, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, UINT32 stoUID, SINT32 stoSubType)
 {
 	MSPAWN_RESULT error = MSDR_FAILED;
 	try
@@ -323,7 +326,8 @@ missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle
 			throw std::domain_error("Unknown player");
 
 		error = mission->getMobileSpawnPermission();
-		dbugLog(_FLI, "m:%u p:%u c:%s sto:%u msp @ %0.3g/%0.3g/%0.3g result:%u", missionID, player->playerID(), player->callsign(), stoUID, x, y, z, error);
+		dbugLog(_FLI, "m:%u p:%u c:%s sto:%u stoType:%d msp @ %0.3g/%0.3g/%0.3g result:%u", 
+			missionID, player->playerID(), player->callsign(), stoUID, stoSubType, x, y, z, error);
 
 		if ( error != MSDR_GRANTED )
 		{
@@ -341,14 +345,14 @@ missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle
 			throw std::domain_error(reason);
 		}
 
-		mission->activateMobileSpawn(player, stoUID, x, y, z);
+		mission->activateMobileSpawn(player, stoUID, stoSubType, x, y, z);
 	}
 	catch ( std::domain_error& e )
 	{
 		Chat::Name callsign(handle);
-		dbugLog(_FLA, "m:%u p:%u c:%s sto:%u unable to add mobile spawn: %s", missionID, playerID, callsign.c_str(), stoUID, e.what());
+		dbugLog(_FLA, "m:%u p:%u c:%s sto:%u stoSubType:%d unable to add mobile spawn: %s", missionID, playerID, callsign.c_str(), stoUID, stoSubType, e.what());
 
-		MobileSpawnWaypoint wp(missionID, playerID, handle, x, y, z, false, stoUID, error);
+		MobileSpawnWaypoint wp(missionID, playerID, handle, x, y, z, false, stoUID, stoSubType, error);
 		chatSendMissionMobileSpawnWaypoint(wp);
 	}
 }

@@ -1644,6 +1644,9 @@
     <ClInclude Include="..\..\src\include\unique_opaque_ptr.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiPPOLoader.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2685,6 +2688,9 @@
       <Filter>ob</Filter>
     </ClCompile>
     <ClCompile Include="build_info.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiPPOLoader.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\cursor.cur">

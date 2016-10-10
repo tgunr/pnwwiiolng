@@ -1,9 +1,10 @@
 /*
- * xmlexports.h : macros for marking symbols as exportable/importable.
+ * Summary: macros for marking symbols as exportable/importable.
+ * Description: macros for marking symbols as exportable/importable.
  *
- * See Copyright for the status of this software.
+ * Copy: See Copyright for the status of this software.
  *
- * igor@zlatkovic.com
+ * Author: Igor Zlatovic <igor@zlatkovic.com>
  */
 
 #ifndef __XML_EXPORTS_H__
@@ -39,13 +40,22 @@
  * Macros which declare the called convention for exported functions
  */
 #define XMLCALL
-#define LIBXML_STATIC
+/**
+ * XMLCDECL:
+ *
+ * Macro which declares the calling convention for exported functions that
+ * use '...'.
+ */
+#define XMLCDECL
+
+/** DOC_DISABLE */
 
 /* Windows platform with MS compiler */
 #if defined(_WIN32) && defined(_MSC_VER)
   #undef XMLPUBFUN
   #undef XMLPUBVAR
   #undef XMLCALL
+  #undef XMLCDECL
   #if defined(IN_LIBXML) && !defined(LIBXML_STATIC)
     #define XMLPUBFUN __declspec(dllexport)
     #define XMLPUBVAR __declspec(dllexport)
@@ -57,7 +67,12 @@
       #define XMLPUBVAR extern
     #endif
   #endif
-  #define XMLCALL __cdecl
+  #if defined(LIBXML_FASTCALL)
+    #define XMLCALL __fastcall
+  #else
+    #define XMLCALL __cdecl
+  #endif
+  #define XMLCDECL __cdecl
   #if !defined _REENTRANT
     #define _REENTRANT
   #endif
@@ -68,6 +83,7 @@
   #undef XMLPUBFUN
   #undef XMLPUBVAR
   #undef XMLCALL
+  #undef XMLCDECL
   #if defined(IN_LIBXML) && !defined(LIBXML_STATIC)
     #define XMLPUBFUN __declspec(dllexport)
     #define XMLPUBVAR __declspec(dllexport) extern
@@ -80,13 +96,36 @@
     #endif
   #endif
   #define XMLCALL __cdecl
+  #define XMLCDECL __cdecl
   #if !defined _REENTRANT
     #define _REENTRANT
   #endif
 #endif
 
 /* Windows platform with GNU compiler (Mingw) */
-#if defined(_WIN32) && defined(__MINGW__)
+#if defined(_WIN32) && defined(__MINGW32__)
+  #undef XMLPUBFUN
+  #undef XMLPUBVAR
+  #undef XMLCALL
+  #undef XMLCDECL
+  /*
+   * if defined(IN_LIBXML) this raises problems on mingw with msys
+   * _imp__xmlFree listed as missing. Try to workaround the problem
+   * by also making that declaration when compiling client code.
+   */
+  #if defined(IN_LIBXML) && !defined(LIBXML_STATIC)
+    #define XMLPUBFUN __declspec(dllexport)
+    #define XMLPUBVAR __declspec(dllexport) extern
+  #else
+    #define XMLPUBFUN
+    #if !defined(LIBXML_STATIC)
+      #define XMLPUBVAR __declspec(dllimport) extern
+    #else
+      #define XMLPUBVAR extern
+    #endif
+  #endif
+  #define XMLCALL __cdecl
+  #define XMLCDECL __cdecl
   #if !defined _REENTRANT
     #define _REENTRANT
   #endif
@@ -97,6 +136,7 @@
   #undef XMLPUBFUN
   #undef XMLPUBVAR
   #undef XMLCALL
+  #undef XMLCDECL
   #if defined(IN_LIBXML) && !defined(LIBXML_STATIC)
     #define XMLPUBFUN __declspec(dllexport)
     #define XMLPUBVAR __declspec(dllexport)
@@ -109,6 +149,7 @@
     #endif
   #endif
   #define XMLCALL __cdecl
+  #define XMLCDECL __cdecl
 #endif
 
 /* Compatibility */

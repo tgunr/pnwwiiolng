@@ -73,7 +73,7 @@ public:
 	MSPAWN_RESULT getMobileSpawnPermission() const;
 	bool isMobileSpawnAvailable() const { return m_summary.mobileSpawnAvailable && spawner().m_active; }
 
-	bool activateMobileSpawn(Player* player, UINT32 stoUID, FLOAT64 x, FLOAT64 y, FLOAT64 z);
+	bool activateMobileSpawn(Player* player, UINT32 stoUID, SINT32 stoSubType, FLOAT64 x, FLOAT64 y, FLOAT64 z);
 
 	// Tell me whether or not this is accessible to the player
 	bool accessible(Player* player) const { return (accessibility(player) == MC_JOIN); }
@@ -82,7 +82,6 @@ public:
 	// Flag a mission as being takeable/listed because the mission leader has joined it
 	void activate();
 
-//	bool activateMobileSpawn(const MMMobileSpawnUpdate& mmsu, UINT32 cellhost, UINT16 port, UINT32 stoUID);
 	void announceMobileSpawnSTO() const;
 
 	bool addPlayer(Player* player);

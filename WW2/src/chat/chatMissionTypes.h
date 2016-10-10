@@ -65,7 +65,7 @@ public:
 	void sendFirstUpdate(const Player* player);
 
 	//! Send a mobile spawn request to the mmhost
-	void sendMobileSpawn(UINT32 playerID, const ChatHandle handle, FLOAT64 x, FLOAT64 y, FLOAT64 z, bool deployed, UINT32 stoUID);
+	void sendMobileSpawn(UINT32 playerID, const ChatHandle handle, FLOAT64 x, FLOAT64 y, FLOAT64 z, bool deployed, UINT32 stoUID, SINT32 stoSubType);
 
 	//! Set the fallback leader.
 	void setBackupLeader(const ChatHandle newLeader) { lead().backup(newLeader); }

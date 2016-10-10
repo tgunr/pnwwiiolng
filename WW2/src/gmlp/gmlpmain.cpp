@@ -84,6 +84,7 @@
 #include "ogl/GLCounter.h"
 #include "maptools/GenerateIcons.h"
 #include "sdm/BuildTerrain.h"
+#include "wwii/wwiiPPOLoader.h"
 
 #ifdef MULTI_CLIENT
 #include "mc/multiClient.h"
@@ -104,6 +105,8 @@ static LOGICAL _PostExternalDrawFunc(LOGICAL IsBeforeStage);
 static LOGICAL _PostInternalDrawFunc(LOGICAL IsBeforeStage);
 static LOGICAL _PostUnsortedDrawFunc(LOGICAL IsBeforeStage);
 static void _CalcFPS();
+
+PPOSpecLoader specLoader;
 
 #define AUTO_AFK_PERIOD 300000	// after 5 minutes, auto-afk turns on
 #define AUTO_AFK_CHECK 5000		// auto-afk checks every 5 seconds
@@ -177,6 +180,9 @@ LOGICAL gmlpMainInit()
     ShadowMap::GetInstance().setPolygonOffset(Vec2f(8, 4));
 
 	ww2imapInit();
+
+	// initialize the PPO mapping, eliminated lazy load
+	specLoader.loadSpecMap();
 
 	rnlogoUpdateStatus("loading.gameloop");
 

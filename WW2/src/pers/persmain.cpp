@@ -4960,7 +4960,10 @@ static bool _findResupplyFRU(ServerTrackedObject& sto, void* cookie)
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
 
-	if(sto.type() == ServerTrackedObject::_UMS && wwiiSide(sto.flags()) == player->Side)
+    // valid STOs are - Any _UMS type  OR  _PPO type with subtype of Ammo Fru (4)
+    if( (sto.type() == ServerTrackedObject::_UMS ||
+        (sto.type() == ServerTrackedObject::_PPO && sto.subType() == PPOSpecLoader::_PPO_AFRU))
+       && wwiiSide(sto.flags()) == player->Side)
 	{
 		const WorldPosition_m& pos = sto.position();
 

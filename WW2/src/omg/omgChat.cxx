@@ -182,6 +182,7 @@ void Chat::MissionStatus::Lead::groupUnpack(ACTION_OBJECT* const a, const TeulTi
 Chat::MissionStatus::FRU& Chat::MissionStatus::FRU::operator = (const Chat::MissionStatus::FRU& rhs)
 {
 	m_lastModified = rhs.m_lastModified;
+	subtype.operator=(rhs.subtype);
 	active.operator=(rhs.active);
 	nextPlaceAvail.operator=(rhs.nextPlaceAvail);
 	position.operator=(rhs.position);
@@ -191,18 +192,20 @@ Chat::MissionStatus::FRU& Chat::MissionStatus::FRU::operator = (const Chat::Miss
 
 void Chat::MissionStatus::FRU::groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes) const
 {
-	active.pack(a, lastPack, changes, 0);
-	nextPlaceAvail.pack(a, lastPack, changes, 1);
-	position.pack(a, lastPack, changes, 2);
-	creator.pack(a, lastPack, changes, 3);
+	subtype.pack(a, lastPack, changes, 0);
+	active.pack(a, lastPack, changes, 1);
+	nextPlaceAvail.pack(a, lastPack, changes, 2);
+	position.pack(a, lastPack, changes, 3);
+	creator.pack(a, lastPack, changes, 4);
 }
 
 void Chat::MissionStatus::FRU::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes)
 {
-	active.unpack(a, lastPack, changes, 0);
-	nextPlaceAvail.unpack(a, lastPack, changes, 1);
-	position.unpack(a, lastPack, changes, 2);
-	creator.unpack(a, lastPack, changes, 3);
+	subtype.unpack(a, lastPack, changes, 0);
+	active.unpack(a, lastPack, changes, 1);
+	nextPlaceAvail.unpack(a, lastPack, changes, 2);
+	position.unpack(a, lastPack, changes, 3);
+	creator.unpack(a, lastPack, changes, 4);
 }
 
 TEUL_CALLBACK* Chat::CellHostUpdate::s_callback;

@@ -145,6 +145,9 @@ ENDMACRO()
 ADD_OMG_TARGET(omgMissionSortieData)
 ADD_OMG_TARGET(omgChat)
 
+IF(NOT MSVC AND NOT PN_CLUSTER STREQUAL "rPI" )
+    SET_TARGET_PROPERTIES(OMGgen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
+ENDIF( )
 SET_PROPERTY(TARGET omggen PROPERTY FOLDER "Tools")
 
 ######################################################################
@@ -297,12 +300,6 @@ ADD_LIBRARY(libwwii
         weap/weapParser.h
     weap/weapSpec.cpp
         weap/weapSpec.h
-    tinyxml/tinystr.cpp
-        tinyxml/tinystr.h
-    tinyxml/tinyxml.cpp
-        tinyxml/tinyxml.h
-    tinyxml/tinyxmlerror.cpp
-    tinyxml/tinyxmlparser.cpp
     tut/tutGroupProgress.cpp
         tut/tutGroupProgress.h
     wwii/wwiiCommandLineArgs.cpp
@@ -392,7 +389,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
             chat/chatRosterClient.cpp
         )
         ADD_PCH(chatClient)
-        TARGET_LINK_LIBRARIES(chatClient libwwii teulserver ${MYSQL_LIBRARIES})
+        TARGET_LINK_LIBRARIES(chatClient libwwii teulserver ${MYSQL_LIBRARIES} ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
         SET_PROPERTY(TARGET chatClient PROPERTY FOLDER "Tools")
 
         # Provide access to the LuaVMs.
@@ -400,7 +397,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
         	ADD_EXECUTABLE(luaClient
             	src/luaClient.cpp
         	)
-        	TARGET_LINK_LIBRARIES(luaClient libwwii teulserver readline ncurses ${MYSQL_LIBRARIES})
+        	TARGET_LINK_LIBRARIES(luaClient libwwii teulserver readline ncurses ${MYSQL_LIBRARIES} ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
         	SET_PROPERTY(TARGET luaClient PROPERTY FOLDER "Tools")
 		ENDIF ( )
     ENDIF( )
@@ -410,7 +407,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
     ADD_EXECUTABLE(checkGameName
         src/checkGameName.cpp
     )
-    TARGET_LINK_LIBRARIES(checkGameName libwwii teulserver ${MYSQL_LIBRARIES})
+    TARGET_LINK_LIBRARIES(checkGameName libwwii teulserver ${MYSQL_LIBRARIES} ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
     SET_PROPERTY(TARGET checkGameName PROPERTY FOLDER "Tools")
 
     # In theory, SDM pre-parser. In practice? Deletes SDM files that don't
@@ -424,7 +421,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
         ${PCH_INCLUDE_HEADERS}
         sdm/sdmConfigVars.h
     )
-    TARGET_LINK_LIBRARIES(sdmpp libwwii teulserver ${MYSQL_LIBRARIES})
+    TARGET_LINK_LIBRARIES(sdmpp libwwii teulserver ${MYSQL_LIBRARIES} ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
     SET_PROPERTY(TARGET sdmpp PROPERTY FOLDER "Tools")
 
     # Analyze SDM files
@@ -433,7 +430,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
         sdm/sdmDump.cpp
         ${PCH_INCLUDE_HEADERS}
     )
-    TARGET_LINK_LIBRARIES(sdmDump libwwii teulserver ${MYSQL_LIBRARIES})
+    TARGET_LINK_LIBRARIES(sdmDump libwwii teulserver ${MYSQL_LIBRARIES} ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
     SET_PROPERTY(TARGET sdmDump PROPERTY FOLDER "Tools")
 
     # Reads SDM files and imports portions of them into the game database.
@@ -446,7 +443,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
             sdm/sdmParse.h
         ${PCH_INCLUDE_HEADERS}
     )
-    TARGET_LINK_LIBRARIES(stratLoader libwwii teulserver ircclient ${MYSQL_LIBRARIES})
+    TARGET_LINK_LIBRARIES(stratLoader libwwii teulserver ircclient ${MYSQL_LIBRARIES} ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
     SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
 
     # Reads SDM and blitzWor data through the server's strat routines,
@@ -479,11 +476,15 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
         strt/strtIO.cpp
             strt/strtIO.h
         strt/strtValidator.cpp
+	weap/weapSpawnXML.cpp
+	    weap/weapSpawnXML.h
+	xml/XMLLoader2.cpp
+	    xml/XMLLoader2.h
         ${PCH_INCLUDE_HEADERS}
     )
     ADD_PCH(stratValidator)
     SET_PROPERTY(TARGET stratValidator PROPERTY COMPILE_DEFINITIONS CHECK_SUPPLY=1)
-    TARGET_LINK_LIBRARIES(stratValidator libwwii teulserver event ${MYSQL_LIBRARIES})
+    TARGET_LINK_LIBRARIES(stratValidator libwwii teulserver event ${MYSQL_LIBRARIES} ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
     SET_PROPERTY(TARGET stratValidator PROPERTY FOLDER "Tools")
 ENDIF( )
 
@@ -520,7 +521,7 @@ IF (NOT PN_DISABLE_AUTH)
 		${PCH_INCLUDE_HEADERS}
 	)
 	ADD_PCH(${AUTH_HOST_EXE})
-	TARGET_LINK_LIBRARIES(${AUTH_HOST_EXE} teulserver libwwii ${MYSQL_LIBRARIES} ircclient)
+	TARGET_LINK_LIBRARIES(${AUTH_HOST_EXE} teulserver libwwii ${MYSQL_LIBRARIES} ircclient ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
 	SET_PROPERTY(TARGET ${AUTH_HOST_EXE} PROPERTY FOLDER "Hosts")
 ENDIF( )
 
@@ -532,7 +533,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
     )
     #ADD_PCH(${CONTROLLER_HOST_EXE})
     SET_PROPERTY(TARGET ${CONTROLLER_HOST_EXE} PROPERTY COMPILE_DEFINITIONS platBuild=BUILD_SERVER IS_CONTROLLER_HOST)
-    TARGET_LINK_LIBRARIES(${CONTROLLER_HOST_EXE} libwwii teulserver ${MYSQL_LIBRARIES})
+    TARGET_LINK_LIBRARIES(${CONTROLLER_HOST_EXE} libwwii teulserver ${MYSQL_LIBRARIES} ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
     SET_PROPERTY(TARGET ${CONTROLLER_HOST_EXE} PROPERTY FOLDER "Hosts")
 
     # Primarily communications-oriented server, the chat host.
@@ -701,6 +702,10 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
             wwii/wwiiHCUnits.h
         wwii/wwiiSquads.cpp
             wwii/wwiiSquads.h
+	wwii/wwiiPPOLoader.cpp
+	    wwii/wwiiPPOLoader.h
+	xml/XMLLoader2.cpp
+	    xml/XMLLoader2.h
 
         dbse/dbseClient.cpp
             dbse/dbseClient.h
@@ -718,7 +723,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
     )
     ADD_PCH(${CHAT_HOST_EXE})
     SET_PROPERTY(TARGET ${CHAT_HOST_EXE} PROPERTY COMPILE_DEFINITIONS platBuild=BUILD_SERVER IS_CHAT_HOST)
-    TARGET_LINK_LIBRARIES(${CHAT_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient libb64)
+    TARGET_LINK_LIBRARIES(${CHAT_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient libb64 ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
     SET_PROPERTY(TARGET ${CHAT_HOST_EXE} PROPERTY FOLDER "Hosts")
 
     ######################################################################
@@ -832,6 +837,10 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
             strt/strtUpdaterPack.h
         strt/strtUpdaterSupportMessages.cpp
             strt/strtUpdaterSupportMessages.h
+	weap/weapSpawnXML.cpp
+	    weap/weapSpawnXML.h
+	xml/XMLLoader2.cpp
+	    xml/XMLLoader2.h
 
         omg/omgMissionSortieData.cxx
 
@@ -839,7 +848,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
     )
     ADD_PCH(${CELL_HOST_EXE})
     SET_PROPERTY(TARGET ${CELL_HOST_EXE} PROPERTY COMPILE_DEFINITIONS platBuild=BUILD_SERVER IS_CELL_HOST)
-    TARGET_LINK_LIBRARIES(${CELL_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+    TARGET_LINK_LIBRARIES(${CELL_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
     SET_PROPERTY(TARGET ${CELL_HOST_EXE} PROPERTY FOLDER "Hosts")
 
     ######################################################################
@@ -997,12 +1006,18 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
             strt/strtSyncSupportMessages.h
         wwii/wwiiHCUnits.cpp
             wwii/wwiiHCUnits.h
+	wwii/wwiiPPOLoader.cpp
+	    wwii/wwiiPPOLoader.h
+	weap/weapSpawnXML.cpp
+	    weap/weapSpawnXML.h
+	xml/XMLLoader2.cpp
+	    xml/XMLLoader2.h
 
         ${PCH_INCLUDE_HEADERS}
     )
     ADD_PCH(${MAP_HOST_EXE})
     SET_PROPERTY(TARGET ${MAP_HOST_EXE} PROPERTY COMPILE_DEFINITIONS platBuild=BUILD_SERVER IS_MAP_HOST)
-    TARGET_LINK_LIBRARIES(${MAP_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+    TARGET_LINK_LIBRARIES(${MAP_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
     SET_PROPERTY(TARGET ${MAP_HOST_EXE} PROPERTY FOLDER "Hosts")
 
     ######################################################################
@@ -1029,7 +1044,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
     )
     ADD_PCH(${DBD_HOST_EXE})
     SET_PROPERTY(TARGET ${DBD_HOST_EXE} PROPERTY COMPILE_DEFINITIONS platBuild=BUILD_SERVER IS_DBD_HOST)
-    TARGET_LINK_LIBRARIES(${DBD_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+    TARGET_LINK_LIBRARIES(${DBD_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
     SET_PROPERTY(TARGET ${DBD_HOST_EXE} PROPERTY FOLDER "Hosts")
 
     ######################################################################
@@ -1156,6 +1171,8 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
                 strt/strtObjectStruct.h
         weap/weapSpawnXML.cpp
             weap/weapSpawnXML.h
+	xml/XMLLoader2.cpp
+	    xml/XMLLoader2.h
         wwii/wwiiHCUnits.cpp
             wwii/wwiiHCUnits.h
         list/listCL.cpp
@@ -1177,7 +1194,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
     ENDIF( )
     SET_PROPERTY(SOURCE ${_LUA_CC} PROPERTY DEPENDS ${TOLUAPP_EXECUTABLE} ${TOLUAPP_LIBRARIES})
     SET_PROPERTY(SOURCE ${_LUA_CC} PROPERTY GENERATED true)
-    TARGET_LINK_LIBRARIES(${STRAT_HOST_EXE} libwwii ${MYSQL_LIBRARIES} teulserver ircclient ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
+    TARGET_LINK_LIBRARIES(${STRAT_HOST_EXE} libwwii ${MYSQL_LIBRARIES} teulserver ircclient ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES} )
     SET_PROPERTY(TARGET ${STRAT_HOST_EXE} PROPERTY FOLDER "Hosts")
 
     TARGET_INCLUDE_DIRECTORIES(${_LUA_HOST} PRIVATE ${TOLUAPP_INCLUDE_DIR})
@@ -1258,16 +1275,16 @@ ENDIF( )
 ######################################################################
 #### Build files.
 
-ADD_CUSTOM_TARGET(envconfig
-    COMMAND ${CMAKE_COMMAND} -E
-        copy ${PROJECT_DIR}/environment.cfg ${CMAKE_CURRENT_BINARY_DIR}
-    COMMAND ${CMAKE_COMMAND} -E
-        copy ${PROJECT_DIR}/environment.win.cfg ${CMAKE_CURRENT_BINARY_DIR}
-    DEPENDS
-        ${PROJECT_DIR}/environment.cfg
-        ${PROJECT_DIR}/environment.win.cfg
-    )
-SET_TARGET_PROPERTIES(envconfig PROPERTIES FOLDER "Tools")
+#ADD_CUSTOM_TARGET(envconfig
+#    COMMAND ${CMAKE_COMMAND} -E
+#        copy ${PROJECT_DIR}/environment.cfg ${CMAKE_CURRENT_BINARY_DIR}
+#    COMMAND ${CMAKE_COMMAND} -E
+#        copy ${PROJECT_DIR}/environment.win.cfg ${CMAKE_CURRENT_BINARY_DIR}
+#    DEPENDS
+#        ${PROJECT_DIR}/environment.cfg
+#        ${PROJECT_DIR}/environment.win.cfg
+#    )
+#SET_TARGET_PROPERTIES(envconfig PROPERTIES FOLDER "Tools")
 
 ######################################################################
 #### Install rule.
@@ -1313,12 +1330,12 @@ IF (NOT PN_DISABLE_AUTH)
         	COMPONENT auth
 	)
 ENDIF( )
-INSTALL(FILES
-            environment.cfg
-            environment.win.cfg
-        DESTINATION bin
-        COMPONENT config
-        )
+#INSTALL(FILES
+#            environment.cfg
+#            environment.win.cfg
+#        DESTINATION bin
+#        COMPONENT config
+#        )
 IF( NOT PN_CLUSTER STREQUAL "Auth")
     INSTALL(DIRECTORY hostproj/lua/ DESTINATION lua COMPONENT lua PATTERN ".svn" EXCLUDE PATTERN ".lua")
     INSTALL(DIRECTORY hostproj/web/ DESTINATION web COMPONENT web PATTERN ".svn" EXCLUDE)

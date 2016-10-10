@@ -88,6 +88,7 @@
 #include "weap/weapammo.h"
 #include "weap/weapList.h"
 #include "weap/weapons.h"
+#include "wwii/wwiiPPOLoader.h"
 
 // WWIIOL specific.
 #include "client/clientStrtQueue.h"
@@ -259,9 +260,13 @@ extern SINT32 _CurrentHitmapObjectDisplay;
 
 #endif // BETA_RELEASE
 
+extern std::vector<PPOSpec *> activePPOList;
+extern UINT16 activePPOIndex;
+
 static bool g_canDeployMobileSpawn = false;
 
 extern void vehloadKill();
+extern SINT32 globalMSCoolDownEnd;
 
 static Covert<vehVehicle*> _VehicleHead = new vehVehicle();
 
@@ -3883,24 +3888,44 @@ vehVehicle* VehicleSTO::getVehicle()
 void MobileSpawnSTO::preProcess()
 {
 	PlayerPlacedSTO::preProcess();
-
-	if(_to)
-		trnFXSetCountryFlags(_to, (SINT32)flags());
 }
 
 void MobileSpawnSTO::postProcess()
 {
 	PlayerPlacedSTO::postProcess();
-
-	if(_to)
-	{
-		trnCDTerrainObject* TO = trncdFindTerrainObject(_to->child);
-
-		// flags is used to pass the country for mobilespawn stos
-		if(TO)
-			TO->Country = (SINT32)flags();
-	}
 }
+
+void PlayerPlacedSTO::preProcess()
+{
+    TerrainSTO::preProcess();
+    
+    if (type() == ServerTrackedObject::_UMS || subType() == PPOSpecLoader::_PPO_AFRU)
+    {
+        if(_to)
+            trnFXSetCountryFlags(_to, (SINT32)flags());
+    }
+}
+
+void PlayerPlacedSTO::postProcess()
+{
+    TerrainSTO::postProcess();
+    
+    if (type() == ServerTrackedObject::_UMS || subType() == PPOSpecLoader::_PPO_AFRU)
+    {
+        if(_to)
+        {
+            trnCDTerrainObject* TO = trncdFindTerrainObject(_to->child);
+            
+            // flags is used to pass the country for mobilespawn stos
+            if(TO)
+                TO->Country = (SINT32)flags();
+        }
+    }
+}
+
+
+
+
 
 BailoutSTO::~BailoutSTO()
 {
@@ -5306,85 +5331,24 @@ PlayerPlacedObject* vehmainFRUBuild()
 		return nullptr;
 	}
 
-	PlayerPlacedObject* fru = fpPPOCreate(FRU_INDEX);
+	PlayerPlacedObject* fru = fpPPOCreate(activePPOList[activePPOIndex]->id);
 
 	// set our callbacks
-	//fru->SetValidityCallback(vehmainFRUCheck);
-	fru->SetExecuteCallback(vehmainFRUExecute);
-
-	// for vehicles, fail on validity checks
-	//fru->failOnInvalid = (veh->VehicleType->Type != VEH_TYPE_PERSON);
-
-	// do one update to check our current validity
-	if(fpPPOUpdate())
-	{
-		fpPPOAlert();
-		return nullptr;
-	}
-
-	// start building the irp if we're not a trooper
-	/*
-	if(veh->VehicleType->Type != VEH_TYPE_PERSON)
-	{
-		if(!fru->Build())
-		{
-			fpPPOAlert();
-			return nullptr;
-		}
-	}
-	*/
+    if (fru != nullptr)
+    {
+        // do one update to check our current validity
+        if(fpPPOUpdate())
+        {
+            fpPPOAlert();
+            return nullptr;
+        }
+    }
+    else
+    {
+        dbugLog(_FLW, "Failed to create fru - fpPPOCreate for index %d and id %d", activePPOIndex, activePPOList[activePPOIndex]->id);
+    }
 
 	return fru;
-}
-
-bool vehmainFRUExecute()
-{
-	PlayerPlacedObject* fru = fpPPOGet();
-
-	if(fru->valid)
-	{
-		Vec3d finalPos = fru->finalPos;
-		piVECTOR finalAtt = fru->finalAtt;
-
-	    WorldPosition_m position(finalPos.x(), finalPos.y(), finalPos.z());
-		AttitudeVector attitude(finalAtt.x, finalAtt.y, finalAtt.z);
-		vehVehicle* player = persGetPersonaVehiclePtr();
-
-		if(Online)
-		{
-			// create a ppo sto
-			MobileSpawnSTO sto(0, fru->spec->id, position, attitude, (UINT32)player->Country);
-
-			// send the request to the host
-			sto.request(PlayerClient()->ChatConnection());
-		}
-		else
-		{
-			MobileSpawnSTO* sto = new MobileSpawnSTO(0, fru->spec->id, position, attitude, (UINT32)player->Country);
-			ServerTrackedObject::addToIndex(sto);
-			trnCDUpdateCollideLists(true);
-			//sto->Sink();
-		}
-
-		// handle troop specific stuff
-		fpFPSCancelPPO();
-
-		// temp string buffer
-		char nkey[50+1];
-
-		// create name key based on id
-		snprintf(nkey, 50, "ppos.ob%d", fru->spec->id);
-
-		const std::wstring& name = uiLocString(nkey);
-
-		fpPPOAlert("ppos.built", name.c_str());
-	}
-	else
-	{
-		fpPPOAlert();
-	}
-
-	return false;
 }
 
 /************************************************************************************************
@@ -5878,45 +5842,30 @@ bool vehmainRemoveSTO(UINT32 id)
 
 void _updateMobileSpawn()
 {
-    // If we are deploying and have not received a GRANTED from the host within a
-    // timeout period, tell host to undeploy (took too long)
-    if(_isDeployingTimeout())
-    {
-        vehHandleMobileSpawnUpdate(MSDR_LAPSED);
-        vehmainUndeployVehicleForMobileSpawn();
-        return;
-    }
-
-    if(!vehmainIsDeployed())
-    {
-		_checkMobileSpawnAbility();
-        return;
-    }
-
-	/* new mobile spawn functionality
-	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle();
-
-	if(veh && veh->StateAnimation.enumDeployedState == IDE_VEHICLE_DEPLOYED && vehmainIsMobileSpawn())
+	// If we are deploying and have not received a GRANTED from the host within a
+	// timeout period, tell host to undeploy (took too long)
+	if(_isDeployingTimeout())
 	{
-		FLOAT32 buildTime = (FLOAT32)((frametime - veh->deployedTimeout) / (FLOAT32)MOBILE_DEPLOYED_TIMEOUT);
-
-		char script[25+1];
-		sprintf(script, "game.ondeploybuild(%.2f)", buildTime);
-
-		// update the deployment timer
-		uiRunScript(script);
+		vehHandleMobileSpawnUpdate(MSDR_LAPSED);
+		vehmainUndeployVehicleForMobileSpawn();
+		return;
 	}
-	*/
 
-    // Send updates to the host periodically
-    if(frametime - g_mobileUpdateTimer < MOBILE_SPAWN_UPDATE_TIMER)
-    {
-        return;
-    }
+	if(!vehmainIsDeployed())
+	{
+		_checkMobileSpawnAbility();
+		return;
+	}
+
+	// Send updates to the host periodically
+	if(frametime - g_mobileUpdateTimer < MOBILE_SPAWN_UPDATE_TIMER)
+	{
+		return;
+	}
 
 	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle();
 
-    g_mobileUpdateTimer = frametime;
+	g_mobileUpdateTimer = frametime;
 
 	MSPAWN_RESULT permission = _canWeDeploy(veh, false);
 	if(permission != MSDR_GRANTED)
@@ -5927,27 +5876,12 @@ void _updateMobileSpawn()
 		return;
 	}
 
-	/* new mobile spawn functionality
-	if(vehmainIsMobileSpawn() && _isDeployedTimeout())
-	{
-		// our build timer has completed, undeploy and leave an sto UMS
-		mlToggleMobileSpawn(1, IMAP_MOBILE_SPAWN, 0);
+	piVECTOR spawnPos;
+
+	// Get position of the vehicle mobile spawn object
+	if(_getVehicleSpawnObjectPosition(veh, &spawnPos) != 0)
 		return;
-	}
-	*/
 
-    piVECTOR spawnPos;
-
-    // Get position of the vehicle mobile spawn object
-    if(_getVehicleSpawnObjectPosition(veh, &spawnPos) != 0)
-        return;
-
-///FIXME: This functionality is no-longer supported.
-/*
-    // Send position to host
-    ClientMobileSpawnUpdate cmsu(MSST_DEPLOYED, spawnPos.x, spawnPos.y, spawnPos.z);
-	cmsu.send(PlayerClient()->CellConnection());
-*/
 }
 
 /************************************************************************************************
@@ -5955,17 +5889,10 @@ void _updateMobileSpawn()
 *************************************************************************************************/
 void _setVehicleDeployedState(DEPLOYEDSTATE enumState)
 {
-    vehVehicle*veh = persGetPersonaVehiclePtr();
-    if(!veh) return;
+	vehVehicle*veh = persGetPersonaVehiclePtr();
+	if(!veh) return;
 
-	/* new mobile spawn functionality
-	if(enumState == IDE_VEHICLE_DEPLOYED)
-		uiRunScript("game.ondeploystate(true)"); // if we're deployed, tell the ui
-	else
-		uiRunScript("game.ondeploystate(false)"); // all other cases, say we're not
-	*/
-
-    veh->StateAnimation.enumDeployedState = enumState;
+	veh->StateAnimation.enumDeployedState = enumState;
 }
 
 /************************************************************************************************

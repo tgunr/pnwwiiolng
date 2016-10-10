@@ -13,8 +13,49 @@
 SET(MYSQL_FOUND 0)
 
 IF (PN_USE_SYSTEM_MYSQL)
+        MESSAGE(STATUS "Using System Mysql")
 
-	IF (WIN32)
+	IF ( PN_CLUSTER STREQUAL "rPI" )
+        	MESSAGE(STATUS "Looking for Mysql on rPI")
+                FIND_PATH(
+                        MYSQL_INCLUDE_DIR
+                        NAMES "mysql.h"
+                        PATHS
+                                        /usr/include
+                                        /usr/include/mysql
+                                        /usr/local/include
+                                        /usr/local/include/mysql
+                                        /usr/local/mysql/include
+                )
+                FIND_LIBRARY(
+                        MYSQL_LIBRARIES
+                        NAMES mysqlclient_r mysqlclient libmysqlclient_r libmysqlclient
+                        HINTS
+                                /usr/lib/arm-linux-gnuabihf
+                                /usr/lib
+                                /usr/lib/mysql
+                                /usr/local/lib
+                                /usr/local/lib/mysql
+                                /usr/local/mysql/lib
+                                /opt/lib
+                                /usr/lib64
+                        PATH_SUFFIXES
+                                mysql
+                                mysql5.6
+                                mysql5-6
+                                mysql-5.6
+                                mysql5.5
+                                mysql5-5
+                                mysql-5.5
+                                mysql5.1
+                                mysql5-1
+                                mysql-5.1
+                                mysql5
+                                mysql-5
+                )
+                SET(MYSQL_LIBRARIES ${MYSQL_LIBRARIES} dl)
+	ELSEIF (WIN32)
+        	MESSAGE(STATUS "Looking for Mysql on Win32")
 		STRING(REGEX REPLACE "\\+" "/" SystemDrive "$ENV{SystemDrive}")
 		STRING(REGEX REPLACE "\\+" "/" ProgramFiles "$ENV{ProgramFiles}")
 		IF (CMAKE_BITNESS EQUAL 8)
@@ -95,6 +136,7 @@ IF (PN_USE_SYSTEM_MYSQL)
 				"c:/msys/local/include"
 		)
 	ELSE ()
+		MESSAGE( STATUS "Looking for Mysql on Linux or MacOS" )
 		FIND_PATH(
 			MYSQL_INCLUDE_DIR
 			NAMES "mysql.h"

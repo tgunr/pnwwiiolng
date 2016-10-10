@@ -45,6 +45,7 @@ MESSAGE MissionStatus
 
 	GROUP FRU
 	{
+		SINT32			subtype;		//! subtype of FRU
 		bool			active;			//! True when a FRU is active.
 		NetTimeMS		nextPlaceAvail;	//! When the next FRU can be placed.
 		WorldPosition_m	position;	//! Absolute world co-ordinates.

@@ -73,6 +73,8 @@
 #include "trn/trnScenario.h"
 #include "ez/EZManager.h"
 #include "veh/vehAnimEnum.h"
+#include "fp/fpFPSdata.h"
+#include "fp/fpPPO.h"
 
 #ifdef GR2_BLEND_EDITOR
 #include "gr2/gr2Anim.h"
@@ -334,6 +336,7 @@ FLOAT64 _ThrottlePos; // 0 to 1.0
 FLOAT64 _RudderPos; // -1.0 to 1.0
 UINT32 _ThrottleDecreaseKeyIsDown;
 UINT32 _ThrottleIncreaseKeyIsDown;
+extern  fpsWeaponTypes   currentWeaponModel;
 
 // hack for vehicle analysis input and floatere
 extern char	buffer[256];
@@ -539,6 +542,8 @@ static void _HandleContactDamage(vehVehicle* Vehicle);
 
 static void _DeclareVehicleKilled (mlVehicleData* pVehicleData, mlComponent* pComponent);
 static void _CheckForSecondaryVehicleKill (mlVehicleData* pVehicleData, mlComponent* pComponent);
+
+extern void fpPPOSwitchPPO(bool allowFrus);
 
 /************************************************************************************************
 	mlMain
@@ -1746,23 +1751,31 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 
 			// check for position switch or ordinance cycle and weapon groups active
 			{
-			SINT32 TempNum;
+				SINT32 TempNum;
 
 				persGetPersonaPosition((UINT32*)&TempNum);
 
 				if (VehicleData->CycleAmmo != 0 ||
 					TempNum != VehicleData->LastPlayerPos)
 				{
-					if (TempNum != VehicleData->LastPlayerPos)
+                    // We need to check to see if a PPO is active
+					if (fpPPOGet() != nullptr)
 					{
-						VehicleData->OrdnanceSelected = persGetPositionOrdnanceNum (TempNum);
+						fpPPOSwitchPPO(true);
 					}
 					else
 					{
-						VehicleData->OrdnanceSelected++;
-						if (VehicleData->OrdnanceSelected > VehicleData->CrewData.NumberOfSecondaryWeapons[TempNum])
+						if (TempNum != VehicleData->LastPlayerPos)
 						{
+							VehicleData->OrdnanceSelected = persGetPositionOrdnanceNum (TempNum);
+						}
+						else
+						{
+							VehicleData->OrdnanceSelected++;
+							if (VehicleData->OrdnanceSelected > VehicleData->CrewData.NumberOfSecondaryWeapons[TempNum])
+							{
 							VehicleData->OrdnanceSelected = 0;
+							}
 						}
 					}
 				}

@@ -27,8 +27,10 @@
 #include "wwii/wwiiDBThreads.h"
 #include "host/hostVehicleRequest.h"
 #include "wwii/wwiiServerTypeEnums.h"
+#include "wwii/wwiiPPOLoader.h"
 
 extern SINT32 mapSendHostSupercellData(SINT32 teulIndex);	// From mapHostSupercellData.cpp
+extern PPOSpecLoader specLoader;
 
 //////////////////////////////////////////////////////////////////////
 // Exception classes for failing during spawn grant
@@ -131,13 +133,12 @@ _getMobileSpawn(const Player* const commander, FLOAT64* const x, FLOAT64* const 
 	if ( !mission || mission->isMobileSpawnAvailable() == false )
 		return 0;
 
+	MobileSpawn& spawner = mission->spawner();
 #if !defined(DOROTHY)
-	///TODO: Determine if the mobile spawn is suitable for the vehicle
-	if ( commander->weapon().spec.wCategory != _INFANTRY )
+	if ( !specLoader.ppoIsSpawnAllowed(spawner.m_stoSubType,
+                        commander->weapon().spec.wClass, commander->weapon().spec.wType))
 		return 0;
 #endif
-
-	MobileSpawn& spawner = mission->spawner();
 
 	*x = spawner.m_x;
 	*y = spawner.m_y;

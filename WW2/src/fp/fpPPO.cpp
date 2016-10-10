@@ -32,6 +32,10 @@
 #include "cfg/cfgPrefs.h"
 #include "wwii/wwiiPermissions.h"
 #include "client/GameClient.h"
+#include "wwii/wwiiPPOLoader.h"
+#include "wwii/wwiiServerTrackedObject.h"
+#include "client/GameClient.h"
+#include "weap/weapSpec.h"
 
 // WWIIOL specific.
 #include "strt/strtCPFlags.h"
@@ -41,6 +45,11 @@
 
 using PPO_SINK_MAP = std::map<UINT32,SINT32>;
 
+extern PPOSpecLoader specLoader;
+
+std::vector<PPOSpec *> activePPOList;
+UINT16 activePPOIndex = 0;
+
 static int _badMat			= -1;
 static int _goodMat			= -1;
 static int _offMat			= -1;
@@ -49,7 +58,6 @@ static std::wstring _fail	= L"";
 
 static PlayerPlacedObject* _placedObject = nullptr;
 
-static PPO_SPEC_MAP _ppoSpecMap;
 static PPO_SINK_MAP _ppoSinkMap;
 
 static ref_ptr<oglMaterial> ppomaterial;
@@ -58,6 +66,8 @@ static bool _ppoDrawCallback(OBJECT* o);
 static bool _inTargetFacilityRange(FLOAT32 distance, SINT32 side);
 static bool _checkFacilityRange(FLOAT32 distance, StratDB::StratObject* so, SINT32 side, bool friendly);
 static bool _fbCheck(vehVehicle* player, StratDB::StratObject* fac, FLOAT32 radius);
+
+SINT32 globalMSCoolDownEnd = 0;
 
 struct AddDrawCallback
 {
@@ -127,9 +137,9 @@ PlayerPlacedObject::PlayerPlacedObject(PPOSpec* s) :
 	obj = obmgrCreateModelInstance(modelName, transform, true);
 	if(!obj) return;
 
-    struct AddDrawCallback addcallback;
-    addcallback.o = obj;
-    addcallback.Apply();
+	struct AddDrawCallback addcallback;
+	addcallback.o = obj;
+	addcallback.Apply();
 
 	// update our object's bounding box
 	trnopRecalcBoundsAndNormals(obj); // COMMENT: possible crash in ldmdlCalcNormals2() in here, #500+ in 1.33.4
@@ -236,7 +246,7 @@ void PlayerPlacedObject::UpdateColliders()
 	position.y() += forward.y;
 	position.z() += forward.z;
 
-	Vec3d& adjust = spec->rayAdjust;
+	Vec3d adjust(spec->rayAdjust);
 
 	if(spec->rotation)
 	{
@@ -257,18 +267,6 @@ void PlayerPlacedObject::UpdateColliders()
 		geom = geoms.at(i);
 
 		// set the ray pos
-
-		/*
-		switch(i)
-		{
-			case 0: rayPos.set(0,0,0);												break; // center
-			case 1: rayPos.set(bl.x + adjust.x(),bl.y + adjust.y(), 0);	break; // front left
-			case 2: rayPos.set(tr.x - adjust.x(),bl.y + adjust.y(), 0);	break; // front right
-			case 3: rayPos.set(bl.x + adjust.x(),tr.y - adjust.y(), 0);	break; // back left
-			case 4: rayPos.set(tr.x - adjust.x(),tr.y - adjust.y(), 0);		break; // back right
-		}
-		*/
-
 		switch(i)
 		{
 			case 0: rayPos.set(0,0,0);							break; // center
@@ -389,7 +387,12 @@ void PlayerPlacedObject::SetInvalid(const char* key, bool force)
 
 SINT32 PlayerPlacedObject::CoolDown()
 {
-	return spec->coolDownEnd;
+    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
+    
+    if (spec && spec->stotype != ServerTrackedObject::_UMS)
+        coolDownEnd = &spec->coolDownEnd;
+    
+	return *coolDownEnd;
 }
 
 bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool checksOnly)
@@ -787,72 +790,36 @@ void PlayerPlacedObject::SetValidityCallback(PPOCallback vc)
 	validityCallback = vc;
 }
 
-/*
-bool PlayerPlacedObject::GetTransform(piMATRIX& t)
-{
-	vehVehicle* player = playerGetVehicle();
-	if(!player) return false;
-
-	FLOAT64VECTOR pos		= player->ModelData->VehiclePos;
-	piMATRIX& att					= player->ModelData->VehicleAttMat;
-	FLOAT64VECTOR ppoPos	= {0, 0, 0};
-	piVECTOR ppoAtt				= {0, 0, 0};
-
-	piVECTOR forward				= {0,-7.0f,0};
-
-	// now orient the vector to our facing
-	math3dMultiplyRotation(&forward, &forward, &att);
-
-	pos.x += forward.x;
-	pos.y += forward.y;
-	pos.z += forward.z;
-
-	if(trnopDynamicBase(pos, att, 2.0f, 1.0f, ppoPos, ppoAtt))
-	{
-		t = IdentityMatrix;
-		mathEul_ToMatrix(&t, EulOrdXYZr, &ppoAtt);
-
-		t._41 = (FLOAT32)(ppoPos.x - WorldOriginOffset.x);
-		t._42 = (FLOAT32)(ppoPos.y - WorldOriginOffset.y);
-		t._43 = (FLOAT32)-(ppoPos.z - WorldOriginOffset.z);
-
-		return true;
-	}
-
-	return false;
-}
-*/
-
 static bool _ppoDrawCallback(OBJECT* o)
 {
 
 	if(fpFPSIsSwimming())
 		return true;
 
-    if(ogl::UseDeprecatedPath() && ppomaterial.valid())
-    {
-        oglSetRenderState(oglRENDERSTATE_LIGHTING, FALSE);
+	if(ogl::UseDeprecatedPath() && ppomaterial.valid())
+	{
+		oglSetRenderState(oglRENDERSTATE_LIGHTING, FALSE);
 
-        ppomaterial->AddTexture(0, o->texid);
-        ppomaterial->Apply();
+		ppomaterial->AddTexture(0, o->texid);
+       		ppomaterial->Apply();
 
-        int id = ppomaterial->GetMaterial();
-        const piMATERIAL& mat = oglGetMaterial(id);
+		int id = ppomaterial->GetMaterial();
+		const piMATERIAL& mat = oglGetMaterial(id);
 
-        oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(mat.diffuse.r, mat.diffuse.g, mat.diffuse.b, mat.diffuse.a));
+		oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(mat.diffuse.r, mat.diffuse.g, mat.diffuse.b, mat.diffuse.a));
 
-        oglSetWorldMatrix(&o->mat);
-        obdrawDrawMesh(o);
+		oglSetWorldMatrix(&o->mat);
+		obdrawDrawMesh(o);
 
-        oglSetRenderState(oglRENDERSTATE_LIGHTING, piLIGHTING_DEFAULT);
-        oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(1, 1, 1, 1));
-    }
-    else
-    {
-        // TODO
-    }
+		oglSetRenderState(oglRENDERSTATE_LIGHTING, piLIGHTING_DEFAULT);
+		oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(1, 1, 1, 1));
+	}
+	else
+	{
+		// TODO
+	}
 
-    return true;
+	return true;
 }
 
 bool PlayerPlacedObject::Update()
@@ -860,6 +827,11 @@ bool PlayerPlacedObject::Update()
 	piVECTOR pos	= {0, 0, 0};
 	piVECTOR att	= {0, 0, 0};
 
+    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
+    
+    if (spec && spec->stotype != ServerTrackedObject::_UMS)
+        coolDownEnd = &spec->coolDownEnd;
+    
 	if(!lastUpdate)
 		lastUpdate = frametime;
 
@@ -869,7 +841,7 @@ bool PlayerPlacedObject::Update()
 		CalculatePlacement(pos, att, true);
 
 		if(Modified())
-            ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
+			ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
 
 		if(frametime < buildAt) // we're building
 		{
@@ -897,10 +869,10 @@ bool PlayerPlacedObject::Update()
 
 		UpdateColliders();
 
-		if(CalculatePlacement(pos, att))
+		if(CalculatePlacement(pos, att) && obj != nullptr)
 			ogrpMoveAndRotateObjectGroup(obj, &pos, &att);
 
-		if(frametime <= spec->coolDownEnd)
+		if(frametime <= *coolDownEnd)
 		{
 			_fail = uiLocString("ppos.coolingdown");
 			valid = false;
@@ -913,12 +885,12 @@ bool PlayerPlacedObject::Update()
 		}
 
 		if(Modified())
-            ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
+			ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
 
-		if(frametime <= spec->coolDownEnd) // we're cooling off
+		if(frametime <= *coolDownEnd) // we're cooling off
 		{
 			// we did our cool down start
-			SINT32 coolDownStart = spec->coolDownEnd - spec->coolDown;
+			SINT32 coolDownStart = *coolDownEnd - spec->coolDown;
 			SINT32 coolDownProgress = frametime - coolDownStart;
 
 			if(coolDownProgress < 0)
@@ -1005,7 +977,12 @@ bool PlayerPlacedObject::Execute()
 {
 	Interrupt();
 
-	// might need to do a max object count here
+    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
+    
+    if (spec && spec->stotype != ServerTrackedObject::_UMS)
+        coolDownEnd = &spec->coolDownEnd;
+
+    // might need to do a max object count here
 	// if too many objects, make invalid
 
 	// if we have an execute callback and it returns false, then
@@ -1018,28 +995,48 @@ bool PlayerPlacedObject::Execute()
 	    WorldPosition_m position(finalPos.x(), finalPos.y(), finalPos.z());
 		AttitudeVector attitude(finalAtt.x, finalAtt.y, finalAtt.z);
 
+        vehVehicle* player = persGetPersonaVehiclePtr();
 		if(Online)
 		{
-			// create a ppo sto
-			PlayerPlacedSTO sto(0, spec->id, position, attitude);
+         
+            if (spec->stotype != ServerTrackedObject::_UMS)
+            {
+                // create a ppo sto
+                PlayerPlacedSTO sto(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype), (UINT32)player->Country);
 
-			// send the request to the host
-			sto.request(PlayerClient()->ChatConnection());
+                // send the request to the host
+                sto.request(PlayerClient()->ChatConnection());
+            }
+            else
+            {
+                // create a ppo sto
+                MobileSpawnSTO sto(0, static_cast<UINT16>(spec->id), position, attitude, (UINT32)player->Country);
+                
+                // send the request to the host
+                sto.request(PlayerClient()->ChatConnection());
+                
+            }
 		}
 		else
 		{
-			PlayerPlacedSTO* sto = new PlayerPlacedSTO(0, spec->id, position, attitude);
-			ServerTrackedObject::addToIndex(sto);
-			trnCDUpdateCollideLists(true);
-			//sto->Sink();
+            
+            if (spec->stotype != ServerTrackedObject::_UMS)
+            {
+                PlayerPlacedSTO* sto = new PlayerPlacedSTO(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype), (UINT32)player->Country);
+                ServerTrackedObject::addToIndex(sto);
+                trnCDUpdateCollideLists(true);
+                //sto->Sink();
+            }
+            else
+            {
+                MobileSpawnSTO* sto = new MobileSpawnSTO(0, static_cast<UINT16>(spec->id), position, attitude, (UINT32)player->Country);
+                ServerTrackedObject::addToIndex(sto);
+                trnCDUpdateCollideLists(true);
+                //sto->Sink();
+            }
 		}
 
-		// fru's are shared and get their cool down from the host
-		if(!Online || spec->id != FRU_INDEX)
-		{
-			// we should apply non-shared cool downs here
-			spec->coolDownEnd = frametime + spec->coolDown;
-		}
+        *coolDownEnd = frametime + spec->coolDown;
 
 		// handle troop specific stuff
 		fpFPSCancelPPO();
@@ -1075,8 +1072,42 @@ bool PlayerPlacedObject::Modified()
 	return false;
 }
 
+void fpPPOInitiateBuildAction(UINT32 & state, UINT32 & control, SINT32 & stance)
+{
+    PlayerPlacedObject* ppo = fpPPOGet();
+    
+    if(ppo)
+    {
+        Write_Log (LOG_FPS, LOG_INFO, "Building ppo!");
+        
+        if(ppo->Build())
+        {
+            state &= static_cast<UINT32>(~STATE_HOLD_FIRE);
+            control &= static_cast<UINT32>(~FPS_FIRE);
+            
+            stance = fpFPSGetPlayerPose();
+            
+            if(stance != POSE_CROUCH)
+            {
+                control |= static_cast<UINT32>(FPS_CROUCH);
+                control &= static_cast<UINT32>(~FPS_PRONE);
+            }
+            
+            if(stance == POSE_TRANSITION)
+                stance = POSE_CROUCH;
+        }
+    }
+    
+    //fpsTrooper.firedWeapon = 1;
+
+}
+
 void fpPPOSet(PlayerPlacedObject* to)
 {
+    // do nothing if already set
+    if (to != nullptr && to == _placedObject)
+        return;
+    
 	if(_placedObject)
 		delete _placedObject;
 
@@ -1086,6 +1117,66 @@ void fpPPOSet(PlayerPlacedObject* to)
 PlayerPlacedObject* fpPPOGet()
 {
 	return _placedObject;
+}
+
+/*
+  The user has elected to switch to the next PPO type.
+  Usually due to pressing the mapped "cycle ammo" key <BKSP> default.
+ */
+void fpPPOSwitchPPO(bool adjust)
+{
+	// don't bother doing a thing unless we have more than one choice
+	if (activePPOList.size() > 1)
+	{
+		
+        PPOCallback up = nullptr, ex = nullptr, val = nullptr;
+		if (_placedObject)
+        {
+            up = _placedObject->updateCallback;
+            ex = _placedObject->executeCallback;
+            val = _placedObject->validityCallback;
+			fpPPOKill(false);
+        }
+
+		if (adjust)
+		{
+			if (++activePPOIndex == activePPOList.size())
+				activePPOIndex = 0;
+		}
+
+		fpPPOSet(fpPPOCreate(activePPOList[activePPOIndex]->id, up, ex, val));
+
+	}
+}
+
+/*
+ Called when you wish to reset the list of possible PPOs that the current vehicle can build.
+ Should be called when the BUILD weapon is first selected.
+ */
+void fpPPOReset()
+{
+	static WEAPON_SPEC troop = NULL_WEAP_SPEC;
+	static bool firsttime = true;
+
+	if(firsttime)
+	{
+		firsttime = false;
+		troop = weapCreateSpec("GV_troop.1");
+	}
+
+	activePPOIndex = 0;
+
+	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
+    vehType* vtype = VehicleData->VehicleMasterPtr->VehicleType;
+
+	// only allow FRUs for infrantry when mission leader
+	bool allowFrus = vtype->WeaponSpec.wClass != troop.wClass || (Online && PlayerClient()->IsMissionLeader());
+
+    // make sure this class/type has ppo types available to it
+    if (specLoader.getAllowedPPOs(vtype->WeaponSpec.wClass, vtype->WeaponSpec.wType, activePPOList, !allowFrus))
+	{
+		fpPPOSwitchPPO(false);
+	}	
 }
 
 bool fpPPOUpdate()
@@ -1120,18 +1211,24 @@ bool fpPPOUpdate()
 	return false;
 }
 
-void fpPPOKill()
+void fpPPOKill(bool release)
 {
-	fpPPOCancel();
+    if (release)
+    {
+        activePPOIndex = 0;
+        activePPOList.clear();
+    }
+	fpPPOCancel(release);
 	fpPPOSet(nullptr);
 }
 
-void fpPPOCancel()
+void fpPPOCancel(bool release)
 {
 	if(_placedObject)
 	{
 		_placedObject->Interrupt();
-		fpFPSCancelPPO();
+        if (release)
+            fpFPSCancelPPO();
 	}
 }
 
@@ -1197,42 +1294,7 @@ void fpPPOCreateMaterial()
 	}
 }
 
-static void _loadSpecMap()
-{
-	_ppoSpecMap.clear();
-
-	// create a spec loader
-	PPOSpecLoader loader(PPO_SPEC, &_ppoSpecMap);
-
-	// load up the ppo specs
-	loader.Load();
-
-	if(Online)
-	{
-		ARENA_VARS::iterator itr = g_arenaDescription.find("fru_cooldown");
-
-		if(itr != g_arenaDescription.end())
-		{
-			PPO_SPEC_MAP::iterator it = _ppoSpecMap.begin();
-
-			for(; it != _ppoSpecMap.end(); ++it)
-			{
-				if(it->first == FRU_INDEX)
-					it->second.coolDown = (SINT32)atol(itr->second.c_str());
-			}
-		}
-
-		PPO_SPEC_MAP::iterator pit = _ppoSpecMap.begin();
-
-		for(; pit != _ppoSpecMap.end(); ++pit)
-		{
-			if(pit->first == FRU_INDEX)
-				pit->second.coolDown = 420000;
-		}
-	}
-}
-
-PlayerPlacedObject* fpPPOCreate(int type,  bool save)
+PlayerPlacedObject* fpPPOCreate(int type,  PPOCallback updateCB, PPOCallback executeCB, PPOCallback validityCB, bool save)
 {
 	static int _lastType = -1;
 
@@ -1247,28 +1309,22 @@ PlayerPlacedObject* fpPPOCreate(int type,  bool save)
 
 	_fail = L"";
 
-	PPOSpec* spec = fpPPOGetSpec(type);
+	PPOSpec* spec = specLoader.ppoGetSpec(type);
 	if(!spec) return nullptr;
 
-	if(!fpPPOReady(type))
-		return nullptr;
-
 	// make sure our materials are created
-    fpPPOCreateMaterial();
+	fpPPOCreateMaterial();
 
-	if(Online && spec->id == FRU_INDEX)
+	if(Online && spec->stotype == ServerTrackedObject::_UMS)
 	{
 		const Chat::MissionStatus* ms = PlayerClient()->MissionStatus();
 
 		if(ms)
 		{
 			SINT32 remaining	= SINT32(ms->fru().cooldownRemaining());
-			spec->coolDownEnd	= (remaining > 0) ? frametime + remaining : 0;
+			globalMSCoolDownEnd	= (remaining > 0) ? frametime + remaining : 0;
 		}
 	}
-
-	//if(false && !Online)
-	//	coolDown = fpPPOSetCooldown(0);
 
 	PlayerPlacedObject* ppo = new PlayerPlacedObject(spec);
 
@@ -1279,40 +1335,14 @@ PlayerPlacedObject* fpPPOCreate(int type,  bool save)
 		ppo = nullptr;
 	}
 
+    ppo->SetUpdateCallback(updateCB);
+    ppo->SetExecuteCallback(executeCB);
+    ppo->SetValidityCallback(validityCB);
+
 	if(save)
 		fpPPOSet(ppo);
 
 	return ppo;
-}
-
-bool fpPPOReady(int type)
-{
-	PPOSpec* spec = fpPPOGetSpec(type);
-	if(!spec) return false;
-
-	// grab the spec and make sure we can create one
-	// check _lastPlacement against the spec
-	PPO_SPEC_MAP::iterator it = _ppoSpecMap.find(type);
-
-	if(it != _ppoSpecMap.end())
-	{
-		//if(it->second.
-	}
-
-	return true;
-}
-
-PPOSpec* fpPPOGetSpec(int type)
-{
-	if(_ppoSpecMap.empty())
-		_loadSpecMap();
-
-	PPO_SPEC_MAP::iterator found = _ppoSpecMap.find(type);
-
-	if(found != _ppoSpecMap.end())
-		return &found->second;
-
-	return nullptr;
 }
 
 void fpPPOAlert(const wchar_t* message)
@@ -1348,9 +1378,6 @@ PlayerPlacedSTO::~PlayerPlacedSTO()
 bool PlayerPlacedSTO::applyJoules(const SINT64& joules, class Player* player)
 {
 	return TerrainSTO::applyJoules(joules, player);
-
-	//Sink();
-	//return true;
 }
 
 bool PlayerPlacedSTO::load()
@@ -1365,12 +1392,22 @@ bool PlayerPlacedSTO::load()
 
 const char* PlayerPlacedSTO::model() const
 {
-	PPOSpec* spec = fpPPOGetSpec(m_subType);
+	PPOSpec* spec = specLoader.ppoGetSpec(m_subType);
 
 	if(spec)
 		return spec->modelName.c_str();
 
 	return "";
+}
+
+const char* MobileSpawnSTO::model() const
+{
+    PPOSpec* spec = specLoader.ppoGetSpec(m_subType);
+    
+    if(spec)
+        return spec->modelName.c_str();
+    
+    return "";
 }
 
 void PlayerPlacedSTO::Sink()
@@ -1426,17 +1463,6 @@ void PlayerPlacedSTO::Update()
 
 	obmainFindCallback(_to, _sinkppo, &move);
 
-	/*
-	FLOAT64ATT att;
-	att.Roll	= attitude().x();
-	att.Pitch	= attitude().y();
-	att.Yaw		= attitude().z();
-
-	_pos.z -= move;
-
-	mlMoveAndRotateObject(_to, &_pos, &att);
-	*/
-
 	_lastUpdate = frametime;
 }
 
@@ -1446,7 +1472,7 @@ void PlayerPlacedSTO::Update()
 static bool _inTargetFacilityRange(FLOAT32 distance, SINT32 side)
 {
  	FULL_OBJ_ID foi = PlayerClient()->SelectedMission().m_target;
-    StratDB::StratObject* so = StratDB::FindStratObject((sdm_full_obj_id&)foi);
+	StratDB::StratObject* so = StratDB::FindStratObject((sdm_full_obj_id&)foi);
 
 	if(!so)
 		return true;
@@ -1493,8 +1519,8 @@ static bool _inTargetFacilityRange(FLOAT32 distance, SINT32 side)
 				best = child;
 				bestDistance2 = diff.length2();
 			}
-        }
-    }
+		}
+	}
 
 	if(best && _checkFacilityRange(distance, best, side, friendly))
 		return true;
@@ -1531,7 +1557,7 @@ static bool _checkFacilityRange(FLOAT32 distance, StratDB::StratObject* so, SINT
 	Vec3d sPos = Vec3d((double)so->PosX(), (double)so->PosY(), pPos.z());
 	Vec3d diff = sPos - pPos;
 
-    FLOAT64 facDis2 = diff.length2();
+	FLOAT64 facDis2 = diff.length2();
 	FLOAT32 adist = fabs(distance);
 
 	if(distance >= 0)

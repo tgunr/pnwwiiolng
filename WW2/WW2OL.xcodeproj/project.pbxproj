@@ -429,6 +429,7 @@
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
 		47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B0ED240E9A66A40089DCC4 /* libteulKit.a */; };
 		E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96991C6D729D00D5EC52 /* WebKit.framework */; };
+		E913E48F1DA2FE6E00A3AF80 /* omgChat.cxx in Sources */ = {isa = PBXBuildFile; fileRef = E913E48E1DA2FE6E00A3AF80 /* omgChat.cxx */; };
 		E94156B01D259A0300C0565B /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94156AF1D259A0300C0565B /* libb64.a */; };
 		E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
 		E97C76161C848E3600875F44 /* CADebugger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B1120222EB00A60CC2 /* CADebugger.cpp */; };
@@ -468,6 +469,7 @@
 		E97C76C51C85395700875F44 /* kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769A1C85156F00875F44 /* kqueue.c */; };
 		E97C76C61C8539BF00875F44 /* XMLLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762B1C84E11A00875F44 /* XMLLoader.cpp */; };
 		E97C76C71C8539BF00875F44 /* XMLLoader2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */; };
+		E99C32571D8607830098798F /* wwiiPPOLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E99C32561D8607830098798F /* wwiiPPOLoader.cpp */; };
 		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
 		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
 		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
@@ -1425,6 +1427,7 @@
 		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
 		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		E913E48E1DA2FE6E00A3AF80 /* omgChat.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = omgChat.cxx; path = omg/omgChat.cxx; sourceTree = "<group>"; };
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E94156AF1D259A0300C0565B /* libb64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libb64.a; path = lib/mac/libb64.a; sourceTree = "<group>"; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
@@ -1498,6 +1501,8 @@
 		E97C76A01C85156F00875F44 /* strlcpy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = strlcpy.c; path = ../../Libraries/libevent/strlcpy.c; sourceTree = "<group>"; };
 		E97C76CD1C85AFD800875F44 /* ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = ww2.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
 		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = text; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = SOURCE_ROOT; };
+		E99C32551D8607830098798F /* wwiiPPOLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiPPOLoader.h; sourceTree = "<group>"; };
+		E99C32561D8607830098798F /* wwiiPPOLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiPPOLoader.cpp; sourceTree = "<group>"; };
 		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
 		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
 		FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authPlaygateTypes.h; path = src/auth/authPlaygateTypes.h; sourceTree = SOURCE_ROOT; };
@@ -2723,6 +2728,8 @@
 		08104EE1103DFE120065E0E2 /* wwii */ = {
 			isa = PBXGroup;
 			children = (
+				E99C32551D8607830098798F /* wwiiPPOLoader.h */,
+				E99C32561D8607830098798F /* wwiiPPOLoader.cpp */,
 				08EBB4D212943BE300AEDB5B /* wwiiSyncVar.cpp */,
 				08EBB4D312943BE300AEDB5B /* wwiiSyncVar.h */,
 				08CBC4571291D9EB00C0987C /* wwiiServerTrackedObjectPacker.cpp */,
@@ -2762,6 +2769,7 @@
 			);
 			path = wwii;
 			sourceTree = "<group>";
+			usesTabs = 1;
 		};
 		08104F4D103DFEDF0065E0E2 /* xml */ = {
 			isa = PBXGroup;
@@ -2906,6 +2914,7 @@
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				E913E48D1DA2FE5300A3AF80 /* omg */,
 				0834F1D1104586AA00E75B52 /* versionNo.h */,
 				E97C763D1C85146A00875F44 /* event */,
 				08E5E55513E855A100A5034D /* ez */,
@@ -3046,6 +3055,14 @@
 				FA13BB4E1C87650800095818 /* libxml2.tbd */,
 			);
 			name = lib;
+			sourceTree = "<group>";
+		};
+		E913E48D1DA2FE5300A3AF80 /* omg */ = {
+			isa = PBXGroup;
+			children = (
+				E913E48E1DA2FE6E00A3AF80 /* omgChat.cxx */,
+			);
+			name = omg;
 			sourceTree = "<group>";
 		};
 		E97C763D1C85146A00875F44 /* event */ = {
@@ -3594,6 +3611,7 @@
 				08104BD0103DF85D0065E0E2 /* TextureCubeMap.cpp in Sources */,
 				08104BD1103DF85D0065E0E2 /* TextureRectangle.cpp in Sources */,
 				08104BDB103DF8CB0065E0E2 /* countryCodes.cpp in Sources */,
+				E99C32571D8607830098798F /* wwiiPPOLoader.cpp in Sources */,
 				08104BDC103DF8CB0065E0E2 /* parse.cpp in Sources */,
 				08104BDD103DF8CB0065E0E2 /* parseIO.cpp in Sources */,
 				08104BDE103DF8CB0065E0E2 /* parseWor.cpp in Sources */,
@@ -3712,6 +3730,7 @@
 				08104EDC103DFDC30065E0E2 /* weapons.cpp in Sources */,
 				08104EDD103DFDC30065E0E2 /* weapParser.cpp in Sources */,
 				08104EDF103DFDC30065E0E2 /* weapSpec.cpp in Sources */,
+				E913E48F1DA2FE6E00A3AF80 /* omgChat.cxx in Sources */,
 				08104F36103DFE120065E0E2 /* wwiiCallbacks.cpp in Sources */,
 				08104F37103DFE120065E0E2 /* wwiiClientMessages.cpp in Sources */,
 				08104F3C103DFE120065E0E2 /* wwiiHCUnitsCommon.cpp in Sources */,

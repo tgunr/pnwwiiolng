@@ -695,7 +695,7 @@ UMSSTO::activate()
 
 //		// Allow 10 seconds for a response from the mmhost
 //		m_lifespan = 1 * 1000;
-		mission->sendMobileSpawn(player->playerID(), player->matchHandle(), position().x(), position().y(), position().z(), true, uid());
+		mission->sendMobileSpawn(player->playerID(), player->matchHandle(), position().x(), position().y(), position().z(), true, uid(), subType());
 	}
 	catch (MSPAWN_RESULT error)
 	{

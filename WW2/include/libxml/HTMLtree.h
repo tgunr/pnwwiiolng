@@ -1,10 +1,11 @@
 /*
- * HTMLtree.h : describes the structures found in an tree resulting
- *              from an XML parsing.
+ * Summary: specific APIs to process HTML tree, especially serialization
+ * Description: this module implements a few function needed to process
+ *              tree in an HTML specific way.
  *
- * See Copyright for the status of this software.
+ * Copy: See Copyright for the status of this software.
  *
- * daniel@veillard.com
+ * Author: Daniel Veillard
  */
 
 #ifndef __HTML_TREE_H__
@@ -15,6 +16,7 @@
 #include <libxml/tree.h>
 #include <libxml/HTMLparser.h>
 
+#ifdef LIBXML_HTML_ENABLED
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,79 +62,86 @@ extern "C" {
 XMLPUBFUN htmlDocPtr XMLCALL
 		htmlNewDoc		(const xmlChar *URI,
 					 const xmlChar *ExternalID);
-XMLPUBFUN htmlDocPtr XMLCALL	
+XMLPUBFUN htmlDocPtr XMLCALL
 		htmlNewDocNoDtD		(const xmlChar *URI,
 					 const xmlChar *ExternalID);
-XMLPUBFUN const xmlChar * XMLCALL	
+XMLPUBFUN const xmlChar * XMLCALL
 		htmlGetMetaEncoding	(htmlDocPtr doc);
-XMLPUBFUN int XMLCALL		
+XMLPUBFUN int XMLCALL
 		htmlSetMetaEncoding	(htmlDocPtr doc,
 					 const xmlChar *encoding);
 #ifdef LIBXML_OUTPUT_ENABLED
-XMLPUBFUN void XMLCALL	    
+XMLPUBFUN void XMLCALL
 		htmlDocDumpMemory	(xmlDocPtr cur,
 					 xmlChar **mem,
 					 int *size);
-XMLPUBFUN int XMLCALL		
+XMLPUBFUN void XMLCALL
+		htmlDocDumpMemoryFormat	(xmlDocPtr cur,
+					 xmlChar **mem,
+					 int *size,
+					 int format);
+XMLPUBFUN int XMLCALL
 		htmlDocDump		(FILE *f,
 					 xmlDocPtr cur);
-XMLPUBFUN int XMLCALL		
+XMLPUBFUN int XMLCALL
 		htmlSaveFile		(const char *filename,
 					 xmlDocPtr cur);
-XMLPUBFUN int XMLCALL		
+XMLPUBFUN int XMLCALL
 		htmlNodeDump		(xmlBufferPtr buf,
 					 xmlDocPtr doc,
 					 xmlNodePtr cur);
-XMLPUBFUN void XMLCALL		
+XMLPUBFUN void XMLCALL
 		htmlNodeDumpFile	(FILE *out,
 					 xmlDocPtr doc,
 					 xmlNodePtr cur);
-XMLPUBFUN int XMLCALL		
+XMLPUBFUN int XMLCALL
 		htmlNodeDumpFileFormat	(FILE *out,
 					 xmlDocPtr doc,
 					 xmlNodePtr cur,
 					 const char *encoding,
 					 int format);
-XMLPUBFUN int XMLCALL		
+XMLPUBFUN int XMLCALL
 		htmlSaveFileEnc		(const char *filename,
 					 xmlDocPtr cur,
 					 const char *encoding);
-XMLPUBFUN int XMLCALL		
+XMLPUBFUN int XMLCALL
 		htmlSaveFileFormat	(const char *filename,
 					 xmlDocPtr cur,
 					 const char *encoding,
 					 int format);
 
-XMLPUBFUN void XMLCALL		
+XMLPUBFUN void XMLCALL
 		htmlNodeDumpFormatOutput(xmlOutputBufferPtr buf,
 					 xmlDocPtr doc,
 					 xmlNodePtr cur,
 					 const char *encoding,
 					 int format);
-XMLPUBFUN void XMLCALL		
+XMLPUBFUN void XMLCALL
 		htmlDocContentDumpOutput(xmlOutputBufferPtr buf,
 					 xmlDocPtr cur,
 					 const char *encoding);
-XMLPUBFUN void XMLCALL		
+XMLPUBFUN void XMLCALL
 		htmlDocContentDumpFormatOutput(xmlOutputBufferPtr buf,
 					 xmlDocPtr cur,
 					 const char *encoding,
 					 int format);
-XMLPUBFUN void XMLCALL 
-		htmlNodeDumpOutput	(xmlOutputBufferPtr buf, 
+XMLPUBFUN void XMLCALL
+		htmlNodeDumpOutput	(xmlOutputBufferPtr buf,
 					 xmlDocPtr doc,
-					 xmlNodePtr cur, 
+					 xmlNodePtr cur,
 					 const char *encoding);
 
 #endif /* LIBXML_OUTPUT_ENABLED */
 
-XMLPUBFUN int XMLCALL		
+XMLPUBFUN int XMLCALL
 		htmlIsBooleanAttr	(const xmlChar *name);
 
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* LIBXML_HTML_ENABLED */
 
 #endif /* __HTML_TREE_H__ */
 

@@ -139,7 +139,7 @@ ThreadTextQuery::commit(const TeulTimeMS maxAge)
 	// Need to add the suffix.
 	strncpy(m_statement + m_length, m_suffix, sizeof(m_statement) - m_length);
 
-#ifdef BETA_RELEASE
+#if defined(BETA_RELEASE) || defined(DEBUG_WW2)
 	dbugLog(_FLD, "Committing: %s", m_statement);
 #endif
 

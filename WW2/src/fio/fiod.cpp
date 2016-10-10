@@ -7,6 +7,7 @@
 #include "wwii/wwiiHash.h" // does this work on linux?
 #include <map>
 #include <set>
+#include <string.h>
 
 #if platBuild != BUILD_SERVER
 # include "pi/pi.h"
@@ -33,6 +34,7 @@
 #endif
 
 #if platBuild == BUILD_SERVER
+# define FILE_URL_DESIGNATOR    "file://"
 # define os_file_path(x) (x)
 #endif
 
@@ -163,7 +165,16 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 #endif
 
 	// think this works as char* because when we get to here we're talking about relative paths which are all ascii?
-	size_t pathLen = pathprintf(buffer, DataPath, name);
+	size_t pathLen = 0;
+	// we don't want file system references to use local data path
+	const char *srchLoc = strstr(name, FILE_URL_DESIGNATOR);
+	if (srchLoc != nullptr) {
+		strncpy(buffer, srchLoc+strlen(FILE_URL_DESIGNATOR), sizeof(buffer));
+		pathLen = strlen(buffer);
+	}
+	else {
+		pathLen = pathprintf(buffer, DataPath, name);
+	}
 
         // must be included for now until data list files can all be cleaned up
         for ( size_t i = 0; i < pathLen; ++i )
@@ -179,20 +190,26 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 	///TODO: OGS: I think this works under Windows too...
 	if ( retval < 0 || !S_ISREG(statBuffer.st_mode) )
 	{
+		dbugLog(_FLW, "File could not be opened %s", buffer);
 		return -1;
 	}
 #else
 	///TODO: OGS: See above: This allows Windows to [try to] open directories like files.
 	if ( retval < 0 )
 	{
+		dbugLog(_FLW, "(WIN32) File could not be opened %s", buffer);
 		return -1;
 	}
 #endif
 
 	// make sure and update our passed in widePath to the found path
 	if(!WWII::ConvertChars(buffer, widePath, wsize))
+	{
+		dbugLog(_FLW, "Could not be convert chars %s", buffer);
 		return -1;
+	}
 
+	dbugLog(_FLD, "file size found to be %ld", statBuffer.st_size);
 	return statBuffer.st_size; // Return what the OS thinks it is
 }
 
@@ -380,16 +397,20 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 	widePath[0] = 0;
 	asciiPath[0] = 0;
 
+	dbugLog(_FLD, "fiodOpen(%s, %d, %d)", filename, userdir, prereadSize);
+
 	off_t fileSize = _getFilePathAndSize(filename, userdir, widePath, sizeof(widePath));
 
 	if ( fileSize < 0 )
 	{
+		dbugLog(_FLD, "Could not open file with file size %ld", fileSize);
 		return - 1;
 	}
 
-	if ( prereadSize > 0 )
+	if ( prereadSize > 0 && fileSize > prereadSize)
 	{
-	fileSize = prereadSize; // if too big will be caught below
+		dbugLog(_FLD, "Altering read size to %d", prereadSize);
+		fileSize = prereadSize; // if too big will be caught below
 	}
 
 	WWIIConvert(widePath, asciiPath);
@@ -412,6 +433,9 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		piExitProgram(_FL, "out of memory");
 		return -1;
 #endif
+	}
+	else {
+		dbugLog(_FLD, "Alloc size for new file is %d", allocSize);
 	}
 
 	mem[fileSize] = 0;
@@ -437,6 +461,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		assert( s_fileMap.find(fd) == s_fileMap.end() );
 
 		// Try to read the file contents into the allocation
+		dbugLog(_FLD, "About to read %ld bytes from file", fileSize);
 		off_t bytesRead = OS_READ(fd, mem, fileSize);
 		if ( bytesRead < fileSize )
 			throw "read failed/truncated";
@@ -916,6 +941,16 @@ const char sep = '/';
     
 #endif
 
+#if platBuild == BUILD_SERVER
+#include "libxml/xmlIO.h"
+
+static int xmlinputmatch(const char* filename) { return 1; }
+
+void fioXmlRegisterInputCallbacks()
+{
+	xmlRegisterInputCallbacks(xmlinputmatch, (xmlInputOpenCallback)fiodOpen, (xmlInputReadCallback)fiodRead, (xmlInputCloseCallback)fiodClose);
+}
+#endif
 
 #if platOS == OS_MACOS && platBuild == BUILD_CLIENT
 

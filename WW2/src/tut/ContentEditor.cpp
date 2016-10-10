@@ -953,7 +953,9 @@ void ContentEditor::SetPPO(const char* name)
 	{
 		_ppoSpec.id						= 1;
 		_ppoSpec.modelName				= name;
-		_ppoSpec.rayAdjust.set(0,0,0);
+		_ppoSpec.rayAdjust.x = 0.0;
+		_ppoSpec.rayAdjust.y = 0.0;
+		_ppoSpec.rayAdjust.z = 0.0;
 		_ppoSpec.avoidance				= 0; // buffer in meters to add to the avoidance box
 		_ppoSpec.rayTolerance			= 0; // ray tolerance; angle between corner and center ray normals allowed
 		_ppoSpec.tiltTolerance			= 0; // tilt tolerance; tilt allowed from straight up
