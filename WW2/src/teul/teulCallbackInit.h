@@ -6,11 +6,10 @@
 // of the original developers having a fetish for using structures rather
 // than function parameters...
 
+#include "teul/teulFuncTypes.h"
+
 namespace Teul
 {
-
-	using ACTION_FN = std::function<SINT32(ACTION_OBJECT*)>;
-
 	struct CallbackInit
 	{
 		CallbackInit()
@@ -30,5 +29,4 @@ namespace Teul
 		const char  *callXName;
 		const char  *callYName;
 	};
-
 } // namespace Teul
