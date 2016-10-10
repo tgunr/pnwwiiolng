@@ -7567,7 +7567,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 			char s[128];
 			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
-			piExitProgram(__FILE__,__LINE__,s);
+			piExitProgram(_FL,s);
 		}
 #ifdef BETA_RELEASE
 		}
@@ -7606,7 +7606,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 			char s[128];
 			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
-			piExitProgram(__FILE__,__LINE__,s);
+			piExitProgram(_FL,s);
 		}
 #ifdef BETA_RELEASE
 		}
@@ -7648,7 +7648,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 			char s[128];
 			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
-			piExitProgram(__FILE__,__LINE__,s);
+			piExitProgram(_FL,s);
 		}
 #ifdef BETA_RELEASE
 		}
@@ -7704,7 +7704,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 
 				sprintf(s,"Cannot find spawn object for scx = %d, scy = %d, id = %d",
 							SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
-				piExitProgram(__FILE__,__LINE__,s);
+				piExitProgram(_FL,s);
 			}
 		}
 

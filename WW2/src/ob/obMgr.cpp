@@ -15,6 +15,7 @@
 #include "ob/obdraw.h"
 #include "math/math3d.h"
 #include "trn/trncloud.h"
+#include "trn/trnsky.h"
 #include "str/strpool.h"
 #include "trn/trnop.h"
 #include "trn/trngrass.h"
@@ -270,7 +271,19 @@ struct	OBJECT*	obmgrCreateModelInstance(const char* modelName, const piMATRIX& t
 	if(poolModel->node == 0)	poolModel->load();
 	if(poolModel->node == 0)	return 0;
 
-	topInstanceNode = poolModel->CreateInstance(transform)->rootObject;
+    // HACK: DEV-787 ==>>
+    piMATRIX matMove = transform;
+
+    if (poolModel->modelType == ModelTypes::CLOUD && poolModel->node->name[0] == 'r')
+    {
+        matMove = IdentityMatrix;
+        matMove._43 -= RAIN_CLOUD_HEIGHT_OFFSET;
+
+        math3dMatrixMultiply(&matMove, &transform, &matMove);
+    }
+    // <<== HACK: DEV-787
+
+	topInstanceNode = poolModel->CreateInstance(matMove)->rootObject;
 	//if(handleSpecialObjects)	HandleSpecialObjects(topInstanceNode);
 
 	return topInstanceNode;
@@ -1785,7 +1798,7 @@ void PoolModel::LoadMDL(const char* path)
 		if(!subModelReference.poolModel)
 		{
 			Write_Debug("Instance model %s not found!", subModelFileName.c_str());
-			piExitProgram(__FILE__, __LINE__, "Instance model not found!");
+			piExitProgram(_FL, "Instance model not found!");
 		}
 
 		subModelReferences.push_back(subModelReference);
@@ -1903,7 +1916,7 @@ void PoolModel::ProcessTerrainObjectCollisionData(OBJECT* o)
 	{
 		std::string	errorMessage = modelname;
 		errorMessage.append(".flt: too many collidable LODs found!");
-		piExitProgram(__FILE__, __LINE__, errorMessage.c_str());
+		piExitProgram(_FL, errorMessage.c_str());
 	}
 
 	if(collideBranches.empty())	ldmdlProcessBranchCollisionData(o->child);
@@ -2034,7 +2047,7 @@ void PoolModel::RebuildMDL()
 	if(!topmostObj)
 	{
 		Write_Debug("Error loading FLT file for %s", fltPath.c_str());
-		piExitProgram(__FILE__, __LINE__, "MDLreb failed");
+		piExitProgram(_FL, "MDLreb failed");
 	}
 
 	SetModelType();
@@ -2110,7 +2123,7 @@ void PoolModel::SaveMDL(const POOLOBJHDR* poolobjhdr,
 	hfile = fioOpenWrite(mdlpath.c_str());
 	if(hfile == -1)
 	{
-		piExitProgram(__FILE__, __LINE__, "Could not create .mdl file!");
+		piExitProgram(_FL, "Could not create .mdl file!");
 	}
 
 	fioPuts(hfile, PLAYNET_COMPANY);
@@ -2309,7 +2322,7 @@ void PoolModel::CollectModelReferences(OBJECT* o)
 				if(!subModelReference.poolModel)
 				{
 					Write_Debug("Instance model %s not found!", modelName.c_str());
-					piExitProgram(__FILE__, __LINE__, "Instance model not found!");
+					piExitProgram(_FL, "Instance model not found!");
 				}
 
 				memcpy(&subModelReference.transform, &o->mat, sizeof(piMATRIX));					// This object also carries the transform matrix.
@@ -2687,7 +2700,7 @@ void PoolModel::CheckModelSanity()	const
 			modelname.find("muzzleflash")	== std::string::npos	)
 		{
 			Write_Log(LOG_FPS, LOG_INFO, "Empty model: %s", modelname.c_str());
-			piExitProgram(__FILE__, __LINE__, "Empty model found!");
+			piExitProgram(_FL, "Empty model found!");
 		}
 	}
 #endif	// #ifdef BETA_RELEASE

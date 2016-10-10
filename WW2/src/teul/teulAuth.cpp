@@ -16,6 +16,7 @@
 #include "teul/teulAuthServer.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulTimeMS.h"
+//#include "teul/teulEnums.h"
 
 #define AUTH_BYPASS 1
 #ifdef AUTH_BYPASS
@@ -58,6 +59,7 @@ static bool _sendNotice = false;
 
 static Teul::TimeMS _timeOpen(~0ULL);
 static Teul::TimeMS _timeDown(0ULL);
+static Teul::TimeMS _timeRetry(0ULL);
 
 static UINT32 _authHost;
 static UINT16 _authPort;
@@ -467,11 +469,19 @@ static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 
 	if ( _timeDown.elapsed() <= MAX_AUTH_DOWN_TIMEOUT )
 	{
-		dbugLog(_FLA,"restarting auth connection error count %d", errorCount);
-		_authConnection = teulOpenSend(_authHost, _authPort, _authOpened, CONNECT_TIMEOUT, PROTOCOL_TCP, _authErrorFn);
+		dbugLog(_FLA,"Auth connection error count %d, waiting to try restart", errorCount);
+
+		// auth is not connected - lets reset a wait timer before we try to reconnect and let the main loop handle it
+		if ( _timeRetry.time() == 0)
+		{
+			_timeRetry.makeCurrent();
+	        }
+
 	}
 	else
 	{
+		// NOTE: this is an extreme case of auth being down for a 1/2 hour or more
+
 		dbugLog(_FLA,"can't restart auth connection time down: %lld", _timeDown.elapsed());
 		if ( _externalErrorFn != nullptr)
 			(_externalErrorFn) (teulIndex,  data, size, object, ETEUL_AUTH_DOWN);
@@ -692,28 +702,94 @@ SINT32 authDeleteDispatch(Auth::Dispatch* dispatch)
 	return 0;
 }
 
+//
+// verifyAuthConnected()
+//
+//    Returns true when auth is connected.
+//    Returns true when auth is in the process of connecting
+//    Returns false when auth is not connected or is in the process of connecting
+//
+//    This function should be used before any transmisions to auth to ensure a valid connection exists.  If one does not
+//    it will attempt a connection to Auth after a respectible grace period (10 seconds).  Teul is non-blocking I/O so
+//    a connection is not always instant so it may still return false even if Auth is available for connection.
+//
+//    NOTE: This function depends on the certainty of being called to maintain an auth connection.  Any periodic transmissions
+//    to auth should be calling this function first
+//
+bool verifyAuthConnected()
+{
+	bool bConnected = false;
+
+	// Is there no connection ID? Or, is there no endpoint configured?  Or, is the endpoint unusable due to state?
+	ENDPOINT *endPoint = nullptr;
+	if (_authConnection < 0 || ((endPoint = teulGetEndpoint(_authConnection)) == nullptr) || 
+		endPoint->state() == IS_CLOSED || endPoint->state() == IS_DEAD)
+	{
+		// No valid auth connection exists.  Has 10 seconds elapsed since last attempt?
+		if ( _timeRetry.elapsed() >= 10000 )
+		{
+			// Grace period elapsed, attempt a connection
+			dbugLog(_FLI,"Auth connection down attempting restart");
+
+			// try restarting
+			_authConnection = teulOpenSend(_authHost, _authPort, _authOpened, CONNECT_TIMEOUT, PROTOCOL_TCP, _authErrorFn);
+			if (_authConnection > 0)
+			{
+
+				// Connection attempt is at least in progress, check and see if its open yet
+				endPoint = teulGetEndpoint(_authConnection);
+				if (endPoint != nullptr && (endPoint->state() == IS_OPEN || endPoint->state() == IS_LISTENING))
+					// yes, tell the caller auth connection is usable
+					bConnected = true;
+			}
+			else
+			{
+				dbugLog(_FLA, "Unable to restart Auth connection");
+			}
+
+			// reset the timer for another wait period so we don't spam attempts
+			_timeRetry.makeCurrent();	
+		}
+		// no, then don't do anything and tell the caller there is no connection
+	}
+	else
+	{
+		if (endPoint->state() == IS_OPEN || endPoint->state() == IS_LISTENING)
+			bConnected = true;
+	}
+
+	return bConnected;
+
+}
+
 SINT32 authUpdateServerLoad(SINT32 numPlayers, UINT32 hostAddress, UINT32 arenaID)
 {
 	if ( !useAuthServer )
 		return 0;
 
-	AUTH_SERVER_LOAD loadMsg;
-
-	loadMsg.numPlayers = numPlayers;
-	loadMsg.hostAddress = hostAddress;
-	loadMsg.arenaID = arenaID;
-
-	const SINT32 retval = teulSend(_authConnection, authSERVER_LOAD, &loadMsg);
-	if ( retval < 0 )
+	// This is called periodically so make sure we have an auth connection before we send it
+	if (verifyAuthConnected())
 	{
+
+		AUTH_SERVER_LOAD loadMsg;
+
+		loadMsg.numPlayers = numPlayers;
+		loadMsg.hostAddress = hostAddress;
+		loadMsg.arenaID = arenaID;
+
+		const SINT32 retval = teulSend(_authConnection, authSERVER_LOAD, &loadMsg);
+		if ( retval < 0 )
+		{
 #ifdef DEBUG
-		dbugWrite(_FLA,"Something went wrong in sending auth load msg: %d.",_authConnection);
+			dbugWrite(_FLA,"Something went wrong in sending auth load msg: %d.",_authConnection);
 #endif
-		return retval;
+			return retval;
+		}
+#ifdef DEBUG
+		dbugWrite(_FLN,"Sending AUTH_SERVER_LOAD %d players on arena %d.",numPlayers,arenaID);
+#endif
 	}
-#ifdef DEBUG
-	dbugWrite(_FLN,"Sending AUTH_SERVER_LOAD %d players on arena %d.",numPlayers,arenaID);
-#endif
+
 	return 0;
 }
 
@@ -722,23 +798,28 @@ SINT32 authSetGameCapacity(SINT32 capacity, SINT32 totalPlayers, UINT32 arenaID,
 	if ( !useAuthServer )
 		return 0;
 
-	AUTH_GAME_CAPACITY message;
-
-	message.capacity = capacity;
-	message.totalPlayers = totalPlayers;
-	message.arenaID = arenaID;
-	message.lock = lock;
-
-	const SINT32 retval = teulSend(_authConnection, authGAME_CAPACITY, &message);
-	if ( retval < 0 )
+	// This is called periodically so make sure we have an auth connection before we send it
+	if (verifyAuthConnected())
 	{
+		AUTH_GAME_CAPACITY message;
+
+		message.capacity = capacity;
+		message.totalPlayers = totalPlayers;
+		message.arenaID = arenaID;
+		message.lock = lock;
+
+		const SINT32 retval = teulSend(_authConnection, authGAME_CAPACITY, &message);
+		if ( retval < 0 )
+		{
 #ifdef DEBUG
-		dbugWrite(_FLA,"Something went wrong in sending game capacity msg: %d.",_authConnection);
+			dbugWrite(_FLA,"Something went wrong in sending game capacity msg: %d.",_authConnection);
 #endif
-		return retval;
+			return retval;
+		}
+#ifdef DEBUG
+		dbugWrite(_FLN,"Sending AUTH_GAME_CAPACITY %d.", capacity);
+#endif
 	}
-#ifdef DEBUG
-	dbugWrite(_FLN,"Sending AUTH_GAME_CAPACITY %d.", capacity);
-#endif
+
 	return 0;
 }

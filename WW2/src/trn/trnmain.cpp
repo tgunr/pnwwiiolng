@@ -290,8 +290,7 @@ SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 le
 		trnGetStratData(td->scx, td->scy, bid, &country, &level);
 
 	if ( 0 > bid || bid >= td->bldHash.maxBldID ) {
-		// TEMP: This is triggering so often that it will occasionally affect performance.
-		//Write_Log(LOG_COMM, LOG_INFO, "trnSetStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
+		Write_Log(LOG_COMM, LOG_INFO, "trnSetStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
 		return -EINVAL;
 	}
 
@@ -311,9 +310,7 @@ SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 le
 
 			if (blist == nullptr)
 			{
-				// This is triggering frequently enough that we actually have to just
-				// silence the message until we can figure out the root cause.
-				//rnmainListText("Invalid building message");
+				rnmainListText("Invalid building message");
 				Write_Debug("Invalid building message in recvWorldUpdate, "
 				            "supercell [%d,%d] bid = %d", td->scx,td->scy, bid);
 				return -EINVAL;
@@ -355,9 +352,15 @@ SINT32 trnUpdateStratData(TERRAIN_DETAIL* td, OBJECT* lpobj, SINT32 bid, LOGICAL
 		}
 	}
 
-	if ( 0 > bid || bid >= td->bldHash.maxBldID ) {
-		// TEMP: This is triggering so often that it will occasionally affect performance.
-		//Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
+	if ( bid < 0 ) {
+		Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (<0) - model type %d - model name %s", 
+		          bid, lpobj->modelInstance == nullptr ? -1 : lpobj->modelInstance->GetModelType(),
+		          lpobj->name);
+		return -EINVAL;
+	}
+
+	if ( bid >= td->bldHash.maxBldID ) {
+		Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
 		return -EINVAL;
 	}
 

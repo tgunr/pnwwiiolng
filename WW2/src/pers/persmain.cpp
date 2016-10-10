@@ -4429,11 +4429,7 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 		return 0;
 	}
 
-#if platOS == OS_MACOS
-#ifdef IS_DEBUG
-    printf( "Damage %f position %u location %u atponly %u\n", Damage, Position, Location, ATPOnly );
-#endif
-#endif
+    Write_Debug( "Damage %f position %u location %u atponly %u\n", Damage, Position, Location, ATPOnly );
 
 	persPersonaHealth& Health = _PersonaHealth[Position];
 	if (Location == PERS_HITLOCATION_HEAD)

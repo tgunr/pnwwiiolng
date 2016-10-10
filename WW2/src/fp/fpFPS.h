@@ -273,3 +273,10 @@ extern LOGICAL	fpFPSUpdateInfantry(FLOAT64 DeltaTime);
 
 extern FLOAT32 fpFPSGetGrenadeThrowPower();
 extern bool fpFPSCanProjectGrenade();
+
+//--------------
+// !!!HACK!!! - for vehInterpolator
+void InitColliderGeometry(void);
+void _updateFPSColliders(void);
+extern fpFPSPoses HACK_forced_pose;
+extern Vec3d* HACK_forced_pos;

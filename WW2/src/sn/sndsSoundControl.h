@@ -63,7 +63,7 @@ extern void sndsUpdateSounds(void);
 // this enforces whatever rules we have regarding max number of sounds playing at one time
 
 #ifdef SOUND_DEBUG
-	#define sndsLoadSound(a)   sndsLoadSoundDebug(a, __FILE__, __LINE__)
+	#define sndsLoadSound(a)   sndsLoadSoundDebug(a, _FL)
 	extern snSound * sndsLoadSoundDebug(LPCREATE lpCreate, SCHAR* file, SINT32 line);
 #else
 	extern snSound * sndsLoadSound(LPSNDSCREATE lpCreate);

@@ -61,6 +61,7 @@
 #include "chat/chatTimeInterval.h"
 #include "chat/chatTuneToChannel.h"
 #include "chat/chatUnitMotds.h"
+#include "chat/chatClientMessages.h"
 #include "dbse/dbseClient.h"
 #include "inst/instHostInstance.h"
 #include "server/serverCodeEnum.h"
@@ -286,32 +287,6 @@ IRCPlayer::describeTo(const Player& player, const FLOAT64& /*x*/, const FLOAT64&
 	}
 
 	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response.c_str());
-}
-
-//////////////////////////////////////////////////////////////////////
-// Build a temporary string, basically a wrapper for sprintf that
-// helps us avoid having to continually allocate new buffers
-
-const char*
-chatMakeTempString(const char* fmt, ...)
-{
-	va_list args;
-
-	static int bufNo = 0;
-	static char buffer[4][MAX_MESSAGE_LENGTH + 1];
-
-	if (bufNo > 3)
-		bufNo = 0;
-
-	buffer[bufNo][0] = 0;
-
-	if (fmt != nullptr) {
-		va_start(args, fmt);
-		vsnprintf(buffer[bufNo], MAX_MESSAGE_LENGTH, fmt, args);
-		va_end(args);
-	}
-
-	return buffer[bufNo++];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -742,7 +717,8 @@ Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
 	break;
 	}
 
-	chatDispatchGMMessage("HOST", chatMakeTempString("%s %s client-mod detected", callsign.c_str(), type));
+	PREP_CHAT_MSG(message, "%s %s client-mod detected", callsign.c_str(), type);
+	chatDispatchGMMessage("HOST", message);
 
 	dbugLog(_FLN, "!HACK:%s:%s", callsign.c_str(), type);
 	chatdbRecordEvent("HACK", callsign.c_str(), type, "", "");
@@ -860,7 +836,8 @@ _snoop(const char* type, Player* player, Player* snooper, const char* to, const 
 	if ( snooper == nullptr || player == nullptr || snooper == player )
 		return;
 
-	snooper->message(LSTR_GM, LSTR_LABELLED_GENERIC, chatMakeTempString("%s->%s", player->callsign(), to), text);
+	PREP_CHAT_MSG(msg, "%s->%s", player->callsign(), to)
+	snooper->message(LSTR_GM, LSTR_LABELLED_GENERIC, msg, text);
 	chatdbRecordEvent(type, player->callsign(), "(snoop)", to, text);
 }
 
@@ -1029,6 +1006,7 @@ chatReportPlaceHolder(Player* player, CHANNEL_TYPE type)
 bool
 _dotCommand(Player& player, Chat::ClientMessage* message)
 {
+	dbugLog(_FLD, "Is this a dot command?");
 	if ( message->m_message[0] != '.' && message->m_message[0] != '/' )
 		return false;
 	if ( message->m_message[0] == message->m_message[1] )
@@ -1037,6 +1015,8 @@ _dotCommand(Player& player, Chat::ClientMessage* message)
 		return false;
 	if ( message->m_message[0] == '/' && message->m_message[1] && message->m_message[2] == '!' )
 		return false;
+
+	dbugLog(_FLD, "Yes, dot command - convert to slash and go look it up");
 
 	if ( message->m_message[0] != '/' )
 		message->m_message[0] = '/';
@@ -1404,7 +1384,8 @@ chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageI
 	if ( allowDotCommands )
 	{
 		std::string msgText = inMessage->m_message;
-		wwiiEscapeString(msgText);
+                DBThread::EscapeString(msgText);
+
 		DBThread::Do(DBThread::Audit, "INSERT INTO `audit`.`chat_messages` (player_id, message) VALUES (%u, '%s')", player->playerID(), msgText.c_str());
 
 		_radioSnoop(player, inMessage);
@@ -2651,7 +2632,7 @@ static void _countUserSides()
 
 	if ( (UINT32)std::abs((SINT32)(newCount - lastCount)) >= gap && lastNotice <= teulTime() - 300 )
 	{
-		const char* update = chatMakeTempString("Update: %u players [%u allied, %u axis]", newCount, _sideCount[ALLIED], _sideCount[AXIS]);
+		PREP_CHAT_MSG(update, "Update: %u players [%u allied, %u axis]", newCount, _sideCount[ALLIED], _sideCount[AXIS]);
 		wwiiIRCChannelMessage("-sys", update);
 		lastNotice = teulTime();
 		lastCount = newCount;
@@ -3557,6 +3538,14 @@ _runHost()
 	}
 }
 
+UINT32 serverStartTime;
+
+UINT32 serverUpTimeMinutes()
+{
+        UINT32 secs = teulTime() - serverStartTime;
+        return secs / 60;
+}
+
 //////////////////////////////////////////////////////////////////////
 //
 
@@ -3679,6 +3668,8 @@ main(int argc, const char* argv[])
 	teulSyncClock();
 
 	nextSpamTime = teulClock64 + 1000;
+
+        serverStartTime = teulTime();
 
 	// Load the MOTDs in
 	chatLoadMotds();

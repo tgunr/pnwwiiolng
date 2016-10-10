@@ -352,9 +352,7 @@ static bool LoadModel(int numargs, FUNCARGS* args)
 static bool LoadCockpitModel(int numargs, FUNCARGS* args)
 {
 	rnlogoUpdateStatus("loading.vehicles");
-	if(g_bBuildMDLS)	obmgrAddModelToPool(args[0].svalue, true);
-	else	obmgrAddModelToPool(args[0].svalue, false);
-
+	obmgrAddModelToPool(args[0].svalue, g_bBuildMDLS);
 	return TRUE;
 }
 
@@ -852,7 +850,7 @@ logTimerBeginExtMacro(parseWor);
 		return (FALSE);
 logTimerEndExtMacro(parseWor);
 
-#ifdef DEBUG
+#ifdef DEBUG_WW2
 	if (DebugBuildingMDLFilesOnly) {
 		fprintf(stderr, "Done building MDL files. Bailing out.");
 		exit(0);
@@ -862,20 +860,18 @@ logTimerEndExtMacro(parseWor);
 	Write_Debug ("*****************Total time loading blitzwor.csv file: %u milliseconds", T2-T1);
 
 	// Granny2 system (needs materials loaded)
-
-
 #if defined(BETA_RELEASE)
 	if(!NoInfPreload){
 #endif
-	rnlogoUpdateStatus("loading.infantry");
+		rnlogoUpdateStatus("loading.infantry");
 
-	if (!gr2AnimInit())
-	{
-		return(FALSE);
-	}
+		if (!gr2AnimInit())
+		{
+			return(FALSE);
+		}
 
 #if defined(BETA_RELEASE)
-}
+	}
 #endif
 
     rnlogoUpdateStatus("loading.objects");

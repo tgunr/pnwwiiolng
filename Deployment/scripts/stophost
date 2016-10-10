@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# Compliment to the "starthost" script
+#
+
+sudo -u wwiiol /playnet/bin/clustercontrol stop

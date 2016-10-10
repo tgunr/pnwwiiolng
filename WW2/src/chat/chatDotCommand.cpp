@@ -157,6 +157,28 @@ DotCommand::vectorize(char* source, ARGV& dest, int maxArguments, bool translate
 	return (int)dest.size();
 }
 
+#if 0
+//////////////////////////////////////////////////////////////////////
+// Append an integer passed in to the string destination provided
+void DotCommand::catIntToText(const UINT32 value, char *dest) const
+{
+   char istring[MAX_INT_REP+1];
+
+   // skip to the null character
+   while (*dest++ != 0);
+
+   // append the integer 
+   sprintf(istring, "%u", value);
+
+   dbugLog(_FLD, "Appending value %u to istring: %s", value, istring);
+
+   istring[MAX_INT_REP] = 0;  // be safe before cat
+   strcat(dest, istring);
+
+   dbugLog(_FLD, "Just appended %s to location %p and result is %s", istring, dest, dest);
+}
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // Set the current availability mode
 // Availabilities are:
@@ -230,14 +252,20 @@ DotCommand::allow(Player& player) const
 {
 	// Some dot commands* require* you to be playnet
 	if ( m_playnetOnly && !player.isPlaynet() )
+	{
+		dbugLog(_FLD, "Command requires playnet status");
 		return nullptr;
+	}
 
 	// Are group permissions required?
 	if ( !player.isManager() && !m_public )
 	{
 		// Command is not in any groups, ergo not available
 		if ( m_groups.empty() )
+		{
+			dbugLog(_FLD, "Non-public command cannot be run by non-manager player");
 			return nullptr;
+		}
 
 		// Request the most recent group set; groups will load
 		// in the player's permissions if they're not already loaded.
@@ -245,7 +273,10 @@ DotCommand::allow(Player& player) const
 
 		// Client is not in any groups, don't bother checking
 		if ( clGroups.empty() )
+		{
+			dbugLog(_FLD, "Command not available, player not in any groups");
 			return nullptr;
+		}
 
 		// See if the player is in at least one of the required groups
 		CHAT_GROUPS::iterator clgIt, clgEnd = clGroups.end();
@@ -258,7 +289,14 @@ DotCommand::allow(Player& player) const
 		}
 
 		if ( !isIn )
+		{
+			dbugLog(_FLD, "Player is not in any of the required groups for Command:");
+			for (auto cmdIt = m_groups.begin(), end = m_groups.end(); isIn == false && cmdIt != end; ++cmdIt)
+			{
+				dbugLog(_FLD, "   %d", *cmdIt);
+			}
 			return nullptr;
+		}
 	}
 
 	for ( UINT32 i = 0; i < m_usages.size(); i++ )
@@ -266,6 +304,8 @@ DotCommand::allow(Player& player) const
 		if ( m_usages[i]->mask == NO_MASK || player.permissions(m_usages[i]->mask) )
 			return m_usages[i];
 	}
+
+	dbugLog(_FLD, "Player with permissions %llx does not have permission to access command", player.m_permissionMask);
 
 	return nullptr;
 }
@@ -392,6 +432,7 @@ DotCommandIndex::lookup(const std::string& target, bool cleanMatchOnly) const
 void
 DotCommandIndex::add(DotCommand* dotCommand)
 {
+	dbugLog(_FLD, "Registering dotCommand: %s", dotCommand->command());
 	betaLog(_FLI, "Registering dotCommand: %s", dotCommand->command());
 
 	if ( lookup(dotCommand->m_command, TRUE) != nullptr )
@@ -405,7 +446,7 @@ DotCommandIndex::add(DotCommand* dotCommand)
 
 	// Now add to the database incase it's not already there
 	std::string desc = dotCommand->description();
-	wwiiEscapeString(desc);
+        DBThread::EscapeString(desc);
 
 	DBThread::Do(DBThread::Default
 				, "INSERT IGNORE INTO chat_commands"

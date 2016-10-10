@@ -274,7 +274,8 @@ UMSSTO::applyJoules(const SINT64& joules, Player* const player)
 						, uid(), side()
 						, joules, damage().accumulated(), damage().capacity());
 #if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
-		player->message(LSTR_BETA, LSTR_GENERIC, chatMakeTempString("%lluj to sto (%llu/%llu)", joules, damage().accumulated(), damage().capacity()));
+		PREP_CHAT_MSG(cmsg, "%lluj to sto (%llu/%llu)", joules, damage().accumulated(), damage().capacity());
+		player->message(LSTR_BETA, LSTR_GENERIC, cmsg);
 #endif
 		return false;
 	}
@@ -346,7 +347,8 @@ HulkSTO::applyJoules(const SINT64& joules, Player* const player)
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, uid(), joules, typeName(), damage().accumulated(), damage().capacity());
 #if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
-		player->message(LSTR_BETA, LSTR_GENERIC, chatMakeTempString("%lluj to %s sto (%llu/%llu)", joules, typeName(), damage().accumulated(), damage().capacity()));
+		PREP_CHAT_MSG(cmsg, "%lluj to %s sto (%llu/%llu)", joules, typeName(), damage().accumulated(), damage().capacity());
+		player->message(LSTR_BETA, LSTR_GENERIC, cmsg);
 #endif
 		return false;
 	}

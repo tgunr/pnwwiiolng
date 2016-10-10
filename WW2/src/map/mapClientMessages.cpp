@@ -59,7 +59,7 @@ _check64(const char* filename)
 	char* memory = (char*)alloca(READ_BUF_SIZE);
 	if ( memory == nullptr )
 	{
-		dbugWrite("No memory");
+		dbugWrite(_FLF, "No memory");
 		return 0;
 	}
 
@@ -67,7 +67,7 @@ _check64(const char* filename)
 	fd = _open(filename, _O_RDONLY | _O_BINARY, 0);
 	if ( fd == -1 )
 	{
-		dbugWrite("File missing");
+		dbugWrite(_FLW, "File missing");
 		return 0;
 	}
 
@@ -76,7 +76,7 @@ _check64(const char* filename)
 		bytes = _read(fd, memory, READ_BUF_SIZE);
 		if ( bytes < 0 )
 		{
-			dbugWrite("Read failure");
+			dbugWrite(_FLI, "Read failure");
 			checksum = 0;
 			break;
 		}

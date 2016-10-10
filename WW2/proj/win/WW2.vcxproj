@@ -10,6 +10,10 @@
     </When>
   </Choose>
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="AlphaRelease|Win32">
+      <Configuration>AlphaRelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="BetaRelease|Win32">
       <Configuration>BetaRelease</Configuration>
       <Platform>Win32</Platform>
@@ -90,6 +94,13 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
@@ -137,6 +148,11 @@
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="PropertySheet.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="PropertySheet.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
@@ -155,10 +171,13 @@
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(BinOutDir)</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(BinOutDir)</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(BinOutDir)</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(IntOutDir)</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(IntOutDir)</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(IntOutDir)</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">false</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">false</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(BinOutDir)</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntOutDir)</IntDir>
@@ -177,10 +196,11 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(IntOutDir)</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">false</LinkIncremental>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</IgnoreImportLibrary>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</EnableManagedIncrementalBuild>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">false</EnableManagedIncrementalBuild>
+    <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">false</EnableManagedIncrementalBuild>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">false</EnableManagedIncrementalBuild>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='China|Win32'">false</EnableManagedIncrementalBuild>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">false</EnableManagedIncrementalBuild>
@@ -188,25 +208,29 @@
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</EnableManagedIncrementalBuild>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</EnableManagedIncrementalBuild>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
     <IncludePath Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
     <CustomBuildBeforeTargets Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     </CustomBuildBeforeTargets>
     <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</PreBuildEventUseInBuild>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">true</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">true</GenerateManifest>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
     <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">true</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">true</PreBuildEventUseInBuild>
     <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">true</PreBuildEventUseInBuild>
     <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='China|Win32'">true</PreBuildEventUseInBuild>
     <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">true</PreBuildEventUseInBuild>
@@ -228,7 +252,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>CONNECTION_TEST_BUILD;DEBUG_WW2;ENABLE_FLOATERS;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -261,7 +285,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -309,7 +333,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>VEHICLES_GAME_INFO;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -341,7 +365,84 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;vcomp;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>%(ForceSymbolReferences)</ForceSymbolReferences>
+      <GenerateMapFile>true</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MapFileName>$(IntDir)/Artifacts/WW2.map</MapFileName>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
+      <MapExports>true</MapExports>
+      <LargeAddressAware>true</LargeAddressAware>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate client_revision.h</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>EVENT_LOG;ALPHA_RELEASE;VEHICLES_GAME_INFO;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <RuntimeTypeInfo>
+      </RuntimeTypeInfo>
+      <OpenMPSupport>true</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAsManaged>false</CompileAsManaged>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -386,7 +487,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>MULTI_CLIENT=1;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -418,7 +519,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(Configuration).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -464,7 +565,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -497,7 +598,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -545,7 +646,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DEBUG_FPU;DEBUG_WW2;ENABLE_FLOATERS;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;BUILDING_GRANNY_STATIC;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -576,7 +677,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)$(ProjectName)_x86.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -619,7 +720,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;ODE_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;BUILDING_GRANNY_STATIC;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -650,7 +751,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -691,7 +792,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;GREEN_INSTALL=1;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=0;DIDDLE_ENABLED;IS_CHINA=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -722,7 +823,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -763,7 +864,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENABLE_FLOATERS;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -794,7 +895,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -882,6 +983,7 @@
     <ClInclude Include="..\..\src\client\ww2Client.h" />
     <ClInclude Include="..\..\src\client_revision.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='China|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -1151,7 +1253,6 @@
     <ClInclude Include="..\..\src\strt\strtTypes.h" />
     <ClInclude Include="..\..\src\strt\strtUpdaterPack.h" />
     <ClInclude Include="..\..\src\strt\strtWOR.h" />
-    <ClInclude Include="..\..\src\sys\callstack.h" />
     <ClInclude Include="..\..\src\sys\crashhandler.h" />
     <ClInclude Include="..\..\src\sys\syscfg.h" />
     <ClInclude Include="..\..\src\sys\sysLaunchUrl.h" />
@@ -1309,6 +1410,7 @@
     <ClInclude Include="..\..\src\inst\instTypes.h" />
     <ClInclude Include="..\..\src\ime\IMEClient.h" />
     <ClInclude Include="..\..\src\ime\imeMain.h" />
+    <ClInclude Include="resource.h" />
     <CustomBuildStep Include="..\..\src\sqlite\sqlite3.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </CustomBuildStep>
@@ -1325,6 +1427,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">Create</PrecompiledHeader>
@@ -1353,6 +1456,8 @@
     <ClCompile Include="..\..\src\client\clientGlobals.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
+      </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
@@ -1379,6 +1484,8 @@
     <ClCompile Include="..\..\src\dd\dx3dinfo.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
+      </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
@@ -1398,6 +1505,8 @@
     <ClCompile Include="..\..\src\di\dip.cpp" />
     <ClCompile Include="..\..\src\di\NPClient.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
       </PrecompiledHeader>
@@ -1497,8 +1606,10 @@
     <ClCompile Include="..\..\src\math\euler.cpp" />
     <ClCompile Include="..\..\src\math\math3d.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">true</ExcludedFromBuild>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">Use</PrecompiledHeader>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">true</ExcludedFromBuild>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">Use</PrecompiledHeader>
@@ -1521,6 +1632,7 @@
     <ClCompile Include="..\..\src\math\Rand.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='China|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
@@ -1529,6 +1641,7 @@
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">NotUsing</PrecompiledHeader>
@@ -1539,6 +1652,7 @@
     <ClCompile Include="..\..\src\math\SuperFastHash.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='China|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
@@ -1547,6 +1661,7 @@
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">NotUsing</PrecompiledHeader>
@@ -1610,6 +1725,8 @@
     <ClCompile Include="..\..\src\pa\md5c.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
+      </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
@@ -1629,6 +1746,8 @@
     <ClCompile Include="..\..\src\pa\rijndael-alg-fst.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
+      </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
@@ -1646,6 +1765,8 @@
     </ClCompile>
     <ClCompile Include="..\..\src\pa\rijndael-api-fst.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
       </PrecompiledHeader>
@@ -1705,6 +1826,7 @@
     <ClCompile Include="..\..\src\spt\treeData.cpp" />
     <ClCompile Include="..\..\src\src\io_mapped_file.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
@@ -1719,12 +1841,13 @@
     <ClCompile Include="..\..\src\strt\strtClientMessages.cpp" />
     <ClCompile Include="..\..\src\strt\strtLua.cpp" />
     <ClCompile Include="..\..\src\strt\strtUpdaterPack.cpp" />
-    <ClCompile Include="..\..\src\sys\callstack.cpp" />
     <ClCompile Include="..\..\src\sys\crashhandler.cpp" />
     <ClCompile Include="..\..\src\sys\sysLaunchUrlWin.cpp" />
     <ClCompile Include="..\..\src\sys\sysmain.cpp" />
     <ClCompile Include="..\..\src\sys\sysMovieWin.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
       </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
       </PrecompiledHeader>
@@ -1847,6 +1970,7 @@
     <ClCompile Include="..\..\src\osgImport\TextureCubeMap.cpp" />
     <ClCompile Include="..\..\src\osgImport\TextureRectangle.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">Use</PrecompiledHeader>
@@ -1878,6 +2002,7 @@
     <ResourceCompile Include="WW2.rc">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
@@ -1901,6 +2026,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\imap\proj.win32\imap.vcxproj">
       <Project>{cccfce71-8ee8-439a-a9e3-109558287b8d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\libb64\libb64-1.2\libb64\libb64.vcxproj">
+      <Project>{b50750de-6f66-4ac5-b1e4-9f7da631d237}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\libevent\libevent.vcxproj">
       <Project>{fe3e7329-9561-4bfc-9e1d-f4bddba2cbb0}</Project>

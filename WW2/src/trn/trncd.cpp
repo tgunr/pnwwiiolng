@@ -570,7 +570,7 @@ UINT32 trncdInit(void)
 	{
 		Write_Debug("Unable to load terrain object flag file");
 
-		piExitProgram(__FILE__, __LINE__,"Unable to load terrain object flag file");
+		piExitProgram(_FL,"Unable to load terrain object flag file");
 	}
 
 	_FlagObject = obmainFindNamedObject("flagtable1");
@@ -579,7 +579,7 @@ UINT32 trncdInit(void)
 	{
 		Write_Debug("Terrain flag object copied, but unable to find it by name");
 
-		piExitProgram(__FILE__, __LINE__,"Unable to find terrain flag file by name");
+		piExitProgram(_FL,"Unable to find terrain flag file by name");
 	}
 
 	_ScanAndSetupFlags(_FlagObject);
@@ -598,7 +598,7 @@ UINT32 trncdInit(void)
 	SINT8 s[256];
 		sprintf(s,"Unable to load up the null terrain texture map! (terrain\\null1.bmp)");
 		Write_Debug(s);
-		piExitProgram(__FILE__, __LINE__,s);
+		piExitProgram(_FL,s);
 	}
 
     _loadSpawnXML("terrain/xml/spawn.xml");
@@ -1499,7 +1499,7 @@ UINT32 trnGetSpawnObject(OBJECT** o,
 
         sprintf(s, "[trnGetSpawnObject] x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
         Write_Log(LOG_OLD, LOG_FATAL, s);
-        piExitProgram(__FILE__,__LINE__, s);
+        piExitProgram(_FL, s);
         return 1;
     }
 
@@ -1511,7 +1511,7 @@ UINT32 trnGetSpawnObject(OBJECT** o,
 
         sprintf(s, "[trnGetSpawnObject] spawn entries = 0 x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
         Write_Log(LOG_OLD, LOG_FATAL, s);
-        piExitProgram(__FILE__,__LINE__, s);
+        piExitProgram(_FL, s);
         return 1;
     }
 
@@ -2411,7 +2411,7 @@ UINT32 TriNum;
 					VertNum, (int)ColObject->numverts, (int)td->numoctetsacross,(int)td->numoctetsdown,
 					Pos.x, Pos.y, objPos[1].x, objPos[1].y, x, y, Width, Height);
 
-			piExitProgram (__FILE__, __LINE__, str);
+			piExitProgram (_FL, str);
 		}
 
 		CenterPos = objPos[VertNum];
@@ -2616,7 +2616,7 @@ UINT32 TriNum;
 				VertNum, (int)ColObject->numverts, (int)td->numoctetsacross,(int)td->numoctetsdown,
 				Pos.x, Pos.y, objPos[1].x, objPos[1].y, x, y, Width, Height);
 
-		piExitProgram (__FILE__, __LINE__, str);
+		piExitProgram (_FL, str);
 	}
 
 	CenterPos = objPos[VertNum];
@@ -3276,17 +3276,10 @@ LOGICAL			retval;
 COLLISION		collision;
 
 #ifdef EVENT_LOG_TIMES
-LARGE_INTEGER	count1, count2;
-static __int64	count=0;
-static int		number=0;
-//static int		npolys=0;
-#endif
-
-
-#ifdef EVENT_LOG_TIMES
-	if (!QueryPerformanceCounter(&count1))
-	{
-	}
+    static UINT64 count = 0;
+    static int number = 0;
+    
+    UINT64 beginhere = GetMicroSeconds();
 #endif
 
 	memset(&collision, 0, sizeof(collision));
@@ -3321,19 +3314,12 @@ static int		number=0;
 	}
 
 #ifdef EVENT_LOG_TIMES
-	if (QueryPerformanceCounter(&count2))
-	{
-		count += count2.QuadPart - count1.QuadPart;
-		if (++number == 128)
-		{
-			QueryPerformanceFrequency(&count2);
-//			Write_Debug("Average object to terrain collision detect time: %d us",
-//				(DWORD)(count / 128) * 1000 / (DWORD)(count2.LowPart / 1000));
-			number = 0;
-			count = 0;
-//			npolys = 0;
-		}
-	}
+    count += GetMicroSeconds() - beginhere;
+	if ((++number % 128) == 0)
+    {
+		Write_Debug("Average object to terrain collision detect time: %lu us", count);
+        count = 0;
+    }
 #endif
 
 	return(retval);
@@ -3358,19 +3344,13 @@ piVECTOR const*	pcn;
 piINDICES*	pt;
 piVECTOR*	lpcrnr;
 
-#ifdef EVENT_LOG_TIMES
-LARGE_INTEGER count1, count2;
-static __int64    count=0;
-static int        number=0;
-static int		  npolys=0;
-#endif
-
 	if((lpobj->flags & OBJECT_NOTOBJECT)) return FALSE;
 
 #ifdef EVENT_LOG_TIMES
-	if (!QueryPerformanceCounter(&count1))
-	{
-	}
+    static UINT64 count = 0;
+    static int number = 0, npolys = 0;
+    
+    UINT64 beginhere = GetMicroSeconds();
 #endif
 
 
@@ -3501,20 +3481,11 @@ static int		  npolys=0;
 	}
 
 #ifdef EVENT_LOG_TIMES
-	if (QueryPerformanceCounter(&count2))
-	{
-		count += count2.QuadPart - count1.QuadPart;
-		if (++number == 1024)
-		{
-			QueryPerformanceFrequency(&count2);
-#ifdef TERRAIN_EDITOR
-			Write_Debug("Average object polygon collision detect time: %d us, polys = %d",
-				(DWORD)(count / 1024) * 1000 / (DWORD)(count2.LowPart / 1000), (DWORD)(npolys / number));
-#endif
-			number = 0;
-			count = 0;
-			npolys = 0;
-		}
+    count += GetMicroSeconds() - beginhere;
+    if ((++number % 1024) == 0) {
+        Write_Debug("Average object polygon collision detect time: %d us, polys = %d", count, npolys / 1024);
+        count = 0;
+        npolys = 0;
 	}
 #endif
 
@@ -6531,7 +6502,7 @@ trncdDTLColliderRef trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
 	{
 		char s[64];
 		snprintf(s, 63, "Unexpected size: %d, cell: %d, %d", td->trindx, td->scx, td->scy);
-		piExitProgram(__FILE__, __LINE__, s);
+		piExitProgram(_FL, s);
 	}
 
 	trncdDTLColliderRef ref = (trncdDTLColliderRef)memAlloc(sizeof(trncdDTLCollider));
@@ -6589,7 +6560,7 @@ SINT32 trncdCollideWithBaseTerrain(FASTCOLLIDE* collisionList, SINT32 maxcols,
 
 	td = &trndtl[12]; // center terrain tile;
 	if(td == nullptr)
-		piExitProgram(__FILE__, __LINE__, "center tile is nullptr!");
+		piExitProgram(_FL, "center tile is nullptr!");
 
 	// get which supercells to test
 	trnGrid.originX = (FLOAT32)((td->scx - 2) * SUPERCELL_WIDTH  - WorldOriginOffset.x); // relative to

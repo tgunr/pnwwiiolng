@@ -244,7 +244,7 @@ static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, S
 
 	if (_Data != nullptr)
 	{
-		piExitProgram(__FILE__,__LINE__,"Bombsight data being setup with non-null data pointer!");
+		piExitProgram(_FL,"Bombsight data being setup with non-null data pointer!");
 	}
 
 	mlComponentListBegin(VehicleData->ComponentList, &it);

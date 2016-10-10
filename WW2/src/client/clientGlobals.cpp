@@ -81,7 +81,6 @@ UINT32			MaxUserClipPlanes;
 UINT32			MaxTextureWidth;
 UINT32			MaxTextureHeight;
 
-LOGICAL          WantedHelp;			// asked for commandline help
 UINT32			WindowAdapter;		// desired adapter
 UINT32			WindowDeviceType;	// desired device type
 UINT32			WindowRefreshRate;	// desired refresh rate
@@ -111,7 +110,11 @@ SINT8			ServerApID[64];		// program apId
 SINT8			ServerData[64];		// data passed from auth server
 SINT8			ServerProtocol[64]; // connection protocol
 SINT8			BypassString[64];
+#if defined(DEBUG_WW2) || defined(ALPHA_RELEASE)
 LOGICAL			WantedUserLogEnabled = TRUE;	// If the user wants the log enabled
+#else
+LOGICAL			WantedUserLogEnabled = FALSE;	// If the user wants the log enabled
+#endif
 SCHAR			WantedVideoCard[64];// desired video card name
 SCHAR			WantedVideoResolution[32];// desired video resolution
 SCHAR			WantedSoundCard[64];// desired sound card name
@@ -238,7 +241,7 @@ LOGICAL			SupportDXT5;				// DXT5 Interpolated alpha
 piMATRIX			IdentityMatrix;
 
 LOGICAL			VehicleObjectAnalysis;		// "Gizmos and Whizbangs"
-LOGICAL			WantDataDir;				// Want to run out of data directory
+LOGICAL			WantDataDir = FALSE;		// Want to run out of data directory
 LOGICAL			HasKeyFile;					// Have key file to enable special features
 LOGICAL			SuperTroop;					// SuperTroop!
 LOGICAL			SuperFloat;					// SuperFloat!
@@ -259,7 +262,11 @@ LOGICAL			gCellClientActive;
 LOGICAL          gWaterShadersEnabled;
 
 LOGICAL			disableButtonInput, disableAxisInput;
-LOGICAL			OpenConsole;
+#if defined(DEBUG) || defined(ALPHA_RELEASE)
+LOGICAL			OpenConsole = TRUE;
+#else
+LOGICAL			OpenConsole = FALSE;
+#endif
 LOGICAL			SquadInvites;
 UINT32			OverrideSpawner;
 UINT32			gRegion; // used for china localizations and other functionality differences
@@ -281,7 +288,7 @@ SINT8            gAuthServer[128]; // Authentication server to be used
 SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 SINT8            gClientV[32]; // Version to submit
 
-#ifdef DEBUG
+#ifdef DEBUG_WW2
 LOGICAL          DebugBuildingMDLFilesOnly = false;
 #endif
 

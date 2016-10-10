@@ -31,25 +31,25 @@
 #if DEBUG_SQRT
 	extern double callSqrt(const char* file, int line, const double& n);
 
-	#define sqrt(n) callSqrt(__FILE__, __LINE__, n)
+	#define sqrt(n) callSqrt(_FL, n)
 #endif
 
 #if DEBUG_POW
 	extern double callPow(const char* file, int line, const double& x, const double& y);
 
-	#define pow(x, y) callPow(__FILE__, __LINE__, x, y)
+	#define pow(x, y) callPow(_FL, x, y)
 #endif
 
 #if DEBUG_ATAN2
 	extern double callAtan2(const char* file, int line, const double& x, const double& y);
 
-	#define atan2(x, y) callAtan2(__FILE__, __LINE__, x, y)
+	#define atan2(x, y) callAtan2(_FL, x, y)
 #endif
 
 #if DEBUG_MATH3DNORMALIZE
     extern piVECTOR* callMath3Dnormalize(const char* file, int line, piVECTOR* v);
 
-    #define math3dNormalize(v)  callMath3Dnormalize(__FILE__, __LINE__, v)
+    #define math3dNormalize(v)  callMath3Dnormalize(_FL, v)
 #endif
 
 	inline void math3dMatrixTranslate(piMATRIX* targetMatrix, const piVECTOR& transVector)

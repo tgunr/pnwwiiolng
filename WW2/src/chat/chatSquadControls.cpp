@@ -39,7 +39,7 @@ _audit(UINT32 squadID, UINT32 action
 		, std::string text="")
 {
 	if ( !text.empty() )
-		wwiiEscapeString(text);
+                DBThread::EscapeString(text);
 
 	DBThread::Do(DBThread::Default
 		, "INSERT LOW_PRIORITY INTO wwii_squad_audit"
@@ -769,7 +769,7 @@ _processText(SquadControl& request, Player* player, SquadList* squadList)
 	break;
 	}
 
-	wwiiEscapeString(request.m_text);
+        DBThread::EscapeString(request.m_text);
 
 	DBThread::Do(DBThread::Default
 					, "UPDATE wwii_squads SET %s = '%s' WHERE squadid = %u"

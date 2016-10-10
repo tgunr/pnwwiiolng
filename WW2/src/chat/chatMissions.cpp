@@ -1443,7 +1443,7 @@ DotMList::action(Player& player, Chat::ClientMessage* const /*message*/) const
 
 	if ( player.isPlaynet() )
 	{
-		const char* const p = chatMakeTempString("m:%u leader:%s memb:%u wps:%u mu:%u mr:%u"
+		PREP_CHAT_MSG(cmsg, "m:%u leader:%s memb:%u wps:%u mu:%u mr:%u"
 											, mission->missionID()
 											, Chat::Name(mission->leader()).c_str()
 											, mission->m_members.size()
@@ -1452,7 +1452,7 @@ DotMList::action(Player& player, Chat::ClientMessage* const /*message*/) const
 											, mission->m_removes.size()
 											);
 
-		player.message(LSTR_NOTE, LSTR_GENERIC, p);
+		player.message(LSTR_NOTE, LSTR_GENERIC, cmsg);
 	}
 
 	std::string list = "";

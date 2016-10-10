@@ -982,15 +982,10 @@ LOGICAL obdshadUpdate(void)
     piVECTOR	up;
 
 #ifdef EVENT_LOG_TIMES
-LARGE_INTEGER count1, count2;
-static __int64    count=0;
-static int        number=0;
-#endif
-
-#ifdef EVENT_LOG_TIMES
-	if (!QueryPerformanceCounter(&count1))
-	{
-	}
+    static UINT64 count = 0;
+    static int number = 0;
+    
+    UINT64 beginhere = GetMicroSeconds();
 #endif
 
     // This shadow routine is a framerate killer.
@@ -1077,18 +1072,13 @@ static int        number=0;
     }
 
 #ifdef EVENT_LOG_TIMES
-	if (QueryPerformanceCounter(&count2))
-	{
-		count += count2.QuadPart - count1.QuadPart;
-		number += shadcnt;
-		if (number >= 1000)
-		{
-			QueryPerformanceFrequency(&count2);
-			Write_Debug("Dynamic shadow time: %d us", (DWORD)(count / number) * 1000 / (DWORD)(count2.LowPart / 1000));
-			number = 0;
-			count = 0;
-		}
-	}
+    count += GetMicroSeconds() - beginhere;
+    if ((number += shadcnt) >= 1000)
+    {
+        Write_Debug("Dynamic shadow time: %lu us", count);
+        number = 0;
+        count = 0;
+    }
 #endif
 
 	return(TRUE);

@@ -7469,6 +7469,17 @@ static int dot_vehprint(const char* line)
     return DC_HANDLED;
 }
 
+// Used for .report and .bug, which need extra tinkering before the command is sent.
+static int dot_clientinfo_command(const wchar_t *line)
+{
+    char *encodedText = ChatClientInfo().encode();
+#if platOS == OS_WIN32
+	swprintf(_LastCommand, sizeof(_LastCommand), L"\x01%S\x01.%ls", encodedText, line);
+#else
+    swprintf(_LastCommand, sizeof(_LastCommand), L"\x01%s\x01.%ls", encodedText, line);
+#endif
+    return DC_PASS_USE_LAST;
+}
 
 static int dot_host_command(const wchar_t* line)
 {
@@ -8069,6 +8080,10 @@ void uiDotCommandsInit()
 	// host commands; this allows for
 	// client localization of host commands
 	ADD_HOST_COMMAND(who, false);
+    
+    // allows extra info to be sent with these commands
+    uiDotCommandAdd("bug", dot_clientinfo_command, false);
+    uiDotCommandAdd("report", dot_clientinfo_command, false);
 
 	uiDotCommandsInitLoc();
 }

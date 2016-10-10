@@ -1093,9 +1093,6 @@
     <ClInclude Include="..\..\src\strt\strtWOR.h">
       <Filter>strt</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sys\callstack.h">
-      <Filter>sys</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\sys\crashhandler.h">
       <Filter>sys</Filter>
     </ClInclude>
@@ -1644,6 +1641,7 @@
     <ClInclude Include="..\..\src\omg\omgChat.hxx">
       <Filter>omg\Generated Headers</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2293,9 +2291,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\strt\strtUpdaterPack.cpp">
       <Filter>strt</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\sys\callstack.cpp">
-      <Filter>sys</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\sys\crashhandler.cpp">
       <Filter>sys</Filter>

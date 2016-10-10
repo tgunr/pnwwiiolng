@@ -408,7 +408,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		LogAbort("out of memory opening %s", asciiPath);
 #else
 		Write_Log(LOG_ALL, LOG_FATAL, "out of memory opening %s", asciiPath);
-		piExitProgram(__FILE__, __LINE__, "out of memory");
+		piExitProgram(_FL, "out of memory");
 		return -1;
 #endif
 	}

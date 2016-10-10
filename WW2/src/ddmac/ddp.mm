@@ -233,7 +233,7 @@ LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscree
     resetOGLAttributeValue(oglAttributes, NSOpenGLPFAColorSize, static_cast<NSOpenGLPixelFormatAttribute>(bpp));
     
     ddpView = [[NSOpenGLView alloc] initWithFrame:NSMakeRect(0, 0, width, height)
-                                      pixelFormat:[[[NSOpenGLPixelFormat alloc] initWithAttributes:oglAttributes] autorelease]];
+                                      pixelFormat:[[NSOpenGLPixelFormat alloc] initWithAttributes:oglAttributes]];
     context = ddpView.openGLContext;
     if (!context) {
         throw "Unable To Allocate OpenGL Window Context";
@@ -411,6 +411,16 @@ void sysGetMousePosition(SINT32 *x, SINT32 *y)
 #pragma mark - GETTERS AND STATS -
 ////////////////////////////////////////////////////////////////////////////////
 
+int ddpGetCenterX()
+{
+    return static_cast<int>([[ddpWin screen] frame].origin.x + ([[ddpWin screen] frame].size.width / 2));
+}
+
+int ddpGetCenterY()
+{
+    return static_cast<int>([[ddpWin screen] frame].origin.y + ([[ddpWin screen] frame].size.height / 2));
+}
+
 int ddpGetWidth()
 {
 	return static_cast<int>(ddpRect.size.width);
@@ -522,7 +532,7 @@ static NSURL *ddcapGenerateScreenshotURL(NSString *providedName)
                 return;
             }
         }
-        screenshotsDirectory = [screenshotsDir retain];
+        screenshotsDirectory = screenshotsDir;
         
         // Create a date formatter that includes full date and time info,
         // doesn't return "today" etc., and uses the user's formatting settings.

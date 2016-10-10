@@ -53,17 +53,10 @@ piINDICES*	pt;
 piVECTOR*  lpcrnr;
 
 #ifdef EVENT_LOG_TIMES
-LARGE_INTEGER count1, count2;
-static __int64    count=0;
-static int        number=0;
-static int		  npolys=0;
-#endif
+    static UINT64 count = 0;
+    static int number = 0, npolys = 0;
 
-
-#ifdef EVENT_LOG_TIMES
-	if (!QueryPerformanceCounter(&count1))
-	{
-	}
+    UINT64 beginhere = GetMicroSeconds();
 #endif
 
 
@@ -186,20 +179,14 @@ static int		  npolys=0;
 	}
 
 #ifdef EVENT_LOG_TIMES
-	if (QueryPerformanceCounter(&count2))
-	{
-		count += count2.QuadPart - count1.QuadPart;
-		if (++number == 1024)
-		{
-			QueryPerformanceFrequency(&count2);
-			Write_Debug("Average object polygon collision detect time: %d us, polys = %d",
-				(UINT32)(count / 1024) * 1000 / (UINT32)(count2.LowPart / 1000),
-				(UINT32)(npolys / number));
-			number = 0;
-			count = 0;
-			npolys = 0;
-		}
-	}
+    count += GetMicroSeconds() - beginhere;
+    if ((++number % 1024) == 0)
+    {
+        Write_Debug("Average object polygon collision detect time: %lu us, polys = %d", count, npolys / 1024);
+        number = 0;
+        count = 0;
+        npolys = 0;
+    }
 #endif
 
 	return(retval);
@@ -220,16 +207,10 @@ piVECTOR    dir, vt, pv;
 LISTHEADER*	lplist;
 
 #ifdef EVENT_LOG_TIMES
-LARGE_INTEGER count1, count2;
-static __int64    count=0;
-static int        number=0;
-#endif
-
-
-#ifdef EVENT_LOG_TIMES
-	if (!QueryPerformanceCounter(&count1))
-	{
-	}
+    static UINT64 count = 0;
+    static int number = 0;
+    
+    UINT64 beginhere = GetMicroSeconds();
 #endif
 
 
@@ -433,17 +414,12 @@ static int        number=0;
 	}
 
 #ifdef EVENT_LOG_TIMES
-	if (QueryPerformanceCounter(&count2))
-	{
-		count += count2.QuadPart - count1.QuadPart;
-		if (++number == 1024)
-		{
-			QueryPerformanceFrequency(&count2);
-			Write_Debug("Average object collision detect time: %d us", (DWORD)(count / 1024) * 1000 / (DWORD)(count2.LowPart / 1000));
-			number = 0;
-			count = 0;
-		}
-	}
+    count += GetMicroSeconds() - beginhere;
+    if ((++number % 1024) == 0)
+    {
+        Write_Debug("Average object collision detect time: %lu us", count);
+        count = 0;
+    }
 #endif
 
 	return(retval);

@@ -122,10 +122,10 @@ public:
 		}
 
 		// Make the strings database safe
-		wwiiEscapeString(profile);
-		wwiiEscapeString(version);
-		wwiiEscapeString(os);
-		wwiiEscapeString(cpuName);
+		DBThread::EscapeString(profile);
+		DBThread::EscapeString(version);
+		DBThread::EscapeString(os);
+		DBThread::EscapeString(cpuName);
 
 		// Send a query to the worker threads
 		DBThread::Do(DBThread::Audit

@@ -850,21 +850,17 @@ JS_FUNCTION_DEF(jsMapView, addwaypoint)
 	JS_ValueToNumber(ctx, argv[1], &jx);
 	JS_ValueToNumber(ctx, argv[2], &jy);
 
-	const wchar_t* wname		= L"";
-	const wchar_t* wnotes		= L"";
 	const char* name			= "";
 	const char* notes			= "";
 
 	if(argc >= 4)
 	{
-		wname = (const wchar_t*)JS_GetStringChars(JS_ValueToString(ctx, argv[3]));
-		name = UTF8(wname);
+        name = JS_GetStringBytes(JS_ValueToString(ctx, argv[3]));
 	}
 
 	if(argc >= 5)
 	{
-		wnotes = (const wchar_t*)JS_GetStringChars(JS_ValueToString(ctx, argv[4]));
-		notes = UTF8(wnotes);
+        notes = JS_GetStringBytes(JS_ValueToString(ctx, argv[4]));
 	}
 
 	char prefix = 'R';
@@ -942,7 +938,7 @@ JS_FUNCTION_DEF(jsMapView, addwaypoint)
 
 	if(name && *name)
 	{
-		handle = chatGetHandle(wname);
+		handle = chatGetHandle(name);
 	}
 	else if(prefix)
 	{

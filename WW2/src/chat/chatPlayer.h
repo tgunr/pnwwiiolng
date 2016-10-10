@@ -240,6 +240,8 @@ public:
 
 	void SetWeapon(const WEAPON_SPEC& weapon);
 
+	void GetWeaponStr(std::string &str) const;
+
 	void squelchSquadAnnounce() { m_announcedToSquad = true; }
 
 	void stopRecruiting();
@@ -306,7 +308,7 @@ public:
 	bool visible(const Player* target) const { return target->isVisibleTo(this); }
 
 	// Describe the locality of a player
-	void whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const;
+	void whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const;
 
 	// CONST Accessors
 	bool active() const { return m_active; }

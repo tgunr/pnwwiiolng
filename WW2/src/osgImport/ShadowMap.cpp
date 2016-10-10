@@ -2169,12 +2169,13 @@ void ShadowMap::Kill()
 {
     for(int i = 0; i < 4; i++)
     {
-        while(_smOctet[i].fbo->referenceCount() > 1)
+		// TODO: It's hideously wrong to forcibly kill all existing refcounts
+        while(_smOctet[i].fbo && _smOctet[i].fbo->referenceCount() > 1)
             _smOctet[i].fbo->unref();
 
         _smOctet[i].fbo = nullptr;
 
-        while(_smOctet[i].map->referenceCount() > 1)
+        while(_smOctet[i].map && _smOctet[i].map->referenceCount() > 1)
             _smOctet[i].map->unref();
 
         _smOctet[i].map = nullptr;

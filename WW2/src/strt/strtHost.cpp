@@ -420,64 +420,121 @@ _housekeeping()
 	}
 
 	static UINT32 nextFBRepairCycle = 0;
-	if ( teulTime() >= nextFBRepairCycle )
-	{
-		strtProcessFBRepairQueue();
-		nextFBRepairCycle = teulTime() + 5;
+	static TeulTimeMS nextSecond = teulClock64+1000;
+	static TeulTimeMS nextHalfSecond = teulClock64 + 500;
+	static UINT32 nextObjectiveUpdate = teulTime() + 5;
+	static UINT32 nextForcedSupplyRouteCheck = 0;
+	static UINT32 nextTOESave = teulTime() + 120;
+	static UINT32 nextSupplyRouteCheck = teulTime() + 1;
+
+	static bool bInitiateFBRepairCycle = false;
+	static bool bInitiateHalfSecProcessing = false;
+	static bool bInitiateSecProcessing = false;
+	static bool bInitiateObjectiveUpdateProcessing = false;
+	static bool bInitiateSupplyRouteCheckProcessing = false;
+	static bool bInitiateForcedSupplyRouteCheckProcessing = false;
+	static bool bInitiateSaveTOESupplieskProcessing = false;
+
+	// Upate flags that control scheduling - but make sure we don't allow processing to affect the
+	// scheduled time.
+	if ( teulTime() >= nextFBRepairCycle ) {
+		nextFBRepairCycle += (teulTime()-nextFBRepairCycle) + 5;
+		bInitiateFBRepairCycle = true;
 	}
 
-	static TeulTimeMS nextHalfSecond = teulClock64 + 500;
-	if ( teulClock64 >= nextHalfSecond )
+	if ( teulClock64 >= nextHalfSecond ) {
+		nextHalfSecond +=  500;
+		if (nextHalfSecond < teulClock64) {
+			nextHalfSecond = teulClock64;
+			dbugLog(_FLI, "Lost time, need to schedule next half second processing immediately");
+		}
+		bInitiateHalfSecProcessing = true;
+	}
+
+	if ( teulClock64 >= nextSecond ) {
+		dbugLog(_FLI, "strat _housekeeping Second procesing, scheduled");
+		nextSecond += 1000;
+		if (nextSecond < teulClock64) {
+			nextSecond = teulClock64;
+			dbugLog(_FLI, "Lost time, need to schedule next second processing immediately");
+		}
+		bInitiateSecProcessing = true;
+	}
+
+	if ( teulTime() >= nextObjectiveUpdate )
+	{
+		nextObjectiveUpdate += (teulTime()-nextObjectiveUpdate) + 5;
+		bInitiateObjectiveUpdateProcessing = true;
+	}
+
+	if ( teulTime() >= nextSupplyRouteCheck ) {
+	
+		nextSupplyRouteCheck = teulTime() + 2;
+		bInitiateSupplyRouteCheckProcessing = true;
+		if ( teulTime() >= nextForcedSupplyRouteCheck ) {
+			nextForcedSupplyRouteCheck += (teulTime()-nextForcedSupplyRouteCheck) + 60;
+			bInitiateForcedSupplyRouteCheckProcessing = true;
+		}
+	}
+
+	if ( teulTime() >= nextTOESave ) {
+		nextTOESave +=  60;
+		bInitiateSaveTOESupplieskProcessing = true;
+	}
+
+	// Now actually act on the info above
+	if (bInitiateFBRepairCycle)
+	{
+		strtProcessFBRepairQueue();
+		bInitiateFBRepairCycle = false;
+	}
+
+	if (bInitiateHalfSecProcessing)
 	{
 		strtProcessDBQueue();
 		strtEvaluateEWSUpdates();
-		nextHalfSecond = teulClock64 + 500;
+		bInitiateHalfSecProcessing = false;
+
+		if (bInitiateSecProcessing) {
+			dbugLog(_FLI, "strat _housekeeping Half Second processing subverted");
+		}
 		return nextHouseKeep;
 	}
 
-	static TeulTimeMS nextSecond = 0;
-	if ( teulClock64 >= nextSecond )
+	if (bInitiateSecProcessing)
 	{
+		dbugLog(_FLI, "strat _housekeeping Second procesing, activated");
 		strtProcessResupply();
 		stratProcessLuaEventQueue();
-		nextSecond = teulClock64 + 1000;
+		bInitiateSecProcessing = false;
 		return nextHouseKeep;
 	}
 
-	static UINT32 nextObjectiveUpdate = teulTime() + 5;
-	if ( teulTime() >= nextObjectiveUpdate )
+	if (bInitiateObjectiveUpdateProcessing)
 	{
 		g_objectiveStats.calculate();
 		if ( g_objectiveStats.m_cityAvailable[ALLIED] >= 1 )
 			strtGameEventTrigger("gameSpareAOCapacity", ALLIED);
 		if ( g_objectiveStats.m_cityAvailable[AXIS] >= 1 )
 			strtGameEventTrigger("gameSpareAOCapacity", AXIS);
-		nextObjectiveUpdate = teulTime() + 5;
+		bInitiateObjectiveUpdateProcessing = false;
 		return nextHouseKeep;
 	}
 
-	static UINT32 nextSupplyRouteCheck = teulTime() + 1;
-	static UINT32 nextForcedSupplyRouteCheck = 0;
-	if ( teulTime() >= nextSupplyRouteCheck )
+	if (bInitiateSupplyRouteCheckProcessing)
 	{
-		bool force = false;
-		if ( teulTime() >= nextForcedSupplyRouteCheck )
-		{
-			force = true;
-			nextForcedSupplyRouteCheck = teulTime() + 60;
-		}
-		strtBuildSupplyChains(force);
-		nextSupplyRouteCheck = teulTime() + 2;
+		strtBuildSupplyChains(bInitiateForcedSupplyRouteCheckProcessing);
+		bInitiateSupplyRouteCheckProcessing = false;
+		bInitiateForcedSupplyRouteCheckProcessing = false;
 		return nextHouseKeep;
 	}
 
 	// Wait 2 minutes before starting to save the lists
-	static UINT32 nextTOESave = teulTime() + 120;
-	if ( teulTime() >= nextTOESave )
+	if (bInitiateSaveTOESupplieskProcessing)
 	{
 		strtSaveTOESupplies();
 		// But then save every minute
-		nextTOESave = teulTime() + 60;
+		bInitiateSaveTOESupplieskProcessing = false;
 		return nextHouseKeep;
 	}
 

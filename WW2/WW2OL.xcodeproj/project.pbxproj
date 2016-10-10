@@ -429,6 +429,7 @@
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
 		47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B0ED240E9A66A40089DCC4 /* libteulKit.a */; };
 		E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96991C6D729D00D5EC52 /* WebKit.framework */; };
+		E94156B01D259A0300C0565B /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94156AF1D259A0300C0565B /* libb64.a */; };
 		E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
 		E97C76161C848E3600875F44 /* CADebugger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B1120222EB00A60CC2 /* CADebugger.cpp */; };
 		E97C76171C848E3A00875F44 /* CADebugMacros.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B3120222EB00A60CC2 /* CADebugMacros.cpp */; };
@@ -477,14 +478,14 @@
 		FA13BB421C87649000095818 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3B1C87649000095818 /* IOKit.framework */; };
 		FA13BB431C87649000095818 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3C1C87649000095818 /* OpenAL.framework */; };
 		FA13BB441C87649000095818 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3D1C87649000095818 /* OpenGL.framework */; };
-		FA13BB451C87649000095818 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3E1C87649000095818 /* QuickTime.framework */; };
 		FA13BB461C87649000095818 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3F1C87649000095818 /* Security.framework */; };
-		FA13BB4A1C8764BB00095818 /* libcrypto.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB481C8764BB00095818 /* libcrypto.tbd */; };
 		FA13BB4B1C8764BB00095818 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB491C8764BB00095818 /* libz.tbd */; };
 		FA13BB4F1C87650800095818 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB4E1C87650800095818 /* libxml2.tbd */; };
 		FA13BB511C87CF8500095818 /* libglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB501C87CF8500095818 /* libglew.a */; };
 		FA37D74F1C937F6E00013187 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = FA37D74D1C937F6E00013187 /* MainMenu.nib */; };
 		FA37D7531C937F8F00013187 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FA37D7511C937F8F00013187 /* Localizable.strings */; };
+		FA3B631B1D613BA500A5A810 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; };
+		FA3B631C1D613BB400A5A810 /* HockeySDK.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
 		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
 /* End PBXBuildFile section */
@@ -520,6 +521,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				FA3B631C1D613BB400A5A810 /* HockeySDK.framework in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1369,7 +1371,6 @@
 		08977E1C134D007B00C9DCFE /* sneaky.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sneaky.h; sourceTree = "<group>"; };
 		08977E1D134D007B00C9DCFE /* sneaky.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sneaky.cpp; sourceTree = "<group>"; };
 		0898699D13A2BB4C00D643A0 /* libotmac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libotmac.a; path = lib/mac/libotmac.a; sourceTree = "<group>"; };
-		089FB52614194F2200EBEB5F /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		08A428C012C93A490041B628 /* oglTextureObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oglTextureObject.cpp; sourceTree = "<group>"; };
 		08A428C112C93A490041B628 /* oglTextureObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = oglTextureObject.h; sourceTree = "<group>"; };
 		08A43F081092021000B13339 /* glplat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glplat.h; sourceTree = "<group>"; };
@@ -1425,6 +1426,7 @@
 		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
+		E94156AF1D259A0300C0565B /* libb64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libb64.a; path = lib/mac/libb64.a; sourceTree = "<group>"; };
 		E97C76281C84CD0700875F44 /* locIDs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = locIDs.h; sourceTree = "<group>"; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
 		E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader2.cpp; sourceTree = "<group>"; };
@@ -1508,15 +1510,14 @@
 		FA13BB3B1C87649000095818 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		FA13BB3C1C87649000095818 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		FA13BB3D1C87649000095818 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		FA13BB3E1C87649000095818 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = System/Library/Frameworks/QuickTime.framework; sourceTree = SDKROOT; };
 		FA13BB3F1C87649000095818 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		FA13BB481C8764BB00095818 /* libcrypto.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcrypto.tbd; path = usr/lib/libcrypto.tbd; sourceTree = SDKROOT; };
 		FA13BB491C8764BB00095818 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		FA13BB4E1C87650800095818 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
 		FA13BB501C87CF8500095818 /* libglew.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglew.a; path = lib/mac/libglew.a; sourceTree = "<group>"; };
 		FA37D7501C937F7100013187 /* Base */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Base; path = proj/mac/Base.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		FA37D7521C937F8F00013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FA37D7551C937F9800013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		FA3B631A1D613BA500A5A810 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = proj/mac/HockeySDK.framework; sourceTree = "<group>"; };
 		FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CodeSigning.xcconfig; path = proj/mac/CodeSigning.xcconfig; sourceTree = "<group>"; };
 		FA3D8BA81C8BF201002C5119 /* Defines.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Defines.xcconfig; path = proj/mac/Defines.xcconfig; sourceTree = "<group>"; };
 		FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = SearchPaths.xcconfig; path = proj/mac/SearchPaths.xcconfig; sourceTree = "<group>"; };
@@ -1545,15 +1546,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA3B631B1D613BA500A5A810 /* HockeySDK.framework in Frameworks */,
 				FA13BB4F1C87650800095818 /* libxml2.tbd in Frameworks */,
-				FA13BB4A1C8764BB00095818 /* libcrypto.tbd in Frameworks */,
 				FA13BB4B1C8764BB00095818 /* libz.tbd in Frameworks */,
 				FA13BB401C87649000095818 /* AGL.framework in Frameworks */,
 				FA13BB411C87649000095818 /* Cocoa.framework in Frameworks */,
 				FA13BB421C87649000095818 /* IOKit.framework in Frameworks */,
 				FA13BB431C87649000095818 /* OpenAL.framework in Frameworks */,
 				FA13BB441C87649000095818 /* OpenGL.framework in Frameworks */,
-				FA13BB451C87649000095818 /* QuickTime.framework in Frameworks */,
 				FA13BB461C87649000095818 /* Security.framework in Frameworks */,
 				E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */,
 				082CF80E1202241200A60CC2 /* CoreAudio.framework in Frameworks */,
@@ -1569,6 +1569,7 @@
 				0863B34F10619AC8005FDF19 /* libphui.a in Frameworks */,
 				0863B35010619AC8005FDF19 /* libspeedtreemac.a in Frameworks */,
 				08DDF926106928D800720B71 /* libmacode.a in Frameworks */,
+				E94156B01D259A0300C0565B /* libb64.a in Frameworks */,
 				08744F51107BF96D009DB5AF /* liblua5.1.a in Frameworks */,
 				08744F53107BF977009DB5AF /* libtolua++.a in Frameworks */,
 				087286DF10D1B23B00456009 /* libimapmac.a in Frameworks */,
@@ -3015,13 +3016,14 @@
 		20286C32FDCF999611CA2CEA /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				FA3B631A1D613BA500A5A810 /* HockeySDK.framework */,
+				E94156AF1D259A0300C0565B /* libb64.a */,
 				FA05B0811C8D3E1800CDE30C /* libgranny2.a */,
 				FA13BB391C87649000095818 /* AGL.framework */,
 				FA13BB3A1C87649000095818 /* Cocoa.framework */,
 				FA13BB3B1C87649000095818 /* IOKit.framework */,
 				FA13BB3C1C87649000095818 /* OpenAL.framework */,
 				FA13BB3D1C87649000095818 /* OpenGL.framework */,
-				FA13BB3E1C87649000095818 /* QuickTime.framework */,
 				FA13BB3F1C87649000095818 /* Security.framework */,
 				0898699D13A2BB4C00D643A0 /* libotmac.a */,
 				FA13BB501C87CF8500095818 /* libglew.a */,
@@ -3041,10 +3043,8 @@
 				0DDF00A508578C460027461D /* libjs.a */,
 				08744F50107BF96D009DB5AF /* liblua5.1.a */,
 				08744F52107BF977009DB5AF /* libtolua++.a */,
-				FA13BB481C8764BB00095818 /* libcrypto.tbd */,
 				FA13BB491C8764BB00095818 /* libz.tbd */,
 				FA13BB4E1C87650800095818 /* libxml2.tbd */,
-				089FB52614194F2200EBEB5F /* Carbon.framework */,
 			);
 			name = lib;
 			sourceTree = "<group>";
@@ -3294,8 +3294,19 @@
 			attributes = {
 				LastUpgradeCheck = 0720;
 				TargetAttributes = {
+					080C7E831062F011000A242F = {
+						DevelopmentTeam = J63A54QWD2;
+					};
+					47B0ED230E9A66A40089DCC4 = {
+						DevelopmentTeam = J63A54QWD2;
+					};
+					8D0C4E890486CD37000505A6 = {
+						DevelopmentTeam = J63A54QWD2;
+						ProvisioningStyle = Manual;
+					};
 					E97C76341C8513EB00875F44 = {
 						CreatedOnToolsVersion = 7.2.1;
+						DevelopmentTeam = J63A54QWD2;
 					};
 				};
 			};
@@ -3846,6 +3857,7 @@
 			buildSettings = {
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/mac",
@@ -3891,6 +3903,7 @@
 			buildSettings = {
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/mac",
@@ -3954,6 +3967,7 @@
 			buildSettings = {
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/mac",
@@ -4008,6 +4022,7 @@
 			buildSettings = {
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/mac",

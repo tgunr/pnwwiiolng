@@ -34,6 +34,7 @@ extern const struct STRT_DTL_HEADER& sdmGetDtlHeader();
 
 extern UINT16 sdmGetNumCP(void);
 extern CP* sdmGetNextCP(void);
+extern CP* sdmGetCPArray(void);
 
 extern UINT16 sdmGetNumFACILITY(void);
 extern FACILITY* sdmGetNextFACILITY(void);

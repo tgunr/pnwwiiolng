@@ -54,6 +54,9 @@
 #define MAX_CHAT_LINES 256
 #define MAGIC_DOT_R_COUNTRY 15
 
+// previous text limit was 250, account for encoded size and header/trailer characters
+#define MAX_REPORT_LEN (250 - INFO_MAX_ENCODE_SIZE - 2)
+
 /******** OBCENITY FILTER TYPES ********/
 
 // Structure that houses an obscenity filter rule.
@@ -1475,6 +1478,11 @@ bool ChatInput::KeyDown(int keycode, unsigned short unicode)
 		text += L" ";
 		SetValue(text.c_str());
 	}
+    else if (text.substr(0,5) == L".bug " || text.substr(0,5) == L"/bug " || text.substr(0,8) == L".report " || text.substr(0,8) == L"/report " )
+    {
+        if (text.length() > MAX_REPORT_LEN)
+            SetValue(text.substr(0, MAX_REPORT_LEN).c_str());
+    }
 	else
 	{
 		/*

@@ -11,11 +11,10 @@
 #define OPENGL3D	1
 #define WIN32_LEAN_AND_MEAN
 #define FRONT_END
-
+#define _CRT_RAND_S
 #define _GDI32_
 
 #define NO_DEBUG_WRITE
-#pragma warning (disable: 4800) // shut the #$!@ up
 
 #include "include/platforms.h"
 

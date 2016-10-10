@@ -1321,16 +1321,22 @@ static int tolua_veh_vehicle_weapCreateSpec00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
+     !tolua_isnumber(tolua_S, 1, 0, &tolua_err) ||
+     !tolua_isnumber(tolua_S, 2, 0, &tolua_err) ||
+     !tolua_isnumber(tolua_S, 3, 0, &tolua_err) ||
+     !tolua_isnumber(tolua_S, 4, 0, &tolua_err) ||
+     !tolua_isnoobj(tolua_S, 5, &tolua_err)
+     )
   goto tolua_lerror;
  else
 #endif
  {
-  const char* weapString = ((const char*)  tolua_tostring(tolua_S,1,0));
+    int wcountry  = ((int)tolua_tonumber(tolua_S, 1, 0));
+    int wcategory = ((int)tolua_tonumber(tolua_S, 2, 0));
+    int wclass    = ((int)tolua_tonumber(tolua_S, 3, 0));
+    int wtype     = ((int)tolua_tonumber(tolua_S, 4, 0));
   {
-   WEAPON_SPEC tolua_ret = (WEAPON_SPEC)  weapCreateSpec(weapString);
+    WEAPON_SPEC tolua_ret = (WEAPON_SPEC)weapCreateSpec(wcountry, wcategory, wclass, wtype);
    {
 #ifdef __cplusplus
     void* tolua_obj = new WEAPON_SPEC(tolua_ret);

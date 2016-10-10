@@ -109,7 +109,8 @@ _executeBan(Player& player, const ARGV& argv, bool kick)
 		return;
 	}
 
-	player.gmNote("GM", (kick) ? "kickban" : "ban", argv[0], chatMakeTempString("%s %s", argv[1], argv[2]));
+	PREP_CHAT_MSG(msg, "%s %s", argv[1], argv[2]);
+	player.gmNote("GM", (kick) ? "kickban" : "ban", argv[0], msg);
 
 	Player* subject = PlayerInterface::Lookup(argv[0]);
 	if ( kick )
@@ -284,12 +285,14 @@ public:
 		target->message(LSTR_WARNING, LSTR_GM_MOVED_YOU, args[1]);
 
 		std::string note = args[1];
-		wwiiEscapeString(note);
+                DBThread::EscapeString(note);
+
 		if ( note.length() > 400 )
 			note.resize(400);
 		DBThread::Do(DBThread::Default, "CALL wwii.p_add_player_note('%s', %u, 3, '%s')", target->callsign(), player.playerID(), note.c_str());
 
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s bumping %s: %s", player.callsign(), target->callsign(), args[1]));
+		PREP_CHAT_MSG(cmsg, "%s bumping %s: %s", player.callsign(), target->callsign(), args[1]);
+		chatDispatchGMMessage("INFO", cmsg);
 	}
 } dotBump;
 
@@ -358,7 +361,8 @@ public:
 		}
 
 		player.gmNote("GM", command(), args[0], args[1]);
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s /buzzardspawning %s: %s", player.callsign(), target->callsign(), args[1]));
+		PREP_CHAT_MSG(cmsg, "%s /buzzardspawning %s: %s", player.callsign(), target->callsign(), args[1]);
+		chatDispatchGMMessage("INFO", cmsg);
 
 		Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::BUZZARD_SPAWN_Y));
 		outgoing.construct<BuzzardSpawn>(player.playerID(), true, location);
@@ -483,7 +487,8 @@ public:
 		if (subject->matchHandle() != player.matchHandle())
 		{
 			// No point logging self-reviews.
-			chatDispatchGMMessage("INFO", chatMakeTempString("%s /chatlog'ing %s: %s", player.callsign(), subject->callsign(), args[1]));
+			PREP_CHAT_MSG(cmsg, "%s /chatlog'ing %s: %s", player.callsign(), subject->callsign(), args[1]);
+			chatDispatchGMMessage("INFO", cmsg);
 			player.gmNote("GM", command(), arguments, nullptr);
 		}
 
@@ -855,10 +860,12 @@ public:
 			chatReleaseGrab(player);
 		}
 
+		char cmsg[MAX_MESSAGE_LENGTH+1];
 		if ( args.size() > 1 && args[1][0] != 0 )
-			chatDispatchGMMessage("INFO", chatMakeTempString("%s grabbing %s: %s", player.callsign(), target->callsign(), args[1]));
+			snprintf(cmsg, MAX_MESSAGE_LENGTH, "%s grabbing %s: %s", player.callsign(), target->callsign(), args[1]);
 		else
-			chatDispatchGMMessage("INFO", chatMakeTempString("%s grabbing %s", player.callsign(), target->callsign()));
+			snprintf(cmsg, MAX_MESSAGE_LENGTH, "%s grabbing %s", player.callsign(), target->callsign());
+		chatDispatchGMMessage("INFO", cmsg);
 
 		// I want to know if the sender is currently afk'd
 		target->notifyOtherIfAFK(player);
@@ -919,7 +926,8 @@ public:
 			return;
 		}
 
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s kicking %s: %s", player.callsign(), target->callsign(), reasonText));
+		PREP_CHAT_MSG(cmsg, "%s kicking %s: %s", player.callsign(), target->callsign(), reasonText);
+		chatDispatchGMMessage("INFO", cmsg);
 
 		// If the victim is afk, it'd be fun to know
 		target->notifyOtherIfAFK(player);
@@ -938,7 +946,8 @@ public:
 		_smite(target);
 
 		std::string sqlReason = (reason ? reason : "<no reason given>");
-		wwiiEscapeString(sqlReason);
+                DBThread::EscapeString(sqlReason);
+
 		DBThread::Do(DBThread::Default, "CALL `wwii`.`p_add_player_note`('%s',%u,4,'%s')", target->callsign(), player.playerID(), sqlReason.c_str());
 	}
 } dotKick;
@@ -995,7 +1004,8 @@ public:
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		player.gmNote("GM", command(), arguments, nullptr);
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s forcing all players to despawn: %s", player.callsign(), arguments));
+		PREP_CHAT_MSG(cmsg, "%s forcing all players to despawn: %s", player.callsign(), arguments);
+		chatDispatchGMMessage("INFO", cmsg);
 
 		UINT32 affected = 0;
 
@@ -1009,7 +1019,8 @@ public:
 				++affected;
 		}
 
-		player.message(LSTR_NOTE, LSTR_GENERIC, chatMakeTempString("%u %s affected.", affected, (affected != 1) ? "players" : "player"));
+		FORMAT_CHAT_MSG(cmsg, "%u %s affected.", affected, (affected != 1) ? "players" : "player");
+		player.message(LSTR_NOTE, LSTR_GENERIC, cmsg);
 	}
 } dotDespawnAll;
 
@@ -1123,15 +1134,15 @@ public:
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
-		const char* clause = "";
-
+		char clause[MAX_MESSAGE_LENGTH+1];
+		clause[0] = '\0';
 		Property* property = chatFindProperty(player.uiTarget());
 		if ( property != nullptr )
 		{
 			if ( property->IsCP() )
-				clause = chatMakeTempString("WHERE cp_oid = %u", property->OID());
+				snprintf(clause, MAX_MESSAGE_LENGTH, "WHERE cp_oid = %u", property->OID());
 			else if ( property->IsFacility() )
-				clause = chatMakeTempString("WHERE facility_oid = %u", property->OID());
+				snprintf(clause, MAX_MESSAGE_LENGTH, "WHERE facility_oid = %u", property->OID());
 			player.gmNote("GM", command(), property->Name(), nullptr);
 		}
 		else
@@ -1142,7 +1153,8 @@ public:
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
-		const char* clause = "";
+		char clause[MAX_MESSAGE_LENGTH+1];
+		clause[0] = '\0';
 
 		if ( strncasecmp(arguments, "glob", 4) == 0 || strcasecmp(arguments, "all") == 0 )
 		{
@@ -1155,12 +1167,12 @@ public:
 		if ( i == ALLIED )
 		{
 			player.gmNote("GM", command(), "allied", nullptr);
-			clause = "AND ctry IN (1,2,3,7,8)";
+			snprintf(clause, MAX_MESSAGE_LENGTH, "AND ctry IN (1,2,3,7,8)");
 		}
 		else if ( i == AXIS )
 		{
 			player.gmNote("GM", command(), "axis", nullptr);
-			clause = "AND ctry IN (4,5,6)";
+			snprintf(clause, MAX_MESSAGE_LENGTH,  "AND ctry IN (4,5,6)");
 		}
 		else
 		{
@@ -1168,13 +1180,13 @@ public:
 			if ( i > WWII_NO_COUNTRY )
 			{
 				player.gmNote("GM", command(), _countryName[i], nullptr);
-				clause = chatMakeTempString("AND ctry = %u", i);
+				snprintf(clause, MAX_MESSAGE_LENGTH, "AND ctry = %u", i);
 			}
 			else
 			{
 				Chat::Name callsign(chatGetHandle(arguments));
 				player.gmNote("GM", command(), callsign.c_str(), nullptr);
-				clause = chatMakeTempString("AND call = '%s'", callsign.c_str());
+				snprintf(clause, MAX_MESSAGE_LENGTH, "AND call = '%s'", callsign.c_str());
 			}
 		}
 
@@ -1492,18 +1504,35 @@ public:
 
 		const Squad& squad = list->squad();
 		std::string response = "";
-		response += chatMakeTempString("Sq#%u %s: %s. Online: %u/%u.\n"
-									, squad.squadID()
-									, squad.callsign().c_str()
-									, squad.name().c_str()
-									, list->online()
-									, list->members().size()
-									);
-		response += chatMakeTempString("Created: %s by %s. ", chatTimeString(squad.created()), Chat::Name(squad.creatorHandle()).c_str());
-		response += chatMakeTempString("CO: %s. ", Chat::Name(squad.coHandle()).c_str());
-		response += chatMakeTempString("R: %s. ", squad.recruiting() ? "Yes" : "No");
-		response += chatMakeTempString("V: %s. ", squad.recruiting() ? "Yes" : "No");
-		response += chatMakeTempString("URL: %s", squad.homepage().c_str());
+		response += "Sq#";
+		response += std::to_string(squad.squadID());
+		response += " ";
+		response += squad.callsign();
+		response += ": ";
+		response += squad.name();
+		response += ". Online: ";
+
+		response += std::to_string(list->online());
+		response += "/";
+		response += std::to_string(list->members().size());
+		response += ".\n";
+		response += "Created: ";
+		response += chatTimeString(squad.created());
+		response += " by ";
+		response.append(Chat::Name(squad.creatorHandle()).c_str());
+		response += ". ";
+		response += "CO: ";
+		response.append(Chat::Name(squad.coHandle()).c_str());
+		response += ". ";
+		response += "R: ";
+		response += (squad.recruiting() ? "Yes" : "No");
+		response += ". ";
+		response += "V: ";
+		response += (squad.votingEnabled() ? "Yes" : "No");
+		response += ". ";
+		response += "URL: ";
+		response += squad.homepage();
+
 		player.message(LSTR_NOTE, LSTR_GENERIC, response.c_str());
 
 		if ( !listAll && list->online() == 0 )
@@ -1738,12 +1767,9 @@ public:
 } dotPInfo;
 
 void
-_addStr(char* dest, const char* src)
+_addStr(std::string & dest, const char* src)
 {
-	char* p = dest;
-	while ( *p ) p++;					// Seek to EOS
-	if ( p != dest ) *(p++) = ' ';		// Add space except at BOS
-	strcpy(p, src);					// Copy second string here
+	dest.append(src);
 }
 
 static const char*
@@ -1812,14 +1838,13 @@ DotPInfo::actionWith(Player& player, Chat::ClientMessage* message, char* argumen
 void
 Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, bool includePermissions) const
 {
-	char response[MAX_MESSAGE_LENGTH + 1];
+	std::string response;
 	char buf[128+1];
-	response[0] = '\0';
 	buf[0] = '\0';
 
 	if ( player.isPlaynet() )
 	{
-		strprintf(buf, "Pid#%u", playerID());
+		snprintf(buf, sizeof(buf), "Pid#%u", playerID());
 		_addStr(response, buf);
 	}
 
@@ -1829,7 +1854,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		_addStr(response, "in:none");
 	else
 	{
-		strprintf(buf, "in:%llu", player.instance().id());
+		snprintf(buf, sizeof(buf), "in:%llu", player.instance().id());
 		_addStr(response, buf);
 	}
 
@@ -1838,18 +1863,17 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		const char* squadName = chatGetSquadCallsign(squadID());
 		if ( squadName != nullptr && squadRank() > 0 )
 		{
-			strprintf(buf
-							, "%s:%s"
-								, chatGetSquadRankName(squadRank())
-								, squadName);
+			snprintf(buf, sizeof(buf), "%s:%s"
+				, chatGetSquadRankName(squadRank())
+				, squadName);
 		}
 		else if ( squadRank() == 0 && player.isPlaynet() )
 		{
-			strprintf(buf, "Sqd:%s (UNRANKED!)", squadName);
+			snprintf(buf, sizeof(buf), "Sqd:%s (UNRANKED!)", squadName);
 		}
 		else if ( player.isPlaynet() )
 		{
-			strprintf(buf, "Sqd#%u(NO DATA)", squadID());
+			snprintf(buf, sizeof(buf), "Sqd#%u(NO DATA)", squadID());
 		}
 		else
 		{
@@ -1876,7 +1900,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		}
 		else if ( player.isPlaynet() )
 		{
-			strprintf(buf, "B#%u:UNK", brigadeID());
+			snprintf(buf, sizeof(buf), "B#%u:UNK", brigadeID());
 			_addStr(response, buf);
 		}
 	}
@@ -1886,14 +1910,14 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		RANK_NO erank = effectiveRank();
 		const Rank* myRank = Rank::lookup(erank);
 		if ( myRank != nullptr )
-			strprintf(buf
+			snprintf(buf, sizeof(buf)
 						, "R#%u(%s/%s)"
 							, erank
 							, _rankType(myRank->type())
 							, rankNames[erank]
 							);
 		else if ( player.isPlaynet() )
-			strprintf(buf, "R#%u(INVALID)", erank);
+			snprintf(buf, sizeof(buf), "R#%u(INVALID)", erank);
 		_addStr(response, buf);
 	}
 
@@ -1907,9 +1931,9 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		char oic[21];
 		HCUnit* unit = HCUnit::Lookup(leadingBrigade());
 		if ( unit )
-			strprintf(oic, "OIC:%s", unit->callsign());
+			snprintf(oic, sizeof(buf), "OIC:%s", unit->callsign());
 		else if ( player.isPlaynet() )
-			strprintf(oic, "OIC:#%u", leadingBrigade());
+			snprintf(oic, sizeof(buf), "OIC:#%u", leadingBrigade());
 		_addStr(response, "OIC");
 	}
 	if ( permissions(ALLIED_COMMAND_STAFF) )
@@ -1925,11 +1949,11 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 	if ( player.isPlaynet() )
 	{
 		char permissionsHex[64];
-		sprintf(permissionsHex, "PM: %016llx", permissionMask());
+		snprintf(permissionsHex, sizeof(permissionsHex), "PM: %016llx", permissionMask());
 		_addStr(response, permissionsHex);
 	}
 
-	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response);
+	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response.c_str());
 
 	if ( includePermissions )
 	{
@@ -1949,7 +1973,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 			{
 				if ( index == 0 )
 					lstrID = LSTR_TEXT_END;
-				player.message(LSTR_NONE, lstrID, response);
+				player.message(LSTR_NONE, lstrID, response.c_str());
 			}
 		}
 		while ( index > 0 );
@@ -1959,7 +1983,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 
 	whereabouts(response, x, y);
 
-	player.message(LSTR_NONE, LSTR_GENERIC, response, nullptr);
+	player.message(LSTR_NONE, LSTR_GENERIC, response.c_str(), nullptr);
 
 	return;
 }
@@ -2301,7 +2325,8 @@ public:
 			else
 			{
 				///LOCALIZE
-				chatDispatchGMMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s", player.callsign(), target->callsign()));
+				PREP_CHAT_MSG(cmsg, "%s is no-longer snooping on %s", player.callsign(), target->callsign());
+				chatDispatchGMMessage("INFO", cmsg);
 				player.m_snoopOn = nullptr;
 				target->m_snoopBy = nullptr;
 			}
@@ -2336,7 +2361,8 @@ public:
 			throw Chat::LStringErr(LSTR_NO_SNOOP_RATS);
 
 		///LOCALIZE
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s snooping on %s: %s", player.callsign(), target->callsign(), argv[1]));
+		PREP_CHAT_MSG(cmsg, "%s snooping on %s: %s", player.callsign(), target->callsign(), argv[1]);
+		chatDispatchGMMessage("INFO", cmsg);
 
 		chatSendChatLog(target->playerID(), player.matchHandle());
 
@@ -2382,7 +2408,8 @@ public:
 				action(player, message);
 			else
 			{
-				chatDispatchCRSMessage("INFO", chatMakeTempString("%s is no-longer crssnooping on %s", player.callsign(), target->callsign()));
+				PREP_CHAT_MSG(cmsg, "%s is no-longer crssnooping on %s", player.callsign(), target->callsign());
+				chatDispatchCRSMessage("INFO", cmsg);
 				player.m_crsSnoopOn = nullptr;
 				target->m_crsSnoopBy = nullptr;
 			}
@@ -2420,7 +2447,8 @@ public:
 		player.gmNote("CRS", command(), arguments, nullptr);
 
 		///LOCALIZE
-		chatDispatchCRSMessage("INFO", chatMakeTempString("%s crsSnooping on %s", player.callsign(), target->callsign()));
+		PREP_CHAT_MSG(cmsg, "%s crsSnooping on %s", player.callsign(), target->callsign());
+		chatDispatchCRSMessage("INFO", cmsg);
 
 		chatSendChatLog(target->playerID(), player.matchHandle());
 
@@ -2588,7 +2616,8 @@ public:
 			return;
 
 		///LOCALIZE
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s noted %s: %s", player->callsign(), Chat::Name(m_handle).c_str(), m_text.c_str()));
+		PREP_CHAT_MSG(cmsg, "%s noted %s: %s", player->callsign(), Chat::Name(m_handle).c_str(), m_text.c_str());
+		chatDispatchGMMessage("INFO", cmsg);
 	}
 
 	virtual void Failure() override
@@ -2726,7 +2755,7 @@ public:
 		if ( args.size() > 1 )
 		{
 			std::string note = args[1];
-			wwiiEscapeString(note);
+                        DBThread::EscapeString(note);
 
 			if ( note.length() > 399 )
 			{
@@ -2773,7 +2802,8 @@ public:
 		player.gmNote("GM", command(), args[0], args[1]);
 
 		///LOCALIZE
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s warning %s: %s", player.callsign(), target->callsign(), args[1]));
+		PREP_CHAT_MSG(cmsg, "%s warning %s: %s", player.callsign(), target->callsign(), args[1]);
+		chatDispatchGMMessage("INFO", cmsg);
 
 		target->notifyOtherIfAFK(player);
 
@@ -2783,7 +2813,8 @@ public:
 
 		// Add the relevant note
 		std::string note = args[1];
-		wwiiEscapeString(note);
+                DBThread::EscapeString(note);
+
 		if ( note.length() > 400 )
 			note.resize(400);
 		DBThread::Do(DBThread::Default, "CALL wwii.p_add_player_note('%s', %u, 3, '%s')", target->callsign(), player.playerID(), note.c_str());

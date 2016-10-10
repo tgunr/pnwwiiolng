@@ -13,7 +13,13 @@
 // How long can a message be in bytes?
 #define MAX_MESSAGE_LENGTH	600
 // How many bits does it take to describe that?
-#define MAX_MESSAGE_LENGTH_BITS	9
+#define MAX_MESSAGE_LENGTH_BITS	10
+// Make sure MAX_IRC_LEN is less thatn MAX_MESSAGE_LENGTH
+#define MAX_IRC_LEN         512
+
+#if (MAX_IRC_LEN >= MAX_MESSAGE_LENGTH)
+#error MAX_IRC_LEN not compatible with MAX_MESSAGE_LENGTH
+#endif
 
 #define MAX_PRINTABLE_LENGTH 4096
 #define MAX_CHANNEL_NAME_LENGTH	80

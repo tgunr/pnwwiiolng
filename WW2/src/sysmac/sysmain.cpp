@@ -93,10 +93,9 @@ int sysmain()
     {
         frames++;
 		ddpEngine(NULL);
-#ifdef IS_DEBUG
-        if ( frames % 100 == 0 )
-        {
-            //printf( "%.1f\n", 1000.0/gFPS );
+#ifdef DEBUG_WW2
+        if ( frames % 100 == 0 ) {
+            Write_Debug( "%.1f\n", 1000.0/gFPS );
         }
 #endif
     }
@@ -250,7 +249,7 @@ void sysmainAddArchives()
 
   if ( ! foundthem )
   {
-		piExitProgram(__FILE__, __LINE__, "No archives found");
+		piExitProgram(_FL, "No archives found");
   }
  */
 }

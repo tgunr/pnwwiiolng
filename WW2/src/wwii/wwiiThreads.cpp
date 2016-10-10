@@ -47,6 +47,8 @@ private:
 public:
 	DBQueueThread() : PNThread(), m_conn(nullptr), m_id(0) {}
 	~DBQueueThread();
+	
+	DB::handle_t*  getConn() {return m_conn;}
 
 	void start(uint32_t id_) {
 		m_id = id_ + 1;
@@ -63,9 +65,8 @@ static LOG_QUEUE logQueue;
 static size_t logQueueMax, logQueuePushes;
 static std::mutex logQueueMutex;
 
-static ConditionQueue<DBThreadQuery> dbQueue;
-DBQueueThread dbThread[NUM_HELPER_THREADS];
-
+static ConditionQueue<DBThreadQuery> dbQueue; 
+DBQueueThread dbThread[NUM_HELPER_THREADS]; 
 typedef std::pair<THREAD_CALLBACK*, void*> CALLBACK_INFO;
 typedef std::vector<CALLBACK_INFO*> CALLBACK_QUEUE;
 static CALLBACK_QUEUE callbackQueue;
@@ -354,6 +355,27 @@ DBThreadQuery::Queue()
 	// The dbQueue version of push_back uses mutex exclusion
 	dbQueue.push_back(this);
 }
+
+void
+DBThread::EscapeString(DB::handle_t* conn, std::string& text)
+{
+    char *tempBuff = new char[text.length()*2+1];
+    mysql_real_escape_string(conn, tempBuff, text.c_str(), text.length());
+    text = tempBuff;
+    delete tempBuff;
+}
+
+void
+DBThread::EscapeString(std::string& text)
+{
+    char *tempBuff = new char[text.length()*2+1];
+    dbQueue.doLocked([&] {
+        mysql_real_escape_string(dbThread[0].getConn(), tempBuff, text.c_str(), text.length());
+    });
+    text = tempBuff;
+    delete tempBuff;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // Perform a query on an unformatted string.

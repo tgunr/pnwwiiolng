@@ -58,7 +58,9 @@ static UINT32 IAC_JOYSTICK_POV_N[IAC_MAX_JOYSTICKS][IAC_JOYSTICK_POV_MAX]  =
 
 static LOGICAL AddToQueue(UINT32 iac, SINT32 count, LOGICAL state);
 
+#ifndef DEBUG_WW2
 #define IN_WINDOW_MOUSE
+#endif
 
 static void InitTrackIR();
 static void GetTrackIRInput();
@@ -89,20 +91,11 @@ SINT32 j;
 		return(FALSE);
 	}
 
-#if defined(_DEBUG)
 	dipSetupKeyboard();
-// now we use the define at the head of the file or syscfg
 #ifdef IN_WINDOW_MOUSE
 	dipSetupMouse();
-#endif	// IN_WINDOW_MOUSE
+#endif
 	dipSetupJoystick();
-#else	// _DEBUG
-	dipSetupKeyboard();
-//#ifndef VEHICLE_OBJECT_ANALYSIS
-	dipSetupMouse();
-//#endif	// VEHICLE_OBJECT_ANALYSIS
-	dipSetupJoystick();
-#endif	// _DEBUG
 
 	for(i = 0; i < NUM_IAC_QUEUE_ENTRIES; i++)
 	{

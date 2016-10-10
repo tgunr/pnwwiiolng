@@ -238,12 +238,6 @@ static LOGICAL SetupVariables(void)
 		return(FALSE);
 	}
 
-    // Temp for now until added to configuration
-#if platOS != OS_MACOS
-	OS_MKDIR(PREPATH);
-	fiodSetPrepath(PREPATH);
-#endif
-
 	rnlogoInit();
 
 	piSetAmbLight(piRGBA_MAKE(51, 51, 51, 255));
@@ -400,7 +394,7 @@ static bool _connectClientToGameNetwork()
 		fprintf(stderr, "NETWORK ERROR: %s", UTF8(message.c_str()));
 #endif
 
-		piExitProgram(__FILE__, __LINE__, UTF8(message.c_str()));
+		piExitProgram(_FL, UTF8(message.c_str()));
 		return false;
 	}
 
@@ -430,7 +424,6 @@ LOGICAL rnmainInit(void)
 
     uiSoundInit();
 	uiInit();
-	//cfgPrefsLoad(); // now called from sysmain > WinMain
 	dimainInit();
 
 #if platOS == OS_WIN32

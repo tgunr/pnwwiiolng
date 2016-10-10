@@ -86,19 +86,19 @@ _banSuccess(void* data)
 	if ( issuer != nullptr )
 	{
 		// Tell the issuer they were successful
-		const char* p;
 		Chat::Name banned(ban->m_handle);
+		char msg[MAX_MESSAGE_LENGTH+1];
 		if ( ban->m_duration == 0 )
-			p = chatMakeTempString("%s has force-kicked %s: %s", issuer->callsign(), banned.c_str(), ban->m_message.c_str());
+			snprintf(msg, MAX_MESSAGE_LENGTH, "%s has force-kicked %s: %s", issuer->callsign(), banned.c_str(), ban->m_message.c_str());
 		else
-			p = chatMakeTempString("%s has issued a %s ban(#%u) on %s: %s"
+			snprintf(msg, MAX_MESSAGE_LENGTH, "%s has issued a %s ban(#%u) on %s: %s"
 						, issuer->callsign()
 						, chatTimeInterval(ban->m_duration)
 						, ban->m_banNo
 						, banned.c_str()
 						, ban->m_message.c_str()
 			);
-		chatDispatchGMMessage("INFO", p);
+		chatDispatchGMMessage("INFO", msg);
 	}
 
 	if ( ban->m_duration == 0 )
@@ -126,6 +126,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 	char* p = nullptr;
 	Chat::Name name(ban.m_handle);
 	Chat::Name issuer(ban.m_issuerHandle);
+	char    *message = nullptr;
 
 	try
 	{
@@ -133,17 +134,20 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 		threadLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, issuer.c_str(), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, name.c_str());
 
-		std::string message(ban.m_message);
-		wwiiEscapeString(message);
-
+		message = new char[strlen(ban.m_message.c_str())*2 + 1];
+        	mysql_real_escape_string(conn, message, ban.m_message.c_str(), ban.m_message.length());
+		
 		// p_ban_player ( playerID, banFor, banBy, reason ) returns either
 		// 0, <reason>
 		// 1, <#bans>
 		static const char QRY_CALL_BAN_PLAYER[] = "CALL wwii.p_ban_player ('%s', %u, %u, '%s')";
 
-		p = threadsPrintf(QRY_CALL_BAN_PLAYER, name.c_str(), ban.m_duration, ban.m_issuer, message.c_str());
+		p = threadsPrintf(QRY_CALL_BAN_PLAYER, name.c_str(), ban.m_duration, ban.m_issuer, message);
 		DBQuery q(conn, p);
 
+		delete message;
+		message = nullptr;
+	
 		playerid_t playerID = 0;
 		if ( q.HasRows() && q.FetchRow() )
 			playerID = q.Row().NextUInt();
@@ -161,6 +165,9 @@ _processBan(DB::handle_t* conn, BAN& ban)
 	}
 	catch (std::exception& e)
 	{
+		if (message != nullptr)
+			delete message;
+
 		ban.m_message = e.what();
 		threadCallback(_banFail, &ban);
 		threadLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, name.c_str(), e.what());
