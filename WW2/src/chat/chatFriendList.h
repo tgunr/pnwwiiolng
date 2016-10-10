@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-using ARGV = std::vector<const char*>;
+#include "chat/chatArgv.h"
 
 // Fetch the friends list for a player in the background
 void chatFetchFriendsAndIgnoreList(class Player* player);
@@ -17,5 +17,4 @@ void chatFetchFriendsAndIgnoreList(class Player* player);
 void chatFriendsList(class Player& player);
 
 // Modify a player's social list; add or remove the named players
-void chatModifySocialList(class Player& player, ARGV& args, bool ignore);
-
+void chatModifySocialList(class Player& player, Chat::ARGV& args, bool ignore);

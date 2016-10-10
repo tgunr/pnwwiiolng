@@ -54,6 +54,8 @@
 extern void serverBroadcastClusterShutdown();
 extern void chatSendChatLog(const playerid_t subjectID, const ChatHandle requester);
 
+using Chat::ARGV;
+
 //////////////////////////////////////////////////////////////////////
 // Private variables
 

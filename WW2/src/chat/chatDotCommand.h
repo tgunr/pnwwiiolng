@@ -12,6 +12,7 @@
 #include "chat/chatClientMessage.h"
 #include "chat/chatGroupsType.h"
 #include "chat/chatLStringIDs.h"
+#include "chat/chatArgv.h"
 
 #define MAX_INT_REP  10
 
@@ -49,8 +50,6 @@ public:
 	bool isHidden() const;
 };
 
-using ARGV = std::vector<const char*>;	//!< Vector of arguments.
-
 //////////////////////////////////////////////////////////////////////
 //! DotCommand class. Encapsulates a constructor which defines the
 //! "rules" (permission masks) for access to the command, and the "action"
@@ -67,6 +66,7 @@ public:
 
 public:
 	using Usages = std::vector<std::unique_ptr<DotUsage>>;
+
 protected:
 	Usages m_usages;
 	CHAT_GROUPS m_groups;
@@ -87,7 +87,7 @@ public:
 	static DotCommandIndex* index();
 
 	//! Transforms an incoming argument string into an ARGV (vector of arguments).
-	static int vectorize(char* source, ARGV& dest, int maxArguments, bool translateSpaces=false);
+	static int vectorize(char* source, Chat::ARGV& dest, int maxArguments, bool translateSpaces=false);
 
 	// Accessors
 	const char* command() const { return m_command.c_str(); }

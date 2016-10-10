@@ -30,6 +30,8 @@
 #include "include/mydbQuery.h"
 #include "wwii/wwiiDBThreads.h"
 
+using Chat::ARGV;
+
 static SquadList*
 _findClientSquadList(const Player& player)
 {

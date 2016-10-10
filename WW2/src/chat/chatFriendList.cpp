@@ -15,8 +15,9 @@
 #include "chat/chatPlayer.h"
 #include "include/mydbQuery.h"
 #include "wwii/wwiiDBThreads.h"
+#include "chat/chatFriendList.h"
 
-using ARGV = std::vector<const char*>;
+using Chat::ARGV;
 
 //	------------------------------	Classes
 

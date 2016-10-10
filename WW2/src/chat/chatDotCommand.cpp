@@ -30,6 +30,8 @@
 #include "chat/chatHostPlayerIndex.h"
 #include "chat/chatLStringErr.h"
 
+using Chat::ARGV;
+
 static Teul::Packet* g_commandListPacket = nullptr;
 
 DotCommand* g_commands;

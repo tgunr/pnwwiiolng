@@ -42,6 +42,8 @@
 #include "wwii/wwiiRank.h"
 #include "weap/weapSpec.h"
 
+using Chat::ARGV;
+
 //////////////////////////////////////////////////////////////////////
 // Private variables
 
