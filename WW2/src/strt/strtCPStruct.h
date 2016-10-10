@@ -13,14 +13,12 @@
 #include "wwii/wwiiHCUnits.h"
 #include "strt/strtDTL.h"
 #include "weap/weapDefs.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 #include "strt/strtCPFlags.h"
 #include "inst/instDescriptor.h"
 
 class EWSReport;
 struct WEAPON_SERIAL;
-class StratHCUnit;
-
-using HCUIDX_ITERATOR = HCUNIT_INDEX::iterator;
 
 // Unit describing a player's request: <PlayerID,TimeStamp>
 using PLAYER_REQUESTS = std::pair<UINT32,UINT32>;

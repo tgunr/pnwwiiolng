@@ -12,6 +12,7 @@
 #include "include/luaGlue.h"
 #include "wwii/wwiiIRC.h"
 #include "teul/teulConfigVar.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 
 extern std::vector<const char*> script_args;
 
@@ -564,11 +565,6 @@ Lua::Results()
 {
 	return _luaOutput;
 }
-
-class HCUnit;
-class StratHCUnit;
-using HCUNIT_INDEX = std::map<UINT32, HCUnit*>;
-using HCUIDX_ITERATOR = HCUNIT_INDEX::iterator;
 
 UINT16 getHCiID(const HCUIDX_ITERATOR* it)
 {

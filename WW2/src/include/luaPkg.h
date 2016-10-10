@@ -3,7 +3,7 @@
 
 class FacilityStruct;
 
-using HCUIDX_ITERATOR = std::map<UINT32, HCUnit*>::iterator;
+#include "wwii/wwiiHCUnitsIndex.h"
 
 //tolua_begin
 FacilityStruct* strtGetFacilityByName(const char* name);

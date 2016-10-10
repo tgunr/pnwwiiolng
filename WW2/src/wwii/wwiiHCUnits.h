@@ -10,14 +10,13 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include <map>
+
+#include "chat/chatHandle.h"
 #include "mm/mmEnums.h"
 #include "wwii/wwiiFullObjID.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 #include "wwii/wwiiOwnershipEnums.h"
-#include <map>
-#include "chat/chatHandle.h"
-
-class HCUnit;
-using HCUNIT_INDEX = std::map<UINT32,HCUnit*>;
 
 //tolua_begin
 enum HCUNIT_TYPE
