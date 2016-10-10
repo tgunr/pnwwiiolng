@@ -392,7 +392,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 	return 0;
 }
 
-SINT32 sdmCloseFile(void)
+void sdmCloseFile()
 {
 	header.numCPs = currentCP = 0;
 	header.numFacilities = currentFacility  = 0;
@@ -411,8 +411,6 @@ SINT32 sdmCloseFile(void)
 		memFree(currentData);
 		currentData = nullptr;
 	}
-
-	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////

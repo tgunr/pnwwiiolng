@@ -208,14 +208,13 @@ void persHUDHideHUD(bool close)
 
 void persHudReceivedUpdate()
 {
-	SINT32 i;
 	static SINT32 _LastUpdateTime;
 
 	if (frametime == _LastUpdateTime) return;
 
 	if(abs(frametime - _LastUpdateTime) < HOST_UPDATE_INTERVAL)
 	{
-		for (i=_UPDATE_METER_COUNT-2;i >= 0;i--)
+		for (SINT32 i=_UPDATE_METER_COUNT-2;i >= 0;i--)
 			_ReceivedUpdateDeltas[i+1] = _ReceivedUpdateDeltas[i];
 
 		_ReceivedUpdateDeltas[0] = frametime - _LastUpdateTime;

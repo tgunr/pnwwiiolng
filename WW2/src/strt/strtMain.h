@@ -26,7 +26,7 @@ extern LOGICAL strtMain(UINT32 currentTime);
 extern const char* HostLanguage;
 
 //Broadcasts the CP_STATUS messages for every cp to everybody
-extern LOGICAL strtBroadcastCPs(void);
+extern void strtBroadcastCPs();
 
 extern CPStruct* strtGetCPList();
 extern Supercell* strtGetCellList();

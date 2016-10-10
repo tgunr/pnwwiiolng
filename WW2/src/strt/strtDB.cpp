@@ -61,7 +61,7 @@ strtInitDB()
 
 	srand((UINT32)teulClock64);
 
-	if ( ! dbGetWWIIConfig(dbh) )
+	if ( ! dbGetWWIIConfig() )
 		dbugLog(_FLA, "No configuration from database");
 
 #ifdef IS_STRAT_HOST

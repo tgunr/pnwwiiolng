@@ -12,9 +12,6 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-extern SINT32 	sizeOfOneTime;
-extern SINT32 	sizeOfFirstTime;
-
 extern SINT32	updtPackInit();
 
 extern SINT32 updtPackWORLD_UPDATE(const LOGICAL mode , UCHAR* data, SINT32 offset, struct WORLD_UPDATE* const wu, SINT32 size);
@@ -36,4 +33,3 @@ extern SINT32 updtPackVehicleBroadcast(LOGICAL mode, UCHAR* data, SINT32 offset,
 
 extern UINT32 g_framingMode;
 extern UINT32 g_hostUpdateInterval;	// Time in MS between host updates
-extern UINT32 m_lastPing;

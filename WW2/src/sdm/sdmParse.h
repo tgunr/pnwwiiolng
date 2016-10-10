@@ -54,7 +54,7 @@ extern UINT32 sdmGetTotalStratObjects();
 extern UINT32 sdmGetMaxStratId();
 
 //closes file and frees all memory used by parser
-extern SINT32 sdmCloseFile(void);
+extern void sdmCloseFile();
 
 // Clean up after the SDM routines and exit it
 // there were any cumulatively fatal errors.

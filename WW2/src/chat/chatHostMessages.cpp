@@ -99,8 +99,6 @@
 #include "chat/chatPreference.h"
 #include "chat/chatCellXfer.h"
 
-using MOBILE_SPAWN_WAYPOINT = teul_network_object<MobileSpawnWaypoint>;
-
 TEUL_CALLBACK*	CHAT_SEND_MESSAGE;
 TEUL_CALLBACK*	CHAT_XCHG_SERVER_TRACKED_OBJS;
 

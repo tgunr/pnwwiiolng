@@ -176,21 +176,11 @@ strtMain(UINT32 currentTime)
 	return TRUE;
 }
 
-LOGICAL
-strtBroadcastCPs(void)
+void
+strtBroadcastCPs()
 {
-	CPStruct* cp;
-
-	if ( _cpList == nullptr )
-		return FALSE;
-
-	for ( cp = _cpList; cp != nullptr; cp = cp->next )
-	{
-		//Send the CP status
+	for ( auto cp = _cpList; cp != nullptr; cp = cp->next )
 		strtQueueCPStatus(cp);
-	}
-
-	return TRUE;
 }
 
 CPStruct*

@@ -142,7 +142,7 @@ dbUpdateWWIIConfigValue(const char* varName, const char* value, const char* mods
 
 // Function for obtaining the current host_config values
 bool
-dbGetWWIIConfig(DBHANDLE& dbh)
+dbGetWWIIConfig()
 {
 	static bool hasRun = false;
 	if ( !hasRun )
