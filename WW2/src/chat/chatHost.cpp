@@ -220,13 +220,13 @@ extern bool chatUpdateHCUnitLocations();
 
 struct TUNE_COMMAND
 {
-	using CALLBACK = bool(*)(Player& player, UCHAR index);
+	using Callback = bool(*)(Player& player, UCHAR index);
 
 	ChatHandle			matchHandle_;
-	CALLBACK			callback_;
+	Callback			callback_;
 	PermissionMask		perms_;
 
-	TUNE_COMMAND(const char* name, CALLBACK callback, PermissionMask perms=0ULL)
+	TUNE_COMMAND(const char* name, Callback callback, PermissionMask perms=0ULL)
 		: matchHandle_(chatGetLowercaseHandle(name))
 		, callback_(callback)
 		, perms_(perms)
