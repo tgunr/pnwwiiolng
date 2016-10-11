@@ -80,7 +80,7 @@ def configure_file(src, dst, substitutions):
     with tempfile.NamedTemporaryFile(mode='wt', delete=False) as ftmp:
         with open(src, 'rt') as fin:
             for line in fin:
-                for replKey, replVal in substitutions.iteritems():
+                for replKey, replVal in substitutions.items():
                     line = line.replace(r'${%s}' % replKey, replVal.replace("\r\n", "\n"))
                 ftmp.write(line)
         ftmp.close()
@@ -97,7 +97,7 @@ def update_infoplist(substitutions):
         'GitShaHash': substitutions['GIT_COMMITISH'], 'GitState': substitutions['GIT_STATE'],
         'CFBundleShortVersionString': substitutions['PRODUCT_VERSION'], 'CFBundleVersion': substitutions['PRODUCT_VERSION']
     }
-    for pkey, pval in plist_subs.iteritems():
+    for pkey, pval in plist_subs.items():
         get_command_output('plutil -replace "%s" -string "%s" "%s"' % (pkey, pval, infoplist_path))
     get_command_output('plutil -convert xml1 "%s"' % infoplist_path)
 
