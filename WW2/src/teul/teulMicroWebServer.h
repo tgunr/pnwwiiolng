@@ -59,7 +59,9 @@ namespace Teul
 			VirtualFileHandlers m_virtualFileHandlers;
 			std::string m_resourceList;
 
+		public:
 			void addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_);
+		private:
 			void processHTTPRequest(const SOCKET fd, char* const request);
 		};
 
