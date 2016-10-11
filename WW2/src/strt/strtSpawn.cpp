@@ -331,17 +331,6 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 		if ( facility->isOpen() == false )
 			throw PostRequestFail("facility closed", SPAWN_FACILITY_CLOSED);
 
-<<<<<<< HEAD
-		if ( g_logDebug )
-			dbugLog(_FLD, "p:%u c:%s br:%u m:%u post request %s @ %s"
-						, request.customerID
-						, Chat::Name(request.handle).c_str()
-						, request.brigadeID
-						, request.missionID
-						, weapPrintName(request.weapon)
-						, facility->name
-						);
-=======
         dbugLog(_FLD, "p:%u c:%s br:%u m:%u post request %s @ %s"
                     , request.customerID
                     , Chat::Name(request.handle).c_str()
@@ -350,7 +339,6 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
                     , weapPrintName(&request.weapon)
                     , facility->name
                     );
->>>>>>> feature/DEV-762_HockeyApp
 
 		UINT32 supplyUnitID = strtGetSupplyingUnit(*facility, request.brigadeID);
 		if ( supplyUnitID == 0 )
