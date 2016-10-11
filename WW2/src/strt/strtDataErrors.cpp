@@ -247,7 +247,7 @@ strtReportDataErrors(UINT32 level)
 		if ( errorMap.empty() )
 			continue;
 
-		dbugLog(_FLIB, "\n============================================================================\n"
+		dbugLog(_FLI, "\n============================================================================\n"
 						"[%s] "
 						"%s"
 						"\n============================================================================\n"
@@ -280,7 +280,7 @@ strtReportDataErrors(UINT32 level)
 
 			if ( list.size() + detail.size() > 77 )
 			{
-				dbugLog(_FLAB, "  %s\n", list.c_str());
+				dbugLog(_FLA, "  %s", list.c_str());
 				list = "";
 			}
 
@@ -291,9 +291,9 @@ strtReportDataErrors(UINT32 level)
 		}
 
 		if ( list.empty() == false )
-			dbugLog(_FLAB, "  %s\n", list.c_str());
+			dbugLog(_FLA, "  %s", list.c_str());
 
-		dbugLog(_FLIB, "\n");
+		dbugLog(_FLI, "");
 	}
 
 	return errors;

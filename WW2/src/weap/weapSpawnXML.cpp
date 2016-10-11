@@ -87,7 +87,7 @@ XML_TAG_HANDLER_IMPL(DoWeapon)
 		char *elText;
 		if (xmlGetNodeValue(node, XML_DATA_STRING, &elText, nullptr))
 		{
-			dbugLog(_FLIB, "weapon:%s ", elText);
+			dbugLog(_FLI, "weapon:%s ", elText);
 			WEAPON* weap = weapLookupWeaponByName(elText);
 			if ( weap == nullptr )
 			{
@@ -122,7 +122,7 @@ XML_TAG_HANDLER_IMPL(DoClass)
 				classes.insert(spec);
 
 				// Stack it up for later consumption
-				dbugLog(_FLIB, "class:%s ", elText);
+				dbugLog(_FLI, "class:%s", elText);
 	
 				// Now add the spawnlist for all spawn lists of this class into our list
 				for ( auto spawn = g_weaponSpawns.begin(), end = g_weaponSpawns.end(); spawn != end; ++spawn )
@@ -138,8 +138,6 @@ XML_TAG_HANDLER_IMPL(DoClass)
 						weaponList->insert(*it);
 					}
 				}
-
-				dbugLog(_FLIB, ", ");
 			}
 		}
 	}
