@@ -686,8 +686,7 @@ char GetOSBuild()
 	}
 
 #if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
-	static const int DBUGLOG_MODE = LOG_TO_FILE;
-	dbugInit(DBUGLOG_MODE, "wwiiClient");
+	dbugInit(LogMode::TO_FILE, "wwiiClient");
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
 	if (OpenConsole) {
@@ -696,8 +695,7 @@ char GetOSBuild()
 		freopen("CONOUT$", "wb", stderr);
 	}
 #else
-	static const int DBUGLOG_MODE = LOG_OFF;
-	dbugInit(DBUGLOG_MODE, "wwiiClient");
+	dbugInit(LogMode::OFF, "wwiiClient");
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
 #endif
