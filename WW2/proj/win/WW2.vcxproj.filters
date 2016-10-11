@@ -2687,7 +2687,6 @@
     <ClCompile Include="..\..\src\ob\obinfo.cpp">
       <Filter>ob</Filter>
     </ClCompile>
-    <ClCompile Include="build_info.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiPPOLoader.cpp">
       <Filter>wwii</Filter>
     </ClCompile>

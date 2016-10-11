@@ -1980,7 +1980,6 @@
     <ClCompile Include="..\..\src\scen\ScenarioManager.cpp" />
     <ClCompile Include="..\..\src\scen\scenLua.cpp" />
     <ClCompile Include="..\..\src\scen\scenMain.cpp" />
-    <ClCompile Include="build_info.cpp" />
   </ItemGroup>
   <ItemGroup>
     <OMGGen Include="..\..\src\omg\omgChat.omg" />
