@@ -16,7 +16,7 @@
 #define stricmp strcasecmp
 #endif
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 #define strlcpy strncpy
 #endif
 

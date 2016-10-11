@@ -1,7 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 #include "xml/XMLLoader2.h"
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 #include "ui/uiMain.h" // for ui fio callbacks
 #endif
 
@@ -71,7 +71,7 @@ const char* xmlGetStringFromNode(xmlNode* node, const char* attribute)
 	return (xmlGetNodeValue(node, XML_DATA_STRING, &str, attribute)) ? str: "";
 }
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 // lame match functions are everywhere
 static int xmlinputmatch(const char* filename) { return 1; }
 

@@ -287,7 +287,7 @@ XMLLoader2<T>::XMLLoader2(const char* path, int flags, bool uiFio) :
     _path(path),
     _handlerReturnScope(NODE)
 {
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 	if(_uiFio)
 		xmlRegisterUIFIO();
 	else
@@ -448,7 +448,7 @@ void XMLLoader2<T>::Reset()
 	Finish();
 
 	// re-init the io callbacks
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 	if(_uiFio)
 		xmlRegisterUIFIO();
 	else
