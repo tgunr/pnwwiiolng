@@ -260,7 +260,7 @@ _playerReleasePersona(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, 
 static void
 _playerDeleteAuth(PlayerStatusNode* psn)
 {
-	if ( psn->inAuth )
+	if (psn->inAuth)
 	{
 		authDeleteDispatch(&psn->dispatch());
 		psn->inAuth = false;
@@ -1264,7 +1264,7 @@ Server::HeartBeat::process()
 
 		server->stats = *this;
 		_updateServerStats(server);
-
+		
 		if ( statusChange )
 		{
 			dbugLog(_FLN, "status update for %s server %s status %d numPlayers %d maxPlayers %d"
@@ -1872,7 +1872,24 @@ void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SI
 	exit(0);
 }
 
-void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERROR_FUNCTION errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
+static bool
+_serverUsesBroadcast(const SERVER_TYPE serverType)
+{
+	switch ( serverType) {
+		case CONTROLLER_HOST:
+		case AUTH_HOST:
+		case DBD_HOST:
+		case EXIT_SERVER:
+		case MAX_SERVER_TYPE:
+			return false;
+		break;
+		default:
+			return true;
+		break;
+	}
+}
+
+void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
 {
 	Server::serverType = serverType_;
 	Teul::SetAppName(appName);
@@ -1939,7 +1956,7 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERR
 
 	_initAddresses();
 
-	if ( Server::IsBroadcastViaController() )
+	if ( _serverUsesBroadcast(serverType) && Server::IsBroadcastViaController() )
 		_connectToController();
 
 	dbugLog(_FLI, "%s started, compiled %s %s", appName, __DATE__, __TIME__);
