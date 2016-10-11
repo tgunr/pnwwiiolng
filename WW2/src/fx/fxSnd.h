@@ -119,7 +119,7 @@ extern LOGICAL fxSndFreeChannel(FXSOUND* lpSnd);
 extern LOGICAL fxSndGetSoundPos(FXSOUND* lpSnd, piVECTOR* pVec);
 extern LOGICAL fxSndInit();
 extern LOGICAL fxSndInitSound(SINT32 iID);
-extern LOGICAL fxSndKill();
+extern void fxSndKill();
 extern LOGICAL fxSndLoadSound(FXSOUND* lpSnd);
 extern LOGICAL fxSndSetExternalVolume(FLOAT32 fVolume);
 extern LOGICAL fxSndFreeSoundsIfNecessary();

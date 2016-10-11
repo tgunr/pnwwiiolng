@@ -505,7 +505,7 @@ extern SINT32 gr2AnimDeathFlags();
 extern LOGICAL	gr2AnimInit ();
 extern void	gr2AnimKill ();
 
-extern LOGICAL gr2AnimKillObject (OBJECT* pObject);
+extern void gr2AnimKillObject (OBJECT& pObject);
 extern LOGICAL gr2AnimInitShadow(OBJECT* pObject);
 extern LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pMain, UINT32 Flags);
 
