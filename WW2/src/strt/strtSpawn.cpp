@@ -336,7 +336,7 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
                     , Chat::Name(request.handle).c_str()
                     , request.brigadeID
                     , request.missionID
-                    , weapPrintName(&request.weapon)
+                    , weapPrintName(request.weapon)
                     , facility->name
                     );
 
