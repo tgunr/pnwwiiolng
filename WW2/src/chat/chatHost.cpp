@@ -3588,7 +3588,6 @@ main(int argc, const char* argv[])
 	chatInitDB();
 
 	dbGetWWIIConfig();
-	chatLoadPPOXML();
 	specLoader.loadSpecMap();
 
 	chatSetUnitMotd(SYSTEM_MOTD_UNIT, DEFAULT_SYS_MOTD);
