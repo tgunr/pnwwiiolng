@@ -226,6 +226,9 @@ public:
 		return ( p ) ? p : "";
 	}
 
+	template<size_t N>
+	const char* NextString(char (&dest)[N]) { return NextString(dest, N); }
+
 	const char* NextString(char* destination, size_t maxLen);
 
 	SINT32 NextSInt()
