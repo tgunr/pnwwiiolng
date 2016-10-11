@@ -632,7 +632,6 @@ void fiodmkdir(const char* path)
 
 #endif
 }
-#endif
 
 // ------------------------------
 
@@ -694,6 +693,7 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool /* userdir */)
   return(retval == 0);
 }
 #endif
+#endif  // CLIENT
 
 // ------------------------------
 
