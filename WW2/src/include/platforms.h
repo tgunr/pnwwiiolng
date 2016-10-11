@@ -154,16 +154,6 @@ static inline void OS_CLOSESOCKET(SOCKET sock) { close(sock); }
 
 #endif
 
-//////////////////////////////////////////////////////////////////////////////
-// Some common definitions
-
-// Cross-platform path builder.
-template<size_t bufSize>
-UINT32 pathprintf(char (&buf)[bufSize], const char* lhs, const char* rhs)
-{
-	return strprintf<bufSize>(buf, "%s/%s", lhs, rhs);
-}
-
 #ifndef PATH_MAX
 #define PATH_MAX 256
 #endif
