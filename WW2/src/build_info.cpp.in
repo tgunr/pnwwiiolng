@@ -33,7 +33,7 @@
 #include "syscfg.h"
 
 #include "build_info.hpp"
-#include "platforms.h"
+#include "include/platforms.h"
 
 // __attribute__((used)) prevents the compiler from dead-stripping these values
 // under Clang/GCC. With MSVC we have to use the much more annoying #pragma.
