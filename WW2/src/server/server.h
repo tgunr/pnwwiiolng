@@ -20,8 +20,6 @@ UINT32 serverGetMaxClusterUsers();
 #include "wwii/wwiiServerTypeEnums.h"
 void serverEnableDebugWebServer(SERVER_TYPE offset);
 
-void serverInitAddresses();
-
 void serverOpenBroadcastIndexes();
 
 void serverBroadcastHostConfig();

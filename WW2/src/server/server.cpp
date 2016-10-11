@@ -950,6 +950,24 @@ _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 }
 
 //////////////////////////////////////////////////////////////////////
+// Populate the Server: ... address fields
+
+static void
+_initAddresses()
+{
+	Server::myServerInfo.stats.arenaID = cv_arenaID.GetUint32();
+
+	Server::broadcastNet = cv_baseAddress.GetUint32();
+	if ( Server::IsBroadcastViaController() )
+		dbugLog(_FLI, "Server peering arena %u via controller at %s", Server::myServerInfo.stats.arenaID, cv_baseAddress.GetString());
+	else
+		dbugLog(_FLI, "Server peering arena %u via broadcast network %s", Server::myServerInfo.stats.arenaID, cv_baseAddress.GetString());
+
+	Server::localHost = Server::myInterface.addr[0].ip;
+	Server::broadcastHost = Server::BroadcastMaskAddress(Server::localHost);
+}
+
+//////////////////////////////////////////////////////////////////////
 // Server functions.
 
 SINT32
@@ -967,7 +985,7 @@ serverInit(UINT32 appVersion
 {
 	if ( Server::myServerInfo.stats.arenaID == 0 )
 	{
-		LogAbort("arenaID not specified [didn't call serverInitAddresses first?]");
+		LogAbort("arenaID not specified [didn't call _initAddresses first?]");
 		/*ABORT*/
 	}
 
@@ -1587,24 +1605,6 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 	return -EINVAL;
 }
 
-//////////////////////////////////////////////////////////////////////
-// Populate the Server: ... address fields
-
-void
-serverInitAddresses()
-{
-	Server::myServerInfo.stats.arenaID = cv_arenaID.GetUint32();
-
-	Server::broadcastNet = cv_baseAddress.GetUint32();
-	if ( Server::IsBroadcastViaController() )
-		dbugLog(_FLI, "Server peering arena %u via controller at %s", Server::myServerInfo.stats.arenaID, cv_baseAddress.GetString());
-	else
-		dbugLog(_FLI, "Server peering arena %u via broadcast network %s", Server::myServerInfo.stats.arenaID, cv_baseAddress.GetString());
-
-	Server::localHost = Server::myInterface.addr[0].ip;
-	Server::broadcastHost = Server::BroadcastMaskAddress(Server::localHost);
-}
-
 static bool _broadcastRxConnected = false;
 
 static void
@@ -1826,7 +1826,7 @@ int main(int argc, const char* argv[])
 
 	memInit();
 
-	serverInitAddresses();
+	_initAddresses();
 
 	extern void serverMain();
 	serverMain();
@@ -1849,7 +1849,7 @@ ServerBase::ServerBase(SERVER_TYPE serverType_, const char* serverName_)
 	if ( teulInitTransport(LogMode::TO_FILE, m_serverName, s_ErrorDelegate, nullptr) < 0 )
 		LogAbort("Can't initialize transport.");
 
-	serverInitAddresses();
+	_initAddresses();
 }
 
 void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SINT32 size_, const TEUL_CALLBACK* const object_, SINT32 error_)
@@ -1937,7 +1937,7 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERR
 
 	serverEnableDebugWebServer(serverType);
 
-	serverInitAddresses();
+	_initAddresses();
 
 	if ( Server::IsBroadcastViaController() )
 		_connectToController();
