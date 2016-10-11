@@ -247,7 +247,7 @@ authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch
 			passwordMatch = row.NextUInt();
 			isActive = row.NextUInt();
 			gamecookie.m_customerID = row.NextUInt();
-			row.NextString(gamecookie.m_callsign, sizeof(gamecookie.m_callsign));
+			row.NextString(gamecookie.m_callsign);
 			haveInfo = row.NextUInt();
 
 			if ( gamecookie.m_callsign[0] == 0 )
@@ -440,9 +440,9 @@ _getAppTable()
 
 			entry.appID = row.NextUInt();
 			entry.gameID = row.NextUInt();
-			row.NextString(entry.appleID, sizeof(entry.appleID));
+			row.NextString(entry.appleID);
 			entry.description[0] = 0;
-			row.NextString(entry.description, sizeof(entry.description));
+			row.NextString(entry.description);
 			if ( entry.description[0] == 0 )
 				sprintf(entry.description, "Unkown Game#%u/%u", entry.appID, entry.gameID);
 		}
@@ -482,7 +482,7 @@ static bool _initAppInfoTable(GAME& gameEntry)
 		gameEntry.appInfo[i].min = gameEntry.curHostVersion;
 	}
 
-	sprintf(statement, QRY_SELECT_HOST_VERSIONS_BY_APPHOST, gameEntry.appID, teulGetAddress(gameEntry.curHostVersion));
+	strprintf(statement, QRY_SELECT_HOST_VERSIONS_BY_APPHOST, gameEntry.appID, teulGetAddress(gameEntry.curHostVersion));
 	try
 	{
 		DBQuery q(dbh, statement);
@@ -677,7 +677,7 @@ bool authInitGameEntry(GAME& gameEntry)
 	 if (appEntry == nullptr)
 	 	return false;
 
-	memcpy(gameEntry.appleID, appEntry->appleID, APPLE_ID_LEN);
+	strsafecpy(gameEntry.appleID, appEntry->appleID);
 
 	try
 	{
@@ -698,9 +698,9 @@ bool authInitGameEntry(GAME& gameEntry)
 		gameEntry.clusterID = row.NextUInt();
 		gameEntry.usePlayerID = (row.NextString()[0] == 'p');
 		gameEntry.description[0] = 0;
-		row.NextString(gameEntry.description, sizeof(gameEntry.description));
-		if ( gameEntry.description[0] == 0 )
-			sprintf(gameEntry.description, "Unk.Game#%u/%u", gameEntry.gameID, gameEntry.clusterID);
+		row.NextString(gameEntry.description);
+		if ( gameEntry.description[0] == 0 ) {
+			strprintf(gameEntry.description, "Unk.Game#%u/%u", gameEntry.gameID, gameEntry.clusterID);
 	}
 	catch ( std::exception& e )
 	{
