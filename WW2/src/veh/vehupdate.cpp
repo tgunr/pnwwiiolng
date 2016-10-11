@@ -2491,8 +2491,7 @@ void _playWeaponFireSound(const char* sound,
 	if (p != distSound.npos)
 	{
 		distSound.replace(distSound.begin() + p, distSound.end(), "_distant.wav");
-        int fd = fioOpen(distSound);
-        
+        int fd = fioOpen(distSound.c_str());
         fioClose(fd);
 		if (fd != -1)
 		{
