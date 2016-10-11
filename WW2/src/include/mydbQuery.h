@@ -226,7 +226,6 @@ public:
 		return ( p ) ? p : "";
 	}
 
-	// NOTE: Does not ensure null-byte placement
 	const char* NextString(char* destination, size_t maxLen);
 
 	SINT32 NextSInt()
