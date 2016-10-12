@@ -671,13 +671,14 @@ _getPlayerTable(GAME& gameEntry)
 //////////////////////////////////////////////////////////////////////
 bool authInitGameEntry(GAME& gameEntry)
 {
-	APP_TABLE_ENTRY* appEntry;
-
-	 appEntry = _findAppTable(gameEntry.appID);
-	 if (appEntry == nullptr)
+	const APP_TABLE_ENTRY* appEntry = _findAppTable(gameEntry.appID);
+	if (appEntry == nullptr) {
+		dbugLog(_FLM, "appID %d not found in appTable", gameEntry.appID);
 	 	return false;
+	}
 
 	strsafecpy(gameEntry.appleID, appEntry->appleID);
+	dbugLog(_FLD, "appID %d is %s", gameEntry.appID, gameEntry.appleID);
 
 	try
 	{
@@ -701,6 +702,9 @@ bool authInitGameEntry(GAME& gameEntry)
 		row.NextString(gameEntry.description);
 		if ( gameEntry.description[0] == 0 ) {
 			strprintf(gameEntry.description, "Unk.Game#%u/%u", gameEntry.gameID, gameEntry.clusterID);
+			dbugLog(_FLM, "game entry for arenaID %u has no description, using default: %s"
+							, gameEntry.arenaID, gameEntry.description);
+		}
 	}
 	catch ( std::exception& e )
 	{
@@ -712,8 +716,10 @@ bool authInitGameEntry(GAME& gameEntry)
 				, gameEntry.gameID,gameEntry.groupID,gameEntry.clusterID
 				, gameEntry.usePlayerID,  gameEntry.description);
 
-	if ( gameEntry.usePlayerID && !_getPlayerTable(gameEntry) )
+	if ( gameEntry.usePlayerID && !_getPlayerTable(gameEntry) ) {
+		dbugLog(_FLW, "gameEntry %d uses playerIDs but has no player table!", gameEntry.appID);
 		return false;
+	}
 
 	return _initAppInfoTable(gameEntry);
 }
