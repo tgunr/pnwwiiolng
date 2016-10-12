@@ -1889,9 +1889,9 @@ _serverUsesBroadcast(const SERVER_TYPE serverType)
 	}
 }
 
-void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
+void Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
 {
-	Server::serverType = serverType_;
+	Server::serverType = myType;
 	Teul::SetAppName(appName);
 
 	// Windows requires us to enable networking (WSAStartup) early on
@@ -1952,11 +1952,11 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERRO
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
 
-	serverEnableDebugWebServer(serverType);
+	serverEnableDebugWebServer(myType);
 
 	_initAddresses();
 
-	if ( _serverUsesBroadcast(serverType) && Server::IsBroadcastViaController() )
+	if ( _serverUsesBroadcast(myType) && Server::IsBroadcastViaController() )
 		_connectToController();
 
 	dbugLog(_FLI, "%s started, compiled %s %s", appName, __DATE__, __TIME__);
