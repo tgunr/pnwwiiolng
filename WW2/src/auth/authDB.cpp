@@ -473,15 +473,13 @@ _findAppTable(UINT32 appID)
 //////////////////////////////////////////////////////////////////////
 static bool _initAppInfoTable(GAME& gameEntry)
 {
-	SCHAR statement[512];
-	SINT32 i, platform;
-
-	for ( i = 0; i < OS_MAX_PLAT; i++)
+	for ( auto i = 0; i < OS_MAX_PLAT; i++)
 	{
 		gameEntry.appInfo[i].max = gameEntry.curHostVersion;
 		gameEntry.appInfo[i].min = gameEntry.curHostVersion;
 	}
 
+	char statement[512];
 	strprintf(statement, QRY_SELECT_HOST_VERSIONS_BY_APPHOST, gameEntry.appID, teulGetAddress(gameEntry.curHostVersion));
 	try
 	{
@@ -497,13 +495,12 @@ static bool _initAppInfoTable(GAME& gameEntry)
 		while ( q.FetchRow() )
 		{
 			auto& row = q.Row();
-			platform = (SINT32)atol(row[0]);
-
-			if ( platform < 0 || platform > OS_MAX_PLAT)
+			size_t platform = row.NextUInt();
+			if ( platform < 0 || platform >= OS_MAX_PLAT )
 				throw std::logic_error("illegal platform value in app_host_versions");
 
-			teulGetHost(row[1], &gameEntry.appInfo[platform].min);
-			teulGetHost(row[2], &gameEntry.appInfo[platform].max);
+			teulGetHost(row.NextString(), &gameEntry.appInfo[platform].min);
+			teulGetHost(row.NextString(), &gameEntry.appInfo[platform].max);
 		}
 
 		return true;
