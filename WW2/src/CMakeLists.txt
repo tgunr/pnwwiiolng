@@ -487,7 +487,7 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     map/mapHost.cpp map/mapHostMessages.cpp map/mapHostMessages.h
     map/mapMinuteBalance.cpp map/mapMinuteBalance.h
     map/mapPack.cpp
-    map/mapPlayer.cpp map/mapPlayer.h map/mapPlayerTypes.h
+    map/mapPlayer.cpp map/mapPlayer.h map/mapPlayerTypes.h omg/omgChat.hxx
     miss/missionTypes.h miss/missionPacket.h miss/missFlags.h
     wwii/wwiiPlayer.h mm/mmEnums.h wwii/wwiiRank.h weap/weapSerial.h
     omg/omgMissionSortieData.cxx omg/omgMissionSortieData.hxx
@@ -680,7 +680,7 @@ ADD_EXECUTABLE( testUnits
     tests/testTeulBits.cpp tests/testAuthQueue.cpp auth/authClientData.cpp
     tests/testChatHandle.cpp tests/testFullObjID.cpp tests/testCommandWithArgs.cpp
     tests/testInplaceVector.cpp tests/testPackers.cpp comm/commPackers.cpp
-    tests/testChatMissionStatus.cpp tests/testHostGridCell.cpp host/hostGridCell.cpp
+    tests/testChatMissionStatus.cpp omg/omgChat.hxx tests/testHostGridCell.cpp host/hostGridCell.cpp
     tests/testSupercellVislevelXfer.cpp tests/testPersonaXfer.cpp tests/testCryptographer.cpp
     tests/testXYZTuple.cpp tests/testTeulPacket.cpp
     wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChat.cxx omg/omgChat.hxx
