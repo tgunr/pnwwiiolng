@@ -20,7 +20,7 @@ IF ( PN_USE_SYSTEM_MYSQL OR APPLE )
 	IF (WIN32)
 		STRING(REGEX REPLACE "\\+" "/" SystemDrive "$ENV{SystemDrive}")
 		STRING(REGEX REPLACE "\\+" "/" ProgramFiles "$ENV{ProgramFiles}")
-		IF (CMAKE_BITNESS EQUAL 8)
+		IF (CMAKE_BITNESS EQUAL 64)
 			# At time of writing: Windows cmake is built as a 32-bit binary,
 			# so it sees "Program Files (x86)" even when building 64-bit.
 			STRING(REGEX REPLACE " *\\(x86\\)" "" ProgramFiles "${ProgramFiles}")
