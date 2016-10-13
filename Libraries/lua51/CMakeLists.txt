@@ -2,6 +2,11 @@ PROJECT ( Lua51 )
 CMAKE_MINIMUM_REQUIRED ( VERSION 2.8.3 )
 INCLUDE_DIRECTORIES( include )
 
+IF ( NOT MSVC AND PN_BUILD_32BIT )
+	SET(CMAKE_CXX_FLAGS "-m32")
+	SET(CMAKE_C_FLAGS "-m32")
+ENDIF ( )
+
 SET ( LUA_CORE_SRCS
     src/lapi.c src/lcode.c src/ldebug.c src/ldo.c src/ldump.c src/lfunc.c
     src/lgc.c src/llex.c src/lmem.c src/lobject.c  src/lopcodes.c
