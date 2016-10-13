@@ -86,7 +86,7 @@ FILE( TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" _PLAYNET )
 OPTION( PN_DIFFERENT_PORTS	"Use different public-facing ports for game servers." ON )
 
 # Default to 64-bit on Windows for now
-IF ( !WIN32 )
+IF ( NOT WIN32 )
 	OPTION( PN_BUILD_32BIT		"Enable 32-bit build" ON )
 ELSE()
 	OPTION( PN_BUILD_32BIT		"Enable 32-bit build" OFF )
