@@ -19,10 +19,10 @@ IF ( MSVC )
         "/nologo" "/MT" "/Gm"
     )
 
-    IF ( CMAKE_BITNESS EQUAL 32 )
-        ADD_COMPILE_OPTIONS( "/arch:SSE2" )
-    ELSE()
+    IF ( BUILD_BITNESS EQUAL 64 )
         ADD_COMPILE_OPTIONS( "/arch:AVX" )
+    ELSE()
+        ADD_COMPILE_OPTIONS( "/arch:SSE2" )
     ENDIF()
 
     IF ( CMAKE_BUILD_TYPE MATCHES Debug )
@@ -77,10 +77,8 @@ ELSE()
     ENDIF()
     LINK_LIBRARIES( "-lpthread" )
 
-    IF ( CMAKE_BITNESS EQUAL 32 )
+    IF ( BUILD_BITNESS EQUAL 32 )
         ADD_COMPILE_OPTIONS( "-m32" )
-    ELSE()
-        ADD_COMPILE_OPTIONS( "-m64" )
     ENDIF()
 
 ENDIF()

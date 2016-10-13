@@ -31,7 +31,6 @@ SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11" CACHE STRING "" FORCE )
 
 ####################################
 ## Determine bitness
-MARK_AS_ADVANCED( CMAKE_BITNESS )
 
 IF ( CMAKE_SIZEOF_VOID_P EQUAL 4 )
 	SET( CMAKE_BITNESS 32 )
@@ -41,7 +40,8 @@ ELSE ()
 	MESSAGE( FATAL_ERROR "Unknown CMAKE_SIZEOF_VOID_P value ${CMAKE_SIZEOF_VOID_P}" )
 ENDIF ()
 
-MESSAGE( STATUS "Build is ${CMAKE_BITNESS}-bit" )
+MARK_AS_ADVANCED( CMAKE_BITNESS BUILD_BITNESS )
+MESSAGE( STATUS "Build is $BUILD_BITNESS}-bit" )
 
 ####################################
 ## Executable names
@@ -93,6 +93,12 @@ ELSE()
 	MARK_AS_ADVANCED( PN_BUILD_32BIT )
 ENDIF()
 
+IF ( CMAKE_BITNESS EQUAL 64 AND NOT PN_BUILD_32BIT )
+	SET(BUILD_BITNESS 64)
+ELSE ( )
+	SET(BUILD_BITNESS 32)
+ENDIF ( )
+
 ####################################
 ## Provide platform and server defines
 IF(WIN32)
@@ -107,7 +113,7 @@ ADD_DEFINITIONS ( "-DAS_SERVER=1" )
 
 ####################################
 ## Status output
-MESSAGE( STATUS "${CMAKE_BUILD_TYPE} build, ${CMAKE_BITNESS}-bit." )
+MESSAGE( STATUS "${CMAKE_BUILD_TYPE} build, ${BUILD_BITNESS}-bit." )
 
 ####################################
 ## Generate config.h

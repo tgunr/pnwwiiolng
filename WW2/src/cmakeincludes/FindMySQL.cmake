@@ -141,12 +141,12 @@ ELSE()
 	IF ( WIN32 )
 		FIND_LIBRARY( MYSQL_LIBRARIES
 			NAMES libmysql mysqlclient
-			PATHS ${LIBRARIES_DIR}/mysql/lib/win${CMAKE_BITNESS}
+			PATHS ${LIBRARIES_DIR}/mysql/lib/win${BUILD_BITNESS}
 		)
 	ELSE()
 		FIND_LIBRARY( MYSQL_LIBRARIES
 			NAMES mysqlclient_r libmysqlclient_r
-			PATHS ${LIBRARIES_DIR}/mysql/lib/lin${CMAKE_BITNESS}
+			PATHS ${LIBRARIES_DIR}/mysql/lib/lin${BUILD_BITNESS}
 		)
 		SET( MYSQL_LIBRARIES ${MYSQL_LIBRARIES} dl )
 	ENDIF()
