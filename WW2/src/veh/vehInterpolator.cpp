@@ -10,9 +10,20 @@
 
 #include "veh/vehmain.h"
 
+
+namespace {
+	using FrameTime = InfantryPredictor::FrameTime;
+	using Update = InfantryPredictor::Update;
+
+	// Make the real and predicted positions match in this many milliseconds.
+	const InfantryPredictor::FrameTime interp_time = 300;
+}
+
+//------------------------------------------------------------------------------
+
 namespace {
 	// Copies position-related data.
-	void CopyPositionData(vehInterpolator::Update& lhs, const vehInterpolator::Update& rhs) {
+	void CopyPositionData(Update& lhs, const Update& rhs) {
 		lhs.pos = rhs.pos;
 		lhs.dir = rhs.dir;
 		lhs.vel = rhs.vel;
@@ -20,12 +31,7 @@ namespace {
 	}
 }
 
-//==============================================================================
-
-namespace {
-	// Make the real and predicted positions match in this many milliseconds.
-	const InfantryPredictor::FrameTime interp_time = 300;
-}
+//------------------------------------------------------------------------------
 
 InfantryPredictor::InfantryPredictor(vehVehicle* v)
 : _vehicle(v) {
@@ -83,7 +89,7 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 // and writing something new just isn't on the table right now.
 // NOTE: Largely taken from fpFPSAreaChecks().
 namespace {
-	void CheckCollisions(InfantryPredictor::Update& update, fpTPSPoseType pose) {
+	void CheckCollisions(Update& update, fpTPSPoseType pose) {
 		// HACK: Guarantee the FPS colliders have been set up.
 		InitColliderGeometry();
 
@@ -211,7 +217,7 @@ namespace {
 
 //--------------
 
-const InfantryPredictor::Update& InfantryPredictor::Interpolate(FrameTime frametime) {
+const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 	if ( frametime == real_pos.frametime )
 		return real_pos;
 
