@@ -61,11 +61,6 @@ private:
 	// Used to smooth the transition when updates are received.
 	FrameTime interp_beg, interp_end;
 	CubicSpline spline;
-
-	// We're waiting for a message with at least this timestamp before resetting.
-	// Used when the last message we received was really far behind,
-	// usually the result of some sort of network trouble.
-	Timestamp waiting_since;
 };
 
 typedef InfantryPredictor vehInterpolator;

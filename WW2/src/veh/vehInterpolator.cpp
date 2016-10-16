@@ -16,10 +16,7 @@ namespace {
 	using Update = InfantryPredictor::Update;
 
 	// Make the real and predicted positions match in this many milliseconds.
-	const FrameTime interp_time = 300;
-
-	// A message is considered old if it's more than this many frames behind our current state.
-	const FrameTime old_message_threshhold = 150;
+	const InfantryPredictor::FrameTime interp_time = 300;
 }
 
 //------------------------------------------------------------------------------
@@ -37,25 +34,13 @@ namespace {
 //------------------------------------------------------------------------------
 
 InfantryPredictor::InfantryPredictor(vehVehicle* v)
-: _vehicle(v)
-, waiting_since(-1) {
+: _vehicle(v) {
+	prev_msg.frametime = curr_msg.frametime = -1;
 }
 
 //------------------------------------------------------------------------------
 
 void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametime) {
-	if ( waiting_since == 0 ) {
-		if ( timestamp < curr_msg.timestamp - old_message_threshhold ) {
-			waiting_since = curr_msg.timestamp;
-			return;
-		}
-	} else {
-		if ( timestamp < waiting_since )
-			return;
-	}
-
-	//--------------
-
 	prev_msg = curr_msg;
 
 	curr_msg.timestamp = timestamp;
@@ -74,11 +59,10 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 	CopyPositionData(pred_pos, curr_msg);
 	pred_pos.animationFlags = curr_msg.animationFlags;
 
-	if ( waiting_since != 0 ) {
-		// This is the first update we've received since marking outselves as waiting.
+	if ( prev_msg.frametime == -1 ) {
+		// This is the first update we've received
 		pred_pos = real_pos = prev_msg = curr_msg;
-		real_pos.frametime = -1; // HACK: To guarantee Interpolate() is called on the next update.
-		waiting_since = 0;
+		real_pos.frametime = -1; // HACK: To guarantee Interpolate() is called on our first update.
 	} else if ( curr_msg.timestamp < prev_msg.timestamp ) {
 		// Because the timestamp is sent over the network as
 		// a uint16, it will rollover every ~65 seconds.
