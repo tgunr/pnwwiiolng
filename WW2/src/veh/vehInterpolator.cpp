@@ -188,9 +188,9 @@ namespace {
 					// on the other client somewhat to handle the heavy lifting until we can get to
 					// generalizing the collision/gravity code.
 
-					if ( abs(this_push.x()) > abs(push.x()) )
+					if ( fabs(this_push.x()) > fabs(push.x()) )
 						push.x() = this_push.x();
-					if ( abs(this_push.y() > abs(push.y())) )
+					if ( fabs(this_push.y()) > fabs(push.y()) )
 						push.y() = this_push.y();
 
 					break;
