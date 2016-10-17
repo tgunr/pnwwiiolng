@@ -580,7 +580,7 @@ teulCreateEndpoint(SINT32 wantIndex
 	}
 
 	newEndpoint->m_impl->m_version = Teul::VersionNumber;
-	newEndpoint->m_impl->m_cryptVersion = (newEndpoint->protocol == PROTOCOL_TCP && !newEndpoint->m_peer) ? Teul::BaseVersion : 0x0000;
+	newEndpoint->m_impl->m_cryptVersion = !newEndpoint->m_peer ? Teul::BaseVersion : 0x0000;
 	newEndpoint->m_impl->m_txCrypt.newSeed();
 	newEndpoint->m_impl->m_rxCrypt.setSeed(0ULL);
 //	newEndpoint->m_recvCrypt = newEndpoint->m_sendCrypt;
