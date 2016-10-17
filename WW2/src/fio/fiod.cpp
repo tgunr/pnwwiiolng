@@ -33,8 +33,9 @@
 # endif
 #endif
 
-#if platBuild == BUILD_SERVER
 # define FILE_URL_DESIGNATOR    "file://"
+
+#if platBuild == BUILD_SERVER
 # define os_file_path(x) (x)
 #endif
 

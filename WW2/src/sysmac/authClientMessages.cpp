@@ -88,8 +88,8 @@ TEUL_CALLBACK*
 commInstallMessage(
                    UCHAR MessageGroup
                    , UCHAR MessageNumber
-                   , ACTION_REF SendFunc
-                   , ACTION_REF ReceiveFunc
+                   , ACTION SendFunc
+                   , ACTION ReceiveFunc
                    )
 {
     Teul::CallbackInit ci;

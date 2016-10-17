@@ -504,8 +504,11 @@ SINT32	dbugGetErrno()
 #endif
 }
 
-#if platOS == OS_WIN32	// should really be a check for 'basename'
-const char* basename(const char* const filepath) noexcept
+// Believe it or not, we need this on macOS as well, because the OS-provided
+// basename() in <libgen.h> is NOT const with respect to its input, which is
+// just... yanno, bad.
+#if platOS == OS_WIN32 || platOS == OS_MACOS // should really be a check for 'basename'
+static const char* basename(const char* const filepath) noexcept
 {
 	const char* slash = strrchr(filepath, '\\');
 	if (PN_UNLIKELY(!slash))

@@ -1489,7 +1489,7 @@ void GameClient::ProcessChatWho(int type, const Chat::Who& who)
 		}
 		if ( who.extendedInfo() && who.spawned() )
 		{
-			StratDB::StratObject* so = StratDB::FindStratObject((sdm_full_obj_id&)who.nearCP());
+			StratDB::StratObject* so = StratDB::FindStratObject(who.nearCP());
 			if ( so != nullptr )
 			{
 				description += L" ";

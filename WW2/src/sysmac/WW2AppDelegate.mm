@@ -560,7 +560,11 @@ extern NSString *WebActionOriginalURLKey;
     // yet" state if we should crash before the next login.
     [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
     
-    dbugInit(LOG_TO_FILE, nullptr);
+#ifdef DEBUG_WW2
+    dbugInit(LogMode::TO_FILE, nullptr);
+#else
+    dbugInit(LogMode::OFF, nullptr);
+#endif
 
     // Wipe out any storage of insecure user info.
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserName"];

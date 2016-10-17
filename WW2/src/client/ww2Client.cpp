@@ -208,6 +208,8 @@ struct ClientClassData
 		int mission;
 	};
 
+    ~ClientClassData() {} // On macOS, without this line Clang produces a number of link errors. TODO: Why?
+
 	PersonaSummaries 					personas;
 	PersonaSelection 					personaselected;
 	BrigadeSelection 					brigadeselected;
