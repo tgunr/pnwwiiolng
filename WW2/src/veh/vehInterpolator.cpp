@@ -16,7 +16,9 @@ namespace {
 	using Update = InfantryPredictor::Update;
 
 	// Make the real and predicted positions match in this many milliseconds.
-	const InfantryPredictor::FrameTime interp_time = 300;
+	const FrameTime interp_time = 300;
+	// Stick to the floor if we're this far from it.
+	const FLOAT64 floor_stickiness = 0.5;
 }
 
 //------------------------------------------------------------------------------
@@ -146,8 +148,7 @@ namespace {
 						continue; // Don't let other entities mess with our prediction.
 
 					if ( (best_floor == nullptr || hit.pos.z() > best_floor->pos.z()) &&
-					     // Only count if it forces us out of the ground.
-					     hit.pos.z() > update.pos.z ) {
+					     hit.pos.z() > update.pos.z - floor_stickiness ) {
 						best_floor = &hit;
 					}
 					break;
@@ -228,14 +229,18 @@ const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 	pred_pos.frametime = frametime;
 	pred_pos.timestamp += (frametime - pred_pos.frametime);
 
+
 	if ( frametime < interp_end ) {
-		// TODO: A lot of this is still mostly from the old interpolator and could use some cleanup.
 		double t = (double)(frametime - interp_beg) / (double)(interp_end - interp_beg);
 		assert ( 0.0 <= t && t <= 1.0 );
 		if ( t < 0.0 ) t = 0.0;
 		if ( t > 1.0 ) t = 1.0;
 
+		FLOAT64 prev_z = real_pos.pos.z;
 		real_pos.pos = spline.InterpolatePoint(t);
+		// HACK: The predicted position we interpolate to doesn't take gravity into account,
+		// so ignore the interpolated height unless it has us heading downward.
+		real_pos.pos.z = std::min(prev_z, real_pos.pos.z);
 
 		FLOAT64VECTOR vel = spline.InterpolateDt(t);
 		mathScaleVector(&vel, &vel, 1000.0/interp_time);
@@ -266,12 +271,9 @@ const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 		CopyPositionData(real_pos, pred_pos);
 	}
 
-	// Collisions are best addressed through the predictions, but our height isn't
-	// actually handled with any of that. The bit of lag isn't actually that big of
-	// a deal except when going up slopes since we'll visibly clip into the floor
-	// before the up-to-date height gets sent to us.
 	CheckCollisions(real_pos, (fpTPSPoseType)flags.pose);
-	// TODO: Gravity prediction.
+	// TODO: Floor stickiness applies to falling models as well as normal walking ones.
+
 
 	// Override motion flags to match what the player's seeing.
 	if ( flags.movement <= TPS_MOVETYPE_IDLE && real_pos.speed >= .1 ) {
@@ -296,8 +298,7 @@ const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 	}
 	real_pos.animationFlags = flags.pack();
 
-	// We should now match the predicted position, although it
-	// may actually be slightly different due to smoothing.
+
 	real_pos.frametime = pred_pos.frametime;
 	real_pos.timestamp = pred_pos.timestamp;
 
