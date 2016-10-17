@@ -38,6 +38,7 @@ public:
 	};
 
 	InterpolatorBase(vehVehicle* v=0);
+    virtual ~InterpolatorBase() = default;
 
 	virtual void NewPosDataUpdate(int timestamp_, int frametime_) = 0;
 	virtual Update const& Interpolate(int frametime_) = 0;
@@ -57,6 +58,7 @@ public:
 	typedef int FrameTime; // The time on this end.
 
 	InfantryPredictor(vehVehicle* v = nullptr);
+    virtual ~InfantryPredictor() = default;
 
 	void NewPosDataUpdate(Timestamp timestamp, FrameTime frametime) override;
 	const Update& Interpolate(FrameTime frametime) override;
@@ -82,6 +84,7 @@ class InfantryInterpolator : public InterpolatorBase
 public:
 
 	InfantryInterpolator(vehVehicle* v=0);
+    virtual ~InfantryInterpolator() = default;
 
 	void NewPosDataUpdate(int timestamp_, int frametime_) override;
 	Update const& Interpolate(int frametime_) override;
