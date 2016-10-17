@@ -320,7 +320,7 @@ bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, in
 {
 	bool retVal = allowed;
 
-	dbugLog(_FLD, "checkList(list:%d, vehclass=%d, vehtype=%d, allowed=%d, setValue=%d",
+	dbugLog(_FLD, "checkList(list:%lu, vehclass=%d, vehtype=%d, allowed=%d, setValue=%d",
 		tlist.size(), vehclass, vehtype, allowed, setValue);
 
 	// first lets see if this vehicle class/type is being spacifically mentioned
@@ -360,7 +360,7 @@ bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, in
 				break;
 		}
 
-		delete tempClassName;
+		delete[] tempClassName;
 	}
 
 	return retVal;
