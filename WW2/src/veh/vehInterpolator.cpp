@@ -41,7 +41,7 @@ namespace {
 	// and writing something new just isn't on the table right now.
 	// NOTE: Largely taken from fpFPSAreaChecks().
 	namespace {
-		void CheckCollisions(Update& update, fpTPSPoseType pose) {
+		void CheckCollisions(Update& update, fpTPSPoseType pose, bool falling = false) {
 			// HACK: Guarantee the FPS colliders have been set up.
 			InitColliderGeometry();
 
@@ -97,8 +97,12 @@ namespace {
 						     colliderIsType(category_bits, COLLIDER_WALK) )
 							continue; // Don't let other entities mess with our prediction.
 
+						FLOAT64 min_height = update.pos.z;
+						if ( ! falling )
+							min_height -= floor_stickiness;
+
 						if ( (best_floor == nullptr || hit.pos.z() > best_floor->pos.z()) &&
-						     hit.pos.z() > update.pos.z - floor_stickiness ) {
+						     hit.pos.z() > min_height ) {
 							best_floor = &hit;
 						}
 						break;
@@ -244,6 +248,7 @@ void InfantryPredictor::NewMessageReceived(Timestamp timestamp, FrameTime framet
 void InfantryPredictor::UpdateInterpolation(void) {
 	CopyPositionData(pred_pos, curr_msg);
 	pred_pos.animationFlags = curr_msg.animationFlags;
+	pred_pos.pos += pred_pos.vel * ((curr_msg.frametime - pred_pos.frametime) / 1000.0);
 
 	// If the message was sent just as they started moving, the soldier will
 	// slowly walk based on the slower speed used in the prediction, then
@@ -258,6 +263,7 @@ void InfantryPredictor::UpdateInterpolation(void) {
 		pred_pos.vel = *mathNormalize(&pred_pos.vel) * new_speed;
 		pred_pos.speed = new_speed;
 	}
+
 
 	const Update& from = real_pos;
 	Update to = pred_pos;
@@ -280,8 +286,9 @@ void InfantryPredictor::UpdateInterpolation(void) {
 
 	// TODO: It's very unlikely, but we may end up on the other
 	// side of a wall/floor after the interp_time has passed.
-	gr2AnimBitPacker flags(to.animationFlags);
-	CheckCollisions(to, (fpTPSPoseType)flags.pose);
+	// TEMP: Removed pending performance improvements.
+	//gr2AnimBitPacker flags(to.animationFlags);
+	//CheckCollisions(to, (fpTPSPoseType)flags.pose);
 
 	spline.SetControlPointsWithDt(from.pos, v1, to.pos, v2);
 
@@ -298,7 +305,7 @@ const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 	gr2AnimBitPacker flags(pred_pos.animationFlags);
 
 	pred_pos.pos += pred_pos.vel * ((frametime - pred_pos.frametime) / 1000.0);
-	CheckCollisions(pred_pos, (fpTPSPoseType)flags.pose);
+	//CheckCollisions(pred_pos, (fpTPSPoseType)flags.pose);
 	pred_pos.frametime = frametime;
 	pred_pos.timestamp += (frametime - pred_pos.frametime);
 
@@ -344,9 +351,7 @@ const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 		CopyPositionData(real_pos, pred_pos);
 	}
 
-	CheckCollisions(real_pos, (fpTPSPoseType)flags.pose);
-	// TODO: Floor stickiness applies to falling models as well as normal walking ones.
-
+	CheckCollisions(real_pos, (fpTPSPoseType)flags.pose, flags.movement & TPS_MOVETYPE_FALL);
 
 	// Override motion flags to match what the player's seeing.
 	if ( flags.movement <= TPS_MOVETYPE_IDLE && real_pos.speed >= .1 ) {
