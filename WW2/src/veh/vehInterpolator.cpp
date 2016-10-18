@@ -308,8 +308,8 @@ const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 
 	pred_pos.pos += pred_pos.vel * ((frametime - pred_pos.frametime) / 1000.0);
 	//CheckCollisions(pred_pos, (fpTPSPoseType)flags.pose);
+	pred_pos.timestamp += (frametime - pred_pos.frametime);
 	pred_pos.frametime = frametime;
-	pred_pos.timestamp += (frametime - pred_pos.frametime); // WTF?
 
 	gr2AnimBitPacker flags(pred_pos.animationFlags);
 
