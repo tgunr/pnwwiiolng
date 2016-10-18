@@ -58,6 +58,8 @@ private:
 	FrameTime waiting_for = -1;
 	bool dirty = false;
 
+	bool is_dead = false;
+
 	// Updates based on the last info received
 	Update prev_msg, curr_msg;
 	// The predicted and real positions. Real may lag behind slightly to keep motion smooth.

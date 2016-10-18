@@ -242,6 +242,9 @@ void InfantryPredictor::NewMessageReceived(Timestamp timestamp, FrameTime framet
 	_lastUpdateYaw = _vehicle->PosData.Att.Yaw;
 	curr_msg.speed = mathExactVectorLength(&curr_msg.vel);
 	curr_msg.animationFlags = _vehicle->PosData.animationFlags;
+
+	gr2AnimBitPacker flags(curr_msg.animationFlags);
+	is_dead = flags.deathState;
 }
 
 //------------------------------------------------------------------------------
@@ -300,16 +303,15 @@ void InfantryPredictor::UpdateInterpolation(void) {
 //==============================================================================
 
 const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
-	if ( frametime == real_pos.frametime && ! dirty )
+	if ( is_dead || (frametime == real_pos.frametime && ! dirty) )
 		return real_pos;
-
-	gr2AnimBitPacker flags(pred_pos.animationFlags);
 
 	pred_pos.pos += pred_pos.vel * ((frametime - pred_pos.frametime) / 1000.0);
 	//CheckCollisions(pred_pos, (fpTPSPoseType)flags.pose);
 	pred_pos.frametime = frametime;
-	pred_pos.timestamp += (frametime - pred_pos.frametime);
+	pred_pos.timestamp += (frametime - pred_pos.frametime); // WTF?
 
+	gr2AnimBitPacker flags(pred_pos.animationFlags);
 
 	if ( frametime < interp_end ) {
 		double t = (double)(frametime - interp_beg) / (double)(interp_end - interp_beg);
