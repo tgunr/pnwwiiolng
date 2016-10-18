@@ -248,24 +248,14 @@ void InfantryPredictor::NewMessageReceived(Timestamp timestamp, FrameTime framet
 
 void InfantryPredictor::UpdateInterpolation(void) {
 	Update to = curr_msg;
-
-	// If the message was sent just as they started moving, the soldier will
-	// slowly walk based on the slower speed used in the prediction, then
-	// rubber-band to the proper position once the next message is received.
-	//
-	// To help with this, we give our prediction a little boost if the
-	// difference when they suddenly accelerate.
-	const double diff_threshhold = 1.25;
-	if ( prev_msg.speed == 0.0 || curr_msg.speed / prev_msg.speed > diff_threshhold ) {
-		double new_speed = curr_msg.speed * 1.15;
-		// TODO: Cap so we don't go above sprint speed.
-		to.vel = *mathNormalize(&to.vel) * new_speed;
-		to.speed = new_speed;
-	}
-
 	to.pos += to.vel * ((curr_msg.frametime - pred_pos.frametime) / 1000.0);
 
-	const Update& from = pred_pos;
+	Update from = pred_pos;
+	// Infantry position can change on a dime, so weaken/ignore our current speed if need be.
+	if ( mathExactVectorLength2(&from.vel) > mathExactVectorLength2(&to.vel) )
+		from.vel = (from.vel + to.vel) / 2;
+	else
+		from.vel = to.vel;
 
 	double pred_time_passed = ((interp_time - (to.frametime - from.frametime)) / 1000.0);
 	to.pos += to.vel * pred_time_passed;

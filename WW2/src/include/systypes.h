@@ -117,12 +117,18 @@ inline FLOAT64VECTOR& operator += (FLOAT64VECTOR& v1, const FLOAT64VECTOR& v2)
 //--------------
 
 inline FLOAT64VECTOR operator * (const FLOAT64VECTOR& v, double s)
-{ return { v.x * s, v.y * s, v.z * s };
-}
+{ return { v.x * s, v.y * s, v.z * s }; }
 
 inline FLOAT64VECTOR& operator *= (FLOAT64VECTOR& v, double s)
 { v = v * s; return v; }
 
+//--------------
+
+inline FLOAT64VECTOR operator / (const FLOAT64VECTOR& v, double s)
+{ return { v.x / s, v.y / s, v.z / s }; }
+
+inline FLOAT64VECTOR operator /= (FLOAT64VECTOR& v, double s)
+{ v = v / s; return v; }
 
 //==============================================================================
 
