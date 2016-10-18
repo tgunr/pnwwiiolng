@@ -42,7 +42,7 @@ public:
 
 	void NewPosDataUpdate(Timestamp timestamp, FrameTime frametime);
 	const Update& Interpolate(FrameTime frametime);
-	void SetFlags(UINT32 flags_) { real_pos.animationFlags = flags_; }
+	void SetFlags(UINT32 flags_) { pred_pos.animationFlags = flags_; }
 
 	void Copy(vehVehicle* v, UINT32 flags);
 
@@ -63,7 +63,7 @@ private:
 	// Updates based on the last info received
 	Update prev_msg, curr_msg;
 	// The predicted and real positions. Real may lag behind slightly to keep motion smooth.
-	Update pred_pos, real_pos;
+	Update pred_pos;
 
 	// Used to smooth the transition when updates are received.
 	FrameTime interp_beg, interp_end;
