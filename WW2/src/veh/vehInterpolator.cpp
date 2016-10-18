@@ -19,6 +19,8 @@ namespace {
 	const FrameTime interp_time = 300;
 	// Stick to the floor if we're this far from it.
 	const FLOAT64 floor_stickiness = 0.5;
+	// How many old an incoming message can be before we consider it out-of-date.
+	const FrameTime message_age_threshold = 200;
 }
 
 //------------------------------------------------------------------------------
@@ -31,18 +33,197 @@ namespace {
 		lhs.vel = rhs.vel;
 		lhs.speed = rhs.speed;
 	}
+
+	// !!!HACK!!!
+	// This is all really horrible and I'm not proud to write it, but the logic for
+	// this stuff is spread over so many places and makes so many assumptions that
+	// it would take ages to try to decouple it from the player-controlled soldier,
+	// and writing something new just isn't on the table right now.
+	// NOTE: Largely taken from fpFPSAreaChecks().
+	namespace {
+		void CheckCollisions(Update& update, fpTPSPoseType pose) {
+			// HACK: Guarantee the FPS colliders have been set up.
+			InitColliderGeometry();
+
+			{
+				switch ( pose ) {
+				case TPS_POSETYPE_PRONE:
+					HACK_forced_pose = POSE_PRONE; break;
+				case TPS_POSETYPE_CROUCH:
+					HACK_forced_pose = POSE_CROUCH; break;
+				case TPS_POSETYPE_STAND:
+				default:
+					HACK_forced_pose = POSE_STAND; break;
+				}
+
+				_updateFPSColliders();
+
+				HACK_forced_pose = POSE_NUM_POSES;
+			}
+
+			FPSColliderData& coldata = fpFPSGetCollider();
+			assert ( coldata.collider );
+			FPSCollider& col = *coldata.collider;
+
+			{
+				Vec3d pos = update.pos;
+				HACK_forced_pos = &pos;
+				col.Update(0);
+				HACK_forced_pos = nullptr;
+			}
+
+			const Vec3d up = Vec3d(0.0,0.0,1.0);
+			Vec3d dir = update.vel;
+			dir.z() = 0.0; // Vertical motion is much more simple.
+
+			if ( col.findCollisions(true) ) {
+				const colliderQuery::Collision* best_floor = nullptr;
+				Vec3d push(0.0, 0.0, 0.0);
+
+				const colliderQuery::CollisionList& hits = col.getCollisions();
+				for ( auto it = hits.begin() ; it != hits.end() ; ++it ) {
+					const colliderQuery::Collision& hit = *it;
+					UINT32 collide_bits = dGeomGetCollideBits(hit.g1);
+					UINT32 category_bits = dGeomGetCategoryBits(hit.g2);
+
+					switch ( collide_bits ) {
+					case WADE_COLLIDER:
+						// We don't simulate gravity right now, so this doesn't matter on our end.
+						continue;
+					case FALL_COLLIDER:
+						if ( (up * hit.normal) < 0 )
+							continue;
+						if ( colliderIsType(category_bits, COLLIDER_VEHICLE_MASK) ||
+						     colliderIsType(category_bits, COLLIDER_WALK) )
+							continue; // Don't let other entities mess with our prediction.
+
+						if ( (best_floor == nullptr || hit.pos.z() > best_floor->pos.z()) &&
+						     hit.pos.z() > update.pos.z - floor_stickiness ) {
+							best_floor = &hit;
+						}
+						break;
+					case CAGE_COLLIDER: {
+						// Scenario-only colliders.
+						if ( colliderIsType(category_bits, COLLIDER_BLOCK) ||
+						     colliderIsType(category_bits, COLLIDER_VOLUME) )
+							continue;
+
+						// If we're not really moving, don't bother to check collisions.
+						if ( dir.length2() < 0.001 )
+							continue;
+
+						double angle = dir * hit.normal;
+
+						// Lower is more forgiving, 1 means must be flat.
+						const double flat_threshold = 0.6;
+
+						// Ignore normals facing the wrong direction.
+						if ( angle > 0.1 )
+							continue;
+						// Ignore relatively flat slopes.
+						if ( up * hit.normal >= flat_threshold )
+							continue;
+						// Just ignoring downward-facing normals for the predcitor.
+						if ( hit.normal.z() < 0 )
+							continue;
+
+						dGeomID geom = dGeomTransformGetGeom(hit.g1);
+						int type = dGeomGetClass(geom);
+
+						Vec3d this_push = hit.normal;
+						this_push.z() = 0; // Again, height is handled differently.
+						this_push.normalize();
+						this_push *= hit.depth;
+
+						// We don't bother to check for conflicting push directions since we're relying
+						// on the other client somewhat to handle the heavy lifting until we can get to
+						// generalizing the collision/gravity code.
+
+						if ( fabs(this_push.x()) > fabs(push.x()) )
+							push.x() = this_push.x();
+						if ( fabs(this_push.y()) > fabs(push.y()) )
+							push.y() = this_push.y();
+
+						break;
+					}
+					default:
+						continue;
+					}
+				}
+
+				if ( best_floor )
+					update.pos.z = best_floor->pos.z();
+
+				if ( push.length2() != 0.0 ) {
+					Vec3d pos = update.pos;
+					pos += push;
+					update.pos = {pos.x(), pos.y(), pos.z()};
+				}
+			}
+
+			// Reset the collider just in case code elsewhere doesn't.
+			_updateFPSColliders();
+		}
+	}
 }
 
-//------------------------------------------------------------------------------
+//==============================================================================
 
 InfantryPredictor::InfantryPredictor(vehVehicle* v)
 : _vehicle(v) {
-	prev_msg.frametime = curr_msg.frametime = -1;
+}
+
+//==============================================================================
+
+void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametime) {
+	UpdateTimestamps(timestamp);
+
+	FrameTime adj_frame = real_pos.frametime - (real_pos.timestamp - timestamp);
+	if ( waiting_for == 0 ) {
+		if ( adj_frame < frametime - message_age_threshold ) {
+			waiting_for = real_pos.frametime;
+			return;
+		}
+	} else if ( adj_frame < waiting_for ) {
+		return;
+	}
+
+	NewMessageReceived(timestamp, adj_frame);
+
+	if ( waiting_for != 0 ) {
+		curr_msg.frametime = frametime;
+		pred_pos = real_pos = prev_msg = curr_msg;
+		waiting_for = 0;
+	}
+
+	UpdateInterpolation();
+
+	dirty = true;
 }
 
 //------------------------------------------------------------------------------
 
-void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametime) {
+void InfantryPredictor::UpdateTimestamps(Timestamp latest) {
+	// Because the timestamp is sent over the network as
+	// a uint16, it will rollover every ~65 seconds.
+	if ( latest < prev_msg.timestamp ) {
+		typedef decltype(SHARED_VEHICLE_INFO::posTimeStamp) RolloverType;
+		curr_msg.timestamp -= std::numeric_limits<RolloverType>::max();
+		prev_msg.timestamp -= std::numeric_limits<RolloverType>::max();
+		pred_pos.timestamp -= std::numeric_limits<RolloverType>::max();
+		real_pos.timestamp -= std::numeric_limits<RolloverType>::max();
+	}
+
+	// Correct our state if earlier messages were lagging behind.
+	if ( real_pos.timestamp < latest )
+		real_pos.timestamp = latest;
+	if ( pred_pos.timestamp < latest )
+		pred_pos.timestamp = latest;
+}
+
+//------------------------------------------------------------------------------
+
+void InfantryPredictor::NewMessageReceived(Timestamp timestamp, FrameTime frametime) {
 	prev_msg = curr_msg;
 
 	curr_msg.timestamp = timestamp;
@@ -56,170 +237,62 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 	_lastUpdateYaw = _vehicle->PosData.Att.Yaw;
 	curr_msg.speed = mathExactVectorLength(&curr_msg.vel);
 	curr_msg.animationFlags = _vehicle->PosData.animationFlags;
-
-	// Our prediction is always based on the latest information.
-	CopyPositionData(pred_pos, curr_msg);
-	pred_pos.animationFlags = curr_msg.animationFlags;
-
-	if ( prev_msg.frametime == -1 ) {
-		// This is the first update we've received
-		pred_pos = real_pos = prev_msg = curr_msg;
-		real_pos.frametime = -1; // HACK: To guarantee Interpolate() is called on our first update.
-	} else if ( curr_msg.timestamp < prev_msg.timestamp ) {
-		// Because the timestamp is sent over the network as
-		// a uint16, it will rollover every ~65 seconds.
-		typedef decltype(SHARED_VEHICLE_INFO::posTimeStamp) RolloverType;
-		prev_msg.timestamp -= std::numeric_limits<RolloverType>::max();
-		real_pos.timestamp -= std::numeric_limits<RolloverType>::max();
-	}
-
-	// Correct the timestamps if our earlier messages were lagging behind.
-	if ( curr_msg.timestamp < real_pos.timestamp )
-		real_pos.timestamp = curr_msg.timestamp;
-	if ( curr_msg.timestamp < pred_pos.timestamp )
-		pred_pos.timestamp = curr_msg.timestamp;
-
-	UpdateInterpolation();
 }
 
 //------------------------------------------------------------------------------
 
-// !!!HACK!!!
-// This is all really horrible and I'm not proud to write it, but the logic for
-// this stuff is spread over so many places and makes so many assumptions that
-// it would take ages to try to decouple it from the player-controlled soldier,
-// and writing something new just isn't on the table right now.
-// NOTE: Largely taken from fpFPSAreaChecks().
-namespace {
-	void CheckCollisions(Update& update, fpTPSPoseType pose) {
-		// HACK: Guarantee the FPS colliders have been set up.
-		InitColliderGeometry();
+void InfantryPredictor::UpdateInterpolation(void) {
+	CopyPositionData(pred_pos, curr_msg);
+	pred_pos.animationFlags = curr_msg.animationFlags;
 
-		{
-			switch ( pose ) {
-			case TPS_POSETYPE_PRONE:
-				HACK_forced_pose = POSE_PRONE; break;
-			case TPS_POSETYPE_CROUCH:
-				HACK_forced_pose = POSE_CROUCH; break;
-			case TPS_POSETYPE_STAND:
-			default:
-				HACK_forced_pose = POSE_STAND; break;
-			}
-
-			_updateFPSColliders();
-
-			HACK_forced_pose = POSE_NUM_POSES;
-		}
-
-		FPSColliderData& coldata = fpFPSGetCollider();
-		assert ( coldata.collider );
-		FPSCollider& col = *coldata.collider;
-
-		{
-			Vec3d pos = update.pos;
-			HACK_forced_pos = &pos;
-			col.Update(0);
-			HACK_forced_pos = nullptr;
-		}
-
-		const Vec3d up = Vec3d(0.0,0.0,1.0);
-		Vec3d dir = update.vel;
-		dir.z() = 0.0; // Vertical motion is much more simple.
-
-		if ( col.findCollisions(true) ) {
-			const colliderQuery::Collision* best_floor = nullptr;
-			Vec3d push(0.0, 0.0, 0.0);
-
-			const colliderQuery::CollisionList& hits = col.getCollisions();
-			for ( auto it = hits.begin() ; it != hits.end() ; ++it ) {
-				const colliderQuery::Collision& hit = *it;
-				UINT32 collide_bits = dGeomGetCollideBits(hit.g1);
-				UINT32 category_bits = dGeomGetCategoryBits(hit.g2);
-
-				switch ( collide_bits ) {
-				case WADE_COLLIDER:
-					// We don't simulate gravity right now, so this doesn't matter on our end.
-					continue;
-				case FALL_COLLIDER:
-					if ( (up * hit.normal) < 0 )
-						continue;
-					if ( colliderIsType(category_bits, COLLIDER_VEHICLE_MASK) ||
-					     colliderIsType(category_bits, COLLIDER_WALK) )
-						continue; // Don't let other entities mess with our prediction.
-
-					if ( (best_floor == nullptr || hit.pos.z() > best_floor->pos.z()) &&
-					     hit.pos.z() > update.pos.z - floor_stickiness ) {
-						best_floor = &hit;
-					}
-					break;
-				case CAGE_COLLIDER: {
-					// Scenario-only colliders.
-					if ( colliderIsType(category_bits, COLLIDER_BLOCK) ||
-					     colliderIsType(category_bits, COLLIDER_VOLUME) )
-						continue;
-
-					// If we're not really moving, don't bother to check collisions.
-					if ( dir.length2() < 0.001 )
-						continue;
-
-					double angle = dir * hit.normal;
-
-					// Lower is more forgiving, 1 means must be flat.
-					const double flat_threshold = 0.6;
-
-					// Ignore normals facing the wrong direction.
-					if ( angle > 0.1 )
-						continue;
-					// Ignore relatively flat slopes.
-					if ( up * hit.normal >= flat_threshold )
-						continue;
-					// Just ignoring downward-facing normals for the predcitor.
-					if ( hit.normal.z() < 0 )
-						continue;
-
-					dGeomID geom = dGeomTransformGetGeom(hit.g1);
-					int type = dGeomGetClass(geom);
-
-					Vec3d this_push = hit.normal;
-					this_push.z() = 0; // Again, height is handled differently.
-					this_push.normalize();
-					this_push *= hit.depth;
-
-					// We don't bother to check for conflicting push directions since we're relying
-					// on the other client somewhat to handle the heavy lifting until we can get to
-					// generalizing the collision/gravity code.
-
-					if ( fabs(this_push.x()) > fabs(push.x()) )
-						push.x() = this_push.x();
-					if ( fabs(this_push.y()) > fabs(push.y()) )
-						push.y() = this_push.y();
-
-					break;
-				}
-				default:
-					continue;
-				}
-			}
-
-			if ( best_floor )
-				update.pos.z = best_floor->pos.z();
-
-			if ( push.length2() != 0.0 ) {
-				Vec3d pos = update.pos;
-				pos += push;
-				update.pos = {pos.x(), pos.y(), pos.z()};
-			}
-		}
-
-		// Reset the collider just in case code elsewhere doesn't.
-		_updateFPSColliders();
+	// If the message was sent just as they started moving, the soldier will
+	// slowly walk based on the slower speed used in the prediction, then
+	// rubber-band to the proper position once the next message is received.
+	//
+	// To help with this, we give our prediction a little boost if the
+	// difference when they suddenly accelerate.
+	const double diff_threshhold = 1.25;
+	if ( prev_msg.speed == 0.0 || curr_msg.speed / prev_msg.speed > diff_threshhold ) {
+		double new_speed = curr_msg.speed * 1.15;
+		// TODO: Cap so we don't go above sprint speed.
+		pred_pos.vel = *mathNormalize(&pred_pos.vel) * new_speed;
+		pred_pos.speed = new_speed;
 	}
+
+	const Update& from = real_pos;
+	Update to = pred_pos;
+
+	double pred_time_passed = ((interp_time - (to.frametime - from.frametime)) / 1000.0);
+	to.pos += to.vel * pred_time_passed;
+
+	const double dt = interp_time / 1000.0;
+	FLOAT64VECTOR v1, v2;
+	if ( mathExactVectorLength2(&from.vel) > .001) {
+		mathScaleVector(&v1, &from.vel, dt);
+	} else {
+		mathScaleVector(&v1, &from.dir, .001);
+	}
+	if(mathExactVectorLength2(&to.vel) > .001) {
+		mathScaleVector(&v2, &to.vel, dt);
+	} else {
+		mathScaleVector(&v2, &to.dir, .001);
+	}
+
+	// TODO: It's very unlikely, but we may end up on the other
+	// side of a wall/floor after the interp_time has passed.
+	gr2AnimBitPacker flags(to.animationFlags);
+	CheckCollisions(to, (fpTPSPoseType)flags.pose);
+
+	spline.SetControlPointsWithDt(from.pos, v1, to.pos, v2);
+
+	interp_beg = from.frametime;
+	interp_end = interp_beg + interp_time;
 }
 
-//--------------
+//==============================================================================
 
 const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
-	if ( frametime == real_pos.frametime )
+	if ( frametime == real_pos.frametime && ! dirty )
 		return real_pos;
 
 	gr2AnimBitPacker flags(pred_pos.animationFlags);
@@ -302,10 +375,11 @@ const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 	real_pos.frametime = pred_pos.frametime;
 	real_pos.timestamp = pred_pos.timestamp;
 
+	dirty = false;
 	return real_pos;
 }
 
-//------------------------------------------------------------------------------
+//==============================================================================
 
 void InfantryPredictor::Copy(vehVehicle* v, UINT32 flags) {
 	InfantryPredictor* from = dynamic_cast<InfantryPredictor*>(&v->interpolator);
@@ -328,55 +402,6 @@ void InfantryPredictor::Copy(vehVehicle* v, UINT32 flags) {
 	pred_pos.dir = real_pos.dir = dir;
 
 	_vehicle->GetAnim()->twist.predictedYaw = v->GetAnim()->twist.predictedYaw;
-}
-
-//------------------------------------------------------------------------------
-
-void InfantryPredictor::UpdateInterpolation(void) {
-	// TODO: Consider skipping interpolation if extreme lag is going on.
-
-	// If the message was sent just as they started moving, the soldier will
-	// slowly walk based on the slower speed used in the prediction, then
-	// rubber-band to the proper position once the next message is received.
-	//
-	// To help with this, we give our prediction a little boost if the
-	// difference when they suddenly accelerate.
-	const double diff_threshhold = 1.25;
-	if ( prev_msg.speed == 0.0 || curr_msg.speed / prev_msg.speed > diff_threshhold ) {
-		double new_speed = curr_msg.speed * 1.15;
-		// TODO: Cap so we don't go above sprint speed.
-		pred_pos.vel = *mathNormalize(&pred_pos.vel) * new_speed;
-		pred_pos.speed = new_speed;
-	}
-
-	const Update& from = real_pos;
-	Update to = pred_pos;
-	
-	double pred_time_passed = ((interp_time - (to.frametime - from.frametime)) / 1000.0);
-	to.pos += to.vel * pred_time_passed;
-
-	const double dt = interp_time / 1000.0;
-	FLOAT64VECTOR v1, v2;
-	if ( mathExactVectorLength2(&from.vel) > .001) {
-		mathScaleVector(&v1, &from.vel, dt);
-	} else {
-		mathScaleVector(&v1, &from.dir, .001);
-	}
-	if(mathExactVectorLength2(&to.vel) > .001) {
-		mathScaleVector(&v2, &to.vel, dt);
-	} else {
-		mathScaleVector(&v2, &to.dir, .001);
-	}
-
-	// TODO: It's very unlikely, but we may end up on the other
-	// side of a wall/floor after the interp_time has passed.
-	gr2AnimBitPacker flags(to.animationFlags);
-	CheckCollisions(to, (fpTPSPoseType)flags.pose);
-
-	spline.SetControlPointsWithDt(from.pos, v1, to.pos, v2);
-
-	interp_beg = from.frametime;
-	interp_end = interp_beg + interp_time;
 }
 
 //==============================================================================

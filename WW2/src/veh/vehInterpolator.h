@@ -48,10 +48,15 @@ public:
 
 	FLOAT64 LastUpdateYaw(void) const { return _lastUpdateYaw; }
 private:
+	void UpdateTimestamps(Timestamp latest);
+	void NewMessageReceived(Timestamp timestamp, FrameTime frametime);
 	void UpdateInterpolation(void);
 
 	vehVehicle* _vehicle;
 	FLOAT64 _lastUpdateYaw = 0.0;
+	// We're waiting for a message that corresponds to at least this frame on our end.
+	FrameTime waiting_for = -1;
+	bool dirty = false;
 
 	// Updates based on the last info received
 	Update prev_msg, curr_msg;
