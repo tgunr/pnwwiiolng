@@ -90,7 +90,7 @@ namespace {
 					case WADE_COLLIDER:
 						// We don't simulate gravity right now, so this doesn't matter on our end.
 						continue;
-					case FALL_COLLIDER:
+					case FALL_COLLIDER: {
 						if ( (up * hit.normal) < 0 )
 							continue;
 						if ( colliderIsType(category_bits, COLLIDER_VEHICLE_MASK) ||
@@ -106,6 +106,7 @@ namespace {
 							best_floor = &hit;
 						}
 						break;
+					}
 					case CAGE_COLLIDER: {
 						// Scenario-only colliders.
 						if ( colliderIsType(category_bits, COLLIDER_BLOCK) ||
