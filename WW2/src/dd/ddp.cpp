@@ -47,11 +47,11 @@ static int cursorvisible;
 */
 static ATOM						wndAtom;
 
-static LOGICAL					dna;
-static LOGICAL					dss;
-static LOGICAL					state;
-static LOGICAL					resetfps;
-static LOGICAL					focus;
+static bool						dna;
+static bool						dss;
+static bool						state;
+static bool						resetfps;
+static bool						focus;
 
 static SINT32					capture;
 
@@ -97,10 +97,7 @@ static void UpdateTimes();
 
 static LOGICAL OnEraseBkgnd(HDC hDC);
 static LOGICAL OnNcActivate(LOGICAL bActive);
-#if(0)
-static LOGICAL MoveSize();
-#endif
-static LOGICAL Create(HWND hwnd);
+static bool Create(HWND hwnd);
 
 static void	Destroy();
 static void	OnClose();
@@ -125,13 +122,13 @@ void ddpSetInstance(HINSTANCE hnewInst)
 
 LOGICAL ddpInit()
 {
-	state = TRUE;
+	state = true;
 	delay = 0;
 	show = DDWND_SHOW_NONE;
-	dna = FALSE;
-	dss = FALSE;
-	resetfps = FALSE;
-	focus = FALSE;
+	dna = false;
+	dss = false;
+	resetfps = false;
+	focus = false;
 	capture = 0;
 	ddinitfunc = nullptr;
 	d3dinitfunc = nullptr;
@@ -147,7 +144,7 @@ LOGICAL ddpInit()
 
 	Write_Debug("Completed ddpInit");
 
-	return(TRUE);
+	return TRUE;
 }
 
 #if(0)
@@ -333,14 +330,14 @@ bool CreateGLContext(HDC dc)
 	return true;
 }
 
-static LOGICAL oglBegin(HWND hwnd)
+static bool oglBegin(HWND hwnd)
 {
 	PIXELFORMATDESCRIPTOR	pfd;
 
 	// Already begun
 	if (myhrc != nullptr)
 	{
-		return(TRUE);
+		return true;
 	}
 
 	if (myhdc == nullptr)
@@ -365,14 +362,14 @@ static LOGICAL oglBegin(HWND hwnd)
 		if(wglSwapIntervalEXT)
 			wglSwapIntervalEXT(NO_LOCK_TO_REFRESH);
 
-		return(TRUE);
+		return true;
 	}
 
     catch(std::exception& ex) { _initializationError(ex.what()); }
 	catch(const char* error) { _initializationError(error); }
 	catch(...) { _initializationError("[unknown error]"); }
 
-	return (FALSE);
+	return false;
 }
 
 static void oglEnd()
@@ -500,7 +497,7 @@ RECT		rect, wrect;
 	else
 	{
 		// bad flags
-		return(FALSE);
+		return FALSE;
 	}
 
 	memset(&wndClass, 0, sizeof(WNDCLASS));
@@ -517,7 +514,7 @@ RECT		rect, wrect;
 	wndAtom = RegisterClass(&wndClass);
 	if (wndAtom == 0)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	if (myflags & DDWND_FULLSCREEN)
@@ -527,7 +524,7 @@ RECT		rect, wrect;
 
 		if (!ddpSetDisplay(flags))
 		{
-			return(FALSE);
+			return FALSE;
 		}
 
 		rect.left = WantedX;
@@ -586,7 +583,7 @@ RECT		rect, wrect;
 
 	if (!myhwnd)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
     gamerect = rect;
@@ -616,7 +613,7 @@ RECT		rect, wrect;
 	if (!oglBegin(myhwnd))
 	{
 		ddpResetDisplay();
-		return(FALSE);
+		return FALSE;
 	}
 
     // post process globals dependent on GLEW if needed
@@ -628,7 +625,7 @@ RECT		rect, wrect;
 		if (!ddinitfunc())
 		{
 			Write_Debug("DD init failed");
-			return(FALSE);
+			return FALSE;
 		}
 	}
 
@@ -637,7 +634,7 @@ RECT		rect, wrect;
 		if (!d3dinitfunc())
 		{
 			Write_Debug("D3D init failed");
-			return(FALSE);
+			return FALSE;
 		}
 	}
 
@@ -675,7 +672,7 @@ RECT		rect, wrect;
 
 	if (!rnmainInit())
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
     // Lock or don't lock based on player's request in Settings app.
@@ -685,7 +682,7 @@ RECT		rect, wrect;
     if(wglSwapIntervalEXT)
 	    wglSwapIntervalEXT(gSupportSwapInterval);
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpUpdate()
@@ -694,7 +691,7 @@ LOGICAL ddpUpdate()
 	if (!state)
 	{
 		Write_Debug("State is wrong");
-		return(FALSE);
+		return FALSE;
 	}
 #else
 	if (!focus)
@@ -706,12 +703,12 @@ LOGICAL ddpUpdate()
 	if (!IsWindow(myhwnd))
 	{
 		Write_Debug("Not a window");
-		return(FALSE);
+		return FALSE;
 	}
 
 	if (IsIconic(myhwnd))
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	UpdateTimes();
@@ -722,7 +719,7 @@ LOGICAL ddpUpdate()
 	// Member draw function
 	if (!ddpDraw())
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	if (resetfps)
@@ -746,7 +743,7 @@ LOGICAL ddpUpdate()
 
 		framecount = 0;
 
-		resetfps = FALSE;
+		resetfps = false;
 	}
 
 	if (capture > 0)
@@ -757,13 +754,13 @@ LOGICAL ddpUpdate()
 
 	if (!ddpFlip())
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	// activate or deactivate the ime as needed
 	//imeUpdate();
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpFlip()
@@ -798,7 +795,7 @@ LOGICAL ddpFlip()
 		}
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpGetDDRect(RECT* rect)
@@ -806,20 +803,20 @@ LOGICAL ddpGetDDRect(RECT* rect)
 	if (myhwnd == nullptr ||
 		rect == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	GetClientRect(myhwnd, (RECT*)rect);
 	ClientToScreen(myhwnd, (LPPOINT)&rect->left);
 	ClientToScreen(myhwnd, (LPPOINT)&rect->right);
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpLockBackbuffer(BYTE** pbyte)
 {
 	//// FIXME
-	return(FALSE);
+	return FALSE;
 }
 
 void ddpUnlockBackbuffer()
@@ -835,7 +832,7 @@ LPVOID ddpGetBackbuffer()
 LOGICAL ddpGetBackbufferSurface(void** lpdds)
 {
 	//// FIXME
-	return(FALSE);
+	return FALSE;
 }
 
 LOGICAL ddpDraw()
@@ -889,20 +886,14 @@ RECT		rect;
 	return(retval);
 }
 
-LOGICAL ddpDrawNotActive(LOGICAL newdna)
+void ddpDrawNotActive(bool newdna)
 {
-LOGICAL		olddna = dna;
-
 	dna = newdna;
-	return(olddna);
 }
 
-LOGICAL ddpDisableScreenSaver(LOGICAL newdss)
+void ddpDisableScreenSaver(bool newdss)
 {
-LOGICAL		olddss = dss;
-
 	dss = newdss;
-	return(olddss);
 }
 
 static void UpdateTimes()
@@ -980,7 +971,7 @@ static UINT32	lastframecount;
 
 void ddpResetFPS()
 {
-	resetfps = TRUE;
+	resetfps = true;
 }
 
 void ddpCapture()
@@ -1006,55 +997,55 @@ SINT32 ddpGetBPP()
 LOGICAL ddpSetDDInit(DDWND_DDINITFUNC newfunc)
 {
 	ddinitfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetD3DInit(DDWND_D3DINITFUNC newfunc)
 {
 	d3dinitfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetDDRender(DDWND_DDRENDERFUNC newfunc)
 {
 	ddrenderfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetD3DRender(DDWND_D3DRENDERFUNC newfunc)
 {
 	d3drenderfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetDDKill(DDWND_DDKILLFUNC newfunc)
 {
 	ddkillfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetD3DKill(DDWND_D3DKILLFUNC newfunc)
 {
 	d3dkillfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetMouse(DDWND_MOUSEFUNC newfunc)
 {
 	mousefunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetTimer(DDWND_TIMERFUNC newfunc)
 {
 	timerfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetKeyboard(DDWND_KEYBOARDFUNC newfunc)
 {
 	keyboardfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -1069,11 +1060,11 @@ LOGICAL		retval, *running;
 
 	if (!ddpInit())
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
-	ddpDrawNotActive(FALSE);
-	ddpDisableScreenSaver(TRUE);
+	ddpDrawNotActive(false);
+	ddpDisableScreenSaver(true);
 
 	ddpSetDDInit(nullptr);//oglInit);
 	ddpSetDDRender(nullptr);//rnlogoRender);
@@ -1232,14 +1223,14 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		case SC_KEYMENU:
 			if (state)
 			{
-				return(FALSE);
+				return FALSE;
 			}
 			break;
 		case SC_SCREENSAVE:
 		{
 			if (dss)
 			{
-				return(FALSE);
+				return FALSE;
 			}
 
 			break;
@@ -1259,9 +1250,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 #endif
 
 			if (!state)
-			{
-				state = TRUE;
-			}
+				state = true;
 			break;
 		}
 		default:
@@ -1276,9 +1265,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_ENTERMENULOOP:
 	{
 		if (state)
-		{
-			state = FALSE;
-		}
+			state = false;
 
 		dipUnacquire();
 		Write_Debug("WM_ENTERMENULOOP");
@@ -1287,9 +1274,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_EXITMENULOOP:
 	{
 		if (!state)
-		{
-			state = TRUE;
-		}
+			state = true;
 
 		dipUnacquire();
 		Write_Debug("WM_EXITMENULOOP");
@@ -1298,9 +1283,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_ENTERSIZEMOVE:
 	{
 		if (state)
-		{
-			state = FALSE;
-		}
+			state = false;
 
 		dipUnacquire();
 		Write_Debug("WM_ENTERSIZEMOVE");
@@ -1311,9 +1294,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	RECT  rect;
 
 		if (!state)
-		{
-			state = TRUE;
-		}
+			state = true;
 
 		GetClientRect(myhwnd, &rect);
 		if (ddpGetWidth() != rect.right ||
@@ -1337,9 +1318,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		{
 			WantedBpp = wParam;
 			if (!state)
-			{
-				state = TRUE;
-			}
+				state = true;
 		}
 
 		Write_Debug("WM_DISPLAYCHANGE");
@@ -1417,14 +1396,12 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	return(DefWindowProc(hwnd, umsg, wParam, lParam));
 }
 
-static LOGICAL Create(HWND hwnd)
+static bool Create(HWND hwnd)
 {
-RECT					rect;
+	RECT rect;
 
 	if (hwnd == nullptr)
-	{
-		return(TRUE);
-	}
+		return true;
 
 	GetClientRect(hwnd, &rect);
 
@@ -1442,7 +1419,7 @@ RECT					rect;
 
 	Write_Debug("Completed Create");
 
-	return(TRUE);
+	return true;
 }
 
 static void Destroy()
@@ -1468,27 +1445,6 @@ static void Destroy()
 	return;
 }
 
-#if(0)
-static LOGICAL MoveSize()
-{
-LOGICAL		retval;
-
-	Destroy();
-	retval = Create(myhwnd);
-	if (!retval)
-	{
-		Write_Debug("An error was encountered in MoveSize");
-		PostMessageA(myhwnd, WM_CLOSE, 0, 0);
-	}
-
-	oglResize(WantedWidth, WantedHeight);
-
-	Write_Debug("Completed MoveSize");
-
-	return(retval);
-}
-#endif
-
 static void OnClose()
 {
 	Destroy();
@@ -1505,7 +1461,7 @@ RECT   rect;
 
 	Write_Debug("OnEraseBkgnd");
 
-	return(TRUE);
+	return TRUE;
 }
 
 static void _OnPaint()
@@ -1520,13 +1476,11 @@ static void OnSetFocus(HWND pOldWnd)
 		if (!dna)
 		{
 			if (!state)
-			{
-				state = TRUE;
-			}
+				state = true;
 		}
 	}
 
-	focus = TRUE;
+	focus = true;
 
 	dipAcquire();
 
@@ -1540,13 +1494,11 @@ static void OnKillFocus(HWND pNewWnd)
 		if (!dna)
 		{
 			if (state)
-			{
-				state = FALSE;
-			}
+				state = false;
 		}
 	}
 
-	focus = FALSE;
+	focus = false;
 
 	dipUnacquire();
 
@@ -1590,18 +1542,14 @@ static LOGICAL OnNcActivate(LOGICAL bActive)
 		if (bActive)
 		{
 			if (!state)
-			{
-				state = TRUE;
-			}
+				state = true;
 		}
 		else
 		{
 			if (!dna)
 			{
 				if (state)
-				{
-					state = FALSE;
-				}
+					state = false;
 			}
 		}
 	}
@@ -1621,7 +1569,7 @@ static LOGICAL OnNcActivate(LOGICAL bActive)
 		dipUnacquire();
 	}
 
-	Write_Debug("OnNcActivate %s", state == TRUE ? "TRUE" : "FALSE");
+	Write_Debug("OnNcActivate %s", state ? "TRUE" : "FALSE");
 
 	return(0);
 }
@@ -1633,9 +1581,7 @@ static void OnSysKeyDown(UINT nChar, UINT nFlags)
 		if (!dna)
 		{
 			if (state)
-			{
-				state = FALSE;
-			}
+				state = false;
 		}
 	}
 
@@ -1649,9 +1595,7 @@ static void OnSysKeyUp(UINT nChar, UINT nFlags)
 		if (!dna)
 		{
 			if (!state)
-			{
-				state = TRUE;
-			}
+				state = true;
 		}
 	}
 
@@ -1695,7 +1639,7 @@ SINT32					i, pixelformat, depth, accum, stencil;
 	if (pixelformat == 0)
 	{
 		Write_Debug("Unable to choose a compatible pixel format");
-		return(FALSE);
+		return FALSE;
 	}
 
 	Write_Debug("ChoosePixelFormat recommended #%d", pixelformat);
@@ -1843,10 +1787,10 @@ SINT32					i, pixelformat, depth, accum, stencil;
 	if (!SetPixelFormat(hdc, pixelformat, pfd))
 	{
 		Write_Debug("Unable to set the desired pixel format");
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetDisplay(UINT32 flags)
@@ -1921,7 +1865,7 @@ DEVMODE			testmode, presentmode;
 		if (!found)
 		{
 			Write_Debug("No compatible display mode exists");
-			return(FALSE);
+			return FALSE;
 		}
 
 		modenum += 1;
@@ -1958,7 +1902,7 @@ DEVMODE			testmode, presentmode;
 		if (!found)
 		{
 			Write_Debug("No compatible display mode exists");
-			return(FALSE);
+			return FALSE;
 		}
 
 		retval = ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, nullptr, CDS_TEST, nullptr);
@@ -1986,13 +1930,13 @@ DEVMODE			testmode, presentmode;
 			Write_Debug("DISP_CHANGE_SUCCESSFUL");
 			ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, nullptr, CDS_FULLSCREEN, nullptr);
 
-			return(TRUE);
+			return TRUE;
 		}
 
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 void ddpResetDisplay()
@@ -2002,7 +1946,7 @@ void ddpResetDisplay()
 
 LOGICAL ddpDrawToScreen(LPVOID lpdds)
 {
-	return(TRUE);
+	return TRUE;
 }
 
 DWORD GetMillisecondTick()

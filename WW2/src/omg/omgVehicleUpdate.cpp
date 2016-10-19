@@ -22,7 +22,7 @@ struct TEUL_CALLBACK* Vehicle::Update::Callback()
 	return callback;
 }
 
-bool Vehicle::Update::packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack)
+bool Vehicle::Update::packer(PackMode mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack)
 {
 	packer(mode, m_hostIndex);
 	SINT32 changeOffset = a->offset;
@@ -58,7 +58,7 @@ Vehicle::Update::Data& operator = (const Data& rhs)
 	return *this;
 }
 
-void Vehicle::Update::Data::groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void Vehicle::Update::Data::groupPacker(PackMode mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
 {
 	UINT32 fieldNo = 0;
 	oneTimeBits.packer(mode, a, lastPack, changes, fieldNo++);
@@ -109,7 +109,7 @@ Vehicle::Update::Model& operator = (const Model& rhs)
 	return *this;
 }
 
-void Vehicle::Update::Model::groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+void Vehicle::Update::Model::groupPacker(PackMode mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
 {
 	UINT32 fieldNo = 0;
 	posX.packer(mode, a, lastPack, changes, fieldNo++);

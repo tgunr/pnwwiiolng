@@ -19,7 +19,7 @@ class Supercell;
 
 // The main Strat Call that the Convoy System makes.  This is the
 // procedure that actually runs a certain amount of CPs before returning.
-extern LOGICAL strtMain(UINT32 currentTime);
+extern bool strtMain(UINT32 currentTime);
 
 //tolua_begin
 

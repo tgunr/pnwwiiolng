@@ -223,7 +223,7 @@ static SINT32 _recvMMJoinListResponse(ACTION_OBJECT* const a)
 
 static SINT32 _recvMMLeaveListResponse(ACTION_OBJECT* const a)
 {
-MM_POST_INFO_RESPONSE postInfoResponse;
+	MM_POST_INFO_RESPONSE postInfoResponse;
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postInfoResponse, sizeof(MM_POST_INFO_RESPONSE));
 
@@ -345,7 +345,7 @@ SINT32
 strtSendMMPostRequest(SINT32 connection, UINT32 customerID, const char* callsign
 					, UINT32 missionID, UINT32 brigadeID, const PermissionMask permMask
 					, const FULL_OBJ_ID facility, WEAPON_SPEC weapon
-					, LOGICAL multicrew, LOGICAL immediateSpawn)
+					, bool multicrew, bool immediateSpawn)
 {
 	MM_POST_REQUEST postRequest;
 
@@ -414,7 +414,7 @@ SINT32 strtSendMMJoinRequest(SINT32 connection, UINT32 customerID, const WEAPON_
 	return 0;
 }
 
-SINT32 strtSendMMPostInfoUpdate(SINT32 connection, UINT32 customerID, const WEAPON_SERIAL& weaponSerial, LOGICAL multicrew)
+SINT32 strtSendMMPostInfoUpdate(SINT32 connection, UINT32 customerID, const WEAPON_SERIAL& weaponSerial, bool multicrew)
 {
 	SINT32 retval;
 	MM_POST_INFO_UPDATE infoUpdate;
@@ -492,7 +492,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 }
 
 SINT32
-strtSendMMPostInfoRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, LOGICAL join)
+strtSendMMPostInfoRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, bool join)
 {
 	MM_POST_INFO_REQUEST postInfoRequest;
 
@@ -504,7 +504,7 @@ strtSendMMPostInfoRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL&
 	return teulSend(connection, _XCHG_MM_POST_INFO, &postInfoRequest);
 }
 
-SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, LOGICAL join)
+SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, bool join)
 {
 	SINT32 retval;
 	MM_POST_INFO_REQUEST postInfoRequest;

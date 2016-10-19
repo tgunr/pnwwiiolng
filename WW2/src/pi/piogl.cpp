@@ -861,7 +861,7 @@ void piLockState(SINT32 state, LOGICAL lock)
 	oglLockState(state, lock);
 }
 
-void piLockTextureState(LOGICAL lock)
+void piLockTextureState(bool lock)
 {
 	oglLockTextureState(lock);
 }

@@ -19,7 +19,7 @@ class TestPackers : public TestUnit
 public:	TestPackers() : TestUnit("TestPackers") {}
 
 	template<typename _Type>
-	bool TYPE_TEST_FUNC(LOGICAL mode, ACTION_OBJECT& a, _Type initialValue)
+	bool TYPE_TEST_FUNC(PackMode mode, ACTION_OBJECT& a, _Type initialValue)
 	{
 		_Type  value = (mode == TEUL_PACK) ? initialValue : 0;
 		a.packer(mode, &value, 0);
@@ -29,7 +29,7 @@ public:	TestPackers() : TestUnit("TestPackers") {}
 	}
 
 	SINT32
-	multiplePackerTestFunction(LOGICAL mode, UCHAR* data, SINT32 offset)
+	multiplePackerTestFunction(PackMode mode, UCHAR* data, SINT32 offset)
 	{
 		ACTION_OBJECT a;
 

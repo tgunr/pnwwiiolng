@@ -33,7 +33,7 @@ public:
 	PersonaUpdate(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 	~PersonaUpdate() {};
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) { return teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { return teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
 
 	SINT32 send();
 

@@ -34,7 +34,7 @@ UINT32 Listing::s_listingID = 0;
 // Packer for a Descriptor
 
     SINT32
-    Descriptor::packer(LOGICAL mode, ACTION_OBJECT* a)
+    Descriptor::packer(PackMode mode, ACTION_OBJECT* a)
     {
         static const SINT32 _ID_BITS = 48;
         static const SINT32 _OWNER_BITS = 64;
@@ -88,7 +88,7 @@ UINT32 Listing::s_listingID = 0;
     // Packer for a BasicStatus
     
     SINT32
-    BasicStatus::packer(LOGICAL mode, ACTION_OBJECT* const a)
+    BasicStatus::packer(PackMode mode, ACTION_OBJECT* const a)
     {
         static const SINT32 _SIDE_BITS = 12;
         
@@ -117,7 +117,7 @@ ClientStatus::ClientStatus(ACTION_OBJECT* const a)
 // Packer for a Status object
 
 SINT32
-ClientStatus::packer(LOGICAL mode, ACTION_OBJECT* const a)
+ClientStatus::packer(PackMode mode, ACTION_OBJECT* const a)
 {
 	BasicStatus::packer(mode, a);
 
@@ -140,7 +140,7 @@ Listing::Listing(ACTION_OBJECT* const a)
 // Packer for a Listing object
 
 SINT32
-Listing::packer(LOGICAL mode, ACTION_OBJECT* const a)
+Listing::packer(PackMode mode, ACTION_OBJECT* const a)
 {
     a->packer(mode, &m_result, 6);
     a->packer(mode, &m_requestID);
@@ -180,7 +180,7 @@ ListingRequest::ListingRequest(ACTION_OBJECT* const a)
 // Packer for a ListingRequest
 
 SINT32
-ListingRequest::packer(LOGICAL mode, ACTION_OBJECT* const a)
+ListingRequest::packer(PackMode mode, ACTION_OBJECT* const a)
 {
 	a->packer(mode, &m_requestID);
 	m_descriptor.packer(mode, a);
@@ -199,7 +199,7 @@ Result::Result(ACTION_OBJECT* const a)
 // Packer for a Result
 
 SINT32
-Result::packer(LOGICAL mode, ACTION_OBJECT* const a)
+Result::packer(PackMode mode, ACTION_OBJECT* const a)
 {
 	a->packer(mode, (UINT32*)(&m_status), 8);
 	m_descriptor.packer(mode, a);

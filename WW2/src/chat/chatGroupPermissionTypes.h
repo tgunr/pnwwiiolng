@@ -42,7 +42,7 @@ struct ChatPermissions
 	VEHTYPES		m_vehicleGrants;
 #endif
 
-	void packer(LOGICAL mode, ACTION_OBJECT* a)
+	void packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->packer(mode, &m_permissionMask, 0);
 		a->packer(mode, &m_limitRank[BRANCH_LAND], 0);

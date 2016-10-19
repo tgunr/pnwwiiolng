@@ -18,7 +18,7 @@ MissionInvite::MissionInvite(ACTION_OBJECT* const a)
 }
 
 SINT32
-MissionInvite::packer(LOGICAL mode, ACTION_OBJECT* a)
+MissionInvite::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_missionID, 0);
 	a->offset = wwiiPackCountry(mode, a->packed, a->offset, &m_countryID, 4);

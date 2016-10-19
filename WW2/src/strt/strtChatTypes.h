@@ -30,7 +30,7 @@ public:
 	OOBMessage(ACTION_OBJECT* const a);
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	void send();
 
 	// Used by the host
@@ -128,7 +128,7 @@ public:
 
 	SINT32 send();
 
-	SINT32 pack(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 pack(PackMode mode, ACTION_OBJECT* a);
 
 	bool describe() const;
 };

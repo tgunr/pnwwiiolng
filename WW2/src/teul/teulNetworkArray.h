@@ -240,7 +240,7 @@ public:
 	}
 
 	//! Pack/Unpack data.
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_action, 8);
 		if ( mode == TEUL_UNPACK )
@@ -303,7 +303,7 @@ private:
 		}
 
 		// 0 indicates not completed, 1 indicates end of list
-		LOGICAL endOfRun = (m_watermark < size()) ? 0 : 1;
+		bool endOfRun = !(m_watermark < size());
 
 		// 15 bits for count - upto 32768 entries, and 1 bit for 'EOR'
 		if ( endOfRun )
@@ -319,12 +319,12 @@ private:
 	_unpackBody(ACTION_OBJECT* const a)
 	{
 		UINT16 entries = 0;
-		LOGICAL endOfRun = 0;
+		bool endOfRun = false;
 		a->offset = teulPackUINT16(TEUL_UNPACK, a->packed, a->offset, &entries, 16);
 		if ( entries & 0x8000 )
 		{
 			entries &= 0x7fff;
-			endOfRun = 1;
+			endOfRun = true;
 		}
 
 		// Avoid lots of reallocs

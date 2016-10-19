@@ -30,7 +30,7 @@ extern bool strtInitBases(CPStruct* cpList);
 //	distribution sequences on one CP.  It takes care of producing
 //	resources, doing repairs, and storing the leftovers (if any)
 //	in the depots of a CP
-extern LOGICAL strtRunCP(CPStruct& cp);
+extern void strtRunCP(CPStruct& cp);
 
 //This function allows the Strat System to accept a convoy into its
 //	depot

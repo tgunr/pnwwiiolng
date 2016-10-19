@@ -21,7 +21,7 @@ SINT32 commPackInit()
 	return 0;
 }
 
-SINT32 commPackVEHICLE_REQUEST(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_REQUEST* request, SINT32 /*size*/)
+SINT32 commPackVEHICLE_REQUEST(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_REQUEST* request, SINT32 /*size*/)
 {
 	offset = wwiiPackWeaponSerial(mode,data,offset, &request->weapon, 0);
 	offset = teulPackUCHAR(mode, data,offset,&request->country, 0);
@@ -31,7 +31,7 @@ SINT32 commPackVEHICLE_REQUEST(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 	return offset;
 }
 
-SINT32 commPackVEHICLE_REPLY(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_REPLY* reply, SINT32 /*size*/)
+SINT32 commPackVEHICLE_REPLY(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_REPLY* reply, SINT32 /*size*/)
 {
 	offset = teulPackUINT32(mode, data, offset, &reply->hostIndex, 0);
 	offset = wwiiPackWeaponSpec(mode, data, offset, &reply->spec, 0);
@@ -44,7 +44,7 @@ SINT32 commPackVEHICLE_REPLY(LOGICAL mode, UCHAR* const data, SINT32 offset, VEH
 	return offset;
 }
 
-SINT32 commPackPlayerExit(LOGICAL mode, UCHAR* const data, SINT32 offset, PLAYER_EXIT* pe, SINT32 /*size*/)
+SINT32 commPackPlayerExit(PackMode mode, UCHAR* const data, SINT32 offset, PLAYER_EXIT* pe, SINT32 /*size*/)
 {
 	offset = teulPackUINT32(mode, data, offset, (UINT32*)&pe->destination, 0);
 	offset = teulPackUINT32(mode, data, offset, (UINT32*)&pe->exitCode, 0);
@@ -53,7 +53,7 @@ SINT32 commPackPlayerExit(LOGICAL mode, UCHAR* const data, SINT32 offset, PLAYER
 	return offset;
 }
 
-SINT32 Vehicle::Hit::packer(LOGICAL mode, ACTION_OBJECT* const a)
+SINT32 Vehicle::Hit::packer(PackMode mode, ACTION_OBJECT* const a)
 {
 	a->packer(mode, m_shooter);
 	a->packer(mode, m_target);

@@ -37,7 +37,7 @@ static UINT32 _thisVersion;
 static PLAYER_ACCEPT_FUNCTION _playerAcceptFn = nullptr;
 static PLAYER_RELEASE_FUNCTION _playerReleaseFn = nullptr;
 
-static LOGICAL _authIsOpen;
+static bool _authIsOpen = false;
 
 // The complete list of all current OTPs.
 using OTPS = std::unordered_map<UINT32, OTP_NODE*>;
@@ -49,9 +49,9 @@ static std::vector<OTP_NODE*> _pendingOtps;
 
 static ERROR_FUNCTION _externalErrorFn;
 
-static LOGICAL _authInited = FALSE;
+static bool _authInited = false;
 
-static LOGICAL parentIsOpen = FALSE;
+static bool parentIsOpen = false;
 
 static SINT32 _bypassCustomerID = 1000000;
 
@@ -105,7 +105,7 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 
 	_sendNotice = true;
 
-	if (  _authInited  == FALSE)
+	if ( !_authInited )
 	{
 #ifdef DEBUG
 		dbugWrite(_FLI,"installing game callbaks from init");
@@ -116,8 +116,7 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 		if ( (retval = authInstallGameCallbacks(_authErrorFn)) < 0)
 			return retval;
 
-		_authInited = TRUE;
-
+		_authInited = true;
 	}
 
 	if ( !useAuthServer )
@@ -318,7 +317,7 @@ authInitAccept(UINT32 appVersion
 	_playerAcceptFn = loginAcceptFn;
 	_playerReleaseFn = releaseFn;
 
-	if (  _authInited  == FALSE )
+	if (  !_authInited )
 	{
 		_thisVersion = appVersion;
 
@@ -328,7 +327,7 @@ authInitAccept(UINT32 appVersion
 
 		dbugLog(_FLI, "registered appVersion = %x",appVersion);
 
-		_authInited = TRUE;
+		_authInited = true;
 	}
 
 	return 0;
@@ -389,7 +388,7 @@ authAcceptPlayer(const SINT32 teulIndex, const playerid_t playerIP, PLAYER_LOGIN
 void
 _authOpened(ENDPOINT& endpoint)
 {
-	_authIsOpen = TRUE;
+	_authIsOpen = true;
 	_authConnection = endpoint.teulIndex();
 
 	if ( _timeDown.time() != 0 )
@@ -410,13 +409,13 @@ _authOpened(ENDPOINT& endpoint)
 void
 _parentOpened(ENDPOINT& /*endpoint*/)
 {
-	parentIsOpen = TRUE;
+	parentIsOpen = true;
 }
 
 // opens a connection to a parent Server.
 SINT32 _openSendParent(UINT32 parentHost, UINT16 parentPort)
 {
-	parentIsOpen = FALSE;
+	parentIsOpen = false;
 
 	if (parentHost == 0)
 		return -EINVAL;
@@ -432,7 +431,7 @@ SINT32 _openSendParent(UINT32 parentHost, UINT16 parentPort)
 	teulSyncClock();
 	const TeulTimeMS startTime = teulClock64;
 	const TeulTimeMS cutoff = startTime + 5000;
-	while ( parentIsOpen == false )
+	while ( !parentIsOpen )
 	{
 		if ( teulClock64 >= cutoff )
 		{
@@ -495,7 +494,7 @@ static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 SINT32 _openSend(APID appID, UINT32 arenaID, UINT32 hostVersion, UINT32 authHost, UINT16 authPort, UINT32 localAddress, UINT16 localPort, UINT32 maxUsers)
 {
 //static AUTH_GAME_INIT game;
-	_authIsOpen = FALSE;
+	_authIsOpen = false;
 
 	if (authHost == 0)
 		return -EINVAL;

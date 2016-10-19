@@ -313,7 +313,7 @@ dotApplyConfig()
 
 // Display a list of commands
 static
-LOGICAL _dotHelp(char* arguments, OOBMessage& message)
+bool _dotHelp(char* arguments, OOBMessage& message)
 {
 	UINT32 i;
 	char buf[2048];
@@ -336,7 +336,7 @@ LOGICAL _dotHelp(char* arguments, OOBMessage& message)
 		}
 
 		BETAMSG(buf);
-		return TRUE;
+		return true;
 	}
 
 	for ( i = 0; dotCommands[i].command; i++ )
@@ -344,36 +344,16 @@ LOGICAL _dotHelp(char* arguments, OOBMessage& message)
 		if ( strcasecmp(arguments, dotCommands[i].command) == 0 )
 		{
 			BETAMSG("%s: %s", arguments, dotCommands[i].description);
-			return TRUE;
+			return true;
 		}
 	}
 
 	BETAMSG("No such command - type;help for list of commands");
-	return FALSE;
+	return false;
 }
-
-#ifdef NOW_UNUSED
-static LOGICAL
-_booleanValue(char* arguments, LOGICAL bDefault)
-{
-	if ( strcasecmp(arguments, "on") == 0 )
-		return TRUE;
-	if ( strcasecmp(arguments, "off") == 0 )
-		return FALSE;
-	if ( strcasecmp(arguments, "yes") == 0 )
-		return TRUE;
-	if ( strcasecmp(arguments, "no") == 0 )
-		return FALSE;
-	if ( strcmp(arguments, "1") == 0 )
-		return TRUE;
-	if ( strcmp(arguments, "0") == 0 )
-		return FALSE;
-	return bDefault;
-}
-#endif // EXTRA_CONFIGURATIONS
 
 template<typename Tp>
-static LOGICAL
+static bool
 _setIntegerValue(const char* arguments, const OOBMessage& message
 				, Tp& variable
 				, const char* fieldName
@@ -388,7 +368,7 @@ _setIntegerValue(const char* arguments, const OOBMessage& message
 	if ( arguments == nullptr || *arguments == 0 )
 	{
 		BETAMSG("Please specify %s in %s.", fieldName, unit);
-		return FALSE;
+		return false;
 	}
 
 	if ( *arguments == '?' )
@@ -397,18 +377,18 @@ _setIntegerValue(const char* arguments, const OOBMessage& message
 			BETAMSG(zeroMessage);
 		else
 			BETAMSG("Current %s: %d %s.", fieldName, variable, unit);
-		return FALSE;
+		return false;
 	}
 
 	if ( !isdigit(*arguments) )
 	{
 		BETAMSG("Woah there, captain keyboard, '%c' doesn't look like a number to me, and %s wants a number.", (*arguments), fieldName);
-		return FALSE;
+		return false;
 	}
 	if ( *arguments == '-' )
 	{
 		BETAMSG("%s doesn't go backwards, so please don't type '-' infront of what you are trying to set it to.", fieldName);
-		return FALSE;
+		return false;
 	}
 
 	newVal = static_cast<Tp>(atol(arguments));
@@ -416,13 +396,13 @@ _setIntegerValue(const char* arguments, const OOBMessage& message
 	if ( newVal < (Tp)min )
 	{
 		BETAMSG("Invalid %s (%d < %d).", fieldName, newVal, min);
-		return FALSE;
+		return false;
 	}
 
 	if ( max > 0 && newVal > (Tp)max )
 	{
 		BETAMSG("Invalid %s (%d > %d).", fieldName, newVal, max);
-		return FALSE;
+		return false;
 	}
 
 	if ( zeroMessage && newVal == (Tp)min )
@@ -432,11 +412,11 @@ _setIntegerValue(const char* arguments, const OOBMessage& message
 
 	variable = newVal;
 
-	return TRUE;
+	return true;
 }
 
 // Lock/unlock arena
-static LOGICAL
+static bool
 _dotArenaLock(char* arguments, OOBMessage& message)
 {
 	if ( _setIntegerValue(arguments, message
@@ -446,10 +426,10 @@ _dotArenaLock(char* arguments, OOBMessage& message)
 				) )
 	{
 		dotApplyConfig();
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 static const char*
@@ -563,21 +543,21 @@ _makeList(CPStruct* cp, const OOBMessage& message)
 //////////////////////////////////////////////////////////////////////
 // The ".own" of firebases
 
-static LOGICAL
+static bool
 _bridgeOwnership(const std::string& title, CPStruct* cp, ObjectStruct* bridge, OOBMessage& message)
 {
 	const char* state = (cp->isContested()) ? "DESTROYED":"standing";
 	RESPOND("%s: %s. %u%% damage", title.c_str(), state, (UINT32)bridge->percentDamage);
-	return TRUE;
+	return true;
 }
 
-static LOGICAL
+static bool
 _factoryOwnership(FacilityStruct* fac, OOBMessage& message)
 {
 	if ( fac->side != fac->originalSide )
 	{
 		RESPOND("%s is owned by %s - no RDP contribution.", fac->name, _countryCode[fac->country]);
-		return TRUE;
+		return true;
 	}
 
 	UINT32 damage = 0;
@@ -599,16 +579,16 @@ _factoryOwnership(FacilityStruct* fac, OOBMessage& message)
 
 	RESPOND("%s: %u%% damage", fac->name, damage);
 
-	return TRUE;
+	return true;
 }
 
-static LOGICAL
+static bool
 _fbOwnership(FacilityStruct* fb, OOBMessage& message)
 {
 	if ( fb->isOpen() == false )
 	{
 		RESPOND("%s is closed", fb->name);
-		return TRUE;
+		return true;
 	}
 
 	std::string result = "";
@@ -655,12 +635,12 @@ _fbOwnership(FacilityStruct* fb, OOBMessage& message)
 
 	RESPOND("%s: %s", fb->name, ((result.length() > 0) ? result.c_str() : "No information available"));
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static LOGICAL
+static bool
 _dotOwn(char* arguments, OOBMessage& message)
 {
 	CPStruct* cp;
@@ -668,13 +648,13 @@ _dotOwn(char* arguments, OOBMessage& message)
 	if ( message.m_side == WWII_NO_SIDE )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SELECT_SIDE);
-		return FALSE;
+		return false;
 	}
 
 	if ( arguments != nullptr && *arguments != 0 && !isalpha(*arguments) )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SPECIFY_TOWN);
-		return FALSE;
+		return false;
 	}
 
 	FacilityStruct* fb = strtGetFacility(message.m_cpID);
@@ -688,7 +668,7 @@ _dotOwn(char* arguments, OOBMessage& message)
 
 	cp = _getCPByArguments(arguments, message, true);
 	if ( cp == nullptr )
-		return FALSE;
+		return false;
 
 	// Describe objectives
 	const char* obj = "";
@@ -736,7 +716,7 @@ _dotOwn(char* arguments, OOBMessage& message)
 	if ( cp->isContested() )
 		_makeList(cp, message);
 
-	return TRUE;
+	return true;
 }
 
 static void
@@ -785,7 +765,7 @@ _makeFBList(CPStruct* cp, const OOBMessage& message)
 	}
 }
 
-static LOGICAL
+static bool
 _dotFBs(char* arguments, OOBMessage& message)
 {
 	CPStruct* cp;
@@ -793,18 +773,18 @@ _dotFBs(char* arguments, OOBMessage& message)
 	if ( message.m_side == WWII_NO_SIDE )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SELECT_SIDE);
-		return FALSE;
+		return false;
 	}
 
 	if ( arguments != nullptr && *arguments != 0 && !isalpha(*arguments) )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SPECIFY_TOWN);
-		return FALSE;
+		return false;
 	}
 
 	cp = _getCPByArguments(arguments, message, false);
 	if ( cp == nullptr )
-		return FALSE;
+		return false;
 
 	const char* hold = (message.m_side == cp->side && cp->isHolding()) ? " HOLD" : "";
 	const char* orun = (message.m_side == cp->side && cp->isOverrun()) ? " OVERRUN" : "";
@@ -820,22 +800,22 @@ _dotFBs(char* arguments, OOBMessage& message)
 
 	_makeFBList(cp, message);
 
-	return TRUE;
+	return true;
 }
 
 // Send CP info
-static LOGICAL
+static bool
 _dotCPInfo(char* arguments, OOBMessage& message)
 {
 	CPStruct* cp;
 
 	cp = _getCPByArguments(arguments, message, true);
 	if ( cp == nullptr )
-		return FALSE;
+		return false;
 
 	_printCPInfo(message, cp);
 
-	return TRUE;
+	return true;
 }
 
 static const char*
@@ -861,17 +841,17 @@ _captureDescription(const FacilityStruct* fac)
 }
 
 // Send CP/Facility info
-static LOGICAL
+static bool
 _dotCPDump(char* arguments, OOBMessage& message)
 {
 	CPStruct* cp;
 	FacilityStruct* fac;
-	LOGICAL fullInfo = FALSE;
+	bool fullInfo = false;
 	UINT32 i;
 
 	if ( arguments && strncmp(arguments, "detail", 6) == 0 )
 	{
-		fullInfo = TRUE;
+		fullInfo = true;
 
 		// Skip the string
 		arguments = strchr(arguments, ' ');
@@ -881,7 +861,7 @@ _dotCPDump(char* arguments, OOBMessage& message)
 
 	cp = _getCPByArguments(arguments, message, true);
 	if ( cp == nullptr )
-		return FALSE;
+		return false;
 
 	_printCPInfo(message, cp);
 
@@ -915,16 +895,16 @@ _dotCPDump(char* arguments, OOBMessage& message)
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
-static LOGICAL
+static bool
 _dotPwnFacQuery(OOBMessage& message, CPStruct* cp)
 {
 	if ( cp == nullptr )
 	{
 		BETAMSG("You must select a CP at the map first");
-		return FALSE;
+		return false;
 	}
 	BETAMSG("%s [own:%s, con:%s, ori:%s]"
 			, cp->name
@@ -952,10 +932,10 @@ _dotPwnFacQuery(OOBMessage& message, CPStruct* cp)
 	{
 		BETAMSG("There are no facilities at this CP.");
 	}
-	return TRUE;
+	return true;
 }
 
-static LOGICAL
+static bool
 _dotPwnFac(char* arguments, OOBMessage& message)
 {
 	CPStruct* cp;
@@ -984,7 +964,7 @@ _dotPwnFac(char* arguments, OOBMessage& message)
 			if ( newCountry == 0 )
 			{
 				BETAMSG("Unrecognized country code, '%s'", arguments);
-				return FALSE;
+				return false;
 			}
 
 			uFacNo = atoi(facilityStr);
@@ -994,7 +974,7 @@ _dotPwnFac(char* arguments, OOBMessage& message)
 						, facilityStr
 						, message.m_text
 						);
-				return FALSE;
+				return false;
 			}
 
 			BETAMSG("Changing %s [%d] from %s to %s"
@@ -1013,11 +993,11 @@ _dotPwnFac(char* arguments, OOBMessage& message)
 			, message.m_text
 			);
 
-	return FALSE;
+	return false;
 }
 
 // Change the ownership of a CP
-static LOGICAL
+static bool
 _dotPwnCP(char* arguments, OOBMessage& message)
 {
 	char* cpName = nullptr;
@@ -1030,7 +1010,7 @@ _dotPwnCP(char* arguments, OOBMessage& message)
 	if ( arguments == nullptr || *arguments == 0 )
 	{
 		BETAMSG("Specify Country Code and (optionally) CP name");
-		return FALSE;
+		return false;
 	}
 
 	cpName = strchr(arguments, ' ');
@@ -1047,12 +1027,12 @@ _dotPwnCP(char* arguments, OOBMessage& message)
 	if ( newOwner == WWII_NO_COUNTRY )
 	{
 		BETAMSG("Unrecognized country code, '%s'", arguments);
-		return FALSE;
+		return false;
 	}
 
 	cp = _getCPByArguments(cpName, message, false);
 	if ( cp == nullptr )
-		return FALSE;
+		return false;
 
 	if ( strncmp(message.m_text, "ch", 2) == 0 )
 		quietly = true;
@@ -1069,10 +1049,10 @@ _dotPwnCP(char* arguments, OOBMessage& message)
 		LOCMESSAGE(LSTR_CAUTION, LSTR_NO_FACILIITIES_CHANGED, cp->name);
 	}
 
-	return TRUE;
+	return true;
 }
 
-static LOGICAL
+static bool
 _dotFacilities(char* arguments, OOBMessage& message)
 {
 	UINT32 uCount;
@@ -1086,7 +1066,7 @@ _dotFacilities(char* arguments, OOBMessage& message)
 				, message.m_text
 				, message.m_text
 				);
-		return FALSE;
+		return false;
 	}
 
 	uNextOID = 0;
@@ -1110,29 +1090,29 @@ _dotFacilities(char* arguments, OOBMessage& message)
 		uNextOID = cur->uOID + 1;
 	}
 
-	return TRUE;
+	return true;
 }
 
-static LOGICAL
+static bool
 _dotRebuildCP(char* arguments, OOBMessage& message)
 {
 	CPStruct* cp;
 
 	cp = _getCPByArguments(arguments, message, true);
 	if ( cp == nullptr )
-		return FALSE;
+		return false;
 
 	strtForceRebuildCP(*cp);
 	BETAMSG("Rebuild at %s completed", cp->name);
 
-	return TRUE;
+	return true;
 }
 
 // Open or close a facility
-static LOGICAL
+static bool
 _dotOpenCloseFac(char* arguments, OOBMessage& message)
 {
-	LOGICAL opening = TRUE;				// Open is the default
+	bool opening = true;				// Open is the default
 	FacilityStruct* fac = nullptr;
 	UINT32 facID;
 
@@ -1143,15 +1123,15 @@ _dotOpenCloseFac(char* arguments, OOBMessage& message)
 		if ( cp == nullptr )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_SELECT_FACILITY);
-			return FALSE;
+			return false;
 		}
 
 		_listSpawnables(cp, message);
-		return FALSE;
+		return false;
 	}
 
 	if ( tolower(message.m_text[0]) == 'c' )
-		opening = FALSE;
+		opening = false;
 
 	facID = atoi(arguments);
 	if ( facID > 0 )
@@ -1163,7 +1143,7 @@ _dotOpenCloseFac(char* arguments, OOBMessage& message)
 						, arguments
 						, message.m_text
 						);
-		return FALSE;
+		return false;
 	}
 
 	if ( opening )
@@ -1187,10 +1167,10 @@ _dotOpenCloseFac(char* arguments, OOBMessage& message)
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
-static LOGICAL
+static bool
 _dotForceFacilitys(char* arguments, OOBMessage& message)
 {
 	bool doAll = false;					// Whether or not to do all firebases
@@ -1202,17 +1182,17 @@ _dotForceFacilitys(char* arguments, OOBMessage& message)
 	if ( arguments != nullptr && strcasecmp(arguments, "all") == 0 )
 	{
 		cp = strtGetCPList();
-		doAll = TRUE;
+		doAll = true;
 	}
 	else
 		cp = _getCPByArguments(arguments, message, false);
 
 	if ( cp == nullptr )
-		return FALSE;
+		return false;
 
 
 	if ( tolower(message.m_text[0]) == 'c' )
-		opening = FALSE;
+		opening = false;
 
 	for (; cp != nullptr; cp = cp->next )
 	{
@@ -1243,12 +1223,12 @@ _dotForceFacilitys(char* arguments, OOBMessage& message)
 		if ( doAll )
 		{
 			BETAMSG("*CAUTION* No facilities indexed in world???");
-			return FALSE;
+			return false;
 		}
 		else if ( arguments != nullptr && *arguments != 0 )
 		{
 			BETAMSG("No CP matching '%s' found", arguments);
-			return FALSE;
+			return false;
 		}
 	}
 	else
@@ -1259,11 +1239,11 @@ _dotForceFacilitys(char* arguments, OOBMessage& message)
 			BETAMSG("Closed %d facilities", affected);
 	}
 
-	return TRUE;
+	return true;
 }
 
 #ifdef EXTRA_CONFIGURATIONS
-static LOGICAL
+static bool
 _dotDebugSupply(char* arguments, OOBMessage& message)
 {
 	if ( arguments && strcmp(arguments, "on") == 0 )
@@ -1281,10 +1261,10 @@ _dotDebugSupply(char* arguments, OOBMessage& message)
 		BETAMSG("Specify 'on' or 'off'");
 	}
 
-	return TRUE;
+	return true;
 }
 
-static LOGICAL
+static bool
 _dotForceFBs(char* arguments, OOBMessage& message)
 {
 	bool doAll = false;					// Whether or not to do all firebases
@@ -1336,12 +1316,12 @@ _dotForceFBs(char* arguments, OOBMessage& message)
 		if ( doAll )
 		{
 			BETAMSG("*CAUTION* No FBS indexed in world???");
-			return FALSE;
+			return false;
 		}
 		else
 		{
 			BETAMSG("No CP matching '%s' found", arguments);
-			return FALSE;
+			return false;
 		}
 	}
 	else
@@ -1352,11 +1332,11 @@ _dotForceFBs(char* arguments, OOBMessage& message)
 			BETAMSG("Closed %d firebases", affected);
 	}
 
-	return TRUE;
+	return true;
 }
 #endif
 
-static LOGICAL
+static bool
 _dotLua(char* arguments, OOBMessage& message)
 {
 	std::string object((const char*)arguments);
@@ -1386,11 +1366,11 @@ _dotLua(char* arguments, OOBMessage& message)
 
 	results.clear();
 
-	return TRUE;
+	return true;
 }
 
 #ifndef PUBLIC_RELEASE
-static LOGICAL
+static bool
 _dotSetTime(char* arguments, OOBMessage& message)
 {
 	bool haveTime = false;
@@ -1411,7 +1391,7 @@ _dotSetTime(char* arguments, OOBMessage& message)
 	if ( !haveTime || hour > 23 || minutes > 59 )
 	{
 		BETAMSG("Invalid time value: %s. Accepted formats HH:MM, HHMM and HH. Prefix time with '@' to lock that particular time.", arguments);
-		return FALSE;
+		return false;
 	}
 
 	if ( freezeTime )
@@ -1430,12 +1410,12 @@ _dotSetTime(char* arguments, OOBMessage& message)
 	sprintf(minutesBuf, "%02u", minutes);
 	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_GM_SET_GAMETIME, hourBuf, minutesBuf);
 
-	return TRUE;
+	return true;
 }
 #endif
 
 SINT32 _lastCPBroadcast;
-static LOGICAL
+static bool
 _dotBroadcastCP(char* arguments, OOBMessage& message)
 {
 	SINT32 currentTime = teulTime();
@@ -1444,7 +1424,7 @@ _dotBroadcastCP(char* arguments, OOBMessage& message)
 	{
 		LOCMESSAGE(LSTR_USAGE, LSTR_BROADCAST_USAGE, message.m_text);
 		LOCMESSAGE(LSTR_DETAIL, LSTR_BROADCAST_DETAIL);
-		return TRUE;
+		return true;
 	}
 
 	if ( arguments != nullptr && strcasecmp(arguments, "all") == 0 )
@@ -1464,16 +1444,16 @@ _dotBroadcastCP(char* arguments, OOBMessage& message)
 
 		cp = _getCPByArguments(arguments, message, true);
 		if ( cp == nullptr )
-			return FALSE;
+			return false;
 
 		strtQueueCPStatus(cp);
 		LOCMESSAGE(LSTR_NOTE, LSTR_CP_REBROADCAST, cp->name);
 	}
 
-	return TRUE;
+	return true;
 }
 
-static LOGICAL
+static bool
 _dotBroadcastFacs(char* arguments, OOBMessage& message)
 {
 	SINT32 i = 0;
@@ -1483,12 +1463,12 @@ _dotBroadcastFacs(char* arguments, OOBMessage& message)
 	if ( arguments != nullptr && arguments[0] == '?' )
 	{
 		BETAMSG("%s [cp name]: Retransmit status of facilities in specified or current CP", message.m_text);
-		return TRUE;
+		return true;
 	}
 
 	cp = _getCPByArguments(arguments, message, true);
 	if ( cp == nullptr )
-		return FALSE;
+		return false;
 
 	for ( facility = cp->facilityList; facility != nullptr; facility = facility->next )
 	{
@@ -1499,7 +1479,7 @@ _dotBroadcastFacs(char* arguments, OOBMessage& message)
 
 	BETAMSG("%d facilities retransmitted", i);
 
-	return TRUE;
+	return true;
 }
 
 static StratHCUnit*
@@ -1523,35 +1503,35 @@ _getHCUnit(const char* arguments, const OOBMessage& message)
 	return unit;
 }
 
-static LOGICAL
+static bool
 _dotResupplyUnit(char* arguments, OOBMessage& message)
 {
 	StratHCUnit* unit = _getHCUnit(arguments, message);
 	if ( unit == nullptr )
-		return FALSE;
+		return false;
 
 	BETAMSG("Resetting full supply of %s (%s)", unit->name(), unit->callsign());
 
 	unit->resetSupply();
 
-	return TRUE;
+	return true;
 }
 
-static LOGICAL
+static bool
 _dotRestartSupply(char* arguments, OOBMessage& message)
 {
 	StratHCUnit* unit = _getHCUnit(arguments, message);
 	if ( unit == nullptr )
-		return FALSE;
+		return false;
 
 	RESPOND("Restart resupply queue for %s (%s) [no effect if unit is out of supply]", unit->name(), unit->callsign());
 
 	unit->purgeResupply(false);
 	unit->restartSupply(60, 900, false);
-	return TRUE;
+	return true;
 }
 
-static LOGICAL
+static bool
 _dotDumpResupply(char* arguments, OOBMessage& message)
 {
 	bool listAll = false;
@@ -1565,13 +1545,13 @@ _dotDumpResupply(char* arguments, OOBMessage& message)
 
 	StratHCUnit* unit = _getHCUnit(arguments, message);
 	if ( unit == nullptr )
-		return FALSE;
+		return false;
 
 #ifdef PUBLIC_RELEASE
 	if ( unit->side() != message.m_side )
 	{
 		BETAMSG("You can't view enemy supply queues.");
-		return FALSE;
+		return false;
 	}
 #endif
 
@@ -1579,7 +1559,7 @@ _dotDumpResupply(char* arguments, OOBMessage& message)
 	if ( !unit->fetchResupplyQueue(results, 36, listAll) || results.empty() )
 	{
 		BETAMSG("%s resupply queue is empty", unit->callsign());
-		return TRUE;
+		return true;
 	}
 
 	BETAMSG("%s resupply queue (%s):", unit->callsign(), results[0].c_str());
@@ -1597,10 +1577,10 @@ _dotDumpResupply(char* arguments, OOBMessage& message)
 	if ( output.empty() == false )
 		BETAMSG(output.c_str());
 
-	return TRUE;
+	return true;
 }
 
-static LOGICAL
+static bool
 _dotBlowFB(char* arguments, OOBMessage& message)
 {
 	FacilityStruct* fb = nullptr;
@@ -1618,29 +1598,29 @@ _dotBlowFB(char* arguments, OOBMessage& message)
 	if ( fb == nullptr || fb->type != FACILITY_FIREBASE )
 	{
 		BETAMSG("Specify firebase to destroy");
-		return FALSE;
+		return false;
 	}
 
 	if ( fb->isOpen() == false )
 	{
 		BETAMSG("%s [%d] is already closed", fb->name, fbOID);
-		return FALSE;
+		return false;
 	}
 
 	if ( !strtProcessFirebase(*fb) )
 	{
 		BETAMSG("%s [%d] failed to blow", fb->name, fbOID);
-		return TRUE;
+		return true;
 	}
 
 	BETAMSG("%s [%d] blown", fb->name, fbOID);
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static LOGICAL
+static bool
 _dotStatus(char* arguments, OOBMessage& message)
 {
 	RESPOND("NOTE: Please use /own (or /ow or .ow) command instead.");
@@ -1651,7 +1631,7 @@ _dotStatus(char* arguments, OOBMessage& message)
 //////////////////////////////////////////////////////////////////////
 
 #ifdef BETA_RELEASE
-static LOGICAL
+static bool
 _dotRestart(char* arguments, OOBMessage& message)
 {
 	dbugLog(_FLA, "restarting the strat host");
@@ -1661,15 +1641,15 @@ _dotRestart(char* arguments, OOBMessage& message)
 	    RESPOND("System call failed");
 	}
 
-	return TRUE;
+	return true;
 }
 #endif // BETA_RELEASE
 
-static LOGICAL
+static bool
 _dotShutdownStrat(char* arguments, OOBMessage& message)
 {
 	if ( strcmp(arguments, "stratSystem") != 0 )
-		return FALSE;
+		return false;
 
 	char command[64] = "2";
 	_dotArenaLock(command, message);
@@ -1684,12 +1664,12 @@ _dotShutdownStrat(char* arguments, OOBMessage& message)
         LogAbort("dotShutdownStrat system call failed");
     }
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static LOGICAL
+static bool
 _dotFallback(char* arguments, OOBMessage& message)
 {
 	CPStruct* cp;
@@ -1698,7 +1678,7 @@ _dotFallback(char* arguments, OOBMessage& message)
 	if ( cp == nullptr )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SELECT_FACILITY);
-		return FALSE;
+		return false;
 	}
 
 	// Whether we are in "try" or "do" mode depends on the supply of a '!'
@@ -1707,7 +1687,7 @@ _dotFallback(char* arguments, OOBMessage& message)
 
 	chatSendSCMDResult(message.m_originatorID, SC_FALLBACK, cp->fullObjID, message.m_side, result);
 
-	return TRUE;
+	return true;
 }
 
 static void
@@ -1748,7 +1728,7 @@ _nextMove(const OOBMessage& message, const StratHCUnit* unit)
 	LOCMESSAGE(LSTR_NOTE, LSTR_LABELLED_GENERIC, unit->callsign(), text.c_str());
 }
 
-static LOGICAL
+static bool
 _dotNextMove(char* arguments, OOBMessage& message)
 {
 	std::vector<const char*> args;
@@ -1762,12 +1742,12 @@ _dotNextMove(char* arguments, OOBMessage& message)
 		if ( unit == nullptr )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_NO_BRIGADE);
-			return TRUE;
+			return true;
 		}
 
 		_nextMove(message, unit);
 
-		return TRUE;
+		return true;
 	}
 
 	std::set<StratHCUnit*> visited;
@@ -1781,7 +1761,7 @@ _dotNextMove(char* arguments, OOBMessage& message)
 		if ( unit == nullptr )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_UNKNOWN_UNIT, args[i]);
-			return TRUE;
+			return true;
 		}
 
 		if ( visited.find(unit) != visited.end() )
@@ -1792,12 +1772,12 @@ _dotNextMove(char* arguments, OOBMessage& message)
 		visited.insert(unit);
 	}
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static LOGICAL
+static bool
 _dotHoldAtAllCosts(char* arguments, OOBMessage& message)
 {
 	CPStruct* cp;
@@ -1806,7 +1786,7 @@ _dotHoldAtAllCosts(char* arguments, OOBMessage& message)
 	if ( cp == nullptr )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SELECT_FACILITY);
-		return FALSE;
+		return false;
 	}
 
 	// Pass a trailing '*' to indicate 'do it now'
@@ -1815,12 +1795,12 @@ _dotHoldAtAllCosts(char* arguments, OOBMessage& message)
 
 	chatSendSCMDResult(message.m_originatorID, SC_HOLD, cp->fullObjID, message.m_side, result);
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static LOGICAL
+static bool
 _dotOverrun(char* arguments, OOBMessage& message)
 {
 	CPStruct* cp;
@@ -1829,14 +1809,14 @@ _dotOverrun(char* arguments, OOBMessage& message)
 	if ( cp == nullptr )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SELECT_FACILITY);
-		return FALSE;
+		return false;
 	}
 
 	SCMD_RESULT result = cp->overrun(message.m_side);
 
 	chatSendSCMDResult(message.m_originatorID, SC_OVERRUN, cp->fullObjID, message.m_side, result);
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1934,13 +1914,13 @@ _listObjectiveNumbers(OOBMessage& message)
 
 //////////////////////////////////////////////////////////////////////
 
-static LOGICAL
+static bool
 _dotObjectives(char* arguments, OOBMessage& message)
 {
 	if ( message.m_side == WWII_NO_SIDE )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SELECT_SIDE);
-		return FALSE;
+		return false;
 	}
 
 	switch ( tolower(arguments[0]) )
@@ -1973,7 +1953,7 @@ _dotObjectives(char* arguments, OOBMessage& message)
 	break;
 	}
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2003,14 +1983,14 @@ _setTarget(const FULL_OBJ_ID id)
 //       keeping them intact
 //  -move tells it to apply movement delays like a normal move
 
-static LOGICAL
+static bool
 _dotRedeploy(char* arguments, OOBMessage& message)
 {
 	if ( arguments[0] == '?' || strcmp(arguments, "help") == 0 )
 	{
 		LOCMESSAGE(LSTR_USAGE, LSTR_REDEPLOY_USAGE);
 		LOCMESSAGE(LSTR_DETAIL, LSTR_REDEPLOY_DETAIL);
-		return TRUE;
+		return true;
 	}
 
 	bool applyDelay = false;
@@ -2032,7 +2012,7 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 		{
 			LOCMESSAGE(LSTR_USAGE, LSTR_REDEPLOY_USAGE);
 			LOCMESSAGE(LSTR_DETAIL, LSTR_REDEPLOY_DETAIL);
-			return TRUE;
+			return true;
 		}
 		else if ( unit == nullptr )
 		{
@@ -2040,7 +2020,7 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 			if ( unit == nullptr )
 			{
 				LOCMESSAGE(LSTR_CAUTION, LSTR_UNKNOWN_UNIT, args[i]);
-				return FALSE;
+				return false;
 			}
 		}
 		else if ( destination == nullptr )
@@ -2054,12 +2034,12 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 			if ( destination == nullptr )
 			{
 				LOCMESSAGE(LSTR_CAUTION, LSTR_INVALID_CP_NAME, args[i]);
-				return FALSE;
+				return false;
 			}
 			if ( destination->isCity() == false )
 			{
 				LOCMESSAGE(LSTR_CAUTION, LSTR_SPECIFY_TOWN);
-				return FALSE;
+				return false;
 			}
 		}
 	}
@@ -2077,7 +2057,7 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 		if ( destination == nullptr )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_SPECIFY_TOWN);
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -2087,14 +2067,14 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 		if ( unit == nullptr )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_JOIN_OR_SPECIFY_BDE, message.m_text);
-			return FALSE;
+			return false;
 		}
 	}
 
 	if ( unit->isDivision() == false && unit->isBrigade() == false )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_BDE_AND_DIV_ONLY);
-		return FALSE;
+		return false;
 	}
 
 	BRIGADE_MOVE_RESULT bmr = unit->deployPermission(destination, false);
@@ -2104,14 +2084,14 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 	case BMR_FAILED_OWNER:
 	case BMR_FAILED_CONTROL:
 		LOCMESSAGE(LSTR_CAUTION, LSTR_ENEMY_OWNS, destination->name);
-		return FALSE;
+		return false;
 	break;
 
 	case BMR_APPROVED:
 		if ( unit->homeCP() == destination && !(transferSupply || applyDelay) )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_UNIT_ALREADY_AT, unit->callsign(), destination->name);
-			return FALSE;
+			return false;
 		}
 
 	break;
@@ -2131,7 +2111,7 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 
 	unit->deploy(destination, (applyDelay) ? brigadeMoveTime_s : 0, Chat::Name(message.m_originatorID).c_str(), transferSupply, applyDelay);
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2142,14 +2122,14 @@ OOBMessage* script_env;
 CPStruct* targeted_cp;
 FacilityStruct* targeted_fac;
 
-static LOGICAL
+static bool
 _dotRunLua(char* arguments, OOBMessage& message)
 {
 	// Single argument
 	if ( _vectorize(arguments, script_args) == 0 )
 	{
 		BETAMSG("No command specified");
-		return FALSE;
+		return false;
 	}
 
 	const char* script = script_args[0];
@@ -2166,12 +2146,12 @@ _dotRunLua(char* arguments, OOBMessage& message)
 		if ( isupper(*p) )
 		{
 			BETAMSG("Illegal command name '%s' (uppercase not allowed)");
-			return FALSE;
+			return false;
 		}
 		if ( !(isalnum(*p) || *p == '-' || (p > script && *p == '/')) )
 		{
 			BETAMSG("Illegal script name '%s'", script);
-			return FALSE;
+			return false;
 		}
 		p++;
 	}
@@ -2179,7 +2159,7 @@ _dotRunLua(char* arguments, OOBMessage& message)
 	if ( (int)(p - script) > 32 )
 	{
 		BETAMSG("Invalid command name (too long)");
-		return FALSE;
+		return false;
 	}
 
 	// Back up host_config so we can tell if the client modifies it
@@ -2241,26 +2221,26 @@ _dotRunLua(char* arguments, OOBMessage& message)
 	// Garbage collection
 	delete old;
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Reload the vehicle access rules
 
-static LOGICAL
+static bool
 _dotUpdateVehicles(char* arguments, OOBMessage& message)
 {
 	strtdbLoadTOETemplates();
 	strtdbReadVehicleAccess();
 	BETAMSG("Updated vehicles (ranks and toe template lists)");
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Describe the current RDP state
 
-static LOGICAL
+static bool
 _dotRDP(char* arguments, OOBMessage& message)
 {
 #ifdef BETA_RELEASE
@@ -2272,21 +2252,21 @@ _dotRDP(char* arguments, OOBMessage& message)
 	if ( rdpInfo.Populated() == false )
 	{
 		RESPOND("No RDP Intel received yet - try again in a few minutes");
-		return TRUE;
+		return true;
 	}
 
 	// Skip it if the update is 60+ minutes old
 	if ( rdpInfo.Expired() == true )
 	{
 		RESPOND("No RDP Intel received in the last hour - try again in a few minutes");
-		return TRUE;
+		return true;
 	}
 
 	rdpInfo.Transcribe();
 
 	RESPOND("%s.", rdpInfo.m_detail.c_str());
 
-	return TRUE;
+	return true;
 }
 
 void
@@ -2346,14 +2326,14 @@ RDPInfo::Transcribe()
 //////////////////////////////////////////////////////////////////////
 // Set current RDP info for a country
 
-static LOGICAL
+static bool
 _dotSetRDP(char* arguments, OOBMessage& message)
 {
 	std::vector<const char*> args;
 	if ( _vectorize(arguments, args) != 3 )
 	{
 		BETAMSG("Incorrect usage - begone");
-		return FALSE;
+		return false;
 	}
 
 	WWII_COUNTRY country = static_cast<WWII_COUNTRY>(strtoul(args[0], nullptr, 10));
@@ -2362,7 +2342,7 @@ _dotSetRDP(char* arguments, OOBMessage& message)
 	
 	if ( WWII_NO_COUNTRY == country || country >= MAX_COUNTRIES ) {
 		BETAMSG("Invalid data");
-		return FALSE;
+		return false;
 	}
 
 	if ( percent > 100 )
@@ -2373,7 +2353,7 @@ _dotSetRDP(char* arguments, OOBMessage& message)
 	strtdbLoadTOETemplates();
 	strtdbReadVehicleAccess();
 
-	return TRUE;
+	return true;
 }
 
 void
@@ -2418,20 +2398,20 @@ _describeSHCU(StratHCUnit* unit)
 	return text.c_str();
 }
 
-static LOGICAL
+static bool
 _dotBrigade(char* arguments, OOBMessage& message)
 {
 	if ( arguments == nullptr || *arguments == 0 )
 	{
 		BETAMSG("Specificy brigade/division short name");
-		return TRUE;
+		return true;
 	}
 
 	StratHCUnit* unit = (StratHCUnit*)HCUnit::Lookup(arguments);
 	if ( unit == nullptr || (!unit->isBrigade() && !unit->isDivision()) )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_UNKNOWN_UNIT, arguments);
-		return TRUE;
+		return true;
 	}
 
 	BETAMSG("%s %s", _describeSHCU(unit), unit->describe());
@@ -2451,7 +2431,7 @@ _dotBrigade(char* arguments, OOBMessage& message)
 		BETAMSG(response.c_str());
 	}
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2459,7 +2439,7 @@ _dotBrigade(char* arguments, OOBMessage& message)
 
 extern std::string strtGetFactoryList(WWII_COUNTRY forCountry);
 
-static LOGICAL
+static bool
 _dotFactories(char* arguments, OOBMessage& message)
 {
 	std::string result = "UK: " + strtGetFactoryList(WWII_ENGLAND);
@@ -2468,7 +2448,7 @@ _dotFactories(char* arguments, OOBMessage& message)
 	RESPOND("%s", result.c_str());
 	result = "DE: " + strtGetFactoryList(WWII_GERMANY);
 	RESPOND("%s", result.c_str());
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////

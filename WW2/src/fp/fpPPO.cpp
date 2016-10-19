@@ -1448,12 +1448,6 @@ void PlayerPlacedSTO::Sink()
 	}
 }
 
-static LOGICAL _sinkppo(struct OBJECT* o, void* userdata)
-{
-	o->mat._43 += (float)(*((FLOAT64*)userdata));
-	return TRUE;
-}
-
 void PlayerPlacedSTO::Update()
 {
 	FLOAT64 delta = (FLOAT64(frametime) - FLOAT64(_lastUpdate)) / 1000.0f;
@@ -1461,7 +1455,8 @@ void PlayerPlacedSTO::Update()
 
 	FLOAT64 move = SINK_RATE * delta;
 
-	obmainFindCallback(_to, _sinkppo, &move);
+	auto sinkppo = [](OBJECT& o, void* userdata) { o.mat._43 += (float)(*((FLOAT64*)userdata)); };
+	obmainFindCallback(_to, sinkppo, &move);
 
 	_lastUpdate = frametime;
 }

@@ -116,8 +116,8 @@ static SINT32 _userConnections = 0;
 
 UINT32 mmStratInternalAddress = 0;
 static SINT32 _stratIndex = -1;
-static LOGICAL _stratOpen = FALSE;
-static LOGICAL _stratError = FALSE;
+static bool _stratOpen = false;
+static bool _stratError = false;
 
 static SINT32 _chatClientPort = 0;
 
@@ -412,7 +412,7 @@ _stratErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, cons
 		dbugLog(_FLA,"t:%d strat error: %d", teulIndex, error );
 	}
 
-	_stratError = TRUE;
+	_stratError = true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -544,7 +544,7 @@ static void
 _stratConnectionOpen(ENDPOINT& endpoint)
 {
 	dbugLog(_FLN,"t:%d strat connection opened %s", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()));
-	_stratOpen = TRUE;
+	_stratOpen = true;
 }
 
 static void
@@ -552,7 +552,7 @@ _connectToStrat()
 {
 	_stratIndex = -1;
 	_stratHost = 0;
-	_stratError = FALSE;
+	_stratError = false;
 
 	dbugLog(_FLN,"waiting for strat server");
 

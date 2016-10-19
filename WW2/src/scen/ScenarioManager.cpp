@@ -4990,12 +4990,10 @@ void _extractNumbers(const char* source, double& x, double& y, double& z)
 	z = _z;
 }
 
-static LOGICAL _bob(struct OBJECT* o, void* userdata)
+static void _bob(OBJECT& o, void* userdata)
 {
 	Matrixf* newMat = (Matrixf*)userdata;
-	newMat->get(o->mat);
-	//o->mat._43 = FLOAT32(-(*((FLOAT64*)userdata)));
-	return TRUE;
+	newMat->get(o.mat);
 }
 
 void ScenarioWaveObject::Update()

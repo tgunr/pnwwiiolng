@@ -53,7 +53,7 @@ SINT32 strtPackInit()
 
 }
 
-static SINT32 _packCP_OBJ_HIT(LOGICAL mode, UCHAR* data, SINT32 offset, CP_OBJ_HIT* hit,  SINT32 size)
+static SINT32 _packCP_OBJ_HIT(PackMode mode, UCHAR* data, SINT32 offset, CP_OBJ_HIT* hit,  SINT32 size)
 {
 	offset = wwiiPackFullObjID(mode, data, offset, &hit->object, 0);
 	offset = teulPackSINT64(mode, data, offset, &hit->damage, 0);
@@ -61,7 +61,7 @@ static SINT32 _packCP_OBJ_HIT(LOGICAL mode, UCHAR* data, SINT32 offset, CP_OBJ_H
 	return offset;
 }
 
-SINT32 strtPackHitList(LOGICAL mode, UCHAR* data, SINT32 offset, CP_HIT_HEADER* hh,  SINT32 size)
+SINT32 strtPackHitList(PackMode mode, UCHAR* data, SINT32 offset, CP_HIT_HEADER* hh,  SINT32 size)
 {
 	SINT32 i;
 
@@ -82,7 +82,7 @@ SINT32 strtPackHitList(LOGICAL mode, UCHAR* data, SINT32 offset, CP_HIT_HEADER* 
 }
 
 SINT32
-strtPackOwnershipUpdate(LOGICAL mode, UCHAR* data, SINT32 offset, OWNERSHIP_UPDATE* object, SINT32 size)
+strtPackOwnershipUpdate(PackMode mode, UCHAR* data, SINT32 offset, OWNERSHIP_UPDATE* object, SINT32 size)
 {
 	UINT16 country;
 
@@ -100,7 +100,7 @@ strtPackOwnershipUpdate(LOGICAL mode, UCHAR* data, SINT32 offset, OWNERSHIP_UPDA
 }
 
 SINT32
-strtPackSyncCPs(LOGICAL mode, UCHAR* message, SINT32 offset, STRT_SYNC_CPS* object, SINT32 size)
+strtPackSyncCPs(PackMode mode, UCHAR* message, SINT32 offset, STRT_SYNC_CPS* object, SINT32 size)
 {
 	offset = teulPackVoid(mode, message, offset, object, sizeof(STRT_SYNC_DATA));
 	offset = teulPackVoid(mode, message, offset, object->info, sizeof(CP_SINFO)*object->numEntries);
@@ -109,7 +109,7 @@ strtPackSyncCPs(LOGICAL mode, UCHAR* message, SINT32 offset, STRT_SYNC_CPS* obje
 }
 
 SINT32
-strtPackSyncFacilities(LOGICAL mode, UCHAR* message, SINT32 offset, STRT_SYNC_FACILITIES* object, SINT32 size)
+strtPackSyncFacilities(PackMode mode, UCHAR* message, SINT32 offset, STRT_SYNC_FACILITIES* object, SINT32 size)
 {
 	offset = teulPackVoid(mode, message, offset, object, sizeof(STRT_SYNC_DATA));
 	offset = teulPackVoid(mode, message, offset, object->uOID, sizeof(object->uOID[0]) * object->numEntries);
@@ -122,7 +122,7 @@ strtPackSyncFacilities(LOGICAL mode, UCHAR* message, SINT32 offset, STRT_SYNC_FA
 }
 
 SINT32
-strtPackSyncBuildings(LOGICAL mode, UCHAR* message, SINT32 offset, STRT_SYNC_BUILDINGS* object, SINT32 size)
+strtPackSyncBuildings(PackMode mode, UCHAR* message, SINT32 offset, STRT_SYNC_BUILDINGS* object, SINT32 size)
 {
 	offset = teulPackVoid(mode, message, offset, object, sizeof(STRT_SYNC_DATA));
 	offset = teulPackVoid(mode, message, offset, object->vislevel, object->numEntries);

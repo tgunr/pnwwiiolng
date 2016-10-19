@@ -22,7 +22,7 @@ public:
 	~ArenaDescription() {}
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	SINT32 send(SINT32 teulIndex);
 	SINT32 receive(SINT32 teulIndex);
 

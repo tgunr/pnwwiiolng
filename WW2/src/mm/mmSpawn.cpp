@@ -182,8 +182,8 @@ mmProcessFEPostRequest(Player& player, const FE_POST_REQUEST& request)
 
 				MM_POST_ACCEPT postAccept;
 
-				postAccept.multicrew = FALSE;
-				postAccept.immediateSpawn = FALSE;
+				postAccept.multicrew = false;
+				postAccept.immediateSpawn = false;
 				postAccept.portal = player.m_portal;
 				postAccept.customerID = player.playerID();
 				postAccept.weaponSerial = player.weapon();
@@ -221,7 +221,7 @@ mmProcessFEPostRequest(Player& player, const FE_POST_REQUEST& request)
 							, player.permissionMask()
 							, player.m_weapOrigin
 							, request.weapon
-							, FALSE
+							, false
 							, request.immediateSpawn
 							);
 		}
@@ -436,11 +436,11 @@ mmProcessPostAccept(Player& player, const MM_POST_ACCEPT& post, UINT32 acceptTyp
 	switch ( acceptType )
 	{
 	  case MM_ACCEPT_NEW:
-		mmSendPostAccept(player.teulIndex(), post.weaponSerial, TRUE, post.portal, mobileSpawnAvailable);
+		mmSendPostAccept(player.teulIndex(), post.weaponSerial, true, post.portal, mobileSpawnAvailable);
 		break;
 
 	  case MM_ACCEPT_UPDATE:
-		mmSendPostAccept(player.teulIndex(), post.weaponSerial, FALSE, post.portal, mobileSpawnAvailable);
+		mmSendPostAccept(player.teulIndex(), post.weaponSerial, false, post.portal, mobileSpawnAvailable);
 		break;
 
 	  case MM_ACCEPT_RTB_RESERVED:
@@ -609,7 +609,7 @@ mmProcessFECrewRequest(Player& player, const FE_CREW_REQUEST& request)
 		case MM_VEH_RESERVED:
 			player.SetVehicleState(MM_VEH_WAITING_CREW);
 			player.updateMissionTaker(false);
-			strtSendMMPostInfoUpdate(mapGetStratIndex(),player.playerID(), request.weaponSerial, TRUE);
+			strtSendMMPostInfoUpdate(mapGetStratIndex(),player.playerID(), request.weaponSerial, true);
 		return true;
 
 		default:
@@ -627,7 +627,7 @@ mmProcessFEJoinRequest(Player& player, const FE_JOIN_REQUEST& request)
 	dbugLog(_FLD, "t:%d p:%u c:%s requesting to join v:%d", player.teulIndex(), player.playerID(), player.callsign(), request.weaponSerial.serial);
 
 	//Ask the strat system about the message
-	strtSendMMJoinListRequest(mapGetStratIndex(), player.playerID(), request.weaponSerial, player.chatHandle(), TRUE);
+	strtSendMMJoinListRequest(mapGetStratIndex(), player.playerID(), request.weaponSerial, player.chatHandle(), true);
 
 	return true;
 }
@@ -722,7 +722,7 @@ mmProcessFEJoinPermKill(Player& player, const FE_JOIN_PERM_KILL& kill)
 
 	///TODO: Verify the kill vehicle matches the current vehicle.
 	// tell strat to ditch all crew
-	strtSendMMPostInfoUpdate(mapGetStratIndex(), player.playerID(), player.weapon(), FALSE);
+	strtSendMMPostInfoUpdate(mapGetStratIndex(), player.playerID(), player.weapon(), false);
 
 	return true;
 }

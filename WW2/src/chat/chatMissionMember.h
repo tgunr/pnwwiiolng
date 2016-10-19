@@ -21,7 +21,7 @@ public:
 	MissionMember(ACTION_OBJECT* const a);
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	bool isSpawned() const { return (m_weapon.wType != 0 && m_x != INVALID_GRID_COORD); }
 
 public:

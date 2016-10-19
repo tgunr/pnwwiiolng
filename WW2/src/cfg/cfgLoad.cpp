@@ -116,20 +116,16 @@ static int* EnumValueMap[cfgNUM_TYPE_VALUES]=
 	nullptr,				// cfgTYPE_TRUE_FALSE,
 };
 
-static LOGICAL ConvertTypes()
+static void ConvertTypes()
 {
-int i, Type;
-
-	for (i = 0; i < cfgNUM_TOTAL_PARAMS; ++i)
+	for (int i = 0; i < cfgNUM_TOTAL_PARAMS; ++i)
 	{
-		Type = cfgParameters[i].Type;
+		int Type = cfgParameters[i].Type;
 		if (EnumValueMap[Type] != nullptr)
 		{
 			*(int*)pGlobalVars[i] = EnumValueMap[Type][*(int*)pGlobalVars[i]];
 		}
 	}
-
-	return TRUE;
 }
 
 #if platOS == OS_WIN32 && defined(DIRECT3D)
@@ -157,7 +153,7 @@ const char* guid = nullptr;
 }
 #endif
 
-static LOGICAL SetupVariables()
+static void SetupVariables()
 {
 	bZEnable            = piZENABLE_DEFAULT;				// Z buffer enable
 	bZWrite             = piZWRITEENABLE_DEFAULT;			// Z buffer write enable
@@ -266,8 +262,6 @@ static LOGICAL SetupVariables()
 
 	SquadInvites = TRUE;
 	EnableMouseClickToDamageBuildings = FALSE;
-
-	return TRUE;
 }
 
 LOGICAL cfgLoadGlobals(const char* ConfigName)

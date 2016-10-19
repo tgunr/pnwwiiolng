@@ -39,7 +39,7 @@ public:
 	SINT32 inEffect() const { return m_inEffect; }
 	UCHAR delays() const { return m_delays; }
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->offset = teulPackSINT32(mode, a->packed, a->offset, &m_meter, 7);
 		a->packer(mode, m_inEffect);

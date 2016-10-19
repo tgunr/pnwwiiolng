@@ -17,7 +17,7 @@
 // bandwidth use by selecting which bits will be transmitted
 
 SINT32
-MultiCrewEntry::packer(LOGICAL mode, ACTION_OBJECT* a)
+MultiCrewEntry::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	// Which player is being described
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, 0);

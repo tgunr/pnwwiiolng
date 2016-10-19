@@ -71,10 +71,6 @@ struct CP_ACC
 	WWII_SIDE_ACC	allied;
 };
 
-#ifdef BETA_RELEASE
-LOGICAL g_logRPProduction;
-#endif
-
 //forward declaration
 //	strat system fuctions
 static void _distributeRPs(CPStruct& cp, SINT32 rpsProduced, WWII_SIDE side);
@@ -92,14 +88,9 @@ static bool _objectReadyToRepair(ObjectStruct& object);
 //	control of a CP manages to reclaim control (ie, they were pushed back but
 //	have rallied to reclaim their army bases).
 
-//	Processing functions
-#ifdef CAN_DAMAGE_MONKEYHEADS
-static LOGICAL _processMonkeyhead(FacilityStruct* facility, WWII_COUNTRY country);
-#endif
-
 //This function is called to remove a CP from contention.  It sets the
 //	contention flag, opens all the bases and links
-static LOGICAL _changeLinks(BRIDGE_ENTRY* linkList, bool closed);
+static bool _changeLinks(BRIDGE_ENTRY* linkList, bool closed);
 
 using FACTORIES = std::vector<ObjectStruct*>;
 static FACTORIES _factories;
@@ -484,11 +475,11 @@ _repairBridge(ObjectStruct& object)
 //////////////////////////////////////////////////////////////////////
 //
 // This function actually runs the internal stuff on a CP
-LOGICAL
+void
 strtRunCP(CPStruct& cp)
 {
 	if ( !host_config.isArenaOpen() )
-		return TRUE;
+		return;
 
 	//Get the current time, which is meaningful for time delayed stuff
 	//runtime=time(NULL);
@@ -508,7 +499,7 @@ strtRunCP(CPStruct& cp)
 	if ( !cp.isBridge() )
 	{
 		if ( cp.side == NEUTRAL )
-			return TRUE;
+			return;
 
 		// Update the EWS counters etc.
 		cp.runCycleEvents(runTimeStamp);
@@ -536,22 +527,6 @@ strtRunCP(CPStruct& cp)
 
 		ca.axis.RPsProduced = (UINT32)(ca.axis.RPsProduced * ca.axis.factoryMultiplier);
 		ca.allied.RPsProduced = (UINT32)(ca.allied.RPsProduced * ca.allied.factoryMultiplier);
-
-#ifdef BETA_RELEASE
-		if ( g_logRPProduction )
-		{
-			WWII_SIDE_ACC* sa;
-			if ( cp.side == AXIS )
-				sa = &ca.axis;
-			else
-				sa = &ca.allied;
-
-			dbugLog(_FLI, "%s Stored: %d, Produced: %d, Total: %d"
-					, cp.name
-					, sa->depotRPs, sa->RPsProduced, sa->RPs
-					);
-		}
-#endif
 
 		_repairCP(cp, ca);
 
@@ -581,8 +556,6 @@ strtRunCP(CPStruct& cp)
 			_repairBridge(bridge);
 		}
 	}
-
-	return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -891,7 +864,7 @@ _repairFacility(FacilityStruct& facility, WWII_SIDE_ACC& sa, UCHAR* lastPercentD
 	SINT32 rpsAvailable, rpsTransAvailable;
 	UINT32 const * RPs;
 	SINT32	originalCapacity;
-	LOGICAL	needSave = FALSE;
+	bool needSave = false;
 
 	//rpsTransferred tracks the transfer limit for the facility
 	rpsTransferred=0;
@@ -914,7 +887,7 @@ _repairFacility(FacilityStruct& facility, WWII_SIDE_ACC& sa, UCHAR* lastPercentD
 		{
  			_repairObject(lastPercentDamage,  *currentObject);
 
-			needSave = TRUE;
+			needSave = true;
 
  			continue;
 		}
@@ -1842,10 +1815,10 @@ strtOpenBase(FacilityStruct& facility)
 //////////////////////////////////////////////////////////////////////
 //
 //Rip through a list of bridge entries and change all the links
-static LOGICAL _changeLinks(BRIDGE_ENTRY* linkList, bool closed)
+static bool _changeLinks(BRIDGE_ENTRY* linkList, bool closed)
 {
 	if (linkList == nullptr)
-		return FALSE;
+		return false;
 
 	BRIDGE_ENTRY* current = linkList;
 	while (current != nullptr)
@@ -1864,7 +1837,7 @@ static LOGICAL _changeLinks(BRIDGE_ENTRY* linkList, bool closed)
 		linkList=linkList->next;
 	}
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -18,7 +18,7 @@ public:
 	MissionDetail() : m_result(MC_ERROR),m_timeLaunch(0) { *m_desc=0; }
 	~MissionDetail() {}
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	void populate(const Mission* mission, bool isCurrent, bool isLeader, UINT32 launchDelay);
 
 	UINT32 launchDelay() const;

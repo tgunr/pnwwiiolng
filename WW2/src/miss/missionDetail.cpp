@@ -11,7 +11,7 @@
 #include "teul/teulTime.h"
 
 SINT32
-MissionDetail::packer(LOGICAL mode, ACTION_OBJECT* a)
+MissionDetail::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_result, 8);
 	if ( m_result < MC_ERROR )

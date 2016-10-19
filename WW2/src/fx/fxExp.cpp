@@ -43,32 +43,58 @@ static piCOLORVALUE* g_lpColor = nullptr;
 static FLOAT32 g_fPi = PI;
 static FLOAT32 g_fPiOver180 = 0.0f;
 
-static LOGICAL _AddExp(FXEXPLOSION* lpExp);
-static LOGICAL _AirBurst(SINT32 iID);
-static LOGICAL _CheckForExps();
-static LOGICAL _CreateBombExp(SINT32 iID);
-static LOGICAL _CreateLight(SINT32 iID);
-static LOGICAL _CreatePlaneFire(SINT32 iID, OBJECT* lpObj);
-static LOGICAL _CreateShake(SINT32 iID);
-static LOGICAL _CreateShockWave(SINT32 iID);
-static LOGICAL _CreateSparks(FLOAT64VECTOR* pPos, FLOAT32 fPOWEnergy);
-#if(0)
-static LOGICAL _CreateWaterSplash(SINT32 iID);
-#endif
-static LOGICAL _DrawShockWave(SINT32 iID);
-static LOGICAL _FreeExp(FXEXPLOSION* lpExp);
-static LOGICAL _FreeIfNecessary(SINT32 iID);
-static LOGICAL _GetExp(FXEXPLOSION** lpExp);
-static LOGICAL _GrenadeExp(SINT32 iID);
-static LOGICAL _GroundBurst(SINT32 iID);
-static LOGICAL _ReleaseExp(FXEXPLOSION* lpExp);
-static LOGICAL _SatchelExp(SINT32 iID);
-static LOGICAL _UpdateShake(SINT32 iID);
-static LOGICAL _VehicleExplosion(SINT32 iID);
+static void _CreateBombExp(SINT32 iID);
+static void _CreateLight(SINT32 iID);
+static void _CreatePlaneFire(SINT32 iID, OBJECT* lpObj);
+static void _CreateShake(SINT32 iID);
+static void _CreateShockWave(SINT32 iID);
+static void _CreateSparks(FLOAT64VECTOR* pPos, FLOAT32 fPOWEnergy);
+static void _DrawShockWave(SINT32 iID);
 
 static void _UpdateShockWave(SINT32 iID);
 
 #define USE_FX2 1
+
+//////////////////////////////////////////////////////////////////////
+// Function: _ReleaseExp
+// Description:
+//////////////////////////////////////////////////////////////////////
+static void _ReleaseExp(FXEXPLOSION* lpExp)
+{
+	if (lpExp) {
+		if (lpExp->next)
+			lpExp->next->prev = lpExp->prev;
+		if (lpExp->prev)
+			lpExp->prev->next = lpExp->next;
+		lpExp->next = lpExp->prev = nullptr;
+	}
+}
+
+//////////////////////////////////////////////
+// Function: _FreeExp
+// Description:
+//////////////////////////////////////////////
+static void _FreeExp(FXEXPLOSION* lpExp)
+{
+	if (lpExp == nullptr)
+		return;
+
+	FXEXPLOSION* lpPrev = nullptr;
+
+	SINT32 iIndex = lpExp->iIndex;
+
+	memset(lpExp, 0, sizeof(FXEXPLOSION));
+
+	lpExp->iIndex = iIndex;
+
+	lpPrev = g_expFreeTail.prev;
+
+	lpExp->prev = lpPrev;
+	lpExp->next = &g_expFreeTail;
+
+	lpPrev->next = lpExp;
+	g_expFreeTail.prev = lpExp;
+}
 
 ////////////////////////////////////
 // Function: fxExpInit
@@ -147,6 +173,226 @@ void fxExpKill()
     memset(&g_expFreeTail, 0, sizeof(FXEXPLOSION));
 }
 
+//////////////////////////////////////////////////////////////////////
+// Function: _GrenadeExp
+// Description:
+//////////////////////////////////////////////////////////////////////
+static void _GrenadeExp(SINT32 id)
+{
+	TransformEffect* te = nullptr;
+	if (g_lpExp[id - 1].bIsWater)
+	{
+		te = TransformEffect::AddEffect("watergrenade", Vec3f(g_lpExp[id - 1].n), 0, nullptr);
+	}
+	else
+	{
+		te = TransformEffect::AddEffect("grenade", Vec3f(g_lpExp[id - 1].n), 0, nullptr);
+	}
+
+	if (te)
+	{
+		Vec3d p(g_lpExp[id - 1].vecPos);
+		p.z() = -p.z();
+
+		te->enableemitters(true);;
+		te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
+		te->setmatrix(Matrixf::translate(p));
+	}
+
+	_CreateLight(id);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Function: _AirBurst
+// Description: Create explosion for airbursts.
+//////////////////////////////////////////////////////////////////////
+static void _AirBurst(SINT32 iID)
+{
+	SINT32 iIndex = iID - 1;
+
+	if (iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
+		return;
+
+	fxExpSetRadius(iID, g_lpExp[iIndex].fPowEnergy * 0.005f);
+
+	switch (g_lpExp[iIndex].uSubType)
+	{
+	case WEAPAMMO_SUBTYPE_BOMB:
+	case WEAPAMMO_SUBTYPE_NUKE:
+	{
+		_CreateShockWave(iID);
+		_CreateLight(iID);
+
+		fxPclCreateExplosion(&g_lpExp[iIndex].vecPos, g_lpExp[iIndex].fEnergy);
+		break;
+	}
+	case WEAPAMMO_SUBTYPE_AIRBURST:
+	{
+		_CreateLight(iID);
+
+		TransformEffect* te = TransformEffect::AddEffect("flak", Vec3f(0, 0, 0), 0, nullptr);
+
+		if (te)
+		{
+			Vec3d p(g_lpExp[iIndex].vecPos);
+			p.z() = -p.z();
+
+			te->enableemitters(true);;
+			te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
+			te->setmatrix(Matrixf::translate(p));
+		}
+
+		break;
+	}
+	case WEAPAMMO_SUBTYPE_GRENADE:
+	case WEAPAMMO_SUBTYPE_MORTAR:
+	{
+		_GrenadeExp(iID);
+		break;
+	}
+	default:
+	{
+		_CreateLight(iID);
+
+		TransformEffect* te = TransformEffect::AddEffect("smallcannon", Vec3f(0, 0, 0), 0, nullptr);
+
+		if (te)
+		{
+			Vec3d p(g_lpExp[iIndex].vecPos);
+			p.z() = -p.z();
+
+			te->enableemitters(true);;
+			te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
+			te->setmatrix(Matrixf::translate(p));
+		}
+		break;
+	}
+	}
+
+	_CreateShake(iID);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Function: _GroundBurst
+// Description: Create ground burst.
+//////////////////////////////////////////////////////////////////////
+static void _GroundBurst(SINT32 ID)
+{
+	SINT32 i = ID - 1;
+
+	if (i < 0 || i >= DEF_MAX_EXPLOSIONS)
+		return;
+
+	if (g_lpExp[i].fPowEnergy <= 0.0001f)
+		return;
+
+	fxExpSetRadius(ID, g_lpExp[i].fPowEnergy * 0.005f);
+
+	switch (g_lpExp[i].uSubType)
+	{
+	case WEAPAMMO_SUBTYPE_BOMB:
+	case WEAPAMMO_SUBTYPE_NUKE:
+	{
+		_CreateShockWave(ID);
+		_CreateLight(ID);
+		_CreateBombExp(ID);
+		break;
+	}
+	case WEAPAMMO_SUBTYPE_AIRBURST:
+	{
+		_CreateLight(ID);
+
+		if (g_lpExp[i].bIsWater)
+		{
+			fxPclCreateH2OExplosion(&g_lpExp[i].vecPos, g_lpExp[i].fEnergy);
+		}
+		else
+		{
+			fxPclCreateExplosion(&g_lpExp[i].vecPos, g_lpExp[i].fEnergy);
+		}
+
+		break;
+	}
+	case WEAPAMMO_SUBTYPE_GRENADE:
+	case WEAPAMMO_SUBTYPE_MORTAR:
+	{
+		_GrenadeExp(ID);
+		break;
+	}
+	default:
+	{
+		_CreateLight(ID);
+
+		if (g_lpExp[i].bIsWater)
+		{
+			fxPclCreateH2OExplosion(&g_lpExp[i].vecPos, g_lpExp[i].fEnergy);
+		}
+		else
+		{
+			fxPclCreateExplosion(&g_lpExp[i].vecPos, g_lpExp[i].fEnergy);
+		}
+
+		break;
+	}
+	}
+
+	_CreateShake(ID);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Function: _VehicleExplosion
+// Description:
+//////////////////////////////////////////////////////////////////////
+static void _VehicleExplosion(SINT32 id)
+{
+	OBJECT* o = g_lpExp[id - 1].lpVehAttach->VehicleObjectData->PlaneObject;
+
+	fxPclCreateExplosion(&g_lpExp[id - 1].vecPos, g_lpExp[id - 1].fEnergy);
+
+	_CreatePlaneFire(id, o);
+
+	_CreateLight(id);
+	_CreateShockWave(id);
+
+	// Shake the screen
+	_CreateShake(id);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Function: _SatchelExp
+// Description:
+//////////////////////////////////////////////////////////////////////
+static void _SatchelExp(SINT32 ID)
+{
+	Vec3d p(g_lpExp[ID - 1].vecPos);
+	p.z() = -p.z();
+
+	Vec3f n(g_lpExp[ID - 1].n);
+
+	TransformEffect* te = nullptr;
+
+	if (g_lpExp[ID - 1].bIsWater)
+	{
+		te = TransformEffect::AddEffect("water_satchelgeneric", n, 0, nullptr);
+	}
+	else
+	{
+		te = TransformEffect::AddEffect("satchelgeneric", n, 0, nullptr);
+	}
+
+	if (te)
+	{
+		te->enableemitters(true);;
+		te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
+		te->setmatrix(Matrixf::translate(p));
+	}
+
+	_CreateLight(ID);
+
+	// Shake the screen.
+	_CreateShake(ID);
+}
+
 //////////////////////////////////////////////
 // Function: fxExpInitExplosion
 // Description:
@@ -192,351 +438,20 @@ void fxExpInitExplosion(SINT32 iID)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Function: _SatchelExp
-// Description:
-//////////////////////////////////////////////////////////////////////
-LOGICAL _SatchelExp(SINT32 ID)
-{
-    Vec3d p(g_lpExp[ID-1].vecPos);
-    p.z() = -p.z();
-
-    Vec3f n(g_lpExp[ID-1].n);
-
-    TransformEffect* te = nullptr;
-
-    if(g_lpExp[ID-1].bIsWater)
-    {
-        te = TransformEffect::AddEffect("water_satchelgeneric", n, 0, nullptr);
-    }
-    else
-    {
-        te = TransformEffect::AddEffect("satchelgeneric", n, 0, nullptr);
-    }
-
-    if(te)
-    {
-        te->enableemitters(true);;
-        te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
-        te->setmatrix(Matrixf::translate(p));
-    }
-
-    _CreateLight(ID);
-
-    // Shake the screen.
-    _CreateShake(ID);
-
-    return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Function: _VehicleExplosion
-// Description:
-//////////////////////////////////////////////////////////////////////
-LOGICAL _VehicleExplosion(SINT32 id)
-{
-    OBJECT* o = nullptr;
-    o = g_lpExp[id-1].lpVehAttach->VehicleObjectData->PlaneObject;
-
-    fxPclCreateExplosion(&g_lpExp[id-1].vecPos, g_lpExp[id-1].fEnergy);
-
-    _CreatePlaneFire(id, o);
-
-    _CreateLight(id);
-    _CreateShockWave(id);
-
-    // Shake the screen
-    _CreateShake(id);
-
-    return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Function: _AirBurst
-// Description: Create explosion for airbursts.
-//////////////////////////////////////////////////////////////////////
-LOGICAL _AirBurst(SINT32 iID)
-{
-    SINT32 iIndex = iID - 1;
-
-    if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
-        return FALSE;
-
-    fxExpSetRadius(iID, g_lpExp[iIndex].fPowEnergy * 0.005f);
-
-    switch(g_lpExp[iIndex].uSubType)
-    {
-    case WEAPAMMO_SUBTYPE_BOMB:
-    case WEAPAMMO_SUBTYPE_NUKE:
-        {
-            _CreateShockWave(iID);
-            _CreateLight(iID);
-
-            fxPclCreateExplosion(&g_lpExp[iIndex].vecPos, g_lpExp[iIndex].fEnergy);
-            break;
-        }
-    case WEAPAMMO_SUBTYPE_AIRBURST:
-        {
-            _CreateLight(iID);
-
-            TransformEffect* te = TransformEffect::AddEffect("flak", Vec3f(0, 0, 0), 0, nullptr);
-
-            if(te)
-            {
-                Vec3d p(g_lpExp[iIndex].vecPos);
-                p.z() = -p.z();
-
-                te->enableemitters(true);;
-                te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
-                te->setmatrix(Matrixf::translate(p));
-            }
-
-            break;
-        }
-    case WEAPAMMO_SUBTYPE_GRENADE:
-    case WEAPAMMO_SUBTYPE_MORTAR:
-        {
-            _GrenadeExp(iID);
-            break;
-        }
-    default:
-        {
-            _CreateLight(iID);
-
-            TransformEffect* te = TransformEffect::AddEffect("smallcannon", Vec3f(0, 0, 0), 0, nullptr);
-
-            if(te)
-            {
-                Vec3d p(g_lpExp[iIndex].vecPos);
-                p.z() = -p.z();
-
-                te->enableemitters(true);;
-                te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
-                te->setmatrix(Matrixf::translate(p));
-            }
-            break;
-        }
-    }
-
-    if(!_CreateShake(iID))
-        return FALSE;
-
-    return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Function: _GroundBurst
-// Description: Create ground burst.
-//////////////////////////////////////////////////////////////////////
-LOGICAL _GroundBurst(SINT32 ID)
-{
-    SINT32 i = ID - 1;
-
-    if(i < 0 || i >= DEF_MAX_EXPLOSIONS)
-        return FALSE;
-
-    if(g_lpExp[i].fPowEnergy <= 0.0001f)
-        return FALSE;
-
-    fxExpSetRadius(ID, g_lpExp[i].fPowEnergy * 0.005f);
-
-    switch(g_lpExp[i].uSubType)
-    {
-    case WEAPAMMO_SUBTYPE_BOMB:
-    case WEAPAMMO_SUBTYPE_NUKE:
-        {
-            _CreateShockWave(ID);
-            _CreateLight(ID);
-            _CreateBombExp(ID);
-            break;
-        }
-    case WEAPAMMO_SUBTYPE_AIRBURST:
-        {
-            _CreateLight(ID);
-
-            if(g_lpExp[i].bIsWater)
-            {
-                fxPclCreateH2OExplosion(&g_lpExp[i].vecPos, g_lpExp[i].fEnergy);
-            }
-            else
-            {
-                fxPclCreateExplosion(&g_lpExp[i].vecPos, g_lpExp[i].fEnergy);
-            }
-
-            break;
-        }
-    case WEAPAMMO_SUBTYPE_GRENADE:
-    case WEAPAMMO_SUBTYPE_MORTAR:
-        {
-            _GrenadeExp(ID);
-            break;
-        }
-    default:
-        {
-            _CreateLight(ID);
-
-            if(g_lpExp[i].bIsWater)
-            {
-                fxPclCreateH2OExplosion(&g_lpExp[i].vecPos, g_lpExp[i].fEnergy);
-            }
-            else
-            {
-                fxPclCreateExplosion(&g_lpExp[i].vecPos, g_lpExp[i].fEnergy);
-            }
-
-            break;
-        }
-    }
-
-    _CreateShake(ID);
-
-    return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Function: _GrenadeExp
-// Description:
-//////////////////////////////////////////////////////////////////////
-LOGICAL _GrenadeExp(SINT32 id)
-{
-    TransformEffect* te = nullptr;
-
-    if(g_lpExp[id-1].bIsWater)
-    {
-        te = TransformEffect::AddEffect("watergrenade", Vec3f(g_lpExp[id-1].n), 0, nullptr);
-    }
-    else
-    {
-        te = TransformEffect::AddEffect("grenade", Vec3f(g_lpExp[id-1].n), 0, nullptr);
-    }
-
-    if(te)
-    {
-        Vec3d p(g_lpExp[id-1].vecPos);
-        p.z() = -p.z();
-
-        te->enableemitters(true);;
-        te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
-        te->setmatrix(Matrixf::translate(p));
-    }
-
-    _CreateLight(id);
-
-    return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Function: _CreateWaterSplash
-// Description:
-//////////////////////////////////////////////////////////////////////
-LOGICAL _CreateWaterSplash(SINT32 iID)
-{
-#if(0)
-    SINT32 iIndex = iID - 1;
-
-    if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
-        return FALSE;
-
-    SINT32 iWtrID = fxWtrGetNewWater();
-
-    if(iWtrID == -1)
-        return FALSE;
-
-    fxWtrSetRadius(iWtrID, g_lpExp[iIndex].fPowEnergy * 0.10f);
-    fxWtrSetScale(iWtrID, 1.0f);
-    fxWtrSetStall(iWtrID, 1);
-
-    fxWtrSetPosition(iWtrID,
-                     g_lpExp[iIndex].vecPos.x,
-                     g_lpExp[iIndex].vecPos.y,
-                     g_lpExp[iIndex].vecPos.z);
-
-    fxWtrSetType(iWtrID, IDE_WATERTYPE_HIT);
-    fxWtrPushFlags(iWtrID, DEF_FXFLAG_INTRADIUS);
-    fxWtrPushFlags(iWtrID, DEF_FXFLAG_INTALPHA);
-    fxWtrSet4PtScale(iWtrID, 0.5f, 1.0f, 1.3f, 0.8f);
-    fxWtrSet4PtAlpha(iWtrID, 1.0f, 1.0f, 1.0f, 0.0f);
-    fxWtrSetPt1Time(iWtrID, (FLOAT32)frametime + 150.0f);
-    fxWtrSetPt2Time(iWtrID, (FLOAT32)frametime + 200.0f);
-    fxWtrSetPt3Time(iWtrID, (FLOAT32)frametime + 300.0f);
-    fxWtrSetPt4Time(iWtrID, (FLOAT32)frametime + 5300.0f);
-
-    fxWtrInitWater(iWtrID);
-
-    iWtrID = fxWtrGetNewWater();
-
-    if(iWtrID == -1)
-        return FALSE;
-
-    fxWtrSetRadius(iWtrID, g_lpExp[iIndex].fPowEnergy * 0.06f);
-    fxWtrSetScale(iWtrID, 1.0f);
-
-    fxWtrSetPosition(iWtrID,
-                     g_lpExp[iIndex].vecPos.x,
-                     g_lpExp[iIndex].vecPos.y,
-                     g_lpExp[iIndex].vecPos.z);
-
-    fxWtrSetType(iWtrID, IDE_WATERTYPE_MIST);
-    fxWtrPushFlags(iWtrID, DEF_FXFLAG_INTRADIUS);
-    fxWtrPushFlags(iWtrID, DEF_FXFLAG_INTALPHA);
-    fxWtrSetType(iWtrID, IDE_WATERTYPE_MIST);
-    fxWtrSet4PtScale(iWtrID, 1.0f, 1.1f, 1.2f, 1.3f);
-    fxWtrSet4PtAlpha(iWtrID, 1.0f, 1.0f, 1.0f, 0.0f);
-    fxWtrSetPt1Time(iWtrID, (FLOAT32)frametime + 150.0f);
-    fxWtrSetPt2Time(iWtrID, (FLOAT32)frametime + 650.0f);
-    fxWtrSetPt3Time(iWtrID, (FLOAT32)frametime + 1650.0f);
-    fxWtrSetPt4Time(iWtrID, (FLOAT32)frametime + 3650.0f);
-
-    fxWtrInitWater(iWtrID);
-
-    // Don't need ripples if in aircraft.
-    if(persIsPersonaVehicleType(VEH_TYPE_AIR))
-        return TRUE;
-
-    iWtrID = fxWtrGetNewWater();
-
-    if(iWtrID == -1)
-        return FALSE;
-
-    fxWtrSetType(iWtrID, IDE_WATERTYPE_RIPPLE);
-    fxWtrSetRadius(iWtrID, g_lpExp[iIndex].fPowEnergy * 0.10f);
-    fxWtrSetScale(iWtrID, 1.0f);
-
-    fxWtrSetPosition(iWtrID,
-                     g_lpExp[iIndex].vecPos.x,
-                     g_lpExp[iIndex].vecPos.y,
-                     g_lpExp[iIndex].vecPos.z);
-
-    fxWtrPushFlags(iWtrID, DEF_FXFLAG_INTRADIUS);
-    fxWtrPushFlags(iWtrID, DEF_FXFLAG_INTALPHA);
-    fxWtrSetPt1Time(iWtrID, (FLOAT32)frametime + 150.0f);
-    fxWtrSetPt2Time(iWtrID, (FLOAT32)frametime + 350.0f);
-    fxWtrSetPt3Time(iWtrID, (FLOAT32)frametime + 550.0f);
-    fxWtrSetPt4Time(iWtrID, (FLOAT32)frametime + 1250.0f);
-    fxWtrSet4PtScale(iWtrID, 0.4f, 0.6f, 0.7f, 1.2f);
-    fxWtrSet4PtAlpha(iWtrID, 0.8f, 0.7f, 0.6f, 0.0f);
-    fxWtrSetEmitterObject(iWtrID, g_lpExp[iIndex].lpEmitterObj);
-    fxWtrInitWater(iWtrID);
-#endif
-    return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////
 // Function: _CreatePlaneFire
 // Description:
 //////////////////////////////////////////////////////////////////////
-LOGICAL _CreatePlaneFire(SINT32 iID, OBJECT* lpObj)
+static void _CreatePlaneFire(SINT32 iID, OBJECT* lpObj)
 {
     SINT32 iIndex = iID - 1;
     SCHAR szBuff[3][16] = {"efire", "efire1", "efire2"};
     OBJECT* fireobj = nullptr;
 
     if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
-        return FALSE;
+        return;
 
     if(lpObj == nullptr)
-        return FALSE;
-
-    TransformEffect* te;
+        return;
 
     for(SINT32 i = 0; i < 3; i++)
     {
@@ -545,23 +460,20 @@ LOGICAL _CreatePlaneFire(SINT32 iID, OBJECT* lpObj)
         if(fireobj == nullptr)
             continue;
 
-        te = TransformEffect::AddEffect("planecrashfire", Vec3f(0, 0, -1), 0, fireobj);
-
+        auto te = TransformEffect::AddEffect("planecrashfire", Vec3f(0, 0, -1), 0, fireobj);
         if(te)
         {
             te->enableemitters(true);;
             te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
         }
     }
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Function: _CreateBombExp
 // Description:
 //////////////////////////////////////////////////////////////////////
-LOGICAL _CreateBombExp(SINT32 id)
+static void _CreateBombExp(SINT32 id)
 {
     if(g_lpExp[id-1].bIsWater)
     {
@@ -589,18 +501,15 @@ LOGICAL _CreateBombExp(SINT32 id)
             fxPclCreateExplosion(&g_lpExp[id-1].vecPos, g_lpExp[id-1].fEnergy);
         }
     }
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Function: _CreateSparks
 // Description:
 //////////////////////////////////////////////////////////////////////
-LOGICAL _CreateSparks(FLOAT64VECTOR* pPos, FLOAT32 energy)
+static void _CreateSparks(FLOAT64VECTOR* pPos, FLOAT32 energy)
 {
     TransformEffect* te = TransformEffect::AddEffect("manysparks", Vec3f(0, 0, -1), 0, nullptr);
-
     if(te)
     {
         Vec3d p(*pPos);
@@ -610,25 +519,23 @@ LOGICAL _CreateSparks(FLOAT64VECTOR* pPos, FLOAT32 energy)
         te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
         te->setmatrix(Matrixf::translate(p));
     }
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Function: _CreateLight
 // Description:
 //////////////////////////////////////////////////////////////////////
-LOGICAL _CreateLight(SINT32 iID)
+static void _CreateLight(SINT32 iID)
 {
     SINT32 iIndex = iID - 1;
 
     if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
-        return FALSE;
+        return;
 
     SINT32 iLightID = fxLgtGetNewLight();
 
     if(iLightID == -1)
-        return FALSE;
+        return;
 
     FLOAT32 fLgt = g_lpExp[iIndex].fPowEnergy;
 
@@ -654,20 +561,18 @@ LOGICAL _CreateLight(SINT32 iID)
 
     // Required after settings
     fxLgtInitLight(iLightID);
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Function: _CreateShake
 // Description: Shake view for concussion.
 //////////////////////////////////////////////////////////////////////
-LOGICAL _CreateShake(SINT32 iID)
+static void _CreateShake(SINT32 iID)
 {
     SINT32 iIndex = iID - 1;
 
     if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
-        return FALSE;
+        return;
 
     FLOAT32 fSpeedOfSound = 344.0f;
     FLOAT32 fMultiplier = 1.0f;
@@ -680,7 +585,7 @@ LOGICAL _CreateShake(SINT32 iID)
         mlVehicleData* pData = persGetPersonaModelDataPtr();
 
         if(pData == nullptr)
-            return FALSE;
+            return;
 
         if(pData->VehicleMass > 100.0f)
         {
@@ -703,7 +608,7 @@ LOGICAL _CreateShake(SINT32 iID)
     if(g_lpExp[iIndex].expShake.fTimeToStart - (FLOAT32)frametime >= 2000.0f)
     {
         g_lpExp[iIndex].expShake.bShake = FALSE;
-        return FALSE;
+        return;
     }
 
     g_lpExp[iIndex].expShake.bShake = TRUE;
@@ -718,13 +623,11 @@ LOGICAL _CreateShake(SINT32 iID)
     if(g_lpExp[iIndex].expShake.fShakeStart < 0.004f)
     {
         g_lpExp[iIndex].expShake.bShake = FALSE;
-        return FALSE;
+        return;
     }
 
     g_lpExp[iIndex].expShake.fShakeCurrent = g_lpExp[iIndex].expShake.fShakeStart;
     g_lpExp[iIndex].expShake.fShakeTime = 2000.0f;
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -732,15 +635,15 @@ LOGICAL _CreateShake(SINT32 iID)
 // Description: Set up shock wave parameters.
 // [DCF]**FIXME**
 //////////////////////////////////////////////////////////////////////
-LOGICAL _CreateShockWave(SINT32 iID)
+static void _CreateShockWave(SINT32 iID)
 {
     if(gCustomTerrain)
-        return FALSE;
+        return;
 
     SINT32 iIndex = iID - 1;
 
     if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
-        return FALSE;
+        return;
 
     g_lpExp[iIndex].bShockWave = TRUE;
 
@@ -776,8 +679,61 @@ LOGICAL _CreateShockWave(SINT32 iID)
     g_lpExp[iIndex].vecWave[3].x -= 0.5f;
     g_lpExp[iIndex].vecWave[3].y += 0.5f;
     g_lpExp[iIndex].vecWave[3].z -= 0.2f;
+}
 
-    return TRUE;
+//////////////////////////////////////////////////////////////////////
+// Function: _FreeIfNecessary
+// Description:
+//////////////////////////////////////////////////////////////////////
+
+static void _FreeIfNecessary(SINT32 iID)
+{
+	SINT32 iIndex = iID - 1;
+
+	if (iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
+		return;
+
+	if (!g_lpExp[iIndex].expShake.bShake && !g_lpExp[iIndex].bShockWave)
+	{
+		_ReleaseExp(&g_lpExp[iIndex]);
+		_FreeExp(&g_lpExp[iIndex]);
+	}
+}
+
+///////////////////////////////////	///////////////////////////////////////
+// Function: _UpdateShake
+// Description:
+//////////////////////////////////////////////////////////////////////
+static void _UpdateShake(SINT32 iID)
+{
+	SINT32 iIndex = iID - 1;
+
+	if (iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
+		return;
+
+	FLOAT32 fTimePassed = (FLOAT32)frametime - g_lpExp[iIndex].expTime.p1;
+	FLOAT32 fShakeAmt = 1.0f - (fTimePassed / g_lpExp[iIndex].expShake.fShakeTime);
+
+	g_lpExp[iIndex].expShake.fShakeCurrent = fShakeAmt * g_lpExp[iIndex].expShake.fShakeStart;
+
+	if (g_lpExp[iIndex].expShake.fShakeCurrent <= 0.0f)
+	{
+		g_lpExp[iIndex].expShake.fShakeCurrent = 0.0f;
+		g_lpExp[iIndex].expShake.bShake = FALSE;
+	}
+
+	SINT32 duration = (g_lpExp[iIndex].expShake.fTimeToStart - (FLOAT32)frametime <= 0.0f) * 1000;
+
+	if (duration > 0 && duration <= 2000)
+	{
+		persShakeCamera(g_lpExp[iIndex].expShake.fShakeCurrent, duration);
+	}
+	else
+	{
+		// we're done shaking
+		g_lpExp[iIndex].expShake.fShakeCurrent = 0.0f;
+		g_lpExp[iIndex].expShake.bShake = FALSE;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -812,73 +768,15 @@ LOGICAL fxExpDraw(SINT32 iIndex)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Function: _FreeIfNecessary
-// Description:
-//////////////////////////////////////////////////////////////////////
-LOGICAL _FreeIfNecessary(SINT32 iID)
-{
-    SINT32 iIndex = iID - 1;
-
-    if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
-        return FALSE;
-
-    if(!g_lpExp[iIndex].expShake.bShake && !g_lpExp[iIndex].bShockWave)
-    {
-        _ReleaseExp(&g_lpExp[iIndex]);
-        _FreeExp(&g_lpExp[iIndex]);
-    }
-
-    return TRUE;
-}
-
-///////////////////////////////////	///////////////////////////////////////
-// Function: _UpdateShake
-// Description:
-//////////////////////////////////////////////////////////////////////
-LOGICAL _UpdateShake(SINT32 iID)
-{
-    SINT32 iIndex = iID - 1;
-
-    if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
-        return FALSE;
-
-    FLOAT32 fTimePassed = (FLOAT32)frametime - g_lpExp[iIndex].expTime.p1;
-    FLOAT32 fShakeAmt = 1.0f - (fTimePassed / g_lpExp[iIndex].expShake.fShakeTime);
-
-    g_lpExp[iIndex].expShake.fShakeCurrent = fShakeAmt * g_lpExp[iIndex].expShake.fShakeStart;
-
-    if(g_lpExp[iIndex].expShake.fShakeCurrent <= 0.0f)
-    {
-        g_lpExp[iIndex].expShake.fShakeCurrent = 0.0f;
-        g_lpExp[iIndex].expShake.bShake = FALSE;
-    }
-
-	SINT32 duration = (g_lpExp[iIndex].expShake.fTimeToStart - (FLOAT32)frametime <= 0.0f) * 1000;
-
-    if(duration > 0 && duration <= 2000)
-	{
-        persShakeCamera(g_lpExp[iIndex].expShake.fShakeCurrent, duration);
-	}
-	else
-	{
-		// we're done shaking
-		g_lpExp[iIndex].expShake.fShakeCurrent = 0.0f;
-		g_lpExp[iIndex].expShake.bShake = FALSE;
-	}
-
-    return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////
 // Function: _DrawShockWave
 // Description: Animate shockwave...
 //////////////////////////////////////////////////////////////////////
-LOGICAL _DrawShockWave(SINT32 iID)
+static void _DrawShockWave(SINT32 iID)
 {
     SINT32 iIndex = iID - 1;
 
     if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
-        return FALSE;
+        return;
 
     piMATRIX matOldWorld = *piGetWorldMatrix();
     UINT32 uColor = 0;
@@ -954,15 +852,13 @@ LOGICAL _DrawShockWave(SINT32 iID)
 
     piSetWorldMatrix(&matOldWorld);
     piSetRenderState(piRENDERSTATE_CULLFACEENABLE, piCULLFACEENABLE_DEFAULT);
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Function: _UpdateShockWave
 // Description:
 //////////////////////////////////////////////////////////////////////
-void _UpdateShockWave(SINT32 iID)
+static void _UpdateShockWave(SINT32 iID)
 {
     SINT32 iIndex = iID - 1;
 
@@ -1003,46 +899,16 @@ void _UpdateShockWave(SINT32 iID)
                           &g_lpExp[iIndex].piColor);
 }
 
-//////////////////////////////////////////////
-// Function: _FreeExp
-// Description:
-//////////////////////////////////////////////
-LOGICAL _FreeExp(FXEXPLOSION* lpExp)
-{
-    if(lpExp == nullptr)
-        return FALSE;
-
-    FXEXPLOSION* lpPrev = nullptr;
-
-    SINT32 iIndex = lpExp->iIndex;
-
-    memset(lpExp, 0, sizeof(FXEXPLOSION));
-
-    lpExp->iIndex = iIndex;
-
-    lpPrev = g_expFreeTail.prev;
-
-    lpExp->prev = lpPrev;
-    lpExp->next = &g_expFreeTail;
-
-    lpPrev->next = lpExp;
-    g_expFreeTail.prev = lpExp;
-
-    return TRUE;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Function: _AddExp
 // Description:
 //////////////////////////////////////////////////////////////////////
-LOGICAL _AddExp(FXEXPLOSION* lpExp)
+static bool _AddExp(FXEXPLOSION* lpExp)
 {
-    FXEXPLOSION* lpNext = nullptr;
-
     if(lpExp == nullptr)
-        return FALSE;
+        return false;
 
-    lpNext = g_expHead.next;
+    auto lpNext = g_expHead.next;
 
     g_expHead.next = lpExp;
     lpExp->prev = &g_expHead;
@@ -1050,29 +916,46 @@ LOGICAL _AddExp(FXEXPLOSION* lpExp)
     lpExp->next = lpNext;
     lpNext->prev = lpExp;
 
-    return TRUE;
+    return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Function: _CheckForExps
+// Description:
+//////////////////////////////////////////////////////////////////////
+static bool _CheckForExps()
+{
+	if (g_expFreeHead.next == &g_expFreeTail)
+	{
+		FXEXPLOSION* lpExp = nullptr;
+
+		if (g_expTail.prev == &g_expHead)
+			return false;
+
+		lpExp = g_expTail.prev;
+
+		_ReleaseExp(lpExp);
+		_FreeExp(lpExp);
+	}
+
+	if (g_expFreeHead.next == &g_expFreeTail)
+		return false;
+
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Function: _GetExp
 // Description:
 //////////////////////////////////////////////////////////////////////
-LOGICAL _GetExp(FXEXPLOSION** lpExp)
+static FXEXPLOSION* _GetExp()
 {
-    FXEXPLOSION* lpNode = nullptr;
-    FXEXPLOSION* lpNext = nullptr;
-    FXEXPLOSION* lpPrev = nullptr;
-
-    if(lpExp == nullptr)
-        return FALSE;
-
     if(!_CheckForExps())
-        return FALSE;
+        return nullptr;
 
-    lpNode = g_expFreeHead.next;
-
-    lpPrev = lpNode->prev;
-    lpNext = lpNode->next;
+    auto lpNode = g_expFreeHead.next;
+    auto lpPrev = lpNode->prev;
+    auto lpNext = lpNode->next;
 
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
@@ -1082,64 +965,7 @@ LOGICAL _GetExp(FXEXPLOSION** lpExp)
 
     lpNode->matSize = IdentityMatrix;
 
-    *lpExp = lpNode;
-
-    return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Function: _CheckForExps
-// Description:
-//////////////////////////////////////////////////////////////////////
-LOGICAL _CheckForExps()
-{
-    if(g_expFreeHead.next == &g_expFreeTail)
-    {
-        FXEXPLOSION* lpExp = nullptr;
-
-        if(g_expTail.prev == &g_expHead)
-            return FALSE;
-
-        lpExp = g_expTail.prev;
-
-        if(!_ReleaseExp(lpExp))
-            return FALSE;
-
-        if(!_FreeExp(lpExp))
-            return FALSE;
-    }
-
-    if(g_expFreeHead.next == &g_expFreeTail)
-        return FALSE;
-
-    return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Function: _ReleaseExp
-// Description:
-//////////////////////////////////////////////////////////////////////
-LOGICAL _ReleaseExp(FXEXPLOSION* lpExp)
-{
-    FXEXPLOSION* lpNext = nullptr;
-    FXEXPLOSION* lpPrev = nullptr;
-
-    if(lpExp == nullptr)
-        return FALSE;
-
-    lpNext = lpExp->next;
-    lpPrev = lpExp->prev;
-
-    if(lpNext == nullptr || lpPrev == nullptr)
-        return FALSE;
-
-    lpPrev->next = lpNext;
-    lpNext->prev = lpPrev;
-
-    lpExp->prev = nullptr;
-    lpExp->next = nullptr;
-
-    return TRUE;
+    return lpNode;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1153,7 +979,7 @@ void fxExpSetColor(piCOLORVALUE* lpColor)
 
 //////////////////////////////////////////
 // Function: fxExpUpdate
-// Desctiption:
+// Description:
 //////////////////////////////////////////
 void fxExpUpdate()
 {
@@ -1263,7 +1089,7 @@ void fxExpSetPowEnergy(SINT32 iID, FLOAT32 fEnergy)
 // Function: fxExpSetIsWater
 // Description:
 //////////////////////////////////////////////////////////////////////
-void fxExpSetIsWater(SINT32 iID, LOGICAL bIsWater)
+void fxExpSetIsWater(SINT32 iID, bool bIsWater)
 {
     SINT32 iIndex = iID - 1;
 
@@ -1492,7 +1318,7 @@ SINT32 fxExpGetNewExplosion()
 {
     FXEXPLOSION* lpExp = nullptr;
 
-    if(!_GetExp(&lpExp))
+    if((lpExp = _GetExp()) == nullptr)
         return -1;
 
     if(!_AddExp(lpExp))

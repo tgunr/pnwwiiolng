@@ -31,7 +31,7 @@ namespace Server
 			, m_timestamp(teulClock64)
 			{}
 
-		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a)
+		public: virtual void packer(PackMode mode, ACTION_OBJECT* const a)
 		{
 			a->packer(mode, m_xferID);
 			a->packer(mode, (UINT32*)&m_reason, 8);

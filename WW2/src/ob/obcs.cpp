@@ -38,7 +38,7 @@
 #include "ogl/oglShadow.h"
 #endif
 
-static Covert<LOGICAL> _doCull(TRUE);
+static Covert<bool> _doCull(true);
 
 using SortVector = std::vector<SORTHEADER*>;
 
@@ -379,7 +379,7 @@ void obcsKill()
 	}
 }
 
-void obcsDoCull(LOGICAL cull)
+void obcsDoCull(bool cull)
 {
     _doCull = cull;
 }

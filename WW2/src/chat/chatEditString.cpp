@@ -23,7 +23,7 @@ EditString::EditString(ACTION_OBJECT* const a)
 // Packer
 
 SINT32
-EditString::packer(LOGICAL mode, ACTION_OBJECT* a)
+EditString::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_category, 8);
 	a->offset = teulPackUINT64(mode, a->packed, a->offset, &m_id, 0);

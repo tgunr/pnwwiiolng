@@ -613,8 +613,8 @@ extern UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 											   FLOAT32 * DynamicFriction,
 											   FLOAT32 * RollCoefficientMult,
 											   SINT32 * InfSurfaceID,
-											   OBJECT * Object,
-											   LOGICAL FrictionMods = FALSE);
+											   const OBJECT * Object,
+											   bool FrictionMods = FALSE);
 extern UINT32 mlGetHitSpriteNumbers(SINT32* Sprite1,SINT32* Sprite2,SINT32* Sprite3, const SINT8 * TextureName);
 extern UINT32 mlGetGroundClutterStuff(SINT32* ClutterType1,
 									   SINT32* ClutterType2,

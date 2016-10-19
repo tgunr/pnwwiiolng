@@ -20,7 +20,7 @@ struct MOTD_REQUEST
 	MOTD_REQUEST(UINT32 Type=0) : type(Type) {}
 	MOTD_REQUEST(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	UINT32	type;
 };
@@ -33,7 +33,7 @@ struct MOTD_REPLY
 		: type(Type), added(Added), poster(Poster), message(Message) {}
 	MOTD_REPLY(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	UINT32		type;
 	UINT32		added;

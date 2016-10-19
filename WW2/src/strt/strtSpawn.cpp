@@ -68,7 +68,7 @@ static bool _canSpawn(const TOE_::WeaponInstance*
 						);
 static void _validateCrew(POSTED_WEAPON& currentWeapon);
 
-static LOGICAL _setupSpawnObject(ObjectStruct& object);
+static void _setupSpawnObject(ObjectStruct& object);
 
 extern const std::string& sdmTranslateName(const std::string& from);
 
@@ -578,7 +578,7 @@ strtProcessPostListRequest(SINT32 teulIndex, const MM_POST_LIST_REQUEST& request
 	return weapons;
 }
 
-LOGICAL
+bool
 strtProcessJoinRequest(const MM_JOIN_REQUEST& request, MM_JOIN_ACCEPT& accept, MM_JOIN_DENY& deny)
 {
 	ObjectStruct* object;
@@ -593,7 +593,7 @@ strtProcessJoinRequest(const MM_JOIN_REQUEST& request, MM_JOIN_ACCEPT& accept, M
 	if ( _spawnDisabledByGM(0) )
 	{
 		deny.reasonCode = SPAWN_DISABLED_BY_GM;
-		return FALSE;
+		return false;
 	}
 #endif
 
@@ -602,14 +602,14 @@ strtProcessJoinRequest(const MM_JOIN_REQUEST& request, MM_JOIN_ACCEPT& accept, M
 	if (object == nullptr)
 	{
 		deny.reasonCode = SPAWN_FACILITY_NOT_FOUND;
-		return FALSE;
+		return false;
 	}
 
 	FacilityStruct& facility = object->Facility();
 	if ( facility.side != request.weaponSerial.spec.side() )
 	{
 		deny.reasonCode = SPAWN_FACILITY_CLOSED;
-		return FALSE;
+		return false;
 	}
 
 	currentWeapon = strtFindPostedWeapon(serial);
@@ -617,13 +617,13 @@ strtProcessJoinRequest(const MM_JOIN_REQUEST& request, MM_JOIN_ACCEPT& accept, M
 	{
 		deny.reasonCode = SPAWN_WEAPON_NOT_AT_FACILITY;
 		dbugLog(_FLW, "p:%u couldn't find v:%u", request.customerID, serial);
-		return FALSE;
+		return false;
 	}
 	if ( currentWeapon->m_crew != 0 )
 	{
 		deny.reasonCode = SPAWN_WEAPON_NOT_AT_FACILITY;
 		dbugLog(_FLN, "p:%u v:%u join request denied: already has crew", request.customerID, serial);
-		return FALSE;
+		return false;
 	}
 
 	//If we found it, *AND* nobody else has jumped in it
@@ -632,7 +632,7 @@ strtProcessJoinRequest(const MM_JOIN_REQUEST& request, MM_JOIN_ACCEPT& accept, M
 	{
 		deny.reasonCode = SPAWN_WEAPON_NOT_AT_FACILITY;
 		dbugLog(_FLW, "p:%u got NULL joinNode", request.customerID);
-		return FALSE;
+		return false;
 	}
 
 	joinNode->AddToList(&currentWeapon->m_crewList);
@@ -646,7 +646,7 @@ strtProcessJoinRequest(const MM_JOIN_REQUEST& request, MM_JOIN_ACCEPT& accept, M
 
 	accept.postedWeapon.copy(*currentWeapon);
 
-	return TRUE;
+	return true;
 }
 
 static void
@@ -666,7 +666,7 @@ _validateCrew(POSTED_WEAPON& post)
 }
 
 //This function processes a spawn grant request
-LOGICAL
+bool
 strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRANT_RESPONSE& response)
 {
 	UINT32 serial = request.weaponSerial.serial;
@@ -683,20 +683,20 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	{
 		dbugLog(_FLA, "v:%u spawnGrant: couldn't find weapon", serial);
 		response.code = SPAWN_WEAPON_NOT_AT_FACILITY;
-		return FALSE;
+		return false;
 	}
 
 	if ( currentWeapon->m_facility == nullptr )
 	{
 		dbugLog(_FLI, "v:%u null facility", serial);
 		response.code = SPAWN_FACILITY_NOT_FOUND;
-		return FALSE;
+		return false;
 	}
 	if ( currentWeapon->m_facility->isOpen() == false )
 	{
 		dbugLog(_FLI, "v:%u no spawning: facility %s is closed", serial, currentWeapon->m_facility->name);
 		response.code = SPAWN_FACILITY_CLOSED;
-		return FALSE;
+		return false;
 	}
 
 	//Pick the server that I'm going to send commander and crew to
@@ -705,7 +705,7 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	{
 		dbugLog(_FLA, "v:%u spawnGrant: couldn't find cell server to send players to", serial);
 		response.code = SPAWN_DISABLED_BY_SERVER;
-		return FALSE;
+		return false;
 	}
 
 	// Incase they've changed mission
@@ -729,14 +729,14 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 		case POSTED_WEAPON::_SPAWNED:
 			dbugLog(_FLA,"v:%u recieved spawnRequest for spawned vehicle weapon %p!", serial, currentWeapon);
 			response.code = SPAWN_ERROR;
-			return FALSE;
+			return false;
 			break;
 		case POSTED_WEAPON::_FREE:
 		case POSTED_WEAPON::_CANCELLED:
 		default:
 			LogAbort("v:%u invalid status %d weapon %p!", serial, currentWeapon->m_status, currentWeapon);
 			response.code = SPAWN_ERROR;
-			return FALSE;
+			return false;
 			break;
 	}
 
@@ -745,7 +745,7 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	{
 		dbugLog(_FLW, "Spawn Error in currentWeapon->spawn!");
 		response.code = SPAWN_ERROR;
-		return FALSE;
+		return false;
 	}
 
 	TELL_TESTER(currentWeapon->m_commander
@@ -761,11 +761,11 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 
 	response.code = SPAWN_GRANTED;
 
-	return TRUE;
+	return true;
 }
 
 //This function processes a post info request
-LOGICAL
+bool
 strtProcessJoinListRequest(SINT32 teulIndex, const MM_POST_INFO_REQUEST& request)
 {
 	ObjectStruct* object;
@@ -775,23 +775,23 @@ strtProcessJoinListRequest(SINT32 teulIndex, const MM_POST_INFO_REQUEST& request
 	//Find the posted Vehicle
 	object = strtGetObject(request.weaponSerial.source);
 	if (object == nullptr)
-		return FALSE;
+		return false;
 
 	facility = object->facility;
 	if (facility == nullptr)
-		return FALSE;
+		return false;
 
 	WeapJoinRequestNode* joinNode = WeapJoinRequestNode::Lookup(request.customerID);
 	if (joinNode == nullptr)
 	{
 		// Why not create one, eh?
-		return FALSE;
+		return false;
 	}
 
 	// Find the posted weapon
 	currentWeapon = strtFindPostedWeapon(request.weaponSerial.serial);
 	if ( currentWeapon == nullptr || currentWeapon->multicrew() == false )
-		return FALSE;
+		return false;
 
 	// Remove the crew from the facility list of joiners and move them onto
 	// the vehicle's list of wannabes.
@@ -799,37 +799,7 @@ strtProcessJoinListRequest(SINT32 teulIndex, const MM_POST_INFO_REQUEST& request
 
 	strtSendMMJoinListResponse(currentWeapon->m_commander, joinNode->m_playerID, joinNode->m_handle);
 
-	return TRUE;
-}
-
-//This function processes a post info request
-LOGICAL
-strtProcessPostInfoRequest(const MM_POST_INFO_REQUEST& request, MM_POST_INFO_RESPONSE& response)
-{
-	ObjectStruct* object;
-	FacilityStruct* facility;
-
-	response.join = request.join;
-
-	//Find the posted Vehicle
-	object = strtGetObject(request.weaponSerial.source);
-	if (object == nullptr)
-		return FALSE;
-
-	facility = object->facility;
-	if (facility == nullptr)
-		return FALSE;
-
-	// Find the posted weapon
-	//If found, send the posted weapon back to the mmhost
-	POSTED_WEAPON* currentWeapon = strtFindPostedWeapon(request.weaponSerial.serial);
-	if (currentWeapon == nullptr || ! currentWeapon->multicrew())
-		return FALSE;
-
-	response.postedWeapon.copy(*currentWeapon);
-	response.customerID = request.customerID;
-
-	return TRUE;
+	return true;
 }
 
 void
@@ -884,19 +854,16 @@ strtProcessPostInfoUpdate(MM_POST_INFO_UPDATE* infoUpdate)
 //////////////////////////////////////////////////////////////////////
 //
 
-LOGICAL
-strtProcessSpawnCancel(MM_SPAWN_CANCEL* spawnCancel)
+bool
+strtProcessSpawnCancel(const MM_SPAWN_CANCEL& spawnCancel)
 {
-	if (spawnCancel == nullptr)
-		return FALSE;
-
-	WeapJoinRequestNode* joinNode = WeapJoinRequestNode::Lookup(spawnCancel->customerID);
+	WeapJoinRequestNode* joinNode = WeapJoinRequestNode::Lookup(spawnCancel.customerID);
 	if (! joinNode)
-		return FALSE;
+		return false;
 
 	_cleanUpJoinNode(joinNode);
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1320,7 +1287,7 @@ void
 strtExpireSpawnedWeapons()
 {
 #ifdef BETA_RELEASE
-	LOGICAL	debugSupplyEnabledMemory = strtGetDebugSupply();
+	bool debugSupplyEnabledMemory = strtGetDebugSupply();
 
 	strtDisableDebugSupply();
 #endif
@@ -1357,7 +1324,7 @@ strtExpireSpawnedWeapons()
 // each country, now that it uses the same process as setup class
 // the two could probably be merged.
 
-static LOGICAL
+static void
 _setupSpawnObject(ObjectStruct& object)
 {
 	if ( object.facility == nullptr )
@@ -1382,12 +1349,12 @@ _setupSpawnObject(ObjectStruct& object)
 						, PRA_WEAPON_SPEC(spawnAbility)
 						);
 		}
-		return FALSE;
+		return;
 	}
 
 	_addWeaponListToFacility(object.facility, weaponList, object, spawnAbility.wCategory);
 
-	return TRUE;
+	return;
 }
 
 //////////////////////////////////////////////////////////////////////

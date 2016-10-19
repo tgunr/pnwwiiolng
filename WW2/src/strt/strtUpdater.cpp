@@ -46,8 +46,6 @@
 std::vector<DAMAGE_QUEUE_ENTRY> damageQueue;
 CPStruct* _cpList;
 
-LOGICAL _stratAddressReceived = FALSE;
-
 static void
 _flushDamageQueue()
 {

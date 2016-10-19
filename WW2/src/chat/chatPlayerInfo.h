@@ -20,7 +20,7 @@ namespace Chat
 		ChatHandle		m_handle;
 		PermissionMask	m_permissionMask;
 
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	};
 
 } // namespace Chat

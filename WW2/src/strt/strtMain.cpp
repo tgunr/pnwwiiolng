@@ -120,7 +120,7 @@ _buildPocketMap()
 
 extern int inUse, allocations;
 
-LOGICAL
+bool
 strtMain(UINT32 currentTime)
 {
 	UINT32 i, toRun, leftToRun;
@@ -169,17 +169,20 @@ strtMain(UINT32 currentTime)
 		LogAbort("build pocket map too %llums", end - start);
 #endif
 
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 void
 strtBroadcastCPs()
 {
-	for ( auto cp = _cpList; cp != nullptr; cp = cp->next )
+	for ( auto cp = _cpList; cp ; cp = cp->next )
+	{
+		//Send the CP status
 		strtQueueCPStatus(cp);
+	}
 }
 
 CPStruct*

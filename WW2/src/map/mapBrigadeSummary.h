@@ -83,7 +83,7 @@ public:
 	explicit BrigadeSummary(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 	// Pack/unpack routine
-	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	virtual SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	//// ---- Member Functions ---- ////
 
@@ -127,7 +127,7 @@ public:
 	BrigadeSummaries() : m_error(false), m_count(0) { }
 	BrigadeSummaries(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
-    SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+    SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
 	// Returns: error < 0  /  ok >= 0
@@ -138,7 +138,7 @@ public:
 	void populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* player);
 
 public:
-	LOGICAL			m_error;							// True error occured
+	bool			m_error;							// True error occured
 	UINT32			m_count;							// Number of summaries described
 	BrigadeSummary	m_summaries[MAX_LISTED_BRIGADES];	// Array of summaries
 };
@@ -158,7 +158,7 @@ public:
 	virtual ~BrigadeDetail() {}
 
 	// Packer
-	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) override;
+	virtual SINT32 packer(PackMode mode, ACTION_OBJECT* a) override;
 
 	// Helpers
 	FULL_OBJ_ID homeCPID() const { return m_homeCPID; }
@@ -204,7 +204,7 @@ public:
 	SINT32 receive(SINT32 teulIndex);
 
 	// Packer
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	//// ---- Member variables ---- ////
 public:

@@ -2525,9 +2525,7 @@ static SINT32 dot_moreammo(const char* line)
 	if(!veh) return DC_ERROR;
 
 	SINT32 numRounds = 999;
-	UINT32 Position;
-
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	sscanf(line, "%*s %d", &numRounds);
 
@@ -2844,7 +2842,7 @@ static SINT32 dot_die(const char* line)
 
 static SINT32 dot_texture(const char* line)
 {
-    static LOGICAL enabled = 1;
+    static bool enabled = TRUE;
 
     enabled = !enabled;
     rnmainListText("Textures %s", enabled ? "ENABLED" : "DISABLED");
@@ -2852,11 +2850,11 @@ static SINT32 dot_texture(const char* line)
     if(!enabled)
     {
         piDisableTexture();
-        piLockTextureState(1);
+        piLockTextureState(true);
     }
     else
     {
-        piLockTextureState(0);
+        piLockTextureState(false);
         piEnableTexture();
     }
 
@@ -4690,7 +4688,7 @@ static SINT32 dot_fogon(const char* line)
 
 static SINT32 dot_cull(const char* line)
 {
-    static LOGICAL toggle = 1;
+    static bool toggle = true;
 
     toggle = !toggle;
 
@@ -4771,7 +4769,7 @@ static SINT32 dot_drawunsortedcockpit(const char* line)
 
 static SINT32 dot_terraindraw(const char* line)
 {
-    static LOGICAL toggle = TRUE;
+    static bool toggle = true;
 
     toggle = !toggle;
 
@@ -4784,7 +4782,7 @@ static SINT32 dot_terraindraw(const char* line)
 
 static SINT32 dot_radclutter(const char* line)
 {
-    static LOGICAL toggle;
+    static bool toggle = false;
     static bool firsttime = true;
 
     if(firsttime)
@@ -4820,7 +4818,7 @@ static int dot_drawalloff(const char* line)
 
 static SINT32 dot_loadtrees(const char* line)
 {
-    static LOGICAL toggle = TRUE;
+    static bool toggle = true;
 
     toggle = !toggle;
 
@@ -5518,8 +5516,7 @@ static phui::Periodical* TurretTestUpdate;
 static void TurretTestCallback(phui::Periodical*, unsigned int, void*)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
-	UINT32 Position;
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	if(VehicleData && VehicleData->LastTurretTraverse[Position] < 0 && VehicleData->TurretTraverse[Position] > 0)
 	{
@@ -5533,9 +5530,7 @@ static void TurretTestCallback(phui::Periodical*, unsigned int, void*)
 static SINT32 dot_turrettest(const char*)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	UINT32 Position;
-
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	TurretTest = 1;
 	TurretTestStartTime = frametime;
@@ -5932,14 +5927,7 @@ static SINT32 dot_vehlod(const char* line)
 
 #endif // GM_RELEASE
 
-
-
 #ifdef BETA_RELEASE
-#if(0)
-static LOGICAL _CollideRoundWithTerrain(FASTCOLLIDE** CollideListPtr,  UINT32* NumCollisionSlotsLeft,
-											piVECTOR const* OldPos, piVECTOR const* NewPos);
-#endif
-
 /************************************************************************************************
 	TrnTextureCmd
 *************************************************************************************************/
@@ -5965,43 +5953,9 @@ static SINT32 dot_trntex(const char* line)
 	return DC_HANDLED;
 }
 
-/************************************************************************************************
-	_CollideRoundWithTerrain
-*************************************************************************************************/
-
-#if(0)
-static LOGICAL _CollideRoundWithTerrain(FASTCOLLIDE** CollideListPtr,  UINT32* NumCollisionSlotsLeft,
-											piVECTOR const* OldPos, piVECTOR const* NewPos)
-{
-	piVECTOR CollidePnt;
-	OBJECT* CollideObject;
-	SINT32 PolyNum;
-
-	if(*NumCollisionSlotsLeft <= 1) return FALSE;
-
-	if(trnopCollide(OldPos,NewPos,&CollidePnt,&CollideObject,&PolyNum) != 0)
-	{
-		(*CollideListPtr)[0].CollideObject = CollideObject;
-		(*CollideListPtr)[0].TopLevelObject = nullptr;
-		(*CollideListPtr)[0].PolyNum = PolyNum;
-		(*CollideListPtr)[0].CollideTime = 0;// this apparently isn't time but the t param of the collision point on the between old and new pos
-		(*CollideListPtr)[0].CollidePnt = CollidePnt;
-		(*CollideListPtr)[0].OldPos = *OldPos;
-		(*CollideListPtr)[0].NewPos = *NewPos;
-		(*CollideListPtr)[0].Alpha = 1.0;
-		(*NumCollisionSlotsLeft)--;
-		(*CollideListPtr)++;
-
-		return TRUE;
-	}
-
-	return FALSE;
-}
-#endif
-
 static SINT32 dot_drawoctettris(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static bool toggle = false;
 
     toggle = !toggle;
 
@@ -6012,7 +5966,7 @@ static SINT32 dot_drawoctettris(const char* line)
 
 static SINT32 dot_drawobtris(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 
@@ -6023,7 +5977,7 @@ static SINT32 dot_drawobtris(const char* line)
 
 static SINT32 dot_drawobnormals(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 
@@ -6034,7 +5988,7 @@ static SINT32 dot_drawobnormals(const char* line)
 
 static SINT32 dot_drawcolnormals(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 
@@ -6045,7 +5999,7 @@ static SINT32 dot_drawcolnormals(const char* line)
 
 static SINT32 dot_drawbbox(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 
@@ -6060,7 +6014,7 @@ static SINT32 dot_drawcollisionobjects(const char* line)
 {
     extern void obdrawDrawCollisionObjects(LOGICAL);
 
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 
@@ -6073,7 +6027,7 @@ static SINT32 dot_drawcollisionobjects(const char* line)
 
 static SINT32 dot_drawtobbox(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 

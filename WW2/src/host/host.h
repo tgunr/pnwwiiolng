@@ -70,7 +70,6 @@ struct MY_SERVER_INFO
 extern SINT32			authConnection;
 extern SINT32 updateBcastRecv, updateBcastSend;
 extern MY_SERVER_INFO msi;
-extern LOGICAL serverResync;
 
 extern SINT32 hostGetMapConnection();
 extern UINT32 hostGetStratAddress();

@@ -20,8 +20,6 @@
 
 #include "host/hostTiming.h"
 
-static LOGICAL _callbacksInited = FALSE;
-
 TEUL_CALLBACK* TEUL_CALLBACK::s_callbackArray[256][256];
 
 TEUL_CALLBACK*	teulAllocSystemCallback(Teul::CallbackInit* const ci);
@@ -172,8 +170,6 @@ void teulFreeAllCallbacks()
 				objPtr->Release();
 		}
 	}
-
-	_callbacksInited = TRUE;
 }
 
 static SINT32

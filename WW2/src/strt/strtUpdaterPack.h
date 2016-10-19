@@ -7,4 +7,4 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-extern SINT32 strtPackEnemySpotted(LOGICAL mode, UCHAR* data, SINT32 offset, struct STRAT_ENEMY_REPORT* report, SINT32 size);
+extern SINT32 strtPackEnemySpotted(PackMode mode, UCHAR* data, SINT32 offset, struct STRAT_ENEMY_REPORT* report, SINT32 size);

@@ -522,7 +522,6 @@ UINT32 _ProcessCallback(SINT32 InParameter,UINT32 Id,UINT32 Detach)
 	vehCntrlCommandListElement* Element = _LookupElement(Id);
 	if(Element == nullptr) return 0;
 
-	UINT32 Position;
 	FLOAT32 Strength;
 	LOGICAL ControlsDisabled;
 
@@ -531,7 +530,7 @@ UINT32 _ProcessCallback(SINT32 InParameter,UINT32 Id,UINT32 Detach)
 	// if it's an axis function for the IK system we still execute it
 	// this is to allow axis operations to trigger
 //	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 	persGetControlStatus(&Strength,&ControlsDisabled);
 
 	if(EZ_MGR && EZ_MGR->InputBlock(Id))

@@ -456,8 +456,7 @@ LOGICAL fxSndCalculateVolume(FXSOUND* s)
         }
     }
 
-    UINT32 position = 0;
-    persGetPersonaPosition(&position);
+    UINT32 position = persGetPersonaPosition();
 
     if(_stopsoundposition[position])
     {
@@ -583,7 +582,7 @@ LOGICAL fxSndUpdate()
         {
             // Set flag to prevent ambient sounds from playing.
             if(s->volume > 0.3f)
-                fxAmbStop(TRUE);
+                fxAmbStop(true);
         }
 
         if(s->onchannel)
@@ -1353,8 +1352,7 @@ LOGICAL _calculateVolumeAndPan(FXSOUND* s)
 
     s->pitch = s->originalPitch;
 
-    UINT32 position = 0;
-    persGetPersonaPosition(&position);
+    UINT32 position = persGetPersonaPosition();
 
     if(s->playType == DEF_PLAYTYPE_HEAD)
     {

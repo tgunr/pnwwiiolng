@@ -112,7 +112,7 @@ public:
 	const PLAYER_LIST& players() const;
 	PLAYER_LIST& players();
 
-	SINT32 packFirstTime(LOGICAL mode, UCHAR* data, SINT32 offset);
+	SINT32 packFirstTime(PackMode mode, UCHAR* data, SINT32 offset);
 
 	//! Send the specified packet to ALL players attached to me,
 	//! with protection against them CTHLing midway.

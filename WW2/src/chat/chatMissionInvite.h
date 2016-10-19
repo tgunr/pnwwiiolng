@@ -30,7 +30,7 @@ public:
 	MissionInvite(ACTION_OBJECT* const a);
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	UINT32			m_missionID;		// 0 or ID of active mission

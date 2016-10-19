@@ -1901,14 +1901,12 @@ static void _CleanVehicle(vehVehicle* v)
 
 #ifdef CLIENT_VEHICLE_CACHING
 
-static LOGICAL _processvehicleobject(struct OBJECT* o, void* userdata)
+static void _processvehicleobject(OBJECT& o, void* userdata)
 {
 	if(userdata)
-		obmainMoveToObjectTree(o);
+		obmainMoveToObjectTree(&o);
 	else
-		obmainMoveToNotObjectTree(o);
-
-	return TRUE;
+		obmainMoveToNotObjectTree(&o);
 }
 
 static UINT32 _AddToReadyList(vehVehicle* Vehicle)

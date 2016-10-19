@@ -31,10 +31,10 @@ struct MissionStatus
 	}
 
 	enum { GroupPresenceBits = 8 };
-	const TeulTimeMS& lastModified() const { return m_lastModified; }
+	const TeulTimeMS lastModified() const { return m_lastModified; }
 	bool groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPack) const;
 	bool groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack);
-	bool packer(LOGICAL mode, ACTION_OBJECT* const a, TeulTimeMS lastPack) { return (mode == TEUL_PACK) ? pack(a, lastPack) : unpack(a, lastPack); }
+	bool packer(PackMode mode, ACTION_OBJECT* const a, TeulTimeMS lastPack) { return (mode == TEUL_PACK) ? pack(a, lastPack) : unpack(a, lastPack); }
 	bool pack(ACTION_OBJECT* const a, TeulTimeMS lastPack) const;
 	bool unpack(ACTION_OBJECT* const a, TeulTimeMS lastPack);
 	TeulTimeMS m_lastModified;
@@ -176,7 +176,7 @@ struct CellHostUpdate
 	}
 	explicit CellHostUpdate(playerid_t playerID_, UINT32 cellHost_) noexcept : playerID{playerID_}, cellHost{cellHost_} {}
 
-	bool packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 size) { return (mode == TEUL_PACK) ? pack(a, size) : unpack(a, size); }
+	bool packer(PackMode mode, ACTION_OBJECT* const a, SINT32 size) { return (mode == TEUL_PACK) ? pack(a, size) : unpack(a, size); }
 	bool pack(ACTION_OBJECT* const a, SINT32 size) const;
 	bool unpack(ACTION_OBJECT* const a, SINT32 size);
 	playerid_t playerID;

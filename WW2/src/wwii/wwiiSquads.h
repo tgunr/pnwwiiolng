@@ -22,7 +22,7 @@ public:
 	Squad(ACTION_OBJECT* const a) { a->offset = packer(TEUL_PACK, a); }
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	enum { NOT_IN_SQUAD, RECRUIT, MEMBER, STAFFER, XO, CO, GM, MAX_RANK };		// Squad ranks
@@ -113,7 +113,7 @@ public:
 	Recruiter(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 

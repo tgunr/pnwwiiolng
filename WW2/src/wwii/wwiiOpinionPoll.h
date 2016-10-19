@@ -29,7 +29,7 @@ public:
 	const char* title() const;				// nullptr if none set
 
 public:		// Member functions
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	void addEntry(const char* entry);
 
 private:
@@ -52,7 +52,7 @@ public:
 	OpinionChoice(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	UINT32 pollID() const { return m_pollID; }

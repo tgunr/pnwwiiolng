@@ -54,9 +54,6 @@ extern bool mmProcessPostDeny(const struct MM_POST_DENY& postDeny);
 //	it on to all who need to know about it
 extern bool mmProcessPostExpired(const struct MM_POST_EXPIRED& postExpired);
 
-//Handles a post info response.  Part of the whole vehicle joining do-se-do.
-extern bool mmProcessPostInfoResponse(const struct MM_POST_INFO_RESPONSE& postInfoResponse);
-
 //Handles the join Accept coming from the strat system.  Tell the accepted
 //	person everything is good to go, then tells the other unlucky people that
 //	they were not chosen to accompany the person on their trip into the magic

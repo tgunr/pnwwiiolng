@@ -2002,8 +2002,7 @@ inline bool NeedCulling()
         return true;
     }
 
-    unsigned int crewpos = 0;
-    persGetPersonaPosition(&crewpos);
+    unsigned int crewpos = persGetPersonaPosition();
 
     if(oldcrewpos != crewpos)
     {

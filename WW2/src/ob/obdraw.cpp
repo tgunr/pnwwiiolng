@@ -4898,12 +4898,12 @@ void obdrawDrawShadowCasters()
     {
         oglDisableTexturesAboveAndIncluding(0);
 
-        oglLockTextureState(1);
+        oglLockTextureState(true);
         oglLockMaterialState(1);
 
         logTimerCallVoid(_drawUnsorted);
 
-        oglLockTextureState(0);
+        oglLockTextureState(false);
         oglLockMaterialState(0);
     }
 }

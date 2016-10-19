@@ -462,7 +462,7 @@ extern LOGICAL		obmainFindCommentCallback(struct OBJECT* lpmain, char* comment, 
 extern LOGICAL		obmainFindCommentFirstPartCallback(struct OBJECT* lpmain, const char* comment, UINT32 user, PROCESSCALLBACK callback);
 extern LOGICAL		obmainFindObjectLOD(struct OBJECT* lpmain, int lod, PROCESSCALLBACK callback);
 extern LOGICAL		obmainFindObjectDamage(struct OBJECT* lpmain, int dmg, PROCESSCALLBACK callback);
-extern void			obmainFindCallback(struct OBJECT* lpmain, FINDCALLBACK callback, void* userdata);
+extern void			obmainFindCallback(struct OBJECT* lpmain, void(*callback)(OBJECT&, void*), void* userdata);
 extern struct OBJECT*	obmainCopyObjectFull(struct OBJECT* lpcopy);
 extern struct OBJECT*	obmainCopyObject(struct OBJECT* lpcopy);
 extern struct OBJECT*	obmainCopyNamedObject(char* name);

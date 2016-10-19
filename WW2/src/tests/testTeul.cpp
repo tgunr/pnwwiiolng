@@ -139,7 +139,7 @@ struct EchoPacketHeader
 	static UINT64 s_requested;
 
 	template<typename Type_>
-	void packData(LOGICAL mode, ACTION_OBJECT* const a)
+	void packData(PackMode mode, ACTION_OBJECT* const a)
 	{
 		Type_* data = (Type_*)(m_data);
 		const size_t typeSize = sizeof(Type_) * 8;
@@ -152,7 +152,7 @@ struct EchoPacketHeader
 		}
 	}
 
-	void packer(LOGICAL mode, ACTION_OBJECT* const a)
+	void packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		a->packer(mode, m_direction, 2);
 		a->packer(mode, m_type, 6);

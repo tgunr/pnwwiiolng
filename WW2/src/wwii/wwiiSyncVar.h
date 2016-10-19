@@ -45,7 +45,7 @@ public:
 	TeulTimeMS lastModified() const { return m_lastModified; }
 
 	//! Function to pack member SyncVars, implemented by derived classes.
-	void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS lastPacked, UINT32& changes)
+	void groupPacker(PackMode mode, ACTION_OBJECT* const a, const TeulTimeMS lastPacked, UINT32& changes)
 	{
 		return (mode == TEUL_PACK) ? groupPack(a, lastPacked, changes) : groupUnpack(a, lastPacked, changes);
 	}
@@ -54,7 +54,7 @@ public:
 	virtual void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPacked, UINT32& changes) = 0;
 
 	//! Function to pack self if there are any changes, otherwise returns false.
-	bool packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS lastPacked) { return (mode == TEUL_PACK) ? pack(a, lastPacked) : unpack(a, lastPacked); }
+	bool packer(PackMode mode, ACTION_OBJECT* const a, const TeulTimeMS lastPacked) { return (mode == TEUL_PACK) ? pack(a, lastPacked) : unpack(a, lastPacked); }
 	bool pack(ACTION_OBJECT* const a, const TeulTimeMS lastPacked) const;
 	bool unpack(ACTION_OBJECT* const a, const TeulTimeMS lastPacked);
 };

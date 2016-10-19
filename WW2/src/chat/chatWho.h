@@ -86,7 +86,7 @@ public:
 
 public:
 	// No network handling (send/receive) - those are done by teulNetworkArray
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	// Accessors

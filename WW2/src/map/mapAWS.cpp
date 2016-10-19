@@ -25,7 +25,7 @@ AWS::Request::Request(ACTION_OBJECT* const a)
 // Packer
 
 SINT32
-AWS::Request::packer(LOGICAL mode, ACTION_OBJECT* a)
+AWS::Request::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_row, 10);
 
@@ -51,7 +51,7 @@ AWS::Grid::Grid(ACTION_OBJECT* const a)
 // Packer
 
 SINT32
-AWS::Grid::packer(LOGICAL mode, ACTION_OBJECT* a)
+AWS::Grid::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	// Definition of the grid
 	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_row, 10);

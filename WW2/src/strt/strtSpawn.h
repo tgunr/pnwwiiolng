@@ -67,23 +67,20 @@ extern SINT32 strtSetupSpawn(FacilityStruct* facility);
 extern bool strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& postRequest, MM_POST_ACCEPT& postAccept, MM_POST_DENY& postDeny);
 
 //Processes an mm join request
-extern LOGICAL strtProcessJoinRequest(const MM_JOIN_REQUEST& joinRequest, MM_JOIN_ACCEPT& joinAccept, MM_JOIN_DENY& joinDeny);
+extern bool strtProcessJoinRequest(const MM_JOIN_REQUEST& joinRequest, MM_JOIN_ACCEPT& joinAccept, MM_JOIN_DENY& joinDeny);
 
 //This function is called to expire a specific weapon
 extern void strtExpireWeapon(POSTED_WEAPON& weapon);
 
 //This function processes a grant request from the mmhost
-extern LOGICAL strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& spawnGrantRequest, MM_SPAWN_GRANT_RESPONSE& spawnGrantResponse);
+extern bool strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& spawnGrantRequest, MM_SPAWN_GRANT_RESPONSE& spawnGrantResponse);
 
-//This function processes a post info request
-extern LOGICAL strtProcessPostInfoRequest(const MM_POST_INFO_REQUEST& postInfoRequest, MM_POST_INFO_RESPONSE& postInfoResponse);
-
-extern LOGICAL strtProcessJoinListRequest(SINT32 teulIndex, const MM_POST_INFO_REQUEST& postInfoRequest);
+extern bool strtProcessJoinListRequest(SINT32 teulIndex, const MM_POST_INFO_REQUEST& postInfoRequest);
 
 extern bool strtProcessPostInfoUpdate(MM_POST_INFO_UPDATE* infoUpdate);
 
 //This function processes a spawn cancellation (post join spawn cancel)
-extern LOGICAL strtProcessSpawnCancel(MM_SPAWN_CANCEL* spawnCancel);
+extern bool strtProcessSpawnCancel(const MM_SPAWN_CANCEL& spawnCancel);
 
 //This function expires weapons that have been spawned longer than X hours
 extern void strtExpireSpawnedWeapons();

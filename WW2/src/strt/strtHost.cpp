@@ -64,7 +64,7 @@ extern ObjectiveStats g_objectiveStats;
 
 const char* HostLanguage = "en";
 
-static LOGICAL _exitSignaled = FALSE;
+static bool _exitSignaled = false;
 static bool _mustSyncChatHost = true;
 extern int tolua_stratd_open(struct lua_State*);
 extern ConfigPath cv_luaPath;
@@ -373,7 +373,7 @@ static void
 _strtSIGINT(int signo)
 {
 	dbugLog(_FLI, "Received exit signal");
-	_exitSignaled = TRUE;
+	_exitSignaled = true;
 }
 
 //////////////////////////////////////////////////////////////////////////

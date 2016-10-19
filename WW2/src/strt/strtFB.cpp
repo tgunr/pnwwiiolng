@@ -271,24 +271,14 @@ _initFirebases(FacilityStruct& depot)
 
 //////////////////////////////////////////////////////////////////////
 
-LOGICAL
+void
 strtInitStratSystemFirebases(CPStruct* cpList)
 {
-	CPStruct* cp;
-	FacilityStruct* facility;
-
-	if ( cpList == nullptr )
-		return FALSE;
-
-	for ( cp = cpList; cp != nullptr; cp = cp->next )
+	for ( auto cp = cpList; cp ; cp = cp->next )
 	{
-		for ( facility = cp->facilityTypeIndex[FACILITY_DEPOT]; facility != nullptr; facility = facility->typeNext )
-		{
+		for ( auto facility = cp->facilityTypeIndex[FACILITY_DEPOT]; facility ; facility = facility->typeNext )
 			_initFirebases(*facility);
-		}
 	}
-
-	return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////

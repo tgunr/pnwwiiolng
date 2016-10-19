@@ -16,7 +16,7 @@
 SINT32 mmHostInstallCallbacks();
 
 //Sends a non-mobile post Accept the front end on the connection
-SINT32 mmSendPostAccept(SINT32 connection, WEAPON_SERIAL weaponSerial, LOGICAL newVehicle, SINT16 portal, bool mobileSpawnAvailable);
+SINT32 mmSendPostAccept(SINT32 connection, WEAPON_SERIAL weaponSerial, bool newVehicle, SINT16 portal, bool mobileSpawnAvailable);
 
 //sends a post deny to the front end on the connection
 SINT32 mmSendPostDeny(SINT32 connection, WEAPON_SPEC weaponSpec, UINT32 reasonCode, bool loseWeapon);

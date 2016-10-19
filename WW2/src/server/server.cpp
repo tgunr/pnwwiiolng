@@ -162,11 +162,11 @@ ServerBase* s_serverBase = nullptr;
 static bool
 _playerAddAuth(PlayerStatusNode* const psn)
 {
-	if (psn->inAuth == FALSE)
+	if ( !psn->inAuth )
 	{
 		if ( authRecordDispatch(&(psn->dispatch()), false)  )
 		{
-			psn->inAuth = TRUE;
+			psn->inAuth = true;
 			return true;
 		}
 		else
@@ -260,10 +260,10 @@ _playerReleasePersona(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, 
 static void
 _playerDeleteAuth(PlayerStatusNode* psn)
 {
-	if (psn->inAuth)
+	if ( psn->inAuth )
 	{
 		authDeleteDispatch(&psn->dispatch());
-		psn->inAuth = FALSE;
+		psn->inAuth = false;
 	}
 }
 
@@ -750,7 +750,7 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 	psn->dispatch() = persXfer->dispatch();
 	psn->teulIndex = -ENOENT;
 	psn->host = 0;
-	psn->inAuth = FALSE;
+	psn->inAuth = false;
 	psn->xferState = persXfer->reason();
 	psn->status = Server::PlayerStatus::New;
 

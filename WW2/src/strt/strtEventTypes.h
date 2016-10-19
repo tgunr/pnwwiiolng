@@ -42,7 +42,7 @@ public:
 		packer(TEUL_UNPACK, a);
 	}
 
-	void packer(LOGICAL mode, ACTION_OBJECT* const a)
+	void packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_fid, 0);
 		a->packer(mode, m_ownership, 4);
@@ -80,7 +80,7 @@ public:
 	const Events& events() const { return m_events; }
 	Events& events() { return m_events; }
 
-	void packer(LOGICAL mode, ACTION_OBJECT* const a)
+	void packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		UINT32 count = m_events.size();
 		a->packer(mode, count, 16);

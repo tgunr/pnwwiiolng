@@ -26,7 +26,7 @@ namespace Teul
 		//! [client] Receive from host.
 		SINT32 receive(SINT32 teulIndex);
 
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* const a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* const a);
 
 	public:
 		Role	role() const { return m_role; }

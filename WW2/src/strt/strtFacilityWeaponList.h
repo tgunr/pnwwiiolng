@@ -88,7 +88,7 @@ public:
 	bool isSpawnable() const { return (m_fullObjID.id > 0 && m_status > FacilityWeaponList::_INVALID && m_status <= FacilityWeaponList::_NORMAL); }
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	bool populate(const StratHCUnit& unit, const FacilityStruct& facility, UINT32 playerID, const PermissionMask& permMask);		// Host function
 	SINT32 send(SINT32 teulIndex);
 

@@ -62,9 +62,9 @@ struct FE_POST_ACCEPT
 {
 	WEAPON_SERIAL	weaponSerial;	//The weapon serial, the bane of my
 									//	existence
-	LOGICAL			newVehicle;
 	SINT16			portal;
-	LOGICAL			mobileSpawnAvailable;
+	bool			newVehicle;
+	bool			mobileSpawnAvailable;
 };
 
 //The message from the front end that cancels a post
@@ -194,7 +194,7 @@ public:
 					, UCHAR _decal = 0
 					, bool isHighCommander = false, bool isBuilder = false, bool isMissionleader = false);
 	FESpawnNotify(ACTION_OBJECT* const a);
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	WEAPON_SERIAL	weaponSerial;	// What you're spawning
