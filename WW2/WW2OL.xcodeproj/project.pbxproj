@@ -3139,13 +3139,13 @@
 		FA3D8BB11C8BF5CC002C5119 /* Config */ = {
 			isa = PBXGroup;
 			children = (
-				FA3D8BA81C8BF201002C5119 /* build_info.cpp */,
 				FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */,
 				FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */,
 				FA78BDEB1D9082FA0042FBF0 /* Defines.xcconfig */,
 				FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */,
 				FA3D8BAA1C8BF201002C5119 /* Warnings.xcconfig */,
 				FA5CDD461CD339D100F93668 /* build_info.hpp */,
+				FA3D8BA81C8BF201002C5119 /* build_info.cpp */,
 			);
 			name = Config;
 			sourceTree = "<group>";
