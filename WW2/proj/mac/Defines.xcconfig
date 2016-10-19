@@ -62,8 +62,8 @@ WW2_DEFINES_Development_01  = $(WW2_DEFINES_Development_02) DEV_BUILD           
 WW2_DEFINES_GM_01           = $(WW2_DEFINES_GM_02) GM_RELEASE                       // enable buzzard and several other things
 
 // Release mode
-WW2_DEFINES_Release_02      = $(WW2_DEFINES_Release_02) NDEBUG
-WW2_DEFINES_Release_01      = $(WW2_DEFINES_Release_03) RELEASE_CLIENT=1            // definitely a release client
+WW2_DEFINES_Release_02      = $(WW2_DEFINES_Release_03) NDEBUG
+WW2_DEFINES_Release_01      = $(WW2_DEFINES_Release_02) RELEASE_CLIENT=1            // definitely a release client
 
 // "Gatherers"
 WW2_DEFINES_Development     = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Debug_01) $(WW2_DEFINES_Development_01)
