@@ -40,135 +40,133 @@ namespace {
 	// it would take ages to try to decouple it from the player-controlled soldier,
 	// and writing something new just isn't on the table right now.
 	// NOTE: Largely taken from fpFPSAreaChecks().
-	namespace {
-		void CheckCollisions(Update& update, fpTPSPoseType pose, bool falling = false) {
-			// HACK: Guarantee the FPS colliders have been set up.
-			InitColliderGeometry();
+	void CheckCollisions(Update& update, fpTPSPoseType pose, bool falling = false) {
+		// HACK: Guarantee the FPS colliders have been set up.
+		InitColliderGeometry();
 
-			{
-				switch ( pose ) {
-				case TPS_POSETYPE_PRONE:
-					HACK_forced_pose = POSE_PRONE; break;
-				case TPS_POSETYPE_CROUCH:
-					HACK_forced_pose = POSE_CROUCH; break;
-				case TPS_POSETYPE_STAND:
-				default:
-					HACK_forced_pose = POSE_STAND; break;
-				}
-
-				_updateFPSColliders();
-
-				HACK_forced_pose = POSE_NUM_POSES;
+		{
+			switch ( pose ) {
+			case TPS_POSETYPE_PRONE:
+				HACK_forced_pose = POSE_PRONE; break;
+			case TPS_POSETYPE_CROUCH:
+				HACK_forced_pose = POSE_CROUCH; break;
+			case TPS_POSETYPE_STAND:
+			default:
+				HACK_forced_pose = POSE_STAND; break;
 			}
 
-			FPSColliderData& coldata = fpFPSGetCollider();
-			assert ( coldata.collider );
-			FPSCollider& col = *coldata.collider;
-
-			{
-				Vec3d pos = update.pos;
-				HACK_forced_pos = &pos;
-				col.Update(0);
-				HACK_forced_pos = nullptr;
-			}
-
-			const Vec3d up = Vec3d(0.0,0.0,1.0);
-			Vec3d dir = update.vel;
-			dir.z() = 0.0; // Vertical motion is much more simple.
-
-			if ( col.findCollisions(true) ) {
-				const colliderQuery::Collision* best_floor = nullptr;
-				Vec3d push(0.0, 0.0, 0.0);
-
-				const colliderQuery::CollisionList& hits = col.getCollisions();
-				for ( auto it = hits.begin() ; it != hits.end() ; ++it ) {
-					const colliderQuery::Collision& hit = *it;
-					UINT32 collide_bits = dGeomGetCollideBits(hit.g1);
-					UINT32 category_bits = dGeomGetCategoryBits(hit.g2);
-
-					switch ( collide_bits ) {
-					case WADE_COLLIDER:
-						// We don't simulate gravity right now, so this doesn't matter on our end.
-						continue;
-					case FALL_COLLIDER: {
-						if ( (up * hit.normal) < 0 )
-							continue;
-						if ( colliderIsType(category_bits, COLLIDER_VEHICLE_MASK) ||
-						     colliderIsType(category_bits, COLLIDER_WALK) )
-							continue; // Don't let other entities mess with our prediction.
-
-						FLOAT64 min_height = update.pos.z;
-						if ( ! falling )
-							min_height -= floor_stickiness;
-
-						if ( (best_floor == nullptr || hit.pos.z() > best_floor->pos.z()) &&
-						     hit.pos.z() > min_height ) {
-							best_floor = &hit;
-						}
-						break;
-					}
-					case CAGE_COLLIDER: {
-						// Scenario-only colliders.
-						if ( colliderIsType(category_bits, COLLIDER_BLOCK) ||
-						     colliderIsType(category_bits, COLLIDER_VOLUME) )
-							continue;
-
-						// If we're not really moving, don't bother to check collisions.
-						if ( dir.length2() < 0.001 )
-							continue;
-
-						double angle = dir * hit.normal;
-
-						// Lower is more forgiving, 1 means must be flat.
-						const double flat_threshold = 0.6;
-
-						// Ignore normals facing the wrong direction.
-						if ( angle > 0.1 )
-							continue;
-						// Ignore relatively flat slopes.
-						if ( up * hit.normal >= flat_threshold )
-							continue;
-						// Just ignoring downward-facing normals for the predcitor.
-						if ( hit.normal.z() < 0 )
-							continue;
-
-						dGeomID geom = dGeomTransformGetGeom(hit.g1);
-						int type = dGeomGetClass(geom);
-
-						Vec3d this_push = hit.normal;
-						this_push.z() = 0; // Again, height is handled differently.
-						this_push.normalize();
-						this_push *= hit.depth;
-
-						// We don't bother to check for conflicting push directions since we're relying
-						// on the other client somewhat to handle the heavy lifting until we can get to
-						// generalizing the collision/gravity code.
-
-						if ( fabs(this_push.x()) > fabs(push.x()) )
-							push.x() = this_push.x();
-						if ( fabs(this_push.y()) > fabs(push.y()) )
-							push.y() = this_push.y();
-
-						break;
-					}
-					default:
-						continue;
-					}
-				}
-
-				if ( best_floor )
-					update.pos.z = best_floor->pos.z();
-
-				if ( push.length2() != 0.0 ) {
-					Vec3d pos = update.pos;
-					pos += push;
-					update.pos = {pos.x(), pos.y(), pos.z()};
-				}
-			}
-
-			// Reset the collider just in case code elsewhere doesn't.
 			_updateFPSColliders();
+
+			HACK_forced_pose = POSE_NUM_POSES;
 		}
+
+		FPSColliderData& coldata = fpFPSGetCollider();
+		assert ( coldata.collider );
+		FPSCollider& col = *coldata.collider;
+
+		{
+			Vec3d pos = update.pos;
+			HACK_forced_pos = &pos;
+			col.Update(0);
+			HACK_forced_pos = nullptr;
+		}
+
+		const Vec3d up = Vec3d(0.0,0.0,1.0);
+		Vec3d dir = update.vel;
+		dir.z() = 0.0; // Vertical motion is much more simple.
+
+		if ( col.findCollisions(true) ) {
+			const colliderQuery::Collision* best_floor = nullptr;
+			Vec3d push(0.0, 0.0, 0.0);
+
+			const colliderQuery::CollisionList& hits = col.getCollisions();
+			for ( auto it = hits.begin() ; it != hits.end() ; ++it ) {
+				const colliderQuery::Collision& hit = *it;
+				UINT32 collide_bits = dGeomGetCollideBits(hit.g1);
+				UINT32 category_bits = dGeomGetCategoryBits(hit.g2);
+
+				switch ( collide_bits ) {
+				case WADE_COLLIDER:
+					// We don't simulate gravity right now, so this doesn't matter on our end.
+					continue;
+				case FALL_COLLIDER: {
+					if ( (up * hit.normal) < 0 )
+						continue;
+					if ( colliderIsType(category_bits, COLLIDER_VEHICLE_MASK) ||
+						    colliderIsType(category_bits, COLLIDER_WALK) )
+						continue; // Don't let other entities mess with our prediction.
+
+					FLOAT64 min_height = update.pos.z;
+					if ( ! falling )
+						min_height -= floor_stickiness;
+
+					if ( (best_floor == nullptr || hit.pos.z() > best_floor->pos.z()) &&
+						    hit.pos.z() > min_height ) {
+						best_floor = &hit;
+					}
+					break;
+				}
+				case CAGE_COLLIDER: {
+					// Scenario-only colliders.
+					if ( colliderIsType(category_bits, COLLIDER_BLOCK) ||
+						    colliderIsType(category_bits, COLLIDER_VOLUME) )
+						continue;
+
+					// If we're not really moving, don't bother to check collisions.
+					if ( dir.length2() < 0.001 )
+						continue;
+
+					double angle = dir * hit.normal;
+
+					// Lower is more forgiving, 1 means must be flat.
+					const double flat_threshold = 0.6;
+
+					// Ignore normals facing the wrong direction.
+					if ( angle > 0.1 )
+						continue;
+					// Ignore relatively flat slopes.
+					if ( up * hit.normal >= flat_threshold )
+						continue;
+					// Just ignoring downward-facing normals for the predcitor.
+					if ( hit.normal.z() < 0 )
+						continue;
+
+					dGeomID geom = dGeomTransformGetGeom(hit.g1);
+					int type = dGeomGetClass(geom);
+
+					Vec3d this_push = hit.normal;
+					this_push.z() = 0; // Again, height is handled differently.
+					this_push.normalize();
+					this_push *= hit.depth;
+
+					// We don't bother to check for conflicting push directions since we're relying
+					// on the other client somewhat to handle the heavy lifting until we can get to
+					// generalizing the collision/gravity code.
+
+					if ( fabs(this_push.x()) > fabs(push.x()) )
+						push.x() = this_push.x();
+					if ( fabs(this_push.y()) > fabs(push.y()) )
+						push.y() = this_push.y();
+
+					break;
+				}
+				default:
+					continue;
+				}
+			}
+
+			if ( best_floor )
+				update.pos.z = best_floor->pos.z();
+
+			if ( push.length2() != 0.0 ) {
+				Vec3d pos = update.pos;
+				pos += push;
+				update.pos = {pos.x(), pos.y(), pos.z()};
+			}
+		}
+
+		// Reset the collider just in case code elsewhere doesn't.
+		_updateFPSColliders();
 	}
 }
 
