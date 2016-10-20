@@ -46,18 +46,20 @@ namespace {
 
 		{
 			switch ( pose ) {
-			case TPS_POSETYPE_PRONE:
-				HACK_forced_pose = POSE_PRONE; break;
-			case TPS_POSETYPE_CROUCH:
-				HACK_forced_pose = POSE_CROUCH; break;
 			case TPS_POSETYPE_STAND:
+				HACK_forced_pose = FPS_POSITION_STAND; break;
+			case TPS_POSETYPE_CROUCH:
+				HACK_forced_pose = FPS_POSITION_CROUCH; break;
+			case TPS_POSETYPE_PRONE:
+			case TPS_POSETYPE_SIT:
+			case TPS_POSETYPE_SWIM:
 			default:
-				HACK_forced_pose = POSE_STAND; break;
+				HACK_forced_pose = FPS_POSITION_PRONE; break;
 			}
 
 			_updateFPSColliders();
 
-			HACK_forced_pose = POSE_NUM_POSES;
+			HACK_forced_pose = FPS_NUM_POSITIONS;
 		}
 
 		FPSColliderData& coldata = fpFPSGetCollider();
