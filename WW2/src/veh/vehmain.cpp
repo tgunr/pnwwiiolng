@@ -1374,17 +1374,8 @@ UINT32 vehUpdate(void)
     reports.clear();
 #endif
 
-	// ok we do several passes through the list because order is important for vehicle riding
-	// our vehicle(s) that aren't riding actually i don't know if i need to do this but
-	// may be some issue with display of other vehicles, I have no idea.
-	for (CurrentVehicle = getVehicleHead().getNext(); CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
-	{
-		if (CurrentVehicle->ModelData && CurrentVehicle->RideVehicleHostIndex == 0)
-		{
-			if(vehUpdate1stPersonVehicle(CurrentVehicle) < 0)
-				break;
-		}
-	}
+	if ( PlayerVehicle && PlayerVehicle->ModelData && PlayerVehicle->RideVehicleHostIndex == 0 )
+		vehUpdate1stPersonVehicle(PlayerVehicle);
 
 	// all vehicles that aren't riding on anything
 	for (CurrentVehicle = getVehicleHead().getNext(); CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
