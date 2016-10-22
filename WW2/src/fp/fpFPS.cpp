@@ -13596,7 +13596,7 @@ void _updateFPSColliders(void)
 
 	fpFPSPositions pose;
 	if ( HACK_forced_pose == FPS_NUM_POSITIONS )
-		pose = targetPose;
+		pose = prevPose;
 	else
 		pose = HACK_forced_pose;
 
