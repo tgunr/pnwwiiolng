@@ -258,11 +258,11 @@ void InfantryPredictor::UpdateInterpolation(void) {
 	to.pos += to.vel * ((curr_msg.frametime - pred_pos.frametime) / 1000.0);
 
 	Update from = pred_pos;
-	// Infantry position can change on a dime, so weaken/ignore our current speed if need be.
-	if ( mathExactVectorLength2(&from.vel) > mathExactVectorLength2(&to.vel) )
-		from.vel = (from.vel + to.vel) / 2;
-	else
-		from.vel = to.vel;
+	// Infantry position can change on a dime, but with the latancy between
+	// packets we also need to smooth things somewhat. We do this by giving our
+	// current position a strong "push" that still leaves a little bit of our
+	// previous motion intact.
+	from.vel = ((from.vel * 2) + to.vel) / 3;
 
 	double pred_time_passed = ((interp_time - (to.frametime - from.frametime)) / 1000.0);
 	to.pos += to.vel * pred_time_passed;
