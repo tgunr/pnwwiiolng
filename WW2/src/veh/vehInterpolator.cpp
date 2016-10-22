@@ -40,7 +40,8 @@ namespace {
 	// it would take ages to try to decouple it from the player-controlled soldier,
 	// and writing something new just isn't on the table right now.
 	// NOTE: Largely taken from fpFPSAreaChecks().
-	void CheckCollisions(Update& update, fpTPSPoseType pose, bool falling = false) {
+	/// @return If we're touching the ground.
+	bool CheckCollisions(Update& update, fpTPSPoseType pose, bool falling = false) {
 		// HACK: Guarantee the FPS colliders have been set up.
 		InitColliderGeometry();
 
@@ -76,6 +77,8 @@ namespace {
 		const Vec3d up = Vec3d(0.0,0.0,1.0);
 		Vec3d dir = update.vel;
 		dir.z() = 0.0; // Vertical motion is much more simple.
+
+		bool hit_floor = false;
 
 		if ( col.findCollisions(true) ) {
 			const colliderQuery::Collision* best_floor = nullptr;
@@ -157,8 +160,10 @@ namespace {
 				}
 			}
 
-			if ( best_floor )
+			if ( best_floor ) {
+				hit_floor = true;
 				update.pos.z = best_floor->pos.z();
+			}
 
 			if ( push.length2() != 0.0 ) {
 				Vec3d pos = update.pos;
@@ -169,6 +174,8 @@ namespace {
 
 		// Reset the collider just in case code elsewhere doesn't.
 		_updateFPSColliders();
+
+		return hit_floor;
 	}
 }
 
@@ -334,7 +341,23 @@ const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 		pred_pos.pos += pred_pos.vel * ((frametime - pred_pos.frametime) / 1000.0);
 	}
 
-	CheckCollisions(pred_pos, (fpTPSPoseType)flags.pose, flags.movement & TPS_MOVETYPE_FALL);
+
+	bool hit_ground = CheckCollisions(pred_pos, (fpTPSPoseType)flags.pose,
+	                                  flags.movement & TPS_MOVETYPE_FALL);
+	if ( hit_ground ) {
+		in_air_for = 0;
+		flags.movement &= ~TPS_MOVETYPE_FALL;
+	} else {
+		in_air_for += frametime - pred_pos.frametime;
+		// HACK: From _doGravityCampaign()
+		if ( in_air_for > 100 ) {
+			flags.movement |= TPS_MOVETYPE_FALL;
+
+			double velocity = 9.8 * (in_air_for - 100) / 1000.0;
+			pred_pos.pos.z -= velocity * ((frametime - pred_pos.frametime) / 1000.0);
+		}
+	}
+
 
 	// Override motion flags to match what the player's seeing.
 	if ( flags.movement <= TPS_MOVETYPE_IDLE && pred_pos.speed >= .1 ) {
