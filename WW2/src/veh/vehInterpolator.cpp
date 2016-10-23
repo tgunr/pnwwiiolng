@@ -136,9 +136,6 @@ namespace {
 					if ( hit.normal.z() < 0 )
 						continue;
 
-					dGeomID geom = dGeomTransformGetGeom(hit.g1);
-					int type = dGeomGetClass(geom);
-
 					Vec3d this_push = hit.normal;
 					this_push.z() = 0; // Again, height is handled differently.
 					this_push.normalize();
@@ -187,12 +184,12 @@ InfantryPredictor::InfantryPredictor(vehVehicle* v)
 
 //==============================================================================
 
-void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametime) {
+void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frame) {
 	UpdateTimestamps(timestamp);
 
 	FrameTime adj_frame = pred_pos.frametime - (pred_pos.timestamp - timestamp);
 	if ( waiting_for == 0 ) {
-		if ( adj_frame < frametime - message_age_threshold ) {
+		if ( adj_frame < frame - message_age_threshold ) {
 			waiting_for = pred_pos.frametime;
 			return;
 		}
@@ -203,7 +200,7 @@ void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametim
 	NewMessageReceived(timestamp, adj_frame);
 
 	if ( waiting_for != 0 ) {
-		curr_msg.frametime = frametime;
+		curr_msg.frametime = frame;
 		pred_pos = prev_msg = curr_msg;
 		waiting_for = 0;
 	}
@@ -232,7 +229,7 @@ void InfantryPredictor::UpdateTimestamps(Timestamp latest) {
 
 //------------------------------------------------------------------------------
 
-void InfantryPredictor::NewMessageReceived(Timestamp timestamp, FrameTime frametime) {
+void InfantryPredictor::NewMessageReceived(Timestamp timestamp, FrameTime frame) {
 	prev_msg = curr_msg;
 
 	curr_msg.timestamp = timestamp;
@@ -294,14 +291,14 @@ void InfantryPredictor::UpdateInterpolation(void) {
 
 //==============================================================================
 
-const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
-	if ( is_dead || (frametime == pred_pos.frametime && ! dirty) )
+const Update& InfantryPredictor::Interpolate(FrameTime frame) {
+	if ( is_dead || (frame == pred_pos.frametime && ! dirty) )
 		return pred_pos;
 
 	gr2AnimBitPacker flags(curr_msg.animationFlags);
 
-	if ( frametime < interp_end ) {
-		double t = (double)(frametime - interp_beg) / (double)(interp_end - interp_beg);
+	if ( frame < interp_end ) {
+		double t = (double)(frame - interp_beg) / (double)(interp_end - interp_beg);
 		assert ( 0.0 <= t && t <= 1.0 );
 		if ( t < 0.0 ) t = 0.0;
 		if ( t > 1.0 ) t = 1.0;
@@ -338,7 +335,7 @@ const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 		else
 			pred_pos.dir = dir;
 	} else {
-		pred_pos.pos += pred_pos.vel * ((frametime - pred_pos.frametime) / 1000.0);
+		pred_pos.pos += pred_pos.vel * ((frame - pred_pos.frametime) / 1000.0);
 	}
 
 
@@ -348,13 +345,13 @@ const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 		in_air_for = 0;
 		flags.movement &= ~TPS_MOVETYPE_FALL;
 	} else {
-		in_air_for += frametime - pred_pos.frametime;
+		in_air_for += frame - pred_pos.frametime;
 		// HACK: From _doGravityCampaign()
 		if ( in_air_for > 100 ) {
 			flags.movement |= TPS_MOVETYPE_FALL;
 
 			double velocity = 9.8 * (in_air_for - 100) / 1000.0;
-			pred_pos.pos.z -= velocity * ((frametime - pred_pos.frametime) / 1000.0);
+			pred_pos.pos.z -= velocity * ((frame - pred_pos.frametime) / 1000.0);
 		}
 	}
 
@@ -383,8 +380,8 @@ const Update& InfantryPredictor::Interpolate(FrameTime frametime) {
 	pred_pos.animationFlags = flags.pack();
 
 
-	pred_pos.timestamp = (frametime - pred_pos.frametime);
-	pred_pos.frametime = frametime;
+	pred_pos.timestamp = (frame - pred_pos.frametime);
+	pred_pos.frametime = frame;
 
 	dirty = false;
 	return pred_pos;
