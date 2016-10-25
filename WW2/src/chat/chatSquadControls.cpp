@@ -40,7 +40,7 @@ _audit(UINT32 squadID, UINT32 action
 	DBThread::EscapeString(text);
 
 	DBThread::Do(DBThread::Default
-		, "INSERT LOW_PRIORITY INTO wwii_squad_audit"
+		, "INSERT INTO wwii_squad_audit"
 				" (squadID, action, occured, originator, target, newval, prev, coID, textmessage)"
 			" VALUES (%u, %u, now(), '%s', '%s', %u, %u, %u, '%s')"
 					, squadID, action, actor, subject, newval, prev, coID, text.c_str()
@@ -467,7 +467,7 @@ _disbandSquad(UINT32 squadID, SquadList* squadList, Player* player)
 {
 	// Dispatch database instructions
 	DBThread::Do(DBThread::Default
-					, "UPDATE LOW_PRIORITY wwii_player"
+					, "UPDATE wwii_player"
 						" SET squadid=0, squad_rank=0, squad_joined=NOW(), squad_time_played=0"
 						" WHERE squadid=%u"
 						, squadID);

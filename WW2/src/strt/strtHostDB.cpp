@@ -45,7 +45,7 @@
 #endif
 
 static const char QRY_SAVE_VEHICLE_ACCESS[] =
-	"UPDATE LOW_PRIORITY wwii_vehtype"
+	"UPDATE wwii_vehtype"
 		" SET campaign_ready = 1"
 			", initial_rank = %u"
 			", current_rank = %u"
@@ -492,7 +492,7 @@ strtdbSaveVehicleCVCs()
 				continue;
 
 			length = snprintf(buf, _BUF_SIZE
-								, "UPDATE LOW_PRIORITY wwii_vehtype SET cvc_value=%u WHERE vehtype_oid=%u AND cvc_value != %u"
+								, "UPDATE wwii_vehtype SET cvc_value=%u WHERE vehtype_oid=%u AND cvc_value != %u"
 									, weap->value, weap->localIndex(), weap->value
 									);
 			q.Query(length, buf);
@@ -989,7 +989,7 @@ strtdbRestoreTOESupplies()
 			// Set this as the initial value
 			if ( unit->initializeWeapon(spec, present) == false )
 			{
-				DBThread::Do(DBThread::Default, "DELETE LOW_PRIORITY IGNORE FROM `toe`.`supply` WHERE unit_id=%u AND vehtype_oid=%u", unitID, vehTypeOID);
+				DBThread::Do(DBThread::Default, "DELETE IGNORE FROM `toe`.`supply` WHERE unit_id=%u AND vehtype_oid=%u", unitID, vehTypeOID);
 			}
 		}
 	}

@@ -242,7 +242,7 @@ public:
 			}
 
 			// Update the database, but make it low-priority
-			DBThread::Do(DBThread::Default, "UPDATE LOW_PRIORITY wwii_squads SET voting = 1 WHERE squadid = %u", player.squadID());
+			DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting = 1 WHERE squadid = %u", player.squadID());
 
 			// Update the in-memory image, it's called "active" for now
 			list->squad().setVotingEnabled(true);
@@ -261,7 +261,7 @@ public:
 			}
 
 			// Low-pri update of the table
-			DBThread::Do(DBThread::Default, "UPDATE LOW_PRIORITY wwii_squads SET voting = 0 WHERE squadid = %u", player.squadID());
+			DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting = 0 WHERE squadid = %u", player.squadID());
 
 			// Update in-memory
 			list->squad().setVotingEnabled(false);
@@ -409,7 +409,7 @@ class SquadRename : public DBThreadQuery
 public:
 	SquadRename(const ChatHandle requester, const Chat::Name& from, const Chat::Name& to)
 		: DBThreadQuery(DBThread::Default, "SquadRename", DBThreadQuery::_CALLBACK
-						, "UPDATE LOW_PRIORITY wwii_squads"
+						, "UPDATE wwii_squads"
 						" SET short_name = '%s'"
 						" WHERE LOWER(short_name) = LOWER('%s')"
 						, to.c_str()
