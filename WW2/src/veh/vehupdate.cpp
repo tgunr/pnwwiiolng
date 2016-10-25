@@ -1579,7 +1579,7 @@ static UINT32 vehupdateInfantry(vehVehicle* Vehicle)
 	vehVehiclePositionData* PosData = &Vehicle->PosData;
 
 	// interpolate from the last position
-	InterpolatorBase::Update const& update	= Vehicle->interpolator.Interpolate(frametime);
+	vehInterpolator::Update const& update	= Vehicle->interpolator.Interpolate(frametime);
 
     // For .vspawn infantry
     if(!Vehicle->isSTO())

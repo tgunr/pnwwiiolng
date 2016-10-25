@@ -10,108 +10,56 @@
 
 #include "veh/vehmain.h"
 
+
+namespace {
+	using FrameTime = InfantryPredictor::FrameTime;
+	using Update = InfantryPredictor::Update;
+
+	// Make the real and predicted positions match in this many milliseconds.
+	const FrameTime interp_time = 300;
+	// Stick to the floor if we're this far from it.
+	const FLOAT64 floor_stickiness = 0.5;
+	// How many old an incoming message can be before we consider it out-of-date.
+	const FrameTime message_age_threshold = 200;
+}
+
+//------------------------------------------------------------------------------
+
 namespace {
 	// Copies position-related data.
-	void CopyPositionData(vehInterpolator::Update& lhs, const vehInterpolator::Update& rhs) {
+	void CopyPositionData(Update& lhs, const Update& rhs) {
 		lhs.pos = rhs.pos;
 		lhs.dir = rhs.dir;
 		lhs.vel = rhs.vel;
 		lhs.speed = rhs.speed;
 	}
-}
 
-/************************************************************************************************
-	vehInterpolator
-*************************************************************************************************/
-
-InterpolatorBase::InterpolatorBase(vehVehicle* v) :
-	_vehicle(v),
-	_interpolatetime(0),
-	_lastUpdateYaw(0)
-{
-}
-
-//==============================================================================
-
-namespace {
-	// Make the real and predicted positions match in this many milliseconds.
-	const InfantryPredictor::FrameTime interp_time = 300;
-}
-
-InfantryPredictor::InfantryPredictor(vehVehicle* v)
-: InterpolatorBase(v) {
-	prev_msg.frametime = curr_msg.frametime = -1;
-}
-
-//------------------------------------------------------------------------------
-
-void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frametime) {
-	prev_msg = curr_msg;
-
-	curr_msg.timestamp = timestamp;
-	curr_msg.frametime = frametime;
-	curr_msg.pos = _vehicle->PosData.Pos;
-	curr_msg.vel = _vehicle->PosData.Vel;
-	curr_msg.vel.x = -_vehicle->PosData.Vel.x;        // Weird math stuff is due to some
-	curr_msg.dir.x = -sin(_vehicle->PosData.Att.Yaw); // sort of hack in how infantry
-	curr_msg.dir.y = -cos(_vehicle->PosData.Att.Yaw); // position/direction is handled.
-	curr_msg.dir.z = 0;
-	_lastUpdateYaw = _vehicle->PosData.Att.Yaw;
-	curr_msg.speed = mathExactVectorLength(&curr_msg.vel);
-	curr_msg.animationFlags = _vehicle->PosData.animationFlags;
-
-	// Our prediction is always based on the latest information.
-	CopyPositionData(pred_pos, curr_msg);
-	pred_pos.animationFlags = curr_msg.animationFlags;
-
-	if ( prev_msg.frametime == -1 ) {
-		// This is the first update we've received
-		pred_pos = real_pos = prev_msg = curr_msg;
-		real_pos.frametime = -1; // HACK: To guarantee Interpolate() is called on our first update.
-	} else if ( curr_msg.timestamp < prev_msg.timestamp ) {
-		// Because the timestamp is sent over the network as
-		// a uint16, it will rollover every ~65 seconds.
-		typedef decltype(SHARED_VEHICLE_INFO::posTimeStamp) RolloverType;
-		prev_msg.timestamp -= std::numeric_limits<RolloverType>::max();
-		real_pos.timestamp -= std::numeric_limits<RolloverType>::max();
-	}
-
-	// Correct the timestamps if our earlier messages were lagging behind.
-	if ( curr_msg.timestamp < real_pos.timestamp )
-		real_pos.timestamp = curr_msg.timestamp;
-	if ( curr_msg.timestamp < pred_pos.timestamp )
-		pred_pos.timestamp = curr_msg.timestamp;
-
-	UpdateInterpolation();
-}
-
-//------------------------------------------------------------------------------
-
-// !!!HACK!!!
-// This is all really horrible and I'm not proud to write it, but the logic for
-// this stuff is spread over so many places and makes so many assumptions that
-// it would take ages to try to decouple it from the player-controlled soldier,
-// and writing something new just isn't on the table right now.
-// NOTE: Largely taken from fpFPSAreaChecks().
-namespace {
-	void CheckCollisions(InterpolatorBase::Update& update, fpTPSPoseType pose) {
+	// !!!HACK!!!
+	// This is all really horrible and I'm not proud to write it, but the logic for
+	// this stuff is spread over so many places and makes so many assumptions that
+	// it would take ages to try to decouple it from the player-controlled soldier,
+	// and writing something new just isn't on the table right now.
+	// NOTE: Largely taken from fpFPSAreaChecks().
+	void CheckCollisions(Update& update, fpTPSPoseType pose, bool falling = false) {
 		// HACK: Guarantee the FPS colliders have been set up.
 		InitColliderGeometry();
 
 		{
 			switch ( pose ) {
-			case TPS_POSETYPE_PRONE:
-				HACK_forced_pose = POSE_PRONE; break;
-			case TPS_POSETYPE_CROUCH:
-				HACK_forced_pose = POSE_CROUCH; break;
 			case TPS_POSETYPE_STAND:
+				HACK_forced_pose = FPS_POSITION_STAND; break;
+			case TPS_POSETYPE_CROUCH:
+				HACK_forced_pose = FPS_POSITION_CROUCH; break;
+			case TPS_POSETYPE_PRONE:
+			case TPS_POSETYPE_SIT:
+			case TPS_POSETYPE_SWIM:
 			default:
-				HACK_forced_pose = POSE_STAND; break;
+				HACK_forced_pose = FPS_POSITION_PRONE; break;
 			}
 
 			_updateFPSColliders();
 
-			HACK_forced_pose = POSE_NUM_POSES;
+			HACK_forced_pose = FPS_NUM_POSITIONS;
 		}
 
 		FPSColliderData& coldata = fpFPSGetCollider();
@@ -143,23 +91,27 @@ namespace {
 				case WADE_COLLIDER:
 					// We don't simulate gravity right now, so this doesn't matter on our end.
 					continue;
-				case FALL_COLLIDER:
+				case FALL_COLLIDER: {
 					if ( (up * hit.normal) < 0 )
 						continue;
 					if ( colliderIsType(category_bits, COLLIDER_VEHICLE_MASK) ||
-					     colliderIsType(category_bits, COLLIDER_WALK) )
+						    colliderIsType(category_bits, COLLIDER_WALK) )
 						continue; // Don't let other entities mess with our prediction.
 
+					FLOAT64 min_height = update.pos.z;
+					if ( ! falling )
+						min_height -= floor_stickiness;
+
 					if ( (best_floor == nullptr || hit.pos.z() > best_floor->pos.z()) &&
-					     // Only count if it forces us out of the ground.
-					     hit.pos.z() > update.pos.z ) {
+						    hit.pos.z() > min_height ) {
 						best_floor = &hit;
 					}
 					break;
+				}
 				case CAGE_COLLIDER: {
 					// Scenario-only colliders.
 					if ( colliderIsType(category_bits, COLLIDER_BLOCK) ||
-					     colliderIsType(category_bits, COLLIDER_VOLUME) )
+						    colliderIsType(category_bits, COLLIDER_VOLUME) )
 						continue;
 
 					// If we're not really moving, don't bother to check collisions.
@@ -180,9 +132,6 @@ namespace {
 					// Just ignoring downward-facing normals for the predcitor.
 					if ( hit.normal.z() < 0 )
 						continue;
-
-					dGeomID geom = dGeomTransformGetGeom(hit.g1);
-					int type = dGeomGetClass(geom);
 
 					Vec3d this_push = hit.normal;
 					this_push.z() = 0; // Again, height is handled differently.
@@ -220,142 +169,91 @@ namespace {
 	}
 }
 
-//--------------
+//==============================================================================
 
-const InterpolatorBase::Update& InfantryPredictor::Interpolate(FrameTime frametime) {
-	if ( frametime == real_pos.frametime )
-		return real_pos;
+InfantryPredictor::InfantryPredictor(vehVehicle* v)
+: _vehicle(v) {
+}
 
-	gr2AnimBitPacker flags(pred_pos.animationFlags);
+//==============================================================================
 
-	pred_pos.pos += pred_pos.vel * ((frametime - pred_pos.frametime) / 1000.0);
-	CheckCollisions(pred_pos, (fpTPSPoseType)flags.pose);
-	pred_pos.frametime = frametime;
-	pred_pos.timestamp += (frametime - pred_pos.frametime);
+void InfantryPredictor::NewPosDataUpdate(Timestamp timestamp, FrameTime frame) {
+	UpdateTimestamps(timestamp);
 
-	if ( frametime < interp_end ) {
-		// TODO: A lot of this is still mostly from the old interpolator and could use some cleanup.
-		double t = (double)(frametime - interp_beg) / (double)(interp_end - interp_beg);
-		assert ( 0.0 <= t && t <= 1.0 );
-		if ( t < 0.0 ) t = 0.0;
-		if ( t > 1.0 ) t = 1.0;
-
-		real_pos.pos = spline.InterpolatePoint(t);
-
-		FLOAT64VECTOR vel = spline.InterpolateDt(t);
-		mathScaleVector(&vel, &vel, 1000.0/interp_time);
-
-		FLOAT64VECTOR dir = vel;
-		mathNormalize(&dir);
-
-		double speed = mathExactVectorLength2(&vel);
-		if ( speed < 0.1 ) { // HACK: To avoid twitchiness
-			vel = { 0.0, 0.0, 0.0 };
-			speed = 0.0;
-			dir = pred_pos.dir;
+	FrameTime adj_frame = pred_pos.frametime - (pred_pos.timestamp - timestamp);
+	if ( waiting_for == 0 ) {
+		if ( adj_frame < frame - message_age_threshold ) {
+			waiting_for = pred_pos.frametime;
+			return;
 		}
-		// HACK: Something isn't being calculated correctly.
-		else {
-			speed = pred_pos.speed;
-		}
-
-		real_pos.vel = vel;
-		real_pos.speed = speed;
-		// If the last message has us not going somewhat forward, respect that orientation.
-		// TODO: We should use a proper constant to determine where "strafing" begins.
-		if ( mathVectDotProduct(&pred_pos.dir, &pred_pos.vel) < .42 )
-			real_pos.dir = pred_pos.dir;
-		else
-			real_pos.dir = dir;
-	} else {
-		CopyPositionData(real_pos, pred_pos);
+	} else if ( adj_frame < waiting_for ) {
+		return;
 	}
 
-	// Collisions are best addressed through the predictions, but our height isn't
-	// actually handled with any of that. The bit of lag isn't actually that big of
-	// a deal except when going up slopes since we'll visibly clip into the floor
-	// before the up-to-date height gets sent to us.
-	CheckCollisions(real_pos, (fpTPSPoseType)flags.pose);
-	// TODO: Gravity prediction.
+	NewMessageReceived(timestamp, adj_frame);
 
-	// Override motion flags to match what the player's seeing.
-	if ( flags.movement <= TPS_MOVETYPE_IDLE && real_pos.speed >= .1 ) {
-		if ( flags.pose == TPS_POSETYPE_STAND ) {
-			if ( real_pos.speed > 6.0 ) // TODO: Match this with an actual constant.
-				flags.movement = TPS_MOVETYPE_SPRINT;
-			else if ( real_pos.speed > 0.1 )
-				flags.movement = TPS_MOVETYPE_FORWARD;
-			else
-				flags.movement = TPS_MOVETYPE_STILL;
-		}
-		if ( flags.pose == TPS_POSETYPE_PRONE && real_pos.speed >= 1.0f ) {
-			// Don't allow fast crawling
-			flags.pose = TPS_POSETYPE_CROUCH;
-			flags.movement = TPS_MOVETYPE_FORWARD;
-		} else {
-			flags.movement = TPS_MOVETYPE_FORWARD;
-
-			if ( flags.pose == TPS_POSETYPE_PRONE )
-				flags.point = TPS_POINTTYPE_RELAXED;
-		}
+	if ( waiting_for != 0 ) {
+		curr_msg.frametime = frame;
+		pred_pos = prev_msg = curr_msg;
+		waiting_for = 0;
 	}
-	real_pos.animationFlags = flags.pack();
 
-	// We should now match the predicted position, although it
-	// may actually be slightly different due to smoothing.
-	real_pos.frametime = pred_pos.frametime;
-	real_pos.timestamp = pred_pos.timestamp;
+	UpdateInterpolation();
 
-	return real_pos;
+	dirty = true;
 }
 
 //------------------------------------------------------------------------------
 
-void InfantryPredictor::Copy(vehVehicle* v, UINT32 flags) {
-	InfantryPredictor* from = dynamic_cast<InfantryPredictor*>(&v->interpolator);
-	if ( ! from )
-		return;
+void InfantryPredictor::UpdateTimestamps(Timestamp latest) {
+	// Because the timestamp is sent over the network as
+	// a uint16, it will rollover every ~65 seconds.
+	if ( latest < prev_msg.timestamp ) {
+		typedef decltype(SHARED_VEHICLE_INFO::posTimeStamp) RolloverType;
+		curr_msg.timestamp -= std::numeric_limits<RolloverType>::max();
+		prev_msg.timestamp -= std::numeric_limits<RolloverType>::max();
+		pred_pos.timestamp -= std::numeric_limits<RolloverType>::max();
+	}
 
-	prev_msg = from->prev_msg;
-	curr_msg = from->curr_msg;
-	pred_pos = from->pred_pos;
-	real_pos = from->real_pos;
+	// Correct our state if earlier messages were lagging behind.
+	if ( pred_pos.timestamp < latest )
+		pred_pos.timestamp = latest;
+}
 
-	prev_msg.animationFlags = curr_msg.animationFlags =
-	pred_pos.animationFlags = real_pos.animationFlags = flags;
+//------------------------------------------------------------------------------
 
-	prev_msg.pos = curr_msg.pos =
-	pred_pos.pos = real_pos.pos = v->PosData.Pos;
+void InfantryPredictor::NewMessageReceived(Timestamp timestamp, FrameTime frame) {
+	prev_msg = curr_msg;
 
-	FLOAT64VECTOR dir = { -sin(v->PosData.Att.Yaw), -cos(v->PosData.Att.Yaw), 0.0 };
-	prev_msg.dir = curr_msg.dir =
-	pred_pos.dir = real_pos.dir = dir;
+	curr_msg.timestamp = timestamp;
+	curr_msg.frametime = frametime;
+	curr_msg.pos = _vehicle->PosData.Pos;
+	curr_msg.vel = _vehicle->PosData.Vel;
+	curr_msg.vel.x = -_vehicle->PosData.Vel.x;        // Weird math stuff is due to some
+	curr_msg.dir.x = -sin(_vehicle->PosData.Att.Yaw); // sort of hack in how infantry
+	curr_msg.dir.y = -cos(_vehicle->PosData.Att.Yaw); // position/direction is handled.
+	curr_msg.dir.z = 0;
+	_lastUpdateYaw = _vehicle->PosData.Att.Yaw;
+	curr_msg.speed = mathExactVectorLength(&curr_msg.vel);
+	curr_msg.animationFlags = _vehicle->PosData.animationFlags;
 
-	_vehicle->GetAnim()->twist.predictedYaw = v->GetAnim()->twist.predictedYaw;
+	gr2AnimBitPacker flags(curr_msg.animationFlags);
+	is_dead = flags.deathState;
 }
 
 //------------------------------------------------------------------------------
 
 void InfantryPredictor::UpdateInterpolation(void) {
-	// TODO: Consider skipping interpolation if extreme lag is going on.
+	Update to = curr_msg;
+	to.pos += to.vel * ((curr_msg.frametime - pred_pos.frametime) / 1000.0);
 
-	// If the message was sent just as they started moving, the soldier will
-	// slowly walk based on the slower speed used in the prediction, then
-	// rubber-band to the proper position once the next message is received.
-	//
-	// To help with this, we give our prediction a little boost if the
-	// difference when they suddenly accelerate.
-	const double diff_threshhold = 1.25;
-	if ( prev_msg.speed == 0.0 || curr_msg.speed / prev_msg.speed > diff_threshhold ) {
-		double new_speed = curr_msg.speed * 1.15;
-		// TODO: Cap so we don't go above sprint speed.
-		pred_pos.vel = *mathNormalize(&pred_pos.vel) * new_speed;
-		pred_pos.speed = new_speed;
-	}
+	Update from = pred_pos;
+	// Infantry position can change on a dime, so weaken/ignore our current speed if need be.
+	if ( mathExactVectorLength2(&from.vel) > mathExactVectorLength2(&to.vel) )
+		from.vel = (from.vel + to.vel) / 2;
+	else
+		from.vel = to.vel;
 
-	const Update& from = real_pos;
-	Update to = pred_pos;
-	
 	double pred_time_passed = ((interp_time - (to.frametime - from.frametime)) / 1000.0);
 	to.pos += to.vel * pred_time_passed;
 
@@ -374,8 +272,9 @@ void InfantryPredictor::UpdateInterpolation(void) {
 
 	// TODO: It's very unlikely, but we may end up on the other
 	// side of a wall/floor after the interp_time has passed.
-	gr2AnimBitPacker flags(to.animationFlags);
-	CheckCollisions(to, (fpTPSPoseType)flags.pose);
+	// TEMP: Removed pending performance improvements.
+	//gr2AnimBitPacker flags(to.animationFlags);
+	//CheckCollisions(to, (fpTPSPoseType)flags.pose);
 
 	spline.SetControlPointsWithDt(from.pos, v1, to.pos, v2);
 
@@ -385,360 +284,148 @@ void InfantryPredictor::UpdateInterpolation(void) {
 
 //==============================================================================
 
-InfantryInterpolator::InfantryInterpolator(vehVehicle* v) : InterpolatorBase(v),
-	_dead(false),
-	_rollover(false)
-{
-}
+const Update& InfantryPredictor::Interpolate(FrameTime frame) {
+	if ( is_dead || (frame == pred_pos.frametime && ! dirty) )
+		return pred_pos;
 
-void InfantryInterpolator::NewPosDataUpdate(int timestamp, int frametime)
-{
+	gr2AnimBitPacker flags(curr_msg.animationFlags);
 
-	//printf("%s %lf\n", _vehicle->Handle, (frametime - _to.frametime) / (double)(_to.timestamp - _from.timestamp));
+	if ( frame < interp_end ) {
+		double t = (double)(frame - interp_beg) / (double)(interp_end - interp_beg);
+		assert ( 0.0 <= t && t <= 1.0 );
+		if ( t < 0.0 ) t = 0.0;
+		if ( t > 1.0 ) t = 1.0;
 
-	//if(_dead) return;
+		FLOAT64 prev_z = pred_pos.pos.z;
+		pred_pos.pos = spline.InterpolatePoint(t);
+		// HACK: The predicted position we interpolate to doesn't take gravity into account,
+		// so ignore the interpolated height unless it has us heading downward.
+		pred_pos.pos.z = std::min(prev_z, pred_pos.pos.z);
 
-	Interpolate(frametime);
+		FLOAT64VECTOR vel = spline.InterpolateDt(t);
+		mathScaleVector(&vel, &vel, 1000.0/interp_time);
 
-	if(_cur.frametime && _next.timestamp > _cur.timestamp && _next.timestamp - _cur.timestamp < 2000)
-	{
-		_cur.animationFlags = _to.animationFlags;
-		_from = _cur;
-	}
-	else
-	{
-		_to.vel.x = _to.vel.y = _to.vel.z = 0;
-		_from = _to;
-	}
+		FLOAT64VECTOR dir = vel;
+		mathNormalize(&dir);
 
-	//	_to = _next;
-	//	_to.frametime = frametime;
-
-	_next.timestamp = timestamp;
-	_next.pos = _vehicle->PosData.Pos;
-	_next.vel = _vehicle->PosData.Vel;
-	_next.vel.x = -_vehicle->PosData.Vel.x; // usual bs (for infantry)
-	_next.dir.x = -sin(_vehicle->PosData.Att.Yaw); // more bs (inf specific as well i think)
-	_next.dir.y = -cos(_vehicle->PosData.Att.Yaw);
-	_next.dir.z = 0;
-	_next.speed = mathExactVectorLength(&_next.vel);
-	_lastUpdateYaw = _vehicle->PosData.Att.Yaw;
-
-	_next.animationFlags = _vehicle->PosData.animationFlags;
-
-	// check for a short rollover
-	if(_next.timestamp < _to.timestamp)
-	{
-		//printf("SHORT ROLLOVER\n");
-
-		if(_from.frametime)
-			_from.timestamp -= USHRT_MAX;
-		if(_to.frametime)
-			_to.timestamp -= USHRT_MAX;
-		if(_cur.frametime)
-			_cur.timestamp -= USHRT_MAX;
-
-		_rollover = true;
-	}
-	else
-	{
-		_rollover = false;
-	}
-
-	// not buffering for now, people don't like the delay when fighting in buildings
-	_to = _next;
-	_to.frametime = frametime;
-
-	UpdateSpline(_from.pos, _to.pos, _from.vel, _to.vel, _from.dir, _to.dir, (_to.timestamp - _from.timestamp)/1000.0);
-}
-
-void InfantryInterpolator::UpdateSpline(FLOAT64VECTOR const& frompos, FLOAT64VECTOR const& topos
-								,  FLOAT64VECTOR const& fromvel, FLOAT64VECTOR const& tovel
-								,  FLOAT64VECTOR const& fromdir, FLOAT64VECTOR const& todir, double dt)
-{
-	FLOAT64VECTOR v1, v2;
-
-	if(mathExactVectorLength2(&fromvel) > .001)
-	{
-		mathScaleVector(&v1, &fromvel, dt);
-	}
-	else
-	{
-		mathScaleVector(&v1, &fromdir, .001);
-	}
-
-	if(mathExactVectorLength2(&tovel) > .001)
-	{
-		mathScaleVector(&v2, &tovel, dt);
-	}
-	else
-	{
-		mathScaleVector(&v2, &todir, .001);
-	}
-
-	_spline.SetControlPointsWithDt(frompos, v1, topos, v2);
-
-	/*if(mathExactVectorLength(&tovel) > .1 || mathExactVectorLength(&fromvel) > .1)
-	{
-		printf("%s\n", _vehicle->Handle);
-		printf("%lf m/s %lf deg %lf deg -> %lf m/s %lf deg %lf deg\n",  mathExactVectorLength(&fromvel), atan2(v1.y, v1.x)*180/PI,  atan2(fromdir.y, fromdir.x)*180/PI
-																	,	mathExactVectorLength(&tovel), atan2(v2.y, v2.x)*180/PI, atan2(todir.y, todir.x)*180/PI );
-		FLOAT64VECTOR diff;
-		mathSubVectors(&diff, &topos, &frompos);
-		printf("%lf m %lf sec %lf m/s\n", mathExactVectorLength(&diff), dt, mathExactVectorLength(&diff) / dt);
-
-		for(double t = 0; t<1.09; t+=.1)
-		{
-			FLOAT64VECTOR vel = _spline.InterpolateDt(t);
-			mathScaleVector(&vel, &vel, 1/dt);
-
-			//printf("%lf %lf\n", t, mathExactVectorLength(&vel));
-			printf("%lf %lf m/s %lf deg\n", t, mathExactVectorLength(&vel), atan2(vel.y, vel.x)*180/PI);
+		double speed = mathExactVectorLength2(&vel);
+		if ( speed < 0.1 ) { // HACK: To avoid twitchiness
+			vel = { 0.0, 0.0, 0.0 };
+			speed = 0.0;
+			dir = curr_msg.dir;
 		}
-	}
-	*/
-}
-
-InterpolatorBase::Update const& InfantryInterpolator::Interpolate(int frametime)
-{
-	return _to;
-
-	if(_from.frametime == 0 || _to.frametime == 0) return _cur; // _dead
-	if(_interpolatetime == frametime) return _cur;
-
-	double dt,t;
-	dt = (_to.timestamp - _from.timestamp) / 1000.0;
-	t = (dt > .001) ? (frametime - _to.frametime) / (double)(_to.timestamp - _from.timestamp) : 0;
-
-	//printf("t: %lf\n", t);
-
-	// haven't gotten the next update yet so use the one that's buffered in _next
-	/*
-	if(t > 1 && _next.frametime)
-	{
-		//printf("%s _next\n", _vehicle->Handle);
-		_from = _to;
-		_to = _next;
-		_to.frametime = frametime;
-		_next.frametime = 0;
-
-		dt = (_to.timestamp - _from.timestamp) / 1000.0;
-		t = (dt > .001) ? (frametime - _to.frametime) / (double)(_to.timestamp - _from.timestamp) : 0;
-
-		UpdateSpline(_from.pos, _to.pos, _from.vel, _to.vel, _from.dir, _to.dir, dt);
-	}
-	*/
-
-	if(t < 0) t = 0;
-	if(t > 1) t = 1;
-
-	_cur.frametime = frametime;
-	_cur.timestamp = _from.timestamp + (frametime - _to.frametime);
-
-	//	if(_cur.timestamp > _to.timestamp)
-	//		_cur.timestamp = _to.timestamp;
-
-	//printf("%f %f %f\n", (float)t, (float)(_from.timestamp + (frametime - _from.frametime)), (float)(_from.timestamp * (1-t) + _to.timestamp * t));
-
-	_cur.pos = _spline.InterpolatePoint(t);
-
-	FLOAT64VECTOR predictVel = _spline.InterpolateDt(t);
-
-	mathScaleVector(&predictVel, &predictVel, 1/dt);
-
-	FLOAT64VECTOR veldir = predictVel;
-	mathNormalize(&veldir);
-
-	gr2AnimBitPacker toFlags(_to.animationFlags);
-	gr2AnimBitPacker fromFlags(_from.animationFlags);
-	gr2AnimBitPacker curFlags = toFlags; //fromFlags;
-
-	double speed = mathExactVectorLength2(&predictVel);
-
-	if(speed <= (.05f * .05f))  // was .1
-	{
-		_cur.vel.x = _cur.vel.y = _cur.vel.z = 0;
-	}
-	else
-	{
-		_cur.dir = veldir;
-		_cur.vel = predictVel;
-	}
-
-	FLOAT64VECTOR delta;
-	mathSubVectors(&delta, &_to.pos, &_from.pos);
-
-	if(mathExactVectorLength2(&delta) < .01) // no movement just rotation
-	{
-		_cur.dir = _to.dir;
-		_cur.vel.x = _cur.vel.y = _cur.vel.z = 0;
-	}
-	else if(mathVectDotProduct(&_to.dir, &_to.vel) < .42) // strafing
-	{
-		//printf("strafing\n");
-		_cur.dir = _to.dir;
-	}
-
-	_cur.speed = mathExactVectorLength(&_cur.vel);
-
-	// override sent speed with what comes from our predicted speed
-	if(curFlags.movement <= TPS_MOVETYPE_IDLE && speed >= .1)
-	{
-		if(curFlags.pose == TPS_POSETYPE_STAND)
-		{
-			if (_cur.speed >= 6.0f)
-				curFlags.movement = TPS_MOVETYPE_SPRINT;
-			else if (_cur.speed > .1f)
-				curFlags.movement = TPS_MOVETYPE_FORWARD;
-			else
-				curFlags.movement = TPS_MOVETYPE_STILL;
+		// HACK: Something isn't being calculated correctly.
+		else {
+			speed = curr_msg.speed;
 		}
-		if(curFlags.pose == TPS_POSETYPE_PRONE && _cur.speed >= 1.0f)
-		{
-			// don't allow fast crawling
-			curFlags.pose = TPS_POSETYPE_CROUCH;
-			curFlags.movement = TPS_MOVETYPE_FORWARD;
-		}
+
+		pred_pos.vel = vel;
+		pred_pos.speed = speed;
+		// If the last message has us not going somewhat forward, respect that orientation.
+		// TODO: We should use a proper constant to determine where "strafing" begins.
+		if ( mathVectDotProduct(&curr_msg.dir, &curr_msg.vel) < .42 )
+			pred_pos.dir = curr_msg.dir;
 		else
-		{
-			curFlags.movement = TPS_MOVETYPE_FORWARD;
-
-			if(curFlags.pose == TPS_POSETYPE_PRONE)
-				curFlags.point = TPS_POINTTYPE_RELAXED;
-		}
+			pred_pos.dir = dir;
+	} else {
+		pred_pos.pos += pred_pos.vel * ((frame - pred_pos.frametime) / 1000.0);
 	}
 
-	curFlags.deathState = toFlags.deathState;
+	CheckCollisions(pred_pos, (fpTPSPoseType)flags.pose, flags.movement & TPS_MOVETYPE_FALL);
 
-	_dead = curFlags.deathState;
-	_cur.animationFlags = curFlags.pack(); // toFlags.pack();
-	_interpolatetime = frametime;
+	// Override motion flags to match what the player's seeing.
+	if ( flags.movement <= TPS_MOVETYPE_IDLE && pred_pos.speed >= .1 ) {
+		if ( flags.pose == TPS_POSETYPE_STAND ) {
+			if ( pred_pos.speed > 6.0 ) // TODO: Match this with an actual constant.
+				flags.movement = TPS_MOVETYPE_SPRINT;
+			else if ( pred_pos.speed > 0.1 )
+				flags.movement = TPS_MOVETYPE_FORWARD;
+			else
+				flags.movement = TPS_MOVETYPE_STILL;
+		}
+		if ( flags.pose == TPS_POSETYPE_PRONE && pred_pos.speed >= 1.0f ) {
+			// Don't allow fast crawling
+			flags.pose = TPS_POSETYPE_CROUCH;
+			flags.movement = TPS_MOVETYPE_FORWARD;
+		} else {
+			flags.movement = TPS_MOVETYPE_FORWARD;
 
-	//if(mathExactVectorLength(&_cur.vel) > .1)
-	//	printf("%lf %lf m/s %lf deg %lf deg\n", t, mathExactVectorLength(&_cur.vel), atan2(_cur.vel.y, _cur.vel.x)*180/PI, atan2(_cur.dir.y, _cur.dir.x)*180/PI);
+			if ( flags.pose == TPS_POSETYPE_PRONE )
+				flags.point = TPS_POINTTYPE_RELAXED;
+		}
+	}
+	pred_pos.animationFlags = flags.pack();
 
-	return _cur;
+
+	pred_pos.timestamp = (frame - pred_pos.frametime);
+	pred_pos.frametime = frame;
+
+	dirty = false;
+	return pred_pos;
 }
 
-void InfantryInterpolator::Copy(vehVehicle* v, UINT32 flags) {
-	InfantryInterpolator* from = dynamic_cast<InfantryInterpolator*>(&v->interpolator);
+//==============================================================================
 
-	if ( ! from ) return;
+void InfantryPredictor::Copy(vehVehicle* v, UINT32 flags) {
+	InfantryPredictor* from = dynamic_cast<InfantryPredictor*>(&v->interpolator);
+	if ( ! from )
+		return;
 
-	_from					= from->GetFrom();
-	_cur					= from->GetCur();
-	_to						= from->GetTo();
-	_next					= from->GetNext();
-	//_lastUpdateYaw			= v->PosData.Att.Yaw;
+	dirty = true;
 
-	_from.animationFlags	= flags;
-	_cur.animationFlags		= flags;
-	_to.animationFlags		= flags;
-	_next.animationFlags	= flags;
+	prev_msg = from->prev_msg;
+	curr_msg = from->curr_msg;
+	pred_pos = from->pred_pos;
 
-	_from.pos				= v->PosData.Pos;
-	_cur.pos				= v->PosData.Pos;
-	_to.pos					= v->PosData.Pos;
-	_next.pos				= v->PosData.Pos;
+	prev_msg.animationFlags = curr_msg.animationFlags = pred_pos.animationFlags = flags;
 
-	_from.dir.x				= -sin(v->PosData.Att.Yaw);
-	_from.dir.y				= -cos(v->PosData.Att.Yaw);
+	prev_msg.pos = curr_msg.pos = pred_pos.pos = v->PosData.Pos;
 
-	_cur.dir				= _from.dir;
-	_to.dir					= _from.dir;
-	_next.dir				= _from.dir;
+	FLOAT64VECTOR dir = { -sin(v->PosData.Att.Yaw), -cos(v->PosData.Att.Yaw), 0.0 };
+	prev_msg.dir = curr_msg.dir = pred_pos.dir = dir;
 
 	_vehicle->GetAnim()->twist.predictedYaw = v->GetAnim()->twist.predictedYaw;
 }
 
-void PassThruInterpolator::NewPosDataUpdate(int timestamp, int frametime)
-{
-	//if(_dead) return; // causes para troops to freeze in midair
+//==============================================================================
 
-	gr2AnimBitPacker curFlags(_vehicle->PosData.animationFlags);
+void CubicSpline::SetControlPoints(FLOAT64VECTOR const& v0, FLOAT64VECTOR const& v1,
+                                   FLOAT64VECTOR const& v2, FLOAT64VECTOR const& v3) {
+	_xc[3] = 1 * v3.x - 3 * v2.x + 3 * v1.x - 1 * v0.x;
+	_xc[2] = 3 * v2.x - 6 * v1.x + 3 * v0.x           ;
+	_xc[1] =                       3 * v1.x - 3 * v0.x;
+	_xc[0] =                                  1 * v0.x;
 
-	_dead = curFlags.deathState;
-	_cur.animationFlags = curFlags.pack();
-	_interpolatetime = frametime;
+	_yc[3] = 1 * v3.y - 3 * v2.y + 3 * v1.y - 1 * v0.y;
+	_yc[2] =            3 * v2.y - 6 * v1.y + 3 * v0.y;
+	_yc[1] =                       3 * v1.y - 3 * v0.y;
+	_yc[0] =                                  1 * v0.y;
 
-	_cur.timestamp = timestamp;
-	_cur.frametime = frametime;
-	_cur.pos = _vehicle->PosData.Pos;
-	_cur.vel = _vehicle->PosData.Vel;
-	_cur.vel.x = -_vehicle->PosData.Vel.x; // usual bs (for infantry)
-	_cur.dir.x = -sin(_vehicle->PosData.Att.Yaw); // more bs (inf specific as well i think)
-	_cur.dir.y = -cos(_vehicle->PosData.Att.Yaw);
-	_cur.dir.z = 0;
-	_cur.speed = mathExactVectorLength(&_cur.vel);
-
-	if(_cur.speed <= .05)  // was .1
-		_cur.vel.x = _cur.vel.y = _cur.vel.z = 0;
-
-	FLOAT64VECTOR delta;
-	mathSubVectors(&delta, &_last.pos, &_cur.pos);
-
-	if(mathExactVectorLength2(&delta) < .01) // no movement just rotation
-	{
-		_cur.dir = _last.dir;
-		_cur.vel.x = _cur.vel.y = _cur.vel.z = 0;
-	}
-	else if(mathVectDotProduct(&_cur.dir, &_cur.vel) < .42) // strafing
-	{
-		_cur.dir = _last.dir;
-	}
-
-	_last = _cur;
-	_lastUpdateYaw = _vehicle->PosData.Att.Yaw;
+	_zc[3] = 1 * v3.z - 3 * v2.z + 3 * v1.z - 1 * v0.z;
+	_zc[2] =            3 * v2.z - 6 * v1.z + 3 * v0.z;
+	_zc[1] =                       3 * v1.z - 3 * v0.z;
+	_zc[0] =                                  1 * v0.z;
 }
 
-InterpolatorBase::Update const& PassThruInterpolator::Interpolate(int frametime)
-{
-	return _cur;
+void CubicSpline::SetControlPointsWithDt(FLOAT64VECTOR const& x0, FLOAT64VECTOR const& v0,
+                                         FLOAT64VECTOR const& x1, FLOAT64VECTOR const& v1) {
+	_xc[3] =  1 * v1.x - 2 * x1.x + 1 * v0.x + 2 * x0.x;
+	_xc[2] = -1 * v1.x + 3 * x1.x - 2 * v0.x - 3 * x0.x;
+	_xc[1] =                            v0.x           ;
+	_xc[0] =                                       x0.x;
+
+	_yc[3] =  1 * v1.y - 2 * x1.y + 1 * v0.y + 2 * x0.y;
+	_yc[2] = -1 * v1.y + 3 * x1.y - 2 * v0.y - 3 * x0.y;
+	_yc[1] =                            v0.y           ;
+	_yc[0] =                                       x0.y;
+
+	_zc[3] =  1 * v1.z - 2 * x1.z + 1 * v0.z + 2 * x0.z;
+	_zc[2] = -1 * v1.z + 3 * x1.z - 2 * v0.z - 3 * x0.z;
+	_zc[1] =                            v0.z           ;
+	_zc[0] =                                       x0.z;
 }
 
-void PassThruInterpolator::Copy(vehVehicle* v, UINT32 flags)
-{
-	// do nothing
-}
-
-void CubicSpline::SetControlPoints(FLOAT64VECTOR const& v0, FLOAT64VECTOR const& v1, FLOAT64VECTOR const& v2, FLOAT64VECTOR const& v3)
-{
-	_xc[3] = 1 * v3.x -	3 * v2.x +	3 * v1.x -	1 * v0.x;
-	_xc[2] =			3 * v2.x -	6 * v1.x +	3 * v0.x;
-	_xc[1] =						3 * v1.x -	3 * v0.x;
-	_xc[0] =									1 * v0.x;
-
-	_yc[3] = 1 * v3.y -	3 * v2.y +	3 * v1.y -	1 * v0.y;
-	_yc[2] =			3 * v2.y -	6 * v1.y +	3 * v0.y;
-	_yc[1] =						3 * v1.y -	3 * v0.y;
-	_yc[0] =									1 * v0.y;
-
-	_zc[3] = 1 * v3.z -	3 * v2.z +	3 * v1.z -	1 * v0.z;
-	_zc[2] =			3 * v2.z -	6 * v1.z +	3 * v0.z;
-	_zc[1] =						3 * v1.z -	3 * v0.z;
-	_zc[0] =									1 * v0.z;
-}
-
-void CubicSpline::SetControlPointsWithDt(FLOAT64VECTOR const& x0, FLOAT64VECTOR const& v0, FLOAT64VECTOR const& x1, FLOAT64VECTOR const& v1)
-{
-	_xc[3] =  1 * v1.x	- 2 * x1.x + 1 * v0.x + 2 * x0.x;
-	_xc[2] = -1 * v1.x	+ 3 * x1.x - 2 * v0.x - 3 * x0.x;
-	_xc[1] =						 v0.x;
-	_xc[0] =										x0.x;
-
-	_yc[3] =  1 * v1.y	- 2 * x1.y + 1 * v0.y + 2 * x0.y;
-	_yc[2] = -1 * v1.y	+ 3 * x1.y - 2 * v0.y - 3 * x0.y;
-	_yc[1] =						 v0.y;
-	_yc[0] =										x0.y;
-
-	_zc[3] =  1 * v1.z	- 2 * x1.z + 1 * v0.z + 2 * x0.z;
-	_zc[2] = -1 * v1.z	+ 3 * x1.z - 2 * v0.z - 3 * x0.z;
-	_zc[1] =						 v0.z;
-	_zc[0] =										x0.z;
-}
-
-FLOAT64VECTOR CubicSpline::InterpolatePoint(double t)
-{
+FLOAT64VECTOR CubicSpline::InterpolatePoint(double t) {
 	FLOAT64VECTOR pos;
 
 	pos.x = calcpos(_xc, t);
@@ -748,8 +435,7 @@ FLOAT64VECTOR CubicSpline::InterpolatePoint(double t)
 	return pos;
 }
 
-FLOAT64VECTOR CubicSpline::InterpolateDt(double t)
-{
+FLOAT64VECTOR CubicSpline::InterpolateDt(double t) {
 	FLOAT64VECTOR dt;
 
 	dt.x = calcdt(_xc, t);
@@ -759,12 +445,10 @@ FLOAT64VECTOR CubicSpline::InterpolateDt(double t)
 	return dt;
 }
 
-double CubicSpline::calcpos(double c[4], double t)
-{
+double CubicSpline::calcpos(double c[4], double t) {
 	return c[3]*t*t*t + c[2]*t*t + c[1]*t + c[0];
 }
 
-double CubicSpline::calcdt(double c[4], double t)
-{
+double CubicSpline::calcdt(double c[4], double t) {
 	return 3*c[3]*t*t + 2*c[2]*t + c[1];
 }

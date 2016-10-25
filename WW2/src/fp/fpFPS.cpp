@@ -13550,15 +13550,15 @@ dGeomID _createFPSCapsuleTest(dSpaceID space, double length, double radius, doub
 }
 
 // !!!HACK!!! - vehInterpolator
-fpFPSPoses HACK_forced_pose = POSE_NUM_POSES;
+fpFPSPositions HACK_forced_pose = FPS_NUM_POSITIONS;
 
 void _updateFPSColliders(void)
 {
 	_collider.collider = nullptr;
 
-	fpFPSPoses pose;
-	if ( HACK_forced_pose == POSE_NUM_POSES )
-		pose = fpFPSGetPlayerPose();
+	fpFPSPositions pose;
+	if ( HACK_forced_pose == FPS_NUM_POSITIONS )
+		pose = targetPose;
 	else
 		pose = HACK_forced_pose;
 
@@ -13571,14 +13571,10 @@ void _updateFPSColliders(void)
 			_collider.collider = &_kneelCollider;
 		break;
 		case POSE_PRONE:
+		default:
 			_collider.collider = &_proneCollider;
-		break;
-        default:
-            // only poses above have colliders
-            break;
+			break;
 	}
-
-	//_collider.collider = &_kneelCollider;
 }
 
 /*
