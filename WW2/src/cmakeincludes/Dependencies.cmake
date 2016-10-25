@@ -1,85 +1,79 @@
 # Server project dependencies.
+MARK_AS_ADVANCED(
+    LIBEVENT_FOUND LIBEVENT_INCLUDE_DIR
+    LUA_LIBRARIES LUA_INCLUDE_DIR
+    GIT_EXECUTABLE
+    LIBIRCCLIENT_FOUND
+)
 
-MARK_AS_ADVANCED(CNL LIBEVENT_FOUND LIBEVENT_INCLUDE_DIR)
-MARK_AS_ADVANCED(CNL LIBXML2_FOUND LIBXML2_INCLUDE_DIR)
+# We need ncurses and readline for the lua client, but don't care on Windows
+FIND_PACKAGE( Readline 6.0 )
 
-IF ( PN_LUA_CLIENT )
-	FIND_LIBRARY(CNL NAMES ncurses)
-	IF ( NOT CNL )
-	 MESSAGE(SEND_ERROR "ncurses library not found")
-	ENDIF ()
-ENDIF ( )
+IF ( NOT WIN32 AND NOT READLINE_FOUND )
+    MESSAGE( FATAL_ERROR "readline library is required" )
+ENDIF()
+
+# Pull in MySQL
+FIND_PACKAGE( MySQL REQUIRED )
+INCLUDE_DIRECTORIES( ${MYSQL_INCLUDE_DIR} )
+
+# Make sure Git is available
+FIND_PROGRAM( GIT_EXECUTABLE NAMES git )
+IF ( NOT GIT_EXECUTABLE )
+    MESSAGE( FATAL_ERROR "A working git executable is required" )
+ENDIF()
+
+# Find Lua 5.1- but for now, pull in our embedded (outdated) one
+ADD_SUBDIRECTORY( ${LIBRARIES_DIR}/lua51 ${CMAKE_CURRENT_BINARY_DIR}/lua51 )
+INCLUDE_DIRECTORIES( ${LUA_INCLUDE_DIR} )
+SET_TARGET_PROPERTIES( lua51 PROPERTIES FOLDER "Libs" )
+
+# Ditto for tolua++ since we haven't gotten rid of it yet
+ADD_SUBDIRECTORY( ${LIBRARIES_DIR}/tolua++ ${CMAKE_CURRENT_BINARY_DIR}/tolua++ )
+SET_TARGET_PROPERTIES( libtolua++ PROPERTIES FOLDER "Libs" )
+SET_TARGET_PROPERTIES( tolua++ PROPERTIES FOLDER "Tools" )
+
+# On Windows, pull in our embedded libevent; elsewhere, search the system for it
+IF ( WIN32 )
+	ADD_SUBDIRECTORY( "${LIBRARIES_DIR}/libevent" "${CMAKE_CURRENT_BINARY_DIR}/libevent" )
+	SET( LIBEVENT_INCLUDE_DIR "${LIBRARIES_DIR}/libevent/include" )
+	INCLUDE_DIRECTORIES( ${LIBEVENT_INCLUDE_DIR} ${LIBEVENT_INCLUDE_DIR}/../WIN32-CODE )
+	SET_TARGET_PROPERTIES( event PROPERTIES FOLDER "Libs" )
+ELSE()
+    FIND_PACKAGE( LibEvent REQUIRED )
+ENDIF()
 
 # Need Python for revno.py
 FIND_PACKAGE( PythonInterp 2.7 REQUIRED )
 
-# Include our macros etc
-find_package(MySQL REQUIRED)
+# Need Bison and Flex for OMGgen; use embedded versions on Windows
+IF ( WIN32 )
+    SET( BISON_EXECUTABLE "${CMAKE_CURRENT_SOURCE_DIR}/omggen/win_bison.exe" )
+    SET( FLEX_EXECUTABLE "${CMAKE_CURRENT_SOURCE_DIR}/omggen/win_flex.exe" )
+ENDIF()
+# Setting the executables first on Windows allows these to work normally
+FIND_PACKAGE( BISON REQUIRED )
+FIND_PACKAGE( FLEX REQUIRED )
 
-# Find SubVersion
-if ( 0 )
- find_package(Subversion REQUIRED)
- IF ( NOT Subversion_FOUND )
-	 message(SEND_ERROR "Unable to find subversion executables")
- ENDIF ( NOT Subversion_FOUND )
- # Ask Subversion for info on this working copy.
- Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} REPO)
-else ( )
-# include ( cmakeincludes/FindMercurial.cmake )
-# if ( NOT MERCURIAL_FOUND )
-#  message(SEND_ERROR "Unable to find mercurial executables")
-# endif ( )
-# MERCURIAL_HG_INFO(${CMAKE_CURRENT_SOURCE_DIR} REPO)
-endif ( )
+# Need libircclient
+FIND_LIBRARY( LIBIRCCLIENT_FOUND ircclient DOC "Location of libircclient" )
+IF ( NOT LIBIRCCLIENT_FOUND )
+    # Fall back on the embedded one
+    ADD_LIBRARY( ircclient libircclient/src/libircclient.cpp )
+    INCLUDE_DIRECTORIES( libircclient/include )
+    SET_PROPERTY( TARGET ircclient PROPERTY COMPILE_DEFINITIONS IN_BUILDING_LIBIRC=1 )
+    SET_PROPERTY( TARGET ircclient PROPERTY FOLDER "Libs" )
+    SET( LIBIRCCLIENT_FOUND TRUE )
+ENDIF()
 
-# Find Lua 5.1
-ADD_SUBDIRECTORY(${LIBRARIES_DIR}/lua51 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
-INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIR})
-SET_TARGET_PROPERTIES(lua51 PROPERTIES FOLDER "Libs")
-
-# Build/use tolua++
-ADD_SUBDIRECTORY(${LIBRARIES_DIR}/tolua++ ${CMAKE_CURRENT_BINARY_DIR}/tolua++)
-SET_TARGET_PROPERTIES(libtolua++ PROPERTIES FOLDER "Libs")
-SET_TARGET_PROPERTIES(tolua++ PROPERTIES FOLDER "Tools")
-
-IF ( UNIX )
-	find_program(CTAGS ctags)
-	add_custom_target(ctags
-		COMMAND ${CTAGS} -R ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]*
-		)
-	MARK_AS_ADVANCED(CTAGS)
-ENDIF ( )
-
-INCLUDE_DIRECTORIES(${LIBRARIES_DIR}/libb64/libb64-1.2/include)
-IF ( WIN OR WIN32 OR WIN64 )
-	ADD_SUBDIRECTORY("${LIBRARIES_DIR}/libevent" "${CMAKE_CURRENT_BINARY_DIR}/libevent")
-	SET(LIBEVENT_INCLUDE_DIR "${LIBRARIES_DIR}/libevent/include")
-	INCLUDE_DIRECTORIES(${LIBEVENT_INCLUDE_DIR})
-	INCLUDE_DIRECTORIES(${LIBEVENT_INCLUDE_DIR}/../WIN32-CODE)
-	SET_TARGET_PROPERTIES(event PROPERTIES FOLDER "Libs")
-ELSE ( )
-	FIND_LIBRARY(LIBEVENT_FOUND
-			NAMES	event-2.0-5 event-2.0 event2 event
-				libevent-2.0-5 libevent-2.0 libevent2 libevent
-			)
-	FIND_PATH(LIBEVENT_INCLUDE_DIR event2/event.h
-			HINTS /usr/include /usr/local/include)
-	IF (NOT LIBEVENT_FOUND OR NOT LIBEVENT_INCLUDE_DIR)
-		MESSAGE(FATAL_ERROR "libevent not found")
-	ENDIF ( )
-ENDIF ( )
-
-IF ( PN_CLUSTER STREQUAL "rPI" )
-	set(LIBXML2_LIBRARIES "${PROJECT_DIR}/WW2/lib/rPI/${CMAKE_BUILD_TYPE}/3rdParty/libxml2.a")
-	set(LIBZ_LIBRARIES "/usr/lib/arm-linux-gnueabihf/libz.a")
-	INCLUDE_DIRECTORIES( "${PROJECT_DIR}/WW2/include" )
-	MESSAGE(STATUS "rPI : Libs: ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES}")
-ELSEIF ( WIN OR WIN32 OR WIN64 )
-	FIND_LIBRARY(LIBXML2_LIBRARIES
-			NAMES	libxml2 xml2
-			HINTS "${PROJECT_DIR}/WW2/lib/win/${CMAKE_BUILD_TYPE}/3rdParty")
-	INCLUDE_DIRECTORIES( "${PROJECT_DIR}/WW2/include" )
-ELSE ( )
-	FIND_PACKAGE( LibXml2 REQUIRED )
-	INCLUDE_DIRECTORIES( ${LIBXML2_INCLUDE_DIR} )
-ENDIF ( )
+# Embedded libb64
+ADD_LIBRARY( libb64
+    ${LIBRARIES_DIR}/libb64/libb64-1.2/src/cdecode.c
+    	${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/cdecode.h
+    		${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/decode.h
+    ${LIBRARIES_DIR}/libb64/libb64-1.2/src/cencode.c
+    	${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/cencode.h
+    		${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/encode.h
+)
+SET_PROPERTY( TARGET libb64 PROPERTY COMPILE_DEFINITIONS )
+SET_PROPERTY( TARGET libb64 PROPERTY FOLDER "Libs" )

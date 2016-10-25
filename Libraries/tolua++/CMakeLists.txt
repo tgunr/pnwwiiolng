@@ -11,6 +11,11 @@ IF (CMAKE_VERBOSE_MAKEFILE)
     INCLUDE ( cmake/dist.cmake )
 ENDIF ( )
 
+IF ( NOT MSVC AND PN_BUILD_32BIT )
+	SET(CMAKE_CXX_FLAGS "-m32")
+	SET(CMAKE_C_FLAGS "-m32")
+ENDIF ( )
+
 INCLUDE_DIRECTORIES ( include src/lib ${LUA_INCLUDE_DIR} )
 
 # Build lib
