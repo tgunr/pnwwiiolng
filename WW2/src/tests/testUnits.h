@@ -50,16 +50,16 @@ public: UINT32 StageErrors() const { return m_stageErrors; }
 public: enum Equality { IsLt = -1, IsEqual, IsGt };
 public: template<typename _Lhs, typename _Rhs> Equality Equals(const _Lhs& result, const _Rhs& expect) const
 		{
-			snprintf(m_lhsVal, 64, "%llu", (UINT64)result);
-			snprintf(m_rhsVal, 64, "%llu", (UINT64)expect);
+			strprintf(m_lhsVal, "%" PR64BitUT "", (UINT64)result);
+			strprintf(m_rhsVal, "%" PR64BitUT "", (UINT64)expect);
 			if ( result < (const _Lhs)expect ) return IsLt;
 			if ( result > (const _Lhs)expect ) return IsGt;
 			return IsEqual;
 		}
 public: Equality Equals(const FULL_OBJ_ID result, const FULL_OBJ_ID expect) const
 		{
-			snprintf(m_lhsVal, 64, "{%d,%d}.%u", result.cell.ox, result.cell.oy, result.id);
-			snprintf(m_rhsVal, 64, "{%d,%d}.%u", expect.cell.ox, expect.cell.oy, expect.id);
+			strprintf(m_lhsVal, "{%d,%d}.%u", result.cell.ox, result.cell.oy, result.id);
+			strprintf(m_rhsVal, "{%d,%d}.%u", expect.cell.ox, expect.cell.oy, expect.id);
 			if ( result.Key() < expect.Key() ) return IsLt;
 			if ( result.Key() > expect.Key() ) return IsGt;
 			return IsEqual;
