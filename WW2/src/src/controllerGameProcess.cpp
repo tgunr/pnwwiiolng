@@ -384,7 +384,7 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 	dbugLog(_FLI, "launching");
 	for ( auto&& arg : execArgs ) {
 		if (arg)
-			dbugLog(_FLIB, " %s", arg);
+			dbugLog(_FLI, " %s", arg);
 	}
 	int s = posix_spawn(&childPid, execArgs[0],
 				&file_actions, nullptr,
