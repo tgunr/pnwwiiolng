@@ -331,6 +331,7 @@ ADD_HOST_TARGET( ${AUTH_HOST_EXE} SOURCES
     auth/authQueue.cpp auth/authQueue.h auth/authQueuePosition.h wwii/wwiiRunningAverage.h
     auth/authOTP.cpp auth/authOTP.h
     auth/authPack.cpp auth/authPack.h
+	EXTRA_DEFINITIONS "IS_AUTH_HOST"
 )
 
 ####################################
