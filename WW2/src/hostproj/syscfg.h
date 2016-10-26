@@ -34,7 +34,6 @@ namespace Teul
 #include "inst/instDescriptor.h"
 #include "wwii/wwiiPlayer.h"
 #include "server/serverIndexes.h"
-#include "wwii/wwiiIRC.h"
 #include "server/serverPeers.h"
 #include "wwii/wwiiServerTypeEnums.h"
 #include "teul/teulConfigVar.h"

@@ -22,14 +22,13 @@
 #include "strt/strtFacilityStruct.h"
 #include "strt/strtMapTypes.h"
 #include "strt/strtTypes.h"
-#include "teul/teulEndpointDefs.h"
 #include "teul/teulBasic.h"
+#include "teul/teulEndpointDefs.h"
 #include "weap/weapDefs.h"
 #include "weap/weapWeapon.h"
 #include "wwii/wwiiDBThreads.h"
-#include "host/hostVehicleRequest.h"
-#include "wwii/wwiiServerTypeEnums.h"
 #include "wwii/wwiiPPOLoader.h"
+#include "wwii/wwiiServerTypeEnums.h"
 
 extern SINT32 mapSendHostSupercellData(SINT32 teulIndex);	// From mapHostSupercellData.cpp
 extern PPOSpecLoader specLoader;

@@ -4,6 +4,7 @@
 // Implement the functionality behind Scoring::Death
 
 #include "chat/chatLStringIDs.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "inst/instTypes.h"
 #include "map/mapPlayer.h"
