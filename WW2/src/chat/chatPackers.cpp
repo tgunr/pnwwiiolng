@@ -136,7 +136,7 @@ Chat::LocalizedMessage::packer(PackMode mode, ACTION_OBJECT* const a)
 	a->packer(mode, (SINT32*)&m_prefix, 12);
 	a->packer(mode, (SINT32*)&m_message, 12);
 	a->packer(mode, &m_size, 16);
-	a->bytePacker(mode, m_data, m_size);
+	a->packBytes(mode, m_data, m_size);
 	if ( mode == TEUL_UNPACK )
 		SetPointers();
 
@@ -148,12 +148,15 @@ Chat::LocalizedMessage::_copy(const char* const p0, const char* const p1, const 
 {
 	if ( (p0[0] | p1[0] | p2[0] | p3[0] | p4[0] | p5[0]) != 0 )
 	{
-		m_size = strprintf(m_data
+		UINT32 size = strprintf(m_data
 							, "%s%c%s%c%s%c%s%c%s%c%s"
 							, p0,0 , p1,0 , p2,0 , p3,0 , p4,0 , p5
 							);
-		if ( m_size > MAX_MESSAGE_LENGTH )
+		if ( size >= MAX_MESSAGE_LENGTH ) {
 			m_size = MAX_MESSAGE_LENGTH - 1;
+        } else {
+            m_size = static_cast<UINT16>(size);
+        }
 	}
 	else
 	{

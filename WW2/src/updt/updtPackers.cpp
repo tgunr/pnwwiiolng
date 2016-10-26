@@ -1139,7 +1139,7 @@ SINT32
 WORLD_UPDATE::packRemoveList(PackMode mode, ACTION_OBJECT* const a)
 {
 	a->packer(mode, numRemove, 8);
-	a->bytePacker(mode, removeList, sizeof(*removeList) * numRemove);
+	a->packBytes(mode, removeList, sizeof(*removeList) * numRemove);
 
 	return a->offset;
 }
