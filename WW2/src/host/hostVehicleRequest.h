@@ -17,6 +17,7 @@ namespace Server
 }
 class Player;
 class HostVehicle;
+struct MM_SPAWN_GRANT_RESPONSE;
 
 namespace Host
 {
@@ -25,7 +26,7 @@ namespace Host
 struct VehicleRequest
 {
 	//! MMHost constructor.
-	VehicleRequest(const instanceid_t instanceID, const struct MM_SPAWN_GRANT_RESPONSE& grant, const class Player& commander, const class Player* const crew);
+	VehicleRequest(const instanceid_t instanceID, const MM_SPAWN_GRANT_RESPONSE& grant, const class Player& commander, const class Player* const crew);
 	VehicleRequest(const instanceid_t instanceID, sortieid_t serial, const WEAPON_SPEC spec) noexcept
 		: m_instanceID(instanceID)
 		, m_weaponSerial()
