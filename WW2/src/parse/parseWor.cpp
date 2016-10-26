@@ -190,18 +190,12 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 template<size_t DestSize>
 static void _copyObjName(const char* sourceName, char (&destName)[DestSize])
 {
-	// If there is a directory separator, advance past it.
-	const char* p = strrchr(sourceName, '\\');
-	if ( p != nullptr )
-		sourceName = ++p;
-
-	// Trim off any trailing extension
-	p = strrchr(sourceName, '.');
-	assert( p > sourceName && "empty filename or filename ends with '\\'");
-	size_t len = p - sourceName;
-	assert( len < MAX_OBJNAME_LENGTH - 1 && "filename too long" );
-	strncpy(destName, sourceName, len);
-	destName[len] = 0;
+    std::string realSourceName = sourceName;
+    
+    realSourceName = realSourceName.substr(realSourceName.find_last_of('\\') + 1); // chop off all leading directory components
+    assert(realSourceName.length() > 0 && "empty filename or filename ends with '\\'");
+	assert(realSourceName.length() < MAX_OBJNAME_LENGTH - 1 && "filename too long" );
+    strncpy(destName, realSourceName.c_str(), std::min(DestSize, realSourceName.length()) - 1);
 }
 
 template<typename _Type>
