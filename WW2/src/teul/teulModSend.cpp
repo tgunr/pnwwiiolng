@@ -142,7 +142,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 		inetAddress.sin_port = htons( targetPort );
 	}
 
-	const SINT32 result = ::sendto(socket, (const char*)data, sizeInBytes, 0, (struct sockaddr*)&inetAddress, sizeof(inetAddress));
+	const ssize_t result = ::sendto(socket, (const char*)data, sizeInBytes, 0, (struct sockaddr*)&inetAddress, sizeof(inetAddress));
 	if ( PN_UNLIKELY(result <= 0) )
 	{
 		// Socket closed.
@@ -178,7 +178,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 		return 0;
 	}
 
-	dbugLog(_FLD, "%d bytes sent %d requested", result, sizeInBytes);
+	dbugLog(_FLD, "%" PRSsizeT " bytes sent %" PRSizeT " requested", result, sizeInBytes);
 
 	lastDataSent.makeCurrent();
 
