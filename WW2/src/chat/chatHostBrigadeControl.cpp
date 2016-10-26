@@ -1802,7 +1802,7 @@ chatBrigadeAttackOrderResponse(AttackOrder& order)
 	bool isConclusion = ( order.m_execute && order.m_result == SCMD_SUCCESS );
 	if ( player == nullptr && !isConclusion )
 	{
-		dbugLog(_FLD, "player (%llu) went away during attack order request", order.m_requester);
+		dbugLog(_FLD, "player (%" PR64BitUT ") went away during attack order request", order.m_requester);
 		return;
 	}
 

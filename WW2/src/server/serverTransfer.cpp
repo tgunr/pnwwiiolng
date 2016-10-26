@@ -29,5 +29,5 @@ Server::Transfer::onReceive(SINT32 teulIndex)
 SINT32
 Server::PersonaMirror::onComplete(SINT32 /*resultCode*/) const
 {
-	LogAbort("xfer:%llu unhandled PersonaMirror::onComplete", xferID());
+	LogAbort("xfer:%" PR64BitUT " unhandled PersonaMirror::onComplete", xferID());
 }

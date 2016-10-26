@@ -1206,7 +1206,7 @@ chatMessageChannel(const ChannelID& channelID, LSTRING_ID prefix, LSTRING_ID mes
 	if ( channel == nullptr )
 	{
 		if ( g_debugChat )
-			dbugLog(_FLD, "cmc: ch:%llu.%u.%u.%llu has NULL channel", channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID());
+			dbugLog(_FLD, "cmc: ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " has NULL channel", channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID());
 		return false;
 	}
 

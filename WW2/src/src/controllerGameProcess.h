@@ -89,18 +89,18 @@ public:
 public:
 	void Log(int level, const char* fmt)
 	{
-		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%llu %s", ServerType(), ServerTypeName(), ProcessID(), fmt);
+		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%" PR64BitUT " %s", ServerType(), ServerTypeName(), ProcessID(), fmt);
 	}
 	template<typename... Args>
 	void Log(int level, const char* fmt, Args&&... args)
 	{
-		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%llu ", ServerType(), ServerTypeName(), ProcessID());
+		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%" PR64BitUT " ", ServerType(), ServerTypeName(), ProcessID());
 		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR | BARE_DEBUG, fmt, std::forward<Args>(args)...);
 	}
 
 	void Log(const char* msg)
 	{
-		dbugLog("GameProcess", 0, Debug::ERR_DBUG | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%llu %s", ServerType(), ServerTypeName(), ProcessID(), msg);
+		dbugLog("GameProcess", 0, Debug::ERR_DBUG | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%" PR64BitUT " %s", ServerType(), ServerTypeName(), ProcessID(), msg);
 	}
 };
 

@@ -436,7 +436,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 #endif
 	}
 	else {
-		dbugLog(_FLD, "Alloc size for new file is %d", allocSize);
+		dbugLog(_FLD, "Alloc size for new file is %" PRSizeT "", allocSize);
 	}
 
 	mem[fileSize] = 0;

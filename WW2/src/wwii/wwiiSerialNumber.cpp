@@ -29,11 +29,11 @@ SerialNumber::getNext()
             if ( q.Rows() && q.FetchRow() )
             {
                 m_counter = (serialno_t)q.Row().NextUINT64() + m_interval;
-				dbugLog(_FLI, "SerialNumber(%s) starting from %llu", m_name, (UINT64)m_counter);
+				dbugLog(_FLI, "SerialNumber(%s) starting from %" PR64BitUT "", m_name, (UINT64)m_counter);
             }
 			else
 			{
-				dbugLog(_FLI, "SerialNumber(%s) starting from default (%llu)", m_name, (UINT64)m_minimum);
+				dbugLog(_FLI, "SerialNumber(%s) starting from default (%" PR64BitUT ")", m_name, (UINT64)m_minimum);
 			}
         }
         catch (std::exception& e)

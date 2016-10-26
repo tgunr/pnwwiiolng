@@ -2471,7 +2471,7 @@ Player::updateAWSPosition(bool onAWS)
 	}
 	else
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu aws side %u update %f.%f => %hd/%hd"
+		dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " aws side %u update %f.%f => %hd/%hd"
 						, teulIndex(), playerID(), callsign()
 						, instance().category(), instance().type(), instance().handle(), instance().id()
 						, side()
@@ -2525,7 +2525,7 @@ Player::removeFromAWS()
 		}
 	}
 
-	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu aws side %u extraction %f.%f => %d/%d"
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " aws side %u extraction %f.%f => %d/%d"
 					, teulIndex(), playerID(), callsign()
 					, instance().category(), instance().type(), instance().handle(), instance().id()
 					, m_impl->m_awsSide

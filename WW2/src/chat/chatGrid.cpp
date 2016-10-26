@@ -746,7 +746,7 @@ chatPatrolGridExpirations()
 		++it;
 		if ( cell->expired() )
 		{
-            dbugLog(_FLD, "g:%llu:%d,%d expiry time elapsed"
+            dbugLog(_FLD, "g:%" PR64BitUT ":%d,%d expiry time elapsed"
                             , cell->gridKey().instanceID(), cell->gridKey().X(), cell->gridKey().Y());
 			_gridIndex.erase(cell->gridKey());
 			cell->deactivate();

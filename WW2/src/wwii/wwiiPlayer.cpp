@@ -276,7 +276,7 @@ wwiiPlayer::SetDispatch(const Auth::Dispatch& rhs, UINT32 overridingCustomerID)
 void
 wwiiPlayer::log(const char* msg) const
 {
-	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu %s"
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " %s"
 					, teulIndex(), playerID(), callsign()
 					, instance().category(), instance().type(), instance().handle(), instance().id()
 					, msg);
@@ -293,7 +293,7 @@ wwiiPlayer::log(const char* file, int lineno, unsigned int errType, const char* 
 	va_end(args);
 
 	dbugLog(file, lineno, errType
-				, "t:%d p:%u c:%s in:%u.%u.%llu.%llu %s"
+				, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " %s"
 				, teulIndex(), playerID(), callsign()
 				, instance().category(), instance().type(), instance().handle(), instance().id()
 				, buf);

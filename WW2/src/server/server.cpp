@@ -292,7 +292,7 @@ _extractPlayerFromServer(Server::ServerInfo* const server, PlayerStatusNode* con
 		return nullptr;
 	}
 
-	dbugLog(_FLD, "p:%u c:%s extracting player %p %s server %p ip %s id %llu: "
+	dbugLog(_FLD, "p:%u c:%s extracting player %p %s server %p ip %s id %" PR64BitUT ": "
 				, psn->dispatch().m_customerID
 				, psn->dispatch().m_callsign
 				, psn
@@ -352,7 +352,7 @@ _sendPlayerStatusUpdate(const PlayerStatusNode& psn)
 	outgoing.setUnencrypted();
 	auto& update = outgoing.construct<Server::PlayerStatusUpdate>(psn);
 
-	dbugLog(_FLD, "p:%u c:%s sending update %d status %d server %llu"
+	dbugLog(_FLD, "p:%u c:%s sending update %d status %d server %" PR64BitUT ""
 					, update.dispatch.m_customerID
 					, update.dispatch.m_callsign
 					, update.id
@@ -397,7 +397,7 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 			break;
 	}
 
-	dbugLog(_FLD, "t:%d p:%u c:%s pushing player %p to %s server %p ip %s:%u id %llu"
+	dbugLog(_FLD, "t:%d p:%u c:%s pushing player %p to %s server %p ip %s:%u id %" PR64BitUT ""
 				, psn.teulIndex, psn.dispatch().m_customerID, psn.dispatch().m_callsign
 				, &psn, g_serverTypes[server.stats.type], &server
 				, teulGetAddress(server.stats.address), server.stats.type, server.stats.id
@@ -448,8 +448,8 @@ _playerMove(PlayerStatusNode* const psn, Server::ServerInfo* const server)
 	teulGetAddress(server->stats.address, toAddr, sizeof(toAddr));
 
 	dbugLog(_FLD, "p:%u c:%s moving player %p"
-					" from %s server ip %s id %llu"
-					" to %s server ip %s id %llu"
+					" from %s server ip %s id %" PR64BitUT ""
+					" to %s server ip %s id %" PR64BitUT ""
 						, psn->dispatch().m_customerID, psn->dispatch().m_callsign, psn
 						, g_serverTypes[psn->m_curServer.type], fromAddr, psn->m_curServer.id
 						, g_serverTypes[server->stats.type], toAddr, server->stats.id
@@ -515,7 +515,7 @@ _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server:
 
 	default:
 		// we better not ever get here, if so abort so I can see how
-		LogAbort("should never get here releaseType == %d", releaseType);
+		LogAbort("should never get here releaseType == %u", releaseType);
 		break;
 
 	}
@@ -703,7 +703,7 @@ _playerProc(Server::PersonaXfer* const persXfer, PlayerStatusNode* const psn, bo
 				break;
 			}
 		default:
-			LogAbort("shouldnt create player %d for persXfer->reason %d!!", psn->id, persXfer->reason());
+			LogAbort("shouldnt create player %d for persXfer->reason %u!!", psn->id, persXfer->reason());
 			break;
 	}
 
@@ -754,7 +754,7 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 	psn->xferState = persXfer->reason();
 	psn->status = Server::PlayerStatus::New;
 
-	dbugLog(_FLD, "p:%u c:%s adding psn to %s server %llu"
+	dbugLog(_FLD, "p:%u c:%s adding psn to %s server %" PR64BitUT ""
 				, psn->dispatch().m_customerID, psn->dispatch().m_callsign
 				, g_serverTypes[server.stats.type], server.stats.id
 				);
@@ -775,7 +775,7 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 	retval = _pushPlayerToServer(server, *psn);
 
 	if (retval < 0)
-		LogAbort("Failed pushing player %u to %s server %llu!"
+		LogAbort("Failed pushing player %u to %s server %" PR64BitUT "!"
 					, psn->id, g_serverTypes[server.stats.type], server.stats.id);
 
 	return psn;
@@ -838,7 +838,7 @@ _timeOutPlayers()
 		if ( elapsed < PLAYER_TIMEOUT )
 			continue;
 
-		dbugLog(_FLD, "t:%d p:%u c:%s timing out player after %lldms"
+		dbugLog(_FLD, "t:%d p:%u c:%s timing out player after %" PR64BitT "ms"
 						, psn->teulIndex
 						, psn->id
 						, psn->dispatch().m_callsign
@@ -862,7 +862,7 @@ _timeOutXfers()
 		if ( xfer->timestamp() >= cutoff )
 			break;
 
-		dbugLog(_FLM, "xfer:%llu timing out", xfer->xferID());
+		dbugLog(_FLM, "xfer:%" PR64BitUT " timing out", xfer->xferID());
 
 		xfer->onComplete(-EAGAIN);
 
@@ -1303,7 +1303,7 @@ SINT32 serverUpdatePlayer(const Server::PlayerStatusUpdate* const update)
 {
 	Server::PersonaXfer persXfer(Server::Transfer::XferReason::Update, update->dispatch, 0, nullptr, update->serverID);
 
-	dbugLog(_FLD, "p:%u c:%s updating player for server id %llu"
+	dbugLog(_FLD, "p:%u c:%s updating player for server id %" PR64BitUT ""
 					, update->dispatch.m_customerID
 					, update->dispatch.m_callsign
 					, update->serverID
@@ -1370,7 +1370,7 @@ Server::Transfer::Transfer(XferReason _reason, Server::ServerInfo* const _destin
 	, m_timestamp(teulClock64)
 {
 	s_transferQueue.push_back(this);
-	dbugLog(_FLD, "xfer:%llu added, reason:%u", xferID(), (UINT32)reason());
+	dbugLog(_FLD, "xfer:%" PR64BitUT " added, reason:%u", xferID(), (UINT32)reason());
 
 	// Temporarily boost the player count on that server.
 	_destination->stats.addPlayer();
@@ -1435,12 +1435,12 @@ Server::PersonaMirrorReply::onReceive(SINT32 teulIndex)
 	auto it = _findTransferNode(xferID());
 	if ( it == s_transferQueue.end() )
 	{
-		dbugLog(_FLA, "xfer:%llu no xnode entry for mirror reply", xferID());
+		dbugLog(_FLA, "xfer:%" PR64BitUT " no xnode entry for mirror reply", xferID());
 		return -ENOENT;
 	}
 	if ( (*it)->reason() != Server::Transfer::XferReason::Mirror )
 	{
-		dbugLog(_FLA, "xfer:%llu reply to a non-mirror", xferID());
+		dbugLog(_FLA, "xfer:%" PR64BitUT " reply to a non-mirror", xferID());
 		return -ENOENT;
 	}
 

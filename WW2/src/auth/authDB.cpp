@@ -977,8 +977,8 @@ authdbSaveLastOTP(UINT64 otp)
 {
 	try
 	{
-		DBQuery q(dbh, "REPLACE INTO `auth`.`auth_variables` (`name`, `value`) VALUES ('last_otp', %llu)", otp);
-		dbugLog(_FLI, "%s: saved last OTP of %llu", __FUNCTION__, otp);
+		DBQuery q(dbh, "REPLACE INTO `auth`.`auth_variables` (`name`, `value`) VALUES ('last_otp', %" PR64BitUT ")", otp);
+		dbugLog(_FLI, "%s: saved last OTP of %" PR64BitUT "", __FUNCTION__, otp);
 	}
 	catch (std::exception& e)
 	{

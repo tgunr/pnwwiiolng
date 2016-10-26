@@ -232,7 +232,7 @@ _expireTurretBits(struct TURRET_STRUCT* turret)
 		{
 #ifdef NEVER
 			dbugLog(_FLD,"turret invalid: %x mask %x",turret->valid, tmpMask);
-			dbugLog(_FLD,"turret invalid: %d, stamp %llu now %llu",i, turret->timeStamp[i], teulClock64);
+			dbugLog(_FLD,"turret invalid: %d, stamp %" PR64BitUT " now %" PR64BitUT "",i, turret->timeStamp[i], teulClock64);
 #endif
 			turret->valid &= ~mask;
 			turret->clock64[i] = teulClock64;
@@ -431,7 +431,7 @@ _recordPacketSize(UINT32 size)
 
 	UINT32 avg = (UINT32)(totalBits / packets);
 
-	dbugLog(_FLI, "rps[%u] bits minSize=%u avgSize=%u meanSize=%u maxSize=%u totalBits=%llu"
+	dbugLog(_FLI, "rps[%u] bits minSize=%u avgSize=%u meanSize=%u maxSize=%u totalBits=%" PR64BitUT ""
 				, packets, minSize, avg, mean, maxSize, totalBits);
 
 	nextLog = teulTime() + 30;
@@ -592,7 +592,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 
 	_expireFireBits( &(vh.vehInfo->fire), vh.fireMask);
 #ifdef TEST_FIRING_BUG
-		dbugLog(_FLI, "t:%d p:%u c:%s v:%u fm:%s fs:%s fv:%s ft:%llu,%llu,%llu,%llu"
+		dbugLog(_FLI, "t:%d p:%u c:%s v:%u fm:%s fs:%s fv:%s ft:%" PR64BitUT ",%" PR64BitUT ",%" PR64BitUT ",%" PR64BitUT ""
 						, player->teulIndex(), player->playerID(), player->dispatch().callsign, vref->index
 						, _bits(vh.fireMask), _bits(vh.vehInfo->fire.state), _bits(vh.vehInfo->fire.valid)
 						, vh.vehInfo->fire.clock64[0]

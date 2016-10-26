@@ -284,7 +284,7 @@ static void _onManagedProcessError(struct bufferevent* bev_, short error_, void*
 	auto it = s_socketToProcess.find(cliSock);
 	if ( it != s_socketToProcess.end() )
 	{
-		dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%llu disconnecting", PRA_SOCKET(cliSock), it->second);
+		dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%" PR64BitUT " disconnecting", PRA_SOCKET(cliSock), it->second);
 		delete (evutil_socket_t*)arg_;
 		///TODO: Tell GameProcessManager that the process went away.
 		if ( it->second != 0ULL )
@@ -302,11 +302,11 @@ static bool _handleIntro(evutil_socket_t srcSock, const ProcessIntroduction& int
 	ABORT_IF( pit != s_processToSocket.end() );
 	auto process = GameProcessManager::LookupGameProcess(intro.m_processID);
 	if (!process) {
-		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%llu no process entry.", PRA_SOCKET(srcSock), intro.m_processID);
+		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%" PR64BitUT " no process entry.", PRA_SOCKET(srcSock), intro.m_processID);
 		return false;
 	}
 	if (process->ServerType() != intro.m_processType) {
-		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%llu type mismatch (expected %u got %u).",
+		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%" PR64BitUT " type mismatch (expected %u got %u).",
 			PRA_SOCKET(srcSock), intro.m_processID, process->ServerType(), intro.m_processType
 		);
 		return false;
@@ -319,7 +319,7 @@ static bool _handleIntro(evutil_socket_t srcSock, const ProcessIntroduction& int
 
 	s_socketToProcess[srcSock] = intro.m_processID;
 	s_processToSocket[intro.m_processID] = srcSock;
-	dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%llu established", PRA_SOCKET(srcSock), intro.m_processID);
+	dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%" PR64BitUT " established", PRA_SOCKET(srcSock), intro.m_processID);
 
 	return true;
 }

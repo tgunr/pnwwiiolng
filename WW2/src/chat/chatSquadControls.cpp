@@ -331,7 +331,7 @@ _checkSquadMember(Player* player, SquadList* list, const ChatHandle handle, RANK
 	SquadMemberEntry* entry = list->find(handle);
 	if ( entry == nullptr )
 	{
-		dbugLog(_FLI, "%llu [%s] is not in squad list", handle, Chat::Name(handle).c_str());
+		dbugLog(_FLI, "%" PR64BitUT " [%s] is not in squad list", handle, Chat::Name(handle).c_str());
 		throw SQR_PLAYER_NOT_IN_SQUAD;
 	}
 
@@ -632,7 +632,7 @@ _processDecline(SquadControl& /*request*/, Player* player, SquadList* /*squadLis
 static UINT32
 _processKick(SquadControl& request, Player* player, SquadList* squadList)
 {
-	dbugLog(_FLI, "t:%d p:%u c:%s sq:%d attempting to remove %llu[%s]", player->teulIndex(), player->playerID(), player->callsign(), player->squadID(), request.m_handle, _subject);
+	dbugLog(_FLI, "t:%d p:%u c:%s sq:%d attempting to remove %" PR64BitUT "[%s]", player->teulIndex(), player->playerID(), player->callsign(), player->squadID(), request.m_handle, _subject);
 	SquadMemberEntry* entry = _checkSquadMember(player, squadList, request.m_handle);
 
 	Player* target = PlayerInterface::Lookup(request.m_handle);

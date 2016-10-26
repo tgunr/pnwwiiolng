@@ -334,7 +334,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 	u_long argp = 1;
 	//int dval;
 
-	dbugLog(_FLD, "t:%d entered _acceptConnectTCP, time:%llu", endpoint.teulIndex(), teulClock64);
+	dbugLog(_FLD, "t:%d entered _acceptConnectTCP, time:%" PR64BitUT "", endpoint.teulIndex(), teulClock64);
 	// Multiple simultaneous incoming connections may only generate a single "event", so while we
 	// are here, we should try and drain any/all incoming connections queued up (hence the loop).
 	do
@@ -393,7 +393,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		char localIP[32];
 		teulGetAddress(newEndpoint->localAddress(), localIP, sizeof(localIP));
 
-		dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET " (li:%llu)"
+		dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET " (li:%" PR64BitUT ")"
 					, endpoint.teulIndex()
 					, remoteIP, newEndpoint->fromPort()
 					, localIP, newEndpoint->localPort()
@@ -444,7 +444,7 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 			// it is important or not.
 
 			err = dbugGetErrno();
-			dbugLog(_FLN, "t:%d closing TCP socket %d end of stream (recv:0, errno:%d), time %llu",
+			dbugLog(_FLN, "t:%d closing TCP socket %d end of stream (recv:0, errno:%d), time %" PR64BitUT "",
 					endpoint.teulIndex(), thesock, err, teulClock64);
 
 			// Tear down all of the teulkit abstractions over the socket and
@@ -965,7 +965,7 @@ _checkEndpointTimeouts(ENDPOINT& endpoint)
 	if (endpoint.state() <= IS_CLOSED)
 	{
 		printf("t:%d timeout\n", endpoint.teulIndex());
-		dbugLog(_FLN, "t:%d endpoint timeout error, closed timeout:%d elapsed:%lldms"
+		dbugLog(_FLN, "t:%d endpoint timeout error, closed timeout:%d elapsed:%" PR64BitT "ms"
 					, endpoint.teulIndex()
 					, endpoint.timeout
 					, elapsed
@@ -1704,7 +1704,7 @@ teulModIdle(const TeulTimeMS duration_)
 	teulSyncClock();
 
 	// At 1s intervals, count stats, kill dead endpoints
-	TeulTimeMS interval = teulClock64 - lastUpdateTime;
+	TeulTimeMS interval = teulClock64 - std::min(teulClock64, lastUpdateTime);
 	if ( PN_UNLIKELY(interval > 1000) )
 	{
 		//time to recalc updates per sec
@@ -1720,26 +1720,26 @@ teulModIdle(const TeulTimeMS duration_)
 
 	numTeulUpdates++;
 
-	interval = teulClock64 - lastTeulUpdate;
+	interval = teulClock64 - std::min(teulClock64, lastTeulUpdate);
 	averageDelta += interval;		// divide by numTeulUpdates to get average
 	maxDelta = std::max(interval, maxDelta);
 
 	// Can't merge with _lastIdle because this gets set elsewhere too
 	lastTeulUpdate = teulClock64;
 
-	interval = teulClock64 - _lastIdle;
+	interval = teulClock64 - std::min(teulClock64, _lastIdle);
 #ifdef BETA_RELEASE
 	static const TeulTimeMS AlertInterval_ms = 3 * 1000;
 #else
 	static const TeulTimeMS AlertInterval_ms = 75;
 #endif
 	if ( PN_UNLIKELY(interval > duration_ + AlertInterval_ms) )
-		dbugLog(_FLA, "STALL. teulModIdle interval=%llu", interval);
+		dbugLog(_FLA, "STALL. teulModIdle interval=%" PR64BitUT "", interval);
 
 	_lastIdle = teulClock64;
 
 	static TeulTimeMS lastIdleCycle = teulClock64;
-	interval = teulClock64 - lastIdleCycle;
+	interval = teulClock64 - std::min(teulClock64, lastIdleCycle);
 	if ( interval < ENDPOINT_IDLE_INTERVAL )
 		return 0;
 
@@ -1752,14 +1752,14 @@ teulModIdle(const TeulTimeMS duration_)
 	TIMER_STOP("tmi_idle");
 
 	teulSyncClock();
-	interval = teulClock64 - lastIdleCycle;
+	interval = teulClock64 - std::min(teulClock64, lastIdleCycle);
 #ifdef BETA_RELEASE
 	static const TeulTimeMS idleLimit = 50;
 #else
 	static const TeulTimeMS idleLimit = 25;
 #endif
 	if ( PN_UNLIKELY(interval > idleLimit + duration_) )
-		dbugLog(_FLA, "STALL. idle endpoints interval=%llums", interval);
+		dbugLog(_FLA, "STALL. idle endpoints interval=%" PR64BitUT "ms", interval);
 
 	return 0;
 }

@@ -88,7 +88,7 @@ _errorSYN_CALLBACK(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*
 		return;
 	}
 
-	dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " errorSYN: closing error %d clock:%llu", teulIndex, PRA_SOCKET(inEndpoint->socket), error, teulClock64);
+	dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " errorSYN: closing error %d clock:%" PR64BitUT "", teulIndex, PRA_SOCKET(inEndpoint->socket), error, teulClock64);
 	teulClose(*inEndpoint, Teul::Closing::SynErr);
 }
 
