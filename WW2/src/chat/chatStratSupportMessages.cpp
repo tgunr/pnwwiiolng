@@ -11,6 +11,7 @@
 
 #include "chat/chatBrigadeMove.h"
 #include "chat/chatConstants.h"
+#include "chat/chatName.h"
 #include "chat/chatSideMessage.h"
 #include "chat/chatStratSupportMessages.h"
 #include "chat/chatTypes.h"

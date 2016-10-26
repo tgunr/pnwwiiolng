@@ -15,6 +15,7 @@
 #include "chat/chatCellTypes.h"
 #include "chat/chatConstants.h"
 #include "chat/chatModReport.h"
+#include "chat/chatName.h"
 #include "chat/chatServerTypes.h"
 #include "chat/chatTypes.h"
 #include "host/hostFraming.h"
