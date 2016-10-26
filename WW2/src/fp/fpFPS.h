@@ -276,7 +276,7 @@ extern bool fpFPSCanProjectGrenade();
 
 //--------------
 // !!!HACK!!! - for vehInterpolator
-enum fpFPSPositions;
+enum fpFPSPositions : int;
 
 void InitColliderGeometry(void);
 void _updateFPSColliders(void);

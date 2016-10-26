@@ -198,7 +198,7 @@ enum fpFPSIconType
 };
 
 // tolua_begin
-enum fpFPSPositions
+enum fpFPSPositions : int
 {
 	FPS_POSITION_STAND,
 	FPS_POSITION_CROUCH,
