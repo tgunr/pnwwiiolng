@@ -26,8 +26,10 @@ PROJECT( WW2GameHosts LANGUAGES C CXX )
 # Unfortunately, the above doesn't work until CMake 3.1
 #ADD_COMPILE_OPTIONS( "-std=gnu++14" )
 # And unfortunately, that doesn't work either because it breaks pure-C files
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14" CACHE STRING "" FORCE )
-SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11" CACHE STRING "" FORCE )
+IF ( NOT MSVC )
+	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14" CACHE STRING "" FORCE )
+	SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11" CACHE STRING "" FORCE )
+ENDIF()
 
 ####################################
 ## Determine bitness
@@ -40,8 +42,25 @@ ELSE ()
 	MESSAGE( FATAL_ERROR "Unknown CMAKE_SIZEOF_VOID_P value ${CMAKE_SIZEOF_VOID_P}" )
 ENDIF ()
 
-MARK_AS_ADVANCED( CMAKE_BITNESS BUILD_BITNESS )
-MESSAGE( STATUS "Build is $BUILD_BITNESS}-bit" )
+MARK_AS_ADVANCED( CMAKE_BITNESS )
+MESSAGE( STATUS "CMake is ${CMAKE_BITNESS}-bit" )
+
+# Default to 64-bit on Windows for now
+IF ( NOT WIN32 )
+	OPTION( PN_BUILD_32BIT		"Enable 32-bit build" ON )
+ELSE()
+	OPTION( PN_BUILD_32BIT		"Enable 32-bit build" OFF )
+	MARK_AS_ADVANCED( PN_BUILD_32BIT )
+ENDIF()
+
+IF ( CMAKE_BITNESS EQUAL 64 AND NOT PN_BUILD_32BIT )
+	SET(BUILD_BITNESS 64)
+ELSE ( )
+	SET(BUILD_BITNESS 32)
+ENDIF ( )
+
+MARK_AS_ADVANCED( BUILD_BITNESS )
+MESSAGE( STATUS "Build is ${BUILD_BITNESS}-bit" )
 
 ####################################
 ## Executable names
@@ -84,20 +103,6 @@ FILE( TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" _PLAYNET )
 
 # Enable per-host ports for running clusters on less than 4 hosts
 OPTION( PN_DIFFERENT_PORTS	"Use different public-facing ports for game servers." ON )
-
-# Default to 64-bit on Windows for now
-IF ( NOT WIN32 )
-	OPTION( PN_BUILD_32BIT		"Enable 32-bit build" ON )
-ELSE()
-	OPTION( PN_BUILD_32BIT		"Enable 32-bit build" OFF )
-	MARK_AS_ADVANCED( PN_BUILD_32BIT )
-ENDIF()
-
-IF ( CMAKE_BITNESS EQUAL 64 AND NOT PN_BUILD_32BIT )
-	SET(BUILD_BITNESS 64)
-ELSE ( )
-	SET(BUILD_BITNESS 32)
-ENDIF ( )
 
 ####################################
 ## Provide platform and server defines
@@ -209,8 +214,9 @@ ADD_LIBRARY( wwiilib STATIC
     weap/weapList.cpp weap/weapList.h weap/weapSerial.h
     weap/weapLoadIndexes.cpp weap/weapLoadIndexes.h weap/weapParser.cpp weap/weapParser.h
     weap/weapSpec.cpp weap/weapSpec.h
-    tinyxml/tinystr.cpp tinyxml/tinystr.h tinyxml/tinyxml.cpp tinyxml/tinyxml.h
-    tinyxml/tinyxmlerror.cpp tinyxml/tinyxmlparser.cpp
+    ${LIBRARIES_DIR}/tinyxml/tinystr.cpp ${LIBRARIES_DIR}/tinyxml/tinystr.h
+	${LIBRARIES_DIR}/tinyxml/tinyxml.cpp ${LIBRARIES_DIR}/tinyxml/tinyxml.h
+    ${LIBRARIES_DIR}/tinyxml/tinyxmlerror.cpp ${LIBRARIES_DIR}/tinyxml/tinyxmlparser.cpp
     tut/tutGroupProgress.cpp tut/tutGroupProgress.h
     wwii/wwiiCommandLineArgs.cpp wwii/wwiiCommandLineArgs.h
     wwii/wwiiIRC.cpp wwii/wwiiIRC.h host/hostCommand.h
@@ -242,7 +248,7 @@ SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
 
 ####################################
 ## Various commandline utility executables
-IF ( NOT WIN32 )
+IF ( NOT MSVC )
 
     # Chat management client
     ADD_EXECUTABLE( chatClient

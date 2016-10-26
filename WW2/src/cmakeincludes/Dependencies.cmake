@@ -7,10 +7,11 @@ MARK_AS_ADVANCED(
 )
 
 # We need ncurses and readline for the lua client, but don't care on Windows
-FIND_PACKAGE( Readline 6.0 )
-
-IF ( NOT WIN32 AND NOT READLINE_FOUND )
-    MESSAGE( FATAL_ERROR "readline library is required" )
+IF ( NOT WIN32 )
+	FIND_PACKAGE( Readline 6.0 )
+	IF ( NOT READLINE_FOUND )
+		MESSAGE( FATAL_ERROR "readline library is required" )
+	ENDIF()
 ENDIF()
 
 # Pull in MySQL
