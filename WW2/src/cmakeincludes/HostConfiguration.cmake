@@ -64,7 +64,7 @@ ELSE()
         LINK_LIBRARIES( "-stdlib=libc++" )
     ENDIF()
     
-    ADD_COMPILE_OPTIONS( "-fstack-protector-all" "-fno-rtti" )
+    ADD_COMPILE_OPTIONS( "-fstack-protector-all" )
     
     if ( CMAKE_BUILD_TYPE MATCHES Debug )
         ADD_COMPILE_OPTIONS( "-O0" )
