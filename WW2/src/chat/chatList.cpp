@@ -18,6 +18,7 @@
 #include "chat/chatManagementIDs.h"
 #include "chat/chatManagementPlayer.h"
 #include "chat/chatManagementTypes.h"
+#include "chat/chatName.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatSaveChannels.h"
 #include "server/serverPlayerStatusNode.h"
