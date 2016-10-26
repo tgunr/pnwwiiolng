@@ -13,6 +13,7 @@
 #include "chat/chatdbParser.h"
 #include "chat/chatdbSquadXchg.h"
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"
 #include "chat/chatSquadControl.h"
 #include "chat/chatSquadControlResults.h"
 #include "chat/chatSquadMemberUpdates.h"
