@@ -18,7 +18,7 @@ LOGICAL sndsPlatformFreeSound(snSound* snd);
 LOGICAL sndsPlatformGetVolume(snSound* snd, SINT32* vol);
 LOGICAL sndsPlatformInit();
 LOGICAL sndsPlatformIsPlaying(snSound* snd);
-LOGICAL sndsPlatformKill();
+void sndsPlatformKill();
 LOGICAL sndsPlatformLoadSound(snSound* snd);
 LOGICAL sndsPlatformOverLimit(UINT32 numPlaying);
 LOGICAL sndsPlatformReloadSound(snSound* oldSound, snSound* newSound);
