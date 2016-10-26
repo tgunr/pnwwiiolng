@@ -83,6 +83,17 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
+#if _WIN64 || __x86_64__ || __ppc64__
+# define BUILD_64
+# define PR64BitT "ld"
+# define PR64BitUT "lu"
+#else
+# define BUILD_32
+# define PR64BitT "lld"
+# define PR64BitUT "llu"
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
 // Overall inclusions
 #include "include/precompile_includes.h"
 
