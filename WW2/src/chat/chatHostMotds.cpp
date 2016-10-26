@@ -11,6 +11,7 @@
 #include "chat/chatHandle.h"
 #include "chat/chatHostMotds.h"
 #include "chat/chatMotds.h"
+#include "chat/chatName.h"
 #include "teul/teulTime.h"
 
 static MOTD_REPLY _motds[MOTD::_MAX_TYPES];
