@@ -133,12 +133,12 @@ MESSAGE( STATUS "${CMAKE_BUILD_TYPE} build, ${BUILD_BITNESS}-bit." )
 INCLUDE( cmakeincludes/PlatformChecks.cmake )
 
 ####################################
-## Check various dependencies.
-INCLUDE( cmakeincludes/Dependencies.cmake )
-
-####################################
 ## Set up the various compiler definitions for things
 INCLUDE( cmakeincludes/HostConfiguration.cmake )
+
+####################################
+## Check various dependencies.
+INCLUDE( cmakeincludes/Dependencies.cmake )
 
 ####################################
 ## Set up the OMG parser commands
