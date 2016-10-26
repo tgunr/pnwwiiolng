@@ -136,7 +136,7 @@ Chat::LocalizedMessage::packer(PackMode mode, ACTION_OBJECT* const a)
 	a->packer(mode, (SINT32*)&m_prefix, 12);
 	a->packer(mode, (SINT32*)&m_message, 12);
 	a->packer(mode, &m_size, 16);
-	a->packBytes(mode, m_data, m_size);
+	a->bytePacker(mode, m_data, m_size);
 	if ( mode == TEUL_UNPACK )
 		SetPointers();
 
