@@ -254,6 +254,7 @@ ADD_LIBRARY( wwiilib STATIC
     # These weren't previously in wwiilib but seem to be required in various places
     auth/authDB.cpp auth/authDB.h src/infoHostMessages.cpp include/infoHostMessages.h
     src/infoPack.cpp include/infoPack.h dbse/dbseDatabaseSchema.cpp dbse/dbseDatabaseSchema.h
+	xml/XMLLoader2.cpp xml/XMLLoader2.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
 
@@ -317,6 +318,7 @@ MACRO( ADD_HOST_TARGET Name )
     IF ( HOST_TARGET_ARG_LUA )
         TARGET_LINK_LIBRARIES( "${Name}" ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
     ENDIF()
+	TARGET_LINK_LIBRARIES( "${Name}" ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES} )
     TARGET_LINK_LIBRARIES( "${Name}" wwiilib teulserver ${MYSQL_LIBRARIES} )
     IF ( NOT "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" STREQUAL "" )
         SET_PROPERTY( TARGET "${Name}" PROPERTY COMPILE_DEFINITIONS "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" )
@@ -420,6 +422,7 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     map/mapAWS.cpp map/mapAWS.h
     map/mapHCUnitLocations.cpp map/mapHCUnitLocations.h
     strt/strtChatTypes.cpp strt/strtChatTypes.h
+	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
     dbse/dbseClient.cpp dbse/dbseClient.h dbse/dbseTypes.h dbse/dbseConstants.h
     dbse/dbseClientMessages.cpp dbse/dbseClientMessages.h
@@ -482,6 +485,7 @@ ADD_HOST_TARGET( ${CELL_HOST_EXE} SOURCES
     strt/strtUpdaterHostMessages.cpp strt/strtUpdaterHostMessages.h
     strt/strtUpdaterPack.cpp strt/strtUpdaterPack.h
     strt/strtUpdaterSupportMessages.cpp strt/strtUpdaterSupportMessages.h
+    weap/weapSpawnXML.cpp weap/weapSpawnXML.h
     INSTANCING
     EXTRA_DEFINITIONS "IS_CELL_HOST"
 )
