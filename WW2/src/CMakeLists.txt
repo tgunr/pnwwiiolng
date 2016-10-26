@@ -78,12 +78,16 @@ SET( MAP_HOST_EXE "mmhostd" )
 SET( STRAT_HOST_EXE "stratd" )
 
 ####################################
+## Embedded library search path
+SET( LIBRARIES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../Libraries" )
+
+####################################
 ## General search paths
 
 # /usr/local is explicitly added because many systems don't search it by
 # default despite it being an obvious place to look.
 INCLUDE_DIRECTORIES(
-	${CMAKE_CURRENT_SOURCE_DIR}/../../Libraries
+	${LIBRARIES_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/../include
     ${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/hostproj
@@ -92,10 +96,6 @@ INCLUDE_DIRECTORIES(
 	${CMAKE_CURRENT_SOURCE_DIR}/sys
     ${CMAKE_CURRENT_BINARY_DIR}
 )
-
-####################################
-## Embedded library search path
-SET( LIBRARIES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../Libraries" )
 
 ####################################
 ## Determine installation directory
