@@ -430,6 +430,7 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     INSTANCING
     EXTRA_DEFINITIONS "IS_CHAT_HOST"
 )
+TARGET_LINK_LIBRARIES( ${CHAT_HOST_EXE} libb64 )
 
 ####################################
 ## Cell host
