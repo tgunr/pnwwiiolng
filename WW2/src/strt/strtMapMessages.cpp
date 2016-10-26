@@ -38,7 +38,6 @@
 
 #define STICK_DEBUG
 
-static TEUL_CALLBACK* _XCHG_MM_POST_INFO;
 static TEUL_CALLBACK* _SEND_MM_POST_LIST;
 static TEUL_CALLBACK* _XCHG_MM_SPAWN_GRANT;
 static TEUL_CALLBACK* _XCHG_MM_FACILITY_CAPACITY;
@@ -195,11 +194,6 @@ _recvMMSpawnGrantResponse(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-static SINT32 _sendMMPostInfoRequest(ACTION_OBJECT* const a)
-{
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_INFO_REQUEST));
-}
-
 static SINT32 _sendMMJoinListRequest(ACTION_OBJECT* const a)
 {
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_INFO_REQUEST));
@@ -235,25 +229,6 @@ static SINT32 _recvMMLeaveListResponse(ACTION_OBJECT* const a)
 static SINT32 _sendMMPostInfoUpdate(ACTION_OBJECT* const a)
 {
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_INFO_UPDATE));
-}
-
-static SINT32 _recvMMPostInfoResponse(ACTION_OBJECT* const a)
-{
-	MM_POST_INFO_RESPONSE postInfoResponse;
-
-	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postInfoResponse, sizeof(MM_POST_INFO_RESPONSE));
-
-#ifdef DEBUG
-	dbugLog(_FLD,"postInfoResponse: %d %d %d"
-				,postInfoResponse.customerID
-				, postInfoResponse.postedWeapon.commander
-				, postInfoResponse.postedWeapon.crew);
-#endif
-
-#ifndef STRAT_CLIENT
-//	mmProcessPostInfoResponse(&postInfoResponse);
-#endif
-	return a->offset;
 }
 
 static SINT32 _sendMMPostCancel(ACTION_OBJECT* const a)
