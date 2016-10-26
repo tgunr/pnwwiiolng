@@ -99,8 +99,11 @@ SET( LIBRARIES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../Libraries" )
 
 ####################################
 ## Determine installation directory
-SET( CMAKE_INSTALL_PREFIX "/playnet" CACHE PATH "Install path prefix" )
-SET( PN_PLAYNET_PATH "${CMAKE_INSTALL_PREFIX}" CACHE PATH "Default top-level runtime path." )
+# This is the wrong way around but it has to be :(
+# CMAKE_INSTALL_PREFIX has an automatic-default value from CMake so we can't do a
+# soft-override or supply our own default (uhm, duh, cmake guys).
+SET( PN_PLAYNET_PATH "/playnet" CACHE PATH "Default top-level runtime and install path." )
+SET( CMAKE_INSTALL_PREFIX "${PN_PLAYNET_PATH}" CACHE PATH "Installation path (auto-set to PN_PLAYNET_PATH)" FORCE )
 FILE( TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" _PLAYNET )
 
 ####################################
