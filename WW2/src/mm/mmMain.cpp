@@ -1107,7 +1107,7 @@ main(int argc, const char* argv[])
 	_authHost = serverGetAuthIP();
 	myMaxUsers = serverGetMaxClusterUsers();
 
-        specLoader.loadSpecMap();
+	specLoader.loadSpecMap();
 
 	wwiiIRCInitialize(Server::localHost, false);
 	wwiiIRCActivate(false);
