@@ -12,6 +12,7 @@
 #define BOTH_WWII_SIDES_PRODUCE	FALSE
 
 #include "chat/chatBroadcast.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "chat/chatTypes.h"
 #include "cnvy/cnvyMain.h"

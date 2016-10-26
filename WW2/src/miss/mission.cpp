@@ -9,6 +9,7 @@
 
 #include "chat/chatBroadcast.h"
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportMessages.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "inst/instTypes.h"					// For the enums

@@ -3,6 +3,7 @@
 // events.
 // Only the MMHost needs to receive callbacks.
 
+#include "chat/chatName.h"
 #include "map/mapPlayer.h"
 #include "mm/mmEnums.h"				// For CAPACITY_REQUEST_STATE
 #include "mm/mmMain.h"				// For mapGetStratIndex()

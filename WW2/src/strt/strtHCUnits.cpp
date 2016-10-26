@@ -11,6 +11,7 @@
 #include <set>
 
 #include "chat/chatBrigadeMove.h"
+#include "chat/chatName.h"
 #include "chat/chatStratSupportMessages.h"
 #include "cnvy/cnvyMain.h"
 #include "strt/strtCPStruct.h"

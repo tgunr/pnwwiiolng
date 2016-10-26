@@ -10,6 +10,7 @@
 #include "build_info.hpp"
 #include "auth/authPlayerDetails.h"
 #include "chat/chatGroupPermissionTypes.h"
+#include "chat/chatName.h"
 #include "dbse/dbseHandle.h"
 #include "include/arenaLockEnums.h"
 #include "include/mydbQuery.h"

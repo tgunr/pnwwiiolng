@@ -9,6 +9,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include "chat/chatName.h"
+#include "host/hostVehicleRequest.h"
 #include "include/logging.h"
 #include "map/mapPlayer.h"
 #include "miss/missionMission.h"

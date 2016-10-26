@@ -11,6 +11,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Eric "Meat" Hall
 
+#include "chat/chatName.h"
 #include "strt/strtServerTypes.h"
 #include "strt/strtJoinList.h"
 #include "mem/mem.h"

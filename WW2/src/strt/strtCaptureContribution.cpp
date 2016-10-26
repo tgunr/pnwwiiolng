@@ -9,6 +9,7 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"
 #include "strt/strtCaptureContribution.h"
 #include "strt/strtCP.h"
 #include "strt/strtFacilityStruct.h"

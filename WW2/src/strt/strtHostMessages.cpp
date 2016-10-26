@@ -13,6 +13,7 @@
 #include <queue>
 
 #include "chat/chatConstants.h"
+#include "chat/chatName.h"
 #include "chat/chatStratSupportMessages.h"
 #include "host/hostConstants.h"
 #include "host/hostTimeUpdate.h"

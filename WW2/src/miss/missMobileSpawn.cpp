@@ -17,6 +17,7 @@
 #include "map/mapBrigades.h"
 #include "chat/chatSupportMessages.h"
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"
 #include "miss/missionMobileSpawnWaypoint.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtFacilityStruct.h"

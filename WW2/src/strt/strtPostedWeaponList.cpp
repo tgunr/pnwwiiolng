@@ -19,6 +19,7 @@
 #include <fcntl.h>
 
 #include "chat/chatLStringIDs.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "cnvy/cnvyMain.h"
 #include "mem/mem.h"
