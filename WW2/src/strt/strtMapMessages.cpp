@@ -491,19 +491,6 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 	return 0;
 }
 
-SINT32
-strtSendMMPostInfoRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, bool join)
-{
-	MM_POST_INFO_REQUEST postInfoRequest;
-
-	postInfoRequest.customerID = crewID;
-	postInfoRequest.weaponSerial = weaponSerial;
-	postInfoRequest.handle = handle;
-	postInfoRequest.join = join;
-
-	return teulSend(connection, _XCHG_MM_POST_INFO, &postInfoRequest);
-}
-
 SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, bool join)
 {
 	SINT32 retval;
@@ -622,7 +609,6 @@ strtInstallMapCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
 	{
-		REGISTER_SENDRECV(STRT_MM_POST_INFO_Y, _sendMMPostInfoRequest, _recvMMPostInfoResponse, _XCHG_MM_POST_INFO);
 		REGISTER_SENDRECV(STRT_MM_POST_LIST_Y, _sendMMPostListReq, PostListReply::Process, _SEND_MM_POST_LIST);
 		REGISTER_SENDRECV(STRT_MM_SPAWN_GRANT_Y, _sendMMSpawnGrantRequest, _recvMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT);
 		REGISTER_SENDRECV(STRT_MM_CAPACITY_Y, _sendMMFacilityCapacityRequest, _recvMMFacilityCapacityResponse, _XCHG_MM_FACILITY_CAPACITY);

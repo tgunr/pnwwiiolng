@@ -28,9 +28,6 @@ extern SINT32 strtSendMMJoinRequest(SINT32 connection, UINT32 customerID, const 
 //Asks the strat system to grant the spawn of the weapon Serial referenced
 extern SINT32 strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial, class Player& player);
 
-//Asks the strat system to pass on the information it has on a weapon Serial
-extern SINT32 strtSendMMPostInfoRequest(SINT32 connection, UINT32 customerID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, bool join);
-
 //This function sends a post cancel to the strat system
 extern SINT32 strtSendMMPostCancel(SINT32 connection, const WEAPON_SERIAL& weaponSerial);
 
