@@ -77,7 +77,9 @@ ELSE()
     ENDIF()
     LINK_LIBRARIES( "-lpthread" )
 
-    IF ( BUILD_BITNESS EQUAL 32 )
+    IF ( BUILD_BITNESS EQUAL 64 )
+		ADD_COMPILE_OPTIONS( "-m64" )
+	ELSE()
         ADD_COMPILE_OPTIONS( "-m32" )
     ENDIF()
 
