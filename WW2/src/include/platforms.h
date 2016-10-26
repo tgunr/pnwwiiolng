@@ -49,7 +49,7 @@
 #define PN_LIKELY(p)   __builtin_expect(!!(p), 1)
 #define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
 #define PRSizeT "zu"
-#define PRSizeT "zd"
+#define PRSsizeT "zd"
 #define FORMAT_FN(n,m) __attribute__((format(printf,n,m)))
 #define FORMAT_ARG(n)
 #define NORETURN_FN __attribute__ ((noreturn))
