@@ -226,6 +226,7 @@ ADD_LIBRARY( wwiilib STATIC
     ${LIBRARIES_DIR}/tinyxml/tinystr.cpp ${LIBRARIES_DIR}/tinyxml/tinystr.h
 	${LIBRARIES_DIR}/tinyxml/tinyxml.cpp ${LIBRARIES_DIR}/tinyxml/tinyxml.h
     ${LIBRARIES_DIR}/tinyxml/tinyxmlerror.cpp ${LIBRARIES_DIR}/tinyxml/tinyxmlparser.cpp
+	libircclient/src/libircclient.cpp
     tut/tutGroupProgress.cpp tut/tutGroupProgress.h
     wwii/wwiiCommandLineArgs.cpp wwii/wwiiCommandLineArgs.h
     wwii/wwiiIRC.cpp wwii/wwiiIRC.h host/hostCommand.h
@@ -315,7 +316,7 @@ MACRO( ADD_HOST_TARGET Name )
     IF ( HOST_TARGET_ARG_LUA )
         TARGET_LINK_LIBRARIES( "${Name}" ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
     ENDIF()
-    TARGET_LINK_LIBRARIES( "${Name}" ircclient wwiilib teulserver ${MYSQL_LIBRARIES} )
+    TARGET_LINK_LIBRARIES( "${Name}" wwiilib teulserver ${MYSQL_LIBRARIES} )
     IF ( NOT "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" STREQUAL "" )
         SET_PROPERTY( TARGET "${Name}" PROPERTY COMPILE_DEFINITIONS "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" )
     ENDIF()

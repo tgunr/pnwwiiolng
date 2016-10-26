@@ -58,15 +58,7 @@ FIND_PACKAGE( BISON REQUIRED )
 FIND_PACKAGE( FLEX REQUIRED )
 
 # Need libircclient
-FIND_LIBRARY( LIBIRCCLIENT_FOUND ircclient DOC "Location of libircclient" )
-IF ( NOT LIBIRCCLIENT_FOUND )
-    # Fall back on the embedded one
-    ADD_LIBRARY( ircclient libircclient/src/libircclient.cpp )
-    INCLUDE_DIRECTORIES( libircclient/include )
-    SET_PROPERTY( TARGET ircclient PROPERTY COMPILE_DEFINITIONS IN_BUILDING_LIBIRC=1 )
-    SET_PROPERTY( TARGET ircclient PROPERTY FOLDER "Libs" )
-    SET( LIBIRCCLIENT_FOUND TRUE )
-ENDIF()
+INCLUDE_DIRECTORIES( libircclient/include )
 
 # Embedded libb64
 SET(LIBB64_DIR "${LIBRARIES_DIR}/libb64/libb64-1.2")
