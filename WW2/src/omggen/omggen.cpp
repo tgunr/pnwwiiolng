@@ -339,6 +339,15 @@ static void _reportLocation(FILE* fp)
 #endif
 }
 
+void annotate(const char* fmt)
+{
+	if (s_debug) {
+		_reportLocation(stdout);
+		fprintf(stdout, "%s", fmt);
+		fprintf(stdout, "\n");
+	}
+}
+
 template<typename... Args>
 void annotate(const char* fmt, Args... args)
 {
@@ -401,12 +410,6 @@ static const TypeDef* _findTypeDef(const char* name)
 static const char* _getIndents(size_t indentLevel)
 {
 	return s_indents + (MAX_INDENTS - std::min(indentLevel, MAX_INDENTS));
-}
-
-static size_t _getUniqueID()
-{
-	static size_t uniqueID = 0;
-	return ++uniqueID;
 }
 
 static void _endOfNode(Node::Type expectedType)
@@ -721,6 +724,8 @@ void omg_add_code(const char* code)
 		case Node::Type::Group:
 			static_cast<Group*>(s_currentNode)->m_extraCode.append(code, len);
 			break;
+		default: // Do nothing
+			yyfatal("should not be able to add code here\n");
 	}
 }
 
@@ -844,7 +849,7 @@ void Message::Emit(size_t indentLevel) const
 	EmitPublicMembers();
 
 	if (!m_code.empty()) {
-		HXX(m_code.c_str());
+		HXX("%s", m_code.c_str());
 		HXX("\n");
 	}
 	HXX("}; // end message %s\n"
