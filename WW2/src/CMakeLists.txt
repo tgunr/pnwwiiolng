@@ -244,6 +244,7 @@ ADD_LIBRARY( wwiilib STATIC
     wwii/wwiiSyncVar.cpp wwii/wwiiSyncVar.h
     sdm/sdmHash.cpp sdm/sdmHash.h sdm/sdmParse.cpp sdm/sdmParse.h strt/strtDTL.h wwii/wwiiTypes.h
     src/wthrTime.cpp include/wthrTime.h
+	strt/strtDataErrors.cpp strt/strtDataErrors.h strt/strtDataErrorInfo.h
     strt/strtSupercell.cpp strt/strtSupercell.h strt/strtSupercells.h
     wwii/wwiiCallbacks.cpp wwii/wwiiCallbacks.h teul/teulCallback.h teul/teulCallbackInit.h
     wwii/wwiiHCUnitsCommon.cpp
