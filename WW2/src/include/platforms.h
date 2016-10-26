@@ -120,6 +120,8 @@
 #define swprintf swprintf_s
 #define	vswprintf vswprintf_s
 
+using ssize_t = intptr_t;
+
 static inline struct tm *localtime_r(const time_t *t, struct tm *b) {
     localtime_s(b, t);
     return b;
