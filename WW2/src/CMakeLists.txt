@@ -14,6 +14,11 @@ IF ( NOT CMAKE_BUILD_TYPE )
 	MESSAGE( WARNING "No CMAKE_BUILD_TYPE specified. Assuming Debug." )
 	SET( CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE )
 ENDIF()
+SET(_BUILD_TYPES "Debug, Release, RelWithDebInfo, MinSizeRel")
+STRING(FIND ", ${_BUILD_TYPES}" "${CMAKE_BUILD_TYPE}" _BUILD_TYPE)
+IF ( NOT _BUILD_TYPE GREATER 1 )	# ',' and ' ' match against the start of the string
+	MESSAGE( FATAL_ERROR "Unrecognized CMAKE_BUILD_TYPE, expected one of ${_BUILD_TYPES}" )
+ENDIF()
 
 ####################################
 ## Declare the project (don't specify version here)
