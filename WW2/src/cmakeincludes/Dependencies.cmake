@@ -4,6 +4,7 @@ MARK_AS_ADVANCED(
     LUA_LIBRARIES LUA_INCLUDE_DIR
     GIT_EXECUTABLE
     LIBIRCCLIENT_FOUND
+	LIBB64_DIR
 )
 
 # We need ncurses and readline for the lua client, but don't care on Windows
@@ -68,13 +69,15 @@ IF ( NOT LIBIRCCLIENT_FOUND )
 ENDIF()
 
 # Embedded libb64
+SET(LIBB64_DIR "${LIBRARIES_DIR}/libb64/libb64-1.2")
 ADD_LIBRARY( libb64
-    ${LIBRARIES_DIR}/libb64/libb64-1.2/src/cdecode.c
-    	${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/cdecode.h
-    		${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/decode.h
-    ${LIBRARIES_DIR}/libb64/libb64-1.2/src/cencode.c
-    	${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/cencode.h
-    		${LIBRARIES_DIR}/libb64/libb64-1.2/include/b64/encode.h
+	${LIBB64_DIR}/src/cdecode.c
+    	${LIBB64_DIR}/include/b64/cdecode.h
+    		${LIBB64_DIR}/include/b64/decode.h
+    ${LIBB64_DIR}/src/cencode.c
+    	${LIBB64_DIR}/include/b64/cencode.h
+    		${LIBB64_DIR}/include/b64/encode.h
 )
+INCLUDE_DIRECTORIES( ${LIBB64_DIR}/include )
 SET_PROPERTY( TARGET libb64 PROPERTY COMPILE_DEFINITIONS )
 SET_PROPERTY( TARGET libb64 PROPERTY FOLDER "Libs" )
