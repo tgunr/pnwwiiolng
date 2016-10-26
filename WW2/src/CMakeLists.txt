@@ -50,14 +50,15 @@ ENDIF ()
 MARK_AS_ADVANCED( CMAKE_BITNESS )
 MESSAGE( STATUS "CMake is ${CMAKE_BITNESS}-bit" )
 
-# Default to 64-bit on Windows for now
-IF ( NOT WIN32 )
-	OPTION( PN_BUILD_32BIT		"Enable 32-bit build" ON )
-ELSE()
-	OPTION( PN_BUILD_32BIT		"Enable 32-bit build" OFF )
+OPTION( PN_BUILD_32BIT "Enable 32-bit build" OFF )
+IF ( WIN32 OR CMAKE_BITNESS EQUAL 32 )
 	MARK_AS_ADVANCED( PN_BUILD_32BIT )
 ENDIF()
 
+# You *HAVE* to supply this on the command line when you first
+# build the cache in order for this to work, otherwise CMake
+# will not re-check library paths and will use the wrong
+# libs.
 IF ( CMAKE_BITNESS EQUAL 64 AND NOT PN_BUILD_32BIT )
 	SET(BUILD_BITNESS 64)
 ELSE ( )
