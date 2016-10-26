@@ -132,7 +132,7 @@ struct ACTION_OBJECT
 	{}
 
 	void packer(PackMode mode, bool& value, SINT32 sb = 1) { return (mode == TEUL_PACK) ? pack(value, sb) : unpack(value, sb); }
-	void packBytes(PackMode mode, void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(mode, this->packed, this->offset, byteStream, numBytes); }
+	void bytePacker(PackMode mode, void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(mode, this->packed, this->offset, byteStream, numBytes); }
 	void packBytes(const void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(TEUL_PACK, this->packed, this->offset, (void*)byteStream, numBytes); }
 	void unpackBytes(void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(TEUL_UNPACK, this->packed, this->offset, byteStream, numBytes); }
 
