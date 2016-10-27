@@ -320,22 +320,20 @@ DBThreadQuery::Queue()
 void
 DBThread::EscapeString(DB::handle_t* conn, std::string& text)
 {
-    char *tempBuff = new char[text.length()*2+1];
-    mysql_real_escape_string(conn, tempBuff, text.c_str(), text.length());
-    text = tempBuff;
-    delete tempBuff;
+	auto buff = std::make_unique<char[]>(text.length() * 2 + 1);
+    mysql_real_escape_string(conn, buff.get(), text.c_str(), text.length());
+    text = buff.get();
 }
 
 void
 DBThread::EscapeString(std::string& text)
 {
-    char *tempBuff = new char[text.length()*2+1];
+	auto buff = std::make_unique<char[]>(text.length() * 2 + 1);
     dbQueue.doLocked([&] {
 		///TODO: FIX: Conflicting access to the connection pointer
-        mysql_real_escape_string(dbThread[0].getConn(), tempBuff, text.c_str(), text.length());
+        mysql_real_escape_string(dbThread[0].getConn(), buff.get(), text.c_str(), text.length());
     });
-    text = tempBuff;
-    delete tempBuff;
+    text = buff.get();
 }
 
 //////////////////////////////////////////////////////////////////////
