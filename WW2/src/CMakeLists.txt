@@ -80,7 +80,8 @@ SET( STRAT_HOST_EXE "stratd" )
 
 ####################################
 ## Embedded library search path
-SET( LIBRARIES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../Libraries" )
+SET( PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
+SET( LIBRARIES_DIR "${PROJECT_DIR}/Libraries" )
 
 ####################################
 ## General search paths
