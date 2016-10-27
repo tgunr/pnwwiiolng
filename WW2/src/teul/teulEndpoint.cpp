@@ -96,7 +96,7 @@ ENDPOINT::encrypt(UCHAR* const stream, const size_t bytes)
 	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
 	{
 #ifdef DEBUG_ENCRYPTION
-		printf("Encrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_txCrypt.seed());
+		printf("Encrypt %p %d [%u] seed %" PR64BitUT "\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_txCrypt.seed());
 #endif
 		m_impl->m_txCrypt.translate(stream, bytes);
 	}
@@ -111,7 +111,7 @@ ENDPOINT::decrypt(UCHAR* const stream, const size_t bytes)
 	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
 	{
 #ifdef DEBUG_ENCRYPTION
-		printf("Decrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_rxCrypt.seed());
+		printf("Decrypt %p %d [%u] seed %" PR64BitUT "\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_rxCrypt.seed());
 #endif
 		m_impl->m_rxCrypt.translate(stream, bytes);
 	}
