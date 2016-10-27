@@ -429,7 +429,6 @@
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
 		47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B0ED240E9A66A40089DCC4 /* libteulKit.a */; };
 		E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96991C6D729D00D5EC52 /* WebKit.framework */; };
-		E913E48F1DA2FE6E00A3AF80 /* omgChat.cxx in Sources */ = {isa = PBXBuildFile; fileRef = E913E48E1DA2FE6E00A3AF80 /* omgChat.cxx */; };
 		E94156B01D259A0300C0565B /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94156AF1D259A0300C0565B /* libb64.a */; };
 		E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
 		E97C76161C848E3600875F44 /* CADebugger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B1120222EB00A60CC2 /* CADebugger.cpp */; };
@@ -494,6 +493,8 @@
 		FA5CDD491CD8BA6D00F93668 /* build_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA3D8BA81C8BF201002C5119 /* build_info.cpp */; };
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
 		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
+		FAE0DB8D1DC260AF00A9E63D /* omgChat.omg in Sources */ = {isa = PBXBuildFile; fileRef = FA448CA71D0CAE4800C4936D /* omgChat.omg */; };
+		FAE0DB8E1DC260AF00A9E63D /* omgMissionSortieData.omg in Sources */ = {isa = PBXBuildFile; fileRef = FA448CA81D0CAE4800C4936D /* omgMissionSortieData.omg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -504,8 +505,10 @@
 			fileType = pattern.proxy;
 			isEditable = 1;
 			outputFiles = (
+				"$(DERIVED_FILE_DIR)/omg/$(INPUT_FILE_BASE).hxx",
+				"$(DERIVED_FILE_DIR)/omg/$(INPUT_FILE_BASE).cxx",
 			);
-			script = "";
+			script = "OMGDSTROOT=\"${DERIVED_FILE_DIR}/omg\"\n\nmkdir -p \"${OMGDSTROOT}\"\n\n\"${BUILT_PRODUCTS_DIR}/omggen\" -D\"${INPUT_FILE_DIR}\" --cxx=\"${OMGDSTROOT}/${INPUT_FILE_BASE}.cxx\" --hxx=\"${OMGDSTROOT}/${INPUT_FILE_BASE}.hxx\" \"${INPUT_FILE_PATH}\"";
 		};
 		FA448CF51D0D01B900C4936D /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -516,7 +519,7 @@
 				"$(DERIVED_FILE_DIR)/$(INPUT_FILE_BASE).tab.h",
 				"$(DERIVED_FILE_DIR)/$(INPUT_FILE_BASE).tab.cpp",
 			);
-			script = "${YACC} ${YACCFLAGS} --defines=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.h\" --file-prefix=\"${DERIVED_FILE_DIR}/omggen\" --output=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.cpp\" \"${INPUT_FILE_PATH}\"";
+			script = "BISON_PKGDATADIR=\"${SRCROOT}/proj/mac/bison-data\" ${YACC} ${YACCFLAGS} --defines=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.h\" --file-prefix=\"${DERIVED_FILE_DIR}/omggen\" --output=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.cpp\" \"${INPUT_FILE_PATH}\"";
 		};
 		FA448CF61D0D02EB00C4936D /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -1480,7 +1483,6 @@
 		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
 		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
-		E913E48E1DA2FE6E00A3AF80 /* omgChat.cxx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = omgChat.cxx; path = omg/omgChat.cxx; sourceTree = "<group>"; };
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E94156AF1D259A0300C0565B /* libb64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libb64.a; path = lib/mac/libb64.a; sourceTree = "<group>"; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
@@ -2981,7 +2983,6 @@
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				E913E48D1DA2FE5300A3AF80 /* omg */,
 				0834F1D1104586AA00E75B52 /* versionNo.h */,
 				E97C763D1C85146A00875F44 /* event */,
 				08E5E55513E855A100A5034D /* ez */,
@@ -3125,14 +3126,6 @@
 				FA13BB4E1C87650800095818 /* libxml2.tbd */,
 			);
 			name = lib;
-			sourceTree = "<group>";
-		};
-		E913E48D1DA2FE5300A3AF80 /* omg */ = {
-			isa = PBXGroup;
-			children = (
-				E913E48E1DA2FE6E00A3AF80 /* omgChat.cxx */,
-			);
-			name = omg;
 			sourceTree = "<group>";
 		};
 		E97C763D1C85146A00875F44 /* event */ = {
@@ -3360,7 +3353,6 @@
 			buildConfigurationList = 0DA6CEF60856391C00A53577 /* Build configuration list for PBXNativeTarget "WW2OL" */;
 			buildPhases = (
 				0D3AF74508FC457800621A78 /* Run Script */,
-				FA448CBB1D0CAF0900C4936D /* Parse OMG Files */,
 				8D0C4E8C0486CD37000505A6 /* Resources */,
 				8D0C4E8F0486CD37000505A6 /* Sources */,
 				8D0C4E910486CD37000505A6 /* Frameworks */,
@@ -3502,27 +3494,6 @@
 			shellPath = /bin/bash;
 			shellScript = "python ${SRCROOT}/../Tools/revno.py client \"${DERIVED_FILES_DIR}\"";
 		};
-		FA448CBB1D0CAF0900C4936D /* Parse OMG Files */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/src/omg/omgChat.omg",
-				"$(SRCROOT)/src/omg/omgMissionSortieData.omg",
-				"$(SRCROOT)/src/omg/typedefs.omg",
-			);
-			name = "Parse OMG Files";
-			outputPaths = (
-				"$(DERIVED_SOURCES_DIR)/omg/omgChat.hxx",
-				"$(DERIVED_SOURCES_DIR)/omg/omgChat.cxx",
-				"$(DERIVED_SOURCES_DIR)/omg/omgMissionSortieData.hxx",
-				"$(DERIVED_SOURCES_DIR)/omg/omgMissionSortieData.cxx",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/bash;
-			shellScript = "OMGSRCROOT=\"${SRCROOT}/src/omg\"\nOMGDSTROOT=\"${DERIVED_SOURCES_DIR}/omg\"\n\nmkdir -p \"${OMGDSTROOT}\"\n\nfor STEM in omgChat omgMissionSortieData; do\n    \"${BUILT_PRODUCTS_DIR}/omggen\" -D\"${OMGSRCROOT}\" --cxx=\"${OMGDSTROOT}/${STEM}.cxx\" --hxx=\"${OMGDSTROOT}/${STEM}.hxx\" \"${OMGSRCROOT}/${STEM}.omg\"\ndone";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -3582,6 +3553,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAE0DB8D1DC260AF00A9E63D /* omgChat.omg in Sources */,
+				FAE0DB8E1DC260AF00A9E63D /* omgMissionSortieData.omg in Sources */,
 				E97C76C61C8539BF00875F44 /* XMLLoader.cpp in Sources */,
 				E97C76C71C8539BF00875F44 /* XMLLoader2.cpp in Sources */,
 				08104734103DCC390065E0E2 /* cfgData.cpp in Sources */,
@@ -3869,7 +3842,6 @@
 				08104EDC103DFDC30065E0E2 /* weapons.cpp in Sources */,
 				08104EDD103DFDC30065E0E2 /* weapParser.cpp in Sources */,
 				08104EDF103DFDC30065E0E2 /* weapSpec.cpp in Sources */,
-				E913E48F1DA2FE6E00A3AF80 /* omgChat.cxx in Sources */,
 				08104F36103DFE120065E0E2 /* wwiiCallbacks.cpp in Sources */,
 				08104F37103DFE120065E0E2 /* wwiiClientMessages.cpp in Sources */,
 				08104F3C103DFE120065E0E2 /* wwiiHCUnitsCommon.cpp in Sources */,
