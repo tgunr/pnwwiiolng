@@ -568,7 +568,7 @@ Player::SetGroups(const char* groupList)
 		// Update our permissions
 		m_permissions = chatGroupPermissionsForGroups(m_groups);
 
-        log(_FLD, "groups: %s perm:%llx max army/air/sea/squad:%u/%u/%u/%u"
+        log(_FLD, "groups: %s perm:%" PRPermMaskT " max army/air/sea/squad:%u/%u/%u/%u"
                     , groupList
                     , m_permissions->m_permissionMask
                     , m_permissions->m_limitRank[BRANCH_LAND]
@@ -1513,7 +1513,7 @@ Player::SetPersonaMissionFlags()
 {
 	updateMask();
 
-	dbugLog(_FLD, "t:%d p:%u c:%s rank:%d perm:%llx hc:%d", teulIndex(), playerID(), callsign(), realRank(), permissionMask(), isOfficer());
+	dbugLog(_FLD, "t:%d p:%u c:%s rank:%d perm:%" PRPermMaskT " hc:%d", teulIndex(), playerID(), callsign(), realRank(), permissionMask(), isOfficer());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1653,7 +1653,8 @@ Player::updateChat(bool immediate)
 	if ( needsChatSync() )
 		return;
 
-	dbugLog(_FLD, "t:%d p:%u c:%s flagging for persona update perms:%llx (plyr:%llx, chat:%llx)", teulIndex(), playerID(), callsign(), permissionMask(), m_playerMask, m_permissions->m_permissionMask);
+	dbugLog(_FLD, "t:%d p:%u c:%s flagging for persona update perms:%" PRPermMaskT " (plyr:%" PRPermMaskT ", chat:%" PRPermMaskT ")"
+				, teulIndex(), playerID(), callsign(), permissionMask(), m_playerMask, m_permissions->m_permissionMask);
 
 	g_chatSyncQueue.push_back(this);
 	m_needsChatSync = true;

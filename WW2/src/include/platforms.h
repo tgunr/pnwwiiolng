@@ -87,10 +87,12 @@
 # define BUILD_64
 # define PR64BitT "ld"
 # define PR64BitUT "lu"
+# define PRPermMaskT "lx"
 #else
 # define BUILD_32
 # define PR64BitT "lld"
 # define PR64BitUT "llu"
+# define PRPermMaskT "llx"
 #endif
 
 //////////////////////////////////////////////////////////////////////////////

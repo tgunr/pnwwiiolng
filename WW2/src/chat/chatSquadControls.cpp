@@ -939,7 +939,7 @@ SquadControl::receive(SINT32 teulIndex)
 			squadList = chatFindSquadList(player->squadID());
 		}
 
-		player->log(_FLI, "squadControl: %s %s[%u] %s[%llx]"
+		player->log(_FLI, "squadControl: %s %s[%u] %s[%" PRPermMaskT "]"
 							, _originator
 							, _control(m_action), m_action
 							, _subject, m_handle);

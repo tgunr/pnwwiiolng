@@ -322,7 +322,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 #ifdef TIME_QUERIES
 		teulSyncClock();
 #endif
-		dbugLog(_FLN, "t:%d p:%u c:%s cust:%u found login info perms:%llx player:%llx mb:%u %s took %" PR64BitUT "ms"
+		dbugLog(_FLN, "t:%d p:%u c:%s cust:%u found login info perms:%" PRPermMaskT " player:%" PRPermMaskT " mb:%u %s took %" PR64BitUT "ms"
 						, teulIndex(), playerID(), callsign(), m_customerID
 						, permissionMask(), m_playerMask
 						, minuteBalance(), (meteredAccess() ? "metered" : "unmetered")
@@ -600,7 +600,7 @@ bool mapFillPersonaData(Player* const player)
 		teulSyncClock();
 #endif
 
-		threadLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%llx tr:%u took %" PR64BitUT "ms"
+		threadLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%" PRPermMaskT " tr:%u took %" PR64BitUT "ms"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, player->personaID(), newRank, player->realRank(), player->points(), player->useRank().permissions()
 						, player->minuteBalance()

@@ -304,7 +304,7 @@ DotCommand::allow(Player& player) const
 			return m_usages[i].get();
 	}
 
-	dbugLog(_FLD, "Player with permissions %llx does not have permission to access command", player.m_permissionMask);
+	dbugLog(_FLD, "Player with permissions %" PRPermMaskT " does not have permission to access command", player.m_permissionMask);
 
 	return nullptr;
 }

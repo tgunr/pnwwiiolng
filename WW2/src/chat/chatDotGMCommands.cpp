@@ -1939,7 +1939,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 	if ( player.isPlaynet() )
 	{
 		char permissionsHex[64];
-		strprintf(permissionsHex, "PM: %016llx", permissionMask());
+		strprintf(permissionsHex, "PM: %016" PRPermMaskT "", permissionMask());
 		_addStr(response, permissionsHex);
 	}
 

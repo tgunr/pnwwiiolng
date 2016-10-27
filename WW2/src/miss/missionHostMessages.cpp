@@ -256,7 +256,7 @@ _recvWEP_LIST_REQ(ACTION_OBJECT* const a)
 		return 0;
 	}
 
-	dbugLog(_FLD, "t:%d p:%u c:%s weapons request at %s, all: %d, refresh: %d, perm: %llx"
+	dbugLog(_FLD, "t:%d p:%u c:%s weapons request at %s, all: %d, refresh: %d, perm: %" PRPermMaskT ""
 			, a->teulIndex, player.playerID(), player.callsign()
 			, facility->name, request.allWeapons, request.isRefresh, player.permissionMask()
 			);

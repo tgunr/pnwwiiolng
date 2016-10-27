@@ -102,7 +102,7 @@ _aggregatePermissions(ChatPermissions& lhs, const CHAT_GROUPS& groups)
         groupNos += num;
     }
     char buffer[2048];
-    strprintf(buffer, "For groups {%s} maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perms=%llx vehGrants=%" PRSizeT ""
+    strprintf(buffer, "For groups {%s} maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perms=%" PRPermMaskT " vehGrants=%" PRSizeT ""
                             , groupNos.c_str()
                             , lhs.m_limitRank[BRANCH_LAND]
                             , lhs.m_limitRank[BRANCH_AIR]
@@ -209,7 +209,7 @@ public:
 
 		ProcessVehicles(git->second, vehicleList.c_str());
 
-        dbugLog(_FLD, "grp:%u %s maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perm:%llx vehs:%" PRSizeT ""
+        dbugLog(_FLD, "grp:%u %s maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perm:%" PRPermMaskT " vehs:%" PRSizeT ""
                         , perm.m_groupOID
                         , (perm.m_enabled ? "enabled" : "disabled")
                         , perm.m_limitRank[BRANCH_LAND]
