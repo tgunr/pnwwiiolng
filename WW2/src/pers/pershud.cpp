@@ -417,7 +417,7 @@ void GameInfoView::DrawSelf()
 /************************************************************************************************
 	DisplayInfo
 *************************************************************************************************/
-#ifdef DEBUG_WW2
+#if defined(DEBUG_WW2) && !defined(RELEASE_CLIENT)
 extern std::vector<std::wstring> updtGetNvHistory();
 #endif
 
@@ -472,11 +472,13 @@ void GameInfoView::DisplayInfo()
 	speedgrassGetStats(txt);
 	DrawString("%s\n", txt);
 
+#if defined(DEBUG_WW2) && !defined(RELEASE_CLIENT)
 	std::vector<std::wstring> nvHistory = updtGetNvHistory();
 	for ( auto it = nvHistory.begin(); it != nvHistory.end(); ++it )
 	{
 		DrawString(L"%ls\n", it->c_str());
 	}
+#endif
 #endif
 }
 

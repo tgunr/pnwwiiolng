@@ -152,7 +152,7 @@ static SINT32 _packVehicleCommon(PackMode mode, UCHAR* const data, SINT32 offset
 	return offset;
 }
 
-#if platBuild == BUILD_CLIENT && defined(DEBUG_WW2)
+#if platBuild == BUILD_CLIENT && defined(DEBUG_WW2) && !defined(RELEASE_CLIENT)
 struct NewVehicleHistory
 {
 	TeulTimeMS	receivedAt;
@@ -327,7 +327,7 @@ static SINT32 _packONE_TIME_INFO(PackMode mode, UCHAR* const data, SINT32 offset
 
 	offset = wwiiPackBrigadeID(mode, data, offset, vehInfo->brigadeID, 0);
 
-#if platBuild == BUILD_CLIENT && !defined(RELEASE_CLIENT)
+#if platBuild == BUILD_CLIENT && defined(DEBUG_WW2) && !defined(RELEASE_CLIENT)
 	_recordNewHistoryEntry(vehInfo, packedCallsign);
 #endif
 
