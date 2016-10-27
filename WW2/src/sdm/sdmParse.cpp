@@ -15,6 +15,7 @@
 #include "sdm/sdmParse.h"
 #include "fio/fio.h"
 #if platBuild == BUILD_SERVER
+# undef fioGetString
 # include "fio/fioDefs.h"
 # include "fio/fiod.h"
 #endif
