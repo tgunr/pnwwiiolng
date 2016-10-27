@@ -293,7 +293,7 @@ strtReportDataErrors(UINT32 level)
 		if ( list.empty() == false )
 			dbugLog(_FLA, "  %s", list.c_str());
 
-		dbugLog(_FLI, "");
+		dbugLog(_FLI, "\n");
 	}
 
 	return errors;
