@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
-PROJECT(OMGGen)
+PROJECT(OMGgen)
 SET(CMAKE_CXX_STANDARD 14)
 
 SET(OMGGEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -39,7 +39,7 @@ ADD_CUSTOM_COMMAND(OUTPUT ${OMGGEN_YY_CPP} ${OMGGEN_YY_H}
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} .)
 
 ADD_EXECUTABLE(
-	omggen
+	OMGgen
 		omggen.l
 		omggen.y
 		${OMGGEN_TAB_CPP} ${OMGGEN_TAB_H}
@@ -47,12 +47,14 @@ ADD_EXECUTABLE(
 		omggen.cpp omggen.h
 )
 
+# Unique Snowflake Alert: We don't want ANY pre-existing compile flags,
+# we just want the minimum required to build an optimized binary. This is a
+# compiler tool, not a part of the system itself per-se.
 IF ( MSVC )
 	SET(CMAKE_CXX_FLAGS "/Ox /MP /MT /EHsc")
-ELSE ( )
+    SET(CMAKE_CXX_FLAGS_DEBUG "/Ox /MP /MT /EHsc")
+    SET_PROPERTY(TARGET OMGgen PROPERTY COMPILE_DEFINITIONS __STDC_VERSION__=199901L)
+ELSE()
 	SET(CMAKE_CXX_FLAGS "-std=c++14 -O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security")
-ENDIF ( )
-
-IF ( WIN32 )
-    SET_PROPERTY(TARGET omggen PROPERTY COMPILE_DEFINITIONS __STDC_VERSION__=199901L)
-ENDIF ( )
+    SET(CMAKE_CXX_FLAGS_DEBUG "-std=c++14 -O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security")
+ENDIF()
