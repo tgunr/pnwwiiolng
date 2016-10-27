@@ -208,12 +208,16 @@ static const char* getBaseName(const char* path, const char* prePath = nullptr);
 
 static granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file** file = nullptr);
 static void gr2Error(granny_log_message_type type, granny_log_message_origin origin, char const* file, granny_int32x line, char const* error, void* userData);
+#if GR2_USE_XML_BLENDS
 static gr2AnimationBlend* gr2LoadBlendedAnimationXML(const SCHAR* blendfile, SINT32 boneCount);
+#endif
 static gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount);
 
+#if GR2_USE_XML_BLENDS
 static XML_TAG_HANDLER(xmlBlendTagHandler);
 static XML_TAG_HANDLER(xmlBlendAnimTagHandler);
 static XML_TAG_HANDLER(xmlBlendBoneTagHandler);
+#endif
 
 #include "libxml/parser.h"
 #include "libxml/tree.h"
@@ -4935,6 +4939,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 }
 */
 
+#if GR2_USE_XML_BLENDS
 gr2AnimationBlend* gr2LoadBlendedAnimationXML(const SCHAR* blendfile, SINT32 boneCount)
 {
 	gr2AnimationBlend* newBlend = _gr2BlendPool.Pop();
@@ -4965,6 +4970,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationXML(const SCHAR* blendfile, SINT32 bon
 
 	return newBlend;
 }
+#endif
 
 gr2AnimationBlend* gr2CreateBlendedAnimation(const SCHAR* animFile, SINT32 boneCount)
 {
@@ -6060,6 +6066,7 @@ std::map<std::string,std::string>& gr2GetTextures()
 }
 #endif
 
+#if GR2_USE_XML_BLENDS
 XML_TAG_HANDLER(xmlBlendTagHandler)
 {
 	gr2AnimationBlend* blend = XML_GET_USERDATA(gr2AnimationBlend*,blend);
@@ -6139,7 +6146,7 @@ XML_TAG_HANDLER(xmlBlendBoneTagHandler)
 
 	return false;
 }
-
+#endif
 
 FLOAT64 gr2NormalizeAngle(FLOAT64& angle)
 {

@@ -255,8 +255,11 @@ ADD_LIBRARY( wwiilib STATIC
     auth/authDB.cpp auth/authDB.h src/infoHostMessages.cpp include/infoHostMessages.h
     src/infoPack.cpp include/infoPack.h dbse/dbseDatabaseSchema.cpp dbse/dbseDatabaseSchema.h
 	xml/XMLLoader2.cpp xml/XMLLoader2.h
+	weap/weapSpawnXML.cpp weap/weapSpawnXML.h
+	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
+SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
 
 ####################################
 ## Various commandline utility executables
@@ -268,7 +271,7 @@ IF ( NOT MSVC )
         chat/chatManagementClientMessages.cpp chat/chatManagementClientMessages.h
         chat/chatManagementPack.cpp chat/chatRoster.cpp chat/chatRosterClient.cpp
     )
-    TARGET_LINK_LIBRARIES( chatClient wwiilib teulserver ${MYSQL_LIBRARIES} )
+    TARGET_LINK_LIBRARIES( chatClient ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
     SET_PROPERTY( TARGET chatClient PROPERTY FOLDER "Tools" )
     
     ADD_EXECUTABLE( luaClient src/luaClient.cpp )
@@ -277,7 +280,7 @@ IF ( NOT MSVC )
         PRIVATE ${NCURSES_INCLUDE_DIRS}
     )
     TARGET_LINK_LIBRARIES( luaClient
-        wwiilib teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
+        ${WWIILIB_LIBRARIES} teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
     )
     SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
 
@@ -318,8 +321,7 @@ MACRO( ADD_HOST_TARGET Name )
     IF ( HOST_TARGET_ARG_LUA )
         TARGET_LINK_LIBRARIES( "${Name}" ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
     ENDIF()
-	TARGET_LINK_LIBRARIES( "${Name}" ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES} )
-    TARGET_LINK_LIBRARIES( "${Name}" wwiilib teulserver ${MYSQL_LIBRARIES} )
+    TARGET_LINK_LIBRARIES( "${Name}" ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
     IF ( NOT "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" STREQUAL "" )
         SET_PROPERTY( TARGET "${Name}" PROPERTY COMPILE_DEFINITIONS "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" )
     ENDIF()
@@ -422,7 +424,6 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     map/mapAWS.cpp map/mapAWS.h
     map/mapHCUnitLocations.cpp map/mapHCUnitLocations.h
     strt/strtChatTypes.cpp strt/strtChatTypes.h
-	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
     dbse/dbseClient.cpp dbse/dbseClient.h dbse/dbseTypes.h dbse/dbseConstants.h
     dbse/dbseClientMessages.cpp dbse/dbseClientMessages.h
@@ -486,7 +487,6 @@ ADD_HOST_TARGET( ${CELL_HOST_EXE} SOURCES
     strt/strtUpdaterHostMessages.cpp strt/strtUpdaterHostMessages.h
     strt/strtUpdaterPack.cpp strt/strtUpdaterPack.h
     strt/strtUpdaterSupportMessages.cpp strt/strtUpdaterSupportMessages.h
-    weap/weapSpawnXML.cpp weap/weapSpawnXML.h
     INSTANCING
     EXTRA_DEFINITIONS "IS_CELL_HOST"
 )
@@ -653,7 +653,6 @@ ADD_HOST_TARGET( ${STRAT_HOST_EXE} SOURCES
     strt/strtTOE.cpp strt/strtTOE.h
     strt/strtWeaponEntry.cpp strt/strtWeaponEntry.h
     strt/strtTypes.h strt/strtObjectStruct.h
-    weap/weapSpawnXML.cpp weap/weapSpawnXML.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
     list/listCL.cpp list/listCL.h list/list.h
     ${STRAT_HOST_EXE}Lua.cc
@@ -693,7 +692,7 @@ INSTALL( DIRECTORY hostproj/web/ DESTINATION web COMPONENT web PATTERN ".git" EX
 
 # Auth connection test
 ADD_EXECUTABLE( testAuthConnect tests/testAuthConnect.cpp )
-TARGET_LINK_LIBRARIES( testAuthConnect wwiilib teulserver ${MYSQL_LIBRARIES} )
+TARGET_LINK_LIBRARIES( testAuthConnect ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
 SET_PROPERTY( TARGET testAuthConnect PROPERTY FOLDER "Test" )
 
 # Builds a single executable that runs all of the unit tests;
@@ -710,7 +709,7 @@ ADD_EXECUTABLE( testUnits
     tests/testSuite.h tests/testUnits.h
 )
 SET_PROPERTY( TARGET testUnits PROPERTY COMPILE_DEFINITIONS "ENABLE_TESTS" )
-TARGET_LINK_LIBRARIES( testUnits wwiilib teulserver ${MYSQL_LIBRARIES} )
+TARGET_LINK_LIBRARIES( testUnits ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
 SET_PROPERTY( TARGET testUnits PROPERTY FOLDER "Test" )
 
 ADD_TEST( testUnits testUnits )
@@ -722,7 +721,7 @@ ADD_EXECUTABLE(testTeul
     wwii/wwiiCallbacks.h tests/testTeulTest.h tests/testTeulClient.h tests/testTeulServer.h
     teul/teulVersion.h teul/teulConnectionInstruction.h
 )
-TARGET_LINK_LIBRARIES( testTeul teulserver wwiilib ${MYSQL_LIBRARIES} )
+TARGET_LINK_LIBRARIES( testTeul teulserver ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
 SET_PROPERTY( TARGET testTeul PROPERTY FOLDER "Test" )
 
 ######################################################################
