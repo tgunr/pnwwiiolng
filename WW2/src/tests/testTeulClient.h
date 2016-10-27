@@ -638,7 +638,7 @@ struct ClientRole : public Role
 		size_t msgSizes[] = {256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536};
 		size_t numSizes = sizeof(msgSizes) / sizeof(size_t);
 
-		Iprintf("sending %u messages for each varing size\n", numMsgs);
+		Iprintf("sending %" PRSizeT " messages for each varing size\n", numMsgs);
 
 		uint8_t nextChar = static_cast<uint8_t>('A');
 		Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::Spam_Y));
@@ -653,7 +653,7 @@ struct ClientRole : public Role
 				nextChar = static_cast<uint8_t>('A');
 			}
 
-			Iprintf("sending %u messages for packet size %d\n", numMsgs, msgSizes[i]);
+			Iprintf("sending %" PRSizeT " messages for packet size %" PRSizeT "\n", numMsgs, msgSizes[i]);
 			for (size_t j = 0; j < numMsgs; ++j)
 			{
 				outgoing.send(teulIndex);

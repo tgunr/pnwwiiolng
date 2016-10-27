@@ -29,12 +29,12 @@ PPOSpecLoader::PPOSpecLoader() : XMLLoader2<PPOSpecLoader>()
 
 void PPOSpecLoader::loadSpecMap()
 {
-        dbugLog(_FLD, "Loading PPO specifications...");
+    dbugLog(_FLD, "Loading PPO specifications...");
 	_ppoSpecMap.clear();
 	SetPath(PPO_SPEC);
 	fioXmlRegisterInputCallbacks();
 	Load();
-        dbugLog(_FLD, "Done loading PPO specifications, %d loaded.", _ppoSpecMap.size());
+    dbugLog(_FLD, "Done loading PPO specifications, %" PRSizeT " loaded.", _ppoSpecMap.size());
 }
 
 // tag handlers
