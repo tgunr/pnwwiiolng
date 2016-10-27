@@ -46,6 +46,8 @@ ADD_EXECUTABLE(
 		${OMGGEN_YY_CPP} ${OMGGEN_YY_H}
 		omggen.cpp omggen.h
 )
+ADD_DEFINITIONS("-DYY_NO_UNPUT")
+ADD_DEFINITIONS("-DYY_NO_INPUT")
 
 # Unique Snowflake Alert: We don't want ANY pre-existing compile flags,
 # we just want the minimum required to build an optimized binary. This is a
