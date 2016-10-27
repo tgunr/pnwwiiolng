@@ -36,7 +36,7 @@ LOGICAL sndsPlatformInit()
     return TRUE;
 }
 
-LOGICAL sndsPlatformKill()
+void sndsPlatformKill()
 {
     SHOW_DEBUG( fprintf( mDebugStream, "sndsPlatformKill()\n" ); fflush( mDebugStream ); fclose( mDebugStream ); )
 
@@ -49,8 +49,6 @@ LOGICAL sndsPlatformKill()
 
         delete audio;
     }
-
-    return TRUE;
 }
 
 UINT32 sndsGetMaxNumberOfSounds()
