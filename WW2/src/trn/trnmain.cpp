@@ -3625,37 +3625,6 @@ LOGICAL trnmainWorldOriginMoved()
 	return _WorldMoved;
 }
 
-static LOGICAL _DrawVertices(int type, OBJECT* lpobj)
-{
-	if (lpobj->flags & OBJECT_INDEXED)
-	{
-		piSTRIDEDDATA sd;
-		lpobj->StridedRenderData(&sd);
-
-		if (!piRenderIndexScene((piPRIMITIVETYPE)type, piVT_VERTEX,
-								&sd, lpobj->numverts,
-								(UINT16*)lpobj->ptris,  lpobj->numtris * 3))
-		{
-			Write_Debug("piRenderIndexScene failed at entity %s (no lite)", lpobj->name);
-			return(FALSE);
-		}
-	}
-	else
-	{
-		piSTRIDEDDATA sd;
-		lpobj->StridedRenderData(&sd);
-
-		if (!piRenderStridedScene((piPRIMITIVETYPE)type, piVT_VERTEX,
-									&sd, lpobj->numverts))
-		{
-			Write_Debug("piRenderScene failed at entity %s (no lite)", lpobj->name);
-			return(FALSE);
-		}
-	}
-
-	return(TRUE);
-}
-
 LOGICAL trnFindStratBuildingByTO(BUILDING** const bld, trnCDTerrainObject* const TO)
 {
 SINT32 i,j;
