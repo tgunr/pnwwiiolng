@@ -4217,9 +4217,11 @@ JSBool jsInstance::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = phui::js::NewString(chatGetWideCallsign(descriptor->handle()));
 		break;
 		case ID_PROP:
+		{
 			char idBuffer[32+1];
-			snprintf(idBuffer, 32, "%llu", descriptor->id()); // really long long unsigned int?
+			strprintf(idBuffer, "%" PR64BitUT "", descriptor->id());
 			*val = phui::js::NewString(idBuffer);
+		}
 		break;
 		case RESULT_PROP:
 			*val = INT_TO_JSVAL(lastResult);

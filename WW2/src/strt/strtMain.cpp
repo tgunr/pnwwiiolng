@@ -166,7 +166,7 @@ strtMain(UINT32 currentTime)
 		_buildPocketMap();
 		teulSyncClock();
 		end = teulClock64;
-		LogAbort("build pocket map too %llums", end - start);
+		LogAbort("build pocket map too %" PR64BitUT "ms", end - start);
 #endif
 
 		return false;

@@ -81,7 +81,7 @@ public:	TestPackers() : TestUnit("TestPackers") {}
 
 			for ( SINT32 i = 0; i < 65; ++i )
 			{
-				TestFocus("Value %llums, Clock %llums, Offset %d", testValue, teulClock64, i);
+				TestFocus("Value %" PR64BitUT "ms, Clock %" PR64BitUT "ms, Offset %d", testValue, teulClock64, i);
 
 				Teul::Packer<Teul::NetTimeMS> pack, unpack;
 				memset(&pack.m_value, 0x7A, sizeof(pack.m_value));

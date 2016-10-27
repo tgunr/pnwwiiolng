@@ -279,7 +279,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 		teulSyncClock();
 
 		if ( teulClock64 - entryTime > 500 || teulClock64 - startTime > 200 )
-			dbugLog(_FLW, "`auth`.`p_get_player_details` appears to be taking too long: apparent:%llums, actual:%llums"
+			dbugLog(_FLW, "`auth`.`p_get_player_details` appears to be taking too long: apparent:%" PR64BitUT "ms, actual:%" PR64BitUT "ms"
 							, teulClock64 - entryTime
 							, teulClock64 - startTime);
 #endif
@@ -322,7 +322,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 #ifdef TIME_QUERIES
 		teulSyncClock();
 #endif
-		dbugLog(_FLN, "t:%d p:%u c:%s cust:%u found login info perms:%llx player:%llx mb:%u %s took %llums"
+		dbugLog(_FLN, "t:%d p:%u c:%s cust:%u found login info perms:%llx player:%llx mb:%u %s took %" PR64BitUT "ms"
 						, teulIndex(), playerID(), callsign(), m_customerID
 						, permissionMask(), m_playerMask
 						, minuteBalance(), (meteredAccess() ? "metered" : "unmetered")
@@ -566,7 +566,7 @@ bool mapFillPersonaData(Player* const player)
 
 #ifdef TIME_QUERIES
 		if ( teulClock64 - entryTime > 500 || teulClock64 - startTime > 200 )
-			dbugLog(_FLW, "QRY_SELECT_PERSONA_REFRESH taking too long: apparent %llums, actual %llums"
+			dbugLog(_FLW, "QRY_SELECT_PERSONA_REFRESH taking too long: apparent %" PR64BitUT "ms, actual %" PR64BitUT "ms"
 							, teulClock64 - entryTime
 							, teulClock64 - startTime
 							);
@@ -600,7 +600,7 @@ bool mapFillPersonaData(Player* const player)
 		teulSyncClock();
 #endif
 
-		threadLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%llx tr:%u took %llums"
+		threadLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%llx tr:%u took %" PR64BitUT "ms"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, player->personaID(), newRank, player->realRank(), player->points(), player->useRank().permissions()
 						, player->minuteBalance()

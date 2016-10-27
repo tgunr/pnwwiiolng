@@ -513,7 +513,7 @@ bool ScenarioManager::Start(const char* path, bool init)
 			const Instance::Descriptor& instance = PlayerClient()->GetInstance();
 
 			// convert our instance id into a string
-			snprintf(buffer, 25, "%llu", instance.id());
+			strprintf(buffer, "%" PR64BitUT "", instance.id());
 
 			// tell our script what our instance id is
 			// this is needed for proper network comms

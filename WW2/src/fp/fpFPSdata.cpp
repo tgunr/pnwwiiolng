@@ -1243,7 +1243,7 @@ void fpFPSDataReadFPSFile()
 		break;
 
 		default:
-			Write_Debug("Unknown hash: '%s' : %llu", buf, hash);
+			Write_Debug("Unknown hash: '%s' : %" PR64BitUT "", buf, hash);
 		}
 	}
 
