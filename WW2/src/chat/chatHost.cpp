@@ -2271,7 +2271,7 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 	char report[256];
 
 	strprintf(hostname, "%shost:%s", g_serverTypes[source], player.callsign());
-	strprintf(report, "Client clock anomaly: delta of %lldms (%s), drift %.6g", sample.delta, sample.delta < 0 ? "fast" : "slow", sample.ratio);
+	strprintf(report, "Client clock anomaly: delta of %" PR64BitT "ms (%s), drift %.6g", sample.delta, sample.delta < 0 ? "fast" : "slow", sample.ratio);
 	chatDispatchGMMessage(hostname, report);
 	reports[player.playerID()] = std::make_pair(teulTime(), sample.delta);
 

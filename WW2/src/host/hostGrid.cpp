@@ -48,12 +48,12 @@ _dumpVisListEntry(const Viewing& entry)
 	const char* lastSent;
 	if ( entry.m_lastSent > 0 )
 	{
-		sprintf(buffer, "%" PR64BitUT "", teulClock64 - entry.m_lastSent);
+		strprintf(buffer, "%" PR64BitUT "", teulClock64 - entry.m_lastSent);
 		lastSent = buffer;
 	}
 	else
 		lastSent = "never";
-	dbugLog(_FLI, "%s:%s:%lld,", entry.m_vehicle.callsign(), lastSent, entry.m_priority);
+	dbugLog(_FLI, "%s:%s:%" PR64BitT ",", entry.m_vehicle.callsign(), lastSent, entry.m_priority);
 }
 #else
 #define VIS_DEBUG(...)
