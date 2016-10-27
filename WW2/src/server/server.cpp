@@ -515,7 +515,7 @@ _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server:
 
 	default:
 		// we better not ever get here, if so abort so I can see how
-		LogAbort("should never get here releaseType == %u", releaseType);
+		LogAbort("should never get here releaseType == %u", static_cast<UINT32>(releaseType));
 		break;
 
 	}
@@ -703,7 +703,7 @@ _playerProc(Server::PersonaXfer* const persXfer, PlayerStatusNode* const psn, bo
 				break;
 			}
 		default:
-			LogAbort("shouldnt create player %d for persXfer->reason %u!!", psn->id, persXfer->reason());
+			LogAbort("shouldnt create player %d for persXfer->reason %u!!", psn->id, static_cast<UINT32>(persXfer->reason()));
 			break;
 	}
 
