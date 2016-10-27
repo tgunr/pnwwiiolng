@@ -373,7 +373,7 @@ _repairFirebase(FacilityStruct* fb)
 		if ( repairJoules <= 0 )
 			repairJoules = 1;
 
-		betaLog(_FLD, "Repairing %s for %lldj", obj->name, repairJoules);
+		betaLog(_FLD, "Repairing %s for %" PR64BitT "j", obj->name, repairJoules);
 
 		obj->applyDamage(-repairJoules, 0);
 
@@ -458,7 +458,7 @@ _repairBridge(ObjectStruct& object)
 	chatSendBroadcast(Chat::_EVERYONE, Instance::_CAMPAIGN, 0, LSTR_BETA, LSTR_AUTO_REPAIR, object.facility->name);
 #endif
 
-	dbugLog(_FLD, "Bridge %s being repaired, %d, %lld/%lld",
+	dbugLog(_FLD, "Bridge %s being repaired, %d, %" PR64BitT "/%" PR64BitT "",
 			object.facility->name,
 			object.visLevel(),
 			object.m_damageJoules,
@@ -466,7 +466,7 @@ _repairBridge(ObjectStruct& object)
 
 	_repairObject(&lastPercentDamage, object);
 
-	dbugLog(_FLD, "Bridge %s repaired, %d, %lld/%lld",
+	dbugLog(_FLD, "Bridge %s repaired, %d, %" PR64BitT "/%" PR64BitT "",
 			object.facility->name,
 			object.visLevel(),
 			object.m_damageJoules,
@@ -700,7 +700,7 @@ _distributeRPs(CPStruct& cp, SINT32 rpsProduced, WWII_SIDE side)
 		//This is where we do all the requests from the other depots
 		//	we are connected to
 
-		//fprintf(stderr,"Convoy? #%lld stored: %d request: %d\n\n",currentFacility->id
+		//fprintf(stderr,"Convoy? #%" PR64BitT " stored: %d request: %d\n\n",currentFacility->id
 				//, currentFacility->incomingRPs + currentFacility->storedRPs
 				//, currentFacility->requestThreshold);
 
@@ -833,7 +833,7 @@ _objectReadyToRepair(ObjectStruct& object)
 	if ( _isAutoRebuildObject(object) )
 	{
 #ifdef DEBUG
-		dbugLog(_FLD, "blessing %s with %d rps to repair %lld/%lldj dmg, totalRPs is %u"
+		dbugLog(_FLD, "blessing %s with %d rps to repair %" PR64BitT "/%" PR64BitT "j dmg, totalRPs is %u"
 					, object.name
 					, rpsNeededToRepair
 					, object.m_damageJoules
@@ -1005,14 +1005,14 @@ ObjectStruct::applyDamage(const SINT64& joules, UINT32 originatingSortieID)
 {
 	if ( setDamageJoules(m_damageJoules + joules) == false )
 	{
-		dbugLog(_FLI, "%lld joules of damage* not applied* to %s (%s/" PRF_FULL_OBJ_ID ")"
+		dbugLog(_FLI, "%" PR64BitT " joules of damage* not applied* to %s (%s/" PRF_FULL_OBJ_ID ")"
 					, joules, name, filename
 					, PRA_FULL_OBJ_ID(fullObjID)
 					);
 		return;
 	}
 
-	dbugLog(_FLI,"applying %lld joules of damage to object %s(%s/%d:%d:%d) capacity %d (prev %d) of %d, facilityCapacity %d parent %s"
+	dbugLog(_FLI,"applying %" PR64BitT " joules of damage to object %s(%s/%d:%d:%d) capacity %d (prev %d) of %d, facilityCapacity %d parent %s"
 				, joules
 				, name
 				, filename
@@ -1141,9 +1141,9 @@ _tellCrew(const POSTED_WEAPON* posting
 {
 	char numJoules[32];
 	if ( joules < 0 )
-		snprintf(numJoules, 31, "%lld", -joules);
+		snprintf(numJoules, 31, "%" PR64BitT "", -joules);
 	else
-		snprintf(numJoules, 31, "%lld", joules);
+		snprintf(numJoules, 31, "%" PR64BitT "", joules);
 
 	WeapJoinRequestList::const_iterator it;
 	for ( it = posting->m_crewList.begin(); it != posting->m_crewList.end(); ++it )
@@ -1327,8 +1327,8 @@ _recordJoulesApplied(const ObjectStruct& object
 			" VALUES"
 				"(%u, %u"
 				", %d, %d, %u, %u"
-				", %u, %llu"
-				", %lld, %lld, %d"
+				", %u, %" PR64BitUT ""
+				", %" PR64BitT ", %" PR64BitT ", %d"
 				")"
 			, weapon.serial
 			, object.facility->uOID
@@ -1344,7 +1344,7 @@ _recordJoulesApplied(const ObjectStruct& object
 		Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_DAMAGE_EVENT_Y));
 		auto& mde = outgoing.construct<MissionDamageEvent>(playerID, weapon.serial, object.fullObjID.Key(), _getDamageTargetType(object, effectLevel), effectLevel, appliedJoules);
 
-		dbugLog(_FLI, "mapt:%d sending p:%u v:%u tt:%d ef:%d j:%lld mission damage event"
+		dbugLog(_FLI, "mapt:%d sending p:%u v:%u tt:%d ef:%d j:%" PR64BitT " mission damage event"
 						, mapEndpoint->teulIndex(), playerID, weapon.serial
 						, mde.m_targetType
 						, mde.m_effectType
@@ -1378,7 +1378,7 @@ _checkDamage(WWII_SIDE vehSide, ObjectStruct* object, const WEAPON_SERIAL& weapo
 
 	if ( object->facility->type == FACILITY_FIREBASE && weapon.spec.wCategory != _INFANTRY )
 	{
-		betaLog(_FLI, "ignoring %llu non-infantry damage joules to half-damaged firebase", damageJoules);
+		betaLog(_FLI, "ignoring %" PR64BitUT " non-infantry damage joules to half-damaged firebase", damageJoules);
 		return 0LL;
 	}
 
@@ -1415,7 +1415,7 @@ strtDamage(const FULL_OBJ_ID fullObjID, SINT64 damageJoules, const WEAPON_SERIAL
 	}
 	if ( !object->facility )
 	{
-		dbugLog(_FLN, "received %lldj joules to non-linked building %d:%d:%u", damageJoules, fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
+		dbugLog(_FLN, "received %" PR64BitT "j joules to non-linked building %d:%d:%u", damageJoules, fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
 		return;
 	}
 
@@ -1450,7 +1450,7 @@ strtDamage(const FULL_OBJ_ID fullObjID, SINT64 damageJoules, const WEAPON_SERIAL
 			recordable = false;
 	}
 
-	betaLog(_FLI, "%u doing %lldj+%lldj/%lldj of damage to %s"
+	betaLog(_FLI, "%u doing %" PR64BitT "j+%" PR64BitT "j/%" PR64BitT "j of damage to %s"
 					, weapon.serial
 					, object->m_damageJoules
 					, damageJoules

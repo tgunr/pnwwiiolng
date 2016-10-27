@@ -322,7 +322,7 @@ HostVehicle::attachControllingPlayer(const Player& player)
 {
 	assert( isRemote() == false );
 
-	dbugLog(_FLI, "t:%d p:%u c:%s attaching controller to v:%u spec:%u.%u.%u.%u sq:%u in:%u.%u.%llu.%llu"
+	dbugLog(_FLI, "t:%d p:%u c:%s attaching controller to v:%u spec:%u.%u.%u.%u sq:%u in:%u.%u.%" PR64BitUT ".%" PR64BitUT ""
 					, player.teulIndex(), player.playerID(), player.callsign(), index
 					, spec().wCountry, spec().wCategory, spec().wClass, spec().wType
 					, player.squadID()
@@ -592,7 +592,7 @@ HostVehicle::interruptCapture()
 void
 HostVehicle::setInstance(const Instance::Descriptor& _instance)
 {
-    dbugLog(_FLD, "v:%u setting instance %u.%u.%llu.%llu"
+    dbugLog(_FLD, "v:%u setting instance %u.%u.%" PR64BitUT ".%" PR64BitUT ""
                 , index
                 , _instance.category(), _instance.type(), _instance.handle(), _instance.id());
 	m_instance = _instance;

@@ -219,7 +219,7 @@ HostInstance::getSquadMemberCount(UINT32 squadID) const
 void
 _adjustmentTrack(wwiiPlayer* const player, const char* const action, const HostInstance* const inst)
 {
-	player->log(_FLD, "%s to in:%u.%u.%llu.%llu side:%u"
+	player->log(_FLD, "%s to in:%u.%u.%" PR64BitUT ".%" PR64BitUT " side:%u"
 						" mps:%u counts:%u/%u/%u/%u"
 					, action
 					, inst->descriptor().category(), inst->descriptor().type(), inst->descriptor().handle(), inst->descriptor().id()

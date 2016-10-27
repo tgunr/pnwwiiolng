@@ -148,7 +148,7 @@ WAYPOINT_CONTROL::receive(SINT32 teulIndex, WAYPOINT_CONTROL& incoming)
 
 	if ( !player->isMissionLeader() )
 	{
-		betaLog(_FLA, "t:%d p:%u c:%s non-leader requesting waypoint %llu[%s] %u"
+		betaLog(_FLA, "t:%d p:%u c:%s non-leader requesting waypoint %" PR64BitUT "[%s] %u"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, incoming.key(), Chat::Name(incoming.key()).c_str(), incoming.flags());
 		return -EACCES;

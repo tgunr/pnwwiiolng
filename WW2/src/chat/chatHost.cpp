@@ -2277,7 +2277,7 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 
 	player.log(_FLW, "%s, host:%" PR64BitUT ", client:%" PR64BitUT "", report, sample.host_ms, sample.client_ms);
 
-	strprintf(report , "{\"src\":\"%s\",\"elapsed\":{\"host\":%llu,\"client\":%llu},\"delta\":%llu,\"ratio\",\"%0.8g\"}",
+	strprintf(report , "{\"src\":\"%s\",\"elapsed\":{\"host\":%" PR64BitUT ",\"client\":%" PR64BitUT "},\"delta\":%" PR64BitUT ",\"ratio\",\"%0.8g\"}",
 	          g_serverTypes[source],
 	          sample.host_ms, sample.client_ms,
 	          sample.delta, sample.ratio);

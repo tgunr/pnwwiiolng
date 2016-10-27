@@ -1846,7 +1846,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		_addStr(response, "in:none");
 	else
 	{
-		strprintf(buf, "in:%llu", player.instance().id());
+		strprintf(buf, "in:%" PR64BitUT "", player.instance().id());
 		_addStr(response, buf);
 	}
 

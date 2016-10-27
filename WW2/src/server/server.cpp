@@ -276,7 +276,7 @@ _sendHeartBeat()
 	Server::myServerInfo.availPlayers = Server::myServerInfo.stats.availPlayers();
 
 #ifdef HEAVY_DEBUG
-	dbugLog(_FLD, "t:%d sending heartbeat at %llu", Server::broadcastIndex, teulClock64);
+	dbugLog(_FLD, "t:%d sending heartbeat at %" PR64BitUT "", Server::broadcastIndex, teulClock64);
 #endif
 
 	teulSend(Server::broadcastIndex, SERVER_HEARTBEAT_CB, &(Server::myServerInfo.stats));

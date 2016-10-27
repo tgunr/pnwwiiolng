@@ -1374,7 +1374,7 @@ strtBuildSupplyChains(bool force)
 
 	teulSyncClock();
 	const TeulTimeMS applyEnded = teulClock64;
-	dbugLog(_FLI, "sup: supply routeing took %llums [%llu run, %llu apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded);
+	dbugLog(_FLI, "sup: supply routeing took %" PR64BitUT "ms [%" PR64BitUT " run, %" PR64BitUT " apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded);
 
 	return true;
 }

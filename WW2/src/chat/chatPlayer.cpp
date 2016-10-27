@@ -2351,7 +2351,7 @@ _populateAWSReply(Player& player, const AWS::Request& request, const AWS_GRID& g
 
 	bool isAllied = (player.side() == ALLIED);
 
-	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu requesting %s AWS [%hu,%hu]-[%hu,%hu](%u)"
+	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " requesting %s AWS [%hu,%hu]-[%hu,%hu](%u)"
 					, player.teulIndex(), player.playerID(), player.callsign()
 					, player.instance().category(), player.instance().type(), player.instance().handle(), player.instance().id()
 					, (isAllied ? "axis" : "allied")

@@ -45,7 +45,7 @@ SerialNumber::getNext()
     if ( isFirst || (m_counter % m_interval) == 0 )
     {
         DBThread::Do(DBThread::Default
-						, "REPLACE INTO wwii_serial_numbers (resource, last_serial) VALUES ('%s', %llu)"
+						, "REPLACE INTO wwii_serial_numbers (resource, last_serial) VALUES ('%s', %" PR64BitUT ")"
                             , m_name, m_counter
 							);
     }

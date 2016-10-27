@@ -48,7 +48,7 @@ _dumpVisListEntry(const Viewing& entry)
 	const char* lastSent;
 	if ( entry.m_lastSent > 0 )
 	{
-		sprintf(buffer, "%llu", teulClock64 - entry.m_lastSent);
+		sprintf(buffer, "%" PR64BitUT "", teulClock64 - entry.m_lastSent);
 		lastSent = buffer;
 	}
 	else
@@ -170,7 +170,7 @@ _isVehicleVisible(const HostVehicle& vehicle, const UINT64& dist_cm2, const bool
 		maxViewingDistance_cm2 >>= 2;
 	}
 
-	EXTREME(_FLD, ":dist=%llu,maxV=%llu,inrange=%s", (UINT64)dist_cm2, (UINT64)maxViewingDistance_cm2, dist_cm2 <= maxViewingDistance_cm2 ? "yes" : "no");
+	EXTREME(_FLD, ":dist=%" PR64BitUT ",maxV=%" PR64BitUT ",inrange=%s", (UINT64)dist_cm2, (UINT64)maxViewingDistance_cm2, dist_cm2 <= maxViewingDistance_cm2 ? "yes" : "no");
 
 	if ( dist_cm2 <= maxViewingDistance_cm2 )
 		return true;

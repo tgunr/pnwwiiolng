@@ -739,7 +739,7 @@ _handleReceive(ENDPOINT& endpoint)
 	teulSyncClock();
 	const TeulTimeMS endRX = teulClock64;
 	if ( endRX - startRX > 1 )
-		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". rcvDatagram interval=%llums", endpoint.teulIndex(), PRA_SOCKET(sock), endRX - startRX);
+		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". rcvDatagram interval=%" PR64BitUT "ms", endpoint.teulIndex(), PRA_SOCKET(sock), endRX - startRX);
 #endif
 
 	if ( PN_UNLIKELY(theErr < 0) )
@@ -772,7 +772,7 @@ _handleReceive(ENDPOINT& endpoint)
 	teulSyncClock();
 	const TeulTimeMS endCB = teulClock64;
 	if ( endCB - startCB > 10 )
-		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". routeCallbacks callbacks interval=%llums", endpoint.teulIndex(), PRA_SOCKET(sock), endCB - startCB);
+		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". routeCallbacks callbacks interval=%" PR64BitUT "ms", endpoint.teulIndex(), PRA_SOCKET(sock), endCB - startCB);
 #endif
 
 	return false;
@@ -896,7 +896,7 @@ _checkEndpointState(ENDPOINT& endpoint)
 		{
 			const TeulDeltaMS timeSinceLastKlive = endpoint.lastKliveSent.elapsed();
 #if defined(DEBUG_CONNECTIONS)
-			dbugLog(_FLD, "t:%d dtc:true tslk:%llu kli:%llu", endpoint.teulIndex(), timeSinceLastKlive, (UINT64)endpoint.m_impl->kliveInterval);
+			dbugLog(_FLD, "t:%d dtc:true tslk:%" PR64BitUT " kli:%" PR64BitUT "", endpoint.teulIndex(), timeSinceLastKlive, (UINT64)endpoint.m_impl->kliveInterval);
 #endif
 			if ( timeSinceLastKlive >= (TeulDeltaMS)(UINT64)endpoint.m_impl->kliveInterval )
 			{
@@ -1142,7 +1142,7 @@ _pollSocketsInner(TeulTimeMS remainder)
 					}
 					else
 					{
-						dbugLog(_FLI, "t:%d recv error:%d, closing. time:%llu", endpoint.teulIndex(), errNo, teulClock64);
+						dbugLog(_FLI, "t:%d recv error:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), errNo, teulClock64);
 						teulClose(endpoint, Teul::Closing::RcvDgramError);
 					}
 					continue;
@@ -1167,7 +1167,7 @@ _pollSocketsInner(TeulTimeMS remainder)
 		}
 		else if( eventData.lNetworkEvents & FD_CLOSE )
 		{
-			dbugLog(_FLI, "t:%d close code:%d, closing. time:%llu", endpoint.teulIndex(), eventData.iErrorCode[FD_CLOSE_BIT], teulClock64);
+			dbugLog(_FLI, "t:%d close code:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), eventData.iErrorCode[FD_CLOSE_BIT], teulClock64);
 			teulClose(endpoint, Teul::Closing::FDClose);
 			continue;
 		}
@@ -1398,7 +1398,7 @@ _pollSocketsInner(TeulTimeMS duration_)
 	const TeulTimeMS interval = teulClock64 - startTime;
 	if ( PN_UNLIKELY(interval > 20) )
 	{
-		dbugLog(_FLW, "STALL fds:%u size:%" PRSizeT ". poll interval=%llums", numfds, pollData.m_size, interval);
+		dbugLog(_FLW, "STALL fds:%u size:%" PRSizeT ". poll interval=%" PR64BitUT "ms", numfds, pollData.m_size, interval);
 	}
 #endif
 }
@@ -1638,7 +1638,7 @@ _executeCallbacks(ENDPOINT& endpoint, DATA_GRAM* const dgram)
 	const TeulTimeMS endCB = teulClock64;
 	if ( endCB - startCB > 5 )
 	{
-		dbugLog(_FLA, "STALL t:%d. cb:%u,%u interval=%llums", endpoint.teulIndex(), hdr->m_callX, hdr->m_callY, endCB - startCB);
+		dbugLog(_FLA, "STALL t:%d. cb:%u,%u interval=%" PR64BitUT "ms", endpoint.teulIndex(), hdr->m_callX, hdr->m_callY, endCB - startCB);
 		TIMER_REPORT(1)
 	}
 #endif

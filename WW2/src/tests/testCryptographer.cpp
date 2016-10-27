@@ -63,7 +63,7 @@ public: virtual bool TestVersion(const UINT32 version, const UINT16 bufSize, con
 
 			END_SUB_STAGE( versionStr )
 
-			strprintf(versionStr, "Decrypt: %04x: %" PRSizeT " bytes w/%llu", version, bufSize, startSeed);
+			strprintf(versionStr, "Decrypt: %04x: %" PRSizeT " bytes w/%" PR64BitUT "", version, bufSize, startSeed);
 
 			BEGIN_SUB_STAGE( versionStr )
 

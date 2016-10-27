@@ -143,7 +143,7 @@ private:
 };
 
 #if defined(CLOSED_BETA)
-# define GRID_INFO(mask, ...) dbugLog(_FLD, "g:%llu:%d,%d " mask, gridKey().instanceID(), gridKey().X(), gridKey().Y(), __VA_ARGS__)
+# define GRID_INFO(mask, ...) dbugLog(_FLD, "g:%" PR64BitUT ":%d,%d " mask, gridKey().instanceID(), gridKey().X(), gridKey().Y(), __VA_ARGS__)
 # define GRID_INFOADD(mask, ...) dbugLog(_FLD, "+ " mask, __VA_ARGS__)
 #else
 # define GRID_INFO(mask, ...)
@@ -733,7 +733,7 @@ chatPatrolGridExpirations()
 		for ( it = _gridIndex.begin(); it != _gridIndex.end(); ++it )
 		{
 			ChatGrid* node = it->second;
-            dbugLog(_FLD, "[g:%llu:%d,%d %p players:%u, stos:%u] "
+            dbugLog(_FLD, "[g:%" PR64BitUT ":%d,%d %p players:%u, stos:%u] "
                             , node->gridKey().instanceID(), node->gridKey().X(), node->gridKey().Y(), node
                             , node->players().size(), node->stos().size());
 		}
@@ -840,7 +840,7 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 	GridKey botleft(player->instance().id(), (SINT32)(player->lastX() - range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() - range) >> ChatGrid::_KEY_SHIFT);
 	GridKey topright(player->instance().id(), (SINT32)(player->lastX() + range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() + range) >> ChatGrid::_KEY_SHIFT);
 
-	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu getting cells within [%d,%d],[%d,%d] %lld range: "
+	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " getting cells within [%d,%d],[%d,%d] %" PR64BitT " range: "
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, player->instance().category(), player->instance().type(), player->instance().handle(), player->instance().id()
 					, botleft.X(), botleft.Y(), topright.X(), topright.Y()

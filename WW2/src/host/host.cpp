@@ -320,7 +320,7 @@ Host::VehicleRequest::execute()
 {
 	const WEAPON_SERIAL& ws = m_weaponSerial;
 
-	dbugLog(_FLD, "in:%llu v:%u c:%s executing host vehicle request", m_instanceID, m_weaponSerial.serial, Chat::Name(m_handle).c_str());
+	dbugLog(_FLD, "in:%" PR64BitUT " v:%u c:%s executing host vehicle request", m_instanceID, m_weaponSerial.serial, Chat::Name(m_handle).c_str());
 
 	// OGS: There's some upper limit on the size of
 	// weapon serials, probably for packer reasons.
@@ -1227,7 +1227,7 @@ _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const 
 	auto* const sample = (const Teul::TickSample*)(data);
 	if ( player_ == nullptr )
 	{
-		dbugLog(_FLW, "t:%d clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+		dbugLog(_FLW, "t:%d clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 		return;
 	}
 
@@ -1245,7 +1245,7 @@ _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const 
 	ah.m_lastSpeedhackDelta = sample->delta;
 	ah.m_lastSpeedhackBlip = teulTime();
 
-	dbugLog(_FLW, "t:%d p:%u c:%s v:%u blip:%u clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", player.teulIndex(), player.playerID(), player.callsign(), player.sortieID(), ah.m_numBlips, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+	dbugLog(_FLW, "t:%d p:%u c:%s v:%u blip:%u clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", player.teulIndex(), player.playerID(), player.callsign(), player.sortieID(), ah.m_numBlips, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 
 	chatSendTickSample(CELL_HOST, player.playerID(), data);
 }
@@ -1733,7 +1733,7 @@ _writeEventCounters()
 		bool started = false;
 		for ( auto it = g_eventCounter.begin(), end = g_eventCounter.end(); it != end; ++it )
 		{
-			p += sprintf(p, "%c(%u,'%s',%llu)", (started) ? ',':' ', host, it->first.c_str(), it->second);
+			p += sprintf(p, "%c(%u,'%s',%" PR64BitUT ")", (started) ? ',':' ', host, it->first.c_str(), it->second);
 			started = true;
 		}
 
@@ -1822,7 +1822,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 
 			if ( (!reportedLagging) & (vehicle->m_nextUpdateClock < lowend) )
 			{
-				threadLog(_FLA, "c:%s v:%u*** LAGGING BEHIND UPDATES: wanted update %llums ago"
+				threadLog(_FLA, "c:%s v:%u*** LAGGING BEHIND UPDATES: wanted update %" PR64BitUT "ms ago"
 								, vehicle->callsign(), vehicle->index, teulClock64 - vehicle->m_nextUpdateClock);
 				reportedLagging = true;
 			}
@@ -2400,7 +2400,7 @@ _runHost()
 			if ( teulClock64 > updateCycleTimeout )
 			{
 				// We overran, we should try sending less updates
-				dbugLog(_FLW, "taking too long to send vehicle updates (%" PRSizeT "): %llums elapsed"
+				dbugLog(_FLW, "taking too long to send vehicle updates (%" PRSizeT "): %" PR64BitUT "ms elapsed"
 								, nextVehicles.size(), teulClock64 - started);
 				if ( maxUpdates > _MIN_UPDATES )
 				{

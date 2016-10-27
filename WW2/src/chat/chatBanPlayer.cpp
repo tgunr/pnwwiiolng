@@ -165,7 +165,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 		threadCallback(_banSuccess, &ban);
 
-		threadLog(_FLN, "p:%u subj:%s %llu vs %llu issued %us ban", ban.m_issuer, name.c_str(), ban.m_issuerHandle, ban.m_handle, ban.m_duration);
+		threadLog(_FLN, "p:%u subj:%s %" PR64BitUT " vs %" PR64BitUT " issued %us ban", ban.m_issuer, name.c_str(), ban.m_issuerHandle, ban.m_handle, ban.m_duration);
 	}
 	catch (std::exception& e)
 	{

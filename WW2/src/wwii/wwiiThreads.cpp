@@ -395,7 +395,7 @@ StatsThread::run()
 				cbLastUsed += cbUsed;
 			}
 
-			threadLog(_FLD, "THREADS: dbq(ttl:%llu,used:%llu,max:%llu,cur:%llu), cbq(ttl:%llu,used:%llu,max:%llu,cur:%llu)"
+			threadLog(_FLD, "THREADS: dbq(ttl:%" PR64BitUT ",used:%" PR64BitUT ",max:%" PR64BitUT ",cur:%" PR64BitUT "), cbq(ttl:%" PR64BitUT ",used:%" PR64BitUT ",max:%" PR64BitUT ",cur:%" PR64BitUT ")"
 							, dbLastUsed, dbUsed, dbMaxSize, dbCurSize
 							, cbLastUsed, cbUsed, cbMaxSize, cbCurSize);
 

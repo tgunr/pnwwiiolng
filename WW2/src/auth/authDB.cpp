@@ -801,7 +801,7 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 						", %u, %u, %u, %u"
 						", %u, %u, %u, %u, %u"
 						", %u, %u, %u, %u, %u"
-						", %llu"				// Speed
+						", %" PR64BitUT ""				// Speed
 						" )"
 					, cardName
 					, vendor

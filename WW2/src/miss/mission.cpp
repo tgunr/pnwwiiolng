@@ -284,7 +284,7 @@ Player::ableToPostIn(const Brigade& toBrigade) const
 Mission::Mission(const instanceid_t forInstanceID, const MISSION_SUMMARY& withSummary)
 	: m_takers(), m_spawner()
 {
-	dbugLog(_FLD, "ALLOC: +mission at %p in:%llu", this, forInstanceID);
+	dbugLog(_FLD, "ALLOC: +mission at %p in:%" PR64BitUT "", this, forInstanceID);
 	memset((MISSION_C_STRUCTURE*)this, 0, sizeof(MISSION_C_STRUCTURE));
 	m_instanceID = forInstanceID;
 	m_summary = withSummary;
@@ -1063,7 +1063,7 @@ _createMission(instanceid_t instanceID
 
 	try
 	{
-		dbugLog(_FLI, "create in:%llu mission type is %d[%s] side is %d[%s] country is %d[%s] by %s playerID %d"
+		dbugLog(_FLI, "create in:%" PR64BitUT " mission type is %d[%s] side is %d[%s] country is %d[%s] by %s playerID %d"
 					, instanceID
 					, summary.missionType, _missionTypes[(int)summary.missionType]
 					, side, _sideName[side]
@@ -1777,7 +1777,7 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 
 		HCUnit* unit = it->second;
 
-		dbugLog(_FLI, "in:%llu posting mission for %s at %s/%s brig#%u %s", instanceID, _countryName[forCountry], cp->name, ab->name, unit->unitID(), unit->name());
+		dbugLog(_FLI, "in:%" PR64BitUT " posting mission for %s at %s/%s brig#%u %s", instanceID, _countryName[forCountry], cp->name, ab->name, unit->unitID(), unit->name());
 
 		NewMission post;
 
@@ -1804,7 +1804,7 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 			index.push_back(mission);
 			if ( mission->instanceID() != 0 )
 			{
-				dbugLog(_FLD, "in:%llu now has %" PRSizeT " missions", mission->instanceID(), index.size());
+				dbugLog(_FLD, "in:%" PR64BitUT " now has %" PRSizeT " missions", mission->instanceID(), index.size());
 			}
 		}
 
@@ -1839,13 +1839,13 @@ missDeleteInstanceMissions(instanceid_t instanceID)
 	InstanceMissionIndex::iterator it = g_instanceMissionIndex.find(instanceID);
 	if ( it == g_instanceMissionIndex.end() )
 	{
-		betaLog(_FLD, "in:%llu has no missions to expire", instanceID);
+		betaLog(_FLD, "in:%" PR64BitUT " has no missions to expire", instanceID);
 		return;
 	}
 
 	InstanceMissions& index = it->second;
 
-	betaLog(_FLD, "in:%llu deleting instance mission list (%" PRSizeT " missions)", instanceID, index.size());
+	betaLog(_FLD, "in:%" PR64BitUT " deleting instance mission list (%" PRSizeT " missions)", instanceID, index.size());
 
 	const UINT32 numMissions = index.size();
 	for ( UINT32 i = 0; i < numMissions; ++i )
@@ -1856,10 +1856,10 @@ missDeleteInstanceMissions(instanceid_t instanceID)
 		Mission* mission = index.front();
 		if ( mission == nullptr )
 		{
-			LogAbort("in:%llu contains NULL in mission index at position %u", instanceID, i);
+			LogAbort("in:%" PR64BitUT " contains NULL in mission index at position %u", instanceID, i);
 		}
 
-		betaLog(_FLD, "in:%llu m[%u]:%u", instanceID, i, mission->missionID());
+		betaLog(_FLD, "in:%" PR64BitUT " m[%u]:%u", instanceID, i, mission->missionID());
 
 		mission->deactivate();
 		mission->cancel();

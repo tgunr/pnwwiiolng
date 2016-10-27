@@ -141,7 +141,7 @@ struct ClientRole : public Role
 			return;
 
 		const TeulTimeMS delay = (2 * Config::ConnectTimeoutMS) + 500ULL;
-		Dprintf("Keepalive check: %llu delay.\n", delay);
+		Dprintf("Keepalive check: %" PR64BitUT " delay.\n", delay);
 		teulUpdateTransport(delay);
 	}
 
@@ -187,11 +187,11 @@ struct ClientRole : public Role
 
 		if ( (EchoPacketHeader::s_requested % 1000) == 0 )
 		{
-			Iprintf("Echo request #%llu type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
+			Iprintf("Echo request #%" PR64BitUT " type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
 		}
 		else
 		{
-			Dprintf("Echo request #%llu type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
+			Dprintf("Echo request #%" PR64BitUT " type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
 		}
 		teulSend(teulIndex, s_cbEcho, &outgoing);
 	}
@@ -250,7 +250,7 @@ struct ClientRole : public Role
 
 		catchupEchoPackets();
 
-		Iprintf("%llu echo packets sent and acked\n", EchoPacketHeader::s_requested);
+		Iprintf("%" PR64BitUT " echo packets sent and acked\n", EchoPacketHeader::s_requested);
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -371,7 +371,7 @@ struct ClientRole : public Role
 
 		const TeulTimeMS totalElapsedMS = endTimeMS - startTimeMS;
 		const TeulTimeMS avgBatchMS = totalOpenTimesMS / (ConnectionsToTest / ConnectionsAtATime);
-		Iprintf("Done [total: %llums, avg batch time: %llums]!\n", totalElapsedMS, avgBatchMS);
+		Iprintf("Done [total: %" PR64BitUT "ms, avg batch time: %" PR64BitUT "ms]!\n", totalElapsedMS, avgBatchMS);
 	}
 
 	private:
@@ -853,7 +853,7 @@ struct ClientRole : public Role
 			throw Teul::Error("Connection timed out", (SINT32)delta);
 		}
 
-		Dprintf("t:%d Getting connected took %llums.\n", teulIndex, delta);
+		Dprintf("t:%d Getting connected took %" PR64BitUT "ms.\n", teulIndex, delta);
 	}
 
 	// Track whether we are currently connected to our primary connection or not.
