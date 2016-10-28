@@ -128,6 +128,7 @@ struct Node
 			m_parent->m_lastChild = this;
 		}
 	}
+	virtual ~Node() {}
 
 	Node(Type type, const char* name, Node* parent)
 		: Node(type, std::string(name), parent)
@@ -192,6 +193,7 @@ struct Message : public Node
 		, m_numGroups(0)
 		, m_extraMembers(nullptr)
 	{}
+	virtual ~Message() {}
 
 	void AddExtraMember(const char* type, const char* name, const char* defaultValue);
 
@@ -218,6 +220,7 @@ struct Group : public Node
 	{
 		makeMemberName(m_memberName);
 	}
+	virtual ~Group() {}
 
 	static void makeMemberName(std::string& field)
 	{
@@ -246,6 +249,7 @@ struct Field : public Node
 		, m_dimensionString("")
 	{
 	}
+	virtual ~Field() {}
 
 	void Emit(size_t indentLevel) const override;
 	void EmitPack(size_t indentLevel) const override;
@@ -263,6 +267,7 @@ struct Conditional : public Node
 		, m_condition(condition)
 	{
 	}
+	virtual ~Conditional() {}
 
 	void Emit(size_t indentLevel) const override;
 	void EmitPack(size_t indentLevel) const override;
@@ -282,6 +287,7 @@ struct Array : public Node
 		, m_dimension(std::move(dimension))
 	{
 	}
+	virtual ~Array() {}
 
 	void Emit(size_t indentLevel) const override;
 	void EmitPack(size_t indentLevel) const override;
@@ -298,6 +304,7 @@ struct Enumeration : public Node
 		: Node(Node::Type::Enumeration, std::move(enumName), parent)
 		, m_count(0)
 	{}
+	virtual ~Enumeration() {}
 
 	void Emit(size_t indentLevel) const override;
 };
@@ -311,6 +318,7 @@ struct EnumValue : public Node
 		, m_value(value)
 	{
 	}
+	virtual ~EnumValue() {}
 
 	void Emit(size_t indentLevel) const override;
 };
