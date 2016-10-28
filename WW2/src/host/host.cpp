@@ -1169,7 +1169,7 @@ Player::changeFPSBuilding(const FULL_OBJ_ID newBuildingID, bool inCaptureBuildin
 		else
 		{
 			char fidBuffer[FULL_OBJ_ID::PrintLen];
-			message(LSTR_BETA, LSTR_ENTERED_UNKNOWN_BUILDING, weapPrintFullObjIDC(&newBuildingID, fidBuffer));
+			message(LSTR_BETA, LSTR_ENTERED_UNKNOWN_BUILDING, weapPrintFullObjIDC(newBuildingID, fidBuffer));
 		}
 	}
 	else

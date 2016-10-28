@@ -1252,7 +1252,7 @@ missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 co
 	{
 		player->log("Mission post denied: Invalid facility");
 		char fidBuffer[FULL_OBJ_ID::PrintLen];
-		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_INVALID_FAC, weapPrintFullObjIDC(&request.origin, fidBuffer));
+		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_INVALID_FAC, weapPrintFullObjIDC(request.origin, fidBuffer));
 		reply.reasonCode = MC_ERROR;
 	}
 	else if ( postingFacility->side != player->side() || activeCountries[postingFacility->country] == false )

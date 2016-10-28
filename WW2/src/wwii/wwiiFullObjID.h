@@ -101,20 +101,15 @@ extern const FULL_OBJ_ID nullObjID;
 //tolua_end
 #define PRF_FULL_OBJ_ID "%d.%d:%u"
 #define PRA_FULL_OBJ_ID(s) (s).cell.ox, (s).cell.oy, (s).id
-//tolua_begin
 
-static inline const char* weapPrintFullObjIDC(const FULL_OBJ_ID* id, char* buffer)
+template<size_t N>
+static inline const char* weapPrintFullObjIDC(const FULL_OBJ_ID& id, char (&buffer)[N])
 {
-	if ( id == nullptr )
-		return "<nullFOID>";
-
-	sprintf(buffer, "x:%d y:%d id:%hu c:%hd t:%hd"
-				, id->cell.ox
-				, id->cell.oy
-				, (unsigned short)id->id
-				, (short)id->objClass
-				, (short)id->objType);
-
+	strprintf(buffer, "x:%d y:%d id:%hu c:%hd t:%hu"
+				, id.cell.ox
+				, id.cell.oy
+				, static_cast<UINT16>(id.id)
+				, static_cast<SINT16>(id.objClass)
+				, static_cast<UINT16>(id.objType));
 	return buffer;
 }
-//tolua_end
