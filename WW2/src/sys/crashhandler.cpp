@@ -388,9 +388,9 @@ static bool AppendRequestFile(std::string &body, const std::string &boundary, co
 // things like mess with COM objects since that's the only way to get the data.
 #pragma region Information Gathering Utilities
 
-#define PullFailure(fmt, ...) do { dbugLog(_FLA, fmt, ## __VA_ARGS__); return; } while (0)
-#define PullFailureIf(cond, fmt, ...) do { if ((cond)) { PullFailure(fmt, ## __VA_ARGS__); } } while (0)
-#define PullFailureIfNotSucceed(fmt, ...) PullFailureIf(!SUCCEEDED(result.Error()), "Failed with %S in crash handler: " fmt, result.ErrorMessage(), ## __VA_ARGS__)
+#define PullFailure(fmt, ...) do { dbugLog(_FLA, fmt, __VA_ARGS__); return; } while (0)
+#define PullFailureIf(cond, fmt, ...) do { if ((cond)) { PullFailure(fmt, __VA_ARGS__); } } while (0)
+#define PullFailureIfNotSucceed(fmt, ...) PullFailureIf(!SUCCEEDED(result.Error()), "Failed with %S in crash handler: " fmt, result.ErrorMessage(), __VA_ARGS__)
 
 #pragma comment(lib, "wbemuuid.lib")
 static void PullMotherboardData(CrashHandlerContext &context)
