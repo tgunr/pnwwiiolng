@@ -3014,7 +3014,13 @@ main(const int argc, const char* argv[])
 	strprintf(hostname, "cell%u", Server::localHost & 255);
 
 	const UINT32 updateNet = cv_baseUpdtAddress.GetUint32();
-	if ( updateNet != 0 )
+	if (Server::IsBroadcastViaController())
+	{
+		/// kfsone: hack until we need to support cell-to-cell peering via controller
+		g_clustered = false;
+		dbugLog(_FLN, "Clustering disabled: broadcasting via controller");
+	}
+	else if ( updateNet != 0 )
 	{
 		dbugLog(_FLM, "Clustering enabled: Broadcast network %s specified.", cv_baseUpdtAddress.GetString());
 
