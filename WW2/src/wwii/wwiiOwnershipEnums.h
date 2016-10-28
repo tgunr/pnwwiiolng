@@ -66,6 +66,7 @@ static inline WWII_SIDE wwiiSide(UINT32 country)
 	case WWII_CHINA:
 	case WWII_RUSSIA:
 	case MAX_COUNTRIES:
+	default:
 		return NEUTRAL;
 	}
 }
@@ -78,7 +79,9 @@ static inline WWII_SIDE wwiiOtherSide(UINT32 side)
 		case ALLIED: return AXIS;
 		case AXIS: return ALLIED;
 		case NEUTRAL:
-		case MAX_SIDES: return NEUTRAL;
+		case MAX_SIDES:
+		default:
+			return NEUTRAL;
 	}
 }
 
