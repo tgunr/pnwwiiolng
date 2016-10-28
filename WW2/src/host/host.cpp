@@ -3011,7 +3011,7 @@ main(const int argc, const char* argv[])
 	if ( !teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, _personaErrorFunction) )
 		LogAbort("Unable to open tcp listen port %u", WWII::Net::Ports::CellHost);
 
-	sprintf(hostname, "cell%u", Server::localHost & 255);
+	strprintf(hostname, "cell%u", Server::localHost & 255);
 
 	const UINT32 updateNet = cv_baseUpdtAddress.GetUint32();
 	if ( updateNet != 0 )
