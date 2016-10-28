@@ -83,7 +83,7 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-#if _WIN64 || __x86_64__ || __ppc64__
+#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__)
 # define BUILD_64
 # define PR64BitT "ld"
 # define PR64BitUT "lu"
