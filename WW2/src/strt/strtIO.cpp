@@ -64,17 +64,34 @@ const char* strtPrintFacilityType(FACILITY_TYPE facilityType)
 //////////////////////////////////////////////////////////////////////
 // Report an occurrence of a duplicate object id
 
+template<typename T> const char* _scGetName(const Supercell* sc, UINT32 index)
+{
+	const T* t = sc->Get<T>(static_cast<UINT16>(index));
+	return t ? t->name : nullptr;
+}
+
 static void
-_reportDuplicate(Supercell* sc, const char* filename, UINT32 index, const char* curName)
+_reportDuplicate(const Supercell* sc, const char* filename, UINT32 index, const char* curName)
 {
 	const char* name = nullptr;
-	switch (((FULL_OBJ_ID*)sc->index[index])->objClass)
+	switch (static_cast<FULL_OBJ_ID*>(sc->index[index])->objClass)
 	{
-		case CLASS_CP: name = ((CPStruct*)sc->index[index])->name; break;
-		case CLASS_FACILITY: name = ((FacilityStruct*)sc->index[index])->name; break;
-		case CLASS_BUILDING: name = ((ObjectStruct*)sc->index[index])->name; break;
-		case CLASS_LINK: name = ((LinkStruct*)sc->index[index])->name; break;
-		case CLASS_WAYPOINT: LogAbort("don't know what to do with waypoints"); break;
+		case CLASS_CP:
+			name = _scGetName<CPStruct>(sc, index);
+		break;
+		case CLASS_FACILITY:
+			name = _scGetName<FacilityStruct>(sc, index);
+		break;
+		case CLASS_BUILDING:
+			name = _scGetName<ObjectStruct>(sc, index);
+		break;
+		case CLASS_LINK:
+			name = _scGetName<LinkStruct>(sc, index);
+		break;
+		case CLASS_WAYPOINT:
+			LogAbort("don't know what to do with waypoints");
+		default:
+			LogAbort("unknown ObjClass");
 	}
 	if (name == nullptr)
 		name = "UNKNOWN OBJECT";
