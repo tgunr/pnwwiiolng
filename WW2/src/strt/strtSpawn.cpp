@@ -720,25 +720,23 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 						, serial
 						, weapPrintName(currentWeapon->spec())
 						);
-			break;
+		break;
 		case POSTED_WEAPON::_POSTED:
 			betaLog(_FLD, "v:%u received spawnRequest for new %s"
 						, serial
 						, weapPrintName(currentWeapon->spec())
 						);
-			break;
+		break;
 		case POSTED_WEAPON::_SPAWNED:
 			dbugLog(_FLA,"v:%u recieved spawnRequest for spawned vehicle weapon %p!", serial, currentWeapon);
 			response.code = SPAWN_ERROR;
 			return false;
-			break;
 		case POSTED_WEAPON::_FREE:
 		case POSTED_WEAPON::_CANCELLED:
 		default:
 			LogAbort("v:%u invalid status %d weapon %p!", serial, currentWeapon->m_status, currentWeapon);
-			response.code = SPAWN_ERROR;
-			return false;
-			break;
+			//response.code = SPAWN_ERROR;
+			//return false;
 	}
 
 	// Place a spawned weapon entry and schedule a new reinforcement
@@ -1439,8 +1437,7 @@ _diagnoseSupply(const StratHCUnit& unit, const FacilityStruct& facility, const F
 
 			supplyFacility = mateAB;
 
-			return FacilityWeaponList::_NORMAL;
-		break;
+		return FacilityWeaponList::_NORMAL;
 
 		default:
 			supplyFacility = facility.supplyingFacility(unit, false);
@@ -1747,7 +1744,6 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 		case _CANCELLED:
 		default:
 			LogAbort("v:%u invalid status %d weapon %p!", m_weaponSerial.serial, m_status, this);
-		break;
 	}
 
 	if ( returnable && rtbed == false )
