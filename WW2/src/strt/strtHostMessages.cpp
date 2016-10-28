@@ -712,8 +712,6 @@ static SINT32 _recvMMPostCancel(ACTION_OBJECT* const a)
 					, PRA_WEAPON_SERIAL(postCancel.weaponSerial)
 					, weapPrintName(postCancel.weaponSerial.spec)
 					);
-
-	return a->offset;
 }
 
 static SINT32 _recvWeaponsReturn(ACTION_OBJECT* const a)

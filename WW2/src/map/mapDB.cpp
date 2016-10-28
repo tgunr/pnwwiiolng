@@ -781,18 +781,18 @@ mapSaveErrorInfo(Player& player, WWII_ERROR_INFO& info)
 		break;
 	case WW_ERR_SYSTEM_INFO:
 		player.log(_FLW, "Got system info bug report???");
-		return;
-		break;
-		sprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
-						", errorType, whereIP, clientVersion, platform,  clientTime, hostTime, rxTime,  archiveCorrupt"
-						", sysNumPackets, sysPacketID, sysInfoText) "
-						" values (%u,%u,%u"
-						",%u,'%s','%s',%d, FROM_UNIXTIME(%u), FROM_UNIXTIME(%u), now(), %u"
-						",%u,%u, '%s') "
-						, player.OTP(), info.eventID, player.playerID()
-						, info.errorType,teulGetAddress(info.hostIP), teulGetAddress(info.clientVersion),platform, info.clientTime, info.hostTime, info.archiveWasCorrupt
-						, info.data.systemInfo.numPackets,  info.data.systemInfo.packetID,  info.data.systemInfo.infoText);
-		break;
+	return;
+
+//		strprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
+//						", errorType, whereIP, clientVersion, platform,  clientTime, hostTime, rxTime,  archiveCorrupt"
+//						", sysNumPackets, sysPacketID, sysInfoText) "
+//						" values (%u,%u,%u"
+//						",%u,'%s','%s',%d, FROM_UNIXTIME(%u), FROM_UNIXTIME(%u), now(), %u"
+//						",%u,%u, '%s') "
+//						, player.OTP(), info.eventID, player.playerID()
+//						, info.errorType,teulGetAddress(info.hostIP), teulGetAddress(info.clientVersion),platform, info.clientTime, info.hostTime, info.archiveWasCorrupt
+//						, info.data.systemInfo.numPackets,  info.data.systemInfo.packetID,  info.data.systemInfo.infoText);
+
 	default:
 		return;
 	}

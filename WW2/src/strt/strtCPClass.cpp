@@ -840,6 +840,7 @@ CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
     //HACK: DEV-824 - .hold command temporary disabled
     return SCMD_ERROR;
 
+#ifdef ENABLE_HOLD
 	if ( side != issuer )
 		return SCMD_WRONG_SIDE;
 
@@ -865,6 +866,7 @@ CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
 		return SCMD_SUCCESS;
 
 	return SCMD_ERROR;
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////

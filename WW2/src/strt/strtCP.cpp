@@ -203,8 +203,6 @@ _isAutoRebuildObject(const ObjectStruct& object)
 			return false;
 		break;
 	}
-
-	return false;
 }
 
 //////////////////////////////////////////////////////////////////////

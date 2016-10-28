@@ -568,7 +568,6 @@ namespace Teul
 			if ( m_union.um_uint32 == 0 )
 			{
 				LogAbort("%s: invalid ip address: %s", GetName(), newValue_);
-				return;
 			}
 		}
 

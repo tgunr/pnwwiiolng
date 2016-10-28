@@ -260,7 +260,7 @@ authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch
 	{
 		authdbLogBadPlayername(cdata.address, request.username, e.what());
 		LogAbort("error looking up %s with %s: %s", request.username, request.password, e.what());
-		return WEB_ERR_INTERNAL;
+		/*return WEB_ERR_INTERNAL;*/
 	}
 
 	if ( foundUser == false )
@@ -375,7 +375,7 @@ Auth::LoginRequest::validate(SINT32 teulIndex, Auth::ClientData& cdata)
 	{
 		authdbLogBadPlayername(cdata.address, username, e.what());
 		LogAbort("error looking up %s with %s: %s", username.c_str(), password.c_str(), e.what());
-		return WEB_ERR_INTERNAL;
+		/*return WEB_ERR_INTERNAL;*/
 	}
 
 	if ( foundUser == false )
@@ -513,8 +513,6 @@ static bool _initAppInfoTable(GAME& gameEntry)
 		dbugLog(_FLA, "error selecting host versions [%s]", statement);
 		LogAbort("%s", e.what());
 	}
-
-	return false;
 }
 
 //////////////////////////////////////////////////////////////////////

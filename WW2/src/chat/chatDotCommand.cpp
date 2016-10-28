@@ -215,12 +215,12 @@ DotCommand::setAvailability(char level)
 		LogAbort("'%s' command has unrecognized availability level %c", command(), level);
 #else
 		dbugLog(_FLA, "'%s' command has unrecognized availability level %c", command(), level);
-#endif
 		// If we somehow deployed with an invalid command, at least mark it as Playnet-only
 		// to limit its potential use as much as possible.
 		m_public = false;
 		m_playnetOnly = true;
 		break;
+#endif
 	}
 }
 

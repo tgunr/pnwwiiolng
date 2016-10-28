@@ -262,7 +262,6 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	{
 		OS_CLOSE(fd);
 		DEBUG_FATAL("Out of memory loading '%s' (%" PRSizeT " bytes).", filename, allocSize);
-		return false;
 	}
 
 	int bytesRead = OS_READ(fd, mem, fileSize);

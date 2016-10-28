@@ -168,9 +168,9 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 	{
 #if platBuild != BUILD_SERVER
 		piExitProgram(_FL,"Weapon Lists did not initialize");
-#endif
+#else
 		DEBUG_FATAL("WEAPON_LISTS DID NOT INITIALIZE!!!");
-		return false;
+#endif
 	}
 #endif //VALIDATOR
 

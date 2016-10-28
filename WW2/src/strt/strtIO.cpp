@@ -59,7 +59,6 @@ const char* strtPrintFacilityType(FACILITY_TYPE facilityType)
 		case FACILITY_ARMYBASE:return("Army Base");break;
 		default:return("Unknown");
 	}
-	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -2258,6 +2258,7 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 	// too late to fix it properly. For now, we're just going to ignore it.
 	return;
 
+#ifdef ENABLE_TICK_SAMPLES
 	static std::map<playerid_t, std::pair<UINT32, TeulDeltaMS>> reports;
 	auto it = reports.find(player.playerID());
 	const UINT32 lastReport = (it != reports.end()) ? it->second.first : 0;
@@ -2282,6 +2283,7 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 	          sample.host_ms, sample.client_ms,
 	          sample.delta, sample.ratio);
 	chatdbRecordEvent("HACK", player.callsign(), "speedhack", report, "");
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////

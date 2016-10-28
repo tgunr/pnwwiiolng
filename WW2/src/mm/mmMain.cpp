@@ -1236,7 +1236,7 @@ main(int argc, const char* argv[])
 	TeulTimeMS nextHousekeeping = teulClock64 + 1000;
 	Teul::housekeeper cpEventsHousekeeper(Strat::Events::Publish, 100);
 
-	while(TRUE)
+	while (1)
 	{
 		teulUpdateTransport(50);
 
@@ -1275,9 +1275,8 @@ main(int argc, const char* argv[])
 		}
 	}
 
-	_shutdown(0);
-
-	exit(0);
+	// if we make the loop above break
+//	_shutdown(0);
 }
 
 //////////////////////////////////////////////////////////////////////

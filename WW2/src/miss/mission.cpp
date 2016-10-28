@@ -670,10 +670,7 @@ Mission::purgeTakers()
 	while ( !m_takers.empty() )
 	{
 		if ( !removePlayer(m_takers.begin()->first, false) )
-		{
 			LogAbort("mission %d: unable to remove %d from takerlist", summary().missionID, m_takers.begin()->first);
-			return;
-		}
 	}
 }
 

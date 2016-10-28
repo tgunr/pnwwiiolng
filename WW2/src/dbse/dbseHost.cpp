@@ -85,8 +85,8 @@ int main(int argc, const char* argv[])
 		threadsLogging();
 	}
 
+/*	when we decide on a condition for the loop above:
 	wwiiIRCTerminate("[[ Shutting Down ]]");
 	teulClose(listenIndex);
-
-	return 0;
+*/
 }

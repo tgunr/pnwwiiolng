@@ -422,7 +422,7 @@ static void _endOfNode(Node::Type expectedType)
 		yyerror("INTERNAL ERROR: node %s is not of expected type (%d != %d)", s_currentNode->m_name.c_str(), s_currentNode->m_type, expectedType);
 		exit(1);
 	}
-	
+
 	s_currentNode = s_currentNode->m_parent;
 }
 
@@ -749,7 +749,6 @@ void omg_using(std::string filename)
 		}
 	}
 	yyfatal("Unable to open USING file \"%s\".\n", filename.c_str());
-	return;
 }
 
 void omg_eof()
