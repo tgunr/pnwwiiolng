@@ -485,7 +485,7 @@ void dbugSetLogLevel(Debug::ERROR_TYPE level)
 // errno.  Additional errors beyond those covered in errno.h and dbugWErrno.h
 // must be added to debugExtErrno.h and must adhear to windows error code
 // conventions to eliminate problems with compataibility.
-void dbugSetErrno(SINT32 err)
+void dbugSetErrno(int err)
 {
     _dbugSetErr(err);
 }
