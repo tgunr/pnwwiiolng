@@ -168,9 +168,9 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 	{
 #if platBuild != BUILD_SERVER
 		piExitProgram(_FL,"Weapon Lists did not initialize");
-#endif
+#else
 		DEBUG_FATAL("WEAPON_LISTS DID NOT INITIALIZE!!!");
-		return false;
+#endif
 	}
 #endif //VALIDATOR
 
@@ -191,11 +191,17 @@ template<size_t DestSize>
 static void _copyObjName(const char* sourceName, char (&destName)[DestSize])
 {
     std::string realSourceName = sourceName;
-    
-    realSourceName = realSourceName.substr(realSourceName.find_last_of('\\') + 1); // chop off all leading directory components
+	// the name of an object is basically the filename with the extension
+	// and path removed, so we need to check for and strip those.
+	auto pos = realSourceName.find_last_of('\\');
+	if (pos != std::string::npos)
+		realSourceName.erase(0, pos + 1);
+	pos = realSourceName.find_last_of('.');
+	if (pos != std::string::npos)
+		realSourceName.erase(pos);
     assert(realSourceName.length() > 0 && "empty filename or filename ends with '\\'");
 	assert(realSourceName.length() < MAX_OBJNAME_LENGTH - 1 && "filename too long" );
-    strncpy(destName, realSourceName.c_str(), std::min(DestSize, realSourceName.length()) - 1);
+    strsafecpy(destName, realSourceName.c_str());
 }
 
 template<typename _Type>
