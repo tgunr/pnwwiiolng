@@ -45,7 +45,7 @@ static size_t _teulConnects;
 
 using ENDPOINT_ARRAY = WWII::inplace_vector<ENDPOINT, Teul::MaxConnections>;
 using ENDPOINT_IMPL_ARRAY = WWII::inplace_vector<EndpointImpl, Teul::MaxConnections>;
-ENDPOINT_ARRAY _endpoints;
+static ENDPOINT_ARRAY _endpoints;
 static ENDPOINT_IMPL_ARRAY _endpointImpls;
 
 using ENDPOINT_VEC = std::vector<ENDPOINT*>;
