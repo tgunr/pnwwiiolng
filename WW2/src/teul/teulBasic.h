@@ -75,7 +75,6 @@ bool teulGetHost(const char* address, UINT32* host);
 //! @ingroup not-thread-safe
 //! @param[in]	host			Binary IP address.
 //!	@return pointer to static buffer with address as a string.
-[[deprecated]]
 const char* teulGetAddress(const UINT32 host);
 
 //! Thread safe conversion of a network address to a string.
