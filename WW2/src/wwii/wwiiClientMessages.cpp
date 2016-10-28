@@ -183,7 +183,7 @@ static SINT32
 _sendPlayerLogin(ACTION_OBJECT* const a)
 {
 	PLAYER_LOGIN* const login = (PLAYER_LOGIN*)a->localRawData;
-	return login->packer(TEUL_PACK, a->packed, a->offset);
+	return login->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -19,7 +19,7 @@ struct PLAYER_LOGIN
 	UINT32 OTP;					// One Time passWord
 	UCHAR CopyRightString[AUTH_SEQ_SIZE];
 
-	SINT32 packer(PackMode mode, UCHAR* const message, SINT32 offset);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* const a);
 };
 
 struct PLAYER_LOGIN_REPLY

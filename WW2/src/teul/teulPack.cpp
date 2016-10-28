@@ -502,16 +502,14 @@ teulPackUCHAR(PackMode mode, UCHAR* const buffer, SINT32 bitOffset, UCHAR* const
 // Pack a PLAYER_LOGIN structure.
 
 SINT32
-PLAYER_LOGIN::packer(PackMode mode, UCHAR* const message, SINT32 offset)
+PLAYER_LOGIN::packer(PackMode mode, ACTION_OBJECT* const a)
 {
-	UINT32 Len = AUTH_SEQ_SIZE;
+	a->packer(mode, OTP);
+	a->packer(mode, appVersion);
+	a->arrayPacker(mode, CopyRightString);
+	a->packer(mode, attemptID);
 
-	offset = teulPackUINT32(mode, message, offset, &this->OTP, 0);
-	offset = teulPackUINT32(mode, message, offset, &this->appVersion, 0);
-	offset = teulPackVoid(mode, message, offset, &this->CopyRightString, Len);
-	offset = teulPackUINT32(mode, message, offset, &this->attemptID, 0);
-
-	return offset;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
