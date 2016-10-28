@@ -828,11 +828,11 @@ _captureDescription(const FacilityStruct* fac)
 		return "disabled";
 
 	case FacilityStruct::_CAP_PENDING:
-		snprintf(description, 63, "in %us", fac->getCaptureRemaining());
+		strprintf(description, "in %us", fac->getCaptureRemaining());
 		return description;
 
 	case FacilityStruct::_CAP_ENABLED:
-		snprintf(description, 63, "at %3.2f%%", fac->m_captureProgress);
+		strprintf(description, "at %3.2f%%", fac->m_captureProgress);
 		return description;
 
 	default:

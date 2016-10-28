@@ -2250,8 +2250,8 @@ Player::whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const
 
 	// He's not in a facility, ergo at the map
 	if ( !missionID() )
-	{	
-		snprintf(tmpbuf, sizeof(tmpbuf), "%s brigade scrn", affiliation);
+	{
+		strprintf(tmpbuf, "%s brigade scrn", affiliation);
 		into.append(tmpbuf);
 		into.append(lastPosition("last near", x, y, true));
 		return;

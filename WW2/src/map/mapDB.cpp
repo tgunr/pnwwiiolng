@@ -766,7 +766,7 @@ mapSaveErrorInfo(Player& player, WWII_ERROR_INFO& info)
 
 	case WW_ERR_VALIDITY_CHECK:
 		player.log(_FLI, "Got validity check bug report");
-		sprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
+		strprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
 						", errorType, whereIP, clientVersion, platform, clientTime, hostTime, rxTime,  archiveCorrupt"
 						", invalidArchive, invalidFileName, invalidCRC, invalidMD5) "
 						" values (%u,%u,%u"

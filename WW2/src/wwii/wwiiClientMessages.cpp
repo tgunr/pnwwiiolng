@@ -228,18 +228,18 @@ Teul::Connection::login()
 	// the idea being that since traffic is encrypted it'll provide something
 	// to test the packet stream. *shrug*
 	if ( m_playerIdent.m_playerID == 0 )
-		memcpy(login.CopyRightString, AUTH_SEQ, AUTH_SEQ_SIZE);
+		strsafecpy(login.CopyRightString, AUTH_SEQ);
 	else
 	{
 		if ( m_type == Map )
 		{
 			// If we're auth-bypassing into the map host, we send our playerID instead.
-			snprintf((char*)login.CopyRightString, AUTH_SEQ_SIZE, "%u", m_playerIdent.m_playerID);
+			strprintf((char*)login.CopyRightString, "%u", m_playerIdent.m_playerID);
 		}
 		else
 		{
 			// For the other servers, we prefix it with an R. I'm not 100% sure why -- OGS.
-			snprintf((char*)login.CopyRightString, AUTH_SEQ_SIZE, "R%u", m_playerIdent.m_playerID);
+			strprintf(login.CopyRightString, "R%u", m_playerIdent.m_playerID);
 		}
 	}
 
