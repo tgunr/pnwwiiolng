@@ -1623,8 +1623,6 @@ void PoolModel::load()
 
 	std::string path = directory + modelname + ".mdl";
 
-	char s[512];
-
 	if(fioQuery() == ISDIRECTORY && ModelNeedsRebuild(path.c_str()))
 	{
 #ifndef COLLECT_TEXTURE_STATS
