@@ -1,7 +1,6 @@
 #include <syscfg.h> // Path is project specific.
 
-#include "wwii/wwiiHash.h" // does this work on linux?
-# include "dbug/dbug.h"
+#include "dbug/dbug.h"
 #include <map>
 #include <set>
 

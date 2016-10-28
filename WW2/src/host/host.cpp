@@ -143,7 +143,6 @@ static UINT32				_vehicleCounter;
 static SINT32 iterationTime = -1, iterationLast = -1;
 */
 
-#include <unordered_map>
 using VEHICLE_HASH = std::unordered_map<sortieid_t, class HostVehicle*>;
 static VEHICLE_HASH _vehicleHash;
 

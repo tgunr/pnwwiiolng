@@ -61,7 +61,7 @@
 
 static HANDLES _spawning;
 
-using RECRUITS = std::unordered_map< UINT32, std::set<UINT32>>;
+using RECRUITS = std::unordered_map<UINT32, std::set<UINT32>>;
 static RECRUITS _recruits;
 
 using PLAYERIDS = std::unordered_set<UINT32>;
@@ -1030,7 +1030,7 @@ Player::objectiveCP() const
 	return ( (prop == nullptr) ? "<unknown>" : prop->Name() );
 }
 
-#include <unordered_map>
+#include "wwii/wwiiHash.h"
 static std::unordered_map<playerid_t, std::vector<UINT32>> playerGroups;
 static std::mutex playerGroupsMutex;
 

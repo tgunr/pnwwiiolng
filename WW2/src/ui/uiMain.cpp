@@ -80,7 +80,7 @@
 #endif
 
 #include <regex>
-#include <unordered_map>
+#include "wwii/wwiiHash.h"
 #define RENS std
 
 #ifdef GR2_BLEND_EDITOR

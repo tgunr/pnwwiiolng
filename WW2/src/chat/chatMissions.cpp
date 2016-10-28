@@ -36,7 +36,6 @@
 #include "teul/teulServer.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
-#include "wwii/wwiiHash.h"
 #include "wwii/wwiiServerTrackedObject.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"

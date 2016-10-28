@@ -27,7 +27,7 @@
 #include "teul/teulPacket.h"
 #include "wwii/wwiiThreads.h"
 
-#include <unordered_map>
+#include "wwii/wwiiHash.h"
 using SYNCHED_VEHICLES = std::unordered_map<UINT32, bool>;
 static SYNCHED_VEHICLES g_synched;
 

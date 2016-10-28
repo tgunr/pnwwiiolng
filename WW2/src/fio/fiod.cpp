@@ -4,7 +4,7 @@
 #include "sysmac/sysMacCompat.h"
 #endif
 
-#include "wwii/wwiiHash.h" // does this work on linux?
+#include "wwii/wwiiHash.h"
 #include <map>
 #include <set>
 #include <string.h>

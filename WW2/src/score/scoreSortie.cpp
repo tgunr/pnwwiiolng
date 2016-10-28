@@ -3,7 +3,7 @@
 
 #include "score/scoreSortie.h"
 #include "teul/teulTime.h"
-#include <unordered_map>
+#include "wwii/wwiiHash.h"
 #include <queue>
 #include <algorithm>
 #include "map/mapPlayer.h"

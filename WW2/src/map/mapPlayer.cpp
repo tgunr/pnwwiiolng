@@ -52,7 +52,6 @@
 #include "wwii/wwiiAntiAddiction.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
-#include "wwii/wwiiHash.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRTBCodes.h"
 
