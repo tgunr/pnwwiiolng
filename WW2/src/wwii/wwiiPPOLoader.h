@@ -60,7 +60,7 @@ public:
 public:
 
 	PPOSpecLoader();
-	virtual ~PPOSpecLoader() { }
+	virtual ~PPOSpecLoader();
 
 	void loadSpecMap();
 

@@ -27,6 +27,8 @@ PPOSpecLoader::PPOSpecLoader() : XMLLoader2<PPOSpecLoader>()
 	AddHandler("param", &PPOSpecLoader::DoParam, this);
 }
 
+PPOSpecLoader::~PPOSpecLoader() {}
+
 void PPOSpecLoader::loadSpecMap()
 {
     dbugLog(_FLD, "Loading PPO specifications...");
