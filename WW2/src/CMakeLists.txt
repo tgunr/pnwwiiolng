@@ -662,7 +662,7 @@ ADD_HOST_TARGET( ${STRAT_HOST_EXE} SOURCES
 )
 IF ( MSVC )
     SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY COMPILE_FLAGS
-                  "/W0" "/wd4480" "/wd4800" "/wd4305" "/wd4505" )
+                  "/W0" )
 ELSE()
 	SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY COMPILE_FLAGS
                   "-Wno-unused-function" )
