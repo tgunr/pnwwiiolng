@@ -52,7 +52,7 @@ enum WWII_SIDE				//] Definitive list of in-game sides.
 
 static inline WWII_SIDE wwiiSide(UINT32 country)
 {
-	switch ( (WWII_COUNTRY)country )
+	switch ( static_cast<WWII_COUNTRY>(country) )
 	{
 	case WWII_NO_COUNTRY:
 		return WWII_NO_SIDE;
@@ -63,19 +63,22 @@ static inline WWII_SIDE wwiiSide(UINT32 country)
 	case WWII_GERMANY:
 	case WWII_ITALY:
 		return AXIS;
-	default:
+	case WWII_CHINA:
+	case WWII_RUSSIA:
+	case MAX_COUNTRIES:
 		return NEUTRAL;
 	}
 }
 
 static inline WWII_SIDE wwiiOtherSide(UINT32 side)
 {
-	switch ( (WWII_SIDE)side )
+	switch ( static_cast<WWII_SIDE>(side) )
 	{
 		case WWII_NO_SIDE: return WWII_NO_SIDE;
 		case ALLIED: return AXIS;
 		case AXIS: return ALLIED;
-		default: return NEUTRAL;
+		case NEUTRAL:
+		case MAX_SIDES: return NEUTRAL;
 	}
 }
 
