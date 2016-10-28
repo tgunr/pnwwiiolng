@@ -296,14 +296,74 @@ IF ( NOT MSVC )
         COMPONENT cmdclients
     )
 
-    # Not currently generated:
-    #  checkGameName: Check callsign validity, not all that useful
-    #  sdmpp: Prunes terrain files lacking strat data, pretty unhelpful currently
-    #  sdmDump: Analyzes terrain files, not helpful without terrain work happening
-    #  stratLoader: Partially loads terrain into the database, which hosts do anyway
-    #  stratValidator: Uses server routines to validate SDM/WOR data, terrain terrain terrain, sigh
-    # See git revision history for build commands.
+ENDIF()
 
+IF ( MSVC )
+	# kfsone: I'm currently using these because they're helpful for cluster-in-a-box,
+
+	# Not currently generated:
+	#  checkGameName: Check callsign validity, not all that useful
+	#  sdmpp: Prunes terrain files lacking strat data, pretty unhelpful currently
+	#  sdmDump: Analyzes terrain files, not helpful without terrain work happening
+	#  stratLoader: Partially loads terrain into the database, which hosts do anyway
+	#  stratValidator: Uses server routines to validate SDM/WOR data, terrain terrain terrain, sigh
+	# See git revision history for build commands.
+
+	# In theory, SDM pre-parser. In practice? Deletes SDM files that don't
+	# contain any strat data.
+	# Not part of stratValidator because the original coders couldn't figure
+	# out why it leaked so much memory.
+	ADD_EXECUTABLE(sdmpp
+		sdm/sdmpp.cpp
+			sdm/sdmpp.h
+
+		sdm/sdmConfigVars.h
+	)
+	TARGET_LINK_LIBRARIES(sdmpp ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES})
+	SET_PROPERTY(TARGET sdmpp PROPERTY FOLDER "Tools")
+
+	# Reads SDM files and imports portions of them into the game database.
+	# Which is a shame, because the hosts wind up reading the SDM files too
+	# to get the missing data. *Sigh*
+	ADD_EXECUTABLE(stratLoader
+		src/loader.cpp
+		sdm/sdmLoad.cpp
+			sdm/sdmLoad.h
+			sdm/sdmParse.h
+	)
+	TARGET_LINK_LIBRARIES(stratLoader ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES})
+	SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
+
+	ADD_EXECUTABLE(stratValidator
+		parse/parseWor.cpp
+			parse/parseWor.h
+				parse/parseIO.h
+				strt/strtWOR.h
+					parse/parse.h
+					strt/strtDTL.h
+		strt/strtCPStruct.cpp
+			strt/strtCPStruct.h
+				strt/strtProtos.h
+				wwii/wwiiHCUnits.h
+				strt/strtCPFlags.h
+				inst/instDescriptor.h
+					mm/mmEnums.h
+		strt/strtData.cpp
+			strt/strtData.h
+			wwii/wwiiConfigVars.h
+				teul/teulConfigVar.h
+		strt/strtFacilityStruct.cpp
+			strt/strtFacilityStruct.h
+		strt/strtObjectStruct.cpp
+			strt/strtObjectStruct.h
+		strt/strtIO.cpp
+			strt/strtIO.h
+		strt/strtValidator.cpp
+		${PCH_INCLUDE_HEADERS}
+	)
+	SET_PROPERTY(TARGET stratValidator PROPERTY COMPILE_DEFINITIONS CHECK_SUPPLY=1)
+	TARGET_LINK_LIBRARIES(stratValidator ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES})
+	SET_PROPERTY(TARGET stratValidator PROPERTY FOLDER "Tools")
 ENDIF()
 
 ####################################
