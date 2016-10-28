@@ -67,7 +67,7 @@ CFG_PATH(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true, "Name of th
 
 CFG_ADDR(wwiiDBAddress, nullptr, "WWII_DB_ADDRESS", true, "IP address of the MySQL Database.");
 CFG_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true, "Default schema for game data.");
-CFG_STRING(wwiiDBPassword, "", "WWII_DB_PASSWD", true, "Password to use for the game database.");
+CFG_STRING(wwiiDBPassword, nullptr, "WWII_DB_PASSWD", true, "Password to use for the game database.");
 CFG_STRING(wwiiDBUser, "wwiiol", "WWII_DB_USER", true, "Username when connecting to the game database.");
 CFG_STRING(wwiiDBPort, "3306", "WWII_DB_PORT", true, "Port of the game MySQL server if not default.");
 CFG_ADDR(dbsePrimaryAddress, nullptr, "DBSE_PRIMARY_ADDRESS", true, "IP address dbd clients will reach the dbd on.");
@@ -97,7 +97,7 @@ CFG_UINT(maxCellPlayers, "1250", "MAX_PLAYERS", "Maximum number of players on th
 CFG_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true, "Network address to use for private cell network or 0.0.0.0 to disable multiple cells (clustering).");
 CFG_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", "Number of miliseconds before a server-peer connection times out.");
 #if defined(WIN32)
-CFG_STRING(defaultInterface, NULL, "DEFAULT_IFACE", false, "Name of the network interface to treat as primary.");
+CFG_STRING(defaultInterface, nullptr, "DEFAULT_IFACE", false, "Name of the network interface to treat as primary.");
 #else
 CFG_STRING(defaultInterface, "eth0", "DEFAULT_IFACE", true, "Name of the network interface to treat as primary.");
 #endif
