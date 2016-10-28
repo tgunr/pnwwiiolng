@@ -3493,7 +3493,7 @@ _runHost()
 		threadsLogging();
 
 		// Catch up on housekeeping.
-		while ( _houseKeeping() ) 
+		while ( _houseKeeping() )
 			;
 
 		chatSendMissionUpdates();

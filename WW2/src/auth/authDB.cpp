@@ -317,7 +317,7 @@ Auth::LoginRequest::validate(SINT32 teulIndex, Auth::ClientData& cdata)
 		authdbLogBadPlayername(cdata.address, username, "illegal password");
 		return WEB_ERR_INTERNAL;
 	}
-    
+
     char ubuffer[16*2+1] = {0};
 	mysql_real_escape_string(dbh, ubuffer, username.c_str(), username.length());
     char pbuffer[80*2+1] = {0};
@@ -752,13 +752,13 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 
 		strsafecpy(statement, ogl.vendor);
 		mysql_real_escape_string(dbh, vendor, statement, strlen(statement));
-        
+
         strsafecpy(statement, cpu.manufacturer);
         mysql_real_escape_string(dbh, cpuManufacturer, statement, strlen(statement));
-        
+
         strsafecpy(statement, cpu.brandName);
         mysql_real_escape_string(dbh, cpuBrandName, statement, strlen(statement));
-        
+
 		if ( pci.sound.isValid )
 		{
 			strsafecpy(statement, mix.szPname);

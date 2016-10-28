@@ -403,7 +403,7 @@ static SINT32 _packVehicleHead(PackMode mode, UCHAR* const data, SINT32 offset, 
 		if (vupHeader != nullptr && vupHeader->player != nullptr && vupHeader->player->station != UPDT_OTHER)
 		{
 			vehInfo->cmdrTimeStamp = localTimeStamp;
-		} 
+		}
 
 #else
 		// restore timestamp for client and update position if included

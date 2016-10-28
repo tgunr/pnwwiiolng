@@ -458,7 +458,7 @@ _housekeeping()
 	}
 
 	if ( teulTime() >= nextSupplyRouteCheck ) {
-	
+
 		nextSupplyRouteCheck = teulTime() + 2;
 		bInitiateSupplyRouteCheckProcessing = true;
 		if ( teulTime() >= nextForcedSupplyRouteCheck ) {

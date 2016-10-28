@@ -191,7 +191,7 @@ template<size_t DestSize>
 static void _copyObjName(const char* sourceName, char (&destName)[DestSize])
 {
     std::string realSourceName = sourceName;
-    
+
     realSourceName = realSourceName.substr(realSourceName.find_last_of('\\') + 1); // chop off all leading directory components
     assert(realSourceName.length() > 0 && "empty filename or filename ends with '\\'");
 	assert(realSourceName.length() < MAX_OBJNAME_LENGTH - 1 && "filename too long" );

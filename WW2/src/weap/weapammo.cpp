@@ -4421,11 +4421,11 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	// commented out because it doesn't do anything
     /*
      TBD - I guess then we should fix it ???
-     
+
 //	if(Vehicle && Vehicle->ModelData && Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
 //		_TransferMomentum(Vehicle->ModelData, Collision, Ammo, AmmoSpeed - ResidualSpeed);
      */
-    
+
 	if(AmmoStopped)
 		ResidualSpeed = 0;
 

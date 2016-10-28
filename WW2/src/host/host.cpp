@@ -2155,7 +2155,7 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		{
 			Teul::Packet copy(*wu.packet);
 			if ( _sendPacket(copy, players[i], vehicle->index, pingOffset) )
-			{	
+			{
 				result = true;
 #ifdef DEBUG_UPDATES
 				++vehMcrewCrewUpdatesSent;
@@ -2385,9 +2385,9 @@ _runHost()
 		if ( teulTime() >= nextStatsReport )
 		{
 			// Report output to client stats every second
-			dbugLog(_FLI, "TV=%u, RV=%u, VS=%u, QV=%u, VR=%u, VUS=%u, VMCU=%u, VCRU=%u, NVR=%u, XF=%u, VT=%u, NU=%u", 
-				totalVehicles, remoteVehicles, vehiclesSkipped, qualifiedVehicles, vehiclesReviewed, vehUpdatesSent, vehMcrewCommanderUpdatesSent, 
-				vehMcrewCrewUpdatesSent, numVehiclesReported, xmissionsFailed, vehiclesThrottled, numberOfUpdatesBehind); 
+			dbugLog(_FLI, "TV=%u, RV=%u, VS=%u, QV=%u, VR=%u, VUS=%u, VMCU=%u, VCRU=%u, NVR=%u, XF=%u, VT=%u, NU=%u",
+				totalVehicles, remoteVehicles, vehiclesSkipped, qualifiedVehicles, vehiclesReviewed, vehUpdatesSent, vehMcrewCommanderUpdatesSent,
+				vehMcrewCrewUpdatesSent, numVehiclesReported, xmissionsFailed, vehiclesThrottled, numberOfUpdatesBehind);
 			totalVehicles = remoteVehicles = vehiclesSkipped = qualifiedVehicles = vehiclesReviewed = vehUpdatesSent = 0;
 			vehMcrewCommanderUpdatesSent = vehMcrewCrewUpdatesSent = xmissionsFailed = vehiclesThrottled = 0;
 			numberOfUpdatesBehind = numVehiclesReported = 0;

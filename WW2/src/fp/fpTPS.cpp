@@ -174,7 +174,7 @@ LOGICAL fpTPSLoad()
 				{
 					const char* key = fpTPSCreateBlendKey(i, j, k, l, TPS_BLENDTYPE_TPS);
 					gr2AnimationBlend *blend = gr2LoadBlendedAnimation(key, boneCount);
-					
+
 					if (blend) {
 					    UINT64 blendID = fpTPSCreateBlendID(i, j, k, l, TPS_BLENDTYPE_TPS);
 

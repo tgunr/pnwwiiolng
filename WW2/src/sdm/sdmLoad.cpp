@@ -11,7 +11,7 @@
 // blocks of data - each cell is it's own pristine little
 // world. This allowed the embedding of much smaller IDs and
 // during many cell-relative operations you can specify
-// a specific strat object with a UINT16 value. 
+// a specific strat object with a UINT16 value.
 // In a world-scope context, such as on the server, you have
 // to combine that ID with the X and Y of the cell to produce
 // a 64 bit value (24 bits of X plus 24 bits of Y plus 16 id)

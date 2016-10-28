@@ -248,7 +248,7 @@ struct ACTION_OBJECT
 
 	DEF_PACKER(void*, teulPackVoid)
 
-	void pack(const bool& value, SINT32 sb = 1) 
+	void pack(const bool& value, SINT32 sb = 1)
 	{
 		assert(sb == 1 || sb == 0);
 		UCHAR i(value ? 1 : 0);

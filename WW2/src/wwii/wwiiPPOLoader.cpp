@@ -87,7 +87,7 @@ XML_TAG_HANDLER_IMPL(DoPPO)
 
 		for(size_t i = 0; i < defaults.allowPlace.size(); i++)
 			spec.allowPlace.push_back(defaults.allowPlace[i]);
-		
+
 		for(size_t i = 0; i < defaults.denyPlace.size(); i++)
 			spec.denyPlace.push_back(defaults.denyPlace[i]);
 
@@ -235,7 +235,7 @@ XML_TAG_HANDLER_IMPL(DoParam)
 	return true;
 }
 
-bool PPOSpecLoader::checkDelimitedField(std::string name, std::string value, 
+bool PPOSpecLoader::checkDelimitedField(std::string name, std::string value,
 			const char *check, std::vector<std::string> & stack)
 {
 	bool retVal = false;
@@ -259,7 +259,7 @@ bool PPOSpecLoader::checkDelimitedField(std::string name, std::string value,
 }
 
 
-bool PPOSpecLoader::checkDelimitedField(std::string name, std::string value, 
+bool PPOSpecLoader::checkDelimitedField(std::string name, std::string value,
 			const char *check, UINT32 & bitfield)
 {
 	std::vector<std::string> temp;
@@ -302,7 +302,7 @@ bool PPOSpecLoader::checkType(const char *pType, int vehtype, bool & retVal, boo
 	{
 		dbugLog(_FLD, "Have a type, check type match");
 		// veh type is specified, make sure it matches
-		int nType = atoi(pType);	
+		int nType = atoi(pType);
 		if (nType == vehtype)
 		{
 			dbugLog(_FLD, "Types match, returning %d", setValue);
@@ -316,7 +316,7 @@ bool PPOSpecLoader::checkType(const char *pType, int vehtype, bool & retVal, boo
 	}
 
 	return done;
-}	
+}
 
 bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, int vehtype, bool allowed, bool setValue)
 {
@@ -332,9 +332,9 @@ bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, in
 		size_t nmSize = tlist[i].size()+1;
 		char *tempClassName = new char[nmSize];
 		strlcpy(tempClassName, tlist[i].c_str(), nmSize);
-	
+
 		dbugLog(_FLD, "tempClassName = %s", tempClassName);
-	
+
 		char *pClass = strtok(tempClassName, "/");
 		char *pType = strtok( nullptr, "/" );
 		if (pClass != nullptr)
@@ -349,7 +349,7 @@ bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, in
 
 				if (checkType(pType, vehtype, retVal, setValue))
 					break;
-			}	
+			}
 			else
 			{
 				dbugLog(_FLD, "Class doesn't match, returning %d", retVal);

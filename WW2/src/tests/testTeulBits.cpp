@@ -33,10 +33,10 @@ public: virtual bool Run() override
 public: bool TestBitsCount()
 	{
 #define EXPECT_FIT(val_type, val, bit_count) \
-	CRITICAL( ExpectTrue( Teul::Bits::Fit<val_type>(val_type(val), bit_count) ) ) 
+	CRITICAL( ExpectTrue( Teul::Bits::Fit<val_type>(val_type(val), bit_count) ) )
 
 #define EXPECT_NOT(val_type, val, bit_count) \
-	CRITICAL( ExpectFalse( Teul::Bits::Fit<val_type>(val_type(val), bit_count) ) ) 
+	CRITICAL( ExpectFalse( Teul::Bits::Fit<val_type>(val_type(val), bit_count) ) )
 
 		START_TEST_STAGE( "TestBitsCount" )
 

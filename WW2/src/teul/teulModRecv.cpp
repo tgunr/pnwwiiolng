@@ -581,7 +581,7 @@ _recvfromStream(ENDPOINT& endpoint)
 	if ( endpoint.m_readBufferUsed < datagramSize )
 	{
 		const SINT32 retval = _continuePacket(endpoint);
-		if ( retval <= 0 ) 
+		if ( retval <= 0 )
 		{
 			// might not be fatal, might just be wait condition
 			return retval;
@@ -699,7 +699,7 @@ _recvDatagram(ENDPOINT& endpoint)
 				errorCount += 1;
 				dbugLog(_FLD, "Error count now %d last error %d", errorCount, err);
 			}
-			else 
+			else
 				++packetsReceived;
 		} while ( errorCount < 16 && endpoint.m_impl->recvQueue.size() == 0 );
 

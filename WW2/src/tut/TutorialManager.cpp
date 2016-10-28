@@ -203,7 +203,7 @@ void TutorialManager::Update()
 						}
 					}
 					break;
-                        
+
                     default:
                         break;
 				}

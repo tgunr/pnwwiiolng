@@ -163,7 +163,7 @@ chatSendSCMDResult(SINT32 playerID
 							, result
 							);
 		scmd.m_data = data;
-		if ( scmd.send() < 0 ) 
+		if ( scmd.send() < 0 )
 			throw std::logic_error("Send error");
 
 		return true;

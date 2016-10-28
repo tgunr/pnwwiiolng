@@ -715,7 +715,7 @@ bool verifyAuthConnected()
 
 	// Is there no connection ID? Or, is there no endpoint configured?  Or, is the endpoint unusable due to state?
 	ENDPOINT *endPoint = nullptr;
-	if (_authConnection < 0 || ((endPoint = teulGetEndpoint(_authConnection)) == nullptr) || 
+	if (_authConnection < 0 || ((endPoint = teulGetEndpoint(_authConnection)) == nullptr) ||
 		endPoint->state() == IS_CLOSED || endPoint->state() == IS_DEAD)
 	{
 		// No valid auth connection exists.  Has 10 seconds elapsed since last attempt?
@@ -741,7 +741,7 @@ bool verifyAuthConnected()
 			}
 
 			// reset the timer for another wait period so we don't spam attempts
-			_timeRetry.makeCurrent();	
+			_timeRetry.makeCurrent();
 		}
 		// no, then don't do anything and tell the caller there is no connection
 	}

@@ -238,7 +238,7 @@ struct Field : public Node
 	std::string			m_dimensionString;
 
 	Field(const TypeDef* typeDef, const char* name, Node* parent)
-		: Node(Node::Type::Field, name, parent) 
+		: Node(Node::Type::Field, name, parent)
 		, m_typeDef(typeDef)
 		, m_size(0)
 		, m_defaultValue("")

@@ -1248,7 +1248,7 @@ Server::HeartBeat::process()
 
 		server->stats = *this;
 		_updateServerStats(server);
-		
+
 		if ( statusChange )
 		{
 			dbugLog(_FLN, "status update for %s server %s status %d numPlayers %d maxPlayers %d"
@@ -1576,7 +1576,7 @@ serverGetAuthIP()
 		LogAbort("Missing AUTH_ADDRESS");
 
 	UINT32 address = Teul::GetSingleIP(authName);	// Returns malloc'd pointer!
-	
+
 	ABORT_IF_EX(address == 0, "Unable to resolve auth address '%s'", authName);
 	return address;
 #endif

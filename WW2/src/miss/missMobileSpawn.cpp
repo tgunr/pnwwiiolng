@@ -327,7 +327,7 @@ missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle
 			throw std::domain_error("Unknown player");
 
 		error = mission->getMobileSpawnPermission();
-		dbugLog(_FLI, "m:%u p:%u c:%s sto:%u stoType:%d msp @ %0.3g/%0.3g/%0.3g result:%u", 
+		dbugLog(_FLI, "m:%u p:%u c:%s sto:%u stoType:%d msp @ %0.3g/%0.3g/%0.3g result:%u",
 			missionID, player->playerID(), player->callsign(), stoUID, stoSubType, x, y, z, error);
 
 		if ( error != MSDR_GRANTED )

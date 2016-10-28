@@ -395,7 +395,7 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 		dbugLog(_FLA, "failed to start %s err %d: %s", processPath.c_str(), errno_, strerror_r(errno_, error, sizeof(error)));
 		return false;
 	}
-			
+
 	process_ = childPid;
 	pid_ = childPid;
 	return true;

@@ -2576,9 +2576,9 @@ const char* ScenarioManager::MapPath(const char* file, const char* ender)
 
 	if(ender)
 		mapPath += ender;
-    
+
     int fd = fioOpen(mapPath.c_str());
-    
+
     if (fd == -1) {
 		std::string tempPath;
 
@@ -3534,9 +3534,9 @@ void ScenarioManager::LoadObject(ScenarioObject* ob, UINT32 loadFlags, const cha
                 /*
                  TBD: Clearly someone meant to process more than just 3 pieces of data here even
                       if it intended to be optional - but as is, its not processing more than three.
-                 
-                 OLD Code: 
-                 
+
+                 OLD Code:
+
 				FLOAT32 x, y, z, dx, dy, dz;
 				x = y = z = dx = dy = dz = 0.0f;
 
@@ -3547,12 +3547,12 @@ void ScenarioManager::LoadObject(ScenarioObject* ob, UINT32 loadFlags, const cha
 				if(parsed > 3)
 					dir.set((double)dx, (double)dy, (double)dz);
                  */
-                
+
                 FLOAT32 x, y, z;
                 x = y = z = 0.0f;
-                
+
                 int parsed = sscanf(data, "%f %f %f", &x, &y, &z);
-                
+
                 if(parsed == 3)
                     position.set((double)x, (double)y, (double)z);
 			}
@@ -3893,7 +3893,7 @@ void ScenarioManager::LoadObject(ScenarioObject* ob, UINT32 loadFlags, const cha
 			// now we have the 2 points that make up the boundary volume
             //  TBD - but only one is being used.  Why?  Is this an error in the calcualtion?
 			// Vec3d front = Vec3d(0,1,0);
-            
+
 			Vec3d up = Vec3d(0,0,1);
 
 			Matrixd rotate;
@@ -4085,7 +4085,7 @@ void ScenarioManager::UnloadObject(ScenarioObject* ob)
 			TUT_MGR->RunCode(code);
 		}
 		break;
-            
+
             default:
             // no actions for any other types.
             break;
@@ -4197,14 +4197,14 @@ void ScenarioManager::LoadContent()
 {
     /*
        TBD - whenever we actually do custom maps, lol, for now - gone.
-     
+
      bool active = IsActive();
-     
+
 	// global offset for custom maps; everything will be offset
 	Vec3d offset = (active) ? _scenario->offset : Vec3d();
-     
+
      */
-    
+
 	// load our category (mappack) include if one is defined
 	jsContentData mapPack;
 
@@ -5058,14 +5058,14 @@ void ScenarioWaveObject::Update()
 
         /*
           TBD - rotate it along the y, did this have an actual purpose?
-         
+
 		Vec3d from = Vec3d(0.0f, 1.0f, 0.0f);
 
 		rotate.makeRotate(from, position);
 		final = final * rotate;
-         
+
          */
-        
+
 		// rotate this into the object's world offsetted position
 		final = final * wd.objAtt;
 

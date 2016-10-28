@@ -81,7 +81,7 @@ SINT32 teulPackVoid(const PackMode mode, UCHAR* const buffer, const SINT32 bitOf
 	{
 		if (mode == TEUL_PACK)
 		{
-			memcpy(&buffer[bitOffset >> 3], anything, size );
+			memcpy(&buffer[bitOffset >> 3], anything, size);
 		}
 		else
 		{

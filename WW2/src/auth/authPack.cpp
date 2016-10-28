@@ -104,7 +104,7 @@ SINT32 authPackAPP_LAUNCH_REQ(PackMode mode, UCHAR* data, SINT32 offset, APP_LAU
 	offset = teulPackUINT32(mode,data,offset,&request->appVersion,0);
 
 	offset = teulPackSINT32(mode,data,offset,&request->cdKeySize,0);
-	
+
 	// Ugly hack: The size sent by the client can't be trusted; we'll get a
 	// nasty buffer overflow if we use an invalid size. However, always
 	// packing/unpacking MAX_PARAM (as similarly done by the username and

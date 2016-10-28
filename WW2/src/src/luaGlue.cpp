@@ -486,7 +486,7 @@ _startInterpreter()
 	lua_pushstring(_luaVM, luaPath.c_str());
 	lua_setfield(_luaVM, -2, "path");
 	lua_pop(_luaVM, 1);
-	
+
 	tolua_game_open(_luaVM);
 	dbugLog(_FLI, "started Lua interpreter");
 

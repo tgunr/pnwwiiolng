@@ -16,7 +16,7 @@ public:
 	virtual ~colliderQuery();
 
     colliderQuery( const colliderQuery & rhs ) { }
-    
+
 	dGeomID addGeom(dGeomID g, unsigned int cat, unsigned int col);
 	void addGeomToCollideWith(dGeomID);
 	void setGeomToCollideWith(dGeomID);

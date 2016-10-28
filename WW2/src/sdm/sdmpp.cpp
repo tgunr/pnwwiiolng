@@ -153,7 +153,7 @@ _getListOfSDMFiles(std::vector<std::string>& into)
 	if ( hFind == INVALID_HANDLE_VALUE )
 		return false;
 
-	do 
+	do
 	{
 		into.push_back(data.cFileName);
 	} while (FindNextFileA(hFind, &data));

@@ -55,7 +55,7 @@ Teul::Packet::Packet(Teul::Packet&& rhs)
 		return;
 
 	this->m_data = rhs.m_data;		// Take possession of the data,
-	
+
 	rhs.m_data = rhs.m_localData;	// point rhs back at its local data.
 
 	// If the source is using it's local data buffer, just copy the data over

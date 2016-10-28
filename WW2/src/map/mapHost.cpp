@@ -497,7 +497,7 @@ MissionList::receive(SINT32 teulIndex) {
 		std::multimap<int, const Mission*> missions;
 		UINT32 highestCount = 0;
 
-		auto add_missions = 
+		auto add_missions =
 		[&] (WWII_COUNTRY country, BRANCH_ENUM branch) {
 			for ( BRIGADES::const_iterator brig = g_brigades[country][branch].begin();
 			      brig != g_brigades[(size_t)country][(size_t)branch].end() ; ++brig ) {

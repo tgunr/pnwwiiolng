@@ -4280,7 +4280,7 @@ const char* getBaseName(const char* path, const char* prePath)
 {
     std::string name = path;
     size_t sepPos = std::string::npos;
-    
+
     if ((sepPos = name.rfind('\\')) != std::string::npos){
         name = name.substr(sepPos + 1);
     }
@@ -4576,7 +4576,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimation(const SCHAR* blendfile, SINT32 boneCo
 {
     std::string path = GR2DATA_PREPATH + std::string(blendfile);
 	gr2AnimationBlend *blend = nullptr;
-    
+
 	// strip extension, if any
 	path = path.substr(0, path.rfind(".")); // substr(0,npos) == entire string
 
@@ -4584,12 +4584,12 @@ gr2AnimationBlend* gr2LoadBlendedAnimation(const SCHAR* blendfile, SINT32 boneCo
 #if GR2_USE_XML_BLENDS
     blend = gr2LoadBlendedAnimationXML((path + ".xml").c_str(), boneCount);
 #endif
-	
+
 	// if it failed or wasn't requested, try the .txt version of the file
 	if (!blend) {
         blend = gr2LoadBlendedAnimationTXT(const_cast<char *>((path + ".txt").c_str()), boneCount);
     }
-    
+
     return blend;
 }
 

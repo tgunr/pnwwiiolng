@@ -313,7 +313,7 @@ strtProcessDBQueue()
 			_commitLink((LinkStruct*)object);
 		break;
 
-		default :
+		default:
 			LogAbort("Queue processing excpetion! Unhandled case.");
 		break;
 		}

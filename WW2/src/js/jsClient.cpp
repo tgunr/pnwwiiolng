@@ -1537,9 +1537,9 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 			{
                 /*
                  TODO: Send in whether or not the player was wounded into Mission Results
-                 
+
                  NOTE: unsure whether code here is connected to above statement.
-                 
+
 				const PersonaSelection& persona = PlayerClient()->PersonaSelected();
 				Player* player = playerGetPlayer();
 				vehVehicle* vehicle = playerGetVehicle();
@@ -4359,10 +4359,10 @@ JS_FUNCTION_DEF(jsClientState, paccess)
 
 JS_FUNCTION_DEF(jsClient, isavailable)
 {
-    
+
 #define AVAIL "available"
 #define INACT "inactive"
-    
+
 	jsPersonaSummary* summary = phui::js::Cast<jsPersonaSummary*>(ctx, argv[0]);
 	if(!summary) return JS_FALSE;
 	else if(strncmp(summary->Summary().availability(), AVAIL, strlen(AVAIL)) == 0 ||

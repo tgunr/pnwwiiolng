@@ -629,7 +629,7 @@ struct ClientRole : public Role
 	}
 
 	public:
-	void TestVaryingPacketSizes(const SINT32 teulIndex) 
+	void TestVaryingPacketSizes(const SINT32 teulIndex)
 	{
 		if (tSendVariety.isEnabled() == false)
 			return;

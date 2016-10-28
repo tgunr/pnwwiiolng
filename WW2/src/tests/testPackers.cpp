@@ -337,7 +337,7 @@ public: virtual bool Run() override
 
 			TestBitRanges<UINT64>("UINT64", 0x1234567890abcdefULL);
 			TestBitRanges<UINT64>("UINT64", 0x1f2e3d4c5b6a7089ULL);
-			
+
 			// signed 64-bit int
 			TestPacker<SINT64>("SINT64", 0, 0);
 			TestPacker<SINT64>("SINT64", 0xffLL, 0);

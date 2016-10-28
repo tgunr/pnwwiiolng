@@ -540,7 +540,7 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 {
     int retval = -EINVAL;
-    
+
 	if(!clientinited) return retval;
 
 	TeulTimeMS timeout = 0LL;
@@ -1404,7 +1404,7 @@ void Client::ProcessLoginAttempt(bool success, SINT32 type, SINT32 result)
 
 		}
 		break;
-            
+
         default:
             // don't care about other host types.
             break;
@@ -2001,7 +2001,7 @@ void Client::ProcessBrigadeSelection(BrigadeSelection const& selection)
 		case BRIG_RESTRICTED:
 			_data->waitmsg[BRIGADE_SELECT_WAIT] = -1;
 		break;
-            
+
         default:
             // don't care about other BRIG status
             break;
@@ -2285,7 +2285,7 @@ void Client::ProcessMissionRoomListReply(RoomList const& missroomlist)
 					_classdata->missionroom.push_back(*entry);
 			}
 			break;
-                
+
             default:
                 // don't care about other RMLIST commands
                 break;

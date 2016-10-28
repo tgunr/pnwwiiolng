@@ -37,7 +37,7 @@ ELSE()
     ADD_COMPILE_OPTIONS( "-Winvalid-pch" "-Wno-array-bounds" )
     ADD_COMPILE_OPTIONS( "-Wno-strict-aliasing" "-Wno-unused-result" "-Wno-unknown-pragmas" )
     ADD_COMPILE_OPTIONS( "-Wall" "-Wshadow" "-Wno-deprecated" )
-    
+
     IF ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang )
         # Use cheap list of stupid options for GCC
     ELSE()
@@ -63,9 +63,9 @@ ELSE()
         ADD_COMPILE_OPTIONS( "-stdlib=libc++" )
         LINK_LIBRARIES( "-stdlib=libc++" )
     ENDIF()
-    
+
     ADD_COMPILE_OPTIONS( "-fstack-protector-all" )
-    
+
     if ( CMAKE_BUILD_TYPE MATCHES Debug )
         ADD_COMPILE_OPTIONS( "-O0" )
         ADD_DEFINITIONS( "-DDEBUG=1" )

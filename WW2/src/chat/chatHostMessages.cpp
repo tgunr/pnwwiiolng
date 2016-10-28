@@ -425,7 +425,7 @@ chatSendUMSKill(const Player* player, const UINT32 stoUID)
 {
 	Scoring::Actor actShooter(player);
 	actShooter.setSortie(player->sortieID(), player->weapon(), false);
-	
+
 	Teul::Packet outgoing(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
 	outgoing.construct<Scoring::UMSKill>(actShooter, stoUID);
 	return serverSendPacketToType(outgoing, MAP_HOST);

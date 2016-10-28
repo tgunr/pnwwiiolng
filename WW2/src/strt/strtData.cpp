@@ -1750,7 +1750,7 @@ bool strtInitLinkfromWOR(LinkStruct& link)
 
 	DEPOT_LINK_PARAMS* linkParams;
 	static const std::string linkRail("RAIL_LINK"), linkBarge("BARGE_LINK"), linkConvoy("CONVOY_LINK"),
-						linkPackAnimal("PACK_ANIMAL_LINK"), linkWagon("WAGON_LINK"), linkPorter("PORTER_LINK"), 
+						linkPackAnimal("PACK_ANIMAL_LINK"), linkWagon("WAGON_LINK"), linkPorter("PORTER_LINK"),
 						linkTruck("TRUCK_LINK");
 	switch (link.startDepot->subType)
 	{
