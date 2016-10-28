@@ -13,6 +13,12 @@ IF ( NOT WIN32 )
 	IF ( NOT READLINE_FOUND )
 		MESSAGE( FATAL_ERROR "readline library is required" )
 	ENDIF()
+
+	FIND_PROGRAM(CTAGS ctags)
+	IF ( CTAGS )
+		ADD_CUSTOM_TARGET(ctags COMMAND ${CTAGS} -R ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]*)
+	ENDIF()
+	MARK_AS_ADVANCED(CTAGS)
 ENDIF()
 
 # Pull in MySQL
