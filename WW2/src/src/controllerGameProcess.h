@@ -108,7 +108,7 @@ public:
 namespace GameProcessManager
 {
 	//! Tear up.
-	void Initialize(const char** envp);
+	void Initialize(const char** envp, bool singleStartMode);
 
 	//! Ask the server manager to include a new server type.
 	//! @note Only one instance of each server per manager.

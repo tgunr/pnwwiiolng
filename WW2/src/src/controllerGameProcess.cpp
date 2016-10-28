@@ -23,6 +23,7 @@ GameProcess* GameProcess::s_processStarting = nullptr;
 static std::list<GameProcess> s_processes;
 
 static const char** s_savedEnvp = nullptr;
+static bool s_singleStartMode = false;
 
 //////////////////////////////////////////////////////////////////////
 // Helper to determine if a process is currently running.
@@ -246,52 +247,50 @@ bool GameProcess::CheckStatus()
 		}
 		// Should not be possible for desired to be false while want running is true.
 		ABORT_IF(!Desired());
-	}
-	else // Process is NOT running.
-	{
-		ABORT_IF(StopSent());
-		ABORT_IF(!StartSent() && ProcessID());
-		if ( Desired() )
-		{
-			if ( WantRunning() == false )
-			{
-				// Flag that we should start it, and let it get picked up this heartbeat cycle.
-				Log("want running.");
-				RequestStart();
-				return true;
-			}
-			// Are we in the process of starting?
-			if ( StartSent() )
-			{
-				ABORT_IF(s_processStarting != this);
-				if ( TimeSinceStartSent() >= s_processLaunchTimeout )
-				{
-					Log(Debug::ERR_WARN, "startup timed out after %" PR64BitUT "ms. Killing.", TimeSinceStartSent());
-					Kill();
-					return false;
-				}
-				Log("waiting for startup.");
-				return false;
-			}
-			ABORT_IF(s_processStarting == this);
-			Log("waiting on startup opportunity.");
-			return true;
-		}
-		else if ( StartSent() )
-		{
-			// Process is no-longer wanted but we were starting up.
-			// Ask the process not to bother.
-			RequestStop();
-			return false;
-		}
-		else
-		{
-			Log("waiting removal (!desired)");
-			return false;
-		}
+		return false;
 	}
 
-	return false;
+	// Process is NOT running.
+	ABORT_IF(StopSent());
+	ABORT_IF(!StartSent() && ProcessID());
+	if ( Desired() )
+	{
+		if ( WantRunning() == false )
+		{
+			// Flag that we should start it, and let it get picked up this heartbeat cycle.
+			Log("want running.");
+			RequestStart();
+			return true;
+		}
+		// Are we in the process of starting?
+		if ( StartSent() )
+		{
+			ABORT_IF(s_processStarting != this);
+			if ( TimeSinceStartSent() >= s_processLaunchTimeout )
+			{
+				Log(Debug::ERR_WARN, "startup timed out after %" PR64BitUT "ms. Killing.", TimeSinceStartSent());
+				Kill();
+				return false;
+			}
+			Log("waiting for startup.");
+			return false;
+		}
+		ABORT_IF(s_processStarting == this);
+		Log("waiting on startup opportunity.");
+		return true;
+	}
+	else if ( StartSent() )
+	{
+		// Process is no-longer wanted but we were starting up.
+		// Ask the process not to bother.
+		RequestStop();
+		return false;
+	}
+	else
+	{
+		Log("awaiting removal (!desired)");
+		return false;
+	}
 }
 
 template<size_t MaxPath>
@@ -410,12 +409,13 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 
 namespace GameProcessManager
 {
-	void Initialize(const char** envp)
+	void Initialize(const char** envp, bool singleStartMode)
 	{
 #if platOS != OS_WIN32
 		signal(SIGCHLD, SIG_IGN);
 #endif
 		s_savedEnvp = envp;
+		s_singleStartMode = singleStartMode;
 	}
 
 	// Include this server in the launch list.
@@ -460,16 +460,18 @@ namespace GameProcessManager
 			return false;
 
 		// Remember if we thought a process was starting before we checked statuses.
+		static UINT32 launchCount[MAX_SERVER_TYPE];
 		bool wasStarting = (GameProcess::s_processStarting != nullptr);
 		GameProcess* starter = nullptr;
 		for ( auto it = s_processes.begin(); it != s_processes.end(); )
 		{
 			auto& proc = (*(it++));
-			if ( proc.CheckStatus() && allowStarts )
-			{
-				if ( starter == nullptr || proc.ServerType() < starter->ServerType() )
-					starter = &proc;
-			}
+			if ( !proc.CheckStatus() || !allowStarts )
+				continue;
+			if ( s_singleStartMode && launchCount[proc.ServerType()] > 0 )
+				continue;
+			if ( starter == nullptr || proc.ServerType() < starter->ServerType() )
+				starter = &proc;
 		}
 
 		if ( !wasStarting && starter != nullptr )
@@ -481,6 +483,8 @@ namespace GameProcessManager
 				/// e.g. right now cell host logs to wwii_host.X.log but the executable is hostd.
 				static const char* processNames[MAX_SERVER_TYPE] = { nullptr, "authHost" EXE_SUFFIX, "dbd" EXE_SUFFIX, "stratd" EXE_SUFFIX, "chatd" EXE_SUFFIX, "mmhostd" EXE_SUFFIX, "hostd" EXE_SUFFIX, nullptr };
 
+				launchCount[starter->ServerType()]++;
+
 				const char* processName = processNames[starter->ServerType()];
 				processhandle_t child = 0ULL;
 				UINT64 childPid = 0ULL;
@@ -488,7 +492,8 @@ namespace GameProcessManager
 				bool success = _spawnProcess(starter, processName, child, childPid, spawnErrno);
 				if ( success )
 				{
-					dbugLog(_FLI, "%s server started %s child %" PR64BitUT " (pid %" PR64BitUT ")", starter->ServerTypeName(), processName, child, childPid);
+					dbugLog(_FLI, "%s server started %s #%u child %" PR64BitUT " (pid %" PR64BitUT ")",
+							starter->ServerTypeName(), processName, launchCount[starter->ServerType()], child, childPid);
 					starter->OnStarting(child, childPid);
 					return true;
 				}

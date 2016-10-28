@@ -51,6 +51,7 @@ static event*			s_managedProcessEvent = nullptr;
 static evutil_socket_t	s_repeaterSocket = INVALID_SOCKET;
 static event*			s_repeaterEvent = nullptr;
 
+bool g_singleShot = false;
 bool g_shuttingDown = false;
 bool g_enableStarts = true;
 
@@ -485,6 +486,7 @@ static void _toggleStarts(int /*signal*/)
 
 int main(int argc, const char* argv[], const char* envp[])
 {
+	bool singleStartMode = false;
 	g_argv0 = argv[0];
 	Server::InitializeProcess(g_serverName, CONTROLLER_HOST, _errorFunction, nullptr, argc, argv, {
 		{ "--configs", "List configuration variables and exit.", false,
@@ -497,6 +499,11 @@ int main(int argc, const char* argv[], const char* envp[])
 			[](const char* filename) {
 				Teul::ConfigVar::Generate(filename);
 				exit(0);
+			}
+		},
+		{ "--single-shot", "Launch each child process only once.", false,
+			[&](const char*) {
+				singleStartMode = true;
 			}
 		}
 	});
@@ -525,7 +532,7 @@ int main(int argc, const char* argv[], const char* envp[])
 	signal(SIGUSR1, _toggleStarts);
 #endif
 
-	GameProcessManager::Initialize(envp);
+	GameProcessManager::Initialize(envp, singleStartMode);
 
 	// Our main loop is handled by libevent rather than teulKit.
 	event_base_dispatch(Teul::eventBase);
