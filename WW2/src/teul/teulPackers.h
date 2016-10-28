@@ -135,6 +135,8 @@ struct ACTION_OBJECT
 	void bytePacker(PackMode mode, void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(mode, this->packed, this->offset, byteStream, numBytes); }
 	void packBytes(const void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(TEUL_PACK, this->packed, this->offset, const_cast<void*>(byteStream), numBytes); }
 	void unpackBytes(void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(TEUL_UNPACK, this->packed, this->offset, byteStream, numBytes); }
+	template<class T, size_t N>
+	void arrayPacker(PackMode mode, T (&array)[N]) { this->offset = teulPackVoid(mode, this->packed, this->offset, array, sizeof(array[0]) * N); }
 
 	//! @brief Check that the packed data stream has enough bytes to populate an object type.
 	template<class Typename_>
