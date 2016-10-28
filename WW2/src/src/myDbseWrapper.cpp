@@ -121,9 +121,8 @@ dbseGetConnection(bool report, bool autoReconnect)
 	if ( !s_dbInitialized ) {
 		dbseSetDatabase(cv_wwiiDBAddress, cv_wwiiDBPort, cv_wwiiDBDefaultSchema, cv_wwiiDBUser, cv_wwiiDBPassword);
 	}
-	if ( !s_dbAddress || !s_dbPort || !s_dbSchema || !s_dbUser || !s_dbPassword ) {
-		threadLog(_FLW, "Missing database configuration, can't connect\n");
-		return nullptr;
+	if ( !s_dbAddress[0] || !s_dbPort || !s_dbSchema[0] || !s_dbUser[0] || !s_dbPassword[0] ) {
+		LogAbort("Missing database configuration, can't connect");
 	}
 
     threadLog(_FLD, "Getting thread connection to host '%s:%hu' database '%s' user '%s'"
