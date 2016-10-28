@@ -125,7 +125,7 @@ struct ACTION_OBJECT
 #endif
 
 	ACTION_OBJECT(void* const packed_, const SINT32 offset_bits_, const SINT32 size_bytes_=0)
-		: teulIndex(-1), actionObj(nullptr), localRawData(nullptr), packed((UCHAR*)packed_)
+		: teulIndex(-1), actionObj(nullptr), localRawData(nullptr), packed(static_cast<UCHAR*>(packed_))
 		, offset(offset_bits_), m_size_bytes(size_bytes_)
 		, fromAddress(0), fromPort(0)
 		, endpoint(nullptr), m_client(nullptr)
@@ -133,14 +133,16 @@ struct ACTION_OBJECT
 
 	void packer(PackMode mode, bool& value, SINT32 sb = 1) { return (mode == TEUL_PACK) ? pack(value, sb) : unpack(value, sb); }
 	void bytePacker(PackMode mode, void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(mode, this->packed, this->offset, byteStream, numBytes); }
-	void packBytes(const void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(TEUL_PACK, this->packed, this->offset, (void*)byteStream, numBytes); }
+	void packBytes(const void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(TEUL_PACK, this->packed, this->offset, const_cast<void*>(byteStream), numBytes); }
 	void unpackBytes(void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(TEUL_UNPACK, this->packed, this->offset, byteStream, numBytes); }
 
 	//! @brief Check that the packed data stream has enough bytes to populate an object type.
 	template<class Typename_>
 	bool canRead() const
 	{
-		return (offset >= 0) ? ((SINT32)(static_cast<size_t>(offset) + sizeof(Typename_) * 8) <= (SINT32)sizeInBits()) : false;
+		if ( offset < 0 )
+			return false;
+		return (static_cast<size_t>(offset) + sizeof(Typename_) * 8) <= sizeInBits();
 	}
 
 	//! @brief Consume an object, in-place, from the packed data section.
@@ -149,16 +151,15 @@ struct ACTION_OBJECT
 	Typename_& read()
 	{
 		ABORT_IF(offset < 0);
-		void* ptr = ((char*)(packed)) + (static_cast<size_t>(offset) / 8);
+		void* ptr = reinterpret_cast<char*>(packed) + (static_cast<size_t>(offset) / 8);
 		offset += static_cast<SINT32>(sizeof(Typename_) * 8);
-		return *(Typename_*)(ptr);
+		return *reinterpret_cast<Typename_*>(ptr);
 	}
 
-	template<class _Class>
+	template<class T>
 	SINT32 packClass(PackMode mode)
 	{
-		_Class* classInstance = (_Class*) this->localRawData;	 // Type cast readability
-		return classInstance->packer(mode, this);
+		return reinterpret_cast<T*>(localRawData)->packer(mode, this);
 	}
 
 	//! Pack data directly.
@@ -171,7 +172,7 @@ struct ACTION_OBJECT
 		// Align to byte boundary so we don't mess about with bits.
 		this->offset = (this->offset + 7) & (~7);
 		// Take a pointer to this position in the byte stream.
-		char* streamPtr = (char*)(this->packed) + static_cast<size_t>(Teul::BitsToBytes(this->offset));
+		auto streamPtr = reinterpret_cast<char*>(this->packed) + static_cast<size_t>(Teul::BitsToBytes(this->offset));
 		// Increment offset.
 		this->offset += Teul::BytesToBits(bytes);
 
@@ -182,7 +183,7 @@ struct ACTION_OBJECT
 	}
 
 	void packSecondsDelta(PackMode mode, UINT32& time, SINT32 sizeBits=0);
-	void packChatHandle(PackMode mode, ChatHandle* const handle) { this->offset = teulPackUINT64(mode, this->packed, this->offset, (UINT64*)handle, GAME_HANDLE_BITS); }
+	void packChatHandle(PackMode mode, ChatHandle* const handle) { this->offset = teulPackUINT64(mode, this->packed, this->offset, static_cast<UINT64*>(handle), GAME_HANDLE_BITS); }
 
 	// Size is in bytes which discards 3 significant bits of data and means that
 	// we can't accurately identify the case where there are less than 7 bits of

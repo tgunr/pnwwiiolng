@@ -61,9 +61,9 @@ struct FULL_OBJ_ID
 
 	void FromKey(const UINT64& key)
 	{
-		cell.ox = (SINT16)((key >> 28) << 4);
-		cell.oy = (SINT16)((key >> 16) << 4);
-		this->id = (UINT16)(key & 0xffff);
+		cell.ox = static_cast<SINT16>((key >> 28) << 4);
+		cell.oy = static_cast<SINT16>((key >> 16) << 4);
+		this->id = static_cast<UINT16>(key & 0xffffU);
 		objClass = 0;
 		objType = 0;
 	}
@@ -84,9 +84,9 @@ struct FULL_OBJ_ID
 	UINT64 Key() const
 	{
 		static const UINT64 SC_MASK = (0x0fff);		// 12 bits of supercell id
-		return (((UINT64)(cell.ox >> 4) & SC_MASK) << 28)	// 12 bits of ox
-			|  (((UINT64)(cell.oy >> 4) & SC_MASK) << 16)	// 12 bits of oy
-			|  (id & 0xffff)								// 16 bits of id
+		return ((static_cast<UINT64>(cell.ox >> 4) & SC_MASK) << 28)	// 12 bits of ox
+			|  ((static_cast<UINT64>(cell.oy >> 4) & SC_MASK) << 16)	// 12 bits of oy
+			|  (id & 0xffff)											// 16 bits of id
 			;
 	}
 
