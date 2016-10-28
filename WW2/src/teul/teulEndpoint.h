@@ -155,7 +155,7 @@ public:
 	UINT32 destAddress() const;
 	UINT16 destPort() const;
 
-	bool const isFromClient() const noexcept { return protocol == PROTOCOL_TCP && !m_peer; }
+	bool isFromClient() const noexcept { return protocol == PROTOCOL_TCP && !m_peer; }
 
 private:
 	//! Write the actual data to the socket.
