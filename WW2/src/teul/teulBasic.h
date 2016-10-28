@@ -1,7 +1,6 @@
 #pragma once
 // Created: Tue Nov 28 14:05:08 CST 2006
 //
-//! @file teul/teulBasic.h
 //! Minimal teulKit include
 //
 // Copyright (C) PlayNet, Inc 1999-2006 - All rights reserved.
@@ -76,6 +75,7 @@ bool teulGetHost(const char* address, UINT32* host);
 //! @ingroup not-thread-safe
 //! @param[in]	host			Binary IP address.
 //!	@return pointer to static buffer with address as a string.
+[[deprecated]]
 const char* teulGetAddress(const UINT32 host);
 
 //! Thread safe conversion of a network address to a string.
@@ -91,12 +91,12 @@ const char* teulGetAddress(const UINT32 host, char* buffer, const size_t bufferS
 //! Since we have to ensure that callbacks happen in step with whatever
 //! application is using teul, we have to make a call for that all to happen.
 //! should be called once per game loop.
-//! @param[in]	waitVal		Sets a maximum number of milliseconds to continue
+//! @param[in]	duration	Sets a maximum number of milliseconds to continue
 //!							processing. A value of 0 indicates no wait
 //!							(non-blocking), a negative value specifies
 //!							wait forever.
 //! @ingroup not-thread-safe
-void teulUpdateTransport(const TeulTimeMS duration_=0ULL);
+void teulUpdateTransport(const TeulTimeMS duration=0ULL);
 
 //! Get the local address of a given teul index.
 //! @param[in]	teulIndex		Index of the connection to query.
