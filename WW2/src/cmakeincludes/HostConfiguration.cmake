@@ -16,8 +16,13 @@ IF ( MSVC )
     ADD_COMPILE_OPTIONS(
         "/Zi" "/Zc:wchar_t" "/Zc:forScope" "/EHsc" "/fp:precise"
         "/WX-" "/FR" "/wd4480" "/wd4800"
-        "/nologo" "/MT" "/Gm"
+        "/nologo" "/Gm"
     )
+	IF ( CMAKE_BUILD_TYPE STREQUAL Debug )
+		ADD_COMPILE_OPTIONS( "/MTd" )
+	ELSE()
+		ADD_COMPILE_OPTIONS( "/MT" )
+	ENDIF()
 
     IF ( BUILD_BITNESS EQUAL 64 )
         ADD_COMPILE_OPTIONS( "/arch:AVX" )
