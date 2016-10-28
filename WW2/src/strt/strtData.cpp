@@ -158,6 +158,8 @@ _checkSupplyLinksIn(const Supercell& sc)
 		bldg = sc.Get<ObjectStruct>(newLink->startDepotID.id);
 		if ( bldg != nullptr )
 		{
+			if (bldg->facility == nullptr)	// problem raised elsewhere
+				continue;
 			const FacilityStruct& facility = bldg->Facility();
 			if ( facility.m_outgoingLink == nullptr)
 			{
@@ -179,6 +181,8 @@ _checkSupplyLinksIn(const Supercell& sc)
 		bldg = strtGetObject(newLink->endDepotID);
 		if ( bldg != nullptr )
 		{
+			if (bldg->facility == nullptr)	// problem raised elsewhere
+				continue;
 			const FacilityStruct& facility = bldg->Facility();
 			if ( facility.m_incomingLink == nullptr)
 			{
