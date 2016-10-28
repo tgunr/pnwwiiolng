@@ -190,7 +190,7 @@ chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 		{
 		case SquadMemberUpdate::_ADD:
 			LogAbort("SMU::ADD is deprecated");
-		break;
+
 		case SquadMemberUpdate::_PROMOTE:
 		{
 			if ( update.m_handle < 0x40LL ) throw SquadError("invalid handle", SQR_INVALID);
@@ -270,7 +270,6 @@ chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 		default:
 		case SquadMemberUpdate::_INVALID:
 			throw SquadError("Invalid/not implemented yet", SQR_NOT_IMPLEMENTED);
-		break;
 		}
 
 		// Record this event

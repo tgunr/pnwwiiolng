@@ -194,14 +194,13 @@ _isAutoRebuildObject(const ObjectStruct& object)
 		case BUILDING_AUTOGUNNER:
 		case BUILDING_BRIDGE:
 			return true;
-		break;
+
 
 		case BUILDING_RESEARCH:
 			return (object.isProductionCenter());
-		break;
+
 		default:
 			return false;
-		break;
 	}
 }
 

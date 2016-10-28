@@ -707,7 +707,6 @@ Chat::SendModReport(const ChatHandle handle, const Chat::ModReport modType)
 		return;
 //		ban = _isBanable(handle);
 //		type = "injection";
-	break;
 	case Chat::ModDamned:
 		// Only ban detects one time in 5.
 		if ( ((rand() % 5) == 1 && host_config.arena.banCheats > 0) || _isBanable(handle) )
@@ -1819,12 +1818,10 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle handleID)
 		case NO_CHANNEL:
 			detuneRadio(index);
 			return true;
-		break;
 
 		case PRIVATE_CHANNEL:
 		case NUMBERED_CHANNEL:
 			return tuneRadioToHandle(index, handleID);
-		break;
 
 		case SQUAD_CHANNEL:
 			if ( squadID() )
@@ -3380,7 +3377,6 @@ _ircNumericMessages(irc_session_t * session, unsigned int event, const char* ori
 		if ( count > 3 && strcmp(params[1], "=") == 0 )
 			_registerUsers(params[2], params[3]);
 		return;
-	break;
 
 	default:
 	break;

@@ -746,27 +746,24 @@ mapSaveErrorInfo(Player& player, WWII_ERROR_INFO& info)
 		try
 		{
 			_errExit(info, player, platform);
-			return;
 		}
 		catch ( std::exception& e )
 		{
 			dbugLog(_FLA, "Error writing bug report to database: %s", e.what());
-			return;
 		}
-		break;
+	return;
+
 	case WW_ERR_EXCEPTION:
 		try
 		{
 			_errException(info, player, platform);
-			return;
 		}
 		catch ( std::exception& e )
 		{
 			dbugLog(_FLA, "Error writing bug report to database: %s", e.what());
-			return;
 		}
+	return;
 
-		break;
 	case WW_ERR_VALIDITY_CHECK:
 		player.log(_FLI, "Got validity check bug report");
 		sprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
@@ -778,7 +775,8 @@ mapSaveErrorInfo(Player& player, WWII_ERROR_INFO& info)
 						, player.OTP(), info.eventID, player.playerID()
 						, info.errorType,teulGetAddress(info.hostIP), teulGetAddress(info.clientVersion),platform, info.clientTime, info.hostTime, info.archiveWasCorrupt
 						, info.data.validityInfo.archive.string,  info.data.validityInfo.filename.string,  info.data.validityInfo.crc, info.data.validityInfo.md5);
-		break;
+	break;
+
 	case WW_ERR_SYSTEM_INFO:
 		player.log(_FLW, "Got system info bug report???");
 	return;

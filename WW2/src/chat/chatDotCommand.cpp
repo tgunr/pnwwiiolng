@@ -209,7 +209,8 @@ DotCommand::setAvailability(char level)
 		dbugLog(_FLD, "%s restricted to CRS by permission" , command());
 		m_public = false;
 		m_playnetOnly = true;
-		break;
+	break;
+
 	default:
 #ifdef DEBUG
 		LogAbort("'%s' command has unrecognized availability level %c", command(), level);
@@ -749,7 +750,6 @@ chatGetTimeInterval(Player& player, const char* timeString, UINT32& interval, co
 			interval = 0;
 			player.message(LSTR_CAUTION, LSTR_INVALID_TIME, timeString);
 			return false;
-		break;
 	};
 
 	return true;

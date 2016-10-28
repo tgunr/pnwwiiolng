@@ -764,7 +764,6 @@ _processText(SquadControl& request, Player* player, SquadList* squadList)
 	break;
 	default:
 		throw SQR_OPERATION_FAILED;
-	break;
 	}
 
 	DBThread::EscapeString(request.m_text);
@@ -820,7 +819,6 @@ _processInteger(SquadControl& request, Player* player, SquadList* squadList)
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, request.m_key, request.m_value);
 		throw SQR_OPERATION_FAILED;
-	break;
 	}
 
 	if ( column == nullptr || *column == 0 )
@@ -971,7 +969,6 @@ SquadControl::receive(SINT32 teulIndex)
 		default:
 			player->log(_FLA, "invalid action %d", m_action);
 			throw SQR_INVALID;
-		break;
 		}
 	}
 	catch (SQUAD_CONTROL_RESULT result)
@@ -984,7 +981,7 @@ SquadControl::receive(SINT32 teulIndex)
 	{
 	case SQR_IN_PROGRESS:
 		return 0;
-	break;
+
 	case SQR_ACCEPTED:
 		reply.m_handle = (squadList) ? squadList->squad().shortHandle() : 0LL;
 	break;
@@ -1145,7 +1142,6 @@ SquadMemberUpdate::receive(SINT32 teulIndex)
 		default:
 			dbugLog(_FLA, "t:%d invalid cmd %d", teulIndex, m_cmd);
 			throw SQR_INVALID;
-		break;
 		}
 	}
 	catch (SQUAD_CONTROL_RESULT result)

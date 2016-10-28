@@ -59,13 +59,13 @@ _getFramingMTU(UINT16 mode)
 	{
 	case UpdateFraming::_MAX:
 		return Teul::TCPMaxPayload;
-	break;
+
 	case UpdateFraming::_LARGE:
 		return Teul::TCPMaxPayload;
-	break;
-	default: break;
+
+	default:
+		return Teul::TCPStdPayload;
 	}
-	return Teul::TCPStdPayload;
 }
 
 //////////////////////////////////////////////////////////////////////

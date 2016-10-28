@@ -1006,7 +1006,6 @@ AttackOrder::process()
 		break;
 		default:
 			LogAbort("Unrecognized attack order packet from %s", Chat::Name(m_requester).c_str());
-		break;
 		}
 	}
 	dbugLog(_FLD, " result: %u", m_result);

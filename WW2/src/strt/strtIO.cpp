@@ -47,17 +47,17 @@ const char* strtPrintFacilityType(FACILITY_TYPE facilityType)
 {
 	switch(facilityType)
 	{
-		case FACILITY_CITY:return("City");break;
-		case FACILITY_FACTORY:return("Factory");break;
-		case FACILITY_BASE:return("Base");break;
-		case FACILITY_DEPOT:return("Depot");break;
-		case FACILITY_OMT:return("Off Map Transfer");break;
-		case FACILITY_SHIPYARD:return("Shipyard");break;
-		case FACILITY_FIREBASE:return("Firebase");break;
-		case FACILITY_AIRBASE:return("Air Base");break;
-		case FACILITY_NAVALBASE:return("Naval base");break;
-		case FACILITY_ARMYBASE:return("Army Base");break;
-		default:return("Unknown");
+		case FACILITY_CITY: return("City");
+		case FACILITY_FACTORY: return("Factory");
+		case FACILITY_BASE: return("Base");
+		case FACILITY_DEPOT: return("Depot");
+		case FACILITY_OMT: return("Off Map Transfer");
+		case FACILITY_SHIPYARD: return("Shipyard");
+		case FACILITY_FIREBASE: return("Firebase");
+		case FACILITY_AIRBASE: return("Air Base");
+		case FACILITY_NAVALBASE: return("Naval base");
+		case FACILITY_ARMYBASE: return("Army Base");
+		default: return("Unknown");
 	}
 }
 

@@ -934,7 +934,6 @@ HostVehicle::checkCapture()
 
 		return;
 	}
-	break;
 
 	default:
 #ifdef BETA_RELEASE

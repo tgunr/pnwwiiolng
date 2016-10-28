@@ -1777,19 +1777,15 @@ mapCreatePlayer(SINT32 teulIndex, PlayerStatusNode* psn, const Server::PersonaXf
 		case Server::Transfer::XferReason::Login:
 			assert( psn != nullptr );
 			return _playerLoggingIn(teulIndex, playerID, *psn, xfer);
-		break;
 
 		case Server::Transfer::XferReason::Reassign:
 			LogAbort("--- player logging in with PXR-TRANSFER; wtf oliver ---");
-		break;
 
 		case Server::Transfer::XferReason::Exit:
 			return _playerExiting(teulIndex, playerID, xfer);
-		break;
 
 		default:
 			throw std::invalid_argument("unhandled xfer reason");
-		break;
 		}
 	}
 	catch (std::exception& e)

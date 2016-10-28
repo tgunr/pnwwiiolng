@@ -948,7 +948,6 @@ _checkEndpointState(ENDPOINT& endpoint)
 
 	default:
 		LogAbort("t:%d endpoint in unknown state %d", endpoint.teulIndex(), endpoint.state());
-	break;
 	}
 }
 

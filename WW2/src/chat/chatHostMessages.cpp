@@ -235,7 +235,6 @@ _recvSideMessage(ACTION_OBJECT* const a)
 		default:
 			dbugLog(_FLA, "invalid side_message type %d", message.m_type);
 			return -EINVAL;
-		break;
 	}
 
 	return a->offset;

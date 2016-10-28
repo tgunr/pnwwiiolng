@@ -2223,10 +2223,9 @@ Player::validatePreference(UINT32 prefId, UINT32 request) const
 	{
 		case CPR_UPDATE_MODE:
 			return _validateUpdateMode(request);
-		break;
+		default:
+			return request;
 	}
-
-	return request;
 }
 
 //////////////////////////////////////////////////////////////////////

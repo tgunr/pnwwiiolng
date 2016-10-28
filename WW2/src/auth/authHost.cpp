@@ -337,18 +337,18 @@ _authenticationErrorString(WEB_ERR errorType)
 {
 	switch(errorType)
 	{
-		case WEB_ERR_FULL: return "full"; break;
-		case WEB_ERR_LOGIN: return "login"; break;
-		case WEB_ERR_GAME: return "game"; break;
-		case WEB_ERR_INSTALL: return "install"; break;
-		case WEB_ERR_LOCKED: return "locked"; break;
-		case WEB_ERR_INTERNAL: return "internal"; break;
-		case WEB_ERR_USER: return "invuser"; break;
-		case WEB_ERR_PASSWORD: return "invpass"; break;
-		case WEB_ERR_SUB: return "inactive"; break;
-		case WEB_ERR_NONE: return ""; break;
-		case WEB_ERR_AUTH: return "auth"; break;
-		default: return "unknown"; break;
+		case WEB_ERR_FULL: return "full";
+		case WEB_ERR_LOGIN: return "login";
+		case WEB_ERR_GAME: return "game";
+		case WEB_ERR_INSTALL: return "install";
+		case WEB_ERR_LOCKED: return "locked";
+		case WEB_ERR_INTERNAL: return "internal";
+		case WEB_ERR_USER: return "invuser";
+		case WEB_ERR_PASSWORD: return "invpass";
+		case WEB_ERR_SUB: return "inactive";
+		case WEB_ERR_NONE: return "";
+		case WEB_ERR_AUTH: return "auth";
+		default: return "unknown";
 	}
 }
 
@@ -943,16 +943,12 @@ static const char* _describeLock(SINT32 lock)
 	case AL_LOADING:
 	case AL_INITIALIZING:
 		return "Starting";
-	break;
 	case AL_SYNCING:
 		return "Syncing";
-	break;
 	case AL_OFF:
 		return "Open";
-	break;
 	case AL_ENTRY:
 		return "Locked";
-	break;
 	default:
 	break;
 	}

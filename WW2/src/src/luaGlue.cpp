@@ -44,7 +44,6 @@ _report(UINT32 level, const char* message, const char* file = _luaSubSystem.c_st
 		case Debug::ERR_WARN:	output += "!: "; break;
 		case Debug::ERR_FATAL:	output += "<!>: "; break;
 		case Debug::ERR_ABORT: output += "ERR: "; break;
-		break;
 	}
 	output += message;
 	output += "\n";

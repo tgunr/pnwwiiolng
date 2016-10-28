@@ -315,7 +315,6 @@ strtProcessDBQueue()
 
 		default:
 			LogAbort("Queue processing excpetion! Unhandled case.");
-		break;
 		}
 	}
 

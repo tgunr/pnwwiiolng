@@ -94,7 +94,6 @@ chatReceiveSTO(UINT16 type, ACTION_OBJECT* const a)
 	case ServerTrackedObject::_REMOVAL:
 		_processSTOKillRequest(a);
 		return;
-	break;
 
 	case ServerTrackedObject::_VEHICLE:
 		sto = new VehicleSTO(a);
@@ -127,7 +126,6 @@ chatReceiveSTO(UINT16 type, ACTION_OBJECT* const a)
 	default:
 		dbugLog(_FLW, "t:%d type:%d unhandled sto type", a->teulIndex, type);
 		return;
-	break;
 	}
 
 	if ( sto == nullptr )
@@ -145,7 +143,7 @@ chatReceiveSTO(UINT16 type, ACTION_OBJECT* const a)
 							, sto->creatorID(), sto->lifespan(), sto->flags()
 				);
 		return;
-	break;
+
 	case ServerTrackedObject::_ADD_FAIL:
 	case ServerTrackedObject::_ADD_DUPLICATE:
 	default:

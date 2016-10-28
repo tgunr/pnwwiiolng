@@ -213,10 +213,10 @@ _pickInstance(wwiiPlayer* const player, Instance::Descriptor& request)
 	{
 	case Instance::_INVALID:
 		return Instance::g_invalid;
-	break;
+
 	case Instance::_CAMPAIGN:
 		return Instance::g_campaign;
-	break;
+
 	case Instance::_TUTORIAL:
 		request.m_type = player->side();
 	break;
@@ -236,18 +236,17 @@ _pickInstance(wwiiPlayer* const player, Instance::Descriptor& request)
 	{
 	case Instance::_TUTORIAL:
 		return _pickTutorialInstance(player, request, it);
-	break;
+
 	case Instance::_TRAINING:
 		return _pickTrainingInstance(player, request, it);
-	break;
+
 	case Instance::_SCENARIO:
 		return it->first;
-	break;
+
 	default:
-	break;
+		return _pickOtherInstance(player, request, it);
 	}
 
-	return _pickOtherInstance(player, request, it);
 }
 
 //////////////////////////////////////////////////////////////////////

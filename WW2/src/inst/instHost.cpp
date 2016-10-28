@@ -89,7 +89,6 @@ _getScenario(const Instance::Descriptor& descriptor)
 					);
 		return scenario;
 	}
-	break;
 
 	case Instance::_CAMPAIGN:
 	{
@@ -104,7 +103,6 @@ _getScenario(const Instance::Descriptor& descriptor)
 					);
 		return scenario;
 	}
-	break;
 
 	case Instance::_SCENARIO:
 	{
@@ -121,7 +119,7 @@ _getScenario(const Instance::Descriptor& descriptor)
 	}
 
 	default:
-	break;
+		break;
 	}
 
 	static Instance::Scenario

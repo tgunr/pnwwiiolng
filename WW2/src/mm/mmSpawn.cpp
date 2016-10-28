@@ -85,8 +85,8 @@ Player::cancelWeapon(bool notifyStrat)
 		break;
 		case MM_VEH_INXFER:
 			// Do even less
-			return;
-		break;
+		return;
+
 		default:
 			dbugLog(_FLA, "t:%d p:%u c:%s illegal vehicle state %d"
 							, teulIndex(), playerID(), callsign()
@@ -190,8 +190,6 @@ mmProcessFEPostRequest(Player& player, const FE_POST_REQUEST& request)
 				postAccept.facility = player.m_weapOrigin;
 
 				return mmProcessPostAccept(player, postAccept, MM_ACCEPT_UPDATE);
-
-				break;
 			}
 			// Else PASSTHRU
 		default:

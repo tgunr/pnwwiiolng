@@ -826,15 +826,15 @@ _captureDescription(const FacilityStruct* fac)
 	{
 	case FacilityStruct::_CAP_DISABLED:
 		return "disabled";
-	break;
+
 	case FacilityStruct::_CAP_PENDING:
 		snprintf(description, 63, "in %us", fac->getCaptureRemaining());
 		return description;
-	break;
+
 	case FacilityStruct::_CAP_ENABLED:
 		snprintf(description, 63, "at %3.2f%%", fac->m_captureProgress);
 		return description;
-	break;
+
 	default:
 		return "!UNKNOWN CAPSTAGE!";
 	}
@@ -2085,7 +2085,7 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 	case BMR_FAILED_CONTROL:
 		LOCMESSAGE(LSTR_CAUTION, LSTR_ENEMY_OWNS, destination->name);
 		return false;
-	break;
+
 
 	case BMR_APPROVED:
 		if ( unit->homeCP() == destination && !(transferSupply || applyDelay) )

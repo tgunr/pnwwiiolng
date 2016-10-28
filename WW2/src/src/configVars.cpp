@@ -459,7 +459,7 @@ namespace Teul
 		case CVT_BOOL: SetBoolValue(newValue_); break;
 		case CVT_IP_ADDRESS: SetIPAddressValue(newValue_); break;
 		case CVT_PATH: SetPathValue(newValue_); break;
-		default: LogAbort("Invalid config var type"); break;
+		default: LogAbort("Invalid config var type");
 		}
 	}
 

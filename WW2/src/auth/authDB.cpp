@@ -523,15 +523,12 @@ _findIsFile(SCHAR manisfile)
 	{
 		case 'f':
 			return ISFILE_FILE;
-		break;
 		case 'u':
 			return ISFILE_URL;
-		break;
 		case 'n':
 			return ISFILE_NUN;
-		break;
 		default:
-		break;
+			break;
 	}
 	return ISFILE_URL;
 }

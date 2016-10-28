@@ -187,7 +187,6 @@ struct EchoPacketHeader
 		default:
 			Dprintf("Echo type: %u\n", m_type);
 			throw std::runtime_error("Invalid echo type");
-		break;
 		}
 
 		if ( a->offset < 0 )
