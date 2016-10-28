@@ -449,8 +449,7 @@ struct Role
 			return;
 
 		// UnencryptedBytes is supposed to be '3'.
-		if ( Teul::Packet::UnencryptedBytes != 3 )
-			throw Teul::Error("UnencryptedBytes is not 3", Teul::Packet::UnencryptedBytes);
+		static_assert(Teul::Packet::UnencryptedBytes == 3, "Code depends on size of UnencryptedBytes being 3");
 
 		// Prepare the packet!
 		Dprintf("preparing Teul::Packet\n");
