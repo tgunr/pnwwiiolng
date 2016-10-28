@@ -114,6 +114,9 @@ FILE( TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" _PLAYNET )
 # Enable per-host ports for running clusters on less than 4 hosts
 OPTION( PN_DIFFERENT_PORTS	"Use different public-facing ports for game servers." ON )
 
+# Disable building and use of auth host (for cluster-on-a-box/controller testing)
+OPTION( PN_DISABLE_AUTH     "Build without use of/support for auth" OFF )
+
 ####################################
 ## Provide platform and server defines
 IF(WIN32)
@@ -331,16 +334,19 @@ ENDMACRO( ADD_HOST_TARGET )
 
 ####################################
 ## Auth host
-ADD_HOST_TARGET( ${AUTH_HOST_EXE} SOURCES
-    auth/authClientData.cpp auth/authClientData.h
-    auth/authDatabaseSchemas.h
-    auth/authGame.h
-    auth/authHost.cpp auth/authHost.h auth/authHostMessages.cpp auth/authHostMessages.h
-    auth/authQueue.cpp auth/authQueue.h auth/authQueuePosition.h wwii/wwiiRunningAverage.h
-    auth/authOTP.cpp auth/authOTP.h
-    auth/authPack.cpp auth/authPack.h
-	EXTRA_DEFINITIONS "IS_AUTH_HOST"
-)
+IF ( NOT PN_DISABLE_AUTH )
+	ADD_HOST_TARGET( ${AUTH_HOST_EXE} SOURCES
+		auth/authClientData.cpp auth/authClientData.h
+		auth/authDatabaseSchemas.h
+		auth/authGame.h
+		auth/authHost.cpp auth/authHost.h auth/authHostMessages.cpp auth/authHostMessages.h
+		auth/authQueue.cpp auth/authQueue.h auth/authQueuePosition.h wwii/wwiiRunningAverage.h
+		auth/authOTP.cpp auth/authOTP.h
+		auth/authPack.cpp auth/authPack.h
+		EXTRA_DEFINITIONS "IS_AUTH_HOST"
+	)
+	SET(AUTH_INSTALL ${AUTH_HOST_EXE})
+ENDIF()
 
 ####################################
 ## Controller host
@@ -672,7 +678,7 @@ TARGET_INCLUDE_DIRECTORIES( ${STRAT_HOST_EXE} PRIVATE ${TOLUAPP_INCLUDE_DIR} )
 INSTALL(
     TARGETS
         ${CONTROLLER_HOST_EXE} ${STRAT_HOST_EXE} ${DBD_HOST_EXE}
-        ${CHAT_HOST_EXE} ${MAP_HOST_EXE} ${CELL_HOST_EXE} ${AUTH_HOST_EXE}
+        ${CHAT_HOST_EXE} ${MAP_HOST_EXE} ${CELL_HOST_EXE} ${AUTH_INSTALL}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
@@ -695,9 +701,11 @@ INSTALL( DIRECTORY hostproj/web/ DESTINATION web COMPONENT web PATTERN ".git" EX
 ## Tests
 
 # Auth connection test
-ADD_EXECUTABLE( testAuthConnect tests/testAuthConnect.cpp )
-TARGET_LINK_LIBRARIES( testAuthConnect ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
-SET_PROPERTY( TARGET testAuthConnect PROPERTY FOLDER "Test" )
+IF ( NOT PN_DISABLE_AUTH )
+	ADD_EXECUTABLE( testAuthConnect tests/testAuthConnect.cpp )
+	TARGET_LINK_LIBRARIES( testAuthConnect ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
+	SET_PROPERTY( TARGET testAuthConnect PROPERTY FOLDER "Test" )
+ENDIF()
 
 # Builds a single executable that runs all of the unit tests;
 # The install process will not execute unless all tests complete.
@@ -727,40 +735,3 @@ ADD_EXECUTABLE(testTeul
 )
 TARGET_LINK_LIBRARIES( testTeul teulserver ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
 SET_PROPERTY( TARGET testTeul PROPERTY FOLDER "Test" )
-
-######################################################################
-#### Package building.
-
-SET(CPACK_COMPONENTS_ALL game lua web auth)
-
-SET(CPACK_GENERATOR "DEB")
-SET(CPACK_INSTALL_PREFIX "${_PLAYNET}/wwiiol")
-SET(CPACK_SET_DESTDIR ON)
-SET(CPACK_PACKAGING_INSTALL_PREFIX "${_PLAYNET}/wwiiol")
-SET(OptLevel "NoOptimization")
-IF( PN_ENABLE_OPTS AND OPTIMIZATION GREATER 0 )
- SET(OptLevel "OptLevel${OPTIMIZATION}")
-ENDIF( )
-SET(CPACK_PACKAGE_VERSION "${REPO_WC_REVISION}.${CMAKE_BUILD_TYPE}.${BUILDNAME}.${OptLevel}")
-SET(CPACK_OUTPUT_FILE_PREFIX "${_PLAYNET}/packages")
-SET(CPACK_PACKAGE_VENDOR "Cornered Rat Software")
-SET(CPACK_PACKAGE_NAME "wwiiol")
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "WWII Online game servers")
-SET(CPACK_PACKAGE_DESCRIPTION "'BattleGround Europe: WWII Online' game servers, auth host and tools.")
-IF( PN_CLUSTER STREQUAL "Auth" )
- SET(CPACK_PACKAGE_NAME "wwiiol-auth")
- SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "WWIIOL Auth Host")
- SET(CPACK_PACKAGE_DESCRIPTION "'BattleGround Europe: WWII Online' stand-alone auth host.")
-ENDIF( )
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Oliver Smith")
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libopenthreads-dev(>= 2.8), lua5.1(>= 5.1.4-5), libmysqlclient16(>= 5.5.0), bash(>= 4.1), gdb(>= 7.1), nfs-common, mysql-server(>= 5.5)")
-SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "WWIIOL Game Servers")
-SET(CPACK_DEBIAN_PACKAGE_SECTION "Network")
-SET(CPACK_DEBIAN_PACKAGE_PRIORITY "Important")
-SET(CPACK_DEBIAN_PACKAGE_RECOMMENDS "vim, mysql-client(>= 5.5), python(>= 2.6.5), bzip2")
-SET(CPACK_DEBIAN_PACKAGE_SUGGESTS "perl(>= 5.1), etckeeper, byobu")
-SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes/preinst;${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes/postinst;")
-
-INCLUDE(CPack)      # For making installers
-
-SET(_PREV_BUILD_TYPE "${PN_BUILD_TYPE}" CACHE INTERNAL "Value of PN_BUILD_TYPE last time CMake Ran" FORCE)
