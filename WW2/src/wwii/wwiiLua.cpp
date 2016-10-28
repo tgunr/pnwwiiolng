@@ -380,37 +380,6 @@ static int tolua_get_wwii_nullObjID(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* function: weapPrintFullObjIDC */
-#ifndef TOLUA_DISABLE_tolua_wwii_wwii_weapPrintFullObjIDC00
-static int tolua_wwii_wwii_weapPrintFullObjIDC00(lua_State* tolua_S)
-{
-#ifndef TOLUA_RELEASE
- tolua_Error tolua_err;
- if (
-     !tolua_isusertype(tolua_S,1,"const FULL_OBJ_ID",0,&tolua_err) ||
-     !tolua_isstring(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,3,&tolua_err)
- )
-  goto tolua_lerror;
- else
-#endif
- {
-  const FULL_OBJ_ID* id = ((const FULL_OBJ_ID*)  tolua_tousertype(tolua_S,1,0));
-  char* buffer = ((char*)  tolua_tostring(tolua_S,2,0));
-  {
-   const char* tolua_ret = (const char*)  weapPrintFullObjIDC(id,buffer);
-   tolua_pushstring(tolua_S,(const char*)tolua_ret);
-  }
- }
- return 1;
-#ifndef TOLUA_RELEASE
- tolua_lerror:
- tolua_error(tolua_S,"#ferror in function 'weapPrintFullObjIDC'.",&tolua_err);
- return 0;
-#endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
 /* function: wwiiSide */
 #ifndef TOLUA_DISABLE_tolua_wwii_wwii_wwiiSide00
 static int tolua_wwii_wwii_wwiiSide00(lua_State* tolua_S)
@@ -1534,7 +1503,6 @@ TOLUA_API int tolua_wwii_open (lua_State* tolua_S)
     tolua_function(tolua_S,"Key",tolua_wwii_wwii_FULL_OBJ_ID_Key00);
    tolua_endmodule(tolua_S);
    tolua_variable(tolua_S,"nullObjID",tolua_get_wwii_nullObjID,NULL);
-   tolua_function(tolua_S,"weapPrintFullObjIDC",tolua_wwii_wwii_weapPrintFullObjIDC00);
    tolua_constant(tolua_S,"WWII_NO_COUNTRY",WWII_NO_COUNTRY);
    tolua_constant(tolua_S,"WWII_ENGLAND",WWII_ENGLAND);
    tolua_constant(tolua_S,"WWII_USA",WWII_USA);
