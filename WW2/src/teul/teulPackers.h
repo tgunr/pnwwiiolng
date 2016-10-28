@@ -144,7 +144,7 @@ struct ACTION_OBJECT
 	{
 		if ( offset < 0 )
 			return false;
-		return (static_cast<size_t>(offset) + sizeof(Typename_) * 8) <= sizeInBits();
+		return (static_cast<size_t>(offset) + sizeof(Typename_) * 8) <= static_cast<size_t>(sizeInBits());
 	}
 
 	//! @brief Consume an object, in-place, from the packed data section.
