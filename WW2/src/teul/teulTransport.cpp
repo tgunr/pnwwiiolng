@@ -54,8 +54,7 @@ namespace Teul
 {
 	UINT32 GetSingleIP(const char* const name)
 	{
-		struct addrinfo hints;
-		memset(&hints, 0, sizeof(hints));
+		struct addrinfo hints {};
 		hints.ai_family = AF_INET;
 
 		struct addrinfo* result = nullptr;
