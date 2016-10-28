@@ -82,5 +82,5 @@ UINT16 chatGetHandleCharacterSymbol(const wchar_t character);
 
 // Return true if a callsign contains wide characters
 constexpr bool chatIsWideCallsign(const ChatHandle handle) noexcept { return (handle & WIDE_HANDLE_BIT) != 0; }
-constexpr bool chatIsWideCallsign(const char* callsign) noexcept { return (*(const unsigned char*)callsign > 0x7f); }
-constexpr bool chatIsWideCallsign(const wchar_t* callsign) noexcept { return (callsign[0] > 0x7f); }
+constexpr bool chatIsWideCallsign(const char* callsign) noexcept { return (callsign[0] & 0x80) != 0; }
+constexpr bool chatIsWideCallsign(const wchar_t* callsign) noexcept { return callsign[0] > 0x7f; }
