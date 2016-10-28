@@ -95,7 +95,7 @@ public:
 	ChatHandle squadHandle() const { return m_squadHandle; }
 
 	UINT32 weaponSpecNo() const { return m_weaponSpecNo; }
-	WEAPON_SPEC weaponSpec() const { return *((const WEAPON_SPEC*)&m_weaponSpecNo); }
+	WEAPON_SPEC weaponSpec() const { return m_weaponSpecNo; }
 
 	const PermissionMask& permissionMask() const { return m_permissionMask; }
 
