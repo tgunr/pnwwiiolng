@@ -17,7 +17,7 @@ struct PLAYER_LOGIN
 	UINT32 attemptID;			// Client's login attempt identifier.
 	UINT32 appVersion;			// version of application that is connecting
 	UINT32 OTP;					// One Time passWord
-	UCHAR CopyRightString[AUTH_SEQ_SIZE];
+	char CopyRightString[AUTH_SEQ_SIZE];
 
 	SINT32 packer(PackMode mode, ACTION_OBJECT* const a);
 };

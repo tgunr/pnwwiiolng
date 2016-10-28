@@ -234,7 +234,7 @@ Teul::Connection::login()
 		if ( m_type == Map )
 		{
 			// If we're auth-bypassing into the map host, we send our playerID instead.
-			strprintf((char*)login.CopyRightString, "%u", m_playerIdent.m_playerID);
+			strprintf(login.CopyRightString, "%u", m_playerIdent.m_playerID);
 		}
 		else
 		{
