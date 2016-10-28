@@ -360,7 +360,7 @@ StatsThread::run()
 	UINT64 cbCurSize, cbMaxSize, cbUsed;
 	UINT64 cbLastUsed = 0L;
 
-	threadLog(_FLI, "Stats thread active [thread #%u]", std::this_thread::get_id());
+	threadLog(_FLI, "Stats thread active");
 
 	UINT32 count = 0;
 	for ( ; ; )
