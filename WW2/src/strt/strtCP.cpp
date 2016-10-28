@@ -1282,8 +1282,8 @@ _getDamageTargetType(const ObjectStruct& object, STRAT_DAMAGE_EFFECT effect)
 			return SDT_AUTOGUNNER;
 	break;
 	case BUILDING_BRIDGE:
-		return SDT_BRIDGE;
-	break;
+	return SDT_BRIDGE;
+
 	case BUILDING_RESEARCH:
 		if ( object.isProductionCenter() )
 			return SDT_FACTORY;
