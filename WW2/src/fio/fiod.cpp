@@ -1048,8 +1048,8 @@ LOGICAL fiocfgAccess(const char* filename, bool userdir)
     }
 
     int fd = fiodOpen(filename, true);
-    
-    fiodClose(fd);
+    if (fd != -1)
+        fiodClose(fd);
 
     if (userdir) {
         fiodSetPrepath(nullptr);
