@@ -6952,11 +6952,7 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 			}
 			break;
 		case IMAP_HOLD_FP_DEPLOY:
-            if (currentWeaponModel == BUILD_TOOL)
-            {
-                fpPPOInitiateBuildAction(stateFlags, controlStateFlags, _ppoLastStance);
-            }
-			else if (param && mobile && !CBLOCK(CB_DEPLOY) && fpsTrooper.wading <= MAX_WADING_PRONE)
+			if (param && mobile && !CBLOCK(CB_DEPLOY) && fpsTrooper.wading <= MAX_WADING_PRONE)
 			{
 				if(deployOK == -1)
 					deployOK = (fpsCheckDeploy()) ? 1 : 0;
@@ -7008,7 +7004,12 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 			controlStateFlags = ((valid && !CBLOCK(CB_LOOK)) ? controlStateFlags | FPS_TURN_LEFT : controlStateFlags & ~FPS_TURN_LEFT);
 			break;
 		case IMAP_HOLD_FP_GUNSIGHT:
-			controlStateFlags = ((valid) ? controlStateFlags | FPS_AIM : controlStateFlags & ~FPS_AIM);
+			if ( currentWeaponModel == BUILD_TOOL ) {
+				if ( valid )
+					fpPPOSwitchPPO(true);
+			} else {
+				controlStateFlags = ((valid) ? controlStateFlags | FPS_AIM : controlStateFlags & ~FPS_AIM);
+			}
 
 			/*
 			WEAPON_LAG_VMAX			*= (valid) ? .1f: 10.0f;
@@ -8772,7 +8773,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 #endif
 		if (currentWeaponModel == BUILD_TOOL)
 		{
-            fpPPOSwitchPPO(true);
+			fpPPOInitiateBuildAction(stateFlags, controlStateFlags, _ppoLastStance);
 		}
 		else if ((currentWeaponModel == AMMO) && (!resupplyTarget))
 		{
