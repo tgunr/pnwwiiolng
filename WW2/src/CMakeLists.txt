@@ -263,7 +263,17 @@ ADD_LIBRARY( wwiilib STATIC
 	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
-SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
+SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES})
+IF (BUILDING_OWN_LIBXML2)
+	MACRO( USE_WWIILIB_ON Name )
+		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} )
+		ADD_DEPENDENCIES( ${Name} libxml2 )
+	ENDMACRO()
+ELSE()
+	MACRO( USE_WWIILIB_ON Name)
+		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} )
+	ENDMACRO()
+ENDIF()
 
 ####################################
 ## Various commandline utility executables
@@ -275,7 +285,8 @@ IF ( NOT MSVC )
         chat/chatManagementClientMessages.cpp chat/chatManagementClientMessages.h
         chat/chatManagementPack.cpp chat/chatRoster.cpp chat/chatRosterClient.cpp
     )
-    TARGET_LINK_LIBRARIES( chatClient ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
+	USE_WWIILIB_ON( chatClient )
+    TARGET_LINK_LIBRARIES( chatClient teulserver ${MYSQL_LIBRARIES} )
     SET_PROPERTY( TARGET chatClient PROPERTY FOLDER "Tools" )
     
     ADD_EXECUTABLE( luaClient src/luaClient.cpp )
@@ -283,8 +294,9 @@ IF ( NOT MSVC )
         PRIVATE ${READLINE_INCLUDE_DIRS}
         PRIVATE ${NCURSES_INCLUDE_DIRS}
     )
+	USE_WWIILIB_ON( luaClient )
     TARGET_LINK_LIBRARIES( luaClient
-        ${WWIILIB_LIBRARIES} teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
+        teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
     )
     SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
 
@@ -385,7 +397,8 @@ MACRO( ADD_HOST_TARGET Name )
     IF ( HOST_TARGET_ARG_LUA )
         TARGET_LINK_LIBRARIES( "${Name}" ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
     ENDIF()
-    TARGET_LINK_LIBRARIES( "${Name}" ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
+	USE_WWIILIB_ON( "${Name}" )
+    TARGET_LINK_LIBRARIES( "${Name}" teulserver ${MYSQL_LIBRARIES} )
     IF ( NOT "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" STREQUAL "" )
         SET_PROPERTY( TARGET "${Name}" PROPERTY COMPILE_DEFINITIONS "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" )
     ENDIF()
@@ -763,6 +776,7 @@ INSTALL( DIRECTORY hostproj/web/ DESTINATION web COMPONENT web PATTERN ".git" EX
 # Auth connection test
 IF ( NOT PN_DISABLE_AUTH )
 	ADD_EXECUTABLE( testAuthConnect tests/testAuthConnect.cpp )
+	USE_WWIILIB_ON( testAuthConnect )
 	TARGET_LINK_LIBRARIES( testAuthConnect ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
 	SET_PROPERTY( TARGET testAuthConnect PROPERTY FOLDER "Test" )
 ENDIF()
@@ -781,7 +795,8 @@ ADD_EXECUTABLE( testUnits
     tests/testSuite.h tests/testUnits.h
 )
 SET_PROPERTY( TARGET testUnits PROPERTY COMPILE_DEFINITIONS "ENABLE_TESTS" )
-TARGET_LINK_LIBRARIES( testUnits ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
+USE_WWIILIB_ON( testUnits )
+TARGET_LINK_LIBRARIES( testUnits teulserver ${MYSQL_LIBRARIES} )
 SET_PROPERTY( TARGET testUnits PROPERTY FOLDER "Test" )
 
 ADD_TEST( testUnits testUnits )
@@ -793,5 +808,6 @@ ADD_EXECUTABLE(testTeul
     wwii/wwiiCallbacks.h tests/testTeulTest.h tests/testTeulClient.h tests/testTeulServer.h
     teul/teulVersion.h teul/teulConnectionInstruction.h
 )
-TARGET_LINK_LIBRARIES( testTeul teulserver ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
+USE_WWIILIB_ON( testTeul )
+TARGET_LINK_LIBRARIES( testTeul teulserver ${MYSQL_LIBRARIES} )
 SET_PROPERTY( TARGET testTeul PROPERTY FOLDER "Test" )
