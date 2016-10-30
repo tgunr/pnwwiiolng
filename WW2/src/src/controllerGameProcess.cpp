@@ -19,6 +19,10 @@ static TeulTimeMS s_processShutdownTimeout = 10 * 1000;
 
 // Launch singleton.
 GameProcess* GameProcess::s_processStarting = nullptr;
+// Timestamp of last launch.
+static TeulTimeMS s_lastLaunch = 0ULL;
+// Delay between process launches
+static const TeulTimeMS s_launchInterval_ms = 2000;
 
 static std::list<GameProcess> s_processes;
 
@@ -451,8 +455,6 @@ namespace GameProcessManager
 	// Check up on all processes.
 	bool Heartbeat(bool allowStarts)
 	{
-		teulSyncClock();
-
 		// Remove all processes we no-longer need.
 		s_processes.remove_if([](const GameProcess& proc_) { return (proc_.ReadyForRemoval()); });
 
@@ -479,6 +481,11 @@ namespace GameProcessManager
 			// Someone wants to start. Only start one at a time.
 			if ( GameProcess::s_processStarting == nullptr )
 			{
+				if ( s_lastLaunch + s_launchInterval_ms > teulClock64 ) {
+					dbugLog(_FLD, "waiting for next launch window");
+					return true;
+				}
+				s_lastLaunch = teulClock64;
 				///TODO: Make the host names match their app names,
 				/// e.g. right now cell host logs to wwii_host.X.log but the executable is hostd.
 				static const char* processNames[MAX_SERVER_TYPE] = { nullptr, "authHost" EXE_SUFFIX, "dbd" EXE_SUFFIX, "stratd" EXE_SUFFIX, "chatd" EXE_SUFFIX, "mmhostd" EXE_SUFFIX, "hostd" EXE_SUFFIX, nullptr };
