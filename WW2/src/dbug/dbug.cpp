@@ -569,10 +569,9 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	}
 
 	const char* text = nullptr;
-	if ( PN_UNLIKELY(fmt == nullptr) )
-		len = 0;
-	else
-	{
+	if ( PN_UNLIKELY(fmt == nullptr) ) {
+		return 0;
+	} else {
 		len = _logger.vformatText(fmt, args);
 		if ( len == (size_t)~0 ) {
 			text = "[ERROR]\n";
@@ -582,13 +581,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 				fprintf(stderr, "%s", _logger.text());
 			}
 			text = "\n";
-        	}
-		len = strlen(text);
-	}
-
-	if ( PN_UNLIKELY(len == 0) )
-	{
-		text = "[nullptr]\n";
+		}
 		len = strlen(text);
 	}
 
