@@ -77,24 +77,25 @@ static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 //	permanent link to the auth server that is used for authentication
 //	purposes.
 //	PARAMETERS:
-//  	gameAddress - the IP address the game server is running on
+//  	gameHost - the IP address the game server is running on
 //		gamePort - the port the game server is listening for front ends on
+//		authHost - the IP address the auth host is running on
+//		authPort - the port to connect to the authHost on
 //		appID - the application ID necessary to connect to this game server
 //		appVersion - the minimum version of the application necessary to
 //			connect to this server
+//		hostVersion - what version to report to auth
 //		maxUsers - the maximum users this server can handle
-//		externErrorFn - the error function to invoke when things go bad for
-//			this connection
+//		acceptFn - callback to notify you of a player login
+//		externErrorFn - callback when errors occur on the auth connection
 SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
-				, UINT32 authHost, UINT16 parentPort
+				, UINT32 authHost, UINT16 authPort
 				, APID appID, UINT32 appVersion
 				, UINT32 hostVersion
 				, UINT32 maxUsers
 				, PLAYER_ACCEPT_FUNCTION acceptFn
 				, ERROR_FUNCTION externErrorFn)
 {
-	SINT32 retval;
-
 	_externalErrorFn = externErrorFn;
 
 	_playerAcceptFn = acceptFn;
@@ -109,7 +110,8 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 
 		_thisVersion = appVersion;
 
-		if ( (retval = authInstallGameCallbacks(_authErrorFn)) < 0)
+		SINT32 retval = authInstallGameCallbacks(_authErrorFn);
+		if ( retval < 0 )
 			return retval;
 
 		_authInited = true;
@@ -118,16 +120,17 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 	if ( !useAuthServer )
 		return 0;
 
-	_authConnection = _openSend(appID, Server::myServerInfo.stats.arenaID, hostVersion, authHost, parentPort, gameHost, gamePort, maxUsers);
+	_authConnection = _openSend(appID, Server::myServerInfo.stats.arenaID, hostVersion, authHost, authPort, gameHost, gamePort, maxUsers);
 	if ( _authConnection < 0 )
 	{
-		dbugWrite(_FLA,"coulnt make Auth connection, err:%d",_authConnection);
+		dbugWrite(_FLA, "couldn't open auth connection err:%d", _authConnection);
 		return _authConnection;
 	}
 
-	if ((retval = authSendGameInit(_authConnection)) < 0)
+	SINT32 retval = authSendGameInit(_authConnection);
+	if ( retval < 0 )
 	{
-		dbugWrite(_FLN,"couldn't send auth init, err %d",retval);
+		dbugWrite(_FLN, "t:%d auth init failed err:%d", _authConnection, retval);
 		return retval;
 	}
 
@@ -143,7 +146,7 @@ SINT32 authExitPlayer(const Auth::Dispatch& dispatch, UINT32 arenaID)
 	if ( !useAuthServer )
 		return 0;
 
-	if ( memcmp(dispatch.m_callsign,"CRS",3) == 0 )
+	if ( memcmp(dispatch.m_callsign, "CRS", 3) == 0 )
 		return -EINVAL;
 
 	authSendClientAction(_authConnection,  arenaID, dispatch.m_customerID, CLIENT_LEAVE, dispatch.m_clientIP);
@@ -180,8 +183,7 @@ _processLoginData(const UINT32 ipAddress, const PLAYER_LOGIN login, const OTP_NO
 
 	if ( login.appVersion != otpNode->appVersion )
 	{
-		dbugLog(_FLW, "version mismatch");
-		dbugLog(_FLW,"this version = %x, otp appVersion is %x, login version is %x"
+		dbugLog(_FLW, "version mismatch: this version = %x, otp appVersion is %x, login version is %x"
 				, _thisVersion, otpNode->appVersion, login.appVersion);
 		return -Teul::Errors::LoginFail_Client;
 	}
@@ -282,6 +284,18 @@ authValidatePlayer(const UINT32 ipAddress, PLAYER_LOGIN& login, Auth::Dispatch& 
 {
 	memset(&dispatch, 0, sizeof(dispatch));
 
+	// Playgate logs the user in to auth and gets a session cookie or One Time Pass (otp).
+	// The client then provides the customer:otp pair for each connection to the cluster.
+	// In theory:
+	// . a cust+otp match with no session match = new login,
+	// . a cust+otp match matching an existing session = client-dropped connection recovery,
+	// . a cust+otp non-match indicates a server-dropped recovery or a stale login.
+	// We also catch the case where a player launches a new client either as a result of a
+	// crash or by logging in to their account from another window/session/machine.
+	// If a man-in-the-middle sees the exchange with auth, they can simply launch the client
+	// with the appropriate "-otp ${value}" argument and seize the session. Presumably
+	// this wouldn't be worth much as the player would simply log in again causing auth to
+	// invalidate the previous otp session and kick the mitm out of the system.
 	const OTP_NODE* const otpNode = _findOTP(login.OTP);
 	if ( otpNode != nullptr )
 	{
@@ -321,7 +335,7 @@ authInitAccept(UINT32 appVersion
 		if ( authVal < 0)
 			return authVal;
 
-		dbugLog(_FLI, "registered appVersion = %x",appVersion);
+		dbugLog(_FLI, "registered appVersion = %x", appVersion);
 
 		_authInited = true;
 	}
@@ -410,7 +424,7 @@ static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 
 	if ( !useAuthServer || error != ENOTCONN || !_authIsOpen )
 	{
-		dbugWrite(_FLA,"received error %d on auth connection %d",error,teulIndex);
+		dbugWrite(_FLA,"t:%d err:%d error on auth connection", teulIndex, error);
 		if ( _externalErrorFn != nullptr)
 			(_externalErrorFn) (teulIndex,  data, size, object, error);
 		return;
