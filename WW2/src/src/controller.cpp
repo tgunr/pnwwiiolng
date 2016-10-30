@@ -402,8 +402,12 @@ static void _addInitialProcesses()
 		const char* end = strchr(p, ';');
 		std::string name = (end) ? std::string(p, end - p) : std::string(p);
 		auto serverType = _getServerType(name);
-		if ( serverType >= MAX_SERVER_TYPE )
-			LogAbort("Unrecognized server: %s", name.c_str());
+		if ( serverType >= MAX_SERVER_TYPE ) {
+			LogAbort("'%s': '%s': Unrecognized server: %s",
+						cv_manageProcesses.GetEnvVarName(),
+						cv_manageProcesses.GetString(),
+						name.c_str());
+		}
 		dbugLog(_FLI, "Managing %s", name.c_str());
 		GameProcessManager::AddServer(serverType);
 		p = end;
@@ -512,6 +516,10 @@ int main(int argc, const char* argv[], const char* envp[])
 	{
 		Teul::ConfigVar::Generate("environment.cfg");
 		LogAbort("environment.cfg could not be found - generated new one, please edit it.");
+	}
+
+	if ( !cv_manageProcesses.GetString() || !*cv_manageProcesses.GetString() ) {
+		dbugLog(_FLM, "'%s' list is empty", cv_manageProcesses.GetEnvVarName());
 	}
 
 	// Prepare the repeater socket, which forwards packets from one peer to all other peers.
