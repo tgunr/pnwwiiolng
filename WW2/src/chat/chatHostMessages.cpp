@@ -1556,8 +1556,9 @@ _recvStratUpdates(ACTION_OBJECT* const a)
 		return -EINVAL;
 
 	UINT32 updates = 0;
+	UINT32 applied = 0;
 
-	while ( a->canRead<StratUpdates>() )
+	for ( ; a->canRead<StratUpdates>() ; ++updates )
 	{
 		auto& entry = a->read<StratUpdates>();
 		if ( entry.m_fullObjID.objClass == CLASS_BUILDING )
@@ -1577,10 +1578,10 @@ _recvStratUpdates(ACTION_OBJECT* const a)
 		if ( property->IsCP() )
 			((PropCP*)property)->m_controller = (WWII_COUNTRY)entry.u_extra.m_controller;
 
-		++updates;
+		++applied;
 	}
 
-	dbugLog(_FLD, "received %u strat updates", updates);
+	dbugLog(_FLD, "received %u strat updates, applied %u", updates, applied);
 
 	return a->offset;
 }
