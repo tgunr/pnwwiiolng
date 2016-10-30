@@ -31,7 +31,7 @@ Teul::Packet::Packet(const Teul::Packet& rhs)
 	: m_data(m_localData)
 	, m_packetSizeBytes(0)
 	, m_capacity(DefaultLocalDataSize)
-	, m_sent(rhs.m_sent)
+	, m_sent(0)  // Do not copy m_sent - none of this copy has been sent
 	, m_address(rhs.m_address)
 	, m_port(rhs.m_port)
 {
