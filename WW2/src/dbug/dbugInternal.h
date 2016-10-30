@@ -34,18 +34,15 @@ struct DebugLogger
 	void setProgram(const char* src) noexcept { m_program = src; }
 	void setText(char* src) noexcept { if ( src ) strsafecpy(m_text, src); else m_text[0] = 0; }
 
-	int vformatText(const char* fmt, va_list args) noexcept
+	UINT32 vformatText(const char* fmt, va_list args) noexcept
 	{
-		const int len = std::min(vsnprintf(m_text, DBUG_MAX_STRING, fmt, args), (int)DBUG_MAX_STRING-1);
-		m_text[len] = 0;
-		return len;
+		return (UINT32)vsnprintf(m_text, DBUG_MAX_STRING, fmt, args);
 	}
 
 	template<typename... Args>
-	int formatText(const char* fmt, Args... args) noexcept
+	UINT32 formatText(const char* fmt, Args&&... args) noexcept
 	{
-		int len = std::min((int)strprintf(m_text, fmt, std::forward<Args>(args)...), (int)DBUG_MAX_STRING-1);
-		return len;
+		return strprintf(m_text, fmt, std::forward<Args>(args)...);
 	}
 
 	void initialize(LogMode logMode, Debug::ERROR_TYPE level, SINT32 file, const char* program) noexcept;
