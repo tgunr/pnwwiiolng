@@ -95,19 +95,26 @@ ELSEIF ( UNIX )
 	SET(LIBXML2_SOURCE_DIR ${LIBRARIES_DIR}/libxml2)
 	SET(LIBXML2_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/libxml2)
 	SET(LIBXML2_LIBRARIES ${LIBXML2_INSTALL_DIR}/lib/libxml2.a)
+	IF ( DEBUG )
+		SET(LIBXML2_CFLAGS "-m${BUILD_BITNESS} -Og -g3")
+	ELSE()
+		SET(LIBXML2_CFLAGS "-m${BUILD_BITNESS} -O3 -g")
+	ENDIF()
+	SET(LIBXML2_LDFLAGS "-m${BUILD_BITNESS}")
 	ExternalProject_Add(
 		libxml2
 		SOURCE_DIR ${LIBXML2_SOURCE_DIR}
 		CONFIGURE_COMMAND ${LIBXML2_SOURCE_DIR}/autogen.sh 
-			CFLAGS=-m${BUILD_BITNESS} CXXFLAGS=-m${BUILD_BITNESS} LDFLAGS=-m${BUILD_BITNESS}
+			"CFLAGS=${LIBXML2_CFLAGS}" LDFLAGS="${LIBXML2_LDFLAGS}"
 			--prefix=${LIBXML2_INSTALL_DIR}
 			--disable-shared --enable-static --disable-ipv6
 			--without-python --with-modules
 			--without-lzma --without-zlib
-			--with-iconv --without-icu --without-iso8859x
+			--with-iconv --without-icu --with-iso8859x
 			--without-catalog
+			--without-debug
 		PREFIX ${LIBXML2_INSTALL_DIR}
-		BUILD_COMMAND make -j9 -ks
+		BUILD_COMMAND make -j5 -ks
 		BUILD_IN_SOURCE 1
 		BUILD_BYPRODUCTS ${LIBXML2_LIBRARIES}
 	)
