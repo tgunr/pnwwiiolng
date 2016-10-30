@@ -64,7 +64,6 @@ public:
 	unsigned int	m_logFlags;
 	unsigned int	m_flags;
 	unsigned int	m_errType;
-	int				m_err;
 	int				m_lineno;  // can be -1
 	const char*		m_program;
 	const char*		m_file;

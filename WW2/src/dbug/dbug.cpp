@@ -224,8 +224,6 @@ void DebugLogger::initialize(LogMode logMode, Debug::ERROR_TYPE level, SINT32 fd
 		m_writeFlags = 0;
 	}
 
-	m_err = 0;
-
 	// transient error flags
 	m_errType = Debug::ERR_ABORT;
 	m_lineno = -1;
@@ -539,8 +537,6 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		_logger.m_errType = errType & ~DBUG_FLAG_MASK;
 	else
 		_logger.m_errType = errType;
-
-	_logger.m_err = dbugGetErrno();
 
 	const UINT32 minLevel = isLog ? _logger.m_logLevel : _logger.m_writeLevel;
 	if ( PN_LIKELY((_logger.m_errType != Debug::ERR_FATAL) && (_logger.m_errType > minLevel)) )
