@@ -51,8 +51,6 @@ static ERROR_FUNCTION _externalErrorFn;
 
 static bool _authInited = false;
 
-static bool parentIsOpen = false;
-
 static SINT32 _bypassCustomerID = 1000000;
 
 static bool _sendNotice = false;
@@ -71,8 +69,6 @@ static  SINT32 _openSend(APID appID,
 							UINT32 authHost, UINT16 authPort,
 							UINT32 localAddress, UINT16 localPort,
 							UINT32 maxUsers );
-
-SINT32 _openSendParent( UINT32 parentHost, UINT16 parentPort);
 
 static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
 
@@ -404,44 +400,6 @@ _authOpened(ENDPOINT& endpoint)
 		dbugLog(_FLA,"Something went wrong in sending auth: %d.",_authConnection);
 	else
 		dbugLog(_FLN,"Sending auth game.");
-}
-
-void
-_parentOpened(ENDPOINT& /*endpoint*/)
-{
-	parentIsOpen = true;
-}
-
-// opens a connection to a parent Server.
-SINT32 _openSendParent(UINT32 parentHost, UINT16 parentPort)
-{
-	parentIsOpen = false;
-
-	if (parentHost == 0)
-		return -EINVAL;
-
-	const SINT32 parentConnection = teulOpenSend(parentHost, parentPort, _parentOpened, CONNECT_TIMEOUT, PROTOCOL_TCP, _authErrorFn);
-
-	if (parentConnection < 0)
-	{
-		dbugLog(_FLA, "Couldn't connect to parent server!");
-		return parentConnection;
-	}
-
-	teulSyncClock();
-	const TeulTimeMS startTime = teulClock64;
-	const TeulTimeMS cutoff = startTime + 5000;
-	while ( !parentIsOpen )
-	{
-		if ( teulClock64 >= cutoff )
-		{
-			dbugLog(_FLA, "couldnt open parent connection start:%" PR64BitUT ", tc64:%" PR64BitUT ", elapsed:%" PR64BitUT "", startTime, teulClock64, teulClock64 - startTime);
-			return -EINVAL;
-		}
-		teulUpdateTransport(25);
-	}
-
-	return parentConnection;
 }
 
 static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
