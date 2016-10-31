@@ -26,7 +26,6 @@
 #include "map/mapSwingMeter.h"
 #include "miss/mission.h"
 #include "miss/missHitArrayNode.h"
-#include "mm/mmAntiAddiction.h"
 #include "mm/mmQueries.h"
 #include "sdm/sdmConfigVars.h"
 #include "server/serverServerInfo.h"
@@ -467,11 +466,6 @@ Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM bra
 			dbugLog(_FLD, "t:%d p:%u c:%s persona has ALL_SPAWN", teulIndex(), playerID(), callsign());
 		if ( m_playerMask & ALL_SPAWN )
 			dbugLog(_FLD, "t:%d p:%u c:%s player has ALL_SPAWN", teulIndex(), playerID(), callsign());
-
-		if ( nullptr == m_antiAddiction && !permissions(IS_MATURE) )
-		{
-			mmAddMinor(this, playedTime);
-		}
 
 		// Now you need to select a brigade
 		SetState(PERS_SELECTING_BRIGADE);

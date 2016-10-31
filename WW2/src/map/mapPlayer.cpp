@@ -29,7 +29,6 @@
 #include "miss/missionHostMessages.h"
 #include "miss/missionMission.h"
 #include "miss/missionResults.h"
-#include "mm/mmAntiAddiction.h"
 #include "mm/mmHostMessages.h"
 #include "mm/mmMain.h"
 #include "mm/mmPack.h"
@@ -49,7 +48,6 @@
 #include "teul/teulAuth.h"
 #include "teul/teulBlipRepeater.h"
 #include "teul/teulUtils.h"
-#include "wwii/wwiiAntiAddiction.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiHCUnits.h"
@@ -633,9 +631,6 @@ Player::~Player()
 		// are currently in.
 		SetInstance(Instance::g_invalid);
 
-		if ( nullptr != m_antiAddiction )
-			mmRemoveMinor(this);
-
 		ExitBrigade(PERS_EXITING);
 
 		// Make sure we're in country 0
@@ -899,19 +894,11 @@ Player::evaluateMissionPacket()
 		return false;
 	}
 
-	FLOAT32 scoringModifier = mmAntiAddictionScoringMultiplier(this);
-	if ( scoringModifier == 0 )
-	{
-		dbugLog(_FLN, "t:%d p:%u c:%s No score in penalty time", teulIndex(), playerID(), callsign());
-		chatSendLocalizedMessage(playerID(), LSTR_CAUTION, LSTR_ANTI_ADDICTION_PENALTY);
-		return true;
-	}
-
 	m_mp.wasSuccessful = m_mp.successful(weaponSpec());
 
-	const UINT32 pointsScored = m_mp.scoring().points = (UINT32)(calculateSortieScore() * scoringModifier);
+	const UINT32 pointsScored = m_mp.scoring().points = (UINT32)(calculateSortieScore());
 
-	dbugLog(_FLD, "t:%d p:%u player %s missionID %d missionType %s rtb %s successful %d totalKills %d aamod: %1.1f"
+	dbugLog(_FLD, "t:%d p:%u player %s missionID %d missionType %s rtb %s successful %d totalKills %d"
 				, teulIndex()
 				, playerID()
 				, callsign()
@@ -920,7 +907,6 @@ Player::evaluateMissionPacket()
 				, _EXPAND_RTB(m_mp.vehicle().rtbState())
 				, m_mp.wasSuccessful
 				, pointsScored
-				, scoringModifier
 				);
 
 	//increment their points

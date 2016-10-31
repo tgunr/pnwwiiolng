@@ -42,7 +42,6 @@
 #include "miss/mission.h"
 #include "miss/missionHostMessages.h"
 #include "miss/missionUtils.h"
-#include "mm/mmAntiAddiction.h"
 #include "mm/mmHostInstanceImpl.h"
 #include "mm/mmHostMessages.h"
 #include "mm/mmMain.h"
@@ -1024,7 +1023,6 @@ _housekeeping()
 #if !defined(DEV_BUILD)
 	,	_pollChecksums
 #endif
-	,	mmCheckAddictionTimers
 	,	Instance::RecordPopulations
 	,	_logWWIIPlayerStats
 	,	[](){ chatHousekeepGroupPermissions(); }

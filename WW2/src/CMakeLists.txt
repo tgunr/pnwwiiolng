@@ -606,7 +606,6 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     miss/missionHostMessages.cpp miss/missionHostMessages.h
     miss/missionPack.cpp miss/missionPack.h
     miss/missMobileSpawn.cpp miss/missMobileSpawn.h include/mobileSpawnEnums.h
-    mm/mmAntiAddiction.cpp mm/mmAntiAddiction.h wwii/wwiiAntiAddiction.h
     mm/mmHostInstanceImpl.cpp mm/mmHostInstanceImpl.h
     inst/instHostInstanceImpl.h inst/instHostInstance.h inst/instBasicStatus.h
     host/hostPlayers.h inst/instStateEnums.h
