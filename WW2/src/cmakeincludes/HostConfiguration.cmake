@@ -75,13 +75,15 @@ ELSE()
         LINK_LIBRARIES( "-stdlib=libc++" )
     ENDIF()
 
-    ADD_COMPILE_OPTIONS( "-fstack-protector-all" )
-
-    if ( CMAKE_BUILD_TYPE MATCHES Debug )
-        ADD_COMPILE_OPTIONS( "-O0" "-g3" )
+    IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+		SET(_EXTRA_HOST_COMPILE_OPTIONS "-fstack-protector-all" "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+		SET(_EXTRA_HOST_LINK_OPTIONS "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+    	IF ( CMAKE_CXX_COMPILER_ID MATCHES Clang )
+        	ADD_COMPILE_OPTIONS( "-O0" "-g3" )
+		ELSE()
+			ADD_COMPILE_OPTIONS( "-Og" "-g3" )
+		ENDIF()
         ADD_DEFINITIONS( "-DDEBUG=1" )
-		# ADD_COMPILE_OPTIONS( "-fsanitize=address" )
-        # LINK_LIBRARIES( "-fsanitize=address" )
     ELSE()
 		# `-Os`: in 4.5.x -O3 generated better code for the Gen 3 Xeons in use, -Os is usually better.
 		# `-g`: Hack: Even RelWithDebInfo seems not to have debug symbols.
