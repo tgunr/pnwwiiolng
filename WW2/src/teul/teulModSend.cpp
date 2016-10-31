@@ -222,7 +222,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 			        teulIndex(), packet.header().m_callX, packet.header().m_callY,
 			        result, packet.packetSizeBytes());
 #endif
-			packet.sentBytes(sent);
+			packet.addBytesSent(sent);
 			if ( packet.sentBytes() >= packetBytes )
 			{
 				return packetBytes;
@@ -235,8 +235,8 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 	Teul::Packet* const copy = s_delayedPackets.New(std::move(packet));
 #else
 	Teul::Packet* const copy = s_delayedPackets.New(packet);
+	copy->addBytesSent(packet.sentBytes());
 #endif
-	copy->sentBytes(packet.sentBytes());
 
 	m_impl->m_sendQueue.push_back(copy);
 
@@ -290,7 +290,7 @@ ENDPOINT::pushSendQueue()
 		        teulIndex(), packet->header().m_callX, packet->header().m_callY,
 		        result, remainingBytes);
 #endif
-		packet->sentBytes((size_t)result);
+		packet->addBytesSent((size_t)result);
 		if ( packet->sentBytes() >= packet->packetSizeBytes() )
 		{
 			// We appear to have sent the data.

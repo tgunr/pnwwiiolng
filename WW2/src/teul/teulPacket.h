@@ -278,7 +278,7 @@ public:
 	//! Bytes we have sent.
 	UINT32 sentBytes() const noexcept { return m_sent; }
 	//! Increment bytes sent.
-	void sentBytes(const UINT32 bytes_) noexcept { m_sent += bytes_; }
+	void addBytesSent(const UINT32 bytes_) noexcept { m_sent += bytes_; }
 };
 
 template<typename T>
