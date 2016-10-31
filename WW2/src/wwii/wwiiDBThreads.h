@@ -15,7 +15,7 @@
 
 namespace DBThread
 {
-	typedef enum { Audit, Auth, Sys, Wwii, WwiiOnline, NumDBNos, Default = WwiiOnline } DBNo;
+	typedef enum { Audit, Auth, Wwii, WwiiOnline, NumDBNos, Default = WwiiOnline } DBNo;
 }
 
 //////////////////////////////////////////////////////////////////////
