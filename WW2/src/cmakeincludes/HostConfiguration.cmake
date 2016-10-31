@@ -41,6 +41,7 @@ IF ( MSVC )
 
 ELSE()
 
+	ADD_COMPILE_OPTIONS( "-fno-omit-frame-pointer" )	# nicer stacks
     ADD_COMPILE_OPTIONS( "-Winvalid-pch" "-Wno-array-bounds" )
     ADD_COMPILE_OPTIONS( "-Wno-strict-aliasing" "-Wno-unused-result" "-Wno-unknown-pragmas" )
     ADD_COMPILE_OPTIONS( "-Wall" "-Wshadow" "-Wno-deprecated" )
