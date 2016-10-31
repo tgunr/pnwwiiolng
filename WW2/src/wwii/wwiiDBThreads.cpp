@@ -61,7 +61,7 @@ _skipExclamationInStatement(const char* src_)
 bool
 DBThreadQuery::Execute(UINT32 threadNo, DB::handle_t* conn, DBThread::DBNo* lastDb)
 {
-	static const char* const dbName[DBThread::NumDBNos] = { "audit", "auth", "chat", "wwii", "wwiionline" };
+	static const char* const dbName[DBThread::NumDBNos] = { "audit", "auth", "strat", "toe", "wwii", "wwiionline" };
 
 	// To avoid various potential race conditions on who has ownership of the
 	// statement string, we need to make our own copy of the statement.
