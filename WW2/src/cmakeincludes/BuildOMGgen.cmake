@@ -6,17 +6,17 @@ SET( OMGGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/omggen" )
 FILE( MAKE_DIRECTORY ${OMGGEN_OUTPUT_DIR} )
 
 # Pull in the Bison parser and Flex lexer used by OMGgen
-BISON_TARGET( OMGParser
-    "${OMGGEN_INPUT_DIR}/omggen.y" "${OMGGEN_OUTPUT_DIR}/omggen.tab.cpp"
-#    COMPILE_FLAGS "--report=all"
-    DEFINES_FILE "${OMGGEN_OUTPUT_DIR}/omggen.tab.h"
-)
-FLEX_TARGET( OMGLexer
-    "${OMGGEN_INPUT_DIR}/omggen.l" "${OMGGEN_OUTPUT_DIR}/omggen.yy.cpp"
-    COMPILE_FLAGS "-B --nounistd"
-    DEFINES_FILE "${OMGGEN_OUTPUT_DIR}/omggen.yy.h"
-)
-ADD_FLEX_BISON_DEPENDENCY( OMGLexer OMGParser )
+#BISON_TARGET( OMGParser
+#    "${OMGGEN_INPUT_DIR}/omggen.y" "${OMGGEN_OUTPUT_DIR}/omggen.tab.cpp"
+##    COMPILE_FLAGS "--report=all"
+#    DEFINES_FILE "${OMGGEN_OUTPUT_DIR}/omggen.tab.h"
+#)
+#FLEX_TARGET( OMGLexer
+#    "${OMGGEN_INPUT_DIR}/omggen.l" "${OMGGEN_OUTPUT_DIR}/omggen.yy.cpp"
+#    COMPILE_FLAGS "-B --nounistd"
+#    DEFINES_FILE "${OMGGEN_OUTPUT_DIR}/omggen.yy.h"
+#)
+#ADD_FLEX_BISON_DEPENDENCY( OMGLexer OMGParser )
 
 # Define OMGgen itself
 ADD_SUBDIRECTORY(omggen)
