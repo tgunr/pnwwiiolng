@@ -162,7 +162,7 @@ public:	TestPackers() : TestUnit("TestPackers") {}
 	{
 		SINT32 min = std::is_signed<T>::value ? 2 : 1;
 		for (SINT32 bits = min; bits <= SINT32(sizeof(T) / 8); ++bits) {
-			TestPacker(name, value & ~(~0 << bits), bits);
+			TestPacker(name, value & ~(~0U << bits), bits);
 		}
 	}
 
