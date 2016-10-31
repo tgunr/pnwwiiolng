@@ -944,7 +944,11 @@ const char sep = '/';
 #if platBuild == BUILD_SERVER
 #include "libxml/xmlIO.h"
 
-using xml_handle_t = void*;
+struct Context
+{
+	Context(int fd) : m_fd(fd) {}
+	int m_fd;
+};
 
 void fioXmlRegisterInputCallbacks()
 {
@@ -954,11 +958,11 @@ void fioXmlRegisterInputCallbacks()
 		// xmlInputOpenCallback: returns an opaque handle disguised as a void*
 		/// HACK: fiodOpen returns -1 on error, libxml expects a 0 for error.
 		/// so I'm bumping the file descriptor by one for all operations here.
-		[](const char* filename) { return reinterpret_cast<xml_handle_t>(fiodOpen(filename) + 1); },	// fiodOpen has default args,
+		[](const char* filename) -> void* { int fd = fiodOpen(filename); return fd == -1 ? nullptr : new Context(fd); },
 		// xmlInputReadCallback: passed the handle, buffer and len
-		[](xml_handle_t ctx, char* buffer, int len) { return static_cast<int>(fiodRead(reinterpret_cast<int>(ctx) - 1, buffer, len)); },
+		[](void* ctx, char* buffer, int len) -> int { return ctx ? fiodRead(static_cast<Context*>(ctx)->m_fd, buffer, len) : -1; },
 		// xmlInputCloseCallback: close file
-		[](xml_handle_t ctx) { fiodClose(reinterpret_cast<int>(ctx) - 1); return 0; }
+		[](void* ctx) { fiodClose(static_cast<Context*>(ctx)->m_fd); delete static_cast<Context*>(ctx); return 0; }
 	);
 }
 #endif
