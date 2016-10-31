@@ -13,12 +13,14 @@ namespace Mem
 	{
 		static_assert(BlockSize > 0, "BlockSize must be at least 1.");
 
-		using Block = Type[BlockSize];
+		using Block = std::array<Type, BlockSize>;
 
 		// Pointers to blocks of allocations
 		std::list<Block> m_blocks;
 		// Pointers to individual elements
 		std::vector<Type*> m_freeList;
+		// Count of assigned allocations
+		size_t m_inUse { 0 };
 
 		// Increase the number of free entries available by BlockSize.
 		// Aborts on out of memory.
@@ -27,8 +29,8 @@ namespace Mem
 			m_blocks.emplace_back();
 			auto& newBlock = m_blocks.back();
 			m_freeList.reserve(m_freeList.size() + BlockSize);
-			for (Type* unit = newBlock; unit != newBlock + BlockSize; ++unit) {
-				m_freeList.push_back(unit);
+			for (size_t i = 0; i < newBlock.size(); ++i ) {
+				m_freeList.push_back(&newBlock[0] + i);
 			}
 		}
 
@@ -44,7 +46,6 @@ namespace Mem
 		void Cleanup() noexcept
 		{
 			m_freeList.clear();
-			std::for_each(m_blocks.begin(), m_blocks.end(), [](Type* block) { memFree(block); });
 			m_blocks.clear();
 		}
 
@@ -69,6 +70,7 @@ namespace Mem
 				Grow();
 			Type* block = m_freeList.back();
 			m_freeList.pop_back();
+			++m_inUse;
 			return block;
 		}
 
@@ -76,8 +78,10 @@ namespace Mem
 		//! @warn Does not verify the allocation came from the pool.
 		void Free(Type* block)
 		{
-			ABORT_IF(block == nullptr);
-			m_freeList.push_back(block);
+			if ( PN_LIKELY( block ) ) {
+				m_freeList.push_back(block);
+				--m_inUse;
+			}
 		}
 
 		//! Obtain the next free allocation and in-place default new it.
