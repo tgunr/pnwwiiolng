@@ -41,12 +41,14 @@ class DBQueueThread : public DBThread::Thread
 private:
 	uint32_t			m_id = 0;
 
+	using DBThread::Thread::start;
+
 public:
 	virtual ~DBQueueThread();
 
 	void start(uint32_t id_) {
 		m_id = id_ + 1;
-		PNThread::start();
+		start();
 	}
 
 	DB::handle_t* getConn() const { return m_conn; }
