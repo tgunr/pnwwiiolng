@@ -80,10 +80,11 @@ ELSE()
     	IF ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang )
 			# -Og does optimizations that don't affect debugging but do radically affect performance.
 			# clang treats -Og as -O1 (https://llvm.org/bugs/show_bug.cgi?id=20765),
-        	ADD_COMPILE_OPTIONS( "-Og" "-g3" )
+        	ADD_COMPILE_OPTIONS( "-Og" )
 		ELSE()
-			ADD_COMPILE_OPTIONS( "-O0" "-g3" )
+			ADD_COMPILE_OPTIONS( "-O0" )
 		ENDIF()
+		ADD_COMPILE_OPTIONS( "-g3" )
         ADD_DEFINITIONS( "-DDEBUG=1" )
 		# ADD_COMPILE_OPTIONS( "-fsanitize=address" )
         # LINK_LIBRARIES( "-fsanitize=address" )
