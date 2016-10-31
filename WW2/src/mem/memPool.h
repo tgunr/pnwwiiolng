@@ -13,25 +13,29 @@ namespace Mem
 	{
 		static_assert(BlockSize > 0, "BlockSize must be at least 1.");
 
-		std::vector<Type*> m_blocks;
+		using Block = Type[BlockSize];
+
+		// Pointers to blocks of allocations
+		std::list<Block> m_blocks;
+		// Pointers to individual elements
 		std::vector<Type*> m_freeList;
 
 		// Increase the number of free entries available by BlockSize.
 		// Aborts on out of memory.
 		void Grow()
 		{
-			Type* const newBlock = static_cast<Type*>(memAlloc(sizeof(Type)* BlockSize));
-			ABORT_IF(newBlock == nullptr);
-			m_blocks.push_back(newBlock);
-			for (Type* block = newBlock + BlockSize - 1; block >= newBlock; --block)
-				m_freeList.push_back(block);
+			m_blocks.emplace_back();
+			auto& newBlock = m_blocks.back();
+			m_freeList.reserve(m_freeList.size() + BlockSize);
+			for (Type* unit = newBlock; unit != newBlock + BlockSize; ++unit) {
+				m_freeList.push_back(unit);
+			}
 		}
 
 	public:
 		//! Default constructor. Optional argument specifies how many units to reserve at startup.
 		Pool(size_t defaultReservation=BlockSize)
 		{
-			m_blocks.reserve(128);			// Boot-strap the allocations tracker.
 			m_freeList.reserve(std::max(defaultReservation, BlockSize * 2));
 			Reserve(defaultReservation);	// Pre-allocate the first units.
 		}
