@@ -216,9 +216,9 @@ Supercell::initialize(SINT16 scx, SINT16 scy, const char* filename)
 	indexSize = sdmGetMaxStratId() + 1;
 
 	if ( numCPs > 0 )
-		cps = new CPStruct[numCPs];
+		cps = new CPStruct[numCPs] {};
 	if ( numFacilities > 0 )
-		facilities = new FacilityStruct[numFacilities];
+		facilities = new FacilityStruct[numFacilities] {};
 	if ( numObjects > 0 )
 		objects = (ObjectStruct*)memCalloc(sizeof(ObjectStruct), numObjects);
 	if ( numLinks > 0 )
