@@ -56,8 +56,6 @@ extern void strtInitSpawn();
 //	WARNING - whoever uses this function needs to free postListResponse->postedWeapon
 extern SINT32 strtProcessPostListRequest(SINT32 teulIndex, const struct MM_POST_LIST_REQUEST& postListRequest);
 
-//tolua_begin
-
 //Sets up spawning on a facility based on the spawn objects attached to it.
 extern SINT32 strtSetupSpawn(FacilityStruct* facility);
 
@@ -86,5 +84,3 @@ extern bool strtProcessSpawnCancel(const MM_SPAWN_CANCEL& spawnCancel);
 extern void strtExpireSpawnedWeapons();
 
 extern UINT32 strtFallback(CPStruct* cp, WWII_SIDE issuer, FALLBACK_MODE execute, UINT32 playerID);
-
-//tolua_end

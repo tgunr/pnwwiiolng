@@ -154,42 +154,6 @@ _callFunction(const char* fn, int nargs)
 	return true;
 }
 
-void
-Lua::CallInstanceFunction(const char* func, const instanceid_t instID, const char* data)
-{
-	lua_getglobal(_luaVM, func);
-	if ( lua_isfunction(_luaVM, -1) != 1 )
-	{
-		dbugLog(_FLW, "no instance function: %s", func);
-		return;
-	}
-
-	char instStr[20];
-	strprintf(instStr, "%" PR64BitUT "", instID);
-	lua_pushstring(_luaVM, instStr);
-	lua_pushstring(_luaVM, data);
-
-	_callFunction(func, 2);
-}
-
-void
-Lua::CallInstanceFunction(const char* func_, const instanceid_t instID_, playerid_t playerID_, Instance::PlayerState* state_)
-{
-	lua_getglobal(_luaVM, func_);
-	if ( lua_isfunction(_luaVM, -1) != 1 )
-	{
-		dbugLog(_FLW, "no instance function: %s", func_);
-		return;
-	}
-	char instStr[20];
-	strprintf(instStr, "%" PR64BitUT "", instID_);
-	lua_pushstring(_luaVM, instStr);
-	tolua_pushnumber(_luaVM, (lua_Number)playerID_);
-	tolua_pushusertype(_luaVM, (void*)state_, "PlayerState");
-
-	_callFunction(func_, 3);
-}
-
 int
 _getNumber(const char* function, int argc=0)
 {

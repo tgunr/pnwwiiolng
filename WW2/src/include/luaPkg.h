@@ -43,6 +43,4 @@ static inline ChatHandle getHandle(const char* gameName)
     return chatGetHandle(gameName);
 }
 
-static inline const Rank* getRank(unsigned int i) { return Rank::lookup(i); }
-
 //tolua_end

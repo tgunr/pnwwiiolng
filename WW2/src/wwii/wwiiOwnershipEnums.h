@@ -92,3 +92,4 @@ static inline WWII_COUNTRY wwiiAdjustedCountry(UINT32 country)
 
 //tolua_end
 static inline bool isValidSide(WWII_SIDE n) { return (n == ALLIED || n == AXIS); }
+

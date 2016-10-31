@@ -150,7 +150,6 @@ enum WAYPOINT_TYPE
 	// Add new waypoint types here
 	MAX_WAYPOINT_TYPES
 };
-//tolua_begin
 
 
 // These appear to be flags for certain strat element classes.
@@ -180,8 +179,6 @@ struct STRT_DTL_HEADER
 	UINT16 reserved3;
 
 };
-
-//tolua_end
 
 struct CP
 {

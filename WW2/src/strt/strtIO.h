@@ -15,12 +15,7 @@
 #include "strt/strtProtos.h"
 #include "strt/strtDTL.h"
 
-// -------------------------------------- Non-Exposed Functions
-
 class CPStruct* strtImportStratData();
-
-// -------------------------------------- Exposed Functions
-//tolua_begin
 
 //This event structure allows us to simulate events
 
@@ -34,6 +29,4 @@ extern const char* strtPrintFacilityType(FACILITY_TYPE facilityType);
 
 //create an array (using malloc) whose elements are the lines of file pointed to by stream
 void strtReleaseSupercells();
-
-//tolua_end
 

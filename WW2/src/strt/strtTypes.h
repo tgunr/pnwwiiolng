@@ -73,6 +73,7 @@ enum {
 ,	SMOKELEVEL_HEAVY = 2
 ,	SMOKELEVEL_FIRE = 3
 };
+//tolua_end
 
 //------------------------------STRUCT SECTION-------------------------------
 
@@ -107,6 +108,7 @@ struct VISLEVEL_UPDATE
 	UCHAR			vislevel;
 };
 
+//tolua_begin
 // Structure for defining allocations of vehicles
 class WeaponCounter
 {
@@ -146,6 +148,7 @@ public:
 	UCHAR	spawnable;				// Used by the client
 	UCHAR	restricted;			// If your account prevents using this
 };
+//tolua_end
 
 #pragma pack(push, 1)				// Wire format capable.
 struct STRAT_ENEMY_REPORT
@@ -159,4 +162,3 @@ struct STRAT_ENEMY_REPORT
 };
 #pragma pack(pop)
 
-//tolua_end

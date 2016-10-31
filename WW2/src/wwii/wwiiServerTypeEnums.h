@@ -7,8 +7,6 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-//tolua_begin
 
 enum SERVER_TYPE
 {
@@ -22,7 +20,5 @@ enum SERVER_TYPE
 	EXIT_SERVER,
 	MAX_SERVER_TYPE,
 };
-
-//tolua_end
 
 extern const char* g_serverTypes[MAX_SERVER_TYPE + 1];
