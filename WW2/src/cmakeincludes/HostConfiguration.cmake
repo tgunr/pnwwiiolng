@@ -77,13 +77,27 @@ ELSE()
     ADD_COMPILE_OPTIONS( "-fstack-protector-all" )
 
     if ( CMAKE_BUILD_TYPE MATCHES Debug )
-        ADD_COMPILE_OPTIONS( "-O0" )
+    	IF ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang )
+			# -Og does optimizations that don't affect debugging but do radically affect performance.
+			# clang treats -Og as -O1 (https://llvm.org/bugs/show_bug.cgi?id=20765),
+        	ADD_COMPILE_OPTIONS( "-Og" "-g3" )
+		ELSE()
+			ADD_COMPILE_OPTIONS( "-O0" "-g3" )
+		ENDIF()
         ADD_DEFINITIONS( "-DDEBUG=1" )
 		# ADD_COMPILE_OPTIONS( "-fsanitize=address" )
         # LINK_LIBRARIES( "-fsanitize=address" )
     ELSE()
-        ADD_COMPILE_OPTIONS( "-Os" )
+		# `-Os`: in 4.5.x -O3 generated better code for the Gen 3 Xeons in use, -Os is usually better.
+		# `-g`: Hack: Even RelWithDebInfo seems not to have debug symbols.
+        ADD_COMPILE_OPTIONS( "-Os" "-g" )
         ADD_DEFINITIONS( "-DNDEBUG=1" )
+    	IF ( CMAKE_CXX_COMPILER_ID MATCHES Clang )
+			# `-flto`: legacy cishness makes for significant perf gains in this codebase :(
+			# `-fwhole-program-vtables`: Defining inline dtors has pros and cons.
+			# The main con being the compiler may have to make a mess, which this option fixes.
+			ADD_COMPILE_OPTIONS( "-flto" "-fwhole-program-vtables" )
+		ENDIF()
     ENDIF()
     LINK_LIBRARIES( "-lpthread" )
 
