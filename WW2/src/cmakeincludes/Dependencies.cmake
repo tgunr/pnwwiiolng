@@ -105,7 +105,7 @@ ELSEIF ( UNIX )
 		libxml2
 		SOURCE_DIR ${LIBXML2_SOURCE_DIR}
 		CONFIGURE_COMMAND ${LIBXML2_SOURCE_DIR}/autogen.sh 
-			"CFLAGS=${LIBXML2_CFLAGS}" LDFLAGS="${LIBXML2_LDFLAGS}"
+			"CFLAGS=${LIBXML2_CFLAGS}" "LDFLAGS=${LIBXML2_LDFLAGS}"
 			--prefix=${LIBXML2_INSTALL_DIR}
 			--disable-shared --enable-static --disable-ipv6
 			--without-python --with-modules
