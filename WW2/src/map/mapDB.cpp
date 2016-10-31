@@ -456,7 +456,7 @@ Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM bra
 		SetSquad(row.NextUInt());									// 8
 		SetSquadHandle(chatGetHandle(row.NextString()));			// 9
 
-		UINT32 playedTime = row.NextUInt();							//10
+		row.NextUInt();	 // playedTime								//10
 		UINT32 newMinuteBalance = row.NextUInt();					//11
 
 		SetRank(myRankNo);
