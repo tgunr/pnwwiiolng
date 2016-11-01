@@ -111,7 +111,7 @@ void
 authInitDB()
 {
 	// Auth has its own database to talk to.
-	dbseSetDatabase(cv_authdbAddress, cv_authdbSchema, cv_authdbUser, cv_authdbPassword, cv_authdbPort);
+	dbseSetDatabase(cv_authdbAddress, cv_authdbPort, cv_authdbSchema, cv_authdbUser, cv_authdbPassword);
 
 	if ( !dbh.connect() )
 		LogAbort("Couldn't connect to database");
