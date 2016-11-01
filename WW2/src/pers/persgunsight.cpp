@@ -37,8 +37,8 @@
 	persGunsight
 *************************************************************************************************/
 // defines
-#define RANGETABLE_MAXRANGE 8000 	// meters
-#define RANGETABLE_INCREMENT 100	// meters
+#define RANGETABLE_MAXRANGE 8000 // meters
+#define RANGETABLE_INCREMENT 10  // meters
 #define RANGETABLE_NUMELEMENTS ((RANGETABLE_MAXRANGE/RANGETABLE_INCREMENT)+1)
 
 #define TIME_INCREMENT .008
