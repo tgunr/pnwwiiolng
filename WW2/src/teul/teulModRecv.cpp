@@ -1729,8 +1729,8 @@ teulModIdle(const TeulTimeMS duration_)
 	lastTeulUpdate = teulClock64;
 
 	interval = teulClock64 - std::min(teulClock64, _lastIdle);
-#ifdef BETA_RELEASE
-	static const TeulTimeMS AlertInterval_ms = 3 * 1000;
+#ifdef DEBUG
+	static const TeulTimeMS AlertInterval_ms = 2 * 1000;
 #else
 	static const TeulTimeMS AlertInterval_ms = 75;
 #endif
