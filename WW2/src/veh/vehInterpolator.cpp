@@ -109,7 +109,7 @@ namespace {
 						min_height -= floor_stickiness;
 
 					if ( (best_floor == nullptr || hit.pos.z() > best_floor->pos.z()) &&
-						    hit.pos.z() > min_height ) {
+						 hit.pos.z() > min_height ) {
 						if ( hit.pos.z() < update.pos.z + HACK_max_jump )
 							best_floor = &hit;
 					}
@@ -118,7 +118,7 @@ namespace {
 				case CAGE_COLLIDER: {
 					// Scenario-only colliders.
 					if ( colliderIsType(category_bits, COLLIDER_BLOCK) ||
-						    colliderIsType(category_bits, COLLIDER_VOLUME) )
+						 colliderIsType(category_bits, COLLIDER_VOLUME) )
 						continue;
 
 					// If we're not really moving, don't bother to check collisions.
@@ -305,9 +305,12 @@ const Update& InfantryPredictor::Interpolate(FrameTime frame) {
 
 		FLOAT64 prev_z = pred_pos.pos.z;
 		pred_pos.pos = spline.InterpolatePoint(t);
-		// HACK: The predicted position we interpolate to doesn't take gravity into account,
-		// so ignore the interpolated height unless it has us heading downward.
-		pred_pos.pos.z = std::min(prev_z, pred_pos.pos.z);
+		// HACK: The predicted position we interpolate to doesn't take gravity
+		// into account, so ignore the interpolated height unless it has us in
+		// the direction we should be.
+		if ( (spline.calcpos(spline._zc, 0.0) < spline.calcpos(spline._zc, 1.0)) !=
+		                              (prev_z < pred_pos.pos.z) )
+			pred_pos.pos.z = prev_z, pred_pos.pos.z;
 
 		FLOAT64VECTOR vel = spline.InterpolateDt(t);
 		mathScaleVector(&vel, &vel, 1000.0/interp_time);
