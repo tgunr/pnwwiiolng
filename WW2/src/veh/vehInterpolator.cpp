@@ -18,7 +18,7 @@ namespace {
 	// Make the real and predicted positions match in this many milliseconds.
 	const FrameTime interp_time = 300;
 	// Stick to the floor if we're this far from it.
-	const FLOAT64 floor_stickiness = 0.5;
+	const FLOAT64 floor_stickiness = 0.0; // TEMP
 	// How many old an incoming message can be before we consider it out-of-date.
 	const FrameTime message_age_threshold = 200;
 
@@ -101,7 +101,7 @@ namespace {
 					if ( (up * hit.normal) < 0 )
 						continue;
 					if ( colliderIsType(category_bits, COLLIDER_VEHICLE_MASK) ||
-						    colliderIsType(category_bits, COLLIDER_WALK) )
+						 colliderIsType(category_bits, COLLIDER_WALK) )
 						continue; // Don't let other entities mess with our prediction.
 
 					FLOAT64 min_height = update.pos.z;
@@ -310,7 +310,7 @@ const Update& InfantryPredictor::Interpolate(FrameTime frame) {
 		// the direction we should be.
 		if ( (spline.calcpos(spline._zc, 0.0) < spline.calcpos(spline._zc, 1.0)) !=
 		                              (prev_z < pred_pos.pos.z) )
-			pred_pos.pos.z = prev_z, pred_pos.pos.z;
+			pred_pos.pos.z = prev_z;
 
 		FLOAT64VECTOR vel = spline.InterpolateDt(t);
 		mathScaleVector(&vel, &vel, 1000.0/interp_time);
