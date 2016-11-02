@@ -21,6 +21,12 @@ namespace {
 	const FLOAT64 floor_stickiness = 0.5;
 	// How many old an incoming message can be before we consider it out-of-date.
 	const FrameTime message_age_threshold = 200;
+
+	// HACK: Don't jump up more than this much based on collisions.
+	// The collision code is occasionally shooting us onto the roof of capture
+	// buildings, but I just don't have the time right now to properly refactor
+	// the collision logic and fix everything.
+	const FLOAT64 HACK_max_jump = 0.5;
 }
 
 //------------------------------------------------------------------------------
@@ -104,7 +110,8 @@ namespace {
 
 					if ( (best_floor == nullptr || hit.pos.z() > best_floor->pos.z()) &&
 						    hit.pos.z() > min_height ) {
-						best_floor = &hit;
+						if ( hit.pos.z() < update.pos.z + HACK_max_jump )
+							best_floor = &hit;
 					}
 					break;
 				}
