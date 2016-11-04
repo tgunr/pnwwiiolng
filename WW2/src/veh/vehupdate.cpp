@@ -1740,7 +1740,7 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 
 	// Position
 // Absolutely no idea why it works like this
-// Seems to be due to some retardation in the FPS math, but fixing it is
+// Seems to be due to some brokenness in the FPS math, but fixing it is
 // a real potential can of worms
 if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 	PosData->Pos.x += -PosData->Vel.x * Delta;

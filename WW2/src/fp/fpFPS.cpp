@@ -6813,7 +6813,7 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 
 	mobile = !(stateFlags & STATE_NO_MOVEMENT);
 
-	// this sucks
+	// this stinks
 	// attempted to prevent the flop-run but all it seems to do is annoy people
 	//poseOK = (!SuperFloat && ((frametime - lastPoseChangeTime) >= POSE_CHANGE_TIME) ? 1 : 0);
 

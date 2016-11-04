@@ -2923,7 +2923,7 @@ UINT32 vehProcessVehicleHit(const Vehicle::Hit& hit)
 	&& ShooterVehicle->VehicleType->Type == VEH_TYPE_PERSON
 	&& TargetVehicle->VehicleType->Type  == VEH_TYPE_PERSON)
 	{
-		vehHit->timeStamp = (UINT16)vehHit->timeStamp;// fucking short timestamp bullshit
+		vehHit->timeStamp = (UINT16)vehHit->timeStamp;// annoying short timestamp nonsense
 		_DeferredHitMessages.push_back(*vehHit);
 	}else*/
 	{

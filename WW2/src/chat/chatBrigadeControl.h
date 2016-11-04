@@ -73,7 +73,7 @@ enum BRIGADE_CONTROL_ERROR
 ,	BCERR_OWN_TOWN					// Target invalid because its friendly
 									// (e.g. for attack)
 ,	BCERR_ALREADY_OBJECTIVE			// Target already has an objective
-,	BCERR_NOT_OBJECTIVE				// Not an objective, retard
+,	BCERR_NOT_OBJECTIVE				// Not an objective
 ,	BCERR_CANT_CANX_DEFEND			// Can't cancel defend, tit
 ,	BCERR_NOT_FRONTLINE				// Can't attack non-frontline towns
 ,	BCERR_NOMINEE_CANT_OIC			// The player you tried to nominate doesn't have OIC permission

@@ -336,7 +336,7 @@ BrigadeControlDescriptor BrigadeControlNotice::getDescription() const
 				case BCERR_YOU_WRONG_BRIGADE:		return BCD_ControlError(this, "error.wrongbrigade");	// You are in the wrong brigade
 				case BCERR_OWN_TOWN:				return BCD_ControlError(this, "error.owntown");				// Target invalid because its friendly
 				case BCERR_ALREADY_OBJECTIVE:		return BCD_ControlError(this, "error.alreadyobjective");	// Target already has an objective
-				case BCERR_NOT_OBJECTIVE:			return BCD_ControlError(this, "error.notobjective");		// Not an objective, retard
+				case BCERR_NOT_OBJECTIVE:			return BCD_ControlError(this, "error.notobjective");		// Not an objective
 				case BCERR_CANT_CANX_DEFEND:		return BCD_ControlError(this, "error.cantcancel");			// Can't cancel defend, tit
 				case BCERR_NOT_FRONTLINE:			return BCD_ControlError(this, "error.notfrontline");		// Can't attack non-frontline towns
 				case BCERR_NOMINEE_CANT_OIC:			return BCD_ControlError(this, "error.notpermitted");		// We can't nominate this player
