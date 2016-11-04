@@ -15,7 +15,7 @@ public:
 	FLOAT64VECTOR InterpolatePoint(double t);
 	FLOAT64VECTOR InterpolateDt(double t);
 
-protected:
+//protected:
 	double calcpos(double c[4], double t);
 	double calcdt(double c[4], double t);
 	double _xc[4], _yc[4], _zc[4];
