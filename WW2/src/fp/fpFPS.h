@@ -276,7 +276,9 @@ extern bool fpFPSCanProjectGrenade();
 
 //--------------
 // !!!HACK!!! - for vehInterpolator
+#include "fpFPSdata.h"
+
 void InitColliderGeometry(void);
 void _updateFPSColliders(void);
-extern fpFPSPoses HACK_forced_pose;
+extern fpFPSPositions HACK_forced_pose;
 extern Vec3d* HACK_forced_pos;

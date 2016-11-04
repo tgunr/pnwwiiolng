@@ -22,6 +22,7 @@ namespace Mem
 		{
 			Type* const newBlock = static_cast<Type*>(memAlloc(sizeof(Type)* BlockSize));
 			ABORT_IF(newBlock == nullptr);
+			m_blocks.push_back(newBlock);
 			for (Type* block = newBlock + BlockSize - 1; block >= newBlock; --block)
 				m_freeList.push_back(block);
 		}
