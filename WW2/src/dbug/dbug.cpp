@@ -542,7 +542,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	if ( PN_LIKELY((_logger.m_errType != Debug::ERR_FATAL) && (_logger.m_errType > minLevel)) )
 		return 0;
 
-	_logger.setFileName(sane_basename(filename));
+	_logger.setFileName(sane_basename(filename != nullptr ? filename : ""));
 	_logger.m_lineno = lineno;
 
 	size_t len = 0;
