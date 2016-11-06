@@ -82,7 +82,6 @@ int main(int argc, const char* argv[])
 	while (1)
 	{
 		teulUpdateTransport(50);
-		threadsLogging();
 	}
 
 /*	when we decide on a condition for the loop above:

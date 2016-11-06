@@ -61,7 +61,6 @@ const char* errorTypes[] = {
 };
 
 static size_t _fileSize = 0;
-static void _levelHandler(UINT32 errType, const char* const text);
 
 // Global boolean that controls whether or not 'D'ebug level messages will be logged.
 // Exposed globally so it can be tested before prior to performing otherwise expensive
@@ -70,6 +69,19 @@ bool g_logDebug = true;
 
 static std::mutex s_dbugInitMutex;
 static bool s_dbugInitialized = false;
+static std::mutex s_dbugOutputMutex;
+
+thread_local char DebugLogger::m_text[DBUG_MAX_STRING + 1];
+
+struct ThreadId
+{
+	size_t m_id;
+	static std::atomic<size_t> s_id;
+	ThreadId() : m_id(s_id++) {}
+};
+
+std::atomic<size_t> ThreadId::s_id { 0 };
+static thread_local ThreadId stl_threadId {};
 
 //////////////////////////////////////////////////////////////////////
 // Set errno.
@@ -191,23 +203,30 @@ _openDbugFile(const char* const srcFile_)
 // MAX_FILE_SIZE being exceeded, then perform file roll-over.
 
 static void
-_dbugOut(const SINT32		file
+_dbugOut(bool logToConsole
 			, const LogMode	logMode
 			, const char*	outString
 			, const size_t	length
 			, const	bool	rollover) noexcept
 {
-	if ( logMode != LogMode::TO_FILE || file < 0 )
+	if ( PN_UNLIKELY(logToConsole) ) {
+		OS_WRITE(_stdErrFileNo, outString, (unsigned long)length);
+		if ( PN_UNLIKELY(_logger.m_dbugfile == _stdErrFileNo) )
+			return;
+	}
+
+	if ( logMode != LogMode::TO_FILE || _logger.m_dbugfile < 0 )
 		return;
 
-	size_t retval = OS_WRITE(file, outString, (unsigned long)length);
-	if ( file == _stdErrFileNo )
+	size_t retval = OS_WRITE(_logger.m_dbugfile, outString, (unsigned long)length);
+	///TODO: handle negative reval???
+	if ( _logger.m_dbugfile == _stdErrFileNo )
 		return;
 
 	_fileSize += retval;
 	if ( PN_UNLIKELY(rollover && _fileSize >= MAX_FILE_SIZE) )
 	{
-		OS_CLOSE(file);
+		OS_CLOSE(_logger.m_dbugfile);
 		_logger.m_dbugfile = _openDbugFile(_logger.program());
 	}
 }
@@ -224,13 +243,8 @@ void DebugLogger::initialize(LogMode logMode, Debug::ERROR_TYPE level, SINT32 fd
 		m_writeFlags = 0;
 	}
 
-	// transient error flags
-	m_errType = Debug::ERR_ABORT;
-	m_lineno = -1;
-
 	setProgram(programName);
-	setFileName(nullptr);		// Don't have an open file.
-	setText(nullptr);
+	m_text[0] = 0;
 
 	m_initialized = true;
 }
@@ -389,15 +403,12 @@ void dbugClose()
 
 void DebugLogger::close() noexcept
 {
-	if ( m_logMode != LogMode::TO_FILE )
+	if ( m_logMode != LogMode::TO_FILE || m_dbugfile < 0 )
 		return;
+	std::lock_guard<std::mutex> lock(s_dbugOutputMutex);
+	_dbugOut(true, _logger.m_logMode, _CLOSE_MSG, sizeof(_CLOSE_MSG)-1, false);
 
-	if ( m_dbugfile < 0 )
-		return;
-
-	_dbugOut(_logger.m_dbugfile, _logger.m_logMode, _CLOSE_MSG, sizeof(_CLOSE_MSG)-1, false);
-
-	if ( m_dbugfile > _stdErrFileNo )
+	if ( m_dbugfile !=  _stdErrFileNo )
 		OS_CLOSE(_logger.m_dbugfile);
 	_logger.m_dbugfile = -1;
 }
@@ -410,7 +421,7 @@ void dbugSetWriteLevel(Debug::ERROR_TYPE level)
 	SINT32 flags;
 	SINT32 temp;
 
-	flags = level &DBUG_FLAG_MASK;
+	flags = level & DBUG_FLAG_MASK;
 	temp = level;
 	temp &= ~DBUG_FLAG_MASK;
 	level = (Debug::ERROR_TYPE)temp;
@@ -524,74 +535,60 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	if ( PN_UNLIKELY(_logger.isInitialized() == false) )
 		_logger.initialize(LogMode::TO_FILE,  Debug::ERR_INFO, _stdErrFileNo, "not_initialized");
 
-	_logger.m_isLog = isLog;
-
-	if (_logger.m_dbugfile < 0)
+	if ( PN_UNLIKELY(_logger.m_dbugfile < 0 || fmt == nullptr) )
 		return 0;
 
-	UINT32 flags = (_logger.m_isLog) ? _logger.m_logFlags : _logger.m_writeFlags;
-	flags |= (errType & DBUG_FLAG_MASK);
-	_logger.m_flags = flags;
-
-	if (PN_LIKELY(errType != Debug::ERR_FATAL))
-		_logger.m_errType = errType & ~DBUG_FLAG_MASK;
-	else
-		_logger.m_errType = errType;
+	// split incoming 'errType' into flags bits and type bits
+	UINT32 flags = errType & DBUG_FLAG_MASK, error = errType & ~DBUG_FLAG_MASK;
+	flags |= isLog ? _logger.m_logFlags : _logger.m_writeFlags;
 
 	const UINT32 minLevel = isLog ? _logger.m_logLevel : _logger.m_writeLevel;
-	if ( PN_LIKELY((_logger.m_errType != Debug::ERR_FATAL) && (_logger.m_errType > minLevel)) )
+	if ( PN_LIKELY((error != Debug::ERR_FATAL) && (error > minLevel)) )
 		return 0;
 
-	_logger.setFileName(basename(filename));
-	_logger.m_lineno = lineno;
+	const bool isFatal = (error == Debug::ERR_FATAL);
+	const bool logToConsole = isFatal || (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && error <= Debug::ERR_MINOR);
 
 	size_t len = 0;
-	if ( ! (flags & BARE_DEBUG) )
-	{
-		time_t now = (time_t)(teulClock64 / 1000);
-		struct tm tmStruct;
-		struct tm* tm = localtime_r(&now, &tmStruct);
-		len = _logger.formatText("%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] "
-								, errorTypes[_logger.m_errType]
-								, tm->tm_year + 1900
-								, tm->tm_mon + 1
-								, tm->tm_mday
-								, tm->tm_hour
-								, tm->tm_min
-								, tm->tm_sec
-								, (UINT32)(teulClock64 % 1000)
-								, _logger.file()
-								, _logger.m_lineno);
-		_dbugOut(_logger.m_dbugfile, _logger.m_logMode, _logger.text(), len, false);
-		if ( ((flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.m_errType <= Debug::ERR_MINOR)) && !(flags & BARE_DEBUG) ) {
-			fprintf(stderr, "%s", _logger.text());
-		}
-	}
+	time_t now = (time_t)(teulClock64 / 1000);
+	struct tm tmStruct;
+	struct tm* tm = localtime_r(&now, &tmStruct);
+	char prefix[512];
+	size_t pfxLen = strprintf(prefix, "%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] %" PRSizeT "# "
+							, errorTypes[error]
+							, tm->tm_year + 1900
+							, tm->tm_mon + 1
+							, tm->tm_mday
+							, tm->tm_hour
+							, tm->tm_min
+							, tm->tm_sec
+							, (UINT32)(teulClock64 % 1000)
+							, basename(filename)
+							, lineno
+							, stl_threadId.m_id);
 
 	const char* text = nullptr;
-	if ( PN_UNLIKELY(fmt == nullptr) ) {
-		return 0;
-	} else {
-		len = _logger.vformatText(fmt, args);
-		if ( len == (size_t)~0 ) {
-			text = "[ERROR]\n";
-		} else {
-			_dbugOut(_logger.m_dbugfile, _logger.m_logMode, _logger.text(), len, true);
-			if ( ((flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.m_errType <= Debug::ERR_MINOR)) ) {
-				fprintf(stderr, "%s", _logger.text());
-			}
-			text = "\n";
-		}
+	len = _logger.vformatText(fmt, args);
+	if ( len == (size_t)~0 ) {
+		text = "[ERROR]\n";
 		len = strlen(text);
+	} else {
+		text = _logger.text();
 	}
 
-	_dbugOut(_logger.m_dbugfile, _logger.m_logMode, text, len, true);
-
-	if ( (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.m_errType <= Debug::ERR_MINOR) ) {
-		fprintf(stderr, "%s", text);
+	//scope
+	{
+		std::lock_guard<std::mutex> lock(s_dbugOutputMutex);
+		// re-check: could have changed while we got the lock
+		if ( logToConsole || _logger.m_dbugfile >= 0 ) {
+			_dbugOut(logToConsole, _logger.m_logMode, prefix, pfxLen, false);
+			_dbugOut(logToConsole, _logger.m_logMode, _logger.text(), len, true);
+		}
 	}
 
-	_levelHandler(_logger.m_errType, text);
+	if ( PN_UNLIKELY(isFatal) ) {
+		abort();
+	}
 
 	return (SINT32)len;
 }
@@ -608,10 +605,9 @@ SINT32 _dbugLog(const char* const filename, const SINT32 lineno, const UINT32 er
 		{
 			va_list args;
 			va_start(args, fmt);
-			char text[DBUG_MAX_STRING + 1];
-			vsnprintf(text, sizeof(text), fmt, args);
+			vfprintf(stderr, fmt, args);
 			va_end(args);
-			_levelHandler(errType, text);
+			abort();
 		}
 	}
 	else
@@ -640,16 +636,6 @@ SINT32 _dbugWrite(const char* filename, SINT32 lineno, UINT32 errType, const cha
 	va_end(args);
 
 	return retval;
-}
-
-void _levelHandler(UINT32 errType, const char* const text)
-{
-	if ( PN_LIKELY(errType != Debug::ERR_FATAL) )
-		return;
-
-	fprintf(stderr, "%s\n", text);
-
-	abort();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -696,9 +682,6 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 #else
 	if ( PN_LIKELY(_logger.isInitialized()) )
 	{
-#if platBuild == BUILD_SERVER
-        threadsLogging();
-#endif
 		if ( assertion_ != nullptr && *assertion_ != 0 )
 			_dbugLog(file_, line_, error_, "ASSERTION: %s", assertion_);
 		_dbugLogPrivate(FALSE, file_, line_, error_, fmt_, args);

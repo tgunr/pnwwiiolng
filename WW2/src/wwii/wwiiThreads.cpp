@@ -58,11 +58,6 @@ public:
 
 static const UINT32 NUM_HELPER_THREADS = 2;
 
-using LOG_QUEUE = std::vector<THREAD_LOG*>;
-static LOG_QUEUE logQueue;
-static size_t logQueueMax, logQueuePushes;
-static std::mutex logQueueMutex;
-
 static ConditionQueue<DBThreadQuery> dbQueue;
 DBQueueThread dbThread[NUM_HELPER_THREADS];
 
@@ -196,8 +191,6 @@ threadsSetup()
 void
 threadsEnable()
 {
-	// Try and clear out any threadLog messages from startup
-	threadsLogging();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -213,46 +206,6 @@ threadsShutdown()
 	dbQueue.destroy();
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-	// Clear out any pending threadLogs, but don't take too long at it
-	threadsLogging();
-}
-
-//////////////////////////////////////////////////////////////////////
-// Write logging messages from the threads so that the IO is
-// all in one place and the OS can schedule for it more easily.
-// LOSSY: If the queue starts to get too full, old entries will
-// be dropped and summarized with an overflow warning.
-
-bool
-threadsLogging()
-{
-	// The logging is not critical, if we miss it this time round
-	// we'll pick it up soon enough.
-	// empty() is atomic.  Worst case scenario is that we don't log
-	// this cycle or we proceed and find that the queue is empty.
-	// Since we are the only consumer, the latter is unlikely.
-	if ( logQueue.empty() )
-		return false;
-
-	std::unique_lock<std::mutex> lock(logQueueMutex, std::try_to_lock);
-	if ( lock.owns_lock() == false )
-		return false;
-
-	if ( logQueue.size() > logQueueMax )
-		logQueueMax = logQueue.size();
-
-	for ( auto& it : logQueue )
-	{
-		const THREAD_LOG* entry = it;
-		if ( *entry->m_entry )
-			_dbugLog(entry->m_file, entry->m_line, entry->m_level, "%s", entry->m_entry);
-		delete entry;
-	}
-
-	logQueue.clear();
-
-	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -288,25 +241,6 @@ threadsCallNextCallback()
 	}
 
 	callbackQueue.clear();
-}
-
-//////////////////////////////////////////////////////////////////////
-// Threaded variation of dbugLog, queues the output for logging in
-// whichever thread owns the logfile access.
-
-void
-threadLog(const char* file, UINT32 line, UINT32 level, const char* fmt, ...)
-{
-	THREAD_LOG* entry = new THREAD_LOG(file, line, level);
-
-	va_list args;
-	va_start(args, fmt);
-	vsnprintf(entry->m_entry, LOG_LENGTH, fmt, args);
-	va_end(args);
-
-	std::lock_guard<std::mutex> lock(logQueueMutex);
-	logQueue.push_back(entry);
-	++logQueuePushes;
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -1019,7 +1019,6 @@ strtdbRestoreTOESupplies()
 			if ( wit->second.weapon().isSupplied() )
 				wit->second.saveText(len, buffer);
 		}
-		threadsLogging();
 	}
 
 	if ( len > 0 )

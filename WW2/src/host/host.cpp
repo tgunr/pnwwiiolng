@@ -2257,7 +2257,6 @@ _runHost()
 		// us to consume. Write upto 64 log entries.
 		TIMER_START
 		threadsCallNextCallback();
-		threadsLogging();
 		TIMER_STOP("threads");
 
 		TIMER_START
@@ -3096,7 +3095,6 @@ main(const int argc, const char* argv[])
 		if (g_hostTerminating)
 			return 0;
 		teulUpdateTransport(50);
-		threadsLogging();
 	}
 
 	if ( !g_accepting && !g_serverReserved )
@@ -3106,10 +3104,7 @@ main(const int argc, const char* argv[])
 	for ( UINT32 i = 0; i < 100; ++i )
 	{
 		teulUpdateTransport(10);
-		threadsLogging();
 	}
-
-	threadsLogging();
 
 	if (g_hostTerminating)
 		return 0;

@@ -181,8 +181,6 @@ _terminate(const char* reason)
 	irc.cancel();
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
-	threadsLogging();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -712,7 +710,6 @@ wwiiIRCActivate(bool includeSigHup)
 	for ( UINT32 i = 0; i < 5 * 100; ++i )
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		threadsLogging();
 		if ( irc.m_joined == true )
 			break;
 	}

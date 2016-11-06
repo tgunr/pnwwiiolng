@@ -1225,7 +1225,6 @@ main(int argc, const char* argv[])
 
 	authSetGameCapacity(0, 0, Server::myServerInfo.stats.arenaID, AL_SYNCING);
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
-	threadsLogging();
 
 	dbugLog(_FLI, "entering update loop");
 
@@ -1248,9 +1247,7 @@ main(int argc, const char* argv[])
 		// Return to "accepting" status if necessary
 		_checkAcceptingStatus();
 
-		threadsLogging();
 		threadsCallNextCallback();
-		threadsLogging();
 
 		static Housekeeper::FUNCTION functions[] =
 		{

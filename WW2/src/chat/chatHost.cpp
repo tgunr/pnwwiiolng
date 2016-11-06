@@ -2815,8 +2815,6 @@ _startShutdown()
 		target->Release(target->teulIndex(), Server::ReleaseType::Exit);
 	}
 
-	threadsLogging();
-
 	serverBroadcastClusterShutdown();
 
 	if ( system(PN_PLAYNET_PATH "/bin/stophost &") < 0 )
@@ -3489,7 +3487,6 @@ _runHost()
 		teulUpdateTransport(25);
 
 		threadsCallNextCallback();
-		threadsLogging();
 
 		// Catch up on housekeeping.
 		while ( _houseKeeping() )

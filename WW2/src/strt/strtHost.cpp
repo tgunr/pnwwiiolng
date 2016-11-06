@@ -396,8 +396,6 @@ _housekeeping()
 {
 	TeulTimeMS nextHouseKeep = teulClock64 + 25;
 
-	threadsLogging();
-
 	if ( !strtIsStratInitialized() )
 		return nextHouseKeep;
 
@@ -610,7 +608,6 @@ main(int argc, const char* argv[])
 	for (; teulClock64 < cutoff && serverPeeringWithType(CHAT_HOST) == false; )
 	{
 		teulUpdateTransport(10);
-		threadsLogging();
 	}
 
 #ifdef DEBUG
@@ -629,7 +626,6 @@ main(int argc, const char* argv[])
 	for ( UINT32 i = 0; i < 10; ++i )
 	{
 		teulUpdateTransport(20);
-		threadsLogging();
 	}
 
 	// Initialize the strat objective limits
@@ -638,8 +634,6 @@ main(int argc, const char* argv[])
 	teulSyncClock();
 
 	strtInitializeStratSystem();
-
-	threadsLogging();
 
 	signal(SIGINT, _strtSIGINT);
 
@@ -651,10 +645,7 @@ main(int argc, const char* argv[])
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		LogAbort("bailing because intermission script failed.");
 	}
-	threadsLogging();
-
 	strtBroadcastConfigUpdate();
-	threadsLogging();
 
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
@@ -662,8 +653,6 @@ main(int argc, const char* argv[])
 	serverOpenLuaClientInterface();
 
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
-
-	threadsLogging();
 
 	TeulTimeMS tick100ms = 0;
 	bool runOnce = false;
@@ -709,8 +698,6 @@ main(int argc, const char* argv[])
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	teulCloseTransport();
-
-	threadsLogging();
 
 	strtCloseDB();
 	dbugLog(_FLN,"strat system shutting down");
