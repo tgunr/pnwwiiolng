@@ -102,7 +102,7 @@ static void	_personaErrorFunction (SINT32 teulIndex, const UCHAR* const data, SI
 
 static void _cnvyErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {
-	dbugLog(_FLA,"cnvyErrorFunction: index %d code %d\n\n",teulIndex, error);
+	dbugLog(_FLA, "cnvyErrorFunction: index %d code %d\n\n",teulIndex, error);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -169,8 +169,6 @@ static void _describeBuildConfigurationToLogFile()
 #if defined(PUBLIC_RELEASE)
 	dbugLog(_FLI, " PUBLIC_RELEASE");
 #endif
-
-	dbugLog(_FLI, ".");
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -596,13 +594,22 @@ main(int argc, const char* argv[])
 	const SINT32 mapConnection = teulOpenListenHost(Server::broadcastHost, WWII::Net::Ports::InternalStrat, _acceptMapConnection, 200000, PROTOCOL_TCP, _mapErrorFunction);
 	dbugLog(_FLN,"Listening for map connections on port %d", WWII::Net::Ports::InternalStrat);
 
+	// We try to send helpful announcements about the server restart, which requires
+	// that we have a connection to the chat server. So, when we're not running in DEBUG,
+	// and we're not running through the controller, we'll give it upto 30 seconds for
+	// chat to start. Otherwise, we'll just give it a single second.
+#if defined(DEBUG)
+	static const TeulTimeMS chatWaitTime_ms = 5000;
+#else
+	static const TeulTimeMS chatWaitTime_ms = (Server::IsBroadcastViaController() ? 5000 : 30000);
+#endif
 	// Give the chat host 20 seconds to start
 	teulSyncClock();
-	TeulTimeMS cutoff = teulClock64 + 30000;
-	dbugLog(_FLI, "Waiting for chat server");
+	TeulTimeMS cutoff = teulClock64 + chatWaitTime_ms;
+	dbugLog(_FLI, "Waiting %" PR64BitUT "ms for chat server", chatWaitTime_ms);
 	for (; teulClock64 < cutoff && serverPeeringWithType(CHAT_HOST) == false; )
 	{
-		teulUpdateTransport(50);
+		teulUpdateTransport(10);
 		threadsLogging();
 	}
 
