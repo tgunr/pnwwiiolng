@@ -75,7 +75,7 @@ void DBThread::Thread::run()
 	m_conn = threadsOpenDBConnection(true);
 	if ( m_conn == nullptr )
 	{
-		threadLog(_FLA, "unable to connect to mysql database\n");
+		dbugLog(_FLA, "unable to connect to mysql database");
 		return;
 	}
 
@@ -92,7 +92,7 @@ DBQueueThread::dbrun()
 {
 	const unsigned int threadId = m_id;
 
-	threadLog(_FLI, "dbc:%u Connected to database", threadId);
+	dbugLog(_FLI, "dbc:%u Connected to database", threadId);
 
 	DBThread::DBNo dbNo = DBThread::Default;
 
@@ -109,13 +109,13 @@ DBQueueThread::dbrun()
 
 		while (!isCancelled() && m_conn == nullptr) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
-			threadLog(_FLW, "dbc:%u reconnecting to database", threadId);
+			dbugLog(_FLW, "dbc:%u reconnecting to database", threadId);
 			m_conn = threadsOpenDBConnection(true);
 			if ( m_conn == nullptr )
-				threadLog(_FLA, "dbc:%u unable to reconnect to database", threadId);
+				dbugLog(_FLA, "dbc:%u unable to reconnect to database", threadId);
 		}
 
-		threadLog(_FLW, "dbc:%u reconnected to database", threadId);
+		dbugLog(_FLW, "dbc:%u reconnected to database", threadId);
 	}
 }
 
@@ -296,7 +296,7 @@ StatsThread::run()
 	UINT64 cbCurSize, cbMaxSize, cbUsed;
 	UINT64 cbLastUsed = 0L;
 
-	threadLog(_FLI, "Stats thread active");
+	dbugLog(_FLI, "Stats thread active");
 
 	UINT32 count = 0;
 	for ( ; ; )
@@ -329,14 +329,14 @@ StatsThread::run()
 				cbLastUsed += cbUsed;
 			}
 
-			threadLog(_FLD, "THREADS: dbq(ttl:%" PR64BitUT ",used:%" PR64BitUT ",max:%" PR64BitUT ",cur:%" PR64BitUT "), cbq(ttl:%" PR64BitUT ",used:%" PR64BitUT ",max:%" PR64BitUT ",cur:%" PR64BitUT ")"
+			dbugLog(_FLD, "THREADS: dbq(ttl:%" PR64BitUT ",used:%" PR64BitUT ",max:%" PR64BitUT ",cur:%" PR64BitUT "), cbq(ttl:%" PR64BitUT ",used:%" PR64BitUT ",max:%" PR64BitUT ",cur:%" PR64BitUT ")"
 							, dbLastUsed, dbUsed, dbMaxSize, dbCurSize
 							, cbLastUsed, cbUsed, cbMaxSize, cbCurSize);
 
 		}
 		catch ( std::exception& e )
 		{
-			threadLog(_FLD, "statsthread: %s", e.what());
+			dbugLog(_FLD, "statsthread: %s", e.what());
 		}
 	}
 }

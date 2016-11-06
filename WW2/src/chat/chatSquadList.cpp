@@ -93,7 +93,7 @@ public:
 		if ( numRows <= 0 )
 			return true;
 
-		threadLog(_FLI, "squad list process: sq:%u rows:%u", m_squadID, numRows);
+		dbugLog(_FLI, "squad list process: sq:%u rows:%u", m_squadID, numRows);
 
 		Result result;
 		while ( Query()->FetchRow() )
@@ -1267,7 +1267,7 @@ SquadNamesQuery::Success()
 		}
 		catch (std::exception& e)
 		{
-			threadLog(_FLW, "SquadNames: %s", e.what());
+			dbugLog(_FLW, "SquadNames: %s", e.what());
 			g_squadNames.clear();
 		}
 	}

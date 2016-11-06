@@ -1474,7 +1474,7 @@ hostAddVehicleToBroadcast(HostVehicle* vehicle, VEHICLE_UPDATE_HEADER* vh)
 	SINT32 offset = updtPackVehicleBroadcast(TEUL_PACK, buffer, 0, &vehHold, 0);
 	if ( offset < 0 )
 	{
-		threadLog(_FLA, "updtPackVehicleBroadcast failed: %d", offset);
+		dbugLog(_FLA, "updtPackVehicleBroadcast failed: %d", offset);
 		return false;
 	}
 
@@ -1821,7 +1821,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 
 			if ( (!reportedLagging) & (vehicle->m_nextUpdateClock < lowend) )
 			{
-				threadLog(_FLA, "c:%s v:%u*** LAGGING BEHIND UPDATES: wanted update %" PR64BitUT "ms ago"
+				dbugLog(_FLA, "c:%s v:%u*** LAGGING BEHIND UPDATES: wanted update %" PR64BitUT "ms ago"
 								, vehicle->callsign(), vehicle->index, teulClock64 - vehicle->m_nextUpdateClock);
 				reportedLagging = true;
 			}

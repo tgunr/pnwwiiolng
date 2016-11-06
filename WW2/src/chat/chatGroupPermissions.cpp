@@ -111,7 +111,7 @@ _aggregatePermissions(ChatPermissions& lhs, const CHAT_GROUPS& groups)
                             , lhs.m_permissionMask
                             , lhs.m_vehicleGrants.size()
                             );
-    threadLog(_FLD, "%s", buffer);
+	dbugLog(_FLD, "%s", buffer);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -169,7 +169,7 @@ public:
 			_aggregatePermissions(it->second.m_permissions, it->first);
 		}
 
-        threadLog(_FLD, "%u groups loaded, %u in cache", numRows, g_pgc.size());
+		dbugLog(_FLD, "%" PRSizeT " groups loaded, %" PRSizeT " in cache", numRows, g_pgc.size());
 	}
 
 	virtual void Failure() override

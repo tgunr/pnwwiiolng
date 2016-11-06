@@ -897,7 +897,7 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 		Teul::Packet forward(Teul::PacketId(Comm::CallbackX, HOST_HIT_Y), source, hitBytes);
 		forward.append(source, hitBytes);
 		if ( forward.send(thePlayer->teulIndex()) < 0)
-			threadLog(_FLA, "v:%u couldn't send hit %u(%d)", hit.m_shooter, hit.m_target, thePlayer->teulIndex());
+			dbugLog(_FLA, "v:%u couldn't send hit %u(%d)", hit.m_shooter, hit.m_target, thePlayer->teulIndex());
 	}
 
 	return true;
@@ -961,14 +961,14 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 
 	if ( (host_config.arena.checksums || shooter->m_flags.canEject) && shooter->m_flags.checksumsDirty )
 	{
-		threadLog(_FLW, "t:%d p:%u c:%s discarded damage messages: dirty checksum"
+		dbugLog(_FLW, "t:%d p:%u c:%s discarded damage messages: dirty checksum"
 						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign());
 		return true;
 	}
 
 	if ( shooter->m_hasExited )
 	{
-		threadLog(_FLM, "t:%d p:%u c:%s discarded damage messages: vehicle is exiting"
+		dbugLog(_FLM, "t:%d p:%u c:%s discarded damage messages: vehicle is exiting"
 						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign());
 		return true;
 	}
@@ -1121,18 +1121,18 @@ _recvMovePlayer(ACTION_OBJECT* const a)
 {
 	if ( a->m_client != nullptr )
 	{
-		threadLog(_FLW, "t:%d unexpected player move from player", a->teulIndex);
+		dbugLog(_FLW, "t:%d unexpected player move from player", a->teulIndex);
 		return -EINVAL;
 	}
 	auto& incoming = a->read<Chat::PlayerMove>();
 	Player* player = static_cast<Player*>(ServerInterface::LookupByPlayerID(incoming.m_playerID));
 	if ( player == nullptr || player->teulIndex() < 0 || player->vehicle == nullptr )
 	{
-		threadLog(_FLD, "p:%u ignoring move request", incoming.m_playerID);
+		dbugLog(_FLD, "p:%u ignoring move request", incoming.m_playerID);
 		return a->offset;
 	}
 
-	threadLog(_FLD, "t:%d p:%u c:%s v:%u moving player to %d/%d/%d"
+	dbugLog(_FLD, "t:%d p:%u c:%s v:%u moving player to %d/%d/%d"
 					, player->teulIndex(), incoming.m_playerID, player->callsign(), player->vehicle->index
 					, incoming.m_x, incoming.m_y, incoming.m_z);
 
@@ -1156,7 +1156,7 @@ _recvForceDespawn(ACTION_OBJECT* const a)
 	Player* player = static_cast<Player*>(ServerInterface::LookupByPlayerID(playerID));
 	if ( player == nullptr )
 		return a->offset;
-	threadLog(_FLD, "p:%u c:%s v:%u received force-despawn instruction", player->playerID(), player->callsign(), player->sortieID());
+	dbugLog(_FLD, "p:%u c:%s v:%u received force-despawn instruction", player->playerID(), player->callsign(), player->sortieID());
 
 	PLAYER_EXIT pe = { PDEST_MAP, PEXIT_RTB, nullObjID };
 	hostPlayerLeave(*player, pe);
@@ -1226,7 +1226,7 @@ _recvCaptureScore(ACTION_OBJECT* const a)
 		return -EINVAL;
 
 	auto& incoming = a->read<CaptureScore>();
-	threadLog(_FLI, "capscore: recvd bld:%d,%d:%u side:%u"
+	dbugLog(_FLI, "capscore: recvd bld:%d,%d:%u side:%u"
 					, incoming.m_fullObjID.cell.ox, incoming.m_fullObjID.cell.oy, incoming.m_fullObjID.id
 					, incoming.m_side);
 	hostGiveCaptureScoreToPlayers(incoming.m_fullObjID, incoming.m_side);

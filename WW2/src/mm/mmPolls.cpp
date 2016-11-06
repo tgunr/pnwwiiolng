@@ -53,7 +53,7 @@ _parseQuery(DBQuery& query)
 		OpinionPoll& poll = newPolls[pollID];
 		if ( poll.empty() )
 		{
-			threadLog(_FLD, "poll:%u %s", pollID, row[1]);
+			dbugLog(_FLD, "poll:%u %s", pollID, row[1]);
 			poll.m_pollID = pollID;
 			poll.m_title = row[1];
 		}
@@ -83,11 +83,11 @@ public:
 			}
 			catch ( std::exception& e)
 			{
-				threadLog(_FLW, "Polls: %s", e.what());
+				dbugLog(_FLW, "Polls: %s", e.what());
 			}
 		}
 
-		threadLog(_FLD, "%u polls, highest %u", polls.size(), g_maxPoll);
+		dbugLog(_FLD, "%u polls, highest %u", polls.size(), g_maxPoll);
 	}
 };
 

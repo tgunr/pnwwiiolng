@@ -857,7 +857,7 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 	{
 		// Look for the vehicle locally, incase this is an update.
 		vhold->vehicle = hostFindVehicleLocal(vehIndex);
-		threadLog(_FLD, "rv:%u received first time", vehIndex);
+		dbugLog(_FLD, "rv:%u received first time", vehIndex);
 
 		if (vhold->vehicle == nullptr)
 		{
@@ -867,7 +867,7 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 			{
 				vhold->vehicle = hostCreateRemoteVehicle(tempVehicle.instance(), vehIndex, tempVehicle.spec());
 				if(vhold->vehicle)
-					threadLog(_FLI, "rv:%u created remote vehicle %p", vehIndex, vhold->vehicle);
+					dbugLog(_FLI, "rv:%u created remote vehicle %p", vehIndex, vhold->vehicle);
 			}
 			else
 			{
@@ -895,7 +895,7 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 			static TeulTimeMS nextBlip = teulClock64;
 			if ( Server::myServerInfo.stats.status == Server::SERVER_ACCEPTING && teulClock64 >= nextBlip )
 			{
-				threadLog(_FLA, "rv:%u not found", vehIndex);
+				dbugLog(_FLA, "rv:%u not found", vehIndex);
 				nextBlip = teulClock64 + 500;
 			}
 			// subsitute a dummy vehicle so we can at least unpack

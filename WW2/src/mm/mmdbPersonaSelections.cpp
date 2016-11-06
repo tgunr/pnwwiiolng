@@ -129,7 +129,7 @@ _saveSelections(DB::handle_t* conn)
 	}
 	catch ( std::exception& e )
 	{
-		threadLog(_FLA, "Failed saving personas: %s", e.what());
+		dbugLog(_FLA, "Failed saving personas: %s", e.what());
 	}
 }
 
@@ -139,7 +139,7 @@ _saveSelections(DB::handle_t* conn)
 void
 PersonaSelectionThread::dbrun()
 {
-	threadLog(_FLM, "Persona-selections thread active");
+	dbugLog(_FLM, "Persona-selections thread active");
 
 	while ( !isCancelled() )
 	{

@@ -40,16 +40,6 @@ extern void threadsCloseDBConnection(DB::handle_t* conn);
 //////////////////////////////////////////////////////////////////////
 // Client calls ("thread")
 
-// Threaded implementation of dbugLog (non-immediate)
-#define threadLog(...) dbugLog(__VA_ARGS__)
-//extern void threadLog(const char* file, unsigned int line, unsigned int level, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4, 5);
-
-#ifdef BETA_RELEASE
-#define betaThreadLog(...) threadLog(__VA_ARGS__)
-#else
-#define betaThreadLog(...)
-#endif
-
 // Add a callback to the thread queue
 extern void threadCallback(THREAD_CALLBACK fn, void*);
 

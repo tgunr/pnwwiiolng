@@ -109,12 +109,12 @@ hostPushVehicleBroadcasts()
 	const bool sent = vehicleBroadcasts.send(updateBcastSend) > 0;
 	if ( sent == false )
 	{
-		threadLog(_FLA, "Unable to broadcast update of size %d to cellnet", vehicleBroadcasts.packetSizeBytes());
+		dbugLog(_FLA, "Unable to broadcast update of size %d to cellnet", vehicleBroadcasts.packetSizeBytes());
 	}
 	else
 	{
 #ifdef DEV_BUILD
-		threadLog(_FLD, "pushed %u vbs in %u bytes. maxBits=%u, avgBits=%u", numberOfVehiclesPending, vehicleBroadcasts.packetSizeBytes(), maxSize * 8, vehicleBroadcasts.packetSizeBits() / numberOfVehiclesPending);
+		dbugLog(_FLD, "pushed %u vbs in %u bytes. maxBits=%u, avgBits=%u", numberOfVehiclesPending, vehicleBroadcasts.packetSizeBytes(), maxSize * 8, vehicleBroadcasts.packetSizeBits() / numberOfVehiclesPending);
 #endif
 	}
 	vehicleBroadcasts.reset();

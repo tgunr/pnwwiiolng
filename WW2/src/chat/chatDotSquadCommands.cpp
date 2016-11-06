@@ -443,7 +443,7 @@ protected:
 			return Failure();
 
 		if (m_affectedRows > 1)
-			threadLog(_FLA, "Updated multiple squads during rename!");
+			dbugLog(_FLA, "Updated multiple squads during rename!");
 
 		Player* player = PlayerInterface::Lookup(m_requester);
 		if (player == nullptr)

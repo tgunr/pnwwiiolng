@@ -176,17 +176,17 @@ HostVehicle::checkLocality(Teul::Packet& packet)
 		{
 #ifdef BETA_RELEASE
 			if ( nearestCP )
-				threadLog(_FLD, "v:%u c:%s approaching area of %s"
+				dbugLog(_FLD, "v:%u c:%s approaching area of %s"
 							, index
 							, callsign()
 							, nearestCP->name);
 			else if ( m_impl->m_nearCP )
-				threadLog(_FLD, "v:%u c:%s departing area of %s"
+				dbugLog(_FLD, "v:%u c:%s departing area of %s"
 							, index
 							, callsign()
 							, m_impl->m_nearCP->name);
 			else
-				threadLog(_FLD, "v:%u c:%s spawned in the wilds"
+				dbugLog(_FLD, "v:%u c:%s spawned in the wilds"
 							, index
 							, callsign()
 							);
@@ -569,7 +569,7 @@ HostVehicle::interruptCapture()
 {
 	if ( m_impl->m_captureActive )
 	{
-		threadLog(_FLD, "p:%u c:%s v:%u interrupting capture"
+		dbugLog(_FLD, "p:%u c:%s v:%u interrupting capture"
 						, seats[0], callsign(), index);
 
 		// Determine which status to send.
@@ -845,7 +845,7 @@ HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 	{
 		if ( m_inBuildingObject )
 		{
-			threadLog(_FLD, "p:%u c:%s v:%u 0 facilityID for capture"
+			dbugLog(_FLD, "p:%u c:%s v:%u 0 facilityID for capture"
 							, seats[0], callsign(), index
 							);
 		}
@@ -864,7 +864,7 @@ HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 							,	player->brigadeID()
 						);
 	serverSendPacketToType(outgoing, STRAT_HOST);
-	threadLog(_FLD, "p:%u c:%s v:%u 0 sending cap contrib for %s"
+	dbugLog(_FLD, "p:%u c:%s v:%u 0 sending cap contrib for %s"
 				, seats[0], callsign(), index
 				, m_inBuildingObject && m_inBuildingObject->facility
 					? m_inBuildingObject->facility->name

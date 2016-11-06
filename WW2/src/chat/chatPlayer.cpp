@@ -1092,7 +1092,7 @@ protected:
 
 	virtual void Failure() override
 	{
-		threadLog(_FLA, "p:%u unable to read player groups from database", m_playerID);
+		dbugLog(_FLA, "p:%u unable to read player groups from database", m_playerID);
 	}
 };
 
