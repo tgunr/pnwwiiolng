@@ -674,7 +674,7 @@ ADD_CUSTOM_COMMAND(
     MAIN_DEPENDENCY hostproj/${STRAT_HOST_EXE}.pkg
     DEPENDS
         ${TOLUAPP_EXECUTABLE} ${TOLUAPP_LIBRARIES}
-        hostproj/syscfg.h hostproj/${STRAT_HOST_EXE}.pkg
+        hostproj/syscfg.h hostproj/${STRAT_HOST_EXE}.pkg include/luaPkg.h
         include/platforms.h include/systypes.h include/luaGlue.h include/precompile_includes.h
         wwii/wwiiThreads.h wwii/wwiiOwnershipEnums.h inst/instBasicStatus.h wwii/wwiiConfig.h
         chat/chatHandle.h weap/weapSpec.h

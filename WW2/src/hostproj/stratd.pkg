@@ -80,6 +80,7 @@ $hfile "wwii/wwiiExitCodes.h"
 $hfile "strt/strtCPClass.h"
 
 $hfile "include/luaPkg.h"
+$#include "include/luaPkg.h"
 
 extern void print(const char* message);
 extern void warn(const char* message);

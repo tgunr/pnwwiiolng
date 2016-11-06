@@ -528,26 +528,3 @@ Lua::Results()
 {
 	return _luaOutput;
 }
-
-UINT16 getHCiID(const HCUIDX_ITERATOR* it)
-{
-	return (*it)->first;
-}
-
-HCUnit* getHCiHCUnit(const HCUIDX_ITERATOR* it)
-{
-	return (HCUnit*)(*it)->second;
-}
-
-StratHCUnit* getHCiStratHCUnit(const HCUIDX_ITERATOR* it)
-{
-	return (StratHCUnit*)(*it)->second;
-}
-
-HCUIDX_ITERATOR getHCiNext(const HCUIDX_ITERATOR* it)
-{
-	HCUIDX_ITERATOR next = *it;
-	++next;
-	return next;
-}
-
