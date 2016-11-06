@@ -117,6 +117,16 @@ OPTION( PN_DIFFERENT_PORTS	"Use different public-facing ports for game servers."
 # Disable building and use of auth host (for cluster-on-a-box/controller testing)
 OPTION( PN_DISABLE_AUTH     "Build without use of/support for auth" OFF )
 
+# If the user is building a Debug build, enable SANITIZE options.
+IF ( NOT MSVC )
+	IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+		OPTION( PN_SANITIZE "Enable -fsanitize=address, -fsanitize=undefined and -fstack-protector-all" OFF )
+	ELSE()
+		SET( PN_SANITIZE OFF CACHE BOOL "Enables address sanitizer etc on non-msvc builds" FORCE )
+		MARK_AS_ADVANCED( PN_SANITIZE )
+	ENDIF()
+ENDIF()
+
 ####################################
 ## Provide platform and server defines
 IF(WIN32)
