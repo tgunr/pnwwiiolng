@@ -3492,7 +3492,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "python ${SRCROOT}/../Tools/revno.py client \"${DERIVED_FILES_DIR}\"";
+			shellScript = "python ${SRCROOT}/src/build_info.py client \"${DERIVED_FILES_DIR}\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 

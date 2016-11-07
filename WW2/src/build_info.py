@@ -12,7 +12,7 @@ import os, sys, tempfile, getpass, time
 def main():
     if len(sys.argv) < 3:
         sys.exit("Usage: %s <build type> <output path>" % sys.argv[0])
-
+    
     repo_path = os.path.realpath(os.path.dirname(sys.path[0]))
     git_command = "git -c color.ui=never -C %s" % repo_path
     build_type = sys.argv[1]
@@ -25,7 +25,7 @@ def main():
 
     if build_type != 'client' and build_type != 'host':
         sys.exit("Build type must be 'client' or 'host'")
-
+    
     replacements = {
         'DATETIME':          time.strftime('%a %b %d, %Y %H:%M:%S %Z'),
         'INPUT_FILE_NAME':   os.path.basename(revision_file_in),
@@ -40,7 +40,7 @@ def main():
         'GIT_COMMITISH':     git_commitish,
         'GIT_STATE':         git_state,
     }
-
+    
     configure_file(os.path.join(repo_path, revision_file_in), os.path.join(output_directory, revision_file_out), replacements)
     print("Wrote build information to " + os.path.join(output_directory, revision_file_out))
     if sys.platform == 'darwin' and os.environ.get('BUILT_PRODUCTS_DIR') != None and build_type == 'client':

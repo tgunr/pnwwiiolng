@@ -150,7 +150,7 @@ ADD_OMG_TARGET( omg/omgMissionSortieData )
 ADD_OMG_TARGET( omg/omgChat )
 
 ####################################
-## Run revno.py to get build_info.cpp
+## Run build_info.py to get build_info.cpp
 # Use BYPRODUCTS for the real result and a symbolic (fake) OUTPUT so the script
 # runs always; easiest way to avoid the run-when-needed default behaviors.
 ADD_CUSTOM_COMMAND(
@@ -159,7 +159,7 @@ ADD_CUSTOM_COMMAND(
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/build_info.cpp.in
     COMMAND
         ${PYTHON_EXECUTABLE}
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../Tools/revno.py
+        ${CMAKE_CURRENT_SOURCE_DIR}/build_info.py
         host
         ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Generating build information"

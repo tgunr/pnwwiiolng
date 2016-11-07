@@ -45,7 +45,7 @@ ELSE()
     FIND_PACKAGE( LibEvent REQUIRED )
 ENDIF()
 
-# Need Python for revno.py
+# Need Python for build_info.py
 FIND_PACKAGE( PythonInterp 2.7 REQUIRED )
 
 # Need Bison and Flex for OMGgen; use embedded versions on Windows

@@ -307,7 +307,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generate build_info.cpp</Message>
@@ -388,7 +388,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generate build_info.cpp</Message>
@@ -465,7 +465,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generate build_info.cpp</Message>
@@ -543,7 +543,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generate build_info.cpp</Message>
@@ -621,7 +621,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generate build_info.cpp</Message>
@@ -702,7 +702,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generate build_info.cpp</Message>
@@ -774,7 +774,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generate build_info.cpp</Message>
@@ -846,7 +846,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generate build_info.cpp</Message>
@@ -918,7 +918,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generate build_info.cpp</Message>
