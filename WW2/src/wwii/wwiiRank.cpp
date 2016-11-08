@@ -104,6 +104,7 @@ Rank::setSize(size_t num)
 void
 wwiiReadRanks()
 {
+	dbugLog(_FLI, "Loading ranks");
 	try
 	{
 		DBQuery dbq(dbh, QRY_SELECT_RANKS);
