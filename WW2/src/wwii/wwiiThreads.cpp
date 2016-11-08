@@ -217,11 +217,11 @@ threadsShutdown()
 void
 threadsCallNextCallback()
 {
-	if ( callbackQueue.empty() )
-		return;
-
 	std::unique_lock<std::mutex> lock(callbackQueueMutex, std::try_to_lock);
 	if ( lock.owns_lock() == false )
+		return;
+
+	if ( callbackQueue.empty() )
 		return;
 
 	if ( callbackQueue.size() > cbQueueMax )
