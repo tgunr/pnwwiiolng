@@ -35,7 +35,9 @@
 #endif
 
 #include <atomic>
+#include <chrono>
 
+///TODO: We need these to be atomic or thread local or something.
 TeulTimeMS teulClock64;
 UINT32 teulClockTime;
 
@@ -48,29 +50,21 @@ UINT32 teulClockTime;
 void
 teulSyncClock()
 {
-#if platOS == OS_LINUX || platOS == OS_MACOS
-	struct timeval tv;
-	gettimeofday(&tv, nullptr);
-	const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL);
-	if ( PN_LIKELY(newTimeMS > teulClock64) )
-	{
-		teulClock64 = newTimeMS;
-		teulClockTime = (UINT32)tv.tv_sec;
-	}
-	else if (PN_UNLIKELY(newTimeMS < teulClock64))
-	{
-		teulClock64++;
-		teulClockTime = teulClock64 / 1000ULL;
-	}
-#elif platOS == OS_WIN32
-	static const DWORD  BaseClockTime = timeGetTime();
-	static const TeulTimeMS BaseClock64 = time(nullptr) * 1000ULL + BaseClockTime % 1000ULL;
+	static std::mutex oneAtATime;
+	std::lock_guard<std::mutex> lock(oneAtATime);
 
-	teulClock64 = BaseClock64 + (timeGetTime() - BaseClockTime);
-	teulClockTime = (UINT32)(teulClock64 / 1000LL);
-#else
-#pragma error("No teulSyncClock implementation for this platform")
+	using namespace std::chrono;
+	auto now = high_resolution_clock::now();
+	TeulTimeMS newTimeMS = duration_cast<milliseconds>(now.time_since_epoch()).count();
+#if platBuild == BUILD_SERVER
+	if ( PN_UNLIKELY(newTimeMS < teulClock64) )
+		LogAbort("Time went backwards: %" PR64BitUT " -> %" PR64BitUT "", teulClock64, newTimeMS);
 #endif
+	// avoid calculations when called many times a millisecond
+	if ( newTimeMS > teulClock64 ) {
+		teulClock64 = newTimeMS;
+		teulClockTime = static_cast<UINT32>(newTimeMS / 1000ULL);
+	}
 }
 
 // wrapper for inet_ntoa.
