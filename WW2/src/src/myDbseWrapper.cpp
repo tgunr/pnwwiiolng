@@ -118,9 +118,7 @@ static std::mutex dbconnMutex;
 DB::handle_t*
 dbseGetConnection(bool report, bool autoReconnect)
 {
-	if ( !s_dbInitialized ) {
-		dbseSetDatabase(cv_wwiiDBAddress, cv_wwiiDBPort, cv_wwiiDBDefaultSchema, cv_wwiiDBUser, cv_wwiiDBPassword);
-	}
+	dbseSetDatabase(cv_wwiiDBAddress, cv_wwiiDBPort, cv_wwiiDBDefaultSchema, cv_wwiiDBUser, cv_wwiiDBPassword);
 	if ( !s_dbAddress[0] || !s_dbPort || !s_dbSchema[0] || !s_dbUser[0] || !s_dbPassword[0] ) {
 		LogAbort("Missing database configuration, can't connect");
 	}
