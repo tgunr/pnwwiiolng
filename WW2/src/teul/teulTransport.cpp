@@ -37,7 +37,7 @@
 #endif
 
 extern SINT32 teulModStartup(ERROR_FUNCTION*);
-extern SINT32 teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION* connectFn, ERROR_FUNCTION* errorFn);
+extern SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION* connectFn, ERROR_FUNCTION* errorFn);
 
 SCHAR* teulModuleName;
 SCHAR* teulAppName;
@@ -166,7 +166,7 @@ teulGetPersonaData(const SINT32 teulIndex)
 //////////////////////////////////////////////////////////////////////
 // Code common to all of the listen functions.
 
-SINT32
+static SINT32
 _openListen(const UINT32 ipAddress
 			, const UINT16 portNumber
 			, CONNECT_FUNCTION* acceptFnPtr
@@ -175,29 +175,7 @@ _openListen(const UINT32 ipAddress
 			, ERROR_FUNCTION* errorFnPtr
 			)
 {
-	SINT32 retval;
-
-	teulSyncClock();
-
-	const SINT32 teulIndex = teulQueryNextFreeIndex();
-	if (PN_UNLIKELY(teulIndex < 0))
-	{
-		dbugSetErrno(ENOSPC);
-		return -ENOSPC;
-	}
-
-	retval = teulOpenConnection(
-				teulIndex, true, timeout
-				, protocol, ipAddress, portNumber
-				, acceptFnPtr, errorFnPtr
-				);
-	if (PN_UNLIKELY(retval < 0))
-	{
-		dbugLog(_FLA, "t:%d teulOpenConn failed %d", teulIndex, retval);
-		return retval;
-	}
-
-	return teulIndex;
+	return teulOpenConnection(true, timeout, protocol, ipAddress, portNumber, acceptFnPtr, errorFnPtr);
 }
 
 
@@ -206,29 +184,20 @@ _openListen(const UINT32 ipAddress
 // connection acceptFnPtr is an optional ptr to callback function which is
 // called when a connection is made to the listening socket, and hence a new
 // connection is created.  pass nullptr if you do not want this notification
-SINT32 teulOpenListen(const UINT16 portNumber
-					, CONNECT_FUNCTION* acceptFnPtr
-					, const SINT32 timeout
-					, const PROTOCOL protocol
-					, ERROR_FUNCTION* errorFnPtr
-					)
+SINT32
+teulOpenListen(const UINT16 portNumber
+				, CONNECT_FUNCTION* acceptFnPtr
+				, const SINT32 timeout
+				, const PROTOCOL protocol
+				, ERROR_FUNCTION* errorFnPtr
+				)
 {
-	if (PN_UNLIKELY(_transportClosing))
-		return -EDEADLK;
-
-	dbugLog(_FLD,"opening listen port on address ? port %d",portNumber);
-
-	return _openListen(0
-					,  portNumber
-					,  acceptFnPtr
-					,  timeout
-					,  protocol
-					,  errorFnPtr
-					);
+	dbugLog(_FLD,"opening listen port on address 0.0.0.0 port %hu", portNumber);
+	return _openListen(0, portNumber,  acceptFnPtr,  timeout,  protocol,  errorFnPtr);
 }
 
 #if platBuild == TEUL_SERVER
-// opens a port for listening on all address associated with the specified interface. "eth0" only!
+// opens a port for listening on all address associated with the specified interface.
 // Assumes that all callbacks have been properly installed.  returns -error_number or 0 on success.
 // connection acceptFnPtr is an optional ptr to callback function which is
 // called when a connection is made to the listening socket, and hence a new
@@ -239,14 +208,16 @@ bool teulOpenListenInterface(const UINT16 portNumber
 					, ERROR_FUNCTION* errorFnPtr
 					)
 {
-	if (PN_UNLIKELY(_transportClosing))
+	if (PN_UNLIKELY(Teul::IsTransportClosing()))
 		return false;
 
 	SINT32 retval;
 	for (UINT32 i = 0; i < Server::myInterface.numIP; ++i)
 	{
+		///TODO: See how this handles actual multiple ips: do the callers appreciate
+		///TODO: the fact that they might be getting these calls with different
+		///TODO: teulIndexes? Do they cache them?
 		dbugLog(_FLD,"opening listen port on address %s port %d", teulGetAddress(Server::myInterface.addr[i].ip), portNumber);
-
 		retval = _openListen( Server::myInterface.addr[i].ip
 						,  portNumber
 						,  acceptFnPtr
@@ -267,7 +238,8 @@ bool teulOpenListenInterface(const UINT16 portNumber
 // connection acceptFnPtr is an optional ptr to callback function which is
 // called when a connection is made to the listening socket, and hence a new
 // connection is created.  pass nullptr if you do not want this notification
-SINT32 teulOpenListenHost(const UINT32 ipAddress
+SINT32
+teulOpenListenHost(const UINT32 ipAddress
 					, const UINT16 portNumber
 					, CONNECT_FUNCTION* acceptFnPtr
 					, const SINT32 timeout
@@ -275,12 +247,8 @@ SINT32 teulOpenListenHost(const UINT32 ipAddress
 					, ERROR_FUNCTION* errorFnPtr
 					)
 {
-	if (PN_UNLIKELY(_transportClosing))
-		return -EDEADLK;
-
-	dbugLog(_FLD,"opening listen port on  address %s port %d", teulGetAddress(ipAddress), portNumber);
-
-	return _openListen(	ipAddress
+	dbugLog(_FLD,"opening listen port on address %s port %d", teulGetAddress(ipAddress), portNumber);
+	return _openListen(ipAddress
 					,  portNumber
 					,  acceptFnPtr
 					,  timeout
@@ -327,30 +295,8 @@ teulOpenSend(UINT32 host
 			, const PROTOCOL protocol
 			, ERROR_FUNCTION* errorFnPtr)
 {
-	if (PN_UNLIKELY(_transportClosing))
-		return -EDEADLK;
-
-	// Have we selected a particular network?
 	host = teulMaskNetworkAddress(host);
-
-	teulSyncClock();
-
-	const SINT32 teulIndex = teulQueryNextFreeIndex();
-	if (PN_UNLIKELY(teulIndex < 0))
-	{
-		dbugLog(_FLA, "no more connections available");
-		dbugSetErrno(ENOSPC);
-		return -ENOSPC;
-	}
-
-	const SINT32 retval = teulOpenConnection(teulIndex, false, timeout, protocol, host, portNumber, connectFnPtr, errorFnPtr);
-	if (PN_UNLIKELY(retval < 0))
-	{
-		dbugLog(_FLA, "t:%d teulOpenConn failed %d", teulIndex, retval);
-		return retval;
-	}
-
-	return teulIndex;
+	return teulOpenConnection(false, timeout, protocol, host, portNumber, connectFnPtr, errorFnPtr);
 }
 
 static UINT32 rawTeulLibVersion;

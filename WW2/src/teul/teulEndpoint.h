@@ -172,14 +172,12 @@ public:
 
 void		teulCleanupEndpoints(void);
 
-ENDPOINT* 	teulCreateEndpoint(SINT32 teulIndex, bool isListening, SINT32 timeout, PROTOCOL protocol);
+ENDPOINT* 	teulCreateEndpoint(bool isListening, SINT32 timeout, PROTOCOL protocol);
 
 void		teulFreeEndpoint(ENDPOINT* theEndpoint);
 
 void		teulRemoveEndpoint(ENDPOINT* inEndpoint);
 void		teulKillDeadEndpoints(void);
 
-// INTERNAL: Get the next free index.
-// Note: this value is incredibly transient.
-SINT32		teulQueryNextFreeIndex();
-
+//! Check for available endpoints. If none are available, checks for and recovers dead endpoints.
+bool		teulHasFreeEndpoints();

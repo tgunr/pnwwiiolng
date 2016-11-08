@@ -452,25 +452,27 @@ _bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
 
 // inActive : true if the TCP socket is to be used to send, false if used to listen/receive
 SINT32
-teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION* connectFn, ERROR_FUNCTION* errorFn)
+teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION* connectFn, ERROR_FUNCTION* errorFn)
 {
+	if (PN_UNLIKELY(Teul::IsTransportClosing())) {
+		dbugLog(_FLM, "open connection refused: transport closing");
+		return -EDEADLK;
+	}
+
 	struct sockaddr_in sockAddress;
 	memset(&sockAddress, 0, sizeof(sockAddress));
 	sockAddress.sin_family = AF_INET;
 	sockAddress.sin_addr.s_addr = htonl(host);
 	sockAddress.sin_port = htons(port);
 
-	ENDPOINT* newEndpoint = teulCreateEndpoint(teulIndex, listening, timeout, protocol);
+	ENDPOINT* newEndpoint = teulCreateEndpoint(listening, timeout, protocol);
 	if ( PN_UNLIKELY(newEndpoint == nullptr) )
 	{
-		dbugLog(_FLA, "Couldn't Allocate endpoint!!");
 		return -ENOSPC;	// could not allocate buffer for endpoint
 	}
 
 	newEndpoint->connectFn = connectFn;
 	newEndpoint->errorFn = errorFn;
-
-	SINT32	retval = 0;
 
 	// create the socket
 	newEndpoint->socket = INVALID_SOCKET;
@@ -521,9 +523,27 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 			_bindDgramSocket(*newEndpoint, newEndpoint->localSockAddress);
 		break;
 		default:
-			Teul::OpenError(EINVAL, "unknown protocol");
-		break;
+			throw Teul::OpenError(EINVAL, "internal error (protocol)");
 		}
+
+		_setEndpointPeerState(*newEndpoint);
+
+		if (newEndpoint->protocol == PROTOCOL_UDB || newEndpoint->protocol == PROTOCOL_CTRL)
+		{
+			// tell the app we are connected
+			newEndpoint->m_state = IS_OPEN;
+			newEndpoint->setConnected();
+			newEndpoint->doConnect();
+		}
+		else if (newEndpoint->state() != IS_LISTENING && (newEndpoint->m_reliable == false))
+		{
+			const SINT32 error = (SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(*newEndpoint, *SYN_TOKEN) : -EINVAL;
+			if ( error < 0 ) {
+				throw Teul::OpenError(error, "couldn't send to new connection");
+			}
+		}
+
+		teulMRecvAddToPoll(*newEndpoint);
 	}
 	catch ( Teul::OpenError& e )
 	{
@@ -540,31 +560,10 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 		newEndpoint->shutdown();
 		teulFreeEndpoint(newEndpoint);
 
-		return -EINVAL;
+		return e.errNo < 0 ? e.errNo : -EINVAL;
 	}
 
-	retval = newEndpoint->teulIndex();
-
-	_setEndpointPeerState(*newEndpoint);
-
-	if ( newEndpoint->protocol == PROTOCOL_UDB || newEndpoint->protocol == PROTOCOL_CTRL )
-	{
-		// tell the app we are connected
-		newEndpoint->m_state = IS_OPEN;
-		newEndpoint->setConnected();
-		newEndpoint->doConnect();
-	}
-	else if (newEndpoint->state() != IS_LISTENING && (newEndpoint->m_reliable == false) )
-	{
-		const SINT32 error = (SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(*newEndpoint, *SYN_TOKEN) : -EINVAL;
-		if ( error < 0 )
-			dbugLog(_FLA,"t:%d err:%d couldn't send to new connection"
-						, newEndpoint->teulIndex(), error);
-	}
-
-	teulMRecvAddToPoll(*newEndpoint);
-
-	return retval;
+	return newEndpoint->teulIndex();
 }
 
 SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint)
