@@ -535,9 +535,25 @@ const char* g_serverName = "stratd";
 int
 main(int argc, const char* argv[])
 {
-	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {});
-	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
-	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	// static? because we're main and we don't need to waste stack space on these,
+	// but they also don't need to be visible outside of our scope.
+	static std::vector<std::string> s_luaCmds;
+	static bool s_initOnly = false;
+	static bool s_debug = false;
+
+	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {
+		{ "--lua-cmd", "Execute lua code after initializing.", true,
+			[](const char* code) { s_luaCmds.emplace_back(code); } },
+		{ "--init-only", "Terminate after loading strat data.", false, [](const char*) { s_initOnly = true; } },
+		{ "--debug", "Enable verbose + console logging", false, [](const char*) { s_debug = true; } }
+	});
+	if ( !s_debug ) {
+		dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+		dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	} else {
+		dbugSetLogLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
+		dbugSetWriteLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
+	}
 
 	HostLanguage = cv_stratLanguage.GetString();
 
@@ -546,9 +562,6 @@ main(int argc, const char* argv[])
 	threadsSetup();
 
 	teulSyncClock();
-
-	wwiiIRCInitialize(Server::localHost);
-	wwiiIRCActivate(true);
 
 	Lua::Start("stratd");
 
@@ -560,12 +573,38 @@ main(int argc, const char* argv[])
 		LogAbort("Couldn't initialize database");
 	}
 
+	//Initializes the convoy system
+	cnvyInit();
+
+	// Initialize the strat objective limits
+	g_objectiveStats.calculate();
+
+	teulSyncClock();
+
+	strtInitializeStratSystem();
+
+	if ( s_luaCmds.empty() == false ) {
+		for ( auto&& code : s_luaCmds ) {
+			dbugLog(_FLM | STD_ERR, "executing %s", code.c_str());
+			Lua::RunObject("--lua-cmd", code);
+			auto results = Lua::Results();
+			for ( auto&& line : results ) {
+				printf("lua: %s\n", line.c_str());
+			}
+		}
+	}
+
+	if ( s_initOnly ) {
+		dbugLog(_FLA | STD_ERR, "exiting after initialization (--init-only)");
+		return 0;
+	}
+
+	wwiiIRCInitialize(Server::localHost);
+	wwiiIRCActivate(true);
+
 	StatsThread statsThread;
 	statsThread.start();
 	threadsEnable();
-
-	//Initializes the convoy system
-	cnvyInit();
 
 	dbugLog(_FLN,"opening broadcast ports");
 	serverOpenBroadcastIndexes();
@@ -592,24 +631,6 @@ main(int argc, const char* argv[])
 	const SINT32 mapConnection = teulOpenListenHost(Server::broadcastHost, WWII::Net::Ports::InternalStrat, _acceptMapConnection, 200000, PROTOCOL_TCP, _mapErrorFunction);
 	dbugLog(_FLN,"Listening for map connections on port %d", WWII::Net::Ports::InternalStrat);
 
-	// We try to send helpful announcements about the server restart, which requires
-	// that we have a connection to the chat server. So, when we're not running in DEBUG,
-	// and we're not running through the controller, we'll give it upto 30 seconds for
-	// chat to start. Otherwise, we'll just give it a single second.
-#if defined(DEBUG)
-	static const TeulTimeMS chatWaitTime_ms = 5000;
-#else
-	static const TeulTimeMS chatWaitTime_ms = (Server::IsBroadcastViaController() ? 5000 : 30000);
-#endif
-	// Give the chat host 20 seconds to start
-	teulSyncClock();
-	TeulTimeMS cutoff = teulClock64 + chatWaitTime_ms;
-	dbugLog(_FLI, "Waiting %" PR64BitUT "ms for chat server", chatWaitTime_ms);
-	for (; teulClock64 < cutoff && serverPeeringWithType(CHAT_HOST) == false; )
-	{
-		teulUpdateTransport(10);
-	}
-
 #ifdef DEBUG
 	dbugLog(_FLN,"Beginning strat processing");
 #endif
@@ -621,19 +642,6 @@ main(int argc, const char* argv[])
 	ABORT_IF(strtHostInstallCallbacks() < 0);
 
 	ABORT_IF(chatInstallStratSupportCallbacks() < 0);
-
-	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_STARTING);
-	for ( UINT32 i = 0; i < 10; ++i )
-	{
-		teulUpdateTransport(20);
-	}
-
-	// Initialize the strat objective limits
-	g_objectiveStats.calculate();
-
-	teulSyncClock();
-
-	strtInitializeStratSystem();
 
 	signal(SIGINT, _strtSIGINT);
 
