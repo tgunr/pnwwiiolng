@@ -665,7 +665,7 @@ wwiiIRCActivate(bool includeSigHup)
 {
 	if ( cv_ircServer.GetString() == nullptr || *cv_ircServer.GetString() == 0 )
 	{
-		dbugLog(_FLA, "IRC: disabled");
+		dbugLog(_FLM, "IRC: disabled");
 		return true;
 	}
 
