@@ -519,7 +519,7 @@ dbseSaveFACILITY(FACWITHID* facw)
 			, "INSERT INTO strat_facility"
 				"(facility_oid,facility_ox,facility_oy"
 				",facility_type,facility_id,facility_subtype"
-				",cp_ox,cp_oy,cp_id,cp_oid"
+				",cp_oid"
 				",name,objectname"
 				",side,country"
 				",originalside,originalcountry"
@@ -550,7 +550,7 @@ dbseSaveFACILITY(FACWITHID* facw)
 	p += sprintf(p
 				, "%c(%u,%d,%d"
 					",%u,%u,%u"
-					",%d,%d,%d,%u"
+					",%u"
 					",'%s','%s'"
 					",%u,%u"
 					",%u,%u"
@@ -561,7 +561,6 @@ dbseSaveFACILITY(FACWITHID* facw)
 				, (p > start) ? ',' : ' '
 				, facw->fac_oid, facw->ox, facw->oy
 				, facility->oid.objType, facility->oid.id, facility->subType
-				, facility->cpid.cell.ox, facility->cpid.cell.oy, facility->cpid.id
 				, cp_oid, g_name, g_fileName
 				, wwiiSide(facw->owner), facw->owner
 				, facility->originalSide, facility->originalCountry
