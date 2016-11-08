@@ -375,16 +375,13 @@ Lua::RunObject(const char* name, std::string& obj)
 	_luaContext("object", name);	// Start of context
 	_luaOutput.clear();
 
-	bool success;
-
+	bool success = true;
 	if ( luaL_loadbuffer(_luaVM, obj.c_str(), obj.size(), name)
 		|| lua_pcall(_luaVM, 0, 0, 0) )
 	{
 		success = false;
 		_luaError();
 	}
-	else
-		success = true;
 
 	_luaContext();					// End of context
 
@@ -406,7 +403,7 @@ Lua::RunCode(std::string& code, const char* function)
 	_luaContext("lua", function);	// start of context
 	_luaOutput.clear();
 
-	bool success = false;
+	bool success = true;
 	if ( luaL_loadbuffer(_luaVM, code.c_str(), code.size(), "code")
 		|| lua_pcall(_luaVM, 0, 0, 0) )
 	{
