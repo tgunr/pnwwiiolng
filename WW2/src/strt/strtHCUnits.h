@@ -60,7 +60,6 @@ public:
 	void initialize();
 	virtual ~StratHCUnit();
 
-public:
 	// Broadcast our current location to other servers.
 	void announceHome() const;
 
@@ -160,10 +159,12 @@ public:
 	UINT32 nextMove() const { return m_nextMove; }
 	UINT32 nextMoveIn() const;
 	bool offMap() const { return ( !homeCP() || homeCP() == routDestination[country()] ); }
+//tolua_end
 	const TOE_::TemplateHeader* toeTemplateHeader() const { return m_toeTemplateHeader; }
 	const TOE_::WeaponInstance* toeWeaponInstance(const WEAPON_SPEC weapon) const;
 	TOE_::WeaponInstance* toeWeaponInstance(const WEAPON_SPEC weapon);
 	const TOE& toe() const { return m_toe; }
+//tolua_begin
 
 	void checkThrottleWindows(const FacilityStruct* facility) const;
 	UINT32 checkThrottleWindow(const FacilityStruct* facility, const WEAPON_SPEC spec) const;
@@ -173,8 +174,8 @@ public:
 public:
 	static StratHCUnit* Lookup(UINT32 unitID);
 	static StratHCUnit* Lookup(const char* name);
-//tolua_end
 
+//tolua_end
 	void addTOEInstance(const TOE_::WeaponTemplate& weaponTemplate);
 
 	void CheckResupplyStatus(bool fullCheck);
