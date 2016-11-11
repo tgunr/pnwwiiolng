@@ -271,6 +271,8 @@ ADD_LIBRARY( wwiilib STATIC
 	xml/XMLLoader2.cpp xml/XMLLoader2.h
 	weap/weapSpawnXML.cpp weap/weapSpawnXML.h
 	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
+	omg/omgChat.cxx omg/omgChat.hxx
+	omg/omgMissionSortieData.cxx omg/omgMissionSortieData.hxx
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
 SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES})
@@ -506,7 +508,7 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     chat/chatHostMotds.cpp chat/chatHostMotds.h chat/chatMotds.cpp chat/chatMotds.h
     chat/chatMissionInvite.cpp chat/chatMissionInvite.h
     chat/chatMissionMember.cpp chat/chatMissionMember.h chat/chatMissions.cpp chat/chatMissions.h
-    omg/omgChat.cxx omg/omgChat.hxx chat/chatConstants.h
+    chat/chatConstants.h
     chat/chatMultiCrew.cpp chat/chatMultiCrew.h
     teul/teulNetworkArray.h teul/teulNetworkObject.h wwii/wwiiPack.h
     chat/chatReports.cpp chat/chatReports.h
@@ -551,7 +553,6 @@ ADD_HOST_TARGET( ${CELL_HOST_EXE} SOURCES
     host/host.cpp host/host.h
     miss/missionPacket.h mm/mmEnums.h
     host/host.h host/hostPlayers.h
-    omg/omgMissionSortieData.cxx omg/omgMissionSortieData.hxx
     miss/missFlags.h wwii/wwiiSyncVar.h
     teul/teulNetTimeMS.h teul/teulNetTimeMSPacker.h
     weap/weapSpecPacker.h wwii/wwiiFullObjIDPacker.h
@@ -605,10 +606,9 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     map/mapHost.cpp map/mapHostMessages.cpp map/mapHostMessages.h
     map/mapMinuteBalance.cpp map/mapMinuteBalance.h
     map/mapPack.cpp
-    map/mapPlayer.cpp map/mapPlayer.h map/mapPlayerTypes.h omg/omgChat.hxx
+    map/mapPlayer.cpp map/mapPlayer.h map/mapPlayerTypes.h
     miss/missionTypes.h miss/missionPacket.h miss/missFlags.h
     wwii/wwiiPlayer.h mm/mmEnums.h wwii/wwiiRank.h weap/weapSerial.h
-    omg/omgMissionSortieData.cxx omg/omgMissionSortieData.hxx
     wwii/wwiiSyncVar.h teul/teulNetTimeMS.h teul/teulNetTimeMSPacker.h
     weap/weapSpecPacker.h wwii/wwiiFullObjIDPacker.h
     inst/instDescriptor.h auth/authDispatch.h
@@ -802,10 +802,10 @@ ADD_EXECUTABLE( testUnits
     tests/testTeulBits.cpp tests/testAuthQueue.cpp auth/authClientData.cpp
     tests/testChatHandle.cpp tests/testFullObjID.cpp tests/testCommandWithArgs.cpp
     tests/testInplaceVector.cpp tests/testPackers.cpp comm/commPackers.cpp
-    tests/testChatMissionStatus.cpp omg/omgChat.hxx tests/testHostGridCell.cpp host/hostGridCell.cpp
+    tests/testChatMissionStatus.cpp tests/testHostGridCell.cpp host/hostGridCell.cpp
     tests/testSupercellVislevelXfer.cpp tests/testPersonaXfer.cpp tests/testCryptographer.cpp
     tests/testXYZTuple.cpp tests/testTeulPacket.cpp
-    wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChat.cxx omg/omgChat.hxx
+    wwii/wwiiServerTrackedObjectPacker.cpp
     tests/testSuite.h tests/testUnits.h
 )
 SET_PROPERTY( TARGET testUnits PROPERTY COMPILE_DEFINITIONS "ENABLE_TESTS" )

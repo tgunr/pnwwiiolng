@@ -93,7 +93,7 @@ public:
 		if ( numRows <= 0 )
 			return true;
 
-		dbugLog(_FLI, "squad list process: sq:%u rows:%u", m_squadID, numRows);
+		dbugLog(_FLI, "squad list process: sq:%u rows:%" PRSizeT "", m_squadID, numRows);
 
 		Result result;
 		while ( Query()->FetchRow() )
