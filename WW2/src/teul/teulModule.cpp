@@ -390,6 +390,9 @@ _connectSocket(ENDPOINT& endpoint)
 
 		const SINT32 error = dbugGetErrno();
 
+		if ( error == PLAT_ECONNREFUSED )
+			throw Teul::OpenError(error, "connection refused");
+
 		if ( error == EADDRNOTAVAIL )
 			continue;
 
