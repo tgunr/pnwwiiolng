@@ -109,7 +109,7 @@ static evutil_socket_t _libEventAcceptHandler(evutil_socket_t listener, short ev
 	do
 	{
 		cliSock = accept(listener, (struct sockaddr*)&cliAddr_, &caLen);
-	} while (cliSock < 0 && (errno == EAGAIN || errno == EINTR));
+	} while (cliSock < 0 && (errno == PLAT_EAGAIN || errno == PLAT_EINTR));
 	if (cliSock >= 0) {
 		evutil_make_socket_nonblocking(cliSock);
 		evutil_make_socket_closeonexec(cliSock);

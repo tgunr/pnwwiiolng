@@ -162,7 +162,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 
 		// Check for an interrupted send attempt.
 		const int err = dbugGetErrno();
-		if ( (err != EAGAIN) & (err != EINTR) & (err != EWOULDBLOCK) )
+		if ( (err != PLAT_EAGAIN) & (err != PLAT_EINTR) & (err != PLAT_EWOULDBLOCK) )
 		{
 			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " send error on send %" PRSizeT " bytes to %u,%u [%u,%hu] attempt, err:%d"
 						, teulIndex(), PRA_SOCKET(socket)
@@ -209,7 +209,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 			// If the error was the result of an interruption, then lets just queue the packet
 			// and give it a retry later on.
 			const SINT32 err = dbugGetErrno();
-			if ( (err != EAGAIN) & (err != EINTR) & (err != EWOULDBLOCK) )
+			if ( (err != PLAT_EAGAIN) && (err != PLAT_EINTR) && (err != PLAT_EWOULDBLOCK) )
 			{
 				return result;
 			}

@@ -289,7 +289,7 @@ _checkConnectTCP(ENDPOINT& endpoint)
 	{
 		dbugWrite(_FLM, "t:%d sock:" PRF_SOCKET " check connect err:%d rev:%d"
 						, endpoint.teulIndex(), PRA_SOCKET(sock), error, retval);
-		if (error == EINTR || error == EROFS)
+		if (error == PLAT_EINTR || error == EROFS)
 		{
 			len = SockAddrLen;
 			if (getsockopt(sock, SOL_SOCKET, SO_ERROR, err, &len) == 0 && error == 0)
@@ -426,7 +426,7 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 
 #if platOS != OS_WIN32
 		err = errno;
-		const bool notCompleteYet = (err == EINTR) | (err == EAGAIN) | (err == EWOULDBLOCK);
+		const bool notCompleteYet = (err == PLAT_EINTR) | (err == PLAT_EAGAIN) | (err == PLAT_EWOULDBLOCK);
 		if ( notCompleteYet )
 		{
 			retval = -err;
@@ -455,7 +455,8 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 	{
 		*ioSize = 0;
 		const SINT32 err = dbugGetErrno();
-		const bool notCompleteYet = (err == EINTR) | (err == EAGAIN) | (err == EWOULDBLOCK);
+		const bool notCompleteYet = (err == PLAT_EINTR) | (err == PLAT_EAGAIN) | (err == PLAT_EWOULDBLOCK);
+		
 		if ( notCompleteYet ) {
 			// This is not an error, simply means data isn't available yet
 			return -err;
@@ -676,7 +677,7 @@ _recvDatagram(ENDPOINT& endpoint)
 			}
 
 			int testWait = retval * -1;
-			if ( (testWait == EINTR) || (testWait == EAGAIN) || (testWait == EWOULDBLOCK))
+			if ( (testWait == PLAT_EINTR) || (testWait == PLAT_EAGAIN) || (testWait == PLAT_EWOULDBLOCK))
 			{
 				retval = 0;
 				// these are legit no data non-errors that should be ignored
@@ -685,7 +686,7 @@ _recvDatagram(ENDPOINT& endpoint)
 			else if (retval < 0)
 			{
 				const int err = dbugGetErrno();
-				if ( err != EINTR && err != 0 )
+				if ( err != PLAT_EINTR && err != 0 )
 				{
 					dbugLog(_FLD, "Non EINTR error detected %d setting return value to %d", retval, packetsReceived);
 					retval = packetsReceived;
@@ -743,7 +744,7 @@ _handleReceive(ENDPOINT& endpoint)
 		if ( theErr != 0 )
 		{
 			dbugSetErrno(0);
-			if ( (theErr == EAGAIN) | (theErr == EWOULDBLOCK) | (theErr == EINTR) )
+			if ( (theErr == PLAT_EAGAIN) | (theErr == PLAT_EWOULDBLOCK) | (theErr == PLAT_EINTR) )
 				return false;
 			else
 			{
@@ -1129,7 +1130,7 @@ _pollSocketsInner(TeulTimeMS remainder)
 				const SINT32 errNo = dbugGetErrno();
 				if ( errNo != 0 )
 				{
-					const bool notCompleteYet = (errNo == EINTR) | (errNo == EAGAIN) | (errNo == EWOULDBLOCK);
+					const bool notCompleteYet = (errNo == PLAT_EINTR) | (errNo == PLAT_EAGAIN) | (errNo == PLAT_EWOULDBLOCK);
 					if (notCompleteYet)
 					{
 						dbugSetErrno(0);	// Not important.
@@ -1374,7 +1375,7 @@ _pollSocketsInner(TeulTimeMS duration_)
 	int numfds = retval = poll(pollFds, pollData.m_size, duration_);
 	TIMER_STOP("tmi_idle_poll");
 
-	if (PN_UNLIKELY(retval < 0 && dbugGetErrno() != EINTR))
+	if (PN_UNLIKELY(retval < 0 && dbugGetErrno() != PLAT_EINTR))
 		LogAbort("illegal return %d from _poll",retval);
 
 	// are there any sockets that need reading?

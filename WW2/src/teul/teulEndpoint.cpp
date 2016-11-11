@@ -667,6 +667,15 @@ Teul::GetErrorName(SINT32 error)
 #if EWOULDBLOCK != EAGAIN
 	ErrorCase( EWOULDBLOCK );
 #endif
+#if defined( WSAEWOULDBLOCK )
+	ErrorCase( WSAEWOULDBLOCK );
+#endif
+#if defined( WSAEINPROGRESS )
+	ErrorCase( WSAEINPROGRESS );
+#endif
+#if defined( WSAEINTR )
+	ErrorCase( WSAEINTR );
+#endif
 #ifdef ESHUTDOWN
 	ErrorCase( ESHUTDOWN );
 #endif

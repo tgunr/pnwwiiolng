@@ -400,7 +400,7 @@ _connectSocket(ENDPOINT& endpoint)
 		// this connection is not a done deal, yet.
 		// Any of EAGAIN, EWOULDBLOCK or EINPROGRESS means that
 		// it's begun, but not finished.
-		const bool inProgress = (error == EAGAIN) | (error == EWOULDBLOCK) | (error == EINPROGRESS);
+		const bool inProgress = (error == PLAT_EAGAIN) | (error == PLAT_EWOULDBLOCK) | (error == PLAT_EINPROGRESS);
 		if ( ! inProgress )
 			throw Teul::OpenError(error, "connect() call failed");
 
