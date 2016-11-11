@@ -13,7 +13,7 @@ namespace Mem
 	{
 		static_assert(BlockSize > 0, "BlockSize must be at least 1.");
 
-		using Block = std::array<Type, BlockSize>;
+		using Block = std::array<char, sizeof(Type) * BlockSize>;
 
 		// Pointers to blocks of allocations
 		std::list<Block> m_blocks;
@@ -29,8 +29,9 @@ namespace Mem
 			m_blocks.emplace_back();
 			auto& newBlock = m_blocks.back();
 			m_freeList.reserve(m_freeList.size() + BlockSize);
-			for (size_t i = 0; i < newBlock.size(); ++i ) {
-				m_freeList.push_back(&newBlock[0] + i);
+			Type* ptr = reinterpret_cast<Type*>(newBlock.data());
+			for (size_t i = 0; i < BlockSize; ++i, ++ptr ) {
+				m_freeList.push_back(ptr);
 			}
 		}
 
