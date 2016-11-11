@@ -163,7 +163,7 @@ chatSendSCMDResult(SINT32 playerID
 							, result
 							);
 		scmd.m_data = data;
-		if ( scmd.send() < 0 ) 
+		if ( scmd.send() < 0 )
 			throw std::logic_error("Send error");
 
 		return true;
@@ -214,7 +214,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 	UINT32 destination = (cp) ? cp->uOID : 0;
 	const char* unitName = (unit ? unit->callsign() : "NULL");
 	char fidBuffer[FULL_OBJ_ID::PrintLen];
-	const char* cpName = (cp ? cp->name : weapPrintFullObjIDC(&request.m_destination, fidBuffer));
+	const char* cpName = (cp ? cp->name : weapPrintFullObjIDC(request.m_destination, fidBuffer));
 
 	dbugLog(_FLI, "%s: %s requesting %s %s(%u) to %s"
 					, __FUNCTION__, requester.c_str(), (request.m_actionable ? "move" : "check")

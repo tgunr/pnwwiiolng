@@ -95,7 +95,7 @@ public:
 	ChatHandle squadHandle() const { return m_squadHandle; }
 
 	UINT32 weaponSpecNo() const { return m_weaponSpecNo; }
-	WEAPON_SPEC weaponSpec() const { return *((const WEAPON_SPEC*)&m_weaponSpecNo); }
+	WEAPON_SPEC weaponSpec() const { return m_weaponSpecNo; }
 
 	const PermissionMask& permissionMask() const { return m_permissionMask; }
 
@@ -104,8 +104,8 @@ public:
 
 	const char* callsign() const { return dispatch().m_callsign; }
 
-	WWII_SIDE side() const { return (WWII_SIDE)m_side; }
-	WWII_COUNTRY country() const { return (WWII_COUNTRY)m_country; }
+	WWII_SIDE side() const { return static_cast<WWII_SIDE>(m_side); }
+	WWII_COUNTRY country() const { return static_cast<WWII_COUNTRY>(m_country); }
 	BRANCH_ENUM branch() const { return m_branch; }
 
 	//// Member functions

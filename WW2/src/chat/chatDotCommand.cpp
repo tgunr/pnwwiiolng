@@ -165,7 +165,7 @@ void DotCommand::catIntToText(const UINT32 value, char *dest) const
    // skip to the null character
    while (*dest++ != 0);
 
-   // append the integer 
+   // append the integer
    sprintf(istring, "%u", value);
 
    dbugLog(_FLD, "Appending value %u to istring: %s", value, istring);
@@ -209,18 +209,19 @@ DotCommand::setAvailability(char level)
 		dbugLog(_FLD, "%s restricted to CRS by permission" , command());
 		m_public = false;
 		m_playnetOnly = true;
-		break;
+	break;
+
 	default:
 #ifdef DEBUG
 		LogAbort("'%s' command has unrecognized availability level %c", command(), level);
 #else
 		dbugLog(_FLA, "'%s' command has unrecognized availability level %c", command(), level);
-#endif
 		// If we somehow deployed with an invalid command, at least mark it as Playnet-only
 		// to limit its potential use as much as possible.
 		m_public = false;
 		m_playnetOnly = true;
 		break;
+#endif
 	}
 }
 
@@ -304,7 +305,7 @@ DotCommand::allow(Player& player) const
 			return m_usages[i].get();
 	}
 
-	dbugLog(_FLD, "Player with permissions %llx does not have permission to access command", player.m_permissionMask);
+	dbugLog(_FLD, "Player with permissions %" PRPermMaskT " does not have permission to access command", player.m_permissionMask);
 
 	return nullptr;
 }
@@ -749,7 +750,6 @@ chatGetTimeInterval(Player& player, const char* timeString, UINT32& interval, co
 			interval = 0;
 			player.message(LSTR_CAUTION, LSTR_INVALID_TIME, timeString);
 			return false;
-		break;
 	};
 
 	return true;

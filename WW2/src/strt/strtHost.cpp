@@ -458,7 +458,7 @@ _housekeeping()
 	}
 
 	if ( teulTime() >= nextSupplyRouteCheck ) {
-	
+
 		nextSupplyRouteCheck = teulTime() + 2;
 		bInitiateSupplyRouteCheckProcessing = true;
 		if ( teulTime() >= nextForcedSupplyRouteCheck ) {
@@ -652,7 +652,6 @@ main(int argc, const char* argv[])
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
 
-	extern void serverOpenLuaClientInterface();
 	serverOpenLuaClientInterface();
 
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");

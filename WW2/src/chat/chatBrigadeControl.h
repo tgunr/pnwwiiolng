@@ -160,7 +160,7 @@ public:
 	BrigadeControl(UINT32 action, UCHAR country, UCHAR branch, UINT32 brigadeID, const ChatHandle officer, const ChatHandle sponsor, const FULL_OBJ_ID origin=nullObjID)
 		: m_action(action), m_country(country), m_branch(branch), m_brigadeID(brigadeID), m_officer(officer), m_sponsor(sponsor), m_origin(origin)
 		{}
-    
+
     BrigadeControl(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 
 	bool isTargettedAction() const { return (m_action == REQ_MOVE || m_action == REQ_ATTACK || m_action == REQ_CLEAR || m_action == REQ_DEFEND); }

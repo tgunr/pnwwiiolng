@@ -166,7 +166,7 @@ strtMain(UINT32 currentTime)
 		_buildPocketMap();
 		teulSyncClock();
 		end = teulClock64;
-		LogAbort("build pocket map too %llums", end - start);
+		LogAbort("build pocket map too %" PR64BitUT "ms", end - start);
 #endif
 
 		return false;
@@ -240,7 +240,6 @@ strtInitializeStratSystem()
 		strtReportDataErrors(0);
 		fprintf(stderr,"Strat system failed to initialize, /tmp/strt*.log\n");
 		LogAbort("Strat System failed to initialize");
-		exit(1);
 	}
 
 	//Hack to get bridges working
@@ -250,7 +249,6 @@ strtInitializeStratSystem()
 	if (strtVerifyStratSystem(_cpList,0) == false)
 	{
 		LogAbort("Strat System is not valid");
-		exit(1);
 	}
 
 	stratInitializeLua();

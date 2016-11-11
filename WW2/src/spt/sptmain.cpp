@@ -1773,7 +1773,7 @@ inline static void sptDrawLeavesDeprecated()
 #else
                 oglSetRenderState(oglRENDERSTATE_ALPHAREF, IS_BUSH(t->isbush_isclutter_base) ? 84 : FloatToInt(t->leafalphas[0]));
 #endif
-                totaltriangles += basetree->DrawLeavesDeprecated(t, 0); 
+                totaltriangles += basetree->DrawLeavesDeprecated(t, 0);
             }
 
             if(t->leaflods[1])
@@ -1783,7 +1783,7 @@ inline static void sptDrawLeavesDeprecated()
 #else
                 oglSetRenderState(oglRENDERSTATE_ALPHAREF, IS_BUSH(t->isbush_isclutter_base) ? 84 : FloatToInt(t->leafalphas[1]));
 #endif
-                totaltriangles += basetree->DrawLeavesDeprecated(t, 1); 
+                totaltriangles += basetree->DrawLeavesDeprecated(t, 1);
             }
         }
 

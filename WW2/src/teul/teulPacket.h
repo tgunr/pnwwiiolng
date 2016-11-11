@@ -32,7 +32,7 @@ struct PacketId
 	uint8_t	m_x, m_y;
 
 	template<typename T1, typename T2>
-	PacketId(T1 callX, T2 callY) noexcept : m_x((uint8_t)callX), m_y((uint8_t)callY) {}
+	PacketId(T1 callX, T2 callY) noexcept : m_x(static_cast<uint8_t>(callX)), m_y(static_cast<uint8_t>(callY)) {}
 };
 
 class Packet
@@ -54,7 +54,7 @@ public:
 	template<typename T>
 	explicit Packet(PacketId id, T src) : Packet(id)
 	{
-		new ((T*)allocateBytes(sizeof(T))) T(src);
+		new (reinterpret_cast<T*>(allocateBytes(sizeof(T)))) T(src);
 	}
 
 	//! Construct and populate from a pre-existing data source.
@@ -157,7 +157,7 @@ public:
 	void increaseUsedPayloadBits(const UINT32 bits_) { increaseUsedPayloadBytes((bits_+7)/8); }
 
 	//! Allocate bytes and return a pointer to the start of those bytes.
-	//! @caution This pointer is potentially invalidated by any call
+	//! \caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
 	public:
 	void* allocateBytes(UINT32 growth_bytes)
@@ -165,14 +165,14 @@ public:
 		const UINT32 oldSize_bytes = packetSizeBytes();
 		reserve(oldSize_bytes + growth_bytes);	// May cause reallocation.
 		m_packetSizeBytes += growth_bytes;		// Change the end-of-data position.
-		return (char*)m_data + oldSize_bytes;	// Calculate pointer here because of potential realloc.
+		return reinterpret_cast<char*>(m_data) + oldSize_bytes;	// Calculate pointer here because of potential realloc.
 	}
 
 	//! Allocate space for an instance of Type_ and return a pointer to the start of those bytes.
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
 	template<typename Type_>
-	Type_* allocatePtr(UINT32 numEntries=1) { return (Type_*)allocateBytes(sizeof(Type_) * numEntries); }
+	Type_* allocatePtr(UINT32 numEntries=1) { return reinterpret_cast<Type_*>(allocateBytes(sizeof(Type_) * numEntries)); }
 
 	//! Assign space for and return a pointer to a
 	//! blank instance of a particular type.
@@ -222,13 +222,13 @@ public:
 	void* writePointer() noexcept { return m_data + packetSizeBytes(); }
 
 	template<typename _Type>
-	_Type& payloadRef(UINT32 offset_=0) noexcept { return *(_Type*)(m_data + headerSizeBytes() + offset_); }
+	_Type& payloadRef(UINT32 offset_=0) noexcept { return *reinterpret_cast<_Type*>(m_data + headerSizeBytes() + offset_); }
 
 	//! Retrieve a reference to the header portion of the packet.
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
-	const PacketHeader& header() const noexcept { return *(const PacketHeader*)(m_data); }
-	PacketHeader& header() noexcept { return *(PacketHeader*)(m_data); }
+	const PacketHeader& header() const noexcept { return *reinterpret_cast<const PacketHeader*>(m_data); }
+	PacketHeader& header() noexcept { return *reinterpret_cast<PacketHeader*>(m_data); }
 
 	//! Pointer to the whole packet.
 	//! @caution This pointer is potentially invalidated by any call
@@ -288,7 +288,7 @@ struct OMGPacket : public Packet
 	OMGPacket(Args&&... args)
 		: Packet(PacketId(T::CallX, T::CallY))
 	{
-		new ((T*)allocateBytes(sizeof(T))) T{ std::forward<Args>(args)... };
+		new (reinterpret_cast<T*>(allocateBytes(sizeof(T)))) T{ std::forward<Args>(args)... };
 	}
 };
 

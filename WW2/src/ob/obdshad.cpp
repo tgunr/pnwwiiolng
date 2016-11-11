@@ -984,7 +984,7 @@ LOGICAL obdshadUpdate()
 #ifdef EVENT_LOG_TIMES
     static UINT64 count = 0;
     static int number = 0;
-    
+
     UINT64 beginhere = GetMicroSeconds();
 #endif
 

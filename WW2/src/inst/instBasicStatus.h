@@ -43,6 +43,7 @@ namespace Instance			//tolua_export
 			m_count[WWII_NO_SIDE] = m_count[ALLIED] = m_count[AXIS] = m_count[NEUTRAL] = 0;
 		}
 		BasicStatus(struct ACTION_OBJECT*);
+		virtual ~BasicStatus() {}
 
 		const Descriptor& descriptor() const { return m_descriptor; }
 		UINT32 ageS() const { return (teulClockTime > createdAt()) ? (teulClockTime - createdAt()) : 0; }

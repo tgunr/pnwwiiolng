@@ -7,7 +7,7 @@ BOOL sysregGetHKeyDword(HKEY HKey, const WCHAR *keyloc, const WCHAR *keyname, DW
 {
 	unique_HKEY hkey;
 	DWORD keylen = sizeof(DWORD);
-	
+
 	return RegOpenKeyEx(HKey, keyloc, 0, KEY_READ, &hkey) == ERROR_SUCCESS &&
 		   RegQueryValueEx(hkey, keyname, nullptr, nullptr, reinterpret_cast<BYTE *>(&keydword), &keylen) == ERROR_SUCCESS;
 }

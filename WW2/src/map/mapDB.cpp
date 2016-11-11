@@ -279,7 +279,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 		teulSyncClock();
 
 		if ( teulClock64 - entryTime > 500 || teulClock64 - startTime > 200 )
-			dbugLog(_FLW, "`auth`.`p_get_player_details` appears to be taking too long: apparent:%llums, actual:%llums"
+			dbugLog(_FLW, "`auth`.`p_get_player_details` appears to be taking too long: apparent:%" PR64BitUT "ms, actual:%" PR64BitUT "ms"
 							, teulClock64 - entryTime
 							, teulClock64 - startTime);
 #endif
@@ -322,7 +322,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 #ifdef TIME_QUERIES
 		teulSyncClock();
 #endif
-		dbugLog(_FLN, "t:%d p:%u c:%s cust:%u found login info perms:%llx player:%llx mb:%u %s took %llums"
+		dbugLog(_FLN, "t:%d p:%u c:%s cust:%u found login info perms:%" PRPermMaskT " player:%" PRPermMaskT " mb:%u %s took %" PR64BitUT "ms"
 						, teulIndex(), playerID(), callsign(), m_customerID
 						, permissionMask(), m_playerMask
 						, minuteBalance(), (meteredAccess() ? "metered" : "unmetered")
@@ -566,7 +566,7 @@ bool mapFillPersonaData(Player* const player)
 
 #ifdef TIME_QUERIES
 		if ( teulClock64 - entryTime > 500 || teulClock64 - startTime > 200 )
-			dbugLog(_FLW, "QRY_SELECT_PERSONA_REFRESH taking too long: apparent %llums, actual %llums"
+			dbugLog(_FLW, "QRY_SELECT_PERSONA_REFRESH taking too long: apparent %" PR64BitUT "ms, actual %" PR64BitUT "ms"
 							, teulClock64 - entryTime
 							, teulClock64 - startTime
 							);
@@ -600,7 +600,7 @@ bool mapFillPersonaData(Player* const player)
 		teulSyncClock();
 #endif
 
-		threadLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%llx tr:%u took %llums"
+		threadLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%" PRPermMaskT " tr:%u took %" PR64BitUT "ms"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, player->personaID(), newRank, player->realRank(), player->points(), player->useRank().permissions()
 						, player->minuteBalance()
@@ -746,30 +746,27 @@ mapSaveErrorInfo(Player& player, WWII_ERROR_INFO& info)
 		try
 		{
 			_errExit(info, player, platform);
-			return;
 		}
 		catch ( std::exception& e )
 		{
 			dbugLog(_FLA, "Error writing bug report to database: %s", e.what());
-			return;
 		}
-		break;
+	return;
+
 	case WW_ERR_EXCEPTION:
 		try
 		{
 			_errException(info, player, platform);
-			return;
 		}
 		catch ( std::exception& e )
 		{
 			dbugLog(_FLA, "Error writing bug report to database: %s", e.what());
-			return;
 		}
+	return;
 
-		break;
 	case WW_ERR_VALIDITY_CHECK:
 		player.log(_FLI, "Got validity check bug report");
-		sprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
+		strprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
 						", errorType, whereIP, clientVersion, platform, clientTime, hostTime, rxTime,  archiveCorrupt"
 						", invalidArchive, invalidFileName, invalidCRC, invalidMD5) "
 						" values (%u,%u,%u"
@@ -778,21 +775,22 @@ mapSaveErrorInfo(Player& player, WWII_ERROR_INFO& info)
 						, player.OTP(), info.eventID, player.playerID()
 						, info.errorType,teulGetAddress(info.hostIP), teulGetAddress(info.clientVersion),platform, info.clientTime, info.hostTime, info.archiveWasCorrupt
 						, info.data.validityInfo.archive.string,  info.data.validityInfo.filename.string,  info.data.validityInfo.crc, info.data.validityInfo.md5);
-		break;
+	break;
+
 	case WW_ERR_SYSTEM_INFO:
 		player.log(_FLW, "Got system info bug report???");
-		return;
-		break;
-		sprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
-						", errorType, whereIP, clientVersion, platform,  clientTime, hostTime, rxTime,  archiveCorrupt"
-						", sysNumPackets, sysPacketID, sysInfoText) "
-						" values (%u,%u,%u"
-						",%u,'%s','%s',%d, FROM_UNIXTIME(%u), FROM_UNIXTIME(%u), now(), %u"
-						",%u,%u, '%s') "
-						, player.OTP(), info.eventID, player.playerID()
-						, info.errorType,teulGetAddress(info.hostIP), teulGetAddress(info.clientVersion),platform, info.clientTime, info.hostTime, info.archiveWasCorrupt
-						, info.data.systemInfo.numPackets,  info.data.systemInfo.packetID,  info.data.systemInfo.infoText);
-		break;
+	return;
+
+//		strprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
+//						", errorType, whereIP, clientVersion, platform,  clientTime, hostTime, rxTime,  archiveCorrupt"
+//						", sysNumPackets, sysPacketID, sysInfoText) "
+//						" values (%u,%u,%u"
+//						",%u,'%s','%s',%d, FROM_UNIXTIME(%u), FROM_UNIXTIME(%u), now(), %u"
+//						",%u,%u, '%s') "
+//						, player.OTP(), info.eventID, player.playerID()
+//						, info.errorType,teulGetAddress(info.hostIP), teulGetAddress(info.clientVersion),platform, info.clientTime, info.hostTime, info.archiveWasCorrupt
+//						, info.data.systemInfo.numPackets,  info.data.systemInfo.packetID,  info.data.systemInfo.infoText);
+
 	default:
 		return;
 	}

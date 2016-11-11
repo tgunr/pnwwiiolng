@@ -388,10 +388,10 @@ void PlayerPlacedObject::SetInvalid(const char* key, bool force)
 SINT32 PlayerPlacedObject::CoolDown()
 {
     SINT32 *coolDownEnd = &globalMSCoolDownEnd;
-    
+
     if (spec && spec->stotype != ServerTrackedObject::_UMS)
         coolDownEnd = &spec->coolDownEnd;
-    
+
 	return *coolDownEnd;
 }
 
@@ -541,11 +541,11 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 					{
                         /*
                          TBD - this doesn't actually do anything.  Probably something unfinished?
-                         
+
 						OBJECT* ohit = colliderData<OBJECT>(hits[0].g2);
 						trnCDTerrainObject* thit = colliderSpaceData<trnCDTerrainObject>(hits[0].g2);
                          */
-                        
+
 						std::vector<std::string> desc = colliderGetDescription(diff);
 
 						SetInvalid("ppos.badavoidance");
@@ -828,10 +828,10 @@ bool PlayerPlacedObject::Update()
 	piVECTOR att	= {0, 0, 0};
 
     SINT32 *coolDownEnd = &globalMSCoolDownEnd;
-    
+
     if (spec && spec->stotype != ServerTrackedObject::_UMS)
         coolDownEnd = &spec->coolDownEnd;
-    
+
 	if(!lastUpdate)
 		lastUpdate = frametime;
 
@@ -978,7 +978,7 @@ bool PlayerPlacedObject::Execute()
 	Interrupt();
 
     SINT32 *coolDownEnd = &globalMSCoolDownEnd;
-    
+
     if (spec && spec->stotype != ServerTrackedObject::_UMS)
         coolDownEnd = &spec->coolDownEnd;
 
@@ -998,7 +998,7 @@ bool PlayerPlacedObject::Execute()
         vehVehicle* player = persGetPersonaVehiclePtr();
 		if(Online)
 		{
-         
+
             if (spec->stotype != ServerTrackedObject::_UMS)
             {
                 // create a ppo sto
@@ -1011,15 +1011,15 @@ bool PlayerPlacedObject::Execute()
             {
                 // create a ppo sto
                 MobileSpawnSTO sto(0, static_cast<UINT16>(spec->id), position, attitude, (UINT32)player->Country);
-                
+
                 // send the request to the host
                 sto.request(PlayerClient()->ChatConnection());
-                
+
             }
 		}
 		else
 		{
-            
+
             if (spec->stotype != ServerTrackedObject::_UMS)
             {
                 PlayerPlacedSTO* sto = new PlayerPlacedSTO(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype), (UINT32)player->Country);
@@ -1075,29 +1075,29 @@ bool PlayerPlacedObject::Modified()
 void fpPPOInitiateBuildAction(UINT32 & state, UINT32 & control, SINT32 & stance)
 {
     PlayerPlacedObject* ppo = fpPPOGet();
-    
+
     if(ppo)
     {
         Write_Log (LOG_FPS, LOG_INFO, "Building ppo!");
-        
+
         if(ppo->Build())
         {
             state &= static_cast<UINT32>(~STATE_HOLD_FIRE);
             control &= static_cast<UINT32>(~FPS_FIRE);
-            
+
             stance = fpFPSGetPlayerPose();
-            
+
             if(stance != POSE_CROUCH)
             {
                 control |= static_cast<UINT32>(FPS_CROUCH);
                 control &= static_cast<UINT32>(~FPS_PRONE);
             }
-            
+
             if(stance == POSE_TRANSITION)
                 stance = POSE_CROUCH;
         }
     }
-    
+
     //fpsTrooper.firedWeapon = 1;
 
 }
@@ -1107,7 +1107,7 @@ void fpPPOSet(PlayerPlacedObject* to)
     // do nothing if already set
     if (to != nullptr && to == _placedObject)
         return;
-    
+
 	if(_placedObject)
 		delete _placedObject;
 
@@ -1128,7 +1128,7 @@ void fpPPOSwitchPPO(bool adjust)
 	// don't bother doing a thing unless we have more than one choice
 	if (activePPOList.size() > 1)
 	{
-		
+
         PPOCallback up = nullptr, ex = nullptr, val = nullptr;
 		if (_placedObject)
         {
@@ -1176,7 +1176,7 @@ void fpPPOReset()
     if (specLoader.getAllowedPPOs(vtype->WeaponSpec.wClass, vtype->WeaponSpec.wType, activePPOList, !allowFrus))
 	{
 		fpPPOSwitchPPO(false);
-	}	
+	}
 }
 
 bool fpPPOUpdate()
@@ -1403,10 +1403,10 @@ const char* PlayerPlacedSTO::model() const
 const char* MobileSpawnSTO::model() const
 {
     PPOSpec* spec = specLoader.ppoGetSpec(m_subType);
-    
+
     if(spec)
         return spec->modelName.c_str();
-    
+
     return "";
 }
 

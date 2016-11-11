@@ -33,7 +33,7 @@ public:
 	bool				m_active;			//!< Indicates whether or not this spawner is active.
 	playerid_t			m_playerID;			//!< PlayerID of creator/owner.
 	UINT32				m_stoUID;			//!< STO we are attached to or 0.
-	SINT32                          m_stoSubType;                   //!< STO type 
+	SINT32                          m_stoSubType;                   //!< STO type
 	FLOAT64				m_x, m_y, m_z;		//!< Spawn co-ordinates.
 	char				m_callsign[MAX_HANDLE_SIZE];	//!< Callsign of owner.
 	ChatHandle			m_handle;			//!< Packed lowercase handle of owner.

@@ -435,7 +435,7 @@ SINT32 _openSendParent(UINT32 parentHost, UINT16 parentPort)
 	{
 		if ( teulClock64 >= cutoff )
 		{
-			dbugLog(_FLA, "couldnt open parent connection start:%llu, tc64:%llu, elapsed:%llu", startTime, teulClock64, teulClock64 - startTime);
+			dbugLog(_FLA, "couldnt open parent connection start:%" PR64BitUT ", tc64:%" PR64BitUT ", elapsed:%" PR64BitUT "", startTime, teulClock64, teulClock64 - startTime);
 			return -EINVAL;
 		}
 		teulUpdateTransport(25);
@@ -478,7 +478,7 @@ static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 	{
 		// NOTE: this is an extreme case of auth being down for a 1/2 hour or more
 
-		dbugLog(_FLA,"can't restart auth connection time down: %lld", _timeDown.elapsed());
+		dbugLog(_FLA,"can't restart auth connection time down: %" PR64BitT "", _timeDown.elapsed());
 		if ( _externalErrorFn != nullptr)
 			(_externalErrorFn) (teulIndex,  data, size, object, ETEUL_AUTH_DOWN);
 	}
@@ -528,7 +528,7 @@ SINT32 _openSend(APID appID, UINT32 arenaID, UINT32 hostVersion, UINT32 authHost
 	{
 		if ( teulClock64 >= cutoff )
 		{
-			dbugLog(_FLA, "couldnt open auth connection to %s after %llums", teulGetAddress(authHost), teulClock64 - startTime);
+			dbugLog(_FLA, "couldnt open auth connection to %s after %" PR64BitUT "ms", teulGetAddress(authHost), teulClock64 - startTime);
 			return -EINVAL;
 		}
 		teulUpdateTransport(1000);
@@ -634,7 +634,7 @@ _registerNewDispatch(Auth::Dispatch& dispatch)
 
 	_pendingOtps.push_back(node);
 
-	dbugLog(_FLD, "p:%u otp:%u -> pendingOtps [%llu]", node->customerID, node->OTP, node->timeOut);
+	dbugLog(_FLD, "p:%u otp:%u -> pendingOtps [%" PR64BitUT "]", node->customerID, node->OTP, node->timeOut);
 
 	return true;
 }
@@ -715,7 +715,7 @@ bool verifyAuthConnected()
 
 	// Is there no connection ID? Or, is there no endpoint configured?  Or, is the endpoint unusable due to state?
 	ENDPOINT *endPoint = nullptr;
-	if (_authConnection < 0 || ((endPoint = teulGetEndpoint(_authConnection)) == nullptr) || 
+	if (_authConnection < 0 || ((endPoint = teulGetEndpoint(_authConnection)) == nullptr) ||
 		endPoint->state() == IS_CLOSED || endPoint->state() == IS_DEAD)
 	{
 		// No valid auth connection exists.  Has 10 seconds elapsed since last attempt?
@@ -741,7 +741,7 @@ bool verifyAuthConnected()
 			}
 
 			// reset the timer for another wait period so we don't spam attempts
-			_timeRetry.makeCurrent();	
+			_timeRetry.makeCurrent();
 		}
 		// no, then don't do anything and tell the caller there is no connection
 	}

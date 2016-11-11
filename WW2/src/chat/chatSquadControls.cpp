@@ -331,7 +331,7 @@ _checkSquadMember(Player* player, SquadList* list, const ChatHandle handle, RANK
 	SquadMemberEntry* entry = list->find(handle);
 	if ( entry == nullptr )
 	{
-		dbugLog(_FLI, "%llu [%s] is not in squad list", handle, Chat::Name(handle).c_str());
+		dbugLog(_FLI, "%" PR64BitUT " [%s] is not in squad list", handle, Chat::Name(handle).c_str());
 		throw SQR_PLAYER_NOT_IN_SQUAD;
 	}
 
@@ -632,7 +632,7 @@ _processDecline(SquadControl& /*request*/, Player* player, SquadList* /*squadLis
 static UINT32
 _processKick(SquadControl& request, Player* player, SquadList* squadList)
 {
-	dbugLog(_FLI, "t:%d p:%u c:%s sq:%d attempting to remove %llu[%s]", player->teulIndex(), player->playerID(), player->callsign(), player->squadID(), request.m_handle, _subject);
+	dbugLog(_FLI, "t:%d p:%u c:%s sq:%d attempting to remove %" PR64BitUT "[%s]", player->teulIndex(), player->playerID(), player->callsign(), player->squadID(), request.m_handle, _subject);
 	SquadMemberEntry* entry = _checkSquadMember(player, squadList, request.m_handle);
 
 	Player* target = PlayerInterface::Lookup(request.m_handle);
@@ -764,7 +764,6 @@ _processText(SquadControl& request, Player* player, SquadList* squadList)
 	break;
 	default:
 		throw SQR_OPERATION_FAILED;
-	break;
 	}
 
 	DBThread::EscapeString(request.m_text);
@@ -820,7 +819,6 @@ _processInteger(SquadControl& request, Player* player, SquadList* squadList)
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, request.m_key, request.m_value);
 		throw SQR_OPERATION_FAILED;
-	break;
 	}
 
 	if ( column == nullptr || *column == 0 )
@@ -939,7 +937,7 @@ SquadControl::receive(SINT32 teulIndex)
 			squadList = chatFindSquadList(player->squadID());
 		}
 
-		player->log(_FLI, "squadControl: %s %s[%u] %s[%llx]"
+		player->log(_FLI, "squadControl: %s %s[%u] %s[%" PRPermMaskT "]"
 							, _originator
 							, _control(m_action), m_action
 							, _subject, m_handle);
@@ -971,7 +969,6 @@ SquadControl::receive(SINT32 teulIndex)
 		default:
 			player->log(_FLA, "invalid action %d", m_action);
 			throw SQR_INVALID;
-		break;
 		}
 	}
 	catch (SQUAD_CONTROL_RESULT result)
@@ -984,7 +981,7 @@ SquadControl::receive(SINT32 teulIndex)
 	{
 	case SQR_IN_PROGRESS:
 		return 0;
-	break;
+
 	case SQR_ACCEPTED:
 		reply.m_handle = (squadList) ? squadList->squad().shortHandle() : 0LL;
 	break;
@@ -1145,7 +1142,6 @@ SquadMemberUpdate::receive(SINT32 teulIndex)
 		default:
 			dbugLog(_FLA, "t:%d invalid cmd %d", teulIndex, m_cmd);
 			throw SQR_INVALID;
-		break;
 		}
 	}
 	catch (SQUAD_CONTROL_RESULT result)

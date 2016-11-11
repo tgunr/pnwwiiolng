@@ -2951,9 +2951,9 @@ LOGICAL gr2AnimInit()
 
 #ifdef USE_CORPSES
 	/*
-     
+
      TBD - is this really meant to be implemented?
-     
+
     ARENA_VARS::iterator itr = g_arenaDescription.find("dead_body_delay");
 
     if(itr != g_arenaDescription.end())
@@ -6273,7 +6273,7 @@ void gr2AnimDetermineMotionType(gr2AnimTrooper* model, FLOAT64 angle)
 #ifdef DEBUG_MOTION
 	fpTPSMotionType startMotion = model->currentMotion;
 #endif
-    
+
 	if(angle > DMT_FORWARD && angle < DMT_BACKWARD)
 		model->strafe = TPS_MOVETYPE_STRAFE_RIGHT;
 	else if(angle < -DMT_FORWARD && angle > -DMT_BACKWARD)
@@ -7760,9 +7760,9 @@ void gr2AnimUpdate()
 
 			// don't allow submarining when crawling off ledges
 			/*
-             
+
             FLOAT64 zLowAdjust = -(worldPos.z() - zLow);
-             
+
 			if(zLowAdjust && model->terrainTargetZ < zLowAdjust)
 			{
 				//uiChatPrintLine("ZLow %.2f < %.2f ... clamping!", zLowAdjust, model->terrainTargetZ);

@@ -67,7 +67,7 @@ _handleHitList(SINT32 teulIndex, CP_HIT_HEADER& hitHeader)
 	// 4. Accumulate the damage packets to reduce traffic
 	for ( int i = 0; i < hitHeader.numHits; ++i )
 	{
-		dbugLog(_FLD, "t:%d p:%u v:%u damaged " PRF_FULL_OBJ_ID " with %lld joules"
+		dbugLog(_FLD, "t:%d p:%u v:%u damaged " PRF_FULL_OBJ_ID " with %" PR64BitT " joules"
 				, teulIndex
 				, player->playerID()
 				, player->vehicle->index

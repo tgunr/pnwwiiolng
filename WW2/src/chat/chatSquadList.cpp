@@ -913,7 +913,7 @@ Player::sendSquadInfo(SquadList* squadList/*=NULL*/)
 		sendWhoList = true;
 	}
 	if ( g_debugSquads )
-		dbugLog(_FLD, "t:%d p:%u c:%s sq:%u sending squad update %u%s time:%llu mod:%llu mmod:%llu lsi:%llu"
+		dbugLog(_FLD, "t:%d p:%u c:%s sq:%u sending squad update %u%s time:%" PR64BitUT " mod:%" PR64BitUT " mmod:%" PR64BitUT " lsi:%" PR64BitUT ""
 						, teulIndex(), playerID(), callsign(), squadID()
 						, msg.status(), ((sendWhoList) ? "+who" : "")
 						, teulClock64, squadList->msstamp(), squadList->lastMemberMod(), lastSquadInfoMS());

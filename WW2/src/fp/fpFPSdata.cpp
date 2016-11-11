@@ -544,7 +544,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
                 hasWarned = true;
             }
         }
-        
+
 		else if (stricmp(buf, "dryFireSound") == 0)
 			fpsWeapons[weapon].dryFireSound = (SCHAR*) strpool (varData);
 		else if (stricmp(buf, "dryFireSoundLength") == 0)
@@ -607,9 +607,9 @@ void fpFPSDataReadFPSFile()
 
 
 	/*
-     
+
      TBD - is this test code??
-     
+
     UINT64 val1 = fpStringHash("piatFile");
 	UINT64 val1 = fpStringHash("m1garandFile");
 	UINT64 val2 = fpStringHash("colt1911File");
@@ -1183,7 +1183,7 @@ void fpFPSDataReadFPSFile()
 		case fg42gFile_hash:
 			_fpFPSDataReadWeaponFile (FG42G, varData);
 		break;
-		
+
 		case crawlSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_CRAWL] = (SCHAR*) strpool (varData);
 		break;
@@ -1243,7 +1243,7 @@ void fpFPSDataReadFPSFile()
 		break;
 
 		default:
-			Write_Debug("Unknown hash: '%s' : %llu", buf, hash);
+			Write_Debug("Unknown hash: '%s' : %" PR64BitUT "", buf, hash);
 		}
 	}
 

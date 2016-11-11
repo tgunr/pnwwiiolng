@@ -235,7 +235,6 @@ _recvSideMessage(ACTION_OBJECT* const a)
 		default:
 			dbugLog(_FLA, "invalid side_message type %d", message.m_type);
 			return -EINVAL;
-		break;
 	}
 
 	return a->offset;
@@ -425,7 +424,7 @@ chatSendUMSKill(const Player* player, const UINT32 stoUID)
 {
 	Scoring::Actor actShooter(player);
 	actShooter.setSortie(player->sortieID(), player->weapon(), false);
-	
+
 	Teul::Packet outgoing(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
 	outgoing.construct<Scoring::UMSKill>(actShooter, stoUID);
 	return serverSendPacketToType(outgoing, MAP_HOST);
@@ -798,7 +797,7 @@ _recvPersonaUpdate(ACTION_OBJECT* const a)
 	{
 		// This can occur when the player isn't done logging in yet.
 #ifdef CLOSED_BETA
-		dbugLog(_FLD, "t:%d Unable to find player %s:%lld", a->teulIndex, Chat::Name(update.m_handleID).c_str(), update.m_handleID);
+		dbugLog(_FLD, "t:%d Unable to find player %s:%" PR64BitT "", a->teulIndex, Chat::Name(update.m_handleID).c_str(), update.m_handleID);
 #endif
 		return a->offset;
 	}
@@ -1115,10 +1114,10 @@ Tutorial::GroupProgress::receive(Player* player) const
 {
 	Chat::Name name(m_groupHandle);
 #ifdef BETA_RELEASE
-	player->log(_FLD, "group progress update %s=%llu", name.c_str(), m_flags);
+	player->log(_FLD, "group progress update %s=%" PR64BitUT "", name.c_str(), m_flags);
 #endif
 	char entry[88];
-	strprintf(entry, "(%u,\"%s\",%llu)", player->playerID(), name.c_str(), m_flags);
+	strprintf(entry, "(%u,\"%s\",%" PR64BitUT ")", player->playerID(), name.c_str(), m_flags);
 	_progressUpdates.addEntry(entry);
 	return 0;
 }
@@ -1206,7 +1205,7 @@ chatMessageChannel(const ChannelID& channelID, LSTRING_ID prefix, LSTRING_ID mes
 	if ( channel == nullptr )
 	{
 		if ( g_debugChat )
-			dbugLog(_FLD, "cmc: ch:%llu.%u.%u.%llu has NULL channel", channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID());
+			dbugLog(_FLD, "cmc: ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " has NULL channel", channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID());
 		return false;
 	}
 

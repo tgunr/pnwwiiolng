@@ -29,11 +29,11 @@ SerialNumber::getNext()
             if ( q.Rows() && q.FetchRow() )
             {
                 m_counter = (serialno_t)q.Row().NextUINT64() + m_interval;
-				dbugLog(_FLI, "SerialNumber(%s) starting from %llu", m_name, (UINT64)m_counter);
+				dbugLog(_FLI, "SerialNumber(%s) starting from %" PR64BitUT "", m_name, (UINT64)m_counter);
             }
 			else
 			{
-				dbugLog(_FLI, "SerialNumber(%s) starting from default (%llu)", m_name, (UINT64)m_minimum);
+				dbugLog(_FLI, "SerialNumber(%s) starting from default (%" PR64BitUT ")", m_name, (UINT64)m_minimum);
 			}
         }
         catch (std::exception& e)
@@ -45,7 +45,7 @@ SerialNumber::getNext()
     if ( isFirst || (m_counter % m_interval) == 0 )
     {
         DBThread::Do(DBThread::Default
-						, "REPLACE INTO wwii_serial_numbers (resource, last_serial) VALUES ('%s', %llu)"
+						, "REPLACE INTO wwii_serial_numbers (resource, last_serial) VALUES ('%s', %" PR64BitUT ")"
                             , m_name, m_counter
 							);
     }

@@ -1299,8 +1299,8 @@ _StratMessageQue*	PrevStratMsg;
                 else
                 {
                   if (TO->ObjId.objClass == CLASS_FACILITY && TO->DamageLevel != FB_CLOSED_VISLEVEL &&
-                      (TO->ObjId.objType == FACILITY_ARMYBASE || 
-                       TO->ObjId.objType == FACILITY_NAVALBASE || 
+                      (TO->ObjId.objType == FACILITY_ARMYBASE ||
+                       TO->ObjId.objType == FACILITY_NAVALBASE ||
                        TO->ObjId.objType == FACILITY_AIRBASE))
                   {
                     TO->LOD[i]->flag2 |= OBJECT_AIRRAIDSIREN;
@@ -3217,7 +3217,7 @@ COLLISION		collision;
 #ifdef EVENT_LOG_TIMES
     static UINT64 count = 0;
     static int number = 0;
-    
+
     UINT64 beginhere = GetMicroSeconds();
 #endif
 
@@ -3288,7 +3288,7 @@ piVECTOR*	lpcrnr;
 #ifdef EVENT_LOG_TIMES
     static UINT64 count = 0;
     static int number = 0, npolys = 0;
-    
+
     UINT64 beginhere = GetMicroSeconds();
 #endif
 

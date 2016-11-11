@@ -17,8 +17,8 @@ namespace Teul
 		using callxy_t = unsigned char;	    // For callback X/Y values.
 	public:
 		UINT32 packetType() const { return m_prefix[0] >> 4; }
-		void packetType(UINT32 type_) { m_prefix[0] = ((UCHAR)type_ << 4) | (m_prefix[0] & 0x0f); }
-		UINT32 packetSizeBytes() const { return ((m_prefix[0] & 0x0f) << 16) | (m_prefix[1] << 8) | (m_prefix[2]); }
+		void packetType(UINT32 type_) { m_prefix[0] = static_cast<uint8_t>((type_ << 4) | (m_prefix[0] & 0x0fU)); }
+		UINT32 packetSizeBytes() const { return ((m_prefix[0] & 0x0fU) * 65536U) | (m_prefix[1] * 256U) | (m_prefix[2]); }
 		void packetSizeBytes(UINT32 size_)
 		{
 			// preserve the upper 4 bits of [0] which represent the packet type,
@@ -30,7 +30,7 @@ namespace Teul
 
 		//// Unencrypted
 		//! Packet type and size, 3 bytes
-		UCHAR		m_prefix[3];
+		uint8_t		m_prefix[3];
 		//// Encrypted
 		//! ID of this packet.
 		tag_t		m_tag;		// CAUTION: Do not move; teulModRecv depends on it.

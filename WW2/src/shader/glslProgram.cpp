@@ -397,7 +397,7 @@ void glslProgram::LinkProgram()
         }
 
         delete [] name;
-    }  
+    }
 }
 
 /*------------------------------------------------------------------------------------
@@ -672,7 +672,7 @@ glslUniform* glslProgram::GetUniform(const std::string &name)
 {
     UniformList::iterator itr = _uniformList.find(name);
 
-    if(itr!=_uniformList.end()) 
+    if(itr!=_uniformList.end())
     {
         return itr->second;
     }

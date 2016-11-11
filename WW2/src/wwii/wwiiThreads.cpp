@@ -360,7 +360,7 @@ StatsThread::run()
 	UINT64 cbCurSize, cbMaxSize, cbUsed;
 	UINT64 cbLastUsed = 0L;
 
-	threadLog(_FLI, "Stats thread active [thread #%u]", std::this_thread::get_id());
+	threadLog(_FLI, "Stats thread active");
 
 	UINT32 count = 0;
 	for ( ; ; )
@@ -393,7 +393,7 @@ StatsThread::run()
 				cbLastUsed += cbUsed;
 			}
 
-			threadLog(_FLD, "THREADS: dbq(ttl:%llu,used:%llu,max:%llu,cur:%llu), cbq(ttl:%llu,used:%llu,max:%llu,cur:%llu)"
+			threadLog(_FLD, "THREADS: dbq(ttl:%" PR64BitUT ",used:%" PR64BitUT ",max:%" PR64BitUT ",cur:%" PR64BitUT "), cbq(ttl:%" PR64BitUT ",used:%" PR64BitUT ",max:%" PR64BitUT ",cur:%" PR64BitUT ")"
 							, dbLastUsed, dbUsed, dbMaxSize, dbCurSize
 							, cbLastUsed, cbUsed, cbMaxSize, cbCurSize);
 

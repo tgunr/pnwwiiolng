@@ -641,7 +641,6 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 	break;
 	default:
 		return BMR_FAILED;
-	break;
 	}
 
 	return BMR_APPROVED;

@@ -48,12 +48,12 @@ _dumpVisListEntry(const Viewing& entry)
 	const char* lastSent;
 	if ( entry.m_lastSent > 0 )
 	{
-		sprintf(buffer, "%llu", teulClock64 - entry.m_lastSent);
+		strprintf(buffer, "%" PR64BitUT "", teulClock64 - entry.m_lastSent);
 		lastSent = buffer;
 	}
 	else
 		lastSent = "never";
-	dbugLog(_FLI, "%s:%s:%lld,", entry.m_vehicle.callsign(), lastSent, entry.m_priority);
+	dbugLog(_FLI, "%s:%s:%" PR64BitT ",", entry.m_vehicle.callsign(), lastSent, entry.m_priority);
 }
 #else
 #define VIS_DEBUG(...)
@@ -170,7 +170,7 @@ _isVehicleVisible(const HostVehicle& vehicle, const UINT64& dist_cm2, const bool
 		maxViewingDistance_cm2 >>= 2;
 	}
 
-	EXTREME(_FLD, ":dist=%llu,maxV=%llu,inrange=%s", (UINT64)dist_cm2, (UINT64)maxViewingDistance_cm2, dist_cm2 <= maxViewingDistance_cm2 ? "yes" : "no");
+	EXTREME(_FLD, ":dist=%" PR64BitUT ",maxV=%" PR64BitUT ",inrange=%s", (UINT64)dist_cm2, (UINT64)maxViewingDistance_cm2, dist_cm2 <= maxViewingDistance_cm2 ? "yes" : "no");
 
 	if ( dist_cm2 <= maxViewingDistance_cm2 )
 		return true;
@@ -256,7 +256,7 @@ _vehicleIsCurrentlyInList(UINT32 index, HostVehicle& myVehicle)
 // Add the vehicles from a given grid node into our vis list.
 
 // Vehicles we know to have riders.
-using CARRIERS = std::unordered_map< UINT32 /*carrierIndex*/, SINT32 /*riderCount or -1*/ >;
+using CARRIERS = std::unordered_map<UINT32 /*carrierIndex*/, SINT32 /*riderCount or -1*/>;
 
 static bool
 _addCellNodesToVisList(HostVehicle& myVehicle, const Grid::VehicleSet& vehicles, CARRIERS& carriers)

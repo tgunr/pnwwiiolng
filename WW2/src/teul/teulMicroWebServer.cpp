@@ -338,7 +338,7 @@ _sendPhysicalFile(const SOCKET sock, const char* const rootPath, const char* con
 		if ( fstat(filefd, &statBuf) < 0 )
 			throw "Inaccessible file";
 
-		static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: %s\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %llu\r\n\r\n";
+		static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: %s\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %" PR64BitUT "\r\n\r\n";
 		char myBuf[sizeof(ok200) + 128];
 
 		const char* contentType = _getContentTypeFor(lastDot);

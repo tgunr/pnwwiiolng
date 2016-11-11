@@ -175,7 +175,7 @@ MappedFile::mapFileHandleInternal()
 		return unmapFile();
 #else
 	// Posix implementation.
-	static const int flags = 
+	static const int flags =
 			  MAP_FILE 		// Compatibility flag, not really required.
 			| MAP_SHARED	// Share buffers with any other mmappers of this file.
 			;

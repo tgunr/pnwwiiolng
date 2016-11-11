@@ -47,7 +47,7 @@ _recvEvent(ACTION_OBJECT* const a)
 {
 	Scoring::EventBase* evt = (Scoring::EventBase*)(a->packed);
 	auto& lhs = evt->lhs();
-	dbugLog(_FLI, "p:%u c:%s v:%u in:%llu Scoring::Event::recvEvent:: type %u. Processing: "
+	dbugLog(_FLI, "p:%u c:%s v:%u in:%" PR64BitUT " Scoring::Event::recvEvent:: type %u. Processing: "
 					, lhs.playerID()
 					, Chat::Name(lhs.handle()).c_str()
 					, lhs.sortieID()
@@ -58,7 +58,7 @@ _recvEvent(ACTION_OBJECT* const a)
 	Player* const lhsPlayer = PlayerInterface::Lookup(lhs.playerID());
 	if ( lhsPlayer == nullptr )
 	{
-		dbugLog(_FLM, "p:%u c:%s v:%u in:%llu Player not online for scoring event"
+		dbugLog(_FLM, "p:%u c:%s v:%u in:%" PR64BitUT " Player not online for scoring event"
 					, lhs.playerID()
 					, Chat::Name(evt->lhs().handle()).c_str()
 					, lhs.sortieID()
@@ -88,7 +88,7 @@ _recvEvent(ACTION_OBJECT* const a)
 		dbugLog(_FLA, "Unhandled event type");
 	break;
 //	default:
-//		dbugLog(_FLA, "Unknown scoring event: %u in inst %llu", evt->type(), evt->instanceID());
+//		dbugLog(_FLA, "Unknown scoring event: %u in inst %" PR64BitUT "", evt->type(), evt->instanceID());
 //	break;
 	}
 

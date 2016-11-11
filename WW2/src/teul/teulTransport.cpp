@@ -54,7 +54,7 @@ namespace Teul
 {
 	UINT32 GetSingleIP(const char* const name)
 	{
-		struct addrinfo hints;	
+		struct addrinfo hints;
 		memset(&hints, 0, sizeof(hints));
 		hints.ai_family = AF_INET;
 
@@ -72,7 +72,7 @@ namespace Teul
 
 	bool GetIPs(const char* const name, std::vector<UINT32>& ips)
 	{
-		struct addrinfo hints;	
+		struct addrinfo hints;
 		memset(&hints, 0, sizeof(hints));
 		hints.ai_family = AF_INET;
 

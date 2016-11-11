@@ -346,7 +346,7 @@ void dbugInit(LogMode logMode, const char* const filename)
 	if ( s_dbugInitialized )
 		return;
 	s_dbugInitialized = true;
-    
+
     _stdErrFileNo = STDERR_FILENO;
 	setlocale(LC_CTYPE, "");
 
@@ -370,7 +370,7 @@ void dbugInit(LogMode logMode, const char* const filename)
 		LogAbort("Unable to install signal handlers.");
 	}
 #endif
-    
+
     teulSyncClock();
 
     if ( file >= 0 ) {

@@ -50,7 +50,7 @@
 
 /*
  TODO - what should be done with this??
- 
+
 // z-physics hackery data
 static piVECTOR _CageEdgesStand[7] = {
 {-0.125f,	 0.0f,	0.0f},

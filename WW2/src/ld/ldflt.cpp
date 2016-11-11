@@ -50,7 +50,7 @@ struct FLTLoadFailure
     FLTLoadFailure(const char* const problem, const char* const doing)
     : m_problem(problem), m_doing(doing)
     {}
-    
+
     std::string m_problem, m_doing ;
 };
 
@@ -59,7 +59,7 @@ struct FLTChunkFailure : public FLTLoadFailure
     FLTChunkFailure(const char* const chunkType)
     : FLTLoadFailure("Unable to load FLT chunk", chunkType)
     {}
-    
+
 };
 
 struct FLTUnknownTexture : public FLTLoadFailure
@@ -80,7 +80,7 @@ struct FLTItemFileError
     FLTItemFileError(const char* error, const char* item, const char* file)
         : m_error(error), m_item(item), m_file(file)
     {}
-    
+
     std::string m_error, m_item, m_file;
 };
 
@@ -1582,9 +1582,9 @@ static bool ReadTextureReference()
 	// Check for normal map
 	str = filename;
 	str += "_normal.dds";
-    
+
     int fd = -1;
-    
+
     if ((fd = fioOpen(str.c_str())) != -1) {
 		_textureflags2[numtexrefs] |= OBJECT_NORMALMAP;
 		fioClose(fd); // Hacky because this is very bad code design, this is a quick fix

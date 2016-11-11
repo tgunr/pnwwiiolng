@@ -194,7 +194,7 @@ _recvPlayerLogin(ACTION_OBJECT* const a)
 
 	try
 	{
-		a->offset = login.packer(TEUL_UNPACK, a->packed, a->offset);
+		login.packer(TEUL_UNPACK, a);
 		if ( PN_UNLIKELY(a->offset < 0) )
 			throw std::logic_error("unable to unpack player login");
 

@@ -4,7 +4,7 @@
 #include "sysmac/sysMacCompat.h"
 #endif
 
-#include "wwii/wwiiHash.h" // does this work on linux?
+#include "wwii/wwiiHash.h"
 #include <map>
 #include <set>
 #include <string.h>
@@ -94,7 +94,7 @@ static std::basic_string<ValueType> safe_os_file_path(const std::basic_string<Va
 {
     size_t pos = std::basic_string<ValueType>::npos;
     std::string result = path;
-    
+
     // Cheap hack: npos + 1 == 0 (size_t is unsigned so it's not UB!)
     // Also we cheat with the knowledge that L'/' == static_cast<wchar_t>('/') etc.
     while ((pos = result.find(static_cast<ValueType>(CHANGE_SEP), pos + 1)) != std::string::npos) {
@@ -262,7 +262,6 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	{
 		OS_CLOSE(fd);
 		DEBUG_FATAL("Out of memory loading '%s' (%" PRSizeT " bytes).", filename, allocSize);
-		return false;
 	}
 
 	int bytesRead = OS_READ(fd, mem, fileSize);
@@ -436,7 +435,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 #endif
 	}
 	else {
-		dbugLog(_FLD, "Alloc size for new file is %d", allocSize);
+		dbugLog(_FLD, "Alloc size for new file is %" PRSizeT "", allocSize);
 	}
 
 	mem[fileSize] = 0;
@@ -749,9 +748,9 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
   else
 #endif
 	  pathprintf(fullpath, DataPath, filename);
-    
+
     int fd = -1;
-    
+
 	OS_OPEN(&fd, os_file_path(fullpath), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
     return fd;
 }
@@ -904,11 +903,11 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	if (numFilesInDir == nullptr || fileList == nullptr) {
 		return;
     }
-    
+
     char *truepath = realpath(safe_os_file_path<char>(dirToSearch ?: ".").c_str(), nullptr);
     struct dirent **entries = nullptr;
     int nentries = 0;
-    
+
     nentries = scandir(truepath, &entries, fiodGetDirListFilter, nullptr);
     if (nentries < 0) {
         *fileList = nullptr;
@@ -916,9 +915,9 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
         free(truepath);
         return;
     }
-    
+
     SCHAR **resultList = static_cast<SCHAR **>(calloc(static_cast<size_t>(nentries), sizeof(SCHAR *)));
-    
+
     *numFilesInDir = nentries;
     while (nentries--) {
 // Hack.
@@ -939,7 +938,7 @@ const char sep = '/';
     free(truepath);
     *fileList = resultList;
 }
-    
+
 #endif
 
 #if platBuild == BUILD_SERVER

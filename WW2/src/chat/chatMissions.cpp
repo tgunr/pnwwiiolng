@@ -36,7 +36,6 @@
 #include "teul/teulServer.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
-#include "wwii/wwiiHash.h"
 #include "wwii/wwiiServerTrackedObject.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"
@@ -573,7 +572,7 @@ ChatMission::removeWaypoint(const ChatHandle handle, bool byPlayer)
 		sendMobileSpawn(0, waypoint.playerHandle(), (FLOAT32)waypoint.x(), (FLOAT32)waypoint.y(), 0.0f, false, 0, 0);
 	}
 
-	dbugLog(_FLD, "m:%u removing waypoint %llu[%s]", missionID(), waypoint.handle(), Chat::Name(waypoint.handle()).c_str());
+	dbugLog(_FLD, "m:%u removing waypoint %" PR64BitUT "[%s]", missionID(), waypoint.handle(), Chat::Name(waypoint.handle()).c_str());
 
 	if ( !m_members.empty() )
 	{
@@ -1437,7 +1436,7 @@ DotMList::action(Player& player, Chat::ClientMessage* const /*message*/) const
 
 	if ( player.isPlaynet() )
 	{
-		PREP_CHAT_MSG(cmsg, "m:%u leader:%s memb:%u wps:%u mu:%u mr:%u"
+		PREP_CHAT_MSG(cmsg, "m:%u leader:%s memb:%" PRSizeT " wps:%" PRSizeT " mu:%" PRSizeT " mr:%" PRSizeT ""
 											, mission->missionID()
 											, Chat::Name(mission->leader()).c_str()
 											, mission->m_members.size()
@@ -1483,7 +1482,7 @@ ChatMission::setFRUCooldown(const UINT32 cooldown_s)
 	const TeulTimeMS cooldown_ms = cooldown_s * 1000;
 	fru().nextPlaceAvail(teulClock64 + cooldown_ms);
 
-	dbugLog(_FLD, "m:%u fru cooldown set for %u seconds (%llums)", missionID(), cooldown_s, cooldown_ms);
+	dbugLog(_FLD, "m:%u fru cooldown set for %u seconds (%" PR64BitUT "ms)", missionID(), cooldown_s, cooldown_ms);
 
 	flagForStatusUpdate();
 }

@@ -107,7 +107,7 @@ bool GameProcess::OnStarted()
 		return false;
 
 	teulSyncClock();
-	Log(Debug::ERR_NOTE, "started (attempt %u, took %llums)", m_launchAttempts, (teulClock64 - m_startSent));
+	Log(Debug::ERR_NOTE, "started (attempt %u, took %" PR64BitUT "ms)", m_launchAttempts, (teulClock64 - m_startSent));
 
 	m_started = teulClock64;
 	m_stopped = 0ULL;
@@ -156,9 +156,9 @@ void GameProcess::OnStopped()
 	}
 	ABORT_IF( !Running() && !StartSent() );
 	if ( Running() )
-		Log(Debug::ERR_NOTE, "stopped after %llus", TimeRunning() / 1000);
+		Log(Debug::ERR_NOTE, "stopped after %" PR64BitUT "s", TimeRunning() / 1000);
 	else
-		Log(Debug::ERR_NOTE, "stopped during startup after %llums", TimeSinceStartSent());
+		Log(Debug::ERR_NOTE, "stopped during startup after %" PR64BitUT "ms", TimeSinceStartSent());
 
 	teulSyncClock();
 
@@ -266,7 +266,7 @@ bool GameProcess::CheckStatus()
 				ABORT_IF(s_processStarting != this);
 				if ( TimeSinceStartSent() >= s_processLaunchTimeout )
 				{
-					Log(Debug::ERR_WARN, "startup timed out after %llums. Killing.", TimeSinceStartSent());
+					Log(Debug::ERR_WARN, "startup timed out after %" PR64BitUT "ms. Killing.", TimeSinceStartSent());
 					Kill();
 					return false;
 				}
@@ -395,7 +395,7 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 		dbugLog(_FLA, "failed to start %s err %d: %s", processPath.c_str(), errno_, strerror_r(errno_, error, sizeof(error)));
 		return false;
 	}
-			
+
 	process_ = childPid;
 	pid_ = childPid;
 	return true;
@@ -488,7 +488,7 @@ namespace GameProcessManager
 				bool success = _spawnProcess(starter, processName, child, childPid, spawnErrno);
 				if ( success )
 				{
-					dbugLog(_FLI, "%s server started %s child %llu (pid %llu)", starter->ServerTypeName(), processName, child, childPid);
+					dbugLog(_FLI, "%s server started %s child %" PR64BitUT " (pid %" PR64BitUT ")", starter->ServerTypeName(), processName, child, childPid);
 					starter->OnStarting(child, childPid);
 					return true;
 				}

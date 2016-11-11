@@ -44,7 +44,6 @@ _report(UINT32 level, const char* message, const char* file = _luaSubSystem.c_st
 		case Debug::ERR_WARN:	output += "!: "; break;
 		case Debug::ERR_FATAL:	output += "<!>: "; break;
 		case Debug::ERR_ABORT: output += "ERR: "; break;
-		break;
 	}
 	output += message;
 	output += "\n";
@@ -166,7 +165,7 @@ Lua::CallInstanceFunction(const char* func, const instanceid_t instID, const cha
 	}
 
 	char instStr[20];
-	strprintf(instStr, "%llu", instID);
+	strprintf(instStr, "%" PR64BitUT "", instID);
 	lua_pushstring(_luaVM, instStr);
 	lua_pushstring(_luaVM, data);
 
@@ -183,7 +182,7 @@ Lua::CallInstanceFunction(const char* func_, const instanceid_t instID_, playeri
 		return;
 	}
 	char instStr[20];
-	strprintf(instStr, "%llu", instID_);
+	strprintf(instStr, "%" PR64BitUT "", instID_);
 	lua_pushstring(_luaVM, instStr);
 	tolua_pushnumber(_luaVM, (lua_Number)playerID_);
 	tolua_pushusertype(_luaVM, (void*)state_, "PlayerState");
@@ -486,7 +485,7 @@ _startInterpreter()
 	lua_pushstring(_luaVM, luaPath.c_str());
 	lua_setfield(_luaVM, -2, "path");
 	lua_pop(_luaVM, 1);
-	
+
 	tolua_game_open(_luaVM);
 	dbugLog(_FLI, "started Lua interpreter");
 

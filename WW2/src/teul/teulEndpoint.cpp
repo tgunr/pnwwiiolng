@@ -45,7 +45,7 @@ static size_t _teulConnects;
 
 using ENDPOINT_ARRAY = WWII::inplace_vector<ENDPOINT, Teul::MaxConnections>;
 using ENDPOINT_IMPL_ARRAY = WWII::inplace_vector<EndpointImpl, Teul::MaxConnections>;
-ENDPOINT_ARRAY _endpoints;
+static ENDPOINT_ARRAY _endpoints;
 static ENDPOINT_IMPL_ARRAY _endpointImpls;
 
 using ENDPOINT_VEC = std::vector<ENDPOINT*>;
@@ -96,7 +96,7 @@ ENDPOINT::encrypt(UCHAR* const stream, const size_t bytes)
 	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
 	{
 #ifdef DEBUG_ENCRYPTION
-		printf("Encrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_txCrypt.seed());
+		printf("Encrypt %p %d [%u] seed %" PR64BitUT "\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_txCrypt.seed());
 #endif
 		m_impl->m_txCrypt.translate(stream, bytes);
 	}
@@ -111,7 +111,7 @@ ENDPOINT::decrypt(UCHAR* const stream, const size_t bytes)
 	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
 	{
 #ifdef DEBUG_ENCRYPTION
-		printf("Decrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_rxCrypt.seed());
+		printf("Decrypt %p %d [%u] seed %" PR64BitUT "\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_rxCrypt.seed());
 #endif
 		m_impl->m_rxCrypt.translate(stream, bytes);
 	}
@@ -134,7 +134,7 @@ ENDPOINT::_dbugOutputPacket( bool isRecv, const uint8_t *input, size_t packetByt
 	debugBuff[0] = 0;
 	char hex[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
 	char charToHex[SZ_HEX_DIG_TEXT+1] = {};
-	charToHex[2] = ' '; 
+	charToHex[2] = ' ';
 	charToHex[SZ_HEX_DIG_TEXT] = 0;
 
 	size_t i = 0;
@@ -576,7 +576,6 @@ teulCreateEndpoint(SINT32 wantIndex
 			dbugLog(_FLA, "error allocating endpoint, invalid protocol");
 			teulFreeEndpoint(newEndpoint);
 			return nullptr;
-			break;
 	}
 
 	newEndpoint->m_impl->m_version = Teul::VersionNumber;
@@ -654,7 +653,6 @@ Teul::GetErrorName(SINT32 error)
 	ErrorCase( ETEUL_CB_REQ_DATA );	// Bad receive.
 	case ETEUL_ILLEGAL_PACKET_ORDER:
 		return "ecorrupt";
-	break;
 
 	TeulErrorCase( LoginFail_ActivateNoLocalInfo );
 	TeulErrorCase( LoginFail_ActivateFailed );
@@ -681,15 +679,15 @@ Teul::GetErrorName(SINT32 error)
 		{
 		case Teul::Errors::PackCallbackCategory:
 			return "pkcb";
-		break;
+
 		case Teul::Errors::SendFailCategory:
 			return "txf";
-		break;
+
 		case Teul::Errors::PushPacketCategory:
 			return "pshp";
-		break;
+
 		default:
-		break;
+			break;
 		}
 	}
 

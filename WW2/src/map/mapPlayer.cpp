@@ -52,7 +52,6 @@
 #include "wwii/wwiiAntiAddiction.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
-#include "wwii/wwiiHash.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRTBCodes.h"
 
@@ -122,7 +121,7 @@ _reportPlayerDetails(SOCKET fd, const char* /*path*/, const char* /*args*/)
 		std::lock_guard<std::mutex> mutexLock(s_sidecountMutex);
 
 		len = strprintf(buffer
-							, "{\"stamp\":%llu,\"players\":%" PRSizeT ",\"balance\":{\"above\":%u,\"delays_max\":%u,\"delays_pctg\":%u,\"margin_pctg\":%u,\"pers_delay\":%u},\"camp\":{\"allies_spawned\":%u,\"axis_spawned\":%u,\"hvyside\":%u,\"overdog\":%u,\"underdog\":%u,\"imb\":%u,\"dev\":%u},\"swing_meter\":{\"in_effect\":%d,\"meter\":%d,\"delays\":%d}}"
+							, "{\"stamp\":%" PR64BitUT ",\"players\":%" PRSizeT ",\"balance\":{\"above\":%u,\"delays_max\":%u,\"delays_pctg\":%u,\"margin_pctg\":%u,\"pers_delay\":%u},\"camp\":{\"allies_spawned\":%u,\"axis_spawned\":%u,\"hvyside\":%u,\"overdog\":%u,\"underdog\":%u,\"imb\":%u,\"dev\":%u},\"swing_meter\":{\"in_effect\":%d,\"meter\":%d,\"delays\":%d}}"
 								, teulClock64
 								, g_players.size()
 								, host_config.balance.above
@@ -568,7 +567,7 @@ Player::SetGroups(const char* groupList)
 		// Update our permissions
 		m_permissions = chatGroupPermissionsForGroups(m_groups);
 
-        log(_FLD, "groups: %s perm:%llx max army/air/sea/squad:%u/%u/%u/%u"
+        log(_FLD, "groups: %s perm:%" PRPermMaskT " max army/air/sea/squad:%u/%u/%u/%u"
                     , groupList
                     , m_permissions->m_permissionMask
                     , m_permissions->m_limitRank[BRANCH_LAND]
@@ -795,7 +794,7 @@ Player::checksum(UINT64 withChecksum)
 	bool isDirty = false;
 	if ( !mapCheckChecksum(dispatch().m_appVersion, withChecksum, permissions(IS_PRODUCER)) )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s invalid checksum %llu for app %u plat:%u"
+		dbugLog(_FLA, "t:%d p:%u c:%s invalid checksum %" PR64BitUT " for app %u plat:%u"
 						, teulIndex(), playerID(), callsign()
 						, withChecksum
 						, dispatch().m_appVersion
@@ -1513,7 +1512,7 @@ Player::SetPersonaMissionFlags()
 {
 	updateMask();
 
-	dbugLog(_FLD, "t:%d p:%u c:%s rank:%d perm:%llx hc:%d", teulIndex(), playerID(), callsign(), realRank(), permissionMask(), isOfficer());
+	dbugLog(_FLD, "t:%d p:%u c:%s rank:%d perm:%" PRPermMaskT " hc:%d", teulIndex(), playerID(), callsign(), realRank(), permissionMask(), isOfficer());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1653,7 +1652,8 @@ Player::updateChat(bool immediate)
 	if ( needsChatSync() )
 		return;
 
-	dbugLog(_FLD, "t:%d p:%u c:%s flagging for persona update perms:%llx (plyr:%llx, chat:%llx)", teulIndex(), playerID(), callsign(), permissionMask(), m_playerMask, m_permissions->m_permissionMask);
+	dbugLog(_FLD, "t:%d p:%u c:%s flagging for persona update perms:%" PRPermMaskT " (plyr:%" PRPermMaskT ", chat:%" PRPermMaskT ")"
+				, teulIndex(), playerID(), callsign(), permissionMask(), m_playerMask, m_permissions->m_permissionMask);
 
 	g_chatSyncQueue.push_back(this);
 	m_needsChatSync = true;
@@ -1776,19 +1776,15 @@ mapCreatePlayer(SINT32 teulIndex, PlayerStatusNode* psn, const Server::PersonaXf
 		case Server::Transfer::XferReason::Login:
 			assert( psn != nullptr );
 			return _playerLoggingIn(teulIndex, playerID, *psn, xfer);
-		break;
 
 		case Server::Transfer::XferReason::Reassign:
 			LogAbort("--- player logging in with PXR-TRANSFER; wtf oliver ---");
-		break;
 
 		case Server::Transfer::XferReason::Exit:
 			return _playerExiting(teulIndex, playerID, xfer);
-		break;
 
 		default:
 			throw std::invalid_argument("unhandled xfer reason");
-		break;
 		}
 	}
 	catch (std::exception& e)
@@ -2050,7 +2046,7 @@ _sendHCUnitMovements(Player* const player)
 	if ( player->m_lastHCUpdate >= lastBrigadeMovement )
 		return true;
 
-	betaLog(_FLD, "t:%d p:%u c:%s movements %llu->%llu", player->teulIndex(), player->playerID(), player->callsign(), player->m_lastHCUpdate, lastBrigadeMovement);
+	betaLog(_FLD, "t:%d p:%u c:%s movements %" PR64BitUT "->%" PR64BitUT "", player->teulIndex(), player->playerID(), player->callsign(), player->m_lastHCUpdate, lastBrigadeMovement);
 
 	static UINT64 _lastStart = 0;
 	static UINT64 _lastEnd = 0;
@@ -2066,7 +2062,7 @@ _sendHCUnitMovements(Player* const player)
 
 	if ( _packet.size() > 0 )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s updating with HCMovements %llu->%llu"
+		dbugLog(_FLD, "t:%d p:%u c:%s updating with HCMovements %" PR64BitUT "->%" PR64BitUT ""
 						, player->teulIndex()
 						, player->playerID()
 						, player->callsign()
@@ -2171,7 +2167,7 @@ Player::debug(const char* label, const char* mask, ...) const
 	vsnprintf(buf, sizeof(buf) - 1, mask, args);
 	va_end(args);
 
-	dbugLog(_FLD, "t:%d p:%u c:%s in:%llu %s: %s"
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%" PR64BitUT " %s: %s"
 				, teulIndex(), playerID(), callsign(), instance().id()
 				, label, buf);
 	chatSendLocalizedMessage(playerID(), LSTR_BETA, LSTR_LABELLED_GENERIC, label, buf);
@@ -2239,7 +2235,7 @@ _isEffectRepair(STRAT_DAMAGE_EFFECT effect)
 void
 Player::addStratHit(const MissionDamageEvent& mde)
 {
-    dbugLog(_FLD, "t:%d p:%u c:%s received MDE for target %lld type %d"
+    dbugLog(_FLD, "t:%d p:%u c:%s received MDE for target %" PR64BitT " type %d"
                     , teulIndex(), playerID(), callsign()
                     , mde.m_targetID
                     , mde.m_targetType

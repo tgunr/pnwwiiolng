@@ -138,7 +138,7 @@ public:
         spawnable = rhs.spawnable;
         restricted = rhs.restricted;
     }
-    
+
 public:
 	UINT16	capacity;				// Automatic resupply level
 	UINT16	current;				// Current actual level

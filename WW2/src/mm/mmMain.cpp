@@ -183,7 +183,7 @@ class PersonaMirrorTo : public Server::PersonaMirror
 			{
 				char servIP[64];
 				teulGetAddress(_destination->stats.address, servIP, sizeof(servIP));
-				dbugLog(_FLD, "p:%u c:%s otp:%u xfer:%llu sending mirror to %s: %s"
+				dbugLog(_FLD, "p:%u c:%s otp:%u xfer:%" PR64BitUT " sending mirror to %s: %s"
 								, dispatch().m_customerID
 								, dispatch().m_callsign
 								, dispatch().m_OTP
@@ -209,7 +209,7 @@ PersonaMirrorTo<CHAT_HOST>::onComplete(SINT32 resultCode) const
 	{
 		// Player has logged out.
 		if ( resultCode >= 0 )
-			dbugLog(_FLM, "p:%u c:%s xfer:%llu player logged out during transfer to chat"
+			dbugLog(_FLM, "p:%u c:%s xfer:%" PR64BitUT " player logged out during transfer to chat"
 							, dispatch().m_customerID
 							, dispatch().m_callsign
 							, m_xferID
@@ -217,7 +217,7 @@ PersonaMirrorTo<CHAT_HOST>::onComplete(SINT32 resultCode) const
 		return -EINVAL;
 	}
 
-	dbugLog(_FLD, "p:%u c:%s xfer:%llu mirror to chat complete, rc:%d"
+	dbugLog(_FLD, "p:%u c:%s xfer:%" PR64BitUT " mirror to chat complete, rc:%d"
 					, dispatch().m_customerID
 					, dispatch().m_callsign
 					, m_xferID
@@ -237,7 +237,7 @@ template<>
 SINT32
 PersonaMirrorTo<CELL_HOST>::onComplete(SINT32 resultCode) const
 {
-	dbugLog(_FLD, "p:%u c:%s xfer:%llu mirrored player to cell host", dispatch().m_customerID, dispatch().m_callsign, m_xferID);
+	dbugLog(_FLD, "p:%u c:%s xfer:%" PR64BitUT " mirrored player to cell host", dispatch().m_customerID, dispatch().m_callsign, m_xferID);
 	return -EINVAL;
 }
 
@@ -528,11 +528,11 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEU
 		Player* player = PlayerInterface::Lookup(teulIndex);
 		if ( player != nullptr )
 		{
-			dbugLog(_FLD, "t:%d p:%u c:%s clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+			dbugLog(_FLD, "t:%d p:%u c:%s clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 			chatSendTickSample(MAP_HOST, player->playerID(), data);
 		}
 		else
-			dbugLog(_FLW, "t:%d clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+			dbugLog(_FLW, "t:%d clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 	}
 	else
 	{
@@ -1236,7 +1236,7 @@ main(int argc, const char* argv[])
 	TeulTimeMS nextHousekeeping = teulClock64 + 1000;
 	Teul::housekeeper cpEventsHousekeeper(Strat::Events::Publish, 100);
 
-	while(TRUE)
+	while (1)
 	{
 		teulUpdateTransport(50);
 
@@ -1275,9 +1275,8 @@ main(int argc, const char* argv[])
 		}
 	}
 
-	_shutdown(0);
-
-	exit(0);
+	// if we make the loop above break
+//	_shutdown(0);
 }
 
 //////////////////////////////////////////////////////////////////////

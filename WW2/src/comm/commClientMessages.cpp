@@ -189,7 +189,7 @@ static SINT32 _recvWorldUpdate( ACTION_OBJECT* const a )
 	if(Online)
 	{
 #endif
-	dbugWrite(_FLW, "index: %d time: %llu", a->teulIndex, teulClock64);
+	dbugWrite(_FLW, "index: %d time: %" PR64BitUT "", a->teulIndex, teulClock64);
 	a->offset = commRecvWorldUpdateData(a->teulIndex, a->packed, a->offset, a->sizeInBytes());
 #ifdef MULTI_CLIENT
 	}
@@ -204,7 +204,7 @@ static SINT32 _recvHostVehicleHit( ACTION_OBJECT* const a )
 	vehProcessVehicleHit(hit);
 
 	// fill out the local vehicle data from this information.
-	dbugWrite(_FLA,"Vehicle Hit: from %d sent %llu numcomponentshit %zu\n"
+	dbugWrite(_FLA,"Vehicle Hit: from %d sent %" PR64BitUT " numcomponentshit %zu\n"
 				, hit.m_shooter, hit.m_timestamp, hit.m_components.size());
 
 	return a->offset;

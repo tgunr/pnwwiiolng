@@ -213,10 +213,10 @@ _pickInstance(wwiiPlayer* const player, Instance::Descriptor& request)
 	{
 	case Instance::_INVALID:
 		return Instance::g_invalid;
-	break;
+
 	case Instance::_CAMPAIGN:
 		return Instance::g_campaign;
-	break;
+
 	case Instance::_TUTORIAL:
 		request.m_type = player->side();
 	break;
@@ -236,18 +236,17 @@ _pickInstance(wwiiPlayer* const player, Instance::Descriptor& request)
 	{
 	case Instance::_TUTORIAL:
 		return _pickTutorialInstance(player, request, it);
-	break;
+
 	case Instance::_TRAINING:
 		return _pickTrainingInstance(player, request, it);
-	break;
+
 	case Instance::_SCENARIO:
 		return it->first;
-	break;
+
 	default:
-	break;
+		return _pickOtherInstance(player, request, it);
 	}
 
-	return _pickOtherInstance(player, request, it);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -271,7 +270,7 @@ SINT32 _recvInstanceSelect(ACTION_OBJECT* const a)
 	wwiiPlayer* const player = ServerInterface::LookupByTeulIndex(a->teulIndex);
 	if ( player != nullptr )
 	{
-		player->log(_FLD, "received instance request %u.%u.%llu.%llu"
+		player->log(_FLD, "received instance request %u.%u.%" PR64BitUT ".%" PR64BitUT ""
 					, request.category(), request.type(), request.handle(), request.id());
 		if ( request.category() == Instance::_INVALID )
 		{
@@ -325,12 +324,12 @@ SINT32 _recvInstanceCreate(ACTION_OBJECT* const a)
 	{
 		if ( request.id() != 0 )
 		{
-			player->log(_FLA, "received instance create request with non-zero id: %u.%u.%llu.>%llu<"
+			player->log(_FLA, "received instance create request with non-zero id: %u.%u.%" PR64BitUT ".>%" PR64BitUT "<"
 					, request.category(), request.type(), request.handle(), request.id());
 		}
 		else
 		{
-			player->log(_FLD, "received instance create request %u.%u.%llu.%llu"
+			player->log(_FLD, "received instance create request %u.%u.%" PR64BitUT ".%" PR64BitUT ""
 						, request.category(), request.type(), request.handle(), request.id());
 			request = _pickInstance(player, request);
 		}
@@ -378,7 +377,7 @@ Listing::populate(wwiiPlayer* const player, const ListingRequest& request)
 	if ( query.id() != 0LL )
 	{
 		m_result = _BAD_DESCRIPTOR;
-		dbugLog(_FLM, "t:%d p:%u c:%s invalid descriptor [%u.%u.%llu.>%llu<]"
+		dbugLog(_FLM, "t:%d p:%u c:%s invalid descriptor [%u.%u.%" PR64BitUT ".>%" PR64BitUT "<]"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, query.category(), query.type(), query.handle(), query.id());
 		return true;
@@ -465,7 +464,7 @@ RecordPopulations()
 	for ( auto it = g_hostInstanceUIDs.begin(); it != g_hostInstanceUIDs.end(); ++it )
 	{
 		Instance::HostInstance* instance = it->second;
-		dbugLog(_FLD, "rp:inst:%u.%u.%llu.%llu"
+		dbugLog(_FLD, "rp:inst:%u.%u.%" PR64BitUT ".%" PR64BitUT ""
 								, instance->descriptor().category()
 								, instance->descriptor().type()
 								, instance->descriptor().handle()
@@ -477,7 +476,7 @@ RecordPopulations()
 			const UINT32 count = instance->count(side);
 			if ( count != 0 || count != instance->m_lastRecorded[side] )
 			{
-				sprintf(entry, "(%u,%u,%llu,%llu,NOW(),%u,%u)"
+				sprintf(entry, "(%u,%u,%" PR64BitUT ",%" PR64BitUT ",NOW(),%u,%u)"
 								, instance->descriptor().category()
 								, instance->descriptor().type()
 								, instance->descriptor().handle()

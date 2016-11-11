@@ -707,7 +707,6 @@ Chat::SendModReport(const ChatHandle handle, const Chat::ModReport modType)
 		return;
 //		ban = _isBanable(handle);
 //		type = "injection";
-	break;
 	case Chat::ModDamned:
 		// Only ban detects one time in 5.
 		if ( ((rand() % 5) == 1 && host_config.arena.banCheats > 0) || _isBanable(handle) )
@@ -1790,14 +1789,14 @@ _getChannel(const ChannelID& id)
 	//If not, create it, and use it
 	if ( id.Type() == NUMBERED_CHANNEL )
 	{
-		sprintf(channelName, "%llu", id.SubID());
+		strprintf(channelName, "%" PR64BitUT "", id.SubID());
 		ChatHandle handle = chatGetHandle(channelName);
-		sprintf(channelName, "%llu", id.SubID());
+		strprintf(channelName, "%" PR64BitUT "", id.SubID());
 		return chatCreateChannel(id, channelName, handle);
 	}
 	else
 	{
-		sprintf(channelName, "Channel %llu.%u.%u.%llu", id.InstID(), id.Type(), id.Side(), id.SubID());
+		strprintf(channelName, "Channel %" PR64BitUT ".%u.%u.%" PR64BitUT "", id.InstID(), id.Type(), id.Side(), id.SubID());
 		return chatCreateChannel(id, channelName, 0ULL);
 	}
 }
@@ -1819,12 +1818,10 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle handleID)
 		case NO_CHANNEL:
 			detuneRadio(index);
 			return true;
-		break;
 
 		case PRIVATE_CHANNEL:
 		case NUMBERED_CHANNEL:
 			return tuneRadioToHandle(index, handleID);
-		break;
 
 		case SQUAD_CHANNEL:
 			if ( squadID() )
@@ -2043,7 +2040,7 @@ Player::tuneRadioToHandle(UCHAR index, const ChatHandle handleID)
 	Chat::Name chanName(chatGetLowercaseHandle(handleID));
 
 	if ( g_debugRadios )
-		dbugLog(_FLD, "t:%d p:%u c:%s tuning #%d to %s(%llx)"
+		dbugLog(_FLD, "t:%d p:%u c:%s tuning #%d to %s(%" PR64BitUT ")"
 						, teulIndex(), playerID(), callsign()
 						, index
 						, chanName.c_str(), handleID
@@ -2258,6 +2255,7 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 	// too late to fix it properly. For now, we're just going to ignore it.
 	return;
 
+#ifdef ENABLE_TICK_SAMPLES
 	static std::map<playerid_t, std::pair<UINT32, TeulDeltaMS>> reports;
 	auto it = reports.find(player.playerID());
 	const UINT32 lastReport = (it != reports.end()) ? it->second.first : 0;
@@ -2271,17 +2269,18 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 	char report[256];
 
 	strprintf(hostname, "%shost:%s", g_serverTypes[source], player.callsign());
-	strprintf(report, "Client clock anomaly: delta of %lldms (%s), drift %.6g", sample.delta, sample.delta < 0 ? "fast" : "slow", sample.ratio);
+	strprintf(report, "Client clock anomaly: delta of %" PR64BitT "ms (%s), drift %.6g", sample.delta, sample.delta < 0 ? "fast" : "slow", sample.ratio);
 	chatDispatchGMMessage(hostname, report);
 	reports[player.playerID()] = std::make_pair(teulTime(), sample.delta);
 
-	player.log(_FLW, "%s, host:%llu, client:%llu", report, sample.host_ms, sample.client_ms);
+	player.log(_FLW, "%s, host:%" PR64BitUT ", client:%" PR64BitUT "", report, sample.host_ms, sample.client_ms);
 
-	strprintf(report , "{\"src\":\"%s\",\"elapsed\":{\"host\":%llu,\"client\":%llu},\"delta\":%llu,\"ratio\",\"%0.8g\"}",
+	strprintf(report , "{\"src\":\"%s\",\"elapsed\":{\"host\":%" PR64BitUT ",\"client\":%" PR64BitUT "},\"delta\":%" PR64BitUT ",\"ratio\",\"%0.8g\"}",
 	          g_serverTypes[source],
 	          sample.host_ms, sample.client_ms,
 	          sample.delta, sample.ratio);
 	chatdbRecordEvent("HACK", player.callsign(), "speedhack", report, "");
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2300,7 +2299,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/, const
 			chatHandleTickSample(CHAT_HOST, *player, *sample);
 		}
 		else
-			dbugLog(_FLW, "t:%d clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+			dbugLog(_FLW, "t:%d clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 
 		return;
 	}
@@ -2404,7 +2403,7 @@ _managementErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*siz
 		Player* player = PlayerInterface::Lookup(teulIndex);
 		if ( player != nullptr )
 		{
-			dbugLog(_FLW, "t:%d p:%u c:%s clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+			dbugLog(_FLW, "t:%d p:%u c:%s clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 			chatHandleTickSample(CHAT_HOST, *player, *sample);
 		}
 	}
@@ -3378,7 +3377,6 @@ _ircNumericMessages(irc_session_t * session, unsigned int event, const char* ori
 		if ( count > 3 && strcmp(params[1], "=") == 0 )
 			_registerUsers(params[2], params[3]);
 		return;
-	break;
 
 	default:
 	break;
@@ -3493,7 +3491,7 @@ _runHost()
 		threadsLogging();
 
 		// Catch up on housekeeping.
-		while ( _houseKeeping() ) 
+		while ( _houseKeeping() )
 			;
 
 		chatSendMissionUpdates();

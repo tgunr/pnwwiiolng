@@ -129,22 +129,22 @@ PersonaSelection::_select(Player* const player)
 			dbugLog(_FLI, "t:%d p:%u c:%s loaded persona %d ctry:%d br:%d rk:%u er:%u prog:%u", player->teulIndex(), player->playerID(), player->callsign(), m_personaID, m_countryID, m_branchID, player->realRank(), player->effectiveRank(), player->progress());
 			player->checksum(m_checksum);
 			player->m_hasSelectedPersonaOnce = true;
-			return _sendResult(player->teulIndex(), PSS_SELECT, player->effectiveRank(), player->progress(), player->chatPermissions(), player->accountGoodUntil());
-		break;
+		return _sendResult(player->teulIndex(), PSS_SELECT, player->effectiveRank(), player->progress(), player->chatPermissions(), player->accountGoodUntil());
+
 		case PLS_LOCKED:
 			player->debug("Persona select refused", "side locked");
 			dbugLog(_FLN, "t:%d p:%u c:%s persona %d locked", player->teulIndex(), player->playerID(), player->callsign(), m_personaID);
-			return _sendResult(player->teulIndex(), PSS_PERSONA_LOCKED);
-		break;
+		return _sendResult(player->teulIndex(), PSS_PERSONA_LOCKED);
+
 		case PLS_MISSING:
 			player->debug("Persona select refused", "missing persona");
 			dbugLog(_FLW, "t:%d p:%u c:%s no such persona %d:%d/%d", player->teulIndex(), player->playerID(), player->callsign(), m_personaID, m_countryID, m_branchID);
-			return _sendResult(player->teulIndex(), PSS_MISSING);
-		break;
+		return _sendResult(player->teulIndex(), PSS_MISSING);
+
 		default:
 			player->debug("Persona select refused", "internal error");
 			dbugLog(_FLW, "t:%d p:%u c:%s unknown error %d loading persona", player->teulIndex(), player->playerID(), player->callsign(), pls);
-			return _sendResult(player->teulIndex(), PSS_ERROR);
+		return _sendResult(player->teulIndex(), PSS_ERROR);
 	}
 }
 
@@ -186,28 +186,26 @@ PersonaSelection::receive(SINT32 teulIndex)
 							, teulIndex, player->playerID(), player->callsign()
 							, m_status, m_personaID, m_countryID, m_branchID
 							);
-			return _create(player);
-		break;
+		return _create(player);
+
 		case PSS_SELECT:
 			dbugLog(_FLI, "t:%d p:%u c:%s persona selection request: st:%d, pid:%d, c:%d, b:%d"
 							, teulIndex, player->playerID(), player->callsign()
 							, m_status, m_personaID, m_countryID, m_branchID
 							);
-			return _select(player);
-		break;
+		return _select(player);
+
 		case PSS_DELETE:
 			dbugLog(_FLI, "t:%d p:%u c:%s persona delete request: st:%d, pid:%d, c:%d, b:%d"
 							, teulIndex, player->playerID(), player->callsign()
 							, m_status, m_personaID, m_countryID, m_branchID
 							);
-			return _delete(player);
-		break;
+		return _delete(player);
+
 		default:
 			dbugLog(_FLW, "t:%d p:%u c:%s invalid request type: %d", teulIndex, player->playerID(), player->callsign(), m_status);
-			return _sendResult(teulIndex, PSS_ERROR);
+		return _sendResult(teulIndex, PSS_ERROR);
 	}
-
-	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -360,19 +358,17 @@ BrigadeSelection::receive(SINT32 teulIndex)
 	{
 		case BRIG_DETAIL:
 			return _query(player, brigade);
-		break;
+
 
 		case BRIG_SELECT:
 			return _select(player, brigade);
-		break;
+
 
 		default:
 			dbugLog(_FLW, "t:%d p:%u c:%s invalid selection.m_status: %d"
 							, teulIndex, player->playerID(), player->callsign(), m_status);
-		return _sendResult(teulIndex, BRIG_ERROR);
+			return _sendResult(teulIndex, BRIG_ERROR);
 	}
-
-	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -497,7 +493,7 @@ MissionList::receive(SINT32 teulIndex) {
 		std::multimap<int, const Mission*> missions;
 		UINT32 highestCount = 0;
 
-		auto add_missions = 
+		auto add_missions =
 		[&] (WWII_COUNTRY country, BRANCH_ENUM branch) {
 			for ( BRIGADES::const_iterator brig = g_brigades[country][branch].begin();
 			      brig != g_brigades[(size_t)country][(size_t)branch].end() ; ++brig ) {

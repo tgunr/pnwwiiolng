@@ -1272,7 +1272,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 curTestLevel)
 				{
 					if ( building->type == BUILDING_AUTOGUNNER )
 					{
-						dbugLog(_FLI, "found autogunner %s " PRF_FULL_OBJ_ID " subtype %d rebuild period %d, totRPS %d RPS/dlevel %d max djoules %lld"
+						dbugLog(_FLI, "found autogunner %s " PRF_FULL_OBJ_ID " subtype %d rebuild period %d, totRPS %d RPS/dlevel %d max djoules %" PR64BitT ""
 									, building->name
 									, PRA_FULL_OBJ_ID(building->fullObjID)
 									, building->subType
@@ -1750,7 +1750,7 @@ bool strtInitLinkfromWOR(LinkStruct& link)
 
 	DEPOT_LINK_PARAMS* linkParams;
 	static const std::string linkRail("RAIL_LINK"), linkBarge("BARGE_LINK"), linkConvoy("CONVOY_LINK"),
-						linkPackAnimal("PACK_ANIMAL_LINK"), linkWagon("WAGON_LINK"), linkPorter("PORTER_LINK"), 
+						linkPackAnimal("PACK_ANIMAL_LINK"), linkWagon("WAGON_LINK"), linkPorter("PORTER_LINK"),
 						linkTruck("TRUCK_LINK");
 	switch (link.startDepot->subType)
 	{

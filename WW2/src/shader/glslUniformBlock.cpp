@@ -65,7 +65,7 @@ Function: glslUniformBlock::glslUniformBlock()
 Description:
 -------------------------------------------------------------------------------------*/
 glslUniformBlock::glslUniformBlock() :
-    _numElements(0), 
+    _numElements(0),
     _ubo(0),
     _dirty(false),
     _base(-1)
@@ -77,7 +77,7 @@ Function: glslUniformBlock::glslUniformBlock()
 Description:
 -------------------------------------------------------------------------------------*/
 glslUniformBlock::glslUniformBlock(const std::string& name) :
-    _numElements(0), 
+    _numElements(0),
     _ubo(0),
     _dirty(false),
     _base(-1)

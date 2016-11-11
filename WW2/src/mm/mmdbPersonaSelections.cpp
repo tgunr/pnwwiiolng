@@ -51,7 +51,7 @@ _grabPersonas(_BRIGADE_PERSONAS& personas)
 	// Do this early to allow the main thread the chance to skip
 	// some locking
 	std::lock_guard<std::mutex> lock(_mutex);
-	
+
 	for ( auto it = _selections.begin(); it != _selections.end(); ++it )
 	{
 		personas[it->second].insert(it->first);

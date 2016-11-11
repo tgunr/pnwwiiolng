@@ -363,7 +363,7 @@ bool jsContent::GetData(const char* path, jsContentData* data, bool match)
                         // change [NL] into newlines
                         static const std::wstring newline(L"\n");
                         std::wstring nl_replaced = RENS::regex_replace(matches.str(2), nlre, newline);
-                        
+
                         data->AddLoc(UTF8(matches.str(1).c_str()), nl_replaced.c_str());
 					}
 				}

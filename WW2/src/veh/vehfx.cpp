@@ -1991,7 +1991,7 @@ LOGICAL _CreateExhaust(FXVEHCONTAINER* lpCon, SINT32 iEngine, SINT32 iSide)
 LOGICAL _CreateSmokeStack(FXVEHCONTAINER* lpCon, SINT32 iEngine, SINT32 iSide)
 {
 #if(0)
-    
+
     // TBD - smoke stack
     OBJECT* lpObj = nullptr;
 
