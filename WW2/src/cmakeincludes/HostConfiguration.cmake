@@ -16,7 +16,7 @@ IF ( MSVC )
     ADD_COMPILE_OPTIONS(
         "/Zi" "/Zc:wchar_t" "/Zc:forScope" "/EHsc" "/fp:precise"
         "/WX-" "/FR" "/wd4480" "/wd4800"
-        "/nologo" "/Gm"
+        "/nologo"
     )
 	IF ( CMAKE_BUILD_TYPE STREQUAL Debug )
 		ADD_COMPILE_OPTIONS( "/MTd" )
