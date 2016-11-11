@@ -17,7 +17,7 @@
 
 using _POLLS = std::map<UINT32,OpinionPoll>;
 static _POLLS polls;
-static UINT32 g_maxPoll = 0;
+static size_t g_maxPoll = 0;
 static std::mutex _pollsLock;
 
 //////////////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ public:
 			}
 		}
 
-		dbugLog(_FLD, "%u polls, highest %u", polls.size(), g_maxPoll);
+		dbugLog(_FLD, "%" PRSizeT " polls, highest %" PRSizeT "", polls.size(), g_maxPoll);
 	}
 };
 

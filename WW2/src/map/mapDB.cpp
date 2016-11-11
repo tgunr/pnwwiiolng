@@ -1311,7 +1311,7 @@ protected:
 			bdu.m_owner = chatGetHandle(ownerHandle);
 		}
 
-		dbugLog(_FLD, "received %u brigade detail updates", numRows);
+		dbugLog(_FLD, "received %" PRSizeT " brigade detail updates", numRows);
 
 		return true;
 	}
