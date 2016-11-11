@@ -330,25 +330,23 @@ _checkConnectTCP(ENDPOINT& endpoint)
 	}
 #endif
 }
-static SINT32
+
+static void
 _acceptConnectTCP(ENDPOINT& endpoint)
 {
-	SOCKET			newSock = INVALID_SOCKET;
-	ENDPOINT*		newEndpoint;
 	u_long argp = 1;
-	//int dval;
 
 	dbugLog(_FLD, "t:%d entered _acceptConnectTCP, time:%" PR64BitUT "", endpoint.teulIndex(), teulClock64);
 	// Multiple simultaneous incoming connections may only generate a single "event", so while we
 	// are here, we should try and drain any/all incoming connections queued up (hence the loop).
-	do
+	for ( ; ; )
 	{
 		socklen_t len = SockAddrLen;
-		newSock = accept(endpoint.socket, (struct sockaddr*) &endpoint.fromSockAddress, &len);
+		SOCKET newSock = accept(endpoint.socket, (struct sockaddr*) &endpoint.fromSockAddress, &len);
 		if ( newSock == INVALID_SOCKET )
 		{
 			// Nothing to accept, we've drained the socket of incoming connections.
-			return 0;
+			return;
 		}
 
 		// set socket to non-blocking.
@@ -360,15 +358,14 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 			continue;
 		}
 
-		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " accepting connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
+		dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " accepting connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
 
-		newEndpoint = teulCreateEndpoint(Teul::AnyIndex, false, endpoint.timeout, (PROTOCOL)endpoint.protocol);
+		ENDPOINT* newEndpoint = teulCreateEndpoint(false, endpoint.timeout, (PROTOCOL)endpoint.protocol);
 		if ( PN_UNLIKELY(newEndpoint == nullptr) )
 		{
-			dbugLog(_FLA,"couldnt allocate new endpoint for accept!");
 			shutdown(newSock, 0x02);
 			closesocket(newSock);
-			return -ENOSPC;
+			continue;
 		}
 
 		newEndpoint->setConnected();
@@ -413,10 +410,6 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 //			teulModReadSet();
 		teulMRecvAddToPoll(*newEndpoint);
 	}
-	while (newSock != INVALID_SOCKET);
-
-	return 0;
-
 }
 
 static SINT32

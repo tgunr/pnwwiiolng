@@ -698,9 +698,8 @@ bool verifyAuthConnected()
 
 			// try restarting
 			_authConnection = teulOpenSend(_authHost, _authPort, _authOpened, CONNECT_TIMEOUT, PROTOCOL_TCP, _authErrorFn);
-			if (_authConnection > 0)
+			if (_authConnection >= 0)
 			{
-
 				// Connection attempt is at least in progress, check and see if its open yet
 				endPoint = teulGetEndpoint(_authConnection);
 				if (endPoint != nullptr && (endPoint->state() == IS_OPEN || endPoint->state() == IS_LISTENING))
