@@ -1474,7 +1474,7 @@ hostAddVehicleToBroadcast(HostVehicle* vehicle, VEHICLE_UPDATE_HEADER* vh)
 	SINT32 offset = updtPackVehicleBroadcast(TEUL_PACK, buffer, 0, &vehHold, 0);
 	if ( offset < 0 )
 	{
-		threadLog(_FLA, "updtPackVehicleBroadcast failed: %d", offset);
+		dbugLog(_FLA, "updtPackVehicleBroadcast failed: %d", offset);
 		return false;
 	}
 
@@ -1821,7 +1821,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 
 			if ( (!reportedLagging) & (vehicle->m_nextUpdateClock < lowend) )
 			{
-				threadLog(_FLA, "c:%s v:%u*** LAGGING BEHIND UPDATES: wanted update %" PR64BitUT "ms ago"
+				dbugLog(_FLA, "c:%s v:%u*** LAGGING BEHIND UPDATES: wanted update %" PR64BitUT "ms ago"
 								, vehicle->callsign(), vehicle->index, teulClock64 - vehicle->m_nextUpdateClock);
 				reportedLagging = true;
 			}
@@ -2257,7 +2257,6 @@ _runHost()
 		// us to consume. Write upto 64 log entries.
 		TIMER_START
 		threadsCallNextCallback();
-		threadsLogging();
 		TIMER_STOP("threads");
 
 		TIMER_START
@@ -3011,7 +3010,7 @@ main(const int argc, const char* argv[])
 	if ( !teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, _personaErrorFunction) )
 		LogAbort("Unable to open tcp listen port %u", WWII::Net::Ports::CellHost);
 
-	sprintf(hostname, "cell%u", Server::localHost & 255);
+	strprintf(hostname, "cell%u", Server::localHost & 255);
 
 	const UINT32 updateNet = cv_baseUpdtAddress.GetUint32();
 	if (Server::IsBroadcastViaController())
@@ -3096,7 +3095,6 @@ main(const int argc, const char* argv[])
 		if (g_hostTerminating)
 			return 0;
 		teulUpdateTransport(50);
-		threadsLogging();
 	}
 
 	if ( !g_accepting && !g_serverReserved )
@@ -3106,10 +3104,7 @@ main(const int argc, const char* argv[])
 	for ( UINT32 i = 0; i < 100; ++i )
 	{
 		teulUpdateTransport(10);
-		threadsLogging();
 	}
-
-	threadsLogging();
 
 	if (g_hostTerminating)
 		return 0;

@@ -28,10 +28,6 @@ extern void threadsEnable();
 // Bring the threads into sync and shut them down
 extern void threadsShutdown();
 
-// Threads can't write to dbugLog directly, so periodically
-// the main process has to log for them
-extern bool threadsLogging();
-
 // Process the next callback on the queue
 extern void threadsCallNextCallback();
 
@@ -43,15 +39,6 @@ extern void threadsCloseDBConnection(DB::handle_t* conn);
 
 //////////////////////////////////////////////////////////////////////
 // Client calls ("thread")
-
-// Threaded implementation of dbugLog (non-immediate)
-extern void threadLog(const char* file, unsigned int line, unsigned int level, const char* fmt, ...);
-
-#ifdef BETA_RELEASE
-#define betaThreadLog(...) threadLog(__VA_ARGS__)
-#else
-#define betaThreadLog(...)
-#endif
 
 // Add a callback to the thread queue
 extern void threadCallback(THREAD_CALLBACK fn, void*);

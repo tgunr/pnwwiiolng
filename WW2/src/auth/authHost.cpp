@@ -856,7 +856,6 @@ _runHost()
 #endif // USE_LOGIN_QUEUES
 
 		threadsCallNextCallback();
-		threadsLogging();
 	}
 }
 

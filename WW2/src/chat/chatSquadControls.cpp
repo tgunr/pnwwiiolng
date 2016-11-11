@@ -192,8 +192,8 @@ _checkSquadName(std::string& name)
 static void
 _checkHomepageURL(std::string& url)
 {
-   if ( url.length() == 0 )
-        return;
+	if ( url.length() == 0 )
+		return;
 
 	std::string protocol = "http://";
 	size_t dot = url.find(".");

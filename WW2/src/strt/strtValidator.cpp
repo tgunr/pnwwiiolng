@@ -17,6 +17,7 @@ main(int argc, char** argv)
 {
 	Teul::SetAppName(argv[0]);
 	Teul::ConfigVar::InitializeConfigVars();
+	Teul::InitializeWinsock();
 
 	int level = 1;
 

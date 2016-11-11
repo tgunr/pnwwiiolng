@@ -26,7 +26,6 @@
 #include "map/mapSwingMeter.h"
 #include "miss/mission.h"
 #include "miss/missHitArrayNode.h"
-#include "mm/mmAntiAddiction.h"
 #include "mm/mmQueries.h"
 #include "sdm/sdmConfigVars.h"
 #include "server/serverServerInfo.h"
@@ -457,7 +456,7 @@ Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM bra
 		SetSquad(row.NextUInt());									// 8
 		SetSquadHandle(chatGetHandle(row.NextString()));			// 9
 
-		UINT32 playedTime = row.NextUInt();							//10
+		row.NextUInt();	 // playedTime								//10
 		UINT32 newMinuteBalance = row.NextUInt();					//11
 
 		SetRank(myRankNo);
@@ -467,11 +466,6 @@ Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM bra
 			dbugLog(_FLD, "t:%d p:%u c:%s persona has ALL_SPAWN", teulIndex(), playerID(), callsign());
 		if ( m_playerMask & ALL_SPAWN )
 			dbugLog(_FLD, "t:%d p:%u c:%s player has ALL_SPAWN", teulIndex(), playerID(), callsign());
-
-		if ( nullptr == m_antiAddiction && !permissions(IS_MATURE) )
-		{
-			mmAddMinor(this, playedTime);
-		}
 
 		// Now you need to select a brigade
 		SetState(PERS_SELECTING_BRIGADE);
@@ -600,7 +594,7 @@ bool mapFillPersonaData(Player* const player)
 		teulSyncClock();
 #endif
 
-		threadLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%" PRPermMaskT " tr:%u took %" PR64BitUT "ms"
+		dbugLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%" PRPermMaskT " tr:%u took %" PR64BitUT "ms"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, player->personaID(), newRank, player->realRank(), player->points(), player->useRank().permissions()
 						, player->minuteBalance()
@@ -1317,7 +1311,7 @@ protected:
 			bdu.m_owner = chatGetHandle(ownerHandle);
 		}
 
-		threadLog(_FLD, "received %u brigade detail updates", numRows);
+		dbugLog(_FLD, "received %u brigade detail updates", numRows);
 
 		return true;
 	}

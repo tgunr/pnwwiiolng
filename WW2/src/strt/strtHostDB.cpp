@@ -589,6 +589,8 @@ strtdbReadVehicleAccess()
 bool
 strtInitHostDB()
 {
+	dbugLog(_FLI, "Initializing strtHostDB");
+
 	memset(&objQueue,0,sizeof(objQueue));
 	objQueue.name = "Object";
 	memset(&weaponQueue,0,sizeof(weaponQueue));
@@ -1019,7 +1021,6 @@ strtdbRestoreTOESupplies()
 			if ( wit->second.weapon().isSupplied() )
 				wit->second.saveText(len, buffer);
 		}
-		threadsLogging();
 	}
 
 	if ( len > 0 )

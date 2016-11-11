@@ -1648,7 +1648,13 @@ _controllerConnect(ENDPOINT& endpoint)
 	intro.m_token = s_controllerToken;
 
 	auto result = endpoint.writeRaw((const char*)&intro, sizeof(intro));
-	ABORT_IF(result != sizeof(intro));
+	if ( result < 0 ) {
+		if ( errno == ECONNREFUSED )
+			LogAbort("Connection to controller refused.");
+		else
+			LogAbort("Unable to greet controller");
+	}
+	ABORT_IF_EX(result != sizeof(intro), "Failed to write intro to controller: %dv%" PRSizeT "", result, sizeof(intro));
 }
 
 static void

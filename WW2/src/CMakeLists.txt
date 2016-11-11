@@ -117,6 +117,16 @@ OPTION( PN_DIFFERENT_PORTS	"Use different public-facing ports for game servers."
 # Disable building and use of auth host (for cluster-on-a-box/controller testing)
 OPTION( PN_DISABLE_AUTH     "Build without use of/support for auth" OFF )
 
+# If the user is building a Debug build, enable SANITIZE options.
+IF ( NOT MSVC )
+	IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+		OPTION( PN_SANITIZE "Enable -fsanitize=address, -fsanitize=undefined and -fstack-protector-all" OFF )
+	ELSE()
+		SET( PN_SANITIZE OFF CACHE BOOL "Enables address sanitizer etc on non-msvc builds" FORCE )
+		MARK_AS_ADVANCED( PN_SANITIZE )
+	ENDIF()
+ENDIF()
+
 ####################################
 ## Provide platform and server defines
 IF(WIN32)
@@ -263,7 +273,17 @@ ADD_LIBRARY( wwiilib STATIC
 	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
-SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
+SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES})
+IF (BUILDING_OWN_LIBXML2)
+	MACRO( USE_WWIILIB_ON Name )
+		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} )
+		ADD_DEPENDENCIES( ${Name} libxml2 )
+	ENDMACRO()
+ELSE()
+	MACRO( USE_WWIILIB_ON Name)
+		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} )
+	ENDMACRO()
+ENDIF()
 
 ####################################
 ## Various commandline utility executables
@@ -275,7 +295,8 @@ IF ( NOT MSVC )
         chat/chatManagementClientMessages.cpp chat/chatManagementClientMessages.h
         chat/chatManagementPack.cpp chat/chatRoster.cpp chat/chatRosterClient.cpp
     )
-    TARGET_LINK_LIBRARIES( chatClient ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
+	USE_WWIILIB_ON( chatClient )
+    TARGET_LINK_LIBRARIES( chatClient teulserver ${MYSQL_LIBRARIES} )
     SET_PROPERTY( TARGET chatClient PROPERTY FOLDER "Tools" )
     
     ADD_EXECUTABLE( luaClient src/luaClient.cpp )
@@ -283,8 +304,9 @@ IF ( NOT MSVC )
         PRIVATE ${READLINE_INCLUDE_DIRS}
         PRIVATE ${NCURSES_INCLUDE_DIRS}
     )
+	USE_WWIILIB_ON( luaClient )
     TARGET_LINK_LIBRARIES( luaClient
-        ${WWIILIB_LIBRARIES} teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
+        teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
     )
     SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
 
@@ -296,14 +318,77 @@ IF ( NOT MSVC )
         COMPONENT cmdclients
     )
 
-    # Not currently generated:
-    #  checkGameName: Check callsign validity, not all that useful
-    #  sdmpp: Prunes terrain files lacking strat data, pretty unhelpful currently
-    #  sdmDump: Analyzes terrain files, not helpful without terrain work happening
-    #  stratLoader: Partially loads terrain into the database, which hosts do anyway
-    #  stratValidator: Uses server routines to validate SDM/WOR data, terrain terrain terrain, sigh
-    # See git revision history for build commands.
+ENDIF()
 
+IF ( MSVC )
+	# kfsone: I'm currently using these because they're helpful for cluster-in-a-box,
+
+	# Not currently generated:
+	#  checkGameName: Check callsign validity, not all that useful
+	#  sdmpp: Prunes terrain files lacking strat data, pretty unhelpful currently
+	#  sdmDump: Analyzes terrain files, not helpful without terrain work happening
+	#  stratLoader: Partially loads terrain into the database, which hosts do anyway
+	#  stratValidator: Uses server routines to validate SDM/WOR data, terrain terrain terrain, sigh
+	# See git revision history for build commands.
+
+	# In theory, SDM pre-parser. In practice? Deletes SDM files that don't
+	# contain any strat data.
+	# Not part of stratValidator because the original coders couldn't figure
+	# out why it leaked so much memory.
+	ADD_EXECUTABLE(sdmpp
+		sdm/sdmpp.cpp
+			sdm/sdmpp.h
+
+		sdm/sdmConfigVars.h
+	)
+	TARGET_LINK_LIBRARIES(sdmpp teulserver ${MYSQL_LIBRARIES})
+	USE_WWIILIB_ON(sdmpp)
+	SET_PROPERTY(TARGET sdmpp PROPERTY FOLDER "Tools")
+
+	# Reads SDM files and imports portions of them into the game database.
+	# Which is a shame, because the hosts wind up reading the SDM files too
+	# to get the missing data. *Sigh*
+	ADD_EXECUTABLE(stratLoader
+		src/loader.cpp
+		sdm/sdmLoad.cpp
+			sdm/sdmLoad.h
+			sdm/sdmParse.h
+	)
+	TARGET_LINK_LIBRARIES(stratLoader teulserver ${MYSQL_LIBRARIES})
+	USE_WWIILIB_ON(stratLoader)
+	SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
+
+	ADD_EXECUTABLE(stratValidator
+		parse/parseWor.cpp
+			parse/parseWor.h
+				parse/parseIO.h
+				strt/strtWOR.h
+					parse/parse.h
+					strt/strtDTL.h
+		strt/strtCPStruct.cpp
+			strt/strtCPStruct.h
+				strt/strtProtos.h
+				wwii/wwiiHCUnits.h
+				strt/strtCPFlags.h
+				inst/instDescriptor.h
+					mm/mmEnums.h
+		strt/strtData.cpp
+			strt/strtData.h
+			wwii/wwiiConfigVars.h
+				teul/teulConfigVar.h
+		strt/strtFacilityStruct.cpp
+			strt/strtFacilityStruct.h
+		strt/strtObjectStruct.cpp
+			strt/strtObjectStruct.h
+		strt/strtIO.cpp
+			strt/strtIO.h
+		strt/strtValidator.cpp
+		${PCH_INCLUDE_HEADERS}
+	)
+	SET_PROPERTY(TARGET stratValidator PROPERTY COMPILE_DEFINITIONS CHECK_SUPPLY=1)
+	USE_WWIILIB_ON(stratValidator)
+	TARGET_LINK_LIBRARIES(stratValidator teulserver ${MYSQL_LIBRARIES})
+	SET_PROPERTY(TARGET stratValidator PROPERTY FOLDER "Tools")
 ENDIF()
 
 ####################################
@@ -325,11 +410,14 @@ MACRO( ADD_HOST_TARGET Name )
     IF ( HOST_TARGET_ARG_LUA )
         TARGET_LINK_LIBRARIES( "${Name}" ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
     ENDIF()
-    TARGET_LINK_LIBRARIES( "${Name}" ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
+	USE_WWIILIB_ON( "${Name}" )
+    TARGET_LINK_LIBRARIES( "${Name}" teulserver ${MYSQL_LIBRARIES} )
     IF ( NOT "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" STREQUAL "" )
         SET_PROPERTY( TARGET "${Name}" PROPERTY COMPILE_DEFINITIONS "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" )
     ENDIF()
     SET_PROPERTY( TARGET "${Name}" PROPERTY FOLDER "Hosts" )
+	TARGET_COMPILE_OPTIONS( "${Name}" PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
+	TARGET_LINK_LIBRARIES( "${Name}" ${_EXTRA_HOST_LINK_OPTIONS} )
 ENDMACRO( ADD_HOST_TARGET )
 
 ####################################
@@ -531,7 +619,6 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     miss/missionHostMessages.cpp miss/missionHostMessages.h
     miss/missionPack.cpp miss/missionPack.h
     miss/missMobileSpawn.cpp miss/missMobileSpawn.h include/mobileSpawnEnums.h
-    mm/mmAntiAddiction.cpp mm/mmAntiAddiction.h wwii/wwiiAntiAddiction.h
     mm/mmHostInstanceImpl.cpp mm/mmHostInstanceImpl.h
     inst/instHostInstanceImpl.h inst/instHostInstance.h inst/instBasicStatus.h
     host/hostPlayers.h inst/instStateEnums.h
@@ -600,7 +687,7 @@ ADD_CUSTOM_COMMAND(
     MAIN_DEPENDENCY hostproj/${STRAT_HOST_EXE}.pkg
     DEPENDS
         ${TOLUAPP_EXECUTABLE} ${TOLUAPP_LIBRARIES}
-        hostproj/syscfg.h hostproj/${STRAT_HOST_EXE}.pkg
+        hostproj/syscfg.h hostproj/${STRAT_HOST_EXE}.pkg include/luaPkg.h
         include/platforms.h include/systypes.h include/luaGlue.h include/precompile_includes.h
         wwii/wwiiThreads.h wwii/wwiiOwnershipEnums.h inst/instBasicStatus.h wwii/wwiiConfig.h
         chat/chatHandle.h weap/weapSpec.h
@@ -703,7 +790,8 @@ INSTALL( DIRECTORY hostproj/web/ DESTINATION web COMPONENT web PATTERN ".git" EX
 # Auth connection test
 IF ( NOT PN_DISABLE_AUTH )
 	ADD_EXECUTABLE( testAuthConnect tests/testAuthConnect.cpp )
-	TARGET_LINK_LIBRARIES( testAuthConnect ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
+	USE_WWIILIB_ON( testAuthConnect )
+	TARGET_LINK_LIBRARIES( testAuthConnect teulserver ${MYSQL_LIBRARIES} )
 	SET_PROPERTY( TARGET testAuthConnect PROPERTY FOLDER "Test" )
 ENDIF()
 
@@ -721,7 +809,10 @@ ADD_EXECUTABLE( testUnits
     tests/testSuite.h tests/testUnits.h
 )
 SET_PROPERTY( TARGET testUnits PROPERTY COMPILE_DEFINITIONS "ENABLE_TESTS" )
-TARGET_LINK_LIBRARIES( testUnits ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
+USE_WWIILIB_ON( testUnits )
+TARGET_COMPILE_OPTIONS( testUnits PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
+TARGET_LINK_LIBRARIES( testUnits ${_EXTRA_HOST_LINK_OPTIONS} )
+TARGET_LINK_LIBRARIES( testUnits teulserver ${MYSQL_LIBRARIES} )
 SET_PROPERTY( TARGET testUnits PROPERTY FOLDER "Test" )
 
 ADD_TEST( testUnits testUnits )
@@ -733,5 +824,8 @@ ADD_EXECUTABLE(testTeul
     wwii/wwiiCallbacks.h tests/testTeulTest.h tests/testTeulClient.h tests/testTeulServer.h
     teul/teulVersion.h teul/teulConnectionInstruction.h
 )
-TARGET_LINK_LIBRARIES( testTeul teulserver ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
+USE_WWIILIB_ON( testTeul )
+TARGET_COMPILE_OPTIONS( testTeul PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
+TARGET_LINK_LIBRARIES( testTeul ${_EXTRA_HOST_LINK_OPTIONS} )
+TARGET_LINK_LIBRARIES( testTeul teulserver ${MYSQL_LIBRARIES} )
 SET_PROPERTY( TARGET testTeul PROPERTY FOLDER "Test" )

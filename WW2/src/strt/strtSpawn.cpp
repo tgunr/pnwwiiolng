@@ -1472,8 +1472,9 @@ char _accessLevels[_NUM_ACCESS_LEVELS];
 void
 strtInitializeVehicleAccessLevels()
 {
-	WEAPON fakeWeapon;
+	dbugLog(_FLI, "Initializing vehicle access levels");
 
+	WEAPON fakeWeapon;
 	fakeWeapon.m_spec.wCountry = 1;
 
 	// For each access level, find the lowest rank

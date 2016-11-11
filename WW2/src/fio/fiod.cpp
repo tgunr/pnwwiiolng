@@ -944,11 +944,26 @@ const char sep = '/';
 #if platBuild == BUILD_SERVER
 #include "libxml/xmlIO.h"
 
-static int xmlinputmatch(const char* filename) { return 1; }
+struct Context
+{
+	Context(int fd) : m_fd(fd) {}
+	int m_fd;
+};
 
 void fioXmlRegisterInputCallbacks()
 {
-	xmlRegisterInputCallbacks(xmlinputmatch, (xmlInputOpenCallback)fiodOpen, (xmlInputReadCallback)fiodRead, (xmlInputCloseCallback)fiodClose);
+	xmlRegisterInputCallbacks(
+		// input match: always report willing to serve.
+		[](const char* filename) { return 1; },
+		// xmlInputOpenCallback: returns an opaque handle disguised as a void*
+		/// HACK: fiodOpen returns -1 on error, libxml expects a 0 for error.
+		/// so I'm bumping the file descriptor by one for all operations here.
+		[](const char* filename) -> void* { int fd = fiodOpen(filename); return fd == -1 ? nullptr : new Context(fd); },
+		// xmlInputReadCallback: passed the handle, buffer and len
+		[](void* ctx, char* buffer, int len) -> int { return ctx ? fiodRead(static_cast<Context*>(ctx)->m_fd, buffer, len) : -1; },
+		// xmlInputCloseCallback: close file
+		[](void* ctx) { fiodClose(static_cast<Context*>(ctx)->m_fd); delete static_cast<Context*>(ctx); return 0; }
+	);
 }
 #endif
 

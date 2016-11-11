@@ -102,7 +102,7 @@ static void	_personaErrorFunction (SINT32 teulIndex, const UCHAR* const data, SI
 
 static void _cnvyErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {
-	dbugLog(_FLA,"cnvyErrorFunction: index %d code %d\n\n",teulIndex, error);
+	dbugLog(_FLA, "cnvyErrorFunction: index %d code %d\n\n",teulIndex, error);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -169,8 +169,6 @@ static void _describeBuildConfigurationToLogFile()
 #if defined(PUBLIC_RELEASE)
 	dbugLog(_FLI, " PUBLIC_RELEASE");
 #endif
-
-	dbugLog(_FLI, ".");
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -398,8 +396,6 @@ _housekeeping()
 {
 	TeulTimeMS nextHouseKeep = teulClock64 + 25;
 
-	threadsLogging();
-
 	if ( !strtIsStratInitialized() )
 		return nextHouseKeep;
 
@@ -539,9 +535,25 @@ const char* g_serverName = "stratd";
 int
 main(int argc, const char* argv[])
 {
-	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {});
-	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
-	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	// static? because we're main and we don't need to waste stack space on these,
+	// but they also don't need to be visible outside of our scope.
+	static std::vector<std::string> s_luaCmds;
+	static bool s_initOnly = false;
+	static bool s_debug = false;
+
+	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {
+		{ "--lua-cmd", "Execute lua code after initializing.", true,
+			[](const char* code) { s_luaCmds.emplace_back(code); } },
+		{ "--init-only", "Terminate after loading strat data.", false, [](const char*) { s_initOnly = true; } },
+		{ "--debug", "Enable verbose + console logging", false, [](const char*) { s_debug = true; } }
+	});
+	if ( !s_debug ) {
+		dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+		dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	} else {
+		dbugSetLogLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
+		dbugSetWriteLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
+	}
 
 	HostLanguage = cv_stratLanguage.GetString();
 
@@ -550,9 +562,6 @@ main(int argc, const char* argv[])
 	threadsSetup();
 
 	teulSyncClock();
-
-	wwiiIRCInitialize(Server::localHost);
-	wwiiIRCActivate(true);
 
 	Lua::Start("stratd");
 
@@ -564,12 +573,38 @@ main(int argc, const char* argv[])
 		LogAbort("Couldn't initialize database");
 	}
 
+	//Initializes the convoy system
+	cnvyInit();
+
+	// Initialize the strat objective limits
+	g_objectiveStats.calculate();
+
+	teulSyncClock();
+
+	strtInitializeStratSystem();
+
+	if ( s_luaCmds.empty() == false ) {
+		for ( auto&& code : s_luaCmds ) {
+			dbugLog(_FLM | STD_ERR, "executing %s", code.c_str());
+			Lua::RunObject("--lua-cmd", code);
+			auto results = Lua::Results();
+			for ( auto&& line : results ) {
+				printf("lua: %s\n", line.c_str());
+			}
+		}
+	}
+
+	if ( s_initOnly ) {
+		dbugLog(_FLA | STD_ERR, "exiting after initialization (--init-only)");
+		return 0;
+	}
+
+	wwiiIRCInitialize(Server::localHost);
+	wwiiIRCActivate(true);
+
 	StatsThread statsThread;
 	statsThread.start();
 	threadsEnable();
-
-	//Initializes the convoy system
-	cnvyInit();
 
 	dbugLog(_FLN,"opening broadcast ports");
 	serverOpenBroadcastIndexes();
@@ -596,16 +631,6 @@ main(int argc, const char* argv[])
 	const SINT32 mapConnection = teulOpenListenHost(Server::broadcastHost, WWII::Net::Ports::InternalStrat, _acceptMapConnection, 200000, PROTOCOL_TCP, _mapErrorFunction);
 	dbugLog(_FLN,"Listening for map connections on port %d", WWII::Net::Ports::InternalStrat);
 
-	// Give the chat host 20 seconds to start
-	teulSyncClock();
-	TeulTimeMS cutoff = teulClock64 + 30000;
-	dbugLog(_FLI, "Waiting for chat server");
-	for (; teulClock64 < cutoff && serverPeeringWithType(CHAT_HOST) == false; )
-	{
-		teulUpdateTransport(50);
-		threadsLogging();
-	}
-
 #ifdef DEBUG
 	dbugLog(_FLN,"Beginning strat processing");
 #endif
@@ -618,22 +643,6 @@ main(int argc, const char* argv[])
 
 	ABORT_IF(chatInstallStratSupportCallbacks() < 0);
 
-	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_STARTING);
-	for ( UINT32 i = 0; i < 10; ++i )
-	{
-		teulUpdateTransport(20);
-		threadsLogging();
-	}
-
-	// Initialize the strat objective limits
-	g_objectiveStats.calculate();
-
-	teulSyncClock();
-
-	strtInitializeStratSystem();
-
-	threadsLogging();
-
 	signal(SIGINT, _strtSIGINT);
 
 	// Run the map-restoration hack for restarts.
@@ -644,10 +653,7 @@ main(int argc, const char* argv[])
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		LogAbort("bailing because intermission script failed.");
 	}
-	threadsLogging();
-
 	strtBroadcastConfigUpdate();
-	threadsLogging();
 
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
@@ -655,8 +661,6 @@ main(int argc, const char* argv[])
 	serverOpenLuaClientInterface();
 
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
-
-	threadsLogging();
 
 	TeulTimeMS tick100ms = 0;
 	bool runOnce = false;
@@ -702,8 +706,6 @@ main(int argc, const char* argv[])
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	teulCloseTransport();
-
-	threadsLogging();
 
 	strtCloseDB();
 	dbugLog(_FLN,"strat system shutting down");

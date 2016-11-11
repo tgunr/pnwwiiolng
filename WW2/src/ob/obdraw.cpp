@@ -1904,11 +1904,17 @@ void obdrawKill()
         _reflectionFBO = nullptr;
     }
 
-    while(_reflectionRTT->referenceCount() > 1)
-        _reflectionRTT->unref();
+	if (_reflectionRTT.valid())
+	{
+		while (_reflectionRTT->referenceCount() > 1)
+			_reflectionRTT->unref();
+	}
 
-    while(_surfaceRTT->referenceCount() > 1)
-        _surfaceRTT->unref();
+	if (_surfaceRTT.valid())
+	{
+		while (_surfaceRTT->referenceCount() > 1)
+			_surfaceRTT->unref();
+	}
 
     _surfaceRTT = nullptr;
     _reflectionRTT = nullptr;

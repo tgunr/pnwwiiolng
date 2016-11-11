@@ -70,15 +70,7 @@ using CPSET = std::set<CPStruct*>;
 
 #define 	FAC_OPEN_FLAG	0x80
 
-//The timefactors we have
-enum STRAT_TIMEFACTOR
-{
-	STRAT_DAWN,
-	STRAT_DAY,
-	STRAT_DUSK,
-	STRAT_NIGHT,
-	MAX_STRAT_TIMEFACTOR
-};
+//tolua_end
 
 //Structure used to build a list of people who have requested
 //	permission to join the posters vehicle
@@ -95,12 +87,10 @@ class WeapJoinRequestNode
 	// from any list it is currently registered to.
 	public: bool AddToList(JOIN_LIST* toList);
 
-//tolua_end
 	private: void _register();
 	private: void _unregister();
 
 public:
-//tolua_begin
 	//CL linked list stuff
 	WeapJoinRequestNode* prev;
 	WeapJoinRequestNode* next;
@@ -143,6 +133,7 @@ struct BRIDGE_ENTRY
 	LinkStruct* link;
 };
 
+//tolua_begin
 // What smoke to aim for when real damage is done
 #define SMOKE_START_LEVEL SMOKELEVEL_LIGHT
 
@@ -151,10 +142,10 @@ struct BRIDGE_ENTRY
 
 // What's the damage required to "ping" the smoke level?
 #define SMOKE_JOULES 1000
+//tolua_end
 
 class EWSReport
 {
-//tolua_end
 private:
 	UINT32			m_weapon;			// Which vehicle is generating this
 	UINT32			m_time;				// Time of report
@@ -164,7 +155,6 @@ private:
 
 	void _incPresence();				// Increase presence counts
 	void _decPresence();				// Decrease presence counts
-//tolua_begin
 
 public:
 	// Constructor
@@ -188,4 +178,3 @@ struct CP_STATUS
 	CP_STATUS_FLAGS		flags;
 };
 
-//tolua_end

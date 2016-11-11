@@ -42,7 +42,6 @@
 #include "miss/mission.h"
 #include "miss/missionHostMessages.h"
 #include "miss/missionUtils.h"
-#include "mm/mmAntiAddiction.h"
 #include "mm/mmHostInstanceImpl.h"
 #include "mm/mmHostMessages.h"
 #include "mm/mmMain.h"
@@ -1024,7 +1023,6 @@ _housekeeping()
 #if !defined(DEV_BUILD)
 	,	_pollChecksums
 #endif
-	,	mmCheckAddictionTimers
 	,	Instance::RecordPopulations
 	,	_logWWIIPlayerStats
 	,	[](){ chatHousekeepGroupPermissions(); }
@@ -1227,7 +1225,6 @@ main(int argc, const char* argv[])
 
 	authSetGameCapacity(0, 0, Server::myServerInfo.stats.arenaID, AL_SYNCING);
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
-	threadsLogging();
 
 	dbugLog(_FLI, "entering update loop");
 
@@ -1250,9 +1247,7 @@ main(int argc, const char* argv[])
 		// Return to "accepting" status if necessary
 		_checkAcceptingStatus();
 
-		threadsLogging();
 		threadsCallNextCallback();
-		threadsLogging();
 
 		static Housekeeper::FUNCTION functions[] =
 		{

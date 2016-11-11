@@ -216,9 +216,9 @@ Supercell::initialize(SINT16 scx, SINT16 scy, const char* filename)
 	indexSize = sdmGetMaxStratId() + 1;
 
 	if ( numCPs > 0 )
-		cps = new CPStruct[numCPs];
+		cps = new CPStruct[numCPs] {};
 	if ( numFacilities > 0 )
-		facilities = new FacilityStruct[numFacilities];
+		facilities = new FacilityStruct[numFacilities] {};
 	if ( numObjects > 0 )
 		objects = (ObjectStruct*)memCalloc(sizeof(ObjectStruct), numObjects);
 	if ( numLinks > 0 )
@@ -279,22 +279,17 @@ _getFilenameXY(const std::string& filename, SINT16* scx, SINT16* scy)
 static void
 _readSupercells()
 {
-	std::ifstream importList;
-	std::string filename;
-
-	filename = cv_dataDir.GetString();
+	std::string filename = cv_dataDir.GetString();
 	filename += "/";
 	filename += cv_importFile.GetString();
-	importList.open(filename.c_str(), std::ifstream::in);
+	std::ifstream importList(filename.c_str(), std::ifstream::in);
 	if ( !importList.is_open() )
 		LogAbort("Unable to open sdm import list: %s", filename.c_str());
 
 	bool errors = false;
 
-	while ( importList.good() )
+	while ( importList >> filename )
 	{
-		filename = "";
-		importList >> filename;
 		if ( filename.length() == 0 || filename[0] == '#' )
 			continue;
 

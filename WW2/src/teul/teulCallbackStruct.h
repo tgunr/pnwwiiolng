@@ -95,3 +95,6 @@ public:
 	SINT32 processCallback(struct ENDPOINT& endpoint_, UCHAR* const data_, const SINT32 dataSize_bytes_);
 };
 
+#define PRF_CALLBACK "x:%d(%s) y:%d(%s)"
+#define PRA_CALLBACK(cb) (cb).callX(), (cb).callXName(), (cb).callY(), (cb).callYName()
+

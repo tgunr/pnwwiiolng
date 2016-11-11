@@ -352,7 +352,7 @@ PPOSTO::applyJoules(const SINT64& joules, class Player* const player)
 	// Player leaving a PPO.
 	if ( joules == 0 )
 	{
-		threadLog(_FLD, "t:%d p:%u c:%s sto:%u player leaving sto (0j damage to %s)"
+		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u player leaving sto (0j damage to %s)"
 							, player->teulIndex(), player->playerID(), player->callsign()
 							, uid(), typeName());
 		extractPlayer(player);
@@ -366,14 +366,14 @@ PPOSTO::applyJoules(const SINT64& joules, class Player* const player)
 		auto it = std::find(m_occupants.begin(), m_occupants.end(), player);
 		if ( it == m_occupants.end() )
 		{
-			threadLog(_FLD, "t:%d p:%u c:%s sto:%u entered %s [%" PR64BitT " damage]"
+			dbugLog(_FLD, "t:%d p:%u c:%s sto:%u entered %s [%" PR64BitT " damage]"
 							, player->teulIndex(), player->playerID(), player->callsign()
 							, uid(), typeName(), joules);
 			m_occupants.push_back(player);
 		}
 		else
 		{
-			threadLog(_FLD, "t:%d p:%u c:%s sto:%u got %s entry message [%" PR64BitT " damage]"
+			dbugLog(_FLD, "t:%d p:%u c:%s sto:%u got %s entry message [%" PR64BitT " damage]"
 								, player->teulIndex(), player->playerID(), player->callsign()
 								, uid(), typeName(), joules);
 		}
@@ -608,7 +608,7 @@ PPOSTO::extractPlayer(const Player* const player)
 
 	m_lastOccupied = teulClock64;
 
-	threadLog(_FLD, "t:%d p:%u c:%s sto:%u left %s"
+	dbugLog(_FLD, "t:%d p:%u c:%s sto:%u left %s"
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, uid(), typeName());
 }

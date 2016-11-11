@@ -696,7 +696,7 @@ public:
 			m_result[handle] = row[1];
 		}
 
-		threadLog(_FLN, "Processed %u mission eggs :)", m_result.size());
+		dbugLog(_FLN, "Processed %" PRSizeT " mission eggs :)", m_result.size());
 
 		return true;
 	}

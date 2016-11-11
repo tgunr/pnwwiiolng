@@ -7,6 +7,7 @@
 ////////// SYSTEM INCLUDES ONLY -- NO PLAYNET SPECIFICS
 
 #include <algorithm>
+#include <atomic>
 #include <array>
 #include <cassert>
 #include <cctype>

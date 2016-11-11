@@ -41,7 +41,7 @@ public:
 	//! Create a packet for a specific callback.
 	Packet(PacketId id);
 	//! Default/receive constructor.
-	Packet();
+	Packet() {}
 #if defined(ALLOW_TEUL_PACKET_MOVE)
 	//! Move constructor
 	Packet(Packet&& moveRef);
@@ -80,19 +80,19 @@ public:
 
 private:
 	//! Data for this packet.
-	UCHAR*			m_data;
+	UCHAR*			m_data = m_localData;
 	//! The size of the whole thing.
-	UINT32			m_packetSizeBytes;
+	UINT32			m_packetSizeBytes = 0;
 	//! Current capacity of the packet.
-	UINT32			m_capacity;
+	UINT32			m_capacity = DefaultLocalDataSize;
 	//! Byte sent.
-	UINT32			m_sent;
+	UINT32			m_sent = 0;
 	//! Destination address for UDP.
-	UINT32			m_address;
+	UINT32			m_address = 0;
 	//! Destination port for UDP.
-	UINT32			m_port;
+	UINT32			m_port = 0;
 	//! Default local buffer of X bytes.
-	UCHAR			m_localData[DefaultLocalDataSize];
+	UCHAR			m_localData[DefaultLocalDataSize] = { 0 };
 
 public:
 	//! Is there any data in the packet?
@@ -278,7 +278,7 @@ public:
 	//! Bytes we have sent.
 	UINT32 sentBytes() const noexcept { return m_sent; }
 	//! Increment bytes sent.
-	void sentBytes(const UINT32 bytes_) noexcept { m_sent += bytes_; }
+	void addBytesSent(const UINT32 bytes_) noexcept { m_sent += bytes_; }
 };
 
 template<typename T>

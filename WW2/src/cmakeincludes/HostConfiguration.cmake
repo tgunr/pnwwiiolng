@@ -20,8 +20,10 @@ IF ( MSVC )
     )
 	IF ( CMAKE_BUILD_TYPE STREQUAL Debug )
 		ADD_COMPILE_OPTIONS( "/MTd" )
+		ADD_DEFINITIONS( "-DDEBUG=1" )
 	ELSE()
 		ADD_COMPILE_OPTIONS( "/MT" )
+		ADD_DEFINITIONS( "-DNDEBUG=1" )
 	ENDIF()
 
     IF ( BUILD_BITNESS EQUAL 64 )
@@ -39,6 +41,7 @@ IF ( MSVC )
 
 ELSE()
 
+	ADD_COMPILE_OPTIONS( "-fno-omit-frame-pointer" )	# nicer stacks
     ADD_COMPILE_OPTIONS( "-Winvalid-pch" "-Wno-array-bounds" )
     ADD_COMPILE_OPTIONS( "-Wno-strict-aliasing" "-Wno-unused-result" "-Wno-unknown-pragmas" )
     ADD_COMPILE_OPTIONS( "-Wall" "-Wshadow" "-Wno-deprecated" )
@@ -72,16 +75,30 @@ ELSE()
         LINK_LIBRARIES( "-stdlib=libc++" )
     ENDIF()
 
-    ADD_COMPILE_OPTIONS( "-fstack-protector-all" )
-
-    if ( CMAKE_BUILD_TYPE MATCHES Debug )
-        ADD_COMPILE_OPTIONS( "-O0" )
+    IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+		IF ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang )	# OR CMAKE_BITNESS EQUAL BUILD_BITNESS: untested.
+			IF ( PN_SANITIZE )
+				SET(_EXTRA_HOST_COMPILE_OPTIONS "-fstack-protector-all" "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+				SET(_EXTRA_HOST_LINK_OPTIONS "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+			ENDIF()
+		ENDIF()
+    	IF ( CMAKE_CXX_COMPILER_ID MATCHES Clang )
+        	ADD_COMPILE_OPTIONS( "-O0" "-g3" )
+		ELSE()
+			ADD_COMPILE_OPTIONS( "-Og" "-g3" )
+		ENDIF()
         ADD_DEFINITIONS( "-DDEBUG=1" )
-		# ADD_COMPILE_OPTIONS( "-fsanitize=address" )
-        # LINK_LIBRARIES( "-fsanitize=address" )
     ELSE()
-        ADD_COMPILE_OPTIONS( "-Os" )
+		# `-Os`: in 4.5.x -O3 generated better code for the Gen 3 Xeons in use, -Os is usually better.
+		# `-g`: Hack: Even RelWithDebInfo seems not to have debug symbols.
+        ADD_COMPILE_OPTIONS( "-Os" "-g" )
         ADD_DEFINITIONS( "-DNDEBUG=1" )
+    	IF ( CMAKE_CXX_COMPILER_ID MATCHES Clang )
+			# `-flto`: legacy cishness makes for significant perf gains in this codebase :(
+			# `-fwhole-program-vtables`: Defining inline dtors has pros and cons.
+			# The main con being the compiler may have to make a mess, which this option fixes.
+			ADD_COMPILE_OPTIONS( "-flto" "-fwhole-program-vtables" )
+		ENDIF()
     ENDIF()
     LINK_LIBRARIES( "-lpthread" )
 

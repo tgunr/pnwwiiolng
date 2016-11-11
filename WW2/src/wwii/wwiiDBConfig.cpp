@@ -150,6 +150,10 @@ dbGetWWIIConfig()
 		dbugLog(_FLI, "Loading db config for first time (host_config size = %" PRSizeT " bytes)", sizeof(host_config));
 		hasRun = true;
 	}
+	else
+	{
+		dbugLog(_FLI, "Refreshing db config");
+	}
 
 	try
 	{

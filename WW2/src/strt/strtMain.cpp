@@ -254,30 +254,24 @@ strtInitializeStratSystem()
 	stratInitializeLua();
 
 	dbugLog(_FLN,"Strat System verified");
-	threadsLogging();
 
 	// Make sure all the global spawn data is ready;
 	// this doesn't actually initialize spawn lists tho.
 	strtInitSpawn();
-	threadsLogging();
 
 	//Turn on all the bases
 	// (which includes creating all the spawn lists)
 	strtInitBases(_cpList);
-	threadsLogging();
 
 	//Init all the firebases
 	strtInitStratSystemFirebases(_cpList);
-	threadsLogging();
 
 #if defined(IS_STRAT_HOST)
 	strtdbSaveGameWorld(_cpList);
-	threadsLogging();
 #endif // IS_STRAT_HOST
 
 	// Put brigades onto the map
 	strtInitializeHCUnits();
-	threadsLogging();
 
 	//Tell everyone the status of the CPs
 	strtBroadcastCPs();

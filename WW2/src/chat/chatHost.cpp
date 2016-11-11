@@ -71,6 +71,7 @@
 #include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
 #include "server/serverInterface.h"
+#include "server/serverPersonaExit.h"
 #include "server/serverPersonaLogin.h"
 #include "server/serverPlayerStatusNode.h"
 #include "server/serverReleaseTypeEnum.h"
@@ -2495,7 +2496,7 @@ _personaActivate(SINT32 teulIndex, PlayerStatusNode* psn)
 static SINT32
 _personaExit(SINT32 teulIndex, PlayerStatusNode* psn, Server::PersonaExit& persExit)
 {
-	dbugLog(_FLN, "t:%d p:%u c:%s _personaExit", teulIndex, psn->dispatch().m_customerID, psn->dispatch().m_callsign);
+	dbugLog(_FLN, "t:%d p:%u c:%s _personaExit (%p)", teulIndex, persExit.dispatch().m_customerID, persExit.dispatch().m_callsign, psn);
 	return 0;
 }
 
@@ -2813,8 +2814,6 @@ _startShutdown()
 		chatSmitePlayer(target->playerID());
 		target->Release(target->teulIndex(), Server::ReleaseType::Exit);
 	}
-
-	threadsLogging();
 
 	serverBroadcastClusterShutdown();
 
@@ -3488,7 +3487,6 @@ _runHost()
 		teulUpdateTransport(25);
 
 		threadsCallNextCallback();
-		threadsLogging();
 
 		// Catch up on housekeeping.
 		while ( _houseKeeping() )
