@@ -550,7 +550,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	const bool logToConsole = isFatal || (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && error <= Debug::ERR_MINOR);
 
 	size_t len = 0;
-	time_t now = (time_t)(teulClock64 / 1000);
+	time_t now = (time_t)(teulClock64 / 1000ULL);
 	struct tm tmStruct;
 	struct tm* tm = localtime_r(&now, &tmStruct);
 	char prefix[512];

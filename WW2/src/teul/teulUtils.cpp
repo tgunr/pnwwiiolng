@@ -54,7 +54,7 @@ teulSyncClock()
 	std::lock_guard<std::mutex> lock(oneAtATime);
 
 	using namespace std::chrono;
-	auto now = high_resolution_clock::now();
+	auto now = system_clock::now();
 	TeulTimeMS newTimeMS = duration_cast<milliseconds>(now.time_since_epoch()).count();
 #if platBuild == BUILD_SERVER
 	if ( PN_UNLIKELY(newTimeMS < teulClock64) )
