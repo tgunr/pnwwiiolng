@@ -252,7 +252,7 @@ void
 EndpointImpl::FreeFirstPacketInSendQueue()
 {
 	Teul::Packet* packet = m_sendQueue.front();
-	m_sendQueue.erase(m_sendQueue.begin());
+	m_sendQueue.pop_front();
 	s_delayedPackets.Delete(packet);
 }
 
