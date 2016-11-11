@@ -155,7 +155,7 @@ public:
 	UINT32 destAddress() const;
 	UINT16 destPort() const;
 
-	bool const isFromClient() const noexcept { return protocol == PROTOCOL_TCP && !m_peer; }
+	bool isFromClient() const noexcept { return protocol == PROTOCOL_TCP && !m_peer; }
 
 private:
 	//! Write the actual data to the socket.
@@ -174,14 +174,12 @@ public:
 
 void		teulCleanupEndpoints();
 
-ENDPOINT* 	teulCreateEndpoint(SINT32 teulIndex, bool isListening, SINT32 timeout, PROTOCOL protocol);
+ENDPOINT* 	teulCreateEndpoint(bool isListening, SINT32 timeout, PROTOCOL protocol);
 
 void		teulFreeEndpoint(ENDPOINT* theEndpoint);
 
 void		teulRemoveEndpoint(ENDPOINT* inEndpoint);
 void		teulKillDeadEndpoints();
 
-// INTERNAL: Get the next free index.
-// Note: this value is incredibly transient.
-SINT32		teulQueryNextFreeIndex();
-
+//! Check for available endpoints. If none are available, checks for and recovers dead endpoints.
+bool		teulHasFreeEndpoints();

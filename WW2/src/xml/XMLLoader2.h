@@ -194,7 +194,7 @@ public:
 	XMLLoader2();
 	XMLLoader2(const char* path, int flags = XML_DEFAULT_FLAGS, bool uiFio = false);
 	virtual ~XMLLoader2();
-    
+
     XMLLoader2<T>(const XMLLoader2<T> &obj) {
         _flags = obj._flags;
         _complete = obj._complete;

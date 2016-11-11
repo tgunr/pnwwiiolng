@@ -111,7 +111,7 @@ void
 authInitDB()
 {
 	// Auth has its own database to talk to.
-	dbseSetDatabase(cv_authdbAddress, cv_authdbSchema, cv_authdbUser, cv_authdbPassword, cv_authdbPort);
+	dbseSetDatabase(cv_authdbAddress, cv_authdbPort, cv_authdbSchema, cv_authdbUser, cv_authdbPassword);
 
 	if ( !dbh.connect() )
 		LogAbort("Couldn't connect to database");
@@ -260,7 +260,7 @@ authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch
 	{
 		authdbLogBadPlayername(cdata.address, request.username, e.what());
 		LogAbort("error looking up %s with %s: %s", request.username, request.password, e.what());
-		return WEB_ERR_INTERNAL;
+		/*return WEB_ERR_INTERNAL;*/
 	}
 
 	if ( foundUser == false )
@@ -317,7 +317,7 @@ Auth::LoginRequest::validate(SINT32 teulIndex, Auth::ClientData& cdata)
 		authdbLogBadPlayername(cdata.address, username, "illegal password");
 		return WEB_ERR_INTERNAL;
 	}
-    
+
     char ubuffer[16*2+1] = {0};
 	mysql_real_escape_string(dbh, ubuffer, username.c_str(), username.length());
     char pbuffer[80*2+1] = {0};
@@ -375,7 +375,7 @@ Auth::LoginRequest::validate(SINT32 teulIndex, Auth::ClientData& cdata)
 	{
 		authdbLogBadPlayername(cdata.address, username, e.what());
 		LogAbort("error looking up %s with %s: %s", username.c_str(), password.c_str(), e.what());
-		return WEB_ERR_INTERNAL;
+		/*return WEB_ERR_INTERNAL;*/
 	}
 
 	if ( foundUser == false )
@@ -513,8 +513,6 @@ static bool _initAppInfoTable(GAME& gameEntry)
 		dbugLog(_FLA, "error selecting host versions [%s]", statement);
 		LogAbort("%s", e.what());
 	}
-
-	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -525,15 +523,12 @@ _findIsFile(SCHAR manisfile)
 	{
 		case 'f':
 			return ISFILE_FILE;
-		break;
 		case 'u':
 			return ISFILE_URL;
-		break;
 		case 'n':
 			return ISFILE_NUN;
-		break;
 		default:
-		break;
+			break;
 	}
 	return ISFILE_URL;
 }
@@ -752,13 +747,13 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 
 		strsafecpy(statement, ogl.vendor);
 		mysql_real_escape_string(dbh, vendor, statement, strlen(statement));
-        
+
         strsafecpy(statement, cpu.manufacturer);
         mysql_real_escape_string(dbh, cpuManufacturer, statement, strlen(statement));
-        
+
         strsafecpy(statement, cpu.brandName);
         mysql_real_escape_string(dbh, cpuBrandName, statement, strlen(statement));
-        
+
 		if ( pci.sound.isValid )
 		{
 			strsafecpy(statement, mix.szPname);
@@ -801,7 +796,7 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 						", %u, %u, %u, %u"
 						", %u, %u, %u, %u, %u"
 						", %u, %u, %u, %u, %u"
-						", %llu"				// Speed
+						", %" PR64BitUT ""				// Speed
 						" )"
 					, cardName
 					, vendor
@@ -977,8 +972,8 @@ authdbSaveLastOTP(UINT64 otp)
 {
 	try
 	{
-		DBQuery q(dbh, "REPLACE INTO `auth`.`auth_variables` (`name`, `value`) VALUES ('last_otp', %llu)", otp);
-		dbugLog(_FLI, "%s: saved last OTP of %llu", __FUNCTION__, otp);
+		DBQuery q(dbh, "REPLACE INTO `auth`.`auth_variables` (`name`, `value`) VALUES ('last_otp', %" PR64BitUT ")", otp);
+		dbugLog(_FLI, "%s: saved last OTP of %" PR64BitUT "", __FUNCTION__, otp);
 	}
 	catch (std::exception& e)
 	{

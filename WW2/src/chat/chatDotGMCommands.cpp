@@ -1846,7 +1846,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		_addStr(response, "in:none");
 	else
 	{
-		strprintf(buf, "in:%llu", player.instance().id());
+		strprintf(buf, "in:%" PR64BitUT "", player.instance().id());
 		_addStr(response, buf);
 	}
 
@@ -1939,7 +1939,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 	if ( player.isPlaynet() )
 	{
 		char permissionsHex[64];
-		strprintf(permissionsHex, "PM: %016llx", permissionMask());
+		strprintf(permissionsHex, "PM: %016" PRPermMaskT "", permissionMask());
 		_addStr(response, permissionsHex);
 	}
 

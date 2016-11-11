@@ -32,3 +32,4 @@ size_t serverGetPlayerCount(const UINT32 serverType_);
 // by different host types and configuration parameters.
 size_t serverGetClusterCapacity();
 
+void serverOpenLuaClientInterface();	// for strat host

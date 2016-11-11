@@ -118,7 +118,7 @@ def get_version_value(version_info_file_path):
         version_expansions = "PN_WW2_PRODUCT_NO.PN_WW2_VERSION_NO.PN_WW2_PATCH_NO.PN_WW2_BUILD_NO"
         with tempfile.NamedTemporaryFile(mode='w', bufsize=0) as ftmp:
             ftmp.write(version_expansions + "\n") ; ftmp.flush()
-            version_value = get_command_output('clang -E -P -include "%s" -x c++ "%s"' % (version_info_file_path, ftmp.name))
+            version_value = get_command_output('c++ -E -P -include "%s" -x c++ "%s"' % (version_info_file_path, ftmp.name))
     return version_value.replace(' ', '')
 
 ### Let Python have "forward declarations" etc.

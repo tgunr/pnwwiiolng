@@ -128,6 +128,7 @@ struct Node
 			m_parent->m_lastChild = this;
 		}
 	}
+	virtual ~Node() {}
 
 	Node(Type type, const char* name, Node* parent)
 		: Node(type, std::string(name), parent)
@@ -192,6 +193,7 @@ struct Message : public Node
 		, m_numGroups(0)
 		, m_extraMembers(nullptr)
 	{}
+	virtual ~Message() {}
 
 	void AddExtraMember(const char* type, const char* name, const char* defaultValue);
 
@@ -218,6 +220,7 @@ struct Group : public Node
 	{
 		makeMemberName(m_memberName);
 	}
+	virtual ~Group() {}
 
 	static void makeMemberName(std::string& field)
 	{
@@ -238,7 +241,7 @@ struct Field : public Node
 	std::string			m_dimensionString;
 
 	Field(const TypeDef* typeDef, const char* name, Node* parent)
-		: Node(Node::Type::Field, name, parent) 
+		: Node(Node::Type::Field, name, parent)
 		, m_typeDef(typeDef)
 		, m_size(0)
 		, m_defaultValue("")
@@ -246,6 +249,7 @@ struct Field : public Node
 		, m_dimensionString("")
 	{
 	}
+	virtual ~Field() {}
 
 	void Emit(size_t indentLevel) const override;
 	void EmitPack(size_t indentLevel) const override;
@@ -263,6 +267,7 @@ struct Conditional : public Node
 		, m_condition(condition)
 	{
 	}
+	virtual ~Conditional() {}
 
 	void Emit(size_t indentLevel) const override;
 	void EmitPack(size_t indentLevel) const override;
@@ -282,6 +287,7 @@ struct Array : public Node
 		, m_dimension(std::move(dimension))
 	{
 	}
+	virtual ~Array() {}
 
 	void Emit(size_t indentLevel) const override;
 	void EmitPack(size_t indentLevel) const override;
@@ -298,6 +304,7 @@ struct Enumeration : public Node
 		: Node(Node::Type::Enumeration, std::move(enumName), parent)
 		, m_count(0)
 	{}
+	virtual ~Enumeration() {}
 
 	void Emit(size_t indentLevel) const override;
 };
@@ -311,6 +318,7 @@ struct EnumValue : public Node
 		, m_value(value)
 	{
 	}
+	virtual ~EnumValue() {}
 
 	void Emit(size_t indentLevel) const override;
 };
@@ -422,7 +430,7 @@ static void _endOfNode(Node::Type expectedType)
 		yyerror("INTERNAL ERROR: node %s is not of expected type (%d != %d)", s_currentNode->m_name.c_str(), s_currentNode->m_type, expectedType);
 		exit(1);
 	}
-	
+
 	s_currentNode = s_currentNode->m_parent;
 }
 
@@ -749,7 +757,6 @@ void omg_using(std::string filename)
 		}
 	}
 	yyfatal("Unable to open USING file \"%s\".\n", filename.c_str());
-	return;
 }
 
 void omg_eof()

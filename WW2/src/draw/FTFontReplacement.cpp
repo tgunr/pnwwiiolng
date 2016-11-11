@@ -41,7 +41,6 @@ static const size_t MAX_CHAR_IN_LINE = 256;
 #include "fio/fio.h"
 #include <iostream>
 #include <sstream>
-#include "wwii/wwiiHash.h"
 #include "draw/fontadaptor.h"
 #include "draw/TextureFont.h"
 

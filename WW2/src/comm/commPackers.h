@@ -14,9 +14,6 @@
 
 SINT32 commPackInit();
 
-SINT32 commPackPLAYER_LOGIN(PackMode mode, UCHAR* const data,
-							 SINT32 offset, struct PLAYER_LOGIN* object, SINT32 size);
-
 SINT32 commPackPERSONA_REQUEST(PackMode mode, UCHAR* const data,
 								  SINT32 offset, struct PERSONA_REQUEST* object, SINT32 size);
 

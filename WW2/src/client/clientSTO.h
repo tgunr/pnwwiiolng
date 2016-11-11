@@ -224,7 +224,7 @@ public:
 
     virtual void preProcess();
     virtual void postProcess();
-    
+
 	void Sink();
 	void Update();
 

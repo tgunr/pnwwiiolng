@@ -158,6 +158,8 @@ _checkSupplyLinksIn(const Supercell& sc)
 		bldg = sc.Get<ObjectStruct>(newLink->startDepotID.id);
 		if ( bldg != nullptr )
 		{
+			if (bldg->facility == nullptr)	// problem raised elsewhere
+				continue;
 			const FacilityStruct& facility = bldg->Facility();
 			if ( facility.m_outgoingLink == nullptr)
 			{
@@ -179,6 +181,8 @@ _checkSupplyLinksIn(const Supercell& sc)
 		bldg = strtGetObject(newLink->endDepotID);
 		if ( bldg != nullptr )
 		{
+			if (bldg->facility == nullptr)	// problem raised elsewhere
+				continue;
 			const FacilityStruct& facility = bldg->Facility();
 			if ( facility.m_incomingLink == nullptr)
 			{
@@ -1272,7 +1276,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 curTestLevel)
 				{
 					if ( building->type == BUILDING_AUTOGUNNER )
 					{
-						dbugLog(_FLI, "found autogunner %s " PRF_FULL_OBJ_ID " subtype %d rebuild period %d, totRPS %d RPS/dlevel %d max djoules %lld"
+						dbugLog(_FLI, "found autogunner %s " PRF_FULL_OBJ_ID " subtype %d rebuild period %d, totRPS %d RPS/dlevel %d max djoules %" PR64BitT ""
 									, building->name
 									, PRA_FULL_OBJ_ID(building->fullObjID)
 									, building->subType
@@ -1750,7 +1754,7 @@ bool strtInitLinkfromWOR(LinkStruct& link)
 
 	DEPOT_LINK_PARAMS* linkParams;
 	static const std::string linkRail("RAIL_LINK"), linkBarge("BARGE_LINK"), linkConvoy("CONVOY_LINK"),
-						linkPackAnimal("PACK_ANIMAL_LINK"), linkWagon("WAGON_LINK"), linkPorter("PORTER_LINK"), 
+						linkPackAnimal("PACK_ANIMAL_LINK"), linkWagon("WAGON_LINK"), linkPorter("PORTER_LINK"),
 						linkTruck("TRUCK_LINK");
 	switch (link.startDepot->subType)
 	{
@@ -2070,15 +2074,21 @@ _checkCPStatus(CPStruct* cpList)
 	if ( cpList == nullptr )
 		return;
 
-	CPStruct* current;
-	FacilityStruct* facility;
-	CPStruct saveCP;
-	FacilityStruct saveFac;
 	WWII_COUNTRY maxSideCountry[MAX_SIDES];
 	SINT32 ownerCount[MAX_COUNTRIES];
 	WWII_SIDE otherSide;
 
-	for ( current = cpList; current != nullptr; current = current->next )
+	// We take snapshots of each CP and facility object before we process them,
+	// so we can tell if *anything* changed during the processing. We allocate
+	// memory for this as an opaque container and then cast pointers to it,
+	// this is to prevent any complex objects (stl containers) being destructed.
+	std::unique_ptr<uint8_t[]> cpSnapAlloc(new uint8_t[sizeof(CSAFE_CPStruct)]);
+	auto* cpSnapshot = reinterpret_cast<CSAFE_CPStruct*>(cpSnapAlloc.get());
+
+	std::unique_ptr<uint8_t[]> facSnapAlloc(new uint8_t[sizeof(CSAFE_FacilityStruct)]);
+	auto* facSnapshot = reinterpret_cast<CSAFE_FacilityStruct*>(facSnapAlloc.get());
+
+	for ( CPStruct* current = cpList; current != nullptr; current = current->next )
 	{
 		CPStruct& cp = *current;
 
@@ -2108,7 +2118,7 @@ _checkCPStatus(CPStruct* cpList)
 		else if ( cp.ownableFacilities == 0 )
 			strtAddErrorListEntry(ERR_CP_NO_OWNABLES, cp.name, cp.name, "");
 
-		saveCP = cp;
+		memcpy(cpSnapshot, &cp, sizeof(*cpSnapshot));
 		//Set our default values
 		memset(ownerCount, 0, sizeof(ownerCount));
 		memset(maxSideCountry, 0, sizeof(maxSideCountry));
@@ -2124,11 +2134,11 @@ _checkCPStatus(CPStruct* cpList)
 		cp.setContention(false);
 		cp.m_attackStarted = 0;
 
-		for ( facility = cp.facilityList
+		for ( FacilityStruct* facility = cp.facilityList
 			; facility != nullptr
 			; facility = facility->next)
 		{
-			saveFac = *facility;
+			memcpy(facSnapshot, facility, sizeof(*facSnapshot));
 			facility->side = wwiiSide(facility->country);
 
 			if ( !_validOwnership(facility->country, facility->side) )
@@ -2142,7 +2152,7 @@ _checkCPStatus(CPStruct* cpList)
 					facility->armyBase = facility->findLocalAB(WWII_NO_SIDE);
 
 				// A change of armybase doesn't require a save
-				saveFac.armyBase = facility->armyBase;
+				facSnapshot->armyBase = facility->armyBase;
 			}
 
 			// Add this facility to it's owner's counts
@@ -2155,7 +2165,7 @@ _checkCPStatus(CPStruct* cpList)
 						maxSideCountry[facility->side] = facility->country;
 			}
 
-			if (memcmp(&saveFac, facility, sizeof(CSAFE_FacilityStruct)) != 0)
+			if (memcmp(facSnapshot, facility, sizeof(*facSnapshot)) != 0)
 			{
 				 _setObjectsOwner(facility->objectList, facility->side, facility->country);
 				//Save the facility to the DB
@@ -2216,7 +2226,7 @@ _checkCPStatus(CPStruct* cpList)
 		if ( cp.isContested() )
 			cp.changeOwnership(cp.country, false, true);
 
-		if (memcmp(&saveCP, &cp, sizeof(saveCP)) != 0)
+		if (memcmp(cpSnapshot, &cp, sizeof(*cpSnapshot)) != 0)
 		{
 			//Save the CP to the DB
 # ifdef HEAVY_DEBUG

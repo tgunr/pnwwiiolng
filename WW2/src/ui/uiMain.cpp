@@ -80,7 +80,7 @@
 #endif
 
 #include <regex>
-#include <unordered_map>
+#include "wwii/wwiiHash.h"
 #define RENS std
 
 #ifdef GR2_BLEND_EDITOR
@@ -1667,7 +1667,7 @@ bool uiHasLocFile(const char* name)
 {
 	std::string path = munge_filename(name);
 	int fd = fioOpen(path.c_str());
-	
+
     fioClose(fd);
     // Technically, this is a memory binding violation - while we "know" that fd is a
     // simple integer value whose "success" meaning was not destroyed by a call to
@@ -1772,10 +1772,10 @@ static std::string munge_filename(const char* name)
 		std::string filename = path.substr(6);
 		path = "languages/"; path += g_szLanguages[gLanguage];
 		path += "/" + filename;
-        
+
 		if(gLanguage != IDE_LANGUAGE_ENGLISH) {
 		    int fd = fioOpen(path.c_str());
-		    
+
 		    if (fd == -1) {
         		path = "languages/english/" + filename;
 		    } else {
@@ -2214,7 +2214,7 @@ static int uiLoadImageFileToSurface(const char* Filename)
 	int texid = -1;
 	UINT32 TransparentColor = colorMAGENTA | colorALPHA;
     std::string basename = Filename;
-    
+
     basename = basename.substr(0, basename.find_last_of('.'));
     for (char &c : basename) { c = tolower(c); } // assumes ASCII; this will Breaking Bad on Unicode
 
@@ -2230,12 +2230,12 @@ static int uiLoadImageFileToSurface(const char* Filename)
 		piSetTextureName(texid, const_cast<char *>(basename.c_str()));
 		return texid;
 	}
-    
+
     std::string bmpname = basename + ".bmp";
     std::string alphaname = basename + "_alpha.bmp";
 	TEXTURE *lptex = nullptr;
     int alphaFD = fioOpen(alphaname.c_str());
-    
+
     fioClose(alphaFD); // This is yet another very hacky workaround for broken "need to know if it exists before using it" logic
     if (alphaFD != -1) { // Technically a use-after-free, but FDs are just integers so it doesn't matter
         TransparentColor = piRGBA_SETALPHA(TransparentColor, 8);
@@ -2251,7 +2251,7 @@ static int uiLoadImageFileToSurface(const char* Filename)
 			lptex->hasalpha = TRUE;
 		}
 	}
-	
+
 	return texid;
 }
 

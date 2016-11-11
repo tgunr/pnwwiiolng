@@ -4,7 +4,7 @@
 // The code behind the messages the host will be sending to the chat server
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
-// Not to be distributed in API form except as part of a 
+// Not to be distributed in API form except as part of a
 // compiled library.
 //
 // Originating Programmer: Marty "Vandal" Poulin
@@ -75,7 +75,7 @@ _callbackError(
                )
 {
     const std::pair<UINT32, UINT16>& dest = Teul::GetRemote(teulIndex);
-    
+
     dbugLog(_FLA, "ERROR: TeulIndex-%d, Address-%s, Dest-%u, Error-%d",
         teulIndex, teulGetAddress(dest.first), dest.second, error
     );
@@ -93,13 +93,13 @@ commInstallMessage(
                    )
 {
     Teul::CallbackInit ci;
-    
+
     ci.callX         = MessageGroup;
     ci.callY         = MessageNumber;
     ci.sendAction    = SendFunc;
     ci.recvAction    = ReceiveFunc;
     ci.error         = _callbackError;
-    
+
     return (teulAllocCallback(&ci));
 }
 

@@ -712,8 +712,6 @@ static SINT32 _recvMMPostCancel(ACTION_OBJECT* const a)
 					, PRA_WEAPON_SERIAL(postCancel.weaponSerial)
 					, weapPrintName(postCancel.weaponSerial.spec)
 					);
-
-	return a->offset;
 }
 
 static SINT32 _recvWeaponsReturn(ACTION_OBJECT* const a)
@@ -1008,7 +1006,6 @@ AttackOrder::process()
 		break;
 		default:
 			LogAbort("Unrecognized attack order packet from %s", Chat::Name(m_requester).c_str());
-		break;
 		}
 	}
 	dbugLog(_FLD, " result: %u", m_result);

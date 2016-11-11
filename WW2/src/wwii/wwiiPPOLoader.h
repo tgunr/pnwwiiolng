@@ -44,7 +44,7 @@ struct PPOSpec
 class PPOSpecLoader : public XMLLoader2<PPOSpecLoader>
 {
 public:
-	
+
 	// NOTE: This order must track what is in the vehicle/ground/groundman/ppo.xml file
 	enum
 	{
@@ -60,7 +60,7 @@ public:
 public:
 
 	PPOSpecLoader();
-	virtual ~PPOSpecLoader() { }
+	virtual ~PPOSpecLoader();
 
 	void loadSpecMap();
 
@@ -84,18 +84,18 @@ private:
 	std::map<int,PPOSpec> _ppoSpecMap;
 	PPOSpec defaults;
 
-	/* 
-		utility method that populates a string vector from csv string 
+	/*
+		utility method that populates a string vector from csv string
 		but only if the key <name> matches what is provided in <check>
 	*/
-	bool checkDelimitedField(std::string name, std::string value, 
+	bool checkDelimitedField(std::string name, std::string value,
 				const char *check, std::vector<std::string> & stack);
 
-	/* 
-		utility method that populates a UINT32 bit field from csv string 
+	/*
+		utility method that populates a UINT32 bit field from csv string
 		but only if the key <name> matches what is provided in <check>
 	*/
-	bool checkDelimitedField(std::string name, std::string value, 
+	bool checkDelimitedField(std::string name, std::string value,
 				const char *check, UINT32 & bitfield);
 
 	/*

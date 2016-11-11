@@ -28,13 +28,10 @@ extern void error(const char* message);
 extern void writeToLog(const char* file, const char* func, unsigned int line, const char* level, const char* facil, const char* message);
 extern char* ARGS(int i);
 extern void gmMessage(const char* message);
-extern std::string luaToC_string;
 extern const char* getCallsign(unsigned long long);
 
 extern void dbDo(const char* msg);
 //tolua_end
-
-namespace Instance { class PlayerState; }
 
 // execute a script in the global lua state
 namespace Lua
@@ -42,9 +39,6 @@ namespace Lua
 	extern bool RunScript(const char* fileName);
 	extern bool RunObject(const char* name, std::string& object);
 	extern bool RunCode(std::string& code, const char* caller);
-
-	extern void CallInstanceFunction(const char* function, const instanceid_t instID, const char* data);
-	extern void CallInstanceFunction(const char* function, const instanceid_t instID, playerid_t playerID_, Instance::PlayerState* state);
 
 	// Pre-compile a lua statement into a compiled chunk.
 	extern std::string CompileCode(std::string code, const char* name);

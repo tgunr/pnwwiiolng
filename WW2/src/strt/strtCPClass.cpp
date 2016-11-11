@@ -840,6 +840,7 @@ CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
     //HACK: DEV-824 - .hold command temporary disabled
     return SCMD_ERROR;
 
+#ifdef ENABLE_HOLD
 	if ( side != issuer )
 		return SCMD_WRONG_SIDE;
 
@@ -865,6 +866,7 @@ CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
 		return SCMD_SUCCESS;
 
 	return SCMD_ERROR;
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1374,7 +1376,7 @@ strtBuildSupplyChains(bool force)
 
 	teulSyncClock();
 	const TeulTimeMS applyEnded = teulClock64;
-	dbugLog(_FLI, "sup: supply routeing took %llums [%llu run, %llu apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded);
+	dbugLog(_FLI, "sup: supply routeing took %" PR64BitUT "ms [%" PR64BitUT " run, %" PR64BitUT " apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded);
 
 	return true;
 }

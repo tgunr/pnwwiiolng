@@ -21,7 +21,7 @@ static UINT32 g_numVars = 0;
 void
 wwiiEscapeString(std::string& text)
 {
-    
+
     for ( UINT32 n = 0; n < text.length(); ++n )
     {
         switch ( text[n] )
@@ -149,6 +149,10 @@ dbGetWWIIConfig()
 	{
 		dbugLog(_FLI, "Loading db config for first time (host_config size = %" PRSizeT " bytes)", sizeof(host_config));
 		hasRun = true;
+	}
+	else
+	{
+		dbugLog(_FLI, "Refreshing db config");
 	}
 
 	try

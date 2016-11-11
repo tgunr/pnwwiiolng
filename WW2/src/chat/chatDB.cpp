@@ -176,8 +176,9 @@ chatdbLoadStratData()
 		memset(&cpid, 0, sizeof(cpid));
 
 		DBQuery q(dbh, "SELECT facility_ox, facility_oy, facility_class, facility_type, facility_id"
-							", cp_ox, cp_oy, cp_id"
-							", country, facility_oid, name FROM strat_facility");
+							", cp.cp_ox, cp.cp_oy, cp.cp_id"
+							", f.country, facility_oid, f.name FROM strat_facility f"
+							" INNER JOIN strat_cp cp USING (cp_oid)");
 
 		while ( q.FetchRow() )
 		{

@@ -1,6 +1,5 @@
 #pragma once
-//! @file	wwii/wwiiBranchEnums.h
-//! @brief	Branch enumerations.
+//! \brief	Branch enumerations.
 
 //tolua_begin
 enum BRANCH_ENUM

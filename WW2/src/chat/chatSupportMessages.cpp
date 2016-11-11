@@ -279,7 +279,7 @@ _recvMapPersonaUpdate(ACTION_OBJECT* const a)
 		return -EINVAL;
 	}
 
-    player->log(_FLD, "mpu isSquad:%c[%u/%llu/%s] isDecal:%c(%u)"
+    player->log(_FLD, "mpu isSquad:%c[%u/%" PR64BitUT "/%s] isDecal:%c(%u)"
                         , (update.m_isSquadUpdate ? 'y':'n')
                         , update.m_squadID, update.m_squadHandle, Chat::Name(update.m_squadHandle).c_str()
                         , (update.m_isDecalUpdate ? 'y':'n')

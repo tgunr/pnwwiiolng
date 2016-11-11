@@ -65,15 +65,15 @@
     CGOpenGLDisplayMask selectedMonitor;
     NSDictionary* selectedMode;
     NSTimer* hidTimer;
-    
+
     BOOL _passwordEntryIsInitial;
-    
+
     NSURL *_patchFileURL;
     NSError *_error;
     NSString *_userName;
     NSString *_userPassword;
     NSURLSessionDownloadTask *_patchDownloadTask;
-    
+
     NSURLSession *_patchDownloadSession;
     NSByteCountFormatter *_downloadProgressFormatter;
 }

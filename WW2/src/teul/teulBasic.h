@@ -1,7 +1,6 @@
 #pragma once
 // Created: Tue Nov 28 14:05:08 CST 2006
 //
-//! @file teul/teulBasic.h
 //! Minimal teulKit include
 //
 // Copyright (C) PlayNet, Inc 1999-2006 - All rights reserved.
@@ -91,12 +90,12 @@ const char* teulGetAddress(const UINT32 host, char* buffer, const size_t bufferS
 //! Since we have to ensure that callbacks happen in step with whatever
 //! application is using teul, we have to make a call for that all to happen.
 //! should be called once per game loop.
-//! @param[in]	waitVal		Sets a maximum number of milliseconds to continue
+//! @param[in]	duration	Sets a maximum number of milliseconds to continue
 //!							processing. A value of 0 indicates no wait
 //!							(non-blocking), a negative value specifies
 //!							wait forever.
 //! @ingroup not-thread-safe
-void teulUpdateTransport(const TeulTimeMS duration_=0ULL);
+void teulUpdateTransport(const TeulTimeMS duration=0ULL);
 
 //! Get the local address of a given teul index.
 //! @param[in]	teulIndex		Index of the connection to query.
@@ -139,7 +138,7 @@ void teulSendError(const SINT32 teulIndex, const SINT32 errorCode);
 
 ENDPOINT* teulGetEndpoint(const SINT32 index);
 #ifndef TEUL_PACKET_NAMES
-#ifdef DEBUG_WW2
+#if defined(DEBUG_WW2) || (platBuild == BUILD_SERVER && defined(DEBUG))
 #define TEUL_PACKET_NAMES 1
 #else
 #define TEUL_PACKET_NAMES 0

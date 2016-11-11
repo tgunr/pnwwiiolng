@@ -1005,7 +1005,7 @@ class DotAttack : public DotCommand
 public:
 	DotAttack() : DotCommand("attack", "Issue an attack objective on targetted CP"
 								, ACTIVE_OFFICER, LSTR_ATTACK_USAGE, LSTR_ATTACK_DETAIL
-								) { };
+								) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
@@ -1034,7 +1034,7 @@ class DotClear : public DotCommand
 public:
 	DotClear() : DotCommand("clear", "Withdraw an objective on targetted CP"
 								, ACTIVE_OFFICER, LSTR_CLEAR_USAGE, LSTR_CLEAR_DETAIL
-								) { };
+								) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
@@ -1063,7 +1063,7 @@ class DotDefend : public DotCommand
 public:
 	DotDefend() : DotCommand("defend", "Issue a defense objective on targetted CP"
 								, ACTIVE_OFFICER, LSTR_DEFEND_USAGE, LSTR_DEFEND_DETAIL
-								) { };
+								) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
@@ -1092,7 +1092,7 @@ class DotMoveBrigade : public DotCommand
 public:
 	DotMoveBrigade() : DotCommand("movebrigade", "Request movement of your current brigade"
 								, ACTIVE_OFFICER, LSTR_MOVEBRIGADE_USAGE, LSTR_MOVEBRIGADE_DETAIL
-								) { };
+								) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
@@ -1125,7 +1125,7 @@ class DotMoveDivision : public DotCommand
 public:
 	DotMoveDivision() : DotCommand("movedivision", "Request movement of your current division"
 								, ACTIVE_OFFICER, LSTR_MOVEDIVISION_USAGE, LSTR_MOVEDIVISION_DETAIL
-								) { };
+								) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
@@ -1802,7 +1802,7 @@ chatBrigadeAttackOrderResponse(AttackOrder& order)
 	bool isConclusion = ( order.m_execute && order.m_result == SCMD_SUCCESS );
 	if ( player == nullptr && !isConclusion )
 	{
-		dbugLog(_FLD, "player (%llu) went away during attack order request", order.m_requester);
+		dbugLog(_FLD, "player (%" PR64BitUT ") went away during attack order request", order.m_requester);
 		return;
 	}
 

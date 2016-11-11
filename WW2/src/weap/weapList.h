@@ -88,8 +88,8 @@ extern WEAPON_SPEC weapAssociateIndex(const char* weapName, UINT32 localIndex);
 // Add a class to the class index.
 extern void weapAddClass(UINT32 classIndex, const std::string& className);
 
-extern void weapListKill();
-
 extern void weapAddWeaponIndex(WEAPON* weapon);
 
 //tolua_end
+
+extern void weapListKill();

@@ -11,7 +11,7 @@
 // blocks of data - each cell is it's own pristine little
 // world. This allowed the embedding of much smaller IDs and
 // during many cell-relative operations you can specify
-// a specific strat object with a UINT16 value. 
+// a specific strat object with a UINT16 value.
 // In a world-scope context, such as on the server, you have
 // to combine that ID with the X and Y of the cell to produce
 // a 64 bit value (24 bits of X plus 24 bits of Y plus 16 id)
@@ -519,7 +519,7 @@ dbseSaveFACILITY(FACWITHID* facw)
 			, "INSERT INTO strat_facility"
 				"(facility_oid,facility_ox,facility_oy"
 				",facility_type,facility_id,facility_subtype"
-				",cp_ox,cp_oy,cp_id,cp_oid"
+				",cp_oid"
 				",name,objectname"
 				",side,country"
 				",originalside,originalcountry"
@@ -550,7 +550,7 @@ dbseSaveFACILITY(FACWITHID* facw)
 	p += sprintf(p
 				, "%c(%u,%d,%d"
 					",%u,%u,%u"
-					",%d,%d,%d,%u"
+					",%u"
 					",'%s','%s'"
 					",%u,%u"
 					",%u,%u"
@@ -561,7 +561,6 @@ dbseSaveFACILITY(FACWITHID* facw)
 				, (p > start) ? ',' : ' '
 				, facw->fac_oid, facw->ox, facw->oy
 				, facility->oid.objType, facility->oid.id, facility->subType
-				, facility->cpid.cell.ox, facility->cpid.cell.oy, facility->cpid.id
 				, cp_oid, g_name, g_fileName
 				, wwiiSide(facw->owner), facw->owner
 				, facility->originalSide, facility->originalCountry

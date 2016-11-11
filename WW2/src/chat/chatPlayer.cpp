@@ -61,7 +61,7 @@
 
 static HANDLES _spawning;
 
-using RECRUITS = std::unordered_map< UINT32, std::set<UINT32>>;
+using RECRUITS = std::unordered_map<UINT32, std::set<UINT32>>;
 static RECRUITS _recruits;
 
 using PLAYERIDS = std::unordered_set<UINT32>;
@@ -1030,7 +1030,7 @@ Player::objectiveCP() const
 	return ( (prop == nullptr) ? "<unknown>" : prop->Name() );
 }
 
-#include <unordered_map>
+#include "wwii/wwiiHash.h"
 static std::unordered_map<playerid_t, std::vector<UINT32>> playerGroups;
 static std::mutex playerGroupsMutex;
 
@@ -1092,7 +1092,7 @@ protected:
 
 	virtual void Failure() override
 	{
-		threadLog(_FLA, "p:%u unable to read player groups from database", m_playerID);
+		dbugLog(_FLA, "p:%u unable to read player groups from database", m_playerID);
 	}
 };
 
@@ -2223,10 +2223,9 @@ Player::validatePreference(UINT32 prefId, UINT32 request) const
 	{
 		case CPR_UPDATE_MODE:
 			return _validateUpdateMode(request);
-		break;
+		default:
+			return request;
 	}
-
-	return request;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2251,8 +2250,8 @@ Player::whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const
 
 	// He's not in a facility, ergo at the map
 	if ( !missionID() )
-	{	
-		snprintf(tmpbuf, sizeof(tmpbuf), "%s brigade scrn", affiliation);
+	{
+		strprintf(tmpbuf, "%s brigade scrn", affiliation);
 		into.append(tmpbuf);
 		into.append(lastPosition("last near", x, y, true));
 		return;
@@ -2351,7 +2350,7 @@ _populateAWSReply(Player& player, const AWS::Request& request, const AWS_GRID& g
 
 	bool isAllied = (player.side() == ALLIED);
 
-	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu requesting %s AWS [%hu,%hu]-[%hu,%hu](%u)"
+	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " requesting %s AWS [%hu,%hu]-[%hu,%hu](%u)"
 					, player.teulIndex(), player.playerID(), player.callsign()
 					, player.instance().category(), player.instance().type(), player.instance().handle(), player.instance().id()
 					, (isAllied ? "axis" : "allied")
@@ -2471,7 +2470,7 @@ Player::updateAWSPosition(bool onAWS)
 	}
 	else
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu aws side %u update %f.%f => %hd/%hd"
+		dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " aws side %u update %f.%f => %hd/%hd"
 						, teulIndex(), playerID(), callsign()
 						, instance().category(), instance().type(), instance().handle(), instance().id()
 						, side()
@@ -2525,7 +2524,7 @@ Player::removeFromAWS()
 		}
 	}
 
-	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu aws side %u extraction %f.%f => %d/%d"
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " aws side %u extraction %f.%f => %d/%d"
 					, teulIndex(), playerID(), callsign()
 					, instance().category(), instance().type(), instance().handle(), instance().id()
 					, m_impl->m_awsSide

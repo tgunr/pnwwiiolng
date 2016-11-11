@@ -331,14 +331,14 @@ SINT32 trnUpdateStratData(TERRAIN_DETAIL* td, OBJECT* lpobj, SINT32 bid, LOGICAL
 
 		for ( int i = 0 ; i < td->bldHash.maxBldID ; ++i ) {
 			if ( td->bldHash.building[i].pobj != lpobj )
-				continue;			
+				continue;
 			bid = i;
 			break;
 		}
 	}
 
 	if ( bid < 0 ) {
-		Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (<0) - model type %d - model name %s", 
+		Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (<0) - model type %d - model name %s",
 		          bid, lpobj->modelInstance == nullptr ? -1 : lpobj->modelInstance->GetModelType(),
 		          lpobj->name);
 		return -EINVAL;

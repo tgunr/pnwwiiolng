@@ -78,7 +78,7 @@ _reportJSONPeers(SOCKET fd, const char* /*path*/, const char* /*args*/)
 		p += sprintf(p, "],\"pending\":[");
 		for ( auto& it : s_pendingPeers )
 		{
-			p += sprintf(p, "{\"ip\":%u,\"time\":%llu},", it.first, teulClock64 - it.second);
+			p += sprintf(p, "{\"ip\":%u,\"time\":%" PR64BitUT "},", it.first, teulClock64 - it.second);
 		}
 	}
 	p += sprintf(p, "]}\n");

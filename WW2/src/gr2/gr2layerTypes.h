@@ -60,7 +60,7 @@ public:
     GR2_POOL<T>( const GR2_POOL<T> &obj ) {
         // dummy, we don't need a copy instructor
     }
-    
+
 	T* Pop(bool reset = true)
 	{
 		if(_pool.empty())

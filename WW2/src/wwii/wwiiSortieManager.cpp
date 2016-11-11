@@ -42,7 +42,7 @@ SortieManager::Commit()
 	*(p++) = ')';
 	*(p++) = 0;
 
-	threadLog(_FLD, "Updating %s/%s for %u sorties", m_set, m_where, m_pending.size());
+	dbugLog(_FLD, "Updating %s/%s for %" PRSizeT " sorties", m_set, m_where, m_pending.size());
 
 	DBThread::Do(DBThread::Default, buffer);
 

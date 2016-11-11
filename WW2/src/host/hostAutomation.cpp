@@ -239,7 +239,7 @@ Fake::moveAircraft()
 
 //	if ( vi.squad == 1 )
 //	{
-//		dbugLog(_FLI, "t=%llu, w=%g, yaw=%g, x=%g, y=%g, vx=%g, vy=%g", t, w, yaw, x, y, vx, vy);
+//		dbugLog(_FLI, "t=%" PR64BitUT ", w=%g, yaw=%g, x=%g, y=%g, vx=%g, vy=%g", t, w, yaw, x, y, vx, vy);
 //	}
 
 	// Convert to radians

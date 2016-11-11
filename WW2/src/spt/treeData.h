@@ -104,7 +104,7 @@ struct Tree
             {
                 dGeomDestroy(transform[i]);
             }
-            
+
             transform.clear();
         }
 		detach();

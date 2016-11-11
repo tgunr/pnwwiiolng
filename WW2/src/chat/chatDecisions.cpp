@@ -444,7 +444,6 @@ _SCMDsuccess(const StratCommand* scmd, const char* command, Player* player, cons
 
 	case SC_ATTACK:
 		LogAbort("SC_ATTACK/DEFEND/CLEAR no-longer supported");
-	break;
 
 	default:
 		dbugLog(_FLW, "Unrecognized scmd reporting success: %d", scmd->m_command);
@@ -572,7 +571,6 @@ _SCMDallowed(const StratCommand* scmd, const char* command, Player* player, cons
 	case SC_DEFEND:
 	case SC_CLEAR:
 		LogAbort("SC_ATTACK/DEFEND/CLEAR no-longer supported");
-	break;
 
 	default:
 		dbugLog(_FLW, "_allowed doesn't recognize this command");

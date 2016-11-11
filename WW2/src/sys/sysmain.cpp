@@ -356,7 +356,7 @@ BOOL				bOsVersionInfo;
 UINT64 GetMicroSeconds(void)
 {
     LARGE_INTEGER result, freq;
-    
+
     QueryPerformanceFrequency(&freq);
     QueryPerformanceCounter(&result);
     result.QuadPart *= 1000000;
@@ -723,7 +723,7 @@ char GetOSBuild()
 
 	// setup the user data path
 	fioInit();
-	
+
 	// delete the log files
 	Fio::DeleteLogFile();
 

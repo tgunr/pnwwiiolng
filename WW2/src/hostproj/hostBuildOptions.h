@@ -10,4 +10,8 @@
 #define BRIDGES
 #define SINGLE_CELL_HOST
 
+#ifndef PN_DISABLE_AUTH
 static constexpr const bool useAuthServer = true;
+#else
+static constexpr const bool useAuthServer = false;
+#endif

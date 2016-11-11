@@ -46,7 +46,7 @@ _indexPlayer(Player* player)
 	if ( player == nullptr )
 		LogAbort("Tried to map NULL player");
 
-	dbugLog(_FLD, "t:%d p:%u c:%s indexing matchid:%llx", player->teulIndex(), player->playerID(), player->callsign(), player->matchHandle());
+	dbugLog(_FLD, "t:%d p:%u c:%s indexing matchid:%" PR64BitUT "", player->teulIndex(), player->playerID(), player->callsign(), player->matchHandle());
 
 	// hash_map doesn't provide lower_bound, so we can't insert-at-place
 	PLAYER_INDEX::iterator it = playerIndex.find(player->matchHandle());
@@ -321,7 +321,7 @@ void chatFreePlayer(Player* player)
 	//Handle taken/squelched
 	if ( player->inGrab() )
 	{
-		dbugLog(_FLI, "takenby = %lld, grabbing = %lld"
+		dbugLog(_FLI, "takenby = %" PR64BitUT ", grabbing = %" PR64BitUT ""
 						, player->takenBy()
 						, player->grabbing()
 						);

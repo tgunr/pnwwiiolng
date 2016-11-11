@@ -34,9 +34,6 @@ enum WWII_SERVICE
 	MAX_SERVICE
 };
 
-//#define WWII_SIDE SIDE
-//#define WWII_MAX_COUNTRY MAX_COUNTRIES
-// ============================>
 // enusre the next three declarations
 // are all updated togeather
 

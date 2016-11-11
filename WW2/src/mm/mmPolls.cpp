@@ -17,7 +17,7 @@
 
 using _POLLS = std::map<UINT32,OpinionPoll>;
 static _POLLS polls;
-static UINT32 g_maxPoll = 0;
+static size_t g_maxPoll = 0;
 static std::mutex _pollsLock;
 
 //////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ _parseQuery(DBQuery& query)
 		OpinionPoll& poll = newPolls[pollID];
 		if ( poll.empty() )
 		{
-			threadLog(_FLD, "poll:%u %s", pollID, row[1]);
+			dbugLog(_FLD, "poll:%u %s", pollID, row[1]);
 			poll.m_pollID = pollID;
 			poll.m_title = row[1];
 		}
@@ -83,11 +83,11 @@ public:
 			}
 			catch ( std::exception& e)
 			{
-				threadLog(_FLW, "Polls: %s", e.what());
+				dbugLog(_FLW, "Polls: %s", e.what());
 			}
 		}
 
-		threadLog(_FLD, "%u polls, highest %u", polls.size(), g_maxPoll);
+		dbugLog(_FLD, "%" PRSizeT " polls, highest %" PRSizeT "", polls.size(), g_maxPoll);
 	}
 };
 

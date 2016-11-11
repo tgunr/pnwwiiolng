@@ -35,6 +35,7 @@ extern void strtInitializeVehicleAccessLevels();
 # include "strt/strtDatabaseSchemas.h"
 static void _updateDatabaseSchema()
 {
+	dbugLog(_FLI, "Updating database schema");
 	DB::Schema schema(dbh, "wwii");
 	schema.Update(revisions);
 }
@@ -47,10 +48,12 @@ strtInitDB()
 {
 	bool retval = true;
 
+	dbugLog(_FLI, "initializing strat database");
 	if ( !dbh.connected() )
 		dbh.connect();
 
 #ifdef IS_STRAT_HOST
+	///TODO: Move to controller or something
 	_updateDatabaseSchema();
 
 	if ( !strtInitHostDB() )

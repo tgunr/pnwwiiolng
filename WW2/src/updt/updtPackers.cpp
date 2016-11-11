@@ -403,7 +403,7 @@ static SINT32 _packVehicleHead(PackMode mode, UCHAR* const data, SINT32 offset, 
 		if (vupHeader != nullptr && vupHeader->player != nullptr && vupHeader->player->station != UPDT_OTHER)
 		{
 			vehInfo->cmdrTimeStamp = localTimeStamp;
-		} 
+		}
 
 #else
 		// restore timestamp for client and update position if included
@@ -625,7 +625,7 @@ static void _initVehicleHeader(VEHICLE_UPDATE_HEADER* const vupHeader, Viewing& 
 					// overide the fire bit and set the xmit flag
 					vupHeader->fireMask |= mask;
 #ifdef HEAVY_DEBUG
-					dbugLog(_FLD, "used fire bit overide %d set at %llus for update last sent %llus", t, vehInfo->fire.clock64[t], viewing.m_lastSent);
+					dbugLog(_FLD, "used fire bit overide %d set at %" PR64BitUT "s for update last sent %" PR64BitUT "s", t, vehInfo->fire.clock64[t], viewing.m_lastSent);
 #endif
 				}
 			}
@@ -857,7 +857,7 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 	{
 		// Look for the vehicle locally, incase this is an update.
 		vhold->vehicle = hostFindVehicleLocal(vehIndex);
-		threadLog(_FLD, "rv:%u received first time", vehIndex);
+		dbugLog(_FLD, "rv:%u received first time", vehIndex);
 
 		if (vhold->vehicle == nullptr)
 		{
@@ -867,7 +867,7 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 			{
 				vhold->vehicle = hostCreateRemoteVehicle(tempVehicle.instance(), vehIndex, tempVehicle.spec());
 				if(vhold->vehicle)
-					threadLog(_FLI, "rv:%u created remote vehicle %p", vehIndex, vhold->vehicle);
+					dbugLog(_FLI, "rv:%u created remote vehicle %p", vehIndex, vhold->vehicle);
 			}
 			else
 			{
@@ -895,7 +895,7 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 			static TeulTimeMS nextBlip = teulClock64;
 			if ( Server::myServerInfo.stats.status == Server::SERVER_ACCEPTING && teulClock64 >= nextBlip )
 			{
-				threadLog(_FLA, "rv:%u not found", vehIndex);
+				dbugLog(_FLA, "rv:%u not found", vehIndex);
 				nextBlip = teulClock64 + 500;
 			}
 			// subsitute a dummy vehicle so we can at least unpack

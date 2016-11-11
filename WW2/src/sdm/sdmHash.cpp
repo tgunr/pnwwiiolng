@@ -198,7 +198,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 		const size_t maxBldgId = (size_t)(bldgMap.rbegin()->first) + 1;
 
 		bldHash->maxBldID = maxBldgId;
-		
+
 		delete[] bldHash->building;
 		bldHash->building = new STRAT_BUILDING[maxBldgId];
 

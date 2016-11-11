@@ -102,7 +102,7 @@ _aggregatePermissions(ChatPermissions& lhs, const CHAT_GROUPS& groups)
         groupNos += num;
     }
     char buffer[2048];
-    strprintf(buffer, "For groups {%s} maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perms=%llx vehGrants=%" PRSizeT ""
+    strprintf(buffer, "For groups {%s} maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perms=%" PRPermMaskT " vehGrants=%" PRSizeT ""
                             , groupNos.c_str()
                             , lhs.m_limitRank[BRANCH_LAND]
                             , lhs.m_limitRank[BRANCH_AIR]
@@ -111,7 +111,7 @@ _aggregatePermissions(ChatPermissions& lhs, const CHAT_GROUPS& groups)
                             , lhs.m_permissionMask
                             , lhs.m_vehicleGrants.size()
                             );
-    threadLog(_FLD, "%s", buffer);
+	dbugLog(_FLD, "%s", buffer);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -169,7 +169,7 @@ public:
 			_aggregatePermissions(it->second.m_permissions, it->first);
 		}
 
-        threadLog(_FLD, "%u groups loaded, %u in cache", numRows, g_pgc.size());
+		dbugLog(_FLD, "%" PRSizeT " groups loaded, %" PRSizeT " in cache", numRows, g_pgc.size());
 	}
 
 	virtual void Failure() override
@@ -209,7 +209,7 @@ public:
 
 		ProcessVehicles(git->second, vehicleList.c_str());
 
-        dbugLog(_FLD, "grp:%u %s maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perm:%llx vehs:%" PRSizeT ""
+        dbugLog(_FLD, "grp:%u %s maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perm:%" PRPermMaskT " vehs:%" PRSizeT ""
                         , perm.m_groupOID
                         , (perm.m_enabled ? "enabled" : "disabled")
                         , perm.m_limitRank[BRANCH_LAND]

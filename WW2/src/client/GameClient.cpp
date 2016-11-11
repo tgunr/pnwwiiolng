@@ -1153,9 +1153,8 @@ void GameClient::ProcessMissionStatus(const Chat::MissionStatus* ms)
         PPOSpec *spec = specLoader.ppoGetSpec(ms->fru().subtype.get());
 		if(spec && spec->stotype == ServerTrackedObject::_UMS)
 		{
-            
             globalMSCoolDownEnd = frametime + remaining;
-            
+
             PlayerPlacedObject* ppo = fpPPOGet();
 			if(ppo && ppo->buildAt > 0)
 				ppo->Interrupt();
@@ -1786,9 +1785,9 @@ bool GameClient::ReceiveServerTrackedObject(int type, ACTION_OBJECT* a)
 
 static void _editCallback(JSContext* ctx, UINT32 argc, jsval* argv)
 {
-    /* 
+    /*
      TBD - I expect something was intended here, but nothing is done currently.
-     
+
 	const char* type = (argc > 0) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[0])) : nullptr;
 	const char* value = (argc > 1) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[1])) : nullptr;
 

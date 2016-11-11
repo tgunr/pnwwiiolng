@@ -6,26 +6,20 @@ SET( OMGGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/omggen" )
 FILE( MAKE_DIRECTORY ${OMGGEN_OUTPUT_DIR} )
 
 # Pull in the Bison parser and Flex lexer used by OMGgen
-BISON_TARGET( OMGParser
-    "${OMGGEN_INPUT_DIR}/omggen.y" "${OMGGEN_OUTPUT_DIR}/omggen.tab.cpp"
-#    COMPILE_FLAGS "--report=all"
-    DEFINES_FILE "${OMGGEN_OUTPUT_DIR}/omggen.tab.h"
-)
-FLEX_TARGET( OMGLexer
-    "${OMGGEN_INPUT_DIR}/omggen.l" "${OMGGEN_OUTPUT_DIR}/omggen.yy.cpp"
-    COMPILE_FLAGS "-B --nounistd"
-    DEFINES_FILE "${OMGGEN_OUTPUT_DIR}/omggen.yy.h"
-)
-ADD_FLEX_BISON_DEPENDENCY( OMGLexer OMGParser )
+#BISON_TARGET( OMGParser
+#    "${OMGGEN_INPUT_DIR}/omggen.y" "${OMGGEN_OUTPUT_DIR}/omggen.tab.cpp"
+##    COMPILE_FLAGS "--report=all"
+#    DEFINES_FILE "${OMGGEN_OUTPUT_DIR}/omggen.tab.h"
+#)
+#FLEX_TARGET( OMGLexer
+#    "${OMGGEN_INPUT_DIR}/omggen.l" "${OMGGEN_OUTPUT_DIR}/omggen.yy.cpp"
+#    COMPILE_FLAGS "-B --nounistd"
+#    DEFINES_FILE "${OMGGEN_OUTPUT_DIR}/omggen.yy.h"
+#)
+#ADD_FLEX_BISON_DEPENDENCY( OMGLexer OMGParser )
 
 # Define OMGgen itself
-ADD_EXECUTABLE( OMGgen
-    ${OMGGEN_OUTPUT_DIR}/omggen.tab.cpp ${OMGGEN_OUTPUT_DIR}/omggen.tab.h
-    ${OMGGEN_OUTPUT_DIR}/omggen.yy.cpp  ${OMGGEN_OUTPUT_DIR}/omggen.yy.h
-    ${OMGGEN_INPUT_DIR}/omggen.cpp     ${OMGGEN_INPUT_DIR}/omggen.h
-)
-TARGET_INCLUDE_DIRECTORIES( OMGgen PRIVATE "${OMGGEN_INPUT_DIR}" PRIVATE "${OMGGEN_OUTPUT_DIR}" )
-SET_PROPERTY(TARGET OMGgen PROPERTY FOLDER "Tools")
+ADD_SUBDIRECTORY(omggen)
 
 # Macro to generate an OMG build command
 MACRO( ADD_OMG_TARGET Name )

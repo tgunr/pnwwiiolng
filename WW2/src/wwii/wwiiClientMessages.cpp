@@ -183,7 +183,7 @@ static SINT32
 _sendPlayerLogin(ACTION_OBJECT* const a)
 {
 	PLAYER_LOGIN* const login = (PLAYER_LOGIN*)a->localRawData;
-	return login->packer(TEUL_PACK, a->packed, a->offset);
+	return login->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -228,18 +228,18 @@ Teul::Connection::login()
 	// the idea being that since traffic is encrypted it'll provide something
 	// to test the packet stream. *shrug*
 	if ( m_playerIdent.m_playerID == 0 )
-		memcpy(login.CopyRightString, AUTH_SEQ, AUTH_SEQ_SIZE);
+		strsafecpy(login.CopyRightString, AUTH_SEQ);
 	else
 	{
 		if ( m_type == Map )
 		{
 			// If we're auth-bypassing into the map host, we send our playerID instead.
-			snprintf((char*)login.CopyRightString, AUTH_SEQ_SIZE, "%u", m_playerIdent.m_playerID);
+			strprintf(login.CopyRightString, "%u", m_playerIdent.m_playerID);
 		}
 		else
 		{
 			// For the other servers, we prefix it with an R. I'm not 100% sure why -- OGS.
-			snprintf((char*)login.CopyRightString, AUTH_SEQ_SIZE, "R%u", m_playerIdent.m_playerID);
+			strprintf(login.CopyRightString, "R%u", m_playerIdent.m_playerID);
 		}
 	}
 
@@ -318,7 +318,7 @@ Teul::Connection::start(class ww2::Client* const client)
 	// tells us that we were able to perform a TCP open,
 	// it doesn't tell us that we're connected yet.
 	SINT32 newTeulIndex = teulOpenSend(m_serverAddr.m_hostIP, m_serverAddr.m_port, s_onConnect, (SINT32)m_timeoutMS, PROTOCOL_TCP, s_onError);
-	if ( newTeulIndex == -1 )
+	if ( newTeulIndex < 0 )
 		return false;
 
 	// Make sure there's not already a connection in progress

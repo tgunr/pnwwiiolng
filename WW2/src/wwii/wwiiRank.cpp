@@ -45,7 +45,7 @@ Rank::add(const RANK_NO level, const Rank::TYPE type, const UINT32 points, const
 	if ( description == nullptr )
 		description = rankNames[0].c_str();
 
-	dbugLog(_FLD, "r:%d new rank: type:%d, perms:%llx, points: %d :: %s", level, type, perm, points, description);
+	dbugLog(_FLD, "r:%d new rank: type:%d, perms:%" PRPermMaskT ", points: %d :: %s", level, type, perm, points, description);
 
 	Rank& rank = s_ranks[level];
 	rank.m_level = level;
@@ -104,6 +104,7 @@ Rank::setSize(size_t num)
 void
 wwiiReadRanks()
 {
+	dbugLog(_FLI, "Loading ranks");
 	try
 	{
 		DBQuery dbq(dbh, QRY_SELECT_RANKS);

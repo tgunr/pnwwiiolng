@@ -307,7 +307,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 	const WEAPON_SPEC& spec = commander->weapon().spec;
 
     auto& instance = commander->instance();
-    dbugLog(_FLD, "Notifying cell:%s spawning t:%d,p:%u,c:%s sq:%u(%s) ct:%d,cp:%u,cc:%s in:%u.%u.%llu.%llu %s#%d [%f/%f/%f]"
+    dbugLog(_FLD, "Notifying cell:%s spawning t:%d,p:%u,c:%s sq:%u(%s) ct:%d,cp:%u,cc:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " %s#%d [%f/%f/%f]"
                     , teulGetAddress(grant.serverIP)
                     , commander->teulIndex(), grant.commander, commander->callsign()
                     , commander->squadID(), Chat::Name(commander->squadHandle()).c_str()

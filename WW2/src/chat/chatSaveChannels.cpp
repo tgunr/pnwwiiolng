@@ -113,7 +113,7 @@ PlayerChannels::Success()
 		player->m_tunes->types[slot] = m_results[i].m_type;
 		player->m_tunes->subs[slot] = m_results[i].m_sub;
 		if ( g_debugRadios )
-			dbugLog(_FLD, "t:%d p:%u c:%s saved tune %u to %u/%llu"
+			dbugLog(_FLD, "t:%d p:%u c:%s saved tune %u to %u/%" PR64BitUT ""
 							, player->teulIndex(), player->playerID(), player->callsign()
 							, slot, player->m_tunes->types[slot], player->m_tunes->subs[slot]
 							);
@@ -185,7 +185,7 @@ chatSaveChannels(Player& player)
 		// Add separator or space
 		*(sp++) = (saved++) ? ',' : ' ';
 
-		sp += sprintf(sp, "(%u,%u,%u,%llu)", player.playerID(), i, type, subID);
+		sp += sprintf(sp, "(%u,%u,%u,%" PR64BitUT ")", player.playerID(), i, type, subID);
 	}
 	if ( saved == 0 )
 	{

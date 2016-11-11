@@ -80,7 +80,8 @@ SET( STRAT_HOST_EXE "stratd" )
 
 ####################################
 ## Embedded library search path
-SET( LIBRARIES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../Libraries" )
+SET( PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
+SET( LIBRARIES_DIR "${PROJECT_DIR}/Libraries" )
 
 ####################################
 ## General search paths
@@ -112,6 +113,19 @@ FILE( TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" _PLAYNET )
 
 # Enable per-host ports for running clusters on less than 4 hosts
 OPTION( PN_DIFFERENT_PORTS	"Use different public-facing ports for game servers." ON )
+
+# Disable building and use of auth host (for cluster-on-a-box/controller testing)
+OPTION( PN_DISABLE_AUTH     "Build without use of/support for auth" OFF )
+
+# If the user is building a Debug build, enable SANITIZE options.
+IF ( NOT MSVC )
+	IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+		OPTION( PN_SANITIZE "Enable -fsanitize=address, -fsanitize=undefined and -fstack-protector-all" OFF )
+	ELSE()
+		SET( PN_SANITIZE OFF CACHE BOOL "Enables address sanitizer etc on non-msvc builds" FORCE )
+		MARK_AS_ADVANCED( PN_SANITIZE )
+	ENDIF()
+ENDIF()
 
 ####################################
 ## Provide platform and server defines
@@ -257,9 +271,21 @@ ADD_LIBRARY( wwiilib STATIC
 	xml/XMLLoader2.cpp xml/XMLLoader2.h
 	weap/weapSpawnXML.cpp weap/weapSpawnXML.h
 	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
+	omg/omgChat.cxx omg/omgChat.hxx
+	omg/omgMissionSortieData.cxx omg/omgMissionSortieData.hxx
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
-SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES} ${LIBZ_LIBRARIES})
+SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES})
+IF (BUILDING_OWN_LIBXML2)
+	MACRO( USE_WWIILIB_ON Name )
+		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} )
+		ADD_DEPENDENCIES( ${Name} libxml2 )
+	ENDMACRO()
+ELSE()
+	MACRO( USE_WWIILIB_ON Name)
+		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} )
+	ENDMACRO()
+ENDIF()
 
 ####################################
 ## Various commandline utility executables
@@ -271,7 +297,8 @@ IF ( NOT MSVC )
         chat/chatManagementClientMessages.cpp chat/chatManagementClientMessages.h
         chat/chatManagementPack.cpp chat/chatRoster.cpp chat/chatRosterClient.cpp
     )
-    TARGET_LINK_LIBRARIES( chatClient ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
+	USE_WWIILIB_ON( chatClient )
+    TARGET_LINK_LIBRARIES( chatClient teulserver ${MYSQL_LIBRARIES} )
     SET_PROPERTY( TARGET chatClient PROPERTY FOLDER "Tools" )
     
     ADD_EXECUTABLE( luaClient src/luaClient.cpp )
@@ -279,8 +306,9 @@ IF ( NOT MSVC )
         PRIVATE ${READLINE_INCLUDE_DIRS}
         PRIVATE ${NCURSES_INCLUDE_DIRS}
     )
+	USE_WWIILIB_ON( luaClient )
     TARGET_LINK_LIBRARIES( luaClient
-        ${WWIILIB_LIBRARIES} teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
+        teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
     )
     SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
 
@@ -292,14 +320,77 @@ IF ( NOT MSVC )
         COMPONENT cmdclients
     )
 
-    # Not currently generated:
-    #  checkGameName: Check callsign validity, not all that useful
-    #  sdmpp: Prunes terrain files lacking strat data, pretty unhelpful currently
-    #  sdmDump: Analyzes terrain files, not helpful without terrain work happening
-    #  stratLoader: Partially loads terrain into the database, which hosts do anyway
-    #  stratValidator: Uses server routines to validate SDM/WOR data, terrain terrain terrain, sigh
-    # See git revision history for build commands.
+ENDIF()
 
+IF ( MSVC )
+	# kfsone: I'm currently using these because they're helpful for cluster-in-a-box,
+
+	# Not currently generated:
+	#  checkGameName: Check callsign validity, not all that useful
+	#  sdmpp: Prunes terrain files lacking strat data, pretty unhelpful currently
+	#  sdmDump: Analyzes terrain files, not helpful without terrain work happening
+	#  stratLoader: Partially loads terrain into the database, which hosts do anyway
+	#  stratValidator: Uses server routines to validate SDM/WOR data, terrain terrain terrain, sigh
+	# See git revision history for build commands.
+
+	# In theory, SDM pre-parser. In practice? Deletes SDM files that don't
+	# contain any strat data.
+	# Not part of stratValidator because the original coders couldn't figure
+	# out why it leaked so much memory.
+	ADD_EXECUTABLE(sdmpp
+		sdm/sdmpp.cpp
+			sdm/sdmpp.h
+
+		sdm/sdmConfigVars.h
+	)
+	TARGET_LINK_LIBRARIES(sdmpp teulserver ${MYSQL_LIBRARIES})
+	USE_WWIILIB_ON(sdmpp)
+	SET_PROPERTY(TARGET sdmpp PROPERTY FOLDER "Tools")
+
+	# Reads SDM files and imports portions of them into the game database.
+	# Which is a shame, because the hosts wind up reading the SDM files too
+	# to get the missing data. *Sigh*
+	ADD_EXECUTABLE(stratLoader
+		src/loader.cpp
+		sdm/sdmLoad.cpp
+			sdm/sdmLoad.h
+			sdm/sdmParse.h
+	)
+	TARGET_LINK_LIBRARIES(stratLoader teulserver ${MYSQL_LIBRARIES})
+	USE_WWIILIB_ON(stratLoader)
+	SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
+
+	ADD_EXECUTABLE(stratValidator
+		parse/parseWor.cpp
+			parse/parseWor.h
+				parse/parseIO.h
+				strt/strtWOR.h
+					parse/parse.h
+					strt/strtDTL.h
+		strt/strtCPStruct.cpp
+			strt/strtCPStruct.h
+				strt/strtProtos.h
+				wwii/wwiiHCUnits.h
+				strt/strtCPFlags.h
+				inst/instDescriptor.h
+					mm/mmEnums.h
+		strt/strtData.cpp
+			strt/strtData.h
+			wwii/wwiiConfigVars.h
+				teul/teulConfigVar.h
+		strt/strtFacilityStruct.cpp
+			strt/strtFacilityStruct.h
+		strt/strtObjectStruct.cpp
+			strt/strtObjectStruct.h
+		strt/strtIO.cpp
+			strt/strtIO.h
+		strt/strtValidator.cpp
+		${PCH_INCLUDE_HEADERS}
+	)
+	SET_PROPERTY(TARGET stratValidator PROPERTY COMPILE_DEFINITIONS CHECK_SUPPLY=1)
+	USE_WWIILIB_ON(stratValidator)
+	TARGET_LINK_LIBRARIES(stratValidator teulserver ${MYSQL_LIBRARIES})
+	SET_PROPERTY(TARGET stratValidator PROPERTY FOLDER "Tools")
 ENDIF()
 
 ####################################
@@ -321,25 +412,31 @@ MACRO( ADD_HOST_TARGET Name )
     IF ( HOST_TARGET_ARG_LUA )
         TARGET_LINK_LIBRARIES( "${Name}" ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
     ENDIF()
-    TARGET_LINK_LIBRARIES( "${Name}" ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
+	USE_WWIILIB_ON( "${Name}" )
+    TARGET_LINK_LIBRARIES( "${Name}" teulserver ${MYSQL_LIBRARIES} )
     IF ( NOT "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" STREQUAL "" )
         SET_PROPERTY( TARGET "${Name}" PROPERTY COMPILE_DEFINITIONS "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" )
     ENDIF()
     SET_PROPERTY( TARGET "${Name}" PROPERTY FOLDER "Hosts" )
+	TARGET_COMPILE_OPTIONS( "${Name}" PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
+	TARGET_LINK_LIBRARIES( "${Name}" ${_EXTRA_HOST_LINK_OPTIONS} )
 ENDMACRO( ADD_HOST_TARGET )
 
 ####################################
 ## Auth host
-ADD_HOST_TARGET( ${AUTH_HOST_EXE} SOURCES
-    auth/authClientData.cpp auth/authClientData.h
-    auth/authDatabaseSchemas.h
-    auth/authGame.h
-    auth/authHost.cpp auth/authHost.h auth/authHostMessages.cpp auth/authHostMessages.h
-    auth/authQueue.cpp auth/authQueue.h auth/authQueuePosition.h wwii/wwiiRunningAverage.h
-    auth/authOTP.cpp auth/authOTP.h
-    auth/authPack.cpp auth/authPack.h
-	EXTRA_DEFINITIONS "IS_AUTH_HOST"
-)
+IF ( NOT PN_DISABLE_AUTH )
+	ADD_HOST_TARGET( ${AUTH_HOST_EXE} SOURCES
+		auth/authClientData.cpp auth/authClientData.h
+		auth/authDatabaseSchemas.h
+		auth/authGame.h
+		auth/authHost.cpp auth/authHost.h auth/authHostMessages.cpp auth/authHostMessages.h
+		auth/authQueue.cpp auth/authQueue.h auth/authQueuePosition.h wwii/wwiiRunningAverage.h
+		auth/authOTP.cpp auth/authOTP.h
+		auth/authPack.cpp auth/authPack.h
+		EXTRA_DEFINITIONS "IS_AUTH_HOST"
+	)
+	SET(AUTH_INSTALL ${AUTH_HOST_EXE})
+ENDIF()
 
 ####################################
 ## Controller host
@@ -411,7 +508,7 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     chat/chatHostMotds.cpp chat/chatHostMotds.h chat/chatMotds.cpp chat/chatMotds.h
     chat/chatMissionInvite.cpp chat/chatMissionInvite.h
     chat/chatMissionMember.cpp chat/chatMissionMember.h chat/chatMissions.cpp chat/chatMissions.h
-    omg/omgChat.cxx omg/omgChat.hxx chat/chatConstants.h
+    chat/chatConstants.h
     chat/chatMultiCrew.cpp chat/chatMultiCrew.h
     teul/teulNetworkArray.h teul/teulNetworkObject.h wwii/wwiiPack.h
     chat/chatReports.cpp chat/chatReports.h
@@ -456,7 +553,6 @@ ADD_HOST_TARGET( ${CELL_HOST_EXE} SOURCES
     host/host.cpp host/host.h
     miss/missionPacket.h mm/mmEnums.h
     host/host.h host/hostPlayers.h
-    omg/omgMissionSortieData.cxx omg/omgMissionSortieData.hxx
     miss/missFlags.h wwii/wwiiSyncVar.h
     teul/teulNetTimeMS.h teul/teulNetTimeMSPacker.h
     weap/weapSpecPacker.h wwii/wwiiFullObjIDPacker.h
@@ -510,10 +606,9 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     map/mapHost.cpp map/mapHostMessages.cpp map/mapHostMessages.h
     map/mapMinuteBalance.cpp map/mapMinuteBalance.h
     map/mapPack.cpp
-    map/mapPlayer.cpp map/mapPlayer.h map/mapPlayerTypes.h omg/omgChat.hxx
+    map/mapPlayer.cpp map/mapPlayer.h map/mapPlayerTypes.h
     miss/missionTypes.h miss/missionPacket.h miss/missFlags.h
     wwii/wwiiPlayer.h mm/mmEnums.h wwii/wwiiRank.h weap/weapSerial.h
-    omg/omgMissionSortieData.cxx omg/omgMissionSortieData.hxx
     wwii/wwiiSyncVar.h teul/teulNetTimeMS.h teul/teulNetTimeMSPacker.h
     weap/weapSpecPacker.h wwii/wwiiFullObjIDPacker.h
     inst/instDescriptor.h auth/authDispatch.h
@@ -524,7 +619,6 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     miss/missionHostMessages.cpp miss/missionHostMessages.h
     miss/missionPack.cpp miss/missionPack.h
     miss/missMobileSpawn.cpp miss/missMobileSpawn.h include/mobileSpawnEnums.h
-    mm/mmAntiAddiction.cpp mm/mmAntiAddiction.h wwii/wwiiAntiAddiction.h
     mm/mmHostInstanceImpl.cpp mm/mmHostInstanceImpl.h
     inst/instHostInstanceImpl.h inst/instHostInstance.h inst/instBasicStatus.h
     host/hostPlayers.h inst/instStateEnums.h
@@ -593,7 +687,7 @@ ADD_CUSTOM_COMMAND(
     MAIN_DEPENDENCY hostproj/${STRAT_HOST_EXE}.pkg
     DEPENDS
         ${TOLUAPP_EXECUTABLE} ${TOLUAPP_LIBRARIES}
-        hostproj/syscfg.h hostproj/${STRAT_HOST_EXE}.pkg
+        hostproj/syscfg.h hostproj/${STRAT_HOST_EXE}.pkg include/luaPkg.h
         include/platforms.h include/systypes.h include/luaGlue.h include/precompile_includes.h
         wwii/wwiiThreads.h wwii/wwiiOwnershipEnums.h inst/instBasicStatus.h wwii/wwiiConfig.h
         chat/chatHandle.h weap/weapSpec.h
@@ -661,14 +755,17 @@ ADD_HOST_TARGET( ${STRAT_HOST_EXE} SOURCES
 )
 IF ( MSVC )
     SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY COMPILE_FLAGS
-                  "/W0" "/wd4480" "/wd4800" "/wd4305" "/wd4505" )
+                  "/W0" )
+ELSE()
+	SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY COMPILE_FLAGS
+                  "-Wno-unused-function" )
 ENDIF()
 TARGET_INCLUDE_DIRECTORIES( ${STRAT_HOST_EXE} PRIVATE ${TOLUAPP_INCLUDE_DIR} )
 
 INSTALL(
     TARGETS
         ${CONTROLLER_HOST_EXE} ${STRAT_HOST_EXE} ${DBD_HOST_EXE}
-        ${CHAT_HOST_EXE} ${MAP_HOST_EXE} ${CELL_HOST_EXE} ${AUTH_HOST_EXE}
+        ${CHAT_HOST_EXE} ${MAP_HOST_EXE} ${CELL_HOST_EXE} ${AUTH_INSTALL}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
     RUNTIME DESTINATION bin
@@ -691,9 +788,12 @@ INSTALL( DIRECTORY hostproj/web/ DESTINATION web COMPONENT web PATTERN ".git" EX
 ## Tests
 
 # Auth connection test
-ADD_EXECUTABLE( testAuthConnect tests/testAuthConnect.cpp )
-TARGET_LINK_LIBRARIES( testAuthConnect ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
-SET_PROPERTY( TARGET testAuthConnect PROPERTY FOLDER "Test" )
+IF ( NOT PN_DISABLE_AUTH )
+	ADD_EXECUTABLE( testAuthConnect tests/testAuthConnect.cpp )
+	USE_WWIILIB_ON( testAuthConnect )
+	TARGET_LINK_LIBRARIES( testAuthConnect teulserver ${MYSQL_LIBRARIES} )
+	SET_PROPERTY( TARGET testAuthConnect PROPERTY FOLDER "Test" )
+ENDIF()
 
 # Builds a single executable that runs all of the unit tests;
 # The install process will not execute unless all tests complete.
@@ -702,14 +802,17 @@ ADD_EXECUTABLE( testUnits
     tests/testTeulBits.cpp tests/testAuthQueue.cpp auth/authClientData.cpp
     tests/testChatHandle.cpp tests/testFullObjID.cpp tests/testCommandWithArgs.cpp
     tests/testInplaceVector.cpp tests/testPackers.cpp comm/commPackers.cpp
-    tests/testChatMissionStatus.cpp omg/omgChat.hxx tests/testHostGridCell.cpp host/hostGridCell.cpp
+    tests/testChatMissionStatus.cpp tests/testHostGridCell.cpp host/hostGridCell.cpp
     tests/testSupercellVislevelXfer.cpp tests/testPersonaXfer.cpp tests/testCryptographer.cpp
     tests/testXYZTuple.cpp tests/testTeulPacket.cpp
-    wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChat.cxx omg/omgChat.hxx
+    wwii/wwiiServerTrackedObjectPacker.cpp
     tests/testSuite.h tests/testUnits.h
 )
 SET_PROPERTY( TARGET testUnits PROPERTY COMPILE_DEFINITIONS "ENABLE_TESTS" )
-TARGET_LINK_LIBRARIES( testUnits ${WWIILIB_LIBRARIES} teulserver ${MYSQL_LIBRARIES} )
+USE_WWIILIB_ON( testUnits )
+TARGET_COMPILE_OPTIONS( testUnits PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
+TARGET_LINK_LIBRARIES( testUnits ${_EXTRA_HOST_LINK_OPTIONS} )
+TARGET_LINK_LIBRARIES( testUnits teulserver ${MYSQL_LIBRARIES} )
 SET_PROPERTY( TARGET testUnits PROPERTY FOLDER "Test" )
 
 ADD_TEST( testUnits testUnits )
@@ -721,42 +824,8 @@ ADD_EXECUTABLE(testTeul
     wwii/wwiiCallbacks.h tests/testTeulTest.h tests/testTeulClient.h tests/testTeulServer.h
     teul/teulVersion.h teul/teulConnectionInstruction.h
 )
-TARGET_LINK_LIBRARIES( testTeul teulserver ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
+USE_WWIILIB_ON( testTeul )
+TARGET_COMPILE_OPTIONS( testTeul PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
+TARGET_LINK_LIBRARIES( testTeul ${_EXTRA_HOST_LINK_OPTIONS} )
+TARGET_LINK_LIBRARIES( testTeul teulserver ${MYSQL_LIBRARIES} )
 SET_PROPERTY( TARGET testTeul PROPERTY FOLDER "Test" )
-
-######################################################################
-#### Package building.
-
-SET(CPACK_COMPONENTS_ALL game lua web auth)
-
-SET(CPACK_GENERATOR "DEB")
-SET(CPACK_INSTALL_PREFIX "${_PLAYNET}/wwiiol")
-SET(CPACK_SET_DESTDIR ON)
-SET(CPACK_PACKAGING_INSTALL_PREFIX "${_PLAYNET}/wwiiol")
-SET(OptLevel "NoOptimization")
-IF( PN_ENABLE_OPTS AND OPTIMIZATION GREATER 0 )
- SET(OptLevel "OptLevel${OPTIMIZATION}")
-ENDIF( )
-SET(CPACK_PACKAGE_VERSION "${REPO_WC_REVISION}.${CMAKE_BUILD_TYPE}.${BUILDNAME}.${OptLevel}")
-SET(CPACK_OUTPUT_FILE_PREFIX "${_PLAYNET}/packages")
-SET(CPACK_PACKAGE_VENDOR "Cornered Rat Software")
-SET(CPACK_PACKAGE_NAME "wwiiol")
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "WWII Online game servers")
-SET(CPACK_PACKAGE_DESCRIPTION "'BattleGround Europe: WWII Online' game servers, auth host and tools.")
-IF( PN_CLUSTER STREQUAL "Auth" )
- SET(CPACK_PACKAGE_NAME "wwiiol-auth")
- SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "WWIIOL Auth Host")
- SET(CPACK_PACKAGE_DESCRIPTION "'BattleGround Europe: WWII Online' stand-alone auth host.")
-ENDIF( )
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Oliver Smith")
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libopenthreads-dev(>= 2.8), lua5.1(>= 5.1.4-5), libmysqlclient16(>= 5.5.0), bash(>= 4.1), gdb(>= 7.1), nfs-common, mysql-server(>= 5.5)")
-SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "WWIIOL Game Servers")
-SET(CPACK_DEBIAN_PACKAGE_SECTION "Network")
-SET(CPACK_DEBIAN_PACKAGE_PRIORITY "Important")
-SET(CPACK_DEBIAN_PACKAGE_RECOMMENDS "vim, mysql-client(>= 5.5), python(>= 2.6.5), bzip2")
-SET(CPACK_DEBIAN_PACKAGE_SUGGESTS "perl(>= 5.1), etckeeper, byobu")
-SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes/preinst;${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes/postinst;")
-
-INCLUDE(CPack)      # For making installers
-
-SET(_PREV_BUILD_TYPE "${PN_BUILD_TYPE}" CACHE INTERNAL "Value of PN_BUILD_TYPE last time CMake Ran" FORCE)
