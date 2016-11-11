@@ -195,7 +195,7 @@ teulOpenListen(const UINT16 portNumber
 	return _openListen(0, portNumber,  acceptFnPtr,  timeout,  protocol,  errorFnPtr);
 }
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 // opens a port for listening on all address associated with the specified interface.
 // Assumes that all callbacks have been properly installed.  returns -error_number or 0 on success.
 // connection acceptFnPtr is an optional ptr to callback function which is
