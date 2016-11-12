@@ -1928,16 +1928,16 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERR
 			LogAbort("unrecognized argument '%s', see '--help' for usage.", argv[argn]);
 	}
 
-	Teul::ConfigVar::CheckConfiguration();
-
-	memInit();
-
 	// execute post-handlers for commands.
 	for (auto&& opt : allOptions) {
 		if (opt.postHandler) {
 			opt.postHandler();
 		}
 	}
+
+	Teul::ConfigVar::CheckConfiguration();
+
+	memInit();
 
 	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
 	if (retval != 0)

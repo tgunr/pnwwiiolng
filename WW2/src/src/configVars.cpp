@@ -300,18 +300,6 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 				break;
 			}
 		}
-
-		if ( !configEntries.m_foundGeneralFile && !configEntries.m_foundOSFile )
-		{
-#if defined(WIN32) && defined(UNICODE)
-			_ftprintf(stderr, _T("NOTE: Could not find '%s' or '%s' config files, using defaults.\n"),
-				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
-#else
-			fprintf(stderr, "NOTE: Could not find '%s' or '%s' config files, using defaults.\n",
-				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
-#endif
-		}
-
 		configEntries.m_read = true;
 	}
 
@@ -407,8 +395,11 @@ namespace Teul
 	const char* ConfigVar::GetEnv(const std::string& varName)
 	{
 		auto var = _findConfigVar(varName);
-		if (var)
-			return var->IsInitialized() && var->GetString() ? var->GetString() : "";
+		if ( var ) {
+			if ( var->IsInitialized() && var->GetString() )
+				return var->GetString();
+			return var->GetDefault() ? var->GetDefault() : "";
+		}
 		return nullptr;
 	}
 
@@ -455,6 +446,18 @@ namespace Teul
 
 	void ConfigVar::CheckConfiguration()
 	{
+		ConfigEntries& configEntries = _getConfigEntries();
+		if ( !configEntries.m_foundGeneralFile && !configEntries.m_foundOSFile )
+		{
+#if defined(WIN32) && defined(UNICODE)
+			_ftprintf(stderr, _T("NOTE: Could not find '%s' or '%s' config files, using defaults.\n"),
+				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+#else
+			fprintf(stderr, "NOTE: Could not find '%s' or '%s' config files, using defaults.\n",
+				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+#endif
+		}
+
 		for (auto& it : _getConfigVars())
 		{
 			if (it->m_required && (it->m_value == nullptr || (it->m_default == nullptr && *it->m_value == 0)))
