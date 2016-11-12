@@ -140,3 +140,5 @@ using ConfigSint = Teul::ConfigVar;
 using ConfigBool = Teul::ConfigVar;
 using ConfigAddr = Teul::ConfigVar;
 using ConfigPath = Teul::ConfigVar;
+
+extern const ConfigPath cv_pnPath;

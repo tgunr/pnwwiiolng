@@ -63,6 +63,7 @@ static ConfigVars& _getConfigVars()
 ////////////////////////////////////////////////////////////////////////////////
 // Variables.
 
+const CFG_PATH(pnPath, PN_PLAYNET_PATH, "PLAYNET_PATH", true, "Hard-coded playnet directory.");
 CFG_PATH(dataDir, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "data", "DATA_DIR", true, "Top level directory for game data.");
 CFG_PATH(importFile, "importlist.txt", "IMPORT_FILE", true, "File which will specify sdm files to be used by the server.");
 CFG_PATH(terrainSubdir, "terrain", "TERRAIN_SUBDIR", true, "Path from DATA_DIR to the terrain sdm files and origin file.");
