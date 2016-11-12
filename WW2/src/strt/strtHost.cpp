@@ -543,9 +543,9 @@ main(int argc, const char* argv[])
 
 	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {
 		{ "--lua-cmd", "Execute lua code after initializing.", true,
-			[](const char* code) { s_luaCmds.emplace_back(code); } },
-		{ "--init-only", "Terminate after loading strat data.", false, [](const char*) { s_initOnly = true; } },
-		{ "--debug", "Enable verbose + console logging", false, [](const char*) { s_debug = true; } }
+			[](const char* code) { s_luaCmds.emplace_back(code); }, nullptr },
+		{ "--init-only", "Terminate after loading strat data.", false, [](const char*) { s_initOnly = true; }, nullptr },
+		{ "--debug", "Enable verbose + console logging", false, [](const char*) { s_debug = true; }, nullptr, }
 	});
 	if ( !s_debug ) {
 		dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);

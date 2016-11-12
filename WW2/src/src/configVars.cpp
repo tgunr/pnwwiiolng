@@ -183,7 +183,9 @@ static Teul::ConfigVar* _findConfigVar(const std::string& envName)
 {
 	auto& vars = _getConfigVars();
 	auto it = std::find_if(vars.begin(), vars.end(),
-		[=](const Teul::ConfigVar* cv) { return envName.compare(cv->GetEnvVarName()) == 0; }
+		[=](const Teul::ConfigVar* cv) {
+			return envName.compare(cv->GetEnvVarName()) == 0;
+		}
 	);
 	return it != vars.end() ? *it : nullptr;
 }
@@ -399,6 +401,14 @@ namespace Teul
 	bool ConfigVar::LoadedOSConfig()
 	{
 		return _getConfigEntries().m_foundOSFile;
+	}
+
+	const char* ConfigVar::GetEnv(const std::string& varName)
+	{
+		auto var = _findConfigVar(varName);
+		if (var)
+			return var->IsInitialized() && var->GetString() ? var->GetString() : "";
+		return nullptr;
 	}
 
 	ConfigVar::ConfigVar(ConfigVarType type_, const char* name_, const char* default_, const char* envVarName_, bool required_, const char* description_)

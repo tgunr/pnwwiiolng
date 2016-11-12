@@ -1886,19 +1886,20 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERR
 	CommandLineOptions allOptions = {
 		{
 			"--help", "Show this help.", false,
-			[&allOptions, argv](const char*) { _help(argv, allOptions); }
+			[&allOptions, argv](const char*) { _help(argv, allOptions); }, nullptr
 		},
 		{
 			"--child", "Process should die when parent terminates.", false,
 #if platOS == OS_LINUX
-			[](const char*) { prctl(PR_SET_PDEATHSIG, SIGHUP); }
+			[](const char*) { prctl(PR_SET_PDEATHSIG, SIGHUP); }, nullptr
 #else
-			[](const char*) {}
+			[](const char*) {}, nullptr
 #endif
 		},
 		{
 			"--token", "Specify the controller connection token.", true,
-			[](const char* text) { s_controllerToken = strtoul(text, nullptr, 10); }
+			[](const char* text) { s_controllerToken = strtoul(text, nullptr, 10); },
+			nullptr
 		}
 	};
 	allOptions.insert(allOptions.end(), cliOptions.begin(), cliOptions.end());
@@ -1930,6 +1931,13 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERR
 	Teul::ConfigVar::CheckConfiguration();
 
 	memInit();
+
+	// execute post-handlers for commands.
+	for (auto&& opt : allOptions) {
+		if (opt.postHandler) {
+			opt.postHandler();
+		}
+	}
 
 	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
 	if (retval != 0)
