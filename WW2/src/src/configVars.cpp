@@ -363,7 +363,11 @@ void Teul::ConfigVar::Generate(const char* const filename_)
 				, it->GetDefault() ? '"' : '>'
 				);
 		fprintf(fp, "# %s\n", it->GetDescription());
-		fprintf(fp, "#%s=%s\n", it->GetEnvVarName(), (it->GetDefault() ? it->GetDefault() : (it->GetRequired() ? "???" : "")));
+		if ( it->IsInitialized() && it->GetString() && (!it->GetDefault() || strcmp(it->GetString(), it->GetDefault()) != 0) ) {
+			fprintf(fp, "%s=%s\n", it->GetEnvVarName(), it->GetString());
+		} else {
+			fprintf(fp, "#%s=%s\n", it->GetEnvVarName(), (it->GetDefault() ? it->GetDefault() : (it->GetRequired() ? "???" : "")));
+		}
 		fprintf(fp, "\n");
 	}
 	fclose(fp);
@@ -609,7 +613,7 @@ namespace Teul
 
 	void ConfigVar::SetUint32Value(UINT32 newValue_)
 	{
-		if ( m_initialized && newValue_ == m_union.um_uint32 )
+		if ( m_initialized && newValue_ == m_union.um_uint32 && m_value[0] )
 			return;
 		m_initialized = true;
 		m_union.um_uint32 = newValue_;
@@ -618,7 +622,7 @@ namespace Teul
 
 	void ConfigVar::SetSint32Value(SINT32 newValue_)
 	{
-		if ( m_initialized && newValue_ == m_union.um_sint32 )
+		if ( m_initialized && newValue_ == m_union.um_sint32 && m_value[0] )
 			return;
 		m_initialized = true;
 		m_union.um_sint32 = newValue_;
@@ -632,7 +636,7 @@ namespace Teul
 
 	void ConfigVar::SetIPAddressValue(UINT32 newValue_)
 	{
-		if ( m_initialized && newValue_ == m_union.um_uint32 )
+		if ( m_initialized && newValue_ == m_union.um_uint32 && m_value[0] )
 			return;
 		m_initialized = true;
 		if ( m_value )
