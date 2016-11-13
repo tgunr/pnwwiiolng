@@ -8,8 +8,8 @@ MACRO( ADD_OMG_TARGET Name )
     GET_FILENAME_COMPONENT( OmgDir ${OmgPrefix}.omg DIRECTORY )
     GET_FILENAME_COMPONENT( OmgFile ${OmgPrefix} NAME )
     ADD_CUSTOM_COMMAND(
-        OUTPUT ${OmgPrefix}.cxx ${OmgPrefix}.hxx
-        COMMAND OMGgen -D${OmgDir} --cxx=${OmgFile}.cxx --hxx=${OmgFile}.hxx ${OmgFile}.omg
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/omg/${OmgFile}.cxx ${CMAKE_CURRENT_BINARY_DIR}/omg/${OmgFile}.hxx
+        COMMAND OMGgen -D${OmgDir} --cxx=${CMAKE_CURRENT_BINARY_DIR}/omg/${OmgFile}.cxx --hxx=${CMAKE_CURRENT_BINARY_DIR}/omg/${OmgFile}.hxx ${OmgFile}.omg
         MAIN_DEPENDENCY ${OmgPrefix}.omg
         DEPENDS OMGgen ${OmgDir}/typedefs.omg
         WORKING_DIRECTORY ${OmgDir}
