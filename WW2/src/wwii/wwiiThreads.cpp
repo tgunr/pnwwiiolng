@@ -381,9 +381,9 @@ StatsThread::run()
 		try
 		{
 			dbQueue.doLocked([&] {
-				dbCurSize = dbQueue.size();
-				dbMaxSize = dbQueue.maxSize();
-				dbUsed = dbQueue.hits() - dbLastUsed;
+				dbCurSize = dbQueue.size_locked();
+				dbMaxSize = dbQueue.maxSize_locked();
+				dbUsed = dbQueue.hits_locked() - dbLastUsed;
 				dbLastUsed += dbUsed;
 			});
 

@@ -399,11 +399,21 @@ PPOSTO::applyJoules(const SINT64& joules, class Player* const player)
 		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u damage (%lldj) < damage threshold (%lluj), taking no damage"
 							, player->teulIndex(), player->playerID(), player->callsign()
 							, uid(), joules, damage().threshold());
+#if defined(BETA_RELEASE)
+		player->message(LSTR_BETA, LSTR_MSP_DMG_IGNORED);
+#endif
 		return false;
 	}
 
 	if ( damage().applyJoules(joules) == false )
 	{
+#if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
+		char doneJoules[32];
+		char threshJoules[32];
+		strprintf(doneJoules, "%llu", joules);
+		strprintf(threshJoules, "%llu", damage().threshold());
+		player->message(LSTR_BETA, LSTR_STO_DMG_THRESHOLD, doneJoules, threshJoules);
+#endif
 		return false;
 	}
 
@@ -412,12 +422,19 @@ PPOSTO::applyJoules(const SINT64& joules, class Player* const player)
 		dbugLog(_FLI, "t:%d p:%u c:%s sto:%u did %lldj damage. %s at %lluj/%lluj total"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, uid(), joules, typeName(), damage().accumulated(), damage().capacity());
+#if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
+		PREP_CHAT_MSG(cmsg, "%lluj to sto (%llu/%llu)", joules, damage().accumulated(), damage().capacity());
+		player->message(LSTR_BETA, LSTR_GENERIC, cmsg);
+#endif
 		return false;
 	}
 
 	dbugLog(_FLI, "t:%d p:%u c:%s sto:%u %s destroyed [%lldj -> %lluj damage]"
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, uid(), typeName(), joules, damage().capacity());
+#if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
+	player->message(LSTR_BETA, LSTR_UMS_KILLED);
+#endif
 
 	wwiiRemoveSTO(uid());
 

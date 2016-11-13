@@ -18,7 +18,7 @@ constexpr void silence_unused_parameter_warning(T&& t, Args&&... args) {
 	(void)std::forward<T>(t), silence_unused_parameter_warning(std::forward<Args>(args)...);
 }
 
-#if defined(DEBUG) || defined(ALPHA_RELEASE)
+#if platBuild == BUILD_SERVER || defined(DEBUG) || defined(ALPHA_RELEASE)
 #define  _FL __FILE__, __LINE__
 #else
 #define  _FL "", 0

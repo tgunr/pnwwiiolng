@@ -145,8 +145,7 @@ listCLPushItem(LISTHEADER** list, LISTHEADER* node)
 #ifdef EXTREME_DEBUG
 	else
 	{
-		dbugWrite(_FLA,"pushing to empty list %x node %x\n"
-					,(UINT32) list, (UINT32) node);
+		dbugWrite(_FLA,"pushing to empty list %p node %p\n", list, node);
 	}
 #endif
 

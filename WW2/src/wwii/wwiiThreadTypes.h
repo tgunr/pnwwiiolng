@@ -103,21 +103,18 @@ public:
 		m_condition.notify_one();
 	}
 
-	auto size() noexcept
+	auto size_locked() noexcept  // lock first!
 	{
-		std::lock_guard<std::mutex> lock(m_mutex);
 		return m_queue.size();
 	}
 
-	auto maxSize() noexcept
+	auto maxSize_locked() noexcept  // lock first!
 	{
-		std::lock_guard<std::mutex> lock(m_mutex);
 		return m_maxSize;
 	}
 
-	auto hits() noexcept
+	auto hits_locked() noexcept  // lock first!
 	{
-		std::lock_guard<std::mutex> lock(m_mutex);
 		return m_hits;
 	}
 };
