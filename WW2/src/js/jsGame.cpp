@@ -47,7 +47,7 @@
 #include "fp/fpTPS.h"
 #include "fp/fpPPO.h"
 #include "gr2/gr2Anim.h"
-#include "versionNo.h"
+#include "build_info.hpp"
 #include "scen/ScenarioManager.h"
 #include "ml/mlutility.h"
 
@@ -202,7 +202,7 @@ jsGame::jsGame() : phui::js::Object(&jsclass, nullptr, nullptr,jsfunctions,jspro
 #endif
 	std::string hostversion;
 	getBuildInfo(hostversion);
-	DefineProperty("version", phui::js::ConstString(STRVER));
+	DefineProperty("version", phui::js::NewString(PN_product_version_string));
 	DefineProperty("buildinfo", phui::js::NewString(hostversion.c_str()));
 	DefineProperty("revision", phui::js::NewString(PN_git_commitish_string));
 	cps = new phui::js::Array;

@@ -12,6 +12,7 @@
 
 #include <stack>
 
+#include "build_info.hpp"
 #include "chat/chatCellHostSupportMessages.h"
 #include "chat/chatCellXfer.h"
 #include "chat/chatConstants.h"
@@ -34,7 +35,6 @@
 #include "host/hostTiming.h"
 #include "host/hostVehicle.h"
 #include "host/hostVehicleRequest.h"
-#include "hostproj/hostversion.h"
 #include "include/wthrTime.h"
 #include "inst/instHostInstance.h"
 #include "miss/missHitArrayNode.h"
@@ -3038,7 +3038,7 @@ main(const int argc, const char* argv[])
 	Server::myServerInfo.stats.port = WWII::Net::Ports::CellHost;
 
 	SINT32 initResult =
-	serverInit(HOST_VERSION
+	serverInit(PN_build_version_value
 				, CELL_HOST, MAP_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback

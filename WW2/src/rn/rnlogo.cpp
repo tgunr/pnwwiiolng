@@ -9,7 +9,6 @@
 #include "gmlp/gmlpmain.h"
 #include "dimain.h"
 #include "imap/iac.h"
-#include "versionNo.h"
 #include "cfg/cfgPrefs.h"
 #include "ui/uiMovieView.h"
 #include "fio/fiod.h"
@@ -94,9 +93,9 @@ LOGICAL rnlogoInit()
 	phui::View* version = _loadingscreen->FindView("version");
 	if(version)
     {
-        std::string str = STRVER;
+        std::string str = PN_product_version_string;
 
-		// For debug and beta releases, append the commit info.
+		// Append the commit info.
 		str += " : ";
 		str += PN_git_commitish_string;
 

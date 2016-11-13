@@ -95,7 +95,7 @@
 #include "veh/vehmain.h"
 #include "veh/vehupdate.h"
 #include "veh/vehVisDamage.h"
-#include "versionNo.h"
+#include "build_info.hpp"
 #include "weap/weapammo.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiServerTrackedObject.h"
@@ -6998,7 +6998,7 @@ static int dot_ragdolls(const char* line)
 static int dot_version(const char* line)
 {
 	std::string display = "Client version = ";
-	display += STRVER;
+	display += PN_product_version_string;
 
 	uiChatPrintLine(display.c_str());
 
