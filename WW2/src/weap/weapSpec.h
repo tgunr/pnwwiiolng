@@ -125,8 +125,17 @@ extern WEAPON_SPEC NULL_WEAP_SPEC; // removed const to work with broken MW Linke
 
 static inline const char* weapPrintSpecC(const WEAPON_SPEC spec)
 {
+#if platOS == OS_MACOS
+#warning TODO: Remove me in a 64-bit build
+    // This leaks memory but this routine is only called for log messages, and
+    // only by the hosts, never in the client. Therefore we call it a hack and
+    // move on, despite it being pretty bad.
+    char *buffer = reinterpret_cast<char *>(::calloc(1, 24));
+    snprintf(buffer, 24, "" PRF_WEAPON_SPEC "", PRA_WEAPON_SPEC(spec));
+#else
 	thread_local char buffer[24];
 	strprintf(buffer, "" PRF_WEAPON_SPEC "", PRA_WEAPON_SPEC(spec));
+#endif
 	return buffer;
 }
 
