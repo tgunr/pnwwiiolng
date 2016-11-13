@@ -58,15 +58,6 @@ ENDIF()
 # Need Python for build_info.py
 FIND_PACKAGE( PythonInterp 2.7 REQUIRED )
 
-# Need Bison and Flex for OMGgen; use embedded versions on Windows
-IF ( WIN32 )
-    SET( BISON_EXECUTABLE "${CMAKE_CURRENT_SOURCE_DIR}/omggen/win_bison.exe" )
-    SET( FLEX_EXECUTABLE "${CMAKE_CURRENT_SOURCE_DIR}/omggen/win_flex.exe" )
-ENDIF()
-# Setting the executables first on Windows allows these to work normally
-FIND_PACKAGE( BISON REQUIRED )
-FIND_PACKAGE( FLEX REQUIRED )
-
 # Need libircclient
 INCLUDE_DIRECTORIES( libircclient/include )
 
