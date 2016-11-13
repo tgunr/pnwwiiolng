@@ -39,7 +39,7 @@ public:
 	{
 		if ( m_address == 0 )
 			dbugLog(_FLA, "Tried to create ServerSync for address 0.0.0.0");
-	};
+	}
 
 	// Get the address of this server
 	UINT32 address() const { return m_address; }

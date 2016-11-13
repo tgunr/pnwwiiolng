@@ -6,6 +6,7 @@
 
 //#include <queue>
 #include "wwii/wwiiCryptographer.h"
+#include <queue>
 
 namespace Teul { class Packet; }
 
@@ -33,7 +34,7 @@ struct EndpointImpl
 
 	using DatagramQueue = std::vector<struct DATA_GRAM*>;
 	DatagramQueue	recvQueue;
-	std::vector<Teul::Packet*> m_sendQueue;
+	std::deque<Teul::Packet*> m_sendQueue;
 
 	//! Buffer of data currently being read from socket.
 	struct

@@ -89,7 +89,6 @@ _getScenario(const Instance::Descriptor& descriptor)
 					);
 		return scenario;
 	}
-	break;
 
 	case Instance::_CAMPAIGN:
 	{
@@ -104,7 +103,6 @@ _getScenario(const Instance::Descriptor& descriptor)
 					);
 		return scenario;
 	}
-	break;
 
 	case Instance::_SCENARIO:
 	{
@@ -121,7 +119,7 @@ _getScenario(const Instance::Descriptor& descriptor)
 	}
 
 	default:
-	break;
+		break;
 	}
 
 	static Instance::Scenario
@@ -147,7 +145,7 @@ _getHostInstance(const Instance::Descriptor& descriptor)
 	// Get the data on this scenario.
 	Instance::Scenario scenario = _getScenario(descriptor);
 
-	dbugLog(_FLI, "in:%u.%u.%llu.%llu creating new %s instance with capacity %u / gametime %u:%u"
+	dbugLog(_FLI, "in:%u.%u.%" PR64BitUT ".%" PR64BitUT " creating new %s instance with capacity %u / gametime %u:%u"
 					, descriptor.category(), descriptor.type(), descriptor.handle(), descriptor.id()
 					, scenario.m_internalDescription.c_str()
 					, scenario.m_capacity, (scenario.m_gameTime_m / 60), (scenario.m_gameTime_m % 60)
@@ -171,7 +169,7 @@ _campaignInstance()
 static void
 _deleteInstance(const Instance::HostInstance* instance)
 {
-	dbugLog(_FLI, "in:%u.%u.%llu.%llu deleting instance"
+	dbugLog(_FLI, "in:%u.%u.%" PR64BitUT ".%" PR64BitUT " deleting instance"
 					, instance->descriptor().category()
 					, instance->descriptor().type()
 					, instance->descriptor().handle()
@@ -219,7 +217,7 @@ HostInstance::getSquadMemberCount(UINT32 squadID) const
 void
 _adjustmentTrack(wwiiPlayer* const player, const char* const action, const HostInstance* const inst)
 {
-	player->log(_FLD, "%s to in:%u.%u.%llu.%llu side:%u"
+	player->log(_FLD, "%s to in:%u.%u.%" PR64BitUT ".%" PR64BitUT " side:%u"
 						" mps:%u counts:%u/%u/%u/%u"
 					, action
 					, inst->descriptor().category(), inst->descriptor().type(), inst->descriptor().handle(), inst->descriptor().id()
@@ -353,7 +351,7 @@ wwiiPlayer::SetInstance(const Instance::Descriptor& toInstance)
 
 	m_hostInstance = nullptr;
 	m_instance = Instance::g_invalid;
-	dbugLog(_FLD, "t:%d p:%u c:%s switching to in:%u.%u.%llu.%llu", teulIndex(), playerID(), callsign(), toInstance.category(), toInstance.type(), toInstance.handle(), toInstance.id());
+	dbugLog(_FLD, "t:%d p:%u c:%s switching to in:%u.%u.%" PR64BitUT ".%" PR64BitUT "", teulIndex(), playerID(), callsign(), toInstance.category(), toInstance.type(), toInstance.handle(), toInstance.id());
 
 	if ( toInstance.isValid() == true )
 	{

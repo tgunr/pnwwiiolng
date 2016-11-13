@@ -31,7 +31,7 @@ public:
 		, bool isSpawned, bool badChecksum
 	);
 	PersonaUpdate(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
-	~PersonaUpdate() {};
+	~PersonaUpdate() {}
 
 	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { return teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
 

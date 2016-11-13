@@ -536,7 +536,7 @@ class DotNoEChat : public DotCommand
 public:
 	DotNoEChat() : DotCommand("noechat", "Toggle receipt of enemy area chat on/off"
 								, NO_MASK, LSTR_NOECHAT_USAGE, LSTR_NOECHAT_DETAIL
-								) { };
+								) { }
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( player.noEnemyChat() )
@@ -561,7 +561,7 @@ class DotNoWho : public DotCommand
 public:
 	DotNoWho() : DotCommand("nowho", "Allows you to hide from .who"
 								, NO_MASK, LSTR_NOWHO_USAGE, LSTR_NOWHO_DETAIL
-								) { };
+								) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
@@ -587,7 +587,7 @@ class DotOrders : public DotCommand
 public:
 	DotOrders() : DotCommand("orders", "Set/view current mission orders"
 							, NO_MASK, LSTR_ORDERS_USAGE, LSTR_ORDERS_DETAIL
-							) { };
+							) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* message) const  override
 	{

@@ -83,14 +83,16 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-#if _WIN64 || __x86_64__ || __ppc64__
+#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__)
 # define BUILD_64
 # define PR64BitT "ld"
 # define PR64BitUT "lu"
+# define PRPermMaskT "lx"
 #else
 # define BUILD_32
 # define PR64BitT "lld"
 # define PR64BitUT "llu"
+# define PRPermMaskT "llx"
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -172,4 +174,18 @@ static inline void OS_CLOSESOCKET(SOCKET sock) { close(sock); }
 
 #ifndef PATH_MAX
 #define PATH_MAX 256
+#endif
+
+#if platOS == OS_WIN32
+#define PLAT_EWOULDBLOCK WSAEWOULDBLOCK
+#define PLAT_EINTR WSAEINTR
+#define PLAT_EAGAIN EAGAIN
+#define PLAT_EINPROGRESS WSAEINPROGRESS
+#define PLAT_ECONNREFUSED WSAECONNREFUSED
+#else
+#define PLAT_EWOULDBLOCK EWOULDBLOCK
+#define PLAT_EINTR EINTR
+#define PLAT_EAGAIN EAGAIN
+#define PLAT_EINPROGRESS EINPROGRESS
+#define PLAT_ECONNREFUSED ECONNREFUSED
 #endif

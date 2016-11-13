@@ -40,7 +40,7 @@ UINT32 Listing::s_listingID = 0;
         static const SINT32 _OWNER_BITS = 64;
         static const SINT32 _CATEGORY_BITS = 12;
         static const SINT32 _TYPE_BITS = 12;
-        
+
         if ( mode == TEUL_PACK )
         {
             // Make sure everything is as expected.
@@ -49,7 +49,7 @@ UINT32 Listing::s_listingID = 0;
             assert( m_category < (1 << _CATEGORY_BITS) );
             assert( m_type < (1 << _TYPE_BITS) );
         }
-        
+
         a->packer(mode, &m_category, _CATEGORY_BITS);
         if ( m_category > 1 )
         {
@@ -57,41 +57,41 @@ UINT32 Listing::s_listingID = 0;
             a->packer(mode, &um_ownerID, _OWNER_BITS);
             a->packer(mode, &m_id, _ID_BITS);
         }
-        
+
         if ( mode == TEUL_UNPACK )
         {
             if ( m_category == _INVALID )
                 *this = g_invalid;
             else if ( m_category == _CAMPAIGN )
                 *this = g_campaign;
-            
+
             // Make sure everything is as expected.
             assert( sizeof(ChatHandle) <= sizeof(UINT64) );
             assert( sizeof(m_id) <= _OWNER_BITS / 8 );
             assert( m_category < (1 << _CATEGORY_BITS) );
             assert( m_type < (1 << _TYPE_BITS) );
         }
-        
+
         return a->offset;
     }
 
-    
+
     //////////////////////////////////////////////////////////////////////
     // Network constructor for a Basic Status object
-    
+
     BasicStatus::BasicStatus(ACTION_OBJECT* const a)
     {
         this->packer(TEUL_UNPACK, a);
     }
-    
+
     //////////////////////////////////////////////////////////////////////
     // Packer for a BasicStatus
-    
+
     SINT32
     BasicStatus::packer(PackMode mode, ACTION_OBJECT* const a)
     {
         static const SINT32 _SIDE_BITS = 12;
-        
+
         m_descriptor.packer(mode, a);
         a->packer(mode, &m_count[0], _SIDE_BITS);
         a->packer(mode, &m_count[1], _SIDE_BITS);
@@ -101,7 +101,7 @@ UINT32 Listing::s_listingID = 0;
         a->packSecondsDelta(mode, m_startedAt, 24);
         a->packer(mode, &m_gameTime_m, 11);
         a->packer(mode, &m_capacity, 13);
-        
+
         return a->offset;
     }
 
@@ -144,13 +144,13 @@ Listing::packer(PackMode mode, ACTION_OBJECT* const a)
 {
     a->packer(mode, &m_result, 6);
     a->packer(mode, &m_requestID);
-    
+
     if ( m_result != _SUCCESS )
     {
         m_results.clear();
         return a->offset;
     }
-    
+
     UINT32 numResults = (UINT32)m_results.size();
     a->packer(mode, &numResults, 10);
     if ( mode == TEUL_UNPACK )
@@ -158,13 +158,13 @@ Listing::packer(PackMode mode, ACTION_OBJECT* const a)
         m_results.clear();
         m_results.resize(numResults);
     }
-    
+
     // Now unpack all of the results
     for ( UINT32 i = 0; i < numResults; ++i )
     {
         m_results[i].packer(mode, a);
     }
-    
+
     return a->offset;
 }
 

@@ -21,7 +21,7 @@ namespace Server
 		// octets of the broadcast network address,
 		// thus [192.168.10].xx | (xx.xx.xx.[151])
 		// makes 192.168.10.151
-		return ((Server::broadcastNet & ~0xff) | (ip & 0xff));
+		return ((Server::broadcastNet & ~0xffU) | (ip & 0xffU));
 	}
 }
 

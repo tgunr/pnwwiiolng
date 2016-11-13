@@ -16,8 +16,15 @@ IF ( MSVC )
     ADD_COMPILE_OPTIONS(
         "/Zi" "/Zc:wchar_t" "/Zc:forScope" "/EHsc" "/fp:precise"
         "/WX-" "/FR" "/wd4480" "/wd4800"
-        "/nologo" "/MT" "/Gm"
+        "/nologo"
     )
+	IF ( CMAKE_BUILD_TYPE STREQUAL Debug )
+		ADD_COMPILE_OPTIONS( "/MTd" )
+		ADD_DEFINITIONS( "-DDEBUG=1" )
+	ELSE()
+		ADD_COMPILE_OPTIONS( "/MT" )
+		ADD_DEFINITIONS( "-DNDEBUG=1" )
+	ENDIF()
 
     IF ( BUILD_BITNESS EQUAL 64 )
         ADD_COMPILE_OPTIONS( "/arch:AVX" )
@@ -34,46 +41,64 @@ IF ( MSVC )
 
 ELSE()
 
+	ADD_COMPILE_OPTIONS( "-fno-omit-frame-pointer" )	# nicer stacks
     ADD_COMPILE_OPTIONS( "-Winvalid-pch" "-Wno-array-bounds" )
     ADD_COMPILE_OPTIONS( "-Wno-strict-aliasing" "-Wno-unused-result" "-Wno-unknown-pragmas" )
     ADD_COMPILE_OPTIONS( "-Wall" "-Wshadow" "-Wno-deprecated" )
-    
+
     IF ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang )
         # Use cheap list of stupid options for GCC
     ELSE()
         # Every warning ever, then shut off the ones we don't want
-        #ADD_COMPILE_OPTIONS( "-Weverything" )
-        #ADD_COMPILE_OPTIONS( "-Wno-double-promotion" "-Wno-cstring-format-directive" )
-        #ADD_COMPILE_OPTIONS( "-Wno-error=c++11-narrowing" "-Wno-packed" "-Wno-pedantic" )
-        #ADD_COMPILE_OPTIONS( "-Wno-gnu-anonymous-struct" "-Wno-cast-align" )
-        #ADD_COMPILE_OPTIONS( "-Wno-covered-switch-default" "-Wno-exit-time-destructors" )
-        #ADD_COMPILE_OPTIONS( "-Wno-documentation" "-Wno-unused-parameter" "-Wno-c++98-compat" )
-        #ADD_COMPILE_OPTIONS( "-Wno-padded" "-Wno-undef" "-Wno-c++98-compat-pedantic" )
-        #ADD_COMPILE_OPTIONS( "-Wno-used-but-marked-unused" "-Wno-c99-extensions" )
-        #ADD_COMPILE_OPTIONS( "-Wno-disabled-macro-expansion" "-Wno-unused-macros" )
-        #ADD_COMPILE_OPTIONS( "-Wno-unused-exception-parameter" "-Wno-global-constructors" )
-        #ADD_COMPILE_OPTIONS( "-Wno-switch-enum" "-Wno-gnu-zero-variadic-macro-arguments" )
-        #ADD_COMPILE_OPTIONS( "-Wno-variadic-macros" "-Wno-missing-noreturn" )
-        #ADD_COMPILE_OPTIONS( "-Wno-unknown-warning-option" "-Wno-auto-import" )
-        #ADD_COMPILE_OPTIONS( "-Wno-overlength-strings" "-Wno-assign-enum" )
-        #ADD_COMPILE_OPTIONS( "-Wno-objc-missing-property-synthesis" )
-        #ADD_COMPILE_OPTIONS( "-Wno-gnu-conditional-omitted-operand" "-Wno-old-style-cast" )
-        #ADD_COMPILE_OPTIONS( "-Wno-documentation-unknown-command" "-Wno-reserved-id-macro" )
-        #ADD_COMPILE_OPTIONS( "-Wno-date-time" )
+        ADD_COMPILE_OPTIONS( "-Weverything" )
+        ADD_COMPILE_OPTIONS( "-Wno-double-promotion" "-Wno-cstring-format-directive" )
+        ADD_COMPILE_OPTIONS( "-Wno-error=c++11-narrowing" "-Wno-packed" "-Wno-pedantic" )
+        ADD_COMPILE_OPTIONS( "-Wno-gnu-anonymous-struct" "-Wno-cast-align" )
+        ADD_COMPILE_OPTIONS( "-Wno-covered-switch-default" "-Wno-exit-time-destructors" )
+        ADD_COMPILE_OPTIONS( "-Wno-documentation" "-Wno-unused-parameter" "-Wno-c++98-compat" )
+        ADD_COMPILE_OPTIONS( "-Wno-padded" "-Wno-undef" "-Wno-c++98-compat-pedantic" )
+        ADD_COMPILE_OPTIONS( "-Wno-used-but-marked-unused" "-Wno-c99-extensions" )
+        ADD_COMPILE_OPTIONS( "-Wno-disabled-macro-expansion" "-Wno-unused-macros" )
+        ADD_COMPILE_OPTIONS( "-Wno-unused-exception-parameter" "-Wno-global-constructors" )
+        ADD_COMPILE_OPTIONS( "-Wno-switch-enum" "-Wno-gnu-zero-variadic-macro-arguments" )
+        ADD_COMPILE_OPTIONS( "-Wno-variadic-macros" "-Wno-missing-noreturn" )
+        ADD_COMPILE_OPTIONS( "-Wno-unknown-warning-option" "-Wno-auto-import" )
+        ADD_COMPILE_OPTIONS( "-Wno-overlength-strings" "-Wno-assign-enum" )
+        ADD_COMPILE_OPTIONS( "-Wno-objc-missing-property-synthesis" )
+        ADD_COMPILE_OPTIONS( "-Wno-gnu-conditional-omitted-operand" "-Wno-old-style-cast" )
+        ADD_COMPILE_OPTIONS( "-Wno-documentation-unknown-command" "-Wno-reserved-id-macro" )
+        ADD_COMPILE_OPTIONS( "-Wno-conversion" "-Wno-weak-vtables" "-Wno-format-nonliteral" )
+        ADD_COMPILE_OPTIONS( "-Wno-missing-prototypes" "-Wno-missing-variable-declarations" )
+        ADD_COMPILE_OPTIONS( "-Wno-implicit-fallthrough" )
+        ADD_COMPILE_OPTIONS( "-Wno-date-time" )
         ADD_COMPILE_OPTIONS( "-stdlib=libc++" )
         LINK_LIBRARIES( "-stdlib=libc++" )
     ENDIF()
-    
-    ADD_COMPILE_OPTIONS( "-fstack-protector-all" )
-    
-    if ( CMAKE_BUILD_TYPE MATCHES Debug )
-        ADD_COMPILE_OPTIONS( "-O0" )
+
+    IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+		IF ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang )	# OR CMAKE_BITNESS EQUAL BUILD_BITNESS: untested.
+			IF ( PN_SANITIZE )
+				SET(_EXTRA_HOST_COMPILE_OPTIONS "-fstack-protector-all" "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+				SET(_EXTRA_HOST_LINK_OPTIONS "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+			ENDIF()
+		ENDIF()
+    	IF ( CMAKE_CXX_COMPILER_ID MATCHES Clang )
+        	ADD_COMPILE_OPTIONS( "-O0" "-g3" )
+		ELSE()
+			ADD_COMPILE_OPTIONS( "-Og" "-g3" )
+		ENDIF()
         ADD_DEFINITIONS( "-DDEBUG=1" )
-		# ADD_COMPILE_OPTIONS( "-fsanitize=address" )
-        # LINK_LIBRARIES( "-fsanitize=address" )
     ELSE()
-        ADD_COMPILE_OPTIONS( "-Os" )
+		# `-Os`: in 4.5.x -O3 generated better code for the Gen 3 Xeons in use, -Os is usually better.
+		# `-g`: Hack: Even RelWithDebInfo seems not to have debug symbols.
+        ADD_COMPILE_OPTIONS( "-Os" "-g" )
         ADD_DEFINITIONS( "-DNDEBUG=1" )
+    	IF ( CMAKE_CXX_COMPILER_ID MATCHES Clang )
+			# `-flto`: legacy cishness makes for significant perf gains in this codebase :(
+			# `-fwhole-program-vtables`: Defining inline dtors has pros and cons.
+			# The main con being the compiler may have to make a mess, which this option fixes.
+			ADD_COMPILE_OPTIONS( "-flto" "-fwhole-program-vtables" )
+		ENDIF()
     ENDIF()
     LINK_LIBRARIES( "-lpthread" )
 

@@ -111,7 +111,7 @@ EditString::receive(SINT32 teulIndex)
 		return -EINVAL;
 	}
 
-	dbugLog(_FLD, "t:%d p:%u c:%s received edit string %u:%llu:%s"
+	dbugLog(_FLD, "t:%d p:%u c:%s received edit string %u:%" PR64BitUT ":%s"
 					, teulIndex, player->playerID(), player->callsign()
 					, category(), id(), text().c_str());
 

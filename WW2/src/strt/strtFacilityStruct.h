@@ -28,7 +28,7 @@ namespace Strat { class CaptureContribution; }
 struct CSAFE_FacilityStruct
 {
 //tolua_end
-	CSAFE_FacilityStruct() { memset(this, 0, sizeof(CSAFE_FacilityStruct)); }
+	CSAFE_FacilityStruct() { memset(this, 0, sizeof(*this)); }
 //tolua_begin
 
 //FULL_OBJ_ID must be the first field in the structure.

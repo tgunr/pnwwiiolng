@@ -94,7 +94,7 @@ main(int argc, char* argv[])
 				if ( wcscmp(callsign, unpacked) != 0 )
 					throw "Produces truncated callsign";
 
-				printf("OK [%llx].\n", handle);
+				printf("OK [%" PR64bitUT "].\n", handle);
 				continue;
 			}
 

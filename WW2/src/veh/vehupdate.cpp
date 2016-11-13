@@ -628,7 +628,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	VehicleHdr.present |= PR_FIRE_FLAGS;
 
     bool sendTurrets = (Data.HasSentUpdate >= 3);
-    
+
 	// turret traverse
 	TurretMask = 0;
 	NumTurrets = 0;
@@ -965,7 +965,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 			a roll-over of the 16 bit time value ocurred (roughtly every 65 seconds)?
 		 */
 		if ( timeDiff < 0
-			
+
 			&& !(VehicleHeader->present & PR_ONE_TIME))
 		{
 
@@ -982,7 +982,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 #ifdef BETA_RELEASE
 			SINT32 verifyDiff = PosData->CurrentSenderUpdateTime - PosData->LastSenderUpdateTime;
 #endif
-            
+
 #ifdef BETA_RELEASE
 			dbugLog(_FLI, "Rollover occurred: Old TS: %d, New Old: %d, New TS: %d, diff: %d, verifyDiff: %d",
 				prevCurrent, PosData->LastSenderUpdateTime, thisTS, timeDiff, verifyDiff);

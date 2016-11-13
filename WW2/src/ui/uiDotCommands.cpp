@@ -7998,7 +7998,7 @@ void uiDotCommandsInit()
 	// host commands; this allows for
 	// client localization of host commands
 	ADD_HOST_COMMAND(who, false);
-    
+
     // allows extra info to be sent with these commands
     uiDotCommandAdd("bug", dot_clientinfo_command, false);
     uiDotCommandAdd("report", dot_clientinfo_command, false);

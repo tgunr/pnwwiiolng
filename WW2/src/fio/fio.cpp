@@ -27,7 +27,7 @@ void fioInit()
     memset(UserDataPath, 0, sizeof(UserDataPath));
 
 #if platOS == OS_WIN32
-	
+
 	// default to current directory
 	std::wstring path = L".";
 

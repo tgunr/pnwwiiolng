@@ -422,7 +422,7 @@ static void PullMotherboardData(CrashHandlerContext &context)
 	_com_error result(ERROR_SUCCESS);
 
 	PullFailureIf(!com, "Failed to initialize COM in crash handler");
-	
+
 	result = _com_error(CoInitializeSecurity(nullptr, -1, nullptr, nullptr, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE, nullptr));
 	PullFailureIfNotSucceed("Initializing COM security");
 
@@ -683,7 +683,7 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 			metadataPaths[filename.substr(0, filename.length() - wcslen(L".dmp.metadata"))] = filename;
 		} else if (ends_with(filename, L".dmp")) {
 			rawDumpPaths[filename.substr(0, filename.length() - wcslen(L".dmp"))] = { filename, fileInfo.ftCreationTime };
-		} 
+		}
 	} while (FindNextFile(hFile, &fileInfo));
 
 	FindClose(hFile);
@@ -706,7 +706,7 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 			metadataPaths.erase(kv.first);
 		}
 	}
-	
+
 	// Any items left in rawDumpPaths or metadataPaths are orphans (not matching any container)
 	dbugLog(_FLI, "Removing %u leftover metadata files", metadataPaths.size());
 	for (const std::pair<std::wstring, std::wstring> &kv : metadataPaths) { _wunlink((dataPath + L"\\" + kv.second).c_str()); }

@@ -207,7 +207,7 @@ _commitObject(ObjectStruct* obj)
 	_objOwnSaves[valuesKey].insert(obj->m_uid);
 	if ( _needsSave(obj->m_maxDamageJoules, obj->m_maxDamageJoulesSaved) || _needsSave(obj->m_maxCapacity, obj->m_maxCapacitySaved) )
 	{
-		sprintf(valuesKey, "maxdamagejoules=%llu,maxcapacity=%u"
+		sprintf(valuesKey, "maxdamagejoules=%" PR64BitUT ",maxcapacity=%u"
 				, obj->m_maxDamageJoules
 				, obj->m_maxCapacity
 				);
@@ -219,7 +219,7 @@ _commitObject(ObjectStruct* obj)
 			|| _needsSave(obj->m_repairRPs, obj->m_repairRPsSaved)
 		)
 	{
-		sprintf(valuesKey, "damagejoules=%llu"
+		sprintf(valuesKey, "damagejoules=%" PR64BitUT ""
 				",capacity=%d"
 				",lastcapacity=%d"
 				",repairrps=%d"
@@ -244,7 +244,7 @@ _saveRows(const char* table, const char* field, UINT64 value, const char* idFiel
 	char* query = threadsAllocText();
 	char* p = query;
 
-	p += sprintf(p, "UPDATE %s SET %s=%llu WHERE %s IN (", table, field, value, idField);
+	p += sprintf(p, "UPDATE %s SET %s=%" PR64BitUT " WHERE %s IN (", table, field, value, idField);
 	_SAVE_IDS::iterator it;
 	for ( it = ids.begin(); it != ids.end(); ++it )
 	{
@@ -313,9 +313,8 @@ strtProcessDBQueue()
 			_commitLink((LinkStruct*)object);
 		break;
 
-		default :
+		default:
 			LogAbort("Queue processing excpetion! Unhandled case.");
-		break;
 		}
 	}
 
@@ -414,7 +413,6 @@ strtdbPopulateVehTypesTable()
 		if ( spec.wCountry == 0 || spec.wCountry > MAX_COUNTRIES )
 		{
 			LogAbort("illegal weapon spec " PRF_WEAPON_SPEC "", PRA_WEAPON_SPEC(spec));
-			continue;
 		}
 
 		snprintf(buf, _BUF_SIZE, "%c(%u,%u,%u,%u,\"%s\",%u,%u,%u,1,%u,'%s',now(),%u)"
@@ -591,6 +589,8 @@ strtdbReadVehicleAccess()
 bool
 strtInitHostDB()
 {
+	dbugLog(_FLI, "Initializing strtHostDB");
+
 	memset(&objQueue,0,sizeof(objQueue));
 	objQueue.name = "Object";
 	memset(&weaponQueue,0,sizeof(weaponQueue));
@@ -1021,7 +1021,6 @@ strtdbRestoreTOESupplies()
 			if ( wit->second.weapon().isSupplied() )
 				wit->second.saveText(len, buffer);
 		}
-		threadsLogging();
 	}
 
 	if ( len > 0 )

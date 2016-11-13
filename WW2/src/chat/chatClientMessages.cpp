@@ -302,9 +302,9 @@ _recvChatMissionStatus(ACTION_OBJECT* const a)
     static Chat::MissionStatus receiver;        // must either be allocated or static as later on game client will point to this for future reference, static for now since we are
                                                 // already riddled with statics, what is one more.
     receiver.unpack(a, ts);
-    
+
 	clientProcessChatMissionStatus(a->teulIndex, &receiver);
-    
+
 	return a->offset;
 }
 

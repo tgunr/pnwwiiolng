@@ -50,7 +50,7 @@ public:
 	{
 		if (m_ptr == nullptr)
 			return false;
-		free((void*)m_ptr);
+		free(m_ptr);
 		m_ptr = nullptr;
 		m_length = 0;
 		return true;

@@ -44,7 +44,6 @@ _report(UINT32 level, const char* message, const char* file = _luaSubSystem.c_st
 		case Debug::ERR_WARN:	output += "!: "; break;
 		case Debug::ERR_FATAL:	output += "<!>: "; break;
 		case Debug::ERR_ABORT: output += "ERR: "; break;
-		break;
 	}
 	output += message;
 	output += "\n";
@@ -153,42 +152,6 @@ _callFunction(const char* fn, int nargs)
 	}
 
 	return true;
-}
-
-void
-Lua::CallInstanceFunction(const char* func, const instanceid_t instID, const char* data)
-{
-	lua_getglobal(_luaVM, func);
-	if ( lua_isfunction(_luaVM, -1) != 1 )
-	{
-		dbugLog(_FLW, "no instance function: %s", func);
-		return;
-	}
-
-	char instStr[20];
-	strprintf(instStr, "%llu", instID);
-	lua_pushstring(_luaVM, instStr);
-	lua_pushstring(_luaVM, data);
-
-	_callFunction(func, 2);
-}
-
-void
-Lua::CallInstanceFunction(const char* func_, const instanceid_t instID_, playerid_t playerID_, Instance::PlayerState* state_)
-{
-	lua_getglobal(_luaVM, func_);
-	if ( lua_isfunction(_luaVM, -1) != 1 )
-	{
-		dbugLog(_FLW, "no instance function: %s", func_);
-		return;
-	}
-	char instStr[20];
-	strprintf(instStr, "%llu", instID_);
-	lua_pushstring(_luaVM, instStr);
-	tolua_pushnumber(_luaVM, (lua_Number)playerID_);
-	tolua_pushusertype(_luaVM, (void*)state_, "PlayerState");
-
-	_callFunction(func_, 3);
 }
 
 int
@@ -412,16 +375,13 @@ Lua::RunObject(const char* name, std::string& obj)
 	_luaContext("object", name);	// Start of context
 	_luaOutput.clear();
 
-	bool success;
-
+	bool success = true;
 	if ( luaL_loadbuffer(_luaVM, obj.c_str(), obj.size(), name)
 		|| lua_pcall(_luaVM, 0, 0, 0) )
 	{
 		success = false;
 		_luaError();
 	}
-	else
-		success = true;
 
 	_luaContext();					// End of context
 
@@ -443,16 +403,13 @@ Lua::RunCode(std::string& code, const char* function)
 	_luaContext("lua", function);	// start of context
 	_luaOutput.clear();
 
-	bool success;
-
+	bool success = true;
 	if ( luaL_loadbuffer(_luaVM, code.c_str(), code.size(), "code")
 		|| lua_pcall(_luaVM, 0, 0, 0) )
 	{
 		success = false;
 		_luaError();
 	}
-	else
-		success = true;
 
 	_luaContext();					// end of context
 
@@ -486,7 +443,7 @@ _startInterpreter()
 	lua_pushstring(_luaVM, luaPath.c_str());
 	lua_setfield(_luaVM, -2, "path");
 	lua_pop(_luaVM, 1);
-	
+
 	tolua_game_open(_luaVM);
 	dbugLog(_FLI, "started Lua interpreter");
 
@@ -565,26 +522,3 @@ Lua::Results()
 {
 	return _luaOutput;
 }
-
-UINT16 getHCiID(const HCUIDX_ITERATOR* it)
-{
-	return (*it)->first;
-}
-
-HCUnit* getHCiHCUnit(const HCUIDX_ITERATOR* it)
-{
-	return (HCUnit*)(*it)->second;
-}
-
-StratHCUnit* getHCiStratHCUnit(const HCUIDX_ITERATOR* it)
-{
-	return (StratHCUnit*)(*it)->second;
-}
-
-HCUIDX_ITERATOR getHCiNext(const HCUIDX_ITERATOR* it)
-{
-	HCUIDX_ITERATOR next = *it;
-	++next;
-	return next;
-}
-

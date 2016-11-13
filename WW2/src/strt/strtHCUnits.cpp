@@ -41,6 +41,8 @@ UINT32 unitReformTime_s;
 
 CPStruct* routDestination[MAX_COUNTRIES];
 
+static std::vector<StratHCUnit*> s_units;
+
 //////////////////////////////////////////////////////////////////////
 // Tell the database and other servers where this HCUnit is
 
@@ -163,6 +165,9 @@ StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withP
 		// we will need to read in any stored levels from the database later.
 		m_toeTemplateHeader->subscribe(this, m_toe);
 	}
+
+	if (isDivision() || isBrigade())
+		s_units.push_back(this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -172,6 +177,7 @@ StratHCUnit::~StratHCUnit()
 {
 	if ( m_toeTemplateHeader != nullptr )
 		m_toeTemplateHeader->unsubscribe(this, m_toe);
+	s_units.erase(std::remove(s_units.begin(), s_units.end(), this));
 	delete &m_impl;
 }
 
@@ -641,7 +647,6 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 	break;
 	default:
 		return BMR_FAILED;
-	break;
 	}
 
 	return BMR_APPROVED;
@@ -1384,3 +1389,10 @@ StratHCUnitImpl::incrementThrottle(UINT32 key)
 	throttle.Increment(teulTime() + windowDuration);
 }
 
+//////////////////////////////////////////////////////////////////////
+// Returns a list of all division/brigade units.
+
+std::vector<StratHCUnit*>& strtGetDivisionsAndBrigades()
+{
+	return s_units;
+}

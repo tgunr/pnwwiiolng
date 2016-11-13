@@ -1674,6 +1674,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
 				if (currentWeaponModel == BUILD_TOOL)
 				{
+					uiGameEvent(GAMEEVENT_ALERT, 1, uiLocString("hud.tut.ppo").c_str());
 					fpPPOReset();
 				}
 
@@ -3527,7 +3528,7 @@ void fpFPSGetEyeMatrix (piMATRIX* pMatrix)
 	eyeMatrix._41 = 0.0f + (FLOAT32)fpsTrooper.leanHorizCurrent;
 	eyeMatrix._42 = 0.0f;
 	eyeMatrix._43 = TROOPER_STAND_EYE_HEIGHT + fpFPSGetHeight() + (FLOAT32)fpsTrooper.leanVertCurrent;
-     
+
     if (fpsTrooper.parachuteOpen) {
         eyeMatrix._42 = -0.16f;
         eyeMatrix._43 += 0.19f;
@@ -6944,7 +6945,7 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 					controlStateFlags &= ~FPS_AUTORUN;
 					fpFPSDeployChange();
 				}
-                
+
 			}
 			break;
 		case IMAP_HOLD_FP_FORWARD:
@@ -7414,13 +7415,13 @@ static void fpFPSVerticalAxisLook (SINT32 param, UINT32 data)
 
 	imap_callback_ext_data*		extdata;
 	FLOAT32						maxUpAngle, maxDownAngle;
-    
+
     /*
      TBD = deal with turret elevation (currently commented out??)
-     
+
 	mlVehicleData*				pVehicleData = persGetPersonaModelDataPtr();
      */
-    
+
 	extdata = (imap_callback_ext_data*)data;
 
 	fpFPSGetEyeUpDownRange(&maxUpAngle, &maxDownAngle);
@@ -7451,7 +7452,7 @@ static void fpFPSVerticalAxisLook (SINT32 param, UINT32 data)
 		}
 
         /*
-         
+
 		FLOAT64 total = mouseLookVertAngle + (AIM_VERTICAL_ANGLE) + angleChange;
 
 		uiChatPrintLine("mlookangle = %.2f avertangle = %.2f change = %.2f total = %.2f min = %.2f max = %.2f", mouseLookVertAngle, AIM_VERTICAL_ANGLE, angleChange, total, maxDownAngle, maxUpAngle);
@@ -7784,7 +7785,7 @@ LOGICAL fpFPSHandleControls ()
 			persShakeHead("common.headshake.reload");
 		}
 	}
-	
+
 	if (controlStateFlags & FPS_PRONE)
 	{
 		eyeState = EYE_PRONE;
@@ -8119,7 +8120,7 @@ LOGICAL	fpFPSGetFirePoint(OBJECT* pObject, piMATRIX* pMatrix, bool visual)
 		if(gr2AnimGetFirePointMatrix (pObject, pMatrix, visual))
 			return TRUE;
 	}
-	
+
 	piMATRIX		rotMatrix = IdentityMatrix;
 	piMATRIX		firePoint = IdentityMatrix;
 	LOGICAL			fireFind = FALSE;
@@ -10630,7 +10631,7 @@ LOGICAL fpFPSRideUnrideVehicle ()
             fpsTrooper.lastUnrideTime = frametime;
         else
             fpsTrooper.lastUnrideTime = 0;
-        
+
 		return TRUE;
 	}
 
@@ -11380,7 +11381,7 @@ void fpFPSDrawGunsight()
 		// This is added to calulate the delay of any grenade for FPS. DEG
 		if (fpsWeapons[currentWeaponModel].grenadeVisDelay)
 		{
-			if((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE) && 
+			if((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE) &&
 				(currentFPSstate == THROW)&&
 				(((frametime / 1000.0) - grenadeApperLapse) > fpsWeapons[currentWeaponModel].grenadeVisDelay ))
 			{
@@ -11503,7 +11504,7 @@ void fpFPSDrawGunsight()
 		// This is added to calulate the delay of any grenade for FPS. DEG
 		if (fpsWeapons[currentWeaponModel].grenadeVisDelay)
 		{
-			if((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE) && 
+			if((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_GRENADE) &&
 				(currentFPSstate == THROW)&&
 				(((frametime / 1000.0) - grenadeApperLapse) > fpsWeapons[currentWeaponModel].grenadeVisDelay ))
 			{

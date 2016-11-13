@@ -45,11 +45,8 @@ static size_t _teulConnects;
 
 using ENDPOINT_ARRAY = WWII::inplace_vector<ENDPOINT, Teul::MaxConnections>;
 using ENDPOINT_IMPL_ARRAY = WWII::inplace_vector<EndpointImpl, Teul::MaxConnections>;
-ENDPOINT_ARRAY _endpoints;
+static ENDPOINT_ARRAY _endpoints;
 static ENDPOINT_IMPL_ARRAY _endpointImpls;
-
-using ENDPOINT_VEC = std::vector<ENDPOINT*>;
-static ENDPOINT_VEC _deadEndpoints;
 
 using namespace Teul;
 namespace Teul
@@ -96,7 +93,7 @@ ENDPOINT::encrypt(UCHAR* const stream, const size_t bytes)
 	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
 	{
 #ifdef DEBUG_ENCRYPTION
-		printf("Encrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_txCrypt.seed());
+		printf("Encrypt %p %d [%u] seed %" PR64BitUT "\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_txCrypt.seed());
 #endif
 		m_impl->m_txCrypt.translate(stream, bytes);
 	}
@@ -111,7 +108,7 @@ ENDPOINT::decrypt(UCHAR* const stream, const size_t bytes)
 	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
 	{
 #ifdef DEBUG_ENCRYPTION
-		printf("Decrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_rxCrypt.seed());
+		printf("Decrypt %p %d [%u] seed %" PR64BitUT "\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_rxCrypt.seed());
 #endif
 		m_impl->m_rxCrypt.translate(stream, bytes);
 	}
@@ -134,7 +131,7 @@ ENDPOINT::_dbugOutputPacket( bool isRecv, const uint8_t *input, size_t packetByt
 	debugBuff[0] = 0;
 	char hex[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
 	char charToHex[SZ_HEX_DIG_TEXT+1] = {};
-	charToHex[2] = ' '; 
+	charToHex[2] = ' ';
 	charToHex[SZ_HEX_DIG_TEXT] = 0;
 
 	size_t i = 0;
@@ -265,51 +262,28 @@ Teul::GetRemote(const SINT32 teulIndex)
 }
 
 //////////////////////////////////////////////////////////////////////
-// TeulTransport needs to find out what the next teulIndex will be.
+// Determines if the caller would be able to allocate an endpoint.
 
-SINT32
-teulQueryNextFreeIndex()
+bool
+teulHasFreeEndpoints()
 {
-	teulKillDeadEndpoints();
-
-	if ( PN_UNLIKELY(_freeEndpoints.empty()) )
-	{
-		return -ENOSPC;
-	}
-
-	return _freeEndpoints.front()->teulIndex();
-}
-
-//////////////////////////////////////////////////////////////////////
-// Allocate a new endpoint object.
-
-static ENDPOINT*
-_allocEndpoint(SINT32 wantIndex)
-{
-	if ( PN_UNLIKELY(_freeEndpoints.empty()) )
-	{
+	if ( PN_UNLIKELY(_freeEndpoints.empty()) ) {
 		teulKillDeadEndpoints();
-		ABORT_IF(_freeEndpoints.empty());
 	}
+	return _freeEndpoints.size() > 0;
 
-	if ( wantIndex < 0 )
-	{
-		ABORT_IF_EX(wantIndex != Teul::AnyIndex, "illegal new endpoint index: %d", wantIndex);
+}
+//////////////////////////////////////////////////////////////////////
+// Allocate a new endpoint object: ABORTS if no endpoints are
+// available. Check teulHasFreeEndpoints() before calling.
 
-		wantIndex = _freeEndpoints.front()->teulIndex();
-		_freeEndpoints.pop_front();
-	}
-	else
-	{
-		assert( (size_t)wantIndex < _endpoints.size() );
+static ENDPOINT&
+_allocEndpoint()
+{
+	auto teulIndex = _freeEndpoints.front()->teulIndex();
+	_freeEndpoints.pop_front();
 
-		// In truth, this should usually be the first endpoint available.
-		ENDPOINT_LIST::iterator it = std::find(_freeEndpoints.begin(), _freeEndpoints.end(), &_endpoints[wantIndex]);
-		ABORT_IF(it == _freeEndpoints.end());
-		_freeEndpoints.erase(it);
-	}
-
-	ENDPOINT& endpoint = _endpoints[wantIndex];
+	ENDPOINT& endpoint = _endpoints[teulIndex];
 
 	_teulConnects++;
 
@@ -319,7 +293,7 @@ _allocEndpoint(SINT32 wantIndex)
 	dbugLog(_FLD, "t:%d allocated endpoint %p", endpoint.teulIndex(), &endpoint);
 #endif
 
-	return &endpoint;
+	return endpoint;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -346,25 +320,90 @@ _releaseEndpoint(ENDPOINT& endpoint)
 }
 
 //////////////////////////////////////////////////////////////////////
+// Manage dead endpoints. This allows us to provide controlled access
+// with a narrow contract that gives a strong-guarantee of non-null
+// pointers in the list.
+
+class DeadEndpointManager
+{
+	std::vector<ENDPOINT*> m_endpoints;
+public:
+	void reserve(size_t n) noexcept { m_endpoints.reserve(n); }
+
+	void add(ENDPOINT* endpoint) noexcept
+	{
+#ifdef DEBUG
+		ABORT_IF(std::find(m_endpoints.begin(), m_endpoints.end(), endpoint) != m_endpoints.end());
+#endif
+		if (endpoint != nullptr)
+			m_endpoints.push_back(endpoint);
+	}
+
+	void remove(ENDPOINT* endpoint) noexcept
+	{
+		auto it = std::find(m_endpoints.begin(), m_endpoints.end(), endpoint);
+		if (it != m_endpoints.end()) {
+			// tail-swap trick
+			*it = m_endpoints.back();
+			m_endpoints.pop_back();
+		}
+	}
+
+	void process()
+	{
+		// a. Freeing the endpoint could eventually lead to code that tries
+		// to modify the dead endpoint list, which would break our walk of the list.
+		// b. The list is in a nicely pre-allocated vector,
+		// c. The list *could* be large enough to make copying expensive.
+		// So:
+		// We *steal* the list (move) to a local, exchanging it for the empty temporary
+		// we stole it to, making the manager object itself safe from modification.
+		// We crawl the stolen data, free those endpoints, and then put the stolen
+		// vector back so that we retain the original pre-sized allocation.
+		auto eps = std::move(m_endpoints);
+		for (auto* ep : eps) {
+			teulFreeEndpoint(ep);
+		}
+		eps.clear();
+		// we don't expect this to ever do anything, but it's there so that if the
+		// free process somehow *adds* an endpoint to the list, we keep it.
+		eps.insert(eps.end(), m_endpoints.begin(), m_endpoints.end());
+		// put the original vector back where we got it from.
+		m_endpoints = std::move(eps);
+	}
+
+	void discard() noexcept
+	{
+		m_endpoints.clear();
+	}
+
+	size_t size() const noexcept { return m_endpoints.size(); }
+};
+DeadEndpointManager s_deadEndpointManager;
+
+//////////////////////////////////////////////////////////////////////
 // Move an endpoint to the dead list.
 
 void
-teulRemoveEndpoint(ENDPOINT* inEndpoint)
+teulRemoveEndpoint(ENDPOINT* endpoint)
 {
-	if ( ! inEndpoint->m_inUse )
+	if ( endpoint == nullptr )
+		return;
+
+	if ( ! endpoint->m_inUse )
 	{
-		dbugLog(_FLD, "t:%d tried to remove endpoint not in use", inEndpoint->teulIndex());
+		dbugLog(_FLD, "t:%d tried to remove endpoint not in use", endpoint->teulIndex());
 		return;
 	}
 
-	if ( inEndpoint->m_closed == false )
+	if ( endpoint->m_closed == false )
 	{
-		dbugLog(_FLD, "t:%d tried to remove unclosed endpoint", inEndpoint->teulIndex());
-		inEndpoint->doError(ECONNABORTED);
-		inEndpoint->shutdown();
+		dbugLog(_FLD, "t:%d tried to remove unclosed endpoint", endpoint->teulIndex());
+		endpoint->doError(ECONNABORTED);
+		endpoint->shutdown();
 	}
 
-	_deadEndpoints.push_back(inEndpoint);
+	s_deadEndpointManager.add(endpoint);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -373,17 +412,7 @@ teulRemoveEndpoint(ENDPOINT* inEndpoint)
 void
 teulKillDeadEndpoints()
 {
-	if ( _deadEndpoints.empty() )
-	{
-		return;
-	}
-
-	for ( ENDPOINT_VEC::iterator it = _deadEndpoints.begin(), end = _deadEndpoints.end(); it != end; ++it )
-	{
-		teulFreeEndpoint(*it);
-	}
-
-	_deadEndpoints.clear();
+	s_deadEndpointManager.process();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -444,8 +473,10 @@ teulInitEndpoints(ERROR_FUNCTION const endpointErrorFn)
 
 	_endpoints.resize(Teul::MaxConnections);
 	_endpointImpls.resize(Teul::MaxConnections);
+	s_deadEndpointManager.reserve(Teul::MaxConnections);
 
 	ABORT_IF(_endpoints.empty() == true);	// Just a sanity check really.
+	ABORT_IF(_endpoints.size() != Teul::MaxConnections);
 
 	const size_t numConnections = _endpoints.size();
 	for ( size_t i = 0; i < numConnections; i++)
@@ -477,7 +508,7 @@ teulCleanupEndpoints()
 	}
 
 	_freeEndpoints.clear();
-	_deadEndpoints.clear();
+	s_deadEndpointManager.discard();
 	idleEndpoints.clear();
 	_endpoints.clear();
 	_endpointImpls.clear();
@@ -514,46 +545,43 @@ ENDPOINT::setTimeout(const UINT32 timeout_)
 }
 
 ENDPOINT*
-teulCreateEndpoint(SINT32 wantIndex
-					, const bool isListening
-					, SINT32 timeout
-					, const PROTOCOL protocol
-					)
+teulCreateEndpoint(const bool isListening, SINT32 timeout, const PROTOCOL protocol)
 {
-	ENDPOINT* const newEndpoint = _allocEndpoint(wantIndex);
-	if (PN_UNLIKELY(newEndpoint == nullptr))
-	{
-		dbugLog(_FLA, "_createEndpoint: could not allocate buffer for endpoint");
+	teulSyncClock();  // for granular reporting, previously all our callers did this
+
+	if (PN_UNLIKELY(teulHasFreeEndpoints() == false)) {
+		dbugLog(_FLA, "no free endpoints available");
 		return nullptr;
 	}
+	ENDPOINT& endpoint = _allocEndpoint();
 
-	newEndpoint->socket = INVALID_SOCKET;
-	newEndpoint->m_connected = false;
-	newEndpoint->lastDataRecv.makeCurrent();
-	newEndpoint->lastDataSent.makeCurrent();
+	endpoint.socket = INVALID_SOCKET;
+	endpoint.m_connected = false;
+	endpoint.lastDataRecv.makeCurrent();
+	endpoint.lastDataSent.makeCurrent();
 
-	newEndpoint->m_impl->m_curDatagram = nullptr;
-	newEndpoint->m_readBufferUsed = 0;
-	newEndpoint->lastKliveSent.makeNever();
+	endpoint.m_impl->m_curDatagram = nullptr;
+	endpoint.m_readBufferUsed = 0;
+	endpoint.lastKliveSent.makeNever();
 
 	// populated in accept if we are the spawn of a listening connection.
-	newEndpoint->m_parent = nullptr;
+	endpoint.m_parent = nullptr;
 
 	if (timeout != 0 && timeout < Teul::MinEndpointTimeout)
 		timeout = Teul::MinEndpointTimeout;
 
-	newEndpoint->m_impl->Reset();
+	endpoint.m_impl->Reset();
 
-	newEndpoint->protocol = (UCHAR)protocol;
-	newEndpoint->m_peer = (protocol == PROTOCOL_UDB) | (protocol == PROTOCOL_CTRL);
+	endpoint.protocol = (UCHAR)protocol;
+	endpoint.m_peer = (protocol == PROTOCOL_UDB) | (protocol == PROTOCOL_CTRL);
 
-	newEndpoint->m_state = (SCHAR)(isListening ? IS_LISTENING : IS_OPENING);
+	endpoint.m_state = (SCHAR)(isListening ? IS_LISTENING : IS_OPENING);
 
-	newEndpoint->setTimeout(timeout);
+	endpoint.setTimeout(timeout);
 
-	newEndpoint->m_created.makeCurrent();
-	newEndpoint->m_haveTicks = false;
-	newEndpoint->m_tickAccumulation = 0ULL;
+	endpoint.m_created.makeCurrent();
+	endpoint.m_haveTicks = false;
+	endpoint.m_tickAccumulation = 0ULL;
 
 	// allocates the packet buffers for write and reliable.
 	// initializes timeout and RTO to 1000ms and therefore defaults
@@ -566,42 +594,41 @@ teulCreateEndpoint(SINT32 wantIndex
 		case PROTOCOL_UDP:
 		case PROTOCOL_UDB:
 		case PROTOCOL_CTRL:
-			newEndpoint->fromSockAddress.sin_family = AF_INET;
-			newEndpoint->localSockAddress.sin_family = AF_INET;
-			newEndpoint->destSockAddress.sin_family = AF_INET;
+			endpoint.fromSockAddress.sin_family = AF_INET;
+			endpoint.localSockAddress.sin_family = AF_INET;
+			endpoint.destSockAddress.sin_family = AF_INET;
 			break;
 
 		default:
 			dbugSetErrno(EINVAL);
 			dbugLog(_FLA, "error allocating endpoint, invalid protocol");
-			teulFreeEndpoint(newEndpoint);
+			teulFreeEndpoint(&endpoint);
 			return nullptr;
-			break;
 	}
 
-	newEndpoint->m_impl->m_version = Teul::VersionNumber;
-	newEndpoint->m_impl->m_cryptVersion = !newEndpoint->m_peer ? Teul::BaseVersion : 0x0000;
-	newEndpoint->m_impl->m_txCrypt.newSeed();
-	newEndpoint->m_impl->m_rxCrypt.setSeed(0ULL);
-//	newEndpoint->m_recvCrypt = newEndpoint->m_sendCrypt;
+	endpoint.m_impl->m_version = Teul::VersionNumber;
+	endpoint.m_impl->m_cryptVersion = (endpoint.protocol == PROTOCOL_TCP && !endpoint.m_peer) ? Teul::BaseVersion : 0x0000;
+	endpoint.m_impl->m_txCrypt.newSeed();
+	endpoint.m_impl->m_rxCrypt.setSeed(0ULL);
+//	endpoint.m_recvCrypt = endpoint.m_sendCrypt;
 
 	switch (protocol)
 	{
 	case PROTOCOL_UDP:
 	case PROTOCOL_UDB:
 	case PROTOCOL_CTRL:
-		newEndpoint->m_reliable = false;
+		endpoint.m_reliable = false;
 		break;
 	case PROTOCOL_TCP:
 	default:
-		newEndpoint->m_reliable = true;
+		endpoint.m_reliable = true;
 		break;
 	}
 
-	idleEndpoints.push_back(newEndpoint);
-	newEndpoint->m_inUse = true;
+	idleEndpoints.push_back(&endpoint);
+	endpoint.m_inUse = true;
 
-	return newEndpoint;
+	return &endpoint;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -640,6 +667,15 @@ Teul::GetErrorName(SINT32 error)
 #if EWOULDBLOCK != EAGAIN
 	ErrorCase( EWOULDBLOCK );
 #endif
+#if defined( WSAEWOULDBLOCK )
+	ErrorCase( WSAEWOULDBLOCK );
+#endif
+#if defined( WSAEINPROGRESS )
+	ErrorCase( WSAEINPROGRESS );
+#endif
+#if defined( WSAEINTR )
+	ErrorCase( WSAEINTR );
+#endif
 #ifdef ESHUTDOWN
 	ErrorCase( ESHUTDOWN );
 #endif
@@ -654,7 +690,6 @@ Teul::GetErrorName(SINT32 error)
 	ErrorCase( ETEUL_CB_REQ_DATA );	// Bad receive.
 	case ETEUL_ILLEGAL_PACKET_ORDER:
 		return "ecorrupt";
-	break;
 
 	TeulErrorCase( LoginFail_ActivateNoLocalInfo );
 	TeulErrorCase( LoginFail_ActivateFailed );
@@ -681,15 +716,15 @@ Teul::GetErrorName(SINT32 error)
 		{
 		case Teul::Errors::PackCallbackCategory:
 			return "pkcb";
-		break;
+
 		case Teul::Errors::SendFailCategory:
 			return "txf";
-		break;
+
 		case Teul::Errors::PushPacketCategory:
 			return "pshp";
-		break;
+
 		default:
-		break;
+			break;
 		}
 	}
 

@@ -998,7 +998,7 @@ TestRagdoll::TestRagdoll() : gr2PhysicsModel()
     // setup our bone joints
     /*
         TBD
-     
+
 	//
 	// setup our joints
 	//
@@ -1598,7 +1598,7 @@ void fpTPSRagdoll::AddDrama(const Vec3d* force)
     gr2PhysicsBone* rforearm	= GetBone("Bip01 R Forearm");
     gr2PhysicsBone* pelvis		= GetBone("Bip01 Pelvis");
      */
-    
+
 	gr2PhysicsBone* lhand		= GetBone("Bip01 L Hand");
 	gr2PhysicsBone* rhand		= GetBone("Bip01 R Hand");
 	gr2PhysicsBone* lfoot		= GetBone("Bip01 L Foot");
@@ -2010,10 +2010,10 @@ fpTPSWeapon::fpTPSWeapon(gr2AnimTrooper* anim, const Vec3d* force, const WeaponS
 	Init();
 
 	piMATRIX& t = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleAttMat: anim->myVehicle->PosData.AttMat;
-    
+
     /*
      TBD - incorporate velocity?  why commented out?
-     
+
 	FLOAT64VECTOR& v = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleVel: anim->myVehicle->PosData.Vel;
      */
 	FLOAT64VECTOR& p = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehiclePos: anim->myVehicle->PosData.Pos;
@@ -2389,10 +2389,10 @@ fpTPSKitObject::fpTPSKitObject(gr2AnimTrooper* anim, const Vec3d* force, const W
 	piMATRIX& t = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleAttMat: anim->myVehicle->PosData.AttMat;
     /*
       TBD - incoporate velocity.  Why commented out below?
-     
+
 	FLOAT64VECTOR& v = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleVel: anim->myVehicle->PosData.Vel;
      */
-    
+
 	FLOAT64VECTOR& p = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehiclePos: anim->myVehicle->PosData.Pos;
 
 	Vec3d worldPos;

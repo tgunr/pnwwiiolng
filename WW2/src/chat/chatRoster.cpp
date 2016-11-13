@@ -456,7 +456,6 @@ main(int argc, char* argv[])
 
 				default:
 					exit(0);
-				break;
 			}
 			teulUpdateTransport();
 		} while (1);

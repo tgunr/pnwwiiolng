@@ -176,17 +176,17 @@ HostVehicle::checkLocality(Teul::Packet& packet)
 		{
 #ifdef BETA_RELEASE
 			if ( nearestCP )
-				threadLog(_FLD, "v:%u c:%s approaching area of %s"
+				dbugLog(_FLD, "v:%u c:%s approaching area of %s"
 							, index
 							, callsign()
 							, nearestCP->name);
 			else if ( m_impl->m_nearCP )
-				threadLog(_FLD, "v:%u c:%s departing area of %s"
+				dbugLog(_FLD, "v:%u c:%s departing area of %s"
 							, index
 							, callsign()
 							, m_impl->m_nearCP->name);
 			else
-				threadLog(_FLD, "v:%u c:%s spawned in the wilds"
+				dbugLog(_FLD, "v:%u c:%s spawned in the wilds"
 							, index
 							, callsign()
 							);
@@ -322,7 +322,7 @@ HostVehicle::attachControllingPlayer(const Player& player)
 {
 	assert( isRemote() == false );
 
-	dbugLog(_FLI, "t:%d p:%u c:%s attaching controller to v:%u spec:%u.%u.%u.%u sq:%u in:%u.%u.%llu.%llu"
+	dbugLog(_FLI, "t:%d p:%u c:%s attaching controller to v:%u spec:%u.%u.%u.%u sq:%u in:%u.%u.%" PR64BitUT ".%" PR64BitUT ""
 					, player.teulIndex(), player.playerID(), player.callsign(), index
 					, spec().wCountry, spec().wCategory, spec().wClass, spec().wType
 					, player.squadID()
@@ -569,7 +569,7 @@ HostVehicle::interruptCapture()
 {
 	if ( m_impl->m_captureActive )
 	{
-		threadLog(_FLD, "p:%u c:%s v:%u interrupting capture"
+		dbugLog(_FLD, "p:%u c:%s v:%u interrupting capture"
 						, seats[0], callsign(), index);
 
 		// Determine which status to send.
@@ -592,7 +592,7 @@ HostVehicle::interruptCapture()
 void
 HostVehicle::setInstance(const Instance::Descriptor& _instance)
 {
-    dbugLog(_FLD, "v:%u setting instance %u.%u.%llu.%llu"
+    dbugLog(_FLD, "v:%u setting instance %u.%u.%" PR64BitUT ".%" PR64BitUT ""
                 , index
                 , _instance.category(), _instance.type(), _instance.handle(), _instance.id());
 	m_instance = _instance;
@@ -845,7 +845,7 @@ HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 	{
 		if ( m_inBuildingObject )
 		{
-			threadLog(_FLD, "p:%u c:%s v:%u 0 facilityID for capture"
+			dbugLog(_FLD, "p:%u c:%s v:%u 0 facilityID for capture"
 							, seats[0], callsign(), index
 							);
 		}
@@ -864,7 +864,7 @@ HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 							,	player->brigadeID()
 						);
 	serverSendPacketToType(outgoing, STRAT_HOST);
-	threadLog(_FLD, "p:%u c:%s v:%u 0 sending cap contrib for %s"
+	dbugLog(_FLD, "p:%u c:%s v:%u 0 sending cap contrib for %s"
 				, seats[0], callsign(), index
 				, m_inBuildingObject && m_inBuildingObject->facility
 					? m_inBuildingObject->facility->name
@@ -934,7 +934,6 @@ HostVehicle::checkCapture()
 
 		return;
 	}
-	break;
 
 	default:
 #ifdef BETA_RELEASE

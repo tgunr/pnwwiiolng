@@ -41,12 +41,12 @@ namespace Instance
         Result() : m_status(_BAD_DATA), m_descriptor(Descriptor()) {}
         Result(const Descriptor& _descriptor) : m_status(_BAD_DATA), m_descriptor(_descriptor) {}
         Result(ACTION_OBJECT* a) ;
-        
+
         int packer(unsigned int mode, ACTION_OBJECT* a);
-        
+
         ResultCodes status() const { return m_status; }
         const Descriptor& descriptor() const { return m_descriptor; }
-        
+
         ResultCodes		m_status;
         Descriptor		m_descriptor;
 	};

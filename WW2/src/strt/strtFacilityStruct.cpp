@@ -174,8 +174,7 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 		if ( forUnit.homeCPID() != cp->fullObjID )
 			return nullptr;
 
-		return armyBase;
-	break;
+	return armyBase;
 
 	case FACILITY_FIREBASE:
 		assert( armyBase != nullptr );
@@ -186,8 +185,7 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 		if ( side != forUnit.side() )
 			return nullptr;
 
-		return armyBase->supplyingFacility(forUnit, false);
-	break;
+	return armyBase->supplyingFacility(forUnit, false);
 
 	case FACILITY_DEPOT:
 		assert( armyBase != nullptr );
@@ -223,12 +221,10 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 		if ( forUnit.homeCPID() != m_incomingLink->startDepot->cp->fullObjID )
 			return nullptr;
 
-		return m_incomingLink->startDepot->supplyingFacility(forUnit, false, false);
-	break;
+	return m_incomingLink->startDepot->supplyingFacility(forUnit, false, false);
 
 	default:
-		return nullptr;
-	break;
+	return nullptr;
 	}
 }
 
@@ -307,16 +303,16 @@ FacilityStruct::getCaptureRemaining() const
 	{
 	case _CAP_DISABLED:
 		return 100;
-	break;
+
 	case _CAP_PENDING:
 		{
 			UINT32 timeOut = m_captureStateChanged + m_captureCounter;
 			return (UINT16)( timeOut > teulTime() ? timeOut - teulTime() : 0 );
 		}
-	break;
+
 	case _CAP_ENABLED:
 		return (UINT16)100 - std::min(m_captureCounter, (UINT16)100);
-	break;
+
 	default:
 	break;
 	}

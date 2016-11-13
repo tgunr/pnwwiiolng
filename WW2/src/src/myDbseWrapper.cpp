@@ -48,7 +48,7 @@ dbseSetDatabase(const ConfigAddr& addr, const ConfigAddr& port, const ConfigStr&
 					addr.GetEnvVarName(), addr.GetString());
 	}
 
-	threadLog(_FLD, "Database is %s:%s [%08x] schema:%s user:%s",
+	dbugLog(_FLD, "Database is %s:%s [%08x] schema:%s user:%s",
 					addr.GetString(), port.GetString(), dbIP,
 					schema.GetString(), user.GetString());
 
@@ -83,8 +83,8 @@ _doMyConnect(bool autoReconnect)
 
 	if ( mysql_real_connect(tempConn, s_dbAddress, s_dbUser, s_dbPassword, s_dbSchema, s_dbPort, nullptr, flags) == nullptr )
 	{
-		threadLog(_FLA, "mysql_real_connect failed:\nError %u (%s) \n", mysql_errno(tempConn), mysql_error(tempConn));
-		threadLog(_FLA, "using host %s:%hu user %s schema %s", s_dbAddress, s_dbPort, s_dbUser, s_dbSchema);
+		dbugLog(_FLA, "mysql_real_connect failed:\nError %u (%s) \n", mysql_errno(tempConn), mysql_error(tempConn));
+		dbugLog(_FLA, "using host %s:%hu user %s schema %s", s_dbAddress, s_dbPort, s_dbUser, s_dbSchema);
 		return nullptr;
 	}
 
@@ -96,14 +96,14 @@ _doMyConnect(bool autoReconnect)
 
 	if ( mysql_select_db(tempConn, s_dbSchema) != 0 )
 	{
-		threadLog(_FLA, "unable to select schema %s", s_dbSchema);
+		dbugLog(_FLA, "unable to select schema %s", s_dbSchema);
 		mysql_close(tempConn);
 		return nullptr;
 	}
 
 	if ( mysql_set_character_set(tempConn, "utf8") != 0 )
 	{
-		threadLog(_FLA, "set names failed");
+		dbugLog(_FLA, "set names failed");
 		mysql_close(tempConn);
 		return nullptr;
 	}
@@ -118,15 +118,12 @@ static std::mutex dbconnMutex;
 DB::handle_t*
 dbseGetConnection(bool report, bool autoReconnect)
 {
-	if ( !s_dbInitialized ) {
-		dbseSetDatabase(cv_wwiiDBAddress, cv_wwiiDBPort, cv_wwiiDBDefaultSchema, cv_wwiiDBUser, cv_wwiiDBPassword);
-	}
-	if ( !s_dbAddress || !s_dbPort || !s_dbSchema || !s_dbUser || !s_dbPassword ) {
-		threadLog(_FLW, "Missing database configuration, can't connect\n");
-		return nullptr;
+	dbseSetDatabase(cv_wwiiDBAddress, cv_wwiiDBPort, cv_wwiiDBDefaultSchema, cv_wwiiDBUser, cv_wwiiDBPassword);
+	if ( !s_dbAddress[0] || !s_dbPort || !s_dbSchema[0] || !s_dbUser[0] || !s_dbPassword[0] ) {
+		LogAbort("Missing database configuration, can't connect");
 	}
 
-    threadLog(_FLD, "Getting thread connection to host '%s:%hu' database '%s' user '%s'"
+    dbugLog(_FLD, "Getting thread connection to host '%s:%hu' database '%s' user '%s'"
 				, s_dbAddress, s_dbPort, s_dbSchema, s_dbUser);
 
 	DB::handle_t* newConn = nullptr;
@@ -138,7 +135,7 @@ dbseGetConnection(bool report, bool autoReconnect)
 
 	if ( report )
 	{
-		threadLog(_FLI, "Connection to host '%s:%hu' database '%s' user '%s' reconnect '%s' %s."
+		dbugLog(_FLI, "Connection to host '%s:%hu' database '%s' user '%s' reconnect '%s' %s."
 						, s_dbAddress, s_dbPort, s_dbSchema, s_dbUser
 						, (autoReconnect ? "auto" : "manual")
 						, ((newConn != nullptr) ? "successful" : "FAILED")

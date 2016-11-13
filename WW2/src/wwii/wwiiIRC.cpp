@@ -112,7 +112,7 @@ static IRCImpl irc;
 void
 IRCImpl::run()
 {
-	threadLog(_FLI, "IRC: started");
+	dbugLog(_FLI, "IRC: started");
 
 	const char* ircPass = cv_ircPassword.GetString();
 
@@ -127,7 +127,7 @@ IRCImpl::run()
 		// disconnected.
 		if ( m_running )
 		{
-			threadLog(_FLN, "IRC: Reconnecting");
+			dbugLog(_FLN, "IRC: Reconnecting");
 			if ( backOff < 90 )
 				++backOff;
 		}
@@ -135,10 +135,10 @@ IRCImpl::run()
 			m_running = true;
 
 		irc.m_joined = false;
-		threadLog(_FLI, "IRC: Connecting %s:%u %s", cv_ircServer.GetString(), cv_ircPort.GetUint32(), m_nick.c_str());
+		dbugLog(_FLI, "IRC: Connecting %s:%u %s", cv_ircServer.GetString(), cv_ircPort.GetUint32(), m_nick.c_str());
 		if ( irc_connect(m_session, cv_ircServer.GetString(), cv_ircPort.GetUint32(), ircPass, m_nick.c_str(), m_nick.c_str(), m_nick.c_str()) )
 		{
-			threadLog(_FLM, "IRC: Unable to connect: %s", irc_strerror(irc_errno(m_session)));
+			dbugLog(_FLM, "IRC: Unable to connect: %s", irc_strerror(irc_errno(m_session)));
 			irc_disconnect(m_session);
 		}
 		else
@@ -181,8 +181,6 @@ _terminate(const char* reason)
 	irc.cancel();
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(250));
-
-	threadsLogging();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -448,7 +446,7 @@ wwiiIRCDumpEvent(irc_session_t* /*session*/, const char* event, const char* orig
 	if ( text.length() > 1000 )
 		text.replace(997, 3, "...");
 
-	threadLog(_FLI, "IRC e:%s o:%s p:%u[%s]", event, origin ? origin : "NULL", count, text.c_str());
+	dbugLog(_FLI, "IRC e:%s o:%s p:%u[%s]", event, origin ? origin : "NULL", count, text.c_str());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -468,7 +466,7 @@ _joinChannel(irc_session_t* session, _CHANNELS::iterator it)
 
 	IRCChannel& chan = it->second;
 
-	threadLog(_FLI, "IRC: Attempting to join %s", chan.m_channel.c_str());
+	dbugLog(_FLI, "IRC: Attempting to join %s", chan.m_channel.c_str());
 
 	chan.m_newChannel = true;
 	irc_cmd_join(session, chan.m_channel.c_str(), nullptr);
@@ -640,7 +638,7 @@ wwiiIRCDefaultNumeric(irc_session_t * session, unsigned int event, const char* o
 	case LIBIRC_RFC_RPL_ENDOFNAMES:	// End of user list
 		if ( chan.m_newChannel == true )
 		{
-			threadLog(_FLI, "IRC: Created %s", channel);
+			dbugLog(_FLI, "IRC: Created %s", channel);
 			if ( chan.m_mode.empty() == false )
 				irc_cmd_channel_mode(session, chan.m_channel.c_str(), chan.m_mode.c_str());
 			if ( chan.m_topic.empty() == false )
@@ -648,7 +646,7 @@ wwiiIRCDefaultNumeric(irc_session_t * session, unsigned int event, const char* o
 		}
 		else
 		{
-			threadLog(_FLI, "IRC: Joined %s", channel);
+			dbugLog(_FLI, "IRC: Joined %s", channel);
 		}
 		++it;
 		_joinChannel(session, it);
@@ -667,7 +665,7 @@ wwiiIRCActivate(bool includeSigHup)
 {
 	if ( cv_ircServer.GetString() == nullptr || *cv_ircServer.GetString() == 0 )
 	{
-		dbugLog(_FLA, "IRC: disabled");
+		dbugLog(_FLM, "IRC: disabled");
 		return true;
 	}
 
@@ -712,7 +710,6 @@ wwiiIRCActivate(bool includeSigHup)
 	for ( UINT32 i = 0; i < 5 * 100; ++i )
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		threadsLogging();
 		if ( irc.m_joined == true )
 			break;
 	}

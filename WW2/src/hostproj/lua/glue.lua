@@ -239,17 +239,9 @@ end
 
 gluehelp['allStratHCUnits'] = "() Iterates through all Strat HC Units (brigades + divisions)"
 function allStratHCUnits ()
-  local it = hcUnits:beginIterator()
-  local last = hcUnits:endIterator()
+  local it = HcUnitIterator:new()
   return function ()
-    local hcUnit, unit
-    repeat
-      if it == nil or it == last then return nil end
-      hcUnit = getHCiHCUnit(it)
-      unit = getHCiStratHCUnit(it)
-      it = getHCiNext(it)
-    until hcUnit:isBrigade() == true or hcUnit:isDivision() == true
-    return unit
+	return it:getNext()
   end
 end
 

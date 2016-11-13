@@ -47,7 +47,7 @@ _recvPlayerUpdate(ACTION_OBJECT* const a)
 
 	Server::PlayerStatusUpdate& update = a->read<Server::PlayerStatusUpdate>();
 
-	dbugLog(_FLD, "p:%u c:%s received update %d source %s from address %s status %d server %llu "
+	dbugLog(_FLD, "p:%u c:%s received update %d source %s from address %s status %d server %" PR64BitUT ""
 				,update.dispatch.m_customerID
 				,update.dispatch.m_callsign
 				,update.id
@@ -166,7 +166,7 @@ _recvPlayerMirror(ACTION_OBJECT* const a)
 
     char remoteServerAddress[64];
     teulGetAddress(a->fromAddress, remoteServerAddress, sizeof(remoteServerAddress));
-    dbugLog(_FLD, "xfer:%llu(%s) p:%u c:%s otp:%u received player mirror for ip:%s"
+    dbugLog(_FLD, "xfer:%" PR64BitUT "(%s) p:%u c:%s otp:%u received player mirror for ip:%s"
                 , mirror.xferID()
                 , remoteServerAddress
                 , mirror.dispatch().m_customerID

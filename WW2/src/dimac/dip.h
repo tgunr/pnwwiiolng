@@ -133,7 +133,7 @@ enum {
     DIK_JIS_KANA             = 0x68,
 
     MAX_KEYS                 = 256, // not really, but other stuff breaks because it hardcodes this value
-    
+
     // Original Windows DirectInput names for things:
     DIK_LMENU = DIK_OPTION,
     DIK_UP = DIK_UPARROW,

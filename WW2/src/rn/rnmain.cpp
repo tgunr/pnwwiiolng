@@ -356,7 +356,7 @@ static bool _connectClientToGameNetwork()
 		UINT32 appversion = 0;
 
 		rnlogoUpdateStatus("loading.network");
-        
+
         if (gClientV[0] != 0) {
             teulGetHost(gClientV, &appversion);
         } else {
@@ -1266,7 +1266,7 @@ static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UI
 {
     LOGICAL	retval=TRUE;
     std::string apID, data, serverIP, serverport, serverprotocol, otp, bypass;
-    
+
     try {
         std::ifstream  ticketFileStream (TicketFile);
         std::getline(ticketFileStream, apID); // ignore
@@ -1296,7 +1296,7 @@ static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UI
         {
             *cookie = static_cast<UINT32>(strtoul(otpText.c_str(), nullptr, 10));
         }
-        
+
         std::getline(ticketFileStream, bypass);
         if (!bypass.empty())
         {
@@ -1305,12 +1305,12 @@ static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UI
                 Write_Debug("Unable to translate host address");
                 return (FALSE);
             }
-            
+
             std::string userId = bypass.substr(bypass.find(" ")+1);
             if (!userId.empty())
             {
                 strncpy(BypassString,userId.c_str(),32);
-            
+
                 if (BypassString[0] != '\0')
                 {
                     if (BypassString[0] == 'R')

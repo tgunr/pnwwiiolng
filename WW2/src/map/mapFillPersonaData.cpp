@@ -106,7 +106,7 @@ protected:
 		// Apply the group list
 		player->SetGroups(m_result.m_newGroups.c_str()) ;
 
-		player->log(_FLI, "fpdq: pers:%u rank:%u gotrank:%d points:%u rankperm:%llx mb:%u took %llums"
+		player->log(_FLI, "fpdq: pers:%u rank:%u gotrank:%d points:%u rankperm:%" PRPermMaskT " mb:%u took %" PR64BitUT "ms"
 						, player->personaID()
 						, player->effectiveRank(), player->realRank(), player->points()
 						, player->useRank().permissions()

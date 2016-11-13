@@ -13,25 +13,32 @@ namespace Mem
 	{
 		static_assert(BlockSize > 0, "BlockSize must be at least 1.");
 
-		std::vector<Type*> m_blocks;
+		using Block = std::array<char, sizeof(Type) * BlockSize>;
+
+		// Pointers to blocks of allocations
+		std::list<Block> m_blocks;
+		// Pointers to individual elements
 		std::vector<Type*> m_freeList;
+		// Count of assigned allocations
+		size_t m_inUse { 0 };
 
 		// Increase the number of free entries available by BlockSize.
 		// Aborts on out of memory.
 		void Grow()
 		{
-			Type* const newBlock = static_cast<Type*>(memAlloc(sizeof(Type)* BlockSize));
-			ABORT_IF(newBlock == nullptr);
-			m_blocks.push_back(newBlock);
-			for (Type* block = newBlock + BlockSize - 1; block >= newBlock; --block)
-				m_freeList.push_back(block);
+			m_blocks.emplace_back();
+			auto& newBlock = m_blocks.back();
+			m_freeList.reserve(m_freeList.size() + BlockSize);
+			Type* ptr = reinterpret_cast<Type*>(newBlock.data());
+			for (size_t i = 0; i < BlockSize; ++i, ++ptr ) {
+				m_freeList.push_back(ptr);
+			}
 		}
 
 	public:
 		//! Default constructor. Optional argument specifies how many units to reserve at startup.
 		Pool(size_t defaultReservation=BlockSize)
 		{
-			m_blocks.reserve(128);			// Boot-strap the allocations tracker.
 			m_freeList.reserve(std::max(defaultReservation, BlockSize * 2));
 			Reserve(defaultReservation);	// Pre-allocate the first units.
 		}
@@ -40,7 +47,6 @@ namespace Mem
 		void Cleanup() noexcept
 		{
 			m_freeList.clear();
-			std::for_each(m_blocks.begin(), m_blocks.end(), [](Type* block) { memFree(block); });
 			m_blocks.clear();
 		}
 
@@ -65,6 +71,7 @@ namespace Mem
 				Grow();
 			Type* block = m_freeList.back();
 			m_freeList.pop_back();
+			++m_inUse;
 			return block;
 		}
 
@@ -72,8 +79,10 @@ namespace Mem
 		//! @warn Does not verify the allocation came from the pool.
 		void Free(Type* block)
 		{
-			ABORT_IF(block == nullptr);
-			m_freeList.push_back(block);
+			if ( PN_LIKELY( block ) ) {
+				m_freeList.push_back(block);
+				--m_inUse;
+			}
 		}
 
 		//! Obtain the next free allocation and in-place default new it.

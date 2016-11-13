@@ -118,7 +118,7 @@ strtAccumulateDamageMessage(const FULL_OBJ_ID object, const SINT64 damageJoules,
 		}
 		if ( newDamage < damageJoules )
 		{
-			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u ignoring %lld joules damage - would wrap", playerID, serial.serial, object.cell.ox, object.cell.oy, object.id, damageJoules);
+			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u ignoring %" PR64BitT " joules damage - would wrap", playerID, serial.serial, object.cell.ox, object.cell.oy, object.id, damageJoules);
 			return;
 		}
 		damageEntry.damageJoules = newDamage;

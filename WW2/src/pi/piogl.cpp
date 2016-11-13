@@ -773,7 +773,7 @@ void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 #endif
 	PostMessageA(myhwnd, WM_CLOSE, 0, 0);
 #endif
-    
+
 	abort(); // Abort raises SIGABRT, which will be trapped by the crash handler
 }
 
