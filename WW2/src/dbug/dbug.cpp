@@ -542,6 +542,8 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	if ( PN_LIKELY((error != Debug::ERR_FATAL) && (error > minLevel)) )
 		return 0;
 
+	const bool isFatal = (error == Debug::ERR_FATAL);
+	const bool logToConsole = isFatal || (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && error <= Debug::ERR_MINOR);
 	_logger.setFileName(sane_basename(filename != nullptr ? filename : ""));
 	_logger.m_lineno = lineno;
 
