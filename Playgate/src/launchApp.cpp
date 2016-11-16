@@ -109,7 +109,7 @@ LOGICAL launchArenaRequest()
 	return TRUE;
 }
 
-static SINT32 _RecievePlayGateOk(ACTION_OBJECT *a)
+static SINT32 _ReceivePlayGateOk(ACTION_OBJECT *a)
 {
 	playgate.SetStatus(GetLoc(AUTH_OK));
 /*
@@ -334,7 +334,7 @@ static SINT32 _ReceiveAppVerify(ACTION_OBJECT *Action)
 {
 	APP_VERIFY AppVerify;
 
-	//playgate.SetStatus("Recieved app verify");
+	//playgate.SetStatus("Received app verify");
 
 	Action->offset = authPackAPP_VERIFY(TEUL_UNPACK, Action->packed, Action->offset, &AppVerify, 0);
 
@@ -373,7 +373,7 @@ extern SINT32 launchInstallCallbacks(void)
 			throw 4;
 		if ( commInstallMessage(Auth::CallbackX, APP_VERIFY_Y, nullptr, _ReceiveAppVerify) == nullptr)
 			throw 5;
-		if ( commInstallMessage(Auth::CallbackX, APP_PLAYGATE_OK_Y, nullptr, _RecievePlayGateOk) == nullptr )
+		if ( commInstallMessage(Auth::CallbackX, APP_PLAYGATE_OK_Y, nullptr, _ReceivePlayGateOk) == nullptr )
 			throw 6;
 		_GetGameList = commInstallMessage(Auth::CallbackX, APP_XCHG_GAME_LIST_Y, _RequestGameList, _ReceiveGameList);
 		if ( nullptr == _GetGameList )
