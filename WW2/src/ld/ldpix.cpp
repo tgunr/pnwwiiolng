@@ -59,49 +59,40 @@ int ldpixLoadImageFileToSurface(const char* Filename, UINT32 TransparentColor, U
 
 int _loadImageFileToSurface(const char* Filename, UINT32 TransparentColor, UINT32 Flags)
 {
-	UINT32		WantFlags;
-	char*		ptr;
-	char		basename[256], localname[256], tmpname[256], alphaname[256];
-	int			i, j, texid, width, height;
-	int			newwidth, newheight;
-	TEXTURE*	lptex;
-	int			mip_texid;
+	char		basename[256], localname[256], tmpname[256];
 
-	bool WantMipmap = (Flags & LDPIX_MIPMAP) != 0;
 	bool WantDXT = (Flags & LDPIX_NO_DXT) == 0;
-
+	bool WantMipmap = (Flags & LDPIX_MIPMAP) != 0;
 	if (WantMipmap
 		&& (strncasecmp("ui\\", Filename, 3) == 0
 			|| strncasecmp("\\fonts\\", Filename, 7) == 0
 			|| strncasecmp("splashscreen", Filename, 12) == 0))
 	{
-		WantMipmap = FALSE;
+		WantMipmap = false;
 	}
+    bool WantFlags = (WantMipmap ? CRT_FLAG_MIPMAP : CRT_FLAG_NONE) | (WantDXT ? CRT_FLAG_NONE : CRT_FLAG_WRITABLE);
 
-    WantFlags = (WantMipmap ? CRT_FLAG_MIPMAP : CRT_FLAG_NONE) | (WantDXT ? CRT_FLAG_NONE : CRT_FLAG_WRITABLE);
-
-	strcpy(basename, Filename);
-	_strlwr(basename);
-
-	ptr = (char*)strrchr(basename, '.');
+	strsafecpy(basename, Filename);
+	char* ptr = (char*)strrchr(basename, '.');
 	if (ptr)
 	{
 		*ptr = 0;
 	}
+	_strlwr(basename);
 
-	texid = piGetNamedTexture(basename);
+	int texid = piGetNamedTexture(basename);
 	if (piIsTexture(texid, 0))
 	{
 		piAddTexRef(texid);
 		return(texid);
 	}
 
-	strcpy(localname, basename);
+	strsafecpy(localname, basename);
 
     Write_Log(LOG_TEXTURE, LOG_INFO, "[TEXTURE] loading %s", localname);
 
 	size_t suffixOffset = strprintf(tmpname, "%s.", localname);
-	for (i=0; GfxFormats[i].Routine; i++)
+	for (int i=0; GfxFormats[i].Routine; i++)
 	{
 		strncpy(tmpname + suffixOffset, GfxFormats[i].Extension, sizeof(tmpname) - suffixOffset);
         if(GfxFormats[i].Routine == ldLoadTexture) {

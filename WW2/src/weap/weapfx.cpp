@@ -2250,8 +2250,6 @@ UINT32 weapfxAmmoDetachAmmo(weapAmmo const* Ammo)
 	return 0;
 }
 
-#pragma mark -
-
 /************************************************************************************************
 	weapfxMountFireSound
 *************************************************************************************************/
@@ -2364,8 +2362,6 @@ UINT32 weapfxMountStopFireSound(mlWeaponMount* Mount, UINT32 i, SINT32 RoundsLef
 
 	return 0;
 }
-
-#pragma mark -
 
 /************************************************************************************************
 	AddBulletDecal

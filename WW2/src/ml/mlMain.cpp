@@ -2841,8 +2841,6 @@ if(VehicleData->VehicleMasterPtr->VehicleType->Type == VEH_TYPE_AIR)
 	return 0;
 }
 
-#pragma mark -
-
 UINT32 mlUpdateComponent(mlComponent* Component, mlVehicleData* VehicleData, FLOAT64 DeltaTime, UINT32 PassNum,
 							FLOAT64VECTOR* SavedVehicleForce, FLOAT64VECTOR* TempNormForceSum)
 {
@@ -4124,8 +4122,6 @@ FLOAT64 Density1 = 0,Density2 = 0;
 
 	return 0;
 }
-
-#pragma mark -
 
 UINT32 mlGetElevatorDeflection(FLOAT64 * ReturnVal,FLOAT64 DeltaTime,mlVehicleData * VehicleData)
 {
@@ -8787,8 +8783,6 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 }
 
 
-#pragma mark -
-
 /************************************************************************************************
 	mlVehicleHandleTurretConvergence
 *************************************************************************************************/
@@ -9617,8 +9611,6 @@ static LOGICAL mlCollideWithVehicle(vehVehicle* CurrentVehicle, piVECTOR const* 
 	return (NumCollisionSlotsLeft != 32);
 }
 
-#pragma mark -
-
 #ifdef BETA_RELEASE
 
 // now does* all* vehicles
@@ -10132,8 +10124,6 @@ static void _LeakTest()
 
 #endif
 
-#pragma mark -
-
 // change!
 // now returns true if it was able to tell, false if it wasn't
 //
@@ -10469,8 +10459,6 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 }
 
 #endif // GM_RELEASE
-
-#pragma mark -
 
 // handles the magical mystery rotational co-ordinate conversion
 

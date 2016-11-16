@@ -1514,7 +1514,7 @@ static bool ReadColorPalette()
 	colorstruct* color = &s_colortable.front();
 	for (size_t i=0; i < length; ++i)
 	{
-		for (size_t j=0; j < 128; ++color, ++j)
+		for (UCHAR j=0; j < 128; ++color, ++j)
 		{
 			color->full			=	colorpal->briteRGB[i];
 			color->rgb.red		=	color->rgb.red * j / 127;
