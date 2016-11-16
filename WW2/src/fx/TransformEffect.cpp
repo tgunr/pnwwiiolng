@@ -1865,7 +1865,7 @@ void TransformEffect::update()
                 e->_lastupdate = frametime;
             }
         }
-       
+
         if(((_flags & REMOVE_ME_WHEN_DONE) && (enablecount == 0)) || _dead)
         {
             removelist.insert(this);

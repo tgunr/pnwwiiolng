@@ -61,15 +61,16 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 {
 	if( PN_UNLIKELY(endpoint.state() == IS_DEAD) )
 	{
-		dbugLog(_FLA,"endpoint not open state = %d, index %d callback %d:%d ", endpoint.state(), endpoint.teulIndex(), callback.callX(), callback.callY());
+		dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " endpoint not open, state:%d callback " PRF_CALLBACK ""
+					, endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), endpoint.state(), PRA_CALLBACK(callback));
 		return -ETEUL_CB_CONN_DEAD;
 	}
 
-	dbugLog(_FLD, "t:%d sending callback x:%d(%s) y:%d(%s)", endpoint.teulIndex(), callback.callX(), callback.callXName(), callback.callY(), callback.callYName());
-	
+	dbugLog(_FLD, "t:%d sending callback " PRF_CALLBACK "", endpoint.teulIndex(), PRA_CALLBACK(callback));
+
 	if ( PN_UNLIKELY(callback.m_sendAction == nullptr) )
 	{
-		dbugLog(_FLA, "cant execute null callback x:%d y:%d", callback.callX(), callback.callY());
+		dbugLog(_FLA, "no action for callback " PRF_CALLBACK "", PRA_CALLBACK(callback));
 		return -ETEUL_CB_SEND_NULL;
 	}
 
@@ -90,7 +91,8 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 	const SINT32 packedSizeBits = (callback.m_sendAction)(&actionObj);
 	if ( PN_UNLIKELY(packedSizeBits < 0) )
 	{
-		dbugLog(_FLA, "t:%d cb:%u,%u pack failed:%d probable data corruption", endpoint.teulIndex(), callback.callX(), callback.callY(), packedSizeBits);
+		// probable data corruption
+		dbugLog(_FLA, "t:%d cb:" PRF_CALLBACK " pack failed:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), packedSizeBits);
 		return packedSizeBits;
 	}
 
@@ -99,7 +101,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 	const SINT32 sendResult = outgoing.send(endpoint);
 	if ( PN_UNLIKELY(sendResult < 0) )
 	{
-		dbugLog(_FLW, "t:%d cb:%u,%u send failed:%d", endpoint.teulIndex(), callback.callX(), callback.callY(), sendResult);
+		dbugLog(_FLW, "t:%d callback " PRF_CALLBACK " send failed:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), sendResult);
 		return sendResult;
 	}
 
@@ -160,7 +162,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 
 		// Check for an interrupted send attempt.
 		const int err = dbugGetErrno();
-		if ( (err != EAGAIN) & (err != EINTR) & (err != EWOULDBLOCK) )
+		if ( (err != PLAT_EAGAIN) & (err != PLAT_EINTR) & (err != PLAT_EWOULDBLOCK) )
 		{
 			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " send error on send %" PRSizeT " bytes to %u,%u [%u,%hu] attempt, err:%d"
 						, teulIndex(), PRA_SOCKET(socket)
@@ -170,7 +172,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 						);
 			return -ETEUL_ENOSPC_SEND_SOCKET;
 		}
-		else 
+		else
 		{
 			dbugLog(_FLD, "::sendto returned code %d, try again return", err);
 		}
@@ -207,7 +209,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 			// If the error was the result of an interruption, then lets just queue the packet
 			// and give it a retry later on.
 			const SINT32 err = dbugGetErrno();
-			if ( (err != EAGAIN) & (err != EINTR) & (err != EWOULDBLOCK) )
+			if ( (err != PLAT_EAGAIN) && (err != PLAT_EINTR) && (err != PLAT_EWOULDBLOCK) )
 			{
 				return result;
 			}
@@ -220,7 +222,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 			        teulIndex(), packet.header().m_callX, packet.header().m_callY,
 			        result, packet.packetSizeBytes());
 #endif
-			packet.sentBytes(sent);
+			packet.addBytesSent(sent);
 			if ( packet.sentBytes() >= packetBytes )
 			{
 				return packetBytes;
@@ -233,8 +235,8 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 	Teul::Packet* const copy = s_delayedPackets.New(std::move(packet));
 #else
 	Teul::Packet* const copy = s_delayedPackets.New(packet);
+	copy->addBytesSent(packet.sentBytes());
 #endif
-	copy->sentBytes(packet.sentBytes());
 
 	m_impl->m_sendQueue.push_back(copy);
 
@@ -250,7 +252,7 @@ void
 EndpointImpl::FreeFirstPacketInSendQueue()
 {
 	Teul::Packet* packet = m_sendQueue.front();
-	m_sendQueue.erase(m_sendQueue.begin());
+	m_sendQueue.pop_front();
 	s_delayedPackets.Delete(packet);
 }
 
@@ -288,7 +290,7 @@ ENDPOINT::pushSendQueue()
 		        teulIndex(), packet->header().m_callX, packet->header().m_callY,
 		        result, remainingBytes);
 #endif
-		packet->sentBytes((size_t)result);
+		packet->addBytesSent((size_t)result);
 		if ( packet->sentBytes() >= packet->packetSizeBytes() )
 		{
 			// We appear to have sent the data.
@@ -372,7 +374,7 @@ teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object)
 	ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex);
 	if (PN_UNLIKELY(theEndpoint == nullptr))
 	{
-		dbugLog(_FLA, "t:%d x:%d y:%d invalid endpoint in send callback", teulIndex, object.callX(), object.callY());
+		dbugLog(_FLA, "t:%d " PRF_CALLBACK " invalid endpoint in send callback", teulIndex, PRA_CALLBACK(object));
 		return -EINVAL;
 	}
 

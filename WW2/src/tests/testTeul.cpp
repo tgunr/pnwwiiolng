@@ -187,7 +187,6 @@ struct EchoPacketHeader
 		default:
 			Dprintf("Echo type: %u\n", m_type);
 			throw std::runtime_error("Invalid echo type");
-		break;
 		}
 
 		if ( a->offset < 0 )
@@ -450,8 +449,7 @@ struct Role
 			return;
 
 		// UnencryptedBytes is supposed to be '3'.
-		if ( Teul::Packet::UnencryptedBytes != 3 )
-			throw Teul::Error("UnencryptedBytes is not 3", Teul::Packet::UnencryptedBytes);
+		static_assert(Teul::Packet::UnencryptedBytes == 3, "Code depends on size of UnencryptedBytes being 3");
 
 		// Prepare the packet!
 		Dprintf("preparing Teul::Packet\n");
@@ -756,7 +754,7 @@ _doCryptTests()
 		ep.m_impl->m_rxCrypt.newSeed();
 		ep.m_impl->m_txCrypt.setSeed(ep.m_impl->m_rxCrypt.seed());
 
-		Dprintf("- ver %04x. rxSeed = %llu, txSeed = %llu\n", version, ep.m_impl->m_rxCrypt.seed(), ep.m_impl->m_txCrypt.seed());
+		Dprintf("- ver %04x. rxSeed = %" PR64BitUT ", txSeed = %" PR64BitUT "\n", version, ep.m_impl->m_rxCrypt.seed(), ep.m_impl->m_txCrypt.seed());
 
 		memcpy(buf1, buf2, len1);
 		ep.m_impl->m_version = ep.m_impl->m_cryptVersion = version;

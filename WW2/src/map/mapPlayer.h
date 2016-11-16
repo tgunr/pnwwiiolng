@@ -305,7 +305,6 @@ public:
 
 	class Brigade*	m_brigade;
 	class Mission*	m_mission;
-	struct AAStatus* m_antiAddiction;
 
 	UINT32			m_roomFlags;		// Last known room list flags
 	UINT32			m_loginState;		// How far into their login they are

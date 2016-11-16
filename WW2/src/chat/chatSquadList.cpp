@@ -93,7 +93,7 @@ public:
 		if ( numRows <= 0 )
 			return true;
 
-		threadLog(_FLI, "squad list process: sq:%u rows:%u", m_squadID, numRows);
+		dbugLog(_FLI, "squad list process: sq:%u rows:%" PRSizeT "", m_squadID, numRows);
 
 		Result result;
 		while ( Query()->FetchRow() )
@@ -913,7 +913,7 @@ Player::sendSquadInfo(SquadList* squadList/*=NULL*/)
 		sendWhoList = true;
 	}
 	if ( g_debugSquads )
-		dbugLog(_FLD, "t:%d p:%u c:%s sq:%u sending squad update %u%s time:%llu mod:%llu mmod:%llu lsi:%llu"
+		dbugLog(_FLD, "t:%d p:%u c:%s sq:%u sending squad update %u%s time:%" PR64BitUT " mod:%" PR64BitUT " mmod:%" PR64BitUT " lsi:%" PR64BitUT ""
 						, teulIndex(), playerID(), callsign(), squadID()
 						, msg.status(), ((sendWhoList) ? "+who" : "")
 						, teulClock64, squadList->msstamp(), squadList->lastMemberMod(), lastSquadInfoMS());
@@ -1267,7 +1267,7 @@ SquadNamesQuery::Success()
 		}
 		catch (std::exception& e)
 		{
-			threadLog(_FLW, "SquadNames: %s", e.what());
+			dbugLog(_FLW, "SquadNames: %s", e.what());
 			g_squadNames.clear();
 		}
 	}

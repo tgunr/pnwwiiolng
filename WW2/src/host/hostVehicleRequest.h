@@ -73,7 +73,7 @@ struct VehicleRequest
 		if ( a->canRead<Host::VehicleRequest>() == false )
 			return -EINVAL;
 		auto& req = a->read<Host::VehicleRequest>();
-		dbugLog(_FLD, "p:%u v:%u in:%llu rxing host vehicle request", req.m_players[0], req.m_weaponSerial.serial, req.m_instanceID);
+		dbugLog(_FLD, "p:%u v:%u in:%" PR64BitUT " rxing host vehicle request", req.m_players[0], req.m_weaponSerial.serial, req.m_instanceID);
 		if ( !req.execute() )
 			return -1;
 		return a->offset;

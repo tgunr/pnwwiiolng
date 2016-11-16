@@ -26,26 +26,25 @@ struct DebugLogger
 {
 	DebugLogger() noexcept {}
 
-	const char* file() const noexcept { return m_file; }
 	const char* program() const noexcept { return m_program; }
 	const char* text() const noexcept { return m_text; }
 
-	void setFileName(const char* src) noexcept { m_file = src; }
 	void setProgram(const char* src) noexcept { m_program = src; }
-	void setText(char* src) noexcept { if ( src ) strsafecpy(m_text, src); else m_text[0] = 0; }
 
-	int vformatText(const char* fmt, va_list args) noexcept
+	UINT32 vformatText(const char* fmt, va_list args) noexcept
 	{
-		const int len = std::min(vsnprintf(m_text, DBUG_MAX_STRING, fmt, args), (int)DBUG_MAX_STRING-1);
-		m_text[len] = 0;
+		UINT32 len = static_cast<UINT32>(vsnprintf(m_text, DBUG_MAX_STRING, fmt, args));
+		if (len < DBUG_MAX_STRING)
+			m_text[len++] = '\n';
+		else
+			m_text[DBUG_MAX_STRING] = '\n';
 		return len;
 	}
 
 	template<typename... Args>
-	int formatText(const char* fmt, Args... args) noexcept
+	UINT32 formatText(const char* fmt, Args&&... args) noexcept
 	{
-		int len = std::min((int)strprintf(m_text, fmt, std::forward<Args>(args)...), (int)DBUG_MAX_STRING-1);
-		return len;
+		return strprintf(m_text, fmt, std::forward<Args>(args)...);
 	}
 
 	void initialize(LogMode logMode, Debug::ERROR_TYPE level, SINT32 file, const char* program) noexcept;
@@ -55,18 +54,16 @@ struct DebugLogger
 
 public:
 	bool			m_initialized;
-	bool			m_isLog;
 	int				m_dbugfile;
 	LogMode			m_logMode;
 	unsigned int	m_writeLevel;
 	unsigned int	m_logLevel;
 	unsigned int	m_writeFlags;
 	unsigned int	m_logFlags;
-	unsigned int	m_flags;
-	unsigned int	m_errType;
-	int				m_err;
-	int				m_lineno;  // can be -1
+	//unsigned int	m_flags;
+	//unsigned int	m_errType;
+	//int				m_lineno;  // can be -1
 	const char*		m_program;
-	const char*		m_file;
-	char			m_text[DBUG_MAX_STRING + 1];
+	//const char*		m_file;
+	static thread_local char m_text[DBUG_MAX_STRING + 1];
 };

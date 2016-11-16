@@ -146,24 +146,24 @@ static std::string strtolower(const std::string &str)
 static std::string strtrim(const std::string &str)
 {
     size_t snwspos = str.find_first_not_of(" \t\n\v\f\r");
-    
+
     if (snwspos == std::string::npos) {
         return "";
     }
-    
+
     size_t enwspos = str.find_last_not_of(" \t\n\v\f\r");
-    
+
     if (enwspos == std::string::npos) {
         return "";
     }
-    
+
     return str.substr(snwspos, (enwspos + 1) - snwspos);
 }
 
 LOGICAL mngoptParse(char* InputLine)
 {
 	char*	ptr;
-	
+
 #if platOS == OS_WIN32
 	ptr = _skipFilename(GetCommandLineA());
 #else
@@ -172,18 +172,18 @@ LOGICAL mngoptParse(char* InputLine)
 
 	if ( ptr == nullptr )
 		return TRUE;
-    
+
     std::vector<std::string> args = split_string(ptr, " ");
-    
+
     for (size_t i = 0, n = args.size(); i < n; i += 2) {
         std::string cmd = strtrim(strtolower(args[i]));
         std::string value = strtrim(strtolower(i < (n - 1) ? args[i + 1] : ""));
-        
+
         if (!has_prefix(cmd, "-")) {
             break;
         }
         auto foundCmd = std::find_if(&vars[0], &vars[sizeof(vars) / sizeof(GVAR)], [c = cmd.substr(1)] (const GVAR &k) { return k.key && k.key == c; });
-        
+
         if (foundCmd == &vars[sizeof(vars) / sizeof(GVAR)]) {
 			Write_Debug("Unknown switch: '%s', '%s'", cmd.c_str(), value.c_str());
             continue;

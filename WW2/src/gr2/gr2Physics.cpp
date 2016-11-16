@@ -328,10 +328,10 @@ void gr2PhysicsBone::Adjust(Matrixd& transform, Vec3d& offset, double angle, int
           TBD -calculate our adjust position
 		Vec3d position = objTransform.getTrans();
 
-		
+
 		position = position + offset;
          */
-        
+
 		// re-save it
 		objTransform.setTrans(offset);
 	}
@@ -2020,12 +2020,12 @@ dJointID gr2PhysicsModel::addJoint(gr2PhysicsBone* from,
 					dJointSetAMotorParam(jointID, dParamLoStop3, DEG(ax3Lo));
 					dJointSetAMotorParam(jointID, dParamHiStop3, DEG(ax3Hi));
 					from->SetJointParams();
-                    
+
                     /*
                       TBD - something related to stiffness we need to do here?
-                    
+
                     double stiffness = 50000.0f;
-                    
+
 					from->SetStiffnessModel(10000.0f, 500.0f, 500);
                      */
 				}
@@ -3168,9 +3168,9 @@ gr2RigidPhysicsModel::gr2RigidPhysicsModel(const char* path, vehVehicle* veh, Ma
 	}
 
 	/*
-     
+
      TBD - Is this code that was broken and needs to be fixed?
-     
+
 	boneTransform = boneTransform * _worldTransform;
 
 	// get our body world transform

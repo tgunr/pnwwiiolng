@@ -3887,7 +3887,7 @@ void MobileSpawnSTO::postProcess()
 void PlayerPlacedSTO::preProcess()
 {
     TerrainSTO::preProcess();
-    
+
     if (type() == ServerTrackedObject::_UMS || subType() == PPOSpecLoader::_PPO_AFRU)
     {
         if(_to)
@@ -3898,13 +3898,13 @@ void PlayerPlacedSTO::preProcess()
 void PlayerPlacedSTO::postProcess()
 {
     TerrainSTO::postProcess();
-    
+
     if (type() == ServerTrackedObject::_UMS || subType() == PPOSpecLoader::_PPO_AFRU)
     {
         if(_to)
         {
             trnCDTerrainObject* TO = trncdFindTerrainObject(_to->child);
-            
+
             // flags is used to pass the country for mobilespawn stos
             if(TO)
                 TO->Country = (SINT32)flags();

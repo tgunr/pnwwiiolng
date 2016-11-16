@@ -55,7 +55,7 @@ SINT32 teulOpenListen(const UINT16 portNumber
 //! \param[in] acceptFnPtr function to call when an incoming connection is accept()d.
 //! \param[in] timeout millisecond period after which the connection is dropped if we can't talk to it.
 //! \param[in] errorFnPtr function to call when an error occurs on this interface.
-//! \return true if all opens were successful, otherwise false. 
+//! \return true if all opens were successful, otherwise false.
 bool teulOpenListenInterface(const UINT16 portNumber
 						, CONNECT_FUNCTION acceptFnPtr
 						, const SINT32 timeout

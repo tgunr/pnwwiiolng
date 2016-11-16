@@ -54,7 +54,7 @@ TOE_::TemplateHeader::initialize(const ChatHandle withHandle, const char* withNa
 	assert( m_handle == 0LL );
 
 	Chat::Name newName(withHandle);
-	dbugLog(_FLI, "toe:%s(%llu) c:%u b:%u %s", newName.c_str(), withHandle, withCountry, withBranch, withName);
+	dbugLog(_FLI, "toe:%s(%" PR64BitUT ") c:%u b:%u %s", newName.c_str(), withHandle, withCountry, withBranch, withName);
 
 	m_handle = withHandle;
 	m_name = withName;
@@ -73,7 +73,7 @@ TOE_::TemplateHeader::setName(const char* newName)
 		return;
 
 	Chat::Name oldName(handle());
-	dbugLog(_FLI, "toe:%s(%llu) new name: %s", oldName.c_str(), handle(), newName);
+	dbugLog(_FLI, "toe:%s(%" PR64BitUT ") new name: %s", oldName.c_str(), handle(), newName);
 
 	m_name = newName;
 }
@@ -93,10 +93,10 @@ TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC spec, UINT16 capacity, UCHA
 		Chat::Name toeName(handle());
 		const WEAPON* weapon = weapLookup(spec);
 		if ( weapon == nullptr )
-			LogAbort("toe:%s(%llu) wanted unknown weapon spec " PRF_WEAPON_SPEC ""
+			LogAbort("toe:%s(%" PR64BitUT ") wanted unknown weapon spec " PRF_WEAPON_SPEC ""
 							, toeName.c_str(), handle(), PRA_WEAPON_SPEC(spec));
 
-		dbugLog(_FLI, "toe:%s(%llu) adding %s(" PRF_WEAPON_SPEC ") capacity %u"
+		dbugLog(_FLI, "toe:%s(%" PR64BitUT ") adding %s(" PRF_WEAPON_SPEC ") capacity %u"
 						, toeName.c_str(), handle()
 						, weapon->name
 						, PRA_WEAPON_SPEC(spec)

@@ -87,20 +87,21 @@ public:
 	static GameProcess* s_processStarting;
 
 public:
-	void Log(int level, const char* fmt)
+	void Log(int level, const char* text)
 	{
-		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%llu %s", ServerType(), ServerTypeName(), ProcessID(), fmt);
+		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%" PR64BitUT " %s", ServerType(), ServerTypeName(), ProcessID(), text);
 	}
 	template<typename... Args>
 	void Log(int level, const char* fmt, Args&&... args)
 	{
-		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%llu ", ServerType(), ServerTypeName(), ProcessID());
-		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR | BARE_DEBUG, fmt, std::forward<Args>(args)...);
+		char myfmt[1024];
+		strprintf(myfmt, "s:%%u(%%s) pid:%%" PR64BitUT " %s", fmt);
+		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, myfmt, ServerType(), ServerTypeName(), ProcessID(), std::forward<Args>(args)...);
 	}
 
 	void Log(const char* msg)
 	{
-		dbugLog("GameProcess", 0, Debug::ERR_DBUG | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%llu %s", ServerType(), ServerTypeName(), ProcessID(), msg);
+		dbugLog("GameProcess", 0, Debug::ERR_DBUG | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%" PR64BitUT " %s", ServerType(), ServerTypeName(), ProcessID(), msg);
 	}
 };
 
@@ -108,7 +109,7 @@ public:
 namespace GameProcessManager
 {
 	//! Tear up.
-	void Initialize(const char** envp);
+	void Initialize(const char** envp, bool singleStartMode);
 
 	//! Ask the server manager to include a new server type.
 	//! @note Only one instance of each server per manager.

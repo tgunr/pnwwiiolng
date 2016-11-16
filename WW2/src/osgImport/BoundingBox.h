@@ -66,7 +66,7 @@ class BoundingBox
     // assignement operator
     inline BoundingBox & operator=(const BoundingBox& bb)
     { _min = bb._min; _max = bb._max; return *this; }
-    
+
     // offset
     inline void offset( value_type diffx, value_type diffy, value_type diffz = 0.0 )
     {

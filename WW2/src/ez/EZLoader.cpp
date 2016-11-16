@@ -404,12 +404,12 @@ public:
 
         std::string modelPath = std::string("vehicles/") + reinterpret_cast<const char *>(&vtype->ModelDirectory[0]);
         std::string::size_type sep = modelPath.find_last_of("/");
-        
+
         ezPath = modelPath + "/" + modelPath.substr(sep + 1) + ".ez"; // HACK: npos + 1 == 0
         ezFallbackPath = _ezBaseFile(vtype);
         SetPath(ezPath.c_str());
 	}
-	
+
 	virtual bool Load(void *userData = nullptr)
 	{
         if (!XMLLoader2::Load(userData)) {

@@ -21,7 +21,6 @@
 #include "fio.h"
 #include <iostream>
 #include <sstream>
-#include "wwii/wwiiHash.h"
 #include <wchar.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H

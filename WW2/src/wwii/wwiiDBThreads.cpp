@@ -43,7 +43,7 @@ _skipExclamationInStatement(const char* src_)
 	if ( *p != '!' )
 		return src_;
 
-	threadLog(_FLW, "QUERY WITH !: %s", src_);
+	dbugLog(_FLW, "QUERY WITH !: %s", src_);
 
 	++p;
 	while ( *p )
@@ -61,13 +61,13 @@ _skipExclamationInStatement(const char* src_)
 bool
 DBThreadQuery::Execute(UINT32 threadNo, DB::handle_t* conn, DBThread::DBNo* lastDb)
 {
-	static const char* const dbName[DBThread::NumDBNos] = { "audit", "auth", "chat", "game", "player", "squad", "sys", "wwii", "wwiionline" };
+	static const char* const dbName[DBThread::NumDBNos] = { "audit", "auth", "strat", "toe", "wwii", "wwiionline" };
 
 	// To avoid various potential race conditions on who has ownership of the
 	// statement string, we need to make our own copy of the statement.
 	const char* const statement = _skipExclamationInStatement(Statement());
 
-    threadLog(_FLD, "dbq:%u db:[%s] execute %s: q:[%s]", threadNo, dbName[m_db], Name(), statement);
+    dbugLog(_FLD, "dbq:%u db:[%s] execute %s: q:[%s]", threadNo, dbName[m_db], Name(), statement);
 
 	bool successful = false;
 
@@ -104,7 +104,7 @@ DBThreadQuery::Execute(UINT32 threadNo, DB::handle_t* conn, DBThread::DBNo* last
 	}
 	catch ( std::logic_error& e )
 	{
-		threadLog(_FLW, "dbq:%u query %s q:[%s] failed: %s", threadNo, Name(), Statement(), e.what());
+		dbugLog(_FLW, "dbq:%u query %s q:[%s] failed: %s", threadNo, Name(), Statement(), e.what());
 
 		if ( m_immediate )
 			Failure();

@@ -48,12 +48,12 @@ chatCreateChannel(const ChannelID& channelID, const char* const name, ChatHandle
 	// Check to see if channel already exists.
 	if ( chatFindChannel(channelID) )
 	{
-		LogAbort("ch:%llu.%u.%u.%llu attempting to re-create existing channel"
+		LogAbort("ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " attempting to re-create existing channel"
 					, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID());
 	}
 
 	Chat::Name chName(chHandle);
-	dbugLog(_FLD, "Creating ch:%llu.%u.%u.%llu %s: %s [%s]", channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID(), chanTypeName[channelID.Type()], name, chName.c_str());
+	dbugLog(_FLD, "Creating ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " %s: %s [%s]", channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID(), chanTypeName[channelID.Type()], name, chName.c_str());
 	_channelIndex.emplace(channelID, std::make_unique<Chat::Channel>(channelID, name, chHandle));
 
 	// Some channels are peristent while others can be deleted if there are no users
@@ -75,7 +75,7 @@ chatCreateChannel(const ChannelID& channelID, const char* const name, ChatHandle
 	break;
 	}
 
-	dbugLog(_FLD, "ch:%llu.%u.%u.%llu channel created, numChannels now %" PRSizeT ""
+	dbugLog(_FLD, "ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " channel created, numChannels now %" PRSizeT ""
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 						, _channelIndex.size());
 
@@ -107,7 +107,7 @@ chatDestroyChannel(const ChannelID channelID)
 	CHANNEL_INDEX::iterator it = _channelIndex.find(channelID);
 	if ( it == _channelIndex.end() )
 	{
-		dbugLog(_FLI, "ch:%llu.%u.%u.%llu attempting to delete unlisted channel"
+		dbugLog(_FLI, "ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " attempting to delete unlisted channel"
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID());
 		return false;
 	}
@@ -116,7 +116,7 @@ chatDestroyChannel(const ChannelID channelID)
 
 	_channelIndex.erase(it);
 
-	dbugLog(_FLI, "ch:%llu.%u.%u.%llu freed channel, numChannels now %" PRSizeT ""
+	dbugLog(_FLI, "ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " freed channel, numChannels now %" PRSizeT ""
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID(), _channelIndex.size());
 
 	return true;
@@ -154,7 +154,7 @@ chatDeleteUnusedChannels()
 		{
 			constexpr TeulTimeMS FiveMinutes_ms = (5 * 60) * 1000;
 			channel->m_expireAt = teulClock64 + FiveMinutes_ms;
-			dbugLog(_FLD, "ch:%llu.%u.%u.%llu marking for expiration"
+			dbugLog(_FLD, "ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " marking for expiration"
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 							);
 			continue;
@@ -163,7 +163,7 @@ chatDeleteUnusedChannels()
 		if ( channel->m_expireAt > teulClock64 )
 			continue;
 
-		dbugLog(_FLM, "ch:%llu.%u.%u.%llu expired and empty, deleting"
+		dbugLog(_FLM, "ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " expired and empty, deleting"
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 						);
 		chatDestroyChannel(channelID);
@@ -184,7 +184,7 @@ Chat::Channel::addSubscriber(const Chat::ChannelSubscription& cnode)
 	if ( inserted == true )
 	{
 		if ( g_debugRadios )
-			dbugLog(_FLD, "ch:%llu.%u.%u.%llu added cnode %p to channel %p subscribers now: %" PRSizeT ""
+			dbugLog(_FLD, "ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " added cnode %p to channel %p subscribers now: %" PRSizeT ""
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 							, &cnode, this
 							, numSubscribers()
@@ -192,7 +192,7 @@ Chat::Channel::addSubscriber(const Chat::ChannelSubscription& cnode)
 	}
 	else
 	{
-		dbugLog(_FLA, "ch:%llu.%u.%u.%llu UNABLE TO ADD CNODE %p to channel %p subscribers now: %" PRSizeT ""
+		dbugLog(_FLA, "ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " UNABLE TO ADD CNODE %p to channel %p subscribers now: %" PRSizeT ""
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 						, &cnode, this
 						, numSubscribers()
@@ -220,7 +220,7 @@ Chat::Channel::removeSubscriber(Chat::ChannelSubscription& cnode)
 	{
 		if ( numRemoved > 0 )
 		{
-			dbugLog(_FLD, "ch:%llu.%u.%u.%llu removed cnode %p from channel %p subscribers now: %" PRSizeT ""
+			dbugLog(_FLD, "ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " removed cnode %p from channel %p subscribers now: %" PRSizeT ""
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 							, &cnode, this
 							, numSubscribers()
@@ -228,7 +228,7 @@ Chat::Channel::removeSubscriber(Chat::ChannelSubscription& cnode)
 		}
 		else
 		{
-			dbugLog(_FLW, "ch:%llu.%u.%u.%llu UNABLE TO REMOVE CNODE %p from channel %p subscribers now: %" PRSizeT ""
+			dbugLog(_FLW, "ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " UNABLE TO REMOVE CNODE %p from channel %p subscribers now: %" PRSizeT ""
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 							, &cnode, this
 							, numSubscribers()

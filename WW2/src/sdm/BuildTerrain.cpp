@@ -246,8 +246,8 @@ static void MergeCPFdata()
 		const _CP* cpCPF = it->second;
 		CP* cpSDM = (CP*)memAlloc(sizeof(CP));
 
-		strcpy(cpSDM->fileName,	cpCPF->objname);
-		strcpy(cpSDM->name, cpCPF->name);
+		strsafecpy(cpSDM->fileName,	cpCPF->objname);
+		strsafecpy(cpSDM->name, cpCPF->name);
 		cpSDM->oid.id		= cpCPF->cpid.id;
 		cpSDM->oid.objClass	= CLASS_CP;
 		cpSDM->oid.objType	= cpCPF->ctype;
@@ -282,8 +282,8 @@ static void MergeCPFdata()
 			piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 
-		strcpy(facSDM->fileName, facCPF->objname);
-		strcpy(facSDM->name, facCPF->name);
+		strsafecpy(facSDM->fileName, facCPF->objname);
+		strsafecpy(facSDM->name, facCPF->name);
 		facSDM->oid.id			= facCPF->fid.id;
 		facSDM->oid.objClass	= CLASS_FACILITY;
 		facSDM->oid.objType		= facCPF->ftype;
@@ -319,8 +319,8 @@ static void MergeCPFdata()
 			piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 
-		strcpy(bldSDM->fileName, bldCPF->objname);
-		strcpy(bldSDM->name, bldCPF->name);
+		strsafecpy(bldSDM->fileName, bldCPF->objname);
+		strsafecpy(bldSDM->name, bldCPF->name);
 		bldSDM->oid.id			= bldCPF->bid.id;
 		bldSDM->oid.objClass	= CLASS_BUILDING;
 		bldSDM->oid.objType		= bldCPF->btype;
@@ -350,7 +350,7 @@ static void MergeCPFdata()
 		DEPOT_LINK*	linkSDM	= (DEPOT_LINK*)memAlloc(sizeof(DEPOT_LINK));
 
 
-		strcpy(linkSDM->name, linkCPF->name);
+		strsafecpy(linkSDM->name, linkCPF->name);
 		linkSDM->oid.id					= linkCPF->lid.id;
 		linkSDM->oid.objClass			= CLASS_LINK;
 		linkSDM->oid.objType			= 0;
@@ -1813,14 +1813,14 @@ SuperCellTerrainData::TerrainObject* SuperCellTerrainData::AddTerrainObject(cons
 		else
             terrainObject->poolModel	= obmgrGetPoolModel("dunes1");
 
-		strcpy(terrainObject->objInfo.objname, terrainObject->poolModel->modelname.c_str());
+		strsafecpy(terrainObject->objInfo.objname, terrainObject->poolModel->modelname.c_str());
 
 		terrainObject->objInfo.ortdrg	= (rand() % 4) * 2;
 	}
 	else
 	{
 		terrainObject->poolModel	= obmgrGetPoolModel(name);
-		strcpy(terrainObject->objInfo.objname, name);
+		strsafecpy(terrainObject->objInfo.objname, name);
 
 		terrainObject->objInfo.ortdrg		= ortdrg;
 	}
@@ -1921,7 +1921,7 @@ SuperCellTerrainData::TerrainObject* SuperCellTerrainData::AddSubObjects(Terrain
                 chokepoint = (CP*)memAlloc(sizeof(*masterObject->stratData.cp));
                 memcpy(chokepoint, masterObject->stratData.cp, sizeof(CP));
 
-                strcpy(chokepoint->fileName, subModelObjectId.fileName);
+                strsafecpy(chokepoint->fileName, subModelObjectId.fileName);
 				chokepoint->posx = subModelObjectId.posX;
 				chokepoint->posy = subModelObjectId.posY;
 
@@ -1949,7 +1949,7 @@ SuperCellTerrainData::TerrainObject* SuperCellTerrainData::AddSubObjects(Terrain
 				facility = (FACILITY*)memAlloc(sizeof(*masterObject->stratData.facility));
                 memcpy(facility, masterObject->stratData.facility, sizeof(FACILITY));
 
-				strcpy(facility->fileName, subModelObjectId.fileName);
+				strsafecpy(facility->fileName, subModelObjectId.fileName);
 				facility->posx = subModelObjectId.posX;
 				facility->posy = subModelObjectId.posY;
 
@@ -1977,7 +1977,7 @@ SuperCellTerrainData::TerrainObject* SuperCellTerrainData::AddSubObjects(Terrain
 				building = (BUILDING*)memAlloc(sizeof(*masterObject->stratData.building));
                 memcpy(building, masterObject->stratData.building, sizeof(BUILDING));
 
-				strcpy(building->fileName, subModelObjectId.fileName);
+				strsafecpy(building->fileName, subModelObjectId.fileName);
 
                 building->oid = masterObject->stratData.building->oid;
                 building->pid = masterObject->stratData.building->pid;
@@ -2538,14 +2538,14 @@ SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& of
 
 	if(cellName.find("Default") != string::npos)
 	{
-		strcpy(texNames[texNameCnt], "water1.bmp");
+		strsafecpy(texNames[texNameCnt], "water1.bmp");
 		texNameCnt++;
 	}
     // Don't force us to have a replacement tile
 #if !WANT_NON_REPLACEMENT_TILES
 	else if(!strstr(texNames[nullTextureIdx], "null1.bmp"))
 	{
-		strcpy(texNames[texNameCnt], "null1.bmp");
+		strsafecpy(texNames[texNameCnt], "null1.bmp");
 		nullTextureIdx = texNameCnt;
 		texNameCnt++;
 	}

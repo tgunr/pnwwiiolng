@@ -136,11 +136,11 @@ _processBan(DB::handle_t* conn, BAN& ban)
 	{
 		mysql_ping(conn);
 
-		threadLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, issuer.c_str(), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, name.c_str());
+		dbugLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, issuer.c_str(), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, name.c_str());
 
 		message = new char[strlen(ban.m_message.c_str())*2 + 1];
 		mysql_real_escape_string(conn, message, ban.m_message.c_str(), ban.m_message.length());
-		
+
 		// p_ban_player ( playerID, banFor, banBy, reason ) returns either
 		// 0, <reason>
 		// 1, <#bans>
@@ -151,7 +151,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 		delete message;
 		message = nullptr;
-	
+
 		playerid_t playerID = 0;
 		if ( q.HasRows() && q.FetchRow() )
 			playerID = q.Row().NextUInt();
@@ -165,7 +165,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 		threadCallback(_banSuccess, &ban);
 
-		threadLog(_FLN, "p:%u subj:%s %llu vs %llu issued %us ban", ban.m_issuer, name.c_str(), ban.m_issuerHandle, ban.m_handle, ban.m_duration);
+		dbugLog(_FLN, "p:%u subj:%s %" PR64BitUT " vs %" PR64BitUT " issued %us ban", ban.m_issuer, name.c_str(), ban.m_issuerHandle, ban.m_handle, ban.m_duration);
 	}
 	catch (std::exception& e)
 	{
@@ -174,7 +174,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 		ban.m_message = e.what();
 		threadCallback(_banFail, &ban);
-		threadLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, name.c_str(), e.what());
+		dbugLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, name.c_str(), e.what());
 	}
 
 	if ( p )
@@ -186,7 +186,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 void BanThread::dbrun()
 {
-	threadLog(_FLI, "Ban Queue Thread active");
+	dbugLog(_FLI, "Ban Queue Thread active");
 
 	while ( !isCancelled() )
 	{

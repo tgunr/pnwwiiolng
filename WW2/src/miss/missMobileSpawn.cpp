@@ -213,7 +213,7 @@ Mission::getMobileSpawnPermission() const
 	// Must own the origin facility
 	if ( m_originFac == nullptr || m_originFac->side != m_side )
 	{
-		threadLog(_FLD, "msp: m#%d no-longer origin owner", missionID());
+		dbugLog(_FLD, "msp: m#%d no-longer origin owner", missionID());
 		return MSDR_OWNER;
 	}
 
@@ -228,7 +228,7 @@ Mission::getMobileSpawnPermission() const
 		// Must be a link between non-same cp
 		if ( m_linkFromTarget == nullptr )
 		{
-			threadLog(_FLD, "msp: m#%d no link from %s to %s"
+			dbugLog(_FLD, "msp: m#%d no link from %s to %s"
 							, missionID()
 							, m_originCP->name
 							, m_targetCP->name
@@ -239,7 +239,7 @@ Mission::getMobileSpawnPermission() const
 
 	if ( m_targetFac && m_targetFac->type == FACILITY_FIREBASE && !m_targetFac->isOpen() )
 	{
-		threadLog(_FLD, "msp: denied: firebase %s is destroyed", m_targetFac->name);
+		dbugLog(_FLD, "msp: denied: firebase %s is destroyed", m_targetFac->name);
 		return MSDR_TARGET_DESTROYED;
 	}
 
@@ -249,7 +249,7 @@ Mission::getMobileSpawnPermission() const
 		// Must be a supply connection
 		if ( m_linkFromTarget && m_linkFromTarget->hasEnemyFirebase(m_side) )
 		{
-			threadLog(_FLD, "msp: m#%d supply cut from %s to %s"
+			dbugLog(_FLD, "msp: m#%d supply cut from %s to %s"
 							, missionID()
 							, m_originCP->name
 							, m_targetCP->name
@@ -265,7 +265,7 @@ Mission::getMobileSpawnPermission() const
 			&& (m_targetCP->isEnemyLinked() == false || m_targetCP->fullObjID == m_brigade->homeCPID())
 			)
 		{
-			threadLog(_FLD, "msp: m#%d(%d) target %s o:%d/c:%d"
+			dbugLog(_FLD, "msp: m#%d(%d) target %s o:%d/c:%d"
 							, missionID()
 							, m_side
 							, m_targetCP->name
@@ -327,7 +327,7 @@ missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle
 			throw std::domain_error("Unknown player");
 
 		error = mission->getMobileSpawnPermission();
-		dbugLog(_FLI, "m:%u p:%u c:%s sto:%u stoType:%d msp @ %0.3g/%0.3g/%0.3g result:%u", 
+		dbugLog(_FLI, "m:%u p:%u c:%s sto:%u stoType:%d msp @ %0.3g/%0.3g/%0.3g result:%u",
 			missionID, player->playerID(), player->callsign(), stoUID, stoSubType, x, y, z, error);
 
 		if ( error != MSDR_GRANTED )

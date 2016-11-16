@@ -15,7 +15,7 @@
 //!
 //! Normally, read() has to have the OS load data from disk into
 //! private buffers and then has to copy that data into user-space
-//! memory (the buffers you supply). 
+//! memory (the buffers you supply).
 //!
 //! Mapped files gives you protected access to those private buffers
 //! in a way that provides on-demand loading of the file (presumably
@@ -48,7 +48,7 @@
 # if defined(UNICODE)
 #  include <cwchar>
 # endif
-# define PATH_SEP_CHAR '\\' 
+# define PATH_SEP_CHAR '\\'
 # define PATH_SEP_WCHAR L'\\'
 
 using imf_handle_t = HANDLE;

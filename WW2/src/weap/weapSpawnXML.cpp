@@ -103,7 +103,7 @@ XML_TAG_HANDLER_IMPL(DoWeapon)
 
 XML_TAG_HANDLER_IMPL(DoClass)
 {
-	
+
         if(first)
 	{
 		char *elText;
@@ -123,7 +123,7 @@ XML_TAG_HANDLER_IMPL(DoClass)
 
 				// Stack it up for later consumption
 				dbugLog(_FLI, "class:%s", elText);
-	
+
 				// Now add the spawnlist for all spawn lists of this class into our list
 				for ( auto spawn = g_weaponSpawns.begin(), end = g_weaponSpawns.end(); spawn != end; ++spawn )
 				{

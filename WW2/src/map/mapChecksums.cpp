@@ -48,7 +48,7 @@ public:
 			newChecksums.push_back(std::make_pair(version, checksum));
 		}
 
-		threadLog(_FLD, "%u checksums", newChecksums.size());
+		dbugLog(_FLD, "%" PRSizeT " checksums", newChecksums.size());
 
 		{
 			std::lock_guard<std::mutex> lock(chMutex);

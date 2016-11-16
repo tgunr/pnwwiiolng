@@ -81,7 +81,7 @@ public:	TestPackers() : TestUnit("TestPackers") {}
 
 			for ( SINT32 i = 0; i < 65; ++i )
 			{
-				TestFocus("Value %llums, Clock %llums, Offset %d", testValue, teulClock64, i);
+				TestFocus("Value %" PR64BitUT "ms, Clock %" PR64BitUT "ms, Offset %d", testValue, teulClock64, i);
 
 				Teul::Packer<Teul::NetTimeMS> pack, unpack;
 				memset(&pack.m_value, 0x7A, sizeof(pack.m_value));
@@ -162,7 +162,7 @@ public:	TestPackers() : TestUnit("TestPackers") {}
 	{
 		SINT32 min = std::is_signed<T>::value ? 2 : 1;
 		for (SINT32 bits = min; bits <= SINT32(sizeof(T) / 8); ++bits) {
-			TestPacker(name, value & ~(~0 << bits), bits);
+			TestPacker(name, value & ~(~0U << bits), bits);
 		}
 	}
 
@@ -337,7 +337,7 @@ public: virtual bool Run() override
 
 			TestBitRanges<UINT64>("UINT64", 0x1234567890abcdefULL);
 			TestBitRanges<UINT64>("UINT64", 0x1f2e3d4c5b6a7089ULL);
-			
+
 			// signed 64-bit int
 			TestPacker<SINT64>("SINT64", 0, 0);
 			TestPacker<SINT64>("SINT64", 0xffLL, 0);

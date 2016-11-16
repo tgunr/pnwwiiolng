@@ -1312,7 +1312,7 @@ void cfgPrefsProcessGlobal(_cfgPARAMS key)
         default:
             // nothing else applies
             break;
-            
+
 
 	}
 }

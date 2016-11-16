@@ -51,7 +51,7 @@ _grabPersonas(_BRIGADE_PERSONAS& personas)
 	// Do this early to allow the main thread the chance to skip
 	// some locking
 	std::lock_guard<std::mutex> lock(_mutex);
-	
+
 	for ( auto it = _selections.begin(); it != _selections.end(); ++it )
 	{
 		personas[it->second].insert(it->first);
@@ -129,7 +129,7 @@ _saveSelections(DB::handle_t* conn)
 	}
 	catch ( std::exception& e )
 	{
-		threadLog(_FLA, "Failed saving personas: %s", e.what());
+		dbugLog(_FLA, "Failed saving personas: %s", e.what());
 	}
 }
 
@@ -139,7 +139,7 @@ _saveSelections(DB::handle_t* conn)
 void
 PersonaSelectionThread::dbrun()
 {
-	threadLog(_FLM, "Persona-selections thread active");
+	dbugLog(_FLM, "Persona-selections thread active");
 
 	while ( !isCancelled() )
 	{

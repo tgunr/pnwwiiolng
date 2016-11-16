@@ -54,12 +54,12 @@ extern const char *GetCommandLine();
 extern UINT64 GetMicroSeconds();
 extern UINT64 GetMillisecondTick();
 extern UINT32 timeGetTime();
-    
+
 extern char GetOSMajorVersion();
 extern char GetOSMinorVersion();
 extern char GetOSRevision();
 extern char GetOSBuild();
-    
+
 #ifdef __cplusplus
 }
 #endif

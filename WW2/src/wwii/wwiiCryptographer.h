@@ -16,8 +16,10 @@ template<bool Encrypting>
 class Cryptographer
 {
 public:
-	using SeedType = unsigned long long;
-	using ByteType = unsigned char;
+	// note: uint8_t is not guaranteed to exist, if we build for such a system
+	// we have big problems.
+	using ByteType = uint8_t;
+	using SeedType = uint64_t;
 
 public:
 	//! Default constructor.

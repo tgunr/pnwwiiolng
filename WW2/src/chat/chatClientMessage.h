@@ -30,7 +30,7 @@ namespace Chat
 
 		// Packer
 		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
-        
+
         // not actually sent, used by chat host
         ChatClientInfo clientInfo;
 	};

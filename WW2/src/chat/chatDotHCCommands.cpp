@@ -559,7 +559,7 @@ class DotOverrun : public DotCommand
 public:
 	DotOverrun() : DotCommand("overrun", "Signals your town has been overrun by the enemy"
 								, NO_MASK, LSTR_OVERRUN_USAGE, LSTR_OVERRUN_DETAIL
-								) { };
+								) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
@@ -677,5 +677,5 @@ public:
 			return;
 		}
 		(new LastMoves(player.matchHandle(), player.country()))->Queue();
-	};
+	}
 } dotLastMoves;

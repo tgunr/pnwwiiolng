@@ -18,7 +18,7 @@ constexpr void silence_unused_parameter_warning(T&& t, Args&&... args) {
 	(void)std::forward<T>(t), silence_unused_parameter_warning(std::forward<Args>(args)...);
 }
 
-#if defined(DEBUG) || defined(ALPHA_RELEASE)
+#if platBuild == BUILD_SERVER || defined(DEBUG) || defined(ALPHA_RELEASE)
 #define  _FL __FILE__, __LINE__
 #else
 #define  _FL "", 0
@@ -41,7 +41,6 @@ namespace Debug
 }
 
 #define STD_ERR				0x0010	// mirror significant output to stderr
-#define BARE_DEBUG			0x0080	// no extra formating, basically printf
 #define LOG_ALL_TO_STDERR	0x0100	// ALL logging to stderr
 
 // always use these macros in place of Full functions so filename and number and errType are set.

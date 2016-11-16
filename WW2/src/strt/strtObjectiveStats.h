@@ -15,7 +15,7 @@ class ObjectiveStats
 {
 public:
 	// Default constructor
-	ObjectiveStats() { };
+	ObjectiveStats() { }
 
 	// Recalculate the values from scratch
 	void calculate();
@@ -27,7 +27,7 @@ public:
 	void checkSideLimits(WWII_SIDE, UINT32);
 
 	// Packer/Unpacker
-	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { return teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); };
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { return teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
 
 	// Save the stats to the database
 	void save();

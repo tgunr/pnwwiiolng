@@ -166,7 +166,7 @@ strtMain(UINT32 currentTime)
 		_buildPocketMap();
 		teulSyncClock();
 		end = teulClock64;
-		LogAbort("build pocket map too %llums", end - start);
+		LogAbort("build pocket map too %" PR64BitUT "ms", end - start);
 #endif
 
 		return false;
@@ -240,7 +240,6 @@ strtInitializeStratSystem()
 		strtReportDataErrors(0);
 		fprintf(stderr,"Strat system failed to initialize, /tmp/strt*.log\n");
 		LogAbort("Strat System failed to initialize");
-		exit(1);
 	}
 
 	//Hack to get bridges working
@@ -250,36 +249,29 @@ strtInitializeStratSystem()
 	if (strtVerifyStratSystem(_cpList,0) == false)
 	{
 		LogAbort("Strat System is not valid");
-		exit(1);
 	}
 
 	stratInitializeLua();
 
 	dbugLog(_FLN,"Strat System verified");
-	threadsLogging();
 
 	// Make sure all the global spawn data is ready;
 	// this doesn't actually initialize spawn lists tho.
 	strtInitSpawn();
-	threadsLogging();
 
 	//Turn on all the bases
 	// (which includes creating all the spawn lists)
 	strtInitBases(_cpList);
-	threadsLogging();
 
 	//Init all the firebases
 	strtInitStratSystemFirebases(_cpList);
-	threadsLogging();
 
 #if defined(IS_STRAT_HOST)
 	strtdbSaveGameWorld(_cpList);
-	threadsLogging();
 #endif // IS_STRAT_HOST
 
 	// Put brigades onto the map
 	strtInitializeHCUnits();
-	threadsLogging();
 
 	//Tell everyone the status of the CPs
 	strtBroadcastCPs();

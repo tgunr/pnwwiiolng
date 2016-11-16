@@ -386,7 +386,7 @@ updtGridGetVehiclesVector(const HostVehicle* vehicle, const SINT64& range, PLAYE
 
 	_WORLD_GRIDS::const_iterator it ;
 
-	betaLog(_FLD, "v:%u c:%s getting cells within [%d,%d],[%d,%d] %llu range: "
+	betaLog(_FLD, "v:%u c:%s getting cells within [%d,%d],[%d,%d] %" PR64BitUT " range: "
 					, vehicle->index, vehicle->callsign()
 					, botleft.x(), botleft.y(), topright.x(), topright.y()
 					, WorldGrid::_RING_RADIUS) ;

@@ -15,7 +15,6 @@
 #include "fio/fio.h"
 #include <iostream>
 #include <sstream>
-#include "wwii/wwiiHash.h"
 #include "draw/TextureFont.h"
 #include "mem/mem.h"
 

@@ -446,7 +446,7 @@ public: virtual bool Run() override
 */
 
 #ifdef I_WANT_TO_KNOW_MORE
-		fprintf(stderr, "CellRad: %lld, CellRad2: %lld\n", Grid::Cell::Radius_cells, Grid::Cell::Radius_cells2);
+		fprintf(stderr, "CellRad: %" PR64BitT ", CellRad2: %" PR64BitT "\n", Grid::Cell::Radius_cells, Grid::Cell::Radius_cells2);
 
 		UINT32 width = World::Meters::Width / Grid::Cell::Size_m;
 		UINT32 height = World::Meters::Height / Grid::Cell::Size_m;

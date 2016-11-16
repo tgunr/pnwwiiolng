@@ -136,9 +136,9 @@ static void loadXML(const char* path)
 
     if(gCustomTerrain) {
         dir = SCEN_MGR->MapPath("trees.xml");
-        
+
         int fd = fioOpen(dir.c_str());
-        
+
         if (fd == -1) {
             dir = path;
             dir += "trees.xml";

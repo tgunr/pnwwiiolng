@@ -158,9 +158,6 @@ private:
 
 using POSTED_WEAPON_LIST = std::list<POSTED_WEAPON*>;
 
-//tolua_begin
-
 //Finds someone in the postedWeapon list
 extern POSTED_WEAPON* strtFindPostedWeapon(UINT32 serialID);
 
-//tolua_end

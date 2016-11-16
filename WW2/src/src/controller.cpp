@@ -51,6 +51,7 @@ static event*			s_managedProcessEvent = nullptr;
 static evutil_socket_t	s_repeaterSocket = INVALID_SOCKET;
 static event*			s_repeaterEvent = nullptr;
 
+bool g_singleShot = false;
 bool g_shuttingDown = false;
 bool g_enableStarts = true;
 
@@ -108,7 +109,7 @@ static evutil_socket_t _libEventAcceptHandler(evutil_socket_t listener, short ev
 	do
 	{
 		cliSock = accept(listener, (struct sockaddr*)&cliAddr_, &caLen);
-	} while (cliSock < 0 && (errno == EAGAIN || errno == EINTR));
+	} while (cliSock < 0 && (errno == PLAT_EAGAIN || errno == PLAT_EINTR));
 	if (cliSock >= 0) {
 		evutil_make_socket_nonblocking(cliSock);
 		evutil_make_socket_closeonexec(cliSock);
@@ -284,7 +285,7 @@ static void _onManagedProcessError(struct bufferevent* bev_, short error_, void*
 	auto it = s_socketToProcess.find(cliSock);
 	if ( it != s_socketToProcess.end() )
 	{
-		dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%llu disconnecting", PRA_SOCKET(cliSock), it->second);
+		dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%" PR64BitUT " disconnecting", PRA_SOCKET(cliSock), it->second);
 		delete (evutil_socket_t*)arg_;
 		///TODO: Tell GameProcessManager that the process went away.
 		if ( it->second != 0ULL )
@@ -302,11 +303,11 @@ static bool _handleIntro(evutil_socket_t srcSock, const ProcessIntroduction& int
 	ABORT_IF( pit != s_processToSocket.end() );
 	auto process = GameProcessManager::LookupGameProcess(intro.m_processID);
 	if (!process) {
-		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%llu no process entry.", PRA_SOCKET(srcSock), intro.m_processID);
+		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%" PR64BitUT " no process entry.", PRA_SOCKET(srcSock), intro.m_processID);
 		return false;
 	}
 	if (process->ServerType() != intro.m_processType) {
-		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%llu type mismatch (expected %u got %u).",
+		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%" PR64BitUT " type mismatch (expected %u got %u).",
 			PRA_SOCKET(srcSock), intro.m_processID, process->ServerType(), intro.m_processType
 		);
 		return false;
@@ -319,7 +320,7 @@ static bool _handleIntro(evutil_socket_t srcSock, const ProcessIntroduction& int
 
 	s_socketToProcess[srcSock] = intro.m_processID;
 	s_processToSocket[intro.m_processID] = srcSock;
-	dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%llu established", PRA_SOCKET(srcSock), intro.m_processID);
+	dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%" PR64BitUT " established", PRA_SOCKET(srcSock), intro.m_processID);
 
 	return true;
 }
@@ -401,8 +402,12 @@ static void _addInitialProcesses()
 		const char* end = strchr(p, ';');
 		std::string name = (end) ? std::string(p, end - p) : std::string(p);
 		auto serverType = _getServerType(name);
-		if ( serverType >= MAX_SERVER_TYPE )
-			LogAbort("Unrecognized server: %s", name.c_str());
+		if ( serverType >= MAX_SERVER_TYPE ) {
+			LogAbort("'%s': '%s': Unrecognized server: %s",
+						cv_manageProcesses.GetEnvVarName(),
+						cv_manageProcesses.GetString(),
+						name.c_str());
+		}
 		dbugLog(_FLI, "Managing %s", name.c_str());
 		GameProcessManager::AddServer(serverType);
 		p = end;
@@ -485,6 +490,7 @@ static void _toggleStarts(int /*signal*/)
 
 int main(int argc, const char* argv[], const char* envp[])
 {
+	bool singleStartMode = false;
 	g_argv0 = argv[0];
 	Server::InitializeProcess(g_serverName, CONTROLLER_HOST, _errorFunction, nullptr, argc, argv, {
 		{ "--configs", "List configuration variables and exit.", false,
@@ -498,6 +504,11 @@ int main(int argc, const char* argv[], const char* envp[])
 				Teul::ConfigVar::Generate(filename);
 				exit(0);
 			}
+		},
+		{ "--single-shot", "Launch each child process only once.", false,
+			[&](const char*) {
+				singleStartMode = true;
+			}
 		}
 	});
 
@@ -505,6 +516,10 @@ int main(int argc, const char* argv[], const char* envp[])
 	{
 		Teul::ConfigVar::Generate("environment.cfg");
 		LogAbort("environment.cfg could not be found - generated new one, please edit it.");
+	}
+
+	if ( !cv_manageProcesses.GetString() || !*cv_manageProcesses.GetString() ) {
+		dbugLog(_FLM, "'%s' list is empty", cv_manageProcesses.GetEnvVarName());
 	}
 
 	// Prepare the repeater socket, which forwards packets from one peer to all other peers.
@@ -525,7 +540,7 @@ int main(int argc, const char* argv[], const char* envp[])
 	signal(SIGUSR1, _toggleStarts);
 #endif
 
-	GameProcessManager::Initialize(envp);
+	GameProcessManager::Initialize(envp, singleStartMode);
 
 	// Our main loop is handled by libevent rather than teulKit.
 	event_base_dispatch(Teul::eventBase);

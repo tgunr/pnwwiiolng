@@ -209,7 +209,7 @@ public:
 			throw std::invalid_argument("index out of bounds");
 
 		return m_row[index];
-	};
+	}
 
 	// Can return null
 	const char* NextColumn()

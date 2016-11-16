@@ -239,7 +239,7 @@ strtBuildCPColliders()
 	teulSyncClock();
 	const TeulTimeMS endMs = teulClock64;
 
-	dbugLog(_FLI, "colliders: %u cells, %u entries, %u overlaps, %f average/cell. Took %llums"
+	dbugLog(_FLI, "colliders: %u cells, %u entries, %u overlaps, %f average/cell. Took %" PR64BitUT "ms"
 					, cells, entries, overlaps, ((FLOAT32)entries / (FLOAT32)cells)
 					, endMs - startMs
 					);

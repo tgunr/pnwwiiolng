@@ -31,7 +31,7 @@ Teul::Packet::Packet(const Teul::Packet& rhs)
 	: m_data(m_localData)
 	, m_packetSizeBytes(0)
 	, m_capacity(DefaultLocalDataSize)
-	, m_sent(rhs.m_sent)
+	, m_sent(0)  // Do not copy m_sent - none of this copy has been sent
 	, m_address(rhs.m_address)
 	, m_port(rhs.m_port)
 {
@@ -55,7 +55,7 @@ Teul::Packet::Packet(Teul::Packet&& rhs)
 		return;
 
 	this->m_data = rhs.m_data;		// Take possession of the data,
-	
+
 	rhs.m_data = rhs.m_localData;	// point rhs back at its local data.
 
 	// If the source is using it's local data buffer, just copy the data over

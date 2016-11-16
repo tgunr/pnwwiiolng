@@ -81,7 +81,7 @@ public:
 	//! Constructor.
 	DotCommand(const std::string& newCommand, const std::string& description
 				, const PermissionMask mask, LSTRING_ID usage, LSTRING_ID detail, bool playnetOnly=false);
-	virtual ~DotCommand() { };
+	virtual ~DotCommand() { }
 
 	//! Retrieves the master index of all dot commands.
 	static DotCommandIndex* index();
