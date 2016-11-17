@@ -3120,11 +3120,18 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 		return 0;
 
 	// check for terrain sto first
-	if(TO->IsSTO())
-	{
+	if ( TO->IsSTO() ) {
 		TerrainSTO* sto = static_cast<TerrainSTO*>(TO->TerrainMasterObject->lpspare);
-		const SINT64 joules = (SINT64)Joules;
-		if(sto) sto->applyJoules(joules);
+		if ( sto ) {
+			SINT64 joules = static_cast<SINT64>(Joules);
+			// HACK: Basing damage off Joules makes PPO gameplay design very difficult,
+			// so PPOs use a different scale. It's possible that all STOs will use
+			// something similar at some point in the future.
+			if ( Ammo && (sto->type() == ServerTrackedObject::_PPO || ServerTrackedObject::_UMS) ) {
+				joules = fpPPOScaleJoules(*Ammo, joules);
+			}
+			sto->applyJoules(joules);
+		}
 
 		return 0;
 	}
