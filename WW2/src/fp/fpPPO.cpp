@@ -1593,19 +1593,26 @@ static bool _fbCheck(vehVehicle* player, StratDB::StratObject* fac, FLOAT32 radi
 
 namespace {
 	// Two-point Lagrange interpolation
-	SINT64 Interpolate(SINT64 lo_in, SINT64 lo_out, SINT64 hi_in, SINT64 hi_out, SINT64 val) {
+	SINT64 InterpDamage(SINT64 lo_in, SINT64 lo_out, SINT64 hi_in, SINT64 hi_out, SINT64 val) {
 		double x0 = static_cast<double>(lo_in),  x1 = static_cast<double>(hi_in);
 		double y0 = static_cast<double>(lo_out), y1 = static_cast<double>(hi_out);
 		double x = static_cast<double>(val);
 
-		return static_cast<SINT64>(((x-x1)/(x0-x1))*y0+ ((x-x0)/(x1-x0))*y1);
+		SINT64 out = static_cast<SINT64>(((x-x1)/(x0-x1))*y0+ ((x-x0)/(x1-x0))*y1);
+		return std::max((SINT64)0, std::min(out, hi_out));
 	}
 }
+
+// Gives a significant boost to HE damage if even the actual joules delivered are minimal.
+#define HE_AOE_BOOST 1
 
 // !!!HACK!!!
 // This entire setup is based on values gathered through testing and what's in
 // the ammo data files, so any changes could bring this whole thing crumbling
 // down. Even if it remains permanent, this setup needs to be overhauled.
+//
+// NOTE: The values in testing are at least partially wrong since some PPOs seem
+// to take damage from certain sources multiple times. Fun...
 //
 // TODO: Right now many of these are based on joules, when the actual projectile
 // weight, etc. are probably far better indicators of what should be in what
@@ -1614,94 +1621,118 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 	using Joules = SINT64;
 	const weapAmmoType& src = *round.AmmoType;
 
-
-	// Small-arms fire [0-1k]
+	// Small-arms & Shrapnel [0-1k]
 	const Joules smallarms_min = 0;
 	const Joules smallarms_max = 4000;
-	if ( src.SubType == WEAPAMMO_SUBTYPE_BALLISTIC && joules < smallarms_max ) {
-		return Interpolate(smallarms_min, 0, smallarms_max, 1000, joules);
+	if ( src.SubType == WEAPAMMO_SUBTYPE_BALLISTIC &&
+	     (joules < smallarms_max || strcmp((const char*)src.Name, "shrapnel") == 0) ) {
+		return InterpDamage(smallarms_min, 0, smallarms_max, 1000, joules);
 	}
 
 	// Anti-material fire (AT Rifle) [20-25k]
 	const Joules antimat_min = 10000;
 	const Joules antimat_max = 18000;
 	if ( src.SubType == WEAPAMMO_SUBTYPE_BALLISTIC && joules < antimat_max ) {
-		return Interpolate(antimat_min, 20000, antimat_max, 25000, joules);
+		return InterpDamage(antimat_min, 20000, antimat_max, 25000, joules);
 	}
 
-	// Grenades [10/40k]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_GRENADE ) {
+#if HE_AOE_BOOST
+		if ( src.ExplosiveEnergy < 500000 ) {
+			// Shrapnel [10k]
+			return joules > 5000 ? 10000 : 0;
+		} else {
+			// Concussion [35k]
+			return joules > 5000 ? 35000 / 3 : 0;
+		}
+#else
 		if ( src.ExplosiveEnergy < 500000 ) {
 			// Shrapnel [10k]
 			const Joules shrap_min = 384000;
 			const Joules shrap_max = 614000;
-			return Interpolate(shrap_min, 9000, shrap_max, 11000, joules);
+			return InterpDamage(shrap_min, 9000, shrap_max, 11000, joules);
 		} else {
-			// Concussion [40k]
+			// Concussion [35k]
 			const Joules gren_min = 380000;
 			const Joules gren_max = 390000;
-			return Interpolate(gren_min, 39000, gren_max, 41000, joules);
+			return InterpDamage(gren_min, 34000, gren_max, 36000, joules);
 		}
+#endif
 	}
 
 	// Rocket [90-110k]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_ROCKET ) {
 		const Joules rocket_min = 180000;
 		const Joules rocket_max = 610000;
-		return Interpolate(rocket_min, 90000, rocket_max, 110000, joules);
+		return InterpDamage(rocket_min, 90000, rocket_max, 110000, joules);
 	}
 
-	// Mortar [280-320k]
+	// Mortar [300k]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_MORTAR ) {
+#if HE_AOE_BOOST
+		return joules > 5000 ? 300000 : 0;
+#else
 		const Joules mortar_min = 3000000;
 		const Joules mortar_max = 4000000;
-		return Interpolate(mortar_min, 280000, mortar_max, 320000, joules);
+		return InterpDamage(mortar_min, 280000, mortar_max, 320000, joules);
+#endif
 	}
 
 	// AP/HE* [varies]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_BALLISTIC ) {
 		if ( src.ExplosiveEnergy > 0.0f ) {
 			// HE* [750-1000k]
-			const Joules he_min = 770000;
-			const Joules he_max = 18600000;
-			return Interpolate(he_min, 750000, he_max, 1000000, joules);
-			
+			const Joules he_min = 250000;
+			const Joules he_max = 6500000;
+#if HE_AOE_BOOST
+			if ( joules > 100000 )
+				joules = std::max(joules, he_min / 2);
+#endif
+			return InterpDamage(he_min, 750000, he_max, 1000000, joules);
 		} else {
 			// Non-HE*
 			if ( src.AmmoWeight < 0.25 ) {
 				// Autocannon [75k]
-				const Joules ac_min = 40000;
-				const Joules ac_max = 43000;
-				return Interpolate(ac_min, 70000, ac_max, 75000, joules);
+				const Joules ac_min = 42500;
+				const Joules ac_max = 44000;
+				return InterpDamage(ac_min, 70000, ac_max, 75000, joules);
 			} else {
 				// AP [150-250k]
-				// Note the Panhard is about 70k due to its tiny gun,
+				// Note the Panhard is a bit under half due to its tiny gun,
 				// but this is reflected through the math anyway.
-				const Joules ap_min = 330000;
-				const Joules ap_max = 8200000;
-				return Interpolate(ap_min, 150000, ap_max, 250000, joules);
+				const Joules ap_min = 200000;
+				const Joules ap_max = 3000000;
+				return InterpDamage(ap_min, 150000, ap_max, 250000, joules);
 			}
 		}
 	}
 
-	// AAA [500-1000k]
+	// AAA [300-1000k]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_AIRBURST ) {
-		const Joules aaa_min = 400000;
-		const Joules aaa_max = 2000000;
-		return Interpolate(aaa_min, 500000, aaa_max, 1000000, joules);
+		const Joules aaa_min = 36000;
+		const Joules aaa_max = 600000;
+#if HE_AOE_BOOST
+		if ( joules > 5000 )
+			joules = std::max(joules, aaa_min / 2);
+#endif
+		return InterpDamage(aaa_min, 300000, aaa_max, 1000000, joules);
 	}
 
 	// Satchel [50m]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_PLACED ) {
-		return 50000000;
+		return joules > 3000000 ? 50000000 : 0;
 	}
 
-	// Bomb [20m-?]
+	// Bomb [20m-50m]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_BOMB ) {
 		// TODO: Need to get proper values. For now a 50kg bomb is 3/5 a satchel.
 		const Joules bomb_min = 50000000;
 		const Joules bomb_max = 190000000;
-		return Interpolate(bomb_min, 20000000, bomb_max, 30000000, joules);
+#if HE_AOE_BOOST
+		if ( joules > 100000 )
+			joules = std::max(joules, bomb_min / 2);
+#endif
+		return InterpDamage(bomb_min, 20000000, bomb_max, 30000000, joules);
 	}
 
 	// If anything's left, just return the joules done.
