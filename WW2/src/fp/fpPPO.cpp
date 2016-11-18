@@ -1642,8 +1642,9 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 			// Shrapnel [10k]
 			return joules > 5000 ? 10000 : 0;
 		} else {
-			// Concussion [35k]
-			return joules > 5000 ? 35000 / 3 : 0;
+			// Concussion [15k]
+			// Should be far higher, but only the Axis have one, so...
+			return joules > 5000 ? 15000 : 0;
 		}
 #else
 		if ( src.ExplosiveEnergy < 500000 ) {
