@@ -1719,21 +1719,20 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 		return InterpDamage(aaa_min, 300000, aaa_max, 1000000, joules);
 	}
 
-	// Satchel [50m]
+	// Satchel [25m]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_PLACED ) {
-		return joules > 3000000 ? 50000000 : 0;
+		return joules > 3000000 ? 25000000 : 0;
 	}
 
-	// Bomb [20m-50m]
+	// Bomb [10m-25m]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_BOMB ) {
-		// TODO: Need to get proper values. For now a 50kg bomb is 3/5 a satchel.
 		const Joules bomb_min = 50000000;
 		const Joules bomb_max = 190000000;
 #if HE_AOE_BOOST
 		if ( joules > 100000 )
 			joules = std::max(joules, bomb_min / 2);
 #endif
-		return InterpDamage(bomb_min, 20000000, bomb_max, 30000000, joules);
+		return InterpDamage(bomb_min, 10000000, bomb_max, 25000000, joules);
 	}
 
 	// If anything's left, just return the joules done.
