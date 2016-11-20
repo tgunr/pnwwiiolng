@@ -670,7 +670,7 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 	MessageBoxA(0, message, caption, MB_OK | MB_ICONERROR | MB_APPLMODAL);
 	free(message);
 
-#if defined(_DEBUG)
+#if defined(DEBUG)
 	__debugbreak();
 #endif
 

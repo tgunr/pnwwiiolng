@@ -127,7 +127,7 @@
 	defines
 *************************************************************************************************/
 
-#if defined(_DEBUG)
+#if defined(DEBUG)
 //#define SPAWN_AT_DINANT_OFFLINE 1
 //#define SPAWN_AT_ANTWERP_OFFLINE 1
 //#define SPAWN_AT_OLD_OFFLINE 1
