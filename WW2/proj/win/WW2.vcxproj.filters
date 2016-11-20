@@ -1622,9 +1622,6 @@
     <ClInclude Include="..\..\src\include\precompile_includes.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\imap\imapTypes.h">
-      <Filter>imap</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\math\Rand.h">
       <Filter>math</Filter>
     </ClInclude>
