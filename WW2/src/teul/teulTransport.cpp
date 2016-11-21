@@ -332,25 +332,32 @@ _logLibEvent(int eventLevel, const char* msg)
 	dbugLog("libevent", 0, dbugLevel, "%s", msg);
 }
 
-void Teul::InitializeWinsock()
+#if platOS == OS_WIN32
+static std::once_flag winsockInitialized;
+#endif
+
+void
+Teul::InitializeWinsock()
 {
 #if platOS == OS_WIN32
-	WSADATA wsaData;
-	WORD wVersionRequested;
-	wVersionRequested = MAKEWORD(2, 2);
+	std::call_once(winsockInitialized, []() {
+		WSADATA wsaData;
+		WORD wVersionRequested;
+		wVersionRequested = MAKEWORD(2, 2);
 
-	const SINT32 err = WSAStartup(wVersionRequested, &wsaData);
-	if (err != 0)
-		LogAbort(_FLA, "WSAStartup failed: %d", err);
+		const SINT32 err = WSAStartup(wVersionRequested, &wsaData);
+		if (err != 0)
+			LogAbort(_FLA, "WSAStartup failed: %d", err);
 
-	// Confirm that the WinSock DLL supports 2.2.
-	// Note that if the DLL supports versions greater
-	// than 2.2 in addition to 2.2, it will still return
-	// 2.2 in wVersion since that is the version we
-	// requested.
-	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
-		LogAbort("Wrong version of winsock library.");
-	// The WinSock DLL is acceptable. Proceed.
+		// Confirm that the WinSock DLL supports 2.2.
+		// Note that if the DLL supports versions greater
+		// than 2.2 in addition to 2.2, it will still return
+		// 2.2 in wVersion since that is the version we
+		// requested.
+		if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
+			LogAbort("Wrong version of winsock library.");
+		// The WinSock DLL is acceptable. Proceed.
+	});
 #endif
 }
 
@@ -391,6 +398,9 @@ teulInitTransport(LogMode logType
 		return -EDEADLK;
 	}
 
+	// This should already be done by InitializeConfigvars, but just in-case.
+	Teul::InitializeWinsock();
+
 	dbugInit(logType, name);
 
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
@@ -411,7 +421,6 @@ teulInitTransport(LogMode logType
 	if ( logFnPtr )
 		Teul::g_logFnPtr = logFnPtr ;
 
-	Teul::InitializeWinsock();
 	_initializeLibEvent();
 
 	teulFreeAllCallbacks();
