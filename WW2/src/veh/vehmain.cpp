@@ -5308,26 +5308,27 @@ static MSPAWN_RESULT _nearEnemyFacility(FULL_OBJ_ID& foi, int side)
 }
 
 /************************************************************************************************
-	vehmainFRUBuild
+	vehmainPPOBuild
 *************************************************************************************************/
 
-PlayerPlacedObject* vehmainFRUBuild()
+PlayerPlacedObject* vehmainPPOBuild()
 {
 	vehVehicle* veh = persGetPersonaVehiclePtr();
-	if(veh == nullptr) return nullptr;
-
-	// do we already have an msp on this misison?
-	bool hasMobileSpawn = PlayerClient()->MobileSpawnMission();
-	bool isMissionLeader = PlayerClient()->IsMissionLeader();
-
-	// now check if we're the mission leader
-	if(hasMobileSpawn && !isMissionLeader)
-	{
-		fpPPOAlert("ppos.fru.notleader");
+	if ( veh == nullptr ) return nullptr;
+	if ( activePPOList.size() < activePPOIndex - 1 || activePPOList[activePPOIndex] == nullptr ) {
 		return nullptr;
 	}
 
-	PlayerPlacedObject* fru = fpPPOCreate(activePPOList[activePPOIndex]->id);
+	// Only the Mission Leader can replace an existing mobile spawn.
+	PPOSpec& spec = *activePPOList[activePPOIndex];
+	if ( spec.spawnable ) {
+		if ( PlayerClient()->MobileSpawnMission() && ! PlayerClient()->IsMissionLeader() ) {
+			fpPPOAlert("ppos.fru.notleader");
+			return nullptr;
+		}
+	}
+
+	PlayerPlacedObject* fru = fpPPOCreate(spec.id);
 
 	// set our callbacks
     if (fru != nullptr)

@@ -532,7 +532,7 @@ vehVehicle*	vehFindRidingVehicle(UINT32 RideVehicleHostIndex, UINT32 RideSeatNum
 
 // Infantry resupply point
 //bool vehmainDropInfantryResupplyPoint();
-PlayerPlacedObject* vehmainFRUBuild();
+PlayerPlacedObject* vehmainPPOBuild();
 //bool vehmainIRPCheck();
 bool vehmainFRUExecute();
 

@@ -728,7 +728,7 @@ UINT32 mlToggleMobileSpawn(SINT32 Param, UINT32 Id, UINT32 Detach)
 		// make sure this class/type has ppo types available to it
 		if (specLoader.getAllowedPPOs(vtype->WeaponSpec.wClass, vtype->WeaponSpec.wType, activePPOList, !allowFrus))
         {
-            vehmainFRUBuild();
+            vehmainPPOBuild();
         }
     }
 
