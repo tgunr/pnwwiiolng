@@ -5311,13 +5311,13 @@ static MSPAWN_RESULT _nearEnemyFacility(FULL_OBJ_ID& foi, int side)
 	vehmainPPOBuild
 *************************************************************************************************/
 
-PlayerPlacedObject* vehmainPPOBuild()
-{
+PlayerPlacedObject* vehmainPPOBuild(void) {
+	// Just in case since this isn't tied with the FPS PPO code yet.
+	if ( activePPOList.size() < (size_t)activePPOIndex + 1 ) activePPOIndex = 0;
+	if ( activePPOList.size() == 0 || activePPOList[activePPOIndex] == nullptr ) return nullptr;
+
 	vehVehicle* veh = persGetPersonaVehiclePtr();
 	if ( veh == nullptr ) return nullptr;
-	if ( activePPOList.size() < activePPOIndex - 1 || activePPOList[activePPOIndex] == nullptr ) {
-		return nullptr;
-	}
 
 	// Only the Mission Leader can replace an existing mobile spawn.
 	PPOSpec& spec = *activePPOList[activePPOIndex];
