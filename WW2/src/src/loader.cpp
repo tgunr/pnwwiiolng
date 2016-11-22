@@ -325,7 +325,6 @@ main(int argc,char** argv)
 {
 	g_appName = argv[0];
 	Teul::ConfigVar::InitializeConfigVars();
-	Teul::InitializeWinsock();
 
 	SCHAR* filename;
 	//LOGICAL moreFiles = TRUE;
