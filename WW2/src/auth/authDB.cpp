@@ -525,7 +525,7 @@ _findIsFile(SCHAR manisfile)
 		case 'n':
 			return ISFILE_NUN;
 		default:
-			break;
+		break;
 	}
 	return ISFILE_URL;
 }
@@ -646,26 +646,6 @@ authInitApps()
 }
 
 //////////////////////////////////////////////////////////////////////
-static bool
-_getPlayerTable(GAME& gameEntry)
-{
-	try
-	{
-		DBQuery q(dbh, "SELECT playertable FROM `auth`.`auth_games` WHERE gameID = %u", gameEntry.gameID);
-		if ( q.HasRows() == false || q.FetchRow() == false )
-			throw std::invalid_argument("couldn't find game entry");
-
-		strsafecpy(gameEntry.playerTable, q.Row()[0]);
-
-		dbugLog(_FLI, "arena:%d game:%d setting playerTable to %s", gameEntry.arenaID, gameEntry.gameID, gameEntry.playerTable);
-		return true;
-	}
-	catch (std::exception& e) { dbugLog(_FLA, "arena:%d game:%d %s", gameEntry.arenaID, gameEntry.gameID, e.what()); }
-
-	return false;
-}
-
-//////////////////////////////////////////////////////////////////////
 bool authInitGameEntry(GAME& gameEntry)
 {
 	const APP_TABLE_ENTRY* appEntry = _findAppTable(gameEntry.appID);
@@ -680,7 +660,7 @@ bool authInitGameEntry(GAME& gameEntry)
 	try
 	{
 		DBQuery q(dbh
-				,	"SELECT gameid, groupid, clusterid, method, description"
+				,	"SELECT gameid, groupid, clusterid, description"
 			 		" FROM auth_arenas WHERE arenaID = %u"
 			 		, gameEntry.arenaID
 			);
@@ -694,7 +674,6 @@ bool authInitGameEntry(GAME& gameEntry)
 		gameEntry.gameID = row.NextUInt();
 		gameEntry.groupID = row.NextUInt();
 		gameEntry.clusterID = row.NextUInt();
-		gameEntry.usePlayerID = (row.NextString()[0] == 'p');
 		gameEntry.description[0] = 0;
 		row.NextString(gameEntry.description);
 		if ( gameEntry.description[0] == 0 ) {
@@ -709,14 +688,8 @@ bool authInitGameEntry(GAME& gameEntry)
 		return false;
 	}
 
-	dbugLog(_FLN,"setting game entry gameID %d groupID %d clusterID %d usePlayerID %d description %s"
-				, gameEntry.gameID,gameEntry.groupID,gameEntry.clusterID
-				, gameEntry.usePlayerID,  gameEntry.description);
-
-	if ( gameEntry.usePlayerID && !_getPlayerTable(gameEntry) ) {
-		dbugLog(_FLW, "gameEntry %d uses playerIDs but has no player table!", gameEntry.appID);
-		return false;
-	}
+	dbugLog(_FLN,"setting game entry gameID %d groupID %d clusterID %d description %s"
+				, gameEntry.gameID,gameEntry.groupID,gameEntry.clusterID, gameEntry.description);
 
 	return _initAppInfoTable(gameEntry);
 }
