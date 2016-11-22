@@ -1889,7 +1889,8 @@ _serverUsesBroadcast(const SERVER_TYPE serverType)
 	}
 }
 
-void Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
+void
+Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTION errorFnPtr, KILL_FUNCTION killFnPtr, int argc, const char* argv[], const CommandLineOptions& cliOptions)
 {
 	Server::serverType = myType;
 	Teul::SetAppName(appName);
