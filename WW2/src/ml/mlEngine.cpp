@@ -1658,26 +1658,13 @@ static UINT32 _HandleFuelTankDamage(mlEngineComponentData* TankData, mlComponent
 		// leak
 		char componentName[64];
 		strprintf(componentName, "fuelleak%d", TankData->TankNum);
-		if (TankData->TankOnFire == 1 || DamageLevel - TankData->FuelTankSealedLevel <= 0 ||
-			TankData->CurrentTankContents < 0.01)
-		{
-			vehAnimChangeVehicleStateByName(VehicleData, static_cast<UCHAR*>(componentName), FALSE);
-		}
-		else
-		{
-			vehAnimChangeVehicleStateByName(VehicleData, static_cast<UCHAR*>(componentName), TRUE);
-		}
+		bool isLeaking = !(TankData->TankOnFire == 1 || DamageLevel - TankData->FuelTankSealedLevel <= 0 || TankData->CurrentTankContents < 0.01);
+		vehAnimChangeVehicleStateByName(VehicleData, reinterpret_cast<UCHAR*>(componentName), isLeaking);
 
 		// fire
 		strprintf(componentName, "fuelfire%d", TankData->TankNum);
-		if (TankData->TankOnFire == 1)
-		{
-			vehAnimChangeVehicleStateByName(VehicleData, static_cast<UCHAR*>(componentName), TRUE);
-		}
-		else
-		{
-			vehAnimChangeVehicleStateByName(VehicleData, static_cast<UCHAR*>(componentName), FALSE);
-		}
+		bool isOnFire = (TankData->TankOnFire == 1);
+		vehAnimChangeVehicleStateByName(VehicleData, reinterpret_cast<UCHAR*>(componentName), isOnFire);
 	}
 
 	return 0;

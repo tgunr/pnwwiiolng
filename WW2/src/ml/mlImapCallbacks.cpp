@@ -912,7 +912,7 @@ UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 	}
 	char compName[32];
 	strprintf(compName, "hatchstate%d", Position+1);
-	vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, static_cast<UCHAR*>(compName), VehicleData->HatchOpen[Position]);
+	vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, reinterpret_cast<UCHAR*>(compName), VehicleData->HatchOpen[Position]);
 //	rnmainListLocText(IDE_LANG_UI,VehicleData->CanopyOpen[Position] ? HATCH_OPEN_ID : HATCH_CLOSE_ID);
 
 	return 0;

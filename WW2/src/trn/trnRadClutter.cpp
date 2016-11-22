@@ -470,7 +470,7 @@ void PlaceClutter_3(const Vec3d& pos)
 // Function: GetPositionKey
 // Description:
 /////////////////////////////////////////////////////////
-bool GetPositionKey(FLOAT64VECTOR& pos, char buff[128], Vec3d& center, float w)
+bool GetPositionKey(FLOAT64VECTOR& pos, char (&buff)[128], Vec3d& center, float w)
 {
     // Get supercell
     int sx = (int)(pos.x / SDM_SUPERCELL_SIZE);
