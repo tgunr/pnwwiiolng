@@ -117,6 +117,8 @@ IF ( BUILDING_OWN_LIBXML2 )
 		BUILD_IN_SOURCE 1
 		BUILD_BYPRODUCTS ${LIBXML2_LIBRARIES}
 	)
+	# Need to make sure we include the installed versions rather than system
+	# versions, but we should fall back to the source version for any other headers.
 	INCLUDE_DIRECTORIES( BEFORE SYSTEM ${LIBXML2_INSTALL_DIR}/include )
 	INCLUDE_DIRECTORIES( ${LIBXML2_SOURCE_DIR}/include )
 ELSEIF ( PN_CLUSTER STREQUAL "rPI" )
