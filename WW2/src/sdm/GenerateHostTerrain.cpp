@@ -50,7 +50,7 @@ void updateGeneratingHostTerrain()
     {
         inited = true;
         getposition(x,y);
-        sprintf(buffer, "move %.0f %.0f 400",x,y);
+        strprintf(buffer, "move %.0f %.0f 400",x,y);
         dot_move(buffer);
         stable_frametime = frametime+2000;
     }
@@ -68,7 +68,7 @@ void updateGeneratingHostTerrain()
         else
         {
             getposition(x,y);
-            sprintf(buffer, "move %.0f %.0f 400",x,y);
+            strprintf(buffer, "move %.0f %.0f 400",x,y);
             dot_move(buffer);
             stable_frametime = frametime+2000;
         }

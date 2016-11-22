@@ -135,11 +135,11 @@ UINT32 mlAdjustElevTrim(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 	char buff[256] = {'\0'};
 	if(val < 0)
-		sprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.elevator").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.down").c_str());
+		strprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.elevator").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.down").c_str());
 	else if(val > 0)
-		sprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.elevator").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.up").c_str());
+		strprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.elevator").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.up").c_str());
 	else
-		sprintf(buff, "%ls %ls 0.0 %ls", uiLocString("hud.readout.elevator").c_str(), uiLocString("hud.readout.trim").c_str(), uiLocString("hud.readout.neutral").c_str());
+		strprintf(buff, "%ls %ls 0.0 %ls", uiLocString("hud.readout.elevator").c_str(), uiLocString("hud.readout.trim").c_str(), uiLocString("hud.readout.neutral").c_str());
 
 	uiChatPrintLine(buff);
 	*/
@@ -159,11 +159,11 @@ UINT32 mlAdjustRudderTrim(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 	char buff[256] = {'\0'};
 	if(val < 0)
-		sprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.rudder").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.left").c_str());
+		strprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.rudder").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.left").c_str());
 	else if(val > 0)
-		sprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.rudder").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.right").c_str());
+		strprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.rudder").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.right").c_str());
 	else
-		sprintf(buff, "%ls %ls 0.0 %ls", uiLocString("hud.readout.rudder").c_str(), uiLocString("hud.readout.trim").c_str(), uiLocString("hud.readout.neutral").c_str());
+		strprintf(buff, "%ls %ls 0.0 %ls", uiLocString("hud.readout.rudder").c_str(), uiLocString("hud.readout.trim").c_str(), uiLocString("hud.readout.neutral").c_str());
 
 	uiChatPrintLine(buff);
 	*/
@@ -183,11 +183,11 @@ UINT32 mlAdjustAileronTrim(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 	char buff[256] = {'\0'};
 	if(val < 0)
-		sprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.aileron").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.left").c_str());
+		strprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.aileron").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.left").c_str());
 	else if(val > 0)
-		sprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.aileron").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.right").c_str());
+		strprintf(buff, "%ls %ls %3.1f %ls", uiLocString("hud.readout.aileron").c_str(), uiLocString("hud.readout.trim").c_str(), fabs(val), uiLocString("hud.readout.right").c_str());
 	else
-		sprintf(buff, "%ls %ls 0.0 %ls", uiLocString("hud.readout.aileron").c_str(), uiLocString("hud.readout.trim").c_str(), uiLocString("hud.readout.neutral").c_str());
+		strprintf(buff, "%ls %ls 0.0 %ls", uiLocString("hud.readout.aileron").c_str(), uiLocString("hud.readout.trim").c_str(), uiLocString("hud.readout.neutral").c_str());
 
 	uiChatPrintLine(buff);
 	*/
@@ -844,13 +844,11 @@ UINT32 mlToggleAuxSight(SINT32 Param,UINT32 Id,UINT32 Detach)
 UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	FLOAT64VECTOR TempPos;
-	UCHAR s[32];
 
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	UINT32 Position = persGetPersonaPosition();
+	const UINT32 Position = persGetPersonaPosition();
 	VehicleData->HatchOpen[Position] = !VehicleData->HatchOpen[Position];
 
-	sprintf((char*)s,"hatchstate%d",Position+1);
 	TempPos.x = TempPos.y = TempPos.z = 0.0f;
 	if (VehicleData->HatchOpen[Position] == 1)
 	{
@@ -912,7 +910,9 @@ UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 			}
 		}
 	}
-	vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, s, VehicleData->HatchOpen[Position]);
+	char compName[32];
+	strprintf(compName, "hatchstate%d", Position+1);
+	vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, static_cast<UCHAR*>(compName), VehicleData->HatchOpen[Position]);
 //	rnmainListLocText(IDE_LANG_UI,VehicleData->CanopyOpen[Position] ? HATCH_OPEN_ID : HATCH_CLOSE_ID);
 
 	return 0;

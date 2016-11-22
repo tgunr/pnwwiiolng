@@ -209,7 +209,7 @@ _ircFinish(TeulTimeMS timeTaken)
 
 	FLOAT32 seconds = ((FLOAT32)timeTaken) / 1000.0f;
 	char message[128];
-	sprintf(message, "%s terrain: import finished - took %.2f seconds", cv_clusterName.GetString(), seconds);
+	strprintf(message, "%s terrain: import finished - took %.2f seconds", cv_clusterName.GetString(), seconds);
 
 	_ircSendMessage("-sys,#servers", message);
 

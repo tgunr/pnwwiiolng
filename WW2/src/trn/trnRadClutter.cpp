@@ -378,7 +378,7 @@ void PlaceClutter_1(const Vec3d& pos)
             attr->pos.z = pos.z();
             attr->maxdist = distclamp2_1;
 
-            sprintf(attr->key, "radclutter%d", _id++);
+            strprintf(attr->key, "radclutter%d", _id++);
             size_t key = SuperFastHash(attr->key, sizeof(char) * strlen(attr->key));
 
             active[key] = attr;
@@ -414,7 +414,7 @@ void PlaceClutter_2(const Vec3d& pos)
             attr->pos.z = pos.z();
             attr->maxdist = distclamp2_2;
 
-            sprintf(attr->key, "radclutter%d", _id++);
+            strprintf(attr->key, "radclutter%d", _id++);
             size_t key = SuperFastHash(attr->key, sizeof(char) * strlen(attr->key));
 
             active[key] = attr;
@@ -450,7 +450,7 @@ void PlaceClutter_3(const Vec3d& pos)
             attr->pos.z = pos.z();
             attr->maxdist = distclamp2_3;
 
-            sprintf(attr->key, "radclutter%d", _id++);
+            strprintf(attr->key, "radclutter%d", _id++);
             size_t key = SuperFastHash(attr->key, sizeof(char) * strlen(attr->key));
 
             active[key] = attr;
@@ -498,7 +498,7 @@ bool GetPositionKey(FLOAT64VECTOR& pos, char buff[128], Vec3d& center, float w)
     int cc = (int)(v.x / size);
     int rr = (int)(v.y / size);
 
-    sprintf(buff, "rclutter%d%d%d%d%d%d", sx, sy, r, c, rr, cc);
+    strprintf(buff, "rclutter%d%d%d%d%d%d", sx, sy, r, c, rr, cc);
 
     center.x() = sx * SDM_SUPERCELL_SIZE + c * SDM_OCTET_SIZE + cc * size;
     center.y() = sy * SDM_SUPERCELL_SIZE + r * SDM_OCTET_SIZE + rr * size;

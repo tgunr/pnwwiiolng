@@ -6051,7 +6051,7 @@ bool obdrawDrawBuildingShadowCasters(int sx,
             continue;
 
         char buff[128];
-        sprintf(buff, "%s_%x_%x", so->Filename(), (UINT16)so->PosX(), (UINT16)so->PosY());
+        strprintf(buff, "%s_%x_%x", so->Filename(), (UINT16)so->PosX(), (UINT16)so->PosY());
 
         OBJECT* o = obmainFindTopmostObject(buff);
 

@@ -568,8 +568,8 @@ UINT32 trncdInit()
 
 	if (!piIsTexture(_NullTexId, 0))
 	{
-	SINT8 s[256];
-		sprintf(s,"Unable to load up the null terrain texture map! (terrain\\null1.bmp)");
+		char s[256];
+		strprintf(s,"Unable to load up the null terrain texture map! (terrain\\null1.bmp)");
 		Write_Debug(s);
 		piExitProgram(_FL,s);
 	}
@@ -1451,9 +1451,8 @@ UINT32 trnGetSpawnObject(OBJECT** o,
 
     if(I == mapSpawnTO.end())
     {
-        SCHAR s[128];
-
-        sprintf(s, "[trnGetSpawnObject] x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
+        char s[128];
+        strprintf(s, "[trnGetSpawnObject] x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
         Write_Log(LOG_OLD, LOG_FATAL, s);
         piExitProgram(_FL, s);
         return 1;
@@ -1463,9 +1462,8 @@ UINT32 trnGetSpawnObject(OBJECT** o,
 
     if(to->SpawnEntries == 0)
     {
-        SCHAR s[128];
-
-        sprintf(s, "[trnGetSpawnObject] spawn entries = 0 x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
+        char s[128];
+        strprintf(s, "[trnGetSpawnObject] spawn entries = 0 x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
         Write_Log(LOG_OLD, LOG_FATAL, s);
         piExitProgram(_FL, s);
         return 1;
@@ -3697,7 +3695,7 @@ TERRAIN_DETAIL*	td = trndtl;
 		{
 			// could optimize this via some array or list of object names bypassing the
 			// iterate-through-each-object-in-database scan
-			sprintf(objname, "%s_%d_%d", td->trnobj[obnum].objname, (SINT32)td->trnobj[obnum].pos.x, (SINT32)td->trnobj[obnum].pos.y);
+			strprintf(objname, "%s_%d_%d", td->trnobj[obnum].objname, (SINT32)td->trnobj[obnum].pos.x, (SINT32)td->trnobj[obnum].pos.y);
 			lpobj = obmainFindTopmostObject(objname);
 			if (lpobj == nullptr)
 			{
@@ -7213,10 +7211,8 @@ static void damageObject(OBJECT* o)
         {
             for(unsigned int i = 0; i < pm->subModelReferences.size(); i++)
             {
-                sprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
-
+                strprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
                 OBJECT* oo = obmainFindTopmostObject(model);
-
                 if(!oo)
                     continue;
 

@@ -261,10 +261,10 @@ void GenerateIcons::MakeAtlas()
     r = (W+curW) / 2048.0f;
     t = (0+curH) / 2048.0f;
     b = (H+curH) / 2048.0f;
-    sprintf(s, "%s_icon %.6f %.6f %.6f %.6f\n", it->name.c_str(), l, t, r, b );
+    strprintf(s, "%s_icon %.6f %.6f %.6f %.6f\n", it->name.c_str(), l, t, r, b );
     atlasInfo.append(s);
 
-    sprintf(s, "%s_icon %d %d %.6f\n", it->name.c_str(), int(it->minx), int(it->miny), it->drawMpp );
+    strprintf(s, "%s_icon %d %d %.6f\n", it->name.c_str(), int(it->minx), int(it->miny), it->drawMpp );
     xyInfo.append(s);
 
     curW += W+2;
@@ -563,8 +563,12 @@ void GenerateIcons::SaveToTexture(const char*name, int x, int y, int w, int h, d
       }
     }
 
-    char s[256]; sprintf(s, "%s/%s-%dx%d.raw", GEN_DIR"tmp", _poolitr->first.c_str(),w, h );
-    FILE*	cf = fopen(s, "wb+");
+    char filename[256];
+	strprintf(filename, "%s/%s-%dx%d.raw", GEN_DIR"tmp", _poolitr->first.c_str(),w, h );
+    FILE* cf = fopen(filename, "wb+");
+	if ( !cf ) {
+		LogAbort("Couldn't save texture file %s", filename);
+	}
     fwrite(bitmapA, 1, w * h * 4 * sizeof(unsigned char), cf);
     fclose(cf);
   }
@@ -961,7 +965,7 @@ void GenerateScenarioMap::ScreenCapture()
     srcimg->allocateImage(destw, desth, 1, GL_RGB, GL_UNSIGNED_BYTE);
 
     char buf[256];
-    sprintf(buf, "%s_%s%d.bmp", SCEN_MGR->MapName(), list[listindex - 1]->name.c_str(), positionindex);
+    strprintf(buf, "%s_%s%d.bmp", SCEN_MGR->MapName(), list[listindex - 1]->name.c_str(), positionindex);
 
     srcimg->setFileName(buf);
     srcimg->ref();

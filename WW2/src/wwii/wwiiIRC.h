@@ -17,7 +17,7 @@ struct IRC
 	virtual bool ignoring(const char* channelName) const = 0;
 	virtual const std::string& nick() const = 0;
 
-	static const char _SERVER_PREFIX = '^';
+	enum : char { _SERVER_PREFIX = '^' };
 };
 
 #include "host/hostCommand.h"

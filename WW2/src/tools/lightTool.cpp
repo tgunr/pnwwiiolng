@@ -165,7 +165,7 @@ bool CMySlider::MouseDrag(float x, float y, int button, bool start)
         {
         case type_skylight:
             {
-                sprintf(s, "%f", m_value * m_max);
+                strprintf(s, "%f", m_value * m_max);
                 c->SetValue(s);
 
                 _setskycolor(m_color, m_value * m_max);
@@ -173,7 +173,7 @@ bool CMySlider::MouseDrag(float x, float y, int button, bool start)
             }
         case type_fogstart:
             {
-                sprintf(s, "%f", m_value * m_max);
+                strprintf(s, "%f", m_value * m_max);
                 c->SetValue(s);
                 FogStart = piFloatLikeLong(m_value * m_max);
                 rnmainSetDefaultFogStart(m_value * m_max);
@@ -181,14 +181,14 @@ bool CMySlider::MouseDrag(float x, float y, int button, bool start)
             }
         case type_fogend:
             {
-                sprintf(s, "%f", m_value * m_max);
+                strprintf(s, "%f", m_value * m_max);
                 c->SetValue(s);
                 rnmainSetDefaultFogEnd(m_value * m_max);
                 break;
             }
         case type_fogcolorR:
             {
-                sprintf(s, "%f", m_value * m_max);
+                strprintf(s, "%f", m_value * m_max);
                 c->SetValue(s);
 
                 UINT32 color = rnmainGetDefaultFogColor();
@@ -202,7 +202,7 @@ bool CMySlider::MouseDrag(float x, float y, int button, bool start)
            }
         case type_fogcolorG:
             {
-                sprintf(s, "%f", m_value * m_max);
+                strprintf(s, "%f", m_value * m_max);
                 c->SetValue(s);
 
                 UINT32 color = rnmainGetDefaultFogColor();
@@ -216,7 +216,7 @@ bool CMySlider::MouseDrag(float x, float y, int button, bool start)
             }
         case type_fogcolorB:
             {
-                sprintf(s, "%f", m_value * m_max);
+                strprintf(s, "%f", m_value * m_max);
                 c->SetValue(s);
 
                 UINT32 color = rnmainGetDefaultFogColor();
@@ -424,7 +424,7 @@ void CLightTool::refresh()
             {
                 (*sB)->setSlider(trnskyGetColor(i));
 
-                sprintf(str, "%f", trnskyGetColor(i++));
+                strprintf(str, "%f", trnskyGetColor(i++));
 
                 (*sB)->c->SetValue(str);
 
@@ -473,8 +473,7 @@ void CLightTool::createSlider(int x,
     c->MoveTo((float)x + 100, (float)y);
 
     char str[32];
-
-    sprintf(str, "%f", trnskyGetColor(enumColor));
+    strprintf(str, "%f", trnskyGetColor(enumColor));
 
     c->SetValue(str);
     c->SetTextAlignment(Caption::ALIGN_LEFT);
@@ -528,7 +527,7 @@ void CLightTool::createFogSlider(int x,
             s->SetMinValue(0);
             s->SetMaxValue(0.0005f);
             s->setSlider(start);
-            sprintf(str, "%f", start);
+            strprintf(str, "%f", start);
             break;
         }
     case CMySlider::type_fogenddensity:
@@ -539,7 +538,7 @@ void CLightTool::createFogSlider(int x,
             s->SetMinValue(0);
             s->SetMaxValue(0.0005f);
             s->setSlider(end);
-            sprintf(str, "%f", end);
+            strprintf(str, "%f", end);
             break;
         }
     case CMySlider::type_fogstart:
@@ -548,7 +547,7 @@ void CLightTool::createFogSlider(int x,
             s->SetMinValue(0);
             s->SetMaxValue(1.0f);
             s->setSlider(value);
-            sprintf(str, "%f", value);
+            strprintf(str, "%f", value);
             break;
         }
     case CMySlider::type_fogend:
@@ -557,28 +556,28 @@ void CLightTool::createFogSlider(int x,
             s->SetMinValue(0);
             s->SetMaxValue(1.0f);
             s->setSlider(value);
-            sprintf(str, "%f", value);
+            strprintf(str, "%f", value);
             break;
        }
     case CMySlider::type_fogcolorR:
         {
             float value = piRGBA_GETRED(rnmainGetDefaultFogColor()) * colorONEOVER255;
             s->setSlider(value);
-            sprintf(str, "%f", value);
+            strprintf(str, "%f", value);
             break;
         }
     case CMySlider::type_fogcolorG:
         {
             float value = piRGBA_GETGREEN(rnmainGetDefaultFogColor()) * colorONEOVER255;
             s->setSlider(value);
-            sprintf(str, "%f", value);
+            strprintf(str, "%f", value);
             break;
         }
     case CMySlider::type_fogcolorB:
         {
             float value = piRGBA_GETBLUE(rnmainGetDefaultFogColor()) * colorONEOVER255;
             s->setSlider(value);
-            sprintf(str, "%f", value);
+            strprintf(str, "%f", value);
             break;
         }
     }
@@ -807,7 +806,7 @@ void _saveLightColors(CMyButton* button)
 
     while(max && _access(fileName, 0) == 0)
     {
-        sprintf(fileName, "%s%d.xml", p, count++);
+        strprintf(fileName, "%s%d.xml", p, count++);
         max--;
     }
 

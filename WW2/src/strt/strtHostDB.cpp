@@ -146,7 +146,7 @@ _saveData(SAVE_SET& saves, const char* const tableName, const char* const indexF
 
 		for ( std::set<UINT32>::iterator idit = vit->second.begin(); idit != vit->second.end(); ++idit )
 		{
-			sprintf(id, "%u", *idit);
+			strprintf(id, "%u", *idit);
 			query.addEntry(id);
 		}
 
@@ -161,7 +161,7 @@ _commitCP(CPStruct* cp)
 {
 	UINT16 attacker = (cp->isCity() && cp->attackingUnit() != nullptr) ? cp->attackingUnit()->unitID() : 0;
 	char valuesKey[128];
-	sprintf(valuesKey, "conside=%u,concountry=%u,side=%u,country=%u,contention=%u,is_objective=%u"
+	strprintf(valuesKey, "conside=%u,concountry=%u,side=%u,country=%u,contention=%u,is_objective=%u"
 			, cp->controllingSide
 			, cp->controllingCountry
 			, cp->side
@@ -177,7 +177,7 @@ static void
 _commitFacility(FacilityStruct* fac)
 {
 	char valuesKey[128];
-	sprintf(valuesKey, "side=%u,country=%u,capacity=%d,storedrps=%d,open=%u"
+	strprintf(valuesKey, "side=%u,country=%u,capacity=%d,storedrps=%d,open=%u"
 			, fac->side
 			, fac->country
 			, fac->capacity
@@ -203,11 +203,11 @@ static void
 _commitObject(ObjectStruct* obj)
 {
 	char valuesKey[80];
-	sprintf(valuesKey, "side=%u,country=%u", obj->m_side, obj->m_country);
+	strprintf(valuesKey, "side=%u,country=%u", obj->m_side, obj->m_country);
 	_objOwnSaves[valuesKey].insert(obj->m_uid);
 	if ( _needsSave(obj->m_maxDamageJoules, obj->m_maxDamageJoulesSaved) || _needsSave(obj->m_maxCapacity, obj->m_maxCapacitySaved) )
 	{
-		sprintf(valuesKey, "maxdamagejoules=%" PR64BitUT ",maxcapacity=%u"
+		strprintf(valuesKey, "maxdamagejoules=%" PR64BitUT ",maxcapacity=%u"
 				, obj->m_maxDamageJoules
 				, obj->m_maxCapacity
 				);
@@ -219,7 +219,7 @@ _commitObject(ObjectStruct* obj)
 			|| _needsSave(obj->m_repairRPs, obj->m_repairRPsSaved)
 		)
 	{
-		sprintf(valuesKey, "damagejoules=%" PR64BitUT ""
+		strprintf(valuesKey, "damagejoules=%" PR64BitUT ""
 				",capacity=%d"
 				",lastcapacity=%d"
 				",repairrps=%d"

@@ -2764,7 +2764,7 @@ OBJECT* ldfltLoad(const std::string& name, float scale, int reduce)
     catch (FLTLoadFailure& e)
     {
         char error[1024] ;
-        sprintf(error, "Flt:%s\nError: %s (%s)", name.c_str(), e.m_problem.c_str(), e.m_doing.c_str()) ;
+        strprintf(error, "Flt:%s\nError: %s (%s)", name.c_str(), e.m_problem.c_str(), e.m_doing.c_str()) ;
         Write_Debug("%s", error) ;
         piExitProgram(_FL, error) ;
         return NULL ;

@@ -285,11 +285,11 @@ StratHCUnit::fetchResupplyQueue(std::vector<std::string>& result, UINT32 limit, 
 			seconds += (it->first - m_impl.m_nextServing) * m_impl.docketRate_s();
 
 		if ( seconds < 120 )
-			offset = sprintf(buffer, "%u sec: ", seconds);
+			offset = strprintf(buffer, "%u sec: ", seconds);
 		else if ( seconds < 7200 )
-			offset = sprintf(buffer, "%u min: ", seconds / 60);
+			offset = strprintf(buffer, "%u min: ", seconds / 60);
 		else
-			offset = sprintf(buffer, "%u hr: ", seconds / 3600);
+			offset = strprintf(buffer, "%u hr: ", seconds / 3600);
 
 		RESUPPLY_MANIFEST manifest;
 		bool printable = false;
@@ -545,7 +545,7 @@ const char*
 StratHCUnit::describe() const
 {
 	static char buffer[400];
-	sprintf(buffer, "hcu:%u(%s) toe:%s(nv=%" PRSizeT ") %s dkts=%" PRSizeT ", tkts=%u, supplies=%" PRSizeT ", xfers=%" PRSizeT ""
+	strprintf(buffer, "hcu:%u(%s) toe:%s(nv=%" PRSizeT ") %s dkts=%" PRSizeT ", tkts=%u, supplies=%" PRSizeT ", xfers=%" PRSizeT ""
 					, unitID(), callsign()
 					, toeTemplateHeader() ? toeTemplateHeader()->name().c_str() : "none", m_toe.size()
 					, (m_impl.m_inTransit ? "InTransit" : "Stationed")
@@ -631,7 +631,7 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 	const UINT32 trickleSlices = host_config.supply.trickleSlices;
 
     char buffer[256];
-    sprintf(buffer, "hcu:%u(%s) %s supply in %um over %um [supply:%u, trickle:%u, slices:%u]"
+    strprintf(buffer, "hcu:%u(%s) %s supply in %um over %um [supply:%u, trickle:%u, slices:%u]"
                     , unitID(), callsign()
                     , (isTransfer) ? "transfering" : "restarting"
                     , delay / 60, window / 60

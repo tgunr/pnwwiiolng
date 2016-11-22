@@ -1637,7 +1637,7 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 
 		if(stateTestFlag)// && !pObject->animModel->myVehicle->ModelData) // stateTestFlag &&
 		{
-			sprintf (tempStr, "TPS STATE: %s, %s, %s, %s, %s, %d, %d", (const char*)pObject->animModel->myVehicle->Handle, fpTPSPoseKeyStrings[pose], fpTPSMoveKeyStrings[move], fpTPSWeaponKeyStrings[tpsWeaponType], fpTPSPointKeyStrings[point], currentWeapon, (changeMask & gr2AnimTrooper::DEAD) ? 1 : 0);
+			strprintf(tempStr, "TPS STATE: %s, %s, %s, %s, %s, %d, %d", (const char*)pObject->animModel->myVehicle->Handle, fpTPSPoseKeyStrings[pose], fpTPSMoveKeyStrings[move], fpTPSWeaponKeyStrings[tpsWeaponType], fpTPSPointKeyStrings[point], currentWeapon, (changeMask & gr2AnimTrooper::DEAD) ? 1 : 0);
 			rnmainListText (tempStr);
 		}
 	}
@@ -4372,7 +4372,7 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 
 		if (stateTestFlag && !anim->myVehicle->ModelData)
 		{
-			sprintf (tempStr, "%s, %s, %s, %d, %d, %d, %d", fpTPSPoseTypeStrings[pose], fpTPSMoveTypeStrings[move], fpTPSPointTypeStrings[point], weapon, death, emote, altWeapon);
+			strprintf(tempStr, "%s, %s, %s, %d, %d, %d, %d", fpTPSPoseTypeStrings[pose], fpTPSMoveTypeStrings[move], fpTPSPointTypeStrings[point], weapon, death, emote, altWeapon);
 //			rnmainListText (tempStr);
 			Write_Log (LOG_FPS, LOG_INFO, tempStr);
 		}
@@ -5724,7 +5724,7 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 	if (++counter > 10)
 		counter = 0;
 
-	sprintf (buf, "inffoot_%d", counter);
+	strprintf(buf, "inffoot_%d", counter);
 
 	math32To64Vec(&pt1, &V1); mathAddVectors(&pt1, &pt1, &WorldOriginOffset);
 	math32To64Vec(&pt2, &V2); mathAddVectors(&pt2, &pt2, &WorldOriginOffset);

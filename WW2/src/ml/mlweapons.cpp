@@ -389,9 +389,7 @@ UINT32 mlLoadBeltFile(weapWeapon* Weapon,UCHAR* VarContents,SINT32 AmmoGroupNum)
 	if(!Weapon || !VarContents) return 1;
 
 	char Buffer[256];
-
-	// Use 'Buffer' for file name while we open the file.
-	sprintf(Buffer, "vehicles\\ammo\\%s", VarContents);
+	strprintf(Buffer, "vehicles\\ammo\\%s", VarContents);
 	SINT32 File = fioOpen(Buffer);
 	if (File == -1)
 	{

@@ -791,7 +791,6 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	UINT32 longestFileName;
 	UINT32 count;
 	SCHAR  curWorkingDir[MAX_PATH];
-	SCHAR  newWorkingDir[MAX_PATH];
 	SCHAR**  list;
 
 	WIN32_FIND_DATAA findData;
@@ -807,15 +806,7 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 
 	GetCurrentDirectoryA(MAX_PATH, curWorkingDir);
 
-	if (dirToSearch == nullptr)	// searching within the root of the DataPath
-	{
-		sprintf(newWorkingDir, ".\\");
-	}
-	else
-	{
-		sprintf(newWorkingDir, "%s", dirToSearch);
-	}
-
+	const char* newWorkingDir = dirToSearch ? dirToSearch : ".\\";
 	SetCurrentDirectoryA(newWorkingDir);
 
 	fileHandle = FindFirstFileA("*.*", &findData);

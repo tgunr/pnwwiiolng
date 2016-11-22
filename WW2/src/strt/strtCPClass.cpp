@@ -271,7 +271,7 @@ ObjectiveStats::checkSideLimits(WWII_SIDE forSide, UINT32 currentTime)
 			{
 				///LOCALIZE
 				char buf[128];
-				sprintf(buf, "[beta] Too many objectives (%u/%u): grace period", m_cityAttacks[forSide], m_cityLimit);
+				strprintf(buf, "[beta] Too many objectives (%u/%u): grace period", m_cityAttacks[forSide], m_cityLimit);
 				chatSendHCMessage(forSide, LSTR_GENERIC, buf);
 			}
 #endif

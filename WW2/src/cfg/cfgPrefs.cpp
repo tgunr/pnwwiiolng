@@ -298,7 +298,7 @@ bool cfgPrefsLoad()
 	{
 #if platOS == OS_MACOS
 		char path[4192];
-		sprintf(path, "%swwiiol.cfg", macPreferencesPath());
+		strprintf(path, "%swwiiol.cfg", macPreferencesPath());
 #else
 		static const char path[] = "wwiiol.cfg";
 #endif

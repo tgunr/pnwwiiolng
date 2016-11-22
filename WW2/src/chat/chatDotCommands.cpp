@@ -1260,7 +1260,7 @@ public:
 		}
 
 		char response[80];
-		sprintf(response, "Sending you error code #%u", (UINT32)err);
+		strprintf(response, "Sending you error code #%u", (UINT32)err);
 		player.message(LSTR_NOTE, LSTR_GENERIC, response);
 
 		teulSendError(player.teulIndex(), err);

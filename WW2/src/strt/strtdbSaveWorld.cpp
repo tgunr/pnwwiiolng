@@ -164,7 +164,7 @@ WorldSave::_addQueriesSimple(VALUE_MAP& map, const char* format)
 {
 	for ( auto it = map.begin(); it != map.end(); ++it)
 	{
-		sprintf(buffer, format, (UINT64)it->first);
+		strprintf(buffer, format, (UINT64)it->first);
 		_addQueries(it->second);
 	}
 }
@@ -193,7 +193,7 @@ WorldSave::_saveCPs(CATEGORY_MAP& map)
 	{
 		UINT32 country = (UINT32)it->first;
 		UINT32 side = (UINT32)wwiiSide(country);
-		sprintf(buffer, "UPDATE strat_cp SET concountry=%u,conside=%u WHERE cp_oid IN (", country, side);
+		strprintf(buffer, "UPDATE strat_cp SET concountry=%u,conside=%u WHERE cp_oid IN (", country, side);
 		_addQueries(it->second);
 	}
 
@@ -215,7 +215,7 @@ WorldSave::_saveFacs(CATEGORY_MAP& map)
 	{
 		UINT32 country = (UINT32)it->first;
 		UINT32 side = (UINT32)wwiiSide(country);
-		sprintf(buffer, "UPDATE strat_facility SET country=%u,side=%u WHERE facility_oid IN(", country, side);
+		strprintf(buffer, "UPDATE strat_facility SET country=%u,side=%u WHERE facility_oid IN(", country, side);
 		_addQueries(it->second);
 	}
 
@@ -235,13 +235,13 @@ WorldSave::_saveObjs(CATEGORY_MAP& map)
 	{
 		UINT32 country = (UINT32)it->first;
 		UINT32 side = (UINT32)wwiiSide(country);
-		sprintf(buffer, "UPDATE strat_object SET country=%u,side=%u WHERE object_oid IN(", country, side);
+		strprintf(buffer, "UPDATE strat_object SET country=%u,side=%u WHERE object_oid IN(", country, side);
 		_addQueries(it->second);
 	}
 
 	for ( auto it = map[OBJ_CAP].begin(); it != map[OBJ_CAP].end(); ++it )
 	{
-		sprintf(buffer, "UPDATE strat_object SET capacity=%" PR64BitUT ",lastcapacity=%" PR64BitUT " WHERE object_oid IN(", it->first, it->first);
+		strprintf(buffer, "UPDATE strat_object SET capacity=%" PR64BitUT ",lastcapacity=%" PR64BitUT " WHERE object_oid IN(", it->first, it->first);
 		_addQueries(it->second);
 	}
 

@@ -1141,7 +1141,7 @@ int _matherr(struct _exception* except)
 		case _OVERFLOW:
 		case _UNDERFLOW:
 		case _TLOSS:
-			sprintf(s, "math err type: %d, func: %s, args: %f, %f", except->type, except->name,
+			strprintf(s, "math err type: %d, func: %s, args: %f, %f", except->type, except->name,
 													(float)except->arg1, (float)except->arg2);
 			rnmainListText(s);
             //piExitProgram(_FL,s);

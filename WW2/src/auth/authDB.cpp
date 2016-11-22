@@ -444,7 +444,7 @@ _getAppTable()
 			entry.description[0] = 0;
 			row.NextString(entry.description, sizeof(entry.description));
 			if ( entry.description[0] == 0 )
-				sprintf(entry.description, "Unkown Game#%u/%u", entry.appID, entry.gameID);
+				strprintf(entry.description, "Unkown Game#%u/%u", entry.appID, entry.gameID);
 		}
 	}
 	catch (std::exception& e)
@@ -482,7 +482,7 @@ static bool _initAppInfoTable(GAME& gameEntry)
 		gameEntry.appInfo[i].min = gameEntry.curHostVersion;
 	}
 
-	sprintf(statement, QRY_SELECT_HOST_VERSIONS_BY_APPHOST, gameEntry.appID, teulGetAddress(gameEntry.curHostVersion));
+	strprintf(statement, QRY_SELECT_HOST_VERSIONS_BY_APPHOST, gameEntry.appID, teulGetAddress(gameEntry.curHostVersion));
 	try
 	{
 		DBQuery q(dbh, statement);
@@ -575,7 +575,7 @@ _getAppManifest()
 	{
 		for (appNum = 0; appNum < config.numApps; appNum++)
 		{
-			sprintf(statement,
+			strprintf(statement,
 						"SELECT old,new,platform,actionType,webURL,ftpPort,ftpProtocol,ftpURL,ftpDir,ftpFile"
 							",INET_ATON(old) AS sorter"
 							" FROM auth.app_manifest"
@@ -700,7 +700,7 @@ bool authInitGameEntry(GAME& gameEntry)
 		gameEntry.description[0] = 0;
 		row.NextString(gameEntry.description, sizeof(gameEntry.description));
 		if ( gameEntry.description[0] == 0 )
-			sprintf(gameEntry.description, "Unk.Game#%u/%u", gameEntry.gameID, gameEntry.clusterID);
+			strprintf(gameEntry.description, "Unk.Game#%u/%u", gameEntry.gameID, gameEntry.clusterID);
 	}
 	catch ( std::exception& e )
 	{

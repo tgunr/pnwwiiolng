@@ -984,7 +984,7 @@ JS_FUNCTION_DEF(jsGame, saveconvergence)
 	if(jsvehtype)
 	{
 		char buff[256] = {'\0'};
-		sprintf(buff, "convergence.%d", (SINT32)jsvehtype->vehtype->WeaponSpec.asUINT16());
+		strprintf(buff, "convergence.%d", (SINT32)jsvehtype->vehtype->WeaponSpec.asUINT16());
 
 		if(isDirty == 1)		// Is there a pending convergence setting change?
 			cfgPrefsSetInt(buff, value);
@@ -1036,7 +1036,7 @@ JS_FUNCTION_DEF(jsGame, getconvergence)
 			UINT16 key = jsvehtype->vehtype->WeaponSpec.asUINT16();
 
 			char buff[256] = {'\0'};
-			sprintf(buff, "convergence.%d", (SINT32)key);
+			strprintf(buff, "convergence.%d", (SINT32)key);
 
 			value = cfgPrefsGetInt(buff, (SINT32)Convergence);
 

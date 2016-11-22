@@ -7561,7 +7561,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		if (!trnldrFindStratObjectPosition(SpawnSuperCellX,  SpawnSuperCellY, SpawnLocId, &Pos))
 		{
 			char s[128];
-			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
+			strprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
 			piExitProgram(_FL,s);
 		}
@@ -7600,7 +7600,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		if (!trnldrFindStratObjectPosition(SpawnSuperCellX,  SpawnSuperCellY, SpawnLocId, &Pos))
 		{
 			char s[128];
-			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
+			strprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
 			piExitProgram(_FL,s);
 		}
@@ -7642,7 +7642,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		if (!trnldrFindStratObjectPosition(SpawnSuperCellX,  SpawnSuperCellY, SpawnLocId, &Pos))
 		{
 			char s[128];
-			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
+			strprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
 			piExitProgram(_FL,s);
 		}
@@ -7697,8 +7697,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 			if (SpawnPtr == nullptr)
 			{
 				char s[128];
-
-				sprintf(s,"Cannot find spawn object for scx = %d, scy = %d, id = %d",
+				strprintf(s,"Cannot find spawn object for scx = %d, scy = %d, id = %d",
 							SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
 				piExitProgram(_FL,s);
 			}

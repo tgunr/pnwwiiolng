@@ -3818,7 +3818,7 @@ void VehicleSTO::load()
     const UCHAR* name = vehtypeGetByIndex(getVehicleTypeNum())->Shape;
 
 	char buf[150];
-    sprintf(buf, "[activate] %s id:%d, veh:%s", type() == _HULK ? "HULK" : "STO", (int)uid(), name);
+    strprintf(buf, "[activate] %s id:%d, veh:%s", type() == _HULK ? "HULK" : "STO", (int)uid(), name);
 	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, uiUTF8toUTF16(buf));
 #endif
 }
@@ -3831,7 +3831,7 @@ void VehicleSTO::deactivate()
     const UCHAR* name = vehtypeGetByIndex(getVehicleTypeNum())->Shape;
 
 	char buf[150];
-    sprintf(buf, "[deactivate] %s id:%d, veh:%s", type() == _HULK ? "HULK" : "STO", (int)uid(), name);
+    strprintf(buf, "[deactivate] %s id:%d, veh:%s", type() == _HULK ? "HULK" : "STO", (int)uid(), name);
 	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, uiUTF8toUTF16(buf));
 #endif
 
@@ -6475,7 +6475,7 @@ static void vehmainSpawn()
 	UINT16 key = pVehicle->VehicleType->WeaponSpec.asUINT16();
 
 	char buff[256] = {'\0'};
-	sprintf(buff, "convergence.%d", (SINT32)key);
+	strprintf(buff, "convergence.%d", (SINT32)key);
 
 	// set our vehicle's convergence
 	persGunsightSetConvergenceRange((FLOAT32)cfgPrefsGetInt(buff, (SINT32)Convergence));
@@ -6504,7 +6504,7 @@ static void _reportEnemyAircraft(vehVehicle* CurrentVehicle)
 	if(clockangle < 1) clockangle = 12+clockangle;
 
     char buf[64];
-    sprintf(buf, "Enemy aircraft spotted at %d o'clock.", clockangle);
+    strprintf(buf, "Enemy aircraft spotted at %d o'clock.", clockangle);
 	uiChatPrintLineIcon(icons, colorREDALPHA, uiUTF8toUTF16(buf));
 
     if(g_wantMessageAlert)

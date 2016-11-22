@@ -110,22 +110,22 @@ static void LogRainTimes()
         char minute[16] = {0};
         char second[16] = {0};
 
-        sprintf(hour, hr < 10 ? "0%d:" : "%d:", hr);
-        sprintf(minute, mn < 10 ? "0%d:" : "%d:", mn);
-        sprintf(second, sc < 10 ? "0%d" : "%d", sc);
+        strprintf(hour, hr < 10 ? "0%d:" : "%d:", hr);
+        strprintf(minute, mn < 10 ? "0%d:" : "%d:", mn);
+        strprintf(second, sc < 10 ? "0%d" : "%d", sc);
 
         std::string str = "Rain Time: ";
         str += hour;
         str += minute;
         str += second;
-        char buff[64] = {0};
+        char buff[80] = {0};
 
         t = rainlength[i];
 
         mn = t / 60;
         sc = t - mn * 60;
 
-        sprintf(buff, " lasting for %d minutes and %d seconds.", mn, sc);
+        strprintf(buff, " lasting for %d minutes and %d seconds.", mn, sc);
         str += buff;
 
         Write_Debug(str.c_str());

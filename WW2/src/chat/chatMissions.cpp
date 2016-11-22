@@ -484,13 +484,13 @@ _getWaypointTypePrefix(char* const p, WP_TYPE type, UINT32 subType)
 static ChatHandle
 _getHandle(ChatMission& mission, const Waypoint& waypoint)
 {
-	char wpname[6] = "\0\0\0\0\0";
+	char wpname[MAX_HANDLE_SIZE] = { 0 };
 	char* p = wpname;
 
 	p = _getWaypointTypePrefix(p, waypoint.type(), (UINT32)waypoint.subType());
 
 	UCHAR& counter = mission.m_waypointNo[waypoint.type()];
-	sprintf(p, "%X", ++counter);
+	strprintf(p, "%X", ++counter);
 	counter %= 31;
 
 	return chatGetHandle(wpname);

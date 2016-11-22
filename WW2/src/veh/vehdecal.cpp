@@ -92,8 +92,7 @@ int vehdecalInit()
 	while(1)
 	{
 		char buff[64];
-
-		sprintf(buff, "vehicles/decals/personal/%d.dds", count++);
+		strprintf(buff, "vehicles/decals/personal/%d.dds", count++);
 		int id = ldddsLoadDDSTexture(buff, GL_TEXTURE_2D, 0);
 
 		// Load textures old way for troopers.

@@ -166,7 +166,7 @@ void DotCommand::catIntToText(const UINT32 value, char *dest) const
    while (*dest++ != 0);
 
    // append the integer
-   sprintf(istring, "%u", value);
+   strprintf(istring, "%u", value);
 
    dbugLog(_FLD, "Appending value %u to istring: %s", value, istring);
 

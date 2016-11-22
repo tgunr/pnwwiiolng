@@ -265,7 +265,7 @@ strtReportDataErrors(UINT32 level)
 //			if ( errorLimit > 0 && level > 0 && errorMap.size() > errorLimit + 10 && reportNo >= errorLimit )
 //			{
 //				char conclusion[80];
-//				sprintf(conclusion, "{ %u more occurances skipped }", (UINT32)(errorMap.size() - reportNo));
+//				strprintf(conclusion, "{ %u more occurances skipped }", (UINT32)(errorMap.size() - reportNo));
 //				list += conclusion;
 //				break;
 //			}
