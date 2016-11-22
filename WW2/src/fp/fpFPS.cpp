@@ -5418,7 +5418,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
-				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
+				PlayerPlacedSTO* ppo = reinterpret_cast<PlayerPlacedSTO*>(sto);
 				ppo->leave();
 			}
 
@@ -5431,7 +5431,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
-				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
+				PlayerPlacedSTO* ppo = reinterpret_cast<PlayerPlacedSTO*>(sto);
 				ppo->enter();
 
 				_ppoLastHit = ppoHit;
