@@ -222,7 +222,7 @@ ObjectiveStats::checkLimits(UINT32 currentTime)
 	calculate();
 
 	// Step #1 - save the damn things :)
-#if !defined(TRAINING_SERVER) && !defined(FRES)
+#if !defined(TRAINING_SERVER)
 	save();
 
 	// Now check the stats of both sides to see if they're valid

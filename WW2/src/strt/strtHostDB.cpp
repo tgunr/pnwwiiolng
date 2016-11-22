@@ -605,7 +605,7 @@ strtInitHostDB()
 void
 strtSaveFactoryOutput(ObjectStruct* factory)
 {
-#if defined(TRAINING_SERVER) || defined(DEV_BUILD) || defined(FRES)
+#if defined(TRAINING_SERVER) || defined(DEV_BUILD)
 	return;
 #else
 	if ( host_config.arena.intermission > 0 || factory == nullptr )
@@ -656,7 +656,7 @@ strtSaveFactoryOutput(ObjectStruct* factory)
 void
 ObjectiveStats::save()
 {
-#if !defined(TRAINING_SERVER) && !defined(FRES) && !defined(DEV_BUILD)
+#if !defined(TRAINING_SERVER) && !defined(DEV_BUILD)
 	static const UINT32 OBJECTIVE_STAT_SAVE_INTERVAL = 600;	// Save after this many seconds
 	static UINT32 nextSaveTime = teulTime();					// First time round, save now
 

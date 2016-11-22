@@ -6761,32 +6761,6 @@ void vehVehicle::clear()
 
 }
 
-#if defined(FRES)
-static ChatHandle FRESuser;
-static int FRESposition;
-
-void vehFRESSetVehicle(const char* username)
-{
-	FRESuser = chatGetHandle(username);
-}
-
-void vehFRESSetCameraPosition(int position)
-{
-	FRESposition = position;
-}
-
-int vehFRESCameraPosition()
-{
-	return FRESposition;
-}
-
-vehVehicle* vehFRESParentVehicle()
-{
-	return vehFindVehicleByChatHandle(FRESuser);
-}
-
-#endif
-
 #include "physics/physicsMain.h"
 
 void vehmainCreateODECollider(vehVehicle* veh)

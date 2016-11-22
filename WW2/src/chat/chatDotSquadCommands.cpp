@@ -346,7 +346,7 @@ DotWho::actionWith(Player& player, Chat::ClientMessage* /*message*/, char* argum
 void
 DotWho::action(Player& player, Chat::ClientMessage* /*message*/) const
 {
-#if !defined(BETA_RELEASE) && !defined(TEST_RELEASE) && !defined(TRAINING_SERVER) && !defined(FRES)
+#if !defined(BETA_RELEASE) && !defined(TEST_RELEASE) && !defined(TRAINING_SERVER)
 	if ( player.squadID() == 0 )
 	{
 		player.message(LSTR_CAUTION, LSTR_NO_SQUAD, NULL, NULL);
@@ -368,7 +368,7 @@ DotWho::action(Player& player, Chat::ClientMessage* /*message*/) const
 	for ( it = playerIndex.begin(); count < listLimit && it != playerIndex.end(); ++it )
 	{
 		const Player* subject = it->second;
-#if !defined(BETA_RELEASE) && !defined(TEST_RELEASE) && !defined(TRAINING_SERVER) && !defined(FRES)
+#if !defined(BETA_RELEASE) && !defined(TEST_RELEASE) && !defined(TRAINING_SERVER)
 		if ( !subject->inSquad(&player) )
 			continue;
 #endif // !BETA_RELEASE

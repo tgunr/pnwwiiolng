@@ -228,7 +228,7 @@ mapInitDB()
 
 	wwiiReadRanks();
 
-#if !defined(DEV_BUILD) && !defined(FRES)
+#if !defined(DEV_BUILD)
 	mapPollChecksums(true);
 #endif
 

@@ -36,7 +36,6 @@ static void
 _areaKillNotice(const Scoring::Sortie& victim, const Scoring::Sortie& killer)
 {
 /*
-#if !defined(CHINA) && !defined(HAPPYOO)
 	if ( ! host_config.kills.notifyKiller )
 		return;
 	if ( victim.spec().wCategory != _INFANTRY && victim.spec().wCategory != _GROUND_VEHICLE )
@@ -73,7 +72,6 @@ _areaKillNotice(const Scoring::Sortie& victim, const Scoring::Sortie& killer)
 	snprintf(kill, 127, fmt, victimName, killerName);
 
 	chatEmitMessageFromPlayer(activePlayer->playerID(), LSTR_CAUTION, LSTR_GENERIC, kill, "");
-#endif
 */
 }
 

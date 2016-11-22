@@ -826,9 +826,7 @@ char GetOSBuild()
 #endif
 
 #ifndef BETA_RELEASE
-#if FRES
     fioSet(ISDIRECTORY);
-#else
 #ifdef ANTIHACK
 	checksum = new Hideaway(*storage1);
     checksum->set(diddle_crc((const unsigned char*)(
@@ -838,7 +836,6 @@ char GetOSBuild()
 #endif
     fioSet(ISARCHIVE);
 	AddArchives();
-#endif // FRES
 #else
 
 	if(WantDataDir)
