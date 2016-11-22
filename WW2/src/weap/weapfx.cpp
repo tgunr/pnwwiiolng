@@ -1055,9 +1055,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 						DoHitSound(&Pos,(FLOAT32)KE,"fps");
 					}
 
-#if IS_CHINA // Ticket # 5888
 					if(WantBloodEffects)
-#endif
 					{
 						Vec3f n;
 
