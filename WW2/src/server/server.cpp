@@ -1895,9 +1895,6 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 	Server::serverType = myType;
 	Teul::SetAppName(appName);
 
-	// Windows requires us to enable networking (WSAStartup) early on
-	Teul::InitializeWinsock();
-
 	// Read in the environment.
 	Teul::ConfigVar::InitializeConfigVars();
 
