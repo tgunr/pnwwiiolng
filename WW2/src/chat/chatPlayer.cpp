@@ -84,7 +84,7 @@ using AWS_INSTANCES = std::map<instanceid_t, AWS_GRID>;
 AWS_INSTANCES g_awsGrids, g_awsSnapshots;
 
 // Decal saving
-static const char* const _DECAL_UPDATE_PREFIX = "INSERT INTO `player`.`players` (id,player_decal)VALUES";
+static const char* const _DECAL_UPDATE_PREFIX = "INSERT INTO `wwiionline`.`wwii_player` (playerid,player_decal) VALUES";
 static const char* const _DECAL_UPDATE_SUFFIX = "ON DUPLICATE KEY UPDATE player_decal=values(player_decal)";
 ThreadTextQuery _decalUpdates(DBThread::Default, _DECAL_UPDATE_PREFIX, _DECAL_UPDATE_SUFFIX);
 
