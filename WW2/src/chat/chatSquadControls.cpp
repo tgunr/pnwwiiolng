@@ -37,7 +37,7 @@ _audit(UINT32 squadID, UINT32 action
 		, std::string text="")
 {
 	if ( !text.empty() )
-	DBThread::EscapeString(text);
+		DBThread::EscapeString(text);
 
 	DBThread::Do(DBThread::Default
 		, "INSERT INTO wwii_squad_audit"
