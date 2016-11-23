@@ -232,7 +232,6 @@ static void 	_SortDeviceList(pRecDevice*, UINT32 numDevices);
 static void 	_AssignDeviceNumbers(pRecDevice*, UINT32 numDevices, UINT32* ids, UINT32 numIDs);
 static void 	_LoadAxisCalibration(HID_ELEMENT*, int pos);
 static void 	_LoadJoystickIDs(UINT32* ids);
-static UINT32 	_vcodeToIAC(UINT32 vcode);
 
 static const KEYCODE_MAP_ELEM* _lookupElemByASCII(UINT32 ascii);
 static const KEYCODE_MAP_ELEM* _lookupElemByDIK(UINT32 dik);
@@ -1180,34 +1179,6 @@ void _LoadJoystickIDs(UINT32* ids)
 		ids[i] = [[NSUserDefaults standardUserDefaults]	
               integerForKey:[NSString stringWithFormat:@"joy%d", i+1]];
 	}
-}
-
-static UINT32 _vcodeToIAC(UINT32 vcode)
-{
-	static UINT32 state = 0;
-	static 	void* kptr = NULL;
-  
-	UINT32 iac, keytrans;
-	UCHAR c;
-	
-	iac = 0;
-	
-	if(!kptr)
-		kptr  = (void*)GetScriptManagerVariable(smKCHRCache);
-  
-	if(_DIKtoASCII[vcode]) // NOTE: this assumes that all ASCII keys are always grouped in the same spot on the keyboard
-	{
-		keytrans = KeyTranslate(kptr, vcode, (unsigned long*)&state);
-		c = ((UCHAR*)&keytrans)[3];
-		
-		if(isascii(c) && c < MAX_KEYS)
-			iac = _ASCIItoIAC[c];
-	}
-  
-	if(iac == 0)
-		iac  = _DIKtoIAC[vcode];
-  
-	return iac;	
 }
 
 static const KEYCODE_MAP_ELEM* _lookupElemByDIK(UINT32 dik)

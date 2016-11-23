@@ -3,14 +3,13 @@
 
 #include "mem/mem.h"
 #include "str/strdupptr.h"
+#include "teul/teulBasic.h"
 #include "teul/teulConfigVar.h"
 #include "include/io_mapped_file.h"
 
 #if platOS == OS_WIN32
 #include "Shlobj.h"
 #endif
-
-extern bool teulGetHost(const SCHAR* address, UINT32* host);
 
 #ifndef PN_PLAYNET_PATH
 #error "PN_PLAYNET_PATH not defined."
@@ -380,6 +379,9 @@ namespace Teul
 {
 	void ConfigVar::InitializeConfigVars()
 	{
+		// Windows needs to have WinSock initialized to be able to
+		// resolve names for addresses.
+		Teul::InitializeWinsock();
 		for (auto& it : _getConfigVars())
 		{
 			it->Initialize();

@@ -513,18 +513,14 @@ SINT32	dbugGetErrno()
 #endif
 }
 
-// Believe it or not, we need this on macOS as well, because the OS-provided
-// basename() in <libgen.h> is NOT const with respect to its input, which is
-// just... yanno, bad.
-#if platOS == OS_WIN32 || platOS == OS_MACOS // should really be a check for 'basename'
-static const char* basename(const char* const filepath) noexcept
+// OS-provided basename() on POSIX systems is bad.
+static const char* sane_basename(const char* const filepath) noexcept
 {
 	const char* slash = strrchr(filepath, '\\');
 	if (PN_UNLIKELY(!slash))
 		slash = strrchr(filepath, '/');
 	return PN_LIKELY(slash) ? slash + 1 : filepath;
 }
-#endif
 
 // _dbugLogPrivate: if the current filename, lineno or string is nullptr then it
 // sets these members.  The parameters are output as a string to the debug
@@ -565,7 +561,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 							, tm->tm_min
 							, tm->tm_sec
 							, (UINT32)(teulClock64 % 1000)
-							, basename(filename)
+							, sane_basename(filename)
 							, lineno
 							, stl_threadId.m_id);
 

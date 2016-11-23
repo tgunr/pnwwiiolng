@@ -1123,29 +1123,23 @@ PlayerPlacedObject* fpPPOGet()
   The user has elected to switch to the next PPO type.
   Usually due to pressing the mapped "cycle ammo" key <BKSP> default.
  */
-void fpPPOSwitchPPO(bool adjust)
-{
-	// don't bother doing a thing unless we have more than one choice
-	if (activePPOList.size() > 1)
-	{
-
-        PPOCallback up = nullptr, ex = nullptr, val = nullptr;
-		if (_placedObject)
-        {
-            up = _placedObject->updateCallback;
-            ex = _placedObject->executeCallback;
-            val = _placedObject->validityCallback;
+void fpPPOSwitchPPO(bool adjust) {
+	if ( activePPOList.size() ) {
+		PPOCallback up = nullptr, ex = nullptr, val = nullptr;
+		if ( _placedObject ) {
+			up = _placedObject->updateCallback;
+			ex = _placedObject->executeCallback;
+			val = _placedObject->validityCallback;
 			fpPPOKill(false);
-        }
-
-		if (adjust)
-		{
-			if (++activePPOIndex == activePPOList.size())
-				activePPOIndex = 0;
 		}
 
-		fpPPOSet(fpPPOCreate(activePPOList[activePPOIndex]->id, up, ex, val));
+		if ( adjust )
+			++activePPOIndex;
 
+		if ( activePPOIndex >= activePPOList.size() )
+			activePPOIndex = 0;
+
+		fpPPOSet(fpPPOCreate(activePPOList[activePPOIndex]->id, up, ex, val));
 	}
 }
 

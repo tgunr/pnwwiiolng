@@ -937,7 +937,9 @@ extern NSString *WebActionOriginalURLKey;
             
         case WAIT_LOGIN:
             dispatch_source_cancel(teulTimer);
+#ifndef __LP64__
             dispatch_release(teulTimer);
+#endif
             teulTimer = nullptr;
             
             if (isConnectedToAuthenticationServer) {
