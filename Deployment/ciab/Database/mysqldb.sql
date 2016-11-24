@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.7.12, for Win64 (x86_64)
 -- Host: localhost    Database: audit
--- ------------------------------------------------------ Server version  5.7.16-log
+-- ------------------------------------------------------ Server version	5.7.16-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -12,6 +12,20 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
+DROP USER IF EXISTS 'wwiiol'@'localhost';
+DROP USER IF EXISTS 'wwiiol'@'%';
+DROP USER IF EXISTS 'authuser'@'localhost';
+DROP USER IF EXISTS 'authuser'@'%';
+CREATE USER 'wwiiol'@'localhost' IDENTIFIED BY 'freebird';
+GRANT ALL PRIVILEGES ON *.* TO 'wwiiol'@'localhost' WITH GRANT OPTION;
+CREATE USER 'authuser'@'localhost' IDENTIFIED BY 'scalar449';
+GRANT ALL PRIVILEGES ON *.* TO 'wwiiol'@'localhost' WITH GRANT OPTION;
+CREATE USER 'wwiiol'@'%' IDENTIFIED BY 'freebird';
+GRANT ALL PRIVILEGES ON *.* TO 'wwiiol'@'%';
+CREATE USER 'authuser'@'%' IDENTIFIED BY 'scalar449';
+GRANT ALL PRIVILEGES ON *.* TO 'authuser'@'%';
 
 -- Current Database: `audit`
 
@@ -490,6 +504,17 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/ `wwiionline` /*!40100 DEFAULT CHARACTER
 
 USE `wwiionline`;
 
+DROP TABLE IF EXISTS `brigade_move_results`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `brigade_move_results` (
+  `result` int(11) unsigned NOT NULL,
+  `description` varchar(16) DEFAULT NULL,
+  `veto_code` varchar(8) DEFAULT NULL,
+  PRIMARY KEY (`result`)
+) ENGINE=MyISAM DEFAULT CHARSET=ucs2;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 DROP TABLE IF EXISTS `chat_commands`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -753,6 +778,21 @@ CREATE TABLE `mission_eggs` (
   PRIMARY KEY (`callsign`),
   UNIQUE KEY `callsign` (`callsign`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+DROP TABLE IF EXISTS `move_requests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `move_requests` (
+  `recorded` datetime NOT NULL,
+  `requester` char(10) NOT NULL,
+  `action` mediumint(3) unsigned DEFAULT '0',
+  `unit_id` int(11) unsigned DEFAULT NULL,
+  `from_cp_oid` int(11) unsigned DEFAULT NULL,
+  `to_cp_oid` int(11) unsigned DEFAULT NULL,
+  `result` int(11) DEFAULT NULL,
+  KEY `smr_recorded` (`recorded`)
+) ENGINE=MyISAM DEFAULT CHARSET=ucs2;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 DROP TABLE IF EXISTS `player_note_types`;
@@ -1189,6 +1229,37 @@ CREATE TABLE `strat_supercell` (
   `added` datetime DEFAULT NULL,
   PRIMARY KEY (`sc_oid`),
   UNIQUE KEY `scx` (`scx`,`scy`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+-- Temporary view structure for view `v_last_captures`
+
+DROP TABLE IF EXISTS `v_last_captures`;
+/*!50001 DROP VIEW IF EXISTS `v_last_captures`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE VIEW `v_last_captures` AS SELECT 
+ 1 AS `time`,
+ 1 AS `ctry`,
+ 1 AS `call`,
+ 1 AS `fac`,
+ 1 AS `con`,
+ 1 AS `cp_oid`,
+ 1 AS `facility_oid`*/;
+SET character_set_client = @saved_cs_client;
+
+DROP TABLE IF EXISTS `wthr_report`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `wthr_report` (
+  `real_start` datetime NOT NULL COMMENT 'Real-world time of start',
+  `game_day` int(11) unsigned NOT NULL COMMENT 'Game day number',
+  `start_time` int(11) unsigned NOT NULL COMMENT 'In-game start time',
+  `weather_pattern` int(11) unsigned NOT NULL COMMENT 'Weather (sky) pattern',
+  `rain_pattern` int(11) unsigned NOT NULL COMMENT 'Rain pattern (if applicable)',
+  `weather_forecast` int(11) unsigned NOT NULL COMMENT 'Prediction for tomorrow',
+  PRIMARY KEY (`real_start`),
+  UNIQUE KEY `real_start` (`real_start`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1964,71 +2035,231 @@ INSERT INTO `wwii_vehtype` VALUES (1,1,1,2,1,'Spitfire Mk Ia','2016-11-11 03:37:
 UNLOCK TABLES;
 
 -- Dumping routines for database 'wwiionline'
+/*!50003 DROP FUNCTION IF EXISTS `schema_exists` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = cp850 */ ;
+/*!50003 SET character_set_results = cp850 */ ;
+/*!50003 SET collation_connection  = cp850_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`wwiiol`@`localhost` FUNCTION `schema_exists`(sch TEXT) RETURNS int(11)
+BEGIN
+    RETURN EXISTS (
+        SELECT  NULL
+          FROM  `information_schema`.`schemata`
+         WHERE  `schema_name` = sch
+         LIMIT  1
+    );
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `table_exists` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = cp850 */ ;
+/*!50003 SET character_set_results = cp850 */ ;
+/*!50003 SET collation_connection  = cp850_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`wwiiol`@`localhost` FUNCTION `table_exists`(sch TEXT, tab TEXT) RETURNS int(11)
+BEGIN
+    RETURN EXISTS (
+        SELECT  NULL
+          FROM  `information_schema`.`tables`
+         WHERE  `table_schema` = sch
+           AND  `table_name` = tab
+         LIMIT  1
+    );
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `view_exists` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = cp850 */ ;
+/*!50003 SET character_set_results = cp850 */ ;
+/*!50003 SET collation_connection  = cp850_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`wwiiol`@`localhost` FUNCTION `view_exists`(sch TEXT, vw TEXT) RETURNS int(11)
+BEGIN
+    RETURN EXISTS (
+        SELECT  NULL
+          FROM  `information_schema`.`views`
+         WHERE  `table_schema` = sch
+           AND  `table_name` = vw
+         LIMIT  1
+    );
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `move_table` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = cp850 */ ;
+/*!50003 SET character_set_results = cp850 */ ;
+/*!50003 SET collation_connection  = cp850_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`wwiiol`@`localhost` PROCEDURE `move_table`(fsch TEXT, ftab TEXT, tsch TEXT, ttab TEXT)
+    MODIFIES SQL DATA
+    SQL SECURITY INVOKER
+move_table:BEGIN
+    DECLARE _stmt TEXT;
 
--- Current Database: `strat`
+    IF NOT tsch > '' THEN SELECT fsch INTO tsch; END IF;
+    IF NOT ttab > '' THEN SELECT ftab INTO ttab; END IF;
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `strat` /*!40100 DEFAULT CHARACTER SET utf8 */;
+    SET @operation := CONCAT(fsch,'.',ftab, " to ", tsch,'.',ttab);
 
-USE `strat`;
+    IF NOT wwiionline.table_exists(fsch, ftab) THEN
+        IF wwiionline.table_exists(tsch, ttab) THEN
+            SELECT CONCAT(@operation, " skipped: already done?")
+                AS Info;
+        ELSE
+	        SELECT CONCAT(@operation, " failed: source does not exist.")
+	            AS Warning;
+        END IF;
+        LEAVE move_table;
+    END IF;
 
-DROP TABLE IF EXISTS `brigade_move_results`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `brigade_move_results` (
-  `result` int(11) unsigned NOT NULL,
-  `description` varchar(16) DEFAULT NULL,
-  `veto_code` varchar(8) DEFAULT NULL,
-  PRIMARY KEY (`result`)
-) ENGINE=MyISAM DEFAULT CHARSET=ucs2;
-/*!40101 SET character_set_client = @saved_cs_client */;
+    IF wwiionline.table_exists(tsch, ttab) THEN
+        SELECT CONCAT("Can't move ", @operation, ": destination exists.")
+            AS Note;
+        LEAVE move_table;
+    END IF;
 
-DROP TABLE IF EXISTS `move_requests`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `move_requests` (
-  `recorded` datetime NOT NULL,
-  `requester` char(10) NOT NULL,
-  `action` mediumint(3) unsigned DEFAULT '0',
-  `unit_id` int(11) unsigned DEFAULT NULL,
-  `from_cp_oid` int(11) unsigned DEFAULT NULL,
-  `to_cp_oid` int(11) unsigned DEFAULT NULL,
-  `result` int(11) DEFAULT NULL,
-  KEY `smr_recorded` (`recorded`)
-) ENGINE=MyISAM DEFAULT CHARSET=ucs2;
-/*!40101 SET character_set_client = @saved_cs_client */;
+    SELECT CONCAT("Moving ", @operation)
+        AS Info;
+    SET @stmt := CONCAT(
+            'ALTER TABLE `', fsch, '`.`', ftab,
+            '` RENAME `', tsch, '`.`', ttab, '`'
+    );
+    PREPARE _stmt FROM @stmt;
+    EXECUTE _stmt;
+    DEALLOCATE PREPARE _stmt;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `move_view` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = cp850 */ ;
+/*!50003 SET character_set_results = cp850 */ ;
+/*!50003 SET collation_connection  = cp850_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`wwiiol`@`localhost` PROCEDURE `move_view`(fsch TEXT, fvw TEXT, tsch TEXT, tvw TEXT)
+    MODIFIES SQL DATA
+    SQL SECURITY INVOKER
+move_view:BEGIN
+    DECLARE _stmt TEXT;
+    DECLARE _definer VARCHAR(128);
+    DECLARE _invoker VARCHAR(128);
+    DECLARE _definition TEXT;
 
--- Temporary view structure for view `v_last_captures`
+    IF NOT tsch > '' THEN SELECT fsch INTO tsch; END IF;
+    IF NOT tvw > '' THEN SELECT fvw INTO tvw; END IF;
 
-DROP TABLE IF EXISTS `v_last_captures`;
-/*!50001 DROP VIEW IF EXISTS `v_last_captures`*/;
-SET @saved_cs_client     = @@character_set_client;
-SET character_set_client = utf8;
-/*!50001 CREATE VIEW `v_last_captures` AS SELECT 
- 1 AS `time`,
- 1 AS `ctry`,
- 1 AS `call`,
- 1 AS `fac`,
- 1 AS `con`,
- 1 AS `cp_oid`,
- 1 AS `facility_oid`*/;
-SET character_set_client = @saved_cs_client;
+    SET @operation := CONCAT(fsch,'.',fvw, " to ", tsch,'.',tvw);
 
-DROP TABLE IF EXISTS `wthr_report`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `wthr_report` (
-  `real_start` datetime NOT NULL COMMENT 'Real-world time of start',
-  `game_day` int(11) unsigned NOT NULL COMMENT 'Game day number',
-  `start_time` int(11) unsigned NOT NULL COMMENT 'In-game start time',
-  `weather_pattern` int(11) unsigned NOT NULL COMMENT 'Weather (sky) pattern',
-  `rain_pattern` int(11) unsigned NOT NULL COMMENT 'Rain pattern (if applicable)',
-  `weather_forecast` int(11) unsigned NOT NULL COMMENT 'Prediction for tomorrow',
-  PRIMARY KEY (`real_start`),
-  UNIQUE KEY `real_start` (`real_start`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
+    IF NOT wwiionline.view_exists(fsch, fvw) THEN
+        IF wwiionline.view_exists(tsch, tvw) THEN
+            SELECT CONCAT(@operation, " skipped: already done?")
+                AS Info;
+        ELSE
+	        SELECT CONCAT(@operation, " failed: source does not exist.")
+	            AS Warning;
+        END IF;
+        LEAVE move_view;
+    END IF;
 
--- Dumping routines for database 'strat'
+    IF wwiionline.view_exists(tsch, tvw) THEN
+        SELECT CONCAT("Can't move ", @operation, ": destination exists.")
+            AS Note;
+        LEAVE move_view;
+    END IF;
+
+    SELECT CONCAT("Moving ", @operation)
+        AS Info;
+    SELECT `definer`, `security_type`, `view_definition` INTO _definer, _invoker, _definition
+      FROM `information_schema`.`views`
+     WHERE `table_schema` = fsch AND `table_name` = `fvw`
+     LIMIT 1;
+    SET @stmt := CONCAT(
+            "CREATE DEFINER = '",_definer,"'",
+            " SQL SECURITY ", _invoker,
+            " VIEW `",tsch,"`.`",tvw,"`",
+            " AS ", _definition
+    );
+    PREPARE _stmt FROM @stmt;
+    EXECUTE _stmt;
+    DEALLOCATE PREPARE _stmt;
+    SET @stmt := CONCAT("DROP VIEW `",fsch,"`.`",fvw,"`");
+    PREPARE _stmt FROM @stmt;
+    EXECUTE _stmt;
+    DEALLOCATE PREPARE _stmt;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `upgrade_game_schema` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = cp850 */ ;
+/*!50003 SET character_set_results = cp850 */ ;
+/*!50003 SET collation_connection  = cp850_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`wwiiol`@`localhost` PROCEDURE `upgrade_game_schema`()
+    MODIFIES SQL DATA
+    SQL SECURITY INVOKER
+BEGIN
+	IF wwiionline.schema_exists('strat') THEN
+		SELECT CONCAT("Depopulating `strat` -> `wwiionline`")
+			AS Note;
+    	CALL wwiionline.move_table('strat', 'brigade_move_results', 'wwiionline', '');
+    	CALL wwiionline.move_table('strat', 'move_requests', 'wwiionline', '');
+    	CALL wwiionline.move_table('strat', 'wthr_report', 'wwiionline', '');
+    	CALL wwiionline.move_view('strat', 'v_last_captures', 'wwiionline', '');
+    	DROP SCHEMA IF EXISTS `strat`;
+    ELSE
+    	SELECT CONCAT("`strat` schema already removed.")
+    		AS Info;
+    END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 -- Current Database: `auth`
 
@@ -3482,8 +3713,8 @@ BEGIN
      ,  pl.player_decal
      ,  s.squadID
      ,  s.short_name
-     ,  0  -- was minor seconds used
-     ,  0  -- was minute_balance
+     ,  0  
+     ,  0  
     FROM  wwiionline.wwii_player pl
       LEFT JOIN wwiionline.wwii_persona p ON (pl.playerid = p.playerid)
         LEFT OUTER JOIN wwiionline.wwii_squads s ON (pl.squadID = s.squadID AND s.disbanded = 0)
@@ -3693,22 +3924,18 @@ USE `audit`;
 
 USE `wwiionline`;
 
--- Current Database: `strat`
-
-USE `strat`;
-
 -- Final view structure for view `v_last_captures`
 
 /*!50001 DROP VIEW IF EXISTS `v_last_captures`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
 /*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8 */;
-/*!50001 SET character_set_results     = utf8 */;
-/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 SET character_set_client      = cp850 */;
+/*!50001 SET character_set_results     = cp850 */;
+/*!50001 SET collation_connection      = cp850_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`wwiiol`@`localhost` SQL SECURITY INVOKER */
-/*!50001 VIEW `v_last_captures` AS select from_unixtime(`cap`.`started_at`) AS `time`,`cap`.`cust_country` AS `ctry`,if((`p`.`callsign` is not null),`p`.`callsign`,'') AS `call`,`f`.`name` AS `fac`,`cap`.`contention` AS `con`,`f`.`cp_oid` AS `cp_oid`,`f`.`facility_oid` AS `facility_oid` from ((`wwiionline`.`strat_facility` `f` join `wwiionline`.`strat_captures` `cap` on((`f`.`facility_oid` = `cap`.`facility_oid`))) left join `wwiionline`.`wwii_player` `p` on((`cap`.`customerID` = `p`.`playerid`))) where (`cap`.`state` = 2) order by `cap`.`capUID` desc */;
+/*!50013 DEFINER=`wwiiol@localhost`@`%` SQL SECURITY INVOKER */
+/*!50001 VIEW `v_last_captures` AS select from_unixtime(`cap`.`started_at`) AS `time`,`cap`.`cust_country` AS `ctry`,if((`p`.`callsign` is not null),`p`.`callsign`,'') AS `call`,`f`.`name` AS `fac`,`cap`.`contention` AS `con`,`f`.`cp_oid` AS `cp_oid`,`f`.`facility_oid` AS `facility_oid` from ((`strat_facility` `f` join `strat_captures` `cap` on((`f`.`facility_oid` = `cap`.`facility_oid`))) left join `wwii_player` `p` on((`cap`.`customerID` = `p`.`playerid`))) where (`cap`.`state` = 2) order by `cap`.`capUID` desc */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -3814,4 +4041,4 @@ USE `toe`;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-23 23:21:04
+-- Dump completed on 2016-11-24 14:21:36
