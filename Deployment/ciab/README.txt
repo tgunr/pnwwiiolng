@@ -1,5 +1,10 @@
 Cluster In A Box Boostrap Process:
 
+NOTE:
+  This is a work in progress. Windows users, please see 'README-WIN.bat'.
+
+DEVELOPERS:
+
 1. Build the server binaries,
   e.g
    user:wwiiolng/$ mkdir build
