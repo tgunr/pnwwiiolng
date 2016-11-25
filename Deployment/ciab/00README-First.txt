@@ -4,6 +4,11 @@ These are the instructions for a generic, non-developer, CiaB install.
 If you are looking for the Linux-specific/Developer instructions, please
 see README-Dev.txt.
 
+If you are running under Windows, obtain a copy of WW2Mods/DATA and
+use the "windows-setup.bat" script to set things up.
+
+For details of setting up manually, read on.
+
 ======================================================================
 == Summary:
 ======================================================================
@@ -86,6 +91,9 @@ by making sure that `blitzWor.csv` is in C:\Playnet\wwiiol\data.
 6. Launch controller
 ------------------------------------------------------------
 
+The bootstrap.py script creates a Server\start-cluster.bat script,
+if you wish to start the cluster manually:
+
 . Open a DOS prompt,
 . Go to the binaries directory:
     > c:           (if the prompt doesn't have C: in it already)
@@ -101,20 +109,17 @@ The first time you launch, you may need to "Accept" holes in your
 Windows firewall. After accepting all the dialogs, restart the
 controller.
 
+ADDITIONAL:
+
+. You can control which server processes the manager runs by editing
+  the MANAGE_PROCESSES variable in /playnet/etc/environment.cfg
+. You can tell the controller to only run each process once by
+  specifying `controller.exe --single-shot`
+
 
 ------------------------------------------------------------
 7. Launch the game
 ------------------------------------------------------------
 
-[[ This needs refinement and probably generation of a default client .bat file ]]
-
-When the bootstrap.py finished, it generated a set of ".bat" and ".tkt"
-files. These are used to launch the client as various game names in the
-CiaB database:
-  rat0001p.bat - rat0005p.bat
-    Launches the game as a RAT account,
-  plyr0001p.bat - plyr0005p.bat
-    Launches the game as a non-rat account,
-
-You will need to copy these files into the location with your "WW2.exe"
-in it and then run the relevant .bat file.
+bootstrap.py generates '.bat' and '.tkt' files for launching the client
+with 10 different accounts; see the Client folder.

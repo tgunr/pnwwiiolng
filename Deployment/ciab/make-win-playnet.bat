@@ -8,4 +8,3 @@ mkdir c:\playnet\wwiiol\lua
 mkdir c:\playnet\wwiiol\web
 mkdir c:\playnet\wwiiol\web\debug
 mkdir c:\playnet\tmp
-pause

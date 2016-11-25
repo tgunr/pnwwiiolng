@@ -14,6 +14,7 @@ PLAYNET_PATH = "%splaynet" % (ROOT_PATH)
 WWIIOL_PATH = pathname(PLAYNET_PATH, "wwiiol")
 DATA_PATH = pathname(WWIIOL_PATH, "data")
 STRAT_LOADER = "stratLoader%s" % (EXE_SFX)
+CLIENT_PATH = pathname(".", "Client")
 
 BASE_DEV_ID = 2000
 BASE_USR_ID = 2100
@@ -51,6 +52,8 @@ def get_ip_address():
 
 def generate_tkt_and_bat(game_name, player_id, base_ip):
     tkt_file = '%s.tkt' % (game_name)
+    if os.path.exists(CLIENT_PATH):
+        tkt_file = pathname(CLIENT_PATH, tkt_file)
     with open(tkt_file, "w") as tktfh:
         tktfh.write(
             "apID: 12\n"
@@ -171,7 +174,7 @@ def main():
         shutil.copy(pathname(lua_path, script), lua_dest)
 
     step("Generating .tkt and .bat files for test accounts.")
-    for i in range(1, 5):
+    for i in range(1, 6):
         for kind in ('rat', 'plyr'):
             name, pid = "%s%04dp" % (kind, i), BASE_DEV_ID + i
             generate_tkt_and_bat(name, pid, base_ip)
