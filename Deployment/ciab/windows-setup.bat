@@ -1,9 +1,9 @@
 @echo off
 
-echo Experimental WWIIOnline Cluster-in-a-Box Setup Script for Windows
+echo WWIIOnline Cluster-in-a-Box Setup Script for Windows.
 echo.
 echo Checks for Python and MySQL installs,
-echo For configuring the MySQL setup, please see README-MySQL-Win.txt
+echo For configuring the MySQL setup, please see README-MySQL-Win.txt.
 echo.
 
 :CheckPython
@@ -19,7 +19,12 @@ echo Re-run this script after the install is complete.
 echo.
 pause
 
-Installers\python-3.5.2-amd64-webinstall.exe /passive PrependPath=1 InstallAllUsers=1 AssociateFiles=1 Shortcuts=1 Include_doc=1 Include_exe=1 Include_launcher=1 InstallLauncherAllUsers=1 Include_lib=1 Include_pip=1 Include_tcltk=1 Include_tools=1 SimpleInstall=1 Include_debug=0 Include_dev=0 Include_symbols=0 Include_test=0 CompileAll=0
+Installers\python-3.5.2-amd64-webinstall.exe /passive SimpleInstall=1 ^
+ PrependPath=1 InstallAllUsers=1 InstallLauncherAllUsers=1 ^
+ AssociateFiles=1 Shortcuts=1 ^
+ Include_doc=1 Include_exe=1 Include_launcher=1 Include_lib=1 Include_pip=1 ^
+ Include_tcltk=1 Include_tools=1 ^
+ Include_debug=0 Include_dev=0 Include_symbols=0 Include_test=0 CompileAll=0
 GOTO FINISH
 
 :PythonInstalled
@@ -36,6 +41,9 @@ echo ========== Attention ==========
 echo.
 echo 'MySQL' needs to be installed, hit enter to launch the installer.
 echo Re-run this script after the install is complete.
+echo NOTE: This tooling was written around MySQL 5.7, if you are installing
+echo a different version or using a non-standard configuration and the tools
+echo cannot find your MySQL, please talk to the dev team!
 echo.
 pause
 
@@ -126,7 +134,7 @@ echo controller.exe >>Server\start-cluster.bat
 echo pause >>Server\start-cluster.bat
 
 echo.
-echo ============================================================================
+echo ==========================================================================
 echo.
 echo SERVER:
 echo To start the cluster: double-click 'Server\start-cluster.bat',
@@ -139,7 +147,7 @@ echo Use the '.bat' files in the 'Client' folder.
 echo Each .bat represents a different account - rat or regular player.
 echo Use different .bat files if you want to run multiple simultaneous clients.
 echo.
-echo ============================================================================
+echo ==========================================================================
 echo.
 
 pause
