@@ -3,22 +3,32 @@
 from __future__ import print_function, absolute_import
 
 import os
-import sys
 
-# Library functions
+
+# Platform specifics
 
 if os.name == 'nt':
     ROOT_PATH, PATH_SEP, EXE_SFX = "C:\\", "\\", ".exe"
 else:
     ROOT_PATH, PATH_SEP, EXE_SFC = "/", "/", ""
 
+
+# Exception types
+
+class DieException(Exception):
+    """ Exit, unsuccessfully, for a specified failure reason. """
+    def __init__(self, message):
+        self.message = "## ERROR: %s" % (message)
+
+
+# Library functions
+
 def pathname(*args):
     return PATH_SEP.join(args)
 
 def die(message):
     """ Exit, unsuccessfully, for a specified failure reason. """
-    print("## ERROR: %s" % (message))
-    sys.exit(1)
+    raise DieException(message)
 
 def warn(message):
     """ Present a non-terminal warning to the user. """

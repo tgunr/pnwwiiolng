@@ -6,45 +6,66 @@ from __future__ import print_function, absolute_import
 
 import os
 import subprocess
-from . helpers import die
+from . helpers import die, DieException
+from . findmysql import find_mysql_exe
 
 
 DEFAULTS_FILE = 'mysql.defaults'
 
 
-class MySQLCli(object):
-    def __init__(self, root_user, root_pw, host):
-        """ Initialize the CLI driver. """
-        with open(DEFAULTS_FILE, "w") as deffh:
+class _DefaultsFile(object):
+    def __init__(self, user, pw, host):
+        self._defaultsFile = None
+        self._user, self._pw, self._host = user, pw, host
+
+    def __enter__(self):
+        defaultsFile = '%s.%s' % (DEFAULTS_FILE, os.getpid())
+        with open(defaultsFile, "w") as deffh:
             deffh.write(
                 "[client]\n"
                 "user=%s\n"
                 "password=%s\n"
                 "host=%s\n"
-                % (root_user, root_pw, host)
+                % (self._user, self._pw, self._host)
             )
-        self._open = True
+            self._defaultsFile = defaultsFile
+        return self._defaultsFile
+
+    def __exit__(self, *args):
+        if self._defaultsFile:
+            os.remove(self._defaultsFile)
+            self._defaultsFile = None
+
+class MySQLCli(object):
+    """
+        Simple MySQL driver that uses per-action invocations of the
+        command line utility, if one can be found, to execute SQL statements
+        and return raw, undecorated output as text.
+        Username, password and host are passed via a defaults file rather
+        than on the command line.
+    """
+    def __init__(self, root_user, root_pw, host):
+        """ Initialize the CLI driver. """
+        self._mysql = find_mysql_exe()
+        self._user, self._pass, self._host = root_user, root_pw, host
+        if not self._mysql:
+            die("Could not find a suitable mysql executable.")
         try:
             self.execute("SELECT NULL;")
-        except:
-            die("Unable to access MySQL database on '%s' as '%s' "
-                "with the given password." % (host, root_user))
-
-    def __del__(self):
-        """ Cleanup - lets not leave the .defaults file around. """
-        if self._open:
-            os.remove(DEFAULTS_FILE)
-            self._open = False
+        except Exception as e:
+            raise DieException("Unable to access '%s' MySQL database as '%s'"
+                " with the given password." % (host, root_user)) from e
 
     def _run_cli_with_args(self, *args, **kwargs):
         """ Wrapper around the invocation of MySQL. """
-        return subprocess.check_output([
-            "mysql",
-                "--defaults-file=%s" % (DEFAULTS_FILE),
-                "--batch", "--quick", "--unbuffered",
-                "-ANsr",  # no rehash, no header, no separators, raw output
-                *args
-        ], **kwargs).decode('ascii').strip()
+        with _DefaultsFile(self._user, self._pass, self._host) as defaultsFile:
+            cmd = [ self._mysql,
+                    "--defaults-file=%s" % (defaultsFile),
+                    "--batch", "--quick", "--unbuffered",
+                    "-ANsr",  # no rehash, no header, no separators, raw output
+                    *args ]
+            result = subprocess.check_output(cmd, **kwargs)
+            return result.decode('ascii').strip()
 
     def execute_script(self, filename):
         """ effectively: mysql <filename """

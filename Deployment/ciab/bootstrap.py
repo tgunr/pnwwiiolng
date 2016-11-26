@@ -7,7 +7,9 @@ from lib.mysqlcli import MySQLCli
 import os
 import shutil
 import socket
+import sys
 from subprocess import check_call
+
 
 DB_IMPORT_FILE = pathname("Database", "mysqldb.sql")
 PLAYNET_PATH = "%splaynet" % (ROOT_PATH)
@@ -18,6 +20,7 @@ CLIENT_PATH = pathname(".", "Client")
 
 BASE_DEV_ID = 2000
 BASE_USR_ID = 2100
+
 
 def source_folder(purpose, default_path, filename):
     if os.path.exists(default_path):
@@ -182,4 +185,8 @@ def main():
     step("Complete.")
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except DieException as e:
+        print(e.message)
+        sys.exit(-1)

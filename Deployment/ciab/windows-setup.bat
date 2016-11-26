@@ -28,7 +28,7 @@ echo Great! Python is already installed.
 :CheckMysql
 echo.
 echo Checking for MySQL:
-mysql --version
+python -m lib.findmysql
 if %errorlevel% == 0 GOTO MySQLInstalled
 
 echo.
