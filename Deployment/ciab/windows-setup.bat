@@ -10,10 +10,17 @@ echo.
 echo Checking for Python:
 python --version
 if %errorlevel% == 0 GOTO PythonInstalled
-echo Python not installed, running installer.
-Installers\python-3.5.2-amd64-webinstall.exe
-echo Re-run this script after finishing the install.
-GOTO End
+
+echo.
+echo ========== Attention ==========
+echo.
+echo 'Python' needs to be installed, hit enter to launch the installer.
+echo Re-run this script after the install is complete.
+echo.
+pause
+
+Installers\python-3.5.2-amd64-webinstall.exe /passive PrependPath=1 InstallAllUsers=1 AssociateFiles=1 Shortcuts=1 Include_doc=1 Include_exe=1 Include_launcher=1 InstallLauncherAllUsers=1 Include_lib=1 Include_pip=1 Include_tcltk=1 Include_tools=1 SimpleInstall=1 Include_debug=0 Include_dev=0 Include_symbols=0 Include_test=0 CompileAll=0
+GOTO FINISH
 
 :PythonInstalled
 echo Great! Python is already installed.
@@ -23,9 +30,17 @@ echo.
 echo Checking for MySQL:
 mysql --version
 if %errorlevel% == 0 GOTO MySQLInstalled
-echo MySQL not installed, running installer.
+
+echo.
+echo ========== Attention ==========
+echo.
+echo 'MySQL' needs to be installed, hit enter to launch the installer.
+echo Re-run this script after the install is complete.
+echo.
+pause
+
 Installers\mysql-installer-web-community-5.7.16.0.msi
-echo Re-run this script after finishing the install.
+start README-MySQL-Win.txt
 GOTO End
 
 :MySQLInstalled
