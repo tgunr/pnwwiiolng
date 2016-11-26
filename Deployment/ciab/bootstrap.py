@@ -54,7 +54,8 @@ def get_ip_address():
 
 
 def generate_tkt_and_bat(game_name, player_id, base_ip):
-    tkt_file = '%s.tkt' % (game_name)
+    tkt_name = '%s.tkt' % (game_name)
+    tkt_file = tkt_name
     if os.path.exists(CLIENT_PATH):
         tkt_file = pathname(CLIENT_PATH, tkt_file)
     with open(tkt_file, "w") as tktfh:
@@ -69,10 +70,12 @@ def generate_tkt_and_bat(game_name, player_id, base_ip):
         )
 
     bat_file = '%s.bat' % (game_name)
+    if os.path.exists(CLIENT_PATH):
+        bat_file = pathname(CLIENT_PATH, bat_file)
     with open(bat_file, "w") as batfh:
         batfh.write(" ".join([
             "WW2.exe",
-                "-ticket", tkt_file,
+                "-ticket", tkt_name,
                 "-window", "1",
                 "-width", "800",
                 "-height", "640",

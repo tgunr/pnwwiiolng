@@ -7,7 +7,7 @@ Installation usually takes a couple of minutes. See "Obtaining MySQL" at the end
 . Accept the license terms, click Next >
 . Choose an install type:
 -- You can accept "Developer Default" and install a lot of baggage, or:
--- Choose "Custom" and select the x86 MySQL Server and the x86 Applications/MySQL Utilities,
+-- Choose "Server Only",
 . Click Next >,
 . Click "Execute" at Check Requirements if it is not greyed out,
 . Click Next >,
