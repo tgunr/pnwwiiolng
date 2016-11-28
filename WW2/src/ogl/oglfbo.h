@@ -8,7 +8,7 @@
 #define ENABLE_FBO
 //#undef ENABLE_FBO
 
-typedef struct
+struct fbotexture
 {
     GLuint texture;
     GLuint w;
@@ -16,7 +16,7 @@ typedef struct
     GLuint attachment;
     GLenum target;
     GLenum lasttarget;
-} fbotexture;
+};
 
 class CFbo
 {

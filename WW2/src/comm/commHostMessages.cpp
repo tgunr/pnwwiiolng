@@ -90,7 +90,7 @@ static bool g_enablePacketSizeRecording = false;
 //
 
 SINT32
-commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination, PLAYER_EXIT_CODE exitCode, const FULL_OBJ_ID& facility)
+commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination, PLAYER_EXIT_CODE exitCode, const FULL_OBJ_ID facility)
 {
 	dbugLog(_FLN, "t:%d sending player exit %d dest %d to " PRF_FULL_OBJ_ID ""
 				, teulIndex
@@ -231,8 +231,8 @@ _expireTurretBits(struct TURRET_STRUCT* turret)
 		if ( (turret->valid & mask) && turret->clock64[i] <= bestBefore )
 		{
 #ifdef NEVER
-			dbugLog(_FLDB,"turret invalid: %x mask %x",turret->valid, tmpMask);
-			dbugLog(_FLDB,"turret invalid: %d, stamp %llu now %llu",i, turret->timeStamp[i], teulClock64);
+			dbugLog(_FLD,"turret invalid: %x mask %x",turret->valid, tmpMask);
+			dbugLog(_FLD,"turret invalid: %d, stamp %" PR64BitUT " now %" PR64BitUT "",i, turret->timeStamp[i], teulClock64);
 #endif
 			turret->valid &= ~mask;
 			turret->clock64[i] = teulClock64;
@@ -342,7 +342,7 @@ _recvVehicleJoinRequest(ACTION_OBJECT* const a)
 				, player.playerID()
 				, localVehicleRequest.weapon.serial
 				, localVehicleRequest.station
-				, weapPrintName(&localVehicleRequest.weapon.spec)
+				, weapPrintName(localVehicleRequest.weapon.spec)
 				, PRA_WEAPON_SPEC(localVehicleRequest.weapon.spec)
 				);
 
@@ -403,7 +403,7 @@ _recordPacketSize(UINT32 size)
 {
 	static UINT32 maxSize = 0;
 	static UINT32 minSize = 0;
-	typedef std::map<SINT32,UINT32> SIZES;
+	using SIZES = std::map<SINT32,UINT32>;
 	static SIZES sizes;
 	static UINT32 packets = 0;
 	static UINT64 totalBits = 0LL;
@@ -431,7 +431,7 @@ _recordPacketSize(UINT32 size)
 
 	UINT32 avg = (UINT32)(totalBits / packets);
 
-	dbugLog(_FLI, "rps[%u] bits minSize=%u avgSize=%u meanSize=%u maxSize=%u totalBits=%llu"
+	dbugLog(_FLI, "rps[%u] bits minSize=%u avgSize=%u meanSize=%u maxSize=%u totalBits=%" PR64BitUT ""
 				, packets, minSize, avg, mean, maxSize, totalBits);
 
 	nextLog = teulTime() + 30;
@@ -574,7 +574,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 
 	if ( player->vehicle != vref )
 	{
-		dbugLog(_FLAS,"t:%d p:%u c:%s v:%u _recvUpdateInfo: ERROR player=%p"
+		dbugLog(_FLA,"t:%d p:%u c:%s v:%u _recvUpdateInfo: ERROR player=%p"
 					, player->teulIndex(), player->playerID(), player->callsign(), vref->index
 					, player);
 		return offset;
@@ -592,7 +592,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 
 	_expireFireBits( &(vh.vehInfo->fire), vh.fireMask);
 #ifdef TEST_FIRING_BUG
-		dbugLog(_FLI, "t:%d p:%u c:%s v:%u fm:%s fs:%s fv:%s ft:%llu,%llu,%llu,%llu"
+		dbugLog(_FLI, "t:%d p:%u c:%s v:%u fm:%s fs:%s fv:%s ft:%" PR64BitUT ",%" PR64BitUT ",%" PR64BitUT ",%" PR64BitUT ""
 						, player->teulIndex(), player->playerID(), player->dispatch().callsign, vref->index
 						, _bits(vh.fireMask), _bits(vh.vehInfo->fire.state), _bits(vh.vehInfo->fire.valid)
 						, vh.vehInfo->fire.clock64[0]
@@ -886,7 +886,7 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 		if ( host_config.kills.reportDamage )
 		{
 			static char buffer[512];
-			sprintf(buffer, "INCOMING: %lld joules of damage %s %s"
+			sprintf(buffer, "INCOMING: %" PR64BitT " joules of damage %s %s"
 							, totalDamageJ
 							, (vShooter->isRemote()) ? "from [alt-cell]" : "from [same cell]"
 							, vShooter->callsign()
@@ -897,7 +897,7 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 		Teul::Packet forward(Teul::PacketId(Comm::CallbackX, HOST_HIT_Y), source, hitBytes);
 		forward.append(source, hitBytes);
 		if ( forward.send(thePlayer->teulIndex()) < 0)
-			threadLog(_FLA, "v:%u couldn't send hit %u(%d)", hit.m_shooter, hit.m_target, thePlayer->teulIndex());
+			dbugLog(_FLA, "v:%u couldn't send hit %u(%d)", hit.m_shooter, hit.m_target, thePlayer->teulIndex());
 	}
 
 	return true;
@@ -961,14 +961,14 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 
 	if ( (host_config.arena.checksums || shooter->m_flags.canEject) && shooter->m_flags.checksumsDirty )
 	{
-		threadLog(_FLW, "t:%d p:%u c:%s discarded damage messages: dirty checksum"
+		dbugLog(_FLW, "t:%d p:%u c:%s discarded damage messages: dirty checksum"
 						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign());
 		return true;
 	}
 
 	if ( shooter->m_hasExited )
 	{
-		threadLog(_FLM, "t:%d p:%u c:%s discarded damage messages: vehicle is exiting"
+		dbugLog(_FLM, "t:%d p:%u c:%s discarded damage messages: vehicle is exiting"
 						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign());
 		return true;
 	}
@@ -992,7 +992,7 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 
 struct ClientResupplyIssue
 {
-	ClientResupplyIssue(sortieid_t fromSerial, const ChatHandle& fromHandle) : m_fromSerial(fromSerial), m_fromHandle(fromHandle) {}
+	ClientResupplyIssue(sortieid_t fromSerial, const ChatHandle fromHandle) : m_fromSerial(fromSerial), m_fromHandle(fromHandle) {}
 	UINT32		m_fromSerial;
 	ChatHandle	m_fromHandle;
 };
@@ -1001,7 +1001,7 @@ struct ClientResupplyIssue
 //
 
 void
-commSendClientResupplyIssue(HostVehicle* vehicle, sortieid_t fromSerial, const ChatHandle& fromHandle)
+commSendClientResupplyIssue(HostVehicle* vehicle, sortieid_t fromSerial, const ChatHandle fromHandle)
 {
 	assert( vehicle->isRemote() == false );
 
@@ -1121,18 +1121,18 @@ _recvMovePlayer(ACTION_OBJECT* const a)
 {
 	if ( a->m_client != nullptr )
 	{
-		threadLog(_FLW, "t:%d unexpected player move from player", a->teulIndex);
+		dbugLog(_FLW, "t:%d unexpected player move from player", a->teulIndex);
 		return -EINVAL;
 	}
 	auto& incoming = a->read<Chat::PlayerMove>();
 	Player* player = static_cast<Player*>(ServerInterface::LookupByPlayerID(incoming.m_playerID));
 	if ( player == nullptr || player->teulIndex() < 0 || player->vehicle == nullptr )
 	{
-		threadLog(_FLD, "p:%u ignoring move request", incoming.m_playerID);
+		dbugLog(_FLD, "p:%u ignoring move request", incoming.m_playerID);
 		return a->offset;
 	}
 
-	threadLog(_FLD, "t:%d p:%u c:%s v:%u moving player to %d/%d/%d"
+	dbugLog(_FLD, "t:%d p:%u c:%s v:%u moving player to %d/%d/%d"
 					, player->teulIndex(), incoming.m_playerID, player->callsign(), player->vehicle->index
 					, incoming.m_x, incoming.m_y, incoming.m_z);
 
@@ -1156,7 +1156,7 @@ _recvForceDespawn(ACTION_OBJECT* const a)
 	Player* player = static_cast<Player*>(ServerInterface::LookupByPlayerID(playerID));
 	if ( player == nullptr )
 		return a->offset;
-	threadLog(_FLD, "p:%u c:%s v:%u received force-despawn instruction", player->playerID(), player->callsign(), player->sortieID());
+	dbugLog(_FLD, "p:%u c:%s v:%u received force-despawn instruction", player->playerID(), player->callsign(), player->sortieID());
 
 	PLAYER_EXIT pe = { PDEST_MAP, PEXIT_RTB, nullObjID };
 	hostPlayerLeave(*player, pe);
@@ -1226,7 +1226,7 @@ _recvCaptureScore(ACTION_OBJECT* const a)
 		return -EINVAL;
 
 	auto& incoming = a->read<CaptureScore>();
-	threadLog(_FLI, "capscore: recvd bld:%d,%d:%u side:%u"
+	dbugLog(_FLI, "capscore: recvd bld:%d,%d:%u side:%u"
 					, incoming.m_fullObjID.cell.ox, incoming.m_fullObjID.cell.oy, incoming.m_fullObjID.id
 					, incoming.m_side);
 	hostGiveCaptureScoreToPlayers(incoming.m_fullObjID, incoming.m_side);
@@ -1296,8 +1296,7 @@ _recvResupplyAccepted(ACTION_OBJECT* const a)
 	HostVehicle* vehicle = hostFindVehicleLocal(incoming.m_supplierID);
 	if ( vehicle == nullptr || vehicle->isRemote() == true )
 		return a->offset;
-	if ( g_logDebug )
-		dbugLog(_FLD, "v:%u supply to %s acknowledged", incoming.m_supplierID, Chat::Name(incoming.m_recipient).c_str());
+    dbugLog(_FLD, "v:%u supply to %s acknowledged", incoming.m_supplierID, Chat::Name(incoming.m_recipient).c_str());
 	vehicle->scoreResupply(incoming.m_recipient);
 
 	return a->offset;
@@ -1310,7 +1309,7 @@ static SINT32
 _registerInterHostCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Host::CallbackX)
-
+	{
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::MovePlayer_Y, _recvMovePlayer);
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ForceDespawn_Y, _recvForceDespawn);
 
@@ -1318,8 +1317,8 @@ _registerInterHostCallbacks()
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::CaptureState_Y, _recvCaptureState);
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ResupplyIssue_Y, _recvResupplyIssue);
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ResupplyAccepted_Y, _recvResupplyAccepted);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Host::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1329,7 +1328,7 @@ static SINT32
 _registerClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
-
+	{
 		REGISTER_SENDER(GRANT_VEHICLE_JOIN_Y, _sendGrantVehicleJoin, _GRANT_VEHICLE_JOIN);
 		REGISTER_SENDER(ACTIVATE_CLIENT_Y, _sendClientActivate, _ACTIVATE_CLIENT);
 		REGISTER_SENDER(RESUPPLY_ISSUE_Y, _sendResupplyIssue, _XFER_RESUPPLY_ISSUE);
@@ -1358,15 +1357,15 @@ _registerClientCallbacks()
 		REGISTER_SENDER(GAME_TIME_UPDATE_Y, Host::TimeUpdate::SendFunction, Host::TimeUpdate::Callback);
 
 		REGISTER_RECEIVER(HOST_HIT_FWD_Y, commProcessApplyHit);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Comm::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
 SINT32
-commInstallHostCallbacks(void)
+commInstallHostCallbacks()
 {
 	SINT32 retval;
 
@@ -1380,7 +1379,7 @@ commInstallHostCallbacks(void)
 	_registerInterHostCallbacks();
 	wwiiRegisterPlayerMessageCallback();
 
-	dbugLog(_FLNS, "installed commHostCallbacks");
+	dbugLog(_FLN, "installed commHostCallbacks");
 
 	return 0;
 }
@@ -1389,7 +1388,7 @@ commInstallHostCallbacks(void)
 // Send/receive resupply messages between cells
 
 void
-hostSendResupplyIssue(UINT32 cellIP, const sortieid_t& toSerial, const sortieid_t& fromSerial, const ChatHandle& fromHandle)
+hostSendResupplyIssue(UINT32 cellIP, const sortieid_t toSerial, const sortieid_t fromSerial, const ChatHandle fromHandle)
 {
 	assert( cellIP != 0 );
 	assert( toSerial != 0 );
@@ -1409,7 +1408,7 @@ hostSendResupplyIssue(UINT32 cellIP, const sortieid_t& toSerial, const sortieid_
 // Acknowledgment that someone received resupply
 
 void
-hostSendResupplyAccepted(UINT32 cellIP, const sortieid_t& sendTo, const ChatHandle& byHandle)
+hostSendResupplyAccepted(UINT32 cellIP, const sortieid_t sendTo, const ChatHandle byHandle)
 {
 	assert(cellIP != 0);
 

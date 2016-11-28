@@ -1,4 +1,4 @@
-#include <syscfg.h>
+#include <syscfg.h> // Path is project specific.
 /*--------------------------------------------------------------------------------------
 Module: glslWater.cpp
 Description:
@@ -1727,8 +1727,7 @@ bool glslWaterInit()
         }
     }
 
-    piMATERIAL material;
-    memset(&material, 0, sizeof(piMATERIAL));
+	piMATERIAL material{};
 
     material.diffuse.set(1, 1, 1, 1);
     material.ambient.set(0.05f, 0.05f, 0.05f, 1.0f);

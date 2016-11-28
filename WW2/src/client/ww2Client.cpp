@@ -208,6 +208,8 @@ struct ClientClassData
 		int mission;
 	};
 
+    ~ClientClassData() {} // On macOS, without this line Clang produces a number of link errors. TODO: Why?
+
 	PersonaSummaries 					personas;
 	PersonaSelection 					personaselected;
 	BrigadeSelection 					brigadeselected;
@@ -270,9 +272,8 @@ static void weapListClear(FacilityWeaponList*);
 
 Client::Client()
 {
-	_classdata = new ClientClassData;
-	_data = new ClientData;
-	memset(_data, 0x0, sizeof(*_data));
+	_classdata = new ClientClassData{};
+	_data = new ClientData{};
 	_data->id = clientid++;
 	_data->hitsPrime = 127979;
 
@@ -446,7 +447,7 @@ static void _shutdownCellConnection(Client* const client, SINT32 teulIndex)
 	throws ClientNetError
 *************************************************************************************************/
 
-int Client::Login(const char* hostname, short port, bool wantChat)
+int Client::Login(const char* hostname, UINT16 port, bool wantChat)
 {
 	unsigned int host = 0;
 	teulGetHost(hostname, &host);
@@ -536,10 +537,10 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 }
 
 #include "include/vars.h"
-int Client::Login(unsigned int host, short port, bool wantChat)
+int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 {
     int retval = -EINVAL;
-    
+
 	if(!clientinited) return retval;
 
 	TeulTimeMS timeout = 0LL;
@@ -742,7 +743,7 @@ int Client::RequestMissionWeapList(FULL_OBJ_ID const& fac, bool allweapons, bool
 	Client::RequestMissionWeapPost
 *************************************************************************************************/
 
-int Client::RequestMissionWeapPost(FULL_OBJ_ID const& fac, const WEAPON_SPEC& spec, bool immediatespawn)
+int Client::RequestMissionWeapPost(FULL_OBJ_ID const& fac, const WEAPON_SPEC spec, bool immediatespawn)
 {
 	return mmSendPostRequest(MapConnection(), fac, spec, (LOGICAL)immediatespawn);
 }
@@ -802,7 +803,7 @@ BrigadeControlList* Client::LookupBrigadeOIC(int brigadeID) const
 
 int Client::RequestClientSpawn(WEAPON_SERIAL const& serial, bool wantMobileSpawn)
 {
-	return mmSendClientSpawn(MapConnection(), serial, (LOGICAL)wantMobileSpawn);
+	return mmSendClientSpawn(MapConnection(), serial, wantMobileSpawn);
 }
 
 /************************************************************************************************
@@ -837,7 +838,7 @@ int Client::RequestMissionList()
 	return missionlist.send(MapConnection());
 }
 
-int Client::RequestQuickMissionList(void) {
+int Client::RequestQuickMissionList() {
 	_data->missionListUpdate = 0;
 	MissionList missionlist;
 	return missionlist.sendQuick(MapConnection());
@@ -1033,7 +1034,7 @@ void Client::SetActiveWaypoint(ChatHandle handle)
 	TUT_MGR->DoEvent(TUT_EVENT_MAP, &type);
 }
 
-const ChatHandle& Client::ActiveWaypointHandle() const
+ChatHandle Client::ActiveWaypointHandle() const
 {
 	return _data->activewaypoint;
 }
@@ -1160,7 +1161,7 @@ ww2::HostState* Client::GetHostStateByType(int type)
 	SetPlayerIdent
 *************************************************************************************************/
 
-void Client::SetPlayerIdent(int playerID, int otp, unsigned int appVersion)
+void Client::SetPlayerIdent(playerid_t playerID, UINT32 otp, unsigned int appVersion)
 {
 	_classdata->playerIdent.m_playerID		= playerID;
 	_classdata->playerIdent.m_otp			= otp;
@@ -1403,7 +1404,7 @@ void Client::ProcessLoginAttempt(bool success, SINT32 type, SINT32 result)
 
 		}
 		break;
-            
+
         default:
             // don't care about other host types.
             break;
@@ -2000,7 +2001,7 @@ void Client::ProcessBrigadeSelection(BrigadeSelection const& selection)
 		case BRIG_RESTRICTED:
 			_data->waitmsg[BRIGADE_SELECT_WAIT] = -1;
 		break;
-            
+
         default:
             // don't care about other BRIG status
             break;
@@ -2284,7 +2285,7 @@ void Client::ProcessMissionRoomListReply(RoomList const& missroomlist)
 					_classdata->missionroom.push_back(*entry);
 			}
 			break;
-                
+
             default:
                 // don't care about other RMLIST commands
                 break;
@@ -2907,9 +2908,9 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	if(clientinited) return 0;
 
 #if defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
-	static const int DBUGLOG_MODE = LOG_TO_FILE;
+	static const LogMode DBUGLOG_MODE = LogMode::TO_FILE;
 #else
-	static const int DBUGLOG_MODE = LOG_OFF;
+	static const LogMode DBUGLOG_MODE = LogMode::OFF;
 #endif
 
 	// update our default player info data
@@ -2921,7 +2922,7 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	// go ahead and set the player ident info in it just to make sure
 	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
 
-	sprintf(dbugFileName, "wwiiClient.%u", playerID);
+	strprintf(dbugFileName, "wwiiClient.%u", playerID);
 	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
 
 	if(err > -1)
@@ -3450,12 +3451,16 @@ SINT32 HostState::ErrorActions(SINT32 error)
 		break;
 		case ETEUL_CB_REQ_DATA:
 		case ECONNREFUSED:
+#ifdef EPFNOSUPPORT
 		case EPFNOSUPPORT:
+#endif
 		case EAFNOSUPPORT:
 		case ENETDOWN:
 		case ENETUNREACH:
 		case ENETRESET:
+#ifdef EHOSTDOWN
 		case EHOSTDOWN:
+#endif
 		case EHOSTUNREACH:
 		case ETEUL_SERVER_SHUTDOWN:
 			return alABORT;

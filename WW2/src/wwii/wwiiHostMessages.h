@@ -7,6 +7,6 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-extern SINT32 wwiiHostInstallCallbacks(void);
+extern SINT32 wwiiHostInstallCallbacks();
 extern SINT32 wwiiSendActivate(SINT32 connection, struct WWII_ACTIVATE* activate);
 

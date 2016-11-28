@@ -29,24 +29,24 @@
 #include "wwii/wwiiPack.h"
 #include "wwii/wwiiPackString.h"
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 # include "chat/chatSideMessage.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 #include "chat/chatPlayerInfo.h"
 SINT32
-Chat::PlayerInfo::packer(LOGICAL mode, ACTION_OBJECT* const a)
+Chat::PlayerInfo::packer(PackMode mode, ACTION_OBJECT* const a)
 {
-	a->packBytes(mode, a->localRawData, sizeof(*this));
+	a->bytePacker(mode, a->localRawData, sizeof(*this));
 	return a->offset;
 }
 #endif
 
 SINT32
-Chat::ClientMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
+Chat::ClientMessage::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	//Make sure our length isn't greater than it should be
 	if ( mode == TEUL_PACK && m_length > (MAX_MESSAGE_LENGTH - 1))
@@ -66,7 +66,7 @@ Chat::ClientMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-Chat::HostMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
+Chat::HostMessage::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	// User must initialize the "msg" pointer before calling.
 	if ( PN_UNLIKELY(msg == nullptr) )
@@ -92,7 +92,7 @@ Chat::HostMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-Chat::TuneToChannel::packer(LOGICAL mode, ACTION_OBJECT* a)
+Chat::TuneToChannel::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_radioIndex, 4);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_type, 12);
@@ -104,7 +104,7 @@ Chat::TuneToChannel::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-Chat::UpdateChannel::packer(LOGICAL mode, ACTION_OBJECT* a)
+Chat::UpdateChannel::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &radioIndex, 7);
 	a->packer(mode, receiveStatus);
@@ -113,7 +113,7 @@ Chat::UpdateChannel::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-Chat::UserNLA::packer(LOGICAL mode, ACTION_OBJECT* a)
+Chat::UserNLA::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &handle, 0);
 	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &radioIndex, 0);
@@ -121,7 +121,7 @@ Chat::UserNLA::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-ChatServerInfo::packer(LOGICAL mode, ACTION_OBJECT* a)
+ChatServerInfo::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_otp, 0);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_ipAddress, 0);
@@ -131,12 +131,12 @@ ChatServerInfo::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-Chat::LocalizedMessage::packer(LOGICAL mode, ACTION_OBJECT* const a)
+Chat::LocalizedMessage::packer(PackMode mode, ACTION_OBJECT* const a)
 {
 	a->packer(mode, (SINT32*)&m_prefix, 12);
 	a->packer(mode, (SINT32*)&m_message, 12);
 	a->packer(mode, &m_size, 16);
-	a->packBytes(mode, m_data, m_size);
+	a->bytePacker(mode, m_data, m_size);
 	if ( mode == TEUL_UNPACK )
 		SetPointers();
 
@@ -148,12 +148,15 @@ Chat::LocalizedMessage::_copy(const char* const p0, const char* const p1, const 
 {
 	if ( (p0[0] | p1[0] | p2[0] | p3[0] | p4[0] | p5[0]) != 0 )
 	{
-		m_size = strprintf(m_data
+		UINT32 size = strprintf(m_data
 							, "%s%c%s%c%s%c%s%c%s%c%s"
 							, p0,0 , p1,0 , p2,0 , p3,0 , p4,0 , p5
 							);
-		if ( m_size > MAX_MESSAGE_LENGTH )
+		if ( size >= MAX_MESSAGE_LENGTH ) {
 			m_size = MAX_MESSAGE_LENGTH - 1;
+        } else {
+            m_size = static_cast<UINT16>(size);
+        }
 	}
 	else
 	{
@@ -196,7 +199,7 @@ Chat::Locality::Locality(ACTION_OBJECT* const a)
 
 // Packer for the locality class.
 SINT32
-Chat::Locality::packer(LOGICAL mode, ACTION_OBJECT* a)
+Chat::Locality::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackFLOAT64(mode, a->packed, a->offset, &m_x, 0);
 	a->offset = teulPackFLOAT64(mode, a->packed, a->offset, &m_z, 0);
@@ -208,7 +211,7 @@ Chat::Locality::packer(LOGICAL mode, ACTION_OBJECT* a)
 //////////////////////////////////////////////////////////////////////
 // Network constructor for a Chat::SideMessage
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 Chat::SideMessage::SideMessage(ACTION_OBJECT* const a)
 	: m_type(static_cast<SIDE_MESSAGE_TYPE>(0))
 	, m_side(WWII_NO_SIDE)
@@ -222,7 +225,7 @@ Chat::SideMessage::SideMessage(ACTION_OBJECT* const a)
 }
 
 SINT32
-Chat::SideMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
+Chat::SideMessage::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_type, 4);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_side, 4);
@@ -243,7 +246,7 @@ Chat::SideMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
 #endif
 
 SINT32
-Waypoint::packer(LOGICAL mode, ACTION_OBJECT* a)
+Waypoint::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, MAX_WP_HANDLE_BITS);
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_playerHandle, 0);
@@ -272,7 +275,7 @@ Waypoint::packer(LOGICAL mode, ACTION_OBJECT* a)
 // Joules being applied to a server tracked object
 
 SINT32
-STOJoules::packer(LOGICAL mode, ACTION_OBJECT* a)
+STOJoules::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_uid, 0);
 	a->offset = teulPackUINT64(mode, a->packed, a->offset, (UINT64*)&m_joules, 0);

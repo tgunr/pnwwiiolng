@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "teul/teulKit.h"
 #include "wwii/wwiiPack.h"
 #include "chat/chatBrigadeMove.h"
@@ -25,7 +23,7 @@
 #include "chat/chatHostBrigadeControl.h"
 #include "wwii/wwiiConfig.h"
 
-typedef std::map<UINT32,UINT32> LAST_MOVEMENTS;
+using LAST_MOVEMENTS = std::map<UINT32,UINT32>;
 static LAST_MOVEMENTS lastMovements;
 bool g_newLocations = false;
 
@@ -91,7 +89,7 @@ chatUpdateHCUnitLocations()
 			continue;
 		if ( hculUpdate.send(player->teulIndex()) < 0 )
 		{
-			betaLog(_FLIB, "<FAIL");
+			betaLog(_FLI, "<FAIL");
 		}
 	}
 
@@ -103,7 +101,7 @@ chatUpdateHCUnitLocations()
 //////////////////////////////////////////////////////////////////////
 
 static void
-_changeHome(const ChatHandle& handle, const UINT32 brigadeID, const FULL_OBJ_ID& destinationID)
+_changeHome(const ChatHandle handle, const UINT32 brigadeID, const FULL_OBJ_ID destinationID)
 {
 	HCUnit* const unit = HCUnit::Lookup(brigadeID);
 	if ( unit == nullptr )
@@ -116,7 +114,7 @@ _changeHome(const ChatHandle& handle, const UINT32 brigadeID, const FULL_OBJ_ID&
 }
 
 void
-HCUnit::setHomeCPID(const FULL_OBJ_ID& destination)
+HCUnit::setHomeCPID(const FULL_OBJ_ID destination)
 {
 	m_homeCPID = destination;
 
@@ -130,7 +128,7 @@ HCUnit::setHomeCPID(const FULL_OBJ_ID& destination)
 //////////////////////////////////////////////////////////////////////
 // Process an incoming brigade move message
 void
-BrigadeMove::process(const ChatHandle& byHandle) const
+BrigadeMove::process(const ChatHandle byHandle) const
 {
 	Player* player = PlayerInterface::Lookup(byHandle);
 	Property* destination = chatFindProperty(m_destination);

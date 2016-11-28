@@ -16,11 +16,8 @@ Auth::ClientData::~ClientData()
 	if ( isQueued )
 		RemoveFromQueue(false);
 
-	if ( m_launchRequest != nullptr )
-	{
-		delete m_launchRequest;
-		m_launchRequest = nullptr;
-	}
+	delete m_launchRequest;
+	m_launchRequest = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -10,7 +10,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 //This function installs all the host callbacks
-SINT32 chatInstallCellHostSupportCallbacks(void);
+SINT32 chatInstallCellHostSupportCallbacks();
 
 // Notify chat we have kicked someone
 bool chatSendKickNotice(const playerid_t playerID, const SCHAR* callsign, const SCHAR* problem);

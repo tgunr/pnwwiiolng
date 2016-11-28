@@ -1,6 +1,6 @@
 #include <syscfg.h> // Path is project specific.
 #include "dbse/dbseDatabaseSchema.h"
-#include "dbse/dbseWrapper.h"
+#include "dbse/dbseHandle.h"
 #include "include/mydbQuery.h"
 
 namespace DB

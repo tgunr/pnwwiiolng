@@ -1,12 +1,12 @@
 #pragma once
 
-extern LOGICAL trnInitAutogunSystem(void);
-extern LOGICAL trnKillAutogunSystem(void);
-extern LOGICAL trnKillAutogun(struct trnAutoGun ** AutoGun);
-extern LOGICAL trnAddAutoGun(trnCDTerrainObject * TO);
-extern LOGICAL trnUpdateAutoGuns(void);
-extern LOGICAL trnAutoVehicleDisappearing(void*  Vehicle);
-extern LOGICAL trnUpdateAutogunStatus(void*  InAG,SINT32 country,SINT32 vislevel);
-extern LOGICAL trnGetAutoGunHead(struct trnAutoGun ** AG);
+LOGICAL trnInitAutogunSystem();
+void trnKillAutogunSystem();
+void trnKillAutogun(struct trnAutoGun ** AutoGun);
+LOGICAL trnAddAutoGun(trnCDTerrainObject * TO);
+LOGICAL trnUpdateAutoGuns();
+LOGICAL trnAutoVehicleDisappearing(void*  Vehicle);
+LOGICAL trnUpdateAutogunStatus(void*  InAG,SINT32 country,SINT32 vislevel);
+LOGICAL trnGetAutoGunHead(struct trnAutoGun ** AG);
 
-extern void trnautogunToggleAI();
+void trnautogunToggleAI();

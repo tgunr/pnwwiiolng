@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include <algorithm>
 
 #include "chat/chatSquadControl.h"
@@ -32,7 +30,7 @@ struct SQUAD_REQUEST
 	std::set<ChatHandle>	agreed;	// Which players have agreed
 };
 
-typedef std::unordered_map<ChatHandle,SQUAD_REQUEST> SQUAD_REQUESTS;
+using SQUAD_REQUESTS = std::unordered_map<ChatHandle,SQUAD_REQUEST>;
 
 extern UINT32 chatSendSquadCreateRequest(SquadControl& control, Player* player);
 
@@ -48,7 +46,7 @@ _expired(Player* player)
 }
 
 static void
-_sendInvites(const ChatHandle& squadHandle, const std::string& squadName, const ChatHandle& co, const ChatHandle& xo, const PLAYER_INDEX& invites)
+_sendInvites(const ChatHandle squadHandle, const std::string& squadName, const ChatHandle co, const ChatHandle xo, const PLAYER_INDEX& invites)
 {
 	dbugLog(_FLI, "sending %s squad invites", squadName.c_str());
 	for ( PLAYER_INDEX::const_iterator it = invites.begin(); it != invites.end(); ++it )
@@ -147,7 +145,7 @@ chatProcessSquadCreateRequest(SquadControl& control, Player* player)
 }
 
 static SQUAD_CONTROL_RESULT
-_processCreateCheck(const ChatHandle& /*originator*/, SQUAD_REQUEST& request, Player* player)
+_processCreateCheck(const ChatHandle /*originator*/, SQUAD_REQUEST& request, Player* player)
 {
 	_checkMembers(player, request.control, true);
 
@@ -158,7 +156,7 @@ _processCreateCheck(const ChatHandle& /*originator*/, SQUAD_REQUEST& request, Pl
 }
 
 static SQUAD_CONTROL_RESULT
-_processCreateComplete(const ChatHandle& /*originator*/, SQUAD_REQUEST& request, Player* player)
+_processCreateComplete(const ChatHandle /*originator*/, SQUAD_REQUEST& request, Player* player)
 {
 	bool updatedPlayer = false;
 	for ( UINT32 i = 0; i < request.control.m_players.size(); ++i )
@@ -191,7 +189,7 @@ _processCreateComplete(const ChatHandle& /*originator*/, SQUAD_REQUEST& request,
 }
 
 SQUAD_CONTROL_RESULT
-chatProcessSquadCreateReply(bool created, const ChatHandle& originator, Player* player)
+chatProcessSquadCreateReply(bool created, const ChatHandle originator, Player* player)
 {
 	// Find the original request for the member's list
 	SQUAD_REQUESTS::iterator it = requestIndex.find(originator);

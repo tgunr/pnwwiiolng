@@ -560,7 +560,11 @@ extern NSString *WebActionOriginalURLKey;
     // yet" state if we should crash before the next login.
     [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
     
-    dbugInit(LOG_TO_FILE, nullptr);
+#ifdef DEBUG_WW2
+    dbugInit(LogMode::TO_FILE, nullptr);
+#else
+    dbugInit(LogMode::OFF, nullptr);
+#endif
 
     // Wipe out any storage of insecure user info.
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserName"];
@@ -933,7 +937,9 @@ extern NSString *WebActionOriginalURLKey;
             
         case WAIT_LOGIN:
             dispatch_source_cancel(teulTimer);
+#ifndef __LP64__
             dispatch_release(teulTimer);
+#endif
             teulTimer = nullptr;
             
             if (isConnectedToAuthenticationServer) {
@@ -1770,34 +1776,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     // determine user's current language setting
     NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
     
-    NSArray* languages = [defs objectForKey:@"AppleLanguages"];
-    for(unsigned int i = 0; i < [languages count]; i++)
-    {
-        NSString* preferredLang = [languages objectAtIndex:i];
-        NSString* nsstr = [NSLocale canonicalLocaleIdentifierFromString: preferredLang];
-        
-        if([nsstr isEqualToString:@"en"])
-        {
-            gLanguage = (UINT32)IDE_LANGUAGE_ENGLISH;
-            break;
-        }else if([nsstr isEqualToString:@"it"])
-        {
-            gLanguage = (UINT32)IDE_LANGUAGE_ITALIAN;
-            break;
-        }else if([nsstr isEqualToString:@"fr"])
-        {
-            gLanguage =  (UINT32)IDE_LANGUAGE_FRENCH;
-            break;
-        }else if([nsstr isEqualToString:@"de"])
-        {
-            gLanguage =  (UINT32)IDE_LANGUAGE_GERMAN;
-            break;
-        }else if([nsstr isEqualToString:@"es"])
-        {
-            gLanguage =  (UINT32)IDE_LANGUAGE_SPANISH;
-            break;
-        }
-    }
+    gLanguage = static_cast<UINT32>(IDE_LANGUAGE_ENGLISH);
     cfgPrefsSetInt("app.language", static_cast<int>(gLanguage));
     cfgPrefsSave();
 }

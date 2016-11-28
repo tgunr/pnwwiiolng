@@ -57,8 +57,7 @@ _recvEnemySpotted(ACTION_OBJECT* const a)
 	if ( a->offset < 0 )
 		return a->offset;
 
-	if ( g_logDebug )
-		dbugLog(_FLD,"t:%d received enemy report for vehicle " PRF_WEAPON_SERIAL "", a->teulIndex, PRA_WEAPON_SERIAL(report.enemyReported));
+    dbugLog(_FLD,"t:%d received enemy report for vehicle " PRF_WEAPON_SERIAL "", a->teulIndex, PRA_WEAPON_SERIAL(report.enemyReported));
 
 	return serverSendPacketToType(outgoing, STRAT_HOST);
 }
@@ -67,7 +66,9 @@ SINT32
 strtInstallUpdaterSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
+	{
 		REGISTER_SENDER(STRT_DAMAGE_Y, _sendHitList, STRT_SEND_HIT_LIST);
 		REGISTER_RECEIVER(STRT_ENEMY_SPOTTED_Y, _recvEnemySpotted);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX);
 }

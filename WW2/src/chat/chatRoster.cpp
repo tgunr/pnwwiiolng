@@ -26,38 +26,38 @@ enum PROG_TYPE
 ,	PT_SCRIPT_CLIENT
 ,	PT_SYSTEM_CLIENT
 ,	PT_CHAT_CLIENT
-} ;
+};
 
-static SCHAR* program ;
-static bool bHaveRoster = false ;
-static int numClients = 0 ;
+static SCHAR* program;
+static bool bHaveRoster = false;
+static int numClients = 0;
 
-SINT32 connection ;
+SINT32 connection;
 
 static inline void
 _pause(int duration=1000)
 {
-	teulSyncClock() ;
-	const TeulTimeMS end = teulClock64 + duration ;
+	teulSyncClock();
+	const TeulTimeMS end = teulClock64 + duration;
 	while ( teulClock64 < end )
-		teulUpdateTransport(5) ;
+		teulUpdateTransport(5);
 }
 
 static void
 _systemClient(char* string)
 {
-	static char cmd[129] ;
+	static char cmd[129];
 
 	if ( *string == ',' )
 	{
-		string++ ;
-		_pause() ;
+		string++;
+		_pause();
 	}
 
 	if ( *string != 0 )
 	{
-		snprintf(cmd, 128, ".sys %s", string) ;
-		chatSendMessage(connection, 1, cmd) ;
+		strprintf(cmd, ".sys %s", string);
+		chatSendMessage(connection, 1, cmd);
 	}
 }
 
@@ -66,141 +66,141 @@ _chatClient(SCHAR* string)
 {
 	if ( *string == ',' )
 	{
-		string++ ;
-		_pause() ;
+		string++;
+		_pause();
 	}
 
 	if ( *string != 0 )
-		chatSendMessage(connection, 1, string) ;
+		chatSendMessage(connection, 1, string);
 }
 
-static const char* pwnType ;
-static SCHAR  pwnCountry[3] ;
+static const char* pwnType;
+static SCHAR  pwnCountry[3];
 
 static WWII_COUNTRY
 _isCountry(SCHAR* string)
 {
-	char country[3] = "\0\0" ;
+	char country[3] = "\0\0";
 
 	if ( !isalpha(*string) )
-		return WWII_NO_COUNTRY ;
+		return WWII_NO_COUNTRY;
 
-	country[0] = string[0] ;
-	country[1] = string[1] ;
+	country[0] = string[0];
+	country[1] = string[1];
 
 	if ( strcasecmp(country, "uk") == 0 )
-		return WWII_ENGLAND ;
+		return WWII_ENGLAND;
 	if ( strcasecmp(country, "de") == 0 )
-		return WWII_GERMANY ;
+		return WWII_GERMANY;
 	if ( strcasecmp(country, "fr") == 0 )
-		return WWII_FRANCE ;
+		return WWII_FRANCE;
 	if ( strcasecmp(country, "it") == 0 )
-		return WWII_ITALY ;
+		return WWII_ITALY;
 	if ( strcasecmp(country, "cn") == 0 )
-		return WWII_CHINA ;
+		return WWII_CHINA;
 	if ( strcasecmp(country, "ru") == 0 )
-		return WWII_RUSSIA ;
-	return WWII_NO_COUNTRY ;
+		return WWII_RUSSIA;
+	return WWII_NO_COUNTRY;
 }
 
 static void
 _scriptClient(SCHAR* string)
 {
-	static SCHAR cmd[600] ;
+	static SCHAR cmd[600];
 
 	if ( *string == ',' )
 	{
-		string++ ;
-		_pause() ;
+		string++;
+		_pause();
 	}
 
 	if ( string == nullptr || *string == 0 )
-		return ;
+		return;
 
 	// 2 character string = set country
 	if ( _isCountry(string) > WWII_NO_COUNTRY )
 	{
-		strncpy(pwnCountry, string, 2) ;
-		_pause() ;
-		return ;
+		strsafecpy(pwnCountry, string);
+		_pause();
+		return;
 	}
 
 	if ( pwnCountry[0] == 0 )
 	{
-		fprintf(stderr, "Must set 2-digit country code before specifying %s name: %s", pwnType, string) ;
-		teulCloseTransport() ;
-		exit(1) ;
+		fprintf(stderr, "Must set 2-digit country code before specifying %s name: %s", pwnType, string);
+		teulCloseTransport();
+		exit(1);
 	}
 
-	snprintf(cmd, sizeof(cmd) - 1, ";chown%s %s %s", pwnType, pwnCountry, string) ;
-	chatSendMessage(connection, 1, cmd) ;
-	printf("%s %s => %s\r\n", pwnType, string, pwnCountry) ;
+	strprintf(cmd, ";chown%s %s %s", pwnType, pwnCountry, string);
+	chatSendMessage(connection, 1, cmd);
+	printf("%s %s => %s\r\n", pwnType, string, pwnCountry);
 
-	_pause(500) ;
+	_pause(500);
 
-	return ;
+	return;
 }
 
 void
 rosterMessage(Chat::LocalizedMessage& lmsg)
 {
-	const char* message = chatLString(lmsg) ;
+	const char* message = chatLString(lmsg);
 	if ( lmsg.m_message == LSTR_TEXT_START || lmsg.m_message == LSTR_TEXT )
-		printf("%s", message) ;
+		printf("%s", message);
 	else
-		printf("%s\n", message) ;
-	bHaveRoster = true ;
+		printf("%s\n", message);
+	bHaveRoster = true;
 }
 
-extern SINT32 chatSetChatInfo(SINT32, UINT32, UINT16) ;
+extern SINT32 chatSetChatInfo(SINT32, UINT32, UINT16);
 
 static void
 _usage()
 {
 	printf("\nUsage: %s [-c 'command' | -C 'command'] [-d delay] -g 'gamename' [HOST_PORT]\n\n", program);
-	printf(" -c 'command'    Sends the specified command(s) to the host and then terminates.\n") ;
-	printf(" -C 'command'    Sends commands without disconnecting afterwards.\n") ;
-	printf(" -d <delay>      Wait 'delay' seconds between submitting command-line commands to the server.\n") ;
-	printf(" -g 'gamename'   Sets the name to be used by this client on the host.\n") ;
-	printf(" -n <number>     Connect a number of clients and wait for the user to abort.\n") ;
+	printf(" -c 'command'    Sends the specified command(s) to the host and then terminates.\n");
+	printf(" -C 'command'    Sends commands without disconnecting afterwards.\n");
+	printf(" -d <delay>      Wait 'delay' seconds between submitting command-line commands to the server.\n");
+	printf(" -g 'gamename'   Sets the name to be used by this client on the host.\n");
+	printf(" -n <number>     Connect a number of clients and wait for the user to abort.\n");
 	exit(1);
 }
 
 static void
 _processCommands(std::vector<const char*>& commands, UINT32 delay, bool exitAfterCommands)
 {
-	_pause(250) ;
+	_pause(250);
 
 	for ( UINT32 i = 0 ; i < commands.size() ; ++i )
 	{
-		chatSendMessage(connection, 1, commands[i]) ;
-		_pause(delay * 1000) ;
+		chatSendMessage(connection, 1, commands[i]);
+		_pause(delay * 1000);
 	}
 
-	_pause() ;
+	_pause();
 
 	if ( exitAfterCommands )
 	{
-		exit(0) ;
+		exit(0);
 	}
 }
 
-static bool _connectionOpened = false ;
+static bool _connectionOpened = false;
 static void _connectionOpen(ENDPOINT& /*endpoint*/)
 {
-	_connectionOpened = true ;
+	_connectionOpened = true;
 }
 
-static bool _connectionError = false ;
+static bool _connectionError = false;
 static void _errorFunction (SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/)
 {
-	_connectionError = true ;
+	_connectionError = true;
 }
 
 static int
 _openConnection(UINT32 host, UINT32 port, const char* const gameName)
 {
-	_connectionError = false ;
+	_connectionError = false;
 	SINT32 conn = teulOpenSend(host, (UINT16)port, _connectionOpen, 2000, PROTOCOL_TCP, _errorFunction);
 	if ( conn < 0 )
 	{
@@ -208,15 +208,15 @@ _openConnection(UINT32 host, UINT32 port, const char* const gameName)
 		exit(-ENOTCONN);
 	}
 
-	dbugLog(_FLI, "t:%d Connecting", conn) ;
+	dbugLog(_FLI, "t:%d Connecting", conn);
 	while ( _connectionOpened == false )
 	{
 		teulUpdateTransport(20);
 
 		if ( _connectionError )
 		{
-			dbugLog(_FLA, "Unable to open connection.\n") ;
-			exit(-ENOTCONN) ;
+			dbugLog(_FLA, "Unable to open connection.\n");
+			exit(-ENOTCONN);
 		}
 	}
 
@@ -224,37 +224,37 @@ _openConnection(UINT32 host, UINT32 port, const char* const gameName)
 
 	chatSendManagementLogin2(conn, gameName);
 
-	return conn ;
+	return conn;
 }
 
 // Open a number of clients.
 static void
 _openNumClients(UINT32 host, UINT32 port)
 {
-	std::vector<const char*> messages = { "/wtf", ".help", ".who", "/roster", "hello", "/m kfs1 test", "/m kfs2 testing", "/pinfo", "/wurble", "/afk", ".time"  } ;
-	std::vector<int> connections ;
+	std::vector<const char*> messages = { "/wtf", ".help", ".who", "/roster", "hello", "/m kfs1 test", "/m kfs2 testing", "/pinfo", "/wurble", "/afk", ".time"  };
+	std::vector<int> connections;
 
 	for ( int i = 0 ; i < numClients ; ++i )
 	{
-		printf("\r#%u ", i + 1) ;
-		fflush(stdout) ;
-		SINT32 conn = _openConnection(host, port, "auto") ;
-		connections.push_back(conn) ;
+		printf("\r#%u ", i + 1);
+		fflush(stdout);
+		SINT32 conn = _openConnection(host, port, "auto");
+		connections.push_back(conn);
 	}
 
-	printf("\r- Opened %u connections\n", numClients) ;
+	printf("\r- Opened %u connections\n", numClients);
 
 	while ( true )
 	{
-		teulUpdateTransport(20) ;
+		teulUpdateTransport(20);
 
 		if ( rand() % 5 > 0 )
-			continue ;
+			continue;
 
-		int n = rand() % connections.size() ;
-		int m = rand() % messages.size() ;
+		int n = rand() % connections.size();
+		int m = rand() % messages.size();
 
-		chatSendMessage(connections[n], 1, messages[m]) ;
+		chatSendMessage(connections[n], 1, messages[m]);
 	}
 }
 
@@ -267,84 +267,84 @@ main(int argc, char* argv[])
 	SINT32 retval;
 	SCHAR hostAddress[1024], hostPort[1024];
 	UINT32 i;
-	PROG_TYPE progType ;
-	std::vector<const char*> commands ;
+	PROG_TYPE progType;
+	std::vector<const char*> commands;
 	// Seconds to wait between commands
-	UINT32 commandDelay = 1 ;
-	bool exitAfterCommands = true ;
-	char gameName[MAX_HANDLE_SIZE] = "auto" ;
+	UINT32 commandDelay = 1;
+	bool exitAfterCommands = true;
+	char gameName[MAX_HANDLE_SIZE] = "auto";
 
-	chatReadHostLocFile() ;
+	chatReadHostLocFile();
 
-	program = strrchr(argv[0], '/') ;
+	program = strrchr(argv[0], '/');
 	if ( program == nullptr )
-		program = argv[0] ;
+		program = argv[0];
 	else
-		program = program + 1 ;
+		program = program + 1;
 
-	int arg ;
+	int arg;
 	for ( arg = 1 ; arg < argc && argv[arg][0] == '-' ; ++arg )
 	{
 		switch ( argv[arg][1] )
 		{
 		case 'g':
-			++arg ;
-			if ( arg >= argc ) _usage() ;
+			++arg;
+			if ( arg >= argc ) _usage();
 			if ( argv[arg][0] == '-' || chatIsValidCallsign(argv[arg]) == false || (int)strlen(argv[arg]) > (int)MAX_HANDLE_LEN )
 			{
-				printf("Invalid gamename: %s\n", argv[arg]) ;
-				_usage() ;
+				printf("Invalid gamename: %s\n", argv[arg]);
+				_usage();
 			}
-			strcpy(gameName, argv[arg]) ;
-		break ;
+			strcpy(gameName, argv[arg]);
+		break;
 
 		case 'C':
-			exitAfterCommands = false ;
+			exitAfterCommands = false;
 		case 'c':
 			++arg;
-			if ( arg >= argc ) _usage() ;
-			commands.push_back(argv[arg]) ;
-		break ;
+			if ( arg >= argc ) _usage();
+			commands.push_back(argv[arg]);
+		break;
 		case 'd':
-			++arg ;
-			if ( arg >= argc ) _usage() ;
-			if ( !isdigit(argv[arg][0]) ) _usage() ;
-			commandDelay = atoi(argv[arg]) ;
-		break ;
+			++arg;
+			if ( arg >= argc ) _usage();
+			if ( !isdigit(argv[arg][0]) ) _usage();
+			commandDelay = atoi(argv[arg]);
+		break;
 		case 'n':
-			++arg ;
-			if ( arg >= argc ) _usage() ;
-			if ( !isdigit(argv[arg][0]) ) _usage() ;
-			numClients = atoi(argv[arg]) ;
-		break ;
+			++arg;
+			if ( arg >= argc ) _usage();
+			if ( !isdigit(argv[arg][0]) ) _usage();
+			numClients = atoi(argv[arg]);
+		break;
 		case '?':
 		case 'h':
 		default:
-			_usage() ;
-		break ;
+			_usage();
+		break;
 		}
 	}
 
 	if ( argc < arg + 1 )
-		_usage() ;
+		_usage();
 
-	strncpy(hostAddress,argv[arg],1024);
+	strsafecpy(hostAddress, argv[arg]);
 
-	UINT32 host=0 ;
+	UINT32 host=0;
 	if(teulGetHost(hostAddress, &host) == 0)
 	{
-		fprintf(stderr, "invalid IP address: %s", hostAddress) ;
+		fprintf(stderr, "invalid IP address: %s", hostAddress);
 		exit(-EINVAL);
 	}
 
-	UINT32 port = WWII::Net::Ports::ChatManagement ;
+	UINT32 port = WWII::Net::Ports::ChatManagement;
 	if (argc > arg+1)
 	{
-		strncpy(hostPort,argv[arg+1],1024);
+		strsafecpy(hostPort, argv[arg+1]);
 		port = (UINT32)atol(hostPort);
 	}
 
-	teulInitTransport(LOG_OFF, "./chatRoster", _errorFunction, nullptr);
+	teulInitTransport(LogMode::OFF, "./chatRoster", _errorFunction, nullptr);
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_NOTE));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_NOTE));
 
@@ -364,29 +364,29 @@ main(int argc, char* argv[])
 
 	if ( numClients > 0 )
 	{
-		_openNumClients(host, port) ;
-		exit(0) ;
+		_openNumClients(host, port);
+		exit(0);
 	}
 
-	connection = _openConnection(host, port, gameName) ;
+	connection = _openConnection(host, port, gameName);
 
 	if ( !commands.empty() )
-		_processCommands(commands, commandDelay, exitAfterCommands) ;
+		_processCommands(commands, commandDelay, exitAfterCommands);
 
 	if ( strcmp(program, "pwncps") == 0 )
 	{
-		progType = PT_SCRIPT_CLIENT ;
-		pwnType = "cp" ;
+		progType = PT_SCRIPT_CLIENT;
+		pwnType = "cp";
 	}
 	else if ( strcmp(program, "pwnfacs") == 0 )
 	{
-		progType = PT_SCRIPT_CLIENT ;
-		pwnType = "fac" ;
+		progType = PT_SCRIPT_CLIENT;
+		pwnType = "fac";
 	}
 	else if ( strcmp(program, "chatClient") == 0 )
-		progType = PT_CHAT_CLIENT ;
+		progType = PT_CHAT_CLIENT;
 	else
-		progType = PT_SYSTEM_CLIENT ;
+		progType = PT_SYSTEM_CLIENT;
 
 //	handleID = chatGetHandle("99");
 //	chatTuneRadioToHandle(0,handleID);
@@ -403,63 +403,62 @@ main(int argc, char* argv[])
 	}
 	else
 	{
-		SCHAR buf[MAX_MESSAGE_LENGTH + 8] ;
-		SCHAR* p ;
-		SCHAR* e ;
-		pollfd pfd = { STDIN_FILENO, POLLIN|POLLPRI|POLLERR|POLLHUP|POLLNVAL, 0 } ;
+		SCHAR buf[MAX_MESSAGE_LENGTH + 8];
+		SCHAR* p;
+		SCHAR* e;
+		pollfd pfd = { STDIN_FILENO, POLLIN|POLLPRI|POLLERR|POLLHUP|POLLNVAL, 0 };
 
-		printf("WW2 Online %s client\n", program) ;
+		printf("WW2 Online %s client\n", program);
 
 		do
 		{
-			size_t bytesRead ;
+			size_t bytesRead;
 
 			while ( poll(&pfd, 1, 25) == 0 )
-				teulUpdateTransport() ;
+				teulUpdateTransport();
 
 			if ( pfd.revents & (POLLERR|POLLHUP|POLLNVAL) )
-				break ;
+				break;
 
-			bytesRead = read(STDIN_FILENO, buf, sizeof(buf)-1) ;
+			bytesRead = read(STDIN_FILENO, buf, sizeof(buf)-1);
 			if ( bytesRead <= 0 )
-				break ;
-			buf[bytesRead] = 0 ;
+				break;
+			buf[bytesRead] = 0;
 
-			p = buf ;
+			p = buf;
 			while ( isspace(*p) && *p != 0 )
-				p++ ;
-			e = p ;
+				p++;
+			e = p;
 			while ( *e != 0 && *e != '\r' && *e != '\n' )
-				e++ ;
-			*e = 0 ;
+				e++;
+			*e = 0;
 
 			if ( strcasecmp(p, "quit") == 0 || strcasecmp(p, "exit") == 0 )
-				break ;
+				break;
 
 			if ( *p == '#' )
-				continue ;
+				continue;
 
 			switch ( progType )
 			{
 				case PT_SYSTEM_CLIENT:
-					_systemClient(p) ;
-					_pause() ;
-				break ;
+					_systemClient(p);
+					_pause();
+				break;
 
 				case PT_SCRIPT_CLIENT:
-					_scriptClient(p) ;
-				break ;
+					_scriptClient(p);
+				break;
 
 				case PT_CHAT_CLIENT:
-					_chatClient(p) ;
-				break ;
+					_chatClient(p);
+				break;
 
 				default:
-					exit(0) ;
-				break ;
+					exit(0);
 			}
-			teulUpdateTransport() ;
-		} while (1) ;
+			teulUpdateTransport();
+		} while (1);
 	}
 
 	teulCloseTransport();

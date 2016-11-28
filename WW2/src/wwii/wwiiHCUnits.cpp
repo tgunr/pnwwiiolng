@@ -14,8 +14,6 @@
 #include "chat/chatName.h"
 #include "dbse/dbseHandle.h"
 
-extern DBHANDLE dbh;
-
 #if defined(IS_MAP_HOST)
 # include "map/mapBrigades.h"
 #elif defined(IS_STRAT_HOST)
@@ -87,7 +85,6 @@ wwiiReadHCUnits()
 		UINT32 lastMoved;
 		ChatHandle lastMovedBy;
 		UCHAR unitClass;
-
 
 		while (q.FetchRow())
 		{
@@ -168,6 +165,8 @@ wwiiReadHCUnits()
 					newUnit = new HCUnit(unitID, typeID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank);
 				break;
 			}
+
+			newUnit->addToRegistry();
 
 			Chat::Name lastMovedByName(lastMovedBy);
 			dbugLog(_FLD, "hcu:%u start:%u fall:%u nm:%u temp:%s lmb:%s lm:%u %p +ALLOC"

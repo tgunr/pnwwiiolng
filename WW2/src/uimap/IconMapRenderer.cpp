@@ -149,7 +149,7 @@ IconMapRenderer::SuperCell::~SuperCell()
 
 /************************************************************************************************
 	Load
- 
+
  NOTE: This is NOT thread-safe!!!  replaceoctets has been taken off the stack and made static
  so we don't ever want to see more than one Cell LoaderThread running!
 *************************************************************************************************/

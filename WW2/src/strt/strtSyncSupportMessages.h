@@ -8,6 +8,6 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 //Installs the callbacks
-extern SINT32 strtSyncSupportInstallCallbacks(void);
+extern SINT32 strtSyncSupportInstallCallbacks();
 
 extern bool strtCheckSyncFinished();

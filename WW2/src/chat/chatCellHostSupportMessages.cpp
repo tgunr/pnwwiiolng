@@ -15,6 +15,7 @@
 #include "chat/chatCellTypes.h"
 #include "chat/chatConstants.h"
 #include "chat/chatModReport.h"
+#include "chat/chatName.h"
 #include "chat/chatServerTypes.h"
 #include "chat/chatTypes.h"
 #include "host/hostFraming.h"
@@ -164,19 +165,19 @@ _recvBandwidthNotice(ACTION_OBJECT* const a)
 
 //This function installs all the host callbacks
 SINT32
-chatInstallCellHostSupportCallbacks(void)
+chatInstallCellHostSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
-
-//		REGISTER_SENDER(Chat::GAME_DIRECT_MESSAGE_Y, _sendDirectMessage, _SEND_DIRECT_MESSAGE);
+	{
+		//		REGISTER_SENDER(Chat::GAME_DIRECT_MESSAGE_Y, _sendDirectMessage, _SEND_DIRECT_MESSAGE);
 
 		REGISTER_RECEIVER(Chat::SMITE_USER_Y, _recvSmiteUser);
 		REGISTER_RECEIVEOBJ(Chat::LOCATE_USER_Y, CHAT_LOC_USER, _recvLocateUser);
 
 		// Send/receive bandwidth notices
 		REGISTER_SENDRECV(Chat::BANDWIDTH_NOTICE_Y, _sendBandwidthNotice, _recvBandwidthNotice, _XCHG_BANDWIDTH_NOTICE);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 
 bool
@@ -194,7 +195,7 @@ chatSendKickNotice(const playerid_t playerID, const SCHAR* callsign, const SCHAR
 }
 
 void
-Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport report)
+Chat::SendModReport(const ChatHandle handle, const Chat::ModReport report)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MOD_REPORT_Y));
 	outgoing.append(report);

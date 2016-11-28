@@ -68,11 +68,9 @@ LOGICAL rntextLocInit()
         fioRead(hHandle, &g_Layout[i], sizeof(LOCFONTLAYOUT));
         fioClose(hHandle);
 
-		ldpixSetTextureReduction(FALSE);
         g_iTextIDS[i] = ldpixLoadImageFileToSurface(g_pFontPCXNames[i],
                                                     uColor,
                                                     LDPIX_NO_DXT);
-      	ldpixSetTextureReduction(TextureReduction);
 
         if(!piLockTextureMemorySurface(g_iTextIDS[i], 0, &g_ddText[i]))
         {
@@ -92,21 +90,17 @@ LOGICAL rntextLocInit()
 // Function: rntextLocKill
 // Description: Kill routine for this module.
 /////////////////////////////////////////////
-LOGICAL rntextLocKill()
+void rntextLocKill()
 {
-    int i;
-
     if(g_bInitialized == FALSE)
-        return TRUE;
+        return;
 
-    for(i = 0; i < DEF_NUM_BITMAPS; i++)
+    for(int i = 0; i < DEF_NUM_BITMAPS; i++)
     {
         piFreeMipTextures(g_iTextIDS[i]);
     }
 
     g_bInitialized = FALSE;
-
-    return TRUE;
 }
 
 /////////////////////////////////////////////

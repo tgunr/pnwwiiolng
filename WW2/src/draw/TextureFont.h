@@ -13,8 +13,8 @@ struct CharData
     short id,x,y,width,height,xoffset,yoffset,xadvance, page;
 };
 
-#include <unordered_map>
-typedef std::unordered_map<int,CharData> CharDataMap;
+#include "wwii/wwiiHash.h"
+using CharDataMap = std::unordered_map<int,CharData>;
 
 class TextureFont
 {

@@ -29,17 +29,17 @@
 #define DEFAULT_HOST			"192.168.0.83"
 #define DEG_TO_RAD(x) ((x) * PI / 180.0)
 
-typedef int (*interp_cmd)(int argc, char* argv[]);
+using interp_cmd = int (*)(int argc, char* argv[]);
 
-typedef struct
+struct interp_cmd_lookupg
 {
 	const char* name;
 	interp_cmd cmd;
 	const char* help;
 	bool queue;
-} interp_cmd_lookup;
+};
 
-typedef std::deque<std::string> QUEUED_CMDS;
+using QUEUED_CMDS = std::deque<std::string>;
 static QUEUED_CMDS _cmdQueue;
 
 static int spawn_cmd	(int argc, char* argv[]);
@@ -184,7 +184,7 @@ protected:
 
 MultiClient* get_client(int i);
 
-typedef std::map<int, MultiClient*> ClientMap;
+using ClientMap = std::map<int, MultiClient*>;
 static ClientMap clients;
 
 /************************************************************************************************
@@ -236,7 +236,7 @@ void multiClientUpdate(int wait, bool force)
 		std::string& cmdToRun = _cmdQueue.front();
 
 		char line[255+1];
-		strncpy(line, cmdToRun.c_str(), 255);
+		strsafecpy(line, cmdToRun.c_str());
 
 		// run the command
 		multiClientExecuteCommand(line);
@@ -303,7 +303,7 @@ static bool queueCmd(int argc, char* argv[])
 	return queued;
 }
 
-static void personaFromSpec(const WEAPON_SPEC& spec, int& country, int& branch)
+static void personaFromSpec(const WEAPON_SPEC spec, int& country, int& branch)
 {
 	country	= spec.wCountry;
 	branch	= BRANCH_LAND;
@@ -399,7 +399,7 @@ static int client_login(int clientIndex, int country, int branch)
 	client_spawn
 *************************************************************************************************/
 
-static int client_spawn(int clientIndex, const WEAPON_SPEC& spec)
+static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 {
 	int country = -1;
 	int branch = -1;
@@ -1189,7 +1189,7 @@ void multiClientInit()
 		ww2::Client::Init();
 
 	char buffer[256+1];
-	strncpy(buffer, "script mc.script q", 256);
+	strsafecpy(buffer, "script mc.script q");
 	multiClientExecuteCommand(buffer, true);
 }
 

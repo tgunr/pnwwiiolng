@@ -17,7 +17,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 HINSTANCE	hinst;
 
-static LOGICAL
+static bool
 _createWindow(HINSTANCE hInstance)
 {
 	WNDCLASS	wndClass;

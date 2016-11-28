@@ -9,7 +9,7 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include <map>
-#include "versionNo.h"
+#include "chat/chatLocalizedMessage.h"
 #include "wwii/wwiiPlayer.h"
 #include "wwii/wwiiExitCodes.h"
 #include "wwii/wwiiPermissions.h"
@@ -31,8 +31,8 @@ static const size_t _ROUNDING = 1023;
 static const UINT32 _MAX_POOLS = 3;
 
 static std::mutex allocMutex;
-typedef UINT64 StorageHeader;
-typedef	std::vector<UINT64*> Pool;
+using StorageHeader = UINT64;
+using Pool = std::vector<UINT64*>;
 static UINT32 _callocs = 0;
 static UINT32 _reserved = 0;
 static UINT32 _inUse = 0;
@@ -94,7 +94,7 @@ _getPoolNo(size_t allocSize)
 void*
 wwiiPlayer::operator new(size_t actualSize)
 {
-	// Because wwiiPlayer is intended to be a base clase, we
+	// Because wwiiPlayer is intended to be a base class, we
 	// need to be aware that descendants may have different
 	// sizes; by normalizing the sizes to significant
 	// boundaries we can avoid pool fragmentation by sharing
@@ -108,44 +108,41 @@ wwiiPlayer::operator new(size_t actualSize)
 	StorageHeader* ptr = nullptr;
 
 	// We'll need a lock.
-	auto* lock = new std::lock_guard<std::mutex>(allocMutex);
-
-	// When the pool is empty, allocate a batch of objects.
-	if ( pool.empty() )
 	{
-		if ( pool.capacity() < _POOL_GROWTH_RATE )
-			pool.reserve(_POOL_GROWTH_RATE);
+		std::lock_guard<std::mutex> lock(allocMutex);
 
-		// calloc: so that we have pre-zero'd memory.
-		void* block = memCalloc(_CALLOC_RATE, allocSize);
-		_callocs++;
-		if ( block == nullptr )
+		// When the pool is empty, allocate a batch of objects.
+		if (pool.empty())
 		{
-			delete lock;
-			throw std::bad_alloc();
+			if (pool.capacity() < _POOL_GROWTH_RATE)
+				pool.reserve(_POOL_GROWTH_RATE);
+
+			// calloc: so that we have pre-zero'd memory.
+			void* block = memCalloc(_CALLOC_RATE, allocSize);
+			_callocs++;
+			if (block == nullptr)
+				throw std::bad_alloc();
+
+			_reserved += _CALLOC_RATE;
+
+			// Now we need to split this block up into units
+			// and feed them backwards onto the pool
+			for (UINT32 i = 1; i <= _CALLOC_RATE; ++i)
+			{
+				StorageHeader* alloc = (StorageHeader*)((char*)block + (_CALLOC_RATE - i) * allocSize);
+				pool.push_back(alloc);
+			}
 		}
 
-		_reserved += _CALLOC_RATE;
+		// Grab the last entry off the vector
+		ptr = pool.back();
+		pool.pop_back();
 
-		// Now we need to split this block up into units
-		// and feed them backwards onto the pool
-		for ( UINT32 i = 1; i <= _CALLOC_RATE; ++i )
-		{
-			StorageHeader* alloc = (StorageHeader*)((char*)block + (_CALLOC_RATE - i) * allocSize);
-			pool.push_back(alloc);
-		}
+		// Adjust counters
+		_reserved--;
+		_inUse++;
+		_news++;
 	}
-
-	// Grab the last entry off the vector
-	ptr = pool.back();
-	pool.pop_back();
-
-	// Adjust counters
-	_reserved--;
-	_inUse++;
-	_news++;
-
-	delete lock;
 
 	assert( ptr != nullptr );
 
@@ -268,10 +265,10 @@ wwiiPlayer::SetDispatch(const Auth::Dispatch& rhs, UINT32 overridingCustomerID)
 {
 	m_dispatch.m_customerID = (overridingCustomerID) ? overridingCustomerID : rhs.m_customerID;
 	m_dispatch.m_OTP = rhs.m_OTP;
-	strncpy(m_dispatch.m_callsign, rhs.m_callsign, sizeof(m_dispatch.m_callsign));
-	m_dispatch.m_callsign[sizeof(m_dispatch.m_callsign) - 1] = 0;
 	m_dispatch.m_clientIP = rhs.m_clientIP;
 	m_dispatch.m_appVersion = rhs.m_appVersion;
+	m_dispatch.m_platform = rhs.m_platform;
+	strsafecpy(m_dispatch.m_callsign, rhs.m_callsign);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -280,7 +277,7 @@ wwiiPlayer::SetDispatch(const Auth::Dispatch& rhs, UINT32 overridingCustomerID)
 void
 wwiiPlayer::log(const char* msg) const
 {
-	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu %s"
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " %s"
 					, teulIndex(), playerID(), callsign()
 					, instance().category(), instance().type(), instance().handle(), instance().id()
 					, msg);
@@ -289,8 +286,6 @@ wwiiPlayer::log(const char* msg) const
 void
 wwiiPlayer::log(const char* file, int lineno, unsigned int errType, const char* mask, ...) const
 {
-	if ( errType == Debug::ERR_DBUG && !g_logDebug ) return;
-
 	static char buf[512];
 
 	va_list args;
@@ -299,7 +294,7 @@ wwiiPlayer::log(const char* file, int lineno, unsigned int errType, const char* 
 	va_end(args);
 
 	dbugLog(file, lineno, errType
-				, "t:%d p:%u c:%s in:%u.%u.%llu.%llu %s"
+				, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " %s"
 				, teulIndex(), playerID(), callsign()
 				, instance().category(), instance().type(), instance().handle(), instance().id()
 				, buf);

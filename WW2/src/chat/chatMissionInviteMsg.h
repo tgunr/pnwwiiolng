@@ -12,4 +12,4 @@
 #include "chat/chatMissionInvite.h"
 
 // Doesn't need a network_msg because we have no key or flags
-typedef teul_network_object<MissionInvite> MISSION_INVITE_MSG;
+using MISSION_INVITE_MSG = teul_network_object<MissionInvite>;

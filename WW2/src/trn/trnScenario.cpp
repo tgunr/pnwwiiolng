@@ -169,19 +169,19 @@ struct ClutterObjects
     }
 };
 
-typedef std::map<std::string, TerrainTile*> TileMap;
+using TileMap = std::map<std::string, TerrainTile*>;
 static TileMap tilemap;
 
-typedef std::map<std::string, GrassObjects*> GrassObjectMap;
+using GrassObjectMap = std::map<std::string, GrassObjects*>;
 static GrassObjectMap grassmap;
 
-typedef std::map<std::string, TreeObjects*> TreeObjectMap;
+using TreeObjectMap = std::map<std::string, TreeObjects*>;
 static TreeObjectMap treemap;
 
-typedef std::map<std::string, ClutterObjects*> ClutterObjectMap;
+using ClutterObjectMap = std::map<std::string, ClutterObjects*>;
 static ClutterObjectMap cluttermap;
 
-typedef std::map<std::string, std::string> LoadedTerrainMap;
+using LoadedTerrainMap = std::map<std::string, std::string>;
 static LoadedTerrainMap loadedmap;
 
 class ExposedLoader : public XMLLoader2<ExposedLoader>

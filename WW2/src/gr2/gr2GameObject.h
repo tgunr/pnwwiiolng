@@ -17,10 +17,10 @@
 
 class gr2DamageModel;
 
-typedef std::map<gr2State*,bool> GrannyActiveStateMap;
-typedef std::map<std::string, gr2State*> GrannyStateMap;
-typedef std::vector<gr2State*> GrannyStateList;
-typedef std::map<UINT64, gr2State*> GrannyFlagMap;
+using GrannyActiveStateMap = std::map<gr2State*,bool>;
+using GrannyStateMap = std::map<std::string, gr2State*>;
+using GrannyStateList = std::vector<gr2State*>;
+using GrannyFlagMap = std::map<UINT64, gr2State*>;
 
 class gr2GameObject : public gr2Object, public gr2JSObject
 {

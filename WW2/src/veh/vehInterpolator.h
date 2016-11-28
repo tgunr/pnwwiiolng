@@ -32,13 +32,13 @@ public:
 		unsigned int animationFlags;
 		FLOAT64 speed;
 
-		Update(void) { memset(this, 0x0, sizeof(Update)); pos.z = -10000; }
+		Update() { memset(this, 0x0, sizeof(Update)); pos.z = -10000; }
 	};
-
 	typedef int Timestamp; // The time on the other client.
 	typedef int FrameTime; // The time on this end.
 
 	InfantryPredictor(vehVehicle* v = nullptr);
+    virtual ~InfantryPredictor() = default;
 
 	void NewPosDataUpdate(Timestamp timestamp, FrameTime frametime);
 	const Update& Interpolate(FrameTime frametime);
@@ -70,4 +70,4 @@ private:
 	CubicSpline spline;
 };
 
-typedef InfantryPredictor vehInterpolator;
+using vehInterpolator = InfantryPredictor;

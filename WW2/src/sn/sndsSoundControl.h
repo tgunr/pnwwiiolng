@@ -19,54 +19,51 @@
 #define DEF_MODE_HEADRELATIVE   0x00000001
 #define DEF_MODE_DISABLE        0x00000002
 
-typedef struct snSound* snSoundPtr;
-typedef struct SNDSCREATE* LPSNDSCREATE;
-
 // Return maximum number of sounds allowed by the sound card
 extern UINT32 sndsGetMaxNumberOfSounds();
 
-extern LOGICAL sndsInit(void);
+extern LOGICAL sndsInit();
 // calls any platform-specific system initialization for sounds, allocates
 // structures and global variables. This should only be called once during
 // a program's execution
 // return values:   1 if no errors occurred during startup
 //					0 if startup failed for any reason
 
-extern LOGICAL sndsKill(void);
+extern void sndsKill();
 // calls any platform-specific shutdown for sounds, deallocates structures and
 // resets any global variables. This should only be called after snInit has been
 // called. Any sound calls made after snKill will automatically fail.
-// return values:   1 if no errors occurred during shutdown
-//					0 if shutdown failed for any reason
 
 extern LOGICAL sndsDriverConfig( void* obj );
 // handles any (temporary) UI config of sound driver issues
 
-extern LOGICAL sndsReset(void);
+extern LOGICAL sndsReset();
 // resets entire sound system to initialization state. All buffers are cleared and
 // freed, all currently playing sounds are stopped.
 // return values:	1 if no errors occurred during reset
 //					0 if reset failed for any reason
 
-extern void sndsUpdateSounds(void);
+extern void sndsUpdateSounds();
 
 // this loops through the linked list of sounds, updating 3D effects such as volume3D/pan3D/freqShift3D
 // according to the listener pos/vel and each sound pos/vel
 //
 // it also handles starting delayed sounds if the time to play them has elapsed
 //
-// it is also a convienent place to put possible resource optomisations such as deleting sounds which have
+// it is also a convenient place to put possible resource optimizations such as deleting sounds which have
 // finished playing (and are not looping), or doing performance monitoring, etc.
 
-//extern LOGICAL sndsCanCreateNewSound(void);
+//extern LOGICAL sndsCanCreateNewSound();
 
 // this enforces whatever rules we have regarding max number of sounds playing at one time
 
+struct snSound;
+struct SNDSCREATE;
 #ifdef SOUND_DEBUG
 	#define sndsLoadSound(a)   sndsLoadSoundDebug(a, _FL)
-	extern snSound * sndsLoadSoundDebug(LPCREATE lpCreate, SCHAR* file, SINT32 line);
+	extern snSound * sndsLoadSoundDebug(SNDSCREATE* lpCreate, SCHAR* file, SINT32 line);
 #else
-	extern snSound * sndsLoadSound(LPSNDSCREATE lpCreate);
+	extern snSound * sndsLoadSound(SNDSCREATE* lpCreate);
 #endif
 
 // creates a new snSound item and loads the sound buffer with the waveform
@@ -137,7 +134,7 @@ extern LOGICAL sndsSetVolume(snSound* whichSound, FLOAT64 newVolume);
 // unpredictable effects.
 // Note that other factors (such as distance attenuation) can impact the volume
 // which is ultimately applied to the sound.  Therefore using this function will
-// effect an immeadiate volume change always, but the actual volume may
+// effect an immediate volume change always, but the actual volume may
 // be different if distance attenuation is active
 // return values:	1 if value was set
 //					0 if value was not set
@@ -149,7 +146,7 @@ extern LOGICAL sndsSetPanPosition(snSound* whichSound, short panPosition);
 // be remixed with this command.
 // Note that other factors (such as 3D panning) can impact the pan
 // which is ultimately applied to the sound.  Therefore using this function will
-// effect an immeadiate pan change always, but the actual pan may
+// effect an immediate pan change always, but the actual pan may
 // be different if 3D pan is active
 // return values:	1 if value was set
 //					0 if value was not set
@@ -234,18 +231,18 @@ LOGICAL sndsApply3D(snSound* snd);
 extern LOGICAL sndsCommitDeferredSettings();
 extern LOGICAL sndsSetListener3DPos(struct piVECTOR* pPos, UINT32 uApply);
 extern LOGICAL sndsSetListener3DVel(struct piVECTOR* pVel, UINT32 uApply);
-extern LOGICAL sndsSetMaxDistance(snSoundPtr lpSound, FLOAT32 fMax, UINT32 uApply);
-extern LOGICAL sndsSetMinDistance(snSoundPtr lpSound, FLOAT32 fMin, UINT32 uApply);
+extern LOGICAL sndsSetMaxDistance(snSound* lpSound, FLOAT32 fMax, UINT32 uApply);
+extern LOGICAL sndsSetMinDistance(snSound* lpSound, FLOAT32 fMin, UINT32 uApply);
 extern LOGICAL sndsSetOrientation(struct piVECTOR* pFront, struct piVECTOR* pTop, UINT32 uApply);
-extern LOGICAL sndsSetSound3DMode(snSoundPtr lpSound, UINT32 uMode, UINT32 uApply);
-extern LOGICAL sndsSetSound3DPos(snSoundPtr lpSound, struct piVECTOR* pPos, UINT32 uApply);
-extern LOGICAL sndsSetSound3DVel(snSoundPtr lpSound, struct piVECTOR* pVel, UINT32 uApply);
-extern LOGICAL sndsSetConeAngles(snSoundPtr lpSound,
+extern LOGICAL sndsSetSound3DMode(snSound* lpSound, UINT32 uMode, UINT32 uApply);
+extern LOGICAL sndsSetSound3DPos(snSound* lpSound, struct piVECTOR* pPos, UINT32 uApply);
+extern LOGICAL sndsSetSound3DVel(snSound* lpSound, struct piVECTOR* pVel, UINT32 uApply);
+extern LOGICAL sndsSetConeAngles(snSound* lpSound,
                                  UINT32 uIn,
                                  UINT32 uOut,
                                  UINT32 uApply);
-extern LOGICAL sndsSetConeOrientation(snSoundPtr lpSound, struct piVECTOR* pVec, UINT32 uApply);
-extern LOGICAL sndsGetVolume(snSoundPtr lpSound, SINT32* pVolume);
+extern LOGICAL sndsSetConeOrientation(snSound* lpSound, struct piVECTOR* pVec, UINT32 uApply);
+extern LOGICAL sndsGetVolume(snSound* lpSound, SINT32* pVolume);
 
 // functions to be defined later:
 // -  pitch bending
@@ -258,4 +255,4 @@ extern LOGICAL sndsGetVolume(snSoundPtr lpSound, SINT32* pVolume);
 // definitions for platform specific functions - description found in the non-platform version unless specified otherwise
 
 // this is for debugging purposes-walks sound list and Write_Debug's the contents
-extern void sndsWalkSoundList(void);
+extern void sndsWalkSoundList();

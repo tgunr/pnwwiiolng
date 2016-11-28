@@ -15,7 +15,7 @@
 void obmainPrintObject(OBJECT* object, int ident=0);
 
 #include <stack>
-typedef std::stack<mlObjectData*> OBJECT_DATA_POOL;
+using OBJECT_DATA_POOL = std::stack<mlObjectData*>;
 static OBJECT_DATA_POOL _objectDataPool;
 
 /************************************************************************************************

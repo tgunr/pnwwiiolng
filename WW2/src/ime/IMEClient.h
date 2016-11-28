@@ -24,7 +24,7 @@ public:
         HRESULT hr = S_OK;
 
 		hr = CoInitializeEx( nullptr, COINIT_APARTMENTTHREADED );
-        
+
 	    if ( SUCCEEDED( hr ) || hr == S_FALSE )
 		{
 			m_bComInit = true;
@@ -45,7 +45,7 @@ public:
 			m_ptim->Release();
 			m_ptim = nullptr;
 		}
-		
+
 		if ( m_bComInit )
 		{
 		    CoUninitialize();

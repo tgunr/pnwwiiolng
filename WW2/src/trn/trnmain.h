@@ -74,16 +74,16 @@
 
 	};
 
-	typedef LOGICAL (*TRN_OBJECT_NOTIFY)(struct OBJECT* lpobj, SINT32 scx, SINT32 scy, UINT32 id, REL_OBJ_ID * ObjId);
+	using TRN_OBJECT_NOTIFY = LOGICAL(*)(struct OBJECT* lpobj, SINT32 scx, SINT32 scy, UINT32 id, REL_OBJ_ID * ObjId);
 
 	extern LOGICAL trnmainInit(SINT8* name, FLOAT32 xorigin, FLOAT32 yorigin);
-	extern void trnmainKill(void);
+	extern void trnmainKill();
 	extern LOGICAL trnmainSetTerrainMatrix(OBJECT* lpobj);
 	extern LOGICAL trnmainGetDimensions(FLOAT64* left, FLOAT64* top, FLOAT64* width, FLOAT64* height);
 	extern LOGICAL trnmainGetHorizon(FLOAT32* reshorizon);
-	extern LOGICAL trnmainUpdate(void);
+	extern LOGICAL trnmainUpdate();
 	extern LOGICAL trnmainDraw();
-	extern LOGICAL trnmainLODChange(void);
+	extern LOGICAL trnmainLODChange();
 	extern LOGICAL trnmainDrawLastFrame(OBJECT* lpobj);
 	extern LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, const SINT8* texname);
 	extern LOGICAL trnmainAddToObject(OBJECT* newobj, OBJECT* lpobj, SINT32 poly, SINT32 tonum, SINT32 drag, SINT32 roughness, SINT32 style, SINT32 orientation);
@@ -104,14 +104,14 @@
 	extern LOGICAL trnGetWorldOriginOffset(FLOAT64VECTOR * Offset);
 	extern LOGICAL trnCheckAndAdjustCameraPositionWithOriginOffset(piVECTOR * CameraPos);
 	extern UINT32 trnUpdateTerrainOriginOffset(LOGICAL force);
-	extern LOGICAL trnmainWorldOriginMoved(void);
+	extern LOGICAL trnmainWorldOriginMoved();
 	extern LOGICAL trnmainDoRawUpdate(LOGICAL ForceCompleteLoad);
 	extern TERRAIN_DETAIL* trnGetTerainDetail(SINT16 scx, SINT16 scy);
 	extern LOGICAL trnFindStratBuildingByTO(struct BUILDING** const bld, struct trnCDTerrainObject* const TO);
 
 	extern LOGICAL trnmainSetLightingUpdate(LOGICAL newLightingUpdate);
 
-	extern SINT32 trnmainGetNumDrawnTriangles(void);
+	extern SINT32 trnmainGetNumDrawnTriangles();
 
 	// called whenever a terain object is loaded or unloaded to
 	// copy strat data and update bldHash

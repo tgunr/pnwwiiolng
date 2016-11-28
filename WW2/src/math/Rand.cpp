@@ -48,7 +48,7 @@
 // GCC at -O3 optimization so try your options and see what's best for you
 //
 
-//typedef unsigned int uint32;
+//using uint32 = unsigned int;
 
 #define N        (624)       // length of state vector
 #define M        (397)       // a period parameter
@@ -73,15 +73,15 @@ void seedMT( unsigned int seed )
 {
 	seedMT(seed, _state, _next, _left);
 }
-unsigned int reloadMT( void )
+unsigned int reloadMT()
 {
 	return reloadMT(_state, _next, _left);
 }
-unsigned int randomMT( void )
+unsigned int randomMT()
 {
 	return randomMT(_state, _next, _left);
 }
-float frandomMT( void )
+float frandomMT()
 {
 	return frandomMT(_state, _next, _left);
 }
@@ -218,53 +218,3 @@ float frandomMT( unsigned int *state, unsigned int *&next, int &left )
 {
 	return ( float ) ( ( double ) randomMT(state, next, left) / 4294967296.0 );
 }
-RakNetRandom::RakNetRandom()
-{
-	left=-1;
-}
-RakNetRandom::~RakNetRandom()
-{
-}
-void RakNetRandom::SeedMT( unsigned int seed )
-{
-	seedMT(seed, state, next, left);
-}
-
-unsigned int RakNetRandom::ReloadMT( void )
-{
-	return reloadMT(state, next, left);
-}
-
-unsigned int RakNetRandom::RandomMT( void )
-{
-	return randomMT(state, next, left);
-}
-
-float RakNetRandom::FrandomMT( void )
-{
-	return frandomMT(state, next, left);
-}
-
-void RakNetRandom::FillBufferMT( void *buffer, unsigned int bytes )
-{
-	fillBufferMT(buffer, bytes, state, next, left);
-}
-
-/*
-int main(void)
-{
-int j;
-
-// you can seed with any uint32, but the best are odds in 0..(2^32 - 1)
-
-seedMT(4357U);
-
-// print the first 2,002 random numbers seven to a line as an example
-
-for(j=0; j<2002; j++)
-RAKNET_DEBUG_PRINTF(" %10lu%s", (unsigned int) randomMT(), (j%7)==6 ? "\n" : "");
-
-return(EXIT_SUCCESS);
-}
-
-*/

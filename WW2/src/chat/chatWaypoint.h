@@ -8,6 +8,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include "str/stringLib.h"
+
 //////////////////////////////////////////////////////////////////////
 // Defined waypoint base-types
 
@@ -63,11 +65,11 @@ static const UINT32 MAX_WP_HANDLE_LEN = MAX_HANDLE_LEN;
 static const UINT32 MAX_WP_HANDLE_BITS = GAME_HANDLE_BITS;
 static const UINT32 CONTACT_REPORT_LIFETIME_S = 7 * 60;		// 7 minutes
 
-class Waypoint
+class Waypoint final
 {
 	// Constructors/destructors
 public:
-	Waypoint(bool isLocal, const ChatHandle& withHandle, const ChatHandle& fromPlayerHandle, WP_TYPE withType, UINT32 withSubType, SINT32 atX, SINT32 atY, UINT32 whenPosted, const char* withNotes)
+	Waypoint(bool isLocal, const ChatHandle withHandle, const ChatHandle fromPlayerHandle, WP_TYPE withType, UINT32 withSubType, SINT32 atX, SINT32 atY, UINT32 whenPosted, const char* withNotes)
 		: m_local(isLocal)
 		, m_handle(withHandle)
 		, m_playerHandle(fromPlayerHandle)
@@ -78,8 +80,7 @@ public:
 		, m_posted((whenPosted) ? whenPosted: (UINT32)teulTime())
 		, m_shared(true)
 		{
-			strncpy(m_notes, withNotes, MAX_WP_NOTE_LENGTH);
-			m_notes[MAX_WP_NOTE_LENGTH] = 0;
+			strsafecpy(m_notes, withNotes);
 		}
 
 	Waypoint()
@@ -91,9 +92,9 @@ public:
 		, m_x(0)
 		, m_y(0)
 		, m_posted((UINT32)teulTime())
+		, m_notes{}
 		, m_shared(true)
 		{
-			m_notes[0] = 0;
 		}
 
 	// Network constructor
@@ -106,6 +107,7 @@ public:
 		, m_x(0)
 		, m_y(0)
 		, m_posted((UINT32)teulTime())
+		, m_notes{}
 		, m_shared(true)
 		{
 			a->offset = packer(TEUL_UNPACK, a);
@@ -118,9 +120,9 @@ public:
 	// Functions
 public:
 	// Pack and unpack routine
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	void setPosted(UINT32 postedTime) { m_local = false; m_posted = postedTime; }
-	void setHandle(const ChatHandle& toHandle) { m_handle = toHandle; }
+	void setHandle(const ChatHandle toHandle) { m_handle = toHandle; }
 	void setShared(bool toShared) { m_shared = toShared; }
 
 	// 'true' if anyone can post this type
@@ -143,8 +145,8 @@ public:
 	// Accessors
 public:
 	UINT32 local() const { return m_local; }
-	const ChatHandle& handle() const { return m_handle; }
-	const ChatHandle& playerHandle() const { return m_playerHandle; }
+	ChatHandle handle() const { return m_handle; }
+	ChatHandle playerHandle() const { return m_playerHandle; }
 	WP_TYPE type() const { return m_type; }
 	UINT32 subType() const { return m_subType; }
 	SINT32 x() const { return m_x; }

@@ -11,8 +11,6 @@
 
 #include <stdexcept>
 
-#include "versionNo.h"
-
 #include "chat/chatDB.h"
 #include "chat/chatDotCommand.h"
 #include "chat/chatDotCommandIndex.h"
@@ -23,14 +21,14 @@
 #include "chat/chatTimeInterval.h"
 #include "include/mydbQuery.h"
 #include "teul/teulTime.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "teul/teulPacket.h"	// For the all-commands list.
 #include "chat/chatDotCommandList.h"
 #include "chat/chatHostPlayerIndex.h"
 #include "chat/chatLStringErr.h"
 
-extern DBHANDLE& chatdbGetDBH();
+using Chat::ARGV;
 
 static Teul::Packet* g_commandListPacket = nullptr;
 
@@ -78,7 +76,7 @@ Chat::LStringErr::LStringErr(const char* err, const char* arg)
 // Constructor
 
 DotCommand::DotCommand(const std::string& newCommand, const std::string& dotDescription
-						, const ChatHandle& mask, LSTRING_ID usage, LSTRING_ID detail
+						, const PermissionMask mask, LSTRING_ID usage, LSTRING_ID detail
 						, bool playnetOnly)
 	: m_command(newCommand)
 	, m_description(dotDescription)
@@ -167,7 +165,7 @@ void DotCommand::catIntToText(const UINT32 value, char *dest) const
    // skip to the null character
    while (*dest++ != 0);
 
-   // append the integer 
+   // append the integer
    sprintf(istring, "%u", value);
 
    dbugLog(_FLD, "Appending value %u to istring: %s", value, istring);
@@ -207,21 +205,23 @@ DotCommand::setAvailability(char level)
 	break;
 
 	case 'C':
+		// CRS only
 		dbugLog(_FLD, "%s restricted to CRS by permission" , command());
 		m_public = false;
 		m_playnetOnly = true;
-		break;
+	break;
+
 	default:
 #ifdef DEBUG
 		LogAbort("'%s' command has unrecognized availability level %c", command(), level);
 #else
 		dbugLog(_FLA, "'%s' command has unrecognized availability level %c", command(), level);
-#endif
 		// If we somehow deployed with an invalid command, at least mark it as Playnet-only
 		// to limit its potential use as much as possible.
 		m_public = false;
 		m_playnetOnly = true;
 		break;
+#endif
 	}
 }
 
@@ -302,10 +302,10 @@ DotCommand::allow(Player& player) const
 	for ( UINT32 i = 0; i < m_usages.size(); i++ )
 	{
 		if ( m_usages[i]->mask == NO_MASK || player.permissions(m_usages[i]->mask) )
-			return m_usages[i];
+			return m_usages[i].get();
 	}
 
-	dbugLog(_FLD, "Player with permissions %llx does not have permission to access command", player.m_permissionMask);
+	dbugLog(_FLD, "Player with permissions %" PRPermMaskT " does not have permission to access command", player.m_permissionMask);
 
 	return nullptr;
 }
@@ -555,7 +555,7 @@ DotCommandIndex::readPermissions()
 	dbugLog(_FLI, "Reading new permissions");
 	try
 	{
-		DBQuery dbq(chatdbGetDBH(), "SELECT cc.command, cc.availability FROM chat_commands cc");
+		DBQuery dbq(dbh, "SELECT cc.command, cc.availability FROM chat_commands cc");
 		while ( dbq.FetchRow() )
 		{
 			DBRow& row = dbq.Row();
@@ -584,11 +584,11 @@ DotCommandIndex::readPermissions()
 		UINT32 lastCmd = 0;
 		DotCommand* dc = nullptr;
 
-		DBQuery dbq(chatdbGetDBH()
-						, "SELECT cc.cmd_oid, cc.command, cgc.group_oid"
-		  					" FROM	chat_commands cc, chat_group_cmds cgc"
-		 					" WHERE	cc.cmd_oid = cgc.cmd_oid AND cc.availability != 'E'"
-							" ORDER BY cc.cmd_oid");
+		DBQuery dbq(dbh,
+					"SELECT cc.cmd_oid, cc.command, cgc.group_oid"
+						" FROM	chat_commands cc, chat_group_cmds cgc"
+						" WHERE	cc.cmd_oid = cgc.cmd_oid AND cc.availability != 'E'"
+						" ORDER BY cc.cmd_oid");
 		while ( dbq.FetchRow() )
 		{
 			DBRow& row = dbq.Row();
@@ -629,8 +629,7 @@ DotCommandIndex::readPermissions()
 void
 DotCommandIndex::buildCommandListPacket()
 {
-	if ( g_commandListPacket )
-		delete g_commandListPacket;
+	delete g_commandListPacket;
 
 	g_commandListPacket = new Teul::Packet(Teul::PacketId(CHAT_X, Chat::CMD_LIST_Y));
 	g_commandListPacket->setUnencrypted();
@@ -751,7 +750,6 @@ chatGetTimeInterval(Player& player, const char* timeString, UINT32& interval, co
 			interval = 0;
 			player.message(LSTR_CAUTION, LSTR_INVALID_TIME, timeString);
 			return false;
-		break;
 	};
 
 	return true;

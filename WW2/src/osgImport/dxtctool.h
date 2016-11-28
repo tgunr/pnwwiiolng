@@ -42,10 +42,10 @@
 
 #if defined(_MSC_VER)
 
-    typedef __int8  dxtc_int8;
-    typedef __int16 dxtc_int16;
-    typedef __int32 dxtc_int32;
-    typedef __int64 dxtc_int64;
+    using dxtc_int8 = __int8 ;
+    using dxtc_int16 = __int16;
+    using dxtc_int32 = __int32;
+    using dxtc_int64 = __int64;
 
     #define HEX_0x000000000000FFFF 0x000000000000FFFF
     #define HEX_0x000000000FFF0000 0x000000000FFF0000
@@ -55,10 +55,10 @@
 
 #else
 
-    typedef char        dxtc_int8;
-    typedef short       dxtc_int16;
-    typedef int         dxtc_int32;
-    typedef long long   dxtc_int64;
+    using dxtc_int8 = char       ;
+    using dxtc_int16 = short      ;
+    using dxtc_int32 = int        ;
+    using dxtc_int64 = long long  ;
 
     #define HEX_0x000000000000FFFF 0x000000000000FFFFll
     #define HEX_0x000000000FFF0000 0x000000000FFF0000ll

@@ -23,39 +23,12 @@
 #include "strt/strtData.h"
 #include "strt/strtHack.h"
 
-static LOGICAL _fakeStructure(CPStruct* cp);
 static std::vector<std::unique_ptr<FacilityStruct>> _fakeFacilitys;
 static std::vector<std::unique_ptr<ObjectStruct>> _fakeObjects;
 
-//Takes the cp list and runs through it all, turning each standalone
-//	bridge CP into one with a faked facility and object to take damage
-void strtFakeBridges(CPStruct* cpList)
-{
-	if (cpList == nullptr)
-		return;
-
-	dbugLog(_FLI, "Initializing bridges");
-
-	//Go through every cp
-	for ( CPStruct* cp = cpList; cp != nullptr; cp = cp->next )
-	{
-		if (cp->fullObjID.objType == CP_BRIDGE)
-		{
-#if defined(DEV_BUILD)
-			dbugLog(_FLN,"CP %s is a bridge CP, building a facility and an object for it", cp->name);
-#endif
-
-			_fakeStructure(cp);
-		}
-	}
-}
-
 //Allocates the fake CP structure underneath bridge CPs
-static LOGICAL _fakeStructure(CPStruct* cp)
+static void _fakeStructure(CPStruct& cp)
 {
-	if (cp == nullptr)
-		return FALSE;
-
 	//Get memory for our darling little hack
 	FacilityStruct* const facility = new FacilityStruct;
 	_fakeFacilitys.emplace_back(facility);
@@ -69,27 +42,27 @@ static LOGICAL _fakeStructure(CPStruct* cp)
 	//The facility is no more than a placeholder, so we only need to set its
 	//	type (I think)
 
-	cp->setSide((WWII_SIDE)BRIDGE_SIDE);
-	cp->country = (WWII_COUNTRY)BRIDGE_BUILT_COUNTRY;
-	cp->controllingSide = cp->side;
-	cp->controllingCountry = cp->country;
+	cp.setSide((WWII_SIDE)BRIDGE_SIDE);
+	cp.country = (WWII_COUNTRY)BRIDGE_BUILT_COUNTRY;
+	cp.controllingSide = cp.side;
+	cp.controllingCountry = cp.country;
 
 	//Set its type to base, so it won't do anything in the main strat loop
-	facility->fullObjID = cp->fullObjID;
+	facility->fullObjID = cp.fullObjID;
 	facility->fullObjID.objType = facility->type = FACILITY_BASE;
 
-	cp->facilityList = facility;
-	facility->cp = cp;
+	cp.facilityList = facility;
+	facility->cp = &cp;
 	//Setup the side
 
-	facility->setCountry(cp->country);
+	facility->setCountry(cp.country);
 
-	strsafecpy(facility->name, cp->name);
-	facility->filename = cp->filename;
-	facility->m_filename = cp->m_filename;
+	strsafecpy(facility->name, cp.name);
+	facility->filename = cp.filename;
+	facility->m_filename = cp.m_filename;
 
 	//Setup the fake FULL_OBJ_ID
-	object->fullObjID = cp->fullObjID;
+	object->fullObjID = cp.fullObjID;
 	object->fullObjID.objClass = CLASS_BUILDING;
 	object->fullObjID.objType = BUILDING_GENERIC;
 	object->type = BUILDING_BRIDGE;
@@ -100,12 +73,12 @@ static LOGICAL _fakeStructure(CPStruct* cp)
 
 	//Initialize the object
 	//Fake an object name
-	strprintf(object->name, "BRIDGE _ %s", cp->name);
+	strprintf(object->name, "BRIDGE _ %s", cp.name);
 
 	//copy over the object filename, so when we lookup its information in the
 	//	WOR file, we actually can find something
-	object->filename = cp->filename;
-	object->m_filename = cp->m_filename;
+	object->filename = cp.filename;
+	object->m_filename = cp.m_filename;
 
 	//Initialize the object from the WOR file
 	strtInitObjectfromWOR(*object);
@@ -113,12 +86,33 @@ static LOGICAL _fakeStructure(CPStruct* cp)
 	//Changes the SC's index to point at the bridge object as opposed to the
 	//	Bridge CP.  This is the big scary hack part.  What it does is
 	//	allow damage lookups on the bridge to find out fake object
-	Supercell* const sc = strtGetSupercellFULL_OBJ_ID(cp->fullObjID);
-	if ( sc != nullptr && sc->index[cp->fullObjID.id] == (void*) cp)
+	Supercell* const sc = strtGetSupercellFULL_OBJ_ID(cp.fullObjID);
+	if ( sc != nullptr && sc->index[cp.fullObjID.id] == (void*) &cp)
 	{
-		sc->index[cp->fullObjID.id] = (void*) object;
+		sc->index[cp.fullObjID.id] = (void*) object;
 	}
+}
 
-	return TRUE;
+//Takes the cp list and runs through it all, turning each standalone
+//	bridge CP into one with a faked facility and object to take damage
+void strtFakeBridges(CPStruct* cpList)
+{
+	if (cpList == nullptr)
+		return;
+
+	dbugLog(_FLI, "Initializing bridges");
+
+	//Go through every cp
+	for ( CPStruct* cp = cpList; cp ; cp = cp->next )
+	{
+		if (cp->fullObjID.objType == CP_BRIDGE)
+		{
+#if defined(DEV_BUILD)
+			dbugLog(_FLN,"CP %s is a bridge CP, building a facility and an object for it", cp->name);
+#endif
+
+			_fakeStructure(*cp);
+		}
+	}
 }
 

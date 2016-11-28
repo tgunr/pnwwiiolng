@@ -1,13 +1,10 @@
 /*
- * xlink.h : interfaces to the hyperlinks detection module
+ * Summary: unfinished XLink detection module
+ * Description: unfinished XLink detection module
  *
- * See Copyright for the status of this software.
+ * Copy: See Copyright for the status of this software.
  *
- * Related specification: http://www.w3.org/TR/xlink
- *                        http://www.w3.org/HTML/
- *     and XBase 
- *
- * daniel@veillard.com
+ * Author: Daniel Veillard
  */
 
 #ifndef __XML_XLINK_H__
@@ -16,9 +13,12 @@
 #include <libxml/xmlversion.h>
 #include <libxml/tree.h>
 
+#ifdef LIBXML_XPTR_ENABLED
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /**
  * Various defines for the various Link properties.
  *
@@ -57,13 +57,13 @@ typedef enum {
  * xlinkNodeDetectFunc:
  * @ctx:  user data pointer
  * @node:  the node to check
- * 
+ *
  * This is the prototype for the link detection routine.
  * It calls the default link detection callbacks upon link detection.
  */
 typedef void (*xlinkNodeDetectFunc) (void *ctx, xmlNodePtr node);
 
-/**
+/*
  * The link detection module interact with the upper layers using
  * a set of callback registered at parsing time.
  */
@@ -157,30 +157,33 @@ struct _xlinkHandler {
 
 /*
  * The default detection routine, can be overridden, they call the default
- * detection callbacks. 
+ * detection callbacks.
  */
 
-XMLPUBFUN xlinkNodeDetectFunc XMLCALL	
+XMLPUBFUN xlinkNodeDetectFunc XMLCALL
 		xlinkGetDefaultDetect	(void);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 		xlinkSetDefaultDetect	(xlinkNodeDetectFunc func);
 
 /*
  * Routines to set/get the default handlers.
  */
-XMLPUBFUN xlinkHandlerPtr XMLCALL	
+XMLPUBFUN xlinkHandlerPtr XMLCALL
 		xlinkGetDefaultHandler	(void);
-XMLPUBFUN void XMLCALL		
+XMLPUBFUN void XMLCALL
 		xlinkSetDefaultHandler	(xlinkHandlerPtr handler);
 
 /*
  * Link detection module itself.
  */
-XMLPUBFUN xlinkType XMLCALL	 
+XMLPUBFUN xlinkType XMLCALL
 		xlinkIsLink		(xmlDocPtr doc,
 					 xmlNodePtr node);
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* LIBXML_XPTR_ENABLED */
+
 #endif /* __XML_XLINK_H__ */

@@ -27,7 +27,7 @@
 
 static bool g_weaponListIsInitialized;
 
-typedef std::map<UINT32, WEAPON*> WEAPON_INDEXES;
+using WEAPON_INDEXES = std::map<UINT32, WEAPON*>;
 static WEAPON_INDEXES s_weaponIndexes;
 
 const char* facilityTypeName[] = {	"NONE",
@@ -110,7 +110,7 @@ extern std::vector<std::unique_ptr<WEAPON>> g_weaponPtrs;
 WEAPON_SPAWNS g_weaponSpawns;
 
 // Weapons indexed by name
-typedef std::unordered_map<std::string,WEAPON*> WEAPON_NAME_INDEX;
+using WEAPON_NAME_INDEX = std::unordered_map<std::string,WEAPON*>;
 static WEAPON_NAME_INDEX weaponNameIndex;
 
 bool weapHasInitialized()
@@ -215,10 +215,6 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 {
 	WEAPON_SPEC weap = NULL_WEAP_SPEC;
 	SINT32 wType;
-	char sCountry[WEAP_IDENT_SIZE+1]
-		,sCategory[WEAP_IDENT_SIZE+1]
-		,sClass[MAX_CLASS_NAME_LEN]
-		;
 
 	const char* const sType = strstr(weapString, ".");
 
@@ -236,16 +232,13 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 	if (tempString < weapString)
 		return NULL_WEAP_SPEC;
 
-	memset(sClass,0,MAX_CLASS_NAME_LEN);
-	memset(sCountry,0,WEAP_IDENT_SIZE+1);
-	memset(sCategory,0,WEAP_IDENT_SIZE+1);
-
+	char sClass[MAX_CLASS_NAME_LEN + 1] = "";
 	if (tempString != nullptr)
 	{
 		tempString++;
 
 		size_t sClassLen = sType - tempString;
-		strncpy(sClass, tempString, std::min(sizeof(sClass), sClassLen));
+		strncpy(sClass, tempString, std::min(sizeof(sClass) - 1, sClassLen));
 
 		if (! strncmp(sClass,"null",MAX_CLASS_NAME_LEN) )
 			weap.wClass = 0;
@@ -255,13 +248,15 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 		tempString -= WEAP_IDENT_SIZE;
 		if (tempString >= weapString)
 		{
-			memcpy(sCategory,tempString,WEAP_IDENT_SIZE);
+			char sCategory[WEAP_IDENT_SIZE + 1] = "";
+			memcpy(sCategory, tempString, WEAP_IDENT_SIZE);
 			weap.wCategory = weapFindCategory(sCategory).wCategory;
 
 			tempString -= WEAP_IDENT_SIZE;
 			if (tempString >= weapString)
 			{
-				memcpy(sCountry,tempString,WEAP_IDENT_SIZE);
+				char sCountry[WEAP_IDENT_SIZE + 1] = "";
+				memcpy(sCountry, tempString, WEAP_IDENT_SIZE);
 				weap.wCountry = weapFindCountryFromCode(sCountry).wCountry;
 			}
 		}
@@ -270,15 +265,15 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 	}
 	else
 	{
-		size_t sClassLen = sType - weapString;
+		size_t sClassLen = std::min((size_t)(sType - weapString), sizeof(sClass) - 1);
 		strncpy(sClass, weapString, sClassLen);
+		sClass[sClassLen] = 0;
 		weap.wClass = weapFindClass(sClass).wClass;
 		weap.wCategory = 0;
 		weap.wCountry = 0;
 
 		return weap;
 	}
-
 }
 
 WEAPON_SPEC
@@ -294,12 +289,12 @@ weapAssociateIndex(const char* objName, UINT32 localIndex)
 	WEAPON* weapon = weapLookupWeaponByName(weapName);
 	if ( weapon == nullptr )
 	{
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 		Write_Debug("weapon %s not defined li:%u", weapName, localIndex);
-#elif defined(AS_SERVER)
+		return NULL_WEAP_SPEC;
+#else
 		LogAbort("weap:%s li:%u no weapon to associate with", weapName, localIndex);
 #endif
-		return NULL_WEAP_SPEC;
 	}
 
 	weapon->m_localIndex = localIndex;
@@ -391,7 +386,7 @@ bool weapListInit(const char* theaterPath)
 	return true;
 }
 
-void weapListKill(void)
+void weapListKill()
 {
 	g_weaponList.clear();
 	g_weaponSpawns.clear();
@@ -403,7 +398,7 @@ void weapListKill(void)
 #endif
 
 // Find the weapon spec of a weapon by its name
-const WEAPON_SPEC&
+WEAPON_SPEC
 weapFindWeaponByName(const char* name)
 {
 	if ( name == nullptr || *name == 0 )
@@ -433,7 +428,7 @@ weapLookupWeaponByIndex(UINT32 localIndex)
 }
 
 // Lookup the weapon with the fast index
-WEAPON* weapLookup(const WEAPON_SPEC& spec)
+WEAPON* weapLookup(const WEAPON_SPEC spec)
 {
 	WEAPON_LIST::iterator it = g_weaponList.find(spec);
 	return ( it != g_weaponList.end() ) ? it->second : nullptr;
@@ -452,7 +447,7 @@ _getAccessValue(const char* key)
 	return atoi(key+1);
 }
 
-WEAPON::WEAPON(const WEAPON_SPEC& withSpec
+WEAPON::WEAPON(const WEAPON_SPEC withSpec
 				, const char* Name, const char* withAccess
 				, UINT16 unitCount
 				, UINT32 lod_cm, UINT32 AlertDist, UINT32 Speed, UINT32 CVCValue
@@ -473,8 +468,8 @@ WEAPON::WEAPON(const WEAPON_SPEC& withSpec
 	, alertDist2((UINT64)AlertDist * (UINT64)AlertDist)
 	, m_modified(false)
 {
-	strncpy(name, Name, MAX_WEAP_NAME_LEN);
-	strncpy(fullName, Name, MAX_WEAP_NAME_LEN);
+	strsafecpy(name, Name);
+	strsafecpy(fullName, Name);
 	strlwr(name);
 
 	memset(bias, 0, sizeof(bias));

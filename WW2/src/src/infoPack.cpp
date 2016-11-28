@@ -12,7 +12,7 @@
 #include "include/infoMessageTypes.h"
 #include "teul/teulPackers.h"
 
-SINT32 packCompInfoReq(LOGICAL mode, UCHAR* data, SINT32 offset, COMPUTER_INFO_REQ* object, SINT32 /*size*/)
+SINT32 packCompInfoReq(PackMode mode, UCHAR* data, SINT32 offset, COMPUTER_INFO_REQ* object, SINT32 /*size*/)
 {
 
 	if (object == nullptr)

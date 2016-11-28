@@ -57,7 +57,7 @@ static UINT32 weapfxAmmoHitMark(weapAmmo const* Ammo,
 static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 					   FLOAT64VECTOR const* pPos,
 					   piVECTOR const* pNormal,
-					   LOGICAL bIsWater);
+					   bool bIsWater);
 static UINT32 weapfxAmmoExpHitAttached(weapAmmo const* Ammo, SINT32 iPenetration);
 
 static UINT32 _CreateMuzzleFlash(weapAmmo const* pAmmo, OBJECT* o, const FLOAT64VECTOR* pos);
@@ -69,26 +69,17 @@ static UINT32 _CreateDebris(weapAmmo const* pAmmo,
 							void* pVehicle,
 							SINT32 iPenetration);
 static SINT32 _Attach3DBombSound(weapAmmo* pAmmo);
-#if(0)
-static bool _Attach3DBulletSound(weapAmmo* pAmmo);
-#endif
 static bool _InitObjectParams(OBJECT* o, piVECTOR& dir, float scale, FLOAT64VECTOR& pos);
 
 static OBJECT* _GetFreeFlash();
 static OBJECT* _GetFreeDebris();
 
-#if(0)
-static void _DebrisKillCallback(void* pData);
-static void _FlashKillCallback(void* pData);
-static LOGICAL _OkForDebris(weapAmmo const* pAmmo, void* pVehicle);
-#endif
 static void ReleaseFlash(OBJECT* o);
 
-static LOGICAL _IsWater(OBJECT* lpObj);
-static LOGICAL _InitFlashObjs();
-static LOGICAL _InitDebrisObjs();
+static bool _IsWater(const OBJECT* lpObj);
+static bool _InitFlashObjs();
 
-static FLOAT32 PiOver180 = 0.0f;
+constexpr FLOAT32 PiOver180 = PI / 180.0f;
 
 static OBJECT* _debris[MAX_DEBRIS_HITS];
 static std::deque<OBJECT*> _freedebris;
@@ -152,44 +143,24 @@ void DoHitSound(FLOAT64VECTOR* Pos, FLOAT32 Energy,	const char* TextureName)
 }
 
 /************************************************************************************************
-	weapfxInit
+_InitDebrisObjs
 *************************************************************************************************/
-LOGICAL weapfxInit()
-{
- logTimerBeginMacro();
-
-	PiOver180 = PI / 180.0f;
-
-	if(!_InitDebrisObjs())
-		return FALSE;
-
-	if(!_InitFlashObjs())
-		return FALSE;
-
- logTimerEndMacro();
-
-	return TRUE;
-}
-
-/************************************************************************************************
-	_InitDebrisObjs
-*************************************************************************************************/
-LOGICAL _InitDebrisObjs()
+static bool _InitDebrisObjs()
 {
 	SINT32 i;
 
 	OBJECT* o;
 
-	for(i = 0; i < MAX_DEBRIS_HITS; i++)
+	for (i = 0; i < MAX_DEBRIS_HITS; i++)
 	{
-		if(!obmgrCreateModelInstance("debris2"))
-			return FALSE;
+		if (!obmgrCreateModelInstance("debris2"))
+			return false;
 
 		o = obmainFindNamedObject("debris2");
 
-		if(!o)
+		if (!o)
 		{
-			return FALSE;
+			return false;
 		}
 
 		// Draw double sided (if flat polygon)
@@ -202,6 +173,24 @@ LOGICAL _InitDebrisObjs()
 
 		_freedebris.push_back(o->child);
 	}
+
+	return true;
+}
+
+/************************************************************************************************
+	weapfxInit
+*************************************************************************************************/
+LOGICAL weapfxInit()
+{
+ logTimerBeginMacro();
+
+	if(!_InitDebrisObjs())
+		return FALSE;
+
+	if(!_InitFlashObjs())
+		return FALSE;
+
+ logTimerEndMacro();
 
 	return TRUE;
 }
@@ -236,18 +225,16 @@ struct AddBlendFunc
 	}
 };
 
-LOGICAL _InitFlashObjs()
+bool _InitFlashObjs()
 {
 	static bool first = true;
-
-	OBJECT* o;
 
 	for(int i = 0; i < MAX_MUZZLE_FLASH; i++)
 	{
 		if(!obmgrCreateModelInstance("muzzleflash"))
-			return FALSE;
+			return false;
 
-		o = obmainFindNamedObject("muzzleflash");
+		OBJECT* o = obmainFindNamedObject("muzzleflash");
 
 		if(first)
 		{
@@ -261,29 +248,27 @@ LOGICAL _InitFlashObjs()
 
 		if(!_muzzelflash[i])
 		{
-			return FALSE;
+			return false;
 		}
 
 		obmainSetFlagsInThisTree(o, OBJECT_ZWRITEOFF);
 		ReleaseFlash(o->child);
 	}
 
-	return TRUE;
+	return true;
 }
 #else
 /************************************************************************************************
 	_InitFlashObjs
 *************************************************************************************************/
-LOGICAL _InitFlashObjs()
+bool _InitFlashObjs()
 {
-	OBJECT* o;
-
 	for(int i = 0; i < MAX_MUZZLE_FLASH; i++)
 	{
 		if(!obmgrCreateModelInstance("muzzleflash"))
-			return FALSE;
+			return false;
 
-		o = obmainFindNamedObject("muzzleflash");
+		OBJECT* o = obmainFindNamedObject("muzzleflash");
 
 		_muzzelflash[i] = o;
 
@@ -296,7 +281,7 @@ LOGICAL _InitFlashObjs()
 		ReleaseFlash(o->child);
 	}
 
-	return TRUE;
+	return true;
 }
 #endif
 
@@ -854,23 +839,6 @@ void weapfxGetObjectPosition(FASTCOLLIDE const* pFast, FLOAT64VECTOR* pPos)
 }
 
 /************************************************************************************************
-	_DebrisKillCallback
-*************************************************************************************************/
-void _DebrisKillCallback(void* data)
-{
-	OBJECT* o = (OBJECT*)data;
-
-	if(o == nullptr)
-	{
-		return;
-	}
-
-	fxUtlSetMatrixInTree(o, &IdentityMatrix);
-
-	_freedebris.push_back(o);
-}
-
-/************************************************************************************************
 	weapfxFlashKillCallback
 *************************************************************************************************/
 void weapfxFlashKillCallback(void* data)
@@ -1403,7 +1371,7 @@ UINT32 weapfxAmmoExplosion(weapAmmo const* Ammo, FLOAT64VECTOR const* Pos, FASTC
 		}
 		else
 		{
-			weapfxExplosion(Ammo, Pos, nullptr, FALSE);
+			weapfxExplosion(Ammo, Pos, nullptr, false);
 		}
 	}
 	// Special case with satchels
@@ -1414,7 +1382,7 @@ UINT32 weapfxAmmoExplosion(weapAmmo const* Ammo, FLOAT64VECTOR const* Pos, FASTC
 	// Air burst
 	else
 	{
-		weapfxExplosion(Ammo, Pos, nullptr, FALSE);
+		weapfxExplosion(Ammo, Pos, nullptr, false);
 	}
 
 	physicsAddWorldForce(*Pos, (FLOAT64)Ammo->AmmoType->ExplosiveEnergy);
@@ -1577,12 +1545,6 @@ UINT32 weapfxAmmoFlyby(weapAmmo* Ammo)
 	{
 		return 0;
 	}
-#if(0)
-	if(!_Attach3DBulletSound(Ammo) == 0)
-	{
-		return 0;
-	}
-#endif
 	if(Ammo->AmmoType->Diameter <= 0.03f)
 		return 0;
 
@@ -2275,79 +2237,6 @@ SINT32 _Attach3DBombSound(weapAmmo* pAmmo)
 }
 
 /************************************************************************************************
-	_Attach3DBulletSound
-*************************************************************************************************/
-bool _Attach3DBulletSound(weapAmmo* pAmmo)
-{
-	if(pAmmo->SoundID > 0)
-		return false;
-
-	if(pAmmo->AmmoType->SubType != WEAPAMMO_SUBTYPE_BALLISTIC)
-		return false;
-
-	if(pAmmo->AmmoType->ExplosiveEnergy > 0.0001f)
-		return false;
-
-	if(pAmmo->AmmoType->Diameter > 0.03f)
-		return false;
-
-	Vec3d p(playpos);
-	p = -p;
-
-	Vec3d pos = Vec3d(pAmmo->Position) - Vec3d(WorldOriginOffset);
-
-	static float min = 5.0f;
-	static float max = 1000.0f;
-
-	// Player to ammo
-	p = p - pos;
-
-	if(p.length2() > max * max)
-		return false;
-
-	p.normalize();
-
-	Vec3d vel(pAmmo->Velocity);
-	vel.normalize();
-
-	// Bullet behind player?
-	if(p * vel < 0)
-		return false;
-
-	int id = fxSndGetNewSound();
-
-	if(id == -1)
-	{
-		return false;
-	}
-
-	fxSndSetSoundName(id, "sounds\\bulletby.wav");
-	fxSndSetPriority(id, IDE_TP_PRIORITY_LOW);
-	fxSndSetSoundType(id, TYPE_INFINITE_EXTERNAL_SOUND);
-
-	static float pitch = 1.0f;
-
-	fxSndSetPitch(id, pitch);
-	fxSndSetVolume(id, 1.0f);
-	fxSndSetPlayType(id, DEF_PLAYTYPE_AMMO);
-	fxSndPushFlags(id, SOUND_NO_DOPPLER);
-
-	fxSndSetMinDistance(id, min);
-	fxSndSetMaxDistance(id, max);
-	fxSndSetAmmo(id, pAmmo);
-
-	if(!fxSndInitSound(id))
-	{
-		fxSndStopSound(id);
-		return false;
-	}
-
-	pAmmo->SoundID = id;
-
-	return true;
-}
-
-/************************************************************************************************
 	weapfxAmmoDetachSound
 *************************************************************************************************/
 
@@ -2361,9 +2250,7 @@ UINT32 weapfxAmmoDetachAmmo(weapAmmo const* Ammo)
 	return 0;
 }
 
-#ifdef __MWERKS__
 #pragma mark -
-#endif
 
 /************************************************************************************************
 	weapfxMountFireSound
@@ -2478,9 +2365,7 @@ UINT32 weapfxMountStopFireSound(mlWeaponMount* Mount, UINT32 i, SINT32 RoundsLef
 	return 0;
 }
 
-#ifdef __MWERKS__
 #pragma mark -
-#endif
 
 /************************************************************************************************
 	AddBulletDecal
@@ -2493,7 +2378,7 @@ UINT32 AddBulletDecal(weapAmmo const* lpAmmo,
 					  SINT32 iPenetration,
 					  bool usehiteffect)
 {
-	LOGICAL iswater = _IsWater(lpFast->CollideObject);
+	bool iswater = _IsWater(lpFast->CollideObject);
 
 	if(iswater)
 	{
@@ -2830,7 +2715,7 @@ UINT32 weapfxAmmoHitMark(weapAmmo const* Ammo,
 static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 					   FLOAT64VECTOR const* pPos,
 					   piVECTOR const* pNormal,
-					   LOGICAL bIsWater)
+					   bool bIsWater)
 {
 	SINT32 iID = -1;
 
@@ -2984,7 +2869,6 @@ UINT32 weapfxAmmoExpHitAttached(weapAmmo const* Ammo, SINT32 iPenetration)
 {
 	FLOAT64VECTOR vecPos;
 	piVECTOR vecNorm;
-	LOGICAL bWater = FALSE;
 	SINT32 id = -1;
 
 	vecPos.x = Ammo->AttachedPnt.x;
@@ -3013,7 +2897,7 @@ UINT32 weapfxAmmoExpHitAttached(weapAmmo const* Ammo, SINT32 iPenetration)
 					 (FLOAT32)Ammo->Velocity.y,
 					 (FLOAT32)Ammo->Velocity.z);
 
-	bWater = _IsWater(Ammo->AttachedObject);
+	bool bWater = _IsWater(Ammo->AttachedObject);
 
 	if(Ammo->AttachedObject != nullptr)
 	{
@@ -3061,14 +2945,14 @@ UINT32 weapfxAmmoExpHitAttached(weapAmmo const* Ammo, SINT32 iPenetration)
 /************************************************************************************************
 	_IsWater
 *************************************************************************************************/
-LOGICAL _IsWater(OBJECT* lpObj)
+bool _IsWater(const OBJECT* lpObj)
 {
 	if(lpObj == nullptr)
-		return FALSE;
+		return false;
 
 	if(trnwtrIsWaterTexture(lpObj->texid))
 	{
-		return TRUE;
+		return true;
 	}
 
 	FLOAT32 fRollCoef = 0.0f;
@@ -3090,21 +2974,21 @@ LOGICAL _IsWater(OBJECT* lpObj)
 			{
 				if(fRollCoef > 0.999f && fRollCoef < 1.001f)
 				{
-					return TRUE;
+					return true;
 				}
 			}
 			else if(fRollCoef > 198.99f && fRollCoef < 199.001f)
 			{
-				return TRUE;
+				return true;
 			}
 		}
 	}
 	else if(fRollCoef > 198.99f && fRollCoef < 199.001f)
 	{
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 /************************************************************************************************

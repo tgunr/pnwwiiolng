@@ -111,7 +111,7 @@ struct trnAutoGunType
 
 };
 
-typedef struct SpawnData
+struct SpawnData
 {
     std::map<UINT32, std::vector<OBJECT*> > classToObject;
     std::string buildingname;
@@ -158,8 +158,7 @@ typedef struct SpawnData
             classToObject.insert(make_pair(key, v));
         }
     }
-
-} SpawnData;
+};
 
 namespace StratDB { class StratObject; }
 
@@ -324,8 +323,8 @@ struct trnAutoGun
 	extern LOGICAL trncdPlayerOnGround(piVECTOR* player, piVECTOR* oldpos, piVECTOR* newpos);
 	extern LOGICAL trncdCollideOnGround(piVECTOR* oldpos, piVECTOR* newpos, piVECTOR* retpos, OBJECT** lpobj, SINT32* poly);
 
-	extern UINT32 trncdInit(void);
-	extern UINT32 trncdKill(void);
+	extern UINT32 trncdInit();
+	extern UINT32 trncdKill();
 
 	extern LOGICAL trncdAddTerrainObject(OBJECT * Object,SINT32 SuperCellX,SINT32 SuperCellY,UINT32 Id,
 									REL_OBJ_ID * ObjId);
@@ -338,7 +337,7 @@ struct trnAutoGun
 	extern void trncdRemoveODEColliderQueued(trnCDTerrainObject& TO);
 	extern void trncdProcessODEQueue(bool all = false);
 
-	extern UINT32 trncdGetNumTOs(void);
+	extern UINT32 trncdGetNumTOs();
 
 	// steps through the list until out of objects or a Terrain object is collided
 	extern UINT32 trncdCollideWithListOfTerrainObjects(FASTCOLLIDE ** CollisionList,
@@ -433,7 +432,7 @@ struct trnAutoGun
 
 	extern void trnFindCollisionObject(OBJECT ** const CollisionObject, OBJECT* Object);
 
-	extern UINT32 trncdUpdateStratMsgQue(void);
+	extern UINT32 trncdUpdateStratMsgQue();
 
 	extern LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
 											   piVECTOR* V2,
@@ -452,10 +451,9 @@ struct trnAutoGun
 // new collider stuff
 struct trncdDTLCollider;
 struct TERRAIN_DETAIL;
-typedef struct trncdDTLCollider* trncdDTLColliderRef;
 
-extern trncdDTLColliderRef trncdDTLColliderAlloc(struct TERRAIN_DETAIL*);
-extern void trncdDTLColliderFree(trncdDTLColliderRef);
+extern trncdDTLCollider* trncdDTLColliderAlloc(struct TERRAIN_DETAIL*);
+extern void trncdDTLColliderFree(trncdDTLCollider*);
 
 extern SINT32 trncdCollideWithBaseTerrain(FASTCOLLIDE* collisionList, SINT32 maxcol, piVECTOR const* start, piVECTOR const* end);
 extern SINT32 trnSetBuilderFlag(SINT32 x, SINT32 y, UINT32 iID);

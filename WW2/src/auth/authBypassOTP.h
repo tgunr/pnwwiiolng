@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #if defined(HAPPYOO)
 # define AUTH_BYPASS_OTP 3735928559UL
 #else

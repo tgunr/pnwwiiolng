@@ -7,13 +7,10 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
-
 #include "strt/strtProtos.h"
 
 #include "wwii/wwiiDBConfig.h"
-#include "dbse/dbseWrapper.h"
-#include "dbse/dbseConnection.h"
+#include "dbse/dbseHandle.h"
 #include "include/mydbQuery.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtData.h"
@@ -28,10 +25,7 @@
 
 //#define HEAVY_DEBUG
 
-typedef void (_PROCESSOR)(DBRow&, void*, UINT32 oid);
-
-extern DBHANDLE dbh;
-extern DBCONNECTION dbConnection;
+using _PROCESSOR = void(*)(DBRow&, void*, UINT32 oid);
 
 extern void strtInitializeVehicleAccessLevels();
 
@@ -41,6 +35,7 @@ extern void strtInitializeVehicleAccessLevels();
 # include "strt/strtDatabaseSchemas.h"
 static void _updateDatabaseSchema()
 {
+	dbugLog(_FLI, "Updating database schema");
 	DB::Schema schema(dbh, "wwii");
 	schema.Update(revisions);
 }
@@ -53,10 +48,12 @@ strtInitDB()
 {
 	bool retval = true;
 
+	dbugLog(_FLI, "initializing strat database");
 	if ( !dbh.connected() )
-		dbh.connect(dbConnection);
+		dbh.connect();
 
 #ifdef IS_STRAT_HOST
+	///TODO: Move to controller or something
 	_updateDatabaseSchema();
 
 	if ( !strtInitHostDB() )
@@ -65,11 +62,11 @@ strtInitDB()
 
 	srand((UINT32)teulClock64);
 
-	if ( ! dbGetWWIIConfig(dbh) )
+	if ( ! dbGetWWIIConfig() )
 		dbugLog(_FLA, "No configuration from database");
 
 #ifdef IS_STRAT_HOST
-	wwiiReadRanks(dbh);
+	wwiiReadRanks();
 
 	strtInitializeVehicleAccessLevels();
 #endif
@@ -77,11 +74,10 @@ strtInitDB()
 	return retval;
 }
 
-LOGICAL
+void
 strtCloseDB()
 {
 	dbh.disconnect();
-	return TRUE;
 }
 
 void
@@ -200,7 +196,7 @@ _processLink(DBRow& row, void* data, UINT32 oid)
 }
 
 static void
-_initAllEntries(const char* query, _PROCESSOR* processFn)
+_initAllEntries(const char* query, _PROCESSOR processFn)
 {
 	SINT32 scx = 0, scy = 0;
 	UINT32 id = 0;

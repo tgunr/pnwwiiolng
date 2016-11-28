@@ -16,7 +16,7 @@
 #include "updt/updtEnums.h"
 #include "updt/updtTurrets.h"
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 	#include "wwii/wwiiTypes.h"
 #endif
 
@@ -121,8 +121,7 @@ struct FIRE_STRUCT
 
 struct SHARED_VEHICLE_INFO
 {
-	const WEAPON_SPEC& spec() const { return wSerial.spec; }
-	WEAPON_SPEC& spec() { return wSerial.spec; }
+	WEAPON_SPEC spec() const { return wSerial.spec; }
 
 	TeulTimeMS			hostPosTimeStamp;
 
@@ -132,7 +131,7 @@ struct SHARED_VEHICLE_INFO
 	UINT32				visBits;		// used for texture progressive damage scheme
 	UINT32				squad;			// squad # 0 is none
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 		///TODO: Move this elsewhere, we don't need one for every vehicle.
 	SINT32				timerInfo;		// Whether or not* I* am depsawning
 #endif
@@ -144,7 +143,7 @@ struct SHARED_VEHICLE_INFO
 	UINT16				posTimeStamp;	//	Last time we got a position update
 	UINT16				globalFlags;
 	UINT16				oneTimeBits;
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	UINT16				cmdrTimeStamp;  // On the host we need to keep track of the commander independently
 #endif
 
@@ -166,7 +165,7 @@ struct SHARED_VEHICLE_INFO
 	VEHICLE_ATTVEL_HIGH	rotational;		// anglular velocity
 	VEHICLE_ATT_HIGH	attitude; 		// orientation of the veh
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	FULL_OBJ_ID			fpsBuildingID;
 #else
 	REL_OBJ_ID          fpsBuildingID;  // Full object ID of building FPS is in/on
@@ -181,7 +180,7 @@ struct SHARED_VEHICLE_INFO
 
 //	DAMAGE_HEAD			damage;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	ChatHandle			squadHandle;
 #else
 	char				squadName[MAX_HANDLE_SIZE]; // SIZE includes null byte
@@ -190,7 +189,7 @@ struct SHARED_VEHICLE_INFO
 	// one time structures...
 	WEAPON_SERIAL		wSerial;	// Partially populated weapon serial for spec
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	bool				m_hideCallsign;
 	ChatHandle			packedCallsign;
 	class HostVehicle*	m_vehicle;
@@ -216,7 +215,7 @@ struct TURRET_HEADER
 
 struct VEHICLE_UPDATE_HEADER
 {
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	SHARED_VEHICLE_INFO* vehInfo;
 	class Player*		player;
 #else
@@ -265,7 +264,7 @@ struct WORLD_UPDATE
 	UINT32			numRemove;
 	UINT32			removeList[MAX_VEH_REMOVE];
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	char			m_state[64];
 	// Host version.
 	class	HostVehicle*	myVehicle;
@@ -278,7 +277,7 @@ struct WORLD_UPDATE
 
 #endif
 
-	SINT32	packRemoveList(LOGICAL mode, ACTION_OBJECT* const a);
+	SINT32	packRemoveList(PackMode mode, ACTION_OBJECT* const a);
 };
 
 // if a fireTimeStamp is valid and hapened btween updateSent and now

@@ -30,9 +30,9 @@ class Plane
     public:
 
         /** Type of Plane class.*/
-        typedef double value_type;
-        typedef Vec3d Vec3_type;
-        typedef Vec4d Vec4_type;
+        using value_type = double;
+        using Vec3_type = Vec3d;
+        using Vec4_type = Vec4d;
 
         /** Number of vector components. */
         enum { num_components = 3 };

@@ -156,24 +156,24 @@ enum
 };
 
 /// Opaque reference type for Keymap object.
-typedef struct imap_keymap_list* imapKeymapRef;
+using imapKeymapRef = struct imap_keymap_list*;
 
 ///	Callback for imapInstallControlCallback.
 // 	Function signature inherited from old imap code for compatability.
-typedef unsigned int (*imapControlCallback)(int param, unsigned int functionCode, unsigned int callbackinfo);
+using imapControlCallback = unsigned int(*)(int param, unsigned int functionCode, unsigned int callbackinfo);
 
 /// Read callback for imapInstallCallbacks.
-typedef int (*imapReadCallback)(void* userdata, int numbytes, void* buf);
+using imapReadCallback = int (*)(void* userdata, int numbytes, void* buf);
 
 /// Write callback for imapInstallCallbacks.
-typedef int (*imapWriteCallback)(void* userdata, int numbytes, const void* buf);
+using imapWriteCallback = int(*)(void* userdata, int numbytes, const void* buf);
 
 /// IAC info callback for imapInstallCallbacks.
 /**  modes - IMAP_HAVE_NAME, IMAP_HAVE_CODE */
-typedef int (*imapIACInfoCallback)(int mode, const char* language, const char* keyboard, unsigned int* iac,
+using imapIACInfoCallback = int(*)(int mode, const char* language, const char* keyboard, unsigned int* iac,
 									char* name, int maxlen, imap_iac_info* info);
 
 /// Function info callback for imapInstallCallbacks.
 /** modes - IMAP_HAVE_NAME, IMAP_HAVE_CODE */
-typedef int (*imapFunctionInfoCallback)(int mode, const char* language, unsigned int* functionCode,
+using imapFunctionInfoCallback = int(*)(int mode, const char* language, unsigned int* functionCode,
 											char* name, int maxlen, imap_function_info* info);

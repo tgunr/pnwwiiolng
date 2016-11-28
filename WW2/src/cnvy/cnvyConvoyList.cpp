@@ -29,10 +29,10 @@ CONVOYSTRUCT* cnvyRemoveFirstConvoy(CONVOYSTRUCT** convoyList)
 }
 
 //Inserts a nextEvent into the convoyList
-LOGICAL cnvyInsertConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy)
+bool cnvyInsertConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy)
 {
 	if ((convoyList == nullptr) || (convoy == nullptr))
-		return FALSE;
+		return false;
 
 	if ((*convoyList) == nullptr)
 	{
@@ -60,7 +60,7 @@ LOGICAL cnvyInsertConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy)
 			listAddItemBefore((LISTHEADER**) convoyList, (LISTHEADER*) current, (LISTHEADER*) convoy);
 	}
 
-	return TRUE;
+	return true;
 }
 
 //Deletes a nextEvent from the convoyList

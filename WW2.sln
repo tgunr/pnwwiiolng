@@ -71,8 +71,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1_lib", "Libraries\lua
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtcmalloc_minimal", "Libraries\gperftools\vsprojects\libtcmalloc_minimal\libtcmalloc_minimal.vcxproj", "{55E2B3AE-3CA1-4DB6-97F7-0A044D6F446F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DebugInstance", "DebugInstance\DebugInstance.vcxproj", "{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libb64", "Libraries\libb64\libb64-1.2\libb64\libb64.vcxproj", "{B50750DE-6F66-4AC5-B1E4-9F7DA631D237}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BallisticCalculator", "Tools\BallisticCalculator\BallisticCalculator.vcxproj", "{FBAF67D5-DFB5-495B-A2A4-70C6D63D923D}"
@@ -802,42 +800,6 @@ Global
 		{55E2B3AE-3CA1-4DB6-97F7-0A044D6F446F}.TestRelease|Win32.Build.0 = Release|Win32
 		{55E2B3AE-3CA1-4DB6-97F7-0A044D6F446F}.TestRelease|x64.ActiveCfg = Debug|Win32
 		{55E2B3AE-3CA1-4DB6-97F7-0A044D6F446F}.TestRelease|x64.Build.0 = Debug|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.AlphaRelease|Win32.ActiveCfg = AlphaRelease|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.AlphaRelease|Win32.Build.0 = AlphaRelease|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.AlphaRelease|x64.ActiveCfg = AlphaRelease|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.AlphaRelease|x64.Build.0 = AlphaRelease|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.BetaRelease|Win32.ActiveCfg = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.BetaRelease|Win32.Build.0 = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.BetaRelease|x64.ActiveCfg = Release|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.BetaRelease|x64.Build.0 = Release|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Buzzard|Win32.ActiveCfg = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Buzzard|Win32.Build.0 = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Buzzard|x64.ActiveCfg = Release|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Buzzard|x64.Build.0 = Release|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.China|Win32.ActiveCfg = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.China|Win32.Build.0 = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.China|x64.ActiveCfg = Release|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.China|x64.Build.0 = Release|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Debug|Win32.ActiveCfg = Debug|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Debug|Win32.Build.0 = Debug|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Debug|x64.ActiveCfg = Debug|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Debug|x64.Build.0 = Debug|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.FullDebug|Win32.ActiveCfg = Debug|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.FullDebug|Win32.Build.0 = Debug|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.FullDebug|x64.ActiveCfg = Debug|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.FullDebug|x64.Build.0 = Debug|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.MultiClient|Win32.ActiveCfg = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.MultiClient|Win32.Build.0 = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.MultiClient|x64.ActiveCfg = Release|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.MultiClient|x64.Build.0 = Release|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Release|Win32.ActiveCfg = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Release|Win32.Build.0 = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Release|x64.ActiveCfg = Release|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.Release|x64.Build.0 = Release|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.TestRelease|Win32.ActiveCfg = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.TestRelease|Win32.Build.0 = Release|Win32
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.TestRelease|x64.ActiveCfg = Release|x64
-		{E0C35874-88E9-4060-A33F-4B5C1C2E5ADD}.TestRelease|x64.Build.0 = Release|x64
 		{B50750DE-6F66-4AC5-B1E4-9F7DA631D237}.AlphaRelease|Win32.ActiveCfg = AlphaRelease|Win32
 		{B50750DE-6F66-4AC5-B1E4-9F7DA631D237}.AlphaRelease|Win32.Build.0 = AlphaRelease|Win32
 		{B50750DE-6F66-4AC5-B1E4-9F7DA631D237}.AlphaRelease|x64.ActiveCfg = AlphaRelease|x64

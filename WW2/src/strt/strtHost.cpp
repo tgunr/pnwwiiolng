@@ -7,18 +7,13 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
 #include "hostproj/hostversion.h"
-#include "hostproj/revision.h"
-
 #include <signal.h>  //to catch SIGHUPS with
-
+#include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatStratSupportMessages.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "cnvy/cnvyMain.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseHandle.h"
 #include "include/arenaLockEnums.h"
 #include "sdm/sdmConfigVars.h"
 #include "server/serverCodeEnum.h"
@@ -59,14 +54,9 @@
 
 extern ObjectiveStats g_objectiveStats;
 
-extern DBHANDLE dbh;
-DBHANDLE dbh;
-extern DBCONNECTION dbConnection;
-DBCONNECTION dbConnection;
-
 #ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
-    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
+    #define DEF_ERR_FLAGS STD_ERR  // LOG_ALL_TO_STDERR
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
     #define DEF_ERR_FLAGS STD_ERR
@@ -74,7 +64,7 @@ DBCONNECTION dbConnection;
 
 const char* HostLanguage = "en";
 
-static LOGICAL _exitSignaled = FALSE;
+static bool _exitSignaled = false;
 static bool _mustSyncChatHost = true;
 extern int tolua_stratd_open(struct lua_State*);
 extern ConfigPath cv_luaPath;
@@ -112,7 +102,7 @@ static void	_personaErrorFunction (SINT32 teulIndex, const UCHAR* const data, SI
 
 static void _cnvyErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {
-	dbugLog(_FLA,"cnvyErrorFunction: index %d code %d\n\n",teulIndex, error);
+	dbugLog(_FLA, "cnvyErrorFunction: index %d code %d\n\n",teulIndex, error);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -150,37 +140,35 @@ static void _mapErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 
 
 static void _describeBuildConfigurationToLogFile()
 {
-	dbugLog(_FLI, REPOSITORY_INFO " HOST FLAGS:");
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLIB, "DEV_BUILD");
+	dbugLog(_FLI, "DEV_BUILD");
 #endif
 #if defined(BETA_RELEASE)
-	dbugLog(_FLIB, " BETA_RELEASE");
+	dbugLog(_FLI, " BETA_RELEASE");
 #endif
 #if defined(TEST_RELEASE)
-	dbugLog(_FLIB, " TEST_RELEASE");
+	dbugLog(_FLI, " TEST_RELEASE");
 #endif
 #if defined(OPEN_BETA)
-	dbugLog(_FLIB, " OPEN_BETA");
+	dbugLog(_FLI, " OPEN_BETA");
 #endif
 #if defined(CLOSED_BETA)
-	dbugLog(_FLIB, " CLOSED_BETA");
+	dbugLog(_FLI, " CLOSED_BETA");
 #endif
 #if defined(FRES)
-	dbugLog(_FLIB, " FRES");
+	dbugLog(_FLI, " FRES");
 #endif
 #if defined(HAPPYOO)
-	dbugLog(_FLIB, " HAPPYOO");
+	dbugLog(_FLI, " HAPPYOO");
+	dbugLog(_FLI, "%s HOST FLAGS:", PN_git_commitish_string);
 #endif
 #if defined(TRAINING_SERVER)
-	dbugLog(_FLIB, " TRAINING_SERVER");
+	dbugLog(_FLI, " TRAINING_SERVER");
 #endif
 #if defined(PUBLIC_RELEASE)
-	dbugLog(_FLIB, " PUBLIC_RELEASE");
+	dbugLog(_FLI, " PUBLIC_RELEASE");
 #endif
-
-	dbugLog(_FLIB, ".");
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -383,7 +371,7 @@ static void
 _strtSIGINT(int signo)
 {
 	dbugLog(_FLI, "Received exit signal");
-	_exitSignaled = TRUE;
+	_exitSignaled = true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -407,8 +395,6 @@ static TeulTimeMS
 _housekeeping()
 {
 	TeulTimeMS nextHouseKeep = teulClock64 + 25;
-
-	threadsLogging();
 
 	if ( !strtIsStratInitialized() )
 		return nextHouseKeep;
@@ -468,7 +454,7 @@ _housekeeping()
 	}
 
 	if ( teulTime() >= nextSupplyRouteCheck ) {
-	
+
 		nextSupplyRouteCheck = teulTime() + 2;
 		bInitiateSupplyRouteCheckProcessing = true;
 		if ( teulTime() >= nextForcedSupplyRouteCheck ) {
@@ -544,45 +530,81 @@ _housekeeping()
 //////////////////////////////////////////////////////////////////////////
 // Main entry point.
 
-static const char* g_serverName = "stratd";
+const char* g_serverName = "stratd";
 
 int
 main(int argc, const char* argv[])
 {
-	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {});
-	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
-	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	// static? because we're main and we don't need to waste stack space on these,
+	// but they also don't need to be visible outside of our scope.
+	static std::vector<std::string> s_luaCmds;
+	static bool s_initOnly = false;
+	static bool s_debug = false;
+
+	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {
+		{ "--lua-cmd", "Execute lua code after initializing.", true,
+			[](const char* code) { s_luaCmds.emplace_back(code); } },
+		{ "--init-only", "Terminate after loading strat data.", false, [](const char*) { s_initOnly = true; } },
+		{ "--debug", "Enable verbose + console logging", false, [](const char*) { s_debug = true; } }
+	});
+	if ( !s_debug ) {
+		dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+		dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	} else {
+		dbugSetLogLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
+		dbugSetWriteLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
+	}
 
 	HostLanguage = cv_stratLanguage.GetString();
 
 	_describeBuildConfigurationToLogFile();
 
-	threadsReadDBEnvironment();
 	threadsSetup();
 
 	teulSyncClock();
-
-	wwiiIRCInitialize(Server::localHost);
-	wwiiIRCActivate(true);
 
 	Lua::Start("stratd");
 
 	if ( !stratStartLua() )
 		exit(0);
 
-#ifdef IS_STRAT_HOST
 	if (!strtInitDB())
 	{
 		LogAbort("Couldn't initialize database");
 	}
-#endif
+
+	//Initializes the convoy system
+	cnvyInit();
+
+	// Initialize the strat objective limits
+	g_objectiveStats.calculate();
+
+	teulSyncClock();
+
+	strtInitializeStratSystem();
+
+	if ( s_luaCmds.empty() == false ) {
+		for ( auto&& code : s_luaCmds ) {
+			dbugLog(_FLM | STD_ERR, "executing %s", code.c_str());
+			Lua::RunObject("--lua-cmd", code);
+			auto results = Lua::Results();
+			for ( auto&& line : results ) {
+				printf("lua: %s\n", line.c_str());
+			}
+		}
+	}
+
+	if ( s_initOnly ) {
+		dbugLog(_FLA | STD_ERR, "exiting after initialization (--init-only)");
+		return 0;
+	}
+
+	wwiiIRCInitialize(Server::localHost);
+	wwiiIRCActivate(true);
 
 	StatsThread statsThread;
 	statsThread.start();
 	threadsEnable();
-
-	//Initializes the convoy system
-	cnvyInit();
 
 	dbugLog(_FLN,"opening broadcast ports");
 	serverOpenBroadcastIndexes();
@@ -609,16 +631,6 @@ main(int argc, const char* argv[])
 	const SINT32 mapConnection = teulOpenListenHost(Server::broadcastHost, WWII::Net::Ports::InternalStrat, _acceptMapConnection, 200000, PROTOCOL_TCP, _mapErrorFunction);
 	dbugLog(_FLN,"Listening for map connections on port %d", WWII::Net::Ports::InternalStrat);
 
-	// Give the chat host 20 seconds to start
-	teulSyncClock();
-	TeulTimeMS cutoff = teulClock64 + 30000;
-	dbugLog(_FLI, "Waiting for chat server");
-	for (; teulClock64 < cutoff && serverPeeringWithType(CHAT_HOST) == false; )
-	{
-		teulUpdateTransport(50);
-		threadsLogging();
-	}
-
 #ifdef DEBUG
 	dbugLog(_FLN,"Beginning strat processing");
 #endif
@@ -631,22 +643,6 @@ main(int argc, const char* argv[])
 
 	ABORT_IF(chatInstallStratSupportCallbacks() < 0);
 
-	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_STARTING);
-	for ( UINT32 i = 0; i < 10; ++i )
-	{
-		teulUpdateTransport(20);
-		threadsLogging();
-	}
-
-	// Initialize the strat objective limits
-	g_objectiveStats.calculate();
-
-	teulSyncClock();
-
-	strtInitializeStratSystem();
-
-	threadsLogging();
-
 	signal(SIGINT, _strtSIGINT);
 
 	// Run the map-restoration hack for restarts.
@@ -657,20 +653,14 @@ main(int argc, const char* argv[])
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		LogAbort("bailing because intermission script failed.");
 	}
-	threadsLogging();
-
 	strtBroadcastConfigUpdate();
-	threadsLogging();
 
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
 
-	extern void serverOpenLuaClientInterface(void);
 	serverOpenLuaClientInterface();
 
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
-
-	threadsLogging();
 
 	TeulTimeMS tick100ms = 0;
 	bool runOnce = false;
@@ -717,11 +707,7 @@ main(int argc, const char* argv[])
 
 	teulCloseTransport();
 
-	threadsLogging();
-
-#ifdef IS_STRAT_HOST
 	strtCloseDB();
-#endif
 	dbugLog(_FLN,"strat system shutting down");
 
 	Lua::Stop();

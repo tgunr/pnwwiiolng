@@ -92,10 +92,10 @@ public:
 	void save();
 
 private:
-	typedef std::set<UINT32> UIDS;
-	typedef std::map<UINT64,UIDS> VALUE_MAP;
-	typedef std::map<UINT32,VALUE_MAP> CATEGORY_MAP;
-	typedef std::map<UINT32,CATEGORY_MAP> TYPE_MAP;
+	using UIDS = std::set<UINT32>;
+	using VALUE_MAP = std::map<UINT64,UIDS>;
+	using CATEGORY_MAP = std::map<UINT32,VALUE_MAP>;
+	using TYPE_MAP = std::map<UINT32,CATEGORY_MAP>;
 
 	void _entry(UINT32 type, UINT32 uid) { m_type = type; m_uid = uid; }
 
@@ -219,9 +219,9 @@ WorldSave::_saveFacs(CATEGORY_MAP& map)
 		_addQueries(it->second);
 	}
 
-	_addQueriesSimple(map[FAC_CAPACITY], "UPDATE strat_facility SET capacity=%llu WHERE facility_oid IN(");
-	_addQueriesSimple(map[FAC_STORED], "UPDATE strat_facility SET storedrps=%llu WHERE facility_oid IN(");
-	_addQueriesSimple(map[FAC_OPEN], "UPDATE strat_facility SET open=%llu WHERE facility_oid IN(");
+	_addQueriesSimple(map[FAC_CAPACITY], "UPDATE strat_facility SET capacity=%" PR64BitUT " WHERE facility_oid IN(");
+	_addQueriesSimple(map[FAC_STORED], "UPDATE strat_facility SET storedrps=%" PR64BitUT " WHERE facility_oid IN(");
+	_addQueriesSimple(map[FAC_OPEN], "UPDATE strat_facility SET open=%" PR64BitUT " WHERE facility_oid IN(");
 }
 
 void
@@ -241,14 +241,14 @@ WorldSave::_saveObjs(CATEGORY_MAP& map)
 
 	for ( auto it = map[OBJ_CAP].begin(); it != map[OBJ_CAP].end(); ++it )
 	{
-		sprintf(buffer, "UPDATE strat_object SET capacity=%llu,lastcapacity=%llu WHERE object_oid IN(", it->first, it->first);
+		sprintf(buffer, "UPDATE strat_object SET capacity=%" PR64BitUT ",lastcapacity=%" PR64BitUT " WHERE object_oid IN(", it->first, it->first);
 		_addQueries(it->second);
 	}
 
-	_addQueriesSimple(map[OBJ_DMG], "UPDATE strat_object SET damagejoules=%llu WHERE object_oid IN (");
-	_addQueriesSimple(map[OBJ_MAXDMG], "UPDATE strat_object SET maxdamagejoules=%llu WHERE object_oid IN (");
-	_addQueriesSimple(map[OBJ_MAXCAP], "UPDATE strat_object SET maxcapacity=%llu WHERE object_oid IN (");
-	_addQueriesSimple(map[OBJ_RPS], "UPDATE strat_object SET repairrps=%llu WHERE object_oid IN (");
+	_addQueriesSimple(map[OBJ_DMG], "UPDATE strat_object SET damagejoules=%" PR64BitUT " WHERE object_oid IN (");
+	_addQueriesSimple(map[OBJ_MAXDMG], "UPDATE strat_object SET maxdamagejoules=%" PR64BitUT " WHERE object_oid IN (");
+	_addQueriesSimple(map[OBJ_MAXCAP], "UPDATE strat_object SET maxcapacity=%" PR64BitUT " WHERE object_oid IN (");
+	_addQueriesSimple(map[OBJ_RPS], "UPDATE strat_object SET repairrps=%" PR64BitUT " WHERE object_oid IN (");
 }
 
 void

@@ -114,7 +114,7 @@ bool EZLoader::DoInclude(xmlNode* node, bool first, void* userData)
 	{
 		std::string path = xmlGetStringFromNode(node, "path");
 
-		if(!path.empty() && fioAccess(path.c_str()))
+		if(!path.empty())
 		{
 			EZLoader loader(path.c_str());
 			loader.Load(this);
@@ -400,36 +400,25 @@ public:
 
 	EZManagerType(const vehType* vtype) : XMLLoader2<EZManagerType>("")
 	{
-		// set our default path
-		ezPath = _ezBaseFile(vtype);
-
 		AddHandler("vehicle", &EZManagerType::DoVehicle, this);
 
-		const char* dir = strstr((const char*)vtype->ModelDirectory, "/");
-		const char* filename = (dir) ? dir + 1 : nullptr;
+        std::string modelPath = std::string("vehicles/") + reinterpret_cast<const char *>(&vtype->ModelDirectory[0]);
+        std::string::size_type sep = modelPath.find_last_of("/");
 
-		while(dir)
-		{
-			dir = strstr(filename, "/");
-			if(dir) filename = dir + 1;
-		}
+        ezPath = modelPath + "/" + modelPath.substr(sep + 1) + ".ez"; // HACK: npos + 1 == 0
+        ezFallbackPath = _ezBaseFile(vtype);
+        SetPath(ezPath.c_str());
+	}
 
-		// filename should be null or the last directory name
-		if(filename)
-		{
-			// read in our ez position file
-			std::string ezVehiclePath = "vehicles/";
-
-			ezVehiclePath += (const char*)vtype->ModelDirectory;
-			ezVehiclePath += "/";
-			ezVehiclePath += filename;
-			ezVehiclePath += ".ez";
-
-			if(fioAccess(ezVehiclePath.c_str()))
-				ezPath = ezVehiclePath;
-		}
-
-		SetPath(ezPath.c_str());
+	virtual bool Load(void *userData = nullptr)
+	{
+        if (!XMLLoader2::Load(userData)) {
+            // Fallback on failure instead of using the dangerous access(2) call
+            ezPath = ezFallbackPath;
+    		SetPath(ezPath.c_str());
+    		return XMLLoader2::Load(userData);
+    	}
+    	return true;
 	}
 
 	virtual ~EZManagerType(){}
@@ -448,6 +437,7 @@ public:
 
 	// file we used to determine the manager from
 	std::string ezPath;
+	std::string ezFallbackPath;
 	std::string ezManager;
 };
 

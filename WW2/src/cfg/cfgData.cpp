@@ -5,7 +5,7 @@
 #endif
 
 // This file used in settings.exe too
-#ifdef FRONT_END
+#if platBuild != BUILD_SERVER
 #include "pi/pi.h"
 #else
 #define piRGBA_MAKE(r, g, b, a) ((unsigned int) (((a) << 24) | ((r) << 0) | ((g) << 8) | ((b) << 16)))
@@ -23,7 +23,6 @@ cfgPARAM_SETUP cfgParameters[cfgNUM_TOTAL_PARAMS] =
 	{"shademode",			cfgTYPE_TEXTURE_SHADE_MODE,		cfgSHADE_MODE_GOURAUD				},
 	{"bdithering",			cfgTYPE_TRUE_FALSE,				cfgVALUE_TRUE						},
 	{"bspecular",			cfgTYPE_TRUE_FALSE,				cfgVALUE_TRUE						},
-	{"texturereduction",	cfgTYPE_TRUE_FALSE,				cfgVALUE_FALSE						},
 	{"sound",				cfgTYPE_STRING,					cfgDEFAULT_SOUND_CARD				},
 	{"bsoundenable",		cfgTYPE_TRUE_FALSE,				cfgVALUE_TRUE						},
 	{"b3dsoundenable",		cfgTYPE_TRUE_FALSE,				cfgVALUE_TRUE						},

@@ -21,9 +21,15 @@
 #include <iostream>
 #include <sstream>
 #include <math.h>
-
+#include "wwii/wwiiPPOLoader.h"
 #include "fx/fxSnd.h"
+#include "client/GameClient.h"
+#include "weap/weapSpec.h"
 
+extern std::vector<PPOSpec *> activePPOList;
+extern UINT16 activePPOIndex;
+extern GameClient* PlayerClient();
+extern PPOSpecLoader specLoader;
 
 //static FLOAT64 _LastAutopilotThrottlePos;
 
@@ -369,13 +375,12 @@ UINT32 mlTraverseTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 	if (VehicleData == nullptr) return 1;
-	UINT32 Position;
 	imap_callback_ext_data* extdata = (imap_callback_ext_data*)data;
 	FLOAT64 Delta, diff, dir;
 
 	//uiChatPrintLine("TurretTraverse: %d %u %u", Param, Id, data);
 
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	VehicleData->axisType = (extdata) ? extdata->axisType : IMAP_SYMMETRIC_AXIS;
 
@@ -545,12 +550,11 @@ UINT32 mlElevateTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 	if (VehicleData == nullptr) return 1;
-	UINT32 Position;
 	imap_callback_ext_data* extdata = (imap_callback_ext_data*)data;
 
 	//uiChatPrintLine("TurretElevate: %d %u %u", Param, Id, data);
 
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	VehicleData->axisType = (extdata) ? extdata->axisType : IMAP_SYMMETRIC_AXIS;
 
@@ -674,22 +678,6 @@ UINT32 mlToggleTowbar(SINT32 Param,UINT32 Id,UINT32 Detach)
 	return 0;
 }
 
-UINT32 mlToggleMobileSpawn(SINT32 Param, UINT32 Id, UINT32 Detach)
-{
-	mlToggleBombBayDoor(Param, Id, Detach);
-	return 0;
-}
-
-static void _soundkill(void* data)
-{
-	SINT32* id = (SINT32*)data;
-
-	if(id == nullptr)
-		return;
-
-	*id = 0;
-}
-
 static void _buildFRU(JSContext* ctx, UINT32 argc, jsval* argv)
 {
 	PlayerPlacedObject* ppo = fpPPOGet();
@@ -702,6 +690,55 @@ static void _buildFRU(JSContext* ctx, UINT32 argc, jsval* argv)
 		if(!build || !ppo->Build())
 			fpPPOSet(nullptr);
 	}
+}
+
+UINT32 mlToggleMobileSpawn(SINT32 Param, UINT32 Id, UINT32 Detach)
+{
+    static WEAPON_SPEC troop = NULL_WEAP_SPEC;
+    static bool firsttime = true;
+
+    if(firsttime)
+    {
+        firsttime = false;
+        troop = weapCreateSpec("GV_troop.1");
+    }
+
+    mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
+    vehType* vtype = VehicleData->VehicleMasterPtr->VehicleType;
+
+    PlayerPlacedObject* ppo = fpPPOGet();
+
+    if(ppo)
+    {
+        if(ppo->valid)
+		{
+			uiCallJS("buildirp", _buildFRU, 0);
+		}
+		else
+		{
+			fpPPOAlert();
+			fpPPOSet(nullptr);
+		}
+	}
+	else
+	{
+		bool allow_ms = PlayerClient()->IsMissionLeader() || !PlayerClient()->MobileSpawnMission();
+		if ( specLoader.getAllowedPPOs(vtype->WeaponSpec.wClass, vtype->WeaponSpec.wType, activePPOList, !allow_ms) ) {
+			vehmainPPOBuild();
+		}
+	}
+
+	return 0;
+}
+
+static void _soundkill(void* data)
+{
+	SINT32* id = (SINT32*)data;
+
+	if(id == nullptr)
+		return;
+
+	*id = 0;
 }
 
 UINT32 mlToggleBombBayDoor(SINT32 Param,UINT32 Id,UINT32 Detach)
@@ -719,36 +756,6 @@ UINT32 mlToggleBombBayDoor(SINT32 Param,UINT32 Id,UINT32 Detach)
 	if(VehicleData->BombBayMaxOpenSpeed && !VehicleData->BombBayDoor && (Speed > VehicleData->BombBayMaxOpenSpeed))
 	{
 		return 0;
-	}
-
-	vehType* vtype = VehicleData->VehicleMasterPtr->VehicleType;
-
-	WEAPON_SPEC truck = weapCreateSpec("GV_truck.1");
-
-	// are we a truck
-	if(vtype->WeaponSpec.wCategory == truck.wCategory && vtype->WeaponSpec.wClass == truck.wClass)
-	{
-		PlayerPlacedObject* ppo = fpPPOGet();
-
-		if(ppo)
-		{
-			if(ppo->valid)
-			{
-				uiCallJS("buildirp", _buildFRU, 0);
-			}
-			else
-			{
-				fpPPOAlert();
-				fpPPOSet(nullptr);
-			}
-		}
-		else
-		{
-			vehmainFRUBuild();
-		}
-
-		if(Online)
-			return 0;
 	}
 
 	VehicleData->BombBayDoor = !VehicleData->BombBayDoor;
@@ -832,12 +839,11 @@ UINT32 mlToggleAuxSight(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-	UINT32 Position;
 	FLOAT64VECTOR TempPos;
 	UCHAR s[32];
 
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 	VehicleData->HatchOpen[Position] = !VehicleData->HatchOpen[Position];
 
 	sprintf((char*)s,"hatchstate%d",Position+1);
@@ -912,11 +918,10 @@ UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 	if(VehicleData == nullptr) return 0;
-	UINT32 Position;
 	FLOAT64VECTOR TempPos;
 	FLOAT64 Speed;
 
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	if(VehicleData->CanopyJammed[Position])
 	{
@@ -1376,10 +1381,9 @@ UINT32 mlAdjustWinch(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 	if (VehicleData == nullptr) return 1;
-	UINT32 Position;
 	SINT32 TurretNum;
 
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	TurretNum = VehicleData->VehicleMasterPtr->VehicleType->TurretAux[Position];
 	if(TurretNum > 0)

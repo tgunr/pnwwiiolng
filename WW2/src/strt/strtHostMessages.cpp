@@ -13,6 +13,7 @@
 #include <queue>
 
 #include "chat/chatConstants.h"
+#include "chat/chatName.h"
 #include "chat/chatStratSupportMessages.h"
 #include "host/hostConstants.h"
 #include "host/hostTimeUpdate.h"
@@ -79,14 +80,13 @@ static	TEUL_CALLBACK* _SEND_MM_POST_DENY;
 static	TEUL_CALLBACK* _SEND_MM_JOIN_ACCEPT;
 static	TEUL_CALLBACK* _SEND_MM_JOIN_DENY;
 static	TEUL_CALLBACK* _XCHG_MM_SPAWN_GRANT;
-static	TEUL_CALLBACK* _XCHG_MM_POST_INFO;
 static	TEUL_CALLBACK* _XCHG_MM_CAPACITY;
 
 static	TEUL_CALLBACK* _SEND_SYNC_CPS;
 static	TEUL_CALLBACK* _SEND_SYNC_FACILITIES;
 static	TEUL_CALLBACK* _SEND_SYNC_BUILDINGS;
 
-static LOGICAL _allowSyncing = FALSE;
+static bool _allowSyncing = false;
 
 template <class Type>
 class SyncQueue : public std::vector<Type*>
@@ -122,7 +122,7 @@ static SyncQueue<ObjectStruct> _objectQueue;
 void
 strtAllowSyncing()
 {
-	_allowSyncing = TRUE;
+	_allowSyncing = true;
 }
 
 // When facility state data changes, we need to queue up the facility
@@ -342,7 +342,7 @@ strtSyncCPs(UINT32 address, UINT16 port, Supercell* sc)
 		//Make the message
 		for ( i = 0, f = startID; i < syncCPs.numEntries; ++i, ++f)
 		{
-			register CPStruct* cp = &sc->cps[f];
+			CPStruct* cp = &sc->cps[f];
 			syncCPs.info[i].uOID = cp->uOID;
 			syncCPs.info[i].owner = (UCHAR) cp->country;
 			syncCPs.info[i].control = (UCHAR) cp->controllingCountry;
@@ -498,7 +498,7 @@ SINT32 strtSyncObjects(UINT32 address, UINT16 port, Supercell* sc)
 	return fretval;
 }
 
-LOGICAL
+bool
 strtReplyToCapacityRequest(SINT32 teulIndex, const MM_CAPACITY_REQUEST& request, FULL_OBJ_ID destFacilityID, bool vehicleDelivered)
 {
 	MM_CAPACITY_RESPONSE response;
@@ -512,10 +512,10 @@ strtReplyToCapacityRequest(SINT32 teulIndex, const MM_CAPACITY_REQUEST& request,
 	if ((teulSend(teulIndex, _XCHG_MM_CAPACITY, &response)) < 0)
 	{
 		dbugLog(_FLA,"error sending capacity response");
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 static SINT32 _recvEnemyReport(ACTION_OBJECT* const a)
@@ -639,8 +639,8 @@ MM_SPAWN_GRANT_RESPONSE spawnGrantResponse;
 
 	betaLog(_FLD, "spawnGrantRequest: %d %d:%d:%d:%d:%d %d:%d:%d:%d", spawnGrantRequest.weaponSerial.serial, spawnGrantRequest.weaponSerial.source.cell.ox, spawnGrantRequest.weaponSerial.source.cell.oy, spawnGrantRequest.weaponSerial.source.id, spawnGrantRequest.weaponSerial.source.objClass, spawnGrantRequest.weaponSerial.source.objType, spawnGrantRequest.weaponSerial.spec.wCountry, spawnGrantRequest.weaponSerial.spec.wCategory, spawnGrantRequest.weaponSerial.spec.wClass, spawnGrantRequest.weaponSerial.spec.wType);
 
-	const LOGICAL success = strtProcessSpawnGrantRequest(spawnGrantRequest, spawnGrantResponse);
-	if ( success == TRUE )
+	const bool success = strtProcessSpawnGrantRequest(spawnGrantRequest, spawnGrantResponse);
+	if ( success )
 	{
 		//serious hack here!!!
 		MM_CAPACITY_REQUEST mmCapacityReq;
@@ -669,24 +669,6 @@ static SINT32 _sendMMSpawnGrantResponse(ACTION_OBJECT* const a)
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_SPAWN_GRANT_RESPONSE));
 }
 
-static SINT32 _recvMMPostInfoRequest(ACTION_OBJECT* const a)
-{
-	MM_POST_INFO_REQUEST postInfoRequest;
-	MM_POST_INFO_RESPONSE postInfoResponse;
-
-	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postInfoRequest, sizeof(MM_POST_INFO_REQUEST));
-
-	betaLog(_FLD, "p:%u postInfoRequest: " PRF_WEAPON_SERIAL " %u", postInfoRequest.customerID, PRA_WEAPON_SERIAL(postInfoRequest.weaponSerial), postInfoRequest.join);
-
-	if (strtProcessPostInfoRequest(postInfoRequest, postInfoResponse))
-	{
-		if ((teulSend(a->teulIndex, _XCHG_MM_POST_INFO, &postInfoResponse)) < 0)
-			dbugLog(_FLA,"Error sending spawn grant response");
-	}
-
-	return a->offset;
-}
-
 static SINT32
 _recvMMJoinListRequest(ACTION_OBJECT* const a)
 {
@@ -696,7 +678,7 @@ _recvMMJoinListRequest(ACTION_OBJECT* const a)
 
 	betaLog(_FLD, "p:%u joinListRequest " PRF_WEAPON_SERIAL " %s %u", request.customerID, PRA_WEAPON_SERIAL(request.weaponSerial), Chat::Name(request.handle).c_str(), request.join);
 
-	if ( strtProcessJoinListRequest(a->teulIndex, request) == false )
+	if ( !strtProcessJoinListRequest(a->teulIndex, request) )
 	{
 		betaLog(_FLD, "p:%u joinListRequest failed, sending deny", request.customerID);
 		strtSendMMJoinDeny(request.customerID, MM_JOIN_FAIL_CANT_FIND_POSTED_WEAPON);
@@ -728,15 +710,8 @@ static SINT32 _recvMMPostCancel(ACTION_OBJECT* const a)
 
 	LogAbort("postCancel: " PRF_WEAPON_SERIAL " %s"
 					, PRA_WEAPON_SERIAL(postCancel.weaponSerial)
-					, weapPrintName(&postCancel.weaponSerial.spec)
+					, weapPrintName(postCancel.weaponSerial.spec)
 					);
-
-	return a->offset;
-}
-
-static SINT32 _sendMMPostInfoResponse(ACTION_OBJECT* const a)
-{
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_INFO_RESPONSE));
 }
 
 static SINT32 _recvWeaponsReturn(ACTION_OBJECT* const a)
@@ -762,15 +737,12 @@ _recvMMSpawnCancel(ACTION_OBJECT* const a)
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &spawnCancel, sizeof(MM_SPAWN_CANCEL));
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "p:%u v:%u spawnCancel: %d:%d:%d:%d:%d %d:%d:%d:%d"
-						, spawnCancel.customerID, spawnCancel.weaponSerial.serial
-						, spawnCancel.weaponSerial.source.cell.ox, spawnCancel.weaponSerial.source.cell.oy, spawnCancel.weaponSerial.source.id, spawnCancel.weaponSerial.source.objClass, spawnCancel.weaponSerial.source.objType
-						, spawnCancel.weaponSerial.spec.wCountry, spawnCancel.weaponSerial.spec.wCategory, spawnCancel.weaponSerial.spec.wClass, spawnCancel.weaponSerial.spec.wType);
-	}
+    dbugLog(_FLD, "p:%u v:%u spawnCancel: %d:%d:%d:%d:%d %d:%d:%d:%d"
+                    , spawnCancel.customerID, spawnCancel.weaponSerial.serial
+                    , spawnCancel.weaponSerial.source.cell.ox, spawnCancel.weaponSerial.source.cell.oy, spawnCancel.weaponSerial.source.id, spawnCancel.weaponSerial.source.objClass, spawnCancel.weaponSerial.source.objType
+                    , spawnCancel.weaponSerial.spec.wCountry, spawnCancel.weaponSerial.spec.wCategory, spawnCancel.weaponSerial.spec.wClass, spawnCancel.weaponSerial.spec.wType);
 
-	strtProcessSpawnCancel(&spawnCancel);
+	strtProcessSpawnCancel(spawnCancel);
 
 	return a->offset;
 }
@@ -1034,11 +1006,9 @@ AttackOrder::process()
 		break;
 		default:
 			LogAbort("Unrecognized attack order packet from %s", Chat::Name(m_requester).c_str());
-		break;
 		}
 	}
-	if ( g_logDebug )
-		dbugLog(_FLDB, " result: %u", m_result);
+	dbugLog(_FLD, " result: %u", m_result);
 
 	// Send back the response
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::ATTACK_ORDER_Y), *this);
@@ -1116,8 +1086,10 @@ static SINT32
 _registerInterHostCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Host::CallbackX)
+	{
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLua);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Host::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1125,15 +1097,14 @@ _registerInterHostCallbacks()
 
 //Installs our callbacks
 SINT32
-strtHostInstallCallbacks(void)
+strtHostInstallCallbacks()
 {
 	_registerInterHostCallbacks();
 
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
-
+	{
 		REGISTER_RECEIVER(STRT_MM_POST_LIST_Y, _recvMMPostListRequest);
 		REGISTER_RECVSEND(STRT_MM_SPAWN_GRANT_Y, _recvMMSpawnGrantRequest, _sendMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT);
-		REGISTER_RECVSEND(STRT_MM_POST_INFO_Y, _recvMMPostInfoRequest, _sendMMPostInfoResponse, _XCHG_MM_POST_INFO);
 		REGISTER_RECEIVER(STRT_MM_JOIN_LIST_Y, _recvMMJoinListRequest);
 		REGISTER_RECVSEND(STRT_MM_CAPACITY_Y, _recvMMCapacityRequest, _sendMMCapacityResponse, _XCHG_MM_CAPACITY);
 
@@ -1161,15 +1132,15 @@ strtHostInstallCallbacks(void)
 		REGISTER_RECEIVER(STRT_ATTACK_ORDER_Y, _recvAttackOrder);
 
 		REGISTER_RECEIVER(STRT_FACILITY_WEAP_LIST_Y, _recvWeaponListRequest);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
 // Send a capture scoring notice to the cell hosts
 
 void
-strtSendCaptureScoreNotice(const FULL_OBJ_ID& fid, WWII_SIDE forSide)
+strtSendCaptureScoreNotice(const FULL_OBJ_ID fid, WWII_SIDE forSide)
 {
 	dbugLog(_FLI, "capscore: bld:%d,%d:%u side:%u", fid.cell.ox, fid.cell.oy, fid.id, forSide);
 	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureScore_Y));

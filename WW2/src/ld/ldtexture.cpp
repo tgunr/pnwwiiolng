@@ -14,13 +14,10 @@ Description:
 
 #include <map>
 
-typedef std::map<int, ref_ptr<Texture> > ldTextureMap;
+using ldTextureMap = std::map<int, ref_ptr<Texture>>;
 static ldTextureMap* Textures = new ldTextureMap(); // crash on exit on Mac avoided
 
 extern Image* ReadDDSFile(const std::string& name);
-#if platOS != OS_MACOS
-extern Image* ReadPNGFile(const std::string& name);
-#endif
 extern Image* ReadTGAFile(const std::string& name);
 extern Image* ReadBMPFile(const std::string& name, unsigned int transparentColor);
 
@@ -84,13 +81,9 @@ Description:
 --------------------------------------------------------------------------------*/
 static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned int transparentColor = 0)
 {
-    std::string regionPath = fioGetRegionalPath(name.c_str());
-
     int texid = -1;
 
-    oglSetActiveTextureStage(0);
-
-    std::string str = regionPath;
+    std::string str = name;
 
     // Remove extension
     int pos = str.rfind('.');
@@ -109,14 +102,16 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
         return texid;
     }
 
-    ref_ptr<Image> img = loadImage(regionPath, flags, transparentColor);
+    ref_ptr<Image> img = loadImage(name, flags, transparentColor);
 
     if(!img.valid() || !img->data())
     {
         return -1;
     }
 
-    img->setFileName(regionPath);
+    img->setFileName(name);
+
+    oglSetActiveTextureStage(0);
 
     ref_ptr<Texture> tex = new Texture2D;
 
@@ -220,7 +215,7 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
     dynamic_cast<Texture2D*>(tex.get())->setImage(nullptr);
     assert(img->referenceCount() == 1);
 
-    Write_Debug("[loadTexture] %s texture created", regionPath.c_str());
+    Write_Debug("[loadTexture] %s texture created", name.c_str());
 
     return id;
 }
@@ -254,13 +249,11 @@ int ldLoadTexture2D(const std::string& texturename,
                     Texture::FilterMode mag_filter,
                     unsigned int flags)
 {
-    std::string regionPath = fioGetRegionalPath(texturename.c_str());
-
     int texid = -1;
 
     oglSetActiveTextureStage(0);
 
-    std::string str = regionPath;
+    std::string str = texturename;
 
     // Remove extension
     int pos = str.rfind('.');
@@ -279,14 +272,14 @@ int ldLoadTexture2D(const std::string& texturename,
         return texid;
     }
 
-    ref_ptr<Image> img = loadImage(regionPath, flags, 0);
+    ref_ptr<Image> img = loadImage(texturename, flags, 0);
 
     if(!img.valid() || !img->data())
     {
         return -1;
     }
 
-    img->setFileName(regionPath);
+    img->setFileName(texturename);
 
     ref_ptr<Texture> tex = new Texture2D;
 
@@ -374,7 +367,7 @@ int ldLoadTexture2D(const std::string& texturename,
     dynamic_cast<Texture2D*>(tex.get())->setImage(nullptr);
     assert(img->referenceCount() == 1);
 
-    Write_Debug("[loadTexture] %s texture created", regionPath.c_str());
+    Write_Debug("[loadTexture] %s texture created", texturename.c_str());
 
     return id;
 }
@@ -390,13 +383,11 @@ int ldLoadTextureRectangle(const std::string& texturename,
                            Texture::FilterMode mag_filter,
                            unsigned int flags)
 {
-    std::string regionPath = fioGetRegionalPath(texturename.c_str());
-
     int texid = -1;
 
     oglSetActiveTextureStage(0);
 
-    std::string str = regionPath;
+    std::string str = texturename;
 
     // Remove extension
     int pos = str.rfind('.');
@@ -415,14 +406,14 @@ int ldLoadTextureRectangle(const std::string& texturename,
         return texid;
     }
 
-    ref_ptr<Image> img = loadImage(regionPath, flags, 0);
+    ref_ptr<Image> img = loadImage(texturename, flags, 0);
 
     if(!img.valid() || !img->data())
     {
         return -1;
     }
 
-    img->setFileName(regionPath);
+    img->setFileName(texturename);
 
     ref_ptr<Texture> tex = new TextureRectangle;
 
@@ -510,7 +501,7 @@ int ldLoadTextureRectangle(const std::string& texturename,
     dynamic_cast<TextureRectangle*>(tex.get())->setImage(nullptr);
     assert(img->referenceCount() == 1);
 
-    Write_Debug("[loadTexture] %s texture created", regionPath.c_str());
+    Write_Debug("[loadTexture] %s texture created", texturename.c_str());
 
     return id;
 }
@@ -528,16 +519,13 @@ int ldLoadTexture2DArray(const std::string& texturename,
 {
     oglSetActiveTextureStage(0);
 
-    std::string regionPath = fioGetRegionalPath(texturename.c_str());
-
     ref_ptr<Texture> tex = new Texture2DArray;
 
     dynamic_cast<Texture2DArray*>(tex.get())->setTextureDepth(names.size());
 
     for(unsigned int i = 0; i < names.size(); ++i)
     {
-        std::string regionPath = fioGetRegionalPath(names[i].c_str());
-        ref_ptr<Image> img = loadImage(regionPath, 0, 0);
+        ref_ptr<Image> img = loadImage(names[i], 0, 0);
 
         if(!img.valid())
         {
@@ -613,14 +601,11 @@ int ldLoadTextureCubeMap(const std::string& texturename,
 {
     oglSetActiveTextureStage(0);
 
-    std::string regionPath = fioGetRegionalPath(texturename.c_str());
-
     ref_ptr<Texture> tex = new TextureCubeMap;
 
     for(unsigned int i = 0; i < names.size(); ++i)
     {
-        std::string regionPath = fioGetRegionalPath(names[i].c_str());
-        ref_ptr<Image> img = loadImage(regionPath, 0, 0);
+        ref_ptr<Image> img = loadImage(names[i], 0, 0);
 
         if(!img.valid())
         {

@@ -29,7 +29,7 @@ public:
 	const char* title() const;				// nullptr if none set
 
 public:		// Member functions
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	void addEntry(const char* entry);
 
 private:
@@ -43,7 +43,7 @@ public:	// Members
 	char		m_strings[_MAX_STRINGS][_MAX_STRING_LEN];
 };
 
-typedef teul_network_object<OpinionPoll> OPINION_POLL_MSG;
+using OPINION_POLL_MSG = teul_network_object<OpinionPoll>;
 
 class OpinionChoice
 {
@@ -52,7 +52,7 @@ public:
 	OpinionChoice(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	UINT32 pollID() const { return m_pollID; }
@@ -63,4 +63,4 @@ private:
 	UINT32		m_choice;
 };
 
-typedef teul_network_object<OpinionChoice> OPINION_CHOICE_MSG;
+using OPINION_CHOICE_MSG = teul_network_object<OpinionChoice>;

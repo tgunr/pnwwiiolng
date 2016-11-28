@@ -20,7 +20,7 @@ namespace Map
 		// Do they want to use the custom location
 		bool			m_useLocation;
 
-		SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, struct ACTION_OBJECT* a);
 	};
 #pragma pack(pop)
 }

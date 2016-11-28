@@ -19,7 +19,7 @@ namespace Teul
 
 	//! @class Teul::ConfigVar
 	//! @brief Describes a configuration variable along with it's supposed type, default value and optional environment variable source.
-	//! @detail Configuration variables describe a runtime manipulatable game setting which starts with
+	//! @details Configuration variables describe a runtime manipulatable game setting which starts with
 	//! a compile time default value that can be superseded by a config file which can be superseded by environment variables.
 	//! The type is used to constrain how we access the variable.
 	class ConfigVar
@@ -128,9 +128,9 @@ namespace Teul
 // While that's not terribly complicated for any given compiler, it defeated
 // reasonable levels of readability to get it to work for all three platforms.
 
-typedef Teul::ConfigVar ConfigStr;
-typedef Teul::ConfigVar ConfigUint;
-typedef Teul::ConfigVar ConfigSint;
-typedef Teul::ConfigVar ConfigBool;
-typedef Teul::ConfigVar ConfigAddr;
-typedef Teul::ConfigVar ConfigPath;
+using ConfigStr = Teul::ConfigVar;
+using ConfigUint = Teul::ConfigVar;
+using ConfigSint = Teul::ConfigVar;
+using ConfigBool = Teul::ConfigVar;
+using ConfigAddr = Teul::ConfigVar;
+using ConfigPath = Teul::ConfigVar;

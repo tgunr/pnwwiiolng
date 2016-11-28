@@ -10,8 +10,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Patrick "thunder" Magruder
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcast.h"
 #include "chat/chatDefines.h"			// For GCI_...
 #include "chat/chatGCIMessage.h"
@@ -587,13 +585,13 @@ _checkUnit(StratHCUnit* unit, const CPStruct* cp)
 	// Ensure we rout parents first.
 	if ( nullptr != unit->parent() && cp == unit->parent()->homeCP() )
 		_checkUnit(unit->parent(), cp);
-	dbugLog(_FLIB, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
+	dbugLog(_FLI, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
 	if ( unit->canDeployTo(cp) )
-		dbugLog(_FLIB, "ok ");
+		dbugLog(_FLI, "ok ");
 	else if ( !unit->rout() )
-		dbugLog(_FLIB, "FAILED ");
+		dbugLog(_FLI, "FAILED ");
 	else
-		dbugLog(_FLIB, "routed ");
+		dbugLog(_FLI, "routed ");
 }
 
 void
@@ -607,14 +605,14 @@ CPStruct::checkHCUnits()
 	{
 		_checkUnit((StratHCUnit*)it->second, this);
 	}
-	dbugLog(_FLIB, "End");
+	dbugLog(_FLI, "End");
 }
 
 //////////////////////////////////////////////////////////////////////
 // Check whether the flags say we're under attack or not
 
 CPStruct*
-CPStruct::checkForUnderAttack(void)
+CPStruct::checkForUnderAttack()
 {
 	///TODO: Differentiate between "people here" and "under attack"
 	if ( flags & CP_EWS_FLAG_MASK )
@@ -842,6 +840,7 @@ CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
     //HACK: DEV-824 - .hold command temporary disabled
     return SCMD_ERROR;
 
+#ifdef ENABLE_HOLD
 	if ( side != issuer )
 		return SCMD_WRONG_SIDE;
 
@@ -867,6 +866,7 @@ CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
 		return SCMD_SUCCESS;
 
 	return SCMD_ERROR;
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1352,7 +1352,7 @@ CPStruct::startObjectiveExpiry(WWII_SIDE forSide, UINT32 delay)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Iterate across the supply centers and propogate supply links outward
+// Iterate across the supply centers and propagate supply links outward
 // from them to all same-side CPs within reach
 
 bool
@@ -1376,7 +1376,7 @@ strtBuildSupplyChains(bool force)
 
 	teulSyncClock();
 	const TeulTimeMS applyEnded = teulClock64;
-	dbugLog(_FLI, "sup: supply routeing took %llums [%llu run, %llu apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded);
+	dbugLog(_FLI, "sup: supply routeing took %" PR64BitUT "ms [%" PR64BitUT " run, %" PR64BitUT " apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded);
 
 	return true;
 }

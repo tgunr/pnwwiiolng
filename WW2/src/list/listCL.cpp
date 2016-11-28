@@ -15,20 +15,13 @@
 
 static inline LOGICAL _listAddItemAfter(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node);
 
-/*
-static void breakHere(void)
-{
-	return;
-}
-*/
-
 static inline LOGICAL
 _listAddItemAfter(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node)
 {
 	const char* reason = nullptr;
 	if ( PN_UNLIKELY(list == nullptr) )
 		reason = "NULL list";
-	else if ( PN_UNLIKELY(node == nullptr) ) 
+	else if ( PN_UNLIKELY(node == nullptr) )
 		reason = "NULL node";
 	else if ( PN_UNLIKELY(inpoint == nullptr) )
 		reason = "NULL inpoint";
@@ -152,8 +145,7 @@ listCLPushItem(LISTHEADER** list, LISTHEADER* node)
 #ifdef EXTREME_DEBUG
 	else
 	{
-		dbugWrite(_FLA,"pushing to empty list %x node %x\n"
-					,(UINT32) list, (UINT32) node);
+		dbugWrite(_FLA,"pushing to empty list %p node %p\n", list, node);
 	}
 #endif
 
@@ -198,11 +190,11 @@ LOGICAL
 listCLPushItemEnd(LISTHEADER** list, LISTHEADER* node)
 {
 	const char* reason = nullptr;
-	if ( PN_UNLIKELY(list == nullptr) ) 
+	if ( PN_UNLIKELY(list == nullptr) )
 		reason = "NULL list";
 	else if ( PN_UNLIKELY(node == nullptr) )
 		reason = "NULL node";
-	else if ( PN_UNLIKELY(node == *list) ) 
+	else if ( PN_UNLIKELY(node == *list) )
 		reason = "already in list";
 	if ( PN_UNLIKELY(reason != nullptr) )
 	{
@@ -224,15 +216,15 @@ LISTHEADER
 		reason = "NULL list";
 	else if ( PN_UNLIKELY(*list == nullptr) )
 		reason = "*NULL list";
-	else if ( PN_UNLIKELY(node == nullptr) ) 
+	else if ( PN_UNLIKELY(node == nullptr) )
 		reason = "NULL item";
-	else if ( PN_UNLIKELY(node->prev == nullptr) ) 
+	else if ( PN_UNLIKELY(node->prev == nullptr) )
 		reason = "NULL prev";
 	else if ( *list != node )
 	{
 		if ( PN_UNLIKELY(node->prev == node) )
 			reason = "invalid backref";
-		if ( PN_UNLIKELY(node->prev->next == nullptr) ) 
+		if ( PN_UNLIKELY(node->prev->next == nullptr) )
 			reason = "invalid fwdref";
 	}
 	if ( PN_UNLIKELY(reason != nullptr) )

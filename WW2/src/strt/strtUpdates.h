@@ -15,7 +15,7 @@ class StratUpdates
 public:
 	enum MODE { CP, FACILITY, BUILDING };
 public:
-	const FULL_OBJ_ID&	fullObjID() const { return m_fullObjID; }
+	FULL_OBJ_ID fullObjID() const { return m_fullObjID; }
 	UINT32 flags() const { return m_flags; }
 	WWII_COUNTRY owner() const { return (WWII_COUNTRY)m_owner; }
 	WWII_COUNTRY controller() const { return (WWII_COUNTRY)u_extra.m_controller; }

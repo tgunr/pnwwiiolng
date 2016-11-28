@@ -46,7 +46,7 @@ extern void Set_Log_Level(SINT32 level);
 
 extern LOGICAL	Open_Debug(const char* filename);
 extern void Write_Debug(const char* str, ...); // equivalent to LOG_OLD, LOG_INFO
-extern void Close_Debug(void);
+extern void Close_Debug();
 
 extern UINT32 Log_System_Mask(const char* system);
 extern const char* Log_System_Name(UINT32 mask);
@@ -123,9 +123,3 @@ logTimerEndExtMacro(x)
 #define logTimerCallVoid(x)  x()
 #define logTimerCallArgs(x, ...) x(__VA_ARGS__)
 #endif //#ifdef USE_LOG_TIMER
-
-
-#ifdef BETA_RELEASE
-extern void logInitProfiling(const char* const profileName, FLOAT32 profilingDuration);
-extern void logUpdateProfiling();
-#endif // BETA_RELEASE

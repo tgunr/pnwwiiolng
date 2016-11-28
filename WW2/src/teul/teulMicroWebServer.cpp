@@ -20,7 +20,6 @@
 #include <sys/sendfile.h>
 #endif
 
-#include <event2/event.h>
 #if platOS == OS_WIN32
 # pragma comment(lib, "event.lib")
 # pragma comment(lib, "ws2_32.lib")
@@ -28,6 +27,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#if defined(WIN32)
+# define poll(...) WSAPoll(__VA_ARGS__)
+#else
+# include <poll.h>
+#endif
 
 #ifndef O_BINARY
 # define O_BINARY 0
@@ -81,8 +86,10 @@ _establishListenSocket(const unsigned short port_)
 	}
 
 	// Allow re-use of the socket so server down/up doesn't cause a problem.
-	evutil_make_listen_socket_reuseable(sock);
-	evutil_make_socket_closeonexec(sock);
+#if platOS != OS_WIN32 // Windows does not use the same meanings for these
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const int []){ 1 }, sizeof(int));
+    fcntl(sock, F_SETFL, fcntl(sock, F_GETFL) | O_CLOEXEC);
+#endif
 
 	// Describe our end of the socket we want:
 	//  IPv4 (AF_INET), all addresses (INADDR_ANY) and the specified port.
@@ -106,8 +113,6 @@ _establishListenSocket(const unsigned short port_)
 		OS_CLOSESOCKET(sock);
 		return listenResult;
 	}
-
-	evutil_make_listen_socket_reuseable(sock);
 
 	printf("uWebServer socket:%u listening on port %u\n", sock, port_);
 
@@ -198,10 +203,16 @@ Teul::uWeb::Server::run()
 	char buffer[4096];
 	sockaddr_in addr;
 
+	pollfd pfd { 0, POLLIN|POLLPRI|POLLERR|POLLHUP|POLLNVAL, 0 };
+
 	for ( ; !isCancelled(); )
 	{
 		// Make sure we're not providing a denial of service to the host by using all the CPU.
 		std::this_thread::yield();
+
+		pfd.fd = m_listenSock;
+		if (poll(&pfd, 1, 250) <= 0)
+			continue;
 
 		socklen_t sockLen = sizeof(addr);
 		const SOCKET newSock = accept(m_listenSock, (struct sockaddr*)&addr, &sockLen);
@@ -214,11 +225,19 @@ Teul::uWeb::Server::run()
 			continue;
 		}
 
-		int bytes = recv(newSock, buffer, sizeof(buffer) - 1, 0);
-		if (bytes < 0)
-		{
+		pfd.fd = newSock;
+		for (size_t i = 0; i < 50; ++i) {
+			if (poll(&pfd, 1, 100) > 0)
+				break;
 			if (isCancelled())
 				return;
+		}
+
+		int bytes = recv(newSock, buffer, sizeof(buffer) - 1, 0);
+		if (isCancelled())
+			return;
+		if (bytes < 0)
+		{
 			printf("uWebServer recv %d: errno %d", bytes, dbugGetErrno());
 			continue;
 		}
@@ -231,10 +250,9 @@ Teul::uWeb::Server::run()
 		catch (WebError& e)
 		{
 			static const char errFmt[] = "HTTP/1.1 %u %s\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/html\r\nContent-Language: en\r\nAllow: GET\r\n\r\n<html><head><title>%u %s</title></head><body><h1>ERROR %u: %s</h1></body></html>\r\n\r\n";
-			char* myBuf = new char[sizeof(errFmt) + e.m_error.size() * 3 + 32];
-			const int len = sprintf(myBuf, errFmt, e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str());
-			send(newSock, myBuf, len, 0);
-			delete [] myBuf;
+			std::unique_ptr<char[]> myBuf = std::make_unique<char[]>(sizeof(errFmt) + e.m_error.size() * 3 + 32);
+			const int len = sprintf(myBuf.get(), errFmt, e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str());
+			send(newSock, myBuf.get(), len, 0);
 		}
 
 		OS_CLOSESOCKET(newSock);
@@ -259,25 +277,25 @@ _callHandler(const SOCKET sock, Teul::uWeb::Server::VirtualFileHandler handler, 
 // Turn a file extension into Content-Type:
 
 static const char*
-_getContentTypeFor(const char* const fileExt)
+_getContentTypeFor(std::string fileExt)
 {
-	if ( strcmp(fileExt, ".js") == 0 )
-		return "text/javascript";
-	else if ( strcmp(fileExt, ".json") == 0 )
-		return "text/application-json";
-	else if ( strcmp(fileExt, ".html") == 0 )
-		return "text/html";
-	else if ( strcmp(fileExt, ".css") == 0 )
-		return "text/css";
-	else if ( strcmp(fileExt, ".xml") == 0 )
-		return "text/xml";
-	else if ( strcmp(fileExt, ".txt") == 0 )
-		return "text/plain";
+	static const std::map<std::string, const char*> extensions =
+	{
+		{".js", "text/javascript"},
+		{".json", "text/application-json"},
+		{".html", "text/html"},
+		{".css", "text/css"},
+		{".xml", "text/xml"},
+		{".txt", "text/plain"},
+	};
+	auto it = extensions.find(fileExt);
+	if (it != extensions.end())
+		return it->second;
 	return "application/octet-stream";
 }
 
 //////////////////////////////////////////////////////////////////////
-// Try and locate a physical file to be sent to the requestee.
+// Try and locate a physical file to be sent to the requester.
 
 static bool
 _sendPhysicalFile(const SOCKET sock, const char* const rootPath, const char* const path, const char* const lastDot)
@@ -320,7 +338,7 @@ _sendPhysicalFile(const SOCKET sock, const char* const rootPath, const char* con
 		if ( fstat(filefd, &statBuf) < 0 )
 			throw "Inaccessible file";
 
-		static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: %s\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %llu\r\n\r\n";
+		static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: %s\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %" PR64BitUT "\r\n\r\n";
 		char myBuf[sizeof(ok200) + 128];
 
 		const char* contentType = _getContentTypeFor(lastDot);

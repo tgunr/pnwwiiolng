@@ -48,8 +48,8 @@ IME_STATE imeState();
 IMEBase* imeClient();
 UINT32 imeProcessKey();
 
-typedef std::map<IME_STRING, std::wstring> IME_STRING_MAP;
-typedef std::vector<std::wstring> IME_CANDIDATE_LIST;
+using IME_STRING_MAP = std::map<IME_STRING, std::wstring>;
+using IME_CANDIDATE_LIST = std::vector<std::wstring>;
 
 struct IME_CANDIDATES : public IME_CANDIDATE_LIST
 {

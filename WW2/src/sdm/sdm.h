@@ -194,8 +194,8 @@ struct sdm_strat_data
 /************************************************************************************************
 	sdm
 *************************************************************************************************/
-typedef size_t (*sdm_read)(int, void*, size_t);
-typedef size_t (*sdm_seek)(int fd, size_t offset);
+using sdm_read = size_t(*)(int, void*, size_t);
+using sdm_seek = size_t(*)(int fd, size_t offset);
 
 // file needs to be positioned at start of data before each call (which it will be if you call
 // these 3 functions sequentially in the order below, otherwise you'll need to do it yourself)

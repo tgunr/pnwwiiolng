@@ -18,7 +18,7 @@
 
 static std::mutex textMutex;
 
-typedef std::deque<char*> TEXT_POOL;
+using TEXT_POOL = std::deque<char*>;
 static TEXT_POOL _pool;
 
 static int inUse = 0;

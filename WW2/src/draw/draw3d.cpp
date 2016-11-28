@@ -591,9 +591,7 @@ LOGICAL draw3dGizmoLine(FLOAT64VECTOR const* inV1, FLOAT64VECTOR const* inV2, pi
 	return(TRUE);
 }
 
-#ifdef _MWERKS
 #pragma mark -
-#endif
 
 /************************************************************************************************
 	draw3dWorldDebug
@@ -684,7 +682,7 @@ int draw3dSetWorldDebugLine(FLOAT64VECTOR const* v1, FLOAT64VECTOR const* v2, co
 
 	obj = &debugObjects[objID];
 	obj->type = DRAW3D_WORLD_LINE;
-	strncpy(obj->name, name, 31);
+	strsafecpy(obj->name, name);
 	obj->color = Color;
 	obj->alwaysOnTop = TRUE;
 	obj->flipZ = FALSE;
@@ -744,7 +742,7 @@ int draw3dFindDebugObject(const char* name)
 	draw3dRemoveAllDebugObjects
 *************************************************************************************************/
 
-void draw3dRemoveAllDebugObjects(void)
+void draw3dRemoveAllDebugObjects()
 {
 	int i;
 

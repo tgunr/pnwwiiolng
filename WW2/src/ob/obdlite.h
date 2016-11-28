@@ -7,7 +7,7 @@
 #define LITE_LFMEDIUM     0x00000004
 #define LITE_LFBRIGHT     0x00000008
 
-typedef LOGICAL (*DYNALITE_UPDATE)(struct LIGHT* light);
+using DYNALITE_UPDATE = LOGICAL(*)(struct LIGHT* light);
 
 struct DYNALITE
 {
@@ -16,12 +16,12 @@ struct DYNALITE
 	SINT32				numlight;
 };
 
-extern LOGICAL obdliteInit(void);
+extern LOGICAL obdliteInit();
 extern int obdliteGetLights(DYNALITE** lplite);
-extern void obdliteKill(void);
+extern void obdliteKill();
 extern LIGHT* obdliteFindDynaLight(const char* name);
 extern LOGICAL obdliteAddDynaLite(LIGHT* light, DYNALITE_UPDATE updfunc);
 extern LOGICAL obdliteSetDynaLite(LIGHT* light);
 extern LOGICAL obdliteSetDynaState(LIGHT* light, LOGICAL state);
 extern LOGICAL obdliteChangeFunction(const char* name, DYNALITE_UPDATE updfunc);
-extern LOGICAL obdliteDynaLiteUpdate(void);
+extern LOGICAL obdliteDynaLiteUpdate();

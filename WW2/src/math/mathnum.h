@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __MATHNUM_H__
+#define __MATHNUM_H__
 
 #include "pi/pi.h"
 #include "math/Rand.h"
@@ -62,24 +63,6 @@ extern const Vec3f& GetEightPartOrdinalDirection(unsigned char ordinal);
 
 extern UINT32 closestPowerOfTwo(UINT32 x);
 
-// Prevent link errors with inline
-#ifndef MATHNUM_INLINE
-
 extern void mathFloatToInt(SINT32* int_pointer, FLOAT32 f);
-
-#else // MATHNUM_INLINE
-
-#define MATHNUM_INLINE
-
-#if platOS == OS_MACOS
-    #define INLINE inline
-#else
-    #define INLINE __forceinline
-#endif
-
-#include "math/mathnum.cpp"
-
-#undef INLINE
-#undef MATHNUM_INLINE
 
 #endif

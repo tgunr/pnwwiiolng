@@ -18,8 +18,8 @@
 // static cache of deleted buffer object lists which can only
 // by completely deleted once the appropriate OpenGL context
 // is set.  Used osg::BufferObject::deleteBufferObject(..) and flushDeletedBufferObjects(..) below.
-typedef std::multimap<unsigned int,GLuint> BufferObjectMap;
-typedef buffered_object<BufferObjectMap> DeletedBufferObjectCache;
+using BufferObjectMap = std::multimap<unsigned int,GLuint>;
+using DeletedBufferObjectCache = buffered_object<BufferObjectMap>;
 
 static DeletedBufferObjectCache s_deletedBufferObjectCache;
 

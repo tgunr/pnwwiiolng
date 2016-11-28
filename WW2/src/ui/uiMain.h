@@ -14,7 +14,7 @@ struct sdm_replacement_octet_data;
 struct sdm_strat_data;
 class jsGame;
 
-typedef void (*UIXMLCALLBACK)(JSContext* ctx, UINT32 argc, jsval* argv);
+using UIXMLCALLBACK = void(*)(JSContext* ctx, UINT32 argc, jsval* argv);
 
 /************************************************************************************************
 	ui

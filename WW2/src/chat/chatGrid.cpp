@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"						// For version dependent code
-
 #include <set>
 #include <stack>
 #include <algorithm>
@@ -48,12 +46,12 @@ struct GridKey
 	//! Constructor.
 	//! GridKeys are instance dependent so that STOs don't cross
 	//! instance boundaries.
-	GridKey(const instanceid_t& _instanceID, SINT32 x, SINT32 y)
+	GridKey(const instanceid_t _instanceID, SINT32 x, SINT32 y)
 		: m_instanceID(_instanceID), m_x(x), m_y(y)
 		{}
 	GridKey(UINT64 _key) : m_key(_key) {}
 
-	const instanceid_t& instanceID() const { return m_instanceID; }
+	instanceid_t instanceID() const { return m_instanceID; }
 	SINT32 X() const { return m_x; }
 	SINT32 Y() const { return m_y; }
 	const UINT64& key() const { return m_key; }
@@ -71,8 +69,8 @@ struct GridKey
 // STL hash functor for the GridKey class.
 namespace std { template<> struct hash<GridKey> { UINT64 operator()(const GridKey& key) const { return (key.instanceID() << 5) ^ key.key(); } }; }
 
-typedef std::unordered_map<GridKey, class ChatGrid*> _CHAT_GRID;
-typedef std::set<class ChatGrid*> _GRIDS;
+using _CHAT_GRID = std::unordered_map<GridKey, class ChatGrid*>;
+using _GRIDS = std::set<class ChatGrid*>;
 
 static ChatGrid* _getGrid(const GridKey& key);
 
@@ -145,8 +143,8 @@ private:
 };
 
 #if defined(CLOSED_BETA)
-# define GRID_INFO(mask, ...) dbugLog(_FLD, "g:%llu:%d,%d " mask, gridKey().instanceID(), gridKey().X(), gridKey().Y(), __VA_ARGS__)
-# define GRID_INFOADD(mask, ...) dbugLog(_FLDB, "+ " mask, __VA_ARGS__)
+# define GRID_INFO(mask, ...) dbugLog(_FLD, "g:%" PR64BitUT ":%d,%d " mask, gridKey().instanceID(), gridKey().X(), gridKey().Y(), __VA_ARGS__)
+# define GRID_INFOADD(mask, ...) dbugLog(_FLD, "+ " mask, __VA_ARGS__)
 #else
 # define GRID_INFO(mask, ...)
 #endif
@@ -155,7 +153,7 @@ private:
 
 static _CHAT_GRID _gridIndex;
 
-typedef std::stack<ChatGrid*> _FREE_GRIDS;
+using _FREE_GRIDS = std::stack<ChatGrid*>;
 static _FREE_GRIDS _freeGrids;
 
 static STOBatch _stoBatch;
@@ -590,13 +588,12 @@ _announceSTOToGrid(ServerSTO& sto, bool isCreation)
 		_stoBatch.add(data, true);
 	}
 
-	if ( g_logDebug )
-		dbugLog(_FLD, "sto:%u %s [%f/%f/%f => %d/%d] %" PRSizeT " cells"
-						, sto.uid(), op
-						, position.x()
-						, position.y()
-						, position.z()
-						, key.X(), key.Y(), cell->neighbors().size());
+    dbugLog(_FLD, "sto:%u %s [%f/%f/%f => %d/%d] %" PRSizeT " cells"
+                    , sto.uid(), op
+                    , position.x()
+                    , position.y()
+                    , position.z()
+                    , key.X(), key.Y(), cell->neighbors().size());
 
 	// Are we forcibly removing an STO rather than expiring one due to old age?
 	if ( isCreation == false && sto.needsBroadcastRemoval() == true )
@@ -698,7 +695,7 @@ UMSSTO::activate()
 
 //		// Allow 10 seconds for a response from the mmhost
 //		m_lifespan = 1 * 1000;
-		mission->sendMobileSpawn(player->playerID(), player->matchHandle(), position().x(), position().y(), position().z(), true, uid());
+		mission->sendMobileSpawn(player->playerID(), player->matchHandle(), position().x(), position().y(), position().z(), true, uid(), subType());
 	}
 	catch (MSPAWN_RESULT error)
 	{
@@ -736,10 +733,9 @@ chatPatrolGridExpirations()
 		for ( it = _gridIndex.begin(); it != _gridIndex.end(); ++it )
 		{
 			ChatGrid* node = it->second;
-			if ( g_logDebug )
-				dbugLog(_FLDB, "[g:%llu:%d,%d %p players:%u, stos:%u] "
-								, node->gridKey().instanceID(), node->gridKey().X(), node->gridKey().Y(), node
-								, node->players().size(), node->stos().size());
+            dbugLog(_FLD, "[g:%" PR64BitUT ":%d,%d %p players:%u, stos:%u] "
+                            , node->gridKey().instanceID(), node->gridKey().X(), node->gridKey().Y(), node
+                            , node->players().size(), node->stos().size());
 		}
 	}
 #endif
@@ -750,9 +746,8 @@ chatPatrolGridExpirations()
 		++it;
 		if ( cell->expired() )
 		{
-			if ( g_logDebug )
-				dbugLog(_FLD, "g:%llu:%d,%d expiry time elapsed"
-								, cell->gridKey().instanceID(), cell->gridKey().X(), cell->gridKey().Y());
+            dbugLog(_FLD, "g:%" PR64BitUT ":%d,%d expiry time elapsed"
+                            , cell->gridKey().instanceID(), cell->gridKey().X(), cell->gridKey().Y());
 			_gridIndex.erase(cell->gridKey());
 			cell->deactivate();
 			_freeGrids.push(cell);
@@ -784,13 +779,10 @@ Player::updateGridPosition()
 	ChatGrid* oldGrid = _findGrid(GridKey(instance().id(), m_gridX, m_gridY));
 	ChatGrid* newGrid = _getGrid(GridKey(instance().id(), newGX, newGY));
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s moved into [%d,%d] -> [%d,%d]"
-						, teulIndex(), playerID(), callsign()
-						, m_gridX, m_gridY
-						, newGX, newGY);
-	}
+    dbugLog(_FLD, "t:%d p:%u c:%s moved into [%d,%d] -> [%d,%d]"
+                    , teulIndex(), playerID(), callsign()
+                    , m_gridX, m_gridY
+                    , newGX, newGY);
 
 #ifdef HEAVY_DEBUG
 	char buffer[4096];
@@ -823,8 +815,7 @@ Player::removeFromGrid()
 	if ( m_gridX == INVALID_GRID_COORD && m_gridY == m_gridX )
 		return;
 
-	if ( g_logDebug )
-		log(_FLD, "removing from grid [%d,%d]", m_gridX, m_gridY);
+    log(_FLD, "removing from grid [%d,%d]", m_gridX, m_gridY);
 
 	ChatGrid* grid = _findGrid(GridKey(instance().id(), m_gridX, m_gridY));
 	if ( grid != nullptr )
@@ -849,7 +840,7 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 	GridKey botleft(player->instance().id(), (SINT32)(player->lastX() - range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() - range) >> ChatGrid::_KEY_SHIFT);
 	GridKey topright(player->instance().id(), (SINT32)(player->lastX() + range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() + range) >> ChatGrid::_KEY_SHIFT);
 
-	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu getting cells within [%d,%d],[%d,%d] %lld range: "
+	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " getting cells within [%d,%d],[%d,%d] %" PR64BitT " range: "
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, player->instance().category(), player->instance().type(), player->instance().handle(), player->instance().id()
 					, botleft.X(), botleft.Y(), topright.X(), topright.Y()
@@ -860,39 +851,19 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 		const ChatGrid* node = (*it);
 		if ( node->players().empty() )
 		{
-#ifdef CLOSED_BETA
-			if ( g_logDebug )
-			{
-				betaLog(_FLDB, "[%d,%d:empty] ", node->gridKey().X(), node->gridKey().Y());
-			}
-#endif
+            betaLog(_FLD, "[%d,%d:empty] ", node->gridKey().X(), node->gridKey().Y());
 			continue;
 		}
 		if ( !node->inRange(botleft, topright) )
 		{
-#ifdef CLOSED_BETA
-			if ( g_logDebug )
-			{
-				betaLog(_FLDB, "[%d,%d:too far] ", node->gridKey().X(), node->gridKey().Y());
-			}
-#endif
+            betaLog(_FLD, "[%d,%d:too far] ", node->gridKey().X(), node->gridKey().Y());
 			continue;
 		}
 		cells.push_back(&node->players());
-#ifdef CLOSED_BETA
-		if ( g_logDebug )
-		{
-			betaLog(_FLDB, "%d,%d ", node->gridKey().X(), node->gridKey().Y());
-		}
-#endif
+		betaLog(_FLD, "%d,%d ", node->gridKey().X(), node->gridKey().Y());
 	}
 
-#ifdef CLOSED_BETA
-	if ( g_logDebug )
-	{
-		betaLog(_FLDB, " total: %" PRSizeT " cells", cells.size());
-	}
-#endif
+	betaLog(_FLD, " total: %" PRSizeT " cells", cells.size());
 }
 
 static bool g_enableSnapshot = false;
@@ -920,7 +891,7 @@ chatGridSnapshot()
 			continue;
 		if ( len == 0 )
 		{
-			len = sprintf(query, "INSERT INTO grid_snapshot (gx,gy,recorded,players,stos) VALUES ");
+			len = strprintf(query, "INSERT INTO grid_snapshot (gx,gy,recorded,players,stos) VALUES ");
 		}
 		else
 		{

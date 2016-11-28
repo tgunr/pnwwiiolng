@@ -3,16 +3,16 @@
 
 #include "score/scoreSortie.h"
 #include "teul/teulTime.h"
-#include <unordered_map>
+#include "wwii/wwiiHash.h"
 #include <queue>
 #include <algorithm>
 #include "map/mapPlayer.h"
 #include "weap/weapWeapon.h"
 
-typedef std::unordered_map<UINT32 /*sortieID*/, Scoring::Sortie*> SortieTable;
+using SortieTable = std::unordered_map<UINT32 /*sortieID*/, Scoring::Sortie*>;
 static SortieTable sorties;
 
-typedef std::queue<Scoring::Sortie*> ExpiryList;
+using ExpiryList = std::queue<Scoring::Sortie*>;
 static ExpiryList expiringSorties;
 
 //////////////////////////////////////////////////////////////////////
@@ -20,7 +20,7 @@ static ExpiryList expiringSorties;
 // Caution: can return 0
 
 static FLOAT32
-_getVehicleValue(const WEAPON_SPEC& vehicleType)
+_getVehicleValue(const WEAPON_SPEC vehicleType)
 {
 	WEAPON* weapon = weapLookup(vehicleType);
 	if ( weapon == nullptr )
@@ -106,7 +106,7 @@ Scoring::Sortie::addHitTo(const Scoring::Actor& actor_, const UINT64& joules_)
 // Add another type to the list of unique types hit/killed.
 
 void
-Scoring::Sortie::addInteraction(const WEAPON_SPEC& spec_)
+Scoring::Sortie::addInteraction(const WEAPON_SPEC spec_)
 {
 	m_typesInteractedWith.insert(spec_.asUINT32());
 }
@@ -115,7 +115,7 @@ Scoring::Sortie::addInteraction(const WEAPON_SPEC& spec_)
 // Add score for a kill.
 
 void
-Scoring::Sortie::addKill(const UINT32 sortieID_, const WEAPON_SPEC& spec_)
+Scoring::Sortie::addKill(const UINT32 sortieID_, const WEAPON_SPEC spec_)
 {
 	assert( sortieID_ != 0 );
 	assert( spec_.asUINT32() != 0 );
@@ -144,7 +144,7 @@ Scoring::Sortie::attachCrew(Player& crew_)
 // Set the rtb code/dest for this sortie.
 
 void
-Scoring::Sortie::setRTB(const CODE_RTB rtbCode_, const FULL_OBJ_ID& rtbDest_)
+Scoring::Sortie::setRTB(const CODE_RTB rtbCode_, const FULL_OBJ_ID rtbDest_)
 {
 	dbugLog(_FLD, "v:%u setting rtb to %u", m_sortieID, rtbCode_);
 
@@ -243,7 +243,7 @@ Player::closeCurrentSortie()
 		if ( m_sortie->despawnTime() == 0 )
 		{
 			const CODE_RTB code = (CODE_RTB)missionPacket().vehicle().rtbState();
-			const FULL_OBJ_ID& dest = missionPacket().vehicle().rtbFacility();
+			const FULL_OBJ_ID dest = missionPacket().vehicle().rtbFacility();
 			m_sortie->setRTB(code, dest);
 			m_sortie->despawned();
 		}

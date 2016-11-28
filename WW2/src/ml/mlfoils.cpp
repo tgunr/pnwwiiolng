@@ -355,9 +355,7 @@ UCHAR * VarContents;
 	}
 
 	*AirfoilList = (mlAirfoilList*)memAlloc(sizeof(mlAirfoilList));
-	memset(*AirfoilList,0,sizeof(mlAirfoilList));
 	(*AirfoilList)->AirfoilData = (mlAirfoilData*)(memAlloc(NumAirfoils * sizeof(mlAirfoilData)));
-	memset((*AirfoilList)->AirfoilData,0,NumAirfoils*sizeof(mlAirfoilData));
 	(*AirfoilList)->NumAirfoils = NumAirfoils;
 
 	AirfoilListPos = -1;
@@ -1150,7 +1148,7 @@ UINT32 mlGetAirfoilForcesAndTorques(FLOAT64VECTOR* RetForce,
 							AirfoilComponentData->VortexEffectOffset;
             /*
              TBD - investigate whether or not Z should incorporate VortexEffectPercent
-             
+
 							AirfoilComponentData->VortexEffectPercent;
              */
 		}

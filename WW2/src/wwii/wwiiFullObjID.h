@@ -61,9 +61,9 @@ struct FULL_OBJ_ID
 
 	void FromKey(const UINT64& key)
 	{
-		cell.ox = (SINT16)((key >> 28) << 4);
-		cell.oy = (SINT16)((key >> 16) << 4);
-		this->id = (UINT16)(key & 0xffff);
+		cell.ox = static_cast<SINT16>((key >> 28) << 4);
+		cell.oy = static_cast<SINT16>((key >> 16) << 4);
+		this->id = static_cast<UINT16>(key & 0xffffU);
 		objClass = 0;
 		objType = 0;
 	}
@@ -72,21 +72,21 @@ struct FULL_OBJ_ID
 	// The cell OX and OY aren't precise and don't need to be,
 	// so we need to eliminate the lower 4 bits in the comparison
 	bool sameCell(SINT16 x, SINT16 y) const { return (cell.ox>>4 == x>>4 && cell.oy>>4 == y>>4); }
-	bool sameCell(const OCTET_CELL& rhs) const { return sameCell(rhs.ox, rhs.oy); }
-	bool sameCell(const FULL_OBJ_ID& rhs) const { return sameCell(rhs.cell.ox, rhs.cell.oy); }
+	bool sameCell(const OCTET_CELL rhs) const { return sameCell(rhs.ox, rhs.oy); }
+	bool sameCell(const FULL_OBJ_ID rhs) const { return sameCell(rhs.cell.ox, rhs.cell.oy); }
 
-	bool operator == (const FULL_OBJ_ID& rhs) const { return id == rhs.id && sameCell(rhs); }
+	bool operator == (const FULL_OBJ_ID rhs) const { return id == rhs.id && sameCell(rhs); }
 //tolua_end
-	bool operator != (const FULL_OBJ_ID& rhs) const { return id != rhs.id || !sameCell(rhs); }
+	bool operator != (const FULL_OBJ_ID rhs) const { return id != rhs.id || !sameCell(rhs); }
 //tolua_begin
 
 	// Helper function for converting a fullObjID into a UINT64
 	UINT64 Key() const
 	{
 		static const UINT64 SC_MASK = (0x0fff);		// 12 bits of supercell id
-		return (((UINT64)(cell.ox >> 4) & SC_MASK) << 28)	// 12 bits of ox
-			|  (((UINT64)(cell.oy >> 4) & SC_MASK) << 16)	// 12 bits of oy
-			|  (id & 0xffff)								// 16 bits of id
+		return ((static_cast<UINT64>(cell.ox >> 4) & SC_MASK) << 28)	// 12 bits of ox
+			|  ((static_cast<UINT64>(cell.oy >> 4) & SC_MASK) << 16)	// 12 bits of oy
+			|  (id & 0xffff)											// 16 bits of id
 			;
 	}
 
@@ -101,20 +101,15 @@ extern const FULL_OBJ_ID nullObjID;
 //tolua_end
 #define PRF_FULL_OBJ_ID "%d.%d:%u"
 #define PRA_FULL_OBJ_ID(s) (s).cell.ox, (s).cell.oy, (s).id
-//tolua_begin
 
-static inline const char* weapPrintFullObjIDC(const FULL_OBJ_ID* id, char* buffer)
+template<size_t N>
+static inline const char* weapPrintFullObjIDC(const FULL_OBJ_ID& id, char (&buffer)[N])
 {
-	if ( id == nullptr )
-		return "<nullFOID>";
-
-	sprintf(buffer, "x:%d y:%d id:%hu c:%hd t:%hd"
-				, id->cell.ox
-				, id->cell.oy
-				, (unsigned short)id->id
-				, (short)id->objClass
-				, (short)id->objType);
-
+	strprintf(buffer, "x:%d y:%d id:%hu c:%hd t:%hu"
+				, id.cell.ox
+				, id.cell.oy
+				, static_cast<UINT16>(id.id)
+				, static_cast<SINT16>(id.objClass)
+				, static_cast<UINT16>(id.objType));
 	return buffer;
 }
-//tolua_end

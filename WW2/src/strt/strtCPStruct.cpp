@@ -62,7 +62,7 @@ CPStruct::linkTo(const CPStruct* rhs) const
 // Function to test if a CP has a link to a CP with the following fullObjID
 
 LinkStruct*
-CPStruct::linkTo(const FULL_OBJ_ID& rhs) const
+CPStruct::linkTo(const FULL_OBJ_ID rhs) const
 {
 	return linkTo(strtGetCP(rhs));
 }

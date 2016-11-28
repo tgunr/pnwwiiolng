@@ -81,35 +81,34 @@ enum
 static ref_ptr<oglMaterial> basictexture;
 static ref_ptr<oglMaterial> basiccolor;
 
-struct tagGSCommandList;
-typedef LOGICAL (GunFileReadFunc)(struct tagGSCommandList * GSCL,SINT8* Params);
-typedef LOGICAL (GunFileDisplayFunc)(void*  Data);
-typedef LOGICAL (GunFileKillFunc)(void*  Data);
+struct GSCommandList;
+using GunFileReadFunc = LOGICAL(*)(GSCommandList * GSCL,SINT8* Params);
+using GunFileDisplayFunc = LOGICAL(*)(void*  Data);
+using GunFileKillFunc = LOGICAL(*)(void*  Data);
 
 // structs
-typedef struct tagpersGunsightRangeTable
+struct persGunsightRangeTable
 {
 	FLOAT32 TimeToDist[RANGETABLE_NUMELEMENTS];
 	FLOAT32 ProjectileDrop[RANGETABLE_NUMELEMENTS];
 	FLOAT32 AimAngle[RANGETABLE_NUMELEMENTS];
-} persGunsightRangeTable;
+};
 
-typedef struct tagGunfileLookup
+struct GunfileLookup
 {
 	SINT8 CommandName[32];
-	GunFileReadFunc* ReadFunction;
-	GunFileDisplayFunc* DisplayFunction;
-	GunFileKillFunc* KillFunction;
-} GunfileLookup;
+	GunFileReadFunc ReadFunction;
+	GunFileDisplayFunc DisplayFunction;
+	GunFileKillFunc KillFunction;
+};
 
-typedef struct tagGunfileElement
+struct GunfileElement
 {
 	SINT32 CommandCode;
 	void*  Data;
+};
 
-} GunfileElement;
-
-typedef struct tagGSCommandList
+struct GSCommandList
 {
 	GunfileElement GE[MAX_GUNFILE_ELEMENTS];
 	SINT32 GECounter;
@@ -123,9 +122,9 @@ typedef struct tagGSCommandList
 	LOGICAL GunSightTiltsToAim;
 
 	OBJECT * ViewDOF;
-} GSCommandList;
+};
 
-typedef struct
+struct GSLadderInfo
 {
 	UINT32 type;
 	SINT32 dir;
@@ -133,7 +132,7 @@ typedef struct
 	FLOAT32 inputMin;
 	FLOAT32 inputMax;
 	FLOAT32 len;
-} GSLadderInfo;
+};
 
 // variables
 static UCHAR _LadderTypeNames[GL_LADDER_TYPE_MAX][32] = { "none", "vertical", "horizontal" };
@@ -227,12 +226,12 @@ static LOGICAL _SetRangeAngleMin(void*  Data);
 static LOGICAL _SetRangeAngleMax(void*  Data);
 static LOGICAL _SetRangeReadout(void*  Data);
 
-static LOGICAL _RenderTextVertices(void);
-static LOGICAL _RenderLineVertices(void);
+static LOGICAL _RenderTextVertices();
+static LOGICAL _RenderLineVertices();
 
 static LOGICAL _KillGeneric(void*  Data);
 
-static FLOAT32 _ComputeShotAngle(void);
+static FLOAT32 _ComputeShotAngle();
 #if(0)
 static FLOAT32 _ComputeShotDrop(FLOAT32 Range,persGunsightRangeTable * RT);
 #endif
@@ -293,7 +292,7 @@ static GunfileLookup Lookup[MAX_GUNFILE_COMMANDS] =
 	persGunsightInit
 *************************************************************************************************/
 
-LOGICAL persGunsightInit(void)
+LOGICAL persGunsightInit()
 {
 	memset(&GunSightView, 0x0, sizeof(GSCommandList));
 	memset(&InstView, 0x0, sizeof(GSCommandList));
@@ -370,7 +369,7 @@ LOGICAL persGunsightInit(void)
 	persGunsightKill
 *************************************************************************************************/
 
-LOGICAL persGunsightKill(void)
+void persGunsightKill()
 {
 	_ClearGunfileData(&GunSightView);
 	_ClearGunfileData(&InstView);
@@ -382,15 +381,13 @@ LOGICAL persGunsightKill(void)
     piFreeMipTextures(_britscope);
 	piFreeMipTextures(_bazookascope);
     piFreeMipTextures(_binocs);
-
-	return 0;
 }
 
 /************************************************************************************************
 	persGunsightUpdate
 *************************************************************************************************/
 
-LOGICAL persGunsightUpdate(void)
+LOGICAL persGunsightUpdate()
 {
 	static SINT32 _LastUpdateTime;
 	FLOAT32 DeltaTime;
@@ -684,50 +681,9 @@ static LOGICAL _ReadGunfileData(GSCommandList * GSCL,SINT8 * FileName)
     std::string str = FileName;
     std::replace(str.begin(), str.end(), '\\', '/');
 
-    bool usedirectory = false;
     int state = fioQuery();
 
-#ifdef BETA_RELEASE
-
-#define PATH "gunsights/"
-
-    int pos =  str.find_last_of('/'); // filename
-    pos = str.find_last_of('/', pos - 1); // directory
-
-    std::string name;
-
-    if(pos != std::string::npos)
-    {
-        name = str.substr(pos + 1, str.length() - pos);
-    }
-
-    if(!name.empty())
-    {
-        std::string path = PATH;
-        path += name;
-
-        // Force directory reading
-        fioSet(ISDIRECTORY);
-
-        // Test if local file is present for beta testers
-        if(fioAccess(path.c_str()))
-        {
-            str = path;
-            usedirectory = true;
-        }
-
-        fioSet(state);
-    }
-
-#endif
-
-    if(usedirectory)
-        fioSet(ISDIRECTORY);
-
     GunFile = fioOpen(str.c_str());
-
-    fioSet(state);
-
 	if (GunFile == -1)
 	{
 		Write_Debug("Failed attempt to read gunsight file %s",FileName);
@@ -1144,7 +1100,7 @@ weapAmmoType * AmmoType;
 		return FALSE;
 	}
 
-	strncpy(_AmmoTypeName, Ptr1, 63);
+	strsafecpy(_AmmoTypeName, Ptr1);
 
 	if(AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO)
 		return TRUE;
@@ -1736,7 +1692,7 @@ static LOGICAL _KillGeneric(void*  Data)
 	return TRUE;
 }
 
-LOGICAL persPrepGunsightDraw(void)
+LOGICAL persPrepGunsightDraw()
 {
 
 	_DrawStats = FALSE;
@@ -1799,7 +1755,7 @@ LOGICAL persGunsightDraw(OBJECT* DOF, UINT32 IsInstrumentView)
 	return TRUE;
 }
 
-static LOGICAL _RenderTextVertices(void)
+static LOGICAL _RenderTextVertices()
 {
 piLVERTEX* Vertex;
 SINT32 NumVerts;
@@ -1846,7 +1802,7 @@ SINT32 i;
 	return TRUE;
 }
 
-static LOGICAL _RenderLineVertices(void)
+static LOGICAL _RenderLineVertices()
 {
 piLVERTEX* Vertex;
 SINT32 NumVerts;
@@ -1887,7 +1843,7 @@ SINT32 i;
 	return TRUE;
 }
 
-static FLOAT32 _ComputeShotAngle(void)
+static FLOAT32 _ComputeShotAngle()
 {
 FLOAT32 Angle,Angle1,Angle2;
 FLOAT32 Delta;
@@ -2075,7 +2031,7 @@ LOGICAL persLoadInstGunsight(SINT8* FileName)
 	return _ReadGunfileData(&InstView,FileName);
 }
 
-LOGICAL persClearGunsights(void)
+LOGICAL persClearGunsights()
 {
 	_ClearGunfileData(&GunSightView);
 	_ClearGunfileData(&InstView);
@@ -2150,7 +2106,7 @@ LOGICAL persGunsightAlignDOF(piMATRIX * RetMatrix, OBJECT * AlignedObject, OBJEC
 	return TRUE;
 }
 
-LOGICAL persUpdateGunsightView(void)
+LOGICAL persUpdateGunsightView()
 {
 	if(GunSightView.ViewDOF)
 		_UpdateView(&GunSightView);
@@ -2158,7 +2114,7 @@ LOGICAL persUpdateGunsightView(void)
 	return TRUE;
 }
 
-LOGICAL persUpdateInstGunsightView(void)
+LOGICAL persUpdateInstGunsightView()
 {
 	if(InstView.ViewDOF)
 		_UpdateView(&InstView);
@@ -2176,7 +2132,7 @@ static LOGICAL _UpdateView(GSCommandList * GSCL)
 }
 
 // called when the player's vehicle goes away
-LOGICAL persGunsightClearData(void)
+LOGICAL persGunsightClearData()
 {
 	GunSightView.ViewDOF = nullptr;
 	InstView.ViewDOF = nullptr;
@@ -2837,7 +2793,7 @@ static FLOAT32 _GetCurrentViewBearing()
 	persGunsightGetRange
 *************************************************************************************************/
 
-FLOAT32 persGunsightGetRange(void)
+FLOAT32 persGunsightGetRange()
 {
 	return _StatsRange;
 }
@@ -3187,7 +3143,7 @@ void persGunsightDrawFPSScope(int type)
 	{
         if(InstView.GE[i].CommandCode)
         {
-            GunFileDisplayFunc* f = Lookup[InstView.GE[i].CommandCode].DisplayFunction;
+            GunFileDisplayFunc f = Lookup[InstView.GE[i].CommandCode].DisplayFunction;
 
             if(f && f == _DisplayMagLine)
             {
@@ -3265,7 +3221,7 @@ void persGunsightDrawOverlay()
 	{
         if(GunSightView.GE[i].CommandCode)
         {
-            GunFileDisplayFunc* f = Lookup[GunSightView.GE[i].CommandCode].DisplayFunction;
+            GunFileDisplayFunc f = Lookup[GunSightView.GE[i].CommandCode].DisplayFunction;
 
             if(f && f == _DisplayMagLine)
             {

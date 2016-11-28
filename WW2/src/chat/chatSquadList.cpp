@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include <mutex>
 
 #include "wwii/wwiiHash.h"
@@ -44,10 +42,10 @@
 
 static const UINT32 SQUAD_UPDATE_INTERVAL_MS = 5 * 1000;
 
-typedef std::unordered_map<UINT32,SquadList> SQUAD_LISTS;
-typedef std::unordered_map<ChatHandle,ChatHandle> SQUAD_NAMES;
+using SQUAD_LISTS = std::unordered_map<UINT32,SquadList>;
+using SQUAD_NAMES = std::unordered_map<ChatHandle,ChatHandle>;
 
-typedef std::set<const Player*> RECRUITERS;
+using RECRUITERS = std::set<const Player*>;
 static RECRUITERS g_recruiters;
 
 static SQUAD_LISTS g_squads;
@@ -55,7 +53,7 @@ static SQUAD_LISTS g_squads;
 static SQUAD_NAMES g_squadNames;
 static std::mutex _namesMutex;
 
-extern void chatSendCOAppointment(UINT32 squadID, const ChatHandle& handle);
+extern void chatSendCOAppointment(UINT32 squadID, const ChatHandle handle);
 
 //////////////////////////////////////////////////////////////////////
 // Fetch the list of members of a squad
@@ -95,7 +93,7 @@ public:
 		if ( numRows <= 0 )
 			return true;
 
-		threadLog(_FLI, "squad list process: sq:%u rows:%u", m_squadID, numRows);
+		dbugLog(_FLI, "squad list process: sq:%u rows:%" PRSizeT "", m_squadID, numRows);
 
 		Result result;
 		while ( Query()->FetchRow() )
@@ -141,9 +139,9 @@ public:
 		for ( size_t i = 0; i < m_results.size(); ++i )
 		{
 			const Result& result = m_results[i];
-			const ChatHandle& handle = result.m_handle;
-			const UINT32& playerID = result.m_playerID;
-			const UINT32& rank = result.m_rank;
+			ChatHandle handle = result.m_handle;
+			const UINT32 playerID = result.m_playerID;
+			const UINT32 rank = result.m_rank;
 			UINT32 joined = result.m_joined;
 
 			if ( rank <= 0 )
@@ -162,7 +160,7 @@ public:
 								, m_squadID, playerID, Chat::Name(handle).c_str());
 				joined = teulTime();
 				DBThread::Do(DBThread::Default
-								, "UPDATE LOW_PRIORITY wwii_player"
+								, "UPDATE wwii_player"
 								   " SET squad_joined=NOW()"
 					 			" WHERE playerID=%u AND squadid=%u AND squad_joined is NULL"
 									, playerID, m_squadID
@@ -217,7 +215,7 @@ static bool
 _requestPending(UINT32 squadID)
 {
 	static const UINT32 PENDING_DURATION_S = 15;
-	typedef std::vector< std::pair<UINT32,UINT32> > GUARD;
+	using GUARD = std::vector<std::pair<UINT32, UINT32>>;
 	static GUARD guard;
 	GUARD::iterator it;
 
@@ -270,7 +268,7 @@ SquadList::SquadList(const Squad& withSquad)
 // SquadList internal function: add a member and update if necessary
 
 void
-SquadList::_addMember(const ChatHandle& handle, RANK_NO squadRank, Player* player, UINT32 joined)
+SquadList::_addMember(const ChatHandle handle, RANK_NO squadRank, Player* player, UINT32 joined)
 {
 	// You're not online until you've initialized
 	Player* usePlayer = (player && player->initialized() && player->teulIndex() >= 0) ? player : nullptr;
@@ -370,7 +368,7 @@ SquadList::created()
 // determined based on whether Player is NULL or not.
 
 void
-SquadList::updateMember(const ChatHandle& handle, RANK_NO squadRank, Player* player, UINT32 joined)
+SquadList::updateMember(const ChatHandle handle, RANK_NO squadRank, Player* player, UINT32 joined)
 {
 	SQUAD_MEMBERS::iterator it = m_members.find(handle);
 
@@ -389,7 +387,7 @@ SquadList::updateMember(const ChatHandle& handle, RANK_NO squadRank, Player* pla
 // Toggle the recruiting status of a member
 
 void
-SquadList::updateRecruiter(const ChatHandle& handle, bool isRecruiting)
+SquadList::updateRecruiter(const ChatHandle handle, bool isRecruiting)
 {
 	SquadMemberEntry* member = find(handle);
 	if ( member == nullptr || member->recruiting() == isRecruiting )
@@ -517,7 +515,7 @@ CHATDB_SQUAD_XCHG::receive(SINT32 /*teulIndex*/, CHATDB_SQUAD_XCHG& incoming)
 		return -EINVAL;
 	}
 
-	if ( g_logDebug & g_debugSquads )
+	if ( g_debugSquads )
 	{
 		Chat::Name co(squad.coHandle()), creator(squad.creatorHandle());
 		dbugLog(_FLD, "sq:%u received info short:%s name:%s co:%s creator:%s", squad.squadID(), squad.callsign().c_str(), squad.name().c_str(), co.c_str(), creator.c_str());
@@ -536,7 +534,6 @@ CHATDB_SQUAD_XCHG::receive(SINT32 /*teulIndex*/, CHATDB_SQUAD_XCHG& incoming)
 
 	// No existing entry so lets grease this pig
 	g_squads[squad.squadID()] = SquadList(squad);
-	list = chatFindSquadList(squad.squadID());
 
 	chatRequestSquadMemberList(squad.squadID());
 
@@ -677,8 +674,8 @@ _autoUpdateSquadlist(SquadList& list)
 		++synced;
 	}
 
-	if ( g_logDebug && g_debugSquads )
-		dbugLog(_FLDB, ", %u synced", synced);
+	if ( g_debugSquads )
+		dbugLog(_FLD, ", %u synced", synced);
 
 	// If nobody got missed, then we can forget these updates
 	if ( !outOfSync )
@@ -825,7 +822,7 @@ _sendWhoList(const Player* player, const SquadList* list, TeulTimeMS lastInfo)
 // Helper for the invite functions
 
 static void
-_invite(Player* player, UINT32 squadID, const Squad& squad, const ChatHandle& from, RANK_NO rank)
+_invite(Player* player, UINT32 squadID, const Squad& squad, const ChatHandle from, RANK_NO rank)
 {
 	SQUAD_MSG invite(squad);
 	invite.data().setInviter(from);
@@ -839,7 +836,7 @@ _invite(Player* player, UINT32 squadID, const Squad& squad, const ChatHandle& fr
 // Send a player their latest squad info
 
 bool
-Player::sendSquadInvite(UINT32 forSquadID, const ChatHandle& from)
+Player::sendSquadInvite(UINT32 forSquadID, const ChatHandle from)
 {
 	SquadList* squadList = chatFindSquadList(forSquadID);
 	if ( !squadList )
@@ -858,7 +855,7 @@ Player::sendSquadInvite(UINT32 forSquadID, const ChatHandle& from)
 ///NOTE: This is currently /requested/ by the client periodically
 
 void
-Player::sendSquadCreateInvite(const ChatHandle& handle, const std::string& name, const ChatHandle& from, RANK_NO withRank)
+Player::sendSquadCreateInvite(const ChatHandle handle, const std::string& name, const ChatHandle from, RANK_NO withRank)
 {
 	Squad squad(0, handle, name);
 	_invite(this, 0, squad, from, withRank);
@@ -916,7 +913,7 @@ Player::sendSquadInfo(SquadList* squadList/*=NULL*/)
 		sendWhoList = true;
 	}
 	if ( g_debugSquads )
-		dbugLog(_FLD, "t:%d p:%u c:%s sq:%u sending squad update %u%s time:%llu mod:%llu mmod:%llu lsi:%llu"
+		dbugLog(_FLD, "t:%d p:%u c:%s sq:%u sending squad update %u%s time:%" PR64BitUT " mod:%" PR64BitUT " mmod:%" PR64BitUT " lsi:%" PR64BitUT ""
 						, teulIndex(), playerID(), callsign(), squadID()
 						, msg.status(), ((sendWhoList) ? "+who" : "")
 						, teulClock64, squadList->msstamp(), squadList->lastMemberMod(), lastSquadInfoMS());
@@ -932,7 +929,7 @@ Player::sendSquadInfo(SquadList* squadList/*=NULL*/)
 // Promote a squad member to the rank of CO, deposing any existing CO
 
 void
-SquadList::appointNewCO(const ChatHandle& newCO, Player* player)
+SquadList::appointNewCO(const ChatHandle newCO, Player* player)
 {
 	ChatHandle oldCO = squad().coHandle();
 	chatSendCOAppointment(squad().squadID(), newCO);
@@ -962,7 +959,7 @@ SquadList::electNewCO()
 	if ( vote == nullptr || vote->m_started == 0 || vote->m_closedUntil != 0 )
 		return;
 
-	const ChatHandle& winner = vote->winner(this);
+	ChatHandle winner = vote->winner(this);
 	if ( winner == 0LL )
 	{
 		if ( vote->expires() == 0 )
@@ -1002,7 +999,7 @@ SquadList::electNewCO()
 // Update all the necessary squad data after a renaming
 
 void
-SquadList::renamed(const ChatHandle& newHandle)
+SquadList::renamed(const ChatHandle newHandle)
 {
 	const std::string oldCallsign = squad().m_callsign;
 	const Chat::Name newCallsign(newHandle);
@@ -1168,7 +1165,7 @@ SquadMemberEntry::teulIndex() const
 static bool
 _exclusiveSquadFetch(UINT32 squadID)
 {
-	typedef std::vector< std::pair<UINT32,UINT32> > _FETCHES;
+	using _FETCHES = std::vector<std::pair<UINT32,UINT32>>;
 	_FETCHES fetches;
 	_FETCHES::iterator it;
 
@@ -1270,7 +1267,7 @@ SquadNamesQuery::Success()
 		}
 		catch (std::exception& e)
 		{
-			threadLog(_FLW, "SquadNames: %s", e.what());
+			dbugLog(_FLW, "SquadNames: %s", e.what());
 			g_squadNames.clear();
 		}
 	}
@@ -1298,7 +1295,7 @@ chatAddSquadName(const char* name)
 }
 
 void
-chatAddSquadName(const ChatHandle& handle)
+chatAddSquadName(const ChatHandle handle)
 {
 	std::lock_guard<std::mutex> lock(_namesMutex);
 	g_squadNames[chatGetLowercaseHandle(handle)] = handle;
@@ -1314,7 +1311,7 @@ chatCheckForSquadName(const char* name)
 }
 
 bool
-chatCheckForSquadName(const ChatHandle& handle)
+chatCheckForSquadName(const ChatHandle handle)
 {
 	std::lock_guard<std::mutex> lock(_namesMutex);
 	const bool exists = (g_squadNames.find(chatGetLowercaseHandle(handle)) != g_squadNames.end());
@@ -1331,7 +1328,7 @@ chatRemoveSquadName(const char* name)
 }
 
 void
-chatRemoveSquadName(const ChatHandle& handle)
+chatRemoveSquadName(const ChatHandle handle)
 {
 	std::lock_guard<std::mutex> lock(_namesMutex);
 	SQUAD_NAMES::iterator it = g_squadNames.find(chatGetLowercaseHandle(handle));
@@ -1371,9 +1368,8 @@ chatUpdateRecruiterList(const Player* player, bool recruiting, SquadList* list)
 		if ( !list->squad().recruiting() )
 			throw "Squad has recruiting disabled";
 
-		if ( g_logDebug )
-			dbugLog(_FLD, "t:%d p:%u c:%s adding to recruiter list"
-							, player->teulIndex(), player->playerID(), player->callsign());
+        dbugLog(_FLD, "t:%d p:%u c:%s adding to recruiter list"
+                        , player->teulIndex(), player->playerID(), player->callsign());
 
 		g_recruiters.insert(player);
 	}
@@ -1382,9 +1378,8 @@ chatUpdateRecruiterList(const Player* player, bool recruiting, SquadList* list)
 		RECRUITERS::iterator it = g_recruiters.find(player);
 		if ( it != g_recruiters.end() )
 		{
-			if ( g_logDebug )
-				dbugLog(_FLD, "t:%d p:%u c:%s removing from recruiter list: %s"
-								, player->teulIndex(), player->playerID(), player->callsign(), e);
+            dbugLog(_FLD, "t:%d p:%u c:%s removing from recruiter list: %s"
+                            , player->teulIndex(), player->playerID(), player->callsign(), e);
 			g_recruiters.erase(it);
 		}
 	}
@@ -1419,7 +1414,7 @@ chatRequestRecruiter(Player* player, UCHAR language)
 	RECRUITER_LIST outgoing;
 	RECRUITERS::const_iterator it;
 
-	typedef std::multimap<UINT32, Recruiter> RECRUITER_WEIGHTING;
+	using RECRUITER_WEIGHTING = std::multimap<UINT32, Recruiter>;
 	RECRUITER_WEIGHTING dupes, spares;
 	std::set<UINT32> listedSquads;
 

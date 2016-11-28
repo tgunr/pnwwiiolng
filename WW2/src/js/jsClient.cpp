@@ -429,7 +429,7 @@ JS_FUNCTION_DEF(jsClient, sendchatmessage)
 		else if(_chatRateSamples)
 		{
 			static int lastChat = 0;
-			static int chatSamples[CHAT_RATE_SAMPLES];
+			static int chatSamples[CHAT_RATE_SAMPLES]{};
 
 			if(_chatRateSamples > CHAT_RATE_SAMPLES)
 				_chatRateSamples = CHAT_RATE_SAMPLES;
@@ -777,8 +777,7 @@ JS_FUNCTION_DEF(jsClient, createmission)
 	std::string missiondesc = UTF8(wmissiondesc);
 	if(missiondesc.empty()) return JS_FALSE;
 
-	MISSION_POST_REQ post;
-	memset(&post, 0x0, sizeof(post));
+	MISSION_POST_REQ post{};
 
 //	WWII_SIDE playerside = weapLookupSide(jsclient->client->PersonaSelected().m_countryID);
 
@@ -786,8 +785,8 @@ JS_FUNCTION_DEF(jsClient, createmission)
 	post.subType = (SINT8)subtype;
 	post.origin = *jsorigin->stratobj->FullObjID();
 	post.target = *jstarget->stratobj->FullObjID();
-	post.descSize = strlen(missiondesc.c_str());
-	strncpy(post.desc,missiondesc.c_str(), MapMiss::MISSION_DESC_LENGTH);
+	post.descSize = static_cast<SINT16>(strlen(missiondesc.c_str()));
+	strsafecpy(post.desc, missiondesc.c_str());
 
 	*rval = INT_TO_JSVAL(0); // trying
 
@@ -1538,9 +1537,9 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 			{
                 /*
                  TODO: Send in whether or not the player was wounded into Mission Results
-                 
+
                  NOTE: unsure whether code here is connected to above statement.
-                 
+
 				const PersonaSelection& persona = PlayerClient()->PersonaSelected();
 				Player* player = playerGetPlayer();
 				vehVehicle* vehicle = playerGetVehicle();
@@ -1800,17 +1799,19 @@ JSBool jsClient::SetProperty(JSContext* ctx, int propid, jsval* val)
 	return JS_TRUE;
 }
 
+#ifndef GM_RELEASE
 /************************************************************************************************
     _isRegularVehicle
 	Looks up the weapon spec and checks if it is a valid vehicle that does not require
-    ENABLE_FLOATERS.
+    GM_RELEASE.
 *************************************************************************************************/
-static bool _isRegularVehicle(const WEAPON_SPEC& spec)
+static bool _isRegularVehicle(const WEAPON_SPEC spec)
 {
 	const WEAPON* weapon = weapLookup(spec);
 
 	return !weapon || weapon->isPlayerWeapon();
 }
+#endif
 
 /************************************************************************************************
 	ProcessWeapList
@@ -1831,7 +1832,7 @@ void jsClient::ProcessWeapList()
 
 		WeaponCounter counter = weaplist.m_counters[i];
 
-#ifndef ENABLE_FLOATERS
+#ifndef GM_RELEASE
 		if(false == _isRegularVehicle(weaplist.m_weapons[i])) {
 			counter.spawnable = WeaponCounter::NOT_PERMITTED;
 		}
@@ -4216,9 +4217,11 @@ JSBool jsInstance::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = phui::js::NewString(chatGetWideCallsign(descriptor->handle()));
 		break;
 		case ID_PROP:
+		{
 			char idBuffer[32+1];
-			snprintf(idBuffer, 32, "%llu", descriptor->id()); // really long long unsigned int?
+			strprintf(idBuffer, "%" PR64BitUT "", descriptor->id());
 			*val = phui::js::NewString(idBuffer);
+		}
 		break;
 		case RESULT_PROP:
 			*val = INT_TO_JSVAL(lastResult);
@@ -4356,10 +4359,10 @@ JS_FUNCTION_DEF(jsClientState, paccess)
 
 JS_FUNCTION_DEF(jsClient, isavailable)
 {
-    
+
 #define AVAIL "available"
 #define INACT "inactive"
-    
+
 	jsPersonaSummary* summary = phui::js::Cast<jsPersonaSummary*>(ctx, argv[0]);
 	if(!summary) return JS_FALSE;
 	else if(strncmp(summary->Summary().availability(), AVAIL, strlen(AVAIL)) == 0 ||

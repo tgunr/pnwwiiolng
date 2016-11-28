@@ -1,5 +1,8 @@
 /build/host
 /build/client
+/build
+/build32
+/build64
 
 *.pyc
 *.pyo
@@ -15,6 +18,8 @@
 /*.suo
 /*.user
 *.vcxproj.user
+*.VC.db
+*.VC.VC.opendb
 .vs
 /BuildLog.htm
 Libraries/*.html
@@ -25,10 +30,31 @@ Libraries/*.pdb
 Libraries/*.sbr
 Libraries/*.suo
 Libraries/*.user
-Libraries/breakpad/src/client/windows/Debug
-Libraries/breakpad/src/client/windows/Release
+Libraries/breakpad/src/**/Debug
+Libraries/breakpad/src/**/Release
 Libraries/breakpad/src/**/testdata
 Libraries/BuildLog.htm
+Libraries/libevent/autom4te.cache
+Libraries/libevent/include/event2/event-config.h
+Libraries/libevent/sample/dns-example
+Libraries/libevent/sample/dns-example
+Libraries/libevent/sample/event-test
+Libraries/libevent/sample/hello-world
+Libraries/libevent/sample/http-server
+Libraries/libevent/sample/signal-test
+Libraries/libevent/sample/time-test
+Libraries/libevent/test/bench
+Libraries/libevent/test/bench_cascade
+Libraries/libevent/test/bench_http
+Libraries/libevent/test/bench_httpclient
+Libraries/libevent/test/regress
+Libraries/libevent/test/rpcgen-attempted
+Libraries/libevent/test/test-changelist
+Libraries/libevent/test/test-eof
+Libraries/libevent/test/test-init
+Libraries/libevent/test/test-ratelim
+Libraries/libevent/test/test-time
+Libraries/libevent/test/test-weof
 Libraries/OpenThreads/*.aps
 Libraries/OpenThreads/*.eto
 Libraries/OpenThreads/*.user
@@ -1603,6 +1629,12 @@ WW2/src/xml/.dirstamp
 /Libraries/libiconv/MSVC14/Release
 /Libraries/libxml2/win32/VC14/Debug
 /Libraries/libxml2/win32/VC14/Release
+/Libraries/libxml2/compile
+/Libraries/libxml2/include/libxml/xmlversion.h
+/Libraries/libxml2/python/setup.py
+/Libraries/libxml2/Makefile
+/Libraries/libxml2/config.h
+/Libraries/libxml2/libxml2-config.cmake
 
 WW2.psess
 WW2/proj/win/WW2.sdf
@@ -1637,7 +1669,6 @@ WW2Archives
 base64
 depend
 libb64.a
-WW2.VC.db
-WW2.VC.VC.opendb
 DebugInstance/Debug/DebugInstance.log
 DebugInstance/Debug/DebugInstance.tlog/DebugInstance.lastbuildstate
+WW2/proj/win/build_info.cpp

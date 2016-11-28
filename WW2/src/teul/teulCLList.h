@@ -10,10 +10,6 @@
 
 #include "list/listCL.h"
 
-#if platOS == OS_MACOS
-#include <unistd.h>
-#endif
-
 //listPopItem removes the head of the list that has been passed to it
 //	<list> is a handle to the list you wish to pop the top item off of
 //	the function returns a pointer to the previous head of the list

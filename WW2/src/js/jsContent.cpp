@@ -331,7 +331,7 @@ bool jsContent::GetData(const char* path, jsContentData* data, bool match)
 			char buf[MAX_CONTENT_VALUE+1];
 			wchar_t wbuf[MAX_CONTENT_VALUE+1];
 
-			strncpy(buf, data->body.c_str(), MAX_CONTENT_VALUE);
+			strsafecpy(buf, data->body.c_str());
 
 			if(!WWII::ConvertChars(buf, wbuf, sizeof(wbuf)))
 				return false;
@@ -363,7 +363,7 @@ bool jsContent::GetData(const char* path, jsContentData* data, bool match)
                         // change [NL] into newlines
                         static const std::wstring newline(L"\n");
                         std::wstring nl_replaced = RENS::regex_replace(matches.str(2), nlre, newline);
-                        
+
                         data->AddLoc(UTF8(matches.str(1).c_str()), nl_replaced.c_str());
 					}
 				}

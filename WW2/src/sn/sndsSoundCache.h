@@ -2,13 +2,11 @@
 
 #include "sn/sndsSoundControl.h"
 
-typedef struct SOUNDCACHE* LPSOUNDCACHE;
-
 #define MINSOUNDCACHE	1024
 
-extern LOGICAL sndsInitCache(void);
-extern void sndsKillCache(void);
-extern LOGICAL sndsEmptyCache(void);
+extern LOGICAL sndsInitCache();
+extern void sndsKillCache();
+extern LOGICAL sndsEmptyCache();
 
 #ifdef SOUND_DEBUG
 	#define sndsPreloadSoundCache(a)   sndsPreloadSoundCacheDebug(a, _FL)

@@ -27,7 +27,7 @@ Description:
 
 static ParticleMgr* _particlemgr = nullptr;
 
-typedef std::set<TransformEffect*> TransformList;
+using TransformList = std::set<TransformEffect*>;
 static TransformEffect* TxEffects = nullptr;
 
 static TransformList updatelist;
@@ -1865,7 +1865,7 @@ void TransformEffect::update()
                 e->_lastupdate = frametime;
             }
         }
-       
+
         if(((_flags & REMOVE_ME_WHEN_DONE) && (enablecount == 0)) || _dead)
         {
             removelist.insert(this);

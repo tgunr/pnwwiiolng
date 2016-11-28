@@ -56,8 +56,6 @@
 
 #if platOS == OS_WIN32
 #include <direct.h>
-#elif platOS == OS_MACOS
-#include <Carbon/Carbon.h>
 #endif
 #include "math/math3d.h"
 #include "comm/commClientMessages.h"
@@ -108,7 +106,7 @@
 #define FRAMEFACTOR_MINFPS	15
 #define FRAMEFACTOR_MINVAL	0.1f
 
-static void PrintDateTime(void);
+static void PrintDateTime();
 
 static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UINT32* cookie);
 static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, UINT32* otp);
@@ -126,7 +124,7 @@ extern SINT32 DefaultMaterialId;
 
 static piVECTOR			lastpos, lastrot;
 
-LOGICAL rnmainSetDefaultRenderStates(void)
+LOGICAL rnmainSetDefaultRenderStates()
 {
 #if USE_STATESET
     States::InitDefaultAttributes();
@@ -228,7 +226,7 @@ LOGICAL		retval=FALSE;
 	return(TRUE);
 }
 
-static LOGICAL SetupVariables(void)
+static LOGICAL SetupVariables()
 {
 	FogStart = piFloatLikeLong(piLongLikeFloat(FogStart) * ScaleFactor * (FLOAT32)_WORLD_VIEW_SCALE_FACTOR);
 	FogEnd   = piFloatLikeLong(piLongLikeFloat(FogEnd) * ScaleFactor * (FLOAT32)_WORLD_VIEW_SCALE_FACTOR);
@@ -360,7 +358,11 @@ static bool _connectClientToGameNetwork()
 
 		rnlogoUpdateStatus("loading.network");
 
-		teulGetHost(STRVER, &appversion);
+        if (gClientV[0] != 0) {
+            teulGetHost(gClientV, &appversion);
+        } else {
+            teulGetHost(STRVER, &appversion);
+        }
 
 		if ( teulMaskNetworkAddress(0) == 0 )
 			teulSetNetworkMask(GameHost);
@@ -374,45 +376,43 @@ static bool _connectClientToGameNetwork()
 	catch (ClientNetError& e)
 	{
 		const char* key = e.What();
-		const std::wstring& message = uiLocString(key);
 
 		rnlogoUpdateStatus(key);
 
 #if platOS == OS_WIN32
-		// character 0 will be a '?' if the uiLocString lookup failed
-		// this can happen if a non ui loc string was passed to the
-		// ClientNetError constructor
-		MessageBox(nullptr, message.c_str(), uiLocString("connect.popup.title").c_str(), MB_OK | MB_TOPMOST);
-
-		// launch the browser with a local html page
-		// describing what to do next
-		// once the mac implementation of this
-		// function is done, it can be moved
-		// outside of the this #if block
-		syslaunchurl("neterror.html", 1);
+		MessageBox(nullptr, uiLocString(key).c_str(), uiLocString("connect.popup.title").c_str(), MB_OK | MB_TOPMOST);
+#elif platOS == OS_MACOS
+        PostModalErrorDialog(uiLocString2("connect.popup.title").c_str(), uiLocString2(key).c_str());
 #else
 		fprintf(stderr, "NETWORK ERROR: %s", UTF8(message.c_str()));
 #endif
-
-		piExitProgram(_FL, UTF8(message.c_str()));
-		return false;
+		//piExitProgram(_FL, UTF8(message.c_str()));
+        return false;
 	}
 
 	// Wipe these variables out.
-	GameHost = rand();
-	GameOTP = rand();
-	GamePort = (UINT16)rand();
+	GameHost = static_cast<UINT32>(random());
+	GameOTP = static_cast<UINT32>(random());
+	GamePort = static_cast<UINT16>(random());
 
 	return true;
 }
 
 // Init everything for rendering
-LOGICAL rnmainInit(void)
+LOGICAL rnmainInit()
 {
-#ifdef EVENT_LOG_TIMES
-	srand(0);
-#else
-	srand(timeGetTime());
+#if platOS == OS_WIN32
+    // OS X and Linux auto-seed the PRNG. Windows, being a backwards OS in need
+    // of assistance, doesn't. Therefore, we borrow Windows' equivalent of
+    // arc4random() to seed the useless LCRG until we can replace all uses of
+    // rand() in the code outright.
+    //
+    // Oh, and by the way, seeding rand() with the current time is the worst
+    // idea ever conceived even if you're NOT looking for cryptographically
+    // secure values. Just don't do that. Please.
+    unsigned int value;
+    rand_s(&value);
+    srand(value);
 #endif
 
 	rnlogoSplash();
@@ -557,12 +557,15 @@ LOGICAL rnmainInit(void)
 		{
 			StratDB::StratObject* strat = StratDB::FindStratObject("Antwerp");
 			HCUnit* hcUnit = new HCUnit(WWII_ENGLAND, HCU_BRIGADE, 0, WWII_ENGLAND, BRANCH_LAND, BRANCH_LAND, 9, 0, "English Training Brigade", "1.uk", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
+			hcUnit->addToRegistry();
 
 			strat = StratDB::FindStratObject("Lier");
 			hcUnit = new HCUnit(WWII_FRANCE, HCU_BRIGADE, 0, WWII_FRANCE, BRANCH_LAND, BRANCH_LAND, 9, 0, "French Training Brigade", "1.fr", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
+			hcUnit->addToRegistry();
 
 			strat = StratDB::FindStratObject("Schilde");
 			hcUnit = new HCUnit(WWII_GERMANY, HCU_BRIGADE, 0, WWII_GERMANY, BRANCH_LAND, BRANCH_LAND, 9, 0, "German Training Brigade", "1.de", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
+			hcUnit->addToRegistry();
 		}
 		catch(std::runtime_error)
 		{
@@ -707,7 +710,7 @@ LOGICAL rnmainGetDefaultFogAttributes(UINT32 * OutFogColor, FLOAT32 * OutFogStar
 	return TRUE;
 }
 
-LOGICAL rnmainFOVChange(void)
+LOGICAL rnmainFOVChange()
 {
 	if (FieldOfView < 15.0f)
 	{
@@ -763,7 +766,7 @@ LOGICAL rnmainFOVChange(void)
 }
 
 // Kill the render engine
-LOGICAL rnmainKill(void)
+void rnmainKill()
 {
 #ifdef MULTI_CLIENT
 	multiClientKill(true);
@@ -803,8 +806,6 @@ LOGICAL rnmainKill(void)
     glslKill();
 
     Write_Log(LOG_OLD, LOG_INFO, "[rnmainKill]");
-
-	return(TRUE);
 }
 
 void rnmainSetPlayerInfo(piVECTOR* lppos, piVECTOR* lprot)
@@ -986,7 +987,7 @@ void rnmainSetViewMatrix2(piMATRIX* view)
     piSetCockpitViewMatrix(&mat);
 }
 
-static void RotateTranslatePlayer(void)
+static void RotateTranslatePlayer()
 {
 piMATRIX    mat,mat1,mat2,mat4;
 piMATRIX	DistortionMat;
@@ -1070,7 +1071,7 @@ piVECTOR	Att;
 	piSetCockpitViewMatrix(&mat);
 }
 
-void rnmainResetPlayer(void)
+void rnmainResetPlayer()
 {
 piMATRIX    mat;
 
@@ -1108,7 +1109,7 @@ void rnmainMovePlayer(piVECTOR* lppos)
 	lastpos.z = lppos->z * ScaleFactor;
 }
 
-void rnUpdateView(void)
+void rnUpdateView()
 {
 	if (ft50msticks != 0)
 	{
@@ -1162,32 +1163,15 @@ LOGICAL rnmainMoveView(FLOAT64 PosX, FLOAT64 PosY)
 	return(TRUE);
 }
 
-static void PrintDateTime(void)
+static void PrintDateTime()
 {
-#if platOS == OS_WIN32
-SYSTEMTIME	SystemTime;
+    char buf[256] = {0};
+    struct tm t;
+    time_t p = time(nullptr);
 
-	GetLocalTime(&SystemTime);
-	Write_Debug("Date and time: %d/%d/%d %d:%02d:%02d",
-				SystemTime.wMonth,
-				SystemTime.wDay,
-				SystemTime.wYear,
-				SystemTime.wHour,
-				SystemTime.wMinute,
-				SystemTime.wSecond);
-#elif platOS == OS_MACOS
-DateTimeRec	time;
-	GetTime(&time);
-	Write_Debug("Date and time: %d/%d/%d %d:%02d:%02d",
-				time.month,
-				time.day,
-				time.year,
-				time.hour,
-				time.minute,
-				time.second);
-#else
-	Write_Debug("Normally, you'd see date and time printed here. Take care of this, programmer...");
-#endif
+    localtime_r(&p, &t);
+    strftime(buf, 255, "Date and time: %F %T %z", &t);
+    Write_Debug("%s", buf);
 }
 
 
@@ -1283,7 +1267,7 @@ static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UI
 {
     LOGICAL	retval=TRUE;
     std::string apID, data, serverIP, serverport, serverprotocol, otp, bypass;
-    
+
     try {
         std::ifstream  ticketFileStream (TicketFile);
         std::getline(ticketFileStream, apID); // ignore
@@ -1313,7 +1297,7 @@ static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UI
         {
             *cookie = static_cast<UINT32>(strtoul(otpText.c_str(), nullptr, 10));
         }
-        
+
         std::getline(ticketFileStream, bypass);
         if (!bypass.empty())
         {
@@ -1322,12 +1306,12 @@ static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UI
                 Write_Debug("Unable to translate host address");
                 return (FALSE);
             }
-            
+
             std::string userId = bypass.substr(bypass.find(" ")+1);
             if (!userId.empty())
             {
                 strncpy(BypassString,userId.c_str(),32);
-            
+
                 if (BypassString[0] != '\0')
                 {
                     if (BypassString[0] == 'R')

@@ -6,9 +6,9 @@
 
 class TSFClient;
 
-typedef ATL::CComPtr<ITfThreadMgr> TSFManager;
-typedef ATL::CComPtr<ITfDocumentMgr> TSFDoc;
-typedef ATL::CComPtr<ITfContext> TSFContext;
+using TSFManager = ATL::CComPtr<ITfThreadMgr>;
+using TSFDoc = ATL::CComPtr<ITfDocumentMgr>;
+using TSFContext = ATL::CComPtr<ITfContext>;
 
 class TSFCompSink : public ITfContextOwnerCompositionSink
 {

@@ -25,7 +25,7 @@ const ChatPermissions nullChatPermissions;
 
 static const UINT16 _MAX_GROUP_OID = (UINT16)~0;
 
-typedef std::map<UINT16, ChatPermissions> GROUP_PERMISSIONS;
+using GROUP_PERMISSIONS = std::map<UINT16, ChatPermissions>;
 GROUP_PERMISSIONS g_groupPermissions;
 
 struct PermissionGroup
@@ -33,7 +33,7 @@ struct PermissionGroup
 	UINT32			m_lastUsed;
 	ChatPermissions	m_permissions;		// What this produces.
 };
-typedef std::map<CHAT_GROUPS, PermissionGroup> PERMISSION_GROUP_CACHE;
+using PERMISSION_GROUP_CACHE = std::map<CHAT_GROUPS, PermissionGroup>;
 PERMISSION_GROUP_CACHE g_pgc;
 
 //////////////////////////////////////////////////////////////////////
@@ -94,27 +94,24 @@ _aggregatePermissions(ChatPermissions& lhs, const CHAT_GROUPS& groups)
 		_aggregateVehicles(lhs, groups);
 	}
 
-	if ( g_logDebug )
-	{
-		std::string groupNos = "";
-		for ( auto it = groups.begin(), end = groups.end(); it != end; ++it )
-		{
-			char num[32];
-			strprintf(num, (it != groups.begin() ? ",%u" : "%u"), *it);
-			groupNos += num;
-		}
-		char buffer[2048];
-		strprintf(buffer, "For groups {%s} maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perms=%llx vehGrants=%" PRSizeT ""
-								, groupNos.c_str()
-								, lhs.m_limitRank[BRANCH_LAND]
-								, lhs.m_limitRank[BRANCH_AIR]
-								, lhs.m_limitRank[BRANCH_SEA]
-								, lhs.m_limitSquadRank
-								, lhs.m_permissionMask
-								, lhs.m_vehicleGrants.size()
-								);
-		threadLog(_FLD, "%s", buffer);
-	}
+    std::string groupNos = "";
+    for ( auto it = groups.begin(), end = groups.end(); it != end; ++it )
+    {
+        char num[32];
+        strprintf(num, (it != groups.begin() ? ",%u" : "%u"), *it);
+        groupNos += num;
+    }
+    char buffer[2048];
+    strprintf(buffer, "For groups {%s} maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perms=%" PRPermMaskT " vehGrants=%" PRSizeT ""
+                            , groupNos.c_str()
+                            , lhs.m_limitRank[BRANCH_LAND]
+                            , lhs.m_limitRank[BRANCH_AIR]
+                            , lhs.m_limitRank[BRANCH_SEA]
+                            , lhs.m_limitSquadRank
+                            , lhs.m_permissionMask
+                            , lhs.m_vehicleGrants.size()
+                            );
+	dbugLog(_FLD, "%s", buffer);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -172,8 +169,7 @@ public:
 			_aggregatePermissions(it->second.m_permissions, it->first);
 		}
 
-		if ( g_logDebug )
-			threadLog(_FLD, "%u groups loaded, %u in cache", numRows, g_pgc.size());
+		dbugLog(_FLD, "%" PRSizeT " groups loaded, %" PRSizeT " in cache", numRows, g_pgc.size());
 	}
 
 	virtual void Failure() override
@@ -213,21 +209,16 @@ public:
 
 		ProcessVehicles(git->second, vehicleList.c_str());
 
-#ifdef DEV_BUILD
-		if ( g_logDebug )
-		{
-			dbugLog(_FLD, "grp:%u %s maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perm:%llx vehs:%" PRSizeT ""
-							, perm.m_groupOID
-							, (perm.m_enabled ? "enabled" : "disabled")
-							, perm.m_limitRank[BRANCH_LAND]
-							, perm.m_limitRank[BRANCH_AIR]
-							, perm.m_limitRank[BRANCH_SEA]
-							, perm.m_limitSquadRank
-							, perm.m_permissionMask
-							, perm.m_vehicleGrants.size()
-							);
-		}
-#endif
+        dbugLog(_FLD, "grp:%u %s maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perm:%" PRPermMaskT " vehs:%" PRSizeT ""
+                        , perm.m_groupOID
+                        , (perm.m_enabled ? "enabled" : "disabled")
+                        , perm.m_limitRank[BRANCH_LAND]
+                        , perm.m_limitRank[BRANCH_AIR]
+                        , perm.m_limitRank[BRANCH_SEA]
+                        , perm.m_limitSquadRank
+                        , perm.m_permissionMask
+                        , perm.m_vehicleGrants.size()
+                        );
 	}
 
 	void ProcessVehicles(ChatPermissions& perm, const char* list) const

@@ -34,13 +34,13 @@ public:
 
 public:
 	// Con-/de-structors
-	ChatReport(UINT16 category=0, const std::string& report="", const ChatHandle& offender=0LL);
+	ChatReport(UINT16 category=0, const std::string& report="", const ChatHandle offender=0LL);
 	ChatReport(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 	~ChatReport() {}
 
 public:
 	// Transport methods
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	// Unique ID assigned by the host
@@ -81,4 +81,4 @@ public:
 	std::string		m_notes;
 };
 
-typedef teul_network_object<ChatReport> CHAT_REPORT;
+using CHAT_REPORT = teul_network_object<ChatReport>;

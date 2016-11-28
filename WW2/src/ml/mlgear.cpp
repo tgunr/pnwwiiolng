@@ -1627,7 +1627,7 @@ static int Count;
 										   RollCoefficientMult,
 										   nullptr,
 										   CollideObject,
-										   TRUE);
+										   true);
 		}
 
 	}

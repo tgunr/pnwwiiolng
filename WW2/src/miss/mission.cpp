@@ -7,10 +7,9 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcast.h"
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportMessages.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "inst/instTypes.h"					// For the enums
@@ -40,10 +39,10 @@
 
 #include "include/logging.h"
 
-typedef std::map<UINT32,Mission*> MissionIndex;
+using MissionIndex = std::map<UINT32,Mission*>;
 
-typedef std::vector<Mission*> InstanceMissions;
-typedef std::map< instanceid_t, InstanceMissions > InstanceMissionIndex;
+using InstanceMissions = std::vector<Mission*>;
+using InstanceMissionIndex = std::map<instanceid_t, InstanceMissions>;
 
 extern const std::string& sdmTranslateName(const std::string& from);
 
@@ -124,7 +123,7 @@ _validBrigadeOrigin(const HCUnit* unit, const FacilityStruct* facility)
 
 	if ( unit->canUseOrigin(facility->type) == false )
 	{
-		dbugLog(_FLIB, " CANT USE ORIGIN");
+		dbugLog(_FLI, " CANT USE ORIGIN");
 		return false;
 	}
 
@@ -132,7 +131,7 @@ _validBrigadeOrigin(const HCUnit* unit, const FacilityStruct* facility)
 	// a combat depot origin?
 	if ( facility->getSupplyingUnit(unit, bcp) == 0 )
 	{
-		dbugLog(_FLIB, " NO SUP UNIT");
+		dbugLog(_FLI, " NO SUP UNIT");
 		return false;
 	}
 
@@ -282,10 +281,10 @@ Player::ableToPostIn(const Brigade& toBrigade) const
 // construct missions, so anyone doing so will have to call all
 // the right stuff...
 
-Mission::Mission(const instanceid_t& forInstanceID, const MISSION_SUMMARY& withSummary)
+Mission::Mission(const instanceid_t forInstanceID, const MISSION_SUMMARY& withSummary)
 	: m_takers(), m_spawner()
 {
-	dbugLog(_FLD, "ALLOC: +mission at %p in:%llu", this, forInstanceID);
+	dbugLog(_FLD, "ALLOC: +mission at %p in:%" PR64BitUT "", this, forInstanceID);
 	memset((MISSION_C_STRUCTURE*)this, 0, sizeof(MISSION_C_STRUCTURE));
 	m_instanceID = forInstanceID;
 	m_summary = withSummary;
@@ -671,10 +670,7 @@ Mission::purgeTakers()
 	while ( !m_takers.empty() )
 	{
 		if ( !removePlayer(m_takers.begin()->first, false) )
-		{
 			LogAbort("mission %d: unable to remove %d from takerlist", summary().missionID, m_takers.begin()->first);
-			return;
-		}
 	}
 }
 
@@ -909,7 +905,7 @@ MissionPacket::successfulDuration() const
 // for 1.2.5, this is simply, did they rtb and damage someone?
 
 bool
-MissionPacket::successful(const WEAPON_SPEC& weaponSpec) const
+MissionPacket::successful(const WEAPON_SPEC weaponSpec) const
 {
 	if ( weaponSpec.wType == 0 )
 		return false;
@@ -927,7 +923,7 @@ MissionPacket::successful(const WEAPON_SPEC& weaponSpec) const
 	if ( scoring().kills() > 0 )
 		return true;
 
-	// Vehicles that don't neccessarily get a kill
+	// Vehicles that don't necessarily get a kill
 	if ( weaponSpec.wClass == weap_bomber.wClass || weaponSpec.wClass == weap_truck.wClass )
 		return true;
 
@@ -943,10 +939,7 @@ _sendTimeUpdates(UINT32 now)
 
 	UINT32 timeout = now - (host_config.mission.timeOut_m * 60);
 
-#if defined(DEV_BUILD)
-	if ( g_logDebug )
-		betaLog(_FLD, "sendTimeUpdates");
-#endif
+    betaLog(_FLD, "sendTimeUpdates");
 
 	// We may delete the mission while we're iterating, so make sure
 	// the iterator iterates before we obliterate
@@ -955,12 +948,7 @@ _sendTimeUpdates(UINT32 now)
 		mission = it->second;
 		++it;
 
-#if defined(DEV_BUILD)
-		if ( g_logDebug )
-		{
-			betaLog(_FLDB, " #%u[act:%u,og:%u,nt:%u]", mission->missionID(), mission->active(), mission->ongoing(), mission->numTakers());
-		}
-#endif
+        betaLog(_FLD, " #%u[act:%u,og:%u,nt:%u]", mission->missionID(), mission->active(), mission->ongoing(), mission->numTakers());
 
 		if ( mission->spawner().isActive() )
 		{
@@ -1072,7 +1060,7 @@ _createMission(instanceid_t instanceID
 
 	try
 	{
-		dbugLog(_FLI, "create in:%llu mission type is %d[%s] side is %d[%s] country is %d[%s] by %s playerID %d"
+		dbugLog(_FLI, "create in:%" PR64BitUT " mission type is %d[%s] side is %d[%s] country is %d[%s] by %s playerID %d"
 					, instanceID
 					, summary.missionType, _missionTypes[(int)summary.missionType]
 					, side, _sideName[side]
@@ -1081,7 +1069,7 @@ _createMission(instanceid_t instanceID
 					);
 
 		{
-			dbugLog(_FLIB, " origin: " PRF_FULL_OBJ_ID ", targ: " PRF_FULL_OBJ_ID ""
+			dbugLog(_FLI, " origin: " PRF_FULL_OBJ_ID ", targ: " PRF_FULL_OBJ_ID ""
 							, PRA_FULL_OBJ_ID(summary.origin)
 							, PRA_FULL_OBJ_ID(summary.target)
 							);
@@ -1195,18 +1183,15 @@ missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 co
 
 	player->ExitMission();
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s Mission Post: "
-			"brig:%d mt:%d " PRF_FULL_OBJ_ID " -> " PRF_FULL_OBJ_ID " [%s]"
-						, player->teulIndex(), player->playerID(), player->callsign()
-						, player->brigadeID()
-						, request.missionType
-						, PRA_FULL_OBJ_ID(request.origin)
-						, PRA_FULL_OBJ_ID(request.target)
-						, request.desc
-						);
-	}
+    dbugLog(_FLD, "t:%d p:%u c:%s Mission Post: "
+        "brig:%d mt:%d " PRF_FULL_OBJ_ID " -> " PRF_FULL_OBJ_ID " [%s]"
+                    , player->teulIndex(), player->playerID(), player->callsign()
+                    , player->brigadeID()
+                    , request.missionType
+                    , PRA_FULL_OBJ_ID(request.origin)
+                    , PRA_FULL_OBJ_ID(request.target)
+                    , request.desc
+                    );
 
 	FacilityStruct* postingFacility;
 	UINT32 now = teulTime();
@@ -1264,7 +1249,7 @@ missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 co
 	{
 		player->log("Mission post denied: Invalid facility");
 		char fidBuffer[FULL_OBJ_ID::PrintLen];
-		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_INVALID_FAC, weapPrintFullObjIDC(&request.origin, fidBuffer));
+		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_INVALID_FAC, weapPrintFullObjIDC(request.origin, fidBuffer));
 		reply.reasonCode = MC_ERROR;
 	}
 	else if ( postingFacility->side != player->side() || activeCountries[postingFacility->country] == false )
@@ -1789,7 +1774,7 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 
 		HCUnit* unit = it->second;
 
-		dbugLog(_FLI, "in:%llu posting mission for %s at %s/%s brig#%u %s", instanceID, _countryName[forCountry], cp->name, ab->name, unit->unitID(), unit->name());
+		dbugLog(_FLI, "in:%" PR64BitUT " posting mission for %s at %s/%s brig#%u %s", instanceID, _countryName[forCountry], cp->name, ab->name, unit->unitID(), unit->name());
 
 		NewMission post;
 
@@ -1798,7 +1783,7 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 		post.brigadeID = unit->unitID();
 		post.missionType = SYSTEM_MISSION;
 		post.postedByID = 1;
-		strcpy(post.posterCallsign, "SYSTEM");
+		strsafecpy(post.posterCallsign, "SYSTEM");
 		post.postedAt = teulTime();
 		post.postAt = teulTime();
 		post.launchAt = teulTime();
@@ -1816,7 +1801,7 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 			index.push_back(mission);
 			if ( mission->instanceID() != 0 )
 			{
-				dbugLog(_FLD, "in:%llu now has %" PRSizeT " missions", mission->instanceID(), index.size());
+				dbugLog(_FLD, "in:%" PR64BitUT " now has %" PRSizeT " missions", mission->instanceID(), index.size());
 			}
 		}
 
@@ -1851,13 +1836,13 @@ missDeleteInstanceMissions(instanceid_t instanceID)
 	InstanceMissionIndex::iterator it = g_instanceMissionIndex.find(instanceID);
 	if ( it == g_instanceMissionIndex.end() )
 	{
-		betaLog(_FLD, "in:%llu has no missions to expire", instanceID);
+		betaLog(_FLD, "in:%" PR64BitUT " has no missions to expire", instanceID);
 		return;
 	}
 
 	InstanceMissions& index = it->second;
 
-	betaLog(_FLD, "in:%llu deleting instance mission list (%" PRSizeT " missions)", instanceID, index.size());
+	betaLog(_FLD, "in:%" PR64BitUT " deleting instance mission list (%" PRSizeT " missions)", instanceID, index.size());
 
 	const UINT32 numMissions = index.size();
 	for ( UINT32 i = 0; i < numMissions; ++i )
@@ -1868,10 +1853,10 @@ missDeleteInstanceMissions(instanceid_t instanceID)
 		Mission* mission = index.front();
 		if ( mission == nullptr )
 		{
-			LogAbort("in:%llu contains NULL in mission index at position %u", instanceID, i);
+			LogAbort("in:%" PR64BitUT " contains NULL in mission index at position %u", instanceID, i);
 		}
 
-		betaLog(_FLD, "in:%llu m[%u]:%u", instanceID, i, mission->missionID());
+		betaLog(_FLD, "in:%" PR64BitUT " m[%u]:%u", instanceID, i, mission->missionID());
 
 		mission->deactivate();
 		mission->cancel();

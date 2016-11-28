@@ -4,6 +4,7 @@
 #include "mem/mem.h"
 #include "str/strdupptr.h"
 #include "teul/teulConfigVar.h"
+#include "include/io_mapped_file.h"
 
 #if platOS == OS_WIN32
 #include "Shlobj.h"
@@ -49,6 +50,17 @@ static const char* const s_configVarTypes[NUM_CONFIG_VAR_TYPES] =
 #define PATH_SEPSTR "/"
 
 ////////////////////////////////////////////////////////////////////////////////
+// Registry of all the known config vars.
+
+using ConfigVars = std::set<Teul::ConfigVar*>;
+
+static ConfigVars& _getConfigVars()
+{
+	static ConfigVars s_configVars;
+	return s_configVars;
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Variables.
 
 CFG_PATH(dataDir, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "data", "DATA_DIR", true, "Top level directory for game data.");
@@ -67,7 +79,7 @@ CFG_PATH(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true, "Name of th
 
 CFG_ADDR(wwiiDBAddress, nullptr, "WWII_DB_ADDRESS", true, "IP address of the MySQL Database.");
 CFG_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true, "Default schema for game data.");
-CFG_STRING(wwiiDBPassword, "", "WWII_DB_PASSWD", true, "Password to use for the game database.");
+CFG_STRING(wwiiDBPassword, nullptr, "WWII_DB_PASSWD", true, "Password to use for the game database.");
 CFG_STRING(wwiiDBUser, "wwiiol", "WWII_DB_USER", true, "Username when connecting to the game database.");
 CFG_STRING(wwiiDBPort, "3306", "WWII_DB_PORT", true, "Port of the game MySQL server if not default.");
 CFG_ADDR(dbsePrimaryAddress, nullptr, "DBSE_PRIMARY_ADDRESS", true, "IP address dbd clients will reach the dbd on.");
@@ -81,25 +93,23 @@ CFG_ADDR(ircServer, "", "WWII_IRC_SERVER", false, "Address of the IRC server. If
 CFG_STRING(ircPassword, "", "WWII_IRC_PASSWD", false, "Server-password for the IRC server.");
 CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", "Port to connect to the IRC server on.");
 CFG_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL", true, "URL to prefix authentication error URLs with.");
-CFG_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true, "Network address (/24) for the cluster. Server's will map their last octets (x.x.x.N) into this network for inter-host communications.");
+CFG_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true, "Network address (/24) for the cluster (server's will map their last octets (x.x.x.N) into this network for inter-host communications) or IP address of controller host.");
 
+#ifndef PN_DISABLE_AUTH
 CFG_ADDR(authHost, "auth.playnet.com", "AUTH_ADDRESS", true, "Host name or IP Address of the authentication server.");
 CFG_ADDR(authdbAddress, nullptr, "AUTH_DB", true, "Address of the MySQL server hosting the auth database.");
 CFG_STRING(authdbPort, "3306", "AUTH_DB_PORT", true, "Port of the Auth MySQL server if not default.");
-#if defined( HAPPYOO )
 CFG_STRING(authdbPassword, "", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
-#else
-CFG_STRING(authdbPassword, "", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
-#endif
 CFG_STRING(authdbSchema, "auth", "AUTH_DB_SCHEMA", true, "Schema to use for auth data.");
 CFG_STRING(authdbUser, "authuser", "AUTH_DB_USER", true, "Username when connecting to the auth database.");
+#endif
 
 CFG_UINT(maxClusterUsers, "0", "MM_MAX_USERS", "Maxmimum number of players on the mmhost/cluster");
 CFG_UINT(maxCellPlayers, "1250", "MAX_PLAYERS", "Maximum number of players on this cell host.");
-CFG_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true, "Network address to use for private cell network.");
+CFG_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true, "Network address to use for private cell network or 0.0.0.0 to disable multiple cells (clustering).");
 CFG_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", "Number of miliseconds before a server-peer connection times out.");
 #if defined(WIN32)
-CFG_STRING(defaultInterface, NULL, "DEFAULT_IFACE", false, "Name of the network interface to treat as primary.");
+CFG_STRING(defaultInterface, nullptr, "DEFAULT_IFACE", false, "Name of the network interface to treat as primary.");
 #else
 CFG_STRING(defaultInterface, "eth0", "DEFAULT_IFACE", true, "Name of the network interface to treat as primary.");
 #endif
@@ -140,21 +150,17 @@ static char* _makeNativePath(const char* const path_)
 
 struct ConfigEntry
 {
-	ConfigEntry() : m_name(nullptr), m_value(nullptr) {}
-	ConfigEntry(const char* name_, const char* nameEnd_, const char* value_, const char* valueEnd_)
-		: m_name(name_, static_cast<size_t>(nameEnd_ - name_))
-		, m_value(value_, static_cast<size_t>(valueEnd_ - value_))
+	ConfigEntry() : m_name(), m_value(nullptr) {}
+	ConfigEntry(std::string name_, std::string value_)
+		: m_name(name_)
+		, m_value(value_)
 	{
 	}
-	StrDupPtr	m_name;
-	StrDupPtr	m_value;
-	void setValue(const char* value_, const char* valueEnd_)
-	{
-		m_value.copy(value_, static_cast<size_t>(valueEnd_ - value_));
-	}
+	std::string	m_name = "";
+	std::string	m_value = "";
 };
 
-typedef std::vector<ConfigEntry> CONFIG_ENTRIES;
+using CONFIG_ENTRIES = std::vector<ConfigEntry>;
 struct ConfigEntries : public CONFIG_ENTRIES
 {
 	ConfigEntries() : CONFIG_ENTRIES(), m_read(false), m_foundGeneralFile(false), m_foundOSFile(false)
@@ -173,7 +179,14 @@ static ConfigEntries& _getConfigEntries()
 	return s_configEntries;
 }
 
-#include "include/io_mapped_file.h"
+static Teul::ConfigVar* _findConfigVar(const std::string& envName)
+{
+	auto& vars = _getConfigVars();
+	auto it = std::find_if(vars.begin(), vars.end(),
+		[=](const Teul::ConfigVar* cv) { return envName.compare(cv->GetEnvVarName()) == 0; }
+	);
+	return it != vars.end() ? *it : nullptr;
+}
 
 static void _readConfigEntriesFromFile(IO::MappedFile& file)
 {
@@ -201,7 +214,7 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 			file.skipline();
 			continue;
 		}
-		const char* name = cur;
+		const char* nameStart = cur;
 		const char* value = equals + 1;
 		if (*value == '"')
 			++value;
@@ -215,17 +228,23 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 		while ( eol > value && isspace(*(eol - 1)) )
 			--eol;
 
+		std::string name(nameStart, equals);
+		if ( !_findConfigVar(name) ) {
+			fprintf(stderr, "Unrecognized config var: %s\n", name.c_str());
+			exit(1);
+		}
 		auto it = configEntries.begin();
 		for ( auto end = configEntries.end(); it != end; ++it )
 		{
-			if ( strncasecmp(it->m_name, name, static_cast<size_t>(equals - name)) == 0 )
+			if ( strcasecmp(it->m_name.c_str(), name.c_str()) == 0 )
 			{
-				it->setValue(value, eol);
+				it->m_value.assign(value, eol);
 				break;
 			}
 		}
-		if ( it == configEntries.end() )
-			configEntries.emplace_back(std::move(ConfigEntry(name, equals, value, eol)));
+		if ( it == configEntries.end() ) {
+			configEntries.emplace_back(name, std::string(value, eol));
+        }
 		file.skipline();
 	}
 }
@@ -278,28 +297,28 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 				break;
 			}
 		}
+
+		if ( !configEntries.m_foundGeneralFile && !configEntries.m_foundOSFile )
+		{
+#if defined(WIN32) && defined(UNICODE)
+			_ftprintf(stderr, _T("NOTE: Could not find '%s' or '%s' config files, using defaults.\n"),
+				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+#else
+			fprintf(stderr, "NOTE: Could not find '%s' or '%s' config files, using defaults.\n",
+				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+#endif
+		}
+
 		configEntries.m_read = true;
 	}
 
 	for ( auto& it : configEntries )
 	{
-		if ( strcmp(it.m_name, name_) == 0 )
-			return it.m_value.str();
+		if ( it.m_name == name_ )
+			return it.m_value.c_str();
 	}
 
 	return nullptr;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Registry of all the known config vars.
-
-#include <set>
-typedef std::set<Teul::ConfigVar*> ConfigVars;
-
-static ConfigVars& _getConfigVars()
-{
-	static ConfigVars s_configVars;
-	return s_configVars;
 }
 
 static void _getSortedConfigVars(std::vector<Teul::ConfigVar*>& myList)
@@ -448,7 +467,7 @@ namespace Teul
 		case CVT_BOOL: SetBoolValue(newValue_); break;
 		case CVT_IP_ADDRESS: SetIPAddressValue(newValue_); break;
 		case CVT_PATH: SetPathValue(newValue_); break;
-		default: LogAbort("Invalid config var type"); break;
+		default: LogAbort("Invalid config var type");
 		}
 	}
 
@@ -557,7 +576,6 @@ namespace Teul
 			if ( m_union.um_uint32 == 0 )
 			{
 				LogAbort("%s: invalid ip address: %s", GetName(), newValue_);
-				return;
 			}
 		}
 

@@ -18,12 +18,12 @@
 #include "osgImport/Polytope.h"
 static Polytope polytope;
 
-LOGICAL rnvisInit(void)
+LOGICAL rnvisInit()
 {
 	return(TRUE);
 }
 
-void rnvisKill(void)
+void rnvisKill()
 {
 }
 

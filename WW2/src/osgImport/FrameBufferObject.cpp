@@ -144,8 +144,8 @@ FBOExtensions::FBOExtensions(unsigned int contextID)
 // static cache of glRenderbuffers flagged for deletion, which will actually
 // be deleted in the correct GL context.
 
-typedef std::list<GLuint> RenderBufferHandleList;
-typedef buffered_object<RenderBufferHandleList> DeletedRenderBufferCache;
+using RenderBufferHandleList = std::list<GLuint>;
+using DeletedRenderBufferCache = buffered_object<RenderBufferHandleList>;
 
 static DeletedRenderBufferCache s_deletedRenderBufferCache;
 
@@ -584,8 +584,8 @@ void FrameBufferAttachment::attach(GLenum target, GLenum attachment_point) const
 // static cache of glRenderbuffers flagged for deletion, which will actually
 // be deleted in the correct GL context.
 
-typedef std::list<GLuint> FrameBufferObjectHandleList;
-typedef buffered_object<FrameBufferObjectHandleList> DeletedFrameBufferObjectCache;
+using FrameBufferObjectHandleList = std::list<GLuint>;
+using DeletedFrameBufferObjectCache = buffered_object<FrameBufferObjectHandleList>;
 
 static DeletedFrameBufferObjectCache* s_deletedFrameBufferObjectCache = new DeletedFrameBufferObjectCache(); // avoids crash on exit due to static deletion ordering problem (mac)
 

@@ -14,9 +14,6 @@
 #include "wwii/wwiiNetPorts.h"
 #include "src/controllerGameProcess.h"
 #include "server/serverInitializeProcess.h"
-#include "dbse/dbseConnection.h"
-
-DBCONNECTION dbConnection;
 
 #if platOS == OS_WIN32
 #include <winsock2.h>
@@ -54,7 +51,9 @@ static event*			s_managedProcessEvent = nullptr;
 static evutil_socket_t	s_repeaterSocket = INVALID_SOCKET;
 static event*			s_repeaterEvent = nullptr;
 
+bool g_singleShot = false;
 bool g_shuttingDown = false;
+bool g_enableStarts = true;
 
 extern ConfigStr cv_manageProcesses;
 
@@ -72,18 +71,19 @@ static void _errorFunction(SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SI
 // Helper for setting up a new libevent listening socket.
 
 static void _prepareLibEventListenSocket(evutil_socket_t* socket_, event** event_
-										, UINT32 ipAddr_hostOrdered_, UINT16 port_hostOrdered_, UINT32 acceptBacklog_
-										, event_callback_fn acceptFn_
+										, UINT32 ipAddr_hostOrdered_, UINT16 port_hostOrdered_
+										, UINT32 acceptBacklog_, event_callback_fn acceptFn_
 										)
 {
 	ABORT_IF(socket_ == nullptr);
 	ABORT_IF(event_ == nullptr);
 
-	*socket_ = socket(AF_INET, SOCK_STREAM, 0);
+	*socket_ = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	evutil_make_socket_nonblocking(*socket_);
+	evutil_make_socket_closeonexec(*socket_);
 	evutil_make_listen_socket_reuseable(*socket_);
 
-	struct sockaddr_in sin;
+	struct sockaddr_in sin{};
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = htonl(ipAddr_hostOrdered_);
 	sin.sin_port = htons(port_hostOrdered_);
@@ -91,26 +91,29 @@ static void _prepareLibEventListenSocket(evutil_socket_t* socket_, event** event
 	if ( bind(*socket_, (struct sockaddr*)&sin, sizeof(sin)) < 0 )
 		LogAbort("Unable to bind listening socket [already running?] %d (%08x:%u).", *socket_, ipAddr_hostOrdered_, port_hostOrdered_);
 
-	if ( listen(*socket_, 16) < 0 )
+	if ( listen(*socket_, acceptBacklog_) < 0 )
 		LogAbort("Unable to listen on listen socket %d (%08x:%u).", *socket_, ipAddr_hostOrdered_, port_hostOrdered_);
 
 	// Create an event to listen for new connections on this socket.
-	*event_ = event_new(Teul::eventBase, *socket_, EV_READ|EV_PERSIST, acceptFn_, (void*)Teul::eventBase);
+	*event_ = event_new(Teul::eventBase, *socket_, EV_READ|EV_PERSIST, acceptFn_, nullptr);
 	event_add(*event_, nullptr);
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Helper for dealing with an accept call on a libevent endpoint.
 
-static evutil_socket_t _libEventAcceptHandler(evutil_socket_t listener, short event, void* arg, sockaddr_in& cliAddr_)
+static evutil_socket_t _libEventAcceptHandler(evutil_socket_t listener, short event, sockaddr_in& cliAddr_)
 {
-	//auto base = static_cast<event_base*>(arg);
 	socklen_t caLen = sizeof(cliAddr_);
-	evutil_socket_t cliSock = EAGAIN;
-	while ( (cliSock == EAGAIN) || (cliSock == EINTR) )
+	evutil_socket_t cliSock;
+	do
 	{
 		cliSock = accept(listener, (struct sockaddr*)&cliAddr_, &caLen);
-	};
+	} while (cliSock < 0 && (errno == PLAT_EAGAIN || errno == PLAT_EINTR));
+	if (cliSock >= 0) {
+		evutil_make_socket_nonblocking(cliSock);
+		evutil_make_socket_closeonexec(cliSock);
+	}
 
 	return cliSock;
 }
@@ -200,7 +203,7 @@ static void _onRepeaterError(struct bufferevent* bev_, short error_, void* arg_)
 	evutil_socket_t cliSock = *(evutil_socket_t*)arg_;
     if (error_ & BEV_EVENT_EOF)
 	{
-		dbugLog(_FLM, "sock:" PRF_SOCKET " disconnected.", PRA_SOCKET(cliSock));
+		dbugLog(_FLN, "sock:" PRF_SOCKET " disconnected.", PRA_SOCKET(cliSock));
     }
 	else if (error_ & BEV_EVENT_ERROR)
 	{
@@ -223,30 +226,29 @@ static void _onRepeaterError(struct bufferevent* bev_, short error_, void* arg_)
 ////////////////////////////////////////////////////////////////////////////////
 // New connection on the repeater interface, add it to the pool.
 
-static void _onRepeaterAccept(evutil_socket_t listener_, short event_, void* arg_)
+static void _onRepeaterAccept(evutil_socket_t listener_, short event_, void*)
 {
 	struct sockaddr_in cliAddr;
-	evutil_socket_t cliSock = _libEventAcceptHandler(listener_, event_, arg_, cliAddr);
+	evutil_socket_t cliSock = _libEventAcceptHandler(listener_, event_, cliAddr);
 	if ( cliSock < 0 )
 	{
 		dbugLog(_FLI, "accept error: %d", cliSock);
 		return;
 	}
 
-	evutil_make_socket_nonblocking(cliSock);
-	struct bufferevent* bev = bufferevent_socket_new(static_cast<event_base*>(arg_), cliSock, BEV_OPT_CLOSE_ON_FREE);
+	dbugLog(_FLN, "sock:" PRF_SOCKET " connected from %s:%u"
+				, PRA_SOCKET(cliSock)
+				, teulGetAddress(ntohl(cliAddr.sin_addr.s_addr)), ntohs(cliAddr.sin_port)
+				);
+
+	struct bufferevent* bev = bufferevent_socket_new(Teul::eventBase, cliSock, BEV_OPT_CLOSE_ON_FREE);
 	bufferevent_setcb(bev, _onRepeaterRead, nullptr, _onRepeaterError, new evutil_socket_t(cliSock));
-	bufferevent_enable(bev, EV_READ|EV_WRITE|EV_PERSIST);
+	bufferevent_enable(bev, EV_READ);
 
 	const bool socketAlreadyRegistered = (s_clients.find(cliSock) != s_clients.end());
 	ABORT_IF( socketAlreadyRegistered );
 
 	s_clients[cliSock] = bev;
-
-	dbugLog(_FLN, "sock:" PRF_SOCKET " connected from %s:%u"
-				, PRA_SOCKET(cliSock)
-				, teulGetAddress(ntohl(cliAddr.sin_addr.s_addr)), ntohs(cliAddr.sin_port)
-				);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -263,7 +265,7 @@ static void _onManagedProcessError(struct bufferevent* bev_, short error_, void*
 	evutil_socket_t cliSock = *(evutil_socket_t*)(arg_);
 	if (error_ & BEV_EVENT_EOF)
 	{
-		dbugLog(_FLM, "sock:" PRF_SOCKET " disconnected.", PRA_SOCKET(cliSock));
+		dbugLog(_FLN, "sock:" PRF_SOCKET " disconnected.", PRA_SOCKET(cliSock));
 	}
 	else if (error_ & BEV_EVENT_ERROR)
 	{
@@ -281,13 +283,14 @@ static void _onManagedProcessError(struct bufferevent* bev_, short error_, void*
 	bufferevent_free(bev_);
 
 	auto it = s_socketToProcess.find(cliSock);
-	if ( it != s_socketToProcess.end() && it->second != 0ULL )
+	if ( it != s_socketToProcess.end() )
 	{
-		dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%llu disconnecting", PRA_SOCKET(cliSock), it->second);
+		dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%" PR64BitUT " disconnecting", PRA_SOCKET(cliSock), it->second);
 		delete (evutil_socket_t*)arg_;
 		///TODO: Tell GameProcessManager that the process went away.
-		s_processToSocket.erase(it->second);
-		s_processToSocket.erase(it->first);
+		if ( it->second != 0ULL )
+			s_processToSocket.erase(it->second);
+		s_socketToProcess.erase(cliSock);
 	}
 }
 
@@ -297,17 +300,14 @@ static void _onManagedProcessError(struct bufferevent* bev_, short error_, void*
 static bool _handleIntro(evutil_socket_t srcSock, const ProcessIntroduction& intro)
 {
 	auto pit = s_processToSocket.find(intro.m_processID);
-	if (pit != s_processToSocket.end()) {
-		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%llu process already has a socket entry.", PRA_SOCKET(srcSock), intro.m_processID);
-		return false;
-	}
+	ABORT_IF( pit != s_processToSocket.end() );
 	auto process = GameProcessManager::LookupGameProcess(intro.m_processID);
 	if (!process) {
-		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%llu no process entry.", PRA_SOCKET(srcSock), intro.m_processID);
+		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%" PR64BitUT " no process entry.", PRA_SOCKET(srcSock), intro.m_processID);
 		return false;
 	}
 	if (process->ServerType() != intro.m_processType) {
-		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%llu type mismatch (expected %u got %u).",
+		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%" PR64BitUT " type mismatch (expected %u got %u).",
 			PRA_SOCKET(srcSock), intro.m_processID, process->ServerType(), intro.m_processType
 		);
 		return false;
@@ -320,7 +320,7 @@ static bool _handleIntro(evutil_socket_t srcSock, const ProcessIntroduction& int
 
 	s_socketToProcess[srcSock] = intro.m_processID;
 	s_processToSocket[intro.m_processID] = srcSock;
-	dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%llu established", PRA_SOCKET(srcSock), intro.m_processID);
+	dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%" PR64BitUT " established", PRA_SOCKET(srcSock), intro.m_processID);
 
 	return true;
 }
@@ -350,33 +350,45 @@ static void _onManagedProcessRead(struct bufferevent* bev_, void* arg_)
 		}
 	}
 
-	evutil_closesocket(srcSock);
+	_onManagedProcessError(bev_, 0, arg_);
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Managed process connecting.
 
-static void _onManagedProcessAccept(evutil_socket_t listener_, short event_, void* arg_)
+static void _onManagedProcessAccept(evutil_socket_t listener_, short event_, void*)
 {
 	struct sockaddr_in cliAddr;
-	evutil_socket_t cliSock = _libEventAcceptHandler(listener_, event_, arg_, cliAddr);
+	evutil_socket_t cliSock = _libEventAcceptHandler(listener_, event_, cliAddr);
 	if ( cliSock < 0 )
 	{
 		dbugLog(_FLI, "managed process accept error: %d", cliSock);
 		return;
 	}
 
-	evutil_make_socket_nonblocking(cliSock);
-	struct bufferevent* bev = bufferevent_socket_new(static_cast<event_base*>(arg_), cliSock, BEV_OPT_CLOSE_ON_FREE);
+	dbugLog(_FLN, "sock:" PRF_SOCKET " process connected from %s:%u", PRA_SOCKET(cliSock), teulGetAddress(ntohl(cliAddr.sin_addr.s_addr)), ntohs(cliAddr.sin_port));
+
+	struct bufferevent* bev = bufferevent_socket_new(Teul::eventBase, cliSock, BEV_OPT_CLOSE_ON_FREE);
 	bufferevent_setcb(bev, _onManagedProcessRead, nullptr, _onManagedProcessError, new evutil_socket_t(cliSock));
-	bufferevent_enable(bev, EV_READ|EV_PERSIST);
+	bufferevent_enable(bev, EV_READ);
 
 	const bool socketAlreadyRegistered = (s_socketToProcess.find(cliSock) != s_socketToProcess.end());
 	ABORT_IF( socketAlreadyRegistered );
 
 	s_socketToProcess[cliSock] = 0ULL;
+}
 
-	dbugLog(_FLN, "sock:" PRF_SOCKET " process connected from %s:%u", PRA_SOCKET(cliSock), teulGetAddress(ntohl(cliAddr.sin_addr.s_addr)), ntohs(cliAddr.sin_port));
+////////////////////////////////////////////////////////////////////////////////
+// Get server type by name
+
+static SERVER_TYPE _getServerType(const std::string& name)
+{
+	for (UINT32 i = 0; i < MAX_SERVER_TYPE; ++i)
+	{
+		if ( name == g_serverTypes[i] )
+			return static_cast<SERVER_TYPE>(i);
+	}
+	return MAX_SERVER_TYPE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -388,14 +400,16 @@ static void _addInitialProcesses()
 	while ( p && *p )
 	{
 		const char* end = strchr(p, ';');
-		for ( UINT32 i = 0; i < MAX_SERVER_TYPE; ++i )
-		{
-			if ( strncmp(g_serverTypes[i], p, strlen(g_serverTypes[i])) == 0 )
-			{
-				GameProcessManager::AddServer(static_cast<SERVER_TYPE>(i));
-				break;
-			}
+		std::string name = (end) ? std::string(p, end - p) : std::string(p);
+		auto serverType = _getServerType(name);
+		if ( serverType >= MAX_SERVER_TYPE ) {
+			LogAbort("'%s': '%s': Unrecognized server: %s",
+						cv_manageProcesses.GetEnvVarName(),
+						cv_manageProcesses.GetString(),
+						name.c_str());
 		}
+		dbugLog(_FLI, "Managing %s", name.c_str());
+		GameProcessManager::AddServer(serverType);
 		p = end;
 		if ( p )	// it points to a semicolon
 			++p;	// which we want to skip.
@@ -414,9 +428,12 @@ static void _scheduleHeartbeatEvent()
 ////////////////////////////////////////////////////////////////////////////////
 // Once-per-second event handling/checking.
 
+extern int teulModIdle(const TeulTimeMS);
+
 static void heartbeatFunction(evutil_socket_t /*-1*/, short /*eventBits*/, void* /*arg*/)
 {
-	GameProcessManager::Heartbeat();
+	teulModIdle(0);
+	GameProcessManager::Heartbeat(g_enableStarts);
 	_scheduleHeartbeatEvent();
 }
 
@@ -446,8 +463,9 @@ static void _shutdownNetwork()
 //////////////////////////////////////////////////////////////////////////
 // CTRL-C handler: Initiate shutdown.
 
-void _startShutdown(int /*signal*/)
+static void _startShutdown(int /*signal*/)
 {
+	g_enableStarts = false;
 	if ( !g_shuttingDown )
 	{
 		g_shuttingDown = true;
@@ -457,10 +475,22 @@ void _startShutdown(int /*signal*/)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Toggle the spawning of new processes.
+
+#if defined(SIGUSR1)
+static void _toggleStarts(int /*signal*/)
+{
+	if ( !g_shuttingDown )
+		g_enableStarts = !g_enableStarts;
+}
+#endif
+
+////////////////////////////////////////////////////////////////////////////////
 // Entry point.
 
-int main(int argc, const char* argv[])
+int main(int argc, const char* argv[], const char* envp[])
 {
+	bool singleStartMode = false;
 	g_argv0 = argv[0];
 	Server::InitializeProcess(g_serverName, CONTROLLER_HOST, _errorFunction, nullptr, argc, argv, {
 		{ "--configs", "List configuration variables and exit.", false,
@@ -474,6 +504,11 @@ int main(int argc, const char* argv[])
 				Teul::ConfigVar::Generate(filename);
 				exit(0);
 			}
+		},
+		{ "--single-shot", "Launch each child process only once.", false,
+			[&](const char*) {
+				singleStartMode = true;
+			}
 		}
 	});
 
@@ -481,6 +516,10 @@ int main(int argc, const char* argv[])
 	{
 		Teul::ConfigVar::Generate("environment.cfg");
 		LogAbort("environment.cfg could not be found - generated new one, please edit it.");
+	}
+
+	if ( !cv_manageProcesses.GetString() || !*cv_manageProcesses.GetString() ) {
+		dbugLog(_FLM, "'%s' list is empty", cv_manageProcesses.GetEnvVarName());
 	}
 
 	// Prepare the repeater socket, which forwards packets from one peer to all other peers.
@@ -497,15 +536,18 @@ int main(int argc, const char* argv[])
 	_scheduleHeartbeatEvent();
 
 	signal(SIGINT, _startShutdown);
+#if defined(SIGUSR1)
+	signal(SIGUSR1, _toggleStarts);
+#endif
 
-	GameProcessManager::Initialize();
+	GameProcessManager::Initialize(envp, singleStartMode);
 
 	// Our main loop is handled by libevent rather than teulKit.
 	event_base_dispatch(Teul::eventBase);
 
 	if ( g_shuttingDown == false )
 	{
-		dbugLog(_FLAS, "exited event_base_dispatch without being flagged as shutting down.");
+		dbugLog(_FLA, "exited event_base_dispatch without being flagged as shutting down.");
 		g_shuttingDown = true;
 	}
 
@@ -513,4 +555,6 @@ int main(int argc, const char* argv[])
 	GameProcessManager::Shutdown();
 
 	_shutdownNetwork();
+
+	teulCloseTransport();
 }

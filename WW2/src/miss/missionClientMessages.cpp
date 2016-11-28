@@ -71,7 +71,7 @@ WEP_LIST_REQ request;
 static SINT32 _sendMISSION_POST_REQ(ACTION_OBJECT* const a)
 {
 #ifdef DEBUG
-	dbugWrite(_FLWS, "sending MISSION_POST_REQ");
+	dbugWrite(_FLW, "sending MISSION_POST_REQ");
 #endif
 	return missPackMISSION_POST_REQ(TEUL_PACK, a->packed, a->offset, (MISSION_POST_REQ*) a->localRawData, 0);
 
@@ -80,7 +80,7 @@ static SINT32 _sendMISSION_POST_REQ(ACTION_OBJECT* const a)
 static SINT32 _sendMISSION_EXIT(ACTION_OBJECT* const a)
 {
 #ifdef DEBUG
-	dbugWrite(_FLWS, "sending MISSION_EXIT");
+	dbugWrite(_FLW, "sending MISSION_EXIT");
 #endif
 
 	// Send the UINT32 we were called with
@@ -90,7 +90,7 @@ static SINT32 _sendMISSION_EXIT(ACTION_OBJECT* const a)
 static SINT32 _sendWEP_LIST_REQ(ACTION_OBJECT* const a)
 {
 #ifdef DEBUG
-	dbugWrite(_FLWS, "sending WEP_LIST_REQ");
+	dbugWrite(_FLW, "sending WEP_LIST_REQ");
 #endif
 	return missPackWEP_LIST_REQ(TEUL_PACK, a->packed, a->offset, (WEP_LIST_REQ*) a->localRawData, 0);
 }
@@ -99,7 +99,7 @@ static SINT32 _sendWEP_LIST_REQ(ACTION_OBJECT* const a)
 static SINT32 _sendMISSION_RESULT_REQ(ACTION_OBJECT* const a)
 {
 #ifdef DEBUG
-	dbugWrite(_FLWS, "Requesting Mission Summary");
+	dbugWrite(_FLW, "Requesting Mission Summary");
 #endif
 	return a->offset;
 }
@@ -113,7 +113,7 @@ _recvMISSION_POST_REPLY(ACTION_OBJECT* const a)
 	//unpack
 	a->offset = missPackMISSION_POST_REPLY(TEUL_UNPACK, a->packed, a->offset, &result, 0);
 
-	dbugWrite(_FLWS, "postreply is %d reasoncode is %d missionID is %d ", result.posted, result.reasonCode, result.missionID);
+	dbugWrite(_FLW, "postreply is %d reasoncode is %d missionID is %d ", result.posted, result.reasonCode, result.missionID);
 
 	clientMissionPostReply(a->teulIndex, &result);
 
@@ -213,7 +213,7 @@ SINT32
 missionInstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(MISSION_X)
-
+	{
 		REGISTER_SENDER(FE_MISSION_POST_REQ_Y, _sendMISSION_POST_REQ, missSEND_POST_REQ);
 		REGISTER_SENDER(FE_MISSION_EXIT_Y, _sendMISSION_EXIT, missSEND_EXIT);
 		REGISTER_SENDER(FE_MISSION_WEP_LIST_REQ_Y, _sendWEP_LIST_REQ, missSEND_WEP_LIST_REQ);
@@ -227,6 +227,6 @@ missionInstallCallbacks()
 		// Register this callback (_Y) to that teul_network_msg
 		REGISTER_MSG(FE_MISSION_DETAIL_Y, MISSION_DETAIL);
 		REGISTER_MSG_RECEIVER(FE_MISSION_LIST_UPDATE_Y, MISSION_LIST_UPDATE);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(MISSION_X)
 }

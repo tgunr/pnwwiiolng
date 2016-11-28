@@ -17,7 +17,7 @@
 ////    ------------------------------  NON-SCRIPTING FUNCTIONS
 
 //Installs our callbacks
-extern SINT32 strtHostInstallCallbacks(void);
+extern SINT32 strtHostInstallCallbacks();
 
 //This function sends a vislevel update to a specific strat Updater.  Used
 //	for making sure that the strat updater is aware of the vislevel of every
@@ -37,12 +37,12 @@ extern SINT32 strtSendMMJoinDeny(UINT32 crewID,UINT32 reasonCode);
 extern SINT32 strtSendMMJoinListResponse(UINT32 commandID, UINT32 crewID, ChatHandle crewHandle);
 
 // Process a capacity request and send the response
-extern LOGICAL strtReplyToCapacityRequest(SINT32 teulIndex, const MM_CAPACITY_REQUEST& request, FULL_OBJ_ID destFacility, bool vehicleDelivered);
+extern bool strtReplyToCapacityRequest(SINT32 teulIndex, const MM_CAPACITY_REQUEST& request, FULL_OBJ_ID destFacility, bool vehicleDelivered);
 
 //A lot smarter than the rest of the send functions, this function actually
 // breaks the CP, Facilty, or Building information inside this supercell
 // into chunks that can be sent easily
-extern void strtAllowSyncing(void);	// Until first call, sync fns do nothing
+extern void strtAllowSyncing();	// Until first call, sync fns do nothing
 extern SINT32 strtSyncCPs(UINT32 address, UINT16 port, Supercell* sc);
 extern SINT32 strtSyncFacilities(UINT32 address, UINT16 port, Supercell* sc);
 extern SINT32 strtSyncObjects(UINT32 address, UINT16 port, Supercell* sc);
@@ -66,7 +66,7 @@ extern void strtQueueVisLevelUpdate(class ObjectStruct*);
 extern void strtQueueFacilityStatus(class FacilityStruct*);
 extern void strtQueueCPStatus(class CPStruct*);
 
-extern void strtSendCaptureScoreNotice(const FULL_OBJ_ID& fid, WWII_SIDE forSide);
+extern void strtSendCaptureScoreNotice(const FULL_OBJ_ID fid, WWII_SIDE forSide);
 
 extern void strtSendCaptureState(const FacilityStruct* facility, WWII_SIDE forSide, SINT32 rate, bool spawnable);
 

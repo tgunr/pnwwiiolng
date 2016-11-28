@@ -271,7 +271,7 @@ protected:
 
     std::queue<int> listids;
 
-    typedef std::map<unsigned int, PatchInstance*> GrassMap;
+    using GrassMap = std::map<unsigned int, PatchInstance*>;
     GrassMap grassMap;
     ref_ptr<oglVertexBuffer> vbo;
 };

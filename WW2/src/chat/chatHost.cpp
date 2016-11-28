@@ -71,6 +71,7 @@
 #include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
 #include "server/serverInterface.h"
+#include "server/serverPersonaExit.h"
 #include "server/serverPersonaLogin.h"
 #include "server/serverPlayerStatusNode.h"
 #include "server/serverReleaseTypeEnum.h"
@@ -81,13 +82,15 @@
 #include "teul/teulPacket.h"
 #include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
-#include "versionNo.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiDBConfig.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiServerTrackedObject.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiServerTypeEnums.h"
+#include "wwii/wwiiDBThreads.h"
+#include "wwii/wwiiPPOLoader.h"
 
 extern UINT32 serverGetAuthIP();
 
@@ -105,13 +108,11 @@ extern void chatRegisterDotCommands();
 
 #ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
-    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
+    #define DEF_ERR_FLAGS STD_ERR  // LOG_ALL_TO_STDERR? look at the logs
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
     #define DEF_ERR_FLAGS STD_ERR
 #endif
-
-typedef bool (TUNE_COMMAND_CALLBACK)(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
 
 #if defined(DEV_BUILD)
 # define DEFAULT_SYS_MOTD		"MOTD: Internal Dev Cluster"
@@ -205,6 +206,8 @@ FLOAT32 _avgMessageLength=0;
 // Commonly used channels so we don't have to keep finding them
 Chat::Channel* adminChannel = nullptr;
 
+PPOSpecLoader specLoader;
+
 UINT32 g_shutdownLockAt = 0;
 UINT32 g_shutdownDowntime = 0;
 static Chat::Name g_shutdownRequestedBy;
@@ -213,28 +216,31 @@ static UINT32 g_finalShutdownTime = 0;
 
 // Dot command list at end of file to avoid prototyping
 
-static bool _tuneHQ(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
-static bool _tuneOrigin(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
-static bool _tuneGM(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
+static bool _tuneHQ(Player& player, UCHAR index);
+static bool _tuneOrigin(Player& player, UCHAR index);
+static bool _tuneGM(Player& player, UCHAR index);
 extern bool chatUpdateHCUnitLocations();
 
 struct TUNE_COMMAND
 {
-	const SCHAR*	string;
-	ChatHandle	matchHandle;
-	UINT32		length;
-	UINT32		index;
-	TUNE_COMMAND_CALLBACK* callback;
-	PermissionMask	perm;
+	using Callback = bool(*)(Player& player, UCHAR index);
+
+	ChatHandle			matchHandle_;
+	Callback			callback_;
+	PermissionMask		perms_;
+
+	TUNE_COMMAND(const char* name, Callback callback, PermissionMask perms=0ULL)
+		: matchHandle_(chatGetLowercaseHandle(name))
+		, callback_(callback)
+		, perms_(perms)
+	{}
 };
 
-static TUNE_COMMAND _tuneCommand[] = {
-								 {"hq",0,0,0,_tuneHQ,0}
-								 ,{"origin",0,0,0,_tuneOrigin,0}
-								 ,{"gm",0,0,0,_tuneGM,GAME_MANAGER}
-								};
-
-static const UINT32 NUM_TUNE_COMMANDS = sizeof(_tuneCommand) / sizeof(TUNE_COMMAND);
+static std::vector<TUNE_COMMAND> _tuneCommands = {
+	TUNE_COMMAND("hq", _tuneHQ),
+	TUNE_COMMAND("origin", _tuneOrigin),
+	TUNE_COMMAND("gm", _tuneGM, GAME_MANAGER)
+};
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -254,7 +260,7 @@ IRCPlayer::message(int prefix, int messageID
 					, const char* ptr0, const char* ptr1, const char* ptr2, const char* ptr3, const char* ptr4, const char* ptr5) const
 {
 	char text[MAX_MESSAGE_LENGTH+1];
-	strcpy(text, chatLString((LSTRING_ID)prefix, (LSTRING_ID)messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5));
+	strsafecpy(text, chatLString((LSTRING_ID)prefix, (LSTRING_ID)messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5));
 
 	char* p = text;
 	do
@@ -347,7 +353,7 @@ chatSetShutdownTime(UINT32 forTime, const char* caller)
 // Helper function that returns a property's name or prints the ox/oy/id
 
 const char*
-chatPropertyName(const FULL_OBJ_ID& id)
+chatPropertyName(const FULL_OBJ_ID id)
 {
 	Property* property = chatFindProperty(id);
 	if ( property != nullptr )
@@ -361,7 +367,7 @@ chatPropertyName(const FULL_OBJ_ID& id)
 
 // Variant for when you want the pointer yourself
 const char*
-chatPropertyName(const Property* property, const FULL_OBJ_ID& id)
+chatPropertyName(const Property* property, const FULL_OBJ_ID id)
 {
 	if ( property != nullptr )
 		return property->Name();
@@ -385,7 +391,7 @@ chatSystemMessage(LSTRING_ID messageID, const char* const ptr0, const char* cons
 //////////////////////////////////////////////////////////////////////
 // Implementation for HCUnitBroadcast...
 
-typedef std::vector<UINT32> SUBORDINATES;
+using SUBORDINATES = std::vector<UINT32>;
 static SUBORDINATES _currentUnits;
 
 //////////////////////////////////////////////////////////////////////
@@ -546,7 +552,7 @@ private:
 	}
 
 public:
-	Ban(const ChatHandle& handle_, UINT32 days_, bool kick_)
+	Ban(const ChatHandle handle_, UINT32 days_, bool kick_)
 		: m_handle(handle_)
 		, m_days(days_)
 		, m_start(teulTime() + _randomBanDelay())
@@ -559,7 +565,7 @@ public:
 	UINT32			m_kickTime;
 };
 
-typedef std::vector<Ban> DELAYED_BANS;
+using DELAYED_BANS = std::vector<Ban>;
 static DELAYED_BANS _delayedBans;
 
 static void
@@ -628,7 +634,7 @@ _processDelayedBan()
 }
 
 static void
-_delayedBan(const ChatHandle& handle, UINT32 days, bool kick=true)
+_delayedBan(const ChatHandle handle, UINT32 days, bool kick=true)
 {
 	Ban ban(handle, days, kick);
 	dbugLog(_FLD, "c:%s will be banned for %u days in %u seconds.", Chat::Name(handle).c_str(), ban.m_days, ban.m_start - teulTime());
@@ -640,7 +646,7 @@ _delayedBan(const ChatHandle& handle, UINT32 days, bool kick=true)
 // Check if a player is online and if they have the CAN_BE_EJECTED flag
 
 static bool
-_isBanable(const ChatHandle& handle)
+_isBanable(const ChatHandle handle)
 {
 	const Player* player = PlayerInterface::Lookup(handle);
 	return ( player && player->permissions(CAN_BE_EJECTED) );
@@ -679,7 +685,7 @@ static DotDetectMe detectMe;
 #endif
 
 void
-Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
+Chat::SendModReport(const ChatHandle handle, const Chat::ModReport modType)
 {
 	Chat::Name callsign(handle);
 	const char* type = nullptr;
@@ -702,7 +708,6 @@ Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
 		return;
 //		ban = _isBanable(handle);
 //		type = "injection";
-	break;
 	case Chat::ModDamned:
 		// Only ban detects one time in 5.
 		if ( ((rand() % 5) == 1 && host_config.arena.banCheats > 0) || _isBanable(handle) )
@@ -765,7 +770,7 @@ chatRouteGCIMessage(Chat::GCIMessage& message, UINT32 messageID)
 // Send an "all" message.
 
 void
-chatSendAllMessage(const ChatHandle& handle, const char* message, UINT32 messageID)
+chatSendAllMessage(const ChatHandle handle, const char* message, UINT32 messageID)
 {
 	Chat::HostMessage& msg = chatBuildHostMessage(handle, messageID, LOBBY_CHAN_ICON, message);
 	chatBroadcastHostMessage(playerIndex.begin(), playerIndex.end(), msg);
@@ -945,8 +950,7 @@ _distributeChannelMessage(Chat::HostMessage& message, Chat::Channel& channel, Pl
 		}
 	}
 
-	if ( g_logDebug )
-		dbugLog(_FLDB, " [%" PRSizeT " recipients]", indexes.size());
+    dbugLog(_FLD, " [%" PRSizeT " recipients]", indexes.size());
 
 	chatBroadcastHostMessage(indexes.begin(), indexes.end(), message);
 }
@@ -1384,7 +1388,7 @@ chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageI
 	if ( allowDotCommands )
 	{
 		std::string msgText = inMessage->m_message;
-                DBThread::EscapeString(msgText);
+		DBThread::EscapeString(msgText);
 
 		DBThread::Do(DBThread::Audit, "INSERT INTO `audit`.`chat_messages` (player_id, message) VALUES (%u, '%s')", player->playerID(), msgText.c_str());
 
@@ -1523,7 +1527,7 @@ chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageI
 // bells, whistles and trimmings
 
 Chat::HostMessage&
-chatBuildHostMessage(const ChatHandle& senderID
+chatBuildHostMessage(const ChatHandle senderID
 					, UINT32 msgID
 					, UINT8 chanIcon
 					, const char* text
@@ -1560,7 +1564,7 @@ struct IsRat : public FilterFn
 ChatHandle IsRat::excludeID = 0LL;
 
 void
-chatDispatchCRSMessage(const SCHAR* source, const SCHAR* text, const ChatHandle& excludeID)
+chatDispatchCRSMessage(const SCHAR* source, const SCHAR* text, const ChatHandle excludeID)
 {
 	Chat::LocalizedMessage lmsg(LSTR_NONE, LSTR_CRS_MSG, source, text);
 
@@ -1581,7 +1585,7 @@ struct IsGM : public FilterFn
 ChatHandle IsGM::excludeID = 0LL;
 
 void
-chatDispatchGMMessage(const SCHAR* source, const SCHAR* text, const ChatHandle& excludeID)
+chatDispatchGMMessage(const SCHAR* source, const SCHAR* text, const ChatHandle excludeID)
 {
 	Chat::LocalizedMessage lmsg(LSTR_NONE, LSTR_GM_MSG, source, text);
 
@@ -1607,8 +1611,8 @@ chatDispatchHCText(WWII_SIDE side, const SCHAR* source, const SCHAR* text)
 struct IsActiveCommander : public FilterFn
 {
 	WWII_SIDE m_side;
-	const ChatHandle& m_exclude;
-	IsActiveCommander(WWII_SIDE side, const ChatHandle& exclude)
+	ChatHandle m_exclude;
+	IsActiveCommander(WWII_SIDE side, ChatHandle exclude)
 		: m_side(side), m_exclude(exclude) {}
 	bool operator()(const wwiiPlayer* wwiiPlayer) const
 	{
@@ -1625,7 +1629,7 @@ chatHCMessage(WWII_SIDE side, LSTRING_ID message, const char* const ptr0, const 
 }
 
 bool
-chatHCMessage(WWII_SIDE side, Chat::LocalizedMessage& lmsg, const ChatHandle& exclude)
+chatHCMessage(WWII_SIDE side, Chat::LocalizedMessage& lmsg, const ChatHandle exclude)
 {
 	const char* channel;
 	if ( side == ALLIED )
@@ -1786,14 +1790,14 @@ _getChannel(const ChannelID& id)
 	//If not, create it, and use it
 	if ( id.Type() == NUMBERED_CHANNEL )
 	{
-		sprintf(channelName, "%llu", id.SubID());
-		const ChatHandle handle = chatGetHandle(channelName);
-		sprintf(channelName, "%llu", id.SubID());
+		strprintf(channelName, "%" PR64BitUT "", id.SubID());
+		ChatHandle handle = chatGetHandle(channelName);
+		strprintf(channelName, "%" PR64BitUT "", id.SubID());
 		return chatCreateChannel(id, channelName, handle);
 	}
 	else
 	{
-		sprintf(channelName, "Channel %llu.%u.%u.%llu", id.InstID(), id.Type(), id.Side(), id.SubID());
+		strprintf(channelName, "Channel %" PR64BitUT ".%u.%u.%" PR64BitUT "", id.InstID(), id.Type(), id.Side(), id.SubID());
 		return chatCreateChannel(id, channelName, 0ULL);
 	}
 }
@@ -1801,7 +1805,7 @@ _getChannel(const ChannelID& id)
 //////////////////////////////////////////////////////////////////////
 
 bool
-Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
+Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle handleID)
 {
 	ChannelID channelID((CHANNEL_TYPE)0);
 	Chat::Channel* tuneChannel = nullptr;
@@ -1815,12 +1819,10 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
 		case NO_CHANNEL:
 			detuneRadio(index);
 			return true;
-		break;
 
 		case PRIVATE_CHANNEL:
 		case NUMBERED_CHANNEL:
 			return tuneRadioToHandle(index, handleID);
-		break;
 
 		case SQUAD_CHANNEL:
 			if ( squadID() )
@@ -1885,7 +1887,7 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
 	if ( channelID.IsPlaceHolder() )
 	{
 		if ( g_debugRadios )
-			dbugLog(_FLDB, " [placeholder]");
+			dbugLog(_FLD, " [placeholder]");
 		tunePlaceHolder(index, type);
 		return true;
 	}
@@ -1919,30 +1921,30 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
 
 //Look for an hq tune
 //This temporary measure allows someone to tune to the hq channel
-static bool _tuneHQ(Player* player, UCHAR /*index*/, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneHQ(Player& player, UCHAR /*index*/)
 {
-	player->SetHqOff(false);
+	player.SetHqOff(false);
 	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static bool _tuneOrigin(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneOrigin(Player& player, UCHAR index)
 {
 	// Remove any pre-existing origin tune
-	player->detuneChannelsByType(ORIGIN_CP_CHANNEL);
+	player.detuneChannelsByType(ORIGIN_CP_CHANNEL);
 	// And now tune this one
-	return player->tuneRadio(index, ORIGIN_CP_CHANNEL, 0);
+	return player.tuneRadio(index, ORIGIN_CP_CHANNEL, 0);
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static bool _tuneGM(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneGM(Player& player, UCHAR index)
 {
-	if ( !player->isGM() )
+	if ( !player.isGM() )
 		return false;
 
-	dbugLog(_FLI, "tuning %s to GM channel", player->callsign());
+	dbugLog(_FLI, "tuning %s to GM channel", player.callsign());
 
 	if ( adminChannel == nullptr )
 	{
@@ -1950,14 +1952,14 @@ static bool _tuneGM(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32
 		return false;
 	}
 
-	return player->tuneRadioToChannel(index, adminChannel, adminChannel->type());
+	return player.tuneRadioToChannel(index, adminChannel, adminChannel->type());
 }
 
 //////////////////////////////////////////////////////////////////////
 // Send a tune acknowledgment to the player
 
 bool
-Player::ackTuneHandle(UCHAR index, const ChatHandle& handleID)
+Player::ackTuneHandle(UCHAR index, const ChatHandle handleID)
 {
 	Chat::TuneToChannel tune(index, PRIVATE_CHANNEL, handleID, true, false);
 	if ( tune.send(teulIndex()) == false )
@@ -1971,20 +1973,6 @@ Player::ackTuneHandle(UCHAR index, const ChatHandle& handleID)
 }
 
 //////////////////////////////////////////////////////////////////////
-
-static inline TUNE_COMMAND*
-_getTuneByName(const char* name)
-{
-	ChatHandle handle = chatGetLowercaseHandle(name);
-	for ( UINT32 i = 0; i < NUM_TUNE_COMMANDS; ++i )
-	{
-		if ( _tuneCommand[i].matchHandle == handle )
-			return &_tuneCommand[i];
-	}
-	return nullptr;
-}
-
-//////////////////////////////////////////////////////////////////////
 // Determine whether a named channel exists with the given name
 // and whether the player has permissions to tune it
 
@@ -1994,24 +1982,25 @@ Player::tuneRadioToNamedChannel(UCHAR index, const char* const channelName)
 	if ( channelName == nullptr )
 		return false;
 
-	TUNE_COMMAND* const tuneCommand = _getTuneByName(channelName);
-	if ( ! tuneCommand )
+	auto channelHandle = chatGetLowercaseHandle(channelName);
+	auto it = std::find_if(_tuneCommands.begin(), _tuneCommands.end(),
+			[=](const auto& cmd) { return cmd.matchHandle_ == channelHandle; });
+	if ( it == _tuneCommands.end() )
 		return false;
+
+	const auto& tuneCommand = *it;
 
 	detuneRadio(index);
 
-	if ( !isPlaynet()
-		&& tuneCommand->perm != 0
-		&& (permissions(tuneCommand->perm)) == 0
-		)
+	if ( !isPlaynet() && tuneCommand.perms_ && !permissions(tuneCommand.perms_) )
 	{
 		dbugLog(_FLW, "%s does not have permission to tune to %s"
 						, callsign()
-						, tuneCommand->string);
+						, channelName);
 		return false;
 	}
 
-	return tuneCommand->callback(this, index, channelName, tuneCommand->index);
+	return tuneCommand.callback_(*this, index);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2025,7 +2014,7 @@ Player::tuneRadioToNamedChannel(UCHAR index, const char* const channelName)
 static inline bool _isANumber(const char* text) { while (isdigit(*text)) ++text; return (*text == 0); }
 
 bool
-Player::tuneRadioToHandle(UCHAR index, const ChatHandle& handleID)
+Player::tuneRadioToHandle(UCHAR index, const ChatHandle handleID)
 {
 	if ( handleID == 0 )
 	{
@@ -2052,7 +2041,7 @@ Player::tuneRadioToHandle(UCHAR index, const ChatHandle& handleID)
 	Chat::Name chanName(chatGetLowercaseHandle(handleID));
 
 	if ( g_debugRadios )
-		dbugLog(_FLD, "t:%d p:%u c:%s tuning #%d to %s(%llx)"
+		dbugLog(_FLD, "t:%d p:%u c:%s tuning #%d to %s(%" PR64BitUT ")"
 						, teulIndex(), playerID(), callsign()
 						, index
 						, chanName.c_str(), handleID
@@ -2209,8 +2198,8 @@ Chat::Broadcast::route()
 
 struct ObjectiveFilterFn : public FilterFn
 {
-	const FULL_OBJ_ID& m_objective;
-	ObjectiveFilterFn(const FULL_OBJ_ID& objective) : m_objective(objective) {}
+	const FULL_OBJ_ID m_objective;
+	ObjectiveFilterFn(const FULL_OBJ_ID objective) : m_objective(objective) {}
 	bool operator()(const wwiiPlayer* wwiiPlayer) const
 	{
 		const Player* player = static_cast<const Player*>(wwiiPlayer);
@@ -2227,7 +2216,7 @@ bool
 chatRouteSideMessage(WWII_SIDE toSide
 					, LSTRING_ID prefix
 					, LSTRING_ID message
-					, const FULL_OBJ_ID& objectiveID
+					, const FULL_OBJ_ID objectiveID
 					, const char* const arg1
 					, const char* const arg2
 					)
@@ -2267,31 +2256,32 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 	// too late to fix it properly. For now, we're just going to ignore it.
 	return;
 
+#ifdef ENABLE_TICK_SAMPLES
 	static std::map<playerid_t, std::pair<UINT32, TeulDeltaMS>> reports;
 	auto it = reports.find(player.playerID());
 	const UINT32 lastReport = (it != reports.end()) ? it->second.first : 0;
 	const TeulDeltaMS lastDelta = (it != reports.end()) ? it->second.second : 0;
 
-	if ( lastReport > teulTime() - 60 && abs(sample.delta - lastDelta) <= 120 )
+	if ( lastReport > teulTime() - 60 && std::abs(sample.delta - lastDelta) <= 120 )
 		return;
 
 	/* According to new types list: CONTROLLER_HOST = 0U, AUTH_HOST, DBD_HOST, STRAT_HOST, CHAT_HOST, MAP_HOST, CELL_HOST  */
-	static const char* const hostNames[] = { "controller", "auth", "dbd", "strat", "chat", "map", "cell", "exit", "unknown" };
 	char hostname[64];
 	char report[256];
 
-	strprintf(hostname, "%shost:%s", hostNames[source], player.callsign());
-	strprintf(report, "Client clock anomaly: delta of %lldms (%s), drift %.6g", sample.delta, sample.delta < 0 ? "fast" : "slow", sample.ratio);
+	strprintf(hostname, "%shost:%s", g_serverTypes[source], player.callsign());
+	strprintf(report, "Client clock anomaly: delta of %" PR64BitT "ms (%s), drift %.6g", sample.delta, sample.delta < 0 ? "fast" : "slow", sample.ratio);
 	chatDispatchGMMessage(hostname, report);
 	reports[player.playerID()] = std::make_pair(teulTime(), sample.delta);
 
-	player.log(_FLW, "%s, host:%llu, client:%llu", report, sample.host_ms, sample.client_ms);
+	player.log(_FLW, "%s, host:%" PR64BitUT ", client:%" PR64BitUT "", report, sample.host_ms, sample.client_ms);
 
-	strprintf(report , "{\"src\":\"%s\",\"elapsed\":{\"host\":%llu,\"client\":%llu},\"delta\":%llu,\"ratio\",\"%0.8g\"}",
-	          hostNames[source],
+	strprintf(report , "{\"src\":\"%s\",\"elapsed\":{\"host\":%" PR64BitUT ",\"client\":%" PR64BitUT "},\"delta\":%" PR64BitUT ",\"ratio\",\"%0.8g\"}",
+	          g_serverTypes[source],
 	          sample.host_ms, sample.client_ms,
 	          sample.delta, sample.ratio);
 	chatdbRecordEvent("HACK", player.callsign(), "speedhack", report, "");
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2310,7 +2300,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/, const
 			chatHandleTickSample(CHAT_HOST, *player, *sample);
 		}
 		else
-			dbugLog(_FLW, "t:%d clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+			dbugLog(_FLW, "t:%d clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 
 		return;
 	}
@@ -2414,7 +2404,7 @@ _managementErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*siz
 		Player* player = PlayerInterface::Lookup(teulIndex);
 		if ( player != nullptr )
 		{
-			dbugLog(_FLW, "t:%d p:%u c:%s clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+			dbugLog(_FLW, "t:%d p:%u c:%s clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 			chatHandleTickSample(CHAT_HOST, *player, *sample);
 		}
 	}
@@ -2463,11 +2453,11 @@ _personaRelease(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType rel
 
 	if ( psn->localInfo != nullptr )
 	{
-		dbugLog(_FLNB, " *freeing");
+		dbugLog(_FLN, " *freeing");
 		chatFreePlayer((Player*)psn->localInfo);
 	}
 	else
-		dbugLog(_FLNB, " no player to free");
+		dbugLog(_FLN, " no player to free");
 
 	return 0;
 
@@ -2506,7 +2496,7 @@ _personaActivate(SINT32 teulIndex, PlayerStatusNode* psn)
 static SINT32
 _personaExit(SINT32 teulIndex, PlayerStatusNode* psn, Server::PersonaExit& persExit)
 {
-	dbugLog(_FLN, "t:%d p:%u c:%s _personaExit", teulIndex, psn->dispatch().m_customerID, psn->dispatch().m_callsign);
+	dbugLog(_FLN, "t:%d p:%u c:%s _personaExit (%p)", teulIndex, persExit.dispatch().m_customerID, persExit.dispatch().m_callsign, psn);
 	return 0;
 }
 
@@ -2522,16 +2512,9 @@ _personaErrorFunction (SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*s
 //Initializes all the global data structures, etc.
 
 static void
-_dataInit(void)
+_dataInit()
 {
 	chatInitPlayerLists();
-
-	for ( size_t i = 0; i < (size_t)NUM_TUNE_COMMANDS; i++)
-	{
-		_tuneCommand[i].length = (UINT32)strlen(_tuneCommand[i].string);
-		_tuneCommand[i].index = i;
-		_tuneCommand[i].matchHandle = chatGetLowercaseHandle(_tuneCommand[i].string);
-	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2709,8 +2692,7 @@ _refreshDefaultSquad()
 	}
 	else
 	{
-		if ( g_logDebug )
-			dbugLog(_FLDB, ": not loaded.");
+		dbugLog(_FLD, ": not loaded.");
 	}
 }
 
@@ -2774,8 +2756,8 @@ _houseKeeping()
 		return false;
 
 	// nullptr TERMINATED List of functions to call
-	typedef bool (HOUSEKEEPING)(void);
-	HOUSEKEEPING* housekeeping[] =
+	using HOUSEKEEPING = bool(*)();
+	static HOUSEKEEPING housekeeping[] =
 	{
 		chatSaveLogRecords
 	,	Chat::CommitProgressUpdates
@@ -2832,8 +2814,6 @@ _startShutdown()
 		chatSmitePlayer(target->playerID());
 		target->Release(target->teulIndex(), Server::ReleaseType::Exit);
 	}
-
-	threadsLogging();
 
 	serverBroadcastClusterShutdown();
 
@@ -3090,7 +3070,7 @@ _extractUserName(const char* ircName, std::string& name)
 //////////////////////////////////////////////////////////////////////
 // Manage the list of IRC Players.
 
-typedef std::map<ChatHandle, IRCPlayer*> IRC_PLAYERS;
+using IRC_PLAYERS = std::map<ChatHandle, IRCPlayer*>;
 static IRC_PLAYERS ircPlayers;
 
 static IRCPlayer*
@@ -3396,7 +3376,6 @@ _ircNumericMessages(irc_session_t * session, unsigned int event, const char* ori
 		if ( count > 3 && strcmp(params[1], "=") == 0 )
 			_registerUsers(params[2], params[3]);
 		return;
-	break;
 
 	default:
 	break;
@@ -3508,10 +3487,9 @@ _runHost()
 		teulUpdateTransport(25);
 
 		threadsCallNextCallback();
-		threadsLogging();
 
 		// Catch up on housekeeping.
-		while ( _houseKeeping() ) 
+		while ( _houseKeeping() )
 			;
 
 		chatSendMissionUpdates();
@@ -3595,7 +3573,6 @@ main(int argc, const char* argv[])
 	wwiiIRCRegisterCommand("who", _ircdotPassthru);
 	wwiiIRCRegisterCommand("wtf", _ircdotPassthru);
 
-	threadsReadDBEnvironment();
 	chatThreadsSetup();
 
 	// Initialize dbse callbacks
@@ -3606,8 +3583,8 @@ main(int argc, const char* argv[])
 	// Connect to the database
 	chatInitDB();
 
-	chatGetWWIIConfig();
-	chatLoadPPOXML();
+	dbGetWWIIConfig();
+	specLoader.loadSpecMap();
 
 	chatSetUnitMotd(SYSTEM_MOTD_UNIT, DEFAULT_SYS_MOTD);
 	chatSetUnitMotd(ALLIED, DEFAULT_ALLIED_HC_MOTD);
@@ -3669,7 +3646,7 @@ main(int argc, const char* argv[])
 
 	nextSpamTime = teulClock64 + 1000;
 
-        serverStartTime = teulTime();
+	serverStartTime = teulTime();
 
 	// Load the MOTDs in
 	chatLoadMotds();

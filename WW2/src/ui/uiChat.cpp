@@ -60,10 +60,10 @@
 /******** OBCENITY FILTER TYPES ********/
 
 // Structure that houses an obscenity filter rule.
-typedef RENS::wregex OBSCENITY_RULE;
+using OBSCENITY_RULE = RENS::wregex;
 
 // Vector of rules forms a filter.
-typedef std::vector<OBSCENITY_RULE> OBSCENITY_FILTER;
+using OBSCENITY_FILTER = std::vector<OBSCENITY_RULE>;
 
 // word filter loader
 class BadWordLoader : public XMLLoader2<BadWordLoader>
@@ -429,9 +429,6 @@ static void _buzzer()
 void uiChatPrintLineMessageLoc(int loc, int prefix, int message
 								, const wchar_t* const arg1, const wchar_t* const arg2, const wchar_t* const arg3, const wchar_t* const arg4, const wchar_t* const arg5, const wchar_t* const arg6)
 {
-	if(prefix == LSTR_BETA && gRegion == 5) // no beta messages for chinese, requested by peter
-		return;
-
 	unsigned int color = colorGREENALPHA;	// Default color
 	int side = 0;
 	int icons[CHATICON_MAX] = {-1,-1,-1};

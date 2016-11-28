@@ -30,7 +30,7 @@ GroupProgress::GroupProgress(ACTION_OBJECT* const a)
 // Pack the individual Group Progress objects
 
 void
-GroupProgress::packer(LOGICAL mode, ACTION_OBJECT* a)
+GroupProgress::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->packChatHandle(mode, &m_groupHandle);
 	a->packer(mode, &m_flags);

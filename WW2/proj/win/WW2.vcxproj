@@ -195,8 +195,8 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(BinOutDir)</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(IntOutDir)</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">false</LinkIncremental>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)\Include;$(SolutionDir)\WW2\include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)\WW2\lib\win\Debug\3rdParty;$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</IgnoreImportLibrary>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</EnableManagedIncrementalBuild>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">false</EnableManagedIncrementalBuild>
@@ -221,7 +221,7 @@
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)\WW2\lib\win\Release\3rdParty;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
     <CustomBuildBeforeTargets Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     </CustomBuildBeforeTargets>
@@ -241,7 +241,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
-      <PreprocessorDefinitions>_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
@@ -253,7 +253,7 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>CONNECTION_TEST_BUILD;DEBUG_WW2;ENABLE_FLOATERS;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;CONNECTION_TEST_BUILD;DEBUG_WW2;GM_RELEASE;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -280,12 +280,12 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;libxml2.lib;libiconv.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -307,10 +307,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
     <CustomBuildStep>
       <Command>
@@ -323,7 +323,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">
     <Midl>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
@@ -334,7 +334,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>VEHICLES_GAME_INFO;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;VEHICLES_GAME_INFO;GM_RELEASE;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -360,7 +360,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
@@ -368,7 +368,7 @@
       <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)WW2\lib\win\release\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;vcomp;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ForceSymbolReferences>%(ForceSymbolReferences)</ForceSymbolReferences>
       <GenerateMapFile>true</GenerateMapFile>
@@ -388,10 +388,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -400,7 +400,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
     <Midl>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
@@ -411,7 +411,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>EVENT_LOG;ALPHA_RELEASE;VEHICLES_GAME_INFO;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;EVENT_LOG;ALPHA_RELEASE;VEHICLES_GAME_INFO;GM_RELEASE;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -437,7 +437,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
@@ -465,10 +465,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -477,7 +477,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
     <Midl>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
@@ -488,7 +488,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>MULTI_CLIENT=1;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;MULTI_CLIENT=1;GM_RELEASE;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -514,7 +514,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
@@ -543,10 +543,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>
@@ -555,7 +555,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Midl>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
@@ -566,7 +566,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -593,12 +593,12 @@
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>crash_generation_client.lib;common.lib;exception_handler.lib;crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;libxml2.lib;libiconv.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -621,10 +621,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>python "$(SolutionDir)\WW2\proj\win\codesign.py" /VS /SIGN /DESC "World War II Online" /PASS:HERE PNww2/pn-codesign /VERBOSE $(TargetPath)</Command>
@@ -635,7 +635,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">
     <Midl>
-      <PreprocessorDefinitions>_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
@@ -647,7 +647,7 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DEBUG_FPU;DEBUG_WW2;ENABLE_FLOATERS;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;BUILDING_GRANNY_STATIC;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;DEBUG_FPU;DEBUG_WW2;GM_RELEASE;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;BUILDING_GRANNY_STATIC;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -672,7 +672,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
@@ -702,15 +702,15 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
     <Midl>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
@@ -721,7 +721,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;ODE_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;BUILDING_GRANNY_STATIC;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;GM_RELEASE;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;ODE_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;BUILDING_GRANNY_STATIC;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -746,7 +746,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
@@ -774,15 +774,15 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
     <Midl>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
@@ -793,7 +793,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;GREEN_INSTALL=1;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=0;DIDDLE_ENABLED;IS_CHINA=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;GREEN_INSTALL=1;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=0;DIDDLE_ENABLED;IS_CHINA=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -818,7 +818,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
@@ -846,15 +846,15 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
     <Midl>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
@@ -865,7 +865,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ENABLE_FLOATERS;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;GM_RELEASE;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -890,7 +890,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
@@ -899,7 +899,7 @@
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)WW2\lib\win\release\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ForceSymbolReferences>%(ForceSymbolReferences)</ForceSymbolReferences>
       <GenerateMapFile>true</GenerateMapFile>
@@ -918,10 +918,10 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)Tools\revno.py client $(ProjectDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generate client_revision.h</Message>
+      <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -981,17 +981,6 @@
     <ClInclude Include="..\..\src\client\clientStrtQueue.h" />
     <ClInclude Include="..\..\src\client\GameClient.h" />
     <ClInclude Include="..\..\src\client\ww2Client.h" />
-    <ClInclude Include="..\..\src\client_revision.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='China|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="..\..\src\comm\commClientMessages.h" />
     <ClInclude Include="..\..\src\comm\commConstants.h" />
     <ClInclude Include="..\..\src\comm\commPackers.h" />
@@ -1065,6 +1054,7 @@
     <ClInclude Include="..\..\src\include\platforms.h" />
     <ClInclude Include="..\..\src\include\precompile_includes.h" />
     <ClInclude Include="..\..\src\include\systypes.h" />
+    <ClInclude Include="..\..\src\include\unique_opaque_ptr.hpp" />
     <ClInclude Include="..\..\src\inst\instAction.h" />
     <ClInclude Include="..\..\src\maptools\GenerateIcons.h" />
     <ClInclude Include="..\..\src\map\mapSupercellVislevelXfer.h" />
@@ -1361,6 +1351,7 @@
     <ClInclude Include="..\..\src\wwii\wwiiOwnershipEnums.h" />
     <ClInclude Include="..\..\src\wwii\wwiiPack.h" />
     <ClInclude Include="..\..\src\wwii\wwiiPermissions.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiPPOLoader.h" />
     <ClInclude Include="..\..\src\wwii\wwiiRoomLists.h" />
     <ClInclude Include="..\..\src\wwii\wwiiServerTrackedObject.h" />
     <ClInclude Include="..\..\src\wwii\wwiiServerTrackedObjectPacker.h" />
@@ -1934,6 +1925,7 @@
     <ClCompile Include="..\..\src\wwii\wwiiHCUnitsCommon.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiLua.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiOpinionPoll.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiPPOLoader.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiServerTrackedObject.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiServerTrackedObjectPacker.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiSquads.cpp" />

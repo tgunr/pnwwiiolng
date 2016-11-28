@@ -11,7 +11,7 @@
 #include "mem/mem.h"
 #include <map>
 
-#if platBuild != TEUL_SERVER && !defined(CMDLINE_CLIENT)
+#if platBuild != BUILD_SERVER
 #include "pi/pi.h"
 #endif
 
@@ -23,7 +23,7 @@
 #include "weap/weapList.h"
 #include "teul/teulKit.h"
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	#include "fio/fioDefs.h"
 	#include "fio/fiod.h"
 	#include "str/stringLib.h"
@@ -46,7 +46,7 @@ static bool _fillFacility(SINT32 numArgs, FUNCARGS* args);
 static bool _fillDepotLink(SINT32 numArgs, FUNCARGS* args);
 static bool _fillCpObject(SINT32 numArgss, FUNCARGS* args);
 
-typedef std::map<const std::string, void*> ObjMap;
+using ObjMap = std::map<const std::string, void*>;
 
 struct SECTION_HEADER
 {
@@ -67,7 +67,7 @@ static PARSE_CALLBACK	_stratCallbacks[] = {{"cp",			_fillCp}
 											,{"depot_link",	_fillDepotLink}
 											,{"",			nullptr}};
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 static bool doNothing(SINT32 numArgss, FUNCARGS* args) { return true; }
 
 static PARSE_CALLBACK  blank[]={{"backdrop",				doNothing},
@@ -107,11 +107,11 @@ static PARSE_CALLBACK  blank[]={{"backdrop",				doNothing},
 static UINT32 worFileLineNum;
 static char _fileName[PN_MAX_PATH];
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 extern SINT32 LoadingScreen;
 #endif
 
-void parseWorKill(void)
+void parseWorKill()
 {
 	for(UINT32 i = 0; _stratSections[i].name[0] != 0;i++)
 	{
@@ -160,45 +160,48 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 	atexit(parseWorKill);
 
 #ifndef VALIDATOR
- #if platBuild == TEUL_SERVER
+ #if platBuild == BUILD_SERVER
 	if ( !weapHasInitialized() && !weapListInit(cv_thblitzPath.GetString()) )
  #else
 	if ( !weapListInit("th_blitz/weapon") )
- #endif // TEUL_SERVER
+ #endif // BUILD_SERVER
 	{
-#if platBuild != TEUL_SERVER && !defined(CMDLINE_CLIENT)
+#if platBuild != BUILD_SERVER
 		piExitProgram(_FL,"Weapon Lists did not initialize");
-#endif
+#else
 		DEBUG_FATAL("WEAPON_LISTS DID NOT INITIALIZE!!!");
-		return false;
+#endif
 	}
 #endif //VALIDATOR
 
-	strncpy(_fileName, levelfile, PN_MAX_PATH);
+	strsafecpy(_fileName, levelfile);
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	world = blank;
 #endif
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 	LoadingScreen = 1;
 #endif
 
 	return parseFile(_fileName, _stratCallbacks, world, &worFileLineNum);
 }
 
-static void _copyObjName(const char* sourceName, char* destName)
+template<size_t DestSize>
+static void _copyObjName(const char* sourceName, char (&destName)[DestSize])
 {
-	// If there is a directory separator, advance past it.
-	const char* p = strrchr(sourceName, '\\');
-	if ( p != nullptr )
-		sourceName = ++p;
-
-	// Trim off any trailing extension
-	p = strrchr(sourceName, '.');
-	size_t copyLen = (p) ? (p - sourceName) : MAX_OBJNAME_LENGTH;
-	strncpy(destName, sourceName, copyLen);
-	destName[copyLen] = 0;
+    std::string realSourceName = sourceName;
+	// the name of an object is basically the filename with the extension
+	// and path removed, so we need to check for and strip those.
+	auto pos = realSourceName.find_last_of('\\');
+	if (pos != std::string::npos)
+		realSourceName.erase(0, pos + 1);
+	pos = realSourceName.find_last_of('.');
+	if (pos != std::string::npos)
+		realSourceName.erase(pos);
+    assert(realSourceName.length() > 0 && "empty filename or filename ends with '\\'");
+	assert(realSourceName.length() < MAX_OBJNAME_LENGTH - 1 && "filename too long" );
+    strsafecpy(destName, realSourceName.c_str());
 }
 
 template<typename _Type>
@@ -365,7 +368,7 @@ WEAPON_SPEC spec;
 
 	// Some mechanism may need to be used for the 64 bit ASCII to 64 bit integer conversion.
 	// The atoll function is not supported on the PC; however, _atoi64 is supported.
-#ifndef FRONT_END // max damage is not used on front end anyway
+#if platBuild == BUILD_SERVER // max damage is not used on front end anyway
 	thisParam->maxdamage		= strtoull(args[MAX_LM_ARG+0].svalue, nullptr, 10);
 #endif
 	thisParam->rpsrepair		= args[MAX_LM_ARG+1].dvalue;

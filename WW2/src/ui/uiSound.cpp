@@ -16,7 +16,7 @@ struct UiSounds
     UiSounds* next;
     UiSounds* prev;
 
-    snSoundPtr s;
+    snSound* s;
 
     SINT32 ID;
 	SCHAR callback[32];

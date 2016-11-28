@@ -75,7 +75,7 @@ ArenaDescription::_unpack(ACTION_OBJECT* const a)
 }
 
 SINT32
-ArenaDescription::packer(LOGICAL mode, ACTION_OBJECT* a)
+ArenaDescription::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	if ( mode == TEUL_PACK )
 		return _pack(a);

@@ -321,20 +321,17 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 							{
 								case ML_COMPONENT_AIRFOIL:
 										CurrentComponent->SpecialData = memAlloc(sizeof(mlAirfoilComponentData));
-										memset(CurrentComponent->SpecialData, 0, sizeof(mlAirfoilComponentData));
 									break;
 
 								case ML_COMPONENT_ENGINE:
 										CurrentComponent->SpecialData = memAlloc(sizeof(mlEngineComponentData));
-										memset(CurrentComponent->SpecialData, 0, sizeof(mlEngineComponentData));
 									break;
 
 								case ML_COMPONENT_GEAR:
 										CurrentComponent->SpecialData = memAlloc(sizeof(mlGearComponentData));
-										memset(CurrentComponent->SpecialData, 0, sizeof(mlGearComponentData));
 									break;
 								case ML_COMPONENT_WEAPONMOUNT:
-										CurrentComponent->SpecialData = new mlWeaponMount;//memAlloc(sizeof(mlWeaponMount));
+										CurrentComponent->SpecialData = new mlWeaponMount{};//memAlloc(sizeof(mlWeaponMount));
 //										memset(CurrentComponent->SpecialData, 0, sizeof(mlWeaponMount));
 										((mlWeaponMount*)CurrentComponent->SpecialData)->MinConvergence = 50.0f;
 //										hackAddProtectedBlock(CurrentComponent->SpecialData,
@@ -534,14 +531,14 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 					{
 						if(!CurrentComponent->VisDamage[i][0])
 						{
-							strncpy(CurrentComponent->VisDamage[i], (char*)VarContents, 31);
+							strsafecpy(CurrentComponent->VisDamage[i], (char*)VarContents);
 							break;
 						}
 					}
 				}
 				break;
 				case ML_COMPONENT_VARNAME_VISDAMAGE_PARENT:
-					strncpy(CurrentComponent->VisDamageParent, (char*)VarContents, 31);
+					strsafecpy(CurrentComponent->VisDamageParent, (char*)VarContents);
 				break;
 				case ML_COMPONENT_VARNAME_DAMAGELEVELFAIL:
 					CurrentComponent->DamageLevelFail = atof((char*)VarContents);

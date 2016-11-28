@@ -1,6 +1,0 @@
-#pragma once
-// String description of the build repository versions
-#define  FROM_SUBVERSION 1
-#undef FROM_MERCURIAL
-#define REPOSITORY_INFO "r${REPO_WC_REVISION}"
-

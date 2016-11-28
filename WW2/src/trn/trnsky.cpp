@@ -79,14 +79,14 @@ static float rainfogclip = 1.0f;
 
 static piVECTOR		_StarField[NUM_STARS];
 
-static LOGICAL _UpdateSunLight(LIGHT* light, const TERRAINSKY* s);
-static LOGICAL _UpdateMoonLight(LIGHT* light, const TERRAINSKY* s);
-static UINT32 _InitSun(void);
-static UINT32 _InitMoon(void);
-static UINT32 _UpdateFogSphere(void);
+static void _UpdateSunLight(LIGHT* light, const TERRAINSKY* s);
+static void _UpdateMoonLight(LIGHT* light, const TERRAINSKY* s);
+static UINT32 _InitSun();
+static UINT32 _InitMoon();
+static void _UpdateFogSphere();
 static UINT32 _ColorObject(OBJECT * Object,UINT32 Color);
 static UINT32 _ColorSubObject(OBJECT * Object,UINT32 Color);
-static UINT32 _DrawStarsDeprecated(void);
+static UINT32 _DrawStarsDeprecated();
 
 static bool _moonfirsttime = true;
 static bool _sunfirsttime = true;
@@ -719,7 +719,7 @@ static inline float Interpolate(float fStart, float fEnd, float fPercent)
 	return fStart + (fEnd - fStart) * fPercent;
 }
 
-void computeFlareParameters(void)
+void computeFlareParameters()
 {
     // project the sun to the window
     Vec4f pos;
@@ -804,7 +804,7 @@ FLOAT32 trnskyGetAfterBright()
 }
 #endif
 
-static LOGICAL FogUpdate(void)
+static void _FogUpdate()
 {
 	int j, num;
 
@@ -819,11 +819,9 @@ static LOGICAL FogUpdate(void)
 	}
 
 	num = sky->numverts;
-
-	return(TRUE);
 }
 
-LOGICAL trnskyUpdate(void)
+LOGICAL trnskyUpdate()
 {
 SINT32		paints;
 piVECTOR	pos, rot;
@@ -1188,7 +1186,7 @@ void trnskyDraw()
     }
 }
 
-LOGICAL trnskyDrawDeprecated(void)
+LOGICAL trnskyDrawDeprecated()
 {
     if(gCustomTerrain)
     {
@@ -1527,7 +1525,7 @@ LOGICAL trnskyDrawDeprecated(void)
 }
 
 #if USE_STATESET
-static UINT32 _DrawStarsDeprecated(void)
+static UINT32 _DrawStarsDeprecated()
 {
 	static piLVERTEX Vertex[NUM_STARS];
 	UINT32		i, num;
@@ -1604,7 +1602,7 @@ static UINT32 _DrawStarsDeprecated(void)
 	return 0;
 }
 #else
-static UINT32 _DrawStarsDeprecated(void)
+static UINT32 _DrawStarsDeprecated()
 {
 	static piLVERTEX	Vertex[NUM_STARS];
 	UINT32		i, num;
@@ -1697,7 +1695,7 @@ static UINT32 _DrawStarsDeprecated(void)
 
 extern void LensFlareKill();
 
-void trnskyKill(void)
+void trnskyKill()
 {
     LensFlareKill();
 
@@ -1739,7 +1737,7 @@ void trnskyKill(void)
     oglFreeMipTextures(skyboxtextures[SKY_TOP]);
 }
 
-static UINT32 _InitSun(void)
+static UINT32 _InitSun()
 {
 LIGHT Light;
 
@@ -1785,12 +1783,12 @@ LIGHT Light;
 	return 0;
 }
 
-LIGHT* trnskyGetSunSource(void)
+LIGHT* trnskyGetSunSource()
 {
-	return(_SunLight);
+	return _SunLight;
 }
 
-static UINT32 _InitMoon(void)
+static UINT32 _InitMoon()
 {
     TERRAINSKY* s = trndataGetSkyData(_setting);
 
@@ -1836,7 +1834,7 @@ static UINT32 _InitMoon(void)
 	return 0;
 }
 
-LIGHT* trnskyGetMoonSource(void)
+LIGHT* trnskyGetMoonSource()
 {
 	return(_MoonLight);
 }
@@ -1908,16 +1906,16 @@ static void InterpolateIfNecessary(TERRAINSKY& c)
     }
 }
 
-static LOGICAL _UpdateSunLight(LIGHT* light, const TERRAINSKY* s)
+static void _UpdateSunLight(LIGHT* light, const TERRAINSKY* s)
 {
-UINT32 TimeOfDay;
-FLOAT32 Angle;
-piVECTOR Vec, Dir;
-FLOAT32 TempNum;
-FLOAT32 Red,Green,Blue,Alpha;
-UINT32 Color;
-FLOAT64VECTOR WorldOriginOffset;
-FLOAT32 PlayerSunDotProduct;
+	UINT32 TimeOfDay;
+	FLOAT32 Angle;
+	piVECTOR Vec, Dir;
+	FLOAT32 TempNum;
+	FLOAT32 Red,Green,Blue,Alpha;
+	UINT32 Color;
+	FLOAT64VECTOR WorldOriginOffset;
+	FLOAT32 PlayerSunDotProduct;
 
 #define FADE_TIME   30000
 
@@ -1942,41 +1940,6 @@ FLOAT32 PlayerSunDotProduct;
 	Vec.z = 1.0;
 
 	TempNum = mathVectDotProduct(&Vec,&Dir);
-
-#if(0)
-	// The Foliage material ambient color must be synchronized to the sun's angle in the sky.
-	// This causes the tree line objects to display properly. The 2X multiplier was used
-	// because the noon lighting of the objects was insufficient (this is related to the
-	// ambient color equation used by DirectX (and OpenGL, I guess?).
-	piGetMaterials(&lpmat);
-	lpmat = &lpmat[FoliageMatId];
-	Temp = -TempNum;
-	if (Temp < 0.0f)
-	{
-		Temp = 0.0f;
-	}
-
-    lpmat->material.ambient.r = 2.0f * (Temp + s->_skynightambient.r * colorONEOVER255);
-
-    if (lpmat->material.ambient.r > 2.0f)
-	{
-		lpmat->material.ambient.r = 2.0f;
-	}
-
-    lpmat->material.ambient.g = 2.0f * (Temp + s->_skynightambient.g * colorONEOVER255);
-
-    if (lpmat->material.ambient.g > 2.0f)
-	{
-		lpmat->material.ambient.g = 2.0f;
-	}
-
-    lpmat->material.ambient.b = 2.0f * (Temp + s->_skynightambient.b * colorONEOVER255);
-
-	if (lpmat->material.ambient.b > 2.0f)
-	{
-		lpmat->material.ambient.b = 2.0f;
-	}
-#endif
 
 	Angle = -(FLOAT32)mlRAD_TO_DEG(asin(TempNum));
 	_SunAngle = Angle;
@@ -2346,12 +2309,7 @@ FLOAT32 PlayerSunDotProduct;
 
 	_ColorObject(sky,Color);
 
-	if (!FogUpdate())
-	{
-		return(FALSE);
-	}
-
-	return TRUE;
+	_FogUpdate();
 }
 
 static void _resetmoon(LIGHT* light)
@@ -2369,12 +2327,12 @@ static void _resetmoon(LIGHT* light)
     light->light.dvFalloff = 1.0f;
 }
 
-static LOGICAL _UpdateMoonLight(LIGHT* light, const TERRAINSKY* s)
+static void _UpdateMoonLight(LIGHT* light, const TERRAINSKY* s)
 {
-UINT32 TimeOfDay;
-FLOAT32 Angle;
-piVECTOR Vec, Dir;
-FLOAT32 TempNum;
+	UINT32 TimeOfDay;
+	FLOAT32 Angle;
+	piVECTOR Vec, Dir;
+	FLOAT32 TempNum;
 
 	trnTODGetTimeOfDay(&TimeOfDay);
 
@@ -2505,8 +2463,6 @@ FLOAT32 TempNum;
 	}
 
     obdliteSetDynaLite(light);
-
-	return TRUE;
 }
 
 static UINT32 _ColorObject(OBJECT * Object,UINT32 Color)
@@ -2663,16 +2619,16 @@ SINT32 trnskyGetFogOption()
     return _fogoption;
 }
 
-UINT32 _UpdateFogSphere(void)
+void _UpdateFogSphere()
 {
-FLOAT32 Alt, AltStep, InvFactor;
-UINT32 Poly;
-piVECTOR Pos;
-FLOAT32 FogStart,FogEnd;
-FLOAT32 ScaleFactor;
-FLOAT32 ZBufferNearVal;
-FLOAT32 FogScaleFactor;
-UINT32 TempNum;
+	FLOAT32 Alt, AltStep, InvFactor;
+	UINT32 Poly;
+	piVECTOR Pos;
+	FLOAT32 FogStart,FogEnd;
+	FLOAT32 ScaleFactor;
+	FLOAT32 ZBufferNearVal;
+	FLOAT32 FogScaleFactor;
+	UINT32 TempNum;
 
 	Alt = -playpos.z;
 
@@ -2693,11 +2649,11 @@ UINT32 TempNum;
         if(v)
         {
             static WEAPON_SPEC spec = NULL_WEAP_SPEC;
-            static LOGICAL firsttime = 1;
+            static bool firsttime = 1;
 
             if(firsttime)
             {
-                firsttime = 0;
+                firsttime = false;
                 spec = weapFindClass("sea");
             }
 
@@ -2823,12 +2779,7 @@ UINT32 TempNum;
 
 
 	// get the lower part of the sky hemisphere to fade into fog color
-	if (!FogUpdate())
-	{
-		return(FALSE);
-	}
-
-	return 0;
+	_FogUpdate();
 }
 
 void trnskyGetFogDensity(FLOAT32& start, FLOAT32& end)

@@ -46,8 +46,8 @@ enum
 
 	};
 
-	extern LOGICAL rnvisInit(void);
-	extern void rnvisKill(void);
+	extern LOGICAL rnvisInit();
+	extern void rnvisKill();
 	extern void rnvisCreatePlane(piVECTOR* p0, piVECTOR* p1, piVECTOR* p2, PLANE* plane);
 	extern void rnvisSetupClipPlanes(bool force = false);
     extern void rnvisSetupFrustum();

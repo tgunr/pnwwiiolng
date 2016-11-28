@@ -14,7 +14,7 @@
 #include "auth/authTypes.h"
 #include "auth/authDispatch.h"
 
-SINT32 authPackAPP_FILE_CHECK(LOGICAL mode, UCHAR* data, SINT32 offset, APP_FILE_CHECK* request, SINT32 /*size*/)
+SINT32 authPackAPP_FILE_CHECK(PackMode mode, UCHAR* data, SINT32 offset, APP_FILE_CHECK* request, SINT32 /*size*/)
 {
 	if (PN_UNLIKELY(request == nullptr))
 		return 0;
@@ -32,7 +32,7 @@ SINT32 authPackAPP_FILE_CHECK(LOGICAL mode, UCHAR* data, SINT32 offset, APP_FILE
 }
 
 SINT32
-authPackARENA_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, ARENA_REQ* request, SINT32 /*size*/)
+authPackARENA_REQ(PackMode mode, UCHAR* data, SINT32 offset, ARENA_REQ* request, SINT32 /*size*/)
 {
 	if (PN_UNLIKELY(request == nullptr))
 		return 0;
@@ -50,7 +50,7 @@ authPackARENA_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, ARENA_REQ* request, 
 	return offset;
 }
 
-SINT32 authPackARENA_REQ2(LOGICAL mode, UCHAR* data, SINT32 offset, ARENA_REQ* request, SINT32 /*size*/)
+SINT32 authPackARENA_REQ2(PackMode mode, UCHAR* data, SINT32 offset, ARENA_REQ* request, SINT32 /*size*/)
 {
 	if (PN_UNLIKELY(request == nullptr))
 		return 0;
@@ -71,7 +71,7 @@ SINT32 authPackARENA_REQ2(LOGICAL mode, UCHAR* data, SINT32 offset, ARENA_REQ* r
 	return offset;
 }
 
-SINT32 authPackAPP_VERIFY(LOGICAL mode, UCHAR* data, SINT32 offset, APP_VERIFY* object, SINT32 /*size*/)
+SINT32 authPackAPP_VERIFY(PackMode mode, UCHAR* data, SINT32 offset, APP_VERIFY* object, SINT32 /*size*/)
 {
 	if (PN_UNLIKELY(object == nullptr))
 		return 0;
@@ -86,7 +86,7 @@ SINT32 authPackAPP_VERIFY(LOGICAL mode, UCHAR* data, SINT32 offset, APP_VERIFY* 
 	return offset;
 }
 
-SINT32 authPackAPP_LAUNCH_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH_REQ* request, SINT32 /*size*/)
+SINT32 authPackAPP_LAUNCH_REQ(PackMode mode, UCHAR* data, SINT32 offset, APP_LAUNCH_REQ* request, SINT32 /*size*/)
 {
 	if (PN_UNLIKELY(request == nullptr))
 		return -EINVAL;
@@ -104,7 +104,7 @@ SINT32 authPackAPP_LAUNCH_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUN
 	offset = teulPackUINT32(mode,data,offset,&request->appVersion,0);
 
 	offset = teulPackSINT32(mode,data,offset,&request->cdKeySize,0);
-	
+
 	// Ugly hack: The size sent by the client can't be trusted; we'll get a
 	// nasty buffer overflow if we use an invalid size. However, always
 	// packing/unpacking MAX_PARAM (as similarly done by the username and
@@ -135,7 +135,7 @@ SINT32 authPackAPP_LAUNCH_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUN
 	return offset;
 }
 
-SINT32 authPackAPP_LAUNCH_REQ2(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH_REQ* request, SINT32 /*size*/)
+SINT32 authPackAPP_LAUNCH_REQ2(PackMode mode, UCHAR* data, SINT32 offset, APP_LAUNCH_REQ* request, SINT32 /*size*/)
 {
 	if (PN_UNLIKELY(request == nullptr))
 		return -EINVAL;
@@ -173,7 +173,7 @@ SINT32 authPackAPP_LAUNCH_REQ2(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAU
 	return offset;
 }
 
-SINT32 authPackAPP_LAUNCH(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH* object, SINT32 /*size*/)
+SINT32 authPackAPP_LAUNCH(PackMode mode, UCHAR* data, SINT32 offset, APP_LAUNCH* object, SINT32 /*size*/)
 {
 	if (PN_UNLIKELY(object == nullptr))
 		return -EINVAL;
@@ -197,9 +197,9 @@ SINT32 authPackAPP_LAUNCH(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH* 
 	return offset;
 }
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 
-SINT32 authPackSERVER_LOAD(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_SERVER_LOAD* object, SINT32 /*size*/)
+SINT32 authPackSERVER_LOAD(PackMode mode, UCHAR* data, SINT32 offset, AUTH_SERVER_LOAD* object, SINT32 /*size*/)
 {
 	if (PN_UNLIKELY(object == nullptr))
 		return -EINVAL;
@@ -212,17 +212,17 @@ SINT32 authPackSERVER_LOAD(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_SERVER
 }
 
 void
-Auth::Dispatch::packer(unsigned int mode, ACTION_OBJECT* a)
+Auth::Dispatch::packer(const unsigned int mode, ACTION_OBJECT* const a)
 {
 	a->packer(mode, &m_customerID, 0);
-	a->packBytes(mode, m_callsign, sizeof(m_callsign));
+	a->bytePacker(mode, m_callsign, sizeof(m_callsign));
 	a->packer(mode, &m_clientIP, 0);
 	a->packer(mode, &m_OTP, 0);
 	a->packer(mode, &m_appVersion, 0);
 	a->packer(mode, &m_platform, 0);
 }
 
-SINT32 authPackGAME_INIT(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_GAME_INIT*init, SINT32 /*size*/)
+SINT32 authPackGAME_INIT(PackMode mode, UCHAR* data, SINT32 offset, AUTH_GAME_INIT*init, SINT32 /*size*/)
 {
 	if (PN_UNLIKELY(init == nullptr))
 		return 0;
@@ -241,13 +241,13 @@ SINT32 authPackGAME_INIT(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_GAME_INI
 }
 
 //This function packs/unpacks the hello acknowledgment
-SINT32 authPackGAME_ACK(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_GAME_ACK* object, SINT32 /*size*/)
+SINT32 authPackGAME_ACK(PackMode mode, UCHAR* data, SINT32 offset, AUTH_GAME_ACK* object, SINT32 /*size*/)
 {
 	return teulPackUINT32(mode,data,offset,&(object->gotcha),0);
 }
 
 //Packs the init login message
-SINT32 authPackClearLoginTable(LOGICAL mode, UCHAR* data, SINT32 offset, CLEAR_LOGIN_TABLE* object, SINT32 /*size*/)
+SINT32 authPackClearLoginTable(PackMode mode, UCHAR* data, SINT32 offset, CLEAR_LOGIN_TABLE* object, SINT32 /*size*/)
 {
 	return teulPackUINT32(mode,data,offset,&(object->init),0);
 }

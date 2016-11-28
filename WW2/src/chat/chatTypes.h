@@ -33,6 +33,6 @@ struct BANDWIDTH_NOTICE
 	bool		display;
 };
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 #include "chat/chatServerTypes.h"
 #endif

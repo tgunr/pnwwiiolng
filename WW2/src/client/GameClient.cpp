@@ -67,6 +67,7 @@
 #include "omg/omgChat.hxx"
 #include "strt/strtEventTypes.h"
 #include "strt/strtCPFlags.h"
+#include "wwii/wwiiServerTrackedObject.h"
 
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags);
 
@@ -74,13 +75,16 @@ using namespace ww2;
 
 static GameClient* _playerclient;
 
+extern PPOSpecLoader specLoader;
+extern SINT32 globalMSCoolDownEnd;
+
 /************************************************************************************************
 	GameClientLogin
 	throws ClientNetError
 *************************************************************************************************/
 
-int GameClientLogin(unsigned int host, int playerID, int otp,
-							unsigned int appVersion, short port)
+int GameClientLogin(unsigned int host, playerid_t playerID, UINT32 otp,
+							unsigned int appVersion, UINT16 port)
 {
 #if platOS == OS_MACOS
 	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
@@ -1142,23 +1146,18 @@ void GameClient::ProcessMissionStatus(const Chat::MissionStatus* ms)
 
 	SINT32 remaining = SINT32(ms->fru().cooldownRemaining());
 
-	PPOSpec* fruSpec = fpPPOGetSpec(FRU_INDEX);
-	if(!fruSpec) return;
-
 	if(remaining > 0)
 	{
-		fruSpec->coolDownEnd = frametime + remaining;
-
 		// now see if we are currently building an fru
 		// interrupt if we are because there was a mission state change
-		PlayerPlacedObject* ppo = fpPPOGet();
-
-		if(ppo && ppo->spec->id == FRU_INDEX)
+        PPOSpec *spec = specLoader.ppoGetSpec(ms->fru().subtype.get());
+		if(spec && spec->stotype == ServerTrackedObject::_UMS)
 		{
-			if(ppo->buildAt > 0)
-				ppo->Interrupt();
+            globalMSCoolDownEnd = frametime + remaining;
 
-			uiGameEvent(GAMEEVENT_PPO, 1, "ppos.fru.built");
+            PlayerPlacedObject* ppo = fpPPOGet();
+			if(ppo && ppo->buildAt > 0)
+				ppo->Interrupt();
 		}
 	}
 }
@@ -1489,7 +1488,7 @@ void GameClient::ProcessChatWho(int type, const Chat::Who& who)
 		}
 		if ( who.extendedInfo() && who.spawned() )
 		{
-			StratDB::StratObject* so = StratDB::FindStratObject((sdm_full_obj_id&)who.nearCP());
+			StratDB::StratObject* so = StratDB::FindStratObject(who.nearCP());
 			if ( so != nullptr )
 			{
 				description += L" ";
@@ -1786,9 +1785,9 @@ bool GameClient::ReceiveServerTrackedObject(int type, ACTION_OBJECT* a)
 
 static void _editCallback(JSContext* ctx, UINT32 argc, jsval* argv)
 {
-    /* 
+    /*
      TBD - I expect something was intended here, but nothing is done currently.
-     
+
 	const char* type = (argc > 0) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[0])) : nullptr;
 	const char* value = (argc > 1) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[1])) : nullptr;
 
@@ -1809,7 +1808,7 @@ void GameClient::Edit(const char* type, const char* title, const char* value)
 //////////////////////////////////////////////////////////////////////
 // Deploy a HCUnit to a CP
 
-void HCUnit::setHomeCPID(const FULL_OBJ_ID& newHomeID)
+void HCUnit::setHomeCPID(const FULL_OBJ_ID newHomeID)
 {
 	// Is this actually a change?
 	if ( m_homeCPID == newHomeID)

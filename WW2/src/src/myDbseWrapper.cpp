@@ -10,11 +10,11 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseWrapper.h"
-#include "mem/mem.h"
 #include <mutex>
 #include <mysql.h>
+
+#include "dbse/dbseWrapper.h"
+#include "mem/mem.h"
 #include "wwii/wwiidbConfigVars.h"
 #include "wwii/wwiiThreads.h"
 
@@ -22,11 +22,51 @@
 
 extern ConfigBool cv_mysqlCompression;
 
+static std::atomic_bool s_dbInitialized;
+static const char* s_dbAddress;
+static unsigned short s_dbPort;
+static const char* s_dbSchema;
+static const char* s_dbUser;
+static const char* s_dbPassword;
+
+DBHANDLE dbh;
+
+//////////////////////////////////////////////////////////////////////
+// Each process communicates with one database.
+
+void
+dbseSetDatabase(const ConfigAddr& addr, const ConfigAddr& port, const ConfigStr& schema, const ConfigStr& user, const ConfigStr& password)
+{
+	static std::mutex mutex;
+	std::lock_guard<std::mutex> lock(mutex);
+	if (s_dbInitialized)
+		return;
+
+	UINT32 dbIP = Teul::GetSingleIP(addr.GetString());
+	if ( !dbIP ) {
+		LogAbort("Invalid %s: %s (unable to resolve)",
+					addr.GetEnvVarName(), addr.GetString());
+	}
+
+	dbugLog(_FLD, "Database is %s:%s [%08x] schema:%s user:%s",
+					addr.GetString(), port.GetString(), dbIP,
+					schema.GetString(), user.GetString());
+
+	s_dbAddress = addr.GetString();
+	s_dbPort = (unsigned short)strtoul(port.GetString(), nullptr, 10);
+	s_dbSchema = schema.GetString();
+	s_dbUser = user.GetString();
+	s_dbPassword = password.GetString();
+
+	s_dbInitialized = true;
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // Low-level MySQL connection initialization
 
 static DB::handle_t*
-_doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
+_doMyConnect(bool autoReconnect)
 {
 	// Make sure MySQL is initialized and construct a connection structure.
 	DB::handle_t* tempConn = mysql_init(nullptr);
@@ -41,12 +81,11 @@ _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 	if ( cv_mysqlCompression.GetBool() )
 		flags |= CLIENT_COMPRESS;
 
-	if ( mysql_real_connect(tempConn, connection.host, connection.username, connection.password, connection.dbName, 0, nullptr, flags) == nullptr )
+	if ( mysql_real_connect(tempConn, s_dbAddress, s_dbUser, s_dbPassword, s_dbSchema, s_dbPort, nullptr, flags) == nullptr )
 	{
-		threadLog(_FLA, "mysql_real_connect failed:\nError %u (%s) \n", mysql_errno(tempConn), mysql_error(tempConn));
-		threadLog(_FLA, "using host %s name %s password %s dbname %s"
-						, connection.host, connection.username, connection.password, connection.dbName);
-		return(nullptr);
+		dbugLog(_FLA, "mysql_real_connect failed:\nError %u (%s) \n", mysql_errno(tempConn), mysql_error(tempConn));
+		dbugLog(_FLA, "using host %s:%hu user %s schema %s", s_dbAddress, s_dbPort, s_dbUser, s_dbSchema);
+		return nullptr;
 	}
 
 #if MYSQL_VERSION_ID >= 50003
@@ -55,16 +94,21 @@ _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 	mysql_options(tempConn, MYSQL_OPT_RECONNECT, &reconnect);
 #endif
 
-	if ( mysql_set_character_set(tempConn, "utf8") != 0 )
+	if ( mysql_select_db(tempConn, s_dbSchema) != 0 )
 	{
-		threadLog(_FLA, "set names failed");
+		dbugLog(_FLA, "unable to select schema %s", s_dbSchema);
 		mysql_close(tempConn);
 		return nullptr;
 	}
 
-//	mysql_set_character_set(tempConn, "utf8");
+	if ( mysql_set_character_set(tempConn, "utf8") != 0 )
+	{
+		dbugLog(_FLA, "set names failed");
+		mysql_close(tempConn);
+		return nullptr;
+	}
 
-	return(tempConn);
+	return tempConn;
 }
 
 // ------ Public Functions
@@ -72,26 +116,27 @@ _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 static std::mutex dbconnMutex;
 
 DB::handle_t*
-dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnect)
+dbseGetConnection(bool report, bool autoReconnect)
 {
-    threadLog(_FLD, "Getting thread connection to host '%s' database '%s' user '%s'", connection.host, connection.dbName, connection.username);
-	if ( connection.host[0] == 0 ) return nullptr;
-	if ( connection.dbName[0] == 0 ) return nullptr;
-	if ( connection.username[0] == 0 ) return nullptr;
-	if ( connection.password[0] == 0 ) return nullptr;
+	dbseSetDatabase(cv_wwiiDBAddress, cv_wwiiDBPort, cv_wwiiDBDefaultSchema, cv_wwiiDBUser, cv_wwiiDBPassword);
+	if ( !s_dbAddress[0] || !s_dbPort || !s_dbSchema[0] || !s_dbUser[0] || !s_dbPassword[0] ) {
+		LogAbort("Missing database configuration, can't connect");
+	}
+
+    dbugLog(_FLD, "Getting thread connection to host '%s:%hu' database '%s' user '%s'"
+				, s_dbAddress, s_dbPort, s_dbSchema, s_dbUser);
 
 	DB::handle_t* newConn = nullptr;
 	std::this_thread::sleep_for(std::chrono::microseconds(250));
 	{
 		std::lock_guard<std::mutex> dbconnLock(dbconnMutex);
-		newConn = _doMyConnect(connection, autoReconnect);
+		newConn = _doMyConnect(autoReconnect);
 	}
 
 	if ( report )
 	{
-		threadLog(_FLI, "Connection to host '%s' database '%s' user '%s' password '%s' reconnect '%s' %s."
-						, connection.host, connection.dbName
-						, connection.username, connection.password
+		dbugLog(_FLI, "Connection to host '%s:%hu' database '%s' user '%s' reconnect '%s' %s."
+						, s_dbAddress, s_dbPort, s_dbSchema, s_dbUser
 						, (autoReconnect ? "auto" : "manual")
 						, ((newConn != nullptr) ? "successful" : "FAILED")
 						);
@@ -103,12 +148,12 @@ dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnec
 }
 
 bool
-DBHANDLE::connect(const DBCONNECTION& connection)
+DBHANDLE::connect()
 {
 	assert( m_initialized == false );
 
 	//Initialization stuff;
-	m_conn = dbseGetConnection(connection, true);
+	m_conn = dbseGetConnection(true);
 	if ( nullptr == m_conn )
 		return false;
 

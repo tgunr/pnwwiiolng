@@ -428,7 +428,6 @@ UINT32 mlUpdateWeaponMount(FLOAT64VECTOR* Force, FLOAT64ATT* Torque,
 {
 	mlWeaponMount* Mount;
 	UINT32 MountFiring;
-	UINT32 Position;
 	UINT32 PrimaryTriggerDown, SecondaryTriggerDown;
 	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
 
@@ -446,7 +445,7 @@ UINT32 mlUpdateWeaponMount(FLOAT64VECTOR* Force, FLOAT64ATT* Torque,
 	PrimaryTriggerDown 	= VehicleData->PrimaryTriggerDown;
 	SecondaryTriggerDown= VehicleData->SecondaryTriggerDown;
 
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	*PrimaryIsFiring = *SecondaryIsFiring = 0;
 
@@ -724,8 +723,7 @@ static void _HandlePickle(mlWeaponMount* Mount, UINT32* PrimaryTriggerDown, UINT
 		Mount->PickleMount != 0 &&
 		*PrimaryTriggerDown)
 	{
-		mlGetPrimaryPickleSetting(&Pickle);
-
+		Pickle = mlGetPrimaryPickleSetting();
 		if (Pickle == 0)
 			*PrimaryTriggerDown = 0;
 	}
@@ -734,8 +732,7 @@ static void _HandlePickle(mlWeaponMount* Mount, UINT32* PrimaryTriggerDown, UINT
 		Mount->PickleMount != 0 &&
 		*SecondaryTriggerDown)
 	{
-		mlGetSecondaryPickleSetting(&Pickle);
-
+		Pickle = mlGetSecondaryPickleSetting();
 		if (Pickle == 0)
 			*SecondaryTriggerDown = 0;
 	}
@@ -744,12 +741,10 @@ static void _HandlePickle(mlWeaponMount* Mount, UINT32* PrimaryTriggerDown, UINT
 		Mount->PickleMount != 0 &&
 		(*PrimaryTriggerDown || *SecondaryTriggerDown))
 	{
-		mlGetPrimaryPickleSetting(&Pickle);
-
+		Pickle = mlGetPrimaryPickleSetting();
 		if (Pickle == 0)
 		{
-			mlGetSecondaryPickleSetting(&Pickle);
-
+			Pickle = mlGetSecondaryPickleSetting();
 			if (Pickle == 0)
 			{
 				*PrimaryTriggerDown = 0;

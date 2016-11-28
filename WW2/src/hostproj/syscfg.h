@@ -10,29 +10,17 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "hostproj/config.h"
-
-// Disable dbugWrite in all host processes
-#define NO_DEBUG_WRITE	1
-
-// Legacy definition of platBuild
-#if !defined(platBuild)
-# if defined(AS_SERVER)
-#  define platBuild TEUL_SERVER
-# elif defined(AS_CLIENT)
-#  define platBuild TEUL_CLIENT
-# else
-#  error ("No AS_SERVER or AS_CLIENT definition")
-# endif
-#endif
-
-// Tell FIOD that we need extra help
-#define LIMITED_FIO	1
-
-#include "hostproj/versionNo.h"
-#include "versionNo.h"
-
+#include "config.h"
+#include "hostproj/hostBuildOptions.h"
 #include "include/platforms.h"	// includes precompile_includes.h
+
+
+#define NOGDI
+#define WIN32_LEAN_AND_MEAN
+
+#if platBuild != BUILD_SERVER
+#error "Why are you building the host project without AS_SERVER?"
+#endif
 
 // Maximum number of active local connections allowed
 namespace Teul
@@ -42,12 +30,10 @@ namespace Teul
 }
 
 #include <signal.h>
-//#include <atomic>
 
 #include "inst/instDescriptor.h"
 #include "wwii/wwiiPlayer.h"
 #include "server/serverIndexes.h"
-#include "wwii/wwiiIRC.h"
 #include "server/serverPeers.h"
 #include "wwii/wwiiServerTypeEnums.h"
 #include "teul/teulConfigVar.h"

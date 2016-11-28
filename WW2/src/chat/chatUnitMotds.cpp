@@ -10,7 +10,7 @@
 
 #include "wwii/wwiiHash.h"
 
-typedef std::unordered_map<UINT32,std::string> MOTD_INDEX;
+using MOTD_INDEX = std::unordered_map<UINT32,std::string>;
 static MOTD_INDEX motds;
 
 //////////////////////////////////////////////////////////////////////

@@ -13,7 +13,7 @@ namespace Server
 {
 	class Transfer
 	{
-		public: using xferid_t = unsigned long long;
+		public: using xferid_t = UINT64;
 		public: enum class XferReason : UINT32 { Login, Update, Relogin, Reassign, Mirror, Exit, MaxReasons };
 
 		private: static xferid_t g_xferID;
@@ -31,7 +31,7 @@ namespace Server
 			, m_timestamp(teulClock64)
 			{}
 
-		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a)
+		public: virtual void packer(PackMode mode, ACTION_OBJECT* const a)
 		{
 			a->packer(mode, m_xferID);
 			a->packer(mode, (UINT32*)&m_reason, 8);
@@ -67,11 +67,11 @@ namespace Server
 			TeulTimeMS			m_timestamp;
 
 		public:
-			const xferid_t&		xferID() const { return m_xferID; }
-			XferReason			reason() const { return (XferReason)m_reason; }
-			const UINT64&		source() const { return m_source; }
-			const UINT64&		dest() const { return m_dest; }
-			const TeulTimeMS&	timestamp() const { return m_timestamp; }
+			xferid_t		xferID() const { return m_xferID; }
+			XferReason		reason() const { return (XferReason)m_reason; }
+			UINT64			source() const { return m_source; }
+			UINT64			dest() const { return m_dest; }
+			TeulTimeMS		timestamp() const { return m_timestamp; }
 	};
 }
 

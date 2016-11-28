@@ -32,29 +32,29 @@ extern SINT32 sdmOpenFile(const SCHAR* path,UINT16 mode);
 
 extern const struct STRT_DTL_HEADER& sdmGetDtlHeader();
 
-extern UINT16 sdmGetNumCP(void);
-extern CP* sdmGetNextCP(void);
-extern CP* sdmGetCPArray(void);
+extern UINT16 sdmGetNumCP();
+extern CP* sdmGetNextCP();
+extern CP* sdmGetCPArray();
 
-extern UINT16 sdmGetNumFACILITY(void);
-extern FACILITY* sdmGetNextFACILITY(void);
-extern FACILITY* sdmGetFACILITYArray(void);
+extern UINT16 sdmGetNumFACILITY();
+extern FACILITY* sdmGetNextFACILITY();
+extern FACILITY* sdmGetFACILITYArray();
 
-extern UINT16 sdmGetNumBUILDING(void);
-extern BUILDING* sdmGetNextBUILDING(void);
-extern BUILDING* sdmGetBUILDINGArray(void);
+extern UINT16 sdmGetNumBUILDING();
+extern BUILDING* sdmGetNextBUILDING();
+extern BUILDING* sdmGetBUILDINGArray();
 
-extern UINT16 sdmGetNumDEPOT_LINK(void);
-extern DEPOT_LINK* sdmGetNextDEPOT_LINK(void);
+extern UINT16 sdmGetNumDEPOT_LINK();
+extern DEPOT_LINK* sdmGetNextDEPOT_LINK();
 
-extern UINT16 sdmGetNumWAYPOINT(void);
-extern WAYPOINT* sdmGetNextWAYPOINT(void);
+extern UINT16 sdmGetNumWAYPOINT();
+extern WAYPOINT* sdmGetNextWAYPOINT();
 
-extern UINT32 sdmGetTotalStratObjects(void);
-extern UINT32 sdmGetMaxStratId(void);
+extern UINT32 sdmGetTotalStratObjects();
+extern UINT32 sdmGetMaxStratId();
 
 //closes file and frees all memory used by parser
-extern SINT32 sdmCloseFile(void);
+extern void sdmCloseFile();
 
 // Clean up after the SDM routines and exit it
 // there were any cumulatively fatal errors.

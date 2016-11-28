@@ -14,14 +14,14 @@
 #define MAX_IAC_CODES 256
 #define DEF_MAX_KEY_INPUT   128
 
-static LOGICAL				trackIRinit;
+static bool					trackIRinit;
 extern HWND					myhwnd;
 
-static LOGICAL				g_lastBuffer[NUM_IAC_QUEUE_ENTRIES];
+static bool					g_lastBuffer[NUM_IAC_QUEUE_ENTRIES];
 static SINT32				g_xlastaxisms;
 static SINT32				g_ylastaxisms;
 static SINT32				g_zlastaxisms;
-static LOGICAL				g_lastbuttonsms[4];
+static bool					g_lastbuttonsms[4];
 static SINT32				g_xlastposjs[IAC_MAX_JOYSTICKS];
 static SINT32				g_ylastposjs[IAC_MAX_JOYSTICKS];
 static SINT32				g_zlastposjs[IAC_MAX_JOYSTICKS];
@@ -30,7 +30,7 @@ static SINT32				g_ylastrotjs[IAC_MAX_JOYSTICKS];
 static SINT32		 		g_zlastrotjs[IAC_MAX_JOYSTICKS];
 static SINT32				g_lastslider[IAC_MAX_JOYSTICKS][NUM_SLIDERS_PER_JOYSTICK];
 static UINT32				g_lastpov[IAC_MAX_JOYSTICKS][IAC_JOYSTICK_POV_MAX];
-static LOGICAL				g_lastbuttonsjs[IAC_MAX_JOYSTICKS][IAC_JOYSTICK_MAX_BUTTONS];
+static bool					g_lastbuttonsjs[IAC_MAX_JOYSTICKS][IAC_JOYSTICK_MAX_BUTTONS];
 
 static UINT16*				g_di2iac;
 static imap_queue_entry*	g_lpiac;
@@ -56,59 +56,51 @@ static UINT32 IAC_JOYSTICK_POV_N[IAC_MAX_JOYSTICKS][IAC_JOYSTICK_POV_MAX]  =
 	{IAC_JOYSTICK4_POV1_N, IAC_JOYSTICK4_POV2_N, IAC_JOYSTICK4_POV3_N, IAC_JOYSTICK4_POV4_N},
 };
 
-static LOGICAL AddToQueue(UINT32 iac, SINT32 count, LOGICAL state);
-
-#ifndef DEBUG_WW2
-#define IN_WINDOW_MOUSE
-#endif
+static bool AddToQueue(UINT32 iac, SINT32 count, LOGICAL state);
 
 static void InitTrackIR();
 static void GetTrackIRInput();
 
-LOGICAL dimainInit(void)
+LOGICAL dimainInit()
 {
 SINT32 i;
 SINT32 j;
 
 	g_lpiac = (imap_queue_entry*)memAlloc(NUM_IAC_QUEUE_ENTRIES * sizeof(imap_queue_entry));
-
 	if(g_lpiac == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	g_di2iac = (UINT16*)memAlloc(MAX_IAC_CODES * sizeof(UINT16));
-
 	if(g_di2iac == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	g_numentries = 0;
 
 	if(!dipInit())
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	dipSetupKeyboard();
-#ifdef IN_WINDOW_MOUSE
 	dipSetupMouse();
-#endif
 	dipSetupJoystick();
 
 	for(i = 0; i < NUM_IAC_QUEUE_ENTRIES; i++)
 	{
-		g_lastBuffer[i] = 0;
+		g_lastBuffer[i] = false;
 	}
 
 	g_xlastaxisms = 0;
 	g_ylastaxisms = 0;
 	g_zlastaxisms = 0;
-	g_lastbuttonsms[0] = 0;
-	g_lastbuttonsms[1] = 0;
-	g_lastbuttonsms[2] = 0;
-	g_lastbuttonsms[3] = 0;
+	g_lastbuttonsms[0] = false;
+	g_lastbuttonsms[1] = false;
+	g_lastbuttonsms[2] = false;
+	g_lastbuttonsms[3] = false;
 
 	for(i = 0; i < IAC_MAX_JOYSTICKS; i++)
 	{
@@ -128,7 +120,7 @@ SINT32 j;
 	{
 		for(i = 0; i < IAC_JOYSTICK_MAX_BUTTONS; i++)
 		{
-			g_lastbuttonsjs[j][i] = 0;
+			g_lastbuttonsjs[j][i] = false;
 		}
 	}
 
@@ -242,7 +234,7 @@ SINT32 j;
 
     InitTrackIR();
 
-	return(TRUE);
+	return TRUE;
 }
 
 ////////////////////////////////////////
@@ -368,7 +360,7 @@ UINT32 dimainVKToIAC(UINT32 uVK)
     }
 }
 
-void dimainKill(void)
+void dimainKill()
 {
 	if(g_lpiac != nullptr)
 	{
@@ -493,18 +485,18 @@ static void AddTextInput(SINT32 uScanCode, LOGICAL bState)
 }
 ----------------------------------------------------------*/
 
-static LOGICAL AddToQueue(UINT32 iac, SINT32 count, LOGICAL state)
+static bool AddToQueue(UINT32 iac, SINT32 count, LOGICAL state)
 {
 	if(iac == 0)
 	{
 		Write_Debug("IAC was null; skipped");
-		return(FALSE);
+		return false;
 	}
 
 	if(g_numentries >= NUM_IAC_QUEUE_ENTRIES)
 	{
 		Write_Debug("Number of entries in the IAC queue has been exceeded");
-		return(FALSE);
+		return false;
 	}
 
 	TUT_MGR->DoEvent(TUT_EVENT_KEY, &iac, &state, &count);
@@ -514,7 +506,7 @@ static LOGICAL AddToQueue(UINT32 iac, SINT32 count, LOGICAL state)
 	g_lpiac[g_numentries].state = state;
 	g_numentries += 1;
 
-	return(TRUE);
+	return true;
 }
 
 LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
@@ -552,7 +544,7 @@ LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
 			{
 				if(!g_lastBuffer[ofs])
 				{
-					g_lastBuffer[ofs] = TRUE;
+					g_lastBuffer[ofs] = true;
  				    AddToQueue(g_di2iac[ofs], 1, TRUE);
 				}
 			}
@@ -560,7 +552,7 @@ LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
 			{
 				if(g_lastBuffer[ofs])
 				{
-					g_lastBuffer[ofs] = FALSE;
+					g_lastBuffer[ofs] = false;
                     AddToQueue(g_di2iac[ofs], 1, FALSE);
 				}
 			}
@@ -597,7 +589,7 @@ LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
 			{
 				if(!g_lastbuttonsms[i])
 				{
-					g_lastbuttonsms[i] = TRUE;
+					g_lastbuttonsms[i] = true;
 					AddToQueue(IAC_MOUSEBUTTON1 + i, 1, TRUE);
 				}
 			}
@@ -605,7 +597,7 @@ LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
 			{
 				if((g_lastbuttonsms[i]) && !(ms.rgbButtons[i] & 0x80))
 				{
-					g_lastbuttonsms[i] = FALSE;
+					g_lastbuttonsms[i] = false;
 					AddToQueue(IAC_MOUSEBUTTON1 + i, 1, FALSE);
 				}
 			}
@@ -632,7 +624,7 @@ LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
 				{
 					if(!g_lastbuttonsjs[JoystickNumber][count])
 					{
-						g_lastbuttonsjs[JoystickNumber][count] = TRUE;
+						g_lastbuttonsjs[JoystickNumber][count] = true;
 
 						AddToQueue(IAC_JOYSTICK_BUTTON1[JoystickNumber] + count, 1 ,TRUE);
 					}
@@ -641,7 +633,7 @@ LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
 				{
 					if(g_lastbuttonsjs[JoystickNumber][count])
 					{
-						g_lastbuttonsjs[JoystickNumber][count] = FALSE;
+						g_lastbuttonsjs[JoystickNumber][count] = false;
 
 						AddToQueue(IAC_JOYSTICK_BUTTON1[JoystickNumber] + count, 1 ,FALSE);
 					}
@@ -1092,5 +1084,5 @@ static void InitTrackIR()
 	result = NP_StartDataTransmission();
 	if (result != NP_OK) return;
 
-	trackIRinit = TRUE;
+	trackIRinit = true;
 }

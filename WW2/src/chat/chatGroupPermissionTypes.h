@@ -13,7 +13,7 @@
 #include "wwii/wwiiOwnershipEnums.h"
 #include "teul/teulPackers.h"
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 #	include <set>
 #endif
 
@@ -23,7 +23,7 @@ struct ChatPermissions
 	ChatPermissions()
 		: m_permissionMask(0ULL), m_lastModified(0)
 		, m_groupOID(0), m_enabled(false), m_limitSquadRank(0)
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		, m_vehicleGrants()
 #endif
 	{
@@ -37,12 +37,12 @@ struct ChatPermissions
 	RANK_NO			m_limitRank[MAX_BRANCHES];
 	RANK_NO			m_limitSquadRank;
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	using VEHTYPES = std::set<UINT16>;
 	VEHTYPES		m_vehicleGrants;
 #endif
 
-	void packer(LOGICAL mode, ACTION_OBJECT* a)
+	void packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->packer(mode, &m_permissionMask, 0);
 		a->packer(mode, &m_limitRank[BRANCH_LAND], 0);

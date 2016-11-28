@@ -29,9 +29,6 @@
 #include "teul/teulPacket.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiNetPorts.h"
-#include "dbse/dbseConnection.h"
-
-DBCONNECTION dbConnection;
 
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -495,9 +492,11 @@ _recvLuaPacket(ACTION_OBJECT* const a)
 static SINT32
 _registerCallbacks()
 {
-	BEGIN_CALLBACK_REGISTRATION((UCHAR)Host::CallbackX)
+	BEGIN_CALLBACK_REGISTRATION(Host::CallbackX)
+	{
 		REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLuaPacket);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Host::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -583,7 +582,7 @@ main(int argc, char* argv[])
 		_printf("Initializing teulTransport\n");
 
 	Teul::SetAppName("luaClient");
-	teulInitTransport(LOG_TO_FILE, "./luaClient", _teulErrorFn, nullptr);
+	teulInitTransport(LogMode::TO_FILE, "./luaClient", _teulErrorFn, nullptr);
 	dbugSetLogLevel(Debug::ERR_WARN);
 
 	_registerCallbacks();

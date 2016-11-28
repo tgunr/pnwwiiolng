@@ -40,7 +40,7 @@
 
 #ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
-    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
+    #define DEF_ERR_FLAGS STD_ERR  // LOG_ALL_TO_STDERR
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
     #define DEF_ERR_FLAGS STD_ERR
@@ -127,7 +127,7 @@ static bool readDBRequired = false;
 static bool _running = true;
 
 #include <map>
-typedef std::map<UINT32, GAME*> GameIndex;
+using GameIndex = std::map<UINT32, GAME*>;
 static GameIndex gameIndex;
 
 //////////////////////////////////////////////////////////////////////
@@ -181,7 +181,7 @@ GAME::GAME()
 	,	m_lastIRCUsers(0)
 	,	m_lastIRCReport(0)
 {
-	strcpy(description, "UNKNOWN GAME");
+	strsafecpy(description, "UNKNOWN GAME");
 }
 
 GAME::GAME(const AUTH_GAME_INIT& gInit)
@@ -337,18 +337,18 @@ _authenticationErrorString(WEB_ERR errorType)
 {
 	switch(errorType)
 	{
-		case WEB_ERR_FULL: return "full"; break;
-		case WEB_ERR_LOGIN: return "login"; break;
-		case WEB_ERR_GAME: return "game"; break;
-		case WEB_ERR_INSTALL: return "install"; break;
-		case WEB_ERR_LOCKED: return "locked"; break;
-		case WEB_ERR_INTERNAL: return "internal"; break;
-		case WEB_ERR_USER: return "invuser"; break;
-		case WEB_ERR_PASSWORD: return "invpass"; break;
-		case WEB_ERR_SUB: return "inactive"; break;
-		case WEB_ERR_NONE: return ""; break;
-		case WEB_ERR_AUTH: return "auth"; break;
-		default: return "unknown"; break;
+		case WEB_ERR_FULL: return "full";
+		case WEB_ERR_LOGIN: return "login";
+		case WEB_ERR_GAME: return "game";
+		case WEB_ERR_INSTALL: return "install";
+		case WEB_ERR_LOCKED: return "locked";
+		case WEB_ERR_INTERNAL: return "internal";
+		case WEB_ERR_USER: return "invuser";
+		case WEB_ERR_PASSWORD: return "invpass";
+		case WEB_ERR_SUB: return "inactive";
+		case WEB_ERR_NONE: return "";
+		case WEB_ERR_AUTH: return "auth";
+		default: return "unknown";
 	}
 }
 
@@ -689,7 +689,7 @@ _sendDispatch(Auth::Dispatch& dispatch, UINT32 otp, UINT32 clientIP, SINT32 teul
 					);
 
 	if ( teulSend(teulIndex, authDISPATCH, &dispatch) > 0)
-		dbugLog(_FLNB," sent otp %u to game on %d", dispatch.m_OTP, teulIndex);
+		dbugLog(_FLN," sent otp %u to game on %d", dispatch.m_OTP, teulIndex);
 	else
 		dbugLog(_FLA,"something went wrong with sending dispatch to game");
 }
@@ -856,7 +856,6 @@ _runHost()
 #endif // USE_LOGIN_QUEUES
 
 		threadsCallNextCallback();
-		threadsLogging();
 	}
 }
 
@@ -885,7 +884,7 @@ main(int argc, const char* argv[])
 	authInitDB();
 
     dbugLog(_FLN, "setting up database threads");
-    
+
 	threadsSetup();
 
 	dbugLog(_FLN,"installing callbacks");
@@ -943,16 +942,12 @@ static const char* _describeLock(SINT32 lock)
 	case AL_LOADING:
 	case AL_INITIALIZING:
 		return "Starting";
-	break;
 	case AL_SYNCING:
 		return "Syncing";
-	break;
 	case AL_OFF:
 		return "Open";
-	break;
 	case AL_ENTRY:
 		return "Locked";
-	break;
 	default:
 	break;
 	}
@@ -1084,7 +1079,7 @@ static void
 _noGameEntry(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_LAUNCH_REQ& request, APP_LAUNCH reply)
 {
 	char tmpStr[64+1];
-	strncpy(tmpStr, teulGetAddress(request.appVersion), 64);
+	strsafecpy(tmpStr, teulGetAddress(request.appVersion));
 	dbugLog(_FLW, "t:%d c:%s ip:%s arena:%u plat:%u app:%u ver:%s GAME entry NULL"
 			, teulIndex, request.username, ip, request.arenaID, platform, request.appID, tmpStr);
 
@@ -1238,10 +1233,7 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 
 	// Get the local network address excluding the last octet.
 	const UINT32 localAddress = teulGetEndpointLocalAddress(teulIndex);
-	const UINT32 localNet = localAddress & ~0xff;
 
-	static const UINT32 PRIVATE_SUBNET = 0xC0A80000;	// 192.168.*.*
-	static const UINT32 PRIVATE_SUBMASK = 0xFFFF0000;
 	UINT32 destAddress = bestServer.ipAddress;
 
 	//hack since teulGetAddress sucks
@@ -1314,7 +1306,7 @@ _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::Cli
 
 	char ip[64+1];
 	cdata.address = teulGetEndpointRemoteAddress(teulIndex);
-	strncpy(ip, teulGetAddress(cdata.address), 64);
+	strsafecpy(ip, teulGetAddress(cdata.address));
 
 	platform = cdata.platform;
 
@@ -1460,15 +1452,13 @@ authEstablishServer(const SINT32 teulIndex, AUTH_GAME_INIT& gInit)
 	teulSetPersonaData(teulIndex, newServer);
 
 	//Log the connection
-	strncpy(tmpStr, teulGetAddress(game->curHostVersion), 64);
+	strsafecpy(tmpStr, teulGetAddress(game->curHostVersion));
 
 	//Place the server onto the server list for the game entry we either found
 	//	or created
 	SERVER* oldServer = game->server();
-	if ( oldServer && oldServer != newServer )
-	{
-		delete game->server();
-	}
+	if ( oldServer != newServer )
+		delete oldServer;
 
 	game->server(newServer);
 
@@ -1529,9 +1519,9 @@ authValidatePlayer(UINT32 /*ipAddress*/, PLAYER_LOGIN& /*loginData*/, Auth::Disp
 
 SINT32
 authInitAccept(UINT32 /*appVersion*/
-				, PLAYER_ACCEPT_FUNCTION* /*loginAcceptFn*/
-				, PLAYER_RELEASE_FUNCTION* /*releaseFn*/
-				, ERROR_FUNCTION* /*externErrorFn*/)
+				, PLAYER_ACCEPT_FUNCTION /*loginAcceptFn*/
+				, PLAYER_RELEASE_FUNCTION /*releaseFn*/
+				, ERROR_FUNCTION /*externErrorFn*/)
 {
 	return -EINVAL;
 }
@@ -1630,7 +1620,7 @@ authGetGameList(const SINT32 teulIndex)
 	const std::vector<UCHAR>& clientSubs = data->m_subscribedArenaIDs;
 #endif
 
-	typedef std::vector<GameListCache> CACHES;
+	using CACHES = std::vector<GameListCache>;
 	static CACHES caches;
 
 	CACHES::iterator it = caches.begin();
@@ -1640,8 +1630,7 @@ authGetGameList(const SINT32 teulIndex)
 		// Check for expired or not populated first
 		if ( cache.m_goodUntil < teulTime() )
 		{
-			if ( g_logDebug )
-				dbugLog(_FLD, "t:%d expiring gamelist cache entry", teulIndex);
+			dbugLog(_FLD, "t:%d expiring gamelist cache entry", teulIndex);
 			*it = caches.back();
 			caches.pop_back();
 			continue;
@@ -1653,8 +1642,7 @@ authGetGameList(const SINT32 teulIndex)
 			continue;
 		}
 
-		if ( g_logDebug )
-			dbugLog(_FLD, "t:%d found cached gamelist entry", teulIndex);
+		dbugLog(_FLD, "t:%d found cached gamelist entry", teulIndex);
 		return &cache.m_list;
 	}
 

@@ -15,14 +15,13 @@
 
 class CPStruct;
 struct STRAT_UPDATE;
-struct WEAPON_SPEC;
 class FacilityStruct;
 class LinkStruct;
 struct POSTED_WEAPON;
 class StratHCUnitImpl;
 class ResupplyTicket;
 
-typedef std::list<POSTED_WEAPON*> POSTED_WEAPON_LIST;
+using POSTED_WEAPON_LIST = std::list<POSTED_WEAPON*>;
 
 //  ----------------------------------------  Variables
 //tolua_begin
@@ -54,14 +53,13 @@ class StratHCUnit : public HCUnit
 public:
 	StratHCUnit(UINT32 unitID, HCUNIT_TYPE type, UINT32 parentID
 				, WWII_COUNTRY countryID, BRANCH_ENUM branchID, BRANCH_ENUM movementType, UCHAR unitClass
-				, const ChatHandle& handle, const char* name, const char* nick, UINT8 rank
-				, const FULL_OBJ_ID& homeCP, const ChatHandle& owner, RANK_NO ownerRank, UINT32 startCPOID, UINT32 fallbackCpOID
-				, UINT32 lastMove, const ChatHandle& lastMovedBy, UINT32 nextMove
+				, const ChatHandle handle, const char* name, const char* nick, UINT8 rank
+				, const FULL_OBJ_ID homeCP, const ChatHandle owner, RANK_NO ownerRank, UINT32 startCPOID, UINT32 fallbackCpOID
+				, UINT32 lastMove, const ChatHandle lastMovedBy, UINT32 nextMove
 				, const char* toeTemplate);
 	void initialize();
 	virtual ~StratHCUnit();
 
-public:
 	// Broadcast our current location to other servers.
 	void announceHome() const;
 
@@ -101,7 +99,7 @@ public:
 
 	// Deliver a number of vehicles into this TOE
 	// Pass replaceTicket if you are planning to re-extract the vehicle on success
-	bool depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allowOverstock, ResupplyTicket* replaceTicket=nullptr);
+	bool depositWeapons(const WEAPON_SPEC spec, UINT16 numUnits, bool allowOverstock, ResupplyTicket* replaceTicket=nullptr);
 
 	const char* describe() const;
 
@@ -113,7 +111,7 @@ public:
 	UINT32 getSupplyPctg(WEAPON_CATEGORY) const;
 
 	// Specify a level for a particular vehicle
-	bool initializeWeapon(const WEAPON_SPEC& spec, UINT16 numUnits);
+	bool initializeWeapon(const WEAPON_SPEC spec, UINT16 numUnits);
 
 	bool isSpawnable() const { return ( m_toeTemplateHeader != nullptr && m_toe.empty() == false ); }
 
@@ -139,7 +137,7 @@ public:
 	bool setFallbackCP(CPStruct* cp);
 
 	// Withdraw a number of vehicles from this TOE
-	bool withdrawWeapons(const WEAPON_SPEC& spec, UINT16 numUnits);
+	bool withdrawWeapons(const WEAPON_SPEC spec, UINT16 numUnits);
 
 //tolua_end
 private:
@@ -152,7 +150,7 @@ public:
 	const CPStruct* fallbackCP() const { return m_fallbackCP; }
 	CPStruct* fallbackCP() { return m_fallbackCP; }
 	UINT32 lastMoved() const { return m_lastMoved; }
-	const ChatHandle& lastMovedBy() const { return m_lastMovedBy; }
+	ChatHandle lastMovedBy() const { return m_lastMovedBy; }
 	const CPStruct* startCP() const { return m_startCP; }
 	CPStruct* startCP() { return m_startCP; }
 	const StratHCUnit* next() const { return m_next; }
@@ -161,21 +159,23 @@ public:
 	UINT32 nextMove() const { return m_nextMove; }
 	UINT32 nextMoveIn() const;
 	bool offMap() const { return ( !homeCP() || homeCP() == routDestination[country()] ); }
+//tolua_end
 	const TOE_::TemplateHeader* toeTemplateHeader() const { return m_toeTemplateHeader; }
-	const TOE_::WeaponInstance* toeWeaponInstance(const WEAPON_SPEC& weapon) const;
-	TOE_::WeaponInstance* toeWeaponInstance(const WEAPON_SPEC& weapon);
+	const TOE_::WeaponInstance* toeWeaponInstance(const WEAPON_SPEC weapon) const;
+	TOE_::WeaponInstance* toeWeaponInstance(const WEAPON_SPEC weapon);
 	const TOE& toe() const { return m_toe; }
+//tolua_begin
 
 	void checkThrottleWindows(const FacilityStruct* facility) const;
-	UINT32 checkThrottleWindow(const FacilityStruct* facility, const WEAPON_SPEC& spec) const;
+	UINT32 checkThrottleWindow(const FacilityStruct* facility, const WEAPON_SPEC spec) const;
 	void incrementThrottle(const POSTED_WEAPON* postedWeapon);
 	void decrementThrottle(const POSTED_WEAPON* postedWeapon);
 
 public:
 	static StratHCUnit* Lookup(UINT32 unitID);
 	static StratHCUnit* Lookup(const char* name);
-//tolua_end
 
+//tolua_end
 	void addTOEInstance(const TOE_::WeaponTemplate& weaponTemplate);
 
 	void CheckResupplyStatus(bool fullCheck);

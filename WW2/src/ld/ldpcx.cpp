@@ -69,8 +69,8 @@ int   stream;
 		return(-1);
 	}
 
-	length = fioSeek(stream, 0, fioSEEK_END);
-	fioSeek(stream, 0, fioSEEK_SET);
+	length = fioSeek(stream, 0, SEEK_END);
+	fioSeek(stream, 0, SEEK_SET);
 	pfh = (PCXHEADER*)memAlloc(length);
 	if (pfh == nullptr)
 	{

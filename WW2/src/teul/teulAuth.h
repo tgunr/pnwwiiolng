@@ -8,10 +8,10 @@
 
 #include "updt/loginTypes.h"
 
-typedef int APID;
+using APID = int;
 
 namespace Auth { struct Dispatch; }
-typedef SINT32 (PLAYER_ACCEPT_FUNCTION) ( SINT32 teulIndex, Auth::Dispatch* authPersona );
+using PLAYER_ACCEPT_FUNCTION = SINT32(*)(SINT32 teulIndex, Auth::Dispatch* authPersona);
 
 // This function initializes the game servers communications to the auth
 //	server.  It takes all the information provided and establishes the
@@ -33,8 +33,8 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 				, APID appID, UINT32 appVersion
 				, UINT32 hostVersion
 				, UINT32 maxUsers
-				, PLAYER_ACCEPT_FUNCTION* acceptFn
-				, ERROR_FUNCTION* externErrorFn);
+				, PLAYER_ACCEPT_FUNCTION acceptFn
+				, ERROR_FUNCTION externErrorFn);
 
 // authExitPlayer notifies the auth server that a player has left the game
 //	PARAMETERS:

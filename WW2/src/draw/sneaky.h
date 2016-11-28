@@ -26,12 +26,12 @@ private:
 
     inline void hide( T* p )
     {
-        ptr = (T*)(((unsigned int)p)^altMask.ui);
+        ptr = (T*)(((uintptr_t)p)^altMask.ui);
     }
 
     inline T* recover( )
     {
-        return (T*)(((unsigned int)ptr)^altMask.ui);
+        return (T*)(((uintptr_t)ptr)^altMask.ui);
     }
 
 public:

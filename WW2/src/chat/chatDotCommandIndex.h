@@ -14,8 +14,8 @@
 
 class DotCommand;
 
-typedef std::vector<DotCommand*> DOT_INDEX;
-typedef std::map<const std::string, const DotCommand*> DOT_ALIASES;
+using DOT_INDEX = std::vector<DotCommand*>;
+using DOT_ALIASES = std::map<const std::string, const DotCommand*>;
 
 class DotCommandIndex : public DOT_INDEX
 {
@@ -42,7 +42,7 @@ public:
 	bool process(Player& player, struct Chat::ClientMessage* message) const;
 
 	// Flush and load permission sets
-	void readPermissions(void);
+	void readPermissions();
 
 protected:
 	//! [Re]Build the Teul::Packet with the list of dot commands.

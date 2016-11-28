@@ -101,7 +101,7 @@ weapLoadIndexes(DB::handle_t* conn)
 			continue;
 
 		weap->m_localIndex = oid;
-		strncpy(weap->fullName, fullName, sizeof(weap->fullName));
+		strsafecpy(weap->fullName, fullName);
 
 		weapAddWeaponIndex(weap);
 

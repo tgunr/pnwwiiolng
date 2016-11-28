@@ -24,7 +24,7 @@ struct BRIGADE_DECAL_SPEC
 	std::vector<DECAL_SPEC> decals;
 };
 
-typedef std::map<std::string, BRIGADE_DECAL_SPEC> BrigadeDecalMap;
+using BrigadeDecalMap = std::map<std::string, BRIGADE_DECAL_SPEC>;
 
 class BrigadeDecalLoader : public XMLLoader2<BrigadeDecalLoader>
 {

@@ -91,5 +91,5 @@ extern void compApplyHit(HostVehicle& target, const struct VEH_HIT& hits);
 extern void compInit(COMP_HEAD * compHead);
 
 // init the system before any thing else
-extern SINT32 compSystemInit(void);
+extern SINT32 compSystemInit();
 

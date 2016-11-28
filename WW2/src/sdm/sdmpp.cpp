@@ -20,9 +20,6 @@
 #include "sdm/sdmpp.h"
 #include "sdm/sdmParse.h"
 #include "include/defs.h"
-#include "dbse/dbseConnection.h"
-
-DBCONNECTION dbConnection;
 
 #include "sdm/sdmConfigVars.h"
 
@@ -33,7 +30,7 @@ static bool s_unlinksEnabled = true;
 static bool s_renamesEnabled = false;
 static unsigned int s_verbose;
 
-//typedef std::map<int,std::string> XPATHS;
+//using XPATHS = std::map<int,std::string>;
 //static XPATHS xpaths;
 
 NORETURN_FN static void
@@ -156,7 +153,7 @@ _getListOfSDMFiles(std::vector<std::string>& into)
 	if ( hFind == INVALID_HANDLE_VALUE )
 		return false;
 
-	do 
+	do
 	{
 		into.push_back(data.cFileName);
 	} while (FindNextFileA(hFind, &data));

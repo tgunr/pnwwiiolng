@@ -11,7 +11,7 @@
 // blocks of data - each cell is it's own pristine little
 // world. This allowed the embedding of much smaller IDs and
 // during many cell-relative operations you can specify
-// a specific strat object with a UINT16 value. 
+// a specific strat object with a UINT16 value.
 // In a world-scope context, such as on the server, you have
 // to combine that ID with the X and Y of the cell to produce
 // a 64 bit value (24 bits of X plus 24 bits of Y plus 16 id)
@@ -52,18 +52,14 @@
 
 #include "str/stringLib.h"
 #include "sdm/sdmLoad.h"
-#include "dbse/dbseWrapper.h"
-#include "dbse/dbseConnection.h"
+#include "dbse/dbseHandle.h"
 #include "sdm/sdmParse.h"
 #include "include/mydbQuery.h"
-
-DBHANDLE dbh;
-extern DBCONNECTION dbConnection;
 
 static char _statement[4096];
 static char g_name[MAX_STRT_NAME_LENGTH], g_fileName[MAX_OBJNAME_LENGTH];
 
-typedef struct CPWITHID
+struct CPWITHID
 {
 	struct CPWITHID* next;
 	struct CPWITHID* prev;
@@ -77,12 +73,12 @@ typedef struct CPWITHID
 	WWII_COUNTRY	controller;
 	UINT32		numLinks;
 	SINT32		absx, absy;
-} CPWITHID;
+};
 static CPWITHID* cps;
 static CPWITHID* lastCW;
 static UINT32 uMaxCPOID;
 
-typedef struct FACWITHID
+struct FACWITHID
 {
 	struct FACWITHID* next;
 	struct FACWITHID* prev;
@@ -94,30 +90,30 @@ typedef struct FACWITHID
 	LOGICAL		bIsCurrent;
 	WWII_COUNTRY owner;
 	SINT32		absx, absy;
-} FACWITHID;
+};
 static FACWITHID* facs;
 static FACWITHID* lastFW;
 static UINT32 uMaxFacOID;
 
-typedef struct BUILDWITHID
+struct BUILDWITHID
 {
 	struct BUILDWITHID* next;
 	struct BUILDWITHID* prev;
 	SINT32		oid;
 	BUILDING	object;
 	SINT32	ox, oy;
-} BUILDWITHID;
+};
 static BUILDWITHID* builds;
 static BUILDWITHID* lastBW;
 static UINT32 uNumBuilds;
 
-typedef struct DLINKWITHID
+struct DLINKWITHID
 {
 	struct DLINKWITHID* next;
 	struct DLINKWITHID* prev;
 	SINT32		oid;
 	DEPOT_LINK	object;
-} DLINKWITHID;
+};
 static DLINKWITHID* dlinks;
 static DLINKWITHID* lastDLW;
 static UINT32 uNumDlinks;
@@ -523,7 +519,7 @@ dbseSaveFACILITY(FACWITHID* facw)
 			, "INSERT INTO strat_facility"
 				"(facility_oid,facility_ox,facility_oy"
 				",facility_type,facility_id,facility_subtype"
-				",cp_ox,cp_oy,cp_id,cp_oid"
+				",cp_oid"
 				",name,objectname"
 				",side,country"
 				",originalside,originalcountry"
@@ -554,7 +550,7 @@ dbseSaveFACILITY(FACWITHID* facw)
 	p += sprintf(p
 				, "%c(%u,%d,%d"
 					",%u,%u,%u"
-					",%d,%d,%d,%u"
+					",%u"
 					",'%s','%s'"
 					",%u,%u"
 					",%u,%u"
@@ -565,7 +561,6 @@ dbseSaveFACILITY(FACWITHID* facw)
 				, (p > start) ? ',' : ' '
 				, facw->fac_oid, facw->ox, facw->oy
 				, facility->oid.objType, facility->oid.id, facility->subType
-				, facility->cpid.cell.ox, facility->cpid.cell.oy, facility->cpid.id
 				, cp_oid, g_name, g_fileName
 				, wwiiSide(facw->owner), facw->owner
 				, facility->originalSide, facility->originalCountry
@@ -1149,7 +1144,7 @@ dbseInitStratLoader()
 {
 	// Please don't ask why... There was a good reason for this, though. -OGS
 	dbh.disconnect();
-	if ( dbh.connect(dbConnection) == false )
+	if ( dbh.connect() == false )
 		return -1;
 
 	// Because we are wielding Latin1 characters for now,

@@ -10,7 +10,6 @@
 // Originating Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Eric "Meat" Hall
 
-#include "versionNo.h"
 #include "server/serverInterface.h"
 
 #include "host/host.h"
@@ -20,6 +19,7 @@
 #include "strt/strtConstants.h"
 #include "strt/strtDamageQueueEntry.h"
 #include "strt/strtData.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtHack.h"
 #include "strt/strtIO.h"
 #include "strt/strtSyncSupportMessages.h"
@@ -46,10 +46,8 @@
 std::vector<DAMAGE_QUEUE_ENTRY> damageQueue;
 CPStruct* _cpList;
 
-LOGICAL _stratAddressReceived = FALSE;
-
 static void
-_flushDamageQueue(void)
+_flushDamageQueue()
 {
 	if ( damageQueue.empty() )
 		return;
@@ -72,7 +70,7 @@ strtUpdaterInit()
 
 	strtFakeBridges(_cpList);
 
-	strtReportDataErrors();
+	strtReportDataErrors(0);
 }
 
 DAMAGE_QUEUE_ENTRY&
@@ -92,7 +90,7 @@ _getDamageQueueEntry(const UINT64& objectKey, const WEAPON_SERIAL& weapon, const
 }
 
 void
-strtAccumulateDamageMessage(const FULL_OBJ_ID& object, const SINT64& damageJoules, UINT32 playerID, const WEAPON_SERIAL& serial)
+strtAccumulateDamageMessage(const FULL_OBJ_ID object, const SINT64 damageJoules, UINT32 playerID, const WEAPON_SERIAL& serial)
 {
 	ObjectStruct* const currentObject = strtGetObject(object);
 	if (currentObject == nullptr)
@@ -120,7 +118,7 @@ strtAccumulateDamageMessage(const FULL_OBJ_ID& object, const SINT64& damageJoule
 		}
 		if ( newDamage < damageJoules )
 		{
-			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u ignoring %lld joules damage - would wrap", playerID, serial.serial, object.cell.ox, object.cell.oy, object.id, damageJoules);
+			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u ignoring %" PR64BitT " joules damage - would wrap", playerID, serial.serial, object.cell.ox, object.cell.oy, object.id, damageJoules);
 			return;
 		}
 		damageEntry.damageJoules = newDamage;

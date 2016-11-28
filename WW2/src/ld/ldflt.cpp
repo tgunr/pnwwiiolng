@@ -21,7 +21,6 @@
 #include "ob/obc.h"
 #include "ob/obmain.h"
 #include "str/strpool.h"
-#include "sys/sysWinISO.h"
 #include "ld/lddds.h"
 #include <assert.h>
 #include "sysmain.h"
@@ -51,7 +50,7 @@ struct FLTLoadFailure
     FLTLoadFailure(const char* const problem, const char* const doing)
     : m_problem(problem), m_doing(doing)
     {}
-    
+
     std::string m_problem, m_doing ;
 };
 
@@ -60,7 +59,7 @@ struct FLTChunkFailure : public FLTLoadFailure
     FLTChunkFailure(const char* const chunkType)
     : FLTLoadFailure("Unable to load FLT chunk", chunkType)
     {}
-    
+
 };
 
 struct FLTUnknownTexture : public FLTLoadFailure
@@ -81,7 +80,7 @@ struct FLTItemFileError
     FLTItemFileError(const char* error, const char* item, const char* file)
         : m_error(error), m_item(item), m_file(file)
     {}
-    
+
     std::string m_error, m_item, m_file;
 };
 
@@ -356,7 +355,7 @@ static UINT32 CreateColor(int colorindex)
 	return(rgba);
 }
 
-static bool ReadHeader(void)
+static bool ReadHeader()
 {
 	fltHEADER* header;
 	if ( !localBufferUseObject(header) )
@@ -445,7 +444,7 @@ static bool CreateLevel(OBJECT** lpnewobj)
 	return true;
 }
 
-static bool ReadGroup(void)
+static bool ReadGroup()
 {
 	fltGROUP* group;
 	if ( !localBufferUseObject(group) )
@@ -524,7 +523,7 @@ static bool ReadGroup(void)
 }
 
 
-static bool ReadVertexPalette(void)
+static bool ReadVertexPalette()
 {
 	fltVERTEXPALETTE* vp;
 
@@ -761,7 +760,6 @@ struct eqstr
 	}
 };
 
-#if platOS == OS_MACOS
 using CharPSet = std::unordered_set<const char*, ConstCharHasher, eqstr>;
 static CharPSet* RoadTextureNames = nullptr;
 
@@ -790,11 +788,9 @@ static void initRoadTextureNames()
 	RoadTextureNames->insert("terrain\\brdg\\tangray1");
 	RoadTextureNames->insert("terrain\\brdg\\urbanroad1");
 }
-#endif
 
 static bool isRoadTexture( int texid )
 {
-#if platOS == OS_MACOS
 	TEXTURE* tp = oglGetTextureData(texid);
 	bool res = tp!=nullptr && RoadTextureNames->find( tp->name ) != RoadTextureNames->end();
 	if ( res )
@@ -802,9 +798,6 @@ static bool isRoadTexture( int texid )
 		//printf("%s\n",tp->name);
 	}
 	return res;
-#else
-	return false;
-#endif
 }
 
 #define LOOK_FOR_DEGENERATE_TRIANGLES 0
@@ -813,7 +806,7 @@ static bool isRoadTexture( int texid )
 #include "SuperFastHash.h"
 #endif
 
-static bool ReadVertexList(void)
+static bool ReadVertexList()
 {
 	void*				pdata					= nullptr;
 	fltCHUNK*			pchunk					= nullptr;
@@ -821,12 +814,10 @@ static bool ReadVertexList(void)
 	OBJECT*				lpobj					= nullptr;
 	piUNIFIED_VERTEX*	vertices				= nullptr;
 
-#if platOS == OS_MACOS
 	if ( RoadTextureNames == nullptr )
 	{
 		initRoadTextureNames();
 	}
-#endif
 
 	length = (int)s_chunk->next - 4;
 
@@ -1321,7 +1312,7 @@ static bool ReadVertexList(void)
 }
 
 
-static bool ReadMatrix(void)
+static bool ReadMatrix()
 {
 	if (!localBufferCopyObject(&s_matrixRecord))
 		return false;
@@ -1511,7 +1502,7 @@ static bool ReadMaterialPalette(const char* name)
 }
 
 
-static bool ReadColorPalette(void)
+static bool ReadColorPalette()
 {
 	size_t length = s_chunk->next - 4;
 	fltCOLORPALETTE* colorpal;
@@ -1540,7 +1531,7 @@ static bool ReadColorPalette(void)
 }
 
 
-static bool ReadTextureReference(void)
+static bool ReadTextureReference()
 {
 	char filename[256];
 	filename[0] = '\0';
@@ -1592,27 +1583,20 @@ static bool ReadTextureReference(void)
 	str = filename;
 	str += "_normal.dds";
 
-	if(fioAccess(str.c_str()))
-	{
-		_textureflags2[numtexrefs] |= OBJECT_NORMALMAP;
-	}
+    int fd = -1;
 
-	// New normal mapping tool outputs _nrm.dds
-	str = filename;
-	str += "_nrm.dds";
-
-	if(fioAccess(str.c_str()))
-	{
+    if ((fd = fioOpen(str.c_str())) != -1) {
 		_textureflags2[numtexrefs] |= OBJECT_NORMALMAP;
+		fioClose(fd); // Hacky because this is very bad code design, this is a quick fix
 	}
 
 	// Check for specular map
 	str = filename;
 	str += "_spec.dds";
 
-	if(fioAccess(str.c_str()))
-	{
+	if ((fd = fioOpen(str.c_str())) != -1) {
 		_textureflags3[numtexrefs] |= OBJECT_SPECULARMAP;
+		fioClose(fd); // Hacky because this is very bad code design, this is a quick fix
 	}
 
 	str = filename;
@@ -1632,7 +1616,7 @@ static bool ReadTextureReference(void)
 	return true;
 }
 
-static bool ReadFace(void)
+static bool ReadFace()
 {
 	if (!localBufferUseObject(s_face))
 		return false;
@@ -1695,7 +1679,7 @@ static bool ReadFace(void)
 }
 
 
-static bool ReadLOD(void)
+static bool ReadLOD()
 {
 	fltLOD* lod;
 	if (!localBufferUseObject(lod))
@@ -1744,7 +1728,7 @@ static bool ReadLOD(void)
 }
 
 
-static bool ReadObject(void)
+static bool ReadObject()
 {
 	if (!localBufferCopyObject(&object))
 		return false;
@@ -1777,7 +1761,7 @@ static bool ReadObject(void)
 }
 
 
-static bool ReadExtension(void)
+static bool ReadExtension()
 {
 	fltEXTENSION*  ext;
 	if (!localBufferUseObject(ext))
@@ -1794,7 +1778,7 @@ static bool ReadExtension(void)
 	return true;
 }
 
-static bool ReadDOF(void)
+static bool ReadDOF()
 {
 	OBJECT*	lpobj;
 
@@ -1942,7 +1926,7 @@ static bool ReadDOF(void)
 	return true;
 }
 
-static bool ReadTextComment(void)
+static bool ReadTextComment()
 {
 	char*	thisTextComment = 0;
 	SINT32	len;
@@ -2044,7 +2028,7 @@ static bool ReadTextComment(void)
 	return true;
 }
 
-static bool ReadLongID(void)
+static bool ReadLongID()
 {
 	size_t len = size_t(s_chunk->next - 4);
 	SCHAR	oldname[32];
@@ -2126,7 +2110,7 @@ static bool ReadLongID(void)
 	return true;
 }
 
-static bool ReadPushLevel(void)
+static bool ReadPushLevel()
 {
 	level += 1;
 	if (level >= MAX_LEVELS)
@@ -2143,7 +2127,7 @@ static bool ReadPushLevel(void)
 }
 
 
-static bool ReadPopLevel(void)
+static bool ReadPopLevel()
 {
 	if (vlistlevel == level)
 	{
@@ -2264,7 +2248,7 @@ static bool ReadPopLevel(void)
 }
 
 
-static bool ReadPushSubface(void)
+static bool ReadPushSubface()
 {
 	facelayer += 1;
 
@@ -2274,7 +2258,7 @@ static bool ReadPushSubface(void)
 }
 
 
-static bool ReadPopSubface(void)
+static bool ReadPopSubface()
 {
 	facelayer -= 1;
 
@@ -2284,7 +2268,7 @@ static bool ReadPopSubface(void)
 }
 
 
-static bool ReadPushExtension(void)
+static bool ReadPushExtension()
 {
 	extlevel += 1;
 
@@ -2294,7 +2278,7 @@ static bool ReadPushExtension(void)
 }
 
 
-static bool ReadPopExtension(void)
+static bool ReadPopExtension()
 {
 	extlevel -= 1;
 
@@ -2305,7 +2289,7 @@ static bool ReadPopExtension(void)
 
 #ifdef MAP_MATS
 // this doesn't work
-typedef std::map<std::string,std::string> MaterialMapper;
+using MaterialMapper = std::map<std::string,std::string>;
 extern MaterialMapper materialMap;
 
 static void changeMaterials( OBJECT* obj )
@@ -2332,18 +2316,7 @@ static void changeMaterials( OBJECT* obj )
 }
 #endif
 
-#define xSHOWLDMSGS 1
-#if platOS == OS_MACOS
-#define OutputDebugStringA(x) printf(x)
-//#undef Write_Debug
-//#define Write_Debug DoOutputX
-
-void DoOutputX(const char* str, ...)
-{
-	printf( "%s\n", str);
-}
-
-#endif
+#define SHOWLDMSGS 1
 
 #ifdef SHOWLDMSGS
 # define LDWrite_Debug(fmt, ...) dbugLog(_FLD, fmt, ## __VA_ARGS__);

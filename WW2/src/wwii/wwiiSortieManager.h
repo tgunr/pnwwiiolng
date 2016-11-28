@@ -20,7 +20,7 @@ private:
 	const char*	m_set;
 	const char*	m_where;
 
-	typedef std::vector<sortieid_t> SORTIES;
+	using SORTIES = std::vector<sortieid_t>;
 	SORTIES		m_pending;
 };
 

@@ -10,7 +10,7 @@
 //! @brief Describes the vis levels for all buildings in a supercell.
 class SupercellVislevelXfer
 {
-	public: typedef UCHAR vis_t;					//!< What size value we group vislevel bits in.
+	public: using vis_t = UCHAR;					//!< What size value we group vislevel bits in.
 	public:	static const size_t BitsPerObject = 4;	// How many bits each object needs.
 
 			//! Size of this entry (scx/scy) in bytes.

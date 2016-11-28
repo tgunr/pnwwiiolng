@@ -1,24 +1,17 @@
 /*
- * dict.h: dictionary of reusable strings, just used to avoid allocation
+ * Summary: string dictionnary
+ * Description: dictionary of reusable strings, just used to avoid allocation
  *         and freeing operations.
  *
- * Copyright (C) 2003 Daniel Veillard.
+ * Copy: See Copyright for the status of this software.
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
- * MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE AUTHORS AND
- * CONTRIBUTORS ACCEPT NO RESPONSIBILITY IN ANY CONCEIVABLE MANNER.
- *
- * Author: daniel@veillard.com
+ * Author: Daniel Veillard
  */
 
 #ifndef __XML_DICT_H__
 #define __XML_DICT_H__
 
+#include <limits.h>
 #include <libxml/xmlversion.h>
 #include <libxml/tree.h>
 
@@ -33,31 +26,54 @@ typedef struct _xmlDict xmlDict;
 typedef xmlDict *xmlDictPtr;
 
 /*
+ * Initializer
+ */
+XMLPUBFUN int XMLCALL  xmlInitializeDict(void);
+
+/*
  * Constructor and destructor.
  */
 XMLPUBFUN xmlDictPtr XMLCALL
 			xmlDictCreate	(void);
+XMLPUBFUN size_t XMLCALL
+			xmlDictSetLimit	(xmlDictPtr dict,
+                                         size_t limit);
+XMLPUBFUN size_t XMLCALL
+			xmlDictGetUsage (xmlDictPtr dict);
+XMLPUBFUN xmlDictPtr XMLCALL
+			xmlDictCreateSub(xmlDictPtr sub);
 XMLPUBFUN int XMLCALL
 			xmlDictReference(xmlDictPtr dict);
-XMLPUBFUN void XMLCALL			
+XMLPUBFUN void XMLCALL
 			xmlDictFree	(xmlDictPtr dict);
 
 /*
  * Lookup of entry in the dictionnary.
  */
-XMLPUBFUN const xmlChar * XMLCALL		
+XMLPUBFUN const xmlChar * XMLCALL
 			xmlDictLookup	(xmlDictPtr dict,
 		                         const xmlChar *name,
 		                         int len);
-XMLPUBFUN const xmlChar * XMLCALL		
+XMLPUBFUN const xmlChar * XMLCALL
+			xmlDictExists	(xmlDictPtr dict,
+		                         const xmlChar *name,
+		                         int len);
+XMLPUBFUN const xmlChar * XMLCALL
 			xmlDictQLookup	(xmlDictPtr dict,
 		                         const xmlChar *prefix,
 		                         const xmlChar *name);
 XMLPUBFUN int XMLCALL
 			xmlDictOwns	(xmlDictPtr dict,
 					 const xmlChar *str);
-XMLPUBFUN int XMLCALL			
+XMLPUBFUN int XMLCALL
 			xmlDictSize	(xmlDictPtr dict);
+
+/*
+ * Cleanup function
+ */
+XMLPUBFUN void XMLCALL
+                        xmlDictCleanup  (void);
+
 #ifdef __cplusplus
 }
 #endif

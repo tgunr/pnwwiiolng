@@ -251,12 +251,3 @@ size_t fioaFileSize(const char* filename)
 
 	return len;
 }
-
-/************************************************************************************************
-	fioaAccess
-*************************************************************************************************/
-
-int fioaAccess(const char* filename)
-{
-	return paFetchMember(fioa.pf, filename, nullptr, nullptr) == 0;
-}

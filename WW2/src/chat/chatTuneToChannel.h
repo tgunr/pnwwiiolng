@@ -16,7 +16,7 @@ namespace Chat
 	struct TuneToChannel
 	{
 		TuneToChannel() : m_radioIndex(0), m_type(static_cast<CHANNEL_TYPE>(0)), m_handle(0ULL), m_rx(false), m_tx(false) {}
-		TuneToChannel(UCHAR radioIndex, CHANNEL_TYPE type, const ChatHandle& handle, bool rx, bool tx)
+		TuneToChannel(UCHAR radioIndex, CHANNEL_TYPE type, const ChatHandle handle, bool rx, bool tx)
 			: m_radioIndex(radioIndex)
 			, m_type(type)
 			, m_handle(handle)
@@ -31,7 +31,7 @@ namespace Chat
 		bool			m_tx;				// Is transmit enabled?
 
 		// Common members
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 		// Host functions
 		bool send(SINT32 connection);

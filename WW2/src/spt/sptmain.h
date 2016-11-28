@@ -26,10 +26,10 @@ enum bushtypes
     MaxBushes = 6
 };
 
-typedef struct tagTreeInstance
+struct TreeInstance
 {
-    struct tagTreeInstance* next;
-    struct tagTreeInstance* prev;
+    TreeInstance* next;
+    TreeInstance* prev;
 
     SINT32 ID;
     SINT32 base;
@@ -50,8 +50,7 @@ typedef struct tagTreeInstance
     piVECTOR relativepos;
 
     OBJECT* o;
-
-} TreeInstance;
+};
 
 enum ENUMTREEPARTS
 {

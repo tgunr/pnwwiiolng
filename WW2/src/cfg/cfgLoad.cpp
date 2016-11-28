@@ -20,7 +20,6 @@ static void*	pGlobalVars[cfgNUM_TOTAL_PARAMS]=
 	&ShadeMode,                 // cfgTEXTURE_SHADE_MODE
 	&bDithering,                // cfgTEXTURE_DITHERING
 	&bSpecular,                 // cfgTEXTURE_SPECULAR
-	&TextureReduction,          // cfgTEXTURE_REDUCTION
 	&WantedSoundCard,           // cfgSOUND_CARD
 	&bSoundEnable,              // cfgSOUND_ENABLED
 	&b3DSoundEnable,            // cfgSOUND_3D_ENABLED
@@ -117,20 +116,16 @@ static int* EnumValueMap[cfgNUM_TYPE_VALUES]=
 	nullptr,				// cfgTYPE_TRUE_FALSE,
 };
 
-static LOGICAL ConvertTypes()
+static void ConvertTypes()
 {
-int i, Type;
-
-	for (i = 0; i < cfgNUM_TOTAL_PARAMS; ++i)
+	for (int i = 0; i < cfgNUM_TOTAL_PARAMS; ++i)
 	{
-		Type = cfgParameters[i].Type;
+		int Type = cfgParameters[i].Type;
 		if (EnumValueMap[Type] != nullptr)
 		{
 			*(int*)pGlobalVars[i] = EnumValueMap[Type][*(int*)pGlobalVars[i]];
 		}
 	}
-
-	return TRUE;
 }
 
 #if platOS == OS_WIN32 && defined(DIRECT3D)
@@ -158,7 +153,7 @@ const char* guid = nullptr;
 }
 #endif
 
-static LOGICAL SetupVariables()
+static void SetupVariables()
 {
 	bZEnable            = piZENABLE_DEFAULT;				// Z buffer enable
 	bZWrite             = piZWRITEENABLE_DEFAULT;			// Z buffer write enable
@@ -267,10 +262,6 @@ static LOGICAL SetupVariables()
 
 	SquadInvites = TRUE;
 	EnableMouseClickToDamageBuildings = FALSE;
-
-	ldpixSetTextureReduction(FALSE);
-
-	return TRUE;
 }
 
 LOGICAL cfgLoadGlobals(const char* ConfigName)
@@ -363,9 +354,6 @@ LOGICAL cfgLoadGlobals(const char* ConfigName)
 	{
 		g_useNetworkRoute = 0;
 	}
-
-	// Set Texture Reduction
-	ldpixSetTextureReduction(TextureReduction);
 
 #if platOS == OS_MACOS
   MaxNumberOfSounds = 128; // ignore setting since core audio doesn't care

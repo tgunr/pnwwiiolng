@@ -17,6 +17,7 @@ namespace Server
 }
 class Player;
 class HostVehicle;
+struct MM_SPAWN_GRANT_RESPONSE;
 
 namespace Host
 {
@@ -25,8 +26,8 @@ namespace Host
 struct VehicleRequest
 {
 	//! MMHost constructor.
-	VehicleRequest(const instanceid_t instanceID, const struct MM_SPAWN_GRANT_RESPONSE& grant, const class Player& commander, const class Player* const crew);
-	VehicleRequest(const instanceid_t instanceID, sortieid_t serial, const WEAPON_SPEC& spec) noexcept
+	VehicleRequest(const instanceid_t instanceID, const MM_SPAWN_GRANT_RESPONSE& grant, const class Player& commander, const class Player* const crew);
+	VehicleRequest(const instanceid_t instanceID, sortieid_t serial, const WEAPON_SPEC spec) noexcept
 		: m_instanceID(instanceID)
 		, m_weaponSerial()
 		, m_brigadeID(0)
@@ -72,7 +73,7 @@ struct VehicleRequest
 		if ( a->canRead<Host::VehicleRequest>() == false )
 			return -EINVAL;
 		auto& req = a->read<Host::VehicleRequest>();
-		dbugLog(_FLD, "p:%u v:%u in:%llu rxing host vehicle request", req.m_players[0], req.m_weaponSerial.serial, req.m_instanceID);
+		dbugLog(_FLD, "p:%u v:%u in:%" PR64BitUT " rxing host vehicle request", req.m_players[0], req.m_weaponSerial.serial, req.m_instanceID);
 		if ( !req.execute() )
 			return -1;
 		return a->offset;

@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "map/mapPlayer.h"
 #include "miss/missHitArrayNode.h"
 #include "miss/missionPacket.h"

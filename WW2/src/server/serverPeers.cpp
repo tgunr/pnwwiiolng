@@ -51,7 +51,7 @@ struct PeerHello
 
 // There are going to be very few of these, probably 3-4,
 // so just store them as a vector.
-typedef std::vector<ServerConnection> ServerConnections;
+using ServerConnections = std::vector<ServerConnection>;
 static ServerConnections s_connections;
 static SINT32 s_peeringIndex = -1;
 
@@ -78,7 +78,7 @@ _reportJSONPeers(SOCKET fd, const char* /*path*/, const char* /*args*/)
 		p += sprintf(p, "],\"pending\":[");
 		for ( auto& it : s_pendingPeers )
 		{
-			p += sprintf(p, "{\"ip\":%u,\"time\":%llu},", it.first, teulClock64 - it.second);
+			p += sprintf(p, "{\"ip\":%u,\"time\":%" PR64BitUT "},", it.first, teulClock64 - it.second);
 		}
 	}
 	p += sprintf(p, "]}\n");
@@ -237,7 +237,7 @@ serverConnectPeer(const UINT32 forIP_, const SERVER_TYPE type_)
 	if ( (net == 127) | (net == 0) )
 	{
 		// Ignore localhost and exit host.
-		dbugLog(_FLIB, " - ignoring local/exit host.");
+		dbugLog(_FLI, " - ignoring local/exit host.");
 		return;
 	}
 	// Ignore requests to connect to ourselves or to peers with lower IPs,
@@ -250,7 +250,7 @@ serverConnectPeer(const UINT32 forIP_, const SERVER_TYPE type_)
 		|| ((forIP_ >> 24) == 127)
 		)
 	{
-		dbugLog(_FLIB, " - leaving this [%u] one to connect to me [%u]", (ip & 0xff), (Server::myServerInfo.stats.address & 0xff));
+		dbugLog(_FLI, " - leaving this [%u] one to connect to me [%u]", (ip & 0xff), (Server::myServerInfo.stats.address & 0xff));
 		return;
 	}
 
@@ -481,8 +481,10 @@ static SINT32
 _registerPeeringCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
+	{
 		REGISTER_RECEIVEOBJ(PEER_HELLO_Y, PeerHello, _onPeerHello);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////

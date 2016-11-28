@@ -22,7 +22,7 @@ static FLOAT32 _DaytimeTimeMultiplier; // time rate accelerator
 
 SINT32 trntodTimeOfDayHasChanged; // flag to state that the time of day has changed
 
-UINT32 trnTODInit(void)
+UINT32 trnTODInit()
 {
 	_TimeOfDay = 43200; // midday
 	_DaytimeTimeMultiplier = 1.0;
@@ -35,7 +35,7 @@ UINT32 trnTODInit(void)
 	return 0;
 }
 
-UINT32 trnTODUpdate(void)
+UINT32 trnTODUpdate()
 {
     UINT32 TempNum;
     static UINT32 _Lastframetime;

@@ -9,8 +9,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
+#include "chat/chatName.h"
+#include "host/hostVehicleRequest.h"
 #include "include/logging.h"
 #include "map/mapPlayer.h"
 #include "miss/missionMission.h"
@@ -22,15 +22,16 @@
 #include "strt/strtFacilityStruct.h"
 #include "strt/strtMapTypes.h"
 #include "strt/strtTypes.h"
-#include "teul/teulEndpointDefs.h"
 #include "teul/teulBasic.h"
+#include "teul/teulEndpointDefs.h"
 #include "weap/weapDefs.h"
 #include "weap/weapWeapon.h"
-#include "wwii/wwiiThreads.h"
-#include "host/hostVehicleRequest.h"
+#include "wwii/wwiiDBThreads.h"
+#include "wwii/wwiiPPOLoader.h"
 #include "wwii/wwiiServerTypeEnums.h"
 
 extern SINT32 mapSendHostSupercellData(SINT32 teulIndex);	// From mapHostSupercellData.cpp
+extern PPOSpecLoader specLoader;
 
 //////////////////////////////////////////////////////////////////////
 // Exception classes for failing during spawn grant
@@ -89,13 +90,12 @@ _sendVehicleToCell(const MM_SPAWN_GRANT_RESPONSE& grant, const Player& commander
 {
 	Host::VehicleRequest vr(commander.instance().id(), grant, commander, crew);
 
-	if ( g_logDebug )
-		dbugLog(_FLD, "v:%u sending vehicle to cell %s with players %u,%u"
-						, vr.m_weaponSerial.serial
-						, teulGetAddress(server->stats.address)
-						, vr.playerNo(0)
-						, vr.playerNo(1)
-						);
+    dbugLog(_FLD, "v:%u sending vehicle to cell %s with players %u,%u"
+                    , vr.m_weaponSerial.serial
+                    , teulGetAddress(server->stats.address)
+                    , vr.playerNo(0)
+                    , vr.playerNo(1)
+                    );
 
 	vr.send(server);
 }
@@ -134,13 +134,12 @@ _getMobileSpawn(const Player* const commander, FLOAT64* const x, FLOAT64* const 
 	if ( !mission || mission->isMobileSpawnAvailable() == false )
 		return 0;
 
+	MobileSpawn& spawner = mission->spawner();
 #if !defined(DOROTHY)
-	///TODO: Determine if the mobile spawn is suitable for the vehicle
-	if ( commander->weapon().spec.wCategory != _INFANTRY )
+	if ( !specLoader.ppoIsSpawnAllowed(spawner.m_stoSubType,
+                        commander->weapon().spec.wClass, commander->weapon().spec.wType))
 		return 0;
 #endif
-
-	MobileSpawn& spawner = mission->spawner();
 
 	*x = spawner.m_x;
 	*y = spawner.m_y;
@@ -307,23 +306,20 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 	const Mission* mission = commander->mission();
 	const WEAPON_SPEC& spec = commander->weapon().spec;
 
-	if ( g_logDebug )
-	{
-		auto& instance = commander->instance();
-		dbugLog(_FLD, "Notifying cell:%s spawning t:%d,p:%u,c:%s sq:%u(%s) ct:%d,cp:%u,cc:%s in:%u.%u.%llu.%llu %s#%d [%f/%f/%f]"
-						, teulGetAddress(grant.serverIP)
-						, commander->teulIndex(), grant.commander, commander->callsign()
-						, commander->squadID(), Chat::Name(commander->squadHandle()).c_str()
-						, ((crew) ? crew->teulIndex() : 0), grant.crew, ((crew) ? crew->callsign() : "n/a")
-						, instance.category(), instance.type(), instance.handle(), instance.id()
-						, weapPrintName(&spec), commander->weapon().serial
-						, x, y, z
-						);
-	}
+    auto& instance = commander->instance();
+    dbugLog(_FLD, "Notifying cell:%s spawning t:%d,p:%u,c:%s sq:%u(%s) ct:%d,cp:%u,cc:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " %s#%d [%f/%f/%f]"
+                    , teulGetAddress(grant.serverIP)
+                    , commander->teulIndex(), grant.commander, commander->callsign()
+                    , commander->squadID(), Chat::Name(commander->squadHandle()).c_str()
+                    , ((crew) ? crew->teulIndex() : 0), grant.crew, ((crew) ? crew->callsign() : "n/a")
+                    , instance.category(), instance.type(), instance.handle(), instance.id()
+                    , weapPrintName(spec), commander->weapon().serial
+                    , x, y, z
+                    );
 
 	// Create the sortie record
 	DBThread::Do(DBThread::Default
-		, "CALL wwii.p_add_sortie("
+		, "CALL `wwii`.`p_add_sortie`("
 			" %u"
 			",%u,%u"
 			",%u,%u"

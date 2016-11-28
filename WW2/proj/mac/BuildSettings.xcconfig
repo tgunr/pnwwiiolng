@@ -54,6 +54,7 @@ ENABLE_NS_ASSERTIONS = YES                                  // Enable assertions
 ENABLE_STRICT_OBJC_MSGSEND = YES                            // Enforce good typing in use of objc_msgSend()
 OTHER_LDFLAGS = -bind_at_load                               // Just skip over any Objective-C linking issues
 CLANG_ENABLE_OBJC_ARC = YES                                 // Enable ARC, now that Clang in Xcode 8 supports it for 32-bit
+CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES            // More C++ ASAN checks
 
 // Settings for Development configuration - please keep this in sync with Debug
 GCC_UNROLL_LOOPS_Development            = NO                // Don't unroll loops

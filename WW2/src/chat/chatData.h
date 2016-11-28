@@ -17,7 +17,7 @@
 #include <math.h>
 
 class Property;			// Forward declaration
-typedef std::map<UINT64, Property*> PROPERTY_INDEX;
+using PROPERTY_INDEX = std::map<UINT64, std::unique_ptr<Property>>;
 extern PROPERTY_INDEX _properties;
 
 // Parent class which defines a Property (ownable entity) within chat
@@ -26,30 +26,30 @@ class Property
 public:
 	// Take the top 48 bits of the fullobjid
 	// this discards the class and type
-	Property(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char* name, UINT32 oid)
+	Property(const FULL_OBJ_ID id, WWII_COUNTRY owner, const char* name, UINT32 oid)
 		: m_fid(id)
 		, m_key(id.Key())
 		, m_name(name)
 		, m_owner(owner)
 		, m_flags(0)
 		, m_oid(oid)
-			{ _properties[m_key] = this; }
+	{}
 
 	// Destructor
-	virtual ~Property() { _properties.erase(m_key); }
+	virtual ~Property() noexcept {}
 
-	const FULL_OBJ_ID& Fid() const { return m_fid; }
-	UINT64 Key() const { return m_key; }
-	const char* Name() const { return m_name.c_str(); }
-	bool Matches(const FULL_OBJ_ID& rhs) const
+	FULL_OBJ_ID Fid() const noexcept { return m_fid; }
+	UINT64 Key() const noexcept { return m_key; }
+	const char* Name() const noexcept { return m_name.c_str(); }
+	bool Matches(FULL_OBJ_ID rhs) const noexcept
 			{ return (m_key == rhs.Key()); }
-	bool Matches(const Property& rhs) const { return m_key == rhs.m_key; }
-	virtual Property* Parent() const { return nullptr; }
-	bool IsBridge() const { return m_fid.objClass == CLASS_CP && m_fid.objType == CP_BRIDGE; }
-	virtual bool IsCP() const { return (m_fid.objClass == CLASS_CP); }
-	virtual bool IsFacility() const { return (m_fid.objClass == CLASS_FACILITY); }
-	UINT32 OID() const { return m_oid; }
-	WWII_SIDE Side() const { return wwiiSide(m_owner); }
+	bool Matches(const Property& rhs) const noexcept { return m_key == rhs.m_key; }
+	virtual Property* Parent() const noexcept { return nullptr; }
+	bool IsBridge() const noexcept { return m_fid.objClass == CLASS_CP && m_fid.objType == CP_BRIDGE; }
+	virtual bool IsCP() const noexcept { return (m_fid.objClass == CLASS_CP); }
+	virtual bool IsFacility() const noexcept { return (m_fid.objClass == CLASS_FACILITY); }
+	UINT32 OID() const noexcept { return m_oid; }
+	WWII_SIDE Side() const noexcept { return wwiiSide(m_owner); }
 
 public:
 	FULL_OBJ_ID			m_fid;
@@ -64,13 +64,14 @@ public:
 class PropCP : public Property
 {
 public:
-	PropCP(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char* name, WWII_COUNTRY controller, UINT32 oid)
+	PropCP(const FULL_OBJ_ID id, WWII_COUNTRY owner, const char* name, WWII_COUNTRY controller, UINT32 oid)
 		: Property(id, owner, name, oid)
 		, m_controller(controller)
 			{}
+	virtual ~PropCP() noexcept {}
 
-	virtual bool isCP() const { return true; }
-	virtual bool isFacility() const { return false; }
+	virtual bool IsCP() const noexcept override { return true; }
+	virtual bool IsFacility() const noexcept override { return false; }
 
 public:
 	WWII_COUNTRY		m_controller;
@@ -80,11 +81,12 @@ public:
 class PropFacility : public Property
 {
 public:
-	PropFacility(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char* name, const FULL_OBJ_ID& cp, UINT32 oid);
+	PropFacility(const FULL_OBJ_ID id, WWII_COUNTRY owner, const char* name, const FULL_OBJ_ID cp, UINT32 oid);
+	virtual ~PropFacility() noexcept {}
 
-	Property* parent() const { return (Property*)m_cp; }
-	virtual bool isCP() const { return false; }
-	virtual bool isFacility() const { return true; }
+	virtual Property* Parent() const noexcept override { return (Property*)m_cp; }
+	virtual bool IsCP() const noexcept override { return false; }
+	virtual bool IsFacility() const noexcept override { return true; }
 
 public:
 	PropCP*				m_cp;				// Which CP I belong to

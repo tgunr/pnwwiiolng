@@ -235,7 +235,7 @@ mlGaugeTranslationTable mlDOFTransTable[ML_DOF_MAXNUM] =
 	{"vehseat",1,ML_DOF_VEH_SEAT,nullptr,0,0}
 };
 
-UINT32 mlGaugeInit(void)
+UINT32 mlGaugeInit()
 {
 UINT32 i,j;
 

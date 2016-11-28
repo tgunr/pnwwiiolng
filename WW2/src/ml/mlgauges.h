@@ -358,7 +358,7 @@ struct mlVehicleVarData
 
 extern mlVehicleVarData _VarData;
 
-extern UINT32 mlGaugeInit(void);
+extern UINT32 mlGaugeInit();
 
 extern UINT32 mlGaugeUpdatePlayerSpeed(FLOAT64 Speed);
 extern UINT32 mlGaugeUpdatePlayerGaugeData(mlVehicleData* VehicleData,OBJECT * Object);

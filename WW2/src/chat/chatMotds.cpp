@@ -17,14 +17,14 @@
 #include "wwii/wwiiPack.h"
 
 SINT32
-MOTD_REQUEST::packer(LOGICAL mode, ACTION_OBJECT* a)
+MOTD_REQUEST::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &type, 8);
 	return a->offset;
 }
 
 SINT32
-MOTD_REPLY::packer(LOGICAL mode, ACTION_OBJECT* a)
+MOTD_REPLY::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &type, 8);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &added, 0);

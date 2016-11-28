@@ -10,8 +10,6 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include "versionNo.h"
-
 #include "chat/chatGCIMessage.h"
 #include "chat/chatGCITypes.h"
 #include "chat/chatSupportRPCMessages.h"
@@ -34,7 +32,7 @@ static const UINT32 EWS_MIN_TIMEOUT = 60;			// ~1 minute
 static const UINT32 EWS_SHORT_TIMEOUT = 120;		// ~2 minutes
 static const UINT32 EWS_MAIN_TIMEOUT = 4 * 60;		// ~4 minutes
 
-typedef std::set<UINT16> CHANGED_CPS;
+using CHANGED_CPS = std::set<UINT16>;
 static CHANGED_CPS _changedCPs;
 
 /*
@@ -48,7 +46,7 @@ class EWSScoreCompare
 */
 
 #ifdef MAINTAIN_ACTIVE_EWS_LIST
-typedef std::set<CPStruct*> ACTIVE_EWS;
+using ACTIVE_EWS = std::set<CPStruct*>;
 static ACTIVE_EWS g_activeEws;
 #endif
 
@@ -467,7 +465,7 @@ EWSReport::EWSReport(UINT32 weaponSerial, FacilityStruct* facility, UINT8 side, 
 	, m_side(side)
 	, m_weapCategory(weapCategory)
 {
-	register CPStruct* cp = m_facility->cp;
+	CPStruct* cp = m_facility->cp;
 	assert(cp != nullptr);
 
 	// Adjust the facility counters
@@ -490,7 +488,7 @@ EWSReport::EWSReport(UINT32 weaponSerial, FacilityStruct* facility, UINT8 side, 
 
 EWSReport::~EWSReport()
 {
-	register CPStruct* cp = m_facility->cp;
+	CPStruct* cp = m_facility->cp;
 	assert(cp != nullptr);
 
 	dbugLog(_FLD, "ews: deleting report for %d at %s", m_weapon, cp->name);

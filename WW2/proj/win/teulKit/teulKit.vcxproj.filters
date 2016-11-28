@@ -54,6 +54,7 @@
     <ClCompile Include="..\..\..\src\teul\teulNetTimeMS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\build_info.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\dbug\dbug.h">

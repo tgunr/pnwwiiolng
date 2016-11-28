@@ -10,8 +10,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcastObject.h"
 #include "chat/chatDB.h"
 #include "chat/chatDotCommand.h"
@@ -41,6 +39,8 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiRank.h"
 #include "weap/weapSpec.h"
+
+using Chat::ARGV;
 
 //////////////////////////////////////////////////////////////////////
 // Private variables
@@ -148,67 +148,6 @@ public:
 		}
 	}
 } dotAfk;
-
-#ifdef DOT_ALARM
-//////////////////////////////////////////////////////////////////////
-// .alarm requests an alarm message after a given number of seconds
-//////////////////////////////////////////////////////////////////////
-
-//! @internal
-class DotAlarm : public DotCommand
-{
-public:
-	DotAlarm() : DotCommand("alarm", "Request timed notice"
-							, IS_PLAYNET, LSTR_NONE, LSTR_NONE
-							) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override;
-}
-
-void
-DotAlarm::actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
-{
-	static ARGV args;
-	vectorize(arguments, args, 3);
-	const char* usage = "Usage: /alarm <number> [<Seconds|Minutes|Hours>";
-	char unit = 's';
-
-	if ( args.size() < 1 )
-	{
-		help(player);
-		return;
-	}
-
-	UINT32 seconds = atol(args[0]);
-	if ( seconds == 0 )
-	{
-		player.message(LSTR_CAUTION, LSTR_LABELLED_GENERIC, "Invalid number of seconds", argv[0]);
-		return;
-	}
-
-	if ( args.size() > 1 )
-		unit = tolower(args[1][0]);
-
-	switch ( unit )
-	{
-		case 's': break;
-		case 'm': seconds *= 60; break;
-		case 'h': seconds *= 3600; break;
-		default:
-			throw Chat::LStringErr("Please specify one of Seconds, Minutes or Hours (abbreviations s, m or h)");
-	}
-
-	if ( seconds < 10 )
-		throw Chat::LStringErr("Minimum of 10 seconds for an alarm");
-
-	if ( seconds > 72 * 3600 )
-		throw Chat::LStringErr("Maximum of 72 hours for an alarm");
-
-	if ( player.hasAlarm() )
-		player.message(LSTR_NOTE, LSTR_GENERIC, "Cancelling previous alarm");
-
-	player.addAlarm(seconds);
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // /backupleader command
@@ -597,7 +536,7 @@ class DotNoEChat : public DotCommand
 public:
 	DotNoEChat() : DotCommand("noechat", "Toggle receipt of enemy area chat on/off"
 								, NO_MASK, LSTR_NOECHAT_USAGE, LSTR_NOECHAT_DETAIL
-								) { };
+								) { }
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( player.noEnemyChat() )
@@ -622,7 +561,7 @@ class DotNoWho : public DotCommand
 public:
 	DotNoWho() : DotCommand("nowho", "Allows you to hide from .who"
 								, NO_MASK, LSTR_NOWHO_USAGE, LSTR_NOWHO_DETAIL
-								) { };
+								) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
@@ -648,7 +587,7 @@ class DotOrders : public DotCommand
 public:
 	DotOrders() : DotCommand("orders", "Set/view current mission orders"
 							, NO_MASK, LSTR_ORDERS_USAGE, LSTR_ORDERS_DETAIL
-							) { };
+							) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* message) const  override
 	{
@@ -1239,11 +1178,6 @@ public:
 	DotWTF() : DotCommand("wtf", "Pointless command", NO_MASK, LSTR_NONE, LSTR_NONE)
 	{
 		reset();
-	}
-
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
-	{
-        action(player, message) ;
 	}
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override

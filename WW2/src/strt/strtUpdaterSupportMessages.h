@@ -7,13 +7,13 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 //This function installs all the host callbacks
-extern SINT32 strtInstallUpdaterSupportCallbacks(void);
+SINT32 strtInstallUpdaterSupportCallbacks();
 
 //This function sends a move user to the strat system
-extern SINT32 strtSendMoveUser(SINT32 teulIndex, const struct OCTET_CELL& octet, const struct WEAPON_SERIAL& weapon, UINT32 playerID);
+SINT32 strtSendMoveUser(SINT32 teulIndex, const struct OCTET_CELL& octet, const struct WEAPON_SERIAL& weapon, UINT32 playerID);
 
 //This function sends a delete user
-extern SINT32 strtSendDeleteUser(SINT32 teulIndex);
+SINT32 strtSendDeleteUser(SINT32 teulIndex);
 
 //Sends the strat address to the strat updater
-extern SINT32 strtSendStratAddress(UINT32 stratAddress);
+SINT32 strtSendStratAddress(UINT32 stratAddress);

@@ -9,10 +9,9 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
-
 #include "chat/chatBrigadeMove.h"
 #include "chat/chatConstants.h"
+#include "chat/chatName.h"
 #include "chat/chatSideMessage.h"
 #include "chat/chatStratSupportMessages.h"
 #include "chat/chatTypes.h"
@@ -30,8 +29,8 @@
 #include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiHCUnits.h"
-#include "wwii/wwiiThreads.h"
 
 static TEUL_CALLBACK* _SEND_SCMD_RESULT;
 static TEUL_CALLBACK* _SEND_SIDE_MESSAGE;
@@ -91,7 +90,7 @@ chatGetPopulation(WWII_SIDE side)
 static bool
 _sideMessage(SIDE_MESSAGE_TYPE type
 				, WWII_SIDE side
-				, const FULL_OBJ_ID& objective
+				, const FULL_OBJ_ID objective
 				, LSTRING_ID prefix
 				, LSTRING_ID message
 				, const char* arg1
@@ -122,7 +121,7 @@ _sideMessage(SIDE_MESSAGE_TYPE type
 // Send a message to one side, possibly limited to one CP
 
 bool
-chatSendSideMessage(WWII_SIDE side, const FULL_OBJ_ID& objective, LSTRING_ID prefix, LSTRING_ID message, const char* arg1, const char* arg2)
+chatSendSideMessage(WWII_SIDE side, const FULL_OBJ_ID objective, LSTRING_ID prefix, LSTRING_ID message, const char* arg1, const char* arg2)
 {
 	return _sideMessage(SM_SIDE, side, objective, prefix, message, arg1, arg2);
 }
@@ -164,7 +163,7 @@ chatSendSCMDResult(SINT32 playerID
 							, result
 							);
 		scmd.m_data = data;
-		if ( scmd.send() < 0 ) 
+		if ( scmd.send() < 0 )
 			throw std::logic_error("Send error");
 
 		return true;
@@ -215,7 +214,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 	UINT32 destination = (cp) ? cp->uOID : 0;
 	const char* unitName = (unit ? unit->callsign() : "NULL");
 	char fidBuffer[FULL_OBJ_ID::PrintLen];
-	const char* cpName = (cp ? cp->name : weapPrintFullObjIDC(&request.m_destination, fidBuffer));
+	const char* cpName = (cp ? cp->name : weapPrintFullObjIDC(request.m_destination, fidBuffer));
 
 	dbugLog(_FLI, "%s: %s requesting %s %s(%u) to %s"
 					, __FUNCTION__, requester.c_str(), (request.m_actionable ? "move" : "check")
@@ -241,7 +240,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 }
 
 BRIGADE_MOVE_RESULT
-BrigadeMove::process(const ChatHandle& mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM)
+BrigadeMove::process(const ChatHandle mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM)
 {
 	if ( unit == nullptr )
 	{
@@ -277,10 +276,10 @@ BrigadeMove::process(const ChatHandle& mover, const char* callsign, StratHCUnit*
 //////////////////////////////////////////////////////////////////////
 //This function installs all the host callbacks
 SINT32
-chatInstallStratSupportCallbacks(void)
+chatInstallStratSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(CHAT_X)
-
+	{
 		REGISTER_SENDER(Chat::SIDE_MESSAGE_Y, _sendSideMessage, _SEND_SIDE_MESSAGE);
 
 		REGISTER_RECEIVER(Chat::OOB_MESSAGE_Y, _recvOOBMessage);
@@ -288,6 +287,6 @@ chatInstallStratSupportCallbacks(void)
 		REGISTER_SENDER(Chat::EXCHANGE_SCMD_Y, _sendSCMDResult, _SEND_SCMD_RESULT);
 
 		REGISTER_MSG(Chat::BRIGADE_MOVE_Y, BRIGADE_MOVE_MSG);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(CHAT_X)
 }

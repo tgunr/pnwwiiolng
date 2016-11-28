@@ -5,7 +5,6 @@
 #include <sys/stat.h>
 #include "cfgPrefs.h"
 #import <Cocoa/Cocoa.h>
-#include "endianess.h"
 
 LOGICAL cursorHidden = false;
 
@@ -289,6 +288,22 @@ void ddpSetFullScreen(LOGICAL fullscreen)
     ddpRefreshGLViewport(WantedWidth, WantedHeight);
 }
 
+void ddpTemporarilyEscapeFullscreen(bool begin)
+{
+    // This is a TERRIBLE solution, for the record. It's just a quick hack that works for now.
+    // TODO: Clean this up with something sane.
+    static NSRect oldWinRect;
+    
+    if (begin) {
+        oldWinRect = winRect;
+        winRect = fullRect;
+        ddpSetFullScreen(false);
+    } else {
+        winRect = oldWinRect;
+        ddpSetFullScreen(true);
+    }
+}
+
 void ddpSetupGL(int w, int h)
 {
 	[nsOpenGlContext makeCurrentContext];
@@ -337,10 +352,6 @@ LOGICAL	ddpUpdate()
     if (GeneratingHostTerrain) {
         updateGeneratingHostTerrain();
     }
-#endif
-    
-#ifdef BETA_RELEASE
-	logUpdateProfiling();
 #endif
     
 	if (resetfps)

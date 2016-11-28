@@ -187,7 +187,7 @@ LOGICAL CFXParticle::RemoveFromList(PARTICLE* pPart)
 	return TRUE;
 }
 
-LOGICAL CFXParticle::Update(void)
+LOGICAL CFXParticle::Update()
 {
     FLOAT32 Speed,OrigSpeed;
     FLOAT32 DeltaTime;

@@ -110,7 +110,7 @@ struct mlComponentListIterator
 	mlComponent* comp;
 };
 
-typedef std::vector<mlComponent*> mlComponentVector;
+using mlComponentVector = std::vector<mlComponent*>;
 
 struct mlAirfoilList;
 struct mlEngineList;

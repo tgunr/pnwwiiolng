@@ -10,10 +10,10 @@
 #include "include/pnThread.h"
 #include "dbse/dbseHandle.h"
 
-typedef struct st_mysql MYSQL;
+using MYSQL = struct st_mysql;
 class DBQuery;
 
-typedef void (THREAD_CALLBACK)(void*);
+using THREAD_CALLBACK = void(*)(void*);
 
 //////////////////////////////////////////////////////////////////////
 // Threads-system calls ("threads")
@@ -28,15 +28,8 @@ extern void threadsEnable();
 // Bring the threads into sync and shut them down
 extern void threadsShutdown();
 
-// Threads can't write to dbugLog directly, so periodically
-// the main process has to log for them
-extern bool threadsLogging();
-
 // Process the next callback on the queue
 extern void threadsCallNextCallback();
-
-// Prepare the dbConnection structure from the environment
-extern bool threadsReadDBEnvironment();
 
 // Open a new database connection in a thread-safe way
 extern DB::handle_t* threadsOpenDBConnection(bool enableAutoCommit);
@@ -47,17 +40,8 @@ extern void threadsCloseDBConnection(DB::handle_t* conn);
 //////////////////////////////////////////////////////////////////////
 // Client calls ("thread")
 
-// Threaded implementation of dbugLog (non-immediate)
-extern void threadLog(const char* file, unsigned int line, unsigned int level, const char* fmt, ...);
-
-#ifdef BETA_RELEASE
-#define betaThreadLog(...) threadLog(__VA_ARGS__)
-#else
-#define betaThreadLog(...)
-#endif
-
 // Add a callback to the thread queue
-extern void threadCallback(THREAD_CALLBACK* fn, void*);
+extern void threadCallback(THREAD_CALLBACK fn, void*);
 
 // Escape a string for mysql/js usage
 extern void wwiiEscapeString(std::string& text);
@@ -71,18 +55,3 @@ class StatsThread : public PNThread
 public:
 	virtual void run() override;
 };
-
-#define MYSQL_ESC_QUERY_VAR_MAX_LEN   512
-
-namespace DBThread
-{
-	typedef enum { Audit, Auth, Chat, Game, Player, Squad, Sys, Wwii, WwiiOnline, NumDBNos, Default = WwiiOnline } DBNo;
-
-	// Escape function to be used prior to adding a query
-	extern void EscapeString(DB::handle_t* conn, std::string& text);
-	extern void EscapeString(std::string& text);
-	// Build a query in a textAlloc and format it for me.
-	extern void Do(const DBNo db_, const char* queryFormat, ...);
-	// Pre-formatted textAlloc query
-	extern void Do(const DBNo db_, char* queryTextAlloc);
-}

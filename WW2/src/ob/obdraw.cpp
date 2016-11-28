@@ -47,11 +47,7 @@
 
 #define MAX_DRAW_PRIMITIVES  1000
 
-#if platOS == OS_MACOS
-    #define INLINE inline
-#else
-    #define INLINE __forceinline
-#endif
+#define INLINE inline
 
 #include <vector>
 
@@ -728,7 +724,7 @@ UINT32			flags;
 }
 #endif
 
-static LOGICAL InitMultiTexture(void)
+static LOGICAL InitMultiTexture()
 {
 SINT32		i;
 
@@ -758,7 +754,7 @@ SINT32		i;
 	return(TRUE);
 }
 
-static void KillMultiTexture(void)
+static void KillMultiTexture()
 {
 SINT32		i;
 
@@ -1840,7 +1836,7 @@ static bool _initSceneFBO()
     return true;
 }
 
-LOGICAL obdrawInit(void)
+LOGICAL obdrawInit()
 {
     if (!obcsInit())
 	{
@@ -1882,7 +1878,7 @@ LOGICAL obdrawInit(void)
     return(TRUE);
 }
 
-void obdrawKill(void)
+void obdrawKill()
 {
     if(_surfaceFBO.valid())
     {
@@ -1908,11 +1904,17 @@ void obdrawKill(void)
         _reflectionFBO = nullptr;
     }
 
-    while(_reflectionRTT->referenceCount() > 1)
-        _reflectionRTT->unref();
+	if (_reflectionRTT.valid())
+	{
+		while (_reflectionRTT->referenceCount() > 1)
+			_reflectionRTT->unref();
+	}
 
-    while(_surfaceRTT->referenceCount() > 1)
-        _surfaceRTT->unref();
+	if (_surfaceRTT.valid())
+	{
+		while (_surfaceRTT->referenceCount() > 1)
+			_surfaceRTT->unref();
+	}
 
     _surfaceRTT = nullptr;
     _reflectionRTT = nullptr;
@@ -4902,12 +4904,12 @@ void obdrawDrawShadowCasters()
     {
         oglDisableTexturesAboveAndIncluding(0);
 
-        oglLockTextureState(1);
+        oglLockTextureState(true);
         oglLockMaterialState(1);
 
         logTimerCallVoid(_drawUnsorted);
 
-        oglLockTextureState(0);
+        oglLockTextureState(false);
         oglLockMaterialState(0);
     }
 }

@@ -168,7 +168,7 @@ LOGICAL Open_Debug(const char* filename)
 	return TRUE;
 }
 
-void Close_Debug(void)
+void Close_Debug()
 {
 }
 
@@ -208,7 +208,7 @@ LOGICAL Open_Debug(const char* filename)
 	Close_Debug
 *************************************************************************************************/
 
-void Close_Debug(void)
+void Close_Debug()
 {
 	std::lock_guard<std::mutex> guard(logLock);
 
@@ -265,7 +265,7 @@ static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 #define MAX_TIMERS 1024
 
 #if platOS == OS_WIN32
-extern FLOAT32 GetCPUSpeed(void);
+extern FLOAT32 GetCPUSpeed();
 #endif
 
 struct logTimer
@@ -466,240 +466,3 @@ float logTimerToMs(int dt)
 }
 #endif //#ifdef USE_LOG_TIMER
 #endif // EVENT_LOG
-
-#ifdef BETA_RELEASE
-
-#include <sstream>
-#include <fstream>
-#include <iomanip>
-#include "rn/rnmain.h"
-#include "float.h"
-#include "include/vars.h"
-#include "chat/chatDefines.h"
-#include "client/GameClient.h"
-#include "VersionNo.h"
-#if platOS == OS_WIN32 || platOS == OS_WIN64
-#include "sys/sysreg.h"
-#endif
-
-static	FLOAT32				remainingProfilingTime;
-static	std::fstream		profilingStream;
-static	std::string			CurrentProfileName = "";
-static	std::string			CurrentProfileFileName = "";
-static	std::ostringstream 	frameTimesString;
-
-
-void logInitProfiling(const char* const profileName, FLOAT32 profilingDuration)
-{
-	CurrentProfileName = STRVER;
-	CurrentProfileName.append("_");
-	CurrentProfileName.append(profileName);
-
-	CurrentProfileFileName = CurrentProfileName;
-	CurrentProfileFileName.append("_profile.txt");
-	remainingProfilingTime = profilingDuration * 60000;
-	profilingStream.open(CurrentProfileFileName.c_str(), std::fstream::out | std::fstream::trunc);
-	profilingStream << std::fixed << std::setprecision(3);
-}
-
-// The sysctl() call is mostly gone on Linux; on OS X it's the easiest way without pulling in Foundation
-#if platOS == OS_MACOS
-#include <sys/sysctl.h>
-
-enum class sctyp { tstr, ti32, ti32x, ti64, ti64x };
-static std::string to_stringx(int32_t v) { char s[32] = {0}; snprintf(s, 31, "%x", v); return std::string{ s }; }
-static std::string to_stringx(int64_t v) { char s[32] = {0}; snprintf(s, 31, "%jx", v); return std::string{ s }; }
-static std::string sysctlString(const std::string &name, sctyp datatype)
-{
-    std::unique_ptr<char[]> buf;
-    size_t sz = 0;
-    
-    if (sysctlbyname(name.c_str(), nullptr, &sz, nullptr, 0) != 0) {
-        return "<ERROR>";
-    }
-    buf = std::make_unique<char[]>(sz);
-    if (sysctlbyname(name.c_str(), buf.get(), &sz, nullptr, 0) != 0) {
-        return "<ERROR>";
-    }
-    switch (datatype) {
-        case sctyp::tstr: return std::string{ buf.get(), sz };
-        case sctyp::ti32: return std::to_string(*reinterpret_cast<int32_t *>(buf.get()));
-        case sctyp::ti32x: return to_stringx(*reinterpret_cast<int32_t *>(buf.get()));
-        case sctyp::ti64: return std::to_string(*reinterpret_cast<int64_t *>(buf.get()));
-        case sctyp::ti64x: return to_stringx(*reinterpret_cast<int64_t *>(buf.get()));
-    }
-    __builtin_unreachable();
-}
-#endif
-
-// Return a string describing characteristics of the user's system
-static void _getSystemDetails(char* into, size_t sizeofInto)
-{
-#if platOS == OS_WIN32 || platOS == OS_WIN64
-	// Find the number of CPUs
-	SYSTEM_INFO sysInfo;
-	GetSystemInfo(&sysInfo);
-
-	// Query the registry for the CPU type etc
-	TCHAR cpuName[256];
-	DWORD cpuMhz = 0;
-	DWORD cpuFlags = 0;
-
-	static const TCHAR* HKLM_CPU0 = _T("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0");
-	sysregGetHKeyText(HKEY_LOCAL_MACHINE, HKLM_CPU0, _T("ProcessorNameString"), cpuName);
-	sysregGetHKeyDword(HKEY_LOCAL_MACHINE, HKLM_CPU0, _T("~Mhz"), &cpuMhz);
-	sysregGetHKeyDword(HKEY_LOCAL_MACHINE, HKLM_CPU0, _T("FeatureSet"), &cpuFlags);
-
-	sprintf_s(into, sizeofInto, "Win %u %x %u %s", sysInfo.dwNumberOfProcessors, cpuFlags, cpuMhz, UTF8(cpuName));
-
-	///TODO: Would be /really/ nice to add total memory and graphics card data.
-#elif platOS == OS_MACOS
-    snprintf(into, sizeofInto - 1, "Mac %s %s %s %s %s",
-        sysctlString("hw.ncpu", sctyp::ti32).c_str(),
-        sysctlString("machdep.cpu.feature_bits", sctyp::ti64x).c_str(), // This value isn't really very useful, this is bad even in the Windows version
-        sysctlString("hw.cpufrequency", sctyp::ti64).c_str(),
-        sysctlString("machdep.cpu.brand_string", sctyp::tstr).c_str(),
-        sysctlString("hw.memsize", sctyp::ti64).c_str()
-    );
-#else
-	strlcpy(into, "Linux <unimplemented>", sizeofInto);
-#endif
-}
-
-
-void logUpdateProfiling()
-{
-			FLOAT32	thisFrameTime;
-	static	FLOAT32	passedTimeSinceLastTick	= 0;
-			UINT32	passedTicks;
-	static	FLOAT32	tickDuration			= 100.0;
-	static	FLOAT32	minFrameTime			= FLT_MAX;
-	static	FLOAT32	maxFrameTime			= 0;
-	static	FLOAT32	totalFramesTime			= 0;
-	static	UINT32	totalFrameCnt			= 0;
-	static	FLOAT32	lastFramesTime			= 0;
-	static	UINT32	lastFrameCount			= 0;
-	static	UINT32	FramesOver100ms			= 0;
-	static	UINT32	FramesOver300ms			= 0;
-	static	UINT32	FramesOver500ms			= 0;
-	static	UINT32	FramesOver1000ms		= 0;
-			size_t	processPeakMemoryUsage	= 0;
-
-
-	if(!remainingProfilingTime) return;
-
-	thisFrameTime	= 1000 / gLastFrameFPS;
-	totalFramesTime += thisFrameTime;
-	totalFrameCnt++;
-	lastFramesTime += thisFrameTime;
-	lastFrameCount++;
-
-	if(thisFrameTime > 1000)	FramesOver1000ms++;
-	if(thisFrameTime > 500)		FramesOver500ms++;
-	if(thisFrameTime > 300)		FramesOver300ms++;
-	if(thisFrameTime > 100)		FramesOver100ms++;
-
-	passedTimeSinceLastTick += thisFrameTime;
-	passedTicks = (UINT32)(passedTimeSinceLastTick  / tickDuration);
-
-	if(passedTicks)
-	{
-		FLOAT32	thisFrameTimeAvg = lastFramesTime / lastFrameCount;
-
-		for(UINT32 i=0; i < passedTicks && remainingProfilingTime > 0; i++)
-		{
-			frameTimesString  << std::endl << thisFrameTimeAvg;
-			remainingProfilingTime -= tickDuration;
-		}
-		if(thisFrameTimeAvg < minFrameTime) minFrameTime = thisFrameTimeAvg;
-		if(thisFrameTimeAvg > maxFrameTime) maxFrameTime = thisFrameTimeAvg;
-
-		passedTimeSinceLastTick -= passedTicks * tickDuration;
-		lastFramesTime	= 0;
-		lastFrameCount	= 0;
-	}
-
-	if(remainingProfilingTime <= 0)
-	{
-		profilingStream << "Profile name: " << CurrentProfileName.c_str() << std::endl << std::endl;
-		profilingStream << "Frame time maximum: " << maxFrameTime << " ms" << std::endl;
-		profilingStream << "Frame time average: " << totalFramesTime / totalFrameCnt << " ms" << std::endl;
-		profilingStream << "Frame time minimum: " << minFrameTime << " ms" << std::endl << std::endl;
-
-		profilingStream << "Frames over 100 ms: " << FramesOver100ms << std::endl;
-		profilingStream << "Frames over 300 ms: " << FramesOver300ms << std::endl;
-		profilingStream << "Frames over 500 ms: " << FramesOver500ms << std::endl;
-		profilingStream << "Frames over 1000 ms: " << FramesOver1000ms << std::endl;
-
-#if platOS == OS_WIN32
-		PROCESS_MEMORY_COUNTERS	memoryCounters;
-		HANDLE						processHandle	= GetCurrentProcess();
-
-		GetProcessMemoryInfo(processHandle, &memoryCounters, sizeof(memoryCounters));
-		processPeakMemoryUsage = memoryCounters.PeakPagefileUsage;
-#endif // #ifdef OS_WIN32
-
-		profilingStream << std::endl;
-		profilingStream.imbue(std::locale("US"));
-		profilingStream << "Peak memory usage during profiling: " << processPeakMemoryUsage << " Bytes";
-		profilingStream << std::endl;	profilingStream << std::endl;
-		profilingStream << frameTimesString.str();
-
-		rnmainListText("... completed profiling.\n\n");
-		rnmainListText("Average frame time: %.3f ms\n", (FLOAT32)totalFramesTime / (FLOAT32)totalFrameCnt);
-		rnmainListText("Complete profile data can be found in %s.", CurrentProfileFileName.c_str());
-
-		if(Online)
-		{
-			// Build a chat command version of the results for the host.
-			char result[MAX_MESSAGE_LENGTH+1];
-
-			int written = 0;
-			written = snprintf(result, MAX_MESSAGE_LENGTH
-								, "/profres"
-									" %s"				// Version number
-									" %u %f %f %f"		// Frame count[minTime/maxTime/ttlTime]
-									" %u %u %u %u"		// Frames over 100, 300, 500, 1000 ms
-									" %lu"				// peak mem
-									" \"%s\""			// Profile name
-									" "
-								, STRVER
-								, totalFrameCnt, minFrameTime, maxFrameTime, totalFramesTime
-								, FramesOver100ms, FramesOver300ms, FramesOver500ms, FramesOver1000ms
-								, processPeakMemoryUsage
-								, CurrentProfileName.c_str()
-								);
-			if ( written > MAX_MESSAGE_LENGTH )
-				written = MAX_MESSAGE_LENGTH;
-			// snprintf doesn't guarantee it will write a trailing zero...
-			result[MAX_MESSAGE_LENGTH] = 0;
-
-			// Tack on as much of the system specs as we can at the end
-			_getSystemDetails(result + written, sizeof(result) - written);
-
-			// Send the command to the chat host
-			PlayerClient()->SendChatMessage(0, result);
-
-			// Note it to the profile file just FYI
-			profilingStream << std::endl;	profilingStream << std::endl;
-			profilingStream << " " << result;
-		}
-
-
-		minFrameTime			= FLT_MAX;
-		maxFrameTime			= 0;
-		totalFramesTime			= 0;
-		totalFrameCnt			= 0;
-		passedTimeSinceLastTick	= 0;
-		remainingProfilingTime	= 0;
-		FramesOver100ms			= 0;
-		FramesOver300ms			= 0;
-		FramesOver500ms			= 0;
-		FramesOver1000ms		= 0;
-		CurrentProfileName = "";
-
-		profilingStream.close();
-		frameTimesString.str("");
-	}
-}
-#endif // BETA_RELEASE

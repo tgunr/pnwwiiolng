@@ -31,7 +31,7 @@ FLARE   ret;
 	return(ret);
 }
 
-LOGICAL oblfInit(void)
+LOGICAL oblfInit()
 {
 LOGICAL  retval=TRUE;
 char  texname[256];
@@ -195,7 +195,7 @@ UINT16		  indices[6] = { 0, 1, 3, 1, 2, 3 };
 	return(TRUE);
 }
 
-void oblfUpdate(void)
+void oblfUpdate()
 {
 	DYNALITE*  lplites;
 	LIGHT*     light;
@@ -215,7 +215,7 @@ void oblfUpdate(void)
 	}
 }
 
-void oblfKill(void)
+void oblfKill()
 {
 int   i;
 

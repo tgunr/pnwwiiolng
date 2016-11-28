@@ -15,14 +15,14 @@
 // Originating Programmer: Martin Poulin
 
 #include "auth/authTypes.h"
-#include "teul/teulFuncTypes.h"		// For ERROR_FUNCTION_REF
+#include "teul/teulFuncTypes.h"		// For ERROR_FUNCTION
 
 extern TEUL_CALLBACK*	authGAME_INIT;
 extern TEUL_CALLBACK*	authSERVER_LOAD;
 extern TEUL_CALLBACK*	authGAME_CAPACITY;
 
 // init auth game callbacks
-SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn);
+SINT32 authInstallGameCallbacks(ERROR_FUNCTION externErrorFn);
 
 
 // used to report client actions (login, logout etc..)

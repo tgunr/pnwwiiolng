@@ -28,7 +28,7 @@ struct ADAPTERMODES
 char* dx3dinfoDeviceTypeToString(DWORD type);
 char* dx3dinfoAdapterToString(DWORD adapter);
 
-bool dx3dinfoEnumAdaptersAndModes(void);
+bool dx3dinfoEnumAdaptersAndModes();
 bool dx3dinfoGetAdaptersAndModes(DWORD* retnumadapters, std::vector<ADAPTERMODES*>& adaptermodes);
 
 int dx3dGetBPP(D3DFORMAT format);

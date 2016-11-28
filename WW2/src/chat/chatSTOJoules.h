@@ -18,11 +18,11 @@ public:
 	STOJoules() : m_uid(0), m_joules(0LL) {}
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	UINT32		m_uid;						// UID of the STO being damaged
 	SINT64		m_joules;					// Joules being done
 };
 
-typedef teul_network_array<STOJoules> STO_JOULES;
+using STO_JOULES = teul_network_array<STOJoules>;

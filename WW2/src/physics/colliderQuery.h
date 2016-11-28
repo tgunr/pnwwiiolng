@@ -16,7 +16,7 @@ public:
 	virtual ~colliderQuery();
 
     colliderQuery( const colliderQuery & rhs ) { }
-    
+
 	dGeomID addGeom(dGeomID g, unsigned int cat, unsigned int col);
 	void addGeomToCollideWith(dGeomID);
 	void setGeomToCollideWith(dGeomID);
@@ -51,7 +51,7 @@ public:
 		void sortByDepthAndGeom();
 	};
 
-	typedef std::vector<dGeomID> dGeomList;
+	using dGeomList = std::vector<dGeomID>;
 
 	colliderQuery::CollisionList& getCollisions(bool sorted = true); // all contacts
 	bool getCollisions(CollisionList&) const;

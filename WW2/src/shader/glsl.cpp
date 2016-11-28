@@ -1,4 +1,4 @@
-#include <syscfg.h>
+#include <syscfg.h> // Path is project specific.
 /*------------------------------------------------------------------
 Module: osgShader.cpp
 Description: Wrapper for creating vertex/frag shaders
@@ -32,25 +32,22 @@ Description: Wrapper for creating vertex/frag shaders
 
 static bool ShaderReload = false;
 
-typedef struct tagShaderData
+struct ShaderData
 {
-    tagShaderData(const char* path, glslShader* sh)
+    ShaderData(const char* path, glslShader* sh)
+		: name(path), shader(sh)
     {
-        name = path;
-        shader = sh;
-
         fioModified(&then, path);
         now = then;
     }
 
     std::string name;
+    glslShader* shader;
     int then;
     int now;
-    glslShader* shader;
+};
 
-} ShaderData;
-
-typedef std::set<ShaderData *> ShaderMap;
+using ShaderMap = std::set<ShaderData *>;
 static ShaderMap _shaders;
 
 #endif // BETA_RELEASE
@@ -80,7 +77,7 @@ public:
         if(first)
         {
             const char* s = xmlGetStringFromNode(node, "statesetonly");
-            
+
 #if USE_STATESET
             if(s && !strncmp(s, "false", 4))
             {
@@ -145,7 +142,7 @@ public:
         if(first)
         {
             const char* s = xmlGetStringFromNode(node);
-           
+
             ref_ptr<glslShader> shader = GLSL.loadVertexShader(s);
             pgm->AddShader(shader.get());
         }
@@ -158,7 +155,7 @@ public:
         if(first)
         {
             const char* s = xmlGetStringFromNode(node);
-           
+
             ref_ptr<glslShader> shader = GLSL.loadFragmentShader(s);
             pgm->AddShader(shader.get());
         }
@@ -171,7 +168,7 @@ public:
         if(first)
         {
             const char* s = xmlGetStringFromNode(node);
-           
+
             ref_ptr<glslShader> shader = GLSL.loadGeometryShader(s);
             pgm->AddShader(shader.get());
         }
@@ -210,7 +207,7 @@ public:
 
             if(!xmlGetNodeValue(node, XML_DATA_BOOL, &onetimeapply, "onetimeapply"))
                 onetimeapply = false;
-            
+
             if(!xmlGetNodeValue(node, XML_DATA_UINT, &numelements, "numelements"))
                 numelements = 1;
 
@@ -224,7 +221,7 @@ public:
 
                     if(!xmlGetNodeValue(node, XML_DATA_UINT, &unit, "unit"))
                         unit = 0;
-                
+
                     pgm->GetOrCreateUniform(name.c_str(), glslUniform::SAMPLER_BUFFER, numelements);
                     pgm->GetUniform(name.c_str())->Set((int)unit);
                 }
@@ -234,7 +231,7 @@ public:
 
                     if(!xmlGetNodeValue(node, XML_DATA_UINT, &unit, "unit"))
                         unit = 0;
-                
+
                     pgm->GetOrCreateUniform(name.c_str(), glslUniform::SAMPLER_2D_ARRAY, numelements);
                     pgm->GetUniform(name.c_str())->Set((int)unit);
                 }
@@ -244,7 +241,7 @@ public:
 
                     if(!xmlGetNodeValue(node, XML_DATA_UINT, &unit, "unit"))
                         unit = 0;
-                
+
                     pgm->GetOrCreateUniform(name.c_str(), glslUniform::SAMPLER_CUBE, numelements);
                     pgm->GetUniform(name.c_str())->Set((int)unit);
                 }
@@ -254,7 +251,7 @@ public:
 
                     if(!xmlGetNodeValue(node, XML_DATA_UINT, &unit, "unit"))
                         unit = 0;
-                
+
                     pgm->GetOrCreateUniform(name.c_str(), glslUniform::SAMPLER_2D_SHADOW, numelements);
                     pgm->GetUniform(name.c_str())->Set((int)unit);
                 }
@@ -264,7 +261,7 @@ public:
 
                     if(!xmlGetNodeValue(node, XML_DATA_UINT, &unit, "unit"))
                         unit = 0;
-                
+
                     pgm->GetOrCreateUniform(name.c_str(), glslUniform::UNSIGNED_INT_SAMPLER_2D, numelements);
                     pgm->GetUniform(name.c_str())->Set((int)unit);
                 }
@@ -274,7 +271,7 @@ public:
 
                     if(!xmlGetNodeValue(node, XML_DATA_UINT, &unit, "unit"))
                         unit = 0;
-                
+
                     pgm->GetOrCreateUniform(name.c_str(), glslUniform::INT_SAMPLER_2D, numelements);
                     pgm->GetUniform(name.c_str())->Set((int)unit);
                 }
@@ -284,7 +281,7 @@ public:
 
                     if(!xmlGetNodeValue(node, XML_DATA_UINT, &unit, "unit"))
                         unit = 0;
-                
+
                     pgm->GetOrCreateUniform(name.c_str(), glslUniform::SAMPLER_2D, numelements);
                     pgm->GetUniform(name.c_str())->Set((int)unit);
                 }
@@ -419,7 +416,7 @@ Description:
 static bool LoadShaders()
 {
     std::string path;
-    
+
     if(ogl::UseDeprecatedPath())
         path = "fx/xml/shadersdeprecated.xml";
     else
@@ -489,7 +486,7 @@ bool glslInit()
 
     if(ogl::UseDeprecatedPath())
         InitGlobalUniforms();
-    
+
     if(!LoadShaders())
         return false;
 
@@ -619,7 +616,7 @@ static inline void UpdateLights()
 
         if(lightblock0)
             firsttime = false;
-        else 
+        else
             return;
     }
 
@@ -631,7 +628,7 @@ static inline void UpdateLights()
         if(lights[0].light.flags & LITE_ON)
         {
             dir = lights[0].light.light.dvDirection;
-            
+
             dir.x = -dir.x;
             dir.y = -dir.y;
             dir.z = -dir.z;
@@ -653,11 +650,11 @@ static inline void UpdateLights()
         {
             lightblock0->Set("b_enabled0", 0.0f);
         }
-       
+
         if(lights[1].light.flags & LITE_ON)
         {
             dir = lights[1].light.light.dvDirection;
-            
+
             dir.x = -dir.x;
             dir.y = -dir.y;
             dir.z = -dir.z;
@@ -683,7 +680,7 @@ static inline void UpdateLights()
         if(lights[2].light.flags & LITE_ON)
         {
             dir = lights[2].light.light.dvDirection;
-            
+
             dir.x = -dir.x;
             dir.y = -dir.y;
             dir.z = -dir.z;
@@ -715,7 +712,7 @@ static inline void UpdateLights()
         if(lights[3].light.flags & LITE_ON)
         {
             dir = lights[3].light.light.dvDirection;
-            
+
             dir.x = -dir.x;
             dir.y = -dir.y;
             dir.z = -dir.z;
@@ -878,7 +875,7 @@ void glslSetTextureMatrix(int unit, const Matrixf& mat)
     if(u && unit < 3)
     {
         // Having TextureMatrix[3] in shader gives incorrect bytesize (driver???)
-        static char buff[3][32] = 
+        static char buff[3][32] =
         {
             "b_TextureMatrix0",
             "b_TextureMatrix1",
@@ -1067,9 +1064,10 @@ Description:
 -------------------------------------------------------------------*/
 glslProgram* OpenGLShader::getProgram(const char* name)
 {
-    if(_programs.find(name) != _programs.end())
+	auto it = _programs.find(name);
+    if(it != _programs.end())
     {
-        return _programs.find(name)->second.get();
+        return it->second.get();
     }
 
     return nullptr;
@@ -1081,9 +1079,10 @@ Description:
 -------------------------------------------------------------------*/
 glslProgram* OpenGLShader::loadProgram(const char* name, const char* vert, const char* frag)
 {
-    if(_programs.find(name) != _programs.end())
+	auto it = _programs.find(name);
+    if(it != _programs.end())
     {
-        return _programs.find(name)->second.get();
+        return it->second.get();
     }
 
     ref_ptr<glslShader> vshader;

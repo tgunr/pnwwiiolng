@@ -391,13 +391,8 @@ void ReadoutView::DisplayAircraftReadout()
 	else if((_VehicleData->FlapSetting >= -1.0) && (_VehicleData->FlapSetting <= 1.0))
 	{
 		int fsi = (int)((_VehicleData->FlapSetting) * 100);
-#if platOS == OS_MACOS
         char fss[16];
-        sprintf( fss, "%d", fsi );
-#else
-        char fss[16];
-		_itoa(fsi, fss, 10);
-#endif
+        strprintf( fss, "%d", fsi );
 		flapstate = UTF16(fss);
 	}
 	// Somehow we have a flap setting that doesn't make sense:
@@ -854,7 +849,7 @@ void ReadoutView::DrawRankIcon(SINT32 Rank)
 	mlSetNormalReadout
 *************************************************************************************************/
 
-SINT32 mlSetNormalReadout(void)
+SINT32 mlSetNormalReadout()
 {
 	_ReadoutType = _READOUT_NORMAL;
 	return 0;

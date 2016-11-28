@@ -4,11 +4,12 @@
 #include "sysmac/sysMacCompat.h"
 #endif
 
-#include "wwii/wwiiHash.h" // does this work on linux?
+#include "wwii/wwiiHash.h"
 #include <map>
 #include <set>
+#include <string.h>
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 # include "pi/pi.h"
 # include "include/vars.h"
 #endif
@@ -32,11 +33,13 @@
 # endif
 #endif
 
-#if LIMITED_FIO
+# define FILE_URL_DESIGNATOR    "file://"
+
+#if platBuild == BUILD_SERVER
 # define os_file_path(x) (x)
 #endif
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 #include "wwii/wwiiConfigVars.h"
 # define DataPath cv_dataDir.GetString()
 #endif
@@ -91,7 +94,7 @@ static std::basic_string<ValueType> safe_os_file_path(const std::basic_string<Va
 {
     size_t pos = std::basic_string<ValueType>::npos;
     std::string result = path;
-    
+
     // Cheap hack: npos + 1 == 0 (size_t is unsigned so it's not UB!)
     // Also we cheat with the knowledge that L'/' == static_cast<wchar_t>('/') etc.
     while ((pos = result.find(static_cast<ValueType>(CHANGE_SEP), pos + 1)) != std::string::npos) {
@@ -100,7 +103,7 @@ static std::basic_string<ValueType> safe_os_file_path(const std::basic_string<Va
     return result;
 }
 
-#ifndef LIMITED_FIO
+#if platBuild == BUILD_CLIENT
 
 static char* os_file_path(char* path)
 {
@@ -141,7 +144,7 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 
 	char buffer[PATH_MAX + 1];
 
-#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
+#if platBuild == BUILD_CLIENT && platOS == OS_WIN32
 	if(userdir)
 	{
 		// no bounds checking here, nice
@@ -163,7 +166,16 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 #endif
 
 	// think this works as char* because when we get to here we're talking about relative paths which are all ascii?
-	size_t pathLen = pathprintf(buffer, DataPath, name);
+	size_t pathLen = 0;
+	// we don't want file system references to use local data path
+	const char *srchLoc = strstr(name, FILE_URL_DESIGNATOR);
+	if (srchLoc != nullptr) {
+		strncpy(buffer, srchLoc+strlen(FILE_URL_DESIGNATOR), sizeof(buffer));
+		pathLen = strlen(buffer);
+	}
+	else {
+		pathLen = pathprintf(buffer, DataPath, name);
+	}
 
         // must be included for now until data list files can all be cleaned up
         for ( size_t i = 0; i < pathLen; ++i )
@@ -179,20 +191,26 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 	///TODO: OGS: I think this works under Windows too...
 	if ( retval < 0 || !S_ISREG(statBuffer.st_mode) )
 	{
+		dbugLog(_FLW, "File could not be opened %s", buffer);
 		return -1;
 	}
 #else
 	///TODO: OGS: See above: This allows Windows to [try to] open directories like files.
 	if ( retval < 0 )
 	{
+		dbugLog(_FLW, "(WIN32) File could not be opened %s", buffer);
 		return -1;
 	}
 #endif
 
 	// make sure and update our passed in widePath to the found path
 	if(!WWII::ConvertChars(buffer, widePath, wsize))
+	{
+		dbugLog(_FLW, "Could not be convert chars %s", buffer);
 		return -1;
+	}
 
+	dbugLog(_FLD, "file size found to be %ld", statBuffer.st_size);
 	return statBuffer.st_size; // Return what the OS thinks it is
 }
 
@@ -226,7 +244,8 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	int fd = OS_WOPEN(widePath, O_RDONLY | O_BINARY);
 	recordRef(widePath);
 #else
-	int fd = OS_OPEN(os_file_path(asciiPath), O_RDONLY | O_BINARY);
+	int fd = -1;
+    OS_OPEN(&fd, os_file_path(asciiPath), O_RDONLY | O_BINARY, 0);
 	recordRef(widePath);
 #endif
 	if ( PN_UNLIKELY(fd < 0) )
@@ -243,7 +262,6 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	{
 		OS_CLOSE(fd);
 		DEBUG_FATAL("Out of memory loading '%s' (%" PRSizeT " bytes).", filename, allocSize);
-		return false;
 	}
 
 	int bytesRead = OS_READ(fd, mem, fileSize);
@@ -318,13 +336,13 @@ namespace Fiod
 			char* newPtr = nullptr;
 			switch ( from )
 			{
-			case fioSEEK_SET:
+			case SEEK_SET:
 				newPtr = basePtr + offset;
 			break;
-			case fioSEEK_CUR:
+			case SEEK_CUR:
 				newPtr = curPtr + offset;
 			break;
-			case fioSEEK_END:
+			case SEEK_END:
 				newPtr = endPtr + offset;
 			break;
 			}
@@ -339,7 +357,7 @@ namespace Fiod
 // We use a map of file descriptors to track memory allocations
 // for fiod files.
 
-typedef std::unordered_map<SINT32, Fiod::FileState> FILE_MAP;
+using FILE_MAP = std::unordered_map<SINT32, Fiod::FileState>;
 static FILE_MAP s_fileMap;
 
 //////////////////////////////////////////////////////////////////////
@@ -379,16 +397,20 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 	widePath[0] = 0;
 	asciiPath[0] = 0;
 
+	dbugLog(_FLD, "fiodOpen(%s, %d, %d)", filename, userdir, prereadSize);
+
 	off_t fileSize = _getFilePathAndSize(filename, userdir, widePath, sizeof(widePath));
 
 	if ( fileSize < 0 )
 	{
+		dbugLog(_FLD, "Could not open file with file size %ld", fileSize);
 		return - 1;
 	}
 
-	if ( prereadSize > 0 )
+	if ( prereadSize > 0 && fileSize > prereadSize)
 	{
-	fileSize = prereadSize; // if too big will be caught below
+		dbugLog(_FLD, "Altering read size to %d", prereadSize);
+		fileSize = prereadSize; // if too big will be caught below
 	}
 
 	WWIIConvert(widePath, asciiPath);
@@ -404,13 +426,16 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 	char* mem = (char*)memAlloc(allocSize);
 	if ( PN_UNLIKELY(mem == nullptr) )
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		LogAbort("out of memory opening %s", asciiPath);
 #else
 		Write_Log(LOG_ALL, LOG_FATAL, "out of memory opening %s", asciiPath);
 		piExitProgram(_FL, "out of memory");
 		return -1;
 #endif
+	}
+	else {
+		dbugLog(_FLD, "Alloc size for new file is %" PRSizeT "", allocSize);
 	}
 
 	mem[fileSize] = 0;
@@ -424,7 +449,8 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		fd = OS_WOPEN(widePath, O_RDONLY | O_BINARY);
 		recordRef(widePath);
 #else
-		fd = OS_OPEN(os_file_path(asciiPath), O_RDONLY | O_BINARY);
+		fd = -1;
+        OS_OPEN(&fd, os_file_path(asciiPath), O_RDONLY | O_BINARY, 0);
 		recordRef(widePath);
 #endif
 		if ( fd < 0 )
@@ -435,6 +461,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		assert( s_fileMap.find(fd) == s_fileMap.end() );
 
 		// Try to read the file contents into the allocation
+		dbugLog(_FLD, "About to read %ld bytes from file", fileSize);
 		off_t bytesRead = OS_READ(fd, mem, fileSize);
 		if ( bytesRead < fileSize )
 			throw "read failed/truncated";
@@ -448,7 +475,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 	catch ( const char* cause )
 	{
 		// Report
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		dbugLog(_FLD, "fiod:%s:%s", cause, asciiPath);
 #else
 		Write_Log(LOG_OLD, LOG_INFO, "fiod:%s:%s", cause, asciiPath);
@@ -555,11 +582,11 @@ size_t fiodFileSize(const char* name, bool userdir)
 //////////////////////////////////////////////////////////////////////
 // Returns a pointer to the path prefix
 
-#ifndef LIMITED_FIO
+#if platBuild == BUILD_CLIENT
 static char *OriginalPrepath = nullptr;
 #endif
 
-const char* fiodGetPrepath(void)
+const char* fiodGetPrepath()
 {
 	return(DataPath);
 }
@@ -567,7 +594,7 @@ const char* fiodGetPrepath(void)
 //////////////////////////////////////////////////////////////////////
 // Changes the path prefix
 
-#ifndef LIMITED_FIO
+#if platBuild == BUILD_CLIENT
 void fiodSetPrepath(char* newpath)
 {
 	if (newpath == nullptr) {
@@ -579,18 +606,14 @@ void fiodSetPrepath(char* newpath)
     if (!OriginalPrepath) {
         OriginalPrepath = strdup(DataPath);
     }
-#if platBuild == TEUL_SERVER
-    cv_dataDir.SetString(newPath);
-#else
 	strsafecpy(DataPath, newpath);
-#endif
 }
 #endif
 
 //////////////////////////////////////////////////////////////////////
 // Create a directory within prefix space
 //
-#if platBuild == TEUL_CLIENT
+#if platBuild == BUILD_CLIENT
 void fiodmkdir(const char* path)
 {
 	char fullPath[PATH_MAX];
@@ -609,42 +632,11 @@ void fiodmkdir(const char* path)
 
 #endif
 }
-#endif
 
 // ------------------------------
 
 #if platOS == OS_WIN32
 // WIN versions
-
-LOGICAL fiodAccess(const char* filename, bool userdir)
-{
-	char	fullpath[PATH_MAX];
-
-#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
-	if(userdir)
-	{
-		pathprintf(fullpath, UserDataPath, filename);
-
-		bool success = false;
-
-		wchar_t widePath[PATH_MAX+1];
-
-		if(WWIIConvert(fullpath, widePath))
-			success = OS_WACCESS(os_file_path(widePath), 0) == 0;
-
-		if(success)
-		{
-			return TRUE;
-		}
-
-		// Else fall through normally
-	}
-#endif
-
-	pathprintf(fullpath, DataPath, filename);
-
-	return (OS_ACCESS(os_file_path(fullpath), 0) == 0);
-}
 
 LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 {
@@ -652,7 +644,6 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 	SINT32	retval;
 	struct	stat	buffer;
 
-#if platOS == OS_WIN32 && platBuild != TEUL_SERVER
 	if(userdir)
 	{
 		pathprintf(fullpath, UserDataPath, filename);
@@ -671,7 +662,6 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 		}
 		// Else fall through normally
 	}
-#endif
 
 	pathprintf(fullpath, DataPath, filename);
 	retval = stat(os_file_path(fullpath), &buffer);
@@ -688,13 +678,6 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 
 // Mac versions
 
-LOGICAL fiodAccess(const char* filename, bool /* userdir */)
-{
-  char fullpath[1024];
-  pathprintf(fullpath, DataPath, filename);
-  return(OS_ACCESS(os_file_path(fullpath), 0) == 0);
-}
-
 LOGICAL fiodModified(SINT32* modified, const char* filename, bool /* userdir */)
 {
   char fullpath[1024];
@@ -710,6 +693,7 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool /* userdir */)
   return(retval == 0);
 }
 #endif
+#endif  // CLIENT
 
 // ------------------------------
 
@@ -726,7 +710,7 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
 {
   char  fullpath[PATH_MAX];
 
-#if platOS == OS_WIN32 && platBuild != TEUL_SERVER
+#if platOS == OS_WIN32 && platBuild != BUILD_SERVER
   if(userdir)
   {
 		// Make sure directorys are created since some filenames contain directory paths.
@@ -765,11 +749,13 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
 #endif
 	  pathprintf(fullpath, DataPath, filename);
 
-	return OS_OPEN(os_file_path(fullpath), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
+    int fd = -1;
+
+	OS_OPEN(&fd, os_file_path(fullpath), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
+    return fd;
 }
 
-// The host uses "LIMITED_FIO"
-#ifdef LIMITED_FIO
+#if platBuild == BUILD_SERVER
 size_t fiodGetString(int fd, char* string, size_t length)
 {
 	FILE_MAP::iterator it = s_fileMap.find(fd);
@@ -917,11 +903,11 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	if (numFilesInDir == nullptr || fileList == nullptr) {
 		return;
     }
-    
+
     char *truepath = realpath(safe_os_file_path<char>(dirToSearch ?: ".").c_str(), nullptr);
     struct dirent **entries = nullptr;
     int nentries = 0;
-    
+
     nentries = scandir(truepath, &entries, fiodGetDirListFilter, nullptr);
     if (nentries < 0) {
         *fileList = nullptr;
@@ -929,9 +915,9 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
         free(truepath);
         return;
     }
-    
+
     SCHAR **resultList = static_cast<SCHAR **>(calloc(static_cast<size_t>(nentries), sizeof(SCHAR *)));
-    
+
     *numFilesInDir = nentries;
     while (nentries--) {
 // Hack.
@@ -952,11 +938,36 @@ const char sep = '/';
     free(truepath);
     *fileList = resultList;
 }
-    
+
 #endif
 
+#if platBuild == BUILD_SERVER
+#include "libxml/xmlIO.h"
 
-#if platOS == OS_MACOS
+struct Context
+{
+	Context(int fd) : m_fd(fd) {}
+	int m_fd;
+};
+
+void fioXmlRegisterInputCallbacks()
+{
+	xmlRegisterInputCallbacks(
+		// input match: always report willing to serve.
+		[](const char* filename) { return 1; },
+		// xmlInputOpenCallback: returns an opaque handle disguised as a void*
+		/// HACK: fiodOpen returns -1 on error, libxml expects a 0 for error.
+		/// so I'm bumping the file descriptor by one for all operations here.
+		[](const char* filename) -> void* { int fd = fiodOpen(filename); return fd == -1 ? nullptr : new Context(fd); },
+		// xmlInputReadCallback: passed the handle, buffer and len
+		[](void* ctx, char* buffer, int len) -> int { return ctx ? fiodRead(static_cast<Context*>(ctx)->m_fd, buffer, len) : -1; },
+		// xmlInputCloseCallback: close file
+		[](void* ctx) { fiodClose(static_cast<Context*>(ctx)->m_fd); delete static_cast<Context*>(ctx); return 0; }
+	);
+}
+#endif
+
+#if platOS == OS_MACOS && platBuild == BUILD_CLIENT
 
 size_t fiocfgRead(int fd, void* dptr, size_t length)
 {
@@ -972,8 +983,12 @@ LOGICAL fiocfgAccess(const char* filename, bool)
 {
 	char	fullpath[_MAX_PATH];
 	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
-
-	return(OS_ACCESS(os_file_path(fullpath), 0) == 0);
+    int fd = -1;
+    if (OS_OPEN(&fd, os_file_path(fullpath), O_RDONLY, 0) != -1) {
+        OS_CLOSE(fd);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 LOGICAL fiocfgModified(SINT32* modified, const char* filename)
@@ -1000,7 +1015,7 @@ size_t fiocfgOpen(const char* filename, bool)
 
 	stat(fullpath, &st);
 	if(S_ISREG(st.st_mode))
-		hfile = OS_OPEN(fullpath, O_RDONLY | O_BINARY);
+		OS_OPEN(&hfile, fullpath, O_RDONLY | O_BINARY, 0);
 
 	return(hfile);
 }
@@ -1013,7 +1028,7 @@ size_t fiocfgOpenWrite(const char* filename, bool)
 	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
 	os_file_path(fullpath);
 
-	hfile = OS_OPEN(fullpath, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
+	OS_OPEN(&hfile, fullpath, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
 
 	return(hfile);
 }
@@ -1038,7 +1053,23 @@ SINT32 fiocfgFileSize(const char* filename, bool)
 	return(-1);
 }
 
-#elif platOS != OS_LINUX && platBuild != TEUL_SERVER
+#elif platOS != OS_LINUX && platBuild != BUILD_SERVER
+
+LOGICAL fiocfgAccess(const char* filename, bool userdir)
+{
+    if (userdir) {
+        fiodSetPrepath(UserDataPath);
+    }
+
+    int fd = fiodOpen(filename, true);
+    if (fd != -1)
+        fiodClose(fd);
+
+    if (userdir) {
+        fiodSetPrepath(nullptr);
+    }
+    return fd != -1;
+}
 
 void fiocfgMkDir(const char* path, bool userdir)
 {

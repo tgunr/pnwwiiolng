@@ -8,8 +8,8 @@
 // Overloaded operator allows it to be used like a
 // MYSQL* pointer.
 
-typedef struct st_mysql_res MYSQL_RES;
-typedef struct st_mysql MYSQL;
+using MYSQL_RES = struct st_mysql_res;
+using MYSQL = struct st_mysql;
 
 namespace DB
 {
@@ -17,9 +17,9 @@ namespace DB
 	// DB::result_t is a a query or result set handle,
 	// DB::row_t is the handle required to read columns
 
-	typedef MYSQL handle_t;
-	typedef MYSQL_RES result_t;
-	typedef char**	row_t;
+	using handle_t = MYSQL;
+	using result_t = MYSQL_RES;
+	using row_t = char**;
 }
 
 //The database connection information
@@ -37,7 +37,7 @@ public:
 
 public:
 	//! Connect to a given database, returns true if successful.
-	bool connect(const struct DBCONNECTION& connectionInfo);
+	bool connect();
 
 	//! Close connection to the given database.
 	void disconnect();
@@ -45,5 +45,7 @@ public:
 public:
 	operator const DB::handle_t* () const { return m_initialized ? m_conn : nullptr; }
 	operator DB::handle_t* () { return m_initialized ? m_conn : nullptr; }
+	operator bool() const noexcept { return m_initialized && m_conn;  }
 };
 
+extern DBHANDLE dbh;

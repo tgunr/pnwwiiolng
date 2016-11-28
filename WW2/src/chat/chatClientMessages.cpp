@@ -89,8 +89,8 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 
 	outGoingMessage.m_length = strlen(message);
 
-	if (outGoingMessage.m_length >= MAX_MESSAGE_LENGTH)
-		outGoingMessage.m_length = MAX_MESSAGE_LENGTH-1;
+	if ( outGoingMessage.m_length >= MAX_MESSAGE_LENGTH )
+		outGoingMessage.m_length = MAX_MESSAGE_LENGTH - 1;
 
 	strncpy((char*)outGoingMessage.m_message, message, outGoingMessage.m_length + 1);
 
@@ -110,7 +110,7 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 //  allows for host-side dot commands which have a
 //  higher degree of integration with the UI map.
 //////////////////////////////////////////////////
-void chatTargetSelection(const FULL_OBJ_ID& id)
+void chatTargetSelection(const FULL_OBJ_ID id)
 {
 	_lastTargetFullObjID = id;
 }
@@ -163,7 +163,7 @@ SINT32 chatTuneRadioToHandle(SINT32 teulIndex, UCHAR radioIndex, ChatHandle hand
 
 	TUT_MGR->DoEvent(TUT_EVENT_CHANNEL, &radioIndex, &tune.m_type);
 
-	return teulSend(teulIndex,_FE_TUNE_TO_CHANNEL,&tune);
+	return teulSend(teulIndex, _FE_TUNE_TO_CHANNEL, &tune);
 }
 
 //This function tells the server to toggle receiving for the radio channel
@@ -173,7 +173,7 @@ SINT32 chatUpdateChannelStatus(SINT32 teulIndex, UCHAR radioIndex, bool receiveS
 {
 	Chat::UpdateChannel updateChannel(radioIndex, receiveStatus);
 
-	return teulSend(teulIndex,_SEND_UPDATE_CHANNEL,&updateChannel);
+	return teulSend(teulIndex, _SEND_UPDATE_CHANNEL, &updateChannel);
 }
 
 //This function sends a message to the server to be distributed on the
@@ -186,7 +186,7 @@ SINT32 chatSendMotdRequest(SINT32 teulIndex, UINT32 id)
 }
 
 // FIXME - remove this when time is right!
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 LOGICAL chatSendLocality(SINT32 teulIndex, UINT32 vehicleHostIndex, const FLOAT64& rawX, const FLOAT64& rawY, const FLOAT64& rawZ, FULL_OBJ_ID nearestCP)
 {
 	static SINT32 lastTeulIndex = -1;
@@ -262,7 +262,7 @@ static SINT32 _sendLocality(ACTION_OBJECT* const a)
 
 static SINT32 _sendSquadControl(ACTION_OBJECT* const a)
 {
-	return ((SquadControl*)a->localRawData)-> packer(TEUL_PACK, a);
+	return ((SquadControl*)a->localRawData)->packer(TEUL_PACK, a);
 }
 
 static SINT32 _sendServerTrackedObject(ACTION_OBJECT* const a)
@@ -296,10 +296,15 @@ _recvMOTD_Reply(ACTION_OBJECT* const a)
 }
 
 static SINT32
-_recvChatMissionStatus(ACTION_OBJECT* const a, Chat::MissionStatus& msg)
+_recvChatMissionStatus(ACTION_OBJECT* const a)
 {
-	///TODO:RAMP: Process the data.
-	clientProcessChatMissionStatus(a->teulIndex, &msg);
+    const TeulTimeMS ts = 0ULL;
+    static Chat::MissionStatus receiver;        // must either be allocated or static as later on game client will point to this for future reference, static for now since we are
+                                                // already riddled with statics, what is one more.
+    receiver.unpack(a, ts);
+
+	clientProcessChatMissionStatus(a->teulIndex, &receiver);
+
 	return a->offset;
 }
 
@@ -531,7 +536,7 @@ SINT32 EditString::receive(SINT32 teulIndex)
 SINT32
 _recvServerTrackedObjects(ACTION_OBJECT* const a)
 {
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 	// How many STOs are there?
 	UINT32 count = 0;
 	a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &count, 8);
@@ -586,7 +591,7 @@ _recvHoldFallInfo(ACTION_OBJECT* const a)
 	// use fullobjid to find cp name and use this for eventid
 	StratDB::StratObject* strat = StratDB::FindStratObject(incoming.m_fullObjID);
 
-	if(strat)
+	if ( strat )
 		eventId = strat->DisplayName(); //swprintf(eventId, MAX_HANDLE_WSIZE-1, L"%ls", strat->DisplayName());
 
 	chatGetCallsign(requester, incoming.m_requester);
@@ -657,10 +662,10 @@ _recvDotCommandList(ACTION_OBJECT* const a)
 //Installs the client callbacks
 
 SINT32
-chatInstallClientCallbacks(void)
+chatInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
-
+	{
 		REGISTER_SENDER(Chat::CLIENT_MESSAGE_Y, _sendMessage, _SEND_CLIENT_MESSAGE);
 		REGISTER_SENDER(Chat::FE_TUNE_TO_CHANNEL_Y, _sendTuneToChannel, _FE_TUNE_TO_CHANNEL);
 		REGISTER_SENDER(Chat::UPDATE_CHANNEL_Y, _sendUpdateChannel, _SEND_UPDATE_CHANNEL);
@@ -702,10 +707,10 @@ chatInstallClientCallbacks(void)
 
 		REGISTER_RECEIVER(Chat::HOLD_FALL_INFO_Y, _recvHoldFallInfo);
 
-		REGISTER_OMG_RECEIVER(Chat::MissionStatus, _recvChatMissionStatus);
+        REGISTER_RECEIVER(Chat::OMG_Y, _recvChatMissionStatus);
 
 		REGISTER_RECEIVER(Chat::CMD_LIST_Y, _recvDotCommandList);
-
-END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 

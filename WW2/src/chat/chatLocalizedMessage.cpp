@@ -35,8 +35,10 @@ SINT32
 wwiiRegisterPlayerMessageCallback()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
+	{
 		REGISTER_SENDER(Chat::LOCALIZED_MESSAGE_Y, _sendLocalisedMessage, Chat::_SEND_LOCALIZED_MESSAGE);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////

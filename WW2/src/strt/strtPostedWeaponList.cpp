@@ -12,8 +12,6 @@
 // Originating Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Eric "Meat" Hall
 
-#include "versionNo.h"
-
 #include <list>
 #include <set>
 #include <algorithm>
@@ -21,6 +19,7 @@
 #include <fcntl.h>
 
 #include "chat/chatLStringIDs.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "cnvy/cnvyMain.h"
 #include "mem/mem.h"
@@ -39,7 +38,7 @@
 
 static SerialNumber serialCounter("weaponserial", 1, 250, 0x3fffffff);
 
-typedef std::map<UINT32, POSTED_WEAPON*> POSTED_WEAPONS;
+using POSTED_WEAPONS = std::map<UINT32, POSTED_WEAPON*>;
 static POSTED_WEAPONS postedWeapons;
 
 //////////////////////////////////////////////////////////////////////
@@ -204,14 +203,14 @@ POSTED_WEAPON::scheduleReinforcement()
 		TELL_TESTER(m_commander, "ERROR: No toeWeaponInstance!");
 		dbugLog(_FLA, "hcu:%u TOE has no toeWeaponInstance for %s while scheduling reinforcement"
 						, m_supplyingBrigade->unitID()
-						, weapPrintName(&spec()));
+						, weapPrintName(spec()));
 		return;
 	}
 
 	UINT32 resupplyTime = stratResupplyTime(spec(), m_supplyingBrigade, m_facility, toeEntry->resupplyTime());
 	if ( resupplyTime == 0 )
 	{
-		TELL_TESTER(m_commander, "Welcome to your shiny new %s, resupplyTime was zero, so I guess its free", weapPrintFullName(&spec()));
+		TELL_TESTER(m_commander, "Welcome to your shiny new %s, resupplyTime was zero, so I guess its free", weapPrintFullName(spec()));
 		return;
 	}
 

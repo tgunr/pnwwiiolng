@@ -13,8 +13,8 @@ extern UINT32 totalPacketsRecv;
 extern UINT32 totalPacketsXfer;
 
 /* Basic functions */
-SINT32 teulModIdle(const TeulTimeMS& duration_);
-SINT32 teulModShutdown(void);
+SINT32 teulModIdle(const TeulTimeMS duration);
+SINT32 teulModShutdown();
 
 SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint);
 

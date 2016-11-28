@@ -50,7 +50,7 @@ static size_t frames = 0;
 static pthread_t mainthread = NULL;
 
 int sysmain()
-{	 
+{
 	unlink(Fio::LogFileName()) ;
 
 	running = 1;
@@ -73,7 +73,7 @@ int sysmain()
 		printf("osgGameInit: App was not able to initialize!\n");
 		exit(0);
 	}
-#else	
+#else
 	if(!rnmainGetOnlineSetting())
 	{
 		printf("rnmainGetOnlineSetting: App was not able to initialize!\n");
@@ -85,7 +85,7 @@ int sysmain()
 		printf("rnmainInit: App was not able to initialize!\n");
 		exit(0);
 	}
-#endif		
+#endif
 
     mainthread = pthread_self(); // used for debugging
 
@@ -94,8 +94,8 @@ int sysmain()
         frames++;
 		ddpEngine(NULL);
 #ifdef DEBUG_WW2
-        if ( frames % 100 == 0 ) {
-            Write_Debug( "%.1f\n", 1000.0/gFPS );
+        if (frames % 100 == 0) {
+            Write_Debug("Current FPS: %.1f", 1000.0 / gFPS );
         }
 #endif
     }
@@ -144,7 +144,7 @@ int sysmainInitApp()
 #endif
 	ddpSetDDRender(rnlogoRender);
 
-	if(!ddpCreateWnd(0, 0, WantedWidth, WantedHeight, 32, !WantedWindow, atoi(WantedVideoCard), WantedRefreshRate)) 
+	if(!ddpCreateWnd(0, 0, WantedWidth, WantedHeight, 32, !WantedWindow, atoi(WantedVideoCard), WantedRefreshRate))
 	{
 		printf("ddpCreateWnd failed!\n");
 		return -1;
@@ -152,7 +152,7 @@ int sysmainInitApp()
 	ddpSetupGL(WantedWidth, WantedHeight);
 
 	return 0;
-} 
+}
 
 void sysmainQuit()
 {
@@ -160,7 +160,7 @@ void sysmainQuit()
 }
 
 void sysmainKillApp()
-{	
+{
 #if USE_OSG
 	osgGameKill();
 #endif
@@ -233,7 +233,7 @@ void sysmainAddArchives()
         fioaAddArchive(s);
         foundthem = true;
       }
-      else 
+      else
       {
         if(!strncmp(s, "playarc.w2", 10))
         {

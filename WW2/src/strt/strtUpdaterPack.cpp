@@ -12,7 +12,7 @@
 #include "strt/strtTypes.h"
 #include "strt/strtUpdaterPack.h"
 
-SINT32 strtPackEnemySpotted(LOGICAL mode, UCHAR* data, SINT32 offset, STRAT_ENEMY_REPORT* const report, SINT32 size)
+SINT32 strtPackEnemySpotted(PackMode mode, UCHAR* data, SINT32 offset, STRAT_ENEMY_REPORT* const report, SINT32 size)
 {
 	offset = wwiiPackFullObjID(mode,data,offset,&(report->reportingFacility),0);
 	offset = wwiiPackWeaponSerial(mode,data,offset,&(report->enemyReported),0);

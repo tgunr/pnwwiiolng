@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatPlayer.h"
 #include "chat/chatDotCommand.h"
 #include "chat/chatHandle.h"
@@ -29,6 +27,8 @@
 #include "teul/teulEndpointDefs.h"
 #include "include/mydbQuery.h"
 #include "wwii/wwiiDBThreads.h"
+
+using Chat::ARGV;
 
 static SquadList*
 _findClientSquadList(const Player& player)
@@ -52,7 +52,7 @@ _validateSquadName(const char* name)
 	Chat::Name unpacked(handle);
 	if ( unpacked != name )
 		return 0LL;
-	int len = strlen(name);
+	size_t len = strlen(name);
 	if ( len < 2 || len > Squad::SHORT_NAME_LEN )
 		return 0LL;
 
@@ -242,7 +242,7 @@ public:
 			}
 
 			// Update the database, but make it low-priority
-			DBThread::Do(DBThread::Default, "UPDATE LOW_PRIORITY wwii_squads SET voting = 1 WHERE squadid = %u", player.squadID());
+			DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting = 1 WHERE squadid = %u", player.squadID());
 
 			// Update the in-memory image, it's called "active" for now
 			list->squad().setVotingEnabled(true);
@@ -261,7 +261,7 @@ public:
 			}
 
 			// Low-pri update of the table
-			DBThread::Do(DBThread::Default, "UPDATE LOW_PRIORITY wwii_squads SET voting = 0 WHERE squadid = %u", player.squadID());
+			DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting = 0 WHERE squadid = %u", player.squadID());
 
 			// Update in-memory
 			list->squad().setVotingEnabled(false);
@@ -407,9 +407,9 @@ DotWho::action(Player& player, Chat::ClientMessage* /*message*/) const
 class SquadRename : public DBThreadQuery
 {
 public:
-	SquadRename(const ChatHandle& requester, const Chat::Name& from, const Chat::Name& to)
+	SquadRename(const ChatHandle requester, const Chat::Name& from, const Chat::Name& to)
 		: DBThreadQuery(DBThread::Default, "SquadRename", DBThreadQuery::_CALLBACK
-						, "UPDATE LOW_PRIORITY wwii_squads"
+						, "UPDATE wwii_squads"
 						" SET short_name = '%s'"
 						" WHERE LOWER(short_name) = LOWER('%s')"
 						, to.c_str()
@@ -443,7 +443,7 @@ protected:
 			return Failure();
 
 		if (m_affectedRows > 1)
-			threadLog(_FLA, "Updated multiple squads during rename!");
+			dbugLog(_FLA, "Updated multiple squads during rename!");
 
 		Player* player = PlayerInterface::Lookup(m_requester);
 		if (player == nullptr)

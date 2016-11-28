@@ -64,7 +64,7 @@ extern bool __luaRunCode(lua_State* L, const char* code, const char* caller);
 #define luaRunCode(l,c) __luaRunCode(l,c,__FUNCTION__)
 
 // Tell me what the last error was
-typedef std::vector<std::string> SCRIPT_RESULTS;
+using SCRIPT_RESULTS = std::vector<std::string>;
 extern SCRIPT_RESULTS& luaResults();
 
 ////////// Functions for controlling lua states

@@ -4,6 +4,7 @@
 // Implement the functionality behind Scoring::Death
 
 #include "chat/chatLStringIDs.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "inst/instTypes.h"
 #include "map/mapPlayer.h"
@@ -12,7 +13,7 @@
 #include "score/scoreSortie.h"
 #include "weap/weapDefs.h"
 #include "wwii/wwiiConfig.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 
 //////////////////////////////////////////////////////////////////////
 // Player killed themselves.
@@ -255,7 +256,7 @@ _awardAssists(Scoring::Sortie& deadSortie, Scoring::Sortie& killerSortie)
 bool
 Scoring::Death::process(Player* const lhsPlayer)
 {
-	dbugLog(_FLIB, " death");	///TODO:134:REMOVE
+	dbugLog(_FLI, " death");	///TODO:134:REMOVE
 
 	// We need to look up the sortie on which the player died.
 	Scoring::Sortie* const deadSortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
@@ -303,10 +304,10 @@ Scoring::Death::process(Player* const lhsPlayer)
 
 	const bool friendlyFire = (deadSortie->side() == killerSortie->side());
 
-	const WEAPON_SPEC& killerSpec = killerSortie->spec();
-	const WEAPON_SPEC& deadSpec = deadSortie->spec();
+	const WEAPON_SPEC killerSpec = killerSortie->spec();
+	const WEAPON_SPEC deadSpec = deadSortie->spec();
 	DBThread::Do(DBThread::Default
-		, "CALL wwii.p_add_kill"
+		, "CALL `wwii`.`p_add_kill`"
 			"(%u, %u,%u,%u,%u, %u,%u,%u,%u, %u, %u,%u,%u,%u, %u,%u,%u,%u, 0, %d,%d,%d)"
 			, killerSortie->sortieID()
 			, 0 /*enemy->m_crew[0]*/, 0 /*enemy->m_personas[0]*/, 0 /*enemy->m_crew[1]*/, 0 /*enemy->m_personas[1]*/

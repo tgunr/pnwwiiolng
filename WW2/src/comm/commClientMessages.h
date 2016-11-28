@@ -66,7 +66,7 @@ SINT32 commSendHostMessage(SINT32 connection, SINT32 identifier, SINT32 flags,
 // returns 0 if message was sent
 // returns -1 if message was not sent
 
-SINT32 commInstallClientCallbacks(void);
+SINT32 commInstallClientCallbacks();
 // installs all callbacks for client into system
 // no return value or arguments
 // should be called only once

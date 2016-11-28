@@ -9,7 +9,7 @@ namespace Host
 		CommandMsg(const char* fromNick, const char* withRecipient, const char* withInput, UINT64 withInstID=0ULL);
 		virtual ~CommandMsg() {}
 
-		typedef std::vector<std::string> ArgVector;
+		using ArgVector = std::vector<std::string>;
 
 		std::string nick, recipient, cmd;
 		ArgVector args;
@@ -40,7 +40,7 @@ namespace Host
 
 	struct CellCommand : public CommandMsg
 	{
-		CellCommand(UINT32 playerID, const ChatHandle& handle, const char* withInput, UINT64 withInstID)
+		CellCommand(UINT32 playerID, const ChatHandle handle, const char* withInput, UINT64 withInstID)
 			: CommandMsg(Chat::Name(handle).c_str(), nullptr, withInput, withInstID)
 			, m_playerID(playerID)
 			, m_handle(handle)

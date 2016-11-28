@@ -3,6 +3,7 @@
 #include "VersionNo.h"
 #include "fio/fio.h"
 #include "fio/fiod.h"
+#include "fio/fioa.h"
 #include "include/vars.h"
 #include "ui/uiUTF.h"
 #include "mem/mem.h"
@@ -12,10 +13,6 @@
 #include <shlobj.h>
 #include <io.h>
 #include "sys/sysreg.h"
-#endif
-
-#ifndef FIO_NO_ARCHIVE
-#include "fio/fioa.h"
 #endif
 
 #define MAX_FIO_STACK 64
@@ -28,10 +25,10 @@ static SINT32 fio_switch;
 
 void fioInit()
 {
-	*UserDataPath = 0;
+    memset(UserDataPath, 0, sizeof(UserDataPath));
 
 #if platOS == OS_WIN32
-	
+
 	// default to current directory
 	std::wstring path = L".";
 
@@ -42,10 +39,10 @@ void fioInit()
 		CoTaskMemFree(docsPath);
 	}
 
-	// HACK: Put in the default location if an installation doesn't exist.
-	path += L"\\";
-	path += (sysregGetInstallValue(_T("Version")) ? sysregGetInstallValue(_T("Version")) : L"Battleground Europe");
-	path += L"\\";
+	// This used to look in the registry, but it turns out the installer never sets anything interesting for
+	// the registry key in question in the first place, so heck with it, just hardcode the name until it gets
+	// moved to the proper place.
+	path += L"\\Battleground Europe\\";
 
 	// Ensure our subdirectory exists
 	CreateDirectory(path.c_str(), nullptr);
@@ -148,11 +145,9 @@ int fioOpen(const char* const filename)
        	default:
 			fd = fiodOpen(fn);
        	break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
 			fd = fioaOpen(fn);
        	break;
-#endif
     }
 
     return fd;
@@ -194,11 +189,9 @@ int fioOpenWrite(const char* filename)
 		case ISDIRECTORY:
 			fd = fiodOpenWrite(filename);
 		break;
-#ifndef FIO_NO_ARCHIVE
 		case ISARCHIVE:
 		    fd = fioaOpenWrite(filename);
 		break;
-#endif
 	}
 
     return fd;
@@ -221,89 +214,9 @@ void fioClose(int fd)
         default:
             fiodClose(fd);
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             fioaClose(fd);
 		break;
-#endif
-    }
-}
-
-/************************************************************************************************
-	fioGetRegionPath
-*************************************************************************************************/
-
-const char* fioGetRegionalPath(const char* p)
-{
-	// chinese specific for now; someday we may have other regions
-	// these ids correlate to the language ids in loclApp.h but I didn't
-	// want to include that here
-	if(gRegion == 5 && p && *p)
-	{
-		// lets see if we have a localized version
-		static std::string path;
-
-		const char* extension = strstr(p, ".");
-		path = p;
-
-		if(extension)
-		{
-			// strip out extension
-			path = path.substr(0, path.size() - 4);
-		}
-
-		switch(gRegion)
-		{
-			/*
-			case 1:	path += "_it";		break;
-			case 2:	path += "_fr";		break;
-			case 3:	path += "_de";		break;
-			case 4:	path += "_es";		break;
-			*/
-			case 5:	path += "_zh";		break; // chinese
-		}
-
-		if(extension)
-			path += extension;
-
-		// DATA/Terrain/BLD/uk-1.dds
-		// becomes
-		// DATA/Terrain/BLD/uk-1_zh.dds
-		// if found, its returned
-
-		if(fioAccess(path.c_str()))
-			return path.c_str();
-	}
-
-	// return the original path;
-	return p;
-}
-
-/************************************************************************************************
-	fioAccess
-*************************************************************************************************/
-
-LOGICAL fioAccess(const char* filename)
-{
-    switch(fio_switch)
-    {
-		case ISUSERDIRECTORY:
-		{
-			fiodSetPrepath(UserDataPath);
-			LOGICAL result = fiodAccess(filename);
-			fiodSetPrepath(nullptr);
-			return result;
-		}
-		break;
-        case ISDIRECTORY:
-        default:
-            return(fiodAccess(filename));
-		break;
-#ifndef FIO_NO_ARCHIVE
-        case ISARCHIVE:
-            return fioaAccess(filename);
-		break;
-#endif
     }
 }
 
@@ -352,11 +265,9 @@ int fioEOF(int fd)
         default:
             return(fiodEOF(fd));
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             return fioaEOF(fd);
 		break;
-#endif
     }
 }
 
@@ -383,11 +294,9 @@ size_t fioFileSize(const char* name)
         default:
             return(fiodFileSize(name));
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             return fioaFileSize(name);
 		break;
-#endif
     }
 }
 
@@ -415,7 +324,6 @@ SINT32 fioQuery()
 
 SINT32 fioDescriptorType(int fd)
 {
-	static_assert(FIOA_FD_START > FIOD_FD_START, "FIOA fds must be bigger than FIOD fds.");
 	if(fd < 0) return -1;
 	if(fd >= FIOA_FD_START)
 		return ISARCHIVE;
@@ -441,11 +349,9 @@ size_t fioSeek(int fd, size_t offset, int from)
         default:
             return(fiodSeek(fd, offset,from));
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             return fioaSeek(fd, offset,from);
       	break;
-#endif
     }
 }
 
@@ -468,11 +374,9 @@ size_t fioRead(int fd, void* dptr, size_t length)
         default:
             return(fiodRead(fd, dptr,length));
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             return fioaRead(fd, dptr,length);
 		break;
-#endif
     }
 }
 
@@ -491,11 +395,9 @@ size_t fioMap(int fd, const void*& data)
 		default:
 			return fiodMap(fd, data);
 		break;
-#ifndef FIO_NO_ARCHIVE
 		case ISARCHIVE:
 			return fioaMap(fd, data);
 		break;
-#endif
 	}
 }
 
@@ -517,11 +419,9 @@ size_t fioWrite(int fd, const void* dptr, size_t length)
         default:
             return(fiodWrite(fd, dptr,length));
 		break;
-#ifndef FIO_NO_ARCHIVE
         case ISARCHIVE:
             return fioaWrite(fd, dptr,length);
 		break;
-#endif
     }
 }
 
@@ -552,20 +452,6 @@ size_t fioGetLine(int fd, char* string, size_t length)
       string[i] = 0;
       return(i+1);
     }
-
-#if platOS == OS_MACOS
-// mac newlines, ugh
-   	if(string[i] == '\r'){
-    	char c = '\0';
-	  	if(fioRead(fd, &c, 1) == 1 ){
-	  		fioSeek(fd,-1,SEEK_CUR);
-	  		if(c != '\n'){
-	  			string[i] = '\0';
-	  			return (i+1);
-	  		}
-	  	}
-	}
-#endif
   }
 
   if (i < length)
@@ -776,21 +662,13 @@ namespace Fio
 
 	//////////////////////////////////////////////////////////////////////
 	// Return the name of the standard log file.
-
    const char* LogFileName() { return "WW2_Log.txt"; }
 
 	//////////////////////////////////////////////////////////////////////
-	// Return a FILE* to either the unified log file or, if unable to
-	// open it, stderr (since much of our code assumes this function
-	// returns a valid FILE handle)
-
-	FILE* OpenLogFile(void)
+	// Return a FILE* to the unified log file
+	FILE* OpenLogFile()
 	{
-		FILE* fp = fioUserFile(Fio::LogFileName(), "a");
-		// If that fails, return stderr
-		if ( PN_UNLIKELY(fp == nullptr) )
-			return OS_FDOPEN(OS_DUP(OS_FILENO(stderr)), "a");
-		return fp;
+		return fioUserFile(Fio::LogFileName(), "a");
 	}
 
 	void DeleteLogFile()

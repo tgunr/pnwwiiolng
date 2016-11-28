@@ -23,9 +23,9 @@ enum WPXFR_TYPE { WPXT_INVALID, WPXT_REQUEST, WPXT_POST };
 // REMOVE: Defacto from host "remove this waypoint"
 enum WPCTRL_TYPE { WPCTRL_APPROVE, WPCTRL_DENIED, WPCTRL_INVALID, WPCTRL_REMOVE, WPCTRL_NO_MISSION };
 
-typedef teul_network_msg<Waypoint> WAYPOINT_XFER;
+using WAYPOINT_XFER = teul_network_msg<Waypoint>;
 
 class WaypointControlMsg : public teul_empty_msg {};
-typedef teul_network_msg<WaypointControlMsg> WAYPOINT_CONTROL;
+using WAYPOINT_CONTROL = teul_network_msg<WaypointControlMsg>;
 
-typedef teul_network_array<Waypoint> WAYPOINT_XFER_ARRAY;
+using WAYPOINT_XFER_ARRAY = teul_network_array<Waypoint>;

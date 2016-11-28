@@ -142,7 +142,7 @@ private:
 #define VisLimit    3200.0f
 
 static std::map<int, float *> windMatrices;      // vector of float pointers storing wind matrices for each matrix defined by SpeedWind
-typedef std::multimap<OBJECT*, Tree*> TreeMap;
+using TreeMap = std::multimap<OBJECT*, Tree*>;
 static TreeMap objectTreeMap;
 
 static std::vector<float> windRustleAngles;     // table of leaf rustle angles shared by all base trees
@@ -215,7 +215,7 @@ void Tree::attach(OBJECT& o) {
 }
 
 
-void Tree::detach(void) {
+void Tree::detach() {
 	if ( ! o )
 		return;
 
@@ -319,24 +319,6 @@ static void InitBillboardUniforms(glslProgram* pgm)
     uniform->SetElement(1, Vec4f(0, -0.5, 1.0, 0));
     uniform->SetElement(2, Vec4f(0, -0.5, 0.0, 0));
     uniform->SetElement(3, Vec4f(0,  0.5, 0.0, 0));
-}
-
-/*---------------------------------------------------------------------
-Function: LoadHorizontalBillboardShaderOff
-Description:
----------------------------------------------------------------------*/
-static bool LoadHorizontalBillboardShaderOff()
-{
-    return true;
-}
-
-/*---------------------------------------------------------------------
-Function: LoadBillboardShaderOff
-Description:
----------------------------------------------------------------------*/
-static bool LoadBillboardShaderOff()
-{
-    return true;
 }
 
 /*---------------------------------------------------------------------
@@ -1791,7 +1773,7 @@ inline static void sptDrawLeavesDeprecated()
 #else
                 oglSetRenderState(oglRENDERSTATE_ALPHAREF, IS_BUSH(t->isbush_isclutter_base) ? 84 : FloatToInt(t->leafalphas[0]));
 #endif
-                totaltriangles += basetree->DrawLeavesDeprecated(t, 0); 
+                totaltriangles += basetree->DrawLeavesDeprecated(t, 0);
             }
 
             if(t->leaflods[1])
@@ -1801,7 +1783,7 @@ inline static void sptDrawLeavesDeprecated()
 #else
                 oglSetRenderState(oglRENDERSTATE_ALPHAREF, IS_BUSH(t->isbush_isclutter_base) ? 84 : FloatToInt(t->leafalphas[1]));
 #endif
-                totaltriangles += basetree->DrawLeavesDeprecated(t, 1); 
+                totaltriangles += basetree->DrawLeavesDeprecated(t, 1);
             }
         }
 
@@ -2020,8 +2002,7 @@ inline bool NeedCulling()
         return true;
     }
 
-    unsigned int crewpos = 0;
-    persGetPersonaPosition(&crewpos);
+    unsigned int crewpos = persGetPersonaPosition();
 
     if(oldcrewpos != crewpos)
     {
@@ -2706,7 +2687,7 @@ void sptGetStats(char stats[])
 {
     unsigned int size = treeDataGetBaseSize();
 
-    sprintf(stats, 
+    sprintf(stats,
             "TREES: Total %d Drawn %d 3D = %d 2D = %d Triangles %d",
             treeDataGetTotalTrees(),
             number3dtrees + numbillboards + numhorizbillboards,

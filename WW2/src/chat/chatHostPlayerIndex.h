@@ -4,9 +4,9 @@
 // Copyright: (C) Playnet Inc 2011 -- All rights reserved.
 // Defines the chat hosts' primary player index type and list.
 
-#include <unordered_map>
+#include "wwii/wwiiHash.h"
 
 class Player;
-typedef std::unordered_map<ChatHandle,Player*> PLAYER_INDEX;	// Players indexed by handle
+using PLAYER_INDEX = std::unordered_map<ChatHandle,Player*>;	// Players indexed by handle
 extern PLAYER_INDEX playerIndex;
 

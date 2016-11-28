@@ -33,10 +33,10 @@ public: virtual bool Run() override
 public: bool TestBitsCount()
 	{
 #define EXPECT_FIT(val_type, val, bit_count) \
-	CRITICAL( ExpectTrue( Teul::Bits::Fit<val_type>(val_type(val), bit_count) ) ) 
+	CRITICAL( ExpectTrue( Teul::Bits::Fit<val_type>(val_type(val), bit_count) ) )
 
 #define EXPECT_NOT(val_type, val, bit_count) \
-	CRITICAL( ExpectFalse( Teul::Bits::Fit<val_type>(val_type(val), bit_count) ) ) 
+	CRITICAL( ExpectFalse( Teul::Bits::Fit<val_type>(val_type(val), bit_count) ) )
 
 		START_TEST_STAGE( "TestBitsCount" )
 
@@ -201,22 +201,22 @@ public: bool TestBitsFit()
 			END_SUB_STAGE( "Unsigned" )
 
 			START_SUB_STAGE( "Signed" )
-				for ( UINT32 i = 1; i < 64; ++i )
+				for ( UINT32 i = 1; i < 63; ++i )	// 64 would be a bit too much.
 				{
 					{
-						TestFocus("-(%u - 1) for %u", 1 << i, i);
+						TestFocus("-(%" PR64BitT " - 1) for %u", 1LL << i, i);
 						bool fit = Teul::Bits::Fit(-((1LL << i) - 1), 15);
 						bool expectFit = i <= 14;
 						CRITICAL( ExpectEqual( fit, expectFit ) );
 					}
 					{
-						TestFocus("-(%u) for %u", 1 << i, i);
+						TestFocus("-(%" PR64BitT ") for %u", 1LL << i, i);
 						bool fit = Teul::Bits::Fit(-((1LL << i)), 15);
 						bool expectFit = i <= 14;
 						CRITICAL( ExpectEqual( fit, expectFit ) );
 					}
 					{
-						TestFocus("-(%u + 1) for %u", 1 << i, i);
+						TestFocus("-(%" PR64BitT " + 1) for %u", 1LL << i, i);
 						bool fit = Teul::Bits::Fit(-((1LL << i) + 1), 15);
 						bool expectFit = i < 14;
 						CRITICAL( ExpectEqual( fit, expectFit ) );

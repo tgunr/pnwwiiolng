@@ -57,5 +57,5 @@ extern void wwiiIRCChannelMessage(const char* channel, const char* message);
 extern void wwiiIRCMessage(const char* channel, const char* fmt, ...) FORMAT_FN(2,3);
 extern void wwiiIRCChannelNotice(const char* channel, const char* message);
 
-typedef void(*irc_dotcmd_t)(Host::CommandMsg &);
+using irc_dotcmd_t = void(*)(Host::CommandMsg &);
 extern void wwiiIRCRegisterCommand(const char* command, irc_dotcmd_t function);

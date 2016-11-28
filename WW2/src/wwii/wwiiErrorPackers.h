@@ -11,7 +11,7 @@
 #include "wwii/wwiiErrorTypes.h"
 #include "str/stringLib.h"
 
-static inline SINT32 wwiiPackERR_STRING(LOGICAL mode, UCHAR* data, SINT32 offset, WWII_ERR_STRING* object, SINT32 size)
+static inline SINT32 wwiiPackERR_STRING(PackMode mode, UCHAR* data, SINT32 offset, WWII_ERR_STRING* object, SINT32 size)
 {
 	if (mode == TEUL_PACK)
 		object->length = strnlen(object->string, WWII_ERR_STRING::_MAX_LEN) +1;
@@ -23,7 +23,7 @@ static inline SINT32 wwiiPackERR_STRING(LOGICAL mode, UCHAR* data, SINT32 offset
 	return offset;
 }
 
-static inline SINT32 wwiiPackPIEXIT_INFO(LOGICAL mode, UCHAR* data, SINT32 offset, WWII_PIEXIT_INFO* object, SINT32 size)
+static inline SINT32 wwiiPackPIEXIT_INFO(PackMode mode, UCHAR* data, SINT32 offset, WWII_PIEXIT_INFO* object, SINT32 size)
 {
 	offset = teulPackSINT32(mode,data,offset,&(object->srcLine), 0);
 
@@ -33,7 +33,7 @@ static inline SINT32 wwiiPackPIEXIT_INFO(LOGICAL mode, UCHAR* data, SINT32 offse
 	return offset;
 }
 
-static inline SINT32 wwiiPackEXCEPTION_INFO(LOGICAL mode, UCHAR* data, SINT32 offset, WWII_EXCEPTION_INFO* object, SINT32 size)
+static inline SINT32 wwiiPackEXCEPTION_INFO(PackMode mode, UCHAR* data, SINT32 offset, WWII_EXCEPTION_INFO* object, SINT32 size)
 {
 	offset = teulPackUINT32(mode,data,offset,&(object->exceptionCode), 0);
 	offset = teulPackUINT32(mode,data,offset,&(object->exceptionAddr), 0);
@@ -48,7 +48,7 @@ static inline SINT32 wwiiPackEXCEPTION_INFO(LOGICAL mode, UCHAR* data, SINT32 of
 	return offset;
 }
 
-static inline SINT32 wwiiPackVALIDITY_INFO(LOGICAL mode, UCHAR* data, SINT32 offset, WWII_VALIDITY_INFO* object, SINT32 size)
+static inline SINT32 wwiiPackVALIDITY_INFO(PackMode mode, UCHAR* data, SINT32 offset, WWII_VALIDITY_INFO* object, SINT32 size)
 {
 	offset = wwiiPackERR_STRING(mode,data,offset,&(object->archive), 0);
 	offset = wwiiPackERR_STRING(mode,data,offset,&(object->filename), 0);
@@ -62,7 +62,7 @@ static inline SINT32 wwiiPackVALIDITY_INFO(LOGICAL mode, UCHAR* data, SINT32 off
 	return offset;
 }
 
-static inline SINT32 wwiiPackSYSTEM_INFO(LOGICAL mode, UCHAR* data, SINT32 offset, WWII_SYSTEM_INFO* object, SINT32 size)
+static inline SINT32 wwiiPackSYSTEM_INFO(PackMode mode, UCHAR* data, SINT32 offset, WWII_SYSTEM_INFO* object, SINT32 size)
 {
 	offset = teulPackUINT32(mode,data,offset,&(object->numPackets), 0);
 	offset = teulPackUINT32(mode,data,offset,&(object->packetID), 0);
@@ -77,7 +77,7 @@ static inline SINT32 wwiiPackSYSTEM_INFO(LOGICAL mode, UCHAR* data, SINT32 offse
 	return offset;
 }
 
-static inline SINT32 wwiiPackERROR_INFO(LOGICAL mode, UCHAR* data, SINT32 offset, WWII_ERROR_INFO* object, SINT32 size)
+static inline SINT32 wwiiPackERROR_INFO(PackMode mode, UCHAR* data, SINT32 offset, WWII_ERROR_INFO* object, SINT32 size)
 {
 	offset = teulPackUINT32(mode,data,offset,(UINT32*)&(object->errorType), 0);
 

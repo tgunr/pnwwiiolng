@@ -24,8 +24,8 @@ static const char* QRY_SELECT_RANKS =
 		", r.description"
 		", bit_or(p.maskvalue)"
 		" FROM wwii_rank r"
-			" LEFT JOIN wwii_rank_permiss rp USING (rankid)"
-				" LEFT JOIN auth.wwii_permissions p USING (permissionid)"
+			" LEFT JOIN `wwii_rank_permiss` rp USING (rankid)"
+				" LEFT JOIN `auth`.`wwii_permissions` p USING (permissionid)"
 		" GROUP BY 1"
 		" ORDER BY 1 desc"
 ;
@@ -43,9 +43,9 @@ Rank::add(const RANK_NO level, const Rank::TYPE type, const UINT32 points, const
 		s_max = level;
 
 	if ( description == nullptr )
-		description = rankNames[0];
+		description = rankNames[0].c_str();
 
-	dbugLog(_FLD, "r:%d new rank: type:%d, perms:%llx, points: %d :: %s", level, type, perm, points, description);
+	dbugLog(_FLD, "r:%d new rank: type:%d, perms:%" PRPermMaskT ", points: %d :: %s", level, type, perm, points, description);
 
 	Rank& rank = s_ranks[level];
 	rank.m_level = level;
@@ -53,7 +53,7 @@ Rank::add(const RANK_NO level, const Rank::TYPE type, const UINT32 points, const
 	rank.m_perm = perm;
 	rank.m_points = points;
 
-	rankNames[level] = strdup(description);
+	rankNames[level] = description;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -102,20 +102,17 @@ Rank::setSize(size_t num)
 // so that we can build a complete tree in a single pass.
 
 void
-wwiiReadRanks(DBHANDLE& dbh)
+wwiiReadRanks()
 {
+	dbugLog(_FLI, "Loading ranks");
 	try
 	{
 		DBQuery dbq(dbh, QRY_SELECT_RANKS);
 
+		rankNames.clear();
 		Rank::setSize(dbq.Rows());
-
 		// Ranks are 1-indexed
-		for ( UINT32 i = 1; i <= dbq.Rows(); ++i )
-		{
-			rankNames[i] = nullptr;
-		}
-		rankNames[0] = strdup("<none>");
+		rankNames[0] = "<none>";
 
 		while (dbq.FetchRow())
 		{
@@ -137,19 +134,3 @@ wwiiReadRanks(DBHANDLE& dbh)
 		dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what());
 	}
 }
-
-//////////////////////////////////////////////////////////////////////
-// Release all the rank information
-
-void
-wwiiFreeRanks()
-{
-	for ( size_t i = 0; i < Rank::count(); ++i ) {
-		void* name = (void*)rankNames[i];
-		if (name)
-			free(name);
-	}
-
-	rankNames.clear();
-}
-

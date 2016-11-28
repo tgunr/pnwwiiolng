@@ -12,8 +12,7 @@
 #include "teul/teulBasic.h"
 #include "teul/teulConfigVar.h"
 #include "auth/authTypes.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseWrapper.h"
+#include "dbse/dbseHandle.h"
 #include "auth/authDB.h"
 #include "mem/mem.h"
 #include "str/stringLib.h"
@@ -21,7 +20,7 @@
 #include "include/infoMessageTypes.h"
 #include "include/infoHostMessages.h"
 #include "include/mydbQuery.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "auth/authHost.h"
 #include "auth/authClientData.h"
@@ -39,7 +38,7 @@ struct APP_TABLE_ENTRY
 	SCHAR	description[MAX_DESCRIPTION+1];
 };
 
-typedef std::vector<APP_TABLE_ENTRY> APP_TABLE;
+using APP_TABLE = std::vector<APP_TABLE_ENTRY>;
 
 struct apps_holder
 {
@@ -100,33 +99,22 @@ static struct apps_holder* apps = config.apps;
 
 static APP_TABLE appTable;
 
-DBHANDLE dbh;
-
-typedef std::map<UINT32, std::string> ARENA_ALIASES;
+using ARENA_ALIASES = std::map<UINT32, std::string>;
 static ARENA_ALIASES g_arenaAliases;
-
-DBCONNECTION dbConnection;
 
 //////////////////////////////////////////////////////////////////////
 //connect function
-void authInitDB(void)
+
+extern void dbseSetDatabase(const ConfigAddr& addr, const ConfigAddr& port, const ConfigStr& schema, const ConfigStr& user, const ConfigStr& password);
+
+void
+authInitDB()
 {
-	// Look up the cannonical name/address of the auth database
-	// and resolve it to an IP
-	UINT32 dbIp = Teul::GetSingleIP(cv_authdbAddress.GetString());
-	if ( dbIp == 0 )
-		LogAbort("Invalid %s: %s (unable to resolve)"
-					, cv_authdbAddress.GetEnvVarName(), cv_authdbAddress.GetString());
+	// Auth has its own database to talk to.
+	dbseSetDatabase(cv_authdbAddress, cv_authdbPort, cv_authdbSchema, cv_authdbUser, cv_authdbPassword);
 
-	// Populate the connection info structure.
-	teulGetAddress(dbIp, dbConnection.host, sizeof(dbConnection.host));
-	strcpy(dbConnection.dbName, cv_authdbSchema.GetString());
-	strcpy(dbConnection.username, cv_authdbUser.GetString());
-	strcpy(dbConnection.password, cv_authdbPassword.GetString());
-	strcpy(dbConnection.port, cv_authdbPort.GetString());
-
-	if ( dbh.connect(dbConnection) == false )
-		LogAbort("Unable to initialize auth database connection - check grants for %s on %s", dbConnection.username, dbConnection.host);
+	if ( !dbh.connect() )
+		LogAbort("Couldn't connect to database");
 
 	DB::Schema updater(dbh, "auth");
 	updater.Update(revisions);
@@ -272,7 +260,7 @@ authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch
 	{
 		authdbLogBadPlayername(cdata.address, request.username, e.what());
 		LogAbort("error looking up %s with %s: %s", request.username, request.password, e.what());
-		return WEB_ERR_INTERNAL;
+		/*return WEB_ERR_INTERNAL;*/
 	}
 
 	if ( foundUser == false )
@@ -329,7 +317,7 @@ Auth::LoginRequest::validate(SINT32 teulIndex, Auth::ClientData& cdata)
 		authdbLogBadPlayername(cdata.address, username, "illegal password");
 		return WEB_ERR_INTERNAL;
 	}
-    
+
     char ubuffer[16*2+1] = {0};
 	mysql_real_escape_string(dbh, ubuffer, username.c_str(), username.length());
     char pbuffer[80*2+1] = {0};
@@ -387,7 +375,7 @@ Auth::LoginRequest::validate(SINT32 teulIndex, Auth::ClientData& cdata)
 	{
 		authdbLogBadPlayername(cdata.address, username, e.what());
 		LogAbort("error looking up %s with %s: %s", username.c_str(), password.c_str(), e.what());
-		return WEB_ERR_INTERNAL;
+		/*return WEB_ERR_INTERNAL;*/
 	}
 
 	if ( foundUser == false )
@@ -488,7 +476,7 @@ static bool _initAppInfoTable(GAME& gameEntry)
 	SCHAR statement[512];
 	SINT32 i, platform;
 
-	for ( i = 0;i < OS_MAX_PLAT; i++)
+	for ( i = 0; i < OS_MAX_PLAT; i++)
 	{
 		gameEntry.appInfo[i].max = gameEntry.curHostVersion;
 		gameEntry.appInfo[i].min = gameEntry.curHostVersion;
@@ -525,8 +513,6 @@ static bool _initAppInfoTable(GAME& gameEntry)
 		dbugLog(_FLA, "error selecting host versions [%s]", statement);
 		LogAbort("%s", e.what());
 	}
-
-	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -537,15 +523,12 @@ _findIsFile(SCHAR manisfile)
 	{
 		case 'f':
 			return ISFILE_FILE;
-		break;
 		case 'u':
 			return ISFILE_URL;
-		break;
 		case 'n':
 			return ISFILE_NUN;
-		break;
 		default:
-		break;
+			break;
 	}
 	return ISFILE_URL;
 }
@@ -624,7 +607,7 @@ _getAppManifest()
 				teulGetHost(row[1], &vers_mans[i].newNo);
 				vers_mans[i].platform = (SINT32)atol(row[2]);
 				vers_mans[i].isfile = _findIsFile(row[3][0]);
-				strncpy(vers_mans[i].location, row[4], URL_STRING_MAX);
+				strsafecpy(vers_mans[i].location, row[4]);
 
 				if (vers_mans[i].isfile == ISFILE_FILE)
 				{
@@ -640,9 +623,9 @@ _getAppManifest()
 						vers_mans[i].protocol = DEF_PROTOCOL;
 					}
 
-					strncpy(vers_mans[i].ftpURL, row[7], URL_STRING_MAX);
-					strncpy(vers_mans[i].ftpDir, row[8], URL_STRING_MAX);
-					strncpy(vers_mans[i].ftpFile, row[9], URL_STRING_MAX);
+					strsafecpy(vers_mans[i].ftpURL, row[7]);
+					strsafecpy(vers_mans[i].ftpDir, row[8]);
+					strsafecpy(vers_mans[i].ftpFile, row[9]);
 				}
 			}
 		}
@@ -659,7 +642,7 @@ _getAppManifest()
 
 //////////////////////////////////////////////////////////////////////
 void
-authInitApps(void)
+authInitApps()
 {
 	_getAppTable();
 	_getAppManifest();
@@ -675,7 +658,7 @@ _getPlayerTable(GAME& gameEntry)
 		if ( q.HasRows() == false || q.FetchRow() == false )
 			throw std::invalid_argument("couldn't find game entry");
 
-		strncpy(gameEntry.playerTable, q.Row()[0], MAX_DESCRIPTION);
+		strsafecpy(gameEntry.playerTable, q.Row()[0]);
 
 		dbugLog(_FLI, "arena:%d game:%d setting playerTable to %s", gameEntry.arenaID, gameEntry.gameID, gameEntry.playerTable);
 		return true;
@@ -759,25 +742,25 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 
 	try
 	{
-		strncpy(statement, ogl.cardName, MAX_OGL_CARD_NAME);
+		strsafecpy(statement, ogl.cardName);
 		mysql_real_escape_string(dbh, cardName, statement, strlen(statement));
 
-		strncpy(statement, ogl.vendor, MAX_OGL_VENDOR_NAME);
+		strsafecpy(statement, ogl.vendor);
 		mysql_real_escape_string(dbh, vendor, statement, strlen(statement));
-        
-        strncpy(statement, cpu.manufacturer, std::min(sizeof(statement), sizeof(cpu.manufacturer)) - 1);
+
+        strsafecpy(statement, cpu.manufacturer);
         mysql_real_escape_string(dbh, cpuManufacturer, statement, strlen(statement));
-        
-        strncpy(statement, cpu.brandName, std::min(sizeof(statement), sizeof(cpu.brandName)) - 1);
+
+        strsafecpy(statement, cpu.brandName);
         mysql_real_escape_string(dbh, cpuBrandName, statement, strlen(statement));
-        
+
 		if ( pci.sound.isValid )
 		{
-			strncpy(statement, mix.szPname, MAX_MIX_NAME);
+			strsafecpy(statement, mix.szPname);
 			statement[MAX_MIX_NAME] = 0;
 			mysql_real_escape_string(dbh, soundCard, statement, strlen(statement));
 		} else {
-			strncpy(soundCard, "*none*", MAX_MIX_NAME);
+			strsafecpy(soundCard, "*none*");
 		}
 
 		descs[0] = 0;
@@ -813,7 +796,7 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 						", %u, %u, %u, %u"
 						", %u, %u, %u, %u, %u"
 						", %u, %u, %u, %u, %u"
-						", %llu"				// Speed
+						", %" PR64BitUT ""				// Speed
 						" )"
 					, cardName
 					, vendor
@@ -989,8 +972,8 @@ authdbSaveLastOTP(UINT64 otp)
 {
 	try
 	{
-		DBQuery q(dbh, "REPLACE INTO `auth`.`auth_variables` (`name`, `value`) VALUES ('last_otp', %llu)", otp);
-		dbugLog(_FLI, "%s: saved last OTP of %llu", __FUNCTION__, otp);
+		DBQuery q(dbh, "REPLACE INTO `auth`.`auth_variables` (`name`, `value`) VALUES ('last_otp', %" PR64BitUT ")", otp);
+		dbugLog(_FLI, "%s: saved last OTP of %" PR64BitUT "", __FUNCTION__, otp);
 	}
 	catch (std::exception& e)
 	{

@@ -15,7 +15,7 @@
 // Packer/unpacker
 
 SINT32
-ActiveMission::packer(LOGICAL mode, ACTION_OBJECT* a)
+ActiveMission::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_missionID, 0);
 	if ( m_missionID > 0 )

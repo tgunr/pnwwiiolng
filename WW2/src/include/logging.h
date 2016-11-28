@@ -2,7 +2,6 @@
 // Simple macro header file which defines a couple of beta-release
 // functions that record an event occurring on a particular teulIndex
 
-#include "versionNo.h"
 #include "map/mapPlayer.h"
 
 #ifdef BETA_RELEASE

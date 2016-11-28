@@ -48,9 +48,9 @@
 #endif
 
 extern LOGICAL obwldInit(const char* levelfile);
-extern void obwldKill(void);
-extern LOGICAL obwldUpdate(void);
+extern void obwldKill();
+extern LOGICAL obwldUpdate();
 
 #ifdef USE_SHADOWS
-	extern LOGICAL obwldPredrawUpdate(void);
+	extern LOGICAL obwldPredrawUpdate();
 #endif

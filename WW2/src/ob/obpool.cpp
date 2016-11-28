@@ -17,7 +17,6 @@
 #include "fx/FXInterface.h"
 #include "trn/trngrass.h"
 #include "spt/sptmain.h"
-#include "sys/sysWinISO.h"
 #include <assert.h>
 #include "ob/obMgr.h"
 #include "ogl/oglMesh.h"
@@ -83,11 +82,11 @@ struct POOL_OBJECT_TO_DIRECTORY
 };
 
 // Callback definitions for scanning object types.
-typedef LOGICAL (*SCANOBJECT)(OBJECT* lpobj, POOLOBJHDR** lphdr);
-typedef LOGICAL (*SCANPOOL)(POOLOBJHDR* lphdr, OBJECT** lpobj);
+using SCANOBJECT = LOGICAL(*)(OBJECT* lpobj, POOLOBJHDR** lphdr);
+using SCANPOOL = LOGICAL(*)(POOLOBJHDR* lphdr, OBJECT** lpobj);
 
-typedef LOGICAL (*SCANPOOLTOFILE)(POOLOBJHDR* lphdr, int hfile, UINT32* pool);
-typedef LOGICAL (*SCANFILETOPOOL)(POOLOBJHDR* lphdr, int hfile, UINT32* pool);
+using SCANPOOLTOFILE = LOGICAL(*)(POOLOBJHDR* lphdr, int hfile, UINT32* pool);
+using SCANFILETOPOOL = LOGICAL(*)(POOLOBJHDR* lphdr, int hfile, UINT32* pool);
 
 //static SINT8		pathname[256];
 static SINT32		numobjects;
@@ -137,10 +136,6 @@ logTimerBeginMacro();
 		return(FALSE);
 	}
 
-#ifdef CONVERSION_PROGRAM
-	return TRUE;
-#endif
-
 logTimerBeginExtMacro(obwldInit);
 	if (!obwldInit(name))
 	{
@@ -157,7 +152,7 @@ logTimerEndMacro();
 	obpoolKill
 *************************************************************************************************/
 // Free all pool objects and free the list.
-void obpoolKill(void)
+void obpoolKill()
 {
 	POOLOBJHDR*	lpobj, *next;
 
@@ -311,7 +306,7 @@ LOGICAL obpoolFreeObjectCallback(OBJECT* lpgrp)
 	obpoolGetNewObject
 *************************************************************************************************/
 // Get a new pool object
-POOLOBJHDR* obpoolGetNewObject(void)
+POOLOBJHDR* obpoolGetNewObject()
 {
 POOLOBJHDR*    lphdr;
 

@@ -1,0 +1,49 @@
+BODY {
+ margin: 1px 1px 1px 1px;
+ padding: 1px 1px 1px 1px;
+ font-family: Arial, Helvetica, Sans-Serif ;
+ background-color: #ffffff ;
+}
+
+.heading {
+ padding-bottom: 3px; margin-bottom: 16px; border-bottom: dotted 1px blue;
+}
+
+.footer {
+  font-size: smaller; font-style: italic;
+  margin-top: 16px; padding-top: 3px; border-top: dotted 1px blue;
+  text-align: right;
+}
+.footer:after {
+  content: "Powered by Teul::uWeb::Server.  Copyright (C) PlayNet Inc 2011 -- All rights reserved.";
+}
+
+h1, h2, .title {
+ padding-left: 4px ;
+ padding-right: 4px ;
+ background-color: #404080 ;
+ color: #f0f0b0 ;
+}
+
+.title {
+ font-size: larger ;
+}
+
+.control {
+ margin: 8px 32px 8px 32px;
+ padding: 4px 24px ;
+
+ border-left: 2px solid #c0c0ff ;
+ border-top: 2px solid #c0c0ff ;
+ border-right: 1px solid #808080 ;
+ border-bottom: 1px solid #808080 ;
+
+ background-color: #fcfcfc ;
+ font-size: smaller ;
+ font: Consolas, Cambria, Verdana, Sans-serif ;
+ text-align: center ;
+}
+
+.control input {
+ margin: 0px ;
+}

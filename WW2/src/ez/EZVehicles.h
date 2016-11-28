@@ -264,7 +264,7 @@ public:
 
 private:
 
-	typedef std::map<std::string, std::string> RETICLE_MAP;
+	using RETICLE_MAP = std::map<std::string, std::string>;
 
 	FLOAT32 _dispersion;
 	FLOAT32 _curReticle; // current reticle size

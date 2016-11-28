@@ -37,7 +37,7 @@ public:
 
 public:
 	static TEUL_CALLBACK*	s_callback;
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_requester, 0);
 		a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_fullObjID, 0);

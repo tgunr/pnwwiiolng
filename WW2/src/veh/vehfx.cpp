@@ -879,8 +879,7 @@ void _updateTraverseSound(FXVEHCONTAINER* c, SINT32 i)
 
         // If player position does not equal i, continue..stop the sound.
         // Don't want annoying sound playing when player changes positions
-        UINT32 position = 0;
-        persGetPersonaPosition(&position);
+        UINT32 position = persGetPersonaPosition();
 
         if(position != (UINT32)i)
         {
@@ -1082,8 +1081,7 @@ void _updateElevateSound(FXVEHCONTAINER* c, SINT32 i)
 
         // If player position does not equal i, continue..stop the sound.
         // Don't want annoying sound playing when player changes positions
-        UINT32 position = 0;
-        persGetPersonaPosition(&position);
+        UINT32 position = persGetPersonaPosition();
 
         if(position != (UINT32)i)
         {
@@ -1993,7 +1991,7 @@ LOGICAL _CreateExhaust(FXVEHCONTAINER* lpCon, SINT32 iEngine, SINT32 iSide)
 LOGICAL _CreateSmokeStack(FXVEHCONTAINER* lpCon, SINT32 iEngine, SINT32 iSide)
 {
 #if(0)
-    
+
     // TBD - smoke stack
     OBJECT* lpObj = nullptr;
 

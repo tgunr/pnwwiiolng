@@ -145,7 +145,7 @@ struct mlObjectData
 	static void Release(mlObjectData* object);
 };
 
-typedef void (*mlForEachCallback)(struct OBJECT*, void*);
+using mlForEachCallback = void(*)(struct OBJECT*, void*);
 struct vehVehicle;
 struct vehType;
 
@@ -165,7 +165,7 @@ extern UINT32 mlObjectSetInplaneObject(struct OBJECT * BaseObject,UINT32 Positio
 extern UINT32 mlObjectSetExternObject(struct OBJECT * BaseObject);
 extern UINT32 mlSetModelSpecialPoints(void* InVehicleData,struct mlObjectData * VehicleObjectData);
 extern UINT32 mlApplyVelocityToObject(struct OBJECT * PlaneObject,struct FLOAT64VECTOR * Vel);
-extern UINT32 mlDrawProps(void);
+extern UINT32 mlDrawProps();
 extern UINT32 mlForEachSubObject(struct OBJECT*, mlForEachCallback, void* data, LOGICAL IncludeSib);
 extern UINT32 mlProcessContactPointObject(struct mlObjectData* ObjectData);
 extern UINT32 mlInitVehicleObject(struct mlObjectData** ObjectData, struct vehType const* VehicleType,

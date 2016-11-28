@@ -25,8 +25,8 @@
 #include <vector>
 static std::vector<int> troop_personal_id;
 
-#define PERSONAL_DIVISOR    4       // Number of textures in row and column
-#define PERSONAL_UV         0.25f   // 128 / 512 (each texture is 128x128 on a 512x512
+#define PERSONAL_DIVISOR    8       // Number of textures in row and column
+#define PERSONAL_UV         0.125f  // 128 / 512 (each texture is 128x128 on a 512x512
 
 #define INDIVIDUAL_DIVISOR 8        // Number of texture in row and column
 #define INDIVIDUAL_UV      0.125f   // 128 / 1024 (each texture is 128x128 on a 1024x1024)

@@ -23,9 +23,9 @@
 //////////////////////////////////////////////////////////////////////
 
 // PERSONA_SELECTIONS are personaID->brigadeID
-typedef std::unordered_map<UINT32,UINT32> _PERSONA_SELECTIONS;
-typedef std::unordered_set<UINT32> _PERSONAS;
-typedef std::unordered_map<UINT32,_PERSONAS> _BRIGADE_PERSONAS;
+using _PERSONA_SELECTIONS = std::unordered_map<UINT32,UINT32>;
+using _PERSONAS = std::unordered_set<UINT32>;
+using _BRIGADE_PERSONAS = std::unordered_map<UINT32,_PERSONAS>;
 
 static _PERSONA_SELECTIONS _selections;
 
@@ -51,7 +51,7 @@ _grabPersonas(_BRIGADE_PERSONAS& personas)
 	// Do this early to allow the main thread the chance to skip
 	// some locking
 	std::lock_guard<std::mutex> lock(_mutex);
-	
+
 	for ( auto it = _selections.begin(); it != _selections.end(); ++it )
 	{
 		personas[it->second].insert(it->first);
@@ -119,7 +119,7 @@ _saveSelections(DB::handle_t* conn)
 				// Add a new persona or start filling buf up from scratch
 				if ( offset == 0 )
 					offset = strprintf(buf
-								, "UPDATE LOW_PRIORITY wwii_persona SET modified = NOW(), brigade_id = %u WHERE personaID IN (%u"
+								, "UPDATE wwii_persona SET modified = NOW(), brigade_id = %u WHERE personaID IN (%u"
 									, (UINT32)(it->first)
 									, *pit);
 				else
@@ -129,7 +129,7 @@ _saveSelections(DB::handle_t* conn)
 	}
 	catch ( std::exception& e )
 	{
-		threadLog(_FLA, "Failed saving personas: %s", e.what());
+		dbugLog(_FLA, "Failed saving personas: %s", e.what());
 	}
 }
 
@@ -137,15 +137,9 @@ _saveSelections(DB::handle_t* conn)
 // Thread that periodically saves personas
 
 void
-PersonaSelectionThread::run()
+PersonaSelectionThread::dbrun()
 {
-	DB::handle_t* conn = threadsOpenDBConnection(true);
-	if ( conn == nullptr )
-	{
-		LogAbort("spt: Unable to open database connection");
-	}
-
-	threadLog(_FLM, "Persona-selections thread active");
+	dbugLog(_FLM, "Persona-selections thread active");
 
 	while ( !isCancelled() )
 	{
@@ -160,8 +154,8 @@ PersonaSelectionThread::run()
 			continue;
 
 		// Wake the connection up
-		mysql_ping(conn);
+		mysql_ping(m_conn);
 
-		_saveSelections(conn);
+		_saveSelections(m_conn);
 	}
 }

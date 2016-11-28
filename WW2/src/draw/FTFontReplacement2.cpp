@@ -21,7 +21,6 @@
 #include "fio.h"
 #include <iostream>
 #include <sstream>
-#include "wwii/wwiiHash.h"
 #include <wchar.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -33,14 +32,14 @@ USING_EXT_NAMESPACE;
 
 extern SINT32 frametime;
 
-typedef struct CharacterInfo
+struct CharacterInfo
 {
     unsigned long boxNumber;
     float pixWidth, pixHeight, pixX, pixY; // in texture coord
     float advance, width, height, offset; // in pixels
-} CharacterInfo;
+};
 
-typedef stdext::hash_map<unsigned int,CharacterInfo> CharacterInfoMap;
+using CharacterInfoMap = stdext::hash_map<unsigned int,CharacterInfo>;
 
 class FTFontMaster
 {

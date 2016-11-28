@@ -27,7 +27,7 @@ UINT32 persHUDToggleGameInfo(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZ
 UINT32 persHUDToggleReadout(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero);
 // tolua_end
 
-void persHudReceivedUpdate(void);
+void persHudReceivedUpdate();
 
 // tolua_begin
 // used by the tutorial system to control hud behavior
@@ -72,7 +72,7 @@ protected:
 	float _maxx,_miny;
 
 	int language;
-	typedef std::map<std::string,std::wstring> StringCache;
+	using StringCache = std::map<std::string,std::wstring>;
 	StringCache strings;
 };
 
@@ -149,7 +149,7 @@ public:
 		virtual bool Update();
 	};
 
-	typedef std::vector<HUDObject*> HUDObjectList;
+	using HUDObjectList = std::vector<HUDObject*>;
 
 	PersHUDManager()
 	{

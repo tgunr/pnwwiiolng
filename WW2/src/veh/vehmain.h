@@ -490,8 +490,8 @@ private:
 	vehmain
 *************************************************************************************************/
 
-UINT32 	vehInit(void);
-UINT32 	vehKill(void);
+UINT32 	vehInit();
+UINT32 	vehKill();
 
 //void vehmainInitModelInstance(OBJECT* root);
 
@@ -506,14 +506,14 @@ UINT32	vehApplyDamageToVehicleComponent(vehVehicle* InVehicle, UINT32 ComponentN
 UINT32	vehGetHitmapComponentThickness(FLOAT64* Thickness,vehVehicle* Vehicle, UINT32 PartNum);
 UINT32	vehFindHitmapObjectNumByName(UINT32* ComponentNum, UCHAR* ComponentName, UINT32 VehicleNum);
 
-UINT32	vehUpdate(void);
+UINT32	vehUpdate();
 namespace Vehicle { struct Hit; }
 UINT32 	vehProcessVehicleHit(const Vehicle::Hit&);
-UINT32 	vehAdjustAnimationTime(void);
+UINT32 	vehAdjustAnimationTime();
 
 UINT32 		vehGetVehicleHead(vehVehicle**);
 vehVehicle*	vehFindVehicle(UINT32 HostIndex);
-vehVehicle*	vehFindVehicleByChatHandle(const ChatHandle& chathandle);
+vehVehicle*	vehFindVehicleByChatHandle(const ChatHandle chathandle);
 LOGICAL vehValid(vehVehicle*);
 LOGICAL vehVehicleInList(vehVehicle*);
 int vehVehicleSpawned(const vehType* vtype, bool onlyPlayers = true); // how many of this vehicle type is spawned
@@ -532,7 +532,7 @@ vehVehicle*	vehFindRidingVehicle(UINT32 RideVehicleHostIndex, UINT32 RideSeatNum
 
 // Infantry resupply point
 //bool vehmainDropInfantryResupplyPoint();
-PlayerPlacedObject* vehmainFRUBuild();
+PlayerPlacedObject* vehmainPPOBuild();
 //bool vehmainIRPCheck();
 bool vehmainFRUExecute();
 

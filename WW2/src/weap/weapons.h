@@ -38,7 +38,7 @@ enum
 };
 
 
-typedef void (*WEAP_FIRE_CALLBACK)(struct weapWeapon * Weapon);
+using WEAP_FIRE_CALLBACK = void(*)(struct weapWeapon * Weapon);
 
 struct weapWeapon
 {
@@ -63,19 +63,19 @@ struct weapWeapon
 
 	weapWeapon()
 		: WeaponType(nullptr)
+		, BeltSequence{}
 		, LastFireTime(0.0f)
 		, ReloadStartTime(0.0f)
 		, WeaponFireType(0)
 		, Displacement(0.0f)
+		, BeltName{}
 	{
-		memset(BeltSequence, 0x0, sizeof(BeltSequence));
-		memset(BeltName, 0x0, sizeof(BeltName));
 	}
 };
 struct vehVehicle;
 
-extern SINT32 weaponsInit(void);
-extern UINT32 weaponsKill(void);
+extern SINT32 weaponsInit();
+extern UINT32 weaponsKill();
 extern UINT32 weapInitializeWeapon(weapWeapon * Weapon,weaponType * WeaponType);
 extern UINT32 weapFindWeaponTypeByName(weaponType ** WeaponType,UCHAR * WeaponName);
 extern UINT32 weapCreateWeaponByName(weapWeapon * Weapon,

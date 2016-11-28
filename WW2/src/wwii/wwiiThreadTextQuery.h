@@ -11,7 +11,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 
 class ThreadTextQuery
@@ -37,7 +37,7 @@ public:
 
 	// Commit the buffer if maxAge milliseconds have elapsed since the last
 	// commit (thus if maxAge = 0 it will force a commit)
-	bool commit(const TeulTimeMS& maxAge);
+	bool commit(const TeulTimeMS maxAge);
 
 	// Return true if the number of bytes specified would exceed the available
 	// space left in the current buffer.
@@ -59,7 +59,7 @@ private:
 	size_t				m_length;
 	TeulTimeMS			m_commitFrom;	// Timestamp from which we decide whether commit maturity has been reached
 
-private:
-	ThreadTextQuery& operator = (const ThreadTextQuery& rhs);
+public:
+	ThreadTextQuery& operator = (const ThreadTextQuery& rhs) = delete;
 };
 

@@ -10,7 +10,7 @@
 #include "mem/mem.h"
 #include "include/defs.h"
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 #include "include/vars.h"
 #include "rn/rnlogo.h"
 #endif
@@ -19,14 +19,14 @@
 #include "parse/parseIO.h"
 #include "str/stringLib.h"
 
-#ifdef LIMITED_FIO
+#if platBuild == BUILD_SERVER
 	#include "fio/fioDefs.h"
 	#include "fio/fiod.h"
 #else
 	#include "fio/fio.h"
 #endif
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 extern SINT32	LoadingScreen;
 #endif
 
@@ -54,7 +54,7 @@ static char _fileName[PN_MAX_PATH];
 static ARG_KEY_HEAD _defaultKeys;
 
 #include <set>
-typedef std::set< std::pair<std::string, std::string> > IGNORE_LIST;
+using IGNORE_LIST = std::set<std::pair<std::string, std::string>>;
 static IGNORE_LIST _ignoreList;
 
 static ARG_LIST* paramGetArgList(char* src)
@@ -201,7 +201,7 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 	keyList.numKeys = 0;
 	keyList.keys = fargs;
 
-	strncpy(_fileName, pathName, PN_MAX_PATH);
+	strsafecpy(_fileName, pathName);
 
 	char* data = nullptr;
 	bool loaded = fioLoad(_fileName, data);
@@ -209,17 +209,14 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 		return loaded;
 
 	_section = (SECTION_HEAD*)memAlloc(sizeof(SECTION_HEAD));
-	memset(_section, 0x0, sizeof(SECTION_HEAD));
-
 	_defaultKeys.keys = (ARG_KEY*)memAlloc(sizeof(ARG_KEY)*(MAX_ARGS+1));
-	memset(_defaultKeys.keys, 0x0, sizeof(ARG_KEY)*(MAX_ARGS+1));
 
 	// should no lines return false?
 	retval = true;
 
 	*lineCounter = 0;
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 	if ( LoadingScreen )
 	{
 		rnUpdateLoadingScreen();
@@ -241,7 +238,7 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 		// if we get an error and break retval its false
 		retval = false;
 
-		strncpy(func, argList->arg[0], MAX_SECT_NAME_SIZE);
+		strsafecpy(func, argList->arg[0]);
 		_strlwr(func);
 		if (  ! strcmp(func,"section"))
 			_defaultKeys.numKeys = 0;
@@ -345,13 +342,15 @@ static bool _setSection(int numargs, FUNCARGS* args)
 {
 SINT32 i;
 
-	strncpy((char*)_section->name,args[0].svalue,MAX_SECT_NAME_SIZE);
+	strsafecpy((char*)_section->name, args[0].svalue, MAX_SECT_NAME_SIZE);
 	_section->numargs = numargs;
 
-	strcpy((char*)_section->header[0],"file/name");
+	strcpy((char*)_section->header[0], "file/name");
 
-	for( i=1; i < numargs; i++ )
-		strncpy((char*)_section->header[i],args[i].svalue,MAX_SECT_NAME_SIZE);
+	for (i = 1; i < numargs; i++)
+	{
+		strsafecpy((char*)_section->header[i], args[i].svalue, MAX_SECT_NAME_SIZE);
+	}
 
 	_defaultKeys.numKeys= 0;
 

@@ -18,7 +18,7 @@
 #include "wwii/wwiiConfig.h"
 
 #include "wwii/wwiiHash.h"
-typedef std::unordered_map<UINT32,SquadVote> SQUAD_VOTES;
+using SQUAD_VOTES = std::unordered_map<UINT32,SquadVote>;
 
 static SQUAD_VOTES g_squadVotes;
 
@@ -26,7 +26,7 @@ static SQUAD_VOTES g_squadVotes;
 // Register a vote
 
 void
-SquadVote::addVote(UINT32 squadID, const ChatHandle& voteBy, const ChatHandle& voteFor)
+SquadVote::addVote(UINT32 squadID, const ChatHandle voteBy, const ChatHandle voteFor)
 {
 	if ( m_started == 0 )
 		startVote();
@@ -111,16 +111,10 @@ SquadVote::close(UINT32 duration)
 
 	m_started = 0;
 	m_closedUntil = teulTime() + duration;
-	if ( m_counts )
-	{
-		delete m_counts;
-		m_counts = nullptr;
-	}
-	if ( m_votes )
-	{
-		delete m_votes;
-		m_votes = nullptr;
-	}
+	delete m_counts;
+	m_counts = nullptr;
+	delete m_votes;
+	m_votes = nullptr;
 	recount();
 }
 
@@ -189,11 +183,9 @@ SquadVote::startVote()
 {
 	m_closedUntil = 0;
 	m_started = teulTime();
-	if ( m_counts )
-		delete m_counts;
+	delete m_counts;
 	m_counts = new COUNTS;
-	if ( m_votes )
-		delete m_votes;
+	delete m_votes;
 	m_votes = new VOTES;
 	m_leader = 0LL;
 	m_lead = 0;
@@ -240,7 +232,7 @@ SquadVote::winner(SquadList* list)
 // Withdraw the vote of a squad member
 
 void
-SquadVote::withdraw(UINT32 squadID, const ChatHandle& handle, SquadList* list)
+SquadVote::withdraw(UINT32 squadID, const ChatHandle handle, SquadList* list)
 {
 	// Is the vote active?
 	if ( !m_started || m_closedUntil || !m_votes || !m_counts )

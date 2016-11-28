@@ -11,7 +11,6 @@
 #include "chat/chatdbParser.h"
 #include "dbse/dbseTypes.h"
 #include "dbse/dbseHandle.h"
-#include "dbse/dbseConnection.h"
 #include "server/serverConfigVars.h"
 #include "server/serverInterfaceDescription.h"			// For myInterface
 #include "server/serverInitializeProcess.h"
@@ -28,9 +27,6 @@
 #endif
 
 #define DEF_ERR_FLAGS STD_ERR
-
-DBCONNECTION dbConnection;
-DBHANDLE dbh;
 
 extern SINT32 dbseInstallHostCallbacks();
 
@@ -49,7 +45,7 @@ static void _errorFunction(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32
 
 static void _initDB()
 {
-	ABORT_IF_EX(dbh.connect(dbConnection) == false, "DBD can't operate without a database connection.");
+	ABORT_IF_EX(dbh.connect() == false, "DBD can't operate without a database connection.");
 
 	dbugLog(_FLI, "Connected to WWII_DB");
 }
@@ -62,7 +58,6 @@ int main(int argc, const char* argv[])
 	dbugSetWriteLevel(Debug::ERR_INFO | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
-	threadsReadDBEnvironment();
 	dbugLog(_FLI,"Database Proxy Host starting. Compiled %s at %s", __DATE__, __TIME__);
 
 	if ( chatdbInstallHostCallbacks() )
@@ -87,11 +82,10 @@ int main(int argc, const char* argv[])
 	while (1)
 	{
 		teulUpdateTransport(50);
-		threadsLogging();
 	}
 
+/*	when we decide on a condition for the loop above:
 	wwiiIRCTerminate("[[ Shutting Down ]]");
 	teulClose(listenIndex);
-
-	return 0;
+*/
 }

@@ -8,14 +8,13 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include <mysql.h>
 
 #include "chat/chatPlayer.h"
 #include "chat/chatHost.h"
 #include "chat/chatLStringIDs.h"
 #include "chat/chatName.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiThreadTypes.h"
@@ -24,7 +23,7 @@
 
 struct BAN
 {
-	BAN(const ChatHandle& handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle& issuerHandle)
+	BAN(const ChatHandle handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle issuerHandle)
 		: m_handle(handle), m_duration(duration), m_message(message), m_issuer(issuer), m_issuerHandle(issuerHandle)
 		, m_banNo(0), m_playerID(0)
 		{}
@@ -38,21 +37,26 @@ struct BAN
 	UINT32		m_banNo;
 	playerid_t	m_playerID;
 };
-typedef ConditionQueue<BAN> BAN_QUEUE;
-BAN_QUEUE banQueue;
+using BAN_QUEUE = ConditionQueue<BAN>;
+static BAN_QUEUE banQueue;
+struct BanThread : public DBThread::Thread
+{
+	virtual void dbrun() override;
+};
+static BanThread _banThread;
 
 //////////////////////////////////////////////////////////////////////
 // Ban a player -- if player is not null then the player is notified
 // of the banning but is not kicked.
 
 void
-chatBanPlayer(const ChatHandle& handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle& issuerHandle)
+chatBanPlayer(const ChatHandle handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle issuerHandle)
 {
 	banQueue.push_back(new BAN(handle, duration, message, issuer, issuerHandle));
 }
 
 void
-chatForceKickPlayer(const ChatHandle& handle, const char* message, UINT32 issuer, const ChatHandle& issuerHandle)
+chatForceKickPlayer(const ChatHandle handle, const char* message, UINT32 issuer, const ChatHandle issuerHandle)
 {
 	banQueue.push_back(new BAN(handle, 0, message, issuer, issuerHandle));
 }
@@ -89,9 +93,9 @@ _banSuccess(void* data)
 		Chat::Name banned(ban->m_handle);
 		char msg[MAX_MESSAGE_LENGTH+1];
 		if ( ban->m_duration == 0 )
-			snprintf(msg, MAX_MESSAGE_LENGTH, "%s has force-kicked %s: %s", issuer->callsign(), banned.c_str(), ban->m_message.c_str());
+			strprintf(msg, "%s has force-kicked %s: %s", issuer->callsign(), banned.c_str(), ban->m_message.c_str());
 		else
-			snprintf(msg, MAX_MESSAGE_LENGTH, "%s has issued a %s ban(#%u) on %s: %s"
+			strprintf(msg, "%s has issued a %s ban(#%u) on %s: %s"
 						, issuer->callsign()
 						, chatTimeInterval(ban->m_duration)
 						, ban->m_banNo
@@ -132,11 +136,11 @@ _processBan(DB::handle_t* conn, BAN& ban)
 	{
 		mysql_ping(conn);
 
-		threadLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, issuer.c_str(), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, name.c_str());
+		dbugLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, issuer.c_str(), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, name.c_str());
 
 		message = new char[strlen(ban.m_message.c_str())*2 + 1];
-        	mysql_real_escape_string(conn, message, ban.m_message.c_str(), ban.m_message.length());
-		
+		mysql_real_escape_string(conn, message, ban.m_message.c_str(), ban.m_message.length());
+
 		// p_ban_player ( playerID, banFor, banBy, reason ) returns either
 		// 0, <reason>
 		// 1, <#bans>
@@ -147,7 +151,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 		delete message;
 		message = nullptr;
-	
+
 		playerid_t playerID = 0;
 		if ( q.HasRows() && q.FetchRow() )
 			playerID = q.Row().NextUInt();
@@ -161,7 +165,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 		threadCallback(_banSuccess, &ban);
 
-		threadLog(_FLN, "p:%u subj:%s %llu vs %llu issued %us ban", ban.m_issuer, name.c_str(), ban.m_issuerHandle, ban.m_handle, ban.m_duration);
+		dbugLog(_FLN, "p:%u subj:%s %" PR64BitUT " vs %" PR64BitUT " issued %us ban", ban.m_issuer, name.c_str(), ban.m_issuerHandle, ban.m_handle, ban.m_duration);
 	}
 	catch (std::exception& e)
 	{
@@ -170,7 +174,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 		ban.m_message = e.what();
 		threadCallback(_banFail, &ban);
-		threadLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, name.c_str(), e.what());
+		dbugLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, name.c_str(), e.what());
 	}
 
 	if ( p )
@@ -180,28 +184,31 @@ _processBan(DB::handle_t* conn, BAN& ban)
 //////////////////////////////////////////////////////////////////////
 // Thread for processing bans
 
-void chatBanQueueThread()
+void BanThread::dbrun()
 {
-	static DB::handle_t* conn = threadsOpenDBConnection(false);
-	if ( conn == nullptr )
-	{
-		threadLog(_FLA, "bqt: Unable to open database connection");
-		return;
-	}
+	dbugLog(_FLI, "Ban Queue Thread active");
 
-	threadLog(_FLI, "Ban Queue Thread active");
-
-	threadIgnoreSIGPIPE();
-
-	for ( ; ; )
+	while ( !isCancelled() )
 	{
 		auto ban = banQueue.getNext();
-		if (ban == nullptr)
-			break;
-		_processBan(conn, *ban);
+		if (ban)
+			_processBan(m_conn, *ban);
 	}
+}
 
-	threadsCloseDBConnection(conn);
+//////////////////////////////////////////////////////////////////////
+// start the ban player thread
 
-	return;
+void chatStartBanThread()
+{
+	_banThread.start();
+}
+
+//////////////////////////////////////////////////////////////////////
+// stop the ban thread
+
+void chatCancelBanThread()
+{
+	_banThread.cancel();
+	banQueue.destroy();
 }

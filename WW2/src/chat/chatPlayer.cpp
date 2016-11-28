@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "mem/mem.h"
 #include "chat/chatBroadcastObject.h"
 #include "chat/chatData.h"
@@ -63,12 +61,10 @@
 
 static HANDLES _spawning;
 
-extern DBHANDLE& chatdbGetDBH();
-
-typedef std::unordered_map< UINT32, std::set<UINT32> > RECRUITS;
+using RECRUITS = std::unordered_map<UINT32, std::set<UINT32>>;
 static RECRUITS _recruits;
 
-typedef std::unordered_set< UINT32 > PLAYERIDS;
+using PLAYERIDS = std::unordered_set<UINT32>;
 static PLAYERIDS _logins;
 #ifdef RECORD_LOGOUTS
 static PLAYERIDS _logouts;
@@ -83,8 +79,8 @@ struct AWS_READING
 	UINT16	allied;
 	UINT16	axis;
 };
-typedef std::map<UINT32, AWS_READING> AWS_GRID;
-typedef std::map<instanceid_t, AWS_GRID> AWS_INSTANCES;
+using AWS_GRID = std::map<UINT32, AWS_READING>;
+using AWS_INSTANCES = std::map<instanceid_t, AWS_GRID>;
 AWS_INSTANCES g_awsGrids, g_awsSnapshots;
 
 // Decal saving
@@ -326,8 +322,7 @@ Player::~Player()
 		m_tunes = nullptr;
 	}
 
-	if ( m_impl )
-		delete m_impl;
+	delete m_impl;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -680,17 +675,14 @@ extern const char* const channelTypeName[];
 void
 Player::detuneAllRadios()
 {
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s DETUNE", teulIndex(), playerID(), callsign());
+    dbugLog(_FLD, "t:%d p:%u c:%s DETUNE", teulIndex(), playerID(), callsign());
 
-		for ( UINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
-		{
-			auto& cnode = this->getChannelSub(i);
-			dbugLog(_FLDB, " radio%u:{chan:%p, type:%u[%s], subs:%" PRSizeT "}"
-							, i, cnode.channel(), cnode.type(), channelTypeName[cnode.type()], (cnode.channel() ? cnode.channel()->numSubscribers() : 0));
-		}
-	}
+    for ( UINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
+    {
+        auto& cnode = this->getChannelSub(i);
+        dbugLog(_FLD, " radio%u:{chan:%p, type:%u[%s], subs:%" PRSizeT "}"
+            , i, cnode.channel(), cnode.type(), channelTypeName[cnode.type()], (cnode.channel() ? cnode.channel()->numSubscribers() : 0));
+    }
 
 	for ( UINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
 		detuneRadio(i);
@@ -1038,7 +1030,7 @@ Player::objectiveCP() const
 	return ( (prop == nullptr) ? "<unknown>" : prop->Name() );
 }
 
-#include <unordered_map>
+#include "wwii/wwiiHash.h"
 static std::unordered_map<playerid_t, std::vector<UINT32>> playerGroups;
 static std::mutex playerGroupsMutex;
 
@@ -1074,7 +1066,7 @@ public:
 	PlayerGroupQuery(const playerid_t _playerID)
 		: DBThreadQuery(DBThread::Default, "PlayerGroupQuery", DBThreadQuery::_IMMEDIATE
 							, "SELECT v.group_oid"
-								" FROM auth.v_player_active_groups v"
+								" FROM `auth`.`v_player_active_groups` v"
 								" WHERE v.playerid = %u AND v.arenaid = %u"
 									, _playerID
 									, Server::myServerInfo.stats.arenaID
@@ -1100,7 +1092,7 @@ protected:
 
 	virtual void Failure() override
 	{
-		threadLog(_FLA, "p:%u unable to read player groups from database", m_playerID);
+		dbugLog(_FLA, "p:%u unable to read player groups from database", m_playerID);
 	}
 };
 
@@ -1416,7 +1408,7 @@ Player::SetMission(UINT32 toMissionID)
 // Set when to send the next reminder not to spam the help channel
 
 void
-Player::SetTimer(const char* timer, const TeulTimeMS& time)
+Player::SetTimer(const char* timer, const TeulTimeMS time)
 {
 	m_impl->m_timers[timer] = time;
 }
@@ -1584,7 +1576,7 @@ Player::SetSpawned(bool newValue)
 }
 
 void
-Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle& handle, UINT32 joined)
+Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle handle, UINT32 joined)
 {
 	if ( m_squadID != toSquadID )
 		m_announcedToSquad = false;
@@ -1615,8 +1607,7 @@ Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle& handle, UI
 void
 Player::SetSquadInvite(SquadInvite* invite)
 {
-	if ( m_squadInvite )
-		delete m_squadInvite;
+	delete m_squadInvite;
 	m_squadInvite = invite;
 }
 
@@ -1625,7 +1616,7 @@ Player::SetSquadInvite(SquadInvite* invite)
 // not it is a buzzard
 
 void
-Player::SetWeapon(const WEAPON_SPEC& toWeapon)
+Player::SetWeapon(const WEAPON_SPEC toWeapon)
 {
 	dbugLog(_FLD, "Weapon was %d.%d.%d.%d", m_weapon.wType, m_weapon.wClass, m_weapon.wCategory, m_weapon.wCountry);
 	m_weapon = toWeapon;
@@ -1943,13 +1934,13 @@ _nameForCP(const Property* nearCP, const Property* lastCP)
 
 void
 Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
-						, bool cpChanged, const FULL_OBJ_ID& nearCP
+						, bool cpChanged, const FULL_OBJ_ID nearCP
 						, UINT32 ride
-						, const FULL_OBJ_ID& nowInFacility
+						, const FULL_OBJ_ID nowInFacility
 						, UINT32 lastPing
 						, bool isOnAWS
 						, bool inCapBldg
-						, const FULL_OBJ_ID& capFac
+						, const FULL_OBJ_ID capFac
 						, SINT32 progress
 						)
 {
@@ -2082,7 +2073,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 		}
 	}
 
-	if ( g_logDebug & g_debugPersonas )
+	if ( g_debugPersonas )
 	{
 		WEAPON_SPEC ws = m_weapon;
 		dbugLog(_FLD, "t:%d p:%u c:%s update c:%u, b:%u, br:%u, m:%u, or:" PRF_FULL_OBJ_ID ", ob:" PRF_FULL_OBJ_ID " spawned:%d weap:" PRF_WEAPON_SPEC ""
@@ -2232,10 +2223,9 @@ Player::validatePreference(UINT32 prefId, UINT32 request) const
 	{
 		case CPR_UPDATE_MODE:
 			return _validateUpdateMode(request);
-		break;
+		default:
+			return request;
 	}
-
-	return request;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2260,8 +2250,8 @@ Player::whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const
 
 	// He's not in a facility, ergo at the map
 	if ( !missionID() )
-	{	
-		snprintf(tmpbuf, sizeof(tmpbuf), "%s brigade scrn", affiliation);
+	{
+		strprintf(tmpbuf, "%s brigade scrn", affiliation);
 		into.append(tmpbuf);
 		into.append(lastPosition("last near", x, y, true));
 		return;
@@ -2360,7 +2350,7 @@ _populateAWSReply(Player& player, const AWS::Request& request, const AWS_GRID& g
 
 	bool isAllied = (player.side() == ALLIED);
 
-	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu requesting %s AWS [%hu,%hu]-[%hu,%hu](%u)"
+	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " requesting %s AWS [%hu,%hu]-[%hu,%hu](%u)"
 					, player.teulIndex(), player.playerID(), player.callsign()
 					, player.instance().category(), player.instance().type(), player.instance().handle(), player.instance().id()
 					, (isAllied ? "axis" : "allied")
@@ -2413,18 +2403,15 @@ _populateAWSReply(Player& player, const AWS::Request& request, const AWS_GRID& g
 		++populatedRows;
 	}
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s %s aws request [%u-%u,%u] data:%s rows:%u, cells:%u"
-						, player.teulIndex()
-						, player.playerID()
-						, player.callsign()
-						, (isAllied ? "allied" : "axis")
-						, static_cast<UINT32>(request.m_startCol), static_cast<UINT32>(request.m_startCol) + AWS::MAX_COLUMNS, static_cast<UINT32>(request.m_row)
-						, (reply.m_hasData ? "yes" : "no")
-						, populatedRows, populatedCells
-						);
-	}
+    dbugLog(_FLD, "t:%d p:%u c:%s %s aws request [%u-%u,%u] data:%s rows:%u, cells:%u"
+                    , player.teulIndex()
+                    , player.playerID()
+                    , player.callsign()
+                    , (isAllied ? "allied" : "axis")
+                    , static_cast<UINT32>(request.m_startCol), static_cast<UINT32>(request.m_startCol) + AWS::MAX_COLUMNS, static_cast<UINT32>(request.m_row)
+                    , (reply.m_hasData ? "yes" : "no")
+                    , populatedRows, populatedCells
+                    );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2483,7 +2470,7 @@ Player::updateAWSPosition(bool onAWS)
 	}
 	else
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu aws side %u update %f.%f => %hd/%hd"
+		dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " aws side %u update %f.%f => %hd/%hd"
 						, teulIndex(), playerID(), callsign()
 						, instance().category(), instance().type(), instance().handle(), instance().id()
 						, side()
@@ -2537,7 +2524,7 @@ Player::removeFromAWS()
 		}
 	}
 
-	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu aws side %u extraction %f.%f => %d/%d"
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " aws side %u extraction %f.%f => %d/%d"
 					, teulIndex(), playerID(), callsign()
 					, instance().category(), instance().type(), instance().handle(), instance().id()
 					, m_impl->m_awsSide
@@ -2561,27 +2548,24 @@ chatUpdateAWSSnapshot()
 		return;
 	nextCheck = teulClock64 + (AWS::UPDATE_INTERVAL_S * 1000);
 
-	if ( g_logDebug )
-	{
-		const AWS_GRID& awsSnapshot = g_awsSnapshots[Instance::_CAMPAIGN];
-		const AWS_GRID& awsGrid = g_awsGrids[Instance::_CAMPAIGN];
-		UINT16 oldX = 0, oldY = 0;
-		UINT16 newX = 0, newY = 0;
-		if ( awsSnapshot.empty() == false )
-		{
-			oldX = awsSnapshot.begin()->first & 0xff;
-			oldY = awsSnapshot.begin()->first >> 16;
-		}
-		if ( awsGrid.empty() == false )
-		{
-			newX = awsGrid.begin()->first & 0xff;
-			newY = awsGrid.begin()->first >> 16;
-		}
-		dbugLog(_FLD, "Updating aws grid: Old grid %" PRSizeT " entries starting %hu,%hu; New grid %" PRSizeT " entries starting %hu,%hu"
-						, awsSnapshot.size(), oldX, oldY
-						, awsGrid.size(), newX, newY
-						);
-	}
+    const AWS_GRID& awsSnapshot = g_awsSnapshots[Instance::_CAMPAIGN];
+    const AWS_GRID& awsGrid = g_awsGrids[Instance::_CAMPAIGN];
+    UINT16 oldX = 0, oldY = 0;
+    UINT16 newX = 0, newY = 0;
+    if ( awsSnapshot.empty() == false )
+    {
+        oldX = awsSnapshot.begin()->first & 0xff;
+        oldY = awsSnapshot.begin()->first >> 16;
+    }
+    if ( awsGrid.empty() == false )
+    {
+        newX = awsGrid.begin()->first & 0xff;
+        newY = awsGrid.begin()->first >> 16;
+    }
+    dbugLog(_FLD, "Updating aws grid: Old grid %" PRSizeT " entries starting %hu,%hu; New grid %" PRSizeT " entries starting %hu,%hu"
+                    , awsSnapshot.size(), oldX, oldY
+                    , awsGrid.size(), newX, newY
+                    );
 
 	for (auto it = g_awsGrids.begin(), end = g_awsGrids.end(); it != end; ++it)
 	{
@@ -2652,7 +2636,7 @@ PlayerInterface::Lookup(UINT32 playerID)
 }
 
 Player*
-PlayerInterface::Lookup(const ChatHandle& handle)
+PlayerInterface::Lookup(const ChatHandle handle)
 {
 	PLAYER_INDEX::iterator it = playerIndex.find(chatGetLowercaseHandle(handle));
 	return ( it == playerIndex.end() ) ? nullptr : it->second;
