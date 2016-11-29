@@ -219,15 +219,24 @@ _dbugOut(bool logToConsole
 		return;
 
 	size_t retval = OS_WRITE(_logger.m_dbugfile, outString, (unsigned long)length);
-	///TODO: handle negative reval???
+	///TODO: handle negative retval???
 	if ( _logger.m_dbugfile == _stdErrFileNo )
 		return;
 
 	_fileSize += retval;
 	if ( PN_UNLIKELY(rollover && _fileSize >= MAX_FILE_SIZE) )
 	{
-		OS_CLOSE(_logger.m_dbugfile);
-		_logger.m_dbugfile = _openDbugFile(_logger.program());
+		static const char rolloverAnnotation[] = "\n\n==== ROLLING LOGFILE ====\n\n";
+		OS_WRITE(_logger.m_dbugfile, rolloverAnnotation, sizeof(rolloverAnnotation) - sizeof('\0'));
+		auto newFile = _openDbugFile(_logger.program());
+		if ( newFile < 0 ) {
+			static const char rolloverFailed[] = "\n\n================ UNABLE TO OPEN NEW FILE ================\n\n";
+			OS_WRITE(_logger.m_dbugfile, rolloverFailed, sizeof(rolloverFailed) - sizeof('\0'));
+		}
+		else {
+			OS_CLOSE(_logger.m_dbugfile);
+			_logger.m_dbugfile = newFile;
+		}
 	}
 }
 
