@@ -83,31 +83,6 @@ using AWS_GRID = std::map<UINT32, AWS_READING>;
 using AWS_INSTANCES = std::map<instanceid_t, AWS_GRID>;
 AWS_INSTANCES g_awsGrids, g_awsSnapshots;
 
-using DECAL_UPDATES = std::map<UINT32 /*decal*/, std::vector<playerid_t> /*playerids*/>;
-static DECAL_UPDATES _decalUpdates;
-
-bool
-Chat::CommitDecalUpdates()
-{
-	for (auto&& kv : _decalUpdates) {
-		// key: decal ID, value: vector<playerid_t>
-		std::string ids;
-		ids.reserve(15 * kv.second.size());
-		for (auto&& playerID : kv.second) {
-			if ( !ids.empty() )
-					ids += ',';
-			ids+= std::to_string(playerID);
-		}
-		DBThread::Do(DBThread::Default
-					,	"UPDATE `wwiionline`.`wwii_player`"
-						" SET `player_decal`=%u"
-						" WHERE `playerid` IN (%s)"
-						, kv.first, ids.c_str());
-	}
-	_decalUpdates.clear();
-	return true;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Internal, private functionality
 
@@ -1478,7 +1453,11 @@ Player::SetPreference(UINT32 prefId, UINT32 request, bool fromClient)
 		if ( value > 0 )
 		{
 			log(_FLI, "setting decal to %u", value);
-			_decalUpdates[value].push_back(playerID());
+			DBThread::Do(DBThread::Default,
+					"UPDATE `wwiionline`.`wwii_player`"
+						" SET player_decal=%u"
+						" WHERE playerid=%u",
+							value, playerID());
 			chatSendMapPersonaUpdate(playerID(), false, 0, 0, true, value);
 		}
 	break;

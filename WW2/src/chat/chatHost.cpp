@@ -2761,7 +2761,6 @@ _houseKeeping()
 	{
 		chatSaveLogRecords
 	,	Chat::CommitProgressUpdates
-	,	Chat::CommitDecalUpdates
 	,	chatHousekeepGroupPermissions
 	,	chatProcessPlayerGroups
 	,	chatCheckDecisionQueues

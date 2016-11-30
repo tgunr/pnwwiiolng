@@ -63,5 +63,4 @@ namespace Chat
 
 	// Save any player submitted tutorial progress updates.
 	bool CommitProgressUpdates();
-	bool CommitDecalUpdates();
 }
