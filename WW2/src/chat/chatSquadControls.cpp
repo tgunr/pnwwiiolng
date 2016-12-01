@@ -578,7 +578,7 @@ _processRecruit(SquadControl& request, Player* player, SquadList* /*squadList*/)
 // Process a recruit-accept request
 
 static UINT32
-_processAccept(SquadControl& /*request*/, Player* player, SquadList*& squadList)
+_processAccept(SquadControl& /*request*/, Player* player)
 {
 	if ( player->squadID() )
 		throw SQR_ALREADY_IN_SQUAD;
@@ -596,7 +596,7 @@ _processAccept(SquadControl& /*request*/, Player* player, SquadList*& squadList)
 		return chatSquadAcceptCreateInvite(player, sender);
 	}
 
-	squadList = chatFindSquadList(invite->m_squadID);
+	SquadList *squadList = chatFindSquadList(invite->m_squadID);
 	if ( squadList == nullptr )
 		throw SQR_NO_INVITE;
 
@@ -942,7 +942,7 @@ SquadControl::receive(SINT32 teulIndex)
 							, _control(m_action), m_action
 							, _subject, m_handle);
 
-		if ( m_action != SquadControl::_CREATE )
+		if ( m_action != SquadControl::_CREATE && m_action != SquadControl::_ACCEPT )
 		{
 			if ( squadList == nullptr )
 			{
@@ -956,7 +956,7 @@ SquadControl::receive(SINT32 teulIndex)
 		case SquadControl::_CREATE:		reply.m_result = _processCreate(*this, player); break;
 		case SquadControl::_DISBAND:	reply.m_result = _processDisband(*this, player, squadList); break;
 		case SquadControl::_RECRUIT:	reply.m_result = _processRecruit(*this, player, squadList); break;
-		case SquadControl::_ACCEPT:		reply.m_result = _processAccept(*this, player, squadList); break;
+		case SquadControl::_ACCEPT:		reply.m_result = _processAccept(*this, player); break;
 		case SquadControl::_DECLINE:	reply.m_result = _processDecline(*this, player, squadList); break;
 		case SquadControl::_KICK:		reply.m_result = _processKick(*this, player, squadList); break;
 		case SquadControl::_LEAVE:		reply.m_result = _processLeave(*this, player, squadList); break;
