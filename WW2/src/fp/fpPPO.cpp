@@ -1709,6 +1709,7 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 	}
 
 	// AAA [300-1000k]
+	// HACK: /4 due to excessive damage to FMS/ATG Emplacement
 	if ( src.SubType == WEAPAMMO_SUBTYPE_AIRBURST ) {
 		const Joules aaa_min = 36000;
 		const Joules aaa_max = 600000;
@@ -1716,7 +1717,7 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 		if ( joules > 5000 )
 			joules = std::max(joules, aaa_min / 2);
 #endif
-		return InterpDamage(aaa_min, 300000, aaa_max, 1000000, joules);
+		return InterpDamage(aaa_min, 300000 / 4, aaa_max, 1000000 / 4, joules);
 	}
 
 	// Satchel [25m]
