@@ -841,7 +841,7 @@ _processInteger(SquadControl& request, Player* player, SquadList* squadList)
 
 // Issued by a recruit candidate requesting this squad from the squadlist
 static UINT32
-_processJoin(SquadControl& request, Player* player, SquadList*& squadList)
+_processJoin(SquadControl& request, Player* player)
 {
 	// You're already in a squad
 	if ( player->squadID() )
@@ -850,7 +850,7 @@ _processJoin(SquadControl& request, Player* player, SquadList*& squadList)
 	Player* recruiter = PlayerInterface::Lookup(request.m_handle);
 	if ( recruiter == nullptr )
 		throw SQR_RECRUITER_GONE;
-	squadList = recruiter->isAvailableRecruiter(player);
+	SquadList *squadList = recruiter->isAvailableRecruiter(player);
 	if ( squadList == nullptr )
 		throw SQR_RECRUITER_GONE;
 
@@ -942,14 +942,11 @@ SquadControl::receive(SINT32 teulIndex)
 							, _control(m_action), m_action
 							, _subject, m_handle);
 
-		if ( m_action != SquadControl::_CREATE && m_action != SquadControl::_ACCEPT )
-		{
-			if ( squadList == nullptr )
-			{
-				player->log(_FLA, "sq:%u No squad list?", player->squadID());
-				throw SQR_SQUAD_UNAVAILABLE;
-			}
-		}
+        if ( player->squadID() != 0 && squadList == nullptr )
+        {
+            player->log(_FLA, "sq:%u No squad list?", player->squadID());
+            throw SQR_SQUAD_UNAVAILABLE;
+        }
 
 		switch ( m_action )
 		{
@@ -964,7 +961,7 @@ SquadControl::receive(SINT32 teulIndex)
 		case SquadControl::_DEMOTE:		reply.m_result = _processDemote(*this, player, squadList); break;
 		case SquadControl::_TEXT:		reply.m_result = _processText(*this, player, squadList); break;
 		case SquadControl::_INTEGER:	reply.m_result = _processInteger(*this, player, squadList); break;
-		case SquadControl::_JOIN:		reply.m_result = _processJoin(*this, player, squadList); break;
+		case SquadControl::_JOIN:		reply.m_result = _processJoin(*this, player); break;
 		case SquadControl::_RESIGN:		reply.m_result = _processResign(*this, player, squadList); break;
 		default:
 			player->log(_FLA, "invalid action %d", m_action);
