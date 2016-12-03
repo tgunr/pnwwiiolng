@@ -99,6 +99,10 @@
 
 #include "wwii/wwiiOhYeahCodes.h"
 
+#include <wwii/wwiiPPOLoader.h>
+extern PPOSpecLoader specLoader;
+
+
 #define REPORT_ENEMIES
 
 #define CLIENT_VEHICLE_CACHING
@@ -4307,9 +4311,8 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 		*ExitStatus = PEXIT_OVER_ENEMY_TERRITORY;
 	}
 
-	// check to see if we're a troop and near a FRU
-	if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON &&
-	   (*ExitStatus == PEXIT_OVER_ENEMY_TERRITORY || *ExitStatus == PEXIT_OVER_FRIENDLY_TERRITORY))
+	// check to see if we're near an STO spawn point
+	if ( (*ExitStatus == PEXIT_OVER_ENEMY_TERRITORY || *ExitStatus == PEXIT_OVER_FRIENDLY_TERRITORY) )
 	{
 		if(wwiiForEachSTO(_findRTBFRU))
 			*ExitStatus = PEXIT_RTB;
@@ -7503,7 +7506,11 @@ bool _findRTBFRU(ServerTrackedObject& sto, void* cookie)
 {
 	vehVehicle* player = persGetPersonaVehiclePtr();
 
-	if(sto.type() == ServerTrackedObject::_UMS && wwiiSide(sto.flags()) == player->Side)
+	UINT16 wClass = player->VehicleType->WeaponSpec.wClass;
+	UINT16 wType = player->VehicleType->WeaponSpec.wType;
+
+	if ( sto.type() == ServerTrackedObject::_UMS && wwiiSide(sto.flags()) == player->Side &&
+	     specLoader.ppoIsSpawnAllowed(sto.subType(), wClass, wType) )
 	{
 		const WorldPosition_m& pos = sto.position();
 
