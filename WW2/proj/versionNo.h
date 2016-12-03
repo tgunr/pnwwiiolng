@@ -4,7 +4,7 @@
 #define PN_WW2_PRODUCT_NO 1
 #define PN_WW2_VERSION_NO 35
 #define PN_WW2_PATCH_NO   6
-#define PN_WW2_BUILD_NO   1
+#define PN_WW2_BUILD_NO   3
 
 // Used in sysreg.cpp for retrieving info from the registry.
 #define PN_WW2_INSTALL_ID Auth::Apps::LIVE_APP_ID

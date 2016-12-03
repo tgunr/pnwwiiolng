@@ -578,7 +578,7 @@ _processRecruit(SquadControl& request, Player* player, SquadList* /*squadList*/)
 // Process a recruit-accept request
 
 static UINT32
-_processAccept(SquadControl& /*request*/, Player* player, SquadList*& squadList)
+_processAccept(SquadControl& /*request*/, Player* player)
 {
 	if ( player->squadID() )
 		throw SQR_ALREADY_IN_SQUAD;
@@ -596,7 +596,7 @@ _processAccept(SquadControl& /*request*/, Player* player, SquadList*& squadList)
 		return chatSquadAcceptCreateInvite(player, sender);
 	}
 
-	squadList = chatFindSquadList(invite->m_squadID);
+	SquadList *squadList = chatFindSquadList(invite->m_squadID);
 	if ( squadList == nullptr )
 		throw SQR_NO_INVITE;
 
@@ -841,7 +841,7 @@ _processInteger(SquadControl& request, Player* player, SquadList* squadList)
 
 // Issued by a recruit candidate requesting this squad from the squadlist
 static UINT32
-_processJoin(SquadControl& request, Player* player, SquadList*& squadList)
+_processJoin(SquadControl& request, Player* player)
 {
 	// You're already in a squad
 	if ( player->squadID() )
@@ -850,7 +850,7 @@ _processJoin(SquadControl& request, Player* player, SquadList*& squadList)
 	Player* recruiter = PlayerInterface::Lookup(request.m_handle);
 	if ( recruiter == nullptr )
 		throw SQR_RECRUITER_GONE;
-	squadList = recruiter->isAvailableRecruiter(player);
+	SquadList *squadList = recruiter->isAvailableRecruiter(player);
 	if ( squadList == nullptr )
 		throw SQR_RECRUITER_GONE;
 
@@ -942,21 +942,18 @@ SquadControl::receive(SINT32 teulIndex)
 							, _control(m_action), m_action
 							, _subject, m_handle);
 
-		if ( m_action != SquadControl::_CREATE )
-		{
-			if ( squadList == nullptr )
-			{
-				player->log(_FLA, "sq:%u No squad list?", player->squadID());
-				throw SQR_SQUAD_UNAVAILABLE;
-			}
-		}
+        if ( player->squadID() != 0 && squadList == nullptr )
+        {
+            player->log(_FLA, "sq:%u No squad list?", player->squadID());
+            throw SQR_SQUAD_UNAVAILABLE;
+        }
 
 		switch ( m_action )
 		{
 		case SquadControl::_CREATE:		reply.m_result = _processCreate(*this, player); break;
 		case SquadControl::_DISBAND:	reply.m_result = _processDisband(*this, player, squadList); break;
 		case SquadControl::_RECRUIT:	reply.m_result = _processRecruit(*this, player, squadList); break;
-		case SquadControl::_ACCEPT:		reply.m_result = _processAccept(*this, player, squadList); break;
+		case SquadControl::_ACCEPT:		reply.m_result = _processAccept(*this, player); break;
 		case SquadControl::_DECLINE:	reply.m_result = _processDecline(*this, player, squadList); break;
 		case SquadControl::_KICK:		reply.m_result = _processKick(*this, player, squadList); break;
 		case SquadControl::_LEAVE:		reply.m_result = _processLeave(*this, player, squadList); break;
@@ -964,7 +961,7 @@ SquadControl::receive(SINT32 teulIndex)
 		case SquadControl::_DEMOTE:		reply.m_result = _processDemote(*this, player, squadList); break;
 		case SquadControl::_TEXT:		reply.m_result = _processText(*this, player, squadList); break;
 		case SquadControl::_INTEGER:	reply.m_result = _processInteger(*this, player, squadList); break;
-		case SquadControl::_JOIN:		reply.m_result = _processJoin(*this, player, squadList); break;
+		case SquadControl::_JOIN:		reply.m_result = _processJoin(*this, player); break;
 		case SquadControl::_RESIGN:		reply.m_result = _processResign(*this, player, squadList); break;
 		default:
 			player->log(_FLA, "invalid action %d", m_action);
