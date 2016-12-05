@@ -387,6 +387,11 @@ void PlayerPlacedObject::SetInvalid(const char* key, bool force)
 
 SINT32 PlayerPlacedObject::CoolDown()
 {
+#ifdef BETA_RELEASE
+	if ( SuperTroop )
+		return 0;
+#endif
+
     SINT32 *coolDownEnd = &globalMSCoolDownEnd;
 
     if (spec && spec->stotype != ServerTrackedObject::_UMS)
@@ -827,10 +832,7 @@ bool PlayerPlacedObject::Update()
 	piVECTOR pos	= {0, 0, 0};
 	piVECTOR att	= {0, 0, 0};
 
-    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
-
-    if (spec && spec->stotype != ServerTrackedObject::_UMS)
-        coolDownEnd = &spec->coolDownEnd;
+	SINT32 coolDownEnd = CoolDown();
 
 	if(!lastUpdate)
 		lastUpdate = frametime;
@@ -872,7 +874,7 @@ bool PlayerPlacedObject::Update()
 		if(CalculatePlacement(pos, att) && obj != nullptr)
 			ogrpMoveAndRotateObjectGroup(obj, &pos, &att);
 
-		if(frametime <= *coolDownEnd)
+		if(frametime <= coolDownEnd)
 		{
 			_fail = uiLocString("ppos.coolingdown");
 			valid = false;
@@ -887,10 +889,10 @@ bool PlayerPlacedObject::Update()
 		if(Modified())
 			ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
 
-		if(frametime <= *coolDownEnd) // we're cooling off
+		if(frametime <= coolDownEnd) // we're cooling off
 		{
 			// we did our cool down start
-			SINT32 coolDownStart = *coolDownEnd - spec->coolDown;
+			SINT32 coolDownStart = coolDownEnd - spec->coolDown;
 			SINT32 coolDownProgress = frametime - coolDownStart;
 
 			if(coolDownProgress < 0)
@@ -939,7 +941,12 @@ bool PlayerPlacedObject::Build()
 {
 	if(valid && buildAt == 0)
 	{
-		buildAt = frametime + spec->buildTime;
+#ifdef BETA_RELEASE
+		if ( SuperTroop )
+			buildAt = frametime;
+		else
+#endif
+			buildAt = frametime + spec->buildTime;
 		buildUI = uiLoadView("buildppo");
 
 		if(buildUI)

@@ -137,7 +137,12 @@ ELSE()
     ADD_DEFINITIONS( "-DplatOS=OS_LINUX" )
 ENDIF()
 
-ADD_DEFINITIONS ( "-DplatBuild=BUILD_SERVER" )
+ADD_DEFINITIONS( "-DplatBuild=BUILD_SERVER" )
+
+####################################
+## Provide critical build type definitions
+# For now, we always build PUBLIC_RELEASE
+ADD_DEFINITIONS( "-DPUBLIC_RELEASE" )
 
 ####################################
 ## Status output

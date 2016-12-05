@@ -169,6 +169,11 @@ static void _describeBuildConfigurationToLogFile()
 #if defined(PUBLIC_RELEASE)
 	dbugLog(_FLI, " PUBLIC_RELEASE");
 #endif
+
+// See DEV-1028 for why this is here.
+#if !defined(PUBLIC_RELEASE)
+#error "Build type not defined!"
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////
