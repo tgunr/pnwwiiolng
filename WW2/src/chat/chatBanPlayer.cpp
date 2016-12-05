@@ -170,7 +170,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 	catch (std::exception& e)
 	{
 		if (message != nullptr)
-			delete message;
+			delete [] message;
 
 		ban.m_message = e.what();
 		threadCallback(_banFail, &ban);
