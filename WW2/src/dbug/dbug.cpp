@@ -226,8 +226,15 @@ _dbugOut(bool logToConsole
 	_fileSize += retval;
 	if ( PN_UNLIKELY(rollover && _fileSize >= MAX_FILE_SIZE) )
 	{
-		OS_CLOSE(_logger.m_dbugfile);
-		_logger.m_dbugfile = _openDbugFile(_logger.program());
+	    int newLogFile = _openDbugFile(_logger.program());
+	    
+	    if (newLogFile != -1) {
+    		OS_CLOSE(_logger.m_dbugfile);
+	    	_logger.m_dbugfile = newLogFile;
+	    } else {
+	        // Note that _openDbugFile() will have reset _fileSize
+	        dbugLog(_FLA, "Failed to open next rollover log file, continuing to use old one despite file size.");
+	    }
 	}
 }
 
@@ -365,8 +372,18 @@ void dbugInit(LogMode logMode, const char* const filename)
 	Debug::ERROR_TYPE level = Debug::ERR_DBUG;
 	g_logDebug = true;
 
-	SINT32 file = (logMode == LogMode::TO_FILE) ? _openDbugFile(filename) : -1;
-	_logger.initialize(logMode, level, file, filename);
+    int file = -1;
+    
+    if (logMode == LogMode::TO_FILE) {
+        file = _openDbugFile(filename);
+        
+#if platBuild == BUILD_SERVER
+        if (file == -1) {
+            LogAbort("Failed to open first log file, can not continue!");
+        }
+#endif
+    }
+    _logger.initialize(logMode, level, file, filename);
 
 #if platBuild == BUILD_SERVER && platOS != OS_WIN32
 	signal(SIGUSR2, _handleSIGUSR2);
