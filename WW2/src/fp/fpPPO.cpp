@@ -387,6 +387,11 @@ void PlayerPlacedObject::SetInvalid(const char* key, bool force)
 
 SINT32 PlayerPlacedObject::CoolDown()
 {
+#ifdef BETA_RELEASE
+	if ( SuperTroop )
+		return 0;
+#endif
+
     SINT32 *coolDownEnd = &globalMSCoolDownEnd;
 
     if (spec && spec->stotype != ServerTrackedObject::_UMS)
@@ -827,10 +832,7 @@ bool PlayerPlacedObject::Update()
 	piVECTOR pos	= {0, 0, 0};
 	piVECTOR att	= {0, 0, 0};
 
-    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
-
-    if (spec && spec->stotype != ServerTrackedObject::_UMS)
-        coolDownEnd = &spec->coolDownEnd;
+	SINT32 coolDownEnd = CoolDown();
 
 	if(!lastUpdate)
 		lastUpdate = frametime;
@@ -872,7 +874,7 @@ bool PlayerPlacedObject::Update()
 		if(CalculatePlacement(pos, att) && obj != nullptr)
 			ogrpMoveAndRotateObjectGroup(obj, &pos, &att);
 
-		if(frametime <= *coolDownEnd)
+		if(frametime <= coolDownEnd)
 		{
 			_fail = uiLocString("ppos.coolingdown");
 			valid = false;
@@ -887,10 +889,10 @@ bool PlayerPlacedObject::Update()
 		if(Modified())
 			ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
 
-		if(frametime <= *coolDownEnd) // we're cooling off
+		if(frametime <= coolDownEnd) // we're cooling off
 		{
 			// we did our cool down start
-			SINT32 coolDownStart = *coolDownEnd - spec->coolDown;
+			SINT32 coolDownStart = coolDownEnd - spec->coolDown;
 			SINT32 coolDownProgress = frametime - coolDownStart;
 
 			if(coolDownProgress < 0)
@@ -939,7 +941,12 @@ bool PlayerPlacedObject::Build()
 {
 	if(valid && buildAt == 0)
 	{
-		buildAt = frametime + spec->buildTime;
+#ifdef BETA_RELEASE
+		if ( SuperTroop )
+			buildAt = frametime;
+		else
+#endif
+			buildAt = frametime + spec->buildTime;
 		buildUI = uiLoadView("buildppo");
 
 		if(buildUI)
@@ -1605,6 +1612,9 @@ namespace {
 
 // Gives a significant boost to HE damage if even the actual joules delivered are minimal.
 #define HE_AOE_BOOST 1
+// Boosts AP rounds to roughly HE levels of damage against the FMS/ATG Emplacement
+// Primarily to balance the British, who lack HE for their early-tier tanks.
+#define AP_DAMAGE_BOOST 1
 
 // !!!HACK!!!
 // This entire setup is based on values gathered through testing and what's in
@@ -1668,10 +1678,10 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 		return InterpDamage(rocket_min, 90000, rocket_max, 110000, joules);
 	}
 
-	// Mortar [300k]
+	// Mortar [600k]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_MORTAR ) {
 #if HE_AOE_BOOST
-		return joules > 5000 ? 300000 : 0;
+		return joules > 5000 ? 600000 : 0;
 #else
 		const Joules mortar_min = 3000000;
 		const Joules mortar_max = 4000000;
@@ -1696,19 +1706,30 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 				// Autocannon [75k]
 				const Joules ac_min = 42500;
 				const Joules ac_max = 44000;
+#if AP_DAMAGE_BOOST
+				// Autocannon [300k x2]
+				return InterpDamage(ac_min, 280000, ac_max, 320000, joules) * 2;
+#else
 				return InterpDamage(ac_min, 70000, ac_max, 75000, joules);
+#endif
 			} else {
 				// AP [150-250k]
 				// Note the Panhard is a bit under half due to its tiny gun,
 				// but this is reflected through the math anyway.
 				const Joules ap_min = 200000;
 				const Joules ap_max = 3000000;
+#if AP_DAMAGE_BOOST
+				// AP [750-1000k x2]
+				return InterpDamage(ap_min, 750000, ap_max, 1000000, joules) * 2;
+#else
 				return InterpDamage(ap_min, 150000, ap_max, 250000, joules);
+#endif
 			}
 		}
 	}
 
 	// AAA [300-1000k]
+	// HACK: /4 due to excessive damage to FMS/ATG Emplacement
 	if ( src.SubType == WEAPAMMO_SUBTYPE_AIRBURST ) {
 		const Joules aaa_min = 36000;
 		const Joules aaa_max = 600000;
@@ -1716,7 +1737,7 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 		if ( joules > 5000 )
 			joules = std::max(joules, aaa_min / 2);
 #endif
-		return InterpDamage(aaa_min, 300000, aaa_max, 1000000, joules);
+		return InterpDamage(aaa_min, 300000 / 4, aaa_max, 1000000 / 4, joules);
 	}
 
 	// Satchel [25m]

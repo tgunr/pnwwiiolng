@@ -172,17 +172,17 @@ _openDbugFile(const char* const srcFile_)
 #endif
 
 #if platBuild == BUILD_SERVER
-		for ( int i = MAX_FILE_NUM; i >= 0; --i )
-		{
+		// bump existing .%u.log files up a number and then delete the Nth
+		for ( int i = MAX_FILE_NUM; i >= 0; --i ) {
 			_roll(filename, i);
 		}
-
-		// Delete the last file.
 		strprintf(ofn, "%s.%" PRSizeT ".log", filename, MAX_FILE_NUM + 1);
 		unlink(ofn);
 
 		strprintf(ofn, "%s.0.log", filename);
 #else
+		// client always writes to .0.log, and since we removed the limit
+		// on per-log-file sizes, the client *always* writes to .0.log.
 		static UINT32 _fileNumber = 0;
 		strprintf(ofn, "%s.%u.log", filename, _fileNumber++);
 
@@ -358,7 +358,17 @@ void dbugInit(LogMode logMode, const char* const filename)
 	Debug::ERROR_TYPE level = Debug::ERR_DBUG;
 	g_logDebug = true;
 
-	SINT32 file = (logMode == LogMode::TO_FILE) ? _openDbugFile(filename) : -1;
+    int file = -1;
+    if (logMode == LogMode::TO_FILE) {
+        file = _openDbugFile(filename);
+        if (file == -1) {
+#if platBuild == BUILD_SERVER
+            LogAbort("Failed to open %s log file, can not continue!", filename);
+#else
+            fprintf(stderr, "ERROR: Unable to open %s log file.", filename);
+#endif
+        }
+    }
 	_logger.initialize(logMode, level, file, filename);
 
 #if platBuild == BUILD_SERVER && platOS != OS_WIN32
