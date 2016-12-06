@@ -4,10 +4,23 @@ These are the instructions for a generic, non-developer, CiaB install.
 If you are looking for the Linux-specific/Developer instructions, please
 see README-Dev.txt.
 
-If you are running under Windows, obtain a copy of WW2Mods/DATA and
-use the "windows-setup.bat" script to set things up.
+=== Windows Quick Start ===
+
+. Obtain a copy of WW2Mods/DATA (git, download, etc);
+. Run "windows-setup" (batch file),
+. Follow the directions,
+
+=== Linux / Mac Quick Start ===
+
+. Obtain a copy of WW2Mods/DATA (git, download, etc);
+. Install Python 3.4 or higher,
+. Install MySQL client and (optionally) server,
+. Build/obtain the server binaries for your platform,
+. Run bootstrap.py
+
 
 For details of setting up manually, read on.
+
 
 ======================================================================
 == Summary:

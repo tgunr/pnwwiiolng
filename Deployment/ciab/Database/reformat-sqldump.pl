@@ -12,20 +12,5 @@ s!-- Dumping data for table `([^`]+)`\n(-- ORDER BY:[^\n]+\n)?\nLOCK TABLES `\1`
 s!\n\n\n+!\n!sg;
 s!-- Table structure for table `[^`]+`\n\n!!sg;
 
-$user_creation = q{
-DROP USER IF EXISTS 'wwiiol'@'localhost';
-DROP USER IF EXISTS 'wwiiol'@'%';
-DROP USER IF EXISTS 'authuser'@'localhost';
-DROP USER IF EXISTS 'authuser'@'%';
-CREATE USER 'wwiiol'@'localhost' IDENTIFIED BY 'freebird';
-GRANT ALL PRIVILEGES ON *.* TO 'wwiiol'@'localhost' WITH GRANT OPTION;
-CREATE USER 'authuser'@'localhost' IDENTIFIED BY 'scalar449';
-GRANT ALL PRIVILEGES ON *.* TO 'wwiiol'@'localhost' WITH GRANT OPTION;
-CREATE USER 'wwiiol'@'%' IDENTIFIED BY 'freebird';
-GRANT ALL PRIVILEGES ON *.* TO 'wwiiol'@'%';
-CREATE USER 'authuser'@'%' IDENTIFIED BY 'scalar449';
-GRANT ALL PRIVILEGES ON *.* TO 'authuser'@'%';
-};
-
 s/^(-- Current Database: `[^`]+`\s*)$/${user_creation}\n$1/m;
 print;

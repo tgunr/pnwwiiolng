@@ -36,6 +36,9 @@ class _DefaultsFile(object):
             os.remove(self._defaultsFile)
             self._defaultsFile = None
 
+class MySQLCliError(Exception):
+    pass
+
 class MySQLCli(object):
     """
         Simple MySQL driver that uses per-action invocations of the
@@ -53,8 +56,8 @@ class MySQLCli(object):
         try:
             self.execute("SELECT NULL;")
         except Exception as e:
-            raise DieException("Unable to access '%s' MySQL database as '%s'"
-                " with the given password." % (host, root_user)) from e
+            raise MySQLCliError("Unable to access '%s' MySQL database as '%s'"
+                " with the given password: %s." % (host, root_user, e)) from e
 
     def _run_cli_with_args(self, *args, **kwargs):
         """ Wrapper around the invocation of MySQL. """
@@ -62,8 +65,10 @@ class MySQLCli(object):
             cmd = [ self._mysql,
                     "--defaults-file=%s" % (defaultsFile),
                     "--batch", "--quick", "--unbuffered",
-                    "-ANsr",  # no rehash, no header, no separators, raw output
-                    *args ]
+                    "-ANsr"  # no rehash, no header, no separators, raw output
+            ]
+            if args:
+                cmd.extend(args)
             result = subprocess.check_output(cmd, **kwargs)
             return result.decode('ascii').strip()
 

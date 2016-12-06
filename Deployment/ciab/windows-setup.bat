@@ -29,6 +29,11 @@ IF %errorlevel% == 0 (
 )
 
 echo.
+echo Checking Python is up-to-date:
+python -m pip install --upgrade pip
+pip install --upgrade setuptools
+
+echo.
 echo Checking for MySQL:
 python -m lib.findmysql
 IF %errorlevel% == 0 (

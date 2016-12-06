@@ -13,20 +13,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-
-DROP USER IF EXISTS 'wwiiol'@'localhost';
-DROP USER IF EXISTS 'wwiiol'@'%';
-DROP USER IF EXISTS 'authuser'@'localhost';
-DROP USER IF EXISTS 'authuser'@'%';
-CREATE USER 'wwiiol'@'localhost' IDENTIFIED BY 'freebird';
-GRANT ALL PRIVILEGES ON *.* TO 'wwiiol'@'localhost' WITH GRANT OPTION;
-CREATE USER 'authuser'@'localhost' IDENTIFIED BY 'scalar449';
-GRANT ALL PRIVILEGES ON *.* TO 'wwiiol'@'localhost' WITH GRANT OPTION;
-CREATE USER 'wwiiol'@'%' IDENTIFIED BY 'freebird';
-GRANT ALL PRIVILEGES ON *.* TO 'wwiiol'@'%';
-CREATE USER 'authuser'@'%' IDENTIFIED BY 'scalar449';
-GRANT ALL PRIVILEGES ON *.* TO 'authuser'@'%';
-
 -- Current Database: `audit`
 
 CREATE DATABASE /*!32312 IF NOT EXISTS*/ `audit` /*!40100 DEFAULT CHARACTER SET utf8 */;
