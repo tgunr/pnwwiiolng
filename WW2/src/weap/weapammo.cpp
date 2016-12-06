@@ -5118,8 +5118,14 @@ static LOGICAL _UpdateAttachedProjectile(weapAmmo* Ammo)
 	if(Vehicle)
 		weapUpdateVehicleHitmap(Vehicle);
 
-	if(!Ammo->AttachedObject) return TRUE;
-	if(!obmainValidateObject(Ammo->AttachedObject)) return TRUE;
+	if ( ! (Ammo->AttachedObject && obmainValidateObject(Ammo->AttachedObject)) ) {
+		// HACK: If the object is gone, at least trigger the explosion effect.
+		// This is mostly an issue when a PPO is destroyed with satchels attached:
+		// Currently the two events are processed out-of-order, so the killing
+		// explosion won't render on other clients.
+		weapfxAmmoExplosion(Ammo, &Ammo->Position, nullptr, 0);
+		return TRUE;
+	}
 
 	math3dVectorMultiply(&Temp32Vec,&Temp32Vec,&Ammo->AttachedObject->mat);
 	mathAddVectors(&Ammo->Position,&WorldOriginOffset,&Temp32Vec);

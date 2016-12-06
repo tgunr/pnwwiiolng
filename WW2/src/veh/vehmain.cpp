@@ -99,6 +99,10 @@
 
 #include "wwii/wwiiOhYeahCodes.h"
 
+#include <wwii/wwiiPPOLoader.h>
+extern PPOSpecLoader specLoader;
+
+
 #define REPORT_ENEMIES
 
 #define CLIENT_VEHICLE_CACHING
@@ -3120,11 +3124,18 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 		return 0;
 
 	// check for terrain sto first
-	if(TO->IsSTO())
-	{
+	if ( TO->IsSTO() ) {
 		TerrainSTO* sto = static_cast<TerrainSTO*>(TO->TerrainMasterObject->lpspare);
-		const SINT64 joules = (SINT64)Joules;
-		if(sto) sto->applyJoules(joules);
+		if ( sto ) {
+			SINT64 joules = static_cast<SINT64>(Joules);
+			// HACK: Basing damage off Joules makes PPO gameplay design very difficult,
+			// so PPOs use a different scale. It's possible that all STOs will use
+			// something similar at some point in the future.
+			if ( Ammo && (sto->type() == ServerTrackedObject::_PPO || ServerTrackedObject::_UMS) ) {
+				joules = fpPPOScaleJoules(*Ammo, joules);
+			}
+			sto->applyJoules(joules);
+		}
 
 		return 0;
 	}
@@ -4300,9 +4311,8 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 		*ExitStatus = PEXIT_OVER_ENEMY_TERRITORY;
 	}
 
-	// check to see if we're a troop and near a FRU
-	if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON &&
-	   (*ExitStatus == PEXIT_OVER_ENEMY_TERRITORY || *ExitStatus == PEXIT_OVER_FRIENDLY_TERRITORY))
+	// check to see if we're near an STO spawn point
+	if ( (*ExitStatus == PEXIT_OVER_ENEMY_TERRITORY || *ExitStatus == PEXIT_OVER_FRIENDLY_TERRITORY) )
 	{
 		if(wwiiForEachSTO(_findRTBFRU))
 			*ExitStatus = PEXIT_RTB;
@@ -5301,26 +5311,27 @@ static MSPAWN_RESULT _nearEnemyFacility(FULL_OBJ_ID& foi, int side)
 }
 
 /************************************************************************************************
-	vehmainFRUBuild
+	vehmainPPOBuild
 *************************************************************************************************/
 
-PlayerPlacedObject* vehmainFRUBuild()
-{
+PlayerPlacedObject* vehmainPPOBuild(void) {
+	// Just in case since this isn't tied with the FPS PPO code yet.
+	if ( activePPOList.size() < (size_t)activePPOIndex + 1 ) activePPOIndex = 0;
+	if ( activePPOList.size() == 0 || activePPOList[activePPOIndex] == nullptr ) return nullptr;
+
 	vehVehicle* veh = persGetPersonaVehiclePtr();
-	if(veh == nullptr) return nullptr;
+	if ( veh == nullptr ) return nullptr;
 
-	// do we already have an msp on this misison?
-	bool hasMobileSpawn = PlayerClient()->MobileSpawnMission();
-	bool isMissionLeader = PlayerClient()->IsMissionLeader();
-
-	// now check if we're the mission leader
-	if(hasMobileSpawn && !isMissionLeader)
-	{
-		fpPPOAlert("ppos.fru.notleader");
-		return nullptr;
+	// Only the Mission Leader can replace an existing mobile spawn.
+	PPOSpec& spec = *activePPOList[activePPOIndex];
+	if ( spec.spawnable ) {
+		if ( PlayerClient()->MobileSpawnMission() && ! PlayerClient()->IsMissionLeader() ) {
+			fpPPOAlert("ppos.fru.notleader");
+			return nullptr;
+		}
 	}
 
-	PlayerPlacedObject* fru = fpPPOCreate(activePPOList[activePPOIndex]->id);
+	PlayerPlacedObject* fru = fpPPOCreate(spec.id);
 
 	// set our callbacks
     if (fru != nullptr)
@@ -7495,7 +7506,11 @@ bool _findRTBFRU(ServerTrackedObject& sto, void* cookie)
 {
 	vehVehicle* player = persGetPersonaVehiclePtr();
 
-	if(sto.type() == ServerTrackedObject::_UMS && wwiiSide(sto.flags()) == player->Side)
+	UINT16 wClass = player->VehicleType->WeaponSpec.wClass;
+	UINT16 wType = player->VehicleType->WeaponSpec.wType;
+
+	if ( sto.type() == ServerTrackedObject::_UMS && wwiiSide(sto.flags()) == player->Side &&
+	     specLoader.ppoIsSpawnAllowed(sto.subType(), wClass, wType) )
 	{
 		const WorldPosition_m& pos = sto.position();
 

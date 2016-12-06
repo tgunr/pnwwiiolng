@@ -3,6 +3,8 @@
 #include "physics/colliderQuery.h"
 #include "wwii/wwiiPPOLoader.h"
 
+struct weapAmmo;
+
 using PPOCallback = bool(*)();
 
 namespace phui { class View; }
@@ -78,3 +80,5 @@ extern void fpPPOKill(bool release = true);
 extern void fpPPOCancel(bool release = true);
 extern void fpPPOAlert(const char* key, ...);
 extern void fpPPOAlert(const wchar_t* message = nullptr);
+
+extern SINT64 fpPPOScaleJoules(const weapAmmo& source, SINT64 joules);
