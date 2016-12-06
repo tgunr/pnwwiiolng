@@ -313,11 +313,12 @@ def main():
 
     print()
 
-    step("Generating .tkt and .bat files for test accounts.")
-    for i in range(1, 6):
-        for kind in ('rat', 'plyr'):
-            name, pid = "%s%04dp" % (kind, i), BASE_DEV_ID + i
-            generate_tkt_and_bat(cfg, name, pid)
+    if IS_WIN:
+        step("Generating .tkt and .bat files for test accounts.")
+        for i in range(1, 6):
+            for kind in ('rat', 'plyr'):
+                name, pid = "%s%04dp" % (kind, i), BASE_DEV_ID + i
+                generate_tkt_and_bat(cfg, name, pid)
 
     step("Complete.")
 
