@@ -444,7 +444,7 @@ _getAppTable()
 			entry.description[0] = 0;
 			row.NextString(entry.description, sizeof(entry.description));
 			if ( entry.description[0] == 0 )
-				strprintf(entry.description, "Unkown Game#%u/%u", entry.appID, entry.gameID);
+				strprintf(entry.description, "Unknown Game#%u/%u", entry.appID, entry.gameID);
 		}
 	}
 	catch (std::exception& e)
