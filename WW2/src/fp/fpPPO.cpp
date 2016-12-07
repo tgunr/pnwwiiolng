@@ -1672,7 +1672,7 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 	}
 
 	// Ignore system-created "shaped charge jet" effects.
-	if ( strcmp((const char*)src.Name, "shrapnel") == 0)
+	if ( strcmp((const char*)src.Name, "shaped charge jet") == 0)
 		return 0;
 
 	// Rocket [90-110k]
