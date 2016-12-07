@@ -45,7 +45,6 @@ static const char _CLOSE_MSG[] = "\nDebug Message System Closed.\n";
 #endif
 
 static const size_t MAX_FILE_NUM = 5;
-static const size_t MAX_FILE_SIZE = 50 * 1000 * 1024;
 
 static SINT32 _stdErrFileNo = -1;
 static DebugLogger _logger;
@@ -59,8 +58,6 @@ const char* errorTypes[] = {
 	"I",		// informational message
 	"D",		// debug level message
 };
-
-static size_t _fileSize = 0;
 
 // Global boolean that controls whether or not 'D'ebug level messages will be logged.
 // Exposed globally so it can be tested before prior to performing otherwise expensive
@@ -168,20 +165,24 @@ _openDbugFile(const char* const srcFile_)
 
 	if (PN_LIKELY(srcFile_ != nullptr))
 	{
-		int oflags = _O_CREAT|_O_WRONLY|_O_TRUNC;
+#if platOS == OS_WIN32
+		int oflags = _O_CREAT | _O_WRONLY | _O_TRUNC | _O_SEQUENTIAL | _O_NOINHERIT;
+#else
+		int oflags = _O_CREAT | _O_WRONLY | _O_TRUNC;
+#endif
 
 #if platBuild == BUILD_SERVER
-		for ( int i = MAX_FILE_NUM; i >= 0; --i )
-		{
+		// bump existing .%u.log files up a number and then delete the Nth
+		for ( int i = MAX_FILE_NUM; i >= 0; --i ) {
 			_roll(filename, i);
 		}
-
-		// Delete the last file.
 		strprintf(ofn, "%s.%" PRSizeT ".log", filename, MAX_FILE_NUM + 1);
 		unlink(ofn);
 
 		strprintf(ofn, "%s.0.log", filename);
 #else
+		// client always writes to .0.log, and since we removed the limit
+		// on per-log-file sizes, the client *always* writes to .0.log.
 		static UINT32 _fileNumber = 0;
 		strprintf(ofn, "%s.%u.log", filename, _fileNumber++);
 
@@ -190,7 +191,6 @@ _openDbugFile(const char* const srcFile_)
 #endif
 
 		OS_OPEN(&file, ofn, oflags, PMODE);
-		_fileSize = 0;
 	} else {
 		file = STDERR_FILENO;
     }
@@ -219,23 +219,9 @@ _dbugOut(bool logToConsole
 		return;
 
 	size_t retval = OS_WRITE(_logger.m_dbugfile, outString, (unsigned long)length);
-	///TODO: handle negative reval???
+	///TODO: handle negative retval???
 	if ( _logger.m_dbugfile == _stdErrFileNo )
 		return;
-
-	_fileSize += retval;
-	if ( PN_UNLIKELY(rollover && _fileSize >= MAX_FILE_SIZE) )
-	{
-	    int newLogFile = _openDbugFile(_logger.program());
-	    
-	    if (newLogFile != -1) {
-    		OS_CLOSE(_logger.m_dbugfile);
-	    	_logger.m_dbugfile = newLogFile;
-	    } else {
-	        // Note that _openDbugFile() will have reset _fileSize
-	        dbugLog(_FLA, "Failed to open next rollover log file, continuing to use old one despite file size.");
-	    }
-	}
 }
 
 void DebugLogger::initialize(LogMode logMode, Debug::ERROR_TYPE level, SINT32 fd, const char* programName) noexcept
@@ -373,17 +359,17 @@ void dbugInit(LogMode logMode, const char* const filename)
 	g_logDebug = true;
 
     int file = -1;
-    
     if (logMode == LogMode::TO_FILE) {
         file = _openDbugFile(filename);
-        
-#if platBuild == BUILD_SERVER
         if (file == -1) {
-            LogAbort("Failed to open first log file, can not continue!");
-        }
+#if platBuild == BUILD_SERVER
+            LogAbort("Failed to open %s log file, can not continue!", filename);
+#else
+            fprintf(stderr, "ERROR: Unable to open %s log file.", filename);
 #endif
+        }
     }
-    _logger.initialize(logMode, level, file, filename);
+	_logger.initialize(logMode, level, file, filename);
 
 #if platBuild == BUILD_SERVER && platOS != OS_WIN32
 	signal(SIGUSR2, _handleSIGUSR2);
