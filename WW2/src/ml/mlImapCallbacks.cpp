@@ -721,16 +721,12 @@ UINT32 mlToggleMobileSpawn(SINT32 Param, UINT32 Id, UINT32 Detach)
 		}
 	}
 	else
-    {
-        // only allow FRUs for infrantry when mission leader
-        bool allowFrus = vtype->WeaponSpec.wClass != troop.wClass || (Online && PlayerClient()->IsMissionLeader());
-
-		// make sure this class/type has ppo types available to it
-		if (specLoader.getAllowedPPOs(vtype->WeaponSpec.wClass, vtype->WeaponSpec.wType, activePPOList, !allowFrus))
-        {
-            vehmainFRUBuild();
-        }
-    }
+	{
+		bool allow_ms = PlayerClient()->IsMissionLeader() || !PlayerClient()->MobileSpawnMission();
+		if ( specLoader.getAllowedPPOs(vtype->WeaponSpec.wClass, vtype->WeaponSpec.wType, activePPOList, !allow_ms) ) {
+			vehmainPPOBuild();
+		}
+	}
 
 	return 0;
 }

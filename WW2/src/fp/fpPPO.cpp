@@ -387,6 +387,11 @@ void PlayerPlacedObject::SetInvalid(const char* key, bool force)
 
 SINT32 PlayerPlacedObject::CoolDown()
 {
+#ifdef BETA_RELEASE
+	if ( SuperTroop )
+		return 0;
+#endif
+
     SINT32 *coolDownEnd = &globalMSCoolDownEnd;
 
     if (spec && spec->stotype != ServerTrackedObject::_UMS)
@@ -827,10 +832,7 @@ bool PlayerPlacedObject::Update()
 	piVECTOR pos	= {0, 0, 0};
 	piVECTOR att	= {0, 0, 0};
 
-    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
-
-    if (spec && spec->stotype != ServerTrackedObject::_UMS)
-        coolDownEnd = &spec->coolDownEnd;
+	SINT32 coolDownEnd = CoolDown();
 
 	if(!lastUpdate)
 		lastUpdate = frametime;
@@ -872,7 +874,7 @@ bool PlayerPlacedObject::Update()
 		if(CalculatePlacement(pos, att) && obj != nullptr)
 			ogrpMoveAndRotateObjectGroup(obj, &pos, &att);
 
-		if(frametime <= *coolDownEnd)
+		if(frametime <= coolDownEnd)
 		{
 			_fail = uiLocString("ppos.coolingdown");
 			valid = false;
@@ -887,10 +889,10 @@ bool PlayerPlacedObject::Update()
 		if(Modified())
 			ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
 
-		if(frametime <= *coolDownEnd) // we're cooling off
+		if(frametime <= coolDownEnd) // we're cooling off
 		{
 			// we did our cool down start
-			SINT32 coolDownStart = *coolDownEnd - spec->coolDown;
+			SINT32 coolDownStart = coolDownEnd - spec->coolDown;
 			SINT32 coolDownProgress = frametime - coolDownStart;
 
 			if(coolDownProgress < 0)
@@ -939,7 +941,12 @@ bool PlayerPlacedObject::Build()
 {
 	if(valid && buildAt == 0)
 	{
-		buildAt = frametime + spec->buildTime;
+#ifdef BETA_RELEASE
+		if ( SuperTroop )
+			buildAt = frametime;
+		else
+#endif
+			buildAt = frametime + spec->buildTime;
 		buildUI = uiLoadView("buildppo");
 
 		if(buildUI)
@@ -1587,4 +1594,168 @@ static bool _fbCheck(vehVehicle* player, StratDB::StratObject* fac, FLOAT32 radi
 	}
 
 	return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+
+namespace {
+	// Two-point Lagrange interpolation
+	SINT64 InterpDamage(SINT64 lo_in, SINT64 lo_out, SINT64 hi_in, SINT64 hi_out, SINT64 val) {
+		double x0 = static_cast<double>(lo_in),  x1 = static_cast<double>(hi_in);
+		double y0 = static_cast<double>(lo_out), y1 = static_cast<double>(hi_out);
+		double x = static_cast<double>(val);
+
+		SINT64 out = static_cast<SINT64>(((x-x1)/(x0-x1))*y0+ ((x-x0)/(x1-x0))*y1);
+		return std::max((SINT64)0, std::min(out, hi_out));
+	}
+}
+
+// Gives a significant boost to HE damage if even the actual joules delivered are minimal.
+#define HE_AOE_BOOST 1
+// Boosts AP rounds to roughly HE levels of damage against the FMS/ATG Emplacement
+// Primarily to balance the British, who lack HE for their early-tier tanks.
+#define AP_DAMAGE_BOOST 1
+
+// !!!HACK!!!
+// This entire setup is based on values gathered through testing and what's in
+// the ammo data files, so any changes could bring this whole thing crumbling
+// down. Even if it remains permanent, this setup needs to be overhauled.
+//
+// NOTE: The values in testing are at least partially wrong since some PPOs seem
+// to take damage from certain sources multiple times. Fun...
+//
+// TODO: Right now many of these are based on joules, when the actual projectile
+// weight, etc. are probably far better indicators of what should be in what
+// tier.
+SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
+	using Joules = SINT64;
+	const weapAmmoType& src = *round.AmmoType;
+
+	// Small-arms & Shrapnel [0-1k]
+	const Joules smallarms_min = 0;
+	const Joules smallarms_max = 4000;
+	if ( src.SubType == WEAPAMMO_SUBTYPE_BALLISTIC &&
+	     (joules < smallarms_max || strcmp((const char*)src.Name, "shrapnel") == 0) ) {
+		return InterpDamage(smallarms_min, 0, smallarms_max, 1000, joules);
+	}
+
+	// Anti-material fire (AT Rifle) [20-25k]
+	const Joules antimat_min = 10000;
+	const Joules antimat_max = 18000;
+	if ( src.SubType == WEAPAMMO_SUBTYPE_BALLISTIC && joules < antimat_max ) {
+		return InterpDamage(antimat_min, 20000, antimat_max, 25000, joules);
+	}
+
+	if ( src.SubType == WEAPAMMO_SUBTYPE_GRENADE ) {
+#if HE_AOE_BOOST
+		if ( src.ExplosiveEnergy < 500000 ) {
+			// Shrapnel [10k]
+			return joules > 5000 ? 10000 : 0;
+		} else {
+			// Concussion [15k]
+			// Should be far higher, but only the Axis have one, so...
+			return joules > 5000 ? 15000 : 0;
+		}
+#else
+		if ( src.ExplosiveEnergy < 500000 ) {
+			// Shrapnel [10k]
+			const Joules shrap_min = 384000;
+			const Joules shrap_max = 614000;
+			return InterpDamage(shrap_min, 9000, shrap_max, 11000, joules);
+		} else {
+			// Concussion [35k]
+			const Joules gren_min = 380000;
+			const Joules gren_max = 390000;
+			return InterpDamage(gren_min, 34000, gren_max, 36000, joules);
+		}
+#endif
+	}
+
+	// Rocket [90-110k]
+	if ( src.SubType == WEAPAMMO_SUBTYPE_ROCKET ) {
+		const Joules rocket_min = 180000;
+		const Joules rocket_max = 610000;
+		return InterpDamage(rocket_min, 90000, rocket_max, 110000, joules);
+	}
+
+	// Mortar [600k]
+	if ( src.SubType == WEAPAMMO_SUBTYPE_MORTAR ) {
+#if HE_AOE_BOOST
+		return joules > 5000 ? 600000 : 0;
+#else
+		const Joules mortar_min = 3000000;
+		const Joules mortar_max = 4000000;
+		return InterpDamage(mortar_min, 280000, mortar_max, 320000, joules);
+#endif
+	}
+
+	// AP/HE* [varies]
+	if ( src.SubType == WEAPAMMO_SUBTYPE_BALLISTIC ) {
+		if ( src.ExplosiveEnergy > 0.0f ) {
+			// HE* [750-1000k]
+			const Joules he_min = 250000;
+			const Joules he_max = 6500000;
+#if HE_AOE_BOOST
+			if ( joules > 100000 )
+				joules = std::max(joules, he_min / 2);
+#endif
+			return InterpDamage(he_min, 750000, he_max, 1000000, joules);
+		} else {
+			// Non-HE*
+			if ( src.AmmoWeight < 0.25 ) {
+				// Autocannon [75k]
+				const Joules ac_min = 42500;
+				const Joules ac_max = 44000;
+#if AP_DAMAGE_BOOST
+				// Autocannon [300k x2]
+				return InterpDamage(ac_min, 280000, ac_max, 320000, joules) * 2;
+#else
+				return InterpDamage(ac_min, 70000, ac_max, 75000, joules);
+#endif
+			} else {
+				// AP [150-250k]
+				// Note the Panhard is a bit under half due to its tiny gun,
+				// but this is reflected through the math anyway.
+				const Joules ap_min = 200000;
+				const Joules ap_max = 3000000;
+#if AP_DAMAGE_BOOST
+				// AP [750-1000k x2]
+				return InterpDamage(ap_min, 750000, ap_max, 1000000, joules) * 2;
+#else
+				return InterpDamage(ap_min, 150000, ap_max, 250000, joules);
+#endif
+			}
+		}
+	}
+
+	// AAA [300-1000k]
+	// HACK: /4 due to excessive damage to FMS/ATG Emplacement
+	if ( src.SubType == WEAPAMMO_SUBTYPE_AIRBURST ) {
+		const Joules aaa_min = 36000;
+		const Joules aaa_max = 600000;
+#if HE_AOE_BOOST
+		if ( joules > 5000 )
+			joules = std::max(joules, aaa_min / 2);
+#endif
+		return InterpDamage(aaa_min, 300000 / 4, aaa_max, 1000000 / 4, joules);
+	}
+
+	// Satchel [25m]
+	if ( src.SubType == WEAPAMMO_SUBTYPE_PLACED ) {
+		return joules > 3000000 ? 25000000 : 0;
+	}
+
+	// Bomb [10m-25m]
+	if ( src.SubType == WEAPAMMO_SUBTYPE_BOMB ) {
+		const Joules bomb_min = 50000000;
+		const Joules bomb_max = 190000000;
+#if HE_AOE_BOOST
+		if ( joules > 100000 )
+			joules = std::max(joules, bomb_min / 2);
+#endif
+		return InterpDamage(bomb_min, 10000000, bomb_max, 25000000, joules);
+	}
+
+	// If anything's left, just return the joules done.
+	return joules;
 }

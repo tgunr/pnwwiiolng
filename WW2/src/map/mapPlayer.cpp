@@ -789,7 +789,9 @@ Player::checksum(UINT64 withChecksum)
 	bool isDirty = false;
 	if ( !mapCheckChecksum(dispatch().m_appVersion, withChecksum, permissions(IS_PRODUCER)) )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s invalid checksum %" PR64BitUT " for app %u plat:%u"
+		auto severity = host_config.arena.checksums ? Debug::ERR_WARN : Debug::ERR_INFO;
+		dbugLog(_FL, severity,
+						"t:%d p:%u c:%s invalid checksum %" PR64BitUT " for app:%u plat:%u"
 						, teulIndex(), playerID(), callsign()
 						, withChecksum
 						, dispatch().m_appVersion

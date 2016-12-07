@@ -12,6 +12,7 @@ namespace Server
 		const char*	help;
 		bool		wantParameter;
 		std::function<void(const char*)> callback;
+		std::function<void()> postHandler;  // called after all arguments have been processed.
 	};
 
 	using CommandLineOptions = std::vector<CommandLineOption>;

@@ -1080,6 +1080,7 @@ main(int argc, const char* argv[])
 				printf("sizeof(E) = %" PRSizeT ", sizeof(EI) = %" PRSizeT ", sizeof(wwiiPlayer) = %" PRSizeT ", sizeof(Player) = %" PRSizeT "\n", sizeof(ENDPOINT), sizeof(EndpointImpl), sizeof(wwiiPlayer), sizeof(Player));
 				exit(0);
 			}
+			, nullptr
 		}
 	});
     dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);

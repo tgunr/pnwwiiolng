@@ -407,6 +407,10 @@ main(int argc,char** argv)
 	if ( result < 0 )
 		LogAbort("Unable to access working directory %s: %d", cv_dataDir.GetString(), result);
 
+	dbugInit(LogMode::TO_FILE, "stratLoader");
+	dbugSetLogLevel(Debug::ERR_INFO | STD_ERR);
+	dbugSetWriteLevel(Debug::ERR_INFO | STD_ERR);
+
 	_checkDirectoryStructure();
 
 	_extract(tarFile);

@@ -428,7 +428,7 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 	if ( result.second == true && server.stats.address == Server::myServerInfo.stats.address )
 	{
 		server.stats.addPlayer();
-		dbugLog(_FLW, " numPlayers now %d, m_players size %" PRSizeT "", server.stats.numPlayers(), server.m_players.size());
+		dbugLog(_FLI, "numPlayers now %d, m_players size %" PRSizeT "", server.stats.numPlayers(), server.m_players.size());
 	}
 
 	return retval;
@@ -1845,19 +1845,20 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 	CommandLineOptions allOptions = {
 		{
 			"--help", "Show this help.", false,
-			[&allOptions, argv](const char*) { _help(argv, allOptions); }
+			[&allOptions, argv](const char*) { _help(argv, allOptions); }, nullptr
 		},
 		{
 			"--child", "Process should die when parent terminates.", false,
 #if platOS == OS_LINUX
-			[](const char*) { prctl(PR_SET_PDEATHSIG, SIGHUP); }
+			[](const char*) { prctl(PR_SET_PDEATHSIG, SIGHUP); }, nullptr
 #else
-			[](const char*) {}
+			[](const char*) {}, nullptr
 #endif
 		},
 		{
 			"--token", "Specify the controller connection token.", true,
-			[](const char* text) { s_controllerToken = strtoul(text, nullptr, 10); }
+			[](const char* text) { s_controllerToken = strtoul(text, nullptr, 10); },
+			nullptr
 		}
 	};
 	allOptions.insert(allOptions.end(), cliOptions.begin(), cliOptions.end());
@@ -1884,6 +1885,13 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 		}
 		if (!found)
 			LogAbort("unrecognized argument '%s', see '--help' for usage.", argv[argn]);
+	}
+
+	// execute post-handlers for commands.
+	for (auto&& opt : allOptions) {
+		if (opt.postHandler) {
+			opt.postHandler();
+		}
 	}
 
 	Teul::ConfigVar::CheckConfiguration();
