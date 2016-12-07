@@ -30,8 +30,8 @@ namespace Debug
 	{
 		ERR_FATAL = 0,		// fatal error detected, exit program
 		ERR_ABORT,			// error detected, operation aborted
-		ERR_MINOR,			// error detected, routine recovered, operation continues
-		ERR_WARN,			// possible error detected, operation continues
+		ERR_WARN,			// error detected, operation continues
+		ERR_MINOR,			// possible error detected, routine recovered, operation continues
 		ERR_NOTE,			// normal but significant
 		ERR_INFO,			// informational message
 		ERR_DBUG,			// debug level message

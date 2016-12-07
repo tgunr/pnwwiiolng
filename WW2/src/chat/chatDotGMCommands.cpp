@@ -1052,7 +1052,7 @@ class LastCapQuery : public DBThreadQuery
 public:
 	LastCapQuery(const ChatHandle byMatchID, const char* clause)
 		: DBThreadQuery(DBThread::Default, "LastCapQuery", DBThreadQuery::_CALLBACK
-			, "SELECT * FROM `strat`.`v_last_captures` %s LIMIT 8", clause
+			, "SELECT * FROM `wwiionline`.`v_last_captures` %s LIMIT 8", clause
 			)
 		, m_matchID(byMatchID)
 		, m_results()

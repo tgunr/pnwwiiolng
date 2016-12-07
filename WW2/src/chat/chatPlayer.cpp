@@ -83,18 +83,6 @@ using AWS_GRID = std::map<UINT32, AWS_READING>;
 using AWS_INSTANCES = std::map<instanceid_t, AWS_GRID>;
 AWS_INSTANCES g_awsGrids, g_awsSnapshots;
 
-// Decal saving
-static const char* const _DECAL_UPDATE_PREFIX = "INSERT INTO `wwiionline`.`wwii_player` (playerid,player_decal) VALUES";
-static const char* const _DECAL_UPDATE_SUFFIX = "ON DUPLICATE KEY UPDATE player_decal=values(player_decal)";
-ThreadTextQuery _decalUpdates(DBThread::Default, _DECAL_UPDATE_PREFIX, _DECAL_UPDATE_SUFFIX);
-
-bool
-Chat::CommitDecalUpdates()
-{
-	_decalUpdates.commit(1000);
-	return true;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Internal, private functionality
 
@@ -1465,9 +1453,11 @@ Player::SetPreference(UINT32 prefId, UINT32 request, bool fromClient)
 		if ( value > 0 )
 		{
 			log(_FLI, "setting decal to %u", value);
-			char buffer[65];
-			strprintf(buffer, "(%u,%u)", playerID(), value);
-			_decalUpdates.addEntry(buffer);
+			DBThread::Do(DBThread::Default,
+					"UPDATE `wwiionline`.`wwii_player`"
+						" SET player_decal=%u"
+						" WHERE playerid=%u",
+							value, playerID());
 			chatSendMapPersonaUpdate(playerID(), false, 0, 0, true, value);
 		}
 	break;
