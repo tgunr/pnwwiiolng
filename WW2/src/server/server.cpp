@@ -985,7 +985,7 @@ serverInit(UINT32 appVersion
 {
 	if ( Server::myServerInfo.stats.arenaID == 0 )
 	{
-		LogAbort("arenaID not specified [didn't call _initAddresses first?]");
+		LogAbort("arenaID not specified [didn't call Server::InitializeProcess first?]");
 		/*ABORT*/
 	}
 
@@ -1801,64 +1801,8 @@ serverGetClusterCapacity()
 	return clusterCapacity;
 }
 
-#if defined(SERVER_AS_ENTRY_POINT)
-//////////////////////////////////////////////////////////////////////
-// EXPERIMENTAL: Entry point for all server processes.
-
-int main(int argc, const char* argv[])
-{
-	Teul::ConfigVar::InitializeConfigVars();
-
-	if ( argc > 1 )
-	{
-		extern bool serverProcessCommandLine(int, const char**);
-		if ( !serverProcessCommandLine(argc, argv) )
-			LogAbort("Invalid command line!\n");
-	}
-
-	Teul::SetAppName(g_serverName);
-	extern ERROR_FUNCTION serverErrorFunction;
-
-	if ( teulInitTransport(LogMode::TO_FILE, g_serverName, serverErrorFunction, nullptr) < 0 )
-		LogAbort("Can't init transport");
-
-	serverEnableDebugWebServer(g_hostType);
-
-	memInit();
-
-	_initAddresses();
-
-	extern void serverMain();
-	serverMain();
-}
-
-ServerBase::ServerBase(SERVER_TYPE serverType_, const char* serverName_)
-	: m_serverType(serverType_)
-	, m_serverName(serverName_)
-{
-	// Singleton check.
-	static std::atomic<UINT32> s_initializedCount(0);
-	ABORT_IF( ++s_initializedCount > 1 );
-
-	s_serverBase = this;
-
-	serverEnableDebugWebServer(serverType_);
-	memInit();
-
-	Teul::SetAppName(m_serverName);
-	if ( teulInitTransport(LogMode::TO_FILE, m_serverName, s_ErrorDelegate, nullptr) < 0 )
-		LogAbort("Can't initialize transport.");
-
-	_initAddresses();
-}
-
-void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SINT32 size_, const TEUL_CALLBACK* const object_, SINT32 error_)
-{
-	s_serverBase->OnError(teulIndex_, data_, size_, object_, error_);
-}
-#endif
-
-[[noreturn]] void _help(const char* argv[], const Server::CommandLineOptions& cliOptions)
+[[noreturn]] void
+_help(const char* argv[], const Server::CommandLineOptions& cliOptions)
 {
 	printf("Usage: %s [arguments | --help]\n", argv[0]);
 	for (size_t i = 0; i < cliOptions.size(); ++i)
