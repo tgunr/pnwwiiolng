@@ -332,20 +332,13 @@ public:
 
 	void add(ENDPOINT* endpoint) noexcept
 	{
+		if (endpoint != nullptr) {
+			dbugLog(_FLD, "t:%d (%p) adding to dead endpoints", endpoint->m_teulIndex, endpoint);
 #ifdef DEBUG
-		ABORT_IF(std::find(m_endpoints.begin(), m_endpoints.end(), endpoint) != m_endpoints.end());
+			ABORT_IF_EX( std::find(m_endpoints.begin(), m_endpoints.end(), endpoint) != m_endpoints.end(),
+							"endpoint added to dead endpoints manager twice." );
 #endif
-		if (endpoint != nullptr)
 			m_endpoints.push_back(endpoint);
-	}
-
-	void remove(ENDPOINT* endpoint) noexcept
-	{
-		auto it = std::find(m_endpoints.begin(), m_endpoints.end(), endpoint);
-		if (it != m_endpoints.end()) {
-			// tail-swap trick
-			*it = m_endpoints.back();
-			m_endpoints.pop_back();
 		}
 	}
 
@@ -360,16 +353,19 @@ public:
 		// we stole it to, making the manager object itself safe from modification.
 		// We crawl the stolen data, free those endpoints, and then put the stolen
 		// vector back so that we retain the original pre-sized allocation.
-		auto eps = std::move(m_endpoints);
-		for (auto* ep : eps) {
-			teulFreeEndpoint(ep);
+		if ( ! m_endpoints.empty() ) {
+			dbugLog(_FLM | STD_ERR, "processing %" PRSizeT " dead endpoints", m_endpoints.size());
+			auto eps = std::move(m_endpoints);
+			for (auto* ep : eps) {
+				teulFreeEndpoint(ep);
+			}
+			eps.clear();
+			// we don't expect this to ever do anything, but it's there so that if the
+			// free process somehow *adds* an endpoint to the list, we keep it.
+			eps.insert(eps.end(), m_endpoints.begin(), m_endpoints.end());
+			// put the original vector back where we got it from.
+			m_endpoints = std::move(eps);
 		}
-		eps.clear();
-		// we don't expect this to ever do anything, but it's there so that if the
-		// free process somehow *adds* an endpoint to the list, we keep it.
-		eps.insert(eps.end(), m_endpoints.begin(), m_endpoints.end());
-		// put the original vector back where we got it from.
-		m_endpoints = std::move(eps);
 	}
 
 	void discard() noexcept
@@ -389,6 +385,8 @@ teulRemoveEndpoint(ENDPOINT* endpoint)
 {
 	if ( endpoint == nullptr )
 		return;
+
+	dbugLog(_FLM, "teulRemoveEndpoint(%p) t:%d iu:%d cl:%d st:%d", endpoint, endpoint->teulIndex(), (int)endpoint->m_inUse, (int)endpoint->m_closed, endpoint->m_state);
 
 	if ( ! endpoint->m_inUse )
 	{

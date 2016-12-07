@@ -824,7 +824,7 @@ strtdbFetchLuaScript(const char* name, std::string& obj)
 void
 strtdbSaveConfigVar(const char* name, const char* value)
 {
-	DBSimpleQuery(dbh, "UPDATE `wwiionline`.`wwii`_config` SET value = '%s' WHERE variableName = '%s'", value, name);
+	DBSimpleQuery(dbh, "UPDATE `wwiionline`.`wwii_config` SET value = '%s' WHERE variableName = '%s'", value, name);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1041,7 +1041,7 @@ strtStartNewDay()
 
 	DBThread::Do(DBThread::Default
 					, "INSERT"
-						" INTO `strat`.`wthr_report` (real_start, game_day, start_time, weather_pattern, rain_pattern, weather_forecast)"
+						" INTO `wwiionline`.`wthr_report` (real_start, game_day, start_time, weather_pattern, rain_pattern, weather_forecast)"
 						" VALUES (NOW(), %u, %u, %u, %u, %u)"
 							, g_gameDay
 							, wthrGetGameTime()
