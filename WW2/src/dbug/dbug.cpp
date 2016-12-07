@@ -559,8 +559,10 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	if ( PN_LIKELY((error != Debug::ERR_FATAL) && (error > minLevel)) )
 		return 0;
 
-	const bool isFatal = (error == Debug::ERR_FATAL);
-	const bool logToConsole = isFatal || (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && error <= Debug::ERR_MINOR);
+	const bool logToConsole = 
+			(error < Debug::ERR_MINOR) || 
+			(error < Debug::ERR_INFO && (flags & STD_ERR)) ||
+			(flags & LOG_ALL_TO_STDERR);
 
 	size_t len = 0;
 	time_t now = (time_t)(teulClock64 / 1000ULL);
@@ -599,7 +601,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		}
 	}
 
-	if ( PN_UNLIKELY(isFatal) ) {
+	if ( PN_UNLIKELY(error == Debug::ERR_FATAL) ) {
 		abort();
 	}
 

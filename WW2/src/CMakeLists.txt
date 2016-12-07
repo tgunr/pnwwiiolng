@@ -283,12 +283,12 @@ SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
 SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES})
 IF (BUILDING_OWN_LIBXML2)
 	MACRO( USE_WWIILIB_ON Name )
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} )
+		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
 		ADD_DEPENDENCIES( ${Name} libxml2 )
 	ENDMACRO()
 ELSE()
 	MACRO( USE_WWIILIB_ON Name)
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} )
+		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
 	ENDMACRO()
 ENDIF()
 
@@ -352,19 +352,6 @@ IF ( MSVC )
 	USE_WWIILIB_ON(sdmpp)
 	SET_PROPERTY(TARGET sdmpp PROPERTY FOLDER "Tools")
 
-	# Reads SDM files and imports portions of them into the game database.
-	# Which is a shame, because the hosts wind up reading the SDM files too
-	# to get the missing data. *Sigh*
-	ADD_EXECUTABLE(stratLoader
-		src/loader.cpp
-		sdm/sdmLoad.cpp
-			sdm/sdmLoad.h
-			sdm/sdmParse.h
-	)
-	TARGET_LINK_LIBRARIES(stratLoader teulserver ${MYSQL_LIBRARIES})
-	USE_WWIILIB_ON(stratLoader)
-	SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
-
 	ADD_EXECUTABLE(stratValidator
 		parse/parseWor.cpp
 			parse/parseWor.h
@@ -397,6 +384,20 @@ IF ( MSVC )
 	TARGET_LINK_LIBRARIES(stratValidator teulserver ${MYSQL_LIBRARIES})
 	SET_PROPERTY(TARGET stratValidator PROPERTY FOLDER "Tools")
 ENDIF()
+
+# Reads SDM files and imports portions of them into the game database.
+# Which is a shame, because the hosts wind up reading the SDM files too
+# to get the missing data. *Sigh*
+ADD_EXECUTABLE(stratLoader
+	src/loader.cpp
+	sdm/sdmLoad.cpp
+		sdm/sdmLoad.h
+		sdm/sdmParse.h
+)
+USE_WWIILIB_ON(stratLoader)
+TARGET_LINK_LIBRARIES(stratLoader teulserver ${MYSQL_LIBRARIES})
+SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
+
 
 ####################################
 ## Macro for building hosts

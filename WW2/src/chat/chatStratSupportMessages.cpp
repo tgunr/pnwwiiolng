@@ -224,7 +224,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 
 	request.m_action = request.process(incoming.key(), requester.c_str(), unit, cp, (bool)incoming.flags());
 	DBThread::Do(DBThread::Default
-				, "INSERT INTO strat.move_requests"
+				, "INSERT INTO `wwiionline`.`move_requests`"
 					"(recorded, requester, action, unit_id, from_cp_oid, to_cp_oid, result)"
 					"VALUES"
 					"(NOW(), '%s', %u, %u, %u, %u, %d)"
