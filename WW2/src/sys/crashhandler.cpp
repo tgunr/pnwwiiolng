@@ -18,7 +18,7 @@
 #include <math.h>
 #include <float.h>
 #pragma warning( push )
-#pragma warning( disable : 4091)
+#pragma warning( disable : 4091)	// 'typedef' ignored on left of stuff in shlobj.h and dbhhelp.h
 #include <ShlObj.h>
 #include "client/windows/handler/exception_handler.h"
 #pragma warning( pop )
