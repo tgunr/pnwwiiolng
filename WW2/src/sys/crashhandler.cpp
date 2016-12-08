@@ -24,8 +24,7 @@
 #include <fstream>
 #include <locale>
 #include <codecvt>
-#include "versionNo.h"
-#include "client_revision.h"
+#include "build_info.hpp"
 #include "sys/sysreg.h"
 #include "unique_opaque_ptr.hpp"
 #include "client/windows/handler/exception_handler.h"

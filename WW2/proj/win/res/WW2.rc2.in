@@ -8,17 +8,13 @@
 
 
 /////////////////////////////////////////////////////////////////////////////
-// Add manually edited resources here...
-#ifndef _MAC
-/////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
-#include "..\versionNo.h"
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION PN_WW2_VERSION_NO,PN_WW2_PATCH_NO,PN_WW2_BUILD_NO,0
- PRODUCTVERSION PRODUCTVER
+ FILEVERSION ${PRODUCT_VERSION_VALUE_MAJOR},${PRODUCT_VERSION_VALUE_MINOR},${PRODUCT_VERSION_VALUE_PATCH},${PRODUCT_VERSION_VALUE_BUILD}
+ PRODUCTVERSION ${PRODUCT_VERSION_VALUE_MAJOR},${PRODUCT_VERSION_VALUE_MINOR},${PRODUCT_VERSION_VALUE_PATCH}
  FILEFLAGSMASK VS_FF_DEBUG | VS_FF_PRERELEASE
 #ifdef _DEBUG
  FILEFLAGS VS_FF_DEBUG
@@ -36,14 +32,14 @@ BEGIN
             VALUE "Comments", "Massively Multiplayer Online Game\0"
             VALUE "CompanyName", "Playnet, Inc.\0"
             VALUE "FileDescription", "WW2\0"
-			VALUE "FileVersion", STRVER "\0"
+            VALUE "FileVersion", "${PRODUCT_VERSION_VALUE_MAJOR}.${PRODUCT_VERSION_VALUE_MINOR}.${PRODUCT_VERSION_VALUE_PATCH}.${PRODUCT_VERSION_VALUE_BUILD}\0"
             VALUE "InternalName", "WW2\0"
-            VALUE "LegalCopyright", "Copyright © 2000-2011\0"
+            VALUE "LegalCopyright", "Copyright © 2000-${DATEYEAR}\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "WW2.exe\0"
             VALUE "PrivateBuild", "\0"
             VALUE "ProductName", "Playnet, Inc. WW2\0"
-            VALUE "ProductVersion", STRPRODUCTVER "\0"
+            VALUE "ProductVersion", "${PRODUCT_VERSION_VALUE_MAJOR}.${PRODUCT_VERSION_VALUE_MINOR}.${PRODUCT_VERSION_VALUE_PATCH}.${PRODUCT_VERSION_VALUE_BUILD}\0"
             VALUE "SpecialBuild", "\0"
         END
     END
@@ -52,7 +48,5 @@ BEGIN
         VALUE "Translation", 0x409, 1200
     END
 END
-
-#endif    // !_MAC
 
 /////////////////////////////////////////////////////////////////////////////

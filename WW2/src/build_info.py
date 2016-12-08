@@ -37,6 +37,7 @@ def main():
     
     replacements = {
         'DATETIME':                     time.strftime('%a %b %d, %Y %H:%M:%S %Z'),
+        'DATEYEAR':                     time.strftime('%Y'),
         'INPUT_FILE_NAME':              os.path.basename(revision_file_in),
         'OUTPUT_FILE_NAME':             revision_file_out.replace("\\", "\\\\"),
         'PLATFORM':                     host_platform,
@@ -58,8 +59,12 @@ def main():
     configure_file(os.path.join(repo_path, revision_file_in), os.path.join(output_directory, revision_file_out), replacements)
     print("Wrote build information to " + os.path.join(output_directory, revision_file_out))
     if sys.platform == 'darwin' and os.environ.get('BUILT_PRODUCTS_DIR') != None and build_type == 'client':
-        update_infoplist(replacements)
+        update_mac_infoplist(replacements)
         print("Updated Mac Info.plist")
+    elif sys.platform == 'win32':
+        update_win_rc(repo_path, replacements)
+        print("Updated Windows .rc file")
+    
 
 ### Subroutine for running commands
 def get_command_output(cmd):
@@ -87,11 +92,12 @@ def configure_file(src, dst, substitutions):
         shutil.move(ftmp.name, dst)
 
 ### Update the Mac Info.plist file
-def update_infoplist(substitutions):
+def update_mac_infoplist(substitutions):
     infoplist_path = os.path.join(
         os.environ.get("BUILT_PRODUCTS_DIR"),
         os.environ.get("WRAPPER_NAME"),
-        "Contents/Info.plist"
+        "Contents",
+        "Info.plist"
     )
     plist_subs = {
         'GitShaHash': substitutions['GIT_COMMITISH'], 'GitState': substitutions['GIT_STATE'],
@@ -100,6 +106,21 @@ def update_infoplist(substitutions):
     for pkey, pval in plist_subs.items():
         get_command_output('plutil -replace "%s" -string "%s" "%s"' % (pkey, pval, infoplist_path))
     get_command_output('plutil -convert xml1 "%s"' % infoplist_path)
+
+### Update the Windows WW2.rc2 file
+def update_win_rc(repo_path, substitutions):
+    winrc_base_path = os.path.join(
+        repo_path,
+        "WW2",
+        "proj",
+        "win",
+        "res"
+    )
+    winrc_in_path = os.path.join(winrc_base_path, "WW2.rc2.in")
+    winrc_out_path = os.path.join(winrc_base_path, "WW2.rc2")
+    # This is a copout - dropping the "output" back in the source directory
+    # is bad form, but I don't know VS well enough to do better.
+    configure_file(winrc_in_path, winrc_out_path, substitutions)
 
 ### Pull the version numbers from the version file
 def get_version_values(version_info_file_path):
