@@ -286,7 +286,7 @@ public:
 		target->message(LSTR_WARNING, LSTR_GM_MOVED_YOU, args[1]);
 
 		std::string note = args[1];
-                DBThread::EscapeString(note);
+		DBThread::EscapeString(note);
 
 		if ( note.length() > 400 )
 			note.resize(400);
