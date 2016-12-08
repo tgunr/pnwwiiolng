@@ -19,7 +19,7 @@ struct PPOSpec
 	double rotation; // degrees to rotate the object around the z
 	SINT32 coolDown; // how long in milliseconds to cool down after building this object
 	SINT32 coolDownEnd; // stateful frametime end when our current cooldown will be finished (this is a runtime dynamic field)
-	SINT32 buildTime; // build time in miliseconds
+	SINT32 buildTime; // build time in milliseconds
 	UINT32 buildFlags; // what this ppo can be built on; everything else must be avoided (collider flags)
 	UINT32 avoidFlags; // what this ppo cant be in contact with to build (collider flags)
 	UINT32 surfaceFlags; // which infantry surfaces are okay for this object type (0 - 5)

@@ -90,7 +90,6 @@ struct IconRank
 
 static const IconRank _SpecialRanks[] =
 {
-#if !defined(CHINA) && !defined(HAPPYOO)
 	{"killer", 		KILLER_RANK },
 	{"martini", 	MARTINI_RANK },
 	{"toto", 		TOTO_RANK },
@@ -100,7 +99,6 @@ static const IconRank _SpecialRanks[] =
 	{"xoom",        XOOM_RANK },
 	{"ohm",         OHM_RANK },
 	{"victarus",    VICTARUS_RANK },
-#endif
 	{nullptr, 0}
 };
 

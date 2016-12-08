@@ -206,7 +206,7 @@ GAME::GAME(const AUTH_GAME_INIT& gInit)
 	// Load arena information from the database.
 	if ( !authInitGameEntry(*this) || description[0] == 0 )
 	{
-		sprintf(description, "Unknown Server #%u/%u", arenaID, appID);
+		strprintf(description, "Unknown Server #%u/%u", arenaID, appID);
 	}
 
 	char hostVer[64+1];

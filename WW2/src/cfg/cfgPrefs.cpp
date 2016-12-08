@@ -298,7 +298,7 @@ bool cfgPrefsLoad()
 	{
 #if platOS == OS_MACOS
 		char path[4192];
-		sprintf(path, "%swwiiol.cfg", macPreferencesPath());
+		strprintf(path, "%swwiiol.cfg", macPreferencesPath());
 #else
 		static const char path[] = "wwiiol.cfg";
 #endif
@@ -1284,14 +1284,10 @@ void cfgPrefsProcessGlobal(_cfgPARAMS key)
 		case cfgSHADOW_RECEIVERS:
 		{
 #if RELEASE_CLIENT != 0
-#if IS_CHINA
-			// Allow ShadowMapFlags to be 0
-#else
 			if(ShadowMapFlags == 0)
 			{
 				ShadowMapFlags = (SHADOW_TERRAIN | SHADOW_VEHICLES | SHADOW_CORPSES);
 			}
-#endif
 #endif
 			break;
 		}

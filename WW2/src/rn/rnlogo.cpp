@@ -24,7 +24,7 @@
 	rnlogo
 *************************************************************************************************/
 
-#if RELEASE_CLIENT != 0
+#if RELEASE_CLIENT != 0 && !defined(DEBUG_WW2)
 #define DISPLAY_LOGO
 #endif
 
@@ -131,7 +131,7 @@ LOGICAL rnlogoRender()
 void rnlogoKill()
 {
 
-#if (platOS == OS_WIN32) && (RELEASE_CLIENT != 0)
+#if (platOS == OS_WIN32) && (RELEASE_CLIENT != 0) && !defined(DEBUG_WW2)
 	// This is used to force the foreground, active and focus window to be ours.
 	// Some players were changing active windows during game loadup and causing
 	// the game to lose active inputs. We use this to force our app to be the

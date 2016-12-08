@@ -64,7 +64,7 @@ chatLocString(int i)
 	if ( it != g_hostMessages.end() )
 		return it->second.c_str();
 	static char buf[32];
-	sprintf(buf, "?#%d?", i);
+	strprintf(buf, "?#%d?", i);
 	return buf;
 }
 
@@ -106,7 +106,7 @@ chatLString(const Chat::LocalizedMessage& lmsg)
 	size_t pos;
 	for ( UINT32 i = 0; i < Chat::LocalizedMessage::_NUM_ARGUMENTS; ++i )
 	{
-		sprintf(format, "{%1u}", i + 1);
+		strprintf(format, "{%1u}", i + 1);
 		while ( 1 )
 		{
 			pos = output.find(format);

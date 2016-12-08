@@ -463,7 +463,7 @@ logTimerBeginMacro();
 						if (Object != nullptr)
 						{
 							AmmoType->Object = Object;
-							sprintf(Object->name,"%s%dat",VarContents,CurrentPos); // ensure unique name
+							strprintf(Object->name,"%s%dat",VarContents,CurrentPos); // ensure unique name
 
 							ogrpHideObjectAndSubtree(Object);
 							obmainMoveToNotObjectTree(Object);

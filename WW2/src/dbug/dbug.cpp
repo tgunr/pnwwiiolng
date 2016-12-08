@@ -661,7 +661,9 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 		MessageBoxA(0, "OUT OF MEMORY", "OUT OF MEMORY", MB_ICONERROR | MB_OK | MB_APPLMODAL);
 		abort();
 	}
+
 	const char* caption;
+#if defined(DEBUG)
 	if ( assertion_[0] )
 	{
 		caption = "Critical Error (ASSERT)";
@@ -672,10 +674,14 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 		caption = "Critical Error";
 		sprintf_s(message, maxSize, "File: %s\nLine: %u\nError: %s\n", file_, line_, _logger.m_text);
 	}
+#else
+	caption = "Critical Error";
+	sprintf_s(message, maxSize, "%s: %s\n", caption, _logger.m_text);
+#endif
 	MessageBoxA(0, message, caption, MB_OK | MB_ICONERROR | MB_APPLMODAL);
 	free(message);
 
-#if defined(_DEBUG)
+#if defined(DEBUG)
 	__debugbreak();
 #endif
 

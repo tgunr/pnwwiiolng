@@ -1792,7 +1792,7 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 		post.targetCP_oid = cp->uOID;
 		post.targetFac_oid = ab->uOID;
 		post.instanceID = instanceID;
-		sprintf(post.description, "%s system mission", _countryNameAdj[forCountry]);
+		strprintf(post.description, "%s system mission", _countryNameAdj[forCountry]);
 
 		Mission* mission = post.post();
 		if ( mission != nullptr )

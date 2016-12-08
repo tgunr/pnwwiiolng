@@ -228,7 +228,7 @@ mapInitDB()
 
 	wwiiReadRanks();
 
-#if !defined(DEV_BUILD) && !defined(FRES)
+#if !defined(DEV_BUILD)
 	mapPollChecksums(true);
 #endif
 
@@ -621,7 +621,7 @@ _errException(const WWII_ERROR_INFO& info, const Player& player, const UINT32 pl
 		if ( info.data.exceptInfo.stackAddrs[i] != 0 )
 		{
 			char addr[20];
-			sprintf(addr, "%x,", info.data.exceptInfo.stackAddrs[i]);
+			strprintf(addr, "%x,", info.data.exceptInfo.stackAddrs[i]);
 			stackinfo.append(addr);
 		}
 	}

@@ -2443,7 +2443,7 @@ SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& of
     memset(editList, 0, sizeof(TERRAIN_INFO) * MAX_TERRAIN_EDIT_LIST);
     memset(objects, 0, sizeof(DTL_TRNOBJ_INFO) * SDM_SUPERCELL_OCTETS_XY * MAX_TRNOBJ_OCTET);
 
-	sprintf(fileName, "%04x_%04x", (unsigned short)supercellX, (unsigned short)supercellY);
+	strprintf(fileName, "%04x_%04x", (unsigned short)supercellX, (unsigned short)supercellY);
 	//wsprintfA(fileName, "%04x_%04x", (unsigned short)supercellX, (unsigned short)supercellY);
 	if(supercellX == SUPERCELL_INVALID && supercellY == SUPERCELL_INVALID)	cellName = "Default";
 	else	cellName = fileName;

@@ -5891,9 +5891,6 @@ void _playearring(FLOAT32 volume, SINT32 duration)
 	if(persIsInDeathCam())
 		return;
 
-#if FRES
-	// Do nothing for now
-#else
 	_playsound("sounds/ear_ringing.wav", _Persona.earringSoundID, volume * .5f, .7f, duration);
 
 	/*
@@ -5925,7 +5922,6 @@ void _playearring(FLOAT32 volume, SINT32 duration)
 		_Persona.earringSoundID = id;
 	}
 	*/
-#endif
 }
 
 void _playheartbeat(FLOAT32 volume, SINT32 duration)
@@ -5933,9 +5929,6 @@ void _playheartbeat(FLOAT32 volume, SINT32 duration)
 	if(persIsInDeathCam())
 		return;
 
-#if FRES
-	// Do nothing for now
-#else
 	_playsound("sounds/heartbeat.wav", _Persona.heartbeatID, volume, 1.0f, duration);
 	/*
 	SINT32 id = fxSndGetNewSound();
@@ -5966,7 +5959,6 @@ void _playheartbeat(FLOAT32 volume, SINT32 duration)
 		_Persona.heartbeatID = id;
 	}
 	*/
-#endif
 }
 
 void _playbreathing(FLOAT32 volume, FLOAT32 pitch, SINT32 duration)
@@ -5974,9 +5966,6 @@ void _playbreathing(FLOAT32 volume, FLOAT32 pitch, SINT32 duration)
 	if(persIsInDeathCam())
 		return;
 
-#if FRES
-	// Do nothing for now
-#else
 	_playsound("sounds/troop/breath1.wav", _Persona.breathID, volume, pitch, duration);
 
 	/*
@@ -6007,14 +5996,10 @@ void _playbreathing(FLOAT32 volume, FLOAT32 pitch, SINT32 duration)
 		_Persona.breathID = id;
 	}
 	*/
-#endif
 }
 
 void _playshellshock(FLOAT32 volume, SINT32 duration)
 {
-#if FRES
-	// Do nothing for now
-#else
 	//_playsound("sounds//troop//breath1.wav", _Persona.shellshockID, volume, 1.0f, duration);
 
 	_targetBreaths = BREATH_SCALE;
@@ -6049,7 +6034,6 @@ void _playshellshock(FLOAT32 volume, SINT32 duration)
 		_Persona.shellshockID = id;
 	}
 	*/
-#endif
 }
 
 void _playsound(const char* path, SINT32& id, FLOAT32 volume, FLOAT32 pitch, SINT32 duration)

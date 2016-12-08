@@ -8,9 +8,5 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#if defined(HAPPYOO)
-# define AUTH_BYPASS_OTP 3735928559UL
-#else
 # define AUTH_BYPASS_OTP 2342426UL
-#endif
 

@@ -370,7 +370,7 @@ static UINT32 _RepopulateArray()
         GetGridCenter(i, pos, center);
         trnmainGetSupercellAndOctet(center, sx, sy, r, c);
 
-        sprintf(key, "clutter%d%d%d%d", sx, sy, r, c);
+        strprintf(key, "clutter%d%d%d%d", sx, sy, r, c);
         wantedkeys.insert(key);
 
         if(keys.find(key) == keys.end())
@@ -598,7 +598,7 @@ static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX, SINT32 PosY, 
             pos.y = Clutter->Pos.y;
             pos.z = -Clutter->Pos.z;
 
-            sprintf(Clutter->grassid, "clutter%d", _id++);
+            strprintf(Clutter->grassid, "clutter%d", _id++);
 
             const char* type = speedgrassGetGrassByPos(pos);
 

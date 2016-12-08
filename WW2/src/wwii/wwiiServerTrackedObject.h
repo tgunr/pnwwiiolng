@@ -278,8 +278,8 @@ public:
 		m_owner = o;
 	}
 
-	//! Get the remaining miliseconds lifespan.
-	//! @return Number of miliseconds until object should expire,
+	//! Get the remaining milliseconds lifespan.
+	//! @return Number of milliseconds until object should expire,
 	//!         or zero if object is already past due.
 	UINT32 timeRemaining() const { return expired() ? 0 : (UINT32)lifespan() - (UINT32)age(); }
 
@@ -296,11 +296,11 @@ protected:
 	WorldPosition_m		m_position;				//!< World-relative position of object.
 	AttitudeVector		m_attitude;				//!< Attitude/orientation.
 	TeulTimeMS			m_created;				//!< Creation timestamp.
-	UINT32				m_uid;					//!< Per-camapign unique ID.
+	UINT32				m_uid;					//!< Per-campaign unique ID.
 	UINT16				m_type;					//!< Transport class.
 	UINT16				m_subType;				//!< Client-specific.
 	UINT32				m_flags;				//!< Client data (does not have to be state).
-	UINT32				m_lifespan;				//!< Miliseconds time-to-live.
+	UINT32				m_lifespan;				//!< Milliseconds time-to-live.
 	ChatHandle			m_owner;				//!< ChatHandle of creating player or 0
 
 private:

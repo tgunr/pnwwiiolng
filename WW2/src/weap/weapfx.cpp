@@ -1055,9 +1055,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 						DoHitSound(&Pos,(FLOAT32)KE,"fps");
 					}
 
-#if IS_CHINA // Ticket # 5888
 					if(WantBloodEffects)
-#endif
 					{
 						Vec3f n;
 
@@ -2250,8 +2248,6 @@ UINT32 weapfxAmmoDetachAmmo(weapAmmo const* Ammo)
 	return 0;
 }
 
-#pragma mark -
-
 /************************************************************************************************
 	weapfxMountFireSound
 *************************************************************************************************/
@@ -2364,8 +2360,6 @@ UINT32 weapfxMountStopFireSound(mlWeaponMount* Mount, UINT32 i, SINT32 RoundsLef
 
 	return 0;
 }
-
-#pragma mark -
 
 /************************************************************************************************
 	AddBulletDecal

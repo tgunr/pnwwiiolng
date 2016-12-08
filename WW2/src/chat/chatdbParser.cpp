@@ -149,7 +149,7 @@ _createSquad(UINT32 ownerID, UINT32* members, const Chat::Name& shortName, const
 
 	char playerIDs[(14 * (SquadControl::CREATE_PLAYERS_REQUIRED+1)) + 1];
 	char* p = playerIDs;
-	sprintf(playerIDs, "%u", ownerID);
+	strprintf(playerIDs, "%u", ownerID);
 	for ( UINT32 i = 0; i < SquadControl::CREATE_PLAYERS_REQUIRED; ++i )
 	{
 		while ( *p )

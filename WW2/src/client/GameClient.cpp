@@ -573,7 +573,7 @@ void GameClient::ProcessPostDeny(FE_POST_DENY const& postDeny)
 	Client::ProcessPostDeny(postDeny);
 
 	static char callback[128];
-	sprintf(callback, "onspawnerror(%u)", postDeny.reasonCode);
+	strprintf(callback, "onspawnerror(%u)", postDeny.reasonCode);
 	jsclient->RunScript(callback);
 }
 

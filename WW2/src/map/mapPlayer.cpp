@@ -1663,7 +1663,7 @@ Player::updateMask()
 
 	PermissionMask newMask = m_playerMask | useRank().permissions() | m_permissions->m_permissionMask;
 
-#if defined(TRAINING_SERVER) || defined(FRES)
+#if defined(TRAINING_SERVER)
 	newMask |= POST_MISSIONS;
 #endif
 

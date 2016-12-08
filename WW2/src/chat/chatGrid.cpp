@@ -787,7 +787,7 @@ Player::updateGridPosition()
 #ifdef HEAVY_DEBUG
 	char buffer[4096];
 	int off;
-	off = sprintf(buffer, "Grid:%d,%d off:%d,%d. Neighborhood:"
+	off = strprintf(buffer, "Grid:%d,%d off:%d,%d. Neighborhood:"
 							, newGX, newGY
 							, lastX - (newGX << ChatGrid::_KEY_SHIFT)
 							, lastY - (newGY << ChatGrid::_KEY_SHIFT)

@@ -448,17 +448,17 @@ void fpTPSDumpStates()
 					if(fpTPSAnimLib[i][j][k][l])
 					{
 						*line = 0;
-						sprintf(line, "<blend type=\"troop\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSAnimLib[i][j][k][l]));
+						strprintf(line, "<blend type=\"troop\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSAnimLib[i][j][k][l]));
 						OS_WRITE(fd, line, strlen(line));
-						sprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
+						strprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
 						OS_WRITE(fd, line, strlen(line));
-						sprintf(line, "\t<state name=\"move\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("move", j));
+						strprintf(line, "\t<state name=\"move\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("move", j));
 						OS_WRITE(fd, line, strlen(line));
-						sprintf(line, "\t<state name=\"weapon\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("weapon", k));
+						strprintf(line, "\t<state name=\"weapon\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("weapon", k));
 						OS_WRITE(fd, line, strlen(line));
-						sprintf(line, "\t<state name=\"pointtype\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pointtype", l));
+						strprintf(line, "\t<state name=\"pointtype\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pointtype", l));
 						OS_WRITE(fd, line, strlen(line));
-						sprintf(line, "</blend>\n");
+						strprintf(line, "</blend>\n");
 						OS_WRITE(fd, line, strlen(line));
 					}
 				}
@@ -473,13 +473,13 @@ void fpTPSDumpStates()
 			if(fpTPSTwitchBlends[i][j])
 			{
 				*line = 0;
-				sprintf(line, "<blend type=\"twitch\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSTwitchBlends[i][j]));
+				strprintf(line, "<blend type=\"twitch\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSTwitchBlends[i][j]));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
+				strprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "\t<state name=\"twitch\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("twitch", j));
+				strprintf(line, "\t<state name=\"twitch\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("twitch", j));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "</blend>\n");
+				strprintf(line, "</blend>\n");
 				OS_WRITE(fd, line, strlen(line));
 			}
 		}
@@ -492,13 +492,13 @@ void fpTPSDumpStates()
 			if(fpTPSDeathBlends[i][j])
 			{
 				*line = 0;
-				sprintf(line, "<blend type=\"death\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSDeathBlends[i][j]));
+				strprintf(line, "<blend type=\"death\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSDeathBlends[i][j]));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
+				strprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "\t<state name=\"death\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("death", j));
+				strprintf(line, "\t<state name=\"death\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("death", j));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "</blend>\n");
+				strprintf(line, "</blend>\n");
 				OS_WRITE(fd, line, strlen(line));
 			}
 		}
@@ -513,15 +513,15 @@ void fpTPSDumpStates()
 				if(fpTPSCombatEmotes[i][j][k])
 				{
 					*line = 0;
-					sprintf(line, "<blend type=\"combatemote\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSCombatEmotes[i][j][k]));
+					strprintf(line, "<blend type=\"combatemote\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSCombatEmotes[i][j][k]));
 					OS_WRITE(fd, line, strlen(line));
-					sprintf(line, "\t<state name=\"combatemote\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("combatemote", i));
+					strprintf(line, "\t<state name=\"combatemote\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("combatemote", i));
 					OS_WRITE(fd, line, strlen(line));
-					sprintf(line, "\t<state name=\"hand\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("hand", j));
+					strprintf(line, "\t<state name=\"hand\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("hand", j));
 					OS_WRITE(fd, line, strlen(line));
-					sprintf(line, "\t<state name=\"mixin\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("mixin", k));
+					strprintf(line, "\t<state name=\"mixin\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("mixin", k));
 					OS_WRITE(fd, line, strlen(line));
-					sprintf(line, "</blend>\n");
+					strprintf(line, "</blend>\n");
 					OS_WRITE(fd, line, strlen(line));
 				}
 			}
@@ -533,11 +533,11 @@ void fpTPSDumpStates()
 		if(fpTPSBodyEmotes[i])
 		{
 			*line = 0;
-			sprintf(line, "<blend type=\"bodyemote\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSBodyEmotes[i]));
+			strprintf(line, "<blend type=\"bodyemote\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSBodyEmotes[i]));
 			OS_WRITE(fd, line, strlen(line));
-			sprintf(line, "\t<state name=\"bodyemote\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("bodyemote", i));
+			strprintf(line, "\t<state name=\"bodyemote\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("bodyemote", i));
 			OS_WRITE(fd, line, strlen(line));
-			sprintf(line, "</blend>\n");
+			strprintf(line, "</blend>\n");
 			OS_WRITE(fd, line, strlen(line));
 		}
 	}

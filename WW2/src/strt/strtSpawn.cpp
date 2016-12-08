@@ -1038,7 +1038,7 @@ WeaponsReturn::process() const
 	currentWeapon->m_isDead = m_isVehicleDead;
 
 	static char info[128];
-	sprintf(info, "p:%u c:%s v:%u return:", currentWeapon->m_commander, Chat::Name(currentWeapon->m_handle).c_str(), m_sortieID);
+	strprintf(info, "p:%u c:%s v:%u return:", currentWeapon->m_commander, Chat::Name(currentWeapon->m_handle).c_str(), m_sortieID);
 
 	dbugLog(_FLD, "%s to " PRF_FULL_OBJ_ID " co-ords %d.%d.%d ex:%u %s %s %s"
 			, info

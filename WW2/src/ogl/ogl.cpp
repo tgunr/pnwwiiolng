@@ -2395,7 +2395,7 @@ SINT32		numcomps, *comps;
 
 	tp = (SINT8*)glGetString(GL_VERSION);
 	static char OGL_Requirements[128];
-	sprintf(OGL_Requirements, "OpenGL drivers %u.%u or higher are required", OPENGL_MAJOR_VERSION, OPENGL_MINOR_VERSION);
+	strprintf(OGL_Requirements, "OpenGL drivers %u.%u or higher are required", OPENGL_MAJOR_VERSION, OPENGL_MINOR_VERSION);
 	if (tp != nullptr)
 	{
 		Write_Debug("Version:   %s", tp);

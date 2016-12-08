@@ -1035,32 +1035,6 @@ void _sndsGetListenerPos(FLOAT64VECTOR* headPos, FLOAT64VECTOR* headLook, FLOAT6
     headPos->y = -playpos.y;
     headPos->z = -playpos.z;
 
-#if FRES
-	piVECTOR up = {0,0,-1};
-	piVECTOR front = {0,1,0};
-	piVECTOR right = {1,0,0};
-
-	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
-	if(Vehicle && Vehicle->ModelData)
-	{
-		math3dMultiplyRotation(&front, &front, &Vehicle->ModelData->VehicleAttMat);
-		math3dMultiplyRotation(&up, &up, &Vehicle->ModelData->VehicleAttMat);
-		math3dMultiplyRotation(&right, &right, &Vehicle->ModelData->VehicleAttMat);
-
-		headUp->x = up.x;
-		headUp->y = up.y;
-		headUp->z = up.z;
-
-		headLook->x =  front.x;
-		headLook->y =  front.y;
-		headLook->z = -front.z;
-
-		headRight->x = right.x;
-		headRight->y = right.y;
-		headRight->z = right.z;
-	}
-
-#else
     headUp->x = playup.x;
     headUp->y = playup.y;
     headUp->z = playup.z;
@@ -1072,7 +1046,6 @@ void _sndsGetListenerPos(FLOAT64VECTOR* headPos, FLOAT64VECTOR* headLook, FLOAT6
     headRight->x = playright.x;
     headRight->y = playright.y;
     headRight->z = playright.z;
-#endif
 
     persGetPlayerVelocity(&vel);
 

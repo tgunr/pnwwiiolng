@@ -121,9 +121,7 @@ LOGICAL CWW2Shader::initialize()
 
 #if 0 //def BETA_RELEASE
     SCHAR szBuff[64];
-
-    sprintf(szBuff, "%s", cgGetProfileString(m_cgVprofile));
-
+    strprintf(szBuff, "%s", cgGetProfileString(m_cgVprofile));
     Write_Debug("[CWW2Shader::Init] Latest supported vertex profile is %s", szBuff);
 #endif
 
@@ -143,8 +141,7 @@ LOGICAL CWW2Shader::initialize()
 #endif
 
 #if 0 //def BETA_RELEASE
-    sprintf(szBuff, "%s", cgGetProfileString(m_cgFprofile));
-
+    strprintf(szBuff, "%s", cgGetProfileString(m_cgFprofile));
     Write_Debug("[CWW2Shader::Init] Latest supported fragment profile is %s", szBuff);
 #endif
 
@@ -585,7 +582,7 @@ void _cgErrorCallback()
         strcpy(szErr, "[_cgErrorCallback] ");
         strcat(szErr, p);
         SCHAR s[256];
-        sprintf(s, "%d %s", count++, szErr);
+        strprintf(s, "%d %s", count++, szErr);
         Write_Debug(s);
 
         g_bError = TRUE;

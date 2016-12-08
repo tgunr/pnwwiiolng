@@ -665,7 +665,7 @@ void ApplyTankFire(struct vehVehicle* v)
 
     for(int i = 0; i < VEH_MAX_FIREPOINTS; i++)
     {
-        sprintf(s,"tfire%d",i+1);
+        strprintf(s, "tfire%d", i+1);
 
         ogrpFindSubObjectByName(&v->StateAnimation.TankFireEmitterPoint[i],
 						        v->VehicleObjectData->EffectsObject,

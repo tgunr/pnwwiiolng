@@ -151,7 +151,7 @@ _populateEnemyMessage(Chat::HostMessage& enemyMsg, const Chat::HostMessage& frie
 	memcpy(&enemyMsg, &friendlyMsg, sizeof(friendlyMsg));
 	enemyMsg.icon = Chat::ENEMY_SAY_ICON;
 
-#if !defined(TRAINING_SERVER) && !defined(FRES)
+#if !defined(TRAINING_SERVER)
 	static const size_t MAX_FOREIGN_STRING_LEN = 80;		// Lets not over-do them or allow spamming
 	enemyMsg.msg = chatForeignizeMessage(country, strnlen(phrase, MAX_FOREIGN_STRING_LEN));
 	enemyMsg.length = (UINT32)strnlen(enemyMsg.msg, MAX_MESSAGE_LENGTH);

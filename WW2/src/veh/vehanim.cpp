@@ -1497,7 +1497,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 				{
 //					Vehicle->StateAnimation.FuelFireEmitter[StateType->Data-1] = (OBJECT*)-1;
 					char s[256];
-					sprintf(s,"State %s, fuel fire emitter smoke, unable to find dof %s, Vehicle type = %s",
+					strprintf(s,"State %s, fuel fire emitter smoke, unable to find dof %s, Vehicle type = %s",
 							StateType->Name,
 							(char*)StateType->Emitter,
 							Vehicle->VehicleType->Description);
@@ -1519,7 +1519,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 				{
 //					Vehicle->StateAnimation.FuelLeakSmokeEmitter[StateType->Data-1] = (OBJECT*)-1;
 					char s[256];
-					sprintf(s,"State %s, fuel leak smoke, unable to find dof %s, Vehicle type = %s",
+					strprintf(s,"State %s, fuel leak smoke, unable to find dof %s, Vehicle type = %s",
 							StateType->Name,
 							(char*)StateType->Emitter,
 							Vehicle->VehicleType->Description);
@@ -1541,7 +1541,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 				{
 //					Vehicle->StateAnimation.OilLeakSmokeEmitter[StateType->Data-1] = (OBJECT*)-1;
 					char s[256];
-					sprintf(s,"State %s, oil leak smoke, unable to find dof %s, Vehicle type = %s",
+					strprintf(s,"State %s, oil leak smoke, unable to find dof %s, Vehicle type = %s",
 							StateType->Name,
 							(char*)StateType->Emitter,
 							Vehicle->VehicleType->Description);
@@ -1567,7 +1567,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 					{
 //						Vehicle->StateAnimation.GlycolLeakSmokeEmitter[StateType->Data-1][StateType->Data1-1] = (OBJECT*)-1;
 						char s[256];
-						sprintf(s,"State %s, glycol leak smoke, unable to find dof %s, Vehicle type = %s",
+						strprintf(s,"State %s, glycol leak smoke, unable to find dof %s, Vehicle type = %s",
 								StateType->Name,
 								(char*)StateType->Emitter,
 								Vehicle->VehicleType->Description);
@@ -1592,7 +1592,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 				{
 //					Vehicle->StateAnimation.EngineFireEmitter[StateType->Data-1] = (OBJECT*)-1;
 					char s[256];
-					sprintf(s,"State %s, engine fire smoke, unable to find dof %s, Vehicle type = %s",
+					strprintf(s,"State %s, engine fire smoke, unable to find dof %s, Vehicle type = %s",
 							StateType->Name,
 							(char*)StateType->Emitter,
 							Vehicle->VehicleType->Description);
@@ -1615,7 +1615,8 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 				// find the tank fire emitter points
 				for (i=0;i<VEH_MAX_FIREPOINTS;i++)
 				{
-					sprintf(s,"tfire%d",i+1);
+					char s[256];
+					strprintf(s,"tfire%d",i+1);
 					ogrpFindSubObjectByName(&Vehicle->StateAnimation.TankFireEmitterPoint[i],
 											Vehicle->VehicleObjectData->EffectsObject,
 											s);;
@@ -1674,7 +1675,7 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
 
     if(lpLeft == nullptr)
     {
-        sprintf(szDOFName, "%s", (SCHAR*)pStateType->Emitter);
+        strprintf(szDOFName, "%s", (SCHAR*)pStateType->Emitter);
 	    ogrpFindSubObjectByName(&lpLeft, Vehicle->VehicleObjectData->EffectsObject, szDOFName);
 
         if(lpLeft == nullptr)
@@ -1682,7 +1683,7 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
 	        SCHAR szBuff[128];
 	        const SCHAR* pStr = "State %s, exhaust smoke, unable to find dof %s, Vehicle type = %s";
 
-	        sprintf(szBuff,
+	        strprintf(szBuff,
 	                pStr,
 	                pStateType->Name,
 	                (SCHAR*)pStateType->Emitter,
@@ -1697,7 +1698,7 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
 
     if(lpRight == nullptr)
     {
-        sprintf(szDOFName, "%s", (SCHAR*)pStateType->Emitter);
+        strprintf(szDOFName, "%s", (SCHAR*)pStateType->Emitter);
 	    ogrpFindSubObjectByName(&lpRight, Vehicle->VehicleObjectData->EffectsObject, szDOFName);
 
         if(lpRight == nullptr)
@@ -1705,7 +1706,7 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
 	        SCHAR szBuff[128];
 	        const SCHAR* pStr = "State %s, exhaust smoke, unable to find dof %s, Vehicle type = %s";
 
-	        sprintf(szBuff,
+	        strprintf(szBuff,
 	                pStr,
 	                pStateType->Name,
 	                (SCHAR*)pStateType->Emitter,
@@ -1789,7 +1790,7 @@ UINT32 _DoWingVortexState(vehVehicle*pVeh,
         if(pVeh->StateAnimation.WingtipVortexEmitter[q] == nullptr)
         {
             SCHAR s[256];
-            sprintf(s, "State %s, wingtip vortex smoke, unable to find dof %s, Vehicle type = %s",
+            strprintf(s, "State %s, wingtip vortex smoke, unable to find dof %s, Vehicle type = %s",
                     pStateType->Name,
                     (SCHAR*)pStateType->Emitter,
                     pVeh->VehicleType->Description);
@@ -1830,7 +1831,7 @@ UINT32 _DoTreadDustState(vehVehicle*Vehicle,
 
     if(lpEmit == nullptr)
     {
-        sprintf(szDOFName, "%s", (SCHAR*)pStateType->Emitter);
+        strprintf(szDOFName, "%s", (SCHAR*)pStateType->Emitter);
 	    ogrpFindSubObjectByName(&lpEmit, Vehicle->VehicleObjectData->EffectsObject, szDOFName);
 
         if(lpEmit == nullptr)
@@ -1838,7 +1839,7 @@ UINT32 _DoTreadDustState(vehVehicle*Vehicle,
 	        SCHAR szBuff[128];
 	        const char* pStr = "State %s, exhaust smoke, unable to find dof %s, Vehicle type = %s";
 
-	        sprintf(szBuff,
+	        strprintf(szBuff,
 	                pStr,
 	                pStateType->Name,
 	                (SCHAR*)pStateType->Emitter,

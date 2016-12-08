@@ -659,7 +659,7 @@ _checkSTO(ServerTrackedObject& sto)
 		{
 #ifdef BETA_RELEASE
 			char buf[128];
-			sprintf(buf, "ums:%u(m:%u) ", umssto.uid(), umssto.missionID());
+			strprintf(buf, "ums:%u(m:%u) ", umssto.uid(), umssto.missionID());
 			stoList += buf;
 #endif
 
@@ -719,7 +719,7 @@ _dumpSTO(ServerTrackedObject& sto)
 	break;
 	}
 
-	sprintf(buf, "%s:%u(%u.%u,age:%u,ls:%u) "
+	strprintf(buf, "%s:%u(%u.%u,age:%u,ls:%u) "
 					, type, sto.uid(), sto.type(), sto.subType(), age, life);
 
 	stoList += buf;
