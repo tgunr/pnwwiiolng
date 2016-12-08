@@ -3,14 +3,13 @@
 
 #include "mem/mem.h"
 #include "str/strdupptr.h"
+#include "teul/teulBasic.h"
 #include "teul/teulConfigVar.h"
 #include "include/io_mapped_file.h"
 
 #if platOS == OS_WIN32
 #include "Shlobj.h"
 #endif
-
-extern bool teulGetHost(const SCHAR* address, UINT32* host);
 
 #ifndef PN_PLAYNET_PATH
 #error "PN_PLAYNET_PATH not defined."
@@ -63,6 +62,7 @@ static ConfigVars& _getConfigVars()
 ////////////////////////////////////////////////////////////////////////////////
 // Variables.
 
+const CFG_PATH(pnPath, PN_PLAYNET_PATH, "PLAYNET_PATH", true, "Hard-coded playnet directory.");
 CFG_PATH(dataDir, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "data", "DATA_DIR", true, "Top level directory for game data.");
 CFG_PATH(importFile, "importlist.txt", "IMPORT_FILE", true, "File which will specify sdm files to be used by the server.");
 CFG_PATH(terrainSubdir, "terrain", "TERRAIN_SUBDIR", true, "Path from DATA_DIR to the terrain sdm files and origin file.");
@@ -183,7 +183,9 @@ static Teul::ConfigVar* _findConfigVar(const std::string& envName)
 {
 	auto& vars = _getConfigVars();
 	auto it = std::find_if(vars.begin(), vars.end(),
-		[=](const Teul::ConfigVar* cv) { return envName.compare(cv->GetEnvVarName()) == 0; }
+		[=](const Teul::ConfigVar* cv) {
+			return envName.compare(cv->GetEnvVarName()) == 0;
+		}
 	);
 	return it != vars.end() ? *it : nullptr;
 }
@@ -297,18 +299,6 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 				break;
 			}
 		}
-
-		if ( !configEntries.m_foundGeneralFile && !configEntries.m_foundOSFile )
-		{
-#if defined(WIN32) && defined(UNICODE)
-			_ftprintf(stderr, _T("NOTE: Could not find '%s' or '%s' config files, using defaults.\n"),
-				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
-#else
-			fprintf(stderr, "NOTE: Could not find '%s' or '%s' config files, using defaults.\n",
-				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
-#endif
-		}
-
 		configEntries.m_read = true;
 	}
 
@@ -372,7 +362,11 @@ void Teul::ConfigVar::Generate(const char* const filename_)
 				, it->GetDefault() ? '"' : '>'
 				);
 		fprintf(fp, "# %s\n", it->GetDescription());
-		fprintf(fp, "#%s=%s\n", it->GetEnvVarName(), (it->GetDefault() ? it->GetDefault() : (it->GetRequired() ? "???" : "")));
+		if ( it->IsInitialized() && it->GetString() && (!it->GetDefault() || strcmp(it->GetString(), it->GetDefault()) != 0) ) {
+			fprintf(fp, "%s=%s\n", it->GetEnvVarName(), it->GetString());
+		} else {
+			fprintf(fp, "#%s=%s\n", it->GetEnvVarName(), (it->GetDefault() ? it->GetDefault() : (it->GetRequired() ? "???" : "")));
+		}
 		fprintf(fp, "\n");
 	}
 	fclose(fp);
@@ -385,6 +379,9 @@ namespace Teul
 {
 	void ConfigVar::InitializeConfigVars()
 	{
+		// Windows needs to have WinSock initialized to be able to
+		// resolve names for addresses.
+		Teul::InitializeWinsock();
 		for (auto& it : _getConfigVars())
 		{
 			it->Initialize();
@@ -399,6 +396,17 @@ namespace Teul
 	bool ConfigVar::LoadedOSConfig()
 	{
 		return _getConfigEntries().m_foundOSFile;
+	}
+
+	const char* ConfigVar::GetEnv(const std::string& varName)
+	{
+		auto var = _findConfigVar(varName);
+		if ( var ) {
+			if ( var->IsInitialized() && var->GetString() )
+				return var->GetString();
+			return var->GetDefault() ? var->GetDefault() : "";
+		}
+		return nullptr;
 	}
 
 	ConfigVar::ConfigVar(ConfigVarType type_, const char* name_, const char* default_, const char* envVarName_, bool required_, const char* description_)
@@ -444,6 +452,18 @@ namespace Teul
 
 	void ConfigVar::CheckConfiguration()
 	{
+		ConfigEntries& configEntries = _getConfigEntries();
+		if ( !configEntries.m_foundGeneralFile && !configEntries.m_foundOSFile )
+		{
+#if defined(WIN32) && defined(UNICODE)
+			_ftprintf(stderr, _T("NOTE: Could not find '%s' or '%s' config files, using defaults.\n"),
+				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+#else
+			fprintf(stderr, "NOTE: Could not find '%s' or '%s' config files, using defaults.\n",
+				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+#endif
+		}
+
 		for (auto& it : _getConfigVars())
 		{
 			if (it->m_required && (it->m_value == nullptr || (it->m_default == nullptr && *it->m_value == 0)))
@@ -595,7 +615,7 @@ namespace Teul
 
 	void ConfigVar::SetUint32Value(UINT32 newValue_)
 	{
-		if ( m_initialized && newValue_ == m_union.um_uint32 )
+		if ( m_initialized && newValue_ == m_union.um_uint32 && m_value[0] )
 			return;
 		m_initialized = true;
 		m_union.um_uint32 = newValue_;
@@ -604,7 +624,7 @@ namespace Teul
 
 	void ConfigVar::SetSint32Value(SINT32 newValue_)
 	{
-		if ( m_initialized && newValue_ == m_union.um_sint32 )
+		if ( m_initialized && newValue_ == m_union.um_sint32 && m_value[0] )
 			return;
 		m_initialized = true;
 		m_union.um_sint32 = newValue_;
@@ -618,7 +638,7 @@ namespace Teul
 
 	void ConfigVar::SetIPAddressValue(UINT32 newValue_)
 	{
-		if ( m_initialized && newValue_ == m_union.um_uint32 )
+		if ( m_initialized && newValue_ == m_union.um_uint32 && m_value[0] )
 			return;
 		m_initialized = true;
 		if ( m_value )

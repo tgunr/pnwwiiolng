@@ -643,6 +643,7 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 	inEndpoint.shutdown();
 
 	inEndpoint.m_state = IS_DEAD;
+	inEndpoint.m_doTimeoutCheck = false;	// stop checking timeouts on me.
 
 	teulRemoveEndpoint(&inEndpoint);
 }

@@ -48,6 +48,7 @@ namespace Teul
 		const char* GetDefault() const { return m_default; }
 		bool GetRequired() const { return m_required; }
 
+		bool IsInitialized() const noexcept { return m_initialized; }
 		bool IsNumber() const { return (m_type == CVT_UNSIGNED_INT || m_type == CVT_SIGNED_INT); }
 		void Set(const char* str_);
 
@@ -76,6 +77,11 @@ namespace Teul
 
 		//! Dump current config vars to stdout and exit.
 		static void PrintCurrentVars();
+
+		//! Looks up a variable by its env name and returns
+		//!  a pointer to it's value, a pointer to the empty string
+		//!  or a null pointer if the name did not match a variable.
+		static const char* GetEnv(const std::string& varName);
 
 		//! Generate a default config file to specified filename and exit.
 		static void Generate(const char* filename_);
@@ -134,3 +140,5 @@ using ConfigSint = Teul::ConfigVar;
 using ConfigBool = Teul::ConfigVar;
 using ConfigAddr = Teul::ConfigVar;
 using ConfigPath = Teul::ConfigVar;
+
+extern const ConfigPath cv_pnPath;

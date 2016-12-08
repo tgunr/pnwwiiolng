@@ -325,7 +325,6 @@ main(int argc,char** argv)
 {
 	g_appName = argv[0];
 	Teul::ConfigVar::InitializeConfigVars();
-	Teul::InitializeWinsock();
 
 	SCHAR* filename;
 	//LOGICAL moreFiles = TRUE;
@@ -407,6 +406,10 @@ main(int argc,char** argv)
 	int result = chdir(cv_dataDir.GetString());
 	if ( result < 0 )
 		LogAbort("Unable to access working directory %s: %d", cv_dataDir.GetString(), result);
+
+	dbugInit(LogMode::TO_FILE, "stratLoader");
+	dbugSetLogLevel(Debug::ERR_INFO | STD_ERR);
+	dbugSetWriteLevel(Debug::ERR_INFO | STD_ERR);
 
 	_checkDirectoryStructure();
 

@@ -286,7 +286,7 @@ public:
 		target->message(LSTR_WARNING, LSTR_GM_MOVED_YOU, args[1]);
 
 		std::string note = args[1];
-                DBThread::EscapeString(note);
+		DBThread::EscapeString(note);
 
 		if ( note.length() > 400 )
 			note.resize(400);
@@ -1052,7 +1052,7 @@ class LastCapQuery : public DBThreadQuery
 public:
 	LastCapQuery(const ChatHandle byMatchID, const char* clause)
 		: DBThreadQuery(DBThread::Default, "LastCapQuery", DBThreadQuery::_CALLBACK
-			, "SELECT * FROM `strat`.`v_last_captures` %s LIMIT 8", clause
+			, "SELECT * FROM `wwiionline`.`v_last_captures` %s LIMIT 8", clause
 			)
 		, m_matchID(byMatchID)
 		, m_results()

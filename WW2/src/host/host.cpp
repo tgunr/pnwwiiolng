@@ -2965,8 +2965,8 @@ int
 main(const int argc, const char* argv[])
 {
 	Server::InitializeProcess(g_serverName, CELL_HOST, _updaterErrorFunction, _killUpdater, argc, argv, {
-		{ "-db", "Deprecated.", false, [](const char*) {} },
-		{ "--reserved", "Flag cell as reserved for recordings.", false, [](const char*) { g_serverReserved = true; } }
+		{ "-db", "Deprecated.", false, [](const char*) {}, nullptr },
+		{ "--reserved", "Flag cell as reserved for recordings.", false, [](const char*) { g_serverReserved = true; }, nullptr }
 	});
 	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);

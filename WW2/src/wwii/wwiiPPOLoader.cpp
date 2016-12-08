@@ -322,10 +322,10 @@ bool PPOSpecLoader::checkList(std::vector<std::string> & tlist, int vehclass, in
 {
 	bool retVal = allowed;
 
-	dbugLog(_FLD, "checkList(list:%" PRSizeT ", vehclass=%d, vehtype=%d, allowed=%d, setValue=%d",
+	dbugLog(_FLD, "checkList(list:%" PRSizeT ", vehclass=%d, vehtype=%d, allowed=%d, setValue=%d)",
 		tlist.size(), vehclass, vehtype, allowed, setValue);
 
-	// first lets see if this vehicle class/type is being spacifically mentioned
+	// first lets see if this vehicle class/type is being specifically mentioned
 	for (size_t i=0; i < tlist.size(); i++)
 	{
 		// String in format Nc/Nt  (Class/Type)
