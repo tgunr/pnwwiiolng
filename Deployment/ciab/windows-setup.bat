@@ -58,111 +58,14 @@ IF %errorlevel% == 0 (
 
 echo.
 IF NOT EXIST C:\playnet (
-    echo C:\playnet already exists, making sure it's populated correctly...
+    echo Creating C:\playnet directory structure.
+    call make-win-playnet.bat
 ) ELSE (
-    echo Creating C:\playnet directories.
+    echo C:\playnet already exists, not touching structure.
 )
-call make-win-playnet.bat
-
-:CheckData
-set data_dst=C:\Playnet\wwiiol\data
-set test_file=blitzWor.csv
-echo.
-echo Checking for blitzWor:
-IF EXIST "%data_dst%\%test_file%" (
-    echo Great - you appear to have %data_dst% ready to go.
-    GOTO CopyFiles
-)
-echo . Not found: %data_dst%\%test_file%
-IF EXIST WW2Mods\DATA\%test_file% (
-    set data_src=WW2Mods\DATA
-    GOTO SetupDataDir
-)
-echo . Not FOund: WW2Mods\Data\%test_file%
-IF EXIST DATA\%test_file% (
-    set data_src=DATA
-    GOTO SetupDataDir
-)
-
-echo.
-echo ========== PROBLEM ==========
-echo.
-echo ERROR: Could not find a DATA directory.
-echo.
-
-:GetDataDir
-set /P data_src="Enter full path to DATA directory: "
-if EXIST "%data_src%\%test_file%" GOTO DecideCopyMoveOrLink
-if NOT EXIST "%data_src%\DATA\%test_file%" (
-    echo ERROR: Could not find %data_src%\%test_file%.
-    GOTO GetDataDir
-)
-set data_src=%data_src%\DATA
-
-:DecideCopyMoveOrLink
-@rem check if 'mklink' is available
-mkdir t1
-mklink /J t2 t1 >NUL 2>NUL
-set mklink_result=%errorlevel%
-rmdir /S /Q t1 t2
-
-echo.
-echo Found blitzWor.csv in %data_src%.
-echo.
-echo ========== Attention ==========
-echo.
-echo Please choose whether to COPY, MOVE or LINK %data_src% to %data_dst%.
-echo 'COPY' will take a while and use more disk space,
-echo 'MOVE' is very quick,
-if %mklink_result% == 0 (
-    echo 'LINK' is cheap but breaks if the source directory is deleted/moved.
-    set op_prompt=COPY, MOVE or LINK
-) ELSE (
-    echo 'LINK' is not available on your system.
-    set op_prompt=COPY or MOVE
-)
-echo.
-
-:GetOpType
-set /P op_type="Enter %op_prompt%: "
-if %op_type% == COPY (
-    echo Copying %data_src% to %data_dst%... Please wait.
-    xcopy "%data_src%" "%data_dst%" /S /E /K /V /Q /R /Y /I
-    GOTO OpDone
-)
-if %op_type% == MOVE (
-    echo Moving %data_src% to %data_dst%.
-    rmdir /S /Q "%data_dst%"
-    move "%data_src%" "%data_dst%"
-    GOTO OpDone
-)
-if %mklink_result% == 0 if %op_type% == LINK (
-    rmdir /S /Q "%data_dst%"
-    mklink /J "%data_dst%" "%data_src%"
-    GOTO OpDone
-)
-echo ERROR: Unrecognized/unavailable option '%op_type%' (case matters).
-GOTO GetOpType
-
-:OpDone
-if %errorlevel% NEQ 0 (
-    echo ERROR: %op_type% operation failed.
-    echo Either try a different operation or press CTRL-C to terminate.
-    GOTO GetOpType
-)
-
-:CopyFiles
-echo.
-echo Copying Server Binaries to C:\playnet\wwiiol\bin
-xcopy /QRY Server\*.exe C:\playnet\wwiiol\bin
-xcopy /QRY Server\*.dll C:\playnet\wwiiol\bin
-echo Copying Lua files to C:\playnet\wwiiol\lua
-xcopy /QRY Lua\*.lua C:\playnet\wwiiol\lua
-
 
 :RunInstaller
 echo.
-echo And now ... Running the CiaB bootstrap script.
 call python bootstrap.py
 if %errorlevel% NEQ 0 (
     echo.
