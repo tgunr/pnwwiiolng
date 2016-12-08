@@ -19,7 +19,7 @@
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiThreads.h"
 
-#ifdef BETA_RELEASE
+#if defined(DEV_BUILD)
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO

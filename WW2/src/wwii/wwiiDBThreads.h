@@ -81,9 +81,13 @@ protected:
 
 namespace DBThread
 {
-	// Escape function to be used prior to adding a query
+	//! Creates a legal SQL string for use in an SQL statement based on the
+	//! character set / quoting context of the specified db connection.
 	extern void EscapeString(DB::handle_t* conn, std::string& text);
-	extern void EscapeString(std::string& text);
+	//! Creates a legal SQL string for use in an SQL statement using the
+	//! default, dbh, database connection.
+	//! NOTE: Not re-entrant, not thread safe, use only from main thread.
+	static inline void EscapeString(std::string& text) { EscapeString(dbh, text); }
 
 	struct Thread : public PNThread
 	{

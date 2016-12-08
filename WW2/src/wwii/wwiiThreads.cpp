@@ -261,17 +261,6 @@ DBThread::EscapeString(DB::handle_t* conn, std::string& text)
     text = buff.get();
 }
 
-void
-DBThread::EscapeString(std::string& text)
-{
-	auto buff = std::make_unique<char[]>(text.length() * 2 + 1);
-    dbQueue.doLocked([&] {
-		///TODO: FIX: Conflicting access to the connection pointer
-        mysql_real_escape_string(dbThread[0].getConn(), buff.get(), text.c_str(), text.length());
-    });
-    text = buff.get();
-}
-
 //////////////////////////////////////////////////////////////////////
 // Add a callback to be invoked inside the main thread
 

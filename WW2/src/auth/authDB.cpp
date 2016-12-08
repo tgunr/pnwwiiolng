@@ -247,7 +247,7 @@ authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch
 			passwordMatch = row.NextUInt();
 			isActive = row.NextUInt();
 			gamecookie.m_customerID = row.NextUInt();
-			row.NextString(gamecookie.m_callsign, sizeof(gamecookie.m_callsign));
+			row.NextString(gamecookie.m_callsign);
 			haveInfo = row.NextUInt();
 
 			if ( gamecookie.m_callsign[0] == 0 )
@@ -440,9 +440,9 @@ _getAppTable()
 
 			entry.appID = row.NextUInt();
 			entry.gameID = row.NextUInt();
-			row.NextString(entry.appleID, sizeof(entry.appleID));
+			row.NextString(entry.appleID);
 			entry.description[0] = 0;
-			row.NextString(entry.description, sizeof(entry.description));
+			row.NextString(entry.description);
 			if ( entry.description[0] == 0 )
 				strprintf(entry.description, "Unknown Game#%u/%u", entry.appID, entry.gameID);
 		}
@@ -473,15 +473,13 @@ _findAppTable(UINT32 appID)
 //////////////////////////////////////////////////////////////////////
 static bool _initAppInfoTable(GAME& gameEntry)
 {
-	SCHAR statement[512];
-	SINT32 i, platform;
-
-	for ( i = 0; i < OS_MAX_PLAT; i++)
+	for ( auto i = 0; i < OS_MAX_PLAT; i++)
 	{
 		gameEntry.appInfo[i].max = gameEntry.curHostVersion;
 		gameEntry.appInfo[i].min = gameEntry.curHostVersion;
 	}
 
+    char statement[512];
 	strprintf(statement, QRY_SELECT_HOST_VERSIONS_BY_APPHOST, gameEntry.appID, teulGetAddress(gameEntry.curHostVersion));
 	try
 	{
@@ -497,13 +495,12 @@ static bool _initAppInfoTable(GAME& gameEntry)
 		while ( q.FetchRow() )
 		{
 			auto& row = q.Row();
-			platform = (SINT32)atol(row[0]);
-
-			if ( platform < 0 || platform > OS_MAX_PLAT)
+			size_t platform = row.NextUInt();
+			if ( platform < 0 || platform >= OS_MAX_PLAT )
 				throw std::logic_error("illegal platform value in app_host_versions");
 
-			teulGetHost(row[1], &gameEntry.appInfo[platform].min);
-			teulGetHost(row[2], &gameEntry.appInfo[platform].max);
+			teulGetHost(row.NextString(), &gameEntry.appInfo[platform].min);
+			teulGetHost(row.NextString(), &gameEntry.appInfo[platform].max);
 		}
 
 		return true;
@@ -649,40 +646,21 @@ authInitApps()
 }
 
 //////////////////////////////////////////////////////////////////////
-static bool
-_getPlayerTable(GAME& gameEntry)
+bool authInitGameEntry(GAME& gameEntry)
 {
-	try
-	{
-		DBQuery q(dbh, "SELECT playertable FROM `auth`.`auth_games` WHERE gameID = %u", gameEntry.gameID);
-		if ( q.HasRows() == false || q.FetchRow() == false )
-			throw std::invalid_argument("couldn't find game entry");
-
-		strsafecpy(gameEntry.playerTable, q.Row()[0]);
-
-		dbugLog(_FLI, "arena:%d game:%d setting playerTable to %s", gameEntry.arenaID, gameEntry.gameID, gameEntry.playerTable);
-		return true;
-	}
-	catch (std::exception& e) { dbugLog(_FLA, "arena:%d game:%d %s", gameEntry.arenaID, gameEntry.gameID, e.what()); }
-
+	const APP_TABLE_ENTRY* appEntry = _findAppTable(gameEntry.appID);
+	if (appEntry == nullptr) {
+		dbugLog(_FLM, "appID %d not found in appTable", gameEntry.appID);
 	return false;
 }
 
-//////////////////////////////////////////////////////////////////////
-bool authInitGameEntry(GAME& gameEntry)
-{
-	APP_TABLE_ENTRY* appEntry;
-
-	 appEntry = _findAppTable(gameEntry.appID);
-	 if (appEntry == nullptr)
-	 	return false;
-
-	memcpy(gameEntry.appleID, appEntry->appleID, APPLE_ID_LEN);
+	strsafecpy(gameEntry.appleID, appEntry->appleID);
+	dbugLog(_FLD, "appID %d is %s", gameEntry.appID, gameEntry.appleID);
 
 	try
 	{
 		DBQuery q(dbh
-				,	"SELECT gameid, groupid, clusterid, method, description"
+				,	"SELECT gameid, groupid, clusterid, description"
 			 		" FROM auth_arenas WHERE arenaID = %u"
 			 		, gameEntry.arenaID
 			);
@@ -696,11 +674,13 @@ bool authInitGameEntry(GAME& gameEntry)
 		gameEntry.gameID = row.NextUInt();
 		gameEntry.groupID = row.NextUInt();
 		gameEntry.clusterID = row.NextUInt();
-		gameEntry.usePlayerID = (row.NextString()[0] == 'p');
 		gameEntry.description[0] = 0;
-		row.NextString(gameEntry.description, sizeof(gameEntry.description));
-		if ( gameEntry.description[0] == 0 )
+		row.NextString(gameEntry.description);
+		if ( gameEntry.description[0] == 0 ) {
 			strprintf(gameEntry.description, "Unk.Game#%u/%u", gameEntry.gameID, gameEntry.clusterID);
+			dbugLog(_FLM, "game entry for arenaID %u has no description, using default: %s"
+							, gameEntry.arenaID, gameEntry.description);
+		}
 	}
 	catch ( std::exception& e )
 	{
@@ -708,12 +688,8 @@ bool authInitGameEntry(GAME& gameEntry)
 		return false;
 	}
 
-	dbugLog(_FLN,"setting game entry gameID %d groupID %d clusterID %d usePlayerID %d description %s"
-				, gameEntry.gameID,gameEntry.groupID,gameEntry.clusterID
-				, gameEntry.usePlayerID,  gameEntry.description);
-
-	if ( gameEntry.usePlayerID && !_getPlayerTable(gameEntry) )
-		return false;
+	dbugLog(_FLN,"setting game entry gameID %d groupID %d clusterID %d description %s"
+				, gameEntry.gameID,gameEntry.groupID,gameEntry.clusterID, gameEntry.description);
 
 	return _initAppInfoTable(gameEntry);
 }
