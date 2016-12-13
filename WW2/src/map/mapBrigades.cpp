@@ -260,7 +260,7 @@ void
 Brigade::updateDestinations()
 {
 	// This function is a little complex because we need to try and avoid
-	// spending too much time dicking with these lists.
+	// spending too much time messing with these lists.
 	//
 	// So what we do is partition the mission list into a convenient
 	// active objective missions vs inactive/non-objective/non-city list.

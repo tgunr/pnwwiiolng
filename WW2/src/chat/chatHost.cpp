@@ -184,7 +184,7 @@ static UINT32	_stratHost = 0;
 static UINT16	_stratPort = 0;
 //static UINT32	_chatHost = 0;
 
-// This is getting ugly. Repeat after me: I will rewrite the chat-shite.
+// This is getting ugly. Repeat after me: I will rewrite the chat garbage.
 
 // Convert commonly used callsigns into 64bit handles
 ChatHandle alliedHandleID = chatGetHandle("ALLIED");

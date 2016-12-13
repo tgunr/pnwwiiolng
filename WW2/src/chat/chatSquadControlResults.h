@@ -37,7 +37,7 @@ enum SQUAD_CONTROL_RESULT
 ,	SQR_NOT_IMPLEMENTED						// Too soon!
 ,	SQR_CANT_DO_TO_SELF						// Can't do that to yourself
 ,	SQR_PLAYER_OUTRANKS						// Other player outranks you
-,	SQR_SQUAD_UNAVAILABLE					// Server is fucked
+,	SQR_SQUAD_UNAVAILABLE					// Something is very wrong
 ,	SQR_MUST_RESIGN							// XO/CO must resign
 ,	SQR_OPERATION_FAILED					// Operation failed
 ,	SQR_POSITION_OCCUPIED					// Position is taken (e.g. XO/CO)

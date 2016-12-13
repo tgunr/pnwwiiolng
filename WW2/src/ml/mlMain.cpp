@@ -3221,7 +3221,7 @@ static UINT32 _UpdateAirfoilComponent(mlComponent* Component, mlVehicleData* Veh
 				if(AirfoilComponentData->ControlSurfaceJammed)
 					VehicleData->CanopyJammed[AirfoilComponentData->Position] = 1;
 
-				// keep applying damage 'til that sucker's ripped off.
+				// keep applying damage 'til that thing's ripped off.
 				if(!Component->ComponentFailed && Component->CurrentDamage < MAX_DAMAGE)
 					Component->CurrentDamage += DRAG_DAMAGE * DeltaTime / 1000.0;
 

@@ -554,7 +554,7 @@ CaptureAction::ApplyEffects() const
 	if ( m_enteredContention == true )
 		EnterContention();
 
-	// Must leave contention before we fuck with control
+	// Must leave contention before we mess with control
 	if ( m_leftContention == true )
 		LeaveContention();
 
