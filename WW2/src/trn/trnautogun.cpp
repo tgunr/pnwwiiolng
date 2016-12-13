@@ -533,7 +533,7 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 		return FALSE;
 	}
 
-	sprintf(AG->Object->name,"%s%d",ObjectName,Counter);
+	strprintf(AG->Object->name,"%s%d",ObjectName,Counter);
 	ogrpParseDOFParameters(AG->Object,(UCHAR*)(&mlDOFVarNameTable[0][0]),ML_DOF_MAXNUM,32);
 
 	ogrpFindSubObjectByDOFVar(&(AG->FirePnt),AG->Object,ML_DOF_AG_FIRE);

@@ -389,14 +389,10 @@ HRESULT         hr;
 
     if(hr != DS_OK)
     {
-        SCHAR szBuff[256];
-
         DDError(hr);
 
-        sprintf(szBuff, "%s %s",
-        "[sndsPlatformLoadSound] **FAILED** to create sound buffer for",
-        whichSound->name);
-
+        SCHAR szBuff[256];
+        strprintf(szBuff, "%s %s", "[sndsPlatformLoadSound] **FAILED** to create sound buffer for", whichSound->name);
         Write_Log(LOG_SOUND, LOG_WARN, szBuff);
 
         if(wave)

@@ -168,7 +168,7 @@ SINT32 weaponsInit()
                             if(WeaponType->GhostAmmoType == nullptr)
                             {
                                 char s[128];
-                                sprintf(s, "ghostammotype %s not found", VarContents);
+                                strprintf(s, "ghostammotype %s not found", VarContents);
                                 Write_Debug(s);
 #if defined(BETA_RELEASE) && !defined (_DEBUG) && (platOS == OS_WIN32) // temp define until they fix the data
                                 piExitProgram(_FL, s);
@@ -191,7 +191,7 @@ SINT32 weaponsInit()
                             if(WeaponType->AmmoType[VarNum-WEAP_VAR_AMMOTYPE1] == nullptr)
                             {
                                 char s[128];
-                                sprintf(s, "ammotype %s not found", VarContents);
+                                strprintf(s, "ammotype %s not found", VarContents);
                                 Write_Debug(s);
 #if defined(BETA_RELEASE) && !defined (_DEBUG) && (platOS == OS_WIN32) // temp define until they fix the data
                                piExitProgram(_FL, s);

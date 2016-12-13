@@ -159,7 +159,7 @@ _initializeFakeWeapons()
 		HostVehicle* fake = hostCreateRemoteVehicle(Instance::g_campaign, serial, weap->spec());
 		assert(fake);
 		SHARED_VEHICLE_INFO& vi = fake->vehicleData;
-		sprintf(vi.callsign, "FAKE%04zu", s_fakes.size());
+		strprintf(vi.callsign, "FAKE%04zu", s_fakes.size());
 		vi.packedCallsign = chatGetHandle(vi.callsign);
 		vi.squad = fakeNo % numWeapons;
 		vi.rank = (fakeNo % 22) + 1;

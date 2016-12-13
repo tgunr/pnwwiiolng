@@ -444,7 +444,7 @@ _getAppTable()
 			entry.description[0] = 0;
 			row.NextString(entry.description);
 			if ( entry.description[0] == 0 )
-				sprintf(entry.description, "Unkown Game#%u/%u", entry.appID, entry.gameID);
+				strprintf(entry.description, "Unknown Game#%u/%u", entry.appID, entry.gameID);
 		}
 	}
 	catch (std::exception& e)
@@ -479,7 +479,7 @@ static bool _initAppInfoTable(GAME& gameEntry)
 		gameEntry.appInfo[i].min = gameEntry.curHostVersion;
 	}
 
-	char statement[512];
+    char statement[512];
 	strprintf(statement, QRY_SELECT_HOST_VERSIONS_BY_APPHOST, gameEntry.appID, teulGetAddress(gameEntry.curHostVersion));
 	try
 	{
@@ -525,7 +525,7 @@ _findIsFile(SCHAR manisfile)
 		case 'n':
 			return ISFILE_NUN;
 		default:
-		break;
+			break;
 	}
 	return ISFILE_URL;
 }
@@ -572,7 +572,7 @@ _getAppManifest()
 	{
 		for (appNum = 0; appNum < config.numApps; appNum++)
 		{
-			sprintf(statement,
+			strprintf(statement,
 						"SELECT old,new,platform,actionType,webURL,ftpPort,ftpProtocol,ftpURL,ftpDir,ftpFile"
 							",INET_ATON(old) AS sorter"
 							" FROM auth.app_manifest"
@@ -651,8 +651,8 @@ bool authInitGameEntry(GAME& gameEntry)
 	const APP_TABLE_ENTRY* appEntry = _findAppTable(gameEntry.appID);
 	if (appEntry == nullptr) {
 		dbugLog(_FLM, "appID %d not found in appTable", gameEntry.appID);
-	 	return false;
-	}
+	return false;
+}
 
 	strsafecpy(gameEntry.appleID, appEntry->appleID);
 	dbugLog(_FLD, "appID %d is %s", gameEntry.appID, gameEntry.appleID);

@@ -2131,7 +2131,7 @@ static void HandleClutterObject(const std::vector<Vec2f>& bucket, int color, voi
 
         if(obj)
         {
-            sprintf(buff, "clutter %s %f %f %f 0 0 %f 0 0 0 0", obj, (float)list[i].pos.x(), (float)list[i].pos.y(), (float)list[i].pos.z(), rot);
+            strprintf(buff, "clutter %s %f %f %f 0 0 %f 0 0 0 0", obj, (float)list[i].pos.x(), (float)list[i].pos.y(), (float)list[i].pos.z(), rot);
             SCEN_MGR->AddContent(buff);
         }
     }
@@ -2510,7 +2510,7 @@ struct AddMultiTexture
             tt = itr->second;
 
             char num[16];
-            sprintf(num, "%d", tt->layercount);
+            strprintf(num, "%d", tt->layercount);
 
             material->SetRenderState(new Program(tt->shader + num));
             std::vector<std::string> textures;
@@ -2613,7 +2613,7 @@ struct AddMultiTexture
             tt = itr->second;
 
             char num[16];
-            sprintf(num, "%d", tt->layercount);
+            strprintf(num, "%d", tt->layercount);
 
             material->SetShader(tt->shader + num);
             std::vector<std::string> textures;
@@ -2742,7 +2742,7 @@ static void damageObject(OBJECT* o)
         {
             for(unsigned int i = 0; i < pm->subModelReferences.size(); i++)
             {
-                sprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
+                strprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
 
                 OBJECT* ooo = obmainFindTopmostObject(model);
 

@@ -56,7 +56,9 @@ using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 #endif
 // #define MEMORY_DEBUG_EXTREME
 #elif defined(BETA_RELEASE)
-#define EVENT_LOG
+#ifndef EVENT_LOG
+# define EVENT_LOG
+#endif
 #endif	// _DEBUG
 
 #define NO_DEBUG_WRITE

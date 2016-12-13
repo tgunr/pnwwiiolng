@@ -1262,7 +1262,7 @@ UINT32 LoadoutNum = 0;
 								Loadout->WeaponObject[i][j],Loadout->MountObject[i]);
 							continue;
 						}
-						sprintf(Object1->name,"%sn%d",Loadout->WeaponObject[i][j],_WeaponCount++);
+						strprintf(Object1->name, "%sn%d", Loadout->WeaponObject[i][j],_WeaponCount++);
 
 						// insert object at connection point
 						ogrpMakeObjectAChildOfAnotherObject(AttachPnt,Object1);

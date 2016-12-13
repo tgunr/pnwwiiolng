@@ -356,13 +356,7 @@ LOGICAL dipSetupKeyboard()
 	}
 
 	// Set the cooperative level
-//#undef RELEASE_CLIENT
-//#define RELEASE_CLIENT 1
-#if RELEASE_CLIENT != 0
 	dirval = DIError(lpkbd->SetCooperativeLevel(myhwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY));
-#else
-	dirval = DIError(lpkbd->SetCooperativeLevel(myhwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY));
-#endif
  	if (dirval != DI_OK)
 	{
 		Write_Debug("SetCooperativeLevel for keyboard failed");

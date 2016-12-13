@@ -824,8 +824,7 @@ STRT_DTL_HEADER		sdh;
 
     _isdefault = 0;
 
-
-	sprintf(filename, "%s%04x_%04x%s", TERRAIN_PREPATH, (UINT16)td->scx, (UINT16)td->scy, TRN_EXT);
+	strprintf(filename, "%s%04x_%04x%s", TERRAIN_PREPATH, (UINT16)td->scx, (UINT16)td->scy, TRN_EXT);
 
 	hfile = fioOpen(filename);
 
@@ -835,7 +834,7 @@ STRT_DTL_HEADER		sdh;
 
 	if (hfile == -1)
 	{
-		sprintf(filename, "%s%04x_%04x%s", TERRAIN_PREPATH, (UINT16)td->scx, (UINT16)td->scy, TERRAINFILE_EXTENSION);
+		strprintf(filename, "%s%04x_%04x%s", TERRAIN_PREPATH, (UINT16)td->scx, (UINT16)td->scy, TERRAINFILE_EXTENSION);
 		Write_Debug("Attempting to substitue DTL file (%s) for SDM", filename);
 		hfile = fioOpen(filename);
 		ReadingSDM = FALSE;
@@ -850,21 +849,19 @@ STRT_DTL_HEADER		sdh;
         // Change back to old archive to get this
         // default.dtl is not ####_####.dtl!
 
-		sprintf(filename, "%sdefault%s", TERRAIN_PREPATH, TRN_EXT);
+		strprintf(filename, "%sdefault%s", TERRAIN_PREPATH, TRN_EXT);
 		hfile = fioOpen(filename);
 
 		ReadingSDM = TRUE;
 
 #if RELEASE_CLIENT == 0
-
 		if (hfile == -1)
 		{
-			sprintf(filename, "%sdefault%s", TERRAIN_PREPATH, TERRAINFILE_EXTENSION);
+			strprintf(filename, "%sdefault%s", TERRAIN_PREPATH, TERRAINFILE_EXTENSION);
 			Write_Debug("Attempting to substitue DTL file (%s) for SDM", filename);
 			hfile = fioOpen(filename);
 			ReadingSDM = FALSE;
 		}
-
 #endif
 
 		if (hfile == -1)
@@ -1508,7 +1505,7 @@ TERRAIN_DETAIL*	td;
 	{
 		if (td->nonreplacementtiles[i] == nullptr)
 		{
-			sprintf(objname, "%s_t%d", td->terrain->name, i);
+			strprintf(objname, "%s_t%d", td->terrain->name, i);
 
 			if (td->trindx <= SUPERCELL_OCTETS_XY)
 			{
@@ -1719,7 +1716,7 @@ TRNSTATEBLOCK*		tsb;
 	{
 		if (td->nonreplacementtiles[i] == nullptr)
 		{
-			sprintf(objname, "%s_t%d", td->terrain->name, i);
+			strprintf(objname, "%s_t%d", td->terrain->name, i);
 
 			if (td->trindx <= SUPERCELL_OCTETS_XY)
 			{

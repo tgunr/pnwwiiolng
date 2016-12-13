@@ -77,7 +77,7 @@ public:	// Templated so it can accept char* or wchar_t*
 		// Test wwiiPackHandle on a whole series of offsets.
 		for ( UINT32 baseOffset = 0; baseOffset <= GAME_HANDLE_BITS * 2; ++baseOffset )
 		{
-			sprintf(packBuffer, "%u bits offset", baseOffset);
+			strprintf(packBuffer, "%u bits offset", baseOffset);
 			TestFocus(packBuffer);
 
 			ChatHandle dest = 0;

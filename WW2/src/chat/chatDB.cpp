@@ -263,7 +263,7 @@ _readPermissionNames()
 	{
 		if ( permissionNames[i].empty() )
 		{
-			sprintf(name, "UNK_PERM_%u", i+1);
+			strprintf(name, "UNK_PERM_%u", i+1);
 			permissionNames[i] = name;
 		}
 	}

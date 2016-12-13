@@ -164,7 +164,7 @@ _checkSupplyLinksIn(const Supercell& sc)
 			if ( facility.m_outgoingLink == nullptr)
 			{
 				char buffer[256];
-				sprintf(buffer, "%d,%d:%d -> %s"
+				strprintf(buffer, "%d,%d:%d -> %s"
 								, newLink->fullObjID.cell.ox
 								, newLink->fullObjID.cell.oy
 								, newLink->fullObjID.id
@@ -187,7 +187,7 @@ _checkSupplyLinksIn(const Supercell& sc)
 			if ( facility.m_incomingLink == nullptr)
 			{
 				char buffer[256];
-				sprintf(buffer, "(%d,%d:%d -> %s)"
+				strprintf(buffer, "(%d,%d:%d -> %s)"
 								, newLink->fullObjID.cell.ox
 								, newLink->fullObjID.cell.oy
 								, newLink->fullObjID.id
@@ -461,7 +461,7 @@ _scPass1_objs(Supercell& sc)
 			if ( parentFacility->m_captureBuilding && parentFacility->m_captureBuilding != newObject )
 			{
 				char error[512];
-				sprintf(error, "type:%s vs %s type:%s"
+				strprintf(error, "type:%s vs %s type:%s"
 								, newObject->filename
 								, parentFacility->m_captureBuilding->name
 								, parentFacility->m_captureBuilding->filename
@@ -600,7 +600,7 @@ _scPass2_linkSetup(Supercell& sc)
 			if ( newLink->firebaseID == nullObjID )
 				continue;
 			char buffer[256];
-			sprintf(buffer, "%d,%d:%u", newLink->firebaseID.cell.ox, newLink->firebaseID.cell.oy, newLink->firebaseID.id);
+			strprintf(buffer, "%d,%d:%u", newLink->firebaseID.cell.ox, newLink->firebaseID.cell.oy, newLink->firebaseID.id);
 			g_dataErrors.emplace(ERR_LINK_FIREBASE, newLink->name, buffer);
 			continue;
 		}

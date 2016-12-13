@@ -44,8 +44,8 @@ public:
 
 public:
 protected:
-	virtual bool activate();
-	virtual void deactivate();
+	virtual bool activate() override;
+	virtual void deactivate() override;
 
 private:
 	FLOAT64 launched;
@@ -84,7 +84,7 @@ public:
 		{}
 
 public:
-	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr);
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) override;
 
 	int getSTOVehicleID() const { return m_uniqueSTOvehicleID; }
 	UINT32 getVehicleTypeNum();
@@ -106,8 +106,8 @@ public:
 
 protected:
 	// Interface for activating and deactivating
-	virtual bool activate();
-	virtual void deactivate();
+	virtual bool activate() override;
+	virtual void deactivate() override;
 
 	SINT32 m_uniqueSTOvehicleID;
 	std::string icon;
@@ -129,8 +129,8 @@ public:
 	HulkSTO(ACTION_OBJECT* const a) : VehicleSTO(a) {}
 
 protected:
-	virtual bool activate();
-	virtual void deactivate();
+	virtual bool activate() override;
+	virtual void deactivate() override;
 };
 
 class TerrainSTO : public ServerTrackedObject
@@ -166,7 +166,7 @@ public:
 		_modelFile = nullptr;
 	}
 
-	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr);
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) override;
 	virtual void enter();
 	virtual void leave();
 
@@ -189,8 +189,8 @@ public:
 	static const char* ModelName(int type);
 
 protected:
-	virtual bool activate();					//!< Interface for activating.
-	virtual void deactivate();					//!< Interface for deactivating.
+	virtual bool activate() override;					//!< Interface for activating.
+	virtual void deactivate() override;					//!< Interface for deactivating.
 
 	virtual const char* model() const
 	{
@@ -219,17 +219,17 @@ public:
 		{}
 
 	virtual ~PlayerPlacedSTO();
-	virtual bool applyJoules(const SINT64& joules, class Player* player = nullptr);
-	virtual bool load();
+	virtual bool applyJoules(const SINT64& joules, class Player* player = nullptr) override;
+	virtual bool load() override;
 
-    virtual void preProcess();
-    virtual void postProcess();
+    virtual void preProcess() override;
+    virtual void postProcess() override;
 
 	void Sink();
 	void Update();
 
 protected:
-	virtual const char* model() const;
+	virtual const char* model() const override;
 
 private:
 	SINT32 _lastUpdate;
@@ -255,12 +255,12 @@ public:
 		_collisionGrace = 20000;
 	}
 
-	virtual void preProcess();
-	virtual void postProcess();
+	virtual void preProcess() override;
+	virtual void postProcess() override;
 
 protected:
 	// which model to use
-    virtual const char* model() const;
+    virtual const char* model() const override;
 
 //private:
 	//int flagTextures[4];
@@ -282,7 +282,7 @@ public:
 	BailoutSTO(ACTION_OBJECT* const a) : VehicleSTO(a) {}
 
 	virtual ~BailoutSTO();
-	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) { return false; }  // do nothing
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) override { return false; }  // do nothing
 
 	void setLifeSpan(UINT32 life){ m_lifespan = life; }
 	bool isMyPilot() const;
@@ -295,5 +295,5 @@ public:
 	static const struct vehType* VTYPE(vehVehicle*); //!< which type of vehicle to use based on the original vehicle type
 
 protected:
-	virtual bool activate();
+	virtual bool activate() override;
 };

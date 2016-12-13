@@ -503,7 +503,7 @@ void WaypointMapObject::Over(SuperCellMapView* mv, int state)
 	#if platOS == OS_MACOS
 				{
 					char abuffer[16];
-					sprintf( abuffer, "%d", (int)dist );
+					strprintf( abuffer, "%d", (int)dist );
 					tip += uiUTF8toUTF16(abuffer);
 				}
 	#else

@@ -155,13 +155,6 @@ static void _describeBuildConfigurationToLogFile()
 #if defined(CLOSED_BETA)
 	dbugLog(_FLI, " CLOSED_BETA");
 #endif
-#if defined(FRES)
-	dbugLog(_FLI, " FRES");
-#endif
-#if defined(HAPPYOO)
-	dbugLog(_FLI, " HAPPYOO");
-	dbugLog(_FLI, "%s HOST FLAGS:", PN_git_commitish_string);
-#endif
 #if defined(TRAINING_SERVER)
 	dbugLog(_FLI, " TRAINING_SERVER");
 #endif

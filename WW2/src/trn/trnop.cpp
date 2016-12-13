@@ -819,7 +819,7 @@ SINT32		i, poly;
 		// ok place objects o1-o7
 		for (i=1; i < 8; i++)
 		{
-			sprintf(s, "o%d", i);
+			strprintf(s, "o%d", i);
 			ogrpFindSubObjectByName(&TempObjPtr, lpobj, s);
 			if (TempObjPtr != nullptr)
 			{

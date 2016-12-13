@@ -1406,8 +1406,8 @@ _dotSetTime(char* arguments, OOBMessage& message)
 
 	char hourBuf[4];
 	char minutesBuf[4];
-	sprintf(hourBuf, "%02u", hour);
-	sprintf(minutesBuf, "%02u", minutes);
+	strprintf(hourBuf, "%02u", hour);
+	strprintf(minutesBuf, "%02u", minutes);
 	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_GM_SET_GAMETIME, hourBuf, minutesBuf);
 
 	return true;

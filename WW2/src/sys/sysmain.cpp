@@ -825,9 +825,7 @@ char GetOSBuild()
 #endif
 
 #ifndef BETA_RELEASE
-#if FRES
     fioSet(ISDIRECTORY);
-#else
 #ifdef ANTIHACK
 	checksum = new Hideaway(*storage1);
     checksum->set(diddle_crc((const unsigned char*)(
@@ -837,12 +835,16 @@ char GetOSBuild()
 #endif
     fioSet(ISARCHIVE);
 	AddArchives();
-#endif // FRES
 #else
 
 	if(WantDataDir)
 	{
 		fioSet(ISDIRECTORY);
+		auto fd = fioOpen("blitzWor.csv");
+		if ( fd < 0 ) {
+			LogAbort("Incorrect/invalid data directory.");
+		}
+		fioClose(fd);
 	}
 	else
 	{
@@ -1135,7 +1137,7 @@ int _matherr(struct _exception* except)
 		case _OVERFLOW:
 		case _UNDERFLOW:
 		case _TLOSS:
-			sprintf(s, "math err type: %d, func: %s, args: %f, %f", except->type, except->name,
+			strprintf(s, "math err type: %d, func: %s, args: %f, %f", except->type, except->name,
 													(float)except->arg1, (float)except->arg2);
 			rnmainListText(s);
             //piExitProgram(_FL,s);
@@ -1212,7 +1214,9 @@ static void AddArchives()
 		{
 			if ( s[len-3] == 'w' && s[len-2] == 'w' && s[len-1] == '2' ) // NEW ARCHIVES
 			{
-				fioaAddArchive(s);
+				if (fioaAddArchive(s) < 0) {
+					LogAbort("Could not access archives.");
+				}
 				foundthem = true;
 			}
 		}
@@ -1236,9 +1240,8 @@ static void AddArchives()
 		memFree(fileList);
 	}
 
-	if ( !foundthem )
-	{
-		throw std::runtime_error("Archives not found");
+	if (!foundthem) {
+		LogAbort("Archives not found.");
 	}
 }
 

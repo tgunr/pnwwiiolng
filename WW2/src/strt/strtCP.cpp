@@ -2146,9 +2146,9 @@ std::string strtGetFactoryList(WWII_COUNTRY forCountry)
 		if ( obj->facility->originalCountry != forCountry )
 			continue;
 		if ( obj->m_country == forCountry )
-			sprintf(buffer, "%s dmg:%u%%. ", obj->name, obj->percentDamage);
+			strprintf(buffer, "%s dmg:%u%%. ", obj->name, obj->percentDamage);
 		else
-			sprintf(buffer, "%s OWNER:%s dmg:%u%%. ", obj->name, _countryCode[obj->m_country], obj->percentDamage);
+			strprintf(buffer, "%s OWNER:%s dmg:%u%%. ", obj->name, _countryCode[obj->m_country], obj->percentDamage);
 		result += buffer;
 	}
 

@@ -1298,7 +1298,7 @@ void uiChatHostMessage(Chat::HostMessage const& message)
 		{
 			lastplayerhandle = callsign;
 			char script[80];
-			sprintf(script, "game.onprivatemessage('%s', %u)", chatGetCallsign(message.handle), teulTime());
+			strprintf(script, "game.onprivatemessage('%s', %u)", chatGetCallsign(message.handle), teulTime());
 			c->jsclient->RunScript(script);
 		}
 	}else

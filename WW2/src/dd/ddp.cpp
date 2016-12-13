@@ -196,7 +196,7 @@ bool CreateGLContext(HDC dc)
 	if(err != GLEW_OK)
 	{
 		static char str[255];
-		sprintf(str, "Error: %s\n", glewGetErrorString(err));
+		strprintf(str, "Error: %s\n", glewGetErrorString(err));
         throw str;
 	}
 
@@ -244,7 +244,7 @@ bool CreateGLContext(HDC dc)
 	        if(err != GLEW_OK)
 	        {
 		        static char str[255];
-		        sprintf(str, "Error: %s\n", glewGetErrorString(err));
+		        strprintf(str, "Error: %s\n", glewGetErrorString(err));
                 throw str;
 	        }
         }
@@ -313,7 +313,7 @@ bool CreateGLContext(HDC dc)
 	        if(err != GLEW_OK)
 	        {
 		        static char str[255];
-		        sprintf(str, "Error: %s\n", glewGetErrorString(err));
+		        strprintf(str, "Error: %s\n", glewGetErrorString(err));
                 throw str;
 	        }
         }
@@ -874,11 +874,11 @@ RECT		rect;
 		{
 		float           fps;
 
-			sprintf(ssz, "%dx%d", rect.right - rect.left, rect.bottom - rect.top);
+			strprintf(ssz, "%dx%d", rect.right - rect.left, rect.bottom - rect.top);
 			fps = ddpGetFPS();
 			if (fps)
 			{
-				sprintf(txt,"%6.3f fps", fps);
+				strprintf(txt,"%6.3f fps", fps);
 			}
 		}
 	}
@@ -2086,9 +2086,9 @@ static void glScreenCapture()
 	{
 		shotCount += 1;
 #if platOS == OS_WIN32
-		sprintf(fileName, "%s%s%d.bmp", UserDataPath, fptr, shotCount);
+		strprintf(fileName, "%s%s%d.bmp", UserDataPath, fptr, shotCount);
 #else
-		sprintf(fileName, "%s%d.bmp", fptr, shotCount);
+		strprintf(fileName, "%s%d.bmp", fptr, shotCount);
 #endif
 	}
 	while (_access(fileName, 0) == 0);

@@ -5418,7 +5418,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
-				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
+				PlayerPlacedSTO* ppo = reinterpret_cast<PlayerPlacedSTO*>(sto);
 				ppo->leave();
 			}
 
@@ -5431,7 +5431,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
-				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
+				PlayerPlacedSTO* ppo = reinterpret_cast<PlayerPlacedSTO*>(sto);
 				ppo->enter();
 
 				_ppoLastHit = ppoHit;
@@ -12446,7 +12446,7 @@ void fpFPSSightAdjust (SINT32 sightParam)
 	/* we now display this in the HUD, no need to show it in chat
 	{
 		char tString[255];
-		sprintf (tString, "%.0dm", fpsWeapons[currentWeaponModel].getSightDist());
+		strprintf(tString, "%.0dm", fpsWeapons[currentWeaponModel].getSightDist());
 		rnmainListEmoteText (IDE_LANG_UI, 9000, colorWHITEALPHA, nullptr, tString);
 	}
 	*/

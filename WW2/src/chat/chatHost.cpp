@@ -121,8 +121,6 @@ extern void chatRegisterDotCommands();
 # define DEFAULT_SYS_MOTD		"MOTD: WWII Online Beta Release"
 #elif defined(TEST_RELEASE)
 # define DEFAULT_SYS_MOTD		"MOTD: WWII Online BETA Release-Candidate"
-#elif defined(FRES)
-# define DEFAULT_SYS_MOTD		"MOTD: Battleground Europe (FRES/ULTRA)"
 #elif defined(TRAINING_SERVER)
 # define DEFAULT_SYS_MOTD		"MOTD: Welcome to the Training Server"
 #else

@@ -52,13 +52,13 @@ public:
 
     STDMETHOD_(void, OnVoiceError) (THIS_ void* pBufferContext, HRESULT Error)
     {
-#if DEBUG_WW2
+#if defined(DEBUG_WW2)
         Enable_Log(LOG_OLD, 1);
 #endif
 
         Write_Debug("OnVoiceError: %x", Error);
 
-#if DEBUG_WW2
+#if defined(DEBUG_WW2)
         Enable_Log(LOG_OLD, WantedUserLogEnabled);
 #endif
     }

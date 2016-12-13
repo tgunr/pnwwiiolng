@@ -132,7 +132,7 @@ public:	TestPackers() : TestUnit("TestPackers") {}
 		for ( SINT32 offset = 0; offset <= 64; ++offset )
 		{
 			char focus[128];
-			sprintf(focus, "offset %d bits %d=>%d", offset, packBits, expectBits);
+			strprintf(focus, "offset %d bits %d=>%d", offset, packBits, expectBits);
 			TestFocus(focus);
 
 			memset(a.packed, 0xa5, MaxBits / 8);

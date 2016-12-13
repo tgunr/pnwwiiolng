@@ -1348,14 +1348,13 @@ OBJECT*    lpobj;
 
 LOGICAL obmainFindObjectLOD(OBJECT* lpmain, int lod, PROCESSCALLBACK callback)
 {
-SINT8		lodname[32];
-
 	if (lpmain == nullptr)
 	{
 		return FALSE;
 	}
 
-	sprintf(lodname, "lod%d", lod);
+	char lodname[32];
+	strprintf(lodname, "lod%d", lod);
 
 	if (!obmainFindCommentCallback(lpmain, lodname, lod, callback))
 	{

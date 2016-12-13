@@ -376,35 +376,35 @@ Description:
 -------------------------------------------------------------------*/
 static void InitGlobalUniforms()
 {
-    char str[64];
+    char str[80];
 
     for(int i = 0; i < max_lights; i++)
     {
-        sprintf(str, "lightsource[%d].enabled", i);
+        strprintf(str, "lightsource[%d].enabled", i);
         lightuniforms[i].enabled = new glslUniform(glslUniform::FLOAT, str, 1, true);
 
-        sprintf(str, "lightsource[%d].kc", i);
+        strprintf(str, "lightsource[%d].kc", i);
         lightuniforms[i].kc = new glslUniform(glslUniform::FLOAT, str, 1, true);
 
-        sprintf(str, "lightsource[%d].kl", i);
+        strprintf(str, "lightsource[%d].kl", i);
         lightuniforms[i].kl = new glslUniform(glslUniform::FLOAT, str, 1, true);
 
-        sprintf(str, "lightsource[%d].kq", i);
+        strprintf(str, "lightsource[%d].kq", i);
         lightuniforms[i].kq = new glslUniform(glslUniform::FLOAT, str, 1, true);
 
-        sprintf(str, "lightsource[%d].dir", i);
+        strprintf(str, "lightsource[%d].dir", i);
         lightuniforms[i].dir = new glslUniform(glslUniform::FLOAT_VEC3, str, 1, true);
 
-        sprintf(str, "lightsource[%d].pos", i);
+        strprintf(str, "lightsource[%d].pos", i);
         lightuniforms[i].pos = new glslUniform(glslUniform::FLOAT_VEC3, str, 1, true);
 
-        sprintf(str, "lightsource[%d].diffuse", i);
+        strprintf(str, "lightsource[%d].diffuse", i);
         lightuniforms[i].diffuse = new glslUniform(glslUniform::FLOAT_VEC4, str, 1, true);
 
-        sprintf(str, "lightsource[%d].specular", i);
+        strprintf(str, "lightsource[%d].specular", i);
         lightuniforms[i].specular = new glslUniform(glslUniform::FLOAT_VEC4, str, 1, true);
 
-        sprintf(str, "lightsource[%d].ambient", i);
+        strprintf(str, "lightsource[%d].ambient", i);
         lightuniforms[i].ambient = new glslUniform(glslUniform::FLOAT_VEC4, str, 1, true);
     }
 }

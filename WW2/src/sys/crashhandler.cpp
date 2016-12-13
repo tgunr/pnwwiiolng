@@ -17,7 +17,11 @@
 #include <stdarg.h>
 #include <math.h>
 #include <float.h>
+#pragma warning( push )
+#pragma warning( disable : 4091)	// 'typedef' ignored on left of stuff in shlobj.h and dbhhelp.h
 #include <ShlObj.h>
+#include "client/windows/handler/exception_handler.h"
+#pragma warning( pop )
 #include <fcntl.h>
 #include <VersionHelpers.h>
 #include <iostream>
@@ -27,7 +31,6 @@
 #include "build_info.hpp"
 #include "sys/sysreg.h"
 #include "unique_opaque_ptr.hpp"
-#include "client/windows/handler/exception_handler.h"
 
 #pragma endregion
 //////////////////////////////////////////////////////////////////////////////

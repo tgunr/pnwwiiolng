@@ -585,7 +585,6 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 	if ( cp->controllingSide != side() )
 		return BMR_FAILED_CONTROL;
 
-#ifndef FRES
 	if ( offMap() && cp != homeCP() && cp->isEnemyLinked() )
 		return BMR_FAILED_FRONTLINE;
 
@@ -596,12 +595,10 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 	// this allows movement within a pocket but not into a pocket
 	if ( homeCP() && cp != homeCP() && homeCP()->isSupplied() && cp->isSupplied() == false )
 		return BMR_FAILED_NFL;
-#endif
 
 	switch ( movementType() )
 	{
 	case BRANCH_LAND:
-#ifndef FRES
 		if ( !offMap() )
 		{
 			LinkStruct* link = nullptr;
@@ -629,7 +626,6 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 			if ( isBrigade() && !cp->hasContactWithDivision(this) )
 				return BMR_FAILED_CONTACT;
 		}
-#endif
 
 		// Gotta have ABs to have a land brigade
 		if ( branch() == BRANCH_LAND && !cp->hasABs(side()) )

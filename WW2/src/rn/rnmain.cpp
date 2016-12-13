@@ -297,7 +297,7 @@ bool rnmainGetOnlineSetting()
 		CommType = PROTOCOL_TCP;
 		GameOTP = strtoul(GameServerOTP, nullptr, 10);
 
-#if FRES || defined(BETA_RELEASE)
+#if defined(BETA_RELEASE)
 		if(GameOTP == 0)
 		{
 			GameOTP = AUTH_BYPASS_OTP;

@@ -1148,7 +1148,7 @@ void EZManager::EZTurret::Update()
 void EZManager::EZTurret::UpdateReticle()
 {
 	char name[32];
-	snprintf(name, 31, "reticle%d", position);
+	strprintf(name, "reticle%d", position);
 
 	phui::View* reticle = uiFindView(name);
 	if(!reticle) return;

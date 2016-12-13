@@ -731,7 +731,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	if(!fileInfo)
 	{
 		char errMsg[255];
-		sprintf (errMsg, "gr2LoadModel: failed to load model %s", modelFile);
+		strprintf(errMsg, "gr2LoadModel: failed to load model %s", modelFile);
 		piExitProgram (_FL, errMsg);
 	}
 
