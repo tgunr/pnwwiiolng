@@ -14,12 +14,12 @@ version_info_pattern = r"""(?x)
 """
 
 ### General imports
-import os, sys, tempfile, getpass, time, re, shutil
+import os, sys, tempfile, getpass, time, re, shutil, shlex, subprocess
 
 ### Entry point
 def main():
     if len(sys.argv) < 3:
-        sys.exit("Usage: %s <build type> <output path>" % sys.argv[0])
+        raise Exception("Usage: %s <build type> <output path>" % sys.argv[0])
     
     repo_path = os.path.realpath(os.path.dirname(os.path.dirname(sys.path[0])))
     build_type = sys.argv[1]
@@ -27,7 +27,7 @@ def main():
     host_platform = "Mac" if sys.platform == 'darwin' else ("PC" if sys.platform == 'win32' else "Linux")
 
     if build_type != 'client' and build_type != 'host':
-        sys.exit("Build type must be 'client' or 'host'")
+        raise Exception("Build type must be 'client' or 'host'")
     
     git_command = "git -c color.ui=never -C %s" % repo_path
     git_commit = get_command_output("%s rev-parse HEAD" % git_command)
@@ -68,8 +68,6 @@ def main():
 
 ### Subroutine for running commands
 def get_command_output(cmd):
-    import shlex, subprocess
-    
     if sys.platform == 'win32':
         posix_parse = False
     else:
@@ -128,7 +126,7 @@ def get_version_values(version_info_file_path):
         version_info_text = version_info_file.read()
     version_info_pieces = re.search(version_info_pattern, version_info_text)
     if not version_info_pieces:
-        sys.exit("Failed to find version information in %s" % version_info_file_path)
+        raise Exception("Failed to find version information in %s" % version_info_file_path)
     
     version_info = version_info_pieces.groupdict()
     version_info["value"] = "0x%s%s%s%s" % tuple(map(lambda s: s.zfill(2), version_info_pieces.groups()))
