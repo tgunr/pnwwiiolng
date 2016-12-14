@@ -219,10 +219,10 @@ void CAShowAudioBufferList(const AudioBufferList &abl, int framesToPrint, const 
 #if CA_PREFER_FIXED_POINT
         int fracbits = (asbd.mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >> kLinearPCMFormatFlagsSampleFractionShift;
         if (fracbits > 0)
-          strprintf(fmtstr, ", %d.%d-bit", (int)asbd.mBitsPerChannel - fracbits, fracbits);
+          sprintf(fmtstr, ", %d.%d-bit", (int)asbd.mBitsPerChannel - fracbits, fracbits);
         else
 #endif
-          strprintf(fmtstr, ", %d-bit", (int)asbd.mBitsPerChannel);
+          sprintf(fmtstr, ", %d-bit", (int)asbd.mBitsPerChannel);
 
         if (!(fmt.mFormatFlags & kLinearPCMFormatFlagIsBigEndian))
         {
