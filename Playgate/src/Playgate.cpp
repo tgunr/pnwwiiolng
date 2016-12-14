@@ -18,7 +18,6 @@
 #include "pnRegion.h"
 #include "launchApp.h"
 #include "wwii/wwiiUTF.h"
-#include "../WW2/proj/versionNo.h"
 #include "../WW2/src/auth/authAppIDs.h"
 
 #ifdef _DEBUG

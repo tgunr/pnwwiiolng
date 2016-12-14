@@ -9,8 +9,7 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "hostproj/hostversion.h"
-
+#include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatBanPlayer.h"
 #include "chat/chatBroadcast.h"
@@ -3601,7 +3600,7 @@ main(int argc, const char* argv[])
 
 	Server::myServerInfo.stats.port = WWII::Net::Ports::ChatHost;
 
-	serverInit(HOST_VERSION
+	serverInit(PN_build_version_value
 				, CHAT_HOST, CHAT_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback

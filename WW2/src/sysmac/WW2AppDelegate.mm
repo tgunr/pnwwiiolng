@@ -1,6 +1,7 @@
 /* $Id: WW2AppDelegate.mm 3979 2010-06-18 13:05:19Z dchristopher@CRS $ */
 #define OBJECTIVE_C
 #include "syscfg.h"
+#include "build_info.hpp"
 #import "WW2AppDelegate.h"
 #include "sysmain.h"
 #include "vars.h"
@@ -9,7 +10,6 @@
 #include "cfgPrefs.h"
 #include "ww2Client.h"
 #include "ddp.h"
-#include "VersionNo.h"
 #include "mngopt.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiClientMessages.h"
@@ -1038,7 +1038,7 @@ extern NSString *WebActionOriginalURLKey;
     launchRequest.sessionID = (UINT32)verifyInfo->sessionID;
     launchRequest.appID = verifyInfo->appID;
     
-    NSString* appVersion = [NSString stringWithCString:STRVER encoding:NSUTF8StringEncoding];
+    NSString* appVersion = [NSString stringWithUTF8String:PN_product_version_string];
 
     /* command line version override - not sure this is needed, but putting it in anyway */
     if (gClientV[0]) {

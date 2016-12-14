@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"						// For version dependent code
-
 #include "map/mapFillPersonaData.h"			// Our header file
 #include "wwii/wwiiDBThreads.h"
 #include "map/mapPlayer.h"

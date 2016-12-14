@@ -42,7 +42,7 @@ SET_TARGET_PROPERTIES( libtolua++ PROPERTIES FOLDER "Libs" )
 SET_TARGET_PROPERTIES( tolua++ PROPERTIES FOLDER "Tools" )
 
 # On Windows, pull in our embedded libevent; elsewhere, search the system for it
-IF ( WIN32 OR UNIX )
+IF ( WIN32 OR NOT APPLE )
 	ADD_SUBDIRECTORY( "${LIBRARIES_DIR}/libevent" "${CMAKE_CURRENT_BINARY_DIR}/libevent" )
 	SET( LIBEVENT_INCLUDE_DIRS "${LIBRARIES_DIR}/libevent/include" )
 	INCLUDE_DIRECTORIES( BEFORE SYSTEM ${LIBEVENT_INCLUDE_DIRS} )
@@ -55,17 +55,8 @@ ELSE()
     FIND_PACKAGE( LibEvent REQUIRED )
 ENDIF()
 
-# Need Python for revno.py
+# Need Python for build_info.py
 FIND_PACKAGE( PythonInterp 2.7 REQUIRED )
-
-# Need Bison and Flex for OMGgen; use embedded versions on Windows
-IF ( WIN32 )
-    SET( BISON_EXECUTABLE "${CMAKE_CURRENT_SOURCE_DIR}/omggen/win_bison.exe" )
-    SET( FLEX_EXECUTABLE "${CMAKE_CURRENT_SOURCE_DIR}/omggen/win_flex.exe" )
-ENDIF()
-# Setting the executables first on Windows allows these to work normally
-FIND_PACKAGE( BISON REQUIRED )
-FIND_PACKAGE( FLEX REQUIRED )
 
 # Need libircclient
 INCLUDE_DIRECTORIES( libircclient/include )

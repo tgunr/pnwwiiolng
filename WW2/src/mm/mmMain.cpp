@@ -8,7 +8,7 @@
 // Originating Programmer: Brian "Stick" Duelm
 
 #include "dbug/dbugExtErrors.h"
-#include "hostproj/hostversion.h"
+#include "build_info.hpp"
 
 #if platOS != OS_WIN32
 #include <netinet/in.h>
@@ -671,8 +671,8 @@ _handleSIGUSR1(SINT32 k)
 
 	//Reconnect to the authHost
 	SINT32 retval = authGameInit(Server::localHost, WWII::Net::Ports::MapHost,
-											_authHost, WWII::Net::Ports::InternalAuth, cv_appID.GetUint32(), HOST_VERSION,
-											HOST_VERSION, Teul::MaxClusterUsers,
+											_authHost, WWII::Net::Ports::InternalAuth, cv_appID.GetUint32(), PN_build_version_value,
+											PN_build_version_value, Teul::MaxClusterUsers,
 											_acceptLogin, _authErrorFunction);
 	if ( retval < 0)
 		LogAbort("%s authGameInit failed retval %d", __FUNCTION__, retval);
@@ -1138,8 +1138,8 @@ main(int argc, const char* argv[])
 					, _authHost
 					, WWII::Net::Ports::InternalAuth
 					, cv_appID.GetUint32()
-					, HOST_VERSION
-					, HOST_VERSION
+					, PN_build_version_value
+					, PN_build_version_value
 					, Teul::MaxClusterUsers
 					, _acceptLogin
 					, _authErrorFunction
@@ -1177,7 +1177,7 @@ main(int argc, const char* argv[])
 
 	Server::myServerInfo.stats.port = WWII::Net::Ports::MapHost;
 
-	serverInit(HOST_VERSION
+	serverInit(PN_build_version_value
 				, MAP_HOST, AUTH_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback

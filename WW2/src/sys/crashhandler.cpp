@@ -28,8 +28,7 @@
 #include <fstream>
 #include <locale>
 #include <codecvt>
-#include "versionNo.h"
-#include "client_revision.h"
+#include "build_info.hpp"
 #include "sys/sysreg.h"
 #include "unique_opaque_ptr.hpp"
 
@@ -218,6 +217,17 @@ static void crash_write_str(int fd, bool wide, const wchar_t *s)
 	crash_write_raw(fd, wide, s, wcslen(s));
 }
 
+static void crash_write_ascii_str(int fd, bool wide, const char *s)
+{
+    // Mind-numbingly inefficient but it doesn't much matter.
+    while (*s) {
+        wchar_t c = static_cast<wchar_t>(static_cast<unsigned char>(*s)); // widen to wchar_t by zerofill
+        
+        crash_write_raw(fd, wide, &c, 1);
+        ++s;
+    }
+}
+
 template <typename T, typename>
 static void crash_write_int(int fd, bool wide, T l, unsigned int base)
 {
@@ -245,6 +255,7 @@ static void crash_wdprintfv(int fd, bool wide, const wchar_t * const format, va_
 			if (!*ptr) { crash_write_raw(fd, wide, L"%", 1);  break; }
 			switch (*ptr++) {
 				case L's': crash_write_str(fd, wide, va_arg(args, const wchar_t *)); break;
+				case L'S': crash_write_ascii_str(fd, wide, va_arg(args, const char *)); break; // Inverse of standard printf() format
 				case L'x': crash_write_int(fd, wide, va_arg(args, uint32_t), 16); break;
 				case L'u': crash_write_int(fd, wide, va_arg(args, uint32_t), 10); break;
 				case L'd': crash_write_int(fd, wide, va_arg(args, int32_t), 10); break;
@@ -504,8 +515,8 @@ static bool CrashReportingCallback(
 	if (fd._wsopen_s(pathBuffer, _O_WRONLY | _O_CREAT | _O_EXCL | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE)) {
 		// Write out the container format HockeyApp's custom upload API expects
 		crash_wdprintf(fd, L"Package: com.playnet.wwiiol\n"); // TODO: Hardcoding the macOS client's bundle ID is probably not quite right
-		crash_wdprintf(fd, L"Version Code: " GIT_COMMIT_STR "\n");
-		crash_wdprintf(fd, L"Version Name: " STRPRODUCTVER "\n");
+		crash_wdprintf(fd, L"Version Code: %S\n", PN_git_commitish_string);
+		crash_wdprintf(fd, L"Version Name: %S\n", PN_product_version_string);
 		crash_wdprintf(fd, L"Windows: %s (%s)\n", context->windowsVersion.c_str(), context->windowsBuild.c_str());
 		crash_wdprintf(fd, L"Manufacturer: %s\n", context->machineManufacturer);
 		crash_wdprintf(fd, L"Model: %s\n", context->machineModel);

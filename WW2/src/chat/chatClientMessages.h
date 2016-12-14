@@ -4,9 +4,7 @@
 
 #include <b64/encode.h>
 #include <b64/decode.h>
-#if platBuild == BUILD_CLIENT
-#include "versionNo.h"
-#endif
+#include "build_info.hpp"
 
 // Created: Wed Jul 26 11:00:52 2000
 //
@@ -79,10 +77,10 @@ struct ChatClientInfo
             m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION+1] = GetOSMinorVersion();
             m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION+2] = GetOSRevision();
             m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION+3] = GetOSBuild();
-            m_clientInfo[INFO_OFFSET_CLIENT_VERSION] = PN_WW2_PRODUCT_NO;
-            m_clientInfo[INFO_OFFSET_CLIENT_VERSION+1] = PN_WW2_VERSION_NO;
-            m_clientInfo[INFO_OFFSET_CLIENT_VERSION+2] = PN_WW2_PATCH_NO;
-            m_clientInfo[INFO_OFFSET_CLIENT_VERSION+3] = PN_WW2_BUILD_NO;
+            m_clientInfo[INFO_OFFSET_CLIENT_VERSION] = PN_build_version_major;
+            m_clientInfo[INFO_OFFSET_CLIENT_VERSION+1] = PN_build_version_minor;
+            m_clientInfo[INFO_OFFSET_CLIENT_VERSION+2] = PN_build_version_patch;
+            m_clientInfo[INFO_OFFSET_CLIENT_VERSION+3] = PN_build_version_build;
 #endif
 
     }

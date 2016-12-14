@@ -73,7 +73,6 @@
 #include "ml/mltypes.h"
 #include "weap/weapammo.h"
 #include "locl/loclMain.h"
-#include "versionNo.h"
 #include "sysmain.h"
 #include "sdm/sdm.h"
 #include "sdm/StratDB.h"
@@ -361,7 +360,7 @@ static bool _connectClientToGameNetwork()
         if (gClientV[0] != 0) {
             teulGetHost(gClientV, &appversion);
         } else {
-            teulGetHost(STRVER, &appversion);
+            teulGetHost(PN_product_version_string, &appversion);
         }
 
 		if ( teulMaskNetworkAddress(0) == 0 )

@@ -8,7 +8,6 @@
 #include "ogl/ogl.h"
 #include "pi/pi.h"
 #include "mem/mem.h"
-#include "versionNo.h"
 #include "sysmain.h"
 #include "dimain.h"
 #include "fio/fio.h"

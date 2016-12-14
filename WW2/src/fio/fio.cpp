@@ -1,6 +1,5 @@
 #include <syscfg.h> // Path is project specific.
 #include <codecvt>
-#include "VersionNo.h"
 #include "fio/fio.h"
 #include "fio/fiod.h"
 #include "fio/fioa.h"

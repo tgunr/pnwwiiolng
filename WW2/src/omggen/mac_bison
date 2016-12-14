@@ -1,0 +1,5 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export BISON_PKGDATADIR="${DIR}/mac-bison-data"
+"${DIR}/mac_bison.real" "$@"

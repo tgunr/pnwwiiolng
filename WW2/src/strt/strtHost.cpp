@@ -7,7 +7,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "hostproj/hostversion.h"
 #include <signal.h>  //to catch SIGHUPS with
 #include "build_info.hpp"
 #include "mem/mem.h"
@@ -607,7 +606,7 @@ main(int argc, const char* argv[])
 	dbugLog(_FLN,"opening broadcast ports");
 	serverOpenBroadcastIndexes();
 
-	serverInit(HOST_VERSION
+	serverInit(PN_build_version_value
 				, STRAT_HOST, STRAT_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback

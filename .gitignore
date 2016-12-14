@@ -1278,6 +1278,7 @@ WW2/proj/win/[Dd]ebug
 WW2/proj/win/[Rr]elease
 WW2/proj/win/_UpgradeReport_Files
 WW2/proj/win/obj
+WW2/proj/win/res/WW2.rc2
 WW2/proj/win/teulKit/*.aps
 WW2/proj/win/teulKit/*.eto
 WW2/proj/win/teulKit/*.user
@@ -1671,4 +1672,4 @@ depend
 libb64.a
 DebugInstance/Debug/DebugInstance.log
 DebugInstance/Debug/DebugInstance.tlog/DebugInstance.lastbuildstate
-WW2/proj/win/build_info.cpp
+build_info.cpp

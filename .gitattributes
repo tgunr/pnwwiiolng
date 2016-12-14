@@ -1555,7 +1555,6 @@ Tools/Tools/ww2tools/xmlturret.pl -text
 Tools/Tools/ww2tools/xmlveh.pl -text
 Tools/Tools/ww2tools/xmlweapon.pl -text
 Tools/Tools/ww2tools/xmlwor.pl -text
-Tools/revno.py -text
 Tools/windtunn/WindTunn.dsp -text
 Tools/windtunn/fio/fio.cpp -text
 Tools/windtunn/fio/fio.h -text
@@ -1674,6 +1673,7 @@ WW2/proj/win/res/cursor.cur -text
 WW2/proj/win/res/wwii1.ico -text
 WW2/proj/win/teulKit/teulKit.vcxproj -text
 WW2/proj/win/teulKit/teulKit.vcxproj.filters -text
+WW2/src/build_info.py -text
 WW2/src/auth/authAppIDs.h -text
 WW2/src/chat/chatGCITypes.h -text
 WW2/src/chat/chatLStringErr.h -text

@@ -16,7 +16,6 @@
 #include "sn/sndsSoundControl.h"
 #include "gmlp/gmlpmain.h"
 #include "fio/fio.h"
-#include "VersionNo.h"
 #include "wwii/wwiiClientMessages.h"
 #include "cfg/cfgPrefs.h"
 #include "wwii/wwiiCovert.h"

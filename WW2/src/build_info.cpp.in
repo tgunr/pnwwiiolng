@@ -24,7 +24,7 @@
     Build:      ${PLATFORM} ${BUILD_TYPE}
     Builder:    ${CURRENT_USER} on ${BUILD_HOST}
     Location:   ${GIT_ROOT}
-    Version:    ${PRODUCT_VERSION}
+    Version:    ${PRODUCT_VERSION} (${PRODUCT_VERSION_VALUE})
     Commit:     ${GIT_COMMITISH} (${GIT_COMMIT}) - ${GIT_STATE}
 */
 
