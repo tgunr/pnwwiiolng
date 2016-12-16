@@ -419,21 +419,12 @@ Teul::uWeb::Server::processHTTPRequest(const SOCKET sock, char* const request)
 void
 Teul::uWeb::Server::addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_)
 {
-	// '{"url":"<url>","desc":"<desc>"}]
-	const size_t bufLen = 9 + path_.length() + 10 + desc_.length() + 2 + 2 + 1;
-	char* buffer = new char[bufLen];
-	snprintf(buffer, bufLen - 1, "{\"url\":\"%s\",\"desc\":\"%s\"}]", path_.c_str(), desc_.c_str());
-
 	std::lock_guard<std::mutex> lock(m_config_mutex);
 	m_virtualFileHandlers[path_] = std::make_pair(handler_, desc_);
-
-	// Replace the ']' at the end of the list with a comma.
-	m_resourceList.erase(m_resourceList.end() - 1);
-	if ( m_resourceList.length() > 1 )
-		m_resourceList.append(",");
-
-	m_resourceList.append(buffer);
-
-	delete [] buffer;
+    
+	if (m_resourceList.length() > 1) {
+        m_resourceList.erase(m_resourceList.end() - 1);
+    }
+    m_resourceList += ",{\"url\":\"" + path_ + "\",\"desc\":\"" + desc_ + "\"}]";
 }
 
