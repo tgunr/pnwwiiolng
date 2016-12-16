@@ -42,7 +42,7 @@ SET_TARGET_PROPERTIES( libtolua++ PROPERTIES FOLDER "Libs" )
 SET_TARGET_PROPERTIES( tolua++ PROPERTIES FOLDER "Tools" )
 
 # On Windows, pull in our embedded libevent; elsewhere, search the system for it
-IF ( WIN32 OR NOT APPLE )
+IF ( WIN32 )
 	ADD_SUBDIRECTORY( "${LIBRARIES_DIR}/libevent" "${CMAKE_CURRENT_BINARY_DIR}/libevent" )
 	SET( LIBEVENT_INCLUDE_DIRS "${LIBRARIES_DIR}/libevent/include" )
 	INCLUDE_DIRECTORIES( BEFORE SYSTEM ${LIBEVENT_INCLUDE_DIRS} )
