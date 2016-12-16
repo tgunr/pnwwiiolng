@@ -118,25 +118,34 @@ _reportPlayerDetails(SOCKET fd, const char* /*path*/, const char* /*args*/)
 	{
 		std::lock_guard<std::mutex> mutexLock(s_sidecountMutex);
 
+        // Write the HTTP header
+        static const char ok200[] =
+            "HTTP/1.1 200 OK\r\n"
+            "Access-Control-Allow-Origin: *\r\n"
+            "Content-Type: text/javascript\r\n"
+            "Content-Language: en\r\n"
+            "Content-Encoding: utf-8\r\n\r\n";
+        
+        send(fd, ok200, sizeof(ok200) - 1, 0);
 		len = strprintf(buffer
-							, "{\"stamp\":%" PR64BitUT ",\"players\":%" PRSizeT ",\"balance\":{\"above\":%u,\"delays_max\":%u,\"delays_pctg\":%u,\"margin_pctg\":%u,\"pers_delay\":%u},\"camp\":{\"allies_spawned\":%u,\"axis_spawned\":%u,\"hvyside\":%u,\"overdog\":%u,\"underdog\":%u,\"imb\":%u,\"dev\":%u},\"swing_meter\":{\"in_effect\":%d,\"meter\":%d,\"delays\":%d}}"
-								, teulClock64
-								, g_players.size()
-								, host_config.balance.above
-								, host_config.balance.delaysMax
-								, host_config.balance.delaysPctg
-								, host_config.balance.marginPctg
-								, host_config.balance.personaDelay
-								, g_spawnedPlayers[ALLIED]
-								, g_spawnedPlayers[AXIS]
-								, g_heavySide
-								, g_overdog
-								, g_underdog
-								, g_sideImbalance
-								, g_sideDeviation
-								, g_swingMeter.inEffect()
-								, g_swingMeter.meter()
-								, g_swingMeter.delays()
+            , "{\"stamp\":%" PR64BitUT ",\"players\":%" PRSizeT ",\"balance\":{\"above\":%u,\"delays_max\":%u,\"delays_pctg\":%u,\"margin_pctg\":%u,\"pers_delay\":%u},\"camp\":{\"allies_spawned\":%u,\"axis_spawned\":%u,\"hvyside\":%u,\"overdog\":%u,\"underdog\":%u,\"imb\":%u,\"dev\":%u},\"swing_meter\":{\"in_effect\":%d,\"meter\":%d,\"delays\":%d}}"
+            , teulClock64
+            , g_players.size()
+            , host_config.balance.above
+            , host_config.balance.delaysMax
+            , host_config.balance.delaysPctg
+            , host_config.balance.marginPctg
+            , host_config.balance.personaDelay
+            , g_spawnedPlayers[ALLIED]
+            , g_spawnedPlayers[AXIS]
+            , g_heavySide
+            , g_overdog
+            , g_underdog
+            , g_sideImbalance
+            , g_sideDeviation
+            , g_swingMeter.inEffect()
+            , g_swingMeter.meter()
+            , g_swingMeter.delays()
 		);
 	}
 

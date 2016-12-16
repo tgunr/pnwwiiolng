@@ -935,17 +935,27 @@ _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 	char ip[32];
 	teulGetAddress(stats.address, ip, sizeof(ip));
 
+    // Write the HTTP header
+    static const char ok200[] =
+        "HTTP/1.1 200 OK\r\n"
+        "Access-Control-Allow-Origin: *\r\n"
+        "Content-Type: text/javascript\r\n"
+        "Content-Language: en\r\n"
+        "Content-Encoding: utf-8\r\n\r\n";
+    
+    send(fd, ok200, sizeof(ok200) - 1, 0);
+
 	char buffer[1024];
 	const int len = strprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s\"}\r\n"
-						, Teul::GetAppName()
-						, ip
-						, stats.arenaID
-						, stats.type
-						, stats.status
-						, stats.maxPlayers()
-						, stats.numPlayers()
-                        , PN_git_commitish_string
-						);
+        , Teul::GetAppName()
+        , ip
+        , stats.arenaID
+        , stats.type
+        , stats.status
+        , stats.maxPlayers()
+        , stats.numPlayers()
+        , PN_git_commitish_string
+    );
 	send(fd, buffer, len, 0);
 }
 

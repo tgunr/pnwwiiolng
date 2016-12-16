@@ -83,6 +83,15 @@ _reportJSONPeers(SOCKET fd, const char* /*path*/, const char* /*args*/)
 	}
 	p += sprintf(p, "]}\n");
 
+    // Write the HTTP header
+    static const char ok200[] =
+        "HTTP/1.1 200 OK\r\n"
+        "Access-Control-Allow-Origin: *\r\n"
+        "Content-Type: text/javascript\r\n"
+        "Content-Language: en\r\n"
+        "Content-Encoding: utf-8\r\n\r\n";
+    
+    send(fd, ok200, sizeof(ok200) - 1, 0);
 	send(fd, report, int(p - report), 0);
 }
 

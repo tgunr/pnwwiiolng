@@ -266,10 +266,6 @@ Teul::uWeb::Server::run()
 static void
 _callHandler(const SOCKET sock, Teul::uWeb::Server::VirtualFileHandler handler, const char* const path, const char* const args, Teul::uWeb::Server* /*server*/)
 {
-	// Write the HTTP header first
-	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/javascript\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\n\r\n";
-	send(sock, ok200, sizeof(ok200) - 1, 0);
-
 	// Call the handler to write the content.
 	(handler)(sock, path, args);
 }
@@ -280,18 +276,19 @@ _callHandler(const SOCKET sock, Teul::uWeb::Server::VirtualFileHandler handler, 
 static const char*
 _getContentTypeFor(std::string fileExt)
 {
-	static const std::map<std::string, const char*> extensions =
-	{
-		{".js", "text/javascript"},
-		{".json", "text/application-json"},
-		{".html", "text/html"},
-		{".css", "text/css"},
-		{".xml", "text/xml"},
-		{".txt", "text/plain"},
+	static const std::map<std::string, const char*> extensions = {
+		{ ".js", "text/javascript" },
+		{ ".json", "application/json" },
+		{ ".html", "text/html" },
+		{ ".css", "text/css" },
+		{ ".xml", "text/xml" },
+		{ ".txt", "text/plain" },
 	};
 	auto it = extensions.find(fileExt);
-	if (it != extensions.end())
+    
+	if (it != extensions.end()) {
 		return it->second;
+    }
 	return "application/octet-stream";
 }
 
@@ -407,22 +404,13 @@ Teul::uWeb::Server::processHTTPRequest(const SOCKET sock, char* const request)
 			handler = it->second.first;
 	}
 
-	if ( handler != nullptr )
-	{
+	if ( handler != nullptr ) {
 		_callHandler(sock, handler, path, args, this);
-		return;
-	}
-
-	if ( _sendPhysicalFile(sock, rootPath().c_str(), path, lastDot) == true )
-		return;
-
-	if ( strcmp(path, "/index.json") == 0 )
-	{
+    } else if ( strcmp(path, "/index.json") == 0 ) {
 		_sendString200(sock, m_resourceList);
-		return;
-	}
-
-	throw WebError(404, "File not found");
+	} else if ( _sendPhysicalFile(sock, rootPath().c_str(), path, lastDot) != true ) {
+        throw WebError(404, "File not found");
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
