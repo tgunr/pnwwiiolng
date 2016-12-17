@@ -84,9 +84,9 @@ static SOCKET
 _establishListenSocket(const unsigned short port_)
 {
 	// Tear up the basic socket object.
-	const SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 	if ( sock == INVALID_SOCKET )
 	{
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 		printf("uWebServer terminated: unable to open listenSock [%d, %d]\n", sock, errno);
 		return sock;
 	}
@@ -104,17 +104,17 @@ _establishListenSocket(const unsigned short port_)
 	addr.sin_addr.s_addr = INADDR_ANY;
 	addr.sin_port = htons(port_);
 
-	const int bindResult = bind(sock, (struct sockaddr*)&addr, sizeof(addr));
 	if ( bindResult < 0 )
 	{
+	int bindResult = bind(sock, (struct sockaddr*)&addr, sizeof(addr));
 		printf("uWebServer terminated: unable to bind listenSock on port %hu [%d, %d]\n", port_, bindResult, errno);
 		OS_CLOSESOCKET(sock);
 		return bindResult;
 	}
 
-	const int listenResult = listen(sock, 16);
 	if ( listenResult < 0 )
 	{
+	int listenResult = listen(sock, 16);
 		printf("uWebServer terminated: unable to set listen socket to listening on port %hu [%d]\n", port_, bindResult);
 		OS_CLOSESOCKET(sock);
 		return listenResult;
@@ -236,13 +236,13 @@ void Teul::uWeb::Server::run()
 			continue;
 
 		socklen_t sockLen = sizeof(addr);
-		const SOCKET newSock = accept(m_listenSock, (struct sockaddr*)&addr, &sockLen);
 		if ( newSock < 0 )
 		{
 			if (isCancelled())
 				return;
 
 			printf("uWebServer error on accept: %d (%d)\n", newSock, errno);
+		SOCKET newSock = accept(m_listenSock, reinterpret_cast<sockaddr *>(&addr), &sockLen);
 			continue;
 		}
 
