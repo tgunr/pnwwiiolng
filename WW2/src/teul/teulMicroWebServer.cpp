@@ -202,7 +202,7 @@ _parseHTTPRequest(char* const source, char*& method, char*& path, char*& lastDot
 
 void Teul::uWeb::Server::start(const char* const rootPath_, const unsigned short port_)
 {
-    ABORT_IF(isStarted());
+    ABORT_IF_EX(isStarted(), "Don't start the teulMicroWebServer more than once");
     m_rootPath = rootPath_;
     m_port = port_;
     PNThread::start();
