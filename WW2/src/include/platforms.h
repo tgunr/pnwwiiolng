@@ -43,6 +43,12 @@
 #define FORMAT_FN(n,m) __attribute__((format(printf,n,m)))
 #define FORMAT_ARG(n)
 #define NORETURN_FN [[noreturn]]
+#define _DISABLE_WARNING(pragma) _Pragma(#pragma)
+#define DISABLE_WARNING(warning) \
+    _Pragma("clang diagnostic push"); \
+    _DISABLE_WARNING(clang diagnostic ignored warning);
+#define POP_WARNINGS() \
+    _Pragma("clang diagnostic pop");
 
 #elif __is_GCC()
 
@@ -53,6 +59,12 @@
 #define FORMAT_FN(n,m) __attribute__((format(printf,n,m)))
 #define FORMAT_ARG(n)
 #define NORETURN_FN __attribute__ ((noreturn))
+#define _DISABLE_WARNING(pragma) _Pragma(#pragma)
+#define DISABLE_WARNING(warning) \
+    _Pragma("GCC diagnostic push") \
+    _DISABLE_WARNING(GCC diagnostic ignored warning);
+#define POP_WARNINGS() \
+    _Pragma("GCC diagnostic pop")
 
 #else
 
@@ -67,6 +79,8 @@
 #define FORMAT_FN(n,m)
 #define FORMAT_ARG(n)   _Printf_format_string_params_(n)
 #define NORETURN_FN [[noreturn]]
+#define DISABLE_WARNING(warning)
+#define POP_WARNINGS()
 
 // Add some explicit warnings
 #pragma warning( 1 : 4505 )	// unreferenced local functions
