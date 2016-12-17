@@ -232,7 +232,7 @@ void Teul::uWeb::Server::run()
 	for ( ; !isCancelled(); )
 	{
 		pfd.fd = m_listenSock;
-		if (poll(&pfd, 1, 250) <= 0)
+		if (poll(&pfd, 1, 100) <= 0) {
 			continue;
 
 		socklen_t sockLen = sizeof(addr);
