@@ -1,4 +1,3 @@
-#include <syscfg.h> // Path is project-specific.
 // Created: Tue Nov 22 13:25:41 CST 2011
 //
 // Implements the simplistic web server for server state reporting.
@@ -8,40 +7,38 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "teul/teulMicroWebServer.h"
-#if platOS != OS_WIN32
-#include <sys/socket.h>
-#include <netinet/in.h>
-#else
-#include <winsock2.h>
-#endif
-#include <errno.h>
-#if defined(HAVE_SYS_SENDFILE_H) && HAVE_SYS_SENDFILE_H == 1
-#include <sys/sendfile.h>
-#endif
+#include <syscfg.h>
 
-#if platOS == OS_WIN32
-# pragma comment(lib, "event.lib")
-# pragma comment(lib, "ws2_32.lib")
-#endif
+#include "teul/teulMicroWebServer.h"
+
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#if defined(WIN32)
-# define poll(...) WSAPoll(__VA_ARGS__)
+#if defined(HAVE_SYS_SENDFILE_H) && HAVE_SYS_SENDFILE_H == 1
+#include <sys/sendfile.h>
+#endif
+
+#if platOS != OS_WIN32
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <poll.h>
+#define PATH_SEPARATOR "/"
+
 #else
-# include <poll.h>
+
+#include <winsock2.h>
+#pragma comment(lib, "event.lib")
+#pragma comment(lib, "ws2_32.lib")
+#define poll(...) WSAPoll(__VA_ARGS__)
+#define PATH_SEPARATOR '\\'
+
 #endif
 
 #ifndef O_BINARY
 # define O_BINARY 0
-#endif
-
-#if platOS == OS_WIN32
-#define PATH_SEPARATOR '\\'
-#else
-#define PATH_SEPARATOR "/"
 #endif
 
 //////////////////////////////////////////////////////////////////////
