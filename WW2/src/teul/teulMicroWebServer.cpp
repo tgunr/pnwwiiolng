@@ -237,11 +237,21 @@ void Teul::uWeb::Server::run()
 
 	char buffer[4096];
 	sockaddr_in addr;
-		if (poll(&pfd, 1, 100) <= 0) {
 	pollfd listen_pollfd{ m_listenSock, POLLIN | POLLPRI | POLLERR | POLLHUP | POLLNVAL, 0 };
     pollfd accept_pollfd{ 0, POLLIN | POLLPRI | POLLERR | POLLHUP | POLLNVAL, 0 };
     
     while (!isCancelled()) {
+        switch (poll(&listen_pollfd, 1, 100)) {
+            case 0: // timeout
+                continue;
+            case SOCKET_ERROR:
+                if (errno != EAGAIN && errno != EINTR) {
+                    cancel();
+                }
+                continue; // C and contextual funniness - break would not break the while() here, but continue does continue it!
+            default:
+                break;
+        }
 
 		socklen_t sockLen = sizeof(addr);
 			printf("uWebServer error on accept: %d (%d)\n", newSock, errno);
