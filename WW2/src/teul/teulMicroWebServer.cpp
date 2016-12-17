@@ -49,10 +49,9 @@
 
 struct WebError
 {
-	WebError(unsigned int code_, const char* const error_)
-		: m_code(code_)
-		, m_error(error_)
-		{}
+	WebError(unsigned int code_, const char* const error_) :
+		m_code(code_), m_error(error_)
+    {}
 
 	unsigned int m_code;
 	std::string m_error;
@@ -61,8 +60,7 @@ struct WebError
 //////////////////////////////////////////////////////////////////////
 // Send a resource list.
 
-void
-_sendString200(const SOCKET fd, const std::string& content)
+void _sendString200(const SOCKET fd, const std::string& content)
 {
     std::string ok200 =
         "HTTP/1.1 200 OK\r\n"
@@ -80,13 +78,12 @@ _sendString200(const SOCKET fd, const std::string& content)
 //////////////////////////////////////////////////////////////////////
 // Tear up the listen socket.
 
-static SOCKET
-_establishListenSocket(const unsigned short port_)
+static SOCKET _establishListenSocket(const unsigned short port_)
 {
 	// Tear up the basic socket object.
-	if ( sock == INVALID_SOCKET )
-	{
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+    
+	if (sock == INVALID_SOCKET) {
 		printf("uWebServer terminated: unable to open listenSock [%d, %d]\n", sock, errno);
 		return sock;
 	}
@@ -104,17 +101,17 @@ _establishListenSocket(const unsigned short port_)
 	addr.sin_addr.s_addr = INADDR_ANY;
 	addr.sin_port = htons(port_);
 
-	if ( bindResult < 0 )
-	{
 	int bindResult = bind(sock, (struct sockaddr*)&addr, sizeof(addr));
+	
+    if (bindResult < 0) {
 		printf("uWebServer terminated: unable to bind listenSock on port %hu [%d, %d]\n", port_, bindResult, errno);
 		OS_CLOSESOCKET(sock);
 		return bindResult;
 	}
 
-	if ( listenResult < 0 )
-	{
 	int listenResult = listen(sock, 16);
+    
+	if (listenResult < 0) {
 		printf("uWebServer terminated: unable to set listen socket to listening on port %hu [%d]\n", port_, bindResult);
 		OS_CLOSESOCKET(sock);
 		return listenResult;
@@ -128,74 +125,82 @@ _establishListenSocket(const unsigned short port_)
 //////////////////////////////////////////////////////////////////////
 // Parse an input string into method, path and the file extension.
 
-static size_t
-_parseHTTPRequest(char* const source, char*& method, char*& path, char*& lastDot, char*& args)
+static size_t _parseHTTPRequest(char* const source, char*& method, char*& path, char*& lastDot, char*& args)
 {
 	args = nullptr;
 
 	// Skip leading white space.
 	char* ptr = source;
-	while ( *ptr && isspace(*ptr) )
+    
+	while (*ptr && isspace(*ptr)) {
 		++ptr;
+    }
 
-	if ( *ptr == 0 )
 		throw WebError(400, "Bad request (missing method)");
+	if (*ptr == 0) {
+    }
 
 	// This marks the start of the method.
 	method = ptr;
 
 	// Advance to the next whitespace.
-	while ( *ptr && !isspace(*ptr) )
+	while (*ptr && !isspace(*ptr)) {
 		++ptr;
-	if ( *ptr == 0 )
+    }
+	if (*ptr == 0) {
 		throw WebError(400, "Bad request (missing path)");
+    }
 
 	// Skip the whitespace.
-	while ( *ptr && isspace(*ptr) )
+	while (*ptr && isspace(*ptr)) {
 		*(ptr++) = 0;
+    }
 
 	// We only support the "GET" method.
-	if ( strcasecmp(method, "GET") != 0 )
+	if (strcasecmp(method, "GET") != 0) {
 		throw WebError(405, "Bad request (unsupported method)");
+    }
 
 	// Method needs to be followed by a path.
-	if ( *ptr == 0 )
+	if (*ptr == 0) {
 		throw WebError(400, "Bad request (missing path)");
+    }
 
 	// Record the start of the path.
 	path = ptr;
-	if ( *path != '/' )
+	if (*path != '/') {
 		throw WebError(400, "Bad request (illegal path)");
+    }
 
-	if ( path[1] == 0 || isspace(path[1]) )
+	if (path[1] == 0 || isspace(path[1])) {
 		strcpy(path, "/index.html");
+    }
 
 	// It's also the last place we saw a dot, in a way.
 	lastDot = ptr;
-	while ( *ptr && !isspace(*ptr) )
-	{
+	while (*ptr && !isspace(*ptr)) {
 		// Don't allow dots after paths.
-		if ( PN_UNLIKELY(*ptr == '/' && ((*(ptr+1) == '.') | (*(ptr+1) == '\\'))) )
+		if (PN_UNLIKELY(*ptr == '/' && ((*(ptr+1) == '.') | (*(ptr+1) == '\\')))) {
 			throw WebError(403, "Interesting path");
-		if ( *ptr == '?' )
-		{
+        }
+        
+		if (*ptr == '?') {
 			args = ptr + 1;
 			break;
 		}
-		if ( *ptr == '.' )
+		if (*ptr == '.') {
 			lastDot = ptr;
+        }
 		++ptr;
 	}
-
-	*ptr = 0;
+    *ptr = 0;
 
 	size_t pathLen = (size_t)(ptr - path);
-	if ( pathLen > 255 )
-	{
+    
+	if (pathLen > 255) {
 		path[255] = 0;
 		pathLen = 255;
 	}
-
 	return pathLen;
 }
 
@@ -212,64 +217,62 @@ void Teul::uWeb::Server::onCancel()
 {
     // Close the socket so that the 'accept()' loop breaks and the thread can tell it needs to terminate.
     SOCKET socket = m_listenSock.exchange(INVALID_SOCKET);
-    if (socket != INVALID_SOCKET) {
-        OS_CLOSESOCKET(socket);
-    }
+
+    OS_CLOSESOCKET(socket);
     std::this_thread::yield();
 }
+
+#define checkForCancellation(cleanup) \
+    if (isCancelled()) {    \
+        cleanup; \
+        return; \
+    }
 
 void Teul::uWeb::Server::run()
 {
 	m_listenSock = _establishListenSocket(port());
-	if (m_listenSock == INVALID_SOCKET)
+	if (m_listenSock == INVALID_SOCKET) {
 		return;
+    }
 
 	char buffer[4096];
 	sockaddr_in addr;
-
-	pollfd pfd { 0, POLLIN|POLLPRI|POLLERR|POLLHUP|POLLNVAL, 0 };
-
-	for ( ; !isCancelled(); )
-	{
-		pfd.fd = m_listenSock;
 		if (poll(&pfd, 1, 100) <= 0) {
-			continue;
+	pollfd listen_pollfd{ m_listenSock, POLLIN | POLLPRI | POLLERR | POLLHUP | POLLNVAL, 0 };
+    pollfd accept_pollfd{ 0, POLLIN | POLLPRI | POLLERR | POLLHUP | POLLNVAL, 0 };
+    
+    while (!isCancelled()) {
 
 		socklen_t sockLen = sizeof(addr);
-		if ( newSock < 0 )
-		{
-			if (isCancelled())
-				return;
-
 			printf("uWebServer error on accept: %d (%d)\n", newSock, errno);
 		SOCKET newSock = accept(m_listenSock, reinterpret_cast<sockaddr *>(&addr), &sockLen);
+        
+		if (newSock < 0) {
+            checkForCancellation(OS_CLOSESOCKET(newSock));
 			continue;
 		}
-
-		pfd.fd = newSock;
+        
+		accept_pollfd.fd = newSock;
 		for (size_t i = 0; i < 50; ++i) {
-			if (poll(&pfd, 1, 100) > 0)
+			if (poll(&accept_pollfd, 1, 100) > 0) {
 				break;
-			if (isCancelled())
-				return;
+            }
+            checkForCancellation(OS_CLOSESOCKET(newSock));
 		}
 
 		int bytes = recv(newSock, buffer, sizeof(buffer) - 1, 0);
-		if (isCancelled())
-			return;
-		if (bytes < 0)
-		{
+        
+        checkForCancellation(OS_CLOSESOCKET(newSock));
+		if (bytes < 0) {
 			printf("uWebServer recv %d: errno %d", bytes, dbugGetErrno());
 			continue;
 		}
 		buffer[bytes] = 0;
 
-		try
-		{
+		try {
 			processHTTPRequest(newSock, buffer);
 		}
-		catch (WebError& e)
-		{
+		catch (WebError& e) {
             std::string errStr = std::to_string(e.m_code) + " " + e.m_error;
             std::string errResp =
                 "HTTP/1.1 " + errStr + "\r\n"
@@ -294,8 +297,7 @@ void Teul::uWeb::Server::run()
 //////////////////////////////////////////////////////////////////////
 // Call the handler for a path.
 
-static void
-_callHandler(const SOCKET sock, Teul::uWeb::Server::VirtualFileHandler handler, const char* const path, const char* const args, Teul::uWeb::Server* /*server*/)
+static void _callHandler(const SOCKET sock, Teul::uWeb::Server::VirtualFileHandler handler, const char* const path, const char* const args, Teul::uWeb::Server* /*server*/)
 {
 	// Call the handler to write the content.
 	(handler)(sock, path, args);
@@ -304,10 +306,9 @@ _callHandler(const SOCKET sock, Teul::uWeb::Server::VirtualFileHandler handler, 
 //////////////////////////////////////////////////////////////////////
 // Turn a file extension into Content-Type:
 
-static const char*
-_getContentTypeFor(std::string fileExt)
+static std::string _getContentTypeFor(std::string fileExt)
 {
-	static const std::map<std::string, const char*> extensions = {
+	static const std::map<std::string, std::string> extensions = {
 		{ ".js", "text/javascript" },
 		{ ".json", "application/json" },
 		{ ".html", "text/html" },
@@ -326,98 +327,109 @@ _getContentTypeFor(std::string fileExt)
 //////////////////////////////////////////////////////////////////////
 // Try and locate a physical file to be sent to the requester.
 
-static bool
-_sendPhysicalFile(const SOCKET sock, const char* const rootPath, const char* const path, const char* const lastDot)
+static bool _sendPhysicalFile(const SOCKET sock, const char* const rootPath, const char* const path, const char* const lastDot)
 {
 	int dirfd = -1, filefd = -1;
 	struct stat statBuf;
 
 	bool success = false;
 
-	try
-	{
+	try {
 #if defined(HAVE_OPENAT)
 		// Check for the base directory.
 		dirfd = open(rootPath, O_RDONLY | O_DIRECTORY);
-		if ( dirfd < 0 )
+		if (dirfd < 0) {
 			throw "Missing root";
+        }
 
 		// Can we open the file?
 		filefd = openat(dirfd, path + 1, O_RDONLY);
-		if ( filefd < 0 )
+		if (filefd < 0) {
 			throw "Not found";
+        }
 #else
 		std::string filepath = rootPath;
-		if ( path[0] != '/' && path[0] != '\\' )
+        
+		if (path[0] != '/' && path[0] != '\\') {
 			filepath += PATH_SEPARATOR;
+        }
 		filepath += path;
 
 #if platOS == OS_WIN32
 		size_t n = 0;
-		while ( (n = filepath.find('/', n)) != filepath.npos )
+		while ((n = filepath.find('/', n)) != filepath.npos) {
 			filepath[n] = PATH_SEPARATOR;
+        }
 #endif
 		filefd = open(filepath.c_str(), O_RDONLY | O_BINARY);
-		if ( filefd < 0 )
+		if (filefd < 0) {
 			throw "Not found";
+        }
 #endif
 
 		// Stat the file so we can get it's size, use the
 		// information available in the fd entry tho.
-		if ( fstat(filefd, &statBuf) < 0 )
+		if (fstat(filefd, &statBuf) < 0) {
 			throw "Inaccessible file";
+        }
 
-		static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: %s\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %" PR64BitUT "\r\n\r\n";
-		char myBuf[sizeof(ok200) + 128];
-
-		const char* contentType = _getContentTypeFor(lastDot);
-
-		int len = strprintf(myBuf, ok200, contentType, (UINT64)statBuf.st_size);
-		if ( send(sock, myBuf, len, 0) > 0 )
-		{
+		std::string contentType = _getContentTypeFor(lastDot);
+        std::string ok200 =
+            "HTTP/1.1 200 OK\r\n"
+            "Access-Control-Allow-Origin: *\r\n"
+            "Content-Type: " + _getContentTypeFor(lastDot) + "\r\n"
+            "Content-Language: en\r\n"
+            "Content-Encoding: utf-8\r\n"
+            "Content-Length: " + std::to_string(statBuf.st_size) + "\r\n"
+            "\r\n";
+		char flushBuffer[] = "\r\n";
+		
+		if (send(sock, ok200.c_str(), ok200.length(), 0) > 0) {
 #if defined(HAVE_SYS_SENDFILE_H) && HAVE_SYS_SENDFILE_H == 1
 			// The first write might fail, if it does we don't care
 			// but we don't need to try and send the second.
 			sendfile(sock, filefd, nullptr, statBuf.st_size);
 #else
 			char xferBuffer[4096];
-			for (;; )
+			for (;;)
 			{
 				int readBytes = read(filefd, xferBuffer, sizeof(xferBuffer));
-				if ( readBytes <= 0 )
+				
+                if (readBytes <= 0) {
 					break;
-				int wroteBytes = send(sock, xferBuffer, readBytes, 0);
-				if ( wroteBytes < readBytes )
+                }
+				
+                int wroteBytes = send(sock, xferBuffer, readBytes, 0);
+				
+                if (wroteBytes < readBytes) {
 					break;
+                }
 			}
 #endif
 		}
 
 		success = true;
-
-		char flushBuffer[] = "\r\n";
-		send(sock, flushBuffer, sizeof(flushBuffer) - 1, 0);
+        send(sock, flushBuffer, sizeof(flushBuffer) - 1, 0);
 		shutdown(sock, 1);
 	}
-	catch ( const char* error )
-	{
+	catch (const char* error) {
 		printf("file:%s %s\n", path + 1, error);
 		success = false;
 	}
 
-	if ( filefd >= 0 )
+	if (filefd >= 0) {
 		close(filefd);
-	if ( dirfd >= 0 )
+    }
+	if (dirfd >= 0) {
 		close(dirfd);
-
+    }
 	return success;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Process a HTTP request from a given fd.
 
-void
-Teul::uWeb::Server::processHTTPRequest(const SOCKET sock, char* const request)
+void Teul::uWeb::Server::processHTTPRequest(const SOCKET sock, char* const request)
 {
 	char* method = nullptr;
 	char* path = nullptr;
@@ -431,15 +443,17 @@ Teul::uWeb::Server::processHTTPRequest(const SOCKET sock, char* const request)
 	{
 		std::lock_guard<std::mutex> lock(m_config_mutex);
 		auto it = m_virtualFileHandlers.find(path);
-		if ( it != m_virtualFileHandlers.end() )
+
+		if (it != m_virtualFileHandlers.end()) {
 			handler = it->second.first;
+        }
 	}
 
-	if ( handler != nullptr ) {
+	if (handler != nullptr) {
 		_callHandler(sock, handler, path, args, this);
-    } else if ( strcmp(path, "/index.json") == 0 ) {
+    } else if (strcmp(path, "/index.json") == 0) {
 		_sendString200(sock, m_resourceList);
-	} else if ( _sendPhysicalFile(sock, rootPath().c_str(), path, lastDot) != true ) {
+	} else if (_sendPhysicalFile(sock, rootPath().c_str(), path, lastDot) != true) {
         throw WebError(404, "File not found");
     }
 }
@@ -447,8 +461,7 @@ Teul::uWeb::Server::processHTTPRequest(const SOCKET sock, char* const request)
 //////////////////////////////////////////////////////////////////////
 // Register a handler.
 
-void
-Teul::uWeb::Server::addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_)
+void Teul::uWeb::Server::addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_)
 {
 	std::lock_guard<std::mutex> lock(m_config_mutex);
 	m_virtualFileHandlers[path_] = std::make_pair(handler_, desc_);
