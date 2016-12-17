@@ -199,8 +199,26 @@ _parseHTTPRequest(char* const source, char*& method, char*& path, char*& lastDot
 	return pathLen;
 }
 
-void
-Teul::uWeb::Server::run()
+
+void Teul::uWeb::Server::start(const char* const rootPath_, const unsigned short port_)
+{
+    ABORT_IF(isStarted());
+    m_rootPath = rootPath_;
+    m_port = port_;
+    PNThread::start();
+}
+
+void Teul::uWeb::Server::onCancel()
+{
+    // Close the socket so that the 'accept()' loop breaks and the thread can tell it needs to terminate.
+    SOCKET socket = m_listenSock.exchange(INVALID_SOCKET);
+    if (socket != INVALID_SOCKET) {
+        OS_CLOSESOCKET(socket);
+    }
+    std::this_thread::yield();
+}
+
+void Teul::uWeb::Server::run()
 {
 	m_listenSock = _establishListenSocket(port());
 	if (m_listenSock == INVALID_SOCKET)
