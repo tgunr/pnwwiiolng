@@ -160,7 +160,7 @@ static inline void OS_CLOSE(int fd) { _close(fd); }
 #define OS_MKDIR(_dir_, ...) _mkdir(_dir_)
 #define OS_WMKDIR(_dir_, ...) _wmkdir(_dir_)
 #define OS_CREAT(...) _creat(__VA_ARGS__)
-static inline void OS_CLOSESOCKET(SOCKET sock) { closesocket(sock); }
+static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { closesocket(sock); } sock = INVALID_SOCKET; }
 
 //////////////////////////////////////////////////////////////////////////////
 // Equivalents for macOS/Linux
@@ -178,7 +178,7 @@ static inline void OS_CLOSE(int fd) { close(fd); }
 #define OS_MKDIR(...) mkdir(__VA_ARGS__)
 #define OS_WMKDIR(...) wmkdir(__VA_ARGS__)
 #define OS_CREAT(f,p) ::creat(f,p)
-static inline void OS_CLOSESOCKET(SOCKET sock) { close(sock); }
+static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { close(sock); } sock = INVALID_SOCKET; }
 
 #else
 
