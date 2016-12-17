@@ -231,9 +231,6 @@ void Teul::uWeb::Server::run()
 
 	for ( ; !isCancelled(); )
 	{
-		// Make sure we're not providing a denial of service to the host by using all the CPU.
-		std::this_thread::yield();
-
 		pfd.fd = m_listenSock;
 		if (poll(&pfd, 1, 250) <= 0)
 			continue;
