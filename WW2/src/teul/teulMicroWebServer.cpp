@@ -64,12 +64,17 @@ struct WebError
 void
 _sendString200(const SOCKET fd, const std::string& content)
 {
-	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/application-json\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %" PRSizeT "\r\n\r\n%s\n";
-	const size_t bufSize = sizeof(ok200) + content.length() + 1;
-	char* buf = new char[bufSize];
-	int bytes = sprintf(buf, ok200, content.length() + 1, content.c_str());
-	send(fd, buf, bytes, 0);
-	delete [] buf;
+    std::string ok200 =
+        "HTTP/1.1 200 OK\r\n"
+        "Access-Control-Allow-Origin: *\r\n"
+        "Content-Type: application/json\r\n"
+        "Content-Language: en\r\n"
+        "Content-Encoding: utf-8\r\n"
+        "Content-Length: " + std::to_string(content.length()) + "\r\n"
+        "\r\n" +
+        content;
+
+	send(fd, ok200.c_str(), ok200.length(), 0);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -250,10 +255,21 @@ Teul::uWeb::Server::run()
 		}
 		catch (WebError& e)
 		{
-			static const char errFmt[] = "HTTP/1.1 %u %s\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/html\r\nContent-Language: en\r\nAllow: GET\r\n\r\n<html><head><title>%u %s</title></head><body><h1>ERROR %u: %s</h1></body></html>\r\n\r\n";
-			std::unique_ptr<char[]> myBuf = std::make_unique<char[]>(sizeof(errFmt) + e.m_error.size() * 3 + 32);
-			const int len = sprintf(myBuf.get(), errFmt, e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str());
-			send(newSock, myBuf.get(), len, 0);
+            std::string errStr = std::to_string(e.m_code) + " " + e.m_error;
+            std::string errResp =
+                "HTTP/1.1 " + errStr + "\r\n"
+                "Access-Control-Allow-Origin: *\r\n"
+                "Content-Type: text/html\r\n"
+                "Content-Language: en\r\n"
+                "Content-Encoding: utf-8\r\n"
+                "\r\n"
+                "<html><head>"
+                "<title>" + errStr + "</title>"
+                "</head><body>"
+                "<h1>ERROR " + errStr + "</h1>"
+                "</body></html>\r\n";
+
+			send(newSock, errResp.c_str(), errResp.length(), 0);
 		}
 
 		OS_CLOSESOCKET(newSock);
