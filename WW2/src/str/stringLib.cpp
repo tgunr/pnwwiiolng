@@ -98,3 +98,30 @@ char* strescape(char* d,const char* s, char c)
 	return d;
 }
 
+std::string string_replace(const std::string &haystack, const std::string &needle, const std::string &replacement)
+{
+    size_t pos = 0;
+    std::string result = haystack;
+
+    while((pos = result.find(needle, pos)) != std::string::npos)
+    {
+        result.replace(pos, needle.length(), replacement);
+        pos += replacement.length();
+    }
+    return result;
+}
+
+std::vector<std::string> split_string(const std::string &str, const std::string &delimiter, size_t max_split)
+{
+    std::vector<std::string> strings;
+
+    std::string::size_type pos = 0;
+    std::string::size_type prev = 0;
+    while ((pos = str.find(delimiter, prev)) != std::string::npos && strings.size() < (max_split == 0 ? 0 : max_split - 1))
+    {
+        strings.push_back(str.substr(prev, pos - prev));
+        prev = pos + 1;
+    }
+    strings.push_back(str.substr(prev));
+    return strings;
+}

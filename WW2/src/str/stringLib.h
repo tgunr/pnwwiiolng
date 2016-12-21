@@ -70,3 +70,7 @@ static inline void strsafecpy(wchar_t* dest, const wchar_t* src, size_t sizeWith
 	wcsncpy(dest, src, sizeWithNul - 1);
 	dest[sizeWithNul - 1] = 0;
 }
+
+// Now let's have some actual C++ string utility going on here.
+std::string string_replace(const std::string &haystack, const std::string &needle, const std::string &replacement);
+std::vector<std::string> split_string(const std::string &str, const std::string &delimiter, size_t max_split = SIZE_MAX);
