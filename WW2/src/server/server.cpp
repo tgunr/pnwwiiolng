@@ -927,23 +927,12 @@ serverEnableDebugWebServer(SERVER_TYPE serverType)
 //////////////////////////////////////////////////////////////////////
 // Simple URL to test the server is running.
 
-static void
-_serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
+static void _serverReportAlive(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
 {
 	auto& stats = Server::myServerInfo.stats;
 
 	char ip[32];
 	teulGetAddress(stats.address, ip, sizeof(ip));
-
-    // Write the HTTP header
-    static const char ok200[] =
-        "HTTP/1.1 200 OK\r\n"
-        "Access-Control-Allow-Origin: *\r\n"
-        "Content-Type: text/javascript\r\n"
-        "Content-Language: en\r\n"
-        "Content-Encoding: utf-8\r\n\r\n";
-    
-    send(fd, ok200, sizeof(ok200) - 1, 0);
 
 	char buffer[1024];
 	const int len = strprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s\"}\r\n"
@@ -956,7 +945,11 @@ _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
         , stats.numPlayers()
         , PN_git_commitish_string
     );
-	send(fd, buffer, len, 0);
+    return Teul::uWeb::HTTPResponseBuilder(request)
+        .status(200)
+        .header("Access-Control-Allow-Origin", "*")
+        .JSON(buffer)
+        .build(response);
 }
 
 //////////////////////////////////////////////////////////////////////
