@@ -41,14 +41,41 @@
 # define O_BINARY 0
 #endif
 
+static const std::unordered_map<int, std::string> s_knownResponseCodes = {
+    { 100, "Continue" },
+    { 200, "OK" },
+    { 201, "Created" },
+    { 204, "No Content" },
+    { 206, "Partial Content" },
+    { 301, "Moved Permanently" },
+    { 302, "Found" },
+    { 307, "Temporary Redirect" },
+    { 400, "Bad Request" },
+    { 401, "Unauthorized" },
+    { 403, "Forbidden" },
+    { 404, "Not Found" },
+    { 405, "Method Not Allowed" },
+    { 500, "Internal Server Error" },
+    { 501, "Not Implemented" },
+    { 505, "HTTP Version Not Supported" },
+};
+
 //////////////////////////////////////////////////////////////////////
 // For throwing errors.
 
 struct WebError
 {
-	WebError(unsigned int code_, const char* const error_) :
+	WebError(unsigned int code_, const char* const error_ = nullptr) :
 		m_code(code_), m_error(error_)
-    {}
+    {
+        if (!m_error) {
+            std::unordered_map<int, std::string>::const_iterator it = s_knownResponseCodes.find(m_code);
+            
+            if (it != s_knownResponseCodes.end()) {
+                m_error = it->second;
+            }
+        }
+    }
 
 	unsigned int m_code;
 	std::string m_error;
