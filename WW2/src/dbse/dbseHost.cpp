@@ -26,11 +26,7 @@
 	//#define DEF_ERR_LEVEL Debug::ERR_NOTE
 #endif
 
-#ifndef NDEBUG
-#define DEF_ERR_FLAGS STD_ERR | LOG_ALL_TO_STDERR
-#else
 #define DEF_ERR_FLAGS STD_ERR
-#endif
 
 extern SINT32 dbseInstallHostCallbacks();
 
