@@ -125,3 +125,33 @@ std::vector<std::string> split_string(const std::string &str, const std::string 
     strings.push_back(str.substr(prev));
     return strings;
 }
+
+
+bool has_prefix(const std::string &str, const std::string &prefix)
+{
+    return str.compare(0, prefix.size(), prefix) == 0;
+}
+
+std::string strtolower(const std::string &str)
+{
+    std::string result = str;
+    for (char &c : result) { c = static_cast<char>(tolower(c)); }
+    return result;
+}
+
+std::string strtrim(const std::string &str)
+{
+    size_t snwspos = str.find_first_not_of(" \t\n\v\f\r");
+
+    if (snwspos == std::string::npos) {
+        return "";
+    }
+
+    size_t enwspos = str.find_last_not_of(" \t\n\v\f\r");
+
+    if (enwspos == std::string::npos) {
+        return "";
+    }
+
+    return str.substr(snwspos, (enwspos + 1) - snwspos);
+}
