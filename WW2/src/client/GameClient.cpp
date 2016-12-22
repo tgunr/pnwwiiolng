@@ -1082,8 +1082,10 @@ void GameClient::ProcessBrigadeControlNotice(const BrigadeControlNotice* const n
 
 	BrigadeControlDescriptor bcd = notice->getDescription();
 
-	// print out the line
-	uiChatPrintUILocLine(icons, color, bcd.label.c_str(), bcd.arg1.c_str(), bcd.arg2.c_str(), bcd.arg3.c_str(), bcd.arg4.c_str());
+	std::wstring text = uiChatAssembleUILoc(bcd.label.c_str(), bcd.arg1.c_str(), bcd.arg2.c_str(), bcd.arg3.c_str(), bcd.arg4.c_str());
+	if ( bcd.major_broadcast )
+		uiGameEvent(GAMEEVENT_ALERT, 1, text.c_str());
+	uiChatPrintLineIcon(icons, color, L"%s", text.c_str());
 }
 
 void GameClient::ProcessHCUnitLocation(const HCUnitLocation& unitloc)
