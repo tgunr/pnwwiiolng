@@ -152,7 +152,7 @@ struct BCD_Objective : public BrigadeControlDescriptor
 					label += ".bridge";
 				} else {
 					label += ".cp";
-					if ( strcmp(l, "objective") != 0 ) // HACK: Proposal/veto messages aren't major.
+					if ( strcmp(l, "objective") == 0 ) // HACK: Proposal/veto messages aren't major.
 						major_broadcast = true;
 				}
 			}
