@@ -88,10 +88,42 @@ static const std::unordered_map<std::string, std::string> s_mimeMap = {
 
 static const std::string s_fallbackMimeType = "application/octet-stream";
 
+//////////////////////////////////////////////////////////////////////
+// URL decoder
+static inline bool hexToBin(char in, uint8_t &out)
+{
+    if (in >= '0' && in <= '9') {
+        out = in - '0';
+    } else if (in >= 'A' && in <= 'F') {
+        out = (in - 'A') + 10;
+    } else if (in >= 'a' && in <= 'f') {
+        out = (in - 'a') + 10;
+    } else {
+        return false;
+    }
+    return true;
+}
+
+std::string URLDecode(const std::string &input)
+{
+    std::string result = input;
+    std::string::size_type loc = 0;
+
+    while ((loc = result.find_first_of('%', loc)) != std::string::npos) {
+        std::string escape = result.substr(loc + 1, 2);
+        uint8_t highNibble = 0, lowNibble = 0;
+        
+        if (escape.length() == 2 && hexToBin(escape[0], highNibble) && hexToBin(escape[1], lowNibble)) {
+            result.replace(loc, 3, std::string(1, ((highNibble & 0x0f) << 4) | (lowNibble & 0x0f)));
+        } else {
+            ++loc;
+        }
+    }
+    return result;
+}
 
 //////////////////////////////////////////////////////////////////////
 // For throwing errors.
-
 struct WebError
 {
 	WebError(unsigned int code_, const char* const error_ = nullptr) :
@@ -108,6 +140,10 @@ struct WebError
 
 	unsigned int m_code;
 	std::string m_error;
+};
+
+class SendFailureError : public std::exception
+{
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -368,37 +404,10 @@ void Teul::uWeb::HTTPResponseBuilder::build(Teul::uWeb::HTTPResponse &result)
 }
 
 //////////////////////////////////////////////////////////////////////
-// URL decoder
-static inline bool hexToBin(char in, uint8_t &out)
 {
-    if (in >= '0' && in <= '9') {
-        out = in - '0';
-    } else if (in >= 'A' && in <= 'F') {
-        out = (in - 'A') + 10;
-    } else if (in >= 'a' && in <= 'f') {
-        out = (in - 'a') + 10;
-    } else {
-        return false;
-    }
-    return true;
-}
 
-std::string URLDecode(const std::string &input)
 {
-    std::string result = input;
-    std::string::size_type loc = 0;
 
-    while ((loc = result.find_first_of('%', loc)) != std::string::npos) {
-        std::string escape = result.substr(loc + 1, 2);
-        uint8_t highNibble = 0, lowNibble = 0;
-        
-        if (escape.length() == 2 && hexToBin(escape[0], highNibble) && hexToBin(escape[1], lowNibble)) {
-            result.replace(loc, 3, std::string(1, ((highNibble & 0x0f) << 4) | (lowNibble & 0x0f)));
-        } else {
-            ++loc;
-        }
-    }
-    return result;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -535,8 +544,6 @@ static int _processAndOpenResponseFile(const std::string &rootPath, const std::s
     fileSize = sbuf.st_size;
     return filefd;
 }
-
-class SendFailureError : public std::exception {};
 
 static void _tryClientSend(int sock, const void *buffer, size_t buflen)
 {
