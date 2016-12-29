@@ -1451,6 +1451,7 @@ LOGICAL obdrawApplyBumpmapTextureStage(OBJECT* lpobj)
 	piTexCoordConstPtr	ptu;
 	piCOLORVALUE		ambient;
 
+    return TRUE;
 	if (!MultiTextureEnable || bTexturesDisabled)
 	{
 		return TRUE;
@@ -5298,7 +5299,7 @@ piMATRIX		mat,mat1;
 	if (textype == MT_BUMPMAP)
 	{
 		// Bump map
-		obdrawApplyBumpmapTextureStage(lpobj);
+//		obdrawApplyBumpmapTextureStage(lpobj);
 
 		if (!DrawVertices(type, lpobj))
 		{
@@ -5306,7 +5307,7 @@ piMATRIX		mat,mat1;
 		}
 
 		// Bump map
-		obdrawReleaseBumpmapTextureStage(lpobj);
+//		obdrawReleaseBumpmapTextureStage(lpobj);
 	}
 	else
 	if (textype == MT_MULTIPASS)

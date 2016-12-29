@@ -6730,7 +6730,8 @@ UINT32 _ReadBumpAndFrictionTable()
 		{
 			continue;
 		}
-		_BAFData[Position].BumpHeight = (FLOAT32)atof((char*)BufferPtr);
+//        _BAFData[Position].BumpHeight = (FLOAT32)atof((char*)BufferPtr);
+        _BAFData[Position].BumpHeight = 0.0;
 
 		BufferPtr = (UCHAR*)strtok(nullptr,",");
 		if (BufferPtr == nullptr)
