@@ -76,4 +76,5 @@ std::string string_replace(const std::string &haystack, const std::string &needl
 std::vector<std::string> split_string(const std::string &str, const std::string &delimiter, size_t max_split = SIZE_MAX);
 bool has_prefix(const std::string &str, const std::string &prefix);
 std::string strtolower(const std::string &str);
+std::string strtoupper(const std::string &str);
 std::string strtrim(const std::string &str);

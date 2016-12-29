@@ -139,6 +139,13 @@ std::string strtolower(const std::string &str)
     return result;
 }
 
+std::string strtoupper(const std::string &str)
+{
+    std::string result = str;
+    for (char &c : result) { c = static_cast<char>(toupper(c)); }
+    return result;
+}
+
 std::string strtrim(const std::string &str)
 {
     size_t snwspos = str.find_first_not_of(" \t\n\v\f\r");
