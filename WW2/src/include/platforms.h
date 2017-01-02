@@ -49,8 +49,17 @@
     _DISABLE_WARNING(clang diagnostic ignored warning);
 #define POP_WARNINGS() \
     _Pragma("clang diagnostic pop");
+#if __has_cpp_attribute(fallthrough)
+#define FALLTHROUGH [[fallthrough]]
+#else
+#define FALLTHROUGH [[clang::fallthrough]]
+#endif
 
 #elif __is_GCC()
+
+#ifndef __has_cpp_attribute
+#define __has_cpp_attribute(x) 0
+#endif
 
 #define PN_LIKELY(p)   __builtin_expect(!!(p), 1)
 #define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
@@ -58,13 +67,22 @@
 #define PRSsizeT "zd"
 #define FORMAT_FN(n,m) __attribute__((format(printf,n,m)))
 #define FORMAT_ARG(n)
+#if __has_cpp_attribute(noreturn)
+#define NORETURN_FN [[noreturn]]
+#else
 #define NORETURN_FN __attribute__ ((noreturn))
+#endif
 #define _DISABLE_WARNING(pragma) _Pragma(#pragma)
 #define DISABLE_WARNING(warning) \
     _Pragma("GCC diagnostic push") \
     _DISABLE_WARNING(GCC diagnostic ignored warning);
 #define POP_WARNINGS() \
     _Pragma("GCC diagnostic pop")
+#if __has_cpp_attribute(fallthrough)
+#define FALLTHROUGH [[fallthrough]]
+#else
+#define FALLTHROUGH
+#endif
 
 #else
 
@@ -81,6 +99,7 @@
 #define NORETURN_FN [[noreturn]]
 #define DISABLE_WARNING(warning)
 #define POP_WARNINGS()
+#define FALLTHROUGH __fallthrough
 
 // Add some explicit warnings
 #pragma warning( 1 : 4505 )	// unreferenced local functions
