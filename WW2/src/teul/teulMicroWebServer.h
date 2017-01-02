@@ -32,62 +32,75 @@ namespace Teul
             std::string responseVirtualFilePath; // use sendfile()
         };
         
-        class Server;
-        
-        /// @internal
+        //! @internal
+        // Because Client is here.
+        class HTTPRequestHeaderReader;
+        class HTTPRequestBodyReader;
         class HTTPRequestParser
         {
             public:
-                HTTPRequestParser() : m_request(), m_parseBuffer(), m_parsePointer(0), m_knownContentLength(UINT64_MAX), m_seenHeaderTerminator(false) {}
-                HTTPRequest getRequest() const { return m_request; }
-                bool parseMoreData(const std::string &data); // Return true if parse resulted in a complete request, throw exception on error
-                void validateRequest() const; // Throw exception on error
+                HTTPRequestParser();
+            
+                const HTTPRequest &getRequest() const { return m_request; }
+            
+                bool parseMoreData(const std::string &data); // Return true if parse resulted in a complete request, pass empty data for EOF, throw exception on error
+                size_t getBytesUnused() const;
+                void reset();
+
             private:
+                std::string::size_type m_bytesSoFar;
                 HTTPRequest m_request;
-                std::string m_parseBuffer; // raw byte stream
-                std::string::size_type m_parsePointer;
-                uint64_t m_knownContentLength;
-                bool m_seenHeaderTerminator;
+                std::unique_ptr<HTTPRequestHeaderReader> m_headersParser;
+                std::unique_ptr<HTTPRequestBodyReader> m_bodyParser;
+                enum class State : uint8_t {
+                    Ready,
+                    ParsingHeaders,
+                    ParsingBody,
+                    Complete,
+                };
+                State m_state;
         };
+
+        // The choice of std::list<> here is carefully considered:
+        // - To make the unregister call below work, a container which does not
+        //   invalidate iterators on erasure of other elements is required. Only
+        //   list<> and forward_list<> do this.
+        // - forward_list<> meets the required semantics, but elements may only
+        //   be erased using the iterator to the *preceeding* element. This
+        //   would compromise the ability for a Client to track its own iterator
+        //   by requiring it to track another Client's lifetime, negating the
+        //   gains of forward_list<>.
+        class Client;
+        using ClientList = std::list<std::unique_ptr<Client>>;
         
-        /// @internal
+        //! @internal
+        //! std::default_delete<> requires a complete type.
+        class Server;
         class Client : public PNThread
         {
             public:
-                Client(Server &owner, SOCKET fd) :
-                    m_owner(owner), m_clientSock(fd)
-                {}
+                Client(Server &owner, SOCKET fd);
             
                 virtual ~Client();
             
+                void start(ClientList::iterator &myIterator);
+                
                 virtual void run() override;
                 virtual void onCancel() override;
             
             private:
                 Server &m_owner;
+                ClientList::iterator m_myIterator;
                 std::atomic<SOCKET> m_clientSock;
                 HTTPRequestParser m_requestParser;
-                std::chrono::steady_clock::time_point m_requestStart;
+                std::chrono::steady_clock::time_point m_currentRequestStart;
+                std::string m_transferBuffer; // raw byte string
             
-                // API guarantee: A 404 response with no virtual file path will never throw an exception.
                 void sendResponse(const HTTPResponse &response);
+                bool pollSocket();
+                size_t readData();
+                void handleData(size_t nbytes);
         };
-    }
-}
-// I hate C++.
-static inline bool operator==(const Teul::uWeb::Client &a, const Teul::uWeb::Client &b)
-{
-    return &a == &b;
-}
-namespace std {
-    template <> struct hash<Teul::uWeb::Client> {
-        typedef Teul::uWeb::Client argument_type;
-        typedef std::size_t result_type;
-        result_type operator()(argument_type const &a) const { return reinterpret_cast<size_t>(&a); }
-    };
-}
-namespace Teul {
-    namespace uWeb {
         
 		class Server : public PNThread
 		{
@@ -125,11 +138,14 @@ namespace Teul {
             
                 // Client-only API
                 friend class Client;
-
-                std::mutex m_clientList_mutex;
-                std::unordered_set<Client> m_clientList;
             
-                void client_unregisterClient(Client &client);
+                std::mutex m_clientList_mutex;
+                ClientList m_clientList;
+                ClientList m_defunctClientList;
+                void reap();
+                void reap_unlocked();
+            
+                void client_unregisterClient(ClientList::iterator &client);
                 VirtualFileHandler client_findHandlerForRequest(const HTTPRequest &request);
 		};
 
