@@ -1375,10 +1375,11 @@ void Teul::uWeb::Server::addVirtualFile(std::string desc_, std::string path_, Vi
 	std::unique_lock<std::shared_timed_mutex> lock(m_config_mutex);
 	m_virtualFileHandlers[path_] = std::make_pair(handler_, desc_);
     
-	if (m_resourceList.length() > 1) {
-        m_resourceList.erase(m_resourceList.end() - 1);
+    m_resourceList.erase(m_resourceList.end() - 1);
+	if (m_resourceList.length() > 2) {
+        m_resourceList += ",";
     }
-    m_resourceList += ",{\"url\":\"" + path_ + "\",\"desc\":\"" + desc_ + "\"}]";
+    m_resourceList += "{\"url\":\"" + path_ + "\",\"desc\":\"" + desc_ + "\"}]";
 }
 
 //////////////////////////////////////////////////////////////////////
