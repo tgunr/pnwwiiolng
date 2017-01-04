@@ -1640,6 +1640,7 @@ _controllerConnect(ENDPOINT& endpoint)
 {
 	dbugLog(_FLD, "t:%d ip:%s:%u connected to controller", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
 	s_controllerConnected = true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 	ProcessIntroduction intro;
 #if platOS == OS_WIN32
@@ -1684,6 +1685,7 @@ void _connectToController()
 		teulUpdateTransport(1);
 		teulSyncClock();
 	}
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 //////////////////////////////////////////////////////////////////////////
