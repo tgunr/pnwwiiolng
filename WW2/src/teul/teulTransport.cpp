@@ -404,7 +404,7 @@ teulInitTransport(LogMode logType
 	dbugInit(logType, name);
 
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
-#if defined(CLOSED_BETA) || defined(ALPHA_RELEASE)
+#if defined(ALPHA_RELEASE)
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
 #else
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));

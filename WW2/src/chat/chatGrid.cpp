@@ -86,11 +86,7 @@ public:
 public:
 	enum
 	{
-#ifdef CLOSED_BETA
-		_EXPIRY_MS = 20 * 1000			//!< 20 seconds
-#else
 		_EXPIRY_MS = 60 * 1000			//!< 1 minute
-#endif
 	,	_KEY_SHIFT = 9					//!< Keys have 512m granularity
 	,	_NODE_SIZE = 1 << _KEY_SHIFT
 	,	_CLIENT_RING_RADIUS = 1
@@ -142,12 +138,7 @@ private:
 	friend ChatGrid* _getGrid(const GridKey& key);
 };
 
-#if defined(CLOSED_BETA)
-# define GRID_INFO(mask, ...) dbugLog(_FLD, "g:%" PR64BitUT ":%d,%d " mask, gridKey().instanceID(), gridKey().X(), gridKey().Y(), __VA_ARGS__)
-# define GRID_INFOADD(mask, ...) dbugLog(_FLD, "+ " mask, __VA_ARGS__)
-#else
-# define GRID_INFO(mask, ...)
-#endif
+#define GRID_INFO(mask, ...) dbugLog(_FLD, "g:%" PR64BitUT ":%d,%d " mask, gridKey().instanceID(), gridKey().X(), gridKey().Y(), __VA_ARGS__)
 
 //////////////////////////////////////////////////////////////////////
 

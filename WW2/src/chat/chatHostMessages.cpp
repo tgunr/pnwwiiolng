@@ -796,9 +796,7 @@ _recvPersonaUpdate(ACTION_OBJECT* const a)
 	if ( player == nullptr )
 	{
 		// This can occur when the player isn't done logging in yet.
-#ifdef CLOSED_BETA
 		dbugLog(_FLD, "t:%d Unable to find player %s:%" PR64BitT "", a->teulIndex, Chat::Name(update.m_handleID).c_str(), update.m_handleID);
-#endif
 		return a->offset;
 	}
 

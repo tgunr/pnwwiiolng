@@ -1001,13 +1001,11 @@ ChatMission::sendUpdates()
 	if ( m_removes.empty() && m_updates.empty() )
 		return 0;
 
-#ifdef CLOSED_BETA
 	dbugLog(_FLD, "m:%u members:%" PRSizeT " updates:%" PRSizeT " "
 					, missionID()
 					, m_members.size()
 					, m_updates.size()
 					);
-#endif
 
 	// The greeting list is no-longer valid.
 	m_mmu.clear();

@@ -2773,12 +2773,6 @@ _releaseVehicleList(Player& player)
 }
 
 void
-#ifdef CLOSED_BETA
-Player::processUpdateValues(UINT32 /*updateNo*/, UINT32 /*prime*/)
-{
-	return;
-}
-#else
 Player::processUpdateValues(UINT32 updateNo, UINT32 prime)
 {
 	bool ejectworthy = false;
@@ -2837,7 +2831,6 @@ Player::processUpdateValues(UINT32 updateNo, UINT32 prime)
 
 	m_ejectionCountdown = (rand() % 120) + (3 * (rand() % 30));
 }
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // IRC Commands
