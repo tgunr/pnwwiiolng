@@ -56,7 +56,7 @@ _unitLocationsKeyframe(HC_UNIT_LOCATIONS& hculUpdate)
 
 	if ( hculUpdate.empty() == false )
 	{
-		betaLog(_FLD, "%" PRSizeT " updates in hcul keyframe", hculUpdate.size());
+		dbugLog(_FLD, "%" PRSizeT " updates in hcul keyframe", hculUpdate.size());
 	}
 }
 
@@ -89,7 +89,7 @@ chatUpdateHCUnitLocations()
 			continue;
 		if ( hculUpdate.send(player->teulIndex()) < 0 )
 		{
-			betaLog(_FLI, "<FAIL");
+			dbugLog(_FLI, "<FAIL");
 		}
 	}
 

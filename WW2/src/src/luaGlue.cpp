@@ -182,7 +182,7 @@ _getDouble(const char* function, int argc=0)
 		return 0;
 	}
 	double result = (double)lua_tonumber(_luaVM, -1);
-	betaLog(_FLI, "%s returned %g", function, result);
+	dbugLog(_FLI, "%s returned %g", function, result);
 	lua_pop(_luaVM, 1);
 	return result;
 }

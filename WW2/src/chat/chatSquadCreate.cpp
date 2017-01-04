@@ -53,7 +53,7 @@ _sendInvites(const ChatHandle squadHandle, const std::string& squadName, const C
 	{
 		RANK_NO rank = (it->first == xo) ? Squad::XO : Squad::MEMBER;
 		Player* invitee = it->second;
-		betaLog(_FLI, "c:%s sending invite to %s", invitee->callsign(), squadName.c_str());
+		dbugLog(_FLI, "c:%s sending invite to %s", invitee->callsign(), squadName.c_str());
 		invitee->sendSquadCreateInvite(squadHandle, squadName, co, rank);
 	}
 }
@@ -262,7 +262,7 @@ chatSquadAcceptCreateInvite(Player* acceptor, Player* creator)
 	// Pointer check
 	if ( acceptor == nullptr || creator == nullptr )
 	{
-		betaLog(_FLA, "NULL pointers");
+		dbugLog(_FLA, "NULL pointers");
 		throw SQR_NO_INVITE;
 	}
 
@@ -270,7 +270,7 @@ chatSquadAcceptCreateInvite(Player* acceptor, Player* creator)
 	SQUAD_REQUESTS::iterator it = requestIndex.find(creator->matchHandle());
 	if ( it == requestIndex.end() )
 	{
-		betaLog(_FLA, "creator has no request pending");
+		dbugLog(_FLA, "creator has no request pending");
 		throw SQR_NO_INVITE;
 	}
 
@@ -282,20 +282,20 @@ chatSquadAcceptCreateInvite(Player* acceptor, Player* creator)
 	// in which case letting me vote would be bad.
 	if ( find(control.m_players.begin(), control.m_players.end(), acceptor->matchHandle()) == control.m_players.end() )
 	{
-		betaLog(_FLA, "acceptor is not in the players list");
+		dbugLog(_FLA, "acceptor is not in the players list");
 		throw SQR_NO_INVITE;
 	}
 
 	// Have I already agreed?
 	if ( find(request.agreed.begin(), request.agreed.end(), acceptor->matchHandle()) != request.agreed.end() )
 	{
-		betaLog(_FLA, "%s has already accepted invite to %s's squad", acceptor->callsign(), creator->callsign());
+		dbugLog(_FLA, "%s has already accepted invite to %s's squad", acceptor->callsign(), creator->callsign());
 		throw SQR_NO_INVITE;
 	}
 
 	if ( request.agreed.size() >= SquadControl::CREATE_PLAYERS_REQUIRED )
 	{
-		betaLog(_FLA, "squad already met member requirements");
+		dbugLog(_FLA, "squad already met member requirements");
 		throw SQR_NO_INVITE;
 	}
 

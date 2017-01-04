@@ -2043,7 +2043,7 @@ _sendHCUnitMovements(Player* const player)
 	if ( player->m_lastHCUpdate >= lastBrigadeMovement )
 		return true;
 
-	betaLog(_FLD, "t:%d p:%u c:%s movements %" PR64BitUT "->%" PR64BitUT "", player->teulIndex(), player->playerID(), player->callsign(), player->m_lastHCUpdate, lastBrigadeMovement);
+	dbugLog(_FLD, "t:%d p:%u c:%s movements %" PR64BitUT "->%" PR64BitUT "", player->teulIndex(), player->playerID(), player->callsign(), player->m_lastHCUpdate, lastBrigadeMovement);
 
 	static UINT64 _lastStart = 0;
 	static UINT64 _lastEnd = 0;

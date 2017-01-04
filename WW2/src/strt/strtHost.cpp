@@ -152,9 +152,6 @@ static void _describeBuildConfigurationToLogFile()
 #if defined(OPEN_BETA)
 	dbugLog(_FLI, " OPEN_BETA");
 #endif
-#if defined(CLOSED_BETA)
-	dbugLog(_FLI, " CLOSED_BETA");
-#endif
 #if defined(TRAINING_SERVER)
 	dbugLog(_FLI, " TRAINING_SERVER");
 #endif

@@ -350,7 +350,6 @@ main(int argc,char** argv)
 			{
 				case '?':
 					usage();
-				break;
 				case 'h':		// Database Host
 					arg = getArgument(argc, argv, i);
 					if ( arg == nullptr )

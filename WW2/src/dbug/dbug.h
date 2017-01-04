@@ -122,13 +122,6 @@ NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, UINT32 err
 #define ABORT_UNLESS(assertion_) ABORT_UNLESS_EX(assertion_, "Failed !(%s)", #assertion_)
 #define ABORT_IF(assertion_)     ABORT_IF_EX(assertion_, "Failed %s", #assertion_)
 
-// Define betaLog()
-#if defined(BETA_RELEASE)
-    #define betaLog(m, fmt, ...) dbugLog(m, fmt, ## __VA_ARGS__)
-#else
-    #define betaLog(m, fmt, ...)
-#endif
-
 #if platBuild == BUILD_SERVER
     #define DEBUG_ERR(fmt, ...) dbugLog(_FLA, fmt, ## __VA_ARGS__)
     #define DEBUG_FATAL(fmt, ...) LogAbort(fmt, ## __VA_ARGS__)

@@ -115,16 +115,16 @@ extern void chatRegisterDotCommands();
 
 #if defined(DEV_BUILD)
 # define DEFAULT_SYS_MOTD		"MOTD: Internal Dev Cluster"
-#elif defined(CLOSED_BETA)
-# define DEFAULT_SYS_MOTD		"MOTD: WWII Online Closed Beta"
 #elif defined(BETA_RELEASE)
 # define DEFAULT_SYS_MOTD		"MOTD: WWII Online Beta Release"
 #elif defined(TEST_RELEASE)
 # define DEFAULT_SYS_MOTD		"MOTD: WWII Online BETA Release-Candidate"
 #elif defined(TRAINING_SERVER)
 # define DEFAULT_SYS_MOTD		"MOTD: Welcome to the Training Server"
-#else
+#elif defined(PUBLIC_RELEASE)
 # define DEFAULT_SYS_MOTD		"MOTD: Welcome to the Virtual Battlefield"
+#else
+# error No build type
 #endif
 
 #define DEFAULT_ALLIED_HC_MOTD	"MOTD: Welcome to the Allied High Command"
