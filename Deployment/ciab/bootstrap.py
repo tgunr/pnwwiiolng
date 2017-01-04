@@ -297,6 +297,7 @@ def main():
             "DBSE_CONNECTION_TIMEOUT_MS=60000\n"
             "PEER_CONNECTION_TIMEOUT_MS=60000\n"
             "MANAGE_PROCESSES=dbd;strat;chat;map;cell\n"
+			"AUTH_DB="+cfg.db_host+"\n"
         )
 
     if cfg.xfer_exes:
