@@ -820,7 +820,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 	}
 
 #if defined(DEBUG_UPDATE_PACK)
-	ON_SERVER(  betaLog(_FLD, "wu: ntp = %u, mvpf = %u, vislist = %u, nv = %u, off = %d, myMTU = %d", numToPack, framing.maxVehiclesPerFrame(), wu->myVehicle->m_visList.size(), wu->numVehicles, offset, myMTUbits)  );
+	ON_SERVER(  dbugLog(_FLD, "wu: ntp = %u, mvpf = %u, vislist = %u, nv = %u, off = %d, myMTU = %d", numToPack, framing.maxVehiclesPerFrame(), wu->myVehicle->m_visList.size(), wu->numVehicles, offset, myMTUbits)  );
 #endif
 
 	return offset;

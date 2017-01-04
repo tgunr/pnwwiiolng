@@ -107,7 +107,7 @@ _findServerSync(UINT32 address)
 	{
 		if ( it->address() == address )
 		{
-			betaLog(_FLI, "%s is already on the synclist", teulGetAddress(address));
+			dbugLog(_FLI, "%s is already on the synclist", teulGetAddress(address));
 			return it;
 		}
 	}
@@ -124,7 +124,7 @@ strtAddSyncPeer(UINT32 address)
 	SYNC_LIST::iterator it = _findServerSync(address);
 	if ( it != synclist.end() )
 	{
-		betaLog(_FLI, "%s is already on the synclist", teulGetAddress(address));
+		dbugLog(_FLI, "%s is already on the synclist", teulGetAddress(address));
 		return;
 	}
 

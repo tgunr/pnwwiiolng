@@ -40,7 +40,7 @@ MobileSpawn::activate(
 	, UINT32 vehicleID
 	)
 {
-	betaLog(_FLD, "msp: m:%u p:%u c:%s sto:%u stoST:%d activating", mission->missionID(), player->playerID(), player->callsign(), stoUID, stoSubType);
+	dbugLog(_FLD, "msp: m:%u p:%u c:%s sto:%u stoST:%d activating", mission->missionID(), player->playerID(), player->callsign(), stoUID, stoSubType);
 
 	m_active = true;
 

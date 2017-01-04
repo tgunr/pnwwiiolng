@@ -83,7 +83,7 @@ chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool /*sendMembers*/)
 
 		squad.m_slogan = row.NextString();
 
-		betaLog(_FLI, "sq:%u sending info to chat host", squad.m_squadID);
+		dbugLog(_FLI, "sq:%u sending info to chat host", squad.m_squadID);
 		if ( squadXchg.send(teulIndex) < 0 )
 			dbugLog(_FLA, "squadXchg send failed");
 	}

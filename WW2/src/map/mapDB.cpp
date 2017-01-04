@@ -1030,7 +1030,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 			}
 			else
 			{
-				betaLog(_FLI, "t:%d p:%u c:%s pers:[%d/%d:%d] locked %d"
+				dbugLog(_FLI, "t:%d p:%u c:%s pers:[%d/%d:%d] locked %d"
 								, player->teulIndex(), player->playerID(), player->callsign()
 								, ps.m_countryID, ps.m_branchID, ps.m_personaID
 								, ps.m_lockedThru);

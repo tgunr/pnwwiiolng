@@ -840,7 +840,7 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 	GridKey botleft(player->instance().id(), (SINT32)(player->lastX() - range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() - range) >> ChatGrid::_KEY_SHIFT);
 	GridKey topright(player->instance().id(), (SINT32)(player->lastX() + range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() + range) >> ChatGrid::_KEY_SHIFT);
 
-	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " getting cells within [%d,%d],[%d,%d] %" PR64BitT " range: "
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " getting cells within [%d,%d],[%d,%d] %" PR64BitT " range: "
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, player->instance().category(), player->instance().type(), player->instance().handle(), player->instance().id()
 					, botleft.X(), botleft.Y(), topright.X(), topright.Y()
@@ -851,19 +851,19 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 		const ChatGrid* node = (*it);
 		if ( node->players().empty() )
 		{
-            betaLog(_FLD, "[%d,%d:empty] ", node->gridKey().X(), node->gridKey().Y());
+            dbugLog(_FLD, "[%d,%d:empty] ", node->gridKey().X(), node->gridKey().Y());
 			continue;
 		}
 		if ( !node->inRange(botleft, topright) )
 		{
-            betaLog(_FLD, "[%d,%d:too far] ", node->gridKey().X(), node->gridKey().Y());
+            dbugLog(_FLD, "[%d,%d:too far] ", node->gridKey().X(), node->gridKey().Y());
 			continue;
 		}
 		cells.push_back(&node->players());
-		betaLog(_FLD, "%d,%d ", node->gridKey().X(), node->gridKey().Y());
+		dbugLog(_FLD, "%d,%d ", node->gridKey().X(), node->gridKey().Y());
 	}
 
-	betaLog(_FLD, " total: %" PRSizeT " cells", cells.size());
+	dbugLog(_FLD, " total: %" PRSizeT " cells", cells.size());
 }
 
 static bool g_enableSnapshot = false;

@@ -421,7 +421,7 @@ SquadList::removeMember(ChatHandle handle)
 
 	if ( subject )
 	{
-		betaLog(_FLI, "t:%d p:%u c:%s sq:%u removing player from %s"
+		dbugLog(_FLI, "t:%d p:%u c:%s sq:%u removing player from %s"
 						, subject->teulIndex(), subject->playerID(), subject->callsign(), squad().squadID(), squad().shortName());
 		_updateOnline(-1);
 		subject->SetSquad(0, Squad::NOT_IN_SQUAD, 0LL);
@@ -480,7 +480,7 @@ chatRequestSquad(UINT32 squadID, Player* player)
 
 	if ( g_debugSquads )
 	{
-		betaLog(_FLI, "t:%d p:%u c:%s sq:%u changing member entry at t:%u", player->teulIndex(), player->playerID(), player->callsign(), squadID, teulTime());
+		dbugLog(_FLI, "t:%d p:%u c:%s sq:%u changing member entry at t:%u", player->teulIndex(), player->playerID(), player->callsign(), squadID, teulTime());
 	}
 
 	list.changeMemberEntry(*entry, entry->squadRank(), player);
@@ -841,7 +841,7 @@ Player::sendSquadInvite(UINT32 forSquadID, const ChatHandle from)
 	SquadList* squadList = chatFindSquadList(forSquadID);
 	if ( !squadList )
 	{
-		betaLog(_FLA, "NO SQUAD LIST FOR SQUAD INVITE");
+		dbugLog(_FLA, "NO SQUAD LIST FOR SQUAD INVITE");
 		return false;
 	}
 

@@ -378,7 +378,7 @@ chatMissionAddPlayer(Player* player, UINT32 missionID, UINT32 sponsor)
 
 	_tellSponsor(sponsor, player, LSTR_RECRUIT_JOINED_MISSION, mission);
 
-	betaLog(_FLI, "m:%u p:%u c:%s joining mission [%" PRSizeT " members]", missionID, player->playerID(), player->callsign(), mission.m_members.size());
+	dbugLog(_FLI, "m:%u p:%u c:%s joining mission [%" PRSizeT " members]", missionID, player->playerID(), player->callsign(), mission.m_members.size());
 
 	// And you generate a membership update by joining
 	mission.addMemberUpdate(player);
@@ -568,7 +568,7 @@ ChatMission::removeWaypoint(const ChatHandle handle, bool byPlayer)
 	// If this is a player removing a mobile spawn...
 	if ( byPlayer && handle == _getMSPHandle() )
 	{
-		betaLog(_FLD, "m:%u removing MSPAWN waypoint", missionID());
+		dbugLog(_FLD, "m:%u removing MSPAWN waypoint", missionID());
 		sendMobileSpawn(0, waypoint.playerHandle(), (FLOAT32)waypoint.x(), (FLOAT32)waypoint.y(), 0.0f, false, 0, 0);
 	}
 
@@ -634,7 +634,7 @@ chatMissionUpdateMember(Player* const player)
 void
 ChatMission::addMemberRemoval(Player* const player)
 {
-	betaLog(_FLD, "m:%u t:%d p:%u c:%s removed"
+	dbugLog(_FLD, "m:%u t:%d p:%u c:%s removed"
 				, missionID()
 				, player->teulIndex()
 				, player->playerID()
@@ -657,7 +657,7 @@ ChatMission::expireWaypoints()
 		Waypoint& wp = it->second;
 		if ( wp.type() == WPT_ENEMY && wp.posted() <= cutoff )
 		{
-			betaLog(_FLI, "m:%u removing waypoint %s", missionID(), Chat::Name(it->first).c_str());
+			dbugLog(_FLI, "m:%u removing waypoint %s", missionID(), Chat::Name(it->first).c_str());
 			removeWaypoint(it->first, false);
 			break;
 		}
@@ -1023,7 +1023,7 @@ ChatMission::sendUpdates()
 			)
 		{
 			update.m_handle = *it;
-			betaLog(_FLD, "-%s ", Chat::Name(update.m_handle).c_str());
+			dbugLog(_FLD, "-%s ", Chat::Name(update.m_handle).c_str());
 			m_mmu.add(update);
 		}
 		m_removes.clear();
@@ -1035,7 +1035,7 @@ ChatMission::sendUpdates()
 		; ++it
 		)
 	{
-        betaLog(_FLD, "*%s ", Chat::Name(it->first).c_str());
+        dbugLog(_FLD, "*%s ", Chat::Name(it->first).c_str());
 
 		Player* const player = it->second;
 		if ( player )
@@ -1107,7 +1107,7 @@ chatSendMissionUpdates()
 		const UINT32 updatesSentThisMission = mission.sendUpdates();
 		if ( updatesSentThisMission )
 		{
-			betaLog(_FLD, "m:%u sent %u updates", mission.missionID(), updatesSentThisMission);
+			dbugLog(_FLD, "m:%u sent %u updates", mission.missionID(), updatesSentThisMission);
 		}
 		updatesSent += updatesSentThisMission;
 		lastMission = mission.missionID();
@@ -1207,7 +1207,7 @@ MOBILE_SPAWN_WAYPOINT::receive(SINT32 /*teulIndex*/, MOBILE_SPAWN_WAYPOINT& inco
 {
 	const MobileSpawnWaypoint& wp = incoming.data();
 
-	betaLog(_FLI, "mspwp: m:%u p:%u c:%s d:%u sto:%u", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_deployed, wp.m_stoUID);
+	dbugLog(_FLI, "mspwp: m:%u p:%u c:%s d:%u sto:%u", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_deployed, wp.m_stoUID);
 
 	if ( wp.m_missionID == 0 )
 	{

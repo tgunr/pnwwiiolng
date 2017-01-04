@@ -526,7 +526,7 @@ static SINT32 _recvEnemyReport(ACTION_OBJECT* const a)
 
 	if ( a->offset > 0 )
 	{
-		betaLog(_FLI,"received enemy report for vehicle " PRF_WEAPON_SERIAL "", PRA_WEAPON_SERIAL(report.enemyReported));
+		dbugLog(_FLI,"received enemy report for vehicle " PRF_WEAPON_SERIAL "", PRA_WEAPON_SERIAL(report.enemyReported));
 
 		if (! strtAddEnemyReport(report))
 			return -EINVAL;
@@ -637,7 +637,7 @@ MM_SPAWN_GRANT_RESPONSE spawnGrantResponse;
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &spawnGrantRequest, sizeof(MM_SPAWN_GRANT_REQUEST));
 
-	betaLog(_FLD, "spawnGrantRequest: %d %d:%d:%d:%d:%d %d:%d:%d:%d", spawnGrantRequest.weaponSerial.serial, spawnGrantRequest.weaponSerial.source.cell.ox, spawnGrantRequest.weaponSerial.source.cell.oy, spawnGrantRequest.weaponSerial.source.id, spawnGrantRequest.weaponSerial.source.objClass, spawnGrantRequest.weaponSerial.source.objType, spawnGrantRequest.weaponSerial.spec.wCountry, spawnGrantRequest.weaponSerial.spec.wCategory, spawnGrantRequest.weaponSerial.spec.wClass, spawnGrantRequest.weaponSerial.spec.wType);
+	dbugLog(_FLD, "spawnGrantRequest: %d %d:%d:%d:%d:%d %d:%d:%d:%d", spawnGrantRequest.weaponSerial.serial, spawnGrantRequest.weaponSerial.source.cell.ox, spawnGrantRequest.weaponSerial.source.cell.oy, spawnGrantRequest.weaponSerial.source.id, spawnGrantRequest.weaponSerial.source.objClass, spawnGrantRequest.weaponSerial.source.objType, spawnGrantRequest.weaponSerial.spec.wCountry, spawnGrantRequest.weaponSerial.spec.wCategory, spawnGrantRequest.weaponSerial.spec.wClass, spawnGrantRequest.weaponSerial.spec.wType);
 
 	const bool success = strtProcessSpawnGrantRequest(spawnGrantRequest, spawnGrantResponse);
 	if ( success )
@@ -676,11 +676,11 @@ _recvMMJoinListRequest(ACTION_OBJECT* const a)
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &request, sizeof(MM_POST_INFO_REQUEST));
 
-	betaLog(_FLD, "p:%u joinListRequest " PRF_WEAPON_SERIAL " %s %u", request.customerID, PRA_WEAPON_SERIAL(request.weaponSerial), Chat::Name(request.handle).c_str(), request.join);
+	dbugLog(_FLD, "p:%u joinListRequest " PRF_WEAPON_SERIAL " %s %u", request.customerID, PRA_WEAPON_SERIAL(request.weaponSerial), Chat::Name(request.handle).c_str(), request.join);
 
 	if ( !strtProcessJoinListRequest(a->teulIndex, request) )
 	{
-		betaLog(_FLD, "p:%u joinListRequest failed, sending deny", request.customerID);
+		dbugLog(_FLD, "p:%u joinListRequest failed, sending deny", request.customerID);
 		strtSendMMJoinDeny(request.customerID, MM_JOIN_FAIL_CANT_FIND_POSTED_WEAPON);
 	}
 
@@ -694,7 +694,7 @@ static SINT32 _recvMMPostInfoUpdate(ACTION_OBJECT* const a)
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &update, sizeof(MM_POST_INFO_UPDATE));
 
-	betaLog(_FLD, "p:%u postInfoUpdate " PRF_WEAPON_SERIAL " %u", update.customerID, PRA_WEAPON_SERIAL(update.weaponSerial), update.multicrew);
+	dbugLog(_FLD, "p:%u postInfoUpdate " PRF_WEAPON_SERIAL " %u", update.customerID, PRA_WEAPON_SERIAL(update.weaponSerial), update.multicrew);
 
 	strtProcessPostInfoUpdate(&update);
 

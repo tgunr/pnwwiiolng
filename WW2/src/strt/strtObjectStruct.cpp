@@ -160,7 +160,7 @@ ObjectStruct::setRepairRPs(UINT32 newRepairRPs)
 void
 ObjectStruct::setTableTimer(UCHAR inVisLevel, bool allowRebuild, bool shortRebuild)
 {
-	betaLog(_FLI, "setTableTimer(%s:%d -> %d) %s, %s"
+	dbugLog(_FLI, "setTableTimer(%s:%d -> %d) %s, %s"
 			, name , visLevel()
 			, inVisLevel
 			, ((allowRebuild)?"RB":"NORB")

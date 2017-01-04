@@ -233,7 +233,7 @@ _extractPlayerFromVehiclesList(Player& player, HostVehicle& vehicle)
 	if ( it != vehicle.players().end() )
 	{
 		vehicle.players().erase(it);
-		betaLog(_FLI, "t:%d p:%u c:%s v:%u extracting player from vehicle crew:%d, players:%" PRSizeT ""
+		dbugLog(_FLI, "t:%d p:%u c:%s v:%u extracting player from vehicle crew:%d, players:%" PRSizeT ""
 						, player.teulIndex(), player.playerID(), player.callsign(), vehicle.index
 						, vehicle.crew, vehicle.players().size()
 						);
@@ -2368,7 +2368,7 @@ _runHost()
 			HostVehicle* const vehicle = *it;
 
 #ifdef HEAVY_DEBUG
-			betaLog(_FLD, "c:%s v:%u sending update fm:%u iv:%ums", callsign, index, vehicle->framingMode, vehicle->m_updateInterval);
+			dbugLog(_FLD, "c:%s v:%u sending update fm:%u iv:%ums", callsign, index, vehicle->framingMode, vehicle->m_updateInterval);
 #endif
 
 			// Send this vehicle it's update.
@@ -2565,7 +2565,7 @@ _releaseVehicle(VEHICLE_HOLDER* const vehicleHold, FULL_OBJ_ID toFacility)
 	{
 		g_sortieReturns.AddSortie(index);
 
-		betaLog(_FLD, "v:%u unscheduling vehicle updates", index);
+		dbugLog(_FLD, "v:%u unscheduling vehicle updates", index);
 		updateUnscheduleVehicle(vehicle);
 	}
 

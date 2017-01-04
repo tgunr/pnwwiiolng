@@ -528,11 +528,11 @@ Player::addToCommandList()
 
 	if ( !isActiveOfficer() && !isEffectiveGM() )
 	{
-		betaLog(_FLI, "%s[%d] lacks permissions for command list", callsign(), playerID());
+		dbugLog(_FLI, "%s[%d] lacks permissions for command list", callsign(), playerID());
 		return;
 	}
 
-	betaLog(_FLI, "%s[%d] adding to command list", callsign(), playerID());
+	dbugLog(_FLI, "%s[%d] adding to command list", callsign(), playerID());
 
 	commandList.insert(this);
 	m_onCommandList = true;
@@ -605,7 +605,7 @@ Player::contextualStratCommand(const char* string, const char* arguments, WWII_C
 
 	OOBMessage outgoing(playerID(), brigadeID(), chatHandle(), string, arguments, property->m_fid, withSide, withCountry);
 
-	betaLog(_FLI, "t:%d p:%u c:%s contextual oob: %s [at %s]", teulIndex(), playerID(), callsign(), outgoing.m_text, property->Name());
+	dbugLog(_FLI, "t:%d p:%u c:%s contextual oob: %s [at %s]", teulIndex(), playerID(), callsign(), outgoing.m_text, property->Name());
 
 	outgoing.send();
 
@@ -1199,7 +1199,7 @@ Player::removeFromCommandList()
 	if ( !m_onCommandList )
 		return;
 
-	betaLog(_FLI, "%s[%d] removing from command list", callsign(), playerID());
+	dbugLog(_FLI, "%s[%d] removing from command list", callsign(), playerID());
 
 	commandList.erase(this);
 	m_onCommandList = false;
@@ -2082,7 +2082,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 
 	if ( newSide != m_prevSide )
 	{
-		betaLog(_FLI, "removing %p from %d side index", this, m_prevSide);
+		dbugLog(_FLI, "removing %p from %d side index", this, m_prevSide);
 		sidePlayers[m_prevSide].erase(this);
 	}
 
@@ -2097,7 +2097,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 
 		if ( newSide != side() )
 		{
-			betaLog(_FLI, "insert %p to %d side index", this, newSide);
+			dbugLog(_FLI, "insert %p to %d side index", this, newSide);
 			sidePlayers[newSide].insert(this);
 		}
 
@@ -2340,7 +2340,7 @@ _populateAWSReply(Player& player, const AWS::Request& request, const AWS_GRID& g
 
 	bool isAllied = (player.side() == ALLIED);
 
-	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " requesting %s AWS [%hu,%hu]-[%hu,%hu](%u)"
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " requesting %s AWS [%hu,%hu]-[%hu,%hu](%u)"
 					, player.teulIndex(), player.playerID(), player.callsign()
 					, player.instance().category(), player.instance().type(), player.instance().handle(), player.instance().id()
 					, (isAllied ? "axis" : "allied")

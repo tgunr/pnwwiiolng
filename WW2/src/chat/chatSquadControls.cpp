@@ -433,12 +433,12 @@ _processCreate(SquadControl& request, Player* player)
 
 	if ( request.m_players.empty() )
 	{
-		betaLog(_FLA, "m_players is empty");
+		dbugLog(_FLA, "m_players is empty");
 		throw SQR_CREATE_TOO_FEW_MEMBERS;
 	}
 	if ( request.m_players.size() < SquadControl::CREATE_PLAYERS_REQUIRED )
 	{
-		betaLog(_FLA, "m_players contains %" PRSizeT " instead of %" PRSizeT " members", request.m_players.size(), SquadControl::CREATE_PLAYERS_REQUIRED);
+		dbugLog(_FLA, "m_players contains %" PRSizeT " instead of %" PRSizeT " members", request.m_players.size(), SquadControl::CREATE_PLAYERS_REQUIRED);
 		throw SQR_CREATE_TOO_FEW_MEMBERS;
 	}
 
@@ -1114,7 +1114,7 @@ SquadMemberUpdate::receive(SINT32 teulIndex)
 
 	chatGetCallsign(_subject, m_handle);
 	chatGetCallsign(_originator, m_originator);
-	betaLog(_FLD, "t:%d receiving squad member update act:%u cmd:%u sq:%u h:%s r:%u orig:%s text:%s res:%u [%s]"
+	dbugLog(_FLD, "t:%d receiving squad member update act:%u cmd:%u sq:%u h:%s r:%u orig:%s text:%s res:%u [%s]"
 					, teulIndex, m_action, m_cmd, m_squadID, _subject, m_rank, _originator, m_text, m_result, reply.printResult());
 
 	Player* orig = PlayerInterface::Lookup(m_originator);

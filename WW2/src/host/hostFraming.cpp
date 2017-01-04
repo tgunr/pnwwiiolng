@@ -81,7 +81,7 @@ HostVehicle::selectBestFramingMode()
 
 	UINT32 interval = framings[framingMode].updateInterval;
 
-	betaLog(_FLI, "c:%s v:%u selecting framing mode %u [%u] dU:%u", vehicleData.callsign, index, framingMode, mtu, interval);
+	dbugLog(_FLI, "c:%s v:%u selecting framing mode %u [%u] dU:%u", vehicleData.callsign, index, framingMode, mtu, interval);
 
 	if ( isActive() )
 		updateScheduleVehicle(this, interval);

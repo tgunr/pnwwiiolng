@@ -675,14 +675,14 @@ mmProcessJoinAccept(const MM_JOIN_ACCEPT& accept)
 	{
 		return false;
 	}
-	BETALog(poster->teulIndex(), "commander");
+	dbugLog(poster->teulIndex(), "commander");
 
 	Player* const joiner = PlayerInterface::Lookup(accept.postedWeapon.crew);
 	if ( joiner == nullptr || poster->isAtLobby() == false )
 	{
 		return false;
 	}
-	BETALog(poster->teulIndex(), "crew");
+	dbugLog(poster->teulIndex(), "crew");
 
 	mmSendJoinAccept(joiner->teulIndex(), accept.postedWeapon);
 	_setWeapSerial(*poster, accept.postedWeapon.weaponSerial, MM_VEH_HAS_CREW);
