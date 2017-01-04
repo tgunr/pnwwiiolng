@@ -1834,6 +1834,10 @@ _serverUsesBroadcast(const SERVER_TYPE serverType)
 	}
 }
 
+#if platOS == OS_MACOS
+static std::thread s_parentCheckThread;
+#endif
+
 void
 Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTION errorFnPtr, KILL_FUNCTION killFnPtr, int argc, const char* argv[], const CommandLineOptions& cliOptions)
 {
@@ -1852,6 +1856,14 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 			"--child", "Process should die when parent terminates.", false,
 #if platOS == OS_LINUX
 			[](const char*) { prctl(PR_SET_PDEATHSIG, SIGHUP); }, nullptr
+#elif platOS == OS_MACOS
+            // This is a terrible hack, relying on launchd becoming an orphaned
+            // process' parent, but it does work reliably on all macOS versions.
+            // Using _exit() here instead of exit() because dbd's atexit
+            // handlers crash out.
+            [](const char*) { s_parentCheckThread = std::thread([] {
+                while (1) { if (getppid() == 1) { _exit(0); } std::this_thread::sleep_for(std::chrono::seconds(1)); } }
+            ); }, nullptr
 #else
 			[](const char*) {}, nullptr
 #endif
