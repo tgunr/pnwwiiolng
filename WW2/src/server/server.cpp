@@ -1914,6 +1914,10 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
+#ifndef NDEBUG
+    dbugSetWriteLevel(Debug::ERR_DBUG | STD_ERR);
+    dbugSetLogLevel(Debug::ERR_DBUG | STD_ERR);
+#endif
 
 	serverEnableDebugWebServer(myType);
 
