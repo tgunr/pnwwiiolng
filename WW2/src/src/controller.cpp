@@ -530,6 +530,9 @@ int main(int argc, const char* argv[], const char* envp[])
 			}
 		}
 	});
+#ifndef NDEBUG
+    dbugSetLogLevel(Debug::ERR_DBUG | STD_ERR);
+#endif
 
 	if ( Teul::ConfigVar::LoadedConfig() == false )
 	{
