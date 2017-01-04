@@ -626,6 +626,7 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 	dbugLog(_FLD, "t:%d closing [%u] st:%u cl:%s", inEndpoint.teulIndex(), code, inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
 	if ( inEndpoint.state() < IS_CLOSING || inEndpoint.m_closed == false )
 		inEndpoint.doError(ENOTCONN);
+        // Returning here results in an infinite loop
 
 	if ( (inEndpoint.state() < IS_CLOSING)
 		& (inEndpoint.state() != IS_LISTENING)
