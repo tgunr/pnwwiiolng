@@ -1652,10 +1652,10 @@ _controllerConnect(ENDPOINT& endpoint)
 
 	auto result = endpoint.writeRaw((const char*)&intro, sizeof(intro));
 	if ( result < 0 ) {
-		if ( errno == ECONNREFUSED )
+		if ( dbugGetErrno() == ECONNREFUSED )
 			LogAbort("Connection to controller refused.");
 		else
-			LogAbort("Unable to greet controller");
+			LogAbort("Unable to greet controller because %d", dbugGetErrno());
 	}
 	ABORT_IF_EX(result != sizeof(intro), "Failed to write intro to controller: %dv%" PRSizeT "", result, sizeof(intro));
 }
