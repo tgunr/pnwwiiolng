@@ -1829,10 +1829,8 @@ _serverUsesBroadcast(const SERVER_TYPE serverType)
 		case EXIT_SERVER:
 		case MAX_SERVER_TYPE:
 			return false;
-		break;
 		default:
 			return true;
-		break;
 	}
 }
 
