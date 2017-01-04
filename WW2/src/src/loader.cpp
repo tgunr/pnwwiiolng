@@ -296,28 +296,6 @@ _extract(const char* tarFile)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Check for an origin file
-
-static void
-_checkOriginFile()
-{
-	FILE* fp = fopen(cv_originFile.GetString(), "rb");
-	if ( fp == nullptr )
-	{
-		LogAbort("Unable to access %s/%s"
-				, cv_dataDir.GetString(), cv_originFile.GetString());
-	}
-
-	if ( fgets(g_origin, sizeof(g_origin) - 1, fp) == nullptr )
-	{
-		LogAbort("Unable to read %s/%s"
-			, cv_dataDir.GetString(), cv_originFile.GetString());
-	}
-
-	fclose(fp);
-}
-
-//////////////////////////////////////////////////////////////////////
 //
 
 int
