@@ -276,7 +276,7 @@ def main():
         cli.execute_script(DB_IMPORT_FILE)
 
     step("Generating environment.cfg.")
-    cfg_file = pathname(PLAYNET_PATH, "etc", "environment.cfg")
+    cfg_file = pathname(cfg.playnet_path, "etc", "environment.cfg")
     with open(cfg_file, "w") as envfh:
         envfh.write(
             "WWII_CLUSTER="+cfg.cluster_name+"\n"
