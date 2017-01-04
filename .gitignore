@@ -1663,6 +1663,11 @@ WW2.VC.opendb
 *.lo
 *.o
 
+/Deployment/ciab/bootstrap.ini
+/Deployment/ciab/Client/*.tkt
+/Deployment/ciab/Client/*.bat
+/Deployment/ciab/Client/*.sh
+
 xcuserdata/
 
 ww2mods
