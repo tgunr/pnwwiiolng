@@ -118,9 +118,16 @@
 //////////////////////////////////////////////////////////////////////////////
 #if defined(_WIN64) || defined(__x86_64__) || defined(__arm64__)
 # define BUILD_64
-# define PR64BitT "ld"
-# define PR64BitUT "lu"
-# define PRPermMaskT "lx"
+// LP64 vs. ILP64 (MSVC vs. not)
+# if defined(__LP64__)
+#  define PR64BitT "lld"
+#  define PR64BitUT "llu"
+#  define PRPermMaskT "llx"
+# else
+#  define PR64BitT "ld"
+#  define PR64BitUT "lu"
+#  define PRPermMaskT "lx"
+# endif
 #else
 # define BUILD_32
 # define PR64BitT "lld"
