@@ -18,7 +18,7 @@ DB_GAME_PASS = "freebird"
 
 CONFIG_XFER_OPTIONS = [ 'copy', 'move' ]
 if not IS_WIN:
-	CONFIG_XER_OPTIONS.append('link')
+	CONFIG_XFER_OPTIONS.append('link')
 
 BASE_DEV_ID = 2000
 BASE_USR_ID = 2100
