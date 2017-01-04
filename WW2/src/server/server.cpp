@@ -1860,10 +1860,8 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 #elif platOS == OS_MACOS
             // This is a terrible hack, relying on launchd becoming an orphaned
             // process' parent, but it does work reliably on all macOS versions.
-            // Using _exit() here instead of exit() because dbd's atexit
-            // handlers crash out.
             [](const char*) { s_parentCheckThread = std::thread([] {
-                while (1) { if (getppid() == 1) { _exit(0); } std::this_thread::sleep_for(std::chrono::seconds(1)); } }
+                while (1) { if (getppid() == 1) { exit(0); } std::this_thread::sleep_for(std::chrono::seconds(1)); } }
             ); }, nullptr
 #else
 			[](const char*) {}, nullptr
