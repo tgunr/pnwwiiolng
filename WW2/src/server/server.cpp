@@ -1825,7 +1825,6 @@ _serverUsesBroadcast(const SERVER_TYPE serverType)
 	switch ( serverType) {
 		case CONTROLLER_HOST:
 		case AUTH_HOST:
-		case DBD_HOST:
 		case EXIT_SERVER:
 		case MAX_SERVER_TYPE:
 			return false;
