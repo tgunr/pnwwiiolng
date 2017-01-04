@@ -335,11 +335,6 @@ main(int argc,char** argv)
 	const char* tarFile = nullptr;
 
 	bool argsOk = true;
-#if platOS != OS_WIN32
-	bool useOrigin = true;
-#else
-	bool useOrigin = false;
-#endif
 
 	for ( int i = 1; i < argc; ++i )
 	{
@@ -373,9 +368,6 @@ main(int argc,char** argv)
 				break;
 				case 'I':
 					useIrc = false;
-				break;
-				case 'O':
-					useOrigin = !useOrigin;
 				break;
 				case 0:
 					fprintf(stderr, "Invalid argument '-'\n");
@@ -413,9 +405,6 @@ main(int argc,char** argv)
 	_checkDirectoryStructure();
 
 	_extract(tarFile);
-
-	if ( useOrigin )
-		_checkOriginFile();
 
 	if ( importFileName == nullptr )
 		importFileName = cv_importFile.GetString();
