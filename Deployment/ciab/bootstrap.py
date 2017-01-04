@@ -27,21 +27,37 @@ def generate_tkt_and_bat(cfg, game_name, player_id):
             "OTP: 2342426\n"
             "bypass: %s\n" % (cfg.app_id, cfg.base_address, player_id)
         )
-
-    bat_file = '%s.bat' % (game_name)
-    if os.path.exists(CLIENT_PATH):
-        bat_file = pathname(CLIENT_PATH, bat_file)
-    with open(bat_file, "w") as batfh:
-        batfh.write(" ".join([
-            "WW2.exe",
-                "-ticket", tkt_name,
-                "-window", "1",
-                "-width", "800",
-                "-height", "640",
-                "-log", "0",
-                "-data", "1",
-                "-datadir", cfg.data_path
-        ]))
+	
+    if IS_WIN:
+        bat_file = '%s.bat' % (game_name)
+        if os.path.exists(CLIENT_PATH):
+            bat_file = pathname(CLIENT_PATH, bat_file)
+        with open(bat_file, "w") as batfh:
+            batfh.write(" ".join([
+                "WW2.exe",
+                    "-ticket", tkt_name,
+                    "-window", "1",
+                    "-width", "800",
+                    "-height", "640",
+                    "-log", "0",
+                    "-data", "1",
+                    "-datadir", cfg.data_path
+            ]))
+    else:
+        sh_file = '%s.sh' % (game_name)
+        if os.path.exists(CLIENT_PATH):
+            sh_file = pathname(CLIENT_PATH, sh_file)
+        with open(sh_file, "w") as batfh:
+            batfh.write(" ".join([
+                "open", "-a", "'World War II Online'", "--args",
+                    "-ticket", tkt_name,
+                    "-window", "1",
+                    "-width", "800",
+                    "-height", "640",
+                    "-log", "0",
+                    "-data", "1",
+                    "-datadir", cfg.data_path
+            ]))
 
 
 class ConfigError(Exception):
@@ -311,14 +327,11 @@ def main():
         except:
             die("Unable to import terrain/strat data.")
 
-    print()
-
-    if IS_WIN:
-        step("Generating .tkt and .bat files for test accounts.")
-        for i in range(1, 6):
-            for kind in ('rat', 'plyr'):
-                name, pid = "%s%04dp" % (kind, i), BASE_DEV_ID + i
-                generate_tkt_and_bat(cfg, name, pid)
+    step("Generating .tkt and .bat files for test accounts.")
+    for i in range(1, 6):
+        for kind in ('rat', 'plyr'):
+            name, pid = "%s%04dp" % (kind, i), BASE_DEV_ID + i
+            generate_tkt_and_bat(cfg, name, pid)
 
     step("Complete.")
 
