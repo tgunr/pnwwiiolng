@@ -922,8 +922,8 @@ JS_FUNCTION_DEF(jsMapView, addwaypoint)
 	}
 	else if(!strcmp(type, "mortar"))
 	{
-		wptype = WPT_ENEMY;
-		subtype = WTP_ENEMY_MORTAR;
+		wptype = WPT_MORTAR;
+		//subtype = WTP_ENEMY_MORTAR;
 		prefix = 'M';
 	}
 

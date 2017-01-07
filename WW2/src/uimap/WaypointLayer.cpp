@@ -305,7 +305,7 @@ void WaypointMapObject::DrawSelf(SuperCellMapView* mv)
 			uv = full;
 		break;
 		case WPT_MORTAR:
-			ctx->SetColor(1,0,0);
+			ctx->SetColor(1,1,0);
 			texid = _waypointlayer->_contacttexid;
 			uv = mortar;
 		break;
