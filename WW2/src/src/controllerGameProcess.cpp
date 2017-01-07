@@ -297,6 +297,8 @@ bool GameProcess::CheckStatus()
 	}
 }
 
+#include <dlfcn.h>
+
 template<size_t MaxPath>
 static void _getCurrentProcessPath(char (& processPath)[MaxPath])
 {
@@ -305,8 +307,12 @@ static void _getCurrentProcessPath(char (& processPath)[MaxPath])
 #if platOS == OS_WIN32
 	GetModuleFileNameA(NULL, processPath, MaxPath - 1);
 #else
-	extern const char* g_argv0;
-	strsafecpy(processPath, g_argv0);
+    extern int main(int argc, const char* argv[], const char* envp[]);
+    Dl_info info;
+    if (dladdr(reinterpret_cast<const void *>(main), &info) == 0) {
+        LogAbort("Can't determine current process name");
+    }
+    strncpy(processPath, info.dli_fname, MaxPath - 1);
 #endif
 	// terminate at the last path separator, otherwise it's just
 	// a filename and we use '.' as the path.

@@ -626,6 +626,7 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 	dbugLog(_FLD, "t:%d closing [%u] st:%u cl:%s", inEndpoint.teulIndex(), code, inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
 	if ( inEndpoint.state() < IS_CLOSING || inEndpoint.m_closed == false )
 		inEndpoint.doError(ENOTCONN);
+        // Returning here results in an infinite loop
 
 	if ( (inEndpoint.state() < IS_CLOSING)
 		& (inEndpoint.state() != IS_LISTENING)
@@ -645,7 +646,14 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 	inEndpoint.m_state = IS_DEAD;
 	inEndpoint.m_doTimeoutCheck = false;	// stop checking timeouts on me.
 
-	teulRemoveEndpoint(&inEndpoint);
+    // Recheck the state to make sure the doError() didn't put us into the dead state
+    // If it didn't, don't re-remove
+    if (inEndpoint.state() != IS_DEAD) {
+        dbugLog(_FLD, "t:%d calling teulRemoveEndpoint()", inEndpoint.teulIndex());
+        teulRemoveEndpoint(&inEndpoint);
+    } else {
+        //dbugLog(_FLD, "t:%d recursion on a dead endpoint", inEndpoint.teulIndex());
+    }
 }
 
 void

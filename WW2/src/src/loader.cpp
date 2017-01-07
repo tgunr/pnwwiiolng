@@ -296,28 +296,6 @@ _extract(const char* tarFile)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Check for an origin file
-
-static void
-_checkOriginFile()
-{
-	FILE* fp = fopen(cv_originFile.GetString(), "rb");
-	if ( fp == nullptr )
-	{
-		LogAbort("Unable to access %s/%s"
-				, cv_dataDir.GetString(), cv_originFile.GetString());
-	}
-
-	if ( fgets(g_origin, sizeof(g_origin) - 1, fp) == nullptr )
-	{
-		LogAbort("Unable to read %s/%s"
-			, cv_dataDir.GetString(), cv_originFile.GetString());
-	}
-
-	fclose(fp);
-}
-
-//////////////////////////////////////////////////////////////////////
 //
 
 int
@@ -335,11 +313,6 @@ main(int argc,char** argv)
 	const char* tarFile = nullptr;
 
 	bool argsOk = true;
-#if platOS != OS_WIN32
-	bool useOrigin = true;
-#else
-	bool useOrigin = false;
-#endif
 
 	for ( int i = 1; i < argc; ++i )
 	{
@@ -373,9 +346,6 @@ main(int argc,char** argv)
 				break;
 				case 'I':
 					useIrc = false;
-				break;
-				case 'O':
-					useOrigin = !useOrigin;
 				break;
 				case 0:
 					fprintf(stderr, "Invalid argument '-'\n");
@@ -413,9 +383,6 @@ main(int argc,char** argv)
 	_checkDirectoryStructure();
 
 	_extract(tarFile);
-
-	if ( useOrigin )
-		_checkOriginFile();
 
 	if ( importFileName == nullptr )
 		importFileName = cv_importFile.GetString();

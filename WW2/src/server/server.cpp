@@ -935,7 +935,7 @@ static void _serverReportAlive(const Teul::uWeb::HTTPRequest &request, Teul::uWe
 	teulGetAddress(stats.address, ip, sizeof(ip));
 
 	char buffer[1024];
-	const int len = strprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s\"}\r\n"
+	strprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s\"}\r\n"
         , Teul::GetAppName()
         , ip
         , stats.arenaID
@@ -1640,6 +1640,7 @@ _controllerConnect(ENDPOINT& endpoint)
 {
 	dbugLog(_FLD, "t:%d ip:%s:%u connected to controller", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
 	s_controllerConnected = true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 	ProcessIntroduction intro;
 #if platOS == OS_WIN32
@@ -1652,10 +1653,10 @@ _controllerConnect(ENDPOINT& endpoint)
 
 	auto result = endpoint.writeRaw((const char*)&intro, sizeof(intro));
 	if ( result < 0 ) {
-		if ( errno == ECONNREFUSED )
+		if ( dbugGetErrno() == ECONNREFUSED )
 			LogAbort("Connection to controller refused.");
 		else
-			LogAbort("Unable to greet controller");
+			LogAbort("Unable to greet controller because %d", dbugGetErrno());
 	}
 	ABORT_IF_EX(result != sizeof(intro), "Failed to write intro to controller: %dv%" PRSizeT "", result, sizeof(intro));
 }
@@ -1684,6 +1685,7 @@ void _connectToController()
 		teulUpdateTransport(1);
 		teulSyncClock();
 	}
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1825,16 +1827,17 @@ _serverUsesBroadcast(const SERVER_TYPE serverType)
 	switch ( serverType) {
 		case CONTROLLER_HOST:
 		case AUTH_HOST:
-		case DBD_HOST:
 		case EXIT_SERVER:
 		case MAX_SERVER_TYPE:
 			return false;
-		break;
 		default:
 			return true;
-		break;
 	}
 }
+
+#if platOS == OS_MACOS
+static std::thread s_parentCheckThread;
+#endif
 
 void
 Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTION errorFnPtr, KILL_FUNCTION killFnPtr, int argc, const char* argv[], const CommandLineOptions& cliOptions)
@@ -1854,6 +1857,12 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 			"--child", "Process should die when parent terminates.", false,
 #if platOS == OS_LINUX
 			[](const char*) { prctl(PR_SET_PDEATHSIG, SIGHUP); }, nullptr
+#elif platOS == OS_MACOS
+            // This is a terrible hack, relying on launchd becoming an orphaned
+            // process' parent, but it does work reliably on all macOS versions.
+            [](const char*) { s_parentCheckThread = std::thread([] {
+                while (1) { if (getppid() == 1) { exit(0); } std::this_thread::sleep_for(std::chrono::seconds(1)); } }
+            ); }, nullptr
 #else
 			[](const char*) {}, nullptr
 #endif
@@ -1904,6 +1913,10 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
+#ifndef NDEBUG
+    dbugSetWriteLevel(Debug::ERR_DBUG | STD_ERR);
+    dbugSetLogLevel(Debug::ERR_DBUG | STD_ERR);
+#endif
 
 	serverEnableDebugWebServer(myType);
 

@@ -57,8 +57,6 @@ bool g_enableStarts = true;
 
 extern ConfigStr cv_manageProcesses;
 
-const char* g_argv0 = nullptr;
-
 ////////////////////////////////////////////////////////////////////////////////
 // TeulKit error handler.
 
@@ -492,7 +490,6 @@ int main(int argc, const char* argv[], const char* envp[])
 {
 	static bool s_singleStartMode = false;
 	static std::vector<std::string> s_envQueries;
-	g_argv0 = argv[0];
 	Server::InitializeProcess(g_serverName, CONTROLLER_HOST, _errorFunction, nullptr, argc, argv, {
 		{ "--configs", "List configuration variables and exit.", false,
 			[](const char*) {
