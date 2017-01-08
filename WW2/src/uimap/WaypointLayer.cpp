@@ -28,6 +28,7 @@
 
 WaypointLayer::WaypointLayer():
 	_waypointtexid(-1),
+	_mortartexid(-1),
 	_contacttexid(-1),
 	_markertexid(-1),
 	_aiCount(0),
@@ -304,10 +305,10 @@ void WaypointMapObject::DrawSelf(SuperCellMapView* mv)
 			texid = _waypointlayer->_waypointtexid;
 			uv = full;
 		break;
-		case WPT_MORTAR:
-			ctx->SetColor(1,1,0);
-			texid = _waypointlayer->_contacttexid;
-			uv = mortar;
+		case WPT_BOMB:
+			ctx->SetColor(1,1,1);
+			texid = _waypointlayer->_mortartexid;
+			uv = full;
 		break;
 		case WPT_ENEMY:
 		case WPT_EAI:
