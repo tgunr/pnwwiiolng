@@ -96,7 +96,7 @@ pocketTurnTownsAtATime = 1
 -- true/false - should automatic attack objective placement be enabled
 gameAOPlacementEnabled = true
 -- How long should we wait after AOs become spare before notifying the HCs
-gameAONoticeDelay = timeInSeconds({ minutes = 5 })
+gameAONoticeDelay = timeInSeconds({ minutes = 20 })
 -- How long between warnings?
 gameAOWarningTime = timeInSeconds({ minutes = 1 })
 -- How many warnings?
@@ -180,13 +180,13 @@ end
 function maxCaptureObjectives()
    local population = getLowerPopulation()
 
-   if population >= 360 then return 8 + math.floor((population - 360) / 40) end
-   if population >= 240 then return 7 end
-   if population >= 200 then return 6 end
-   if population >= 160 then return 5 end
-   if population >= 120 then return 4 end
-   if population >=  80 then return 3 end
-   if population >=  40 then return 2 end
+   if population >= 385 then return 8 + math.floor((population - 330) / 55) end
+   if population >= 330 then return 7 end
+   if population >= 275 then return 6 end
+   if population >= 220 then return 5 end
+   if population >= 165 then return 4 end
+   if population >= 110 then return 3 end
+   if population >=  55 then return 2 end
    return 1
 end
 
