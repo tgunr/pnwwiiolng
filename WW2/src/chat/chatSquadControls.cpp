@@ -786,7 +786,36 @@ _processDemote(SquadControl& request, Player* player, SquadList* squadList)
 
 	_checkEmptyPosition(newRank, squadList);
 
-	return _update(request.m_action, SquadMemberUpdate::_DEMOTE, player->squadID(), request.m_handle, newRank, entry->squadRank(), player->matchHandle());
+    DBQuery q(dbh, "UPDATE wwii_player SET squad_rank = %u WHERE squadID = %u AND callsign = '%s' AND squad_rank = %u"
+                    , newRank, squadList->squad().squadID(), Chat::Name(request.m_handle).c_str(), entry->squadRank());
+    if ( q.HasRows() == false )
+        throw SQR_OPERATION_FAILED;
+    
+	if ( entry->squadRank() == Squad::CO || newRank == Squad::CO )
+		chatdbSquadInfo(0, player->squadID(), false);
+    
+	if ( entry->player() && newRank < Squad::STAFFER )
+		entry->player()->stopRecruiting();
+
+	squadList->updateMember(request.m_handle, newRank, entry->player());
+
+	LSTRING_ID msg = LSTR_NONE;
+	switch (newRank)
+	{
+        case Squad::MEMBER: msg = LSTR_DEMO_TO_MEMBER; break;
+        case Squad::STAFFER: msg = LSTR_DEMO_TO_STAFFER; break;
+        case Squad::XO: msg = LSTR_DEMO_TO_XO; break;
+        default: break;
+	}
+
+	chatGetCallsign(_subject, request.m_handle);
+	chatGetCallsign(_originator, player->matchHandle());
+
+	if ( msg != LSTR_NONE )
+		squadList->sendMessage(LSTR_SQUAD, msg, _originator, _subject);
+
+	squadList->setUpdated();
+    return SQR_DONE;
 }
 
 static bool
