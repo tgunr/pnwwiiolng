@@ -443,8 +443,7 @@ _processCreate(SquadControl& request, Player* player)
 	}
 
 	chatProcessSquadCreateRequest(request, player);
-
-	return _update(request.m_action, SquadMemberUpdate::_CREATE_CHECK, 0, request.m_handle, 0, 0, player->matchHandle(), request.m_text);
+    return SQR_DONE;
 }
 
 UINT32

@@ -19,6 +19,8 @@
 #include "chat/chatSaveChannels.h"
 #include "chat/chatSquadList.h"
 #include "chat/chatSquadListTypes.h"
+#include "wwii/wwiiDBThreads.h"
+#include "chat/chatSquadCreate.h"
 
 static const UINT32 CREATE_REQUEST_EXPIRY_S = 6 * 30;	// 3 minutes
 
@@ -116,6 +118,33 @@ _checkMembers(Player* player, SquadControl& control, bool sendInvites)
 		_sendInvites(control.m_handle, control.m_text, player->matchHandle(), xo, approved);
 }
 
+static void
+_checkExistingSquad(const Chat::Name& gameName)
+{
+	DBQuery q(dbh, "SELECT squadID FROM wwii_squads WHERE disbanded = 0 AND LOWER(short_name) = LOWER('%s') LIMIT 1", gameName.c_str());
+	if ( q.HasRows() )
+		throw SQR_SQUAD_EXISTS;
+}
+
+static void
+_checkReservedSquad(const Chat::Name& gameName)
+{
+	DBQuery q(dbh, "SELECT short_name FROM wwii_reserved_squadnames WHERE lower(short_name) = LOWER('%s') LIMIT 1", gameName.c_str());
+	if ( q.HasRows() )
+		throw SQR_INVALID_SQUAD_SHORT;
+}
+
+static SQUAD_CONTROL_RESULT
+_processCreateCheck(const ChatHandle /*originator*/, SQUAD_REQUEST& request, Player* player)
+{
+	_checkMembers(player, request.control, true);
+
+	request.expires = teulTime() + CREATE_REQUEST_EXPIRY_S + 1;
+	request.approved = true;
+
+	return SQR_DONE;
+}
+
 void
 chatProcessSquadCreateRequest(SquadControl& control, Player* player)
 {
@@ -142,17 +171,13 @@ chatProcessSquadCreateRequest(SquadControl& control, Player* player)
 	request.approved = false;
 
 	dbugLog(_FLD, "t:%d p:%u c:%s ok to proceed with squad creation", player->teulIndex(), player->playerID(), player->callsign());
-}
 
-static SQUAD_CONTROL_RESULT
-_processCreateCheck(const ChatHandle /*originator*/, SQUAD_REQUEST& request, Player* player)
-{
-	_checkMembers(player, request.control, true);
-
-	request.expires = teulTime() + CREATE_REQUEST_EXPIRY_S + 1;
-	request.approved = true;
-
-	return SQR_DONE;
+    // Implementation of CREATE_CHECK
+    _checkExistingSquad(control.m_handle);
+    _checkReservedSquad(control.m_handle);
+    
+    // CREATE_CHECK reply
+    chatProcessSquadCreateReply(false, player->matchHandle(), player);
 }
 
 static SQUAD_CONTROL_RESULT
