@@ -20,11 +20,83 @@
 #include "chat/chatSquadMemberUpdates.h"
 #include "chat/chatSquadCreate.h"
 #include "chat/chatSaveChannels.h"
+#include "chat/chatdbSquadXchg.h"
 #include "teul/teulKit.h"
 #include "wwii/wwiiSquads.h"
 #include "wwii/wwiiDBThreads.h"
 
 static char _originator[MAX_HANDLE_SIZE], _subject[MAX_HANDLE_SIZE];
+
+//////////////////////////////////////////////////////////////////////
+// Retrieve and update the info for a squad. This takes a weird form because it
+// used to be part of dbd
+void
+chatdbSquadInfo(SINT32 /*teulIndex*/, UINT32 squadID, bool /*sendMembers*/)
+{
+	if ( squadID == 0 )
+		return;
+
+	try
+	{
+		DBQuery q(dbh,
+					"SELECT s.short_name, s.name"
+							", cr.callsign, co.callsign, unix_timestamp(s.created)"
+							", s.flags, s.voting, s.recruiting"
+							", s.rookie_days, s.last_joined, s.last_joiner"
+							", s.description, s.motd, s.homepage"
+							", s.squad_night"
+							", s.pri_language"
+							", s.slogan"
+						" FROM wwii_squads s"
+							" LEFT JOIN wwii_player cr ON (s.creatorID = cr.playerID)"
+							" LEFT JOIN wwii_player co ON (s.squadid = co.squadid)"
+						" WHERE s.squadID = %u AND co.squad_rank = 5"
+							" LIMIT 1"
+							, squadID);
+
+		if ( q.HasRows() == false || q.FetchRow() == false )
+			throw std::logic_error("no rows for squad");
+
+		auto& row = q.Row();
+		CHATDB_SQUAD_XCHG squadXchg;
+		Squad& squad = squadXchg.data();
+
+		squad.m_squadID = squadID;
+		squad.m_shortHandle = chatGetHandle(row.NextString());
+		squad.m_name = row.NextString();
+
+		squad.m_creatorHandle = chatGetHandle(row.NextString());
+		squad.m_coHandle = chatGetHandle(row.NextString());
+		squad.m_created = row.NextUInt();
+
+		squad.m_flags = row.NextUInt();
+		squad.m_votingEnabled = (row.NextUInt() != 0);
+		squad.m_recruiting = (row.NextUInt() != 0);
+
+		squad.m_rookieDays = row.NextUInt();
+		squad.m_lastJoined = row.NextUInt();
+		squad.m_lastJoiner = chatGetHandle(row.NextString());
+
+		squad.m_description = row.NextString();
+		squad.m_motd = row.NextString();
+		squad.m_homepage = row.NextString();
+
+		squad.setSquadNight(row.NextString());
+		squad.m_language = row.NextUInt();
+
+		squad.m_slogan = row.NextString();
+
+		dbugLog(_FLI, "sq:%u sending info to chat host (which is us now)", squad.m_squadID);
+        // This isn't in dbd anymore. Rather than rewrite a bunch of code, just
+        // call the packet's receive handler directly. This is bad form and
+        // should be improved on, but that can wait.
+        squadXchg.receive(0, squadXchg);
+	}
+	catch ( std::exception& e)
+	{
+		dbugLog(_FLA, "%s(%u): %s", __FUNCTION__, squadID, e.what());
+	}
+}
 
 //////////////////////////////////////////////////////////////////////
 // Write an audit entry for a squad action
