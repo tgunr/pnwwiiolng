@@ -733,7 +733,41 @@ _processPromote(SquadControl& request, Player* player, SquadList* squadList)
 
 	_checkEmptyPosition(newRank, squadList);
 
-	return _update(request.m_action, SquadMemberUpdate::_PROMOTE, player->squadID(), request.m_handle, newRank, entry->squadRank(), player->matchHandle());
+    DBQuery q(dbh, "UPDATE wwii_player SET squad_rank = %u WHERE squadID = %u AND callsign = '%s' AND squad_rank = %u"
+                    , newRank, player->squadID(), Chat::Name(request.m_handle).c_str(), entry->squadRank());
+    if ( q.HasRows() == false ) {
+		dbugLog(_FLA, "sq:%d promote %s failed", player->squadID(), Chat::Name(player->matchHandle()).c_str());
+        throw SQR_OPERATION_FAILED;
+    }
+
+    // Don't need the separate _checkLeadership() function for this simple check.
+	if ( entry->squadRank() == Squad::CO || newRank == Squad::CO )
+		chatdbSquadInfo(0, player->squadID(), false);
+    
+    // Skipping dbd, so immediately process a reply
+    player->unrecruit();
+
+	squadList->updateMember(request.m_handle, newRank, player);
+
+	LSTRING_ID msg = LSTR_NONE;
+	switch (newRank)
+	{
+        case Squad::MEMBER: msg = LSTR_PROMO_TO_MEMBER; break;
+        case Squad::STAFFER: msg = LSTR_PROMO_TO_STAFFER; break;
+        case Squad::XO: msg = LSTR_PROMO_TO_XO; break;
+        case Squad::CO: msg = LSTR_PROMO_TO_CO; break;
+        default: break;
+	}
+
+	chatGetCallsign(_subject, request.m_handle);
+	chatGetCallsign(_originator, player->matchHandle());
+
+	if ( msg != LSTR_NONE )
+		squadList->sendMessage(LSTR_SQUAD, msg, _originator, _subject);
+
+	player->unrecruit(); // Why is this here twice?
+	squadList->setUpdated();
+    return SQR_DONE;
 }
 
 static UINT32
