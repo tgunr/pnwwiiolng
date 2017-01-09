@@ -848,12 +848,14 @@ _checkSquadNight(std::string& text)
 static bool
 _checkSlogan(std::string& text)
 {
-	while ( text[0] == ' ' )
-		text.erase(0);
-/*
-	while ( text.length() > 1 && text[text.length()-1] == ' ' )
-		text.erase(text.length()-1);
-*/
+    std::string::size_type locstart = text.find_first_not_of(" \t\v\n\r");
+    
+    if (locstart == std::string::npos) {
+        text = "";
+    } else {
+        text = text.substr(locstart);
+    }
+    text = text.substr(0, text.find_last_not_of(" \t\v\n\r")); // npos == entire string
 	return true;
 }
 
