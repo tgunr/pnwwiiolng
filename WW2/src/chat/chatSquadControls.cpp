@@ -737,7 +737,7 @@ _processPromote(SquadControl& request, Player* player, SquadList* squadList)
 	_checkEmptyPosition(newRank, squadList);
 
     DBQuery q(dbh, "UPDATE wwii_player SET squad_rank = %u WHERE squadID = %u AND callsign = '%s' AND squad_rank = %u"
-                    , newRank, player->squadID(), Chat::Name(request.m_handle).c_str(), entry->squadRank());
+                    , newRank, squadList->squad().squadID(), Chat::Name(request.m_handle).c_str(), entry->squadRank());
     if ( q.HasRows() == false ) {
 		dbugLog(_FLA, "sq:%d promote %s failed", player->squadID(), Chat::Name(player->matchHandle()).c_str());
         throw SQR_OPERATION_FAILED;
@@ -748,9 +748,10 @@ _processPromote(SquadControl& request, Player* player, SquadList* squadList)
 		chatdbSquadInfo(0, player->squadID(), false);
     
     // Skipping dbd, so immediately process a reply
-    player->unrecruit();
+    if (entry->player())
+        entry->player()->unrecruit();
 
-	squadList->updateMember(request.m_handle, newRank, player);
+	squadList->updateMember(request.m_handle, newRank, entry->player());
 
 	LSTRING_ID msg = LSTR_NONE;
 	switch (newRank)
@@ -768,7 +769,8 @@ _processPromote(SquadControl& request, Player* player, SquadList* squadList)
 	if ( msg != LSTR_NONE )
 		squadList->sendMessage(LSTR_SQUAD, msg, _originator, _subject);
 
-	player->unrecruit(); // Why is this here twice?
+    if (entry->player())
+        entry->player()->unrecruit(); // Why is this here twice?
 	squadList->setUpdated();
     return SQR_DONE;
 }
