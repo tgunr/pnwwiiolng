@@ -514,6 +514,7 @@ _processCreate(SquadControl& request, Player* player)
 	}
 
 	chatProcessSquadCreateRequest(request, player);
+    _audit(0, SquadMemberUpdate::_CREATE_CHECK, player->callsign(), player->callsign(), 0, 0, 0, "createcheck");
     return SQR_DONE;
 }
 
@@ -524,7 +525,10 @@ chatSendSquadCreateRequest(SquadControl& request, Player* player)
     
 	chatdbSquadInfo(0, squadID, true);
 
-    return chatProcessSquadCreateReply(true, player->matchHandle(), player);
+    UINT32 result = chatProcessSquadCreateReply(true, player->matchHandle(), player);
+    
+    _audit(squadID, SquadMemberUpdate::_CREATE, player->callsign(), player->callsign(), 0, 0, 0, "create");
+    return result;
 }
 
 void
@@ -772,6 +776,8 @@ _processPromote(SquadControl& request, Player* player, SquadList* squadList)
     if (entry->player())
         entry->player()->unrecruit(); // Why is this here twice?
 	squadList->setUpdated();
+
+    _audit(squadList->squad().squadID(), SquadMemberUpdate::_PROMOTE, player->callsign(), Chat::Name(request.m_handle), newRank, entry->squadRank(), 0, "promote");
     return SQR_DONE;
 }
 
@@ -815,6 +821,7 @@ _processDemote(SquadControl& request, Player* player, SquadList* squadList)
 		squadList->sendMessage(LSTR_SQUAD, msg, _originator, _subject);
 
 	squadList->setUpdated();
+    _audit(squadList->squad().squadID(), SquadMemberUpdate::_DEMOTE, player->callsign(), Chat::Name(request.m_handle), newRank, entry->squadRank(), 0, "demote");
     return SQR_DONE;
 }
 
