@@ -180,6 +180,54 @@ chatProcessSquadCreateRequest(SquadControl& control, Player* player)
     chatProcessSquadCreateReply(false, player->matchHandle(), player);
 }
 
+static UINT32
+_createSquad(UINT32 ownerID, UINT32* members, const Chat::Name& shortName, const char* fullName)
+{
+    //DEV-560 - before creating new squad, delete disbanded squad with the same name
+    DBQuery qDel(dbh, "DELETE FROM wwii_squads WHERE disbanded = 1 AND LOWER(short_name) = LOWER('%s')", shortName.c_str());
+
+    DBQuery q(dbh, "INSERT INTO wwii_squads (creatorid, short_name, name, password, description, active, recruiting, voting, disbanded, created)"
+					" VALUES (%u, '%s', '%s', '', '', 1, 1, 1, 0, now())"
+					, ownerID, shortName.c_str(), fullName);
+	UINT32 squadID = q.LastInsertID();
+	if ( squadID == 0 ) {
+        // This is fatal because failure to have a last insert ID means either
+        // critical database error or multithreading problem. Neither of these
+        // should be allowed to proceed.
+        dbugLog(_FLF, "No last insert ID during squad create!");
+		throw SQR_OPERATION_FAILED;
+    }
+
+	char playerIDs[(14 * (SquadControl::CREATE_PLAYERS_REQUIRED+1)) + 1];
+	char* p = playerIDs;
+	strprintf(playerIDs, "%u", ownerID);
+	for ( UINT32 i = 0; i < SquadControl::CREATE_PLAYERS_REQUIRED; ++i )
+	{
+		while ( *p )
+			++p;
+		sprintf(p, ",%u", members[i]);
+	}
+
+	// Promote the CO and XO
+	DBSimpleQuery(dbh, "UPDATE wwii_player"
+							" SET squadID=%u"
+								", squad_rank=IF(playerID=%u,%u,IF(playerID=%u,%u,%u))"
+								", squad_joined=NOW()"
+								", squad_time_played=0"
+							" WHERE playerID in (%s)"
+						, squadID, ownerID, Squad::CO, members[0], Squad::XO, Squad::MEMBER, playerIDs
+						);
+
+	return squadID;
+}
+
+UINT32 chatProcessSquadReallyCreateRequest(SquadControl& control, Player* player)
+{
+    _checkExistingSquad(control.m_handle);
+    _checkReservedSquad(control.m_handle);
+    return _createSquad(player->playerID(), &control.m_playerIDs[0], Chat::Name(control.m_handle), control.m_text.c_str());
+}
+
 static SQUAD_CONTROL_RESULT
 _processCreateComplete(const ChatHandle /*originator*/, SQUAD_REQUEST& request, Player* player)
 {

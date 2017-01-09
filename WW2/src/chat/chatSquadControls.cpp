@@ -30,8 +30,7 @@ static char _originator[MAX_HANDLE_SIZE], _subject[MAX_HANDLE_SIZE];
 //////////////////////////////////////////////////////////////////////
 // Retrieve and update the info for a squad. This takes a weird form because it
 // used to be part of dbd
-void
-chatdbSquadInfo(SINT32 /*teulIndex*/, UINT32 squadID, bool /*sendMembers*/)
+void chatdbSquadInfo(SINT32 /*teulIndex*/, UINT32 squadID, bool /*sendMembers*/)
 {
 	if ( squadID == 0 )
 		return;
@@ -521,7 +520,11 @@ _processCreate(SquadControl& request, Player* player)
 UINT32
 chatSendSquadCreateRequest(SquadControl& request, Player* player)
 {
-	return _update(request.m_action, SquadMemberUpdate::_CREATE, 0, request.m_handle, 0, 0, player->matchHandle(), request.m_text, player->playerID(), &request.m_playerIDs[0]);
+    UINT32 squadID = chatProcessSquadReallyCreateRequest(request, player);
+    
+	chatdbSquadInfo(0, squadID, true);
+
+    return chatProcessSquadCreateReply(true, player->matchHandle(), player);
 }
 
 void

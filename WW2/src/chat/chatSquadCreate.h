@@ -14,6 +14,7 @@ class SquadControl;
 class Player;
 
 void chatProcessSquadCreateRequest(SquadControl&, Player* player);
+UINT32 chatProcessSquadReallyCreateRequest(SquadControl& control, Player* player);
 SQUAD_CONTROL_RESULT chatProcessSquadCreateReply(bool created, const ChatHandle originator, Player* player);
 bool chatExpireSquadCreates();
 SQUAD_CONTROL_RESULT chatSquadAcceptCreateInvite(Player* player, Player* sender);
