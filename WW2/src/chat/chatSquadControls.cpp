@@ -722,7 +722,7 @@ _processKick(SquadControl& request, Player* player, SquadList* squadList)
 
 	_removeSquadMember(true, squadList, entry, player->chatHandle(), LSTR_SQUAD_KICK, player->callsign());
 
-	throw SQR_HAVE_KICKED;
+	return SQR_HAVE_KICKED;
 }
 
 static UINT32
