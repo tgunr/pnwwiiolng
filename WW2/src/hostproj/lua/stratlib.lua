@@ -96,11 +96,11 @@ pocketTurnTownsAtATime = 1
 -- true/false - should automatic attack objective placement be enabled
 gameAOPlacementEnabled = true
 -- How long should we wait after AOs become spare before notifying the HCs
-gameAONoticeDelay = timeInSeconds({ minutes = 20 })
+gameAONoticeDelay = timeInSeconds({ minutes = 10 })
 -- How long between warnings?
 gameAOWarningTime = timeInSeconds({ minutes = 1 })
 -- How many warnings?
-gameAOWarnings = 10
+gameAOWarnings = 20
 -- How many times to warn a second spare?
 gameAOReWarnings = 4
 -- What fraction of available AOs must be placed?
