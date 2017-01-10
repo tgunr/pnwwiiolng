@@ -470,6 +470,9 @@ _getWaypointTypePrefix(char* const p, WP_TYPE type, UINT32 subType)
 	case WPT_PATROL:
 		*(p++) = 'P';
 	break;
+	case WPT_MORTAR:
+		*(p++) = 'M';
+	break;
 	default:
 		*(p++) = 'x';
 	break;

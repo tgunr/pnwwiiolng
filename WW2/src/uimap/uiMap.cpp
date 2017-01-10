@@ -1142,6 +1142,7 @@ void uiMapAddLayer(SuperCellMapView* mapview, xmlNode* node)
 		{
 			WaypointLayer* wl = new WaypointLayer;
 			wl->_waypointtexid = uiGetTexture("ui/textures/waypoint.bmp");
+			wl->_mortartexid = uiGetTexture("ui/textures/targeticon1.bmp");
 			wl->_contacttexid = uiGetTexture("ui/textures/mapvehicles.bmp");
 			wl->_markertexid = uiGetTexture("ui/textures/marker.bmp");
 			r = wl;

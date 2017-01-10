@@ -236,6 +236,33 @@ int uiChatPrintLine(const wchar_t* format, ...)
 
 *************************************************************************************************/
 
+std::wstring uiChatAssembleUILoc(const char* key, ...) {
+	int index = -1;
+
+	std::wstring format = uiLocString(key);
+
+	va_list marker;
+	va_start( marker, key );
+
+	for ( int p = 1; p < 7; ++p ) { // loc vars are 1 based
+		wchar_t* arg = va_arg(marker, wchar_t*);
+
+		if ( arg ) {
+			wchar_t placeHolder[4] = {0,0,0,0};
+			swprintf(placeHolder, 4, L"{%d}", p);
+
+			int index;
+			while ( (index = format.find(placeHolder)) >= 0 )
+				format.replace(index, 3, arg);
+		} else {
+			break;
+		}
+	}
+	va_end(marker);
+
+	return std::wstring(format);
+}
+
 void uiChatPrintUILocLine(int icons[CHATICON_MAX], unsigned int color, const char* key, ...)
 {
  	if(!_chatview) return;
