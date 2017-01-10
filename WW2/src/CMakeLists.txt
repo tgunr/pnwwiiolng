@@ -72,7 +72,6 @@ MESSAGE( STATUS "Build is ${BUILD_BITNESS}-bit" )
 ## Executable names
 SET( AUTH_HOST_EXE "authHost" )
 SET( CONTROLLER_HOST_EXE "controller" )
-SET( DBD_HOST_EXE "dbd" )
 SET( CHAT_HOST_EXE "chatd" )
 SET( CELL_HOST_EXE "hostd" )
 SET( MAP_HOST_EXE "mmhostd" )
@@ -508,7 +507,6 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     chat/chatBrigadeControl.cpp chat/chatBrigadeControl.h
     chat/chatBrigadeMove.cpp chat/chatBrigadeMove.h chat/chatBrigadeMoveResults.h
     teul/teulNetworkMsg.h wwii/wwiiNetPorts.h
-    chat/chatdbClientMessages.cpp chat/chatdbClientMessages.h
     chat/chatDecisions.cpp chat/chatDecisions.h
     chat/chatHostBrigadeControl.cpp chat/chatHostBrigadeControl.h chat/chatBrigadeVote.h
     chat/chatHostMotds.cpp chat/chatHostMotds.h chat/chatMotds.cpp chat/chatMotds.h
@@ -664,22 +662,6 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
 )
 
 ####################################
-## Database Proxy Daemon [deprecated]
-
-# Because the original host implementation was
-# entirely single-threaded, this host process was created to offload
-# expensive synchronous database queries.
-# You should really use DB::Threads instead.
-ADD_HOST_TARGET( ${DBD_HOST_EXE} SOURCES
-    chat/chatdbHostMessages.cpp chat/chatdbParser.cpp chat/chatdbParser.h
-    dbse/dbseHost.cpp dbse/dbseHostMessages.cpp dbse/dbseConstants.h dbse/dbseTypes.h
-    wwii/wwiiCallbacks.h teul/teulBasic.h server/serverConfigVars.h
-    wwii/wwiiSquads.cpp wwii/wwiiSquads.h
-    EXTRA_DEFINITIONS "IS_DBD_HOST"
-    INSTANCING
-)
-
-####################################
 ## Strat host
 
 # Build the Lua glue file
@@ -770,7 +752,7 @@ TARGET_INCLUDE_DIRECTORIES( ${STRAT_HOST_EXE} PRIVATE ${TOLUAPP_INCLUDE_DIR} )
 
 INSTALL(
     TARGETS
-        ${CONTROLLER_HOST_EXE} ${STRAT_HOST_EXE} ${DBD_HOST_EXE}
+        ${CONTROLLER_HOST_EXE} ${STRAT_HOST_EXE}
         ${CHAT_HOST_EXE} ${MAP_HOST_EXE} ${CELL_HOST_EXE} ${AUTH_INSTALL}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib

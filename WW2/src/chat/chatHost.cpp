@@ -3571,11 +3571,6 @@ main(int argc, const char* argv[])
 
 	chatThreadsSetup();
 
-	// Initialize dbse callbacks
-	chatdbInstallClientCallbacks();
-	if ( !dbseInit() )
-		return FALSE;
-
 	// Connect to the database
 	chatInitDB();
 
