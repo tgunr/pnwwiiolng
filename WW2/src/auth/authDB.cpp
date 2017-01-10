@@ -496,7 +496,7 @@ static bool _initAppInfoTable(GAME& gameEntry)
 		{
 			auto& row = q.Row();
 			size_t platform = row.NextUInt();
-			if ( platform < 0 || platform >= OS_MAX_PLAT )
+			if ( platform >= OS_MAX_PLAT )
 				throw std::logic_error("illegal platform value in app_host_versions");
 
 			teulGetHost(row.NextString(), &gameEntry.appInfo[platform].min);

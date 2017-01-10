@@ -952,7 +952,7 @@ Player::lastPosition(const char* prefix, const FLOAT64& x, const FLOAT64& y, boo
 			return "";
 		return " (not spawned yet)";
 	}
-	if ( isSpawned() && (x == INVALID_GRID_COORD || y == INVALID_GRID_COORD) )
+	if ( isSpawned() && (x >= INVALID_GRID_COORD || y >= INVALID_GRID_COORD) )
 	{
 		return " (spawning)";
 	}
@@ -1934,11 +1934,12 @@ Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
 						, SINT32 progress
 						)
 {
-	if ( x == INVALID_GRID_COORD )
+	if ( x >= INVALID_GRID_COORD )
 		return;
 
 	// Feh. We send ourselves this when the player is hacking wwiiCovert
-	if ( x == 39 && y == 40 && z == 41 && nearCP.id == 42 )
+DISABLE_WARNING("-Wfloat-equal")
+    if ( x == 39 && y == 40 && z == 41 && nearCP.id == 42 )
 	{
 		///TODO:COVERT:
 		if ( !m_invalidData )
@@ -1970,6 +1971,7 @@ Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
 	}
 	if ( isSpawned() && m_lastX == x && m_lastY == y && m_lastZ == z && cpChanged == false && isOnAWS == m_impl->onAWS() && capBldgChanged == false && progress == m_capProgress )
 		return;
+POP_WARNINGS()
 
 	Property* nearest = (cpChanged) ? chatFindProperty(nearCP) : m_lastCP;
 

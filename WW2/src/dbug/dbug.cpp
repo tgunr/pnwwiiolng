@@ -218,7 +218,7 @@ _dbugOut(bool logToConsole
 	if ( logMode != LogMode::TO_FILE || _logger.m_dbugfile < 0 )
 		return;
 
-	size_t retval = OS_WRITE(_logger.m_dbugfile, outString, (unsigned long)length);
+	/*size_t retval = */OS_WRITE(_logger.m_dbugfile, outString, (unsigned long)length);
 	///TODO: handle negative retval???
 	if ( _logger.m_dbugfile == _stdErrFileNo )
 		return;
