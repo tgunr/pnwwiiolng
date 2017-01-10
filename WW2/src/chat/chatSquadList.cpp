@@ -460,8 +460,13 @@ chatRequestSquad(UINT32 squadID, Player* player)
 	{
 		if ( g_debugSquads )
 			dbugLog(_FLI, "sq:%u requesting info", squadID);
-		chatdbRequestSquad(squadID);
-		return;
+        chatdbSquadInfo(0, squadID, false);
+        // No need to return here, since squad info is now synchronous
+        it = g_squads.find(squadID);
+        if (it == g_squads.end()) {
+            dbugLog(_FLW, "sq:%u no such squad!", squadID);
+            return;
+        }
 	}
 
 	if ( player == nullptr )
