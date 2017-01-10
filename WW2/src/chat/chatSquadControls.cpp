@@ -941,11 +941,21 @@ _processText(SquadControl& request, Player* player, SquadList* squadList)
 static UINT32
 _processResign(SquadControl& request, Player* player, SquadList* squadList)
 {
+    // Logic note: Previous code acted as if XO could resign through this, but
+    // the check here requires CO only (with GM excluded a line further down)
 	SquadMemberEntry* entry = _checkSquadMember(player, squadList, request.m_handle, Squad::CO);
 	if ( entry == nullptr ) throw SQR_SQUAD_UNAVAILABLE;
 	if ( player->squadRank() == Squad::GM ) throw SQR_OPERATION_FAILED;
 
     chatSendCOAppointment(squadList->squad().squadID(), request.m_handle);
+    
+	chatGetCallsign(_subject, request.m_handle);
+	chatGetCallsign(_originator, player->matchHandle());
+
+    squadList->sendMessage(LSTR_SQUAD, LSTR_CO_RESIGNED, _originator, _subject);
+	squadList->updateMember(player->matchHandle(), Squad::XO, player);
+	squadList->updateMember(request.m_handle, Squad::CO, entry->player());
+	squadList->setUpdated();
     return SQR_DONE;
 }
 
