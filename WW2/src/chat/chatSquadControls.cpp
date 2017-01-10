@@ -605,7 +605,7 @@ _processLeave(SquadControl& /*request*/, Player* player, SquadList* squadList)
 
 	_removeSquadMember(true, squadList, entry, entry->handle(), LSTR_SQUAD_LEAVER, "leave");
 
-	throw SQR_LEFT;
+	return SQR_LEFT;
 }
 
 //////////////////////////////////////////////////////////////////////
