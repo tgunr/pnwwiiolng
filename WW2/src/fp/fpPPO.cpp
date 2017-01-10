@@ -1671,6 +1671,10 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 #endif
 	}
 
+	// Ignore system-created "shaped charge jet" effects.
+	if ( strcmp((const char*)src.Name, "shaped charge jet") == 0)
+		return 0;
+
 	// Rocket [90-110k]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_ROCKET ) {
 		const Joules rocket_min = 180000;
