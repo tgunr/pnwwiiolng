@@ -534,7 +534,19 @@ chatSendSquadCreateRequest(SquadControl& request, Player* player)
 void
 chatSendCOAppointment(UINT32 squadID, const ChatHandle handle)
 {
-	_update(SquadControl::_INTERNAL, SquadMemberUpdate::_APPOINT, squadID, handle, Squad::CO, 0, 0LL);
+    DBQuery q(dbh, "UPDATE wwii_player"
+                        " SET squad_rank=%u"
+                            ", squad_joined=IF(squad_joined,squad_joined,NOW())"
+                        " WHERE squadID = %u AND callsign = '%s' AND squad_rank < %u"
+                    , Squad::CO, squadID, Chat::Name(handle).c_str(), Squad::CO);
+    if ( q.HasRows() == false )
+        throw SQR_OPERATION_FAILED;
+
+    // We've become CO, remove the prior member
+    DBSimpleQuery(dbh, "UPDATE wwii_player SET squad_rank=%u WHERE squadID=%u AND squad_rank=%u AND callsign != '%s'"
+                    , Squad::XO, squadID, Squad::CO, Chat::Name(handle).c_str());
+    chatdbSquadInfo(0, squadID, false);
+    _audit(squadID, SquadMemberUpdate::_APPOINT, "", Chat::Name(handle).c_str(), 0, 0, 0, "CO appointment");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -933,7 +945,8 @@ _processResign(SquadControl& request, Player* player, SquadList* squadList)
 	if ( entry == nullptr ) throw SQR_SQUAD_UNAVAILABLE;
 	if ( player->squadRank() == Squad::GM ) throw SQR_OPERATION_FAILED;
 
-	return _update(request.m_action, SquadMemberUpdate::_APPOINT, player->squadID(), request.m_handle, player->squadRank(), player->squadRank(), player->matchHandle());
+    chatSendCOAppointment(squadList->squad().squadID(), request.m_handle);
+    return SQR_DONE;
 }
 
 static UINT32
