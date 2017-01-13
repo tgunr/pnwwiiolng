@@ -649,7 +649,7 @@ JS_FUNCTION_DEF(jsMapView, deletereports)
 				case WPT_DEFEND:
 				case WPT_WAYPOINT:
 				case WPT_PATROL:
-				case WPT_MORTAR:
+				case WPT_BOMB:
 					PlayerClient()->RemoveWaypoint(wp.handle());
 				break;
                 default:
@@ -924,6 +924,10 @@ JS_FUNCTION_DEF(jsMapView, addwaypoint)
 	{
 		wptype = WPT_ENEMY;
 		subtype = WTP_ENEMY_MORTAR;
+	}
+	else if ( !strcmp(type, "bombard") )
+	{
+		wptype = WPT_BOMB;
 		prefix = 'M';
 	}
 

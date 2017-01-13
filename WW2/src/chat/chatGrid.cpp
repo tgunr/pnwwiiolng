@@ -919,12 +919,14 @@ public:
 		}
 		if ( strcmp(arguments, "full") == 0 )
 		{
-			g_enableSnapshot = g_enableFullSnapshot = false;
+			g_enableSnapshot = true;
+			g_enableFullSnapshot = true;
 			player.message(LSTR_NOTE, LSTR_GRIDSNAPSHOT_FULL);
 		}
 		else if ( strcmp(arguments, "off") == 0 )
 		{
 			g_enableSnapshot = false;
+			g_enableFullSnapshot = false;
 			player.message(LSTR_NOTE, LSTR_GRIDSNAPSHOT_DISABLED);
 		}
 		else

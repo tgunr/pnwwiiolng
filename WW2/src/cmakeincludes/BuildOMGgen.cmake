@@ -1,6 +1,9 @@
 # Define OMGgen itself
 ADD_SUBDIRECTORY(omggen)
 
+# Need to create the destination directory
+FILE( MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/omg )
+
 # Macro to generate an OMG build command
 MACRO( ADD_OMG_TARGET Name )
     SET( OmgPrefix "${CMAKE_CURRENT_SOURCE_DIR}/${Name}" )

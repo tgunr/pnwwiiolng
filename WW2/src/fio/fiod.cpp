@@ -975,7 +975,7 @@ LOGICAL fiocfgAccess(const char* filename, bool)
 	char	fullpath[_MAX_PATH];
 	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
     int fd = -1;
-    if (OS_OPEN(&fd, os_file_path(fullpath), O_RDONLY, 0) != -1) {
+    if (OS_OPEN(&fd, os_file_path(fullpath), O_RDONLY, 0) == 0) { // fix for 1083
         OS_CLOSE(fd);
         return TRUE;
     }

@@ -1398,7 +1398,6 @@
 		0834F1C9104585DA00E75B52 /* loclLang.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = loclLang.h; sourceTree = "<group>"; };
 		0834F1CA104585DA00E75B52 /* loclMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = loclMain.cpp; sourceTree = "<group>"; };
 		0834F1CB104585DA00E75B52 /* loclMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = loclMain.h; sourceTree = "<group>"; };
-		0834F1D1104586AA00E75B52 /* versionNo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = versionNo.h; path = proj/versionNo.h; sourceTree = SOURCE_ROOT; };
 		0834F28110458DFA00E75B52 /* ShadowMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShadowMap.cpp; sourceTree = "<group>"; };
 		08477137135E279F00325E43 /* trnScenario.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trnScenario.h; sourceTree = "<group>"; };
 		08477138135E279F00325E43 /* trnScenario.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = trnScenario.cpp; sourceTree = "<group>"; };
@@ -2983,7 +2982,6 @@
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				0834F1D1104586AA00E75B52 /* versionNo.h */,
 				E97C763D1C85146A00875F44 /* event */,
 				08E5E55513E855A100A5034D /* ez */,
 				08977DDA134CFB7200C9DCFE /* scen */,
