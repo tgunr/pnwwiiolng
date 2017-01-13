@@ -103,7 +103,7 @@ void WaypointLayer::RenderSuperCells(SuperCellMapView* mv, int scx1, int scy1, i
 	}
 
 	// add ai waypoints
-	if(false && setAI)
+	if(setAI)
 	{
 		_aiInit = false;
 
@@ -322,8 +322,8 @@ void WaypointMapObject::DrawSelf(SuperCellMapView* mv)
 			if(alpha > 0) // alpha should always be greater than 0 if we get to here
 			{
 				UINT32 color = (_waypoint.type() == WPT_FAI) ?
-									gIconFriendlyColor:
-									gIconEnemyColor;
+									colorSKYBLUEALPHA:
+									colorORANGEALPHA;
 
 				float r = piRGBA_GETRED(color)/(float)0xff;
 				float g = piRGBA_GETGREEN(color)/(float)0xff;
