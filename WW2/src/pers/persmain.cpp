@@ -2009,28 +2009,28 @@ static SINT32 _LastCallTime;
 					&Mat1);
 
 	// accentuate head bobbing when in scope
-	if (FieldOfView < 45.0f)
-	{
-		FLOAT32 Mult;
-
-		Mult = 1;
-
-		AttChange.Pitch *= Mult;
-		AttChange.Roll *= Mult;
-		AttChange.Yaw *= Mult;
-
-		Att1.x = -(float)AttChange.Pitch/2;
-		Att1.y = (float)AttChange.Roll/2;
-		Att1.z = (float)AttChange.Yaw/2;
-		mathEul_ToMatrix(&Matrix,EulOrdXYZs,&Att1);
-
-	}
-	else
-	{
+//	if (FieldOfView < 45.0f)
+//	{
+//		FLOAT32 Mult;
+//
+//		Mult = 1;
+//
+//		AttChange.Pitch *= Mult;
+//		AttChange.Roll *= Mult;
+//		AttChange.Yaw *= Mult;
+//
+//		Att1.x = -(float)AttChange.Pitch/2;
+//		Att1.y = (float)AttChange.Roll/2;
+//		Att1.z = (float)AttChange.Yaw/2;
+//		mathEul_ToMatrix(&Matrix,EulOrdXYZs,&Att1);
+//
+//	}
+//	else
+//	{
 		AttChange.Pitch = AttChange.Roll = AttChange.Yaw = 0.0;
 
 		Matrix = IdentityMatrix;
-	}
+//	}
 
 //	Matrix = IdentityMatrix;
 	Matrix._41 = (float)(Displacement.x) * ScaleFactor;
