@@ -3530,9 +3530,12 @@ UINT32 serverUpTimeMinutes()
 struct PlayerControlMinimumData {
     playerid_t playerID;
     Player *realPlayerObject;
-    ChatHandle matchHandle;
+    Chat::Name matchHandle;
     uint32_t squadID;
     RANK_NO squadRank;
+    
+    ChatHandle handle() const { return matchHandle.LowercaseHandle(); }
+    const char *callsign() const { return matchHandle.c_str(); }
 };
 
 static bool _lookupMinimalDataFromPlayerID(playerid_t playerID, PlayerControlMinimumData &result)
@@ -3557,7 +3560,7 @@ static bool _lookupMinimalDataFromPlayerID(playerid_t playerID, PlayerControlMin
         }
         result.playerID = q.Row().NextUInt();
         result.realPlayerObject = nullptr;
-        result.matchHandle = Chat::Name(q.Row().NextString()).LowercaseHandle(); // Player.m_matchHandle is lowercased
+        result.matchHandle = q.Row().NextString();
         result.squadID = q.Row().NextUInt();
         result.squadRank = q.Row().NextUInt();
     }
@@ -3618,13 +3621,13 @@ static void _playerControlAPIPromote(
         default: break;
     }
     if (promoteMessage != LSTR_NONE) {
-        squadList->sendMessage(LSTR_SQUAD, promoteMessage, Chat::Name(originator.matchHandle).c_str(), Chat::Name(target.matchHandle).c_str());
+        squadList->sendMessage(LSTR_SQUAD, promoteMessage, originator.callsign(), target.callsign());
     }
     if (targetSquadEntry->player()) { targetSquadEntry->player()->unrecruit(); } // why twice?
     squadList->setUpdated();
     DBThread::Do(DBThread::Default, "INSERT INTO wwii_squad_audit (squadID, action, occured, originator, target, newval, prev, coID, textmessage)"
         " VALUES (%u, %u, NOW(), '%s', '%s', %u, %u, 0, '')",
-        squadList->squad().squadID(), SquadMemberUpdate::_PROMOTE, Chat::Name(originator.matchHandle).c_str(), Chat::Name(target.matchHandle).c_str(),
+        squadList->squad().squadID(), SquadMemberUpdate::_PROMOTE, originator.callsign(), target.callsign(),
         newRank, newRank - 1);
     return Teul::uWeb::HTTPResponseBuilder(request)
         .status(200)
@@ -3670,17 +3673,54 @@ static void _playerControlAPIDemote(
         default: break;
     }
     if (promoteMessage != LSTR_NONE) {
-        squadList->sendMessage(LSTR_SQUAD, promoteMessage, Chat::Name(originator.matchHandle).c_str(), Chat::Name(target.matchHandle).c_str());
+        squadList->sendMessage(LSTR_SQUAD, promoteMessage, originator.callsign(), target.callsign());
     }
     if (targetSquadEntry->player()) { targetSquadEntry->player()->unrecruit(); } // why twice?
     squadList->setUpdated();
     DBThread::Do(DBThread::Default, "INSERT INTO wwii_squad_audit (squadID, action, occured, originator, target, newval, prev, coID, textmessage)"
         " VALUES (%u, %u, NOW(), '%s', '%s', %u, %u, 0, '')",
-        squadList->squad().squadID(), SquadMemberUpdate::_DEMOTE, Chat::Name(originator.matchHandle).c_str(), Chat::Name(target.matchHandle).c_str(),
+        squadList->squad().squadID(), SquadMemberUpdate::_DEMOTE, originator.callsign(), target.callsign(),
         newRank, newRank + 1);
     return Teul::uWeb::HTTPResponseBuilder(request)
         .status(200)
         .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squad_rank", newRank } }).dump())
+        .build(response);
+}
+
+static void _playerControlAPIRemove(
+    const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response,
+    const PlayerControlMinimumData &originator, const PlayerControlMinimumData &target
+)
+{
+	dbugLog(_FLI, "p:%u c:%s sq:%d attempting to remove %u[%s]", originator.playerID, originator.callsign(), originator.squadID, target.playerID, target.callsign());
+
+    SquadList *squadList = nullptr;
+    SquadMemberEntry *originatorSquadEntry = nullptr;
+    SquadMemberEntry *targetSquadEntry = nullptr;
+    
+    status_if(originator.squadID == 0, 403, "You're not in a squad"); // Originator not in any squad
+    status_if(originator.squadRank < Squad::CO, 403, "You're not CO"); // Originator is not CO
+    status_if(target.squadID != originator.squadID, 403, "You're not in the same squad"); // Originator and target in different squads
+    if (!target.realPlayerObject && !originator.realPlayerObject) { chatdbSquadInfo(0, target.squadID, true); } // If both are offline, load their squad
+    status_if((squadList = chatFindSquadList(originator.squadID)) == nullptr, 403, "Missing squad list"); // The squad list couldn't be looked up
+    status_if((originatorSquadEntry = squadList->find(originator.matchHandle)) == nullptr, 403, "No originator squad entry"); // Originator not in squad???
+    status_if((targetSquadEntry = squadList->find(target.matchHandle)) == nullptr, 403, "Target not in squad"); // Target not in squad
+    status_if(targetSquadEntry->squadRank() > originator.squadRank, 403, "Target outranks you"); // Target outranks originator
+    
+    if (targetSquadEntry->player()) {
+        SquadControlResult(SQR_KICKED, SquadControl::_KICK, targetSquadEntry->player()->chatHandle()).send(targetSquadEntry->player()->teulIndex());
+        targetSquadEntry->player()->unrecruit();
+        targetSquadEntry->player()->stopRecruiting();
+    }
+    DBThread::Do(DBThread::Default,
+        "UPDATE wwii_player SET squadid=0, squad_rank=0, squad_joined=NOW(), squad_time_played=0 WHERE playerid=%u AND squadid=%u", target.playerID, target.squadID);
+    squadList->removeMember(target.matchHandle);
+    squadList->sendMessage(LSTR_SQUAD, LSTR_SQUAD_KICK, target.callsign(), originator.callsign());
+    
+
+    return Teul::uWeb::HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squadid", 0 }, { "squad_rank", 0 } }).dump())
         .build(response);
 }
 
@@ -3715,10 +3755,70 @@ static void _playerControlAPISquad(const Teul::uWeb::HTTPRequest &request, Teul:
     } else if (components[5] == "demote") {
         return _playerControlAPIDemote(request, response, originator, target);
     } else if (components[5] == "remove") {
-    
+        return _playerControlAPIRemove(request, response, originator, target);
     } else {
         status_if(true, 404, "Don't know that player squad control command");
     }
+}
+
+static void _playerControlAPIList(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, const std::vector<std::string> &components)
+{
+    status_if(request.method != "GET", 405, "Bad request method");
+    status_if(request.requestData.length() > 0, 400, "No request content expected in GET");
+    status_if(components.size() > 4, 404, "Too many path components (>4)");
+    
+    const PLAYERID_HASH allPlayers = ServerInterface::GetOnlinePlayers();
+    nlohmann::json result;
+    uint64_t totalOnline = 0;
+    uint64_t numAxis = 0, numAxisSpawn = 0, numAllies = 0, numAlliesSpawn = 0;
+    uint64_t numGM = 0, numGMSpawn = 0, numGMBuzz = 0, numRats = 0, numRatsSpawn = 0, numRatBuzz = 0;
+    
+    // TODO: Move this part to another thread
+    result["players"] = nlohmann::json::array();
+    for (const std::pair<const playerid_t, PlayerStatusNode *> &psnp : allPlayers) {
+        playerid_t playerID = psnp.first;
+        const PlayerStatusNode *psn = psnp.second;
+        const Player *player = static_cast<const Player *>(psn->localInfo); // WHY!
+        nlohmann::json entry;
+        
+        if (!player || !player->isConnected()) { continue; }
+        entry["id"] = playerID;
+        entry["callsign"] = player->callsign();
+        entry["persona"] = player->noSide() ? "none" : (player->side() == ALLIED ? "allies" : (player->side() == AXIS ? "axis" : "INVALID"));
+        entry["spawned"] = player->isSpawned();
+        entry["isGM"] = player->isEffectiveGM() && !player->isPlaynet();
+        entry["isPlaynet"] = player->isPlaynet();
+        if (player->isEffectiveGM() ||  player->isPlaynet()) {
+            entry["usingBuzzard"] = player->isBuzzard();
+        }
+        result["players"].push_back(entry);
+        ++totalOnline;
+        numAxis += player->side() == AXIS;
+        numAxisSpawn += (player->side() == AXIS && player->isSpawned());
+        numAllies += player->side() == ALLIED;
+        numAlliesSpawn += (player->side() == ALLIED && player->isSpawned());
+        numGM += player->isEffectiveGM() && !player->isPlaynet();
+        numGMSpawn += (player->isEffectiveGM() && !player->isPlaynet() && player->isSpawned());
+        numGMBuzz += (player->isEffectiveGM() && !player->isPlaynet() && player->isBuzzard());
+        numRats += player->isPlaynet();
+        numRatsSpawn += (player->isPlaynet() && player->isSpawned());
+        numRatBuzz += (player->isPlaynet() && player->isBuzzard());
+    }
+    result["numOnline"] = totalOnline;
+    result["numAxisOnline"] = numAxis;
+    result["numAxisSpawned"] = numAxisSpawn;
+    result["numAlliesOnline"] = numAllies;
+    result["numAlliesSpawned"] = numAlliesSpawn;
+    result["numGMOnline"] = numGM;
+    result["numGMSpawned"] = numGMSpawn;
+    result["numGMBuzzards"] = numGMBuzz;
+    result["numPlaynetOnline"] = numRats;
+    result["numPlaynetSpawned"] = numRatsSpawn;
+    result["numPlaynetBuzzards"] = numRatBuzz;
+    return Teul::uWeb::HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(result.dump())
+        .build(response);
 }
 
 static void _playerControlAPIHandler_unlocked(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
@@ -3735,8 +3835,7 @@ static void _playerControlAPIHandler_unlocked(const Teul::uWeb::HTTPRequest &req
     // This is not a proper RESTful router. It's a hack. It'll be improved on later.
     status_if(components.size() < 4, 404, "Not enough path components (4)");
     if (components[3] == "list") {
-        // return list of online players
-        return Teul::uWeb::HTTPResponseBuilder(request).status(501).build(response);
+        return _playerControlAPIList(request, response, components);
     } else {
         status_if(components[3].find_first_not_of("0123456789") != std::string::npos, 404, "Player ID gotta be numeric");
         status_if(components.size() < 5, 404, "Not enough path components (5)");
