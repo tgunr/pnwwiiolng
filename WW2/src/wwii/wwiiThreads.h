@@ -13,7 +13,7 @@
 using MYSQL = struct st_mysql;
 class DBQuery;
 
-using THREAD_CALLBACK = void(*)(void*);
+using THREAD_CALLBACK = std::function<void(void*)>;
 
 //////////////////////////////////////////////////////////////////////
 // Threads-system calls ("threads")

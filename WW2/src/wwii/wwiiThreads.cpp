@@ -229,14 +229,18 @@ threadsCallNextCallback()
 
 	for ( auto& it : callbackQueue )
 	{
+#ifdef NDEBUG
 		try
+#endif
 		{
 			it->first(it->second);
 		}
+#ifdef NDEBUG
 		catch ( std::exception& e )
 		{
 			dbugLog(_FLA, "UNHANDLED EXCEPTION THROWN BY THREAD CALLBACK: %s", e.what());
 		}
+#endif
 		delete it;
 	}
 
