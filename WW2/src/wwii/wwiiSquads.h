@@ -13,7 +13,7 @@
 
 #define DEFAULT_ROOKIE_DAYS 7
 
-void chatdbSquadInfo(SINT32 /*teulIndex*/, UINT32 squadID, bool /*sendMembers*/);
+void chatdbSquadInfo(SINT32 /*teulIndex*/, UINT32 squadID, bool sendMembers);
 
 //////////////////////////////////////////////////////////////////////
 // Squad list includes its own integrated index

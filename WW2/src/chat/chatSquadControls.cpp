@@ -30,7 +30,7 @@ static char _originator[MAX_HANDLE_SIZE], _subject[MAX_HANDLE_SIZE];
 //////////////////////////////////////////////////////////////////////
 // Retrieve and update the info for a squad. This takes a weird form because it
 // used to be part of dbd
-void chatdbSquadInfo(SINT32 /*teulIndex*/, UINT32 squadID, bool /*sendMembers*/)
+void chatdbSquadInfo(SINT32 /*teulIndex*/, UINT32 squadID, bool sendMembers)
 {
 	if ( squadID == 0 )
 		return;
@@ -90,6 +90,14 @@ void chatdbSquadInfo(SINT32 /*teulIndex*/, UINT32 squadID, bool /*sendMembers*/)
         // call the packet's receive handler directly. This is bad form and
         // should be improved on, but that can wait.
         squadXchg.receive(0, squadXchg);
+        
+        // If members were requested, grab 'em right away instead of waiting.
+        // This is used in some special cases.
+        if (sendMembers) {
+            chatRequestSquadMemberListImmediate(squad.squadID());
+        } else {
+            chatRequestSquadMemberList(squad.squadID());
+        }
 	}
 	catch ( std::exception& e)
 	{
@@ -495,7 +503,7 @@ chatSendSquadCreateRequest(SquadControl& request, Player* player)
 {
     UINT32 squadID = chatProcessSquadReallyCreateRequest(request, player);
     
-	chatdbSquadInfo(0, squadID, true);
+	chatdbSquadInfo(0, squadID, false);
 
     UINT32 result = chatProcessSquadCreateReply(true, player->matchHandle(), player);
     
