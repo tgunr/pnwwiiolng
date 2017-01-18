@@ -3707,8 +3707,8 @@ static void _playerControlAPISquad(const Teul::uWeb::HTTPRequest &request, Teul:
     playerid_t originatorPlayerID = requestParams["requester_id"];
     PlayerControlMinimumData originator, target;
     
-    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 404, "no originator data"); // TODO: Is 404 correct for this?
-    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 403, "no target data"); // TODO: Is 403 correct for this?
+    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 422, "no originator data");
+    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 422, "no target data");
     
     if (components[5] == "promote") {
         return _playerControlAPIPromote(request, response, originator, target);
