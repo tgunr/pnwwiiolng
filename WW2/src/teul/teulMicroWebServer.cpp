@@ -930,6 +930,10 @@ void Client::handleData(size_t nbytes)
             auto it = m_requestParser.getRequest().headers.find("connection");
             if (it != m_requestParser.getRequest().headers.end() && strtolower(it->second) == "close") {
                 cancel();
+            } else if (std::find(response.orderedHeaders.begin(), response.orderedHeaders.end(), "Connection: close") != response.orderedHeaders.end()) {
+                cancel(); // Close if the response explicitly closed the connection
+            } else if (response.responseCode > 399) {
+                cancel(); // Close for any response code in the 4xx or 5xx ranges
             } else {
                 // There may be more data that we didn't use in processing the
                 // current completed request. Only in the case of a keepalive
