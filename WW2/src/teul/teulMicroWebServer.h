@@ -122,15 +122,21 @@ namespace Teul
                 virtual void onCancel() override;
 
                 void addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_);
+                void addVirtualPrefix(std::string desc_, std::string prefix_, VirtualFileHandler handler_);
 
             private:
-                using VirtualFileHandlers = std::unordered_map<std::string, std::pair<VirtualFileHandler /*handler*/, std::string /*description*/>>;
+                struct VirtualHandlerEntry { // aka typealias VirtualHandlerEntry = (handler: (HTTPRequest) throws -> HTTPResponse, prefix: Bool, description: String)
+                    VirtualFileHandler handler;
+                    bool prefixMatch;
+                    std::string description;
+                };
+                using VirtualHandlers = std::unordered_map<std::string, VirtualHandlerEntry>;
 
                 std::string m_rootPath;
                 unsigned short m_port;
                 std::shared_timed_mutex m_config_mutex;
                 std::atomic<SOCKET> m_listenSock;
-                VirtualFileHandlers m_virtualFileHandlers;
+                VirtualHandlers m_virtualFileHandlers;
                 std::string m_resourceList;
             
                 void indexHandler(const HTTPRequest &request, HTTPResponse &response);
@@ -146,7 +152,7 @@ namespace Teul
                 void reap_unlocked();
             
                 void client_unregisterClient(ClientList::iterator &client);
-                VirtualFileHandler client_findHandlerForRequest(const HTTPRequest &request);
+                VirtualHandlerEntry client_findHandlerForRequest(const HTTPRequest &request);
 		};
 
         class HTTPResponseBuilder

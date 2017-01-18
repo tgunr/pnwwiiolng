@@ -914,20 +914,16 @@ void Client::handleData(size_t nbytes)
         }
 
         // Got a complete request
-        Server::VirtualFileHandler handler = m_owner.client_findHandlerForRequest(m_requestParser.getRequest());
+        Server::VirtualHandlerEntry handler = m_owner.client_findHandlerForRequest(m_requestParser.getRequest());
         
-        if (handler) {
-            handler(m_requestParser.getRequest(), response);
-        } else {
-            throw WebError(404);
-        }
-
+        ABORT_IF_EX(!handler.handler, "No handler, not even the default one?");
+        handler.handler(m_requestParser.getRequest(), response);
+        
         checkForCancellation();
         sendResponse(response); // Sending a file-based response can throw errors
         dbugLog(_FLD, "uWebServerClient: Client %d sent %d for %s %s",
             static_cast<SOCKET>(m_clientSock), response.responseCode,
             m_requestParser.getRequest().method.c_str(), m_requestParser.getRequest().path.c_str());
-        
         
         if (m_requestParser.getRequest().version == "HTTP/1.1") {
             // HTTP/1.1 defaults to keep-alive and closes with Connection: close or blind request body
@@ -1210,6 +1206,8 @@ void Server::start(const char* const rootPath_, const unsigned short port_)
             .JSON("{\"working\":\"yes\"}")
             .build(response);
     });
+    addVirtualFile("Index", "/index.json", [this] (const HTTPRequest &request, HTTPResponse &response) { return indexHandler(request, response); });
+    addVirtualFile("Index", "/", [this] (const HTTPRequest &request, HTTPResponse &response) { return indexHandler(request, response); });
     PNThread::start();
 }
 
@@ -1349,37 +1347,75 @@ void Server::physicalHandler(const HTTPRequest &request, HTTPResponse &response)
         .build(response);
 }
 
-Server::VirtualFileHandler Server::client_findHandlerForRequest(const HTTPRequest &request)
+Server::VirtualHandlerEntry Server::client_findHandlerForRequest(const HTTPRequest &request)
 {
     {
         std::shared_lock<std::shared_timed_mutex> lock(m_config_mutex);
-        auto it = m_virtualFileHandlers.find(request.path);
-
-        if (it != m_virtualFileHandlers.end()) {
-            return it->second.first;
+        
+        // Try exact path match first, since that's a simple hash lookup. My
+        // kingdom for C++17's if (auto foo = ...) construct.
+        for (auto it = m_virtualFileHandlers.find(request.path); it != m_virtualFileHandlers.end(); ) {
+            return it->second;
+        }
+        
+        // No match by exact path, iterate looking for longest matching prefix.
+        // There is a 100% chance there's a more efficient data structure for
+        // dealing with this lookup (think trie), but that's more trouble than
+        // it's worth for this usage.
+        VirtualHandlers::iterator longestMatch = m_virtualFileHandlers.end();
+        std::string::const_iterator::difference_type longestMatchLength = 0;
+        
+        for (auto it = m_virtualFileHandlers.begin(), end = m_virtualFileHandlers.end(); it != end; ++it) {
+            if (!it->second.prefixMatch) {
+                continue; // Not a prefix match handler, don't even try
+            }
+            if (it->first.length() > request.path.length()) {
+                continue; // The request path is shorter than the prefix to match; this check also makes it safe to use std::mismatch() in C++11 mode
+            }
+            
+            auto mismatchLoc = std::mismatch(it->first.begin(), it->first.end(), request.path.begin(), request.path.end());
+            auto matchLength = std::distance(it->first.begin(), mismatchLoc.first);
+            
+#ifndef NDEBUG
+            ABORT_IF_EX(static_cast<std::string::size_type>(matchLength) >= request.path.length(), "Exact match not found by hash lookup?");
+#endif
+            if (mismatchLoc.first == it->first.end() && matchLength > longestMatchLength) { // If loc in the prefix isn't the end, no match at all
+                longestMatchLength = matchLength;
+                longestMatch = it;
+            }
+        }
+        if (longestMatch != m_virtualFileHandlers.end()) {
+            return longestMatch->second;
         }
     }
-    
-    if (request.path.compare("/index.json") == 0 || request.path.compare("/") == 0) {
-        return [this] (const HTTPRequest &req, HTTPResponse &response) { indexHandler(req, response); };
-    } else {
-        return [this] (const HTTPRequest &req, HTTPResponse &response) { physicalHandler(req, response); };
-    }
+    return VirtualHandlerEntry{ [this] (const HTTPRequest &req, HTTPResponse &response) { physicalHandler(req, response); }, false, "physical file lookup" };
 }
 
 //////////////////////////////////////////////////////////////////////
 // Register a handler.
 
-void Teul::uWeb::Server::addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_)
+void Server::addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_)
 {
 	std::unique_lock<std::shared_timed_mutex> lock(m_config_mutex);
-	m_virtualFileHandlers[path_] = std::make_pair(handler_, desc_);
+	m_virtualFileHandlers[path_] = VirtualHandlerEntry{ handler_, false, desc_ };
     
     m_resourceList.erase(m_resourceList.end() - 1);
 	if (m_resourceList.length() > 2) {
         m_resourceList += ",";
     }
     m_resourceList += "{\"url\":\"" + path_ + "\",\"desc\":\"" + desc_ + "\"}]";
+}
+
+void Server::addVirtualPrefix(std::string desc_, std::string prefix_, VirtualFileHandler handler_)
+{
+	std::unique_lock<std::shared_timed_mutex> lock(m_config_mutex);
+	m_virtualFileHandlers[prefix_] = VirtualHandlerEntry{ handler_, true, desc_ };
+    
+    m_resourceList.erase(m_resourceList.end() - 1);
+	if (m_resourceList.length() > 2) {
+        m_resourceList += ",";
+    }
+    m_resourceList += "{\"url\":\"" + prefix_ + "*\",\"desc\":\"" + desc_ + "\"}]";
 }
 
 //////////////////////////////////////////////////////////////////////
