@@ -9,6 +9,7 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
+#include <json.hpp>
 #include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatBanPlayer.h"
@@ -50,11 +51,13 @@
 #include "chat/chatSay.h"
 #include "chat/chatServerTrackedObjects.h"
 #include "chat/chatSpamCan.h"
+#include "chat/chatSquadControl.h"
 #include "chat/chatSquadCreate.h"
 #include "chat/chatSquadInvite.h"
 #include "chat/chatSquadList.h"
 #include "chat/chatSquadListPurge.h"
 #include "chat/chatSquadListTypes.h"
+#include "chat/chatSquadMemberUpdates.h"
 #include "chat/chatSquadVote.h"
 #include "chat/chatThreads.h"
 #include "chat/chatTimeInterval.h"
@@ -78,6 +81,7 @@
 #include "str/stringLib.h"
 #include "strt/strtChatTypes.h"
 #include "teul/teulEndpoint.h"
+#include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
 #include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
@@ -3481,7 +3485,7 @@ _runHost()
 	{
 		// Process network updates.
 		teulUpdateTransport(25);
-
+        
 		threadsCallNextCallback();
 
 		// Catch up on housekeeping.
@@ -3518,6 +3522,257 @@ UINT32 serverUpTimeMinutes()
 {
         UINT32 secs = teulTime() - serverStartTime;
         return secs / 60;
+}
+
+//////////////////////////////////////////////////////////////////////
+// This struct is the absolute minimum we must know about a player to perform
+// operations on them, whether online or offline.
+struct PlayerControlMinimumData {
+    playerid_t playerID;
+    Player *realPlayerObject;
+    ChatHandle matchHandle;
+    uint32_t squadID;
+    RANK_NO squadRank;
+};
+
+static bool _lookupMinimalDataFromPlayerID(playerid_t playerID, PlayerControlMinimumData &result)
+{
+    Player *realPlayer = PlayerInterface::Lookup(playerID);
+    
+    if (realPlayer) {
+        result.playerID = playerID;
+        result.realPlayerObject = realPlayer;
+        result.matchHandle = realPlayer->matchHandle();
+        result.squadID = realPlayer->squadID();
+        result.squadRank = realPlayer->squadRank();
+    } else {
+        // We need to look up the player info manually
+        // Oops, prepared statements are too common sense and reasonable to be
+        // available to this API. Time for some trivial SQL injection vulns!
+        //DBQuery q(dbh, "SELECT playerid, callsign, squadid, squad_rank FROM wwii_player WHERE playerid=?");
+        DBQuery q(dbh, "SELECT playerid, callsign, squadid, squad_rank FROM wwii_player WHERE playerid=%u", playerID);
+        
+        if (!q.HasRows() || !q.FetchRow()) {
+            return false;
+        }
+        result.playerID = q.Row().NextUInt();
+        result.realPlayerObject = nullptr;
+        result.matchHandle = Chat::Name(q.Row().NextString()).LowercaseHandle(); // Player.m_matchHandle is lowercased
+        result.squadID = q.Row().NextUInt();
+        result.squadRank = q.Row().NextUInt();
+    }
+    return true;
+}
+
+#ifndef NDEBUG
+#define status_if(cond, stat, ...) do { \
+    if ((cond)) { \
+        return Teul::uWeb::HTTPResponseBuilder(request) \
+            .status(stat, ## __VA_ARGS__) \
+            .header("Connection", "close") \
+            .content("<h1>" #stat " " __VA_ARGS__ "</h1>") \
+            .build(response); \
+    } \
+} while(0)
+#else
+#define status_if(cond, stat, ...) do { if ((cond)) { return Teul::uWeb::HTTPResponseBuilder(request).status(stat).header("Connection", "close").build(response); } } while(0)
+#endif
+
+static void _playerControlAPIPromote(
+    const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response,
+    const PlayerControlMinimumData &originator, const PlayerControlMinimumData &target
+)
+{
+    SquadList *squadList = nullptr;
+    SquadMemberEntry *originatorSquadEntry = nullptr;
+    SquadMemberEntry *targetSquadEntry = nullptr;
+    RANK_NO newRank = target.squadRank + 1; // Might be meaningless if some of the following checks fail
+    
+    status_if(target.matchHandle == originator.matchHandle, 403, "Can't promote yourself"); // Promoting self
+    status_if(originator.squadID == 0, 403, "You're not in a squad"); // Originator not in any squad
+    status_if(originator.squadRank < Squad::STAFFER, 403, "You're not a staffer"); // Originator is not staffer or higher
+    status_if(target.squadID != originator.squadID, 403, "You're not in the same squad"); // Originator and target in different squads
+    if (!target.realPlayerObject && !originator.realPlayerObject) { chatdbSquadInfo(0, target.squadID, true); } // If both are offline, load their squad
+    status_if((squadList = chatFindSquadList(originator.squadID)) == nullptr, 403, "Missing squad list"); // The squad list couldn't be looked up
+    status_if((originatorSquadEntry = squadList->find(originator.matchHandle)) == nullptr, 403, "No originator squad entry"); // Originator not in squad???
+    status_if((targetSquadEntry = squadList->find(target.matchHandle)) == nullptr, 403, "Target not in squad"); // Target not in squad
+    status_if(targetSquadEntry->squadRank() > originator.squadRank, 403, "Target outranks you"); // Target outranks originator
+    status_if(newRank > Squad::CO || newRank > originator.squadRank, 403, "Can't go that high"); // New rank is too high
+    status_if(originator.squadRank <= Squad::CO && newRank > Squad::XO, 403, "Can't just make a CO"); // Only GM can promote to CO
+    status_if(newRank == Squad::CO && squadList->squad().coHandle() != 0, 403, "CO not available"); // CO position isn't open
+    status_if(newRank == Squad::CO && originatorSquadEntry->squadRank() == Squad::CO, 403, "CO not available"); // CO position REALLY isn't open...
+    
+    DBQuery q(dbh, "UPDATE wwii_player SET squad_rank=%u WHERE squadID=%u AND playerid=%u AND squad_rank=%u", newRank, target.squadID, target.playerID, target.squadRank);
+    status_if(!q.HasRows(), 500, "DB query 'sploded"); // something went horribly wrong!
+    
+    if (targetSquadEntry->squadRank() == Squad::CO || newRank == Squad::CO) { chatdbSquadInfo(0, target.squadID, false); } // Refresh whole squad if CO changed
+    if (targetSquadEntry->player()) { targetSquadEntry->player()->unrecruit(); }
+    squadList->updateMember(target.matchHandle, newRank, targetSquadEntry->player());
+    
+    LSTRING_ID promoteMessage = LSTR_NONE;
+    switch (newRank) {
+        case Squad::MEMBER:     promoteMessage = LSTR_PROMO_TO_MEMBER; break;
+        case Squad::STAFFER:    promoteMessage = LSTR_PROMO_TO_STAFFER; break;
+        case Squad::XO:         promoteMessage = LSTR_PROMO_TO_XO; break;
+        case Squad::CO:         promoteMessage = LSTR_PROMO_TO_CO; break;
+        default: break;
+    }
+    if (promoteMessage != LSTR_NONE) {
+        squadList->sendMessage(LSTR_SQUAD, promoteMessage, Chat::Name(originator.matchHandle).c_str(), Chat::Name(target.matchHandle).c_str());
+    }
+    if (targetSquadEntry->player()) { targetSquadEntry->player()->unrecruit(); } // why twice?
+    squadList->setUpdated();
+    DBThread::Do(DBThread::Default, "INSERT INTO wwii_squad_audit (squadID, action, occured, originator, target, newval, prev, coID, textmessage)"
+        " VALUES (%u, %u, NOW(), '%s', '%s', %u, %u, 0, '')",
+        squadList->squad().squadID(), SquadMemberUpdate::_PROMOTE, Chat::Name(originator.matchHandle).c_str(), Chat::Name(target.matchHandle).c_str(),
+        newRank, newRank - 1);
+    return Teul::uWeb::HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squad_rank", newRank } }).dump())
+        .build(response);
+}
+
+static void _playerControlAPIDemote(
+    const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response,
+    const PlayerControlMinimumData &originator, const PlayerControlMinimumData &target
+)
+{
+    SquadList *squadList = nullptr;
+    SquadMemberEntry *originatorSquadEntry = nullptr;
+    SquadMemberEntry *targetSquadEntry = nullptr;
+    RANK_NO newRank = target.squadRank - 1; // Might be meaningless if some of the following checks fail
+    
+    status_if(target.matchHandle == originator.matchHandle, 403, "Can't promote yourself"); // Promoting self
+    status_if(originator.squadID == 0, 403, "You're not in a squad"); // Originator not in any squad
+    status_if(originator.squadRank < Squad::STAFFER, 403, "You're not a staffer"); // Originator is not staffer or higher
+    status_if(target.squadID != originator.squadID, 403, "You're not in the same squad"); // Originator and target in different squads
+    if (!target.realPlayerObject && !originator.realPlayerObject) { chatdbSquadInfo(0, target.squadID, true); } // If both are offline, load their squad
+    status_if((squadList = chatFindSquadList(originator.squadID)) == nullptr, 403, "Missing squad list"); // The squad list couldn't be looked up
+    status_if((originatorSquadEntry = squadList->find(originator.matchHandle)) == nullptr, 403, "No originator squad entry"); // Originator not in squad???
+    status_if((targetSquadEntry = squadList->find(target.matchHandle)) == nullptr, 403, "Target not in squad"); // Target not in squad
+    status_if(targetSquadEntry->squadRank() > originator.squadRank, 403, "Target outranks you"); // Target outranks originator
+    status_if(newRank < Squad::MEMBER || newRank >= Squad::CO, 403, "Can't go that low"); // New rank is too low
+    status_if(newRank == Squad::CO && squadList->squad().coHandle() != 0, 403, "CO not available"); // CO position isn't open
+    status_if(newRank == Squad::CO && originatorSquadEntry->squadRank() == Squad::CO, 403, "CO not available"); // CO position REALLY isn't open...
+    
+    DBQuery q(dbh, "UPDATE wwii_player SET squad_rank=%u WHERE squadID=%u AND playerid=%u AND squad_rank=%u", newRank, target.squadID, target.playerID, target.squadRank);
+    status_if(!q.HasRows(), 500, "DB query 'sploded"); // something went horribly wrong!
+    
+    if (targetSquadEntry->squadRank() == Squad::CO || newRank == Squad::CO) { chatdbSquadInfo(0, target.squadID, false); } // Refresh whole squad if CO changed
+    if (targetSquadEntry->player() && newRank < Squad::STAFFER) { targetSquadEntry->player()->stopRecruiting(); }
+    squadList->updateMember(target.matchHandle, newRank, targetSquadEntry->player());
+    
+    LSTRING_ID promoteMessage = LSTR_NONE;
+    switch (newRank) {
+        case Squad::MEMBER:     promoteMessage = LSTR_DEMO_TO_MEMBER; break;
+        case Squad::STAFFER:    promoteMessage = LSTR_DEMO_TO_STAFFER; break;
+        case Squad::XO:         promoteMessage = LSTR_DEMO_TO_XO; break;
+        default: break;
+    }
+    if (promoteMessage != LSTR_NONE) {
+        squadList->sendMessage(LSTR_SQUAD, promoteMessage, Chat::Name(originator.matchHandle).c_str(), Chat::Name(target.matchHandle).c_str());
+    }
+    if (targetSquadEntry->player()) { targetSquadEntry->player()->unrecruit(); } // why twice?
+    squadList->setUpdated();
+    DBThread::Do(DBThread::Default, "INSERT INTO wwii_squad_audit (squadID, action, occured, originator, target, newval, prev, coID, textmessage)"
+        " VALUES (%u, %u, NOW(), '%s', '%s', %u, %u, 0, '')",
+        squadList->squad().squadID(), SquadMemberUpdate::_DEMOTE, Chat::Name(originator.matchHandle).c_str(), Chat::Name(target.matchHandle).c_str(),
+        newRank, newRank + 1);
+    return Teul::uWeb::HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squad_rank", newRank } }).dump())
+        .build(response);
+}
+
+static void _playerControlAPISquad(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, const std::vector<std::string> &components)
+{
+    status_if(request.headers.find("content-type") == request.headers.end(), 400, "No content-type");
+    status_if(strtolower(request.headers.find("content-type")->second) != "application/json", 400, "Require application/json");
+    
+    status_if(components.size() < 6, 404, "Not enough path components (6)");
+
+    // All "squad" operations require the requester_id param and PATCH method.
+    status_if(request.method != "PATCH", 405, "Bad request method");
+    
+    nlohmann::json requestParams;
+    try {
+        requestParams = nlohmann::json::parse(request.requestData);
+    } catch (std::invalid_argument &e) {
+        status_if(true, 400, "Bad JSON");
+    }
+    status_if(requestParams.find("requester_id") == requestParams.end(), 422, "requester_id required");
+    status_if(!requestParams["requester_id"].is_number_integer(), 422, "numeric requester_id required");
+    
+    playerid_t targetPlayerID = std::stoull(components[3]);
+    playerid_t originatorPlayerID = requestParams["requester_id"];
+    PlayerControlMinimumData originator, target;
+    
+    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 404, "no originator data"); // TODO: Is 404 correct for this?
+    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 403, "no target data"); // TODO: Is 403 correct for this?
+    
+    if (components[5] == "promote") {
+        return _playerControlAPIPromote(request, response, originator, target);
+    } else if (components[5] == "demote") {
+        return _playerControlAPIDemote(request, response, originator, target);
+    } else if (components[5] == "remove") {
+    
+    } else {
+        status_if(true, 404, "Don't know that player squad control command");
+    }
+}
+
+static void _playerControlAPIHandler_unlocked(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
+{
+    // This URL parsing should really be generalized and improved.
+    std::string path = request.path.substr(0, request.path.find_first_of("?#")); // substr(0,npos) == whole string
+    std::vector<std::string> components = split_string(path, "/");
+    
+    status_if(components.size() < 3, 400, "Not enough path components (3)");
+    status_if(components[0] != "", 400, "How did you get here with no /?");
+    status_if(components[1] != "v1", 400, "How did you get here with no version?");
+    status_if(components[2] != "player", 400, "How did you get here with no player control?"); // If the prefix match didn't happen, something's gone really wrong
+    
+    // This is not a proper RESTful router. It's a hack. It'll be improved on later.
+    status_if(components.size() < 4, 404, "Not enough path components (4)");
+    if (components[3] == "list") {
+        // return list of online players
+        return Teul::uWeb::HTTPResponseBuilder(request).status(501).build(response);
+    } else {
+        status_if(components[3].find_first_not_of("0123456789") != std::string::npos, 404, "Player ID gotta be numeric");
+        status_if(components.size() < 5, 404, "Not enough path components (5)");
+        if (components[4] == "squad") {
+            return _playerControlAPISquad(request, response, components);
+        } else {
+            status_if(true, 404, "Don't know that player control command");
+        }
+    }
+}
+
+static void _playerControlAPIHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
+{
+    std::mutex waitMutex;
+    std::condition_variable waitCondition;
+    bool waitSignal = false;
+    
+    threadCallback([&request, &response, &waitMutex, &waitCondition, &waitSignal] (void *) {
+        _playerControlAPIHandler_unlocked(request, response);
+        {
+            std::lock_guard<std::mutex> lock(waitMutex);
+            waitSignal = true;
+            waitCondition.notify_all();
+        }
+    }, nullptr);
+    
+    {
+        std::unique_lock<std::mutex> lock(waitMutex);
+        waitCondition.wait(lock, [&waitSignal] { return waitSignal == true; });
+    }
+}
+#undef status_if
+
+static void _initializeHTTPEndpoints()
+{
+    Teul::uWeb::s_debugServer.addVirtualPrefix("V1 player control REST API", "/v1/player", _playerControlAPIHandler);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -3626,6 +3881,9 @@ main(int argc, const char* argv[])
 	ABORT_IF(managementListenInterface < 0);
 
 	dbugLog(_FLN, "Listening for management players on port %u", WWII::Net::Ports::ChatManagement);
+    
+    _initializeHTTPEndpoints();
+    dbugLog(_FLN, "Listening for management commands on HTTP microserver (port %u)", WWII::Net::Ports::DebugWebServer);
 
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
@@ -3669,7 +3927,7 @@ main(int argc, const char* argv[])
 		dbugLog(_FLA, "failed registering dot commands: %s", e.what());
 		exit(0);
 	}
-
+    
 	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
 
 	_runHost();
