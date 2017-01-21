@@ -32,7 +32,6 @@
 #include "wwii/wwiiCallbacks.h"
 
 static TEUL_CALLBACK* _XCHG_BANDWIDTH_NOTICE;
-static TEUL_CALLBACK* _XCHG_NETCODE_NOTICE;
 
 extern void hostSmiteCustomer(playerid_t playerID);
 
