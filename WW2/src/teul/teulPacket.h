@@ -109,9 +109,9 @@ public:
 	}
 
 	//! Encrypt and send data to given teulIndex.
-	SINT32 send(const SINT32 teulIndex_);
+	SINT32 send(const SINT32 teulIndex_, const UCHAR protocolPreference = PROTOCOL_UNDEF);
 	//! Pack, encrypt and send data to given endpoint.
-	SINT32 send(ENDPOINT& endpoint_);
+	SINT32 send(ENDPOINT& endpoint_, const UCHAR protocolPreference=PROTOCOL_UNDEF);
 
 	//! Broadcast this packet to an array of endpoints.
 	void send(const std::vector<ENDPOINT*>& endpoints);

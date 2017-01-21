@@ -88,6 +88,8 @@ enum _cfgPARAMS
 	cfgINF_LODMOD,
 	cfgVEH_CONV,
 	cfgAIM_SENS,
+	cfgNETCODE,
+
 	// add more vars here
 	cfgNUM_TOTAL_PARAMS
 };

@@ -690,7 +690,6 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 			vref->checkCapture();
 	}
 
-#ifdef NEW_BCODE
 	if ( player->station == UPDT_OTHER )
 		vh.present &= ~PR_FROM_CONTROLLER;
 	else
@@ -699,7 +698,6 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	}
 
 	hostAddVehicleToBroadcast(vref, &vh);
-#endif
 
 	player->processUpdateValues(vh.updateNo, vh.updatePrime);
 

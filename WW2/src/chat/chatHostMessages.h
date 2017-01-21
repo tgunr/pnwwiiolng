@@ -41,6 +41,7 @@ SINT32 chatSendPopulation();
 void chatSendLocateUser(Player& requester, UINT32 playerID);
 
 bool chatSendBandwidthNotice(const Player& player, UINT32 mode);
+bool chatSendNetcodeNotice(const Player& player, bool netcode);
 
 bool chatMessageChannel(const ChannelID& channelID, LSTRING_ID prefix, LSTRING_ID message, const char* arg1 = nullptr, const char* arg2 = nullptr);
 

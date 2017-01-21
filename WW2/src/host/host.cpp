@@ -1971,7 +1971,10 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 {
 	_calculatePingTime(packet, player, pingOffset);
 
-	SINT32 retval = packet.send(player->teulIndex());
+	// If the player has netcode enhancements enabled, specify a UDP protocol preference
+	// once this netcode version (netcode3) is made permanent, the netcode flag will be used for the next version
+	// and this check will go away.
+	SINT32 retval = packet.send(player->teulIndex(), player->GetNetcode() ? PROTOCOL_UDP : PROTOCOL_UNDEF);
 	if ( retval >= 0 )
 	{
 		player->m_updatesFailed = 0;
@@ -2589,9 +2592,7 @@ _releaseVehicle(VEHICLE_HOLDER* const vehicleHold, FULL_OBJ_ID toFacility)
 		}
 		else
 		{
-#ifdef NEW_BCODE
 			hostQueueVehicleRemove(index, vehicle->exitState);
-#endif
 
 			if ( _vehicleCounter > 0 )
 				_vehicleCounter--;

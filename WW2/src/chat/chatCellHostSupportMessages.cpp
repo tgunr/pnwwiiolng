@@ -32,6 +32,7 @@
 #include "wwii/wwiiCallbacks.h"
 
 static TEUL_CALLBACK* _XCHG_BANDWIDTH_NOTICE;
+static TEUL_CALLBACK* _XCHG_NETCODE_NOTICE;
 
 extern void hostSmiteCustomer(playerid_t playerID);
 
@@ -133,18 +134,7 @@ _recvBandwidthNotice(ACTION_OBJECT* const a)
 
 	reply.playerID = request.playerID;
 
-	if ( request.mode != 255 )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s v:%u requested framing mode %d"
-						, player->teulIndex()
-						, player->playerID()
-						, player->callsign()
-						, (player->vehicle ? player->vehicle->index : 0)
-						, request.mode
-						);
-		player->setFramingMode(request.mode);
-	}
-	else
+	if (request.mode == UpdateFraming::_QUERY)
 	{
 		dbugLog(_FLI, "t:%d p:%u c:%s v:%u querying framing mode"
 						, player->teulIndex()
@@ -153,12 +143,50 @@ _recvBandwidthNotice(ACTION_OBJECT* const a)
 						, (player->vehicle ? player->vehicle->index : 0)
 						);
 	}
+	else 
+	{
+		dbugLog(_FLD, "t:%d p:%u c:%s v:%u requested framing mode %d"
+			, player->teulIndex()
+			, player->playerID()
+			, player->callsign()
+			, (player->vehicle ? player->vehicle->index : 0)
+			, request.mode
+		);
+		player->setFramingMode(request.mode);
+	}
 
 	reply.mode = player->getCurrentFramingMode();
-	reply.display = (request.mode == 255);
+	reply.display = (request.mode == UpdateFraming::_QUERY);
 	strsafecpy(reply.response, framings[reply.mode].description);
 
 	teulSendTo(a->teulIndex, a->fromAddress & DIRECT_MASK, a->fromPort, _XCHG_BANDWIDTH_NOTICE, &reply);
+
+	return a->offset;
+}
+
+// Receive a netcode change request from the chat host
+static SINT32
+_recvNetcodeNotice(ACTION_OBJECT* const a)
+{
+	NETCODE_CHANGE request;
+
+	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &request, sizeof(request));
+
+	if (a->offset < 0)
+	{
+		dbugLog(_FLW, "invalid netcode notice");
+		return a->offset;
+	}
+
+	Player* player = (Player*)ServerInterface::LookupByPlayerID(request.playerID);
+	if (player == nullptr)
+	{
+		dbugLog(_FLA, "p:%u invalid player holder", request.playerID);
+		return -EINVAL;
+	}
+
+	// set the netcode value locally, cell host will never refuse this
+	player->SetNetcode(request.netcode);
 
 	return a->offset;
 }
@@ -176,6 +204,8 @@ chatInstallCellHostSupportCallbacks()
 
 		// Send/receive bandwidth notices
 		REGISTER_SENDRECV(Chat::BANDWIDTH_NOTICE_Y, _sendBandwidthNotice, _recvBandwidthNotice, _XCHG_BANDWIDTH_NOTICE);
+
+		REGISTER_RECEIVER(Chat::NETCODE_NOTICE_Y, _recvNetcodeNotice);
 	}
 	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }

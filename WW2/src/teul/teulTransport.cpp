@@ -490,11 +490,11 @@ void teulCloseTransport()
 // point the CALLBACK->outData to your data structure and call this
 // function to send it.
 
-extern SINT32 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback);
-extern SINT32 teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& callback);
+extern SINT32 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const UCHAR protocol);
+extern SINT32 teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& callback, const UCHAR protocol);
 
 SINT32
-teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data)
+teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data, const UCHAR protocol)
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
@@ -504,11 +504,11 @@ teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data)
 
 	object->outData = data;
 
-	return teulModSendCALLBACKe(endpoint, *object);
+	return teulModSendCALLBACKe(endpoint, *object, protocol);
 }
 
 SINT32
-teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data)
+teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data, const UCHAR protocol)
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
@@ -524,7 +524,7 @@ teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data)
 
 	object->outData = data;
 
-	return teulModSendCALLBACK(teulIndex, *object);
+	return teulModSendCALLBACK(teulIndex, *object, protocol);
 }
 
 SINT32

@@ -57,6 +57,7 @@ cfgPARAM_SETUP cfgParameters[cfgNUM_TOTAL_PARAMS] =
 	{"radialdensity",       cfgTYPE_FLOAT,                  cfgDEFAULT_RADIAL_CLUTTER_DENSITY   },
 	{"radialradius",        cfgTYPE_FLOAT,                  cfgDEFAULT_RADIAL_CLUTTER_RADIUS    },
 	{"visplayerlimit",      cfgTYPE_INTEGER,                cfgDEFAULT_VIS_PLAYER_LIMIT         },
+	{"usenetcode",				cfgTYPE_TRUE_FALSE,             cfgVALUE_FALSE						},
 	{"fsaasamples",      	cfgTYPE_FSAA_SAMPLES,           cfgDEFAULT_FSSA_SAMPLES       	    },
 	{"fsaahighquality",     cfgTYPE_TRUE_FALSE,             cfgVALUE_FALSE      	            },
 	{"soundhighquality",    cfgTYPE_TRUE_FALSE,             cfgVALUE_TRUE       	            },

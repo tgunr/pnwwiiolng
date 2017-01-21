@@ -77,11 +77,11 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.shademode",			&ShadeMode,					cfgPARAM_UINT,		1,		0,	0, false },
 	{"app.bdithering",			&bDithering,				cfgPARAM_BOOLEAN,	1,		0,	1, false	},
 	{"app.bspecular",			&WantSpecularMaps,			cfgPARAM_BOOLEAN,	1,		0,	1, false	},
-	{"app.sound",				&WantedSoundCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedSoundCard)-1, true	},
+	{"app.sound",				&WantedSoundCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedSoundCard) - 1, true	},
 	{"app.bsoundenable",		&bSoundEnable,				cfgPARAM_BOOLEAN,	0,		0,	1, true	},
 	{"app.b3dsoundenable",		&b3DSoundEnable,			cfgPARAM_BOOLEAN,	0,		0,	1, true	},
-	{"app.video",				&WantedVideoCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoCard)-1, true	},
-	{"app.resolution",			&WantedVideoResolution,		cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoResolution)-1, true	},
+	{"app.video",				&WantedVideoCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoCard) - 1, true	},
+	{"app.resolution",			&WantedVideoResolution,		cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoResolution) - 1, true	},
 	{"app.bnoframerunahead",	&bNoFrameRunahead,			cfgPARAM_BOOLEAN,	0,		0,	1, false	},
 #if platOS == OS_MACOS
 	{"app.enablevsync",	        &g_enableVSync,				cfgPARAM_BOOLEAN,	1,		0,	1, true	},
@@ -115,6 +115,7 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.radialdensity",       &g_fRadialDensity,          cfgPARAM_FLOAT,		1,		0,	0, true	},
 	{"app.radialradius",        &g_fRadialRadius,           cfgPARAM_FLOAT,		1,		0,	0, true	},
 	{"app.visplayerlimit",      &g_iVisiblePlayerLimit,     cfgPARAM_SINT,		0,		0,	0, true	},
+	{"app.g_wantNetcode",		&g_wantNetcode,				cfgPARAM_BOOLEAN,   0,      0,  1, true },
 	{"app.fsaasamples",      	&g_iFSSASamples,			cfgPARAM_SINT,		1,		0,	0, false	},
 	{"app.fsaahighquality",		&g_bFSSAHighQuality,        cfgPARAM_BOOLEAN,	1,		0,	1, false	},
 	{"app.soundhighquality",    &g_bSoundHighQuality,       cfgPARAM_BOOLEAN,	1,		0,	1, false	},
@@ -191,6 +192,9 @@ void cfgPrefsSendSharedPrefs()
 	name = cfgPrefsGetGlobalName(cfgVISIBLE_PLAYER_LIMIT);
 	outgoing.construct<Chat::Preference>(CPR_UPDATE_MODE, cfgPrefsGetInt(name, 2));
 
+	name = cfgPrefsGetGlobalName(cfgNETCODE);
+	outgoing.construct<Chat::Preference>(CPR_SET_NETCODE, cfgPrefsGetInt(name, 2));
+
 	name = cfgPrefsGetGlobalName(cfgLANGUAGE_CHOICE);
 	outgoing.construct<Chat::Preference>(CPR_CLIENT_LANGUAGE, cfgPrefsGetInt(name, 0));
 	outgoing.construct<Chat::Preference>(CPR_PLAYER_LANGUAGE, cfgPrefsGetInt(name, 0));
@@ -222,10 +226,16 @@ void cfgPrefsSendSharedPref(CHAT_PREFERENCE key)
 			outgoing.append(Chat::Preference(key, cfgPrefsGetInt(name, 2)));
 		}
 		break;
+		case CPR_SET_NETCODE:
+		{
+			const char* name = cfgPrefsGetGlobalName(cfgNETCODE);
+			outgoing.append(Chat::Preference(key, cfgPrefsGetInt(name, 2)));
+		}
+		break;
 		case CPR_CLIENT_LANGUAGE: // my ui language
 		case CPR_PLAYER_LANGUAGE: // my spoken language
 		{
-			const char* name = cfgPrefsGetGlobalName(cfgVISIBLE_PLAYER_LIMIT);
+			const char* name = cfgPrefsGetGlobalName(cfgLANGUAGE_CHOICE);
 			outgoing.append(Chat::Preference(key, cfgPrefsGetInt(name, 0)));
 		}
 		break;
@@ -1202,6 +1212,11 @@ void cfgPrefsProcessGlobal(_cfgPARAMS key)
 		case cfgVISIBLE_PLAYER_LIMIT:
 		{
 			cfgPrefsSendSharedPref(CPR_UPDATE_MODE); // send it to the host
+		}
+		break;
+		case cfgNETCODE:
+		{
+			cfgPrefsSendSharedPref(CPR_SET_NETCODE); // send it to the host
 		}
 		break;
 		case cfgAWS_LOW:

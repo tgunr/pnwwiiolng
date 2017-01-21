@@ -1159,6 +1159,33 @@ chatSendBandwidthNotice(const Player& player, UINT32 mode)
 	return outgoing.send(peerIdx);
 }
 
+bool 
+chatSendNetcodeNotice(const Player& player, bool netcode)
+{
+	auto host = player.getCellHost();
+	if (host == 0) {
+		dbugLog(_FLD, "p:%u c:%s %s: not on a cell host", player.playerID(), player.callsign(), __FUNCTION__);
+		return false;
+	}
+	teulindex_t peerIdx = serverGetPeerIndex(host, CELL_HOST);
+	if (peerIdx < 0) {
+		dbugLog(_FLD, "p:%u c:%s %s: not connected to cell %08x", player.playerID(), player.callsign(), __FUNCTION__, host);
+		return false;
+	}
+
+	if (g_debugPersonas) {
+		char hostAddr[64];
+		teulGetAddress(host, hostAddr, sizeof(hostAddr));
+		dbugLog(_FLD, "p:%u c:%s Informing host %s give netcode %u after spawning"
+			, player.playerID(), player.callsign(), hostAddr, netcode);
+	}
+
+	NETCODE_CHANGE change{ player.playerID(), netcode };
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::NETCODE_NOTICE_Y), change);
+	return outgoing.send(peerIdx);
+
+}
+
 bool
 Chat::TuneToChannel::send(SINT32 connection)
 {

@@ -27,6 +27,7 @@ enum PROTOCOL
 	PROTOCOL_UDP,			// User Datagram protocol, unreliable, datagram based, most flexible.
 	PROTOCOL_TCP,			// Transport Control Protocol, reliable, stream based, extra overhead.
 	PROTOCOL_UDB,			// UDB = UDP bare, no rel, also allows broadcast
-	PROTOCOL_CTRL			// CTRL = Via the controller
+	PROTOCOL_CTRL,			// CTRL = Via the controller
+	PROTOCOL_UNDEF
 };
 

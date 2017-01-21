@@ -57,7 +57,7 @@ void teulCleanupSend()
 // endpoint destination.
 
 SINT32
-teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
+teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const UCHAR protocolPreference)
 {
 	if( PN_UNLIKELY(endpoint.state() == IS_DEAD) )
 	{
@@ -98,7 +98,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 
 	outgoing.setPayloadSizeBytes(Teul::BitsToBytes(packedSizeBits));
 
-	const SINT32 sendResult = outgoing.send(endpoint);
+	const SINT32 sendResult = outgoing.send(endpoint, protocolPreference);
 	if ( PN_UNLIKELY(sendResult < 0) )
 	{
 		dbugLog(_FLW, "t:%d callback " PRF_CALLBACK " send failed:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), sendResult);
@@ -121,7 +121,7 @@ ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 // Actually write data to a socket.
 
 SINT32
-ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port)
+ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port, const UCHAR protocolPreference)
 {
 	if ( protocol == PROTOCOL_TCP || protocol == PROTOCOL_CTRL )
 	{
@@ -191,7 +191,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 // Try to send or queue a packet to a socket.
 
 SINT32
-ENDPOINT::sendPacket(Teul::Packet& packet)
+ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 {
 	const UINT32 packetBytes = packet.packetSizeBytes();
 
@@ -202,7 +202,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 		// dbugLog(_FLD, "start of packet address = %p", packet.packet());
 		// dbugLog(_FLD, "address of packet obj = %p", &packet);
 
-		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
+		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port(), protocolPreference);
 		// Anything but a partial send, the sender handles.
 		if ( PN_UNLIKELY(result < 0) )
 		{
@@ -305,7 +305,7 @@ ENDPOINT::pushSendQueue()
 //
 
 SINT32
-Teul::Packet::send(ENDPOINT& endpoint)
+Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 {
 	if ( PN_UNLIKELY(endpoint.state() == IS_LISTENING || endpoint.state() >= IS_CLOSING) )
 	{
@@ -344,7 +344,7 @@ Teul::Packet::send(ENDPOINT& endpoint)
 		endpoint.encrypt(encryptable(), header().packetSizeBytes());
 	}
 
-	const SINT32 result = endpoint.sendPacket(*this);
+	const SINT32 result = endpoint.sendPacket(*this, protocolPreference);
 	if ( PN_UNLIKELY(result <= 0) )
 	{
 		int err = 0;
@@ -369,7 +369,7 @@ Teul::Packet::send(ENDPOINT& endpoint)
 //////////////////////////////////////////////////////////////////////
 
 SINT32
-teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object)
+teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object, const UCHAR protocol)
 {
 	ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex);
 	if (PN_UNLIKELY(theEndpoint == nullptr))
@@ -378,7 +378,7 @@ teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object)
 		return -EINVAL;
 	}
 
-	return teulModSendCALLBACKe(*theEndpoint, object);
+	return teulModSendCALLBACKe(*theEndpoint, object, protocol);
 }
 
 //////////////////////////////////////////////////////////////////////

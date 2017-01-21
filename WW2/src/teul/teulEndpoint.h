@@ -131,7 +131,7 @@ public:
 
 	//! Attempt to send a packet, or queue it if we cannot
 	//! send it immediately.
-	SINT32 sendPacket(Teul::Packet& packet);
+	SINT32 sendPacket(Teul::Packet& packet, const UCHAR protocolPreference);
 
 	//! Flag the endpoint as having become connected.
 	void setConnected();
@@ -159,7 +159,7 @@ public:
 
 private:
 	//! Write the actual data to the socket.
-	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port);
+	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port, const UCHAR protocolPreference=PROTOCOL_UNDEF);
 
 #if platBuild == BUILD_SERVER
 public:

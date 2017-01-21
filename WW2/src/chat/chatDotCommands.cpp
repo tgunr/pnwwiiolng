@@ -948,41 +948,6 @@ public:
 } dotTrainers;
 
 //////////////////////////////////////////////////////////////////////
-// The .um command
-//////////////////////////////////////////////////////////////////////
-
-//! @internal
-class DotUM : public DotCommand
-{
-public:
-	DotUM() : DotCommand("um", "Set current update mode"
-							, NO_MASK, LSTR_UM_USAGE, LSTR_UM_DETAIL
-							) { }
-
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
-	{
-		SINT32 mode = -1;
-
-		if ( !player.isSpawned() )
-			throw Chat::LStringErr(LSTR_ONLY_WHILE_SPAWNED);
-
-		if ( arguments[0] != '?' )
-		{
-			(void)sscanf(arguments, "%u", &mode);
-			if ( mode < 0 || mode >= UpdateFraming::_MODES )
-				throw Chat::LStringErr(LSTR_INVALID_UM, arguments);
-		}
-		else
-		{
-			mode = 255;
-		}
-
-		chatSendBandwidthNotice(player, (UINT32)mode);
-	}
-
-} dotUM;
-
-//////////////////////////////////////////////////////////////////////
 // Small Area chat message
 //////////////////////////////////////////////////////////////////////
 

@@ -824,7 +824,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 			teulSyncClock();
 			cub.size = teulPackUINT64(TEUL_PACK, cub.data, cub.size, &teulClock64, 0);
             if (Online) { // wait until here to check this in case all that junk above actually does something to game state
-                teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub);
+                teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub, PROTOCOL_UDP);
             }
 		}
 	}
