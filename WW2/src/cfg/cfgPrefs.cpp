@@ -1018,6 +1018,7 @@ void cfgPrefsSetDefaults()
 	g_iNumBullets = 128;
 
 	g_iVisiblePlayerLimit = 2; // medium
+	g_wantNetcode = TRUE;
 	g_useNetworkRoute = 0;
 	g_wantSSE2 = FALSE;
 
