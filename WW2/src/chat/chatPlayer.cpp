@@ -1569,6 +1569,7 @@ Player::SetSpawned(bool newValue)
 
 		// If they have a non-zero update mode, then update their vis mode
 		chatSendBandwidthNotice(*this, getPreference(CPR_UPDATE_MODE));
+		chatSendBandwidthNotice(*this, getPreference(CPR_SET_NETCODE));
 
 		if ( m_snoopBy != nullptr )
 		{
