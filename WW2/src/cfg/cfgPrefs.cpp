@@ -193,7 +193,7 @@ void cfgPrefsSendSharedPrefs()
 	outgoing.construct<Chat::Preference>(CPR_UPDATE_MODE, cfgPrefsGetInt(name, 2));
 
 	name = cfgPrefsGetGlobalName(cfgNETCODE);
-	outgoing.construct<Chat::Preference>(CPR_SET_NETCODE, cfgPrefsGetInt(name, 2));
+	outgoing.construct<Chat::Preference>(CPR_SET_NETCODE, cfgPrefsGetBool(name, true));
 
 	name = cfgPrefsGetGlobalName(cfgLANGUAGE_CHOICE);
 	outgoing.construct<Chat::Preference>(CPR_CLIENT_LANGUAGE, cfgPrefsGetInt(name, 0));
@@ -229,7 +229,7 @@ void cfgPrefsSendSharedPref(CHAT_PREFERENCE key)
 		case CPR_SET_NETCODE:
 		{
 			const char* name = cfgPrefsGetGlobalName(cfgNETCODE);
-			outgoing.append(Chat::Preference(key, cfgPrefsGetInt(name, 2)));
+			outgoing.append(Chat::Preference(key, cfgPrefsGetBool(name, true)));
 		}
 		break;
 		case CPR_CLIENT_LANGUAGE: // my ui language

@@ -43,6 +43,7 @@ enum _cfgPARAMS
 	cfgRADIAL_CLUTTER_DENSITY,
 	cfgRADIAL_CLUTTER_RADIUS,
 	cfgVISIBLE_PLAYER_LIMIT,
+	cfgNETCODE,
 	cfgFSSA_SAMPLES,
 	cfgFSSA_QUALITY,
 	cfgSOUND_QUALITY,
@@ -88,7 +89,6 @@ enum _cfgPARAMS
 	cfgINF_LODMOD,
 	cfgVEH_CONV,
 	cfgAIM_SENS,
-	cfgNETCODE,
 
 	// add more vars here
 	cfgNUM_TOTAL_PARAMS
