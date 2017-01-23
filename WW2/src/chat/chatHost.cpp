@@ -3778,6 +3778,16 @@ static inline playerid_t get_as_playerid(const nlohmann::json &value) {
     }
 }
 
+static inline uint64_t get_as_squadid(const nlohmann::json &value) {
+    if (value.is_string()) {
+        return std::stoull(value.get<std::string>());
+    } else if (value.is_number_integer()) {
+        return value;
+    } else {
+        throw std::domain_error("squadid only recognizes string and number");
+    }
+}
+
 static void _playerControlAPIPromote(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
 {
     status_if(params.find("player_id") == params.end(), 500, "player id missing?");
@@ -3999,6 +4009,210 @@ static void _playerControlAPIList(const HTTPRequest &request, HTTPResponse &resp
         .build(response);
 }
 
+static void _squadControlAPIPlayersInternal(const HTTPRequest &request, HTTPResponse &response, uint64_t squad_id, bool onlineOnly)
+{
+    SquadList *squad = chatFindSquadList(squad_id);
+    
+    if (!squad) {
+        // Not already in memory, load it, with immediate member list retrieval
+        chatdbSquadInfo(0, squad_id, true);
+        squad = chatFindSquadList(squad_id);
+    }
+    status_if(!squad, 404, "No such squad"); // Still nothing? No such squad, then.
+    
+    nlohmann::json result = nlohmann::json::array();
+
+    for (auto &kv : squad->members()) {
+        const SquadMemberEntry &player = kv.second;
+        
+        if (onlineOnly && player.player() == nullptr) {
+            continue;
+        }
+        
+        nlohmann::json entry = nlohmann::json::object();
+        
+        entry["callsign"] = Chat::Name(player.handle()).c_str();
+        entry["rank"] = player.squadRank();
+        result.push_back(entry);
+    }
+    return HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(result.dump())
+        .build(response);
+}
+
+static void _squadControlAPIPlayers(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    return _squadControlAPIPlayersInternal(request, response, get_as_squadid(params.at("squad_id")), false);
+}
+
+static void _squadControlAPIPlayersOnline(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    return _squadControlAPIPlayersInternal(request, response, get_as_squadid(params.at("squad_id")), true);
+}
+
+static inline std::string _trim(const std::string &text)
+{
+    std::string result = text;
+    std::string::size_type locstart = text.find_first_not_of(" \t\v\n\r");
+    
+    if (locstart == std::string::npos) {
+        result = "";
+    } else {
+        result = result.substr(locstart);
+    }
+    return result.substr(0, result.find_last_not_of(" \t\v\n\r")); // npos == entire string
+}
+
+static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    status_if(params.find("requester_id") == params.end(), 422, "requester ID is required");
+
+    playerid_t requester_id = get_as_playerid(params.at("requester_id"));
+    uint64_t squad_id = get_as_squadid(params.at("squad_id"));
+    SquadList *squad = chatFindSquadList(squad_id);
+    PlayerControlMinimumData requester;
+    SquadMemberEntry *requesterMember = nullptr;
+    
+    if (!squad) {
+        // Not already in memory, load it, with immediate member list retrieval
+        chatdbSquadInfo(0, squad_id, true);
+        squad = chatFindSquadList(squad_id);
+    }
+    status_if(!squad, 404, "No such squad"); // Still nothing? No such squad, then.
+    status_if(!_lookupMinimalDataFromPlayerID(requester_id, requester), 422, "no requester data");
+    status_if((requesterMember = squad->find(requester.handle())) == nullptr, 403, "requester not member of squad");
+    status_if(requesterMember->squadRank() < Squad::STAFFER, 403, "requester must be staffer or higher");
+    
+    std::vector<std::function<void()>> operations;
+    
+    if (params.find("name") != params.end()) {
+        std::string name = params.at("name");
+        std::string trimmedName = _trim(name);
+        
+        status_if(trimmedName.length() < 4, 422, "requested squad name too short (4)");
+        status_if(trimmedName.length() > Squad::NAME_LENGTH, 422, "requested squad name too long (40)");
+        operations.push_back([trimmedName, &squad] () mutable {
+            squad->setFullName(trimmedName);
+            DBThread::EscapeString(trimmedName); // Eww eww eww eww eww eww
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET name='%s' WHERE squadid=%u", trimmedName.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("description") != params.end()) {
+        std::string desc = params.at("description");
+        
+        status_if(desc.length() < 3, 422, "requested squad description too short (3)");
+        status_if(desc.length() > Squad::DESCRIPTION_LENGTH, 422, "requested squad description too long (255)");
+        operations.push_back([desc, &squad] () mutable {
+            squad->setDescription(desc);
+            DBThread::EscapeString(desc);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET description='%s' WHERE squadid=%u", desc.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("homepage") != params.end()) {
+        std::string homepage = params.at("homepage");
+        
+        status_if(homepage.length() > Squad::HOMEPAGE_LENGTH, 422, "requested squad homepage too long");
+        operations.push_back([homepage, &squad] () mutable {
+            squad->setHomepage(homepage);
+            DBThread::EscapeString(homepage);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET homepage='%s' WHERE squadid=%u", homepage.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("motd") != params.end()) {
+        std::string motd = params.at("motd");
+        
+        status_if(motd.length() > Squad::MOTD_LENGTH, 422, "requested MOTD too long");
+        operations.push_back([motd, &squad] () mutable {
+            squad->setMOTD(motd);
+            DBThread::EscapeString(motd);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET motd='%s' WHERE squadid=%u", motd.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("slogan") != params.end()) {
+        std::string slogan = params.at("slogan");
+        std::string trimmedSlogan = _trim(slogan);
+        
+        status_if(trimmedSlogan.length() > 0 && trimmedSlogan.length() < 16, 422, "requested squad slogan too short (16)");
+        status_if(trimmedSlogan.length() > Squad::SLOGAN_LENGTH, 422, "requested squad slogan too long");
+        operations.push_back([trimmedSlogan, &squad] () mutable {
+            squad->setSlogan(trimmedSlogan);
+            DBThread::EscapeString(trimmedSlogan);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET slogan='%s' WHERE squadid=%u", trimmedSlogan.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("squad_night") != params.end()) {
+        nlohmann::json night = params.at("squad_night");
+        
+        status_if(night.find("hour") == night.end(), 422, "night must have hour");
+        status_if(night.find("day") == night.end(), 422, "night must have day");
+        status_if(night.find("timezone") == night.end(), 422, "night must have timezone");
+        
+        uint32_t hour = night.at("hour");
+        uint32_t day = night.at("day");
+        std::string ntimezone = night.at("timezone");
+        
+        status_if(hour > 23, 422, "hour is out of range");
+        status_if(day > 6, 422, "day is out of range");
+        status_if(ntimezone.length() != 6 || (ntimezone[0] != '+' && ntimezone[0] != '-') || ntimezone[3] != ':', 422, "timezone is badly formatted");
+        status_if(!isdigit(ntimezone[1]) || !isdigit(ntimezone[2]) || !isdigit(ntimezone[4]) || !isdigit(ntimezone[5]), 422, "timezone is badly formatted");
+        int64_t adjustedTimezone = std::stoll(ntimezone.substr(0, 3));
+        status_if(adjustedTimezone < -23 || adjustedTimezone > 24, 422, "adjusted timezone is out of range (-23..23)");
+        
+        std::string formattedNight = std::to_string(day) + "," + std::to_string(hour) + "," + std::to_string(adjustedTimezone);
+
+        operations.push_back([formattedNight, &squad] () mutable {
+            squad->setSquadNight(formattedNight);
+            DBThread::EscapeString(formattedNight); // I mean seriously.
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET squad_night='%s' WHERE squadid=%u", formattedNight.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("language") != params.end()) {
+        uint64_t language = params.at("language");
+
+        status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set language");
+        status_if(language > 5, 422, "requested language is invalid");
+        operations.push_back([language, &squad] {
+            squad->setLanguage(language);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET pri_language=%llu WHERE squadid=%u", language, squad->squad().squadID());
+        });
+    }
+    if (params.find("is_recruiting") != params.end()) {
+        bool is_recruiting = params.at("is_recruiting");
+        
+        operations.push_back([is_recruiting, &squad, &requesterMember] {
+            squad->setRecruiting(is_recruiting, requesterMember->player());
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET recruiting=%u WHERE squadid=%u", is_recruiting ? 1 : 0, squad->squad().squadID());
+        });
+    }
+    if (params.find("is_voting") != params.end()) {
+        bool is_voting = params.at("is_voting");
+        
+        status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set voting flag");
+        operations.push_back([is_voting, &squad, &requesterMember] {
+            squad->setRecruiting(is_voting, requesterMember->player());
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting=%u WHERE squadid=%u", is_voting ? 1 : 0, squad->squad().squadID());
+        });
+    }
+    
+    status_if(operations.size() < 1, 422, "No changes requested");
+    for (const std::function<void()> &op : operations) {
+        op();
+    }
+    if (requesterMember->player()) {
+        requesterMember->player()->sendSquadInfo();
+    }
+    
+    nlohmann::json results = params;
+    
+    results.erase("requester_id");
+    results.erase("squad_id");
+    return HTTPResponseBuilder()
+        .status(200)
+        .JSON(results.dump())
+        .build(response);
+}
+
 static std::vector<std::string> _getURLPathComponents(const std::string &requestPath)
 {
     return split_string(requestPath.substr(0, requestPath.find_first_of("?#")), "/"); // substr(0,npos) == whole string
@@ -4019,9 +4233,10 @@ static void _v1APIHandler_unlocked(const HTTPRequest &request, HTTPResponse &res
         { { "PATCH" }, "/player/{player_id}/squad/demote", _playerControlAPIDemote },
         { { "PATCH" }, "/player/{player_id}/squad/remove", _playerControlAPIRemove },
         { { "GET"   }, "/player/online", _playerControlAPIList },
-        { { "GET"   }, "/squad/{squad_id}/player", nullptr },
-        { { "GET"   }, "/squad/{squad_id}/player/online", nullptr },
-        { { "PATCH" }, "/squad/{squad_id}", nullptr },
+        { { "GET"   }, "/player/list", _playerControlAPIList }, // legacy alias
+        { { "GET"   }, "/squad/{squad_id}/player", _squadControlAPIPlayers },
+        { { "GET"   }, "/squad/{squad_id}/player/online", _squadControlAPIPlayersOnline },
+        { { "PATCH" }, "/squad/{squad_id}", _squadControlAPIPatch },
     };
     
     RESTAPIRoute bestMatchingRoute;

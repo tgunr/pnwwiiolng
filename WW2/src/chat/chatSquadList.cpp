@@ -1144,7 +1144,7 @@ SquadList::setRecruiting(bool newFlag, Player* player)
 	if ( newFlag == m_squad.m_recruiting )
 		return;
 	dbugLog(_FLD, "t:%d p:%u c:%s sq:%u(%s) recruiting %s"
-					, player->teulIndex(), player->playerID(), player->callsign()
+					, player ? player->teulIndex() : 0, player ? player->playerID() : 0, player ? player->callsign() : "API"
 					, squad().squadID(), squad().shortName()
 					, ((newFlag) ? "enabled" : "disabled"));
 	m_squad.m_recruiting = newFlag;
