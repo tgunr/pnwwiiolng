@@ -3525,6 +3525,19 @@ UINT32 serverUpTimeMinutes()
 }
 
 //////////////////////////////////////////////////////////////////////
+using namespace Teul::uWeb;
+
+using RESTAPIParams = nlohmann::json;
+using RESTAPIHandler = std::function<void(const HTTPRequest &, HTTPResponse &, const RESTAPIParams &)>;
+
+struct RESTAPIRoute {
+    std::vector<std::string> allowedMethods;
+    std::string parameterizedPath;
+    RESTAPIHandler handler;
+};
+
+using RESTAPIRouteList = std::vector<RESTAPIRoute>;
+
 // This struct is the absolute minimum we must know about a player to perform
 // operations on them, whether online or offline.
 struct PlayerControlMinimumData {
@@ -3570,7 +3583,7 @@ static bool _lookupMinimalDataFromPlayerID(playerid_t playerID, PlayerControlMin
 #ifndef NDEBUG
 #define status_if(cond, stat, ...) do { \
     if ((cond)) { \
-        return Teul::uWeb::HTTPResponseBuilder(request) \
+        return HTTPResponseBuilder(request) \
             .status(stat, ## __VA_ARGS__) \
             .header("Connection", "close") \
             .content("<h1>" #stat " " __VA_ARGS__ "</h1>") \
@@ -3578,14 +3591,33 @@ static bool _lookupMinimalDataFromPlayerID(playerid_t playerID, PlayerControlMin
     } \
 } while(0)
 #else
-#define status_if(cond, stat, ...) do { if ((cond)) { return Teul::uWeb::HTTPResponseBuilder(request).status(stat).header("Connection", "close").build(response); } } while(0)
+#define status_if(cond, stat, ...) do { if ((cond)) { return HTTPResponseBuilder(request).status(stat).header("Connection", "close").build(response); } } while(0)
 #endif
 
-static void _playerControlAPIPromote(
-    const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response,
-    const PlayerControlMinimumData &originator, const PlayerControlMinimumData &target
-)
+static inline bool is_integer_string(const std::string &s) { return s.find_first_not_of("0123456789") == std::string::npos; }
+
+static inline playerid_t get_as_playerid(const nlohmann::json &value) {
+    if (value.is_string()) {
+        return std::stoull(value.get<std::string>());
+    } else if (value.is_number_integer()) {
+        return value;
+    } else {
+        throw std::domain_error("playerid only recognizes string and number");
+    }
+}
+
+static void _playerControlAPIPromote(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
 {
+    status_if(params.find("player_id") == params.end(), 500, "player id missing?");
+    status_if(params.find("requester_id") == params.end(), 422, "requester id required");
+    
+    playerid_t targetPlayerID = get_as_playerid(params.at("player_id"));
+    playerid_t originatorPlayerID = get_as_playerid(params.at("requester_id"));
+    PlayerControlMinimumData originator, target;
+    
+    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 422, "no originator data");
+    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 422, "no target data");
+    
     SquadList *squadList = nullptr;
     SquadMemberEntry *originatorSquadEntry = nullptr;
     SquadMemberEntry *targetSquadEntry = nullptr;
@@ -3629,17 +3661,24 @@ static void _playerControlAPIPromote(
         " VALUES (%u, %u, NOW(), '%s', '%s', %u, %u, 0, '')",
         squadList->squad().squadID(), SquadMemberUpdate::_PROMOTE, originator.callsign(), target.callsign(),
         newRank, newRank - 1);
-    return Teul::uWeb::HTTPResponseBuilder(request)
+    return HTTPResponseBuilder(request)
         .status(200)
         .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squad_rank", newRank } }).dump())
         .build(response);
 }
 
-static void _playerControlAPIDemote(
-    const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response,
-    const PlayerControlMinimumData &originator, const PlayerControlMinimumData &target
-)
+static void _playerControlAPIDemote(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
 {
+    status_if(params.find("player_id") == params.end(), 500, "player id missing?");
+    status_if(params.find("requester_id") == params.end(), 422, "requester id required");
+    
+    playerid_t targetPlayerID = get_as_playerid(params.at("player_id"));
+    playerid_t originatorPlayerID = get_as_playerid(params.at("requester_id"));
+    PlayerControlMinimumData originator, target;
+    
+    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 422, "no originator data");
+    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 422, "no target data");
+    
     SquadList *squadList = nullptr;
     SquadMemberEntry *originatorSquadEntry = nullptr;
     SquadMemberEntry *targetSquadEntry = nullptr;
@@ -3681,17 +3720,24 @@ static void _playerControlAPIDemote(
         " VALUES (%u, %u, NOW(), '%s', '%s', %u, %u, 0, '')",
         squadList->squad().squadID(), SquadMemberUpdate::_DEMOTE, originator.callsign(), target.callsign(),
         newRank, newRank + 1);
-    return Teul::uWeb::HTTPResponseBuilder(request)
+    return HTTPResponseBuilder(request)
         .status(200)
         .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squad_rank", newRank } }).dump())
         .build(response);
 }
 
-static void _playerControlAPIRemove(
-    const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response,
-    const PlayerControlMinimumData &originator, const PlayerControlMinimumData &target
-)
+static void _playerControlAPIRemove(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
 {
+    status_if(params.find("player_id") == params.end(), 500, "player id missing?");
+    status_if(params.find("requester_id") == params.end(), 422, "requester id required");
+    
+    playerid_t targetPlayerID = get_as_playerid(params.at("player_id"));
+    playerid_t originatorPlayerID = get_as_playerid(params.at("requester_id"));
+    PlayerControlMinimumData originator, target;
+    
+    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 422, "no originator data");
+    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 422, "no target data");
+    
 	dbugLog(_FLI, "p:%u c:%s sq:%d attempting to remove %u[%s]", originator.playerID, originator.callsign(), originator.squadID, target.playerID, target.callsign());
 
     SquadList *squadList = nullptr;
@@ -3717,55 +3763,15 @@ static void _playerControlAPIRemove(
     squadList->removeMember(target.matchHandle);
     squadList->sendMessage(LSTR_SQUAD, LSTR_SQUAD_KICK, target.callsign(), originator.callsign());
     
-
-    return Teul::uWeb::HTTPResponseBuilder(request)
+    return HTTPResponseBuilder(request)
         .status(200)
         .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squadid", 0 }, { "squad_rank", 0 } }).dump())
         .build(response);
 }
 
-static void _playerControlAPISquad(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, const std::vector<std::string> &components)
+static void _playerControlAPIList(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
 {
-    status_if(request.headers.find("content-type") == request.headers.end(), 400, "No content-type");
-    status_if(strtolower(request.headers.find("content-type")->second) != "application/json", 400, "Require application/json");
-    
-    status_if(components.size() < 6, 404, "Not enough path components (6)");
-
-    // All "squad" operations require the requester_id param and PATCH method.
-    status_if(request.method != "PATCH", 405, "Bad request method");
-    
-    nlohmann::json requestParams;
-    try {
-        requestParams = nlohmann::json::parse(request.requestData);
-    } catch (std::invalid_argument &e) {
-        status_if(true, 400, "Bad JSON");
-    }
-    status_if(requestParams.find("requester_id") == requestParams.end(), 422, "requester_id required");
-    status_if(!requestParams["requester_id"].is_number_integer(), 422, "numeric requester_id required");
-    
-    playerid_t targetPlayerID = std::stoull(components[3]);
-    playerid_t originatorPlayerID = requestParams["requester_id"];
-    PlayerControlMinimumData originator, target;
-    
-    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 422, "no originator data");
-    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 422, "no target data");
-    
-    if (components[5] == "promote") {
-        return _playerControlAPIPromote(request, response, originator, target);
-    } else if (components[5] == "demote") {
-        return _playerControlAPIDemote(request, response, originator, target);
-    } else if (components[5] == "remove") {
-        return _playerControlAPIRemove(request, response, originator, target);
-    } else {
-        status_if(true, 404, "Don't know that player squad control command");
-    }
-}
-
-static void _playerControlAPIList(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, const std::vector<std::string> &components)
-{
-    status_if(request.method != "GET", 405, "Bad request method");
     status_if(request.requestData.length() > 0, 400, "No request content expected in GET");
-    status_if(components.size() > 4, 404, "Too many path components (>4)");
     
     const PLAYERID_HASH allPlayers = ServerInterface::GetOnlinePlayers();
     nlohmann::json result;
@@ -3815,63 +3821,111 @@ static void _playerControlAPIList(const Teul::uWeb::HTTPRequest &request, Teul::
     result["numPlaynetOnline"] = numRats;
     result["numPlaynetSpawned"] = numRatsSpawn;
     result["numPlaynetBuzzards"] = numRatBuzz;
-    return Teul::uWeb::HTTPResponseBuilder(request)
+    return HTTPResponseBuilder(request)
         .status(200)
         .JSON(result.dump())
         .build(response);
 }
 
-static void _playerControlAPIHandler_unlocked(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
+static std::vector<std::string> _getURLPathComponents(const std::string &requestPath)
 {
-    // This URL parsing should really be generalized and improved.
-    std::string path = request.path.substr(0, request.path.find_first_of("?#")); // substr(0,npos) == whole string
-    std::vector<std::string> components = split_string(path, "/");
+    return split_string(requestPath.substr(0, requestPath.find_first_of("?#")), "/"); // substr(0,npos) == whole string
+}
+
+static void _v1APIHandler_unlocked(const HTTPRequest &request, HTTPResponse &response)
+{
+    std::vector<std::string> components = _getURLPathComponents(request.path);
     
+    // Verify API path
     status_if(components.size() < 3, 400, "Not enough path components (3)");
     status_if(components[0] != "", 400, "How did you get here with no /?");
     status_if(components[1] != "v1", 400, "How did you get here with no version?");
-    status_if(components[2] != "player", 400, "How did you get here with no player control?"); // If the prefix match didn't happen, something's gone really wrong
     
-    // This is not a proper RESTful router. It's a hack. It'll be improved on later.
-    status_if(components.size() < 4, 404, "Not enough path components (4)");
-    if (components[3] == "list") {
-        return _playerControlAPIList(request, response, components);
-    } else {
-        status_if(components[3].find_first_not_of("0123456789") != std::string::npos, 404, "Player ID gotta be numeric");
-        status_if(components.size() < 5, 404, "Not enough path components (5)");
-        if (components[4] == "squad") {
-            return _playerControlAPISquad(request, response, components);
-        } else {
-            status_if(true, 404, "Don't know that player control command");
+    // Basic RESTful routing (not very smart yet)
+    static const RESTAPIRouteList routes = {
+        { { "PATCH" }, "/player/{player_id}/squad/promote", _playerControlAPIPromote },
+        { { "PATCH" }, "/player/{player_id}/squad/demote", _playerControlAPIDemote },
+        { { "PATCH" }, "/player/{player_id}/squad/remove", _playerControlAPIRemove },
+        { { "GET"   }, "/player/online", _playerControlAPIList },
+        { { "GET"   }, "/squad/{squad_id}/player", nullptr },
+        { { "GET"   }, "/squad/{squad_id}/player/online", nullptr },
+        { { "PATCH" }, "/squad/{squad_id}", nullptr },
+    };
+    
+    RESTAPIRouteList potentialRoutes;
+    
+    // Was it really so hard to write:
+    //  potentialRoutes = routes.filter { $0.allowedMethods.contains(request.method) && $0.parameterizedPath.components(separatedBy:"/").count == components.count - 2 }
+    std::copy_if(routes.begin(), routes.end(), std::back_inserter(potentialRoutes), [&] (const RESTAPIRoute &route) {
+        return std::find(route.allowedMethods.begin(), route.allowedMethods.end(), request.method) != route.allowedMethods.end() &&
+               split_string(route.parameterizedPath, "/").size() == components.size() - 2;
+    });
+
+    RESTAPIRoute bestMatchingRoute;
+    size_t bestMatchingRouteScore = 0;
+    RESTAPIParams bestMatchingRouteParams;
+
+    for (const RESTAPIRoute &route : potentialRoutes) {
+        std::vector<std::string> routeComponents = split_string(route.parameterizedPath, "/");
+        bool routeMatch = true;
+        size_t routeScore = 0;
+        RESTAPIParams routeParams = nlohmann::json::object();
+        
+        for (size_t i = 0; i < routeComponents.size(); ++i) {
+            const std::string &component = routeComponents[i];
+            
+            if (component.length() > 2 && component.front() == '{' && component.back() == '}') {
+                routeParams[component.substr(1, component.length() - 2)] = components[i + 2];
+            } else if (component != components[i + 2]) {
+                routeMatch = false;
+                break;
+            } else {
+                ++routeScore; // Route gets 1 point for every matching, non-parameterized path component
+            }
         }
+        if (routeMatch && routeScore > bestMatchingRouteScore) {
+            bestMatchingRoute = route;
+            bestMatchingRouteScore = routeScore;
+            bestMatchingRouteParams = routeParams;
+        }
+    }
+    status_if(bestMatchingRouteScore == 0, 404, "No matching routes"); // A matching route must always have at least one non-parameterized path component
+    status_if(!bestMatchingRoute.handler, 501, "Unimplemented route");
+    
+    status_if(request.requestData.size() > 0 &&
+              (request.headers.find("content-type") == request.headers.end() ||
+              request.headers.at("content-type") != "application/json"), 400, "Request data must be JSON");
+    
+    nlohmann::json requestParams;
+    try {
+        requestParams = nlohmann::json::parse(request.requestData);
+    } catch (std::invalid_argument &e) {
+        status_if(true, 400, "Bad JSON");
+    }
+    status_if(!requestParams.is_object(), 400, "Request JSON must be object");
+    
+    for (nlohmann::json::iterator it = bestMatchingRouteParams.begin(); it != bestMatchingRouteParams.end(); ++it) {
+        status_if(requestParams.find(it.key()) != requestParams.end(), 400, "Request JSON can't have a parameter matching a name in the route parameters");
+        // Technically this is more of an ABORT_IF, but what the hey.
+        requestParams[it.key()] = it.value();
+    }
+    
+    try {
+        return bestMatchingRoute.handler(request, response, requestParams);
+    } catch (std::domain_error &) {
+        status_if(true, 400, "JSON contained invalid type");
     }
 }
 
-static void _playerControlAPIHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
+static void _v1APIHandler(const HTTPRequest &request, HTTPResponse &response)
 {
-    std::mutex waitMutex;
-    std::condition_variable waitCondition;
-    bool waitSignal = false;
-    
-    threadCallback([&request, &response, &waitMutex, &waitCondition, &waitSignal] (void *) {
-        _playerControlAPIHandler_unlocked(request, response);
-        {
-            std::lock_guard<std::mutex> lock(waitMutex);
-            waitSignal = true;
-            waitCondition.notify_all();
-        }
-    }, nullptr);
-    
-    {
-        std::unique_lock<std::mutex> lock(waitMutex);
-        waitCondition.wait(lock, [&waitSignal] { return waitSignal == true; });
-    }
+    threadCallbackSync<void>([&] { _v1APIHandler_unlocked(request, response); });
 }
 #undef status_if
 
 static void _initializeHTTPEndpoints()
 {
-    Teul::uWeb::s_debugServer.addVirtualPrefix("V1 player control REST API", "/v1/player", _playerControlAPIHandler);
+    s_debugServer.addVirtualPrefix("V1 REST API", "/v1", _v1APIHandler);
 }
 
 //////////////////////////////////////////////////////////////////////
