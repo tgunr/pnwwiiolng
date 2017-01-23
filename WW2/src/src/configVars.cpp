@@ -21,14 +21,14 @@
 #define CFG_STRING(Name_, Default_, EnvName_, Required_, Description_)	\
 	ConfigStr cv_##Name_ ( CVT_STRING, #Name_, Default_, EnvName_, Required_, Description_ )
 
-#define CFG_UINT(Name_, Default_, EnvName_, Description_)	\
-	ConfigUint cv_##Name_ ( CVT_UNSIGNED_INT, #Name_, Default_, EnvName_, true, Description_ )
+#define CFG_UINT(Name_, Default_, EnvName_, Required_, Description_)	\
+	ConfigUint cv_##Name_ ( CVT_UNSIGNED_INT, #Name_, Default_, EnvName_, Required_, Description_ )
 
-#define CFG_SINT(Name_, Default_, EnvName_, Description_)	\
-	ConfigSint cv_##Name_ ( CVT_SIGNED_INT, #Name_, Default_, EnvName_, false, Description_ )
+#define CFG_SINT(Name_, Default_, EnvName_, Required_, Description_)	\
+	ConfigSint cv_##Name_ ( CVT_SIGNED_INT, #Name_, Default_, EnvName_, Required_, Description_ )
 
-#define CFG_BOOL(Name_, Default_, EnvName_, Description_)	\
-	ConfigBool cv_##Name_ ( CVT_BOOL, #Name_, Default_, EnvName_, false, Description_ )
+#define CFG_BOOL(Name_, Default_, EnvName_, Required_, Description_)	\
+	ConfigBool cv_##Name_ ( CVT_BOOL, #Name_, Default_, EnvName_, Required_, Description_ )
 
 #define CFG_ADDR(Name_, Default_, EnvName_, Required_, Description_)	\
 	ConfigAddr cv_##Name_ ( CVT_IP_ADDRESS, #Name_, Default_, EnvName_, Required_, Description_ )
@@ -69,7 +69,7 @@ CFG_PATH(terrainSubdir, "terrain", "TERRAIN_SUBDIR", true, "Path from DATA_DIR t
 CFG_PATH(originFile, "origin", "ORIGIN_FILE", true, "Name of the file which identifies where the sdm files came from.");
 CFG_STRING(stratLanguage, "en", "STRAT_LANGUAGE", true, "2-letter language code for server localization.");
 CFG_PATH(thblitzPath, "th_blitz" PATH_SEPSTR "weapon", "THBLITZ_PATH", true, "Path from DATA_DIR to the thBlitz csv files.");
-CFG_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS", "Disables sdm-loading errors from causing termination.");
+CFG_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS", false, "Disables sdm-loading errors from causing termination.");
 CFG_PATH(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH", true, "DATA_DIR-relative path/filename for the blitzWor csv file");
 CFG_PATH(luaPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "lua", "LUA_BASE_PATH", true, "Path to the Lua scripts.");
 CFG_PATH(defaultLogPath, nullptr, "LOG_PATH", false, "Default location for log files.");
@@ -83,15 +83,15 @@ CFG_STRING(wwiiDBPassword, nullptr, "WWII_DB_PASSWD", true, "Password to use for
 CFG_STRING(wwiiDBUser, "wwiiol", "WWII_DB_USER", true, "Username when connecting to the game database.");
 CFG_STRING(wwiiDBPort, "3306", "WWII_DB_PORT", true, "Port of the game MySQL server if not default.");
 CFG_ADDR(dbsePrimaryAddress, nullptr, "DBSE_PRIMARY_ADDRESS", true, "IP address dbd clients will reach the dbd on.");
-CFG_UINT(dbseConnectionTimeout_ms, "3000", "DBSE_CONNECTION_TIMEOUT_MS", "Time in miliseconds before database proxy connections timeout.");
-CFG_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION", "Enable compression when communicating with the MySQL server");
+CFG_UINT(dbseConnectionTimeout_ms, "3000", "DBSE_CONNECTION_TIMEOUT_MS", false, "Time in miliseconds before database proxy connections timeout.");
+CFG_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION", false, "Enable compression when communicating with the MySQL server");
 
 CFG_STRING(clusterName, nullptr, "WWII_CLUSTER", true, "Short-name for this cluster, e.g. 'dev'");
-CFG_UINT(arenaID, nullptr, "ARENA_ID", "Numeric ID for this arena.");
-CFG_UINT(appID, "1", "APP_ID", "App ID for this server - 1 being release, 12 being beta.");
+CFG_UINT(arenaID, nullptr, "ARENA_ID", true, "Numeric ID for this arena.");
+CFG_UINT(appID, "1", "APP_ID", false, "App ID for this server - 1 being release, 12 being beta.");
 CFG_ADDR(ircServer, "", "WWII_IRC_SERVER", false, "Address of the IRC server. If not defined, disables IRC.");
 CFG_STRING(ircPassword, "", "WWII_IRC_PASSWD", false, "Server-password for the IRC server.");
-CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", "Port to connect to the IRC server on.");
+CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", false, "Port to connect to the IRC server on.");
 CFG_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL", true, "URL to prefix authentication error URLs with.");
 CFG_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true, "Network address (/24) for the cluster (server's will map their last octets (x.x.x.N) into this network for inter-host communications) or IP address of controller host.");
 
@@ -104,8 +104,8 @@ CFG_STRING(authdbSchema, "auth", "AUTH_DB_SCHEMA", true, "Schema to use for auth
 CFG_STRING(authdbUser, "authuser", "AUTH_DB_USER", true, "Username when connecting to the auth database.");
 #endif
 
-CFG_UINT(maxClusterUsers, "0", "MM_MAX_USERS", "Maxmimum number of players on the mmhost/cluster");
-CFG_UINT(maxCellPlayers, "1250", "MAX_PLAYERS", "Maximum number of players on this cell host.");
+CFG_UINT(maxClusterUsers, "0", "MM_MAX_USERS", true, "Maxmimum number of players on the mmhost/cluster");
+CFG_UINT(maxCellPlayers, "1250", "MAX_PLAYERS", true, "Maximum number of players on this cell host.");
 CFG_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true, "Network address to use for private cell network or 0.0.0.0 to disable multiple cells (clustering).");
 CFG_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", "Number of miliseconds before a server-peer connection times out.");
 #if defined(WIN32)
