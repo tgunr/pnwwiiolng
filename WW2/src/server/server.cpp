@@ -1665,8 +1665,9 @@ _controllerError(SINT32, const UCHAR* const, SINT32, const struct TEUL_CALLBACK*
 
 void _connectToController()
 {
-	if (Server::serverType == CONTROLLER_HOST)
+	if (Server::serverType == CONTROLLER_HOST || cv_oneProcessMode.GetBool() == true) {
 		return;
+    }
 
 #ifdef PUBLIC_RELEASE
 	static const SINT32 controllerTimeout = 5000;
