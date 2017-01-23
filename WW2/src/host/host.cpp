@@ -126,9 +126,7 @@ UINT32 numVehiclesReported = 0;
 #endif
 
 PLAYERS g_players;
-#include "teul/teulConfigVar.h"
-extern ConfigUint cv_maxCellPlayers;
-extern ConfigAddr cv_baseUpdtAddress;
+#include "include/configVars.h"
 static SINT32 _userConnections = 0;
 
 char hostname[32];

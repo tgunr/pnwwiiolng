@@ -13,11 +13,11 @@
 #include <sys/prctl.h>
 #endif
 #include "build_info.hpp"
+#include "include/configVars.h"
 #include "mem/mem.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
 #include "server/serverCodeEnum.h"
-#include "server/serverConfigVars.h"
 #include "server/serverIndexes.h"
 #include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
@@ -36,7 +36,6 @@
 #include "server/serverTypes.h"
 #include "teul/teulAuth.h"
 #include "teul/teulAuthServer.h"
-#include "teul/teulConfigVar.h"
 #include "teul/teulConnectionInstruction.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
@@ -60,9 +59,6 @@ namespace Teul
 // before they're sent back to the auth Host
 static const UINT32 PLAYER_TIMEOUT = 3 * 60 * 1000;	// 4 minutes
 static const SINT32 PLAYER_XFER_TIMEOUT = 30 * 1000;	// 30 seconds
-
-extern ConfigUint cv_maxClusterUsers;
-extern ConfigAddr cv_authHost;
 
 extern void serverInitializePeering();
 extern void serverConnectPeer(const UINT32 ip, const SERVER_TYPE type);

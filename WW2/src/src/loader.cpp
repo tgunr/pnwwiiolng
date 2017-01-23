@@ -19,9 +19,7 @@
 #include "dbse/dbseHandle.h"
 #include "wwii/wwiiThreads.h"
 
-#include "sdm/sdmConfigVars.h"
-#include "wwii/wwiidbConfigVars.h"
-#include "server/serverConfigVars.h"
+#include "include/configVars.h"
 
 static bool useIrc = true;
 static irc_session_t* ircSession;

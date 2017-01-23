@@ -40,7 +40,7 @@
 #endif
 
 #if platBuild == BUILD_SERVER
-#include "wwii/wwiiConfigVars.h"
+#include "include/configVars.h"
 # define DataPath cv_dataDir.GetString()
 #endif
 

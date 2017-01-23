@@ -34,7 +34,7 @@
 
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiIRC.h"
-#include "server/serverConfigVars.h"
+#include "include/configVars.h"
 
 void wwiiIRCDefaultChannelMsg(irc_session_t* session, const char* event, const char* origin, const char** params, unsigned int count);
 

@@ -14,8 +14,8 @@
 #include "server/serverIndexes.h"
 #include "server/serverPeers.h"
 #include "server/serverServerInfo.h"
+#include "include/configVars.h"
 #include "teul/teulCallbackStruct.h"
-#include "teul/teulConfigVar.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulMicroWebServer.h"
@@ -23,8 +23,6 @@
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiCallbacks.h"
-
-extern ConfigUint cv_peerConnectionTimeout_ms;
 
 // Describe the mapping.
 struct ServerConnection

@@ -27,7 +27,7 @@
 #include "miss/mission.h"
 #include "miss/missHitArrayNode.h"
 #include "mm/mmQueries.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverServerInfo.h"
 #include "str/stringLib.h"
 #include "strt/strtCPStruct.h"

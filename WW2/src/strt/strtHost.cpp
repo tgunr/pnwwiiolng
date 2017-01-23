@@ -14,7 +14,7 @@
 #include "chat/chatSupportRPCMessages.h"
 #include "cnvy/cnvyMain.h"
 #include "include/arenaLockEnums.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverCodeEnum.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
@@ -66,7 +66,6 @@ const char* HostLanguage = "en";
 static bool _exitSignaled = false;
 static bool _mustSyncChatHost = true;
 extern int tolua_stratd_open(struct lua_State*);
-extern ConfigPath cv_luaPath;
 
 //////////////////////////////////////////////////////////////////////////
 // Users never directly connect to strat, so while we are aware of them

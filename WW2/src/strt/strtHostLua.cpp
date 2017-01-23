@@ -17,12 +17,10 @@
 #include "include/luaGlue.h"
 #include "strt/strtHostDB.h"
 #include "wwii/wwiiIRC.h"
-#include "wwii/wwiiConfigVars.h"
+#include "include/configVars.h"
 
 #include "strt/strtDotCommands.h"
 #include "include/arenaLockEnums.h"
-
-extern ConfigPath cv_luaRCFile, cv_luaStratlibFile;
 
 // Lua/Tolua API headers
 #ifdef __cplusplus

@@ -27,7 +27,7 @@
 #include "wwii/wwiiConfig.h"
 #include "inst/instTypes.h"
 #include "chat/chatHostMessages.h"
-#include "wwii/wwiiConfigVars.h"
+#include "include/configVars.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiPPOLoader.h"
 

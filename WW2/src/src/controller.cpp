@@ -14,6 +14,7 @@
 #include "wwii/wwiiNetPorts.h"
 #include "src/controllerGameProcess.h"
 #include "server/serverInitializeProcess.h"
+#include "include/configVars.h"
 
 #if platOS == OS_WIN32
 #include <winsock2.h>
@@ -54,8 +55,6 @@ static event*			s_repeaterEvent = nullptr;
 bool g_singleShot = false;
 bool g_shuttingDown = false;
 bool g_enableStarts = true;
-
-extern ConfigStr cv_manageProcesses;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TeulKit error handler.

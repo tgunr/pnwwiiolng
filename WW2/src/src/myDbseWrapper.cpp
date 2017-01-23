@@ -15,12 +15,8 @@
 
 #include "dbse/dbseWrapper.h"
 #include "mem/mem.h"
-#include "wwii/wwiidbConfigVars.h"
 #include "wwii/wwiiThreads.h"
-
-#include "teul/teulConfigVar.h"
-
-extern ConfigBool cv_mysqlCompression;
+#include "include/configVars.h"
 
 static std::atomic_bool s_dbInitialized;
 static const char* s_dbAddress;

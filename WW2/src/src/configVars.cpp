@@ -6,6 +6,7 @@
 #include "teul/teulBasic.h"
 #include "teul/teulConfigVar.h"
 #include "include/io_mapped_file.h"
+#include "include/configVars.h"
 
 #if platOS == OS_WIN32
 #include "Shlobj.h"
@@ -102,12 +103,19 @@ CFG_STRING(authdbPort, "3306", "AUTH_DB_PORT", true, "Port of the Auth MySQL ser
 CFG_STRING(authdbPassword, "", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
 CFG_STRING(authdbSchema, "auth", "AUTH_DB_SCHEMA", true, "Schema to use for auth data.");
 CFG_STRING(authdbUser, "authuser", "AUTH_DB_USER", true, "Username when connecting to the auth database.");
+#else
+CFG_ADDR(authHost, nullptr, "AUTH_ADDRESS", false, "Host name or IP Address of the authentication server.");
+CFG_ADDR(authdbAddress, nullptr, "AUTH_DB", false, "Address of the MySQL server hosting the auth database.");
+CFG_STRING(authdbPort, nullptr, "AUTH_DB_PORT", false, "Port of the Auth MySQL server if not default.");
+CFG_STRING(authdbPassword, nullptr, "AUTH_DB_PASSWD", false, "Password to use for the auth database.");
+CFG_STRING(authdbSchema, nullptr, "AUTH_DB_SCHEMA", false, "Schema to use for auth data.");
+CFG_STRING(authdbUser, nullptr, "AUTH_DB_USER", false, "Username when connecting to the auth database.");
 #endif
 
 CFG_UINT(maxClusterUsers, "0", "MM_MAX_USERS", true, "Maxmimum number of players on the mmhost/cluster");
 CFG_UINT(maxCellPlayers, "1250", "MAX_PLAYERS", true, "Maximum number of players on this cell host.");
 CFG_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true, "Network address to use for private cell network or 0.0.0.0 to disable multiple cells (clustering).");
-CFG_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", "Number of miliseconds before a server-peer connection times out.");
+CFG_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", false, "Number of miliseconds before a server-peer connection times out.");
 #if defined(WIN32)
 CFG_STRING(defaultInterface, nullptr, "DEFAULT_IFACE", false, "Name of the network interface to treat as primary.");
 #else

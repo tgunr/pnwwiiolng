@@ -14,13 +14,12 @@
 #include <sys/stat.h>
 #include "include/defs.h"
 #include "teul/teulTime.h"
+#include "include/configVars.h"
 #include <locale.h>
 #include <mutex>
 
 #if platBuild == BUILD_SERVER
 #include "wwii/wwiiThreads.h"
-#include "teul/teulConfigVar.h"
-extern ConfigPath cv_defaultLogPath;
 static const char _OPEN_MSG[] = "Playnet Server Log File.";
 static const char _CLOSE_MSG[] = "\nPlayer Server Log File Closed.\n";
 #else

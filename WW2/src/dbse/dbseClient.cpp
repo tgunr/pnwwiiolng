@@ -12,11 +12,8 @@
 #include "dbse/dbseClientMessages.h"
 #include "teul/teulClosingEnums.h"
 #include "teul/teulEndpoint.h"
-#include "server/serverConfigVars.h"
 #include "wwii/wwiiNetPorts.h"
-
-extern ConfigAddr cv_dbsePrimaryAddress;
-extern ConfigUint cv_dbseConnectionTimeout_ms;
+#include "include/configVars.h"
 
 static SINT32 hostIndex = 0;
 static Dbse::ConnectionStatus connected = Dbse::ConnectionStatus::None;

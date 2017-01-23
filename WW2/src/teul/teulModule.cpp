@@ -28,7 +28,7 @@
 #include "teul/teulUtils.h"
 #include "teul/teulVersion.h"
 #include "wwii/wwiiNetPorts.h"
-
+#include "include/configVars.h"
 
 #if platOS == OS_WIN32
 #include <winsock2.h>
@@ -47,8 +47,6 @@
 
 #if platBuild == BUILD_SERVER
 #include "server/serverInterfaceDescription.h"
-#include "teul/teulConfigVar.h"
-extern ConfigStr cv_defaultInterface;
 #endif
 
 #if platOS != OS_WIN32

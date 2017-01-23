@@ -17,6 +17,7 @@
 #include "chat/chatStratSupportMessages.h"
 #include "host/hostConstants.h"
 #include "host/hostTimeUpdate.h"
+#include "include/configVars.h"
 #include "include/luaClient.h"
 #include "include/luaGlue.h"
 #include "miss/missionDamageEvent.h"
@@ -65,8 +66,6 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiExitCodes.h"
 #include "wwii/wwiiServerTypeEnums.h"
-
-extern ConfigPath cv_luaPath;
 
 #undef DEBUG_SYNC
 

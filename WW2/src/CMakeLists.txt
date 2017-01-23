@@ -266,7 +266,7 @@ ADD_LIBRARY( wwiilib STATIC
     strt/strtSupercell.cpp strt/strtSupercell.h strt/strtSupercells.h
     wwii/wwiiCallbacks.cpp wwii/wwiiCallbacks.h teul/teulCallback.h teul/teulCallbackInit.h
     wwii/wwiiHCUnitsCommon.cpp
-    src/configVars.cpp sdm/sdmConfigVars.h server/serverConfigVars.h wwii/wwiidbConfigVars.h
+    include/configVars.h src/configVars.cpp
     str/strdupptr.h
     wwii/wwiiNetPorts.h wwii/wwiiCallbacks.h
     # These weren't previously in wwiilib but seem to be required in various places
@@ -345,7 +345,7 @@ IF ( MSVC )
 		sdm/sdmpp.cpp
 			sdm/sdmpp.h
 
-		sdm/sdmConfigVars.h
+		include/configVars.h
 	)
 	TARGET_LINK_LIBRARIES(sdmpp teulserver ${MYSQL_LIBRARIES})
 	USE_WWIILIB_ON(sdmpp)
@@ -367,7 +367,7 @@ IF ( MSVC )
 					mm/mmEnums.h
 		strt/strtData.cpp
 			strt/strtData.h
-			wwii/wwiiConfigVars.h
+			include/configVars.h
 				teul/teulConfigVar.h
 		strt/strtFacilityStruct.cpp
 			strt/strtFacilityStruct.h
