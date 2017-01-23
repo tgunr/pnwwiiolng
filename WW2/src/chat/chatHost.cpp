@@ -3768,8 +3768,6 @@ static bool _lookupMinimalDataFromPlayerID(playerid_t playerID, PlayerControlMin
 #define status_if(cond, stat, ...) do { if ((cond)) { return HTTPResponseBuilder(request).status(stat).header("Connection", "close").build(response); } } while(0)
 #endif
 
-static inline bool is_integer_string(const std::string &s) { return s.find_first_not_of("0123456789") == std::string::npos; }
-
 static inline playerid_t get_as_playerid(const nlohmann::json &value) {
     if (value.is_string()) {
         return std::stoull(value.get<std::string>());
@@ -4026,31 +4024,25 @@ static void _v1APIHandler_unlocked(const HTTPRequest &request, HTTPResponse &res
         { { "PATCH" }, "/squad/{squad_id}", nullptr },
     };
     
-    RESTAPIRouteList potentialRoutes;
-    
-    // Was it really so hard to write:
-    //  potentialRoutes = routes.filter { $0.allowedMethods.contains(request.method) && $0.parameterizedPath.components(separatedBy:"/").count == components.count - 2 }
-    std::copy_if(routes.begin(), routes.end(), std::back_inserter(potentialRoutes), [&] (const RESTAPIRoute &route) {
-        return std::find(route.allowedMethods.begin(), route.allowedMethods.end(), request.method) != route.allowedMethods.end() &&
-               split_string(route.parameterizedPath, "/").size() == components.size() - 2;
-    });
-
     RESTAPIRoute bestMatchingRoute;
     size_t bestMatchingRouteScore = 0;
     RESTAPIParams bestMatchingRouteParams;
 
-    for (const RESTAPIRoute &route : potentialRoutes) {
+    for (const RESTAPIRoute &route : routes) {
         std::vector<std::string> routeComponents = split_string(route.parameterizedPath, "/");
         bool routeMatch = true;
         size_t routeScore = 0;
         RESTAPIParams routeParams = nlohmann::json::object();
         
-        for (size_t i = 0; i < routeComponents.size(); ++i) {
+        if (std::find(route.allowedMethods.begin(), route.allowedMethods.end(), request.method) == route.allowedMethods.end()) { continue; }
+        if (routeComponents.size() != components.size() - 1) { continue; }
+        status_if(routeComponents.size() < 2 || routeComponents[0] != "", 500, "Bad route in route table");
+        for (size_t i = 1; i < routeComponents.size(); ++i) {
             const std::string &component = routeComponents[i];
             
             if (component.length() > 2 && component.front() == '{' && component.back() == '}') {
-                routeParams[component.substr(1, component.length() - 2)] = components[i + 2];
-            } else if (component != components[i + 2]) {
+                routeParams[component.substr(1, component.length() - 2)] = components[i + 1];
+            } else if (component != components[i + 1]) {
                 routeMatch = false;
                 break;
             } else {
@@ -4070,11 +4062,13 @@ static void _v1APIHandler_unlocked(const HTTPRequest &request, HTTPResponse &res
               (request.headers.find("content-type") == request.headers.end() ||
               request.headers.at("content-type") != "application/json"), 400, "Request data must be JSON");
     
-    nlohmann::json requestParams;
-    try {
-        requestParams = nlohmann::json::parse(request.requestData);
-    } catch (std::invalid_argument &e) {
-        status_if(true, 400, "Bad JSON");
+    nlohmann::json requestParams = nlohmann::json::object();
+    if (request.requestData.size() > 0) {
+        try {
+            requestParams = nlohmann::json::parse(request.requestData);
+        } catch (std::invalid_argument &e) {
+            status_if(true, 400, "Bad JSON");
+        }
     }
     status_if(!requestParams.is_object(), 400, "Request JSON must be object");
     
