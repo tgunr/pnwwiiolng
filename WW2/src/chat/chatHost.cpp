@@ -3525,6 +3525,180 @@ UINT32 serverUpTimeMinutes()
 }
 
 //////////////////////////////////////////////////////////////////////
+static void _v1APIHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response);
+
+static void _initializeHTTPEndpoints()
+{
+    Teul::uWeb::s_debugServer.addVirtualPrefix("V1 REST API", "/v1", _v1APIHandler);
+}
+
+//////////////////////////////////////////////////////////////////////
+//
+
+const char* const g_serverName = "chatd";
+
+int
+main(int argc, const char* argv[])
+{
+	Server::InitializeProcess(g_serverName, CHAT_HOST, _errorFunction, _killFunction, argc, argv, {});
+	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+
+	chatReadHostLocFile();
+
+	wwiiIRCInitialize(Server::localHost, false);
+
+	ircCallbacks.event_privmsg = _ircChannelMessages;
+	ircCallbacks.event_channel = _ircChannelMessages;
+	ircCallbacks.event_numeric = _ircNumericMessages;
+	ircCallbacks.event_join    = _ircJoinMessages;
+	ircCallbacks.event_part    = _ircPartMessages;
+	ircCallbacks.event_nick    = _ircNickMessages;
+
+	wwiiIRCAddInitialChannel("-hcs", "", "In-Game /hc channel (both sides)");
+	wwiiIRCAddInitialChannel("-ghc", "", "In-Game Allied HC channel");
+	wwiiIRCAddInitialChannel("-ahc", "", "In-Game Axis HC channel");
+
+	wwiiIRCRegisterCommand("all", _ircdotPassthru);
+	wwiiIRCRegisterCommand("allied", _ircdotPassthru);
+	wwiiIRCRegisterCommand("arenalock", _ircdotPassthru);
+	wwiiIRCRegisterCommand("axis", _ircdotPassthru);
+	wwiiIRCRegisterCommand("cpinfo", _ircdotPassthru);
+	wwiiIRCRegisterCommand("crs", _ircdotPassthru);
+	wwiiIRCRegisterCommand("gm", _ircdotPassthru);
+	wwiiIRCRegisterCommand("hc", _ircdotPassthru);
+	wwiiIRCRegisterCommand("hclist", _ircdotPassthru);
+	wwiiIRCRegisterCommand("pinfo", _ircdotPassthru);
+	wwiiIRCRegisterCommand("rdp", _ircdotPassthru);
+	wwiiIRCRegisterCommand("roster", _ircdotPassthru);
+	wwiiIRCRegisterCommand("setmotd", _ircdotPassthru);
+	wwiiIRCRegisterCommand("shutdown", _ircdotPassthru);
+	wwiiIRCRegisterCommand("spam", _ircdotPassthru);
+	wwiiIRCRegisterCommand("sys", _ircdotSys);
+	wwiiIRCRegisterCommand("sysmotd", _ircdotPassthru);
+	wwiiIRCRegisterCommand("warnall", _ircdotPassthru);
+	wwiiIRCRegisterCommand("m", _ircdotPassthru);
+	wwiiIRCRegisterCommand("who", _ircdotPassthru);
+	wwiiIRCRegisterCommand("wtf", _ircdotPassthru);
+
+	chatThreadsSetup();
+
+	// Connect to the database
+	chatInitDB();
+
+	dbGetWWIIConfig();
+	specLoader.loadSpecMap();
+
+	chatSetUnitMotd(SYSTEM_MOTD_UNIT, DEFAULT_SYS_MOTD);
+	chatSetUnitMotd(ALLIED, DEFAULT_ALLIED_HC_MOTD);
+	chatSetUnitMotd(AXIS, DEFAULT_AXIS_HC_MOTD);
+
+	//Initialize all our data
+	_dataInit();
+
+	wwiiIRCActivate(true);
+
+	//Create all the static channels that exist All the time
+	adminChannel = chatCreateChannel(chatGetAdminChannelID(), "GM Channel", chatGetHandle("GM"));
+	chatCreateChannel(chatGetGCIChannelID(Instance::g_campaign.id(), ALLIED), "Allied GCI Channel", chatGetHandle("Allied"));
+	chatCreateChannel(chatGetGCIChannelID(Instance::g_campaign.id(), AXIS), "Axis GCI Channel", chatGetHandle("Axis"));
+
+	serverOpenBroadcastIndexes();
+
+	Server::myServerInfo.stats.port = WWII::Net::Ports::ChatHost;
+
+	serverInit(PN_build_version_value
+				, CHAT_HOST, CHAT_HOST
+				, _serverEnterCallback
+				, _serverLeaveCallback
+				, _serverStatusCallback
+				, _personaCreate
+				, _personaRelease
+				, _personaActivate
+				, _personaExit
+				, nullptr					// Don't care about cluster exits
+				, _personaErrorFunction);
+
+	Server::myServerInfo.flags = Server::SVRFLAG_RELOGIN;//SVRFLAG_SEND_PSTAT;
+	Server::myServerInfo.stats.m_maxPlayers = Teul::MaxClusterUsers;
+
+	ABORT_IF(chatInstallHostCallbacks() < 0);
+	ABORT_IF(chatInstallHostManagementCallbacks() < 0);
+
+	//End broadcast configuration
+
+	//Find map server
+
+	if ( !teulOpenListenInterface(WWII::Net::Ports::ChatHost, _acceptPlayerConnection, 45000, _listenErrorFunction) )
+		LogAbort("Opening player connection ports failed.");
+
+	dbugLog(_FLN, "Listening for players on port %u", WWII::Net::Ports::ChatHost);
+
+	const SINT32 managementListenInterface = teulOpenListen(WWII::Net::Ports::ChatManagement, _acceptManagementConnection, 20000, PROTOCOL_TCP, _managementErrorFunction);
+	ABORT_IF(managementListenInterface < 0);
+
+	dbugLog(_FLN, "Listening for management players on port %u", WWII::Net::Ports::ChatManagement);
+    
+    _initializeHTTPEndpoints();
+    dbugLog(_FLN, "Listening for management commands on HTTP microserver (port %u)", WWII::Net::Ports::DebugWebServer);
+
+	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
+	Server::myServerInfo.sync();
+
+	_countUserSides();
+	chatSendPopulation();
+
+	teulSyncClock();
+
+	nextSpamTime = teulClock64 + 1000;
+
+	serverStartTime = teulTime();
+
+	// Load the MOTDs in
+	chatLoadMotds();
+	chatFetchSquadNames();
+
+	// Enable any threads that were waiting to be allowed
+	chatThreadsEnable();
+
+	dbugLog(_FLI, "registering chat commands");
+
+	chatRegisterDotCommands();
+
+	// Now we can register the dot-commands; permission data
+	// is taken from the database so register after connecting
+	try
+	{
+		DotCommandIndex& index = *DotCommand::index();
+		index.addAlias("whisper", "w");
+		index.addAlias("m", "tell");
+		index.addAlias("m", "t");
+		index.addAlias("m", "r");
+
+		dbugLog(_FLI, "DotIndex contains %" PRSizeT " commands", index.size());
+
+		index.readPermissions();
+	}
+	catch (std::exception& e)
+	{
+		dbugLog(_FLA, "failed registering dot commands: %s", e.what());
+		exit(0);
+	}
+    
+	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
+
+	_runHost();
+
+	teulClose(managementListenInterface);
+
+	wwiiIRCTerminate("[[ Normal shutdown ]]");
+
+	chatThreadsShutdown();
+
+	teulCloseTransport();
+}
+
+//////////////////////////////////////////////////////////////////////
 using namespace Teul::uWeb;
 
 using RESTAPIParams = nlohmann::json;
@@ -3922,174 +4096,3 @@ static void _v1APIHandler(const HTTPRequest &request, HTTPResponse &response)
     threadCallbackSync<void>([&] { _v1APIHandler_unlocked(request, response); });
 }
 #undef status_if
-
-static void _initializeHTTPEndpoints()
-{
-    s_debugServer.addVirtualPrefix("V1 REST API", "/v1", _v1APIHandler);
-}
-
-//////////////////////////////////////////////////////////////////////
-//
-
-const char* const g_serverName = "chatd";
-
-int
-main(int argc, const char* argv[])
-{
-	Server::InitializeProcess(g_serverName, CHAT_HOST, _errorFunction, _killFunction, argc, argv, {});
-	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
-	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
-
-	chatReadHostLocFile();
-
-	wwiiIRCInitialize(Server::localHost, false);
-
-	ircCallbacks.event_privmsg = _ircChannelMessages;
-	ircCallbacks.event_channel = _ircChannelMessages;
-	ircCallbacks.event_numeric = _ircNumericMessages;
-	ircCallbacks.event_join    = _ircJoinMessages;
-	ircCallbacks.event_part    = _ircPartMessages;
-	ircCallbacks.event_nick    = _ircNickMessages;
-
-	wwiiIRCAddInitialChannel("-hcs", "", "In-Game /hc channel (both sides)");
-	wwiiIRCAddInitialChannel("-ghc", "", "In-Game Allied HC channel");
-	wwiiIRCAddInitialChannel("-ahc", "", "In-Game Axis HC channel");
-
-	wwiiIRCRegisterCommand("all", _ircdotPassthru);
-	wwiiIRCRegisterCommand("allied", _ircdotPassthru);
-	wwiiIRCRegisterCommand("arenalock", _ircdotPassthru);
-	wwiiIRCRegisterCommand("axis", _ircdotPassthru);
-	wwiiIRCRegisterCommand("cpinfo", _ircdotPassthru);
-	wwiiIRCRegisterCommand("crs", _ircdotPassthru);
-	wwiiIRCRegisterCommand("gm", _ircdotPassthru);
-	wwiiIRCRegisterCommand("hc", _ircdotPassthru);
-	wwiiIRCRegisterCommand("hclist", _ircdotPassthru);
-	wwiiIRCRegisterCommand("pinfo", _ircdotPassthru);
-	wwiiIRCRegisterCommand("rdp", _ircdotPassthru);
-	wwiiIRCRegisterCommand("roster", _ircdotPassthru);
-	wwiiIRCRegisterCommand("setmotd", _ircdotPassthru);
-	wwiiIRCRegisterCommand("shutdown", _ircdotPassthru);
-	wwiiIRCRegisterCommand("spam", _ircdotPassthru);
-	wwiiIRCRegisterCommand("sys", _ircdotSys);
-	wwiiIRCRegisterCommand("sysmotd", _ircdotPassthru);
-	wwiiIRCRegisterCommand("warnall", _ircdotPassthru);
-	wwiiIRCRegisterCommand("m", _ircdotPassthru);
-	wwiiIRCRegisterCommand("who", _ircdotPassthru);
-	wwiiIRCRegisterCommand("wtf", _ircdotPassthru);
-
-	chatThreadsSetup();
-
-	// Connect to the database
-	chatInitDB();
-
-	dbGetWWIIConfig();
-	specLoader.loadSpecMap();
-
-	chatSetUnitMotd(SYSTEM_MOTD_UNIT, DEFAULT_SYS_MOTD);
-	chatSetUnitMotd(ALLIED, DEFAULT_ALLIED_HC_MOTD);
-	chatSetUnitMotd(AXIS, DEFAULT_AXIS_HC_MOTD);
-
-	//Initialize all our data
-	_dataInit();
-
-	wwiiIRCActivate(true);
-
-	//Create all the static channels that exist All the time
-	adminChannel = chatCreateChannel(chatGetAdminChannelID(), "GM Channel", chatGetHandle("GM"));
-	chatCreateChannel(chatGetGCIChannelID(Instance::g_campaign.id(), ALLIED), "Allied GCI Channel", chatGetHandle("Allied"));
-	chatCreateChannel(chatGetGCIChannelID(Instance::g_campaign.id(), AXIS), "Axis GCI Channel", chatGetHandle("Axis"));
-
-	serverOpenBroadcastIndexes();
-
-	Server::myServerInfo.stats.port = WWII::Net::Ports::ChatHost;
-
-	serverInit(PN_build_version_value
-				, CHAT_HOST, CHAT_HOST
-				, _serverEnterCallback
-				, _serverLeaveCallback
-				, _serverStatusCallback
-				, _personaCreate
-				, _personaRelease
-				, _personaActivate
-				, _personaExit
-				, nullptr					// Don't care about cluster exits
-				, _personaErrorFunction);
-
-	Server::myServerInfo.flags = Server::SVRFLAG_RELOGIN;//SVRFLAG_SEND_PSTAT;
-	Server::myServerInfo.stats.m_maxPlayers = Teul::MaxClusterUsers;
-
-	ABORT_IF(chatInstallHostCallbacks() < 0);
-	ABORT_IF(chatInstallHostManagementCallbacks() < 0);
-
-	//End broadcast configuration
-
-	//Find map server
-
-	if ( !teulOpenListenInterface(WWII::Net::Ports::ChatHost, _acceptPlayerConnection, 45000, _listenErrorFunction) )
-		LogAbort("Opening player connection ports failed.");
-
-	dbugLog(_FLN, "Listening for players on port %u", WWII::Net::Ports::ChatHost);
-
-	const SINT32 managementListenInterface = teulOpenListen(WWII::Net::Ports::ChatManagement, _acceptManagementConnection, 20000, PROTOCOL_TCP, _managementErrorFunction);
-	ABORT_IF(managementListenInterface < 0);
-
-	dbugLog(_FLN, "Listening for management players on port %u", WWII::Net::Ports::ChatManagement);
-    
-    _initializeHTTPEndpoints();
-    dbugLog(_FLN, "Listening for management commands on HTTP microserver (port %u)", WWII::Net::Ports::DebugWebServer);
-
-	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
-	Server::myServerInfo.sync();
-
-	_countUserSides();
-	chatSendPopulation();
-
-	teulSyncClock();
-
-	nextSpamTime = teulClock64 + 1000;
-
-	serverStartTime = teulTime();
-
-	// Load the MOTDs in
-	chatLoadMotds();
-	chatFetchSquadNames();
-
-	// Enable any threads that were waiting to be allowed
-	chatThreadsEnable();
-
-	dbugLog(_FLI, "registering chat commands");
-
-	chatRegisterDotCommands();
-
-	// Now we can register the dot-commands; permission data
-	// is taken from the database so register after connecting
-	try
-	{
-		DotCommandIndex& index = *DotCommand::index();
-		index.addAlias("whisper", "w");
-		index.addAlias("m", "tell");
-		index.addAlias("m", "t");
-		index.addAlias("m", "r");
-
-		dbugLog(_FLI, "DotIndex contains %" PRSizeT " commands", index.size());
-
-		index.readPermissions();
-	}
-	catch (std::exception& e)
-	{
-		dbugLog(_FLA, "failed registering dot commands: %s", e.what());
-		exit(0);
-	}
-    
-	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
-
-	_runHost();
-
-	teulClose(managementListenInterface);
-
-	wwiiIRCTerminate("[[ Normal shutdown ]]");
-
-	chatThreadsShutdown();
-
-	teulCloseTransport();
-}
