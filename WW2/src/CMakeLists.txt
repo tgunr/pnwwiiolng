@@ -127,6 +127,12 @@ IF ( NOT MSVC )
 	ENDIF()
 ENDIF()
 
+IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+    OPTION( PN_DEV_BUILD "Enable funny farm and more logging" OFF )
+ELSE()
+    SET( PN_DEV_BUILD OFF )
+ENDIF()
+
 ####################################
 ## Provide platform and server defines
 IF(WIN32)
@@ -143,6 +149,10 @@ ADD_DEFINITIONS( "-DplatBuild=BUILD_SERVER" )
 ## Provide critical build type definitions
 # For now, we always build PUBLIC_RELEASE
 ADD_DEFINITIONS( "-DPUBLIC_RELEASE" )
+
+IF ( PN_DEV_BUILD )
+    ADD_DEFINITIONS( "-DDEV_BUILD" )
+ENDIF()
 
 ####################################
 ## Status output
