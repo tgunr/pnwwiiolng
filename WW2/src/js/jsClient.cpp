@@ -2582,7 +2582,7 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case OWNERRANK_PROP:
 			*val = (new jsRank(detail.country(), detail.branch(), detail.ownerRank()))->jsVal();
 		break;
-		case OIC_PROP: // guy who is currently in charge (may be null)
+		case OIC_PROP: // player who is currently in charge (may be null)
 		{
 			BrigadeControlList* oic = PlayerClient()->LookupBrigadeOIC(detail.brigadeID());
 			if(oic && oic->m_officer > 0)

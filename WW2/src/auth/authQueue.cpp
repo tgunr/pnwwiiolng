@@ -137,7 +137,7 @@ _trimDeadEntries(QueueHeader& header)
 
 //////////////////////////////////////////////////////////////////////
 // When a queue hasn't had anyone launch from it yet but it has people
-// waiting, use the guy at the front of the queue to estimate launch
+// waiting, use the player at the front of the queue to estimate launch
 // times.
 
 static void

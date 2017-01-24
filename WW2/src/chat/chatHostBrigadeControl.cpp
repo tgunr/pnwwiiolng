@@ -874,7 +874,7 @@ BrigadeController::requestAttack(Player* player, FULL_OBJ_ID& target)
 	if ( property == nullptr )
 		throw BCERR_INVALID_REQ;
 
-	// If the guy clicked on a facility; upgrade to the CP
+	// If the player clicked on a facility; upgrade to the CP
 	if ( property->IsFacility() )
 	{
 		if ( property->Parent() == nullptr )
@@ -925,7 +925,7 @@ BrigadeController::requestDefend(Player* player, FULL_OBJ_ID& target)
 	if ( property == nullptr )
 		throw BCERR_INVALID_REQ;
 
-	// If the guy clicked on a facility; upgrade to the CP
+	// If the player clicked on a facility; upgrade to the CP
 	if ( property->IsFacility() )
 	{
 		Property* parent = property->Parent();
@@ -1441,7 +1441,7 @@ BrigadeController::processReplacingExpired()
 	Player* player = PlayerInterface::Lookup(vote()->m_sponsor);
 	if ( player == nullptr || player->brigadeID() != unit().unitID() || player->leadingBrigade() )
 	{
-		// The guy wanting to take charge has gone offline, so leave the OIC inplace
+		// The player wanting to take charge has gone offline, so leave the OIC inplace
 		_noticeToOfficers(BrigadeControl::_APPOINTMENT_FAILED, BrigadeControl::REQ_REPLACE, 0, VP_NONE, unit(), vote()->m_nominee, vote()->m_sponsor);
 		return;
 	}
@@ -1903,7 +1903,7 @@ chatRemoveOICStatus(UINT32 brigadeID, const ChatHandle handle)
 	if ( bc == nullptr )
 		return;
 
-	// Is this guy actually the OIC of the brigade?
+	// Is this player actually the OIC of the brigade?
 	if ( bc->oic() && bc->oic()->hasHandle(handle) )
 	{
 		if ( bc->vote() && bc->vote()->m_voteMode == Vote::TOMOVE )

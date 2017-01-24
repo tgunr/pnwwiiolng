@@ -311,7 +311,7 @@ chatSay(Player* player, Chat::ClientMessage* message, char* phrase, AREA_CHAT_MO
 	break;
 	}
 
-	// Find which cells we need to transmit to for this guy
+	// Find which cells we need to transmit to for this player
 	static PLAYERS_ARRAY array;
 	chatGridGetPlayersVector(player, std::max(friendlyRange2, hostileRange2), array);
 	if ( array.empty() )

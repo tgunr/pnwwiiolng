@@ -1277,7 +1277,7 @@ Server::HeartBeat::process()
 			if (_statusCallback)
 				(_statusCallback)(server, Server::Code::Status);
 
-			// Check if we've lost our connection to this guy.
+			// Check if we've lost our connection to this server.
 			if ( serverPeeringWithIP(this->address, this->type) == false )
 			{
 				_sendHeartBeat();

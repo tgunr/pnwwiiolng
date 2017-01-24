@@ -1695,7 +1695,7 @@ LeaderChange::process() const
 	if ( mission->isSystemMission() )
 		return _FAIL_NO_MISSION;
 
-	// Is this guy already leading?
+	// Is this player already leading?
 	UINT32 oldLeaderID = mission->playerID();
 	ChatHandle oldLeaderHandle = mission->posterHandle();
 

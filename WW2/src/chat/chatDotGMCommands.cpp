@@ -77,7 +77,7 @@ _smite(Player* target)
 {
 	if ( target == nullptr ) return;
 
-	// Yes, use the broadcast index because we don't know where this guy is
+	// Yes, use the broadcast index because we don't know where this player is
 	///FIXME: We should know where this player is, thank you teul
 	chatSmitePlayer(target->playerID());
 

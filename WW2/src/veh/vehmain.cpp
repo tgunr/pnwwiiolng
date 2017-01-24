@@ -2512,7 +2512,7 @@ UINT32 vehKillVehicle(vehVehicle* Vehicle)
 	if(Vehicle == nullptr) return 0;
     if(Vehicle->InUse == 0) return 0;
 
-	// process flags one more time to catch dead guys that didn't ragdoll
+	// process flags one more time to catch dead vehicles that didn't ragdoll
 	if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		fpProcessVehicleAnimationFlags(Vehicle);
 
@@ -3623,7 +3623,7 @@ UINT32 vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 	vehDetermineExitStatus(&ExitStatus, &rtbFacilityID);
 
-	// send out an update to make sure they ragdoll our guy
+	// send out an update to make sure they ragdoll our vehicle
 	if(ExitStatus == PEXIT_DEAD && Vehicle->VehicleType->Type == VEH_TYPE_PERSON && !fpFPSIsDead())
 	{
 		fpFPSKillTrooper();

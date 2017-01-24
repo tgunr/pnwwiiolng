@@ -852,7 +852,7 @@ HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 		return;
 	}
 
-	// Tell the strat host to contribute this guy to the capture
+	// Tell the strat host to contribute this player to the capture
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_CAPTURE_CONTRIB_Y));
 	outgoing.construct<Strat::CaptureContributionEvent>(
 							(Strat::CaptureContributionEvent::Status)status
