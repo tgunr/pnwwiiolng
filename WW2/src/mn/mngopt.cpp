@@ -85,6 +85,7 @@ static GVAR vars[] = {
     STRING_KEY_DEF("o", HackID),
     NULL_KEY_DEF("altfont", AltFont),
     STRING_KEY_DEF("authserver", gAuthServer),
+    STRING_KEY_DEF("authserverport", gAuthServerPort),
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
     STRING_KEY_DEF("datadir", DataPath),
