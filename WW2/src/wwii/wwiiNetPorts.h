@@ -24,6 +24,7 @@ namespace WWII
 
 			// Public ports (customer facing)
 			,	AuthHost = 27015					// Auth Server port
+            ,   AltAuthHost = 27014                 // Auth Server port in Super-CiaB (five-host) mode
 			,	MapHost = 27015						// Map/Login server
 #if defined(PN_DIFFERENT_PORTS)
 			,	ChatHost = 27016					// Chat host server
