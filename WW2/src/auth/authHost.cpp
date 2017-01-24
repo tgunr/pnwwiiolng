@@ -901,20 +901,23 @@ main(int argc, const char* argv[])
 #if defined(SIGHUP)
 	signal(SIGHUP, _authSIGHUP);
 #endif
-
-	const SINT32 tcpconnection = teulOpenListen(WWII::Net::Ports::AuthHost, _acceptUserConnection, PLAYER_TIMEOUT, PROTOCOL_TCP, _errorFunction);
-	dbugLog(_FLN, "listening for clients on TCP port %u", WWII::Net::Ports::AuthHost);
+    
+    SINT32 tcpconnection = -1;
+    if (Server::IsBroadcastViaController()) {
+        tcpconnection = teulOpenListen(WWII::Net::Ports::AltAuthHost, _acceptUserConnection, PLAYER_TIMEOUT, PROTOCOL_TCP, _errorFunction);
+        dbugLog(_FLN, "listening for clients on TCP port %u", WWII::Net::Ports::AltAuthHost);
+    } else {
+        tcpconnection = teulOpenListen(WWII::Net::Ports::AuthHost, _acceptUserConnection, PLAYER_TIMEOUT, PROTOCOL_TCP, _errorFunction);
+        dbugLog(_FLN, "listening for clients on TCP port %u", WWII::Net::Ports::AuthHost);
+    }
 	if (tcpconnection < 0)
 		LogAbort("Error allocating endpoint!");
 
-#if platOS == OS_WIN32 // HACK: We should properly detect if we're using the controller via code if possible.
-	const SINT32 gameConnection = teulOpenListen(WWII::Net::Ports::InternalAuth, _acceptGameConnection, GAME_TIMEOUT, PROTOCOL_CTRL, _gameErrorFunction);
-#else
-	const SINT32 gameConnection = teulOpenListen(WWII::Net::Ports::InternalAuth, _acceptGameConnection, GAME_TIMEOUT, PROTOCOL_TCP, _gameErrorFunction);
-#endif
+    SINT32 gameConnection = -1;
+    
+    gameConnection = teulOpenListen(WWII::Net::Ports::InternalAuth, _acceptGameConnection, GAME_TIMEOUT, PROTOCOL_TCP, _gameErrorFunction);
 	if ( gameConnection < 0 )
 		LogAbort("failed to open game listening socket");
-
 	dbugLog(_FLN, "listening for games on port %u", WWII::Net::Ports::InternalAuth);
 
 	threadsEnable();
