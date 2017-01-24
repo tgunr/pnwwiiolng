@@ -1670,6 +1670,8 @@ WW2Archives
 base64
 depend
 libb64.a
-DebugInstance/Debug/DebugInstance.log
-DebugInstance/Debug/DebugInstance.tlog/DebugInstance.lastbuildstate
 build_info.cpp
+
+Deployment/database/vendor
+Deployment/database/.env
+
