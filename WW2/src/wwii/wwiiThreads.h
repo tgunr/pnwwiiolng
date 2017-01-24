@@ -7,6 +7,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include <condition_variable>
 #include "include/pnThread.h"
 #include "dbse/dbseHandle.h"
 
