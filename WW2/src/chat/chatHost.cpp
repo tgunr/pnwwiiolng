@@ -3927,7 +3927,7 @@ static void _playerControlAPIRemove(const HTTPRequest &request, HTTPResponse &re
     SquadMemberEntry *targetSquadEntry = nullptr;
     
     status_if(originator.squadID == 0, 403, "You're not in a squad"); // Originator not in any squad
-    status_if(originator.squadRank < Squad::CO, 403, "You're not CO"); // Originator is not CO
+    status_if(originator.squadRank < Squad::STAFFER, 403, "You're not staffer or better"); // Originator is not staffer
     status_if(target.squadID != originator.squadID, 403, "You're not in the same squad"); // Originator and target in different squads
     if (!target.realPlayerObject && !originator.realPlayerObject) { chatdbSquadInfo(0, target.squadID, true); } // If both are offline, load their squad
     status_if((squadList = chatFindSquadList(originator.squadID)) == nullptr, 403, "Missing squad list"); // The squad list couldn't be looked up
