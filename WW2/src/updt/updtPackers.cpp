@@ -84,11 +84,11 @@ UPDATE_FRAMING framings[NUM_FRAMING_MODES] =
 */
 UpdateFraming framings[UpdateFraming::_MODES] =
 {
-	{ 88,  UpdateFraming::_LARGE, 125, 20, "um:0 88 Limit 20/Update" }
-,	{ 112, UpdateFraming::_LARGE, 125, 28, "um:1 112 Limit 28/Update" }
-, 	{ 128, UpdateFraming::_LARGE, 125, 32, "um:2 128 Limit 32/Update" }
-, 	{ 146, UpdateFraming::_LARGE, 125, 36, "um:3 146 Limit 36/Update" }
-, 	{ 184, UpdateFraming::_LARGE, 125, 48, "um:4 184 Limit 48/Update" }
+	{ 88,  UpdateFraming::_LARGE, 125, 20, "um:0 88 Limit 20/Update 125ms" }
+,	{ 112, UpdateFraming::_LARGE, 100, 28, "um:1 112 Limit 28/Update 100ms" }
+, 	{ 128, UpdateFraming::_LARGE, 100, 32, "um:2 128 Limit 32/Update 100ms" }
+, 	{ 146, UpdateFraming::_LARGE, 100, 36, "um:3 146 Limit 36/Update 100ms" }
+, 	{ 184, UpdateFraming::_LARGE,  75, 48, "um:4 184 Limit 48/Update 75ms" }
 };
 
 #if platBuild != BUILD_SERVER
