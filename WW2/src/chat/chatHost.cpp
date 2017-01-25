@@ -4177,21 +4177,21 @@ static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &resp
             DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET pri_language=%llu WHERE squadid=%u", language, squad->squad().squadID());
         });
     }
-    if (params.find("is_recruiting") != params.end()) {
-        bool is_recruiting = params.at("is_recruiting");
+    if (params.find("recruiting") != params.end()) {
+        bool recruiting = params.at("recruiting");
         
-        operations.push_back([is_recruiting, &squad, &requesterMember] {
-            squad->setRecruiting(is_recruiting, requesterMember->player());
-            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET recruiting=%u WHERE squadid=%u", is_recruiting ? 1 : 0, squad->squad().squadID());
+        operations.push_back([recruiting, &squad, &requesterMember] {
+            squad->setRecruiting(recruiting, requesterMember->player());
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET recruiting=%u WHERE squadid=%u", recruiting ? 1 : 0, squad->squad().squadID());
         });
     }
-    if (params.find("is_voting") != params.end()) {
-        bool is_voting = params.at("is_voting");
+    if (params.find("voting") != params.end()) {
+        bool voting = params.at("voting");
         
         status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set voting flag");
-        operations.push_back([is_voting, &squad, &requesterMember] {
-            squad->setRecruiting(is_voting, requesterMember->player());
-            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting=%u WHERE squadid=%u", is_voting ? 1 : 0, squad->squad().squadID());
+        operations.push_back([voting, &squad, &requesterMember] {
+            squad->setRecruiting(voting, requesterMember->player());
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting=%u WHERE squadid=%u", voting ? 1 : 0, squad->squad().squadID());
         });
     }
     
