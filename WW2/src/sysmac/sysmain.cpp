@@ -94,8 +94,8 @@ int sysmain()
         frames++;
 		ddpEngine(NULL);
 #ifdef DEBUG_WW2
-        if (frames % 100 == 0) {
-            Write_Debug("Current FPS: %.1f", 1000.0 / gFPS );
+        if (frames % 10000 == 0) {
+            Write_Debug("Current FPS: %.1f", 10000.0 / gFPS );
         }
 #endif
     }
@@ -118,7 +118,7 @@ int sysmainInitApp()
 		if(f)
 		{
 			fscanf(f,"%d", &key);
-			HasKeyFile = (key == 0xDEADBEEF);
+			HasKeyFile = (LOGICAL) (key == 0xDEADBEEF);
 			fclose(f);
 		}
 	}
