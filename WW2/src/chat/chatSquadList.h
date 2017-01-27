@@ -45,4 +45,5 @@ void chatUpdateRecruiterList(const Player* player, bool isRecruiting, class Squa
 void chatRequestRecruiter(Player* player, UCHAR language);
 
 //! Load a squad member list from the database.
-void chatRequestSquadMemberList(const UINT32 squadID);
+void chatRequestSquadMemberList(UINT32 squadID);
+void chatRequestSquadMemberListImmediate(UINT32 squadID);

@@ -822,7 +822,7 @@
 		08104A4C103DD3370065E0E2 /* mapArenaDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapArenaDescription.h; sourceTree = "<group>"; };
 		08104A4D103DD3370065E0E2 /* mapAWS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapAWS.cpp; sourceTree = "<group>"; };
 		08104A4E103DD3370065E0E2 /* mapAWS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapAWS.h; sourceTree = "<group>"; };
-		08104A51103DD3370065E0E2 /* mapBrigadeSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = mapBrigadeSummary.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		08104A51103DD3370065E0E2 /* mapBrigadeSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = mapBrigadeSummary.h; sourceTree = "<group>"; };
 		08104A54103DD3370065E0E2 /* mapClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapClientMessages.cpp; sourceTree = "<group>"; };
 		08104A55103DD3370065E0E2 /* mapClientMessages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapClientMessages.h; sourceTree = "<group>"; };
 		08104A56103DD3370065E0E2 /* mapConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapConstants.h; sourceTree = "<group>"; };

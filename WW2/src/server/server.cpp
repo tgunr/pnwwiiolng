@@ -13,11 +13,11 @@
 #include <sys/prctl.h>
 #endif
 #include "build_info.hpp"
+#include "include/configVars.h"
 #include "mem/mem.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
 #include "server/serverCodeEnum.h"
-#include "server/serverConfigVars.h"
 #include "server/serverIndexes.h"
 #include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
@@ -36,7 +36,6 @@
 #include "server/serverTypes.h"
 #include "teul/teulAuth.h"
 #include "teul/teulAuthServer.h"
-#include "teul/teulConfigVar.h"
 #include "teul/teulConnectionInstruction.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
@@ -60,9 +59,6 @@ namespace Teul
 // before they're sent back to the auth Host
 static const UINT32 PLAYER_TIMEOUT = 3 * 60 * 1000;	// 4 minutes
 static const SINT32 PLAYER_XFER_TIMEOUT = 30 * 1000;	// 30 seconds
-
-extern ConfigUint cv_maxClusterUsers;
-extern ConfigAddr cv_authHost;
 
 extern void serverInitializePeering();
 extern void serverConnectPeer(const UINT32 ip, const SERVER_TYPE type);
@@ -927,8 +923,7 @@ serverEnableDebugWebServer(SERVER_TYPE serverType)
 //////////////////////////////////////////////////////////////////////
 // Simple URL to test the server is running.
 
-static void
-_serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
+static void _serverReportAlive(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
 {
 	auto& stats = Server::myServerInfo.stats;
 
@@ -936,17 +931,21 @@ _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 	teulGetAddress(stats.address, ip, sizeof(ip));
 
 	char buffer[1024];
-	const int len = strprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s\"}\r\n"
-						, Teul::GetAppName()
-						, ip
-						, stats.arenaID
-						, stats.type
-						, stats.status
-						, stats.maxPlayers()
-						, stats.numPlayers()
-                        , PN_git_commitish_string
-						);
-	send(fd, buffer, len, 0);
+	strprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s\"}\r\n"
+        , Teul::GetAppName()
+        , ip
+        , stats.arenaID
+        , stats.type
+        , stats.status
+        , stats.maxPlayers()
+        , stats.numPlayers()
+        , PN_git_commitish_string
+    );
+    return Teul::uWeb::HTTPResponseBuilder(request)
+        .status(200)
+        .header("Access-Control-Allow-Origin", "*")
+        .JSON(buffer)
+        .build(response);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1637,6 +1636,7 @@ _controllerConnect(ENDPOINT& endpoint)
 {
 	dbugLog(_FLD, "t:%d ip:%s:%u connected to controller", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
 	s_controllerConnected = true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 	ProcessIntroduction intro;
 #if platOS == OS_WIN32
@@ -1649,10 +1649,10 @@ _controllerConnect(ENDPOINT& endpoint)
 
 	auto result = endpoint.writeRaw((const char*)&intro, sizeof(intro));
 	if ( result < 0 ) {
-		if ( errno == ECONNREFUSED )
+		if ( dbugGetErrno() == ECONNREFUSED )
 			LogAbort("Connection to controller refused.");
 		else
-			LogAbort("Unable to greet controller");
+			LogAbort("Unable to greet controller because %d", dbugGetErrno());
 	}
 	ABORT_IF_EX(result != sizeof(intro), "Failed to write intro to controller: %dv%" PRSizeT "", result, sizeof(intro));
 }
@@ -1665,8 +1665,9 @@ _controllerError(SINT32, const UCHAR* const, SINT32, const struct TEUL_CALLBACK*
 
 void _connectToController()
 {
-	if (Server::serverType == CONTROLLER_HOST)
+	if (Server::serverType == CONTROLLER_HOST || cv_oneProcessMode.GetBool() == true) {
 		return;
+    }
 
 #ifdef PUBLIC_RELEASE
 	static const SINT32 controllerTimeout = 5000;
@@ -1681,6 +1682,7 @@ void _connectToController()
 		teulUpdateTransport(1);
 		teulSyncClock();
 	}
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1822,16 +1824,17 @@ _serverUsesBroadcast(const SERVER_TYPE serverType)
 	switch ( serverType) {
 		case CONTROLLER_HOST:
 		case AUTH_HOST:
-		case DBD_HOST:
 		case EXIT_SERVER:
 		case MAX_SERVER_TYPE:
 			return false;
-		break;
 		default:
 			return true;
-		break;
 	}
 }
+
+#if platOS == OS_MACOS
+static std::thread s_parentCheckThread;
+#endif
 
 void
 Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTION errorFnPtr, KILL_FUNCTION killFnPtr, int argc, const char* argv[], const CommandLineOptions& cliOptions)
@@ -1851,6 +1854,12 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 			"--child", "Process should die when parent terminates.", false,
 #if platOS == OS_LINUX
 			[](const char*) { prctl(PR_SET_PDEATHSIG, SIGHUP); }, nullptr
+#elif platOS == OS_MACOS
+            // This is a terrible hack, relying on launchd becoming an orphaned
+            // process' parent, but it does work reliably on all macOS versions.
+            [](const char*) { s_parentCheckThread = std::thread([] {
+                while (1) { if (getppid() == 1) { exit(0); } std::this_thread::sleep_for(std::chrono::seconds(1)); } }
+            ); }, nullptr
 #else
 			[](const char*) {}, nullptr
 #endif
@@ -1901,6 +1910,10 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
+#ifndef NDEBUG
+    dbugSetWriteLevel(Debug::ERR_DBUG | STD_ERR);
+    dbugSetLogLevel(Debug::ERR_DBUG | STD_ERR);
+#endif
 
 	serverEnableDebugWebServer(myType);
 

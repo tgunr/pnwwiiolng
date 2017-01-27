@@ -32,7 +32,7 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiThreads.h"
-#include "server/serverConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
 #include "teul/teulAuthServer.h"

@@ -13,7 +13,7 @@ if os.name == 'nt':
     DEFAULT_EDITOR = "notepad"
     IS_WIN = True
 else:
-    ROOT_PATH, PATH_SEP, EXE_SFC = "/", "/", ""
+    ROOT_PATH, PATH_SEP, EXE_SFX = "/", "/", ""
     DEFAULT_EDITOR = "nano"
     IS_WIN = False
 

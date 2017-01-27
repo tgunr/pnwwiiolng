@@ -45,7 +45,6 @@ public:
 
 	Teul::TimeMS	timeStamp;
 	void*			localInfo;
-	void*			sessionInfo;
 
 	UINT32			serviceID;
 };

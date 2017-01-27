@@ -43,8 +43,23 @@
 #define FORMAT_FN(n,m) __attribute__((format(printf,n,m)))
 #define FORMAT_ARG(n)
 #define NORETURN_FN [[noreturn]]
+#define _DISABLE_WARNING(pragma) _Pragma(#pragma)
+#define DISABLE_WARNING(warning) \
+    _Pragma("clang diagnostic push"); \
+    _DISABLE_WARNING(clang diagnostic ignored warning);
+#define POP_WARNINGS() \
+    _Pragma("clang diagnostic pop");
+#if __has_cpp_attribute(fallthrough)
+#define FALLTHROUGH [[fallthrough]]
+#else
+#define FALLTHROUGH [[clang::fallthrough]]
+#endif
 
 #elif __is_GCC()
+
+#ifndef __has_cpp_attribute
+#define __has_cpp_attribute(x) 0
+#endif
 
 #define PN_LIKELY(p)   __builtin_expect(!!(p), 1)
 #define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
@@ -52,7 +67,22 @@
 #define PRSsizeT "zd"
 #define FORMAT_FN(n,m) __attribute__((format(printf,n,m)))
 #define FORMAT_ARG(n)
+#if __has_cpp_attribute(noreturn)
+#define NORETURN_FN [[noreturn]]
+#else
 #define NORETURN_FN __attribute__ ((noreturn))
+#endif
+#define _DISABLE_WARNING(pragma) _Pragma(#pragma)
+#define DISABLE_WARNING(warning) \
+    _Pragma("GCC diagnostic push") \
+    _DISABLE_WARNING(GCC diagnostic ignored warning);
+#define POP_WARNINGS() \
+    _Pragma("GCC diagnostic pop")
+#if __has_cpp_attribute(fallthrough)
+#define FALLTHROUGH [[fallthrough]]
+#else
+#define FALLTHROUGH
+#endif
 
 #else
 
@@ -67,6 +97,9 @@
 #define FORMAT_FN(n,m)
 #define FORMAT_ARG(n)   _Printf_format_string_params_(n)
 #define NORETURN_FN [[noreturn]]
+#define DISABLE_WARNING(warning)
+#define POP_WARNINGS()
+#define FALLTHROUGH __fallthrough
 
 // Add some explicit warnings
 #pragma warning( 1 : 4505 )	// unreferenced local functions
@@ -83,11 +116,18 @@
 #endif
 
 //////////////////////////////////////////////////////////////////////////////
-#if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__)
+#if defined(_WIN64) || defined(__x86_64__) || defined(__arm64__)
 # define BUILD_64
-# define PR64BitT "ld"
-# define PR64BitUT "lu"
-# define PRPermMaskT "lx"
+// LP64 vs. ILP64 (MSVC vs. not)
+# if defined(__LP64__)
+#  define PR64BitT "lld"
+#  define PR64BitUT "llu"
+#  define PRPermMaskT "llx"
+# else
+#  define PR64BitT "ld"
+#  define PR64BitUT "lu"
+#  define PRPermMaskT "lx"
+# endif
 #else
 # define BUILD_32
 # define PR64BitT "lld"
@@ -146,7 +186,7 @@ static inline void OS_CLOSE(int fd) { _close(fd); }
 #define OS_MKDIR(_dir_, ...) _mkdir(_dir_)
 #define OS_WMKDIR(_dir_, ...) _wmkdir(_dir_)
 #define OS_CREAT(...) _creat(__VA_ARGS__)
-static inline void OS_CLOSESOCKET(SOCKET sock) { closesocket(sock); }
+static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { closesocket(sock); } sock = INVALID_SOCKET; }
 
 //////////////////////////////////////////////////////////////////////////////
 // Equivalents for macOS/Linux
@@ -164,7 +204,7 @@ static inline void OS_CLOSE(int fd) { close(fd); }
 #define OS_MKDIR(...) mkdir(__VA_ARGS__)
 #define OS_WMKDIR(...) wmkdir(__VA_ARGS__)
 #define OS_CREAT(f,p) ::creat(f,p)
-static inline void OS_CLOSESOCKET(SOCKET sock) { close(sock); }
+static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { close(sock); } sock = INVALID_SOCKET; }
 
 #else
 

@@ -12,7 +12,7 @@
 
 #include "chat/chatLocFile.h"
 #include "chat/chatLocalizedMessage.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 
 HOSTLOC g_hostMessages;
 

@@ -19,6 +19,8 @@
 #include "chat/chatSaveChannels.h"
 #include "chat/chatSquadList.h"
 #include "chat/chatSquadListTypes.h"
+#include "wwii/wwiiDBThreads.h"
+#include "chat/chatSquadCreate.h"
 
 static const UINT32 CREATE_REQUEST_EXPIRY_S = 6 * 30;	// 3 minutes
 
@@ -53,7 +55,7 @@ _sendInvites(const ChatHandle squadHandle, const std::string& squadName, const C
 	{
 		RANK_NO rank = (it->first == xo) ? Squad::XO : Squad::MEMBER;
 		Player* invitee = it->second;
-		betaLog(_FLI, "c:%s sending invite to %s", invitee->callsign(), squadName.c_str());
+		dbugLog(_FLI, "c:%s sending invite to %s", invitee->callsign(), squadName.c_str());
 		invitee->sendSquadCreateInvite(squadHandle, squadName, co, rank);
 	}
 }
@@ -116,6 +118,33 @@ _checkMembers(Player* player, SquadControl& control, bool sendInvites)
 		_sendInvites(control.m_handle, control.m_text, player->matchHandle(), xo, approved);
 }
 
+static void
+_checkExistingSquad(const Chat::Name& gameName)
+{
+	DBQuery q(dbh, "SELECT squadID FROM wwii_squads WHERE disbanded = 0 AND LOWER(short_name) = LOWER('%s') LIMIT 1", gameName.c_str());
+	if ( q.HasRows() )
+		throw SQR_SQUAD_EXISTS;
+}
+
+static void
+_checkReservedSquad(const Chat::Name& gameName)
+{
+	DBQuery q(dbh, "SELECT short_name FROM wwii_reserved_squadnames WHERE lower(short_name) = LOWER('%s') LIMIT 1", gameName.c_str());
+	if ( q.HasRows() )
+		throw SQR_INVALID_SQUAD_SHORT;
+}
+
+static SQUAD_CONTROL_RESULT
+_processCreateCheck(const ChatHandle /*originator*/, SQUAD_REQUEST& request, Player* player)
+{
+	_checkMembers(player, request.control, true);
+
+	request.expires = teulTime() + CREATE_REQUEST_EXPIRY_S + 1;
+	request.approved = true;
+
+	return SQR_DONE;
+}
+
 void
 chatProcessSquadCreateRequest(SquadControl& control, Player* player)
 {
@@ -142,17 +171,61 @@ chatProcessSquadCreateRequest(SquadControl& control, Player* player)
 	request.approved = false;
 
 	dbugLog(_FLD, "t:%d p:%u c:%s ok to proceed with squad creation", player->teulIndex(), player->playerID(), player->callsign());
+
+    // Implementation of CREATE_CHECK
+    _checkExistingSquad(control.m_handle);
+    _checkReservedSquad(control.m_handle);
+    
+    // CREATE_CHECK reply
+    chatProcessSquadCreateReply(false, player->matchHandle(), player);
 }
 
-static SQUAD_CONTROL_RESULT
-_processCreateCheck(const ChatHandle /*originator*/, SQUAD_REQUEST& request, Player* player)
+static UINT32
+_createSquad(UINT32 ownerID, UINT32* members, const Chat::Name& shortName, const char* fullName)
 {
-	_checkMembers(player, request.control, true);
+    //DEV-560 - before creating new squad, delete disbanded squad with the same name
+    DBQuery qDel(dbh, "DELETE FROM wwii_squads WHERE disbanded = 1 AND LOWER(short_name) = LOWER('%s')", shortName.c_str());
 
-	request.expires = teulTime() + CREATE_REQUEST_EXPIRY_S + 1;
-	request.approved = true;
+    DBQuery q(dbh, "INSERT INTO wwii_squads (creatorid, short_name, name, password, description, active, recruiting, voting, disbanded, created)"
+					" VALUES (%u, '%s', '%s', '', '', 1, 1, 1, 0, now())"
+					, ownerID, shortName.c_str(), fullName);
+	UINT32 squadID = q.LastInsertID();
+	if ( squadID == 0 ) {
+        // This is fatal because failure to have a last insert ID means either
+        // critical database error or multithreading problem. Neither of these
+        // should be allowed to proceed.
+        dbugLog(_FLF, "No last insert ID during squad create!");
+		throw SQR_OPERATION_FAILED;
+    }
 
-	return SQR_DONE;
+	char playerIDs[(14 * (SquadControl::CREATE_PLAYERS_REQUIRED+1)) + 1];
+	char* p = playerIDs;
+	strprintf(playerIDs, "%u", ownerID);
+	for ( UINT32 i = 0; i < SquadControl::CREATE_PLAYERS_REQUIRED; ++i )
+	{
+		while ( *p )
+			++p;
+		sprintf(p, ",%u", members[i]);
+	}
+
+	// Promote the CO and XO
+	DBSimpleQuery(dbh, "UPDATE wwii_player"
+							" SET squadID=%u"
+								", squad_rank=IF(playerID=%u,%u,IF(playerID=%u,%u,%u))"
+								", squad_joined=NOW()"
+								", squad_time_played=0"
+							" WHERE playerID in (%s)"
+						, squadID, ownerID, Squad::CO, members[0], Squad::XO, Squad::MEMBER, playerIDs
+						);
+
+	return squadID;
+}
+
+UINT32 chatProcessSquadReallyCreateRequest(SquadControl& control, Player* player)
+{
+    _checkExistingSquad(control.m_handle);
+    _checkReservedSquad(control.m_handle);
+    return _createSquad(player->playerID(), &control.m_playerIDs[0], Chat::Name(control.m_handle), control.m_text.c_str());
 }
 
 static SQUAD_CONTROL_RESULT
@@ -262,7 +335,7 @@ chatSquadAcceptCreateInvite(Player* acceptor, Player* creator)
 	// Pointer check
 	if ( acceptor == nullptr || creator == nullptr )
 	{
-		betaLog(_FLA, "NULL pointers");
+		dbugLog(_FLA, "NULL pointers");
 		throw SQR_NO_INVITE;
 	}
 
@@ -270,7 +343,7 @@ chatSquadAcceptCreateInvite(Player* acceptor, Player* creator)
 	SQUAD_REQUESTS::iterator it = requestIndex.find(creator->matchHandle());
 	if ( it == requestIndex.end() )
 	{
-		betaLog(_FLA, "creator has no request pending");
+		dbugLog(_FLA, "creator has no request pending");
 		throw SQR_NO_INVITE;
 	}
 
@@ -282,20 +355,20 @@ chatSquadAcceptCreateInvite(Player* acceptor, Player* creator)
 	// in which case letting me vote would be bad.
 	if ( find(control.m_players.begin(), control.m_players.end(), acceptor->matchHandle()) == control.m_players.end() )
 	{
-		betaLog(_FLA, "acceptor is not in the players list");
+		dbugLog(_FLA, "acceptor is not in the players list");
 		throw SQR_NO_INVITE;
 	}
 
 	// Have I already agreed?
 	if ( find(request.agreed.begin(), request.agreed.end(), acceptor->matchHandle()) != request.agreed.end() )
 	{
-		betaLog(_FLA, "%s has already accepted invite to %s's squad", acceptor->callsign(), creator->callsign());
+		dbugLog(_FLA, "%s has already accepted invite to %s's squad", acceptor->callsign(), creator->callsign());
 		throw SQR_NO_INVITE;
 	}
 
 	if ( request.agreed.size() >= SquadControl::CREATE_PLAYERS_REQUIRED )
 	{
-		betaLog(_FLA, "squad already met member requirements");
+		dbugLog(_FLA, "squad already met member requirements");
 		throw SQR_NO_INVITE;
 	}
 

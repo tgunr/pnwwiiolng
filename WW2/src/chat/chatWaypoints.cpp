@@ -98,7 +98,7 @@ Waypoint::processIncomingFrom(class Player* const player)
 
 		if ( leader != nullptr && leader->teulIndex() >= 0 )
 		{
-			betaLog(_FLI, "t:%d p:%u c:%s m:%u forwarding waypoint to mission leader %s", player->teulIndex(), player->playerID(), player->callsign(), mission.missionID(), leader->callsign());
+			dbugLog(_FLI, "t:%d p:%u c:%s m:%u forwarding waypoint to mission leader %s", player->teulIndex(), player->playerID(), player->callsign(), mission.missionID(), leader->callsign());
 			WAYPOINT_XFER forward(*this, WPXT_REQUEST);
 			forward.send(leader->teulIndex());
 		}
@@ -148,7 +148,7 @@ WAYPOINT_CONTROL::receive(SINT32 teulIndex, WAYPOINT_CONTROL& incoming)
 
 	if ( !player->isMissionLeader() )
 	{
-		betaLog(_FLA, "t:%d p:%u c:%s non-leader requesting waypoint %" PR64BitUT "[%s] %u"
+		dbugLog(_FLA, "t:%d p:%u c:%s non-leader requesting waypoint %" PR64BitUT "[%s] %u"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, incoming.key(), Chat::Name(incoming.key()).c_str(), incoming.flags());
 		return -EACCES;

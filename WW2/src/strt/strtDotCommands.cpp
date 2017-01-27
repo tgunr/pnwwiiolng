@@ -45,7 +45,7 @@
 #include "strt/strtWeaponUpdate.h"
 #include "teul/teulTime.h"
 #include "wwii/wwiiConfig.h"
-#include "wwii/wwiiConfigVars.h"
+#include "include/configVars.h"
 #include "wwii/wwiiIRC.h"
 
 using namespace std;

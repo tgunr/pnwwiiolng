@@ -14,8 +14,8 @@
 #include "server/serverIndexes.h"
 #include "server/serverPeers.h"
 #include "server/serverServerInfo.h"
+#include "include/configVars.h"
 #include "teul/teulCallbackStruct.h"
-#include "teul/teulConfigVar.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulMicroWebServer.h"
@@ -23,8 +23,6 @@
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiCallbacks.h"
-
-extern ConfigUint cv_peerConnectionTimeout_ms;
 
 // Describe the mapping.
 struct ServerConnection
@@ -63,27 +61,39 @@ static std::mutex s_peerMutex;
 //////////////////////////////////////////////////////////////////////
 // JSON description of current peering info.
 
-static void
-_reportJSONPeers(SOCKET fd, const char* /*path*/, const char* /*args*/)
+static void _reportJSONPeers(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
 {
-	size_t maxSize = 128 + (s_connections.size() * 128) + (s_pendingPeers.size() * 64) + 1;
-	char* report = static_cast<char*>(alloca(maxSize));
-	char* p = report + sprintf(report, "{\"peers\":[");
+    std::string resultJSON;
+    
+    resultJSON = "{";
 	{
 		std::lock_guard<std::mutex> lock(s_peerMutex);
-		for ( auto& it : s_connections )
-		{
-			p += sprintf(p, "{\"ip\":%u,\"type\":%u,\"idx\":%d,\"conn\":%u},", it.m_ip, it.m_type, it.m_teulIndex, it.m_connected);
+        resultJSON += "\"peers\":[";
+		for (auto& it : s_connections) {
+            resultJSON += "{";
+            resultJSON += "\"ip\":" + std::to_string(it.m_ip) + ",";
+            resultJSON += "\"type\":" + std::to_string(it.m_type) + ",";
+            resultJSON += "\"idx\":" + std::to_string(it.m_teulIndex) + ",";
+            resultJSON += "\"conn\":" + std::to_string(it.m_connected);
+            resultJSON += "}";
 		}
-		p += sprintf(p, "],\"pending\":[");
-		for ( auto& it : s_pendingPeers )
-		{
-			p += sprintf(p, "{\"ip\":%u,\"time\":%" PR64BitUT "},", it.first, teulClock64 - it.second);
+        resultJSON += "],";
+        resultJSON += "\"pending\":[";
+		for (auto& it : s_pendingPeers) {
+            resultJSON += "{";
+            resultJSON += "\"ip\":" + std::to_string(it.first) + ",";
+            resultJSON += "\"time\":" + std::to_string(teulClock64 - it.second);
+            resultJSON += "}";
 		}
+        resultJSON += "]";
 	}
-	p += sprintf(p, "]}\n");
-
-	send(fd, report, int(p - report), 0);
+    resultJSON += "}";
+    
+    return Teul::uWeb::HTTPResponseBuilder(request)
+        .status(200)
+        .header("Access-Control-Allow-Origin", "*")
+        .JSON(resultJSON)
+        .build(response);
 }
 
 //////////////////////////////////////////////////////////////////////

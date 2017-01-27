@@ -9,6 +9,7 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
+#include <json.hpp>
 #include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatBanPlayer.h"
@@ -50,11 +51,13 @@
 #include "chat/chatSay.h"
 #include "chat/chatServerTrackedObjects.h"
 #include "chat/chatSpamCan.h"
+#include "chat/chatSquadControl.h"
 #include "chat/chatSquadCreate.h"
 #include "chat/chatSquadInvite.h"
 #include "chat/chatSquadList.h"
 #include "chat/chatSquadListPurge.h"
 #include "chat/chatSquadListTypes.h"
+#include "chat/chatSquadMemberUpdates.h"
 #include "chat/chatSquadVote.h"
 #include "chat/chatThreads.h"
 #include "chat/chatTimeInterval.h"
@@ -78,6 +81,7 @@
 #include "str/stringLib.h"
 #include "strt/strtChatTypes.h"
 #include "teul/teulEndpoint.h"
+#include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
 #include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
@@ -115,16 +119,16 @@ extern void chatRegisterDotCommands();
 
 #if defined(DEV_BUILD)
 # define DEFAULT_SYS_MOTD		"MOTD: Internal Dev Cluster"
-#elif defined(CLOSED_BETA)
-# define DEFAULT_SYS_MOTD		"MOTD: WWII Online Closed Beta"
 #elif defined(BETA_RELEASE)
 # define DEFAULT_SYS_MOTD		"MOTD: WWII Online Beta Release"
 #elif defined(TEST_RELEASE)
 # define DEFAULT_SYS_MOTD		"MOTD: WWII Online BETA Release-Candidate"
 #elif defined(TRAINING_SERVER)
 # define DEFAULT_SYS_MOTD		"MOTD: Welcome to the Training Server"
-#else
+#elif defined(PUBLIC_RELEASE)
 # define DEFAULT_SYS_MOTD		"MOTD: Welcome to the Virtual Battlefield"
+#else
+# error No build type
 #endif
 
 #define DEFAULT_ALLIED_HC_MOTD	"MOTD: Welcome to the Allied High Command"
@@ -3481,7 +3485,7 @@ _runHost()
 	{
 		// Process network updates.
 		teulUpdateTransport(25);
-
+        
 		threadsCallNextCallback();
 
 		// Catch up on housekeeping.
@@ -3518,6 +3522,14 @@ UINT32 serverUpTimeMinutes()
 {
         UINT32 secs = teulTime() - serverStartTime;
         return secs / 60;
+}
+
+//////////////////////////////////////////////////////////////////////
+static void _v1APIHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response);
+
+static void _initializeHTTPEndpoints()
+{
+    Teul::uWeb::s_debugServer.addVirtualPrefix("V1 REST API", "/v1", _v1APIHandler);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -3570,11 +3582,6 @@ main(int argc, const char* argv[])
 	wwiiIRCRegisterCommand("wtf", _ircdotPassthru);
 
 	chatThreadsSetup();
-
-	// Initialize dbse callbacks
-	chatdbInstallClientCallbacks();
-	if ( !dbseInit() )
-		return FALSE;
 
 	// Connect to the database
 	chatInitDB();
@@ -3631,6 +3638,9 @@ main(int argc, const char* argv[])
 	ABORT_IF(managementListenInterface < 0);
 
 	dbugLog(_FLN, "Listening for management players on port %u", WWII::Net::Ports::ChatManagement);
+    
+    _initializeHTTPEndpoints();
+    dbugLog(_FLN, "Listening for management commands on HTTP microserver (port %u)", WWII::Net::Ports::DebugWebServer);
 
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
@@ -3674,7 +3684,7 @@ main(int argc, const char* argv[])
 		dbugLog(_FLA, "failed registering dot commands: %s", e.what());
 		exit(0);
 	}
-
+    
 	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
 
 	_runHost();
@@ -3687,3 +3697,611 @@ main(int argc, const char* argv[])
 
 	teulCloseTransport();
 }
+
+//////////////////////////////////////////////////////////////////////
+using namespace Teul::uWeb;
+
+using RESTAPIParams = nlohmann::json;
+using RESTAPIHandler = std::function<void(const HTTPRequest &, HTTPResponse &, const RESTAPIParams &)>;
+
+struct RESTAPIRoute {
+    std::vector<std::string> allowedMethods;
+    std::string parameterizedPath;
+    RESTAPIHandler handler;
+};
+
+using RESTAPIRouteList = std::vector<RESTAPIRoute>;
+
+// This struct is the absolute minimum we must know about a player to perform
+// operations on them, whether online or offline.
+struct PlayerControlMinimumData {
+    playerid_t playerID;
+    Player *realPlayerObject;
+    Chat::Name matchHandle;
+    uint32_t squadID;
+    RANK_NO squadRank;
+    
+    ChatHandle handle() const { return matchHandle.LowercaseHandle(); }
+    const char *callsign() const { return matchHandle.c_str(); }
+};
+
+static bool _lookupMinimalDataFromPlayerID(playerid_t playerID, PlayerControlMinimumData &result)
+{
+    Player *realPlayer = PlayerInterface::Lookup(playerID);
+    
+    if (realPlayer) {
+        result.playerID = playerID;
+        result.realPlayerObject = realPlayer;
+        result.matchHandle = realPlayer->matchHandle();
+        result.squadID = realPlayer->squadID();
+        result.squadRank = realPlayer->squadRank();
+    } else {
+        // We need to look up the player info manually
+        // Oops, prepared statements are too common sense and reasonable to be
+        // available to this API. Time for some trivial SQL injection vulns!
+        //DBQuery q(dbh, "SELECT playerid, callsign, squadid, squad_rank FROM wwii_player WHERE playerid=?");
+        DBQuery q(dbh, "SELECT playerid, callsign, squadid, squad_rank FROM wwii_player WHERE playerid=%u", playerID);
+        
+        if (!q.HasRows() || !q.FetchRow()) {
+            return false;
+        }
+        result.playerID = q.Row().NextUInt();
+        result.realPlayerObject = nullptr;
+        result.matchHandle = q.Row().NextString();
+        result.squadID = q.Row().NextUInt();
+        result.squadRank = q.Row().NextUInt();
+    }
+    return true;
+}
+
+#ifndef NDEBUG
+#define status_if(cond, stat, ...) do { \
+    if ((cond)) { \
+        return HTTPResponseBuilder(request) \
+            .status(stat, ## __VA_ARGS__) \
+            .header("Connection", "close") \
+            .content("<h1>" #stat " " __VA_ARGS__ "</h1>") \
+            .build(response); \
+    } \
+} while(0)
+#else
+#define status_if(cond, stat, ...) do { if ((cond)) { return HTTPResponseBuilder(request).status(stat).header("Connection", "close").build(response); } } while(0)
+#endif
+
+static inline playerid_t get_as_playerid(const nlohmann::json &value) {
+    if (value.is_string()) {
+        return std::stoull(value.get<std::string>());
+    } else if (value.is_number_integer()) {
+        return value;
+    } else {
+        throw std::domain_error("playerid only recognizes string and number");
+    }
+}
+
+static inline uint64_t get_as_squadid(const nlohmann::json &value) {
+    if (value.is_string()) {
+        return std::stoull(value.get<std::string>());
+    } else if (value.is_number_integer()) {
+        return value;
+    } else {
+        throw std::domain_error("squadid only recognizes string and number");
+    }
+}
+
+static void _playerControlAPIPromote(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    status_if(params.find("player_id") == params.end(), 500, "player id missing?");
+    status_if(params.find("requester_id") == params.end(), 422, "requester id required");
+    
+    playerid_t targetPlayerID = get_as_playerid(params.at("player_id"));
+    playerid_t originatorPlayerID = get_as_playerid(params.at("requester_id"));
+    PlayerControlMinimumData originator, target;
+    
+    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 422, "no originator data");
+    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 422, "no target data");
+    
+    SquadList *squadList = nullptr;
+    SquadMemberEntry *originatorSquadEntry = nullptr;
+    SquadMemberEntry *targetSquadEntry = nullptr;
+    RANK_NO newRank = target.squadRank + 1; // Might be meaningless if some of the following checks fail
+    
+    status_if(target.matchHandle == originator.matchHandle, 403, "Can't promote yourself"); // Promoting self
+    status_if(originator.squadID == 0, 403, "You're not in a squad"); // Originator not in any squad
+    status_if(originator.squadRank < Squad::STAFFER, 403, "You're not a staffer"); // Originator is not staffer or higher
+    status_if(target.squadID != originator.squadID, 403, "You're not in the same squad"); // Originator and target in different squads
+    if (!target.realPlayerObject && !originator.realPlayerObject) { chatdbSquadInfo(0, target.squadID, true); } // If both are offline, load their squad
+    status_if((squadList = chatFindSquadList(originator.squadID)) == nullptr, 403, "Missing squad list"); // The squad list couldn't be looked up
+    status_if((originatorSquadEntry = squadList->find(originator.matchHandle)) == nullptr, 403, "No originator squad entry"); // Originator not in squad???
+    status_if((targetSquadEntry = squadList->find(target.matchHandle)) == nullptr, 403, "Target not in squad"); // Target not in squad
+    status_if(targetSquadEntry->squadRank() > originator.squadRank, 403, "Target outranks you"); // Target outranks originator
+    status_if(newRank > Squad::CO || newRank > originator.squadRank, 403, "Can't go that high"); // New rank is too high
+    status_if(originator.squadRank <= Squad::CO && newRank > Squad::XO, 403, "Can't just make a CO"); // Only GM can promote to CO
+    status_if(newRank == Squad::CO && squadList->squad().coHandle() != 0, 403, "CO not available"); // CO position isn't open
+    status_if(newRank == Squad::CO && originatorSquadEntry->squadRank() == Squad::CO, 403, "CO not available"); // CO position REALLY isn't open...
+    
+    DBQuery q(dbh, "UPDATE wwii_player SET squad_rank=%u WHERE squadID=%u AND playerid=%u AND squad_rank=%u", newRank, target.squadID, target.playerID, target.squadRank);
+    status_if(!q.HasRows(), 500, "DB query 'sploded"); // something went horribly wrong!
+    
+    if (targetSquadEntry->squadRank() == Squad::CO || newRank == Squad::CO) { chatdbSquadInfo(0, target.squadID, false); } // Refresh whole squad if CO changed
+    if (targetSquadEntry->player()) { targetSquadEntry->player()->unrecruit(); }
+    squadList->updateMember(target.matchHandle, newRank, targetSquadEntry->player());
+    
+    LSTRING_ID promoteMessage = LSTR_NONE;
+    switch (newRank) {
+        case Squad::MEMBER:     promoteMessage = LSTR_PROMO_TO_MEMBER; break;
+        case Squad::STAFFER:    promoteMessage = LSTR_PROMO_TO_STAFFER; break;
+        case Squad::XO:         promoteMessage = LSTR_PROMO_TO_XO; break;
+        case Squad::CO:         promoteMessage = LSTR_PROMO_TO_CO; break;
+        default: break;
+    }
+    if (promoteMessage != LSTR_NONE) {
+        squadList->sendMessage(LSTR_SQUAD, promoteMessage, originator.callsign(), target.callsign());
+    }
+    if (targetSquadEntry->player()) { targetSquadEntry->player()->unrecruit(); } // why twice?
+    squadList->setUpdated();
+    DBThread::Do(DBThread::Default, "INSERT INTO wwii_squad_audit (squadID, action, occured, originator, target, newval, prev, coID, textmessage)"
+        " VALUES (%u, %u, NOW(), '%s', '%s', %u, %u, 0, '')",
+        squadList->squad().squadID(), SquadMemberUpdate::_PROMOTE, originator.callsign(), target.callsign(),
+        newRank, newRank - 1);
+    return HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squad_rank", newRank } }).dump())
+        .build(response);
+}
+
+static void _playerControlAPIDemote(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    status_if(params.find("player_id") == params.end(), 500, "player id missing?");
+    status_if(params.find("requester_id") == params.end(), 422, "requester id required");
+    
+    playerid_t targetPlayerID = get_as_playerid(params.at("player_id"));
+    playerid_t originatorPlayerID = get_as_playerid(params.at("requester_id"));
+    PlayerControlMinimumData originator, target;
+    
+    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 422, "no originator data");
+    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 422, "no target data");
+    
+    SquadList *squadList = nullptr;
+    SquadMemberEntry *originatorSquadEntry = nullptr;
+    SquadMemberEntry *targetSquadEntry = nullptr;
+    RANK_NO newRank = target.squadRank - 1; // Might be meaningless if some of the following checks fail
+    
+    status_if(target.matchHandle == originator.matchHandle, 403, "Can't promote yourself"); // Promoting self
+    status_if(originator.squadID == 0, 403, "You're not in a squad"); // Originator not in any squad
+    status_if(originator.squadRank < Squad::STAFFER, 403, "You're not a staffer"); // Originator is not staffer or higher
+    status_if(target.squadID != originator.squadID, 403, "You're not in the same squad"); // Originator and target in different squads
+    if (!target.realPlayerObject && !originator.realPlayerObject) { chatdbSquadInfo(0, target.squadID, true); } // If both are offline, load their squad
+    status_if((squadList = chatFindSquadList(originator.squadID)) == nullptr, 403, "Missing squad list"); // The squad list couldn't be looked up
+    status_if((originatorSquadEntry = squadList->find(originator.matchHandle)) == nullptr, 403, "No originator squad entry"); // Originator not in squad???
+    status_if((targetSquadEntry = squadList->find(target.matchHandle)) == nullptr, 403, "Target not in squad"); // Target not in squad
+    status_if(targetSquadEntry->squadRank() > originator.squadRank, 403, "Target outranks you"); // Target outranks originator
+    status_if(newRank < Squad::MEMBER || newRank >= Squad::CO, 403, "Can't go that low"); // New rank is too low
+    status_if(newRank == Squad::CO && squadList->squad().coHandle() != 0, 403, "CO not available"); // CO position isn't open
+    status_if(newRank == Squad::CO && originatorSquadEntry->squadRank() == Squad::CO, 403, "CO not available"); // CO position REALLY isn't open...
+    
+    DBQuery q(dbh, "UPDATE wwii_player SET squad_rank=%u WHERE squadID=%u AND playerid=%u AND squad_rank=%u", newRank, target.squadID, target.playerID, target.squadRank);
+    status_if(!q.HasRows(), 500, "DB query 'sploded"); // something went horribly wrong!
+    
+    if (targetSquadEntry->squadRank() == Squad::CO || newRank == Squad::CO) { chatdbSquadInfo(0, target.squadID, false); } // Refresh whole squad if CO changed
+    if (targetSquadEntry->player() && newRank < Squad::STAFFER) { targetSquadEntry->player()->stopRecruiting(); }
+    squadList->updateMember(target.matchHandle, newRank, targetSquadEntry->player());
+    
+    LSTRING_ID promoteMessage = LSTR_NONE;
+    switch (newRank) {
+        case Squad::MEMBER:     promoteMessage = LSTR_DEMO_TO_MEMBER; break;
+        case Squad::STAFFER:    promoteMessage = LSTR_DEMO_TO_STAFFER; break;
+        case Squad::XO:         promoteMessage = LSTR_DEMO_TO_XO; break;
+        default: break;
+    }
+    if (promoteMessage != LSTR_NONE) {
+        squadList->sendMessage(LSTR_SQUAD, promoteMessage, originator.callsign(), target.callsign());
+    }
+    if (targetSquadEntry->player()) { targetSquadEntry->player()->unrecruit(); } // why twice?
+    squadList->setUpdated();
+    DBThread::Do(DBThread::Default, "INSERT INTO wwii_squad_audit (squadID, action, occured, originator, target, newval, prev, coID, textmessage)"
+        " VALUES (%u, %u, NOW(), '%s', '%s', %u, %u, 0, '')",
+        squadList->squad().squadID(), SquadMemberUpdate::_DEMOTE, originator.callsign(), target.callsign(),
+        newRank, newRank + 1);
+    return HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squad_rank", newRank } }).dump())
+        .build(response);
+}
+
+static void _playerControlAPIRemove(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    status_if(params.find("player_id") == params.end(), 500, "player id missing?");
+    status_if(params.find("requester_id") == params.end(), 422, "requester id required");
+    
+    playerid_t targetPlayerID = get_as_playerid(params.at("player_id"));
+    playerid_t originatorPlayerID = get_as_playerid(params.at("requester_id"));
+    PlayerControlMinimumData originator, target;
+    
+    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 422, "no originator data");
+    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 422, "no target data");
+    
+	dbugLog(_FLI, "p:%u c:%s sq:%d attempting to remove %u[%s]", originator.playerID, originator.callsign(), originator.squadID, target.playerID, target.callsign());
+
+    SquadList *squadList = nullptr;
+    SquadMemberEntry *originatorSquadEntry = nullptr;
+    SquadMemberEntry *targetSquadEntry = nullptr;
+    
+    status_if(originator.squadID == 0, 403, "You're not in a squad"); // Originator not in any squad
+    status_if(originator.squadRank < Squad::STAFFER, 403, "You're not staffer or better"); // Originator is not staffer
+    status_if(target.squadID != originator.squadID, 403, "You're not in the same squad"); // Originator and target in different squads
+    if (!target.realPlayerObject && !originator.realPlayerObject) { chatdbSquadInfo(0, target.squadID, true); } // If both are offline, load their squad
+    status_if((squadList = chatFindSquadList(originator.squadID)) == nullptr, 403, "Missing squad list"); // The squad list couldn't be looked up
+    status_if((originatorSquadEntry = squadList->find(originator.matchHandle)) == nullptr, 403, "No originator squad entry"); // Originator not in squad???
+    status_if((targetSquadEntry = squadList->find(target.matchHandle)) == nullptr, 403, "Target not in squad"); // Target not in squad
+    status_if(targetSquadEntry->squadRank() > originator.squadRank, 403, "Target outranks you"); // Target outranks originator
+    
+    if (targetSquadEntry->player()) {
+        SquadControlResult(SQR_KICKED, SquadControl::_KICK, targetSquadEntry->player()->chatHandle()).send(targetSquadEntry->player()->teulIndex());
+        targetSquadEntry->player()->unrecruit();
+        targetSquadEntry->player()->stopRecruiting();
+    }
+    DBThread::Do(DBThread::Default,
+        "UPDATE wwii_player SET squadid=0, squad_rank=0, squad_joined=NOW(), squad_time_played=0 WHERE playerid=%u AND squadid=%u", target.playerID, target.squadID);
+    squadList->removeMember(target.matchHandle);
+    squadList->sendMessage(LSTR_SQUAD, LSTR_SQUAD_KICK, target.callsign(), originator.callsign());
+    
+    return HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squadid", 0 }, { "squad_rank", 0 } }).dump())
+        .build(response);
+}
+
+static void _playerControlAPIList(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    status_if(request.requestData.length() > 0, 400, "No request content expected in GET");
+    
+    const PLAYERID_HASH allPlayers = ServerInterface::GetOnlinePlayers();
+    nlohmann::json result;
+    uint64_t totalOnline = 0;
+    uint64_t numAxis = 0, numAxisSpawn = 0, numAllies = 0, numAlliesSpawn = 0;
+    uint64_t numGM = 0, numGMSpawn = 0, numGMBuzz = 0, numRats = 0, numRatsSpawn = 0, numRatBuzz = 0;
+    
+    // TODO: Move this part to another thread
+    result["players"] = nlohmann::json::array();
+    for (const std::pair<const playerid_t, PlayerStatusNode *> &psnp : allPlayers) {
+        playerid_t playerID = psnp.first;
+        const PlayerStatusNode *psn = psnp.second;
+        const Player *player = static_cast<const Player *>(psn->localInfo); // WHY!
+        nlohmann::json entry;
+        
+        if (!player || !player->isConnected()) { continue; }
+        entry["id"] = playerID;
+        entry["callsign"] = player->callsign();
+        entry["persona"] = player->noSide() ? "none" : (player->side() == ALLIED ? "allies" : (player->side() == AXIS ? "axis" : "INVALID"));
+        entry["spawned"] = player->isSpawned();
+        entry["isGM"] = player->isEffectiveGM() && !player->isPlaynet();
+        entry["isPlaynet"] = player->isPlaynet();
+        if (player->isEffectiveGM() ||  player->isPlaynet()) {
+            entry["usingBuzzard"] = player->isBuzzard();
+        }
+        result["players"].push_back(entry);
+        ++totalOnline;
+        numAxis += player->side() == AXIS;
+        numAxisSpawn += (player->side() == AXIS && player->isSpawned());
+        numAllies += player->side() == ALLIED;
+        numAlliesSpawn += (player->side() == ALLIED && player->isSpawned());
+        numGM += player->isEffectiveGM() && !player->isPlaynet();
+        numGMSpawn += (player->isEffectiveGM() && !player->isPlaynet() && player->isSpawned());
+        numGMBuzz += (player->isEffectiveGM() && !player->isPlaynet() && player->isBuzzard());
+        numRats += player->isPlaynet();
+        numRatsSpawn += (player->isPlaynet() && player->isSpawned());
+        numRatBuzz += (player->isPlaynet() && player->isBuzzard());
+    }
+    result["numOnline"] = totalOnline;
+    result["numAxisOnline"] = numAxis;
+    result["numAxisSpawned"] = numAxisSpawn;
+    result["numAlliesOnline"] = numAllies;
+    result["numAlliesSpawned"] = numAlliesSpawn;
+    result["numGMOnline"] = numGM;
+    result["numGMSpawned"] = numGMSpawn;
+    result["numGMBuzzards"] = numGMBuzz;
+    result["numPlaynetOnline"] = numRats;
+    result["numPlaynetSpawned"] = numRatsSpawn;
+    result["numPlaynetBuzzards"] = numRatBuzz;
+    return HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(result.dump())
+        .build(response);
+}
+
+static void _squadControlAPIPlayersInternal(const HTTPRequest &request, HTTPResponse &response, uint64_t squad_id, bool onlineOnly)
+{
+    SquadList *squad = chatFindSquadList(squad_id);
+    
+    if (!squad) {
+        // Not already in memory, load it, with immediate member list retrieval
+        chatdbSquadInfo(0, squad_id, true);
+        squad = chatFindSquadList(squad_id);
+    }
+    status_if(!squad, 404, "No such squad"); // Still nothing? No such squad, then.
+    
+    nlohmann::json result = nlohmann::json::array();
+
+    for (auto &kv : squad->members()) {
+        const SquadMemberEntry &player = kv.second;
+        
+        if (onlineOnly && player.player() == nullptr) {
+            continue;
+        }
+        
+        nlohmann::json entry = nlohmann::json::object();
+        
+        entry["callsign"] = Chat::Name(player.handle()).c_str();
+        entry["rank"] = player.squadRank();
+        result.push_back(entry);
+    }
+    return HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(result.dump())
+        .build(response);
+}
+
+static void _squadControlAPIPlayers(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    return _squadControlAPIPlayersInternal(request, response, get_as_squadid(params.at("squad_id")), false);
+}
+
+static void _squadControlAPIPlayersOnline(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    return _squadControlAPIPlayersInternal(request, response, get_as_squadid(params.at("squad_id")), true);
+}
+
+static inline std::string _trim(const std::string &text)
+{
+    std::string result = text;
+    std::string::size_type locstart = text.find_first_not_of(" \t\v\n\r");
+    
+    if (locstart == std::string::npos) {
+        result = "";
+    } else {
+        result = result.substr(locstart);
+    }
+    return result.substr(0, result.find_last_not_of(" \t\v\n\r")); // npos == entire string
+}
+
+static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    status_if(params.find("requester_id") == params.end(), 422, "requester ID is required");
+
+    playerid_t requester_id = get_as_playerid(params.at("requester_id"));
+    uint64_t squad_id = get_as_squadid(params.at("squad_id"));
+    SquadList *squad = chatFindSquadList(squad_id);
+    PlayerControlMinimumData requester;
+    SquadMemberEntry *requesterMember = nullptr;
+    
+    if (!squad) {
+        // Not already in memory, load it, with immediate member list retrieval
+        chatdbSquadInfo(0, squad_id, true);
+        squad = chatFindSquadList(squad_id);
+    }
+    status_if(!squad, 404, "No such squad"); // Still nothing? No such squad, then.
+    status_if(!_lookupMinimalDataFromPlayerID(requester_id, requester), 422, "no requester data");
+    status_if((requesterMember = squad->find(requester.handle())) == nullptr, 403, "requester not member of squad");
+    status_if(requesterMember->squadRank() < Squad::STAFFER, 403, "requester must be staffer or higher");
+    
+    std::vector<std::function<void()>> operations;
+    
+    if (params.find("name") != params.end()) {
+        std::string name = params.at("name");
+        std::string trimmedName = _trim(name);
+        
+        status_if(trimmedName.length() < 4, 422, "requested squad name too short (4)");
+        status_if(trimmedName.length() > Squad::NAME_LENGTH, 422, "requested squad name too long (40)");
+        operations.push_back([trimmedName, &squad] () mutable {
+            squad->setFullName(trimmedName);
+            DBThread::EscapeString(trimmedName); // Eww eww eww eww eww eww
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET name='%s' WHERE squadid=%u", trimmedName.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("description") != params.end()) {
+        std::string desc = params.at("description");
+        
+        status_if(desc.length() < 3, 422, "requested squad description too short (3)");
+        status_if(desc.length() > Squad::DESCRIPTION_LENGTH, 422, "requested squad description too long (255)");
+        operations.push_back([desc, &squad] () mutable {
+            squad->setDescription(desc);
+            DBThread::EscapeString(desc);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET description='%s' WHERE squadid=%u", desc.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("homepage") != params.end()) {
+        std::string homepage = params.at("homepage");
+        
+        status_if(homepage.length() > Squad::HOMEPAGE_LENGTH, 422, "requested squad homepage too long");
+        operations.push_back([homepage, &squad] () mutable {
+            squad->setHomepage(homepage);
+            DBThread::EscapeString(homepage);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET homepage='%s' WHERE squadid=%u", homepage.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("motd") != params.end()) {
+        std::string motd = params.at("motd");
+        
+        status_if(motd.length() > Squad::MOTD_LENGTH, 422, "requested MOTD too long");
+        operations.push_back([motd, &squad] () mutable {
+            squad->setMOTD(motd);
+            DBThread::EscapeString(motd);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET motd='%s' WHERE squadid=%u", motd.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("slogan") != params.end()) {
+        std::string slogan = params.at("slogan");
+        std::string trimmedSlogan = _trim(slogan);
+        
+        status_if(trimmedSlogan.length() > 0 && trimmedSlogan.length() < 16, 422, "requested squad slogan too short (16)");
+        status_if(trimmedSlogan.length() > Squad::SLOGAN_LENGTH, 422, "requested squad slogan too long");
+        operations.push_back([trimmedSlogan, &squad] () mutable {
+            squad->setSlogan(trimmedSlogan);
+            DBThread::EscapeString(trimmedSlogan);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET slogan='%s' WHERE squadid=%u", trimmedSlogan.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("squad_night") != params.end()) {
+        nlohmann::json night = params.at("squad_night");
+        
+        status_if(night.find("hour") == night.end(), 422, "night must have hour");
+        status_if(night.find("day") == night.end(), 422, "night must have day");
+        status_if(night.find("timezone") == night.end(), 422, "night must have timezone");
+        
+        uint32_t hour = night.at("hour");
+        uint32_t day = night.at("day");
+        std::string ntimezone = night.at("timezone");
+        
+        status_if(hour > 23, 422, "hour is out of range");
+        status_if(day > 6, 422, "day is out of range");
+        status_if(ntimezone.length() != 6 || (ntimezone[0] != '+' && ntimezone[0] != '-') || ntimezone[3] != ':', 422, "timezone is badly formatted");
+        status_if(!isdigit(ntimezone[1]) || !isdigit(ntimezone[2]) || !isdigit(ntimezone[4]) || !isdigit(ntimezone[5]), 422, "timezone is badly formatted");
+        int64_t adjustedTimezone = std::stoll(ntimezone.substr(0, 3));
+        status_if(adjustedTimezone < -23 || adjustedTimezone > 24, 422, "adjusted timezone is out of range (-23..23)");
+        
+        std::string formattedNight = std::to_string(day) + "," + std::to_string(hour) + "," + std::to_string(adjustedTimezone);
+
+        operations.push_back([formattedNight, &squad] () mutable {
+            squad->setSquadNight(formattedNight);
+            DBThread::EscapeString(formattedNight); // I mean seriously.
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET squad_night='%s' WHERE squadid=%u", formattedNight.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("language") != params.end()) {
+        uint64_t language = params.at("language");
+
+        status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set language");
+        status_if(language > 5, 422, "requested language is invalid");
+        operations.push_back([language, &squad] {
+            squad->setLanguage(language);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET pri_language=%llu WHERE squadid=%u", language, squad->squad().squadID());
+        });
+    }
+    if (params.find("recruiting") != params.end()) {
+        bool recruiting = params.at("recruiting");
+        
+        operations.push_back([recruiting, &squad, &requesterMember] {
+            squad->setRecruiting(recruiting, requesterMember->player());
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET recruiting=%u WHERE squadid=%u", recruiting ? 1 : 0, squad->squad().squadID());
+        });
+    }
+    if (params.find("voting") != params.end()) {
+        bool voting = params.at("voting");
+        
+        status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set voting flag");
+        operations.push_back([voting, &squad, &requesterMember] {
+            squad->setRecruiting(voting, requesterMember->player());
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting=%u WHERE squadid=%u", voting ? 1 : 0, squad->squad().squadID());
+        });
+    }
+    
+    status_if(operations.size() < 1, 422, "No changes requested");
+    for (const std::function<void()> &op : operations) {
+        op();
+    }
+    if (requesterMember->player()) {
+        requesterMember->player()->sendSquadInfo();
+    }
+    
+    nlohmann::json results = params;
+    
+    results.erase("requester_id");
+    results.erase("squad_id");
+    return HTTPResponseBuilder()
+        .status(200)
+        .JSON(results.dump())
+        .build(response);
+}
+
+static std::vector<std::string> _getURLPathComponents(const std::string &requestPath)
+{
+    return split_string(requestPath.substr(0, requestPath.find_first_of("?#")), "/"); // substr(0,npos) == whole string
+}
+
+static void _v1APIHandler_unlocked(const HTTPRequest &request, HTTPResponse &response)
+{
+    std::vector<std::string> components = _getURLPathComponents(request.path);
+    
+    // Verify API path
+    status_if(components.size() < 3, 400, "Not enough path components (3)");
+    status_if(components[0] != "", 400, "How did you get here with no /?");
+    status_if(components[1] != "v1", 400, "How did you get here with no version?");
+    
+    // Basic RESTful routing (not very smart yet)
+    static const RESTAPIRouteList routes = {
+        { { "PATCH" }, "/player/{player_id}/squad/promote", _playerControlAPIPromote },
+        { { "PATCH" }, "/player/{player_id}/squad/demote", _playerControlAPIDemote },
+        { { "PATCH" }, "/player/{player_id}/squad/remove", _playerControlAPIRemove },
+        { { "GET"   }, "/player/online", _playerControlAPIList },
+        { { "GET"   }, "/player/list", _playerControlAPIList }, // legacy alias
+        { { "GET"   }, "/squad/{squad_id}/player", _squadControlAPIPlayers },
+        { { "GET"   }, "/squad/{squad_id}/player/online", _squadControlAPIPlayersOnline },
+        { { "PATCH" }, "/squad/{squad_id}", _squadControlAPIPatch },
+    };
+    
+    RESTAPIRoute bestMatchingRoute;
+    size_t bestMatchingRouteScore = 0;
+    RESTAPIParams bestMatchingRouteParams;
+
+    for (const RESTAPIRoute &route : routes) {
+        std::vector<std::string> routeComponents = split_string(route.parameterizedPath, "/");
+        bool routeMatch = true;
+        size_t routeScore = 0;
+        RESTAPIParams routeParams = nlohmann::json::object();
+        
+        if (std::find(route.allowedMethods.begin(), route.allowedMethods.end(), request.method) == route.allowedMethods.end()) { continue; }
+        if (routeComponents.size() != components.size() - 1) { continue; }
+        status_if(routeComponents.size() < 2 || routeComponents[0] != "", 500, "Bad route in route table");
+        for (size_t i = 1; i < routeComponents.size(); ++i) {
+            const std::string &component = routeComponents[i];
+            
+            if (component.length() > 2 && component.front() == '{' && component.back() == '}') {
+                routeParams[component.substr(1, component.length() - 2)] = components[i + 1];
+            } else if (component != components[i + 1]) {
+                routeMatch = false;
+                break;
+            } else {
+                ++routeScore; // Route gets 1 point for every matching, non-parameterized path component
+            }
+        }
+        if (routeMatch && routeScore > bestMatchingRouteScore) {
+            bestMatchingRoute = route;
+            bestMatchingRouteScore = routeScore;
+            bestMatchingRouteParams = routeParams;
+        }
+    }
+    status_if(bestMatchingRouteScore == 0, 404, "No matching routes"); // A matching route must always have at least one non-parameterized path component
+    status_if(!bestMatchingRoute.handler, 501, "Unimplemented route");
+    
+    status_if(request.requestData.size() > 0 &&
+              (request.headers.find("content-type") == request.headers.end() ||
+              request.headers.at("content-type") != "application/json"), 400, "Request data must be JSON");
+    
+    nlohmann::json requestParams = nlohmann::json::object();
+    if (request.requestData.size() > 0) {
+        try {
+            requestParams = nlohmann::json::parse(request.requestData);
+        } catch (std::invalid_argument &e) {
+            status_if(true, 400, "Bad JSON");
+        }
+    }
+    status_if(!requestParams.is_object(), 400, "Request JSON must be object");
+    
+    for (nlohmann::json::iterator it = bestMatchingRouteParams.begin(); it != bestMatchingRouteParams.end(); ++it) {
+        status_if(requestParams.find(it.key()) != requestParams.end(), 400, "Request JSON can't have a parameter matching a name in the route parameters");
+        // Technically this is more of an ABORT_IF, but what the hey.
+        requestParams[it.key()] = it.value();
+    }
+    
+    try {
+        return bestMatchingRoute.handler(request, response, requestParams);
+    } catch (std::domain_error &) {
+        status_if(true, 400, "JSON contained invalid type");
+    }
+}
+
+static void _v1APIHandler(const HTTPRequest &request, HTTPResponse &response)
+{
+    threadCallbackSync<void>([&] { _v1APIHandler_unlocked(request, response); });
+}
+#undef status_if

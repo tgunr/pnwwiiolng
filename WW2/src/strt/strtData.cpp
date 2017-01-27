@@ -14,7 +14,7 @@
 
 #include "map/mapConstants.h"
 #include "parse/parseWor.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "strt/strtCP.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtData.h"
@@ -35,11 +35,7 @@
 #include "teul/teulTime.h"
 #include "weap/weapSpawnXML.h"
 #include "wwii/wwiiConfig.h"
-#include "wwii/wwiiConfigVars.h"
 #include "fio/fiod.h"                                           // for fiodGetPrepath()
-
-extern ConfigBool cv_stratIgnoreErrors;
-extern ConfigPath cv_blitzworPath;
 
 static SpawnLoader spawnLoader;
 

@@ -16,7 +16,7 @@
 #include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
 #include "teul/teulConfigVar.h"
-#include "wwii/wwiidbConfigVars.h"
+#include "include/configVars.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiThreadTypes.h"
@@ -229,14 +229,18 @@ threadsCallNextCallback()
 
 	for ( auto& it : callbackQueue )
 	{
+#ifdef NDEBUG
 		try
+#endif
 		{
 			it->first(it->second);
 		}
+#ifdef NDEBUG
 		catch ( std::exception& e )
 		{
 			dbugLog(_FLA, "UNHANDLED EXCEPTION THROWN BY THREAD CALLBACK: %s", e.what());
 		}
+#endif
 		delete it;
 	}
 

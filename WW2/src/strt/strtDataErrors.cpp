@@ -11,7 +11,7 @@
 
 //#include "map/mapConstants.h"
 #include "parse/parseWor.h"
-//#include "sdm/sdmConfigVars.h"
+//#include "include/configVars.h"
 //#include "strt/strtCP.h"
 //#include "strt/strtCPStruct.h"
 //#include "strt/strtData.h"

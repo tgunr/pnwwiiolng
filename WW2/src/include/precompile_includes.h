@@ -20,14 +20,13 @@
 #include <cstring>
 #include <ctime>
 #include <limits>
-
 #include <list>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
-
+#include <numeric>
 #include <thread>
 #include <mutex>
 
