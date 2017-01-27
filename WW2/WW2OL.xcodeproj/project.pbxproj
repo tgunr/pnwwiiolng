@@ -3483,6 +3483,8 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/src/build_info.cpp.in",
+				"$(SRCROOT)/src/build_info.py",
 			);
 			name = "Run Script";
 			outputPaths = (

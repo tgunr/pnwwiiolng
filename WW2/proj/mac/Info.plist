@@ -22,10 +22,6 @@
 	<string>pn12</string>
 	<key>CFBundleVersion</key>
 	<string></string>
-	<key>GitShaHash</key>
-	<string></string>
-	<key>GitState</key>
-	<string></string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.simulation-games</string>
 	<key>LSMinimumSystemVersion</key>

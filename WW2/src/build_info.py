@@ -22,6 +22,7 @@ def main():
         raise Exception("Usage: %s <build type> <output path>" % sys.argv[0])
     
     repo_path = os.path.realpath(os.path.dirname(os.path.dirname(sys.path[0])))
+    data_repo_path = os.path.realpath(os.path.join(repo_path, "opt", "ww2mods"))
     build_type = sys.argv[1]
     output_directory = os.path.realpath(sys.argv[2])
     host_platform = "Mac" if sys.platform == 'darwin' else ("PC" if sys.platform == 'win32' else "Linux")
@@ -29,10 +30,8 @@ def main():
     if build_type != 'client' and build_type != 'host':
         raise Exception("Build type must be 'client' or 'host'")
     
-    git_command = "git -c color.ui=never -C %s" % repo_path
-    git_commit = get_command_output("%s rev-parse HEAD" % git_command)
-    git_commitish = get_command_output("%s rev-parse --short HEAD" % git_command)
-    git_state = "clean" if len(get_command_output("%s status --porcelain" % git_command)) == 0 else "dirty"
+    code_repo_info = git_repo_info(repo_path)
+    data_repo_info = git_repo_info(data_repo_path)
     version_values = get_version_values(os.path.realpath(os.path.join(repo_path, version_info_file)))
     
     replacements = {
@@ -51,9 +50,12 @@ def main():
         'PRODUCT_VERSION_VALUE_PATCH':  version_values['patch'],
         'PRODUCT_VERSION_VALUE_BUILD':  version_values['build'],
         'PRODUCT_VERSION_VALUE':        version_values['value'],
-        'GIT_COMMIT':                   git_commit,
-        'GIT_COMMITISH':                git_commitish,
-        'GIT_STATE':                    git_state,
+        'GIT_CODE_COMMIT':              code_repo_info['commit'],
+        'GIT_CODE_COMMITISH':           code_repo_info['commitish'],
+        'GIT_CODE_STATE':               code_repo_info['state'],
+        'GIT_DATA_COMMIT':              data_repo_info['commit'],
+        'GIT_DATA_COMMITISH':           data_repo_info['commitish'],
+        'GIT_DATA_STATE':               data_repo_info['state'],
     }
     
     configure_file(os.path.join(repo_path, revision_file_in), os.path.join(output_directory, revision_file_out), replacements)
@@ -78,6 +80,15 @@ def get_command_output(cmd):
     else:
         return str(rawdata, sys.stdout.encoding).strip('\n')
 
+### Pull state information for a given Git repository
+def git_repo_info(repo_path):
+    git_command = "git -c color.ui=never -C %s" % repo_path
+    return {
+        'commit': get_command_output("%s rev-parse HEAD" % git_command),
+        'commitish': get_command_output("%s rev-parse --short HEAD" % git_command),
+        'state': "clean" if len(get_command_output("%s status --porcelain" % git_command)) == 0 else "dirty",
+    }
+
 ### Perform replacement substitutions on a file atomically
 def configure_file(src, dst, substitutions):
     with tempfile.NamedTemporaryFile(mode='wt', delete=False) as ftmp:
@@ -98,8 +109,8 @@ def update_mac_infoplist(substitutions):
         "Info.plist"
     )
     plist_subs = {
-        'GitShaHash': substitutions['GIT_COMMITISH'], 'GitState': substitutions['GIT_STATE'],
-        'CFBundleShortVersionString': substitutions['PRODUCT_VERSION'], 'CFBundleVersion': substitutions['GIT_COMMITISH']
+        'CFBundleShortVersionString': substitutions['PRODUCT_VERSION'],
+        'CFBundleVersion': "%s%s" % (substitutions['GIT_CODE_COMMITISH'], substitutions['GIT_DATA_COMMITISH']),
     }
     for pkey, pval in plist_subs.items():
         get_command_output('plutil -replace "%s" -string "%s" "%s"' % (pkey, pval, infoplist_path))
