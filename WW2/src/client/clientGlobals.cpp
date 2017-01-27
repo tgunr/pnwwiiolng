@@ -285,6 +285,8 @@ FLOAT32			aimMouse;	// Aiming mouse sensitivity
 SINT8            gAuthServer[128]; // Authentication server to be used
 SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 SINT8            gClientV[32]; // Version to submit
+UINT32           gLogMask = LOG_ALL;
+SINT32           gLogLevel = LOG_INFO;
 
 #ifdef DEBUG_WW2
 LOGICAL          DebugBuildingMDLFilesOnly = false;

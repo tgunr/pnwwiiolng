@@ -134,8 +134,8 @@ int sysmainInitApp()
     b3DSoundEnable = 1; // always want 3D enabled with OpenAL
 	//g_bRadialClutter = FALSE; // screwed on the mac at the moment
 
-	Enable_Log(LOG_ALL, WantedUserLogEnabled);
-	Set_Log_Level(LOG_INFO);
+	Enable_Log(gLogMask, WantedUserLogEnabled);
+	Set_Log_Level(gLogLevel);
 
 #if USE_OSG
 	ddpSetD3DRender(osgGameUpdate);
