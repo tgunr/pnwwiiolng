@@ -27,7 +27,7 @@
 #include "miss/mission.h"
 #include "miss/missHitArrayNode.h"
 #include "mm/mmQueries.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverServerInfo.h"
 #include "str/stringLib.h"
 #include "strt/strtCPStruct.h"
@@ -189,8 +189,8 @@ _connectGameDB()
 			"  `clientVersion` char(16) NOT NULL default '0.0.0.0',"
 			"  `platform` int(11) unsigned default NULL,"
 			"  `rxTime` timestamp NOT NULL,"
-			"  `hostTime` timestamp NOT NULL,"
-			"  `clientTime` timestamp NOT NULL,"
+			"  `hostTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+			"  `clientTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 			"  `archiveCorrupt` tinyint(3) unsigned default '0',"
 			"  `piExitLine` int(11) unsigned default '0',"
 			"  `piExitFile` char(64) default '',"
@@ -1030,7 +1030,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 			}
 			else
 			{
-				betaLog(_FLI, "t:%d p:%u c:%s pers:[%d/%d:%d] locked %d"
+				dbugLog(_FLI, "t:%d p:%u c:%s pers:[%d/%d:%d] locked %d"
 								, player->teulIndex(), player->playerID(), player->callsign()
 								, ps.m_countryID, ps.m_branchID, ps.m_personaID
 								, ps.m_lockedThru);

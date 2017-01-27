@@ -148,7 +148,7 @@ void chatPlayerDeactivate(Player* player)
 
 	if ( isValidSide(player->side()) )
 	{
-		betaLog(_FLI, "removing %p from %d side lists", player, player->side());
+		dbugLog(_FLI, "removing %p from %d side lists", player, player->side());
 		sidePlayers[player->side()].erase(player);
 	}
 

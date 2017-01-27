@@ -21,7 +21,7 @@
 #endif
 
 #include "include/io_mapped_file.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 
 // Instead of importing pi.h and its baggage
 struct piVECTOR

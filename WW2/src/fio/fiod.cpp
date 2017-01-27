@@ -40,7 +40,7 @@
 #endif
 
 #if platBuild == BUILD_SERVER
-#include "wwii/wwiiConfigVars.h"
+#include "include/configVars.h"
 # define DataPath cv_dataDir.GetString()
 #endif
 
@@ -210,7 +210,7 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 		return -1;
 	}
 
-	dbugLog(_FLD, "file size found to be %ld", statBuffer.st_size);
+	dbugLog(_FLD, "file size found to be %" PRSsizeT, statBuffer.st_size);
 	return statBuffer.st_size; // Return what the OS thinks it is
 }
 
@@ -403,7 +403,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 
 	if ( fileSize < 0 )
 	{
-		dbugLog(_FLD, "Could not open file with file size %ld", fileSize);
+		dbugLog(_FLD, "Could not open file with file size %" PRSsizeT, fileSize);
 		return - 1;
 	}
 
@@ -461,7 +461,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		assert( s_fileMap.find(fd) == s_fileMap.end() );
 
 		// Try to read the file contents into the allocation
-		dbugLog(_FLD, "About to read %ld bytes from file", fileSize);
+		dbugLog(_FLD, "About to read %" PRSsizeT " bytes from file", fileSize);
 		off_t bytesRead = OS_READ(fd, mem, fileSize);
 		if ( bytesRead < fileSize )
 			throw "read failed/truncated";

@@ -14,13 +14,12 @@
 #include <sys/stat.h>
 #include "include/defs.h"
 #include "teul/teulTime.h"
+#include "include/configVars.h"
 #include <locale.h>
 #include <mutex>
 
 #if platBuild == BUILD_SERVER
 #include "wwii/wwiiThreads.h"
-#include "teul/teulConfigVar.h"
-extern ConfigPath cv_defaultLogPath;
 static const char _OPEN_MSG[] = "Playnet Server Log File.";
 static const char _CLOSE_MSG[] = "\nPlayer Server Log File Closed.\n";
 #else
@@ -218,7 +217,7 @@ _dbugOut(bool logToConsole
 	if ( logMode != LogMode::TO_FILE || _logger.m_dbugfile < 0 )
 		return;
 
-	size_t retval = OS_WRITE(_logger.m_dbugfile, outString, (unsigned long)length);
+	/*size_t retval = */OS_WRITE(_logger.m_dbugfile, outString, (unsigned long)length);
 	///TODO: handle negative retval???
 	if ( _logger.m_dbugfile == _stdErrFileNo )
 		return;
@@ -579,12 +578,17 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 
 	//scope
 	{
-		std::lock_guard<std::mutex> lock(s_dbugOutputMutex);
-		// re-check: could have changed while we got the lock
-		if ( logToConsole || _logger.m_dbugfile >= 0 ) {
-			_dbugOut(logToConsole, _logger.m_logMode, prefix, pfxLen, false);
-			_dbugOut(logToConsole, _logger.m_logMode, _logger.text(), len, true);
-		}
+        try {
+            std::lock_guard<std::mutex> lock(s_dbugOutputMutex);
+            // re-check: could have changed while we got the lock
+            if ( logToConsole || _logger.m_dbugfile >= 0 ) {
+                _dbugOut(logToConsole, _logger.m_logMode, prefix, pfxLen, false);
+                _dbugOut(logToConsole, _logger.m_logMode, _logger.text(), len, true);
+            }
+        } catch (std::system_error &e) {
+            // This probably means we tried to grab the mutex during exit(),
+            // when it's not valid anymore. Silently ignore.
+        }
 	}
 
 	if ( PN_UNLIKELY(error == Debug::ERR_FATAL) ) {

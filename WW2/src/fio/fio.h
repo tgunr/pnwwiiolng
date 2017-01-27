@@ -80,3 +80,67 @@ extern void fioWritef(int fd, const FLOAT32* fp, int numfloats);
 extern void fioWrited(int fd, const FLOAT64* dp, int numdoubles);
 
 extern void fioXmlRegisterInputCallbacks();
+
+// RAII helper for file descriptors. Gadget is tired of not having this available.
+namespace Fio {
+
+struct FD
+{
+    // Construct
+	constexpr FD() {}
+	FD(int fd) : m_fd(fd) {}
+    FD(const char *filename, int openflag, int permissionflag) { _open(filename, openflag, permissionflag); }
+#if platOS == OS_WIN32
+	FD(const wchar_t *filename, int openflag, int shareflag, int permissionflag) { _wsopen_s(filename, openflag, shareflag, permissionflag); }
+#endif
+
+    // Destruct
+    ~FD() {
+        if (m_fd != -1) {
+            OS_CLOSE(m_fd);
+        }
+    }
+    
+    // Reopen
+    FD &_open(const char *filename, int openflag, int permissionflag) {
+        if (m_fd != -1) {
+            OS_CLOSE(m_fd);
+        }
+        OS_OPEN(&m_fd, filename, openflag, permissionflag);
+        return *this;
+    }
+
+#if platOS == OS_WIN32
+	FD &_wsopen_s(const wchar_t *filename, int openflag, int shareflag, int permissionflag) {
+		if (m_fd != -1) {
+            OS_CLOSE(m_fd);
+        }
+		::_wsopen_s(&m_fd, filename, openflag, shareflag, permissionflag);
+		return *this;
+	}
+#endif
+    
+    // Take ownership
+    FD &assign(int fd) {
+        if (m_fd != -1) {
+            OS_CLOSE(m_fd);
+        }
+        m_fd = fd;
+        return *this;
+    }
+
+    // Extraction
+	operator int() const { return m_fd; }
+	explicit operator bool() const { return m_fd != -1; }
+
+    private:
+        int m_fd = -1;
+
+        // No copy/assign
+        FD(const FD &) = delete;
+        FD(FD &&) = delete;
+        FD &operator=(const FD &) = delete;
+        FD &operator=(FD &&) = delete;
+};
+
+}

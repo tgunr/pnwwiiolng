@@ -27,6 +27,7 @@
 #include "auth/authGame.h"
 #include "auth/authPlaygateTypes.h"
 #include "auth/authDatabaseSchemas.h"
+#include "include/configVars.h"
 
 #define MAX_APPIDS	256
 
@@ -86,12 +87,6 @@ static const char QRY_SELECT_HOST_VERSIONS_BY_APPHOST[] =
 #define AUTH_VAR_LAST_OTP "last_otp"
 static const char QRY_GET_LAST_OTP[] =
 	"SELECT value FROM auth_variables WHERE name = '" AUTH_VAR_LAST_OTP "'";
-
-extern ConfigAddr cv_authdbAddress;
-extern ConfigStr cv_authdbPort;
-extern ConfigStr cv_authdbPassword;
-extern ConfigStr cv_authdbSchema;
-extern ConfigStr cv_authdbUser;
 
 static struct conf_struct config;
 
@@ -496,7 +491,7 @@ static bool _initAppInfoTable(GAME& gameEntry)
 		{
 			auto& row = q.Row();
 			size_t platform = row.NextUInt();
-			if ( platform < 0 || platform >= OS_MAX_PLAT )
+			if ( platform >= OS_MAX_PLAT )
 				throw std::logic_error("illegal platform value in app_host_versions");
 
 			teulGetHost(row.NextString(), &gameEntry.appInfo[platform].min);

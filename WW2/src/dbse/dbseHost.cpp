@@ -19,7 +19,7 @@
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiThreads.h"
 
-#if defined(DEV_BUILD)
+#ifndef NDEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
@@ -55,7 +55,7 @@ static const char* g_serverName = "dbd";
 int main(int argc, const char* argv[])
 {
 	Server::InitializeProcess(g_serverName, DBD_HOST, _errorFunction, nullptr, argc, argv, {});
-	dbugSetWriteLevel(Debug::ERR_INFO | DEF_ERR_FLAGS);
+	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
 	dbugLog(_FLI,"Database Proxy Host starting. Compiled %s at %s", __DATE__, __TIME__);

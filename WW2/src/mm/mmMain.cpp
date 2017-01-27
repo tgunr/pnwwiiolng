@@ -25,6 +25,7 @@
 #include "chat/chatTypes.h"
 #include "comm/commTypes.h"
 #include "include/arenaLockEnums.h"
+#include "include/configVars.h"
 #include "include/wthrTime.h"
 #include "inst/instHostMessages.h"
 #include "inst/instTypes.h"
@@ -46,7 +47,7 @@
 #include "mm/mmHostMessages.h"
 #include "mm/mmMain.h"
 #include "mm/mmPolls.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverFlagsEnum.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
@@ -145,8 +146,6 @@ extern SINT32 mapCreatePlayer(SINT32 teulIndex, PlayerStatusNode* psn, const Ser
 extern SINT32 mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType releaseType);
 extern SINT32 mapPlayerExitCluster(PlayerStatusNode& psn);
 extern void teulCloseAllEndpoints(const SINT32 errorCode);
-
-extern ConfigUint cv_appID;
 
 void
 mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsign)

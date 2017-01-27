@@ -586,17 +586,17 @@ extern NSString *WebActionOriginalURLKey;
     cfgPrefsLoad();
     
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
+    // By the way, the only way to check that is the ticket file itself since that
+    // won't have been parsed yet at this point.
     // Or, if we're only here to build MDLs.
-    if(GameServerIP[0]
+    // This is only allowed in debug.
 #ifdef DEBUG_WW2
-        || DebugBuildingMDLFilesOnly
-#endif
-    )
-    {
+    if(DebugBuildingMDLFilesOnly || TicketFile[0]) {
         state = WAIT_APPLE_EVT;
         [self launchOffline:self];
         return;
     }
+#endif
     
     //  g_buildTerrain = 1;
     

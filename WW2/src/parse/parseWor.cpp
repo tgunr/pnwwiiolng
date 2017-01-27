@@ -27,9 +27,8 @@
 	#include "fio/fioDefs.h"
 	#include "fio/fiod.h"
 	#include "str/stringLib.h"
-	#include "wwii/wwiiConfigVars.h"
+    #include "include/configVars.h"
 
-extern ConfigPath cv_thblitzPath;
 #else
 	#include "fio/fio.h"
 #endif

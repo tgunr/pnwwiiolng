@@ -908,15 +908,11 @@ HostVehicle::checkCapture()
 	switch ( fac.m_captureStage )
 	{
 	case FacilityStruct::_CAP_DISABLED:
-#ifdef CLOSED_BETA
 //		player->message(LSTR_BETA, LSTR_GENERIC, "Facility is not currently capturable");
-#endif
 	break;
 
 	case FacilityStruct::_CAP_PENDING:
-#ifdef BETA_RELEASE
 //		player->messagef(LSTR_BETA, LSTR_GENERIC, "Facility is not capturable for another %u seconds", fac.getCaptureRemaining());
-#endif
 		if ( m_inBuildingObject->facility->getCaptureRemaining() > 0 )
 		{
 			CaptureState capState;
@@ -927,18 +923,14 @@ HostVehicle::checkCapture()
 
 	case FacilityStruct::_CAP_ENABLED:
 	{
-#ifdef CLOSED_BETA
 //		player->messagef(LSTR_BETA, LSTR_GENERIC, "Facility is at ~%u%%, sending capture contribution", fac.m_captureCounter);
-#endif
 		sendCaptureContribution(player, Strat::CaptureContributionEvent::Active);
 
 		return;
 	}
 
 	default:
-#ifdef BETA_RELEASE
-		player->message(LSTR_BETA, LSTR_GENERIC, "Facility in unknown capture state, not attempting capture submission");
-#endif
+        dbugLog(_FLW, "Facility in unknown capture state, not attempting capture submission");
 	break;
 	}
 
