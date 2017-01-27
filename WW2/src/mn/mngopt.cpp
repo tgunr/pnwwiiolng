@@ -88,6 +88,8 @@ static GVAR vars[] = {
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
     STRING_KEY_DEF("datadir", DataPath),
+    UINT_KEY_DEF("logmask", gLogMask),
+    UINT_KEY_DEF("loglevel", gLogLevel),
 #ifdef DEBUG_WW2
     NULL_KEY_DEF("buildmdlonly", DebugBuildingMDLFilesOnly),
 #endif
