@@ -4061,7 +4061,7 @@ static inline std::string _trim(const std::string &text)
     } else {
         result = result.substr(locstart);
     }
-    return result.substr(0, result.find_last_not_of(" \t\v\n\r")); // npos == entire string
+    return result.substr(0, result.find_last_not_of(" \t\v\n\r") + 1); // npos + 1 == 0 (hack, but it works)
 }
 
 static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
