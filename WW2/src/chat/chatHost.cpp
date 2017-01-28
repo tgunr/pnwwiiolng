@@ -4061,7 +4061,7 @@ static inline std::string _trim(const std::string &text)
     } else {
         result = result.substr(locstart);
     }
-    return result.substr(0, result.find_last_not_of(" \t\v\n\r")); // npos == entire string
+    return result.substr(0, result.find_last_not_of(" \t\v\n\r") + 1); // npos + 1 == 0 (hack, but it works)
 }
 
 static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
@@ -4167,14 +4167,14 @@ static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &resp
             DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET squad_night='%s' WHERE squadid=%u", formattedNight.c_str(), squad->squad().squadID());
         });
     }
-    if (params.find("language") != params.end()) {
-        uint64_t language = params.at("language");
+    if (params.find("pri_language") != params.end()) {
+        uint64_t pri_language = params.at("pri_language");
 
         status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set language");
-        status_if(language > 5, 422, "requested language is invalid");
-        operations.push_back([language, &squad] {
-            squad->setLanguage(language);
-            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET pri_language=%llu WHERE squadid=%u", language, squad->squad().squadID());
+        status_if(pri_language > 5, 422, "requested language is invalid");
+        operations.push_back([pri_language, &squad] {
+            squad->setLanguage(pri_language);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET pri_language=%llu WHERE squadid=%u", pri_language, squad->squad().squadID());
         });
     }
     if (params.find("recruiting") != params.end()) {
@@ -4190,7 +4190,7 @@ static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &resp
         
         status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set voting flag");
         operations.push_back([voting, &squad, &requesterMember] {
-            squad->setRecruiting(voting, requesterMember->player());
+            squad->setVoting(voting, requesterMember->player());
             DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting=%u WHERE squadid=%u", voting ? 1 : 0, squad->squad().squadID());
         });
     }
