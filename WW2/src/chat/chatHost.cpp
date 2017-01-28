@@ -4167,14 +4167,14 @@ static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &resp
             DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET squad_night='%s' WHERE squadid=%u", formattedNight.c_str(), squad->squad().squadID());
         });
     }
-    if (params.find("language") != params.end()) {
-        uint64_t language = params.at("language");
+    if (params.find("pri_language") != params.end()) {
+        uint64_t pri_language = params.at("pri_language");
 
         status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set language");
-        status_if(language > 5, 422, "requested language is invalid");
-        operations.push_back([language, &squad] {
-            squad->setLanguage(language);
-            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET pri_language=%llu WHERE squadid=%u", language, squad->squad().squadID());
+        status_if(pri_language > 5, 422, "requested language is invalid");
+        operations.push_back([pri_language, &squad] {
+            squad->setLanguage(pri_language);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET pri_language=%llu WHERE squadid=%u", pri_language, squad->squad().squadID());
         });
     }
     if (params.find("recruiting") != params.end()) {
