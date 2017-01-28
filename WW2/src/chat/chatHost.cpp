@@ -4190,7 +4190,7 @@ static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &resp
         
         status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set voting flag");
         operations.push_back([voting, &squad, &requesterMember] {
-            squad->setRecruiting(voting, requesterMember->player());
+            squad->setVoting(voting, requesterMember->player());
             DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting=%u WHERE squadid=%u", voting ? 1 : 0, squad->squad().squadID());
         });
     }
