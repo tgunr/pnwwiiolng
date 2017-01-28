@@ -74,15 +74,15 @@
 // See updtEnums.h::FE_UPDATE_INTERVAL
 UpdateFraming framings[UpdateFraming::_MODES] =
 {
-    // MaxV  Intvl   MaxU
-    //   |      |     ^--   Max vehicles per update
-    //   |      ^-----|--   Interval between updates in ms
-    //   ^------|-----|--   Max vehicles to track
-	{    88,   100,    20, "um:0 88 Limit 20/Update 100ms" }
-,	{   112,   100,    28, "um:1 112 Limit 28/Update 100ms" }
-, 	{   128,   100,    32, "um:2 128 Limit 32/Update 100ms" }
-, 	{   146,   100,    36, "um:3 146 Limit 36/Update 100ms" }
-, 	{   184,   100,    48, "um:4 184 Limit 48/Update 100ms" }
+    // MaxV                         Intvl   MaxU
+    //   |                             |     ^--   Max vehicles per update
+    //   |                             ^-----|--   Interval between updates in ms
+    //   ^-----------------------------|-----|--   Max vehicles to track
+	{    88,   UpdateFraming::_LARGE, 100,    20, "um:0 88 Limit 20/Update 100ms" }
+,	{   112,   UpdateFraming::_LARGE, 100,    28, "um:1 112 Limit 28/Update 100ms" }
+, 	{   128,   UpdateFraming::_LARGE, 100,    32, "um:2 128 Limit 32/Update 100ms" }
+, 	{   146,   UpdateFraming::_LARGE, 100,    36, "um:3 146 Limit 36/Update 100ms" }
+, 	{   184,   UpdateFraming::_LARGE, 100,    48, "um:4 184 Limit 48/Update 100ms" }
 };
 
 #if platBuild != BUILD_SERVER
