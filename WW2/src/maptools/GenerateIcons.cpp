@@ -12,7 +12,7 @@
 #include "osgImport/ref_ptr.h"
 #include "ui/uiChat.h"
 #include "ui/uiDotCommands.h"
-#include "ww2func.h"
+#include "imap/ww2func.h"
 #include "ob/obplyr.h"
 #include "math/math3d.h"
 #include "trn/trncd.h"

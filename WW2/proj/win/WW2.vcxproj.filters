@@ -2687,6 +2687,9 @@
     <ClCompile Include="..\..\src\wwii\wwiiPPOLoader.cpp">
       <Filter>wwii</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\sdm\GenerateHostTerrain.cpp">
+      <Filter>sdm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\cursor.cur">

@@ -91,7 +91,7 @@
 #endif
 
 #ifdef GENICONS
-#include "GenerateIcons.h"
+#include "maptools/GenerateIcons.h"
 #endif
 
 static void _UpdateInit();
