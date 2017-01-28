@@ -931,7 +931,7 @@ static void _serverReportAlive(const Teul::uWeb::HTTPRequest &request, Teul::uWe
 	teulGetAddress(stats.address, ip, sizeof(ip));
 
 	char buffer[1024];
-	strprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s\"}\r\n"
+	strprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s %s\"}\r\n"
         , Teul::GetAppName()
         , ip
         , stats.arenaID
@@ -939,7 +939,7 @@ static void _serverReportAlive(const Teul::uWeb::HTTPRequest &request, Teul::uWe
         , stats.status
         , stats.maxPlayers()
         , stats.numPlayers()
-        , PN_git_commitish_string
+        , PN_code_git_commitish_string, PN_data_git_commitish_string
     );
     return Teul::uWeb::HTTPResponseBuilder(request)
         .status(200)

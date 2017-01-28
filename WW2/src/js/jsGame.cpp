@@ -204,7 +204,7 @@ jsGame::jsGame() : phui::js::Object(&jsclass, nullptr, nullptr,jsfunctions,jspro
 	getBuildInfo(hostversion);
 	DefineProperty("version", phui::js::NewString(PN_product_version_string));
 	DefineProperty("buildinfo", phui::js::NewString(hostversion.c_str()));
-	DefineProperty("revision", phui::js::NewString(PN_git_commitish_string));
+	DefineProperty("revision", phui::js::NewString((std::string(PN_code_git_commitish_string)+PN_data_git_commitish_string).c_str()));
 	cps = new phui::js::Array;
 	keymaps = new phui::js::Array;
 	spawnablevehicles = new phui::js::Array;

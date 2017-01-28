@@ -51,7 +51,8 @@ extern const char
     * const PN_build_platform_string,
     * const PN_build_type_string,
     * const PN_product_version_string,
-    * const PN_git_commitish_string
+    * const PN_code_git_commitish_string,
+    * const PN_data_git_commitish_string
 #if defined(BUILD_INFO_SENSITIVE_INFO_AVAILABLE) && BUILD_INFO_SENSITIVE_INFO_AVAILABLE == 12345
     ,
     * const PN_build_info_input_string,
@@ -59,8 +60,10 @@ extern const char
     * const PN_build_user_string,
     * const PN_build_host_string,
     * const PN_build_location_string,
-    * const PN_git_commit_string,
-    * const PN_git_repository_state_string
+    * const PN_code_git_commit_string,
+    * const PN_code_git_repository_state_string,
+    * const PN_data_git_commit_string,
+    * const PN_data_git_repository_state_string
 #endif
 ;
 
