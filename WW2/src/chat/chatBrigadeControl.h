@@ -130,7 +130,7 @@ public:
 
 public:
 	//// ACTION CODES:
-	enum
+	enum BRIGADE_ACTION_REQ : int
 	{
 		REQ_INVALID				// Uninitialized
 	,	REQ_LIST				// Request a list
@@ -150,6 +150,12 @@ public:
 
 	,	MAX_BC_REQ_CODES		// Maximum brigade control request codes
 	};
+    static inline std::string to_string(BRIGADE_ACTION_REQ req) {
+        static const std::vector<std::string> reqs{
+            "INVALID", "LIST", "NOMINATE", "VETO", "VOLUNTEER", "RESIGN", "REPLACE", "REMOVE", "MOVE", "ATTACK", "CLEAR", "DEFEND" };
+        auto rawReq = static_cast<std::underlying_type<BRIGADE_ACTION_REQ>::type>(req);
+        return rawReq > 0 && rawReq < reqs.size() ? reqs[rawReq] : std::to_string(rawReq);
+    }
 
 public:
 	BrigadeControl()
@@ -157,7 +163,7 @@ public:
 		, m_officer(0), m_sponsor(0)
 		, m_target(nullObjID), m_origin(nullObjID)
 		{}
-	BrigadeControl(UINT32 action, UCHAR country, UCHAR branch, UINT32 brigadeID, const ChatHandle officer, const ChatHandle sponsor, const FULL_OBJ_ID origin=nullObjID)
+	BrigadeControl(BRIGADE_ACTION_REQ action, UCHAR country, UCHAR branch, UINT32 brigadeID, const ChatHandle officer, const ChatHandle sponsor, const FULL_OBJ_ID origin=nullObjID)
 		: m_action(action), m_country(country), m_branch(branch), m_brigadeID(brigadeID), m_officer(officer), m_sponsor(sponsor), m_origin(origin)
 		{}
 
@@ -167,7 +173,7 @@ public:
 	bool isObjective() const { return (m_action == REQ_ATTACK || m_action == REQ_CLEAR || m_action == REQ_DEFEND); }
 
 public:
-	UINT32		m_action;		// What action you was requested
+	BRIGADE_ACTION_REQ		m_action;		// What action you was requested
 	UCHAR		m_country;		// Country affected
 	UCHAR		m_branch;		// Branch affected
 	UINT32		m_brigadeID;	// Brigade No
@@ -258,7 +264,8 @@ class BrigadeControlNotice : public BrigadeControl
 public:
 	BrigadeControlNotice(UINT32 notice=_ERROR)
 		: BrigadeControl(), m_notice(notice), m_error(0), m_time(0), m_votePermit(VP_NONE), m_received(0) {}
-	BrigadeControlNotice(UINT32 notice, UINT32 error, UINT32 action, VOTE_PERMIT votePermit, class HCUnit const& unit, const ChatHandle subject, const ChatHandle actor, UINT32 duration=0);
+	BrigadeControlNotice(UINT32 notice, UINT32 error, BRIGADE_ACTION_REQ action, VOTE_PERMIT votePermit, class HCUnit const& unit, const ChatHandle subject,
+                         const ChatHandle actor, UINT32 duration=0);
 	BrigadeControlNotice(const BrigadeControl& rhs, UINT32 notice, UINT32 error, UINT32 time)
 		: BrigadeControl(rhs), m_notice(notice), m_error(error), m_time(time), m_votePermit(VP_NONE), m_received(0) {}
 	BrigadeControlNotice(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }

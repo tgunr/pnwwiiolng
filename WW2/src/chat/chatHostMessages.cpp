@@ -384,7 +384,7 @@ _recvBrigadeControl(ACTION_OBJECT* const a)
 	BrigadeControlRequest incoming(a);
 
 	if ( g_debugPersonas )
-		dbugLog(_FLD, "t:%d incoming brigade control action %u", a->teulIndex, incoming.m_action);
+		dbugLog(_FLD, "t:%d incoming brigade control action %s", a->teulIndex, BrigadeControl::to_string(incoming.m_action).c_str());
 
 	incoming.processRequest(a->teulIndex);
 
