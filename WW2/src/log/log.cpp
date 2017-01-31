@@ -23,18 +23,28 @@ static SINT32 logLevel = 0;
 #endif
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker);
+static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker);
 
+/************************************************************************************************
+	Write_Where
+*************************************************************************************************/
+void Write_Where(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, ...) {
+    va_list marker;
+
+    va_start(marker, str);
+    logw(file, line, function, system, level, str, marker);
+    va_end(marker);
+}
 
 /************************************************************************************************
 	Write_Log
-*************************************************************************************************/
-
+ *************************************************************************************************/
 void Write_Log(UINT32 system, SINT32 level, const char* str, ...)
 {
 	va_list marker;
 
 	va_start(marker, str);
-	logv(system,level,str, marker);
+	logv(system, level, str, marker);
 	va_end(marker);
 }
 
@@ -64,6 +74,32 @@ void Set_Log_Level(SINT32 level)
 	logLevel = level;
 }
 
+/************************************************************************************************
+	Set_Log_Mask
+ *************************************************************************************************/
+
+void Set_Log_Mask(const char* system)
+{
+    int i;
+    
+    if(!strcmp("all", system)) {
+        logMask = LOG_ALL;
+        return;
+    }
+    else if(!strcmp("none", system)) {
+        logMask = LOG_NONE;
+        return;
+    }
+    
+    for(i = 0; i < 31; i++)
+    {
+        if(LOG_SYSTEM_NAMES[i] == nullptr)
+            break;
+        
+        if(!strcmp(LOG_SYSTEM_NAMES[i], system))
+            logMask = (1 << i);
+    }
+}
 
 /************************************************************************************************
 	Write_Debug
@@ -129,6 +165,20 @@ const char* Log_System_Name(UINT32 mask)
 UINT32 Get_Log_Mask()
 {
 	return logMask;
+}
+
+/************************************************************************************************
+	logw
+ *************************************************************************************************/
+static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
+{
+    if(logLevel < level || !(system & logMask)) return;
+    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s\n", file, line, function, str);
+    char buf[wheresize + 1]; // note +1 for terminating null byte
+    snprintf(buf, sizeof buf, "%s:%d: %s: %s\n", file, line, function, str);
+    
+    vprintf(buf, marker);
+    printf("\n");
 }
 
 #if platOS == OS_MACOS

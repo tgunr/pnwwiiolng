@@ -67,10 +67,11 @@ enum
 };
 
 #ifdef EVENT_LOG
-
+extern void Write_Where(const char* file, int line, const char* function, UINT32 system, SINT32 level, const char* str, ...);
 extern void Write_Log(UINT32 system, SINT32 level, const char* str, ...);
 extern void Enable_Log(UINT32 system, LOGICAL enable);
 extern void Set_Log_Level(SINT32 level);
+extern void Set_Log_Mask(const char *system);
 
 extern LOGICAL	Open_Debug(const char* filename);
 extern void Write_Debug(const char* str, ...); // equivalent to LOG_OLD, LOG_INFO
@@ -80,11 +81,16 @@ extern UINT32 Log_System_Mask(const char* system);
 extern const char* Log_System_Name(UINT32 mask);
 extern UINT32 Get_Log_Mask();
 
-#else // EVENT_LOG
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define WriteLog(system, level, fmt, ...) Write_Where(__FILENAME__, __LINE__, __FUNCTION__, system, level, fmt, ## __VA_ARGS__)
+#define WriteDebug(fmt, ...) Write_Where(__FILENAME__, __LINE__, __FUNCTION__, LOG_ALL, LOG_DEBUG, fmt, ## __VA_ARGS__)
 
+#else // EVENT_LOG
+#define Write_Where
 #define Write_Log
 #define Enable_Log
 #define Set_Log_Level
+#define Set_Log_Mask
 
 #define Open_Debug(...)
 #define	Write_Debug(...)
