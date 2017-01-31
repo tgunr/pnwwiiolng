@@ -173,9 +173,9 @@ UINT32 Get_Log_Mask()
 static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
 {
     if(logLevel < level || !(system & logMask)) return;
-    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s\n", file, line, function, str);
+    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, str);
     char buf[wheresize + 1]; // note +1 for terminating null byte
-    snprintf(buf, sizeof buf, "%s:%d: %s: %s\n", file, line, function, str);
+    snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, str);
     
     vprintf(buf, marker);
     printf("\n");
