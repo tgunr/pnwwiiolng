@@ -250,7 +250,7 @@ LOGICAL          g_buildTerrain;             // Build SDMs for archives.
 
 LOGICAL          g_log_comm;					// turn on logging for LOG_COMM
 LOGICAL          g_log_fps;					// turn on logging for LOG_FPS
-LOGICAL          g_log_weap;					// turn on logging for LOG_WEAP
+LOGICAL          g_log_weap;					// turn on logging for LOG_WEAPON
 
 FLOAT32			gFPS;
 FLOAT32			gLastFrameFPS;
@@ -285,7 +285,7 @@ FLOAT32			aimMouse;	// Aiming mouse sensitivity
 SINT8            gAuthServer[128]; // Authentication server to be used
 SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 SINT8            gClientV[32]; // Version to submit
-UINT32           gLogMask = LOG_ALL;
+SINT8            gLogMask[_MAX_PATH];
 SINT32           gLogLevel = LOG_INFO;
 
 #ifdef DEBUG_WW2

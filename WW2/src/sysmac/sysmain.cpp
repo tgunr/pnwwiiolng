@@ -134,7 +134,7 @@ int sysmainInitApp()
     b3DSoundEnable = 1; // always want 3D enabled with OpenAL
 	//g_bRadialClutter = FALSE; // screwed on the mac at the moment
 
-	Enable_Log(gLogMask, WantedUserLogEnabled);
+    Set_Log_Mask(gLogMask);
 	Set_Log_Level(gLogLevel);
 
 #if USE_OSG
