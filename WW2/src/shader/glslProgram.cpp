@@ -232,7 +232,7 @@ void glslProgram::LinkProgram()
 
     if(!_isLinked)
     {
-        WriteDebug("glLinkProgram: FAILED");
+        WriteLog(LOG_RENDER, LOG_DEBUG, "glLinkProgram: FAILED");
 
         std::string infoLog;
 
@@ -269,11 +269,11 @@ void glslProgram::LinkProgram()
         {
             glGetActiveUniformBlockName(_programhandle, i, 256, nullptr, blockname);
 
-            WriteDebug("BLOCKNAME: %s", blockname);
+            WriteLog(LOG_RENDER, LOG_DEBUG, "BLOCKNAME: %s", blockname);
 
             if(BaseID.find(blockname) == BaseID.end())
             {
-                WriteDebug("BLOCKNAME %s not found. Add to BaseID map in glslProgram.cpp", blockname);
+                WriteLog(LOG_RENDER, LOG_DEBUG, "BLOCKNAME %s not found. Add to BaseID map in glslProgram.cpp", blockname);
                 continue;
             }
 
@@ -318,7 +318,7 @@ void glslProgram::LinkProgram()
                 glGetActiveUniformsiv(_programhandle, 1, (GLuint*)&indices[j], GL_UNIFORM_SIZE, &size);
                 glGetActiveUniformsiv(_programhandle, 1, (GLuint*)&indices[j], GL_UNIFORM_TYPE, &type);
 
-                WriteDebug("BLOCK UNIFORM %s: size = %d byteoffset = %d type = %x", name, size, byteoffset, type);
+                WriteLog(LOG_RENDER, LOG_DEBUG, "BLOCK UNIFORM %s: size = %d byteoffset = %d type = %x", name, size, byteoffset, type);
 
                 u->AddUniform(name, size, byteoffset, type);
             }

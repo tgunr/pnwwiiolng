@@ -1020,7 +1020,7 @@ UCHAR _BombsightTypeNames[3][32] =
 			}
 			else
 			{
-				WriteDebug("Unrecognized turret %d type \"%s\"",
+				Write_Log(LOG_VEHICLE, LOG_WARN, "Unrecognized turret %d type \"%s\"",
 							CurrentPos,
 							VarContents);
 			}

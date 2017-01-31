@@ -65,9 +65,9 @@ LOGICAL sndsInit()
 	}
 
 #if XAUDIO
-    WriteDebug("Running XAUDIO");
+    WriteLog(LOG_OLD, LOG_DEBUG, "Running XAUDIO");
 #else
-    WriteDebug("Running DirectSound");
+    WriteLog(LOG_OLD, LOG_DEBUG, "Running DirectSound");
 #endif
 
 	LOGICAL rVal = sndsPlatformInit();

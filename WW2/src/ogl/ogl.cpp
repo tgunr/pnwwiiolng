@@ -263,7 +263,7 @@ SINT32		enumber;
 				break;
 			}
 
-			WriteDebug("GL error 0x%04x encountered\n %s", enumber, ptr);
+			WriteLog(LOG_RENDER, LOG_DEBUG, "GL error 0x%04x encountered\n %s", enumber, ptr);
 		}
 
 		bError = FALSE;
@@ -311,7 +311,7 @@ LOGICAL oglSetupRC()
 
     if(!HandleGLError(TRUE))
     {
-        WriteDebug("[oglSetupRC] GL error encountered");
+        WriteLog(LOG_RENDER, LOG_DEBUG, "[oglSetupRC] GL error encountered");
     }
 
     return TRUE;
@@ -335,7 +335,7 @@ void oglResize(GLsizei w, GLsizei h)
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug("GL error encountered in oglResize");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "GL error encountered in oglResize");
 	}
 }
 
@@ -470,7 +470,7 @@ TEXTURE*	lpt;
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug("GL error encountered in oglDrawToScreen");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "GL error encountered in oglDrawToScreen");
 	}
 
 	return bRetVal;
@@ -690,7 +690,7 @@ SINT32		retval, i, miplevels;
 			if (textures[texid].comp[miplevel] != 3 && textures[texid].comp[miplevel] != 4)
 			{
 #ifdef OGL_EVENT_LOG_EXTREME
-				WriteDebug("Texture already has compressed color components");
+				WriteLog(LOG_RENDER, LOG_DEBUG, "Texture already has compressed color components");
 #endif	// OGL_EVENT_LOG_EXTREME
 				textures[texid].hdevtex[miplevel] = 1;
 				return(retval);
@@ -725,7 +725,7 @@ SINT32		retval, i, miplevels;
 		if (!glIsTexture(textures[texid].genlist))
 		{
 			//	glGenTextures is not supported!
-			WriteDebug("glGenTextures is not supported!");
+			WriteLog(LOG_RENDER, LOG_DEBUG, "glGenTextures is not supported!");
 			retval = -1;
 		}
 
@@ -745,7 +745,7 @@ SINT32		retval, i, miplevels;
 
 		if (!HandleGLError(TRUE))
 		{
-			WriteDebug("GL error encountered in oglGetTextureHandle for texture %d/%d", texid, miplevel);
+			WriteLog(LOG_RENDER, LOG_DEBUG, "GL error encountered in oglGetTextureHandle for texture %d/%d", texid, miplevel);
 			retval = -1;
 		}
 
@@ -763,7 +763,7 @@ SINT32		retval, i, miplevels;
 
 		if (!HandleGLError(TRUE))
 		{
-			WriteDebug("GL error encountered in oglGetTextureHandle for texture %d/%d", texid, miplevel);
+			WriteLog(LOG_RENDER, LOG_DEBUG, "GL error encountered in oglGetTextureHandle for texture %d/%d", texid, miplevel);
 			retval = -1;
 		}
 #ifdef OGL_EVENT_LOG
@@ -794,7 +794,7 @@ SINT32		retval, i, miplevels;
 				size = width * height * textures[texid].comp[0];
 			}
 
-//            WriteDebug("Texture image details: "
+//            WriteLog(LOG_RENDER, LOG_DEBUG, "Texture image details: "
 //						" Image is %12s,"
 //						" Width: %4d,"
 //						" Height: %4d,"
@@ -808,7 +808,7 @@ SINT32		retval, i, miplevels;
 
 			if (!HandleGLError(TRUE))
 			{
-				WriteDebug("GL error encountered in oglGetTextureHandle for texture %d/%d", texid, miplevel);
+				WriteLog(LOG_RENDER, LOG_DEBUG, "GL error encountered in oglGetTextureHandle for texture %d/%d", texid, miplevel);
 				retval = -1;
 			}
 		}
@@ -850,7 +850,7 @@ SINT32		retval, i, miplevels;
 			{
 				if (textures[texid].lpsurf[i] == nullptr)
 				{
-					WriteDebug("Found an active mip level with a nullptr surface pointer!");
+					WriteLog(LOG_RENDER, LOG_DEBUG, "Found an active mip level with a nullptr surface pointer!");
 				}
 
 				glTexImage2D(GL_TEXTURE_2D, i,
@@ -863,7 +863,7 @@ SINT32		retval, i, miplevels;
                              textures[texid].lpsurf[i]);
 				if (!HandleGLError(TRUE))
 				{
-					WriteDebug("GL error encountered in oglGetTextureHandle for texture %d/%d", texid, i);
+					WriteLog(LOG_RENDER, LOG_DEBUG, "GL error encountered in oglGetTextureHandle for texture %d/%d", texid, i);
 					retval = -1;
 				}
 #ifdef OGL_EVENT_LOG
@@ -894,7 +894,7 @@ SINT32		retval, i, miplevels;
 						size = width * height * textures[texid].comp[i];
 					}
 
-					WriteDebug("Texture mipmap details:"
+					WriteLog(LOG_RENDER, LOG_DEBUG, "Texture mipmap details:"
 								" Image is %12s,"
 								" Width: %4d,"
 								" Height: %4d,"
@@ -908,7 +908,7 @@ SINT32		retval, i, miplevels;
 
 					if (!HandleGLError(TRUE))
 					{
-						WriteDebug("GL error encountered in oglGetTextureHandle for texture %d/%d", texid, miplevel);
+						WriteLog(LOG_RENDER, LOG_DEBUG, "GL error encountered in oglGetTextureHandle for texture %d/%d", texid, miplevel);
 						retval = -1;
 					}
 				}
@@ -928,7 +928,7 @@ SINT32		retval, i, miplevels;
 			}
 			else
 			{
-				WriteDebug("Found an active mip level when there shouldn't be one!");
+				WriteLog(LOG_RENDER, LOG_DEBUG, "Found an active mip level when there shouldn't be one!");
 				retval = -1;
 			}
 		}
@@ -1064,7 +1064,7 @@ SINT32   i;
 
 	if (textures[texid].miplevels == 0)
 	{
-		WriteDebug("oglReleaseMipTexture called for empty texture %d", texid);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "oglReleaseMipTexture called for empty texture %d", texid);
 		return;
 	}
 
@@ -1155,7 +1155,7 @@ LOGICAL oglSetActiveTexture(SINT32 stage, SINT32 texid)
 
 			if (oglGetTextureHandle(texid, 0) == -1)
 			{
-				WriteDebug("Textures disabled, unable to load new texture at miplevel");
+				WriteLog(LOG_RENDER, LOG_DEBUG, "Textures disabled, unable to load new texture at miplevel");
 				return(FALSE);
 			}
 		}
@@ -1173,7 +1173,7 @@ LOGICAL oglSetActiveTexture(SINT32 stage, SINT32 texid)
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug(" GL error in oglSetActiveTexture");
+		WriteLog(LOG_RENDER, LOG_DEBUG, " GL error in oglSetActiveTexture");
 	}
 
 	return(TRUE);
@@ -1277,7 +1277,7 @@ SINT32		pdepth;
 		height > gMaxTextureHeight ||
 		depth > gMaxTextureWidth)
 	{
-		WriteDebug("The requested texture dimensions are not supported");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "The requested texture dimensions are not supported");
 		return(-1);
 	}
 
@@ -1326,7 +1326,7 @@ SINT32		pwidth, pheight;
 	if (width > gMaxTextureWidth ||
 		height > gMaxTextureHeight)
 	{
-		WriteDebug("The requested texture dimensions are not supported");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "The requested texture dimensions are not supported");
 		return(-1);
 	}
 
@@ -1413,7 +1413,7 @@ SINT32		pwidth, pheight;
 
 	if (flags & CRT_FLAG_HARDWARE)
 	{
-		WriteDebug("CRT_FLAG_HARDWARE not supported in OpenGL version");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "CRT_FLAG_HARDWARE not supported in OpenGL version");
 	}
    else
     {
@@ -1423,7 +1423,7 @@ SINT32		pwidth, pheight;
 		textures[texid].numuses = 1;
 		if ((flags & CRT_FLAG_MIPMAP) && width != height)
 		{
-			WriteDebug("Texture is not square!");
+			WriteLog(LOG_RENDER, LOG_DEBUG, "Texture is not square!");
 		}
 
 		do
@@ -1622,7 +1622,7 @@ SINT32 oglCreateMaterial(LPVOID lpmat)
 		return(-1);
 	}
 
-	//WriteDebug("CreateMaterial: id=%d", matid);
+	//WriteLog(LOG_RENDER, LOG_DEBUG, "CreateMaterial: id=%d", matid);
 
 	materials[matid].matid = matid;
 	materials[matid].numuses += 1;
@@ -2293,7 +2293,7 @@ GLenum		mode;
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug(" GL error in oglSetViewportDimensions");
+		WriteLog(LOG_RENDER, LOG_DEBUG, " GL error in oglSetViewportDimensions");
 	}
 
 	return TRUE;
@@ -2326,7 +2326,7 @@ LOGICAL oglSetViewportZ(FLOAT32 znear, FLOAT32 zfar)
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug(" GL error in oglSetViewportZ");
+		WriteLog(LOG_RENDER, LOG_DEBUG, " GL error in oglSetViewportZ");
 	}
 
     return(TRUE);
@@ -2390,7 +2390,7 @@ SINT32		numcomps, *comps;
 	tp = (SINT8*)glGetString(GL_VENDOR);
 	if (tp != nullptr)
 	{
-		WriteDebug("Vendor:    %s", tp);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Vendor:    %s", tp);
 	}
 
 	tp = (SINT8*)glGetString(GL_VERSION);
@@ -2398,7 +2398,7 @@ SINT32		numcomps, *comps;
 	strprintf(OGL_Requirements, "OpenGL drivers %u.%u or higher are required", OPENGL_MAJOR_VERSION, OPENGL_MINOR_VERSION);
 	if (tp != nullptr)
 	{
-		WriteDebug("Version:   %s", tp);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Version:   %s", tp);
 		gOpenGLMajorVersion = atoi(tp);
 		gOpenGLMinorVersion = 0;
 		tp = strchr(tp, '.');
@@ -2408,7 +2408,7 @@ SINT32		numcomps, *comps;
 			gOpenGLMinorVersion = atoi(tp);
 		}
 
-		WriteDebug("OpenGL version: %d.%d", gOpenGLMajorVersion, gOpenGLMinorVersion);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "OpenGL version: %d.%d", gOpenGLMajorVersion, gOpenGLMinorVersion);
 
 		if (!(gOpenGLMajorVersion > OPENGL_MAJOR_VERSION || (gOpenGLMajorVersion == OPENGL_MAJOR_VERSION && gOpenGLMinorVersion >= OPENGL_MINOR_VERSION)))
 		{
@@ -2424,7 +2424,7 @@ SINT32		numcomps, *comps;
 
     if (tp != nullptr)
 	{
-		WriteDebug("Renderer:  %s", tp);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Renderer:  %s", tp);
 
 #if platOS != OS_MACOS
         if(strstr(tp, "GDI Generic"))
@@ -2514,7 +2514,7 @@ SINT32		numcomps, *comps;
 	if (GLEW_ARB_texture_compression && GLEW_EXT_texture_compression_s3tc)
 	{
 		glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB, (GLint*)&numcomps);
-		WriteDebug("Number of compressed texture formats supported: %d", numcomps);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Number of compressed texture formats supported: %d", numcomps);
 		if (numcomps > 0)
 		{
 			comps = (SINT32*)memAlloc(numcomps * sizeof(SINT32));
@@ -2546,7 +2546,7 @@ SINT32		numcomps, *comps;
 					break;
 				}
 
-				WriteDebug(" Format %d: %s (0x%08x)", i, ptr, comps[i]);
+				WriteLog(LOG_RENDER, LOG_DEBUG, " Format %d: %s (0x%08x)", i, ptr, comps[i]);
 			}
 
 			memFree(comps);
@@ -2580,7 +2580,7 @@ SINT32		numcomps, *comps;
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug(" GL error in oglInit");
+		WriteLog(LOG_RENDER, LOG_DEBUG, " GL error in oglInit");
 	}
 
 	textureMutex = systhreadMutexCreate();
@@ -2597,7 +2597,7 @@ SINT32		numcomps, *comps;
     }
 #endif
 
-    WriteDebug("Completed oglInit");
+    WriteLog(LOG_RENDER, LOG_DEBUG, "Completed oglInit");
 
     return TRUE;
 }
@@ -2676,7 +2676,7 @@ SINT32		total, free;
 	// Textures
 	if (oglGetTextureMemory(&total, &free))
 	{
-		WriteDebug("Texture memory (before free): total = %d, free = %d, in use = %d", total, free, total - free);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Texture memory (before free): total = %d, free = %d, in use = %d", total, free, total - free);
 	}
 
 	for (i=0; i < numtexture3Ds; i++)
@@ -2698,7 +2698,7 @@ SINT32		total, free;
 
 	if (oglGetTextureMemory(&total, &free))
 	{
-		WriteDebug("Texture memory (after free): total = %d, free = %d, in use = %d", total, free, total - free);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Texture memory (after free): total = %d, free = %d, in use = %d", total, free, total - free);
 	}
 
 	numtexture3Ds = 0;
@@ -2740,7 +2740,7 @@ LOGICAL oglClearPorts(piRECT piRect, UINT32 uTargets)
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug(" GL error in oglClearPorts");
+		WriteLog(LOG_RENDER, LOG_DEBUG, " GL error in oglClearPorts");
 	}
 
 	return(FALSE);
@@ -2774,7 +2774,7 @@ GLbitfield	clrbits=0;
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug(" GL error in oglClearTargets");
+		WriteLog(LOG_RENDER, LOG_DEBUG, " GL error in oglClearTargets");
 	}
 
 	return(TRUE);
@@ -2999,7 +2999,7 @@ void oglSetRenderState(oglRENDERSTATETYPES enumStateType, UINT32 uState)
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug(" GL error PRIOR to set render state %d to value %d", enumStateType, uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, " GL error PRIOR to set render state %d to value %d", enumStateType, uState);
 	}
 
 	switch(enumStateType)
@@ -3041,7 +3041,7 @@ void oglSetRenderState(oglRENDERSTATETYPES enumStateType, UINT32 uState)
             break;
         }
     case oglRENDERSTATE_TEXTUREHANDLE:
-        WriteDebug("Unimplemented oglRENDERSTATE_TEXTUREHANDLE %d", uState);
+        WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented oglRENDERSTATE_TEXTUREHANDLE %d", uState);
         break;
 
     case oglRENDERSTATE_ANTIALIAS:
@@ -3132,11 +3132,11 @@ void oglSetRenderState(oglRENDERSTATETYPES enumStateType, UINT32 uState)
 		break;
 
 	case oglRENDERSTATE_ROP2:
-		WriteDebug("Unimplemented oglRENDERSTATE_ROP2 %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented oglRENDERSTATE_ROP2 %d", uState);
 		break;
 
 	case oglRENDERSTATE_PLANEMASK:
-		WriteDebug("Unimplemented oglRENDERSTATE_PLANEMASK %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented oglRENDERSTATE_PLANEMASK %d", uState);
 		break;
 
 	case oglRENDERSTATE_ZWRITEENABLE:
@@ -3292,23 +3292,23 @@ void oglSetRenderState(oglRENDERSTATETYPES enumStateType, UINT32 uState)
 
     case oglRENDERSTATE_SPECULARENABLE:
 		bSpecular = uState;
-        //WriteDebug("Unimplemented render state set: oglRENDERSTATE_SPECULARENABLE %d", uState);
+        //WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_SPECULARENABLE %d", uState);
         break;
 
     case oglRENDERSTATE_ZVISIBLE:
-        WriteDebug("Unimplemented render state set: oglRENDERSTATE_ZVISIBLE %d", uState);
+        WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_ZVISIBLE %d", uState);
         break;
 
     case oglRENDERSTATE_SUBPIXEL:
-        WriteDebug("Unimplemented render state set: oglRENDERSTATE_SUBPIXEL %d", uState);
+        WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_SUBPIXEL %d", uState);
         break;
 
     case oglRENDERSTATE_SUBPIXELX:
-        WriteDebug("Unimplemented render state set: oglRENDERSTATE_SUBPIXELX %d", uState);
+        WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_SUBPIXELX %d", uState);
         break;
 
     case oglRENDERSTATE_STIPPLEDALPHA:
-        WriteDebug("Unimplemented render state set: oglRENDERSTATE_STIPPLEDALPHA %d", uState);
+        WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_STIPPLEDALPHA %d", uState);
         break;
 
 	case oglRENDERSTATE_FOGENABLE:
@@ -3476,23 +3476,23 @@ void oglSetRenderState(oglRENDERSTATETYPES enumStateType, UINT32 uState)
         break;
 
 	case oglRENDERSTATE_COLORKEYENABLE:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_COLORKEYENABLE %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_COLORKEYENABLE %d", uState);
 		break;
 
 	case oglRENDERSTATE_BORDERCOLOR:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_BORDERCOLOR %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_BORDERCOLOR %d", uState);
 		break;
 
 	case oglRENDERSTATE_TEXTUREADDRESSU:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_TEXTUREADDRESSU %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_TEXTUREADDRESSU %d", uState);
 		break;
 
 	case oglRENDERSTATE_TEXTUREADDRESSV:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_TEXTUREADDRESSV %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_TEXTUREADDRESSV %d", uState);
 		break;
 
 	case oglRENDERSTATE_MIPMAPLODBIAS:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_MIPMAPLODBIAS %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_MIPMAPLODBIAS %d", uState);
 		break;
 
 	case oglRENDERSTATE_ZBIAS:
@@ -3500,51 +3500,51 @@ void oglSetRenderState(oglRENDERSTATETYPES enumStateType, UINT32 uState)
 		break;
 
 	case oglRENDERSTATE_ANISOTROPY:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_ANISOTROPY %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_ANISOTROPY %d", uState);
 		break;
 
 	case oglRENDERSTATE_FLUSHBATCH:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_FLUSHBATCH %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_FLUSHBATCH %d", uState);
 		break;
 
 	case oglRENDERSTATE_TRANSLUCENTSORTINDEPENDENT:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_TRANSLUCENTSORTINDEPENDENT %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_TRANSLUCENTSORTINDEPENDENT %d", uState);
 		break;
 
 	case oglRENDERSTATE_STENCILENABLE:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_STENCILENABLE %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_STENCILENABLE %d", uState);
 		break;
 
 	case oglRENDERSTATE_STENCILFAIL:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_STENCILFAIL %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_STENCILFAIL %d", uState);
 		break;
 
 	case oglRENDERSTATE_STENCILZFAIL:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_STENCILZFAIL %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_STENCILZFAIL %d", uState);
 		break;
 
 	case oglRENDERSTATE_STENCILPASS:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_STENCILPASS %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_STENCILPASS %d", uState);
 		break;
 
 	case oglRENDERSTATE_STENCILFUNC:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_STENCILFUNC %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_STENCILFUNC %d", uState);
 		break;
 
 	case oglRENDERSTATE_STENCILREF:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_STENCILREF %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_STENCILREF %d", uState);
 		break;
 
 	case oglRENDERSTATE_STENCILMASK:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_STENCILMASK %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_STENCILMASK %d", uState);
 		break;
 
 	case oglRENDERSTATE_STENCILWRITEMASK:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_STENCILWRITEMASK %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_STENCILWRITEMASK %d", uState);
 		break;
 
 	case oglRENDERSTATE_TEXTUREFACTOR:
-		WriteDebug("Unimplemented render state set: oglRENDERSTATE_TEXTUREFACTOR %d", uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: oglRENDERSTATE_TEXTUREFACTOR %d", uState);
 		break;
 
 	case oglRENDERSTATE_LIGHTING:
@@ -3579,13 +3579,13 @@ void oglSetRenderState(oglRENDERSTATETYPES enumStateType, UINT32 uState)
 		break;
 
 	default:
-	//	WriteDebug("Unimplemented render state set: default %d, 0x%x", enumStateType, uState);
+	//	WriteLog(LOG_RENDER, LOG_DEBUG, "Unimplemented render state set: default %d, 0x%x", enumStateType, uState);
 		break;
 	};
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug(" GL error during set render state %d to value %d", enumStateType, uState);
+		WriteLog(LOG_RENDER, LOG_DEBUG, " GL error during set render state %d to value %d", enumStateType, uState);
 	}
 
     renderstates[enumStateType] = uState;
@@ -3600,7 +3600,7 @@ SINT32		i;
 	{
 		if (renderstates[i] != 0xffffffff)
 		{
-			WriteDebug("Render state %d = 0x%08x", i, renderstates[i]);
+			WriteLog(LOG_RENDER, LOG_DEBUG, "Render state %d = 0x%08x", i, renderstates[i]);
 		}
 	}
 
@@ -3686,12 +3686,12 @@ SINT32		i, num, tottriangles, totrunning, totpaints, halfpaints;
 		{
 			halfpaints = totpaints / 2;
 			totrunning = 0;
-			WriteDebug("Triangle render bucket breakdown:");
+			WriteLog(LOG_RENDER, LOG_DEBUG, "Triangle render bucket breakdown:");
 			for (i=0; i < MAX_RENDER_BUCKETS; i++)
 			{
 				num = renderbuckets[i];
 				totrunning += num;
-				WriteDebug(" %3d = %7d (%7d) - %7.3f : %7.3f", i, num, (num + halfpaints) / totpaints, (FLOAT32)(num * 100) / (FLOAT32)tottriangles, (FLOAT32)(totrunning * 100) / (FLOAT32)tottriangles);
+				WriteLog(LOG_RENDER, LOG_DEBUG, " %3d = %7d (%7d) - %7.3f : %7.3f", i, num, (num + halfpaints) / totpaints, (FLOAT32)(num * 100) / (FLOAT32)tottriangles, (FLOAT32)(totrunning * 100) / (FLOAT32)tottriangles);
 			}
 		}
 	}
@@ -3716,12 +3716,12 @@ SINT32		i, num, tottriangles, totrunning, totpaints, halfpaints;
 		{
 			halfpaints = totpaints / 2;
 			totrunning = 0;
-			WriteDebug("Triangle render index bucket breakdown:");
+			WriteLog(LOG_RENDER, LOG_DEBUG, "Triangle render index bucket breakdown:");
 			for (i=0; i < MAX_RENDER_BUCKETS; i++)
 			{
 				num = renderindexbuckets[i];
 				totrunning += num;
-				WriteDebug(" %3d = %7d (%7d) - %7.3f : %7.3f", i, num, (num + halfpaints) / totpaints, (FLOAT32)(num * 100) / (FLOAT32)tottriangles, (FLOAT32)(totrunning * 100) / (FLOAT32)tottriangles);
+				WriteLog(LOG_RENDER, LOG_DEBUG, " %3d = %7d (%7d) - %7.3f : %7.3f", i, num, (num + halfpaints) / totpaints, (FLOAT32)(num * 100) / (FLOAT32)tottriangles, (FLOAT32)(totrunning * 100) / (FLOAT32)tottriangles);
 			}
 		}
 	}
@@ -4722,7 +4722,7 @@ LOGICAL oglSetRenderStageState(UINT32 stage, oglTEXTURESTAGESTATETYPE type, UINT
 	{
 		if(!HandleGLError(TRUE))
 		{
-			WriteDebug("GL error PRIOR to set render stage state %d to value %d", type, state);
+			WriteLog(LOG_RENDER, LOG_DEBUG, "GL error PRIOR to set render stage state %d to value %d", type, state);
 		}
 
 		switch(type)
@@ -4858,7 +4858,7 @@ LOGICAL oglSetRenderStageState(UINT32 stage, oglTEXTURESTAGESTATETYPE type, UINT
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug(" GL error during set render stage state %d to value %d", type, state);
+		WriteLog(LOG_RENDER, LOG_DEBUG, " GL error during set render stage state %d to value %d", type, state);
 	}
 
 	return(TRUE);
@@ -5194,7 +5194,7 @@ LOGICAL oglSetLight(SINT32 numlight, LIGHT* light)
 
 	    if (!HandleGLError(TRUE))
 	    {
-		    WriteDebug(" GL error in oglSetLight");
+		    WriteLog(LOG_RENDER, LOG_DEBUG, " GL error in oglSetLight");
 	    }
     }
 
@@ -5712,7 +5712,7 @@ static void _RenderScene3D(oglPRIMITIVETYPE oglt, oglVERTEXTYPE oglvt, UINT32 Ve
 
 	if (!HandleGLError(TRUE))
 	{
-		WriteDebug(" GL error in _RenderScene");
+		WriteLog(LOG_RENDER, LOG_DEBUG, " GL error in _RenderScene");
 	}
 }
 

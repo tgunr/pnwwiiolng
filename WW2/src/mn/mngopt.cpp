@@ -187,7 +187,7 @@ LOGICAL mngoptParse(char* InputLine)
         auto foundCmd = std::find_if(&vars[0], &vars[sizeof(vars) / sizeof(GVAR)], [c = cmd.substr(1)] (const GVAR &k) { return k.key && k.key == c; });
 
         if (foundCmd == &vars[sizeof(vars) / sizeof(GVAR)]) {
-			WriteDebug("Unknown switch: '%s', '%s'", cmd.c_str(), value.c_str());
+			WriteLog(LOG_OLD, LOG_DEBUG, "Unknown switch: '%s', '%s'", cmd.c_str(), value.c_str());
             continue;
         }
         switch (foundCmd->ktype) {
@@ -201,7 +201,7 @@ LOGICAL mngoptParse(char* InputLine)
                 } else if (value == "1" || value == "true") {
                     *(foundCmd->valuePtr.logicalValue) = true;
                 } else {
-                    WriteDebug("Invalid boolean switch '%s', '%s'", cmd.c_str(), value.c_str());
+                    WriteLog(LOG_OLD, LOG_DEBUG, "Invalid boolean switch '%s', '%s'", cmd.c_str(), value.c_str());
                 }
                 break;
             case EINT:

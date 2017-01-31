@@ -433,7 +433,7 @@ int uiPostInit()
 
 int uiKill()
 {
-    WriteDebug("[uiKill] Begin");
+    WriteLog(LOG_RENDER, LOG_DEBUG, "[uiKill] Begin");
 
 	_killui = true;
 
@@ -468,7 +468,7 @@ int uiKill()
 	phui::js::Kill();
 #endif
 */
-    WriteDebug("[uiKill] End");
+    WriteLog(LOG_RENDER, LOG_DEBUG, "[uiKill] End");
 
 	return 0;
 }
