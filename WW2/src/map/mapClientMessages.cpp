@@ -181,13 +181,13 @@ HCUnitList::receive(SINT32 teulIndex)
 	if ( m_listStart )
 	{
 		// m_listStart indicates the first packet in a sequence
-		WriteDebug("Receiving new HCUnit List");
+		WriteLog(LOG_MAP, LOG_INFO, "Receiving new HCUnit List");
 		_packets = 0;
 	}
 	else
 	{
 		// If m_listStart is false, this packet is a continuation
-		WriteDebug("Receiving HCUnit list packet #%d", _packets);
+		WriteLog(LOG_MAP, LOG_INFO, "Receiving HCUnit list packet #%d", _packets);
 	}
 
 	// We contain several HCUnit objects in our m_units field.
@@ -195,7 +195,7 @@ HCUnitList::receive(SINT32 teulIndex)
 	{
 		HCUnit& unit = m_units[i];
 
-		WriteDebug("p#%d e#%d unit#%d type#%d rank#%d:: %s", _packets, i, unit.unitID(), unit.type(), unit.rank(), unit.name());
+		WriteLog(LOG_MAP, LOG_INFO, "p#%d e#%d unit#%d type#%d rank#%d:: %s", _packets, i, unit.unitID(), unit.type(), unit.rank(), unit.name());
 
 		// Constructed this way, the HCUnit will self-register itself into hcUnits.
 		HCUnit* hcUnit = new HCUnit(unit.unitID(), unit.type(), unit.parentID(), unit.country(), unit.branch(), unit.movementType(), unit.unitClass(), unit.handle(), unit.name(), unit.shortName(), unit.rank(), unit.homeCPID(), unit.owner(), unit.ownerRank());
@@ -214,7 +214,7 @@ HCUnitList::receive(SINT32 teulIndex)
 	if ( m_listEnd )
 	{
 		// When m_listEnd is set, this is the last packet in a sequence
-		WriteDebug("HCUnit list completed: %d units in %d packets", hcUnits.size(), _packets);
+		WriteLog(LOG_MAP, LOG_INFO, "HCUnit list completed: %d units in %d packets", hcUnits.size(), _packets);
 	}
 
 	return 0;
@@ -240,7 +240,7 @@ _recvBrigadeListResponse(ACTION_OBJECT* const a)
 	catch (std::exception& e)
 	{
 		(void)e;
-		WriteDebug("BrigadeSummaries failed: %s", e.what());
+		WriteLog(LOG_MAP, LOG_WARN, "BrigadeSummaries failed: %s", e.what());
 	}
 	return a->offset;
 }
@@ -426,12 +426,12 @@ SINT32
 BrigadeSelection::send(SINT32 teulIndex)
 {
 	if ( m_status == BRIG_SELECT )
-		WriteDebug("SELECTing brigade %d", m_detail.brigadeID());
+		WriteLog(LOG_MAP, LOG_INFO, "SELECTing brigade %d", m_detail.brigadeID());
 	else if ( m_status == BRIG_DETAIL )
-		WriteDebug("QUERYing brigade %d", m_detail.brigadeID());
+		WriteLog(LOG_MAP, LOG_INFO, "QUERYing brigade %d", m_detail.brigadeID());
 	else
 	{
-		WriteDebug("Unknown selection request type.");
+		WriteLog(LOG_MAP, LOG_WARN, "Unknown selection request type.");
 		return -EINVAL;
 	}
 

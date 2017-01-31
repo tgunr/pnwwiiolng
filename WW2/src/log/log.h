@@ -27,6 +27,7 @@ enum
 	LOG_CONSOLE = 0x00002000,
 	LOG_FIO		= 0x00004000,
     LOG_TEUL    = 0x00008000,
+    LOG_MAP     = 0x00010000,
 
 	// Add others as needed
 	LOG_ALL		= 0xffffffff
@@ -49,7 +50,8 @@ static const char* LOG_SYSTEM_NAMES[32] =
                 "texture",
                 "console",
                 "fio",
-                "teul"
+                "teul",
+                "map"
                 // NULLS the rest out
         };
 
