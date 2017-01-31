@@ -9,6 +9,7 @@
 
 #include <cstdarg>
 #include <errno.h>
+#include "log/log.h"
 
 // Can't think of a better place for this.
 // Use to silence one or more warnings about unused parameters.
@@ -58,11 +59,11 @@ enum class LogMode { OFF, TO_FILE };
 
 // Each ERROR_TYPE is associated with a syslog error level on linux
 //
-//	ERR_FATAL	= LOG_EMRG	-fatal error, system is unusable
+//	ERR_FATAL       = LOG_EMRG	-fatal error, system is unusable
 //	ERR_ERRALERT	= LOG_ALERT	-action should be taken immediately
-//	ERR_ABORT	= LOG_CRIT	-error condition, operation aborted
-//	ERR_MINOR	= LOG_ERR	-error detected, routine recovered, operation continues
-//	ERR_WARN	= LOG_WARN	-possible error detected, operation continues
+//	ERR_ABORT       = LOG_CRIT	-error condition, operation aborted
+//	ERR_MINOR       = LOG_ERR	-error detected, routine recovered, operation continues
+//	ERR_WARN        = LOG_WARN	-possible error detected, operation continues
 //	ERR_NOTE		= LOG_NOTE	-normal but significant
 //	ERR_INFO		= LOG_INFO	-informational message
 //	ERR_DBUG		= LOG_DEBUG	-debug level message
@@ -133,6 +134,7 @@ NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, UINT32 err
     #define DEBUG_ERR(fmt, ...) dbugLog(_FLA, fmt, ## __VA_ARGS__)
     #define DEBUG_FATAL(fmt, ...) LogAbort(fmt, ## __VA_ARGS__)
 #else
-    #define DEBUG_ERR(fmt, ...) Write_Debug(fmt, ## __VA_ARGS__)
-    #define DEBUG_FATAL(fmt, ...) Write_Log(LOG_ALL, LOG_FATAL, fmt, ## __VA_ARGS__)
+    #define DEBUG_ERR(fmt, ...) WriteLog(LOG_ALL, LOG_WARN, fmt, ## __VA_ARGS__)
+    #define DEBUG_FATAL(fmt, ...) WriteLog(LOG_ALL, LOG_FATAL, fmt, ## __VA_ARGS__)
+    #define DEBUG_HERE Write_Where(__FILE__, __LINE__, __FUNCTION__, LOG_ALL, LOG_DEBUG, "Entered", ## __VA_ARGS__)
 #endif
