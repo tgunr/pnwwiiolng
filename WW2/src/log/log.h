@@ -30,6 +30,27 @@ enum
 	LOG_ALL		= 0xffffffff
 };
 
+static const char* LOG_SYSTEM_NAMES[32] =
+        {
+                "old",
+                "terrain",
+                "weapon",
+                "fps",
+                "render",
+                "sound",
+                "ui",
+                "vehicle",
+                "physics",
+                "comm",
+                "fx",
+                "timer",
+                "texture",
+                "console",
+                "fio",
+                "teul"
+                // NULLS the rest out
+        };
+
 // logging levels
 enum
 {

@@ -24,24 +24,6 @@ static SINT32 logLevel = 0;
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker);
 
-static const char* LOG_SYSTEM_NAMES[32] =
-{
-	"old",
-	"terrain",
-	"weap",
-	"fps",
-	"render",
-	"sound",
-	"ui",
-	"vehicle",
-	"physics",
-	"comm",
-	"fx",
-	"timer",
-    "texture",
-	"console"
-	// NULLS the rest out
-};
 
 /************************************************************************************************
 	Write_Log
