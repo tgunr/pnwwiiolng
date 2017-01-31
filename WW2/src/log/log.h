@@ -11,9 +11,9 @@
 enum
 {
 	LOG_NONE	= 0x0,
-	LOG_OLD 	= 0x00000001, // Old Write_Debug
+	LOG_OLD 	= 0x00000001, // Old WriteDebug
 	LOG_TERRAIN	= 0x00000002,
-	LOG_WEAP	= 0x00000004,
+	LOG_WEAPON	= 0x00000004,
 	LOG_FPS		= 0x00000008,
 	LOG_RENDER	= 0x00000010,
 	LOG_SOUND	= 0x00000020,
@@ -25,6 +25,8 @@ enum
    	LOG_TIMER	= 0x00000800,
     LOG_TEXTURE = 0x00001000,
 	LOG_CONSOLE = 0x00002000,
+	LOG_FIO		= 0x00004000,
+    LOG_TEUL    = 0x00008000,
 
 	// Add others as needed
 	LOG_ALL		= 0xffffffff
@@ -55,8 +57,13 @@ static const char* LOG_SYSTEM_NAMES[32] =
 enum
 {
 	LOG_FATAL,
+    LOG_ABORT,
+    LOG_RECOVER,
 	LOG_WARN,
-	LOG_INFO
+    LOG_MINOR,
+    LOG_NOTE,
+	LOG_INFO,
+	LOG_DEBUG
 };
 
 #ifdef EVENT_LOG
