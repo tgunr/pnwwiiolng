@@ -31,7 +31,7 @@
 
 #include <cat/Singleton.hpp>
 #include <memory>
-#include <xstring>
+#include <string>
 #include <sstream>
 
 namespace cat {
