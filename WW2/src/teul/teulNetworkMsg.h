@@ -154,7 +154,7 @@ public:
 		}
 		catch (std::exception& e)
         {
-            dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what());
+            WriteLog(LOG_TEUL, LOG_ABORT, "%s: %s", __FUNCTION__, e.what());
             return -EINVAL;
         }
 	}

@@ -114,7 +114,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 	SINT32 sy = (bd[0].posy/SUPERCELL_SIZE_M);
 
 #ifdef SDM_DEBUG_EXTREAM
-	dbugLog(_FLW,"adding buildings to sc %d:%d",sx,sy);
+	WriteLog(LOG_TERRAIN, LOG_WARN,"adding buildings to sc %d:%d",sx,sy);
 #endif
 
 	// TODO: Is there any reason this isn't a vector?
@@ -138,7 +138,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 			const BUILDING& building = bd[i];
 			strtDataErrorParentFacility(building.name, building.fileName, sx, sy, building.oid.id, static_cast<UINT16>(i), building.pid.id);
 #else
-			dbugLog(_FLA,"sc:%d,%d can't find facility:%d for building:%d (%s [%s])"
+			WriteLog(LOG_TERRAIN, LOG_ABORT,"sc:%d,%d can't find facility:%d for building:%d (%s [%s])"
 						, sx, sy
 						, bd[i].pid.id
 						, bd[i].oid.id
@@ -170,7 +170,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 		if (cell.empty())
 			cell.reserve(MAX_BUILDINGS_PER_CELL);
 		cell.push_back(bd[i].oid.id);
-//		dbugLog(_FLW,"adding building %d to pos:%d,%d sc:%d,%d cell:%d,%d"
+//		WriteLog(LOG_TERRAIN, LOG_WARN,"adding building %d to pos:%d,%d sc:%d,%d cell:%d,%d"
 //					,bd[i].oid.id,bd[i].posx,bd[i].posy,sx,sy,x,y);
 	}
 

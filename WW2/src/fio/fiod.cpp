@@ -191,14 +191,14 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 	///TODO: OGS: I think this works under Windows too...
 	if ( retval < 0 || !S_ISREG(statBuffer.st_mode) )
 	{
-		dbugLog(_FLW, "File could not be opened %s", buffer);
+		WriteLog(LOG_FIO, LOG_WARN, "File could not be opened %s", buffer);
 		return -1;
 	}
 #else
 	///TODO: OGS: See above: This allows Windows to [try to] open directories like files.
 	if ( retval < 0 )
 	{
-		dbugLog(_FLW, "(WIN32) File could not be opened %s", buffer);
+		WriteLog(LOG_FIO, LOG_WARN, "(WIN32) File could not be opened %s", buffer);
 		return -1;
 	}
 #endif
@@ -206,11 +206,11 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 	// make sure and update our passed in widePath to the found path
 	if(!WWII::ConvertChars(buffer, widePath, wsize))
 	{
-		dbugLog(_FLW, "Could not be convert chars %s", buffer);
+		WriteLog(LOG_FIO, LOG_WARN, "Could not be convert chars %s", buffer);
 		return -1;
 	}
 
-	dbugLog(_FLD, "file size found to be %ld", statBuffer.st_size);
+//	WriteLog(LOG_FIO, LOG_DEBUG, "file size found to be %ld", statBuffer.st_size);
 	return statBuffer.st_size; // Return what the OS thinks it is
 }
 
@@ -397,19 +397,19 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 	widePath[0] = 0;
 	asciiPath[0] = 0;
 
-	dbugLog(_FLD, "fiodOpen(%s, %d, %d)", filename, userdir, prereadSize);
+//	WriteLog(LOG_FIO, LOG_DEBUG, "fiodOpen(%s, %d, %d)", filename, userdir, prereadSize);
 
 	off_t fileSize = _getFilePathAndSize(filename, userdir, widePath, sizeof(widePath));
 
 	if ( fileSize < 0 )
 	{
-		dbugLog(_FLD, "Could not open file with file size %ld", fileSize);
+		WriteLog(LOG_FIO, LOG_DEBUG, "Could not open file: %s dir: %s size %lld",filename, userdir, fileSize);
 		return - 1;
 	}
 
 	if ( prereadSize > 0 && fileSize > prereadSize)
 	{
-		dbugLog(_FLD, "Altering read size to %d", prereadSize);
+		WriteLog(LOG_FIO, LOG_DEBUG, "Altering file: %s read size to %d", filename, prereadSize);
 		fileSize = prereadSize; // if too big will be caught below
 	}
 
@@ -435,7 +435,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 #endif
 	}
 	else {
-		dbugLog(_FLD, "Alloc size for new file is %" PRSizeT "", allocSize);
+//		WriteLog(LOG_FIO, LOG_DEBUG, "Alloc size for new file is %" PRSizeT "", allocSize);
 	}
 
 	mem[fileSize] = 0;
@@ -461,7 +461,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		assert( s_fileMap.find(fd) == s_fileMap.end() );
 
 		// Try to read the file contents into the allocation
-		dbugLog(_FLD, "About to read %ld bytes from file", fileSize);
+//		WriteLog(LOG_FIO, LOG_DEBUG, "About to read %ld bytes from file", fileSize);
 		off_t bytesRead = OS_READ(fd, mem, fileSize);
 		if ( bytesRead < fileSize )
 			throw "read failed/truncated";
@@ -476,7 +476,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 	{
 		// Report
 #if platBuild == BUILD_SERVER
-		dbugLog(_FLD, "fiod:%s:%s", cause, asciiPath);
+		WriteLog(LOG_FIO, LOG_DEBUG, "fiod:%s:%s", cause, asciiPath);
 #else
 		Write_Log(LOG_OLD, LOG_INFO, "fiod:%s:%s", cause, asciiPath);
 #endif
@@ -975,7 +975,7 @@ LOGICAL fiocfgAccess(const char* filename, bool)
 	char	fullpath[_MAX_PATH];
 	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
     int fd = -1;
-    if (OS_OPEN(&fd, os_file_path(fullpath), O_RDONLY, 0) == 0) { // fix for 1083
+    if (OS_OPEN(&fd, os_file_path(fullpath), O_RDONLY, 0) != -1) {
         OS_CLOSE(fd);
         return TRUE;
     }

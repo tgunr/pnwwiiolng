@@ -15,7 +15,7 @@ Teul::CallbackInit CallbackRegister::sm_ci;
 void
 CallbackRegister::_error(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {
-	dbugLog(_FLA, "t:%d error %d in teulCallback %p data %p size %d", teulIndex, error, static_cast<const void*>(object), data, size);
+	WriteLog(LOG_TEUL, LOG_ABORT, "t:%d error %d in teulCallback %p data %p size %d", teulIndex, error, static_cast<const void*>(object), data, size);
 }
 
 CallbackRegister::CallbackRegister(UCHAR x, const char * const name)

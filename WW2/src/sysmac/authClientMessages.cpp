@@ -76,7 +76,7 @@ _callbackError(
 {
     const std::pair<UINT32, UINT16>& dest = Teul::GetRemote(teulIndex);
 
-    dbugLog(_FLA, "ERROR: TeulIndex-%d, Address-%s, Dest-%u, Error-%d",
+    WriteLog(LOG_COMM, LOG_ABORT, "ERROR: TeulIndex-%d, Address-%s, Dest-%u, Error-%d",
         teulIndex, teulGetAddress(dest.first), dest.second, error
     );
 }

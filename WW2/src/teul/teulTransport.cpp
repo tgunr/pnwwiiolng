@@ -118,12 +118,12 @@ ENDPOINT::doConnect()
 {
 	if (PN_LIKELY(this->connectFn != nullptr))
 	{
-		dbugLog(_FLN, "t:%d connected calling %p", this->teulIndex(), this->connectFn);
+		WriteLog(LOG_TEUL, LOG_NOTE, "t:%d connected calling %p", this->teulIndex(), this->connectFn);
 		this->connectFn(*this);
 	}
 	else if ( protocol != PROTOCOL_UDB && protocol != PROTOCOL_CTRL )	// UDB doesn't connect.
 	{
-		dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " state:%u prot:%u connected NO CONNECT FN", this->teulIndex(), PRA_SOCKET(this->socket), this->state(), this->protocol);
+		WriteLog(LOG_TEUL, LOG_ABORT, "t:%d sock:" PRF_SOCKET " state:%u prot:%u connected NO CONNECT FN", this->teulIndex(), PRA_SOCKET(this->socket), this->state(), this->protocol);
 	}
 }
 
@@ -135,12 +135,12 @@ ENDPOINT::doAccept(ENDPOINT& newEndpoint)
 {
 	if (PN_LIKELY(this->connectFn))
 	{
-		dbugLog(_FLD, "t:%d doing handshaking calling doAccept(t:%d)", this->teulIndex(), newEndpoint.teulIndex());
+		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d doing handshaking calling doAccept(t:%d)", this->teulIndex(), newEndpoint.teulIndex());
 		this->connectFn(newEndpoint);
 	}
 	else
 	{
-		dbugLog(_FLD, "t:%d done handshaking t:%d", this->teulIndex(), newEndpoint.teulIndex());
+		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d done handshaking t:%d", this->teulIndex(), newEndpoint.teulIndex());
 	}
 }
 
@@ -191,7 +191,7 @@ teulOpenListen(const UINT16 portNumber
 					, ERROR_FUNCTION errorFnPtr
 					)
 {
-	dbugLog(_FLD,"opening listen port on address 0.0.0.0 port %hu", portNumber);
+	WriteLog(LOG_TEUL, LOG_DEBUG,"opening listen port on address 0.0.0.0 port %hu", portNumber);
 	return _openListen(0, portNumber,  acceptFnPtr,  timeout,  protocol,  errorFnPtr);
 }
 
@@ -217,7 +217,7 @@ teulOpenListenInterface(const UINT16 portNumber
 		///TODO: See how this handles actual multiple ips: do the callers appreciate
 		///TODO: the fact that they might be getting these calls with different
 		///TODO: teulIndexes? Do they cache them?
-		dbugLog(_FLD,"opening listen port on address %s port %d", teulGetAddress(Server::myInterface.addr[i].ip), portNumber);
+		WriteLog(LOG_TEUL, LOG_DEBUG,"opening listen port on address %s port %d", teulGetAddress(Server::myInterface.addr[i].ip), portNumber);
 		retval = _openListen( Server::myInterface.addr[i].ip
 						,  portNumber
 						,  acceptFnPtr
@@ -247,7 +247,7 @@ teulOpenListenHost(const UINT32 ipAddress
 					, ERROR_FUNCTION errorFnPtr
 					)
 {
-	dbugLog(_FLD,"opening listen port on address %s port %d", teulGetAddress(ipAddress), portNumber);
+	WriteLog(LOG_TEUL, LOG_DEBUG,"opening listen port on address %s port %d", teulGetAddress(ipAddress), portNumber);
 	return _openListen(ipAddress
 					,  portNumber
 					,  acceptFnPtr
@@ -414,7 +414,7 @@ teulInitTransport(LogMode logType
 
 	_transportInited = true;
 
-	dbugLog(_FLI, "Initializing TeulKit transport [compiled %s %s]", __DATE__, __TIME__);
+	WriteLog(LOG_COMM, LOG_INFO, "Initializing TeulKit transport [compiled %s %s]", __DATE__, __TIME__);
 
 	_transportClosing = false;
 
@@ -428,7 +428,7 @@ teulInitTransport(LogMode logType
 	const SINT32 retval = teulModStartup(errorFnPtr);
 	if ( retval < 0 )
 	{
-		dbugLog(_FLA,"module wont Init");
+		WriteLog(LOG_TEUL, LOG_ABORT,"module wont Init");
 		return retval;
 	}
 
@@ -498,7 +498,7 @@ teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data)
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
-		dbugLog(_FLA, "teulSend called with null callback");
+		WriteLog(LOG_TEUL, LOG_ABORT, "teulSend called with null callback");
 		return -EINVAL;
 	}
 
@@ -512,13 +512,13 @@ teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data)
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
-		dbugLog(_FLA, "teulSend called with null callback");
+		WriteLog(LOG_TEUL, LOG_ABORT, "teulSend called with null callback");
 		return -EINVAL;
 	}
 
 	if (PN_UNLIKELY(teulIndex < 0))
 	{
-		dbugLog(_FLW, "t:%d illegal", teulIndex);
+		WriteLog(LOG_TEUL, LOG_WARN, "t:%d illegal", teulIndex);
 		return teulIndex;
 	}
 
@@ -532,13 +532,13 @@ teulSendTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBACK* callbac
 {
 	if (PN_UNLIKELY(callback == nullptr))
 	{
-		dbugLog(_FLA,"illegal callback");
+		WriteLog(LOG_TEUL, LOG_ABORT,"illegal callback");
 		return -EINVAL;
 	}
 
 	if (PN_UNLIKELY(teulIndex < 0))
 	{
-		dbugLog(_FLA,"illegal index %d", teulIndex);
+		WriteLog(LOG_TEUL, LOG_ABORT,"illegal index %d", teulIndex);
 		return teulIndex;
 	}
 

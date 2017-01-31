@@ -335,7 +335,7 @@ _recvTuneToChannel(ACTION_OBJECT* const a)
 	SCHAR name[MAX_HANDLE_SIZE];
 	chatGetCallsign(name, tune.m_handle);
 
-	dbugLog(_FLD, "t:%d tuned rid %d to %d [%s] rx %d tx %d"
+	WriteLog(LOG_COMM, LOG_DEBUG, "t:%d tuned rid %d to %d [%s] rx %d tx %d"
 					, a->teulIndex
 					, tune.m_radioIndex
 					, tune.m_type
@@ -359,7 +359,7 @@ static SINT32 _recvUpdateChannel(ACTION_OBJECT* const a)
 	Chat::UpdateChannel update;
 	update.packer(TEUL_UNPACK, a);
 
-	dbugLog(_FLD, "received update channel from %d, radioIndex: %u, status: %d"
+	WriteLog(LOG_COMM, LOG_DEBUG, "received update channel from %d, radioIndex: %u, status: %d"
 					, a->teulIndex, update.radioIndex, update.receiveStatus
 					);
 

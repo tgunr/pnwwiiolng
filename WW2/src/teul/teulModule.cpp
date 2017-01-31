@@ -94,7 +94,7 @@ _getHostIPAddresses()
 		Server::myInterface.pid = getpid();
 		Server::myInterface.addr[ifNo].naddr = ((struct sockaddr_in*)(ifa->ifa_addr))->sin_addr.s_addr;
 		Server::myInterface.addr[ifNo].ip = ntohl(Server::myInterface.addr[ifNo].naddr);
-		dbugLog(_FLI, "read index %u interface %s, ip %s pid %u"
+		WriteLog(LOG_COMM, LOG_INFO, "read index %u interface %s, ip %s pid %u"
 					, ifNo
 					, ifa->ifa_name
 					, teulGetAddress(Server::myInterface.addr[ifNo].ip)
@@ -180,7 +180,7 @@ _getHostIPAddresses()
 		DWORD addrSize = sizeof(addrString) / sizeof(TCHAR);
 		WSAAddressToString(address->Address.lpSockaddr, address->Address.iSockaddrLength, nullptr, addrString, &addrSize);
 
-		dbugLog(_FLI, "read index %u interface %ls, ip %s pid %u"
+		WriteLog(LOG_COMM, LOG_INFO, "read index %u interface %ls, ip %s pid %u"
 						, ifNo
 						, preferredIf->FriendlyName
 						, addrString
@@ -372,7 +372,7 @@ _bindAndListen(ENDPOINT& endpoint)
 	if ( listen(endpoint.socket, MAX_ACCEPT_BACKLOG) < 0 )
 		throw Teul::OpenError("listen failed");
 
-	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " listening socket on %s:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d sock:" PRF_SOCKET " listening socket on %s:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -412,7 +412,7 @@ _connectSocket(ENDPOINT& endpoint)
 
 		assert( endpoint.m_impl->pollSlot() < 0 );
 
-		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " connecting on %s:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
+		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d sock:" PRF_SOCKET " connecting on %s:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
 
 		break;
 	}
@@ -446,7 +446,7 @@ _bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
 	if ( getsockname(endpoint.socket, (struct sockaddr*)&sockAddr, &len) < 0 )
 		throw Teul::OpenError("getsockname() failed after bind");
 
-	dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " bound to fam:%u addr:%s port:%hu"
+	WriteLog(LOG_COMM, LOG_INFO, "t:%d sock:" PRF_SOCKET " bound to fam:%u addr:%s port:%hu"
 					, endpoint.teulIndex()
 					, PRA_SOCKET(endpoint.socket)
 					, sockAddr.sin_family
@@ -460,7 +460,7 @@ SINT32
 teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn)
 {
 	if (PN_UNLIKELY(Teul::IsTransportClosing())) {
-		dbugLog(_FLM, "open connection refused: transport closing");
+		WriteLog(LOG_TEUL, LOG_RECOVER, "open connection refused: transport closing");
 		return -EDEADLK;
 	}
 
@@ -556,7 +556,7 @@ teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL pr
 		if ( err == nullptr )
 			err = "unknown";
 
-		dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " open error:%d [%s] %s"
+		WriteLog(LOG_TEUL, LOG_WARN, "t:%d sock:" PRF_SOCKET " open error:%d [%s] %s"
 					, newEndpoint->teulIndex(), PRA_SOCKET(newEndpoint->socket)
 					, e.errNo, err, e.msg
 					);
@@ -575,7 +575,7 @@ SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint)
 {
 	if (PN_UNLIKELY(inEndpoint.state() != IS_OPENING))
 	{
-		dbugLog(_FLA,"can't connect an endpoint in state %d", inEndpoint.state());
+		WriteLog(LOG_TEUL, LOG_ABORT,"can't connect an endpoint in state %d", inEndpoint.state());
 		return -EINVAL;
 	}
 
@@ -619,11 +619,11 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 	// When an error occurs, the full cycle of shutdown may bring us back here.
 	if ( inEndpoint.state() == IS_DEAD )
 	{
-//		dbugLog(_FLD, "t:%d endpoint already IS_DEAD", inEndpoint->teulIndex());
+//		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d endpoint already IS_DEAD", inEndpoint->teulIndex());
 		return;
 	}
 
-	dbugLog(_FLD, "t:%d closing [%u] st:%u cl:%s", inEndpoint.teulIndex(), code, inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d closing [%u] st:%u cl:%s", inEndpoint.teulIndex(), code, inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
 	if ( inEndpoint.state() < IS_CLOSING || inEndpoint.m_closed == false )
 		inEndpoint.doError(ENOTCONN);
 

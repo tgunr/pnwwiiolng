@@ -596,9 +596,9 @@ static void ReleaseSupercellObjects(TERRAIN_DETAIL* td) {
 		if (td->trnobjRefs[i] != nullptr) {
 			OBJECT* lpobj = obmainFindTopmostObject(td->trnobjRefs[i]);
 			if ( lpobj == nullptr ) {
-				dbugLog(_FLW, "Topmost object not found for %s.", td->trnobjRefs[i]);
+				WriteLog(LOG_TERRAIN, LOG_WARN, "Topmost object not found for %s.", td->trnobjRefs[i]);
 			} else if ( ! trnldrReleaseTerrainObject(lpobj, td) ) {
-				dbugLog(_FLW, "ReleaseSupercellObjects for supercell %d could not find object '%s' to remove.", td->terrain->trnum, td->trnobjRefs[i]);
+				WriteLog(LOG_TERRAIN, LOG_WARN, "ReleaseSupercellObjects for supercell %d could not find object '%s' to remove.", td->terrain->trnum, td->trnobjRefs[i]);
 			}
 
 			td->trnobjRefs[i] = nullptr;
@@ -627,9 +627,9 @@ static bool ReleaseSupercellObjectsSequenced(SINT32 sc) {
 	if ( td->trnobjRefs[i] != nullptr ) {
 		OBJECT* lpobj = obmainFindTopmostObject(td->trnobjRefs[i]);
 		if ( lpobj == nullptr )
-			dbugLog(_FLW, "Topmost object not found for %s.", td->trnobjRefs[i]);
+			WriteLog(LOG_TERRAIN, LOG_WARN, "Topmost object not found for %s.", td->trnobjRefs[i]);
 		else if ( ! trnldrReleaseTerrainObject(lpobj, td) )
-			dbugLog(_FLW, "ReleaseSupercellObjectsSequenced for supercell %d could not find object '%s' to remove.", td->terrain->trnum, td->trnobjRefs[i]);
+			WriteLog(LOG_TERRAIN, LOG_WARN, "ReleaseSupercellObjectsSequenced for supercell %d could not find object '%s' to remove.", td->terrain->trnum, td->trnobjRefs[i]);
 
 		td->trnobjRefs[i] = nullptr;
 	}

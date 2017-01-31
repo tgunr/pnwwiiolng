@@ -63,7 +63,7 @@ extern void teulReleaseDatagram(struct DATA_GRAM*);
 void
 teulCloseAllEndpoints(const SINT32 errorCode)
 {
-	dbugLog(_FLM, "Orderly shutdown in progress [%d].", errorCode);
+	WriteLog(LOG_TEUL, LOG_RECOVER, "Orderly shutdown in progress [%d].", errorCode);
 
 	Teul::ENDPOINT_LIST eps = idleEndpoints;
 
@@ -155,10 +155,10 @@ ENDPOINT::_dbugOutputPacket( bool isRecv, const uint8_t *input, size_t packetByt
 		}
 
 	if (!isRecv)
-		dbugLog(_FLD, "Sending MSG (%" PRSizeT " bytes): SourcePort %d DestPort %d IP %s Sent Dump:\n-->%s",
+		WriteLog(LOG_TEUL, LOG_DEBUG, "Sending MSG (%" PRSizeT " bytes): SourcePort %d DestPort %d IP %s Sent Dump:\n-->%s",
 		        packetBytes, destPort(), fromPort(), teulGetAddress(fromAddress()), debugBuff.get());
 	else
-		dbugLog(_FLD, "Receiving MSG (%" PRSizeT " bytes): SourcePort %d DestPort %d IP %s Recv Dump:\n<--%s",
+		WriteLog(LOG_TEUL, LOG_DEBUG, "Receiving MSG (%" PRSizeT " bytes): SourcePort %d DestPort %d IP %s Recv Dump:\n<--%s",
 		        packetBytes, destPort(), fromPort(), teulGetAddress(fromAddress()), debugBuff.get());
 }
 
@@ -202,7 +202,7 @@ teulGetEndpoint(const SINT32 teulIndex)
 	ENDPOINT& endpoint = _endpoints[teulIndex];
 	if ( PN_UNLIKELY(endpoint.m_inUse == false) )
 	{
-		dbugLog(_FLW, "t:%d endpoint not in use", teulIndex);
+		WriteLog(LOG_TEUL, LOG_WARN, "t:%d endpoint not in use", teulIndex);
 		return nullptr;
 	}
 
@@ -290,7 +290,7 @@ _allocEndpoint()
 	endpoint.m_closed = false;
 
 #ifdef DEV_BUILD
-	dbugLog(_FLD, "t:%d allocated endpoint %p", endpoint.teulIndex(), &endpoint);
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d allocated endpoint %p", endpoint.teulIndex(), &endpoint);
 #endif
 
 	return endpoint;
@@ -312,7 +312,7 @@ _releaseEndpoint(ENDPOINT& endpoint)
 	_freeEndpoints.push_back(&endpoint);
 
 #ifdef DEV_BUILD
-	dbugLog(_FLD, "t:%d pushed to freeList (%" PRSizeT " endpoints)", endpoint.teulIndex(), _freeEndpoints.size());
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d pushed to freeList (%" PRSizeT " endpoints)", endpoint.teulIndex(), _freeEndpoints.size());
 	dbugWrite(_FLN, "t:%d released", endpoint.teulIndex());
 #endif
 
@@ -333,7 +333,7 @@ public:
 	void add(ENDPOINT* endpoint) noexcept
 	{
 		if (endpoint != nullptr) {
-			dbugLog(_FLD, "t:%d (%p) adding to dead endpoints", endpoint->m_teulIndex, endpoint);
+			WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d (%p) adding to dead endpoints", endpoint->m_teulIndex, endpoint);
 #ifdef DEBUG
 			ABORT_IF_EX( std::find(m_endpoints.begin(), m_endpoints.end(), endpoint) != m_endpoints.end(),
 							"endpoint added to dead endpoints manager twice." );
@@ -386,17 +386,17 @@ teulRemoveEndpoint(ENDPOINT* endpoint)
 	if ( endpoint == nullptr )
 		return;
 
-	dbugLog(_FLM, "teulRemoveEndpoint(%p) t:%d iu:%d cl:%d st:%d", endpoint, endpoint->teulIndex(), (int)endpoint->m_inUse, (int)endpoint->m_closed, endpoint->m_state);
+	WriteLog(LOG_TEUL, LOG_RECOVER, "teulRemoveEndpoint(%p) t:%d iu:%d cl:%d st:%d", endpoint, endpoint->teulIndex(), (int)endpoint->m_inUse, (int)endpoint->m_closed, endpoint->m_state);
 
 	if ( ! endpoint->m_inUse )
 	{
-		dbugLog(_FLD, "t:%d tried to remove endpoint not in use", endpoint->teulIndex());
+		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d tried to remove endpoint not in use", endpoint->teulIndex());
 		return;
 	}
 
 	if ( endpoint->m_closed == false )
 	{
-		dbugLog(_FLD, "t:%d tried to remove unclosed endpoint", endpoint->teulIndex());
+		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d tried to remove unclosed endpoint", endpoint->teulIndex());
 		endpoint->doError(ECONNABORTED);
 		endpoint->shutdown();
 	}
@@ -438,14 +438,14 @@ teulFreeEndpoint(ENDPOINT* inEndpoint)
 		return;
 
 #ifdef DEV_BUILD
-	dbugLog(_FLD, "t:%d freeing endpoint %p", inEndpoint->teulIndex(), inEndpoint);
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d freeing endpoint %p", inEndpoint->teulIndex(), inEndpoint);
 #endif
 
 	inEndpoint->releaseDatagram();
 
 	inEndpoint->m_impl->Reset();
 
-//	dbugLog(_FLD, "pushing endpoint %p to freelist", inEndpoint);
+//	WriteLog(LOG_TEUL, LOG_DEBUG, "pushing endpoint %p to freelist", inEndpoint);
 	_releaseEndpoint(*inEndpoint);
 }
 
@@ -482,7 +482,7 @@ teulInitEndpoints(ERROR_FUNCTION const endpointErrorFn)
 		_endpoints[i].initialize(i);
 	}
 
-	dbugLog(_FLI, "Teul::MaxConnections %" PRSizeT " freeEndpoints %" PRSizeT " sizeof(ENDPOINT):%" PRSizeT " sizeof(ENDPOINTImpl):%" PRSizeT, Teul::MaxConnections, _endpoints.size(), sizeof(ENDPOINT), sizeof(EndpointImpl));
+	WriteLog(LOG_COMM, LOG_INFO, "Teul::MaxConnections %" PRSizeT " freeEndpoints %" PRSizeT " sizeof(ENDPOINT):%" PRSizeT " sizeof(ENDPOINTImpl):%" PRSizeT, Teul::MaxConnections, _endpoints.size(), sizeof(ENDPOINT), sizeof(EndpointImpl));
 
 	ABORT_IF_EX(_freeEndpoints.empty() == true, "endpointFreeList should not be empty after initialization");
 }
@@ -532,7 +532,7 @@ ENDPOINT::setTimeout(const UINT32 timeout_)
 		m_impl->kliveInterval = (UINT16)interval;
 		m_doTimeoutCheck = true;
 #if defined(DEBUG_CONNECTIONS)
-		dbugLog(_FLD, "t:%d timeout:%u, iv:%u, dtc:true", teulIndex(), timeout_, interval);
+		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d timeout:%u, iv:%u, dtc:true", teulIndex(), timeout_, interval);
 		printf("t:%d timeout:%u, iv:%u, dtc:true\n", teulIndex(), timeout_, interval);
 #endif
 	}
@@ -548,7 +548,7 @@ teulCreateEndpoint(const bool isListening, SINT32 timeout, const PROTOCOL protoc
 	teulSyncClock();  // for granular reporting, previously all our callers did this
 
 	if (PN_UNLIKELY(teulHasFreeEndpoints() == false)) {
-		dbugLog(_FLA, "no free endpoints available");
+		WriteLog(LOG_TEUL, LOG_ABORT, "no free endpoints available");
 		return nullptr;
 	}
 	ENDPOINT& endpoint = _allocEndpoint();
@@ -599,7 +599,7 @@ teulCreateEndpoint(const bool isListening, SINT32 timeout, const PROTOCOL protoc
 
 		default:
 			dbugSetErrno(EINVAL);
-			dbugLog(_FLA, "error allocating endpoint, invalid protocol");
+			WriteLog(LOG_TEUL, LOG_ABORT, "error allocating endpoint, invalid protocol");
 			teulFreeEndpoint(&endpoint);
 			return nullptr;
 	}
@@ -741,7 +741,7 @@ ENDPOINT::setRcvBufferSize(UINT32 newSize)
 	const UINT32 goalSize = (std::min(newSize, (UINT32)ENDPOINT::MaxRcvBufferSize) + chunkSize) & (~chunkMask);
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " setting rcv to %dbytes", teulIndex(), PRA_SOCKET(socket), goalSize);
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d sock:" PRF_SOCKET " setting rcv to %dbytes", teulIndex(), PRA_SOCKET(socket), goalSize);
 #endif
 
 	return setsockopt(socket, SOL_SOCKET, SO_RCVBUF, (const char*)&goalSize, sizeof(goalSize));
@@ -759,7 +759,7 @@ ENDPOINT::setSndBufferSize(UINT32 newSize)
 	const UINT32 goalSize = (std::min(newSize, (UINT32)ENDPOINT::MaxSndBufferSize) + chunkSize) & (~chunkMask);
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " setting sndbuf to %dbytes", teulIndex(), PRA_SOCKET(socket), goalSize);
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d sock:" PRF_SOCKET " setting sndbuf to %dbytes", teulIndex(), PRA_SOCKET(socket), goalSize);
 #endif
 
 	return setsockopt(socket, SOL_SOCKET, SO_SNDBUF, (const char*)&goalSize, sizeof(goalSize));
@@ -788,7 +788,7 @@ ENDPOINT::shutdown()
 		OS_CLOSESOCKET(this->socket);
 
 #ifdef DEV_BUILD
-		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " closed socket", this->teulIndex(), PRA_SOCKET(this->socket));
+		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d sock:" PRF_SOCKET " closed socket", this->teulIndex(), PRA_SOCKET(this->socket));
 #endif
 
 		this->socket = INVALID_SOCKET;

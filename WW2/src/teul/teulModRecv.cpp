@@ -207,7 +207,7 @@ teulReleaseDatagram(DATA_GRAM* gram)
 void teulInitModRecv()
 {
 #if defined(NIX_VERSION)
-	dbugLog(_FLI, "FD_SETSIZE = %u, sizeof(fd_set) = %" PRSizeT ", MAX_POLL_FD = %" PRSizeT, FD_SETSIZE, sizeof(fd_set), POLL_STRUCT::CAPACITY);
+//	WriteLog(LOG_COMM, LOG_INFO, "FD_SETSIZE = %u, sizeof(fd_set) = %" PRSizeT ", MAX_POLL_FD = %" PRSizeT, FD_SETSIZE, sizeof(fd_set), POLL_STRUCT::CAPACITY);
 
 	memset(&pollData, 0, sizeof(pollData));
 	for (size_t i = 0; i < pollData.CAPACITY; i++)
@@ -228,7 +228,7 @@ void teulCleanupModRecv()
 	for (size_t i = 0; i < s_freeDatagrams.size(); ++i)
 	{
 		auto& bucket = s_freeDatagrams[i];
-		dbugLog(_FLN, "Freeing %" PRSizeT "Kb DATA_GRAMs: %" PRSizeT "", (i * DATAGRAM_ROUNDING) / 1024, bucket.size());
+		WriteLog(LOG_TEUL, LOG_NOTE, "Freeing %" PRSizeT "Kb DATA_GRAMs: %" PRSizeT "", (i * DATAGRAM_ROUNDING) / 1024, bucket.size());
 		while (bucket.empty() == false)
 		{
 			memFree(bucket.top());
@@ -240,7 +240,7 @@ void teulCleanupModRecv()
 static void
 _connectionRefused(ENDPOINT& endpoint, const SINT32 error)
 {
-	dbugLog(_FLA, "t:%d connection refused.", endpoint.teulIndex());
+	WriteLog(LOG_TEUL, LOG_ABORT, "t:%d connection refused.", endpoint.teulIndex());
 
 	dbugSetErrno(error);
 	endpoint.doError(error);
@@ -280,7 +280,7 @@ _checkConnectTCP(ENDPOINT& endpoint)
 		endpoint.setConnected();
 		retval = PN_LIKELY(SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *SYN_TOKEN) : -EINVAL;
 		if (PN_UNLIKELY(retval < 0))
-			dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " new connection send failed err:%d"
+			WriteLog(LOG_TEUL, LOG_ABORT, "t:%d sock:" PRF_SOCKET " new connection send failed err:%d"
 						, endpoint.teulIndex(), PRA_SOCKET(sock), retval);
 //		return 0;
 	}
@@ -298,13 +298,13 @@ _checkConnectTCP(ENDPOINT& endpoint)
 				endpoint.lastDataSent.makeCurrent();
 				len = SockAddrLen;
 				getsockname(sock, (struct sockaddr*) &endpoint.localSockAddress, &len);
-				dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " open err:%d retval:%d"
+				WriteLog(LOG_TEUL, LOG_ABORT, "t:%d sock:" PRF_SOCKET " open err:%d retval:%d"
 							, endpoint.teulIndex(), PRA_SOCKET(sock), error, retval);
 				endpoint.setConnected();
 				retval = PN_LIKELY(SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *SYN_TOKEN) : -EINVAL;
 				if ( retval < 0 )
 				{
-					dbugLog(_FLA,"t:%d sock:" PRF_SOCKET " couldn't send to new connection err:%d"
+					WriteLog(LOG_TEUL, LOG_ABORT,"t:%d sock:" PRF_SOCKET " couldn't send to new connection err:%d"
 								, endpoint.teulIndex(), PRA_SOCKET(sock), retval);
 					teulClose(endpoint, Teul::Closing::ConnSend);
 				}
@@ -312,7 +312,7 @@ _checkConnectTCP(ENDPOINT& endpoint)
 			}
 			else
 			{
-				dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " connect error, closing", endpoint.teulIndex(), PRA_SOCKET(sock));
+				WriteLog(LOG_TEUL, LOG_ABORT, "t:%d sock:" PRF_SOCKET " connect error, closing", endpoint.teulIndex(), PRA_SOCKET(sock));
 				teulClose(endpoint, Teul::Closing::ConnError);
 //				return -ENOTCONN;
 			}
@@ -323,7 +323,7 @@ _checkConnectTCP(ENDPOINT& endpoint)
 		}
 		else
 		{
-			dbugLog(_FLA,"t:%d sock:" PRF_SOCKET " open err:%d retval:%d", endpoint.teulIndex(), PRA_SOCKET(sock), error, retval);
+			WriteLog(LOG_TEUL, LOG_ABORT,"t:%d sock:" PRF_SOCKET " open err:%d retval:%d", endpoint.teulIndex(), PRA_SOCKET(sock), error, retval);
 			dbugSetErrno(error);
 //			return -error;
 		}
@@ -336,7 +336,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 {
 	u_long argp = 1;
 
-	dbugLog(_FLD, "t:%d entered _acceptConnectTCP, time:%" PR64BitUT "", endpoint.teulIndex(), teulClock64);
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d entered _acceptConnectTCP, time:%" PR64BitUT "", endpoint.teulIndex(), teulClock64);
 	// Multiple simultaneous incoming connections may only generate a single "event", so while we
 	// are here, we should try and drain any/all incoming connections queued up (hence the loop).
 	for ( ; ; )
@@ -353,12 +353,12 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		const SINT32 retval = ioctlsocket(newSock, FIONBIO, &argp);
 		if ( PN_UNLIKELY(retval < 0) )
 		{
-			dbugLog(_FLA, "t:%d could not accept connection", endpoint.teulIndex());
+			WriteLog(LOG_TEUL, LOG_ABORT, "t:%d could not accept connection", endpoint.teulIndex());
 			closesocket(newSock);
 			continue;
 		}
 
-		dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " accepting connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
+		WriteLog(LOG_COMM, LOG_INFO, "t:%d sock:" PRF_SOCKET " accepting connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
 
 		ENDPOINT* newEndpoint = teulCreateEndpoint(false, endpoint.timeout, (PROTOCOL)endpoint.protocol);
 		if ( PN_UNLIKELY(newEndpoint == nullptr) )
@@ -394,7 +394,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		char localIP[32];
 		teulGetAddress(newEndpoint->localAddress(), localIP, sizeof(localIP));
 
-		dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET " (li:%" PR64BitUT ")"
+		WriteLog(LOG_TEUL, LOG_NOTE, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET " (li:%" PR64BitUT ")"
 					, endpoint.teulIndex()
 					, remoteIP, newEndpoint->fromPort()
 					, localIP, newEndpoint->localPort()
@@ -441,7 +441,7 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 			// it is important or not.
 
 			err = dbugGetErrno();
-			dbugLog(_FLN, "t:%d sock:" PRF_SOCKET " tcp close: end of stream (recv:0, err:%d), time %" PR64BitUT "",
+			WriteLog(LOG_TEUL, LOG_NOTE, "t:%d sock:" PRF_SOCKET " tcp close: end of stream (recv:0, err:%d), time %" PR64BitUT "",
 					endpoint.teulIndex(), PRA_SOCKET(sock), err, teulClock64);
 
 			// Tear down all of the teulkit abstractions over the socket and
@@ -463,7 +463,7 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 		} else if ( err == ECONNREFUSED ) {
 			_connectionRefused(endpoint, err);
 		} else {
-			dbugLog(_FLN, "t:%d sock:" PRF_SOCKET " read err:%d retval:%d", endpoint.teulIndex(), PRA_SOCKET(sock), err, retval);
+			WriteLog(LOG_TEUL, LOG_NOTE, "t:%d sock:" PRF_SOCKET " read err:%d retval:%d", endpoint.teulIndex(), PRA_SOCKET(sock), err, retval);
 			teulClose(endpoint, Teul::Closing::ReadErr);
 			dbugSetErrno(err);
 		}
@@ -502,7 +502,7 @@ _startNewPacket(ENDPOINT& endpoint)
 	{
 		dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
 
-		dbugLog(_FLN, "t:%d garbage packet prefix %u", endpoint.teulIndex(), token);
+		WriteLog(LOG_TEUL, LOG_NOTE, "t:%d garbage packet prefix %u", endpoint.teulIndex(), token);
 		teulClose(endpoint, Teul::Closing::Prefix);
 		return -EINVAL;
 	}
@@ -516,7 +516,7 @@ _startNewPacket(ENDPOINT& endpoint)
 	{
 		dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
 
-		dbugLog(_FLN, "t:%d garbage short packets, ignoring.", endpoint.teulIndex());
+		WriteLog(LOG_TEUL, LOG_NOTE, "t:%d garbage short packets, ignoring.", endpoint.teulIndex());
 		endpoint.m_readBufferUsed = totalRead;
 		dbugSetErrno(0);
 		return -1;
@@ -527,7 +527,7 @@ _startNewPacket(ENDPOINT& endpoint)
 	{
 		dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
 
-		dbugLog(_FLN, "t:%d invalid packet size: %" PRSizeT, endpoint.teulIndex(), size);
+		WriteLog(LOG_TEUL, LOG_NOTE, "t:%d invalid packet size: %" PRSizeT, endpoint.teulIndex(), size);
 		teulClose(endpoint, Teul::Closing::BadSize);
 		return -EINVAL;
 	}
@@ -585,7 +585,7 @@ _recvfromStream(ENDPOINT& endpoint)
 #ifdef DEBUG_RECV_PACKET
 		const DATA_GRAM& dgram = *endpoint.m_impl->m_curDatagram;
 		// Note that the start logic above will make it so every packet starts with three bytes.
-		dbugLog(_FLD, "t:%d RecvPacket%s [%u:%u] : %u(+%d)/%u bytes",
+		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d RecvPacket%s [%u:%u] : %u(+%d)/%u bytes",
 		        endpoint.teulIndex(), endpoint.m_readBufferUsed < dgram.m_size ? "Cont" : "End",
 		        dgram.contents->m_callX, dgram.contents->m_callY,
 		        endpoint.m_readBufferUsed, retval, dgram.m_size);
@@ -688,19 +688,19 @@ _recvDatagram(ENDPOINT& endpoint)
 				const int err = dbugGetErrno();
 				if ( err != PLAT_EINTR && err != 0 )
 				{
-					dbugLog(_FLD, "Non EINTR error detected %d setting return value to %d", retval, packetsReceived);
+					WriteLog(LOG_TEUL, LOG_DEBUG, "Non EINTR error detected %d setting return value to %d", retval, packetsReceived);
 					retval = packetsReceived;
 					break;
 				}
 				errorCount += 1;
-				dbugLog(_FLD, "Error count now %d last error %d", errorCount, err);
+				WriteLog(LOG_TEUL, LOG_DEBUG, "Error count now %d last error %d", errorCount, err);
 			}
 			else
 				++packetsReceived;
 		} while ( errorCount < 16 && endpoint.m_impl->recvQueue.size() == 0 );
 
 		if ( errorCount > 2 )
-			dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " packets:%u errors:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), packetsReceived, errorCount);
+			WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d sock:" PRF_SOCKET " packets:%u errors:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), packetsReceived, errorCount);
 	}
 	else if ( endpoint.m_reliable == false )
 	{
@@ -735,7 +735,7 @@ _handleReceive(ENDPOINT& endpoint)
 	teulSyncClock();
 	const TeulTimeMS endRX = teulClock64;
 	if ( endRX - startRX > 1 )
-		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". rcvDatagram interval=%" PR64BitUT "ms", endpoint.teulIndex(), PRA_SOCKET(sock), endRX - startRX);
+		WriteLog(LOG_TEUL, LOG_ABORT, "STALL t:%d sock:" PRF_SOCKET ". rcvDatagram interval=%" PR64BitUT "ms", endpoint.teulIndex(), PRA_SOCKET(sock), endRX - startRX);
 #endif
 
 	if ( PN_UNLIKELY(theErr < 0) )
@@ -748,7 +748,7 @@ _handleReceive(ENDPOINT& endpoint)
 				return false;
 			else
 			{
-				dbugLog(_FLI, "t:%d endpoint error %d; closing", endpoint.teulIndex(), theErr);
+				WriteLog(LOG_COMM, LOG_INFO, "t:%d endpoint error %d; closing", endpoint.teulIndex(), theErr);
 				teulClose(endpoint, Teul::Closing::RecvError);
 				return true;
 			}
@@ -768,7 +768,7 @@ _handleReceive(ENDPOINT& endpoint)
 	teulSyncClock();
 	const TeulTimeMS endCB = teulClock64;
 	if ( endCB - startCB > 10 )
-		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". routeCallbacks callbacks interval=%" PR64BitUT "ms", endpoint.teulIndex(), PRA_SOCKET(sock), endCB - startCB);
+		WriteLog(LOG_TEUL, LOG_ABORT, "STALL t:%d sock:" PRF_SOCKET ". routeCallbacks callbacks interval=%" PR64BitUT "ms", endpoint.teulIndex(), PRA_SOCKET(sock), endCB - startCB);
 #endif
 
 	return false;
@@ -812,7 +812,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 		if ( it == socketToEndpoint.end() )
 		{
 			// not sure how we get here yet but I know its bad...
-			dbugLog(_FLI, "sock:" PRF_SOCKET " attempt to use invalid null endpoint whacking slot %" PRSizeT "", PRA_SOCKET(sock), slot);
+			WriteLog(LOG_COMM, LOG_INFO, "sock:" PRF_SOCKET " attempt to use invalid null endpoint whacking slot %" PRSizeT "", PRA_SOCKET(sock), slot);
 			sfd.fd = INVALID_SOCKET;
 			continue;
 		}
@@ -822,7 +822,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 
 		if ( (endpoint.m_inUse == false) | (endpoint.socket == INVALID_SOCKET) )
 		{
-			dbugLog(_FLI,"t:%d attempted used of invalid endpoint", endpoint.teulIndex());
+			WriteLog(LOG_COMM, LOG_INFO,"t:%d attempted used of invalid endpoint", endpoint.teulIndex());
 			teulMRecvRemoveFromPoll(endpoint);
 			continue;
 		}
@@ -858,7 +858,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 #if defined(POLLRDHUP)
 		if ( PN_UNLIKELY((revents & POLLRDHUP) != 0) )
 		{
-			dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " remote disconnected", endpoint.teulIndex(), PRA_SOCKET(sock));
+			WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d sock:" PRF_SOCKET " remote disconnected", endpoint.teulIndex(), PRA_SOCKET(sock));
 			teulClose(endpoint, Teul::Closing::RemoteDisc);
 			continue;
 		}
@@ -866,7 +866,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 
 		if ( PN_UNLIKELY((revents & POLLHUP) != 0) )
 		{
-			dbugLog(_FLM, "t:%d sock:" PRF_SOCKET " socket terminated", endpoint.teulIndex(), PRA_SOCKET(sock));
+			WriteLog(LOG_TEUL, LOG_RECOVER, "t:%d sock:" PRF_SOCKET " socket terminated", endpoint.teulIndex(), PRA_SOCKET(sock));
 			teulClose(endpoint, Teul::Closing::LocalDisc);
 			continue;
 		}
@@ -892,12 +892,12 @@ _checkEndpointState(ENDPOINT& endpoint)
 		{
 			const TeulDeltaMS timeSinceLastKlive = endpoint.lastKliveSent.elapsed();
 #if defined(DEBUG_CONNECTIONS)
-			dbugLog(_FLD, "t:%d dtc:true tslk:%" PR64BitUT " kli:%" PR64BitUT "", endpoint.teulIndex(), timeSinceLastKlive, (UINT64)endpoint.m_impl->kliveInterval);
+			WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d dtc:true tslk:%" PR64BitUT " kli:%" PR64BitUT "", endpoint.teulIndex(), timeSinceLastKlive, (UINT64)endpoint.m_impl->kliveInterval);
 #endif
 			if ( timeSinceLastKlive >= (TeulDeltaMS)(UINT64)endpoint.m_impl->kliveInterval )
 			{
 #if defined(DEBUG_CONNECTIONS)
-				dbugLog(_FLD, " sending klive");
+				WriteLog(LOG_TEUL, LOG_DEBUG, " sending klive");
 #endif
 				const bool oldNagleValue = endpoint.setNagleEnabled(false);
 				const SINT32 sendResult = PN_LIKELY(KLIVE_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *KLIVE_TOKEN) : -EINVAL;
@@ -960,7 +960,7 @@ _checkEndpointTimeouts(ENDPOINT& endpoint)
 	if (endpoint.state() <= IS_CLOSED)
 	{
 		printf("t:%d timeout\n", endpoint.teulIndex());
-		dbugLog(_FLN, "t:%d endpoint timeout error, closed timeout:%d elapsed:%" PR64BitT "ms"
+		WriteLog(LOG_TEUL, LOG_NOTE, "t:%d endpoint timeout error, closed timeout:%d elapsed:%" PR64BitT "ms"
 					, endpoint.teulIndex()
 					, endpoint.timeout
 					, elapsed
@@ -981,7 +981,7 @@ _idleEndpoint(ENDPOINT& endpoint)
 static void
 _endpointError(const char* const text, ENDPOINT& endpoint, const SINT32 err)
 {
-	dbugLog(_FLA, "t:%d endpoint connect error %d (%s), closing", endpoint.teulIndex(), err, text);
+	WriteLog(LOG_TEUL, LOG_ABORT, "t:%d endpoint connect error %d (%s), closing", endpoint.teulIndex(), err, text);
 	endpoint.doError(err);
 	teulClose(endpoint, Teul::Closing::EndpointError);
 }
@@ -1019,14 +1019,14 @@ _endpointFDConnect(ENDPOINT& endpoint, const WSANETWORKEVENTS& eventData)
 	case 0:
 		if ( endpoint.protocol != PROTOCOL_TCP ) // && endpoint->protocol != CMD )
 		{
-			dbugLog(_FLA, "received connect for endpoint %d ilegal protocol %d"
+			WriteLog(LOG_TEUL, LOG_ABORT, "received connect for endpoint %d ilegal protocol %d"
 						, endpoint.teulIndex(), endpoint.protocol);
 			return false;
 		}
 
 		if ( endpoint.state() != IS_OPENING || endpoint.m_connected == true )
 		{
-			dbugLog(_FLA,"received connect on endpoint %d in state %d"
+			WriteLog(LOG_TEUL, LOG_ABORT,"received connect on endpoint %d in state %d"
 						, endpoint.teulIndex(), endpoint.state());
 			return false;
 		}
@@ -1105,7 +1105,7 @@ _pollSocketsInner(TeulTimeMS remainder)
 		const int enumErr = WSAEnumNetworkEvents(endpoint.socket, endpoint.eventObject, &eventData);
 		if ( enumErr != 0 )
 		{
-			dbugLog(_FLD, "Aborting, error returned from WSAEnumNetworkEvents %d", enumErr);
+			WriteLog(LOG_TEUL, LOG_DEBUG, "Aborting, error returned from WSAEnumNetworkEvents %d", enumErr);
 			continue;
 		}
 
@@ -1137,7 +1137,7 @@ _pollSocketsInner(TeulTimeMS remainder)
 					}
 					else
 					{
-						dbugLog(_FLI, "t:%d recv error:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), errNo, teulClock64);
+						WriteLog(LOG_COMM, LOG_INFO, "t:%d recv error:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), errNo, teulClock64);
 						teulClose(endpoint, Teul::Closing::RcvDgramError);
 					}
 					continue;
@@ -1148,13 +1148,13 @@ _pollSocketsInner(TeulTimeMS remainder)
 		{
 			if ( endpoint.protocol != PROTOCOL_TCP ) // && endpoint->protocol != CMD )
 			{
-				dbugLog(_FLA, "t:%d received accept for ilegal protocol %d", endpoint.teulIndex(), endpoint.protocol);
+				WriteLog(LOG_TEUL, LOG_ABORT, "t:%d received accept for ilegal protocol %d", endpoint.teulIndex(), endpoint.protocol);
 				continue;
 			}
 
 			if ( endpoint.state() != IS_LISTENING)
 			{
-				dbugLog(_FLA, "t:%d received accept on non listening endpoint", endpoint.teulIndex());
+				WriteLog(LOG_TEUL, LOG_ABORT, "t:%d received accept on non listening endpoint", endpoint.teulIndex());
 				continue;
 			}
 
@@ -1162,7 +1162,7 @@ _pollSocketsInner(TeulTimeMS remainder)
 		}
 		else if( eventData.lNetworkEvents & FD_CLOSE )
 		{
-			dbugLog(_FLI, "t:%d close code:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), eventData.iErrorCode[FD_CLOSE_BIT], teulClock64);
+			WriteLog(LOG_COMM, LOG_INFO, "t:%d close code:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), eventData.iErrorCode[FD_CLOSE_BIT], teulClock64);
 			teulClose(endpoint, Teul::Closing::FDClose);
 			continue;
 		}
@@ -1226,7 +1226,7 @@ static void _pollAddEndpoint(ENDPOINT& endpoint)
 	pollData.m_count++;
 	endpoint.m_impl->pollSlot(slot);
 
-	dbugLog(_FLD,"t:%d sock:" PRF_SOCKET " adding endpoint state:%d slot:%d count:%" PRSizeT ""
+	WriteLog(LOG_TEUL, LOG_DEBUG,"t:%d sock:" PRF_SOCKET " adding endpoint state:%d slot:%d count:%" PRSizeT ""
 				, endpoint.teulIndex(), PRA_SOCKET(endpoint.socket)
 				, endpoint.state(), endpoint.m_impl->pollSlot(), static_cast<size_t>(pollData.m_count));
 
@@ -1243,7 +1243,7 @@ static void _pollRemoveEndpoint(ENDPOINT& endpoint)
 	assert(pollData.m_count > 0);
 	pollData.m_count--;
 
-	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " removing endpoint state:%d slot:%d count:%" PRSizeT ""
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d sock:" PRF_SOCKET " removing endpoint state:%d slot:%d count:%" PRSizeT ""
 				, endpoint.teulIndex(), PRA_SOCKET(endpoint.socket)
 				, endpoint.state(), slot, static_cast<size_t>(pollData.m_count));
 
@@ -1279,7 +1279,7 @@ teulMRecvRemoveFromPoll(ENDPOINT& endpoint)
 		WSAEventSelect(endpoint.socket, endpoint.eventObject, 0);
 		// Now close the event object.
 		if (WSACloseEvent(endpoint.eventObject) < 0)
-			dbugLog(_FLA,"t:%d error closing wsa event: %d", endpoint.teulIndex(), WSAGetLastError());
+			WriteLog(LOG_TEUL, LOG_ABORT,"t:%d error closing wsa event: %d", endpoint.teulIndex(), WSAGetLastError());
 	}
 #endif
 }
@@ -1289,7 +1289,7 @@ void teulMRecvUpdatePoll(ENDPOINT& endpoint)
 {
 	endpoint.updateSocketEvents();
 #ifdef EXTREME_DEBUG
-	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " updating endpoint slot:%d combined"
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d sock:" PRF_SOCKET " updating endpoint slot:%d combined"
 				, endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), endpoint.m_impl->pollSlot());
 #endif
 }
@@ -1305,7 +1305,7 @@ void teulMRecvAddToPoll(ENDPOINT& endpoint)
 #if defined(NIX_VERSION)
 	if ( PN_UNLIKELY((endpoint.state() == IS_DEAD) | (endpoint.socket == INVALID_SOCKET)) )
 	{
-		dbugLog(_FLA, "t:%d attempt to add an invalid endpoint to poll", endpoint.teulIndex());
+		WriteLog(LOG_TEUL, LOG_ABORT, "t:%d attempt to add an invalid endpoint to poll", endpoint.teulIndex());
 		return;
 	}
 
@@ -1352,7 +1352,7 @@ _pollSet()
 		}
 	}
 
-	dbugLog(_FLN, "combined %" PRSizeT " sockets for reading, max %d"
+	WriteLog(LOG_TEUL, LOG_NOTE, "combined %" PRSizeT " sockets for reading, max %d"
 				, static_cast<size_t>(pollData.m_count), static_cast<int>(pollData.m_maxSock));
 }
 #endif
@@ -1393,7 +1393,7 @@ _pollSocketsInner(TeulTimeMS duration_)
 	const TeulTimeMS interval = teulClock64 - startTime;
 	if ( PN_UNLIKELY(interval > 20) )
 	{
-		dbugLog(_FLW, "STALL fds:%u size:%" PRSizeT ". poll interval=%" PR64BitUT "ms", numfds, pollData.m_size, interval);
+		WriteLog(LOG_TEUL, LOG_WARN, "STALL fds:%u size:%" PRSizeT ". poll interval=%" PR64BitUT "ms", numfds, pollData.m_size, interval);
 	}
 #endif
 }
@@ -1492,7 +1492,7 @@ _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 	// The new tag should be *exactly* one higher than the old
 	if ( PN_UNLIKELY(header.m_tag != expectTag) )
 	{
-		dbugLog(_FLW, "t:%d out of order packet rx:%u, prev:%u, expected:%u"
+		WriteLog(LOG_TEUL, LOG_WARN, "t:%d out of order packet rx:%u, prev:%u, expected:%u"
 						, endpoint.teulIndex()
 						, static_cast<UINT32>(header.m_tag), static_cast<UINT32>(prevTag), static_cast<UINT32>(expectTag));
 		endpoint.doError(ETEUL_ILLEGAL_PACKET_ORDER);
@@ -1580,7 +1580,7 @@ _executeCallbacks(ENDPOINT& endpoint, DATA_GRAM* const dgram)
 		// and try a different encryption
 		if ( PN_UNLIKELY(_isValidSynData(hdr, payloadSize_bytes) == false) )
 		{
-			dbugLog(_FLA, "t:%d non-syn data in opening mode", endpoint.teulIndex());
+			WriteLog(LOG_TEUL, LOG_ABORT, "t:%d non-syn data in opening mode", endpoint.teulIndex());
 			dbugSetErrno(EINVAL);
 			return;
 		}
@@ -1611,13 +1611,13 @@ _executeCallbacks(ENDPOINT& endpoint, DATA_GRAM* const dgram)
 	TEUL_CALLBACK* const callback = TEUL_CALLBACK::Lookup(hdr->m_callX, hdr->m_callY);
 	if ( PN_UNLIKELY(callback == nullptr) )
 	{
-		dbugLog(_FLW, "t:%d ip:%s cb:%u,%u callback does not exist", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hdr->m_callX, hdr->m_callY);
+		WriteLog(LOG_TEUL, LOG_WARN, "t:%d ip:%s cb:%u,%u callback does not exist", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hdr->m_callX, hdr->m_callY);
 		return;
 	}
 
 	if ( PN_UNLIKELY(hdr->m_callX == Teul::Serv::CallbackX && endpoint.teulIndex() >= 0 && !(endpoint.m_peer)) )
 	{
-		dbugLog(_FLA,"t:%d ip:%s cb:%d,%d callback access denied", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hdr->m_callX, hdr->m_callY);
+		WriteLog(LOG_TEUL, LOG_ABORT,"t:%d ip:%s cb:%d,%d callback access denied", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hdr->m_callX, hdr->m_callY);
 		return;
 	}
 
@@ -1633,7 +1633,7 @@ _executeCallbacks(ENDPOINT& endpoint, DATA_GRAM* const dgram)
 	const TeulTimeMS endCB = teulClock64;
 	if ( endCB - startCB > 5 )
 	{
-		dbugLog(_FLA, "STALL t:%d. cb:%u,%u interval=%" PR64BitUT "ms", endpoint.teulIndex(), hdr->m_callX, hdr->m_callY, endCB - startCB);
+		WriteLog(LOG_TEUL, LOG_ABORT, "STALL t:%d. cb:%u,%u interval=%" PR64BitUT "ms", endpoint.teulIndex(), hdr->m_callX, hdr->m_callY, endCB - startCB);
 		TIMER_REPORT(1)
 	}
 #endif
@@ -1729,7 +1729,7 @@ teulModIdle(const TeulTimeMS duration_)
 	static const TeulTimeMS AlertInterval_ms = 75;
 #endif
 	if ( PN_UNLIKELY(interval > duration_ + AlertInterval_ms) )
-		dbugLog(_FLA, "STALL. teulModIdle interval=%" PR64BitUT "", interval);
+		WriteLog(LOG_TEUL, LOG_ABORT, "STALL. teulModIdle interval=%" PR64BitUT "", interval);
 
 	_lastIdle = teulClock64;
 
@@ -1754,7 +1754,7 @@ teulModIdle(const TeulTimeMS duration_)
 	static const TeulTimeMS idleLimit = 25;
 #endif
 	if ( PN_UNLIKELY(interval > idleLimit + duration_) )
-		dbugLog(_FLA, "STALL. idle endpoints interval=%" PR64BitUT "ms", interval);
+		WriteLog(LOG_TEUL, LOG_ABORT, "STALL. idle endpoints interval=%" PR64BitUT "ms", interval);
 
 	return 0;
 }

@@ -338,7 +338,7 @@ static UINT32 CreateColor(int colorindex)
     if (colorindex >= 0 && colorindex < s_colortable.size()) {
         color.full = s_colortable[colorindex].full;
     } else {
-        dbugLog(_FLN, "Invalid face color index %d in FLT file, using black", colorindex);
+        WriteLog(LOG_RENDER, LOG_NOTE, "Invalid face color index %d in FLT file, using black", colorindex);
         color.rgb = { 0, 0, 0, 0 };
     }
 	if (s_face->matindex >= 0)

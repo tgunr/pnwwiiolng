@@ -5345,7 +5345,7 @@ PlayerPlacedObject* vehmainPPOBuild(void) {
     }
     else
     {
-        dbugLog(_FLW, "Failed to create fru - fpPPOCreate for index %d and id %d", activePPOIndex, activePPOList[activePPOIndex]->id);
+        WriteLog(LOG_WEAPON, LOG_WARN, "Failed to create fru - fpPPOCreate for index %d and id %d", activePPOIndex, activePPOList[activePPOIndex]->id);
     }
 
 	return fru;
