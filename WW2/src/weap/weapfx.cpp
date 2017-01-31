@@ -37,6 +37,8 @@
 
 #include <deque>
 
+//#define WEAPFX_DEBUG
+
 #define MAX_DEBRIS_HITS     128
 #define MAX_MUZZLE_FLASH    128
 
@@ -933,7 +935,9 @@ void weapfxKill()
 
 	_freeflash.clear();
 
-	Write_Log(LOG_OLD, LOG_INFO, "[weapfxKill]");
+#ifdef WEAPFX_DEBUG
+	WriteLog(LOG_OLD, LOG_INFO, "[weapfxKill]");
+#endif
 }
 
 /*
@@ -2715,43 +2719,57 @@ static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 
 	if(!pPos)
 	{
-		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pPos is nullptr");
+#ifdef WEAPFX_DEBUG
+		WriteLog(LOG_FX, LOG_WARN, "[weapfxExplosion] pPos is nullptr");
+#endif
 		return 1;
 	}
 
 	if(_isnan(pPos->x) || !_finite(pPos->x))
 	{
-		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pPos->x is INFINITE");
+#ifdef WEAPFX_DEBUG
+		WriteLog(LOG_FX, LOG_WARN, "[weapfxExplosion] pPos->x is INFINITE");
+#endif
 		return 1;
 	}
 
 	if(_isnan(pPos->y) || !_finite(pPos->y))
 	{
-		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pPos->y is INFINITE");
+#ifdef WEAPFX_DEBUG
+		WriteLog(LOG_FX, LOG_WARN, "[weapfxExplosion] pPos->y is INFINITE");
+#endif
 		return 1;
 	}
 
 	if(_isnan(pPos->z) || !_finite(pPos->z))
 	{
-		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pPos->z is INFINITE");
+#ifdef WEAPFX_DEBUG
+		WriteLog(LOG_FX, LOG_WARN, "[weapfxExplosion] pPos->z is INFINITE");
+#endif
 		return 1;
 	}
 
 	if(!pAmmo)
 	{
-		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pAmmo is nullptr");
+#ifdef WEAPFX_DEBUG
+		WriteLog(LOG_FX, LOG_WARN, "[weapfxExplosion] pAmmo is nullptr");
+#endif
 		return 1;
 	}
 
 	if(!pAmmo->AmmoType)
 	{
-		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pAmmo->AmmoType is nullptr");
+#ifdef WEAPFX_DEBUG
+		WriteLog(LOG_FX, LOG_WARN, "[weapfxExplosion] pAmmo->AmmoType is nullptr");
+#endif
 		return 1;
 	}
 
 	if(pAmmo->AmmoType->ExplosiveEnergy < 0.0001f)
 	{
-		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] ExplosiveEnergy <= 0.0");
+#ifdef WEAPFX_DEBUG
+		WriteLog(LOG_FX, LOG_WARN, "[weapfxExplosion] ExplosiveEnergy <= 0.0");
+#endif
 		return 1;
 	}
 
@@ -2819,17 +2837,23 @@ static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 
 	if(pAmmo->AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO)
 	{
-		Write_Log(LOG_FX, LOG_INFO, "[weapfxExplosion] Weapon is ground torpedo burst");
+#ifdef WEAPFX_DEBUG
+		WriteLog(LOG_FX, LOG_INFO, "[weapfxExplosion] Weapon is ground torpedo burst");
+#endif
 		fxExpSetType(iID, IDE_EXPTYPE_AMMOGROUND);
 	}
 	else if(pNormal == nullptr)
 	{
-		Write_Log(LOG_FX, LOG_INFO, "[weapfxExplosion] Weapon is air burst");
+#ifdef WEAPFX_DEBUG
+		WriteLog(LOG_FX, LOG_INFO, "[weapfxExplosion] Weapon is air burst");
+#endif
 		fxExpSetType(iID, IDE_EXPTYPE_AMMOAIR);
 	}
 	else
 	{
-		Write_Log(LOG_FX, LOG_INFO, "[weapfxExplosion] Weapon hit object");
+#ifdef WEAPFX_DEBUG
+		WriteLog(LOG_FX, LOG_INFO, "[weapfxExplosion] Weapon hit object");
+#endif
 		fxExpSetNormal(iID, pNormal->x, pNormal->y, pNormal->z);
 		fxExpSetType(iID, IDE_EXPTYPE_AMMOGROUND);
 	}

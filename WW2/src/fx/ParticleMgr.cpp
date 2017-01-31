@@ -1518,7 +1518,7 @@ void ParticleMgr::kill()
         _freeparticle.clear();
     }
 
-    Write_Log(LOG_OLD, LOG_INFO, "[ParticleMgr::kill]");
+    WriteLog(LOG_OLD, LOG_INFO, "[ParticleMgr::kill]");
 }
 
 /*----------------------------------------------------------------------
@@ -1542,7 +1542,7 @@ static void GetLightColor(Vec4f& c)
 
     if(!s || !m)
     {
-        Write_Log(LOG_OLD, LOG_INFO, "ERROR: Cannot find sun/moon object");
+        WriteLog(LOG_OLD, LOG_INFO, "ERROR: Cannot find sun/moon object");
         return;
     }
 

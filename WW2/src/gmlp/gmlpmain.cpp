@@ -529,15 +529,15 @@ LOGICAL gmlpMainUpdate()
 	{
 		Enable_Log(LOG_TIMER, TRUE);
 
-		Write_Log(LOG_TIMER, LOG_INFO, "***Frame Profile Begin***");
-		Write_Log(LOG_TIMER, LOG_INFO, "logTimerFPS: %.2f", logTimerFPS);
+		WriteLog(LOG_TIMER, LOG_INFO, "***Frame Profile Begin***");
+		WriteLog(LOG_TIMER, LOG_INFO, "logTimerFPS: %.2f", logTimerFPS);
 		for(i = 9; i >= 1; i--)
 		{
-			Write_Log(LOG_TIMER, LOG_INFO, "Frame %d", 5 - i);
+			WriteLog(LOG_TIMER, LOG_INFO, "Frame %d", 5 - i);
 			logTimerPrint(timerid, i);
 		}
 
-		Write_Log(LOG_TIMER, LOG_INFO, "***Frame Profile End***");
+		WriteLog(LOG_TIMER, LOG_INFO, "***Frame Profile End***");
 		logTimerFPS = 0;
 		rnmainListText("Logged frame profile");
 		rnmainListText("Frame profiling off");
@@ -560,7 +560,7 @@ LOGICAL gmlpMainUpdate()
 
 LOGICAL gmlpMainKill()
 {
-    Write_Debug("[gmlpMainKill] Begin");
+    WriteDebug("[gmlpMainKill] Begin");
 
 	//cfgPrefsSave();
 
@@ -604,7 +604,7 @@ LOGICAL gmlpMainKill()
 
     cfgPrefsKill();
 
-    Write_Debug("[gmlpMainKill] End");
+    WriteDebug("[gmlpMainKill] End");
 
 	return 0;
 }

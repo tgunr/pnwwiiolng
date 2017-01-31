@@ -559,7 +559,7 @@ static UINT32 _ReadSoundFile(vehType* CurrentVehicle, UCHAR* ModelDirectory, UCH
 
 	if (VehicleSoundFile == -1)
 	{
-		Write_Debug("Can't find Sound file %s for vehicle %s", FileName, CurrentVehicle->Id);
+		WriteDebug("Can't find Sound file %s for vehicle %s", FileName, CurrentVehicle->Id);
 		return 0;
 	}
 
@@ -581,7 +581,7 @@ static UINT32 _ReadSoundFile(vehType* CurrentVehicle, UCHAR* ModelDirectory, UCH
 				Num++;
 				if (Num >= VEH_MAX_ENGINESOUND_SPEED_RANGES)
 				{
-					Write_Debug("Too many speed ranges in file %s",FileName);
+					WriteDebug("Too many speed ranges in file %s",FileName);
 					Num--;
 				}
 			}
@@ -689,7 +689,7 @@ UCHAR* VarContents;
 
 	if (VehicleLoadoutFile == -1)
 	{
-		Write_Debug("Can't find Loadout file %s for vehicle %s",
+		WriteDebug("Can't find Loadout file %s for vehicle %s",
 					FileName,
 					CurrentVehicle->Id);
 		return 0;
@@ -776,7 +776,7 @@ UCHAR* VarContents;
 			weapFindWeaponTypeByName(&(CurrentVehicle->Loadout[Loadout].WeaponTypes[CurrentMount][CurrentWeapon]),VarContents);
 			if (CurrentVehicle->Loadout[Loadout].WeaponTypes[CurrentMount][CurrentWeapon] == nullptr)
 			{
-				Write_Debug("Unrecognized weapon %s, in mount %d, loadout %d",
+				WriteDebug("Unrecognized weapon %s, in mount %d, loadout %d",
 							VarContents,
 							CurrentMount,
 							Loadout);
@@ -898,7 +898,7 @@ UCHAR _BombsightTypeNames[3][32] =
 
 	if (VehicleTurretFile == -1)
 	{
-		Write_Debug("Can't find turret file %s for vehicle %s",
+		WriteDebug("Can't find turret file %s for vehicle %s",
 					FileName,
 					CurrentVehicle->Id);
 		return 0;
@@ -1020,7 +1020,7 @@ UCHAR _BombsightTypeNames[3][32] =
 			}
 			else
 			{
-				Write_Debug("Unrecognized turret %d type \"%s\"",
+				WriteDebug("Unrecognized turret %d type \"%s\"",
 							CurrentPos,
 							VarContents);
 			}
@@ -1148,7 +1148,7 @@ UCHAR* VarContents1;
 
 	if (VehicleDamageFile == -1)
 	{
-		Write_Debug("Can't find damage hit list file %s for vehicle %s",
+		WriteDebug("Can't find damage hit list file %s for vehicle %s",
 					FileName,
 					CurrentVehicle->Id);
 		return 0;
@@ -1209,7 +1209,7 @@ UCHAR* VarContents1;
             }
 			else
 			{
-				Write_Debug("Invalid line -%s=%s in %s",
+				WriteDebug("Invalid line -%s=%s in %s",
 							VarName,
 							VarContents1,
 							FileName);

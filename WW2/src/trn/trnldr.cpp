@@ -364,7 +364,7 @@ void trnldrReduceEditList(TERRAIN_DETAIL* td)
 {
 SINT32		i, j, k;
 
-	Write_Debug("Removing unused edit list entries");
+	WriteDebug("Removing unused edit list entries");
 	if (td->trindx > SUPERCELL_OCTETS_XY)
 	{
 		for (i=0; i < SUPERCELL_OCTETS_XY; i++)
@@ -392,7 +392,7 @@ SINT32		i, j, k;
 		td->trindx = SUPERCELL_OCTETS_XY;
 	}
 
-	Write_Debug("Ordering edit list entries");
+	WriteDebug("Ordering edit list entries");
 	for (i=0; i < td->tricnt; i++)
 	{
 		j = 0;
@@ -406,11 +406,11 @@ SINT32		i, j, k;
 
 		if (j == 0)
 		{
-			Write_Debug("Texture '%s' at index %d was not referenced", td->triname[i], i);
+			WriteDebug("Texture '%s' at index %d was not referenced", td->triname[i], i);
 		}
 	}
 
-	Write_Debug("Edit list has been minimized and ordered");
+	WriteDebug("Edit list has been minimized and ordered");
 }
 
 LOGICAL trnldrInit()
@@ -772,7 +772,7 @@ LOGICAL		retval=TRUE;
 	if (trnfile->company != PLAYNET_COMPANY)
 	{
 		retval = FALSE;
-		Write_Debug("DTL file does not have a valid file marker");
+		WriteDebug("DTL file does not have a valid file marker");
 	}
 	else
 	{
@@ -784,7 +784,7 @@ LOGICAL		retval=TRUE;
 #endif
 		{
 			retval = FALSE;
-			Write_Debug("DTL file does not have a valid terrain marker");
+			WriteDebug("DTL file does not have a valid terrain marker");
 		}
 		else
 		{
@@ -796,7 +796,7 @@ LOGICAL		retval=TRUE;
 #endif
 			{
 				retval = FALSE;
-				Write_Debug("DTL file has an invalid version");
+				WriteDebug("DTL file has an invalid version");
 			}
 		}
 	}
@@ -835,7 +835,7 @@ STRT_DTL_HEADER		sdh;
 	if (hfile == -1)
 	{
 		strprintf(filename, "%s%04x_%04x%s", TERRAIN_PREPATH, (UINT16)td->scx, (UINT16)td->scy, TERRAINFILE_EXTENSION);
-		Write_Debug("Attempting to substitue DTL file (%s) for SDM", filename);
+		WriteDebug("Attempting to substitue DTL file (%s) for SDM", filename);
 		hfile = fioOpen(filename);
 		ReadingSDM = FALSE;
 	}
@@ -844,7 +844,7 @@ STRT_DTL_HEADER		sdh;
 
 	if (hfile == -1)
 	{
-		Write_Debug("Unable to open %s file (%s)", TRN_EXT, filename);
+		WriteDebug("Unable to open %s file (%s)", TRN_EXT, filename);
 
         // Change back to old archive to get this
         // default.dtl is not ####_####.dtl!
@@ -858,7 +858,7 @@ STRT_DTL_HEADER		sdh;
 		if (hfile == -1)
 		{
 			strprintf(filename, "%sdefault%s", TERRAIN_PREPATH, TERRAINFILE_EXTENSION);
-			Write_Debug("Attempting to substitue DTL file (%s) for SDM", filename);
+			WriteDebug("Attempting to substitue DTL file (%s) for SDM", filename);
 			hfile = fioOpen(filename);
 			ReadingSDM = FALSE;
 		}
@@ -867,7 +867,7 @@ STRT_DTL_HEADER		sdh;
 		if (hfile == -1)
 		{
 			retval = FALSE;
-			Write_Debug("Failed to open %s", filename);
+			WriteDebug("Failed to open %s", filename);
 		}
 
         _isdefault = 1; //  Change state for detail/archive
@@ -875,18 +875,18 @@ STRT_DTL_HEADER		sdh;
 
 	while (retval)
 	{
-		Write_Debug("Loading supercell %d file %s", td->terrain->trnum, filename);
+		WriteDebug("Loading supercell %d file %s", td->terrain->trnum, filename);
 
 		if (fioRead(hfile, &trnfile, sizeof(TERRAINFILE)) != sizeof(TERRAINFILE))
 		{
-			Write_Debug("Unable to read the DTL file header");
+			WriteDebug("Unable to read the DTL file header");
 			retval = FALSE;
 			continue;
 		}
 
 		if (!VerifyHeader(&trnfile))
 		{
-			Write_Debug("Unable to read the %s file header", TRN_EXT);
+			WriteDebug("Unable to read the %s file header", TRN_EXT);
 			retval = FALSE;
 			continue;
 		}
@@ -900,7 +900,7 @@ STRT_DTL_HEADER		sdh;
 
 		if (td->numheightmapelements > SUPERCELL_SIZE_XY)
 		{
-			Write_Debug("DTL file %s has excess data at ptcnt (%d)", filename, td->numheightmapelements);
+			WriteDebug("DTL file %s has excess data at ptcnt (%d)", filename, td->numheightmapelements);
 			retval = FALSE;
 			continue;
 		}
@@ -910,7 +910,7 @@ STRT_DTL_HEADER		sdh;
 			void* readTo = (trnfile.flags & TF_FLAG_DATA_RLE) ? data : td->heightmap;
 			if (fioRead(hfile, readTo, (size_t)tmpShort) != (size_t)tmpShort)
 			{
-				Write_Debug("Unable to read the %s file point data", TRN_EXT);
+				WriteDebug("Unable to read the %s file point data", TRN_EXT);
 				retval = FALSE;
 				continue;
 			}
@@ -926,7 +926,7 @@ STRT_DTL_HEADER		sdh;
 
 		if (td->nmcnt > SUPERCELL_SIZE_XY)
 		{
-			Write_Debug("DTL file %s has excess normal data at nmcnt (%d)", filename, td->nmcnt);
+			WriteDebug("DTL file %s has excess normal data at nmcnt (%d)", filename, td->nmcnt);
 			retval = FALSE;
 			continue;
 		}
@@ -936,7 +936,7 @@ STRT_DTL_HEADER		sdh;
 			void* readTo = (trnfile.flags & TF_FLAG_NORMALS_RLE) ? data : td->nm;
 			if (fioRead(hfile, readTo, (size_t)tmpShort) != (size_t)tmpShort)
 			{
-				Write_Debug("Unable to read the %s file normal data", TRN_EXT);
+				WriteDebug("Unable to read the %s file normal data", TRN_EXT);
 				retval = FALSE;
 				continue;
 			}
@@ -952,7 +952,7 @@ STRT_DTL_HEADER		sdh;
 
 		if (td->tricnt > MAX_TERRAIN_TEXTURES)
 		{
-			Write_Debug("DTL file %s has excess data at tricnt (%d)", filename, td->tricnt);
+			WriteDebug("DTL file %s has excess data at tricnt (%d)", filename, td->tricnt);
 			retval = FALSE;
 			continue;
 		}
@@ -962,7 +962,7 @@ STRT_DTL_HEADER		sdh;
 			tmpShort = td->tricnt * 32;
 			if (fioRead(hfile, td->triname[0], (size_t)tmpShort) != (size_t)tmpShort)
 			{
-				Write_Debug("Unable to read the %s file texture names", TRN_EXT);
+				WriteDebug("Unable to read the %s file texture names", TRN_EXT);
 				retval = FALSE;
 				continue;
 			}
@@ -974,7 +974,7 @@ STRT_DTL_HEADER		sdh;
 
 		if (td->trindx > MAX_TERRAIN_EDIT_LIST)
 		{
-			Write_Debug("DTL file %s has excess data at trindx (%d, max is %d)", filename, td->trindx, MAX_TERRAIN_EDIT_LIST);
+			WriteDebug("DTL file %s has excess data at trindx (%d, max is %d)", filename, td->trindx, MAX_TERRAIN_EDIT_LIST);
 			retval = FALSE;
 			continue;
 		}
@@ -984,7 +984,7 @@ STRT_DTL_HEADER		sdh;
 			sizecheck = td->trindx * sizeof(TERRAIN_INFO);
 			if (fioRead(hfile, td->trinfo, sizecheck) != sizecheck)
 			{
-				Write_Debug("Unable to read the %s file edit list", TRN_EXT);
+				WriteDebug("Unable to read the %s file edit list", TRN_EXT);
 				retval = FALSE;
 				continue;
 			}
@@ -996,7 +996,7 @@ STRT_DTL_HEADER		sdh;
 
 		if (td->tobndx >= (MAX_TERRAIN_OCTETS * MAX_TRNOBJ_OCTET))				// We have to add one cloud object per supercell, so check accordingly
 		{
-			Write_Debug("DTL file %s has excess data at tobndx (%d)", filename, td->tobndx);
+			WriteDebug("DTL file %s has excess data at tobndx (%d)", filename, td->tobndx);
 			retval = FALSE;
 			continue;
 		}
@@ -1006,7 +1006,7 @@ STRT_DTL_HEADER		sdh;
 			sizecheck = td->tobndx * sizeof(SDM_ObjInfo);
 			if (fioRead(hfile, td->trnobj, sizecheck) != sizecheck)
 			{
-				Write_Debug("Unable to read the %s file object list", TRN_EXT);
+				WriteDebug("Unable to read the %s file object list", TRN_EXT);
 				retval = FALSE;
 				continue;
 			}
@@ -1054,7 +1054,7 @@ STRT_DTL_HEADER		sdh;
 		{
 			if (fioRead(hfile, &sdh, sizeof(STRT_DTL_HEADER)) != sizeof(STRT_DTL_HEADER))
 			{
-				Write_Debug("Unable to read the %s file strat header", TRN_EXT);
+				WriteDebug("Unable to read the %s file strat header", TRN_EXT);
 				retval = FALSE;
 				continue;
 			}
@@ -1073,7 +1073,7 @@ STRT_DTL_HEADER		sdh;
 				p += cpSize;
 				if (fioRead(hfile, td->pcp, cpSize) != cpSize)
 				{
-					Write_Debug("Unable to read the %s file strat CPs", TRN_EXT);
+					WriteDebug("Unable to read the %s file strat CPs", TRN_EXT);
 					retval = FALSE;
 					continue;
 				}
@@ -1086,7 +1086,7 @@ STRT_DTL_HEADER		sdh;
 				p += facSize;
 				if (fioRead(hfile, td->pfac, facSize) != facSize)
 				{
-					Write_Debug("Unable to read the %s file strat Facilities", TRN_EXT);
+					WriteDebug("Unable to read the %s file strat Facilities", TRN_EXT);
 					retval = FALSE;
 					continue;
 				}
@@ -1102,7 +1102,7 @@ STRT_DTL_HEADER		sdh;
 				p += bldgSize;
 				if (fioRead(hfile, td->pbld, bldgSize) != bldgSize)
 				{
-					Write_Debug("Unable to read the %s file strat Buildings", TRN_EXT);
+					WriteDebug("Unable to read the %s file strat Buildings", TRN_EXT);
 					retval = FALSE;
 					continue;
 				}
@@ -1119,7 +1119,7 @@ STRT_DTL_HEADER		sdh;
 				p += linkSize;
 				if (fioRead(hfile, td->plink, linkSize) != linkSize)
 				{
-					Write_Debug("Unable to read the %s file strat Links", TRN_EXT);
+					WriteDebug("Unable to read the %s file strat Links", TRN_EXT);
 					retval = FALSE;
 					continue;
 				}
@@ -1132,7 +1132,7 @@ STRT_DTL_HEADER		sdh;
 				p += wptSize;
 				if (fioRead(hfile, td->pwp, wptSize) != wptSize)
 				{
-					Write_Debug("Unable to read the %s file strat Waypoints", TRN_EXT);
+					WriteDebug("Unable to read the %s file strat Waypoints", TRN_EXT);
 					retval = FALSE;
 					continue;
 				}
@@ -1379,7 +1379,7 @@ static LOGICAL DuplicateBaseSupercell(TERRAIN_DETAIL* td)
 	td->terrainorig = obmainCopyObject(td->terrain);
 	if (td->terrainorig == nullptr)
 	{
-		Write_Debug("error copying terrain object to collision terrain object");
+		WriteDebug("error copying terrain object to collision terrain object");
 	}
 
     if(td->terrainorig->flags & OBJECT_TERRAIN)
@@ -1409,7 +1409,7 @@ SINT32		count;
 
 	if (count == 0)
 	{
-		//Write_Debug("Texture index was not found: %d", txndx);
+		//WriteDebug("Texture index was not found: %d", txndx);
 	}
 
 	return(count);
@@ -1539,7 +1539,7 @@ TERRAIN_DETAIL*	td;
 			texid = ldpixLoadImageFileToSurface(filename, colorBLACK, LDPIX_MIPMAP);
 			if (!piIsTexture(texid, 0))
 			{
-				Write_Debug("Could not load file as a texture");
+				WriteDebug("Could not load file as a texture");
 				obpoolFreeObjectCallback(newobj);
 				return(FALSE);
 			}
@@ -1580,7 +1580,7 @@ TERRAIN_DETAIL*	td;
 				*ptr = 0;
 			}
 
-			Write_Debug("Material = %s", filename);
+			WriteDebug("Material = %s", filename);
 			newobj->matid = piFindMaterialName(filename);
 			if (piIsMaterial(newobj->matid))
 			{
@@ -1588,7 +1588,7 @@ TERRAIN_DETAIL*	td;
 			}
 			else
 			{
-				Write_Debug("Terrain tile '%s' has no material", filename);
+				WriteDebug("Terrain tile '%s' has no material", filename);
 				newobj->matid = piFindMaterialName(TERRAIN_DEFAULT_MATERIAL);
 				newobj->matname = TERRAIN_DEFAULT_MATERIAL;
 			}
@@ -1751,7 +1751,7 @@ TRNSTATEBLOCK*		tsb;
 			texid = ldpixLoadImageFileToSurface(filename, colorBLACK, LDPIX_MIPMAP);
 			if (!piIsTexture(texid, 0))
 			{
-				Write_Debug("Could not load file as a texture");
+				WriteDebug("Could not load file as a texture");
 				obpoolFreeObjectCallback(newobj);
 				return(FALSE);
 			}
@@ -1792,7 +1792,7 @@ TRNSTATEBLOCK*		tsb;
 				*ptr = 0;
 			}
 
-			Write_Debug("Material = %s", filename);
+			WriteDebug("Material = %s", filename);
 			newobj->matid = piFindMaterialName(filename);
 			if (piIsMaterial(newobj->matid))
 			{
@@ -1800,7 +1800,7 @@ TRNSTATEBLOCK*		tsb;
 			}
 			else
 			{
-				Write_Debug("Terrain tile '%s' has no material", filename);
+				WriteDebug("Terrain tile '%s' has no material", filename);
 				newobj->matid = piFindMaterialName(TERRAIN_DEFAULT_MATERIAL);
 				newobj->matname = TERRAIN_DEFAULT_MATERIAL;
 			}
@@ -1862,7 +1862,7 @@ SINT32		i, j;
 
 		if (j == td->tricnt)
 		{
-			Write_Debug("Cannot find texture '%s' for edit entry %d!!", td->triname[td->trinfo[i].txndx], i);
+			WriteDebug("Cannot find texture '%s' for edit entry %d!!", td->triname[td->trinfo[i].txndx], i);
 		}
 		else
 		{
@@ -1924,7 +1924,7 @@ static LOGICAL		trip=FALSE;
 
 		if (j == td->tricnt)
 		{
-			Write_Debug("Cannot find texture '%s' for edit entry %d!!", td->triname[td->trinfo[i].txndx], i);
+			WriteDebug("Cannot find texture '%s' for edit entry %d!!", td->triname[td->trinfo[i].txndx], i);
 		}
 		else
 		{
@@ -2255,7 +2255,7 @@ static LOGICAL		trip;
 
 			trip = TRUE;
 
-			Write_Debug("Object %d (%s) of %d was loaded for supercell %d", tsb->varone, td->trnobj[tsb->varone].objname, td->tobndx, sc);
+			WriteDebug("Object %d (%s) of %d was loaded for supercell %d", tsb->varone, td->trnobj[tsb->varone].objname, td->tobndx, sc);
 			return(FALSE);
 		}
 	}
@@ -2787,7 +2787,7 @@ TERRAIN_DETAIL*	td;
 	case TRN_STATE_WAIT:			// Wait for visibility or deletion of supercell
 		if (td->trnstate.nextstate[0] != 0)
 		{
-			Write_Debug("State started for supercell %d", sc);
+			WriteDebug("State started for supercell %d", sc);
 
 			td->trnstate.state = td->trnstate.nextstate[0];
 			td->scx = td->trnstate.nextscx[0];
@@ -2843,95 +2843,95 @@ TERRAIN_DETAIL*	td;
 	case TRN_STATE_LOAD_LOAD:		// Load all elements of a supercell for immediate visibility
 		if (!trnldrLoadSupercell(sc))
 		{
-			Write_Debug("TRN_STATE_LOAD_LOAD failed");
+			WriteDebug("TRN_STATE_LOAD_LOAD failed");
 			td->trnstate.state = TRN_STATE_ERROR;
 			break;
 		}
 
 		td->trnstate.state = TRN_STATE_LOAD_MODIFY;
-		Write_Debug("State TRN_STATE_LOAD_LOAD finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_LOAD finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_MODIFY:		// Modify the supercell elements bases on terrain data
 		if (!trnldrModifySupercell(sc))
 		{
-			Write_Debug("TRN_STATE_LOAD_MODIFY failed");
+			WriteDebug("TRN_STATE_LOAD_MODIFY failed");
 			td->trnstate.state = TRN_STATE_ERROR;
 			break;
 		}
 
 		td->trnstate.state = TRN_STATE_WAIT;
-		Write_Debug("State TRN_STATE_LOAD_MODIFY finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_MODIFY finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_DEFAULT:	// Load the default data into a supercell object
 		if (!trnldrLoadSupercell(sc))
 		{
-			Write_Debug("TRN_STATE_LOAD_DEFAULT failed");
+			WriteDebug("TRN_STATE_LOAD_DEFAULT failed");
 			td->trnstate.state = TRN_STATE_ERROR;
 			break;
 		}
 
 		td->trnstate.state = TRN_STATE_LOAD_FILE;
-		Write_Debug("State TRN_STATE_LOAD_DEFAULT finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_DEFAULT finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_FILE:		// Load the DTL file
 		if (!trnldrLoadDTL(td))
 		{
-			Write_Debug("TRN_STATE_LOAD_FILE failed");
+			WriteDebug("TRN_STATE_LOAD_FILE failed");
 			td->trnstate.state = TRN_STATE_ERROR;
 			break;
 		}
 
 		td->trnstate.state = TRN_STATE_LOAD_NORMALS;
-		Write_Debug("State TRN_STATE_LOAD_FILE finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_FILE finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_NORMALS:	// Translate terrain normals into vertex normals
         if (!trnldrLoadNormals(td->terrain, td->nm))
 		{
-			Write_Debug("TRN_STATE_LOAD_NORMALS failed");
+			WriteDebug("TRN_STATE_LOAD_NORMALS failed");
 			td->trnstate.state = TRN_STATE_ERROR;
 			break;
 		}
 
 		td->trnstate.state = TRN_STATE_LOAD_POINTS;
-		Write_Debug("State TRN_STATE_LOAD_NORMALS finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_NORMALS finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_POINTS:		// Translate terrain points into vertex x, y and z
         if (!trnldrLoadPoints(td->terrain, td->heightmap))
 		{
-			Write_Debug("TRN_STATE_LOAD_POINTS failed");
+			WriteDebug("TRN_STATE_LOAD_POINTS failed");
 			td->trnstate.state = TRN_STATE_ERROR;
 			break;
 		}
 
 		td->trnstate.state = TRN_STATE_LOAD_CALC;
-		Write_Debug("State TRN_STATE_LOAD_POINTS finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_POINTS finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_CALC:		// Calculate the surface normals and bounding box
 		if (!CalculateNormalsAndBounds(td))
 		{
-			Write_Debug("TRN_STATE_LOAD_CALC failed");
+			WriteDebug("TRN_STATE_LOAD_CALC failed");
 			td->trnstate.state = TRN_STATE_ERROR;
 			break;
 		}
 
 		td->trnstate.state = TRN_STATE_LOAD_LIGHT;
-		Write_Debug("State TRN_STATE_LOAD_CALC finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_CALC finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_LIGHT:		// Light surface of terrain
 		if (!LightSupercell(td))
 		{
-			Write_Debug("TRN_STATE_LOAD_LIGHT failed");
+			WriteDebug("TRN_STATE_LOAD_LIGHT failed");
 			td->trnstate.state = TRN_STATE_ERROR;
 			break;
 		}
 
 		td->trnstate.state = TRN_STATE_LOAD_DUPBASE;
-		Write_Debug("State TRN_STATE_LOAD_LIGHT finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_LIGHT finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_DUPBASE:	// Duplicate the base terrain cell
 		if (!DuplicateBaseSupercell(td))
 		{
-			Write_Debug("TRN_STATE_LOAD_DUPBASE failed");
+			WriteDebug("TRN_STATE_LOAD_DUPBASE failed");
 			td->trnstate.state = TRN_STATE_ERROR;
 			break;
 		}
@@ -2940,7 +2940,7 @@ TERRAIN_DETAIL*	td;
 		td->trnstate.varone = td->tricnt;
 		td->trnstate.vartwo = 0;
 		td->trnstate.varthree = 0;
-		Write_Debug("State TRN_STATE_LOAD_DUPBASE finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_DUPBASE finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_TEXTURES:	// Load terrain texture objects
 		if (!LoadTexturesSequenced(sc))
@@ -2955,7 +2955,7 @@ TERRAIN_DETAIL*	td;
 
 		td->trnstate.state = TRN_STATE_LOAD_OCTETS;
 		td->trnstate.varone = 0;
-		Write_Debug("State TRN_STATE_LOAD_TEXTURES finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_TEXTURES finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_OCTETS:		// Do octet substitution into texture objects
 		loading = TRUE;
@@ -2969,7 +2969,7 @@ TERRAIN_DETAIL*	td;
 		loading = FALSE;
 		td->trnstate.state = TRN_STATE_LOAD_BOUNDS;
 		td->trnstate.varone = 0;
-		Write_Debug("State TRN_STATE_LOAD_OCTETS finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_OCTETS finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_BOUNDS:		// Calculate bounding information for texture objects
 		loading = TRUE;
@@ -2991,7 +2991,7 @@ TERRAIN_DETAIL*	td;
 			td->trnstate.varone = 0;
 		}
 
-		Write_Debug("State TRN_STATE_LOAD_BOUNDS finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_BOUNDS finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_OBJECTS:	// Create terrain objects and place on terrain
 		loading = TRUE;
@@ -3013,7 +3013,7 @@ TERRAIN_DETAIL*	td;
 
 		td->trnstate.state = TRN_STATE_LOAD_SNAP;
 		td->trnstate.varone = 0;
-		Write_Debug("State TRN_STATE_LOAD_OBJECTS finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_OBJECTS finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_SNAP:		// Snap objects to XY grid
 #if WANT_NON_REPLACEMENT_TILES
@@ -3023,22 +3023,22 @@ TERRAIN_DETAIL*	td;
 		}
 #endif
 		td->trnstate.state = TRN_STATE_LOAD_DONE;
-		Write_Debug("State TRN_STATE_LOAD_SNAP finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_SNAP finished for supercell %d", sc);
 		break;
 	case TRN_STATE_LOAD_DONE:		// Finished all loading
 		td->trnstate.state = TRN_STATE_WAIT;
-		Write_Debug("State TRN_STATE_LOAD_DONE finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_LOAD_DONE finished for supercell %d", sc);
 		break;
 	case TRN_STATE_UNLOAD_FULL:		// Unload all elements of a supercell and release
 		if (!trnldrReleaseSupercell(sc))
 		{
-			Write_Debug("TRN_STATE_UNLOAD_FULL failed");
+			WriteDebug("TRN_STATE_UNLOAD_FULL failed");
 			td->trnstate.state = TRN_STATE_ERROR;
 			break;
 		}
 
 		td->trnstate.state = TRN_STATE_WAIT;
-		Write_Debug("State TRN_STATE_UNLOAD_FULL finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_UNLOAD_FULL finished for supercell %d", sc);
 		break;
 	case TRN_STATE_UNLOAD_OBJECTS:	// Delete terrain objects from existing supercell
 
@@ -3065,7 +3065,7 @@ TERRAIN_DETAIL*	td;
 			td->trnstate.varone = 0;
 		}
 
-		Write_Debug("State TRN_STATE_UNLOAD_OBJECTS finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_UNLOAD_OBJECTS finished for supercell %d", sc);
 		break;
 	case TRN_STATE_UNLOAD_OTHERS:	// Unload remainder of supercell and release
 
@@ -3137,10 +3137,10 @@ TERRAIN_DETAIL*	td;
 		td->stratLoaded = FALSE;
 
 		td->trnstate.state = TRN_STATE_WAIT;
-		Write_Debug("State TRN_STATE_UNLOAD_OTHERS finished for supercell %d", sc);
+		WriteDebug("State TRN_STATE_UNLOAD_OTHERS finished for supercell %d", sc);
 		break;
 	default:
-		Write_Debug("Undefined state during UpdateSupercellState");
+		WriteDebug("Undefined state during UpdateSupercellState");
 		td->trnstate.state = TRN_STATE_ERROR;
 		break;
 	}
@@ -3522,7 +3522,7 @@ SINT32		i;
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
-			Write_Debug("State added to queue %d in trnldrStartLoadingAll for supercell %d", i, sc);
+			WriteDebug("State added to queue %d in trnldrStartLoadingAll for supercell %d", i, sc);
 			trndtl[sc].trnstate.nextstate[i] = TRN_STATE_LOAD_DEFAULT;
 			trndtl[sc].trnstate.nextscx[i] = scx;
 			trndtl[sc].trnstate.nextscy[i] = scy;
@@ -3532,7 +3532,7 @@ SINT32		i;
 
 	if (i == MAX_TSB_NEXTSTATES)
 	{
-		Write_Debug("State queue is full in trnldrStartLoadingAll for supercell %d", sc);
+		WriteDebug("State queue is full in trnldrStartLoadingAll for supercell %d", sc);
 	}
 
 	return(TRUE);
@@ -3554,7 +3554,7 @@ SINT32		i;
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
-			Write_Debug("State added to queue %d in trnldrStartLoadingFirstHalf for supercell %d", i, sc);
+			WriteDebug("State added to queue %d in trnldrStartLoadingFirstHalf for supercell %d", i, sc);
 			trndtl[sc].trnstate.nextstate[i] = TRN_STATE_LOAD_DEFAULT;
 			trndtl[sc].trnstate.nextscx[i] = scx;
 			trndtl[sc].trnstate.nextscy[i] = scy;
@@ -3564,7 +3564,7 @@ SINT32		i;
 
 	if (i == MAX_TSB_NEXTSTATES)
 	{
-		Write_Debug("State queue is full in trnldrStartLoadingFirstHalf for supercell %d", sc);
+		WriteDebug("State queue is full in trnldrStartLoadingFirstHalf for supercell %d", sc);
 	}
 
 	return(TRUE);
@@ -3586,7 +3586,7 @@ SINT32		i;
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
-			Write_Debug("State added to queue %d in trnldrStartLoadingSecondHalf for supercell %d", i, sc);
+			WriteDebug("State added to queue %d in trnldrStartLoadingSecondHalf for supercell %d", i, sc);
 			trndtl[sc].trnstate.nextstate[i] = TRN_STATE_LOAD_OBJECTS;
 			trndtl[sc].trnstate.nextscx[i] = scx;
 			trndtl[sc].trnstate.nextscy[i] = scy;
@@ -3596,7 +3596,7 @@ SINT32		i;
 
 	if (i == MAX_TSB_NEXTSTATES)
 	{
-		Write_Debug("State queue is full in trnldrStartLoadingSecondHalf for supercell %d", sc);
+		WriteDebug("State queue is full in trnldrStartLoadingSecondHalf for supercell %d", sc);
 	}
 
 	return(TRUE);
@@ -3619,7 +3619,7 @@ SINT32		i;
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
-			Write_Debug("State added to queue %d in trnldrStartUnloadingAll for supercell %d", i, sc);
+			WriteDebug("State added to queue %d in trnldrStartUnloadingAll for supercell %d", i, sc);
 			trndtl[sc].trnstate.nextstate[i] = TRN_STATE_UNLOAD_OBJECTS;
 			trndtl[sc].trnstate.nextscx[i] = trndtl[sc].scx;
 			trndtl[sc].trnstate.nextscy[i] = trndtl[sc].scy;
@@ -3629,7 +3629,7 @@ SINT32		i;
 
 	if (i == MAX_TSB_NEXTSTATES)
 	{
-		Write_Debug("State queue is full in trnldrStartUnloadingAll for supercell %d", sc);
+		WriteDebug("State queue is full in trnldrStartUnloadingAll for supercell %d", sc);
 	}
 
 	return(TRUE);
@@ -3651,7 +3651,7 @@ SINT32		i;
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
-			Write_Debug("State added to queue %d in trnldrStartUnloadingFirstHalf for supercell %d", i, sc);
+			WriteDebug("State added to queue %d in trnldrStartUnloadingFirstHalf for supercell %d", i, sc);
 			trndtl[sc].trnstate.nextstate[i] = TRN_STATE_UNLOAD_OBJECTS;
 			trndtl[sc].trnstate.nextscx[i] = trndtl[sc].scx;
 			trndtl[sc].trnstate.nextscy[i] = trndtl[sc].scy;
@@ -3661,7 +3661,7 @@ SINT32		i;
 
 	if (i == MAX_TSB_NEXTSTATES)
 	{
-		Write_Debug("State queue is full in trnldrStartUnloadingFirstHalf for supercell %d", sc);
+		WriteDebug("State queue is full in trnldrStartUnloadingFirstHalf for supercell %d", sc);
 	}
 
 	return(TRUE);
@@ -3682,7 +3682,7 @@ SINT32		i;
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
-			Write_Debug("State added to queue %d in trnldrStartUnloadingSecondHalf for supercell %d", i, sc);
+			WriteDebug("State added to queue %d in trnldrStartUnloadingSecondHalf for supercell %d", i, sc);
 			trndtl[sc].trnstate.nextstate[i] = TRN_STATE_UNLOAD_OTHERS;
 			trndtl[sc].trnstate.nextscx[i] = trndtl[sc].scx;
 			trndtl[sc].trnstate.nextscy[i] = trndtl[sc].scy;
@@ -3692,7 +3692,7 @@ SINT32		i;
 
 	if (i == MAX_TSB_NEXTSTATES)
 	{
-		Write_Debug("State queue is full in trnldrStartUnloadingSecondHalf for supercell %d", sc);
+		WriteDebug("State queue is full in trnldrStartUnloadingSecondHalf for supercell %d", sc);
 	}
 
 	return(TRUE);
@@ -3710,7 +3710,7 @@ TERRAIN_DETAIL*	td;
 
     logTimerBeginMacro();
 
-	Write_Debug("trnldrReleaseSupercell called for supercell %d", sc);
+	WriteDebug("trnldrReleaseSupercell called for supercell %d", sc);
 
 	td = &trndtl[sc];
 
@@ -4100,12 +4100,12 @@ void trnldrInitializeSuperCellVertices(OBJECT* tt, int scx, int scy)
 
 	if (tt->numverts != ofs)
 	{
-		Write_Debug("Incorrect number of vertices created");
+		WriteDebug("Incorrect number of vertices created");
 	}
 
 	if (tt->numverts != ndx)
 	{
-		Write_Debug("Incorrect number of triangles created");
+		WriteDebug("Incorrect number of triangles created");
 	}
 
 	tt->numtris = SUPERCELL_OCTETS_XY * NUM_TRIANGLES_PER_OCTET;
@@ -4186,7 +4186,7 @@ TERRAIN_DETAIL*	td;
 
 	if (loading)
 	{
-		Write_Debug("'loading' was TRUE upon entry to trnldrModifySupercell");
+		WriteDebug("'loading' was TRUE upon entry to trnldrModifySupercell");
 	}
 
 	if (!trnldrLoadDTL(td))

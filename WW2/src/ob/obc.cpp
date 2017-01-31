@@ -321,7 +321,7 @@ MATERIAL*	lpmats;
 
         Enable_Log(LOG_OLD, 1);
 
-        Write_Log(LOG_OLD, LOG_INFO, "<MATERIAL>");
+        WriteLog(LOG_OLD, LOG_INFO, "<MATERIAL>");
 
         string str;
 
@@ -329,52 +329,52 @@ MATERIAL*	lpmats;
         str += lpmaterial->name;
         str += "</MATNAME>";
 
-        Write_Log(LOG_OLD, LOG_INFO, str.c_str());
+        WriteLog(LOG_OLD, LOG_INFO, str.c_str());
 
         str.clear();
         str = "<TEXNAME>";
         str += lpmaterial->texname;
         str += "</TEXNAME>";
 
-        Write_Log(LOG_OLD, LOG_INFO, str.c_str());
+        WriteLog(LOG_OLD, LOG_INFO, str.c_str());
 
         str.clear();
         str = "<ALPHANAME>";
         str += lpmaterial->alphaname;
         str += "</ALPHANAME>";
 
-        Write_Log(LOG_OLD, LOG_INFO, str.c_str());
+        WriteLog(LOG_OLD, LOG_INFO, str.c_str());
 
         FLOAT32 r = lpmaterial->material.diffuse.r;
         FLOAT32 g = lpmaterial->material.diffuse.g;
         FLOAT32 b = lpmaterial->material.diffuse.b;
         FLOAT32 a = lpmaterial->material.diffuse.a;
 
-        Write_Log(LOG_OLD, LOG_INFO, "<DIFFUSE>%f %f %f %f</DIFFUSE>", r, g, b, a);
+        WriteLog(LOG_OLD, LOG_INFO, "<DIFFUSE>%f %f %f %f</DIFFUSE>", r, g, b, a);
 
         r = lpmaterial->material.ambient.r;
         g = lpmaterial->material.ambient.g;
         b = lpmaterial->material.ambient.b;
         a = lpmaterial->material.ambient.a;
 
-        Write_Log(LOG_OLD, LOG_INFO, "<AMBIENT>%f %f %f %f</AMBIENT>", r, g, b, a);
+        WriteLog(LOG_OLD, LOG_INFO, "<AMBIENT>%f %f %f %f</AMBIENT>", r, g, b, a);
 
         r = lpmaterial->material.specular.r;
         g = lpmaterial->material.specular.g;
         b = lpmaterial->material.specular.b;
         a = lpmaterial->material.specular.a;
 
-        Write_Log(LOG_OLD, LOG_INFO, "<SPECULAR>%f %f %f %f</SPECULAR>", r, g, b, a);
+        WriteLog(LOG_OLD, LOG_INFO, "<SPECULAR>%f %f %f %f</SPECULAR>", r, g, b, a);
 
         r = lpmaterial->material.emissive.r;
         g = lpmaterial->material.emissive.g;
         b = lpmaterial->material.emissive.b;
         a = lpmaterial->material.emissive.a;
 
-        Write_Log(LOG_OLD, LOG_INFO, "<EMISSIVE>%f %f %f %f</EMISSIVE>", r, g, b, a);
+        WriteLog(LOG_OLD, LOG_INFO, "<EMISSIVE>%f %f %f %f</EMISSIVE>", r, g, b, a);
 
-        Write_Log(LOG_OLD, LOG_INFO, "<SHININESS>%f</SHININESS>", lpmaterial->material.power);
-        Write_Log(LOG_OLD, LOG_INFO, "</MATERIAL>");
+        WriteLog(LOG_OLD, LOG_INFO, "<SHININESS>%f</SHININESS>", lpmaterial->material.power);
+        WriteLog(LOG_OLD, LOG_INFO, "</MATERIAL>");
 
         Enable_Log(LOG_OLD, 0);
     }
@@ -410,7 +410,7 @@ MATERIAL*	lpmats;
 		strcpy(lpmats[matid].texname, lpmaterial->texname);
 		strcpy(lpmats[matid].alphaname, lpmaterial->alphaname);
 
-		Write_Debug("Material loaded: %s", lpmats[matid].name);
+		WriteLog(LOG_FX, LOG_DEBUG, "Material loaded: %s", lpmats[matid].name);
 
 		// if a filename is specified, get a handle to existing texture
 		if (lpmats[matid].texname[0])
@@ -418,7 +418,7 @@ MATERIAL*	lpmats;
 			lpmats[matid].texid = ldpixLoadImageFileToSurface(lpmats[matid].texname, colorBLACK, LDPIX_NONE);
 			if (!piIsTexture(lpmats[matid].texid, 0))
 			{
-				Write_Debug("Material texture file not found: %s", lpmats[matid].texname);
+				WriteLog(LOG_FX, LOG_DEBUG, "Material texture file not found: %s", lpmats[matid].texname);
 				lpmats[matid].texid = -1;
 				retval = FALSE;
 			}
@@ -468,7 +468,7 @@ char str[32];
 			matid = piFindMaterialName(tv->matname);
 			if (!piIsMaterial(matid))
 			{
-				Write_Debug("Material not found: %s\n", tv->matname);
+				WriteLog(LOG_FX, LOG_DEBUG, "Material not found: %s\n", tv->matname);
 				return(nullptr);
 			}
 		}
@@ -492,7 +492,7 @@ char str[32];
 	numverts = piGetNumberVertices();
 	if (numverts == 0 || numverts < tv->numverts)
 	{
-		Write_Debug("Entity has too many vertices: %d, max: %d\n", tv->numverts, numverts);
+		WriteLog(LOG_FX, LOG_DEBUG, "Entity has too many vertices: %d, max: %d\n", tv->numverts, numverts);
 		return(nullptr);
 	}
 
@@ -739,7 +739,7 @@ void _modifymaterialElements(xmlNodePtr root)
                 if(!piIsMaterial(id))
                 {
                     // Bad error
-                    Write_Log(LOG_OLD, LOG_INFO, "[_modifymaterialElements] did not find %s", (char*)s);
+                    WriteLog(LOG_OLD, LOG_INFO, "[_modifymaterialElements] did not find %s", (char*)s);
                     return;
                 }
 

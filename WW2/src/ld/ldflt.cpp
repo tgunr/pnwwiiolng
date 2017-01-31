@@ -329,7 +329,7 @@ static UINT32 CreateColor(int colorindex)
 {
 	if (PN_UNLIKELY(s_colortable.empty()))
 	{
-		Write_Debug("Tried to get a color but the color table has not been created");
+		WriteDebug("Tried to get a color but the color table has not been created");
 		return(0xffffffff);
 	}
 
@@ -366,8 +366,8 @@ static bool ReadHeader()
 
 	fltrevision = LongEndian(header->format);
 
-	//Write_Debug("Header for id: %s", header.id);
-	//Write_Debug("Openflight version: %d", header.format);
+	//WriteDebug("Header for id: %s", header.id);
+	//WriteDebug("Openflight version: %d", header.format);
 
 	offset += s_chunk->next;
 
@@ -436,7 +436,7 @@ static bool CreateLevel(OBJECT** lpnewobj)
 		obmainMoveToNotObjectTree(lpobj);
 		topmostObject = lpobj;
 		topmost = false;
-		Write_Debug("Topmost object was tagged");
+		WriteDebug("Topmost object was tagged");
 	}
 
 	*lpnewobj = lpobj;
@@ -461,7 +461,7 @@ static bool ReadGroup()
 			bTopmostObject = false;
 			if (stricmp(group->id, s_conversionFile.c_str()))
 			{
-				Write_Debug("[ReadGroup] FAILURE: Topmost group.id = %s Filename = %s\n",
+				WriteDebug("[ReadGroup] FAILURE: Topmost group.id = %s Filename = %s\n",
 							group->id, s_conversionFile.c_str());
 
 				FLTItemFileError("Topmost group", group->id, s_conversionFile.c_str());
@@ -517,7 +517,7 @@ static bool ReadGroup()
 		strcpy(objname[level], grpname[groupindex]);
 	}
 
-	//	Write_Debug("Processing group: %s (%d)", grpname[groupindex], level);
+	//	WriteDebug("Processing group: %s (%d)", grpname[groupindex], level);
 
 	return true;
 }
@@ -836,11 +836,11 @@ static bool ReadVertexList()
 	if( s_face->drawtype != fltWIRE_OPEN && s_face->drawtype != fltWIRE_CLOSED && num < 3 )
 	{
 #ifdef EVENT_LOG_EXTREME
-		Write_Debug("Degenerated face found in .flt! Skipped in .mdl.");
+		WriteDebug("Degenerated face found in .flt! Skipped in .mdl.");
 #endif
 		offset += s_chunk->next;
 
-		Write_Debug("Degenerate face found in .flt! This face %s is not a polygon", s_face->id);
+		WriteDebug("Degenerate face found in .flt! This face %s is not a polygon", s_face->id);
 		return false;
 	}
 
@@ -938,7 +938,7 @@ static bool ReadVertexList()
 			tv.matname = strpool(material[s_face->matindex].name);
 			if (tv.matname[0] == 0)
 			{
-				Write_Debug("Material has no name!");
+				WriteDebug("Material has no name!");
 			}
 		}
 		else
@@ -960,11 +960,11 @@ static bool ReadVertexList()
 	tv.level = s_face->surfmatcode;
 	tv.layer = object.priority + facelayer;
 
-	////Write_Debug(" vertices: %d", length);////
+	////WriteDebug(" vertices: %d", length);////
 
 	if (length < 2)
 	{
-		Write_Debug("Points are not allowable object types!");
+		WriteDebug("Points are not allowable object types!");
 		return false;
 	}
 
@@ -1015,19 +1015,19 @@ static bool ReadVertexList()
 		switch (ShortEndian(pchunk->cid))
 		{
 		case VERTEX_COORDINATE:
-			////Write_Debug(" VERTEX_COORDINATE");
+			////WriteDebug(" VERTEX_COORDINATE");
 			ReadVertexCoordinate(pdata, vertices);
 		break;
 		case VERTEX_NORMAL:
-			////Write_Debug(" VERTEX_NORMAL");
+			////WriteDebug(" VERTEX_NORMAL");
 			ReadVertexNormal(pdata, vertices);
 		break;
 		case VERTEX_NORMAL_UV:
-			////Write_Debug(" VERTEX_NORMAL_UV");
+			////WriteDebug(" VERTEX_NORMAL_UV");
 			ReadVertexNormalUV(pdata, vertices);
 		break;
 		case VERTEX_UV:
-			////Write_Debug(" VERTEX_UV");
+			////WriteDebug(" VERTEX_UV");
 			ReadVertexUV(pdata, vertices);
 		break;
 		}
@@ -1177,7 +1177,7 @@ static bool ReadVertexList()
 			lpobj->layer = g_grassType;
 		}
 
-	//		Write_Debug("Object face '%s' (%s) was created (%d)", tv.name, s_face->id, level);
+	//		WriteDebug("Object face '%s' (%s) was created (%d)", tv.name, s_face->id, level);
 		if (attached == nullptr)
 		{
 			if (groups[groupindex] != nullptr)
@@ -1333,12 +1333,12 @@ static bool ReadMaterialTable(const char* name)
 	s_nummaterials = materialsLen / sizeof(fltMATERIAL);
 	if (s_nummaterials > MAX_FLT_MATERIALS)
 	{
-		Write_Debug("fltLoad failed at %s:%u", _FL);
+		WriteDebug("fltLoad failed at %s:%u", _FL);
 		return false;
 	}
 	if (s_nummaterials * sizeof(fltMATERIAL) != materialsLen)
 	{
-		Write_Debug("Bad materials data");
+		WriteDebug("Bad materials data");
 		return false;
 	}
 
@@ -1350,7 +1350,7 @@ static bool ReadMaterialTable(const char* name)
 
 	for (size_t i = 0; i < s_nummaterials; ++i)
 	{
-		Write_Debug("Material %u loaded: %s", i, material[i].name);
+		WriteDebug("Material %u loaded: %s", i, material[i].name);
 
 		material[i].ambRed	= FloatEndian(material[i].ambRed);
 		material[i].ambGreen	= FloatEndian(material[i].ambGreen);
@@ -1396,7 +1396,7 @@ static bool ReadMaterialTable(const char* name)
 
 			mat.material.power = material[i].shininess;
 
-//			Write_Debug("Material name: %s", mat.matname);
+//			WriteDebug("Material name: %s", mat.matname);
 			if (!obcMaterial(&mat))
 			{
 				return false;
@@ -1424,7 +1424,7 @@ static bool ReadMaterialPalette(const char* name)
 	size_t i = LongEndian(matpal.index);
 	if(i >= 64)
 	{
-		Write_Log(LOG_OLD, LOG_WARN, "[ReadMaterialPalette] material index is %d. It should be 0<=x<=63.", i);
+		WriteLog(LOG_OLD, LOG_WARN, "[ReadMaterialPalette] material index is %d. It should be 0<=x<=63.", i);
 		return false;
 	}
 
@@ -1482,7 +1482,7 @@ static bool ReadMaterialPalette(const char* name)
 
 		mat.material.power = material[i].shininess;
 
-//		Write_Debug("Material name: %s", mat.matname);
+//		WriteDebug("Material name: %s", mat.matname);
 		if (!obcMaterial(&mat))
 		{
 			return false;
@@ -1491,7 +1491,7 @@ static bool ReadMaterialPalette(const char* name)
 		++s_nummaterials;
 		if (s_nummaterials > 64)
 		{
-			Write_Debug("Too many materials!");
+			WriteDebug("Too many materials!");
 			return false;
 		}
 	}
@@ -1642,11 +1642,11 @@ static bool ReadFace()
 	s_face->altcolorindex  = LongEndian(s_face->altcolorindex);
 
 
-	//	Write_Debug("Processing face: %s (%d)", s_face->id, level);
+	//	WriteDebug("Processing face: %s (%d)", s_face->id, level);
 
 	if (objectlevel == -1)
 	{
-		Write_Debug("Error! Trying to add a face when no object has been defined!");
+		WriteDebug("Error! Trying to add a face when no object has been defined!");
 		return false;
 	}
 
@@ -1659,7 +1659,7 @@ static bool ReadFace()
 		obmainMoveToNotObjectTree(o);
 		topmostObject = o;
 		topmost = false;
-	//		Write_Debug("Topmost object was tagged");
+	//		WriteDebug("Topmost object was tagged");
 	}
 
 	if (fltrevision < 1510)
@@ -1720,7 +1720,7 @@ static bool ReadLOD()
 	attached = nullptr;
 	lastobject = lpobj;
 
-	//	Write_Debug("Processing LOD: %s; in=%g, out=%g (%d)", lod->name, (float)s_currentLod.switchin, (float)s_currentLod.switchout, s_currentLod.level);
+	//	WriteDebug("Processing LOD: %s; in=%g, out=%g (%d)", lod->name, (float)s_currentLod.switchin, (float)s_currentLod.switchout, s_currentLod.level);
 
 	offset += s_chunk->next;
 
@@ -1747,7 +1747,7 @@ static bool ReadObject()
 	object.spfxid2		= ShortEndian(object.spfxid2);
 	object.significance	= ShortEndian(object.significance);
 
-	//	Write_Debug("Processing object: %s (%d)", objname[level], level);
+	//	WriteDebug("Processing object: %s (%d)", objname[level], level);
 
 	attached = nullptr;
 	headObject	= nullptr;
@@ -1770,7 +1770,7 @@ static bool ReadExtension()
 #if (0)
 	ext->code = ShortEndian(ext->code);
 	ext->reserved1 = 0;  // terminate the site id
-	//Write_Debug(" extension: '%s', '%s', code=0x%x, level=%d", ext->id, ext->siteid, ext->code, extlevel);
+	//WriteDebug(" extension: '%s', '%s', code=0x%x, level=%d", ext->id, ext->siteid, ext->code, extlevel);
 #endif
 
 	offset += s_chunk->next;
@@ -1856,7 +1856,7 @@ static bool ReadDOF()
 		obmainMoveToNotObjectTree(lpobj);
 		topmostObject = lpobj;
 		topmost = false;
-		Write_Debug("Topmost object was tagged");
+		WriteDebug("Topmost object was tagged");
 	}
 
 	strcpy(lpobj->name, dof.name);
@@ -1917,7 +1917,7 @@ static bool ReadDOF()
 	lpobj->dof->dofstatic->dofcurscale.z = (float)dof.curzscale;
 	lpobj->dof->dofstatic->dofincscale.z = (float)dof.inczscale;
 
-	//	Write_Debug("Processing DOF: %s (%d)", dof.name, level);
+	//	WriteDebug("Processing DOF: %s (%d)", dof.name, level);
 
 	doflevel = level;
 
@@ -1944,7 +1944,7 @@ static bool ReadTextComment()
 	{
 		if(textcomment != nullptr)
 		{
-			Write_Debug("Old text comment was unused");
+			WriteDebug("Old text comment was unused");
 			memFree(textcomment);
 		}
 		textcomment = thisTextComment;
@@ -2038,7 +2038,7 @@ static bool ReadLongID()
 	char*	completeString = (char*)alloca(len + 1);
 	if (PN_UNLIKELY(!localBufferCopyBytes(completeString, len)))
 	{
-		Write_Debug("[ReadLongID] FAILURE: bad read\n", lastobject->name, s_conversionFile.c_str());
+		WriteDebug("[ReadLongID] FAILURE: bad read\n", lastobject->name, s_conversionFile.c_str());
 		return false;
 	}
 
@@ -2070,11 +2070,11 @@ static bool ReadLongID()
 		{
 			strcpy(lastobject->name, tempname);
 			strcpy(objname[level], tempname);
-		//			Write_Debug("Existing object name changed from '%s' to '%s' (%d)", oldname, tempname, level);
+		//			WriteDebug("Existing object name changed from '%s' to '%s' (%d)", oldname, tempname, level);
 		}
 		else
 		{
-		//			Write_Debug("Existing object name '%s' was not changed to '%s' (%d)", oldname, tempname, level);
+		//			WriteDebug("Existing object name '%s' was not changed to '%s' (%d)", oldname, tempname, level);
 		}
 
 		// Check if topmost name is the file name...required.
@@ -2097,11 +2097,11 @@ static bool ReadLongID()
 	{
 		if (facelevel == -1)
 		{
-		//			Write_Debug("Uncreated object name set to '%s' (%d)", objname[level], level);
+		//			WriteDebug("Uncreated object name set to '%s' (%d)", objname[level], level);
 		}
 		else
 		{
-		//			Write_Debug("Uncreated object '%s', name unchanged: '%s' (%d)", objname[level], tempname, level);
+		//			WriteDebug("Uncreated object '%s', name unchanged: '%s' (%d)", objname[level], tempname, level);
 		}
 	}
 
@@ -2115,11 +2115,11 @@ static bool ReadPushLevel()
 	level += 1;
 	if (level >= MAX_LEVELS)
 	{
-		Write_Debug("Exceeded maximum number of supported levels: %d; max = %d", level, MAX_LEVELS);
+		WriteDebug("Exceeded maximum number of supported levels: %d; max = %d", level, MAX_LEVELS);
 		return false;
 	}
 
-	//Write_Debug("Down to level %d", level);
+	//WriteDebug("Down to level %d", level);
 
 	offset += s_chunk->next;
 
@@ -2149,13 +2149,13 @@ static bool ReadPopLevel()
 	if (level == 0)
 		topmost = true;
 
-	//Write_Debug("Up to level %d", level);
+	//WriteDebug("Up to level %d", level);
 
 	if (groupindex >= 0)
 	{
 		if (grouplevels[groupindex] >= level)
 		{
-			//Write_Debug("Up a group level: %d (%d)", groupindex, level);
+			//WriteDebug("Up a group level: %d (%d)", groupindex, level);
 
 			for (size_t i=groupindex+1; i < MAX_GROUP_SIZE; i++)
 			{
@@ -2319,9 +2319,9 @@ static void changeMaterials( OBJECT* obj )
 #define SHOWLDMSGS 1
 
 #ifdef SHOWLDMSGS
-# define LDWrite_Debug(fmt, ...) dbugLog(_FLD, fmt, ## __VA_ARGS__);
+# define LDWriteDebug(fmt, ...) dbugLog(_FLD, fmt, ## __VA_ARGS__);
 #else
-# define LDWrite_Debug(fmt, ...)
+# define LDWriteDebug(fmt, ...)
 #endif
 
 static OBJECT* _fltLoad(const char* const name, const float scale, const int reduce)
@@ -2437,72 +2437,72 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 		switch (s_chunk->cid)
 		{
 		case HEADER_RECORD:
-			LDWrite_Debug("HEADER_RECORD");
+			LDWriteDebug("HEADER_RECORD");
 			if(!ReadHeader())
 				return FLTChunkFailure("HEADER_RECORD"), nullptr;
 		break;
 		case GROUP_RECORD:
-			LDWrite_Debug("GROUP_RECORD");
+			LDWriteDebug("GROUP_RECORD");
 			if(!ReadGroup())
 				return FLTChunkFailure("GROUP_RECORD"), nullptr;
 		break;
 		case OBJECT_RECORD:
-			LDWrite_Debug("OBJECT_RECORD");
+			LDWriteDebug("OBJECT_RECORD");
 			if(!ReadObject())
 				return FLTChunkFailure("OBJECT_RECORD"), nullptr;
 		break;
 		case FACE_RECORD:
-			LDWrite_Debug("FACE_RECORD");
+			LDWriteDebug("FACE_RECORD");
 			if(!ReadFace())
 				return FLTChunkFailure("FACE_RECORD"), nullptr;
 		break;
 		case PUSH_LEVEL:
 			if(!ReadPushLevel())
 				return FLTChunkFailure("PUSH_LEVEL"), nullptr;
-			LDWrite_Debug("PUSH_LEVEL: %d", level);
+			LDWriteDebug("PUSH_LEVEL: %d", level);
 		break;
 		case POP_LEVEL:
-			LDWrite_Debug("POP_LEVEL: %d", level);
+			LDWriteDebug("POP_LEVEL: %d", level);
 			if(!ReadPopLevel())
 				return FLTChunkFailure("POP_LEVEL"), nullptr;
 		break;
 		case DOF_RECORD:
-			LDWrite_Debug("DOF");
+			LDWriteDebug("DOF");
 			if (!ReadDOF())
 				return FLTChunkFailure("DOF_RECORD"), nullptr;
 		break;
 		case PUSH_SUBFACE:
-			LDWrite_Debug("PUSH_SUBFACE");
+			LDWriteDebug("PUSH_SUBFACE");
 			if(!ReadPushSubface())
 				return FLTChunkFailure("PUSH_SUBFACE"), nullptr;
 		break;
 		case POP_SUBFACE:
-			LDWrite_Debug("POP_SUBFACE");
+			LDWriteDebug("POP_SUBFACE");
 			if(!ReadPopSubface())
 				return FLTChunkFailure("POP_SUBFACE"), nullptr;
 		break;
 		case PUSH_EXTENSION:
-			LDWrite_Debug("PUSH_EXTENSION");
+			LDWriteDebug("PUSH_EXTENSION");
 			if(!ReadPushExtension())
 				return FLTChunkFailure("PUSH_EXTENSION"), nullptr;
 		break;
 		case POP_EXTENSION:
-			LDWrite_Debug("POP_EXTENSION");
+			LDWriteDebug("POP_EXTENSION");
 			if(!ReadPopExtension())
 				return FLTChunkFailure("POP_EXTENSION"), nullptr;
 		break;
 		case TEXT_COMMENT:
-			LDWrite_Debug("TEXT_COMMENT");
+			LDWriteDebug("TEXT_COMMENT");
 			if(!ReadTextComment())
 				return FLTChunkFailure("TEXT_COMMENT"), nullptr;
 		break;
 		case COLOR_PALETTE:
-			LDWrite_Debug("COLOR_PALETTE");
+			LDWriteDebug("COLOR_PALETTE");
 			if(!ReadColorPalette())
 				return FLTChunkFailure("COLOR_PALETTE"), nullptr;
 		break;
 		case LONG_ID:
-			LDWrite_Debug("LONG_ID");
+			LDWriteDebug("LONG_ID");
 			if(!ReadLongID())
 				return FLTChunkFailure("LONG_ID"), nullptr;
 		break;
@@ -2511,181 +2511,181 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 				return FLTChunkFailure("MATRIX"), nullptr;
 		break;
 		case VECTOR:
-			LDWrite_Debug("VECTOR");
+			LDWriteDebug("VECTOR");
 			ReadUnknown();
 		break;
 		case BSP:
-			LDWrite_Debug("BSP");
+			LDWriteDebug("BSP");
 			ReadUnknown();
 		break;
 		case REPLICATE:
-			LDWrite_Debug("REPLICATE");
+			LDWriteDebug("REPLICATE");
 			ReadUnknown();
 		break;
 		case INSTANCE_REFERENCE:
-			LDWrite_Debug("INSTANCE_REFERENCE");
+			LDWriteDebug("INSTANCE_REFERENCE");
 			ReadUnknown();
 		break;
 		case INSTANCE_DEFINITION:
-			LDWrite_Debug("INSTANCE_DEFINITION");
+			LDWriteDebug("INSTANCE_DEFINITION");
 			ReadUnknown();
 		break;
 		case EXTERNAL:
-			LDWrite_Debug("EXTERNAL");
+			LDWriteDebug("EXTERNAL");
 			ReadUnknown();
 		break;
 		case TEXTURE_REFERENCE:
-			LDWrite_Debug("TEXTURE_REFERENCE");
+			LDWriteDebug("TEXTURE_REFERENCE");
 			if(!ReadTextureReference())
 				return FLTChunkFailure("TEXTURE_REFERENCE"), nullptr;
 		break;
 		case VERTEX_PALETTE:
-			LDWrite_Debug("VERTEX_PALETTE");
+			LDWriteDebug("VERTEX_PALETTE");
 			if(!ReadVertexPalette())
 				return FLTChunkFailure("VERTEX_PALETTE"), nullptr;
 		break;
 		case VERTEX_LIST:
-			LDWrite_Debug("VERTEX_LIST");
+			LDWriteDebug("VERTEX_LIST");
 			if(!ReadVertexList())
 				return FLTChunkFailure("VERTEX_LIST"), nullptr;
 		break;
 		case FLT_LOD:
-			LDWrite_Debug("LOD");
+			LDWriteDebug("LOD");
 			if(!ReadLOD())
 				return FLTChunkFailure("LOD"), nullptr;
 		break;
 		case BOUNDING_BOX:
-			LDWrite_Debug("BOUNDING_BOX");
+			LDWriteDebug("BOUNDING_BOX");
 			ReadUnknown();
 		break;
 		case ROTATE_EDGE:
-			LDWrite_Debug("ROTATE_EDGE");
+			LDWriteDebug("ROTATE_EDGE");
 			ReadUnknown();
 		break;
 		case TRANSLATE:
-			LDWrite_Debug("TRANSLATE");
+			LDWriteDebug("TRANSLATE");
 			ReadUnknown();
 		break;
 		case SCALE_INDEPENDENT_XYZ:
-			LDWrite_Debug("SCALE_INDEPENDENT_XYZ");
+			LDWriteDebug("SCALE_INDEPENDENT_XYZ");
 			ReadUnknown();
 		break;
 		case ROTATE_POINT:
-			LDWrite_Debug("ROTATE_POINT");
+			LDWriteDebug("ROTATE_POINT");
 			ReadUnknown();
 		break;
 		case ROTATE_SCALE:
-			LDWrite_Debug("ROTATE_SCALE");
+			LDWriteDebug("ROTATE_SCALE");
 			ReadUnknown();
 		break;
 		case PUT:
-			LDWrite_Debug("PUT");
+			LDWriteDebug("PUT");
 			ReadUnknown();
 		break;
 		case EYEPOINT_TRACKPLANE:
-			LDWrite_Debug("EYEPOINT_TRACKPLANE");
+			LDWriteDebug("EYEPOINT_TRACKPLANE");
 			ReadUnknown();
 		break;
 		case ROAD_SEGMENT:
-			LDWrite_Debug("ROAD_SEGMENT");
+			LDWriteDebug("ROAD_SEGMENT");
 			ReadUnknown();
 		break;
 		case ROAD_ZONE:
-			LDWrite_Debug("ROAD_ZONE");
+			LDWriteDebug("ROAD_ZONE");
 			ReadUnknown();
 		break;
 		case MORPH_VERTEX_LIST:
-			LDWrite_Debug("MORPH_VERTEX_LIST");
+			LDWriteDebug("MORPH_VERTEX_LIST");
 			ReadUnknown();
 		break;
 		case SOUND:
-			LDWrite_Debug("SOUND");
+			LDWriteDebug("SOUND");
 			ReadUnknown();
 		break;
 		case ROAD_PATH:
-			LDWrite_Debug("ROAD_PATH");
+			LDWriteDebug("ROAD_PATH");
 			ReadUnknown();
 		break;
 		case SOUND_PALETTE:
-			LDWrite_Debug("SOUND_PALETTE");
+			LDWriteDebug("SOUND_PALETTE");
 			ReadUnknown();
 		case TEXT_RECORD:
-			LDWrite_Debug("TEXT_RECORD");
+			LDWriteDebug("TEXT_RECORD");
 			ReadUnknown();
 		break;
 		case SWITCH:
-			LDWrite_Debug("SWITCH");
+			LDWriteDebug("SWITCH");
 			ReadUnknown();
 		break;
 		case CLIP_REGION:
-			LDWrite_Debug("CLIP_REGION");
+			LDWriteDebug("CLIP_REGION");
 			ReadUnknown();
 		break;
 		case EXTENSION:
-			LDWrite_Debug("EXTENSION");
+			LDWriteDebug("EXTENSION");
 			if(!ReadExtension())
 				return FLTChunkFailure("EXTENSION"), nullptr;
 		break;
 		case LIGHT_SOURCE:
-			LDWrite_Debug("LIGHT_SOURCE");
+			LDWriteDebug("LIGHT_SOURCE");
 			ReadUnknown();
 		break;
 		case LIGHT_SOURCE_PALETTE:
-			LDWrite_Debug("LIGHT_SOURCE_PALETTE");
+			LDWriteDebug("LIGHT_SOURCE_PALETTE");
 			ReadUnknown();
 		break;
 		case BOUNDING_SPHERE:
-			LDWrite_Debug("BOUNDING_SPHERE");
+			LDWriteDebug("BOUNDING_SPHERE");
 			ReadUnknown();
 		break;
 		case BOUNDING_CYLINDER:
-			LDWrite_Debug("BOUNDING_CYLINDER");
+			LDWriteDebug("BOUNDING_CYLINDER");
 			ReadUnknown();
 		break;
 		case BOUNDING_VOLUME_CENTER:
-			LDWrite_Debug("BOUNDING_VOLUME_CENTER");
+			LDWriteDebug("BOUNDING_VOLUME_CENTER");
 			ReadUnknown();
 		break;
 		case BOUNDING_VOLUME_ORIENT:
-			LDWrite_Debug("BOUNDING_VOLUME_ORIENT");
+			LDWriteDebug("BOUNDING_VOLUME_ORIENT");
 			ReadUnknown();
 		break;
 		case LIGHT_POINT:
-			LDWrite_Debug("LIGHT_POINT");
+			LDWriteDebug("LIGHT_POINT");
 			ReadUnknown();
 		break;
 		case MATERIAL_TABLE:
-			LDWrite_Debug("MATERIAL_TABLE");
+			LDWriteDebug("MATERIAL_TABLE");
 			if(!ReadMaterialTable(name))
 				return FLTChunkFailure("MATERIAL_TABLE"), nullptr;
 		break;
 		case TEXTURE_MAPPING_PALETTE:
-			LDWrite_Debug("TEXTURE_MAPPING_PALETTE");
+			LDWriteDebug("TEXTURE_MAPPING_PALETTE");
 			ReadUnknown();
 		break;
 		case MATERIAL_PALETTE:
-			LDWrite_Debug("MATERIAL_PALETTE");
+			LDWriteDebug("MATERIAL_PALETTE");
 			if(!ReadMaterialPalette(name))
 				return FLTChunkFailure("MATERIAL_PALETTE"), nullptr;
 		break;
 		case COLOR_NAME_PALETTE:
-			LDWrite_Debug("COLOR_NAME_PALETTE");
+			LDWriteDebug("COLOR_NAME_PALETTE");
 			ReadUnknown();
 		break;
 		case CAT:
-			LDWrite_Debug("CAT");
+			LDWriteDebug("CAT");
 			ReadUnknown();
 		break;
 		case CAT_DATA:
-			LDWrite_Debug("CAT_DATA");
+			LDWriteDebug("CAT_DATA");
 			ReadUnknown();
 		break;
 		case CURVE:
-			LDWrite_Debug("CURVE");
+			LDWriteDebug("CURVE");
 			ReadUnknown();
 		break;
 		default:
-			Write_Debug("UNKNOWN: %d", s_chunk->cid);
+			WriteDebug("UNKNOWN: %d", s_chunk->cid);
 			ReadUnknown();
 		break;
 		}
@@ -2747,7 +2747,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 
 	//	tstart = GetTickCount() - tstart;
 	tstart = timeGetTime() - tstart;
-	Write_Debug("Finished ldfltLoad in %d ms", tstart);
+	WriteDebug("Finished ldfltLoad in %d ms", tstart);
 
 	g_bSpeedTrees = false;
 	memset(filename, 0, sizeof(filename));
@@ -2765,7 +2765,7 @@ OBJECT* ldfltLoad(const std::string& name, float scale, int reduce)
     {
         char error[1024] ;
         strprintf(error, "Flt:%s\nError: %s (%s)", name.c_str(), e.m_problem.c_str(), e.m_doing.c_str()) ;
-        Write_Debug("%s", error) ;
+        WriteDebug("%s", error) ;
         piExitProgram(_FL, error) ;
         return NULL ;
     }

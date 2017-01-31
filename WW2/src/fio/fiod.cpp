@@ -429,7 +429,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 #if platBuild == BUILD_SERVER
 		LogAbort("out of memory opening %s", asciiPath);
 #else
-		Write_Log(LOG_ALL, LOG_FATAL, "out of memory opening %s", asciiPath);
+		WriteLog(LOG_ALL, LOG_FATAL, "out of memory opening %s", asciiPath);
 		piExitProgram(_FL, "out of memory");
 		return -1;
 #endif
@@ -478,7 +478,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 #if platBuild == BUILD_SERVER
 		WriteLog(LOG_FIO, LOG_DEBUG, "fiod:%s:%s", cause, asciiPath);
 #else
-		Write_Log(LOG_OLD, LOG_INFO, "fiod:%s:%s", cause, asciiPath);
+		WriteLog(LOG_OLD, LOG_INFO, "fiod:%s:%s", cause, asciiPath);
 #endif
 
 		// Relinquish the file descriptor

@@ -217,7 +217,7 @@ LOGICAL		retval=FALSE;
 
 	if (retval)
 	{
-		Write_Debug("Encountered an error while setting states in rnSetDefaultStates");
+		WriteDebug("Encountered an error while setting states in rnSetDefaultStates");
 		return(FALSE);
 	}
 #endif
@@ -289,7 +289,7 @@ bool rnmainGetOnlineSetting()
 
 		if (teulGetHost(GameServerIP, &GameHost) == 0)
 		{
-			Write_Debug("Unable to translate host address");
+			WriteDebug("Unable to translate host address");
 			return false;
 		}
 
@@ -313,7 +313,7 @@ bool rnmainGetOnlineSetting()
 		#pragma message("AUTH_BYPASS using Host " AUTH_BYPASS)
 		if (teulGetHost((UCHAR*) AUTH_BYPASS, &GameHost) == 0)
 		{
-			Write_Debug("Unable to translate host address");
+			WriteDebug("Unable to translate host address");
 			return false;
 		}
 
@@ -446,7 +446,7 @@ LOGICAL rnmainInit()
 	//call for language
 	if(!loclLoadLocalizationStringTable(0))
     {
-        Write_Debug("[rnmainInit] loclLoadLocalizationStringTable** FAILED**");
+        WriteDebug("[rnmainInit] loclLoadLocalizationStringTable** FAILED**");
         return FALSE;
     }
 	*/
@@ -497,14 +497,14 @@ LOGICAL rnmainInit()
 	if(!adInit())
     {
         // Not an error
-        Write_Log(LOG_OLD, LOG_INFO, "[rnmainInit] adInit FAILED");
+        WriteLog(LOG_OLD, LOG_INFO, "[rnmainInit] adInit FAILED");
     }
 #endif
 
 	rnlogoUpdateStatus("loading.sounds.init");
 	if (!sndsInit())
 	{
-        Write_Debug("Initializing Sounds FAILED. Disabling sounds");
+        WriteDebug("Initializing Sounds FAILED. Disabling sounds");
         // Keep playing without sounds
         bSoundEnable = FALSE;
 	}
@@ -535,7 +535,7 @@ LOGICAL rnmainInit()
 	rnlogoUpdateStatus("loading.fx");
 	if(!FXInitialize())
     {
-        Write_Debug("[rnmainInit] FXInitialized** FAILED**");
+        WriteDebug("[rnmainInit] FXInitialized** FAILED**");
         return FALSE;
     }
 #endif
@@ -792,8 +792,8 @@ void rnmainKill()
 
 	if (ScaleFactor != 0.0f)
 	{
-		Write_Debug("Player position: x=%f, y=%f, z=%f", playpos.x/ScaleFactor, playpos.y/ScaleFactor, playpos.z/ScaleFactor);
-		Write_Debug("Player rotation: x=%f, y=%f, z=%f", playrot.x, playrot.y, playrot.z);
+		WriteDebug("Player position: x=%f, y=%f, z=%f", playpos.x/ScaleFactor, playpos.y/ScaleFactor, playpos.z/ScaleFactor);
+		WriteDebug("Player rotation: x=%f, y=%f, z=%f", playrot.x, playrot.y, playrot.z);
 	}
 
 	obmainKill();
@@ -804,7 +804,7 @@ void rnmainKill()
 	sndsKill();
     glslKill();
 
-    Write_Log(LOG_OLD, LOG_INFO, "[rnmainKill]");
+    WriteLog(LOG_OLD, LOG_INFO, "[rnmainKill]");
 }
 
 void rnmainSetPlayerInfo(piVECTOR* lppos, piVECTOR* lprot)
@@ -1170,7 +1170,7 @@ static void PrintDateTime()
 
     localtime_r(&p, &t);
     strftime(buf, 255, "Date and time: %F %T %z", &t);
-    Write_Debug("%s", buf);
+    WriteDebug("%s", buf);
 }
 
 
@@ -1218,24 +1218,24 @@ static void OutputStatusMessageToFile(SINT8* File, SINT32 Line, SINT8* MessageSt
 {
 	FILE* ExitLog = Fio::OpenLogFile();
 
-	Write_Debug("Status handler information...");
+	WriteDebug("Status handler information...");
 
 	if (MessageString == nullptr)
 	{
 		if ( ExitLog )
 			fprintf(ExitLog, "No exit message!\n");
-		Write_Debug("No exit message!");
+		WriteDebug("No exit message!");
 	}
 	else
 	{
 		if ( ExitLog )
 			fprintf(ExitLog, "%s\n", MessageString);
-		Write_Debug("%s", MessageString);
+		WriteDebug("%s", MessageString);
 	}
 
 	if ( ExitLog )
 		fprintf(ExitLog,"File: %s, Line: %d\n", File, Line);
-	Write_Debug("File: %s, Line: %d", File, Line);
+	WriteDebug("File: %s, Line: %d", File, Line);
 
 	if ( ExitLog )
 	{
@@ -1302,7 +1302,7 @@ static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UI
         {
             if (teulGetHost(ipAddress.c_str(), host) == 0)
             {
-                Write_Debug("Unable to translate host address");
+                WriteDebug("Unable to translate host address");
                 return (FALSE);
             }
 
@@ -1324,7 +1324,7 @@ static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UI
 
         }
     } catch (std::ifstream::failure e) {
-        Write_Debug( e.what());
+        WriteDebug( e.what());
         retval = FALSE;
         Online = 0;
     }
@@ -1345,7 +1345,7 @@ static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, U
 
 	if (teulGetHost(GameServerIP, host) == 0)
 	{
-		Write_Debug("Unable to translate host address");
+		WriteDebug("Unable to translate host address");
 		return (FALSE);
 	}
 

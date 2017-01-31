@@ -363,7 +363,7 @@ void fxMgrKill()
         g_lpSort = nullptr;
     }
 
-    Write_Log(LOG_OLD, LOG_INFO, "[fxMgrKill]");
+    WriteLog(LOG_OLD, LOG_INFO, "[fxMgrKill]");
 }
 
 /////////////////////////////////////////////////
@@ -432,7 +432,7 @@ void fxMgrSetLight()
 
     if(!s || !m)
     {
-        Write_Log(LOG_OLD, LOG_INFO, "ERROR: Cannot find sun/moon object");
+        WriteLog(LOG_OLD, LOG_INFO, "ERROR: Cannot find sun/moon object");
         return;
     }
 

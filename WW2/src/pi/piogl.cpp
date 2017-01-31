@@ -106,7 +106,7 @@ void piKill()
 {
 	dimainKill();
 	oglKill();
-	Write_Log(LOG_OLD, LOG_INFO, "[piKill]");
+	WriteLog(LOG_OLD, LOG_INFO, "[piKill]");
 }
 
 LOGICAL piClearTargets(UINT32 targets)
@@ -704,7 +704,7 @@ LOGICAL piLockSurface(void* lpdds, piSURFACEDESC* lppisd)
 
 void piCloseProgram()
 {
-	Write_Debug("piCloseProgram was called");
+	WriteDebug("piCloseProgram was called");
 
 #if platOS == OS_WIN32
 	running = 0;

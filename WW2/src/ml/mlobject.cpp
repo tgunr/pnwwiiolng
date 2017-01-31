@@ -124,7 +124,7 @@ OBJECT*	lpobj;
 	lpobj = obmainFindChildFromObject(lpgrp, "shadow");
 	if (lpobj == nullptr)
 	{
-		Write_Debug("Shadow object not found in model %s", lpgrp->name);
+		WriteDebug("Shadow object not found in model %s", lpgrp->name);
 		// no shadow, no error
 		return(TRUE);
 	}
@@ -299,7 +299,7 @@ static UINT32 _FindAndSetupHideUnhideObjects(mlObjectData* ObjectData, OBJECT* O
 					}
 				}else
 				{
-					Write_Debug("enginefast comment for object %s with invalid engine number", ObjSib->name);
+					WriteDebug("enginefast comment for object %s with invalid engine number", ObjSib->name);
 				}
 			}
 
@@ -315,7 +315,7 @@ static UINT32 _FindAndSetupHideUnhideObjects(mlObjectData* ObjectData, OBJECT* O
 					}
 				}else
 				{
-					Write_Debug("enginefast comment for object %s with invalid engine number", ObjSib->name);
+					WriteDebug("enginefast comment for object %s with invalid engine number", ObjSib->name);
 				}
 			}
 		}
@@ -560,7 +560,7 @@ UCHAR s[32];
 			{
 				if (ObjectPtr->child == nullptr)
 				{
-					Write_Debug("No object under %s in vehicle object %s",s,ObjectData->PlaneObject->name);
+					WriteDebug("No object under %s in vehicle object %s",s,ObjectData->PlaneObject->name);
 					break;
 				}
 				ObjectPtr = ObjectPtr->child;
@@ -608,7 +608,7 @@ UCHAR s[32];
 		{
 			if (ObjectPtr->child == nullptr)
 			{
-				Write_Debug("No object under lodloadout in vehicle object %s",ObjectData->PlaneObject->name);
+				WriteDebug("No object under lodloadout in vehicle object %s",ObjectData->PlaneObject->name);
 				break;
 			}
 			ObjectPtr = ObjectPtr->child;
@@ -1140,7 +1140,7 @@ OBJECT * AttachPnt;
 	ogrpFindSubObjectByName(&Mount->MountObject,Object,(char*)Mount->MountName);
 	if (Mount->MountObject == nullptr)
 	{
-		Write_Debug("Unable to find weapon mount %s",Mount->MountName);
+		WriteDebug("Unable to find weapon mount %s",Mount->MountName);
 //		hackLockBlock(Mount);
 		return 0;
 	}
@@ -1219,7 +1219,7 @@ UINT32 LoadoutNum = 0;
 
 	if (VehicleType == nullptr)
 	{
-		Write_Debug("Vehicle exists with no vehicletype!");
+		WriteDebug("Vehicle exists with no vehicletype!");
 
 		return 0;
 	}
@@ -1235,7 +1235,7 @@ UINT32 LoadoutNum = 0;
 
 			if (MountObject == nullptr)
 			{
-				Write_Debug("Unable to find %s in %s",
+				WriteDebug("Unable to find %s in %s",
 							Loadout->MountObject[i],
 							MasterObj->name);
 			}
@@ -1249,7 +1249,7 @@ UINT32 LoadoutNum = 0;
 						ogrpFindSubObjectByDOFVarAndSubVar(&AttachPnt,MountObject,ML_DOF_CONNECT,j);
 						if (AttachPnt == nullptr)
 						{
-							Write_Debug("Connection point %d for mount %s doesn't exist",
+							WriteDebug("Connection point %d for mount %s doesn't exist",
 								j+1,
 								Loadout->MountObject[i]);
 							continue;
@@ -1258,7 +1258,7 @@ UINT32 LoadoutNum = 0;
 						Object1 = obmgrCreateModelInstance((char*)Loadout->WeaponObject[i][j]);
 						if (!Object1)
 						{
-							Write_Debug("Unable to load object %s for mount %s",
+							WriteDebug("Unable to load object %s for mount %s",
 								Loadout->WeaponObject[i][j],Loadout->MountObject[i]);
 							continue;
 						}
@@ -2397,7 +2397,7 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 	ogrpFindSubObjectByName(&Object,(*ObjectData)->PlaneObject,"lod1");
 	if (Object == nullptr)
 	{
-		Write_Debug("Cannot find LOD1, using entire object for lowest point check");
+		WriteDebug("Cannot find LOD1, using entire object for lowest point check");
 		Object = (*ObjectData)->PlaneObject;
 	}
 
@@ -2580,7 +2580,7 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 		}
 		else
 		{
-			Write_Debug("Unable to find damage object %s in object %s",
+			WriteDebug("Unable to find damage object %s in object %s",
 							DamageObjectListPtr,
 							(*ObjectData)->PlaneObject->name);
 		}

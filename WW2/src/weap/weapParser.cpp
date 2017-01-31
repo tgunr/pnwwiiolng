@@ -489,7 +489,7 @@ static bool _fillSpawn(SINT32 /*numArgs*/, FUNCARGS* args)
 	catch ( const char* reason )
 	{
 #if platBuild == BUILD_CLIENT
-		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason);
+		WriteLog(LOG_WEAPON, LOG_FATAL, "%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason);
 		return false;
 #else
 		LogAbort("%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason);

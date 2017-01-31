@@ -52,7 +52,7 @@ LOGICAL sndsInit()
 {
 	if (bSoundEnable == FALSE)
 	{
-		Write_Log(LOG_SOUND, LOG_INFO, "Sounds have been disabled in the config file");
+		WriteLog(LOG_SOUND, LOG_INFO, "Sounds have been disabled in the config file");
 		return TRUE;
 	}
 
@@ -65,9 +65,9 @@ LOGICAL sndsInit()
 	}
 
 #if XAUDIO
-    Write_Debug("Running XAUDIO");
+    WriteDebug("Running XAUDIO");
 #else
-    Write_Debug("Running DirectSound");
+    WriteDebug("Running DirectSound");
 #endif
 
 	LOGICAL rVal = sndsPlatformInit();
@@ -102,7 +102,7 @@ void sndsKill()
 
     _sndsFreeRemainingSounds();
 
-    Write_Log(LOG_OLD, LOG_INFO, "[sndsKill]");
+    WriteLog(LOG_OLD, LOG_INFO, "[sndsKill]");
 }
 
 // does any driver configuration (such as on windows, enumerating sound drivers and picking
@@ -138,14 +138,14 @@ snSound*		eachSound;
 #ifdef SOUND_DEBUG
 	if (eachSound != nullptr)
 	{
-		Write_Log(LOG_SOUND, LOG_INFO, "Sounds still allocated...");
+		WriteLog(LOG_SOUND, LOG_INFO, "Sounds still allocated...");
 	}
 #endif
 
 	while(eachSound != nullptr && eachSound != &_activeSoundsTail)
 	{
 #ifdef SOUND_DEBUG
-		Write_Log(LOG_SOUND, LOG_INFO, "Sound: %s' - File: %s, Line: %d",
+		WriteLog(LOG_SOUND, LOG_INFO, "Sound: %s' - File: %s, Line: %d",
 			eachSound->name,
 			eachSound->file,
 			eachSound->line);
@@ -252,14 +252,14 @@ snSound*	listSound;
 	{
 		return;
 	}
-	Write_Log(LOG_SOUND, LOG_INFO, "BaseSoundPtr = %x", _activeSoundsHead.next);
+	WriteLog(LOG_SOUND, LOG_INFO, "BaseSoundPtr = %x", _activeSoundsHead.next);
 	listSound = _activeSoundsHead.next;
 	while(listSound != &_activeSoundsTail)
 	{
-		Write_Log(LOG_SOUND, LOG_INFO, "Sound %s, addr = %x, next = %x, prev = %x", listSound->name, listSound, listSound->next, listSound->prev);
+		WriteLog(LOG_SOUND, LOG_INFO, "Sound %s, addr = %x, next = %x, prev = %x", listSound->name, listSound, listSound->next, listSound->prev);
 		listSound = listSound->next;
 	}
-	Write_Log(LOG_SOUND, LOG_INFO, "");
+	WriteLog(LOG_SOUND, LOG_INFO, "");
 }
 
 // this loops through the linked list of sounds, updating 3D effects such as volume3D/pan3D/freqShift3D

@@ -237,7 +237,7 @@ static void endianSwapBlock32(long* l, int  n)
 // replace with a new logging subsystem when that's working. - Gadget
 //#define LOG_FORMATS
 #ifdef LOG_FORMATS
-#define Write_Format_Log(...) Write_Log(__VA_ARGS__)
+#define Write_Format_Log(...) WriteLog(__VA_ARGS__)
 #else
 #define Write_Format_Log(...)
 #endif
@@ -252,12 +252,12 @@ Image* ReadDDSFile(const std::string& name)
     if(fd < 0)
     {
         if (errno != ENOENT) {
-            Write_Debug("[ReadDDSFile] cannot open %s", name.c_str());
+            WriteDebug("[ReadDDSFile] cannot open %s", name.c_str());
         }
         return nullptr;
     }
 
-    //Write_Log(LOG_TEXTURE, LOG_INFO, "[ReadDDSFile] Reading image %s", name.c_str());
+    //WriteLog(LOG_TEXTURE, LOG_INFO, "[ReadDDSFile] Reading image %s", name.c_str());
 
     char filecode[4];
 
@@ -265,7 +265,7 @@ Image* ReadDDSFile(const std::string& name)
 
     if(strncmp(filecode, "DDS ", 4) != 0)
     {
-        Write_Debug("[ReadDDSFile] File %s not DDS", name.c_str());
+        WriteDebug("[ReadDDSFile] File %s not DDS", name.c_str());
         fioClose(fd);
         return nullptr;
     }
@@ -283,7 +283,7 @@ Image* ReadDDSFile(const std::string& name)
     //Check valid structure sizes
     if(ddsd.dwSize != 124 && ddsd.ddpfPixelFormat.dwSize != 32)
     {
-        Write_Debug("[ReadDDSFile] File %s not valid structure size", name.c_str());
+        WriteDebug("[ReadDDSFile] File %s not valid structure size", name.c_str());
         fioClose(fd);
         return nullptr;
     }
@@ -311,14 +311,14 @@ Image* ReadDDSFile(const std::string& name)
     if(ddsd.ddpfPixelFormat.dwFlags & DDPF_BUMPDUDV)
     {
         fioClose(fd);
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: DDPF_BUMPDUDV format is not supported");
+        WriteLog(LOG_OLD, LOG_WARN, "ERROR: DDPF_BUMPDUDV format is not supported");
         return nullptr;
     }
 
     if(ddsd.ddpfPixelFormat.dwFlags & DDPF_BUMPLUMINANCE)
     {
         fioClose(fd);
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: DDPF_BUMPLUMINANCE format is not supported");
+        WriteLog(LOG_OLD, LOG_WARN, "ERROR: DDPF_BUMPLUMINANCE format is not supported");
         return nullptr;
     }
 
@@ -401,7 +401,7 @@ Image* ReadDDSFile(const std::string& name)
         if(!found)
         {
             fioClose(fd);
-            Write_Log(LOG_OLD, LOG_WARN, "ERROR: unhandled RGB pixel format in dds file");
+            WriteLog(LOG_OLD, LOG_WARN, "ERROR: unhandled RGB pixel format in dds file");
             return nullptr;
         }
     }
@@ -490,11 +490,11 @@ Image* ReadDDSFile(const std::string& name)
             break;
         case 0x00000070: // G16R16F
             fioClose(fd);
-            Write_Log(LOG_OLD, LOG_INFO, "G16R16F format is not supported");
+            WriteLog(LOG_OLD, LOG_INFO, "G16R16F format is not supported");
             return nullptr;
             break;
         case 0x00000073: // G32R32F
-            Write_Log(LOG_OLD, LOG_INFO, "G32R32F format is not supported");
+            WriteLog(LOG_OLD, LOG_INFO, "G32R32F format is not supported");
             fioClose(fd);
             return nullptr;
             break;
@@ -518,7 +518,7 @@ Image* ReadDDSFile(const std::string& name)
             break;
         case 0x00000075: // CxV8U8
             fioClose(fd);
-            Write_Log(LOG_OLD, LOG_INFO, "CxV8U8 format is not supported");
+            WriteLog(LOG_OLD, LOG_INFO, "CxV8U8 format is not supported");
             return nullptr;
 
         case MAKEFOURCC( 'U', 'Y', 'V', 'Y'): // not supported in OSG
@@ -529,14 +529,14 @@ Image* ReadDDSFile(const std::string& name)
 
         default:
             fioClose(fd);
-            Write_Log(LOG_OLD, LOG_WARN, "ERROR: unhandled FOURCC pixel format");
+            WriteLog(LOG_OLD, LOG_WARN, "ERROR: unhandled FOURCC pixel format");
             return nullptr;
         }
     }
     else
     {
         fioClose(fd);
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: unhandled FOURCC pixel format");
+        WriteLog(LOG_OLD, LOG_WARN, "ERROR: unhandled FOURCC pixel format");
         return nullptr;
     }
 
@@ -614,7 +614,7 @@ Image* ReadDDSFile(const std::string& name)
 
     if(size <= 0)
     {
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: size <= 0");
+        WriteLog(LOG_OLD, LOG_WARN, "ERROR: size <= 0");
         fioClose(fd);
         return nullptr;
     }
@@ -624,7 +624,7 @@ Image* ReadDDSFile(const std::string& name)
     if(!imageData)
     {
         fioClose(fd);
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: imageData == nullptr");
+        WriteLog(LOG_OLD, LOG_WARN, "ERROR: imageData == nullptr");
         return nullptr;
     }
 
@@ -654,9 +654,9 @@ Image* ReadDDSFile(const std::string& name)
 
     image->setImage(s,t,r, internalFormat, pixelFormat, dataType, imageData, Image::USE_NEW_DELETE);
     if (mipmaps.size()>0)  image->setMipmapLevels(mipmaps);
-
-    Write_Log(LOG_TEXTURE, LOG_INFO, "[ReadDDSFile] Image %s loaded", name.c_str());
-
+#ifdef GR2_TEXTURE_DEBUG
+    WriteLog(LOG_TEXTURE, LOG_INFO, "[ReadDDSFile] Image %s loaded", name.c_str());
+#endif
     // Return Image.
     return image.release();
 }
@@ -824,7 +824,7 @@ bool WriteDDSFile(const Image* img, std::ostream& fout)
         }
         break;
     default:
-        Write_Debug("Warning:: unhandled pixel format in image, file cannot be written.");
+        WriteDebug("Warning:: unhandled pixel format in image, file cannot be written.");
         return false;
     }
 

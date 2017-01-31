@@ -184,7 +184,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 			if (!src.empty())
 			{
 				auto& dst = table[(x * CELLS_PER_SIDE) + y];
-//				Write_Debug("adding %d buildings to sc:%d,%d cell:%d,%d"
+//				WriteDebug("adding %d buildings to sc:%d,%d cell:%d,%d"
 //							,cell->numBuildings,sx,sy,x,y);
 				dst.numBuildings = src.size();
 				const size_t dataSize = sizeof(*dst.bid) * dst.numBuildings;
@@ -215,7 +215,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 		{
 			auto& cell = table[(x * CELLS_PER_SIDE) + y];
 			if (cell.numBuildings > 0)
-				Write_Debug("successfully added %d buildings to sc:%d,%d cell:%" PRSizeT ",%" PRSizeT "", cell.numBuildings, sx, sy, x, y);
+				WriteDebug("successfully added %d buildings to sc:%d,%d cell:%" PRSizeT ",%" PRSizeT "", cell.numBuildings, sx, sy, x, y);
 		}
 	}
 #endif

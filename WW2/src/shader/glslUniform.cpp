@@ -51,7 +51,7 @@ void glslUniform::SetName(const std::string& name)
 {
     if(_name != "")
     {
-        Write_Log(LOG_OLD, LOG_INFO, "ERROR: cannot change Uniform name");
+        WriteLog(LOG_OLD, LOG_INFO, "ERROR: cannot change Uniform name");
         return;
     }
 
@@ -67,7 +67,7 @@ bool glslUniform::SetArray(std::vector<float>& array)
     // Incoming array must match configuration of the Uniform
     if(GetInternalArrayType(GetType()) != GL_FLOAT)
     {
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: Uniform::setArray : incompatible array");
+        WriteLog(LOG_OLD, LOG_WARN, "ERROR: Uniform::setArray : incompatible array");
         return false;
     }
 
@@ -88,7 +88,7 @@ bool glslUniform::SetArray(std::vector<int>& array)
     // Incoming array must match configuration of the Uniform
     if(GetInternalArrayType(GetType()) != GL_INT)
     {
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: Uniform::setArray : incompatible array");
+        WriteLog(LOG_OLD, LOG_WARN, "ERROR: Uniform::setArray : incompatible array");
         return false;
     }
 
@@ -108,7 +108,7 @@ void glslUniform::SetNumElements(unsigned int numElements)
 {
     if(numElements < 1)
     {
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: Uniform numElements < 1 is invalid");
+        WriteLog(LOG_OLD, LOG_WARN, "ERROR: Uniform numElements < 1 is invalid");
         return;
     }
 
@@ -116,7 +116,7 @@ void glslUniform::SetNumElements(unsigned int numElements)
 
     if(_numElements > 0)
     {
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: cannot change Uniform numElements, size already fixed.");
+        WriteLog(LOG_OLD, LOG_WARN, "ERROR: cannot change Uniform numElements, size already fixed.");
         return;
     }
 
@@ -356,7 +356,7 @@ bool glslUniform::SetType(Type t)
 
     if(_type != UNDEFINED)
     {
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: cannot change Uniform type");
+        WriteLog(LOG_OLD, LOG_WARN, "ERROR: cannot change Uniform type");
         return false;
     }
 
@@ -511,7 +511,7 @@ bool glslUniform::IsCompatibleType(Type t)
         return true;
     }
 
-    Write_Log(LOG_OLD, LOG_WARN, "ERROR: Cannot assign between types %s and %s", GetTypename(t), GetTypename(GetType()));
+    WriteLog(LOG_OLD, LOG_WARN, "ERROR: Cannot assign between types %s and %s", GetTypename(t), GetTypename(GetType()));
 
     return false;
 }
@@ -1560,7 +1560,7 @@ void glslUniform::Apply(GLint location) const
         }
     default:
         {
-            Write_Log(LOG_OLD, LOG_WARN, "ERROR: %s %s", _FL);
+            WriteLog(LOG_OLD, LOG_WARN, "ERROR: %s %s", _FL);
             break;
         }
     }

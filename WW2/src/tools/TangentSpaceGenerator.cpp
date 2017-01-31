@@ -90,7 +90,7 @@ void TangentSpaceGenerator::generate(piVectorConstPtr vx, // positions
             }
         default:
             {
-                Write_Log(LOG_OLD, LOG_WARN, "Warning: TangentSpaceGenerator: unknown primitive mode");
+                WriteLog(LOG_OLD, LOG_WARN, "Warning: TangentSpaceGenerator: unknown primitive mode");
             }
     }
 
@@ -200,7 +200,7 @@ void TangentSpaceGenerator::generate(OBJECT* geo)
             }
         default:
             {
-                Write_Log(LOG_OLD, LOG_WARN, "Warning: TangentSpaceGenerator: unknown primitive mode");
+                WriteLog(LOG_OLD, LOG_WARN, "Warning: TangentSpaceGenerator: unknown primitive mode");
             }
     }
 

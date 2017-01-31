@@ -317,7 +317,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 	if (weapDataFile == -1)
 	{
 		// BAD!
-		Write_Log (LOG_FPS, LOG_INFO, "Unable to open weapon file %s for %d", filename, weapon);
+		WriteLog (LOG_FPS, LOG_INFO, "Unable to open weapon file %s for %d", filename, weapon);
 		return;
 	}
 
@@ -540,7 +540,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
                  stricmp(buf, "convDist7") == 0 || stricmp(buf, "convDist8") == 0 ||
                  stricmp(buf, "convDist9") == 0 || stricmp(buf, "convDist10") == 0) {
             if (!hasWarned) {
-                Write_Log(LOG_FPS, LOG_WARN, "Data file %s is still using old convDistN, consider updating with startConvDists/incConvDists", filename);
+                WriteLog(LOG_FPS, LOG_WARN, "Data file %s is still using old convDistN, consider updating with startConvDists/incConvDists", filename);
                 hasWarned = true;
             }
         }
@@ -554,7 +554,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 			fpsWeapons[weapon].placedObject = (LOGICAL) atoi (varData);
 
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "Unidentified key/value pair in weapon file %s .. %s = %s", filename, buf, varData);
+			WriteLog (LOG_FPS, LOG_INFO, "Unidentified key/value pair in weapon file %s .. %s = %s", filename, buf, varData);
 	}
 
 	fioClose (weapDataFile);
@@ -575,7 +575,7 @@ static void _fpFPSDataHandleWeaponTypeString (fpsWeaponTypes weapon, char* types
 
 	if (type == FPS_WEAPONTYPE_NUM_TYPES)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Unable to find match for weapon type string %s");
+		WriteLog (LOG_FPS, LOG_INFO, "Unable to find match for weapon type string %s");
 		return;
 	}
 
@@ -1243,7 +1243,7 @@ void fpFPSDataReadFPSFile()
 		break;
 
 		default:
-			Write_Debug("Unknown hash: '%s' : %" PR64BitUT "", buf, hash);
+			WriteDebug("Unknown hash: '%s' : %" PR64BitUT "", buf, hash);
 		}
 	}
 

@@ -32,7 +32,7 @@ LOGICAL obsphCreate(const char* name, int MeshSize, piVECTOR* Location, float Sc
 	NumSphereVertices	= (MeshSize * 2 + 1) * (MeshSize + 1);
 	if (NumSphereVertices > piGetNumberVertices())
 	{
-		Write_Debug("Sphere has too many vertices: %d; max is %d", NumSphereVertices, piGetNumberVertices());
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere has too many vertices: %d; max is %d", NumSphereVertices, piGetNumberVertices());
 		return(FALSE);
 	}
 
@@ -111,7 +111,7 @@ LOGICAL obsphCreate(const char* name, int MeshSize, piVECTOR* Location, float Sc
 
 	if (TotalVertices != NumSphereVertices)
 	{
-		Write_Debug("Sphere vertex count was incorrect");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere vertex count was incorrect");
 		return(FALSE);
 	}
 
@@ -136,7 +136,7 @@ LOGICAL obsphCreate(const char* name, int MeshSize, piVECTOR* Location, float Sc
 
 	if (TotalIndices != NumSphereIndices)
 	{
-		Write_Debug("Sphere index count was incorrect");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere index count was incorrect");
 		return(FALSE);
 	}
 
@@ -155,7 +155,7 @@ LOGICAL obsphCreate(const char* name, int MeshSize, piVECTOR* Location, float Sc
 		return(FALSE);
 	}
 
-	Write_Debug("Sphere '%s' created with %d triangles comprised of %d vertices %d indices", name, NumSphereIndices / 3, NumSphereVertices, TotalIndices);
+	WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere '%s' created with %d triangles comprised of %d vertices %d indices", name, NumSphereIndices / 3, NumSphereVertices, TotalIndices);
 
 	return(TRUE);
 }
@@ -180,7 +180,7 @@ piVECTOR	loc;
   NumSphereVertices	= (MeshSize + 1) * (MeshSize * 2 + 1);
   if (NumSphereVertices > piGetNumberVertices())
   {
-    Write_Debug("Sphere has too many vertices: %d; max is %d", NumSphereVertices, piGetNumberVertices());
+    WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere has too many vertices: %d; max is %d", NumSphereVertices, piGetNumberVertices());
     return(FALSE);
   }
 
@@ -252,7 +252,7 @@ piVECTOR	loc;
 
 	if (TotalVertices != NumSphereVertices)
 	{
-		Write_Debug("Hemisphere vertex count was incorrect");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Hemisphere vertex count was incorrect");
 		return(FALSE);
 	}
 
@@ -277,7 +277,7 @@ piVECTOR	loc;
 
 	if (TotalIndices != NumSphereIndices)
 	{
-		Write_Debug("Hemisphere index count was incorrect");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Hemisphere index count was incorrect");
 		return(FALSE);
 	}
 
@@ -296,7 +296,7 @@ piVECTOR	loc;
 		return(FALSE);
 	}
 
-	Write_Debug("Hemisphere '%s' created with %d triangles comprised of %d vertices %d indices", name, NumSphereIndices / 3, NumSphereVertices, TotalIndices);
+	WriteLog(LOG_RENDER, LOG_DEBUG, "Hemisphere '%s' created with %d triangles comprised of %d vertices %d indices", name, NumSphereIndices / 3, NumSphereVertices, TotalIndices);
 
 	return(TRUE);
 }
@@ -321,7 +321,7 @@ piVECTOR loc;
 	NumSphereVertices	= (MeshSize * 2 + 1) * (MeshSize + 1);
 	if (NumSphereVertices > piGetNumberVertices())
 	{
-		Write_Debug("Sphere has too many vertices: %d; max is %d", NumSphereVertices, piGetNumberVertices());
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere has too many vertices: %d; max is %d", NumSphereVertices, piGetNumberVertices());
 		return(FALSE);
 	}
 
@@ -393,7 +393,7 @@ piVECTOR loc;
 
 	if (TotalVertices != NumSphereVertices)
 	{
-		Write_Debug("Sphere vertex count was incorrect");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere vertex count was incorrect");
 		return(FALSE);
 	}
 
@@ -418,7 +418,7 @@ piVECTOR loc;
 
 	if (TotalIndices != NumSphereIndices)
 	{
-		Write_Debug("Sphere index count was incorrect");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere index count was incorrect");
 		return(FALSE);
 	}
 
@@ -437,7 +437,7 @@ piVECTOR loc;
 		return(FALSE);
 	}
 
-  Write_Debug("Sphere '%s' created with %d triangles comprised of %d vertices %d indices", name, NumSphereIndices / 3, NumSphereVertices, TotalIndices);
+  WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere '%s' created with %d triangles comprised of %d vertices %d indices", name, NumSphereIndices / 3, NumSphereVertices, TotalIndices);
 
   return(TRUE);
 }
@@ -461,7 +461,7 @@ UINT16*		ptris;
 	NumSphereVertices	= ((MeshSize / 2 + 1) * (MeshSize + 1));
 	if (NumSphereVertices > piGetNumberVertices())
 	{
-		Write_Debug("Sphere has too many vertices: %d; max is %d", NumSphereVertices, piGetNumberVertices());
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere has too many vertices: %d; max is %d", NumSphereVertices, piGetNumberVertices());
 		return(FALSE);
 	}
 
@@ -562,7 +562,7 @@ UINT16*		ptris;
 
 	if (TotalVertices != NumSphereVertices)
 	{
-		Write_Debug("Sphere vertex count was incorrect");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere vertex count was incorrect");
 		return(FALSE);
 	}
 
@@ -599,7 +599,7 @@ UINT16*		ptris;
 
 	if (TotalIndices != NumSphereIndices)
 	{
-		Write_Debug("Sphere index count was incorrect");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Sphere index count was incorrect");
 		return(FALSE);
 	}
 
@@ -613,7 +613,7 @@ UINT16*		ptris;
 	lpobj->loc.y = Location->y * ScaleFactor;
 	lpobj->loc.z = Location->z * ScaleFactor;
 
-  Write_Debug("Quarter Sphere '%s' created with %d triangles comprised of %d vertices %d indices", name, NumSphereIndices / 3, NumSphereVertices, TotalIndices);
+  WriteLog(LOG_RENDER, LOG_DEBUG, "Quarter Sphere '%s' created with %d triangles comprised of %d vertices %d indices", name, NumSphereIndices / 3, NumSphereVertices, TotalIndices);
 
   return(TRUE);
 }

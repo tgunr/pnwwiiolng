@@ -2543,7 +2543,7 @@ static SINT32 dot_c(const char* line)
 {
 	char cmd[256] = "";
 	sscanf(line, "%255s", cmd);
-	Write_Log(LOG_ALL, LOG_INFO, "COMMENT:%s", line + strlen(cmd));
+	WriteLog(LOG_ALL, LOG_INFO, "COMMENT:%s", line + strlen(cmd));
 
 	return DC_HANDLED;
 }
@@ -3520,7 +3520,7 @@ static int dot_duplicate(const char* line)
                 veh->ModelData->VehiclePos.z);
 
             Enable_Log(LOG_OLD, 1);
-            Write_Debug("Duplicate VehicleHostIndex: %d User: %s IsHulked: %d IsSTO: %d InUse: %d Their Pos: %f %f %f MyPos: %f %f %f",
+            WriteDebug("Duplicate VehicleHostIndex: %d User: %s IsHulked: %d IsSTO: %d InUse: %d Their Pos: %f %f %f MyPos: %f %f %f",
                 list->VehicleHostIndex,
                 list->Handle,
                 list->isHulked(),
@@ -4031,7 +4031,7 @@ static SINT32 dot_tspawn(const char* input)
         return DC_HANDLED;
     }
 
-    Write_Debug("[%s] x = %f y = %f z = %f", model, posxyz.x, posxyz.y, posxyz.z);
+    WriteDebug("[%s] x = %f y = %f z = %f", model, posxyz.x, posxyz.y, posxyz.z);
 
     std::string topmodel = model;
 
@@ -5007,7 +5007,7 @@ SINT32 dot_vehstats(const char* line)
 		_UpdateVehicleBoundingBox(&objdata,PlaneObject);
 		ogrpFreeObjectTree(PlaneObject);
 
-		Write_Log(LOG_VEHICLE, LOG_INFO, "%s width: %.1f length: %.1f height: %.1f", vehtype->Id,
+		WriteLog(LOG_VEHICLE, LOG_INFO, "%s width: %.1f length: %.1f height: %.1f", vehtype->Id,
 					objdata.BBox2.x - objdata.BBox1.x,
 					objdata.BBox2.y - objdata.BBox1.y,
 					objdata.BBox2.z - objdata.BBox1.z);
@@ -7144,7 +7144,7 @@ static int dot_texinfo(const char* line)
         case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:   s= "GL_COMPRESSED_RGBA_S3TC_DXT5_EXT"; bytes=4;
           break;
       }
-      Write_Debug("%4d %50s [%4ld x %4ld x %1d = %'12ld, (%s)]\n", i, textureName.c_str(),  W, H, bytes, W*H*bytes, s);
+      WriteDebug("%4d %50s [%4ld x %4ld x %1d = %'12ld, (%s)]\n", i, textureName.c_str(),  W, H, bytes, W*H*bytes, s);
     }
   }
   return DC_HANDLED;

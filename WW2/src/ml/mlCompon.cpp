@@ -293,7 +293,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 
 						if ((*ComponentList)->Components[ComponentListPos].Type == 0)
 						{
-							Write_Log(LOG_VEHICLE, LOG_WARN,"Component type %s in component %s not recognized in file %s\n",
+							WriteLog(LOG_VEHICLE, LOG_WARN,"Component type %s in component %s not recognized in file %s\n",
 										VarContents, CurrentComponent->ComponentName, UseFileName);
 						}
 						else
@@ -428,7 +428,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 							VehicleTypeNum);
 					if (CurrentComponent->DamageComponentNum[idx] == 0)
 					{
-						Write_Log(LOG_VEHICLE, LOG_WARN,"Unable to find hitmap object %s, component %s, # = %d",
+						WriteLog(LOG_VEHICLE, LOG_WARN,"Unable to find hitmap object %s, component %s, # = %d",
 									VarContents, CurrentComponent->ComponentName, idx + 1);
 					}
 				}
@@ -459,7 +459,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 					// Unsigned cast to force negatives to overflow.
 					if((UINT32)CurrentComponent->CrewPosition >= ML_MAX_CREW_POSITIONS)
 					{
-						Write_Log(LOG_VEHICLE, LOG_WARN, "Invalid Crew Position %d", CurrentComponent->CrewPosition + 1);
+						WriteLog(LOG_VEHICLE, LOG_WARN, "Invalid Crew Position %d", CurrentComponent->CrewPosition + 1);
 						CurrentComponent->CrewPosition = 0;
 					}
 				break;
@@ -503,7 +503,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 					{
 						if(CurrentComponent->CriticalSecondary > MAX_SECONDARY_GROUPS)
 						{
-							Write_Log(LOG_VEHICLE, LOG_WARN, "invalid criticalsecondary value");
+							WriteLog(LOG_VEHICLE, LOG_WARN, "invalid criticalsecondary value");
 							CurrentComponent->CriticalSecondary = 0;
 						}
 						else
@@ -555,7 +555,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 					// to shut up warning message
 				break;
 				default:
-					Write_Log(LOG_VEHICLE, LOG_WARN,"Unidentified variable %s in file %s\n",(char*)VarName,(char*)UseFileName);
+					WriteLog(LOG_VEHICLE, LOG_WARN,"Unidentified variable %s in file %s\n",(char*)VarName,(char*)UseFileName);
 				break;
 			}
 		}

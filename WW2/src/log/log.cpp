@@ -232,7 +232,7 @@ LOGICAL Open_Debug(const char* filename)
 		}
 	}
 
-	Write_Debug("\r\nDebug Message System Open.\r\n");
+	WriteDebug("\r\nDebug Message System Open.\r\n");
 	return true;
 }
 
@@ -473,7 +473,7 @@ void logTimerPrint(int maintimerid, int frameidx)
 
 		if(sortTime->tottime > 0)
 		{
-			Write_Log(LOG_TIMER, LOG_INFO, "%s: %.2f ms %.2f%%", sortTime->funcname, logTimerToMs(sortTime->tottime),
+			WriteLog(LOG_TIMER, LOG_INFO, "%s: %.2f ms %.2f%%", sortTime->funcname, logTimerToMs(sortTime->tottime),
 						(sortTime->tottime / (FLOAT32)totaltime) * 100.0f);
 
 		}

@@ -290,7 +290,7 @@ weapAssociateIndex(const char* objName, UINT32 localIndex)
 	if ( weapon == nullptr )
 	{
 #if platBuild == BUILD_CLIENT
-		Write_Debug("weapon %s not defined li:%u", weapName, localIndex);
+		WriteLog(LOG_WEAPON, LOG_DEBUG, "weapon %s not defined li:%u", weapName, localIndex);
 		return NULL_WEAP_SPEC;
 #else
 		LogAbort("weap:%s li:%u no weapon to associate with", weapName, localIndex);

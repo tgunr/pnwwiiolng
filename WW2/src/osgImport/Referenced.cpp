@@ -97,7 +97,7 @@ Referenced::~Referenced()
 {
     if (_refCount>0)
     {
-        Write_Log(LOG_OLD, LOG_WARN, "Warning: deleting still referenced object. Refcount = %d", _refCount);
+        WriteLog(LOG_OLD, LOG_WARN, "Warning: deleting still referenced object. Refcount = %d", _refCount);
     }
 }
 

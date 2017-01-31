@@ -134,7 +134,7 @@ public:
 		else
 			return teulSendTo(broadcastIndex, directAddr, WWII::Net::Ports::PrivateBcast, callback(), this);
 #else
-//		Write_Log(LOG_COMM, LOG_ERR, "broadcast not supported");
+//		WriteLog(LOG_COMM, LOG_ERR, "broadcast not supported");
 		return -EINVAL;
 #endif
 	}

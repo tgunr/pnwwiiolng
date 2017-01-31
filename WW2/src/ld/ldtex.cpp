@@ -317,7 +317,7 @@ int     SearchColor, Color;
 	}
 
 	/*
-	Write_Debug("Updated %d alpha values in the output texture", Count);
+	WriteDebug("Updated %d alpha values in the output texture", Count);
 	*/
 	return(TRUE);
 }
