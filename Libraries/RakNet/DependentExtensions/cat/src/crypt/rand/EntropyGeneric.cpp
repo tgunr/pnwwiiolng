@@ -35,12 +35,11 @@ using namespace cat;
 #if !defined(CAT_OS_WINDOWS) && !defined(CAT_OS_LINUX)
 
 #include <fcntl.h>
-#include <unistd.h>
 
 
 #if !defined(CAT_NO_ENTROPY_THREAD)
 
-bool FortunaFactory::ThreadFunction(void *)
+bool FortunaFactory::Entrypoint(void *)
 {
 	// Generic version does not spawn a thread
 	return true;

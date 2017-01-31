@@ -33,12 +33,12 @@ using namespace cat;
 
 RuntimeEndianDetector Endianness::detector;
 
-static u8 endian_detection_array[4] = {1, 2, 3, 4};
+static u8 endian_detection_array[4] CAT_ALIGNED(4) = {1, 2, 3, 4};
 
 RuntimeEndianDetector::RuntimeEndianDetector()
 {
 	u8 *ptr8 = endian_detection_array;
-	u32 *ptr32 = reinterpret_cast<u32 *>( ptr8 );
+	u32 *ptr32 = reinterpret_cast<u32*>( ptr8 );
 
 	_little_endian = (*ptr32 == 0x04030201);
 	_big_endian = (*ptr32 == 0x01020304);

@@ -20,6 +20,7 @@
 #include "teul/teulCallbackStruct.h"
 #include "teul/teulConstants.h"
 #include "SecureHandshake.h" 
+#include "cat/crypt/tunnel/Keys.hpp"
 
 extern IP_ENDPOINT_MAP ipToEndPoint;
 
@@ -55,12 +56,16 @@ bool RakNetChannel::init()
 	m_peer = RakNet::RakPeerInterface::GetInstance();
 	if (m_peer != nullptr)
 	{
+		
 		// for servers only we generate the public/private key
-		if (!m_isServer || m_handshake.GenerateServerKey(m_public_key, m_private_key))
+		if (!m_isServer || m_handshake.GenerateServerKey(m_pair))
 		{
 
 			// Initialize with the key pair
-			if (!m_isServer || m_peer->InitializeSecurity(m_public_key, m_private_key, false))
+			if (!m_isServer || m_peer->InitializeSecurity(
+				reinterpret_cast<char *>(m_pair.GetPublicKey()), 
+				reinterpret_cast<char *>(m_pair.GetPrivateKey()),
+				false))
 			{
 
 				// Match to associated port for teul connection, this will be UDP after all
@@ -119,10 +124,10 @@ void RakNetChannel::release()
 // TODO: this method is called on clients when the server passes the public key via teul connection
 void RakNetChannel::setPublicKey(const char *publicKey, SINT32 teulIndex)
 {
-	strncpy(m_public_key, publicKey, cat::EasyHandshake::PUBLIC_KEY_BYTES);
+	strncpy(reinterpret_cast<char *>(m_pair.GetPublicKey()), publicKey, cat::EasyHandshake::PUBLIC_KEY_BYTES);
 
 	PublicKey pk;
-	pk.remoteServerPublicKey = m_public_key;
+	pk.remoteServerPublicKey = reinterpret_cast<char *>(m_pair.GetPublicKey());
 	pk.publicKeyMode = PKM_USE_KNOWN_PUBLIC_KEY; // Recommended mode
 
 	ENDPOINT *ep = teulGetEndpoint(teulIndex);

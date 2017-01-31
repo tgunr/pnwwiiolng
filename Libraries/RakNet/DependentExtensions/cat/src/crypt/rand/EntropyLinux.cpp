@@ -40,7 +40,7 @@ using namespace cat;
 
 #if !defined(CAT_NO_ENTROPY_THREAD)
 
-bool FortunaFactory::ThreadFunction(void *)
+bool FortunaFactory::Entrypoint(void *)
 {
     // Assume ~16 bits of entropy per fast poll, so it takes 16 fast polls to get 256 bits of entropy
     // This means there will be 4 slow polls in pool 0 for each reseed, which is 256 bits from /dev/urandom
@@ -168,11 +168,11 @@ void FortunaFactory::PollInvariantSources(int pool_index)
     // pid
     Sources.pid = (u32)getpid();
 
-	// Poll vmstat -s
-	PollVMStat(pool);
-
     // Cycles at the end
     Sources.cycles_end = Clock::cycles();
+
+	// Poll vmstat -s
+	PollVMStat(pool);
 
     pool.Crunch(&Sources, sizeof(Sources));
 }

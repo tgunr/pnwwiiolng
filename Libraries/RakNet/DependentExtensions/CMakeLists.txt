@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
+include(ExternalProject)
+
 option( RAKNET_ENABLE_EXTENSIONS 		"Enable extension projects that might need specific dependencies." TRUE )
 option( RAKNET_EXTENSION_USEMYSQL 		"Enable extensions using MySQL" 		FALSE )
 option( RAKNET_EXTENSION_USEPOSTGRESQL		"Enable extensions using PostgreSQL" 		FALSE )
@@ -17,7 +19,7 @@ option( RAKNET_EXTENSION_PORTAUDIO		"Enable Port Audio extension"			FALSE )
 
 if( RAKNET_ENABLE_EXTENSIONS ) 
 	if( RAKNET_EXTENSION_CATID )
-	        add_subdirectory("cat")
+		add_subdirectory( "${RakNet_SOURCE_DIR}/DependentExtensions/cat/build" )
 	endif()
 
 	if( RAKNET_EXTENSION_BZIP )

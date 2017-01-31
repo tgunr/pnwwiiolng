@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2009-2010 Christopher A. Taylor.  All rights reserved.
+	Copyright (c) 2009-2012 Christopher A. Taylor.  All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -31,8 +31,6 @@ using namespace cat;
 
 #if defined(CAT_OS_WINDOWS)
 
-# include <cat/port/WindowsInclude.hpp>
-
 # if defined(CAT_COMPILER_MSVC)
 #  pragma warning(push)
 #  pragma warning(disable: 4201) // Squelch annoying warning from MSVC2005 SDK
@@ -42,14 +40,6 @@ using namespace cat;
 # else
 #  include <mmsystem.h>
 # endif
-
-// Windows version requires some initialization
-static const int LOWEST_ACCEPTABLE_PERIOD = 10;
-
-Mutex Clock::init_lock;
-u32 Clock::initialized = 0;
-u32 Clock::period = LOWEST_ACCEPTABLE_PERIOD+1;
-double Clock::inv_freq = 1;
 
 #else // Linux/other version
 
@@ -62,48 +52,38 @@ double Clock::inv_freq = 1;
 using namespace std;
 
 
-bool Clock::Initialize()
+//// Clock
+
+CAT_REF_SINGLETON(Clock);
+
+bool Clock::OnInitialize()
 {
 #if defined(CAT_OS_WINDOWS)
-	// Protect with a mutex
-	AutoMutex lock(init_lock);
 
-	// If this is the first initialize,
-	if (!initialized)
-	{
-		// Set minimum timer resolution as low as possible
-		for (period = 1; period <= LOWEST_ACCEPTABLE_PERIOD && (timeBeginPeriod(period) != TIMERR_NOERROR); ++period);
+	// Set minimum timer resolution as low as possible
+	u32 period;
 
-		// Cache the inverse of the performance counter frequency
-		LARGE_INTEGER freq;
-		QueryPerformanceFrequency(&freq);
-		inv_freq = 1.0 / static_cast<double>(freq.QuadPart);
-	}
+	for (period = 1; period <= LOWEST_ACCEPTABLE_PERIOD && (timeBeginPeriod(period) != TIMERR_NOERROR); ++period);
 
-	// Increment initialized counter
-	++initialized;
+	_period = period;
+
+	// Cache the inverse of the performance counter frequency
+	LARGE_INTEGER freq;
+	QueryPerformanceFrequency(&freq);
+	_inv_freq = 1.0 / static_cast<double>(freq.QuadPart);
+
 #endif
 
 	return true;
 }
 
-bool Clock::Shutdown()
+void Clock::OnFinalize()
 {
 #if defined(CAT_OS_WINDOWS)
-	// Protect with a mutex
-	AutoMutex lock(init_lock);
 
-	// If this is the last shutdown,
-	if (initialized == 1)
-	{
-		if (period <= LOWEST_ACCEPTABLE_PERIOD) timeEndPeriod(period);
-	}
- 
-	// Decrement initialized counter
-	--initialized;
+	if (_period <= LOWEST_ACCEPTABLE_PERIOD) timeEndPeriod(_period);
+
 #endif
-
-	return true;
 }
 
 
@@ -172,7 +152,7 @@ double Clock::usec()
 
     QueryPerformanceCounter(&tim);
 
-    return (static_cast<double>(tim.QuadPart) * 1000000.0) * inv_freq;
+    return (static_cast<double>(tim.QuadPart) * 1000000.0) * _inv_freq;
 
 #else
 
@@ -292,42 +272,65 @@ u32 Clock::cycles()
     return x[0];
 }
 
-// Algorithm from Skein test app
-bool Clock::SetHighPriority()
-{
-#if defined(CAT_OS_WINDOWS)
-    return 0 != SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-#else
-    return false;
-#endif
-}
 
-// Algorithm from Skein test app
-bool Clock::SetNormalPriority()
+/*
+	This Quickselect routine is based on the algorithm described in
+	"Numerical recipes in C", Second Edition,
+	Cambridge University Press, 1992, Section 8.5, ISBN 0-521-43108-5
+	This code by Nicolas Devillard - 1998. Public domain.
+*/
+#define ELEM_SWAP(a,b) { register u32 t=(a);(a)=(b);(b)=t; }
+u32 quick_select(u32 arr[], int n)
 {
-#if defined(CAT_OS_WINDOWS)
-    return 0 != SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
-#else
-    return false;
-#endif
+	int low, high ;
+	int median;
+	int middle, ll, hh;
+	low = 0 ; high = n-1 ; median = (low + high) / 2;
+	for (;;) {
+		if (high <= low) /* One element only */
+			return arr[median] ;
+		if (high == low + 1) { /* Two elements only */
+			if (arr[low] > arr[high])
+				ELEM_SWAP(arr[low], arr[high]) ;
+			return arr[median] ;
+		}
+		/* Find median of low, middle and high items; swap into position low */
+		middle = (low + high) / 2;
+		if (arr[middle] > arr[high]) ELEM_SWAP(arr[middle], arr[high]) ;
+		if (arr[low] > arr[high]) ELEM_SWAP(arr[low], arr[high]) ;
+		if (arr[middle] > arr[low]) ELEM_SWAP(arr[middle], arr[low]) ;
+		/* Swap low item (now in position middle) into position (low+1) */
+		ELEM_SWAP(arr[middle], arr[low+1]) ;
+		/* Nibble from each end towards middle, swapping items when stuck */
+		ll = low + 1;
+		hh = high;
+		for (;;) {
+			do ll++; while (arr[low] > arr[ll]) ;
+			do hh--; while (arr[hh] > arr[low]) ;
+			if (hh < ll)
+				break;
+			ELEM_SWAP(arr[ll], arr[hh]) ;
+		}
+		/* Swap middle item (in position low) back into correct position */
+		ELEM_SWAP(arr[low], arr[hh]) ;
+		/* Re-set active partition */
+		if (hh <= median)
+			low = ll;
+		if (hh >= median)
+			high = hh - 1;
+	}
 }
+#undef ELEM_SWAP
 
-static int compare_u32(const void *aPtr,const void *bPtr)
-{
-    u32 a = *(u32*)aPtr;
-    u32 b = *(u32*)bPtr;
 
-    if (a > b) return  1;
-    if (a < b) return -1;
-    return 0;
-}
 
 // Algorithm from Skein test app
 u32 Clock::MeasureClocks(int iterations, void (*FunctionPtr)())
 {
-    u32 *timings = new u32[iterations];
+    u32 *timings = new (std::nothrow) u32[iterations];
+	if (!timings) return 0;
 
-    Clock::SetHighPriority();
+    SetExecPriority(P_HIGHEST);
     Clock::sleep(200);
 
     u32 dtMin = ~(u32)0;
@@ -375,11 +378,9 @@ u32 Clock::MeasureClocks(int iterations, void (*FunctionPtr)())
         timings[jj] = dt;
     }
 
-    qsort(timings, iterations, sizeof(u32), compare_u32);
+	SetExecPriority(P_NORMAL);
 
-    Clock::SetNormalPriority();
-
-    u32 median = timings[iterations/2];
+	u32 median = quick_select(timings, iterations);
 
     delete []timings;
 

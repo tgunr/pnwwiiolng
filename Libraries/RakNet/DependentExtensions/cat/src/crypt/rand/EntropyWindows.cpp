@@ -39,6 +39,8 @@ using namespace cat;
 #include <cat/math/BitMath.hpp>
 #include <cat/time/Clock.hpp>
 
+static Clock *m_clock = 0;
+
 // Include and link to various Windows libraries needed to collect system info
 #include <Psapi.h>
 #include <Lmcons.h>   // LAN-MAN constants for "UNLEN" username max length
@@ -50,7 +52,7 @@ using namespace cat;
 
 #if !defined(CAT_NO_ENTROPY_THREAD)
 
-bool FortunaFactory::ThreadFunction(void *)
+bool FortunaFactory::Entrypoint(void *)
 {
     // Assume ~16 bits of entropy per fast poll, so it takes 16 fast polls to get 256 bits of entropy
     // This means there will be 4 slow polls in pool 0 for each reseed, which is 256 bits from CryptoAPI
@@ -76,7 +78,7 @@ bool FortunaFactory::ThreadFunction(void *)
             // Keep track of entropy in pool 0 and reseed when it is ready
             if (fast_pool == 0 && ++pool0_entropy >= POOL0_RESEED_RATE)
             {
-                FortunaFactory::ii->Reseed();
+                FortunaFactory::ref()->Reseed();
                 pool0_entropy = 0;
             }
         }
@@ -101,9 +103,11 @@ bool FortunaFactory::InitializeEntropySources()
     if (!CryptAcquireContext(&hCryptProv, 0, 0, PROV_RSA_AES, CRYPT_VERIFYCONTEXT))
         return false;
 
-	NTDLL = LoadLibrary(L"NtDll.dll");
+	NTDLL = LoadLibraryA("NtDll.dll");
 	if (NTDLL)
 		NtQuerySystemInformation = (PtNtQuerySystemInformation)GetProcAddress(NTDLL, "NtQuerySystemInformation");
+
+	m_clock = Clock::ref();
 
     // Fire poll for entropy all goes into pool 0
     PollInvariantSources(0);
@@ -251,7 +255,7 @@ void FortunaFactory::PollSlowEntropySources(int pool_index)
     CryptGenRandom(hCryptProv, sizeof(Sources.system_prng), (BYTE*)Sources.system_prng);
 
     // Poll time in microseconds
-    Sources.this_request = Clock::usec();
+    Sources.this_request = m_clock->usec();
 
     // Time since last poll in microseconds
     static double last_request = 0;
@@ -288,7 +292,7 @@ void FortunaFactory::PollFastEntropySources(int pool_index)
     Sources.cycles_start = Clock::cycles();
 
     // Poll time in microseconds
-    Sources.this_request = Clock::usec();
+    Sources.this_request = m_clock->usec();
 
     // Time since last poll in microseconds
     static double last_request = 0;

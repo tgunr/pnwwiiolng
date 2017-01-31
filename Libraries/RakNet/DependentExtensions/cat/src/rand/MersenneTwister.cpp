@@ -33,7 +33,6 @@ using namespace cat;
 using namespace std;
 
 #if defined(CAT_OS_WINDOWS)
-# include <cat/port/WindowsInclude.hpp>
 # include <wincrypt.h>
 # if defined(CAT_COMPILER_MSVC)
 #  pragma comment(lib, "advapi32")
@@ -75,7 +74,7 @@ void MersenneTwister::enforcePeriod()
     {
         if (PARITY[ii])
         {
-            state32[ii] ^= CAT_LEAST_SIGNIFICANT_BIT(PARITY[ii]);
+            state32[ii] ^= CAT_LSB32(PARITY[ii]);
             break;
         }
     }

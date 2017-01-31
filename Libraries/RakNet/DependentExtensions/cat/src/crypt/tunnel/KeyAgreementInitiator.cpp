@@ -1,5 +1,5 @@
 /*
-	Copyright (c) 2009-2010 Christopher A. Taylor.  All rights reserved.
+	Copyright (c) 2009-2011 Christopher A. Taylor.  All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -27,15 +27,18 @@
 */
 
 #include <cat/crypt/tunnel/KeyAgreementInitiator.hpp>
-#include <cat/crypt/SecureCompare.hpp>
-#include <cat/port/AlignedAlloc.hpp>
+#include <cat/crypt/SecureEqual.hpp>
+#include <cat/mem/AlignedAllocator.hpp>
 using namespace cat;
+
+
+//// KeyAgreementInitiator
 
 bool KeyAgreementInitiator::AllocateMemory()
 {
     FreeMemory();
 
-    B = new (Aligned::ii) Leg[KeyLegs * 17];
+    B = AlignedAllocator::ref()->AcquireArray<Leg>(KeyLegs * 17);
     a = B + KeyLegs*4;
     A = a + KeyLegs;
     hB = A + KeyLegs*4;
@@ -47,40 +50,42 @@ bool KeyAgreementInitiator::AllocateMemory()
 
 void KeyAgreementInitiator::FreeMemory()
 {
+	AlignedAllocator *allocator = AlignedAllocator::ref();
+
     if (B)
     {
-        CAT_CLR(a, KeyBytes);
-        Aligned::Delete(B);
+        CAT_SECURE_CLR(a, KeyBytes);
+        allocator->Delete(B);
         B = 0;
     }
 
 	if (G_MultPrecomp)
 	{
-		Aligned::Delete(G_MultPrecomp);
+		allocator->Delete(G_MultPrecomp);
 		G_MultPrecomp = 0;
  	}
 
 	if (B_MultPrecomp)
 	{
-		Aligned::Delete(B_MultPrecomp);
+		allocator->Delete(B_MultPrecomp);
 		B_MultPrecomp = 0;
 	}
 
 	if (Y_MultPrecomp)
 	{
-		Aligned::Delete(Y_MultPrecomp);
+		allocator->Delete(Y_MultPrecomp);
 		Y_MultPrecomp = 0;
 	}
 
 	if (I_private)
 	{
-		Aligned::Delete(I_private);
+		allocator->Delete(I_private);
 		I_private = 0;
 	}
 
 	if (I_public)
 	{
-		Aligned::Delete(I_public);
+		allocator->Delete(I_public);
 		I_public = 0;
 	}
 }
@@ -102,15 +107,14 @@ KeyAgreementInitiator::~KeyAgreementInitiator()
 
 void KeyAgreementInitiator::SecureErasePrivateKey()
 {
-	if (B) CAT_CLR(a, KeyBytes);
+	if (B) CAT_SECURE_CLR(a, KeyBytes);
 }
 
-bool KeyAgreementInitiator::Initialize(BigTwistedEdwards *math, const u8 *responder_public_key, int public_bytes)
+bool KeyAgreementInitiator::Initialize(TunnelTLS *tls, TunnelPublicKey &public_key)
 {
-#if defined(CAT_USER_ERROR_CHECKING)
-	if (!math) return false;
-#endif
+	CAT_DEBUG_ENFORCE(tls && tls->Valid() && public_key.Valid());
 
+	BigTwistedEdwards *math = tls->Math();
 	int bits = math->RegBytes() * 8;
 
     // Validate and accept number of bits
@@ -122,7 +126,7 @@ bool KeyAgreementInitiator::Initialize(BigTwistedEdwards *math, const u8 *respon
         return false;
 
     // Verify that inputs are of the correct length
-    if (public_bytes != KeyBytes*2) return false;
+    if (public_key.GetPublicKeyBytes() != KeyBytes*2) return false;
 
 	// Precompute a table for multiplication
 	G_MultPrecomp = math->PtMultiplyPrecompAlloc(6);
@@ -130,6 +134,7 @@ bool KeyAgreementInitiator::Initialize(BigTwistedEdwards *math, const u8 *respon
     math->PtMultiplyPrecomp(math->GetGenerator(), 6, G_MultPrecomp);
 
     // Unpack the responder's public key
+	u8 *responder_public_key = public_key.GetPublicKey();
     if (!math->LoadVerifyAffineXY(responder_public_key, responder_public_key + KeyBytes, B))
         return false;
 
@@ -152,17 +157,16 @@ bool KeyAgreementInitiator::Initialize(BigTwistedEdwards *math, const u8 *respon
     return true;
 }
 
-bool KeyAgreementInitiator::SetIdentity(BigTwistedEdwards *math,
-										const u8 *initiator_public_key, int public_bytes,
-										const u8 *initiator_private_key, int private_bytes)
+bool KeyAgreementInitiator::SetIdentity(TunnelTLS *tls, TunnelKeyPair &key_pair)
 {
-#if defined(CAT_USER_ERROR_CHECKING)
-	if (!math || public_bytes != KeyBytes*2 || private_bytes != KeyBytes) return false;
-#endif
+	CAT_DEBUG_ENFORCE(tls && tls->Valid() && key_pair.Valid() &&
+		key_pair.GetPublicKeyBytes() == KeyBytes*2 && key_pair.GetPrivateKeyBytes() == KeyBytes);
 
+	BigTwistedEdwards *math = tls->Math();
 	Leg *I_temp = math->Get(0);
 
 	// Unpack the initiator's public key
+	u8 *initiator_public_key = key_pair.GetPublicKey();
 	if (!math->LoadVerifyAffineXY(initiator_public_key, initiator_public_key + KeyBytes, I_temp))
 		return false;
 
@@ -173,14 +177,14 @@ bool KeyAgreementInitiator::SetIdentity(BigTwistedEdwards *math,
 	// Allocate space for private key if needed
 	if (!I_private)
 	{
-		I_private = (Leg*)Aligned::Acquire(KeyBytes);
+		I_private = (Leg*)AlignedAllocator::ref()->Acquire(KeyBytes);
 		if (!I_private) return false;
 	}
 
 	// Allocate space for public key if needed
 	if (!I_public)
 	{
-		I_public = (Leg*)Aligned::Acquire(KeyBytes*2);
+		I_public = (Leg*)AlignedAllocator::ref()->Acquire(KeyBytes*2);
 		if (!I_public) return false;
 	}
 
@@ -188,21 +192,20 @@ bool KeyAgreementInitiator::SetIdentity(BigTwistedEdwards *math,
 	memcpy(I_public, initiator_public_key, KeyBytes*2);
 
 	// Load the private key
-	math->Load(initiator_private_key, KeyBytes, I_private);
+	math->Load(key_pair.GetPrivateKey(), KeyBytes, I_private);
 
 	return true;
 }
 
-bool KeyAgreementInitiator::GenerateChallenge(BigTwistedEdwards *math, FortunaOutput *csprng,
+bool KeyAgreementInitiator::GenerateChallenge(TunnelTLS *tls,
 											  u8 *initiator_challenge, int challenge_bytes)
 {
-#if defined(CAT_USER_ERROR_CHECKING)
-	// Verify that inputs are of the correct length
-	if (!math || !csprng || challenge_bytes != KeyBytes*2) return false;
-#endif
+	CAT_DEBUG_ENFORCE(tls && tls->Valid() && challenge_bytes == KeyBytes*2);
+
+	BigTwistedEdwards *math = tls->Math();
 
     // a = initiator private key
-	GenerateKey(math, csprng, a);
+	GenerateKey(tls, a);
 
     // A = a * G
     math->PtMultiply(G_MultPrecomp, 6, a, 0, A);
@@ -215,14 +218,13 @@ bool KeyAgreementInitiator::GenerateChallenge(BigTwistedEdwards *math, FortunaOu
     return true;
 }
 
-bool KeyAgreementInitiator::ProcessAnswer(BigTwistedEdwards *math,
+bool KeyAgreementInitiator::ProcessAnswer(TunnelTLS *tls,
 										  const u8 *responder_answer, int answer_bytes,
                                           Skein *key_hash)
 {
-#if defined(CAT_USER_ERROR_CHECKING)
-	// Verify that inputs are of the correct length
-	if (!math || answer_bytes < KeyBytes*3) return false;
-#endif
+	CAT_DEBUG_ENFORCE(tls && tls->Valid() && answer_bytes >= KeyBytes*3);
+
+	BigTwistedEdwards *math = tls->Math();
 
     Leg *Y = math->Get(0);
     Leg *S = math->Get(4);
@@ -294,19 +296,19 @@ bool KeyAgreementInitiator::ProcessAnswer(BigTwistedEdwards *math,
 	return SecureEqual(expected, responder_answer + KeyBytes * 3, KeyBytes);
 }
 
-bool KeyAgreementInitiator::ProcessAnswerWithIdentity(BigTwistedEdwards *math, FortunaOutput *csprng,
+bool KeyAgreementInitiator::ProcessAnswerWithIdentity(TunnelTLS *tls,
 													  const u8 *responder_answer, int answer_bytes,
 													  Skein *key_hash,
 													  u8 *identity_proof, int proof_bytes)
 {
 	// Process answer first and fail out if needed
-	if (!ProcessAnswer(math, responder_answer, answer_bytes, key_hash))
+	if (!ProcessAnswer(tls, responder_answer, answer_bytes, key_hash))
 		return false;
 
-#if defined(CAT_USER_ERROR_CHECKING)
-	// Verify that inputs are of the correct length
-	if (!csprng || proof_bytes != KeyBytes*5) return false;
-#endif
+	CAT_DEBUG_ENFORCE(tls && tls->Valid() && proof_bytes == KeyBytes*5);
+
+	BigTwistedEdwards *math = tls->Math();
+	FortunaOutput *csprng = tls->CSPRNG();
 
 	// Fill endian-neutral public key for initiator
 	memcpy(identity_proof, I_public, KeyBytes * 2);
@@ -326,7 +328,7 @@ bool KeyAgreementInitiator::ProcessAnswerWithIdentity(BigTwistedEdwards *math, F
 		do {
 
 			// k = ephemeral key
-			GenerateKey(math, csprng, k);
+			GenerateKey(tls, k);
 
 			// K = k * G
 			math->PtMultiply(G_MultPrecomp, 6, k, 0, K);
@@ -378,14 +380,13 @@ bool KeyAgreementInitiator::ProcessAnswerWithIdentity(BigTwistedEdwards *math, F
 	return true;
 }
 
-bool KeyAgreementInitiator::Verify(BigTwistedEdwards *math,
+bool KeyAgreementInitiator::Verify(TunnelTLS *tls,
 								   const u8 *message, int message_bytes,
 								   const u8 *signature, int signature_bytes)
 {
-#if defined(CAT_USER_ERROR_CHECKING)
-	// Verify that inputs are of the correct length
-	if (!math || signature_bytes != KeyBytes*2) return false;
-#endif
+	CAT_DEBUG_ENFORCE(tls && tls->Valid() && signature_bytes == KeyBytes*2);
+
+	BigTwistedEdwards *math = tls->Math();
 
     Leg *e = math->Get(0);
     Leg *s = math->Get(1);
