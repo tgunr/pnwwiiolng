@@ -99,7 +99,6 @@ static const IconRank _SpecialRanks[] =
 	{"xoom",        XOOM_RANK },
 	{"ohm",         OHM_RANK },
 	{"victarus",    VICTARUS_RANK },
-    {"tgunr",       TGUNR_RANK },
 	{nullptr, 0}
 };
 
