@@ -20,6 +20,7 @@
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiNetPorts.h"
+#include "teul/raknetConn.h"
 
 UINT32 totalPacketsSent;
 UINT32 totalPacketsRecv;
@@ -121,7 +122,7 @@ ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 // Actually write data to a socket.
 
 SINT32
-ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port, const UCHAR protocolPreference)
+ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port)
 {
 	if ( protocol == PROTOCOL_TCP || protocol == PROTOCOL_CTRL )
 	{
@@ -193,7 +194,24 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 SINT32
 ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 {
+
 	const UINT32 packetBytes = packet.packetSizeBytes();
+
+	// First check to see if this should be sent via a RakNet backchannel
+	if (protocolPreference == PROTOCOL_UDP &&
+		m_pairdUdpConn != nullptr &&
+		m_pairdUdpConn->isConnected())
+	{
+		// No need to encrypt, RakNet has its own encryption
+		if (m_pairdUdpConn->send(packet, *this))
+			return packetBytes;
+	}  // fall through if sending failed - transmit via normal path
+
+	// Encrypt the data.
+	if (packet.header().packetType() != Teul::Tokens::Unencrypted)
+	{
+		encrypt(packet.encryptable(), packet.header().packetSizeBytes());
+	}
 
 	// If there's no send queue, try and send the data directly.
 	if ( m_impl->m_sendQueue.empty() == true )
@@ -202,7 +220,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 		// dbugLog(_FLD, "start of packet address = %p", packet.packet());
 		// dbugLog(_FLD, "address of packet obj = %p", &packet);
 
-		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port(), protocolPreference);
+		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
 		// Anything but a partial send, the sender handles.
 		if ( PN_UNLIKELY(result < 0) )
 		{
@@ -337,12 +355,6 @@ Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 	header().packetSizeBytes(payloadBytes);
 	ABORT_IF(header().packetSizeBytes() != payloadBytes);
 	m_sent = 0;
-
-	// Encrypt the data.
-	if ( header().packetType() != Teul::Tokens::Unencrypted )
-	{
-		endpoint.encrypt(encryptable(), header().packetSizeBytes());
-	}
 
 	const SINT32 result = endpoint.sendPacket(*this, protocolPreference);
 	if ( PN_UNLIKELY(result <= 0) )

@@ -3008,7 +3008,7 @@ main(const int argc, const char* argv[])
 	wthrInitTime();
 
 	static const UINT32 ClientTimeoutTime_ms = 40 * 1000;
-	if ( !teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, _personaErrorFunction) )
+	if ( !teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, _personaErrorFunction, true) )
 		LogAbort("Unable to open tcp listen port %u", WWII::Net::Ports::CellHost);
 
 	strprintf(hostname, "cell%u", Server::localHost & 255);

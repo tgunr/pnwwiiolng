@@ -37,6 +37,7 @@
 #include "teul/teulTime.h"
 #include "teul/teulUtils.h"
 #include "teul/teulVersion.h"
+#include "teul/raknetConn.h"
 
 //#define DEBUG_ENCRYPTION
 //#define DEBUG_CONNECTIONS
@@ -47,6 +48,8 @@ using ENDPOINT_ARRAY = WWII::inplace_vector<ENDPOINT, Teul::MaxConnections>;
 using ENDPOINT_IMPL_ARRAY = WWII::inplace_vector<EndpointImpl, Teul::MaxConnections>;
 static ENDPOINT_ARRAY _endpoints;
 static ENDPOINT_IMPL_ARRAY _endpointImpls;
+
+IP_ENDPOINT_MAP ipToEndPoint;
 
 using namespace Teul;
 namespace Teul
@@ -308,6 +311,17 @@ _releaseEndpoint(ENDPOINT& endpoint)
 	// Remove me from the idle list.
 	idleEndpoints.remove(&endpoint);
 
+	// remove from the ip/endpoint list
+	IP_ENDPOINT_MAP::iterator it = ipToEndPoint.begin();
+	while (it != ipToEndPoint.end())
+	{
+		if (it->second == &endpoint)
+		{
+			ipToEndPoint.erase(it);
+			break;
+		}
+	}
+
 	// Push me onto the free list.
 	_freeEndpoints.push_back(&endpoint);
 
@@ -487,6 +501,27 @@ teulInitEndpoints(ERROR_FUNCTION const endpointErrorFn)
 	ABORT_IF_EX(_freeEndpoints.empty() == true, "endpointFreeList should not be empty after initialization");
 }
 
+void 
+teulEndpointBackchannels()
+{
+	if (_endpoints.empty() == false)
+	{
+		const size_t numEndpoints = _endpoints.size();
+		for (size_t i = 0; i < numEndpoints; i++)
+		{
+			ENDPOINT& endpoint = _endpoints[i];
+			if (endpoint.m_pairdUdpConn != nullptr)
+			{
+				if (endpoint.m_pairdUdpConn->isInitialized() &&
+					endpoint.m_pairdUdpConn->isConnected())
+				{
+					endpoint.m_pairdUdpConn->update();
+				}
+			}
+		}
+	}
+}
+
 void
 teulCleanupEndpoints()
 {
@@ -558,6 +593,7 @@ teulCreateEndpoint(const bool isListening, SINT32 timeout, const PROTOCOL protoc
 	endpoint.lastDataRecv.makeCurrent();
 	endpoint.lastDataSent.makeCurrent();
 
+	endpoint.m_pairdUdpConn = nullptr;
 	endpoint.m_impl->m_curDatagram = nullptr;
 	endpoint.m_readBufferUsed = 0;
 	endpoint.lastKliveSent.makeNever();

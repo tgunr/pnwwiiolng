@@ -37,7 +37,17 @@
 #endif
 
 extern SINT32 teulModStartup(ERROR_FUNCTION);
-extern SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn);
+extern SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn, const bool initBackChannel = false);
+
+static SINT32
+_openListen(const UINT32 ipAddress
+	, const UINT16 portNumber
+	, CONNECT_FUNCTION acceptFnPtr
+	, const SINT32 timeout
+	, const PROTOCOL protocol
+	, ERROR_FUNCTION errorFnPtr
+	, const bool initBackChannel = false
+);
 
 SCHAR* teulModuleName;
 SCHAR* teulAppName;
@@ -172,9 +182,10 @@ _openListen(const UINT32 ipAddress
 			, const SINT32 timeout
 			, const PROTOCOL protocol
 			, ERROR_FUNCTION errorFnPtr
+			, const bool initBackChannel
 			)
 {
-	return teulOpenConnection(true, timeout, protocol, ipAddress, portNumber, acceptFnPtr, errorFnPtr);
+	return teulOpenConnection(true, timeout, protocol, ipAddress, portNumber, acceptFnPtr, errorFnPtr, initBackChannel);
 }
 
 
@@ -206,7 +217,8 @@ teulOpenListenInterface(const UINT16 portNumber
 					, CONNECT_FUNCTION acceptFnPtr
 					, const SINT32 timeout
 					, ERROR_FUNCTION errorFnPtr
-					)
+					, const bool initBackChannel
+)
 {
 	if (PN_UNLIKELY(Teul::IsTransportClosing()))
 		return false;
@@ -224,6 +236,7 @@ teulOpenListenInterface(const UINT16 portNumber
 						,  timeout
 						,  PROTOCOL_TCP
 						,  errorFnPtr
+						,  initBackChannel
 						);
 		if (retval < 0)
 			return false;
@@ -293,10 +306,11 @@ teulOpenSend(UINT32 host
 			, CONNECT_FUNCTION connectFnPtr
 			, const SINT32 timeout
 			, const PROTOCOL protocol
-			, ERROR_FUNCTION errorFnPtr)
+			, ERROR_FUNCTION errorFnPtr
+			, const bool initBackChannel)
 {
 	host = teulMaskNetworkAddress(host);
-	return teulOpenConnection(false, timeout, protocol, host, portNumber, connectFnPtr, errorFnPtr);
+	return teulOpenConnection(false, timeout, protocol, host, portNumber, connectFnPtr, errorFnPtr, initBackChannel);
 }
 
 static UINT32 rawTeulLibVersion;
@@ -462,6 +476,9 @@ teulUpdateTransport(const TeulTimeMS duration_)
 	extern void serverUpdate();
 	serverUpdate();
 #endif
+
+	// update any back channels configured
+	teulEndpointBackchannels();
 }
 
 // close all connections and the debugger. (teul go bye bye)

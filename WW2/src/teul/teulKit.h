@@ -55,11 +55,13 @@ SINT32 teulOpenListen(const UINT16 portNumber
 //! \param[in] acceptFnPtr function to call when an incoming connection is accept()d.
 //! \param[in] timeout millisecond period after which the connection is dropped if we can't talk to it.
 //! \param[in] errorFnPtr function to call when an error occurs on this interface.
+//! \param[in] initBackChannel set to true if incoming connections allow for a UDP (raknet) backchannel
 //! \return true if all opens were successful, otherwise false.
 bool teulOpenListenInterface(const UINT16 portNumber
 						, CONNECT_FUNCTION acceptFnPtr
 						, const SINT32 timeout
 						, ERROR_FUNCTION errorFnPtr
+						, const bool initBackChannel = false
 						);
 
 // opens a port for listening on ipAddress. Assumes that all callbacks have been properly
@@ -84,8 +86,10 @@ SINT32 teulOpenListenHost(const UINT32 ipAddress
 // [timeout] is a timeout for this connection in ms for this connection (0 uses default).
 // [protocol] is the protocol for this connection (TCP, UDP, etc).
 // returns the teulIndex associated with this connection.
+// [initBackChannel] set to true if this connection should establish a UDP (Raknet) backchannel to host
 SINT32 teulOpenSend(UINT32 Host, const UINT16 portNumber
 					, CONNECT_FUNCTION connectFnPtr
 					, const SINT32 timeout, const PROTOCOL protocol
-					, ERROR_FUNCTION errorFnPtr);
+					, ERROR_FUNCTION errorFnPtr
+					, const bool initBackChannel = false);
 

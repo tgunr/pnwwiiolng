@@ -28,7 +28,7 @@
 #include "teul/teulUtils.h"
 #include "teul/teulVersion.h"
 #include "wwii/wwiiNetPorts.h"
-
+#include "teul/raknetConn.h"
 
 #if platOS == OS_WIN32
 #include <winsock2.h>
@@ -154,8 +154,10 @@ _getHostIPAddresses()
 				continue;
 			if (preferredIf->FirstDnsServerAddress)
 			{
+#if (NTDDI_VERSION >= NTDDI_VISTA)
 				if (curAddr->FirstGatewayAddress == nullptr)
 					continue;
+#endif
 			}
 		}
 
@@ -457,7 +459,7 @@ _bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
 
 // inActive : true if the TCP socket is to be used to send, false if used to listen/receive
 SINT32
-teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn)
+teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn, const bool initBackChannel)
 {
 	if (PN_UNLIKELY(Teul::IsTransportClosing())) {
 		dbugLog(_FLM, "open connection refused: transport closing");
@@ -567,6 +569,13 @@ teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL pr
 
 		return e.errNo < 0 ? e.errNo : -EINVAL;
 	}
+
+	// Backchannels may exist on listening hosts and clients
+	if (initBackChannel)
+	{
+		newEndpoint->m_pairdUdpConn = new RakNetChannel(listening, port, newEndpoint);
+	}
+
 
 	return newEndpoint->teulIndex();
 }

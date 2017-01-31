@@ -14,12 +14,16 @@
 #include "teul/teulSockTypes.h"		// For SOCKET
 #include "teul/teulFuncTypes.h"
 
+class RakNetChannel;
+
 namespace Teul
 {
 	class Packet;
 }
 
 struct EndpointImpl;
+
+typedef std::map<UINT32, ENDPOINT *> IP_ENDPOINT_MAP;
 
 #ifdef TEUL_DETAIL_OUTPUT
 #define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )     ep._dbugOutputPacket ( bIsRecv, reinterpret_cast<const uint8_t *>(bpInput), static_cast<size_t>(szBytes) );
@@ -74,6 +78,7 @@ public:
 
 	//! Implementation entity for stuff we don't really need to expose to all callers.
 	EndpointImpl*		m_impl;
+	RakNetChannel*		m_pairdUdpConn;
 
 	//! Generic pointer to application-specific data associated with
 	//! this connection. Typically either a ww2Client (on the client)
@@ -157,9 +162,13 @@ public:
 
 	bool isFromClient() const noexcept { return protocol == PROTOCOL_TCP && !m_peer; }
 
+	RakNetChannel *getBackChannel() {
+		return m_pairdUdpConn;
+	}
+
 private:
 	//! Write the actual data to the socket.
-	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port, const UCHAR protocolPreference=PROTOCOL_UNDEF);
+	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port);
 
 #if platBuild == BUILD_SERVER
 public:
@@ -172,6 +181,7 @@ public:
 
 /* Endpoint functions */
 
+void		teulEndpointBackchannels();
 void		teulCleanupEndpoints();
 
 ENDPOINT* 	teulCreateEndpoint(bool isListening, SINT32 timeout, PROTOCOL protocol);

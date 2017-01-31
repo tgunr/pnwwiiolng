@@ -63,6 +63,8 @@
 
 #define FE_REMOVE_TIMEOUT	20000
 
+#define MAX_UDP_DATA   1400
+
 #undef DEBUG_UPDATE_PACK
 
 /* 8 Updates a second
@@ -694,8 +696,8 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 {
 	TIMER_USE_HERE
 
-	ON_SERVER(  assert( wu->myVehicle != nullptr )  );
-	ON_SERVER(  VEHICLE_UPDATE_HEADER vhdr  );
+		ON_SERVER(assert(wu->myVehicle != nullptr));
+	ON_SERVER(VEHICLE_UPDATE_HEADER vhdr);
 
 	TIMER_ACCUMULATOR(pack_initvh);
 	TIMER_ACCUMULATOR(pack_resrv);
@@ -707,7 +709,10 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 	TIMER_ACCUMULATOR(pack_tur);
 	TIMER_ACCUMULATOR(pack_resize);
 
-	for ( UINT32 vehNo = 0; vehNo < wu->header.numVehicles; ++vehNo )
+	size_t packetSize = 0;
+	bool sizeLimitReached = false;
+
+	for ( UINT32 vehNo = 0; (vehNo < wu->header.numVehicles) && !sizeLimitReached; ++vehNo )
 	{
 		ON_SERVER
 		(
@@ -807,13 +812,23 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 			ON_CLIENT(  wu->vehUpdate[vehNo].vt.turretMask = turretHeader.vt.turretMask  );
 		}
 
+		packetSize += Teul::BitsToBytes(offset);
+
 		ON_SERVER
 		(
-			viewing.m_lastSent = teulClock64;
-			// Increase the actual packet size.
-			TIMER_START
-			wu->packet->setPayloadSizeBytes(startingSize_bytes + Teul::BitsToBytes(offset));
-			TIMER_STOP_ADD(pack_resize);
+			// we only know this entry's size after its been packed, so check it now for busting our limit
+			if (packetSize < MAX_UDP_DATA)
+			{
+				viewing.m_lastSent = teulClock64;
+				// Increase the actual packet size.
+				TIMER_START
+					wu->packet->setPayloadSizeBytes(startingSize_bytes + Teul::BitsToBytes(offset));
+				TIMER_STOP_ADD(pack_resize);
+			}
+			else
+			{
+				sizeLimitReached = true;
+			}
 		);
 
 		assert( (offset & 7) == 0 );

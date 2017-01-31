@@ -947,6 +947,44 @@ public:
 	}
 } dotTrainers;
 
+//! @internal
+class DotUM : public DotCommand
+{
+public:
+	DotUM() : DotCommand("um", "Set current update mode"
+							, NO_MASK, LSTR_UM_USAGE, LSTR_UM_DETAIL
+							) { }
+
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
+	{
+		SINT32 mode = -1;
+
+		if (!player.isGM())
+			throw Chat::LStringErr(LSTR_UNKNOWN_COMMAND);
+
+		if (!player.isSpawned())
+			throw Chat::LStringErr(LSTR_ONLY_WHILE_SPAWNED);
+
+		if (!player.isBuzzard())
+			throw Chat::LStringErr(LSTR_ONLY_WHILE_BUZZARD);
+
+		if ( arguments[0] != '?' )
+		{
+			(void)sscanf(arguments, "%u", &mode);
+			if ( mode < 0 || mode >= UpdateFraming::_MODES )
+				throw Chat::LStringErr(LSTR_INVALID_UM, arguments);
+		}
+		else
+		{
+			mode = 255;
+		}
+
+		// NOTE: this will only affect this spawn, mode selected is not stored - next spawn will read from player setting.
+		chatSendBandwidthNotice(player, (UINT32)mode);
+	}
+
+} dotUM;
+
 //////////////////////////////////////////////////////////////////////
 // Small Area chat message
 //////////////////////////////////////////////////////////////////////
