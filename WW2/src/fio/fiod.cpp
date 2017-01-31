@@ -230,7 +230,7 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	off_t fileSize = _getFilePathAndSize(filename, false, widePath, sizeof(widePath));
 	if ( PN_UNLIKELY(fileSize < 0) )
 	{
-		DEBUG_ERR("Error performing stat on '%s'.", filename);
+		WriteLog(LOG_FIO, LOG_WARN,"Error performing stat on '%s'.", filename);
 		return false;
 	}
 
@@ -250,7 +250,7 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 #endif
 	if ( PN_UNLIKELY(fd < 0) )
 	{
-		DEBUG_ERR("Unable to open '%s'.", asciiPath);
+		WriteLog(LOG_FIO, LOG_WARN,"Unable to open '%s'.", asciiPath);
 		return false;
 	}
 
@@ -269,14 +269,14 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 
 	if ( bytesRead < 0 )
 	{
-		DEBUG_ERR("Error reading data from %s (fd:%d, size:%u)", asciiPath, fd, (unsigned int)fileSize);
+		WriteLog(LOG_FIO, LOG_WARN,"Error reading data from %s (fd:%d, size:%u)", asciiPath, fd, (unsigned int)fileSize);
 		memFree(mem);
 		return false;
 	}
 
 	if ( bytesRead != fileSize )
 	{
-		DEBUG_ERR("Read error reading %s, got %d bytes instead of %u.", filename, bytesRead, (unsigned int)fileSize);
+		WriteLog(LOG_FIO, LOG_WARN,"Read error reading %s, got %d bytes instead of %u.", filename, bytesRead, (unsigned int)fileSize);
 	}
 
 	mem[bytesRead] = 0;
