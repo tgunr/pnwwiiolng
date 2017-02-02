@@ -228,7 +228,7 @@ void FileListTransfer::Send(FileList *fileList, RakNet::RakPeerInterface *rakPee
 			FileToPushRecipient *ftpr;
 
 			fileToPushRecipientListMutex.Lock();
-			for (unsigned int i=0; i < fileToPushRecipientList.Size(); i++)
+			for (i=0; i < fileToPushRecipientList.Size(); i++)
 			{
 				if (fileToPushRecipientList[i]->systemAddress==recipient && fileToPushRecipientList[i]->setId==setId)
 				{
@@ -543,7 +543,7 @@ void FileListTransfer::Clear(void)
 	fileListReceivers.Clear();
 
 	fileToPushRecipientListMutex.Lock();
-	for (unsigned int i=0; i < fileToPushRecipientList.Size(); i++)
+	for (i=0; i < fileToPushRecipientList.Size(); i++)
 	{
 		FileToPushRecipient *ftpr = fileToPushRecipientList[i];
 		// Taken out of the list
@@ -561,9 +561,9 @@ void FileListTransfer::OnClosedConnection(const SystemAddress &systemAddress, Ra
 
 	RemoveReceiver(systemAddress);
 }
-void FileListTransfer::CancelReceive(unsigned short setId)
+void FileListTransfer::CancelReceive(unsigned short sId)
 {
-	if (fileListReceivers.Has(setId)==false)
+	if (fileListReceivers.Has(sId)==false)
 	{
 #ifdef _DEBUG
 		RakAssert(0);
@@ -631,9 +631,9 @@ void FileListTransfer::RemoveReceiver(SystemAddress systemAddress)
 	}
 	fileToPushRecipientListMutex.Unlock();
 }
-bool FileListTransfer::IsHandlerActive(unsigned short setId)
+bool FileListTransfer::IsHandlerActive(unsigned short sId)
 {
-	return fileListReceivers.Has(setId);
+	return fileListReceivers.Has(sId);
 }
 void FileListTransfer::AddCallback(FileListProgress *cb)
 {
@@ -1100,12 +1100,12 @@ int SendIRIToAddressCB(FileListTransfer::ThreadData threadData, bool *returnOutp
 	return 0;
 }
 }
-void FileListTransfer::SendIRIToAddress(SystemAddress systemAddress, unsigned short setId)
+void FileListTransfer::SendIRIToAddress(SystemAddress systemAddress, unsigned short sId)
 {
 	ThreadData threadData;
 	threadData.fileListTransfer=this;
 	threadData.systemAddress=systemAddress;
-	threadData.setId=setId;
+	threadData.setId=sId;
 
 	if (threadPool.WasStarted())
 	{
@@ -1121,9 +1121,9 @@ void FileListTransfer::OnReferencePushAck(Packet *packet)
 {
 	RakNet::BitStream inBitStream(packet->data, packet->length, false);
 	inBitStream.IgnoreBits(8);
-	unsigned short setId;
-	inBitStream.Read(setId);
-	SendIRIToAddress(packet->systemAddress, setId);
+	unsigned short sId;
+	inBitStream.Read(sId);
+	SendIRIToAddress(packet->systemAddress, sId);
 }
 void FileListTransfer::RemoveFromList(FileToPushRecipient *ftpr)
 {

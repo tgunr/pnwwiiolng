@@ -424,7 +424,7 @@ StartupResult RakPeer::Startup( unsigned int maxConnections, SocketDescriptor *s
 	DerefAllSockets();
 
 
-	int i;
+	unsigned int i;
 	// Go through all socket descriptors and precreate sockets on the specified addresses
 	for (i=0; i<socketDescriptorCount; i++)
 	{
@@ -638,7 +638,7 @@ StartupResult RakPeer::Startup( unsigned int maxConnections, SocketDescriptor *s
 			activeSystemList[ i ] = &remoteSystemList[ i ];
 		}
 
-		for (unsigned int i=0; i < (unsigned int) maximumNumberOfPeers*REMOTE_SYSTEM_LOOKUP_HASH_MULTIPLE; i++)
+		for (i=0; i < maximumNumberOfPeers*REMOTE_SYSTEM_LOOKUP_HASH_MULTIPLE; i++)
 		{
 			remoteSystemLookup[i]=0;
 		}
@@ -4542,7 +4542,7 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 	(void) timeRead;
 	RakPeer::RemoteSystemStruct *remoteSystem;
 	RakNet::Packet *packet;
-	unsigned i;
+	unsigned int i;
 
 
 	char str1[64];
@@ -4587,7 +4587,7 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 	else if (
 		((unsigned char)data[0] == ID_UNCONNECTED_PING ||
 		(unsigned char)data[0] == ID_UNCONNECTED_PING_OPEN_CONNECTIONS) &&
-		length >= sizeof(unsigned char) + sizeof(RakNet::Time) + sizeof(OFFLINE_MESSAGE_DATA_ID))
+		length >= static_cast<const int>(sizeof(unsigned char) + sizeof(RakNet::Time) + sizeof(OFFLINE_MESSAGE_DATA_ID)))
 	{
 		*isOfflineMessage=memcmp(data+sizeof(unsigned char) + sizeof(RakNet::Time), OFFLINE_MESSAGE_DATA_ID, sizeof(OFFLINE_MESSAGE_DATA_ID))==0;
 	}
@@ -4633,7 +4633,7 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 
 		// These are all messages from unconnected systems.  Messages here can be any size, but are never processed from connected systems.
 		if ( ( (unsigned char) data[ 0 ] == ID_UNCONNECTED_PING_OPEN_CONNECTIONS
-			|| (unsigned char)(data)[0] == ID_UNCONNECTED_PING)	&& length >= sizeof(unsigned char)+sizeof(RakNet::Time)+sizeof(OFFLINE_MESSAGE_DATA_ID) )
+			|| (unsigned char)(data)[0] == ID_UNCONNECTED_PING)	&& length >= static_cast<const int>(sizeof(unsigned char)+sizeof(RakNet::Time)+sizeof(OFFLINE_MESSAGE_DATA_ID)) )
 		{
 			if ( (unsigned char)(data)[0] == ID_UNCONNECTED_PING ||
 				rakPeer->AllowIncomingConnections() ) // Open connections with players
@@ -4657,7 +4657,6 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 				outBitStream.Write( (char*)rakPeer->offlinePingResponse.GetData(), rakPeer->offlinePingResponse.GetNumberOfBytesUsed() );
 				rakPeer->rakPeerMutexes[ RakPeer::offlinePingResponse_Mutex ].Unlock();
 
-				unsigned i;
 				for (i=0; i < rakPeer->pluginListNTS.Size(); i++)
 					rakPeer->pluginListNTS[i]->OnDirectSocketSend((const char*)outBitStream.GetData(), outBitStream.GetNumberOfBytesUsed(), systemAddress);
 
@@ -4760,7 +4759,6 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 			if (serverHasSecurity)
 				bsOut.Write(cookie);
 
-			unsigned i;
 			rakPeer->requestedConnectionQueueMutex.Lock();
 			for (i=0; i <  rakPeer->requestedConnectionQueue.Size(); i++)
 			{
@@ -4885,13 +4883,16 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 			b=bs.Read(mtu);
 			RakAssert(b);
 			bool doSecurity=false;
-			b=bs.Read(doSecurity);
-			RakAssert(b);
+			if (b)
+			{
+				b=bs.Read(doSecurity);
+				RakAssert(b);
+			}
 
 #if LIBCAT_SECURITY==1
 			char answer[cat::EasyHandshake::ANSWER_BYTES];
 			CAT_AUDIT_PRINTF("AUDIT: Got ID_OPEN_CONNECTION_REPLY_2 and given doSecurity=%i\n", (int)doSecurity);
-			if (doSecurity)
+			if (b && doSecurity)
 			{
 				CAT_AUDIT_PRINTF("AUDIT: Reading cookie and public key\n");
 				bs.ReadAlignedBytes((unsigned char*) answer, sizeof(answer));
@@ -4901,7 +4902,6 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 
 			RakPeer::RequestedConnectionStruct *rcs;
 			bool unlock=true;
-			unsigned i;
 			rakPeer->requestedConnectionQueueMutex.Lock();
 			for (i=0; i <  rakPeer->requestedConnectionQueue.Size(); i++)
 			{
@@ -5092,7 +5092,6 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 
 			RakPeer::RequestedConnectionStruct *rcs;
 			bool connectionAttemptCancelled=false;
-			unsigned i;
 			rakPeer->requestedConnectionQueueMutex.Lock();
 			for (i=0; i <  rakPeer->requestedConnectionQueue.Size(); i++)
 			{
@@ -5132,7 +5131,6 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 			SystemAddress *addr = (SystemAddress*)&systemAddress;
 			addr->binaryAddress += x;*/
 
-			unsigned int i;
 			//RAKNET_DEBUG_PRINTF("%i:IOCR, ", __LINE__);
 			char remoteProtocol=data[1+sizeof(OFFLINE_MESSAGE_DATA_ID)];
 			if (remoteProtocol!=RAKNET_PROTOCOL_VERSION)
@@ -5316,7 +5314,6 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 				}
 #endif // LIBCAT_SECURITY
 
-				unsigned int i;
 				for (i=0; i < rakPeer->pluginListNTS.Size(); i++)
 					rakPeer->pluginListNTS[i]->OnDirectSocketSend((const char*) bsAnswer.GetData(), bsAnswer.GetNumberOfBitsUsed(), systemAddress);
 				// SocketLayer::SendTo( rakNetSocket, (const char*) bsAnswer.GetData(), bsAnswer.GetNumberOfBytesUsed(), systemAddress, _FILE_AND_LINE_ );
@@ -5406,7 +5403,6 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 			}
 #endif // LIBCAT_SECURITY
 
-			unsigned int i;
 			for (i=0; i < rakPeer->pluginListNTS.Size(); i++)
 				rakPeer->pluginListNTS[i]->OnDirectSocketSend((const char*) bsAnswer.GetData(), bsAnswer.GetNumberOfBitsUsed(), systemAddress);
 			// SocketLayer::SendTo( rakNetSocket, (const char*) bsAnswer.GetData(), bsAnswer.GetNumberOfBytesUsed(), systemAddress, _FILE_AND_LINE_ );

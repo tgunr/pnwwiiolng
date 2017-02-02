@@ -32,9 +32,11 @@
 using namespace cat;
 
 #if defined(CAT_OS_LINUX)
+# include <sys/types.h>
 # include <sys/mman.h>
 # include <sys/stat.h>
 # include <fcntl.h>
+# include <unistd.h>
 #endif
 
 MappedFile::MappedFile()
@@ -79,7 +81,11 @@ bool MappedFile::Open(const char *path, bool random_access)
 	}
 
 #else
-#error "TODO"
+	int flags = O_RDONLY | (random_access?0:O_SYNC);
+	_fd = open(path, flags);
+	off_t fSize = lseek(_fd, 0, SEEK_END) ;
+	lseek(_fd, 0, SEEK_SET);
+	_len = static_cast<u64>(fSize);
 #endif
 
 	return true;
@@ -215,10 +221,10 @@ void MappedView::Close()
 
 #else
 
-	if (data)
+	if (_data)
 	{
-		munmap(data, len);
-		data = 0;
+		munmap(_data, _length);
+		_data = 0;
 	}
 
 #endif

@@ -126,7 +126,7 @@ bool KeyAgreementInitiator::Initialize(TunnelTLS *tls, TunnelPublicKey &public_k
         return false;
 
     // Verify that inputs are of the correct length
-    if (public_key.GetPublicKeyBytes() != KeyBytes*2) return false;
+    if (static_cast<int>(public_key.GetPublicKeyBytes()) != KeyBytes*2) return false;
 
 	// Precompute a table for multiplication
 	G_MultPrecomp = math->PtMultiplyPrecompAlloc(6);
@@ -160,7 +160,7 @@ bool KeyAgreementInitiator::Initialize(TunnelTLS *tls, TunnelPublicKey &public_k
 bool KeyAgreementInitiator::SetIdentity(TunnelTLS *tls, TunnelKeyPair &key_pair)
 {
 	CAT_DEBUG_ENFORCE(tls && tls->Valid() && key_pair.Valid() &&
-		key_pair.GetPublicKeyBytes() == KeyBytes*2 && key_pair.GetPrivateKeyBytes() == KeyBytes);
+		static_cast<int>(key_pair.GetPublicKeyBytes()) == KeyBytes*2 && static_cast<int>(key_pair.GetPrivateKeyBytes()) == KeyBytes);
 
 	BigTwistedEdwards *math = tls->Math();
 	Leg *I_temp = math->Get(0);

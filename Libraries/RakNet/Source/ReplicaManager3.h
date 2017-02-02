@@ -696,7 +696,7 @@ protected:
 private:
 	Connection_RM3() {};
 
-	ConstructionMode constructionMode;
+//	ConstructionMode constructionMode;
 };
 
 /// \brief Return codes for Connection_RM3::GetConstructionState() and Replica3::QueryConstruction()

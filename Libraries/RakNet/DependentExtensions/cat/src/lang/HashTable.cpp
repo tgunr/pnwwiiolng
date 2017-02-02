@@ -52,8 +52,8 @@ int cat::SanitizeKeyStringCase(const char *key, /*char *sanitized_string,*/ char
 			*outc++ = ch;
 			//*outs++ = ch + 'a' - 'A';
 		}
-		else if (ch >= 'a' && ch <= 'z' ||
-			ch >= '0' && ch <= '9')
+		else if ((ch >= 'a' && ch <= 'z') ||
+			(ch >= '0' && ch <= '9'))
 		{
 			if (seen_punct)
 			{
@@ -93,8 +93,8 @@ int cat::SanitizeKeyString(const char *key, char *sanitized_string)
 			}
 			*outs++ = ch + 'a' - 'A';
 		}
-		else if (ch >= 'a' && ch <= 'z' ||
-			ch >= '0' && ch <= '9')
+		else if ((ch >= 'a' && ch <= 'z') ||
+			(ch >= '0' && ch <= '9'))
 		{
 			if (seen_punct)
 			{
@@ -133,8 +133,8 @@ int cat::SanitizeKeyRangeString(const char *key, int len, char *sanitized_string
 			}
 			*outs++ = ch + 'a' - 'A';
 		}
-		else if (ch >= 'a' && ch <= 'z' ||
-			ch >= '0' && ch <= '9')
+		else if ((ch >= 'a' && ch <= 'z') ||
+			(ch >= '0' && ch <= '9'))
 		{
 			if (seen_punct)
 			{
@@ -258,10 +258,10 @@ HashTableBase::~HashTableBase()
 			if (!bucket.Empty())
 			{
 				// For each item in the bucket,
-				for (iter ii = bucket; ii; ++ii)
+				for (iter iiIter = bucket; iiIter; ++iiIter)
 				{
 					// Free item
-					delete ii;
+					delete iiIter;
 				}
 			}
 		}

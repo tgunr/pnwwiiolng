@@ -30,11 +30,11 @@ void RNS2_Berkley::SetSocketOptions(void)
 
 	// Immediate hard close. Don't linger the socket, or recreating the socket quickly on Vista fails.
 	// Fail with voice and xbox
-
-	sock_opt=0;
-	r = setsockopt__( rns2Socket, SOL_SOCKET, SO_LINGER, ( char * ) & sock_opt, sizeof ( sock_opt ) );
-	// Do not assert, ignore failure
-
+	if (r==0) {
+		sock_opt=0;
+		r = setsockopt__( rns2Socket, SOL_SOCKET, SO_LINGER, ( char * ) & sock_opt, sizeof ( sock_opt ) );
+		// Do not assert, ignore failure
+	}
 
 
 	// This doesn't make much difference: 10% maybe

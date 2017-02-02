@@ -592,7 +592,7 @@ void TCPInterface::CloseConnection( SystemAddress systemAddress )
 	}
 	else
 	{
-		for (int i=0; i < remoteClientsLength; i++)
+		for (i=0; i < static_cast<unsigned int>(remoteClientsLength); i++)
 		{
 			remoteClients[i].isActiveMutex.Lock();
 			if (remoteClients[i].isActive && remoteClients[i].systemAddress==systemAddress)

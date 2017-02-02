@@ -243,7 +243,7 @@ PluginReceiveResult NatPunchthroughServer::OnReceive(Packet *packet)
 			{
 				DataStructures::List<RakNetSocket2* > sockets;
 				rakPeerInterface->GetSockets(sockets);
-				for (int i=0; i < sockets.Size() && i < MAXIMUM_NUMBER_OF_INTERNAL_IDS; i++)
+				for (int i=0; i < static_cast<int>(sockets.Size()) && i < MAXIMUM_NUMBER_OF_INTERNAL_IDS; i++)
 				{
 					boundAddresses[i]=sockets[i]->GetBoundAddress();
 					boundAddressCount++;
@@ -435,9 +435,9 @@ void NatPunchthroughServer::OnGetMostRecentPort(Packet *packet)
 {
 	RakNet::BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID));
-	uint16_t sessionId;
+	uint16_t sId;
 	unsigned short mostRecentPort;
-	bsIn.Read(sessionId);
+	bsIn.Read(sId);
 	bsIn.Read(mostRecentPort);
 
 	unsigned int i,j;
@@ -452,7 +452,7 @@ void NatPunchthroughServer::OnGetMostRecentPort(Packet *packet)
 		char addr1[128], addr2[128];
 		packet->systemAddress.ToString(true,addr1);
 		packet->guid.ToString(addr2);
-		log=RakNet::RakString("Got ID_NAT_GET_MOST_RECENT_PORT from systemAddress %s guid %s. port=%i. sessionId=%i. userFound=%i.", addr1, addr2, mostRecentPort, sessionId, objectExists);
+		log=RakNet::RakString("Got ID_NAT_GET_MOST_RECENT_PORT from systemAddress %s guid %s. port=%i. sId=%i. userFound=%i.", addr1, addr2, mostRecentPort, sId, objectExists);
 		natPunchthroughServerDebugInterface->OnServerMessage(log.C_String());
 	}
 
@@ -468,8 +468,8 @@ void NatPunchthroughServer::OnGetMostRecentPort(Packet *packet)
 			if (connectionAttempt->attemptPhase==ConnectionAttempt::NAT_ATTEMPT_PHASE_GETTING_RECENT_PORTS &&
 				connectionAttempt->sender->mostRecentPort!=0 &&
 				connectionAttempt->recipient->mostRecentPort!=0 &&
-				// 04/29/08 add sessionId to prevent processing for other systems
-				connectionAttempt->sessionId==sessionId)
+				// 04/29/08 add sId to prevent processing for other systems
+				connectionAttempt->sessionId==sId)
 			{
 				SystemAddress senderSystemAddress = connectionAttempt->sender->systemAddress;
 				SystemAddress recipientSystemAddress = connectionAttempt->recipient->systemAddress;

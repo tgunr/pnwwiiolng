@@ -133,8 +133,8 @@ bool KeyAgreementResponder::Initialize(TunnelTLS *tls, TunnelKeyPair &key_pair)
         return false;
 
 	// Verify that inputs are of the correct length
-	if (key_pair.GetPrivateKeyBytes() != KeyBytes) return false;
-	if (key_pair.GetPublicKeyBytes() != KeyBytes*2) return false;
+	if (static_cast<int>(key_pair.GetPrivateKeyBytes()) != KeyBytes) return false;
+	if (static_cast<int>(key_pair.GetPublicKeyBytes()) != KeyBytes*2) return false;
 
     // Allocate memory space for the responder's key pair and generator point
     if (!AllocateMemory())
@@ -206,7 +206,7 @@ bool KeyAgreementResponder::ProcessChallenge(TunnelTLS *tls,
 	m_thread_id_mutex.Leave();
 
 	if (time_to_rekey)
-		Rekey(math, csprng);
+		Rekey(tls);
 
 #else // CAT_NO_ATOMIC_RESPONDER
 

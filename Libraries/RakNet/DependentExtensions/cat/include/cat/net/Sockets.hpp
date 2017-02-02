@@ -64,9 +64,13 @@ typedef u16 Port;
 	CAT_INLINE bool CloseSocketHandle(SocketHandle s) { return !closesocket(s); }
 #else
 	typedef int SocketHandle;
-	static const SocketHandle INVALID_SOCKET = -1;
-	static const int SOCKET_ERROR = -1;
-	CAT_INLINE bool CloseSocketHandle(Socket s) { return !close(s); }
+#ifndef INVALID_SOCKET
+#define	INVALID_SOCKET -1;
+#endif
+#ifndef SOCKET_ERROR
+#define	SOCKET_ERROR -1;
+#endif
+	CAT_INLINE bool CloseSocketHandle(SocketHandle s) { return !close(s); }
 #endif
 
 

@@ -27,9 +27,9 @@ class RakNetChannel
 {
 public:
 	// Default Constructor
-	RakNetChannel(const bool isServer, const UINT16 port, ENDPOINT *endpoint) 
+	RakNetChannel(const bool isSrvr, const UINT16 port, ENDPOINT *endpoint) 
 	{
-		m_isServer = isServer;
+		m_isServer = isSrvr;
 		m_port = port;
 		m_endpoint = endpoint;
 		m_initialized = false;

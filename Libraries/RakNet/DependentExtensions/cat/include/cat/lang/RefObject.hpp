@@ -111,7 +111,7 @@ public:
 
 // Classes that derive from RefObject have asynchronously managed lifetimes
 // Never delete a RefObject directly.  Use the Destroy() member instead
-class CAT_EXPORT RefObject : DListItem
+class CAT_EXPORT RefObject : public DListItem
 {
 	friend class RefObjects;
 
@@ -167,7 +167,7 @@ public:
 		_ref_count -= times;
 		_lock.Leave();
 
-		if (ref_count == times)
+		if (static_cast<s32>(ref_count) == times)
 #else
 		if (Atomic::Add(&_ref_count, -times) == times)
 #endif

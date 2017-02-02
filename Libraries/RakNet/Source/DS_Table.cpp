@@ -187,11 +187,11 @@ RakNet::RakString Table::Cell::ToString(ColumnType columnType)
 
 	return RakNet::RakString();
 }
-Table::Cell::Cell(double numericValue, char *charValue, void *ptr, ColumnType type)
+Table::Cell::Cell(double numericValue, char *charValue, void *p, ColumnType type)
 {
-	SetByType(numericValue,charValue,ptr,type);
+	SetByType(numericValue,charValue,p,type);
 }
-void Table::Cell::SetByType(double numericValue, char *charValue, void *ptr, ColumnType type)
+void Table::Cell::SetByType(double numericValue, char *charValue, void *p, ColumnType type)
 {
 	isEmpty=true;
 	if (type==NUMERIC)
@@ -208,7 +208,7 @@ void Table::Cell::SetByType(double numericValue, char *charValue, void *ptr, Col
 	}
 	else if (type==POINTER)
 	{
-		SetPtr(ptr);
+		SetPtr(p);
 	}
 	else
 	{

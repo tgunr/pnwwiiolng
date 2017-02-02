@@ -31,6 +31,9 @@
 #include <cstdio>
 using namespace std;
 using namespace cat;
+#if !defined(CAT_OS_WINDOWS)
+#include <cat/mem/AlignedAllocator.hpp>
+#endif
 
 CAT_SINGLETON(LargeAllocator);
 
@@ -40,7 +43,8 @@ void *LargeAllocator::Acquire(u32 bytes)
 #if defined(CAT_OS_WINDOWS)
 	return VirtualAlloc(0, bytes, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 #else
-	return AlignedAllocator::Acquire(bytes);
+	AlignedAllocator *aa = Singleton<AlignedAllocator>::ref();
+	return aa->Acquire(bytes);
 #endif
 }
 
@@ -52,7 +56,8 @@ void LargeAllocator::Release(void *ptr)
 #if defined(CAT_OS_WINDOWS)
 		VirtualFree(ptr, 0, MEM_RELEASE);
 #else
-		AlignedAllocator::Release(ptr);
+		AlignedAllocator *aa = Singleton<AlignedAllocator>::ref();
+		aa->Release(ptr);
 #endif
 	}
 }

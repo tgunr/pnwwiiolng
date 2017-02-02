@@ -107,4 +107,4 @@ public:
 
 } // namespace cat
 
-#endif CAT_VHASH_HPP
+#endif // CAT_VHASH_HPP

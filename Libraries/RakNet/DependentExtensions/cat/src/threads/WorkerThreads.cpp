@@ -30,6 +30,11 @@
 #include <cat/time/Clock.hpp>
 #include <cat/port/SystemInfo.hpp>
 #include <cat/io/Log.hpp>
+#if !defined(CAT_OS_WINDOWS)
+#include <errno.h>
+#define GetLastError(x) errno
+#endif
+
 using namespace cat;
 
 static const u32 INITIAL_TIMERS_ALLOCATED = 16;

@@ -91,7 +91,7 @@ bool PacketizedTCP::SendList( const char **data, const unsigned int *lengths, co
 	const char *dataArray[512];
 	dataArray[0]=(char*) &dataLength;
 	lengthsArray[0]=sizeof(dataLength);
-	for (int i=0; i < 512 && i < numParameters; i++)
+	for (i=0; i < 512 && i < numParameters; i++)
 	{
 		dataArray[i+1]=data[i];
 		lengthsArray[i+1]=lengths[i];

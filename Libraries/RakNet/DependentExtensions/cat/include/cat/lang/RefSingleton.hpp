@@ -35,6 +35,10 @@
 
 namespace cat {
 
+// forward declarations
+template<class T>
+class CAT_EXPORT RefSingleton;
+
 
 /*
 	RefSingleton builds on the Singleton class, to add OnFinalize().
@@ -268,7 +272,7 @@ public:
 	template<> T *RefSingleton<T>::ref() { return m_T_rss.GetRef(M); }
 
 // In the C file for the object, use this macro:
-#define CAT_REF_SINGLETON(T)	CAT_REF_SINGLETON_MUTEX(T, GetRefSingletonMutex())
+#define CAT_REF_SINGLETON(T)	namespace cat { CAT_REF_SINGLETON_MUTEX(T, GetRefSingletonMutex()) }
 
 
 // Internal free function

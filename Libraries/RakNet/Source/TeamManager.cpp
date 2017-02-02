@@ -368,9 +368,9 @@ bool TM_TeamMember::LeaveTeam(TM_Team* team, NoTeamId _noTeamSubcategory)
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-bool TM_TeamMember::LeaveAllTeams(NoTeamId noTeamSubcategory)
+bool TM_TeamMember::LeaveAllTeams(NoTeamId noTeamSubcat)
 {
-	return RequestTeam(TeamSelection::NoTeam(noTeamSubcategory));
+	return RequestTeam(TeamSelection::NoTeam(noTeamSubcat));
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -481,8 +481,8 @@ bool TM_TeamMember::DeserializeConstruction(TeamManager *teamManager, BitStream 
 
 	WorldId worldId;
 	constructionBitstream->Read(worldId);
-	TM_World *world = teamManager->GetWorldWithId(worldId);
-	RakAssert(world);
+	TM_World *thisWorld = teamManager->GetWorldWithId(worldId);
+	RakAssert(thisWorld);
 	constructionBitstream->Read(networkId);
 	world->ReferenceTeamMember(this,networkId);
 
@@ -500,7 +500,7 @@ bool TM_TeamMember::DeserializeConstruction(TeamManager *teamManager, BitStream 
 		if (hasTeamToLeave)
 		{
 			constructionBitstream->Read(teamToLeaveId);
-			rt.teamToLeave = world->GetTeamByNetworkID(teamToLeaveId);
+			rt.teamToLeave = thisWorld->GetTeamByNetworkID(teamToLeaveId);
 			RakAssert(rt.teamToLeave);
 		}
 		else
@@ -511,7 +511,7 @@ bool TM_TeamMember::DeserializeConstruction(TeamManager *teamManager, BitStream 
 		if (hasTeamRequested)
 		{
 			success=constructionBitstream->Read(teamRequestedId);
-			rt.requested = world->GetTeamByNetworkID(teamRequestedId);
+			rt.requested = thisWorld->GetTeamByNetworkID(teamRequestedId);
 			RakAssert(rt.requested);
 		}
 		rt.whenRequested=RakNet::GetTime();
@@ -527,7 +527,7 @@ bool TM_TeamMember::DeserializeConstruction(TeamManager *teamManager, BitStream 
 
 
 	if (success)
-		world->teamManager->ProcessTeamAssigned(constructionBitstream);
+		thisWorld->teamManager->ProcessTeamAssigned(constructionBitstream);
 	return success;
 }
 
@@ -979,8 +979,8 @@ bool TM_Team::DeserializeConstruction(TeamManager *teamManager, BitStream *const
 {
 	WorldId worldId;
 	constructionBitstream->Read(worldId);
-	TM_World *world = teamManager->GetWorldWithId(worldId);
-	RakAssert(world);
+	TM_World *thisWorld = teamManager->GetWorldWithId(worldId);
+	RakAssert(thisWorld);
 	constructionBitstream->Read(ID);
 	constructionBitstream->Read(joinPermissions);
 	constructionBitstream->Read(balancingApplies);
@@ -988,7 +988,7 @@ bool TM_Team::DeserializeConstruction(TeamManager *teamManager, BitStream *const
 	RakAssert(b);
 	if (b)
 	{
-		world->ReferenceTeam(this,ID,balancingApplies);
+		thisWorld->ReferenceTeam(this,ID,balancingApplies);
 	}
 	return b;
 }
@@ -1164,14 +1164,14 @@ void TM_World::DereferenceTeam(TM_Team *team, NoTeamId noTeamSubcategory)
 	{
 		if (teams[i]==team)
 		{
-			TM_Team *team = teams[i];
-			while (team->teamMembers.Size())
+			TM_Team *myTeam = teams[i];
+			while (myTeam->teamMembers.Size())
 			{
-				team->teamMembers[team->teamMembers.Size()-1]->LeaveTeam(team, noTeamSubcategory);
+				myTeam->teamMembers[myTeam->teamMembers.Size()-1]->LeaveTeam(myTeam, noTeamSubcategory);
 			}
 			teams.RemoveAtIndex(i);
 
-			teamsHash.Remove(team->GetNetworkID(),_FILE_AND_LINE_);
+			teamsHash.Remove(myTeam->GetNetworkID(),_FILE_AND_LINE_);
 
 			break;
 		}

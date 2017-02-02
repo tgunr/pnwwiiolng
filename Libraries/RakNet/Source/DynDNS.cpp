@@ -145,27 +145,27 @@ void DynDNS::Update(void)
 		{
 			unsigned int i;
 
-			char *result;
-			result=strstr((char*) packet->data, "Connection: close");
+			char *resultChar;
+			resultChar=strstr((char*) packet->data, "Connection: close");
 			if (result!=0)
 			{
-				result+=strlen("Connection: close");
-				while (*result && ((*result=='\r') || (*result=='\n') || (*result==' ')) )
-					result++;
+				resultChar+=strlen("Connection: close");
+				while (*resultChar && ((*resultChar=='\r') || (*resultChar=='\n') || (*resultChar==' ')) )
+					resultChar++;
 				for (i=0; i < 13; i++)
 				{
-					if (strncmp(resultTable[i].code, result, strlen(resultTable[i].code))==0)
+					if (strncmp(resultTable[i].code, resultChar, strlen(resultTable[i].code))==0)
 					{
 						if (resultTable[i].resultCode==RC_SUCCESS)
 						{
 							// Read my external IP into myIPStr
 							// Advance until we hit a number
-							while (*result && ((*result<'0') || (*result>'9')) )
-								result++;
-							if (*result)
+							while (*resultChar && ((*resultChar<'0') || (*resultChar>'9')) )
+								resultChar++;
+							if (*resultChar)
 							{
 								SystemAddress parser;
-								parser.FromString(result);
+								parser.FromString(resultChar);
 								parser.ToString(false, myIPStr);
 							}
 						}
@@ -206,20 +206,20 @@ void DynDNS::Update(void)
 			Connection to host lost.
 			*/
 
-			char *result;
-			result=strstr((char*) packet->data, "Current IP Address: ");
-			if (result!=0)
+			char *resultChar;
+			resultChar=strstr((char*) packet->data, "Current IP Address: ");
+			if (resultChar!=0)
 			{
-				result+=strlen("Current IP Address: ");
+				resultChar+=strlen("Current IP Address: ");
 				SystemAddress myIp;
-				myIp.FromString(result);
-				myIp.ToString(false, myIPStr);
+				myIp.FromString(resultChar);
+				myIp.ToString(false, resultChar);
 
 				char existingHost[65];
 				existingHost[0]=0;
 				// Resolve DNS we are setting. If equal to current then abort
 				RakNetSocket2::DomainNameToIP(host.C_String(), existingHost);
-				if (existingHost && strcmp(existingHost, myIPStr)==0)
+				if (strcmp(existingHost, myIPStr)==0)
 				{
 					// DynDNS considers setting the IP to what it is already set abuse
 					tcp->DeallocatePacket(packet);

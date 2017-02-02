@@ -142,7 +142,7 @@ Packet* TelnetTransport::Receive( void )
 		if (remoteClient->lastSentTextInput[0])
 		{
 			// Up arrow, return last string
-			for (int i=0; remoteClient->textInput[i]; i++)
+			for (i=0; remoteClient->textInput[i]; i++)
 				remoteClient->textInput[i]=8;
 			strcat(remoteClient->textInput, remoteClient->lastSentTextInput);
 			tcpInterface->Send((const char *)remoteClient->textInput, (unsigned int) strlen(remoteClient->textInput), p->systemAddress, false);

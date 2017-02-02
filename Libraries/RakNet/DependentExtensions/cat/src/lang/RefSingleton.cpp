@@ -30,9 +30,7 @@
 #include <cat/threads/Thread.hpp>
 using namespace cat;
 
-static RefSingletons *m_ref_singletons = 0;
-
-
+CAT_SINGLETON(RefSingletons);
 
 //// Mutex
 
@@ -326,6 +324,9 @@ void RefSingletonBase::MergeSort(SListForward &list)
 
 //// RefSingletons
 
+
+static RefSingletons *m_ref_singletons = 0;
+
 void RefSingletons::AtExit()
 {
 	if (m_ref_singletons)
@@ -337,7 +338,6 @@ void RefSingletons::AtExit()
 	CAT_DEBUG_LEAKS_DUMP();
 }
 
-CAT_SINGLETON(RefSingletons);
 
 bool RefSingletons::OnInitialize()
 {
@@ -389,3 +389,4 @@ void RefSingletons::OnFinalize()
 	// NOTE: No need to clear the list since it is not accessed after this point
 	//_active_list.Clear();
 }
+

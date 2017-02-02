@@ -86,6 +86,9 @@
 
 namespace cat {
 
+// forward delcaration
+template<class T>
+class CAT_EXPORT Singleton;
 
 // Internal class
 template<class T>
@@ -195,7 +198,7 @@ public:
 	template<> T *Singleton<T>::ref() { return m_T_ss.GetRef(M); }
 
 // In the C file for the object, use this macro:
-#define CAT_SINGLETON(T)	CAT_SINGLETON_MUTEX(T, GetSingletonMutex())
+#define CAT_SINGLETON(T)	namespace cat { CAT_SINGLETON_MUTEX(T, GetSingletonMutex()) }
 
 
 // Internal free function

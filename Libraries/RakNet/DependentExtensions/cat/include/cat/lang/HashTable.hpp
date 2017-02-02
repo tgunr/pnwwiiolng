@@ -73,7 +73,7 @@ class CAT_EXPORT KeyAdapter
 	u32 _hash;
 
 public:
-	CAT_INLINE KeyAdapter::KeyAdapter(SanitizedKey &key)
+	CAT_INLINE KeyAdapter(SanitizedKey &key)
 	{
 		_key = key.Key();
 		_len = key.Length();
@@ -198,7 +198,7 @@ protected:
 
 public:
 	HashTableBase();
-	~HashTableBase();
+	virtual ~HashTableBase();
 
 	HashItem *Lookup(const KeyAdapter &key); // Returns 0 if key not found
 	HashItem *Create(const KeyAdapter &key); // Creates if it does not exist yet

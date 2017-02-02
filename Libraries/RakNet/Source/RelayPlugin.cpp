@@ -349,7 +349,7 @@ void RelayPlugin::SendMessageToRoom(StrAndGuidAndRoom **strAndGuidSender, BitStr
 			bsOut.Write(message);
 
 			RP_Group *room = chatRooms[i];
-			for (unsigned int i=0; i < room->usersInRoom.Size(); i++)
+			for (i=0; i < room->usersInRoom.Size(); i++)
 			{
 				if (room->usersInRoom[i].guid!=(*strAndGuidSender)->guid)
 					SendUnified(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, room->usersInRoom[i].guid, false);
@@ -377,14 +377,10 @@ void RelayPlugin::OnGroupMessageFromClient(Packet *packet)
 	BitStream bsIn(packet->data, packet->length, false);
 	bsIn.IgnoreBytes(sizeof(MessageID)*2);
 
-	PacketPriority priority;
-	PacketReliability reliability;
 	char orderingChannel;
 	unsigned char cIn;
-	bsIn.Read(cIn);
-	priority = (PacketPriority) cIn;
-	bsIn.Read(cIn);
-	reliability = (PacketReliability) cIn;
+	bsIn.Read(cIn); // priority, skip
+	bsIn.Read(cIn); // reliability, skip
 	bsIn.Read(orderingChannel);
 	BitStream bsData;
 	bsIn.Read(&bsData);

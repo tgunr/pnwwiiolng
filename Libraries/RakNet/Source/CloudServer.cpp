@@ -648,7 +648,6 @@ void CloudServer::OnGetRequest(Packet *packet)
 				CloudData *cloudData;
 				bool keyDataListExists;
 
-				unsigned int specificSystemIndex;
 				for (specificSystemIndex=0; specificSystemIndex < getRequest->cloudQueryWithAddresses.specificSystems.Size(); specificSystemIndex++)
 				{
 					RakNetGUID specificSystem = getRequest->cloudQueryWithAddresses.specificSystems[specificSystemIndex];
@@ -687,9 +686,7 @@ void CloudServer::OnGetRequest(Packet *packet)
 				subscribedKeysIndex = remoteCloudClient->subscribedKeys.GetIndexFromKey(cloudDataList->key, &subscribedKeysIndexExists);
 				if (subscribedKeysIndexExists)
 				{
-					KeySubscriberID* keySubscriberId;
 					keySubscriberId = remoteCloudClient->subscribedKeys[subscribedKeysIndex];
-					unsigned int specificSystemIndex;
 					for (specificSystemIndex=0; specificSystemIndex < keySubscriberId->specificSystemsSubscribedTo.Size(); specificSystemIndex++)
 					{
 						bool keyDataExists;
@@ -760,7 +757,7 @@ void CloudServer::OnUnsubscribeRequest(Packet *packet)
 
 	for (index=0; index < keyCount; index++)
 	{
-		CloudKey cloudKey = cloudKeys[index];
+		cloudKey = cloudKeys[index];
 
 	//	dataRepositoryIndex = 
 			dataRepository.GetIndexFromKey(cloudKey, &dataRepositoryExists);

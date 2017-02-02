@@ -114,14 +114,17 @@ void LogCommandParser::AddChannel(const char *channelName)
 	// Each channel can only be added once.
 	RakAssert(channelIndex==(unsigned)-1);
 
-	unsigned i;
-	for (i=0; i < 32; i++)
+	if (channelIndex==(unsigned)-1) 
 	{
-		if (channelNames[i]==0)
+		unsigned i;
+		for (i=0; i < 32 ; i++)
 		{
-			// Assuming a persistent static string.
-			channelNames[i]=channelName;
-			return;
+			if (channelNames[i]==0)
+			{
+				// Assuming a persistent static string.
+				channelNames[i]=channelName;
+				return;
+			}
 		}
 	}
 

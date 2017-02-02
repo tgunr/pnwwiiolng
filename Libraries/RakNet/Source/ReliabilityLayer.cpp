@@ -1693,12 +1693,18 @@ void ReliabilityLayer::Update( RakNetSocket2 *s, SystemAddress &systemAddress, i
 {
 	(void) MTUSize;
 
+#ifdef _DEBUG
 	RakNet::TimeMS timeMs;
+#endif
 #if CC_TIME_TYPE_BYTES==4
 	time/=1000;
+#ifdef _DEBUG
 	timeMs=time;
+#endif
 #else
+#ifdef _DEBUG
 	timeMs=(RakNet::TimeMS) (time/(CCTimeType)1000);
+#endif
 #endif
 
 #ifdef _DEBUG
@@ -3222,7 +3228,7 @@ InternalPacket * ReliabilityLayer::BuildPacketFromSplitPacketList( SplitPacketCh
 #endif
 }
 //-------------------------------------------------------------------------------------------------------
-InternalPacket * ReliabilityLayer::BuildPacketFromSplitPacketList( SplitPacketIdType splitPacketId, CCTimeType time,
+InternalPacket * ReliabilityLayer::BuildPacketFromSplitPacketList( SplitPacketIdType sPacketId, CCTimeType time,
 																  RakNetSocket2 *s, SystemAddress &systemAddress, RakNetRandom *rnr, 
 																  BitStream &updateBitStream)
 {
@@ -3231,8 +3237,8 @@ InternalPacket * ReliabilityLayer::BuildPacketFromSplitPacketList( SplitPacketId
 	SplitPacketChannel *splitPacketChannel;
 	InternalPacket * internalPacket;
 
-	// Find in splitPacketChannelList the SplitPacketChannel with this splitPacketId
-	i=splitPacketChannelList.GetIndexFromKey(splitPacketId, &objectExists);
+	// Find in splitPacketChannelList the SplitPacketChannel with this sPacketId
+	i=splitPacketChannelList.GetIndexFromKey(sPacketId, &objectExists);
 	splitPacketChannel=splitPacketChannelList[i];
 	
 #if PREALLOCATE_LARGE_MESSAGES==1

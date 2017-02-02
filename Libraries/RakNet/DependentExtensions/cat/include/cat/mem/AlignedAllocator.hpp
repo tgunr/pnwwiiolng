@@ -49,7 +49,7 @@ public:
     void *Acquire(u32 bytes);
 
 	// Resizes an aligned pointer
-	void *Resize(void *ptr, u32 bytes);
+    void *Resize(void *ptr, u32 bytes);
 
     // Release an aligned pointer
     void Release(void *ptr);

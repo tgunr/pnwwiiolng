@@ -9,6 +9,12 @@ MESSAGE( STATUS "Working dir: " ${CMAKE_CURRENT_SOURCE_DIR} )
 
 get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 
+if (WIN32)
+else (WIN32)
+#set(CMAKE_CXX_FLAGS " -std=gnu++11 " )
+set(CMAKE_CXX_FLAGS " -std=gnu++14 " )
+endif (WIN32)
+
 # Define some shortcuts
 SET(SRC ${PARENT_DIR}/src/)
 SET(LIB ${PARENT_DIR}/lib/)
@@ -33,10 +39,8 @@ ${SRC}/lang/LinkedLists.cpp
 ${SRC}/lang/HashTable.cpp
 ${SRC}/time/Clock.cpp
 ${SRC}/lang/Strings.cpp
-${SRC}/lang/RefSingleton.cpp
 ${SRC}/lang/Singleton.cpp
 ${SRC}/io/Settings.cpp
-${SRC}/io/Log.cpp
 ${SRC}/io/LogThread.cpp
 ${SRC}/io/MappedFile.cpp
 ${SRC}/time/Clock.cpp
@@ -49,7 +53,9 @@ ${SRC}/mem/StdAllocator.cpp
 ${SRC}/mem/IAllocator.cpp
 ${SRC}/parse/BufferTok.cpp
 ${SRC}/parse/Base64.cpp
-${SRC}/hash/Murmur.cpp)
+${SRC}/hash/Murmur.cpp
+${SRC}/io/Log.cpp
+${SRC}/lang/RefSingleton.cpp)
 if (WIN32)
     target_link_libraries(libcatcommon winmm.lib)
 else (WIN32)

@@ -41,6 +41,8 @@
 
 namespace cat {
 
+//forward declarations
+template<class T> class TLSInstance;
 
 //// Thread priority modification
 
@@ -83,6 +85,7 @@ public:
 	{
 		if (!_is_initialized)
 			_is_initialized = OnInitialize();
+		return _is_initialized;
 	}
 
 	// Called when TLS object is inserted into the TLS slot

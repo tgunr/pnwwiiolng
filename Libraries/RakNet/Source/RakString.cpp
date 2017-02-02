@@ -150,28 +150,28 @@ RakString& RakString::operator = ( const char c )
 	buff[1]=0;
 	return operator = ((const char*)buff);
 }
-void RakString::Realloc(SharedString *sharedString, size_t bytes)
+void RakString::Realloc(SharedString *sString, size_t bytes)
 {
-	if (bytes<=sharedString->bytesUsed)
+	if (bytes<=sString->bytesUsed)
 		return;
 
 	RakAssert(bytes>0);
-	size_t oldBytes = sharedString->bytesUsed;
+	size_t oldBytes = sString->bytesUsed;
 	size_t newBytes;
 	const size_t smallStringSize = 128-sizeof(unsigned int)-sizeof(size_t)-sizeof(char*)*2;
 	newBytes = GetSizeToAllocate(bytes);
 	if (oldBytes <=(size_t) smallStringSize && newBytes > (size_t) smallStringSize)
 	{
-		sharedString->bigString=(char*) rakMalloc_Ex(newBytes, _FILE_AND_LINE_);
-		strcpy(sharedString->bigString, sharedString->smallString);
-		sharedString->c_str=sharedString->bigString;
+		sString->bigString=(char*) rakMalloc_Ex(newBytes, _FILE_AND_LINE_);
+		strcpy(sString->bigString, sString->smallString);
+		sString->c_str=sString->bigString;
 	}
 	else if (oldBytes > smallStringSize)
 	{
-		sharedString->bigString=(char*) rakRealloc_Ex(sharedString->bigString,newBytes, _FILE_AND_LINE_);
-		sharedString->c_str=sharedString->bigString;
+		sString->bigString=(char*) rakRealloc_Ex(sString->bigString,newBytes, _FILE_AND_LINE_);
+		sString->c_str=sString->bigString;
 	}
-	sharedString->bytesUsed=newBytes;
+	sString->bytesUsed=newBytes;
 }
 RakString& RakString::operator +=( const RakString& rhs)
 {
