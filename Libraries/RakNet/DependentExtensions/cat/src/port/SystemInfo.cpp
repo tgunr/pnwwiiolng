@@ -38,7 +38,7 @@ using namespace cat;
 	typedef BOOL (WINAPI* PGetLogicalProcessorInformation)(PSYSTEM_LOGICAL_PROCESSOR_INFORMATION, PDWORD);
 #elif defined(CAT_OS_LINUX) || defined(CAT_OS_AIX) || defined(CAT_OS_SOLARIS) || defined(CAT_OS_IRIX)
 # include <unistd.h>
-#elif defined(CAT_OS_OSX) || defined(CAT_OS_BSD)
+#elif defined(CAT_OS_OSX) || defined(CAT_OS_BSD) || defined(CAT_OS_APPLE)
 # include <sys/sysctl.h>
 # include <unistd.h>
 #elif defined(CAT_OS_HPUX)
@@ -185,7 +185,7 @@ static u32 GetPageSize()
 	GetSystemInfo(&sys_info);
 	page_size = sys_info.dwPageSize;
 
-#elif defined(CAT_OS_OSX) || defined(CAT_OS_BSD)
+#elif defined(CAT_OS_OSX) || defined(CAT_OS_BSD) || defined(CAT_OS_APPLE)
 
 	page_size = (u32)getpagesize();
 

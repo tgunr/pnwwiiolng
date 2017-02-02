@@ -174,7 +174,7 @@ MurmurHash::MurmurHash(const void *key, u64 bytes, u64 seed)
 
 u32 cat::MurmurGenerateUnbiased(const void *key, u64 bytes, u32 low, u32 high)
 {
-	u64 h1, h2;
+	u64 h1 = 0, h2;
 
 	u32 range = high - low;
 	if (range == 0) return low;

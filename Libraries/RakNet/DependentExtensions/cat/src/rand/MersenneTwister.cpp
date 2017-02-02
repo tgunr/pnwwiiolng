@@ -37,7 +37,7 @@ using namespace std;
 # if defined(CAT_COMPILER_MSVC)
 #  pragma comment(lib, "advapi32")
 # endif
-#elif defined(CAT_OS_LINUX)
+#elif defined(CAT_OS_LINUX) | defined(CAT_OS_APPLE)
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <fcntl.h>

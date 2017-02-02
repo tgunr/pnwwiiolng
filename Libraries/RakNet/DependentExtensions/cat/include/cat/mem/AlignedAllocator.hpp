@@ -33,7 +33,6 @@
 #include <cat/lang/Singleton.hpp>
 
 #include <cstddef> // size_t
-#include <vector> // std::_Construct and std::_Destroy
 
 namespace cat {
 
@@ -111,15 +110,8 @@ public:
 		AlignedAllocator::ref()->Release(Ptr);
 	}
 
-	void construct(pointer Ptr, const T &Val)
-	{
-		std::_Construct(Ptr, Val);
-	}
-
-	void destroy(pointer Ptr)
-	{
-		std::_Destroy(Ptr);
-	}
+	void construct(pointer Ptr, const T &Val);
+	void destroy(pointer Ptr);
 
 	size_type max_size() const
 	{

@@ -27,6 +27,8 @@
 */
 
 #include <cat/crypt/rand/Fortuna.hpp>
+#include <cat/time/Clock.hpp>
+
 using namespace cat;
 
 // Used for MacOSX, iPhone, PS3, XBox, and others (for now)
@@ -35,6 +37,7 @@ using namespace cat;
 #if !defined(CAT_OS_WINDOWS) && !defined(CAT_OS_LINUX)
 
 #include <fcntl.h>
+#include <unistd.h>
 
 
 #if !defined(CAT_NO_ENTROPY_THREAD)

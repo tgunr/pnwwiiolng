@@ -178,7 +178,7 @@ class CAT_EXPORT HashTableBase
 {
 	friend class Iterator;
 
-	CAT_NO_COPY(HashTableBase);
+    CAT_NO_COPY(HashTableBase)
 
 	static const u32 PREALLOC = 64;
 	static const u32 GROW_THRESH = 2;
@@ -241,7 +241,7 @@ public:
 template<class T>
 class CAT_EXPORT HashTable : protected HashTableBase
 {
-	CAT_NO_COPY(HashTable);
+	CAT_NO_COPY(HashTable)
 
 	CAT_INLINE HashItem *Allocate(const KeyAdapter &key)
 	{

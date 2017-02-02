@@ -30,6 +30,7 @@
 #include <cat/port/SystemInfo.hpp>
 #include <cstdlib>
 #include <cstdio>
+#include <vector>
 using namespace std;
 using namespace cat;
 
@@ -125,7 +126,7 @@ void *AlignedAllocator::Resize(void *ptr, u32 bytes)
 	{
 		// Need to shift the buffer around if alignment changed
 		// This sort of inefficiency is why I wrote my own allocator
-		memmove(buffer + offset, buffer + old_offset, min(bytes, old_bytes));
+        memmove(buffer + offset, buffer + old_offset, std::min(bytes, old_bytes));
 	}
 
 	buffer += offset;
@@ -156,3 +157,16 @@ void AlignedAllocator::Release(void *ptr)
 
 #endif
 }
+
+template<typename T>
+void STLAlignedAllocator<T>::construct(STLAlignedAllocator::pointer Ptr, const T &Val)
+{
+	new (Ptr) T(Val);
+}
+
+template<typename T>
+void STLAlignedAllocator<T>::destroy(STLAlignedAllocator::pointer Ptr)
+{
+    Ptr->~T();
+}
+

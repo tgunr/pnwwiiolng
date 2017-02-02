@@ -100,7 +100,7 @@ public:
 	// Usage: MyTLSDerivativeType *mine; tls->Unwrap(mine);
 	template<class T> CAT_INLINE void Unwrap(T *&to)
 	{
-		to = (this == 0) ? 0 : static_cast<T*>( this );
+		to = static_cast<T*>( this );
 	}
 };
 

@@ -125,8 +125,7 @@ class CAT_EXPORT Singleton
 {
 	friend class SingletonImpl<T>;
 
-	CAT_NO_COPY(Singleton);
-
+	CAT_NO_COPY(Singleton)
 	bool _init_success;
 
 protected:

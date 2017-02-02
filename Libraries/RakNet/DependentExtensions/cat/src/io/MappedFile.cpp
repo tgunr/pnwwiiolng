@@ -31,7 +31,7 @@
 #include <cat/port/SystemInfo.hpp>
 using namespace cat;
 
-#if defined(CAT_OS_LINUX)
+#if defined(CAT_OS_LINUX) | defined(CAT_OS_APPLE)
 # include <sys/types.h>
 # include <sys/mman.h>
 # include <sys/stat.h>

@@ -218,7 +218,6 @@ ADD_LIBRARY(teulserver STATIC
 )
 TARGET_INCLUDE_DIRECTORIES( teulserver PRIVATE ${LIBEVENT_INCLUDE_DIRS} ${RAKNET_INCLUDE_DIRS} ${RakNet_SOURCE_DIR}/DependentExtensions ${RakNet_SOURCE_DIR}/DependentExtensions/cat/include )
 TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
-#TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} libcattunnel RakNetLibStatic)
 SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
 
 ####################################

@@ -115,7 +115,7 @@ class CAT_EXPORT RefObject : public DListItem
 {
 	friend class RefObjects;
 
-	CAT_NO_COPY(RefObject);
+	CAT_NO_COPY(RefObject)
 
 #if defined(CAT_NO_ATOMIC_REF_OBJECT)
 	Mutex _lock;
@@ -169,7 +169,7 @@ public:
 
 		if (static_cast<s32>(ref_count) == times)
 #else
-		if (Atomic::Add(&_ref_count, -times) == times)
+		if (static_cast<s32>(Atomic::Add(&_ref_count, -times)) == times)
 #endif
 		{
 			OnZeroReferences(file_line);

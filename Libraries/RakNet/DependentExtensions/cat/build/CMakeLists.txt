@@ -9,16 +9,10 @@ MESSAGE( STATUS "Working dir: " ${CMAKE_CURRENT_SOURCE_DIR} )
 
 get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 
-if (WIN32)
-else (WIN32)
-#set(CMAKE_CXX_FLAGS " -std=gnu++11 " )
-set(CMAKE_CXX_FLAGS " -std=gnu++14 " )
-endif (WIN32)
-
 # Define some shortcuts
 SET(SRC ${PARENT_DIR}/src/)
 SET(LIB ${PARENT_DIR}/lib/)
-SET(INC ${PARENT_DIR}/include/)
+SET(INC ${PARENT_DIR}/include/ )
 SET(TESTS ${PARENT_DIR}/tests/)
 
 include_directories(${INC})
@@ -90,28 +84,11 @@ endif (WIN32)
 # Math
 add_library(libcatmath STATIC
 ${SRC}/math/BigRTL.cpp
+${SRC}/math/BitMath.cpp
 ${SRC}/math/BigPseudoMersenne.cpp
 ${SRC}/math/BigTwistedEdwards.cpp
 ${SRC}/math/BigMontgomery.cpp)
 target_link_libraries(libcatmath libcatcommon)
-
-if (NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
-
-    # x64-bit assembly code
-    if (WIN32)
-        set(big_x64_files ${LIB}/cat/big_x64.obj)
-    else (WIN32)
-        set(big_x64_files ${LIB}/cat/big_x64.o)
-    endif (WIN32)
-
-    # wrap the pre-built code in a static link library
-    add_library(big_x64_obj STATIC EXCLUDE_FROM_ALL ${big_x64_files})
-    set_source_files_properties(${big_x64_files} PROPERTIES EXTERNAL_OBJECT true GENERATED true)
-    set_target_properties(big_x64_obj PROPERTIES LINKER_LANGUAGE C ARCHIVE_OUTPUT_DIRECTORY ${LIB}/cat)
-
-    target_link_libraries(libcatmath big_x64_obj)
-
-endif (NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
 
 # Tunnel
 add_library(libcattunnel STATIC

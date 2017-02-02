@@ -61,3 +61,16 @@ void LargeAllocator::Release(void *ptr)
 #endif
 	}
 }
+
+template<typename T>
+void STLLargeAllocator<T>::construct(STLLargeAllocator::pointer Ptr, const T &Val)
+{
+    new (Ptr) T(Val);
+}
+
+template<typename T>
+void STLLargeAllocator<T>::destroy(pointer Ptr)
+{
+    Ptr->~T();
+}
+
