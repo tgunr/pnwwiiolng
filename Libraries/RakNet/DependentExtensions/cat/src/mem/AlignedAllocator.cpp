@@ -157,16 +157,3 @@ void AlignedAllocator::Release(void *ptr)
 
 #endif
 }
-
-template<typename T>
-void STLAlignedAllocator<T>::construct(STLAlignedAllocator::pointer Ptr, const T &Val)
-{
-	new (Ptr) T(Val);
-}
-
-template<typename T>
-void STLAlignedAllocator<T>::destroy(STLAlignedAllocator::pointer Ptr)
-{
-    Ptr->~T();
-}
-

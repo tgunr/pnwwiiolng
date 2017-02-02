@@ -106,8 +106,15 @@ public:
 		LargeAllocator::ref()->Release(Ptr);
 	}
 
-	void construct(pointer Ptr, const T &Val);
-	void destroy(pointer Ptr);
+	void construct(pointer Ptr, const T &Val)
+	{
+		new (Ptr) T(Val);
+	}
+
+	void destroy(pointer Ptr)
+	{
+		Ptr->~T();
+	}
 
 	size_type max_size() const
 	{
