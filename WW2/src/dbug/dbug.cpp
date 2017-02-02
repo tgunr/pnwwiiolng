@@ -389,7 +389,7 @@ void dbugInit(LogMode logMode, const char* const filename)
 
     if ( file >= 0 ) {
         dbugLog(_FLM, "%s", _OPEN_MSG);
-        dbugLog(_FLM, "Version: %s (%s, %s)", PN_product_version_string, PN_git_commitish_string, PN_build_platform_string);
+        dbugLog(_FLM, "Version: %s (%s%s, %s)", PN_product_version_string, PN_code_git_commitish_string, PN_data_git_commitish_string, PN_build_platform_string);
     }
 }
 

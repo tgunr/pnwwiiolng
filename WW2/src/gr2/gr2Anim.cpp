@@ -11165,8 +11165,8 @@ void setEditBlendWeapon(int type)
 			{
 				_editWeapon->Update(true, true);
 
-				SINT32 from = _editWeapon->FindBone(tpsWeapons[type].attachBone);
-				SINT32 to = _editModel->skeleton->FindBone(tpsWeapons[type].attachToBone);
+				SINT32 from = _editWeapon->FindBone((SCHAR *)(tpsWeapons[type].attachBone));
+				SINT32 to = _editModel->skeleton->FindBone((SCHAR *)(tpsWeapons[type].attachToBone));
 				_editModel->skeleton->AddAttachment(_editWeapon, from, to, true);
 				_editModel->skeleton->updateAttachment = true;
 				_editWeapon->updateAttachment = true;

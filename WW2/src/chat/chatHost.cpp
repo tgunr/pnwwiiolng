@@ -160,10 +160,17 @@ const char* const channelTypeName[] = {
 
 static bool _running = true;
 
+#ifndef NDEBUG
+bool g_debugRadios = true;
+bool g_debugSquads = true;
+bool g_debugPersonas = true;
+bool g_debugChat = true;
+#else
 bool g_debugRadios = false;
 bool g_debugSquads = false;
 bool g_debugPersonas = false;
 bool g_debugChat = false;
+#endif
 
 const char* const chanTypeName[MAX_CHANNEL_TYPES] =
 {
@@ -247,11 +254,6 @@ static std::vector<TUNE_COMMAND> _tuneCommands = {
 //////////////////////////////////////////////////////////////////////
 // Chat Host
 //////////////////////////////////////////////////////////////////////
-
-struct CampaignFilterFn : public FilterFn
-{
-	bool operator()(const wwiiPlayer* player) const { return player->instance().isCampaign(); }
-};
 
 //////////////////////////////////////////////////////////////////////
 // Send a message to a user connected through the IRC interface.
@@ -528,7 +530,7 @@ chatSideMessage(WWII_SIDE side, LSTRING_ID messageID, const char* const ptr0, co
 	if ( sidePlayers[side].empty() == false )
 	{
 		Chat::LocalizedMessage message(prefix, messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5);
-		chatBroadcastLocMessage(sidePlayers[side].begin(), sidePlayers[side].end(), message, CampaignFilterFn());
+		chatBroadcastLocMessage(sidePlayers[side].begin(), sidePlayers[side].end(), message, [] (const wwiiPlayer *player) { return player->instance().isCampaign(); });
 	}
 
 	return true;
@@ -2426,9 +2428,9 @@ _personaCreate(const Server::PersonaLogin& login, PlayerStatusNode& psn)
 	}
 
 	if ( g_debugPersonas )
-		dbugLog(_FLD, "t:%d p:%u c:%s -> personaCreate reason %d"
+		dbugLog(_FLD, "t:%d p:%u c:%s -> personaCreate reason %s"
 						, psn.teulIndex, psn.dispatch().m_customerID, psn.dispatch().m_callsign
-						, static_cast<int>(login.reason())
+						, Server::Transfer::to_string(login.reason()).c_str()
 						);
 
 	chatCreatePlayer(&psn, (struct Chat::PlayerInfo*) login.data.auxData);
@@ -4061,7 +4063,7 @@ static inline std::string _trim(const std::string &text)
     } else {
         result = result.substr(locstart);
     }
-    return result.substr(0, result.find_last_not_of(" \t\v\n\r")); // npos == entire string
+    return result.substr(0, result.find_last_not_of(" \t\v\n\r") + 1); // npos + 1 == 0 (hack, but it works)
 }
 
 static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
@@ -4167,14 +4169,14 @@ static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &resp
             DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET squad_night='%s' WHERE squadid=%u", formattedNight.c_str(), squad->squad().squadID());
         });
     }
-    if (params.find("language") != params.end()) {
-        uint64_t language = params.at("language");
+    if (params.find("pri_language") != params.end()) {
+        uint64_t pri_language = params.at("pri_language");
 
         status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set language");
-        status_if(language > 5, 422, "requested language is invalid");
-        operations.push_back([language, &squad] {
-            squad->setLanguage(language);
-            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET pri_language=%llu WHERE squadid=%u", language, squad->squad().squadID());
+        status_if(pri_language > 5, 422, "requested language is invalid");
+        operations.push_back([pri_language, &squad] {
+            squad->setLanguage(pri_language);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET pri_language=%llu WHERE squadid=%u", pri_language, squad->squad().squadID());
         });
     }
     if (params.find("recruiting") != params.end()) {
@@ -4190,7 +4192,7 @@ static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &resp
         
         status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set voting flag");
         operations.push_back([voting, &squad, &requesterMember] {
-            squad->setRecruiting(voting, requesterMember->player());
+            squad->setVoting(voting, requesterMember->player());
             DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting=%u WHERE squadid=%u", voting ? 1 : 0, squad->squad().squadID());
         });
     }

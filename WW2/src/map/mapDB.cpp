@@ -108,7 +108,7 @@ static void
 _setArenaDescriptionHostRevision()
 {
 	char hostRevision[200];
-	strprintf(hostRevision, "%s (%s)", PN_git_commitish_string, cv_stratLanguage.GetString());
+	strprintf(hostRevision, "c:%s d:%s (%s)", PN_code_git_commitish_string, PN_data_git_commitish_string, cv_stratLanguage.GetString());
 
 	std::string revision = hostRevision;
 	_removePrefix(revision, "branches/");

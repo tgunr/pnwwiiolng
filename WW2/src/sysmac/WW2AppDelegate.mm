@@ -1862,7 +1862,6 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     }];
 }
 
-
 - (void)closeAllWindows
 {
     [configWindow orderOut:self];
@@ -1887,16 +1886,10 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 - (IBAction)showAbout:(id)sender {
     NSURL *url = [[[NSBundle mainBundle] bundleURL] URLByAppendingPathComponent:@"Contents/Info.plist"];
     NSDictionary *dictionary = [NSDictionary dictionaryWithContentsOfURL:url];
-    
     NSString *version = [dictionary objectForKey:@"CFBundleShortVersionString"];
-    
-    NSRange range = NSMakeRange( 0, 6 );
-    NSString *hash = [[dictionary objectForKey:@"GitShaHash"] substringWithRange: range];
-    NSString *repoState = [dictionary objectForKey:@"GitState"];
-    
-    NSString *fullVersion = [NSString stringWithFormat:@"v%@ - %@", version, hash];
-    NSDictionary *aboutDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                               fullVersion, @"Version", repoState, @"ApplicationVersion", nil];
+    NSString *hash = [@(PN_code_git_commitish_string) stringByAppendingString:@(PN_data_git_commitish_string)];
+    NSDictionary *aboutDict = @{ @"Version": version, @"ApplicationVersion": hash };
+
     [[NSApplication sharedApplication] orderFrontStandardAboutPanelWithOptions:aboutDict];
 }
 

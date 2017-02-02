@@ -185,10 +185,12 @@ _createSquad(UINT32 ownerID, UINT32* members, const Chat::Name& shortName, const
 {
     //DEV-560 - before creating new squad, delete disbanded squad with the same name
     DBQuery qDel(dbh, "DELETE FROM wwii_squads WHERE disbanded = 1 AND LOWER(short_name) = LOWER('%s')", shortName.c_str());
-
+    
+    std::string safeFullName = fullName;
+    DBThread::EscapeString(dbh, safeFullName);
     DBQuery q(dbh, "INSERT INTO wwii_squads (creatorid, short_name, name, password, description, active, recruiting, voting, disbanded, created)"
 					" VALUES (%u, '%s', '%s', '', '', 1, 1, 1, 0, now())"
-					, ownerID, shortName.c_str(), fullName);
+					, ownerID, shortName.c_str(), safeFullName.c_str());
 	UINT32 squadID = q.LastInsertID();
 	if ( squadID == 0 ) {
         // This is fatal because failure to have a last insert ID means either

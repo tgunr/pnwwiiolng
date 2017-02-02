@@ -433,7 +433,7 @@ void GameInfoView::DisplayInfo()
 
 	DrawString(L"%ls: %.0f ", strings["hud.gameinfo.fps"].c_str(), gFPS);
 #ifdef DEBUG_WW2
-	DrawString(L"commit %s\n", PN_git_commitish_string);
+	DrawString(L"commit code %s data %s\n", PN_code_git_commitish_string, PN_data_git_commitish_string);
 #endif
 	DrawString(L"%ls: %02d:%02d\n", strings["hud.gameinfo.time"].c_str(), Hour, Min);
 

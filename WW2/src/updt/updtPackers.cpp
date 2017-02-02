@@ -65,30 +65,24 @@
 
 #undef DEBUG_UPDATE_PACK
 
-/* 8 Updates a second
-UPDATE_FRAMING framings[NUM_FRAMING_MODES] =
-{
-	{ 28, false, { 4, 4, 4 }, { 4, 8, 16 }, "28 vis, 12 per, 0 r/o" }
-, 	{ 45, true, { 5, 6, 7 }, { 5, 12, 28 }, "45 vis, 18 per, 0 r/o" }
-, 	{ 92, true, { 6, 12, 14 }, { 6, 30, 56 }, "92 vis, 32 per, 4 r/o" }
-, 	{ 178, true, { 6, 12, 14 }, { 8, 72, 98 }, "178 vis, 32 per, lots of r/o" }
-};
-OLD:
-UPDATE_FRAMING framings[NUM_FRAMING_MODES] =
-{
-	{ 28, false, { 4, 4, 4 }, { 4, 8, 16 }, "28 vis, 12 per, 0 r/o" }
-, 	{ 42, true, { 6, 8, 8 }, { 6, 20, 16 }, "42 vis, 22 per, 0 r/o" }
-, 	{ 74, true, { 4, 10, 11 }, { 6, 20, 48 }, "74 vis, 25 per, 4 r/o" }
-, 	{ 128, true, { 5, 12, 10 }, { 10, 48, 70 }, "128 vis, 27 per, lots of r/o" }
-};
-*/
+// The host update rate should be tied closely to the client's update rate,
+// where host/client here is the sender.
+//
+// "MaxU" is a "best case" value; the actual number sent may be significantly
+// smaller depending on space available in the world update buffer/packet.
+//
+// See updtEnums.h::FE_UPDATE_INTERVAL
 UpdateFraming framings[UpdateFraming::_MODES] =
 {
-	{ 88,  UpdateFraming::_LARGE, 125, 20, "um:0 88 Limit 20/Update" }
-,	{ 112, UpdateFraming::_LARGE, 125, 28, "um:1 112 Limit 28/Update" }
-, 	{ 128, UpdateFraming::_LARGE, 125, 32, "um:2 128 Limit 32/Update" }
-, 	{ 146, UpdateFraming::_LARGE, 125, 36, "um:3 146 Limit 36/Update" }
-, 	{ 184, UpdateFraming::_LARGE, 125, 48, "um:4 184 Limit 48/Update" }
+    // MaxV                         Intvl   MaxU
+    //   |                             |     ^--   Max vehicles per update
+    //   |                             ^-----|--   Interval between updates in ms
+    //   ^-----------------------------|-----|--   Max vehicles to track
+	{    88,   UpdateFraming::_LARGE, 100,    20, "um:0 88 Limit 20/Update 100ms" }
+,	{   112,   UpdateFraming::_LARGE, 100,    28, "um:1 112 Limit 28/Update 100ms" }
+, 	{   128,   UpdateFraming::_LARGE, 100,    32, "um:2 128 Limit 32/Update 100ms" }
+, 	{   146,   UpdateFraming::_LARGE, 100,    36, "um:3 146 Limit 36/Update 100ms" }
+, 	{   184,   UpdateFraming::_LARGE, 100,    48, "um:4 184 Limit 48/Update 100ms" }
 };
 
 #if platBuild != BUILD_SERVER
