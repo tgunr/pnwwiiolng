@@ -52,7 +52,10 @@ public:
     static u32 sec();			// Timestamp in seconds
     static u32 msec_fast();		// Timestamp in milliseconds, less accurate than msec() but faster
     static u32 msec();			// Timestamp in milliseconds
-    static double usec();		// Timestamp in microseconds
+#if !defined(CAT_OS_WINDOWS)
+	static 
+#endif		
+	double usec();		// Timestamp in microseconds
     static u32 cycles();		// Timestamp in cycles
 
     static std::string format(const char *format_string);
