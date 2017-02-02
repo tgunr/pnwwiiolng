@@ -41,7 +41,6 @@ Mutex &cat::GetRefSingletonMutex()
 	return m_ref_singleton_mutex;
 }
 
-
 //// RefSingletonBase
 
 void RefSingletonBase::MergeSort(SListForward &list)
@@ -389,4 +388,11 @@ void RefSingletons::OnFinalize()
 	// NOTE: No need to clear the list since it is not accessed after this point
 	//_active_list.Clear();
 }
+
+// Internal inline member function definition
+void RefSingletonImplBase::Watch(RefSingletonBase *obj)
+{
+	RefSingletons::ref()->Watch(obj);
+}
+
 

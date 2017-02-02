@@ -33,6 +33,7 @@
 #include <cat/lang/Singleton.hpp>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 namespace cat {
 
@@ -122,7 +123,7 @@ public:
 
 class CAT_EXPORT Recorder
 {
-	CAT_NO_COPY(Recorder);
+	CAT_NO_COPY(Recorder)
 
 	friend class Log;
 
@@ -191,7 +192,7 @@ public:
 
 class CAT_EXPORT Enforcer
 {
-	CAT_NO_COPY(Enforcer);
+	CAT_NO_COPY(Enforcer)
 
 protected:
 	std::ostringstream oss;

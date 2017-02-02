@@ -27,8 +27,6 @@
 */
 
 #include <cat/io/Log.hpp>
-#include <cat/time/Clock.hpp>
-#include <cat/io/LogThread.hpp>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
@@ -108,8 +106,12 @@ std::string cat::HexDumpString(const void *vdata, u32 bytes)
 
 CAT_SINGLETON(Log);
 
+#include <cat/time/Clock.hpp>
+#include <cat/io/LogThread.hpp>
+
 bool Log::OnInitialize()
 {
+
 	_backend = Callback::FromMember<Log, &Log::DefaultLogCallback>(this);
 #if defined(CAT_THREADED_LOGGER)
 	_frontend = Callback::FromMember<Log, &Log::InvokeBackendAndSetupThreaded>(this);

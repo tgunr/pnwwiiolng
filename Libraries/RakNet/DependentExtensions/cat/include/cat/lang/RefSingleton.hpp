@@ -90,7 +90,7 @@ class CAT_EXPORT RefSingletonBase : public SListItem
 {
 	friend class RefSingletons;
 
-	CAT_NO_COPY(RefSingletonBase);
+	CAT_NO_COPY(RefSingletonBase)
 
 protected:
 	int _final_priority; // shutdown order (lower = sooner)
@@ -152,7 +152,7 @@ public:
 class CAT_EXPORT RefSingletonImplBase
 {
 protected:
-	CAT_INLINE void Watch(RefSingletonBase *obj);
+	void Watch(RefSingletonBase *obj);
 };
 
 // Internal class
@@ -298,13 +298,6 @@ class CAT_EXPORT RefSingletons : public Singleton<RefSingletons>
 public:
 	static void AtExit();
 };
-
-// Internal inline member function definition
-CAT_INLINE void RefSingletonImplBase::Watch(RefSingletonBase *obj)
-{
-	RefSingletons::ref()->Watch(obj);
-}
-
 
 } // namespace cat
 
