@@ -97,7 +97,7 @@ ELSE()
 			# `-flto`: legacy cishness makes for significant perf gains in this codebase :(
 			# `-fwhole-program-vtables`: Defining inline dtors has pros and cons.
 			# The main con being the compiler may have to make a mess, which this option fixes.
-			ADD_COMPILE_OPTIONS( "-flto" "-fwhole-program-vtables" )
+#			ADD_COMPILE_OPTIONS( "-flto" "-fwhole-program-vtables" )
 		ENDIF()
     ENDIF()
     LINK_LIBRARIES( "-lpthread" )

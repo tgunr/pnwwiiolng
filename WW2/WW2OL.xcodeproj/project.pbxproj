@@ -422,7 +422,6 @@
 		08E800BC13745261000F25A9 /* HeightField.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08E800BB13745261000F25A9 /* HeightField.cpp */; };
 		08EBB4D412943BE300AEDB5B /* wwiiSyncVar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08EBB4D212943BE300AEDB5B /* wwiiSyncVar.cpp */; };
 		08F41C5612D39B7B0001C6F5 /* libfreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08F41C5512D39B7B0001C6F5 /* libfreetype2.a */; };
-		08FA20E91598B791007B0B9A /* Rand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FA20E51598B791007B0B9A /* Rand.cpp */; };
 		08FA20EA1598B791007B0B9A /* SuperFastHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FA20E71598B791007B0B9A /* SuperFastHash.cpp */; };
 		0DBEF4410A7FD8F60094C53D /* libexpat-ww2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */; };
 		0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A308578C460027461D /* libHIDUtilities.a */; };
@@ -469,6 +468,12 @@
 		E97C76C61C8539BF00875F44 /* XMLLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762B1C84E11A00875F44 /* XMLLoader.cpp */; };
 		E97C76C71C8539BF00875F44 /* XMLLoader2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */; };
 		E99C32571D8607830098798F /* wwiiPPOLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E99C32561D8607830098798F /* wwiiPPOLoader.cpp */; };
+		E9C1BDDD1E462A38001FD5B0 /* libRakNetLibStatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD01E461EE6001FD5B0 /* libRakNetLibStatic.a */; };
+		E9C1BDDE1E462A38001FD5B0 /* liblibcatcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD11E461EE6001FD5B0 /* liblibcatcommon.a */; };
+		E9C1BDDF1E462A38001FD5B0 /* liblibcatcrypt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD21E461EE6001FD5B0 /* liblibcatcrypt.a */; };
+		E9C1BDE01E462A38001FD5B0 /* liblibcatmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD31E461EE6001FD5B0 /* liblibcatmath.a */; };
+		E9C1BDE11E462A38001FD5B0 /* liblibcattunnel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD41E461EE6001FD5B0 /* liblibcattunnel.a */; };
+		E9C1BDE21E462B00001FD5B0 /* raknetConn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9C1BDDA1E461F1E001FD5B0 /* raknetConn.cpp */; };
 		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
 		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
 		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
@@ -1557,6 +1562,13 @@
 		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = text; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = SOURCE_ROOT; };
 		E99C32551D8607830098798F /* wwiiPPOLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiPPOLoader.h; sourceTree = "<group>"; };
 		E99C32561D8607830098798F /* wwiiPPOLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiPPOLoader.cpp; sourceTree = "<group>"; };
+		E9C1BDD01E461EE6001FD5B0 /* libRakNetLibStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRakNetLibStatic.a; path = lib/mac/libRakNetLibStatic.a; sourceTree = "<group>"; };
+		E9C1BDD11E461EE6001FD5B0 /* liblibcatcommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibcatcommon.a; path = lib/mac/liblibcatcommon.a; sourceTree = "<group>"; };
+		E9C1BDD21E461EE6001FD5B0 /* liblibcatcrypt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibcatcrypt.a; path = lib/mac/liblibcatcrypt.a; sourceTree = "<group>"; };
+		E9C1BDD31E461EE6001FD5B0 /* liblibcatmath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibcatmath.a; path = lib/mac/liblibcatmath.a; sourceTree = "<group>"; };
+		E9C1BDD41E461EE6001FD5B0 /* liblibcattunnel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibcattunnel.a; path = lib/mac/liblibcattunnel.a; sourceTree = "<group>"; };
+		E9C1BDDA1E461F1E001FD5B0 /* raknetConn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raknetConn.cpp; path = teul/raknetConn.cpp; sourceTree = "<group>"; };
+		E9C1BDDC1E461F2F001FD5B0 /* raknetConn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = raknetConn.h; sourceTree = "<group>"; };
 		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
 		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
 		FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authPlaygateTypes.h; path = src/auth/authPlaygateTypes.h; sourceTree = SOURCE_ROOT; };
@@ -1614,6 +1626,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9C1BDDD1E462A38001FD5B0 /* libRakNetLibStatic.a in Frameworks */,
+				E9C1BDDE1E462A38001FD5B0 /* liblibcatcommon.a in Frameworks */,
+				E9C1BDDF1E462A38001FD5B0 /* liblibcatcrypt.a in Frameworks */,
+				E9C1BDE01E462A38001FD5B0 /* liblibcatmath.a in Frameworks */,
+				E9C1BDE11E462A38001FD5B0 /* liblibcattunnel.a in Frameworks */,
 				FA3B631B1D613BA500A5A810 /* HockeySDK.framework in Frameworks */,
 				FA13BB4F1C87650800095818 /* libxml2.tbd in Frameworks */,
 				FA13BB4B1C8764BB00095818 /* libz.tbd in Frameworks */,
@@ -2569,6 +2586,7 @@
 		08104D69103DFC1A0065E0E2 /* teul */ = {
 			isa = PBXGroup;
 			children = (
+				E9C1BDDC1E461F2F001FD5B0 /* raknetConn.h */,
 				08104D90103DFC1A0065E0E2 /* teulKit.h */,
 				08104D97103DFC1A0065E0E2 /* teulNetworkArray.h */,
 				08104D98103DFC1A0065E0E2 /* teulNetworkMsg.h */,
@@ -2901,6 +2919,7 @@
 		0834F11B1044E56E00E75B52 /* teulOther */ = {
 			isa = PBXGroup;
 			children = (
+				E9C1BDDA1E461F1E001FD5B0 /* raknetConn.cpp */,
 				080D20A31408344100ECCF00 /* testTeul.cpp */,
 				080D1E071404397100ECCF00 /* teulPacket.cpp */,
 				080D1E081404397100ECCF00 /* teulPacket.h */,
@@ -3093,6 +3112,11 @@
 		20286C32FDCF999611CA2CEA /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				E9C1BDD01E461EE6001FD5B0 /* libRakNetLibStatic.a */,
+				E9C1BDD11E461EE6001FD5B0 /* liblibcatcommon.a */,
+				E9C1BDD21E461EE6001FD5B0 /* liblibcatcrypt.a */,
+				E9C1BDD31E461EE6001FD5B0 /* liblibcatmath.a */,
+				E9C1BDD41E461EE6001FD5B0 /* liblibcattunnel.a */,
 				FA3B631A1D613BA500A5A810 /* HockeySDK.framework */,
 				E94156AF1D259A0300C0565B /* libb64.a */,
 				FA05B0811C8D3E1800CDE30C /* libgranny2.a */,
@@ -3529,6 +3553,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9C1BDE21E462B00001FD5B0 /* raknetConn.cpp in Sources */,
 				080D20C41408371500ECCF00 /* wwiiCallbacks.cpp in Sources */,
 				0834F1801044E6B400E75B52 /* teulUtils.cpp in Sources */,
 				0834F1811044E6B400E75B52 /* teulModSend.cpp in Sources */,
@@ -3888,7 +3913,6 @@
 				08E5E55D13E855A100A5034D /* EZManager.cpp in Sources */,
 				08E5E55E13E855A100A5034D /* EZVehicles.cpp in Sources */,
 				08E5E56113E855B600A5034D /* ScenarioMapRenderer.cpp in Sources */,
-				08FA20E91598B791007B0B9A /* Rand.cpp in Sources */,
 				08FA20EA1598B791007B0B9A /* SuperFastHash.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4146,6 +4170,10 @@
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
@@ -4157,6 +4185,10 @@
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
@@ -4168,6 +4200,10 @@
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
@@ -4179,6 +4215,10 @@
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};

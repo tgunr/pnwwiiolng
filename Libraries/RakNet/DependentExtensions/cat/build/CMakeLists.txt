@@ -6,6 +6,7 @@ OPTION(BUILD_ECC_TEST "Build Elliptic Curve Cryptography Test" OFF)
 OPTION(BUILD_NETCODE_TEST "Build MMO NetCode Test" OFF)
 
 MESSAGE( STATUS "Working dir: " ${CMAKE_CURRENT_SOURCE_DIR} )
+MESSAGE( STATUS "Build type: " ${CMAKE_BUILD_TYPE} )
 
 get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 
