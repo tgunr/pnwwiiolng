@@ -92,6 +92,7 @@
 #include "wwii/wwiiSortieManager.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
+#include "teul/raknetConn.h"
 
 extern SINT32 hostInstallAllCallbacks();
 
@@ -1683,6 +1684,20 @@ _personaActivate(SINT32 teulIndex , PlayerStatusNode* psn)
 	activate.serverType = CELL_HOST;
 	activate.hostIP = Server::myServerInfo.stats.address;
 	activate.port = WWII::Net::Ports::CellHost;
+	
+	// If Netcode3 (raknet) is enabled, we need to tell the
+	// client how it can connect to use with NC2.
+	if (host_config.netcode3Enabled)
+	{
+		activate.teulIndex = (UINT32)teulIndex;
+		activate.playerID = psn->dispatch().m_customerID;
+		activate.otp = psn->dispatch().m_OTP;
+		ENDPOINT *ep = teulGetEndpoint(teulIndex);
+		if (ep != nullptr && ep->m_parent != nullptr && ep->m_parent->m_pairdUdpConn != nullptr)
+		{
+			memcpy(activate.pkey, ep->m_parent->m_pairdUdpConn->getPackedPublicKey(), sizeof(activate.pkey));
+		}
+	}
 
 	const SINT32 retval = wwiiSendActivate(teulIndex, &activate);
 	if ( PN_UNLIKELY(retval < 0) )

@@ -41,7 +41,7 @@ public:
 	void release();
 
 	const UCHAR *getPackedPublicKey() { return m_packedPublicKey; }
-	void setPublicKey(const char *publicKey, SINT32 teulIndex);
+	bool setPublicKey( char *publicKey, SINT32 teulIndex);
 
 	void update();
 	bool send(Teul::Packet& packet, ENDPOINT& endpoint);
@@ -61,8 +61,6 @@ private:
 
 	UCHAR m_packedPublicKey[cat::EasyHandshake::PUBLIC_KEY_BYTES];
 	cat::TunnelKeyPair m_pair;
-	//char m_public_key[cat::EasyHandshake::PUBLIC_KEY_BYTES];
-	//char m_private_key[cat::EasyHandshake::PRIVATE_KEY_BYTES];
 
 	SocketDescriptor m_sd;
 	UINT16  m_port;

@@ -188,6 +188,9 @@ SET_SOURCE_FILES_PROPERTIES( build_info.stamp PROPERTIES SYMBOLIC TRUE )
 
 add_subdirectory(../../Libraries/RakNet ./RakNet)
 
+# RakNet
+SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
+
 ####################################
 # teulserver library, provides teul and the "server" API, for what they're worth
 ADD_LIBRARY(teulserver STATIC
@@ -216,7 +219,7 @@ ADD_LIBRARY(teulserver STATIC
     dbug/dbugInternal.h mem/memPool.h
     teul/raknetConn.cpp teul/raknetConn.h
 )
-TARGET_INCLUDE_DIRECTORIES( teulserver PRIVATE ${LIBEVENT_INCLUDE_DIRS} ${RAKNET_INCLUDE_DIRS} ${RakNet_SOURCE_DIR}/DependentExtensions ${RakNet_SOURCE_DIR}/DependentExtensions/cat/include )
+TARGET_INCLUDE_DIRECTORIES( teulserver PRIVATE ${LIBEVENT_INCLUDE_DIRS} ${RAKNET_INCLUDE_DIRS} )
 TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
 SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
 
@@ -596,6 +599,7 @@ ADD_HOST_TARGET( ${CELL_HOST_EXE} SOURCES
     INSTANCING
     EXTRA_DEFINITIONS "IS_CELL_HOST"
 )
+TARGET_INCLUDE_DIRECTORIES( ${CELL_HOST_EXE} PRIVATE ${LIBEVENT_INCLUDE_DIRS} PRIVATE ${RAKNET_INCLUDE_DIRS})
 
 ####################################
 ## Map/Mission Host

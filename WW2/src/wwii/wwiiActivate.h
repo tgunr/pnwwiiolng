@@ -11,6 +11,12 @@
 
 #include "wwii/wwiiServerTypeEnums.h"		// For SERVER_TYPE enum
 
+#include "cat/crypt/tunnel/EasyHandshake.hpp"
+
+using namespace cat;
+
+class EasyHandshake;
+
 struct WWII_ACTIVATE
 {
 	WWII_ACTIVATE()
@@ -32,7 +38,7 @@ struct WWII_ACTIVATE
 	UINT16		teulIndex;
 	playerid_t	playerID;
 	UINT32		otp;
-	UCHAR		pkey[80];
+	UCHAR		pkey[cat::EasyHandshake::PUBLIC_KEY_BYTES];
 
 	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{

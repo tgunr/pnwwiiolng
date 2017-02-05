@@ -1641,6 +1641,9 @@
     <ClInclude Include="..\..\src\wwii\wwiiPPOLoader.h">
       <Filter>wwii</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiBackChannel.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2679,6 +2682,9 @@
       <Filter>ob</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\wwii\wwiiPPOLoader.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiBackChannel.cpp">
       <Filter>wwii</Filter>
     </ClCompile>
   </ItemGroup>

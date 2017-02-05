@@ -121,13 +121,11 @@ void RakNetChannel::release()
 	}
 }
 
-// TODO: this method is called on clients when the server passes the public key via teul connection
-void RakNetChannel::setPublicKey(const char *publicKey, SINT32 teulIndex)
+// this method is called on clients when the server passes the public key via teul connection
+bool RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
 {
-	strncpy(reinterpret_cast<char *>(m_pair.GetPublicKey()), publicKey, cat::EasyHandshake::PUBLIC_KEY_BYTES);
-
 	PublicKey pk;
-	pk.remoteServerPublicKey = reinterpret_cast<char *>(m_pair.GetPublicKey());
+	pk.remoteServerPublicKey = publicKey;
 	pk.publicKeyMode = PKM_USE_KNOWN_PUBLIC_KEY; // Recommended mode
 
 	ENDPOINT *ep = teulGetEndpoint(teulIndex);
@@ -144,9 +142,11 @@ void RakNetChannel::setPublicKey(const char *publicKey, SINT32 teulIndex)
 			m_isConnected = true;
 		}
 	}
+
+	return m_isConnected;
 }
 
-// TODO: Call to m_peer->Receive() will be here
+// Call to m_peer->Receive() will be here
 void RakNetChannel::update()
 {
 	if (m_peer != nullptr && m_peer->IsActive())
