@@ -10,8 +10,8 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "include/luaGlue.h"
+#include "include/configVars.h"
 #include "wwii/wwiiIRC.h"
-#include "teul/teulConfigVar.h"
 #include "wwii/wwiiHCUnitsIndex.h"
 
 extern std::vector<const char*> script_args;
@@ -24,9 +24,6 @@ lua_State* _luaVM;					// General purpose/default _luaVM
 std::string _luaSource = "?";		// Current source for commands/scripts etc
 std::string _luaSubSystem = "?";	// Part of the source
 Lua::SCRIPT_RESULTS _luaOutput;
-
-extern ConfigPath cv_luaPath;
-extern ConfigPath cv_luaRCFile;
 
 //////////////////////////////////////////////////////////////////////
 // dbugLog wrapper that takes error level and text string
@@ -182,7 +179,7 @@ _getDouble(const char* function, int argc=0)
 		return 0;
 	}
 	double result = (double)lua_tonumber(_luaVM, -1);
-	betaLog(_FLI, "%s returned %g", function, result);
+	dbugLog(_FLI, "%s returned %g", function, result);
 	lua_pop(_luaVM, 1);
 	return result;
 }

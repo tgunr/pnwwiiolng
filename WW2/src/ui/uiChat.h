@@ -28,7 +28,8 @@ extern phui::DOM::ElementDOM* uiChatIconCreateDOM(const char* classname, phui::V
 
 extern int uiChatPrintLine(const char* format, ...);
 extern int uiChatPrintLine(const wchar_t* format, ...);
-extern void uiChatPrintUILocLine(int icon[CHATICON_MAX], unsigned int, const char* key, ...); // prints a localized line from ui.dtd
+extern std::wstring uiChatAssembleUILoc(const char* key, ...); // Assemble a string from ui.dtd
+extern void uiChatPrintUILocLine(int icon[CHATICON_MAX], unsigned int, const char* key, ...);
 extern void uiChatPrintLineColor(unsigned int, const wchar_t* format, ...);
 extern void uiChatPrintLineIcon(int icon[CHATICON_MAX], unsigned int color, const wchar_t* format, ...);
 extern void uiChatPrintLineFeedback(int locgroup, int locid, bool iserror, ...);

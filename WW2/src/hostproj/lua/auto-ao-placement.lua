@@ -353,10 +353,6 @@ function gameSpareAOCapacity (forSide)
 		chatSendHCMessage(forSide, LSTR_LABELLED_GENERIC, locstr('aoNotice'), stats)
 		log('D', 'autoao', stats .. " considering auto-placement")
 		local noticeDelay = gameAONoticeDelay
-		if (required - placed) == 1 then
-		-- If this is the only spare, sit quietly for an extra 15 minutes to let the HC plan.
-		noticeDelay = gameAONoticeDelay + 15
-		end	
 		_schedulePlacement(forSide, noticeDelay, gameAOWarnings)	-- false := first warning
 		return
 	end

@@ -1663,6 +1663,11 @@ WW2.VC.opendb
 *.lo
 *.o
 
+/Deployment/ciab/bootstrap.ini
+/Deployment/ciab/Client/*.tkt
+/Deployment/ciab/Client/*.bat
+/Deployment/ciab/Client/*.sh
+
 xcuserdata/
 
 ww2mods
@@ -1670,6 +1675,8 @@ WW2Archives
 base64
 depend
 libb64.a
-DebugInstance/Debug/DebugInstance.log
-DebugInstance/Debug/DebugInstance.tlog/DebugInstance.lastbuildstate
 build_info.cpp
+
+Deployment/database/vendor
+Deployment/database/.env
+

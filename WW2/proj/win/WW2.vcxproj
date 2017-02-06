@@ -1594,7 +1594,6 @@
     <ClCompile Include="..\..\src\map\mapPack.cpp" />
     <ClCompile Include="..\..\src\math\euler.cpp" />
     <ClCompile Include="..\..\src\math\math3d.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">true</ExcludedFromBuild>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">Use</PrecompiledHeader>
@@ -1773,6 +1772,7 @@
     <ClCompile Include="..\..\src\rn\rntextloc.cpp" />
     <ClCompile Include="..\..\src\rn\rnvis.cpp" />
     <ClCompile Include="..\..\src\sdm\BuildTerrain.cpp" />
+    <ClCompile Include="..\..\src\sdm\GenerateHostTerrain.cpp" />
     <ClCompile Include="..\..\src\sdm\sdm.cpp" />
     <ClCompile Include="..\..\src\sdm\sdmHash.cpp" />
     <ClCompile Include="..\..\src\sdm\StratDB.cpp" />

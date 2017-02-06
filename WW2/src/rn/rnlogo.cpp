@@ -97,7 +97,7 @@ LOGICAL rnlogoInit()
 
 		// Append the commit info.
 		str += " : ";
-		str += PN_git_commitish_string;
+		str += PN_code_git_commitish_string + std::string(PN_data_git_commitish_string);
 
         version->SetValue(str.c_str());
     }

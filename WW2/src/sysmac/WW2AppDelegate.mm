@@ -586,17 +586,17 @@ extern NSString *WebActionOriginalURLKey;
     cfgPrefsLoad();
     
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
+    // By the way, the only way to check that is the ticket file itself since that
+    // won't have been parsed yet at this point.
     // Or, if we're only here to build MDLs.
-    if(GameServerIP[0]
+    // This is only allowed in debug.
 #ifdef DEBUG_WW2
-        || DebugBuildingMDLFilesOnly
-#endif
-    )
-    {
+    if(DebugBuildingMDLFilesOnly || TicketFile[0]) {
         state = WAIT_APPLE_EVT;
         [self launchOffline:self];
         return;
     }
+#endif
     
     //  g_buildTerrain = 1;
     
@@ -1859,7 +1859,6 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     }];
 }
 
-
 - (void)closeAllWindows
 {
     [configWindow orderOut:self];
@@ -1884,16 +1883,10 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 - (IBAction)showAbout:(id)sender {
     NSURL *url = [[[NSBundle mainBundle] bundleURL] URLByAppendingPathComponent:@"Contents/Info.plist"];
     NSDictionary *dictionary = [NSDictionary dictionaryWithContentsOfURL:url];
-    
     NSString *version = [dictionary objectForKey:@"CFBundleShortVersionString"];
-    
-    NSRange range = NSMakeRange( 0, 6 );
-    NSString *hash = [[dictionary objectForKey:@"GitShaHash"] substringWithRange: range];
-    NSString *repoState = [dictionary objectForKey:@"GitState"];
-    
-    NSString *fullVersion = [NSString stringWithFormat:@"v%@ - %@", version, hash];
-    NSDictionary *aboutDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                               fullVersion, @"Version", repoState, @"ApplicationVersion", nil];
+    NSString *hash = [@(PN_code_git_commitish_string) stringByAppendingString:@(PN_data_git_commitish_string)];
+    NSDictionary *aboutDict = @{ @"Version": version, @"ApplicationVersion": hash };
+
     [[NSApplication sharedApplication] orderFrontStandardAboutPanelWithOptions:aboutDict];
 }
 

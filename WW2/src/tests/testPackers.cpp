@@ -23,7 +23,9 @@ public:	TestPackers() : TestUnit("TestPackers") {}
 	{
 		_Type  value = (mode == TEUL_PACK) ? initialValue : 0;
 		a.packer(mode, &value, 0);
+DISABLE_WARNING("-Wfloat-equal")
 		assert( value == initialValue );
+POP_WARNINGS()
 		CRITICAL( a.offset == sizeof(_Type) * 8 );
 		return true;
 	}

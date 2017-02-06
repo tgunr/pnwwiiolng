@@ -24,6 +24,7 @@ protected:
 	static PLAYERIDX_MAP	s_byTeulIndex;
 
 public:
+    static const PLAYERID_HASH GetOnlinePlayers() { return s_byPlayerID; }
 	static bool isServerEmpty() { return s_byPlayerID.empty(); }
 	static PlayerStatusNode* PlayerStatusNodeByPlayerID(playerid_t id)
 	{

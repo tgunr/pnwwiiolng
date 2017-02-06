@@ -30,6 +30,7 @@
 #include <codecvt>
 #include "build_info.hpp"
 #include "sys/sysreg.h"
+#include "fio/fio.h"
 #include "unique_opaque_ptr.hpp"
 
 #pragma endregion
@@ -60,26 +61,6 @@ static const std::wstring HockeyApp_userAgent = L"HockeySDK/0.1 (Windows custom)
 //	- COM (CoInitializeEx() on construction, CoUninitialize() on exiting scope if succeeded)
 //	- WinInet (call InternetCloseHandle() on exiting scope)
 #pragma region RAII Utilities
-
-// Yet another thing which should be in fio
-struct FD {
-	int m_fd = -1;
-	FD() {}
-	FD(const FD &) = delete;
-	FD(FD &&) = delete;
-	FD(int fd) : m_fd(fd) {}
-	FD(const wchar_t *filename, int openflag, int shareflag, int permissionflag) { _wsopen_s(filename, openflag, shareflag, permissionflag); }
-	~FD() { if (m_fd != -1) { _close(m_fd); } }
-	FD &_wsopen_s(const wchar_t *filename, int openflag, int shareflag, int permissionflag) {
-		if (m_fd != -1) { _close(m_fd); }
-		::_wsopen_s(&m_fd, filename, openflag, shareflag, permissionflag);
-		return *this;
-	}
-	FD &operator=(const FD &) = delete;
-	FD &operator=(FD &&) = delete;
-	operator int() const { return m_fd; }
-	explicit operator bool() const { return m_fd != -1; }
-};
 
 // COM RAII helper
 struct CCom {
@@ -509,13 +490,13 @@ static bool CrashReportingCallback(
 	// to remove the handler at some later time.
 	CrashHandlerContext *context = reinterpret_cast<CrashHandlerContext *>(context_);
 	wchar_t pathBuffer[MAX_PATH] = { 0 };
-	FD fd;
+	Fio::FD fd;
 
 	crash_mkpath(pathBuffer, dumpPath, minidumpID, L".dmp.container", nullptr);
 	if (fd._wsopen_s(pathBuffer, _O_WRONLY | _O_CREAT | _O_EXCL | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE)) {
 		// Write out the container format HockeyApp's custom upload API expects
 		crash_wdprintf(fd, L"Package: com.playnet.wwiiol\n"); // TODO: Hardcoding the macOS client's bundle ID is probably not quite right
-		crash_wdprintf(fd, L"Version Code: %S\n", PN_git_commitish_string);
+		crash_wdprintf(fd, L"Version Code: %S%S\n", PN_code_git_commitish_string, PN_data_git_commitish_string);
 		crash_wdprintf(fd, L"Version Name: %S\n", PN_product_version_string);
 		crash_wdprintf(fd, L"Windows: %s (%s)\n", context->windowsVersion.c_str(), context->windowsBuild.c_str());
 		crash_wdprintf(fd, L"Manufacturer: %s\n", context->machineManufacturer);

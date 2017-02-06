@@ -43,7 +43,7 @@ public:
 
 	using WaypointMap = std::map<ChatHandle, phui::ref_ptr<WaypointMapObject>>;
 	WaypointMap _waypoints;
-	int _waypointtexid ,_contacttexid, _markertexid;
+	int _waypointtexid, _mortartexid, _contacttexid, _markertexid;
 
 	int _aiCount;
 	bool _aiInit;

@@ -352,7 +352,7 @@ _repairFirebase(FacilityStruct* fb)
 		|| fb->m_lastDamaged > teulTime() - (host_config.fbRepairIntervalM*60)
 		)
 	{
-		betaLog(_FLD, "FB %s repaired, removing from queue", fb->name);
+		dbugLog(_FLD, "FB %s repaired, removing from queue", fb->name);
 		_repairQueue.erase(fb);
 		fb->m_onRepairQueue = false;
 		return false;
@@ -370,7 +370,7 @@ _repairFirebase(FacilityStruct* fb)
 		if ( repairJoules <= 0 )
 			repairJoules = 1;
 
-		betaLog(_FLD, "Repairing %s for %" PR64BitT "j", obj->name, repairJoules);
+		dbugLog(_FLD, "Repairing %s for %" PR64BitT "j", obj->name, repairJoules);
 
 		obj->applyDamage(-repairJoules, 0);
 
@@ -406,7 +406,7 @@ strtProcessFBRepairQueue()
 	}
 	if ( affected > 0 )
 	{
-		betaLog(_FLI, "repaired %u firebases", affected);
+		dbugLog(_FLI, "repaired %u firebases", affected);
 	}
 }
 
@@ -429,7 +429,7 @@ _scheduleFirebaseRepairs(FacilityStruct* facility)
 	if ( facility->m_lastDamaged > REBUILD_OLDER_THAN )
 		return;
 
-	betaLog(_FLD, "Adding %s to repair queue", facility->name);
+	dbugLog(_FLD, "Adding %s to repair queue", facility->name);
 
 	_repairQueue[facility] = teulTime();
 	facility->m_repairRate = host_config.fbRepairIntervalM * 60;
@@ -770,7 +770,7 @@ _repairObject(UCHAR* lastPercentDamage, ObjectStruct& object)
 	*lastPercentDamage = object.percentDamage;
 	object.calcPercentDamage();
 
-	betaLog(_FLI,"%s:repairing:%s %d->%d%%"
+	dbugLog(_FLI,"%s:repairing:%s %d->%d%%"
 					, object.facility->name
 					, object.name
 					, *lastPercentDamage
@@ -1375,7 +1375,7 @@ _checkDamage(WWII_SIDE vehSide, ObjectStruct* object, const WEAPON_SERIAL& weapo
 
 	if ( object->facility->type == FACILITY_FIREBASE && weapon.spec.wCategory != _INFANTRY )
 	{
-		betaLog(_FLI, "ignoring %" PR64BitUT " non-infantry damage joules to half-damaged firebase", damageJoules);
+		dbugLog(_FLI, "ignoring %" PR64BitUT " non-infantry damage joules to half-damaged firebase", damageJoules);
 		return 0LL;
 	}
 
@@ -1447,7 +1447,7 @@ strtDamage(const FULL_OBJ_ID fullObjID, SINT64 damageJoules, const WEAPON_SERIAL
 			recordable = false;
 	}
 
-	betaLog(_FLI, "%u doing %" PR64BitT "j+%" PR64BitT "j/%" PR64BitT "j of damage to %s"
+	dbugLog(_FLI, "%u doing %" PR64BitT "j+%" PR64BitT "j/%" PR64BitT "j of damage to %s"
 					, weapon.serial
 					, object->m_damageJoules
 					, damageJoules
@@ -1530,7 +1530,7 @@ strtCaptureFacility(FacilityStruct& facility, WWII_COUNTRY taker, WWII_COUNTRY h
 	if ( facility.isRDPFactory() && takerSide == facility.originalSide )
 		taker = facility.originalCountry;
 
-	betaLog(_FLI, "%s(%s, %d, %d, %d, %d)", __FUNCTION__, facility.name, taker, holder, force, quietly);
+	dbugLog(_FLI, "%s(%s, %d, %d, %d, %d)", __FUNCTION__, facility.name, taker, holder, force, quietly);
 
 	// Disallow capture without an objective, unless
 	// the caller is really sure they this doing, and
@@ -1565,7 +1565,7 @@ strtCaptureFacility(FacilityStruct& facility, WWII_COUNTRY taker, WWII_COUNTRY h
 bool
 strtConvertFacility(FacilityStruct& facility, WWII_COUNTRY toCountry, bool force, bool quietly)
 {
-	betaLog(_FLI, "converting %s from %d->%d [%s][%s]"
+	dbugLog(_FLI, "converting %s from %d->%d [%s][%s]"
 					, facility.name
 					, facility.country
 					, toCountry
@@ -1576,7 +1576,7 @@ strtConvertFacility(FacilityStruct& facility, WWII_COUNTRY toCountry, bool force
 	if ( facility.country == toCountry && force )
 	{
 		// Quietly force conversion
-		betaLog(_FLI, "conversion needs to be forced, so it will be quiet");
+		dbugLog(_FLI, "conversion needs to be forced, so it will be quiet");
 		strtCaptureFacility(facility, toCountry, facility.country, true, true);
 		return true;
 	}

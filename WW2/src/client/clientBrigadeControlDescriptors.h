@@ -19,7 +19,8 @@ struct BrigadeControlDescriptor
 		arg1(L"<undef1>"),
 		arg2(L"<undef2>"),
 		arg3(L"<undef3>"),
-		arg4(L"<undef4>")
+		arg4(L"<undef4>"),
+		major_broadcast(false)
 	{
 		label += l;
 
@@ -44,6 +45,8 @@ struct BrigadeControlDescriptor
 	std::wstring arg2;
 	std::wstring arg3;
 	std::wstring arg4;
+
+	bool major_broadcast;
 };
 
 struct BCD_OfficerBrigade : public BrigadeControlDescriptor
@@ -145,7 +148,13 @@ struct BCD_Objective : public BrigadeControlDescriptor
 			case BrigadeControlNotice::REQ_DEFEND:
 			{
 				label += (bcn->m_action == BrigadeControlNotice::REQ_ATTACK) ? ".attack": ".defend";
-				label += (target && target->StratType() == SDM_CP_BRIDGE) ? ".bridge": ".cp";
+				if ( target && target->StratType() == SDM_CP_BRIDGE ) {
+					label += ".bridge";
+				} else {
+					label += ".cp";
+					if ( strcmp(l, "objective") == 0 ) // HACK: Proposal/veto messages aren't major.
+						major_broadcast = true;
+				}
 			}
 			break;
 			case BrigadeControlNotice::REQ_CLEAR:

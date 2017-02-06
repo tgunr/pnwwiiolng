@@ -39,10 +39,6 @@ void sysmainCommandLine(int argc, const char** argv)
 	_argc = argc;
 	_argv = argv;
 
-#if RELEASE_CLIENT == 0
-	HasKeyFile = 1;
-#endif
-
 	mngoptParse((char *)"");
 }
 

@@ -107,7 +107,7 @@ _banSuccess(void* data)
 
 	if ( ban->m_duration == 0 )
 	{
-		betaLog(_FLI, "p:%u issuing smite on playerID", ban->m_playerID);
+		dbugLog(_FLI, "p:%u issuing smite on playerID", ban->m_playerID);
 		chatSmitePlayer(ban->m_playerID);
 	}
 	else

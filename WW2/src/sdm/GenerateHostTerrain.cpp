@@ -6,9 +6,8 @@
  *  Copyright 2011 Playnet Inc. All rights reserved.
  *
  */
-#ifdef MAKE_HOST_TERRAIN
-
 #include <syscfg.h> // Path is project specific.
+#ifdef MAKE_HOST_TERRAIN
 #include "GenerateHostTerrain.h"
 #include "sdm.h"
 #include <limits.h>

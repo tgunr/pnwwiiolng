@@ -29,7 +29,7 @@ enum WP_TYPE
 ,	WPT_MOBILESPAWN					// Mobile spawn
 ,	WPT_SUPPLY						// Supply Point
 ,	WPT_AMMO						// Ammo request
-,	WPT_MORTAR						// requested mortar attack
+,	WPT_BOMB						// requested bombardment attack
 ,	WPT_EAI							// enemy ai
 ,	WPT_FAI							// friendly ai
 ,	WPT_DEATH						// death
