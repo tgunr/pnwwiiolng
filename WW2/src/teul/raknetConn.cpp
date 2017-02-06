@@ -131,7 +131,9 @@ bool RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
 	ENDPOINT *ep = teulGetEndpoint(teulIndex);
 	if (ep != nullptr)
 	{
-		
+		// basically a keep alive
+		m_peer->SetOccasionalPing(true);
+
 		if (CONNECTION_ATTEMPT_STARTED != m_peer->Connect(teulGetAddress(ep->destAddress()), ep->destPort(), 0, 0, &pk))
 		{
 			m_isConnected = false;
