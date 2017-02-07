@@ -3011,7 +3011,7 @@ static void _drawScene(OBJECT* o)
     {
         obdrawApplyBumpmapTextureStage(o);
 
-        piRenderScene(piPT_TRIANGLELIST, piVT_CVERTEX, o->ptverts, o->numtverts);
+//        piRenderScene(piPT_TRIANGLELIST, piVT_CVERTEX, o->ptverts, o->numtverts);
 
         obdrawReleaseBumpmapTextureStage(o);
     }
