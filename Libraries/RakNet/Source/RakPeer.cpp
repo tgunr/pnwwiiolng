@@ -53,6 +53,8 @@
 #include "SuperFastHash.h"
 #include "RakAlloca.h"
 #include "WSAStartupSingleton.h"
+#include "cat/crypt/tunnel/EasyHandshake.hpp"
+#include "cat/crypt/tunnel/KeyAgreement.hpp"
 
 #ifdef USE_THREADED_SEND
 #include "SendToThread.h"
@@ -759,7 +761,7 @@ StartupResult RakPeer::Startup( unsigned int maxConnections, SocketDescriptor *s
 // If the private keys are 0, then a new key will be generated when this function is called
 // bRequireClientKey: Should be set to false for most servers.  Allows the server to accept a public key from connecting clients as a proof of identity but eats twice as much CPU time as a normal connection
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool RakPeer::InitializeSecurity(const char *public_key, const char *private_key, bool bRequireClientKey)
+bool RakPeer::InitializeSecurity(cat::TunnelKeyPair &p_pair, bool bRequireClientKey)
 {
 #if LIBCAT_SECURITY==1
 	if ( endThreads == false )
@@ -786,13 +788,13 @@ bool RakPeer::InitializeSecurity(const char *public_key, const char *private_key
 	CAT_AUDIT_PRINTF("AUDIT: Created new cookie jar %x\n", _cookie_jar);
 	CAT_AUDIT_PRINTF("AUDIT: Running _server_handshake->Initialize()\n");
 
-	if (_server_handshake->Initialize(public_key, private_key))
+	if (_server_handshake->Initialize(p_pair))
 	{
 		CAT_AUDIT_PRINTF("AUDIT: Successfully initialized, filling cookie jar with goodies, storing public key and setting using security flag to true\n");
 
 		_server_handshake->FillCookieJar(_cookie_jar);
 
-		memcpy(my_public_key, public_key, sizeof(my_public_key));
+		memcpy(my_public_key, p_pair.GetPublicKey(), sizeof(my_public_key));
 
 		_using_security = true;
 		return true;
@@ -3190,16 +3192,16 @@ int RakPeer::GetIndexFromGuid( const RakNetGUID guid )
 }
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #if LIBCAT_SECURITY==1
-bool RakPeer::GenerateConnectionRequestChallenge(RequestedConnectionStruct *rcs,PublicKey *publicKey)
+bool RakPeer::GenerateConnectionRequestChallenge(RequestedConnectionStruct *rcs, PublicKey *remotePublicKey, cat::TunnelKeyPair *keyPair)
 {
 	CAT_AUDIT_PRINTF("AUDIT: In GenerateConnectionRequestChallenge()\n");
 
 	rcs->client_handshake = 0;
 	rcs->publicKeyMode = PKM_INSECURE_CONNECTION;
 
-	if (!publicKey) return true;
+	if (!keyPair) return true;
 
-	switch (publicKey->publicKeyMode)
+	switch (remotePublicKey->publicKeyMode)
 	{
 	default:
 	case PKM_INSECURE_CONNECTION:
@@ -3213,49 +3215,57 @@ bool RakPeer::GenerateConnectionRequestChallenge(RequestedConnectionStruct *rcs,
 		break;
 
 	case PKM_USE_TWO_WAY_AUTHENTICATION:
-		if (publicKey->myPublicKey == 0 || publicKey->myPrivateKey == 0 ||
-			publicKey->remoteServerPublicKey == 0)
+	{
+		cat::TunnelPublicKey pubKey(*keyPair);
+
+		if (keyPair == 0 || pubKey.GetPublicKey() == 0 || keyPair->GetPrivateKey() == 0 ||
+			remotePublicKey->remoteServerPublicKey == 0)
 		{
 			return false;
 		}
 
 		rcs->client_handshake = RakNet::OP_NEW<cat::ClientEasyHandshake>(_FILE_AND_LINE_);
-		memcpy(rcs->remote_public_key, publicKey->remoteServerPublicKey, cat::EasyHandshake::PUBLIC_KEY_BYTES);
+		memcpy(rcs->remote_public_key, remotePublicKey->remoteServerPublicKey, cat::EasyHandshake::PUBLIC_KEY_BYTES);
 
-		if (!rcs->client_handshake->Initialize(publicKey->remoteServerPublicKey) ||
-			!rcs->client_handshake->SetIdentity(publicKey->myPublicKey, publicKey->myPrivateKey) ||
+		if (!rcs->client_handshake->Initialize(pubKey) ||
+			!rcs->client_handshake->SetIdentity(*keyPair) ||
 			!rcs->client_handshake->GenerateChallenge(rcs->handshakeChallenge))
 		{
 			CAT_AUDIT_PRINTF("AUDIT: Failure initializing new client_handshake object with identity for this RequestedConnectionStruct\n");
-			RakNet::OP_DELETE(rcs->client_handshake,_FILE_AND_LINE_);
-			rcs->client_handshake=0;
+			RakNet::OP_DELETE(rcs->client_handshake, _FILE_AND_LINE_);
+			rcs->client_handshake = 0;
 			return false;
 		}
 
 		CAT_AUDIT_PRINTF("AUDIT: Success initializing new client handshake object with identity for this RequestedConnectionStruct -- pre-generated challenge\n");
 
 		rcs->publicKeyMode = PKM_USE_TWO_WAY_AUTHENTICATION;
+	}
 		break;
 
 	case PKM_USE_KNOWN_PUBLIC_KEY:
-		if (publicKey->remoteServerPublicKey == 0)
+	{
+		cat::TunnelPublicKey pubKey(remotePublicKey->remoteServerPublicKey, cat::EasyHandshake::PUBLIC_KEY_BYTES);
+
+		if (remotePublicKey->remoteServerPublicKey == 0)
 			return false;
 
 		rcs->client_handshake = RakNet::OP_NEW<cat::ClientEasyHandshake>(_FILE_AND_LINE_);
-		memcpy(rcs->remote_public_key, publicKey->remoteServerPublicKey, cat::EasyHandshake::PUBLIC_KEY_BYTES);
+		memcpy(rcs->remote_public_key, remotePublicKey->remoteServerPublicKey, cat::EasyHandshake::PUBLIC_KEY_BYTES);
 
-		if (!rcs->client_handshake->Initialize(publicKey->remoteServerPublicKey) ||
+		if (!rcs->client_handshake->Initialize(pubKey) ||
 			!rcs->client_handshake->GenerateChallenge(rcs->handshakeChallenge))
 		{
 			CAT_AUDIT_PRINTF("AUDIT: Failure initializing new client_handshake object for this RequestedConnectionStruct\n");
-			RakNet::OP_DELETE(rcs->client_handshake,_FILE_AND_LINE_);
-			rcs->client_handshake=0;
+			RakNet::OP_DELETE(rcs->client_handshake, _FILE_AND_LINE_);
+			rcs->client_handshake = 0;
 			return false;
 		}
 
 		CAT_AUDIT_PRINTF("AUDIT: Success initializing new client handshake object for this RequestedConnectionStruct -- pre-generated challenge\n");
 
 		rcs->publicKeyMode = PKM_USE_KNOWN_PUBLIC_KEY;
+	}
 		break;
 	}
 
@@ -3263,12 +3273,12 @@ bool RakPeer::GenerateConnectionRequestChallenge(RequestedConnectionStruct *rcs,
 }
 #endif
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-ConnectionAttemptResult RakPeer::SendConnectionRequest( const char* host, unsigned short remotePort, const char *passwordData, int passwordDataLength, PublicKey *publicKey, unsigned connectionSocketIndex, unsigned int extraData, unsigned sendConnectionAttemptCount, unsigned timeBetweenSendConnectionAttemptsMS, RakNet::TimeMS timeoutTime )
+ConnectionAttemptResult RakPeer::SendConnectionRequest(const char* host, unsigned short remotePort, const char *passwordData, int passwordDataLength, PublicKey *publicKey, unsigned connectionSocketIndex, unsigned int extraData, unsigned sendConnectionAttemptCount, unsigned timeBetweenSendConnectionAttemptsMS, RakNet::TimeMS timeoutTime)
 {
 	RakAssert(passwordDataLength <= 256);
-	RakAssert(remotePort!=0);
+	RakAssert(remotePort != 0);
 	SystemAddress systemAddress;
-	if (!systemAddress.FromStringExplicitPort(host,remotePort,socketList[connectionSocketIndex]->GetBoundAddress().GetIPVersion()))
+	if (!systemAddress.FromStringExplicitPort(host, remotePort, socketList[connectionSocketIndex]->GetBoundAddress().GetIPVersion()))
 		return CANNOT_RESOLVE_DOMAIN_NAME;
 
 	// Already connected?
@@ -3278,23 +3288,31 @@ ConnectionAttemptResult RakPeer::SendConnectionRequest( const char* host, unsign
 	//RequestedConnectionStruct *rcs = (RequestedConnectionStruct *) rakMalloc_Ex(sizeof(RequestedConnectionStruct), _FILE_AND_LINE_);
 	RequestedConnectionStruct *rcs = RakNet::OP_NEW<RequestedConnectionStruct>(_FILE_AND_LINE_);
 
-	rcs->systemAddress=systemAddress;
-	rcs->nextRequestTime=RakNet::GetTimeMS();
-	rcs->requestsMade=0;
-	rcs->data=0;
-	rcs->socket=0;
-	rcs->extraData=extraData;
-	rcs->socketIndex=connectionSocketIndex;
-	rcs->actionToTake=RequestedConnectionStruct::CONNECT;
-	rcs->sendConnectionAttemptCount=sendConnectionAttemptCount;
-	rcs->timeBetweenSendConnectionAttemptsMS=timeBetweenSendConnectionAttemptsMS;
+	rcs->systemAddress = systemAddress;
+	rcs->nextRequestTime = RakNet::GetTimeMS();
+	rcs->requestsMade = 0;
+	rcs->data = 0;
+	rcs->socket = 0;
+	rcs->extraData = extraData;
+	rcs->socketIndex = connectionSocketIndex;
+	rcs->actionToTake = RequestedConnectionStruct::CONNECT;
+	rcs->sendConnectionAttemptCount = sendConnectionAttemptCount;
+	rcs->timeBetweenSendConnectionAttemptsMS = timeBetweenSendConnectionAttemptsMS;
 	memcpy(rcs->outgoingPassword, passwordData, passwordDataLength);
-	rcs->outgoingPasswordLength=(unsigned char) passwordDataLength;
-	rcs->timeoutTime=timeoutTime;
+	rcs->outgoingPasswordLength = (unsigned char)passwordDataLength;
+	rcs->timeoutTime = timeoutTime;
 
 #if LIBCAT_SECURITY==1
 	CAT_AUDIT_PRINTF("AUDIT: In SendConnectionRequest()\n");
-	if (!GenerateConnectionRequestChallenge(rcs,publicKey))
+	cat::TunnelKeyPair *p_pair = 0;
+	if (publicKey->myPrivateKey != 0 && publicKey->myPublicKey != 0)
+	{
+		char localPairMem[cat::KeyAgreementCommon::MAX_BYTES * 3];
+		strncpy(localPairMem, publicKey->myPublicKey, cat::EasyHandshake::PUBLIC_KEY_BYTES);
+		strncpy(localPairMem + cat::EasyHandshake::PUBLIC_KEY_BYTES * 2, publicKey->myPrivateKey, cat::EasyHandshake::PRIVATE_KEY_BYTES);
+		p_pair = new cat::TunnelKeyPair(localPairMem, cat::KeyAgreementCommon::MAX_BYTES * 3);
+	}
+	if (!GenerateConnectionRequestChallenge(rcs,publicKey, p_pair))
 		return SECURITY_INITIALIZATION_FAILED;
 #else
 	(void) publicKey;
@@ -4774,8 +4792,9 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 
 						if (rcs->publicKeyMode==PKM_ACCEPT_ANY_PUBLIC_KEY)
 						{
+							cat::TunnelPublicKey pubKey(public_key, cat::EasyHandshake::PUBLIC_KEY_BYTES);
 							memcpy(rcs->remote_public_key, public_key, cat::EasyHandshake::PUBLIC_KEY_BYTES);
-							if (!rcs->client_handshake->Initialize(public_key) ||
+							if (!rcs->client_handshake->Initialize(pubKey) ||
 								!rcs->client_handshake->GenerateChallenge(rcs->handshakeChallenge))
 							{
 								CAT_AUDIT_PRINTF("AUDIT: Server passed a bad public key with PKM_ACCEPT_ANY_PUBLIC_KEY");

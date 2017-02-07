@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "cat/crypt/tunnel/EasyHandshake.hpp"
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -92,7 +93,13 @@ bool RakNetCommandParser::OnCommand(const char *command, unsigned numParameters,
 	}
 	else if (strcmp(command, "InitializeSecurity")==0)
 	{
-		ReturnResult(peer->InitializeSecurity(parameterList[0],parameterList[1]), command, transport, systemAddress);
+		// Need to create a key pair from the public/private keys provided
+		char load_mem[cat::EasyHandshake::PUBLIC_KEY_BYTES * 3];
+		memcpy(load_mem, parameterList[0], cat::EasyHandshake::PUBLIC_KEY_BYTES * 2);
+		memcpy(load_mem + cat::EasyHandshake::PUBLIC_KEY_BYTES * 2, parameterList[1], cat::EasyHandshake::PUBLIC_KEY_BYTES);
+		cat::TunnelKeyPair m_pair(load_mem, sizeof(load_mem));
+
+		ReturnResult(peer->InitializeSecurity(m_pair), command, transport, systemAddress);
 	}
 	else if (strcmp(command, "DisableSecurity")==0)
 	{

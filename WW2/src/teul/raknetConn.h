@@ -20,7 +20,6 @@ using namespace cat;
 
 class AddressOrGUID;
 class RakPeerInterface;
-class EasyHandshake;
 class TunnelKeyPair;
 
 class RakNetChannel
@@ -34,7 +33,6 @@ public:
 		m_endpoint = endpoint;
 		m_initialized = false;
 		m_isConnected = false;  // client notion only
-		init();
 	}
 
 	bool init();
@@ -58,6 +56,8 @@ private:
 
 	class RakNet::RakPeerInterface *m_peer;
 	RakNet::RPC4 m_rpc;
+
+	cat::ServerEasyHandshake m_handshake;
 
 	UCHAR m_packedPublicKey[cat::EasyHandshake::PUBLIC_KEY_BYTES];
 	cat::TunnelKeyPair m_pair;

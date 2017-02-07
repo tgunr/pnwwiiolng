@@ -573,6 +573,7 @@ teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL pr
 	if (initBackChannel)
 	{
 		newEndpoint->m_pairdUdpConn = new RakNetChannel(listening, port, newEndpoint);
+		newEndpoint->m_pairdUdpConn->init();
 	}
 
 

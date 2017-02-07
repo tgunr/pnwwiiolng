@@ -86,7 +86,7 @@ public:
 	/// \param[in] publicKey A pointer to the public key for accepting new connections
 	/// \param[in] privateKey A pointer to the private key for accepting new connections
 	/// \param[in] bRequireClientKey: Should be set to false for most servers.  Allows the server to accept a public key from connecting clients as a proof of identity but eats twice as much CPU time as a normal connection
-	bool InitializeSecurity( const char *publicKey, const char *privateKey, bool bRequireClientKey = false );
+	bool InitializeSecurity(cat::TunnelKeyPair &key_pair, bool bRequireClientKey = false );
 
 	/// Disables security for incoming connections.
 	/// \note Must be called while offline
@@ -855,7 +855,7 @@ protected:
 #endif
 	};
 #if LIBCAT_SECURITY==1
-	bool GenerateConnectionRequestChallenge(RequestedConnectionStruct *rcs,PublicKey *publicKey);
+	bool GenerateConnectionRequestChallenge(RequestedConnectionStruct *rcs, PublicKey *remotePublicKey, cat::TunnelKeyPair *pair = 0);
 #endif
 
 	//DataStructures::List<DataStructures::List<MemoryBlock>* > automaticVariableSynchronizationList;

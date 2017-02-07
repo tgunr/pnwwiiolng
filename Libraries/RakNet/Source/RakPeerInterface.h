@@ -24,6 +24,7 @@
 #include "DS_List.h"
 #include "RakNetSmartPtr.h"
 #include "RakNetSocket2.h"
+#include "cat/crypt/tunnel/Keys.hpp"
 
 namespace RakNet
 {
@@ -72,7 +73,7 @@ public:
 	/// \param[in] publicKey A pointer to the public key for accepting new connections
 	/// \param[in] privateKey A pointer to the private key for accepting new connections
 	/// \param[in] bRequireClientKey: Should be set to false for most servers.  Allows the server to accept a public key from connecting clients as a proof of identity but eats twice as much CPU time as a normal connection
-	virtual bool InitializeSecurity( const char *publicKey, const char *privateKey, bool bRequireClientKey = false )=0;
+	virtual bool InitializeSecurity( cat::TunnelKeyPair &key_pair, bool bRequireClientKey = false )=0;
 
 	/// Disables security for incoming connections.
 	/// \note Must be called while offline

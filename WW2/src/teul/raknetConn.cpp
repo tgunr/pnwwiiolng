@@ -21,13 +21,13 @@
 #include "teul/teulConstants.h"
 #include "SecureHandshake.h" 
 #include "cat/crypt/tunnel/Keys.hpp"
+#include "cat/math/BigTwistedEdwards.hpp"
+#include "cat/crypt/rand/Fortuna.hpp"
 
 extern IP_ENDPOINT_MAP ipToEndPoint;
 
 typedef std::map<UINT32, SystemAddress> IP_SYS_MAP;
 static IP_SYS_MAP ipToSysMap;
-
-cat::EasyHandshake m_handshake;
 
 void RakNetChannel::_addHost(UINT32 ip, const SystemAddress address)
 {
@@ -56,15 +56,12 @@ bool RakNetChannel::init()
 	m_peer = RakNet::RakPeerInterface::GetInstance();
 	if (m_peer != nullptr)
 	{
-		
 		// for servers only we generate the public/private key
-		if (!m_isServer || m_handshake.GenerateServerKey(m_pair))
+		if (!m_isServer || m_handshake.GenerateServerKey(m_pair))  // .generateKeys())
 		{
 
 			// Initialize with the key pair
-			if (!m_isServer || m_peer->InitializeSecurity(
-				reinterpret_cast<char *>(m_pair.GetPublicKey()), 
-				reinterpret_cast<char *>(m_pair.GetPrivateKey()),
+			if (!m_isServer || m_peer->InitializeSecurity( m_pair,
 				false))
 			{
 
@@ -247,3 +244,4 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
 
 	return (result > 0);
 }
+

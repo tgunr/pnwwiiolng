@@ -2316,7 +2316,8 @@ void ReliabilityLayer::SendBitStream( RakNetSocket2 *s, SystemAddress &systemAdd
 
 		// Verify there is enough room for encrypted output and encrypt
 		// Encrypt() will increase length
-		bool success = auth_enc.Encrypt(buffer, buffer_size, length);
+		static unsigned long long nextIv = 0;
+		bool success = auth_enc.Encrypt(nextIv, buffer, buffer_size);
 		RakAssert(success);
 	}
 #endif

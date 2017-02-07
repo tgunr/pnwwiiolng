@@ -206,6 +206,8 @@ class CAT_EXPORT EasyHandshake : public RefSingleton<EasyHandshake>
 protected:
 	// Normally these would be created per-thread.
 	// To free memory associated with these objects just delete them.
+
+	// this was being overshadowed by the parent classes and never initialized anyway because OnInitialized is never called
 	TunnelTLS *_tls;
 
 public:
@@ -238,7 +240,9 @@ public:
 class CAT_EXPORT ServerEasyHandshake : public EasyHandshake
 {
 	KeyAgreementResponder _tun_server;
-	TunnelTLS *_tls;
+
+	// This was shadowing the base class - can't be right
+	//TunnelTLS *_tls;
 
 public:
 	ServerEasyHandshake();
@@ -270,7 +274,9 @@ public:
 class CAT_EXPORT ClientEasyHandshake : public EasyHandshake
 {
 	KeyAgreementInitiator _tun_client;
-	TunnelTLS *_tls;
+
+	// This was shadowing the base class - can't be right
+	//TunnelTLS *_tls;
 
 public:
 	ClientEasyHandshake();

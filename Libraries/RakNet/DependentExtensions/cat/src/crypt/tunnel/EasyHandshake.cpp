@@ -39,7 +39,8 @@ CAT_REF_SINGLETON(EasyHandshake);
 bool EasyHandshake::OnInitialize()
 {
 	_tls = new (std::nothrow) TunnelTLS;
-	return _tls && _tls->Valid();
+
+	return _tls && _tls->TryInitialize() && _tls->Valid();
 }
 
 void EasyHandshake::OnFinalize()

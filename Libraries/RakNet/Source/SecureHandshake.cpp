@@ -14,7 +14,9 @@
 
 #include "NativeFeatureIncludes.h"
 
-#if LIBCAT_SECURITY==1
+#if 0   // Removed for now since we are building the dependent libs ourselves.
+
+//#if LIBCAT_SECURITY==1
 
 // If building a RakNet DLL, be sure to tweak the CAT_EXPORT macro meaning
 #if !defined(_RAKNET_LIB) && defined(_RAKNET_DLL)
@@ -24,12 +26,12 @@
 #endif
 
 #include "cat/src/port/EndianNeutral.cpp"
-#include "cat/src/port/AlignedAlloc.cpp"
+#include "cat/src/mem/AlignedAllocator.cpp"
 #include "cat/src/time/Clock.cpp"
 #include "cat/src/threads/Mutex.cpp"
 #include "cat/src/threads/Thread.cpp"
 #include "cat/src/threads/WaitableFlag.cpp"
-#include "cat/src/hash/MurmurHash2.cpp"
+#include "cat/src/hash/Murmur.cpp"
 #include "cat/src/lang/Strings.cpp"
 
 #include "cat/src/math/BigRTL.cpp"
@@ -55,7 +57,7 @@
 #include "cat/src/crypt/tunnel/AuthenticatedEncryption.cpp"
 #include "cat/src/crypt/tunnel/KeyAgreementInitiator.cpp"
 #include "cat/src/crypt/tunnel/KeyAgreementResponder.cpp"
-#include "cat/src/crypt/tunnel/KeyMaker.cpp"
+#include "cat/src/crypt/tunnel/Keys.cpp"
 
 #include "cat/src/crypt/tunnel/EasyHandshake.cpp"
 
