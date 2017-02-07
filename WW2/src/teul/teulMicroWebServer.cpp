@@ -1087,20 +1087,26 @@ static int _processAndOpenResponseFile(const std::string &rootPath, const std::s
         close(filefd);
         throw WebError(500);
     }
-    if (!S_ISREG(sbuf.st_mode)) {
+
+#if platOS != OS_WIN32
+	if (!S_ISREG(sbuf.st_mode)) {
         dbugLog(_FLW, "uWebServerClient: Only regular files are supported, %s is 0x%x", virtualPath.c_str(), sbuf.st_mode);
         close(filefd);
         throw WebError(403);
     }
+#endif
+
     fileSize = sbuf.st_size;
     return filefd;
 }
 
 static void _tryClientSend(int sock, const void *buffer, size_t buflen)
 {
-    ABORT_IF_EX(buflen > SSIZE_MAX, "Can't send buffers larger than the send result size");
-    
-    ssize_t sendResult = send(sock, buffer, buflen, 0);
+#if platOS != OS_WIN32
+	ABORT_IF_EX(buflen > SSIZE_MAX, "Can't send buffers larger than the send result size");
+#endif
+
+    ssize_t sendResult = send(sock, reinterpret_cast<const char *>(buffer), buflen, 0);
     
     // Blocking socket = no need to check for partial send (well, close enough)
     if (sendResult < static_cast<ssize_t>(buflen)) { // Already range-checked the length so this won't underflow
