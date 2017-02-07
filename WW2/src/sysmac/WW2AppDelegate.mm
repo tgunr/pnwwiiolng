@@ -1087,13 +1087,13 @@ extern NSString *WebActionOriginalURLKey;
             if (! isteulInitialized) {
                 ww2::Client::Init();
                 
-#ifdef DEBUG_WW2
-                dbugSetWriteLevel(Debug::ERR_DBUG);
-                dbugSetLogLevel(Debug::ERR_DBUG);
-#else
+//#ifdef DEBUG_WW2
+//                dbugSetWriteLevel(Debug::ERR_DBUG);
+//                dbugSetLogLevel(Debug::ERR_DBUG);
+//#else
                 dbugSetWriteLevel(Debug::ERR_ABORT);
                 dbugSetLogLevel(Debug::ERR_ABORT);
-#endif
+//#endif
                 authClientInstallCallbacks();
                 isteulInitialized = YES;
             }
