@@ -14,8 +14,11 @@
 #ifdef EVENT_LOG
 
 static std::mutex logLock;
+static SINT32 gLogLevelOnly = LOG_NONE;
+static UINT32 glogMaskOnly = LOG_NONE;
+
 #ifdef DEBUG_WW2
-static UINT32 logMask = LOG_ALL;
+static UINT32 logMask = LOG_UICONSOLE | LOG_VEHICLE;
 static SINT32 logLevel = LOG_DEBUG;
 #else
 static UINT32 logMask = LOG_NONE;
@@ -24,16 +27,47 @@ static SINT32 logLevel = 0;
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker);
 static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker);
+static void logwstr(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* pstr);
+
+struct {
+    const char* prevFile = "";
+    int prevLine = 0;
+    uint count = 0;
+} prevLog ;
 
 /************************************************************************************************
 	Write_Where
 *************************************************************************************************/
 void Write_Where(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, ...) {
-    va_list marker;
-
-    va_start(marker, str);
-    logw(file, line, function, system, level, str, marker);
-    va_end(marker);
+    const char* pstr;
+    if ( (prevLog.prevFile == file) && (prevLog.prevLine == line) ) {
+        switch (prevLog.count) {
+            case 0:
+                pstr = str;
+                prevLog.count += 1;
+                va_list marker;
+                va_start(marker, str);
+                logw(file, line, function, system, level, str, marker);
+                va_end(marker);
+                break;
+            case 1:
+                pstr = "REPEATED";
+                prevLog.count += 1;
+                logwstr(file, line, function, system, level, pstr);
+                break;
+            default:
+                prevLog.count += 1;
+                return;
+        }
+    } else {
+        prevLog.count = 1;
+        va_list marker;
+        va_start(marker, str);
+        logw(file, line, function, system, level, str, marker);
+        va_end(marker);
+    }
+    prevLog.prevFile = file;
+    prevLog.prevLine = line;
 }
 
 /************************************************************************************************
@@ -170,15 +204,82 @@ UINT32 Get_Log_Mask()
 /************************************************************************************************
 	logw
  *************************************************************************************************/
-static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
+static void logwI(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
 {
-    if(logLevel < level || !(system & logMask)) return;
     int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, str);
     char buf[wheresize + 1]; // note +1 for terminating null byte
     snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, str);
     
     vprintf(buf, marker);
     printf("\n");
+}
+
+//struct {
+//    const char* prevFile = "";
+//    int prevLine = 0;
+//    uint count = 0;
+//} prevLog ;
+
+static void lognodup(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
+{
+    char buf[1024];
+    //    char buf[wheresize + 1]; // note +1 for terminating null byte
+    if ( (prevLog.prevFile == file) && (prevLog.prevLine == line) ) {
+        switch (prevLog.count) {
+            case 0:
+                snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, str);
+                prevLog.count += 1;
+                goto printLog;
+            case 1:
+                snprintf(buf, sizeof buf, "%s:%d: %s: ...", file, line, function);
+                prevLog.count += 1;
+                goto printLog;
+            default:
+                prevLog.count += 1;
+                return;
+        }
+    } else {
+        prevLog.count = 1;
+    }
+printLog:
+    vprintf(buf, marker);
+    printf("\n");
+    prevLog.prevFile = file;
+    prevLog.prevLine = line;
+}
+
+static void logwstr(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* pstr)
+{
+    if(gLogLevelOnly && glogMaskOnly) {
+        if ((gLogLevelOnly == level) && (system & glogMaskOnly))
+            goto logwhere;
+    } else {
+        if (logLevel < level || !(system & logMask))
+            return;
+        else
+            goto logwhere;
+    }
+
+logwhere:
+    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, pstr);
+    char buf[wheresize + 1]; // note +1 for terminating null byte
+    snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, pstr);
+    printf("%s\n", buf);
+}
+
+static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
+{
+    if(gLogLevelOnly && glogMaskOnly) {
+        if ((gLogLevelOnly == level) && (system & glogMaskOnly))
+            goto logwhere;
+    } else {
+        if (logLevel < level || !(system & logMask))
+            return;
+        else
+            goto logwhere;
+    }
+logwhere:
+    logwI(file, line, function, system, level, str, marker);
 }
 
 #if platOS == OS_MACOS
