@@ -335,8 +335,8 @@ public:
 		if (endpoint != nullptr) {
 			dbugLog(_FLD, "t:%d (%p) adding to dead endpoints", endpoint->m_teulIndex, endpoint);
 #ifdef DEBUG
-			ABORT_IF_EX( std::find(m_endpoints.begin(), m_endpoints.end(), endpoint) != m_endpoints.end(),
-							"endpoint added to dead endpoints manager twice." );
+//			ABORT_IF_EX( std::find(m_endpoints.begin(), m_endpoints.end(), endpoint) != m_endpoints.end(),
+//							"endpoint added to dead endpoints manager twice." );
 #endif
 			m_endpoints.push_back(endpoint);
 		}
