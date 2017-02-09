@@ -512,8 +512,8 @@ teulEndpointBackchannels()
 			ENDPOINT& endpoint = _endpoints[i];
 			if (endpoint.m_pairdUdpConn != nullptr)
 			{
-				if (endpoint.m_pairdUdpConn->isInitialized() &&
-					endpoint.m_pairdUdpConn->isConnected())
+				if (endpoint.m_pairdUdpConn->isConnected() ||
+					(endpoint.m_pairdUdpConn->isServer() && endpoint.m_pairdUdpConn->isInitialized()) )
 				{
 					endpoint.m_pairdUdpConn->update();
 				}

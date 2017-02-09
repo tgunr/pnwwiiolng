@@ -38,7 +38,7 @@ public:
 	bool init();
 	void release();
 
-	const UCHAR *getPackedPublicKey() { return m_packedPublicKey; }
+	const UCHAR *getPackedPublicKey() { return m_pair.GetPublicKey(); }
 	bool setPublicKey( char *publicKey, SINT32 teulIndex);
 
 	void update();
@@ -59,7 +59,6 @@ private:
 
 	cat::ServerEasyHandshake m_handshake;
 
-	UCHAR m_packedPublicKey[cat::EasyHandshake::PUBLIC_KEY_BYTES];
 	cat::TunnelKeyPair m_pair;
 
 	SocketDescriptor m_sd;
