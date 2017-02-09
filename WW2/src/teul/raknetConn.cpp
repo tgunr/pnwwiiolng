@@ -164,10 +164,6 @@ void RakNetChannel::update()
 			unsigned char packetX = (unsigned char)p->data[0];
 			UINT32 ip = ntohl(p->systemAddress.address.addr4.sin_addr.s_addr);
 
-#ifdef DEV_BUILD
-			dbugLog(_FLD, "cell:%s px:%u", p->systemAddress.ToString(), packetX);
-#endif
-            
 			switch (packetX)
 			{
 			case ID_DISCONNECTION_NOTIFICATION:
@@ -192,7 +188,6 @@ void RakNetChannel::update()
 				dbugLog(_FLW, "Raknet: %s connection lost", p->systemAddress.ToString());
 				break;
 			case ID_USER_PACKET_ENUM:
-				dbugLog(_FLN, "Raknet: Processing incoming packet from %s", p->systemAddress.ToString());
 				processApplicationPacket(p, ip);
 				break;
             case ID_PUBLIC_KEY_MISMATCH:
@@ -215,7 +210,6 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p, UINT32 ip)
 
 	if (sourceEndpoint != nullptr)
 	{
-		dbugLog(_FLN, "Raknet: Received incoming RakNet msg");
 		Teul::PacketHeader* const hdr = reinterpret_cast<Teul::PacketHeader *>(&p->data[1]);
 		TEUL_CALLBACK* const callback = TEUL_CALLBACK::Lookup(hdr->m_callX, hdr->m_callY);
 		if (PN_UNLIKELY(callback == nullptr))

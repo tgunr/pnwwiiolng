@@ -207,6 +207,8 @@ ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 			return packetBytes;
 	}  // fall through if sending failed - transmit via normal path
 
+	packet.header().m_tag = ++this->m_impl->sentTag;
+
 	// Encrypt the data.
 	if (packet.header().packetType() != Teul::Tokens::Unencrypted)
 	{
@@ -335,8 +337,6 @@ Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 					, "tried to re-send a Teul::Packet");
 
 	static_assert( sizeof(header().m_tag) == sizeof(endpoint.m_impl->sentTag), "Endpoint and Packet disagree on tag size" );
-
-	header().m_tag = ++endpoint.m_impl->sentTag;
 
 #if platBuild == BUILD_CLIENT
 	teulSyncClock();
