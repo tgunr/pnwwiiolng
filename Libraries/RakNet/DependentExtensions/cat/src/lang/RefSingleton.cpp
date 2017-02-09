@@ -28,17 +28,25 @@
 
 #include <cat/lang/RefSingleton.hpp>
 #include <cat/threads/Thread.hpp>
+#include <map>
+
 using namespace cat;
+using namespace std;
 
 CAT_SINGLETON(RefSingletons);
 
 //// Mutex
 
-static Mutex m_ref_singleton_mutex;
+typedef std::map<const char *, Mutex *> NAME_MTX_MAP;
+static NAME_MTX_MAP m_ref_singleton_mutex_map;
 
-Mutex &cat::GetRefSingletonMutex()
+Mutex &cat::GetRefSingletonMutex(const char *className)
 {
-	return m_ref_singleton_mutex;
+    if (m_ref_singleton_mutex_map[className] == nullptr)
+    {
+        m_ref_singleton_mutex_map[className] = new Mutex();
+    }
+	return *m_ref_singleton_mutex_map[className];
 }
 
 //// RefSingletonBase
