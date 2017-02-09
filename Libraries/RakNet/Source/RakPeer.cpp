@@ -118,6 +118,8 @@ using namespace RakNet;
 
 static RakNetRandom rnr;
 
+extern bool libCatSecurityEnabled;
+
 /*
 struct RakPeerAndIndex
 {
@@ -194,11 +196,14 @@ STATIC_FACTORY_DEFINITIONS(RakPeerInterface,RakPeer)
 RakPeer::RakPeer()
 {
 #if LIBCAT_SECURITY==1
-	// Encryption and security
-	CAT_AUDIT_PRINTF("AUDIT: Initializing RakPeer security flags: using_security = false, server_handshake = null, cookie_jar = null\n");
-	_using_security = false;
-	_server_handshake = 0;
-	_cookie_jar = 0;
+	if (libCatSecurityEnabled)
+	{
+		// Encryption and security
+		CAT_AUDIT_PRINTF("AUDIT: Initializing RakPeer security flags: using_security = false, server_handshake = null, cookie_jar = null\n");
+		_using_security = false;
+		_server_handshake = 0;
+		_cookie_jar = 0;
+	}
 #endif
 
 	StringCompressor::AddReference();
@@ -332,10 +337,13 @@ RakPeer::~RakPeer()
 	quitAndDataEvents.CloseEvent();
 
 #if LIBCAT_SECURITY==1
-	// Encryption and security
-	CAT_AUDIT_PRINTF("AUDIT: Deleting RakPeer security objects, handshake = %x, cookie jar = %x\n", _server_handshake, _cookie_jar);
-	if (_server_handshake) RakNet::OP_DELETE(_server_handshake,_FILE_AND_LINE_);
-	if (_cookie_jar) RakNet::OP_DELETE(_cookie_jar,_FILE_AND_LINE_);
+	if (libCatSecurityEnabled)
+	{
+		// Encryption and security
+		CAT_AUDIT_PRINTF("AUDIT: Deleting RakPeer security objects, handshake = %x, cookie jar = %x\n", _server_handshake, _cookie_jar);
+		if (_server_handshake) RakNet::OP_DELETE(_server_handshake, _FILE_AND_LINE_);
+		if (_cookie_jar) RakNet::OP_DELETE(_cookie_jar, _FILE_AND_LINE_);
+	}
 #endif
 
 
@@ -764,50 +772,54 @@ StartupResult RakPeer::Startup( unsigned int maxConnections, SocketDescriptor *s
 bool RakPeer::InitializeSecurity(cat::TunnelKeyPair &p_pair, bool bRequireClientKey)
 {
 #if LIBCAT_SECURITY==1
-	if ( endThreads == false )
+	if (libCatSecurityEnabled)
+	{
+
+		if (endThreads == false)
+			return false;
+
+		// Copy client public key requirement flag
+		_require_client_public_key = bRequireClientKey;
+
+		if (_server_handshake)
+		{
+			CAT_AUDIT_PRINTF("AUDIT: Deleting old server_handshake %x\n", _server_handshake);
+			RakNet::OP_DELETE(_server_handshake, _FILE_AND_LINE_);
+		}
+		if (_cookie_jar)
+		{
+			CAT_AUDIT_PRINTF("AUDIT: Deleting old cookie jar %x\n", _cookie_jar);
+			RakNet::OP_DELETE(_cookie_jar, _FILE_AND_LINE_);
+		}
+
+		_server_handshake = RakNet::OP_NEW<cat::ServerEasyHandshake>(_FILE_AND_LINE_);
+		_cookie_jar = RakNet::OP_NEW<cat::CookieJar>(_FILE_AND_LINE_);
+
+		CAT_AUDIT_PRINTF("AUDIT: Created new server_handshake %x\n", _server_handshake);
+		CAT_AUDIT_PRINTF("AUDIT: Created new cookie jar %x\n", _cookie_jar);
+		CAT_AUDIT_PRINTF("AUDIT: Running _server_handshake->Initialize()\n");
+
+		if (_server_handshake->Initialize(p_pair))
+		{
+			CAT_AUDIT_PRINTF("AUDIT: Successfully initialized, filling cookie jar with goodies, storing public key and setting using security flag to true\n");
+
+			_server_handshake->FillCookieJar(_cookie_jar);
+
+			memcpy(my_public_key, p_pair.GetPublicKey(), sizeof(my_public_key));
+
+			_using_security = true;
+			return true;
+		}
+
+		CAT_AUDIT_PRINTF("AUDIT: Failure to initialize so deleting server handshake and cookie jar; also setting using_security flag = false\n");
+
+		RakNet::OP_DELETE(_server_handshake, _FILE_AND_LINE_);
+		_server_handshake = 0;
+		RakNet::OP_DELETE(_cookie_jar, _FILE_AND_LINE_);
+		_cookie_jar = 0;
+		_using_security = false;
 		return false;
-
-	// Copy client public key requirement flag
-	_require_client_public_key = bRequireClientKey;
-
-	if (_server_handshake)
-	{
-		CAT_AUDIT_PRINTF("AUDIT: Deleting old server_handshake %x\n", _server_handshake);
-		RakNet::OP_DELETE(_server_handshake,_FILE_AND_LINE_);
 	}
-	if (_cookie_jar)
-	{
-		CAT_AUDIT_PRINTF("AUDIT: Deleting old cookie jar %x\n", _cookie_jar);
-		RakNet::OP_DELETE(_cookie_jar,_FILE_AND_LINE_);
-	}
-
-	_server_handshake = RakNet::OP_NEW<cat::ServerEasyHandshake>(_FILE_AND_LINE_);
-	_cookie_jar = RakNet::OP_NEW<cat::CookieJar>(_FILE_AND_LINE_);
-
-	CAT_AUDIT_PRINTF("AUDIT: Created new server_handshake %x\n", _server_handshake);
-	CAT_AUDIT_PRINTF("AUDIT: Created new cookie jar %x\n", _cookie_jar);
-	CAT_AUDIT_PRINTF("AUDIT: Running _server_handshake->Initialize()\n");
-
-	if (_server_handshake->Initialize(p_pair))
-	{
-		CAT_AUDIT_PRINTF("AUDIT: Successfully initialized, filling cookie jar with goodies, storing public key and setting using security flag to true\n");
-
-		_server_handshake->FillCookieJar(_cookie_jar);
-
-		memcpy(my_public_key, p_pair.GetPublicKey(), sizeof(my_public_key));
-
-		_using_security = true;
-		return true;
-	}
-
-	CAT_AUDIT_PRINTF("AUDIT: Failure to initialize so deleting server handshake and cookie jar; also setting using_security flag = false\n");
-
-	RakNet::OP_DELETE(_server_handshake,_FILE_AND_LINE_);
-	_server_handshake=0;
-	RakNet::OP_DELETE(_cookie_jar,_FILE_AND_LINE_);
-	_cookie_jar=0;
-	_using_security = false;
-	return false;
 #else
 	(void) public_key;
 	(void) private_key;
@@ -825,13 +837,17 @@ bool RakPeer::InitializeSecurity(cat::TunnelKeyPair &p_pair, bool bRequireClient
 void RakPeer::DisableSecurity( void )
 {
 #if LIBCAT_SECURITY==1
-	CAT_AUDIT_PRINTF("AUDIT: DisableSecurity() called, so deleting _server_handshake %x and cookie_jar %x\n", _server_handshake, _cookie_jar);
-	RakNet::OP_DELETE(_server_handshake,_FILE_AND_LINE_);
-	_server_handshake=0;
-	RakNet::OP_DELETE(_cookie_jar,_FILE_AND_LINE_);
-	_cookie_jar=0;
+	if (libCatSecurityEnabled)
+	{
 
-	_using_security = false;
+		CAT_AUDIT_PRINTF("AUDIT: DisableSecurity() called, so deleting _server_handshake %x and cookie_jar %x\n", _server_handshake, _cookie_jar);
+		RakNet::OP_DELETE(_server_handshake, _FILE_AND_LINE_);
+		_server_handshake = 0;
+		RakNet::OP_DELETE(_cookie_jar, _FILE_AND_LINE_);
+		_cookie_jar = 0;
+
+		_using_security = false;
+	}
 #endif
 }
 
@@ -1697,8 +1713,12 @@ void RakPeer::CancelConnectionAttempt( const SystemAddress target )
 		if (requestedConnectionQueue[i]->systemAddress==target)
 		{
 #if LIBCAT_SECURITY==1
-			CAT_AUDIT_PRINTF("AUDIT: Deleting requestedConnectionQueue %i client_handshake %x\n", i, requestedConnectionQueue[ i ]->client_handshake);
-			RakNet::OP_DELETE(requestedConnectionQueue[i]->client_handshake, _FILE_AND_LINE_ );
+			if (libCatSecurityEnabled)
+			{
+
+				CAT_AUDIT_PRINTF("AUDIT: Deleting requestedConnectionQueue %i client_handshake %x\n", i, requestedConnectionQueue[i]->client_handshake);
+				RakNet::OP_DELETE(requestedConnectionQueue[i]->client_handshake, _FILE_AND_LINE_);
+			}
 #endif
 			RakNet::OP_DELETE(requestedConnectionQueue[i], _FILE_AND_LINE_ );
 			requestedConnectionQueue.RemoveAtIndex(i);
@@ -2477,40 +2497,43 @@ SystemAddress RakPeer::GetSystemAddressFromGuid( const RakNetGUID input ) const
 bool RakPeer::GetClientPublicKeyFromSystemAddress( const SystemAddress input, char *client_public_key ) const
 {
 #if LIBCAT_SECURITY == 1
-	if (input == UNASSIGNED_SYSTEM_ADDRESS)
-		return false;
-
-	char *copy_source = 0;
-
-	if (input.systemIndex!=(SystemIndex)-1 && input.systemIndex<maximumNumberOfPeers && remoteSystemList[ input.systemIndex ].systemAddress == input)
+	if (libCatSecurityEnabled)
 	{
-		copy_source = remoteSystemList[ input.systemIndex ].client_public_key;
-	}
-	else
-	{
-		for ( unsigned int i = 0; i < maximumNumberOfPeers; i++ )
+
+		if (input == UNASSIGNED_SYSTEM_ADDRESS)
+			return false;
+
+		char *copy_source = 0;
+
+		if (input.systemIndex != (SystemIndex)-1 && input.systemIndex < maximumNumberOfPeers && remoteSystemList[input.systemIndex].systemAddress == input)
 		{
-			if (remoteSystemList[ i ].systemAddress == input )
+			copy_source = remoteSystemList[input.systemIndex].client_public_key;
+		}
+		else
+		{
+			for (unsigned int i = 0; i < maximumNumberOfPeers; i++)
 			{
-				copy_source = remoteSystemList[ i ].client_public_key;
-				break;
+				if (remoteSystemList[i].systemAddress == input)
+				{
+					copy_source = remoteSystemList[i].client_public_key;
+					break;
+				}
+			}
+		}
+
+		if (copy_source)
+		{
+			// Verify that at least one byte in the public key is non-zero to indicate that the key was received
+			for (int ii = 0; ii < cat::EasyHandshake::PUBLIC_KEY_BYTES; ++ii)
+			{
+				if (copy_source[ii] != 0)
+				{
+					memcpy(client_public_key, copy_source, cat::EasyHandshake::PUBLIC_KEY_BYTES);
+					return true;
+				}
 			}
 		}
 	}
-
-	if (copy_source)
-	{
-		// Verify that at least one byte in the public key is non-zero to indicate that the key was received
-		for (int ii = 0; ii < cat::EasyHandshake::PUBLIC_KEY_BYTES; ++ii)
-		{
-			if (copy_source[ii] != 0)
-			{
-				memcpy(client_public_key, copy_source, cat::EasyHandshake::PUBLIC_KEY_BYTES);
-				return true;
-			}
-		}
-	}
-
 #else
 	(void) input;
 	(void) client_public_key;
@@ -3304,17 +3327,21 @@ ConnectionAttemptResult RakPeer::SendConnectionRequest(const char* host, unsigne
 	rcs->timeoutTime = timeoutTime;
 
 #if LIBCAT_SECURITY==1
-	CAT_AUDIT_PRINTF("AUDIT: In SendConnectionRequest()\n");
-	cat::TunnelKeyPair *p_pair = 0;
-	if (publicKey->myPrivateKey != 0 && publicKey->myPublicKey != 0)
+	if (libCatSecurityEnabled)
 	{
-		char localPairMem[cat::KeyAgreementCommon::MAX_BYTES * 3];
-		strncpy(localPairMem, publicKey->myPublicKey, cat::EasyHandshake::PUBLIC_KEY_BYTES);
-		strncpy(localPairMem + cat::EasyHandshake::PUBLIC_KEY_BYTES * 2, publicKey->myPrivateKey, cat::EasyHandshake::PRIVATE_KEY_BYTES);
-		p_pair = new cat::TunnelKeyPair(localPairMem, cat::KeyAgreementCommon::MAX_BYTES * 3);
+
+		CAT_AUDIT_PRINTF("AUDIT: In SendConnectionRequest()\n");
+		cat::TunnelKeyPair *p_pair = 0;
+		if (publicKey->myPrivateKey != 0 && publicKey->myPublicKey != 0)
+		{
+			char localPairMem[cat::KeyAgreementCommon::MAX_BYTES * 3];
+			strncpy(localPairMem, publicKey->myPublicKey, cat::EasyHandshake::PUBLIC_KEY_BYTES);
+			strncpy(localPairMem + cat::EasyHandshake::PUBLIC_KEY_BYTES * 2, publicKey->myPrivateKey, cat::EasyHandshake::PRIVATE_KEY_BYTES);
+			p_pair = new cat::TunnelKeyPair(localPairMem, cat::KeyAgreementCommon::MAX_BYTES * 3);
+		}
+		if (!GenerateConnectionRequestChallenge(rcs, publicKey, p_pair))
+			return SECURITY_INITIALIZATION_FAILED;
 	}
-	if (!GenerateConnectionRequestChallenge(rcs,publicKey, p_pair))
-		return SECURITY_INITIALIZATION_FAILED;
 #else
 	(void) publicKey;
 #endif
@@ -3367,8 +3394,12 @@ ConnectionAttemptResult RakPeer::SendConnectionRequest( const char* host, unsign
 	rcs->socket=socket;
 
 #if LIBCAT_SECURITY==1
-	if (!GenerateConnectionRequestChallenge(rcs,publicKey))
-		return SECURITY_INITIALIZATION_FAILED;
+	if (libCatSecurityEnabled)
+	{
+
+		if (!GenerateConnectionRequestChallenge(rcs, publicKey))
+			return SECURITY_INITIALIZATION_FAILED;
+	}
 #else
 	(void) publicKey;
 #endif
@@ -3475,61 +3506,65 @@ void RakPeer::ParseConnectionRequestPacket( RakPeer::RemoteSystemStruct *remoteS
 	bs.Read(doSecurity);
 
 #if LIBCAT_SECURITY==1
-	unsigned char doClientKey;
-	if (_using_security)
+	if (libCatSecurityEnabled)
 	{
-		// Ignore message on bad state
-		if (doSecurity != 1 || !remoteSystem->reliabilityLayer.GetAuthenticatedEncryption())
-			return;
 
-		// Validate client proof of key
-		unsigned char proof[cat::EasyHandshake::PROOF_BYTES];
-		bs.ReadAlignedBytes(proof, sizeof(proof));
-		if (!remoteSystem->reliabilityLayer.GetAuthenticatedEncryption()->ValidateProof(proof, sizeof(proof)))
+		unsigned char doClientKey;
+		if (_using_security)
 		{
-			remoteSystem->connectMode = RemoteSystemStruct::DISCONNECT_ASAP_SILENTLY;
-			return;
-		}
+			// Ignore message on bad state
+			if (doSecurity != 1 || !remoteSystem->reliabilityLayer.GetAuthenticatedEncryption())
+				return;
 
-		CAT_OBJCLR(remoteSystem->client_public_key);
-
-		bs.Read(doClientKey);
-
-		// Check if client wants to prove identity
-		if (doClientKey == 1)
-		{
-			// Read identity proof
-			unsigned char ident[cat::EasyHandshake::IDENTITY_BYTES];
-			bs.ReadAlignedBytes(ident, sizeof(ident));
-
-			// If we are listening to these proofs,
-			if (_require_client_public_key)
+			// Validate client proof of key
+			unsigned char proof[cat::EasyHandshake::PROOF_BYTES];
+			bs.ReadAlignedBytes(proof, sizeof(proof));
+			if (!remoteSystem->reliabilityLayer.GetAuthenticatedEncryption()->ValidateProof(proof, sizeof(proof)))
 			{
-				// Validate client identity
-				if (!_server_handshake->VerifyInitiatorIdentity(remoteSystem->answer, ident, remoteSystem->client_public_key))
+				remoteSystem->connectMode = RemoteSystemStruct::DISCONNECT_ASAP_SILENTLY;
+				return;
+			}
+
+			CAT_OBJCLR(remoteSystem->client_public_key);
+
+			bs.Read(doClientKey);
+
+			// Check if client wants to prove identity
+			if (doClientKey == 1)
+			{
+				// Read identity proof
+				unsigned char ident[cat::EasyHandshake::IDENTITY_BYTES];
+				bs.ReadAlignedBytes(ident, sizeof(ident));
+
+				// If we are listening to these proofs,
+				if (_require_client_public_key)
+				{
+					// Validate client identity
+					if (!_server_handshake->VerifyInitiatorIdentity(remoteSystem->answer, ident, remoteSystem->client_public_key))
+					{
+						RakNet::BitStream bitStream;
+						bitStream.Write((MessageID)ID_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY); // Report an error since the client is not providing an identity when it is necessary to connect
+						bitStream.Write((unsigned char)2); // Indicate client identity is invalid
+						SendImmediate((char*)bitStream.GetData(), bitStream.GetNumberOfBytesUsed(), IMMEDIATE_PRIORITY, RELIABLE, 0, systemAddress, false, false, RakNet::GetTimeUS(), 0);
+						remoteSystem->connectMode = RemoteSystemStruct::DISCONNECT_ASAP_SILENTLY;
+						return;
+					}
+				}
+
+				// Otherwise ignore the client public key
+			}
+			else
+			{
+				// If no client key was provided but it is required,
+				if (_require_client_public_key)
 				{
 					RakNet::BitStream bitStream;
 					bitStream.Write((MessageID)ID_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY); // Report an error since the client is not providing an identity when it is necessary to connect
-					bitStream.Write((unsigned char)2); // Indicate client identity is invalid
-					SendImmediate((char*) bitStream.GetData(), bitStream.GetNumberOfBytesUsed(), IMMEDIATE_PRIORITY, RELIABLE, 0, systemAddress, false, false, RakNet::GetTimeUS(), 0);
+					bitStream.Write((unsigned char)1); // Indicate client identity is missing
+					SendImmediate((char*)bitStream.GetData(), bitStream.GetNumberOfBytesUsed(), IMMEDIATE_PRIORITY, RELIABLE, 0, systemAddress, false, false, RakNet::GetTimeUS(), 0);
 					remoteSystem->connectMode = RemoteSystemStruct::DISCONNECT_ASAP_SILENTLY;
 					return;
 				}
-			}
-
-			// Otherwise ignore the client public key
-		}
-		else
-		{
-			// If no client key was provided but it is required,
-			if (_require_client_public_key)
-			{
-				RakNet::BitStream bitStream;
-				bitStream.Write((MessageID)ID_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY); // Report an error since the client is not providing an identity when it is necessary to connect
-				bitStream.Write((unsigned char)1); // Indicate client identity is missing
-				SendImmediate((char*) bitStream.GetData(), bitStream.GetNumberOfBytesUsed(), IMMEDIATE_PRIORITY, RELIABLE, 0, systemAddress, false, false, RakNet::GetTimeUS(), 0);
-				remoteSystem->connectMode = RemoteSystemStruct::DISCONNECT_ASAP_SILENTLY;
-				return;
 			}
 		}
 	}
@@ -4463,8 +4498,12 @@ void RakPeer::ClearRequestedConnectionList(void)
 	for (i=0; i < freeQueue.Size(); i++)
 	{
 #if LIBCAT_SECURITY==1
-		CAT_AUDIT_PRINTF("AUDIT: In ClearRequestedConnectionList(), Deleting freeQueue index %i client_handshake %x\n", i, freeQueue[i]->client_handshake);
-		RakNet::OP_DELETE(freeQueue[i]->client_handshake,_FILE_AND_LINE_);
+		if (libCatSecurityEnabled)
+		{
+
+			CAT_AUDIT_PRINTF("AUDIT: In ClearRequestedConnectionList(), Deleting freeQueue index %i client_handshake %x\n", i, freeQueue[i]->client_handshake);
+			RakNet::OP_DELETE(freeQueue[i]->client_handshake, _FILE_AND_LINE_);
+		}
 #endif
 		RakNet::OP_DELETE(freeQueue[i], _FILE_AND_LINE_ );
 	}
@@ -4788,50 +4827,58 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 					if (serverHasSecurity)
 					{
 #if LIBCAT_SECURITY==1
-						unsigned char public_key[cat::EasyHandshake::PUBLIC_KEY_BYTES];
-						bsIn.ReadAlignedBytes(public_key, sizeof(public_key));
-
-						if (rcs->publicKeyMode==PKM_ACCEPT_ANY_PUBLIC_KEY)
+						if (libCatSecurityEnabled)
 						{
-							cat::TunnelPublicKey pubKey(public_key, cat::EasyHandshake::PUBLIC_KEY_BYTES);
-							memcpy(rcs->remote_public_key, public_key, cat::EasyHandshake::PUBLIC_KEY_BYTES);
-							if (!rcs->client_handshake->Initialize(pubKey) ||
-								!rcs->client_handshake->GenerateChallenge(rcs->handshakeChallenge))
+
+							unsigned char public_key[cat::EasyHandshake::PUBLIC_KEY_BYTES];
+							bsIn.ReadAlignedBytes(public_key, sizeof(public_key));
+
+							if (rcs->publicKeyMode == PKM_ACCEPT_ANY_PUBLIC_KEY)
 							{
-								CAT_AUDIT_PRINTF("AUDIT: Server passed a bad public key with PKM_ACCEPT_ANY_PUBLIC_KEY");
+								cat::TunnelPublicKey pubKey(public_key, cat::EasyHandshake::PUBLIC_KEY_BYTES);
+								memcpy(rcs->remote_public_key, public_key, cat::EasyHandshake::PUBLIC_KEY_BYTES);
+								if (!rcs->client_handshake->Initialize(pubKey) ||
+									!rcs->client_handshake->GenerateChallenge(rcs->handshakeChallenge))
+								{
+									CAT_AUDIT_PRINTF("AUDIT: Server passed a bad public key with PKM_ACCEPT_ANY_PUBLIC_KEY");
+									return true;
+								}
+							}
+
+							if (cat::SecureEqual(public_key,
+								rcs->remote_public_key,
+								cat::EasyHandshake::PUBLIC_KEY_BYTES) == false)
+							{
+								rakPeer->requestedConnectionQueueMutex.Unlock();
+								CAT_AUDIT_PRINTF("AUDIT: Expected public key does not match what was sent by server -- Reporting back ID_PUBLIC_KEY_MISMATCH to user\n");
+
+								packet = rakPeer->AllocPacket(sizeof(char), _FILE_AND_LINE_);
+								packet->data[0] = ID_PUBLIC_KEY_MISMATCH; // Attempted a connection and couldn't
+								packet->bitSize = (sizeof(char) * 8);
+								packet->systemAddress = rcs->systemAddress;
+								packet->guid = serverGuid;
+								rakPeer->AddPacketToProducer(packet);
 								return true;
 							}
-						}
 
-						if (cat::SecureEqual(public_key,
-							rcs->remote_public_key,
-							cat::EasyHandshake::PUBLIC_KEY_BYTES)==false)
-						{
-							rakPeer->requestedConnectionQueueMutex.Unlock();
-							CAT_AUDIT_PRINTF("AUDIT: Expected public key does not match what was sent by server -- Reporting back ID_PUBLIC_KEY_MISMATCH to user\n");
-
-							packet=rakPeer->AllocPacket(sizeof( char ), _FILE_AND_LINE_);
-							packet->data[ 0 ] = ID_PUBLIC_KEY_MISMATCH; // Attempted a connection and couldn't
-							packet->bitSize = ( sizeof( char ) * 8);
-							packet->systemAddress = rcs->systemAddress;
-							packet->guid=serverGuid;
-							rakPeer->AddPacketToProducer(packet);
-							return true;
-						}
-
-						if (rcs->client_handshake==0)
-						{
-							// Message does not contain a challenge
-							// We might still pass if we are in the security exception list
-							bsOut.Write((unsigned char)0);
+							if (rcs->client_handshake == 0)
+							{
+								// Message does not contain a challenge
+								// We might still pass if we are in the security exception list
+								bsOut.Write((unsigned char)0);
+							}
+							else
+							{
+								// Message contains a challenge
+								bsOut.Write((unsigned char)1);
+								// challenge
+								CAT_AUDIT_PRINTF("AUDIT: Sending challenge\n");
+								bsOut.WriteAlignedBytes((const unsigned char*)rcs->handshakeChallenge, cat::EasyHandshake::CHALLENGE_BYTES);
+							}
 						}
 						else
 						{
-							// Message contains a challenge
-							bsOut.Write((unsigned char)1);
-							// challenge
-							CAT_AUDIT_PRINTF("AUDIT: Sending challenge\n");
-							bsOut.WriteAlignedBytes((const unsigned char*) rcs->handshakeChallenge,cat::EasyHandshake::CHALLENGE_BYTES);
+							bsOut.Write((unsigned char)0);
 						}
 #else // LIBCAT_SECURITY
 						// Message does not contain a challenge
@@ -4842,18 +4889,22 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 					{
 						// Server does not need security
 #if LIBCAT_SECURITY==1
-						if (rcs->client_handshake!=0)
+						if (libCatSecurityEnabled)
 						{
-							rakPeer->requestedConnectionQueueMutex.Unlock();
-							CAT_AUDIT_PRINTF("AUDIT: Security disabled by server but we expected security (indicated by client_handshake not null) so failing!\n");
 
-							packet=rakPeer->AllocPacket(sizeof( char ), _FILE_AND_LINE_);
-							packet->data[ 0 ] = ID_OUR_SYSTEM_REQUIRES_SECURITY; // Attempted a connection and couldn't
-							packet->bitSize = ( sizeof( char ) * 8);
-							packet->systemAddress = rcs->systemAddress;
-							packet->guid=serverGuid;
-							rakPeer->AddPacketToProducer(packet);
-							return true;
+							if (rcs->client_handshake != 0)
+							{
+								rakPeer->requestedConnectionQueueMutex.Unlock();
+								CAT_AUDIT_PRINTF("AUDIT: Security disabled by server but we expected security (indicated by client_handshake not null) so failing!\n");
+
+								packet = rakPeer->AllocPacket(sizeof(char), _FILE_AND_LINE_);
+								packet->data[0] = ID_OUR_SYSTEM_REQUIRES_SECURITY; // Attempted a connection and couldn't
+								packet->bitSize = (sizeof(char) * 8);
+								packet->systemAddress = rcs->systemAddress;
+								packet->guid = serverGuid;
+								rakPeer->AddPacketToProducer(packet);
+								return true;
+							}
 						}
 #endif // LIBCAT_SECURITY
 
@@ -4911,13 +4962,17 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 
 #if LIBCAT_SECURITY==1
 			char answer[cat::EasyHandshake::ANSWER_BYTES];
-			CAT_AUDIT_PRINTF("AUDIT: Got ID_OPEN_CONNECTION_REPLY_2 and given doSecurity=%i\n", (int)doSecurity);
-			if (b && doSecurity)
+			cat::ClientEasyHandshake *client_handshake = 0;
+			if (libCatSecurityEnabled)
 			{
-				CAT_AUDIT_PRINTF("AUDIT: Reading cookie and public key\n");
-				bs.ReadAlignedBytes((unsigned char*) answer, sizeof(answer));
+
+				CAT_AUDIT_PRINTF("AUDIT: Got ID_OPEN_CONNECTION_REPLY_2 and given doSecurity=%i\n", (int)doSecurity);
+				if (b && doSecurity)
+				{
+					CAT_AUDIT_PRINTF("AUDIT: Reading cookie and public key\n");
+					bs.ReadAlignedBytes((unsigned char*)answer, sizeof(answer));
+				}
 			}
-			cat::ClientEasyHandshake *client_handshake=0;
 #endif // LIBCAT_SECURITY
 
 			RakPeer::RequestedConnectionStruct *rcs;
@@ -4931,25 +4986,29 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 				if (rcs->systemAddress==systemAddress)
 				{
 #if LIBCAT_SECURITY==1
-					CAT_AUDIT_PRINTF("AUDIT: System address matches an entry in the requestedConnectionQueue and doSecurity=%i\n", (int)doSecurity);
-					if (doSecurity)
+					if (libCatSecurityEnabled)
 					{
-						if (rcs->client_handshake==0)
+
+						CAT_AUDIT_PRINTF("AUDIT: System address matches an entry in the requestedConnectionQueue and doSecurity=%i\n", (int)doSecurity);
+						if (doSecurity)
 						{
-							CAT_AUDIT_PRINTF("AUDIT: Server wants security but we didn't set a public key -- Reporting back ID_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY to user\n");
-							rakPeer->requestedConnectionQueueMutex.Unlock();
+							if (rcs->client_handshake == 0)
+							{
+								CAT_AUDIT_PRINTF("AUDIT: Server wants security but we didn't set a public key -- Reporting back ID_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY to user\n");
+								rakPeer->requestedConnectionQueueMutex.Unlock();
 
-							packet=rakPeer->AllocPacket(2, _FILE_AND_LINE_);
-							packet->data[ 0 ] = ID_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY; // Attempted a connection and couldn't
-							packet->data[ 1 ] = 0; // Indicate server public key is missing
-							packet->bitSize = ( sizeof( char ) * 8);
-							packet->systemAddress = rcs->systemAddress;
-							packet->guid=guid;
-							rakPeer->AddPacketToProducer(packet);
-							return true;
+								packet = rakPeer->AllocPacket(2, _FILE_AND_LINE_);
+								packet->data[0] = ID_REMOTE_SYSTEM_REQUIRES_PUBLIC_KEY; // Attempted a connection and couldn't
+								packet->data[1] = 0; // Indicate server public key is missing
+								packet->bitSize = (sizeof(char) * 8);
+								packet->systemAddress = rcs->systemAddress;
+								packet->guid = guid;
+								rakPeer->AddPacketToProducer(packet);
+								return true;
+							}
+
+							CAT_AUDIT_PRINTF("AUDIT: Looks good, preparing to send challenge to server! client_handshake = %x\n", client_handshake);
 						}
-
-						CAT_AUDIT_PRINTF("AUDIT: Looks good, preparing to send challenge to server! client_handshake = %x\n", client_handshake);
 					}
 
 #endif // LIBCAT_SECURITY
@@ -4984,64 +5043,74 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 #if LIBCAT_SECURITY==1
 							cat::u8 ident[cat::EasyHandshake::IDENTITY_BYTES];
 							bool doIdentity = false;
-
-							if (rcs->client_handshake)
+							if (libCatSecurityEnabled)
 							{
-								CAT_AUDIT_PRINTF("AUDIT: Processing answer\n");
-								if (rcs->publicKeyMode == PKM_USE_TWO_WAY_AUTHENTICATION)
+								if (rcs->client_handshake)
 								{
-									if (!rcs->client_handshake->ProcessAnswerWithIdentity(answer, ident, remoteSystem->reliabilityLayer.GetAuthenticatedEncryption()))
+									CAT_AUDIT_PRINTF("AUDIT: Processing answer\n");
+									if (rcs->publicKeyMode == PKM_USE_TWO_WAY_AUTHENTICATION)
 									{
-										CAT_AUDIT_PRINTF("AUDIT: Processing answer -- Invalid Answer\n");
-										rakPeer->requestedConnectionQueueMutex.Unlock();
+										if (!rcs->client_handshake->ProcessAnswerWithIdentity(answer, ident, remoteSystem->reliabilityLayer.GetAuthenticatedEncryption()))
+										{
+											CAT_AUDIT_PRINTF("AUDIT: Processing answer -- Invalid Answer\n");
+											rakPeer->requestedConnectionQueueMutex.Unlock();
 
-										return true;
+											return true;
+										}
+
+										doIdentity = true;
 									}
-
-									doIdentity = true;
-								}
-								else
-								{
-									if (!rcs->client_handshake->ProcessAnswer(answer, remoteSystem->reliabilityLayer.GetAuthenticatedEncryption()))
+									else
 									{
-										CAT_AUDIT_PRINTF("AUDIT: Processing answer -- Invalid Answer\n");
-										rakPeer->requestedConnectionQueueMutex.Unlock();
+										if (!rcs->client_handshake->ProcessAnswer(answer, remoteSystem->reliabilityLayer.GetAuthenticatedEncryption()))
+										{
+											CAT_AUDIT_PRINTF("AUDIT: Processing answer -- Invalid Answer\n");
+											rakPeer->requestedConnectionQueueMutex.Unlock();
 
-										return true;
+											return true;
+										}
 									}
-								}
-								CAT_AUDIT_PRINTF("AUDIT: Success!\n");
+									CAT_AUDIT_PRINTF("AUDIT: Success!\n");
 
-								RakNet::OP_DELETE(rcs->client_handshake,_FILE_AND_LINE_);
-								rcs->client_handshake=0;
+									RakNet::OP_DELETE(rcs->client_handshake, _FILE_AND_LINE_);
+									rcs->client_handshake = 0;
+								}
 							}
 #endif // LIBCAT_SECURITY
 
-							remoteSystem->weInitiatedTheConnection=true;
-							remoteSystem->connectMode=RakPeer::RemoteSystemStruct::REQUESTED_CONNECTION;
-							if (rcs->timeoutTime!=0)
+							remoteSystem->weInitiatedTheConnection = true;
+							remoteSystem->connectMode = RakPeer::RemoteSystemStruct::REQUESTED_CONNECTION;
+							if (rcs->timeoutTime != 0)
 								remoteSystem->reliabilityLayer.SetTimeoutTime(rcs->timeoutTime);
 
 							RakNet::BitStream temp;
-							temp.Write( (MessageID)ID_CONNECTION_REQUEST);
+							temp.Write((MessageID)ID_CONNECTION_REQUEST);
 							temp.Write(rakPeer->GetGuidFromSystemAddress(UNASSIGNED_SYSTEM_ADDRESS));
 							temp.Write(RakNet::GetTime());
 
 #if LIBCAT_SECURITY==1
-							temp.Write((unsigned char)(doSecurity ? 1 : 0));
-
-							if (doSecurity)
+							if (libCatSecurityEnabled)
 							{
-								unsigned char proof[32];
-								remoteSystem->reliabilityLayer.GetAuthenticatedEncryption()->GenerateProof(proof, sizeof(proof));
-								temp.WriteAlignedBytes(proof, sizeof(proof));
 
-								temp.Write((unsigned char)(doIdentity ? 1 : 0));
+								temp.Write((unsigned char)(doSecurity ? 1 : 0));
 
-								if (doIdentity)
+								if (doSecurity)
 								{
-									temp.WriteAlignedBytes(ident, sizeof(ident));
+									unsigned char proof[32];
+									remoteSystem->reliabilityLayer.GetAuthenticatedEncryption()->GenerateProof(proof, sizeof(proof));
+									temp.WriteAlignedBytes(proof, sizeof(proof));
+
+									temp.Write((unsigned char)(doIdentity ? 1 : 0));
+
+									if (doIdentity)
+									{
+										temp.WriteAlignedBytes(ident, sizeof(ident));
+									}
 								}
+							}
+							else
+							{
+								temp.Write((unsigned char)0);
 							}
 #else
 							temp.Write((unsigned char)0);
@@ -5076,9 +5145,12 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 					rakPeer->requestedConnectionQueueMutex.Unlock();
 
 #if LIBCAT_SECURITY==1
-					CAT_AUDIT_PRINTF("AUDIT: Deleting client_handshake object %x and rcs->client_handshake object %x\n", client_handshake, rcs->client_handshake);
-					RakNet::OP_DELETE(client_handshake,_FILE_AND_LINE_);
-					RakNet::OP_DELETE(rcs->client_handshake,_FILE_AND_LINE_);
+					if (libCatSecurityEnabled)
+					{
+						CAT_AUDIT_PRINTF("AUDIT: Deleting client_handshake object %x and rcs->client_handshake object %x\n", client_handshake, rcs->client_handshake);
+						RakNet::OP_DELETE(client_handshake, _FILE_AND_LINE_);
+						RakNet::OP_DELETE(rcs->client_handshake, _FILE_AND_LINE_);
+					}
 #endif // LIBCAT_SECURITY
 					RakNet::OP_DELETE(rcs,_FILE_AND_LINE_);
 
@@ -5122,8 +5194,11 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 					rakPeer->requestedConnectionQueue.RemoveAtIndex(i);
 
 #if LIBCAT_SECURITY==1
-					CAT_AUDIT_PRINTF("AUDIT: Connection attempt canceled so deleting rcs->client_handshake object %x\n", rcs->client_handshake);
-					RakNet::OP_DELETE(rcs->client_handshake,_FILE_AND_LINE_);
+					if (libCatSecurityEnabled)
+					{
+						CAT_AUDIT_PRINTF("AUDIT: Connection attempt canceled so deleting rcs->client_handshake object %x\n", rcs->client_handshake);
+						RakNet::OP_DELETE(rcs->client_handshake, _FILE_AND_LINE_);
+					}
 #endif // LIBCAT_SECURITY
 					RakNet::OP_DELETE(rcs,_FILE_AND_LINE_);
 					break;
@@ -5183,19 +5258,27 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 			bsOut.WriteAlignedBytes((const unsigned char*) OFFLINE_MESSAGE_DATA_ID, sizeof(OFFLINE_MESSAGE_DATA_ID));
 			bsOut.Write(rakPeer->GetGuidFromSystemAddress(UNASSIGNED_SYSTEM_ADDRESS));
 #if LIBCAT_SECURITY==1
-			if (rakPeer->_using_security)
+			if (libCatSecurityEnabled)
 			{
-				bsOut.Write((unsigned char) 1); // HasCookie Yes
-				// Write cookie
-				uint32_t cookie = rakPeer->_cookie_jar->Generate(&systemAddress.address,sizeof(systemAddress.address));
-				CAT_AUDIT_PRINTF("AUDIT: Writing cookie %i to %i:%i\n", cookie, systemAddress);
-				bsOut.Write(cookie);
-				// Write my public key
-				bsOut.WriteAlignedBytes((const unsigned char *) rakPeer->my_public_key,sizeof(rakPeer->my_public_key));
+
+				if (rakPeer->_using_security)
+				{
+					bsOut.Write((unsigned char)1); // HasCookie Yes
+					// Write cookie
+					uint32_t cookie = rakPeer->_cookie_jar->Generate(&systemAddress.address, sizeof(systemAddress.address));
+					CAT_AUDIT_PRINTF("AUDIT: Writing cookie %i to %i:%i\n", cookie, systemAddress);
+					bsOut.Write(cookie);
+					// Write my public key
+					bsOut.WriteAlignedBytes((const unsigned char *)rakPeer->my_public_key, sizeof(rakPeer->my_public_key));
+				}
 			}
 			else
-#endif // LIBCAT_SECURITY
+			{
+				bsOut.Write((unsigned char)0);  // HasCookie oN
+			}
+#else
 				bsOut.Write((unsigned char) 0);  // HasCookie oN
+#endif // LIBCAT_SECURITY
 
 			// MTU. Lower MTU if it is exceeds our own limit
 			if (length+UDP_HEADER_SIZE > MAXIMUM_MTU_SIZE)
@@ -5226,41 +5309,44 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 #if LIBCAT_SECURITY==1
 			char remoteHandshakeChallenge[cat::EasyHandshake::CHALLENGE_BYTES];
 
-			if (rakPeer->_using_security)
+			if (libCatSecurityEnabled)
 			{
-				char str1[64];
-				systemAddress.ToString(false, str1);
-				requiresSecurityOfThisClient=rakPeer->IsInSecurityExceptionList(str1)==false;
-
-				uint32_t cookie;
-				bs.Read(cookie);
-				CAT_AUDIT_PRINTF("AUDIT: Got cookie %i from %i:%i\n", cookie, systemAddress);
-				if (rakPeer->_cookie_jar->Verify(&systemAddress.address,sizeof(systemAddress.address), cookie)==false)
+				if (rakPeer->_using_security)
 				{
-					return true;
-				}
-				CAT_AUDIT_PRINTF("AUDIT: Cookie good!\n");
+					char str1[64];
+					systemAddress.ToString(false, str1);
+					requiresSecurityOfThisClient = rakPeer->IsInSecurityExceptionList(str1) == false;
 
-				unsigned char clientWroteChallenge;
-				bs.Read(clientWroteChallenge);
-
-				if (requiresSecurityOfThisClient==true && clientWroteChallenge==0)
-				{
-					// Fail, client doesn't support security, and it is required
-					return true;
-				}
-
-				if (clientWroteChallenge)
-				{
-					bs.ReadAlignedBytes((unsigned char*) remoteHandshakeChallenge, cat::EasyHandshake::CHALLENGE_BYTES);
-#ifdef CAT_AUDIT
-					printf("AUDIT: RECV CHALLENGE ");
-					for (int ii = 0; ii < sizeof(remoteHandshakeChallenge); ++ii)
+					uint32_t cookie;
+					bs.Read(cookie);
+					CAT_AUDIT_PRINTF("AUDIT: Got cookie %i from %i:%i\n", cookie, systemAddress);
+					if (rakPeer->_cookie_jar->Verify(&systemAddress.address, sizeof(systemAddress.address), cookie) == false)
 					{
-						printf("%02x", (cat::u8)remoteHandshakeChallenge[ii]);
+						return true;
 					}
-					printf("\n");
+					CAT_AUDIT_PRINTF("AUDIT: Cookie good!\n");
+
+					unsigned char clientWroteChallenge;
+					bs.Read(clientWroteChallenge);
+
+					if (requiresSecurityOfThisClient == true && clientWroteChallenge == 0)
+					{
+						// Fail, client doesn't support security, and it is required
+						return true;
+					}
+
+					if (clientWroteChallenge)
+					{
+						bs.ReadAlignedBytes((unsigned char*)remoteHandshakeChallenge, cat::EasyHandshake::CHALLENGE_BYTES);
+#ifdef CAT_AUDIT
+						printf("AUDIT: RECV CHALLENGE ");
+						for (int ii = 0; ii < sizeof(remoteHandshakeChallenge); ++ii)
+						{
+							printf("%02x", (cat::u8)remoteHandshakeChallenge[ii]);
+						}
+						printf("\n");
 #endif
+					}
 				}
 			}
 #endif // LIBCAT_SECURITY
@@ -5327,10 +5413,14 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 				// Duplicate connection request packet from packetloss
 				// Send back the same answer
 #if LIBCAT_SECURITY==1
-				if (requiresSecurityOfThisClient)
+				if (libCatSecurityEnabled)
 				{
-					CAT_AUDIT_PRINTF("AUDIT: Resending public key and answer from packetloss.  Sending ID_OPEN_CONNECTION_REPLY_2\n");
-					bsAnswer.WriteAlignedBytes((const unsigned char *) rssFromSA->answer,sizeof(rssFromSA->answer));
+
+					if (requiresSecurityOfThisClient)
+					{
+						CAT_AUDIT_PRINTF("AUDIT: Resending public key and answer from packetloss.  Sending ID_OPEN_CONNECTION_REPLY_2\n");
+						bsAnswer.WriteAlignedBytes((const unsigned char *)rssFromSA->answer, sizeof(rssFromSA->answer));
+					}
 				}
 #endif // LIBCAT_SECURITY
 
@@ -5402,24 +5492,28 @@ bool ProcessOfflineNetworkPacket( SystemAddress systemAddress, const char *data,
 			}
 
 #if LIBCAT_SECURITY==1
-			if (requiresSecurityOfThisClient)
+			if (libCatSecurityEnabled)
 			{
-				CAT_AUDIT_PRINTF("AUDIT: Writing public key.  Sending ID_OPEN_CONNECTION_REPLY_2\n");
-				if (rakPeer->_server_handshake->ProcessChallenge(remoteHandshakeChallenge, rssFromSA->answer, rssFromSA->reliabilityLayer.GetAuthenticatedEncryption() ))
-				{
-					CAT_AUDIT_PRINTF("AUDIT: Challenge good!\n");
-					// Keep going to OK block
-				}
-				else
-				{
-					CAT_AUDIT_PRINTF("AUDIT: Challenge BAD!\n");
 
-					// Unassign this remote system
-					rakPeer->DereferenceRemoteSystem(systemAddress);
-					return true;
-				}
+				if (requiresSecurityOfThisClient)
+				{
+					CAT_AUDIT_PRINTF("AUDIT: Writing public key.  Sending ID_OPEN_CONNECTION_REPLY_2\n");
+					if (rakPeer->_server_handshake->ProcessChallenge(remoteHandshakeChallenge, rssFromSA->answer, rssFromSA->reliabilityLayer.GetAuthenticatedEncryption()))
+					{
+						CAT_AUDIT_PRINTF("AUDIT: Challenge good!\n");
+						// Keep going to OK block
+					}
+					else
+					{
+						CAT_AUDIT_PRINTF("AUDIT: Challenge BAD!\n");
 
-				bsAnswer.WriteAlignedBytes((const unsigned char *) rssFromSA->answer,sizeof(rssFromSA->answer));
+						// Unassign this remote system
+						rakPeer->DereferenceRemoteSystem(systemAddress);
+						return true;
+					}
+
+					bsAnswer.WriteAlignedBytes((const unsigned char *)rssFromSA->answer, sizeof(rssFromSA->answer));
+				}
 			}
 #endif // LIBCAT_SECURITY
 
@@ -6351,7 +6445,7 @@ RAK_THREAD_DECLARATION(RakNet::UpdateNetworkLoop)
 
 	BitStream updateBitStream( MAXIMUM_MTU_SIZE
 #if LIBCAT_SECURITY==1
-		+ cat::AuthenticatedEncryption::OVERHEAD_BYTES
+		+((libCatSecurityEnabled)?cat::AuthenticatedEncryption::OVERHEAD_BYTES:0)
 #endif
 		);
 // 

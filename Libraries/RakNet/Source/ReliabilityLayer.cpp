@@ -39,6 +39,8 @@ double Ceil(double d) {if (((double)((int)d))==d) return d; return (int) (d+1.0)
 
 //#define _DEBUG_LOGGER
 
+extern bool libCatSecurityEnabled;
+
 #if CC_TIME_TYPE_BYTES==4
 static const CCTimeType MAX_TIME_BETWEEN_PACKETS= 350; // 350 milliseconds
 static const CCTimeType HISTOGRAM_RESTART_CYCLE=10000; // Every 10 seconds reset the histogram
@@ -351,10 +353,13 @@ void ReliabilityLayer::Reset( bool resetVariables, int MTUSize, bool _useSecurit
 		InitializeVariables();
 
 #if LIBCAT_SECURITY==1
-		useSecurity = _useSecurity;
+		if (libCatSecurityEnabled)
+		{
+			useSecurity = _useSecurity;
 
-		if (_useSecurity)
-			MTUSize -= cat::AuthenticatedEncryption::OVERHEAD_BYTES;
+			if (_useSecurity)
+				MTUSize -= cat::AuthenticatedEncryption::OVERHEAD_BYTES;
+		}
 #else
 		(void) _useSecurity;
 #endif // LIBCAT_SECURITY
@@ -666,14 +671,17 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 	unsigned i;
 
 #if LIBCAT_SECURITY==1
-	if (useSecurity)
+	if (libCatSecurityEnabled)
 	{
-		unsigned int received = length;
+		if (useSecurity)
+		{
+			unsigned int received = length;
 
-		if (!auth_enc.Decrypt((cat::u8*)buffer, received))
-			return false;
+			if (!auth_enc.Decrypt((cat::u8*)buffer, received))
+				return false;
 
-		length = received;
+			length = received;
+		}
 	}
 #endif
 
@@ -2308,17 +2316,20 @@ void ReliabilityLayer::SendBitStream( RakNetSocket2 *s, SystemAddress &systemAdd
 #endif
 
 #if LIBCAT_SECURITY==1
-	if (useSecurity)
+	if (libCatSecurityEnabled)
 	{
-		unsigned char *buffer = reinterpret_cast<unsigned char*>( bitStream->GetData() );
+		if (useSecurity)
+		{
+			unsigned char *buffer = reinterpret_cast<unsigned char*>(bitStream->GetData());
 
-		int buffer_size = bitStream->GetNumberOfBitsAllocated() / 8;
+			int buffer_size = bitStream->GetNumberOfBitsAllocated() / 8;
 
-		// Verify there is enough room for encrypted output and encrypt
-		// Encrypt() will increase length
-		static unsigned long long nextIv = 0;
-		bool success = auth_enc.Encrypt(nextIv, buffer, buffer_size);
-		RakAssert(success);
+			// Verify there is enough room for encrypted output and encrypt
+			// Encrypt() will increase length
+			static unsigned long long nextIv = 0;
+			bool success = auth_enc.Encrypt(nextIv, buffer, buffer_size);
+			RakAssert(success);
+		}
 	}
 #endif
 
@@ -3918,8 +3929,11 @@ unsigned int ReliabilityLayer::GetMaxDatagramSizeExcludingMessageHeaderBytes(voi
 	unsigned int val = congestionManager.GetMTU() - DatagramHeaderFormat::GetDataHeaderByteLength();
 
 #if LIBCAT_SECURITY==1
-	if (useSecurity)
-		val -= cat::AuthenticatedEncryption::OVERHEAD_BYTES;
+	if (libCatSecurityEnabled)
+	{
+		if (useSecurity)
+			val -= cat::AuthenticatedEncryption::OVERHEAD_BYTES;
+	}
 #endif
 
 	return val;

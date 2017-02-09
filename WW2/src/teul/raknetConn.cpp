@@ -26,6 +26,8 @@
 
 extern IP_ENDPOINT_MAP ipToEndPoint;
 
+bool libCatSecurityEnabled = false;
+
 typedef std::map<UINT32, SystemAddress> IP_SYS_MAP;
 static IP_SYS_MAP ipToSysMap;
 
