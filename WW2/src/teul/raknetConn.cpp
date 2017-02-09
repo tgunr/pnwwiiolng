@@ -156,6 +156,8 @@ void RakNetChannel::update()
 {
 	if (m_peer != nullptr && m_peer->IsActive())
 	{
+		m_peer->RunUpdateCycle(updateBitStream);
+
 		RakNet::Packet *p;
 		while ((p = m_peer->Receive()) != nullptr)
 		{

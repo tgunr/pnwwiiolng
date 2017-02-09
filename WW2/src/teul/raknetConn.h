@@ -68,6 +68,8 @@ private:
 
 	bool m_initialized;
 	bool m_isConnected;
+
+	BitStream updateBitStream;
 };
 
 
