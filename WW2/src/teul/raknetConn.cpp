@@ -63,7 +63,7 @@ bool RakNetChannel::init()
 		{
 
 			// Initialize with the key pair
-			if (!m_isServer || m_peer->InitializeSecurity( m_pair,
+			if (!m_isServer || !libCatSecurityEnabled || m_peer->InitializeSecurity( m_pair,
 				false))
 			{
 
@@ -158,8 +158,6 @@ void RakNetChannel::update()
 {
 	if (m_peer != nullptr && m_peer->IsActive())
 	{
-		m_peer->RunUpdateCycle(updateBitStream);
-
 		RakNet::Packet *p;
 		while ((p = m_peer->Receive()) != nullptr)
 		{
