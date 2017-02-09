@@ -268,15 +268,15 @@ public:
 
 // Use this alternative form to specify which Mutex object to use
 #define CAT_REF_SINGLETON_MUTEX(T, M)	\
-	static cat::RefSingletonImpl<T> m_T_rss;	\
-	template<> T *RefSingleton<T>::ref() { return m_T_rss.GetRef(M); }
+	static cat::RefSingletonImpl<T> m_ ## T ## _rss;	\
+	template<> T *RefSingleton<T>::ref() { return m_ ## T ## _rss.GetRef(M); }
 
 // In the C file for the object, use this macro:
-#define CAT_REF_SINGLETON(T)	namespace cat { CAT_REF_SINGLETON_MUTEX(T, GetRefSingletonMutex()) }
+#define CAT_REF_SINGLETON(T)	namespace cat { CAT_REF_SINGLETON_MUTEX(T, GetRefSingletonMutex(#T)) }
 
 
 // Internal free function
-Mutex CAT_EXPORT &GetRefSingletonMutex();
+Mutex CAT_EXPORT &GetRefSingletonMutex(const char *className);
 
 // Internal class
 class CAT_EXPORT RefSingletons : public Singleton<RefSingletons>

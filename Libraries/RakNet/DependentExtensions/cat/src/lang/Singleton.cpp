@@ -27,11 +27,21 @@
 */
 
 #include <cat/lang/Singleton.hpp>
+#include <map>
+
 using namespace cat;
+using namespace std;
 
-static Mutex m_singleton_lock;
+//// Mutex
 
-Mutex &cat::GetSingletonMutex()
+typedef std::map<const char *, Mutex *> NAME_MTX_MAP;
+static NAME_MTX_MAP m_singleton_mutex_map;
+
+Mutex &cat::GetSingletonMutex(const char *className)
 {
-	return m_singleton_lock;
+    if (m_singleton_mutex_map[className] == nullptr)
+    {
+        m_singleton_mutex_map[className] = new Mutex();
+    }
+    return *m_singleton_mutex_map[className];
 }

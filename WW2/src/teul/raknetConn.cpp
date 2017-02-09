@@ -66,7 +66,8 @@ bool RakNetChannel::init()
 			{
 
 				// Match to associated port for teul connection, this will be UDP after all
-				m_sd.port = (m_isServer)?m_port:0;
+				//m_sd.port = (m_isServer)?m_port:0;
+                m_sd.port = m_port;
 
 				// TODO: link to cell hosts max connections value
 				const int maxConn = (m_isServer) ? 2000 : 1;
@@ -124,7 +125,9 @@ bool RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
 	PublicKey pk;
 	pk.remoteServerPublicKey = publicKey;
 	pk.publicKeyMode = PKM_USE_KNOWN_PUBLIC_KEY; // Recommended mode
-
+    pk.myPrivateKey = nullptr;
+    pk.myPublicKey = nullptr;
+    
 	ENDPOINT *ep = teulGetEndpoint(teulIndex);
 	if (ep != nullptr)
 	{
@@ -234,8 +237,19 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
 	UINT8 msgType = static_cast<UINT8>(ID_USER_PACKET_ENUM);
 	bitStream.Write(msgType);
 	bitStream.Write(static_cast<char *>(packet.packet()), packet.packetSizeBytes());
-	SystemAddress addr = ipToSysMap[packet.address()];
-
+    
+    // We need to specify the target address
+    // NOTE: we might be able to do without this map I think - wait for now
+    SystemAddress addr;
+    if (isServer())
+    {
+        addr = ipToSysMap[endpoint.destAddress()];
+    }
+    else
+    {
+        addr.address.addr4 = endpoint.destSockAddress;
+    }
+    
 	UINT32 result = m_peer->Send(&bitStream, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, 0, addr, false);
 	if (result == 0)
 	{
