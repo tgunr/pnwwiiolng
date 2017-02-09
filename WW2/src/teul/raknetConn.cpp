@@ -66,8 +66,8 @@ bool RakNetChannel::init()
 			{
 
 				// Match to associated port for teul connection, this will be UDP after all
-				//m_sd.port = (m_isServer)?m_port:0;
-                m_sd.port = m_port;
+				//    only server needs port to be identified
+				m_sd.port = (m_isServer)?m_port:0;
 
 				// TODO: link to cell hosts max connections value
 				const int maxConn = (m_isServer) ? 2000 : 1;
@@ -77,6 +77,8 @@ bool RakNetChannel::init()
 
 				if (m_isServer)
 					m_peer->SetMaximumIncomingConnections(maxConn);
+
+				dbugLog(_FLN, "RakNet: Successfully initialized backchannel on port %d", m_sd.port);
 
 				m_initialized = true;
 			}
@@ -170,31 +172,32 @@ void RakNetChannel::update()
 				dbugLog(_FLN, "cell:%s disconnected", p->systemAddress.ToString());
 				break;
 			case ID_CONNECTION_ATTEMPT_FAILED:
-				dbugLog(_FLN, "cell:%s connection attempt failed", p->systemAddress.ToString());
+				dbugLog(_FLW, "Raknet: ell:%s connection attempt failed", p->systemAddress.ToString());
 				break;
 			case ID_NEW_INCOMING_CONNECTION:
-				dbugLog(_FLN, "cell:%s connecting", p->systemAddress.ToString());
+				dbugLog(_FLN, "Raknet: %s connecting", p->systemAddress.ToString());
 				_addHost(ip, p->systemAddress);
 				break;
 			case ID_CONNECTION_REQUEST_ACCEPTED:
-				dbugLog(_FLN, "cell:%s connected", p->systemAddress.ToString());
+				dbugLog(_FLN, "Raknet: %s connected", p->systemAddress.ToString());
 				_addHost(ip, p->systemAddress);
 				break;
 			case ID_ALREADY_CONNECTED:
-				dbugLog(_FLN, "cell:%s already connected", p->systemAddress.ToString());
+				dbugLog(_FLW, "Raknet: %s already connected", p->systemAddress.ToString());
 				_addHost(ip, p->systemAddress);
 				break;
 			case ID_CONNECTION_LOST:
-				dbugLog(_FLW, "cell:%s connection lost", p->systemAddress.ToString());
+				dbugLog(_FLW, "Raknet: %s connection lost", p->systemAddress.ToString());
 				break;
 			case ID_USER_PACKET_ENUM:
+				dbugLog(_FLN, "Raknet: Processing incoming packet from %s", p->systemAddress.ToString());
 				processApplicationPacket(p, ip);
 				break;
             case ID_PUBLIC_KEY_MISMATCH:
-                dbugLog(_FLW, "cell:%s Public Key mismatch", p->systemAddress.ToString());
+                dbugLog(_FLW, "Raknet: %s Public Key mismatch", p->systemAddress.ToString());
                 break;
 			default:
-				dbugLog(_FLI, "Unknown packet id %u", packetX);
+				dbugLog(_FLN, "Raknet: Unknown packet id %u", packetX);
 				break;
 			}
 
@@ -210,18 +213,18 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p, UINT32 ip)
 
 	if (sourceEndpoint != nullptr)
 	{
-		dbugLog(_FLD, "Received incoming RakNet msg");
+		dbugLog(_FLN, "Raknet: Received incoming RakNet msg");
 		Teul::PacketHeader* const hdr = reinterpret_cast<Teul::PacketHeader *>(&p->data[1]);
 		TEUL_CALLBACK* const callback = TEUL_CALLBACK::Lookup(hdr->m_callX, hdr->m_callY);
 		if (PN_UNLIKELY(callback == nullptr))
 		{
-			dbugLog(_FLW, "t:%d ip:%s cb:%u,%u callback does not exist", sourceEndpoint->teulIndex(), teulGetAddress(sourceEndpoint->fromAddress()), hdr->m_callX, hdr->m_callY);
+			dbugLog(_FLW, "Raknet: t:%d ip:%s cb:%u,%u callback does not exist", sourceEndpoint->teulIndex(), teulGetAddress(sourceEndpoint->fromAddress()), hdr->m_callX, hdr->m_callY);
 			return;
 		}
 
 		if (PN_UNLIKELY(hdr->m_callX == Teul::Serv::CallbackX && sourceEndpoint->teulIndex() >= 0 && !(sourceEndpoint->m_peer)))
 		{
-			dbugLog(_FLA, "t:%d ip:%s cb:%d,%d callback access denied", sourceEndpoint->teulIndex(), teulGetAddress(sourceEndpoint->fromAddress()), hdr->m_callX, hdr->m_callY);
+			dbugLog(_FLA, "Raknet: t:%d ip:%s cb:%d,%d callback access denied", sourceEndpoint->teulIndex(), teulGetAddress(sourceEndpoint->fromAddress()), hdr->m_callX, hdr->m_callY);
 			return;
 		}
 
@@ -230,7 +233,7 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p, UINT32 ip)
 	}
 	else
 	{
-		dbugLog(_FLW, "No endpoint located for incoming msg");
+		dbugLog(_FLW, "Raknet: No endpoint located for incoming msg");
 	}
 
 }
