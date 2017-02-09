@@ -467,6 +467,7 @@
 		E97C76C51C85395700875F44 /* kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769A1C85156F00875F44 /* kqueue.c */; };
 		E97C76C61C8539BF00875F44 /* XMLLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762B1C84E11A00875F44 /* XMLLoader.cpp */; };
 		E97C76C71C8539BF00875F44 /* XMLLoader2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */; };
+		E98C64811E48DF7C00ABE277 /* wwiiBackChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E98C647E1E48DF5A00ABE277 /* wwiiBackChannel.cpp */; };
 		E99C32571D8607830098798F /* wwiiPPOLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E99C32561D8607830098798F /* wwiiPPOLoader.cpp */; };
 		E9C1BDDD1E462A38001FD5B0 /* libRakNetLibStatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD01E461EE6001FD5B0 /* libRakNetLibStatic.a */; };
 		E9C1BDDE1E462A38001FD5B0 /* liblibcatcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD11E461EE6001FD5B0 /* liblibcatcommon.a */; };
@@ -1560,6 +1561,8 @@
 		E97C76A01C85156F00875F44 /* strlcpy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = strlcpy.c; path = ../../Libraries/libevent/strlcpy.c; sourceTree = "<group>"; };
 		E97C76CD1C85AFD800875F44 /* ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = ww2.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
 		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = text; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = SOURCE_ROOT; };
+		E98C647E1E48DF5A00ABE277 /* wwiiBackChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiBackChannel.cpp; sourceTree = "<group>"; };
+		E98C647F1E48DF5A00ABE277 /* wwiiBackChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiBackChannel.h; sourceTree = "<group>"; };
 		E99C32551D8607830098798F /* wwiiPPOLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiPPOLoader.h; sourceTree = "<group>"; };
 		E99C32561D8607830098798F /* wwiiPPOLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiPPOLoader.cpp; sourceTree = "<group>"; };
 		E9C1BDD01E461EE6001FD5B0 /* libRakNetLibStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRakNetLibStatic.a; path = lib/mac/libRakNetLibStatic.a; sourceTree = "<group>"; };
@@ -2814,6 +2817,8 @@
 		08104EE1103DFE120065E0E2 /* wwii */ = {
 			isa = PBXGroup;
 			children = (
+				E98C647E1E48DF5A00ABE277 /* wwiiBackChannel.cpp */,
+				E98C647F1E48DF5A00ABE277 /* wwiiBackChannel.h */,
 				E99C32551D8607830098798F /* wwiiPPOLoader.h */,
 				E99C32561D8607830098798F /* wwiiPPOLoader.cpp */,
 				08EBB4D212943BE300AEDB5B /* wwiiSyncVar.cpp */,
@@ -3578,6 +3583,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E98C64811E48DF7C00ABE277 /* wwiiBackChannel.cpp in Sources */,
 				FAE0DB8D1DC260AF00A9E63D /* omgChat.omg in Sources */,
 				FAE0DB8E1DC260AF00A9E63D /* omgMissionSortieData.omg in Sources */,
 				E97C76C61C8539BF00875F44 /* XMLLoader.cpp in Sources */,

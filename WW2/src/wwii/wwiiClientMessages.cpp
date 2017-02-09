@@ -163,12 +163,11 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 	switch (activate.serverType)
 	{
 	case MAP_HOST:
-		wwiiBackChannelDisconnect(a->teulIndex);
 		clientActivateMap(a->teulIndex,TRUE, maskedAddr, activate.port);
 		_updatesSent = 0;
 		break;
 	case CELL_HOST:
-		wwiiBackChannelConnect(teulGetAddress(maskedAddr), activate.port, activate.teulIndex, activate.playerID, activate.otp, reinterpret_cast<char *>(activate.pkey));
+		wwiiBackChannelConnect(teulGetAddress(maskedAddr), activate.port, a->teulIndex, activate.playerID, activate.otp, reinterpret_cast<char *>(activate.pkey));
 		clientActivateCell(a->teulIndex, TRUE, maskedAddr, activate.port);
 		_updatesSent = 0;
 		break;

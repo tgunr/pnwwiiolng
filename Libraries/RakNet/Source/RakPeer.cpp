@@ -3199,7 +3199,8 @@ bool RakPeer::GenerateConnectionRequestChallenge(RequestedConnectionStruct *rcs,
 	rcs->client_handshake = 0;
 	rcs->publicKeyMode = PKM_INSECURE_CONNECTION;
 
-	if (!keyPair) return true;
+    // keyPair only needs to exist for two way authentication
+	//if (!keyPair) return true;
 
 	switch (remotePublicKey->publicKeyMode)
 	{

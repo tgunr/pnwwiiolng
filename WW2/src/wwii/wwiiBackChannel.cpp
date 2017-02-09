@@ -33,8 +33,11 @@ bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, UINT32 teulIndex,
 	if (ep == nullptr)
 	{
 		dbugLog(_FLW, "Endpoint not found for backchannel connect for teul index %d", teulIndex);
+		return false;
 	}
-
+	
+	ep->m_pairdUdpConn = new RakNetChannel(false, port, ep);
+	ep->m_pairdUdpConn->init();
 	return ep->m_pairdUdpConn->setPublicKey(packedPublicKey, teulIndex);
 }
 
@@ -48,8 +51,13 @@ void wwiiBackChannelDisconnect(UINT32 teulIndex)
 	if (ep == nullptr)
 	{
 		dbugLog(_FLW, "Endpoint not found for backchannel disconnect for teul index %d", teulIndex);
+		return;
 	}
 
-	ep->m_pairdUdpConn->release();
+	if (ep->m_pairdUdpConn != nullptr)
+	{
+		ep->m_pairdUdpConn->release();
+		ep->m_pairdUdpConn = nullptr;
+	}
 }
 

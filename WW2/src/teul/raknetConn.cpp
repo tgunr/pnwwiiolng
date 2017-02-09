@@ -141,6 +141,7 @@ bool RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
 		}
 		else
 		{
+            dbugLog(_FLW, "Connected to backchannel on teulIndex: %d", teulIndex);
 			m_isConnected = true;
 		}
 	}
@@ -162,6 +163,7 @@ void RakNetChannel::update()
 #ifdef DEV_BUILD
 			dbugLog(_FLD, "cell:%s px:%u", p->systemAddress.ToString(), packetX);
 #endif
+            
 			switch (packetX)
 			{
 			case ID_DISCONNECTION_NOTIFICATION:
@@ -188,7 +190,9 @@ void RakNetChannel::update()
 			case ID_USER_PACKET_ENUM:
 				processApplicationPacket(p, ip);
 				break;
-
+            case ID_PUBLIC_KEY_MISMATCH:
+                dbugLog(_FLW, "cell:%s Public Key mismatch", p->systemAddress.ToString());
+                break;
 			default:
 				dbugLog(_FLI, "Unknown packet id %u", packetX);
 				break;
@@ -233,6 +237,17 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p, UINT32 ip)
 
 bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
 {
+    if (!isInitialized())
+    {
+        dbugLog(_FLW, "Server Could not send to backchannel, not initialized for endpoint %d", endpoint.teulIndex());
+        return false;
+    }
+    else if (!isServer() && !isConnected())
+    {
+        dbugLog(_FLW, "Client could not send through backchannel, not connected to server for endpoint %d", endpoint.teulIndex());
+        return false;
+    }
+    
 	RakNet::BitStream bitStream;
 	UINT8 msgType = static_cast<UINT8>(ID_USER_PACKET_ENUM);
 	bitStream.Write(msgType);
@@ -255,6 +270,10 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
 	{
 		dbugLog(_FLW, "Failed to send data over backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
 	}
+    else
+    {
+        dbugLog(_FLI, "Sent data via backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
+    }
 
 	return (result > 0);
 }
