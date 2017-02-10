@@ -1,13 +1,21 @@
 #include <syscfg.h> // Path is project specific.
-// Created: Fri Sep 29 16:08:01 CDT 2006
+// Created: February 2017
 //
 // Raknet data backchannel functions
 //
-// Copyright (C) PlayNet, Inc 1999-2006 - All rights reserved.
+// Copyright (C) PlayNet, Inc 1999-2017 - All rights reserved.
 // Not for redistribution.
 //
-// Originating Programmer: Oliver "kfsone" Smith
+// Originating Programmer: Ian "frisbone" Frisbie
 //
+// Notes:
+//
+//    This class is part of the Teul library and is shared between clients and
+// servers.  A server is special because it opens a single channel/object
+// and awaits incoming connections.  The client awaits authentication through
+// the sharing of the public key through a normal TCP teul endpoint and once
+// the key is received it opens a channel to the server.  Once the servers
+// receive this open request it registers the IP for transmission to client.
 
 #include "raknetConn.h"
 
@@ -31,6 +39,10 @@ bool libCatSecurityEnabled = false;
 typedef std::map<UINT32, SystemAddress> IP_SYS_MAP;
 static IP_SYS_MAP ipToSysMap;
 
+/*
+ * Private method called for server to add the incoming client connection
+ * to a map for later transmission.
+ */
 void RakNetChannel::_addHost(UINT32 ip, const SystemAddress address)
 {
 	dbugLog(_FLD, "adding host %s", teulGetAddress(ip));
@@ -41,6 +53,10 @@ void RakNetChannel::_addHost(UINT32 ip, const SystemAddress address)
 	ipToSysMap[ip] = address;
 }
 
+/*
+ * Ensures the ip to SystemAddress map is limited to only open 
+ * connections.
+ */
 void RakNetChannel::_removeHost(UINT32 ip)
 {
 	dbugLog(_FLD, "disconnecting cell %s", teulGetAddress(ip));
@@ -52,6 +68,10 @@ void RakNetChannel::_removeHost(UINT32 ip)
 	}
 }
 
+/*
+ * Must be called after the connection is created in order to be usable.  Will set the 
+ * initialized flag if successful and can be tested through isInitialized()
+ */
 bool RakNetChannel::init()
 {
 	// allocate a raknet peer resource
@@ -72,7 +92,7 @@ bool RakNetChannel::init()
 				m_sd.port = (m_isServer)?m_port:0;
 
 				// TODO: link to cell hosts max connections value
-				const int maxConn = (m_isServer) ? 2000 : 1;
+                UINT16 maxConn = (m_isServer) ? 2000 : 1;
 
 				// Instruct peer channel to startup 
 				m_peer->Startup(maxConn, &m_sd, 1);
@@ -103,6 +123,12 @@ bool RakNetChannel::init()
 	return m_initialized;
 }
 
+/*
+ * Should be called when there is no longer a use for this channel:
+ *    - Server should call this when shutting down
+ *    - Client should call this when it loses its paired TCP link to host
+ *    - Client should call this when shutting down
+ */
 void RakNetChannel::release()
 {
 	if (m_initialized)
@@ -123,7 +149,9 @@ void RakNetChannel::release()
 	}
 }
 
-// this method is called on clients when the server passes the public key via teul connection
+/*
+ * this method is called on clients when the server passes the public key via teul connection
+ */
 bool RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
 {
 	PublicKey pk;
@@ -145,7 +173,7 @@ bool RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
 		}
 		else
 		{
-            dbugLog(_FLW, "Connected to backchannel on teulIndex: %d", teulIndex);
+            dbugLog(_FLN, "Connected to backchannel on teulIndex: %d", teulIndex);
 			m_isConnected = true;
 		}
 	}
@@ -153,7 +181,13 @@ bool RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
 	return m_isConnected;
 }
 
-// Call to m_peer->Receive() will be here
+/*
+ * Calling this function is the only way to manage incoming notifications from the peer 
+ * system and this includes the user data exchanged.  Although it could be called from its own thread
+ * it should be serialized though the same thread that ultimately services the TCP channels so we don't
+ * run into simultaneous access issues.  NOTE: Raknet already manages its own separate thread for 
+ * each channel anyway so there is no fear that the underlying network layers will not be serviced.
+ */
 void RakNetChannel::update()
 {
 	if (m_peer != nullptr && m_peer->IsActive())
@@ -204,6 +238,10 @@ void RakNetChannel::update()
 	}
 }
 
+/*
+ * Incoming user data is handled here and it is passed through to the registered callback just as it would through
+ * the normal TCP endpoint.
+ */
 void RakNetChannel::processApplicationPacket(RakNet::Packet *p, UINT32 ip)
 {
 	ENDPOINT *sourceEndpoint = (isServer()) ? ipToEndPoint[ip] : m_endpoint;
@@ -224,8 +262,11 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p, UINT32 ip)
 			return;
 		}
 
-		UCHAR* const dataStart = reinterpret_cast<UCHAR *>(&hdr[1]);	// Immediately after the header.
-		callback->processCallback(*sourceEndpoint, dataStart, p->length - sizeof(*hdr) - 1);  // adjust for header and type field
+        // Immediately after the header.
+		UCHAR* const dataStart = reinterpret_cast<UCHAR *>(&hdr[1]);
+        
+        // adjust for header and type field
+		callback->processCallback(*sourceEndpoint, dataStart, static_cast<SINT32>(p->length - sizeof(*hdr) - 1));
 	}
 	else
 	{
@@ -234,6 +275,10 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p, UINT32 ip)
 
 }
 
+/*
+ * This method should be called by either client or server to transmit a user message through the backchannel to 
+ * a partnered endpoint.
+ */
 bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
 {
     if (!isInitialized())
@@ -255,6 +300,7 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
     // We need to specify the target address
     // NOTE: we might be able to do without this map I think - wait for now
     SystemAddress addr;
+    memset(&addr, 0, sizeof(SystemAddress));
     if (isServer())
     {
         addr = ipToSysMap[endpoint.destAddress()];
@@ -264,14 +310,20 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
         addr.address.addr4 = endpoint.destSockAddress;
     }
     
-	UINT32 result = m_peer->Send(&bitStream, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, 0, addr, false);
-	if (result == 0)
-	{
-		dbugLog(_FLW, "Failed to send data over backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
-	}
-    else
+    UINT32 result = 0;
+    
+    // make sure we are connected to this address
+    if (addr.address.addr4.sin_addr.s_addr != 0)
     {
-        dbugLog(_FLI, "Sent data via backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
+        result = m_peer->Send(&bitStream, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, 0, addr, false);
+        if (result == 0)
+        {
+            dbugLog(_FLW, "Failed to send data over backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
+        }
+        else
+        {
+            dbugLog(_FLI, "Sent data via backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
+        }
     }
 
 	return (result > 0);

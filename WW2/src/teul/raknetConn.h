@@ -1,13 +1,23 @@
 #pragma once
-// Created: Fri Sep 29 16:08:01 CDT 2006
+// Created: February 2017
 //
-// Raknet support for WWII Online
+// Raknet data backchannel functions
 //
-// Copyright (C) PlayNet, Inc 1999-2006 - All rights reserved.
+// Copyright (C) PlayNet, Inc 1999-2017 - All rights reserved.
 // Not for redistribution.
 //
-// Originating Programmer: Oliver "kfsone" Smith
+// Originating Programmer: Ian "frisbone" Frisbie
+//
+// Notes:
+//
+//    This class is part of the Teul library and is shared between clients and
+// servers.  A server is special because it opens a single channel/object
+// and awaits incoming connections.  The client awaits authentication through
+// the sharing of the public key through a normal TCP teul endpoint and once
+// the key is received it opens a channel to the server.  Once the servers
+// receive this open request it registers the IP for transmission to client.
 
+// TODO: sample files say to set this but I think it is set elsewhere - can probably remove this
 #define LIBCAT_SECURITY 1
 
 #include "RakPeerInterface.h"
@@ -25,7 +35,6 @@ class TunnelKeyPair;
 class RakNetChannel
 {
 public:
-	// Default Constructor
 	RakNetChannel(const bool isSrvr, const UINT16 port, ENDPOINT *endpoint) 
 	{
 		m_isServer = isSrvr;
