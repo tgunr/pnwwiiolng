@@ -91,8 +91,10 @@ bool RakNetChannel::init()
 				//    only server needs port to be identified
 				m_sd.port = (m_isServer)?m_port:0;
 
-				// TODO: link to cell hosts max connections value
-                UINT16 maxConn = (m_isServer) ? 2000 : 1;
+				// Currently there is no limit established per cell host for connections.  The only real limit
+                // is established by auth and it covers all players: Not spawned + players spawned into all cells = 675 (currently)
+                // when we launch with steam this number will be bumped up obviously - for now we'll leave it at 1300
+                UINT16 maxConn = (m_isServer) ? 1300 : 1;
 
 				// Instruct peer channel to startup 
 				m_peer->Startup(maxConn, &m_sd, 1);
@@ -125,9 +127,9 @@ bool RakNetChannel::init()
 
 /*
  * Should be called when there is no longer a use for this channel:
- *    - Server should call this when shutting down
+ *    - Server should call this when shutting down (but cleanup in general is already fubar so this can wait for that)
  *    - Client should call this when it loses its paired TCP link to host
- *    - Client should call this when shutting down
+ *    - Client should call this when shutting down (but normal close of TCP endpoint will trigger it)
  */
 void RakNetChannel::release()
 {
@@ -201,10 +203,11 @@ void RakNetChannel::update()
 			switch (packetX)
 			{
 			case ID_DISCONNECTION_NOTIFICATION:
-				dbugLog(_FLN, "cell:%s disconnected", p->systemAddress.ToString());
+				dbugLog(_FLN, "Raknet: %s disconnected", p->systemAddress.ToString());
+                _removeHost(ip);
 				break;
 			case ID_CONNECTION_ATTEMPT_FAILED:
-				dbugLog(_FLW, "Raknet: ell:%s connection attempt failed", p->systemAddress.ToString());
+				dbugLog(_FLW, "Raknet: %s connection attempt failed", p->systemAddress.ToString());
 				break;
 			case ID_NEW_INCOMING_CONNECTION:
 				dbugLog(_FLN, "Raknet: %s connecting", p->systemAddress.ToString());
@@ -220,6 +223,7 @@ void RakNetChannel::update()
 				break;
 			case ID_CONNECTION_LOST:
 				dbugLog(_FLW, "Raknet: %s connection lost", p->systemAddress.ToString());
+                _removeHost(ip);
 				break;
 			case ID_USER_PACKET_ENUM:
 				processApplicationPacket(p, ip);

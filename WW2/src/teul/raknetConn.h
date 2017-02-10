@@ -17,7 +17,7 @@
 // the key is received it opens a channel to the server.  Once the servers
 // receive this open request it registers the IP for transmission to client.
 
-// TODO: sample files say to set this but I think it is set elsewhere - can probably remove this
+// Raknet headers are sensitive to this flag so it needs to be defined when referencing them
 #define LIBCAT_SECURITY 1
 
 #include "RakPeerInterface.h"
@@ -35,7 +35,7 @@ class TunnelKeyPair;
 class RakNetChannel
 {
 public:
-	RakNetChannel(const bool isSrvr, const UINT16 port, ENDPOINT *endpoint) 
+	RakNetChannel(const bool isSrvr, const UINT16 port, ENDPOINT *endpoint)
 	{
 		m_isServer = isSrvr;
 		m_port = port;

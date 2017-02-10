@@ -21,6 +21,7 @@
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiNetPorts.h"
 #include "teul/raknetConn.h"
+#include "wwii/wwiiConfig.h"
 
 UINT32 totalPacketsSent;
 UINT32 totalPacketsRecv;
@@ -198,13 +199,20 @@ ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 	const UINT32 packetBytes = packet.packetSizeBytes();
 
 	// First check to see if this should be sent via a RakNet backchannel
+    //      - through configuration, make sure we even have it enabled.
+    //      - application must be asking for UDP
+    //      - channel must exist, be initialized
+    //      - if a client, must also be connected
 	if (protocolPreference == PROTOCOL_UDP &&
 		m_pairdUdpConn != nullptr && m_pairdUdpConn->isInitialized() &&
 		(m_pairdUdpConn->isServer() || m_pairdUdpConn->isConnected()))
 	{
-		// No need to encrypt, RakNet has its own encryption
-		if (m_pairdUdpConn->send(packet, *this))
-			return packetBytes;
+#if platBuild == BUILD_SERVER
+        if (host_config.netcode3Enabled)
+#endif
+            // No need to encrypt, RakNet has its own encryption
+            if (m_pairdUdpConn->send(packet, *this))
+                return static_cast<SINT32>(packetBytes);
 	}  // fall through if sending failed - transmit via normal path
 
 	packet.header().m_tag = ++this->m_impl->sentTag;
@@ -245,7 +253,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 			packet.addBytesSent(sent);
 			if ( packet.sentBytes() >= packetBytes )
 			{
-				return packetBytes;
+				return static_cast<SINT32>(packetBytes);
 			}
 		}
 		// Partial or blocked send falls thru and queues the remainder.
@@ -262,7 +270,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 
 	setWritesPending(true);
 
-	return packetBytes;
+	return static_cast<SINT32>(packetBytes);
 }
 
 //////////////////////////////////////////////////////////////////////

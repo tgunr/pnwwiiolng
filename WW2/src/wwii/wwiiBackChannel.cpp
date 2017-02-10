@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////
 // Connect a back channel -- one per player client
 
-bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, UINT32 teulIndex, UINT32 playerId, UINT32 otp, char * packedPublicKey)
+bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, SINT32 teulIndex, UINT32 playerId, UINT32 otp, char * packedPublicKey)
 {
 	wwiiBackChannelDisconnect(teulIndex) ;
 
@@ -44,7 +44,7 @@ bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, UINT32 teulIndex,
 //////////////////////////////////////////////////////////////////////
 // Disconnect a player client
 
-void wwiiBackChannelDisconnect(UINT32 teulIndex)
+void wwiiBackChannelDisconnect(SINT32 teulIndex)
 {
 
 	ENDPOINT *ep = teulGetEndpoint(teulIndex);
@@ -57,6 +57,7 @@ void wwiiBackChannelDisconnect(UINT32 teulIndex)
 	if (ep->m_pairdUdpConn != nullptr)
 	{
 		ep->m_pairdUdpConn->release();
+		delete ep->m_pairdUdpConn;
 		ep->m_pairdUdpConn = nullptr;
 	}
 }
