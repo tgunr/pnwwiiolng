@@ -24,7 +24,7 @@ bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, SINT32 teulIndex,
 {
 	wwiiBackChannelDisconnect(teulIndex) ;
 
-	if ( cfgPrefsGetBool("app.usenetcode", false) == true )
+	if ( !g_wantNetcode )
 	{
 		return false ;
 	}
