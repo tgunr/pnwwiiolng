@@ -32,6 +32,10 @@
 #include "cat/math/BigTwistedEdwards.hpp"
 #include "cat/crypt/rand/Fortuna.hpp"
 
+#if platBuild == BUILD_SERVER
+#include "configVars.h"
+#endif
+
 extern IP_ENDPOINT_MAP ipToEndPoint;
 
 bool libCatSecurityEnabled = false;
@@ -91,12 +95,12 @@ bool RakNetChannel::init()
 				//    only server needs port to be identified
 				m_sd.port = (m_isServer)?m_port:0;
 
-				// Currently there is no limit established per cell host for connections.  The only real limit
-                // is established by auth and it covers all players: Not spawned + players spawned into all cells = 675 (currently)
-                // when we launch with steam this number will be bumped up obviously - for now we'll leave it at 1300
-                UINT16 maxConn = (m_isServer) ? 1300 : 1;
-
-				// Instruct peer channel to startup 
+#if platBuild == BUILD_SERVER
+                UINT16 maxConn = cv_maxCellPlayers.GetUint32();
+#else
+                UINT16 maxConn = 1;
+#endif
+				// Instruct peer channel to startup
 				m_peer->Startup(maxConn, &m_sd, 1);
 
 				if (m_isServer)
