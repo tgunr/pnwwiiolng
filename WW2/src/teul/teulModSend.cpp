@@ -199,8 +199,8 @@ ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 
 	// First check to see if this should be sent via a RakNet backchannel
 	if (protocolPreference == PROTOCOL_UDP &&
-		m_pairdUdpConn != nullptr &&
-		m_pairdUdpConn->isConnected())
+		m_pairdUdpConn != nullptr && m_pairdUdpConn->isInitialized() &&
+		(m_pairdUdpConn->isServer() || m_pairdUdpConn->isConnected()))
 	{
 		// No need to encrypt, RakNet has its own encryption
 		if (m_pairdUdpConn->send(packet, *this))

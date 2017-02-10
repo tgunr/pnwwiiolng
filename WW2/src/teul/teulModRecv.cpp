@@ -384,7 +384,10 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		getsockname(newSock, (sockaddr*)&newEndpoint->localSockAddress, &len);
 		assert( len == SockAddrLen );
 
+		// endpoints created inherit the parents backchannel
+		newEndpoint->m_pairdUdpConn = endpoint.m_pairdUdpConn;
 		newEndpoint->fromSockAddress = endpoint.fromSockAddress;
+
 		// If we only have a partial address, use the local address to fill it out.
 		static const UINT32 netMask = 0x00ffffff;
 		if ( (newEndpoint->fromSockAddress.sin_addr.s_addr & netMask) == 0 )
