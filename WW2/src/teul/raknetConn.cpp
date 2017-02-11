@@ -158,33 +158,39 @@ void RakNetChannel::release()
 /*
  * this method is called on clients when the server passes the public key via teul connection
  */
-bool RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
+int RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
 {
 	PublicKey pk;
 	pk.remoteServerPublicKey = publicKey;
 	pk.publicKeyMode = PKM_USE_KNOWN_PUBLIC_KEY; // Recommended mode
     pk.myPrivateKey = nullptr;
     pk.myPublicKey = nullptr;
-    
-	ENDPOINT *ep = teulGetEndpoint(teulIndex);
-	if (ep != nullptr)
-	{
-		// basically a keep alive
-		m_peer->SetOccasionalPing(true);
+	int retCode = RN_SK_FAILED;
 
-		if (CONNECTION_ATTEMPT_STARTED != m_peer->Connect(teulGetAddress(ep->destAddress()), ep->destPort(), 0, 0, &pk))
+	if (isInitialized())
+	{
+		ENDPOINT *ep = teulGetEndpoint(teulIndex);
+		if (ep != nullptr)
 		{
-			m_isConnected = false;
-			dbugLog(_FLW, "Warning: Connect() returned false - invalid public key most likely");
-		}
-		else
-		{
-            dbugLog(_FLN, "Connected to backchannel on teulIndex: %d", teulIndex);
-			m_isConnected = true;
+			// basically a keep alive
+			m_peer->SetOccasionalPing(true);
+
+			if (CONNECTION_ATTEMPT_STARTED != m_peer->Connect(teulGetAddress(ep->destAddress()), ep->destPort(), 0, 0, &pk))
+			{
+				m_isConnected = false;
+				dbugLog(_FLW, "Warning: Connect() returned false - invalid public key most likely");
+			}
+			else
+			{
+				retCode = RN_SK_CONNECTED;
+				dbugLog(_FLN, "Connected to backchannel on teulIndex: %d", teulIndex);
+				m_isConnected = true;
+				m_wasConnected = true;
+			}
 		}
 	}
 
-	return m_isConnected;
+	return retCode;
 }
 
 /*

@@ -57,6 +57,7 @@
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRoomLists.h"
 #include "omg/omgChat.hxx"
+#include "teul/raknetConn.h"
 
 using namespace ww2;
 
@@ -349,6 +350,11 @@ Client::~Client()
 void ClientHostConnection::onError(Client* client, SINT32 error)
 {
 	Teul::Connection::onError(client, error);
+
+	ENDPOINT *ep = teulGetEndpoint(m_teulIndex);
+	if (ep->m_pairdUdpConn != nullptr)
+		if (ep->m_pairdUdpConn->wasDisconnected())
+			uiChatPrintLineColor(colorYELLOWALPHA, uiLocString("connect.netcode3.disabled").c_str());
 
 	ww2::HostState* state = client->GetHostStateByType(m_type);
 	if(!state) return;

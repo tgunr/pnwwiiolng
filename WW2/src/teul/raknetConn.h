@@ -32,6 +32,11 @@ class AddressOrGUID;
 class RakPeerInterface;
 class TunnelKeyPair;
 
+enum {
+	RN_SK_CONNECTED,
+	RN_SK_FAILED
+};
+
 class RakNetChannel
 {
 public:
@@ -42,19 +47,23 @@ public:
 		m_endpoint = endpoint;
 		m_initialized = false;
 		m_isConnected = false;  // client notion only
+		m_wasConnected = false; // client notion only
 	}
 
 	bool init();
 	void release();
 
 	const UCHAR *getPackedPublicKey() { return m_pair.GetPublicKey(); }
-	bool setPublicKey( char *publicKey, SINT32 teulIndex);
+	int setPublicKey( char *publicKey, SINT32 teulIndex);
 
 	void update();
 	bool send(Teul::Packet& packet, ENDPOINT& endpoint);
 	bool isInitialized() { return m_initialized; }
 	bool isConnected() { return m_isConnected; }
 	bool isServer() { return m_isServer; }
+
+	// samples last state and returns it while clearing it.
+	bool wasDisconnected() { bool retVal = m_wasConnected; m_wasConnected = false; return retVal && !m_isConnected; }
 
 private:
 
@@ -77,7 +86,7 @@ private:
 
 	bool m_initialized;
 	bool m_isConnected;
-
+	bool m_wasConnected;
 };
 
 

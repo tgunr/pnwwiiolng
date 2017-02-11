@@ -14,6 +14,10 @@
 #include "teul/teulEndpoint.h"
 #include "teul/raknetConn.h"
 #include "teul/teulBasic.h"
+#include "ui/uiChat.h"
+#include "pi/piogl.h"
+#include "ogl/oglcolors.h"
+#include "ui/uiMain.h"
 
 #include "dbug/dbug.h"
 
@@ -28,11 +32,14 @@ bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, SINT32 teulIndex,
 
 	if ( !g_wantNetcode )
 	{
+		if (playerId != 0)
+			uiChatPrintLineColor(colorGREENALPHA, uiLocString("connect.netcode3.enabled.server").c_str());
+
 		return false ;
 	}
 
 	// make sure there is a Raknet component to the activate information
-	if (teulIndex != 0 &&
+	if (playerId != 0 &&
 		(!libCatSecurityEnabled || reinterpret_cast<int *>(packedPublicKey)))
 	{
 		ENDPOINT *ep = teulGetEndpoint(teulIndex);
@@ -42,9 +49,24 @@ bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, SINT32 teulIndex,
 			return false;
 		}
 		
-		ep->m_pairdUdpConn = new RakNetChannel(false, port, ep);
+		if (ep->m_pairdUdpConn == nullptr)
+			ep->m_pairdUdpConn = new RakNetChannel(false, port, ep);
 		ep->m_pairdUdpConn->init();
-		return ep->m_pairdUdpConn->setPublicKey(packedPublicKey, teulIndex);
+		int resp = ep->m_pairdUdpConn->setPublicKey(packedPublicKey, teulIndex);
+		switch (resp)
+		{
+		case RN_SK_CONNECTED:
+			uiChatPrintLineColor(colorGREENALPHA, uiLocString("connect.netcode3.enabled").c_str());
+			break;
+		case RN_SK_FAILED:
+			uiChatPrintLineColor(colorYELLOWALPHA, uiLocString("connect.netcode3.failed").c_str());
+			break;
+		}
+		return (resp == RN_SK_CONNECTED);
+	}
+	else
+	{
+		uiChatPrintLineColor(colorYELLOWALPHA, uiLocString("connect.netcode3.disabled.server").c_str());
 	}
 	
 	// No, Raknet must be disabled by the server
@@ -67,8 +89,6 @@ void wwiiBackChannelDisconnect(SINT32 teulIndex)
 	if (ep->m_pairdUdpConn != nullptr)
 	{
 		ep->m_pairdUdpConn->release();
-		delete ep->m_pairdUdpConn;
-		ep->m_pairdUdpConn = nullptr;
 	}
 }
 

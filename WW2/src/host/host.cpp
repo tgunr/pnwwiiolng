@@ -1688,7 +1688,7 @@ _personaActivate(SINT32 teulIndex , PlayerStatusNode* psn)
 	if (host_config.netcode3Enabled)
 	{
 		activate.teulIndex = (UINT32)teulIndex;
-		activate.playerID = psn->dispatch().m_customerID;
+		activate.playerID = player->playerID();
 		activate.otp = psn->dispatch().m_OTP;
 		ENDPOINT *ep = teulGetEndpoint(teulIndex);
 		if (ep != nullptr && ep->m_parent != nullptr && ep->m_parent->m_pairdUdpConn != nullptr)
