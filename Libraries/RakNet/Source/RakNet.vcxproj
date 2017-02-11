@@ -54,7 +54,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\Engine\RakNet3.0\DependentExtensions\speex-1.1.12\include\speex;$(SolutionDir)Source\Engine\RakNet3.0\DependentExtensions\speex-1.1.12\include;$(SolutionDir)Source\Engine\RakNet3.0\DependentExtensions\bzip2-1.0.6;$(SolutionDir)Source\Engine\RakNet3.0\DependentExtensions\AutopatcherPostgreRepository;$(SolutionDir)Source\Engine\RakNet3.0\DependentExtensions;$(SolutionDir)Source\Engine\RakNet3.0\CrashReporter;$(SolutionDir)Source\Engine\RakNet3.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;$(SolutionDir)\Libraries\Raknet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;WIN32;_WINDOWS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -79,8 +79,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Source\Engine\RakNet3.0\DependentExtensions\speex-1.1.12\include\speex;$(SolutionDir)Source\Engine\RakNet3.0\DependentExtensions\speex-1.1.12\include;$(SolutionDir)Source\Engine\RakNet3.0\DependentExtensions\bzip2-1.0.6;$(SolutionDir)Source\Engine\RakNet3.0\DependentExtensions\AutopatcherPostgreRepository;$(SolutionDir)Source\Engine\RakNet3.0\DependentExtensions;$(SolutionDir)Source\Engine\RakNet3.0\CrashReporter;$(SolutionDir)Source\Engine\RakNet3.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;$(SolutionDir)\Libraries\Raknet\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>XP_WIN;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_WINDOWS;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <PrecompiledHeader />
