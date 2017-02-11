@@ -29,16 +29,23 @@ bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, SINT32 teulIndex,
 		return false ;
 	}
 
-	ENDPOINT *ep = teulGetEndpoint(teulIndex);
-	if (ep == nullptr)
+	// make sure there is a Raknet component to the activate information
+	if (teulIndex != 0 && playerId != 0 && reinterpret_cast<int *>(packedPublicKey))
 	{
-		dbugLog(_FLW, "Endpoint not found for backchannel connect for teul index %d", teulIndex);
-		return false;
+		ENDPOINT *ep = teulGetEndpoint(teulIndex);
+		if (ep == nullptr)
+		{
+			dbugLog(_FLW, "Endpoint not found for backchannel connect for teul index %d", teulIndex);
+			return false;
+		}
+		
+		ep->m_pairdUdpConn = new RakNetChannel(false, port, ep);
+		ep->m_pairdUdpConn->init();
+		return ep->m_pairdUdpConn->setPublicKey(packedPublicKey, teulIndex);
 	}
 	
-	ep->m_pairdUdpConn = new RakNetChannel(false, port, ep);
-	ep->m_pairdUdpConn->init();
-	return ep->m_pairdUdpConn->setPublicKey(packedPublicKey, teulIndex);
+	// No, Raknet must be disabled by the server
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
