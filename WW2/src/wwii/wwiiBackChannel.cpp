@@ -17,6 +17,8 @@
 
 #include "dbug/dbug.h"
 
+extern bool libCatSecurityEnabled;
+
 //////////////////////////////////////////////////////////////////////
 // Connect a back channel -- one per player client
 
@@ -30,7 +32,8 @@ bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, SINT32 teulIndex,
 	}
 
 	// make sure there is a Raknet component to the activate information
-	if (teulIndex != 0 && playerId != 0 && reinterpret_cast<int *>(packedPublicKey))
+	if (teulIndex != 0 &&
+		(!libCatSecurityEnabled || reinterpret_cast<int *>(packedPublicKey)))
 	{
 		ENDPOINT *ep = teulGetEndpoint(teulIndex);
 		if (ep == nullptr)
