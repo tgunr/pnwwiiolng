@@ -675,12 +675,10 @@ bool ReliabilityLayer::HandleSocketReceiveFromConnectedPlayer(
 	{
 		if (useSecurity)
 		{
-			unsigned int received = length;
-
-			if (!auth_enc.Decrypt((cat::u8*)buffer, received))
+			if (!auth_enc.Decrypt((cat::u8*)buffer, length))
 				return false;
 
-			length = received;
+            length -= cat::AuthenticatedEncryption::OVERHEAD_BYTES;
 		}
 	}
 #endif
@@ -2326,8 +2324,9 @@ void ReliabilityLayer::SendBitStream( RakNetSocket2 *s, SystemAddress &systemAdd
 
 			// Verify there is enough room for encrypted output and encrypt
 			// Encrypt() will increase length
-			static unsigned long long nextIv = 0;
-			bool success = auth_enc.Encrypt(nextIv, buffer, buffer_size);
+            unsigned long long iv = auth_enc.GrabIVRange(1);
+            length += cat::AuthenticatedEncryption::OVERHEAD_BYTES;
+			bool success = auth_enc.Encrypt(iv, buffer, length);
 			RakAssert(success);
 		}
 	}

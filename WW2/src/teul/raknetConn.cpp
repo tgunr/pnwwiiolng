@@ -49,7 +49,7 @@ static IP_SYS_MAP ipToSysMap;
  */
 void RakNetChannel::_addHost(UINT32 ip, const SystemAddress address)
 {
-	dbugLog(_FLD, "adding host %s", teulGetAddress(ip));
+	dbugLog(_FLD, "Raknet: adding host %s", teulGetAddress(ip));
 
 	IP_SYS_MAP::iterator it = ipToSysMap.find(ip);
 	if (it != ipToSysMap.end() && it->second == address)
@@ -63,7 +63,7 @@ void RakNetChannel::_addHost(UINT32 ip, const SystemAddress address)
  */
 void RakNetChannel::_removeHost(UINT32 ip)
 {
-	dbugLog(_FLD, "disconnecting cell %s", teulGetAddress(ip));
+	dbugLog(_FLD, "Raknet: disconnecting cell %s", teulGetAddress(ip));
 	IP_SYS_MAP::iterator it = ipToSysMap.find(ip);
 	if (it != ipToSysMap.end())
 	{
@@ -112,17 +112,17 @@ bool RakNetChannel::init()
 			}
 			else 
 			{
-				dbugLog(_FLW, "Warning: Public/private keys are invalid!");
+				dbugLog(_FLW, "Raknet: Warning: Public/private keys are invalid!");
 			}
 		}
 		else
 		{
-			dbugLog(_FLW, "Warning Unable to generate key for client");
+			dbugLog(_FLW, "Raknet: Warning Unable to generate key for client");
 		}
 	}
 	else
 	{
-		dbugLog(_FLW, "Warning: Unable to allocate RakNet peer resource");
+		dbugLog(_FLW, "Raknet: Warning: Unable to allocate RakNet peer resource");
 
 	}
 
@@ -145,6 +145,8 @@ void RakNetChannel::release()
 			{
                 m_endpoint->doError(RN_SK_FAILED);
 				m_peer->Shutdown(0);
+                m_isConnected = false;
+                m_isConnecting = false;
 			}
 
 			RakNet::RakPeerInterface::DestroyInstance(m_peer);
@@ -173,23 +175,41 @@ int RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
 		ENDPOINT *ep = teulGetEndpoint(teulIndex);
 		if (ep != nullptr)
 		{
-			// basically a keep alive
-			m_peer->SetOccasionalPing(true);
+            if (!isConnected() && !isConnecting())
+            {
+                // basically a keep alive
+                m_peer->SetOccasionalPing(true);
 
-			if (CONNECTION_ATTEMPT_STARTED != m_peer->Connect(teulGetAddress(ep->destAddress()), ep->destPort(), 0, 0, &pk))
-			{
-				m_isConnected = false;
-				dbugLog(_FLW, "Warning: Connect() returned false - invalid public key most likely");
-			}
-			else
-			{
-				retCode = RN_SK_CONNECTED;
-				dbugLog(_FLN, "Connected to backchannel on teulIndex: %d", teulIndex);
-				m_isConnected = true;
-				m_wasConnected = true;
-			}
+                if (CONNECTION_ATTEMPT_STARTED != m_peer->Connect(teulGetAddress(ep->destAddress()), ep->destPort(), 0, 0, &pk))
+                {
+                    m_isConnecting = false;
+                    m_isConnected = false;
+                    dbugLog(_FLW, "Raknet: Warning: Connect() returned false - invalid public key most likely");
+                }
+                else
+                {
+                    retCode = RN_SK_CONNECTING;
+                    dbugLog(_FLN, "Raknet: Connecting to backchannel on teulIndex: %d", teulIndex);
+                    m_isConnecting = true;
+                }
+            }
+            else
+            {
+                if (isConnected())
+                    dbugLog(_FLW, "Raknet: Can't connect to already connected channel!");
+                else if (isConnecting())
+                    dbugLog(_FLW, "Raknet: Can't connect to a channel in the process of connecting!");
+            }
 		}
+        else
+        {
+            dbugLog(_FLW, "Raknet: Can't connect through invalid endpoint!");
+        }
 	}
+    else
+    {
+        dbugLog(_FLW, "Raknet: Can't connect when not previously initialized!");
+    }
 
 	return retCode;
 }
@@ -213,47 +233,59 @@ void RakNetChannel::update()
 
 			switch (packetX)
 			{
-			case ID_DISCONNECTION_NOTIFICATION:
-				dbugLog(_FLN, "Raknet: %s disconnected", p->systemAddress.ToString());
-                if (isServer())
-                    _removeHost(ip);
-                else
+                case ID_DISCONNECTION_NOTIFICATION:
+                    dbugLog(_FLN, "Raknet: %s disconnected", p->systemAddress.ToString());
+                    if (isServer())
+                        _removeHost(ip);
+                    else
+                    {
+                        // time to abort netcode3
+                        m_peer->DeallocatePacket(p);
+                        release();
+                        return;
+                    }
+                    break;
+                case ID_CONNECTION_ATTEMPT_FAILED:
+                    dbugLog(_FLW, "Raknet: %s connection attempt failed", p->systemAddress.ToString());
+                    m_peer->DeallocatePacket(p);
                     release();
-				break;
-			case ID_CONNECTION_ATTEMPT_FAILED:
-				dbugLog(_FLW, "Raknet: %s connection attempt failed", p->systemAddress.ToString());
-                release();
-				break;
-			case ID_NEW_INCOMING_CONNECTION:
-				dbugLog(_FLN, "Raknet: %s connecting", p->systemAddress.ToString());
-				_addHost(ip, p->systemAddress);
-				break;
-			case ID_CONNECTION_REQUEST_ACCEPTED:
-				dbugLog(_FLN, "Raknet: %s connected", p->systemAddress.ToString());
-				break;
-			case ID_ALREADY_CONNECTED:
-				dbugLog(_FLW, "Raknet: %s already connected", p->systemAddress.ToString());
-				_addHost(ip, p->systemAddress);
-				break;
-			case ID_CONNECTION_LOST:
-				dbugLog(_FLW, "Raknet: %s connection lost", p->systemAddress.ToString());
-                if (isServer())
-                    _removeHost(ip);
-                else
-                    release();
-				break;
-			case ID_USER_PACKET_ENUM:
-				processApplicationPacket(p, ip);
-				break;
-            case ID_PUBLIC_KEY_MISMATCH:
-                dbugLog(_FLW, "Raknet: %s Public Key mismatch", p->systemAddress.ToString());
-                break;
-			default:
-				dbugLog(_FLN, "Raknet: Unknown packet id %u", packetX);
-				break;
+                    return;
+                case ID_NEW_INCOMING_CONNECTION:
+                    dbugLog(_FLN, "Raknet: %s connecting", p->systemAddress.ToString());
+                    _addHost(ip, p->systemAddress);
+                    break;
+                case ID_CONNECTION_REQUEST_ACCEPTED:
+                    dbugLog(_FLN, "Raknet: %s connected", p->systemAddress.ToString());
+                    m_isConnecting = false;
+                    m_isConnected = true;
+                    break;
+                case ID_ALREADY_CONNECTED:
+                    dbugLog(_FLW, "Raknet: %s already connected", p->systemAddress.ToString());
+                    _addHost(ip, p->systemAddress);
+                    break;
+                case ID_CONNECTION_LOST:
+                    dbugLog(_FLW, "Raknet: %s connection lost", p->systemAddress.ToString());
+                    if (isServer())
+                        _removeHost(ip);
+                    else
+                    {
+                        // time to abort netcode3
+                        m_peer->DeallocatePacket(p);
+                        release();
+                        return;
+                    }
+                    break;
+                case ID_USER_PACKET_ENUM:
+                    processApplicationPacket(p, ip);
+                    break;
+                case ID_PUBLIC_KEY_MISMATCH:
+                    dbugLog(_FLW, "Raknet: %s Public Key mismatch", p->systemAddress.ToString());
+                    break;
+                default:
+                    dbugLog(_FLN, "Raknet: Unknown packet id %u", packetX);
+                    break;
 			}
-
-			m_peer->DeallocatePacket(p);
+            m_peer->DeallocatePacket(p);
 
 		}
 	}
@@ -304,12 +336,19 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
 {
     if (!isInitialized())
     {
-        dbugLog(_FLW, "Server Could not send to backchannel, not initialized for endpoint %d", endpoint.teulIndex());
+        dbugLog(_FLW, "Raknet: Server Could not send to backchannel, not initialized for endpoint %d", endpoint.teulIndex());
         return false;
     }
     else if (!isServer() && !isConnected())
     {
-        dbugLog(_FLW, "Client could not send through backchannel, not connected to server for endpoint %d", endpoint.teulIndex());
+        if (isConnecting())
+        {
+            dbugLog(_FLI, "Raknet: Still waiting for connect, can't send data yet");
+        }
+        else
+        {
+            dbugLog(_FLW, "Raknet: Client could not send through backchannel, not connected to server for endpoint %d", endpoint.teulIndex());
+        }
         return false;
     }
     
@@ -339,11 +378,11 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
         result = m_peer->Send(&bitStream, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, 0, addr, false);
         if (result == 0)
         {
-            dbugLog(_FLW, "Failed to send data over backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
+            dbugLog(_FLW, "Raknet: Failed to send data over backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
         }
         else
         {
-            dbugLog(_FLI, "Sent data via backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
+            dbugLog(_FLI, "Raknet: Sent data via backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
         }
     }
 

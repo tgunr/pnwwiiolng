@@ -55,14 +55,14 @@ bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, SINT32 teulIndex,
 		int resp = ep->m_pairdUdpConn->setPublicKey(packedPublicKey, teulIndex);
 		switch (resp)
 		{
-		case RN_SK_CONNECTED:
+		case RN_SK_CONNECTING:
 			uiChatPrintLineColor(colorGREENALPHA, uiLocString("connect.netcode3.enabled").c_str());
 			break;
 		case RN_SK_FAILED:
 			uiChatPrintLineColor(colorYELLOWALPHA, uiLocString("connect.netcode3.failed").c_str());
 			break;
 		}
-		return (resp == RN_SK_CONNECTED);
+		return (resp == RN_SK_CONNECTING);
 	}
 	else
 	{

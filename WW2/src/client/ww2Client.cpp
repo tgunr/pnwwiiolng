@@ -352,10 +352,7 @@ void ClientHostConnection::onError(Client* client, SINT32 error)
     // for raknet errors lets just end things here, its not a real connetion failure until teul goes down
     if (error == RN_SK_FAILED)
     {
-        ENDPOINT *ep = teulGetEndpoint(m_teulIndex);
-        if (ep->m_pairdUdpConn != nullptr)
-            if (ep->m_pairdUdpConn->wasDisconnected())
-                uiChatPrintLineColor(colorYELLOWALPHA, uiLocString("connect.netcode3.disabled").c_str());
+        uiChatPrintLineColor(colorYELLOWALPHA, uiLocString("connect.netcode3.disabled").c_str());
         return;
     }
     
