@@ -33,7 +33,7 @@ class RakPeerInterface;
 class TunnelKeyPair;
 
 enum {
-	RN_SK_CONNECTED,
+	RN_SK_CONNECTED = 654321,
 	RN_SK_FAILED
 };
 

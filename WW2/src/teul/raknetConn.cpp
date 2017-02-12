@@ -38,7 +38,7 @@
 
 extern IP_ENDPOINT_MAP ipToEndPoint;
 
-bool libCatSecurityEnabled = false;
+bool libCatSecurityEnabled = true;
 
 typedef std::map<UINT32, SystemAddress> IP_SYS_MAP;
 static IP_SYS_MAP ipToSysMap;
@@ -143,6 +143,7 @@ void RakNetChannel::release()
 		{
 			if (m_isConnected)
 			{
+                m_endpoint->doError(RN_SK_FAILED);
 				m_peer->Shutdown(0);
 			}
 
@@ -214,10 +215,14 @@ void RakNetChannel::update()
 			{
 			case ID_DISCONNECTION_NOTIFICATION:
 				dbugLog(_FLN, "Raknet: %s disconnected", p->systemAddress.ToString());
-                _removeHost(ip);
+                if (isServer())
+                    _removeHost(ip);
+                else
+                    release();
 				break;
 			case ID_CONNECTION_ATTEMPT_FAILED:
 				dbugLog(_FLW, "Raknet: %s connection attempt failed", p->systemAddress.ToString());
+                release();
 				break;
 			case ID_NEW_INCOMING_CONNECTION:
 				dbugLog(_FLN, "Raknet: %s connecting", p->systemAddress.ToString());
@@ -225,7 +230,6 @@ void RakNetChannel::update()
 				break;
 			case ID_CONNECTION_REQUEST_ACCEPTED:
 				dbugLog(_FLN, "Raknet: %s connected", p->systemAddress.ToString());
-				_addHost(ip, p->systemAddress);
 				break;
 			case ID_ALREADY_CONNECTED:
 				dbugLog(_FLW, "Raknet: %s already connected", p->systemAddress.ToString());
@@ -233,7 +237,10 @@ void RakNetChannel::update()
 				break;
 			case ID_CONNECTION_LOST:
 				dbugLog(_FLW, "Raknet: %s connection lost", p->systemAddress.ToString());
-                _removeHost(ip);
+                if (isServer())
+                    _removeHost(ip);
+                else
+                    release();
 				break;
 			case ID_USER_PACKET_ENUM:
 				processApplicationPacket(p, ip);

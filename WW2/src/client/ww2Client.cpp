@@ -349,13 +349,18 @@ Client::~Client()
 
 void ClientHostConnection::onError(Client* client, SINT32 error)
 {
-	Teul::Connection::onError(client, error);
-
-	ENDPOINT *ep = teulGetEndpoint(m_teulIndex);
-	if (ep->m_pairdUdpConn != nullptr)
-		if (ep->m_pairdUdpConn->wasDisconnected())
-			uiChatPrintLineColor(colorYELLOWALPHA, uiLocString("connect.netcode3.disabled").c_str());
-
+    // for raknet errors lets just end things here, its not a real connetion failure until teul goes down
+    if (error == RN_SK_FAILED)
+    {
+        ENDPOINT *ep = teulGetEndpoint(m_teulIndex);
+        if (ep->m_pairdUdpConn != nullptr)
+            if (ep->m_pairdUdpConn->wasDisconnected())
+                uiChatPrintLineColor(colorYELLOWALPHA, uiLocString("connect.netcode3.disabled").c_str());
+        return;
+    }
+    
+    Teul::Connection::onError(client, error);
+    
 	ww2::HostState* state = client->GetHostStateByType(m_type);
 	if(!state) return;
 
