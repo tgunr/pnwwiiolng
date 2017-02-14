@@ -33,6 +33,8 @@
 #include <cat/math/BitMath.hpp>
 using namespace cat;
 
+#define CAT_AUDIT
+
 // Obfuscated key names, collected here for ease of modification and less chance of typos
 #define CAT_KEYNAME_MAC(WHOAMI) ((WHOAMI) ? "dsound.dll" : "opengl32.dll")
 #define CAT_KEYNAME_CIPHER(WHOAMI) ((WHOAMI) ? "Advapi32.dll" : "OpenProcessToken")
@@ -294,16 +296,28 @@ bool AuthenticatedEncryption::Decrypt(u8 *buffer, u32 buf_bytes)
 	// Generate first block and discard all but first 8 bytes
 	u32 first_block[16];
 	remote_cipher.GenerateNeutralKeyStream(first_block);
+#ifdef CAT_AUDIT
+	printf("AUDIT: First block after GenerateNeutralKeyStream : ");
+	for (int ii = 0; ii < 16; ++ii)
+	{
+		printf("%0llx", (cat::u8)first_block[ii]);
+	}
+	printf("\n");
+#endif
 
 	// Generate the MAC by encrypting (XORing) VHash with the first 8 bytes of keystream
 	const u64 *vhash_keystream = reinterpret_cast<const u64*>( first_block );
 	const u64 *mac_input = reinterpret_cast<u64*>( overhead );
 	u64 remote_vhash = getLE(*mac_input ^ *vhash_keystream);
-	u32 lsb = remote_vhash & 1;
+//	u32 lsb = remote_vhash & 1;
 
 	// Generate VHash of the ciphertext
-	overhead[0] = (u8)lsb;
-	u64 vhash = _remote_mac.Hash(buffer, msg_bytes + 1) << 1;
+//	overhead[0] = (u8)lsb;
+//	u64 vhash = _remote_mac.Hash(buffer, msg_bytes + 1) << 1;
+	u64 vhash = _remote_mac.Hash(buffer, msg_bytes);
+#ifdef CAT_AUDIT
+	printf("AUDIT: Vhash of the ciphertext : %0llx \n", vhash);
+#endif
 
 	// Validate the MAC
 	if ((remote_vhash ^ vhash) >> 1)
@@ -315,7 +329,23 @@ bool AuthenticatedEncryption::Decrypt(u8 *buffer, u32 buf_bytes)
 	}
 
 	// Decrypt the message in-place
-    remote_cipher.Crypt(buffer, buffer, msg_bytes);
+#ifdef CAT_AUDIT
+	printf("AUDIT: Buffer before decrypt : ");
+	for (int ii = 0; ii < msg_bytes; ++ii)
+	{
+		printf("%02x", (cat::u8)buffer[ii]);
+	}
+	printf("\n");
+#endif
+	remote_cipher.Crypt(buffer, buffer, msg_bytes);
+#ifdef CAT_AUDIT
+	printf("AUDIT: Buffer after decrypt : ");
+	for (int ii = 0; ii < msg_bytes; ++ii)
+	{
+		printf("%02x", (cat::u8)buffer[ii]);
+	}
+	printf("\n");
+#endif
 
 #ifdef CAT_AUDIT
 	printf("AUDIT: MAC valid!  Message successfully decrypted!\n");
@@ -344,7 +374,7 @@ bool AuthenticatedEncryption::Encrypt(u64 &next_iv, u8 *buffer, u32 buf_bytes)
 {
 	u32 msg_bytes = buf_bytes - OVERHEAD_BYTES;
     u8 *overhead = buffer + buf_bytes - OVERHEAD_BYTES;
-	u32 lsb = overhead[0] & 1;
+//	u32 lsb = overhead[0] & 1;
 
 	// Outgoing IV increments by one each time, and starts one ahead of remotely generated IV
 	u64 iv = next_iv;
@@ -366,12 +396,40 @@ bool AuthenticatedEncryption::Encrypt(u64 &next_iv, u8 *buffer, u32 buf_bytes)
 	// Generate first block and discard all but first 8 bytes
 	u32 first_block[16];
 	local_cipher.GenerateNeutralKeyStream(first_block);
+#ifdef CAT_AUDIT
+	printf("AUDIT: First block after GenerateNeutralKeyStream : ");
+	for (int ii = 0; ii < 16; ++ii)
+	{
+		printf("%0llx", (cat::u8)first_block[ii]);
+	}
+	printf("\n");
+#endif
 
     // Encrypt the message and MAC
-    local_cipher.Crypt(buffer, buffer, msg_bytes);
+#ifdef CAT_AUDIT
+	printf("AUDIT: Buffer before encrypt : ");
+	for (int ii = 0; ii < msg_bytes; ++ii)
+	{
+		printf("%02x", (cat::u8)buffer[ii]);
+	}
+	printf("\n");
+#endif
+	local_cipher.Crypt(buffer, buffer, msg_bytes);
+#ifdef CAT_AUDIT
+	printf("AUDIT: Buffer after encrypt : ");
+	for (int ii = 0; ii < msg_bytes; ++ii)
+	{
+		printf("%02x", (cat::u8)buffer[ii]);
+	}
+	printf("\n");
+#endif
 
 	// Generate VHash of the ciphertext
-	u64 vhash = (_local_mac.Hash(buffer, msg_bytes + 1) << 1) | lsb;
+	//u64 vhash = (_local_mac.Hash(buffer, msg_bytes + 1) << 1) | lsb;
+	u64 vhash = _local_mac.Hash(buffer, msg_bytes);
+#ifdef CAT_AUDIT
+	printf("AUDIT: Vhash of the ciphertext : %0llx \n", vhash);
+#endif
 
 	// Generate the MAC by encrypting (XORing) VHash with the first 8 bytes of keystream
 	const u64 *vhash_keystream = reinterpret_cast<const u64*>( first_block );
