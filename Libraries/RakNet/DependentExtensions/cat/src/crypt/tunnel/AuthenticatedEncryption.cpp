@@ -33,7 +33,7 @@
 #include <cat/math/BitMath.hpp>
 using namespace cat;
 
-#define CAT_AUDIT
+//#define CAT_AUDIT
 
 // Obfuscated key names, collected here for ease of modification and less chance of typos
 #define CAT_KEYNAME_MAC(WHOAMI) ((WHOAMI) ? "dsound.dll" : "opengl32.dll")
@@ -279,9 +279,9 @@ bool AuthenticatedEncryption::Decrypt(u8 *buffer, u32 buf_bytes)
 
     if (!IsValidIV(iv))
 	{
-#ifdef CAT_AUDIT
+//#ifdef CAT_AUDIT
 		printf("AUDIT: Not valid IV!\n");
-#endif
+//#endif
 		return false;
 	}
 
@@ -322,9 +322,9 @@ bool AuthenticatedEncryption::Decrypt(u8 *buffer, u32 buf_bytes)
 	// Validate the MAC
 	if ((remote_vhash ^ vhash) >> 1)
 	{
-#ifdef CAT_AUDIT
+//#ifdef CAT_AUDIT
 		printf("AUDIT: MAC invalid!\n");
-#endif
+//#endif
 		return false;
 	}
 
