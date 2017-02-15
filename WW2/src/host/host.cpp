@@ -3028,6 +3028,8 @@ main(const int argc, const char* argv[])
 	}
 	else if ( updateNet != 0 )
 	{
+        g_clustered = true;
+        
 		dbugLog(_FLM, "Clustering enabled: Broadcast network %s specified.", cv_baseUpdtAddress.GetString());
 
 		const UINT32 updateBcastHost = cv_baseUpdtAddress.GetUint32() | 0x000000ff;
