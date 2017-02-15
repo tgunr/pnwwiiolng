@@ -3031,11 +3031,11 @@ main(const int argc, const char* argv[])
 		dbugLog(_FLM, "Clustering enabled: Broadcast network %s specified.", cv_baseUpdtAddress.GetString());
 
 		const UINT32 updateBcastHost = cv_baseUpdtAddress.GetUint32() | 0x000000ff;
-		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
+		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateCellBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
 		dbugLog(_FLN, "t:%d updateBcastRecv:%s", updateBcastRecv, teulGetAddress(updateBcastHost));
 
 		const UINT32 updateDirectHost = cv_baseUpdtAddress.GetUint32() | (Server::localHost & 0x000000ff);
-		updateBcastSend = teulOpenSend(updateDirectHost, WWII::Net::Ports::PrivateBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
+		updateBcastSend = teulOpenSend(updateDirectHost, WWII::Net::Ports::PrivateCellBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
 		dbugLog(_FLN, "t:%d updateBcastSend:%s", updateBcastSend, teulGetAddress(updateDirectHost));
 	}
 	else
