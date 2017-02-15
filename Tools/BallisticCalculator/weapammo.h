@@ -178,3 +178,5 @@ weapAmmoType ReadAmmoType(const std::string& name);
 weapAmmo CreateRound(weapAmmoType& ammo_type);
 void UpdateProjectile(weapAmmo* Ammo, double CurrentTime);
 FLOAT64 PiercingPotential(const weapAmmo& round);
+FLOAT64 CurrentJoules(const weapAmmo& round);
+FLOAT64 CurrentVelocity(const weapAmmo& round);
