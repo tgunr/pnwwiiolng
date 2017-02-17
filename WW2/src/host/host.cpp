@@ -93,6 +93,7 @@
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "teul/raknetConn.h"
+#include "weap/weapDefs.h"
 
 extern SINT32 hostInstallAllCallbacks();
 
@@ -128,10 +129,13 @@ UINT32 numVehiclesReported = 0;
 
 PLAYERS g_players;
 #include "include/configVars.h"
-static SINT32 _userConnections = 0;
+
+SINT32 _userConnections = 0;
 
 char hostname[32];
 UINT32 _stratHost = 0;
+
+static const SINT32 MAX_BUF_VEH_BROADCAST = 256;
 
 SINT32 updateBcastSend = -1, updateBcastRecv = -1;
 
@@ -1469,12 +1473,18 @@ hostAddVehicleToBroadcast(HostVehicle* vehicle, VEHICLE_UPDATE_HEADER* vh)
 	if ( vehicle->isReallyActive() == true )
 		vehHold.present |= PRX_REALLY_ACTIVE;
 
-	UCHAR buffer[256];
-	SINT32 offset = updtPackVehicleBroadcast(TEUL_PACK, buffer, 0, &vehHold, 0);
+	UCHAR buffer[MAX_BUF_VEH_BROADCAST];
+	SINT32 offset = sizeof(SINT32) * 8;  // save space for length
+	offset = updtPackVehicleBroadcast(TEUL_PACK, buffer, offset, &vehHold, 0);
 	if ( offset < 0 )
 	{
 		dbugLog(_FLA, "updtPackVehicleBroadcast failed: %d", offset);
 		return false;
+	}
+	
+	if ((offset/8) > (MAX_BUF_VEH_BROADCAST-1))
+	{
+		dbugLog(_FLA, "While constructing vehicle broadcast: WE WROTE INTO UNALLOCATED SPACE!!!!");
 	}
 
 	return hostSendVehicleBroadcast(buffer, offset);
@@ -2294,7 +2304,8 @@ _runHost()
 		}
 
 		// Send any cell-to-cell vehicle updates generated.
-		hostPushVehicleBroadcasts();
+		// Don't send these, it is subverting the collect and hold policy
+		//hostPushVehicleBroadcasts();
 
 		// For any sorties that have completed the spawning
 		// process, save off the data.

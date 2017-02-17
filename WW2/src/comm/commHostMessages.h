@@ -32,7 +32,7 @@ void commForcePlayerExit(class Player& persona, const char* reason, bool alert);
 SINT32 commRecvPeriodicUpdate(SINT32 teulIndex, Player* persona, UCHAR* message, SINT32 offset, bool isFromTeul);
 
 // Function that receives data for a vehicle update
-void commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer);
+SINT32 commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer, SINT32 offset);
 
 // Function that dispatches a resupply issue to a client
 class HostVehicle;

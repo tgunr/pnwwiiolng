@@ -33,7 +33,9 @@ static SYNCHED_VEHICLES g_synched;
 
 static Teul::Packet vehicleBroadcasts(Teul::PacketId(Comm::CallbackX, BCAST_VEH_UPDATE_Y));
 static UINT32 numberOfVehiclesPending = 0;
-static UINT32 maxSize = 0;
+static SINT32 maxSize = 0;
+
+extern SINT32 _userConnections;
 
 bool g_clustered = false;
 
@@ -63,17 +65,35 @@ cellVehicleRemoval(ACTION_OBJECT* const a)
 // Receive a vehicle update packet and pass it on to the comm system
 
 UINT32
-hostReceiveVehicleUpdates(const unsigned char* const input, const UINT32 bytes, const UINT32 source)
+hostReceiveVehicleUpdates(unsigned char* const input, const UINT32 bytes, const UINT32 source)
 {
-	const unsigned char* cur = input;
-	const unsigned char* const end = cur + bytes;
-	UINT32 count = 0;
-	while ( cur < end )
+
+#if DEV_BUILD
+	char temp_buff[bytes * 3 + 1];
+	for (UINT32 i=0; i < bytes; i++)
 	{
-		SINT32 size = *((const SINT32*)cur);
-		cur = cur + sizeof(SINT32);
-		commRecvVehicleUpdate(source, cur);
-		cur += size;
+		sprintf(temp_buff+i*3, "%02X ", input[i]);
+	}
+	temp_buff[bytes*3] = 0;
+	dbugLog(_FLD, "MultiCell: Incoming packet: %s", temp_buff);
+#endif
+
+	const unsigned char* const end = input + bytes;
+	UINT32 count = 0;
+	SINT32 offset = 0;
+	SINT32 size = 0;
+	while ( (input + (offset/8)) < end  && offset >= 0 )
+	{
+		// Since we are padding each block and they aren't being accounted for in the PACK/UNPACK we need to
+		// reset the offset manually
+		SINT32 nextOffset = offset;
+	        offset = teulPackSINT32(TEUL_UNPACK, input, offset, &size, 0);
+		nextOffset += size * 8;
+
+                dbugLog(_FLD, "hostReceiveVehicleUpdates extracting update of size %d", size);
+		commRecvVehicleUpdate(source, input, offset);
+
+		offset = nextOffset;
 		++count;
 	}
 
@@ -96,7 +116,9 @@ void
 hostPushVehicleBroadcasts()
 {
 	if ( vehicleBroadcasts.empty() == true )
+	{
 		return;
+	}
 
 	if ( !g_clustered )
 	{
@@ -106,6 +128,7 @@ hostPushVehicleBroadcasts()
 		return;
 	}
 
+	vehicleBroadcasts.setUnencrypted();
 	const bool sent = vehicleBroadcasts.send(updateBcastSend) > 0;
 	if ( sent == false )
 	{
@@ -114,7 +137,7 @@ hostPushVehicleBroadcasts()
 	else
 	{
 #ifdef DEV_BUILD
-		dbugLog(_FLD, "pushed %u vbs in %u bytes. maxBits=%u, avgBits=%u", numberOfVehiclesPending, vehicleBroadcasts.packetSizeBytes(), maxSize * 8, vehicleBroadcasts.packetSizeBits() / numberOfVehiclesPending);
+		dbugLog(_FLD, "pushed %u vbs in %u bytes. maxBits=%d, avgBits=%u", numberOfVehiclesPending, vehicleBroadcasts.packetSizeBytes(), maxSize * 8, vehicleBroadcasts.packetSizeBits() / numberOfVehiclesPending);
 #endif
 	}
 	vehicleBroadcasts.reset();
@@ -125,13 +148,15 @@ hostPushVehicleBroadcasts()
 // Send a vehicle broadcast to the other cellhosts
 
 bool
-hostSendVehicleBroadcast(UCHAR* buffer, SINT32 size)
+hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 {
+	SINT32 sizeBytes = 0;
+
 	if ( buffer == nullptr )
 	{
 		LogAbort("called hostSendVehicleBroadcast with NULL");
 	}
-	if ( size == 0 )
+	if ( sizeBits == 0 )
 	{
 		LogAbort("called hostSendVehicleBroadcast with 0 size");
 	}
@@ -139,17 +164,30 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 size)
 	if ( !g_clustered )
 		return false;
 
-	// Round size up to a multiple of 32.
-	size = ((size & ~((sizeof(size)*8)-1)) + sizeof(size)) / 8;
+	// Convert bits to bytes and round size up to a multiple of 32.
+	sizeBytes = ((sizeBits & ~((sizeof(SINT32)*8)-1)) + sizeof(SINT32)) / 8;
 
-	if ( (UINT32)size > maxSize )
-		maxSize = size;
+	if ( sizeBytes > maxSize )
+		maxSize = sizeBytes;
 
-	if ( vehicleBroadcasts.packetSizeBytes() + size >= 4000 )
-		hostPushVehicleBroadcasts();
+	// store in the final size
+	teulPackSINT32(TEUL_PACK, buffer, 0, &sizeBytes, 0);
 
-	vehicleBroadcasts.append(buffer, size);
+	vehicleBroadcasts.append(buffer, sizeBytes);
 	++numberOfVehiclesPending;
+
+	dbugLog(_FLD, "hostSendVehicleBroadcast: queuing size %d, packet allocated length = %d, packet size = %d, pendingPackets = %d", 
+		sizeBytes,
+		vehicleBroadcasts.packetCapacityBytes(),
+		vehicleBroadcasts.packetSizeBytes(),
+		numberOfVehiclesPending);
+
+	// disable packaging of multiple vehicles for now and just send them out as we get them
+	if ( vehicleBroadcasts.packetSizeBytes() >= (static_cast<UINT32>(_userConnections) * 400))
+	{
+		dbugLog(_FLD, "hostSendVehicleBroadcast: pushing out broadcasts");
+		hostPushVehicleBroadcasts();
+	}
 
 	return true;
 }
