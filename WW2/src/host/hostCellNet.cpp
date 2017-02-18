@@ -45,14 +45,16 @@ bool g_clustered = false;
 extern SINT32
 cellVehicleRemoval(ACTION_OBJECT* const a)
 {
-	const UINT32 numUpdates = a->sizeInBytes() / sizeof(UINT32);
-	UINT32* data = (UINT32*)a->localRawData;
+	const UINT32 numUpdates = a->sizeInBytes() / (sizeof(UINT32)+sizeof(UCHAR));
+	UCHAR* data = reinterpret_cast<UCHAR*>(a->packed);
 
 	for ( UINT32 i = 0; i < numUpdates; ++i )
 	{
-		const UINT32 vehIndex = *(data++);
-		const UINT32 exitCode = *(data++);
-		hostRemoveRemoteVehicle(vehIndex, (PLAYER_EXIT_CODE)exitCode);
+		const UINT32 vehIndex = *(reinterpret_cast<UINT32 *>(data));
+		data += sizeof(UINT32);
+		const PLAYER_EXIT_CODE exitCode = static_cast<PLAYER_EXIT_CODE>(*data);
+		data ++;
+		hostRemoveRemoteVehicle(vehIndex, exitCode);
 	}
 
 	dbugLog(_FLD, "cell:%s removed %u remote vehicles"
@@ -238,6 +240,8 @@ hostQueueVehicleRemove(UINT32 vehIndex, UCHAR exitCode)
 			outgoing = new Teul::Packet(Teul::PacketId(Comm::CallbackX, BCAST_VEH_REMOVE_Y));
 			outgoing->setUnencrypted();
 		}
+
+		dbugLog(_FLD, "Adding vehicle to remove broadcast %u, exit code %u", vehIndex, exitCode);
 
 		outgoing->append(vehIndex);
 		outgoing->append(exitCode);
