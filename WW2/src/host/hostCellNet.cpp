@@ -68,7 +68,7 @@ UINT32
 hostReceiveVehicleUpdates(unsigned char* const input, const UINT32 bytes, const UINT32 source)
 {
 
-#if DEV_BUILD
+#ifdef DEV_BUILD
 	char temp_buff[bytes * 3 + 1];
 	for (UINT32 i=0; i < bytes; i++)
 	{
@@ -90,7 +90,9 @@ hostReceiveVehicleUpdates(unsigned char* const input, const UINT32 bytes, const 
 	        offset = teulPackSINT32(TEUL_UNPACK, input, offset, &size, 0);
 		nextOffset += size * 8;
 
+#ifdef DEV_BUILD
                 dbugLog(_FLD, "hostReceiveVehicleUpdates extracting update of size %d", size);
+#endif
 		commRecvVehicleUpdate(source, input, offset);
 
 		offset = nextOffset;
@@ -165,7 +167,7 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 		return false;
 
 	// Convert bits to bytes and round size up to a multiple of 32.
-	sizeBytes = ((sizeBits & ~((sizeof(SINT32)*8)-1)) + sizeof(SINT32)) / 8;
+	sizeBytes = ((sizeBits & ~((sizeof(SINT32)*8)-1))) / 8 + sizeof(SINT32);
 
 	if ( sizeBytes > maxSize )
 		maxSize = sizeBytes;
@@ -176,16 +178,23 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 	vehicleBroadcasts.append(buffer, sizeBytes);
 	++numberOfVehiclesPending;
 
-	dbugLog(_FLD, "hostSendVehicleBroadcast: queuing size %d, packet allocated length = %d, packet size = %d, pendingPackets = %d", 
+#ifdef DEV_BUILD
+	dbugLog(_FLD, "hostSendVehicleBroadcast: original bits = %d(bytes=%d), queuing size = %d, packet allocated length = %d, packet size = %d, pendingPackets = %d", 
+		sizeBits,
+		sizeBits/8,
 		sizeBytes,
 		vehicleBroadcasts.packetCapacityBytes(),
 		vehicleBroadcasts.packetSizeBytes(),
 		numberOfVehiclesPending);
+#endif
 
 	// disable packaging of multiple vehicles for now and just send them out as we get them
-	if ( vehicleBroadcasts.packetSizeBytes() >= (static_cast<UINT32>(_userConnections) * 400))
+	// we want to force updates based on how many connections we have.  We might want to put a cap on it too.
+	// 4000 is arbitrary but 35 is about the size of your average veh update
+        UINT32 limitPacketSize = std::min( static_cast<UINT32>(4000),
+		 (static_cast<UINT32>(_userConnections) * 35));
+	if ( vehicleBroadcasts.packetSizeBytes() >= limitPacketSize )
 	{
-		dbugLog(_FLD, "hostSendVehicleBroadcast: pushing out broadcasts");
 		hostPushVehicleBroadcasts();
 	}
 
