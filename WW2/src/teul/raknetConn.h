@@ -63,7 +63,10 @@ public:
 	bool isConnected() { return m_isConnected; }
     bool isConnecting() { return m_isConnecting; }
 	bool isServer() { return m_isServer; }
-
+    static void disconnectPeer(ENDPOINT *pEndpoint);
+    RakNet::RakPeerInterface *getPeerInterface() {return m_peer;}
+    void disconnect();
+    
 private:
 
 	void processApplicationPacket(RakNet::Packet *packet, UINT32 ip);

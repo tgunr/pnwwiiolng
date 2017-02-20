@@ -650,13 +650,7 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 	}
 
     // check status of paired backchannel, if client release - it'll get recreated when they log back in
-    if (inEndpoint.m_pairdUdpConn != nullptr &&
-        !inEndpoint.m_pairdUdpConn->isServer())
-    {
-        inEndpoint.m_pairdUdpConn->release();
-        delete inEndpoint.m_pairdUdpConn;
-        inEndpoint.m_pairdUdpConn = nullptr;
-    }
+    RakNetChannel::disconnectPeer(&inEndpoint);
     
 	// dispose of socket
 	inEndpoint.shutdown();

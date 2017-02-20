@@ -389,3 +389,38 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
 	return (result > 0);
 }
 
+void RakNetChannel::disconnectPeer(ENDPOINT *pEndpoint)
+{
+    
+    if (pEndpoint != nullptr)
+    {
+        if (pEndpoint->m_pairdUdpConn != nullptr)
+        {
+            if  (!pEndpoint->m_pairdUdpConn->isServer())
+            {
+                pEndpoint->m_pairdUdpConn->release();
+                delete pEndpoint->m_pairdUdpConn;
+                pEndpoint->m_pairdUdpConn = nullptr;
+            }
+            else
+            {
+                // see if this is a client endpoint
+                if (pEndpoint->m_parent != nullptr)
+                {
+                    pEndpoint->m_pairdUdpConn->disconnect();
+                }
+                
+            }
+        }
+    }
+
+}
+
+
+void RakNetChannel::disconnect()
+{
+    SystemAddress addr;
+    addr.address.addr4 = m_endpoint->destSockAddress;
+    m_peer->CloseConnection(addr, true);
+    _removeHost(m_endpoint->destAddress());
+}
