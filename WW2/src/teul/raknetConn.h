@@ -65,14 +65,14 @@ public:
 	bool isServer() { return m_isServer; }
     static void disconnectPeer(ENDPOINT *pEndpoint);
     RakNet::RakPeerInterface *getPeerInterface() {return m_peer;}
-    void disconnect();
+    void disconnect(ENDPOINT *pEndpoint);
     
 private:
 
 	void processApplicationPacket(RakNet::Packet *packet, UINT32 ip);
 
-	void _addHost(UINT32 ip, const SystemAddress address);
-	void _removeHost(UINT32 ip);
+	void _addClient(UINT32 ip, const SystemAddress address);
+	void _removeClient(UINT32 ip);
 
 	class RakNet::RakPeerInterface *m_peer;
 	RakNet::RPC4 m_rpc;

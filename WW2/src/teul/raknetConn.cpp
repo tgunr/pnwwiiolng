@@ -47,28 +47,35 @@ static IP_SYS_MAP ipToSysMap;
  * Private method called for server to add the incoming client connection
  * to a map for later transmission.
  */
-void RakNetChannel::_addHost(UINT32 ip, const SystemAddress address)
+void RakNetChannel::_addClient(UINT32 ip, const SystemAddress address)
 {
-	dbugLog(_FLD, "Raknet: adding host %s", teulGetAddress(ip));
 
 	IP_SYS_MAP::iterator it = ipToSysMap.find(ip);
 	if (it != ipToSysMap.end() && it->second == address)
+	{
+		dbugLog(_FLD, "Raknet: Tried to add duplicate client %s", teulGetAddress(ip));
 		return;
+	}
 	ipToSysMap[ip] = address;
+	dbugLog(_FLD, "Raknet: adding host %s", teulGetAddress(ip));
 }
 
 /*
  * Ensures the ip to SystemAddress map is limited to only open 
  * connections.
  */
-void RakNetChannel::_removeHost(UINT32 ip)
+void RakNetChannel::_removeClient(UINT32 ip)
 {
-	dbugLog(_FLD, "Raknet: disconnecting cell %s", teulGetAddress(ip));
 	IP_SYS_MAP::iterator it = ipToSysMap.find(ip);
 	if (it != ipToSysMap.end())
 	{
-		m_peer->CloseConnection(it->second, true, 0, IMMEDIATE_PRIORITY);
+		dbugLog(_FLD, "Raknet: Removing client %s", teulGetAddress(ip));
 		ipToSysMap.erase(it);
+		m_peer->CloseConnection(it->second, false, 0, IMMEDIATE_PRIORITY);
+	}
+	else
+	{
+		dbugLog(_FLD, "Raknet: Tried to remove unregistered client %s", teulGetAddress(ip));
 	}
 }
 
@@ -96,9 +103,9 @@ bool RakNetChannel::init()
 				m_sd.port = (m_isServer)?m_port:0;
 
 #if platBuild == BUILD_SERVER
-                UINT16 maxConn = cv_maxCellPlayers.GetUint32();
+				UINT16 maxConn = cv_maxCellPlayers.GetUint32();
 #else
-                UINT16 maxConn = 1;
+				UINT16 maxConn = 1;
 #endif
 				// Instruct peer channel to startup
 				m_peer->Startup(maxConn, &m_sd, 1);
@@ -143,10 +150,10 @@ void RakNetChannel::release()
 		{
 			if (m_isConnected)
 			{
-                m_endpoint->doError(RN_SK_FAILED);
+				m_endpoint->doError(RN_SK_FAILED);
 				m_peer->Shutdown(0);
-                m_isConnected = false;
-                m_isConnecting = false;
+				m_isConnected = false;
+				m_isConnecting = false;
 			}
 
 			RakNet::RakPeerInterface::DestroyInstance(m_peer);
@@ -236,7 +243,7 @@ void RakNetChannel::update()
                 case ID_DISCONNECTION_NOTIFICATION:
                     dbugLog(_FLN, "Raknet: %s disconnected", p->systemAddress.ToString());
                     if (isServer())
-                        _removeHost(ip);
+                        _removeClient(ip);
                     else
                     {
                         // time to abort netcode3
@@ -252,7 +259,7 @@ void RakNetChannel::update()
                     return;
                 case ID_NEW_INCOMING_CONNECTION:
                     dbugLog(_FLN, "Raknet: %s connecting", p->systemAddress.ToString());
-                    _addHost(ip, p->systemAddress);
+                    _addClient(ip, p->systemAddress);
                     break;
                 case ID_CONNECTION_REQUEST_ACCEPTED:
                     dbugLog(_FLN, "Raknet: %s connected", p->systemAddress.ToString());
@@ -261,12 +268,12 @@ void RakNetChannel::update()
                     break;
                 case ID_ALREADY_CONNECTED:
                     dbugLog(_FLW, "Raknet: %s already connected", p->systemAddress.ToString());
-                    _addHost(ip, p->systemAddress);
+                    _addClient(ip, p->systemAddress);
                     break;
                 case ID_CONNECTION_LOST:
                     dbugLog(_FLW, "Raknet: %s connection lost", p->systemAddress.ToString());
                     if (isServer())
-                        _removeHost(ip);
+                        _removeClient(ip);
                     else
                     {
                         // time to abort netcode3
@@ -407,7 +414,7 @@ void RakNetChannel::disconnectPeer(ENDPOINT *pEndpoint)
                 // see if this is a client endpoint
                 if (pEndpoint->m_parent != nullptr)
                 {
-                    pEndpoint->m_pairdUdpConn->disconnect();
+                    pEndpoint->m_pairdUdpConn->disconnect(pEndpoint);
                 }
                 
             }
@@ -416,11 +423,7 @@ void RakNetChannel::disconnectPeer(ENDPOINT *pEndpoint)
 
 }
 
-
-void RakNetChannel::disconnect()
+void RakNetChannel::disconnect(ENDPOINT *pEndpoint)
 {
-    SystemAddress addr;
-    addr.address.addr4 = m_endpoint->destSockAddress;
-    m_peer->CloseConnection(addr, true);
-    _removeHost(m_endpoint->destAddress());
+    _removeClient(pEndpoint->destAddress());
 }
