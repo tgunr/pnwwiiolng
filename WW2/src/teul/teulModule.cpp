@@ -644,14 +644,7 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 	inEndpoint.m_state = IS_DEAD;
 	inEndpoint.m_doTimeoutCheck = false;	// stop checking timeouts on me.
 
-    // Recheck the state to make sure the doError() didn't put us into the dead state
-    // If it didn't, don't re-remove
-    if (inEndpoint.state() != IS_DEAD) {
-        dbugLog(_FLD, "t:%d calling teulRemoveEndpoint()", inEndpoint.teulIndex());
-        teulRemoveEndpoint(&inEndpoint);
-    } else {
-        //dbugLog(_FLD, "t:%d recursion on a dead endpoint", inEndpoint.teulIndex());
-    }
+	teulRemoveEndpoint(&inEndpoint);
 }
 
 void

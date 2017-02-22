@@ -136,7 +136,7 @@ static void _handleSquadMemberListResults(UINT32 squadID, const std::vector<Squa
 
     if ( g_debugSquads )
         dbugLog(_FLD, "sq:%u '%s' got list of %" PRSizeT " members was %" PRSizeT ""
-                    , squadID, list->squad().shortName(), results.size(), list->members().size());
+                    , squadID, list->squad().callsign().c_str(), results.size(), list->members().size());
 
     // In order that we can tell who is no-longer in the squad according
     // to the database, we erase all member's joined dates. Then as members
@@ -382,7 +382,7 @@ SquadList::created()
 	if ( !m_newSquad )
 		return;
 
-	dbugLog(_FLI, "sq:%u %s creation completed", squad().squadID(), squad().shortName());
+	dbugLog(_FLI, "sq:%u %s creation completed", squad().squadID(), squad().callsign().c_str());
 	m_newSquad = false;
 
 	SQUAD_MEMBERS::iterator it;
@@ -454,7 +454,7 @@ SquadList::removeMember(ChatHandle handle)
 	if ( subject )
 	{
 		dbugLog(_FLI, "t:%d p:%u c:%s sq:%u removing player from %s"
-						, subject->teulIndex(), subject->playerID(), subject->callsign(), squad().squadID(), squad().shortName());
+						, subject->teulIndex(), subject->playerID(), subject->callsign(), squad().squadID(), squad().callsign().c_str());
 		_updateOnline(-1);
 		subject->SetSquad(0, Squad::NOT_IN_SQUAD, 0LL);
 		subject->sendSquadInfo(nullptr);
@@ -1036,12 +1036,11 @@ SquadList::electNewCO()
 void
 SquadList::renamed(const ChatHandle newHandle)
 {
-	const std::string oldCallsign = squad().m_callsign;
+	const std::string oldCallsign = squad().callsign();
 	const Chat::Name newCallsign(newHandle);
-	dbugLog(_FLN, "Squad %s renamed to %s, updating tables and players", squad().m_callsign.c_str(), newCallsign.c_str());
+	dbugLog(_FLN, "Squad %s renamed to %s, updating tables and players", squad().callsign().c_str(), newCallsign.c_str());
 	// Mark the squad as needing its details resent
 	squad().m_shortHandle = newHandle;
-	squad().m_callsign = newCallsign.c_str();
 	setUpdated();
 
 	SQUAD_MEMBERS::iterator it;
@@ -1145,7 +1144,7 @@ SquadList::setRecruiting(bool newFlag, Player* player)
 		return;
 	dbugLog(_FLD, "t:%d p:%u c:%s sq:%u(%s) recruiting %s"
 					, player ? player->teulIndex() : 0, player ? player->playerID() : 0, player ? player->callsign() : "API"
-					, squad().squadID(), squad().shortName()
+					, squad().squadID(), squad().callsign().c_str()
 					, ((newFlag) ? "enabled" : "disabled"));
 	m_squad.m_recruiting = newFlag;
 	setUpdated();

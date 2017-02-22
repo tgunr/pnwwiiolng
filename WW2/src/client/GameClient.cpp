@@ -1620,7 +1620,7 @@ void GameClient::ProcessSquadInvite(const SquadMsg& msg)
 
 				uiChatPrintLine(locmsg.c_str()
 							, chatGetWideCallsign(msg.inviter())
-							, uiUTF8toUTF16(msg.squad().shortName())
+							, uiUTF8toUTF16(msg.squad().callsign().c_str())
 							, uiUTF8toUTF16(msg.squad().name().c_str())
 							, SquadControl::CREATE_PLAYERS_REQUIRED+1
 					);
@@ -1639,7 +1639,7 @@ void GameClient::ProcessSquadInvite(const SquadMsg& msg)
 			const std::wstring& locmsg = uiLocString("squad.control.joininvite");
 			uiChatPrintLine(locmsg.c_str()
 				, chatGetWideCallsign(msg.inviter())
-				, uiUTF8toUTF16(msg.squad().shortName())
+				, uiUTF8toUTF16(msg.squad().callsign().c_str())
 				, uiUTF8toUTF16(msg.squad().name().c_str()));
 		}
 

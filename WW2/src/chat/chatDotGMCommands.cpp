@@ -1641,21 +1641,21 @@ public:
 			Player* co = PlayerInterface::Lookup(oldCO);
 			if ( co )
 			{
-				player.message(LSTR_CAUTION, LSTR_SQUAD_CO_ONLINE, squad.shortName(), co->callsign());
+				player.message(LSTR_CAUTION, LSTR_SQUAD_CO_ONLINE, squad.callsign().c_str(), co->callsign());
 				return;
 			}
 			else if ( !force )
 			{
-				player.message(LSTR_CAUTION, LSTR_MAKECO_USE_FORCE, squad.shortName(), Chat::Name(oldCO).c_str());
+				player.message(LSTR_CAUTION, LSTR_MAKECO_USE_FORCE, squad.callsign().c_str(), Chat::Name(oldCO).c_str());
 				return;
 			}
 		}
 
 		list->appointNewCO(subject->matchHandle(), subject);
 
-		player.gmNote("GM", command(), arguments, squad.shortName());
-		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_MAKECO_APPOINTED, subject->callsign(), squad.shortName());
-		player.message(LSTR_NOTE, LSTR_MAKECO_APPOINTED, subject->callsign(), squad.shortName());
+		player.gmNote("GM", command(), arguments, squad.callsign().c_str());
+		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_MAKECO_APPOINTED, subject->callsign(), squad.callsign().c_str());
+		player.message(LSTR_NOTE, LSTR_MAKECO_APPOINTED, subject->callsign(), squad.callsign().c_str());
 	}
 } dotMakeCO;
 
