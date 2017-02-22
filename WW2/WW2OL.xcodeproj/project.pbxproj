@@ -519,7 +519,7 @@
 				"$(DERIVED_FILE_DIR)/$(INPUT_FILE_BASE).tab.h",
 				"$(DERIVED_FILE_DIR)/$(INPUT_FILE_BASE).tab.cpp",
 			);
-			script = "BISON_PKGDATADIR=\"${SRCROOT}/proj/mac/bison-data\" ${YACC} ${YACCFLAGS} --defines=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.h\" --file-prefix=\"${DERIVED_FILE_DIR}/omggen\" --output=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.cpp\" \"${INPUT_FILE_PATH}\"";
+			script = "${SRCROOT}/src/omggen/mac_bison ${YACCFLAGS} --defines=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.h\" --file-prefix=\"${DERIVED_FILE_DIR}/omggen\" --output=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.cpp\" \"${INPUT_FILE_PATH}\"";
 		};
 		FA448CF61D0D02EB00C4936D /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -530,7 +530,7 @@
 				"$(DERIVED_FILE_DIR)/$(INPUT_FILE_BASE).yy.h",
 				"$(DERIVED_FILE_DIR)/$(INPUT_FILE_BASE).yy.cpp",
 			);
-			script = "${LEX} ${LEXFLAGS} --nodefault --header-file=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.yy.h\" -o\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.yy.cpp\" \"${INPUT_FILE_PATH}\"";
+			script = "${SRCROOT}/src/omggen/mac_flex ${LEXFLAGS} --nodefault --header-file=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.yy.h\" -o\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.yy.cpp\" \"${INPUT_FILE_PATH}\"";
 		};
 /* End PBXBuildRule section */
 
@@ -822,7 +822,7 @@
 		08104A4C103DD3370065E0E2 /* mapArenaDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapArenaDescription.h; sourceTree = "<group>"; };
 		08104A4D103DD3370065E0E2 /* mapAWS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapAWS.cpp; sourceTree = "<group>"; };
 		08104A4E103DD3370065E0E2 /* mapAWS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapAWS.h; sourceTree = "<group>"; };
-		08104A51103DD3370065E0E2 /* mapBrigadeSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = mapBrigadeSummary.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
+		08104A51103DD3370065E0E2 /* mapBrigadeSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = mapBrigadeSummary.h; sourceTree = "<group>"; };
 		08104A54103DD3370065E0E2 /* mapClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapClientMessages.cpp; sourceTree = "<group>"; };
 		08104A55103DD3370065E0E2 /* mapClientMessages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapClientMessages.h; sourceTree = "<group>"; };
 		08104A56103DD3370065E0E2 /* mapConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapConstants.h; sourceTree = "<group>"; };
@@ -1398,7 +1398,6 @@
 		0834F1C9104585DA00E75B52 /* loclLang.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = loclLang.h; sourceTree = "<group>"; };
 		0834F1CA104585DA00E75B52 /* loclMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = loclMain.cpp; sourceTree = "<group>"; };
 		0834F1CB104585DA00E75B52 /* loclMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = loclMain.h; sourceTree = "<group>"; };
-		0834F1D1104586AA00E75B52 /* versionNo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = versionNo.h; path = proj/versionNo.h; sourceTree = SOURCE_ROOT; };
 		0834F28110458DFA00E75B52 /* ShadowMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShadowMap.cpp; sourceTree = "<group>"; };
 		08477137135E279F00325E43 /* trnScenario.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trnScenario.h; sourceTree = "<group>"; };
 		08477138135E279F00325E43 /* trnScenario.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = trnScenario.cpp; sourceTree = "<group>"; };
@@ -2983,7 +2982,6 @@
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				0834F1D1104586AA00E75B52 /* versionNo.h */,
 				E97C763D1C85146A00875F44 /* event */,
 				08E5E55513E855A100A5034D /* ez */,
 				08977DDA134CFB7200C9DCFE /* scen */,
@@ -3485,6 +3483,8 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/src/build_info.cpp.in",
+				"$(SRCROOT)/src/build_info.py",
 			);
 			name = "Run Script";
 			outputPaths = (
@@ -3492,7 +3492,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "python ${SRCROOT}/../Tools/revno.py client \"${DERIVED_FILES_DIR}\"";
+			shellScript = "python ${SRCROOT}/src/build_info.py client \"${DERIVED_FILES_DIR}\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 

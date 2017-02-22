@@ -87,10 +87,11 @@ int GameClientLogin(unsigned int host, playerid_t playerID, UINT32 otp,
 							unsigned int appVersion, UINT16 port)
 {
 #if platOS == OS_MACOS
-	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
-#else
-	Client::Init(playerID, otp, appVersion);
+    if (!TicketFile[0])
+        PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
+    else
 #endif
+	Client::Init(playerID, otp, appVersion);
 	try
 	{
 		if(PlayerClient()->Login(host, port, true) != 0)
@@ -573,7 +574,7 @@ void GameClient::ProcessPostDeny(FE_POST_DENY const& postDeny)
 	Client::ProcessPostDeny(postDeny);
 
 	static char callback[128];
-	sprintf(callback, "onspawnerror(%u)", postDeny.reasonCode);
+	strprintf(callback, "onspawnerror(%u)", postDeny.reasonCode);
 	jsclient->RunScript(callback);
 }
 
@@ -1619,7 +1620,7 @@ void GameClient::ProcessSquadInvite(const SquadMsg& msg)
 
 				uiChatPrintLine(locmsg.c_str()
 							, chatGetWideCallsign(msg.inviter())
-							, uiUTF8toUTF16(msg.squad().shortName())
+							, uiUTF8toUTF16(msg.squad().callsign().c_str())
 							, uiUTF8toUTF16(msg.squad().name().c_str())
 							, SquadControl::CREATE_PLAYERS_REQUIRED+1
 					);
@@ -1638,7 +1639,7 @@ void GameClient::ProcessSquadInvite(const SquadMsg& msg)
 			const std::wstring& locmsg = uiLocString("squad.control.joininvite");
 			uiChatPrintLine(locmsg.c_str()
 				, chatGetWideCallsign(msg.inviter())
-				, uiUTF8toUTF16(msg.squad().shortName())
+				, uiUTF8toUTF16(msg.squad().callsign().c_str())
 				, uiUTF8toUTF16(msg.squad().name().c_str()));
 		}
 

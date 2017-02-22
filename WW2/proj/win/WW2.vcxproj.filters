@@ -1622,9 +1622,6 @@
     <ClInclude Include="..\..\src\include\precompile_includes.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\imap\imapTypes.h">
-      <Filter>imap</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\math\Rand.h">
       <Filter>math</Filter>
     </ClInclude>
@@ -2689,6 +2686,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\wwii\wwiiPPOLoader.cpp">
       <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sdm\GenerateHostTerrain.cpp">
+      <Filter>sdm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

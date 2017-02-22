@@ -8,7 +8,7 @@
 // Originating Programmer: Brian "Stick" Duelm
 
 #include "dbug/dbugExtErrors.h"
-#include "hostproj/hostversion.h"
+#include "build_info.hpp"
 
 #if platOS != OS_WIN32
 #include <netinet/in.h>
@@ -25,6 +25,7 @@
 #include "chat/chatTypes.h"
 #include "comm/commTypes.h"
 #include "include/arenaLockEnums.h"
+#include "include/configVars.h"
 #include "include/wthrTime.h"
 #include "inst/instHostMessages.h"
 #include "inst/instTypes.h"
@@ -46,7 +47,7 @@
 #include "mm/mmHostMessages.h"
 #include "mm/mmMain.h"
 #include "mm/mmPolls.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverFlagsEnum.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
@@ -145,8 +146,6 @@ extern SINT32 mapCreatePlayer(SINT32 teulIndex, PlayerStatusNode* psn, const Ser
 extern SINT32 mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType releaseType);
 extern SINT32 mapPlayerExitCluster(PlayerStatusNode& psn);
 extern void teulCloseAllEndpoints(const SINT32 errorCode);
-
-extern ConfigUint cv_appID;
 
 void
 mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsign)
@@ -671,8 +670,8 @@ _handleSIGUSR1(SINT32 k)
 
 	//Reconnect to the authHost
 	SINT32 retval = authGameInit(Server::localHost, WWII::Net::Ports::MapHost,
-											_authHost, WWII::Net::Ports::InternalAuth, cv_appID.GetUint32(), HOST_VERSION,
-											HOST_VERSION, Teul::MaxClusterUsers,
+											_authHost, WWII::Net::Ports::InternalAuth, cv_appID.GetUint32(), PN_build_version_value,
+											PN_build_version_value, Teul::MaxClusterUsers,
 											_acceptLogin, _authErrorFunction);
 	if ( retval < 0)
 		LogAbort("%s authGameInit failed retval %d", __FUNCTION__, retval);
@@ -1080,6 +1079,7 @@ main(int argc, const char* argv[])
 				printf("sizeof(E) = %" PRSizeT ", sizeof(EI) = %" PRSizeT ", sizeof(wwiiPlayer) = %" PRSizeT ", sizeof(Player) = %" PRSizeT "\n", sizeof(ENDPOINT), sizeof(EndpointImpl), sizeof(wwiiPlayer), sizeof(Player));
 				exit(0);
 			}
+			, nullptr
 		}
 	});
     dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
@@ -1137,8 +1137,8 @@ main(int argc, const char* argv[])
 					, _authHost
 					, WWII::Net::Ports::InternalAuth
 					, cv_appID.GetUint32()
-					, HOST_VERSION
-					, HOST_VERSION
+					, PN_build_version_value
+					, PN_build_version_value
 					, Teul::MaxClusterUsers
 					, _acceptLogin
 					, _authErrorFunction
@@ -1176,7 +1176,7 @@ main(int argc, const char* argv[])
 
 	Server::myServerInfo.stats.port = WWII::Net::Ports::MapHost;
 
-	serverInit(HOST_VERSION
+	serverInit(PN_build_version_value
 				, MAP_HOST, AUTH_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback

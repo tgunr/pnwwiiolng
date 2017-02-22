@@ -498,7 +498,7 @@ Mission::cancel()
 {
 	if ( isMobileSpawnAvailable() )
 	{
-		betaLog(_FLI, "m:%u cancel killing mobile spawn", missionID());
+		dbugLog(_FLI, "m:%u cancel killing mobile spawn", missionID());
 		deactivateMobileSpawn(MSDR_MISSION_EXPIRED);
 	}
 
@@ -939,7 +939,7 @@ _sendTimeUpdates(UINT32 now)
 
 	UINT32 timeout = now - (host_config.mission.timeOut_m * 60);
 
-    betaLog(_FLD, "sendTimeUpdates");
+    dbugLog(_FLD, "sendTimeUpdates");
 
 	// We may delete the mission while we're iterating, so make sure
 	// the iterator iterates before we obliterate
@@ -948,7 +948,7 @@ _sendTimeUpdates(UINT32 now)
 		mission = it->second;
 		++it;
 
-        betaLog(_FLD, " #%u[act:%u,og:%u,nt:%u]", mission->missionID(), mission->active(), mission->ongoing(), mission->numTakers());
+        dbugLog(_FLD, " #%u[act:%u,og:%u,nt:%u]", mission->missionID(), mission->active(), mission->ongoing(), mission->numTakers());
 
 		if ( mission->spawner().isActive() )
 		{
@@ -1792,7 +1792,7 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 		post.targetCP_oid = cp->uOID;
 		post.targetFac_oid = ab->uOID;
 		post.instanceID = instanceID;
-		sprintf(post.description, "%s system mission", _countryNameAdj[forCountry]);
+		strprintf(post.description, "%s system mission", _countryNameAdj[forCountry]);
 
 		Mission* mission = post.post();
 		if ( mission != nullptr )
@@ -1836,13 +1836,13 @@ missDeleteInstanceMissions(instanceid_t instanceID)
 	InstanceMissionIndex::iterator it = g_instanceMissionIndex.find(instanceID);
 	if ( it == g_instanceMissionIndex.end() )
 	{
-		betaLog(_FLD, "in:%" PR64BitUT " has no missions to expire", instanceID);
+		dbugLog(_FLD, "in:%" PR64BitUT " has no missions to expire", instanceID);
 		return;
 	}
 
 	InstanceMissions& index = it->second;
 
-	betaLog(_FLD, "in:%" PR64BitUT " deleting instance mission list (%" PRSizeT " missions)", instanceID, index.size());
+	dbugLog(_FLD, "in:%" PR64BitUT " deleting instance mission list (%" PRSizeT " missions)", instanceID, index.size());
 
 	const UINT32 numMissions = index.size();
 	for ( UINT32 i = 0; i < numMissions; ++i )
@@ -1856,7 +1856,7 @@ missDeleteInstanceMissions(instanceid_t instanceID)
 			LogAbort("in:%" PR64BitUT " contains NULL in mission index at position %u", instanceID, i);
 		}
 
-		betaLog(_FLD, "in:%" PR64BitUT " m[%u]:%u", instanceID, i, mission->missionID());
+		dbugLog(_FLD, "in:%" PR64BitUT " m[%u]:%u", instanceID, i, mission->missionID());
 
 		mission->deactivate();
 		mission->cancel();

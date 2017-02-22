@@ -19,9 +19,7 @@
 #include "dbse/dbseHandle.h"
 #include "wwii/wwiiThreads.h"
 
-#include "sdm/sdmConfigVars.h"
-#include "wwii/wwiidbConfigVars.h"
-#include "server/serverConfigVars.h"
+#include "include/configVars.h"
 
 static bool useIrc = true;
 static irc_session_t* ircSession;
@@ -209,7 +207,7 @@ _ircFinish(TeulTimeMS timeTaken)
 
 	FLOAT32 seconds = ((FLOAT32)timeTaken) / 1000.0f;
 	char message[128];
-	sprintf(message, "%s terrain: import finished - took %.2f seconds", cv_clusterName.GetString(), seconds);
+	strprintf(message, "%s terrain: import finished - took %.2f seconds", cv_clusterName.GetString(), seconds);
 
 	_ircSendMessage("-sys,#servers", message);
 
@@ -296,28 +294,6 @@ _extract(const char* tarFile)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Check for an origin file
-
-static void
-_checkOriginFile()
-{
-	FILE* fp = fopen(cv_originFile.GetString(), "rb");
-	if ( fp == nullptr )
-	{
-		LogAbort("Unable to access %s/%s"
-				, cv_dataDir.GetString(), cv_originFile.GetString());
-	}
-
-	if ( fgets(g_origin, sizeof(g_origin) - 1, fp) == nullptr )
-	{
-		LogAbort("Unable to read %s/%s"
-			, cv_dataDir.GetString(), cv_originFile.GetString());
-	}
-
-	fclose(fp);
-}
-
-//////////////////////////////////////////////////////////////////////
 //
 
 int
@@ -325,7 +301,6 @@ main(int argc,char** argv)
 {
 	g_appName = argv[0];
 	Teul::ConfigVar::InitializeConfigVars();
-	Teul::InitializeWinsock();
 
 	SCHAR* filename;
 	//LOGICAL moreFiles = TRUE;
@@ -336,11 +311,6 @@ main(int argc,char** argv)
 	const char* tarFile = nullptr;
 
 	bool argsOk = true;
-#if platOS != OS_WIN32
-	bool useOrigin = true;
-#else
-	bool useOrigin = false;
-#endif
 
 	for ( int i = 1; i < argc; ++i )
 	{
@@ -351,7 +321,6 @@ main(int argc,char** argv)
 			{
 				case '?':
 					usage();
-				break;
 				case 'h':		// Database Host
 					arg = getArgument(argc, argv, i);
 					if ( arg == nullptr )
@@ -375,9 +344,6 @@ main(int argc,char** argv)
 				break;
 				case 'I':
 					useIrc = false;
-				break;
-				case 'O':
-					useOrigin = !useOrigin;
 				break;
 				case 0:
 					fprintf(stderr, "Invalid argument '-'\n");
@@ -408,12 +374,13 @@ main(int argc,char** argv)
 	if ( result < 0 )
 		LogAbort("Unable to access working directory %s: %d", cv_dataDir.GetString(), result);
 
+	dbugInit(LogMode::TO_FILE, "stratLoader");
+	dbugSetLogLevel(Debug::ERR_INFO | STD_ERR);
+	dbugSetWriteLevel(Debug::ERR_INFO | STD_ERR);
+
 	_checkDirectoryStructure();
 
 	_extract(tarFile);
-
-	if ( useOrigin )
-		_checkOriginFile();
 
 	if ( importFileName == nullptr )
 		importFileName = cv_importFile.GetString();

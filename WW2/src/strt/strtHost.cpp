@@ -7,7 +7,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "hostproj/hostversion.h"
 #include <signal.h>  //to catch SIGHUPS with
 #include "build_info.hpp"
 #include "mem/mem.h"
@@ -15,7 +14,7 @@
 #include "chat/chatSupportRPCMessages.h"
 #include "cnvy/cnvyMain.h"
 #include "include/arenaLockEnums.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverCodeEnum.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
@@ -67,7 +66,6 @@ const char* HostLanguage = "en";
 static bool _exitSignaled = false;
 static bool _mustSyncChatHost = true;
 extern int tolua_stratd_open(struct lua_State*);
-extern ConfigPath cv_luaPath;
 
 //////////////////////////////////////////////////////////////////////////
 // Users never directly connect to strat, so while we are aware of them
@@ -152,16 +150,6 @@ static void _describeBuildConfigurationToLogFile()
 #endif
 #if defined(OPEN_BETA)
 	dbugLog(_FLI, " OPEN_BETA");
-#endif
-#if defined(CLOSED_BETA)
-	dbugLog(_FLI, " CLOSED_BETA");
-#endif
-#if defined(FRES)
-	dbugLog(_FLI, " FRES");
-#endif
-#if defined(HAPPYOO)
-	dbugLog(_FLI, " HAPPYOO");
-	dbugLog(_FLI, "%s HOST FLAGS:", PN_git_commitish_string);
 #endif
 #if defined(TRAINING_SERVER)
 	dbugLog(_FLI, " TRAINING_SERVER");
@@ -548,9 +536,9 @@ main(int argc, const char* argv[])
 
 	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {
 		{ "--lua-cmd", "Execute lua code after initializing.", true,
-			[](const char* code) { s_luaCmds.emplace_back(code); } },
-		{ "--init-only", "Terminate after loading strat data.", false, [](const char*) { s_initOnly = true; } },
-		{ "--debug", "Enable verbose + console logging", false, [](const char*) { s_debug = true; } }
+			[](const char* code) { s_luaCmds.emplace_back(code); }, nullptr },
+		{ "--init-only", "Terminate after loading strat data.", false, [](const char*) { s_initOnly = true; }, nullptr },
+		{ "--debug", "Enable verbose + console logging", false, [](const char*) { s_debug = true; }, nullptr, }
 	});
 	if ( !s_debug ) {
 		dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
@@ -614,7 +602,7 @@ main(int argc, const char* argv[])
 	dbugLog(_FLN,"opening broadcast ports");
 	serverOpenBroadcastIndexes();
 
-	serverInit(HOST_VERSION
+	serverInit(PN_build_version_value
 				, STRAT_HOST, STRAT_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback

@@ -27,7 +27,7 @@
 #include "miss/mission.h"
 #include "miss/missHitArrayNode.h"
 #include "mm/mmQueries.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverServerInfo.h"
 #include "str/stringLib.h"
 #include "strt/strtCPStruct.h"
@@ -108,7 +108,7 @@ static void
 _setArenaDescriptionHostRevision()
 {
 	char hostRevision[200];
-	strprintf(hostRevision, "%s (%s)", PN_git_commitish_string, cv_stratLanguage.GetString());
+	strprintf(hostRevision, "c:%s d:%s (%s)", PN_code_git_commitish_string, PN_data_git_commitish_string, cv_stratLanguage.GetString());
 
 	std::string revision = hostRevision;
 	_removePrefix(revision, "branches/");
@@ -189,8 +189,8 @@ _connectGameDB()
 			"  `clientVersion` char(16) NOT NULL default '0.0.0.0',"
 			"  `platform` int(11) unsigned default NULL,"
 			"  `rxTime` timestamp NOT NULL,"
-			"  `hostTime` timestamp NOT NULL,"
-			"  `clientTime` timestamp NOT NULL,"
+			"  `hostTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+			"  `clientTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
 			"  `archiveCorrupt` tinyint(3) unsigned default '0',"
 			"  `piExitLine` int(11) unsigned default '0',"
 			"  `piExitFile` char(64) default '',"
@@ -228,7 +228,7 @@ mapInitDB()
 
 	wwiiReadRanks();
 
-#if !defined(DEV_BUILD) && !defined(FRES)
+#if !defined(DEV_BUILD)
 	mapPollChecksums(true);
 #endif
 
@@ -621,7 +621,7 @@ _errException(const WWII_ERROR_INFO& info, const Player& player, const UINT32 pl
 		if ( info.data.exceptInfo.stackAddrs[i] != 0 )
 		{
 			char addr[20];
-			sprintf(addr, "%x,", info.data.exceptInfo.stackAddrs[i]);
+			strprintf(addr, "%x,", info.data.exceptInfo.stackAddrs[i]);
 			stackinfo.append(addr);
 		}
 	}
@@ -691,8 +691,8 @@ _errExit(const WWII_ERROR_INFO& info, const Player& player, const UINT32 platfor
 
 	std::string error = info.data.piExitInfo.errorMessage.string;
 //	DB::handle_t* conn = threadsOpenDBConnection(false);
-	DBThread::EscapeString(dbh, src);
-	DBThread::EscapeString(dbh, error);
+	DBThread::EscapeString(src);
+	DBThread::EscapeString(error);
 //	threadsCloseDBConnection(conn);
 
 	player.log(_FLN, "Received PIEXIT ver %s exit info type %u at %s:%u: %s"
@@ -1030,7 +1030,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 			}
 			else
 			{
-				betaLog(_FLI, "t:%d p:%u c:%s pers:[%d/%d:%d] locked %d"
+				dbugLog(_FLI, "t:%d p:%u c:%s pers:[%d/%d:%d] locked %d"
 								, player->teulIndex(), player->playerID(), player->callsign()
 								, ps.m_countryID, ps.m_branchID, ps.m_personaID
 								, ps.m_lockedThru);

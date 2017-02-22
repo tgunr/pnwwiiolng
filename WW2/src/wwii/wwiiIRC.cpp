@@ -34,7 +34,7 @@
 
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiIRC.h"
-#include "server/serverConfigVars.h"
+#include "include/configVars.h"
 
 void wwiiIRCDefaultChannelMsg(irc_session_t* session, const char* event, const char* origin, const char** params, unsigned int count);
 
@@ -215,9 +215,9 @@ _ircSigHandler(int signo)
 	}
 
 	if ( sigName != nullptr )
-		sprintf(buffer, format, sigName);
+		strprintf(buffer, format, sigName);
 	else
-		sprintf(buffer, "*** PROCESS CRASHED with signal %d ***", signo);
+		strprintf(buffer, "*** PROCESS CRASHED with signal %d ***", signo);
 
 	_terminate(buffer);
 
@@ -316,9 +316,9 @@ wwiiIRCInitialize(UINT32 ip, bool plural)
 
 	// Plural indicates there is more than one of this type of host
 	if ( plural )
-		sprintf(buf, "%c%c%s%c%s%u", IRC::_SERVER_PREFIX, toupper(cv_clusterName.GetString()[0]), cv_clusterName.GetString()+1, toupper(appName[0]), appName+1, ip & 255);
+		strprintf(buf, "%c%c%s%c%s%u", IRC::_SERVER_PREFIX, toupper(cv_clusterName.GetString()[0]), cv_clusterName.GetString()+1, toupper(appName[0]), appName+1, ip & 255);
 	else
-		sprintf(buf, "%c%c%s%c%s", IRC::_SERVER_PREFIX, toupper(cv_clusterName.GetString()[0]), cv_clusterName.GetString()+1, toupper(appName[0]), appName+1);
+		strprintf(buf, "%c%c%s%c%s", IRC::_SERVER_PREFIX, toupper(cv_clusterName.GetString()[0]), cv_clusterName.GetString()+1, toupper(appName[0]), appName+1);
 
 	irc.m_nick = buf;
 
@@ -348,7 +348,7 @@ wwiiIRCInitialize(UINT32 ip, bool plural)
 	wwiiIRCAddChannelIgnore("#servers");
 
 	// Cluster server notices
-	sprintf(buf, "#%s-sys", cv_clusterName.GetString());
+	strprintf(buf, "#%s-sys", cv_clusterName.GetString());
 	char title[256];
 	strprintf(title, "CRS, GM and System messages from %s servers", cv_clusterName.GetString());
 	wwiiIRCAddInitialChannel(buf, "-nt", title);
@@ -552,7 +552,7 @@ wwiiIRCDefaultPrivMsg(irc_session_t* session, const char* event, const char* ori
 	if ( it == irc.m_dots.end() )
 	{
 		char retort[64];
-		sprintf(retort, "I don't understand '%s'", iCmd.Command());
+		strprintf(retort, "I don't understand '%s'", iCmd.Command());
 		irc_cmd_msg(session, recipient, retort);
 		return;
 	}
@@ -611,7 +611,7 @@ void
 wwiiIRCDefaultNumeric(irc_session_t * session, unsigned int event, const char* origin, const char** params, unsigned int count)
 {
 	char buf[32];
-	sprintf(buf, "num#%u", event);
+	strprintf(buf, "num#%u", event);
 	wwiiIRCDumpEvent(session, buf, origin, params, count);
 
 	if ( count < 2 )

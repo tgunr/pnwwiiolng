@@ -186,7 +186,7 @@ UINT32 imaphackDoKeyboardInputs()
 
             char buffer[64] = {0};
 
-            sprintf(buffer, hour < 10 ? "0%d00" : "%d00", hour);
+            strprintf(buffer, hour < 10 ? "0%d00" : "%d00", hour);
             const wchar_t* str = uiUTF8toUTF16(buffer);
 
             uiChatPrintLine(L"Time set to %s", str);

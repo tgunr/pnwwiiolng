@@ -3,14 +3,14 @@
 
 #include "mem/mem.h"
 #include "str/strdupptr.h"
+#include "teul/teulBasic.h"
 #include "teul/teulConfigVar.h"
 #include "include/io_mapped_file.h"
+#include "include/configVars.h"
 
 #if platOS == OS_WIN32
 #include "Shlobj.h"
 #endif
-
-extern bool teulGetHost(const SCHAR* address, UINT32* host);
 
 #ifndef PN_PLAYNET_PATH
 #error "PN_PLAYNET_PATH not defined."
@@ -22,14 +22,14 @@ extern bool teulGetHost(const SCHAR* address, UINT32* host);
 #define CFG_STRING(Name_, Default_, EnvName_, Required_, Description_)	\
 	ConfigStr cv_##Name_ ( CVT_STRING, #Name_, Default_, EnvName_, Required_, Description_ )
 
-#define CFG_UINT(Name_, Default_, EnvName_, Description_)	\
-	ConfigUint cv_##Name_ ( CVT_UNSIGNED_INT, #Name_, Default_, EnvName_, true, Description_ )
+#define CFG_UINT(Name_, Default_, EnvName_, Required_, Description_)	\
+	ConfigUint cv_##Name_ ( CVT_UNSIGNED_INT, #Name_, Default_, EnvName_, Required_, Description_ )
 
-#define CFG_SINT(Name_, Default_, EnvName_, Description_)	\
-	ConfigSint cv_##Name_ ( CVT_SIGNED_INT, #Name_, Default_, EnvName_, false, Description_ )
+#define CFG_SINT(Name_, Default_, EnvName_, Required_, Description_)	\
+	ConfigSint cv_##Name_ ( CVT_SIGNED_INT, #Name_, Default_, EnvName_, Required_, Description_ )
 
-#define CFG_BOOL(Name_, Default_, EnvName_, Description_)	\
-	ConfigBool cv_##Name_ ( CVT_BOOL, #Name_, Default_, EnvName_, false, Description_ )
+#define CFG_BOOL(Name_, Default_, EnvName_, Required_, Description_)	\
+	ConfigBool cv_##Name_ ( CVT_BOOL, #Name_, Default_, EnvName_, Required_, Description_ )
 
 #define CFG_ADDR(Name_, Default_, EnvName_, Required_, Description_)	\
 	ConfigAddr cv_##Name_ ( CVT_IP_ADDRESS, #Name_, Default_, EnvName_, Required_, Description_ )
@@ -63,13 +63,14 @@ static ConfigVars& _getConfigVars()
 ////////////////////////////////////////////////////////////////////////////////
 // Variables.
 
+const CFG_PATH(pnPath, PN_PLAYNET_PATH, "PLAYNET_PATH", true, "Hard-coded playnet directory.");
 CFG_PATH(dataDir, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "data", "DATA_DIR", true, "Top level directory for game data.");
 CFG_PATH(importFile, "importlist.txt", "IMPORT_FILE", true, "File which will specify sdm files to be used by the server.");
 CFG_PATH(terrainSubdir, "terrain", "TERRAIN_SUBDIR", true, "Path from DATA_DIR to the terrain sdm files and origin file.");
 CFG_PATH(originFile, "origin", "ORIGIN_FILE", true, "Name of the file which identifies where the sdm files came from.");
 CFG_STRING(stratLanguage, "en", "STRAT_LANGUAGE", true, "2-letter language code for server localization.");
 CFG_PATH(thblitzPath, "th_blitz" PATH_SEPSTR "weapon", "THBLITZ_PATH", true, "Path from DATA_DIR to the thBlitz csv files.");
-CFG_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS", "Disables sdm-loading errors from causing termination.");
+CFG_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS", false, "Disables sdm-loading errors from causing termination.");
 CFG_PATH(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH", true, "DATA_DIR-relative path/filename for the blitzWor csv file");
 CFG_PATH(luaPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "lua", "LUA_BASE_PATH", true, "Path to the Lua scripts.");
 CFG_PATH(defaultLogPath, nullptr, "LOG_PATH", false, "Default location for log files.");
@@ -83,17 +84,18 @@ CFG_STRING(wwiiDBPassword, nullptr, "WWII_DB_PASSWD", true, "Password to use for
 CFG_STRING(wwiiDBUser, "wwiiol", "WWII_DB_USER", true, "Username when connecting to the game database.");
 CFG_STRING(wwiiDBPort, "3306", "WWII_DB_PORT", true, "Port of the game MySQL server if not default.");
 CFG_ADDR(dbsePrimaryAddress, nullptr, "DBSE_PRIMARY_ADDRESS", true, "IP address dbd clients will reach the dbd on.");
-CFG_UINT(dbseConnectionTimeout_ms, "3000", "DBSE_CONNECTION_TIMEOUT_MS", "Time in miliseconds before database proxy connections timeout.");
-CFG_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION", "Enable compression when communicating with the MySQL server");
+CFG_UINT(dbseConnectionTimeout_ms, "3000", "DBSE_CONNECTION_TIMEOUT_MS", false, "Time in miliseconds before database proxy connections timeout.");
+CFG_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION", false, "Enable compression when communicating with the MySQL server");
 
 CFG_STRING(clusterName, nullptr, "WWII_CLUSTER", true, "Short-name for this cluster, e.g. 'dev'");
-CFG_UINT(arenaID, nullptr, "ARENA_ID", "Numeric ID for this arena.");
-CFG_UINT(appID, "1", "APP_ID", "App ID for this server - 1 being release, 12 being beta.");
+CFG_UINT(arenaID, nullptr, "ARENA_ID", true, "Numeric ID for this arena.");
+CFG_UINT(appID, "1", "APP_ID", false, "App ID for this server - 1 being release, 12 being beta.");
 CFG_ADDR(ircServer, "", "WWII_IRC_SERVER", false, "Address of the IRC server. If not defined, disables IRC.");
 CFG_STRING(ircPassword, "", "WWII_IRC_PASSWD", false, "Server-password for the IRC server.");
-CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", "Port to connect to the IRC server on.");
+CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", false, "Port to connect to the IRC server on.");
 CFG_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL", true, "URL to prefix authentication error URLs with.");
 CFG_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true, "Network address (/24) for the cluster (server's will map their last octets (x.x.x.N) into this network for inter-host communications) or IP address of controller host.");
+CFG_BOOL(oneProcessMode, "0", "ONE_PROCESS_MODE", false, "If enabled, it will not be a fatal error to fail to contact other hosts in the cluster.");
 
 #ifndef PN_DISABLE_AUTH
 CFG_ADDR(authHost, "auth.playnet.com", "AUTH_ADDRESS", true, "Host name or IP Address of the authentication server.");
@@ -102,12 +104,19 @@ CFG_STRING(authdbPort, "3306", "AUTH_DB_PORT", true, "Port of the Auth MySQL ser
 CFG_STRING(authdbPassword, "", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
 CFG_STRING(authdbSchema, "auth", "AUTH_DB_SCHEMA", true, "Schema to use for auth data.");
 CFG_STRING(authdbUser, "authuser", "AUTH_DB_USER", true, "Username when connecting to the auth database.");
+#else
+CFG_ADDR(authHost, nullptr, "AUTH_ADDRESS", false, "Host name or IP Address of the authentication server.");
+CFG_ADDR(authdbAddress, nullptr, "AUTH_DB", false, "Address of the MySQL server hosting the auth database.");
+CFG_STRING(authdbPort, nullptr, "AUTH_DB_PORT", false, "Port of the Auth MySQL server if not default.");
+CFG_STRING(authdbPassword, nullptr, "AUTH_DB_PASSWD", false, "Password to use for the auth database.");
+CFG_STRING(authdbSchema, nullptr, "AUTH_DB_SCHEMA", false, "Schema to use for auth data.");
+CFG_STRING(authdbUser, nullptr, "AUTH_DB_USER", false, "Username when connecting to the auth database.");
 #endif
 
-CFG_UINT(maxClusterUsers, "0", "MM_MAX_USERS", "Maxmimum number of players on the mmhost/cluster");
-CFG_UINT(maxCellPlayers, "1250", "MAX_PLAYERS", "Maximum number of players on this cell host.");
+CFG_UINT(maxClusterUsers, "0", "MM_MAX_USERS", true, "Maxmimum number of players on the mmhost/cluster");
+CFG_UINT(maxCellPlayers, "1250", "MAX_PLAYERS", true, "Maximum number of players on this cell host.");
 CFG_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true, "Network address to use for private cell network or 0.0.0.0 to disable multiple cells (clustering).");
-CFG_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", "Number of miliseconds before a server-peer connection times out.");
+CFG_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", false, "Number of miliseconds before a server-peer connection times out.");
 #if defined(WIN32)
 CFG_STRING(defaultInterface, nullptr, "DEFAULT_IFACE", false, "Name of the network interface to treat as primary.");
 #else
@@ -183,7 +192,9 @@ static Teul::ConfigVar* _findConfigVar(const std::string& envName)
 {
 	auto& vars = _getConfigVars();
 	auto it = std::find_if(vars.begin(), vars.end(),
-		[=](const Teul::ConfigVar* cv) { return envName.compare(cv->GetEnvVarName()) == 0; }
+		[=](const Teul::ConfigVar* cv) {
+			return envName.compare(cv->GetEnvVarName()) == 0;
+		}
 	);
 	return it != vars.end() ? *it : nullptr;
 }
@@ -297,18 +308,6 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 				break;
 			}
 		}
-
-		if ( !configEntries.m_foundGeneralFile && !configEntries.m_foundOSFile )
-		{
-#if defined(WIN32) && defined(UNICODE)
-			_ftprintf(stderr, _T("NOTE: Could not find '%s' or '%s' config files, using defaults.\n"),
-				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
-#else
-			fprintf(stderr, "NOTE: Could not find '%s' or '%s' config files, using defaults.\n",
-				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
-#endif
-		}
-
 		configEntries.m_read = true;
 	}
 
@@ -372,7 +371,11 @@ void Teul::ConfigVar::Generate(const char* const filename_)
 				, it->GetDefault() ? '"' : '>'
 				);
 		fprintf(fp, "# %s\n", it->GetDescription());
-		fprintf(fp, "#%s=%s\n", it->GetEnvVarName(), (it->GetDefault() ? it->GetDefault() : (it->GetRequired() ? "???" : "")));
+		if ( it->IsInitialized() && it->GetString() && (!it->GetDefault() || strcmp(it->GetString(), it->GetDefault()) != 0) ) {
+			fprintf(fp, "%s=%s\n", it->GetEnvVarName(), it->GetString());
+		} else {
+			fprintf(fp, "#%s=%s\n", it->GetEnvVarName(), (it->GetDefault() ? it->GetDefault() : (it->GetRequired() ? "???" : "")));
+		}
 		fprintf(fp, "\n");
 	}
 	fclose(fp);
@@ -385,6 +388,9 @@ namespace Teul
 {
 	void ConfigVar::InitializeConfigVars()
 	{
+		// Windows needs to have WinSock initialized to be able to
+		// resolve names for addresses.
+		Teul::InitializeWinsock();
 		for (auto& it : _getConfigVars())
 		{
 			it->Initialize();
@@ -399,6 +405,17 @@ namespace Teul
 	bool ConfigVar::LoadedOSConfig()
 	{
 		return _getConfigEntries().m_foundOSFile;
+	}
+
+	const char* ConfigVar::GetEnv(const std::string& varName)
+	{
+		auto var = _findConfigVar(varName);
+		if ( var ) {
+			if ( var->IsInitialized() && var->GetString() )
+				return var->GetString();
+			return var->GetDefault() ? var->GetDefault() : "";
+		}
+		return nullptr;
 	}
 
 	ConfigVar::ConfigVar(ConfigVarType type_, const char* name_, const char* default_, const char* envVarName_, bool required_, const char* description_)
@@ -444,6 +461,18 @@ namespace Teul
 
 	void ConfigVar::CheckConfiguration()
 	{
+		ConfigEntries& configEntries = _getConfigEntries();
+		if ( !configEntries.m_foundGeneralFile && !configEntries.m_foundOSFile )
+		{
+#if defined(WIN32) && defined(UNICODE)
+			_ftprintf(stderr, _T("NOTE: Could not find '%s' or '%s' config files, using defaults.\n"),
+				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+#else
+			fprintf(stderr, "NOTE: Could not find '%s' or '%s' config files, using defaults.\n",
+				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+#endif
+		}
+
 		for (auto& it : _getConfigVars())
 		{
 			if (it->m_required && (it->m_value == nullptr || (it->m_default == nullptr && *it->m_value == 0)))
@@ -595,7 +624,7 @@ namespace Teul
 
 	void ConfigVar::SetUint32Value(UINT32 newValue_)
 	{
-		if ( m_initialized && newValue_ == m_union.um_uint32 )
+		if ( m_initialized && newValue_ == m_union.um_uint32 && m_value[0] )
 			return;
 		m_initialized = true;
 		m_union.um_uint32 = newValue_;
@@ -604,7 +633,7 @@ namespace Teul
 
 	void ConfigVar::SetSint32Value(SINT32 newValue_)
 	{
-		if ( m_initialized && newValue_ == m_union.um_sint32 )
+		if ( m_initialized && newValue_ == m_union.um_sint32 && m_value[0] )
 			return;
 		m_initialized = true;
 		m_union.um_sint32 = newValue_;
@@ -618,7 +647,7 @@ namespace Teul
 
 	void ConfigVar::SetIPAddressValue(UINT32 newValue_)
 	{
-		if ( m_initialized && newValue_ == m_union.um_uint32 )
+		if ( m_initialized && newValue_ == m_union.um_uint32 && m_value[0] )
 			return;
 		m_initialized = true;
 		if ( m_value )

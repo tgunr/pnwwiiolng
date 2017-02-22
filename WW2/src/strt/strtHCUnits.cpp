@@ -585,7 +585,6 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 	if ( cp->controllingSide != side() )
 		return BMR_FAILED_CONTROL;
 
-#ifndef FRES
 	if ( offMap() && cp != homeCP() && cp->isEnemyLinked() )
 		return BMR_FAILED_FRONTLINE;
 
@@ -596,12 +595,10 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 	// this allows movement within a pocket but not into a pocket
 	if ( homeCP() && cp != homeCP() && homeCP()->isSupplied() && cp->isSupplied() == false )
 		return BMR_FAILED_NFL;
-#endif
 
 	switch ( movementType() )
 	{
 	case BRANCH_LAND:
-#ifndef FRES
 		if ( !offMap() )
 		{
 			LinkStruct* link = nullptr;
@@ -629,7 +626,6 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 			if ( isBrigade() && !cp->hasContactWithDivision(this) )
 				return BMR_FAILED_CONTACT;
 		}
-#endif
 
 		// Gotta have ABs to have a land brigade
 		if ( branch() == BRANCH_LAND && !cp->hasABs(side()) )
@@ -1054,13 +1050,13 @@ strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 
 	if ( fromEvent != nullptr && brigade->nextEvent() != fromEvent )
 	{
-		betaLog(_FLW, "hcu:%u incorrect event %p", brigadeID, fromEvent);
+		dbugLog(_FLW, "hcu:%u incorrect event %p", brigadeID, fromEvent);
 		return false;
 	}
 
 	if ( !brigade->offMap() )
 	{
-		betaLog(_FLW, "hcu:%u brigade not off-map", brigadeID);
+		dbugLog(_FLW, "hcu:%u brigade not off-map", brigadeID);
 		return true;
 	}
 
@@ -1072,7 +1068,7 @@ strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 
 	if ( brigade->parent()->offMap() )
 	{
-		betaLog(_FLN, "hcu:%u reformation failed -- parent is off-map", brigadeID);
+		dbugLog(_FLN, "hcu:%u reformation failed -- parent is off-map", brigadeID);
 		return false;
 	}
 
@@ -1118,7 +1114,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC spec, UINT16 numUnits, bool allowO
 	const UINT32 overstockLimit = entry->overstockCapacity();
 	if ( entry->present() >= overstockLimit )
 	{
-		betaLog(_FLI, "hcu:%u(%s) weap:%s equipment pool at/over max oversupply limit (%u/%u->%u)"
+		dbugLog(_FLI, "hcu:%u(%s) weap:%s equipment pool at/over max oversupply limit (%u/%u->%u)"
 						, unitID(), callsign(), weapPrintName(spec)
 						, entry->present(), entry->capacity(), overstockLimit
 						);
@@ -1127,7 +1123,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC spec, UINT16 numUnits, bool allowO
 
 	if ( allowOverstock == false && entry->present() >= entry->capacity() )
 	{
-		betaLog(_FLI, "hcu:%u(%s) weap:%s equipment pool at capacity (%u/%u)"
+		dbugLog(_FLI, "hcu:%u(%s) weap:%s equipment pool at capacity (%u/%u)"
 						, unitID(), callsign(), weapPrintName(spec)
 						, entry->present(), entry->capacity()
 						);

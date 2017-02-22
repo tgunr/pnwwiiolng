@@ -72,7 +72,6 @@ MESSAGE( STATUS "Build is ${BUILD_BITNESS}-bit" )
 ## Executable names
 SET( AUTH_HOST_EXE "authHost" )
 SET( CONTROLLER_HOST_EXE "controller" )
-SET( DBD_HOST_EXE "dbd" )
 SET( CHAT_HOST_EXE "chatd" )
 SET( CELL_HOST_EXE "hostd" )
 SET( MAP_HOST_EXE "mmhostd" )
@@ -127,6 +126,12 @@ IF ( NOT MSVC )
 	ENDIF()
 ENDIF()
 
+IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+    OPTION( PN_DEV_BUILD "Enable funny farm and more logging" OFF )
+ELSE()
+    SET( PN_DEV_BUILD OFF )
+ENDIF()
+
 ####################################
 ## Provide platform and server defines
 IF(WIN32)
@@ -143,6 +148,10 @@ ADD_DEFINITIONS( "-DplatBuild=BUILD_SERVER" )
 ## Provide critical build type definitions
 # For now, we always build PUBLIC_RELEASE
 ADD_DEFINITIONS( "-DPUBLIC_RELEASE" )
+
+IF ( PN_DEV_BUILD )
+    ADD_DEFINITIONS( "-DDEV_BUILD" )
+ENDIF()
 
 ####################################
 ## Status output
@@ -169,7 +178,7 @@ ADD_OMG_TARGET( omg/omgMissionSortieData )
 ADD_OMG_TARGET( omg/omgChat )
 
 ####################################
-## Run revno.py to get build_info.cpp
+## Run build_info.py to get build_info.cpp
 # Use BYPRODUCTS for the real result and a symbolic (fake) OUTPUT so the script
 # runs always; easiest way to avoid the run-when-needed default behaviors.
 ADD_CUSTOM_COMMAND(
@@ -178,7 +187,7 @@ ADD_CUSTOM_COMMAND(
     MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/build_info.cpp.in
     COMMAND
         ${PYTHON_EXECUTABLE}
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../Tools/revno.py
+        ${CMAKE_CURRENT_SOURCE_DIR}/build_info.py
         host
         ${CMAKE_CURRENT_BINARY_DIR}
     COMMENT "Generating build information"
@@ -267,7 +276,7 @@ ADD_LIBRARY( wwiilib STATIC
     strt/strtSupercell.cpp strt/strtSupercell.h strt/strtSupercells.h
     wwii/wwiiCallbacks.cpp wwii/wwiiCallbacks.h teul/teulCallback.h teul/teulCallbackInit.h
     wwii/wwiiHCUnitsCommon.cpp
-    src/configVars.cpp sdm/sdmConfigVars.h server/serverConfigVars.h wwii/wwiidbConfigVars.h
+    include/configVars.h src/configVars.cpp
     str/strdupptr.h
     wwii/wwiiNetPorts.h wwii/wwiiCallbacks.h
     # These weren't previously in wwiilib but seem to be required in various places
@@ -283,12 +292,12 @@ SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
 SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES})
 IF (BUILDING_OWN_LIBXML2)
 	MACRO( USE_WWIILIB_ON Name )
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} )
+		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
 		ADD_DEPENDENCIES( ${Name} libxml2 )
 	ENDMACRO()
 ELSE()
 	MACRO( USE_WWIILIB_ON Name)
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} )
+		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
 	ENDMACRO()
 ENDIF()
 
@@ -346,24 +355,11 @@ IF ( MSVC )
 		sdm/sdmpp.cpp
 			sdm/sdmpp.h
 
-		sdm/sdmConfigVars.h
+		include/configVars.h
 	)
 	TARGET_LINK_LIBRARIES(sdmpp teulserver ${MYSQL_LIBRARIES})
 	USE_WWIILIB_ON(sdmpp)
 	SET_PROPERTY(TARGET sdmpp PROPERTY FOLDER "Tools")
-
-	# Reads SDM files and imports portions of them into the game database.
-	# Which is a shame, because the hosts wind up reading the SDM files too
-	# to get the missing data. *Sigh*
-	ADD_EXECUTABLE(stratLoader
-		src/loader.cpp
-		sdm/sdmLoad.cpp
-			sdm/sdmLoad.h
-			sdm/sdmParse.h
-	)
-	TARGET_LINK_LIBRARIES(stratLoader teulserver ${MYSQL_LIBRARIES})
-	USE_WWIILIB_ON(stratLoader)
-	SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
 
 	ADD_EXECUTABLE(stratValidator
 		parse/parseWor.cpp
@@ -381,7 +377,7 @@ IF ( MSVC )
 					mm/mmEnums.h
 		strt/strtData.cpp
 			strt/strtData.h
-			wwii/wwiiConfigVars.h
+			include/configVars.h
 				teul/teulConfigVar.h
 		strt/strtFacilityStruct.cpp
 			strt/strtFacilityStruct.h
@@ -397,6 +393,20 @@ IF ( MSVC )
 	TARGET_LINK_LIBRARIES(stratValidator teulserver ${MYSQL_LIBRARIES})
 	SET_PROPERTY(TARGET stratValidator PROPERTY FOLDER "Tools")
 ENDIF()
+
+# Reads SDM files and imports portions of them into the game database.
+# Which is a shame, because the hosts wind up reading the SDM files too
+# to get the missing data. *Sigh*
+ADD_EXECUTABLE(stratLoader
+	src/loader.cpp
+	sdm/sdmLoad.cpp
+		sdm/sdmLoad.h
+		sdm/sdmParse.h
+)
+USE_WWIILIB_ON(stratLoader)
+TARGET_LINK_LIBRARIES(stratLoader teulserver ${MYSQL_LIBRARIES})
+SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
+
 
 ####################################
 ## Macro for building hosts
@@ -507,7 +517,6 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     chat/chatBrigadeControl.cpp chat/chatBrigadeControl.h
     chat/chatBrigadeMove.cpp chat/chatBrigadeMove.h chat/chatBrigadeMoveResults.h
     teul/teulNetworkMsg.h wwii/wwiiNetPorts.h
-    chat/chatdbClientMessages.cpp chat/chatdbClientMessages.h
     chat/chatDecisions.cpp chat/chatDecisions.h
     chat/chatHostBrigadeControl.cpp chat/chatHostBrigadeControl.h chat/chatBrigadeVote.h
     chat/chatHostMotds.cpp chat/chatHostMotds.h chat/chatMotds.cpp chat/chatMotds.h
@@ -663,22 +672,6 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
 )
 
 ####################################
-## Database Proxy Daemon [deprecated]
-
-# Because the original host implementation was
-# entirely single-threaded, this host process was created to offload
-# expensive synchronous database queries.
-# You should really use DB::Threads instead.
-ADD_HOST_TARGET( ${DBD_HOST_EXE} SOURCES
-    chat/chatdbHostMessages.cpp chat/chatdbParser.cpp chat/chatdbParser.h
-    dbse/dbseHost.cpp dbse/dbseHostMessages.cpp dbse/dbseConstants.h dbse/dbseTypes.h
-    wwii/wwiiCallbacks.h teul/teulBasic.h server/serverConfigVars.h
-    wwii/wwiiSquads.cpp wwii/wwiiSquads.h
-    EXTRA_DEFINITIONS "IS_DBD_HOST"
-    INSTANCING
-)
-
-####################################
 ## Strat host
 
 # Build the Lua glue file
@@ -769,7 +762,7 @@ TARGET_INCLUDE_DIRECTORIES( ${STRAT_HOST_EXE} PRIVATE ${TOLUAPP_INCLUDE_DIR} )
 
 INSTALL(
     TARGETS
-        ${CONTROLLER_HOST_EXE} ${STRAT_HOST_EXE} ${DBD_HOST_EXE}
+        ${CONTROLLER_HOST_EXE} ${STRAT_HOST_EXE}
         ${CHAT_HOST_EXE} ${MAP_HOST_EXE} ${CELL_HOST_EXE} ${AUTH_INSTALL}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib

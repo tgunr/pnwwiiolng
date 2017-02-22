@@ -30,8 +30,8 @@ namespace Debug
 	{
 		ERR_FATAL = 0,		// fatal error detected, exit program
 		ERR_ABORT,			// error detected, operation aborted
-		ERR_MINOR,			// error detected, routine recovered, operation continues
-		ERR_WARN,			// possible error detected, operation continues
+		ERR_WARN,			// error detected, operation continues
+		ERR_MINOR,			// possible error detected, routine recovered, operation continues
 		ERR_NOTE,			// normal but significant
 		ERR_INFO,			// informational message
 		ERR_DBUG,			// debug level message
@@ -121,13 +121,6 @@ NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, UINT32 err
 #define ABORT_IF_EX(assertion_, fmt, ...)     do { if (PN_UNLIKELY((assertion_)))  { _LogAbort(_FLF, #assertion_, fmt, ## __VA_ARGS__); } } while (0)
 #define ABORT_UNLESS(assertion_) ABORT_UNLESS_EX(assertion_, "Failed !(%s)", #assertion_)
 #define ABORT_IF(assertion_)     ABORT_IF_EX(assertion_, "Failed %s", #assertion_)
-
-// Define betaLog()
-#if defined(BETA_RELEASE)
-    #define betaLog(m, fmt, ...) dbugLog(m, fmt, ## __VA_ARGS__)
-#else
-    #define betaLog(m, fmt, ...)
-#endif
 
 #if platBuild == BUILD_SERVER
     #define DEBUG_ERR(fmt, ...) dbugLog(_FLA, fmt, ## __VA_ARGS__)

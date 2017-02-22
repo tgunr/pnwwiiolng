@@ -210,7 +210,7 @@ StratHCUnit::createResupplyTicket(
 	{
 		if ( homeCP()->isSupplied() == true )
 		{
-			betaLog(_FLD, "hcu:%u(%s) weap:%s immediate delivery", unitID(), callsign(), weapPrintName(entry.spec()));
+			dbugLog(_FLD, "hcu:%u(%s) weap:%s immediate delivery", unitID(), callsign(), weapPrintName(entry.spec()));
 			entry.setPresent(entry.present() + units);
 		}
 		return nullptr;
@@ -285,11 +285,11 @@ StratHCUnit::fetchResupplyQueue(std::vector<std::string>& result, UINT32 limit, 
 			seconds += (it->first - m_impl.m_nextServing) * m_impl.docketRate_s();
 
 		if ( seconds < 120 )
-			offset = sprintf(buffer, "%u sec: ", seconds);
+			offset = strprintf(buffer, "%u sec: ", seconds);
 		else if ( seconds < 7200 )
-			offset = sprintf(buffer, "%u min: ", seconds / 60);
+			offset = strprintf(buffer, "%u min: ", seconds / 60);
 		else
-			offset = sprintf(buffer, "%u hr: ", seconds / 3600);
+			offset = strprintf(buffer, "%u hr: ", seconds / 3600);
 
 		RESUPPLY_MANIFEST manifest;
 		bool printable = false;
@@ -545,7 +545,7 @@ const char*
 StratHCUnit::describe() const
 {
 	static char buffer[400];
-	sprintf(buffer, "hcu:%u(%s) toe:%s(nv=%" PRSizeT ") %s dkts=%" PRSizeT ", tkts=%u, supplies=%" PRSizeT ", xfers=%" PRSizeT ""
+	strprintf(buffer, "hcu:%u(%s) toe:%s(nv=%" PRSizeT ") %s dkts=%" PRSizeT ", tkts=%u, supplies=%" PRSizeT ", xfers=%" PRSizeT ""
 					, unitID(), callsign()
 					, toeTemplateHeader() ? toeTemplateHeader()->name().c_str() : "none", m_toe.size()
 					, (m_impl.m_inTransit ? "InTransit" : "Stationed")
@@ -631,7 +631,7 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 	const UINT32 trickleSlices = host_config.supply.trickleSlices;
 
     char buffer[256];
-    sprintf(buffer, "hcu:%u(%s) %s supply in %um over %um [supply:%u, trickle:%u, slices:%u]"
+    strprintf(buffer, "hcu:%u(%s) %s supply in %um over %um [supply:%u, trickle:%u, slices:%u]"
                     , unitID(), callsign()
                     , (isTransfer) ? "transfering" : "restarting"
                     , delay / 60, window / 60
@@ -666,7 +666,7 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 			// We are transferring vehicles from A->B, take all present units
 			absent = entry.present();
 			entry.setPresent(0);
-			betaLog(_FLI, "hcu:%u(%s) is transfer: %s absent = %u/%u", unitID(), callsign(), weapPrintName(entry.spec()), absent, entry.capacity());
+			dbugLog(_FLI, "hcu:%u(%s) is transfer: %s absent = %u/%u", unitID(), callsign(), weapPrintName(entry.spec()), absent, entry.capacity());
 		}
 		else
 			absent = shortfall;
@@ -678,7 +678,7 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 		if ( !trickleEnabled || (delay == 0 && window == 0) )
 		{
 			UINT32 delivery = supplyEnabled ? (entry.present() + absent) : 1;
-			betaLog(_FLI, "hcu:%u(%s) %s instant delivery of %u", unitID(), callsign(), weapPrintName(entry.spec()), delivery);
+			dbugLog(_FLI, "hcu:%u(%s) %s instant delivery of %u", unitID(), callsign(), weapPrintName(entry.spec()), delivery);
 			entry.setPresent(delivery);
 			continue;
 		}
@@ -690,7 +690,7 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 		UINT32 intervals = ( trickleSlices > 0 ) ? trickleSlices : target;
 		if ( intervals == 0 || window == 0 )
 		{
-			betaLog(_FLI, "hcu:%u(%s) %s immediate ticket of %u:%u:%u", unitID(), callsign(), weapPrintName(entry.spec()), isTransfer, delay, absent);
+			dbugLog(_FLI, "hcu:%u(%s) %s immediate ticket of %u:%u:%u", unitID(), callsign(), weapPrintName(entry.spec()), isTransfer, delay, absent);
 			createResupplyTicket(entry, isTransfer, delay, absent);
 			continue;
 		}

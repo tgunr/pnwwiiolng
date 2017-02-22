@@ -27,7 +27,7 @@
 #include "strt/strtIO.h"
 #include "strt/strtData.h"
 #include "strt/strtDTL.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "sdm/sdmParse.h"
 #include "include/defs.h"
 #include "wwii/wwiiConfig.h"

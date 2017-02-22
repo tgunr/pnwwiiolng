@@ -145,7 +145,7 @@ _sendBrigadeListResponse(ACTION_OBJECT* const a)
 SINT32
 BrigadeSummaries::send(SINT32 teulIndex)
 {
-	betaLog(_FLD, "t:%d sending %u brigade summaries", teulIndex, m_count);
+	dbugLog(_FLD, "t:%d sending %u brigade summaries", teulIndex, m_count);
 	return teulSend(teulIndex, _XCHG_BRIGADE_LIST, this);
 }
 

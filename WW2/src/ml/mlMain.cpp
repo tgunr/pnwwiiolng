@@ -127,7 +127,7 @@
 	defines
 *************************************************************************************************/
 
-#if defined(_DEBUG)
+#if defined(DEBUG)
 //#define SPAWN_AT_DINANT_OFFLINE 1
 //#define SPAWN_AT_ANTWERP_OFFLINE 1
 //#define SPAWN_AT_OLD_OFFLINE 1
@@ -2841,8 +2841,6 @@ if(VehicleData->VehicleMasterPtr->VehicleType->Type == VEH_TYPE_AIR)
 	return 0;
 }
 
-#pragma mark -
-
 UINT32 mlUpdateComponent(mlComponent* Component, mlVehicleData* VehicleData, FLOAT64 DeltaTime, UINT32 PassNum,
 							FLOAT64VECTOR* SavedVehicleForce, FLOAT64VECTOR* TempNormForceSum)
 {
@@ -3223,7 +3221,7 @@ static UINT32 _UpdateAirfoilComponent(mlComponent* Component, mlVehicleData* Veh
 				if(AirfoilComponentData->ControlSurfaceJammed)
 					VehicleData->CanopyJammed[AirfoilComponentData->Position] = 1;
 
-				// keep applying damage 'til that sucker's ripped off.
+				// keep applying damage 'til that thing's ripped off.
 				if(!Component->ComponentFailed && Component->CurrentDamage < MAX_DAMAGE)
 					Component->CurrentDamage += DRAG_DAMAGE * DeltaTime / 1000.0;
 
@@ -4124,8 +4122,6 @@ FLOAT64 Density1 = 0,Density2 = 0;
 
 	return 0;
 }
-
-#pragma mark -
 
 UINT32 mlGetElevatorDeflection(FLOAT64 * ReturnVal,FLOAT64 DeltaTime,mlVehicleData * VehicleData)
 {
@@ -7565,7 +7561,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		if (!trnldrFindStratObjectPosition(SpawnSuperCellX,  SpawnSuperCellY, SpawnLocId, &Pos))
 		{
 			char s[128];
-			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
+			strprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
 			piExitProgram(_FL,s);
 		}
@@ -7604,7 +7600,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		if (!trnldrFindStratObjectPosition(SpawnSuperCellX,  SpawnSuperCellY, SpawnLocId, &Pos))
 		{
 			char s[128];
-			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
+			strprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
 			piExitProgram(_FL,s);
 		}
@@ -7646,7 +7642,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		if (!trnldrFindStratObjectPosition(SpawnSuperCellX,  SpawnSuperCellY, SpawnLocId, &Pos))
 		{
 			char s[128];
-			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
+			strprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
 			piExitProgram(_FL,s);
 		}
@@ -7701,8 +7697,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 			if (SpawnPtr == nullptr)
 			{
 				char s[128];
-
-				sprintf(s,"Cannot find spawn object for scx = %d, scy = %d, id = %d",
+				strprintf(s,"Cannot find spawn object for scx = %d, scy = %d, id = %d",
 							SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
 				piExitProgram(_FL,s);
 			}
@@ -8787,8 +8782,6 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 }
 
 
-#pragma mark -
-
 /************************************************************************************************
 	mlVehicleHandleTurretConvergence
 *************************************************************************************************/
@@ -9617,8 +9610,6 @@ static LOGICAL mlCollideWithVehicle(vehVehicle* CurrentVehicle, piVECTOR const* 
 	return (NumCollisionSlotsLeft != 32);
 }
 
-#pragma mark -
-
 #ifdef BETA_RELEASE
 
 // now does* all* vehicles
@@ -10132,8 +10123,6 @@ static void _LeakTest()
 
 #endif
 
-#pragma mark -
-
 // change!
 // now returns true if it was able to tell, false if it wasn't
 //
@@ -10469,8 +10458,6 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 }
 
 #endif // GM_RELEASE
-
-#pragma mark -
 
 // handles the magical mystery rotational co-ordinate conversion
 

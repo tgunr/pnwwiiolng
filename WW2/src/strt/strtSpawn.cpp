@@ -530,7 +530,7 @@ strtProcessPostListRequest(SINT32 teulIndex, const MM_POST_LIST_REQUEST& request
 	facility = strtGetFacility(request.facility);
 	if (facility == nullptr)
 	{
-		betaLog(_FLD, "NULL facility for post list request");
+		dbugLog(_FLD, "NULL facility for post list request");
 		return -EINVAL;
 	}
 
@@ -544,7 +544,7 @@ strtProcessPostListRequest(SINT32 teulIndex, const MM_POST_LIST_REQUEST& request
 	joinNode = _getNewJoinNode(request.crewID, request.crewHandle, request.missionID);
 	if ( !joinNode )
 	{
-		betaLog(_FLW, "NULL join node for post list request");
+		dbugLog(_FLW, "NULL join node for post list request");
 		return -EINVAL;
 	}
 
@@ -716,13 +716,13 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	switch ( currentWeapon->m_status )
 	{
 		case POSTED_WEAPON::_RESERVED:
-			betaLog(_FLD, "v:%u received spawnRequest for reserved %s"
+			dbugLog(_FLD, "v:%u received spawnRequest for reserved %s"
 						, serial
 						, weapPrintName(currentWeapon->spec())
 						);
 		break;
 		case POSTED_WEAPON::_POSTED:
-			betaLog(_FLD, "v:%u received spawnRequest for new %s"
+			dbugLog(_FLD, "v:%u received spawnRequest for new %s"
 						, serial
 						, weapPrintName(currentWeapon->spec())
 						);
@@ -1038,7 +1038,7 @@ WeaponsReturn::process() const
 	currentWeapon->m_isDead = m_isVehicleDead;
 
 	static char info[128];
-	sprintf(info, "p:%u c:%s v:%u return:", currentWeapon->m_commander, Chat::Name(currentWeapon->m_handle).c_str(), m_sortieID);
+	strprintf(info, "p:%u c:%s v:%u return:", currentWeapon->m_commander, Chat::Name(currentWeapon->m_handle).c_str(), m_sortieID);
 
 	dbugLog(_FLD, "%s to " PRF_FULL_OBJ_ID " co-ords %d.%d.%d ex:%u %s %s %s"
 			, info
@@ -1099,19 +1099,19 @@ WeaponsReturn::process() const
 
 			if ( rtbFacility != nullptr )
 			{
-				betaLog(_FLD, "%s rtbFacility is %s", info, rtbFacility->name);
+				dbugLog(_FLD, "%s rtbFacility is %s", info, rtbFacility->name);
 
 				if ( rtbFacility->weaponEntry(currentWeapon->spec()) != nullptr )
 				{
 					if ( rtbFacility != destFacility )
 					{
-						betaLog(_FLD, "%s found new destination: %s", info, rtbFacility->name);
+						dbugLog(_FLD, "%s found new destination: %s", info, rtbFacility->name);
 						destFacility = rtbFacility;
 						overSupply = true;
 					}
 					else
 					{
-						betaLog(_FLD, "%s rtbing to origin: %s", info, rtbFacility->name);
+						dbugLog(_FLD, "%s rtbing to origin: %s", info, rtbFacility->name);
 					}
 				}
 			}
@@ -1542,7 +1542,7 @@ FacilityWeaponList::populate(const StratHCUnit& unit, const FacilityStruct& faci
 
 	m_nextSupplyM = (unit.getSecondsToNextSupply() + 59) / 60;
 
-	betaLog(_FLI, "p:%u fac:%s aw:%s", playerID, facility.name, (allWeapons ? "yes" : "no"));
+	dbugLog(_FLI, "p:%u fac:%s aw:%s", playerID, facility.name, (allWeapons ? "yes" : "no"));
 
 	unit.checkThrottleWindows(&facility);
 

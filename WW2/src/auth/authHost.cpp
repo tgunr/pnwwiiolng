@@ -32,7 +32,7 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiThreads.h"
-#include "server/serverConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
 #include "teul/teulAuthServer.h"
@@ -127,7 +127,7 @@ static bool readDBRequired = false;
 static bool _running = true;
 
 #include <map>
-using GameIndex = std::map<UINT32, GAME*>;
+using GameIndex = std::map<UINT32, std::unique_ptr<GAME>>;
 static GameIndex gameIndex;
 
 //////////////////////////////////////////////////////////////////////
@@ -177,7 +177,6 @@ GAME::GAME()
 	,	m_server(nullptr)
 	,	requiresMax(true)
 	,	calcMaxUsersOnTheFly(true)
-	,	usePlayerID(true)
 	,	m_lastIRCUsers(0)
 	,	m_lastIRCReport(0)
 {
@@ -199,7 +198,6 @@ GAME::GAME(const AUTH_GAME_INIT& gInit)
 	, m_server(nullptr)
 	, requiresMax(true)
 	, calcMaxUsersOnTheFly(true)
-	, usePlayerID(true)
 	, m_lastIRCUsers(0)
 	, m_lastIRCReport(0)
 {
@@ -208,7 +206,7 @@ GAME::GAME(const AUTH_GAME_INIT& gInit)
 	// Load arena information from the database.
 	if ( !authInitGameEntry(*this) || description[0] == 0 )
 	{
-		sprintf(description, "Unknown Server #%u/%u", arenaID, appID);
+		strprintf(description, "Unknown Server #%u/%u", arenaID, appID);
 	}
 
 	char hostVer[64+1];
@@ -282,8 +280,8 @@ _platformName(UINT32 platform)
 static GAME*
 _findGame(UINT32 arenaID)
 {
-	GameIndex::iterator it = gameIndex.find(arenaID);
-	return (it != gameIndex.end() ? it->second : nullptr);
+	auto it = gameIndex.find(arenaID);
+	return (it != gameIndex.end() ? it->second.get() : nullptr);
 }
 
 static void
@@ -500,10 +498,8 @@ _verifyChecksum(const SINT32 /*teulIndex*/, const UINT32 appID, const UINT32 pla
 static void
 _reloadGameEntries()
 {
-	GameIndex::iterator it;
-	for ( it = gameIndex.begin(); it != gameIndex.end(); ++it )
-	{
-		authInitGameEntry(*it->second);
+	for ( auto it = gameIndex.begin(); it != gameIndex.end(); ++it ) {
+		authInitGameEntry(*it->second.get());
 	}
 }
 
@@ -734,11 +730,6 @@ GAME::~GAME()
 	m_server = nullptr;
 
 	authdbUpdateArenaStatus(arenaID, AL_OFFLINE, 0);
-
-	// Remove ourselves from the index.
-	auto it = gameIndex.find(arenaID);
-	if ( it != gameIndex.end() && it->second == this )
-		it->second = nullptr;
 }
 
 static void _gameErrorFunction (const SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
@@ -774,7 +765,9 @@ static void _gameErrorFunction (const SINT32 teulIndex, const UCHAR* const /*dat
 	server->ipAddress = 0;
 	if ( game->server() == server )
 	{
-		delete game;
+		if ( _findGame(game->arenaID) == game ) {
+			gameIndex.erase(game->arenaID);
+		}
 		server->game = nullptr;
 	}
 
@@ -884,7 +877,7 @@ main(int argc, const char* argv[])
 	authInitDB();
 
     dbugLog(_FLN, "setting up database threads");
-
+    
 	threadsSetup();
 
 	dbugLog(_FLN,"installing callbacks");
@@ -1427,8 +1420,9 @@ authEstablishServer(const SINT32 teulIndex, AUTH_GAME_INIT& gInit)
 
 		try
 		{
-			game = new GAME(gInit);
-			gameIndex[game->arenaID] = game;
+			auto newGame = std::make_unique<GAME>(gInit);
+			game = newGame.get();
+			gameIndex[game->arenaID] = std::move(newGame);
 		}
 		catch ( std::exception& e )
 		{
@@ -1457,8 +1451,10 @@ authEstablishServer(const SINT32 teulIndex, AUTH_GAME_INIT& gInit)
 	//Place the server onto the server list for the game entry we either found
 	//	or created
 	SERVER* oldServer = game->server();
-	if ( oldServer != newServer )
+	if ( oldServer && oldServer != newServer )
+	{
 		delete oldServer;
+	}
 
 	game->server(newServer);
 
@@ -1630,7 +1626,7 @@ authGetGameList(const SINT32 teulIndex)
 		// Check for expired or not populated first
 		if ( cache.m_goodUntil < teulTime() )
 		{
-			dbugLog(_FLD, "t:%d expiring gamelist cache entry", teulIndex);
+				dbugLog(_FLD, "t:%d expiring gamelist cache entry", teulIndex);
 			*it = caches.back();
 			caches.pop_back();
 			continue;
@@ -1642,7 +1638,7 @@ authGetGameList(const SINT32 teulIndex)
 			continue;
 		}
 
-		dbugLog(_FLD, "t:%d found cached gamelist entry", teulIndex);
+			dbugLog(_FLD, "t:%d found cached gamelist entry", teulIndex);
 		return &cache.m_list;
 	}
 

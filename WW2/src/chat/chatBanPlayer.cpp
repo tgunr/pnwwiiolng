@@ -107,7 +107,7 @@ _banSuccess(void* data)
 
 	if ( ban->m_duration == 0 )
 	{
-		betaLog(_FLI, "p:%u issuing smite on playerID", ban->m_playerID);
+		dbugLog(_FLI, "p:%u issuing smite on playerID", ban->m_playerID);
 		chatSmitePlayer(ban->m_playerID);
 	}
 	else
@@ -169,8 +169,9 @@ _processBan(DB::handle_t* conn, BAN& ban)
 	}
 	catch (std::exception& e)
 	{
-		if (message != nullptr)
-			delete message;
+		if (message != nullptr) {
+			delete [] message;
+		}
 
 		ban.m_message = e.what();
 		threadCallback(_banFail, &ban);

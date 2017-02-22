@@ -90,7 +90,6 @@ struct IconRank
 
 static const IconRank _SpecialRanks[] =
 {
-#if !defined(CHINA) && !defined(HAPPYOO)
 	{"killer", 		KILLER_RANK },
 	{"martini", 	MARTINI_RANK },
 	{"toto", 		TOTO_RANK },
@@ -100,7 +99,6 @@ static const IconRank _SpecialRanks[] =
 	{"xoom",        XOOM_RANK },
 	{"ohm",         OHM_RANK },
 	{"victarus",    VICTARUS_RANK },
-#endif
 	{nullptr, 0}
 };
 
@@ -1740,7 +1738,7 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 
 	// Position
 // Absolutely no idea why it works like this
-// Seems to be due to some retardation in the FPS math, but fixing it is
+// Seems to be due to some brokenness in the FPS math, but fixing it is
 // a real potential can of worms
 if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 	PosData->Pos.x += -PosData->Vel.x * Delta;

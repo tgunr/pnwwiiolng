@@ -886,7 +886,7 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 		if ( host_config.kills.reportDamage )
 		{
 			static char buffer[512];
-			sprintf(buffer, "INCOMING: %" PR64BitT " joules of damage %s %s"
+			strprintf(buffer, "INCOMING: %" PR64BitT " joules of damage %s %s"
 							, totalDamageJ
 							, (vShooter->isRemote()) ? "from [alt-cell]" : "from [same cell]"
 							, vShooter->callsign()

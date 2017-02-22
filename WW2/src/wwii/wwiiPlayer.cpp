@@ -306,7 +306,7 @@ wwiiPlayer::log(const char* file, int lineno, unsigned int errType, const char* 
 bool
 wwiiPlayer::isEffectiveGM() const
 {
-#if defined(TRAINING_SERVER) || defined(BETA_RELEASE) || defined(FRES)
+#if defined(TRAINING_SERVER) || defined(BETA_RELEASE)
 	return permissions(IS_PLAYNET | GAME_MANAGER | GAME_TRAINER);
 #else
 	return permissions(IS_PLAYNET | GAME_MANAGER);

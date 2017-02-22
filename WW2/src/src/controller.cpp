@@ -14,6 +14,7 @@
 #include "wwii/wwiiNetPorts.h"
 #include "src/controllerGameProcess.h"
 #include "server/serverInitializeProcess.h"
+#include "include/configVars.h"
 
 #if platOS == OS_WIN32
 #include <winsock2.h>
@@ -54,10 +55,6 @@ static event*			s_repeaterEvent = nullptr;
 bool g_singleShot = false;
 bool g_shuttingDown = false;
 bool g_enableStarts = true;
-
-extern ConfigStr cv_manageProcesses;
-
-const char* g_argv0 = nullptr;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TeulKit error handler.
@@ -490,24 +487,45 @@ static void _toggleStarts(int /*signal*/)
 
 int main(int argc, const char* argv[], const char* envp[])
 {
-	bool singleStartMode = false;
-	g_argv0 = argv[0];
+	static bool s_singleStartMode = false;
+	static std::vector<std::string> s_envQueries;
 	Server::InitializeProcess(g_serverName, CONTROLLER_HOST, _errorFunction, nullptr, argc, argv, {
 		{ "--configs", "List configuration variables and exit.", false,
 			[](const char*) {
 				Teul::ConfigVar::PrintCurrentVars();
 				exit(0);
-			}
+			},
+			nullptr,
 		},
 		{ "--make-config-file", "Generate an environment.cfg file and exit.", true,
 			[](const char* filename) {
 				Teul::ConfigVar::Generate(filename);
 				exit(0);
+			},
+			nullptr,
+		},
+		{ "--getenv", "Output value of specified environment variable(s) (in order) to stdout and exit.", true,
+			[&](const char* varName) {
+				// cmd line parsing precedes env loading, so we have to save these and query later.
+				s_envQueries.push_back(varName);
+			},
+			[&]() {
+				if (s_envQueries.empty() == false) {
+					for (std::string varName : s_envQueries) {
+						const char* value = Teul::ConfigVar::GetEnv(varName);
+						if (!value) {
+							fprintf(stderr, "unrecognized variable: %s\n", varName.c_str());
+							exit(1);
+						}
+						printf("%s\n", value);
+					}
+					exit(0);
+				}
 			}
 		},
 		{ "--single-shot", "Launch each child process only once.", false,
 			[&](const char*) {
-				singleStartMode = true;
+				s_singleStartMode = true;
 			}
 		}
 	});
@@ -540,7 +558,7 @@ int main(int argc, const char* argv[], const char* envp[])
 	signal(SIGUSR1, _toggleStarts);
 #endif
 
-	GameProcessManager::Initialize(envp, singleStartMode);
+	GameProcessManager::Initialize(envp, s_singleStartMode);
 
 	// Our main loop is handled by libevent rather than teulKit.
 	event_base_dispatch(Teul::eventBase);

@@ -88,123 +88,155 @@ public:
 
 	std::vector<Result> m_results;
 
-	virtual bool Process(const size_t numRows) override
-	{
-		if ( numRows <= 0 )
-			return true;
+	virtual bool Process(const size_t numRows) override;
 
-		dbugLog(_FLI, "squad list process: sq:%u rows:%" PRSizeT "", m_squadID, numRows);
-
-		Result result;
-		while ( Query()->FetchRow() )
-		{
-			DBRow& row = Query()->Row();
-
-			result.m_handle = chatGetHandle(row.NextString());
-			result.m_playerID = row.NextUInt();
-			result.m_rank = row.NextUInt();
-			result.m_joined = row.NextUInt();
-			m_results.push_back(result);
-		}
-
-		return true;
-	}
-
-	virtual void Success() override
-	{
-		SquadList* list = chatFindSquadList(m_squadID);
-		if ( list == nullptr )
-		{
-			dbugLog(_FLI, "sq:%u list went away while querying members", m_squadID);
-			Failure();
-			return;
-		}
-
-		if ( g_debugSquads )
-			dbugLog(_FLD, "sq:%u '%s' got list of %" PRSizeT " members was %" PRSizeT ""
-						, m_squadID, list->squad().shortName(), m_results.size(), list->members().size());
-
-		// In order that we can tell who is no-longer in the squad according
-		// to the database, we erase all member's joined dates. Then as members
-		// are read back from the database, we set the joined dates to the
-		// values we read from the database.
-		SQUAD_MEMBERS::iterator mit;
-		for ( mit = list->begin(); mit != list->end(); ++mit )
-		{
-			mit->second.m_joined = 0;
-		}
-
-		// See who was listed.
-		Player* player;
-		for ( size_t i = 0; i < m_results.size(); ++i )
-		{
-			const Result& result = m_results[i];
-			ChatHandle handle = result.m_handle;
-			const UINT32 playerID = result.m_playerID;
-			const UINT32 rank = result.m_rank;
-			UINT32 joined = result.m_joined;
-
-			if ( rank <= 0 )
-			{
-				// A rank of zero means they've been removed externally.
-				mit = list->m_members.find(handle);
-				if ( mit != list->m_members.end() )
-					list->memberLeave(true, &mit->second, LSTR_SQUAD_LEAVER, "removed");
-				else
-					list->removeMember(handle);
-			}
-
-			if ( joined == 0 )
-			{
-				dbugLog(_FLA, "sq:%u p:%u c:%s has squad id but null squad_joined"
-								, m_squadID, playerID, Chat::Name(handle).c_str());
-				joined = teulTime();
-				DBThread::Do(DBThread::Default
-								, "UPDATE wwii_player"
-								   " SET squad_joined=NOW()"
-					 			" WHERE playerID=%u AND squadid=%u AND squad_joined is NULL"
-									, playerID, m_squadID
-					);
-			}
-
-			mit = list->m_members.find(handle);
-			// Check for an existing entry with no change
-			if ( mit != list->end() && mit->second.squadRank() == rank )
-			{
-				mit->second.m_joined = joined;
-				continue;
-			}
-
-			player = PlayerInterface::Lookup(handle);
-			const bool announce = (list->squad().callsign() != host_config.squad.defaultSquad);
-			list->memberJoin(player, handle, rank, joined, nullptr, announce);
-		}
-
-		// Anyone who still has a zero joined data must no-longer be
-		// in the squad according to the database, so eliminate them.
-		for ( mit = list->begin(); mit != list->end();  )
-		{
-			std::pair<const ChatHandle, SquadMemberEntry>& entry = *(mit++);
-			if ( entry.second.joined() == 0 )
-			{
-				dbugLog(_FLD, "sq:%u player %s no-longer in member list", m_squadID, Chat::Name(entry.first).c_str());
-				list->memberLeave(true, &entry.second, LSTR_SQUAD_LEAVER, "missing");
-			}
-		}
-
-		list->announce();
-	}
-
-	virtual void Failure() override
-	{
-		dbugLog(_FLW, "sq:%u error reading squad list", m_squadID);
-	}
+	virtual void Success() override;
+	virtual void Failure() override;
+    
+    // This complete rigamarole avoids having to refactor other things because
+    // they all assume this threaded query is the only way to do things.
+    static void SetSquadMemberEntryJoined(SquadMemberEntry *entry, UINT32 value) { entry->m_joined = value; }
+    static SQUAD_MEMBERS &GetSquadListMembers(SquadList *list) { return list->m_members; }
 };
 
-void
-chatRequestSquadMemberList(const UINT32 squadID)
+static void _preprocessSquadMemberListResults(UINT32 squadID, DBQuery *q, std::vector<SquadMemberQuery::Result> &results)
+{
+    if ( q->Rows() <= 0 )
+        return;
+
+    dbugLog(_FLI, "squad list process: sq:%u rows:%u", squadID, q->Rows());
+
+    SquadMemberQuery::Result result;
+    while ( q->FetchRow() )
+    {
+        DBRow& row = q->Row();
+
+        result.m_handle = chatGetHandle(row.NextString());
+        result.m_playerID = row.NextUInt();
+        result.m_rank = row.NextUInt();
+        result.m_joined = row.NextUInt();
+        results.push_back(result);
+    }
+}
+
+static void _handleSquadMemberListFailure(UINT32 squadID)
+{
+    dbugLog(_FLW, "sq:%u error reading squad list", squadID);
+}
+
+static void _handleSquadMemberListResults(UINT32 squadID, const std::vector<SquadMemberQuery::Result> &results)
+{
+    SquadList* list = chatFindSquadList(squadID);
+    if ( list == nullptr )
+    {
+        dbugLog(_FLI, "sq:%u list went away while querying members", squadID);
+        _handleSquadMemberListFailure(squadID);
+        return;
+    }
+
+    if ( g_debugSquads )
+        dbugLog(_FLD, "sq:%u '%s' got list of %" PRSizeT " members was %" PRSizeT ""
+                    , squadID, list->squad().callsign().c_str(), results.size(), list->members().size());
+
+    // In order that we can tell who is no-longer in the squad according
+    // to the database, we erase all member's joined dates. Then as members
+    // are read back from the database, we set the joined dates to the
+    // values we read from the database.
+    SQUAD_MEMBERS::iterator mit;
+    for ( mit = list->begin(); mit != list->end(); ++mit )
+    {
+        SquadMemberQuery::SetSquadMemberEntryJoined(&mit->second, 0);
+    }
+
+    // See who was listed.
+    Player* player;
+    for ( size_t i = 0; i < results.size(); ++i )
+    {
+        const SquadMemberQuery::Result& result = results[i];
+        ChatHandle handle = result.m_handle;
+        const UINT32 playerID = result.m_playerID;
+        const UINT32 rank = result.m_rank;
+        UINT32 joined = result.m_joined;
+
+        if ( rank <= 0 )
+        {
+            // A rank of zero means they've been removed externally.
+            mit = SquadMemberQuery::GetSquadListMembers(list).find(handle);
+            if ( mit != SquadMemberQuery::GetSquadListMembers(list).end() )
+                list->memberLeave(true, &mit->second, LSTR_SQUAD_LEAVER, "removed");
+            else
+                list->removeMember(handle);
+        }
+
+        if ( joined == 0 )
+        {
+            dbugLog(_FLA, "sq:%u p:%u c:%s has squad id but null squad_joined"
+                            , squadID, playerID, Chat::Name(handle).c_str());
+            joined = teulTime();
+            DBThread::Do(DBThread::Default
+                            , "UPDATE wwii_player"
+                               " SET squad_joined=NOW()"
+                            " WHERE playerID=%u AND squadid=%u AND squad_joined is NULL"
+                                , playerID, squadID
+                );
+        }
+
+        mit = SquadMemberQuery::GetSquadListMembers(list).find(handle);
+        // Check for an existing entry with no change
+        if ( mit != list->end() && mit->second.squadRank() == rank )
+        {
+            SquadMemberQuery::SetSquadMemberEntryJoined(&mit->second, joined);
+            continue;
+        }
+
+        player = PlayerInterface::Lookup(handle);
+        const bool announce = (list->squad().callsign() != host_config.squad.defaultSquad);
+        list->memberJoin(player, handle, rank, joined, nullptr, announce);
+    }
+
+    // Anyone who still has a zero joined data must no-longer be
+    // in the squad according to the database, so eliminate them.
+    for ( mit = list->begin(); mit != list->end();  )
+    {
+        std::pair<const ChatHandle, SquadMemberEntry>& entry = *(mit++);
+        if ( entry.second.joined() == 0 )
+        {
+            dbugLog(_FLD, "sq:%u player %s no-longer in member list", squadID, Chat::Name(entry.first).c_str());
+            list->memberLeave(true, &entry.second, LSTR_SQUAD_LEAVER, "missing");
+        }
+    }
+
+    list->announce();
+}
+
+bool SquadMemberQuery::Process(const size_t numRows)
+{
+    _preprocessSquadMemberListResults(m_squadID, Query(), m_results);
+    return true;
+}
+
+void SquadMemberQuery::Success()
+{
+    _handleSquadMemberListResults(m_squadID, m_results);
+}
+
+void SquadMemberQuery::Failure()
+{
+    _handleSquadMemberListFailure(m_squadID);
+}
+
+void chatRequestSquadMemberList(UINT32 squadID)
 {
 	(new SquadMemberQuery(squadID))->Queue();
+}
+
+void chatRequestSquadMemberListImmediate(UINT32 squadID)
+{
+    DBQuery q(dbh, QRY_SQUAD_MEMBERS, squadID);
+    std::vector<SquadMemberQuery::Result> results;
+    
+    _preprocessSquadMemberListResults(squadID, &q, results);
+    _handleSquadMemberListResults(squadID, results);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -350,7 +382,7 @@ SquadList::created()
 	if ( !m_newSquad )
 		return;
 
-	dbugLog(_FLI, "sq:%u %s creation completed", squad().squadID(), squad().shortName());
+	dbugLog(_FLI, "sq:%u %s creation completed", squad().squadID(), squad().callsign().c_str());
 	m_newSquad = false;
 
 	SQUAD_MEMBERS::iterator it;
@@ -421,8 +453,8 @@ SquadList::removeMember(ChatHandle handle)
 
 	if ( subject )
 	{
-		betaLog(_FLI, "t:%d p:%u c:%s sq:%u removing player from %s"
-						, subject->teulIndex(), subject->playerID(), subject->callsign(), squad().squadID(), squad().shortName());
+		dbugLog(_FLI, "t:%d p:%u c:%s sq:%u removing player from %s"
+						, subject->teulIndex(), subject->playerID(), subject->callsign(), squad().squadID(), squad().callsign().c_str());
 		_updateOnline(-1);
 		subject->SetSquad(0, Squad::NOT_IN_SQUAD, 0LL);
 		subject->sendSquadInfo(nullptr);
@@ -460,8 +492,13 @@ chatRequestSquad(UINT32 squadID, Player* player)
 	{
 		if ( g_debugSquads )
 			dbugLog(_FLI, "sq:%u requesting info", squadID);
-		chatdbRequestSquad(squadID);
-		return;
+        chatdbSquadInfo(0, squadID, false);
+        // No need to return here, since squad info is now synchronous
+        it = g_squads.find(squadID);
+        if (it == g_squads.end()) {
+            dbugLog(_FLW, "sq:%u no such squad!", squadID);
+            return;
+        }
 	}
 
 	if ( player == nullptr )
@@ -480,7 +517,7 @@ chatRequestSquad(UINT32 squadID, Player* player)
 
 	if ( g_debugSquads )
 	{
-		betaLog(_FLI, "t:%d p:%u c:%s sq:%u changing member entry at t:%u", player->teulIndex(), player->playerID(), player->callsign(), squadID, teulTime());
+		dbugLog(_FLI, "t:%d p:%u c:%s sq:%u changing member entry at t:%u", player->teulIndex(), player->playerID(), player->callsign(), squadID, teulTime());
 	}
 
 	list.changeMemberEntry(*entry, entry->squadRank(), player);
@@ -534,8 +571,6 @@ CHATDB_SQUAD_XCHG::receive(SINT32 /*teulIndex*/, CHATDB_SQUAD_XCHG& incoming)
 
 	// No existing entry so lets grease this pig
 	g_squads[squad.squadID()] = SquadList(squad);
-
-	chatRequestSquadMemberList(squad.squadID());
 
 	return 0;
 }
@@ -841,7 +876,7 @@ Player::sendSquadInvite(UINT32 forSquadID, const ChatHandle from)
 	SquadList* squadList = chatFindSquadList(forSquadID);
 	if ( !squadList )
 	{
-		betaLog(_FLA, "NO SQUAD LIST FOR SQUAD INVITE");
+		dbugLog(_FLA, "NO SQUAD LIST FOR SQUAD INVITE");
 		return false;
 	}
 
@@ -1001,12 +1036,11 @@ SquadList::electNewCO()
 void
 SquadList::renamed(const ChatHandle newHandle)
 {
-	const std::string oldCallsign = squad().m_callsign;
+	const std::string oldCallsign = squad().callsign();
 	const Chat::Name newCallsign(newHandle);
-	dbugLog(_FLN, "Squad %s renamed to %s, updating tables and players", squad().m_callsign.c_str(), newCallsign.c_str());
+	dbugLog(_FLN, "Squad %s renamed to %s, updating tables and players", squad().callsign().c_str(), newCallsign.c_str());
 	// Mark the squad as needing its details resent
 	squad().m_shortHandle = newHandle;
-	squad().m_callsign = newCallsign.c_str();
 	setUpdated();
 
 	SQUAD_MEMBERS::iterator it;
@@ -1109,8 +1143,8 @@ SquadList::setRecruiting(bool newFlag, Player* player)
 	if ( newFlag == m_squad.m_recruiting )
 		return;
 	dbugLog(_FLD, "t:%d p:%u c:%s sq:%u(%s) recruiting %s"
-					, player->teulIndex(), player->playerID(), player->callsign()
-					, squad().squadID(), squad().shortName()
+					, player ? player->teulIndex() : 0, player ? player->playerID() : 0, player ? player->callsign() : "API"
+					, squad().squadID(), squad().callsign().c_str()
 					, ((newFlag) ? "enabled" : "disabled"));
 	m_squad.m_recruiting = newFlag;
 	setUpdated();

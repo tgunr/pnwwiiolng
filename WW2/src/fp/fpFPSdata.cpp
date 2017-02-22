@@ -581,8 +581,8 @@ static void _fpFPSDataHandleWeaponTypeString (fpsWeaponTypes weapon, char* types
 
 	fpsWeapons[weapon].weaponType = (fpFPSWeaponType)type;
 
-	static char			defaultTypeFileName[255];
-	sprintf(defaultTypeFileName, "default_%s.txt", fpFPSWeaponTypeStrings[type]);
+	static char defaultTypeFileName[255];
+	strprintf(defaultTypeFileName, "default_%s.txt", fpFPSWeaponTypeStrings[type]);
 
 	_fpFPSDataReadWeaponFile (weapon, defaultTypeFileName);
 }

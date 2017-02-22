@@ -166,7 +166,7 @@ void DotCommand::catIntToText(const UINT32 value, char *dest) const
    while (*dest++ != 0);
 
    // append the integer
-   sprintf(istring, "%u", value);
+   strprintf(istring, "%u", value);
 
    dbugLog(_FLD, "Appending value %u to istring: %s", value, istring);
 
@@ -433,7 +433,6 @@ void
 DotCommandIndex::add(DotCommand* dotCommand)
 {
 	dbugLog(_FLD, "Registering dotCommand: %s", dotCommand->command());
-	betaLog(_FLI, "Registering dotCommand: %s", dotCommand->command());
 
 	if ( lookup(dotCommand->m_command, TRUE) != nullptr )
 		throw std::domain_error("Duplicate dot command");
@@ -444,9 +443,9 @@ DotCommandIndex::add(DotCommand* dotCommand)
 		++it;
 	insert(it, dotCommand);
 
-	// Now add to the database incase it's not already there
+	// Now add to the database in case it's not already there
 	std::string desc = dotCommand->description();
-        DBThread::EscapeString(desc);
+	DBThread::EscapeString(desc);
 
 	DBThread::Do(DBThread::Default
 				, "INSERT IGNORE INTO chat_commands"
@@ -567,7 +566,7 @@ DotCommandIndex::readPermissions()
 			DotCommand* dc = const_cast<DotCommand*> (lookup(row[0], true));
 			if ( dc == nullptr )
 			{
-				betaLog(_FLW, "chat_command %s not recognized", row[0]);
+				dbugLog(_FLW, "chat_command %s not recognized", row[0]);
 				continue;
 			}
 			dc->setAvailability(row[1][0]);

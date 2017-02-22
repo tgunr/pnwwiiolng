@@ -95,40 +95,17 @@ Description:
 #if defined(BETA_RELEASE)
 static void LogRainTimes()
 {
-    for(unsigned int i = 0; i < raintimes.size(); i++)
+	for (unsigned int i = 0; i < raintimes.size(); i++)
     {
-        unsigned int time = raintimes[i];
+        const UINT32 time = raintimes[i];
+		const UINT32 len = rainlength[i];
 
-        int hr = time / 3600;
+        auto hour = time / 3600;
+        auto minute = (time % 3600) / 60;
+        auto second = time % 60;
 
-        int t = time % 3600;
-
-        int mn = t / 60;
-        int sc = t % 60;
-
-        char hour[16] = {0};
-        char minute[16] = {0};
-        char second[16] = {0};
-
-        sprintf(hour, hr < 10 ? "0%d:" : "%d:", hr);
-        sprintf(minute, mn < 10 ? "0%d:" : "%d:", mn);
-        sprintf(second, sc < 10 ? "0%d" : "%d", sc);
-
-        std::string str = "Rain Time: ";
-        str += hour;
-        str += minute;
-        str += second;
-        char buff[64] = {0};
-
-        t = rainlength[i];
-
-        mn = t / 60;
-        sc = t - mn * 60;
-
-        sprintf(buff, " lasting for %d minutes and %d seconds.", mn, sc);
-        str += buff;
-
-        Write_Debug(str.c_str());
+		Write_Debug("Rain Time: %02u:%02u:%02u lasting for %02u minutes and %02u seconds.",
+					hour, minute, second, len / 60, len % 60);
     }
 }
 #endif

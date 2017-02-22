@@ -91,7 +91,7 @@
 #endif
 
 #ifdef GENICONS
-#include "GenerateIcons.h"
+#include "maptools/GenerateIcons.h"
 #endif
 
 static void _UpdateInit();
@@ -1116,7 +1116,7 @@ void gmlpProcessInputs()
 	if(imapqueuesize)
 		inputtime = frametime;
 
-	// auto-afk code, checks every AUTO_AFK_CHECK miliseconds
+	// auto-afk code, checks every AUTO_AFK_CHECK milliseconds
 	if(frametime > afkcheck)
 	{
 		SINT32 isafk = uiIsAFK();

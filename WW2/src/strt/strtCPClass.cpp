@@ -222,7 +222,7 @@ ObjectiveStats::checkLimits(UINT32 currentTime)
 	calculate();
 
 	// Step #1 - save the damn things :)
-#if !defined(TRAINING_SERVER) && !defined(FRES)
+#if !defined(TRAINING_SERVER)
 	save();
 
 	// Now check the stats of both sides to see if they're valid
@@ -271,7 +271,7 @@ ObjectiveStats::checkSideLimits(WWII_SIDE forSide, UINT32 currentTime)
 			{
 				///LOCALIZE
 				char buf[128];
-				sprintf(buf, "[beta] Too many objectives (%u/%u): grace period", m_cityAttacks[forSide], m_cityLimit);
+				strprintf(buf, "[beta] Too many objectives (%u/%u): grace period", m_cityAttacks[forSide], m_cityLimit);
 				chatSendHCMessage(forSide, LSTR_GENERIC, buf);
 			}
 #endif
@@ -619,7 +619,7 @@ CPStruct::checkForUnderAttack()
 	{
 		if ( !isUnderAttack )
 		{
-			betaLog(_FLI, "ews: marking %s as under attack", name);
+			dbugLog(_FLI, "ews: marking %s as under attack", name);
 		}
 		isUnderAttack = true;
 	}
@@ -627,7 +627,7 @@ CPStruct::checkForUnderAttack()
 	{
 		if ( isUnderAttack )
 		{
-			betaLog(_FLI, "ews: removing %s under attack flag", name);
+			dbugLog(_FLI, "ews: removing %s under attack flag", name);
 		}
 		isUnderAttack = false;
 	}
@@ -1300,13 +1300,13 @@ CPStruct::setTableStates(bool isNewObjective)
 		if ( !isObjective() )
 		{
 			// No objective, no tables
-			betaLog(_FLD, "NORB hiding %s non-obj table", fac->name);
+			dbugLog(_FLD, "NORB hiding %s non-obj table", fac->name);
 			fac->setCaptureDisabled();
 
 			// If the facility is spawnable and closed, time to wake it up
 			if ( fac->m_spawnable && !fac->isOpen() )
 			{
-				betaLog(_FLI, "opening %s since no objective", fac->name);
+				dbugLog(_FLI, "opening %s since no objective", fac->name);
 				strtOpenBase(*fac);
 			}
 			continue;
@@ -1318,18 +1318,18 @@ CPStruct::setTableStates(bool isNewObjective)
 			// entered contention, they should redraw soon
 			if ( isContested() )
 			{
-				betaLog(_FLD, "RB-MF table %s", fac->name);
+				dbugLog(_FLD, "RB-MF table %s", fac->name);
 				fac->setCapturePending();
 			}
 			else
 			{
-				betaLog(_FLD, "NORB-MF hiding %s", fac->name);
+				dbugLog(_FLD, "NORB-MF hiding %s", fac->name);
 				fac->setCaptureDisabled();
 			}
 		}
 		else if ( isNewObjective )
 		{
-			betaLog(_FLD, "RB show %s table no radio", fac->name);
+			dbugLog(_FLD, "RB show %s table no radio", fac->name);
 			fac->setCapturePending();
 		}
 	}

@@ -430,9 +430,9 @@ int		i, j;
 		}
 
 		trndtl[i].terrain->flags = OBJECT_COLLISION | OBJECT_USEMATRIX;
-		sprintf(trndtl[i].terrain->name, "%s_r%d", name, i);
+		strprintf(trndtl[i].terrain->name, "%s_r%d", name, i);
 //		lstrcpy(trndtl[i].terrain->name, name);
-//		sprintf(line, "_r%d", i);
+//		strprintf(line, "_r%d", i);
 //		lstrcat(trndtl[i].terrain->name, line);
 		trndtl[i].terrain->texid	= -1;
 		trndtl[i].terrain->trnum = i;
@@ -600,7 +600,7 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, const
 		{
 			if (td->nonreplacementtiles[i] == nullptr)
 			{
-				sprintf(objname, "%s_t%d", td->terrain->name, i);
+				strprintf(objname, "%s_t%d", td->terrain->name, i);
 				if (!obmainCreateObject(&newobj, objname, MAX_TERRAIN_VERTICES, MAX_TERRAIN_TRIANGLES))
 				{
 					return(FALSE);
@@ -614,7 +614,7 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, const
 			if (td->nonreplacementtiles[i]->numtris == 0)
 			{
 				newobj = td->nonreplacementtiles[i];
-				sprintf(newobj->name, "%s_t%d", td->terrain->name, i);
+				strprintf(newobj->name, "%s_t%d", td->terrain->name, i);
 				break;
 			}
 		}

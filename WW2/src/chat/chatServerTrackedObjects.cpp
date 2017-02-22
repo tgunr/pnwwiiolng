@@ -27,7 +27,7 @@
 #include "wwii/wwiiConfig.h"
 #include "inst/instTypes.h"
 #include "chat/chatHostMessages.h"
-#include "wwii/wwiiConfigVars.h"
+#include "include/configVars.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiPPOLoader.h"
 
@@ -266,7 +266,7 @@ UMSSTO::applyJoules(const SINT64& joules, Player* const player)
 
 	if ( missionID() > 0 )
 	{
-		betaLog(_FLI, "m:%u sto:%u sending mspw delete", missionID(), uid());
+		dbugLog(_FLI, "m:%u sto:%u sending mspw delete", missionID(), uid());
 		ChatMission* const mission = chatFindMission(missionID());
 		if ( mission )
 		{
@@ -659,7 +659,7 @@ _checkSTO(ServerTrackedObject& sto)
 		{
 #ifdef BETA_RELEASE
 			char buf[128];
-			sprintf(buf, "ums:%u(m:%u) ", umssto.uid(), umssto.missionID());
+			strprintf(buf, "ums:%u(m:%u) ", umssto.uid(), umssto.missionID());
 			stoList += buf;
 #endif
 
@@ -719,7 +719,7 @@ _dumpSTO(ServerTrackedObject& sto)
 	break;
 	}
 
-	sprintf(buf, "%s:%u(%u.%u,age:%u,ls:%u) "
+	strprintf(buf, "%s:%u(%u.%u,age:%u,ls:%u) "
 					, type, sto.uid(), sto.type(), sto.subType(), age, life);
 
 	stoList += buf;

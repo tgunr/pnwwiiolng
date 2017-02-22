@@ -47,7 +47,7 @@
 #include "fp/fpTPS.h"
 #include "fp/fpPPO.h"
 #include "gr2/gr2Anim.h"
-#include "versionNo.h"
+#include "build_info.hpp"
 #include "scen/ScenarioManager.h"
 #include "ml/mlutility.h"
 
@@ -202,9 +202,9 @@ jsGame::jsGame() : phui::js::Object(&jsclass, nullptr, nullptr,jsfunctions,jspro
 #endif
 	std::string hostversion;
 	getBuildInfo(hostversion);
-	DefineProperty("version", phui::js::ConstString(STRVER));
+	DefineProperty("version", phui::js::NewString(PN_product_version_string));
 	DefineProperty("buildinfo", phui::js::NewString(hostversion.c_str()));
-	DefineProperty("revision", phui::js::NewString(PN_git_commitish_string));
+	DefineProperty("revision", phui::js::NewString((std::string(PN_code_git_commitish_string)+PN_data_git_commitish_string).c_str()));
 	cps = new phui::js::Array;
 	keymaps = new phui::js::Array;
 	spawnablevehicles = new phui::js::Array;
@@ -984,7 +984,7 @@ JS_FUNCTION_DEF(jsGame, saveconvergence)
 	if(jsvehtype)
 	{
 		char buff[256] = {'\0'};
-		sprintf(buff, "convergence.%d", (SINT32)jsvehtype->vehtype->WeaponSpec.asUINT16());
+		strprintf(buff, "convergence.%d", (SINT32)jsvehtype->vehtype->WeaponSpec.asUINT16());
 
 		if(isDirty == 1)		// Is there a pending convergence setting change?
 			cfgPrefsSetInt(buff, value);
@@ -1036,7 +1036,7 @@ JS_FUNCTION_DEF(jsGame, getconvergence)
 			UINT16 key = jsvehtype->vehtype->WeaponSpec.asUINT16();
 
 			char buff[256] = {'\0'};
-			sprintf(buff, "convergence.%d", (SINT32)key);
+			strprintf(buff, "convergence.%d", (SINT32)key);
 
 			value = cfgPrefsGetInt(buff, (SINT32)Convergence);
 

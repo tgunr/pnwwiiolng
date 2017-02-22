@@ -86,11 +86,7 @@ public:
 public:
 	enum
 	{
-#ifdef CLOSED_BETA
-		_EXPIRY_MS = 20 * 1000			//!< 20 seconds
-#else
 		_EXPIRY_MS = 60 * 1000			//!< 1 minute
-#endif
 	,	_KEY_SHIFT = 9					//!< Keys have 512m granularity
 	,	_NODE_SIZE = 1 << _KEY_SHIFT
 	,	_CLIENT_RING_RADIUS = 1
@@ -142,12 +138,7 @@ private:
 	friend ChatGrid* _getGrid(const GridKey& key);
 };
 
-#if defined(CLOSED_BETA)
-# define GRID_INFO(mask, ...) dbugLog(_FLD, "g:%" PR64BitUT ":%d,%d " mask, gridKey().instanceID(), gridKey().X(), gridKey().Y(), __VA_ARGS__)
-# define GRID_INFOADD(mask, ...) dbugLog(_FLD, "+ " mask, __VA_ARGS__)
-#else
-# define GRID_INFO(mask, ...)
-#endif
+#define GRID_INFO(mask, ...) dbugLog(_FLD, "g:%" PR64BitUT ":%d,%d " mask, gridKey().instanceID(), gridKey().X(), gridKey().Y(), __VA_ARGS__)
 
 //////////////////////////////////////////////////////////////////////
 
@@ -787,7 +778,7 @@ Player::updateGridPosition()
 #ifdef HEAVY_DEBUG
 	char buffer[4096];
 	int off;
-	off = sprintf(buffer, "Grid:%d,%d off:%d,%d. Neighborhood:"
+	off = strprintf(buffer, "Grid:%d,%d off:%d,%d. Neighborhood:"
 							, newGX, newGY
 							, lastX - (newGX << ChatGrid::_KEY_SHIFT)
 							, lastY - (newGY << ChatGrid::_KEY_SHIFT)
@@ -840,7 +831,7 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 	GridKey botleft(player->instance().id(), (SINT32)(player->lastX() - range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() - range) >> ChatGrid::_KEY_SHIFT);
 	GridKey topright(player->instance().id(), (SINT32)(player->lastX() + range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() + range) >> ChatGrid::_KEY_SHIFT);
 
-	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " getting cells within [%d,%d],[%d,%d] %" PR64BitT " range: "
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " getting cells within [%d,%d],[%d,%d] %" PR64BitT " range: "
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, player->instance().category(), player->instance().type(), player->instance().handle(), player->instance().id()
 					, botleft.X(), botleft.Y(), topright.X(), topright.Y()
@@ -851,19 +842,19 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 		const ChatGrid* node = (*it);
 		if ( node->players().empty() )
 		{
-            betaLog(_FLD, "[%d,%d:empty] ", node->gridKey().X(), node->gridKey().Y());
+            dbugLog(_FLD, "[%d,%d:empty] ", node->gridKey().X(), node->gridKey().Y());
 			continue;
 		}
 		if ( !node->inRange(botleft, topright) )
 		{
-            betaLog(_FLD, "[%d,%d:too far] ", node->gridKey().X(), node->gridKey().Y());
+            dbugLog(_FLD, "[%d,%d:too far] ", node->gridKey().X(), node->gridKey().Y());
 			continue;
 		}
 		cells.push_back(&node->players());
-		betaLog(_FLD, "%d,%d ", node->gridKey().X(), node->gridKey().Y());
+		dbugLog(_FLD, "%d,%d ", node->gridKey().X(), node->gridKey().Y());
 	}
 
-	betaLog(_FLD, " total: %" PRSizeT " cells", cells.size());
+	dbugLog(_FLD, " total: %" PRSizeT " cells", cells.size());
 }
 
 static bool g_enableSnapshot = false;
@@ -928,12 +919,14 @@ public:
 		}
 		if ( strcmp(arguments, "full") == 0 )
 		{
-			g_enableSnapshot = g_enableFullSnapshot = false;
+			g_enableSnapshot = true;
+			g_enableFullSnapshot = true;
 			player.message(LSTR_NOTE, LSTR_GRIDSNAPSHOT_FULL);
 		}
 		else if ( strcmp(arguments, "off") == 0 )
 		{
 			g_enableSnapshot = false;
+			g_enableFullSnapshot = false;
 			player.message(LSTR_NOTE, LSTR_GRIDSNAPSHOT_DISABLED);
 		}
 		else

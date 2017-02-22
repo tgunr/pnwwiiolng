@@ -86,14 +86,13 @@ int vehdecalInit()
 
 	personal_id = ldddsLoadDDSTexture("vehicles/decals/personal.dds", GL_TEXTURE_2D, 0);
 
-	// Granny sucks! Hopefully we can use the above someday for granny troopers.
+	// Granny stinks! Hopefully we can use the above someday for granny troopers.
 	int count = 1;
 
 	while(1)
 	{
 		char buff[64];
-
-		sprintf(buff, "vehicles/decals/personal/%d.dds", count++);
+		strprintf(buff, "vehicles/decals/personal/%d.dds", count++);
 		int id = ldddsLoadDDSTexture(buff, GL_TEXTURE_2D, 0);
 
 		// Load textures old way for troopers.

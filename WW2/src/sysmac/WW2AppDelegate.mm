@@ -1,6 +1,7 @@
 /* $Id: WW2AppDelegate.mm 3979 2010-06-18 13:05:19Z dchristopher@CRS $ */
 #define OBJECTIVE_C
 #include "syscfg.h"
+#include "build_info.hpp"
 #import "WW2AppDelegate.h"
 #include "sysmain.h"
 #include "vars.h"
@@ -9,7 +10,6 @@
 #include "cfgPrefs.h"
 #include "ww2Client.h"
 #include "ddp.h"
-#include "VersionNo.h"
 #include "mngopt.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiClientMessages.h"
@@ -586,17 +586,17 @@ extern NSString *WebActionOriginalURLKey;
     cfgPrefsLoad();
     
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
+    // By the way, the only way to check that is the ticket file itself since that
+    // won't have been parsed yet at this point.
     // Or, if we're only here to build MDLs.
-    if(GameServerIP[0]
+    // This is only allowed in debug.
 #ifdef DEBUG_WW2
-        || DebugBuildingMDLFilesOnly
-#endif
-    )
-    {
+    if(DebugBuildingMDLFilesOnly || TicketFile[0]) {
         state = WAIT_APPLE_EVT;
         [self launchOffline:self];
         return;
     }
+#endif
     
     //  g_buildTerrain = 1;
     
@@ -1038,7 +1038,7 @@ extern NSString *WebActionOriginalURLKey;
     launchRequest.sessionID = (UINT32)verifyInfo->sessionID;
     launchRequest.appID = verifyInfo->appID;
     
-    NSString* appVersion = [NSString stringWithCString:STRVER encoding:NSUTF8StringEncoding];
+    NSString* appVersion = [NSString stringWithUTF8String:PN_product_version_string];
 
     /* command line version override - not sure this is needed, but putting it in anyway */
     if (gClientV[0]) {
@@ -1859,7 +1859,6 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     }];
 }
 
-
 - (void)closeAllWindows
 {
     [configWindow orderOut:self];
@@ -1884,16 +1883,10 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 - (IBAction)showAbout:(id)sender {
     NSURL *url = [[[NSBundle mainBundle] bundleURL] URLByAppendingPathComponent:@"Contents/Info.plist"];
     NSDictionary *dictionary = [NSDictionary dictionaryWithContentsOfURL:url];
-    
     NSString *version = [dictionary objectForKey:@"CFBundleShortVersionString"];
-    
-    NSRange range = NSMakeRange( 0, 6 );
-    NSString *hash = [[dictionary objectForKey:@"GitShaHash"] substringWithRange: range];
-    NSString *repoState = [dictionary objectForKey:@"GitState"];
-    
-    NSString *fullVersion = [NSString stringWithFormat:@"v%@ - %@", version, hash];
-    NSDictionary *aboutDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                               fullVersion, @"Version", repoState, @"ApplicationVersion", nil];
+    NSString *hash = [@(PN_code_git_commitish_string) stringByAppendingString:@(PN_data_git_commitish_string)];
+    NSDictionary *aboutDict = @{ @"Version": version, @"ApplicationVersion": hash };
+
     [[NSApplication sharedApplication] orderFrontStandardAboutPanelWithOptions:aboutDict];
 }
 

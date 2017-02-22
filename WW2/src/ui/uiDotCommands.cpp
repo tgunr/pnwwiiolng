@@ -95,7 +95,7 @@
 #include "veh/vehmain.h"
 #include "veh/vehupdate.h"
 #include "veh/vehVisDamage.h"
-#include "versionNo.h"
+#include "build_info.hpp"
 #include "weap/weapammo.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiServerTrackedObject.h"
@@ -480,7 +480,7 @@ static SINT32 dot_conv(const wchar_t* line)
 			UINT16 key = vtype->WeaponSpec.asUINT16();
 
 			char buff[256] = {'\0'};
-			sprintf(buff, "convergence.%d", (SINT32)key);
+			strprintf(buff, "convergence.%d", (SINT32)key);
 
 			cfgPrefsSetInt(buff, (SINT32)range);
 			persGunsightSetConvergenceRange((FLOAT32)range);
@@ -506,7 +506,7 @@ static SINT32 dot_conv(const wchar_t* line)
 			UINT16 key = vtype->WeaponSpec.asUINT16();
 
 			char buff[256] = {'\0'};
-			sprintf(buff, "convergence.%d", (SINT32)key);
+			strprintf(buff, "convergence.%d", (SINT32)key);
 
 			SINT32 range = cfgPrefsGetInt(buff, (SINT32)Convergence);
 
@@ -2086,7 +2086,7 @@ static SINT32 dot_bunch(const char* line)
   for (int i=0; i<10; i++ )
     for (int j=0; j<10; j++ )
     {
-      sprintf(s, "vspawn %s %d %d %d", t, j*spread, -i*spread, 0 );
+      strprintf(s, "vspawn %s %d %d %d", t, j*spread, -i*spread, 0 );
       dot_vspawn(s);
     }
 
@@ -4086,7 +4086,7 @@ static SINT32 dot_tspawn(const char* input)
             masterInstance = buildingobj;
         else
         {
-            sprintf(obj->name, "%s_%d", model, subModelIndex);
+            strprintf(obj->name, "%s_%d", model, subModelIndex);
         }
 
         if(!buildingobj)
@@ -4423,7 +4423,7 @@ static SINT32 dot_damageoctet(const char* input)
             {
                 char buff[128];
 
-                sprintf(buff, "%s_%d_%d", so->Filename(), so->PosX(), so->PosY());
+                strprintf(buff, "%s_%d_%d", so->Filename(), so->PosX(), so->PosY());
 
                 OBJECT* top = obmainFindTopmostObject(buff);
 
@@ -4452,7 +4452,7 @@ static SINT32 dot_damageoctet(const char* input)
                 {
                     strcpy(model, pm->subModelReferences[i].poolModel->modelname.c_str());
 
-                    sprintf(buff, "%s_%d_%d", model, so->PosX(), so->PosY());
+                    strprintf(buff, "%s_%d_%d", model, so->PosX(), so->PosY());
 
                     OBJECT* o = obmainFindTopmostObject(buff);
 
@@ -4504,7 +4504,7 @@ static SINT32 dot_resetoctet(const char* input)
             if(so->StratType() == SDM_BUILDING_GENERIC || so->StratType() == SDM_BUILDING_AUTOGUNNER)
             {
                 char buff[128];
-                sprintf(buff, "%s_%d_%d", so->Filename(), so->PosX(), so->PosY());
+                strprintf(buff, "%s_%d_%d", so->Filename(), so->PosX(), so->PosY());
 
                 OBJECT* top = obmainFindTopmostObject(buff);
 
@@ -4533,7 +4533,7 @@ static SINT32 dot_resetoctet(const char* input)
                 {
                     strcpy(model, pm->subModelReferences[i].poolModel->modelname.c_str());
 
-                    sprintf(buff, "%s_%d_%d", model, so->PosX(), so->PosY());
+                    strprintf(buff, "%s_%d_%d", model, so->PosX(), so->PosY());
 
                     OBJECT* o = obmainFindTopmostObject(buff);
 
@@ -4596,7 +4596,7 @@ static SINT32 dot_bdamage(const char* input)
 
     for(unsigned int i = 0; i < pm->subModelReferences.size(); i++)
     {
-        sprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
+        strprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
 
         OBJECT* o = obmainFindTopmostObject(model);
 
@@ -6998,7 +6998,7 @@ static int dot_ragdolls(const char* line)
 static int dot_version(const char* line)
 {
 	std::string display = "Client version = ";
-	display += STRVER;
+	display += PN_product_version_string;
 
 	uiChatPrintLine(display.c_str());
 
@@ -8032,88 +8032,6 @@ void uiDotCommandsInitLoc()
 			it->second.help = help.c_str();
 	}
 }
-
-#if FRES
-
-static SINT32 FRESCamCmd(const char* line)
-{
-	char name[32];
-	int pos = 0;
-	int argc = sscanf(line, "%*s %31s %d", name, &pos);
-
-	if(argc == 1)
-	{
-		if(strcmp(name, "reload") == 0)
-		{
-			vehVehicle* fresVeh = vehFRESParentVehicle();
-			if(fresVeh)
-				vehFRESLoadCamFile(fresVeh->VehicleType);
-			return DC_HANDLED;
-		}else
-		{
-			pos = atoi(name);
-			vehFRESSetCameraPosition(pos);
-			return DC_HANDLED;
-		}
-	}
-
-	vehFRESSetVehicle(name);
-	vehFRESSetCameraPosition(pos);
-
-	if(!uiInGame())
-	{
-//		WEAPON_SPEC weapon = weapFindWeaponByName("uk_buzzard");
-//		PlayerClient()->RequestDirectSpawn(weapon);
-		char spawncmd[32];
-		snprintf(spawncmd, 31, "/buz %s", name);
-		PlayerClient()->SendChatMessage(0, spawncmd);
-	}
-
-	return DC_HANDLED;
-}
-#endif
-
-
-
-#if FRES
-
-static SINT32 FRESCamCmd(const char* line)
-{
-	char name[32];
-	int pos = 0;
-	int argc = sscanf(line, "%*s %31s %d", name, &pos);
-
-	if(argc == 1)
-	{
-		if(strcmp(name, "reload") == 0)
-		{
-			vehVehicle* fresVeh = vehFRESParentVehicle();
-			if(fresVeh)
-				vehFRESLoadCamFile(fresVeh->VehicleType);
-			return 0;
-		}else
-		{
-			pos = atoi(name);
-			vehFRESSetCameraPosition(pos);
-			return 0;
-		}
-	}
-
-	vehFRESSetVehicle(name);
-	vehFRESSetCameraPosition(pos);
-
-	if(!uiInGame())
-	{
-//		WEAPON_SPEC weapon = weapFindWeaponByName("uk_buzzard");
-//		PlayerClient()->RequestDirectSpawn(weapon);
-		char spawncmd[32];
-		snprintf(spawncmd, 31, "/buz %s", name);
-		PlayerClient()->SendChatMessage(0, spawncmd);
-	}
-
-	return 0;
-}
-#endif
 
 void uiDotCommandAddClone(int id)
 {

@@ -28,7 +28,7 @@
 #include "teul/teulUtils.h"
 #include "teul/teulVersion.h"
 #include "wwii/wwiiNetPorts.h"
-
+#include "include/configVars.h"
 
 #if platOS == OS_WIN32
 #include <winsock2.h>
@@ -47,8 +47,6 @@
 
 #if platBuild == BUILD_SERVER
 #include "server/serverInterfaceDescription.h"
-#include "teul/teulConfigVar.h"
-extern ConfigStr cv_defaultInterface;
 #endif
 
 #if platOS != OS_WIN32
@@ -626,6 +624,7 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 	dbugLog(_FLD, "t:%d closing [%u] st:%u cl:%s", inEndpoint.teulIndex(), code, inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
 	if ( inEndpoint.state() < IS_CLOSING || inEndpoint.m_closed == false )
 		inEndpoint.doError(ENOTCONN);
+        // Returning here results in an infinite loop
 
 	if ( (inEndpoint.state() < IS_CLOSING)
 		& (inEndpoint.state() != IS_LISTENING)
@@ -643,6 +642,7 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 	inEndpoint.shutdown();
 
 	inEndpoint.m_state = IS_DEAD;
+	inEndpoint.m_doTimeoutCheck = false;	// stop checking timeouts on me.
 
 	teulRemoveEndpoint(&inEndpoint);
 }

@@ -16,7 +16,7 @@
 #include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
 #include "teul/teulConfigVar.h"
-#include "wwii/wwiidbConfigVars.h"
+#include "include/configVars.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiThreadTypes.h"
@@ -229,14 +229,18 @@ threadsCallNextCallback()
 
 	for ( auto& it : callbackQueue )
 	{
+#ifdef NDEBUG
 		try
+#endif
 		{
 			it->first(it->second);
 		}
+#ifdef NDEBUG
 		catch ( std::exception& e )
 		{
 			dbugLog(_FLA, "UNHANDLED EXCEPTION THROWN BY THREAD CALLBACK: %s", e.what());
 		}
+#endif
 		delete it;
 	}
 
@@ -258,17 +262,6 @@ DBThread::EscapeString(DB::handle_t* conn, std::string& text)
 {
 	auto buff = std::make_unique<char[]>(text.length() * 2 + 1);
     mysql_real_escape_string(conn, buff.get(), text.c_str(), text.length());
-    text = buff.get();
-}
-
-void
-DBThread::EscapeString(std::string& text)
-{
-	auto buff = std::make_unique<char[]>(text.length() * 2 + 1);
-    dbQueue.doLocked([&] {
-		///TODO: FIX: Conflicting access to the connection pointer
-        mysql_real_escape_string(dbThread[0].getConn(), buff.get(), text.c_str(), text.length());
-    });
     text = buff.get();
 }
 

@@ -109,8 +109,7 @@ const char* _pstates[] =
 ,	"PERS_EXITING"
 };
 
-static void
-_reportPlayerDetails(SOCKET fd, const char* /*path*/, const char* /*args*/)
+static void _reportPlayerDetails(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
 {
 	char buffer[2048];
 	int len = 0;
@@ -119,29 +118,39 @@ _reportPlayerDetails(SOCKET fd, const char* /*path*/, const char* /*args*/)
 		std::lock_guard<std::mutex> mutexLock(s_sidecountMutex);
 
 		len = strprintf(buffer
-							, "{\"stamp\":%" PR64BitUT ",\"players\":%" PRSizeT ",\"balance\":{\"above\":%u,\"delays_max\":%u,\"delays_pctg\":%u,\"margin_pctg\":%u,\"pers_delay\":%u},\"camp\":{\"allies_spawned\":%u,\"axis_spawned\":%u,\"hvyside\":%u,\"overdog\":%u,\"underdog\":%u,\"imb\":%u,\"dev\":%u},\"swing_meter\":{\"in_effect\":%d,\"meter\":%d,\"delays\":%d}}"
-								, teulClock64
-								, g_players.size()
-								, host_config.balance.above
-								, host_config.balance.delaysMax
-								, host_config.balance.delaysPctg
-								, host_config.balance.marginPctg
-								, host_config.balance.personaDelay
-								, g_spawnedPlayers[ALLIED]
-								, g_spawnedPlayers[AXIS]
-								, g_heavySide
-								, g_overdog
-								, g_underdog
-								, g_sideImbalance
-								, g_sideDeviation
-								, g_swingMeter.inEffect()
-								, g_swingMeter.meter()
-								, g_swingMeter.delays()
+            , "{\"stamp\":%" PR64BitUT ",\"players\":%" PRSizeT ",\"balance\":{\"above\":%u,\"delays_max\":%u,\"delays_pctg\":%u,\"margin_pctg\":%u,\"pers_delay\":%u},\"camp\":{\"allies_spawned\":%u,\"axis_spawned\":%u,\"hvyside\":%u,\"overdog\":%u,\"underdog\":%u,\"imb\":%u,\"dev\":%u},\"swing_meter\":{\"in_effect\":%d,\"meter\":%d,\"delays\":%d}}"
+            , teulClock64
+            , g_players.size()
+            , host_config.balance.above
+            , host_config.balance.delaysMax
+            , host_config.balance.delaysPctg
+            , host_config.balance.marginPctg
+            , host_config.balance.personaDelay
+            , g_spawnedPlayers[ALLIED]
+            , g_spawnedPlayers[AXIS]
+            , g_heavySide
+            , g_overdog
+            , g_underdog
+            , g_sideImbalance
+            , g_sideDeviation
+            , g_swingMeter.inEffect()
+            , g_swingMeter.meter()
+            , g_swingMeter.delays()
 		);
 	}
 
-	if ( len > 0 )
-		send(fd, buffer, len, 0);
+	if (len > 0) {
+        return Teul::uWeb::HTTPResponseBuilder(request)
+            .status(200)
+            .header("Access-Control-Allow-Origin", "*")
+            .JSON(buffer)
+            .build(response);
+    } else {
+        return Teul::uWeb::HTTPResponseBuilder(request)
+            .status(500)
+            .JSON("{\"error\":\"An unknown error occurred\"}")
+            .build(response);
+    }
 }
 
 static inline UINT32
@@ -789,7 +798,9 @@ Player::checksum(UINT64 withChecksum)
 	bool isDirty = false;
 	if ( !mapCheckChecksum(dispatch().m_appVersion, withChecksum, permissions(IS_PRODUCER)) )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s invalid checksum %" PR64BitUT " for app %u plat:%u"
+		auto severity = host_config.arena.checksums ? Debug::ERR_WARN : Debug::ERR_INFO;
+		dbugLog(_FL, severity,
+						"t:%d p:%u c:%s invalid checksum %" PR64BitUT " for app:%u plat:%u"
 						, teulIndex(), playerID(), callsign()
 						, withChecksum
 						, dispatch().m_appVersion
@@ -1661,7 +1672,7 @@ Player::updateMask()
 
 	PermissionMask newMask = m_playerMask | useRank().permissions() | m_permissions->m_permissionMask;
 
-#if defined(TRAINING_SERVER) || defined(FRES)
+#if defined(TRAINING_SERVER)
 	newMask |= POST_MISSIONS;
 #endif
 
@@ -2032,7 +2043,7 @@ _sendHCUnitMovements(Player* const player)
 	if ( player->m_lastHCUpdate >= lastBrigadeMovement )
 		return true;
 
-	betaLog(_FLD, "t:%d p:%u c:%s movements %" PR64BitUT "->%" PR64BitUT "", player->teulIndex(), player->playerID(), player->callsign(), player->m_lastHCUpdate, lastBrigadeMovement);
+	dbugLog(_FLD, "t:%d p:%u c:%s movements %" PR64BitUT "->%" PR64BitUT "", player->teulIndex(), player->playerID(), player->callsign(), player->m_lastHCUpdate, lastBrigadeMovement);
 
 	static UINT64 _lastStart = 0;
 	static UINT64 _lastEnd = 0;

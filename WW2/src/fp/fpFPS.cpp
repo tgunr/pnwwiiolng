@@ -5418,7 +5418,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
-				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
+				PlayerPlacedSTO* ppo = reinterpret_cast<PlayerPlacedSTO*>(sto);
 				ppo->leave();
 			}
 
@@ -5431,7 +5431,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
-				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
+				PlayerPlacedSTO* ppo = reinterpret_cast<PlayerPlacedSTO*>(sto);
 				ppo->enter();
 
 				_ppoLastHit = ppoHit;
@@ -6814,7 +6814,7 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 
 	mobile = !(stateFlags & STATE_NO_MOVEMENT);
 
-	// this sucks
+	// this stinks
 	// attempted to prevent the flop-run but all it seems to do is annoy people
 	//poseOK = (!SuperFloat && ((frametime - lastPoseChangeTime) >= POSE_CHANGE_TIME) ? 1 : 0);
 
@@ -12446,7 +12446,7 @@ void fpFPSSightAdjust (SINT32 sightParam)
 	/* we now display this in the HUD, no need to show it in chat
 	{
 		char tString[255];
-		sprintf (tString, "%.0dm", fpsWeapons[currentWeaponModel].getSightDist());
+		strprintf(tString, "%.0dm", fpsWeapons[currentWeaponModel].getSightDist());
 		rnmainListEmoteText (IDE_LANG_UI, 9000, colorWHITEALPHA, nullptr, tString);
 	}
 	*/

@@ -48,13 +48,11 @@ protected:
 public:
 	bool	requiresMax : 1;			//!< If the game can only be run using the latest version
 	bool	calcMaxUsersOnTheFly : 1; 	//!< Keep tally of maxUsers ourself.
-	bool	usePlayerID : 1;			//!< Use playerIDs in database queries.
 
 	APP_INFO appInfo[OS_MAX_PLAT];
 
 	SCHAR	appleID[APPLE_ID_LEN+1]; //	connect to this game
 	SCHAR	description[MAX_DESCRIPTION+1];
-	SCHAR	playerTable[MAX_DESCRIPTION+1];
 	SCHAR	alias[MAX_ARENA_ALIAS_SIZE];
 
 	UINT32	m_lastIRCUsers, m_lastIRCReport;

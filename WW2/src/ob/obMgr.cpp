@@ -1295,7 +1295,7 @@ OBJECT* PoolNode::createPoolInstance(ModelInstance* modelInstance, const piMATRI
             lpobj->pscdon = lpobj->pscdn = collisionNormals;
         }
 
-        // The completely retarded multitexture code doesn't worth anything more than a ugly hack!
+        // The completely futterwacken multitexture code isn't worth anything more than a ugly hack!
         // Only take up to two multitextures
         UINT32 count = obdrawGetMultiTextureCount(texid);
 
@@ -1438,7 +1438,7 @@ OBJECT* PoolNode::createPoolInstance(ModelInstance* modelInstance, const piMATRI
             lpobj->pscdon = lpobj->pscdn = collisionNormals;
         }
 
-        // The completely retarded multitexture code doesn't worth anything more than a ugly hack!
+        // The completely futterwacken multitexture code isn't worth anything more than a ugly hack!
         // Only take up to two multitextures
         UINT32 count = obdrawGetMultiTextureCount(texid);
 

@@ -9,7 +9,6 @@
 #include "gmlp/gmlpmain.h"
 #include "dimain.h"
 #include "imap/iac.h"
-#include "versionNo.h"
 #include "cfg/cfgPrefs.h"
 #include "ui/uiMovieView.h"
 #include "fio/fiod.h"
@@ -24,7 +23,7 @@
 	rnlogo
 *************************************************************************************************/
 
-#if RELEASE_CLIENT != 0
+#if RELEASE_CLIENT != 0 && !defined(DEBUG_WW2)
 #define DISPLAY_LOGO
 #endif
 
@@ -94,11 +93,11 @@ LOGICAL rnlogoInit()
 	phui::View* version = _loadingscreen->FindView("version");
 	if(version)
     {
-        std::string str = STRVER;
+        std::string str = PN_product_version_string;
 
-		// For debug and beta releases, append the commit info.
+		// Append the commit info.
 		str += " : ";
-		str += PN_git_commitish_string;
+		str += PN_code_git_commitish_string + std::string(PN_data_git_commitish_string);
 
         version->SetValue(str.c_str());
     }
@@ -131,7 +130,7 @@ LOGICAL rnlogoRender()
 void rnlogoKill()
 {
 
-#if (platOS == OS_WIN32) && (RELEASE_CLIENT != 0)
+#if (platOS == OS_WIN32) && (RELEASE_CLIENT != 0) && !defined(DEBUG_WW2)
 	// This is used to force the foreground, active and focus window to be ours.
 	// Some players were changing active windows during game loadup and causing
 	// the game to lose active inputs. We use this to force our app to be the

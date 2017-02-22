@@ -476,7 +476,7 @@ RecordPopulations()
 			const UINT32 count = instance->count(side);
 			if ( count != 0 || count != instance->m_lastRecorded[side] )
 			{
-				sprintf(entry, "(%u,%u,%" PR64BitUT ",%" PR64BitUT ",NOW(),%u,%u)"
+				strprintf(entry, "(%u,%u,%" PR64BitUT ",%" PR64BitUT ",NOW(),%u,%u)"
 								, instance->descriptor().category()
 								, instance->descriptor().type()
 								, instance->descriptor().handle()

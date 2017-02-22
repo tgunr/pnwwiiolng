@@ -13,11 +13,11 @@
 #include <sys/prctl.h>
 #endif
 #include "build_info.hpp"
+#include "include/configVars.h"
 #include "mem/mem.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
 #include "server/serverCodeEnum.h"
-#include "server/serverConfigVars.h"
 #include "server/serverIndexes.h"
 #include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
@@ -36,7 +36,6 @@
 #include "server/serverTypes.h"
 #include "teul/teulAuth.h"
 #include "teul/teulAuthServer.h"
-#include "teul/teulConfigVar.h"
 #include "teul/teulConnectionInstruction.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
@@ -60,9 +59,6 @@ namespace Teul
 // before they're sent back to the auth Host
 static const UINT32 PLAYER_TIMEOUT = 3 * 60 * 1000;	// 4 minutes
 static const SINT32 PLAYER_XFER_TIMEOUT = 30 * 1000;	// 30 seconds
-
-extern ConfigUint cv_maxClusterUsers;
-extern ConfigAddr cv_authHost;
 
 extern void serverInitializePeering();
 extern void serverConnectPeer(const UINT32 ip, const SERVER_TYPE type);
@@ -260,7 +256,7 @@ _playerReleasePersona(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, 
 static void
 _playerDeleteAuth(PlayerStatusNode* psn)
 {
-	if ( psn->inAuth )
+	if (psn->inAuth)
 	{
 		authDeleteDispatch(&psn->dispatch());
 		psn->inAuth = false;
@@ -428,7 +424,7 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 	if ( result.second == true && server.stats.address == Server::myServerInfo.stats.address )
 	{
 		server.stats.addPlayer();
-		dbugLog(_FLW, " numPlayers now %d, m_players size %" PRSizeT "", server.stats.numPlayers(), server.m_players.size());
+		dbugLog(_FLI, "numPlayers now %d, m_players size %" PRSizeT "", server.stats.numPlayers(), server.m_players.size());
 	}
 
 	return retval;
@@ -927,8 +923,7 @@ serverEnableDebugWebServer(SERVER_TYPE serverType)
 //////////////////////////////////////////////////////////////////////
 // Simple URL to test the server is running.
 
-static void
-_serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
+static void _serverReportAlive(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
 {
 	auto& stats = Server::myServerInfo.stats;
 
@@ -936,17 +931,39 @@ _serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 	teulGetAddress(stats.address, ip, sizeof(ip));
 
 	char buffer[1024];
-	const int len = sprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s\"}\r\n"
-						, Teul::GetAppName()
-						, ip
-						, stats.arenaID
-						, stats.type
-						, stats.status
-						, stats.maxPlayers()
-						, stats.numPlayers()
-                        , PN_git_commitish_string
-						);
-	send(fd, buffer, len, 0);
+	strprintf(buffer, "{\"alive\":\"yes\",\"app\":\"%s\",\"ip\":\"%s\",\"arena\":%u,\"type\":%u,\"status\":%u,\"max_pl\":%u,\"cur_pl\":%u,\"src_rev\":\"%s %s\"}\r\n"
+        , Teul::GetAppName()
+        , ip
+        , stats.arenaID
+        , stats.type
+        , stats.status
+        , stats.maxPlayers()
+        , stats.numPlayers()
+        , PN_code_git_commitish_string, PN_data_git_commitish_string
+    );
+    return Teul::uWeb::HTTPResponseBuilder(request)
+        .status(200)
+        .header("Access-Control-Allow-Origin", "*")
+        .JSON(buffer)
+        .build(response);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Populate the Server: ... address fields
+
+static void
+_initAddresses()
+{
+	Server::myServerInfo.stats.arenaID = cv_arenaID.GetUint32();
+
+	Server::broadcastNet = cv_baseAddress.GetUint32();
+	if ( Server::IsBroadcastViaController() )
+		dbugLog(_FLI, "Server peering arena %u via controller at %s", Server::myServerInfo.stats.arenaID, cv_baseAddress.GetString());
+	else
+		dbugLog(_FLI, "Server peering arena %u via broadcast network %s", Server::myServerInfo.stats.arenaID, cv_baseAddress.GetString());
+
+	Server::localHost = Server::myInterface.addr[0].ip;
+	Server::broadcastHost = Server::BroadcastMaskAddress(Server::localHost);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -967,7 +984,7 @@ serverInit(UINT32 appVersion
 {
 	if ( Server::myServerInfo.stats.arenaID == 0 )
 	{
-		LogAbort("arenaID not specified [didn't call serverInitAddresses first?]");
+		LogAbort("arenaID not specified [didn't call Server::InitializeProcess first?]");
 		/*ABORT*/
 	}
 
@@ -1246,7 +1263,7 @@ Server::HeartBeat::process()
 
 		server->stats = *this;
 		_updateServerStats(server);
-
+		
 		if ( statusChange )
 		{
 			dbugLog(_FLN, "status update for %s server %s status %d numPlayers %d maxPlayers %d"
@@ -1587,24 +1604,6 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 	return -EINVAL;
 }
 
-//////////////////////////////////////////////////////////////////////
-// Populate the Server: ... address fields
-
-void
-serverInitAddresses()
-{
-	Server::myServerInfo.stats.arenaID = cv_arenaID.GetUint32();
-
-	Server::broadcastNet = cv_baseAddress.GetUint32();
-	if ( Server::IsBroadcastViaController() )
-		dbugLog(_FLI, "Server peering arena %u via controller at %s", Server::myServerInfo.stats.arenaID, cv_baseAddress.GetString());
-	else
-		dbugLog(_FLI, "Server peering arena %u via broadcast network %s", Server::myServerInfo.stats.arenaID, cv_baseAddress.GetString());
-
-	Server::localHost = Server::myInterface.addr[0].ip;
-	Server::broadcastHost = Server::BroadcastMaskAddress(Server::localHost);
-}
-
 static bool _broadcastRxConnected = false;
 
 static void
@@ -1637,6 +1636,7 @@ _controllerConnect(ENDPOINT& endpoint)
 {
 	dbugLog(_FLD, "t:%d ip:%s:%u connected to controller", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
 	s_controllerConnected = true;
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 	ProcessIntroduction intro;
 #if platOS == OS_WIN32
@@ -1649,10 +1649,10 @@ _controllerConnect(ENDPOINT& endpoint)
 
 	auto result = endpoint.writeRaw((const char*)&intro, sizeof(intro));
 	if ( result < 0 ) {
-		if ( errno == ECONNREFUSED )
+		if ( dbugGetErrno() == ECONNREFUSED )
 			LogAbort("Connection to controller refused.");
 		else
-			LogAbort("Unable to greet controller");
+			LogAbort("Unable to greet controller because %d", dbugGetErrno());
 	}
 	ABORT_IF_EX(result != sizeof(intro), "Failed to write intro to controller: %dv%" PRSizeT "", result, sizeof(intro));
 }
@@ -1665,8 +1665,9 @@ _controllerError(SINT32, const UCHAR* const, SINT32, const struct TEUL_CALLBACK*
 
 void _connectToController()
 {
-	if (Server::serverType == CONTROLLER_HOST)
+	if (Server::serverType == CONTROLLER_HOST || cv_oneProcessMode.GetBool() == true) {
 		return;
+    }
 
 #ifdef PUBLIC_RELEASE
 	static const SINT32 controllerTimeout = 5000;
@@ -1681,6 +1682,7 @@ void _connectToController()
 		teulUpdateTransport(1);
 		teulSyncClock();
 	}
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1801,64 +1803,8 @@ serverGetClusterCapacity()
 	return clusterCapacity;
 }
 
-#if defined(SERVER_AS_ENTRY_POINT)
-//////////////////////////////////////////////////////////////////////
-// EXPERIMENTAL: Entry point for all server processes.
-
-int main(int argc, const char* argv[])
-{
-	Teul::ConfigVar::InitializeConfigVars();
-
-	if ( argc > 1 )
-	{
-		extern bool serverProcessCommandLine(int, const char**);
-		if ( !serverProcessCommandLine(argc, argv) )
-			LogAbort("Invalid command line!\n");
-	}
-
-	Teul::SetAppName(g_serverName);
-	extern ERROR_FUNCTION serverErrorFunction;
-
-	if ( teulInitTransport(LogMode::TO_FILE, g_serverName, serverErrorFunction, nullptr) < 0 )
-		LogAbort("Can't init transport");
-
-	serverEnableDebugWebServer(g_hostType);
-
-	memInit();
-
-	serverInitAddresses();
-
-	extern void serverMain();
-	serverMain();
-}
-
-ServerBase::ServerBase(SERVER_TYPE serverType_, const char* serverName_)
-	: m_serverType(serverType_)
-	, m_serverName(serverName_)
-{
-	// Singleton check.
-	static std::atomic<UINT32> s_initializedCount(0);
-	ABORT_IF( ++s_initializedCount > 1 );
-
-	s_serverBase = this;
-
-	serverEnableDebugWebServer(serverType_);
-	memInit();
-
-	Teul::SetAppName(m_serverName);
-	if ( teulInitTransport(LogMode::TO_FILE, m_serverName, s_ErrorDelegate, nullptr) < 0 )
-		LogAbort("Can't initialize transport.");
-
-	serverInitAddresses();
-}
-
-void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SINT32 size_, const TEUL_CALLBACK* const object_, SINT32 error_)
-{
-	s_serverBase->OnError(teulIndex_, data_, size_, object_, error_);
-}
-#endif
-
-[[noreturn]] void _help(const char* argv[], const Server::CommandLineOptions& cliOptions)
+[[noreturn]] void
+_help(const char* argv[], const Server::CommandLineOptions& cliOptions)
 {
 	printf("Usage: %s [arguments | --help]\n", argv[0]);
 	for (size_t i = 0; i < cliOptions.size(); ++i)
@@ -1872,13 +1818,29 @@ void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SI
 	exit(0);
 }
 
-void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERROR_FUNCTION errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
+static bool
+_serverUsesBroadcast(const SERVER_TYPE serverType)
 {
-	Server::serverType = serverType_;
-	Teul::SetAppName(appName);
+	switch ( serverType) {
+		case CONTROLLER_HOST:
+		case AUTH_HOST:
+		case EXIT_SERVER:
+		case MAX_SERVER_TYPE:
+			return false;
+		default:
+			return true;
+	}
+}
 
-	// Windows requires us to enable networking (WSAStartup) early on
-	Teul::InitializeWinsock();
+#if platOS == OS_MACOS
+static std::thread s_parentCheckThread;
+#endif
+
+void
+Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTION errorFnPtr, KILL_FUNCTION killFnPtr, int argc, const char* argv[], const CommandLineOptions& cliOptions)
+{
+	Server::serverType = myType;
+	Teul::SetAppName(appName);
 
 	// Read in the environment.
 	Teul::ConfigVar::InitializeConfigVars();
@@ -1886,19 +1848,26 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERR
 	CommandLineOptions allOptions = {
 		{
 			"--help", "Show this help.", false,
-			[&allOptions, argv](const char*) { _help(argv, allOptions); }
+			[&allOptions, argv](const char*) { _help(argv, allOptions); }, nullptr
 		},
 		{
 			"--child", "Process should die when parent terminates.", false,
 #if platOS == OS_LINUX
-			[](const char*) { prctl(PR_SET_PDEATHSIG, SIGHUP); }
+			[](const char*) { prctl(PR_SET_PDEATHSIG, SIGHUP); }, nullptr
+#elif platOS == OS_MACOS
+            // This is a terrible hack, relying on launchd becoming an orphaned
+            // process' parent, but it does work reliably on all macOS versions.
+            [](const char*) { s_parentCheckThread = std::thread([] {
+                while (1) { if (getppid() == 1) { exit(0); } std::this_thread::sleep_for(std::chrono::seconds(1)); } }
+            ); }, nullptr
 #else
-			[](const char*) {}
+			[](const char*) {}, nullptr
 #endif
 		},
 		{
 			"--token", "Specify the controller connection token.", true,
-			[](const char* text) { s_controllerToken = strtoul(text, nullptr, 10); }
+			[](const char* text) { s_controllerToken = strtoul(text, nullptr, 10); },
+			nullptr
 		}
 	};
 	allOptions.insert(allOptions.end(), cliOptions.begin(), cliOptions.end());
@@ -1927,6 +1896,13 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERR
 			LogAbort("unrecognized argument '%s', see '--help' for usage.", argv[argn]);
 	}
 
+	// execute post-handlers for commands.
+	for (auto&& opt : allOptions) {
+		if (opt.postHandler) {
+			opt.postHandler();
+		}
+	}
+
 	Teul::ConfigVar::CheckConfiguration();
 
 	memInit();
@@ -1934,12 +1910,16 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType_, ERR
 	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
+#ifndef NDEBUG
+    dbugSetWriteLevel(Debug::ERR_DBUG | STD_ERR);
+    dbugSetLogLevel(Debug::ERR_DBUG | STD_ERR);
+#endif
 
-	serverEnableDebugWebServer(serverType);
+	serverEnableDebugWebServer(myType);
 
-	serverInitAddresses();
+	_initAddresses();
 
-	if ( Server::IsBroadcastViaController() )
+	if ( _serverUsesBroadcast(myType) && Server::IsBroadcastViaController() )
 		_connectToController();
 
 	dbugLog(_FLI, "%s started, compiled %s %s", appName, __DATE__, __TIME__);

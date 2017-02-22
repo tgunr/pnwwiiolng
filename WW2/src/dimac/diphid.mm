@@ -951,7 +951,7 @@ int dipHasKeyboard()
 
 int dipHasMouse()
 {
-	// Because 'false' would mean you are a fucktard.
+	// We don't support lacking a mouse.
 	return 1 ;
 }
 

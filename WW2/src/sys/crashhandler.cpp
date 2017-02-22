@@ -17,18 +17,21 @@
 #include <stdarg.h>
 #include <math.h>
 #include <float.h>
+#pragma warning( push )
+#pragma warning( disable : 4091)	// 'typedef' ignored on left of stuff in shlobj.h and dbhhelp.h
 #include <ShlObj.h>
+#include "client/windows/handler/exception_handler.h"
+#pragma warning( pop )
 #include <fcntl.h>
 #include <VersionHelpers.h>
 #include <iostream>
 #include <fstream>
 #include <locale>
 #include <codecvt>
-#include "versionNo.h"
-#include "client_revision.h"
+#include "build_info.hpp"
 #include "sys/sysreg.h"
+#include "fio/fio.h"
 #include "unique_opaque_ptr.hpp"
-#include "client/windows/handler/exception_handler.h"
 
 #pragma endregion
 //////////////////////////////////////////////////////////////////////////////
@@ -58,26 +61,6 @@ static const std::wstring HockeyApp_userAgent = L"HockeySDK/0.1 (Windows custom)
 //	- COM (CoInitializeEx() on construction, CoUninitialize() on exiting scope if succeeded)
 //	- WinInet (call InternetCloseHandle() on exiting scope)
 #pragma region RAII Utilities
-
-// Yet another thing which should be in fio
-struct FD {
-	int m_fd = -1;
-	FD() {}
-	FD(const FD &) = delete;
-	FD(FD &&) = delete;
-	FD(int fd) : m_fd(fd) {}
-	FD(const wchar_t *filename, int openflag, int shareflag, int permissionflag) { _wsopen_s(filename, openflag, shareflag, permissionflag); }
-	~FD() { if (m_fd != -1) { _close(m_fd); } }
-	FD &_wsopen_s(const wchar_t *filename, int openflag, int shareflag, int permissionflag) {
-		if (m_fd != -1) { _close(m_fd); }
-		::_wsopen_s(&m_fd, filename, openflag, shareflag, permissionflag);
-		return *this;
-	}
-	FD &operator=(const FD &) = delete;
-	FD &operator=(FD &&) = delete;
-	operator int() const { return m_fd; }
-	explicit operator bool() const { return m_fd != -1; }
-};
 
 // COM RAII helper
 struct CCom {
@@ -215,6 +198,17 @@ static void crash_write_str(int fd, bool wide, const wchar_t *s)
 	crash_write_raw(fd, wide, s, wcslen(s));
 }
 
+static void crash_write_ascii_str(int fd, bool wide, const char *s)
+{
+    // Mind-numbingly inefficient but it doesn't much matter.
+    while (*s) {
+        wchar_t c = static_cast<wchar_t>(static_cast<unsigned char>(*s)); // widen to wchar_t by zerofill
+        
+        crash_write_raw(fd, wide, &c, 1);
+        ++s;
+    }
+}
+
 template <typename T, typename>
 static void crash_write_int(int fd, bool wide, T l, unsigned int base)
 {
@@ -242,6 +236,7 @@ static void crash_wdprintfv(int fd, bool wide, const wchar_t * const format, va_
 			if (!*ptr) { crash_write_raw(fd, wide, L"%", 1);  break; }
 			switch (*ptr++) {
 				case L's': crash_write_str(fd, wide, va_arg(args, const wchar_t *)); break;
+				case L'S': crash_write_ascii_str(fd, wide, va_arg(args, const char *)); break; // Inverse of standard printf() format
 				case L'x': crash_write_int(fd, wide, va_arg(args, uint32_t), 16); break;
 				case L'u': crash_write_int(fd, wide, va_arg(args, uint32_t), 10); break;
 				case L'd': crash_write_int(fd, wide, va_arg(args, int32_t), 10); break;
@@ -495,14 +490,14 @@ static bool CrashReportingCallback(
 	// to remove the handler at some later time.
 	CrashHandlerContext *context = reinterpret_cast<CrashHandlerContext *>(context_);
 	wchar_t pathBuffer[MAX_PATH] = { 0 };
-	FD fd;
+	Fio::FD fd;
 
 	crash_mkpath(pathBuffer, dumpPath, minidumpID, L".dmp.container", nullptr);
 	if (fd._wsopen_s(pathBuffer, _O_WRONLY | _O_CREAT | _O_EXCL | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE)) {
 		// Write out the container format HockeyApp's custom upload API expects
 		crash_wdprintf(fd, L"Package: com.playnet.wwiiol\n"); // TODO: Hardcoding the macOS client's bundle ID is probably not quite right
-		crash_wdprintf(fd, L"Version Code: " GIT_COMMIT_STR "\n");
-		crash_wdprintf(fd, L"Version Name: " STRPRODUCTVER "\n");
+		crash_wdprintf(fd, L"Version Code: %S%S\n", PN_code_git_commitish_string, PN_data_git_commitish_string);
+		crash_wdprintf(fd, L"Version Name: %S\n", PN_product_version_string);
 		crash_wdprintf(fd, L"Windows: %s (%s)\n", context->windowsVersion.c_str(), context->windowsBuild.c_str());
 		crash_wdprintf(fd, L"Manufacturer: %s\n", context->machineManufacturer);
 		crash_wdprintf(fd, L"Model: %s\n", context->machineModel);
