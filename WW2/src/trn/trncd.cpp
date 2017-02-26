@@ -5908,7 +5908,7 @@ _StratMessageQue * StratMsg;
 			WriteDebug("Id number zero! scx = %d, scy = %d",scx,scy);
 			return 0;
 		}
-		WriteDebug("Unable to find strat object scx=%d,scy=%d,id=%d, updated with country"
+		WriteLog(LOG_TERRAIN, LOG_WARN, "Unable to find strat object scx=%d,scy=%d,id=%d, updated with country"
 					"=%d,VisLevel=%d",
 					scx,
 					scy,
