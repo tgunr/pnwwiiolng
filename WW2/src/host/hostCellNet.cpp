@@ -192,8 +192,8 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 
 	// disable packaging of multiple vehicles for now and just send them out as we get them
 	// we want to force updates based on how many connections we have.  We might want to put a cap on it too.
-	// 4000 is arbitrary but 35 is about the size of your average veh update
-        UINT32 limitPacketSize = std::min( static_cast<UINT32>(4000),
+	// 1400 is just under the max MTU size but 35 is about the size of your average veh update
+    UINT32 limitPacketSize = std::min( static_cast<UINT32>(1400),
 		 (static_cast<UINT32>(_userConnections) * 35));
 	if ( vehicleBroadcasts.packetSizeBytes() >= limitPacketSize )
 	{

@@ -3512,7 +3512,7 @@ JSBool jsSquad::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = phui::js::NewString(UTF16(squad.name().c_str()));
 		break;
 		case SHORTNAME_PROP:
-			*val = phui::js::NewString(UTF16(squad.shortName()));
+			*val = phui::js::NewString(UTF16(squad.callsign().c_str()));
 		break;
 		case CO_PROP:
 		{

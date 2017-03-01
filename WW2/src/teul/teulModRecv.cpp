@@ -648,13 +648,24 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 			++packets;
 
 			const UINT32 dgramSize = hdr->packetSizeBytes() + Teul::Packet::UnencryptedBytes;
-			assert( (SINT32)dgramSize == (SINT32)rxSize );
+			if (dgramSize == (UINT32)rxSize)
+			{
+				assert((SINT32)dgramSize == (SINT32)rxSize);
 
-			dgram->m_size = dgramSize;
+				dgram->m_size = dgramSize;
 
-			endpoint.m_impl->recvQueue.push_back(dgram);
-//			dbugWrite(_FLI, " pushed %p to %p ", dgram, endpoint.m_impl->recvDataQue);
-			dgram = nullptr;
+				endpoint.m_impl->recvQueue.push_back(dgram);
+				//			dbugWrite(_FLI, " pushed %p to %p ", dgram, endpoint.m_impl->recvDataQue);
+				dgram = nullptr;
+			}
+			else
+			{
+				dbugLog(_FLW, "Received datagram from %s for packet of size %d where the size indicated was %u, ignoring!!!",
+					teulGetAddress(ntohl(dgram->sockAddress.sin_addr.s_addr)),
+					rxSize,
+					dgramSize);
+				break;
+			}
 		}
 
 	}
