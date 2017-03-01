@@ -773,3 +773,11 @@ FLOAT64 PiercingPotential(const weapAmmo& round) {
 
 	return PenetrationThickness;
 }
+
+FLOAT64 CurrentJoules(const weapAmmo& round) {
+	return 0.5 * round.AmmoType->ProjectileWeight * pow(CurrentVelocity(round), 2);
+}
+
+FLOAT64 CurrentVelocity(const weapAmmo& round) {
+	return mathExactVectorLength(&round.Velocity);
+}

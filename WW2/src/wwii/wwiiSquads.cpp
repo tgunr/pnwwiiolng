@@ -37,7 +37,6 @@ Squad::Squad(UINT32 withSquadID, const ChatHandle handle, const std::string& wit
 	, m_description("")
 	, m_motd("")
 	, m_homepage("")
-	, m_callsign(Chat::Name(handle))
 	, m_voiceInfo("")
 	, m_slogan("")
 {
@@ -49,8 +48,6 @@ Squad::Squad(UINT32 withSquadID, const ChatHandle handle, const std::string& wit
 		m_motd.erase(MOTD_LENGTH);
 	if ( m_homepage.length() > HOMEPAGE_LENGTH )
 		m_homepage.erase(HOMEPAGE_LENGTH);
-	if ( m_callsign.length() > (size_t)MAX_HANDLE_LEN )
-		m_callsign.erase(MAX_HANDLE_LEN);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -79,8 +76,6 @@ Squad::packer(PackMode mode, ACTION_OBJECT* a)
 	a->offset = teulPackSCHAR(mode, a->packed, a->offset, &m_squadTimezone, 0);
 	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_language, 0);
 	a->offset = wwiiPackString(mode, a->packed, a->offset, m_slogan, SLOGAN_LENGTH);
-
-	m_callsign = Chat::Name(m_shortHandle).c_str();
 
 	return a->offset;
 }

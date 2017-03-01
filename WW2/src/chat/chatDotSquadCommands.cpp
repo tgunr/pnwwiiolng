@@ -249,7 +249,7 @@ public:
 			list->setUpdated();
 
 			// Notify the squad
-			list->sendMessage(LSTR_SQUAD, LSTR_CO_ENABLED_ELECTIONS, player.callsign(), list->squad().shortName());
+			list->sendMessage(LSTR_SQUAD, LSTR_CO_ENABLED_ELECTIONS, player.callsign(), list->squad().callsign().c_str());
 		}
 		else if ( strcasecmp(arguments, "off") == 0 )	// Turn voting off
 		{
@@ -267,7 +267,7 @@ public:
 			list->squad().setVotingEnabled(false);
 			list->setUpdated();
 
-			list->sendMessage(LSTR_SQUAD, LSTR_CO_DISABLED_ELECTIONS, player.callsign(), list->squad().shortName());
+			list->sendMessage(LSTR_SQUAD, LSTR_CO_DISABLED_ELECTIONS, player.callsign(), list->squad().callsign().c_str());
 
 			// Cancel any pending vote
 			SquadVote* vote = chatFindSquadVote(player.squadID());
