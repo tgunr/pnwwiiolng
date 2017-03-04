@@ -320,6 +320,8 @@ _releaseEndpoint(ENDPOINT& endpoint)
 			ipToEndPoint.erase(it);
 			break;
 		}
+		else
+			it++;
 	}
 
 	// Push me onto the free list.
