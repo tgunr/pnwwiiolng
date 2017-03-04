@@ -649,16 +649,22 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 		return;
 	}
 
-    // check status of paired backchannel, if client release - it'll get recreated when they log back in
-    RakNetChannel::disconnectPeer(&inEndpoint);
+	// NOTE:
+	//    This check is needed because the call to doError above **may** result in teulClose being re-entrant.
+	//    If this happens the endpoing state will be dead and we should not continue, so we check again.
+	if ( inEndpoint.state() != IS_DEAD )
+	{
+		// check status of paired backchannel, if client release - it'll get recreated when they log back in
+		RakNetChannel::disconnectPeer(&inEndpoint);
     
-	// dispose of socket
-	inEndpoint.shutdown();
+		// dispose of socket
+		inEndpoint.shutdown();
 
-	inEndpoint.m_state = IS_DEAD;
-	inEndpoint.m_doTimeoutCheck = false;	// stop checking timeouts on me.
+		inEndpoint.m_state = IS_DEAD;
+		inEndpoint.m_doTimeoutCheck = false;	// stop checking timeouts on me.
 
-	teulRemoveEndpoint(&inEndpoint);
+		teulRemoveEndpoint(&inEndpoint);
+	}
 }
 
 void

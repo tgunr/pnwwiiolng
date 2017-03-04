@@ -368,7 +368,7 @@ _actionRecvFYN_TOKEN(ACTION_OBJECT* const a)
 	if ( (inEndpoint == nullptr) | (FYN_ACK_TOKEN == nullptr) )
 		return -EINVAL;
 
-	if ( (inEndpoint->state() != IS_CLOSING) & (inEndpoint->state() != IS_CLOSED) )
+	if ( inEndpoint->state() < IS_CLOSING )
 	{
 		dbugLog(_FLD, "t:%d rxFyn: closing", a->teulIndex);
 		if ( FYN_TOKEN != nullptr )
