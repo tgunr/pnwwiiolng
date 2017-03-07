@@ -305,12 +305,12 @@ UCHAR s[32];
 
 		VehicleData->AnimationData.LastPropPosition[i] = PropPos;
 
+		sprintf((char*)s, "propstate%u", i + 1);
 		if(VehicleData->AnimationData.PropFailed[i])
 		{
 			vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, s, FALSE);
 		}else
 		{
-			sprintf((char*)s,"propstate%u",i+1);
 			if (_VarData.PropRpm[i] >= 300.0 &&
 				_VarData.LastPropRpm[i] < 300.0)
 			{
