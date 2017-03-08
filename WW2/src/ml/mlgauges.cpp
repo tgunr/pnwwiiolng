@@ -285,7 +285,7 @@ FLOAT32 WheelPos;
 UINT32 DeltaTime;
 UINT32 Alpha;
 OBJECT* Object1;
-UCHAR s[32];
+char s[32];
 
 
 	DeltaTime = frametime - VehicleData->AnimationData.LastAnimationTime;
@@ -305,21 +305,21 @@ UCHAR s[32];
 
 		VehicleData->AnimationData.LastPropPosition[i] = PropPos;
 
+		strprintf(s, "propstate%u", i + 1);
 		if(VehicleData->AnimationData.PropFailed[i])
 		{
-			vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, s, FALSE);
+			vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, reinterpret_cast<UCHAR *>(s), FALSE);
 		}else
 		{
-			sprintf((char*)s,"propstate%u",i+1);
 			if (_VarData.PropRpm[i] >= 300.0 &&
 				_VarData.LastPropRpm[i] < 300.0)
 			{
-				vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, s, TRUE);
+				vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, reinterpret_cast<UCHAR *>(s), TRUE);
 			}
 			if (_VarData.PropRpm[i] < 300.0 &&
 				_VarData.LastPropRpm[i] >= 300.0)
 			{
-				vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, s, FALSE);
+				vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, reinterpret_cast<UCHAR *>(s), FALSE);
 			}
 		}
 		// set prop transparency
