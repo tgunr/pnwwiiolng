@@ -239,7 +239,7 @@ static void lognodup(const char *file, int line, const char *function, UINT32 sy
                 return;
         }
     } else {
-        prevLog.count = 1;
+        prevLog.count = 0;
     }
 printLog:
     vprintf(buf, marker);
@@ -248,24 +248,24 @@ printLog:
     prevLog.prevLine = line;
 }
 
-static void logwstr(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* pstr)
-{
-    if(gLogLevelOnly && glogMaskOnly) {
-        if ((gLogLevelOnly == level) && (system & glogMaskOnly))
-            goto logwhere;
-    } else {
-        if (logLevel < level || !(system & logMask))
-            return;
-        else
-            goto logwhere;
-    }
-
-logwhere:
-    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, pstr);
-    char buf[wheresize + 1]; // note +1 for terminating null byte
-    snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, pstr);
-    printf("%s\n", buf);
-}
+//static void logwstr(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* pstr)
+//{
+//    if(gLogLevelOnly && glogMaskOnly) {
+//        if ((gLogLevelOnly == level) && (system & glogMaskOnly))
+//            goto logwhere;
+//    } else {
+//        if (logLevel < level || !(system & logMask))
+//            return;
+//        else
+//            goto logwhere;
+//    }
+//
+//logwhere:
+//    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, pstr);
+//    char buf[wheresize + 1]; // note +1 for terminating null byte
+//    snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, pstr);
+//    printf("%s\n", buf);
+//}
 
 static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
 {
@@ -279,7 +279,7 @@ static void logw(const char *file, int line, const char *function, UINT32 system
             goto logwhere;
     }
 logwhere:
-    logwI(file, line, function, system, level, str, marker);
+    lognodup(file, line, function, system, level, str, marker);
 }
 
 #if platOS == OS_MACOS
