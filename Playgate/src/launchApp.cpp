@@ -84,6 +84,12 @@ Auth::LoginRequest::send()
 	commSend(_LoginXchg, this);
 }
 
+void
+Auth::LoginSteamRequest::send()
+{
+	commSend(_LoginXchg, this);
+}
+
 LOGICAL launchArenaRequest()
 {
 	ARENA_REQ ArenaRequest;

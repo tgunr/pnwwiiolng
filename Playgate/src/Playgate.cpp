@@ -19,6 +19,7 @@
 #include "launchApp.h"
 #include "wwii/wwiiUTF.h"
 #include "../WW2/src/auth/authAppIDs.h"
+#include "steam_api.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -84,6 +85,8 @@ BEGIN_MESSAGE_MAP(CPlaygateApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
+static const int STEAM_APP_ID = 30798;
+bool steamInitialized = false;
 
 // CPlaygateApp construction
 
@@ -419,15 +422,67 @@ BOOL CPlaygateApp::InitInstance()
 
 	DWORD threadId;
 	::CreateThread(nullptr, 0, threadFunc, nullptr,0, &threadId);
-	if ( _Login() )
+
+	// let app close and restart if it must start through steam
+	if (!SteamAPI_RestartAppIfNecessary(STEAM_APP_ID))
 	{
-		loginData.MarkForWrite();
+		bool steamRunning = SteamAPI_IsSteamRunning();
 
-		pgState = PgServerSelect;
+		// If steam is not running at this point it means its either not installed, or isn't managing our APP
+		if (!steamRunning)
+		{
+			if (_Login())
+			{
+				loginData.MarkForWrite();
 
-		if ( _ServerSelect() )
-			loginData.MarkForWrite();
+				pgState = PgServerSelect;
+
+				if (_ServerSelect())
+					loginData.MarkForWrite();
+			}
+		}
+		else
+		{
+			// we are here because steam believes its managing our app
+			steamInitialized = SteamAPI_Init();
+			if (steamInitialized)
+			{
+				bool installedAsSteamApp = SteamApps()->BIsAppInstalled(STEAM_APP_ID);
+				if (installedAsSteamApp)
+				{
+					bool isSteamApp = SteamApps()->BIsSubscribedApp(STEAM_APP_ID);
+					if (isSteamApp)
+					{
+						assert(steamInitialized);
+
+						// we don't ask for credentials
+						loginData.m_steamAccountId = SteamApps()->GetAppOwner().GetAccountID();
+
+						playgate.QueueLogonAttempt();
+						pgState = PgServerSelect;
+
+						_ServerSelect();
+					}
+					else
+					{
+						// illogical, steam shouldn't be launching a game not subscribed to
+						dbugLog(_FLW, "Not currently subscribed to game through steam");
+					}
+				}
+				else
+				{
+					// illogical to get here
+					dbugLog(_FLW, "Not installed as a steam app");
+				}
+			}
+			else
+			{
+				// steam SDK could not be initialized, illogical to get here
+				dbugLog(_FLW, "Steam API failed to initialize");
+			}
+		}
 	}
+	/// we may be exiting here just to restart through steam
 
 	pgState = PgFinished;
 

@@ -78,7 +78,12 @@ typedef JSUint64 uint64;
 #if !defined(XP_MAC) && !defined(_WIN32) && !defined(XP_OS2)
 typedef JSUint32 uint32;
 #else
+#if defined(_WIN32)
+typedef unsigned __int32 uint32;
+#else
 typedef unsigned long uint32;
+#endif
+
 #endif
 typedef JSUint16 uint16;
 typedef JSUint8 uint8;
@@ -105,7 +110,12 @@ typedef JSInt64 int64;
 #if !defined(XP_MAC) && !defined(_WIN32) && !defined(XP_OS2)
 typedef JSInt32 int32;
 #else
+#if defined(_WIN32)
+typedef __int32 int32;
+#else
 typedef long int32;
+#endif
+
 #endif
 typedef JSInt16 int16;
 typedef JSInt8 int8;
