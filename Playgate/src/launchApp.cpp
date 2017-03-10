@@ -99,6 +99,7 @@ LOGICAL launchArenaRequest()
 	ArenaRequest.arenaID = loginData.m_arenaID;
 	ArenaRequest.sessionID = 0;
 	ArenaRequest.presenterVersion = g_playgateVersion;
+	ArenaRequest.steamID = loginData.m_steamAccountId;
 
 	// Username is stored as wide characters, convert to UTF8
 	loginData.GetUsernameAsUTF8(ArenaRequest.username, sizeof(ArenaRequest.username));
@@ -137,6 +138,7 @@ UINT32         CurrentVer;
 	loginData.GetUsernameAsUTF8(LaunchRequest.username, sizeof(LaunchRequest.username));
 	loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password)-1);
 
+	LaunchRequest.steamID = loginData.m_steamAccountId;
 	LaunchRequest.status = 0;
 	LaunchRequest.cdKeySize = 0;
 	LaunchRequest.arenaID = AppVerify->arenaID;
