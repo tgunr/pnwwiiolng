@@ -27,6 +27,9 @@
 #include <arpa/inet.h>
 #include "sysLaunchURL.h"
 #import <HockeySDK/HockeySDK.h>
+#include "steam_api.h"
+
+static const int STEAM_APP_ID = 251950;
 
 #define PLAYGATE_VERSION 0x01010109
 
@@ -60,6 +63,8 @@ static WW2AppDelegate* gPlayGateAppDelegate;
 extern NSString * const PGErrorDomain;
 extern NSString * const PGteulErrorDomain;
 extern NSString * const PGErrorDataKey;
+
+static UINT32 steamID = 0;
 
 // PGErrorDomain error code constants
 enum
@@ -583,6 +588,20 @@ extern NSString *WebActionOriginalURLKey;
         sysmainAddArchives();
     }
     
+    if (SteamAPI_RestartAppIfNecessary(STEAM_APP_ID))
+        // abort
+        [NSApp terminate:self];
+    
+    if (SteamAPI_Init()) {
+        
+        if (SteamApps()->BIsAppInstalled(STEAM_APP_ID)) {
+            if (SteamApps()->BIsSubscribedApp(STEAM_APP_ID)) {
+                steamID = SteamApps()->GetAppOwner().GetAccountID();
+            }
+        }
+            
+    }
+    
     cfgPrefsLoad();
     
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
@@ -607,11 +626,18 @@ extern NSString *WebActionOriginalURLKey;
     
     [self goHome];
     
-    [self loadUserNamePassword];
-    [userNameField setDelegate:self];
-    [passwordField setDelegate:self];
-    
-    [self updateLoginEnabled];
+    if (steamID == 0) {
+        [self loadUserNamePassword];
+        [userNameField setDelegate:self];
+        [passwordField setDelegate:self];
+        [self updateLoginEnabled];
+    } else {
+        [userNameField setHidden:true];
+        [passwordField setHidden:true];
+        [rememberPasswordCheckbox setHidden:true];
+        [userLabel setHidden:true];
+        [passwordLabel setHidden:true];
+    }
     
     authServer = [NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding];
     if (gAuthServer[0]) {
@@ -913,7 +939,11 @@ extern NSString *WebActionOriginalURLKey;
             if (! isConnectedToAuthenticationServer)
             {
                 [self connectToAuthenticationServer];
-                state = WAIT_AUTH_CONNECT;
+                if (steamID == 0) {
+                    state = WAIT_AUTH_CONNECT;
+                } else {
+                    state = WAIT_USER_PASS;
+                }
                 break;
             }
             [[clang::fallthrough]];
@@ -1033,6 +1063,7 @@ extern NSString *WebActionOriginalURLKey;
     memset(&launchRequest, 0x0, sizeof(launchRequest));
     strncpy((char *)launchRequest.username, [[self userName] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.username)-1);
     strncpy((char *)launchRequest.password, [[self userPassword] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.password)-1);
+    launchRequest.steamID = steamID;
     launchRequest.cdKeySize = 0;
     launchRequest.arenaID = verifyInfo->arenaID;
     launchRequest.sessionID = (UINT32)verifyInfo->sessionID;
@@ -1115,6 +1146,8 @@ extern NSString *WebActionOriginalURLKey;
     arenaRequest.arenaID	= arena;
     arenaRequest.sessionID 	= static_cast<UINT32>(session);
     arenaRequest.infoOnly	= 0;
+    arenaRequest.steamID = steamID;
+    
     /*
      int vers[4] = {0,0,0,0};
      

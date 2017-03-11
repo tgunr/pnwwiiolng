@@ -32,6 +32,8 @@ HEADER_SEARCH_PATHS_01      = $(HEADER_SEARCH_PATHS_02) "$(SRCROOT)/../Libraries
 HEADER_SEARCH_PATHS         = $(inherited) $(HEADER_SEARCH_PATHS_01)
 
 // Search paths that only match #include "", not #include <>
+USER_HEADER_SEARCH_PATHS_21 = $(USER_HEADER_SEARCH_PATHS_22) "$(SRCROOT)/../Libraries/SteamSDK/public/steam"
+USER_HEADER_SEARCH_PATHS_20 = $(USER_HEADER_SEARCH_PATHS_21) "$(SRCROOT)/../Libraries/phui/include/js"
 USER_HEADER_SEARCH_PATHS_19 = $(USER_HEADER_SEARCH_PATHS_20) "$(SRCROOT)/../Libraries/imap/include"
 USER_HEADER_SEARCH_PATHS_18 = $(USER_HEADER_SEARCH_PATHS_19) "$(SRCROOT)/../Libraries/libxml2/include/libxml"
 USER_HEADER_SEARCH_PATHS_17 = $(USER_HEADER_SEARCH_PATHS_18) "$(SRCROOT)/../Libraries/glew/include"
@@ -62,7 +64,9 @@ FRAMEWORK_SEARCH_PATHS_01   = $(FRAMEWORK_SEARCH_PATHS_02) "$(SRCROOT)/lib/mac"
 FRAMEWORK_SEARCH_PATHS      = $(inherited) $(FRAMEWORK_SEARCH_PATHS_01)
 
 // Shared library search paths
-LIBRARY_SEARCH_PATHS_01     = $(LIBRARY_SEARCH_PATHS_02) "$(SRCROOT)/lib/mac"/**
+LIBRARY_SEARCH_PATHS_02     = $(LIBRARY_SEARCH_PATHS_03) "$(SRCROOT)/lib/mac"/**
+LIBRARY_SEARCH_PATHS_01     = $(LIBRARY_SEARCH_PATHS_02) "$(SRCROOT)/../Libraries/SteamSDK/redistributable_bin/osx32"/**
+
 
 LIBRARY_SEARCH_PATHS        = $(inherited) $(LIBRARY_SEARCH_PATHS_01)
 

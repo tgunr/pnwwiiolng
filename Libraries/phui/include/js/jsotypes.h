@@ -81,7 +81,7 @@ typedef JSUint32 uint32;
 #if defined(_WIN32)
 typedef unsigned __int32 uint32;
 #else
-typedef unsigned long uint32;
+typedef unsigned int uint32;
 #endif
 
 #endif
@@ -113,7 +113,7 @@ typedef JSInt32 int32;
 #if defined(_WIN32)
 typedef __int32 int32;
 #else
-typedef long int32;
+typedef int int32;
 #endif
 
 #endif
