@@ -269,7 +269,7 @@ static UINT32 GameHost, GameOTP;
 static UINT16 GamePort;
 
 // globals for steam
-static const int STEAM_APP_ID = 30798;
+static const int STEAM_APP_ID = 251950;
 bool steamInitialized = false;
 bool installedAsSteamApp = false;
 bool isSteamApp = false;

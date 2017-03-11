@@ -85,7 +85,7 @@ BEGIN_MESSAGE_MAP(CPlaygateApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
-static const int STEAM_APP_ID = 30798;
+static const int STEAM_APP_ID = 251950;
 bool steamInitialized = false;
 
 // CPlaygateApp construction
