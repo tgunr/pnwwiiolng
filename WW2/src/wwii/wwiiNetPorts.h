@@ -16,6 +16,7 @@ namespace WWII
 			{
 			// Internal ports
 				PrivateBcast = 6666					// server<->server backbone
+            ,	PrivateCellBcast = 6667				// cell host<->cell host backbone
 			,	InternalAuth = 6002					// Auth<->server interface
 			,	DebugWebServer = 6080				// Debugging web interface
 			,	ChatManagement = 6066				// For rosterClient

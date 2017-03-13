@@ -157,8 +157,9 @@ LOGICAL          WantCombatSmoke;    // emersive smoke from damaged buildings an
 SINT32           g_updateReflectionRate; // 0 - 5 seconds
 SINT32           g_iNumBullets;      // Limit to number of displayable bullets.
 SINT32           g_iAmbLevel;        // Frequent = 1; Infrequent = 2; Never = 0;
-SINT32           g_iVisiblePlayerLimit; // 1 = low 2 = medium 3 = high
+SINT32           g_iVisiblePlayerLimit; // 0 = very low, 1 = low, 2 = medium, 3 = high, 4 = very high
 SINT32           g_useNetworkRoute;    // 0, 1, 2 (auto/primary/secondary)
+LOGICAL          g_wantNetcode;        // true = netcode X enabled
 
 SINT32			g_iFSSASamples; 	// 0 = off, 2,4,6,8 (Mac OS X only currently)
 LOGICAL			g_bFSSAHighQuality; // enable high quality FSAA hinting (Mac OS X only currently) XXXX

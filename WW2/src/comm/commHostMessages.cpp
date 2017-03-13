@@ -243,13 +243,13 @@ _expireTurretBits(struct TURRET_STRUCT* turret)
 //////////////////////////////////////////////////////////////////////
 //
 
-void
-commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer)
+SINT32
+commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer, SINT32 offset)
 {
 	if ( Server::myServerInfo.stats.status == Server::SERVER_LOGIN )
 	{
 		dbugLog(_FLD, "ignoring broadcastupdate during SERVER_LOGIN");
-		return;
+		return -1;
 	}
 
 	static TeulTimeMS nextBlip = teulClock64 + 10000;
@@ -265,15 +265,18 @@ commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer)
 
 	static VEHICLE_HOLDER vh;
 	vh.vehicle = nullptr;
-	SINT32 result = updtPackVehicleBroadcast(TEUL_UNPACK, const_cast<UCHAR*>(buffer), 0, &vh, 0);
+	offset = updtPackVehicleBroadcast(TEUL_UNPACK, const_cast<UCHAR*>(buffer), offset, &vh, 0);
 
 	if (!vh.vehicle)
-		return;
-
-	if ( result < 0 )
 	{
-		dbugLog(_FLA, "couldnt unpack broadcast retval %d", result);
-		return;
+		dbugLog(_FLW, "Received a vehicle broadcast but no vehicles could be decoded");
+		return -1;
+	}
+
+	if ( offset < 0 )
+	{
+		dbugLog(_FLA, "Unable to unpack vehicle broadcast retval %d", offset);
+		return -1;
 	}
 
 	vh.vehicle->serverAddress = serverAddress;
@@ -287,6 +290,8 @@ commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer)
 		vh.vehicle->updateGrid();
 
 	vh.vehicle->lastRX = teulClock64;
+
+	return offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -690,7 +695,6 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 			vref->checkCapture();
 	}
 
-#ifdef NEW_BCODE
 	if ( player->station == UPDT_OTHER )
 		vh.present &= ~PR_FROM_CONTROLLER;
 	else
@@ -699,7 +703,6 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	}
 
 	hostAddVehicleToBroadcast(vref, &vh);
-#endif
 
 	player->processUpdateValues(vh.updateNo, vh.updatePrime);
 
@@ -1091,12 +1094,12 @@ _recvKillNotice(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-extern UINT32 hostReceiveVehicleUpdates(const unsigned char* const input, const UINT32 bytes, const UINT32 fromAddr);
+extern UINT32 hostReceiveVehicleUpdates(unsigned char* const input, const UINT32 bytes, const UINT32 fromAddr);
 
 static SINT32
 _recvVehicleBcast(ACTION_OBJECT* const a)
 {
-	hostReceiveVehicleUpdates((const unsigned char*)a->packed, (UINT32)a->sizeInBytes(), a->fromAddress);
+	hostReceiveVehicleUpdates((unsigned char * const)a->packed, (UINT32)a->sizeInBytes(), a->fromAddress);
 	return 0;
 }
 

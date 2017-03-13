@@ -8,6 +8,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include "teulEnums.h"
+
 struct ENDPOINT;
 
 enum { TEUL_UNPACK, TEUL_PACK };
@@ -57,8 +59,8 @@ namespace Teul
 //! @param[in]	teulIndex		Connection to send to.
 //!	@param[in]	teulCallback	Callback structure (to determine send function and packer).
 //!	@param[in]	data			Pointer to the data.
-SINT32 teulSend(SINT32 teulIndex, struct TEUL_CALLBACK* const teulCallback, void* const data);
-SINT32 teulSend(ENDPOINT& endpoint, struct TEUL_CALLBACK* const teulCallback, void* const data);
+SINT32 teulSend(SINT32 teulIndex, struct TEUL_CALLBACK* const teulCallback, void* const data, const UCHAR protocol=PROTOCOL_UNDEF);
+SINT32 teulSend(ENDPOINT& endpoint, struct TEUL_CALLBACK* const teulCallback, void* const data, const UCHAR protocol=PROTOCOL_UNDEF);
 
 //! Close a local connection. will not work until its opened.
 void teulClose(const SINT32 teulIndex, const UINT32 reason=0);

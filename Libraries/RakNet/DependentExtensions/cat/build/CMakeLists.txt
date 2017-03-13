@@ -1,0 +1,128 @@
+cmake_minimum_required(VERSION 2.6) # or other version
+
+project(LIBCAT)
+
+OPTION(BUILD_ECC_TEST "Build Elliptic Curve Cryptography Test" OFF)
+OPTION(BUILD_NETCODE_TEST "Build MMO NetCode Test" OFF)
+
+MESSAGE( STATUS "Working dir: " ${CMAKE_CURRENT_SOURCE_DIR} )
+MESSAGE( STATUS "Build type: " ${CMAKE_BUILD_TYPE} )
+
+get_filename_component(PARENT_DIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+
+# Define some shortcuts
+SET(SRC ${PARENT_DIR}/src/)
+SET(LIB ${PARENT_DIR}/lib/)
+SET(INC ${PARENT_DIR}/include/ )
+SET(TESTS ${PARENT_DIR}/tests/)
+
+include_directories(${INC})
+link_directories(${LIB}/cat)
+set(LIBRARY_OUTPUT_PATH ${LIB}/cat)
+
+# Common
+add_library(libcatcommon STATIC
+${SRC}/port/EndianNeutral.cpp
+${SRC}/port/SystemInfo.cpp
+${SRC}/threads/WorkerThreads.cpp
+${SRC}/threads/Thread.cpp
+${SRC}/threads/Mutex.cpp
+${SRC}/threads/RWLock.cpp
+${SRC}/threads/WaitableFlag.cpp
+${SRC}/lang/RefObject.cpp
+${SRC}/lang/LinkedLists.cpp
+${SRC}/lang/HashTable.cpp
+${SRC}/time/Clock.cpp
+${SRC}/lang/Strings.cpp
+${SRC}/lang/Singleton.cpp
+${SRC}/io/Settings.cpp
+${SRC}/io/LogThread.cpp
+${SRC}/io/MappedFile.cpp
+${SRC}/time/Clock.cpp
+${SRC}/rand/MersenneTwister.cpp
+${SRC}/rand/StdRand.cpp
+${SRC}/mem/AlignedAllocator.cpp
+${SRC}/mem/BufferAllocator.cpp
+${SRC}/mem/LargeAllocator.cpp
+${SRC}/mem/StdAllocator.cpp
+${SRC}/mem/IAllocator.cpp
+${SRC}/parse/BufferTok.cpp
+${SRC}/parse/Base64.cpp
+${SRC}/hash/Murmur.cpp
+${SRC}/io/Log.cpp
+${SRC}/lang/RefSingleton.cpp)
+if (WIN32)
+    target_link_libraries(libcatcommon winmm.lib)
+else (WIN32)
+    target_link_libraries(libcatcommon pthread)
+endif (WIN32)
+
+# Codec
+add_library(libcatcodec STATIC
+${SRC}/codec/RangeCoder.cpp)
+target_link_libraries(libcatcodec libcatcommon)
+
+# Crypt
+add_library(libcatcrypt STATIC
+${SRC}/crypt/privatekey/ChaCha.cpp
+${SRC}/crypt/cookie/CookieJar.cpp
+${SRC}/crypt/rand/EntropyLinux.cpp
+${SRC}/crypt/rand/EntropyWindows.cpp
+${SRC}/crypt/rand/EntropyWindowsCE.cpp
+${SRC}/crypt/rand/EntropyGeneric.cpp
+${SRC}/crypt/rand/Fortuna.cpp
+${SRC}/crypt/hash/HMAC_MD5.cpp
+${SRC}/crypt/hash/VHash.cpp
+${SRC}/crypt/hash/Skein.cpp
+${SRC}/crypt/hash/Skein256.cpp
+${SRC}/crypt/hash/Skein512.cpp
+${SRC}/crypt/SecureCompare.cpp)
+target_link_libraries(libcatcrypt libcatcommon)
+if (WIN32)
+    target_link_libraries(libcatcrypt rpcrt4.lib iphlpapi.lib psapi.lib advapi32.lib)
+endif (WIN32)
+
+# Math
+add_library(libcatmath STATIC
+${SRC}/math/BigRTL.cpp
+${SRC}/math/BitMath.cpp
+${SRC}/math/BigPseudoMersenne.cpp
+${SRC}/math/BigTwistedEdwards.cpp
+${SRC}/math/BigMontgomery.cpp)
+target_link_libraries(libcatmath libcatcommon)
+
+# Tunnel
+add_library(libcattunnel STATIC
+${SRC}/crypt/tunnel/Keys.cpp
+${SRC}/crypt/tunnel/KeyAgreement.cpp
+${SRC}/crypt/tunnel/KeyAgreementInitiator.cpp
+${SRC}/crypt/tunnel/KeyAgreementResponder.cpp
+${SRC}/crypt/tunnel/EasyHandshake.cpp
+${SRC}/crypt/tunnel/AuthenticatedEncryption.cpp
+${SRC}/crypt/tunnel/TunnelTLS.cpp)
+target_link_libraries(libcattunnel libcatcrypt libcatmath)
+
+if (BUILD_ECC_TEST)
+
+# ECC Test
+add_executable(TEST_ECC
+${TESTS}/ECC_Test/ecc_unit_test.cpp
+${TESTS}/ECC_Test/SecureClientDemo.cpp
+${TESTS}/ECC_Test/SecureServerDemo.cpp)
+target_link_libraries(TEST_ECC libcattunnel)
+
+endif (BUILD_ECC_TEST)
+
+if (BUILD_NETCODE_TEST)
+
+# ChatServer Test
+add_executable(ChatServer
+${TESTS}/SecureChatServer/ChatServer.cpp)
+target_link_libraries(ChatServer libcatsphynx)
+
+# ChatClient Test
+add_executable(ChatClient
+${TESTS}/SecureChatClient/ChatClient.cpp)
+target_link_libraries(ChatClient libcatsphynx)
+
+endif (BUILD_NETCODE_TEST)
