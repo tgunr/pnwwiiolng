@@ -30,9 +30,8 @@
 
 #define PLAYGATE_VERSION 0x01010109
 
-//#define DEFAULT_AUTH_SERVER "auth.playnet.com"
+#define DEFAULT_AUTH_SERVER "authdev.playnet.com"
 //#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
-#define DEFAULT_AUTH_SERVER "192.168.0.109"
 #define DEFAULT_AUTH_PORT WWII::Net::Ports::AuthHost
 
 static void xmlerrorstub (void *ctx, const char *msg, ...) {}
@@ -650,7 +649,8 @@ extern NSString *WebActionOriginalURLKey;
     [arenaMenu.menu addItemWithTitle:@"LIVE (1)" action:nullptr keyEquivalent:@""].tag = 1;
     [arenaMenu.menu addItemWithTitle:@"TRAINING (22)" action:nullptr keyEquivalent:@""].tag = 22;
     [arenaMenu.menu addItemWithTitle:@"BETA (222)" action:nullptr keyEquivalent:@""].tag = 222;
-    [arenaMenu.menu addItemWithTitle:@"DEV (250)" action:nullptr keyEquivalent:@""].tag = 250;
+    [arenaMenu.menu addItemWithTitle:@"DEV 4 (101)" action:nullptr keyEquivalent:@""].tag = 101;
+    [arenaMenu.menu addItemWithTitle:@"DEV 1 (250)" action:nullptr keyEquivalent:@""].tag = 250;
     [arenaMenu selectItemWithTag:1];
     arenaMenu.enabled = YES;
 #else
@@ -658,6 +658,7 @@ extern NSString *WebActionOriginalURLKey;
     // server, which is apparently pretending to be arena 1 (e.g. "live").
     [arenaMenu.menu addItemWithTitle:@"Campaign" action:nullptr keyEquivalent:@""].tag = 1;
     [arenaMenu.menu addItemWithTitle:@"Training / Events" action:nullptr keyEquivalent:@""].tag = 22;
+    [arenaMenu.menu addItemWithTitle:@"DEV 4 (101)" action:nullptr keyEquivalent:@""].tag = 101;
     [arenaMenu selectItemWithTag:1];
     arenaMenu.enabled = YES;
 #endif
