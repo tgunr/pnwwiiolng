@@ -1095,11 +1095,19 @@ _recvKillNotice(ACTION_OBJECT* const a)
 //
 
 extern UINT32 hostReceiveVehicleUpdates(unsigned char* const input, const UINT32 bytes, const UINT32 fromAddr);
+extern UINT32 hostReceiveResyncVehicles(unsigned char* const input, const UINT32 bytes, const UINT32 fromAddr);
 
 static SINT32
 _recvVehicleBcast(ACTION_OBJECT* const a)
 {
 	hostReceiveVehicleUpdates((unsigned char * const)a->packed, (UINT32)a->sizeInBytes(), a->fromAddress);
+	return 0;
+}
+
+static SINT32
+_recvResyncVehicles(ACTION_OBJECT* const a)
+{
+	hostReceiveResyncVehicles((unsigned char * const)a->packed, (UINT32)a->sizeInBytes(), a->fromAddress);
 	return 0;
 }
 
@@ -1351,6 +1359,8 @@ _registerClientCallbacks()
 		REGISTER_RECEIVER(DESPAWNED_Y, _recvDespawned);
 
 		REGISTER_RECEIVER(BCAST_VEH_UPDATE_Y, _recvVehicleBcast);
+
+		REGISTER_RECEIVER(RESYNC_VEHICLES_Y, _recvResyncVehicles);
 
 		REGISTER_SENDER(CAPTURE_STATE_Y, _sendCaptureState, _SEND_CAPTURE_STATE);
 

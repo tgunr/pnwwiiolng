@@ -26,6 +26,7 @@
 #include "teul/teulBasic.h"
 #include "teul/teulPacket.h"
 #include "wwii/wwiiThreads.h"
+#include <execinfo.h>
 
 #include "wwii/wwiiHash.h"
 using SYNCHED_VEHICLES = std::unordered_map<UINT32, bool>;
@@ -102,6 +103,22 @@ hostReceiveVehicleUpdates(unsigned char* const input, const UINT32 bytes, const 
 	}
 
 	return count;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Receive a vehicle list resync request packet 
+
+UINT32
+hostReceiveResyncVehicles(unsigned char* const input, const UINT32 bytes, const UINT32 source)
+{
+	// vehicles present in this list are presumed to be synched, by clearing the list we are telling our host
+	// that they need to resend the full information to other host
+	g_synched.clear();	
+
+	dbugLog(_FLI, "Received resync request from %s", teulGetAddress(source));
+	void *frames[64]; int n = backtrace(frames, 64); char **names = backtrace_symbols(frames, n); for (int i = 0; i < n; ++i) { dbugLog(_FLD, "Frame %d: %s", i, names[i]); } free(names);
+
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -205,7 +222,7 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 
 //////////////////////////////////////////////////////////////////////
 // Force FIRST_TIME updates for all
-
+// This should be called when a cell hosts starts
 void
 hostForceFirstTimeUpdates()
 {
@@ -213,7 +230,11 @@ hostForceFirstTimeUpdates()
 		return;
 
 	g_synched.clear();
+
+	dbugLog(_FLI, "Host initiating request to RESYNC vehicles to all listening cell hosts");
+
 	Teul::Packet outgoing(Teul::PacketId(Comm::CallbackX, RESYNC_VEHICLES_Y));
+	outgoing.setUnencrypted();
 	outgoing.send(updateBcastSend);
 }
 
