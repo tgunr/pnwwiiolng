@@ -981,10 +981,14 @@ updtPackVehicleBroadcast(PackMode mode, UCHAR* const data, SINT32 offset, VEHICL
 
 			vehInfo->hostPosTimeStamp = teulClock64;
 		}
-		vehInfo->timeStamp	= vhold->timeStamp;
-		vehInfo->posTimeStamp	= vhold->posTimeStamp;
-		vehInfo->cmdrTimeStamp  = vhold->timeStamp;     // NOTE: This was a multi-crew addition and needs exist when sending out remote vehicle status
-								// since hosts won't send crew updates to other hosts (just commanders) this works out fine.
+
+		if ( vhold->present & PR_FROM_CONTROLLER )
+		{
+			vehInfo->timeStamp	= vhold->timeStamp;
+			vehInfo->posTimeStamp	= vhold->posTimeStamp;
+			// NOTE: This was a multi-crew addition and needs to exist when sending out remote vehicle status
+			vehInfo->cmdrTimeStamp  = vhold->timeStamp;
+		}
 	}
 
 	//pack up common elements

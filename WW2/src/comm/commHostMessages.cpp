@@ -287,7 +287,9 @@ commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer, SINT32 of
 	if ( vh.vehicle->isActive() == false )
 		hostActivateVehicle(vh.vehicle, false);
 	else
-		vh.vehicle->updateGrid();
+		// make sure this is coming from the controller before we call udpate grid
+		if (vh.present & PR_FROM_CONTROLLER)
+			vh.vehicle->updateGrid();
 
 	vh.vehicle->lastRX = teulClock64;
 
