@@ -30,8 +30,8 @@
 
 #define PLAYGATE_VERSION 0x01010109
 
-#define DEFAULT_AUTH_SERVER "authdev.playnet.com"
-//#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
+//#define DEFAULT_AUTH_SERVER "authdev.playnet.com"
+#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
 #define DEFAULT_AUTH_PORT WWII::Net::Ports::AuthHost
 
 static void xmlerrorstub (void *ctx, const char *msg, ...) {}

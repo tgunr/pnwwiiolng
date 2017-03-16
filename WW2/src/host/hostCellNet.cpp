@@ -117,7 +117,6 @@ hostReceiveResyncVehicles(unsigned char* const input, const UINT32 bytes, const 
 	g_synched.clear();	
 
 	dbugLog(_FLI, "Received resync request from %s", teulGetAddress(source));
-	void *frames[64]; int n = backtrace(frames, 64); char **names = backtrace_symbols(frames, n); for (int i = 0; i < n; ++i) { dbugLog(_FLD, "Frame %d: %s", i, names[i]); } free(names);
 
 	return 0;
 }
