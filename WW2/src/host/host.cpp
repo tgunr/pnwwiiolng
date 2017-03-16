@@ -1275,8 +1275,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN )
 		{
-			_userConnections--;
-			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d", teulIndex, error);
+			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d connCount:%d", teulIndex, error, _userConnections);
 			return;
 		}
 		else
@@ -1290,7 +1289,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 		if ( error == ENOTCONN && teulIndex == player->teulIndex() )
 		{
 			_userConnections--;
-			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected", teulIndex, player->playerID(), player->callsign(), player->sortieID());
+			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected, userConn:%d", teulIndex, player->playerID(), player->callsign(), player->sortieID(), _userConnections);
 			player->SetTeulIndex(-1);
 		}
 		else

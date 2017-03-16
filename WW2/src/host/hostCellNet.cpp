@@ -25,6 +25,7 @@
 #include "host/hostVehicle.h"
 #include "teul/teulBasic.h"
 #include "teul/teulPacket.h"
+#include "teul/teulEndpointDefs.h"
 #include "wwii/wwiiThreads.h"
 #include <execinfo.h>
 
@@ -191,6 +192,10 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 	if ( sizeBytes > maxSize )
 		maxSize = sizeBytes;
 
+	// Lets first test to see if we will bust our MTU size if we append this - if so, push out now
+	if ( (vehicleBroadcasts.packetSizeBytes() + sizeBytes) >= static_cast<SINT32>(Teul::MaxMTU))
+		hostPushVehicleBroadcasts();
+
 	// store in the final size
 	teulPackSINT32(TEUL_PACK, buffer, 0, &sizeBytes, 0);
 
@@ -207,11 +212,14 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 		numberOfVehiclesPending);
 #endif
 
-	// disable packaging of multiple vehicles for now and just send them out as we get them
-	// we want to force updates based on how many connections we have.  We might want to put a cap on it too.
-	// 1400 is just under the max MTU size but 35 is about the size of your average veh update
-    UINT32 limitPacketSize = std::min( static_cast<UINT32>(1400),
-		 (static_cast<UINT32>(_userConnections) * 35));
+	// Lets limit our size based on how many connections we have knowing that the average update is about 35 bytes
+	// also - lets do a sanity check on the user connections counter host is tracking
+	int connectionsCounted = 1;
+	if (_userConnections > 0)
+		connectionsCounted = _userConnections;
+	else
+		dbugLog(_FLW, "_userConnections counter is underflowing - currently %d", _userConnections);
+	UINT32 limitPacketSize = static_cast<UINT32>(connectionsCounted) * 35;
 	if ( vehicleBroadcasts.packetSizeBytes() >= limitPacketSize )
 	{
 		hostPushVehicleBroadcasts();
