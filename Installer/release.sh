@@ -1,14 +1,46 @@
 #!/bin/bash
-
-function pause {
+################################################################
+# release.sh
+#
+# Supported platforms: Windows
+# Supported shells: mobaxterm bash
+#
+# This script will automatically (if enabled) follow the 
+# documented build procedures for building a PC installer
+# which includes building the diffs for a PC patch.
+#
+# !!!IF THINGS LOOK OVERLY COMPLICATED!!!!
+#
+# Don't just assume that the author didn't know there was a way
+# easier way to do something!  Bash shell implementation varies
+# wildly and Mobaxterm's implementaion has a number of flaws 
+# where it doesn't behave as expected.  One area in particular
+# is how it translates user/group ownership and permissions.
+# This bad behavior forces using sub-optimal approaches
+# occsionally so DON'T change anything unless you throroughly 
+# test it first under Mobaxterm
+################################################################
+function build_step {
     if [ "$pause_enabled" = true ] ; then
         out_msg='About to '$1$' '$3$' press any key to continue'
         read -p "$out_msg" -n 1 -r 
         echo    # (optional) move to a new line
-	echo $2" "$3
+	echo "Step "$buildstep". "$2" "$3
     else
-	echo $2" "$3
+	echo "Step "$buildstep". "$2" "$3
     fi
+
+    if (( skipto > 0 )) ; then
+        if (( skipto > buildstep )); then
+            skip_step=true
+	else
+            skip_step=false
+	fi
+    else
+        skip_step=false
+    fi
+
+    buildstep=$((buildstep+1))
 }
 
 function print_exit_msg {
@@ -45,10 +77,18 @@ BUILDDIR="$APPDATA"
 BUILDLOG="build_output.log"
 PREV_RELEASE="$PROGRAMFILES\\CRS\\Battleground Europe\\"
 
+skipto=$1
+if (( skipto > 0 )) ; then
+    echo "Will skip to step "$skipto
+fi
+
+buildstep=1
+skip_step=false
+
 #pause_enabled=true
 pause_enabled=false
 
-pause "check" "Checking" "pre-requisites"
+build_step "check" "Checking" "pre-requisites"
 
 found_prereq_errors=false
 exit_msg=""
@@ -169,6 +209,8 @@ else
     fi
 fi
 
+build_step "test" "Testing" "repositories"
+
 cleanedfiles=`git clean -d -x -n --exclude="Installer/release.sh" && git -C opt/ww2mods clean -d -x -n`
 if [ -n "$cleanedfiles" ] ; then
     clean=false
@@ -197,177 +239,212 @@ if [ -n "$cleanedfiles" ] ; then
         fi
     fi
 
-    if [ "$clean" = true ] ; then
-        echo $cleanedfiles | sed 's/Would /\nWould /g'
-        if [ "$noprompt" = false ]; then
-            read -p "The above files will be affected, please (V)erify to proceed :" -n 1 -r 
-            echo    # (optional) move to a new line
-            if [[ ! $REPLY =~ ^[Vv]$ ]] ; then
-                exit_msg="When you are ready to proceed, restart the build process"
-                exit 1
+    build_step "clean" "Cleaning" "repositories"
+    if [ "$skip_step" = false ]; then
+        if [ "$clean" = true ] ; then
+            echo $cleanedfiles | sed 's/Would /\nWould /g'
+            if [ "$noprompt" = false ]; then
+                read -p "The above files will be affected, please (V)erify to proceed :" -n 1 -r 
+                echo    # (optional) move to a new line
+                if [[ ! $REPLY =~ ^[Vv]$ ]] ; then
+                    exit_msg="When you are ready to proceed, restart the build process"
+                    exit 1
+                fi
             fi
-	fi
-	echo "Cleaning wwiiolng"
-	git clean -d -x -f --exclude="Installer/release.sh"
-	echo "Resetting wwiiolng"
-       	git reset --hard HEAD
-	echo "Cleaning ww2mods"
-       	git -C opt/ww2mods clean -d -x -f
-	echo "Resetting ww2mods"
-	git -C opt/ww2mods reset --hard HEAD
+            echo "Cleaning wwiiolng"
+            git clean -d -x -f --exclude="Installer/release.sh"
+            echo "Resetting wwiiolng"
+            git reset --hard HEAD
+            echo "Cleaning ww2mods"
+            git -C opt/ww2mods clean -d -x -f
+            echo "Resetting ww2mods"
+            git -C opt/ww2mods reset --hard HEAD
+        fi
     fi
 fi
 
 if [ "$build_patch" = true ] ; then
     winpath2bash "$PREV_RELEASE"
-    pause "copy" "copying" "over previous release for patch from $bashpath"
-    rsync -auv "$bashpath/" "$INSTALLER/previous/"
+    build_step "copy" "copying" "over previous release for patch from $bashpath"
+    if [ "$skip_step" = false ]; then
+        rsync -auv "$bashpath/" "$INSTALLER/previous/"
+    fi
 fi
 
 echo "TODO: libxml prebuild"
 
-pause "build" "Building" "debug version"
+build_step "build" "Building" "debug version"
+if [ "$skip_step" = false ]; then
+    bld_config="Debug"
+    BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
+    winpath2bash "$BUILDFILE"
+    rm "$bashpath"
+    echo "writing output to: "$BUILDFILE
+    if [ "$isrelease" = true ] ; then
+        echo "Cleaning "$bld_config" first"
+        devenv WW2.sln /clean $bld_config
+    fi
+    devenv WW2.sln /build $bld_config /out "$BUILDFILE"
 
-bld_config="Debug"
-BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
-winpath2bash "$BUILDFILE"
-rm "$bashpath"
-echo "writing output to: "$BUILDFILE
-if [ "$isrelease" = true ] ; then
-    echo "Cleaning "$bld_config" first"
-    devenv WW2.sln /clean $bld_config
+    errOutput=`grep ": error" "$BUILDFILE"`
+    if [ -n "$errOutput" ] ; then
+        echo $errOutput
+        exit_msg="Error: Build failed, see "$BUILDFILE" for errors"
+        exit 1
+    fi
 fi
-devenv WW2.sln /build $bld_config /out "$BUILDFILE"
 
-errOutput=`grep ": error" "$BUILDFILE"`
-if [ -n "$errOutput" ] ; then
-    echo $errOutput
-    exit_msg="Error: Build failed, see "$BUILDFILE" for errors"
-    exit 1
+build_step "copy" "Copying" "Debug binaries into WW2MODS"
+if [ "$skip_step" = false ]; then
+    for product in $PRODUCTS ; do
+        cp "$DEBUGDIR/$product" "$WW2MODS/$product"
+        chmod 550 "$WW2MODS/$product"
+    done
 fi
-
-pause "copy" "Copying" "Debug binaries into WW2MODS"
-
-for product in $PRODUCTS ; do
-	cp "$DEBUGDIR/$product" "$WW2MODS/$product"
-	chmod 550 "$WW2MODS/$product"
-done
 
 # Copy 3rd party libraries into WW2MODS
-rsync -au "$LIBDIR/" "$WW2MODS/"
-
-pause "remove" "Removing" "old .mdl files"
-
-find "$WW2MODS" -name "*.mdl" -delete
-cp "$WW2MODS/Launch Files/ww2mods.bat" "$WW2MODS/."
-chmod 550 "$WW2MODS/ww2mods.bat"
-
-pause "build" "Building" "mdl files"
-
-pushd "$WW2MODS"
-./ww2mods.bat
-popd
-
-mdlfiles=`find "$WW2MODS" -name "*.mdl" -print`
-if [ -n "$mdlfiles" ] ; then
-    exit_msg="Error: Failed to build .mdl files, build aborted"
-    exit 1
+build_step "copy" "Copying" "3rd party libs into WW2MODS"
+if [ "$skip_step" = false ]; then
+    rsync -au "$LIBDIR/" "$WW2MODS/"
 fi
 
-pause "build" "Building" "archive (.ww2) files"
-
-"$WWII_ROOT/Tools/PlayBuilder/run.bat"
-
-# remove the empty archive file
-rm -f WW2Archives/playarc11.ww2
-echo
-echo
-
-pause "copy" "Copying" "product files"
-
-### Copy build products to Installer
-find "$WW2ARCHIVES" -path "*/.sync" -prune -o -name "*.ww2" -print -exec cp {} "$INSTALLER/current/" \;
-
-pause "build" "Building" "release version"
-
-# If not tagged as official release then we want beta
-if [ "$isrelease" = true ] ; then
-    bld_config="Release"
-else
-    bld_config="BetaRelease"
+build_step "remove" "Removing" "old .mdl files"
+if [ "$skip_step" = false ]; then
+    find "$WW2MODS" -name "*.mdl" -delete
+    cp "$WW2MODS/Launch Files/ww2mods.bat" "$WW2MODS/."
+    chmod 550 "$WW2MODS/ww2mods.bat"
 fi
 
-BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
-winpath2bash "$BUILDFILE"
-rm "$bashpath"
-echo "writing output to: "$BUILDFILE
-if [ "$isrelease" = true ] ; then
-    echo "Cleaning "$bld_config" first"
-    devenv WW2.sln /clean $bld_config
-fi
-devenv WW2.sln /build $bld_config /out "$BUILDFILE"
-
-errOutput=`grep ": error" "$BUILDFILE"`
-if [ -n "$errOutput" ] ; then
-    echo $errOutput
-    exit_msg="Error: Build failed, see "$BUILDFILE" for errors"
-    exit 1
-fi
-
-pause "copy" "Copying" "executable products"
-
-# Copy executables over
-for product in $PRODUCTS ; do
-    if [[ "$BUILDDIR\\$bld_config/Bin//$product" -nt "$INSTALLER/current/$product" ]] ; then
-	   cp "$BUILDDIR\\$bld_config/Bin/$product" "$INSTALLER/current/$product"
-	   chmod 550 "$INSTALLER/current/$product"
-    fi
-done
-cp $WWII_ROOT/Installer/previous/Settings.exe $WWII_ROOT/Installer/current/.
-chmod 550 $WWII_ROOT/Installer/current/.
-   
-pause "copy" "Copying" " dlls and libraries"
-
-rsync -auv "$INSTALLER/libs/" "$INSTALLER/current/"
-
-pause "copy" "Copying" "WW2MODS datafiles datafiles"
-
-for product in $DATAFILES ; do
-	cp "$WW2MODS/$product" "$INSTALLER/current/$product"
-	chmod 440 "$INSTALLER/current/$product"
-done
-
-pause_enabled=true
-
-pause "copy" "Copying" "data directories"
-
-for folder in $DATADIRS ; do
-    pause "copy" "Copying" "folder $folder"
-    mkdir -p "Installer/current/DATA/$folder"
-    rsync -auv --exclude=".DS_Store" "$WW2MODS/DATA/$folder/" "$INSTALLER/current/DATA/$folder/"
-done
-
-pause "prune" "Pruning" "unwanted files"
-
-pushd "$INSTALLER/current"
-for file in WW2.{lib,ilk,exp} Playgate.{pbd,map,ilk} *.tkt *.bat ; do
-	if [[ -e "$file" ]] ; then
-		rm "$file"
-	fi
-done
-popd
-
-if [ "$build_patch" = true ] ; then
-    pause "create" "Creating" "diff files for patcher"
-
-    pushd "$INSTALLER"
-    ./MakeDiffs.bat
+build_step "build" "Building" "mdl files"
+if [ "$skip_step" = false ]; then
+    pushd "$WW2MODS"
+    ./ww2mods.bat
     popd
 
-    pause "build" "Building" "complete running patch install scripts"
-    iscc "$INSTALLER/release/winrelease/Patch Installer.iss"
+    mdlfiles=`find "$WW2MODS" -name "*.mdl" -print`
+    if [ -n "$mdlfiles" ] ; then
+        exit_msg="Error: Failed to build .mdl files, build aborted"
+        exit 1
+    fi
 fi
 
-pause "build" "Building" "complete running full install scripts"
-iscc "$INSTALLER/release/winrelease/Full Installer.iss"
+build_step "build" "Building" "archive (.ww2) files"
+if [ "$skip_step" = false ]; then
 
+    "$WWII_ROOT/Tools/PlayBuilder/run.bat"
+
+    # remove the empty archive file
+    rm -f WW2Archives/playarc11.ww2
+    echo
+    echo
+fi
+
+build_step "copy" "Copying" "product files"
+if [ "$skip_step" = false ]; then
+
+    ### Copy build products to Installer
+    find "$WW2ARCHIVES" -path "*/.sync" -prune -o -name "*.ww2" -print -exec cp {} "$INSTALLER/current/" \;
+fi
+
+build_step "build" "Building" "release version"
+if [ "$skip_step" = false ]; then
+
+    # If not tagged as official release then we want beta
+    if [ "$isrelease" = true ] ; then
+        bld_config="Release"
+    else
+        bld_config="BetaRelease"
+    fi
+
+    BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
+    winpath2bash "$BUILDFILE"
+    rm "$bashpath"
+    echo "writing output to: "$BUILDFILE
+    if [ "$isrelease" = true ] ; then
+        echo "Cleaning "$bld_config" first"
+        devenv WW2.sln /clean $bld_config
+    fi
+    devenv WW2.sln /build $bld_config /out "$BUILDFILE"
+    
+    errOutput=`grep ": error" "$BUILDFILE"`
+    if [ -n "$errOutput" ] ; then
+        echo $errOutput
+        exit_msg="Error: Build failed, see "$BUILDFILE" for errors"
+        exit 1
+    fi
+fi
+
+build_step "copy" "Copying" "executable products"
+if [ "$skip_step" = false ]; then
+
+    # Copy executables over
+    for product in $PRODUCTS ; do
+        srcfile="$WWII_ROOT/build/client/$bld_config/Bin/$product"
+        dstfile="$INSTALLER/current/$product"
+        echo "Copying $srcfile to $dstfile"
+        cp $srcfile $dstfile
+        echo "Setting perms on $dstfile"
+        chmod 550 $dstfile
+    done
+    cp $WWII_ROOT/Installer/previous/Settings.exe $WWII_ROOT/Installer/current/.
+    chmod 550 $WWII_ROOT/Installer/current/.
+fi
+
+build_step "copy" "Copying" " dlls and libraries"
+if [ "$skip_step" = false ]; then
+    rsync -auv "$INSTALLER/libs/" "$INSTALLER/current/"
+fi
+
+build_step "copy" "Copying" "WW2MODS datafiles datafiles"
+if [ "$skip_step" = false ]; then
+    for product in $DATAFILES ; do
+        cp "$WW2MODS/$product" "$INSTALLER/current/$product"
+        chmod 440 "$INSTALLER/current/$product"
+    done
+fi
+
+build_step "copy" "Copying" "data directories"
+if [ "$skip_step" = false ]; then
+    for folder in $DATADIRS ; do
+        mkdir -p "Installer/current/DATA/$folder"
+        rsync -auv --exclude=".DS_Store" "$WW2MODS/DATA/$folder/" "$INSTALLER/current/DATA/$folder/"
+    done
+fi
+
+build_step "prune" "Pruning" "unwanted files"
+if [ "$skip_step" = false ]; then
+
+    pushd "$INSTALLER/current"
+    for file in WW2.{lib,ilk,exp} Playgate.{pbd,map,ilk} *.tkt *.bat ; do
+        if [[ -e "$file" ]] ; then
+            rm "$file"
+	fi
+    done
+    popd
+fi
+
+prefix="Release"
+if [ "$isrelease" = false ] ; then
+    prefix="Beta"
+fi
+
+if [ "$build_patch" = true ] ; then
+    build_step "create" "Creating" "diff files for patcher"
+    if [ "$skip_step" = false ]; then
+        pushd "$INSTALLER"
+        ./MakeDiffs.bat
+        popd
+    fi
+
+    fname="Installer/$prefix - Patch.iss"
+    build_step "build" "Building" "complete running patch install scripts: "$fname
+    if [ "$skip_step" = false ]; then
+        iscc "$fname"
+    fi
+fi
+
+fname="Installer/$prefix - FullInstall.iss"
+build_step "build" "Building" "complete running full install scripts: "$fname
+if [ "$skip_step" = false ]; then
+    iscc "$fname"
+fi
