@@ -20,6 +20,11 @@ do
 done
 }
 
+function winpath2bash {
+    bashpath=$(echo "$1" | sed 's/\\/\//g' | sed 's/://')
+    bashpath="/drives/$bashpath"
+}
+
 trap '
 print_exit_msg
 sleep 5
@@ -38,8 +43,10 @@ DATADIRS="DirectXRedist loc playgate screens"
 DATAFILES="eula.txt license.rtf readme.rtf regions.txt tos.txt wwii1.ico"
 BUILDDIR="$APPDATA"
 BUILDLOG="build_output.log"
+PREV_RELEASE="$PROGRAMFILES\\CRS\\Battleground Europe\\"
 
-pause_enabled=true
+#pause_enabled=true
+pause_enabled=false
 
 pause "check" "Checking" "pre-requisites"
 
@@ -82,10 +89,29 @@ if [ ! -d "WW2Archives" ] ; then
     found_prereq_errors=true
 fi
 
+build_patch=true
+while [ ! -d "$PREV_RELEASE" ] ; do
+    echo "Standard location for previous build "$PREV_RELEASE" does not exist"
+    echo -n "Please enter the directory containing the previous release (ENTER for none): "
+    read -r HANDLE
+    HANDLE="$HANDLE\\"
+    if [ -z "$HANDLE" ] ; then
+        echo "WARNING: No previous release specified, PC patch will not be built!"
+        build_patch=false 
+	break
+    elif [ ! -r "$HANDLE" ] ; then
+        echo "Invalid directory, '$HANDLE' try again"
+    else
+        PREV_RELEASE="$HANDLE"
+    fi
+done
+
 # make sure the previous release for the patch to apply exists
-if [ ! -f "$INSTALLER/previous/WW2.exe" ] ; then
-    exit_msg=$exit_msg'|The previous release has not been copied into target dir "$INSTALLER"/previous yet, please do so now'
-    found_prereq_errors=true
+if [ "$build_patch" = true ] ; then
+    if [ ! -f "$PREV_RELEASE/WW2.exe" ] ; then
+        exit_msg=$exit_msg'|The previous release directory ($PREV_RELEASE) is not valid, restart when correct directory located'
+        found_prereq_errors=true
+    fi
 fi
 
 # make sure visual studio isn't running
@@ -192,12 +218,20 @@ if [ -n "$cleanedfiles" ] ; then
     fi
 fi
 
+if [ "$build_patch" = true ] ; then
+    winpath2bash "$PREV_RELEASE"
+    pause "copy" "copying" "over previous release for patch from $bashpath"
+    rsync -auv "$bashpath/" "$INSTALLER/previous/"
+fi
+
 echo "TODO: libxml prebuild"
 
 pause "build" "Building" "debug version"
 
 bld_config="Debug"
 BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
+winpath2bash "$BUILDFILE"
+rm "$bashpath"
 echo "writing output to: "$BUILDFILE
 if [ "$isrelease" = true ] ; then
     echo "Cleaning "$bld_config" first"
@@ -264,6 +298,8 @@ else
 fi
 
 BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
+winpath2bash "$BUILDFILE"
+rm "$bashpath"
 echo "writing output to: "$BUILDFILE
 if [ "$isrelease" = true ] ; then
     echo "Cleaning "$bld_config" first"
@@ -282,8 +318,8 @@ pause "copy" "Copying" "executable products"
 
 # Copy executables over
 for product in $PRODUCTS ; do
-    if [[ "$BUILDDIR$bld_config/Bin//$product" -nt "$INSTALLER/current/$product" ]] ; then
-	   cp "$BUILDDIR$bld_config/Bin/$product" "$INSTALLER/current/$product"
+    if [[ "$BUILDDIR\\$bld_config/Bin//$product" -nt "$INSTALLER/current/$product" ]] ; then
+	   cp "$BUILDDIR\\$bld_config/Bin/$product" "$INSTALLER/current/$product"
 	   chmod 550 "$INSTALLER/current/$product"
     fi
 done
@@ -291,9 +327,6 @@ cp $WWII_ROOT/Installer/previous/Settings.exe $WWII_ROOT/Installer/current/.
 chmod 550 $WWII_ROOT/Installer/current/.
    
 pause "copy" "Copying" " dlls and libraries"
-
-cp $WWII_ROOT/Installer/previous/libzmq.dll $WWII_ROOT/Installer/current/.
-chmod 440 $WWII_ROOT/Installer/current/.
 
 rsync -auv "$INSTALLER/libs/" "$INSTALLER/current/"
 
@@ -304,10 +337,13 @@ for product in $DATAFILES ; do
 	chmod 440 "$INSTALLER/current/$product"
 done
 
+pause_enabled=true
+
 pause "copy" "Copying" "data directories"
 
 for folder in $DATADIRS ; do
-    mkdir -p "$INSTALLER/current/DATA/$folder"
+    pause "copy" "Copying" "folder $folder"
+    mkdir -p "Installer/current/DATA/$folder"
     rsync -auv --exclude=".DS_Store" "$WW2MODS/DATA/$folder/" "$INSTALLER/current/DATA/$folder/"
 done
 
@@ -321,17 +357,17 @@ for file in WW2.{lib,ilk,exp} Playgate.{pbd,map,ilk} *.tkt *.bat ; do
 done
 popd
 
-pause "create" "Creating" "diff files for patcher"
+if [ "$build_patch" = true ] ; then
+    pause "create" "Creating" "diff files for patcher"
 
-pushd "$INSTALLER"
-./MakeDiffs.bat
-popd
+    pushd "$INSTALLER"
+    ./MakeDiffs.bat
+    popd
 
-pause "build" "Building" "complete running patch install scripts"
-
-iscc "$INSTALLER/release/winrelease/Patch Installer.iss"
+    pause "build" "Building" "complete running patch install scripts"
+    iscc "$INSTALLER/release/winrelease/Patch Installer.iss"
+fi
 
 pause "build" "Building" "complete running full install scripts"
-
 iscc "$INSTALLER/release/winrelease/Full Installer.iss"
 
