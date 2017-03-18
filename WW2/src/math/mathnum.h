@@ -2,7 +2,7 @@
 #define __MATHNUM_H__
 
 #include "pi/pi.h"
-#include "math/Rand.h"
+#include "Rand.h"
 
 #define ABS(x) x < 0 ? -x : x
 

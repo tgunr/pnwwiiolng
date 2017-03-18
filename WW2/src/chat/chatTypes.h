@@ -25,6 +25,12 @@ struct BANDWIDTH_CHANGE
 	UINT32		mode;
 };
 
+struct NETCODE_CHANGE
+{
+	playerid_t	playerID;
+	bool        netcode;
+};
+
 struct BANDWIDTH_NOTICE
 {
 	playerid_t	playerID;

@@ -83,7 +83,7 @@ namespace Chat
 		KICK_NOTICE_Y,
 		CLIENT_LOCALITY_Y,
 		GENERIC_STRING_Y,		// Exchange a string
-		BANDWIDTH_NOTICE_Y,
+		BANDWIDTH_NOTICE_Y,     // VisLimit (um) changed
 		WAYPOINT_H,
 		SIDE_MESSAGE_Y,		// Message to a side [and optional objective]
 		___SPARE_CALLBACK_1___,
@@ -101,6 +101,7 @@ namespace Chat
 		MISSION_INVITE_Y,		// invitation/directive to join a mission
 
 		MAP_REFRESH_PLAYER_Y,	// Chat needs a refresh of a player.
+		NETCODE_NOTICE_Y,		// Netcode enabled value changed
 		MAX_MESSAGE_Y
 	};
 }

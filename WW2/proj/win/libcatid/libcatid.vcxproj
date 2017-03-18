@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="AlphaRelease|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7C64282A-FC3F-4ED0-81D4-3BE1BB67C90F}</ProjectGuid>
+    <RootNamespace>libcatid</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\proj\win\PropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\proj\win\PropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\..\proj\win\PropertySheet.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(LibOutDir)</OutDir>
+    <IntDir>$(IntOutDir)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(LibOutDir)</OutDir>
+    <IntDir>$(IntOutDir)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
+    <OutDir>$(LibOutDir)</OutDir>
+    <IntDir>$(IntOutDir)</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>
+      </SDLCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS=1;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>
+      </SDLCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS=1;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>
+      </SDLCheck>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include</AdditionalIncludeDirectories>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS=1;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\cookie\CookieJar.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\hash\HMAC_MD5.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\hash\Skein.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\hash\Skein256.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\hash\Skein512.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\hash\VHash.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\privatekey\ChaCha.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\rand\EntropyGeneric.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\rand\EntropyLinux.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\rand\EntropyWindows.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\rand\EntropyWindowsCE.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\rand\Fortuna.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\SecureCompare.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\AuthenticatedEncryption.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\EasyHandshake.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\KeyAgreement.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\KeyAgreementInitiator.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\KeyAgreementResponder.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\Keys.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\TunnelTLS.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\hash\Murmur.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\io\Log.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\io\LogThread.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\io\MappedFile.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\io\Settings.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\HashTable.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\LinkedLists.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\RefObject.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\RefSingleton.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\Singleton.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\Strings.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\math\BigMontgomery.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\math\BigPseudoMersenne.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\math\BigRTL.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\math\BigTwistedEdwards.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\math\BitMath.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\mem\AlignedAllocator.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\mem\BufferAllocator.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\mem\IAllocator.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\mem\LargeAllocator.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\mem\StdAllocator.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\parse\Base64.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\parse\BufferTok.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\port\EndianNeutral.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\port\SystemInfo.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\rand\MersenneTwister.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\rand\StdRand.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\threads\Mutex.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\threads\RWLock.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\threads\Thread.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\threads\WaitableFlag.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\threads\WorkerThreads.cpp" />
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\time\Clock.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\cookie\CookieJar.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\hash\HMAC_MD5.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\hash\ICryptHash.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\hash\Skein.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\hash\VHash.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\rand\Fortuna.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\symmetric\ChaCha.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\AuthenticatedEncryption.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\EasyHandshake.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\KeyAgreement.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\KeyAgreementInitiator.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\KeyAgreementResponder.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\Keys.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\TunnelTLS.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\hash\Murmur.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\io\Log.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\io\LogThread.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\io\MappedFile.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\io\Settings.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\Delegates.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\HashTable.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\LinkedLists.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\MergeSort.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\MulticastDelegates.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\RefObject.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\RefSingleton.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\Singleton.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\Strings.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\math\BigMontgomery.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\math\BigPseudoMersenne.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\math\BigRTL.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\math\BigTwistedEdwards.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\math\BitMath.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\AlignedAllocator.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\BufferAllocator.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\IAllocator.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\LargeAllocator.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\ResizableBuffer.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\ReuseAllocator.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\StdAllocator.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\parse\Base64.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\parse\BufferTok.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\port\EndianNeutral.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\port\SystemInfo.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\port\WindowsInclude.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\rand\MersenneTwister.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\rand\StdRand.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\Atomic.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\Mutex.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\RWLock.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\Thread.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\WaitableFlag.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\WorkerThreads.hpp" />
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\time\Clock.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -34,7 +34,8 @@ static const int STEAM_APP_ID = 251950;
 #define PLAYGATE_VERSION 0x01010109
 
 //#define DEFAULT_AUTH_SERVER "auth.playnet.com"
-#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
+//#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
+#define DEFAULT_AUTH_SERVER "192.168.0.109"
 #define DEFAULT_AUTH_PORT WWII::Net::Ports::AuthHost
 
 static void xmlerrorstub (void *ctx, const char *msg, ...) {}

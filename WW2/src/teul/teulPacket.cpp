@@ -161,13 +161,13 @@ Teul::Packet::setPacketCapacityBytes(const UINT32 newCapacityBytes_)
 // Send ready-to-go data to a given teulIndex (looks up endpoint).
 
 SINT32
-Teul::Packet::send(const SINT32 teulIndex_)
+Teul::Packet::send(const SINT32 teulIndex_, const UCHAR protocolPreference)
 {
 	ENDPOINT* endpoint = teulGetEndpoint(teulIndex_);
 	if ( PN_UNLIKELY(endpoint == nullptr) )
 		return -EINVAL;
 
-	return send(*endpoint);
+	return send(*endpoint, protocolPreference);
 }
 
 //////////////////////////////////////////////////////////////////////

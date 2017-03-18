@@ -12,6 +12,7 @@ struct UpdateFraming
 {
 	enum { _SMALL, _MED, _LARGE, _MAX };
 	enum { _MODES = 5 };
+	enum { _QUERY = 255 };
 
 	UINT32	maxVehicles;				//!< Maximum vehicles player can see: total.
 	UINT32	packetSize;				//!< Which packet size to use.

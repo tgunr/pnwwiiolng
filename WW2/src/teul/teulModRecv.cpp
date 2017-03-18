@@ -89,6 +89,8 @@ SINT32 _updatesThisSec = 0;
 //static UINT32 _lastPRecvTotal = 0;
 static UINT32 _lastPXferTotal = 0;
 
+extern IP_ENDPOINT_MAP ipToEndPoint;
+
 #if defined(WINDOWS_VERSION)
 static fd_set 		master_readfs, master_writefs;//, exceptfs;
 static size_t		maxSock;
@@ -382,7 +384,10 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		getsockname(newSock, (sockaddr*)&newEndpoint->localSockAddress, &len);
 		assert( len == SockAddrLen );
 
+		// endpoints created inherit the parents backchannel
+		newEndpoint->m_pairdUdpConn = endpoint.m_pairdUdpConn;
 		newEndpoint->fromSockAddress = endpoint.fromSockAddress;
+
 		// If we only have a partial address, use the local address to fill it out.
 		static const UINT32 netMask = 0x00ffffff;
 		if ( (newEndpoint->fromSockAddress.sin_addr.s_addr & netMask) == 0 )
@@ -393,6 +398,9 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		teulGetAddress(newEndpoint->destAddress(), remoteIP, sizeof(remoteIP));
 		char localIP[32];
 		teulGetAddress(newEndpoint->localAddress(), localIP, sizeof(localIP));
+
+		// Add to IP/endpoint map
+		ipToEndPoint[newEndpoint->destAddress()] = newEndpoint;
 
 		dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET " (li:%" PR64BitUT ")"
 					, endpoint.teulIndex()
@@ -640,13 +648,24 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 			++packets;
 
 			const UINT32 dgramSize = hdr->packetSizeBytes() + Teul::Packet::UnencryptedBytes;
-			assert( (SINT32)dgramSize == (SINT32)rxSize );
+			if (dgramSize == (UINT32)rxSize)
+			{
+				assert((SINT32)dgramSize == (SINT32)rxSize);
 
-			dgram->m_size = dgramSize;
+				dgram->m_size = dgramSize;
 
-			endpoint.m_impl->recvQueue.push_back(dgram);
-//			dbugWrite(_FLI, " pushed %p to %p ", dgram, endpoint.m_impl->recvDataQue);
-			dgram = nullptr;
+				endpoint.m_impl->recvQueue.push_back(dgram);
+				//			dbugWrite(_FLI, " pushed %p to %p ", dgram, endpoint.m_impl->recvDataQue);
+				dgram = nullptr;
+			}
+			else
+			{
+				dbugLog(_FLW, "Received datagram from %s for packet of size %d where the size indicated was %u, ignoring!!!",
+					teulGetAddress(ntohl(dgram->sockAddress.sin_addr.s_addr)),
+					rxSize,
+					dgramSize);
+				break;
+			}
 		}
 
 	}
