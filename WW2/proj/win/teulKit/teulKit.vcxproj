@@ -204,7 +204,7 @@
     <ClCompile Include="..\..\..\src\teul\teulTransport.cpp" />
     <ClCompile Include="..\..\..\src\teul\teulUtils.cpp" />
     <ClCompile Include="..\..\..\src\wwii\wwiiCallbacks.cpp" />
-    <ClCompile Include="..\build_info.cpp" />
+    <ClCompile Include="build_info.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\dbug\dbug.h" />
