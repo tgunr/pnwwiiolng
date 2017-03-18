@@ -286,7 +286,7 @@ if [ "$skip_step" = false ]; then
     fi
     devenv WW2.sln /build $bld_config /out "$BUILDFILE"
 
-    errOutput=`grep ": error" "$BUILDFILE"`
+    errOutput=`grep ": error|: fatal" "$BUILDFILE"`
     if [ -n "$errOutput" ] ; then
         echo $errOutput
         exit_msg="Error: Build failed, see "$BUILDFILE" for errors"
@@ -366,7 +366,7 @@ if [ "$skip_step" = false ]; then
     fi
     devenv WW2.sln /build $bld_config /out "$BUILDFILE"
     
-    errOutput=`grep ": error" "$BUILDFILE"`
+    errOutput=`grep ": error|: fatal" "$BUILDFILE"`
     if [ -n "$errOutput" ] ; then
         echo $errOutput
         exit_msg="Error: Build failed, see "$BUILDFILE" for errors"
