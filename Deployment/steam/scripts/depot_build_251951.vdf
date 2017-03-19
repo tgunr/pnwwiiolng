@@ -8,13 +8,14 @@
 	// will be resolved relative to this root.
 	// If you don't define ContentRoot, then it will be assumed to be
 	// the location of this script file, which probably isn't what you want
-	"ContentRoot"	"D:\MyGame\rel\master\"
+        // frisbone NOTE: Above note seems to be bogus
+	//"ContentRoot"	"..\..\..\Installer\current\"
 
 	// include all files recursivley
   "FileMapping"
   {
   	// This can be a full path, or a path relative to ContentRoot
-    "LocalPath" ".\windows\*"
+    "LocalPath" "*"
     
     // This is a path relative to the install folder of your game
     "DepotPath" "."

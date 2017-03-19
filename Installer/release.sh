@@ -448,3 +448,14 @@ build_step "build" "Building" "complete running full install scripts: "$fname
 if [ "$skip_step" = false ]; then
     iscc "$fname"
 fi
+
+
+#build_step "deploy" "Deploying" "to Steam"
+#if [ "$skip_step" = false ]; then
+#    echo "When prompted to allow steam accesss to the network, enable it please"
+#    pushd "Libraries/SteamSDK/tools/ContentBuilder/builder"
+#    ./steamcmd.exe --help 
+#    popd
+#
+#fi
+
