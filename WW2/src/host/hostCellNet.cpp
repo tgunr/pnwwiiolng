@@ -25,7 +25,9 @@
 #include "host/hostVehicle.h"
 #include "teul/teulBasic.h"
 #include "teul/teulPacket.h"
+#include "teul/teulEndpointDefs.h"
 #include "wwii/wwiiThreads.h"
+#include <execinfo.h>
 
 #include "wwii/wwiiHash.h"
 using SYNCHED_VEHICLES = std::unordered_map<UINT32, bool>;
@@ -105,6 +107,21 @@ hostReceiveVehicleUpdates(unsigned char* const input, const UINT32 bytes, const 
 }
 
 //////////////////////////////////////////////////////////////////////
+// Receive a vehicle list resync request packet 
+
+UINT32
+hostReceiveResyncVehicles(unsigned char* const input, const UINT32 bytes, const UINT32 source)
+{
+	// vehicles present in this list are presumed to be synched, by clearing the list we are telling our host
+	// that they need to resend the full information to other host
+	g_synched.clear();	
+
+	dbugLog(_FLI, "Received resync request from %s", teulGetAddress(source));
+
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////
 // Determine whether a vehicle is in the synched list or not.
 
 bool
@@ -174,6 +191,10 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 	if ( sizeBytes > maxSize )
 		maxSize = sizeBytes;
 
+	// Lets first test to see if we will bust our MTU size if we append this - if so, push out now
+	if ( (vehicleBroadcasts.packetSizeBytes() + sizeBytes) >= static_cast<SINT32>(Teul::MaxMTU))
+		hostPushVehicleBroadcasts();
+
 	// store in the final size
 	teulPackSINT32(TEUL_PACK, buffer, 0, &sizeBytes, 0);
 
@@ -190,11 +211,14 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 		numberOfVehiclesPending);
 #endif
 
-	// disable packaging of multiple vehicles for now and just send them out as we get them
-	// we want to force updates based on how many connections we have.  We might want to put a cap on it too.
-	// 1400 is just under the max MTU size but 35 is about the size of your average veh update
-    UINT32 limitPacketSize = std::min( static_cast<UINT32>(1400),
-		 (static_cast<UINT32>(_userConnections) * 35));
+	// Lets limit our size based on how many connections we have knowing that the average update is about 35 bytes
+	// also - lets do a sanity check on the user connections counter host is tracking
+	int connectionsCounted = 1;
+	if (_userConnections > 0)
+		connectionsCounted = _userConnections;
+	else
+		dbugLog(_FLW, "_userConnections counter is underflowing - currently %d", _userConnections);
+	UINT32 limitPacketSize = static_cast<UINT32>(connectionsCounted) * 35;
 	if ( vehicleBroadcasts.packetSizeBytes() >= limitPacketSize )
 	{
 		hostPushVehicleBroadcasts();
@@ -205,7 +229,7 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 
 //////////////////////////////////////////////////////////////////////
 // Force FIRST_TIME updates for all
-
+// This should be called when a cell hosts starts
 void
 hostForceFirstTimeUpdates()
 {
@@ -213,7 +237,11 @@ hostForceFirstTimeUpdates()
 		return;
 
 	g_synched.clear();
+
+	dbugLog(_FLI, "Host initiating request to RESYNC vehicles to all listening cell hosts");
+
 	Teul::Packet outgoing(Teul::PacketId(Comm::CallbackX, RESYNC_VEHICLES_Y));
+	outgoing.setUnencrypted();
 	outgoing.send(updateBcastSend);
 }
 

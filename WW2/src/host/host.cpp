@@ -137,7 +137,7 @@ UINT32 _stratHost = 0;
 
 static const SINT32 MAX_BUF_VEH_BROADCAST = 256;
 
-SINT32 updateBcastSend = -1, updateBcastRecv = -1;
+SINT32 updateBcastRecv = -1, updateBcastSend = -1;
 
 static UINT32				_personaCounter;
 static UINT32				_vehicleCounter;
@@ -1275,8 +1275,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN )
 		{
-			_userConnections--;
-			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d", teulIndex, error);
+			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d connCount:%d", teulIndex, error, _userConnections);
 			return;
 		}
 		else
@@ -1290,7 +1289,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 		if ( error == ENOTCONN && teulIndex == player->teulIndex() )
 		{
 			_userConnections--;
-			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected", teulIndex, player->playerID(), player->callsign(), player->sortieID());
+			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected, userConn:%d", teulIndex, player->playerID(), player->callsign(), player->sortieID(), _userConnections);
 			player->SetTeulIndex(-1);
 		}
 		else
@@ -3041,7 +3040,7 @@ main(const int argc, const char* argv[])
 	}
 	else if ( updateNet != 0 )
 	{
-        g_clustered = true;
+		g_clustered = true;
         
 		dbugLog(_FLM, "Clustering enabled: Broadcast network %s specified.", cv_baseUpdtAddress.GetString());
 
@@ -3049,9 +3048,7 @@ main(const int argc, const char* argv[])
 		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateCellBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
 		dbugLog(_FLN, "t:%d updateBcastRecv:%s", updateBcastRecv, teulGetAddress(updateBcastHost));
 
-		const UINT32 updateDirectHost = cv_baseUpdtAddress.GetUint32() | (Server::localHost & 0x000000ff);
-		updateBcastSend = teulOpenSend(updateDirectHost, WWII::Net::Ports::PrivateCellBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
-		dbugLog(_FLN, "t:%d updateBcastSend:%s", updateBcastSend, teulGetAddress(updateDirectHost));
+		updateBcastSend = updateBcastRecv;
 	}
 	else
 	{
@@ -3132,6 +3129,9 @@ main(const int argc, const char* argv[])
 		return 0;
 
 	chatSendAdminMessage("cell host #%u %s", Server::localHost & 255, (g_serverReserved ? "*RESERVED*" : "online"));
+
+	// inform other hosts that we are in need of updating
+	hostForceFirstTimeUpdates();
 
 	_runHost();
 
