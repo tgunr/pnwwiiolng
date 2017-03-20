@@ -146,6 +146,26 @@ while [ ! -d "$PREV_RELEASE" ] ; do
     fi
 done
 
+build_steam=false
+steam_user=""
+steam_pwd=""
+
+while [ ! -d "$PREV_RELEASE" ] ; do
+    echo "Standard location for previous build "$PREV_RELEASE" does not exist"
+    echo -n "Please enter the directory containing the previous release (ENTER for none): "
+    read -r HANDLE
+    HANDLE="$HANDLE\\"
+    if [ -z "$HANDLE" ] ; then
+        echo "WARNING: No previous release specified, PC patch will not be built!"
+        build_patch=false 
+	break
+    elif [ ! -r "$HANDLE" ] ; then
+        echo "Invalid directory, '$HANDLE' try again"
+    else
+        PREV_RELEASE="$HANDLE"
+    fi
+done
+
 # make sure the previous release for the patch to apply exists
 if [ "$build_patch" = true ] ; then
     if [ ! -f "$PREV_RELEASE/WW2.exe" ] ; then
@@ -260,6 +280,30 @@ if [ -n "$cleanedfiles" ] ; then
             echo "Resetting ww2mods"
             git -C opt/ww2mods reset --hard HEAD
         fi
+    fi
+fi
+
+read -p "Deploy to Steam when finished? (y|n) :" -n 1 -r
+echo    # (optional) move to a new line
+if [[ $REPLY =~ ^[Yy]$ ]] ; then
+    build_steam=true
+    echo -n "Enter Steam build user name: "
+    read -r steam_user
+    echo    # (optional) move to a new line
+    if [ ! -z "$steam_user" ] ; then
+        echo -n "Enter Steam build password: "
+        read -s steam_pwd
+        echo    # (optional) move to a new line
+
+	echo "Preparing Steam build environment"
+	echo "NOTE: If this is your first time on this computer you may be asked to enter a confirmation code emailed to you!!"
+        pushd "Libraries/SteamSDK/tools/ContentBuilder/builder"
+	./steamcmd.exe +login $steam_user $steam_pwd +quit
+        popd
+	echo "Preparing Steam build environment"
+    else
+	echo "Warning: No user specified, will not deploy to steam"
+	build_steam=false
     fi
 fi
 
@@ -450,12 +494,13 @@ if [ "$skip_step" = false ]; then
 fi
 
 
-#build_step "deploy" "Deploying" "to Steam"
-#if [ "$skip_step" = false ]; then
-#    echo "When prompted to allow steam accesss to the network, enable it please"
-#    pushd "Libraries/SteamSDK/tools/ContentBuilder/builder"
-#    ./steamcmd.exe --help 
-#    popd
-#
-#fi
+if [ "$build_steam" = true ] ; then
+    build_step "deploy" "Deploying" "to Steam"
+    if [ "$skip_step" = false ]; then
+        echo "When prompted to allow steam accesss to the network, enable it please"
+        pushd "Libraries/SteamSDK/tools/ContentBuilder/builder"
+        ./steamcmd.exe +login $steam_user $steam_pwd +run_app_build "../../../../../Deployment/steam/scripts/app_pc_build_251950.vdf" +quit
+        popd
+    fi
+fi
 
