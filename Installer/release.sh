@@ -562,8 +562,6 @@ if [ "$myos" == "win" ] ; then
         done
         popd
     fi
-else
-
 fi
 
 prefix="Release"
