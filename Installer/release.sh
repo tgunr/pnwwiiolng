@@ -99,7 +99,7 @@ myos=""
 if [ "$OSTYPE" == "cygwin" ] ; then
     echo "Detected Windows under cygwin"
     myos="win"
-elif [ "$OSTYPE" == "darwin" ] ; then
+elif [[ "${OSTYPE#*darwin}" != "$OSTYPE" ]] ; then
     echo "Detected OSX"
     echo "WARNING: If Xcode is running it will be terminated before the build starts.  Save any unsaved work!."
     echo "WARNING: DO NOT DO ANYTHING while build is running, especially when DropDMG is running!!!!"
@@ -137,10 +137,10 @@ else
         found_prereq_errors=true
     else
         xcode_version=$(xcodebuild -version)
-        version_rsp=(${gitBranch// / })
+        version_rsp=(${xcode_version// / })
         version_nums=(${version_rsp[1]//\./ })
         if (( version_nums[0] < min_xcode_version_major ))  || (( version_nums[1] < min_xcode_version_minor )); then
-            exit_msg=${exit_msg}'|Xcode version incorrect, update to version $min_xcode_version_major.$min_xcode_version_minor or greater' 
+            exit_msg=${exit_msg}'|Xcode version incorrect, update to version '$min_xcode_version_major'.'$min_xcode_version_minor' or greater' 
             found_prereq_errors=true
         fi
     fi
@@ -214,11 +214,10 @@ if [ "$myos" == "win" ] ; then
     fi
 else
     # check mac specific issues
-
     playgate_version=$(grep -r -m 1 -h 'PLAYGATE_VERSION' WW2/src)
-    pn_elements=(${gitBranch// / })
-    if [ ! "$pn_elements[2]" == "0x01010109" ] ; then
-        exit_msg=$exit_msg'|Playgate version is not correct ($pn_elements[2]) should be 0x01010109, please correct'
+    pn_elements=(${playgate_version// / })
+    if [ ! "${pn_elements[2]}" == "0x01010109" ] ; then
+        exit_msg=$exit_msg'|Playgate version is not correct ('${pn_elements[2]}') should be 0x01010109, please correct'
         found_prereq_errors=true
     fi
 fi
@@ -486,6 +485,7 @@ if [ "$skip_step" = false ]; then
         fi
     fi
 
+    extradefines="$2"
     if [ "$myos" == "win" ] ; then
         BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
         winpath2bash "$BUILDFILE"
@@ -494,6 +494,8 @@ if [ "$skip_step" = false ]; then
         if [ "$isrelease" = true ] ; then
             echo "Cleaning "$bld_config" first"
             devenv WW2.sln /clean $bld_config
+        else
+            SET CL=/D"$extradefines"
         fi
         devenv WW2.sln /build $bld_config /out "$BUILDFILE"
     
@@ -509,7 +511,7 @@ if [ "$skip_step" = false ]; then
             xcodebuild -project WW2/WW2OL.xcodeproj -scheme '$bld_config Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
             codesign='Developer ID Application: Playnet Inc (J63A54QWD2)'
         fi
-        xcodebuild -project WW2/WW2OL.xcodeproj -scheme '$bld_config Client' build PROVISIONING_PROFILE= CODE_SIGN_IDENTITY=$codesign WARNING_CFLAGS=-w
+        xcodebuild -project WW2/WW2OL.xcodeproj -scheme '$bld_config Client' build PROVISIONING_PROFILE= CODE_SIGN_IDENTITY=$codesign WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS $extradefines'
     fi
 fi
 
