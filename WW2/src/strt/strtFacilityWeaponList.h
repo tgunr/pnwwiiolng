@@ -76,12 +76,20 @@ public:
 		, _BDE_DISABLED					// Brigade is disabled by TOE.
 	};
 
+	
 	FacilityWeaponList(UINT32 playerID = 0, const FULL_OBJ_ID fullObjID = nullObjID, FacilityWeaponList::REASON_CODE status=FacilityWeaponList::_INVALID)
 		: m_status(status)
 		, m_playerID(playerID), m_fullObjID(fullObjID)
 		, m_numWeapons(0)
 		, m_refreshSeconds(30)
-		{ }
+		{ 
+#ifdef MULTI_CLIENT
+			//Change the constructor for multiclient
+			status = FacilityWeaponList::_NORMAL;
+			m_status = status;
+#endif
+		}
+
 	FacilityWeaponList(ACTION_OBJECT* const a) : m_status(FacilityWeaponList::_INVALID), m_numWeapons(0) { a->offset = packer(TEUL_UNPACK, a); }
 	~FacilityWeaponList() {}
 

@@ -2384,8 +2384,9 @@ static void weapListClear(FacilityWeaponList* weapList)
 
 bool Client::CellClientActive() const
 {
-	//return _data->cellClientActive;
-	return false; //CellState()->Connected();
+	//return false;		//CellState->Connected();
+	//Check to see if we are connected to a cell
+	return _classdata->connections[Teul::Connection::Cell]->Connected();
 }
 
 bool Client::MapClientActive() const
