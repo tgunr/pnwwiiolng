@@ -377,11 +377,15 @@ mac_product_base_name="World\ War\ II\ Online"
 mac_product_name=$mac_product_base_name
 if [ "$isrelease" = false ] && [ "$myos" == "osx" ] ; then
     echo "Updating CFBundleName and PRODUCT_NAME"
-    mac_product_name=$mac_product_name"\ Beta"
     plutil -replace CFBundleName -string "$mac_product_name"  WW2/proj/mac/Info.plist
-    sedargs='s/'$mac_product_base_name'/'$mac_product_name'/g'
+
+    mac_product_name=$mac_product_name"\ Beta"
     target_file='WW2/WW2OL.xcodeproj/project.pbxproj'
-    sed -i -e "$sedargs" "$target_file"
+    grepresult=$(grep "$mac_product_name" $target_file)
+    if [ ! -n "$grepresult" ] ; then
+        sedargs='s/'$mac_product_base_name'/'$mac_product_name'/g'
+        sed -i -e "$sedargs" "$target_file"
+    fi
     touch WW2Archives/playarc.ww2
 fi
 mac_app_name=$mac_product_name".app"
@@ -408,20 +412,23 @@ if [ "$skip_step" = false ]; then
         fi
     else
         if [ "$isrelease" = true ] ; then
+            echo "Cleaning build"
             xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
         fi
         xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
     fi
 fi
 
+pause_enabled=true
+
 build_step "remove" "Removing" "old .mdl files"
 if [ "$skip_step" = false ]; then
     find "$WW2MODS" -name "*.mdl" -delete
-    cp "$WW2MODS/Launch Files/ww2mods.bat" "$WW2MODS/."
-    chmod 550 "$WW2MODS/ww2mods.bat"
 fi
 
 if [ "$myos" == "win" ] ; then
+    cp "$WW2MODS/Launch Files/ww2mods.bat" "$WW2MODS/."
+    chmod 550 "$WW2MODS/ww2mods.bat"
     build_step "copy" "Copying" "Debug binaries into WW2MODS"
     if [ "$skip_step" = false ]; then
         for product in $PRODUCTS ; do
@@ -444,7 +451,9 @@ if [ "$myos" == "win" ] ; then
     fi
 else
     build_step "build" "Building" "mdl files"
-    open 'WW2/proj/mac/build/$bld_config/$mac_app_name' --args -BuildMDLOnly -data 1 -datadir "$(pwd)/opt/ww2mods/DATA/" -window 1
+    ww2path="WW2/proj/mac/build/$bld_config/$mac_app_name"
+    ww2path=$(echo $ww2path | sed 's/\\//g')
+    open "$ww2path" --args -BuildMDLOnly -data 1 -datadir "$(pwd)/opt/ww2mods/DATA/" -window 1
 fi
 
 mdlfiles=`find "$WW2MODS" -name "*.mdl" -print`
@@ -514,6 +523,7 @@ if [ "$skip_step" = false ]; then
     else
         codesign=''
         if [ "$isrelease" = true ] ; then
+            echo "Cleaning build"
             xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
             codesign='Developer ID Application: Playnet Inc (J63A54QWD2)'
         fi
