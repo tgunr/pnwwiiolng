@@ -308,7 +308,9 @@ if [ -n "$cleanedfiles" ] ; then
     build_step "clean" "Cleaning" "repositories"
     if [ "$skip_step" = false ]; then
         if [ "$clean" = true ] ; then
-            echo $cleanedfiles | sed 's/Would /\nWould /g'
+            #Wickedness below because mac's built in bash sucks
+            nl=$'\n'
+            echo $cleanedfiles | sed "s/ Would/\\${nl}Would/g"
             if [ "$noprompt" = false ]; then
                 read -p "The above files will be affected, please (V)erify to proceed :" -n 1 -r 
                 echo    # (optional) move to a new line
