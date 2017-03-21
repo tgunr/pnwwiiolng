@@ -1680,3 +1680,5 @@ build_info.cpp
 Deployment/database/vendor
 Deployment/database/.env
 
+WW2/src/mc/multiClient - Copy.cpp
+WW2/src/client/ww2Client - Copy.cpp
