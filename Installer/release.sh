@@ -2,7 +2,7 @@
 ################################################################
 # release.sh
 #
-# Supported platforms: Windows
+# Supported platforms: Windows, Mac
 # Supported shells: mobaxterm bash
 #
 # This script will automatically (if enabled) follow the 
@@ -94,20 +94,61 @@ found_prereq_errors=false
 exit_msg=""
 
 isccpath=$(which iscc)
-if [ ! -x "$isccpath" ] ; then
-    exit_msg=${exit_msg}'|Inno setup install directory not in windows path, please add it'
-    found_prereq_errors=true
-fi
 
-devenvpath=$(which devenv)
-if [ ! -x "$devenvpath" ] ; then
-    exit_msg=${exit_msg}'|Microsoft build (devenv) not in windows path, please add it'
-    found_prereq_errors=true
+myos=""
+if [ "$OSTYPE" == "cygwin" ] ; then
+    echo "Detected Windows under cygwin"
+    myos="win"
+elif [ "$OSTYPE" == "darwin" ] ; then
+    echo "Detected OSX"
+    echo "WARNING: If Xcode is running it will be terminated before the build starts.  Save any unsaved work!."
+    echo "WARNING: DO NOT DO ANYTHING while build is running, especially when DropDMG is running!!!!"
+    myos="osx"
+else
+    exit_msg="Unknown OS, make sure you are running this from a bash shell on the Mac, or Mobaxterm on Windows"
+    exit 1
+endif
+
+if [ "$myos" == "win" ] ; then
+    if [ ! -x "$isccpath" ] ; then
+        exit_msg=${exit_msg}'|Inno setup install directory not in windows path, please add it'
+        found_prereq_errors=true
+    fi
+
+    devenvpath=$(which devenv)
+    if [ ! -x "$devenvpath" ] ; then
+        exit_msg=${exit_msg}'|Microsoft build (devenv) not in windows path, please add it'
+        found_prereq_errors=true
+    fi
+
+    gitpath=$(which git)
+    if [ ! -x "$gitpath" ] ; then
+        exit_msg=${exit_msg}'|Git bin directory not in windows path, please add it'
+        found_prereq_errors=true
+    fi
+else
+    min_xcode_version_major=8
+    min_xcode_version_minor=2
+    
+    #validate xcode version
+    xcodepath=$(which xcodebuild)
+    if [ ! -x "$xcodepath" ] ; then
+        exit_msg=${exit_msg}'|XCode is not available, install version $min_xcode_version_major.$min_xcode_version_minor or greater'
+        found_prereq_errors=true
+    else
+        xcode_version=$(xcodebuild -version)
+        version_rsp=(${gitBranch// / })
+        version_nums=(${version_rsp[1]//\./ })
+        if (( version_nums[0] < min_xcode_version_major ))  || (( version_nums[1] < min_xcode_version_minor )); then
+            exit_msg=${exit_msg}'|Xcode version incorrect, update to version $min_xcode_version_major.$min_xcode_version_minor or greater' 
+            found_prereq_errors=true
+        fi
+    fi
 fi
 
 gitpath=$(which git)
 if [ ! -x "$gitpath" ] ; then
-    exit_msg=${exit_msg}'|Git bin directory not in windows path, please add it'
+    exit_msg=${exit_msg}'|Git not found, please install and/or add to path'
     found_prereq_errors=true
 fi
 
@@ -129,42 +170,32 @@ if [ ! -d "WW2Archives" ] ; then
     found_prereq_errors=true
 fi
 
-build_patch=true
-while [ ! -d "$PREV_RELEASE" ] ; do
-    echo "Standard location for previous build "$PREV_RELEASE" does not exist"
-    echo -n "Please enter the directory containing the previous release (ENTER for none): "
-    read -r HANDLE
-    HANDLE="$HANDLE\\"
-    if [ -z "$HANDLE" ] ; then
-        echo "WARNING: No previous release specified, PC patch will not be built!"
-        build_patch=false 
-	break
-    elif [ ! -r "$HANDLE" ] ; then
-        echo "Invalid directory, '$HANDLE' try again"
-    else
-        PREV_RELEASE="$HANDLE"
-    fi
-done
+if [ "$myos" == "win" ] ; then
+    build_patch=true
+
+    while [ ! -d "$PREV_RELEASE" ] ; do
+        echo "Standard location for previous build "$PREV_RELEASE" does not exist"
+        echo -n "Please enter the directory containing the previous release (ENTER for none): "
+        read -r HANDLE
+        HANDLE="$HANDLE\\"
+        if [ -z "$HANDLE" ] ; then
+            echo "WARNING: No previous release specified, PC patch will not be built!"
+            build_patch=false 
+            break
+        elif [ ! -r "$HANDLE" ] ; then
+            echo "Invalid directory, '$HANDLE' try again"
+        else
+            PREV_RELEASE="$HANDLE"
+        fi
+    done
+
+else
+    build_patch=false
+fi
 
 build_steam=false
 steam_user=""
 steam_pwd=""
-
-while [ ! -d "$PREV_RELEASE" ] ; do
-    echo "Standard location for previous build "$PREV_RELEASE" does not exist"
-    echo -n "Please enter the directory containing the previous release (ENTER for none): "
-    read -r HANDLE
-    HANDLE="$HANDLE\\"
-    if [ -z "$HANDLE" ] ; then
-        echo "WARNING: No previous release specified, PC patch will not be built!"
-        build_patch=false 
-	break
-    elif [ ! -r "$HANDLE" ] ; then
-        echo "Invalid directory, '$HANDLE' try again"
-    else
-        PREV_RELEASE="$HANDLE"
-    fi
-done
 
 # make sure the previous release for the patch to apply exists
 if [ "$build_patch" = true ] ; then
@@ -174,12 +205,24 @@ if [ "$build_patch" = true ] ; then
     fi
 fi
 
-# make sure visual studio isn't running
-vsProc=`ps -W | grep devenv`
-if [ -n "$vsProc" ] ; then
-    exit_msg=$exit_msg'Visual studio cannot be running when starting the build, please close all instances'
-    found_prereq_errors=true
+if [ "$myos" == "win" ] ; then
+    # make sure visual studio isn't running
+    vsProc=`ps -W | grep devenv`
+    if [ -n "$vsProc" ] ; then
+        exit_msg=$exit_msg'|Visual studio cannot be running when starting the build, please close all instances'
+        found_prereq_errors=true
+    fi
+else
+    # check mac specific issues
+
+    playgate_version=$(grep -r -m 1 -h 'PLAYGATE_VERSION' WW2/src)
+    pn_elements=(${gitBranch// / })
+    if [ ! "$pn_elements[2]" == "0x01010109" ] ; then
+        exit_msg=$exit_msg'|Playgate version is not correct ($pn_elements[2]) should be 0x01010109, please correct'
+        found_prereq_errors=true
+    fi
 fi
+
 
 if [ "$found_prereq_errors" = true ] ; then
     exit 1
@@ -230,6 +273,10 @@ else
 fi
 
 build_step "test" "Testing" "repositories"
+
+if [ "$myos" == "osx" ] ; then
+    osascript -e 'tell app "Xcode" to quit'
+fi
 
 cleanedfiles=`git clean -d -x -n --exclude="Installer/release.sh" && git -C opt/ww2mods clean -d -x -n`
 if [ -n "$cleanedfiles" ] ; then
@@ -297,9 +344,15 @@ if [[ $REPLY =~ ^[Yy]$ ]] ; then
 
 	echo "Preparing Steam build environment"
 	echo "NOTE: If this is your first time on this computer you may be asked to enter a confirmation code emailed to you!!"
-        pushd "Libraries/SteamSDK/tools/ContentBuilder/builder"
-	./steamcmd.exe +login $steam_user $steam_pwd +quit
-        popd
+        if [ "$myos" == "win" ] ; then
+            pushd "Libraries/SteamSDK/tools/ContentBuilder/builder"
+    	    ./steamcmd.exe +login $steam_user $steam_pwd +quit
+            popd
+        else
+            pushd "Libraries/SteamSDK/tools/ContentBuilder/builder_osx"
+    	    ./steamcmd.sh +login $steam_user $steam_pwd +quit
+            popd
+        fi
 	echo "Preparing Steam build environment"
     else
 	echo "Warning: No user specified, will not deploy to steam"
@@ -317,39 +370,43 @@ fi
 
 echo "TODO: libxml prebuild"
 
+mac_product_base_name="World War II Online"
+mac_product_name=$mac_product_base_name
+if [ "$isrelease" = false ] && [ "$myos" == "osx" ] ; then
+    echo "Updating CFBundleName and PRODUCT_NAME"
+    mac_product_name=$mac_product_name" Beta"
+    plutil -replace CFBundleName -string "$mac_product_name"  WW2/proj/mac/Info.plist
+    sed -i -e 's/"$mac_product_base_name"/"$mac_product_name"/g' WW2/WW2OL.xcodeproj/project.pbxproj 
+    touch WW2Archives/playarc.ww2
+fi
+mac_app_name=$mac_product_name".app"
+
 build_step "build" "Building" "debug version"
 if [ "$skip_step" = false ]; then
     bld_config="Debug"
-    BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
-    winpath2bash "$BUILDFILE"
-    rm "$bashpath"
-    echo "writing output to: "$BUILDFILE
-    if [ "$isrelease" = true ] ; then
-        echo "Cleaning "$bld_config" first"
-        devenv WW2.sln /clean $bld_config
+    if [ "$myos" == "win" ] ; then
+        BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
+        winpath2bash "$BUILDFILE"
+        rm "$bashpath"
+        echo "writing output to: "$BUILDFILE
+        if [ "$isrelease" = true ] ; then
+            echo "Cleaning "$bld_config" first"
+            devenv WW2.sln /clean $bld_config
+        fi
+        devenv WW2.sln /build $bld_config /out "$BUILDFILE"
+
+        errOutput=`grep ": error|: fatal" "$BUILDFILE"`
+        if [ -n "$errOutput" ] ; then
+            echo $errOutput
+            exit_msg="Error: Build failed, see "$BUILDFILE" for errors"
+            exit 1
+        fi
+    else
+        if [ "$isrelease" = true ] ; then
+            xcodebuild -project WW2/WW2OL.xcodeproj -scheme '$bld_config Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
+        fi
+        xcodebuild -project WW2/WW2OL.xcodeproj -scheme '$bld_config Client' build PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
     fi
-    devenv WW2.sln /build $bld_config /out "$BUILDFILE"
-
-    errOutput=`grep ": error|: fatal" "$BUILDFILE"`
-    if [ -n "$errOutput" ] ; then
-        echo $errOutput
-        exit_msg="Error: Build failed, see "$BUILDFILE" for errors"
-        exit 1
-    fi
-fi
-
-build_step "copy" "Copying" "Debug binaries into WW2MODS"
-if [ "$skip_step" = false ]; then
-    for product in $PRODUCTS ; do
-        cp "$DEBUGDIR/$product" "$WW2MODS/$product"
-        chmod 550 "$WW2MODS/$product"
-    done
-fi
-
-# Copy 3rd party libraries into WW2MODS
-build_step "copy" "Copying" "3rd party libs into WW2MODS"
-if [ "$skip_step" = false ]; then
-    rsync -au "$LIBDIR/" "$WW2MODS/"
 fi
 
 build_step "remove" "Removing" "old .mdl files"
@@ -359,28 +416,52 @@ if [ "$skip_step" = false ]; then
     chmod 550 "$WW2MODS/ww2mods.bat"
 fi
 
-build_step "build" "Building" "mdl files"
-if [ "$skip_step" = false ]; then
-    pushd "$WW2MODS"
-    ./ww2mods.bat
-    popd
-
-    mdlfiles=`find "$WW2MODS" -name "*.mdl" -print`
-    if [ -n "$mdlfiles" ] ; then
-        exit_msg="Error: Failed to build .mdl files, build aborted"
-        exit 1
+if [ "$myos" == "win" ] ; then
+    build_step "copy" "Copying" "Debug binaries into WW2MODS"
+    if [ "$skip_step" = false ]; then
+        for product in $PRODUCTS ; do
+            cp "$DEBUGDIR/$product" "$WW2MODS/$product"
+            chmod 550 "$WW2MODS/$product"
+        done
     fi
+
+    # Copy 3rd party libraries into WW2MODS
+    build_step "copy" "Copying" "3rd party libs into WW2MODS"
+    if [ "$skip_step" = false ]; then
+        rsync -au "$LIBDIR/" "$WW2MODS/"
+    fi
+
+    build_step "build" "Building" "mdl files"
+    if [ "$skip_step" = false ]; then
+        pushd "$WW2MODS"
+        ./ww2mods.bat
+        popd
+    fi
+else
+    build_step "build" "Building" "mdl files"
+    open 'WW2/proj/mac/build/$bld_config/$mac_app_name' --args -BuildMDLOnly -data 1 -datadir "$(pwd)/opt/ww2mods/DATA/" -window 1
+fi
+
+mdlfiles=`find "$WW2MODS" -name "*.mdl" -print`
+if [ -n "$mdlfiles" ] ; then
+    exit_msg="Error: Failed to build .mdl files, build aborted"
+    exit 1
 fi
 
 build_step "build" "Building" "archive (.ww2) files"
 if [ "$skip_step" = false ]; then
 
-    "$WWII_ROOT/Tools/PlayBuilder/run.bat"
+    if [ "$myos" == "win" ] ; then
+        "$WWII_ROOT/Tools/PlayBuilder/run.bat"
 
-    # remove the empty archive file
-    rm -f WW2Archives/playarc11.ww2
-    echo
-    echo
+        # remove the empty archive file
+        rm -f WW2Archives/playarc11.ww2
+        echo
+        echo
+    else
+        xcodebuild -project Tools/archivetools/playbuilder.xcodeproj -scheme 'playbuilder Release' clean build
+        Tools/archivetools/build/Release/playbuilder --verbose opt/ww2mods/DATA WW2Archives
+    fi
 fi
 
 build_step "copy" "Copying" "product files"
@@ -397,74 +478,92 @@ if [ "$skip_step" = false ]; then
     if [ "$isrelease" = true ] ; then
         bld_config="Release"
     else
-        bld_config="BetaRelease"
+        if [ "$myos" == "win" ] ; then
+            bld_config="BetaRelease"
+        else
+            # NOTE: TODO - we should have a BetaRelease scheme on Mac side
+            bld_config="Release"
+        fi
     fi
 
-    BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
-    winpath2bash "$BUILDFILE"
-    rm "$bashpath"
-    echo "writing output to: "$BUILDFILE
-    if [ "$isrelease" = true ] ; then
-        echo "Cleaning "$bld_config" first"
-        devenv WW2.sln /clean $bld_config
-    fi
-    devenv WW2.sln /build $bld_config /out "$BUILDFILE"
+    if [ "$myos" == "win" ] ; then
+        BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
+        winpath2bash "$BUILDFILE"
+        rm "$bashpath"
+        echo "writing output to: "$BUILDFILE
+        if [ "$isrelease" = true ] ; then
+            echo "Cleaning "$bld_config" first"
+            devenv WW2.sln /clean $bld_config
+        fi
+        devenv WW2.sln /build $bld_config /out "$BUILDFILE"
     
-    errOutput=`grep ": error|: fatal" "$BUILDFILE"`
-    if [ -n "$errOutput" ] ; then
-        echo $errOutput
-        exit_msg="Error: Build failed, see "$BUILDFILE" for errors"
-        exit 1
+        errOutput=`grep ": error|: fatal" "$BUILDFILE"`
+        if [ -n "$errOutput" ] ; then
+            echo $errOutput
+            exit_msg="Error: Build failed, see "$BUILDFILE" for errors"
+            exit 1
+        fi
+    else
+        codesign=''
+        if [ "$isrelease" = true ] ; then
+            xcodebuild -project WW2/WW2OL.xcodeproj -scheme '$bld_config Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
+            codesign='Developer ID Application: Playnet Inc (J63A54QWD2)'
+        fi
+        xcodebuild -project WW2/WW2OL.xcodeproj -scheme '$bld_config Client' build PROVISIONING_PROFILE= CODE_SIGN_IDENTITY=$codesign WARNING_CFLAGS=-w
     fi
 fi
 
-build_step "copy" "Copying" "executable products"
-if [ "$skip_step" = false ]; then
+if [ "$myos" == "win" ] ; then
+    build_step "copy" "Copying" "executable products"
+    if [ "$skip_step" = false ]; then
 
-    # Copy executables over
-    for product in $PRODUCTS ; do
-        srcfile="$WWII_ROOT/build/client/$bld_config/Bin/$product"
-        dstfile="$INSTALLER/current/$product"
-        echo "Copying $srcfile to $dstfile"
-        cp $srcfile $dstfile
-        echo "Setting perms on $dstfile"
-        chmod 550 $dstfile
-    done
-    cp $WWII_ROOT/Installer/previous/Settings.exe $WWII_ROOT/Installer/current/.
-    chmod 550 $WWII_ROOT/Installer/current/.
-fi
+        # Copy executables over
+        for product in $PRODUCTS ; do
+            srcfile="$WWII_ROOT/build/client/$bld_config/Bin/$product"
+            dstfile="$INSTALLER/current/$product"
+            echo "Copying $srcfile to $dstfile"
+            cp $srcfile $dstfile
+            echo "Setting perms on $dstfile"
+            chmod 550 $dstfile
+        done
+        cp $WWII_ROOT/Installer/previous/Settings.exe $WWII_ROOT/Installer/current/.
+        chmod 550 $WWII_ROOT/Installer/current/.
+    fi
 
-build_step "copy" "Copying" " dlls and libraries"
-if [ "$skip_step" = false ]; then
-    rsync -auv "$INSTALLER/libs/" "$INSTALLER/current/"
-fi
+    build_step "copy" "Copying" " dlls and libraries"
+    if [ "$skip_step" = false ]; then
+        rsync -auv "$INSTALLER/libs/" "$INSTALLER/current/"
+    fi
 
-build_step "copy" "Copying" "WW2MODS datafiles datafiles"
-if [ "$skip_step" = false ]; then
-    for product in $DATAFILES ; do
-        cp "$WW2MODS/$product" "$INSTALLER/current/$product"
-        chmod 440 "$INSTALLER/current/$product"
-    done
-fi
+    build_step "copy" "Copying" "WW2MODS datafiles datafiles"
+    if [ "$skip_step" = false ]; then
+        for product in $DATAFILES ; do
+            cp "$WW2MODS/$product" "$INSTALLER/current/$product"
+            chmod 440 "$INSTALLER/current/$product"
+        done
+    fi
 
-build_step "copy" "Copying" "data directories"
-if [ "$skip_step" = false ]; then
-    for folder in $DATADIRS ; do
-        mkdir -p "Installer/current/DATA/$folder"
-        rsync -auv --exclude=".DS_Store" "$WW2MODS/DATA/$folder/" "$INSTALLER/current/DATA/$folder/"
-    done
-fi
+    build_step "copy" "Copying" "data directories"
+    if [ "$skip_step" = false ]; then
+        for folder in $DATADIRS ; do
+            mkdir -p "Installer/current/DATA/$folder"
+            rsync -auv --exclude=".DS_Store" "$WW2MODS/DATA/$folder/" "$INSTALLER/current/DATA/$folder/"
+        done
+    fi
 
-build_step "prune" "Pruning" "unwanted files"
-if [ "$skip_step" = false ]; then
+    build_step "prune" "Pruning" "unwanted files"
+    if [ "$skip_step" = false ]; then
 
-    pushd "$INSTALLER/current"
-    for file in WW2.{lib,ilk,exp} Playgate.{pbd,map,ilk} *.tkt *.bat ; do
-        if [[ -e "$file" ]] ; then
-            rm "$file"
-	fi
-    done
-    popd
+        pushd "$INSTALLER/current"
+        for file in WW2.{lib,ilk,exp} Playgate.{pbd,map,ilk} *.tkt *.bat ; do
+            if [[ -e "$file" ]] ; then
+                rm "$file"
+            fi
+        done
+        popd
+    fi
+else
+
 fi
 
 prefix="Release"
@@ -472,35 +571,51 @@ if [ "$isrelease" = false ] ; then
     prefix="Beta"
 fi
 
-if [ "$build_patch" = true ] ; then
-    build_step "create" "Creating" "diff files for patcher"
-    if [ "$skip_step" = false ]; then
-        pushd "$INSTALLER"
-        ./MakeDiffs.bat
-        popd
+if [ "$myos" == "win" ] ; then
+    if [ "$build_patch" = true ] ; then
+        build_step "create" "Creating" "diff files for patcher"
+        if [ "$skip_step" = false ]; then
+            pushd "$INSTALLER"
+            ./MakeDiffs.bat
+            popd
+        fi
+
+        fname="Installer/$prefix - Patch.iss"
+        build_step "build" "Building" "complete running patch install scripts: "$fname
+        if [ "$skip_step" = false ]; then
+            iscc "$fname"
+        fi
     fi
 
-    fname="Installer/$prefix - Patch.iss"
-    build_step "build" "Building" "complete running patch install scripts: "$fname
+    fname="Installer/$prefix - FullInstall.iss"
+    build_step "build" "Building" "complete running full install scripts: "$fname
     if [ "$skip_step" = false ]; then
         iscc "$fname"
     fi
+else
+    pushd "WW2/proj/mac/WW2 Release Items/DropDMG"
+    open ./DropDMG.zip
+    popd
+    mkdir -p "$HOME/Library/Application Support/DropDMG/"{Configurations,Layouts}
+    cp 'WW2/proj/mac/WW2 Release Items/DropDMG/Configurations/ww2.plist' "$HOME/Library/Application Support/DropDMG/Configurations"
+    cp -r 'WW2/proj/mac/WW2 Release Items/DropDMG/Layouts/ww2' "$HOME/Library/Application Support/DropDMG/Layouts"
+    plutil -replace 'content.options.destinationFolder' -string "$( pwd )/Installer/release/macrelease" "$HOME/Library/Application Support/DropDMG/Configurations/ww2.plist"
+    'WW2/proj/mac/WW2 Release Items/DropDMG/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg' --config-name ww2 'WW2/proj/mac/build/$bld_config/$mac_app_name'
 fi
-
-fname="Installer/$prefix - FullInstall.iss"
-build_step "build" "Building" "complete running full install scripts: "$fname
-if [ "$skip_step" = false ]; then
-    iscc "$fname"
-fi
-
 
 if [ "$build_steam" = true ] ; then
     build_step "deploy" "Deploying" "to Steam"
     if [ "$skip_step" = false ]; then
         echo "When prompted to allow steam accesss to the network, enable it please"
-        pushd "Libraries/SteamSDK/tools/ContentBuilder/builder"
-        ./steamcmd.exe +login $steam_user $steam_pwd +run_app_build "../../../../../Deployment/steam/scripts/app_pc_build_251950.vdf" +quit
-        popd
+        if [ "$myos" == "win" ] ; then
+            pushd "Libraries/SteamSDK/tools/ContentBuilder/builder"
+            ./steamcmd.exe +login $steam_user $steam_pwd +run_app_build "../../../../../Deployment/steam/scripts/app_pc_build_251950.vdf" +quit
+            popd
+        else
+            pushd "Libraries/SteamSDK/tools/ContentBuilder/builder_osx"
+            ./steamcmd.sh +login $steam_user $steam_pwd +run_app_build "../../../../../Deployment/steam/scripts/app_mac_build_251950.vdf" +quit
+            popd
+        fi
     fi
 fi
 
