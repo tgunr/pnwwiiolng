@@ -554,31 +554,6 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    // This sequence depends on certain implementation details of the
-    // BITCrashManager - in particular, that report metadata is processed
-    // synchronously during -startManager, that -userIDForHockeyManager is
-    // only called once per crash report, and only one crash report will be
-    // freshly processed at a time (versus needing to be sent). If these
-    // preconditions are violated (likely due to implementation changes in the
-    // SDK), the provided username of the player (if any) may be inaccurate.
-    // Not much of a big deal, is it?
-    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"97d81f56ff22d04ccdbc1a0d537e81c0" delegate:self];
-#ifdef DEBUG_WW2
-    [BITHockeyManager sharedHockeyManager].logLevel = BITLogLevelDebug;
-#endif
-    [BITHockeyManager sharedHockeyManager].disableFeedbackManager = YES;
-    [BITHockeyManager sharedHockeyManager].crashManager.autoSubmitCrashReport = YES;
-    [[BITHockeyManager sharedHockeyManager] startManager];
-    // This should no longer be needed, so try to maintain the "not logged in
-    // yet" state if we should crash before the next login.
-    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
-    
-#ifdef DEBUG_WW2
-    dbugInit(LogMode::TO_FILE, nullptr);
-#else
-    dbugInit(LogMode::OFF, nullptr);
-#endif
-
     // Wipe out any storage of insecure user info.
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserName"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserPassword"];
@@ -596,20 +571,6 @@ extern NSString *WebActionOriginalURLKey;
         sysmainAddArchives();
     }
     
-    if (SteamAPI_RestartAppIfNecessary(STEAM_APP_ID))
-        // abort
-        [NSApp terminate:self];
-    
-    if (SteamAPI_Init()) {
-        
-        if (SteamApps()->BIsAppInstalled(STEAM_APP_ID)) {
-            if (SteamApps()->BIsSubscribedApp(STEAM_APP_ID)) {
-                steamID = SteamApps()->GetAppOwner().GetAccountID();
-            }
-        }
-            
-    }
-    
     cfgPrefsLoad();
     
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
@@ -624,6 +585,46 @@ extern NSString *WebActionOriginalURLKey;
         return;
     }
 #endif
+    
+    //if (SteamAPI_RestartAppIfNecessary(STEAM_APP_ID))
+    // abort
+    //    [NSApp terminate:self];
+    
+    if (SteamAPI_Init()) {
+        
+        if (SteamApps()->BIsAppInstalled(STEAM_APP_ID)) {
+            if (SteamApps()->BIsSubscribedApp(STEAM_APP_ID)) {
+                steamID = SteamApps()->GetAppOwner().GetAccountID();
+            }
+        }
+        
+    }
+    
+    // This sequence depends on certain implementation details of the
+    // BITCrashManager - in particular, that report metadata is processed
+    // synchronously during -startManager, that -userIDForHockeyManager is
+    // only called once per crash report, and only one crash report will be
+    // freshly processed at a time (versus needing to be sent). If these
+    // preconditions are violated (likely due to implementation changes in the
+    // SDK), the provided username of the player (if any) may be inaccurate.
+    // Not much of a big deal, is it?
+    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"97d81f56ff22d04ccdbc1a0d537e81c0" delegate:self];
+#ifdef DEBUG_WW2
+    [BITHockeyManager sharedHockeyManager].logLevel = BITLogLevelDebug;
+#endif
+    [BITHockeyManager sharedHockeyManager].disableFeedbackManager = YES;
+    [BITHockeyManager sharedHockeyManager].crashManager.autoSubmitCrashReport = YES;
+    [[BITHockeyManager sharedHockeyManager] startManager];
+    
+#ifdef DEBUG_WW2
+    dbugInit(LogMode::TO_FILE, nullptr);
+#else
+    dbugInit(LogMode::OFF, nullptr);
+#endif
+    
+    // This should no longer be needed, so try to maintain the "not logged in
+    // yet" state if we should crash before the next login.
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
     
     //  g_buildTerrain = 1;
     
