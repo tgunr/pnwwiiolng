@@ -8,13 +8,13 @@
 	// will be resolved relative to this root.
 	// If you don't define ContentRoot, then it will be assumed to be
 	// the location of this script file, which probably isn't what you want
-	"ContentRoot"	"D:\MyGame\rel\master\"
+	//"ContentRoot"	"D:\MyGame\rel\master\"
 
 	// include all files recursivley
   "FileMapping"
   {
   	// This can be a full path, or a path relative to ContentRoot
-    "LocalPath" ".\osx\*"
+    "LocalPath" "*"
     
     // This is a path relative to the install folder of your game
     "DepotPath" "."
@@ -27,5 +27,5 @@
 
 	// but exclude all symbol files  
 	// This can be a full path, or a path relative to ContentRoot
-  "FileExclusion" "*.pdb"
+  "FileExclusion" "*.dSYM "*.a" "omggen"
 }
