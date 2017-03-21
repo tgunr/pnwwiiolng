@@ -107,7 +107,7 @@ elif [ "$OSTYPE" == "darwin" ] ; then
 else
     exit_msg="Unknown OS, make sure you are running this from a bash shell on the Mac, or Mobaxterm on Windows"
     exit 1
-endif
+fi
 
 if [ "$myos" == "win" ] ; then
     if [ ! -x "$isccpath" ] ; then
