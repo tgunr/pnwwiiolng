@@ -423,7 +423,9 @@ pause_enabled=true
 
 build_step "remove" "Removing" "old .mdl files"
 if [ "$skip_step" = false ]; then
-    find "$WW2MODS" -name "*.mdl" -delete
+    if [ "$isrelease" = true ] ; then
+        find "$WW2MODS" -name "*.mdl" -delete
+    fi
 fi
 
 if [ "$myos" == "win" ] ; then
@@ -453,11 +455,11 @@ else
     build_step "build" "Building" "mdl files"
     ww2path="WW2/proj/mac/build/$bld_config/$mac_app_name"
     ww2path=$(echo $ww2path | sed 's/\\//g')
-    open "$ww2path" --args -BuildMDLOnly -data 1 -datadir "$(pwd)/opt/ww2mods/DATA/" -window 1
+    open -W "$ww2path" --args -BuildMDLOnly -data 1 -datadir "$(pwd)/opt/ww2mods/DATA/" -window 1
 fi
 
-mdlfiles=`find "$WW2MODS" -name "*.mdl" -print`
-if [ -n "$mdlfiles" ] ; then
+mdlfiles=`find opt/ww2mods -name "*.mdl" -print`
+if [ ! -n "$mdlfiles" ] ; then
     exit_msg="Error: Failed to build .mdl files, build aborted"
     exit 1
 fi
@@ -473,16 +475,18 @@ if [ "$skip_step" = false ]; then
         echo
         echo
     else
-        xcodebuild -project Tools/archivetools/playbuilder.xcodeproj -scheme 'playbuilder Release' clean build
-        Tools/archivetools/build/Release/playbuilder --verbose opt/ww2mods/DATA WW2Archives
+        xcodebuild -project archivetools/playbuilder.xcodeproj -scheme 'playbuilder Release' clean build
+        archivetools/build/Release/playbuilder --verbose opt/ww2mods/DATA WW2Archives
     fi
 fi
 
-build_step "copy" "Copying" "product files"
-if [ "$skip_step" = false ]; then
+if [ "$myos" == "win" ] ; then
+    build_step "copy" "Copying" "production files to installer directory"
+    if [ "$skip_step" = false ]; then
 
-    ### Copy build products to Installer
-    find "$WW2ARCHIVES" -path "*/.sync" -prune -o -name "*.ww2" -print -exec cp {} "$INSTALLER/current/" \;
+        ### Copy build products to Installer
+        find "$WW2ARCHIVES" -path "*/.sync" -prune -o -name "*.ww2" -print -exec cp {} "$INSTALLER/current/" \;
+    fi
 fi
 
 build_step "build" "Building" "release version"
@@ -609,6 +613,7 @@ if [ "$myos" == "win" ] ; then
         iscc "$fname"
     fi
 else
+    build_step "create" "Creating" "dmg file"
     pushd "WW2/proj/mac/WW2 Release Items/DropDMG"
     open ./DropDMG.zip
     popd
@@ -616,7 +621,9 @@ else
     cp 'WW2/proj/mac/WW2 Release Items/DropDMG/Configurations/ww2.plist' "$HOME/Library/Application Support/DropDMG/Configurations"
     cp -r 'WW2/proj/mac/WW2 Release Items/DropDMG/Layouts/ww2' "$HOME/Library/Application Support/DropDMG/Layouts"
     plutil -replace 'content.options.destinationFolder' -string "$( pwd )/Installer/release/macrelease" "$HOME/Library/Application Support/DropDMG/Configurations/ww2.plist"
-    'WW2/proj/mac/WW2 Release Items/DropDMG/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg' --config-name ww2 'WW2/proj/mac/build/$bld_config/$mac_app_name'
+    app_path='WW2/proj/mac/build/'$bld_config'/'$mac_app_name
+    app_path=$(echo $app_path | sed 's/\\//g')
+    WW2/proj/mac/WW2\ Release\ Items/DropDMG/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg --config-name ww2 "$app_path"
 fi
 
 if [ "$build_steam" = true ] ; then
