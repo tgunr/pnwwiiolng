@@ -33,7 +33,9 @@ static const int STEAM_APP_ID = 251950;
 
 #define PLAYGATE_VERSION 0x01010109
 
-#ifndef DEFAULT_AUTH_SERVER
+#ifdef AUTH_OVERRIDE
+#define DEFAULT_AUTH_SERVER "AUTH_OVERRIDE"
+#else
 
 #if defined(BETA_RELEASE)
 #define DEFAULT_AUTH_SERVER "authdev.playnet.com"
