@@ -419,8 +419,6 @@ if [ "$skip_step" = false ]; then
     fi
 fi
 
-pause_enabled=true
-
 build_step "remove" "Removing" "old .mdl files"
 if [ "$skip_step" = false ]; then
     if [ "$isrelease" = true ] ; then
@@ -615,7 +613,7 @@ if [ "$myos" == "win" ] ; then
 else
     build_step "create" "Creating" "dmg file"
     pushd "WW2/proj/mac/WW2 Release Items/DropDMG"
-    open ./DropDMG.zip
+    unzip -o DropDMG.zip
     popd
     mkdir -p "$HOME/Library/Application Support/DropDMG/"{Configurations,Layouts}
     cp 'WW2/proj/mac/WW2 Release Items/DropDMG/Configurations/ww2.plist' "$HOME/Library/Application Support/DropDMG/Configurations"

@@ -27,5 +27,7 @@
 
 	// but exclude all symbol files  
 	// This can be a full path, or a path relative to ContentRoot
-  "FileExclusion" "*.dSYM "*.a" "omggen"
+  "FileExclusion" "*.dSYM"
+  "FileExclusion" "*.a"
+  "FileExclusion" "omggen"
 }
