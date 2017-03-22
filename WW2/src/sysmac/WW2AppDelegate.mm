@@ -588,11 +588,13 @@ extern NSString *WebActionOriginalURLKey;
     }
 #endif
     
-    //if (SteamAPI_RestartAppIfNecessary(STEAM_APP_ID))
+#ifndef DEBUG_WW2
+    if (SteamAPI_RestartAppIfNecessary(STEAM_APP_ID))
     // abort
-    //    [NSApp terminate:self];
+        [NSApp terminate:self];
+#endif
     
-    if (SteamAPI_Init()) {
+    if ( SteamAPI_Init() ) {
         
         if (SteamApps()->BIsAppInstalled(STEAM_APP_ID)) {
             if (SteamApps()->BIsSubscribedApp(STEAM_APP_ID)) {
