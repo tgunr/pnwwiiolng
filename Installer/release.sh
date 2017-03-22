@@ -390,9 +390,9 @@ if [ "$isrelease" = false ] && [ "$myos" == "osx" ] ; then
 fi
 mac_app_name=$mac_product_name".app"
 
+bld_config="Debug"
 build_step "build" "Building" "debug version"
 if [ "$skip_step" = false ]; then
-    bld_config="Debug"
     if [ "$myos" == "win" ] ; then
         BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
         winpath2bash "$BUILDFILE"
