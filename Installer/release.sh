@@ -487,21 +487,22 @@ if [ "$myos" == "win" ] ; then
     fi
 fi
 
+# If not tagged as official release then we want beta
+if [ "$isrelease" = true ] ; then
+    bld_config="Release"
+    bld_config_dir=$bld_config
+else
+    if [ "$myos" == "win" ] ; then
+        bld_config="BetaRelease"
+        bld_config_dir=$bld_config
+    else
+        bld_config="Dev"
+        bld_config_dir="Development"
+    fi
+fi
+
 build_step "build" "Building" "release version"
 if [ "$skip_step" = false ]; then
-
-    # If not tagged as official release then we want beta
-    if [ "$isrelease" = true ] ; then
-        bld_config="Release"
-    else
-        if [ "$myos" == "win" ] ; then
-            bld_config="BetaRelease"
-            bld_config_dir=$bld_config
-        else
-            bld_config="Dev"
-            bld_config_dir="Development"
-        fi
-    fi
 
     extradefines="$2"
     if [ "$myos" == "win" ] ; then
@@ -613,16 +614,18 @@ if [ "$myos" == "win" ] ; then
     fi
 else
     build_step "create" "Creating" "dmg file"
-    pushd "WW2/proj/mac/WW2 Release Items/DropDMG"
-    unzip -o DropDMG.zip
-    popd
-    mkdir -p "$HOME/Library/Application Support/DropDMG/"{Configurations,Layouts}
-    cp 'WW2/proj/mac/WW2 Release Items/DropDMG/Configurations/ww2.plist' "$HOME/Library/Application Support/DropDMG/Configurations"
-    cp -r 'WW2/proj/mac/WW2 Release Items/DropDMG/Layouts/ww2' "$HOME/Library/Application Support/DropDMG/Layouts"
-    plutil -replace 'content.options.destinationFolder' -string "$( pwd )/Installer/release/macrelease" "$HOME/Library/Application Support/DropDMG/Configurations/ww2.plist"
-    app_path='WW2/proj/mac/build/'$bld_config_dir'/'$mac_app_name
-    app_path=$(echo $app_path | sed 's/\\//g')
-    WW2/proj/mac/WW2\ Release\ Items/DropDMG/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg --config-name ww2 "$app_path"
+    if [ "$skip_step" = false ]; then
+        pushd "WW2/proj/mac/WW2 Release Items/DropDMG"
+        unzip -o DropDMG.zip
+        popd
+        mkdir -p "$HOME/Library/Application Support/DropDMG/"{Configurations,Layouts}
+        cp 'WW2/proj/mac/WW2 Release Items/DropDMG/Configurations/ww2.plist' "$HOME/Library/Application Support/DropDMG/Configurations"
+        cp -r 'WW2/proj/mac/WW2 Release Items/DropDMG/Layouts/ww2' "$HOME/Library/Application Support/DropDMG/Layouts"
+        plutil -replace 'content.options.destinationFolder' -string "$( pwd )/Installer/release/macrelease" "$HOME/Library/Application Support/DropDMG/Configurations/ww2.plist"
+        app_path='WW2/proj/mac/build/'$bld_config_dir'/'$mac_app_name
+        app_path=$(echo $app_path | sed 's/\\//g')
+        WW2/proj/mac/WW2\ Release\ Items/DropDMG/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg --config-name ww2 "$app_path"
+    fi
 fi
 
 if [ "$build_steam" = true ] ; then
@@ -635,7 +638,7 @@ if [ "$build_steam" = true ] ; then
             popd
         else
             pushd "Libraries/SteamSDK/tools/ContentBuilder/builder_osx"
-            ./steamcmd.sh +login $steam_user $steam_pwd +run_app_build "../../../../../Deployment/steam/scripts/app_mac_build_251950.vdf" +quit
+            ./steamcmd.sh +login $steam_user $steam_pwd +run_app_build "../../../../../Deployment/steam/scripts/app_mac_build_"$bld_config"_251950.vdf" +quit
             popd
         fi
     fi
