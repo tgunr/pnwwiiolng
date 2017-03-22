@@ -496,9 +496,10 @@ if [ "$skip_step" = false ]; then
     else
         if [ "$myos" == "win" ] ; then
             bld_config="BetaRelease"
+            bld_config_dir=$bld_config
         else
-            # NOTE: TODO - we should have a BetaRelease scheme on Mac side
-            bld_config="Release"
+            bld_config="Dev"
+            bld_config_dir="Development"
         fi
     fi
 
@@ -619,7 +620,7 @@ else
     cp 'WW2/proj/mac/WW2 Release Items/DropDMG/Configurations/ww2.plist' "$HOME/Library/Application Support/DropDMG/Configurations"
     cp -r 'WW2/proj/mac/WW2 Release Items/DropDMG/Layouts/ww2' "$HOME/Library/Application Support/DropDMG/Layouts"
     plutil -replace 'content.options.destinationFolder' -string "$( pwd )/Installer/release/macrelease" "$HOME/Library/Application Support/DropDMG/Configurations/ww2.plist"
-    app_path='WW2/proj/mac/build/'$bld_config'/'$mac_app_name
+    app_path='WW2/proj/mac/build/'$bld_config_dir'/'$mac_app_name
     app_path=$(echo $app_path | sed 's/\\//g')
     WW2/proj/mac/WW2\ Release\ Items/DropDMG/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg --config-name ww2 "$app_path"
 fi
