@@ -650,6 +650,7 @@ extern NSString *WebActionOriginalURLKey;
         [rememberPasswordCheckbox setHidden:true];
         [userLabel setHidden:true];
         [passwordLabel setHidden:true];
+        [playOnlineButton setEnabled:true];
     }
     
     authServer = [NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding];
@@ -1075,8 +1076,10 @@ extern NSString *WebActionOriginalURLKey;
     UINT32 vers[4] = {0,0,0,0};
     
     memset(&launchRequest, 0x0, sizeof(launchRequest));
-    strncpy((char *)launchRequest.username, [[self userName] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.username)-1);
-    strncpy((char *)launchRequest.password, [[self userPassword] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.password)-1);
+    if (steamID == 0) {
+        strncpy((char *)launchRequest.username, [[self userName] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.username)-1);
+        strncpy((char *)launchRequest.password, [[self userPassword] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.password)-1);
+    }
     launchRequest.steamID = steamID;
     launchRequest.cdKeySize = 0;
     launchRequest.arenaID = verifyInfo->arenaID;
