@@ -598,9 +598,10 @@ _checkChatMaster()
 		return false;
 	}
 
-	if ( _chatClientHost != server->stats.address )
+	UINT32 chat_addr = ((0xffffff00 & cv_publicSubnet.GetUint32()) | (0x000000ff & server->stats.address));
+	if ( _chatClientHost != chat_addr )
 	{
-		_chatClientHost = server->stats.address;
+		_chatClientHost = chat_addr;
 		_chatClientPort = server->stats.port;
 
 		dbugLog(_FLN,"Chat host master at %s", teulGetAddress(_chatClientHost));
@@ -669,10 +670,11 @@ _handleSIGUSR1(SINT32 k)
 	signal(SIGUSR1, SIG_IGN);
 
 	//Reconnect to the authHost
-	SINT32 retval = authGameInit(Server::localHost, WWII::Net::Ports::MapHost,
-											_authHost, WWII::Net::Ports::InternalAuth, cv_appID.GetUint32(), PN_build_version_value,
-											PN_build_version_value, Teul::MaxClusterUsers,
-											_acceptLogin, _authErrorFunction);
+	SINT32 retval = authGameInit(Server::localHost, ((0xffffff00 & cv_publicSubnet.GetUint32()) | (0x000000ff & Server::localHost))
+	                             WWII::Net::Ports::MapHost,
+	                             _authHost, WWII::Net::Ports::InternalAuth, cv_appID.GetUint32(),
+	                             PN_build_version_value, PN_build_version_value,
+	                             Teul::MaxClusterUsers, _acceptLogin, _authErrorFunction);
 	if ( retval < 0)
 		LogAbort("%s authGameInit failed retval %d", __FUNCTION__, retval);
 
@@ -1133,6 +1135,7 @@ main(int argc, const char* argv[])
 	{
 		retval = authGameInit(
 					Server::localHost
+					, ((0xffffff00 & cv_publicSubnet.GetUint32()) | (0x000000ff & Server::localHost))
 					, WWII::Net::Ports::MapHost
 					, _authHost
 					, WWII::Net::Ports::InternalAuth

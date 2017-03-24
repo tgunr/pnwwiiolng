@@ -67,7 +67,7 @@ static AUTH_GAME_INIT game;
 static  SINT32 _openSend(APID appID,
 							UINT32 arenaID, UINT32 hostVersion,
 							UINT32 authHost, UINT16 authPort,
-							UINT32 localAddress, UINT16 localPort,
+							UINT32 localAddress, UINT32 extHost, UINT16 localPort,
 							UINT32 maxUsers );
 
 static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
@@ -78,6 +78,7 @@ static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 //	purposes.
 //	PARAMETERS:
 //  	gameHost - the IP address the game server is running on
+//		extHost - the IP address to tell the client to connect to
 //		gamePort - the port the game server is listening for front ends on
 //		authHost - the IP address the auth host is running on
 //		authPort - the port to connect to the authHost on
@@ -88,7 +89,7 @@ static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 //		maxUsers - the maximum users this server can handle
 //		acceptFn - callback to notify you of a player login
 //		externErrorFn - callback when errors occur on the auth connection
-SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
+SINT32 authGameInit(UINT32 gameHost, UINT32 extHost, UINT16 gamePort
 				, UINT32 authHost, UINT16 authPort
 				, APID appID, UINT32 appVersion
 				, UINT32 hostVersion
@@ -120,7 +121,7 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 	if ( !useAuthServer )
 		return 0;
 
-	_authConnection = _openSend(appID, Server::myServerInfo.stats.arenaID, hostVersion, authHost, authPort, gameHost, gamePort, maxUsers);
+	_authConnection = _openSend(appID, Server::myServerInfo.stats.arenaID, hostVersion, authHost, authPort, gameHost, extHost, gamePort, maxUsers);
 	if ( _authConnection < 0 )
 	{
 		dbugWrite(_FLA, "couldn't open auth connection err:%d", _authConnection);
@@ -463,7 +464,7 @@ static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 // <authHost> host address of an Auth Server.
 // <authPort> port address of an Auth Server.
 // <localPort> local port game is listening for new users on.
-SINT32 _openSend(APID appID, UINT32 arenaID, UINT32 hostVersion, UINT32 authHost, UINT16 authPort, UINT32 localAddress, UINT16 localPort, UINT32 maxUsers)
+SINT32 _openSend(APID appID, UINT32 arenaID, UINT32 hostVersion, UINT32 authHost, UINT16 authPort, UINT32 localAddress, UINT32 extAddress, UINT16 localPort, UINT32 maxUsers)
 {
 //static AUTH_GAME_INIT game;
 	_authIsOpen = false;
@@ -480,6 +481,7 @@ SINT32 _openSend(APID appID, UINT32 arenaID, UINT32 hostVersion, UINT32 authHost
 	game.maxUsers = maxUsers;
 	game.port = localPort;
 	game.ipAddress = localAddress;
+	game.extAddress = extAddress;
 	strsafecpy(game.hello, "Hello!");
 
 	_authConnection = teulOpenSend(_authHost, _authPort, _authOpened, CONNECT_TIMEOUT, PROTOCOL_TCP, _authErrorFn);

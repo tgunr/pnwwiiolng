@@ -95,6 +95,7 @@ CFG_STRING(ircPassword, "", "WWII_IRC_PASSWD", false, "Server-password for the I
 CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", false, "Port to connect to the IRC server on.");
 CFG_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL", true, "URL to prefix authentication error URLs with.");
 CFG_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true, "Network address (/24) for the cluster (server's will map their last octets (x.x.x.N) into this network for inter-host communications) or IP address of controller host.");
+CFG_ADDR(publicSubnet, nullptr, "PUBLIC_SUBNET", true, "The public subnet clients should connect to this cluster through.");
 CFG_BOOL(oneProcessMode, "0", "ONE_PROCESS_MODE", false, "If enabled, it will not be a fatal error to fail to contact other hosts in the cluster.");
 
 #ifndef PN_DISABLE_AUTH
