@@ -648,7 +648,12 @@ extern NSString *WebActionOriginalURLKey;
         [userNameField setHidden:true];
         [passwordField setHidden:true];
         [rememberPasswordCheckbox setHidden:true];
-        [userLabel setHidden:true];
+        // temporary display of steamid
+        NSString *baseString = @"";
+        NSString *userInfo = [baseString stringByAppendingFormat:
+                             @" SteamID: %u", steamID];
+        [userLabel setStringValue:userInfo];
+        //[userLabel setHidden:true];
         [passwordLabel setHidden:true];
         [playOnlineButton setEnabled:true];
     }
