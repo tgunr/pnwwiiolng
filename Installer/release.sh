@@ -177,15 +177,17 @@ if [ "$myos" == "win" ] ; then
         echo "Standard location for previous build "$PREV_RELEASE" does not exist"
         echo -n "Please enter the directory containing the previous release (ENTER for none): "
         read -r HANDLE
-        HANDLE="$HANDLE\\"
         if [ -z "$HANDLE" ] ; then
             echo "WARNING: No previous release specified, PC patch will not be built!"
             build_patch=false 
             break
-        elif [ ! -r "$HANDLE" ] ; then
-            echo "Invalid directory, '$HANDLE' try again"
-        else
-            PREV_RELEASE="$HANDLE"
+	else
+            HANDLE="$HANDLE\\"
+            if [ ! -r "$HANDLE" ] ; then
+                echo "Invalid directory, '$HANDLE' try again"
+            else
+                PREV_RELEASE="$HANDLE"
+	    fi
         fi
     done
 
@@ -200,7 +202,7 @@ steam_pwd=""
 # make sure the previous release for the patch to apply exists
 if [ "$build_patch" = true ] ; then
     if [ ! -f "$PREV_RELEASE/WW2.exe" ] ; then
-        exit_msg=$exit_msg'|The previous release directory ($PREV_RELEASE) is not valid, restart when correct directory located'
+        exit_msg=$exit_msg'|The previous release directory ('$PREV_RELEASE') is not valid, restart when correct directory located'
         found_prereq_errors=true
     fi
 fi
