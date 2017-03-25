@@ -31,6 +31,7 @@ static TEUL_CALLBACK*	_APP_PLAYGATE_OK;
 static TEUL_CALLBACK*	_XCHG_GAME_LIST;
 static TEUL_CALLBACK*	_XCHG_GAME_LIST2;
 static TEUL_CALLBACK*	_XCHG_AUTH_LOGIN;
+static TEUL_CALLBACK*	_XCHG_AUTH_LOGIN_STEAM;
 static TEUL_CALLBACK*	_SEND_QUEUE_POSITION;
 
 //Send Login Reply function
@@ -80,6 +81,13 @@ static SINT32 _recvAuthLoginRequest(ACTION_OBJECT* const a)
 	Auth::LoginRequest request(a);
 	request.process(a->teulIndex);
 	return a->offset;
+}
+
+static SINT32 _recvAuthLoginSteamRequest(ACTION_OBJECT* const a)
+{
+    Auth::LoginSteamRequest request(a);
+    request.process(a->teulIndex);
+    return a->offset;
 }
 
 static SINT32 _sendAuthLoginReply(ACTION_OBJECT* const a)
@@ -326,6 +334,7 @@ authHostInstallCallbacks()
 		REGISTER_SENDRECV(APP_GET_GAME_LIST_Y, _sendAppGameList, _recvAppGameListRequest, _XCHG_GAME_LIST);
 		REGISTER_SENDRECV(APP_XCHG_GAME_LIST_Y, _sendGameList, _recvGameListRequest, _XCHG_GAME_LIST2);
 		REGISTER_SENDRECV(AUTH_XCHG_LOGIN_Y, _sendAuthLoginReply, _recvAuthLoginRequest, _XCHG_AUTH_LOGIN);
+		REGISTER_SENDRECV(AUTH_XCHG_LOGIN_STEAM_Y, _sendAuthLoginReply, _recvAuthLoginSteamRequest, _XCHG_AUTH_LOGIN_STEAM);
 		REGISTER_SENDER(AUTH_QUEUE_POSITION_Y, _sendAuthQueuePosition, _SEND_QUEUE_POSITION);
 	}
 	END_CALLBACK_REGISTRATION(Auth::CallbackX)
