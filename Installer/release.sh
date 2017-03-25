@@ -458,7 +458,7 @@ else
     open -W "$ww2path" --args -BuildMDLOnly -data 1 -datadir "$(pwd)/opt/ww2mods/DATA/" -window 1
 fi
 
-mdlfiles=`find opt/ww2mods -name "*.mdl" -print`
+mdlfiles=`find opt/ww2mods/DATA -name "*.mdl" -print`
 if [ ! -n "$mdlfiles" ] ; then
     exit_msg="Error: Failed to build .mdl files, build aborted"
     exit 1
@@ -516,7 +516,7 @@ if [ "$skip_step" = false ]; then
             echo "Cleaning "$bld_config" first"
             devenv WW2.sln /clean $bld_config
         else
-            SET CL=/D"$extradefines"
+            set CL=/D"$extradefines"
         fi
         devenv WW2.sln /build $bld_config /out "$BUILDFILE"
     
