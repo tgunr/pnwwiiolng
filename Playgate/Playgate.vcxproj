@@ -110,7 +110,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.\;src;$(SolutionDir)\WW2\src;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)Libraries\SteamSDK\public\steam;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ANTIHACK;WIN32;_WINDOWS;FRONT_END;platOS=OS_WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ANTIHACK;WIN32;_WINDOWS;FRONT_END;platOS=OS_WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS;DEBUG_WW2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

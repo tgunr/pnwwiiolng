@@ -60,16 +60,6 @@ UINT32 webURL;
 
 CPlaygateApp playgate;
 
-enum PlaygateState
-{
-	PgStarting = 0
-,	PgTOS
-,	PgRegionSelection
-,	PgAuthentication
-,	PgServerSelect
-,	PgFinished
-};
-
 static PlaygateState pgState;
 
 //////////////////////////////////////////////////////////////////////
@@ -142,7 +132,8 @@ _setInput(bool enable)
 static void
 _attemptConnection()
 {
-	_setInput(false);
+	if (loginData.m_steamAccountId == 0)
+		_setInput(false);
 
 	bool connected = false;
 	bool firstTime = true;
@@ -190,7 +181,8 @@ _attemptConnection()
 	}
 
 	// Ok, now you can start typing stuff.
-	_setInput(true);
+	if (loginData.m_steamAccountId == 0)
+		_setInput(true);
 }
 
 static DWORD WINAPI threadFunc(LPVOID dummyParam)
@@ -271,7 +263,7 @@ namespace {
 			std::wstring var(param.begin(), param.begin()+param.find_first_of('='));
 			std::wstring val(param.begin()+param.find_first_of('=')+1, param.end());
 
-            if (var == L"authhost")
+            if (var == L"authserver")
                 WWII::ConvertChars(val.c_str(), g_authHostName, sizeof(g_authHostName));
 			else if ( var == L"path" )
 				g_exePath = val;
@@ -371,65 +363,73 @@ BOOL CPlaygateApp::InitInstance()
 		exit(0);
 	}
 
-	// If they've logged in before, recover the data.
-	loginData.Read();
-	// Make sure it's not just or something.
-	loginData.Validate();
-
-	pgState = PgTOS;
-
-	// Load the "region"s data.
-	dbugLog(_FLI, "Regions");
-	if ( !CRegionSelect::ReadRegionsFile() )
-		return FALSE;
-
-	// Show the Terms of Service file
-	// (%exepath%\\data\\playgate\\tos.rtf)
-	dbugLog(_FLI, "TOS");
-	if ( !_TosDialog() )
-		return FALSE;
-
-	pgState = PgRegionSelection;
-
-	// Prompt the user to select their region.
-	dbugLog(_FLI, "Regions follow-up");
-	if ( !RegionSelect() )
-		return FALSE;
-
-	// Update the region
-	const wchar_t* regionName = g_region.name().c_str();
-	if ( wcscmp(regionName, loginData.m_region) != 0 )
-	{
-		// Arena will change
-		loginData.m_arenaID = 0;
-		wcsncpy_s(loginData.m_region, regionName, sizeof(loginData.m_region));
-		loginData.MarkForWrite();
-	}
-
-	// Verify access to the data directory.
-	if ( _tchdir(g_dataPath.c_str()) != 0 )
-	{
-		dbugLog(_FLA, "Unable to access datapath [%ls]", g_dataPath.c_str());
-		MessageBox(nullptr, GetLoc(ERROR_DATA_FOLDER, g_dataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
-		return FALSE;
-	}
-
-	hStatusMutex = CreateMutex(nullptr, FALSE, nullptr);
-	hExitMutex = CreateMutex(nullptr, TRUE, nullptr);
-	hApplicationMutex = CreateMutex(nullptr, TRUE, nullptr);
-
-	pgState = PgAuthentication;
-
-	DWORD threadId;
-	::CreateThread(nullptr, 0, threadFunc, nullptr,0, &threadId);
-
-	// let app close and restart if it must start through steam
+#ifndef DEBUG_WW2
 	if (!SteamAPI_RestartAppIfNecessary(STEAM_APP_ID))
 	{
-		bool steamRunning = SteamAPI_IsSteamRunning();
+#endif
 
-		// If steam is not running at this point it means its either not installed, or isn't managing our APP
-		if (!steamRunning)
+		// If they've logged in before, recover the data.
+		loginData.Read();
+		// Make sure it's not just or something.
+		loginData.Validate();
+
+		pgState = PgTOS;
+
+		// Load the "region"s data.
+		dbugLog(_FLI, "Regions");
+		if ( !CRegionSelect::ReadRegionsFile() )
+			return FALSE;
+
+		// Show the Terms of Service file
+		// (%exepath%\\data\\playgate\\tos.rtf)
+		dbugLog(_FLI, "TOS");
+		if ( !_TosDialog() )
+			return FALSE;
+
+		pgState = PgRegionSelection;
+
+		// Prompt the user to select their region.
+		dbugLog(_FLI, "Regions follow-up");
+		if ( !RegionSelect() )
+			return FALSE;
+
+		// Update the region
+		const wchar_t* regionName = g_region.name().c_str();
+		if ( wcscmp(regionName, loginData.m_region) != 0 )
+		{
+			// Arena will change
+			loginData.m_arenaID = 0;
+			wcsncpy_s(loginData.m_region, regionName, sizeof(loginData.m_region));
+			loginData.MarkForWrite();
+		}
+
+		// Verify access to the data directory.
+		if ( _tchdir(g_dataPath.c_str()) != 0 )
+		{
+			dbugLog(_FLA, "Unable to access datapath [%ls]", g_dataPath.c_str());
+			MessageBox(nullptr, GetLoc(ERROR_DATA_FOLDER, g_dataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+			return FALSE;
+		}
+
+		hStatusMutex = CreateMutex(nullptr, FALSE, nullptr);
+		hExitMutex = CreateMutex(nullptr, TRUE, nullptr);
+		hApplicationMutex = CreateMutex(nullptr, TRUE, nullptr);
+
+		pgState = PgAuthentication;
+
+		DWORD threadId;
+		::CreateThread(nullptr, 0, threadFunc, nullptr,0, &threadId);
+
+		// let app close and restart if it must start through steam
+		if (SteamAPI_Init())
+		{
+			if (SteamApps()->BIsAppInstalled(STEAM_APP_ID))
+			{
+				loginData.m_steamAccountId = SteamApps()->GetAppOwner().GetAccountID();
+			}
+		}
+
+		if (loginData.m_steamAccountId == 0)
 		{
 			if (_Login())
 			{
@@ -443,46 +443,17 @@ BOOL CPlaygateApp::InitInstance()
 		}
 		else
 		{
-			// we are here because steam believes its managing our app
-			steamInitialized = SteamAPI_Init();
-			if (steamInitialized)
-			{
-				bool installedAsSteamApp = SteamApps()->BIsAppInstalled(STEAM_APP_ID);
-				if (installedAsSteamApp)
-				{
-					bool isSteamApp = SteamApps()->BIsSubscribedApp(STEAM_APP_ID);
-					if (isSteamApp)
-					{
-						assert(steamInitialized);
+			pgState = PgAuthentication;
+			playgate.QueueLogonAttempt();
 
-						// we don't ask for credentials
-						loginData.m_steamAccountId = SteamApps()->GetAppOwner().GetAccountID();
+			ReleaseMutex(hApplicationMutex);
 
-						playgate.QueueLogonAttempt();
-						pgState = PgServerSelect;
-
-						_ServerSelect();
-					}
-					else
-					{
-						// illogical, steam shouldn't be launching a game not subscribed to
-						dbugLog(_FLW, "Not currently subscribed to game through steam");
-					}
-				}
-				else
-				{
-					// illogical to get here
-					dbugLog(_FLW, "Not installed as a steam app");
-				}
-			}
-			else
-			{
-				// steam SDK could not be initialized, illogical to get here
-				dbugLog(_FLW, "Steam API failed to initialize");
-			}
+			_ServerSelect();
 		}
+
+#ifndef DEBUG_WW2
 	}
-	/// we may be exiting here just to restart through steam
+#endif
 
 	pgState = PgFinished;
 
@@ -502,6 +473,12 @@ BOOL CPlaygateApp::InitInstance()
 }
 
 void
+CPlaygateApp::SetState(PlaygateState state)
+{
+	pgState = state;
+}
+
+void
 CPlaygateApp::SetStatus(const TCHAR* message, StatusType status) const
 {
 	if ( !hMainWnd ) return;
@@ -510,8 +487,11 @@ CPlaygateApp::SetStatus(const TCHAR* message, StatusType status) const
 	WaitForSingleObject(hStatusMutex, INFINITE);
 	if ( hMainWnd )
 	{
-		hMainWnd->m_hint.SetWindowText(message);
-		hMainWnd->m_hint.SetTextColor((int)status);
+		if (hMainWnd->m_hint.IsWindowVisible())
+		{
+			hMainWnd->m_hint.SetWindowText(message);
+			hMainWnd->m_hint.SetTextColor((int)status);
+		}
 	}
 	ReleaseMutex(hStatusMutex);
 	Sleep(250);

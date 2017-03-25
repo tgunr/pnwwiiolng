@@ -172,7 +172,7 @@ void logonAttempt()
 {
 	playgate.SetStatus(GetLoc(AUTH_AUTHENTICATION));
 
-	if (loginData.m_steamAccountId != 0)
+	if (loginData.m_steamAccountId == 0)
 	{
 		char username[sizeof(loginData.m_username) + 1];
 		WWII::ConvertChars(loginData.m_username, username, sizeof(username));
@@ -193,6 +193,7 @@ void Auth::LoginReply::process()
 	dbugLog(_FLI, "Login reply %s[%c]", m_code.c_str(), (m_playnet) ? 'y' : 'n');
 	if ( wasSuccessful() )
 	{
+		playgate.SetState(PgServerSelect);
 		playgate.SetStatus(GetLoc(AUTH_LOGIN), AppProgress);
 		playgate.m_playnet = m_playnet;
 		hMainWnd->SetTimer('AOK', 1500, nullptr);
