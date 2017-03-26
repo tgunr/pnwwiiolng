@@ -670,7 +670,7 @@ _handleSIGUSR1(SINT32 k)
 	signal(SIGUSR1, SIG_IGN);
 
 	//Reconnect to the authHost
-	SINT32 retval = authGameInit(Server::localHost, ((0xffffff00 & cv_publicSubnet.GetUint32()) | (0x000000ff & Server::localHost))
+	SINT32 retval = authGameInit(Server::localHost, ((0xffffff00 & cv_publicSubnet.GetUint32()) | (0x000000ff & Server::localHost)),
 	                             WWII::Net::Ports::MapHost,
 	                             _authHost, WWII::Net::Ports::InternalAuth, cv_appID.GetUint32(),
 	                             PN_build_version_value, PN_build_version_value,
