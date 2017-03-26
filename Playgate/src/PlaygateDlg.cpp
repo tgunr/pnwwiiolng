@@ -35,7 +35,9 @@ const char* states[NUM_LOCK_STATES] =
 static CPlaygateDlg* g_dlg;
 static bool g_launchInProgress;
 
+
 // CPlaygateDlg dialog
+IMPLEMENT_DYNAMIC(CPlaygateDlg, CDialog)
 
 CPlaygateDlg::CPlaygateDlg(CWnd* pParent /*=nullptr*/)
 	: CBDialog(CPlaygateDlg::IDD, pParent)
@@ -69,6 +71,7 @@ BEGIN_MESSAGE_MAP(CPlaygateDlg, CBDialog)
 	ON_LBN_SELCHANGE(IDC_SERVER_LIST, &CPlaygateDlg::OnLbnSelchangeServerList)
 	ON_BN_CLICKED(IDOK, &CPlaygateDlg::OnBnClickedOk)
 	ON_WM_TIMER()
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 
@@ -425,4 +428,15 @@ void CPlaygateDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	CBDialog::OnTimer(nIDEvent);
+}
+
+HBRUSH CPlaygateDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	// Add the following code
+	if (pWnd->GetDlgCtrlID() == IDS_SERVER_NOTE)
+		pDC->SetTextColor(RGB(255, 255, 255)); // make white
+
+	return hbr;
 }
