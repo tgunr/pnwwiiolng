@@ -147,6 +147,16 @@ extern SINT32 mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::
 extern SINT32 mapPlayerExitCluster(PlayerStatusNode& psn);
 extern void teulCloseAllEndpoints(const SINT32 errorCode);
 
+
+namespace {
+	UINT32 GetPublicAddress(UINT32 addr) {
+		// HACK: Assumes the last octet is both the only difference
+		// and remains in the same position relative to the mmhost.
+		return cv_publicIP.GetUint32() + (Server::myServerInfo.stats.address - addr);
+	}
+}
+
+
 void
 mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsign)
 {
@@ -295,7 +305,8 @@ Player::mirrorToCellHost(Server::ServerInfo* const server)
 	auto mirror = new PersonaMirrorTo<CELL_HOST>(pxd, server, "cell");
 	server->mirrorPlayer(mirror);
 
-	Teul::ConnectionInstruction connIns(Teul::ConnectionInstruction::Cell, (UINT8)(server->stats.address & 0xff), server->stats.port, OTP());
+	UINT8 cell_ip = static_cast<UINT8>(GetPublicAddress(server->stats.address) & 0xff);
+	Teul::ConnectionInstruction connIns(Teul::ConnectionInstruction::Cell, cell_ip, server->stats.port, OTP());
 	const SINT32 retval = connIns.send(teulIndex());
 
 	m_lastSpawnedTo = server->stats.address;
@@ -598,7 +609,7 @@ _checkChatMaster()
 		return false;
 	}
 
-	UINT32 chat_addr = ((0xffffff00 & cv_publicSubnet.GetUint32()) | (0x000000ff & server->stats.address));
+	UINT32 chat_addr = GetPublicAddress(server->stats.address);
 	if ( _chatClientHost != chat_addr )
 	{
 		_chatClientHost = chat_addr;
@@ -670,8 +681,7 @@ _handleSIGUSR1(SINT32 k)
 	signal(SIGUSR1, SIG_IGN);
 
 	//Reconnect to the authHost
-	SINT32 retval = authGameInit(Server::localHost, ((0xffffff00 & cv_publicSubnet.GetUint32()) | (0x000000ff & Server::localHost)),
-	                             WWII::Net::Ports::MapHost,
+	SINT32 retval = authGameInit(Server::localHost, cv_publicIP.GetUint32(), WWII::Net::Ports::MapHost,
 	                             _authHost, WWII::Net::Ports::InternalAuth, cv_appID.GetUint32(),
 	                             PN_build_version_value, PN_build_version_value,
 	                             Teul::MaxClusterUsers, _acceptLogin, _authErrorFunction);
@@ -1135,7 +1145,7 @@ main(int argc, const char* argv[])
 	{
 		retval = authGameInit(
 					Server::localHost
-					, ((0xffffff00 & cv_publicSubnet.GetUint32()) | (0x000000ff & Server::localHost))
+					, cv_publicIP.GetUint32()
 					, WWII::Net::Ports::MapHost
 					, _authHost
 					, WWII::Net::Ports::InternalAuth
