@@ -8,7 +8,7 @@
   // will be resolved relative to this root.
   // If you don't define ContentRoot, then it will be assumed to be
   // the location of this script file, which probably isn't what you want
-  // NOTE: above comment doesn't seem to be true, it inherits parent content root
+  "ContentRoot"	".\"
 
   // include all files recursivley
   "FileMapping"
