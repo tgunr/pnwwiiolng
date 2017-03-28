@@ -152,7 +152,7 @@ namespace {
 	UINT32 GetPublicAddress(UINT32 addr) {
 		// HACK: Assumes the last octet is both the only difference
 		// and remains in the same position relative to the mmhost.
-		return cv_publicIP.GetUint32() + (Server::myServerInfo.stats.address - addr);
+		return cv_publicIP.GetUint32() + (addr - Server::myServerInfo.stats.address);
 	}
 }
 
