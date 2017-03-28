@@ -1227,7 +1227,7 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 	// Get the local network address excluding the last octet.
 	const UINT32 localAddress = teulGetEndpointLocalAddress(teulIndex);
 
-	UINT32 destAddress = bestServer.ipAddress;
+	UINT32 destAddress = bestServer.extAddress;
 
 	//hack since teulGetAddress sucks
 	teulGetAddress(request.appVersion, appVer, sizeof(appVer) - 1);
@@ -1415,6 +1415,7 @@ authEstablishServer(const SINT32 teulIndex, AUTH_GAME_INIT& gInit)
 	SERVER* newServer = new SERVER;
 	newServer->teulIndex = teulIndex;
 	newServer->ipAddress = gInit.ipAddress;
+	newServer->extAddress = gInit.extAddress;
 	newServer->port = gInit.port;
 	newServer->sourcePort = 0;	///TODO:AUTH: Should use either local or dest port.
 	newServer->maxUsers = gInit.maxUsers;

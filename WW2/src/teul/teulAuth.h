@@ -19,6 +19,7 @@ using PLAYER_ACCEPT_FUNCTION = SINT32(*)(SINT32 teulIndex, Auth::Dispatch* authP
 //	purposes.
 //	PARAMETERS:
 //  	gameAddress - the IP address the game server is running on
+//		extHost - the IP address to tell the client to connect to
 //		gamePort - the port the game server is listening for front ends on
 //		appID - the application ID necessary to connect to this game server
 //		appVersion - the minimum version of the application necessary to
@@ -28,7 +29,7 @@ using PLAYER_ACCEPT_FUNCTION = SINT32(*)(SINT32 teulIndex, Auth::Dispatch* authP
 //		maxUsers - the maximum users this server can handle
 //		externErrorFn - the error function to invoke when things go bad for
 //			this connection
-SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
+SINT32 authGameInit(UINT32 gameHost, UINT32 extHost, UINT16 gamePort
 				, UINT32 authHost, UINT16 parentPort
 				, APID appID, UINT32 appVersion
 				, UINT32 hostVersion
