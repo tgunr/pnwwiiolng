@@ -27,11 +27,24 @@
 #include <arpa/inet.h>
 #include "sysLaunchURL.h"
 #import <HockeySDK/HockeySDK.h>
+#include "steam_api.h"
+
+static const int STEAM_APP_ID = 251950;
 
 #define PLAYGATE_VERSION 0x01010109
 
-//#define DEFAULT_AUTH_SERVER "authdev.playnet.com"
+#ifdef AUTH_OVERRIDE
+#define DEFAULT_AUTH_SERVER "AUTH_OVERRIDE"
+#else
+
+#if defined(BETA_RELEASE)
+#define DEFAULT_AUTH_SERVER "authdev.playnet.com"
+#else
 #define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
+#endif
+
+#endif
+
 #define DEFAULT_AUTH_PORT WWII::Net::Ports::AuthHost
 
 static void xmlerrorstub (void *ctx, const char *msg, ...) {}
@@ -60,6 +73,8 @@ static WW2AppDelegate* gPlayGateAppDelegate;
 extern NSString * const PGErrorDomain;
 extern NSString * const PGteulErrorDomain;
 extern NSString * const PGErrorDataKey;
+
+static UINT32 steamID = 0;
 
 // PGErrorDomain error code constants
 enum
@@ -541,31 +556,6 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    // This sequence depends on certain implementation details of the
-    // BITCrashManager - in particular, that report metadata is processed
-    // synchronously during -startManager, that -userIDForHockeyManager is
-    // only called once per crash report, and only one crash report will be
-    // freshly processed at a time (versus needing to be sent). If these
-    // preconditions are violated (likely due to implementation changes in the
-    // SDK), the provided username of the player (if any) may be inaccurate.
-    // Not much of a big deal, is it?
-    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"97d81f56ff22d04ccdbc1a0d537e81c0" delegate:self];
-#ifdef DEBUG_WW2
-    [BITHockeyManager sharedHockeyManager].logLevel = BITLogLevelDebug;
-#endif
-    [BITHockeyManager sharedHockeyManager].disableFeedbackManager = YES;
-    [BITHockeyManager sharedHockeyManager].crashManager.autoSubmitCrashReport = YES;
-    [[BITHockeyManager sharedHockeyManager] startManager];
-    // This should no longer be needed, so try to maintain the "not logged in
-    // yet" state if we should crash before the next login.
-    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
-    
-#ifdef DEBUG_WW2
-    dbugInit(LogMode::TO_FILE, nullptr);
-#else
-    dbugInit(LogMode::OFF, nullptr);
-#endif
-
     // Wipe out any storage of insecure user info.
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserName"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserPassword"];
@@ -598,6 +588,48 @@ extern NSString *WebActionOriginalURLKey;
     }
 #endif
     
+#ifndef DEBUG_WW2
+    if (SteamAPI_RestartAppIfNecessary(STEAM_APP_ID))
+    // abort
+        [NSApp terminate:self];
+#endif
+    
+    if ( SteamAPI_Init() ) {
+        
+        if (SteamApps()->BIsAppInstalled(STEAM_APP_ID)) {
+            if (SteamApps()->BIsSubscribedApp(STEAM_APP_ID)) {
+                steamID = SteamApps()->GetAppOwner().GetAccountID();
+            }
+        }
+        
+    }
+    
+    // This sequence depends on certain implementation details of the
+    // BITCrashManager - in particular, that report metadata is processed
+    // synchronously during -startManager, that -userIDForHockeyManager is
+    // only called once per crash report, and only one crash report will be
+    // freshly processed at a time (versus needing to be sent). If these
+    // preconditions are violated (likely due to implementation changes in the
+    // SDK), the provided username of the player (if any) may be inaccurate.
+    // Not much of a big deal, is it?
+    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"97d81f56ff22d04ccdbc1a0d537e81c0" delegate:self];
+#ifdef DEBUG_WW2
+    [BITHockeyManager sharedHockeyManager].logLevel = BITLogLevelDebug;
+#endif
+    [BITHockeyManager sharedHockeyManager].disableFeedbackManager = YES;
+    [BITHockeyManager sharedHockeyManager].crashManager.autoSubmitCrashReport = YES;
+    [[BITHockeyManager sharedHockeyManager] startManager];
+    
+#ifdef DEBUG_WW2
+    dbugInit(LogMode::TO_FILE, nullptr);
+#else
+    dbugInit(LogMode::OFF, nullptr);
+#endif
+    
+    // This should no longer be needed, so try to maintain the "not logged in
+    // yet" state if we should crash before the next login.
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
+    
     //  g_buildTerrain = 1;
     
     gPlayGateAppDelegate = self;
@@ -607,11 +639,24 @@ extern NSString *WebActionOriginalURLKey;
     
     [self goHome];
     
-    [self loadUserNamePassword];
-    [userNameField setDelegate:self];
-    [passwordField setDelegate:self];
-    
-    [self updateLoginEnabled];
+    if (steamID == 0) {
+        [self loadUserNamePassword];
+        [userNameField setDelegate:self];
+        [passwordField setDelegate:self];
+        [self updateLoginEnabled];
+    } else {
+        [userNameField setHidden:true];
+        [passwordField setHidden:true];
+        [rememberPasswordCheckbox setHidden:true];
+        // temporary display of steamid
+        NSString *baseString = @"";
+        NSString *userInfo = [baseString stringByAppendingFormat:
+                             @" SteamID: %u", steamID];
+        [userLabel setStringValue:userInfo];
+        //[userLabel setHidden:true];
+        [passwordLabel setHidden:true];
+        [playOnlineButton setEnabled:true];
+    }
     
     authServer = [NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding];
     if (gAuthServer[0]) {
@@ -914,7 +959,11 @@ extern NSString *WebActionOriginalURLKey;
             if (! isConnectedToAuthenticationServer)
             {
                 [self connectToAuthenticationServer];
-                state = WAIT_AUTH_CONNECT;
+                if (steamID == 0) {
+                    state = WAIT_AUTH_CONNECT;
+                } else {
+                    state = WAIT_USER_PASS;
+                }
                 break;
             }
             [[clang::fallthrough]];
@@ -1032,8 +1081,11 @@ extern NSString *WebActionOriginalURLKey;
     UINT32 vers[4] = {0,0,0,0};
     
     memset(&launchRequest, 0x0, sizeof(launchRequest));
-    strncpy((char *)launchRequest.username, [[self userName] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.username)-1);
-    strncpy((char *)launchRequest.password, [[self userPassword] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.password)-1);
+    if (steamID == 0) {
+        strncpy((char *)launchRequest.username, [[self userName] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.username)-1);
+        strncpy((char *)launchRequest.password, [[self userPassword] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.password)-1);
+    }
+    launchRequest.steamID = steamID;
     launchRequest.cdKeySize = 0;
     launchRequest.arenaID = verifyInfo->arenaID;
     launchRequest.sessionID = (UINT32)verifyInfo->sessionID;
@@ -1116,6 +1168,8 @@ extern NSString *WebActionOriginalURLKey;
     arenaRequest.arenaID	= arena;
     arenaRequest.sessionID 	= static_cast<UINT32>(session);
     arenaRequest.infoOnly	= 0;
+    arenaRequest.steamID = steamID;
+    
     /*
      int vers[4] = {0,0,0,0};
      

@@ -428,7 +428,9 @@
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
 		47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B0ED240E9A66A40089DCC4 /* libteulKit.a */; };
 		E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96991C6D729D00D5EC52 /* WebKit.framework */; };
+		E91EBF511E744877005AE0A0 /* libsteam_api.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E91EBF4F1E7447F6005AE0A0 /* libsteam_api.dylib */; };
 		E94156B01D259A0300C0565B /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94156AF1D259A0300C0565B /* libb64.a */; };
+		E95E664F1E8301A3005A04FF /* steam_appid.txt in Resources */ = {isa = PBXBuildFile; fileRef = E95E664E1E8301A2005A04FF /* steam_appid.txt */; };
 		E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
 		E97C76161C848E3600875F44 /* CADebugger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B1120222EB00A60CC2 /* CADebugger.cpp */; };
 		E97C76171C848E3A00875F44 /* CADebugMacros.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B3120222EB00A60CC2 /* CADebugMacros.cpp */; };
@@ -469,6 +471,7 @@
 		E97C76C71C8539BF00875F44 /* XMLLoader2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */; };
 		E98C64811E48DF7C00ABE277 /* wwiiBackChannel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E98C647E1E48DF5A00ABE277 /* wwiiBackChannel.cpp */; };
 		E99C32571D8607830098798F /* wwiiPPOLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E99C32561D8607830098798F /* wwiiPPOLoader.cpp */; };
+		E99C3E791E7457FC008A435E /* libsteam_api.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = E99C3E761E744FC6008A435E /* libsteam_api.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E9C1BDDD1E462A38001FD5B0 /* libRakNetLibStatic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD01E461EE6001FD5B0 /* libRakNetLibStatic.a */; };
 		E9C1BDDE1E462A38001FD5B0 /* liblibcatcommon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD11E461EE6001FD5B0 /* liblibcatcommon.a */; };
 		E9C1BDDF1E462A38001FD5B0 /* liblibcatcrypt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD21E461EE6001FD5B0 /* liblibcatcrypt.a */; };
@@ -581,6 +584,16 @@
 				FA3B631C1D613BB400A5A810 /* HockeySDK.framework in Copy Files */,
 			);
 			name = "Copy Files";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E99C3E781E7457E8008A435E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				E99C3E791E7457FC008A435E /* libsteam_api.dylib in CopyFiles */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		FA448CE01D0CB25500C4936D /* CopyFiles */ = {
@@ -1488,8 +1501,10 @@
 		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
 		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		E91EBF4F1E7447F6005AE0A0 /* libsteam_api.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsteam_api.dylib; path = ../Libraries/SteamSDK/redistributable_bin/osx32/libsteam_api.dylib; sourceTree = "<group>"; };
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E94156AF1D259A0300C0565B /* libb64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libb64.a; path = lib/mac/libb64.a; sourceTree = "<group>"; };
+		E95E664E1E8301A2005A04FF /* steam_appid.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = steam_appid.txt; path = ../opt/ww2mods/steam_appid.txt; sourceTree = "<group>"; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
 		E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader2.cpp; sourceTree = "<group>"; };
 		E97C76351C8513EB00875F44 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1565,6 +1580,7 @@
 		E98C647F1E48DF5A00ABE277 /* wwiiBackChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiBackChannel.h; sourceTree = "<group>"; };
 		E99C32551D8607830098798F /* wwiiPPOLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiPPOLoader.h; sourceTree = "<group>"; };
 		E99C32561D8607830098798F /* wwiiPPOLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiPPOLoader.cpp; sourceTree = "<group>"; };
+		E99C3E761E744FC6008A435E /* libsteam_api.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsteam_api.dylib; path = ../Libraries/SteamSDK/redistributable_bin/osx32/libsteam_api.dylib; sourceTree = "<group>"; };
 		E9C1BDD01E461EE6001FD5B0 /* libRakNetLibStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRakNetLibStatic.a; path = lib/mac/libRakNetLibStatic.a; sourceTree = "<group>"; };
 		E9C1BDD11E461EE6001FD5B0 /* liblibcatcommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibcatcommon.a; path = lib/mac/liblibcatcommon.a; sourceTree = "<group>"; };
 		E9C1BDD21E461EE6001FD5B0 /* liblibcatcrypt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibcatcrypt.a; path = lib/mac/liblibcatcrypt.a; sourceTree = "<group>"; };
@@ -1664,6 +1680,7 @@
 				08F41C5612D39B7B0001C6F5 /* libfreetype2.a in Frameworks */,
 				FA13BB511C87CF8500095818 /* libglew.a in Frameworks */,
 				08492F5B131708E700C7F39E /* libftgl.a in Frameworks */,
+				E91EBF511E744877005AE0A0 /* libsteam_api.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3089,6 +3106,8 @@
 		20286C29FDCF999611CA2CEA /* WW2OL */ = {
 			isa = PBXGroup;
 			children = (
+				E95E664E1E8301A2005A04FF /* steam_appid.txt */,
+				E99C3E761E744FC6008A435E /* libsteam_api.dylib */,
 				FA3D8BB11C8BF5CC002C5119 /* Config */,
 				FA448CBC1D0CB01100C4936D /* omggen */,
 				0DA6D33608563A0900A53577 /* src */,
@@ -3124,6 +3143,7 @@
 				E9C1BDD41E461EE6001FD5B0 /* liblibcattunnel.a */,
 				FA3B631A1D613BA500A5A810 /* HockeySDK.framework */,
 				E94156AF1D259A0300C0565B /* libb64.a */,
+				E91EBF4F1E7447F6005AE0A0 /* libsteam_api.dylib */,
 				FA05B0811C8D3E1800CDE30C /* libgranny2.a */,
 				FA13BB391C87649000095818 /* AGL.framework */,
 				FA13BB3A1C87649000095818 /* Cocoa.framework */,
@@ -3384,6 +3404,7 @@
 				8D0C4E8F0486CD37000505A6 /* Sources */,
 				8D0C4E910486CD37000505A6 /* Frameworks */,
 				E97C76D21C85B1FD00875F44 /* Copy Files */,
+				E99C3E781E7457E8008A435E /* CopyFiles */,
 			);
 			buildRules = (
 				FA448CA51D0CADA900C4936D /* PBXBuildRule */,
@@ -3493,6 +3514,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E95E664F1E8301A3005A04FF /* steam_appid.txt in Resources */,
 				FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */,
 				FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */,
 				FA37D7531C937F8F00013187 /* Localizable.strings in Resources */,

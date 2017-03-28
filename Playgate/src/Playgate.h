@@ -13,6 +13,16 @@
 
 extern CBDialog* hMainWnd;
 
+enum PlaygateState
+{
+	PgStarting = 0
+	, PgTOS
+	, PgRegionSelection
+	, PgAuthentication
+	, PgServerSelect
+	, PgFinished
+};
+
 enum StatusType
 {
 	AppError = RGB(255, 0, 0)
@@ -42,6 +52,7 @@ public:
 		if ( hMainWnd )
 			hMainWnd->MessageBox(message, AppName(), MB_OK);
 	}
+	void SetState(PlaygateState state);
 	void SetStatus(const TCHAR* message, StatusType=AppNote) const;
 	static void SetWindowText(CWnd* wnd, const char* text);
 	void PostCommand(UINT32 messageID, LPARAM lParam) const

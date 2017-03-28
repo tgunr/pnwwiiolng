@@ -42,6 +42,7 @@ authPackARENA_REQ(PackMode mode, UCHAR* data, SINT32 offset, ARENA_REQ* request,
 	offset = teulPackUINT32(mode,data,offset,(UINT32*)&request->infoOnly,8);
 	offset = teulPackUINT32(mode,data,offset,&request->presenterVersion,0);
 
+	request->steamID = 0;
 	request->username[0] = '\0';
 	request->password[0] = '\0';
 
@@ -59,6 +60,7 @@ SINT32 authPackARENA_REQ2(PackMode mode, UCHAR* data, SINT32 offset, ARENA_REQ* 
 	offset = teulPackUINT32(mode,data,offset,&request->sessionID,0);
 	offset = teulPackUINT32(mode,data,offset,(UINT32*)&request->infoOnly,8);
 	offset = teulPackUINT32(mode,data,offset,&request->presenterVersion,0);
+	offset = teulPackUINT32(mode, data, offset, &request->steamID, 0);
 
 	offset = teulPackVoid(mode,data,offset,&request->username,MAX_OLD_USERNAME);
 	offset = teulPackVoid(mode,data,offset,&request->password,MAX_PASSWORD);
@@ -97,6 +99,7 @@ SINT32 authPackAPP_LAUNCH_REQ(PackMode mode, UCHAR* data, SINT32 offset, APP_LAU
 	request->username[MAX_OLD_USERNAME-1]='\0';
 	request->password[MAX_PASSWORD-1]='\0';
 
+	offset = teulPackUINT32(mode, data, offset, &request->steamID, 0);
 	offset = teulPackSINT32(mode,data,offset,&request->status,0);
 	offset = teulPackSINT32(mode,data,offset,&request->arenaID,0);
 	offset = teulPackUINT32(mode,data,offset,&request->sessionID,0);
@@ -146,6 +149,7 @@ SINT32 authPackAPP_LAUNCH_REQ2(PackMode mode, UCHAR* data, SINT32 offset, APP_LA
 	request->username[MAX_OLD_USERNAME-1]='\0';
 	request->password[MAX_PASSWORD-1]='\0';
 
+	offset = teulPackUINT32(mode, data, offset, &request->steamID, 0);
 	offset = teulPackSINT32(mode,data,offset,&request->status,0);
 	offset = teulPackSINT32(mode,data,offset,&request->arenaID,0);
 	offset = teulPackUINT32(mode,data,offset,&request->sessionID,0);

@@ -96,6 +96,10 @@
       <AdditionalDependencies>
       </AdditionalDependencies>
     </Lib>
+    <PreBuildEvent>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
+      <Message>Generate build_info.cpp</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -133,6 +137,10 @@
       </ForceSymbolReferences>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
     </Lib>
+    <PreBuildEvent>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
+      <Message>Generate build_info.cpp</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">
     <ClCompile>
@@ -172,6 +180,10 @@
       </ForceSymbolReferences>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
     </Lib>
+    <PreBuildEvent>
+      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
+      <Message>Generate build_info.cpp</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\dbug\dbug.cpp">
@@ -192,7 +204,7 @@
     <ClCompile Include="..\..\..\src\teul\teulTransport.cpp" />
     <ClCompile Include="..\..\..\src\teul\teulUtils.cpp" />
     <ClCompile Include="..\..\..\src\wwii\wwiiCallbacks.cpp" />
-    <ClCompile Include="..\build_info.cpp" />
+    <ClCompile Include="build_info.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\dbug\dbug.h" />

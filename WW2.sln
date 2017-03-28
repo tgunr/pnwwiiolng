@@ -385,8 +385,8 @@ Global
 		{A755190B-E034-45F3-A255-75DCEE000361}.AlphaRelease|Win32.ActiveCfg = AlphaRelease|Win32
 		{A755190B-E034-45F3-A255-75DCEE000361}.AlphaRelease|Win32.Build.0 = AlphaRelease|Win32
 		{A755190B-E034-45F3-A255-75DCEE000361}.AlphaRelease|x64.ActiveCfg = AlphaRelease|Win32
-		{A755190B-E034-45F3-A255-75DCEE000361}.BetaRelease|Win32.ActiveCfg = Release|Win32
-		{A755190B-E034-45F3-A255-75DCEE000361}.BetaRelease|Win32.Build.0 = Release|Win32
+		{A755190B-E034-45F3-A255-75DCEE000361}.BetaRelease|Win32.ActiveCfg = BetaRelease|Win32
+		{A755190B-E034-45F3-A255-75DCEE000361}.BetaRelease|Win32.Build.0 = BetaRelease|Win32
 		{A755190B-E034-45F3-A255-75DCEE000361}.BetaRelease|x64.ActiveCfg = Debug|Win32
 		{A755190B-E034-45F3-A255-75DCEE000361}.BetaRelease|x64.Build.0 = Debug|Win32
 		{A755190B-E034-45F3-A255-75DCEE000361}.Buzzard|Win32.ActiveCfg = Release|Win32
