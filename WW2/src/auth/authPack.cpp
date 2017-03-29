@@ -234,6 +234,7 @@ SINT32 authPackGAME_INIT(PackMode mode, UCHAR* data, SINT32 offset, AUTH_GAME_IN
 	offset = teulPackUINT32(mode,data,offset,&(init->maxUsers),0);
 	offset = teulPackUINT32(mode,data,offset,&(init->port),0);
 	offset = teulPackUINT32(mode,data,offset,&(init->ipAddress),0);
+	offset = teulPackUINT32(mode,data,offset,&(init->extAddress),0);
 
 	offset = teulPackVoid(mode, data, offset, init->hello, 16);
 
