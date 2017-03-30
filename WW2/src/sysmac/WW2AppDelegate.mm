@@ -40,7 +40,7 @@ static const int STEAM_APP_ID = 251950;
 #if defined(BETA_RELEASE)
 #define DEFAULT_AUTH_SERVER "authdev.playnet.com"
 #else
-#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
+#define DEFAULT_AUTH_SERVER "auth.playnet.com"
 #endif
 
 #endif
