@@ -198,7 +198,7 @@ static bool _lookupAuthHost()
 	if ( auth_override || !Teul::GetIPs(g_region.authSuffix().c_str(), g_authHosts) || g_authHosts.empty() ) {
 		if (!auth_override) {
 #ifndef BETA_RELEASE
-			strprintf(g_authHostName, "authdevng%s", g_region.authSuffix().c_str());
+			strprintf(g_authHostName, "auth%s", g_region.authSuffix().c_str());
 #else
 			strprintf(g_authHostName, "authdev%s", g_region.authSuffix().c_str());
 #endif
