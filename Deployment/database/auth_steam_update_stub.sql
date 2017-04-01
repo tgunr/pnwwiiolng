@@ -1,0 +1,78 @@
+USE `audit`;
+DROP TABLE IF EXISTS `auth_steamcustomer`;
+CREATE TABLE `auth_steamcustomer` (
+  `steamID` int(11) unsigned NOT NULL,
+  `customerID` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`steamID`),
+  UNIQUE KEY `steamID` (`steamID`),
+  KEY `cust_id` (`customerID`),
+  KEY `steam_id` (`steamID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+DROP PROCEDURE IF EXISTS `p_authenticate_steam_user_for_arena`; 
+DELIMITER ;;
+CREATE PROCEDURE `p_authenticate_steam_user_for_arena`(
+    i_steamid  INT(11) UNSIGNED
+  , i_arena_id  INT(11) UNSIGNED
+  )
+    READS SQL DATA
+    SQL SECURITY INVOKER
+BEGIN
+  DECLARE l_not_found TINYINT(1) UNSIGNED DEFAULT 0;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET l_not_found = 1;
+
+  SELECT  IF ( s.status = 'active', 1, 0 ) AS is_active
+     ,  p.playerID, c.handle
+     ,  IF ( c.flags & 2, 1, 0 ) AS have_hw_info
+    FROM wwiiol_players p
+      INNER JOIN auth_customer c USING (customerID)
+      INNER JOIN auth_subscribed s USING (customerID)
+      INNER JOIN auth_subarenaassoc a USING (subscriptionID)
+      INNER JOIN auth_steamcustomer m USING (customerID)
+       WHERE m.steamID = i_steamid
+         AND a.arenaID = i_arena_id
+       ORDER BY s.status ASC
+       LIMIT 1
+  ;
+END ;;
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS `p_get_steam_user_subscriptions`;
+DELIMITER ;;
+CREATE PROCEDURE `p_get_steam_user_subscriptions`(
+    i_steamid  INT(11) UNSIGNED
+  )
+    READS SQL DATA
+    SQL SECURITY INVOKER
+BEGIN
+  DECLARE l_not_found TINYINT(1) UNSIGNED DEFAULT 0;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET l_not_found = 1;
+
+  SELECT  IF ( s.status = 'active', 1, 0 ) AS is_active
+     ,  p.playerID
+     ,  1 AS have_hw_info
+     ,  IF ( ps.status = 'active', 1, 0 ) AS is_playnet
+     ,  (
+        SELECT  GROUP_CONCAT(DISTINCT(a.arenaID))
+          FROM  auth_subscribed s
+            INNER JOIN auth_subarenaassoc a USING (subscriptionID)
+            INNER JOIN auth_arenas aa USING (arenaID)
+         WHERE  s.customerID = c.customerID
+            AND s.status = 'active'
+         GROUP  BY s.customerID
+         ORDER  BY a.arenaID
+      ) AS subs
+    , IF ( s.status = 'active', 'Y', 'N' ) AS is_premium
+    FROM wwiiol_players p
+      INNER JOIN auth_customer c USING (customerID)
+      INNER JOIN auth_subscribed s USING (customerID)
+      INNER JOIN auth_steamcustomer m USING (customerID)
+      LEFT OUTER JOIN auth_subscribed ps
+        ON (ps.customerid = p.customerid AND ps.subscriptionid = 9)
+       WHERE m.steamID = i_steamid
+       ORDER BY s.status ASC
+       LIMIT 1
+  ;
+END ;;
+DELIMITER ;
+

@@ -184,6 +184,73 @@ MANAGEMENT_MSG::process() const
 }
 
 //////////////////////////////////////////////////////////////////////
+//this function validates a steam user against the database
+UINT32
+authValidateSteamUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch& gamecookie, const Auth::ClientData& cdata)
+{
+	char buffer[512] = {0};
+
+	strprintf(buffer
+					, "CALL `auth`.`p_authenticate_steam_user_for_arena`(%u,%u)"
+						, request.steamID
+						, request.arenaID
+						);
+
+	UINT32 isActive = 0, haveInfo = 0;
+	bool foundUser = false;
+
+	try
+	{
+		DBQuery q(dbh, buffer);
+		if ( q.HasRows() && q.FetchRow() == true )
+		{
+			DBRow& row = q.Row();
+
+			isActive = row.NextUInt();
+			gamecookie.m_customerID = row.NextUInt();
+			row.NextString(gamecookie.m_callsign);
+			haveInfo = row.NextUInt();
+
+			if ( gamecookie.m_callsign[0] == 0 )
+				throw std::invalid_argument("null game name");
+
+			foundUser = true;
+		}
+	}
+	catch (std::exception& e)
+	{
+        strprintf(buffer, "%u", request.steamID);
+		authdbLogBadPlayername(cdata.address, buffer, e.what());
+		LogAbort("error looking up steam user %u: %s", request.steamID, e.what());
+		/*return WEB_ERR_INTERNAL;*/
+	}
+
+	if ( foundUser == false )
+	{
+        strprintf(buffer, "%u", request.steamID);
+		dbugLog(_FLN, "t:%d s:%u ip:%s arena:%u plat:%u no such steam user"
+						, teulIndex, request.steamID, teulGetAddress(cdata.address), request.arenaID, cdata.platform);
+		authdbLogBadPlayername(cdata.address, buffer, "no such steam user");
+		return WEB_ERR_USER;
+	}
+
+	if ( isActive == 0 )
+	{
+		dbugLog(_FLN, "t:%d s:%u ip:%s arena:%u plat:%u account not active"
+						, teulIndex, request.steamID, teulGetAddress(cdata.address)
+						, request.arenaID, cdata.platform
+						);
+		authdbLogBadPlayername(cdata.address, buffer, "steam account not active");
+		return WEB_ERR_SUB;
+	}
+
+	if ( cdata.oVersion > 1 && haveInfo == 0 )
+		infoSendCompInfoRequest(teulIndex, "Updating Terms of Service");
+
+	return WEB_ERR_NONE;
+}
+
+//////////////////////////////////////////////////////////////////////
 //this function validates a user against the database
 UINT32
 authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch& gamecookie, const Auth::ClientData& cdata)
@@ -281,6 +348,88 @@ authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch
 						, request.arenaID, cdata.platform
 						);
 		authdbLogBadPlayername(cdata.address, request.username, "account not active");
+		return WEB_ERR_SUB;
+	}
+
+	if ( cdata.oVersion > 1 && haveInfo == 0 )
+		infoSendCompInfoRequest(teulIndex, "Updating Terms of Service");
+
+	return WEB_ERR_NONE;
+}
+
+UINT32
+Auth::LoginSteamRequest::validate(SINT32 teulIndex, Auth::ClientData& cdata)
+{
+	char buffer[512] = {0};
+	strprintf(buffer
+					, "CALL `auth`.`p_get_steam_user_subscriptions`('%u')"
+						, m_account);
+
+	UINT32 isActive = 0, haveInfo = 0;
+	bool foundUser = false;
+
+	try
+	{
+		DBQuery q(dbh, buffer);
+		if ( q.HasRows() && q.FetchRow() == true )
+		{
+			DBRow& row = q.Row();
+
+			isActive = row.NextUInt();
+			cdata.customerID = row.NextUInt();
+			haveInfo = row.NextUInt();
+			cdata.isPlaynet = (row.NextUInt() == 1);
+			const char* subs = row.NextString();
+			while ( subs && *subs )
+			{
+				char* p = const_cast<char*>(strchr(subs, ','));
+				if ( p )
+				{
+					*(p++) = 0;
+					if ( *p == ',' )
+						continue;
+				}
+				cdata.m_subscribedArenaIDs.push_back((UCHAR)atoi(subs));
+				subs = p;
+			}
+			cdata.isPremium = (row.NextString()[0] == 'Y');
+
+			foundUser = true;
+		}
+	}
+	catch (std::exception& e)
+	{
+        strprintf(buffer, "steamID: %u", m_account);
+		authdbLogBadPlayername(cdata.address, buffer, e.what());
+		LogAbort("error looking up steam user %u: %s", m_account, e.what());
+	}
+
+	if ( foundUser == false )
+	{
+		dbugLog(_FLN, "t:%d s:%u ip:%s plat:%u no such steam user"
+						, teulIndex, m_account, teulGetAddress(cdata.address), m_platform);
+        strprintf(buffer, "steamID: %u", m_account);
+		authdbLogBadPlayername(cdata.address, buffer, "no such steam user");
+		return WEB_ERR_USER;
+	}
+
+	if ( isActive == 0 )
+	{
+		dbugLog(_FLN, "t:%d s:%u ip:%s plat:%u steam account not active"
+						, teulIndex, m_account, teulGetAddress(cdata.address), m_platform
+						);
+        strprintf(buffer, "steamID: %u", m_account);
+		authdbLogBadPlayername(cdata.address, buffer, "steam account not active");
+		return WEB_ERR_SUB;
+	}
+
+	if ( cdata.m_subscribedArenaIDs.empty() )
+	{
+		dbugLog(_FLN, "t:%d c:%u ip:%s plat:%u steam account has no subscriptions"
+						, teulIndex, m_account, teulGetAddress(cdata.address), m_platform
+						);
+        strprintf(buffer, "steamID: %u", m_account);
+		authdbLogBadPlayername(cdata.address, buffer, "no active subs for steam user");
 		return WEB_ERR_SUB;
 	}
 

@@ -46,6 +46,7 @@ struct SERVER
 	~SERVER();
 
 	UINT32	ipAddress;			//The IP address of the server
+	UINT32	extAddress;			//The IP address for the client to connect to
 	SINT32	teulIndex;			//The teulIndex of the server
 	UINT16	port;				//The port the server is running on
 	UINT16	sourcePort;
@@ -67,6 +68,7 @@ struct AUTH_GAME_INIT
 							//	to connect to this arena
 	UINT32	maxUsers;		// The max users this server can handle
 	UINT32	ipAddress;		// IP address of server
+	UINT32	extAddress;		// IP address to forward the client to.
 	UINT32	port;			// Port of server
 	SCHAR	hello[16];		// A hello message
 };

@@ -26,6 +26,7 @@ public:
 	bool	m_savePassword : 1;	// Whether or not to save passwords
 	bool	m_needsWrite : 1;
 	UCHAR	m_spare[256];
+	UINT32  m_steamAccountId;	// steam account ID
 
 	// Extract the password mask/MD5/username
 	void GetPasswordMask(wchar_t* maskDest) const;

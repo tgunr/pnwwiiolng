@@ -121,6 +121,36 @@ struct LoginRequest
 };
 
 //////////////////////////////////////////////////////////////////////
+// Steam User requesting to log in
+struct LoginSteamRequest
+{
+	enum { PLAT_PC = 0, PLAT_MAC = 1 };
+	// Constructor.
+	LoginSteamRequest(const UINT32& account)
+		: m_account(account)
+		, m_platform(platOS)
+	{}
+	// Network ctor.
+	LoginSteamRequest(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
+	// Serializing function
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
+	{
+		a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_account, sizeof(UINT32)*8);
+		a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_platform, 8);
+		return a->offset;
+	}
+	// Host: Log the guy in.
+	SINT32 process(SINT32 teulIndex);
+	// Client: Send this request
+	void send();
+	// Host: authenticate
+	UINT32 validate(SINT32 teulIndex, struct ClientData& cdata);
+
+	UINT32	m_account;		//!< Account name
+	UCHAR	m_platform;	//!< 0 = Windows, 1 = Mac
+};
+
+//////////////////////////////////////////////////////////////////////
 // After an Auth::LoginRequest the host validates your request and determines
 // whether your account has permission to log in or not. The result of this
 // authentication is described through an Auth::LoginReply. "code" is a
