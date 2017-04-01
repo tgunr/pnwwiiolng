@@ -350,11 +350,11 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
 	result = m_peer->Send(&bitStream, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, 0, guid, false);
 	if (result == 0)
     {
-        dbugLog(_FLW, "Raknet: Failed to send data over backchannel to host %s, teulIndex %d", guid, endpoint.teulIndex());
+        dbugLog(_FLW, "Raknet: Failed to send data over backchannel to host %s, teulIndex %d", guid.ToString(), endpoint.teulIndex());
     }
     else
     {
-        dbugLog(_FLI, "Raknet: Sent data via backchannel to host %s, teulIndex %d", guid, endpoint.teulIndex());
+        dbugLog(_FLI, "Raknet: Sent data via backchannel to host %s, teulIndex %d", guid.ToString(), endpoint.teulIndex());
     }
 
 	return (result > 0);
