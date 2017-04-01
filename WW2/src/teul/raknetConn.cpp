@@ -197,8 +197,6 @@ void RakNetChannel::update()
 		while ((p = m_peer->Receive()) != nullptr)
 		{
 			unsigned char packetX = (unsigned char)p->data[0];
-			UINT32 ip = ntohl(p->systemAddress.address.addr4.sin_addr.s_addr);
-
 			switch (packetX)
 			{
                 case ID_DISCONNECTION_NOTIFICATION:
@@ -241,11 +239,19 @@ void RakNetChannel::update()
 				{
 					SINT32 teulIndex = ntohl(*(reinterpret_cast<SINT32 *>(p->data + 1)));
 					// Have we associated this guid with an endpoint yet?
-					if (guidToEndPoint[p->guid] != nullptr && teulIndex > 0) {
+					if (isServer() && guidToEndPoint[p->guid] == nullptr && teulIndex > 0) {
+					    dbugLog(_FLD, "Raknet: teulIndex received from client: %d with guid: %s", teulIndex, p->guid.ToString());
 						ENDPOINT *ep = teulGetEndpoint(teulIndex);
 						guidToEndPoint[p->guid] = ep;
 						ep->m_rakNetGuid = p->guid;
 					}
+                    else
+                    {
+                        if (teulIndex < 1)
+                        {
+                            dbugLog(_FLW, "Raknet: recevied bad index from client: %d", teulIndex);
+                        }
+                    }
 					processApplicationPacket(p);
 				}
                     break;
@@ -294,7 +300,7 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p)
 	}
 	else
 	{
-		dbugLog(_FLW, "Raknet: No endpoint located for incoming msg");
+		dbugLog(_FLW, "Raknet: No endpoint located for incoming msg: guid-%s", p->guid.ToString());
 	}
 
 }
@@ -354,7 +360,7 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
     }
     else
     {
-        dbugLog(_FLI, "Raknet: Sent data via backchannel to host %s, teulIndex %d", guid.ToString(), endpoint.teulIndex());
+        dbugLog(_FLD, "Raknet: Sent data via backchannel to host %s, teulIndex %d", guid.ToString(), endpoint.teulIndex());
     }
 
 	return (result > 0);
