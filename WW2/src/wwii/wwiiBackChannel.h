@@ -15,7 +15,7 @@
 // Backchannel system is not currently encapsulated to handle multiple
 // connections per client
 
-extern bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, SINT32 teulIndex, UINT32 playerId, UINT32 otp, char * packedPublicKey) ;
+extern bool wwiiBackChannelConnect(SINT32 hostTeulIndex, const char* serverIP, UINT16 port, SINT32 teulIndex, UINT32 playerId, UINT32 otp, char * packedPublicKey) ;
 
 // Disconnect from the current back channel
 extern void wwiiBackChannelDisconnect( SINT32 teulIndex ) ;

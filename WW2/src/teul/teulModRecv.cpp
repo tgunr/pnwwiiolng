@@ -89,8 +89,6 @@ SINT32 _updatesThisSec = 0;
 //static UINT32 _lastPRecvTotal = 0;
 static UINT32 _lastPXferTotal = 0;
 
-extern IP_ENDPOINT_MAP ipToEndPoint;
-
 #if defined(WINDOWS_VERSION)
 static fd_set 		master_readfs, master_writefs;//, exceptfs;
 static size_t		maxSock;
@@ -398,9 +396,6 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		teulGetAddress(newEndpoint->destAddress(), remoteIP, sizeof(remoteIP));
 		char localIP[32];
 		teulGetAddress(newEndpoint->localAddress(), localIP, sizeof(localIP));
-
-		// Add to IP/endpoint map
-		ipToEndPoint[newEndpoint->destAddress()] = newEndpoint;
 
 		dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET " (li:%" PR64BitUT ")"
 					, endpoint.teulIndex()
