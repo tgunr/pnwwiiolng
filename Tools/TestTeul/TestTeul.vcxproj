@@ -78,7 +78,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>platBuild=BUILD_CLIENT;CLOSED_BETA;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions);</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <BrowseInformation>false</BrowseInformation>
@@ -98,7 +98,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>platBuild=BUILD_CLIENT;CLOSED_BETA;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsManaged>false</CompileAsManaged>
@@ -127,7 +127,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>platBuild=BUILD_CLIENT;CLOSED_BETA;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsManaged>false</CompileAsManaged>
