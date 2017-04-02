@@ -234,6 +234,14 @@ void RakNetChannel::update()
                         release();
                         return;
                     }
+                    else
+                    {
+                        // release GUID mapping if still allocated
+                        if ( guidToEndPoint[p->guid] != nullptr )
+                        {
+                            disconnect( guidToEndPoint[p->guid] );
+                        }
+                    }
                     break;
                 case ID_USER_PACKET_ENUM:
 				{
@@ -384,6 +392,7 @@ void RakNetChannel::disconnectPeer(ENDPOINT *pEndpoint)
                 // see if this is a client endpoint
                 if (pEndpoint->m_parent != nullptr)
                 {
+                    dbugLog(_FLI, "Raknet: disconnectPeer: Disconnecting endpoint %p", pEndpoint);
                     pEndpoint->m_pairdUdpConn->disconnect(pEndpoint);
                 }
                 
@@ -395,6 +404,8 @@ void RakNetChannel::disconnectPeer(ENDPOINT *pEndpoint)
 
 void RakNetChannel::disconnect(ENDPOINT *pEndpoint)
 {
+    dbugLog(_FLI, "Raknet: Disconnecting endpoint %p", pEndpoint);
+
 	// reset all of the associations
 	RakNetGUID defaultGuid;
 	RakNetGUID guid = pEndpoint->m_rakNetGuid;
