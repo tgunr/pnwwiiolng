@@ -1686,9 +1686,12 @@ void SpeedGrassDeprecated::LoadBMP(const char* filename,
     miscTexIds.push_back(id);
 
     piSURFACEDESC pisd;
-    piLockTextureMemorySurface(id, 0, &pisd);
+	if (!piLockTextureMemorySurface(id, 0, &pisd))
+	{
+		dbugLog(_FLW, "Could not lock texture for id=%d", id);
+	}
 
-    char* cptr;
+    char* cptr = nullptr;
 
     int density = 0;
 
@@ -1709,7 +1712,7 @@ void SpeedGrassDeprecated::LoadBMP(const char* filename,
     patch.w = pisd.Width;
     patch.h = pisd.Height;
 
-    if(pisd.PixelFormat.dwRGBBitCount > 24)
+    if(pisd.Surface == nullptr || pisd.PixelFormat.dwRGBBitCount > 24)
         return;
 
     float s = 1.0f;
