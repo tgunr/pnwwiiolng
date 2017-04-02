@@ -496,13 +496,8 @@ if [ "$isrelease" = true ] ; then
     bld_config="Release"
     bld_config_dir=$bld_config
 else
-    if [ "$myos" == "win" ] ; then
-        bld_config="BetaRelease"
-        bld_config_dir=$bld_config
-    else
-        bld_config="Dev"
-        bld_config_dir="Development"
-    fi
+    bld_config="BetaRelease"
+    bld_config_dir=$bld_config
 fi
 
 build_step "build" "Building" "release version"
