@@ -1275,6 +1275,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN )
 		{
+			_userConnections--;
 			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d connCount:%d", teulIndex, error, _userConnections);
 			return;
 		}
