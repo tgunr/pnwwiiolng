@@ -36,48 +36,9 @@
 #include "configVars.h"
 #endif
 
-extern IP_ENDPOINT_MAP ipToEndPoint;
+extern GUID_ENDPOINT_MAP guidToEndPoint;
 
 bool libCatSecurityEnabled = true;
-
-typedef std::map<UINT32, SystemAddress> IP_SYS_MAP;
-static IP_SYS_MAP ipToSysMap;
-
-/*
- * Private method called for server to add the incoming client connection
- * to a map for later transmission.
- */
-void RakNetChannel::_addClient(UINT32 ip, const SystemAddress address)
-{
-
-	IP_SYS_MAP::iterator it = ipToSysMap.find(ip);
-	if (it != ipToSysMap.end() && it->second == address)
-	{
-		dbugLog(_FLD, "Raknet: Tried to add duplicate client %s", teulGetAddress(ip));
-		return;
-	}
-	ipToSysMap[ip] = address;
-	dbugLog(_FLD, "Raknet: adding host %s", teulGetAddress(ip));
-}
-
-/*
- * Ensures the ip to SystemAddress map is limited to only open 
- * connections.
- */
-void RakNetChannel::_removeClient(UINT32 ip)
-{
-	IP_SYS_MAP::iterator it = ipToSysMap.find(ip);
-	if (it != ipToSysMap.end())
-	{
-		dbugLog(_FLD, "Raknet: Removing client %s", teulGetAddress(ip));
-		ipToSysMap.erase(it);
-		m_peer->CloseConnection(it->second, false, 0, IMMEDIATE_PRIORITY);
-	}
-	else
-	{
-		dbugLog(_FLD, "Raknet: Tried to remove unregistered client %s", teulGetAddress(ip));
-	}
-}
 
 /*
  * Must be called after the connection is created in order to be usable.  Will set the 
@@ -236,15 +197,11 @@ void RakNetChannel::update()
 		while ((p = m_peer->Receive()) != nullptr)
 		{
 			unsigned char packetX = (unsigned char)p->data[0];
-			UINT32 ip = ntohl(p->systemAddress.address.addr4.sin_addr.s_addr);
-
 			switch (packetX)
 			{
                 case ID_DISCONNECTION_NOTIFICATION:
                     dbugLog(_FLN, "Raknet: %s disconnected", p->systemAddress.ToString());
-                    if (isServer())
-                        _removeClient(ip);
-                    else
+                    if (!isServer())
                     {
                         // time to abort netcode3
                         m_peer->DeallocatePacket(p);
@@ -259,7 +216,6 @@ void RakNetChannel::update()
                     return;
                 case ID_NEW_INCOMING_CONNECTION:
                     dbugLog(_FLN, "Raknet: %s connecting", p->systemAddress.ToString());
-                    _addClient(ip, p->systemAddress);
                     break;
                 case ID_CONNECTION_REQUEST_ACCEPTED:
                     dbugLog(_FLN, "Raknet: %s connected", p->systemAddress.ToString());
@@ -268,22 +224,44 @@ void RakNetChannel::update()
                     break;
                 case ID_ALREADY_CONNECTED:
                     dbugLog(_FLW, "Raknet: %s already connected", p->systemAddress.ToString());
-                    _addClient(ip, p->systemAddress);
                     break;
                 case ID_CONNECTION_LOST:
                     dbugLog(_FLW, "Raknet: %s connection lost", p->systemAddress.ToString());
-                    if (isServer())
-                        _removeClient(ip);
-                    else
+                    if (!isServer())
                     {
                         // time to abort netcode3
                         m_peer->DeallocatePacket(p);
                         release();
                         return;
                     }
+                    else
+                    {
+                        // release GUID mapping if still allocated
+                        if ( guidToEndPoint[p->guid] != nullptr )
+                        {
+                            disconnect( guidToEndPoint[p->guid] );
+                        }
+                    }
                     break;
                 case ID_USER_PACKET_ENUM:
-                    processApplicationPacket(p, ip);
+				{
+					SINT32 teulIndex = ntohl(*(reinterpret_cast<SINT32 *>(p->data + 1)));
+					// Have we associated this guid with an endpoint yet?
+					if (isServer() && guidToEndPoint[p->guid] == nullptr && teulIndex > 0) {
+					    dbugLog(_FLD, "Raknet: teulIndex received from client: %d with guid: %s", teulIndex, p->guid.ToString());
+						ENDPOINT *ep = teulGetEndpoint(teulIndex);
+						guidToEndPoint[p->guid] = ep;
+						ep->m_rakNetGuid = p->guid;
+					}
+                    else
+                    {
+                        if (teulIndex < 1)
+                        {
+                            dbugLog(_FLW, "Raknet: recevied bad index from client: %d", teulIndex);
+                        }
+                    }
+					processApplicationPacket(p);
+				}
                     break;
                 case ID_PUBLIC_KEY_MISMATCH:
                     dbugLog(_FLW, "Raknet: %s Public Key mismatch", p->systemAddress.ToString());
@@ -302,13 +280,13 @@ void RakNetChannel::update()
  * Incoming user data is handled here and it is passed through to the registered callback just as it would through
  * the normal TCP endpoint.
  */
-void RakNetChannel::processApplicationPacket(RakNet::Packet *p, UINT32 ip)
+void RakNetChannel::processApplicationPacket(RakNet::Packet *p)
 {
-	ENDPOINT *sourceEndpoint = (isServer()) ? ipToEndPoint[ip] : m_endpoint;
+	ENDPOINT *sourceEndpoint = (isServer()) ? guidToEndPoint[p->guid] : m_endpoint;
 
 	if (sourceEndpoint != nullptr)
 	{
-		Teul::PacketHeader* const hdr = reinterpret_cast<Teul::PacketHeader *>(&p->data[1]);
+		Teul::PacketHeader* const hdr = reinterpret_cast<Teul::PacketHeader *>(&p->data[1+sizeof(SINT32)]);
 		TEUL_CALLBACK* const callback = TEUL_CALLBACK::Lookup(hdr->m_callX, hdr->m_callY);
 		if (PN_UNLIKELY(callback == nullptr))
 		{
@@ -330,7 +308,7 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p, UINT32 ip)
 	}
 	else
 	{
-		dbugLog(_FLW, "Raknet: No endpoint located for incoming msg");
+		dbugLog(_FLW, "Raknet: No endpoint located for incoming msg: guid-%s", p->guid.ToString());
 	}
 
 }
@@ -362,35 +340,35 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
 	RakNet::BitStream bitStream;
 	UINT8 msgType = static_cast<UINT8>(ID_USER_PACKET_ENUM);
 	bitStream.Write(msgType);
+	bitStream.Write(m_peerTeulIndex);
 	bitStream.Write(static_cast<char *>(packet.packet()), packet.packetSizeBytes());
     
-    // We need to specify the target address
+	UINT32 result = 0;
+
+	RakNet::AddressOrGUID guid;
+
+	// We need to specify the target address
     // NOTE: we might be able to do without this map I think - wait for now
-    SystemAddress addr;
-    memset(&addr, 0, sizeof(SystemAddress));
     if (isServer())
     {
-        addr = ipToSysMap[endpoint.destAddress()];
+		guid = endpoint.m_rakNetGuid;
     }
     else
     {
-        addr.address.addr4 = endpoint.destSockAddress;
-    }
+		SystemAddress addr;
+		memset(&addr, 0, sizeof(SystemAddress));
+		addr.address.addr4 = endpoint.destSockAddress;
+		guid = addr;
+	}
     
-    UINT32 result = 0;
-    
-    // make sure we are connected to this address
-    if (addr.address.addr4.sin_addr.s_addr != 0)
+	result = m_peer->Send(&bitStream, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, 0, guid, false);
+	if (result == 0)
     {
-        result = m_peer->Send(&bitStream, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, 0, addr, false);
-        if (result == 0)
-        {
-            dbugLog(_FLW, "Raknet: Failed to send data over backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
-        }
-        else
-        {
-            dbugLog(_FLI, "Raknet: Sent data via backchannel to host %s, teulIndex %d", addr.ToString(), endpoint.teulIndex());
-        }
+        dbugLog(_FLW, "Raknet: Failed to send data over backchannel to host %s, teulIndex %d", guid.ToString(), endpoint.teulIndex());
+    }
+    else
+    {
+        dbugLog(_FLD, "Raknet: Sent data via backchannel to host %s, teulIndex %d", guid.ToString(), endpoint.teulIndex());
     }
 
 	return (result > 0);
@@ -414,6 +392,7 @@ void RakNetChannel::disconnectPeer(ENDPOINT *pEndpoint)
                 // see if this is a client endpoint
                 if (pEndpoint->m_parent != nullptr)
                 {
+                    dbugLog(_FLI, "Raknet: disconnectPeer: Disconnecting endpoint %p", pEndpoint);
                     pEndpoint->m_pairdUdpConn->disconnect(pEndpoint);
                 }
                 
@@ -425,5 +404,11 @@ void RakNetChannel::disconnectPeer(ENDPOINT *pEndpoint)
 
 void RakNetChannel::disconnect(ENDPOINT *pEndpoint)
 {
-    _removeClient(pEndpoint->destAddress());
+    dbugLog(_FLI, "Raknet: Disconnecting endpoint %p", pEndpoint);
+
+	// reset all of the associations
+	RakNetGUID defaultGuid;
+	RakNetGUID guid = pEndpoint->m_rakNetGuid;
+	guidToEndPoint[guid] = nullptr;
+	pEndpoint->m_rakNetGuid = defaultGuid;
 }

@@ -49,7 +49,7 @@ using ENDPOINT_IMPL_ARRAY = WWII::inplace_vector<EndpointImpl, Teul::MaxConnecti
 static ENDPOINT_ARRAY _endpoints;
 static ENDPOINT_IMPL_ARRAY _endpointImpls;
 
-IP_ENDPOINT_MAP ipToEndPoint;
+GUID_ENDPOINT_MAP guidToEndPoint;
 
 using namespace Teul;
 namespace Teul
@@ -312,12 +312,12 @@ _releaseEndpoint(ENDPOINT& endpoint)
 	idleEndpoints.remove(&endpoint);
 
 	// remove from the ip/endpoint list
-	IP_ENDPOINT_MAP::iterator it = ipToEndPoint.begin();
-	while (it != ipToEndPoint.end())
+	GUID_ENDPOINT_MAP::iterator it = guidToEndPoint.begin();
+	while (it != guidToEndPoint.end())
 	{
 		if (it->second == &endpoint)
 		{
-			ipToEndPoint.erase(it);
+			guidToEndPoint.erase(it);
 			break;
 		}
 		else

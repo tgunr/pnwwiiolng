@@ -14,6 +14,7 @@
 #include "chat/chatLocalizedMessage.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiPlayer.h"
+#include "RakNetTypes.h"
 #include "teul/teulBasic.h"
 
 //	------------------------------	Declarations

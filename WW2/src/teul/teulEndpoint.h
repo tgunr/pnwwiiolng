@@ -13,6 +13,7 @@
 #include "teul/teulTimeMS.h"
 #include "teul/teulSockTypes.h"		// For SOCKET
 #include "teul/teulFuncTypes.h"
+#include "RakNetTypes.h"
 
 class RakNetChannel;
 
@@ -22,8 +23,7 @@ namespace Teul
 }
 
 struct EndpointImpl;
-
-typedef std::map<UINT32, ENDPOINT *> IP_ENDPOINT_MAP;
+typedef std::map<RakNet::RakNetGUID, ENDPOINT *> GUID_ENDPOINT_MAP;
 
 #ifdef TEUL_DETAIL_OUTPUT
 #define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )     ep._dbugOutputPacket ( bIsRecv, reinterpret_cast<const uint8_t *>(bpInput), static_cast<size_t>(szBytes) );
@@ -79,6 +79,7 @@ public:
 	//! Implementation entity for stuff we don't really need to expose to all callers.
 	EndpointImpl*		m_impl;
 	RakNetChannel*		m_pairdUdpConn;
+	RakNet::RakNetGUID  m_rakNetGuid;
 
 	//! Generic pointer to application-specific data associated with
 	//! this connection. Typically either a ww2Client (on the client)

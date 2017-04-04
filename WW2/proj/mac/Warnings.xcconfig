@@ -157,6 +157,7 @@ CLANG_ANALYZER_SECURITY_INSECUREAPI_VFORK = YES
 WW2_WARNINGS_Development    = $(WW2_WARNINGS_01)
 WW2_WARNINGS_Debug          = $(WW2_WARNINGS_01)
 WW2_WARNINGS_Release        =
+WW2_WARNINGS_BetaRelease    =
 WW2_WARNINGS_GM             =
 
 // Actual build setting that Xcode cares about!

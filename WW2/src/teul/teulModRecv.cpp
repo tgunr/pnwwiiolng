@@ -89,8 +89,6 @@ SINT32 _updatesThisSec = 0;
 //static UINT32 _lastPRecvTotal = 0;
 static UINT32 _lastPXferTotal = 0;
 
-extern IP_ENDPOINT_MAP ipToEndPoint;
-
 #if defined(WINDOWS_VERSION)
 static fd_set 		master_readfs, master_writefs;//, exceptfs;
 static size_t		maxSock;
@@ -399,9 +397,6 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		char localIP[32];
 		teulGetAddress(newEndpoint->localAddress(), localIP, sizeof(localIP));
 
-		// Add to IP/endpoint map
-		ipToEndPoint[newEndpoint->destAddress()] = newEndpoint;
-
 		dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET " (li:%" PR64BitUT ")"
 					, endpoint.teulIndex()
 					, remoteIP, newEndpoint->fromPort()
@@ -637,7 +632,7 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 		// ignore packets we broadcast..
 		if ( endpoint.protocol == PROTOCOL_UDB && (dgram->sockAddress.sin_addr.s_addr & 0xff000000) == (Server::myInterface.addr[0].naddr & 0xff000000) )
 		{
-			dbugWrite(_FLI, "ignoring packet from %s!", teulGetAddress(ntohl(dgram->sockAddress.sin_addr.s_addr)) );
+			dbugWrite(_FLD, "ignoring packet from %s!", teulGetAddress(ntohl(dgram->sockAddress.sin_addr.s_addr)) );
 			continue;
 		}
 		else
