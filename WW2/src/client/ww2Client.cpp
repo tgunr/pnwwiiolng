@@ -57,6 +57,7 @@
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRoomLists.h"
 #include "omg/omgChat.hxx"
+#include "teul/raknetConn.h"
 
 using namespace ww2;
 
@@ -348,8 +349,15 @@ Client::~Client()
 
 void ClientHostConnection::onError(Client* client, SINT32 error)
 {
-	Teul::Connection::onError(client, error);
-
+    // for raknet errors lets just end things here, its not a real connetion failure until teul goes down
+    if (error == RN_SK_FAILED)
+    {
+        uiChatPrintLineColor(colorYELLOWALPHA, uiLocString("connect.netcode3.disabled").c_str());
+        return;
+    }
+    
+    Teul::Connection::onError(client, error);
+    
 	ww2::HostState* state = client->GetHostStateByType(m_type);
 	if(!state) return;
 

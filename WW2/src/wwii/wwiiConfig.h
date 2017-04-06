@@ -251,8 +251,9 @@ struct	WWII_CONFIG
 	cfSUPPLY	supply;
 	cfTHROTTLE	throttle;
 	cfUPDATE	update;
-
 	cfWEATHER	weather;
+
+	UCHAR       netcode3Enabled;
 };
 #pragma pack(pop)
 

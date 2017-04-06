@@ -297,7 +297,9 @@ bool GameProcess::CheckStatus()
 	}
 }
 
+#if platOS != OS_WIN32
 #include <dlfcn.h>
+#endif
 
 template<size_t MaxPath>
 static void _getCurrentProcessPath(char (& processPath)[MaxPath])

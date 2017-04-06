@@ -211,7 +211,7 @@ SquadList::memberJoin(Player* player, const ChatHandle handle, RANK_NO atRank, U
 		if ( recruitedBy )
 			sendMessage(LSTR_SQUAD, LSTR_SQUAD_RECRUITED_BY_RECRUITER, player ? player->callsign() : Chat::Name(handle).c_str(), recruitedBy);
 		else
-			sendMessage(LSTR_SQUAD, LSTR_SQUAD_ADDITION, player ? player->callsign() : Chat::Name(handle).c_str(), squad().shortName());
+			sendMessage(LSTR_SQUAD, LSTR_SQUAD_ADDITION, player ? player->callsign() : Chat::Name(handle).c_str(), squad().callsign().c_str());
 	}
 
 	updateMember(handle, atRank, player, joined);
@@ -572,7 +572,7 @@ _disbandSquad(UINT32 squadID, SquadList* squadList, Player* player)
 
 		if ( member->teulIndex() >= 0 )
 			member->message(LSTR_CAUTION, LSTR_SQUAD_DISBANDED
-							, player->callsign(), squadList->squad().shortName());
+							, player->callsign(), squadList->squad().callsign().c_str());
 	}
 
 	chatRemoveSquadList(squadID);

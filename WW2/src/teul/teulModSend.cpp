@@ -20,6 +20,8 @@
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiNetPorts.h"
+#include "teul/raknetConn.h"
+#include "wwii/wwiiConfig.h"
 
 UINT32 totalPacketsSent;
 UINT32 totalPacketsRecv;
@@ -57,7 +59,7 @@ void teulCleanupSend()
 // endpoint destination.
 
 SINT32
-teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
+teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const UCHAR protocolPreference)
 {
 	if( PN_UNLIKELY(endpoint.state() == IS_DEAD) )
 	{
@@ -98,7 +100,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 
 	outgoing.setPayloadSizeBytes(Teul::BitsToBytes(packedSizeBits));
 
-	const SINT32 sendResult = outgoing.send(endpoint);
+	const SINT32 sendResult = outgoing.send(endpoint, protocolPreference);
 	if ( PN_UNLIKELY(sendResult < 0) )
 	{
 		dbugLog(_FLW, "t:%d callback " PRF_CALLBACK " send failed:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), sendResult);
@@ -191,9 +193,35 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 // Try to send or queue a packet to a socket.
 
 SINT32
-ENDPOINT::sendPacket(Teul::Packet& packet)
+ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 {
+
 	const UINT32 packetBytes = packet.packetSizeBytes();
+
+	// First check to see if this should be sent via a RakNet backchannel
+    //      - through configuration, make sure we even have it enabled.
+    //      - application must be asking for UDP
+    //      - channel must exist, be initialized
+    //      - if a client, must also be connected
+	if (protocolPreference == PROTOCOL_UDP &&
+		m_pairdUdpConn != nullptr && m_pairdUdpConn->isInitialized() &&
+		(m_pairdUdpConn->isServer() || m_pairdUdpConn->isConnected()))
+	{
+#if platBuild == BUILD_SERVER
+        if (host_config.netcode3Enabled)
+#endif
+            // No need to encrypt, RakNet has its own encryption
+            if (m_pairdUdpConn->send(packet, *this))
+                return static_cast<SINT32>(packetBytes);
+	}  // fall through if sending failed - transmit via normal path
+
+	packet.header().m_tag = ++this->m_impl->sentTag;
+
+	// Encrypt the data.
+	if (packet.header().packetType() != Teul::Tokens::Unencrypted)
+	{
+		encrypt(packet.encryptable(), packet.header().packetSizeBytes());
+	}
 
 	// If there's no send queue, try and send the data directly.
 	if ( m_impl->m_sendQueue.empty() == true )
@@ -225,7 +253,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 			packet.addBytesSent(sent);
 			if ( packet.sentBytes() >= packetBytes )
 			{
-				return packetBytes;
+				return static_cast<SINT32>(packetBytes);
 			}
 		}
 		// Partial or blocked send falls thru and queues the remainder.
@@ -242,7 +270,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 
 	setWritesPending(true);
 
-	return packetBytes;
+	return static_cast<SINT32>(packetBytes);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -305,7 +333,7 @@ ENDPOINT::pushSendQueue()
 //
 
 SINT32
-Teul::Packet::send(ENDPOINT& endpoint)
+Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 {
 	if ( PN_UNLIKELY(endpoint.state() == IS_LISTENING || endpoint.state() >= IS_CLOSING) )
 	{
@@ -317,8 +345,6 @@ Teul::Packet::send(ENDPOINT& endpoint)
 					, "tried to re-send a Teul::Packet");
 
 	static_assert( sizeof(header().m_tag) == sizeof(endpoint.m_impl->sentTag), "Endpoint and Packet disagree on tag size" );
-
-	header().m_tag = ++endpoint.m_impl->sentTag;
 
 #if platBuild == BUILD_CLIENT
 	teulSyncClock();
@@ -338,13 +364,7 @@ Teul::Packet::send(ENDPOINT& endpoint)
 	ABORT_IF(header().packetSizeBytes() != payloadBytes);
 	m_sent = 0;
 
-	// Encrypt the data.
-	if ( header().packetType() != Teul::Tokens::Unencrypted )
-	{
-		endpoint.encrypt(encryptable(), header().packetSizeBytes());
-	}
-
-	const SINT32 result = endpoint.sendPacket(*this);
+	const SINT32 result = endpoint.sendPacket(*this, protocolPreference);
 	if ( PN_UNLIKELY(result <= 0) )
 	{
 		int err = 0;
@@ -369,7 +389,7 @@ Teul::Packet::send(ENDPOINT& endpoint)
 //////////////////////////////////////////////////////////////////////
 
 SINT32
-teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object)
+teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object, const UCHAR protocol)
 {
 	ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex);
 	if (PN_UNLIKELY(theEndpoint == nullptr))
@@ -378,7 +398,7 @@ teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object)
 		return -EINVAL;
 	}
 
-	return teulModSendCALLBACKe(*theEndpoint, object);
+	return teulModSendCALLBACKe(*theEndpoint, object, protocol);
 }
 
 //////////////////////////////////////////////////////////////////////

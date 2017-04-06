@@ -170,6 +170,14 @@
     <ClInclude Include="..\..\WW2\src\include\io_mapped_file.h" />
     <ClInclude Include="syscfg.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\RakNet\Source\RakNet.vcxproj">
+      <Project>{143f9b67-c223-4f2d-b8f9-b644ca710ca6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\WW2\proj\win\libcatid\libcatid.vcxproj">
+      <Project>{7c64282a-fc3f-4ed0-81d4-3be1bb67c90f}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

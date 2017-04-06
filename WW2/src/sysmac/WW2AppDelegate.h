@@ -42,7 +42,9 @@
     IBOutlet NSButton *playOnlineButton;
     IBOutlet NSPopUpButton *arenaMenu;
     IBOutlet NSProgressIndicator *arenaLoadingIndicator;
-
+    IBOutlet NSTextField *userLabel;
+    IBOutlet NSTextField *passwordLabel;
+    
     float downloadBoxResizeHeight;
     BOOL isHidingDownloadProgress;
     NSDate* lastStatusUpdateTime;

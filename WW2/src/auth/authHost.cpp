@@ -1227,7 +1227,7 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 	// Get the local network address excluding the last octet.
 	const UINT32 localAddress = teulGetEndpointLocalAddress(teulIndex);
 
-	UINT32 destAddress = bestServer.ipAddress;
+	UINT32 destAddress = bestServer.extAddress;
 
 	//hack since teulGetAddress sucks
 	teulGetAddress(request.appVersion, appVer, sizeof(appVer) - 1);
@@ -1322,7 +1322,16 @@ _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::Cli
 	}
 
 	// Fill in the dispatch
-	UINT32 error = authValidateUser(teulIndex, request, dispatch, cdata);
+	UINT32 error = WEB_ERR_NONE;
+    if (request.steamID == 0)
+    {
+        error = authValidateUser(teulIndex, request, dispatch, cdata);
+    }
+    else
+    {
+        error = authValidateSteamUser(teulIndex, request, dispatch, cdata);
+    }
+
 	if ( error != WEB_ERR_NONE )
 	{
 		_authValidateFailed(teulIndex, platform, ip, request, *gameEntry, reply, error);
@@ -1406,6 +1415,7 @@ authEstablishServer(const SINT32 teulIndex, AUTH_GAME_INIT& gInit)
 	SERVER* newServer = new SERVER;
 	newServer->teulIndex = teulIndex;
 	newServer->ipAddress = gInit.ipAddress;
+	newServer->extAddress = gInit.extAddress;
 	newServer->port = gInit.port;
 	newServer->sourcePort = 0;	///TODO:AUTH: Should use either local or dest port.
 	newServer->maxUsers = gInit.maxUsers;
@@ -1692,6 +1702,50 @@ Auth::GameList::populate(const std::vector<UCHAR>& clientSubs)
 		}
 		m_games.push_back(entry);
 	}
+}
+
+SINT32
+Auth::LoginSteamRequest::process(const SINT32 teulIndex)
+{
+	Auth::ClientData* cdata = (Auth::ClientData*)teulGetPersonaData(teulIndex);
+	if (cdata != nullptr)
+	{
+		dbugLog(_FLA, "t:%d c:%s ignoring multiple login requests from client", teulIndex, cdata->m_username.c_str());
+		return -EINVAL;
+	}
+
+	// Get teul's information about this connection such as IP address etc.
+	const UINT32 destAddress = teulGetEndpointRemoteAddress(teulIndex);
+	dbugLog(_FLI, "t:%d auth login request plat:%u ip:%s ov:%u s:%u"
+					, teulIndex
+					, m_platform
+					, teulGetAddress(destAddress)
+					, 0
+					, m_account
+					);
+
+	cdata = new Auth::ClientData(teulIndex
+									, m_platform			// Windows/Mac?
+									, destAddress			// IP address
+									, 0						// oVersion
+									, m_account);	    	// steamID
+
+	// Translate this into a response:
+	WEB_ERR err = (WEB_ERR)validate(teulIndex, *cdata);
+	// Text
+	const char* code = _authenticationErrorString(err);
+	// Filter the playnet status out until you succeed
+	bool isPlaynet = (err == WEB_ERR_NONE) ? cdata->isPlaynet : false;
+
+	Auth::LoginReply response(isPlaynet, code);
+	response.send(teulIndex);
+
+	if ( err == WEB_ERR_NONE )
+		teulSetPersonaData(teulIndex, cdata);
+	else
+		delete cdata;
+
+	return 0;
 }
 
 SINT32

@@ -127,6 +127,13 @@ SINT32 chatSendModeNotice(SINT32 teulIndex, UCHAR updateMode)
 	return outgoing.send(teulIndex);
 }
 
+SINT32 chatSendNetcodeNotice(SINT32 teulIndex, bool netcode)
+{
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::PREFERENCE_Y));
+	outgoing.construct<Chat::Preference>(CPR_SET_NETCODE, netcode);
+	return outgoing.send(teulIndex);
+}
+
 SINT32 chatSendRecruiterRequest(SINT32 teulIndex, UCHAR language)
 {
 	return teulSend(teulIndex, _SEND_RECRUITER_REQUEST, &language);

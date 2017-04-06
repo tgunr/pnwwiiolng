@@ -129,7 +129,7 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "kills.notifyKiller",			TYPE_BOOL,	&host_config.kills.notifyKiller,		0,		"n",	"Enable kill credit notifices" }
 ,	{ "kills.reportRats",			TYPE_BOOL,	&host_config.kills.reportRats,			0,		"n",	"Enable Kill-A-Rat notices" }
 ,	{ "kills.reportDamage",			TYPE_BOOL,	&host_config.kills.reportDamage,		0,		"n",		"Enable host reporting of joules damage being sent to your client" }
-,	{ "kills.assistWindow_s",		TYPE_BOOL,	&host_config.kills.assistWindow_s,		0,		"90",	"Time damage is remembered for assist credit (seconds)" }
+,	{ "kills.assistWindow_s",		TYPE_BOOL,	&host_config.kills.assistWindow_s,		0,		"y",	"Time damage is remembered for assist credit (seconds)" }
 
 //,	{ "mission.expireM",			TYPE_SINT,	&host_config.mission.expire_m,			15840,	"0",	"No-longer used (minutes)" }
 ,	{ "mission.launchCycleS",		TYPE_SINT,	&host_config.mission.launchCycle_s,		3600,	"0",	"Time between launch button recycles (seconds,	0=disabled)" }
@@ -257,6 +257,9 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "weather.numFogs",			TYPE_SINT,	&host_config.weather.numFogs,		 99,	"16",	"Number of fog patterns [per weather pattern]" }
 ,	{ "weather.numPatterns",		TYPE_SINT,	&host_config.weather.numPatterns,		99,	"3",	"Number of weather patterns" }
 ,	{ "weather.chanceOf",			TYPE_SINT,	&host_config.weather.chanceOf,		100,	"10",	"Per-day chance it will be a rainy day (0=never,	100=always)" }
+
+,	{ "netcode3Enabled",			TYPE_BOOL,	&host_config.netcode3Enabled,		0,		"n",	"Enable transmission of time-critical client-host data over UDP." }
+
 
 // -- End of list
 ,	{ nullptr, MAX_WWII_CONFIG_TYPES, nullptr, 0, nullptr, nullptr }

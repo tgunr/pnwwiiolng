@@ -94,6 +94,8 @@
 #include "mc/multiClient.h"
 #endif
 
+#include "steam_api.h"
+
 //#define USE_VTUNE
 
 #define _DUMP_STRAT_TRANSLATIONS
@@ -266,6 +268,12 @@ static int _GetStratData(int scx, int scy, sdm_strat_data* sdmdata)
 static UINT32 GameHost, GameOTP;
 static UINT16 GamePort;
 
+// globals for steam
+static const int STEAM_APP_ID = 251950;
+bool steamInitialized = false;
+bool installedAsSteamApp = false;
+bool isSteamApp = false;
+
 Covert<bool> ProtectedOnlineFlag = false;
 
 bool rnmainGetOnlineSetting()
@@ -413,6 +421,17 @@ LOGICAL rnmainInit()
     rand_s(&value);
     srand(value);
 #endif
+
+	// these globals can be used to validate the state of the game w/steam prior to executing steam related functions
+	steamInitialized = SteamAPI_Init();
+	if (steamInitialized)
+	{
+		installedAsSteamApp = SteamApps()->BIsAppInstalled(STEAM_APP_ID);
+		if (installedAsSteamApp)
+		{
+			isSteamApp = SteamApps()->BIsSubscribedApp(STEAM_APP_ID);
+		}
+	}
 
 	rnlogoSplash();
 

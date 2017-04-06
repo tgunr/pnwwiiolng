@@ -1622,9 +1622,6 @@
     <ClInclude Include="..\..\src\include\precompile_includes.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\math\Rand.h">
-      <Filter>math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\math\SuperFastHash.h">
       <Filter>math</Filter>
     </ClInclude>
@@ -1642,6 +1639,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\wwii\wwiiPPOLoader.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiBackChannel.h">
       <Filter>wwii</Filter>
     </ClInclude>
   </ItemGroup>
@@ -2669,9 +2669,6 @@
     <ClCompile Include="..\..\src\src\io_mapped_file.cpp">
       <Filter>fio</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\math\Rand.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\math\SuperFastHash.cpp">
       <Filter>math</Filter>
     </ClCompile>
@@ -2685,6 +2682,9 @@
       <Filter>ob</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\wwii\wwiiPPOLoader.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiBackChannel.cpp">
       <Filter>wwii</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\sdm\GenerateHostTerrain.cpp">

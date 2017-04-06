@@ -33,6 +33,7 @@ extern ConfigStr	cv_ircPassword;
 extern ConfigUint	cv_ircPort;
 extern ConfigStr	cv_authErrorUrl;
 extern ConfigAddr	cv_baseAddress;
+extern ConfigAddr   cv_publicIP;
 extern ConfigBool   cv_oneProcessMode;
 extern ConfigPath	cv_teulWebPath;
 

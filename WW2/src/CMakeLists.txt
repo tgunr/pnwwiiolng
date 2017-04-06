@@ -195,6 +195,11 @@ ADD_CUSTOM_COMMAND(
 )
 SET_SOURCE_FILES_PROPERTIES( build_info.stamp PROPERTIES SYMBOLIC TRUE )
 
+add_subdirectory(../../Libraries/RakNet ./RakNet)
+
+# RakNet
+SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
+
 ####################################
 # teulserver library, provides teul and the "server" API, for what they're worth
 ADD_LIBRARY(teulserver STATIC
@@ -221,9 +226,10 @@ ADD_LIBRARY(teulserver STATIC
     teul/teulAuth.cpp teul/teulAuth.h updt/loginTypes.h
     wwii/wwiiConfig.cpp wwii/wwiiConfig.h wwii/wwiiConfigMap.h
     dbug/dbugInternal.h mem/memPool.h
+    teul/raknetConn.cpp teul/raknetConn.h
 )
-TARGET_INCLUDE_DIRECTORIES( teulserver PRIVATE ${LIBEVENT_INCLUDE_DIRS} )
-TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} )
+TARGET_INCLUDE_DIRECTORIES( teulserver PRIVATE ${LIBEVENT_INCLUDE_DIRS} ${RAKNET_INCLUDE_DIRS} )
+TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
 SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
 
 ####################################
@@ -312,13 +318,14 @@ IF ( NOT MSVC )
         chat/chatManagementPack.cpp chat/chatRoster.cpp chat/chatRosterClient.cpp
     )
 	USE_WWIILIB_ON( chatClient )
-    TARGET_LINK_LIBRARIES( chatClient teulserver ${MYSQL_LIBRARIES} )
+    TARGET_LINK_LIBRARIES( chatClient teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
     SET_PROPERTY( TARGET chatClient PROPERTY FOLDER "Tools" )
     
     ADD_EXECUTABLE( luaClient src/luaClient.cpp )
     TARGET_INCLUDE_DIRECTORIES( luaClient
         PRIVATE ${READLINE_INCLUDE_DIRS}
         PRIVATE ${NCURSES_INCLUDE_DIRS}
+	PRIVATE ${RAKNET_INCLUDE_DIRS}
     )
 	USE_WWIILIB_ON( luaClient )
     TARGET_LINK_LIBRARIES( luaClient
@@ -404,7 +411,7 @@ ADD_EXECUTABLE(stratLoader
 		sdm/sdmParse.h
 )
 USE_WWIILIB_ON(stratLoader)
-TARGET_LINK_LIBRARIES(stratLoader teulserver ${MYSQL_LIBRARIES})
+TARGET_LINK_LIBRARIES(stratLoader teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
 SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
 
 
@@ -428,7 +435,7 @@ MACRO( ADD_HOST_TARGET Name )
         TARGET_LINK_LIBRARIES( "${Name}" ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
     ENDIF()
 	USE_WWIILIB_ON( "${Name}" )
-    TARGET_LINK_LIBRARIES( "${Name}" teulserver ${MYSQL_LIBRARIES} )
+    TARGET_LINK_LIBRARIES( "${Name}" teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
     IF ( NOT "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" STREQUAL "" )
         SET_PROPERTY( TARGET "${Name}" PROPERTY COMPILE_DEFINITIONS "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" )
     ENDIF()
@@ -459,7 +466,7 @@ ADD_HOST_TARGET( ${CONTROLLER_HOST_EXE} SOURCES
     src/controller.cpp src/controllerGameProcess.cpp src/controllerGameProcess.h
     EXTRA_DEFINITIONS "IS_CONTROLLER_HOST"
 )
-TARGET_INCLUDE_DIRECTORIES( ${CONTROLLER_HOST_EXE} PRIVATE ${LIBEVENT_INCLUDE_DIRS} )
+TARGET_INCLUDE_DIRECTORIES( ${CONTROLLER_HOST_EXE} PRIVATE ${LIBEVENT_INCLUDE_DIRS} PRIVATE ${RAKNET_INCLUDE_DIRS})
 TARGET_LINK_LIBRARIES( ${CONTROLLER_HOST_EXE} ${LIBEVENT_LIBRARIES} )
 
 ####################################
@@ -542,7 +549,7 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     INSTANCING
     EXTRA_DEFINITIONS "IS_CHAT_HOST"
 )
-TARGET_LINK_LIBRARIES( ${CHAT_HOST_EXE} libb64 )
+TARGET_LINK_LIBRARIES( ${CHAT_HOST_EXE} libb64 ${LIBZ_LIBRARIES})
 
 ####################################
 ## Cell host
@@ -600,6 +607,7 @@ ADD_HOST_TARGET( ${CELL_HOST_EXE} SOURCES
     INSTANCING
     EXTRA_DEFINITIONS "IS_CELL_HOST"
 )
+TARGET_INCLUDE_DIRECTORIES( ${CELL_HOST_EXE} PRIVATE ${LIBEVENT_INCLUDE_DIRS} PRIVATE ${RAKNET_INCLUDE_DIRS})
 
 ####################################
 ## Map/Mission Host
@@ -670,6 +678,7 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     EXTRA_DEFINITIONS "IS_MAP_HOST"
     INSTANCING
 )
+TARGET_INCLUDE_DIRECTORIES( ${MAP_HOST_EXE} PRIVATE ${LIBEVENT_INCLUDE_DIRS} PRIVATE ${RAKNET_INCLUDE_DIRS})
 
 ####################################
 ## Strat host
@@ -758,7 +767,7 @@ ELSE()
 	SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY COMPILE_FLAGS
                   "-Wno-unused-function" )
 ENDIF()
-TARGET_INCLUDE_DIRECTORIES( ${STRAT_HOST_EXE} PRIVATE ${TOLUAPP_INCLUDE_DIR} )
+TARGET_INCLUDE_DIRECTORIES( ${STRAT_HOST_EXE} PRIVATE ${TOLUAPP_INCLUDE_DIR} PRIVATE ${RAKNET_INCLUDE_DIRS})
 
 INSTALL(
     TARGETS
@@ -774,7 +783,7 @@ INSTALL(
 ## File installs
 
 # Environment template files from the source tree
-INSTALL( FILES environment.cfg environment.win.cfg DESTINATION bin COMPONENT config )
+#INSTALL( FILES environment.cfg environment.win.cfg DESTINATION bin COMPONENT config )
 
 # Lua scripts
 INSTALL( DIRECTORY hostproj/lua/ DESTINATION lua COMPONENT lua PATTERN ".git" EXCLUDE PATTERN "*.lua" )
@@ -810,7 +819,7 @@ SET_PROPERTY( TARGET testUnits PROPERTY COMPILE_DEFINITIONS "ENABLE_TESTS" )
 USE_WWIILIB_ON( testUnits )
 TARGET_COMPILE_OPTIONS( testUnits PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
 TARGET_LINK_LIBRARIES( testUnits ${_EXTRA_HOST_LINK_OPTIONS} )
-TARGET_LINK_LIBRARIES( testUnits teulserver ${MYSQL_LIBRARIES} )
+TARGET_LINK_LIBRARIES( testUnits teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
 SET_PROPERTY( TARGET testUnits PROPERTY FOLDER "Test" )
 
 ADD_TEST( testUnits testUnits )
@@ -825,5 +834,6 @@ ADD_EXECUTABLE(testTeul
 USE_WWIILIB_ON( testTeul )
 TARGET_COMPILE_OPTIONS( testTeul PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
 TARGET_LINK_LIBRARIES( testTeul ${_EXTRA_HOST_LINK_OPTIONS} )
-TARGET_LINK_LIBRARIES( testTeul teulserver ${MYSQL_LIBRARIES} )
+TARGET_LINK_LIBRARIES( testTeul teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
 SET_PROPERTY( TARGET testTeul PROPERTY FOLDER "Test" )
+

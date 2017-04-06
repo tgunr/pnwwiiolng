@@ -54,7 +54,12 @@
     <ClCompile Include="..\..\..\src\teul\teulNetTimeMS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\build_info.cpp" />
+    <ClCompile Include="..\..\..\src\teul\raknetConn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="build_info.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\dbug\dbug.h">
@@ -187,6 +192,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\teul\teulCallbackInit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\teul\raknetConn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

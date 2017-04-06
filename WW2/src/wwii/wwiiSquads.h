@@ -10,6 +10,7 @@
 
 #include "wwii/wwiiHash.h"
 #include "wwii/wwiiFullObjID.h"
+#include "chat/chatName.h"
 
 #define DEFAULT_ROOKIE_DAYS 7
 
@@ -43,7 +44,7 @@ public:
 	};
 
 public:
-	const std::string& callsign() const { return m_callsign; }
+	std::string callsign() const { return Chat::Name(shortHandle()).c_str(); }
 	UINT32 created() const { return m_created; }
 	ChatHandle creatorHandle() const { return m_creatorHandle; }
 	ChatHandle coHandle() const { return m_coHandle; }
@@ -57,7 +58,6 @@ public:
 	bool recruiting() const { return m_recruiting; }
 	UINT32 rookieDays() const { return m_rookieDays; }
 	ChatHandle shortHandle() const { return m_shortHandle; }
-	const char* shortName() const { return m_callsign.c_str(); }
 	UINT32 squadID() const { return m_squadID; }
 	bool votingEnabled() const { return m_votingEnabled; }
 	const std::string& voiceInfo() const { return m_voiceInfo; }
@@ -97,7 +97,6 @@ public:
 	std::string	m_description;
 	std::string	m_motd;
 	std::string	m_homepage;
-	std::string	m_callsign;
 	std::string m_voiceInfo; // Voice server info
 	std::string m_slogan;
 

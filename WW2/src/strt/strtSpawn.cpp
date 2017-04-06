@@ -1672,7 +1672,6 @@ _returnToOrigin(POSTED_WEAPON& weapon)
 		return false;
 
 	_returnLog(&weapon, "returned to origin");
-	assert( weapon.m_resupplyTicket == nullptr );
 
 	return true;
 }

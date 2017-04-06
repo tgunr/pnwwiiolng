@@ -18,18 +18,18 @@ int main(int argc, char* argv[]) {
 		weapAmmoType ammo_type = ReadAmmoType(argv[1]);
 		weapAmmo round = CreateRound(ammo_type);
 
-		int max_dist = 3000;
-		if ( argc >= 4 )
-			max_dist = std::stoi(argv[2]);
-
 		double step = 1.0f / 60.0f;
 		if ( argc >= 3 )
-			step = std::stoi(argv[3]) / 1000.0;
+			step = 1.0 / std::stoi(argv[2]);
+
+		int max_dist = 3000;
+		if ( argc >= 4 )
+			max_dist = std::stoi(argv[3]);
 
 		std::string out_filename(std::string("ballistics/") + argv[1] + ".txt");
 		out = fopen(out_filename.c_str(), "w");
-		if ( ! out )
-			throw std::runtime_error("Failed to create '" + out_filename);
+		if ( !out )
+			throw std::runtime_error("Failed to create '" + out_filename + ".txt'");
 
 		fprintf(out, "Time (seconds) | Distance (meters) | Velocity (m/sec) |    Joules    | Piercing Potential\n");
 
