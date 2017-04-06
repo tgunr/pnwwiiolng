@@ -379,9 +379,11 @@ mac_product_base_name="World\ War\ II\ Online"
 mac_product_name=$mac_product_base_name
 if [ "$isrelease" = false ] && [ "$myos" == "osx" ] ; then
     echo "Updating CFBundleName and PRODUCT_NAME"
-    plutil -replace CFBundleName -string "$mac_product_name"  WW2/proj/mac/Info.plist
-
     mac_product_name=$mac_product_name"\ Beta"
+
+    strip_name=`echo "$mac_product_name" | sed 's/\\\//g'`
+    plutil -replace CFBundleName -string "$strip_name"  WW2/proj/mac/Info.plist
+
     target_file='WW2/WW2OL.xcodeproj/project.pbxproj'
     grepresult=$(grep "$mac_product_name" $target_file)
     if [ ! -n "$grepresult" ] ; then
@@ -494,13 +496,8 @@ if [ "$isrelease" = true ] ; then
     bld_config="Release"
     bld_config_dir=$bld_config
 else
-    if [ "$myos" == "win" ] ; then
-        bld_config="BetaRelease"
-        bld_config_dir=$bld_config
-    else
-        bld_config="Dev"
-        bld_config_dir="Development"
-    fi
+    bld_config="BetaRelease"
+    bld_config_dir=$bld_config
 fi
 
 build_step "build" "Building" "release version"

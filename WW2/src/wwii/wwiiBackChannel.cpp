@@ -26,7 +26,7 @@ extern bool libCatSecurityEnabled;
 //////////////////////////////////////////////////////////////////////
 // Connect a back channel -- one per player client
 
-bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, SINT32 teulIndex, UINT32 playerId, UINT32 otp, char * packedPublicKey)
+bool wwiiBackChannelConnect(SINT32 hostTeulIndex, const char* serverIP, UINT16 port, SINT32 teulIndex, UINT32 playerId, UINT32 otp, char * packedPublicKey)
 {
 	wwiiBackChannelDisconnect(teulIndex) ;
 
@@ -50,7 +50,7 @@ bool wwiiBackChannelConnect(const char* serverIP, UINT16 port, SINT32 teulIndex,
 		}
 		
 		if (ep->m_pairdUdpConn == nullptr)
-			ep->m_pairdUdpConn = new RakNetChannel(false, port, ep);
+			ep->m_pairdUdpConn = new RakNetChannel(hostTeulIndex, false, port, ep);
 		ep->m_pairdUdpConn->init();
 		int resp = ep->m_pairdUdpConn->setPublicKey(packedPublicKey, teulIndex);
 		switch (resp)

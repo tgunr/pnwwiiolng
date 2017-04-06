@@ -572,7 +572,7 @@ teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL pr
 	// Backchannels may exist on listening hosts and clients
 	if (initBackChannel)
 	{
-		newEndpoint->m_pairdUdpConn = new RakNetChannel(listening, port, newEndpoint);
+		newEndpoint->m_pairdUdpConn = new RakNetChannel(0, listening, port, newEndpoint);
 		newEndpoint->m_pairdUdpConn->init();
 	}
 

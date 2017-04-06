@@ -41,7 +41,7 @@ enum {
 class RakNetChannel
 {
 public:
-	RakNetChannel(const bool isSrvr, const UINT16 port, ENDPOINT *endpoint)
+	RakNetChannel(SINT32 peerTeulIndex, const bool isSrvr, const UINT16 port, ENDPOINT *endpoint)
 	{
 		m_isServer = isSrvr;
 		m_port = port;
@@ -49,6 +49,7 @@ public:
 		m_initialized = false;
 		m_isConnected = false;  // client notion only
         m_isConnecting = false;
+		m_peerTeulIndex = peerTeulIndex;
 	}
 
 	bool init();
@@ -69,10 +70,7 @@ public:
     
 private:
 
-	void processApplicationPacket(RakNet::Packet *packet, UINT32 ip);
-
-	void _addClient(UINT32 ip, const SystemAddress address);
-	void _removeClient(UINT32 ip);
+	void processApplicationPacket(RakNet::Packet *packet);
 
 	class RakNet::RakPeerInterface *m_peer;
 	RakNet::RPC4 m_rpc;
@@ -85,6 +83,7 @@ private:
 	UINT16  m_port;
 	ENDPOINT *m_endpoint;
 	bool m_isServer;
+	SINT32 m_peerTeulIndex;
 
 	bool m_initialized;
 	bool m_isConnected;

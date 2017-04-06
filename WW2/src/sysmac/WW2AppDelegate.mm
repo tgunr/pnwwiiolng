@@ -40,7 +40,7 @@ static const int STEAM_APP_ID = 251950;
 #if defined(BETA_RELEASE)
 #define DEFAULT_AUTH_SERVER "authdev.playnet.com"
 #else
-#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
+#define DEFAULT_AUTH_SERVER "auth.playnet.com"
 #endif
 
 #endif
@@ -687,7 +687,7 @@ extern NSString *WebActionOriginalURLKey;
     // But just so ya know, auth CAN provide it.
     arenaLoadingIndicator.hidden = YES;
     [arenaMenu.menu removeAllItems];
-#if DEV_BUILD
+#if defined(DEV_BUILD) || defined(BETA_RELEASE)
     // Developers get a build which lets you pick an arbitrary arena ID. This
     // bit will go away once we've implemented having auth tell us what arenas
     // are available.
