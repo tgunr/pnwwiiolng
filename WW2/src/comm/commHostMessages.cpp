@@ -901,7 +901,7 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 
 		Teul::Packet forward(Teul::PacketId(Comm::CallbackX, HOST_HIT_Y), source, hitBytes);
 		forward.append(source, hitBytes);
-		if ( forward.send(thePlayer->teulIndex()) < 0)
+		if ( forward.send(thePlayer->teulIndex(), PROTOCOL_UDP) < 0)
 			dbugLog(_FLA, "v:%u couldn't send hit %u(%d)", hit.m_shooter, hit.m_target, thePlayer->teulIndex());
 	}
 
