@@ -58,6 +58,7 @@
 #include "tut/TutorialManager.h"
 #include "fx/TransformEffect.h"
 #include "trn/trnvars.h"
+#include "random.h"
 
 #define USE_FX2 1
 
@@ -1758,7 +1759,11 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 	// calculate round's actual velocity
 	ProjVel.x = ProjVel.z = 0;
 	// vary round's velocity a bit
-	ProjVel.y = InitVelocity * (1.0 + 0.02 * (mathGetFloat32ChaoticNumber() *  mathGetFloat32ChaoticNumber() *  2.0f - 1.0f));
+//    double velocityFactor = (1.0 + 0.02 * (mathGetFloat32ChaoticNumber() *  mathGetFloat32ChaoticNumber() *  2.0f - 1.0f));
+    float velocityFactor = GetRandom(0.0f, 0.02f);
+    ProjVel.y = (FLOAT64)InitVelocity - (FLOAT64)((FLOAT64)InitVelocity * (FLOAT64)velocityFactor);
+//    WriteLog(LOG_1, LOG_INFO, "WEAP AMMO %s(%d) IVel: %f vFactor: %.2f PVel: %.2f",
+//			AmmoType->Name, InitVelocity , velocityFactor, ProjVel.y);
 
 	// add shooter's velocity
 	mathVectorMultiply64(&ProjVel, &ProjVel, FireAtt);
