@@ -2787,7 +2787,7 @@ static UINT32 _SendDamageUpdate(vehVehicle* CurrentVehicle, vehDamageQue * DQ)
 	}
 	else
 	{
-		teulSend(PlayerClient()->CellConnection(), commCLIENT_HIT, &hit);
+		teulSend(PlayerClient()->CellConnection(), commCLIENT_HIT, &hit, PROTOCOL_UDP);
 	}
 
 	return 0;
