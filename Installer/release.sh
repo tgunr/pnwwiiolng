@@ -390,6 +390,8 @@ if [ "$isrelease" = false ] && [ "$myos" == "osx" ] ; then
         sedargs='s/'$mac_product_base_name'/'$mac_product_name'/g'
         sed -i -e "$sedargs" "$target_file"
     fi
+fi
+if [ "$myos" == "osx" ] ; then
     touch WW2Archives/playarc.ww2
 fi
 mac_app_name=$mac_product_name".app"
