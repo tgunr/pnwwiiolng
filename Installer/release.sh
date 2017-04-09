@@ -238,8 +238,8 @@ fi
 
 gitBranch=`git rev-parse --abbrev-ref HEAD`
 arrayBranchElements=(${gitBranch//\// })
-releasetype=$arrayBranchElements[0]
-releaseversion=$arrayBranchElements[1]
+releasetype=${arrayBranchElements[0]}
+releaseversion=${arrayBranchElements[1]}
 
 isrelease=false
 
@@ -258,7 +258,7 @@ if [[ $REPLY =~ ^[Yy]$ ]] ; then
     echo "Release version is "$releaseversion
     isrelease=true
 else
-    if [ "$releasetype" != "feature" ] ; then
+    if [ "$releasetype" == "feature" ] ; then
         if [ "$noprompt" = false ]; then
             echo "WARNING! You are building from a feature branch which is normally unwise"
             read -p "Are you sure you want to continue? (y|n) :" -n 1 -r
