@@ -73,6 +73,7 @@ RELEASEDIR="$WWII_ROOT/build/client/Release/Bin"
 PRODUCTS="WW2.exe Playgate.exe"
 DATADIRS="DirectXRedist loc playgate screens"
 DATAFILES="steam_appid.txt eula.txt license.rtf readme.rtf regions.txt tos.txt wwii1.ico"
+ASSETFILES="eula.txt license.rtf readme.rtf wwii1.ico"
 BUILDDIR="$APPDATA"
 BUILDLOG="build_output.log"
 PREV_RELEASE="$PROGRAMFILES\\CRS\\Battleground Europe\\"
@@ -532,7 +533,7 @@ if [ "$skip_step" = false ]; then
             xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
             codesign='Developer ID Application: Playnet Inc (J63A54QWD2)'
         fi
-        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= CODE_SIGN_IDENTITY=$codesign WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
+        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= "CODE_SIGN_IDENTITY=$codesign" WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
     fi
 fi
 
@@ -563,6 +564,9 @@ if [ "$myos" == "win" ] ; then
         for product in $DATAFILES ; do
             cp "$WW2MODS/$product" "$INSTALLER/current/$product"
             chmod 440 "$INSTALLER/current/$product"
+        done
+        for asset in $DATAFILES ; do
+            cp "$WW2MODS/$asset" "$INSTALLER/assets/$asset"
         done
     fi
 
