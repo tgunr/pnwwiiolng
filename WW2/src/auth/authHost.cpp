@@ -1323,7 +1323,7 @@ _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::Cli
 
 	// Fill in the dispatch
 	UINT32 error = WEB_ERR_NONE;
-    if (request.steamID == 0)
+    if (request.username[0] || request.steamID == 0)
     {
         error = authValidateUser(teulIndex, request, dispatch, cdata);
     }
