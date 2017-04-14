@@ -73,6 +73,7 @@ RELEASEDIR="$WWII_ROOT/build/client/Release/Bin"
 PRODUCTS="WW2.exe Playgate.exe"
 DATADIRS="DirectXRedist loc playgate screens"
 DATAFILES="steam_appid.txt eula.txt license.rtf readme.rtf regions.txt tos.txt wwii1.ico"
+ASSETFILES="eula.txt license.rtf readme.rtf wwii1.ico"
 BUILDDIR="$APPDATA"
 BUILDLOG="build_output.log"
 PREV_RELEASE="$PROGRAMFILES\\CRS\\Battleground Europe\\"
@@ -238,8 +239,8 @@ fi
 
 gitBranch=`git rev-parse --abbrev-ref HEAD`
 arrayBranchElements=(${gitBranch//\// })
-releasetype=$arrayBranchElements[0]
-releaseversion=$arrayBranchElements[1]
+releasetype=${arrayBranchElements[0]}
+releaseversion=${arrayBranchElements[1]}
 
 isrelease=false
 
@@ -258,7 +259,7 @@ if [[ $REPLY =~ ^[Yy]$ ]] ; then
     echo "Release version is "$releaseversion
     isrelease=true
 else
-    if [ "$releasetype" != "feature" ] ; then
+    if [ "$releasetype" == "feature" ] ; then
         if [ "$noprompt" = false ]; then
             echo "WARNING! You are building from a feature branch which is normally unwise"
             read -p "Are you sure you want to continue? (y|n) :" -n 1 -r
@@ -390,6 +391,8 @@ if [ "$isrelease" = false ] && [ "$myos" == "osx" ] ; then
         sedargs='s/'$mac_product_base_name'/'$mac_product_name'/g'
         sed -i -e "$sedargs" "$target_file"
     fi
+fi
+if [ "$myos" == "osx" ] ; then
     touch WW2Archives/playarc.ww2
 fi
 mac_app_name=$mac_product_name".app"
@@ -530,7 +533,7 @@ if [ "$skip_step" = false ]; then
             xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
             codesign='Developer ID Application: Playnet Inc (J63A54QWD2)'
         fi
-        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= CODE_SIGN_IDENTITY=$codesign WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
+        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= "CODE_SIGN_IDENTITY=$codesign" WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
     fi
 fi
 
@@ -561,6 +564,9 @@ if [ "$myos" == "win" ] ; then
         for product in $DATAFILES ; do
             cp "$WW2MODS/$product" "$INSTALLER/current/$product"
             chmod 440 "$INSTALLER/current/$product"
+        done
+        for asset in $DATAFILES ; do
+            cp "$WW2MODS/$asset" "$INSTALLER/assets/$asset"
         done
     fi
 

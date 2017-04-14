@@ -115,6 +115,8 @@ Source: "{#MyPatchSourceDir}\Playgate.exe.patch";  DestDir: "{app}"; BeforeInsta
 Source: "{#MyPatchSourceDir}\WW2.exe.patch";       DestDir: "{app}"; BeforeInstall: BackupPatchTgt('WW2.exe');       Flags: ignoreversion deleteafterinstall  
 Source: "{#MyPatchSourceDir}\license.rtf.patch";   DestDir: "{app}"; BeforeInstall: BackupPatchTgt('license.rtf');   Flags: ignoreversion deleteafterinstall  
 Source: "{#MyPatchSourceDir}\readme.rtf.patch";    DestDir: "{app}"; BeforeInstall: BackupPatchTgt('readme.rtf');    Flags: ignoreversion deleteafterinstall  
+Source: "current\steam_api.dll"; DestDir: "{app}"; Flags: ignoreversion              
+Source: "current\steam_appid.txt"; DestDir: "{app}"; Flags: ignoreversion        
 
 [Run]                          
 Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -9 -s ""{app}\playarc01.ww2.backup"" ""{app}\playarc01.ww2.patch"" ""{app}\playarc01.ww2"""; Flags: skipifsilent runhidden; AfterInstall: CleanUp('playarc01.ww2')
