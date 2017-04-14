@@ -552,7 +552,7 @@ int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 	if(!clientinited) return retval;
 
 	TeulTimeMS timeout = 0LL;
-	static const int CONNECTION_TIMEOUT = 3000 * 1000; // nobody's gonna wait more than 30 secs before force quitting
+	static const int CONNECTION_TIMEOUT = 30 * 1000; // nobody's gonna wait more than 30 secs before force quitting
 
 	if ( port == 0 || port == 27017 )
 		port = WWII::Net::Ports::MapHost;
