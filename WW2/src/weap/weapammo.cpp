@@ -1767,8 +1767,8 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 	// vary round's velocity a bit
     float velocityFactor = GetRandom(0.0f, AmmoType->VelocityVariance);
     ProjVel.y = (FLOAT64)InitVelocity - (FLOAT64)((FLOAT64)InitVelocity * (FLOAT64)velocityFactor);
-    WriteLog(LOG_WEAPON, LOG_INFO, "WEAP AMMO %s(%d) IVel: %f vFactor: %.2f PVel: %.2f",
-			AmmoType->Name, InitVelocity , velocityFactor, ProjVel.y);
+    Write_Log(LOG_WEAP, LOG_INFO, "WEAP AMMO %s IVel: %f Variance: %f vFactor: %f PVel: %f DIFF: %f",
+              AmmoType->Name, InitVelocity, AmmoType->VelocityVariance, velocityFactor, ProjVel.y,  InitVelocity - ProjVel.y );
 
 	// add shooter's velocity
 	mathVectorMultiply64(&ProjVel, &ProjVel, FireAtt);
