@@ -398,7 +398,7 @@ logTimerBeginMacro();
 			// ensure that ammo has some form of penetration constant
 			AmmoType->PenetrationConstant = 0.00000000001f;
             AmmoType->TracerScale = 4.0f; // WAG
-            AmmoType->VelocityVariance = 0.02f; // 2 % variance
+            AmmoType->VelocityVariance = 0.0015f; // .15 % variance
 
 			while (fioGetString(CurrentAmmoFile,(char*)Buffer,255) != 0)
 			{
