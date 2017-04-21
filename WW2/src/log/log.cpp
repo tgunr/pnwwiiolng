@@ -15,7 +15,7 @@
 
 static std::mutex logLock;
 #ifdef DEBUG_WW2
-static UINT32 logMask = LOG_ALL;
+static UINT32 logMask = LOG_WEAP;
 static SINT32 logLevel = LOG_INFO;
 #else
 static UINT32 logMask = 0;
