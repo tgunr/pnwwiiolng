@@ -5,7 +5,7 @@
 
 // compile flags
 #define	GUN_WOBBLE				1
-//#define AIMING_WEAPONS			1
+#define AIMING_WEAPONS			1
 //#define	TESTING_FPS				1
 #if AIMING_WEAPONS
 #undef GUN_WOBBLE
