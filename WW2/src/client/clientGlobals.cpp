@@ -283,6 +283,7 @@ UINT32			Convergence; // Global (default) Airplane gun convergence setting
 UINT32			CurrentConv; // Current airplane gun convergence setting
 
 FLOAT32			aimMouse;	// Aiming mouse sensitivity
+FLOAT32         aimFOVAdjust = 1.0; // Aiming FOV
 SINT8            gAuthServer[128]; // Authentication server to be used
 SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 SINT8            gClientV[32]; // Version to submit

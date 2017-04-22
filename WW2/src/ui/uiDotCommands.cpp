@@ -3381,6 +3381,15 @@ static int dot_genscenariomap(const char* line)
     return DC_HANDLED;
 }
 
+static int dot_fov(const char * line) {
+    FLOAT32 fov;
+    int argc = sscanf(line, "%*s %f", &fov);
+    
+    if(argc > 0)
+        aimFOVAdjust = fov;
+    return DC_HANDLED;
+}
+
 #ifdef SPATIAL_DB
 extern bool SDB_DrawDebugFlag;
 
@@ -7942,6 +7951,7 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(inflodmod, false);
 	ADD_DOT_COMMAND(js, false);
     ADD_DOT_COMMAND(genscenariomap, true);
+    ADD_DOT_COMMAND(fov, true);
 #if platOS != OS_MACOS
     ADD_DOT_COMMAND(audiochatlogging, true);
     ADD_DOT_COMMAND(audiowritelog, true);

@@ -91,6 +91,7 @@ static GVAR vars[] = {
 #ifdef DEBUG_WW2
     NULL_KEY_DEF("buildmdlonly", DebugBuildingMDLFilesOnly),
 #endif
+//    STRING_KEY_DEF("aimfov", aimFOVAdjust),
     { nullptr, ENULL, { nullptr }, 0 },
 };
 
