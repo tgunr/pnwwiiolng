@@ -109,12 +109,16 @@ int sysmainInitApp()
 	printf("WW2OL Started\n"); fflush(stdout);
 #ifdef BETA_RELEASE
 	{
-		FILE* f = fopen("../../gizmo.key","r");
+        char buff[PATH_MAX];
+        getcwd( buff, PATH_MAX );
+        std::string cwd( buff );
+        cwd.append("/../../gizmo.key");
+        FILE* f = std::fopen(cwd.c_str(), "r");
 		UINT32 key = 0;
 		if(f)
 		{
 			fscanf(f,"%d", &key);
-			HasKeyFile = (key == 0xDEADBEEF);
+			HasKeyFile = (key == 0xDEDDC6CD);
 			fclose(f);
 		}
 	}

@@ -241,7 +241,7 @@ piMATRIX			IdentityMatrix;
 
 LOGICAL			VehicleObjectAnalysis;		// "Gizmos and Whizbangs"
 LOGICAL			WantDataDir = FALSE;		// Want to run out of data directory
-LOGICAL			HasKeyFile;					// Have key file to enable special features
+LOGICAL			HasKeyFile = TRUE;					// Have key file to enable special features
 LOGICAL			SuperTroop;					// SuperTroop!
 LOGICAL			SuperFloat;					// SuperFloat!
 LOGICAL			NoBlitzWorPreload;			// don't preload blitz.wor
