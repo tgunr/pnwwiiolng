@@ -2288,8 +2288,9 @@ int uiConsoleprintf(const char* text, ...)
             out.resize(out.size() - 1);
         }
 		Write_Log(LOG_CONSOLE, LOG_INFO, out.c_str());
-        out += "\n";
-		if(display) display->AddText(out.c_str());
+//        out += "\n";
+//		if(display)
+//            display->AddText(out.c_str());
 		return static_cast<int>(out.size());
 	}
     return 0;
