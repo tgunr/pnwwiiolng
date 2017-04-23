@@ -110,8 +110,6 @@ authInitDB()
 	if ( !dbh.connect() )
 		LogAbort("Couldn't connect to database");
 
-	DBSimpleQuery(dbh, "UPDATE `auth`.`auth_arenas` SET lock_state = %d, players = 0", AL_OFFLINE);
-
 	dbugLog(_FLN, "auth database ready");
 }
 
