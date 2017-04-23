@@ -385,7 +385,7 @@ public: virtual bool Run() override
 			ExpectEqual( UpdatesQueued(), 1 );
 			sendQueue.clear();
 
-			// If we remove the last guy, there should be no updates.
+			// If we remove the last player, there should be no updates.
 			ExpectTrue( Auth::Queue::RemovePlayer(2, GetCData(2, 3, false), false, false) );
 			ExpectFalse( arenas[2].m_nonPremium.m_modified );
 			AdvanceClock_s(_UPDATE_INTERVAL + 1);
@@ -418,7 +418,7 @@ public: virtual bool Run() override
 			Auth::Queue::ProcessQueues();
 			CRITICAL( ExpectEqual(UpdatesQueued(), 0) );
 
-			// "Disconnect" the second guy from the first arena
+			// "Disconnect" the second player from the first arena
 			UINT32 arenaID = 1;
 			ExpectTrue( Auth::Queue::RemovePlayer(arenaID, GetCData(arenaID, 2, premiums[2 - 1]), premiums[2 - 1], false) );
 			ExpectEqual( UpdatesQueued(), 0 );
@@ -429,7 +429,7 @@ public: virtual bool Run() override
 			bool isPremium = premiums[1 - 1];
 			QueueHeader& header = (isPremium ? arenas[arenaID].m_premium : arenas[arenaID].m_nonPremium);
 
-			// Now lets "launch" the first guy from the first arena,
+			// Now lets "launch" the first player from the first arena,
 			// which should establish a bonafide wait time for that queue.
 			UINT32 waited = teulTime() - header.m_queue[0].m_entryTime;
 			CRITICAL( ExpectTrue( Auth::Queue::RemovePlayer(arenaID, GetCData(arenaID, 1, isPremium), isPremium, true) ) );
