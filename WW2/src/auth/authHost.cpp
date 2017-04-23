@@ -61,16 +61,6 @@
 								//presenterHost
 
 
-//uncomment the following if you want to tell authhost to ignore an address
-//if you do, if a connection is made from this ip, it is closed in the
-//accept function
-
-//#define BLOCK_AN_ADDRESS
-
-#ifdef BLOCK_AN_ADDRESS
-#define BLOCK_ADDRESS "192.168.0.75"
-#endif
-
 //if the following is defined, the authhost will not send an APP_LAUNCH
 //with the appID of the version updater when presenter or an appVersion
 //needs updating, but will look up a url based on the appID
@@ -119,9 +109,6 @@ struct TOS_CHECKSUMS
 static UINT32 numTOSChecksums = 0;
 
 //global variables
-#ifdef BLOCK_AN_ADDRESS
-static UINT32		blockedIP;
-#endif
 static bool readDBRequired = false;
 
 static bool _running = true;
@@ -863,10 +850,6 @@ main(int argc, const char* argv[])
 	Server::InitializeProcess(g_serverName, AUTH_HOST, _errorFunction, nullptr, argc, argv, {});
 	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
-
-#ifdef BLOCK_AN_ADDRESS
-	teulGetHost(BLOCK_ADDRESS, &blockedIP);
-#endif
 
 	wwiiIRCInitialize(Server::myInterface.addr[0].ip, false);
 	wwiiIRCAddInitialChannel("-err", "", "Authentication errors");
