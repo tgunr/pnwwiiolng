@@ -819,13 +819,6 @@ _runHost()
 			nextRead = teulClock64 + 10 * 60 * 1000;	// 10 minutes
 		}
 
-		static TeulTimeMS nextSave = 0;
-		if ( teulClock64 >= nextSave )
-		{
-			authdbSaveLogins();
-			nextSave = teulClock64 + 1000;				// Once per second.
-		}
-
 #if defined(USE_LOGIN_QUEUES)
 		static const TeulTimeMS _QUEUE_CHECK_INTERVAL_MS = 1000;
 		static TeulTimeMS nextQueueCheck = teulClock64 + _QUEUE_CHECK_INTERVAL_MS;

@@ -134,47 +134,16 @@ authDBInsertOTP(const APP_LAUNCH& launch , const APP_LAUNCH_REQ& request, const 
 //This function takes the connectinfo struct and logs it in
 //	the connection activity table, then updates the who's online
 //	table
-//
-
-static std::vector<MANAGEMENT_MSG> logins;
-
-void
-authdbSaveLogins()
-{
-	if ( logins.empty() )
-		return;
-
-	char* statement = threadsAllocText();
-										/*  ,   (   %u   ,   %u   ,   %u   )   \0	*/
-	static const size_t EST_STATEMENT_LEN = 1 + 1 + 12 + 1 + 12 + 1 + 12 + 1 + 1;
-	char* cutoff = statement + TEXT_POOL_SIZE - EST_STATEMENT_LEN;
-
-	static const char* const prefix = "INSERT INTO `auth`.`auth_connections`(`customerID`, `arenaID`, `ip`)VALUES";
-	char* p = statement + sprintf(statement, "%s", prefix);
-	char* comma = p;
-	auto it = logins.begin();
-	while ( it != logins.end() && p < cutoff )
-	{
-		p += sprintf(p, ",(%u,%u,%u)", (UINT32)it->m_customerID, (UINT32)it->m_arenaID, (UINT32)it->m_ip);
-		++it;
-	}
-
-	// Replace that leading comma with a space.
-	*comma = ' ';
-
-	// Dispatch the query.
-	DBThread::Do(DBThread::Auth, statement);
-
-	// Remove the logins we've accumulated.
-	logins.erase(logins.begin(), it);
-}
-
-void
-MANAGEMENT_MSG::process() const
+void MANAGEMENT_MSG::process() const
 {
 	// When a player is logging in (CLIENT_ENTER), record the connection
-	if ( m_action == CLIENT_ENTER )
-		logins.push_back(*this);
+	if ( m_action == CLIENT_ENTER ) {
+        char qrybuf[128];
+        
+        strprintf(qrybuf, "INSERT INTO `auth`.`auth_connections` (`customerID`, `arenaID`, `ip`) VALUES (%u, %u, %u)",
+                  m_customerID, m_arenaID, m_ip);
+        DBThread::Do(DBThread::Auth, qrybuf);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
