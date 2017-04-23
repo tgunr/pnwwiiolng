@@ -26,7 +26,6 @@
 #include "auth/authClientData.h"
 #include "auth/authGame.h"
 #include "auth/authPlaygateTypes.h"
-#include "auth/authDatabaseSchemas.h"
 #include "include/configVars.h"
 
 #define MAX_APPIDS	256
@@ -110,9 +109,6 @@ authInitDB()
 
 	if ( !dbh.connect() )
 		LogAbort("Couldn't connect to database");
-
-	DB::Schema updater(dbh, "auth");
-	updater.Update(revisions);
 
 	DBSimpleQuery(dbh, "UPDATE `auth`.`auth_arenas` SET lock_state = %d, players = 0", AL_OFFLINE);
 

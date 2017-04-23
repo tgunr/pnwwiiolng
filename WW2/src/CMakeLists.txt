@@ -287,7 +287,7 @@ ADD_LIBRARY( wwiilib STATIC
     wwii/wwiiNetPorts.h wwii/wwiiCallbacks.h
     # These weren't previously in wwiilib but seem to be required in various places
     auth/authDB.cpp auth/authDB.h src/infoHostMessages.cpp include/infoHostMessages.h
-    src/infoPack.cpp include/infoPack.h dbse/dbseDatabaseSchema.cpp dbse/dbseDatabaseSchema.h
+    src/infoPack.cpp include/infoPack.h
 	xml/XMLLoader2.cpp xml/XMLLoader2.h
 	weap/weapSpawnXML.cpp weap/weapSpawnXML.h
 	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
@@ -449,7 +449,6 @@ ENDMACRO( ADD_HOST_TARGET )
 IF ( NOT PN_DISABLE_AUTH )
 	ADD_HOST_TARGET( ${AUTH_HOST_EXE} SOURCES
 		auth/authClientData.cpp auth/authClientData.h
-		auth/authDatabaseSchemas.h
 		auth/authGame.h
 		auth/authHost.cpp auth/authHost.h auth/authHostMessages.cpp auth/authHostMessages.h
 		auth/authQueue.cpp auth/authQueue.h auth/authQueuePosition.h wwii/wwiiRunningAverage.h
