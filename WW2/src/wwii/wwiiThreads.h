@@ -51,7 +51,7 @@ static inline R threadCallbackSync(const std::function<R(void)> &fn) {
     std::mutex waitMutex;
     std::condition_variable waitCondition;
     bool waitSignal = false;
-    std::aligned_storage<sizeof(R)> result;
+    typename std::aligned_storage<sizeof(R)>::type result;
     
     threadCallback([&fn, &result, &waitMutex, &waitSignal, &waitCondition] (void *) {
         new (&result) R(std::move(fn()));
