@@ -244,10 +244,10 @@ chatForeignizeMessage(WWII_COUNTRY country, size_t maxLen)
 		int symRate, spaceChance;
 		switch (country)
 		{
-			case WWII_GERMANY: symRate = 6, spaceChance = 5; break;
-			case WWII_FRANCE: symRate = 4, spaceChance = 6; break;
-			case MAX_COUNTRIES: symRate = 1, spaceChance = 9; break;
-			default: symRate = 3, spaceChance = 9; break;
+			case WWII_GERMANY: symRate = 6; spaceChance = 5; break;
+			case WWII_FRANCE: symRate = 4; spaceChance = 6; break;
+			case MAX_COUNTRIES: symRate = 1; spaceChance = 9; break;
+			default: symRate = 3; spaceChance = 9; break;
 		}
 
 		// And maybe some dressing
