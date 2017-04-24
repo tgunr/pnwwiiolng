@@ -761,13 +761,6 @@ _runHost()
 			readDBRequired = false;
 		}
 
-		static TeulTimeMS nextRead = 0;
-		if ( teulClock64 >= nextRead )
-		{
-			authdbReadArenaAliases();
-			nextRead = teulClock64 + 10 * 60 * 1000;	// 10 minutes
-		}
-
 		threadsCallNextCallback();
 	}
 }
