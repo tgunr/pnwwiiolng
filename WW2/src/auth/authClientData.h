@@ -79,9 +79,9 @@ public:
 	std::string	m_password;
 	std::vector<UCHAR> m_subscribedArenaIDs;	// Arenas this user has access to
 	APP_LAUNCH_REQ* m_launchRequest;
-	bool	isPlaynet : 1;		// Staff account?
-	bool	isPremium : 1;		// Paying subscription?
 	bool	isQueued : 1;		// Player is queued
+	bool	isPlaynet;		// Staff account?
+	bool	isPremium;		// Paying subscription?
 };
 
 }
