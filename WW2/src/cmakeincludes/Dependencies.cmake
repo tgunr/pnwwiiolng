@@ -8,18 +8,12 @@ MARK_AS_ADVANCED(
 )
 
 # We need ncurses and readline for the lua client, but don't care on Windows
-IF ( NOT WIN32 )
-	FIND_PACKAGE( Readline 6.0 )
-	IF ( NOT READLINE_FOUND )
-		MESSAGE( FATAL_ERROR "readline library is required" )
-	ENDIF()
-
-	FIND_PROGRAM(CTAGS ctags)
-	IF ( CTAGS )
-		ADD_CUSTOM_TARGET(ctags COMMAND ${CTAGS} -R ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]*)
-	ENDIF()
-	MARK_AS_ADVANCED(CTAGS)
-ENDIF()
+#IF ( NOT WIN32 )
+#	FIND_PACKAGE( Readline 6.0 )
+#	IF ( NOT READLINE_FOUND )
+#		MESSAGE( FATAL_ERROR "readline library is required" )
+#	ENDIF()
+#ENDIF()
 
 # Pull in MySQL
 FIND_PACKAGE( MySQL REQUIRED )

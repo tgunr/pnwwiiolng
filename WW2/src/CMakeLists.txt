@@ -1,6 +1,6 @@
 ####################################
 ## Declare CMake version requirement
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.8.0)
 
 ####################################
 ## Initial CMake config
@@ -26,15 +26,8 @@ PROJECT( WW2GameHosts LANGUAGES C CXX )
 
 ####################################
 ## Require C++14
-#SET( CMAKE_CXX_STANDARD_REQUIRED ON )
-#SET( CMAKE_CXX_STANDARD 14 )
-# Unfortunately, the above doesn't work until CMake 3.1
-#ADD_COMPILE_OPTIONS( "-std=gnu++14" )
-# And unfortunately, that doesn't work either because it breaks pure-C files
-IF ( NOT MSVC )
-	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14" CACHE STRING "" FORCE )
-	SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11" CACHE STRING "" FORCE )
-ENDIF()
+SET( CMAKE_CXX_STANDARD_REQUIRED ON )
+SET( CMAKE_CXX_STANDARD 14 )
 
 ####################################
 ## Determine bitness
@@ -321,20 +314,20 @@ IF ( NOT MSVC )
     TARGET_LINK_LIBRARIES( chatClient teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
     SET_PROPERTY( TARGET chatClient PROPERTY FOLDER "Tools" )
     
-    ADD_EXECUTABLE( luaClient src/luaClient.cpp )
-    TARGET_INCLUDE_DIRECTORIES( luaClient
-        PRIVATE ${READLINE_INCLUDE_DIRS}
-        PRIVATE ${NCURSES_INCLUDE_DIRS}
-	PRIVATE ${RAKNET_INCLUDE_DIRS}
-    )
-	USE_WWIILIB_ON( luaClient )
-    TARGET_LINK_LIBRARIES( luaClient
-        teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
-    )
-    SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
+    #ADD_EXECUTABLE( luaClient src/luaClient.cpp )
+    #TARGET_INCLUDE_DIRECTORIES( luaClient
+    #    PRIVATE ${READLINE_INCLUDE_DIRS}
+    #    PRIVATE ${NCURSES_INCLUDE_DIRS}
+	#PRIVATE ${RAKNET_INCLUDE_DIRS}
+    #)
+	#USE_WWIILIB_ON( luaClient )
+    #TARGET_LINK_LIBRARIES( luaClient
+    #    teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
+    #)
+    #SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
 
     INSTALL(
-        TARGETS chatClient luaClient
+        TARGETS chatClient #luaClient
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
