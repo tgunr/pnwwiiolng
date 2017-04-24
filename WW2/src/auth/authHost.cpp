@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include <signal.h>  //to catch SIGHUPS with
-
 #include "teul/teulKit.h"
 #include "auth/authClientData.h"
 #include "str/stringLib.h"
@@ -32,6 +30,7 @@
 #include "server/serverInterfaceDescription.h"
 #include "teul/teulAuthServer.h"
 #include "teul/teulEndpoint.h"
+#include "teul/teulMicroWebServer.h"
 
 #ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
@@ -104,8 +103,6 @@ struct TOS_CHECKSUMS
 static UINT32 numTOSChecksums = 0;
 
 //global variables
-static bool readDBRequired = false;
-
 static bool _running = true;
 
 #include <map>
@@ -463,21 +460,6 @@ _findOptimumServer(GAME& game)
 	return best;
 }
 
-#if defined(SIGHUP)
-static void
-_authSIGHUP(int /*signo*/)
-{
-	signal(SIGHUP, SIG_IGN);
-
-	//Received a kill -HUP
-	dbugLog(_FLW,"*** Recieved restart signal");
-
-	readDBRequired = true;
-
-	signal(SIGHUP, _authSIGHUP);
-}
-#endif
-
 static bool
 _presenterOutdated(UINT32 presenterVersion, UINT32 platform)
 {
@@ -746,23 +728,28 @@ void authProcessArenaRequest(const SINT32 teulIndex, ARENA_REQ& request)
 	_sendArenaInfo(*cdata, request);
 }
 
-static void
-_runHost()
+static void _runHost()
 {
 	// Check queues once a second.
 	while ( _running )
 	{
 		teulUpdateTransport(25);
-
-		if (readDBRequired)
-		{
-			wwiiIRCChannelMessage("-sys,#servers", "++ Reloading Data ++");
-			_reloadAuthDB();
-			readDBRequired = false;
-		}
-
+        
 		threadsCallNextCallback();
 	}
+}
+
+static void _reloadAuthDBRequestHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
+{
+    threadCallback([] (void *) {
+        wwiiIRCChannelMessage("-sys,#servers", "++ Reloading Data ++");
+        _reloadAuthDB();
+    }, nullptr);
+
+    return Teul::uWeb::HTTPResponseBuilder(request)
+        .status(200)
+        .JSON("{\"status\":\"ok\"}")
+        .build(response);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -798,19 +785,8 @@ main(int argc, const char* argv[])
 
 	_reloadAuthDB();
 
-	if ( argc > 1 && strcmp(argv[1], "-test") == 0 )
-	{
-		printf("Test good.\n");
-		exit(0);
-	}
+	wwiiIRCActivate(true);
 
-	wwiiIRCActivate(false);
-
-	// Override with our own signal handler.
-#if defined(SIGHUP)
-	signal(SIGHUP, _authSIGHUP);
-#endif
-    
     SINT32 tcpconnection = -1;
     if (Server::IsBroadcastViaController()) {
         tcpconnection = teulOpenListen(WWII::Net::Ports::AltAuthHost, _acceptUserConnection, PLAYER_TIMEOUT, PROTOCOL_TCP, _errorFunction);
@@ -830,6 +806,8 @@ main(int argc, const char* argv[])
 	dbugLog(_FLN, "listening for games on port %u", WWII::Net::Ports::InternalAuth);
 
 	threadsEnable();
+    
+    Teul::uWeb::s_debugServer.addVirtualFile("Database Reload", "/v0.1/reload/all", _reloadAuthDBRequestHandler);
 
 	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
 
