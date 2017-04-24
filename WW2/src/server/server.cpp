@@ -905,7 +905,7 @@ static void
 _killDebugWebServer()
 {
 	Teul::uWeb::s_debugServer.cancel();
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    Teul::uWeb::s_debugServer.join();
 }
 
 //////////////////////////////////////////////////////////////////////
