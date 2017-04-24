@@ -254,6 +254,7 @@ void RakNetChannel::update()
 						if (ep != nullptr)
 						{
 							ep->m_rakNetGuid = p->guid;
+							ep->m_rakNetEnabled = true;
 						}
 					}
                     else
@@ -360,7 +361,7 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
 	UINT32 result = 0;
 
     // Make sure we have a target before we build a message, connection may net be running raknet
-	if (!guid.IsUndefined())
+	if (endpoint.m_rakNetEnabled)
 	{
 	    RakNet::BitStream bitStream;
     	UINT8 msgType = static_cast<UINT8>(ID_USER_PACKET_ENUM);
@@ -419,4 +420,5 @@ void RakNetChannel::disconnect(ENDPOINT *pEndpoint)
 	RakNetGUID guid = pEndpoint->m_rakNetGuid;
 	guidToEndPoint[guid] = nullptr;
 	pEndpoint->m_rakNetGuid = defaultGuid;
+	pEndpoint->m_rakNetEnabled = false;
 }
