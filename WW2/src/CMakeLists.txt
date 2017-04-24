@@ -444,7 +444,7 @@ IF ( NOT PN_DISABLE_AUTH )
 		auth/authClientData.cpp auth/authClientData.h
 		auth/authGame.h
 		auth/authHost.cpp auth/authHost.h auth/authHostMessages.cpp auth/authHostMessages.h
-		auth/authQueue.cpp auth/authQueue.h auth/authQueuePosition.h wwii/wwiiRunningAverage.h
+		wwii/wwiiRunningAverage.h
 		auth/authOTP.cpp auth/authOTP.h
 		auth/authPack.cpp auth/authPack.h
 		EXTRA_DEFINITIONS "IS_AUTH_HOST"
@@ -795,7 +795,7 @@ ENDIF()
 # The install process will not execute unless all tests complete.
 ADD_EXECUTABLE( testUnits
     tests/testUnits.cpp tests/testUnits.h tests/testCovert.cpp tests/testLocalizedMessage.cpp
-    tests/testTeulBits.cpp tests/testAuthQueue.cpp auth/authClientData.cpp
+    tests/testTeulBits.cpp auth/authClientData.cpp
     tests/testChatHandle.cpp tests/testFullObjID.cpp tests/testCommandWithArgs.cpp
     tests/testInplaceVector.cpp tests/testPackers.cpp comm/commPackers.cpp
     tests/testChatMissionStatus.cpp tests/testHostGridCell.cpp host/hostGridCell.cpp
