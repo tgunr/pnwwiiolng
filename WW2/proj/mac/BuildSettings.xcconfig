@@ -80,6 +80,12 @@ GCC_OPTIMIZATION_LEVEL_BetaRelease          = fast              // Optimize for 
 DEBUG_INFORMATION_FORMAT_BetaRelease        = dwarf-with-dsym   // Keep debugging information separate
 STRIP_INSTALLED_PRODUCT_BetaRelease         = YES               // Do strip the built binary
 
+// Settings for MC configuration - there's nothing to sync this with :)
+GCC_UNROLL_LOOPS_MC                     = NO                // Do unroll loops
+GCC_OPTIMIZATION_LEVEL_MC               = 0                 // Optimize for size and speed
+DEBUG_INFORMATION_FORMAT_MC             = dwarf             // Keep debugging information separate
+STRIP_INSTALLED_PRODUCT_MC              = NO                // Do strip the built binary
+
 // Settings for GM configuration - always identical to release but have to be specified explicitly due to Xcode limitations
 GCC_UNROLL_LOOPS_GM                     = $(GCC_UNROLL_LOOPS_Release)
 GCC_OPTIMIZATION_LEVEL_GM               = $(GCC_OPTIMIZATION_LEVEL_Release)
