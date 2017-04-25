@@ -75,6 +75,7 @@ public:
 	bool				m_writesPending : 1;
 	bool				m_haveTicks : 1;		// False until we've started recording ticks.
 	bool				m_peer : 1;			// Peering connection.
+	bool				m_rakNetEnabled : 1;	
 
 	//! Implementation entity for stuff we don't really need to expose to all callers.
 	EndpointImpl*		m_impl;
