@@ -230,10 +230,8 @@ void multiClientUpdate(int wait, bool force)
 	}
 
 	// run any queued commands
-	if(time - nextCmd > 1000 && !_cmdQueue.empty())
+	if(((time - nextCmd) > 1000) && (_cmdQueue.size() > 0))
 	{
-		nextCmd = time;
-
 		// grab the next command to run
 		std::string& cmdToRun = _cmdQueue.front();
 
@@ -245,6 +243,9 @@ void multiClientUpdate(int wait, bool force)
 
 		// pop us off the queue
 		_cmdQueue.pop_front();
+
+        nextCmd = time;
+        
 	}
 }
 
@@ -508,7 +509,9 @@ static int login_cmd(int argc, char* argv[])
 		//uiChatPrintLine("%d: login failed", i);
 
 		// let all of the currently spawned in clients tell the host they are still alive
-		multiClientUpdate(100, true);
+        
+        // TBD: frisbone, temporarily commented out because it could be triggered from this call
+		//multiClientUpdate(100, true);
 
 		if(Online)
 			PlayerClient()->SendUpdate();
@@ -624,7 +627,7 @@ static int spawn_cmd(int argc, char* argv[])
 			uiChatPrintLine("%d: spawn failed", i);
 
 		// let all of the currently spawned in clients tell the host they are still alive
-		multiClientUpdate(100, true);
+		//multiClientUpdate(100, true);
 
 		if(Online)
 			PlayerClient()->SendUpdate();

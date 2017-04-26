@@ -4229,6 +4229,76 @@
 			};
 			name = Release;
 		};
+		E9F69BC61EAFB97F00D4A207 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+			};
+			name = MC;
+		};
+		E9F69BC71EAFB97F00D4A207 /* MC */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LEX = "$(SRCROOT)/proj/mac/flex";
+				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
+				LEX_SUPPRESS_DEFAULT_RULE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				YACC = "$(SRCROOT)/proj/mac/bison";
+			};
+			name = MC;
+		};
+		E9F69BC81EAFB97F00D4A207 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				INFOPLIST_FILE = proj/mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
+				MACH_O_TYPE = mh_execute;
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				WRAPPER_EXTENSION = app;
+			};
+			name = MC;
+		};
+		E9F69BC91EAFB97F00D4A207 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = MC;
+		};
+		E9F69BCA1EAFB97F00D4A207 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = MC;
+		};
+		E9F69BCB1EAFB97F00D4A207 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = MC;
+		};
 		FA3D8BB21C8BF6D6002C5119 /* Development */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
@@ -4407,6 +4477,7 @@
 			buildConfigurations = (
 				085BD0D0110F5D5C0063F377 /* Debug */,
 				FA3D8BB51C8BF6D6002C5119 /* Development */,
+				E9F69BCA1EAFB97F00D4A207 /* MC */,
 				085BD0CC110F5D560063F377 /* Release */,
 				E964E0601E914A0E00D4BC5F /* BetaRelease */,
 				FAFF044A1C9F9E5300C3F5B0 /* GM */,
@@ -4419,6 +4490,7 @@
 			buildConfigurations = (
 				085BD0CE110F5D5C0063F377 /* Debug */,
 				FA3D8BB31C8BF6D6002C5119 /* Development */,
+				E9F69BC81EAFB97F00D4A207 /* MC */,
 				085BD0CA110F5D560063F377 /* Release */,
 				E964E05E1E914A0E00D4BC5F /* BetaRelease */,
 				FAFF04481C9F9E5300C3F5B0 /* GM */,
@@ -4431,6 +4503,7 @@
 			buildConfigurations = (
 				085BD0CD110F5D5C0063F377 /* Debug */,
 				FA3D8BB21C8BF6D6002C5119 /* Development */,
+				E9F69BC61EAFB97F00D4A207 /* MC */,
 				085BD0C9110F5D560063F377 /* Release */,
 				E964E05C1E914A0E00D4BC5F /* BetaRelease */,
 				FAFF04471C9F9E5300C3F5B0 /* GM */,
@@ -4443,6 +4516,7 @@
 			buildConfigurations = (
 				085BD0CF110F5D5C0063F377 /* Debug */,
 				FA3D8BB41C8BF6D6002C5119 /* Development */,
+				E9F69BC91EAFB97F00D4A207 /* MC */,
 				085BD0CB110F5D560063F377 /* Release */,
 				E964E05F1E914A0E00D4BC5F /* BetaRelease */,
 				FAFF04491C9F9E5300C3F5B0 /* GM */,
@@ -4455,6 +4529,7 @@
 			buildConfigurations = (
 				E97C76391C8513EB00875F44 /* Debug */,
 				FA3D8BB61C8BF6D6002C5119 /* Development */,
+				E9F69BCB1EAFB97F00D4A207 /* MC */,
 				E97C763B1C8513EB00875F44 /* Release */,
 				E964E0611E914A0E00D4BC5F /* BetaRelease */,
 				FAFF044B1C9F9E5300C3F5B0 /* GM */,
@@ -4467,6 +4542,7 @@
 			buildConfigurations = (
 				FA448CE71D0CB25500C4936D /* Debug */,
 				FA448CE81D0CB25500C4936D /* Development */,
+				E9F69BC71EAFB97F00D4A207 /* MC */,
 				FA448CE91D0CB25500C4936D /* Release */,
 				E964E05D1E914A0E00D4BC5F /* BetaRelease */,
 				FA448CEA1D0CB25500C4936D /* GM */,
