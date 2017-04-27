@@ -187,11 +187,15 @@ static void _ServerSelection(CListBox* serverList, int i)
 	else
 	{
 		Auth::GameEntry& server = Auth::g_games.m_games[i];
+#ifdef BETA_RELEASE
 		std::string info = "SteamID: ";
 		char buffer[50];  // over-cover the size of a large number
 		strprintf(buffer, "%u", loginData.m_steamAccountId);
 		info += buffer; 
-		
+#else
+		std::string info = "";
+#endif
+
 #if 0
 		info += "Server: v";
 		if ( server.m_minVer != 0 && server.m_minVer != server.m_maxVer )

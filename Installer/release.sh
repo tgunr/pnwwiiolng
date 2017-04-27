@@ -252,8 +252,8 @@ else
 fi
 
 if [[ $REPLY =~ ^[Yy]$ ]] ; then
-    if [ "$releasetype" != "release" ] ; then
-        exit_msg="Formal releases must be on a release branch, create a release branch and restart build"
+    if [ "$releasetype" != "release" ] && [ "$releasetype" != "hotfix" ]; then
+        exit_msg="Formal releases must be on a release or hotfix branch, create a release or hotfix branch and restart build"
 	exit 1
     fi
     echo "Release version is "$releaseversion
