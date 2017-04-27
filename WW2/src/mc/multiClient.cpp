@@ -237,6 +237,8 @@ void multiClientUpdate(int wait, bool force)
 		// grab the next command to run
 		std::string& cmdToRun = _cmdQueue.front();
 
+		if (&cmdToRun == nullptr) return;
+
 		char line[255+1];
 		strsafecpy(line, cmdToRun.c_str());
 
@@ -448,21 +450,34 @@ static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 		return -1;
 	}
 
+	//write notification out to stdout
+//	printf("%d: after selectpersona \n", clientIndex);
+
+
 	// now let's spawn
-	client->RequestDirectSpawn(spec);
+	int index = client->RequestDirectSpawn(spec);
+
+	//write notification out to stdout
+//	printf("%i: teul connection index! \n", index);
+//	printf("%d: after RequestDirectSpawn \n", clientIndex);
+
+
 	client->ClearWaits();
 	client->SetWait(ww2::Client::SPAWN_NOTIFY_WAIT);
 	client->SetWait(ww2::Client::CELL_CLIENT_WAIT);
 //	client->SetWait(ww2::Client::REDIRECT_WAIT);
 
-	if(client->WaitForMessages(10) != 0)
+	if (client->WaitForMessages(10) != 0)
 	{
 		uiChatPrintLine("%d: spawn request timeout!", clientIndex);
+		// pop us off the queue
+		_cmdQueue.pop_front();
 		return -1;
 	}
 
+	//write notification out to stdout
+//	printf("%d: after WaitForMessages \n", clientIndex);
 
-	uiChatPrintLine("%d: RequestDirectSpawn Completed", clientIndex);
 
 	//Testing - use the same method for vehicle as persona above
 	client->ClearWaits();
@@ -471,16 +486,27 @@ static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 	client->RequestVehicleJoin(client->SpawnNotify().weaponSerial,0);
 
 
+	//write notification out to stdout
+//	printf("%d: after RequestVehicleJoin \n", clientIndex);
+
+
 //	if(client->WaitForMessage(ww2::Client::VEHICLE_REPLY_WAIT, 5) != 0)
-	if (client->WaitForMessages(10) != 0)
+	if (client->WaitForMessages(5) != 0)
 	{
 		uiChatPrintLine("%d: vehicle join request timeout!", clientIndex);
 		return -1;
 	}
-	uiChatPrintLine("%d: vehicle join request Completed", clientIndex);
 
-	client->MoveTo(_startx + clientIndex*10, _starty, _startz);
+//	printf("%d: vehicle join request Completed\n", clientIndex);
+
+	//Update the distance from the pos command by each new client
+	//client->MoveTo(_startx + clientIndex*10, _starty, _startz);
+	client->MoveTo(_startx + clientIndex * 1.50, _starty, _startz);
+
 	uiChatPrintLine("%d: spawned", clientIndex);
+
+	//write notification out to stdout
+//	printf("client %d spawned \n", clientIndex);
 
 	return 0;
 }
