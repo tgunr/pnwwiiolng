@@ -13,6 +13,10 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="MultiClient|Win32">
+      <Configuration>MultiClient</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -36,6 +40,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
@@ -74,6 +85,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\proj\win\PropertySheet.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\proj\win\PropertySheet.props" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\proj\win\PropertySheet.props" />
@@ -93,6 +108,11 @@
     <IntDir>$(IntOutDir)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(BinOutDir)</OutDir>
+    <IntDir>$(IntOutDir)</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(BinOutDir)</OutDir>
     <IntDir>$(IntOutDir)</IntDir>
@@ -128,6 +148,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;__STDC_VERSION__=199901L;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <ExceptionHandling>SyncCThrow</ExceptionHandling>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <CompileAsManaged>false</CompileAsManaged>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <OpenMPSupport>false</OpenMPSupport>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
@@ -263,18 +315,22 @@
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">[Flex] OMGGEN</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">win_flex.exe -o %(Filename).yy.cpp -B --nounistd --header-file=%(Filename).yy.h %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">win_flex.exe -o %(Filename).yy.cpp -B --nounistd --header-file=%(Filename).yy.h %(Identity)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">win_flex.exe -o %(Filename).yy.cpp -B --nounistd --header-file=%(Filename).yy.h %(Identity)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">win_flex.exe -o %(Filename).yy.cpp -B --nounistd --header-file=%(Filename).yy.h %(Identity)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">win_flex.exe -o %(Filename).yy.cpp -B --nounistd --header-file=%(Filename).yy.h %(Identity)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">[Flex] OMGGEN</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">[Flex] OMGGEN</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">[Flex] OMGGEN</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">[Flex] OMGGEN</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">[Flex] OMGGEN</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).yy.cpp;%(Filename).yy.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">%(Filename).yy.cpp;%(Filename).yy.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">%(Filename).yy.cpp;%(Filename).yy.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">%(Filename).yy.cpp;%(Filename).yy.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">%(Filename).yy.cpp;%(Filename).yy.h;%(Outputs)</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">false</LinkObjects>
@@ -286,18 +342,22 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).tab.cpp;%(Filename).tab.h;%(Outputs)</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">win_bison.exe -o %(Filename).tab.cpp --defines=%(Filename).tab.h --report=all %(Identity)</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">win_bison.exe -o %(Filename).tab.cpp --defines=%(Filename).tab.h --report=all %(Identity)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">win_bison.exe -o %(Filename).tab.cpp --defines=%(Filename).tab.h --report=all %(Identity)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">win_bison.exe -o %(Filename).tab.cpp --defines=%(Filename).tab.h --report=all %(Identity)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">win_bison.exe -o %(Filename).tab.cpp --defines=%(Filename).tab.h --report=all %(Identity)</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">[BISON] OMGGEN</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">[BISON] OMGGEN</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">[BISON] OMGGEN</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">[BISON] OMGGEN</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">[BISON] OMGGEN</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).tab.cpp;%(Filename).tab.h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">%(Filename).tab.cpp;%(Filename).tab.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">%(Filename).tab.cpp;%(Filename).tab.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">%(Filename).tab.cpp;%(Filename).tab.h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">%(Filename).tab.cpp;%(Filename).tab.h;%(Outputs)</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">false</LinkObjects>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">false</LinkObjects>
@@ -311,10 +371,13 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
       </PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
       </PrecompiledHeaderFile>
