@@ -68,3 +68,8 @@
 #include "teul/teulEndpoint.h"
 #include "chat/chatLStringIDs.h"
 #include "str/stringLib.h"
+
+////////// Core utility functions
+
+template <typename T, std::size_t N>
+constexpr std::size_t ArraySize(T(&)[N]) { return N; }
