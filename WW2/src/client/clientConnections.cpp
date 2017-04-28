@@ -5,6 +5,7 @@
 #include <steam_api.h>
 
 #include <build_info.hpp>
+#include <auth/authAppIDs.h>
 #include <auth/authConstants.h>
 #include <auth/authPack.h>
 #include <auth/authPlaygateTypes.h> // TODO: Move
@@ -52,6 +53,13 @@ void SaveUserInfo(const UsernamePassword& info) {
 
 //==============================================================================
 
+const std::string AuthConnection::States::Waiting("authconn.waiting");
+const std::string AuthConnection::States::Complete("authconn.complete");
+namespace {
+	const std::string ErrorCode("authconn.error.generic.netcode");
+	const std::string UnknownError("authconn.error.generic.unknown");
+}
+
 namespace {
 	// HACK: Teul is C-style garbage. What'cha gonna do? *shrugs*
 	AuthConnection* g_authconn = nullptr;
@@ -74,17 +82,17 @@ AuthConnection::AuthConnection(const std::string& addr) {
 	dbugLog(_FLI, "Creating connection to %s", addr.c_str());
 
 	if ( g_authconn != nullptr )
-		throw ConnException("authconn.multipleconnections");
+		throw ConnException("authconn.error.init.multipleconnections");
 	if ( CheckTeulCallbacks() != 0 )
-		throw ConnException("authconn.teulcallbackerror");
+		throw ConnException("authconn.error.init.callbackinitfailed");
 
 	UINT32 auth_ip = Teul::GetSingleIP(addr.c_str());
 	if ( auth_ip == 0 )
-		throw ConnException("authconn.error.couldnotresolve", addr);
+		throw ConnException("authconn.error.init.couldnotresolve", addr);
 
 	if ( (teul_index = teulOpenSend(auth_ip, WWII::Net::Ports::AuthHost, &::ConnectionOpened,
 	                                3000, PROTOCOL_TCP, &::ConnectionError)) < 0 )
-		throw ConnException("authconn.errorcode", retval);
+		throw ConnException(ErrorCode, std::to_wstring(retval));
 
 	g_authconn = this;
 }
@@ -108,17 +116,17 @@ void AuthConnection::Login(const UsernamePassword& info) {
 
 	// TODO: This is correct for callsigns. Verify the same for usernames
 	if ( info.username.length() > 10 )
-		throw ConnException("authconn.badusername.length");
+		throw ConnException("authconn.error.badusername.length");
 	for ( char c : info.username )
 		if ( ! (('0' <= c && c <= '9') || ('A' <= c && c <= 'z')) )
-			throw ConnException("authconn.badusername.char", c);
+			throw ConnException("authconn.error.badusername.char", c);
 
 	login_info = info;
 
 	Auth::LoginRequest req(login_info.username, (const UCHAR*)login_info.password_md5);
 	if ( commSend(_LoginXchg, &req) < 0 )
-		throw ConnException("authconn.unknown");
-	action = {ACT_LOGIN, ACT_WAITING};
+		throw ConnException(UnknownError);
+	action = {ACT_LOGIN, States::Waiting};
 }
 
 
@@ -130,28 +138,28 @@ void AuthConnection::Login(uint32_t steamid) {
 	dbugLog(_FLI, "Sending Steam login request");
 	Auth::LoginSteamRequest req(SteamApps()->GetAppOwner().GetAccountID());
 	if ( commSend(_LoginSteamXchg, &req) < 0 )
-		throw ConnException("authconn.unknown");
-	action = {ACT_LOGIN, ACT_WAITING};
+		throw ConnException(UnknownError);
+	action = {ACT_LOGIN, States::Waiting};
 }
 
 //==============
 
 void AuthConnection::PollArenas(void) {
+	dbugLog(_FLD, "Polling arenas");
 	uint32_t dummy = 0;
 	if ( commSend(_GetArenaList, &dummy) < 0 )
-		throw ConnException("authconn.unknown");
-	action = {ACT_POLL_ARENAS, ACT_WAITING};
+		throw ConnException(UnknownError);
+	action = {ACT_POLL_ARENAS, States::Waiting};
 }
 
 //==============
 
 void AuthConnection::SelectArena(const Auth::GameEntry& entry) {
 	dbugLog(_FLI, "Requesting to join arena %d", entry.m_arenaID);
-
-	ARENA_REQ req{entry.m_arenaID, 0, false, presenter_version, 0};
-
-
-	action = {ACT_CHOOSE_ARENA, ACT_WAITING};
+	ARENA_REQ req{entry.m_arenaID, 0, false, presenter_version, 0, steam_id};
+	strlcpy(req.username, login_info.username.c_str(), ArraySize(req.username));
+	//req.password ???
+	action = {ACT_CHOOSE_ARENA, States::Waiting};
 }
 
 //==============================================================================
@@ -160,21 +168,21 @@ void AuthConnection::SelectArena(const Auth::GameEntry& entry) {
 void AuthConnection::ConnectionOpened(const ENDPOINT& endpoint) {
 	if ( action.action != AuthConnection::ACT_CONNECT )
 		return;
+	dbugLog(_FLI, "Auth connection opened.");
 	is_connected = true;
 	teul_index = endpoint.teulIndex();
 	conn_error = 0;
-	action.state = ACT_COMPLETE;
-	dbugLog(_FLI, "Auth connection opened.");
+	action.state = States::Complete;
 }
 
 //--------------
 
 void AuthConnection::ConnectionError(SINT32 error) {
+	dbugLog(_FLW, "Auth connection error: %d", error);
 	is_connected = false;
 	teul_index = -1; // Close connection? Need to check if all errors do this on their own.
 	conn_error = error;
-	action = {ACT_ERROR, ACT_FAILED};
-	dbugLog(_FLI, "Auth connection error: %d", error);
+	action = {ACT_ERROR, ErrorCode, std::to_wstring(error)};
 }
 
 //--------------
@@ -182,10 +190,28 @@ void AuthConnection::ConnectionError(SINT32 error) {
 void AuthConnection::LoginReplyReceived(const Auth::LoginReply& reply) {
 	if ( action.action != ACT_LOGIN )
 		return;
-
 	dbugLog(_FLI, "Login reply %s[%c]", reply.m_code.c_str(), (reply.m_playnet) ? 'y' : 'n');
-	login_code = reply.m_code;
-	action.state = reply.wasSuccessful() ? ACT_COMPLETE : ACT_FAILED;
+
+	if ( reply.m_code.length() == 0 )
+		action.state = States::Complete;
+	else if ( reply.m_code == "full")
+		action.state = "authconn.error.login.arenafull";
+	else if ( reply.m_code == "login" || reply.m_code == "internal" || reply.m_code == "unknown" )
+		action.state = "authconn.error.login.system";
+	else if ( reply.m_code == "game" )
+		action.state = "authconn.error.login.game";
+	else if ( reply.m_code == "install" )
+		action.state = "authconn.error.login.version";
+	else if ( reply.m_code == "locked" )
+		action.state = "authconn.error.login.locked";
+	else if ( reply.m_code == "invuser" )
+		action.state = "authconn.error.login.username";
+	else if ( reply.m_code == "invpass" )
+		action.state = "authconn.error.login.password";
+	else if ( reply.m_code == "inactive" )
+		action.state = "authconn.error.login.subscription";
+	else
+		action.state = "authconn.error.login.unknown";
 }
 
 //--------------
@@ -193,8 +219,9 @@ void AuthConnection::LoginReplyReceived(const Auth::LoginReply& reply) {
 void AuthConnection::ArenaUpdateReceived(ACTION_OBJECT* a) {
 	if ( action.action != ACT_POLL_ARENAS )
 		return;
+	dbugLog(_FLD, "Arena update received");
 	arenas.packer(TEUL_UNPACK, a);
-	action.state = ACT_COMPLETE;
+	action.state = States::Complete;
 }
 
 //--------------
@@ -202,6 +229,7 @@ void AuthConnection::ArenaUpdateReceived(ACTION_OBJECT* a) {
 void AuthConnection::AppVerifyReceived(const APP_VERIFY& verify) {
 	if ( action.action != ACT_CHOOSE_ARENA )
 		return;
+	dbugLog(_FLI, "AppVerify received");
 
 	APP_LAUNCH_REQ req;
 	strlcpy(req.username, login_info.username.c_str(), ArraySize(req.username));
@@ -219,7 +247,7 @@ void AuthConnection::AppVerifyReceived(const APP_VERIFY& verify) {
 	req.oVersion = 2; // ???
 
 	if ( commSend(_LaunchReq, &req) < 0 )
-		action.state = ACT_FAILED;
+		action.state = UnknownError;
 
 	// No state change since we still need to wait for auth to process this new info
 }
@@ -229,6 +257,7 @@ void AuthConnection::AppVerifyReceived(const APP_VERIFY& verify) {
 void AuthConnection::LaunchReplyReceived(const APP_LAUNCH& launch) {
 	if ( action.action != ACT_CHOOSE_ARENA )
 		return;
+	dbugLog(_FLI, "AppLaunch received");
 
 #if 0
 	switch ( launch.appID ) {
@@ -284,7 +313,7 @@ void AuthConnection::LaunchReplyReceived(const APP_LAUNCH& launch) {
 	}
 	}
 #endif
-	action.state = ACT_COMPLETE;
+	action.state = States::Complete;
 }
 
 //------------------------------------------------------------------------------

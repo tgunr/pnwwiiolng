@@ -86,12 +86,18 @@ class AuthConnection {
 public:
 	// The last action we attempted to perform.
 	enum ActionType { ACT_ERROR, ACT_CONNECT, ACT_LOGIN, ACT_POLL_ARENAS, ACT_CHOOSE_ARENA };
-	enum ActionState { ACT_WAITING, ACT_FAILED, ACT_COMPLETE };
+
+	// The state of the last/current action. This also doubles as the UI localized string describing the state.
+	// Any states not mentioned here are errors.
+	struct States {
+		static const std::string Waiting;
+		static const std::string Complete;
+	};
 
 	struct Action {
 		ActionType action;
-		ActionState state;
-		// result?
+		std::string state;
+		std::wstring arg1;
 	};
 
 public:
@@ -125,6 +131,5 @@ private:
 	uint32_t steam_id = 0;
 
 	Action action;
-	std::string login_code; // ???
 	Auth::GameList arenas;
 };
