@@ -2690,6 +2690,9 @@
     <ClCompile Include="..\..\src\sdm\GenerateHostTerrain.cpp">
       <Filter>sdm</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\client\clientConnections.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\cursor.cur">
