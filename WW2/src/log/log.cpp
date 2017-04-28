@@ -18,7 +18,7 @@ static SINT32 gLogLevelOnly = LOG_NONE;
 static UINT32 glogMaskOnly = LOG_NONE;
 
 #ifdef DEBUG_WW2
-static UINT32 logMask = LOG_UICONSOLE | LOG_VEHICLE;
+static UINT32 logMask = LOG_WEAPON | LOG_VEHICLE | LOG_1 ;
 static SINT32 logLevel = LOG_DEBUG;
 #else
 static UINT32 logMask = LOG_NONE;
@@ -214,11 +214,19 @@ static void logwI(const char *file, int line, const char *function, UINT32 syste
     printf("\n");
 }
 
-//struct {
-//    const char* prevFile = "";
-//    int prevLine = 0;
-//    uint count = 0;
-//} prevLog ;
+
+static void logww(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
+{
+    if(gLogLevelOnly && glogMaskOnly) {
+        if (gLogLevelOnly == level && (system & glogMaskOnly))
+            logwI(file, line, function, system, level, str, marker);
+    } else {
+        if (logLevel < level || !(system & logMask))
+            return;
+        else
+            logwI(file, line, function, system, level, str, marker);
+    }
+}
 
 static void lognodup(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
 {
@@ -239,7 +247,7 @@ static void lognodup(const char *file, int line, const char *function, UINT32 sy
                 return;
         }
     } else {
-        prevLog.count = 0;
+        prevLog.count = 1;
     }
 printLog:
     vprintf(buf, marker);
@@ -279,7 +287,7 @@ static void logw(const char *file, int line, const char *function, UINT32 system
             goto logwhere;
     }
 logwhere:
-    lognodup(file, line, function, system, level, str, marker);
+    logwI(file, line, function, system, level, str, marker);
 }
 
 #if platOS == OS_MACOS

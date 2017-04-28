@@ -321,6 +321,8 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 		return;
 	}
 
+	WriteLog (LOG_WEAPON, LOG_DEBUG, "Open weapon file %s for %d", filename, weapon);
+
 	static const size_t BUF_SIZE = 255;
 	static char	buf[BUF_SIZE + 1];
 
@@ -618,6 +620,7 @@ void fpFPSDataReadFPSFile()
 	UINT64 val5 = fpStringHash("gew43File");
 	*/
 
+	WriteLog(LOG_WEAPON, LOG_INFO, "FPS RELOAD");
 	while (fioGetString(fpsDataFile, (char*)buf, 255) != 0)
 	{
 		if (buf[0] == '#')
@@ -635,6 +638,7 @@ void fpFPSDataReadFPSFile()
 		//	int i = 0;
 
 		UINT64 hash = fpStringHash(buf);
+
 
 		switch (hash)
 		{
