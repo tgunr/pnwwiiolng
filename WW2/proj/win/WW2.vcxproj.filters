@@ -200,6 +200,9 @@
     <Filter Include="omg\Generated Source">
       <UniqueIdentifier>{828d491a-a561-466c-b3c3-f0306ba21c09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="auth">
+      <UniqueIdentifier>{7faacd35-52b9-4bb7-a391-8cadea6b01a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\cfg\cfgCodes.h">
@@ -1644,6 +1647,9 @@
     <ClInclude Include="..\..\src\wwii\wwiiBackChannel.h">
       <Filter>wwii</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\auth\authPack.h">
+      <Filter>auth</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2692,6 +2698,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\client\clientConnections.cpp">
       <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\auth\authPack.cpp">
+      <Filter>auth</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

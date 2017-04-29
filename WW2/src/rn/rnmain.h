@@ -39,4 +39,5 @@
 	extern LOGICAL rnmainListLocColorText(SINT32 category, SINT32 locID, UINT32 uColor);
 	extern LOGICAL rnmainListEmoteText(SINT32 category, SINT32 locID, UINT32 uColor, const WCHAR* prepend, const WCHAR* append);
 
-    extern bool rnmainGetOnlineSetting();
+	extern void rnsetServerInfo(UINT32 serverip, UINT32 serverport, UINT32 otp);
+	extern void rnconnectToServer(void);

@@ -942,6 +942,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\auth\authPack.h" />
     <ClInclude Include="..\..\src\cfg\cfgCodes.h" />
     <ClInclude Include="..\..\src\cfg\cfgData.h" />
     <ClInclude Include="..\..\src\cfg\cfgLoad.h" />
@@ -1432,6 +1433,7 @@
     <ClInclude Include="..\versionNo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\auth\authPack.cpp" />
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">Create</PrecompiledHeader>

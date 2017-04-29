@@ -92,12 +92,17 @@ public:
 	struct States {
 		static const std::string Waiting;
 		static const std::string Complete;
+		static const std::string URLResponse;
+		static const std::string FTPResponse;
 	};
 
 	struct Action {
 		ActionType action;
 		std::string state;
 		std::wstring arg1;
+		// HACK
+		std::string url;
+		std::string ftp;
 	};
 
 public:

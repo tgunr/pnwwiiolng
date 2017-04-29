@@ -1,22 +1,19 @@
 #include <syscfg.h>
 #include "clientConnections.h"
 
-#include <../../Playgate/src/md5.h> // TODO: Move or use different code
 #include <steam_api.h>
 
 #include <build_info.hpp>
 #include <auth/authAppIDs.h>
 #include <auth/authConstants.h>
 #include <auth/authPack.h>
-#include <auth/authPlaygateTypes.h> // TODO: Move
-#include <comm/commPlaygateMessages.h> // TODO: Move
+#include <auth/authPlaygateTypes.h>
+#include <pa/md5.h>
+#include <rn/rnmain.h>
 #include <teul/teulKit.h>
 #include <wwii/wwiiCallbacks.h>
 #include <wwii/wwiiNetPorts.h>
 #include <wwii/wwiiUTF.h>
-
-
-const uint32_t presenter_version = 0x00010109; //teulGetHost("0.1.1.9", &g_playgateVersion);
 
 
 // Placeholder
@@ -34,8 +31,7 @@ void UsernamePassword::SetPasswordString(const std::wstring& str) {
 	UCHAR digest[256+1];
 	memset(digest, 0, sizeof(digest));
 	getMD5FromString(utf8Password, digest);
-	// Don't look at this function; you will cry
-	convertMD5StringToHex(digest, password_md5, sizeof(digest));
+	convertMD5StringToHex(digest, password_md5);
 }
 
 //--------------
@@ -55,6 +51,8 @@ void SaveUserInfo(const UsernamePassword& info) {
 
 const std::string AuthConnection::States::Waiting("authconn.waiting");
 const std::string AuthConnection::States::Complete("authconn.complete");
+const std::string AuthConnection::States::URLResponse("authconn.urlresponse");
+const std::string AuthConnection::States::FTPResponse("authconn.ftpresponse");
 namespace {
 	const std::string ErrorCode("authconn.error.generic.netcode");
 	const std::string UnknownError("authconn.error.generic.unknown");
@@ -74,6 +72,9 @@ namespace {
 	TEUL_CALLBACK* _ArenaReq = nullptr;
 	TEUL_CALLBACK* _ArenaReq2 = nullptr;
 	TEUL_CALLBACK* _LaunchReq = nullptr;
+
+
+	const uint32_t presenter_version = 0x00010109; //teulGetHost("0.1.1.9", &g_playgateVersion);
 }
 
 //==============================================================================
@@ -124,7 +125,7 @@ void AuthConnection::Login(const UsernamePassword& info) {
 	login_info = info;
 
 	Auth::LoginRequest req(login_info.username, (const UCHAR*)login_info.password_md5);
-	if ( commSend(_LoginXchg, &req) < 0 )
+	if ( teulSend(teul_index, _LoginXchg, &req) < 0 )
 		throw ConnException(UnknownError);
 	action = {ACT_LOGIN, States::Waiting};
 }
@@ -137,7 +138,7 @@ void AuthConnection::Login(uint32_t steamid) {
 
 	dbugLog(_FLI, "Sending Steam login request");
 	Auth::LoginSteamRequest req(SteamApps()->GetAppOwner().GetAccountID());
-	if ( commSend(_LoginSteamXchg, &req) < 0 )
+	if ( teulSend(teul_index, _LoginSteamXchg, &req) < 0 )
 		throw ConnException(UnknownError);
 	action = {ACT_LOGIN, States::Waiting};
 }
@@ -147,7 +148,7 @@ void AuthConnection::Login(uint32_t steamid) {
 void AuthConnection::PollArenas(void) {
 	dbugLog(_FLD, "Polling arenas");
 	uint32_t dummy = 0;
-	if ( commSend(_GetArenaList, &dummy) < 0 )
+	if ( teulSend(teul_index, _GetArenaList, &dummy) < 0 )
 		throw ConnException(UnknownError);
 	action = {ACT_POLL_ARENAS, States::Waiting};
 }
@@ -158,7 +159,7 @@ void AuthConnection::SelectArena(const Auth::GameEntry& entry) {
 	dbugLog(_FLI, "Requesting to join arena %d", entry.m_arenaID);
 	ARENA_REQ req{entry.m_arenaID, 0, false, presenter_version, 0, steam_id};
 	strlcpy(req.username, login_info.username.c_str(), ArraySize(req.username));
-	//req.password ???
+	//req.password ? unused on auth
 	action = {ACT_CHOOSE_ARENA, States::Waiting};
 }
 
@@ -233,7 +234,7 @@ void AuthConnection::AppVerifyReceived(const APP_VERIFY& verify) {
 
 	APP_LAUNCH_REQ req;
 	strlcpy(req.username, login_info.username.c_str(), ArraySize(req.username));
-	//req.password ???
+	//req.password ? unused on auth
 	req.steamID = steam_id;
 	req.arenaID = verify.arenaID;
 	req.sessionID = verify.sessionID;
@@ -246,7 +247,7 @@ void AuthConnection::AppVerifyReceived(const APP_VERIFY& verify) {
 	req.ignoreMinorUpdates = false; // ???
 	req.oVersion = 2; // ???
 
-	if ( commSend(_LaunchReq, &req) < 0 )
+	if ( teulSend(teul_index, _LaunchReq, &req) < 0 )
 		action.state = UnknownError;
 
 	// No state change since we still need to wait for auth to process this new info
@@ -254,66 +255,38 @@ void AuthConnection::AppVerifyReceived(const APP_VERIFY& verify) {
 
 //--------------
 
+namespace {
+	const size_t MAX_URL = 256;
+}
+
 void AuthConnection::LaunchReplyReceived(const APP_LAUNCH& launch) {
 	if ( action.action != ACT_CHOOSE_ARENA )
 		return;
 	dbugLog(_FLI, "AppLaunch received");
 
-#if 0
 	switch ( launch.appID ) {
-	case Auth::Apps::LOGIN_DENIED:
-
-		strcpy_s(_DownloadPage, launch.data);
-		playgate.PostCommand(MSG_DOWNLOAD, (UINT32)_DownloadPage);
-		_CleanUpLaunchData();
-		playgate.Quit();
-
-		return 0;
-
+	case Auth::Apps::WWIIOL:
+		rnsetServerInfo(launch.serverIP, launch.serverPort, launch.otp);
+		action.state = States::Complete;
 		break;
-
+	case Auth::Apps::LOGIN_DENIED:
+		action.state = "authconn.error.launch.denied";
+		break;
 	case Auth::Apps::BROWSER:
 	case Auth::Apps::WEB_DOWNLOAD:
-	{
-		SINT32 len;
-		SCHAR *ftpData;
-
-		len = sizeof(_DownloadPage);
-		memset(_DownloadPage, 0, sizeof(_DownloadPage));
-		memset(ftpURL, 0, sizeof(ftpURL));
-
-		strcpy_s(_DownloadPage, launch.data);
-		len = strlen(_DownloadPage);
-		if ( launch.dataSize > len ) {
-			ftpData = launch.data + len + 1;
-
-			strcpy_s(ftpURL, ftpData);
-		}
-		//			else
-		//				strcpy(_DownloadPage, "www." AUTH_DOMAIN "/bv/download.jsp");
-
-		//winsSendMessage(MSG_DOWNLOAD, (UINT32)_DownloadPage);
-		webID = MSG_DOWNLOAD;
-		webURL = (UINT32)_DownloadPage;
-		playgate.SetStatus(GetLoc(UPDATING), AppProgress);
-		ftpStart();
-
-		return 0;
-	}
 	case Auth::Apps::WEB_REDIRECT:
-	{
-		strcpy_s(_DownloadPage, launch.data);
-		playgate.PostCommand(MSG_DOWNLOAD, (UINT32)_DownloadPage);
-
-		_CleanUpLaunchData();
-
-		playgate.Quit();
-
-		return 0;
+		action.state = States::URLResponse;
+		action.url = launch.data;
+		if ( (size_t)launch.dataSize > action.url.size() ) {
+			action.state = States::FTPResponse;
+			action.ftp = launch.data + action.url.size() + 1;
+		}
+		// ftpStart()
+		break;
+	default:
+		dbugLog(_FLW, "Unknown APP_LAUNCH flag '%d'", launch.appID);
+		action.state = UnknownError;
 	}
-	}
-#endif
-	action.state = States::Complete;
 }
 
 //------------------------------------------------------------------------------
@@ -405,7 +378,7 @@ SINT32 RecvAppLaunch(ACTION_OBJECT* a) {
 
 //------------------------------------------------------------------------------
 
-SINT32 InitCallbacks(void) {
+SINT32 CheckTeulCallbacks(void) {
 	if ( _LoginXchg != nullptr )
 		return 0;
 
