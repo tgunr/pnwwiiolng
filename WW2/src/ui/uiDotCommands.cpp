@@ -310,7 +310,7 @@ static SINT32 dot_help(const wchar_t* line)
 
         for(; itr != _dotCommands.end(); ++itr)
         {
-            if(!itr->second.key || (itr->second.key && HasKeyFile))
+            if(!itr->second.key || (itr->second.key && true )) //HasKeyFile))
             {
 				if(cmdlist.empty() == false)
 					cmdlist += L", ";
@@ -7521,7 +7521,7 @@ int uiDotCommand(const wchar_t* line)
 		}
 	}
 
-    if(it != _dotCommands.end() && (!it->second.key || (it->second.key && HasKeyFile)))
+    if(it != _dotCommands.end() && (!it->second.key || (it->second.key && true)))
     {
         if(wstrncasecmp(pcmd, L"doover", DOT_COMMAND_SIZE) != 0)
 			wcsncpy(_LastCommand, line, 255);
@@ -7591,7 +7591,7 @@ const wchar_t* uiDotCommandMatch(const wchar_t* search, bool again)
 
 					// only auto-complete debug commands if they have
 					// a keyfile
-					if(it->second.key && !HasKeyFile)
+					if(it->second.key && !true)
 						continue;
 
 					const wchar_t* command = it->first.c_str();

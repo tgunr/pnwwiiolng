@@ -9623,9 +9623,9 @@ static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData)
 	mlObjectData* ObjectData;
 	OBJECT* Object;
 
-#if RELEASE_CLIENT != 0
-	if(!HasKeyFile) return 0;
-#endif
+//#if RELEASE_CLIENT != 0
+//	if(!HasKeyFile) return 0;
+//#endif
 
 	if(!VehicleObjectAnalysis) return 0;
 
