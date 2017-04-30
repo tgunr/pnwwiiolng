@@ -34,8 +34,9 @@
 #include "ld/lddds.h"
 #include "ogl/GLCounter.h"
 
-#define ALLOW_RESURRECT
+//#define ALLOW_RESURRECT
 //#undef ALLOW_RESURRECT
+//#define GR2_DEBUG
 
 #if USE_STATESET
 static ref_ptr<RenderStateSet> depthpass;
@@ -357,7 +358,7 @@ static void _loadReplaceXML()
 
         if(!root)
         {
-            Write_Log(LOG_OLD, LOG_INFO, "*** %s FAILED ***", name);
+            WriteLog(LOG_OLD, LOG_INFO, "*** %s FAILED ***", name);
             return;
         }
 
@@ -409,7 +410,7 @@ void gr2Init()
 
 	// threshold defaults to 0.2
 //	threshold = GrannyGetLocalPoseFillThreshold(localScene.SharedLocalPose);
-//	Write_Log(LOG_FPS, LOG_INFO, "Threshold:  %f", threshold);
+//	WriteLog(LOG_FPS, LOG_INFO, "Threshold:  %f", threshold);
 
 	generateRotationMatrix (AROUND_Z, 90.0, &arbitraryRotationMatrix);
 
@@ -450,7 +451,8 @@ gr2Error(granny_log_message_type type, granny_log_message_origin origin, char co
   {
     error="";
   }
-	Write_Log(LOG_FPS, LOG_INFO, "GRANNY: %d, %d, %s line %d: \"%s\"", type, origin, file, line, error);
+#ifdef GR2LAYER_DEBUG	WriteLog(LOG_FPS, LOG_INFO, "GRANNY: %d, %d, %s line %d: \"%s\"", type, origin, file, line, error);
+#endif
 }
 
 /*
@@ -465,7 +467,7 @@ granny_file_info* findFileInCache(const char* basename, granny_file** file = nul
 
 	if(found != _fileCache.end())
 	{
-		//Write_Log (LOG_FPS, LOG_INFO, "Fileinfo FROM CACHE for file %s = 0x%x", gr2File, found->second);
+		//WriteLog (LOG_FPS, LOG_INFO, "Fileinfo FROM CACHE for file %s = 0x%x", gr2File, found->second);
 		return found->second;
 	}
 
@@ -477,7 +479,7 @@ granny_file_info* findFileInCache(const char* basename, granny_file** file = nul
 	// add it to the cache, even if its null
 	_fileCache[basename] = fileInfo;
 
-	//	Write_Log (LOG_FPS, LOG_INFO, "Fileinfo LOADED for file %s = 0x%x", gr2File, fileInfo);
+	//	WriteLog (LOG_FPS, LOG_INFO, "Fileinfo LOADED for file %s = 0x%x", gr2File, fileInfo);
 
 	// return it
 	return fileInfo;
@@ -504,7 +506,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		if(static_cast<int>(fileSize) < 0)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to size file %s (probably file not found)!", filename);
+			WriteLog (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to size file %s (probably file not found)!", filename);
 			return nullptr;
 		}
 
@@ -512,7 +514,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		if(stream < 0)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to open %s!", filename);
+			WriteLog (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to open %s!", filename);
 			return nullptr;
 		}
 
@@ -520,7 +522,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		if(!buffer)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to allocate read buffer for %s", filename);
+			WriteLog (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to allocate read buffer for %s", filename);
 			return nullptr;
 		}
 
@@ -528,7 +530,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		if(readSize != fileSize)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Bytes read != bytes in file (%d != %d) in file %s", readSize, fileSize, filename);
+			WriteLog (LOG_FPS, LOG_INFO, "getFileInfo:  Bytes read != bytes in file (%d != %d) in file %s", readSize, fileSize, filename);
 			memFree (buffer);
 			return nullptr;
 		}
@@ -544,7 +546,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		if(!fileInfo)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to get model data out of %s!", filename);
+			WriteLog (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to get model data out of %s!", filename);
 			GrannyFreeFile(loadedFile);
 			return nullptr;
 		}
@@ -738,13 +740,13 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	//if (fileInfo->ModelCount != 1)
 	if(fileInfo->ModelCount <= 0)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Model file %s doesn't contain any models .. it has %d", modelFile, fileInfo->ModelCount);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2LoadModel: Model file %s doesn't contain any models .. it has %d", modelFile, fileInfo->ModelCount);
 		return nullptr;
 	}
 
 	if(modelIndex < 0 || modelIndex >= fileInfo->ModelCount)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Model file %s doesn't contain a model at index %d .. it has %d models", modelFile, modelIndex, fileInfo->ModelCount);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2LoadModel: Model file %s doesn't contain a model at index %d .. it has %d models", modelFile, modelIndex, fileInfo->ModelCount);
 		return nullptr;
 	}
 
@@ -786,7 +788,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 
 	if(!newModel)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Failed to allocate memory for model %s", modelFile);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2LoadModel: Failed to allocate memory for model %s", modelFile);
 		piExitProgram (_FL, "gr2LoadModel: Failed to allocate memory for model");
 		return nullptr;
 	}
@@ -798,7 +800,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 
 	if (grannyModel->Skeleton->BoneCount > MAX_GR2_BONE_COUNT)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Bone count too high (%d > %d) for %s", grannyModel->Skeleton->BoneCount, MAX_GR2_BONE_COUNT, modelFile);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2LoadModel: Bone count too high (%d > %d) for %s", grannyModel->Skeleton->BoneCount, MAX_GR2_BONE_COUNT, modelFile);
 		piExitProgram (_FL, "gr2LoadModel: Bonecount too high");
 		return nullptr;
 	}
@@ -808,8 +810,9 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	newModel->skeleton = GrannyGetSourceSkeleton(newModel->GrannyInstance);
 	newModel->boneCount = newModel->skeleton->BoneCount;
 	newModel->active = 1;
-
-	Write_Log (LOG_FPS, LOG_INFO, "Granny2:  Instance for %s is 0x%x", modelFile, newModel->GrannyInstance);
+#ifdef GR2LAYER_DEBUG
+	WriteLog (LOG_FPS, LOG_INFO, "Granny2:  Instance for %s is 0x%x", modelFile, newModel->GrannyInstance);
+#endif
 
 	granny_skeleton* wornOnSkeleton = nullptr;
 
@@ -864,7 +867,7 @@ static SINT32 createTexture (granny_texture* grannyTexture)
 
 	if (grannyImage->MIPLevelCount > 1)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "createTexture: Multiple MIP levels detected for image %s", grannyTexture->FromFileName);
+		WriteLog (LOG_FPS, LOG_INFO, "createTexture: Multiple MIP levels detected for image %s", grannyTexture->FromFileName);
 	}
 
 	strcpy(texname, grannyTexture->FromFileName);
@@ -884,7 +887,7 @@ static SINT32 createTexture (granny_texture* grannyTexture)
 
 	if (strlen(texname) == 0)
 	{
-		Write_Log(LOG_FPS, LOG_INFO, "Animation texture has no name! (w=%d,h=%d)", grannyTexture->Width, grannyTexture->Height);
+		WriteLog(LOG_FPS, LOG_INFO, "Animation texture has no name! (w=%d,h=%d)", grannyTexture->Width, grannyTexture->Height);
 //		rnmainListText(loclGetLocalizationStringByID(loclANIMATION_TEXTURE_MSG));
 	}
 
@@ -909,12 +912,12 @@ static SINT32 createTexture (granny_texture* grannyTexture)
 
 	if (piIsTexture(texid, 0))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "createTexture: Using existing game texture %s", texname);
+		WriteLog (LOG_FPS, LOG_INFO, "createTexture: Using existing game texture %s", texname);
 		piAddTexRef(texid);
 	}
 	else
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "createTexture: Creating game texture %s", texname);
+		WriteLog (LOG_FPS, LOG_INFO, "createTexture: Creating game texture %s", texname);
 		// some hardcoding here .. 24 bytes per pixel, 0 alpha bits
 
 		texid = piCreateRawTexture(-1, 0, grannyTexture->Width, grannyTexture->Height, 24, 0, CRT_FLAG_WRITABLE);
@@ -1071,7 +1074,7 @@ static void createMeshData(granny_mesh* grannyMesh, granny_skeleton* mySkeleton,
 
         if(!data->GrannyDeformer)
 		{
-			Write_Log(LOG_FPS, LOG_INFO, "Granny didn't find a matching deformer for the vertex format used by mesh \"%s\".  This mesh won't be rendered properly.",
+			WriteLog(LOG_FPS, LOG_INFO, "Granny didn't find a matching deformer for the vertex format used by mesh \"%s\".  This mesh won't be rendered properly.",
 				grannyMesh->Name);
 		}
 	}
@@ -1171,7 +1174,7 @@ static void createMeshOld(gr2Model* model, gr2MeshData* mesh, granny_mesh* grann
 
         if(!mesh->GrannyDeformer)
 		{
-			Write_Log(LOG_FPS, LOG_INFO, "Granny didn't find a matching deformer for the vertex format used by mesh \"%s\".  This mesh won't be rendered properly.",
+			WriteLog(LOG_FPS, LOG_INFO, "Granny didn't find a matching deformer for the vertex format used by mesh \"%s\".  This mesh won't be rendered properly.",
 				grannyMesh->Name);
 		}
 	}
@@ -1190,17 +1193,17 @@ gr2Animation* gr2LoadAnimation (const SCHAR* animationFile, SINT32 useCache)
 
 	if (!fileInfo || fileInfo->AnimationCount < 1)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Failed to load animation %s", animationFile);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Failed to load animation %s", animationFile);
 		return nullptr;
 	}
 
-//	Write_Log (LOG_FPS, LOG_INFO, "Fileinfo for animation file %s = 0x%x", animationFile, fileInfo);
+//	WriteLog (LOG_FPS, LOG_INFO, "Fileinfo for animation file %s = 0x%x", animationFile, fileInfo);
 
 	newAnimation = _gr2AnimationPool.Pop();
 
 	if (!newAnimation)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Failed to allocate memory for animation %s", animationFile);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Failed to allocate memory for animation %s", animationFile);
 		piExitProgram (_FL, "gr2LoadAnimation: Failed to allocate memory for animation");
 		return nullptr;
 	}
@@ -1242,7 +1245,7 @@ gr2Animation* gr2LoadAnimation (const SCHAR* animationFile, SINT32 useCache)
 
             gr2Event* newEvent = nullptr;
 
-    //		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Loading event data for animation %s", animationFile);
+    //		WriteLog (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Loading event data for animation %s", animationFile);
 
             while(fioGetLine(evtFileID, buf, 255) != 0)
             {
@@ -1285,7 +1288,7 @@ LOGICAL gr2AttachModel (gr2Model* model, const SCHAR* attachBone, gr2Model* atta
 
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Null model passed to gr2AttachModel!");
+		WriteLog (LOG_FPS, LOG_INFO, "Null model passed to gr2AttachModel!");
 		return FALSE;
 	}
 
@@ -1303,7 +1306,7 @@ LOGICAL gr2AttachModel (gr2Model* model, const SCHAR* attachBone, gr2Model* atta
 	}
 	else
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Bone %s not found in model %s", attachBone, model->grannyModel->Name);
+		WriteLog (LOG_FPS, LOG_INFO, "Bone %s not found in model %s", attachBone, model->grannyModel->Name);
 		//piExitProgram (_FL, "gr2LoadModel: Failed to find bone for model");
 		attached = false;
 	}
@@ -1314,7 +1317,7 @@ LOGICAL gr2AttachModel (gr2Model* model, const SCHAR* attachBone, gr2Model* atta
 	}
 	else
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Bone %s not found in model %s", attachToBone, attachToModel->grannyModel->Name);
+		WriteLog (LOG_FPS, LOG_INFO, "Bone %s not found in model %s", attachToBone, attachToModel->grannyModel->Name);
 		//piExitProgram (_FL, "gr2AttachModel: Failed to find bone for attach model");
 		attached = false;
 	}
@@ -1336,7 +1339,7 @@ LOGICAL gr2AttachModelByIndex (gr2Model* model, int attachBone, gr2Model* attach
 {
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Null model passed to gr2AttachModel!");
+		WriteLog (LOG_FPS, LOG_INFO, "Null model passed to gr2AttachModel!");
 		return FALSE;
 	}
 
@@ -1377,19 +1380,19 @@ gr2Control* gr2PlayAnimation (gr2Model* model, gr2Animation* animation)
 
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  Null model passed to gr2PlayAnimation!");
+		WriteLog (LOG_FPS, LOG_INFO, "ERROR:  Null model passed to gr2PlayAnimation!");
 		return nullptr;
 	}
 
 	if (!animation)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  Null animation passed to gr2PlayAnimation!");
+		WriteLog (LOG_FPS, LOG_INFO, "ERROR:  Null animation passed to gr2PlayAnimation!");
 		return nullptr;
 	}
 
 	if (!(animation->animation))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  Null gr2 animation passed to gr2PlayAnimation!");
+		WriteLog (LOG_FPS, LOG_INFO, "ERROR:  Null gr2 animation passed to gr2PlayAnimation!");
 		return nullptr;
 	}
 
@@ -1414,9 +1417,9 @@ gr2Control* gr2PlayAnimation (gr2Model* model, gr2Animation* animation)
 	newControl->easeInDuration = 0;
 	newControl->animation = animation;
 
-//	Write_Log (LOG_FPS, LOG_INFO, "Generated control 0x%x for animation 0x%x", newControl->control, animation);
+//	WriteLog (LOG_FPS, LOG_INFO, "Generated control 0x%x for animation 0x%x", newControl->control, animation);
 
-//	Write_Log (LOG_FPS, LOG_INFO, "Playing (%s) on (%s) at %f", animation->name, model->name, (frametime / 1000.0f));
+//	WriteLog (LOG_FPS, LOG_INFO, "Playing (%s) on (%s) at %f", animation->name, model->name, (frametime / 1000.0f));
 
 	return newControl;
 }
@@ -1432,17 +1435,19 @@ LOGICAL gr2PlayBlendedAnimationFull (gr2Model* model, gr2AnimationBlend* blend, 
 	{
 		if (!blend)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: Null blend!");
+#ifdef GR2LAYER_DEBUG			WriteLog (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: Null blend!");
+#endif
 			return FALSE;
 		}
 		if (!blend->animations[0])
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: no animations in blend!");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: no animations in blend!");
 			return FALSE;
 		}
 		if (!blend->numBlends)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: numBlends = 0");
+#ifdef GR2LAYER_DEBUG			WriteLog (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: numBlends = 0");
+#endif
 			return FALSE;
 		}
 	}
@@ -1462,8 +1467,9 @@ LOGICAL gr2PlayBlendedAnimationFull (gr2Model* model, gr2AnimationBlend* blend, 
 		}
 	}
 #endif
-
-	Write_Log (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: Starting blend 0x%x (%s) on model %s at %f", blend, blend->blendFile, model->name, (frametime/1000.0f));
+#ifdef GR2LAYER_DEBUG
+	WriteLog (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: Starting blend 0x%x (%s) on model %s at %f", blend, blend->blendFile, model->name, (frametime/1000.0f));
+#endif
 
 	granny_controlled_animation_builder* builder		= nullptr;
 	granny_control	* control								= nullptr;
@@ -1561,19 +1567,19 @@ gr2ControlBlend* gr2BlendControlFindRunningBlend (gr2Model* model, gr2AnimationB
 {
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: Null model passed");
+		WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: Null model passed");
 		return nullptr;
 	}
 
 	if (!model->blends)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: model has no blends");
+		WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: model has no blends");
 		return nullptr;
 	}
 
 	if ((!animationBlend) || (!animationBlend->animations[0])  || (!animationBlend->numBlends))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: Null data passed");
+		WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: Null data passed");
 		return nullptr;
 	}
 
@@ -1591,7 +1597,7 @@ void gr2BlendControlSetMixin (gr2Model* model, gr2AnimationBlend* animationBlend
 
 	if (!blendControl)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetMixin: failed to find control!");
+		WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetMixin: failed to find control!");
 		return;
 	}
 
@@ -1622,15 +1628,15 @@ void gr2BlendControlSetWeight (gr2Model* model,
 	{
 		/*
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: Null animationBlend");
 		*/
 
 		return;
 	}
 
-//	Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: Blend %s, weight %f", animationBlend->blendFile, weight);
+//	WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: Blend %s, weight %f", animationBlend->blendFile, weight);
 
 	UINT32 blendCount = animationBlend->numBlends;
 
@@ -1675,9 +1681,9 @@ void gr2BlendControlSetLastFrame (gr2Model* model, gr2AnimationBlend* animationB
 	if (!blendControl)
 	{
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLastFrame: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetLastFrame: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLastFrame: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetLastFrame: Null animationBlend");
 		return;
 	}
 
@@ -1695,9 +1701,9 @@ void gr2BlendControlSetLoopCount (gr2Model* model, gr2AnimationBlend* animationB
 	if (!blendControl)
 	{
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCount: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCount: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCount: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCount: Null animationBlend");
 		return;
 	}
 
@@ -1719,9 +1725,9 @@ void gr2BlendControlSetLoopCountForGrenade (gr2Model* model, gr2AnimationBlend* 
 	if (!blendControl)
 	{
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCountForGrenade: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCountForGrenade: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCountForGrenade: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCountForGrenade: Null animationBlend");
 		return;
 	}
 
@@ -1741,9 +1747,9 @@ void gr2BlendControlSetSpeed(gr2Model* model, gr2AnimationBlend* animationBlend,
 	{
 		/*
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetSpeed: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetSpeed: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetSpeed: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetSpeed: Null animationBlend");
 		*/
 		return;
 	}
@@ -1769,9 +1775,9 @@ void gr2BlendControlSetEaseOutDuration (gr2Model* model, gr2AnimationBlend* anim
 	if (!blendControl)
 	{
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration: Null animationBlend");
 		return;
 	}
 
@@ -1780,7 +1786,7 @@ void gr2BlendControlSetEaseOutDuration (gr2Model* model, gr2AnimationBlend* anim
 		gr2ControlSetEaseOutDuration (&blendControl->controls[i], time);
 	}
 
-//	Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration:  ease OUT time %f for blend %s at %d", time, animationBlend->blendFile, frametime);
+//	WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration:  ease OUT time %f for blend %s at %d", time, animationBlend->blendFile, frametime);
 
 	blendControl->easeOutDuration = time;
 }
@@ -1792,9 +1798,9 @@ void gr2BlendControlSetEaseInDuration (gr2Model* model, gr2AnimationBlend* anima
 	if (!blendControl)
 	{
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration: Null animationBlend");
 		return;
 	}
 
@@ -1814,7 +1820,7 @@ void gr2BlendControlSetEaseInDuration (gr2Model* model, gr2AnimationBlend* anima
 		}
 	}
 
-//	Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration:  ease IN time %f for blend %s at %d", time, animationBlend->blendFile, frametime);
+//	WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration:  ease IN time %f for blend %s at %d", time, animationBlend->blendFile, frametime);
 
 	blendControl->easeInDuration = time;
 }
@@ -1833,9 +1839,9 @@ void gr2BlendControlEaseOut (gr2Model* model, gr2AnimationBlend* animationBlend,
 	if (!blendControl)
 	{
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut: Null animationBlend");
 		return;
 	}
 
@@ -1844,7 +1850,7 @@ void gr2BlendControlEaseOut (gr2Model* model, gr2AnimationBlend* animationBlend,
 		GrannyEaseControlOut (blendControl->controls[i].control, time);
 	}
 
-//	Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut:  ease OUT time %f for blend %s at %d", time, animationBlend->blendFile, frametime);
+//	WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut:  ease OUT time %f for blend %s at %d", time, animationBlend->blendFile, frametime);
 }
 
 LOGICAL gr2BlendIsComplete (gr2Model* model, gr2AnimationBlend* animationBlend)
@@ -1854,9 +1860,9 @@ LOGICAL gr2BlendIsComplete (gr2Model* model, gr2AnimationBlend* animationBlend)
 	if (!blendControl)
 	{
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendIsControlComplete: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendIsControlComplete: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendIsControlComplete: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendIsControlComplete: Null animationBlend");
 		return FALSE;
 	}
 
@@ -1885,9 +1891,9 @@ FLOAT32 gr2BlendControlCompletePercent (gr2Model* model, gr2AnimationBlend* anim
 	if (!blendControl)
 	{
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlCompletePercent: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlCompletePercent: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlCompletePercent: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlCompletePercent: Null animationBlend");
 		return -1.0f;
 	}
 
@@ -1903,8 +1909,8 @@ FLOAT32 gr2BlendControlCompletePercent (gr2Model* model, gr2AnimationBlend* anim
 			localclock = GrannyGetControlClampedLocalClock (blendControl->controls[i].control);
 			percent = localclock/duration;
 
-#ifdef DEBUG
-			Write_Log(LOG_FPS, LOG_INFO, "Percent complete %2.2f", percent);
+#ifdef GR2_DEBUG
+			WriteLog(LOG_FPS, LOG_INFO, "Percent complete %2.2f", percent);
 #endif
 
 			return percent;
@@ -1921,9 +1927,9 @@ void gr2BlendControlSetStartOffset (gr2Model* model, gr2AnimationBlend* animatio
 	if (!blendControl)
 	{
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetStartOffset: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetStartOffset: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetStartOffset: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetStartOffset: Null animationBlend");
 		return;
 	}
 
@@ -1938,7 +1944,7 @@ void gr2BlendControlSetStartOffset (gr2Model* model, gr2AnimationBlend* animatio
 			// ok, we got one that isn't a single frame, use it
 			localclock = duration * percent;
 			GrannySetControlRawLocalClock (blendControl->controls[i].control, localclock);
-			//Write_Log (LOG_FPS, LOG_INFO, "Setting new local clock to %2.2f", localclock);
+			//WriteLog (LOG_FPS, LOG_INFO, "Setting new local clock to %2.2f", localclock);
 		}
 	}
 }
@@ -1950,9 +1956,9 @@ void gr2BlendControlSetEndOffset(gr2Model* model, gr2AnimationBlend* animationBl
 	if (!blendControl)
 	{
 		if (animationBlend)
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEndOffset: failed to find control %s!", animationBlend->blendFile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetEndOffset: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEndOffset: Null animationBlend");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlSetEndOffset: Null animationBlend");
 
 		return;
 	}
@@ -2328,7 +2334,7 @@ LOGICAL gr2RenderModel(gr2Model* currentModel, bool update)
 
 			if(vertexCount <= 0)
 			{
-				Write_Debug("[gr2RenderModel] *** VERTEX COUNT IS ZERO for %s ***", currentModel->name);
+				WriteDebug("[gr2RenderModel] *** VERTEX COUNT IS ZERO for %s ***", currentModel->name);
 				continue;
 			}
 
@@ -2549,7 +2555,7 @@ LOGICAL gr2RenderModel(gr2Model* currentModel, bool update)
 
 			if(vertexCount <= 0)
 			{
-				Write_Debug("[gr2RenderModel] *** VERTEX COUNT IS ZERO for %s ***", currentModel->name);
+				WriteDebug("[gr2RenderModel] *** VERTEX COUNT IS ZERO for %s ***", currentModel->name);
 				continue;
 			}
 
@@ -2679,7 +2685,7 @@ LOGICAL gr2RenderModel(gr2Model* currentModel, bool update)
                                             (UINT16*) indexPtr,
                                             group->TriCount*3))
 				    {
-					    Write_Log (LOG_FPS, LOG_INFO, "gr2RenderModel: piRenderIndexScene failed on mesh %d!", meshIndex);
+					    WriteLog (LOG_FPS, LOG_INFO, "gr2RenderModel: piRenderIndexScene failed on mesh %d!", meshIndex);
 					    oglPopRenderState(oglRENDERSTATE_ALPHABLENDENABLE);
 					    return FALSE;
 				    }
@@ -2710,7 +2716,7 @@ void gr2FreeModel (gr2Model* model)
 	if (!model)
 		return;
 
-	//Write_Log (LOG_FPS, LOG_INFO, "Freeing Granny Model: %s", model->name);
+	//WriteLog (LOG_FPS, LOG_INFO, "Freeing Granny Model: %s", model->name);
 
 	if(_gr2ModelPool.Push(model))
 		model->reset();
@@ -2721,7 +2727,7 @@ void gr2FreeMesh (gr2Mesh* mesh)
 	if(!mesh)
 		return;
 
-	//Write_Log (LOG_FPS, LOG_INFO, "     Freeing Granny Mesh: %s", mesh->GrannyMesh->Name);
+	//WriteLog (LOG_FPS, LOG_INFO, "     Freeing Granny Mesh: %s", mesh->GrannyMesh->Name);
 
 	if(_gr2MeshPool.Push(mesh))
 		mesh->reset();
@@ -2777,7 +2783,7 @@ static FLOAT64 gr2UpdateTwist(FLOAT64& target, FLOAT64& twist, FLOAT64& speed, F
 			gr2NormalizeAngle(tmt);
 			gr2NormalizeAngle(mt);
 
-			//Write_Log (LOG_FPS, LOG_INFO, "Model Twist data:  targ = %f  now = %f  diff = %f  move = %f  time = %f",
+			//WriteLog (LOG_FPS, LOG_INFO, "Model Twist data:  targ = %f  now = %f  diff = %f  move = %f  time = %f",
 			//	tmt, mt, diff, move, deltaTime);
 		}
 
@@ -2820,7 +2826,7 @@ static FLOAT64 gr2UpdateTwist(FLOAT64& target, FLOAT64& twist, FLOAT64& speed, F
 			gr2NormalizeAngle(tmt);
 			gr2NormalizeAngle(mt);
 
-			//Write_Log (LOG_FPS, LOG_INFO, "Model Twist data:  targ = %f  now = %f  diff = %f  move = %f  time = %f",
+			//WriteLog (LOG_FPS, LOG_INFO, "Model Twist data:  targ = %f  now = %f  diff = %f  move = %f  time = %f",
 			//	tmt, mt, diff, move, deltaTime);
 		}
 
@@ -2837,7 +2843,7 @@ void gr2UpdateModelOld(gr2Model* model, bool force, bool granular)
 {
 	if(!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** NULL MODEL");
+		WriteLog (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** NULL MODEL");
 		return;
 	}
 
@@ -2853,7 +2859,7 @@ void gr2UpdateModelOld(gr2Model* model, bool force, bool granular)
 	if(!force && !deltaTime)
 		return;
 
-//	Write_Log (LOG_FPS, LOG_INFO, "Setting clock for 0x%x to %f", model->GrannyInstance, gameClock);
+//	WriteLog (LOG_FPS, LOG_INFO, "Setting clock for 0x%x to %f", model->GrannyInstance, gameClock);
 
 	GrannySetModelClock(model->GrannyInstance, gameClock);
 	GrannySampleModelAnimations(model->GrannyInstance, 0, boneCount, localScene.SharedLocalPose);
@@ -2883,7 +2889,7 @@ void gr2UpdateModelOld(gr2Model* model, bool force, bool granular)
 
 		GrannyColumnMatrixMultiply4x3 ((float*)&finalTransform, (float*)&model->attachOffset, skeletonPtr);
 /*
-		Write_Log (LOG_FPS, LOG_INFO, "%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n",
+		WriteLog (LOG_FPS, LOG_INFO, "%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n",
 			finalTransform[0][0], finalTransform[0][1], finalTransform[0][2], finalTransform[0][3],
 			finalTransform[1][0], finalTransform[1][1], finalTransform[1][2], finalTransform[1][3],
 			finalTransform[2][0], finalTransform[2][1], finalTransform[2][2], finalTransform[2][3],
@@ -2945,7 +2951,7 @@ void gr2UpdateModel(gr2Model* model, bool force, bool granular)
 {
 	if(!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** NULL MODEL");
+		WriteLog (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** NULL MODEL");
 		return;
 	}
 
@@ -2978,8 +2984,9 @@ void gr2UpdateModel(gr2Model* model, bool force, bool granular)
 				// the granny version of the control will either already have been freed, or it will free itself once we advance the clock
 				// courtesy of the GrannyCompleteControlAt call
 
-				Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: CLEARING blend 0x%x (%s).. %d < %d", blend, blend->blendFile, blendControl->killTime, frametime);
-
+#ifdef GR2_DEBUG
+				WriteLog (LOG_FPS, LOG_INFO, "gr2UpdateModel: CLEARING blend 0x%x (%s).. %d < %d", blend, blend->blendFile, blendControl->killTime, frametime);
+#endif
 				for (int j = 0; j < blend->numBlends; j++)
 				{
 					gr2StopControl (&blendControl->controls[j], TRUE);
@@ -3007,12 +3014,13 @@ void gr2UpdateModel(gr2Model* model, bool force, bool granular)
 					newWeight = 0.0f;
 				}
 
-				Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: FADING blend 0x%x (%s).. %.2f", blend, blend->blendFile, newWeight);
-
+#ifdef GR2_DEBUG
+				WriteLog (LOG_FPS, LOG_INFO, "gr2UpdateModel: FADING blend 0x%x (%s).. %.2f", blend, blend->blendFile, newWeight);
+#endif
 				gr2BlendControlSetWeight(model, blend, newWeight);
 			}
 
-#ifdef BETA_RELEASE
+#ifdef GR2_DEBUG
 			// since the above can remove a blend, need to check again
 			// update event timers
 			if (!done && animOutput)
@@ -3021,13 +3029,13 @@ void gr2UpdateModel(gr2Model* model, bool force, bool granular)
 				{
 					if (GrannyGetControlEffectiveWeight(blendControl->controls[j].control) > 0)
 					{
-						Write_Log (LOG_FPS, LOG_INFO, "AnimOutput: time (%d) anim (%s)[%d] weights %f %f",
+						WriteLog (LOG_FPS, LOG_INFO, "AnimOutput: time (%d) anim (%s)[%d] weights %f %f",
 							frametime,
 							blend->blendFile,
 							j,
 							GrannyGetControlEaseCurveMultiplier(blendControl->controls[j].control),
 							GrannyGetControlEffectiveWeight(blendControl->controls[j].control)	);
-					}
+                    }
 				}
 			}
 #endif
@@ -3054,7 +3062,7 @@ void gr2UpdateModel(gr2Model* model, bool force, bool granular)
 		}
 	}
 
-//	Write_Log (LOG_FPS, LOG_INFO, "Setting clock for 0x%x to %f", model->GrannyInstance, gameClock);
+//	WriteLog (LOG_FPS, LOG_INFO, "Setting clock for 0x%x to %f", model->GrannyInstance, gameClock);
 
 	GrannySetModelClock(model->GrannyInstance, gameClock);
 
@@ -3119,7 +3127,7 @@ void gr2UpdateModel(gr2Model* model, bool force, bool granular)
 
 	if (!controlCount)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "No active controls found on model");
+		WriteLog (LOG_FPS, LOG_INFO, "No active controls found on model");
 	}
 	else
 
@@ -3150,7 +3158,7 @@ void gr2UpdateModel(gr2Model* model, bool force, bool granular)
 
 		GrannyColumnMatrixMultiply4x3 ((float*)&finalTransform, (float*)&model->attachOffset, skeletonPtr);
 /*
-		Write_Log (LOG_FPS, LOG_INFO, "%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n",
+		WriteLog (LOG_FPS, LOG_INFO, "%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n%f %f %f %f\n",
 			finalTransform[0][0], finalTransform[0][1], finalTransform[0][2], finalTransform[0][3],
 			finalTransform[1][0], finalTransform[1][1], finalTransform[1][2], finalTransform[1][3],
 			finalTransform[2][0], finalTransform[2][1], finalTransform[2][2], finalTransform[2][3],
@@ -3374,7 +3382,7 @@ UINT32 gr2IsControlComplete (gr2Control* gr2Control)
 		return FALSE;
 	}
 
-//	Write_Log (LOG_FPS, LOG_INFO, "gr2IsControlComplete:  Control 0x%x (%s)  %f", gr2Control->control, gr2Control->animation->name, GrannyGetControlDurationLeft(gr2Control->control));
+//	WriteLog (LOG_FPS, LOG_INFO, "gr2IsControlComplete:  Control 0x%x (%s)  %f", gr2Control->control, gr2Control->animation->name, GrannyGetControlDurationLeft(gr2Control->control));
 
 	return (GrannyGetControlDurationLeft(gr2Control->control) < 0.0f);
 
@@ -3441,7 +3449,7 @@ void gr2StopControl (gr2Control* gr2Control, LOGICAL immediate)
 
 	if (immediate)
 	{
-//		Write_Log (LOG_FPS, LOG_INFO, "gr2StopControl: Immediate! Killing control 0x%x", gr2Control->control);
+//		WriteLog (LOG_FPS, LOG_INFO, "gr2StopControl: Immediate! Killing control 0x%x", gr2Control->control);
 		GrannyFreeControl (gr2Control->control);
 		return;
 	}
@@ -3463,13 +3471,13 @@ void gr2StopControl (gr2Control* gr2Control, LOGICAL immediate)
 		GrannySetControlEaseOutCurve(gr2Control->control, easeOutStartTime, clockWhenEaseWillFinish, 1.0f, 1.0f, 0.0f, 0.0f);
 		GrannyCompleteControlAt (gr2Control->control, clockWhenEaseWillFinish);
 
-		Write_Log (LOG_FPS, LOG_INFO, "Delayed control:  current: %f  easeIn: %f  easeOut: %f .. %f, %f", (frametime / 1000.0f), gr2Control->easeInDuration, gr2Control->easeOutDuration, easeOutStartTime, clockWhenEaseWillFinish);
+		WriteLog (LOG_FPS, LOG_INFO, "Delayed control:  current: %f  easeIn: %f  easeOut: %f .. %f, %f", (frametime / 1000.0f), gr2Control->easeInDuration, gr2Control->easeOutDuration, easeOutStartTime, clockWhenEaseWillFinish);
 	}
 	else if (gr2Control->easeOutDuration > 0.0f)
 	{
 		clockWhenEaseWillFinish = GrannyEaseControlOut(gr2Control->control, gr2Control->easeOutDuration);
 		GrannyCompleteControlAt(gr2Control->control, clockWhenEaseWillFinish);
-//		Write_Log (LOG_FPS, LOG_INFO, "Setting control 0x%x to die at %f, currently %f, ease %f", gr2Control->control, ClockWhenEaseWillFinish, (frametime/1000.0f), gr2Control->easeOutDuration);
+//		WriteLog (LOG_FPS, LOG_INFO, "Setting control 0x%x to die at %f, currently %f, ease %f", gr2Control->control, ClockWhenEaseWillFinish, (frametime/1000.0f), gr2Control->easeOutDuration);
 	}
 	else
 	{
@@ -3477,7 +3485,7 @@ void gr2StopControl (gr2Control* gr2Control, LOGICAL immediate)
 //		GrannyCompleteControlAt(gr2Control->control, ClockWhenEaseWillFinish+2.0f);
 //		GrannySetControlWeight (gr2Control->control, 0.0f);
 
-//		Write_Log (LOG_FPS, LOG_INFO, "Killing control 0x%x", gr2Control->control);
+//		WriteLog (LOG_FPS, LOG_INFO, "Killing control 0x%x", gr2Control->control);
 		GrannyFreeControl (gr2Control->control);
 		// setcontrolactive = false
 	}
@@ -3487,11 +3495,11 @@ void gr2StopControl (gr2Control* gr2Control, LOGICAL immediate)
 	{
 		clockWhenEaseWillFinish = GrannyEaseControlOut(gr2Control->control, gr2Control->easeOutDuration);
 		GrannyCompleteControlAt(gr2Control->control, clockWhenEaseWillFinish);
-//		Write_Log (LOG_FPS, LOG_INFO, "Setting control 0x%x to die at %f, currently %f, ease %f", gr2Control->control, clockWhenEaseWillFinish, (frametime/1000.0f), gr2Control->easeOutDuration);
+//		WriteLog (LOG_FPS, LOG_INFO, "Setting control 0x%x to die at %f, currently %f, ease %f", gr2Control->control, clockWhenEaseWillFinish, (frametime/1000.0f), gr2Control->easeOutDuration);
 	}
 	else
 	{
-//		Write_Log (LOG_FPS, LOG_INFO, "Killing control 0x%x", gr2Control->control);
+//		WriteLog (LOG_FPS, LOG_INFO, "Killing control 0x%x", gr2Control->control);
 		GrannyFreeControl (gr2Control->control);
 	}
 }
@@ -3526,7 +3534,7 @@ void gr2ControlSetLoopCount (gr2Control* gr2Control, SINT32 numLoops)
 	if (numLoops)
 	{
 //		numLoops++;
-//		Write_Log (LOG_FPS, LOG_INFO, "gr2ControlSetLoopCount:  control 0x%x (%s) set to loop %d times", gr2Control->control, gr2Control->animation->name, numLoops);
+//		WriteLog (LOG_FPS, LOG_INFO, "gr2ControlSetLoopCount:  control 0x%x (%s) set to loop %d times", gr2Control->control, gr2Control->animation->name, numLoops);
 	}
 
 	GrannySetControlLoopCount (gr2Control->control, numLoops);
@@ -3544,7 +3552,7 @@ void gr2ControlSetEaseInDuration (gr2Control* gr2Control, FLOAT32 time)
 //	GrannySetControlEaseIn(gr2Control->control, true);
 	GrannyEaseControlIn (gr2Control->control, time, false);
 
-//	Write_Log (LOG_FPS, LOG_INFO, "gr2ControlSetEaseInDuration:  control 0x%x (%s) set to ease in over %f", gr2Control->control, gr2Control->animation->name, time);
+//	WriteLog (LOG_FPS, LOG_INFO, "gr2ControlSetEaseInDuration:  control 0x%x (%s) set to ease in over %f", gr2Control->control, gr2Control->animation->name, time);
 
 }
 
@@ -3557,7 +3565,7 @@ void gr2ControlSetEaseOutDuration (gr2Control* gr2Control, FLOAT32 time)
 
 	gr2Control->easeOutDuration = time;
 
-//	Write_Log (LOG_FPS, LOG_INFO, "gr2ControlSetEaseOutDuration:  control 0x%x (%s) set to ease out over %f", gr2Control->control, gr2Control->animation->name, time);
+//	WriteLog (LOG_FPS, LOG_INFO, "gr2ControlSetEaseOutDuration:  control 0x%x (%s) set to ease out over %f", gr2Control->control, gr2Control->animation->name, time);
 
 	// getcontrolduration - how long the entire control will last for
 	// getcontroldurationleft (how much longer is left)
@@ -3636,7 +3644,7 @@ void gr2SetModelRotation (gr2Model* model, piMATRIX* matrix)
 
 		if (!model->finalModelTransform)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2SetModelRotation: Failed to allocate memory for final transform");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2SetModelRotation: Failed to allocate memory for final transform");
 			piExitProgram (_FL, "gr2SetModelRotation: Failed to allocate memory for final transform");
 		}
 
@@ -3676,7 +3684,7 @@ void gr2GetModelFinalTransform (gr2Model* model, piMATRIX* matrix)
 
 		if (!model->finalModelTransform)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2SetModelRotation: Failed to allocate memory for final transform");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2SetModelRotation: Failed to allocate memory for final transform");
 			piExitProgram (_FL, "gr2SetModelRotation: Failed to allocate memory for final transform");
 		}
 
@@ -3700,7 +3708,7 @@ void gr2SetModelPosition (gr2Model* model, piVECTOR* position)
 
 		if (!model->finalModelTransform)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2SetModelRotation: Failed to allocate memory for final transform");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2SetModelRotation: Failed to allocate memory for final transform");
 			piExitProgram (_FL, "gr2SetModelRotation: Failed to allocate memory for final transform");
 		}
 
@@ -3793,9 +3801,9 @@ void gr2SetMeshActiveByName(gr2Model* model, const char* mesh, bool active)
 
 		if(!stricmp(model->meshes[i]->data->GrannyMesh->Name, mesh))
 		{
-#ifdef BETA_RELEASE
+#ifdef GR2_DEBUG
 			bool current = gr2IsMeshActive(model, i);
-			Write_Log (LOG_FPS, LOG_INFO, "gr2SetMeshActiveByName: Setting %s at %d from %s to %s", mesh, frametime, (current) ? "true": "false", (active) ? "true": "false");
+			WriteLog (LOG_FPS, LOG_INFO, "gr2SetMeshActiveByName: Setting %s at %d from %s to %s", mesh, frametime, (current) ? "true": "false", (active) ? "true": "false");
 #endif
 			gr2SetMeshActive(model, i, active);
 			break;
@@ -3832,11 +3840,12 @@ LOGICAL gr2GetBonePosition (gr2Model* model, const SCHAR* boneName, piMATRIX* ma
 
 	if(!(GrannyFindBoneByName(model->skeleton, boneName, &boneIndex)))
 	{
+#ifdef GR2_DEBUG
 		char crap[255];
-
 		snprintf (crap, 255, "gr2GetBonePosition: Bone %s not found in model %s", boneName, model->grannyModel->Name);
-		Write_Log (LOG_FPS, LOG_INFO, "%s", crap);
-		return FALSE;
+		WriteLog (LOG_FPS, LOG_INFO, "%s", crap);
+#endif
+        return FALSE;
 	}
 
 
@@ -3889,11 +3898,12 @@ granny_real32*	gr2GetBoneTransform (gr2Model* model, SCHAR* boneName)
 
 	if(!(GrannyFindBoneByName(model->skeleton, boneName, &boneIndex)))
 	{
+#ifdef GR2_DEBUG
 		char crap[255];
-
 		snprintf (crap, 255, "gr2GetBoneTransform: Bone %s not found in model %s", boneName, model->grannyModel->Name);
-		Write_Log (LOG_FPS, LOG_INFO, "%s", crap);
-		return nullptr;
+		WriteLog (LOG_FPS, LOG_INFO, "%s", crap);
+#endif
+        return nullptr;
 	}
 
 	return gr2GetBoneTransformByIndex(model, boneIndex);
@@ -3910,11 +3920,12 @@ granny_real32* gr2GetCompositeBoneTransform (gr2Model* model, SCHAR* boneName)
 
 	if(!(GrannyFindBoneByName(model->skeleton, boneName, &boneIndex)))
 	{
+#ifdef GR2_DEBUG
 		char crap[255];
-
 		snprintf (crap, 255, "gr2GetBoneTransform: Bone %s not found in model %s", boneName, model->grannyModel->Name);
-		Write_Log (LOG_FPS, LOG_INFO, "%s", crap);
-		return nullptr;
+		WriteLog (LOG_FPS, LOG_INFO, "%s", crap);
+#endif
+        return nullptr;
 	}
 
 	return gr2GetCompositeBoneTransformByIndex(model, boneIndex);
@@ -4164,7 +4175,9 @@ LOGICAL gr2CollideRayWithModel (gr2Model* collisionModel, piVECTOR* rayStart, pi
 				if(fpHitMap[currentBoneIndex] >= 0 && fpHitMap[currentBoneIndex] < FP_HIT_LOCATION_NUM)
 				{
 					if (fpHitMap[currentBoneIndex] == FP_HIT_LOCATION_NONE)
-						Write_Log (LOG_FPS, LOG_INFO, "gr2CollideRayWithModel: Bone %d invalid hit location", bbIndex);
+#ifdef GR2_DEBUG
+						WriteLog (LOG_FPS, LOG_INFO, "gr2CollideRayWithModel: Bone %d invalid hit location", bbIndex);
+#endif
 #ifdef BETA_RELEASE
 					if (colTestFlag)
 					{
@@ -4215,15 +4228,17 @@ void gr2SetPositioningBone (gr2Model* model, SCHAR* boneName)
 
 	if(!(GrannyFindBoneByName(model->skeleton, boneName, &boneIndex)))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2SetPositioningBone: Bone %s not found in model %s", model->grannyModel->Name, boneName);
-		piExitProgram (_FL, "gr2SetPositioningBone: Failed to find bone for model");
+#ifdef GR2_DEBUG
+		WriteLog (LOG_FPS, LOG_INFO, "gr2SetPositioningBone: Bone %s not found in model %s", model->grannyModel->Name, boneName);
+#endif
+        piExitProgram (_FL, "gr2SetPositioningBone: Failed to find bone for model");
 	}
 
 	model->rootPositioningBone = boneIndex;
 
 //	if(!(GrannyFindBoneByName(model->skeleton, "Bip01", &boneIndex)))
 //	{
-//		Write_Log (LOG_FPS, LOG_INFO, "gr2SetPositioningBone: Bone %s not found in model %s", model->grannyModel->Name, boneName);
+//		WriteLog (LOG_FPS, LOG_INFO, "gr2SetPositioningBone: Bone %s not found in model %s", model->grannyModel->Name, boneName);
 //		piExitProgram (_FL, "gr2SetPositioningBone: Failed to find bone for model");
 //	}
 
@@ -4264,8 +4279,10 @@ void loadTextures(granny_file_info* fileInfo, const char* path)
 		}
 		else if (fileInfo->Textures[i]->TextureType != GrannyColorMapTextureType || fileInfo->Textures[i]->ImageCount > 0)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "What kind of texture is this? It's index %d and looks like %d", i, fileInfo->Textures[i]->TextureType);
-			//return nullptr;
+#ifdef GR2_DEBUG
+			WriteLog (LOG_FPS, LOG_INFO, "What kind of texture is this? It's index %d and looks like %d", i, fileInfo->Textures[i]->TextureType);
+#endif
+            //return nullptr;
 		}
 	}
 
@@ -4432,7 +4449,7 @@ static SINT32 loadMaterials(granny_material* material, bool& hasNormals)
             if(!piIsTexture(specular, 0))
             {
                 Enable_Log(LOG_OLD, 1);
-                Write_Debug("[GRANNY] %s does not have a specular map", dt->name);
+                WriteDebug("[GRANNY] %s does not have a specular map", dt->name);
                 Enable_Log(LOG_OLD, WantedUserLogEnabled);
             }
 #endif
@@ -4458,7 +4475,7 @@ static SINT32 loadMaterials(granny_material* material, bool& hasNormals)
             if(!piIsTexture(normal, 0))
             {
                 Enable_Log(LOG_OLD, 1);
-                Write_Debug("[GRANNY] %s does not have a normal map", dt->name);
+                WriteDebug("[GRANNY] %s does not have a normal map", dt->name);
                 Enable_Log(LOG_OLD, WantedUserLogEnabled);
             }
 #endif
@@ -4507,9 +4524,11 @@ void createMeshTextures(gr2MeshData* data, bool wantNormals)
 
 				data->materialRefs.push_back(piFindMaterialName(name.c_str()));
 
-				Write_Log (LOG_FPS, LOG_INFO, "Material (%d) >%s< loading texture >%s<",
+#ifdef GR2_DEBUG
+				WriteLog (LOG_FPS, LOG_INFO, "Material (%d) >%s< loading texture >%s<",
 					t, grannyMesh->MaterialBindings[t].Material->Name, texname);
-
+#endif
+                
 #if USE_STATESET
                 if(data->materialRefs[t] == -1)
                     data->stateset[t].SetRenderState(new Material(oglFindMaterialName("forest1")));
@@ -4543,8 +4562,10 @@ void createMeshTextures(gr2MeshData* data, bool wantNormals)
 			}
 			else
 			{
-				Write_Log (LOG_FPS, LOG_INFO, "Material (%d) >%s< has no texture!",
-					t, grannyMesh->MaterialBindings[t].Material->Name);
+#ifdef GR2_DEBUG
+				WriteLog (LOG_FPS, LOG_INFO, "Material (%d) >%s< has no texture!",
+                           t, grannyMesh->MaterialBindings[t].Material->Name);
+#endif
 
 				data->textureRefs.push_back(-1);
 			}
@@ -4674,8 +4695,10 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 			scanReturn = sscanf (buf, "%*s %s %f", tString, &(loadedMasks[numAnimFiles].defaultWeight));
 			if (scanReturn != 2)
 			{
-				Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad anim line in blendfile %s", blendfile);
-				piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad anim line in blendfile");
+#ifdef GR2_DEBUG
+				WriteLog (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad anim line in blendfile %s", blendfile);
+#endif
+                piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad anim line in blendfile");
 			}
 
 			ptr = strrchr(tString, '.');
@@ -4711,8 +4734,10 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 				scanReturn = sscanf (buf, "%d %f", &boneNum, &boneWeight);
 				if (scanReturn != 2)
 				{
-					Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad data line in animation %s", loadedMasks[numAnimFiles].animationFile);
-					//piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad data line in animation");
+#ifdef GR2_DEBUG
+					WriteLog (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad data line in animation %s", loadedMasks[numAnimFiles].animationFile);
+#endif
+                    //piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad data line in animation");
 					continue;
 				}
 
@@ -4733,7 +4758,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 #ifndef GR2_BLEND_EDITOR
 	if (numAnimFiles < 1)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: No animation files specified", loadedMasks[numAnimFiles].animationFile);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: No animation files specified", loadedMasks[numAnimFiles].animationFile);
 		piExitProgram (_FL, "gr2LoadBlendedAnimation: No animation files specified");
 	}
 #endif
@@ -4760,7 +4785,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 
 		if (!newBlend->animations[i])
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Failed to load animation %s in blend %s", animPath, blendfile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Failed to load animation %s in blend %s", animPath, blendfile);
 			continue;
 		}
 
@@ -4838,7 +4863,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 			scanReturn = sscanf (buf, "%*s %s %f", tString, &(loadedMasks[numAnimFiles].defaultWeight));
 			if (scanReturn != 2)
 			{
-				Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad anim line in blendfile %s", blendfile);
+				WriteLog (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad anim line in blendfile %s", blendfile);
 				piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad anim line in blendfile");
 			}
 
@@ -4875,7 +4900,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 				scanReturn = sscanf (buf, "%d %f", &boneNum, &boneWeight);
 				if (scanReturn != 2)
 				{
-					Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad data line in animation %s", loadedMasks[numAnimFiles].animationFile);
+					WriteLog (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad data line in animation %s", loadedMasks[numAnimFiles].animationFile);
 					piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad data line in animation");
 				}
 
@@ -4890,7 +4915,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 
 	if (numAnimFiles < 1)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: No animation files specified", loadedMasks[numAnimFiles].animationFile);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: No animation files specified", loadedMasks[numAnimFiles].animationFile);
 		piExitProgram (_FL, "gr2LoadBlendedAnimation: No animation files specified");
 	}
 
@@ -4910,7 +4935,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 
 		if (!newBlend->animations[i])
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Failed to load animation %s in blend %s", loadedMasks[i].animationFile, blendfile);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Failed to load animation %s in blend %s", loadedMasks[i].animationFile, blendfile);
 			continue;
 		}
 
@@ -5025,8 +5050,9 @@ LOGICAL gr2RemoveAllBlendedAnimations (gr2Model* model, FLOAT32 easeOutOverrideT
 		{
 			if (curControl->easeOutDuration > 0.0)
 			{
-				Write_Log (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  out %f time %d", curBlend, curBlend->blendFile, curControl->easeOutDuration, frametime);
-
+#ifdef GR2_DEBUG
+				WriteLog (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  out %f time %d", curBlend, curBlend->blendFile, curControl->easeOutDuration, frametime);
+#endif
 				if (easeOutOverrideTime < 0)
 				{
 					curControl->killTime = frametime + (SINT32)(curControl->easeOutDuration * 1000.0f);
@@ -5045,7 +5071,7 @@ LOGICAL gr2RemoveAllBlendedAnimations (gr2Model* model, FLOAT32 easeOutOverrideT
 //					GrannySetControlEaseOutCurve(model->blendControls[i].controls[j].control,
 //						(frametime/1000.0f), (model->blendControls[i].killTime/1000.0f), easeWeight, 1.0f, 0.0f, 0.0f);
 
-//					Write_Log (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: anim %d weight %f", j, GrannyGetControlEaseCurveMultiplier(model->blendControls[i].controls[j].control));
+//					WriteLog (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: anim %d weight %f", j, GrannyGetControlEaseCurveMultiplier(model->blendControls[i].controls[j].control));
 					if (easeOutOverrideTime < 0)
 					{
 						GrannyEaseControlOut(curControl->controls[j].control, curControl->easeOutDuration);
@@ -5073,8 +5099,9 @@ LOGICAL gr2RemoveAllBlendedAnimations (gr2Model* model, FLOAT32 easeOutOverrideT
         curBlend = it->first;
         curControl = it->second;
 
-        Write_Log (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  CLEAR", curBlend, curBlend->blendFile);
-
+#ifdef GR2_DEBUG
+        WriteLog (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  CLEAR", curBlend, curBlend->blendFile);
+#endif
         for (int j = 0; j < curBlend->numBlends; j++)
         {
             // GrannyEaseControlOut(&model->blendControls[i].controls[j], model->blendControls[i].easeOutDuration)
@@ -5119,8 +5146,9 @@ LOGICAL gr2ClearBlendedAnimations(gr2Model* model)
 			curBlend = it->first;
 			curControl = it->second;
 
-			Write_Log (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  CLEAR", curBlend, curBlend->blendFile);
-
+#ifdef GR2_DEBUG
+			WriteLog (LOG_FPS, LOG_INFO, "gr2RemoveAllBlendedAnimations: blend 0x%x %s  CLEAR", curBlend, curBlend->blendFile);
+#endif
 			for (int j = 0; j < curBlend->numBlends; j++)
 			{
 				// GrannyEaseControlOut(&model->blendControls[i].controls[j], model->blendControls[i].easeOutDuration)
@@ -5147,7 +5175,7 @@ void gr2BlendControlResurrect (gr2Model* model, gr2AnimationBlend* animationBlen
 
 	if(!blendControl)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: control not found");
+		WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: control not found");
 		return;
 	}
 
@@ -5166,17 +5194,17 @@ void gr2BlendControlResurrect (gr2Model* model, gr2AnimationBlend* animationBlen
 		// a little sanity checking ..
 		if (realtimeLeft < 0.0)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: negative realtime %f %d %d", realtimeLeft, killtimeLeft, frametime);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: negative realtime %f %d %d", realtimeLeft, killtimeLeft, frametime);
 			realtimeLeft = 0;
 		}
 		else if (realtimeLeft > blendControl->easeOutDuration)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: excessive realtime %f %f %d %d", realtimeLeft, blendControl->easeOutDuration, killtimeLeft, frametime);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: excessive realtime %f %f %d %d", realtimeLeft, blendControl->easeOutDuration, killtimeLeft, frametime);
 			realtimeLeft = blendControl->easeOutDuration;
 		}
 		else
 		{
-//			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: normal realtime %f %f %d %d", realtimeLeft, model->blendControls[blendNum].easeOutDuration, killtimeLeft, frametime);
+//			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: normal realtime %f %f %d %d", realtimeLeft, model->blendControls[blendNum].easeOutDuration, killtimeLeft, frametime);
 		}
 
 		percentLeft = 1.0f - (realtimeLeft / blendControl->easeOutDuration);
@@ -5184,11 +5212,11 @@ void gr2BlendControlResurrect (gr2Model* model, gr2AnimationBlend* animationBlen
 		easeInTime = blendControl->easeInDuration * percentLeft;
 		if (easeInTime > maxEaseInTime)
 			easeInTime = maxEaseInTime;
-//		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: data %f %f %d", percentLeft, easeInTime, frametime);
+//		WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: data %f %f %d", percentLeft, easeInTime, frametime);
 	}
 	else
 	{
-//		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: no killtime %f %d", model->blendControls[blendNum].easeOutDuration, frametime);
+//		WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: no killtime %f %d", model->blendControls[blendNum].easeOutDuration, frametime);
 //		easeInTime = model->blendControls[blendNum].easeInDuration;
 		easeInTime = maxEaseInTime;
 	}
@@ -5208,12 +5236,12 @@ void gr2BlendControlResurrect (gr2Model* model, gr2AnimationBlend* animationBlen
 			GrannySetControlEaseIn (blendControl->controls[i].control, true);
 			GrannySetControlEaseInCurve (blendControl->controls[i].control,
 				(frametime/1000.f), (frametime/1000.f) + easeInTime, easeWeight, 0.0f, 1.0f, 1.0f);
-//			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: curve %f -> %f, weight %f", (frametime/1000.f), (frametime/1000.f) + easeInTime, easeWeight);
+//			WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: curve %f -> %f, weight %f", (frametime/1000.f), (frametime/1000.f) + easeInTime, easeWeight);
 		}
 
 		GrannySetControlEaseOut (blendControl->controls[i].control, false);
 
-//		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: anim weights %f %f",
+//		WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: anim weights %f %f",
 //			GrannyGetControlEaseCurveMultiplier(model->blendControls[blendNum].controls[i].control),
 //			GrannyGetControlEffectiveWeight(model->blendControls[blendNum].controls[i].control)	);
 
@@ -5227,7 +5255,7 @@ void gr2BlendControlResurrect (gr2Model* model, gr2AnimationBlend* animationBlen
 		}
 	}
 
-	Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: blend 0x%x %s  time = %f",
+	WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlResurrect: blend 0x%x %s  time = %f",
 		animationBlend, animationBlend->blendFile, easeInTime);
 
 	blendControl->active = true;
@@ -5244,8 +5272,10 @@ void gr2BlendControlRemoveWhenDone (gr2Model* model, gr2AnimationBlend* animatio
 
 	if (!blendControl)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlRemoveWhenDone: failed to find control!");
-		return;
+#ifdef GR2_DEBUG
+		WriteLog (LOG_FPS, LOG_INFO, "gr2BlendControlRemoveWhenDone: failed to find control!");
+#endif
+        return;
 	}
 
 	// this is a no-op if the animation has a loopCount of 0
@@ -5456,7 +5486,7 @@ void gr2ModelPersonalize (gr2Model* model, SINT32 countryID, SINT32 branch, SCHA
 
 	    model->currentFaceID = faceNum;
 
-	    Write_Log (LOG_FPS, LOG_INFO, "gr2ModelPersonalize: <%s>, <%d> <%d> <%d> to 0x%x", handle, countryID, branch, decalID, model);
+	    WriteLog (LOG_FPS, LOG_INFO, "gr2ModelPersonalize: <%s>, <%d> <%d> <%d> to 0x%x", handle, countryID, branch, decalID, model);
     }
 	*/
 
@@ -5673,7 +5703,7 @@ void gr2HandleEvent (gr2Model* model, SINT32 eventID)
 {
 	if (model->eventHandler)
 		model->eventHandler(model->pObject, model, eventID);
-//	Write_Log (LOG_FPS, LOG_INFO, "gr2HandleEvent: %d", eventID);
+//	WriteLog (LOG_FPS, LOG_INFO, "gr2HandleEvent: %d", eventID);
 }
 
 void gr2ModelSetEventHandler (gr2Model* model, OBJECT* pObject, GR2_EVENTHANDLER eventHandler)

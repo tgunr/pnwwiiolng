@@ -527,7 +527,7 @@ LOGICAL fxBltClip(FXBULLET* blt, piVECTOR* pvecShot)
 
     if(!fxBltCreateRotationMatrix(blt, &matAtt, pvecShot))
     {
-        Write_Debug("[fxBltClip] fxBltCreateRotationMatrix** FAILED**");
+        WriteDebug("[fxBltClip] fxBltCreateRotationMatrix** FAILED**");
         return FALSE;
     }
 

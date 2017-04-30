@@ -84,11 +84,11 @@ _errorSYN_CALLBACK(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*
 	ENDPOINT* const inEndpoint = teulGetEndpoint(teulIndex);
 	if ( inEndpoint == nullptr)
 	{
-		dbugLog(_FLA, "t:%d illegal index", teulIndex);
+		WriteLog(LOG_TEUL, LOG_ABORT, "t:%d illegal index", teulIndex);
 		return;
 	}
 
-	dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " errorSYN: closing error %d clock:%" PR64BitUT "", teulIndex, PRA_SOCKET(inEndpoint->socket), error, teulClock64);
+	WriteLog(LOG_TEUL, LOG_ABORT, "t:%d sock:" PRF_SOCKET " errorSYN: closing error %d clock:%" PR64BitUT "", teulIndex, PRA_SOCKET(inEndpoint->socket), error, teulClock64);
 	teulClose(*inEndpoint, Teul::Closing::SynErr);
 }
 
@@ -109,7 +109,7 @@ _packSYN_TOKEN( PackMode mode, UCHAR* const data, SINT32 offset, struct SYN_TOKE
 static inline void _report(const ACTION_OBJECT* const a, const char* const txt)
 {
 #ifdef DEBUG_CONNECTIONS
-	dbugLog(_FLD, "t:%d[%d] %s", a->teulIndex, (a->endpoint ? a->endpoint->teulIndex() : -999), txt);
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d[%d] %s", a->teulIndex, (a->endpoint ? a->endpoint->teulIndex() : -999), txt);
 #else
 	silence_unused_parameter_warning(a, txt);
 #endif
@@ -118,7 +118,7 @@ static inline void _report(const ACTION_OBJECT* const a, const char* const txt)
 static inline void _status(const char* const doing, const char* const what, UINT32 version, const ENDPOINT* const endpoint)
 {
 #ifdef DEBUG_CONNECTIONS
-	dbugLog(_FLD, "t:%d [%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%" PR64BitUT " rxs=%" PR64BitUT "",
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d [%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%" PR64BitUT " rxs=%" PR64BitUT "",
             endpoint->teulIndex(), doing, what, version, endpoint->m_impl->m_version, endpoint->m_impl->m_cryptVersion,
             endpoint->m_impl->m_txCrypt.seed(), endpoint->m_impl->m_rxCrypt.seed());
 #else
@@ -156,7 +156,7 @@ _negotiateVersionNumber(UINT16 remoteVersion, const ENDPOINT* const endpoint)
 	// Datagram delivery services don't use encryption.
 	if ( !endpoint->isFromClient() )
 	{
-		dbugLog(_FLM, "t:%d non-client connection, disabling encryption", endpoint->teulIndex());
+		WriteLog(LOG_TEUL, LOG_RECOVER, "t:%d non-client connection, disabling encryption", endpoint->teulIndex());
 		return 0;
 	}
 
@@ -254,7 +254,7 @@ _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 
 	if (PN_UNLIKELY(a->endpoint->state() == IS_LISTENING))
 	{
-		dbugLog(_FLA, "someone sending a SYN_ACK to the listen port!!");
+		WriteLog(LOG_TEUL, LOG_ABORT, "someone sending a SYN_ACK to the listen port!!");
 		return -EINVAL;
 	}
 
@@ -264,7 +264,7 @@ _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 		const SINT32 retval = teulModSendCALLBACKe(*a->endpoint, *SYN_ACK_ACK_TOKEN);
 		if ( retval < 0 )
 		{
-			dbugLog(_FLA, "cant send SYN_ACK_ACK callback");
+			WriteLog(LOG_TEUL, LOG_ABORT, "cant send SYN_ACK_ACK callback");
 			return retval;
 		}
 		///ISSUE: Shouldn't we unpack the token to consume it?
@@ -274,7 +274,7 @@ _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 	struct SYN_TOKEN_STRUCT token;
 	a->offset = _packSYN_ACK_TOKEN(TEUL_UNPACK, a->packed, a->offset, &token, 0);
 
-	dbugLog(_FLD, "t:%d at:%d negotiated teul version:%04x negotiated timeout: %d", a->teulIndex, a->endpoint->teulIndex(), token.version, token.timeout);
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d at:%d negotiated teul version:%04x negotiated timeout: %d", a->teulIndex, a->endpoint->teulIndex(), token.version, token.timeout);
 
 	a->endpoint->setTimeout(token.timeout);				// use the timeout and version given.
 
@@ -292,7 +292,7 @@ _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 		const SINT32 retval = teulModSendCALLBACKe(*a->endpoint, *SYN_ACK_ACK_TOKEN);
 		if ( retval < 0)
 		{
-			dbugLog(_FLA, "t:%d cant send SYN_ACK_ACK callback", a->endpoint->teulIndex());
+			WriteLog(LOG_TEUL, LOG_ABORT, "t:%d cant send SYN_ACK_ACK callback", a->endpoint->teulIndex());
 			teulClose(*a->endpoint, Teul::Closing::SynAckAckFail);
 			///ISSUE Should this really be -retval?
 			return -retval;
@@ -304,7 +304,7 @@ _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 	}
 	else
 	{
-		dbugLog(_FLA, "t:%d failed to connect endpoint", a->endpoint->teulIndex());
+		WriteLog(LOG_TEUL, LOG_ABORT, "t:%d failed to connect endpoint", a->endpoint->teulIndex());
 		teulClose(*a->endpoint, Teul::Closing::ConnectFail);
 	}
 
@@ -327,7 +327,7 @@ _actionRecvSYN_ACK_ACK_TOKEN(ACTION_OBJECT* const a)
 
 	if (a->endpoint->state() == IS_OPEN)						// is it a duplicate?
 	{
-		dbugLog(_FLN, "RecvSYN_ACK_ACK %d is already open, this may be normal", a->endpoint->teulIndex());
+		WriteLog(LOG_TEUL, LOG_NOTE, "RecvSYN_ACK_ACK %d is already open, this may be normal", a->endpoint->teulIndex());
 		return a->offset;
 	}
 
@@ -370,7 +370,7 @@ _actionRecvFYN_TOKEN(ACTION_OBJECT* const a)
 
 	if ( inEndpoint->state() < IS_CLOSING )
 	{
-		dbugLog(_FLD, "t:%d rxFyn: closing", a->teulIndex);
+		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d rxFyn: closing", a->teulIndex);
 		if ( FYN_TOKEN != nullptr )
 			teulModSendCALLBACKe(*inEndpoint, *FYN_TOKEN);
 		teulClose(*inEndpoint, Teul::Closing::FynRx);

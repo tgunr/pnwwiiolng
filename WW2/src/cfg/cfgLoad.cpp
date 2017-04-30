@@ -274,7 +274,7 @@ LOGICAL cfgLoadGlobals(const char* ConfigName)
 
 	if (!cfgLoadW2(ConfigName, pGlobalVars))
 	{
-		Write_Debug("Config Value Init Failed");
+		WriteDebug("Config Value Init Failed");
 		return FALSE;
 	}
 

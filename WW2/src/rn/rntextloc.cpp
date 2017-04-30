@@ -61,7 +61,7 @@ LOGICAL rntextLocInit()
 
         if(hHandle == -1)
         {
-            Write_Debug("[rntextLocInit] %s FAILED", g_pFontDATNames[i]);
+            WriteDebug("[rntextLocInit] %s FAILED", g_pFontDATNames[i]);
             return FALSE;
         }
 
@@ -74,7 +74,7 @@ LOGICAL rntextLocInit()
 
         if(!piLockTextureMemorySurface(g_iTextIDS[i], 0, &g_ddText[i]))
         {
-            Write_Debug("[rntextLocInit] %s FAILED", g_pFontPCXNames[i]);
+            WriteDebug("[rntextLocInit] %s FAILED", g_pFontPCXNames[i]);
             return FALSE;
         }
 
@@ -390,7 +390,7 @@ SINT32 rntextLocOutput2d(SCHAR* pStr,
                                    (UINT16*)Indices,
                                    icnt * 3))
             {
-	            Write_Debug("[rntextLocOutput2d] piRenderIndexScene FAILED");
+	            WriteDebug("[rntextLocOutput2d] piRenderIndexScene FAILED");
             }
 
             vcnt = icnt = 0;
@@ -408,7 +408,7 @@ SINT32 rntextLocOutput2d(SCHAR* pStr,
                                 (UINT16*)Indices,
                                 icnt * 3))
 		{
-            Write_Debug("[rntextLocOutput2d] piRenderIndexScene FAILED");
+            WriteDebug("[rntextLocOutput2d] piRenderIndexScene FAILED");
 		}
 	}
 
@@ -446,7 +446,7 @@ LOGICAL rntextLoc3DRender(LOCCHAR* lpVert, SINT32 iLength)
 
     if(lpVert == nullptr)
     {
-        Write_Debug("[rntextLoc3DRender] ***** lpVert == nullptr *****");
+        WriteDebug("[rntextLoc3DRender] ***** lpVert == nullptr *****");
         return FALSE;
     }
 
@@ -459,7 +459,7 @@ LOGICAL rntextLoc3DRender(LOCCHAR* lpVert, SINT32 iLength)
                           lpVert[i].lVert,
                           6))
         {
-            Write_Debug("[rntextLoc3DRender] piRenderScene FAILED!");
+            WriteDebug("[rntextLoc3DRender] piRenderScene FAILED!");
             bRetVal = FALSE;
             break;
         }

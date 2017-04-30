@@ -234,7 +234,7 @@ bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 	break;
 
 	default:
-		Write_Log(LOG_COMM, LOG_WARN, "Unknown STO type %hu", type);
+		WriteLog(LOG_COMM, LOG_WARN, "Unknown STO type %hu", type);
 	break;
 	}
 

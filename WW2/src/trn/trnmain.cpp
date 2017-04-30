@@ -275,7 +275,7 @@ SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 le
 		trnGetStratData(td->scx, td->scy, bid, &country, &level);
 
 	if ( 0 > bid || bid >= td->bldHash.maxBldID ) {
-		Write_Log(LOG_COMM, LOG_INFO, "trnSetStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
+		WriteLog(LOG_COMM, LOG_INFO, "trnSetStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
 		return -EINVAL;
 	}
 
@@ -295,10 +295,8 @@ SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 le
 
 			if (blist == nullptr)
 			{
-#ifdef BETA_RELEASE
 				rnmainListText("Invalid building message");
-#endif
-				Write_Debug("Invalid building message in recvWorldUpdate, "
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Invalid building message in recvWorldUpdate, "
 				            "supercell [%d,%d] bid = %d", td->scx,td->scy, bid);
 				return -EINVAL;
 			}
@@ -340,14 +338,14 @@ SINT32 trnUpdateStratData(TERRAIN_DETAIL* td, OBJECT* lpobj, SINT32 bid, LOGICAL
 	}
 
 	if ( bid < 0 ) {
-		Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (<0) - model type %d - model name %s",
+		WriteLog(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (<0) - model type %d - model name %s",
 		          bid, lpobj->modelInstance == nullptr ? -1 : lpobj->modelInstance->GetModelType(),
 		          lpobj->name);
 		return -EINVAL;
 	}
 
 	if ( bid >= td->bldHash.maxBldID ) {
-		Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
+		WriteLog(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
 		return -EINVAL;
 	}
 
@@ -409,12 +407,12 @@ int		i, j;
 	xstep *= 0.5f;
 	ystep *= 0.5f;
 
-	Write_Debug("Terrain square dimensions: width = %f, height = %f", xstep / ScaleFactor, ystep / ScaleFactor);
+	WriteLog(LOG_TERRAIN, LOG_DEBUG, "Terrain square dimensions: width = %f, height = %f", xstep / ScaleFactor, ystep / ScaleFactor);
 
 	trnlod = 0;
 
 	horizon = 8000.0f * ScaleFactor;
-	Write_Debug("Terrain minimal horizons: %f", horizon / ScaleFactor);
+	WriteLog(LOG_TERRAIN, LOG_DEBUG, "Terrain minimal horizons: %f", horizon / ScaleFactor);
 
 	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
@@ -563,7 +561,7 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, const
 	td = &trndtl[static_cast<int>(lpobj->trnum)];
 	if (strcmp(texname, "null1.bmp") == 0)
 	{
-		Write_Debug("Null texture object was used");
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Null texture object was used");
 	}
 
 	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
@@ -621,7 +619,7 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, const
 
 		if (i == MAX_TERRAIN_TEXTURES)
 		{
-			Write_Debug("No room for terrain texture!");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "No room for terrain texture!");
 			return(FALSE);
 		}
 
@@ -659,7 +657,7 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, const
 		texid = ldpixLoadImageFileToSurface(filename, colorBLACK, LDPIX_MIPMAP);
 		if (!piIsTexture(texid, 0))
 		{
-			Write_Debug("Could not load file as a texture");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not load file as a texture");
 			obmainFreeObject(newobj);
 			return(FALSE);
 		}
@@ -681,7 +679,7 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, const
 		else
 			filename[i] = 0;
 
-		Write_Debug("Material = %s", filename);
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Material = %s", filename);
 		newobj->matid = piFindMaterialName(filename);
 		if (piIsMaterial(newobj->matid))
 		{
@@ -735,18 +733,18 @@ TERRAIN_DETAIL*	td;
 #ifdef DEBUG_WW2
 	if (strcmp(newobj->texname, lpobj->texname) == 0)
 	{
-		Write_Debug("Source and destination texture objects are the same: '%s'", newobj->texname);
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Source and destination texture objects are the same: '%s'", newobj->texname);
 #ifdef DONT_USE
 		return(TRUE);
 #endif
 	}
 	else if (strcmp(newobj->texname, "null1.bmp") == 0 && strlen(lpobj->texname) > 0)
 	{
-		Write_Debug("Null texture object was destination of source %s", lpobj->texname);
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Null texture object was destination of source %s", lpobj->texname);
 	}
 	else if (strcmp(lpobj->texname, "null1.bmp") == 0)
 	{
-		Write_Debug("Null texture object was source");
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Null texture object was source");
 	}
 #endif
 
@@ -755,7 +753,7 @@ TERRAIN_DETAIL*	td;
 		td = &trndtl[static_cast<int>(lpobj->trnum)];
 		if (td->trindx < 0 || td->trindx >= MAX_TERRAIN_EDIT_LIST)
 		{
-			Write_Debug("Out of edit buffer space.");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Out of edit buffer space.");
 			return(FALSE);
 		}
 	}
@@ -763,28 +761,28 @@ TERRAIN_DETAIL*	td;
 	// Just incase a rogue object gets through; should never happen
 	if (lpobj->numtris == 0)
 	{
-		Write_Debug("Terrain error: Old object (%s) should be disabled (%s)", lpobj->name, lpobj->texname);
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Terrain error: Old object (%s) should be disabled (%s)", lpobj->name, lpobj->texname);
 		return(TRUE);
 	}
 
 	tri = octet * NUM_TRIANGLES_PER_OCTET;
 	if (tri >= lpobj->numtris)
 	{
-		Write_Debug("Number of source triangle (%d) was higher than is available (%d)", tri, lpobj->numtris);
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Number of source triangle (%d) was higher than is available (%d)", tri, lpobj->numtris);
 		return(FALSE);
 	}
 
 	ofs = lpobj->ptris[tri].v3;
 	if (ofs >= lpobj->numverts)
 	{
-		Write_Debug("Number of source vertex (%d) was higher than is available (%d)", ofs, lpobj->numverts);
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Number of source vertex (%d) was higher than is available (%d)", ofs, lpobj->numverts);
 		return(FALSE);
 	}
 
 	nv = newobj->numverts;
 	if (nv >= (NUM_VERTICES_PER_OCTET * SUPERCELL_OCTETS_XY))
 	{
-		Write_Debug("Error in number of vertices in destination texture object");
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Error in number of vertices in destination texture object");
 		return(FALSE);
 	}
 
@@ -801,7 +799,7 @@ TERRAIN_DETAIL*	td;
 	nt = newobj->numtris;
 	if (nt >= (NUM_TRIANGLES_PER_OCTET * SUPERCELL_OCTETS_XY))
 	{
-		Write_Debug("Error in number of triangles in destination texture object");
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Error in number of triangles in destination texture object");
 		return(FALSE);
 	}
 
@@ -885,7 +883,7 @@ TERRAIN_DETAIL*	td;
 	}
 	else
 	{
-		Write_Debug("No triangles were relocated in the source object: %s (%s)", lpobj->name, lpobj->texname);
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "No triangles were relocated in the source object: %s (%s)", lpobj->name, lpobj->texname);
 	}
 
 	newobj->trnum = lpobj->trnum;
@@ -897,7 +895,7 @@ TERRAIN_DETAIL*	td;
 	{
 		if (!loading)
 		{
-			Write_Debug("Old texture object (%s) was disabled (%s)", lpobj->name, lpobj->texname);
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Old texture object (%s) was disabled (%s)", lpobj->name, lpobj->texname);
 			lpobj->numverts		= 0;
 			lpobj->flags		&= ~OBJECT_VISIBLE;
 			lpobj->texname = "";
@@ -906,14 +904,14 @@ TERRAIN_DETAIL*	td;
 		}
 		else
 		{
-			Write_Debug("Old object (%s) should be disabled (%s); no triangles", lpobj->name, lpobj->texname);
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Old object (%s) should be disabled (%s); no triangles", lpobj->name, lpobj->texname);
 		}
 	}
 	else
 	if (lpobj->numtris == 0xffff)
 	{
 		// Should never happen
-		Write_Debug("Terrain error: Negative value for triangles on old object");
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Terrain error: Negative value for triangles on old object");
 	}
 	else
 	{
@@ -946,7 +944,7 @@ TERRAIN_DETAIL*	td;
 		if (td->trindx < 0 || td->trindx >= MAX_TERRAIN_EDIT_LIST)
 		{
 			// Should never happen
-			Write_Debug("Terrain error: edit list has an illegal number of entries");
+			WriteLog(LOG_TERRAIN, LOG_FATAL, "Terrain error: edit list has an illegal number of entries");
 		}
 		else
 		{
@@ -1076,7 +1074,7 @@ LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
 	strcpy(newobj->name, newname);
 	*objRefName = newobj->name;
 
-	//Write_Debug("Object renamed: %s", newname);
+	//WriteLog(LOG_TERRAIN, LOG_DEBUG, "Object renamed: %s", newname);
 
 	// temporary hack for the terrain collision detection routines
 
@@ -1199,7 +1197,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	scy = SUPERCELL_INVALID;
 	if (!trnmainFindSupercell(&scx, &scy, &p))
 	{
-		Write_Debug("Could not find the center terrain square");
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not find the center terrain square");
 
 #ifdef DONT_USE
 		for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
@@ -1682,7 +1680,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 						break;
 					default:
 						// A periphery supercell causes a full load like a warp
-						Write_Debug("Supercell %d became center square (%04x_%04x)", i, (UINT16)scx, (UINT16)scy);
+						WriteLog(LOG_TERRAIN, LOG_DEBUG, "Supercell %d became center square (%04x_%04x)", i, (UINT16)scx, (UINT16)scy);
 						i = NUM_TERRAIN_RECTANGLES;
 						bits = 0x1ffffff;
 						break;
@@ -1690,7 +1688,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 
 					if (i != NUM_TERRAIN_RECTANGLES)
 					{
-						Write_Debug("Supercell %d became center square (%04x_%04x)", i, (UINT16)scx, (UINT16)scy);
+						WriteLog(LOG_TERRAIN, LOG_DEBUG, "Supercell %d became center square (%04x_%04x)", i, (UINT16)scx, (UINT16)scy);
 					}
 
 					break;
@@ -1736,7 +1734,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(0, (SINT16)(scx - 2), (SINT16)(scy + 2)))
 		{
-			Write_Debug("Could not build terrain map at 0");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 0");
 			return(FALSE);
 		}
 	}
@@ -1747,7 +1745,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(1, (SINT16)(scx - 1), (SINT16)(scy + 2)))
 		{
-			Write_Debug("Could not build terrain map at 1");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 1");
 			return(FALSE);
 		}
 	}
@@ -1758,7 +1756,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(2, scx, (SINT16)(scy + 2)))
 		{
-			Write_Debug("Could not build terrain map at 2");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 2");
 			return(FALSE);
 		}
 	}
@@ -1769,7 +1767,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(3, (SINT16)(scx + 1), (SINT16)(scy + 2)))
 		{
-			Write_Debug("Could not build terrain map at 3");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 3");
 			return(FALSE);
 		}
 	}
@@ -1780,7 +1778,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(4, (SINT16)(scx + 2), (SINT16)(scy + 2)))
 		{
-			Write_Debug("Could not build terrain map at 4");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 4");
 			return(FALSE);
 		}
 	}
@@ -1791,7 +1789,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(5, (SINT16)(scx - 2), (SINT16)(scy + 1)))
 		{
-			Write_Debug("Could not build terrain map at 5");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 5");
 			return(FALSE);
 		}
 	}
@@ -1802,7 +1800,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(9, (SINT16)(scx + 2), (SINT16)(scy + 1)))
 		{
-			Write_Debug("Could not build terrain map at 9");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 9");
 			return(FALSE);
 		}
 	}
@@ -1813,7 +1811,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(10, (SINT16)(scx - 2), scy))
 		{
-			Write_Debug("Could not build terrain map at 10");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 10");
 			return(FALSE);
 		}
 	}
@@ -1824,7 +1822,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(14, (SINT16)(scx + 2), scy))
 		{
-			Write_Debug("Could not build terrain map at 14");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 14");
 			return(FALSE);
 		}
 	}
@@ -1835,7 +1833,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(15, (SINT16)(scx - 2), (SINT16)(scy - 1)))
 		{
-			Write_Debug("Could not build terrain map at 15");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 15");
 			return(FALSE);
 		}
 	}
@@ -1846,7 +1844,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(19, (SINT16)(scx + 2), (SINT16)(scy - 1)))
 		{
-			Write_Debug("Could not build terrain map at 19");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 19");
 			return(FALSE);
 		}
 	}
@@ -1857,7 +1855,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(20, (SINT16)(scx - 2), (SINT16)(scy - 2)))
 		{
-			Write_Debug("Could not build terrain map at 20");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 20");
 			return(FALSE);
 		}
 	}
@@ -1868,7 +1866,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(21, (SINT16)(scx - 1), (SINT16)(scy - 2)))
 		{
-			Write_Debug("Could not build terrain map at 21");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 21");
 			return(FALSE);
 		}
 	}
@@ -1879,7 +1877,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(22, scx, (SINT16)(scy - 2)))
 		{
-			Write_Debug("Could not build terrain map at 22");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 22");
 			return(FALSE);
 		}
 	}
@@ -1890,7 +1888,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(23, (SINT16)(scx + 1), (SINT16)(scy - 2)))
 		{
-			Write_Debug("Could not build terrain map at 23");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 23");
 			return(FALSE);
 		}
 	}
@@ -1901,7 +1899,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	{
 		if (!trnldrStartLoadingFirstHalf(24, (SINT16)(scx + 2), (SINT16)(scy - 2)))
 		{
-			Write_Debug("Could not build terrain map at 24");
+			WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build terrain map at 24");
 			return(FALSE);
 		}
 	}
@@ -1911,7 +1909,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 
 	if (bits == 0x1ffffff)
 	{
-		Write_Debug("Warping to new terrain location");
+		WriteLog(LOG_TERRAIN, LOG_DEBUG, "Warping to new terrain location");
 
 		// Load terrain cells (initial)
 
@@ -1926,7 +1924,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			trndtl[12].scy = scy;
 			if (!trnldrLoadSupercell(12))
 			{
-				Write_Debug("Could not build center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build center terrain map");
 				return(FALSE);
 			}
 		}
@@ -1940,7 +1938,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			trndtl[6].scy = scy + 1;
 			if (!trnldrLoadSupercell(6))
 			{
-				Write_Debug("Could not build top left terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build top left terrain map");
 				return(FALSE);
 			}
 		}
@@ -1954,7 +1952,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			trndtl[7].scy = scy + 1;
 			if (!trnldrLoadSupercell(7))
 			{
-				Write_Debug("Could not build top center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build top center terrain map");
 				return(FALSE);
 			}
 		}
@@ -1968,7 +1966,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			trndtl[8].scy = scy + 1;
 			if (!trnldrLoadSupercell(8))
 			{
-				Write_Debug("Could not build right top terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build right top terrain map");
 				return(FALSE);
 			}
 		}
@@ -1982,7 +1980,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			trndtl[11].scy = scy;
 			if (!trnldrLoadSupercell(11))
 			{
-				Write_Debug("Could not build left center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build left center terrain map");
 				return(FALSE);
 			}
 		}
@@ -1996,7 +1994,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			trndtl[13].scy = scy;
 			if (!trnldrLoadSupercell(13))
 			{
-				Write_Debug("Could not build right center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build right center terrain map");
 				return(FALSE);
 			}
 		}
@@ -2010,7 +2008,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			trndtl[16].scy = scy - 1;
 			if (!trnldrLoadSupercell(16))
 			{
-				Write_Debug("Could not build left bottom terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build left bottom terrain map");
 				return(FALSE);
 			}
 		}
@@ -2024,7 +2022,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			trndtl[17].scy = scy - 1;
 			if (!trnldrLoadSupercell(17))
 			{
-				Write_Debug("Could not build bottom center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build bottom center terrain map");
 				return(FALSE);
 			}
 		}
@@ -2038,7 +2036,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			trndtl[18].scy = scy - 1;
 			if (!trnldrLoadSupercell(18))
 			{
-				Write_Debug("Could not build right bottom terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build right bottom terrain map");
 				return(FALSE);
 			}
 		}
@@ -2052,7 +2050,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrModifySupercell(12))
 			{
-				Write_Debug("Could not modify center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not modify center terrain map");
 				return(FALSE);
 			}
 		}
@@ -2063,7 +2061,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrModifySupercell(6))
 			{
-				Write_Debug("Could not modify top left terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not modify top left terrain map");
 				return(FALSE);
 			}
 		}
@@ -2074,7 +2072,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrModifySupercell(7))
 			{
-				Write_Debug("Could not modify top center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not modify top center terrain map");
 				return(FALSE);
 			}
 		}
@@ -2085,7 +2083,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrModifySupercell(8))
 			{
-				Write_Debug("Could not modify right top terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not modify right top terrain map");
 				return(FALSE);
 			}
 		}
@@ -2096,7 +2094,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrModifySupercell(11))
 			{
-				Write_Debug("Could not modify left center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not modify left center terrain map");
 				return(FALSE);
 			}
 		}
@@ -2107,7 +2105,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrModifySupercell(13))
 			{
-				Write_Debug("Could not modify right center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not modify right center terrain map");
 				return(FALSE);
 			}
 		}
@@ -2118,7 +2116,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrModifySupercell(16))
 			{
-				Write_Debug("Could not modify left bottom terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not modify left bottom terrain map");
 				return(FALSE);
 			}
 		}
@@ -2129,7 +2127,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrModifySupercell(17))
 			{
-				Write_Debug("Could not modify bottom center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not modify bottom center terrain map");
 				return(FALSE);
 			}
 		}
@@ -2140,7 +2138,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrModifySupercell(18))
 			{
-				Write_Debug("Could not modify right bottom terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not modify right bottom terrain map");
 				return(FALSE);
 			}
 		}
@@ -2158,7 +2156,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrStartLoadingSecondHalf(6, (SINT16)(scx - 1), (SINT16)(scy + 1)))
 			{
-				Write_Debug("Could not build top left terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build top left terrain map");
 				return(FALSE);
 			}
 		}
@@ -2169,7 +2167,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrStartLoadingSecondHalf(7, scx, (SINT16)(scy + 1)))
 			{
-				Write_Debug("Could not build top center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build top center terrain map");
 				return(FALSE);
 			}
 		}
@@ -2180,7 +2178,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrStartLoadingSecondHalf(8, (SINT16)(scx + 1), (SINT16)(scy + 1)))
 			{
-				Write_Debug("Could not build right top terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build right top terrain map");
 				return(FALSE);
 			}
 		}
@@ -2191,7 +2189,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrStartLoadingSecondHalf(11, (SINT16)(scx - 1), scy))
 			{
-				Write_Debug("Could not build left center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build left center terrain map");
 				return(FALSE);
 			}
 		}
@@ -2208,7 +2206,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrStartLoadingSecondHalf(13, (SINT16)(scx + 1), scy))
 			{
-				Write_Debug("Could not build right center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build right center terrain map");
 				return(FALSE);
 			}
 		}
@@ -2219,7 +2217,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrStartLoadingSecondHalf(16, (SINT16)(scx - 1), (SINT16)(scy - 1)))
 			{
-				Write_Debug("Could not build left bottom terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build left bottom terrain map");
 				return(FALSE);
 			}
 		}
@@ -2230,7 +2228,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrStartLoadingSecondHalf(17, scx, (SINT16)(scy - 1)))
 			{
-				Write_Debug("Could not build bottom center terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build bottom center terrain map");
 				return(FALSE);
 			}
 		}
@@ -2241,7 +2239,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		{
 			if (!trnldrStartLoadingSecondHalf(18, (SINT16)(scx + 1), (SINT16)(scy - 1)))
 			{
-				Write_Debug("Could not build right bottom terrain map");
+				WriteLog(LOG_TERRAIN, LOG_DEBUG, "Could not build right bottom terrain map");
 				return(FALSE);
 			}
 		}
@@ -3386,7 +3384,7 @@ int		i;
 	// next line* MUST* occur after trnldrKill();
 	trnKillAutogunSystem();
 
-    Write_Log(LOG_OLD, LOG_INFO, "[trnmainKill]");
+    WriteLog(LOG_OLD, LOG_INFO, "[trnmainKill]");
 }
 
 LOGICAL trnmainPositionToLatLong(FLOAT64 x, FLOAT64 y, SINT32* latdeg, SINT32* latmin, SINT32* latsec, SINT32* north, SINT32* longdeg, SINT32* longmin, SINT32* longsec, SINT32* east)

@@ -29,6 +29,8 @@
 #include "chat/chatRecruiterList.h"
 #include "chat/chatMissionInviteMsg.h"
 
+//#define CLIENT_DEBUG
+
 namespace Chat
 {
 	struct MissionStatus;
@@ -347,8 +349,9 @@ SINT32 HC_UNIT_LOCATIONS::receive(SINT32 teulIndex, HC_UNIT_LOCATIONS& incoming)
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(!client)
 		return 0;
-
-	Write_Debug("Receiving %u incoming HC Unit Locations", incoming.size());
+#ifdef CLIENT_DEBUG
+	WriteDebug("Receiving %u incoming HC Unit Locations", incoming.size());
+#endif
 
 	for ( UINT32 i = 0; i < incoming.size(); ++i )
 		client->ProcessHCUnitLocation(incoming.data(i));

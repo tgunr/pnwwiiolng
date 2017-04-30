@@ -215,7 +215,7 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
     dynamic_cast<Texture2D*>(tex.get())->setImage(nullptr);
     assert(img->referenceCount() == 1);
 
-    Write_Debug("[loadTexture] %s texture created", name.c_str());
+    WriteLog(LOG_TEXTURE, LOG_DEBUG, "name %s texture created", name.c_str());
 
     return id;
 }
@@ -367,7 +367,7 @@ int ldLoadTexture2D(const std::string& texturename,
     dynamic_cast<Texture2D*>(tex.get())->setImage(nullptr);
     assert(img->referenceCount() == 1);
 
-    Write_Debug("[loadTexture] %s texture created", texturename.c_str());
+    WriteLog(LOG_TEXTURE, LOG_DEBUG, "name %s texture created", texturename.c_str());
 
     return id;
 }
@@ -501,7 +501,7 @@ int ldLoadTextureRectangle(const std::string& texturename,
     dynamic_cast<TextureRectangle*>(tex.get())->setImage(nullptr);
     assert(img->referenceCount() == 1);
 
-    Write_Debug("[loadTexture] %s texture created", texturename.c_str());
+    WriteLog(LOG_TEXTURE, LOG_DEBUG, "name %s texture created", texturename.c_str());
 
     return id;
 }

@@ -996,7 +996,7 @@ LOGICAL fpFPSAttachWeapon (fpsWeaponTypes weapon)
 
 	if (!gr2AttachModel (weapModel, fpsWeapons[weapon].weaponConnect, skeletonModel, fpsWeapons[weapon].weaponConnectTo))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Failed to attach %d to skeleton", weapon);
+		WriteLog (LOG_FPS, LOG_INFO, "Failed to attach %d to skeleton", weapon);
 		return FALSE;
 	}
 
@@ -1004,7 +1004,7 @@ LOGICAL fpFPSAttachWeapon (fpsWeaponTypes weapon)
 	{
 		if (!gr2AttachModel (clipModel, fpsWeapons[weapon].clipConnect, weapModel, fpsWeapons[weapon].clipConnectTo))
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "Failed to attach clip to gun %d", weapon);
+			WriteLog (LOG_FPS, LOG_INFO, "Failed to attach clip to gun %d", weapon);
 			return FALSE;
 		}
 	}
@@ -1027,7 +1027,7 @@ LOGICAL fpFPSAttachWeapon (fpsWeaponTypes weapon)
 
 			if (!gr2AttachModel (auxModel[i], fpsWeapons[weapon].auxConnect[i], weapModel, auxConnectToBone))
 			{
-				Write_Log (LOG_FPS, LOG_INFO, "Failed to attach aux %d to gun %d", i, weapon);
+				WriteLog (LOG_FPS, LOG_INFO, "Failed to attach aux %d to gun %d", i, weapon);
 				return FALSE;
 			}
 		}
@@ -1073,7 +1073,7 @@ void fpFPSInitDeployedState()
 
 		if (!pointFound)
 		{
-			Write_Log (LOG_FPS,LOG_INFO, "fpFPSInitDeployedState():  Failed to find deploy point for current model");
+			WriteLog (LOG_FPS,LOG_INFO, "fpFPSInitDeployedState():  Failed to find deploy point for current model");
 			return;
 		}
 
@@ -1327,7 +1327,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				if (targetPose != FPS_POSITION_CROUCH)
 					prevPose = targetPose;
 				targetPose = FPS_POSITION_CROUCH;
-//				Write_Log (LOG_FPS, LOG_INFO, "%d, %d", prevPose, targetPose);
+//				WriteLog (LOG_FPS, LOG_INFO, "%d, %d", prevPose, targetPose);
 				prevEyeStateFlags = stateFlags & STATE_EYE_MASK;
 			}
 			else
@@ -1353,7 +1353,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				if (targetPose != FPS_POSITION_STAND)
 					prevPose = targetPose;
 				targetPose = FPS_POSITION_STAND;
-//				Write_Log (LOG_FPS, LOG_INFO, "%d, %d", prevPose, targetPose);
+//				WriteLog (LOG_FPS, LOG_INFO, "%d, %d", prevPose, targetPose);
 				prevEyeStateFlags = stateFlags & STATE_EYE_MASK;
 			}
 			else
@@ -1380,7 +1380,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				}
 				else
 				{
-					Write_Log (LOG_FPS, LOG_INFO, "Unexpected state?  %d %d %d", prevEyeStateFlags, stateFlags, controlStateFlags);
+					WriteLog (LOG_FPS, LOG_INFO, "Unexpected state?  %d %d %d", prevEyeStateFlags, stateFlags, controlStateFlags);
 				}
 
 				// and shake the screen (you bad player you!)
@@ -1396,7 +1396,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				if (targetPose != FPS_POSITION_PRONE)
 					prevPose = targetPose;
 				targetPose = FPS_POSITION_PRONE;
-//				Write_Log (LOG_FPS, LOG_INFO, "%d, %d", prevPose, targetPose);
+//				WriteLog (LOG_FPS, LOG_INFO, "%d, %d", prevPose, targetPose);
 				prevEyeStateFlags = stateFlags & STATE_EYE_MASK;
 			}
 			else
@@ -1415,7 +1415,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				}
 				else
 				{
-					Write_Log (LOG_FPS, LOG_INFO, "Unexpected state?  %d %d %d", prevEyeStateFlags, stateFlags, controlStateFlags);
+					WriteLog (LOG_FPS, LOG_INFO, "Unexpected state?  %d %d %d", prevEyeStateFlags, stateFlags, controlStateFlags);
 				}
 
 				// and shake the screen (you bad player you!)
@@ -1424,10 +1424,10 @@ fpsWeaponStates fpFPSDetermineNextState ()
 		}
 		else
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "*************Unidentified pose!**************");
+			WriteLog (LOG_FPS, LOG_INFO, "*************Unidentified pose!**************");
 			prevPose = targetPose;
 			targetPose = FPS_POSITION_STAND;
-			Write_Log (LOG_FPS, LOG_INFO, "%d, %d", prevPose, targetPose);
+			WriteLog (LOG_FPS, LOG_INFO, "%d, %d", prevPose, targetPose);
 		}
 
 		if(targetPose != prevPose)
@@ -1441,7 +1441,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
         if(currentFPSstate != old)
         {
-            Write_Debug("%d = currentFPSstate", currentFPSstate);
+            WriteDebug("%d = currentFPSstate", currentFPSstate);
         }
 
         old = currentFPSstate;
@@ -1453,7 +1453,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 			fpFPSWeaponChange (fpsTrooper.autoswitchWeaponNumber, 1);
 			//return currentFPSstate; // go ahead and let it drop through; this fixes a binocs zoom issue
 		}
-//		Write_Log (LOG_FPS, LOG_INFO, "Failed to autoswitch to weapon %d", fpsTrooper.autoswitchWeaponNumber);
+//		WriteLog (LOG_FPS, LOG_INFO, "Failed to autoswitch to weapon %d", fpsTrooper.autoswitchWeaponNumber);
 	}
 
 	// special handling for sprint
@@ -1470,7 +1470,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				stateFlags &= ~( STATE_MOVE_FAST | STATE_NO_ARM_SWAY);
 				stateFlags |= STATE_MOVE_SLOW;
 				controlStateFlags &= ~FPS_SPRINT;
-//				Write_Log (LOG_FPS, LOG_INFO, "Ok, I'm pooped!");
+//				WriteLog (LOG_FPS, LOG_INFO, "Ok, I'm pooped!");
 			}
 			else
 			{
@@ -1482,7 +1482,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 			stateFlags &= ~STATE_MOVE_FAST;
 			stateFlags |= STATE_MOVE_SLOW;
 			controlStateFlags &= ~FPS_SPRINT;
-//			Write_Log (LOG_FPS, LOG_INFO, "Not Yet!");
+//			WriteLog (LOG_FPS, LOG_INFO, "Not Yet!");
 		}
 		// ok, we're really sprinting, turn off aim
 		else
@@ -1651,7 +1651,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
 				if (!fpFPSDetachWeapon (currentWeaponModel))
 				{
-					Write_Log (LOG_FPS, LOG_INFO, "Failed to detach weapon!");
+					WriteLog (LOG_FPS, LOG_INFO, "Failed to detach weapon!");
 					return currentFPSstate;
 				}
 			}
@@ -1693,7 +1693,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
 				if (!fpFPSAttachWeapon (currentWeaponModel))
 				{
-					Write_Log (LOG_FPS, LOG_INFO, "Failed to attach weapon!");
+					WriteLog (LOG_FPS, LOG_INFO, "Failed to attach weapon!");
 					return currentFPSstate;
 				}
 
@@ -2057,7 +2057,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 		{
 			if ((currentTime - fireStartTime) > (FLOAT64)fpsWeapons[currentWeaponModel].fireDelay)
 			{
-				Write_Debug("Mortar round leaving at %f, %f seconds after being fired.", currentTime, (currentTime - fireStartTime));
+				WriteDebug("Mortar round leaving at %f, %f seconds after being fired.", currentTime, (currentTime - fireStartTime));
 				stateFlags &= ~STATE_HOLD_FIRE;
 				stateFlags |= STATE_FIRE_DELAYED_WEAP;
 				fireStartTime = 0.0f;
@@ -2272,7 +2272,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 			}
 			break;
 		default:
-			Write_Log (LOG_FPS, LOG_INFO, "Unknown state!  0x%x", animationStateFlags);
+			WriteLog (LOG_FPS, LOG_INFO, "Unknown state!  0x%x", animationStateFlags);
 			newState = IDLE;
 			break;
 	}
@@ -2374,7 +2374,7 @@ LOGICAL fpFPSWeaponStateCheck (fpsWeaponStates* newState)
 
 					if (!gr2AttachModel (auxModel[FPS_AUX_RGGRENADE], currWeapon.auxConnect[FPS_AUX_RGGRENADE], weapModel, currWeapon.auxConnectToAlt[FPS_AUX_RGGRENADE]))
 					{
-						Write_Log (LOG_FPS, LOG_INFO, "Failed to attach rggrenade to alt mount in gun");
+						WriteLog (LOG_FPS, LOG_INFO, "Failed to attach rggrenade to alt mount in gun");
 						return FALSE;
 					}*/
 				}
@@ -2398,7 +2398,7 @@ LOGICAL fpFPSWeaponStateCheck (fpsWeaponStates* newState)
 
 				if (!gr2AttachModel (auxModel[FPS_AUX_RGGRENADE], currWeapon.auxConnect[FPS_AUX_RGGRENADE], weapModel, currWeapon.auxConnectTo[FPS_AUX_RGGRENADE]))
 				{
-					Write_Log (LOG_FPS, LOG_INFO, "Failed to attach rggrenade to alt mount in gun");
+					WriteLog (LOG_FPS, LOG_INFO, "Failed to attach rggrenade to alt mount in gun");
 					return FALSE;
 				}*/
 
@@ -2446,7 +2446,7 @@ LOGICAL fpFPSWeaponStateCheck (fpsWeaponStates* newState)
 					*newState = DEPLOYED_FIRE;
 					return FALSE;
 				default:
-					Write_Log (LOG_FPS, LOG_INFO, "Unknown state encountered in fpFPSWeaponStateCheck for satchel");
+					WriteLog (LOG_FPS, LOG_INFO, "Unknown state encountered in fpFPSWeaponStateCheck for satchel");
 					*newState = IDLE;
 					return FALSE;
 			}
@@ -2503,7 +2503,7 @@ LOGICAL fpFPSWeaponStateCheck (fpsWeaponStates* newState)
 				*newState = STAND_FIRE;
 				return FALSE;
 			default:
-				Write_Log (LOG_FPS, LOG_INFO, "Unknown state encountered in fpFPSWeaponStateCheck for satchel");
+				WriteLog (LOG_FPS, LOG_INFO, "Unknown state encountered in fpFPSWeaponStateCheck for satchel");
 				*newState = IDLE;
 				return FALSE;
 		}
@@ -2537,7 +2537,7 @@ LOGICAL fpFPSWeaponStateCheck (fpsWeaponStates* newState)
 				*newState = STAND_FIRE;
 				return FALSE;
 			default:
-				Write_Log (LOG_FPS, LOG_INFO, "Unknown state (%d) encountered in fpFPSWeaponStateCheck for knife or grenade", currState);
+				WriteLog (LOG_FPS, LOG_INFO, "Unknown state (%d) encountered in fpFPSWeaponStateCheck for knife or grenade", currState);
 				*newState = IDLE;
 				return FALSE;
 		}
@@ -2591,7 +2591,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
 	fpFPSCleanupAnimationState ();
 
-	Write_Log (LOG_FPS, LOG_INFO, "starting state %d, currentState %d, controlFlags = 0x%x, stateFlags = 0x%x", state, currentFPSstate, controlStateFlags, stateFlags);
+	WriteLog (LOG_FPS, LOG_INFO, "starting state %d, currentState %d, controlFlags = 0x%x, stateFlags = 0x%x", state, currentFPSstate, controlStateFlags, stateFlags);
 
 	// let the tutorial manager know we've changed states
 	TUT_MGR->DoEvent(TUT_EVENT_STATE_TROOP, &state, &weapon);
@@ -2784,7 +2784,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 				stateFlags |= STATE_HOLD_FIRE;
 				fireStartTime = frametime / 1000.0;
 				fpsTrooper.tpsStartAttack = 1;
-				Write_Debug("Firing mortar at %f", fireStartTime);
+				WriteDebug("Firing mortar at %f", fireStartTime);
 
 				// go ahead and play the reload sound for mortars here
 				SCHAR* reloadSound = fpsWeapons[currentWeaponModel].reloadSound;
@@ -3164,7 +3164,7 @@ void fpFPSAdjustEyeToPose (FLOAT32 deltaTime)
 
 		if (eyeHeight == targetEyeHeight)
 		{
-//				Write_Log (LOG_FPS, LOG_INFO, "End reached");
+//				WriteLog (LOG_FPS, LOG_INFO, "End reached");
 			prevPose = targetPose;
 			stat2Flags &= ~STAT2_POSE_CHANGE;
 			TUT_MGR->DoEvent(TUT_EVENT_FPS_POSE, &targetPose);
@@ -3704,7 +3704,7 @@ FLOAT32 fpFPSGetEyeAdjust(int pose, int move, bool asDiff)
 		height = fpGetZAdjust(currentPose, currentMove, 0);
 	}
 
-	//Write_Log (LOG_FPS, LOG_INFO, "EYE HEIGHT: height = %.2f", height);
+	//WriteLog (LOG_FPS, LOG_INFO, "EYE HEIGHT: height = %.2f", height);
 
 	return (asDiff) ? -TROOPER_STAND_EYE_HEIGHT + height : height;
 }
@@ -3814,7 +3814,7 @@ FLOAT32 fpFPSGetBulletDispersion()
 	}
 	*/
 
-//	Write_Log (LOG_FPS, LOG_INFO, "MaxDispersion = %f, min = %f", maxDispersion, minDispersion);
+//	WriteLog (LOG_FPS, LOG_INFO, "MaxDispersion = %f, min = %f", maxDispersion, minDispersion);
 
 #if AIMING_WEAPONS
 	return 0.0f;
@@ -4331,7 +4331,7 @@ LOGICAL fpFPSUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 deltaTime)
 	if (!currentGameWeapon)
 	{
 		//FIXME .. somehow.  this is ugly, but can't do it in the init process as the weapons haven't been loaded yet
-		Write_Log (LOG_FPS, LOG_INFO, "warning:  weapon identification hack in progress");
+		WriteLog (LOG_FPS, LOG_INFO, "warning:  weapon identification hack in progress");
 		currentGameWeapon = &(((vehVehicle*)(pVehicleData->VehicleMasterPtr))->Weapons[fpsTrooper.activeWeaponNumber][0]);
 
 		if(fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_ROCKET)
@@ -4678,7 +4678,7 @@ LOGICAL fpFPSUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 deltaTime)
 	{
 		requestedForward /= 2.0f;
 		requestedStrafe /= 2.0f;
-//		Write_Log (LOG_FPS, LOG_INFO, "ATP Slowdown! %f < %f", currentATP, minATP);
+//		WriteLog (LOG_FPS, LOG_INFO, "ATP Slowdown! %f < %f", currentATP, minATP);
 	}
 
 	// now we have requestedStrafe and requestedForward, figure our real velocities using acceleration
@@ -4742,7 +4742,7 @@ LOGICAL fpFPSUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 deltaTime)
 		pVehicleData->VehiclePos.z += fpsTrooper.swimDisplacement;
 	}
 
-//	Write_Log (LOG_FPS, LOG_INFO, "Forward = %f, Strafe = %f .. actual %f, %f", requestedForward, requestedStrafe, currentForwardVectorLength, currentStrafeVectorLength);
+//	WriteLog (LOG_FPS, LOG_INFO, "Forward = %f, Strafe = %f .. actual %f, %f", requestedForward, requestedStrafe, currentForwardVectorLength, currentStrafeVectorLength);
 
 	return TRUE;
 }
@@ -4796,7 +4796,7 @@ void fpFPSGetVelocity (FLOAT64VECTOR* velocity)
 			driftX = driftY = 0.0f;
 		}
 
-		Write_Log (LOG_FPS, LOG_INFO, "Fall time %f (%d - %d)  (%f, (%f, %f, %f)", fallTime,  ft10mscount, personData->StartFallTime10ms, fpsTrooper.parachuteDecelerationTime,
+		WriteLog (LOG_FPS, LOG_INFO, "Fall time %f (%d - %d)  (%f, (%f, %f, %f)", fallTime,  ft10mscount, personData->StartFallTime10ms, fpsTrooper.parachuteDecelerationTime,
 			velocity->x, velocity->y, velocity->z);
 
 		// add drift
@@ -4838,7 +4838,7 @@ LOGICAL fpFPSUpdateState ()
 	if (newState == currentFPSstate)
 		return TRUE;
 
-	Write_Log (LOG_FPS, LOG_INFO, "State change from %d to %d, control 0x%x, state 0x%x", currentFPSstate, newState, controlStateFlags, stateFlags);
+	WriteLog (LOG_FPS, LOG_INFO, "State change from %d to %d, control 0x%x, state 0x%x", currentFPSstate, newState, controlStateFlags, stateFlags);
 
 	// based on our current state, clean up things
 	if (!fpFPSCleanupAnimationState ())
@@ -6835,7 +6835,7 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 	else
 		valid = (param && mobile);
 
-	//Write_Log (LOG_FPS, LOG_INFO, "frametime = %d, param = %d, id = %d", frametime, param, id);
+	//WriteLog (LOG_FPS, LOG_INFO, "frametime = %d, param = %d, id = %d", frametime, param, id);
 
     // kind of a HACK
 	// could be moved to per weapon data as an aim override
@@ -7240,11 +7240,11 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 			}
 			break;
 		default:
-			Write_Log (LOG_FPS, LOG_INFO, "Unrecognized input received %d", id);
+			WriteLog (LOG_FPS, LOG_INFO, "Unrecognized input received %d", id);
 			break;
 	}
 
-//	Write_Log (LOG_FPS, LOG_INFO, "control state flags 0x%08x", controlStateFlags);
+//	WriteLog (LOG_FPS, LOG_INFO, "control state flags 0x%08x", controlStateFlags);
 
 	return TRUE;
 }
@@ -7487,7 +7487,7 @@ static void fpFPSVerticalAxisLook (SINT32 param, UINT32 data)
 			aimVertAngleOffset = 0;
 		}
 	}
-//	Write_Log (LOG_FPS, LOG_INFO, "VertAxisParam = %d", param);
+//	WriteLog (LOG_FPS, LOG_INFO, "VertAxisParam = %d", param);
 }
 
 static void fpFPSHorizAxisLook (SINT32 param, UINT32 data)
@@ -7516,7 +7516,7 @@ static void fpFPSHorizAxisLook (SINT32 param, UINT32 data)
 	{
 		mouseLookHorizAngle = fpsTrooper.maxHorizEyeAngle * (param / 1000.0f);
 	}
-//	Write_Log (LOG_FPS, LOG_INFO, "HorizAxisParam = %d", param);
+//	WriteLog (LOG_FPS, LOG_INFO, "HorizAxisParam = %d", param);
 }
 
 static void fpFPSAxisRotation (SINT32 param, UINT32 id)
@@ -7727,7 +7727,7 @@ UINT32 fpFPSCheckNewPose(fpFPSPoses poseToCheck)
 	}
 	else
 	{
-		//	Write_Log (LOG_FPS, LOG_INFO, "Checking pose %d", poseToCheck);
+		//	WriteLog (LOG_FPS, LOG_INFO, "Checking pose %d", poseToCheck);
 		mlVehicleData*	vehicleData = persGetPersonaModelDataPtr();
 		FLOAT64VECTOR	zeroVel = { 0, 0, 0 };
 		return (mlDetermineInfantryCollisions(vehicleData, &zeroVel, (UINT32)poseToCheck, FALSE));
@@ -8054,7 +8054,7 @@ LOGICAL fpFPSGetFireDirection(OBJECT* pObject, piMATRIX* pMatrix)
 		else
 		{
 #if(0) // Don't spam chat box
-			Write_Log (LOG_FPS, LOG_INFO, "fpFPSGetFirePoint: Failed to find firepoint bone, using identity!");
+			WriteLog (LOG_FPS, LOG_INFO, "fpFPSGetFirePoint: Failed to find firepoint bone, using identity!");
 #endif
 			firePoint = IdentityMatrix;
 		}
@@ -8136,7 +8136,7 @@ LOGICAL	fpFPSGetFirePoint(OBJECT* pObject, piMATRIX* pMatrix, bool visual)
 		else
 		{
 #if(0) // Don't spam chat box
-			Write_Log (LOG_FPS, LOG_INFO, "fpFPSGetFirePoint: Failed to find firepoint bone, using identity!");
+			WriteLog (LOG_FPS, LOG_INFO, "fpFPSGetFirePoint: Failed to find firepoint bone, using identity!");
 #endif
 			firePoint = IdentityMatrix;
 		}
@@ -8384,17 +8384,17 @@ LOGICAL fpFPSStateWeaponReadyToFire(bool honorDelays)
 	if ((fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_SATCHEL) && (mlInfantryInsideVehicleCheck(vehicleData, &eyePoint)))
 	{
 		weaponReady = FALSE;
-		Write_Log (LOG_FPS, LOG_INFO, "%d fpFPSStateWeaponReadyToFire: FALSE due to collision", frametime);
+		WriteLog (LOG_FPS, LOG_INFO, "%d fpFPSStateWeaponReadyToFire: FALSE due to collision", frametime);
 	}
 #endif
 /*
 	if (weaponReady)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "%d fpFPSStateWeaponReadyToFire: TRUE", frametime);
+		WriteLog (LOG_FPS, LOG_INFO, "%d fpFPSStateWeaponReadyToFire: TRUE", frametime);
 	}
 	else
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "%d fpFPSStateWeaponReadyToFire: FALSE", frametime);
+		WriteLog (LOG_FPS, LOG_INFO, "%d fpFPSStateWeaponReadyToFire: FALSE", frametime);
 	}
 */
 	return weaponReady;
@@ -8456,11 +8456,11 @@ LOGICAL fpFPSStateOKToFire ()
 /*
 	if (okToFire)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "fpFPSStateOKToFire: TRUE");
+		WriteLog (LOG_FPS, LOG_INFO, "fpFPSStateOKToFire: TRUE");
 	}
 	else
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "fpFPSStateOKToFire: FALSE");
+		WriteLog (LOG_FPS, LOG_INFO, "fpFPSStateOKToFire: FALSE");
 	}
 */
 	return okToFire;
@@ -8518,7 +8518,7 @@ void fpFPSFireResupply (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, pi
 			// does this need to make use of oversupply?
 			--currentGameWeapon->NumRoundsAmmoLeft[currentGameWeapon->AmmoTypeInUse];
 			fpFPSFireRound (currentGameWeapon, pFireAtt);
-			Write_Log (LOG_FPS, LOG_INFO, "Resupply vehicle <0x%x>, handle >%s<!", collideVehicle, collideVehicle->Handle);
+			WriteLog (LOG_FPS, LOG_INFO, "Resupply vehicle <0x%x>, handle >%s<!", collideVehicle, collideVehicle->Handle);
 
 			resupplyTarget = collideVehicle->VehicleHostIndex;
 			resupplyTime = frametime;
@@ -8606,7 +8606,7 @@ void fpFPSFireBridgeRepair (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos
 			// does this need to make use of oversupply?
 			--currentGameWeapon->NumRoundsAmmoLeft[currentGameWeapon->AmmoTypeInUse];
 			fpFPSFireRound (currentGameWeapon, pFireAtt);
-			Write_Log (LOG_FPS, LOG_INFO, "Repair Bridge <0x%x>, name >%s<!", TO, TO->TerrainMasterObject->name);
+			WriteLog (LOG_FPS, LOG_INFO, "Repair Bridge <0x%x>, name >%s<!", TO, TO->TerrainMasterObject->name);
 			vehApplyDamageToObject(fpFPSGetBridgeRepair(), TO, nullptr, nullptr);
 		}
 	}
@@ -8756,7 +8756,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 		}
 		else if ((currentWeaponModel == AMMO) && (!resupplyTarget))
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "Ammo weapon fire!");
+			WriteLog (LOG_FPS, LOG_INFO, "Ammo weapon fire!");
 			fpFPSFireResupply (pVehicleData, &FirePositionVector, &FireAttitudeMatrix);
 			//fpsTrooper.firedWeapon = 1;
 		}
@@ -9030,7 +9030,7 @@ void fpFPSEjectShell (OBJECT* pObject, piMATRIX* fireAtt, LOGICAL firstPerson)
 
 	if (!ejectAvailable)
 	{
-		Write_Debug ("No ejection point found");
+		WriteDebug ("No ejection point found");
 		return;
 	}
 
@@ -9261,7 +9261,7 @@ void fpFPSRecycle ()
 	    fpFPSDetachWeapon (currentWeaponModel);
 		if (!gr2AttachModel (weapModel, "atrsecondary-connect", skeletonModel, "rifle-control"))
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "Failed to attach BOYSMK1 to skeleton");
+			WriteLog (LOG_FPS, LOG_INFO, "Failed to attach BOYSMK1 to skeleton");
 		}
 	}
 }
@@ -9307,7 +9307,7 @@ void fpFPSReload (weapWeapon* weapon)
 			*/
         }
     }
-//	Write_Log (LOG_FPS, LOG_INFO, "Reloaded into clip: %d", fpsWeapons[currentWeaponModel].clipBullets);
+//	WriteLog (LOG_FPS, LOG_INFO, "Reloaded into clip: %d", fpsWeapons[currentWeaponModel].clipBullets);
 
 	if(fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_LTMORTAR)
 		return;
@@ -9349,7 +9349,7 @@ void fpFPSReload (weapWeapon* weapon)
 // this is where auto-reload gets blocked (called from weapon system)
 LOGICAL	fpFPSReloadCheck (weapWeapon* weapon, SINT32 ammoGroup)
 {
-//	Write_Log (LOG_FPS, LOG_INFO, "Left in clip: %d", fpsWeaponData[currentWeaponModel].clipBullets);
+//	WriteLog (LOG_FPS, LOG_INFO, "Left in clip: %d", fpsWeaponData[currentWeaponModel].clipBullets);
 
 	if (!fpsTrooper.autoReload)
 		return FALSE;
@@ -10596,7 +10596,7 @@ LOGICAL fpFPSRideUnrideVehicle ()
 			// 30.0 m/s is about 110kph
 			if (speed > 30.0)
 			{
-				Write_Log (LOG_FPS, LOG_INFO, "Absurd speed calculated on j:  %f %f %f", speed,
+				WriteLog (LOG_FPS, LOG_INFO, "Absurd speed calculated on j:  %f %f %f", speed,
 					FPSRideVehicle->PosData.Vel,
 					FPSRideVehicle->PosData.LastLastUpdateVel);
 			}
@@ -10803,8 +10803,8 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 
 		if (!gr2AttachModel (legsModel, "Bip01", skeletonModel, "Bip01"))
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "Failed to attach legs to skeleton");
-			Write_Log (LOG_FPS, LOG_INFO, "0x%x 0x%x 0x%x .. legs = 0x%x", legsModels[0], legsModels[1], legsModels[2], legsModel);
+			WriteLog (LOG_FPS, LOG_INFO, "Failed to attach legs to skeleton");
+			WriteLog (LOG_FPS, LOG_INFO, "0x%x 0x%x 0x%x .. legs = 0x%x", legsModels[0], legsModels[1], legsModels[2], legsModel);
 			return FALSE;
 		}
 
@@ -11615,7 +11615,7 @@ void fpFPSMarkForVehicleCollideCheck(UINT32 flag)
 	if (flag && !fpsHitVehicleThisFrame)
 	{
 		fpsHitVehicleThisFrame = TRUE;
-		Write_Log (LOG_FPS, LOG_INFO, "%d fpsHitVehicleThisFrame set", frametime);
+		WriteLog (LOG_FPS, LOG_INFO, "%d fpsHitVehicleThisFrame set", frametime);
 	}
 #endif
 }
@@ -11690,37 +11690,37 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 
 	if (!fpsTrooper.initialized)
 	{
-		Write_Log(LOG_FPS, LOG_INFO, "FPS system not ready! (%s)", emote);
+		WriteLog(LOG_FPS, LOG_INFO, "FPS system not ready! (%s)", emote);
 		return;
 	}
 
 	if ((stateFlags & STATE_EMOTE_PLAYING) && !force)
 	{
-		Write_Log(LOG_FPS, LOG_INFO, "Emote already playing! (%s)", emote);
+		WriteLog(LOG_FPS, LOG_INFO, "Emote already playing! (%s)", emote);
 		return;
 	}
 
 	if (stateFlags & STATE_DEAD)
 	{
-		Write_Log(LOG_FPS, LOG_INFO, "No emotes while dead! (%s)", emote);
+		WriteLog(LOG_FPS, LOG_INFO, "No emotes while dead! (%s)", emote);
 		return;
 	}
 
 	if (stateFlags & STATE_SWIMMING)
 	{
-		Write_Log(LOG_FPS, LOG_INFO, "No emotes while swimming! (%s)", emote);
+		WriteLog(LOG_FPS, LOG_INFO, "No emotes while swimming! (%s)", emote);
 		return;
 	}
 
 	if (stateFlags & STATE_RELOADING)
 	{
-		Write_Log(LOG_FPS, LOG_INFO, "No emotes while reloading! (%s)", emote);
+		WriteLog(LOG_FPS, LOG_INFO, "No emotes while reloading! (%s)", emote);
 		return;
 	}
 
 	if (fpFPSIsTrooperFalling())
 	{
-		Write_Log(LOG_FPS, LOG_INFO, "No emotes while falling! (%s)", emote);
+		WriteLog(LOG_FPS, LOG_INFO, "No emotes while falling! (%s)", emote);
 		return;
 	}
 
@@ -11780,7 +11780,7 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 	// bail if it's crap
 	if (newEmoteID < 0)
 	{
-		Write_Log(LOG_FPS, LOG_INFO, "Bad emote %s passed to start emote", emote);
+		WriteLog(LOG_FPS, LOG_INFO, "Bad emote %s passed to start emote", emote);
 		return;
 	}
 
@@ -11789,12 +11789,12 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 	{
 		if ((!((stateFlags & STATE_MOVE_STILL) && (stateFlags & STATE_EYE_STAND))) && !force)
 		{
-			Write_Log(LOG_FPS, LOG_INFO, "Tried to play fullbody emote while moving (%s)", emote);
+			WriteLog(LOG_FPS, LOG_INFO, "Tried to play fullbody emote while moving (%s)", emote);
 			return;
 		}
 		if (stateFlags & STATE_SIT)
 		{
-			Write_Log(LOG_FPS, LOG_INFO, "Tried to play fullbody emote while sitting (%s)", emote);
+			WriteLog(LOG_FPS, LOG_INFO, "Tried to play fullbody emote while sitting (%s)", emote);
 			return;
 		}
 
@@ -11803,26 +11803,26 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 		{
 			if ((!handle) || (!handle[0]))
 			{
-				Write_Log(LOG_FPS, LOG_INFO, "Invalid handle passed to dressdown!");
+				WriteLog(LOG_FPS, LOG_INFO, "Invalid handle passed to dressdown!");
 				return;
 			}
 			ChatHandle target = chatGetHandle(handle);
 			if(!target)
 			{
-				Write_Log(LOG_FPS, LOG_INFO, "Handle is not a real handle");
+				WriteLog(LOG_FPS, LOG_INFO, "Handle is not a real handle");
 				return;
 			}
 
 			if (!((currentArms == BRITISH_HC) || (currentArms == GERMAN_HC) || (currentArms == FRENCH_HC)))
 			{
-				Write_Log(LOG_FPS, LOG_INFO, "Only HC can dress down!  (%s)", handle);
+				WriteLog(LOG_FPS, LOG_INFO, "Only HC can dress down!  (%s)", handle);
 				return;
 			}
 
 			targetVehicle = vehFindVehicleByChatHandle(target);
 			if (!targetVehicle)
 			{
-				Write_Log(LOG_FPS, LOG_INFO, "Failed to find target vehicle!  (%s)", handle);
+				WriteLog(LOG_FPS, LOG_INFO, "Failed to find target vehicle!  (%s)", handle);
 				return;
 			}
 /*
@@ -11842,7 +11842,7 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 			}
 			else
 			{
-				Write_Log(LOG_FPS, LOG_INFO, "Invalid target for dressdown!  (%s)", handle);
+				WriteLog(LOG_FPS, LOG_INFO, "Invalid target for dressdown!  (%s)", handle);
 				return;
 			}
 		}
@@ -11855,13 +11855,13 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 
 		if (speed > 0.0)
 		{
-			Write_Log(LOG_FPS, LOG_INFO, "Tried to play prone combat emote while moving (%s) %f", emote, speed);
+			WriteLog(LOG_FPS, LOG_INFO, "Tried to play prone combat emote while moving (%s) %f", emote, speed);
 			return;
 		}
 	}
 
 	// ok, emote start
-	Write_Log(LOG_FPS, LOG_INFO, "Starting emote %s, id = %d, type = %d", emote, newEmoteID, newEmoteType);
+	WriteLog(LOG_FPS, LOG_INFO, "Starting emote %s, id = %d, type = %d", emote, newEmoteID, newEmoteType);
 
 	if (newEmoteType == TPS_EMOTETYPE_FULLBODY)
 	{
@@ -11916,7 +11916,7 @@ void fpFPSResupplySelf(vehVehicle*vehicle)
 {
 	if (!vehicle)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Null vehicle tried to resupply me?!!");
+		WriteLog (LOG_FPS, LOG_INFO, "Null vehicle tried to resupply me?!!");
 		return;
 	}
 
@@ -11945,7 +11945,7 @@ void fpFPSResupplySelf (const wchar_t* from)
 		const char* utf8from = uiUTF16toUTF8(from);
 		bool resupplied = false;
 
-		Write_Log (LOG_FPS, LOG_INFO, "%s just resupplied me", utf8from);
+		WriteLog (LOG_FPS, LOG_INFO, "%s just resupplied me", utf8from);
 
 		for(int i = 0; i < VEH_MAX_MOUNTS; i++)
 		{
@@ -12000,7 +12000,7 @@ void fpFPSResupplySelf (const wchar_t* from)
 	}
 	else
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Repeat resupply from %s suppressed", from);
+		WriteLog (LOG_FPS, LOG_INFO, "Repeat resupply from %s suppressed", from);
 	}
 }
 
@@ -12841,7 +12841,7 @@ void fpFPSIterateHighlightedWeapon (SINT32 direction)
 	fpsTrooper.highlightedWeaponNumber = foundWeaponNumber;
 	fpsTrooper.highlightTime = frametime / 1000.0;
 
-	Write_Log (LOG_FPS, LOG_INFO, "Highlighting %d at %lf", fpsTrooper.highlightedWeaponNumber, fpsTrooper.highlightTime);
+	WriteLog (LOG_FPS, LOG_INFO, "Highlighting %d at %lf", fpsTrooper.highlightedWeaponNumber, fpsTrooper.highlightTime);
 }
 
 SINT32 fpFPSGetWeaponType()
@@ -13809,7 +13809,7 @@ void _updateWeaponLag(float deltaTime)
 				horizWeaponLag = (horizWeaponLag < 0) ? -WLHM: WLHM;
 		}
 
-		//Write_Debug("Horizontal Weapon Lag lag:%.4f acc:%.4f jmp:%.4f", horizWeaponLag, horizWeaponLagAcc, jump);
+		//WriteDebug("Horizontal Weapon Lag lag:%.4f acc:%.4f jmp:%.4f", horizWeaponLag, horizWeaponLagAcc, jump);
 	}
 
 	// for testing

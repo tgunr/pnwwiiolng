@@ -514,38 +514,38 @@ LOGICAL gmlpMainUpdate()
 	// close the game loop
 	_UpdateKill();
 
-#ifdef BETA_RELEASE
-	logTimerEnd(timerid);
-{
-	static FLOAT32 fps[10];
-	static int lasttotpaints;
-	int i;
-	int totpaints = piGetTotalPaints();
-
-	memmove(&fps[1], &fps[0], 9 * sizeof(FLOAT32));
-	fps[0] = gFPS;
-
-	if(logTimerFPS > 0 && fps[4] < logTimerFPS)
-	{
-		Enable_Log(LOG_TIMER, TRUE);
-
-		Write_Log(LOG_TIMER, LOG_INFO, "***Frame Profile Begin***");
-		Write_Log(LOG_TIMER, LOG_INFO, "logTimerFPS: %.2f", logTimerFPS);
-		for(i = 9; i >= 1; i--)
-		{
-			Write_Log(LOG_TIMER, LOG_INFO, "Frame %d", 5 - i);
-			logTimerPrint(timerid, i);
-		}
-
-		Write_Log(LOG_TIMER, LOG_INFO, "***Frame Profile End***");
-		logTimerFPS = 0;
-		rnmainListText("Logged frame profile");
-		rnmainListText("Frame profiling off");
-	}
-	lasttotpaints = totpaints;
-}
-	logTimerReset();
-#endif
+//#ifdef BETA_RELEASE 
+//	logTimerEnd(timerid);
+//{
+//	static FLOAT32 fps[10];
+//	static int lasttotpaints;
+//	int i;
+//	int totpaints = piGetTotalPaints();
+//
+//	memmove(&fps[1], &fps[0], 9 * sizeof(FLOAT32));
+//	fps[0] = gFPS;
+//
+//	if(logTimerFPS > 0 && fps[4] < logTimerFPS)
+//	{
+//		Enable_Log(LOG_TIMER, TRUE);
+//
+//		WriteLog(LOG_TIMER, LOG_INFO, "***Frame Profile Begin***");
+//		WriteLog(LOG_TIMER, LOG_INFO, "logTimerFPS: %.2f", logTimerFPS);
+//		for(i = 9; i >= 1; i--)
+//		{
+//			WriteLog(LOG_TIMER, LOG_INFO, "Frame %d", 5 - i);
+//			logTimerPrint(timerid, i);
+//		}
+//
+//		WriteLog(LOG_TIMER, LOG_INFO, "***Frame Profile End***");
+//		logTimerFPS = 0;
+//		rnmainListText("Logged frame profile");
+//		rnmainListText("Frame profiling off");
+//	}
+//	lasttotpaints = totpaints;
+//}
+//	logTimerReset();
+//#endif
 
     // Ticket #2298
     // Removes loading screen once per spawn. Returns if no work necessary.
@@ -560,7 +560,7 @@ LOGICAL gmlpMainUpdate()
 
 LOGICAL gmlpMainKill()
 {
-    Write_Debug("[gmlpMainKill] Begin");
+    WriteDebug("[gmlpMainKill] Begin");
 
 	//cfgPrefsSave();
 
@@ -604,7 +604,7 @@ LOGICAL gmlpMainKill()
 
     cfgPrefsKill();
 
-    Write_Debug("[gmlpMainKill] End");
+    WriteDebug("[gmlpMainKill] End");
 
 	return 0;
 }

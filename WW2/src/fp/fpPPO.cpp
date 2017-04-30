@@ -1085,7 +1085,7 @@ void fpPPOInitiateBuildAction(UINT32 & state, UINT32 & control, SINT32 & stance)
 
     if(ppo)
     {
-        Write_Log (LOG_FPS, LOG_INFO, "Building ppo!");
+        WriteLog (LOG_FPS, LOG_INFO, "Building ppo!");
 
         if(ppo->Build())
         {

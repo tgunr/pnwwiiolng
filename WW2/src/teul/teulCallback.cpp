@@ -38,11 +38,11 @@ teulPostCallbackError(const SINT32 teulIndex, const UCHAR* const data, const SIN
 
 	if ( callback->error == nullptr )
 	{
-		dbugLog(_FLA, "t:%d missing error handler for " PRF_CALLBACK "", teulIndex, PRA_CALLBACK(*callback));
+		WriteLog(LOG_TEUL, LOG_ABORT, "t:%d missing error handler for " PRF_CALLBACK "", teulIndex, PRA_CALLBACK(*callback));
 		return 0;
 	}
 
-	dbugLog(_FLW, "executing error for " PRF_CALLBACK "", PRA_CALLBACK(*callback));
+	WriteLog(LOG_TEUL, LOG_WARN, "executing error for " PRF_CALLBACK "", PRA_CALLBACK(*callback));
 
 	// Invoke the error handler.
 	(callback->error)(teulIndex, data, size, callback, error);
@@ -113,18 +113,18 @@ teulAllocCallback(Teul::CallbackInit* const ci)
 	if(	PN_UNLIKELY(ci->callX < Teul::RestrictedCallbackRange_X) )
 	{
 		dbugSetErrno(EINVAL);
-		dbugLog(_FLA,"Invalid Parameter for callback x:%u y:%u", ci->callX, ci->callY );
+		WriteLog(LOG_TEUL, LOG_ABORT,"Invalid Parameter for callback x:%u y:%u", ci->callX, ci->callY );
 		return nullptr;
 	}
 	if ( PN_UNLIKELY(ci->sendAction == nullptr && ci->recvAction == nullptr) )
 	{
 		dbugSetErrno(EINVAL);
-		dbugLog(_FLA,"Invalid handlers for callback x:%u y:%u", ci->callX, ci->callY );
+		WriteLog(LOG_TEUL, LOG_ABORT,"Invalid handlers for callback x:%u y:%u", ci->callX, ci->callY );
 		return nullptr;
 	}
 
 #if defined(DEV_RELEASE)
-	dbugLog(_FLD, "Alloc entered x:%d(%s) y:%d(%s) mode:%d "
+	WriteLog(LOG_TEUL, LOG_DEBUG, "Alloc entered x:%d(%s) y:%d(%s) mode:%d "
 		"sendA:%p recvA:%p timeout:%d"
 		, ci->callX, ci->callXName, ci->callY, ci->callYName, ci->mode
 		, ci->sendAction, ci->recvAction, ci->sendTimeout);
@@ -152,7 +152,7 @@ teulAllocSystemCallback(Teul::CallbackInit* const ci)
 void
 TEUL_CALLBACK::Release()
 {
-	dbugLog(_FLI, "freeing callback " PRF_CALLBACK "", PRA_CALLBACK(*this));
+	WriteLog(LOG_COMM, LOG_INFO, "freeing callback " PRF_CALLBACK "", PRA_CALLBACK(*this));
 
 	s_callbackArray[callX()][callY()] = nullptr;
 	memFree(this);
@@ -206,14 +206,14 @@ _doAction(ENDPOINT& endpoint
 
 	TIMER_STOP("doact:start")
 
-	dbugLog(_FLD, "t:%d executing callback " PRF_CALLBACK " size:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), dataSize_bytes);
+	WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d executing callback " PRF_CALLBACK " size:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), dataSize_bytes);
 
 	TIMER_START
 	const SINT32 retval = callback.recvAction()(&actionObj);
 	TIMER_STOP("doact:recv")
 
 	if (PN_UNLIKELY(retval < 0))
-		dbugLog(_FLA, "t:%d callback " PRF_CALLBACK " err:%d size:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), abs(retval), dataSize_bytes);
+		WriteLog(LOG_TEUL, LOG_ABORT, "t:%d callback " PRF_CALLBACK " err:%d size:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), abs(retval), dataSize_bytes);
 
 	return retval;
 }
@@ -226,7 +226,7 @@ TEUL_CALLBACK::processCallback(ENDPOINT& endpoint_, UCHAR* const callData_, cons
 {
 	if ( PN_UNLIKELY(recvAction() == nullptr) )
 	{
-		dbugLog(_FLA, "t:%d " PRF_CALLBACK " null action", endpoint_.teulIndex(), PRA_CALLBACK(*this));
+		WriteLog(LOG_TEUL, LOG_ABORT, "t:%d " PRF_CALLBACK " null action", endpoint_.teulIndex(), PRA_CALLBACK(*this));
 		return -EINVAL;
 	}
 

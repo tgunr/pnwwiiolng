@@ -353,7 +353,7 @@ static SINT32 _packVehicleHead(PackMode mode, UCHAR* const data, SINT32 offset, 
 #ifdef BETA_RELEASE
 			LogAbort("BAD VEHICLE DATA (claimed %u) offset:%d", myIndex, offset);
 #else
-			dbugLog(_FLA, "Invalid vehicle index: %u", myIndex);
+			WriteLog(LOG_VEHICLE, LOG_ABORT, "Invalid vehicle index: %u", myIndex);
 			return -EINVAL;
 #endif
 		}
@@ -745,7 +745,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 		TIMER_STOP_ADD(pack_head);
 		if ( offset < 0 )
 		{
-			dbugLog(_FLA, "couldnt pack vehicle head for vehicle slot %d", vehNo);
+			WriteLog(LOG_VEHICLE, LOG_ABORT, "couldnt pack vehicle head for vehicle slot %d", vehNo);
 			return offset;
 		}
 
@@ -763,7 +763,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 			TIMER_STOP_ADD(pack_vpos);
 			if ( offset < 0 )
 			{
-				dbugLog(_FLA, "couldnt pack position for vehicle slot %d", vehNo);
+				WriteLog(LOG_VEHICLE, LOG_ABORT, "couldnt pack position for vehicle slot %d", vehNo);
 				return offset;
 			}
 
@@ -772,7 +772,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 			TIMER_STOP_ADD(pack_vaux);
 			if ( offset < 0 )
 			{
-				dbugLog(_FLA, "couldnt pack AUX_INFO for vehicle slot %d", vehNo);
+				WriteLog(LOG_VEHICLE, LOG_ABORT, "couldnt pack AUX_INFO for vehicle slot %d", vehNo);
 				return offset;
 			}
 
@@ -799,7 +799,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 
 			if ( offset < 0 )
 			{
-				dbugLog(_FLA, "couldnt pack turrets for vehicle slot %d", vehNo);
+				WriteLog(LOG_VEHICLE, LOG_ABORT, "couldnt pack turrets for vehicle slot %d", vehNo);
 				return offset;
 			}
 
@@ -852,7 +852,7 @@ static SINT32 _packUPDATE_HIGH(PackMode mode, UCHAR* const data, SINT32 offset, 
 
 static void _badVehicle(SINT32 vehIndex)
 {
-	dbugLog(_FLA, "**** INVOKED _badVehicle -- BEWARE ****");
+	WriteLog(LOG_VEHICLE, LOG_ABORT, "**** INVOKED _badVehicle -- BEWARE ****");
 }
 
 static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_HOLDER* vhold, UINT32 vehIndex)
@@ -880,7 +880,7 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 			}
 			else
 			{
-				dbugLog(_FLA, "rv:%u couldnt unpack first time info error %d", vehIndex, retval);
+				WriteLog(LOG_VEHICLE, LOG_ABORT, "rv:%u couldnt unpack first time info error %d", vehIndex, retval);
 				return retval;
 			}
 		}
@@ -892,7 +892,7 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 				_badVehicle(vehIndex);
 			}
 
-			dbugLog(_FLA, "rv:%u could not create vehicle node %p is not valid", vehIndex, vhold->vehicle);
+			WriteLog(LOG_VEHICLE, LOG_ABORT, "rv:%u could not create vehicle node %p is not valid", vehIndex, vhold->vehicle);
 			return -EINVAL;
 		}
 	}
@@ -904,7 +904,7 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 			static TeulTimeMS nextBlip = teulClock64;
 			if ( Server::myServerInfo.stats.status == Server::SERVER_ACCEPTING && teulClock64 >= nextBlip )
 			{
-				dbugLog(_FLA, "rv:%u not found", vehIndex);
+				WriteLog(LOG_VEHICLE, LOG_ABORT, "rv:%u not found", vehIndex);
 				nextBlip = teulClock64 + 500;
 			}
 			// subsitute a dummy vehicle so we can at least unpack
@@ -977,7 +977,7 @@ updtPackVehicleBroadcast(PackMode mode, UCHAR* const data, SINT32 offset, VEHICL
 		{
 			// Position messages must be from the controller.
 			if ( (vhold->present & PR_FROM_CONTROLLER) == 0 )
-				dbugLog(_FLA, "rv:%u illegal PR_POSITION not allowed for non control player", vehIndex);
+				WriteLog(LOG_VEHICLE, LOG_ABORT, "rv:%u illegal PR_POSITION not allowed for non control player", vehIndex);
 
 			vehInfo->hostPosTimeStamp = teulClock64;
 		}

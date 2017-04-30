@@ -303,7 +303,7 @@ LOGICAL persGunsightInit()
 	_GunsightFOVTexId = ldpixLoadImageFileToSurface("vehicles\\vo\\sightfov1.bmp", colorBLACK, LDPIX_NONE);
 	if (!piIsTexture(_GunsightFOVTexId, 0))
 	{
-		Write_Debug("Unable to load up the basic gunsight texture map! (vehicles\\vo\\sightfov1.bmp)");
+		WriteDebug("Unable to load up the basic gunsight texture map! (vehicles\\vo\\sightfov1.bmp)");
 	}
 	piAddTexRef(_GunsightFOVTexId);
 
@@ -316,37 +316,37 @@ LOGICAL persGunsightInit()
 
     if(!piIsTexture(_bazookascope, 0))
     {
-        Write_Log(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/m9optic.dds");
+        WriteLog(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/m9optic.dds");
         return FALSE;
     }
 
     if(!piIsTexture(_yankscope, 0))
     {
-        Write_Log(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/springfieldoptic.dds");
+        WriteLog(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/springfieldoptic.dds");
         return FALSE;
     }
 
     if(!piIsTexture(_britscope, 0))
     {
-        Write_Log(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/britscope.dds");
+        WriteLog(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/britscope.dds");
         return FALSE;
     }
 
     if(!piIsTexture(_frenchscope, 0))
     {
-        Write_Log(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/frenscope.dds");
+        WriteLog(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/frenscope.dds");
         return FALSE;
     }
 
     if(!piIsTexture(_germanscope, 0))
     {
-        Write_Log(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/germscope.dds");
+        WriteLog(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/germscope.dds");
         return FALSE;
     }
 
     if(!piIsTexture(_binocs, 0))
     {
-        Write_Log(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/binos.dds");
+        WriteLog(LOG_OLD, LOG_INFO, "%s Failed To Load", "vehicles/vo/binos.dds");
         return FALSE;
     }
 
@@ -686,11 +686,11 @@ static LOGICAL _ReadGunfileData(GSCommandList * GSCL,SINT8 * FileName)
     GunFile = fioOpen(str.c_str());
 	if (GunFile == -1)
 	{
-		Write_Debug("Failed attempt to read gunsight file %s",FileName);
+		WriteDebug("Failed attempt to read gunsight file %s",FileName);
 		return FALSE;
 	}
 
-	Write_Debug("Reading gunsight file %s",FileName);
+	WriteDebug("Reading gunsight file %s",FileName);
 
 	_AdjustMin = 0.0;
 	_AdjustMax = 0.0;
@@ -721,7 +721,7 @@ static LOGICAL _ReadGunfileData(GSCommandList * GSCL,SINT8 * FileName)
 		{
 			if (Lookup[i].CommandName[0] == 0)
 			{
-				Write_Debug("Unidentified gunfile command %s %s",VarName,VarContents);
+				WriteDebug("Unidentified gunfile command %s %s",VarName,VarContents);
 				// at end of list, therefore command not recognized
 				break;
 			}
@@ -739,7 +739,7 @@ static LOGICAL _ReadGunfileData(GSCommandList * GSCL,SINT8 * FileName)
 			{
 				if (Lookup[VarNum].ReadFunction(GSCL,(char*)VarContents) != TRUE)
 				{
-					Write_Debug("Error function %s, line %d",VarName,LineCount);
+					WriteDebug("Error function %s, line %d",VarName,LineCount);
 				}
 				else
 				{
@@ -805,7 +805,7 @@ SINT8* Ptr1,*Ptr2;
 
 	if (Ptr == nullptr)
 	{
-		Write_Debug("Memory Allocation Error!");
+		WriteDebug("Memory Allocation Error!");
 		return FALSE;
 	}
 
@@ -860,7 +860,7 @@ SINT8* Ptr1,*Ptr2;
 
 	if (Ptr == nullptr)
 	{
-		Write_Debug("Memory Allocation Error!");
+		WriteDebug("Memory Allocation Error!");
 		return FALSE;
 	}
 
@@ -921,7 +921,7 @@ SINT8* Ptr1,*Ptr2;
 
 	if (Ptr == nullptr)
 	{
-		Write_Debug("Memory Allocation Error!");
+		WriteDebug("Memory Allocation Error!");
 		return FALSE;
 	}
 
@@ -979,7 +979,7 @@ static LOGICAL _ReadTextLine(GSCommandList * GSCL,SINT8 * Params)
 	Ptr = (float*)memAlloc(sizeof(FLOAT32)*16 + 128);
 	if (Ptr == nullptr)
 	{
-		Write_Debug("Memory Allocation Error!");
+		WriteDebug("Memory Allocation Error!");
 		return FALSE;
 	}
 
@@ -1012,7 +1012,7 @@ SINT8* Ptr1,*Ptr2;
 
 	if (Ptr == nullptr)
 	{
-		Write_Debug("Memory Allocation Error!");
+		WriteDebug("Memory Allocation Error!");
 		return FALSE;
 	}
 
@@ -1057,7 +1057,7 @@ SINT8* Ptr1,*Ptr2;
 
 	if (Ptr == nullptr)
 	{
-		Write_Debug("Memory Allocation Error!");
+		WriteDebug("Memory Allocation Error!");
 		return FALSE;
 	}
 
@@ -1900,8 +1900,8 @@ piLVERTEX * Vertex;
 
 	if (wcslen(TextString) > 32)
 	{
-		Write_Debug("Attempted to display text string that was too long in rendering gunsight");
-		Write_Debug(" String = %s",TextString);
+		WriteDebug("Attempted to display text string that was too long in rendering gunsight");
+		WriteDebug(" String = %s",TextString);
 		piExitProgram(_FL,"Gunsight render string too long");
 	}
 
@@ -2401,7 +2401,7 @@ static LOGICAL _ReadLadder(GSCommandList * GSCL,SINT8 * Params)
 
 	if (GSCL->GE[GSCL->GECounter].Data == nullptr)
 	{
-		Write_Debug("Memory Allocation Error!");
+		WriteDebug("Memory Allocation Error!");
 		return FALSE;
 	}
 

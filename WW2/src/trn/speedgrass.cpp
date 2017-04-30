@@ -1679,7 +1679,7 @@ void SpeedGrassDeprecated::LoadBMP(const char* filename,
 
 	if(!piIsTexture(id, 0))
 	{
-		Write_Debug("ERROR: %s could not be found", filename);
+		WriteDebug("ERROR: %s could not be found", filename);
 		return;
 	}
 

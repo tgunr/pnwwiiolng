@@ -137,7 +137,7 @@ LOGICAL fxAmbInitRegion(REGION* lpReg, const SCHAR* pFile)
 
         if(lpNode == nullptr)
         {
-            Write_Log(LOG_SOUND, LOG_FATAL, "[fxAmbInitRegion] Out of memory");
+            WriteLog(LOG_SOUND, LOG_FATAL, "[fxAmbInitRegion] Out of memory");
             fioClose(hHandle);
             return FALSE;
         }

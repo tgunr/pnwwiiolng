@@ -253,7 +253,7 @@ extern LOGICAL          g_buildTerrain;             // Build SDMs for archives.
 
 extern LOGICAL          g_log_comm;					// turn on logging for LOG_COMM
 extern LOGICAL          g_log_fps;					// turn on logging for LOG_FPS
-extern LOGICAL          g_log_weap;					// turn on logging for LOG_WEAP
+extern LOGICAL          g_log_weap;					// turn on logging for LOG_WEAPON
 
 extern FLOAT32			gFPS;
 extern FLOAT32			gLastFrameFPS;
@@ -285,6 +285,8 @@ extern FLOAT32          aimFOVAdjust;
 extern SINT8            gAuthServer[128]; // Authentication server to be used
 extern SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 extern SINT8            gClientV[32]; // Version to submit
+extern SINT8            gLogMask[_MAX_PATH];	// Gobal logmask value to specify subsystem to match.
+extern SINT32           gLogLevel;
 
 #ifdef DEBUG_WW2
 extern LOGICAL          DebugBuildingMDLFilesOnly;

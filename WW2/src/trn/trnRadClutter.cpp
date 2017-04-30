@@ -146,7 +146,7 @@ void radclutterKill()
 
     memFree(_attributes);
 
-    Write_Log(LOG_OLD, LOG_INFO, "[CRadClutter::Kill]");
+    WriteLog(LOG_OLD, LOG_INFO, "[CRadClutter::Kill]");
 }
 
 /////////////////////////////////////////////////////////

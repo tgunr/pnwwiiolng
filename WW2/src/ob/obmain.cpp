@@ -98,7 +98,7 @@ LOGICAL obmainFreeObject(OBJECT* lpobj)
 
   /* bogus check
 	if (NumObjUsed <= 0)
-		Write_Debug("Attempt to free object when none are used!");
+		WriteDebug("Attempt to free object when none are used!");
 	else
 		NumObjUsed -= 1;
   */
@@ -338,7 +338,7 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
 	{
 		if (lpobj->flag2 & OBJECT_ANIMATION)
 		{
-			Write_Debug("%%%%%%%%%%%%%%%%%Freeing allocated lpspare!");
+			WriteDebug("%%%%%%%%%%%%%%%%%Freeing allocated lpspare!");
 			memFree(lpobj->lpspare);
 
 			lpobj->lpspare = nullptr;
@@ -1638,7 +1638,7 @@ void obmainKill()
     obpoolFreeObjectFinish();
     ldfltKill();
 
-	Write_Debug("Objects still allocated: %d", NumObjUsed);
+	WriteDebug("Objects still allocated: %d", NumObjUsed);
 
 	for(lpobj=objused.next; lpobj != nullptr; lpobj=next)
 	{
@@ -1664,7 +1664,7 @@ void obmainKill()
 
     obmgrKill();
 
-    Write_Log(LOG_OLD, LOG_INFO, "[obmainKill]");
+    WriteLog(LOG_OLD, LOG_INFO, "[obmainKill]");
 }
 
 LOGICAL obmainUpdate()

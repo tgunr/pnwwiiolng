@@ -137,7 +137,7 @@ SINT32 uiPlaySound(const SCHAR* file, LOGICAL finite, FLOAT64 volume, const SCHA
 
     if(!s)
     {
-        Write_Log(LOG_OLD, LOG_WARN, "[uiPlaySound] sndsLoadSound(%s) **FAILED**", file);
+        WriteLog(LOG_OLD, LOG_WARN, "[uiPlaySound] sndsLoadSound(%s) **FAILED**", file);
         return -1;
     }
 
@@ -147,7 +147,7 @@ SINT32 uiPlaySound(const SCHAR* file, LOGICAL finite, FLOAT64 volume, const SCHA
     {
         sndsFreeSound(s);
 
-        Write_Log(LOG_OLD, LOG_WARN, "[uiPlaySound] _GetSound() **FAILED**");
+        WriteLog(LOG_OLD, LOG_WARN, "[uiPlaySound] _GetSound() **FAILED**");
         return -1;
     }
 

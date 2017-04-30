@@ -488,7 +488,7 @@ static void _loadSpawnXML(const char* file)
 
         if(!root)
         {
-            Write_Log(LOG_OLD, LOG_INFO, "*** %s FAILED ***", file);
+            WriteLog(LOG_OLD, LOG_INFO, "*** %s FAILED ***", file);
             return;
         }
 
@@ -541,7 +541,7 @@ UINT32 trncdInit()
 
 	if(!obmgrCreateModelInstance("flagtable1"))
 	{
-		Write_Debug("Unable to load terrain object flag file");
+		WriteDebug("Unable to load terrain object flag file");
 
 		piExitProgram(_FL,"Unable to load terrain object flag file");
 	}
@@ -550,7 +550,7 @@ UINT32 trncdInit()
 
 	if (_FlagObject == nullptr)
 	{
-		Write_Debug("Terrain flag object copied, but unable to find it by name");
+		WriteDebug("Terrain flag object copied, but unable to find it by name");
 
 		piExitProgram(_FL,"Unable to find terrain flag file by name");
 	}
@@ -570,7 +570,7 @@ UINT32 trncdInit()
 	{
 		char s[256];
 		strprintf(s,"Unable to load up the null terrain texture map! (terrain\\null1.bmp)");
-		Write_Debug(s);
+		WriteDebug(s);
 		piExitProgram(_FL,s);
 	}
 
@@ -583,12 +583,12 @@ UINT32 trncdKill()
 {
     if(!mapTO.empty())
     {
-        Write_Log(LOG_OLD, LOG_INFO, "[trncdKill] mapTO size %d", mapTO.size());
+        WriteLog(LOG_OLD, LOG_INFO, "[trncdKill] mapTO size %d", mapTO.size());
     }
 
     if(!mapOBJ.empty())
     {
-        Write_Log(LOG_OLD, LOG_INFO, "[trncdKill] mapOBJ size %d", mapOBJ.size());
+        WriteLog(LOG_OLD, LOG_INFO, "[trncdKill] mapOBJ size %d", mapOBJ.size());
     }
 
     piFreeMipTextures(_NullTexId);
@@ -802,7 +802,7 @@ static UINT32 _AddToListHead(trnCDTerrainObject* TO)
 LOGICAL trncdRemoveTerrainObject(OBJECT* Object, SINT32 DummyNum1, SINT32 DummyNum2, UINT32 Id,
 								 REL_OBJ_ID * ObjId)
 {
-	Write_Debug("Removing overall object %s",Object->name);
+	WriteDebug("Removing overall object %s",Object->name);
 
 	if (Object != nullptr)
 	{
@@ -915,7 +915,7 @@ LOGICAL trncdAddTerrainObject(OBJECT* Object,SINT32 SuperCellX, SINT32 SuperCell
     BUILDING_PARAMS* Params;
     SINT32 DamThreshold;
 
-    //Write_Debug("Adding overall object %s",Object->name);
+    //WriteDebug("Adding overall object %s",Object->name);
 	if (Object != nullptr)
 	{
 		DamThreshold = 0;
@@ -1006,13 +1006,13 @@ static UINT32 _RemoveTerrainObject(OBJECT* o)
 
     if(I == mapOBJ.end())
     {
-		Write_Debug("Object being removed that isn't on the collide list!");
+		WriteDebug("Object being removed that isn't on the collide list!");
         return 0;
     }
 
     trnCDTerrainObject* to;
 
-	Write_Debug("_RemoveTerrainObject: %s", o->name);
+	WriteDebug("_RemoveTerrainObject: %s", o->name);
 
     to = I->second;
 
@@ -1135,20 +1135,20 @@ _StratMessageQue*	PrevStratMsg;
 		return;
 	}
 
-	//Write_Debug("Adding Object %s, top level %s",Object->name,TopObject->name);
+	//WriteDebug("Adding Object %s, top level %s",Object->name,TopObject->name);
 
     mapOBJList::iterator I = mapOBJ.find(Object);
 
     if(I != mapOBJ.end())
     {
-        Write_Debug("Attempt to add duplicate object to the terrain object list!");
+        WriteDebug("Attempt to add duplicate object to the terrain object list!");
         return;
     }
 
 	// first grab an object slot
 	if (_GetNewCDTerrainObject(&TO) == 1 || TO == nullptr)
 	{
-		Write_Debug("Unable to get new terrain object");
+		WriteDebug("Unable to get new terrain object");
 		return;
 	}
 
@@ -1177,7 +1177,7 @@ _StratMessageQue*	PrevStratMsg;
 	{
 		if(!TO->CollisionObject)
 		{
-			//Write_Debug("Cannot find damage collision object for object %s, using entire object tree instead", TO->TerrainObject->name);
+			//WriteDebug("Cannot find damage collision object for object %s, using entire object tree instead", TO->TerrainObject->name);
 			TO->DamageCollisionObject = Object;
 		}
 		else
@@ -1189,7 +1189,7 @@ _StratMessageQue*	PrevStratMsg;
 
 	if (TO->CollisionObject == nullptr)
 	{
-		//Write_Debug("Cannot find collision object for object %s, using entire object tree instead", TO->TerrainObject->name);
+		//WriteDebug("Cannot find collision object for object %s, using entire object tree instead", TO->TerrainObject->name);
 		TO->CollisionObject = Object;
 	}
 
@@ -1287,7 +1287,7 @@ _StratMessageQue*	PrevStratMsg;
 			}
 			if (Obj->flags & OBJECT_NOTOBJECT)
 			{
-				Write_Debug("Terrain object % has LOD with no direct child object",
+				WriteDebug("Terrain object % has LOD with no direct child object",
 							TO->TerrainMasterObject->name);
 			}
 			else
@@ -1453,7 +1453,7 @@ UINT32 trnGetSpawnObject(OBJECT** o,
     {
         char s[128];
         strprintf(s, "[trnGetSpawnObject] x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
-        Write_Log(LOG_OLD, LOG_FATAL, s);
+        WriteLog(LOG_OLD, LOG_FATAL, s);
         piExitProgram(_FL, s);
         return 1;
     }
@@ -1464,7 +1464,7 @@ UINT32 trnGetSpawnObject(OBJECT** o,
     {
         char s[128];
         strprintf(s, "[trnGetSpawnObject] spawn entries = 0 x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
-        Write_Log(LOG_OLD, LOG_FATAL, s);
+        WriteLog(LOG_OLD, LOG_FATAL, s);
         piExitProgram(_FL, s);
         return 1;
     }
@@ -3128,7 +3128,7 @@ TERRAIN_DETAIL*	td;
 //					(mnz <= zo &&
 //					mxz >= zo))
 				{
-					//Write_Debug("Non-flat BBox: %s", lpobj->name);
+					//WriteDebug("Non-flat BBox: %s", lpobj->name);
 					//obdrawWireframeObject(lpobj, colorWHITEALPHA);
 					if (trncdCheckTerrainCollision(lpobj, collision))
 //					if (obcdCheckObjectCollision(lpobj,collision))
@@ -3157,7 +3157,7 @@ TERRAIN_DETAIL*	td;
 //					(mnz <= zo &&
 //					mxz >= zn))
 				{
-					//Write_Debug("Flat BBox: %s", lpobj->name);
+					//WriteDebug("Flat BBox: %s", lpobj->name);
 					//obdrawWireframeObject(lpobj, colorREDALPHA);
 					if (trncdCheckTerrainCollision(lpobj, collision))
 					{
@@ -3254,7 +3254,7 @@ COLLISION		collision;
     count += GetMicroSeconds() - beginhere;
 	if ((++number % 128) == 0)
     {
-		Write_Debug("Average object to terrain collision detect time: %lu us", count);
+		WriteDebug("Average object to terrain collision detect time: %lu us", count);
         count = 0;
     }
 #endif
@@ -3420,7 +3420,7 @@ piVECTOR*	lpcrnr;
 #ifdef EVENT_LOG_TIMES
     count += GetMicroSeconds() - beginhere;
     if ((++number % 1024) == 0) {
-        Write_Debug("Average object polygon collision detect time: %d us, polys = %d", count, npolys / 1024);
+        WriteDebug("Average object polygon collision detect time: %d us, polys = %d", count, npolys / 1024);
         count = 0;
         npolys = 0;
 	}
@@ -3591,7 +3591,7 @@ piVECTOR		dir, vt, pv;
 					(mnz <= zo &&
 					mxz >= zo))
 				{
-					//Write_Debug("Non-flat BBox: %s", lpobj->name);
+					//WriteDebug("Non-flat BBox: %s", lpobj->name);
 					//obdrawWireframeObject(lpobj, colorWHITEALPHA);
 					if (trncdCheckObjectCollision(lpobj, collision))
 					{
@@ -3618,7 +3618,7 @@ piVECTOR		dir, vt, pv;
 					(mnz <= zo &&
 					mxz >= zn))
 				{
-					//Write_Debug("Flat BBox: %s", lpobj->name);
+					//WriteDebug("Flat BBox: %s", lpobj->name);
 					//obdrawWireframeObject(lpobj, colorREDALPHA);
 					if (trncdCheckObjectCollision(lpobj, collision))
 					{
@@ -5483,12 +5483,12 @@ static UINT32	_Count;
 	{
 		if (ft500msticks == 0)
 		{
-			//Write_Debug("Returning");
+			//WriteDebug("Returning");
 			return 0;
 		}
 	}
 
-	//Write_Debug("LODing");
+	//WriteDebug("LODing");
 	_Count++;
 
 	if (_Count >= 6)
@@ -5762,7 +5762,7 @@ UINT32 trnUpdateObjectStatus(SINT32 x, SINT32 y, UINT32 id, SINT32 country, SINT
 				(TO->ObjId.objType == CP_BRIDGE))
 			{
 				// HACK for making bridges appear/disappear
-				Write_Log (LOG_COMM, LOG_INFO, "Bridge status change .. %d %d %d -> %d (%d)", x, y, id, country, vislevel);
+				WriteLog (LOG_COMM, LOG_INFO, "Bridge status change .. %d %d %d -> %d (%d)", x, y, id, country, vislevel);
 
 				// FIXME use values from strtTypes.h once it's properly shared in source control
 				if (country == BRIDGE_DESTROYED_COUNTRY)
@@ -5794,7 +5794,7 @@ UINT32 trnUpdateObjectStatus(SINT32 x, SINT32 y, UINT32 id, SINT32 country, SINT
 				// Server sends both 0xf and 0xfffff to denote this state.
 				if ((vislevel & 0xf) == 0xf)
                 {
-                   // Write_Debug("StratID %d is tagged as FB_CLOSED_VISLEVEL (%x)", TO->StratId, vislevel);
+                   // WriteDebug("StratID %d is tagged as FB_CLOSED_VISLEVEL (%x)", TO->StratId, vislevel);
 					vislevel = FB_CLOSED_VISLEVEL;
                 }
 
@@ -5905,10 +5905,10 @@ _StratMessageQue * StratMsg;
 	{
 		if (Id == 0)
 		{
-			Write_Debug("Id number zero! scx = %d, scy = %d",scx,scy);
+			WriteDebug("Id number zero! scx = %d, scy = %d",scx,scy);
 			return 0;
 		}
-		Write_Debug("Unable to find strat object scx=%d,scy=%d,id=%d, updated with country"
+		WriteLog(LOG_TERRAIN, LOG_WARN, "Unable to find strat object scx=%d,scy=%d,id=%d, updated with country"
 					"=%d,VisLevel=%d",
 					scx,
 					scy,
@@ -5922,7 +5922,7 @@ _StratMessageQue * StratMsg;
 
 	if (StratMsg == nullptr)
 	{
-		Write_Debug("Unable to allocate new strat message que element");
+		WriteDebug("Unable to allocate new strat message que element");
 		return 0;
 	}
 

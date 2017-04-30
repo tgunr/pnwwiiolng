@@ -408,7 +408,7 @@ int uiPostInit()
 	}
 
 #ifdef BETA_RELEASE
-	if(OpenConsole && fioQuery() == ISDIRECTORY && true)
+	if(OpenConsole && fioQuery() == ISDIRECTORY && HasKeyFile)
 	{
 		_terminal = uiLoadView("widgets/terminal", true, true);
 		_terminal->MoveTo(1,-_terminal->Height());
@@ -2287,9 +2287,9 @@ int uiConsoleprintf(const char* text, ...)
         while (out.size() && out[out.size() - 1] == '\n') {
             out.resize(out.size() - 1);
         }
-		WriteLog(LOG_CONSOLE, LOG_INFO, out.c_str());
+		WriteLog(LOG_UICONSOLE, LOG_INFO, out.c_str());
         out += "\n";
-//		if(display) display->AddText(out.c_str());
+		if(display) display->AddText(out.c_str());
 		return static_cast<int>(out.size());
 	}
     return 0;

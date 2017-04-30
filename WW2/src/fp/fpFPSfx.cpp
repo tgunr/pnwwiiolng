@@ -22,6 +22,7 @@
 #include <deque>
 
 #define MAX_SHELLS  32
+//#define FPSFX_DEBUG
 
 static struct OBJECT* fpFPSfxGetFreeShell();
 #if(0)
@@ -362,11 +363,15 @@ SINT32 fpFPSfxPlaySound(const char* soundName, SINT32 soundPriority, SINT32 soun
 {
 	if (soundName)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Playing sound %s", soundName);
-	}
+#ifdef FPSFX_DEBUG
+		WriteLog (LOG_FPS, LOG_INFO, "Playing sound %s", soundName);
+#endif
+    }
 	else
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "nullptr sound");
+#ifdef FPSFX_DEBUG
+        WriteLog (LOG_FPS, LOG_INFO, "nullptr sound");
+#endif
         return -1;
 	}
 

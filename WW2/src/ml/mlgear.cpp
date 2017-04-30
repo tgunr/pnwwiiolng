@@ -273,7 +273,7 @@ UINT32 VarNum;
 			ComponentData->CollideLength = atof(VarContents);
 			break;
 		default:
-			Write_Debug("Unidentified variable %s in component %s\n",VarName,Component->ComponentName);
+			WriteDebug("Unidentified variable %s in component %s\n",VarName,Component->ComponentName);
 			break;
 
 	}

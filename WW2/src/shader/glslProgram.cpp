@@ -232,13 +232,13 @@ void glslProgram::LinkProgram()
 
     if(!_isLinked)
     {
-        Write_Debug("glLinkProgram: FAILED");
+        WriteLog(LOG_RENDER, LOG_DEBUG, "glLinkProgram: FAILED");
 
         std::string infoLog;
 
         if(GetProgramInfoLog(infoLog))
         {
-            Write_Log(LOG_OLD, LOG_WARN, "glLinkProgram: %s %s", GetName().c_str(), infoLog.c_str());
+            WriteLog(LOG_OLD, LOG_WARN, "glLinkProgram: %s %s", GetName().c_str(), infoLog.c_str());
         }
 
         return;
@@ -248,7 +248,7 @@ void glslProgram::LinkProgram()
         std::string infoLog;
         if(GetProgramInfoLog(infoLog))
         {
-            Write_Log(LOG_OLD, LOG_WARN, "glLinkProgram: %s %s", GetName().c_str(), infoLog.c_str());
+            WriteLog(LOG_OLD, LOG_WARN, "glLinkProgram: %s %s", GetName().c_str(), infoLog.c_str());
         }
     }
 
@@ -269,11 +269,11 @@ void glslProgram::LinkProgram()
         {
             glGetActiveUniformBlockName(_programhandle, i, 256, nullptr, blockname);
 
-            Write_Debug("BLOCKNAME: %s", blockname);
+            WriteLog(LOG_RENDER, LOG_DEBUG, "BLOCKNAME: %s", blockname);
 
             if(BaseID.find(blockname) == BaseID.end())
             {
-                Write_Debug("BLOCKNAME %s not found. Add to BaseID map in glslProgram.cpp", blockname);
+                WriteLog(LOG_RENDER, LOG_DEBUG, "BLOCKNAME %s not found. Add to BaseID map in glslProgram.cpp", blockname);
                 continue;
             }
 
@@ -318,7 +318,7 @@ void glslProgram::LinkProgram()
                 glGetActiveUniformsiv(_programhandle, 1, (GLuint*)&indices[j], GL_UNIFORM_SIZE, &size);
                 glGetActiveUniformsiv(_programhandle, 1, (GLuint*)&indices[j], GL_UNIFORM_TYPE, &type);
 
-                Write_Debug("BLOCK UNIFORM %s: size = %d byteoffset = %d type = %x", name, size, byteoffset, type);
+                WriteLog(LOG_RENDER, LOG_DEBUG, "BLOCK UNIFORM %s: size = %d byteoffset = %d type = %x", name, size, byteoffset, type);
 
                 u->AddUniform(name, size, byteoffset, type);
             }
@@ -365,7 +365,7 @@ void glslProgram::LinkProgram()
                 }
 
                 _uniformInfoMap[name] = ActiveVarInfo(loc, type, size);
-                Write_Log(LOG_OLD, LOG_INFO, "UNIFORM: name: %s loc: %d size: %d type: %d", name, loc, size, type);
+                WriteLog(LOG_OLD, LOG_INFO, "UNIFORM: name: %s loc: %d size: %d type: %d", name, loc, size, type);
             }
         }
 
@@ -392,7 +392,7 @@ void glslProgram::LinkProgram()
             if(loc != -1)
             {
                 _attribInfoMap[name] = ActiveVarInfo(loc, type, size);
-                Write_Log(LOG_OLD, LOG_INFO, "ATTRIBUTE: name: %s loc: %d size: %d", name, loc, size);
+                WriteLog(LOG_OLD, LOG_INFO, "ATTRIBUTE: name: %s loc: %d size: %d", name, loc, size);
             }
         }
 

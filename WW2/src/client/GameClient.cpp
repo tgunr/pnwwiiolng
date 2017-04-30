@@ -102,11 +102,11 @@ int GameClientLogin(unsigned int host, playerid_t playerID, UINT32 otp,
 	}
 	catch(ClientNetError& e)
 	{
-		Write_Log(LOG_COMM, LOG_WARN, "Client::Login generated an error: %d, %s", e.Error(), e.What());
+		WriteLog(LOG_COMM, LOG_WARN, "Client::Login generated an error: %d, %s", e.Error(), e.What());
 		throw;
 	}
 
-	Write_Log(LOG_COMM, LOG_INFO, "Connected to host");
+	WriteLog(LOG_COMM, LOG_INFO, "Connected to host");
 
 	return _playerclient->MapConnection();
 }

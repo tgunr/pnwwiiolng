@@ -39,6 +39,10 @@ void sysmainCommandLine(int argc, const char** argv)
 	_argc = argc;
 	_argv = argv;
 
+#if RELEASE_CLIENT == 0
+	HasKeyFile = 1;
+#endif
+
 	mngoptParse((char *)"");
 }
 
@@ -90,8 +94,8 @@ int sysmain()
         frames++;
 		ddpEngine(NULL);
 #ifdef DEBUG_WW2
-        if (frames % 100 == 0) {
-            Write_Log(LOG_FPS, LOG_INFO, "Current FPS: %.1f", 1000.0 / gFPS );
+        if (frames % 10000 == 0) {
+            WriteLog(LOG_FPS, LOG_DEBUG, "Current FPS: %.1f", 1000.0 / gFPS );
         }
 #endif
     }
@@ -109,16 +113,12 @@ int sysmainInitApp()
 	printf("WW2OL Started\n"); fflush(stdout);
 #ifdef BETA_RELEASE
 	{
-        char buff[PATH_MAX];
-        getcwd( buff, PATH_MAX );
-        std::string cwd( buff );
-        cwd.append("/../../gizmo.key");
-        FILE* f = std::fopen(cwd.c_str(), "r");
+		FILE* f = fopen("../../gizmo.key","r");
 		UINT32 key = 0;
 		if(f)
 		{
 			fscanf(f,"%d", &key);
-			HasKeyFile = (key == 0xDEDDC6CD);
+			HasKeyFile = (key == 0xDEADBEEF);
 			fclose(f);
 		}
 	}
@@ -134,8 +134,8 @@ int sysmainInitApp()
     b3DSoundEnable = 1; // always want 3D enabled with OpenAL
 	//g_bRadialClutter = FALSE; // screwed on the mac at the moment
 
-	Enable_Log(LOG_ALL, WantedUserLogEnabled);
-	Set_Log_Level(LOG_INFO);
+    Set_Log_Mask(gLogMask);
+	Set_Log_Level(gLogLevel);
 
 #if USE_OSG
 	ddpSetD3DRender(osgGameUpdate);
