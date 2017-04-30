@@ -742,7 +742,8 @@ char GetOSBuild()
 	WantedWindow = FALSE;
 #ifdef DEBUG_WW2
 	WantedUserLogEnabled = TRUE;
-	WantDataDir = TRUE;
+	//TBD: Disabled for now, force debug clients to specify so we can use it for QA testing.
+	//WantDataDir = TRUE;
 	HasKeyFile = TRUE;
 #elif RELEASE_CLIENT == 0 && defined(BETA_RELEASE)
 	WantedUserLogEnabled = FALSE;
