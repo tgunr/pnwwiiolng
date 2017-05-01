@@ -1017,7 +1017,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 
 	if(Ammo->Flags & WEAP_AMMOFLAG_NOFX) return 0;
-	if(Ammo->AmmoType->IsSmokeGrenade) return 0;
+	if(Ammo->AmmoType->IsSmokeGrenade == 1) return 0;
 
 	mathSubVectors(&DeltaVec, NewPos, OldPos);
 	mathReallyFastNormalize(DeltaVec);
