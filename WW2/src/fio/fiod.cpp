@@ -134,7 +134,7 @@ static wchar_t* os_file_path(wchar_t* path)
 //////////////////////////////////////////////////////////////////////
 // Get me the name and size of a given file.
 
-#if platOS == OS_WIN32
+#if platBuild == BUILD_CLIENT
 static off_t _getFilePathAndSize(const char* name, bool userdir, wchar_t* widePath, size_t wsize)
 #else
 static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* widePath, size_t wsize)
@@ -144,7 +144,7 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 
 	char buffer[PATH_MAX + 1];
 
-#if platBuild == BUILD_CLIENT && platOS == OS_WIN32
+#if platBuild == BUILD_CLIENT
 	if(userdir)
 	{
 		// no bounds checking here, nice
@@ -152,14 +152,22 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 
 		if(WWII::ConvertChars(buffer, widePath, wsize))
 		{
+#if platOS == OS_WIN
 			struct _stat64i32 wStatBuffer;
 
 			retval = _wstat(os_file_path(widePath), &wStatBuffer);
-
-			if (retval == 0)
-			{
-				return wStatBuffer.st_size; // Return what the OS thinks it is
-			}
+            if (retval == 0)
+            {
+                return wStatBuffer.st_size; // Return what the OS thinks it is
+            }
+#else
+            struct stat statBuffer;
+            retval = stat(os_file_path(buffer), &statBuffer);
+            if (retval == 0)
+            {
+                return statBuffer.st_size; // Return what the OS thinks it is
+            }
+#endif
 		}
 	// Else fall through normally
 	}

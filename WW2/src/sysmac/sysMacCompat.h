@@ -47,6 +47,7 @@ extern void PostModalErrorDialog(const char *title, const char *message);
 
 extern void chAppDir();
 extern const char *macPreferencesPath();
+extern const char *macDocumentsPath();
 
 extern void SetCommandLine(int argc, const char** argv);
 extern const char *GetCommandLine();

@@ -93,6 +93,33 @@ const char* macPreferencesPath()
     return prefsFSR;
 }
 
+const char* macDocumentsPath()
+{
+    static NSURL *docsDir = nil;
+    static const char *docsFSR;
+    static dispatch_once_t predicate = 0;
+    
+    dispatch_once(&predicate, ^ {
+        @autoreleasepool {
+            // FIXME: This is a hack to use the prefs directory. Whether this
+            // actually belongs there is debatable. Consider Application Support or
+            // even Documents instead.
+            docsDir = [[NSFileManager defaultManager]
+                        URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nullptr];
+            docsDir = [docsDir URLByAppendingPathComponent:@"Battleground Europe"];
+            
+            // We're giving the prefs folder the permissions it would otherwise have
+            // gotten by default here. Would 0750 or 0700 be a better choice?
+            [[NSFileManager defaultManager] createDirectoryAtURL:docsDir withIntermediateDirectories:YES attributes:@{
+                                                                                                                       NSFilePosixPermissions: @(0755)
+                                                                                                                       } error:nullptr];
+            docsFSR = strdup(docsDir.fileSystemRepresentation);
+        }
+    });
+    
+    return docsFSR;
+}
+
 static char *cmdLine = nullptr;
 
 void SetCommandLine(int argc, const char** argv)
