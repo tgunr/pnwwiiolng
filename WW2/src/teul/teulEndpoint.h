@@ -24,6 +24,10 @@ namespace Teul
 
 namespace Teul
 {
+#if platBuild == BUILD_SERVER
+        static const size_t MaxConnections = 6000;
+        static const size_t MaxClusterUsers = 5000;
+#else
 #if !defined(MULTI_CLIENT)
 	// Number of users to support per client (cluster is the host term)
 	static const size_t MaxClusterUsers = 8;
@@ -36,6 +40,7 @@ namespace Teul
 	// How many endpoints teulKit reserve, also limits the
 	// number of concurrent connections.
 	static const size_t	MaxConnections = MaxClusterUsers * 3 + (MaxClusterUsers / 4);
+#endif
 #endif
 }
 

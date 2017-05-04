@@ -352,7 +352,7 @@ _recvDirectSpawn(ACTION_OBJECT* const a)
 		return -EINVAL;
 	}
 
-#ifdef PUBLIC_RELEASE
+#if !defined(BETA_RELEASE) && !defined(DEV_BUILD)
 	if ( !player.isPlaynet() && player.instance().isCampaign() )
 	{
 		player.log(_FLA, "non-playnet persona requesting direct spawn in campaign instance");
