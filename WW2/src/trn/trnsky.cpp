@@ -245,7 +245,7 @@ void trnskyInitSkyBox()
 
             if(!oglIsTexture(skyboxtexture, 0))
             {
-                Write_Debug("Creating skybox texture failed");
+                WriteDebug("Creating skybox texture failed");
                 return;
             }
 
@@ -499,20 +499,20 @@ LOGICAL trnskyInit(const SINT8* name, SINT32 mesh, FLOAT32 scale)
 	// now init the sun objects
 	if(!obmgrCreateModelInstance("sunglare1"))
 	{
-		Write_Debug("Can't find sunglare1.flt object!");
+		WriteDebug("Can't find sunglare1.flt object!");
 		return(FALSE);
 	}
 
 	sundisk = obmainFindNamedObject("sunglare1");
 	if (sundisk == nullptr)
 	{
-		Write_Debug("Can't find sunglare1.flt object!");
+		WriteDebug("Can't find sunglare1.flt object!");
 		return(FALSE);
 	}
 
 	if (sundisk->child == nullptr)
 	{
-		Write_Debug("no child object in sunglare1.flt object!");
+		WriteDebug("no child object in sunglare1.flt object!");
 		return(FALSE);
 	}
 
@@ -530,20 +530,20 @@ LOGICAL trnskyInit(const SINT8* name, SINT32 mesh, FLOAT32 scale)
 	// now init the moon objects
 	if(!obmgrCreateModelInstance("fullmoon1"))
 	{
-		Write_Debug("Can't find fullmoon1.flt object!");
+		WriteDebug("Can't find fullmoon1.flt object!");
 		return(FALSE);
 	}
 
 	moondisk = obmainFindNamedObject("fullmoon1");
 	if (moondisk == nullptr)
 	{
-		Write_Debug("Can't find fullmoon1.flt object!");
+		WriteDebug("Can't find fullmoon1.flt object!");
 		return(FALSE);
 	}
 
 	if (moondisk->child == nullptr)
 	{
-		Write_Debug("no child object in fullmoon1.flt object!");
+		WriteDebug("no child object in fullmoon1.flt object!");
 		return(FALSE);
 	}
 

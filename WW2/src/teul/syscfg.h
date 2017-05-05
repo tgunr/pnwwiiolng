@@ -22,7 +22,7 @@
 #include "teul/teulPacket.h"
 #include "weap/weapSpec.h"
 
-#define Write_Debug(...)
+#define WriteDebug(...)
 
 namespace Teul
 {

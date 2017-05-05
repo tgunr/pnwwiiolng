@@ -277,7 +277,7 @@ void TextureCubeMap::copyTexSubImageCubeMap(int face, int xoffset, int yoffset, 
         if (!textureObject)
         {
             // failed to create texture object
-            Write_Log(LOG_OLD, LOG_INFO, "Warning : failed to create TextureCubeMap texture obeject");
+            WriteLog(LOG_OLD, LOG_INFO, "Warning : failed to create TextureCubeMap texture obeject");
             return;
         }
 
@@ -301,7 +301,7 @@ void TextureCubeMap::copyTexSubImageCubeMap(int face, int xoffset, int yoffset, 
             if (!hardwareMipMapOn)
             {
                 // have to switch off mip mapping
-                Write_Log(LOG_OLD, LOG_INFO, "Warning: TextureCubeMap::copyTexImage2D(,,,,) switch off mip mapping as hardware support not available.");
+                WriteLog(LOG_OLD, LOG_INFO, "Warning: TextureCubeMap::copyTexImage2D(,,,,) switch off mip mapping as hardware support not available.");
                 _min_filter = LINEAR;
             }
         }

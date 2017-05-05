@@ -774,7 +774,7 @@ UINT32 mlReadVehicleFile(mlVehicleData * VehicleData,
 	VehicleFile = fioOpen((char*)UseFileName);
 	if (VehicleFile < 0)
   {
-    Write_Debug("Failed to load vehicle file %s\n",UseFileName);
+    WriteLog(LOG_FIO,LOG_DEBUG,"Failed to load vehicle file %s\n",UseFileName);
 		return 1;
   }
 
@@ -800,7 +800,7 @@ UINT32 mlReadVehicleFile(mlVehicleData * VehicleData,
 
 		if (VarNum == ML_VARNAME_NOVAR)
 		{
-			Write_Debug("Unidentified variable %s in file %s\n",VarName, FileName);
+			WriteLog(LOG_FIO,LOG_DEBUG,"Unidentified variable %s in file %s\n",VarName, FileName);
 			continue;
 		}
 
@@ -974,7 +974,7 @@ UINT32 mlReadVehicleFile(mlVehicleData * VehicleData,
 				VehicleData->DynamicFrictionMod = (FLOAT32)atof((char*)VarContents);
 				break;
 			default:
-				Write_Debug("Unidentified variable %s in file %s",VarName,UseFileName);
+				WriteLog(LOG_FIO,LOG_DEBUG,"Unidentified variable %s in file %s",VarName,UseFileName);
 				break;
 		}
 
@@ -1290,7 +1290,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 	{
 		DeltaTime = 0.0;
 		VehicleData->LastVehicleUpdateTime = frametime;
-		Write_Debug("Deltatime in modelling loop was negative!!!");
+		WriteLog(LOG_FIO,LOG_DEBUG,"Deltatime in modelling loop was negative!!!");
 	}
 
 	NumTics = (UINT32)(DeltaTime / _MS_PER_TIC);
@@ -1300,7 +1300,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 		DeltaTime = _MAX_TICS * _MS_PER_TIC;
 		VehicleData->LastVehicleUpdateTime = (SINT32)((FLOAT64)frametime - DeltaTime);
 
-		Write_Debug("Number of modelling loop tics exceeded %d for one frame",_MAX_TICS);
+		WriteLog(LOG_FIO,LOG_DEBUG,"Number of modelling loop tics exceeded %d for one frame",_MAX_TICS);
 	}
 
 	TicTime = (SINT32)_MS_PER_TIC;
@@ -3964,7 +3964,7 @@ static UINT32 _UpdateCrew(mlComponent * Component,mlVehicleData * VehicleData)
 	UINT32 CrewPosition = Component->CrewPosition;
 	if(CrewPosition >= ML_MAX_CREW_POSITIONS)
 	{
-		Write_Log(LOG_WEAP, LOG_WARN, "_UpdateCrew: Invalid Crew Position! %d", CrewPosition+1);
+		WriteLog(LOG_WEAPON, LOG_WARN, "_UpdateCrew: Invalid Crew Position! %d", CrewPosition+1);
 		return 0;
 	}
 
@@ -5898,7 +5898,7 @@ if(VehicleObjectAnalysis && DisplayCollideLines && IsFirstTic) // Vehicle line c
 
 		if(ColObj == nullptr)
 		{
-			Write_Log(LOG_VEHICLE, LOG_WARN, "mlCheckSpecificObjectForLineCollision1: Null collide object!");
+			WriteLog(LOG_VEHICLE, LOG_WARN, "mlCheckSpecificObjectForLineCollision1: Null collide object!");
 			return 0;
 		}
 
@@ -6685,7 +6685,7 @@ UINT32 _ReadBumpAndFrictionTable()
 		FileNum = fioOpen("vehicles\\ground.txt");
 		if (FileNum < 0)
 		{
-			Write_Debug("Can't find ground modelling data file vehicles\\ground.txt");
+			WriteLog(LOG_FIO,LOG_DEBUG,"Can't find ground modelling data file vehicles\\ground.txt");
 			return 1;
 		}
 	}
@@ -6894,7 +6894,7 @@ UINT32 _ReadBumpAndFrictionTable()
 		if(_BAFData[Position].GroundClutterDensity > 4)
 		{
 			_BAFData[Position].GroundClutterDensity = 4;
-			Write_Log(LOG_VEHICLE, LOG_TERRAIN, "Do not set GroundClutterDensity > 4");
+			WriteLog(LOG_VEHICLE, LOG_TERRAIN, "Do not set GroundClutterDensity > 4");
 		}
 		if(_BAFData[Position].GroundClutterDensity < 1)
 		{
@@ -7533,13 +7533,13 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		physicsSetWorldOffset(offset);
 	}
 
-	Write_Debug("Pos x=%lf, y=%lf, z=%lf", Pos.x, Pos.y, Pos.z);
+	WriteLog(LOG_FIO,LOG_DEBUG,"Pos x=%lf, y=%lf, z=%lf", Pos.x, Pos.y, Pos.z);
 
 	TempPos.x = -(FLOAT32)(Pos.x - WorldOffsetOrigin.x);
 	TempPos.y = -(FLOAT32)(Pos.y - WorldOffsetOrigin.y);
 	TempPos.z = -(FLOAT32)(Pos.z - WorldOffsetOrigin.z);
 
-	Write_Debug("TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
+	WriteLog(LOG_FIO,LOG_DEBUG,"TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
 	trnCheckAndAdjustCameraPositionWithOriginOffset(&TempPos);
 
 	// move the world origin offset if necessary
@@ -7574,7 +7574,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 	TempPos.y = -(FLOAT32)(Pos.y - WorldOffsetOrigin.y);
 	TempPos.z = -(FLOAT32)(Pos.z - WorldOffsetOrigin.z);
 
-	Write_Debug("TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
+	WriteLog(LOG_FIO,LOG_DEBUG,"TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
 	trnCheckAndAdjustCameraPositionWithOriginOffset(&TempPos);
 
 	trnUpdateTerrainOriginOffset(FALSE); // 2nd call forces terrain to load
@@ -7612,7 +7612,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 	TempPos.y = -(FLOAT32)(Pos.y - WorldOffsetOrigin.y);
 	TempPos.z = -(FLOAT32)(Pos.z - WorldOffsetOrigin.z);
 
-	Write_Debug("TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
+	WriteLog(LOG_FIO,LOG_DEBUG,"TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
 	trnCheckAndAdjustCameraPositionWithOriginOffset(&TempPos);
 
 	trnUpdateTerrainOriginOffset(FALSE);
@@ -7654,7 +7654,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 	TempPos.y = -(FLOAT32)(Pos.y - WorldOffsetOrigin.y);
 	TempPos.z = -(FLOAT32)(Pos.z - WorldOffsetOrigin.z);
 
-	Write_Debug("TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
+	WriteLog(LOG_FIO,LOG_DEBUG,"TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
 	trnCheckAndAdjustCameraPositionWithOriginOffset(&TempPos);
 
 	trnUpdateTerrainOriginOffset(FALSE);
@@ -7671,7 +7671,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 
     trnGetWorldOriginOffset(&WorldOffsetOrigin);
 
-	Write_Debug("mlResetVehiclePos is trying to spawn at: scx=%d, scy=%d, id=%d, num=%d",
+	WriteLog(LOG_FIO,LOG_DEBUG,"mlResetVehiclePos is trying to spawn at: scx=%d, scy=%d, id=%d, num=%d",
 					SpawnSuperCellX, SpawnSuperCellY, SpawnLocId, SpawnNumber);
 
 	if(!MobileSpawn && !SpecialOverride)
@@ -7681,7 +7681,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 #endif
 		if (SpawnNumber == 0)
 		{
-			Write_Debug("INVALID SPAWN NUMBER!!!!!!!!");
+			WriteLog(LOG_FIO,LOG_DEBUG,"INVALID SPAWN NUMBER!!!!!!!!");
 			SpawnNumber = 1;
 		}
 
@@ -7745,8 +7745,8 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 	}
 	AttMat._41 = AttMat._42 = AttMat._43 = 0.0f;
 
-	Write_Debug("Spawning': scx=%d, scy=%d, id=%d, num=%d", SpawnSuperCellX, SpawnSuperCellY, SpawnLocId, SpawnNumber);
-	Write_Debug("Spawn Position: x=%lf, y=%lf, z=%lf", Pos.x, Pos.y, Pos.z);
+	WriteLog(LOG_FIO,LOG_DEBUG,"Spawning': scx=%d, scy=%d, id=%d, num=%d", SpawnSuperCellX, SpawnSuperCellY, SpawnLocId, SpawnNumber);
+	WriteLog(LOG_FIO,LOG_DEBUG,"Spawn Position: x=%lf, y=%lf, z=%lf", Pos.x, Pos.y, Pos.z);
 
 	_TunnelResetVehiclePos(VehicleData,Pos.z);
 	VehicleData->VehiclePos.x = Pos.x;
@@ -8595,7 +8595,7 @@ static UINT32 _DoODEVehicleCollision(mlVehicleData* VehicleData, FLOAT64 DeltaTi
 
 UINT32 mlSetSpawnStuff(SINT32 SpawnCellX,SINT32 SpawnCellY,SINT32 SpawnId,UINT32 SpawnNum)
 {
-	Write_Debug("SetSpawnStuff called, scx = %d, scy = %d, sid = %d, n = %d",
+	WriteLog(LOG_FIO,LOG_DEBUG,"SetSpawnStuff called, scx = %d, scy = %d, sid = %d, n = %d",
 					SpawnCellX, SpawnCellY, SpawnId, SpawnNum);
 	MobileSpawn = FALSE;
 	SpawnSuperCellX = SpawnCellX;
@@ -8671,7 +8671,7 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 		{
 			if (Position == -1)
 			{
-				Write_Debug("Attempted to specify a weapon grouping message before a position has been specified");
+				WriteLog(LOG_FIO,LOG_DEBUG,"Attempted to specify a weapon grouping message before a position has been specified");
 				continue;
 			}
 
@@ -8680,7 +8680,7 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 
 			if (VarContents == nullptr)
 			{
-				Write_Debug("Weapon grouping message has no parameters");
+				WriteLog(LOG_FIO,LOG_DEBUG,"Weapon grouping message has no parameters");
 				continue;
 			}
 
@@ -8689,7 +8689,7 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 
 			if (VarContents == nullptr)
 			{
-				Write_Debug("Weapon grouping message has insufficient parameters");
+				WriteLog(LOG_FIO,LOG_DEBUG,"Weapon grouping message has insufficient parameters");
 				continue;
 			}
 
@@ -8697,7 +8697,7 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 
 			if (TempNum >= ML_MAX_WEAPON_GROUPINGS)
 			{
-				Write_Debug("Weapon grouping message has invalid weapon group number");
+				WriteLog(LOG_FIO,LOG_DEBUG,"Weapon grouping message has invalid weapon group number");
 				continue;
 			}
 

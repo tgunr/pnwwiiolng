@@ -290,7 +290,7 @@ weapAssociateIndex(const char* objName, UINT32 localIndex)
 	if ( weapon == nullptr )
 	{
 #if platBuild == BUILD_CLIENT
-		Write_Debug("weapon %s not defined li:%u", weapName, localIndex);
+		WriteLog(LOG_WEAPON, LOG_DEBUG, "weapon %s not defined li:%u", weapName, localIndex);
 		return NULL_WEAP_SPEC;
 #else
 		LogAbort("weap:%s li:%u no weapon to associate with", weapName, localIndex);
@@ -326,7 +326,7 @@ bool weapListInit(const char* theaterPath)
 #endif
 	if ( ! weapParseCountry(importFile))
 	{
-		dbugLog(_FLA, "couldnt parse countries file (%s)", importFile);
+		WriteLog(LOG_WEAPON, LOG_ABORT, "couldnt parse countries file (%s)", importFile);
 		return false;
 	}
 
@@ -337,7 +337,7 @@ bool weapListInit(const char* theaterPath)
 #endif
 	if ( ! weapParseClasses(importFile))
 	{
-		dbugLog(_FLA, "couldnt parse class file (%s)", importFile);
+		WriteLog(LOG_WEAPON, LOG_ABORT, "couldnt parse class file (%s)", importFile);
 		return false;
 	}
 
@@ -354,7 +354,7 @@ bool weapListInit(const char* theaterPath)
 
 			if (!weapParseWeapons(importFile,country,category) && category != _MUNITIONS )
 			{
-				dbugLog(_FLA,"couldn't parse %u.%u weapons file (%s)", country, category, importFile);
+				WriteLog(LOG_WEAPON, LOG_ABORT,"couldn't parse %u.%u weapons file (%s)", country, category, importFile);
 #ifndef LIVE_DANGEROUS
 				return false;
 #endif
@@ -373,7 +373,7 @@ bool weapListInit(const char* theaterPath)
 					, theaterPath, Parse::countryCode[weaponCountry[country].code], wwii_category[category], "spawn.csv");
 			if ( ! weapParseSpawn(importFile, country, category) && category != _MUNITIONS )
 			{
-				dbugLog(_FLA,"couldn't parse spawn file for %s",importFile);
+				WriteLog(LOG_WEAPON, LOG_ABORT,"couldn't parse spawn file for %s",importFile);
 #ifndef LIVE_DANGEROUS
 				return false;
 #endif

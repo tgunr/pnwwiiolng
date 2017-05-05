@@ -88,6 +88,8 @@ static GVAR vars[] = {
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
     STRING_KEY_DEF("datadir", DataPath),
+    STRING_KEY_DEF("logmask", gLogMask),
+    UINT_KEY_DEF("loglevel", gLogLevel),
 #ifdef DEBUG_WW2
     NULL_KEY_DEF("buildmdlonly", DebugBuildingMDLFilesOnly),
 #endif
@@ -141,7 +143,7 @@ LOGICAL mngoptParse(char* InputLine)
         auto foundCmd = std::find_if(&vars[0], &vars[sizeof(vars) / sizeof(GVAR)], [c = cmd.substr(1)] (const GVAR &k) { return k.key && k.key == c; });
 
         if (foundCmd == &vars[sizeof(vars) / sizeof(GVAR)]) {
-			Write_Debug("Unknown switch: '%s', '%s'", cmd.c_str(), value.c_str());
+			WriteLog(LOG_OLD, LOG_DEBUG, "Unknown switch: '%s', '%s'", cmd.c_str(), value.c_str());
             continue;
         }
         switch (foundCmd->ktype) {
@@ -155,7 +157,7 @@ LOGICAL mngoptParse(char* InputLine)
                 } else if (value == "1" || value == "true") {
                     *(foundCmd->valuePtr.logicalValue) = true;
                 } else {
-                    Write_Debug("Invalid boolean switch '%s', '%s'", cmd.c_str(), value.c_str());
+                    WriteLog(LOG_OLD, LOG_DEBUG, "Invalid boolean switch '%s', '%s'", cmd.c_str(), value.c_str());
                 }
                 break;
             case EINT:

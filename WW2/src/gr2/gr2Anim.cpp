@@ -53,6 +53,7 @@
 
 #define STOWED_WEAPON_POSITION 0
 #define STOWED_WEAPON_ATTACH "StowedAttach"
+//#define GR2ANIM_DEBUG
 
 // distance over which we don't get gravy features (idles, tps sounds, etc)
 #define POLISH_VERY_NEAR 10.0f
@@ -694,7 +695,8 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 
 	if (!gr2PlayBlendedAnimation (newModel->skeleton, fpTPSBasePose))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Failed to play base pose blend!");
+#ifdef GR2ANIM_DEBUG		WriteLog (LOG_FPS, LOG_INFO, "Failed to play base pose blend!");
+#endif
 	}
 
 //	gr2BlendControlEaseIn (newModel->skeleton, fpTPSAnimLib[TPS_POSETYPE_STAND][TPS_MOVETYPE_IDLE][TPS_WEAPONTYPE_EMPTY][TPS_POINTTYPE_RELAXED], 0.0);
@@ -790,7 +792,7 @@ static void gr2AnimStartBlendedAnimation (gr2AnimTrooper* model, gr2AnimationBle
 {
 	if (!gr2PlayBlendedAnimationFull (model->skeleton, blend, easeInTime, easeOutTime, allowResurrect))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Failed to play blend!");
+		WriteLog (LOG_FPS, LOG_INFO, "Failed to play blend!");
 	}
 
 	if (model->animationOffsetPercent > 0.0f)
@@ -909,7 +911,7 @@ LOGICAL gr2AnimUpdateModel (OBJECT* pObject, LOGICAL isFPS)
 				model->modelSpeed = 1.0f;
 		}
 
-//		Write_Log (LOG_FPS, LOG_INFO, "Speeds = %f / %f ->>>> %f", playerSpeed, baseSpeed, model->modelSpeed);
+//		WriteLog (LOG_FPS, LOG_INFO, "Speeds = %f / %f ->>>> %f", playerSpeed, baseSpeed, model->modelSpeed);
 	}
 
 	if(model->currentPose == TPS_POSETYPE_PRONE && model->modelSpeed >= 1.4f)
@@ -975,7 +977,7 @@ LOGICAL gr2AnimUpdateModel (OBJECT* pObject, LOGICAL isFPS)
 		*/
 
 		//uiChatPrintLine("Turrets: %f %f : %f %f", pVehicleData->TurretElevate[2], pVehicleData->TurretTraverse[2], model->rectUpDownWeight, model->rectLeftRightWeight);
-//		Write_Log (LOG_FPS, LOG_INFO, "%f %f : %f %f", pVehicleData->TurretElevate[1], pVehicleData->TurretTraverse[1], model->rectUpDownWeight, model->rectLeftRightWeight);
+//		WriteLog (LOG_FPS, LOG_INFO, "%f %f : %f %f", pVehicleData->TurretElevate[1], pVehicleData->TurretTraverse[1], model->rectUpDownWeight, model->rectLeftRightWeight);
 	}
 	else
 	{
@@ -1154,7 +1156,7 @@ LOGICAL gr2AnimUpdateModel (OBJECT* pObject, LOGICAL isFPS)
 					FLOAT32 weightDL = (1.0f - model->rectUpDownWeight) * (1.0f - model->rectLeftRightWeight);
 					FLOAT32 weightDR = (1.0f - model->rectUpDownWeight) * (model->rectLeftRightWeight);
 
-					// Write_Log (LOG_FPS, LOG_INFO, "%f %f : %f %f %f %f", model->rectUpDownWeight, model->rectLeftRightWeight, weightUL, weightUR, weightDL, weightDR);
+					// WriteLog (LOG_FPS, LOG_INFO, "%f %f : %f %f %f %f", model->rectUpDownWeight, model->rectLeftRightWeight, weightUL, weightUR, weightDL, weightDR);
 
 					gr2BlendControlSetWeight(model->skeleton, blend, weightUL, weightUR, weightDL, weightDR);
 
@@ -1335,25 +1337,25 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 
 	if((pose < 0) || (pose >= TPS_POSETYPE_NUM_TYPES))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Pose out of bounds %d!", pose);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Pose out of bounds %d!", pose);
 		return TRUE;
 	}
 
 	if((move < 0) || (move >= TPS_MOVETYPE_NUM_TYPES))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Movement out of bounds %d!", move);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Movement out of bounds %d!", move);
 		return TRUE;
 	}
 
 	if((point < 0) || (point >= TPS_POINTTYPE_NUM_TYPES))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Point out of bounds %d!", point);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Point out of bounds %d!", point);
 		return TRUE;
 	}
 
 	if((currentWeapon < 0) || (currentWeapon >= MAX_NUM_FPS_WEAPONS))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Weapon out of bounds %d!", currentWeapon);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Weapon out of bounds %d!", currentWeapon);
 		return TRUE;
 	}
 
@@ -1709,7 +1711,7 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 					}
 					else
 					{
-						Write_Log (LOG_FPS, LOG_INFO, "Failed to play death blend %d (%s)!", TPS_DEATH_PARA, fpTPSDeathFiles[TPS_POSETYPE_STAND][TPS_DEATH_PARA]);
+						WriteLog (LOG_FPS, LOG_INFO, "Failed to play death blend %d (%s)!", TPS_DEATH_PARA, fpTPSDeathFiles[TPS_POSETYPE_STAND][TPS_DEATH_PARA]);
 					}
 				}
 			}
@@ -1947,7 +1949,7 @@ LOGICAL gr2AnimGetBoneMatrix (struct OBJECT* pObject, piMATRIX* pMatrix, const c
 
 	if (!weapModel)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimGetBoneMatrix: Null weapon model");
+		WriteLog (LOG_FPS, LOG_INFO, "gr2AnimGetBoneMatrix: Null weapon model");
 		return FALSE;
 	}
 
@@ -1955,7 +1957,7 @@ LOGICAL gr2AnimGetBoneMatrix (struct OBJECT* pObject, piMATRIX* pMatrix, const c
 
 	if(!fireFind)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimGetBoneMatrix: Failed to find %s bone, using IdentityMatrix!", bone);
+		WriteLog (LOG_FPS, LOG_INFO, "gr2AnimGetBoneMatrix: Failed to find %s bone, using IdentityMatrix!", bone);
 		*pMatrix = IdentityMatrix;
 	}
 
@@ -2219,7 +2221,7 @@ LOGICAL gr2AnimGetEjectPointMatrix (OBJECT* pObject, piMATRIX* pMatrix, bool vis
 
 	if (!weapModel)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimGetEjectPointMatrix: Null weapon model");
+		WriteLog (LOG_FPS, LOG_INFO, "gr2AnimGetEjectPointMatrix: Null weapon model");
 		return FALSE;
 	}
 
@@ -2933,14 +2935,15 @@ LOGICAL gr2AnimInit()
 	helmet1 = gr2Model::Load("TPS\\meshes\\british_inf\\Kit_UK_Helmet_LOD1", nullptr, nullptr, 1);
 	helmet2 = gr2Model::Load("TPS\\meshes\\german_inf\\Kit_DE_Helmet_LOD1", nullptr, nullptr, 1);
 	*/
-
-	Write_Log (LOG_FPS, LOG_INFO, "Total bits used = %d",
+#ifdef GR2ANIM_DEBUG
+	WriteLog (LOG_FPS, LOG_INFO, "Total bits used = %d",
 		gr2AnimWeapBits + gr2AnimPoseBits + gr2AnimMoveBits + gr2AnimPointBits + gr2AnimHeadBits + gr2AnimDeathBits + gr2AnimAltWeapBits + gr2AnimParachuteBits + gr2AnimStateBits); // gr2AnimEmoteBits
+#endif
 
 	rnlogoUpdateStatus("loading.animations.fx");
     if(!fpFPSfxInit())
     {
-        Write_Debug("[gr2AnimInit] fpFPSfxInit FAILED!");
+        WriteDebug("[gr2AnimInit] fpFPSfxInit FAILED!");
         return FALSE;
     }
 
@@ -2995,8 +2998,9 @@ void gr2AnimKill()
 	fpTPSKitsKill();
 
     animInited = FALSE;
-
-    Write_Log(LOG_OLD, LOG_INFO, "[gr2AnimKill]");
+#ifdef GR2ANIM_DEBUG
+    WriteLog(LOG_OLD, LOG_INFO, "[gr2AnimKill]");
+#endif
 }
 
 void _freemodel(gr2AnimTrooper* model)
@@ -4086,7 +4090,7 @@ extern LOGICAL gr2AnimInitShadow (OBJECT* pObject)
 
 	if (pShadowObject == nullptr)
 	{
-		Write_Debug("Shadow object not found for troops");
+		WriteDebug("Shadow object not found for troops");
 		// no shadow, no error
 		return TRUE;
 	}
@@ -4357,7 +4361,7 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 	// the weapon provided is the weapon # in the weapon array .. we need to translate this to a real weapon ID
 	if ((weapon < 0) || (weapon > MAX_NUM_FPS_WEAPONS))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Weapon out of bounds! %d", weapon);
+		WriteLog (LOG_FPS, LOG_INFO, "Weapon out of bounds! %d", weapon);
 		// for live this shouldn't be a CTD .. just set to weapon 0 (weapon 0 will always be a valid weapon)
 #ifdef BETA_RELEASE
 		piExitProgram (_FL, "Weapon out of bounds in animation flags");
@@ -4374,7 +4378,8 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 		{
 			strprintf(tempStr, "%s, %s, %s, %d, %d, %d, %d", fpTPSPoseTypeStrings[pose], fpTPSMoveTypeStrings[move], fpTPSPointTypeStrings[point], weapon, death, emote, altWeapon);
 //			rnmainListText (tempStr);
-			Write_Log (LOG_FPS, LOG_INFO, tempStr);
+#ifdef GR2ANIM_DEBUG			WriteLog (LOG_FPS, LOG_INFO, tempStr);
+#endif
 		}
 	}
 #endif	// BETA_RELEASE
@@ -4491,7 +4496,7 @@ void gr2AnimHandleEmotes(gr2AnimTrooper* model)
 				{
 					if (!gr2PlayBlendedAnimation (model->skeleton, emoteAnim))
 					{
-						Write_Log (LOG_FPS, LOG_INFO, "Failed to play body emote blend %d (%s)!", emoteID-TPS_COMBATEMOTE_NUM_TYPES-1, fpTPSBodyEmoteFiles[emoteID-TPS_COMBATEMOTE_NUM_TYPES-1]);
+						WriteLog (LOG_FPS, LOG_INFO, "Failed to play body emote blend %d (%s)!", emoteID-TPS_COMBATEMOTE_NUM_TYPES-1, fpTPSBodyEmoteFiles[emoteID-TPS_COMBATEMOTE_NUM_TYPES-1]);
 					}
 
 					gr2BlendControlSetEaseInDuration (model->skeleton, emoteAnim, 0.4f);
@@ -4585,7 +4590,7 @@ void gr2AnimHandleEmotes(gr2AnimTrooper* model)
 				{
 					if (!gr2PlayBlendedAnimation (model->skeleton, emoteAnim))
 					{
-						Write_Log (LOG_FPS, LOG_INFO, "Failed to play combat emote blend %d (%s)!", emoteID-1, fpTPSCombatEmoteFiles[emoteID-1][handedness][mixinPose]);
+						WriteLog (LOG_FPS, LOG_INFO, "Failed to play combat emote blend %d (%s)!", emoteID-1, fpTPSCombatEmoteFiles[emoteID-1][handedness][mixinPose]);
 					}
 					gr2BlendControlSetEaseInDuration (model->skeleton, emoteAnim, 1.0f);
 					gr2BlendControlSetEaseOutDuration (model->skeleton, emoteAnim, 1.0f);
@@ -5234,7 +5239,7 @@ void gr2AnimAddTwitch (OBJECT* pObject)
 
 		if (!gr2PlayBlendedAnimation (model->skeleton, twitchBlend))
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "Failed to play twitch blend %d %d!", usePose, twitchNum);
+			WriteLog (LOG_FPS, LOG_INFO, "Failed to play twitch blend %d %d!", usePose, twitchNum);
 		}
 		gr2BlendControlSetLoopCount (model->skeleton, twitchBlend, 10);
 		gr2BlendControlSetEaseInDuration (model->skeleton, twitchBlend, 1.0f/6.0f);
@@ -5536,12 +5541,13 @@ void gr2PlayFootstepSound(OBJECT* pObject, gr2Model* model, SINT32 eventID)
 				if(ID > 0) fxSndSetVolume(ID, 1.5f);
             }
 		}
-
-		Write_Log (LOG_FPS, LOG_INFO, "gr2PlayFootstepSound: Event %d, Surface %d, Sound >%s<", eventID, model->surfaceID, soundName);
+#ifdef GR2ANIM_DEBUG
+		WriteLog (LOG_FPS, LOG_INFO, "gr2PlayFootstepSound: Event %d, Surface %d, Sound >%s<", eventID, model->surfaceID, soundName);
+#endif
 	}
 	else
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2PlayFootstepSound: No surface underfoot, possible fall");
+		WriteLog (LOG_FPS, LOG_INFO, "gr2PlayFootstepSound: No surface underfoot, possible fall");
 	}
 }
 
@@ -5658,7 +5664,8 @@ void gr2AnimHandleEvent(OBJECT* pObject, gr2Model* model, SINT32 eventID)
 
 void gr2AnimExecuteEvent(OBJECT* pObject, gr2Model* model, SINT32 typeID, const char* data)
 {
-	Write_Log (LOG_FPS, LOG_INFO, "gr2AnimExecuteEvent: %d", typeID);
+#ifdef GR2ANIM_DEBUG	WriteLog (LOG_FPS, LOG_INFO, "gr2AnimExecuteEvent: %d", typeID);
+#endif
 
 	switch(typeID)
 	{
@@ -5681,7 +5688,7 @@ void gr2AnimExecuteEvent(OBJECT* pObject, gr2Model* model, SINT32 typeID, const 
 			gr2SetModelActive(model, true);
 			break;
 		default:
-			Write_Log (LOG_FPS, LOG_INFO, "gr2AnimExecuteEvent: Unknown event type %d", typeID);
+			WriteLog (LOG_FPS, LOG_INFO, "gr2AnimExecuteEvent: Unknown event type %d", typeID);
 			return;
 	}
 }
@@ -5745,7 +5752,7 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 
 		if (surfID < 0)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "WARNING: Failed to correctly identify surface for footstep, using default");
+			WriteLog (LOG_FPS, LOG_INFO, "WARNING: Failed to correctly identify surface for footstep, using default");
 		}
 
 		if (retval != 0)
@@ -5758,14 +5765,14 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 			if (strlen(pObject->texname) == 0)
 			{
 				if (strlen(pObject->matname) != 0)
-					Write_Log (LOG_FPS, LOG_INFO, "Troop foot on material <%s>, surface ID <%d>", pObject->matname, surfID);
+					WriteLog (LOG_FPS, LOG_INFO, "Troop foot on material <%s>, surface ID <%d>", pObject->matname, surfID);
 			}
 			else
 			{
 				if (pObject->texname)
-					Write_Log (LOG_FPS, LOG_INFO, "Troop foot on texture <%s>, surface ID <%d>", pObject->texname, surfID);
+					WriteLog (LOG_FPS, LOG_INFO, "Troop foot on texture <%s>, surface ID <%d>", pObject->texname, surfID);
 				else
-					Write_Log (LOG_FPS, LOG_INFO, "Troop foot on Null texture, surface ID <%d>", surfID);
+					WriteLog (LOG_FPS, LOG_INFO, "Troop foot on Null texture, surface ID <%d>", surfID);
 			}
 		}
 
@@ -6402,27 +6409,27 @@ void gr2AnimDetermineMotionType(gr2AnimTrooper* model, FLOAT64 angle)
 		switch (model->currentMotion)
 		{
 			case TPS_MOTION_F:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_F .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_F .. angle = %lf", angle);
 				uiChatPrintLine("Motion = TPS_MOTION_F .. angle = %lf", angle);
 				break;
 			case TPS_MOTION_RFF:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_RFF .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_RFF .. angle = %lf", angle);
 				uiChatPrintLine("Motion = TPS_MOTION_RFF .. angle = %lf", angle);
 				break;
 			case TPS_MOTION_RFB:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_RFB .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_RFB .. angle = %lf", angle);
 				uiChatPrintLine("Motion = TPS_MOTION_RFB .. angle = %lf", angle);
 				break;
 			case TPS_MOTION_LFF:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_LFF .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_LFF .. angle = %lf", angle);
 				uiChatPrintLine("Motion = TPS_MOTION_LFF .. angle = %lf", angle);
 				break;
 			case TPS_MOTION_LFB:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_LFB .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_LFB .. angle = %lf", angle);
 				uiChatPrintLine("Motion = TPS_MOTION_LFB .. angle = %lf", angle);
 				break;
 			case TPS_MOTION_B:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_B .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_B .. angle = %lf", angle);
 				uiChatPrintLine("Motion = TPS_MOTION_B .. angle = %lf", angle);
 				break;
 		}
@@ -6517,27 +6524,27 @@ void gr2AnimDetermineMotionType3 (gr2AnimTrooper* model, FLOAT64 angle)
 			model->currentMotion = TPS_MOTION_F;
 	}
 
-#define DEBUG_MOTION
+//#define DEBUG_MOTION
 #ifdef DEBUG_MOTION
 		switch (model->currentMotion)
 		{
 			case TPS_MOTION_F:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_F .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_F .. angle = %lf", angle);
 				break;
 			case TPS_MOTION_RFF:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_RFF .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_RFF .. angle = %lf", angle);
 				break;
 			case TPS_MOTION_RFB:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_RFB .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_RFB .. angle = %lf", angle);
 				break;
 			case TPS_MOTION_LFF:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_LFF .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_LFF .. angle = %lf", angle);
 				break;
 			case TPS_MOTION_LFB:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_LFB .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_LFB .. angle = %lf", angle);
 				break;
 			case TPS_MOTION_B:
-				Write_Log (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_B .. angle = %lf", angle);
+				WriteLog (LOG_FPS, LOG_INFO, "Motion = TPS_MOTION_B .. angle = %lf", angle);
 				break;
 		}
 #endif
@@ -6661,7 +6668,7 @@ void gr2AnimTrooperTwists(OBJECT* object,
 	{
 		vel = model->myVehicle->ModelData->VehicleVel;
 		yaw = model->myVehicle->ModelData->VehicleAtt.Yaw;
-		//Write_Log (LOG_FPS, LOG_INFO, "FPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
+		//WriteLog (LOG_FPS, LOG_INFO, "FPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
 
 		yaw = mlRAD_TO_DEG(yaw);
 	}
@@ -6672,7 +6679,7 @@ void gr2AnimTrooperTwists(OBJECT* object,
 		vel.z = -vel.z;
 		yaw = model->myVehicle->PosData.Att.Yaw;
 		yaw = -yaw;
-		//Write_Log (LOG_FPS, LOG_INFO, "TPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
+		//WriteLog (LOG_FPS, LOG_INFO, "TPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
 
 		yaw = mlRAD_TO_DEG(yaw);
 	}
@@ -6704,7 +6711,7 @@ void gr2AnimTrooperTwists(OBJECT* object,
 
 		diff = yaw + theta;
 
-		//Write_Log (LOG_FPS, LOG_INFO, "\nTheta/Yaw = %f / %f ->>>> %f", theta, yaw, diff);
+		//WriteLog (LOG_FPS, LOG_INFO, "\nTheta/Yaw = %f / %f ->>>> %f", theta, yaw, diff);
 
 		FLOAT64 absdiff = fabs(diff);
 		UINT32 divdiff = (UINT32)(absdiff / 90.0f);
@@ -6724,7 +6731,7 @@ void gr2AnimTrooperTwists(OBJECT* object,
 
 		absdiff = fabs(diff);
 
-		//Write_Log (LOG_FPS, LOG_INFO, "Diff/absdiff = %f / %f", diff, absdiff);
+		//WriteLog (LOG_FPS, LOG_INFO, "Diff/absdiff = %f / %f", diff, absdiff);
 
 		fpTPSMotionType lastMotion = model->currentMotion;
 
@@ -8349,7 +8356,7 @@ void gr2AnimTwist::UpdateYaw(vehVehicle* v, FLOAT64 delta)
 			// normalize it
 			gr2NormalizeAngle(vYaw);
 
-			//Write_Log (LOG_FPS, LOG_INFO, "TPS Yaw Pred = %f, Cur = %f, Diff = %f, Move = %f", predictedYaw, currentYaw, diff, move);
+			//WriteLog (LOG_FPS, LOG_INFO, "TPS Yaw Pred = %f, Cur = %f, Diff = %f, Move = %f", predictedYaw, currentYaw, diff, move);
 
 			// set our posdata to the newly smoothed yaw
 			vehicleYaw = mlDEG_TO_RAD(vYaw);
@@ -9300,7 +9307,7 @@ void gr2AnimTwist::Calculate(FLOAT64 delta, gr2AnimTrooper* model)
 	{
 		vel = model->myVehicle->ModelData->VehicleVel;
 		yaw = model->myVehicle->ModelData->VehicleAtt.Yaw;
-		//Write_Log (LOG_FPS, LOG_INFO, "FPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
+		//WriteLog (LOG_FPS, LOG_INFO, "FPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
 
 		yaw = mlRAD_TO_DEG(yaw);
 	}
@@ -9311,7 +9318,7 @@ void gr2AnimTwist::Calculate(FLOAT64 delta, gr2AnimTrooper* model)
 		vel.z = -vel.z;
 		yaw = model->myVehicle->PosData.Att.Yaw;
 		yaw = -yaw;
-		//Write_Log (LOG_FPS, LOG_INFO, "TPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
+		//WriteLog (LOG_FPS, LOG_INFO, "TPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
 
 		yaw = mlRAD_TO_DEG(yaw);
 	}
@@ -9345,7 +9352,7 @@ void gr2AnimTwist::Calculate(FLOAT64 delta, gr2AnimTrooper* model)
 		// in degrees
 		FLOAT64 angle		= yaw + theta;
 
-		//Write_Log (LOG_FPS, LOG_INFO, "\nTheta/Yaw = %f / %f ->>>> %f", theta, yaw, diff);
+		//WriteLog (LOG_FPS, LOG_INFO, "\nTheta/Yaw = %f / %f ->>>> %f", theta, yaw, diff);
 
 		FLOAT64 absAngle	= fabs(angle);
 		UINT32 divAngle		= (UINT32)(absAngle / 90.0f);
@@ -9443,7 +9450,7 @@ void gr2AnimTwist::Calculate2(FLOAT64 delta, gr2AnimTrooper* model)
 	{
 		vel = model->myVehicle->ModelData->VehicleVel;
 		yaw = model->myVehicle->ModelData->VehicleAtt.Yaw;
-		//Write_Log (LOG_FPS, LOG_INFO, "FPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
+		//WriteLog (LOG_FPS, LOG_INFO, "FPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
 
 		yaw = mlRAD_TO_DEG(yaw);
 	}
@@ -9454,7 +9461,7 @@ void gr2AnimTwist::Calculate2(FLOAT64 delta, gr2AnimTrooper* model)
 		vel.z = -vel.z;
 		yaw = model->myVehicle->PosData.Att.Yaw;
 		yaw = -yaw;
-		//Write_Log (LOG_FPS, LOG_INFO, "TPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
+		//WriteLog (LOG_FPS, LOG_INFO, "TPS:  %f %f %f .. %f", vel.x, vel.y, vel.z, mlRAD_TO_DEG(yaw));
 
 		yaw = mlRAD_TO_DEG(yaw);
 	}
@@ -9489,7 +9496,7 @@ void gr2AnimTwist::Calculate2(FLOAT64 delta, gr2AnimTrooper* model)
 
 		diff = yaw + theta;
 
-		//Write_Log (LOG_FPS, LOG_INFO, "\nTheta/Yaw = %f / %f ->>>> %f", theta, yaw, diff);
+		//WriteLog (LOG_FPS, LOG_INFO, "\nTheta/Yaw = %f / %f ->>>> %f", theta, yaw, diff);
 
 		FLOAT64 absdiff = fabs(diff);
 		UINT32 divdiff = (UINT32)(absdiff / 90.0f);

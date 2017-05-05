@@ -34,7 +34,7 @@ UINT32 bitspitch = 0;
 	if ((bi->bmiHeader.biBitCount * bi->bmiHeader.biPlanes) != 8 &&
 	    (bi->bmiHeader.biBitCount * bi->bmiHeader.biPlanes) != 24)
 	{
-    Write_Debug("Invalid BMP image format");
+    WriteDebug("Invalid BMP image format");
     return(-1);
 	}
 
@@ -83,7 +83,7 @@ UINT32 bitspitch = 0;
 
 	if (!piLockTextureMemorySurface(texid, 0, &pisd))
   {
-    Write_Debug("Could not get a lock on the text surface");
+    WriteDebug("Could not get a lock on the text surface");
     piFreeTexture(texid, 0);
     if (bitcount == 8)
     {
@@ -126,14 +126,14 @@ piSURFACEDESC	pisd;
 
 	if (!piLockTextureMemorySurface(texid, miplevel, &pisd))
   {
-    Write_Debug("Could not get a lock on the text surface");
+    WriteDebug("Could not get a lock on the text surface");
     return(FALSE);
   }
 
   /*if (width != (int)pisd.Width ||
       height != (int)pisd.Height)
   {
-    Write_Debug("The alpha file width/height do not match the surface");
+    WriteDebug("The alpha file width/height do not match the surface");
     retval = FALSE;
   }
 	else*/
@@ -258,7 +258,7 @@ UINT32 bitspitch = 0;
 
 	if (bmi->bmiHeader.biBitCount != 8)
 	{
-        Write_Debug("[ldbmpLoadBMPAlphaFileToSurface] **ERROR** %s needs 8 bit count.", Filename);
+        WriteDebug("[ldbmpLoadBMPAlphaFileToSurface] **ERROR** %s needs 8 bit count.", Filename);
 		memFree(bmi);
 		return(FALSE);
 	}
@@ -295,7 +295,7 @@ UINT32 bitspitch = 0;
 	if (retval)
 	{
 #ifdef EVENT_LOG_EXTREME
-		Write_Debug("Alpha channel added to texture %d/%d", texid, miplevel);
+		WriteDebug("Alpha channel added to texture %d/%d", texid, miplevel);
 #endif
 	}
 

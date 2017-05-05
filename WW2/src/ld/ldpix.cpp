@@ -88,9 +88,9 @@ int _loadImageFileToSurface(const char* Filename, UINT32 TransparentColor, UINT3
 	}
 
 	strsafecpy(localname, basename);
-
-    Write_Log(LOG_TEXTURE, LOG_INFO, "[TEXTURE] loading %s", localname);
-
+#ifdef GR2_TEXTURE_DEBUG
+    WriteLog(LOG_TEXTURE, LOG_INFO, "[TEXTURE] loading %s", localname);
+#endif
 	size_t suffixOffset = strprintf(tmpname, "%s.", localname);
 	for (int i=0; GfxFormats[i].Routine; i++)
 	{
@@ -739,7 +739,7 @@ piRGBQUAD PalColor;
     }
   }
 /*
-  Write_Debug("Updated %d alpha values in the output texture", Count);
+  WriteDebug("Updated %d alpha values in the output texture", Count);
 */
   return(TRUE);
 }
@@ -875,7 +875,7 @@ int		red, blue, green, alpha;
 				inptr_16 = (UINT16*)inptr;
 				outptr_16 = (UINT16*)outptr;
 
-//				Write_Debug ("Picking %d, %d", x_index, y_index);
+//				WriteDebug ("Picking %d, %d", x_index, y_index);
 
 				// basic algorithm .. if we have an odd index, subtract, otherwise add
 				if (x_index & 1)	// fast modulo 2
@@ -938,20 +938,20 @@ int			i, j, width, height;
 
 	if (lppisd1 == nullptr || lppisd2 == nullptr)
 	{
-		Write_Debug("Surface's descriptor is nullptr");
+		WriteDebug("Surface's descriptor is nullptr");
 		return(FALSE);
 	}
 
 	if (lppisd1->PixelFormat.dwRGBBitCount != lppisd2->PixelFormat.dwRGBBitCount)
 	{
-		Write_Debug("Surface's bitcounts do not match");
+		WriteDebug("Surface's bitcounts do not match");
 		return(FALSE);
 	}
 
 	if (lppisd1->Width != lppisd2->Width ||
 		lppisd1->Height != lppisd2->Height)
 	{
-		Write_Debug("Surface's dimensions do not match");
+		WriteDebug("Surface's dimensions do not match");
 		return(FALSE);
 	}
 

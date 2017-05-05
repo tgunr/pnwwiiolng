@@ -57,7 +57,7 @@ FBOExtensions::FBOExtensions(unsigned int contextID)
 {
     if(!GLEW_EXT_framebuffer_object)
     {
-        Write_Log(LOG_OLD, LOG_INFO, "!GLEW_EXT_framebuffer_object");
+        WriteLog(LOG_OLD, LOG_INFO, "!GLEW_EXT_framebuffer_object");
         return;
     }
 
@@ -93,23 +93,23 @@ FBOExtensions::FBOExtensions(unsigned int contextID)
         glFramebufferRenderbufferEXT != 0 &&
         glGenerateMipmapEXT != 0;
 
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glBindRenderbufferEXT = %x", glBindRenderbufferEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glDeleteRenderbuffersEXT = %x", glDeleteRenderbuffersEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glGenRenderbuffersEXT = %x", glGenRenderbuffersEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glRenderbufferStorageEXT = %x", glRenderbufferStorageEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glBindFramebufferEXT = %x", glBindFramebufferEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glDeleteFramebuffersEXT = %x", glDeleteFramebuffersEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glGenFramebuffersEXT = %x", glGenFramebuffersEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glCheckFramebufferStatusEXT = %x", glCheckFramebufferStatusEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glFramebufferTexture1DEXT = %x", glFramebufferTexture1DEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glFramebufferTexture2DEXT = %x", glFramebufferTexture2DEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glFramebufferTexture3DEXT = %x", glFramebufferTexture3DEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glFramebufferRenderbufferEXT = %x", glFramebufferRenderbufferEXT);
-    Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glGenerateMipmapEXT = %x", glGenerateMipmapEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glBindRenderbufferEXT = %x", glBindRenderbufferEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glDeleteRenderbuffersEXT = %x", glDeleteRenderbuffersEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glGenRenderbuffersEXT = %x", glGenRenderbuffersEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glRenderbufferStorageEXT = %x", glRenderbufferStorageEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glBindFramebufferEXT = %x", glBindFramebufferEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glDeleteFramebuffersEXT = %x", glDeleteFramebuffersEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glGenFramebuffersEXT = %x", glGenFramebuffersEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glCheckFramebufferStatusEXT = %x", glCheckFramebufferStatusEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glFramebufferTexture1DEXT = %x", glFramebufferTexture1DEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glFramebufferTexture2DEXT = %x", glFramebufferTexture2DEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glFramebufferTexture3DEXT = %x", glFramebufferTexture3DEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glFramebufferRenderbufferEXT = %x", glFramebufferRenderbufferEXT);
+    WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] glGenerateMipmapEXT = %x", glGenerateMipmapEXT);
 
     if(!GLEW_EXT_framebuffer_blit)
     {
-        Write_Log(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] !GLEW_EXT_framebuffer_blit");
+        WriteLog(LOG_OLD, LOG_INFO, "[FBOExtensions::FBOExtensions] !GLEW_EXT_framebuffer_blit");
         return;
     }
 
@@ -764,7 +764,7 @@ void FrameBufferObject::apply(BindTarget target) const
 
     if(_unsupported[contextID])
     {
-        Write_Log(LOG_OLD, LOG_INFO, "Unsupported");
+        WriteLog(LOG_OLD, LOG_INFO, "Unsupported");
         return;
     }
 
@@ -772,7 +772,7 @@ void FrameBufferObject::apply(BindTarget target) const
     if(!ext->isSupported())
     {
         _unsupported[contextID] = 1;
-        Write_Log(LOG_OLD, LOG_INFO, "EXT_framebuffer_object is not supported");
+        WriteLog(LOG_OLD, LOG_INFO, "EXT_framebuffer_object is not supported");
         return;
     }
 
@@ -790,7 +790,7 @@ void FrameBufferObject::apply(BindTarget target) const
         glGenFramebuffersEXT(1, &fboID);
         if(fboID == 0)
         {
-            Write_Log(LOG_OLD, LOG_INFO, "could not create the FBO");
+            WriteLog(LOG_OLD, LOG_INFO, "could not create the FBO");
             return;
         }
 

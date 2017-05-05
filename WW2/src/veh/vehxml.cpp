@@ -73,6 +73,7 @@ static void vehxmlExpandVehicleNodes(xmlDocPtr doc)
 
 static void vehxmlAddVehicleFile(xmlDocPtr doc, xmlNodePtr parentnode, const char* filename)
 {
+	WriteLog(LOG_VEHICLE, LOG_DEBUG, "filename: %s", filename);
 	xmlDocPtr vehdoc = xmlReadFile(filename, nullptr, XML_PARSE_RECOVER);
 	if(!vehdoc) return;
 
@@ -165,6 +166,7 @@ static void vehxmlCopyVariantNode(xmlNodePtr vehnode, xmlNodePtr variantnode, co
 
 	if(variantid)
 	{
+        Write_Log(LOG_VEHICLE, LOG_DEBUG, "vehid: %s variantid: %s", vehid, variantid);
 		if(xmlStrcmp(vehid, variantid) == 0)
 		{
 			vehxmlCopyVehicleAttributes(variantnode, vehnode);

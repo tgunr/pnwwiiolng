@@ -182,7 +182,7 @@ piVECTOR*  lpcrnr;
     count += GetMicroSeconds() - beginhere;
     if ((++number % 1024) == 0)
     {
-        Write_Debug("Average object polygon collision detect time: %lu us, polys = %d", count, npolys / 1024);
+        WriteDebug("Average object polygon collision detect time: %lu us, polys = %d", count, npolys / 1024);
         number = 0;
         count = 0;
         npolys = 0;
@@ -369,7 +369,7 @@ LISTHEADER*	lplist;
 					(mnz <= zo &&
 					mxz >= zo))
 				{
-					//Write_Debug("Non-flat BBox: %s", lpobj->name);
+					//WriteDebug("Non-flat BBox: %s", lpobj->name);
 					//obdrawWireframeObject(lpobj, colorWHITEALPHA);
 					if (obcdCheckObjectCollision(lpobj, collision))
 					{
@@ -397,7 +397,7 @@ LISTHEADER*	lplist;
 					(mnz <= zo &&
 					mxz >= zn))
 				{
-					//Write_Debug("Flat BBox: %s", lpobj->name);
+					//WriteDebug("Flat BBox: %s", lpobj->name);
 					//obdrawWireframeObject(lpobj, colorREDALPHA);
 					if (obcdCheckObjectCollision(lpobj, collision))
 					{
@@ -417,7 +417,7 @@ LISTHEADER*	lplist;
     count += GetMicroSeconds() - beginhere;
     if ((++number % 1024) == 0)
     {
-        Write_Debug("Average object collision detect time: %lu us", count);
+        WriteDebug("Average object collision detect time: %lu us", count);
         count = 0;
     }
 #endif

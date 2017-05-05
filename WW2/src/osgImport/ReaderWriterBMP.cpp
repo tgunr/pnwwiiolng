@@ -148,7 +148,7 @@ static unsigned char* bmp_load(int fd,
 
         if (bmp.magic != BMP_MAGIC_BM && bmp.magic != BMP_MAGIC_MB)
         {
-            Write_Debug("Invalid BMP magic");
+            WriteDebug("Invalid BMP magic");
             return 0;
         }
 
@@ -185,7 +185,7 @@ static unsigned char* bmp_load(int fd,
         unsigned int expectHdrSize = sizeof(hdr) + sizeof(dibHdrSize);
         if (expectHdrSize != dibHdrSize)
         {
-            Write_Debug("Invalid BMP OS/2 v1 header size %d != %d", expectHdrSize, dibHdrSize);
+            WriteDebug("Invalid BMP OS/2 v1 header size %d != %d", expectHdrSize, dibHdrSize);
             return 0;
         }
 
@@ -226,29 +226,29 @@ static unsigned char* bmp_load(int fd,
     }
     else
     {
-        Write_Debug("Unsupported BMP/DIB header size = %d", dibHdrSize);
+        WriteDebug("Unsupported BMP/DIB header size = %d", dibHdrSize);
         return 0;
     }
 
     // sanity checks
     if (dib.height < 0)
     {
-        Write_Debug("BMP Image is upside-down");
+        WriteDebug("BMP Image is upside-down");
         dib.height *= -1;
     }
     if (dib.colorPlanes != 1)
     {
-        Write_Debug("Invalid BMP number of color planes = %d", dib.colorPlanes);
+        WriteDebug("Invalid BMP number of color planes = %d", dib.colorPlanes);
         return 0;
     }
     if (dib.bitsPerPixel == 0)
     {
-        Write_Debug("Invalid BMP bits/pixel = %d", dib.bitsPerPixel);
+        WriteDebug("Invalid BMP bits/pixel = %d", dib.bitsPerPixel);
         return 0;
     }
     if (dib.compression != _BI_RGB && dib.compression != _BI_BITFIELDS)
     {
-        Write_Debug("Unsupported BMP compression = %d", dib.compression);
+        WriteDebug("Unsupported BMP compression = %d", dib.compression);
         return 0;
     }
 
@@ -311,7 +311,7 @@ static unsigned char* bmp_load(int fd,
             imageBytesPerPixel = dib.bitsPerPixel / 8;
         else
         {
-            Write_Debug("Unsupported BMP bit depth %d", dib.bitsPerPixel);
+            WriteDebug("Unsupported BMP bit depth %d", dib.bitsPerPixel);
             return 0;
         }
     }
@@ -320,7 +320,7 @@ static unsigned char* bmp_load(int fd,
     if (Where != bmp.imageOffset)
     {
         // this can happen because we don't fully parse v4/v5 headers
-        Write_Debug("BMP streampos out-of-sync where = %d imageOffset = %d", Where, bmp.imageOffset);
+        WriteDebug("BMP streampos out-of-sync where = %d imageOffset = %d", Where, bmp.imageOffset);
         fioSeek(fd, bmp.imageOffset, SEEK_SET);
     }
 
@@ -473,12 +473,12 @@ Image* ReadBMPFile(const std::string& name, unsigned int transparentColor)
     if(fd < 0)
     {
         if (errno != ENOENT) {
-            Write_Debug("[ReadBMPFile] cannot open %s", name.c_str());
+            WriteDebug("[ReadBMPFile] cannot open %s", name.c_str());
         }
         return nullptr;
     }
 
-    Write_Log(LOG_TEXTURE, LOG_INFO, "[ReadBMPFile] Reading image %s", name.c_str());
+    WriteLog(LOG_TEXTURE, LOG_INFO, "[ReadBMPFile] Reading image %s", name.c_str());
 
     unsigned char* imageData = bmp_load(fd, s, t, internalFormat, transparentColor);
 

@@ -244,7 +244,7 @@ void KillFxSystem()
         TxEffects = nullptr;
     }
 
-    Write_Log(LOG_OLD, LOG_INFO, "[KillFxSystem]");
+    WriteLog(LOG_OLD, LOG_INFO, "[KillFxSystem]");
 }
 
 /*----------------------------------------------------------------------

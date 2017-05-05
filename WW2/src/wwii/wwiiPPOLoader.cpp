@@ -392,7 +392,7 @@ bool PPOSpecLoader::ppoIsSpawnAllowed(int pposubtype, int vehclass, int vehtype)
 	}
 	else
 	{
-		dbugLog(_FLW, "Unable to match a spec to subtype %d", pposubtype);
+		WriteLog(LOG_WEAPON, LOG_WARN, "Unable to match a spec to subtype %d", pposubtype);
 	}
 
 	dbugLog(_FLD, "Spawn allowed flag: %d", retVal);

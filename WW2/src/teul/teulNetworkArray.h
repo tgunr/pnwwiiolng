@@ -193,7 +193,7 @@ public:
 				return retval;
 			return a->offset;
 		}
-		catch (std::exception& e) { dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what()); return -EINVAL; }
+		catch (std::exception& e) { WriteLog(LOG_TEUL, LOG_ABORT, "%s: %s", __FUNCTION__, e.what()); return -EINVAL; }
 	}
 
 	//! Provides a sender function for the Callback registration.

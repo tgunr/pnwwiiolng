@@ -292,7 +292,7 @@ int			texid, layer;
 								&sd, lpobj->numverts,
 								(UINT16*)lpobj->ptris,  lpobj->numtris * 3))
 		{
-			Write_Debug("piRenderIndexScene failed at entity %s (shadow)", lpobj->name);
+			WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderIndexScene failed at entity %s (shadow)", lpobj->name);
 			retval = FALSE;
 		}
 	}
@@ -304,7 +304,7 @@ int			texid, layer;
 		if (!piRenderStridedScene((piPRIMITIVETYPE)piPT_TRIANGLELIST, piVT_VERTEX,
 									&sd, lpobj->numverts))
 		{
-			Write_Debug("piRenderScene failed at entity %s (shadow)", lpobj->name);
+			WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderScene failed at entity %s (shadow)", lpobj->name);
 			retval = FALSE;
 		}
 	}
@@ -335,7 +335,7 @@ piLVERTEX* pverts;
 								pverts, lpobj->numverts,
 								(UINT16*)lpobj->ptris,  lpobj->numtris * 3))
 		{
-			Write_Debug("piRenderIndexScene failed at entity %s (%s lite)", lpobj->name,
+			WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderIndexScene failed at entity %s (%s lite)", lpobj->name,
 						flags & OBJECT_DYNALITE ? "dyna" : "stat");
 			return(FALSE);
 		}
@@ -345,7 +345,7 @@ piLVERTEX* pverts;
 		if (!piRenderScene((piPRIMITIVETYPE)type, piVT_LVERTEX,
 							pverts, lpobj->numverts))
 		{
-			Write_Debug("piRenderScene failed at entity %s (%s lite)", lpobj->name,
+			WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderScene failed at entity %s (%s lite)", lpobj->name,
 						flags & OBJECT_DYNALITE ? "dyna" : "stat");
 			return(FALSE);
 		}
@@ -603,7 +603,7 @@ static LOGICAL DrawVertices(int type, OBJECT* lpobj)
 									lpobj->ptverts, lpobj->numtverts,
 									(UINT16*)lpobj->ptris,  lpobj->numtris * 3))
 			{
-				Write_Debug("piRenderIndexScene failed at entity %s (no lite)", lpobj->name);
+				WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderIndexScene failed at entity %s (no lite)", lpobj->name);
 
                  return(FALSE);
 			}
@@ -613,7 +613,7 @@ static LOGICAL DrawVertices(int type, OBJECT* lpobj)
 			if (!piRenderScene((piPRIMITIVETYPE)type, piVT_CVERTEX,
 								lpobj->ptverts, lpobj->numtverts))
 			{
-				Write_Debug("piRenderScene failed at entity %s (no lite)", lpobj->name);
+				WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderScene failed at entity %s (no lite)", lpobj->name);
 
                 return(FALSE);
 			}
@@ -635,7 +635,7 @@ static LOGICAL DrawVertices(int type, OBJECT* lpobj)
 									&sd, lpobj->numverts,
 									(UINT16*)lpobj->ptris,  lpobj->numtris * 3))
 			{
-				Write_Debug("piRenderIndexScene failed at entity %s (no lite)", lpobj->name);
+				WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderIndexScene failed at entity %s (no lite)", lpobj->name);
 
                 return(FALSE);
 			}
@@ -648,7 +648,7 @@ static LOGICAL DrawVertices(int type, OBJECT* lpobj)
 			if (!piRenderStridedScene((piPRIMITIVETYPE)type, piVT_VERTEX,
 										&sd, lpobj->numverts))
 			{
-				Write_Debug("piRenderScene failed at entity %s (no lite)", lpobj->name);
+				WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderScene failed at entity %s (no lite)", lpobj->name);
 
                 return(FALSE);
 			}
@@ -673,7 +673,7 @@ UINT32			flags;
 									lpobj->ptverts, lpobj->numtverts,
 									(UINT16*)lpobj->ptris,  lpobj->numtris * 3))
 			{
-				Write_Debug("piRenderIndexScene failed at entity %s (lite)", lpobj->name);
+				WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderIndexScene failed at entity %s (lite)", lpobj->name);
 				return(FALSE);
 			}
 		}
@@ -682,7 +682,7 @@ UINT32			flags;
 			if (!piRenderScene((piPRIMITIVETYPE)type, piVT_LVERTEX,
 								lpobj->ptverts, lpobj->numtverts))
 			{
-				Write_Debug("piRenderScene failed at entity %s (lite)", lpobj->name);
+				WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderScene failed at entity %s (lite)", lpobj->name);
 				return(FALSE);
 			}
 		}
@@ -700,7 +700,7 @@ UINT32			flags;
 									&sd, lpobj->numverts,
 									(UINT16*)lpobj->ptris,  lpobj->numtris * 3))
 			{
-				Write_Debug("piRenderIndexScene failed at entity %s (%s lite)", lpobj->name,
+				WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderIndexScene failed at entity %s (%s lite)", lpobj->name,
 							flags & OBJECT_DYNALITE ? "dyna" : "stat");
 				return(FALSE);
 			}
@@ -713,7 +713,7 @@ UINT32			flags;
 			if (!piRenderStridedScene((piPRIMITIVETYPE)type, piVT_LVERTEX,
 								&sd, numvis))
 			{
-				Write_Debug("piRenderScene failed at entity %s (%s lite)", lpobj->name,
+				WriteLog(LOG_RENDER, LOG_DEBUG, "piRenderScene failed at entity %s (%s lite)", lpobj->name,
 							flags & OBJECT_DYNALITE ? "dyna" : "stat");
 				return(FALSE);
 			}
@@ -730,7 +730,7 @@ SINT32		i;
 
 	if (MultiTextureInfo != nullptr)
 	{
-		Write_Debug("MultiTextureInfo structure pointer has already been initialized");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "MultiTextureInfo structure pointer has already been initialized");
 		return(FALSE);
 	}
 
@@ -782,18 +782,18 @@ SINT32		i, j, btid, mtid;
 
 	if (MultiTextureInfo == nullptr)
 	{
-		Write_Debug("MultiTextureInfo structure pointer has not been initialized");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "MultiTextureInfo structure pointer has not been initialized");
 		return(FALSE);
 	}
 
 	if (NumMultiTextures >= MAX_MULTITEXTURES)
 	{
-		Write_Debug("Too many multitexture pairs have been specified");
+		WriteLog(LOG_RENDER, LOG_DEBUG, "Too many multitexture pairs have been specified");
 		return(FALSE);
 	}
 
 #ifdef EVENT_LOG_EXTREME
-	Write_Debug("MultiTexture %s - %s", BaseTexture, MultiTexture);
+	WriteLog(LOG_RENDER, LOG_DEBUG, "MultiTexture %s - %s", BaseTexture, MultiTexture);
 #endif
 
     std::string str;
@@ -1849,7 +1849,7 @@ LOGICAL obdrawInit()
 	}
 
     multisample = GLEW_EXT_framebuffer_multisample && GLEW_EXT_framebuffer_blit;
-    Write_Debug("Multisample FBO %s ", multisample ? "ENABLED" : "DISABLED");
+    WriteLog(LOG_RENDER, LOG_DEBUG, "Multisample FBO %s ", multisample ? "ENABLED" : "DISABLED");
 
     obdrawSetRenderPass(RENDER_SCENE);
 
@@ -5210,7 +5210,7 @@ piMATRIX		mat,mat1;
 #ifdef OBDRAW_EVENT_LOG
 		if (DrawingSortedObjects)
 		{
-			Write_Debug("ALPHAREF objects should be in an unsorted list");
+			WriteLog(LOG_RENDER, LOG_DEBUG, "ALPHAREF objects should be in an unsorted list");
 		}
 #endif
 

@@ -222,7 +222,7 @@ bool parseValidArgs(ARG_SPEC* argSpec, FUNCARGS* args, SINT32 numArgs, const cha
 			dbugLog(_FLA, "########## BLITZWOR IS INVALID ########## missing or bad parameter (%d) type %d, value (%s) to type %d, section %s, line %d"
 						,i,args[i].baseType,args[i].svalue,argSpec[i].baseType,section,lineNum);
 #else
-			Write_Debug("missing or bad parmeter (%d) type %d, value (%s) to type %d, section %s"
+			WriteDebug("missing or bad parmeter (%d) type %d, value (%s) to type %d, section %s"
 						,i,args[i].baseType,args[i].svalue,argSpec[i].baseType,section);
 #endif
 			return false;
@@ -233,7 +233,7 @@ bool parseValidArgs(ARG_SPEC* argSpec, FUNCARGS* args, SINT32 numArgs, const cha
 			dbugLog(_FLA, "########## BLITZWOR IS INVALID ########## parameter (%d) too long type %d, value (%s) to type %d, section %s, line %d"
 						,i,args[i].baseType,args[i].svalue,argSpec[i].baseType,section,lineNum);
 #else
-			Write_Debug("parameter too long in blitzWor");
+			WriteDebug("parameter too long in blitzWor");
 #endif
 			return false;
 		}

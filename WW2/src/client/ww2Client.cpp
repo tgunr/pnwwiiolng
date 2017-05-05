@@ -615,7 +615,7 @@ int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 		}
 	}
 	else
-		dbugLog(_FLW, "not looking for chat");
+		WriteLog(LOG_WEAPON, LOG_WARN, "not looking for chat");
 
 	StatusMessage("loading.network.complete");
 

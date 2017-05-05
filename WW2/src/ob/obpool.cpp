@@ -171,7 +171,7 @@ void obpoolKill()
 
 	obwldKill();
 
-	Write_Debug("Pool objects still allocated: %d", numobjused);
+	WriteDebug("Pool objects still allocated: %d", numobjused);
 
 	for (lpobj=objused.next ; lpobj != nullptr ; lpobj=next)
 	{
@@ -190,7 +190,7 @@ void obpoolKill()
 
    // FreeQueuedObjects();
 
-    Write_Log(LOG_OLD, LOG_INFO, "[obpoolKill]");
+    WriteLog(LOG_OLD, LOG_INFO, "[obpoolKill]");
 }
 
 
@@ -205,7 +205,7 @@ POOLOBJHDR* obpoolObjectToPool(OBJECT* lpgrp, FLOAT32 localscale, SINT32 reduce)
 	POOLOBJHDR*	lphdr = ScanObjectCallback(lpgrp, nullptr, CopyObjectToPool);;
 
 	assert(lpgrp);
-	Write_Debug("Object %s was copied to pool", lpgrp->name);
+	WriteDebug("Object %s was copied to pool", lpgrp->name);
 
 	return lphdr;
 }
@@ -313,7 +313,7 @@ POOLOBJHDR*    lphdr;
 	lphdr = (POOLOBJHDR*)listGetItem((LISTHEADER*)&objfree);
 	if (lphdr == nullptr)
 	{
-		Write_Debug("[obpoolGetNewObject] No more storage available for objects!");
+		WriteDebug("[obpoolGetNewObject] No more storage available for objects!");
 		return(nullptr);
 	}
 

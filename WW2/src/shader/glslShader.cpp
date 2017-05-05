@@ -179,13 +179,13 @@ void glslShader::CompileShader()
 
     if(!_isCompiled)
     {
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: %s %s FALED", GetTypename(), GetName().c_str());
+        WriteLog(LOG_OLD, LOG_WARN, "ERROR: %s %s FALED", GetTypename(), GetName().c_str());
 
         std::string infoLog;
 
         if(GetShaderInfoLog(infoLog))
         {
-            Write_Log(LOG_OLD, LOG_WARN, "%s", infoLog.c_str());
+            WriteLog(LOG_OLD, LOG_WARN, "%s", infoLog.c_str());
         }
     }
     else
@@ -194,7 +194,7 @@ void glslShader::CompileShader()
 
         if(GetShaderInfoLog(infoLog))
         {
-            Write_Log(LOG_OLD, LOG_WARN, "%s", infoLog.c_str());
+            WriteLog(LOG_OLD, LOG_WARN, "%s", infoLog.c_str());
         }
     }
 }

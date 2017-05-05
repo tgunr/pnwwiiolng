@@ -121,7 +121,7 @@ void trnwtrKill()
     _waterids.clear();
 #endif
 
-    Write_Log(LOG_OLD, LOG_INFO, "[trnwtrKill]");
+    WriteLog(LOG_OLD, LOG_INFO, "[trnwtrKill]");
 }
 
 LOGICAL trnwtrIsWaterTexture(SINT32 texid)

@@ -287,7 +287,7 @@ SINT32 i;
 			return (i);
 	}
 
-	Write_Debug("missing or bad facility type name %s, section %s, line %d"
+	WriteDebug("missing or bad facility type name %s, section %s, line %d"
 				,typeName,_section->name,worFileLineNum);
 
 	return -EINVAL;
