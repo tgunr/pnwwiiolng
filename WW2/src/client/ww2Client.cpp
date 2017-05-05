@@ -255,6 +255,7 @@ struct ClientClassData
 };
 
 static int clientid;
+static bool clientconnected = false;
 static bool clientinited;
 
 static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
@@ -311,7 +312,7 @@ Client::Client()
 
 Client::~Client()
 {
-	if(clientinited)
+	if(clientconnected)
 	{
 		for(int i = 0; i < Teul::Connection::NumHostTypes; i++)
 		{
@@ -325,6 +326,7 @@ Client::~Client()
 
 			_classdata->connections[i] = nullptr;
 		}
+		clientconnected = false;
 	}
 
 	weapListClear(&_data->weapList);
@@ -2911,6 +2913,9 @@ void ww2::Client::SetKilledByAI(bool status)
 *************************************************************************************************/
 
 bool ww2::Client::InitTeul(void) {
+	if ( clientconnected )
+		return true;
+
 #if defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
 	static const LogMode DBUGLOG_MODE = LogMode::TO_FILE;
 #else
@@ -2931,12 +2936,13 @@ bool ww2::Client::InitTeul(void) {
 			Instance::InstallClientCallbacks();
 	}
 
-	// TODO: Save if we have internet access as a flag.
-	return err > -1;
+	clientconnected = err > -1;
+	return clientconnected;
 }
 
 int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 {
+	if ( ! clientconnected ) return -1;
 	if(clientinited) return 0;
 
 	// update our default player info data
@@ -2955,6 +2961,7 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 
 void ww2::Client::Kill()
 {
+	clientconnected = false;
 	clientinited = false;
 	teulCloseTransport();
 }
@@ -2967,7 +2974,7 @@ void ww2::Client::Kill()
 
 void ww2::Client::NetUpdate(int /*wait*/)
 {
-	if(clientinited)
+	if(Teul::IsTransportInited())
 	{
 		teulUpdateTransport();
 		Teul::Connection::expire();
@@ -3037,7 +3044,7 @@ unsigned int ww2::Client::OICOfBrigade() const
 
 static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {
-	if(!clientinited)
+	if(!clientconnected)
 		return;
 
 	Client* client = Client::FromTeulIndex(teulIndex);

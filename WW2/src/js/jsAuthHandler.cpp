@@ -85,18 +85,21 @@ JS_FUNCTION_DEF(jsAuthHandler, CheckMessages) {
 	jsAuthHandler* handler = phui::js::Cast<jsAuthHandler*>(ctx, jsobj);
 	if ( ! handler ) return JS_FALSE;
 
-	*rval = BOOLEAN_TO_JSVAL(false);
-	if ( ! authconn ) return JS_TRUE;
+	if ( ! authconn ) {
+		*rval = BOOLEAN_TO_JSVAL(false);
+		return JS_TRUE;
+	}
 
-	jsval dummy;
+	*rval = BOOLEAN_TO_JSVAL(true);
 
 	const AuthConnection::Action& action = authconn->GetAction();
 	assert ( 0 < action.action && action.action < AuthConnection::ACT_COUNT );
 	using States = AuthConnection::States;
 
-	if ( action.action == AuthConnection::ACT_IDLE || action.state == States::Waiting )
+	jsval dummy;
+	if ( action.action == AuthConnection::ACT_IDLE || action.state == States::Waiting ) {
 		return JS_TRUE;
-	else if ( action.state == States::Complete ) {
+	} else if ( action.state == States::Complete ) {
 		JS_CallFunctionName(ctx, jsobj, completion_callbacks[action.action], 0, nullptr, &dummy);
 	} else if ( action.state == States::URLResponse ) {
 		jsval argv[] = { phui::js::NewString(action.url.c_str()) };
@@ -112,7 +115,6 @@ JS_FUNCTION_DEF(jsAuthHandler, CheckMessages) {
 	}
 
 	authconn->ClearAction();
-	*rval = BOOLEAN_TO_JSVAL(true);
 	return JS_TRUE;
 }
 

@@ -117,7 +117,7 @@ AuthConnection::~AuthConnection() {
 //==============
 
 bool AuthConnection::ConnectionGood(void) const {
-	return teul_index > 1;
+	return teul_index > 0;
 }
 
 bool AuthConnection::Connected(void) const {
