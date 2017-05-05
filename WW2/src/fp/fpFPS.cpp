@@ -1441,7 +1441,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
         if(currentFPSstate != old)
         {
-            WriteDebug("%d = currentFPSstate", currentFPSstate);
+            WriteLog(LOG_WEAPON, LOG_DEBUG,"%d = currentFPSstate", currentFPSstate);
         }
 
         old = currentFPSstate;
@@ -2061,7 +2061,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 		{
 			if ((currentTime - fireStartTime) > (FLOAT64)fpsWeapons[currentWeaponModel].fireDelay)
 			{
-				WriteDebug("Mortar round leaving at %f, %f seconds after being fired.", currentTime, (currentTime - fireStartTime));
+				WriteLog(LOG_WEAPON, LOG_DEBUG,"Mortar round leaving at %f, %f seconds after being fired.", currentTime, (currentTime - fireStartTime));
 				stateFlags &= ~STATE_HOLD_FIRE;
 				stateFlags |= STATE_FIRE_DELAYED_WEAP;
 				fireStartTime = 0.0f;
@@ -2788,7 +2788,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 				stateFlags |= STATE_HOLD_FIRE;
 				fireStartTime = frametime / 1000.0;
 				fpsTrooper.tpsStartAttack = 1;
-				WriteDebug("Firing mortar at %f", fireStartTime);
+				WriteLog(LOG_WEAPON, LOG_DEBUG,"Firing mortar at %f", fireStartTime);
 
 				// go ahead and play the reload sound for mortars here
 				SCHAR* reloadSound = fpsWeapons[currentWeaponModel].reloadSound;
@@ -13813,7 +13813,7 @@ void _updateWeaponLag(float deltaTime)
 				horizWeaponLag = (horizWeaponLag < 0) ? -WLHM: WLHM;
 		}
 
-		//WriteDebug("Horizontal Weapon Lag lag:%.4f acc:%.4f jmp:%.4f", horizWeaponLag, horizWeaponLagAcc, jump);
+		//WriteLog(LOG_WEAPON, LOG_DEBUG,"Horizontal Weapon Lag lag:%.4f acc:%.4f jmp:%.4f", horizWeaponLag, horizWeaponLagAcc, jump);
 	}
 
 	// for testing

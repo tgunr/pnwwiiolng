@@ -204,7 +204,7 @@ static SINT32 _recvHostVehicleHit( ACTION_OBJECT* const a )
 	vehProcessVehicleHit(hit);
 
 	// fill out the local vehicle data from this information.
-	dbugWrite(_FLA,"Vehicle Hit: from %d sent %" PR64BitUT " numcomponentshit %zu\n"
+	dbugWrite(_FLA,"Vehicle Hit: from %d sent %" PR64BitUT " components-hit %zu\n"
 				, hit.m_shooter, hit.m_timestamp, hit.m_components.size());
 
 	return a->offset;
