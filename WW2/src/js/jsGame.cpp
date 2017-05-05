@@ -388,7 +388,8 @@ JS_FUNCTION_DEF(jsGame, consoleprint)
 	if(argc < 1) return JS_FALSE;
 
 	const wchar_t* wstr = phui::js::ValueToWideString(argv[0]);
-	if(wstr) uiConsoleprintf(UTF8(wstr));
+	if(wstr)
+		uiConsoleprintf(UTF8(wstr));
 
 	return JS_TRUE;
 }
