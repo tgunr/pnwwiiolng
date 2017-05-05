@@ -467,7 +467,7 @@ LOGICAL rnmainInit()
 	_ViewScaleFactor = _WORLD_VIEW_SCALE_FACTOR;
 
 	uiPostInit();
-	uiLoadView("login");
+	uiLoadView("OnlineModeSelect");
 	uiChatShow();
 
 #if 0 // TODO: Move this to post-login logic

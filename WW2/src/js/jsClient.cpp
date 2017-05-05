@@ -25,6 +25,7 @@
 #include "uimap/uiMap.h"
 #include "client/GameClient.h"
 #include "ui/uiMain.h"
+#include "js/jsAuthHandler.h"
 #include "js/jsPosition.h"
 #include "wwii/wwiiSquadMsg.h"
 #include "chat/chatSquadControl.h"
@@ -71,6 +72,7 @@ static const char* branches[MAX_BRANCHES] = {"none", "army", "airforce", "navy" 
 JSClass jsClient::jsclass = JS_CLASS_MACRO("client");
 JSFunctionSpec jsClient::jsfunctions[] =
 {
+	JS_FUNCTION_SPEC(jsClient, createauthhandler,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
 	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
 	JS_FUNCTION_SPEC(jsClient, acceptmission,1),
@@ -203,6 +205,21 @@ jsClient::jsClient(ww2::Client* c) :
 
 jsClient::~jsClient()
 {
+}
+
+
+/************************************************************************************************
+	auth connection
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, createauthhandler) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	// HACK: At some point it would be nice to not have the controllers pointing to a global
+	// connection and actually have that connection be attached to the client or something.
+	*rval = (new jsAuthHandler())->jsVal();
+	return JS_TRUE;
 }
 
 

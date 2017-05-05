@@ -11,13 +11,10 @@
 #include <pa/md5.h>
 #include <rn/rnmain.h>
 #include <teul/teulKit.h>
+#include <ui/uiUTF.h>
 #include <wwii/wwiiCallbacks.h>
 #include <wwii/wwiiNetPorts.h>
 #include <wwii/wwiiUTF.h>
-
-
-// Placeholder
-#define ConnException(...) std::runtime_error("Stuff happened")
 
 //==============================================================================
 
@@ -82,19 +79,26 @@ namespace {
 AuthConnection::AuthConnection(const std::string& addr) {
 	dbugLog(_FLI, "Creating connection to %s", addr.c_str());
 
+	// I'd love to do exceptions for all of these, but it breaks the flow in the GUI scripts.
+	// We can at least leave it for these two, though.
 	if ( g_authconn != nullptr )
-		throw ConnException("authconn.error.init.multipleconnections");
+		throw std::runtime_error("authconn.error.init.multipleconnections");
 	if ( CheckTeulCallbacks() != 0 )
-		throw ConnException("authconn.error.init.callbackinitfailed");
+		throw std::runtime_error("authconn.error.init.callbackinitfailed");
 
 	UINT32 auth_ip = Teul::GetSingleIP(addr.c_str());
-	if ( auth_ip == 0 )
-		throw ConnException("authconn.error.init.couldnotresolve", addr);
+	if ( auth_ip == 0 ) {
+		action = {ACT_ERROR, "authconn.error.init.couldnotresolve", uiUTF8toUTF16(addr.c_str())};
+		return;
+	}
 
 	if ( (teul_index = teulOpenSend(auth_ip, WWII::Net::Ports::AuthHost, &::ConnectionOpened,
-	                                3000, PROTOCOL_TCP, &::ConnectionError)) < 0 )
-		throw ConnException(ErrorCode, std::to_wstring(retval));
+	                                3000, PROTOCOL_TCP, &::ConnectionError)) < 0 ) {
+		action = {ACT_ERROR, ErrorCode, std::to_wstring(teul_index)};
+		return;
+	}
 
+	action = {ACT_CONNECT, States::Waiting};
 	g_authconn = this;
 }
 
@@ -112,21 +116,46 @@ AuthConnection::~AuthConnection() {
 
 //==============
 
+bool AuthConnection::ConnectionGood(void) const {
+	return teul_index > 1;
+}
+
+bool AuthConnection::Connected(void) const {
+	return is_connected;
+}
+
+bool AuthConnection::LoggedIn(void) const {
+	return ConnectionGood() && is_connected && is_logged_in;
+}
+
+//==============
+
 void AuthConnection::Login(const UsernamePassword& info) {
 	dbugLog(_FLI, "Sending login request");
 
+	if ( LoggedIn() ) {
+		action = {ACT_ERROR, "authconn.error.alreadyloggedin"};
+		return;
+	}
+
 	// TODO: This is correct for callsigns. Verify the same for usernames
-	if ( info.username.length() > 10 )
-		throw ConnException("authconn.error.badusername.length");
+	if ( info.username.length() > 10 ) {
+		action = {ACT_ERROR, "authconn.error.badusername.length"};
+		return;
+	}
 	for ( char c : info.username )
-		if ( ! (('0' <= c && c <= '9') || ('A' <= c && c <= 'z')) )
-			throw ConnException("authconn.error.badusername.char", c);
+		if ( ! (('0' <= c && c <= '9') || ('A' <= c && c <= 'z')) ) {
+			action = {ACT_ERROR, "authconn.error.badusername.char", std::to_wstring(c)};
+			return;
+		}
 
 	login_info = info;
 
 	Auth::LoginRequest req(login_info.username, (const UCHAR*)login_info.password_md5);
-	if ( teulSend(teul_index, _LoginXchg, &req) < 0 )
-		throw ConnException(UnknownError);
+	if ( teulSend(teul_index, _LoginXchg, &req) < 0 ) {
+		action = {ACT_ERROR, UnknownError};
+		return;
+	}
 	action = {ACT_LOGIN, States::Waiting};
 }
 
@@ -138,8 +167,10 @@ void AuthConnection::Login(uint32_t steamid) {
 
 	dbugLog(_FLI, "Sending Steam login request");
 	Auth::LoginSteamRequest req(SteamApps()->GetAppOwner().GetAccountID());
-	if ( teulSend(teul_index, _LoginSteamXchg, &req) < 0 )
-		throw ConnException(UnknownError);
+	if ( teulSend(teul_index, _LoginSteamXchg, &req) < 0 ) {
+		action = {ACT_ERROR, UnknownError};
+		return;
+	}
 	action = {ACT_LOGIN, States::Waiting};
 }
 
@@ -148,8 +179,10 @@ void AuthConnection::Login(uint32_t steamid) {
 void AuthConnection::PollArenas(void) {
 	dbugLog(_FLD, "Polling arenas");
 	uint32_t dummy = 0;
-	if ( teulSend(teul_index, _GetArenaList, &dummy) < 0 )
-		throw ConnException(UnknownError);
+	if ( teulSend(teul_index, _GetArenaList, &dummy) < 0 ) {
+		action = {ACT_ERROR, UnknownError};
+		return;
+	}
 	action = {ACT_POLL_ARENAS, States::Waiting};
 }
 
@@ -160,6 +193,10 @@ void AuthConnection::SelectArena(const Auth::GameEntry& entry) {
 	ARENA_REQ req{entry.m_arenaID, 0, false, presenter_version, 0, steam_id};
 	strlcpy(req.username, login_info.username.c_str(), ArraySize(req.username));
 	//req.password ? unused on auth
+	if ( teulSend(teul_index, _ArenaReq2, &req) < 0 ) {
+		action = {ACT_ERROR, UnknownError};
+		return;
+	}
 	action = {ACT_CHOOSE_ARENA, States::Waiting};
 }
 

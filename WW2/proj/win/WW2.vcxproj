@@ -1073,6 +1073,7 @@
     <ClInclude Include="..\..\src\include\systypes.h" />
     <ClInclude Include="..\..\src\include\unique_opaque_ptr.hpp" />
     <ClInclude Include="..\..\src\inst\instAction.h" />
+    <ClInclude Include="..\..\src\js\jsAuthHandler.h" />
     <ClInclude Include="..\..\src\maptools\GenerateIcons.h" />
     <ClInclude Include="..\..\src\map\mapSupercellVislevelXfer.h" />
     <ClInclude Include="..\..\src\math\SuperFastHash.h" />
@@ -1584,6 +1585,7 @@
     <ClCompile Include="..\..\src\imap\imapLua.cpp" />
     <ClCompile Include="..\..\src\imap\ww2func.cpp" />
     <ClCompile Include="..\..\src\imap\ww2imap.cpp" />
+    <ClCompile Include="..\..\src\js\jsAuthHandler.cpp" />
     <ClCompile Include="..\..\src\js\jsClient.cpp" />
     <ClCompile Include="..\..\src\js\jsContent.cpp" />
     <ClCompile Include="..\..\src\js\jsGame.cpp" />

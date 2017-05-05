@@ -85,7 +85,9 @@ namespace Auth {
 class AuthConnection {
 public:
 	// The last action we attempted to perform.
-	enum ActionType { ACT_ERROR, ACT_CONNECT, ACT_LOGIN, ACT_POLL_ARENAS, ACT_CHOOSE_ARENA };
+	enum ActionType {
+		ACT_IDLE, ACT_ERROR, ACT_CONNECT, ACT_LOGIN, ACT_POLL_ARENAS, ACT_CHOOSE_ARENA, ACT_COUNT
+	};
 
 	// The state of the last/current action. This also doubles as the UI localized string describing the state.
 	// Any states not mentioned here are errors.
@@ -110,7 +112,12 @@ public:
 	~AuthConnection();
 
 	const Action& GetAction(void) const { return action; }
-	SINT32 GetConnectionError(void) const { return conn_error; }
+	void ClearAction(void) { action = { ACT_IDLE }; }
+
+	/// @note Distinct from Connected() because we might still be in the process of connecting.
+	bool ConnectionGood(void) const;
+	bool Connected(void) const;
+	bool LoggedIn(void) const;
 
 	void Login(const UsernamePassword&);
 	void Login(uint32_t steamid);
@@ -129,6 +136,7 @@ public:
 	void LaunchReplyReceived(const APP_LAUNCH&);
 private:
 	bool is_connected = false;
+	bool is_logged_in = false;
 	SINT32 teul_index = -1;
 	SINT32 conn_error = 0;
 

@@ -70,6 +70,7 @@ public:
 	jsClient(ww2::Client*);
 
 	JS_CLASS_DATA;
+	JS_FUNCTION(createauthhandler);
 	JS_FUNCTION(getmisscountry);
 	JS_FUNCTION(getmissbrigade);
 	JS_FUNCTION(acceptmission);

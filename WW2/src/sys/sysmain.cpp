@@ -966,11 +966,6 @@ char GetOSBuild()
 #endif
 #endif
 
-	UINT32 host = 0, otp = 0;
-	UINT16 port = 0;
-	if(rnmainGetOnlineSetting() == false)
-		return FALSE;
-
 #define DONT_USE_THREAD
 #if defined(DONT_USE_THREAD) || defined(DIRECT3D)	// Use this path for a single thread environment else a multi-thread environment
 
@@ -1250,11 +1245,14 @@ void sysGetMousePosition(int* x, int* y)
 {
 	POINT pt;
 	GetCursorPos(&pt);
-	*x = pt.x - WantedX;
-	*y = pt.y - WantedY;
+	ScreenToClient(myhwnd, &pt);
+	*x = pt.x;
+	*y = pt.y;
 }
 
 void sysSetMousePosition(int x, int y)
 {
-	SetCursorPos(WantedX + x, WantedY + y);
+	POINT pt{x,y};
+	ClientToScreen(myhwnd, &pt);
+	SetCursorPos(pt.x, pt.y);
 }

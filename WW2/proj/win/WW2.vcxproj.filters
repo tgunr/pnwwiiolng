@@ -1650,6 +1650,9 @@
     <ClInclude Include="..\..\src\auth\authPack.h">
       <Filter>auth</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\js\jsAuthHandler.h">
+      <Filter>js</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2701,6 +2704,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\auth\authPack.cpp">
       <Filter>auth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsAuthHandler.cpp">
+      <Filter>js</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
