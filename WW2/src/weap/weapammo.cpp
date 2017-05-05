@@ -1859,6 +1859,7 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 
 		Displacement.y = -weapon->Displacement;
 		mathVectorMultiply64(&Displacement, &Displacement, FireAtt);
+        WriteLog(LOG_WEAPON, LOG_DEBUG, "Before displaced AmmoX: %f AmmoY: %f AmmoZ: %f", Ammo->Position.x, Ammo->Position.y, Ammo->Position.z);
 		mathAddVectors(&Ammo->Position, &Ammo->Position, &Displacement);
 		Ammo->LastCollidePos = Ammo->Position;
 	}
@@ -1889,6 +1890,7 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 		if(AmmoType->UseGhostRoundSTO)
 			_FireOrdnanceSTO(Ammo);
 	}
+    WriteLog(LOG_WEAPON, LOG_DEBUG, "AmmoX: %f AmmoY: %f AmmoZ: %f", Ammo->Position.x, Ammo->Position.y, Ammo->Position.z);
 
 	return 0;
 }
