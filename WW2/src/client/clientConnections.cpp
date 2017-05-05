@@ -51,7 +51,7 @@ const std::string AuthConnection::States::Complete("authconn.complete");
 const std::string AuthConnection::States::URLResponse("authconn.urlresponse");
 const std::string AuthConnection::States::FTPResponse("authconn.ftpresponse");
 namespace {
-	const std::string ErrorCode("authconn.error.generic.netcode");
+	const std::string ErrorCode("authconn.error.generic.errorcode");
 	const std::string UnknownError("authconn.error.generic.unknown");
 }
 
@@ -94,7 +94,7 @@ AuthConnection::AuthConnection(const std::string& addr) {
 
 	if ( (teul_index = teulOpenSend(auth_ip, WWII::Net::Ports::AuthHost, &::ConnectionOpened,
 	                                3000, PROTOCOL_TCP, &::ConnectionError)) < 0 ) {
-		action = {ACT_ERROR, ErrorCode, std::to_wstring(teul_index)};
+		action = {ACT_ERROR, ErrorCode, std::to_wstring(-teul_index)};
 		return;
 	}
 
@@ -191,7 +191,7 @@ void AuthConnection::PollArenas(void) {
 void AuthConnection::SelectArena(const Auth::GameEntry& entry) {
 	dbugLog(_FLI, "Requesting to join arena %d", entry.m_arenaID);
 	ARENA_REQ req{entry.m_arenaID, 0, false, presenter_version, 0, steam_id};
-	strlcpy(req.username, login_info.username.c_str(), ArraySize(req.username));
+	strlcpy(req.username, login_info.username.c_str(), array_size(req.username));
 	//req.password ? unused on auth
 	if ( teulSend(teul_index, _ArenaReq2, &req) < 0 ) {
 		action = {ACT_ERROR, UnknownError};
@@ -270,7 +270,7 @@ void AuthConnection::AppVerifyReceived(const APP_VERIFY& verify) {
 	dbugLog(_FLI, "AppVerify received");
 
 	APP_LAUNCH_REQ req;
-	strlcpy(req.username, login_info.username.c_str(), ArraySize(req.username));
+	strlcpy(req.username, login_info.username.c_str(), array_size(req.username));
 	//req.password ? unused on auth
 	req.steamID = steam_id;
 	req.arenaID = verify.arenaID;

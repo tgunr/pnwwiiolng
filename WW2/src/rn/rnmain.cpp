@@ -466,6 +466,8 @@ LOGICAL rnmainInit()
 
 	_ViewScaleFactor = _WORLD_VIEW_SCALE_FACTOR;
 
+	GameClientInitTeul(); // TODO: Don't load the online mode stuff if we can't init teul anyway.
+
 	uiPostInit();
 	uiLoadView("OnlineModeSelect");
 	uiChatShow();

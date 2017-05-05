@@ -78,6 +78,12 @@ static GameClient* _playerclient;
 extern PPOSpecLoader specLoader;
 extern SINT32 globalMSCoolDownEnd;
 
+/************************************************************************************************/
+
+bool GameClientInitTeul(void) {
+	return Client::InitTeul();
+}
+
 /************************************************************************************************
 	GameClientLogin
 	throws ClientNetError

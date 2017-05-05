@@ -72,4 +72,13 @@
 ////////// Core utility functions
 
 template <typename T, std::size_t N>
-constexpr std::size_t ArraySize(T(&)[N]) { return N; }
+constexpr std::size_t array_size(T(&)[N]) { return N; }
+
+
+template <typename... Args>
+struct num_args { enum { value = sizeof...(Args); }; };
+
+
+template <bool...> struct bool_pack;
+template <bool... v>
+using all_true = std::is_same<bool_pack<true, v...>, bool_pack<v..., true>>;

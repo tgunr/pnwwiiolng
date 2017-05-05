@@ -17,13 +17,7 @@ namespace {
 
 //==============================================================================
 
-JSClass jsAuthHandler::jsclass = //JS_CLASS_MACRO("AuthHandler");
-{"AuthHandler", JSCLASS_HAS_PRIVATE,
-JS_PropertyStub, JS_PropertyStub,
-phui::js::Object::JSClassGetProperty, phui::js::Object::JSClassSetProperty,
-JS_EnumerateStandardClasses, JS_ResolveStub,
-JS_ConvertStub, phui::js::Object::JSClassFinalize,JSCLASS_NO_OPTIONAL_MEMBERS
-};
+JSClass jsAuthHandler::jsclass = JS_CLASS_MACRO("AuthHandler");
 
 jsAuthHandler::jsAuthHandler(void)
 : Object(&jsclass, jsfunctions, jsproperties) {
@@ -40,6 +34,7 @@ JSFunctionSpec jsAuthHandler::jsfunctions[] = {
 	JS_FUNCTION_SPEC(jsAuthHandler, Connect, 1),
 	JS_FUNCTION_SPEC(jsAuthHandler, Disconnect, 0),
 	JS_FUNCTION_SPEC(jsAuthHandler, CheckMessages, 0),
+	{0}
 };
 
 //--------------
@@ -83,7 +78,7 @@ namespace {
 	const char* const completion_callbacks[] = {
 		"", "OnError", "OnConnect", "OnLogin", "OnArenaUpdate", "OnArenaJoin"
 	};
-	static_assert ( ArraySize(completion_callbacks) == AuthConnection::ACT_COUNT , "array/enum mismatch" );
+	static_assert ( array_size(completion_callbacks) == AuthConnection::ACT_COUNT , "array/enum mismatch" );
 }
 
 JS_FUNCTION_DEF(jsAuthHandler, CheckMessages) {
@@ -105,15 +100,15 @@ JS_FUNCTION_DEF(jsAuthHandler, CheckMessages) {
 		JS_CallFunctionName(ctx, jsobj, completion_callbacks[action.action], 0, nullptr, &dummy);
 	} else if ( action.state == States::URLResponse ) {
 		jsval argv[] = { phui::js::NewString(action.url.c_str()) };
-		JS_CallFunctionName(ctx, jsobj, "OnURLResponse", ArraySize(argv), argv, &dummy);
+		JS_CallFunctionName(ctx, jsobj, "OnURLResponse", array_size(argv), argv, &dummy);
 	} else if ( action.state == States::FTPResponse ) {
 		// TODO: Send URL also? Auth sends both...
 		jsval argv[] = { phui::js::NewString(action.ftp.c_str()) };
-		JS_CallFunctionName(ctx, jsobj, "OnFTPResponse", ArraySize(argv), argv, &dummy);
+		JS_CallFunctionName(ctx, jsobj, "OnFTPResponse", array_size(argv), argv, &dummy);
 	} else {
-		std::wstring msg(uiChatAssembleUILoc(action.state.c_str(), action.arg1));
+		std::wstring msg(uiChatAssembleUILoc(action.state.c_str(), action.arg1.c_str()));
 		jsval argv[] = { phui::js::NewString(msg.c_str()) };
-		JS_CallFunctionName(ctx, jsobj, completion_callbacks[AuthConnection::ACT_ERROR], ArraySize(argv), argv, &dummy);
+		JS_CallFunctionName(ctx, jsobj, completion_callbacks[AuthConnection::ACT_ERROR], array_size(argv), argv, &dummy);
 	}
 
 	authconn->ClearAction();
@@ -133,7 +128,7 @@ JSPropertySpec jsAuthHandler::jsproperties[] = {
 	{"logged_in",       LOGGEDIN_PROP,       JSPROP_READONLY | JSPROP_PERMANENT},
 	{0}
 };
-static_assert ( ArraySize(jsAuthHandler::jsproperties) == NUM_PROPS+1 , "array/enum mismatch" );
+static_assert ( array_size(jsAuthHandler::jsproperties) == NUM_PROPS+1 , "array/enum mismatch" );
 
 
 JSBool jsAuthHandler::GetProperty(JSContext* ctx, int propid, jsval* val) {

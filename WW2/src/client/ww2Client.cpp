@@ -2910,16 +2910,34 @@ void ww2::Client::SetKilledByAI(bool status)
 	Init
 *************************************************************************************************/
 
-int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
-{
-	char dbugFileName[21];
-	if(clientinited) return 0;
-
+bool ww2::Client::InitTeul(void) {
 #if defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
 	static const LogMode DBUGLOG_MODE = LogMode::TO_FILE;
 #else
 	static const LogMode DBUGLOG_MODE = LogMode::OFF;
 #endif
+
+	char dbugFileName[21];
+	strprintf(dbugFileName, "wwiiClient");
+	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
+	if ( err > -1 ) {
+		err = commInstallClientCallbacks() 	|
+			chatInstallClientCallbacks()	|
+			strtInstallClientCallbacks() 	|
+			mapInstallClientCallbacks()		|
+			missionInstallCallbacks()		|
+			mmClientInstallCallbacks()		|
+			wwiiClientInstallCallbacks()	|
+			Instance::InstallClientCallbacks();
+	}
+
+	// TODO: Save if we have internet access as a flag.
+	return err > -1;
+}
+
+int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
+{
+	if(clientinited) return 0;
 
 	// update our default player info data
 	_defaultPlayerIdent.m_playerID		= playerID;
@@ -2930,25 +2948,9 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	// go ahead and set the player ident info in it just to make sure
 	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
 
-	strprintf(dbugFileName, "wwiiClient.%u", playerID);
-	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
+	clientinited = true;
 
-	if(err > -1)
-	{
-		err = 	commInstallClientCallbacks() 	|
-				chatInstallClientCallbacks()	|
-				strtInstallClientCallbacks() 	|
-				mapInstallClientCallbacks()		|
-				missionInstallCallbacks()		|
-				mmClientInstallCallbacks()		|
-				wwiiClientInstallCallbacks()	|
-				Instance::InstallClientCallbacks();
-	}
-
-	if(err == 0)
-		clientinited = true;
-
-	return err;
+	return 0;
 }
 
 void ww2::Client::Kill()
