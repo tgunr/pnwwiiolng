@@ -34,6 +34,7 @@ JSFunctionSpec jsAuthHandler::jsfunctions[] = {
 	JS_FUNCTION_SPEC(jsAuthHandler, Connect, 1),
 	JS_FUNCTION_SPEC(jsAuthHandler, Disconnect, 0),
 	JS_FUNCTION_SPEC(jsAuthHandler, CheckMessages, 0),
+	JS_FUNCTION_SPEC(jsAuthHandler, Login, 3),
 	{0}
 };
 
@@ -65,7 +66,7 @@ JS_FUNCTION_DEF(jsAuthHandler, Connect) {
 
 JS_FUNCTION_DEF(jsAuthHandler, Disconnect) {
 	jsAuthHandler* handler = phui::js::Cast<jsAuthHandler*>(ctx, jsobj);
-	if ( !handler ) return JS_FALSE;
+	if ( ! handler ) return JS_FALSE;
 
 	delete authconn;
 	authconn = nullptr;
@@ -115,6 +116,25 @@ JS_FUNCTION_DEF(jsAuthHandler, CheckMessages) {
 	}
 
 	authconn->ClearAction();
+	return JS_TRUE;
+}
+
+//--------------
+
+JS_FUNCTION_DEF(jsAuthHandler, Login) {
+	jsAuthHandler* handler = phui::js::Cast<jsAuthHandler*>(ctx, jsobj);
+	if ( ! handler || ! authconn || argc < 3 ) return JS_FALSE;
+
+	std::string username(JS_GetStringBytes(JS_ValueToString(ctx, argv[0])));
+	std::wstring password((wchar_t*)JS_GetStringChars(JS_ValueToString(ctx, argv[1])));
+	JSBool save; JS_ValueToBoolean(ctx, argv[2], &save);
+
+	UsernamePassword creds(username, password);
+	authconn->Login(creds);
+
+	if ( save && authconn->GetAction().action == AuthConnection::ACT_LOGIN )
+		SaveUserInfo(creds);
+
 	return JS_TRUE;
 }
 

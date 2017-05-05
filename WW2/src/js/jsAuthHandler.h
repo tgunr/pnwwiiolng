@@ -19,6 +19,7 @@ public:
 	JS_FUNCTION(Connect);
 	JS_FUNCTION(Disconnect);
 	JS_FUNCTION(CheckMessages); // HACK: Shouldn't be called from GUI.
+	JS_FUNCTION(Login);
 
 	virtual JSBool GetProperty(JSContext* ctx, int propid, jsval* val) override;
 };
