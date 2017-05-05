@@ -2293,15 +2293,25 @@ static SINT32 dot_log(const char* line)
 			else
 				break;
 		}
-	}else if(argc >= 2 && !strcmp(s1, "level")) // level
+	} else if(argc >= 2 && !strcmp(s1, "level")) // level
 	{
-		int level = 0;
+		int level = LOG_NONE;
 
-		if(!strcmp(s2, "warn")) level = 1;
-		else if(!strcmp(s2, "info")) level = 2;
+		if(!strcmp(s2, "fatal")) level = LOG_FATAL;
+        else if(!strcmp(s2, "abort")) level = LOG_ABORT;
+        else if(!strcmp(s2, "recover")) level = LOG_RECOVER;
+        else if(!strcmp(s2, "warn")) level = LOG_WARN;
+        else if(!strcmp(s2, "minor")) level = LOG_MINOR;
+        else if(!strcmp(s2, "note")) level = LOG_NOTE;
+        else if(!strcmp(s2, "info")) level = LOG_INFO;
+        else if(!strcmp(s2, "debug")) level = LOG_DEBUG;
 
 		Set_Log_Level(level);
-	}else if(argc >= 1) // on/off
+    } else if(argc >= 1 && !strcmp(s1, "duplicates")) // level
+    {
+        gLogDuplicates =  !gLogDuplicates;
+        uiChatPrintLine("logging duplicates %s", gLogDuplicates ? "on" : "off");
+    } else if(argc >= 1) // on/off
 	{
 		UINT32 logmask = 0;
 		LOGICAL enable = !strcmp(s2, "on"); // on/off
@@ -6446,6 +6456,9 @@ static int dot_fire(const char* line)
     mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 	if(!VehicleData) return DC_ERROR;
 
+    WriteLog(LOG_WEAPON, LOG_DEBUG, "Vx: %f Vy: %f Vz: %f Ap: %f Ar: %f Ay: %f",
+			VehicleData->VehiclePos.x, VehicleData->VehiclePos.y, VehicleData->VehiclePos.z,
+            VehicleData->VehicleAtt.Pitch, VehicleData->VehicleAtt.Roll, VehicleData->VehicleAtt.Yaw);
 	static char LastAmmoName[64];
 	static FLOAT32 lastX, lastY, lastZ, lasttraverse, lastelevate;
 	char AmmoName[64] = "";

@@ -8,7 +8,7 @@
 // new debug logging
 
 // subsystems for logging
-enum
+enum LogMask
 {
 	LOG_NONE	= 0x0,
 	LOG_OLD 	= 0x00000001, // Old WriteDebug
@@ -56,9 +56,9 @@ static const char* LOG_SYSTEM_NAMES[32] =
         };
 
 // logging levels
-enum
+enum LogLevel
 {
-	LOG_FATAL,
+	LOG_FATAL = 1,
     LOG_ABORT,
     LOG_RECOVER,
 	LOG_WARN,
