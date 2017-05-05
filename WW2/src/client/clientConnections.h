@@ -64,6 +64,9 @@ private:
 // TODO: Consider moving
 
 struct UsernamePassword {
+	UsernamePassword(void) {}
+	UsernamePassword(const std::string& un, const std::wstring& pass);
+
 	std::string username = "";
 	unsigned char password_md5[64+1] = {0};
 
