@@ -261,11 +261,7 @@ LOGICAL			gCellClientActive;
 LOGICAL          gWaterShadersEnabled;
 
 LOGICAL			disableButtonInput, disableAxisInput;
-#if defined(DEBUG) || defined(ALPHA_RELEASE)
-LOGICAL			OpenConsole = TRUE;
-#else
 LOGICAL			OpenConsole = FALSE;
-#endif
 LOGICAL			SquadInvites;
 UINT32			OverrideSpawner;
 UINT32			gRegion; // used for china localizations and other functionality differences
