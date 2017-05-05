@@ -592,6 +592,7 @@ teulCreateEndpoint(const bool isListening, SINT32 timeout, const PROTOCOL protoc
 
 	endpoint.socket = INVALID_SOCKET;
 	endpoint.m_connected = false;
+	endpoint.m_rakNetEnabled = false;
 	endpoint.lastDataRecv.makeCurrent();
 	endpoint.lastDataSent.makeCurrent();
 

@@ -120,7 +120,7 @@ WWII::ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_InBy
 		// If we have a surrogate pair, convert to UTF32 first.
 		if ( ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_HIGH_END && *source )
 		{
-			UTF32 ch2 = *source;
+			UTF32 ch2 = (UTF32) *source;
 			if ( ch2 == 0 )
 			{
 				return false;

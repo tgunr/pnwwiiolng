@@ -261,11 +261,7 @@ LOGICAL			gCellClientActive;
 LOGICAL          gWaterShadersEnabled;
 
 LOGICAL			disableButtonInput, disableAxisInput;
-#if defined(DEBUG) || defined(ALPHA_RELEASE)
-LOGICAL			OpenConsole = TRUE;
-#else
 LOGICAL			OpenConsole = FALSE;
-#endif
 LOGICAL			SquadInvites;
 UINT32			OverrideSpawner;
 UINT32			gRegion; // used for china localizations and other functionality differences
@@ -288,7 +284,11 @@ SINT8            gAuthServer[128]; // Authentication server to be used
 SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 SINT8            gClientV[32]; // Version to submit
 SINT8            gLogMask[_MAX_PATH];
-SINT32           gLogLevel = LOG_INFO;
+#ifdef DEBUG_WW2
+SINT32           gLogLevel = LOG_DEBUG;
+#else
+SINT32           gLogLevel = LOG_RECOVER;
+#endif
 
 #ifdef DEBUG_WW2
 LOGICAL          DebugBuildingMDLFilesOnly = false;

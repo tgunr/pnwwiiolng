@@ -251,7 +251,11 @@ void RakNetChannel::update()
 					    dbugLog(_FLD, "Raknet: teulIndex received from client: %d with guid: %s", teulIndex, p->guid.ToString());
 						ENDPOINT *ep = teulGetEndpoint(teulIndex);
 						guidToEndPoint[p->guid] = ep;
-						ep->m_rakNetGuid = p->guid;
+						if (ep != nullptr)
+						{
+							ep->m_rakNetGuid = p->guid;
+							ep->m_rakNetEnabled = true;
+						}
 					}
                     else
                     {
@@ -308,6 +312,7 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p)
 	}
 	else
 	{
+		// NOTE: We might get this if a UDP straggler comes in right as we have closed a connection, its to be expected and can be ignored
 		dbugLog(_FLW, "Raknet: No endpoint located for incoming msg: guid-%s", p->guid.ToString());
 	}
 
@@ -337,14 +342,6 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
         return false;
     }
     
-	RakNet::BitStream bitStream;
-	UINT8 msgType = static_cast<UINT8>(ID_USER_PACKET_ENUM);
-	bitStream.Write(msgType);
-	bitStream.Write(m_peerTeulIndex);
-	bitStream.Write(static_cast<char *>(packet.packet()), packet.packetSizeBytes());
-    
-	UINT32 result = 0;
-
 	RakNet::AddressOrGUID guid;
 
 	// We need to specify the target address
@@ -360,15 +357,27 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
 		addr.address.addr4 = endpoint.destSockAddress;
 		guid = addr;
 	}
+
+	UINT32 result = 0;
+
+    // Make sure we have a target before we build a message, connection may net be running raknet
+	if (endpoint.m_rakNetEnabled)
+	{
+	    RakNet::BitStream bitStream;
+    	UINT8 msgType = static_cast<UINT8>(ID_USER_PACKET_ENUM);
+    	bitStream.Write(msgType);
+    	bitStream.Write(m_peerTeulIndex);
+    	bitStream.Write(static_cast<char *>(packet.packet()), packet.packetSizeBytes());
     
-	result = m_peer->Send(&bitStream, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, 0, guid, false);
-	if (result == 0)
-    {
-        dbugLog(_FLW, "Raknet: Failed to send data over backchannel to host %s, teulIndex %d", guid.ToString(), endpoint.teulIndex());
-    }
-    else
-    {
-        dbugLog(_FLD, "Raknet: Sent data via backchannel to host %s, teulIndex %d", guid.ToString(), endpoint.teulIndex());
+    	result = m_peer->Send(&bitStream, PacketPriority::HIGH_PRIORITY, PacketReliability::RELIABLE_ORDERED, 0, guid, false);
+    	if (result == 0)
+        {
+            dbugLog(_FLW, "Raknet: Failed to send data over backchannel to host %s, teulIndex %d", guid.ToString(), endpoint.teulIndex());
+        }
+        else
+        {
+            dbugLog(_FLD, "Raknet: Sent data via backchannel to host %s, teulIndex %d", guid.ToString(), endpoint.teulIndex());
+        }
     }
 
 	return (result > 0);
@@ -411,4 +420,5 @@ void RakNetChannel::disconnect(ENDPOINT *pEndpoint)
 	RakNetGUID guid = pEndpoint->m_rakNetGuid;
 	guidToEndPoint[guid] = nullptr;
 	pEndpoint->m_rakNetGuid = defaultGuid;
+	pEndpoint->m_rakNetEnabled = false;
 }

@@ -121,7 +121,7 @@ struct weapAmmoType
 	LOGICAL IsPlaced; // ammo is placed on something to work
 
 	FLOAT32 GrenadeRotateRate;
-	LOGICAL IsSmokeGrenade;
+	SINT32 IsSmokeGrenade; // 1 for only smoke, 2 for smoke without disabling other functionality
 
 	LOGICAL UseGhostRoundSTO; // do we use an sto for the ghost round so everyone is sycned up?
 
