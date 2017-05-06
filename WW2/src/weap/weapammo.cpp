@@ -570,7 +570,7 @@ logTimerBeginMacro();
 							Write_Log(LOG_WEAP,LOG_WARN, "fuze type %s not supported yet", VarContents);
 					break;
 					case WEAP_AMMOVAR_ISSMOKEGRENADE:
-						AmmoType->IsSmokeGrenade = (LOGICAL)atoi((char*)VarContents);
+						AmmoType->IsSmokeGrenade = (SINT32)atoi((char*)VarContents);
 					break;
 					// new HE variables
 					case WEAP_AMMOVAR_USE_NEW_HE:
@@ -1696,16 +1696,18 @@ static LOGICAL _UpdateGrenade(weapAmmo* Ammo)
 					Ammo->Flags |= WEAP_AMMOFLAG_SPECIALACTIVE;
 				}
 
-                return FALSE;
+				if(Ammo->AmmoType->IsSmokeGrenade != 1)
+					return FALSE;
             }
 		}
-		else
-		{
+		
+		if ( Ammo->AmmoType->IsSmokeGrenade != 1 ) {
 			weapfxAmmoExplosion(Ammo, &Position, nullptr, 0);
 
 			_DoExplosionShrapnel(Ammo, &Position, &Ammo->Velocity, frametime / 1000.0);
 			_DoExplosionConcussion(Ammo, &Position, FALSE);
 		}
+		
 		return TRUE;
 	}
 
@@ -4154,7 +4156,7 @@ static LOGICAL _DoAmmoFuzeCheck(weapAmmo* Ammo, piVECTOR const* OldPos,  piVECTO
 	Pos.y = Pos.y + WorldOriginOffset.y;
 	Pos.z = -(Pos.z + WorldOriginOffset.z);
 
-	if(!Ammo->AmmoType->IsSmokeGrenade)
+	if(Ammo->AmmoType->IsSmokeGrenade != 1) // HACK: 1 is for smoke-only rounds
 	{
 		weapfxAmmoExplosion(Ammo, &Pos, nullptr, 0);
 		_DoExplosionShrapnel(Ammo, &Pos, &Ammo->Velocity, DetontateTime);
@@ -4171,7 +4173,7 @@ static LOGICAL _DoAmmoFuzeCheck(weapAmmo* Ammo, piVECTOR const* OldPos,  piVECTO
 static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVECTOR const* OldPos,
 									piVECTOR const* NewPos, FLOAT64 DeltaTime,  FLOAT64 CurrentTime)
 {
-	if(Ammo->AmmoType->IsSmokeGrenade)
+	if(Ammo->AmmoType->IsSmokeGrenade == 1) // HACK: 1 is for smoke-only rounds
 		return FALSE;
 
 	if(Collision->Alpha < 0.5)
@@ -4599,10 +4601,13 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 					else
 						Ammo->Flags |= WEAP_AMMOFLAG_SPECIALACTIVE;
 
-                    return FALSE;
+					if(Ammo->AmmoType->IsSmokeGrenade != 1)
+						return FALSE;
                 }
 			}
-		}else
+		}
+
+		if(Ammo->AmmoType->IsSmokeGrenade != 1)
 		{
 			FLOAT64VECTOR AmmoDir;
 			AmmoSpeed = mathExactVectorLength(&Ammo->Velocity);
