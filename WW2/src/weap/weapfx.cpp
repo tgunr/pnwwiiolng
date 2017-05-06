@@ -1016,8 +1016,10 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 	piVECTOR DeltaVec;
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 
-	if(Ammo->Flags & WEAP_AMMOFLAG_NOFX) return 0;
-	if(Ammo->AmmoType->IsSmokeGrenade == 1) return 0;
+	if(Ammo->Flags & WEAP_AMMOFLAG_NOFX)
+		return 0;
+	if(Ammo->AmmoType->HasSmoke == 1)
+		return 0;
 
 	mathSubVectors(&DeltaVec, NewPos, OldPos);
 	mathReallyFastNormalize(DeltaVec);
@@ -2986,19 +2988,19 @@ bool _IsWater(const OBJECT* lpObj)
 }
 
 /************************************************************************************************
-	weapfxAttachSmokeGrenadeToAmmo
+	weapfxAttachSmokeToAmmo
 *************************************************************************************************/
-UINT32 weapfxAttachSmokeGrenadeToAmmo(weapAmmo const* pAmmo)
+UINT32 weapfxAttachSmokeToAmmo(weapAmmo const* pAmmo)
 {
 	return 0;
 }
 
 /************************************************************************************************
-	weapfxDetonateSmokeGrenade
+	weapfxDetonateSmoke
 	Start billowing smoke after tracer dies.
 	return 1 to kill the ammo; 0 to keep it around for the old behavior
 *************************************************************************************************/
-UINT32 weapfxDetonateSmokeGrenade(FLOAT64VECTOR* pos, const weapAmmo* ammo)
+UINT32 weapfxDetonateSmoke(FLOAT64VECTOR* pos, const weapAmmo* ammo)
 {
 	UINT16 mslifetime = 47500 + ((rand() & 63) * 100);	// 47.5-53.8 seconds
 
@@ -3044,16 +3046,16 @@ UINT32 weapfxDetonateSmokeGrenade(FLOAT64VECTOR* pos, const weapAmmo* ammo)
 		pos->z -= 0.02f;
 
 		if(strcmp((const char*)ammo->AmmoType->Name, "uk_smokegrenade") == 0)
-			colorFlag = SmokeGrenadeSTO::BRITISH;
+			colorFlag = SmokeSTO::BRITISH;
 		else if(strcmp((const char*)ammo->AmmoType->Name, "fr_smokegrenade") == 0)
-			colorFlag = SmokeGrenadeSTO::FRENCH;
+			colorFlag = SmokeSTO::FRENCH;
 		else if(strcmp((const char*)ammo->AmmoType->Name, "desmokegrenade") == 0)
-			colorFlag = SmokeGrenadeSTO::GERMAN;
+			colorFlag = SmokeSTO::GERMAN;
 	}
 
 	WorldPosition_m position(pos->x, pos->y, pos->z);
 
-	SmokeGrenadeSTO* sg = new SmokeGrenadeSTO(position, attitude, mslifetime, colorFlag);
+	SmokeSTO* sg = new SmokeSTO(position, attitude, mslifetime, colorFlag);
 
 	if(Online)
 	{
