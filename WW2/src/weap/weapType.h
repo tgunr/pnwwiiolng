@@ -150,6 +150,7 @@ struct weapAmmoType
 	FLOAT64 Ixx, Iyy, Izz, Ixz, Ixy, Iyz;
 	FLOAT32 GrenadeOrient;
 	FLOAT32 GrenadeRestitution;
+    FLOAT32 VelocityVariance;
 
 	OBJECT* Object;
 };
