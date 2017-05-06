@@ -226,7 +226,7 @@ bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 	break;
 
 	case ServerTrackedObject::_EFFECT:
-		sto = new SmokeGrenadeSTO(a);
+		sto = new SmokeSTO(a);
 	break;
 
 	case ServerTrackedObject::_ORDNANCE:
