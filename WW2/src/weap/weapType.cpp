@@ -389,10 +389,10 @@ static void weaponParseAmmoNode(xmlNode* ammoNode)
 		// fix me
 		xmlFree(xmlstr);
 	}
-	xmlstr = xmlGetProp(ammoNode, (xmlChar*)"issmokegrenade");
+	xmlstr = xmlGetProp(ammoNode, (xmlChar*)"hassmoke");
 	if(xmlstr)
 	{
-		ammoType->IsSmokeGrenade = atoi((char*)xmlstr);
+		ammoType->HasSmoke = atoi((char*)xmlstr);
 		xmlFree(xmlstr);
 	}
 	xmlstr = xmlGetProp(ammoNode, (xmlChar*)"muzzleflash");
