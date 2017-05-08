@@ -52,6 +52,7 @@
 #include "strt/strtCaptureState.h"
 #include "pers/persmain.h"
 #include "scen/ScenarioManager.h"
+#include "rn/rnmain.h"
 
 #ifdef GR2_BLEND_EDITOR
 #include "gr2/gr2Anim.h"
@@ -73,6 +74,7 @@ JSClass jsClient::jsclass = JS_CLASS_MACRO("client");
 JSFunctionSpec jsClient::jsfunctions[] =
 {
 	JS_FUNCTION_SPEC(jsClient, createauthhandler,0),
+	JS_FUNCTION_SPEC(jsClient, connecttoarena,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
 	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
 	JS_FUNCTION_SPEC(jsClient, acceptmission,1),
@@ -219,6 +221,21 @@ JS_FUNCTION_DEF(jsClient, createauthhandler) {
 	// HACK: At some point it would be nice to not have the controllers pointing to a global
 	// connection and actually have that connection be attached to the client or something.
 	*rval = (new jsAuthHandler())->jsVal();
+	return JS_TRUE;
+}
+
+
+/************************************************************************************************
+	arena joining
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, connecttoarena) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	// HACK: I kind of feel like we should pass in the auth info, but instead it's set semi-globally.
+	rnconnectToServer();
+
 	return JS_TRUE;
 }
 

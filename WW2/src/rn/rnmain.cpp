@@ -304,10 +304,30 @@ void rnconnectToServer(void) {
 	GameOTP = static_cast<UINT32>(random());
 	GamePort = static_cast<UINT16>(random());
 
+	// TODO: Clear this flag if we lose connection so players can continue in offline mode.
 	Online = true;
 	ProtectedOnlineFlag = Online;
 
 	cfgPrefsSendSharedPrefs();
+
+	// TODO: Move to UI flow.
+	{
+		// a bit of conditional logic to determine online entry page
+		// default to campaign mode only
+		SINT32 playMode = 1;
+
+		ARENA_VARS::iterator found = g_arenaDescription.find("play_mode");
+
+		if ( found != g_arenaDescription.end() )
+			playMode = atoi(found->second.c_str());
+
+		if ( playMode == 2 )
+			uiLoadView("scenarios/lobby");
+		else if ( playMode == 1 )
+			uiLoadView("persona");
+		else
+			uiLoadView("online");
+	}
 }
 
 // Init everything for rendering
@@ -471,26 +491,6 @@ LOGICAL rnmainInit()
 	uiPostInit();
 	uiLoadView("OnlineModeSelect");
 	uiChatShow();
-
-#if 0 // TODO: Move this to post-login logic
-	{
-		// a bit of conditional logic to determine online entry page
-		// default to campaign mode only
-		SINT32 playMode = 1;
-
-		ARENA_VARS::iterator found = g_arenaDescription.find("play_mode");
-
-		if(found != g_arenaDescription.end())
-			playMode = atoi(found->second.c_str());
-
-		if(playMode == 2)
-			uiLoadView("scenarios/lobby");
-		else if(playMode == 1)
-			uiLoadView("persona");
-		else
-			uiLoadView("online");
-	}
-#endif
 
 	// make sure devices get detected
 	// testing for now

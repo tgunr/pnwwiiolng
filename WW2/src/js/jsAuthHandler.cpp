@@ -20,7 +20,8 @@ namespace {
 JSClass jsAuthHandler::jsclass = JS_CLASS_MACRO("AuthHandler");
 
 jsAuthHandler::jsAuthHandler(void)
-: Object(&jsclass, jsfunctions, jsproperties) {
+: Object(&jsclass, jsfunctions, jsproperties)
+, arenas(new phui::js::Array()) {
 	JS_CONSTRUCTOR_LOCK;
 }
 
@@ -35,6 +36,8 @@ JSFunctionSpec jsAuthHandler::jsfunctions[] = {
 	JS_FUNCTION_SPEC(jsAuthHandler, Disconnect, 0),
 	JS_FUNCTION_SPEC(jsAuthHandler, CheckMessages, 0),
 	JS_FUNCTION_SPEC(jsAuthHandler, Login, 3),
+	JS_FUNCTION_SPEC(jsAuthHandler, PollArenas, 3),
+	JS_FUNCTION_SPEC(jsAuthHandler, JoinArena, 1),
 	{0}
 };
 
@@ -101,6 +104,12 @@ JS_FUNCTION_DEF(jsAuthHandler, CheckMessages) {
 	if ( action.action == AuthConnection::ACT_IDLE || action.state == States::Waiting ) {
 		return JS_TRUE;
 	} else if ( action.state == States::Complete ) {
+		if ( action.action == AuthConnection::ACT_POLL_ARENAS ) {
+			handler->arenas->clear();
+			size_t i = 0;
+			for ( auto& arena : authconn->GetArenas().m_games )
+				handler->arenas->SetElement(new jsGameArena(arena), i++);
+		}
 		JS_CallFunctionName(ctx, jsobj, completion_callbacks[action.action], 0, nullptr, &dummy);
 	} else if ( action.state == States::URLResponse ) {
 		jsval argv[] = { phui::js::NewString(action.url.c_str()) };
@@ -138,16 +147,41 @@ JS_FUNCTION_DEF(jsAuthHandler, Login) {
 	return JS_TRUE;
 }
 
+//--------------
+
+JS_FUNCTION_DEF(jsAuthHandler, PollArenas) {
+	jsAuthHandler* handler = phui::js::Cast<jsAuthHandler*>(ctx, jsobj);
+	if ( ! handler || ! authconn ) return JS_FALSE;
+	authconn->PollArenas();
+	return JS_TRUE;
+}
+
+//--------------
+
+JS_FUNCTION_DEF(jsAuthHandler, JoinArena) {
+	jsAuthHandler* handler = phui::js::Cast<jsAuthHandler*>(ctx, jsobj);
+	if ( ! handler || ! authconn || argc < 1 ) return JS_FALSE;
+
+	jsGameArena* arena = phui::js::Cast<jsGameArena*>(ctx, argv[0]);
+	if ( arena == nullptr )
+		return JS_FALSE;
+
+	authconn->SelectArena(arena->entry);
+
+	return JS_TRUE;
+}
+
 //==============
 
 namespace {
-	enum { CONNECTIONGOOD_PROP, CONNECTED_PROP, LOGGEDIN_PROP, NUM_PROPS };
+	enum { CONNECTIONGOOD_PROP, CONNECTED_PROP, LOGGEDIN_PROP, ARENAS_PROP, NUM_PROPS };
 }
 
 JSPropertySpec jsAuthHandler::jsproperties[] = {
 	{"connection_good", CONNECTIONGOOD_PROP, JSPROP_READONLY | JSPROP_PERMANENT},
 	{"connected",       CONNECTED_PROP,      JSPROP_READONLY | JSPROP_PERMANENT},
 	{"logged_in",       LOGGEDIN_PROP,       JSPROP_READONLY | JSPROP_PERMANENT},
+	{"arenas",          ARENAS_PROP,         JSPROP_READONLY | JSPROP_PERMANENT},
 	{0}
 };
 static_assert ( array_size(jsAuthHandler::jsproperties) == NUM_PROPS+1 , "array/enum mismatch" );
@@ -163,6 +197,9 @@ JSBool jsAuthHandler::GetProperty(JSContext* ctx, int propid, jsval* val) {
 	case LOGGEDIN_PROP:
 		*val = BOOLEAN_TO_JSVAL(authconn && authconn->LoggedIn());
 		return JS_TRUE;
+	case ARENAS_PROP:
+		*val = arenas->jsVal();
+		return JS_TRUE;
 	default:
 		// We actually add callbacks to this in the GUI, so non-standard properties are fine.
 		// TODO: It's probably worth explicitly laying out the callbacks to give a little extra safety.
@@ -174,10 +211,14 @@ JSBool jsAuthHandler::GetProperty(JSContext* ctx, int propid, jsval* val) {
 //==============================================================================
 
 JSClass jsGameArena::jsclass = JS_CLASS_MACRO("GameArena");
+JSFunctionSpec jsGameArena::jsfunctions[] = {{0}};
+JSPropertySpec jsGameArena::jsproperties[] = {{0}};
 
-jsGameArena::jsGameArena(const Auth::GameEntry& arena)
-: Object(&jsclass) {
+jsGameArena::jsGameArena(const Auth::GameEntry& e)
+: Object(&jsclass, jsfunctions, jsproperties)
+, entry(e) {
 	JS_CONSTRUCTOR_LOCK;
-	DefineProperty("name", phui::js::ConstString(arena.m_name.c_str()));
-	DefineProperty("state", INT_TO_JSVAL(arena.m_lockState));
+	DefineProperty("name", phui::js::ConstString(entry.m_name.c_str()));
+	DefineProperty("state", INT_TO_JSVAL(entry.m_lockState));
+	DefineProperty("id", INT_TO_JSVAL(entry.m_arenaID));
 }
