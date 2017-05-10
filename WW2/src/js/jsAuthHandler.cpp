@@ -48,7 +48,7 @@ JS_FUNCTION_DEF(jsAuthHandler, Connect) {
 	if ( ! handler ) return JS_FALSE;
 
 	// HACK: The default shouldn't be in the GUI code.
-	std::string authaddr = "authdev.playnet.com";
+	std::string authaddr = "authdevng.playnet.com";
 	if ( argc > 0 )
 		authaddr = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
 
@@ -108,7 +108,7 @@ JS_FUNCTION_DEF(jsAuthHandler, CheckMessages) {
 			handler->arenas->clear();
 			size_t i = 0;
 			for ( auto& arena : authconn->GetArenas().m_games )
-				handler->arenas->SetElement(new jsGameArena(arena), i++);
+				handler->arenas->SetElement(new jsGameArena(arena, authconn->GetArenas().isPlaynet), i++);
 		}
 		JS_CallFunctionName(ctx, jsobj, completion_callbacks[action.action], 0, nullptr, &dummy);
 	} else if ( action.state == States::URLResponse ) {
@@ -214,11 +214,32 @@ JSClass jsGameArena::jsclass = JS_CLASS_MACRO("GameArena");
 JSFunctionSpec jsGameArena::jsfunctions[] = {{0}};
 JSPropertySpec jsGameArena::jsproperties[] = {{0}};
 
-jsGameArena::jsGameArena(const Auth::GameEntry& e)
+jsGameArena::jsGameArena(const Auth::GameEntry& e, bool is_playnet)
 : Object(&jsclass, jsfunctions, jsproperties)
 , entry(e) {
 	JS_CONSTRUCTOR_LOCK;
 	DefineProperty("name", phui::js::ConstString(entry.m_name.c_str()));
-	DefineProperty("state", INT_TO_JSVAL(entry.m_lockState));
 	DefineProperty("id", INT_TO_JSVAL(entry.m_arenaID));
+	
+	const char* state;
+	if ( entry.m_lockState >= AL_ENTRY )
+		state = "maintenance";
+	else if ( entry.m_lockState >= AL_CAPTURE )
+		state = "locked";
+	else if ( entry.m_lockState == AL_OFF )
+		state = "online";
+	else if ( entry.m_lockState == AL_SYNCING )
+		state = "syncing";
+	else if ( entry.m_lockState == AL_INITIALIZING )
+		state = "starting";
+	else if ( entry.m_lockState == AL_LOADING )
+		state = "loading";
+	else
+		state = "offline";
+	DefineProperty("state", phui::js::ConstString(state));
+
+	bool can_join = (AL_OFF <= entry.m_lockState && entry.m_lockState < AL_ENTRY);
+	if ( AL_ENTRY <= entry.m_lockState && is_playnet )
+		can_join = true;
+	DefineProperty("can_join", BOOLEAN_TO_JSVAL(can_join));
 }

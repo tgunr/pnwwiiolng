@@ -17,7 +17,7 @@
 
 //==============================================================================
 
-// HACKHACKHACK
+#if 1 // HACKHACKHACK
 // Playgate's MD5 is apparently different than the stuff used by WW2.exe. Blech.
 namespace {
 	static unsigned char PADDING[64] = {
@@ -295,6 +295,7 @@ namespace {
 		return q+2; // how many bytes written
 	}
 }
+#endif // MD5 HACK
 
 //==============================================================================
 
@@ -304,8 +305,6 @@ UsernamePassword::UsernamePassword(const std::string& un, const std::wstring& pa
 }
 
 void UsernamePassword::SetPasswordString(const std::wstring& str) {
-	// Oh my god this garbage hurts my brain, but if I change how
-	// it's done I'm worried that all current passwords will break.
 	const size_t MAX_PASSWORD_LENGTH = 32;
 	char utf8Password[(MAX_PASSWORD_LENGTH * 4) + 1] = {0};
 	WWII::ConvertChars(str.c_str(), utf8Password, sizeof(utf8Password));
@@ -423,7 +422,7 @@ void AuthConnection::Login(const UsernamePassword& info) {
 	}
 
 	// TODO: This is correct for callsigns. Verify the same for usernames
-	if ( info.username.length() > 10 ) {
+	if ( info.username.length() < 2 || info.username.length() > 16 ) {
 		action = {ACT_ERROR, "authconn.error.badusername.length"};
 		return;
 	}
@@ -555,7 +554,7 @@ void AuthConnection::AppVerifyReceived(const APP_VERIFY& verify) {
 
 	APP_LAUNCH_REQ req;
 	strlcpy(req.username, login_info.username.c_str(), array_size(req.username));
-	//req.password ? unused on auth
+	strlcpy((char*)req.password, (const char*)login_info.password_md5, array_size(req.password));
 	req.steamID = steam_id;
 	req.arenaID = verify.arenaID;
 	req.sessionID = verify.sessionID;
@@ -602,7 +601,6 @@ void AuthConnection::LaunchReplyReceived(const APP_LAUNCH& launch) {
 			action.state = States::FTPResponse;
 			action.ftp = launch.data + action.url.size() + 1;
 		}
-		// ftpStart()
 		break;
 	default:
 		dbugLog(_FLW, "Unknown APP_LAUNCH flag '%d'", launch.appID);

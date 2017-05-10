@@ -31,7 +31,7 @@ public:
 
 class jsGameArena : public phui::js::Object {
 public:
-	jsGameArena(const Auth::GameEntry&);
+	jsGameArena(const Auth::GameEntry&, bool is_playnet);
 	JS_CLASS_DATA;
 
 	const Auth::GameEntry& entry;
