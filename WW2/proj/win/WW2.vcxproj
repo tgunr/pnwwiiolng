@@ -1082,6 +1082,7 @@
     <ClInclude Include="..\..\src\omg\omgMissionSortieData.hxx" />
     <ClInclude Include="..\..\src\physics\HeightField.h" />
     <ClInclude Include="..\..\src\sys\sysmainHackNonsense.h" />
+    <ClInclude Include="..\..\src\sys\sysSteam.h" />
     <ClInclude Include="..\..\src\teul\teulKit.h" />
     <ClInclude Include="..\..\src\teul\teulNetworkArray.h" />
     <ClInclude Include="..\..\src\teul\teulNetworkMsg.h" />
@@ -1858,6 +1859,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\src\sys\sysreg.cpp" />
+    <ClCompile Include="..\..\src\sys\sysSteam.cpp" />
     <ClCompile Include="..\..\src\sys\systhreadwin.cpp" />
     <ClCompile Include="..\..\SRC\tools\TangentSpaceGenerator.cpp" />
     <ClCompile Include="..\..\src\trn\LensFlare.cpp" />

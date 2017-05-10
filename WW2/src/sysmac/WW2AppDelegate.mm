@@ -4,6 +4,7 @@
 #include "build_info.hpp"
 #import "WW2AppDelegate.h"
 #include "sysmain.h"
+#include "sysSteam.h"
 #include "vars.h"
 #include "HID_Utilities.h"
 #include "HID_Queue_Utilities.h"
@@ -27,9 +28,6 @@
 #include <arpa/inet.h>
 #include "sysLaunchURL.h"
 #import <HockeySDK/HockeySDK.h>
-#include "steam_api.h"
-
-static const int STEAM_APP_ID = 251950;
 
 #define PLAYGATE_VERSION 0x01010109
 
@@ -73,8 +71,6 @@ static WW2AppDelegate* gPlayGateAppDelegate;
 extern NSString * const PGErrorDomain;
 extern NSString * const PGteulErrorDomain;
 extern NSString * const PGErrorDataKey;
-
-static UINT32 steamID = 0;
 
 // PGErrorDomain error code constants
 enum
@@ -588,21 +584,11 @@ extern NSString *WebActionOriginalURLKey;
     }
 #endif
     
-#ifndef DEBUG_WW2
-    if (SteamAPI_RestartAppIfNecessary(STEAM_APP_ID))
+#ifndef DEBUG_WW2 // TODO: Make this the first thing that happens ~Victarus
+    if (InitSteam())
     // abort
         [NSApp terminate:self];
 #endif
-    
-    if ( SteamAPI_Init() ) {
-        
-        if (SteamApps()->BIsAppInstalled(STEAM_APP_ID)) {
-            if (SteamApps()->BIsSubscribedApp(STEAM_APP_ID)) {
-                steamID = SteamApps()->GetAppOwner().GetAccountID();
-            }
-        }
-        
-    }
     
     // This sequence depends on certain implementation details of the
     // BITCrashManager - in particular, that report metadata is processed
@@ -639,24 +625,10 @@ extern NSString *WebActionOriginalURLKey;
     
     [self goHome];
     
-    if (steamID == 0) {
-        [self loadUserNamePassword];
-        [userNameField setDelegate:self];
-        [passwordField setDelegate:self];
-        [self updateLoginEnabled];
-    } else {
-        [userNameField setHidden:true];
-        [passwordField setHidden:true];
-        [rememberPasswordCheckbox setHidden:true];
-        // temporary display of steamid
-        NSString *baseString = @"";
-        NSString *userInfo = [baseString stringByAppendingFormat:
-                             @" SteamID: %u", steamID];
-        [userLabel setStringValue:userInfo];
-        //[userLabel setHidden:true];
-        [passwordLabel setHidden:true];
-        [playOnlineButton setEnabled:true];
-    }
+    [self loadUserNamePassword];
+    [userNameField setDelegate:self];
+    [passwordField setDelegate:self];
+    [self updateLoginEnabled];
     
     authServer = [NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding];
     if (gAuthServer[0]) {
@@ -959,11 +931,7 @@ extern NSString *WebActionOriginalURLKey;
             if (! isConnectedToAuthenticationServer)
             {
                 [self connectToAuthenticationServer];
-                if (steamID == 0) {
-                    state = WAIT_AUTH_CONNECT;
-                } else {
-                    state = WAIT_USER_PASS;
-                }
+                state = WAIT_AUTH_CONNECT;
                 break;
             }
             [[clang::fallthrough]];
@@ -1081,11 +1049,8 @@ extern NSString *WebActionOriginalURLKey;
     UINT32 vers[4] = {0,0,0,0};
     
     memset(&launchRequest, 0x0, sizeof(launchRequest));
-    if (steamID == 0) {
-        strncpy((char *)launchRequest.username, [[self userName] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.username)-1);
-        strncpy((char *)launchRequest.password, [[self userPassword] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.password)-1);
-    }
-    launchRequest.steamID = steamID;
+    strncpy((char *)launchRequest.username, [[self userName] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.username)-1);
+    strncpy((char *)launchRequest.password, [[self userPassword] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.password)-1);
     launchRequest.cdKeySize = 0;
     launchRequest.arenaID = verifyInfo->arenaID;
     launchRequest.sessionID = (UINT32)verifyInfo->sessionID;
@@ -1168,7 +1133,6 @@ extern NSString *WebActionOriginalURLKey;
     arenaRequest.arenaID	= arena;
     arenaRequest.sessionID 	= static_cast<UINT32>(session);
     arenaRequest.infoOnly	= 0;
-    arenaRequest.steamID = steamID;
     
     /*
      int vers[4] = {0,0,0,0};

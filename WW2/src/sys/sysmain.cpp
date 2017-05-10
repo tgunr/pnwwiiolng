@@ -13,6 +13,7 @@
 #include "rn/rnlogo.h"
 #include "sysmain.h"
 #include "systhread.h"
+#include "sysSteam.h"
 #include "sn/sndsSoundControl.h"
 #include "gmlp/gmlpmain.h"
 #include "fio/fio.h"
@@ -672,6 +673,8 @@ char GetOSBuild()
 // This is the actual winmain
  int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	InitSteam();
+
 	int		x, y, w, h, wh, xy;
 	int		bpp, hdw, stencil, wnd;
 	MSG		msg;

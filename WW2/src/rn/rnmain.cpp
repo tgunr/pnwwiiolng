@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "fio/fio.h"
@@ -93,8 +94,6 @@
 #ifdef MULTI_CLIENT
 #include "mc/multiClient.h"
 #endif
-
-#include "steam_api.h"
 
 //#define USE_VTUNE
 
@@ -268,12 +267,6 @@ static int _GetStratData(int scx, int scy, sdm_strat_data* sdmdata)
 static UINT32 GameHost, GameOTP;
 static UINT16 GamePort;
 
-// globals for steam
-static const int STEAM_APP_ID = 251950;
-bool steamInitialized = false;
-bool installedAsSteamApp = false;
-bool isSteamApp = false;
-
 Covert<bool> ProtectedOnlineFlag = false;
 
 void rnsetServerInfo(UINT32 serverip, UINT32 serverport, UINT32 otp) {
@@ -330,7 +323,7 @@ void rnconnectToServer(void) {
 	}
 }
 
-// Init everything for rendering
+// Init everything for rendering (HACK: and everything else...)
 LOGICAL rnmainInit()
 {
 #if platOS == OS_WIN32
@@ -346,17 +339,6 @@ LOGICAL rnmainInit()
     rand_s(&value);
     srand(value);
 #endif
-
-	// these globals can be used to validate the state of the game w/steam prior to executing steam related functions
-	steamInitialized = SteamAPI_Init();
-	if (steamInitialized)
-	{
-		installedAsSteamApp = SteamApps()->BIsAppInstalled(STEAM_APP_ID);
-		if (installedAsSteamApp)
-		{
-			isSteamApp = SteamApps()->BIsSubscribedApp(STEAM_APP_ID);
-		}
-	}
 
 	rnlogoSplash();
 
@@ -486,7 +468,7 @@ LOGICAL rnmainInit()
 
 	_ViewScaleFactor = _WORLD_VIEW_SCALE_FACTOR;
 
-	GameClientInitTeul(); // TODO: Don't load the online mode stuff if we can't init teul anyway.
+	GameClientInitTeul();
 
 	uiPostInit();
 	uiLoadView("OnlineModeSelect");
