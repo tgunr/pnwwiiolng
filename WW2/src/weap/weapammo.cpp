@@ -58,7 +58,6 @@
 #include "tut/TutorialManager.h"
 #include "fx/TransformEffect.h"
 #include "trn/trnvars.h"
-#include "random.h"
 
 #define USE_FX2 1
 
@@ -153,8 +152,7 @@ enum
     WEAP_AMMOVAR_GRENADEORIENT,
 	WEAP_AMMOVAR_GRENADERESTITUTION,
     WEAP_AMMOVAR_HITEFFECT_TYPE,
-    WEAP_AMMOVAR_GHOSTROUNDSTO,
-    WEAP_AMMOVAR_VARIANCE,
+	WEAP_AMMOVAR_GHOSTROUNDSTO,
 	WEAP_AMMOMAXVAR
 };
 
@@ -232,8 +230,7 @@ static UCHAR _AmmoTypeVarNames[WEAP_AMMOMAXVAR][32] = {
 	"grenadeorient",
 	"grenaderestitution",
     "hiteffect",
-	"ghostroundsto",
-    "variance"
+	"ghostroundsto"
 };
 
 static UCHAR _AmmoSubTypeVarNames[WEAPAMMO_SUBTYPE_MAX][32] =
@@ -398,7 +395,6 @@ logTimerBeginMacro();
 			// ensure that ammo has some form of penetration constant
 			AmmoType->PenetrationConstant = 0.00000000001f;
             AmmoType->TracerScale = 4.0f; // WAG
-            AmmoType->VelocityVariance = 0.0015f; // .15 % variance
 
 			while (fioGetString(CurrentAmmoFile,(char*)Buffer,255) != 0)
 			{
@@ -668,10 +664,7 @@ logTimerBeginMacro();
 					break;
                     case WEAP_AMMOVAR_GHOSTROUNDSTO:
 						AmmoType->UseGhostRoundSTO = (LOGICAL)atoi((char*)VarContents);
-                        break;
-                    case WEAP_AMMOVAR_VARIANCE:
-                        AmmoType->VelocityVariance = (FLOAT32)atof((char*)VarContents);
-                        break;
+                    break;
 					default:
 						Write_Log(LOG_WEAP,LOG_WARN,"Unidentified var %s in file %s",VarName,FileName);
 					break;
@@ -1767,10 +1760,7 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 	// calculate round's actual velocity
 	ProjVel.x = ProjVel.z = 0;
 	// vary round's velocity a bit
-    float velocityFactor = GetRandom(0.0f, AmmoType->VelocityVariance);
-    ProjVel.y = (FLOAT64)InitVelocity - (FLOAT64)((FLOAT64)InitVelocity * (FLOAT64)velocityFactor);
-    Write_Log(LOG_WEAP, LOG_INFO, "WEAP AMMO %s IVel: %f Variance: %f vFactor: %f PVel: %f DIFF: %f",
-              AmmoType->Name, InitVelocity, AmmoType->VelocityVariance, velocityFactor, ProjVel.y,  InitVelocity - ProjVel.y );
+	ProjVel.y = InitVelocity * (1.0 + 0.018 * (mathGetFloat32ChaoticNumber() *  mathGetFloat32ChaoticNumber() *  2.0f - 1.0f));
 
 	// add shooter's velocity
 	mathVectorMultiply64(&ProjVel, &ProjVel, FireAtt);
