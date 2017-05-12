@@ -571,7 +571,11 @@ int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 	Teul::PlayerIdent& ident	= _classdata->playerIdent;
 
 	ClientHostConnection* conn = new ClientHostConnection(Teul::Connection::Map, server, ident, 30*1000);
-	conn->start(this);
+	if (!conn->start(this))
+	{
+		dbugLog(_FLI, "Failed to start host connection");
+		throw ClientNetError("connect.login.auth.failed");
+	}
 
 	StatusMessage("loading.network.loggingin");
 
