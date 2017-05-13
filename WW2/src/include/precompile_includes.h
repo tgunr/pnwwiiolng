@@ -72,7 +72,7 @@
 ////////// Core utility functions
 
 template <typename T, std::size_t N>
-constexpr std::size_t array_size(T(&)[N]) { return N; }
+constexpr std::size_t array_size(T(&)[N]) noexcept { return N; }
 
 
 template <typename... Args>

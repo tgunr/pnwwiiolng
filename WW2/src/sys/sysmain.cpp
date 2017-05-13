@@ -673,7 +673,9 @@ char GetOSBuild()
 // This is the actual winmain
  int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	InitSteam();
+	// We may need to restart if this is a Steam version that wasn't launched properly.
+	if ( ! InitSteam() )
+		return 0;
 
 	int		x, y, w, h, wh, xy;
 	int		bpp, hdw, stencil, wnd;
