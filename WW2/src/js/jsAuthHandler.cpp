@@ -47,8 +47,8 @@ JS_FUNCTION_DEF(jsAuthHandler, Connect) {
 	jsAuthHandler* handler = phui::js::Cast<jsAuthHandler*>(ctx, jsobj);
 	if ( ! handler ) return JS_FALSE;
 
-	// HACK: The default shouldn't be in the GUI code.
-	std::string authaddr = "authdevng.playnet.com";
+	// HACK: The default really shouldn't be in the GUI code.
+	std::string authaddr = "auth.playnet.com";
 	if ( argc > 0 )
 		authaddr = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
 
@@ -71,8 +71,12 @@ JS_FUNCTION_DEF(jsAuthHandler, Disconnect) {
 	jsAuthHandler* handler = phui::js::Cast<jsAuthHandler*>(ctx, jsobj);
 	if ( ! handler ) return JS_FALSE;
 
-	delete authconn;
-	authconn = nullptr;
+	if ( handler->checking_messages ) {
+		handler->disconnect_requested = true;
+	} else {
+		delete authconn;
+		authconn = nullptr;
+	}
 	return JS_TRUE;
 }
 
@@ -88,13 +92,9 @@ namespace {
 JS_FUNCTION_DEF(jsAuthHandler, CheckMessages) {
 	jsAuthHandler* handler = phui::js::Cast<jsAuthHandler*>(ctx, jsobj);
 	if ( ! handler ) return JS_FALSE;
+	if ( ! authconn ) return JS_FALSE;
 
-	if ( ! authconn ) {
-		*rval = BOOLEAN_TO_JSVAL(false);
-		return JS_TRUE;
-	}
-
-	*rval = BOOLEAN_TO_JSVAL(true);
+	handler->checking_messages = true;
 
 	const AuthConnection::Action& action = authconn->GetAction();
 	assert ( 0 < action.action && action.action < AuthConnection::ACT_COUNT );
@@ -102,6 +102,7 @@ JS_FUNCTION_DEF(jsAuthHandler, CheckMessages) {
 
 	jsval dummy;
 	if ( action.action == AuthConnection::ACT_IDLE || action.state == States::Waiting ) {
+		handler->checking_messages = false; // HACK: Early return
 		return JS_TRUE;
 	} else if ( action.state == States::Complete ) {
 		if ( action.action == AuthConnection::ACT_POLL_ARENAS ) {
@@ -123,8 +124,15 @@ JS_FUNCTION_DEF(jsAuthHandler, CheckMessages) {
 		jsval argv[] = { phui::js::NewString(msg.c_str()) };
 		JS_CallFunctionName(ctx, jsobj, completion_callbacks[AuthConnection::ACT_ERROR], array_size(argv), argv, &dummy);
 	}
-
 	authconn->ClearAction();
+
+	handler->checking_messages = false;
+	if ( handler->disconnect_requested ) { // HACK: Repeated code
+		delete authconn;
+		authconn = nullptr;
+		handler->disconnect_requested = false;
+	}
+
 	return JS_TRUE;
 }
 

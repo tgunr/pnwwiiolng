@@ -26,6 +26,10 @@ public:
 	virtual JSBool GetProperty(JSContext* ctx, int propid, jsval* val) override;
 
 	phui::js::array_root_ptr arenas;
+
+	// HACK: For disconnecting as a result of a login request being approved
+	bool checking_messages = false;
+	bool disconnect_requested = false;
 };
 
 
