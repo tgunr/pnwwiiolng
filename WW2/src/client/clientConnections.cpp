@@ -391,7 +391,7 @@ AuthConnection::~AuthConnection() {
 	dbugLog(_FLI, "Closing AuthConnection");
 	assert ( g_authconn == this );
 
-	if ( teul_index > -1 )
+	if ( teul_index >= 0 )
 		teulClose(teul_index);
 
 	g_authconn = nullptr;
@@ -400,7 +400,7 @@ AuthConnection::~AuthConnection() {
 //==============
 
 bool AuthConnection::ConnectionGood(void) const {
-	return teul_index > 0;
+	return teul_index >= 0;
 }
 
 bool AuthConnection::Connected(void) const {
@@ -421,7 +421,6 @@ void AuthConnection::Login(const UsernamePassword& info) {
 		return;
 	}
 
-	// TODO: This is correct for callsigns. Verify the same for usernames
 	if ( info.username.length() < 2 || info.username.length() > 16 ) {
 		action = {ACT_ERROR, "authconn.error.badusername.length"};
 		return;
