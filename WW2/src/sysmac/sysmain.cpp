@@ -70,11 +70,7 @@ int sysmain()
 		exit(0);
 	}
 #else
-	if(!rnmainGetOnlineSetting())
-	{
-		printf("rnmainGetOnlineSetting: App was not able to initialize!\n");
-		exit(0);
-	}
+	rncheckPlaygateParams();
 
 	if(!rnmainInit())
 	{

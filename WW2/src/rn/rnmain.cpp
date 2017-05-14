@@ -264,8 +264,65 @@ static int _GetStratData(int scx, int scy, sdm_strat_data* sdmdata)
 //////////////////////////////////////////////////////////////////////
 // Find out whether this is going to be an online session or not.
 
-static UINT32 GameHost, GameOTP;
-static UINT16 GamePort;
+namespace {
+	UINT32 GameHost = 0, GameOTP = 0;
+	UINT16 GamePort = 0;
+}
+
+void rncheckPlaygateParams(void) {
+	UINT16 CommType;
+
+	// temp hack until command line params set for going online
+	if ( BypassString[0] != '\0' ) {
+		if ( BypassString[0] == 'R' )
+			BypassID = strtoul(&BypassString[1], nullptr, 10);
+		else
+			BypassID = strtoul(&BypassString[0], nullptr, 10);
+	} else
+		BypassID = 0;
+
+	if ( BypassID != 0 ) {
+		if ( teulGetHost(GameServerIP, &GameHost) == 0 ) {
+			Write_Debug("Unable to translate host address");
+			return;
+		}
+
+		GamePort = WWII::Net::Ports::MapHost;
+		CommType = PROTOCOL_TCP;
+		GameOTP = strtoul(GameServerOTP, nullptr, 10);
+
+#if defined(BETA_RELEASE)
+		if ( GameOTP == 0 ) {
+			GameOTP = AUTH_BYPASS_OTP;
+			snprintf(GameServerOTP, sizeof(GameServerOTP)-1, "%u", GameOTP);
+		}
+#endif
+	} else {
+#if defined(AUTH_BYPASS)
+#pragma message("AUTH_BYPASS using Host " AUTH_BYPASS)
+		if ( teulGetHost((UCHAR*)AUTH_BYPASS, &GameHost) == 0 ) {
+			Write_Debug("Unable to translate host address");
+			return false;
+		}
+
+		GamePort = WWII::Net::Ports::MapHost;
+		CommType = TCP;
+		GameOTP = AUTH_BYPASS_OTP;
+#else
+		if ( TicketFile[0] != 0 )
+			_ParseTicketFile(&GameHost, &GamePort, &CommType, &GameOTP);
+		else if ( GameServerIP[0] != 0 )
+			_ParseCommandArgs(&GameHost, &GamePort, &CommType, &GameOTP);
+#endif
+	}
+}
+
+
+bool rnhasServerInfo(void) {
+	return GameOTP != 0;
+}
+
+//////////////////////////////////////////////////////////////////////
 
 Covert<bool> ProtectedOnlineFlag = false;
 
@@ -302,24 +359,26 @@ void rnconnectToServer(void) {
 	ProtectedOnlineFlag = Online;
 
 	cfgPrefsSendSharedPrefs();
+}
 
-	// TODO: Move to UI flow.
-	{
-		// a bit of conditional logic to determine online entry page
-		// default to campaign mode only
-		SINT32 playMode = 1;
-
+void rnloadRootWindow(void) {
+	if ( Online ) {
 		ARENA_VARS::iterator found = g_arenaDescription.find("play_mode");
+		if ( found != g_arenaDescription.end() ) {
+			SINT32 playMode = atoi(found->second.c_str());
 
-		if ( found != g_arenaDescription.end() )
-			playMode = atoi(found->second.c_str());
-
-		if ( playMode == 2 )
-			uiLoadView("scenarios/lobby");
-		else if ( playMode == 1 )
+			if ( playMode == 2 )
+				uiLoadView("scenarios/lobby");
+			else if ( playMode == 1 )
+				uiLoadView("persona");
+			else
+				uiLoadView("online");
+		} else {
 			uiLoadView("persona");
-		else
-			uiLoadView("online");
+		}
+	} else {
+		// TODO: Connect by default for Steam.
+		uiLoadView("OnlineModeSelect");
 	}
 }
 
@@ -380,6 +439,15 @@ LOGICAL rnmainInit()
 	if (!rntextInit())
 	{
 		return(FALSE);
+	}
+
+	if ( rnhasServerInfo() ) {
+		try {
+			rnconnectToServer();
+		} catch ( std::exception& e ) {
+			dbugLog(_FLA, "Failed to connect to server: '%s'", e.what());
+			return FALSE;
+		}
 	}
 
 	// lets check to make sure we have the minimum spec to run the game
@@ -471,7 +539,7 @@ LOGICAL rnmainInit()
 	GameClientInitTeul();
 
 	uiPostInit();
-	uiLoadView("OnlineModeSelect");
+	rnloadRootWindow();
 	uiChatShow();
 
 	// make sure devices get detected
@@ -1129,6 +1197,90 @@ inline std::string& rtrim(std::string& s, const char* t = " \t\n\r\f\v")
 {
     s.erase(s.find_last_not_of(t) + 1);
     return s;
+}
+
+static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UINT32* cookie) {
+	LOGICAL	retval = TRUE;
+	std::string apID, data, serverIP, serverport, serverprotocol, otp, bypass;
+
+	try {
+		std::ifstream  ticketFileStream(TicketFile);
+		std::getline(ticketFileStream, apID); // ignore
+		std::getline(ticketFileStream, data); // ignore
+		std::getline(ticketFileStream, serverIP);
+		std::string temp = serverIP.substr(serverIP.find(" ")+1);
+		std::string ipAddress = rtrim(temp);
+		if ( !ipAddress.empty() ) {
+			*host = strtoul(ipAddress.c_str(), nullptr, 10);
+		}
+		std::getline(ticketFileStream, serverport);
+		std::string ipPort = serverport.substr(serverport.find(" ")+1);
+		if ( !ipPort.empty() ) {
+			*port = static_cast<UINT16>(strtoul(ipPort.c_str(), nullptr, 10));
+		}
+		std::getline(ticketFileStream, serverprotocol);
+		std::string ipProt = serverprotocol.substr(serverprotocol.find(" ")+1);
+		if ( !ipProt.empty() ) {
+			*protocol = static_cast<UINT16>(strtoul(ipProt.c_str(), nullptr, 10));
+		}
+		std::getline(ticketFileStream, otp); // cookie
+		std::string otpText = otp.substr(otp.find(" ")+1);
+		if ( !otpText.empty() ) {
+			*cookie = static_cast<UINT32>(strtoul(otpText.c_str(), nullptr, 10));
+		}
+
+		std::getline(ticketFileStream, bypass);
+		if ( !bypass.empty() ) {
+			if ( teulGetHost(ipAddress.c_str(), host) == 0 ) {
+				Write_Debug("Unable to translate host address");
+				return (FALSE);
+			}
+
+			std::string userId = bypass.substr(bypass.find(" ")+1);
+			if ( !userId.empty() ) {
+				strncpy(BypassString, userId.c_str(), 32);
+
+				if ( BypassString[0] != '\0' ) {
+					if ( BypassString[0] == 'R' )
+						BypassID = strtoul(&BypassString[1], nullptr, 10);
+					else
+						BypassID = strtoul(&BypassString[0], nullptr, 10);
+				} else
+					BypassID = 0;
+			}
+
+		}
+	} catch ( std::ifstream::failure e ) {
+		Write_Debug(e.what());
+		retval = FALSE;
+		Online = 0;
+	}
+
+
+	return(retval);
+}
+
+static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, UINT32* otp) {
+
+	if ( GameServerIP[0] == 0 )
+		return FALSE;
+	if ( GameServerPort[0] == 0 )
+		return FALSE;
+	if ( GameServerOTP[0] == 0 )
+		return FALSE;
+
+	if ( teulGetHost(GameServerIP, host) == 0 ) {
+		Write_Debug("Unable to translate host address");
+		return (FALSE);
+	}
+
+	*port = (UINT16)strtoul(GameServerPort, nullptr, 10);
+	*protocol = PROTOCOL_TCP;
+
+	*otp = strtoul(GameServerOTP, nullptr, 10);
+
+	return TRUE;
+
 }
 
 #if DEBUG_SQRT

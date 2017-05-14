@@ -39,5 +39,10 @@
 	extern LOGICAL rnmainListLocColorText(SINT32 category, SINT32 locID, UINT32 uColor);
 	extern LOGICAL rnmainListEmoteText(SINT32 category, SINT32 locID, UINT32 uColor, const WCHAR* prepend, const WCHAR* append);
 
+	extern void rncheckPlaygateParams(void);
 	extern void rnsetServerInfo(UINT32 serverip, UINT32 serverport, UINT32 otp);
+	extern bool rnhasServerInfo(void);
 	extern void rnconnectToServer(void);
+	// Sends us to the starting GUI screen based on the server we are/aren't connected to.
+
+	extern void rnloadRootWindow(void);

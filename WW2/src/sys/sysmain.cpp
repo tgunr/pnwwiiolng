@@ -971,6 +971,8 @@ char GetOSBuild()
 #endif
 #endif
 
+	rncheckPlaygateParams();
+
 #define DONT_USE_THREAD
 #if defined(DONT_USE_THREAD) || defined(DIRECT3D)	// Use this path for a single thread environment else a multi-thread environment
 

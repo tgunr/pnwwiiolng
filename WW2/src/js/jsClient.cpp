@@ -75,6 +75,7 @@ JSFunctionSpec jsClient::jsfunctions[] =
 {
 	JS_FUNCTION_SPEC(jsClient, createauthhandler,0),
 	JS_FUNCTION_SPEC(jsClient, connecttoarena,0),
+	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
 	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
 	JS_FUNCTION_SPEC(jsClient, acceptmission,1),
@@ -233,8 +234,28 @@ JS_FUNCTION_DEF(jsClient, connecttoarena) {
 	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
 	if ( ! jsclient ) return JS_FALSE;
 
-	// HACK: I kind of feel like we should pass in the auth info, but instead it's set semi-globally.
-	rnconnectToServer();
+	try {
+		// HACK: We should pass in the auth info, but for now it's set semi-globally.
+		rnconnectToServer();
+	} catch ( std::exception& ) {
+		// TODO: Error message
+		*rval = BOOLEAN_TO_JSVAL(false);
+	}
+
+	*rval = BOOLEAN_TO_JSVAL(true);
+	return JS_TRUE;
+}
+
+
+/************************************************************************************************
+	gui state
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, loadrootwindow) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	rnloadRootWindow();
 
 	return JS_TRUE;
 }

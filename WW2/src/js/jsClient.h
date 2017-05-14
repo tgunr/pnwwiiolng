@@ -72,6 +72,7 @@ public:
 	JS_CLASS_DATA;
 	JS_FUNCTION(createauthhandler);
 	JS_FUNCTION(connecttoarena);
+	JS_FUNCTION(loadrootwindow);
 	JS_FUNCTION(getmisscountry);
 	JS_FUNCTION(getmissbrigade);
 	JS_FUNCTION(acceptmission);
