@@ -1493,10 +1493,12 @@ ServerManager::SetPlayerTeulIndex(PlayerStatusNode* const psn, SINT32 teulIndex)
 	if ( psn->teulIndex >= 0 )
 	{
 		PLAYERIDX_MAP::iterator it = s_byTeulIndex.find(psn->teulIndex);
+		assert ( it != s_byTeulIndex.end() )
 		if ( it == s_byTeulIndex.end() )
-			LogAbort("t:%d p:%u oldt:%d previous instance not registered", teulIndex, psn->id, psn->teulIndex);
+			dbugLog(_FLA, "t:%d p:%u oldt:%d previous instance not registered", teulIndex, psn->id, psn->teulIndex);
+		assert ( it == s_byTeulIndex.end() )
 		if ( it->second != psn )
-			LogAbort("t:%d p:%u newt:%u oldt:%u oldp:%u previous instance registered to someone else"
+			dbugLog(_FLA, "t:%d p:%u newt:%u oldt:%u oldp:%u previous instance registered to someone else"
 							, teulIndex, psn->id, psn->teulIndex, (it->second)->teulIndex, (it->second)->id
 							);
 
