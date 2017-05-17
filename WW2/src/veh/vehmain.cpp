@@ -1378,8 +1378,17 @@ UINT32 vehUpdate()
     reports.clear();
 #endif
 
-	if ( PlayerVehicle && PlayerVehicle->ModelData && PlayerVehicle->RideVehicleHostIndex == 0 )
-		vehUpdate1stPersonVehicle(PlayerVehicle);
+	// ok we do several passes through the list because order is important for vehicle riding
+	// our vehicle(s) that aren't riding actually i don't know if i need to do this but
+	// may be some issue with display of other vehicles, I have no idea.
+	for (CurrentVehicle = getVehicleHead().getNext(); CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
+	{
+		if (CurrentVehicle->ModelData && CurrentVehicle->RideVehicleHostIndex == 0)
+		{
+			if(vehUpdate1stPersonVehicle(CurrentVehicle) < 0)
+				break;
+		}
+	}
 
 	// all vehicles that aren't riding on anything
 	for (CurrentVehicle = getVehicleHead().getNext(); CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
@@ -7016,8 +7025,6 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			// so we can manage them via dot command
             uiDotCommandAddClone((int)vehicle->uid());
 
-			vehUpdate();
-
 			vehVehicle*veh = vehFindVehicle(vehicle->getSTOVehicleID());
 
             veh->Flags |= VEH_FLAGS_IS_CLONE;
@@ -7030,6 +7037,15 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 
 			if(myVehicle->VehicleType->Type == VEH_TYPE_PERSON)
 			{
+				veh->PosData.Att = myVehicle->ModelData->VehicleAtt;
+				veh->PosData.RenderAtt = myVehicle->ModelData->VehicleAtt;
+				veh->PosData.Att.Yaw = veh->PosData.Att.Yaw * -1.0;
+				veh->PosData.RenderAtt.Yaw = veh->PosData.RenderAtt.Yaw * -1.0;
+
+				// fake a position update
+				vehicle->getVehicle()->interpolator.NewPosDataUpdate(0, frametime);
+				vehUpdate();
+
 				gr2AnimTrooper* newAnimModel = veh->VehicleObjectData->PlaneObject->animModel;
 				gr2AnimTrooper* myAnimModel = myVehicle->VehicleObjectData->PlaneObject->animModel;
 
@@ -7104,8 +7120,6 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 				newAnimModel->currentPoint = myAnimModel->currentPoint;
 				*/
 
-				veh->PosData.Att = myVehicle->ModelData->VehicleAtt;
-				veh->PosData.RenderAtt = myVehicle->ModelData->VehicleAtt;
 				veh->VehicleObjectData->PlaneObject->mat = myVehicle->VehicleObjectData->PlaneObject->mat;
 
 				--newAnimModel->lastUpdateTime;
@@ -7125,6 +7139,8 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			}
 			else
 			{
+				vehUpdate();
+
 				// do something for vehicles
 				veh->AnimationBits = myVehicle->AnimationBits;
 				veh->PosData = myVehicle->PosData;
