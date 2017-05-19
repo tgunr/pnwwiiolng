@@ -271,14 +271,15 @@ JS_FUNCTION_DEF(jsGame, bailout)
 
 char* jsGame::basicTrainingIncomplete(char *viewname)
 {
-    bool basicTrainingComplete = TUT_MGR->IsComplete("basic", 0);
+    
     std::string compareString(viewname);
     bool compareStringBool = compareString.compare("confirm") == 0;
-    
-    if(compareStringBool && !basicTrainingComplete)
+    if(compareStringBool)
     {
-        // conditions exist for an ok box instead.
-        return "ok";
+        bool basicTrainingComplete = TUT_MGR->IsComplete("basic", 0);
+        if(!basicTrainingComplete)
+            return "ok";
+        return viewname;
     }
     return viewname;
 }
