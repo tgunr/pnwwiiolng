@@ -572,7 +572,7 @@ void ReadoutView::DisplayRiding()
 	if(PlayerVehicle->RideVehicleHostIndex)
 		DisplayRidee(PlayerVehicle);
 
-	// display guys riding on you
+	// display players riding on you
 	DisplayVehiclesRiding(PlayerVehicle, PlayerVehicle->VehicleHostIndex);
 	DisplayInfantryRiding(PlayerVehicle, PlayerVehicle->VehicleHostIndex);
 

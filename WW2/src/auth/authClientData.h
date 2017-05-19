@@ -33,7 +33,6 @@ struct ClientData
 		, m_launchRequest(nullptr)
 		, isPlaynet(false)
 		, isPremium(false)
-		, isQueued(false)
 		{}
 
 	ClientData(SINT32 _teulIndex, UINT32 _platform, UINT32 _address
@@ -54,14 +53,9 @@ struct ClientData
 		, m_launchRequest(nullptr)
 		, isPlaynet(false)
 		, isPremium(false)
-		, isQueued(false)
 		{}
 
 	~ClientData();
-
-public:
-	void AddToQueue(const APP_LAUNCH_REQ& request);
-	void RemoveFromQueue(bool enteredGame);
 
 public:
 	SERVER*	server;
@@ -79,9 +73,8 @@ public:
 	std::string	m_password;
 	std::vector<UCHAR> m_subscribedArenaIDs;	// Arenas this user has access to
 	APP_LAUNCH_REQ* m_launchRequest;
-	bool	isPlaynet : 1;		// Staff account?
-	bool	isPremium : 1;		// Paying subscription?
-	bool	isQueued : 1;		// Player is queued
+	bool	isPlaynet;		// Staff account?
+	bool	isPremium;		// Paying subscription?
 };
 
 }

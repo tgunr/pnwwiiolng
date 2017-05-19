@@ -635,6 +635,9 @@ extern NSString *WebActionOriginalURLKey;
         authServer = [[NSString alloc] initWithUTF8String:gAuthServer];
     }
     authPort = DEFAULT_AUTH_PORT;
+    if (gAuthServerPort[0]) {
+        authPort = std::stoul(gAuthServerPort);
+    }
     
     NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     style.alignment = NSCenterTextAlignment;

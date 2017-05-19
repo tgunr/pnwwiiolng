@@ -292,7 +292,7 @@
 
 	};
 
-	// these new guys need to be taken care of...
+	// these new states need to be taken care of...
 
 	enum oglRENDERSTATEFOGTYPE
 	{

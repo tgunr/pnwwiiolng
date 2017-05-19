@@ -13,8 +13,6 @@
 
 #include "cat/crypt/tunnel/EasyHandshake.hpp"
 
-using namespace cat;
-
 class EasyHandshake;
 
 struct WWII_ACTIVATE

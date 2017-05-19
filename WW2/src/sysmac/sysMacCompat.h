@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <wchar.h>
 
-#include "include/sysTypes.h"
+#include "include/systypes.h"
 
 using DWORD = UINT32;
 
