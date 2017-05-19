@@ -269,13 +269,31 @@ JS_FUNCTION_DEF(jsGame, bailout)
 	return JS_TRUE;
 }
 
+char* jsGame::basicTrainingIncomplete(char *viewname)
+{
+    bool basicTrainingComplete = TUT_MGR->IsComplete("basic", 0);
+    std::string compareString(viewname);
+    bool compareStringBool = compareString.compare("confirm") == 0;
+    
+    if(compareStringBool && !basicTrainingComplete)
+    {
+        // conditions exist for an ok box instead.
+        return "ok";
+    }
+    return viewname;
+}
+
 /************************************************************************************************
 	load
 *************************************************************************************************/
-
+#include <iostream>
 JS_FUNCTION_DEF(jsGame,load)
 {
-	phui::View* view = uiLoadView(JS_GetStringBytes(JS_ValueToString(ctx, argv[0])));
+    
+    char* loadviewname = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
+    loadviewname = jsGame::basicTrainingIncomplete(loadviewname);
+    
+	phui::View* view = uiLoadView(loadviewname);
 
 	if(view)
 	{
