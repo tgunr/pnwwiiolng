@@ -479,6 +479,8 @@
 		E9C1BDE11E462A38001FD5B0 /* liblibcattunnel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD41E461EE6001FD5B0 /* liblibcattunnel.a */; };
 		E9C1BDE21E462B00001FD5B0 /* raknetConn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9C1BDDA1E461F1E001FD5B0 /* raknetConn.cpp */; };
 		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
+		FA06C3B51ECF289F00A9977E /* authSteam.h in Headers */ = {isa = PBXBuildFile; fileRef = FA06C3B31ECF289F00A9977E /* authSteam.h */; };
+		FA06C3B61ECF2CD400A9977E /* authSteam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3B21ECF289F00A9977E /* authSteam.cpp */; };
 		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
 		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
 		FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */ = {isa = PBXBuildFile; fileRef = FA13BB181C875F6800095818 /* placeholder-background.png */; };
@@ -1589,6 +1591,8 @@
 		E9C1BDDA1E461F1E001FD5B0 /* raknetConn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raknetConn.cpp; path = teul/raknetConn.cpp; sourceTree = "<group>"; };
 		E9C1BDDC1E461F2F001FD5B0 /* raknetConn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = raknetConn.h; sourceTree = "<group>"; };
 		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
+		FA06C3B21ECF289F00A9977E /* authSteam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = authSteam.cpp; path = auth/authSteam.cpp; sourceTree = "<group>"; };
+		FA06C3B31ECF289F00A9977E /* authSteam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authSteam.h; path = auth/authSteam.h; sourceTree = "<group>"; };
 		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
 		FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authPlaygateTypes.h; path = src/auth/authPlaygateTypes.h; sourceTree = SOURCE_ROOT; };
 		FA13BB161C86758600095818 /* libevent.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libevent.a; path = proj/mac/build/Debug/libevent.a; sourceTree = "<group>"; };
@@ -3023,6 +3027,7 @@
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				FA06C3B11ECF27FB00A9977E /* auth */,
 				E97C763D1C85146A00875F44 /* event */,
 				08E5E55513E855A100A5034D /* ez */,
 				08977DDA134CFB7200C9DCFE /* scen */,
@@ -3248,6 +3253,15 @@
 			name = event;
 			sourceTree = "<group>";
 		};
+		FA06C3B11ECF27FB00A9977E /* auth */ = {
+			isa = PBXGroup;
+			children = (
+				FA06C3B31ECF289F00A9977E /* authSteam.h */,
+				FA06C3B21ECF289F00A9977E /* authSteam.cpp */,
+			);
+			name = auth;
+			sourceTree = "<group>";
+		};
 		FA3D8BB11C8BF5CC002C5119 /* Config */ = {
 			isa = PBXGroup;
 			children = (
@@ -3311,6 +3325,7 @@
 				082CF7EC120222EB00A60CC2 /* oalOSX.h in Headers */,
 				082CF7EE120222EB00A60CC2 /* oalSource.h in Headers */,
 				082CF82A12022CF700A60CC2 /* al.h in Headers */,
+				FA06C3B51ECF289F00A9977E /* authSteam.h in Headers */,
 				082CF82B12022CF700A60CC2 /* alc.h in Headers */,
 				082CF82C12022CF700A60CC2 /* CAAtomicStack.h in Headers */,
 				082CF82D12022CF700A60CC2 /* CAByteOrder.h in Headers */,
@@ -3872,6 +3887,7 @@
 				08104E68103DFD270065E0E2 /* uiLua.cpp in Sources */,
 				08104E69103DFD270065E0E2 /* uiMain.cpp in Sources */,
 				08104E6A103DFD270065E0E2 /* uiMovieView.cpp in Sources */,
+				FA06C3B61ECF2CD400A9977E /* authSteam.cpp in Sources */,
 				08104E6B103DFD270065E0E2 /* uiSound.cpp in Sources */,
 				08104E7A103DFD480065E0E2 /* updtPackers.cpp in Sources */,
 				08104EA6103DFD750065E0E2 /* vehanim.cpp in Sources */,
