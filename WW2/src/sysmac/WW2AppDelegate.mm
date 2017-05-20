@@ -25,7 +25,6 @@
 #include "auth/authAppIDs.h"
 #include <netdb.h>
 #include <arpa/inet.h>
-#include "sysLaunchURL.h"
 #import <HockeySDK/HockeySDK.h>
 #include "steam_api.h"
 
@@ -1949,8 +1948,3 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 }
 
 @end
-
-LOGICAL syslaunchurl(const char* url, LOGICAL local)
-{
-    return TRUE;
-}

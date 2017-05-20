@@ -8,6 +8,7 @@
 #include "ddp.h"
 #include "rnmain.h"
 #include "rnlogo.h"
+#include "sys/sysLaunchUrl.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -143,4 +144,9 @@ void PostModalErrorDialog(const char *title, const char *message)
         ddpTemporarilyEscapeFullscreen(false);
     }
     rnUpdateLoadingScreen();
+}
+
+LOGICAL syslaunchurl(const char* url, LOGICAL local)
+{
+    return TRUE;
 }

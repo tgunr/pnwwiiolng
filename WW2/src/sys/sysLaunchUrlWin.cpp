@@ -3,7 +3,7 @@
 #include <shellapi.h>
 #include <direct.h> // _getcwd
 #include <string>
-#include "sysLaunchUrl.h"
+#include "sys/sysLaunchUrl.h"
 #include "include/vars.h"
 
 extern HWND	myhwnd;
