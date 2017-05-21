@@ -154,7 +154,7 @@ public:
         static const std::vector<std::string> reqs{
             "INVALID", "LIST", "NOMINATE", "VETO", "VOLUNTEER", "RESIGN", "REPLACE", "REMOVE", "MOVE", "ATTACK", "CLEAR", "DEFEND" };
         auto rawReq = static_cast<std::underlying_type<BRIGADE_ACTION_REQ>::type>(req);
-        return rawReq > 0 && rawReq < reqs.size() ? reqs[rawReq] : std::to_string(rawReq);
+        return rawReq > 0 && (size_t)rawReq < reqs.size() ? reqs[rawReq] : std::to_string(rawReq);
     }
 
 public:
