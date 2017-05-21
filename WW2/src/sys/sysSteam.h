@@ -8,4 +8,3 @@ bool InitSteam(void);
 void KillSteam(void);
 
 bool IsSteamCopy(void);
-bool SteamIsConnected(void);

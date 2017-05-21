@@ -2,9 +2,12 @@
 #include <string.h>
 #include <algorithm>
 
+#include <steam_api.h> // HACK
+
 #include "phui/Util.h"
 
 #include "include/vars.h"
+#include "auth/authSteam.h"
 #include "js/jsClient.h"
 #include "js/jsStratDB.h"
 #include "js/jsGame.h"
@@ -75,6 +78,7 @@ JSFunctionSpec jsClient::jsfunctions[] =
 {
 	JS_FUNCTION_SPEC(jsClient, createauthhandler,0),
 	JS_FUNCTION_SPEC(jsClient, connecttoarena,0),
+	JS_FUNCTION_SPEC(jsClient, steamconnect,2),
 	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
 	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
@@ -243,6 +247,35 @@ JS_FUNCTION_DEF(jsClient, connecttoarena) {
 	}
 
 	*rval = BOOLEAN_TO_JSVAL(true);
+	return JS_TRUE;
+}
+
+
+/************************************************************************************************
+	steam connection
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, steamconnect) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+	if ( argc < 1 ) return JS_FALSE;
+	
+	int32 arena;
+	JS_ValueToInt32(ctx, argv[0], &arena);
+	const char* callsign = "";
+	if ( argc >= 2 )
+		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[3]));
+
+	// HACK: Move this to sysSteam so we aren't doing this in GUI code.
+	char ticket_data[128];
+	uint32_t ticket_length;
+	HAuthTicket ticket = SteamUser()->GetAuthSessionTicket(ticket_data, array_size(ticket_data),
+	                                                       &ticket_length);
+	SteamLoginResponse login_response = authRequestSteamLogin(ticket_data, ticket_length,
+	                                                          arena, callsign);
+	SteamUser()->CancelAuthTicket(ticket);
+
+	*rval = INT_TO_JSVAL(login_response);
 	return JS_TRUE;
 }
 

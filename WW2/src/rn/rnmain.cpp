@@ -75,6 +75,7 @@
 #include "weap/weapammo.h"
 #include "locl/loclMain.h"
 #include "sysmain.h"
+#include "sys/sysSteam.h"
 #include "sdm/sdm.h"
 #include "sdm/StratDB.h"
 #include "js/jsClient.h"
@@ -377,8 +378,10 @@ void rnloadRootWindow(void) {
 			uiLoadView("persona");
 		}
 	} else {
-		// TODO: Connect by default for Steam.
-		uiLoadView("OnlineModeSelect");
+		if ( IsSteamCopy() )
+			uiLoadView("SteamOnlineModeSelect");
+		else
+			uiLoadView("OnlineModeSelect");
 	}
 }
 

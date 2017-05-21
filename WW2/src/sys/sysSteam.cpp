@@ -12,6 +12,8 @@ namespace {
 //==============================================================================
 
 bool InitSteam(void) {
+	// TODO: Don't initialize Steam for non-steam installations.
+
 	if ( steam_initialized )
 		return true;
 
@@ -37,7 +39,3 @@ bool IsSteamCopy(void) {
 	// and own the game, *every* copy is a Steam copy as far as this is concerned.
 	return steam_initialized && SteamApps()->BIsSubscribed();
 }
-
-/*bool SteamIsConnected(void) {
-	return steam_initialized && 
-}*/
