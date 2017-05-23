@@ -6,12 +6,12 @@
 enum STO_EFFECT_SUBTYPES
 {
     _STO_NONE,
-    _STO_SMOKE_GRENADE,
+    _STO_SMOKE,
     //Add here
     _STO_MAX_EFFECTS
 };
 
-class SmokeGrenadeSTO : public ServerTrackedObject
+class SmokeSTO : public ServerTrackedObject
 {
 public:
 
@@ -22,22 +22,22 @@ public:
 		GERMAN		= 1<<2
 	};
 
-    SmokeGrenadeSTO(const WorldPosition_m& worldpos, const AttitudeVector& attitude, UINT32 mslifetime, UINT32 flags)
-                    : ServerTrackedObject(0, _EFFECT, _STO_SMOKE_GRENADE, worldpos, attitude, flags, mslifetime)
+    SmokeSTO(const WorldPosition_m& worldpos, const AttitudeVector& attitude, UINT32 mslifetime, UINT32 flags)
+                    : ServerTrackedObject(0, _EFFECT, _STO_SMOKE, worldpos, attitude, flags, mslifetime)
 					, te(nullptr)
 					, _stosoundpopID(0)
 					, _stosoundfizzID(0)
     {
     }
 
-    virtual ~SmokeGrenadeSTO();
+    virtual ~SmokeSTO();
 
-    SmokeGrenadeSTO(ACTION_OBJECT* const a)
+    SmokeSTO(ACTION_OBJECT* const a)
     : ServerTrackedObject(a), te(nullptr), _stosoundpopID(0), _stosoundfizzID(0)
     {
     }
 
-    bool createSmokeGrenade();
+    bool createSmoke();
 
 protected:
 	// Interface for activating and deactivating

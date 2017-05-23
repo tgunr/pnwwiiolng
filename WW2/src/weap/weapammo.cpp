@@ -125,7 +125,7 @@ enum
 	WEAP_AMMOVAR_TORPEDO_RUNDEPTH,
 	WEAP_AMMOVAR_TORPEDO_RUNSPEED,
 	WEAP_AMMOVAR_FUSE_TYPE,
-	WEAP_AMMOVAR_ISSMOKEGRENADE,
+	WEAP_AMMOVAR_HAS_SMOKE,
 	WEAP_AMMOVAR_SHRAPNELPENETRATION,
 	WEAP_AMMOVAR_USE_NEW_HE,
 	WEAP_AMMOVAR_NHE_SHRAP_DIAM,
@@ -565,8 +565,8 @@ logTimerBeginMacro();
 						if(AmmoType->FuzeType != WEAPAMMO_FUZE_FIXTIME && AmmoType->FuzeType != WEAPAMMO_FUZE_VARTIME)
 							Write_Log(LOG_WEAP,LOG_WARN, "fuze type %s not supported yet", VarContents);
 					break;
-					case WEAP_AMMOVAR_ISSMOKEGRENADE:
-						AmmoType->IsSmokeGrenade = (SINT32)atoi((char*)VarContents);
+					case WEAP_AMMOVAR_HAS_SMOKE:
+						AmmoType->HasSmoke = (SINT32)atoi((char*)VarContents);
 					break;
 					// new HE variables
 					case WEAP_AMMOVAR_USE_NEW_HE:
@@ -1639,7 +1639,7 @@ static LOGICAL _UpdateGrenade(weapAmmo* Ammo)
 {
 	if(Ammo->KillAmmo) return TRUE;
 
-    // Keep smokegrenade object drawn until smoke has completed.
+    // Keep smoke object drawn until smoke has completed.
     if(Ammo->Flags & WEAP_AMMOFLAG_SPECIALACTIVE)
     {
         return FALSE;
@@ -1674,13 +1674,13 @@ static LOGICAL _UpdateGrenade(weapAmmo* Ammo)
 		}
 
 
-		if(Ammo->AmmoType->IsSmokeGrenade)
+		if(Ammo->AmmoType->HasSmoke)
 		{
 			if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
             {
-                // Have to handle smokegrenades in a special case, since we want
+                // Have to handle smoke in a special case, since we want
                 // the object to remain until the smoke has finished.
-				if(weapfxDetonateSmokeGrenade(&Position, Ammo))
+				if(weapfxDetonateSmoke(&Position, Ammo))
 				{
 					Ammo->KillAmmo = TRUE;
 				}
@@ -1689,12 +1689,12 @@ static LOGICAL _UpdateGrenade(weapAmmo* Ammo)
 					Ammo->Flags |= WEAP_AMMOFLAG_SPECIALACTIVE;
 				}
 
-				if(Ammo->AmmoType->IsSmokeGrenade != 1)
+				if(Ammo->AmmoType->HasSmoke == 1)
 					return FALSE;
             }
 		}
 		
-		if ( Ammo->AmmoType->IsSmokeGrenade != 1 ) {
+		if ( Ammo->AmmoType->HasSmoke != 1 ) {
 			weapfxAmmoExplosion(Ammo, &Position, nullptr, 0);
 
 			_DoExplosionShrapnel(Ammo, &Position, &Ammo->Velocity, frametime / 1000.0);
@@ -1881,8 +1881,8 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 	{
 		weapfxAmmoAttachSound(Ammo);
 
-		if(AmmoType->IsSmokeGrenade)
-    		weapfxAttachSmokeGrenadeToAmmo(Ammo);
+		if(AmmoType->HasSmoke)
+    		weapfxAttachSmokeToAmmo(Ammo);
 
 		// this is a real round that uses an STO for the
 		// ghost round, we should send that out here
@@ -2588,7 +2588,7 @@ static UINT32 _UpdateProjectileDisplay(weapAmmo * Ammo)
 
     // Leave smoke grenade on ground for an alotted time.
 	/* corpses are used to display grenade, so this is no longer needed
-    if(Ammo->AmmoType->IsSmokeGrenade)
+    if(Ammo->AmmoType->HasSmoke)
     {
         // Leave for 2.5 minutes
         if(frametime - (Ammo->LaunchTime * 1000) > 150000)
@@ -4146,7 +4146,7 @@ static LOGICAL _DoAmmoFuzeCheck(weapAmmo* Ammo, piVECTOR const* OldPos,  piVECTO
 	Pos.y = Pos.y + WorldOriginOffset.y;
 	Pos.z = -(Pos.z + WorldOriginOffset.z);
 
-	if(Ammo->AmmoType->IsSmokeGrenade != 1) // HACK: 1 is for smoke-only rounds
+	if(Ammo->AmmoType->HasSmoke != 1) // HACK: 1 is for smoke-only rounds
 	{
 		weapfxAmmoExplosion(Ammo, &Pos, nullptr, 0);
 		_DoExplosionShrapnel(Ammo, &Pos, &Ammo->Velocity, DetontateTime);
@@ -4163,7 +4163,7 @@ static LOGICAL _DoAmmoFuzeCheck(weapAmmo* Ammo, piVECTOR const* OldPos,  piVECTO
 static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVECTOR const* OldPos,
 									piVECTOR const* NewPos, FLOAT64 DeltaTime,  FLOAT64 CurrentTime)
 {
-	if(Ammo->AmmoType->IsSmokeGrenade == 1) // HACK: 1 is for smoke-only rounds
+	if(Ammo->AmmoType->HasSmoke == 1) // HACK: 1 is for smoke-only rounds
 		return FALSE;
 
 	if(Collision->Alpha < 0.5)
@@ -4577,7 +4577,7 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	// explode
 	if(!(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO && !Ammo->TorpedoIsRunning))
 	{
-		if(Ammo->AmmoType->IsSmokeGrenade)
+		if(Ammo->AmmoType->HasSmoke)
 		{
 			if(!_IsWater(Collision->CollideObject))
 			{
@@ -4586,18 +4586,18 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
                 // Only create STO for ownship smoke grenades
                 if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
                 {
-				    if(weapfxDetonateSmokeGrenade(&CollidePos, Ammo))
+				    if(weapfxDetonateSmoke(&CollidePos, Ammo))
 						Ammo->KillAmmo = TRUE;
 					else
 						Ammo->Flags |= WEAP_AMMOFLAG_SPECIALACTIVE;
 
-					if(Ammo->AmmoType->IsSmokeGrenade != 1)
+					if(Ammo->AmmoType->HasSmoke == 1)
 						return FALSE;
                 }
 			}
 		}
 
-		if(Ammo->AmmoType->IsSmokeGrenade != 1)
+		if(Ammo->AmmoType->HasSmoke != 1)
 		{
 			FLOAT64VECTOR AmmoDir;
 			AmmoSpeed = mathExactVectorLength(&Ammo->Velocity);

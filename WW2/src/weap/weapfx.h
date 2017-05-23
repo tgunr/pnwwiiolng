@@ -18,8 +18,8 @@ extern UINT32 weapfxAmmoWaterSplash(weapAmmo const*, FLOAT64VECTOR const* Collid
 								SINT32 PolyNum, FLOAT64 KE);
 extern UINT32 weapfxAmmoAttachSound(weapAmmo*);
 extern UINT32 weapfxAmmoDetachAmmo(weapAmmo const*);
-extern UINT32 weapfxAttachSmokeGrenadeToAmmo(weapAmmo const*);
-extern UINT32 weapfxDetonateSmokeGrenade(FLOAT64VECTOR* pPos, const weapAmmo* ammo);
+extern UINT32 weapfxAttachSmokeToAmmo(weapAmmo const*);
+extern UINT32 weapfxDetonateSmoke(FLOAT64VECTOR* pPos, const weapAmmo* ammo);
 
 // weapMount
 extern UINT32 weapfxMountFireSound(mlWeaponMount*, UINT32 MountNum, SINT32 RoundsLeft, FLOAT64VECTOR const* Pos, OBJECT* PlaneObject);
