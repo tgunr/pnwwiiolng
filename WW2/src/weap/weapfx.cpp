@@ -1018,7 +1018,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 
 	if(Ammo->Flags & WEAP_AMMOFLAG_NOFX)
 		return 0;
-	if(Ammo->AmmoType->HasSmoke == 1)
+	if(Ammo->AmmoType->HasSmoke == 1) // HACK: 1 is for smoke-only rounds
 		return 0;
 
 	mathSubVectors(&DeltaVec, NewPos, OldPos);

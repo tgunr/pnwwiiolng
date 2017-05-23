@@ -203,7 +203,7 @@ static UCHAR _AmmoTypeVarNames[WEAP_AMMOMAXVAR][32] = {
 	"torpedorundepth",
 	"torpedorunspeed",
 	"fuzetype",
-	"hassmoke",
+	"issmokegrenade",
 	"shrapnelpenetration",
 	"use_new_he",
 	"nhe_diameter",
@@ -1689,7 +1689,7 @@ static LOGICAL _UpdateGrenade(weapAmmo* Ammo)
 					Ammo->Flags |= WEAP_AMMOFLAG_SPECIALACTIVE;
 				}
 
-				if(Ammo->AmmoType->HasSmoke != 1)
+				if(Ammo->AmmoType->HasSmoke == 1)
 					return FALSE;
             }
 		}
@@ -4163,8 +4163,7 @@ static LOGICAL _DoAmmoFuzeCheck(weapAmmo* Ammo, piVECTOR const* OldPos,  piVECTO
 static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVECTOR const* OldPos,
 									piVECTOR const* NewPos, FLOAT64 DeltaTime,  FLOAT64 CurrentTime)
 {
-	int isSmoke = Ammo->AmmoType->HasSmoke;
-	if(isSmoke == 1)
+	if(Ammo->AmmoType->HasSmoke == 1) // HACK: 1 is for smoke-only rounds
 		return FALSE;
 
 	if(Collision->Alpha < 0.5)
@@ -4592,16 +4591,14 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 					else
 						Ammo->Flags |= WEAP_AMMOFLAG_SPECIALACTIVE;
 
-					if(Ammo->AmmoType->HasSmoke == 2)
-						goto explode;
-                    return FALSE;
+					if(Ammo->AmmoType->HasSmoke == 1)
+						return FALSE;
                 }
 			}
 		}
 
 		if(Ammo->AmmoType->HasSmoke != 1)
 		{
-explode:
 			FLOAT64VECTOR AmmoDir;
 			AmmoSpeed = mathExactVectorLength(&Ammo->Velocity);
 			AmmoDir = Ammo->Velocity;
