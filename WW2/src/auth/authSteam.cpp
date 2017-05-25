@@ -21,7 +21,13 @@ SteamLoginResponse authRequestSteamLogin(const void *authTicket, size_t authTick
     sysBasicHTTPResponse response;
     
     request.method = "POST";
-    request.url = authSteamLoginURL;
+	if (!gAuthServer[0])
+		request.url = authSteamLoginURL;
+	else
+	{
+		request.url = std::string("https://") + gAuthServer +
+			std::string("/v1/login");
+	}
     request.headers["Content-Type"] = "application/json";
     request.headers["X-WWIIOnline-Client-Version"] = PN_product_version_string; // Not required, just for good measure
     request.content = std::string("{") + // TODO: Do a real JSON encode here instead of just stringing strings together
