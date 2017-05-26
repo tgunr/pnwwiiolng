@@ -3180,11 +3180,18 @@ namespace {
 
 //--------------------------------------------------------------------------------------------------
 
+	/// The info needed to define a cone pointing at a target
 	struct ShrapTarget {
+		/// A ray pointing to the target's center
 		FLOAT64VECTOR dir;
-		double dist; // For culling shards that won't reach the target
+		/// The distance to the target
+		double dist;
+		/// If we pointed a cone at the target, this would be the angle needed to contain it
 		double angle;
+		/// How much of the shrapnel that angle covers.
 		double shrap_pct;
+		/// The actual target.
+		/// We note this so we can allow overlapping cones by ignoring "wrong" hits.
 		void* target;
 #ifdef WEAPON_LOGGING
 		const char* name;
@@ -3272,15 +3279,15 @@ namespace {
 
 //--------------------------------------------------------------------------------------------------
 
-	struct ShardProps {
+	struct ShrapProps {
 		unsigned total_shards; // The if-we-simulated-everything shard count
 		double mass_mult;
 		double avg_weight;
 		double base_pc;
 	};
 
-	ShardProps DetermineShardProps(const weapAmmoType& round_type, double shard_pct) {
-		ShardProps props;
+	ShrapProps DetermineShrapProps(const weapAmmoType& round_type, double shard_pct) {
+		ShrapProps props;
 
 		unsigned minmax_diff = (round_type.MaxShrapPieces > round_type.MinShrapPieces ? round_type.MaxShrapPieces - round_type.MinShrapPieces : 0);
 		props.total_shards = round_type.MinShrapPieces + (unsigned)(minmax_diff * mathGetFloat32ChaoticNumber());
@@ -3311,6 +3318,78 @@ namespace {
 		shrap.RichochetAngle = round.ShrapProjRicochetAngle;
 		return shrap;
 	}
+
+	//--------------------------------------------------------------------------------------------------
+
+	double RandomShardSpeed(const weapAmmoType& round_type) {
+		double energy = round_type.ExplosiveEnergy * round_type.ShrapEnergyMult;
+		// TODO: Scale based on the mass_mult?
+		double max_speed = sqrt(2*energy / round_type.TotalShrapnelMass);
+		return round_type.AddedParticleSpeed + max_speed * mathGetFloat32ChaoticNumber();
+	}
+
+	// Gets the matrix that points [1,0,0] toward the target
+	piMATRIX GetTargetTransform(const ShrapTarget& target) {
+		double rotz = atan2(target.dir.y, target.dir.x);
+		double roty = atan2(target.dir.z, sqrt((target.dir.x*target.dir.x) + (target.dir.y*target.dir.y)));
+		piMATRIX rotzmat, rotymat;
+		generateRotationMatrix(AROUND_Z, mlRAD_TO_DEG(rotz), &rotzmat);
+		generateRotationMatrix(AROUND_Y, mlRAD_TO_DEG(roty), &rotymat);
+		piMATRIX centermat;
+		math3dMatrixMultiply(&centermat, &rotymat, &rotzmat);
+		return centermat;
+	}
+
+	//------
+
+	// Generate a random ray pointing toward the target
+	piVECTOR GetRandomShardVelocity(const ShrapTarget& target, const piMATRIX& centermat, double speed) {
+		// Start with a random point in a cone with the right size
+		double dispy = target.angle * mathGetFloat32ChaoticNumber();
+		double dispx = PI * ((mathGetFloat32ChaoticNumber() * 2.0) - 1.0);
+		piMATRIX dispymat, dispxmat;
+		generateRotationMatrix(AROUND_Y, mlRAD_TO_DEG(dispy), &dispymat);
+		generateRotationMatrix(AROUND_X, mlRAD_TO_DEG(dispx), &dispxmat);
+		piMATRIX disprotmat;
+		math3dMatrixMultiply(&disprotmat, &dispymat, &dispxmat);
+		piVECTOR vel{1,0,0};
+		math3dMultiplyRotation(&vel, &vel, &disprotmat);
+
+		// Point that cone toward the target
+		math3dMultiplyRotation(&vel, &vel, &centermat);
+
+		// Now travel the right speed
+		mathScaleVector(&vel, &vel, (FLOAT32)speed);
+		vel.y = -vel.y;
+		vel.z = -vel.z;
+
+		return vel;
+	}
+
+	void GetRandomShardSize(const weapAmmoType& round_type, const ShrapProps& shard_props, weapAmmoType& shrap_type) {
+		// TODO: ShrapProjWeight is an absolute minimum? Need to talk with prod guys...
+		shrap_type.ProjectileWeight = (FLOAT32)std::max(shard_props.avg_weight * (2.0 * mathGetFloat32ChaoticNumber()),
+		                                                (double)round_type.ShrapProjWeight);
+		// ???
+		shrap_type.PenetrationConstant = (FLOAT32)(shard_props.base_pc * (shrap_type.ProjectileWeight / round_type.ProjectileWeight));
+	}
+
+	weapAmmo CreateShard(const weapAmmoType& round_type, weapAmmoType& shrap_type,
+	                     const FLOAT64VECTOR& pos, const piVECTOR& vel, void* target) {
+		weapAmmo shrap{};
+		shrap.AmmoType = &shrap_type;
+		shrap.Velocity.x = vel.x; shrap.Velocity.y = vel.y; shrap.Velocity.z = vel.z;
+		shrap.Position = pos;
+		shrap.Position.x += vel.x * round_type.ParticleTimeout;
+		shrap.Position.y += vel.y * round_type.ParticleTimeout;
+		shrap.Position.z += vel.z * round_type.ParticleTimeout;
+		shrap.Flags = WEAP_AMMOFLAG_CANDAMAGE | WEAP_AMMOFLAG_USE_MEDCOLLIDELIST |
+		              WEAP_AMMOFLAG_DONTCHECKTERRAIN | WEAP_AMMOFLAG_DAMAGE_SPECIFIC_OBJECT |
+		              WEAP_AMMOFLAG_NOFX | WEAP_AMMOFLAG_IS_SHRAPNEL;
+		shrap.Id = 0;
+		shrap.SpecificDamageObject = target;
+		return shrap;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -3322,73 +3401,33 @@ static void _DoImprovedShrapnel(const weapAmmo& round, const FLOAT64VECTOR& pos,
 
 	double shard_pct = 0.0;
 	std::list<ShrapTarget> targets = GetShrapTargets(pos, shard_pct);
-	ShardProps shard_props = DetermineShardProps(round_type, shard_pct);
+	ShrapProps shrap_props = DetermineShrapProps(round_type, shard_pct);
 
+	// Kept to the side
 	weapAmmoType shrap_type = CreateShrapnelType(round_type);
 	for ( auto& target : targets ) {
-		unsigned shrap_ct = (unsigned)(target.shrap_pct * shard_props.total_shards);
+		unsigned shrap_ct = (unsigned)(target.shrap_pct * shrap_props.total_shards);
 #ifdef BETA_RELEASE
 		WEAP_LOG("> Throwing %u shards at %s [%f, %f, %f]", shrap_ct, target.name,
 		         target.pos.x, target.pos.y, target.pos.z);
 #endif
 		if ( shrap_ct == 0 ) continue; // TODO: Maybe send one token shard? :/
 
-		double rotz = atan2(target.dir.y, target.dir.x);
-		double roty = atan2(target.dir.z, sqrt((target.dir.x*target.dir.x) + (target.dir.y*target.dir.y)));
-		piMATRIX rotzmat, rotymat;
-		generateRotationMatrix(AROUND_Z, mlRAD_TO_DEG(rotz), &rotzmat);
-		generateRotationMatrix(AROUND_Y, mlRAD_TO_DEG(roty), &rotymat);
-		piMATRIX centermat;
-		math3dMatrixMultiply(&centermat, &rotymat, &rotzmat);
+		piMATRIX transform = GetTargetTransform(target);
 
 		for ( unsigned i = 0 ; i < shrap_ct ; ++i ) {
-			double energy = round_type.ExplosiveEnergy * round_type.ShrapEnergyMult;
-			// TODO: Scale based on the mass_mult?
-			double max_speed = sqrt(2*energy / round_type.TotalShrapnelMass);
-			double speed = round_type.AddedParticleSpeed + max_speed * mathGetFloat32ChaoticNumber();
-			// Quick check: See if the shard can even reach the target before timing out.
+			double speed = RandomShardSpeed(round_type);
 			if ( speed * round_type.ParticleTimeout < target.dist ) {
 				WEAP_LOG(">> %u : <IGNORED : %f m/s too slow to travel %f m in %f seconds>",
 				         i, speed, target.dist, round_type.ParticleTimeout);
 				continue;
 			}
 
-			double dispy = target.angle * mathGetFloat32ChaoticNumber();
-			double dispx = PI * ((mathGetFloat32ChaoticNumber() * 2.0) - 1.0);
-			piMATRIX dispymat, dispxmat;
-			generateRotationMatrix(AROUND_Y, mlRAD_TO_DEG(dispy), &dispymat);
-			generateRotationMatrix(AROUND_X, mlRAD_TO_DEG(dispx), &dispxmat);
-			piMATRIX disprotmat;
-			math3dMatrixMultiply(&disprotmat, &dispymat, &dispxmat);
-			piVECTOR vel{1,0,0};
-			math3dMultiplyRotation(&vel, &vel, &disprotmat);
-			math3dMultiplyRotation(&vel, &vel, &centermat);
-			mathScaleVector(&vel, &vel, (FLOAT32)speed);
-			vel.y = -vel.y;
-			vel.z = -vel.z;
+			piVECTOR vel = GetRandomShardVelocity(target, transform, speed);
+			GetRandomShardSize(round_type, shrap_props, shrap_type);
+			weapAmmo shrap = CreateShard(round_type, shrap_type, pos, vel, target.target);
 
-			// TODO: ShrapProjWeight is an absolute minimum? Need to talk with prod guys...
-			shrap_type.ProjectileWeight = (FLOAT32)std::max(shard_props.avg_weight * (2.0 * mathGetFloat32ChaoticNumber()),
-			                                                (double)round_type.ShrapProjWeight);
-			// ???
-			shrap_type.PenetrationConstant = (FLOAT32)(shard_props.base_pc * (shrap_type.ProjectileWeight / round_type.ProjectileWeight));
-
-
-			weapAmmo shrap{};
-			shrap.AmmoType = &shrap_type;
-			shrap.Velocity.x = vel.x; shrap.Velocity.y = vel.y; shrap.Velocity.z = vel.z;
 			FLOAT64VECTOR prev_pos = pos;
-			shrap.Position = prev_pos;
-			shrap.Position.x += vel.x * round_type.ParticleTimeout;
-			shrap.Position.y += vel.y * round_type.ParticleTimeout;
-			shrap.Position.z += vel.z * round_type.ParticleTimeout;
-			shrap.Flags = WEAP_AMMOFLAG_CANDAMAGE | WEAP_AMMOFLAG_USE_MEDCOLLIDELIST |
-			              WEAP_AMMOFLAG_DONTCHECKTERRAIN |
-			              WEAP_AMMOFLAG_DAMAGE_SPECIFIC_OBJECT |
-			              WEAP_AMMOFLAG_NOFX | WEAP_AMMOFLAG_IS_SHRAPNEL;
-			shrap.Id = i;
-			shrap.SpecificDamageObject = target.target;
-
 #ifdef WEAPON_LOGGING
 			bool hit = 
 #endif
