@@ -3174,8 +3174,206 @@ static UINT32 _DoExplosionShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, F
 // throws out shrapnel for explosion
 // as a child of _DoExplosionShrapnel it skips a lot of the error checking
 
+namespace {
+	struct ShrapTarget {
+		FLOAT64VECTOR dir;
+		double angle;
+		double shrap_pct;
+		void* target;
+	};
+
+	bool GetShrapTarget(const FLOAT64VECTOR& round_pos, const FLOAT64VECTOR& target_pos,
+	                    double radius, void* target, ShrapTarget& target_info) {
+		FLOAT64VECTOR distvect;
+		mathSubVectors(&distvect, &target_pos, &round_pos);
+		double dist2 = (double)mathExactVectorLength2(&distvect);
+		// TODO: Base this on shrap density instead? Maybe set by ammo type & radius at 100m...
+		if ( dist2 > 10000.0 ) // Too far away, don't bother
+			return false;
+		double dist = sqrt(dist2);
+
+
+		double angle = atan2(radius, dist);
+		double shrap_pct = (0.5 * (1.0 - cos(angle)));
+
+
+		FLOAT64VECTOR cone_center;
+		mathScaleVector(&cone_center, &distvect, 1/dist); // equiv. to mathNormalize()
+
+		target_info = {cone_center, angle, shrap_pct, target};
+		return true;
+	}
+
+	bool GetVehicleTarget(const FLOAT64VECTOR& round_pos, const vehVehicle& veh,
+	                      ShrapTarget& target) {
+		double radius = std::max(1.0, veh.VehicleObjectData->Radius - 1.0);
+
+		FLOAT64VECTOR pos = veh.PosData.RenderPos;
+		if ( &veh == persGetPersonaVehiclePtr() && veh.ModelData != nullptr )
+			pos = veh.ModelData->RenderPos;
+		if ( veh.VehicleType->Type == VEH_TYPE_PERSON ) {
+			// Infantry position is based on their feet, not their center, so we need to
+			// adjust the bounding sphere accordingly.
+			radius /= 2;
+			pos.z += radius;
+		}
+
+		return GetShrapTarget(round_pos, pos, radius, (void*)&veh, target);
+	}
+
+	bool GetAGTarget(const FLOAT64VECTOR& round_pos, const trnAutoGun& ag, ShrapTarget& target) {
+		// HACK: Hard-coded radius
+		return GetShrapTarget(round_pos, ag.Pos, 5.0, (void*)&ag, target);
+	}
+
+
+	std::list<ShrapTarget> GetShrapTargets(const FLOAT64VECTOR& round_pos, double& pct) {
+		std::list<ShrapTarget> targets;
+		ShrapTarget target;
+
+		vehVehicle* veh;
+		for ( vehGetVehicleHead(&veh) ; veh != nullptr ; veh = veh->getNext() ) {
+			if ( GetVehicleTarget(round_pos, *veh, target) ) {
+				pct += target.shrap_pct;
+				targets.push_back(target);
+			}
+		}
+
+		trnAutoGun* ag;
+		for ( trnGetAutoGunHead(&ag) ; ag != nullptr ; ag = ag->next ) {
+			if ( GetAGTarget(round_pos, *ag, target) ) {
+				pct += target.shrap_pct;
+				targets.push_back(target);
+			}
+		}
+
+		// TODO: Buildings?
+
+		return targets;
+	}
+
+	//------------------------------
+
+	weapAmmoType CreateShrapnelType(const weapAmmoType& round) {
+		weapAmmoType shrap{};
+		strncpy((char*)shrap.Name, "shrapnel", 63/*array_size(shrap.Name)*/);
+		shrap.Diameter = round.ShrapProjDiameter;
+		shrap.RichochetAngle = round.ShrapProjRicochetAngle;
+		return shrap;
+	}
+
+
+	const unsigned max_shards = 2000; // TODO: Find a proper value.
+}
+
+
+UINT32 _OldCode(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FLOAT64VECTOR const* ProjVel, FLOAT64 CurrentTime);
+
 static UINT32 _DoImprovedShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FLOAT64VECTOR const* ProjVel, FLOAT64 CurrentTime)
 {
+	weapAmmo& round = *Ammo; const FLOAT64VECTOR& pos = *InPos; const FLOAT64VECTOR& vel = *ProjVel; const FLOAT64& currtime = CurrentTime;
+
+	const weapAmmoType& round_type = *Ammo->AmmoType;
+
+	// If we simulated everything, how many shards would we generate?
+	unsigned minmax_diff = (round_type.MaxShrapPieces > round_type.MinShrapPieces ? round_type.MaxShrapPieces - round_type.MinShrapPieces : 0);
+	unsigned theoretical_shards = round_type.MinShrapPieces + (unsigned)(minmax_diff * mathGetFloat32ChaoticNumber());
+	if ( theoretical_shards == 0 ) // We do this early in case a non-HE round slipped in
+		return 0;
+
+
+	double pct_total = 0.0;
+	std::list<ShrapTarget> targets = GetShrapTargets(pos, pct_total);
+
+	double mass_mult = 1.0;
+	unsigned total_shards = (unsigned)(theoretical_shards * pct_total);
+	if ( total_shards > max_shards ) {
+		mass_mult = ((double)total_shards / max_shards);
+		mass_mult = std::min(mass_mult, (double)round_type.MaxMassMultiplier);
+		total_shards = max_shards;
+	}
+
+	double avg_weight = (round_type.TotalShrapnelMass / total_shards) * mass_mult;
+	double base_pc = round_type.ShrapnelPenetrationConstant;
+	if ( ! base_pc )
+		base_pc = round_type.PenetrationConstant * 0.1;
+	base_pc = std::max(base_pc, (double)round_type.ShrapProjMinPenConst);
+
+
+	// Time to actually send out some shards
+	weapAmmoType shrap_type = CreateShrapnelType(round_type);
+	for ( auto& target : targets ) {
+		unsigned shrap_ct = (unsigned)(target.shrap_pct * total_shards);
+		if ( shrap_ct == 0 ) continue; // TODO: Maybe send one token shard? :/
+
+		double rotz = atan2(target.dir.y, target.dir.x);
+		double roty = atan2(target.dir.z, sqrt((target.dir.x*target.dir.x) + (target.dir.y*target.dir.y)));
+		piMATRIX rotzmat, rotymat;
+		generateRotationMatrix(AROUND_Z, mlRAD_TO_DEG(rotz), &rotzmat);
+		generateRotationMatrix(AROUND_Y, mlRAD_TO_DEG(roty), &rotymat);
+		piMATRIX centermat;
+		math3dMatrixMultiply(&centermat, &rotymat, &rotzmat);
+
+		for ( unsigned i = 0 ; i < shrap_ct ; ++i ) {
+			double energy = round_type.ExplosiveEnergy * round_type.ShrapEnergyMult;
+			// TODO: Scale based on the mass_mult?
+			double max_speed = sqrt(2*energy / round_type.TotalShrapnelMass);
+			double speed = round_type.AddedParticleSpeed + max_speed * mathGetFloat32ChaoticNumber();
+			// Quick check: See if the shard can even reach the target before timing out.
+			/*if ( speed * round_type.ParticleTimeout < cone.dist )
+				continue;*/
+
+			double dispy = target.angle * mathGetFloat32ChaoticNumber();
+			double dispx = PI * ((mathGetFloat32ChaoticNumber() * 2.0) - 1.0);
+			piMATRIX dispymat, dispxmat;
+			generateRotationMatrix(AROUND_Y, mlRAD_TO_DEG(dispy), &dispymat);
+			generateRotationMatrix(AROUND_X, mlRAD_TO_DEG(dispx), &dispxmat);
+			piMATRIX disprotmat;
+			math3dMatrixMultiply(&disprotmat, &dispymat, &dispxmat);
+			piVECTOR vel{1,0,0};
+			math3dMultiplyRotation(&vel, &vel, &disprotmat);
+			math3dMultiplyRotation(&vel, &vel, &centermat);
+			mathScaleVector(&vel, &vel, (FLOAT32)speed);
+			vel.y = -vel.y;
+			vel.z = -vel.z;
+
+			// TODO: ShrapProjWeight is an absolute minimum? Need to talk with prod guys...
+			shrap_type.ProjectileWeight = (FLOAT32)std::max(avg_weight * (2.0 * mathGetFloat32ChaoticNumber()),
+			                                                (double)round_type.ShrapProjWeight);
+			// ???
+			shrap_type.PenetrationConstant = (FLOAT32)(base_pc * (shrap_type.ProjectileWeight / round_type.ProjectileWeight));
+
+
+			weapAmmo shrap{};
+			shrap.AmmoType = &shrap_type;
+			shrap.Velocity.x = vel.x; shrap.Velocity.y = vel.y; shrap.Velocity.z = vel.z;
+			FLOAT64VECTOR prev_pos = pos;
+			shrap.Position = prev_pos;
+			shrap.Position.x += vel.x * round_type.ParticleTimeout;
+			shrap.Position.y += vel.y * round_type.ParticleTimeout;
+			shrap.Position.z += vel.z * round_type.ParticleTimeout;
+			shrap.Flags = WEAP_AMMOFLAG_CANDAMAGE | WEAP_AMMOFLAG_USE_MEDCOLLIDELIST |
+			              WEAP_AMMOFLAG_DONTCHECKTERRAIN |
+			              WEAP_AMMOFLAG_DAMAGE_SPECIFIC_OBJECT |
+			              WEAP_AMMOFLAG_NOFX | WEAP_AMMOFLAG_IS_SHRAPNEL;
+			shrap.Id = i;
+			shrap.SpecificDamageObject = target.target;
+
+			_DoProjectileUpdate(&shrap, &prev_pos, round_type.ParticleTimeout, currtime + round_type.ParticleTimeout);
+
+#ifdef BETA_RELEASE
+			FLOAT64VECTOR CurPos = shrap.Position;
+			char name[32]; snprintf(name, 31, "shrap%d\n", i);
+			int id = draw3dSetWorldDebugLine(&prev_pos, &CurPos, name, colorREDALPHA);
+			draw3dSetDebugObjectFlipZ(id, TRUE);
+			draw3dSetDebugObjectAlwaysOnTop(id, FALSE);
+#endif
+		}
+	}
+	return 0;
+}
+
+UINT32 _OldCode(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FLOAT64VECTOR const* ProjVel, FLOAT64 CurrentTime) {
 	// linear scale between min and max piece counts
 	UINT32 numPieces = (UINT32) ((Ammo->AmmoType->MinShrapPieces) +
 		((FLOAT32)(Ammo->AmmoType->MaxShrapPieces - Ammo->AmmoType->MinShrapPieces) * mathGetFloat32ChaoticNumber()));
@@ -3280,6 +3478,7 @@ static UINT32 _DoImprovedShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FL
 
 	// now iterate the target list and blow shrapnel at them
 	it = shrapList.begin();
+	int shraplist_ct = 0;
 	for(; it!= shrapList.end(); ++it)
 	{
         FLOAT64VECTOR	distVect = {0, 0, 0}, centerVect = {0, 0, 0};
@@ -3413,7 +3612,7 @@ static UINT32 _DoImprovedShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FL
 #ifdef BETA_RELEASE
 			FLOAT64VECTOR CurPos = TempAmmo.Position;
 			char name[32];
-			snprintf(name, 31, "shrap%d\n", i);
+			snprintf(name, 31, "shrap%d-%d\n", shraplist_ct++, i);
 			int id = draw3dSetWorldDebugLine(&PrevPos, &CurPos, name, colorREDALPHA);
 			draw3dSetDebugObjectFlipZ(id, TRUE);
 			draw3dSetDebugObjectAlwaysOnTop(id, FALSE);
