@@ -3324,9 +3324,6 @@ static void _DoImprovedShrapnel(const weapAmmo& round, const FLOAT64VECTOR& pos,
 	std::list<ShrapTarget> targets = GetShrapTargets(pos, shard_pct);
 	ShardProps shard_props = DetermineShardProps(round_type, shard_pct);
 
-#ifdef BETA_RELEASE
-	unsigned shrap_idx = 0; // To give each drawn ray a unique index
-#endif
 	weapAmmoType shrap_type = CreateShrapnelType(round_type);
 	for ( auto& target : targets ) {
 		unsigned shrap_ct = (unsigned)(target.shrap_pct * shard_props.total_shards);
@@ -3399,9 +3396,9 @@ static void _DoImprovedShrapnel(const weapAmmo& round, const FLOAT64VECTOR& pos,
 			WEAP_LOG(">> %u : [%6.4f, %6.4f, %6.4f] > %s", i, vel.x, vel.y, vel.z, hit ? "HIT" : "miss");
 
 #ifdef BETA_RELEASE
-			FLOAT64VECTOR CurPos = shrap.Position;
-			char name[32]; snprintf(name, 31, "shrap%d\n", shrap_idx++);
-			int id = draw3dSetWorldDebugLine(&prev_pos, &CurPos, name, colorREDALPHA);
+			static unsigned shrap_idx = 0;
+			char name[32]; snprintf(name, 31, "shrap%u\n", shrap_idx++);
+			int id = draw3dSetWorldDebugLine(&prev_pos, &shrap.Position, name, colorREDALPHA);
 			draw3dSetDebugObjectFlipZ(id, TRUE);
 			draw3dSetDebugObjectAlwaysOnTop(id, FALSE);
 #endif
