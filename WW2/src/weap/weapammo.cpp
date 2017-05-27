@@ -3204,7 +3204,7 @@ namespace {
 		FLOAT64VECTOR distvect;
 		mathSubVectors(&distvect, &target_pos, &round_pos);
 		double dist2 = mathExactVectorLength2(&distvect);
-		// TODO: Set this in data file for distance and radius at X meters for shrap density.
+		// TODO: Set this in data file for both distance and radius at X meters.
 		if ( dist2 > 10000.0 ) // Too far away, don't bother
 			return false;
 		double dist = sqrt(dist2);
@@ -3313,7 +3313,7 @@ namespace {
 
 	weapAmmoType CreateShrapnelType(const weapAmmoType& round) {
 		weapAmmoType shrap{};
-		strncpy((char*)shrap.Name, "shrapnel", 63/*array_size(shrap.Name)*/);
+		strncpy((char*)shrap.Name, "shrapnel", array_size(shrap.Name));
 		shrap.Diameter = round.ShrapProjDiameter;
 		shrap.RichochetAngle = round.ShrapProjRicochetAngle;
 		return shrap;
@@ -3436,7 +3436,7 @@ static void _DoImprovedShrapnel(const weapAmmo& round, const FLOAT64VECTOR& pos,
 
 #ifdef BETA_RELEASE
 			static unsigned shrap_idx = 0;
-			char name[32]; snprintf(name, 31, "shrap%u\n", shrap_idx++);
+			char name[32]; snprintf(name, array_size(name), "shrap%u\n", shrap_idx++);
 			int id = draw3dSetWorldDebugLine(&prev_pos, &shrap.Position, name, colorREDALPHA);
 			draw3dSetDebugObjectFlipZ(id, TRUE);
 			draw3dSetDebugObjectAlwaysOnTop(id, FALSE);
