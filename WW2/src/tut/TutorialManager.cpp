@@ -1,10 +1,13 @@
 #include <syscfg.h> // Path is project specific.
 #include <stdarg.h>	// var args
+#include <thread>
+#include <chrono>
 
 #include "tut/TutorialManager.h"
 #include "tut/tutGroupProgress.h"
 #include "ui/uiMain.h"
 #include "client/GameClient.h"
+#include "client/clientSTO.h"
 #include "sdm/sdm.h"
 #include "include/vars.h"
 #include "spt/Random.h"
@@ -20,6 +23,8 @@
 #include "veh/vehmain.h"
 #include "trn/trncd.h"
 #include "ob/obmain.h"
+#include "fp/fpPPO.h"
+#include "wwii/wwiiServerTrackedObject.h"
 
 // defines
 
@@ -33,6 +38,11 @@
 
 // local functions
 static bool _pointInArea(Vec3d& pos, TutorialHandler& handler);
+
+//local variable to keep track of whether a FMS has been placed into the world.
+static bool fmsBuilt = false;
+
+extern PPOSpecLoader specLoader;
 
 // singleton
 static TutorialManager _tutMgr;
@@ -357,6 +367,9 @@ bool TutorialManager::Stop(bool delayed)
 
 		// clear out the current handlers
 		RemoveHandlers();
+
+		//Set this to false so the FMS gets built again if we spawn back in.
+		fmsBuilt = false;
 
 		return true;
 	}
@@ -778,6 +791,30 @@ int TutorialManager::_handleEvent(TutorialHandler& handler, va_list* args)
 
 	lua_settop(_tutorial, top);
 
+
+	//Create an FMS only if it isn't already built.
+	//This replaces the old truck based UMS that was loaded via lua.
+	if (!fmsBuilt)
+	{
+		WorldPosition_m position((FLOAT64)-314061.23, (FLOAT64)3603759.46, (FLOAT64)101.24);
+		AttitudeVector attitude(0.0f, 0.0f, 1.0f);
+		PPOSpec* spec = specLoader.ppoGetSpec(PPOSpecLoader::_PPO_FMS);
+		if (!spec) uiChatPrintLine("Failed to get PPOSpec in TutorialManager::_handleEvent");
+
+		if (Online)
+		{
+			// create a ppsto, it just gets assigned a British flag because there is no player to get the country from at this stage.
+			PlayerPlacedSTO sto(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype), (UINT32)1);
+			
+			//For some reason there has to be a delay between creating the ppsto and the request, if there isn't then the ppsto doesn't get created.
+			std::chrono::seconds dura(1);
+			std::this_thread::sleep_for(dura);
+			// send the request to the host
+			sto.request(PlayerClient()->ChatConnection());
+		}
+		fmsBuilt = true;
+	}
+	
 	return keep;
 }
 
