@@ -27,6 +27,7 @@
 #include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiPack.h"
+#include "wwii/wwiiConfig.h"
 
 #include "score/scorePacket.h"
 #include "score/scoreConstants.h"
@@ -352,13 +353,16 @@ _recvDirectSpawn(ACTION_OBJECT* const a)
 		return -EINVAL;
 	}
 
-#if !defined(BETA_RELEASE) && !defined(DEV_BUILD)
-	if ( !player.isPlaynet() && player.instance().isCampaign() )
+	if (!host_config.arena.allowDirectSpawn)
 	{
-		player.log(_FLA, "non-playnet persona requesting direct spawn in campaign instance");
-		return false;
-	}
+#if !defined(BETA_RELEASE) && !defined(DEV_BUILD)
+		if ( !player.isPlaynet() && player.instance().isCampaign() )
+		{
+			player.log(_FLA, "non-playnet persona requesting direct spawn in campaign instance");
+			return false;
+		}
 #endif
+	}
 
 	mmDirectSpawn(player, request.m_weapon, true, request.m_useLocation, request.m_location);
 
