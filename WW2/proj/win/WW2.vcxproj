@@ -195,7 +195,7 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(BinOutDir)</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(IntOutDir)</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">false</LinkIncremental>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)\Include;$(SolutionDir)\WW2\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(SolutionDir)\WW2\include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(SolutionDir)\WW2\lib\win\Debug\3rdParty;$(SolutionDir)\build\client\$(Configuration)\Lib;$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</IgnoreImportLibrary>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</EnableManagedIncrementalBuild>
@@ -207,14 +207,14 @@
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">false</EnableManagedIncrementalBuild>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</EnableManagedIncrementalBuild>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</EnableManagedIncrementalBuild>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(SolutionDir)\WW2\lib\win\Release\3rdParty;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(LibraryPath)</LibraryPath>

@@ -10,6 +10,7 @@
 #include "authSteam.h"
 #include "sys/sysLaunchUrl.h"
 #include "build_info.hpp"
+#include "json.hpp"
 
 static const std::string authSteamLoginURL = "https://auth.playnet.com/v1/login";
 
@@ -51,7 +52,38 @@ SteamLoginResponse authRequestSteamLogin(const void *authTicket, size_t authTick
         return SteamLoginResponse::LoginUnknownError;
     }
     
-    // TODO: Decode response.content JSON and return response code based on it.
+    try {
+        auto responseJson = nlohmann::json::parse(response.content);
+        
+        if (!responseJson.is_object() || responseJson.find("result") == responseJson.end() || !responseJson["result"].is_number_unsigned()) {
+            // TODO: Logging, better error handling
+            return SteamLoginResponse::LoginUnknownError;
+        }
+        
+        uint64_t resultCode = responseJson["result"];
+        
+        // TODO: This is a bad API design - it relies on the auth relay using
+        // the same numeric values as the client-side enum. In the future this
+        // should be improved.
+        if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginSuccess)) {
+            return SteamLoginResponse::LoginSuccess;
+        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginNotValidUser)) {
+            return SteamLoginResponse::LoginNotValidUser;
+        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignRequired)) {
+            return SteamLoginResponse::LoginCallsignRequired;
+        } else {
+            // TODO: Logging, better error handling
+            return SteamLoginResponse::LoginUnknownError;
+        }
+    } catch (std::invalid_argument &e) {
+        // TODO: Logging, better error handling
+        return SteamLoginResponse::LoginUnknownError;
+    } catch (...) {
+        // TODO: Narrow this down!
+        // TODO: Logging, better error handling
+        return SteamLoginResponse::LoginUnknownError;
+    }
     
+    // TODO: Logging, better error handling
     return SteamLoginResponse::LoginUnknownError;
 }
