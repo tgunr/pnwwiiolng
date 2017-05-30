@@ -368,6 +368,9 @@ bool TutorialManager::Stop(bool delayed)
 		// clear out the current handlers
 		RemoveHandlers();
 
+		// Remove the Mobile spawn sto that we created in the TutorialManager::_handleEvent function.
+		wwiiRemoveSTO(2147483647);
+
 		//Set this to false so the FMS gets built again if we spawn back in.
 		fmsBuilt = false;
 
@@ -803,14 +806,13 @@ int TutorialManager::_handleEvent(TutorialHandler& handler, va_list* args)
 
 		if (Online)
 		{
-			// create a ppsto, it just gets assigned a British flag because there is no player to get the country from at this stage.
-			PlayerPlacedSTO sto(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype), (UINT32)1);
-			
-			//For some reason there has to be a delay between creating the ppsto and the request, if there isn't then the ppsto doesn't get created.
-			std::chrono::seconds dura(1);
-			std::this_thread::sleep_for(dura);
-			// send the request to the host
-			sto.request(PlayerClient()->ChatConnection());
+			// create a mssto, it just gets assigned a British flag because there is no player to get the country from at this stage.
+			// assign it the highest uid possible in the hope that this will never cause a duplicate (Frisbones idea :-) )
+			// the server isn't told about this sto.
+			// It is destroyed in the TutorialManager::Stop function.
+			MobileSpawnSTO* sto = new MobileSpawnSTO(2147483647, static_cast<UINT16>(spec->id), position, attitude, (UINT32)1);
+			ServerTrackedObject::addToIndex(sto);
+			sto->setCanExpire(false);
 		}
 		fmsBuilt = true;
 	}

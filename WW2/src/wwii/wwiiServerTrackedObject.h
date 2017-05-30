@@ -278,6 +278,28 @@ public:
 		m_owner = o;
 	}
 
+	//! Set the lifespan of this sto
+	public:
+	void setLifespan(UINT32 lifespan)
+	{
+		if(lifespan >= 0)
+			m_lifespan = lifespan;
+	}
+
+	//! Set whether this STO can be automatically removed.
+	public:
+	void setCanExpire(bool canExpire)
+	{
+		m_canExpire = canExpire;
+	}
+
+	//! Get whether this STO can expire.
+	public:
+		bool getCanExpire()
+		{
+			return m_canExpire;
+		}
+
 	//! Get the remaining milliseconds lifespan.
 	//! @return Number of milliseconds until object should expire,
 	//!         or zero if object is already past due.
@@ -302,6 +324,7 @@ protected:
 	UINT32				m_flags;				//!< Client data (does not have to be state).
 	UINT32				m_lifespan;				//!< Milliseconds time-to-live.
 	ChatHandle			m_owner;				//!< ChatHandle of creating player or 0
+	bool				m_canExpire = true;		//!< We may not want some STO's automatically removed.
 
 private:
 	bool m_activated;							//!< Set to true once activated.
