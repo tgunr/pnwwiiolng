@@ -39,9 +39,6 @@
 // local functions
 static bool _pointInArea(Vec3d& pos, TutorialHandler& handler);
 
-//local variable to keep track of whether a FMS has been placed into the world.
-static bool fmsBuilt = false;
-
 extern PPOSpecLoader specLoader;
 
 // singleton
@@ -68,6 +65,7 @@ TutorialManager::TutorialManager() :
 	_allowStrat(true),
 	_prePath("tutorials/")
 {
+	m_fmsBuilt = false;
 }
 
 TutorialManager::~TutorialManager()
@@ -372,7 +370,7 @@ bool TutorialManager::Stop(bool delayed)
 		wwiiRemoveSTO(2147483647);
 
 		//Set this to false so the FMS gets built again if we spawn back in.
-		fmsBuilt = false;
+		m_fmsBuilt = false;
 
 		return true;
 	}
@@ -797,7 +795,7 @@ int TutorialManager::_handleEvent(TutorialHandler& handler, va_list* args)
 
 	//Create an FMS only if it isn't already built.
 	//This replaces the old truck based UMS that was loaded via lua.
-	if (!fmsBuilt)
+	if (!m_fmsBuilt)
 	{
 		WorldPosition_m position((FLOAT64)-314061.23, (FLOAT64)3603759.46, (FLOAT64)101.24);
 		AttitudeVector attitude(0.0f, 0.0f, 1.0f);
@@ -814,7 +812,7 @@ int TutorialManager::_handleEvent(TutorialHandler& handler, va_list* args)
 			ServerTrackedObject::addToIndex(sto);
 			sto->setCanExpire(false);
 		}
-		fmsBuilt = true;
+		m_fmsBuilt = true;
 	}
 	
 	return keep;
