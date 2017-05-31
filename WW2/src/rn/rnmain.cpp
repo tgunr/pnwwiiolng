@@ -79,7 +79,7 @@
 #include "sdm/sdm.h"
 #include "sdm/StratDB.h"
 #include "js/jsClient.h"
-#include "sysLaunchUrl.h"
+#include "sys/sysLaunchUrl.h"
 #include "physics/physicsMain.h"
 #include "ui/uiMain.h"
 #include "cfg/cfgPrefs.h"

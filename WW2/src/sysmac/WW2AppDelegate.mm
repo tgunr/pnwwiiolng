@@ -26,7 +26,6 @@
 #include "auth/authAppIDs.h"
 #include <netdb.h>
 #include <arpa/inet.h>
-#include "sysLaunchURL.h"
 #import <HockeySDK/HockeySDK.h>
 
 #define PLAYGATE_VERSION 0x01010109
@@ -1913,8 +1912,3 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 }
 
 @end
-
-LOGICAL syslaunchurl(const char* url, LOGICAL local)
-{
-    return TRUE;
-}

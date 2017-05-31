@@ -4,7 +4,7 @@
 static_assert( platBuild != BUILD_SERVER, "Can't include piogl.h in a server build." );
 #endif
 
-#include "gl/glew.h"
+#include "GL/glew.h"
 #include "gl/glplat.h"
 
 #define USE_LINEAR_FOG
