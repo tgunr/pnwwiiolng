@@ -274,8 +274,6 @@ extern SINT32 globalMSCoolDownEnd;
 
 static Covert<vehVehicle*> _VehicleHead = new vehVehicle();
 
-static int cloneHostFakeMsgNum = 0;
-
 /*----------------------------------------------------------*/
 
 /****************************************************************************
@@ -4883,12 +4881,10 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 
 			if(anim && anim->active)
 			{
-                gr2AnimBitPacker animFlags(anim->currentFlags);
+				gr2AnimBitPacker animFlags(anim->currentFlags);
 
 				animFlags.deathState = 1;
 				Vehicle->interpolator.SetFlags(animFlags.pack());
-                Vehicle->PosData.animationFlags = animFlags.pack();
-                Vehicle->interpolator.NewPosDataUpdate(cloneHostFakeMsgNum++, frametime);
 			}
 		}
 #endif
@@ -7047,7 +7043,7 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 				veh->PosData.RenderAtt.Yaw = veh->PosData.RenderAtt.Yaw * -1.0;
 
 				// fake a position update
-				vehicle->getVehicle()->interpolator.NewPosDataUpdate(cloneHostFakeMsgNum++, frametime);
+				vehicle->getVehicle()->interpolator.NewPosDataUpdate(0, frametime);
 				vehUpdate();
 
 				gr2AnimTrooper* newAnimModel = veh->VehicleObjectData->PlaneObject->animModel;
