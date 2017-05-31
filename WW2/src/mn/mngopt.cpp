@@ -68,6 +68,7 @@ static GVAR vars[] = {
     STRING_KEY_DEF("serverotp", GameServerOTP),
     STRING_KEY_DEF("apid", ServerApID),
     STRING_KEY_DEF("serverprotocol", ServerProtocol),
+    LOGICAL_KEY_DEF("steamlogin", UseSteamLogin),
     LOGICAL_KEY_DEF("log", WantedUserLogEnabled),
     INT_KEY_DEF("side", WantedSide),
     LOGICAL_KEY_DEF("data", WantDataDir),
