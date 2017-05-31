@@ -246,6 +246,9 @@ public:
 	// gets the master instance of the manager
 	static TutorialManager* GetInstance(); // tolua_export
 
+	// Get whether we are spawned into the tutorial game world.
+	bool getAreSpawnedIn() const { return m_areSpawnedIn; }
+
 	// tutorial specific input handling
 	static unsigned int Input(int param, unsigned int functionCode, unsigned int unused);
 
@@ -289,6 +292,10 @@ private:
 
 	// prepath
 	std::string _prePath;
+
+	// Keep track of whether we are spawned into the tutorial world.
+	private:
+	bool m_areSpawnedIn = false;
 
 }; // tolua_export
 

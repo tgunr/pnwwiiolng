@@ -276,6 +276,9 @@ void TutorialManager::DoEvent(UINT32 eventType, ...)
 
 bool TutorialManager::Start(const char* id, const char* script)
 {
+	// we are now spawned into the game world.
+	m_areSpawnedIn = true;
+
 	// copy these because this called could originate from the script
 	// layer; the Stop(false) call a few lines below will trash these
 	// variables in that case
@@ -357,6 +360,9 @@ bool TutorialManager::Stop(bool delayed)
 
 		// clear out the current handlers
 		RemoveHandlers();
+
+		// we are no longer spawned into the game world.
+		m_areSpawnedIn = false;
 
 		return true;
 	}
