@@ -230,12 +230,10 @@ void multiClientUpdate(int wait, bool force)
 	}
 
 	// run any queued commands
-	if(((time - nextCmd) > 1000) && (_cmdQueue.size() > 0))
+	if(((time - nextCmd) > 1000) && !_cmdQueue.empty())
 	{
 		// grab the next command to run
 		std::string& cmdToRun = _cmdQueue.front();
-
-		if (&cmdToRun == nullptr) return;
 
 		char line[255+1];
 		strsafecpy(line, cmdToRun.c_str());
@@ -456,12 +454,7 @@ static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 
 
 	// now let's spawn
-	int index = client->RequestDirectSpawn(spec);
-
-	//write notification out to stdout
-//	printf("%i: teul connection index! \n", index);
-//	printf("%d: after RequestDirectSpawn \n", clientIndex);
-
+	client->RequestDirectSpawn(spec);
 
 	client->ClearWaits();
 	client->SetWait(ww2::Client::SPAWN_NOTIFY_WAIT);
@@ -1726,29 +1719,27 @@ static int ticket_cmd(int argc, char* argv[])
 			break;
 		}
 
-		ptr = strchr(tktIP, ' ');	//finds leading space
-
-		if (ptr == nullptr)
-		{
-			uiChatPrintLine("Could not parse serverIP");
-			break;
-		}
-
-		ptr += 1;
-
-		//tktIP has a label on the front and a newline on the end - need to remove both
+		// tktIP has a label on the front and a newline on the end - need to remove both
 		std::string z7 = tktIP;
-		z7.erase(0, z7.find(' ') + 1);				//Remove the label
-		z7.erase(z7.length() - 1, z7.length());		//delete the end of the string (newline)
+        size_t labelSep = z7.find(' ');
+        // ensure a separator was found and there is enough space for a value
+        if ( (labelSep != std::string::npos) && ((labelSep+2) < z7.length()) )
+        {
+            z7.erase(0, labelSep + 1);				//Remove the label
+            z7.erase(z7.length() - 1, z7.length());		//delete the end of the string (newline)
 
-		//ptr = z7.c_str();
-		//if (teulGetHost(ptr, &host) == 0)
-		if (teulGetHost(z7.c_str(), &host) == 0)
-		{
-			uiChatPrintLine("Unable to translate host address");
-			break;
-		}
-
+            if (teulGetHost(z7.c_str(), &host) == 0)
+            {
+                uiChatPrintLine("Unable to translate host address");
+                break;
+            }
+        }
+        else
+        {
+            uiChatPrintLine("Error when parsing serverIP");
+            break;
+        }
+        
 		if (fgets(tktPort, 64, stream) == nullptr)
 		{
 			uiChatPrintLine("Error when reading port");

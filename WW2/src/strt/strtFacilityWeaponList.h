@@ -77,18 +77,16 @@ public:
 	};
 
 	
-	FacilityWeaponList(UINT32 playerID = 0, const FULL_OBJ_ID fullObjID = nullObjID, FacilityWeaponList::REASON_CODE status=FacilityWeaponList::_INVALID)
+#ifdef MULTI_CLIENT
+	FacilityWeaponList(UINT32 playerID = 0, const FULL_OBJ_ID fullObjID = nullObjID, FacilityWeaponList::REASON_CODE status=FacilityWeaponList::_NORMAL)
+#else
+    FacilityWeaponList(UINT32 playerID = 0, const FULL_OBJ_ID fullObjID = nullObjID, FacilityWeaponList::REASON_CODE status=FacilityWeaponList::_INVALID)
+#endif
 		: m_status(status)
 		, m_playerID(playerID), m_fullObjID(fullObjID)
 		, m_numWeapons(0)
 		, m_refreshSeconds(30)
-		{ 
-#ifdef MULTI_CLIENT
-			//Change the constructor for multiclient
-			status = FacilityWeaponList::_NORMAL;
-			m_status = status;
-#endif
-		}
+    { }
 
 	FacilityWeaponList(ACTION_OBJECT* const a) : m_status(FacilityWeaponList::_INVALID), m_numWeapons(0) { a->offset = packer(TEUL_UNPACK, a); }
 	~FacilityWeaponList() {}

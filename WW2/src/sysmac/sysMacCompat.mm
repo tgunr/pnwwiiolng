@@ -96,14 +96,11 @@ const char* macPreferencesPath()
 const char* macDocumentsPath()
 {
     static NSURL *docsDir = nil;
-    static const char *docsFSR;
+    static const char *docsFSR = nullptr;
     static dispatch_once_t predicate = 0;
     
     dispatch_once(&predicate, ^ {
         @autoreleasepool {
-            // FIXME: This is a hack to use the prefs directory. Whether this
-            // actually belongs there is debatable. Consider Application Support or
-            // even Documents instead.
             docsDir = [[NSFileManager defaultManager]
                         URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nullptr];
             docsDir = [docsDir URLByAppendingPathComponent:@"Battleground Europe"];

@@ -1126,11 +1126,10 @@ _pollSocketsInner(TeulTimeMS remainder)
 
 		WSANETWORKEVENTS eventData;
 		it = idleEndpoints.begin();
-		for (; g_idleInstance == idleInstance && it != idleEndpoints.end(); )
+		for (; g_idleInstance == idleInstance && it != idleEndpoints.end(); ++it)
 		{
 			ABORT_IF(*it == nullptr);
 			ENDPOINT& endpoint = *(*it);
-			++it;
 
 			const int enumErr = WSAEnumNetworkEvents(endpoint.socket, endpoint.eventObject, &eventData);
 			if (enumErr != 0)
