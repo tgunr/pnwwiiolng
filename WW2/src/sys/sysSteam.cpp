@@ -3,6 +3,8 @@
 
 #include <steam_api.h>
 
+#include <vars.h>
+
 
 
 namespace {
@@ -12,15 +14,18 @@ namespace {
 //==============================================================================
 
 bool InitSteam(void) {
-	// TODO: Don't initialize Steam for non-steam installations.
-
-	if ( steam_initialized )
+	if ( steam_initialized || UseSteamLogin == false )
 		return true;
 
-	steam_initialized = SteamAPI_Init();
+	// TODO: SteamAPI_RestartAppIfNecessary()? It's probably better to just use
+	// the Steam Wrapper...
+	if ( ! SteamAPI_Init() )
+		return false;
+	// Unfortunately, we can't trust the program to actually shut down properly,
+	// so we just force this to run at exit ourselves.
 	atexit(KillSteam);
 
-	// TODO: Return the result of SteamAPI_RestartAppIfNecessary() if/when we switch to that.
+	steam_initialized = true;
 	return true;
 }
 
@@ -35,7 +40,5 @@ void KillSteam(void) {
 //==============================================================================
 
 bool IsSteamCopy(void) {
-	// NOTE: This will trigger even for alternate installs: If they have Steam
-	// and own the game, *every* copy is a Steam copy as far as this is concerned.
 	return steam_initialized && SteamApps()->BIsSubscribed();
 }

@@ -271,11 +271,13 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	uint32_t ticket_length;
 	HAuthTicket ticket = SteamUser()->GetAuthSessionTicket(ticket_data, array_size(ticket_data),
 	                                                       &ticket_length);
-	SteamLoginResponse login_response = authRequestSteamLogin(ticket_data, ticket_length,
-	                                                          arena, callsign);
+	SteamLoginResult result = authRequestSteamLogin(ticket_data, ticket_length, arena, callsign);
 	SteamUser()->CancelAuthTicket(ticket);
 
-	*rval = INT_TO_JSVAL(login_response);
+	if ( result.status = SteamLoginResponse::LoginSuccess )
+		rnsetServerInfo(result.serverIP, result.serverPort, result.otp);
+
+	*rval = INT_TO_JSVAL(result.status);
 	return JS_TRUE;
 }
 

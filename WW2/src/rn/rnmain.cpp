@@ -381,7 +381,9 @@ void rnloadRootWindow(void) {
 		if ( IsSteamCopy() )
 			uiLoadView("SteamOnlineModeSelect");
 		else
-			uiLoadView("OnlineModeSelect");
+			// TODO: Reenable once we've figured out in-game patching
+			//uiLoadView("OnlineModeSelect");
+			uiLoadView("offline");
 	}
 }
 
