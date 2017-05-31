@@ -63,9 +63,9 @@ TutorialManager::TutorialManager() :
 	_nextUpdate(0),
 	_stop(false),
 	_allowStrat(true),
-	_prePath("tutorials/")
+	_prePath("tutorials/"),
+	m_fmsBuilt(false)
 {
-	m_fmsBuilt = false;
 }
 
 TutorialManager::~TutorialManager()
