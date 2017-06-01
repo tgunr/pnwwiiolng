@@ -510,9 +510,10 @@ void TutorialManager::SetComplete(const char* id, int key, bool completed)
 {
 	if(key < -1 || key >= 64) return;
 
-    if(key==0)
+    if(key==0 || key==1)
     {
         SetComplete("fighter",1,true);
+	SetCOmplete("basic",6,true);
     }
     
 	if(_completed.find(id) == _completed.end())
