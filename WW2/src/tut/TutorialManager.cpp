@@ -509,8 +509,6 @@ void TutorialManager::RemoveHandlers()
 void TutorialManager::SetComplete(const char* id, int key, bool completed)
 {
 	if(key < -1 || key >= 64) return;
-    
-    
 	if(_completed.find(id) == _completed.end())
 		_completed[id] = 0;
 
