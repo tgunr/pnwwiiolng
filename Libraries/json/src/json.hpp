@@ -6210,7 +6210,6 @@ class basic_json
 
     @since version 2.0.3
     */
-#ifndef _MSC_VER
     template<class ContiguousContainer, typename std::enable_if<
                  not std::is_pointer<ContiguousContainer>::value and
                  std::is_base_of<
@@ -6223,13 +6222,6 @@ class basic_json
         // delegate the call to the iterator-range parse overload
         return parse(std::begin(c), std::end(c), cb);
     }
-#else
-	// HACK: Just to get something running without forcing code to change
-	template <typename Container>
-	static basic_json parse(const Container& c, const parser_callback_t cb = nullptr) {
-		return parse(std::begin(c), std::end(c), cb);
-	}
-#endif
 
     /*!
     @brief deserialize from stream
