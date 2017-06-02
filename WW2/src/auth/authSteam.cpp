@@ -1,0 +1,135 @@
+//
+//  authSteam.cpp
+//  WW2OL
+//
+//  Created by Gwynne Raskind on 5/19/17.
+//  Copyright © 2017 Cornered Rat Software - All rights reserved.
+//
+
+#include "syscfg.h"
+#include "authSteam.h"
+#include "sys/sysLaunchUrl.h"
+#include "build_info.hpp"
+#include "json.hpp"
+
+static const std::string authSteamLoginURL = "https://auth.playnet.com/v1/login";
+
+SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &requestedCallsign)
+{
+    ABORT_IF_EX(authTicket == nullptr || authTicketLen < 1, "Steam auth ticket is required");
+    
+    sysBasicHTTPRequest request;
+    sysBasicHTTPResponse response;
+    
+    request.method = "POST";
+	if (!gAuthServer[0])
+		request.url = authSteamLoginURL;
+	else
+	{
+		request.url = std::string("https://") + gAuthServer +
+			std::string("/v1/login");
+	}
+    request.headers["Content-Type"] = "application/json";
+    request.headers["X-WWIIOnline-Client-Version"] = PN_product_version_string; // Not required, just for good measure
+    request.content = std::string("{") + // TODO: Do a real JSON encode here instead of just stringing strings together
+        "\"steam_ticket\":" + ""/* hex-encode authTicket */ + ","
+        "\"arena_id\":" + std::to_string(arenaID) +
+        (requestedCallsign.empty() ? "" : std::string("\"callsign\":\"") + requestedCallsign + "\"") +
+    "}";
+    
+    if (!sysExecuteHTTPRequest(request, response)) {
+        // TODO: Better error handling
+        return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+    }
+    
+    if (response.responseCode != 200) {
+        // TODO: Logging, better error handling
+        return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+    }
+    
+    if (response.headers.find("content-type") == response.headers.end() || response.headers["Content-Type"] != "application/json") {
+        // TODO: Logging, better error handling
+        return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+    }
+    
+    try {
+        auto responseJson = nlohmann::json::parse(response.content);
+        
+        if (!responseJson.is_object()) {
+            // TODO: Logging, better error handling
+            return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+        }
+        if (responseJson.find("result") == responseJson.end() || !responseJson["result"].is_number_unsigned()) {
+            // TODO: Logging, better error handling
+            return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+        }
+        
+        uint64_t resultCode = responseJson["result"];
+        
+        // TODO: This is a bad API design - it relies on the auth relay using
+        // the same numeric values as the client-side enum. In the future this
+        // should be improved.
+        if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginSuccess)) {
+            if (responseJson.find("arenaID") == responseJson.end() || !responseJson["arenaID"].is_number_unsigned()) {
+                // TODO: Logging, better error handling
+                return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+            }
+            if (responseJson.find("otp") == responseJson.end() || !responseJson["otp"].is_number_unsigned()) {
+                // TODO: Logging, better error handling
+                return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+            }
+            if (responseJson.find("serverIP") == responseJson.end() || !responseJson["serverIP"].is_number_unsigned()) {
+                // TODO: Logging, better error handling
+                return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+            }
+            if (responseJson.find("serverPort") == responseJson.end() || !responseJson["serverPort"].is_number_unsigned()) {
+                // TODO: Logging, better error handling
+                return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+            }
+            
+            int32_t resultArenaID = responseJson["arenaID"];
+            uint32_t resultOTP = responseJson["otp"];
+            uint32_t resultServerIP = responseJson["serverIP"];
+            uint32_t resultServerPort = responseJson["serverPort"];
+
+            return { SteamLoginResponse::LoginSuccess, resultArenaID, resultOTP, resultServerIP, resultServerPort };
+        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginNotValidUser)) {
+            return { SteamLoginResponse::LoginNotValidUser, 0, 0, 0, 0 };
+        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignRequired)) {
+            return { SteamLoginResponse::LoginCallsignRequired, 0, 0, 0, 0 };
+        } else {
+            // TODO: Logging, better error handling
+            return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+        }
+    } catch (std::invalid_argument &e) {
+        // TODO: Logging, better error handling
+        return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+    } catch (...) {
+        // TODO: Narrow this down!
+        // TODO: Logging, better error handling
+        return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+    }
+    
+    // TODO: Logging, better error handling
+    return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+}
+
+/*
+	SINT32	arenaID;
+	UINT32	sessionID;		//The sessionID is used by the chat server, as
+							//	well as any game service that wants sessions
+	SINT32	appID;			//Application ID
+	SINT32	appVersion;		//Version of the app required
+	UINT32	otp;			//One time password, provided authentication was
+							//	successful
+	UINT32	serverIP;		//IP address of the server to connect to
+	UINT32	serverPort;		//port of the game server
+	PROTOCOL protocol;		//Protocol ID
+	SINT32	status;			// server status < 0 is an error, > 0 is # of players
+	SINT32	dataSize;
+	SCHAR	appleID[4];
+	char	data[MAX_PARAM];		//Application data.  Like parameters and such.
+
+	APPDL_ACTION action;	// what to do with a file that we download
+	SINT32	dlAppID;		//Application ID
+*/

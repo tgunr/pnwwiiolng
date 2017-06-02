@@ -32,7 +32,7 @@ enum
 	GAMEEVENT_ALERT_ENEMY,			// enemy spotted near CP
 	GAMEEVENT_NEED_AMMO,			// friendly needs ammo nearby
 	GAMEEVENT_TUTORIAL,				// tutorial event
-	GAMEEVENT_TIMELEFT,				// hourly guy; time left alert
+	GAMEEVENT_TIMELEFT,				// hourly player; time left alert
 	GAMEEVENT_NOFIRE,				// alert that they can't fire in this area
 	GAMEEVENT_PPO,					// player placed object event
 	GAMEEVENT_NOBAILOUT,			// can't bailout at this altitude

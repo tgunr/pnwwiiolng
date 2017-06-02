@@ -160,10 +160,17 @@ const char* const channelTypeName[] = {
 
 static bool _running = true;
 
+#ifndef NDEBUG
+bool g_debugRadios = true;
+bool g_debugSquads = true;
+bool g_debugPersonas = true;
+bool g_debugChat = true;
+#else
 bool g_debugRadios = false;
 bool g_debugSquads = false;
 bool g_debugPersonas = false;
 bool g_debugChat = false;
+#endif
 
 const char* const chanTypeName[MAX_CHANNEL_TYPES] =
 {
@@ -247,11 +254,6 @@ static std::vector<TUNE_COMMAND> _tuneCommands = {
 //////////////////////////////////////////////////////////////////////
 // Chat Host
 //////////////////////////////////////////////////////////////////////
-
-struct CampaignFilterFn : public FilterFn
-{
-	bool operator()(const wwiiPlayer* player) const { return player->instance().isCampaign(); }
-};
 
 //////////////////////////////////////////////////////////////////////
 // Send a message to a user connected through the IRC interface.
@@ -528,7 +530,7 @@ chatSideMessage(WWII_SIDE side, LSTRING_ID messageID, const char* const ptr0, co
 	if ( sidePlayers[side].empty() == false )
 	{
 		Chat::LocalizedMessage message(prefix, messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5);
-		chatBroadcastLocMessage(sidePlayers[side].begin(), sidePlayers[side].end(), message, CampaignFilterFn());
+		chatBroadcastLocMessage(sidePlayers[side].begin(), sidePlayers[side].end(), message, [] (const wwiiPlayer *player) { return player->instance().isCampaign(); });
 	}
 
 	return true;
@@ -2426,9 +2428,9 @@ _personaCreate(const Server::PersonaLogin& login, PlayerStatusNode& psn)
 	}
 
 	if ( g_debugPersonas )
-		dbugLog(_FLD, "t:%d p:%u c:%s -> personaCreate reason %d"
+		dbugLog(_FLD, "t:%d p:%u c:%s -> personaCreate reason %s"
 						, psn.teulIndex, psn.dispatch().m_customerID, psn.dispatch().m_callsign
-						, static_cast<int>(login.reason())
+						, Server::Transfer::to_string(login.reason()).c_str()
 						);
 
 	chatCreatePlayer(&psn, (struct Chat::PlayerInfo*) login.data.auxData);

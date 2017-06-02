@@ -15,6 +15,7 @@ _Type inline round(const _Type& x) { return floor(x + (_Type)0.5); }
 #else
 #include <OpenGL/gl.h>
 #include "macgl.h"
+typedef uint32_t UINT32;
 #endif
 
 #include "phui/FTFontReplacement.h"

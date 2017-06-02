@@ -131,9 +131,9 @@ void RakNetChannel::release()
  */
 int RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
 {
-	PublicKey pk;
+	RakNet::PublicKey pk;
 	pk.remoteServerPublicKey = publicKey;
-	pk.publicKeyMode = PKM_USE_KNOWN_PUBLIC_KEY; // Recommended mode
+	pk.publicKeyMode = RakNet::PKM_USE_KNOWN_PUBLIC_KEY; // Recommended mode
     pk.myPrivateKey = nullptr;
     pk.myPublicKey = nullptr;
 	int retCode = RN_SK_FAILED;
@@ -148,7 +148,7 @@ int RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
                 // basically a keep alive
                 m_peer->SetOccasionalPing(true);
 
-                if (CONNECTION_ATTEMPT_STARTED != m_peer->Connect(teulGetAddress(ep->destAddress()), ep->destPort(), 0, 0, &pk))
+                if (RakNet::CONNECTION_ATTEMPT_STARTED != m_peer->Connect(teulGetAddress(ep->destAddress()), ep->destPort(), 0, 0, &pk))
                 {
                     m_isConnecting = false;
                     m_isConnected = false;
@@ -356,8 +356,8 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
     }
     else
     {
-		SystemAddress addr;
-		memset(&addr, 0, sizeof(SystemAddress));
+		RakNet::SystemAddress addr;
+		memset(&addr, 0, sizeof(RakNet::SystemAddress));
 		addr.address.addr4 = endpoint.destSockAddress;
 		guid = addr;
 	}
@@ -420,8 +420,8 @@ void RakNetChannel::disconnect(ENDPOINT *pEndpoint)
     dbugLog(_FLI, "Raknet: t:%d Disconnecting endpoint %p", pEndpoint->teulIndex(), pEndpoint);
 
 	// reset all of the associations
-	RakNetGUID defaultGuid;
-	RakNetGUID guid = pEndpoint->m_rakNetGuid;
+	RakNet::RakNetGUID defaultGuid;
+	RakNet::RakNetGUID guid = pEndpoint->m_rakNetGuid;
 	guidToEndPoint[guid] = nullptr;
 	pEndpoint->m_rakNetGuid = defaultGuid;
 	pEndpoint->m_rakNetEnabled = false;

@@ -558,7 +558,7 @@ _announceSTOToGrid(ServerSTO& sto, bool isCreation)
 		op = "add";
 		cell = _getGrid(key);
 
-		// DEBUG: Make sure we're not adding the same guy
+		// DEBUG: Make sure we're not adding the same STO
 		assert( cell != nullptr );
 		assert( cell->stos().find(&sto) == cell->stos().end() );
 
