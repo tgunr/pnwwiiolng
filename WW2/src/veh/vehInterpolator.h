@@ -38,13 +38,13 @@ public:
 	typedef int FrameTime; // The time on this end.
 
 	InfantryPredictor(vehVehicle* v = nullptr);
-    virtual ~InfantryPredictor() = default;
+	virtual ~InfantryPredictor() = default;
 
 	void NewPosDataUpdate(Timestamp timestamp, FrameTime frametime);
 	const Update& Interpolate(FrameTime frametime);
 	void SetFlags(UINT32 flags_) { pred_pos.animationFlags = flags_; }
 
-	void Copy(vehVehicle* v, UINT32 flags);
+	void ForceSync(void);
 
 	FLOAT64 LastUpdateYaw(void) const { return _lastUpdateYaw; }
 private:
