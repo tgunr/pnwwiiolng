@@ -573,7 +573,11 @@ int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 	Teul::PlayerIdent& ident	= _classdata->playerIdent;
 
 	ClientHostConnection* conn = new ClientHostConnection(Teul::Connection::Map, server, ident, 30*1000);
-	conn->start(this);
+	if (!conn->start(this))
+	{
+		dbugLog(_FLI, "Failed to start host connection");
+		throw ClientNetError("connect.login.auth.failed");
+	}
 
 	StatusMessage("loading.network.loggingin");
 
@@ -2394,8 +2398,9 @@ static void weapListClear(FacilityWeaponList* weapList)
 
 bool Client::CellClientActive() const
 {
-	//return _data->cellClientActive;
-	return false; //CellState()->Connected();
+	//return false;		//CellState->Connected();
+	//Check to see if we are connected to a cell
+	return _classdata->connections[Teul::Connection::Cell]->Connected();
 }
 
 bool Client::MapClientActive() const
@@ -3153,30 +3158,53 @@ int Client::GetWait(MSG_WAIT msg)
 	return _data->waitmsg[msg];
 }
 
+
+/**
+ * Check for messages against a bit mask. Set different fields in the bit mask to test for different conditions
+*/
 int Client::WaitForMessages(int timeout)
 {
-	TeulTimeMS endtime = teulClock64 + (unsigned int)timeout * 1000;
+	//set an end time
+	TeulTimeMS endtime = teulClock64 + (unsigned int)timeout * 1000;		// 1000;
 
+	//initialize the bit mask - using ints here
 	int waits[MAX_MSG_WAIT];
 	memcpy(waits,_data->waitmsg,sizeof(waits));
 
+	//From now until the end
 	for(;teulClock64 < endtime;)
 	{
+		//check for current status
 		NetUpdate();
 
 		bool done = true;
 		for(int i = 0; i < MAX_MSG_WAIT; i++)
 		{
-			if(waits[i] && _data->waitmsg[i] != 0)
+			if((waits[i] && _data->waitmsg[i]) != 0)		//if the waits array and the waitmsg are 1 - follow the if and set done to false
 			{
 				done = false;
 				break;
 			}
 		}
 
-		if(done)
+		if (done)
 			return 0;
 	}
+
+
+
+	//display the offending mask
+	//for (int i = 0; i < MAX_MSG_WAIT; i++)
+	//{
+	//	if ((waits[i] && _data->waitmsg[i]) != 0)		//if the waits array and the waitmsg are 1 - follow the if and set done to false
+	//	{
+	//		printf("Failed mask is %d\n", i);
+	//		break;
+	//	}
+	//}
+
+
+
 
 	return -1;
 }

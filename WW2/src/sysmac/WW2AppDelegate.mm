@@ -561,6 +561,9 @@ extern NSString *WebActionOriginalURLKey;
     
     chAppDir();
     
+    // Setup the user data path
+    fioInit();
+    
     fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
     
     if(!WantDataDir) {

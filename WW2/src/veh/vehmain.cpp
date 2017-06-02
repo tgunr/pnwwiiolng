@@ -3293,6 +3293,10 @@ UINT32 vehExitVehicleTrigger(SINT32 Param, UINT32 Id, UINT32 Detach)
 	}
 	*/
 
+
+	//what is player does not exist?
+	if (player == nullptr) return 0;
+
 	// handle bailing cases; only for planes right now
 	if(player->ModelData && player->VehicleType->Type == VEH_TYPE_AIR)
 	{
@@ -6920,7 +6924,7 @@ std::string& vehVehiclesGameInfo()
 
 		char buffer[256] = {0};
 
-		strprintf(buffer, "Vehicles: %u of %u  Received: %u of %zu  Possible: %u\n",
+		strprintf(buffer, "Vehicles: %u of %u dispayed. Updates Received: %u of %zu per frame.  Possible in range: %u\n",
 			numVehiclesDisplayed,
 			maxVehiclesDisplayed,
 			numVehiclesWorldUpdate,

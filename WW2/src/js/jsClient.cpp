@@ -2573,6 +2573,13 @@ JS_FUNCTION_DEF(jsBrigade, move)
 
 JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 {
+	// TODO: This is just a temporary hack to avoid phui related PC crashes - this needs to be further investigated to see why
+	// unit gets corrupted (very well might be this js object that is corrupted)
+	if (unit && (unit->country() >= MAX_COUNTRIES || unit->country() == WWII_NO_COUNTRY))
+	{
+		return JS_FALSE;
+	}
+
 	switch(propid)
 	{
 		case NAME_PROP:
@@ -2591,6 +2598,7 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 				*val = (new jsHCUnit(detail.parent()))->jsVal();
 		break;
 		case DIVISION_PROP:
+			
 			if (unit && unit->parent())
 				*val = phui::js::NewString(UTF16(unit->parent()->name()));
 			else if(detail.parent())
