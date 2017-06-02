@@ -509,14 +509,7 @@ void TutorialManager::RemoveHandlers()
 void TutorialManager::SetComplete(const char* id, int key, bool completed)
 {
 	if(key < -1 || key >= 64) return;
-
-    if(key==0 || key==1)
-    {
-        if (key==0)
-            SetComplete("fighter",1,true);
-        
-        SetComplete("basic",6,true);
-    }
+    
     
 	if(_completed.find(id) == _completed.end())
 		_completed[id] = 0;
@@ -556,6 +549,15 @@ void TutorialManager::SetComplete(const char* id, int key, bool completed)
 bool TutorialManager::IsComplete(const char* id, int key)
 {
 	if(key < 0 || key >= 64) return false;
+    
+    if(key==1 && strcmp("fighter",id)==0)
+    {
+        SetComplete("fighter",1,true);
+    }
+    if(key==6 && strcmp("basic",id)==0)
+    {
+        SetComplete("basic",6,true);
+    }
 
 	if(_completed.find(id) == _completed.end())
 		_completed[id] = 0;
