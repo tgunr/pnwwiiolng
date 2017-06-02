@@ -35,7 +35,7 @@
 #else
 
 #if defined(BETA_RELEASE)
-#define DEFAULT_AUTH_SERVER "authdev.playnet.com"
+#define DEFAULT_AUTH_SERVER "auth.playnet.com"
 #else
 #define DEFAULT_AUTH_SERVER "auth.playnet.com"
 #endif
