@@ -109,8 +109,10 @@ dbseInit()
 SINT32
 dbseClose()
 {
-	if ( hostIndex >= 0 )
-		return (teulClose(hostIndex), Teul::Closing::DBDClose);
+	if ( hostIndex >= 0 ) {
+        teulClose(hostIndex);
+		return Teul::Closing::DBDClose;
+    }
 	return 0;
 }
 

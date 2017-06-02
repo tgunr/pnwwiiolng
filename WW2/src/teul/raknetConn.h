@@ -25,9 +25,6 @@
 #include "RPC4Plugin.h"
 #include "RakNetTypes.h"
 
-using namespace RakNet;
-using namespace cat;
-
 class AddressOrGUID;
 class RakPeerInterface;
 class TunnelKeyPair;
@@ -79,7 +76,7 @@ private:
 
 	cat::TunnelKeyPair m_pair;
 
-	SocketDescriptor m_sd;
+	RakNet::SocketDescriptor m_sd;
 	UINT16  m_port;
 	ENDPOINT *m_endpoint;
 	bool m_isServer;

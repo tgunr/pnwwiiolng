@@ -236,15 +236,15 @@ int uiChatPrintLine(const wchar_t* format, ...)
 
 *************************************************************************************************/
 
-std::wstring uiChatAssembleUILoc(const char* key, ...) {
+std::wstring uivChatAssembleUILoc(const char* key, int argc, ...) {
 	int index = -1;
 
 	std::wstring format = uiLocString(key);
 
 	va_list marker;
-	va_start( marker, key );
+	va_start( marker, argc );
 
-	for ( int p = 1; p < 7; ++p ) { // loc vars are 1 based
+	for ( int p = 1; p < argc+1; ++p ) { // loc vars are 1 based
 		wchar_t* arg = va_arg(marker, wchar_t*);
 
 		if ( arg ) {
@@ -263,7 +263,7 @@ std::wstring uiChatAssembleUILoc(const char* key, ...) {
 	return std::wstring(format);
 }
 
-void uiChatPrintUILocLine(int icons[CHATICON_MAX], unsigned int color, const char* key, ...)
+void uivChatPrintUILocLine(int icons[CHATICON_MAX], unsigned int color, const char* key, int argc, ...)
 {
  	if(!_chatview) return;
 
@@ -280,9 +280,9 @@ void uiChatPrintUILocLine(int icons[CHATICON_MAX], unsigned int color, const cha
 	// we'll search for up to 6 dynamic variables in the localized message
 
 	va_list marker;
-	va_start( marker, key ); /* Initialize variable arguments. */
+	va_start( marker, argc ); /* Initialize variable arguments. */
 
-	for(int p = 1; p < 7; ++p) // loc vars are 1 based
+	for(int p = 1; p < argc+1; ++p) // loc vars are 1 based
 	{
 		arg = va_arg( marker, wchar_t*);
 
@@ -298,7 +298,7 @@ void uiChatPrintUILocLine(int icons[CHATICON_MAX], unsigned int color, const cha
 			break; // reached null
 	}
 
-	va_start( marker, key ); /* Initialize variable arguments. */
+	va_start( marker, argc ); /* Initialize variable arguments. */
 	uiChatPrintLinev(icons, color, format.c_str(), marker);
 	va_end( marker ); /* Reset variable arguments. */
 }

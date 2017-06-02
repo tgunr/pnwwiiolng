@@ -22,7 +22,18 @@ public:
 	virtual ~TextControl(); 
 
 	virtual View* AsView() override { return this; }
-		
+	
+	virtual void SetObscure(bool val) { _obscure = val; }
+	virtual void SetFakeLength(int val) { _fakelen = val; }
+	virtual void SetMaintainFake(bool val) { _maintainfake = val; }
+
+	virtual void SetText(const wchar_t* text);
+	virtual void SetText(const char* text);
+	virtual void AddText(const wchar_t* text);
+	virtual void AddText(const char* text);
+	virtual void InsertText(const wchar_t* text, int start = -1, int stop = -1);
+	virtual void RemoveText(int start = -1, int stop = -1);
+
 	virtual void DrawSelf() override;
 
 	virtual bool KeyDown(int keycode, unsigned short unicode) override;
@@ -54,9 +65,9 @@ public:
 	};
 	
 protected:
-	
-	int _maxlength, _alignment, _historySize, _historyIndex, _lastKeyDown;
+	int _maxlength, _alignment, _historySize, _historyIndex, _lastKeyDown, _fakelen;
 	float _drawx;
+	bool _obscure, _maintainfake;
 	
 	TextHistory* _history;
 	AutoCompleteCallback _autoCompletor;

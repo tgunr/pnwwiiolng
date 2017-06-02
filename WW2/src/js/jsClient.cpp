@@ -2,9 +2,12 @@
 #include <string.h>
 #include <algorithm>
 
+#include <steam_api.h> // HACK
+
 #include "phui/Util.h"
 
 #include "include/vars.h"
+#include "auth/authSteam.h"
 #include "js/jsClient.h"
 #include "js/jsStratDB.h"
 #include "js/jsGame.h"
@@ -25,6 +28,7 @@
 #include "uimap/uiMap.h"
 #include "client/GameClient.h"
 #include "ui/uiMain.h"
+#include "js/jsAuthHandler.h"
 #include "js/jsPosition.h"
 #include "wwii/wwiiSquadMsg.h"
 #include "chat/chatSquadControl.h"
@@ -51,6 +55,7 @@
 #include "strt/strtCaptureState.h"
 #include "pers/persmain.h"
 #include "scen/ScenarioManager.h"
+#include "rn/rnmain.h"
 
 #ifdef GR2_BLEND_EDITOR
 #include "gr2/gr2Anim.h"
@@ -71,6 +76,10 @@ static const char* branches[MAX_BRANCHES] = {"none", "army", "airforce", "navy" 
 JSClass jsClient::jsclass = JS_CLASS_MACRO("client");
 JSFunctionSpec jsClient::jsfunctions[] =
 {
+	JS_FUNCTION_SPEC(jsClient, createauthhandler,0),
+	JS_FUNCTION_SPEC(jsClient, connecttoarena,0),
+	JS_FUNCTION_SPEC(jsClient, steamconnect,2),
+	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
 	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
 	JS_FUNCTION_SPEC(jsClient, acceptmission,1),
@@ -203,6 +212,87 @@ jsClient::jsClient(ww2::Client* c) :
 
 jsClient::~jsClient()
 {
+}
+
+
+/************************************************************************************************
+	auth connection
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, createauthhandler) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	// HACK: At some point it would be nice to not have the controllers pointing to a global
+	// connection and actually have that connection be attached to the client or something.
+	*rval = (new jsAuthHandler())->jsVal();
+	return JS_TRUE;
+}
+
+
+/************************************************************************************************
+	arena joining
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, connecttoarena) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	try {
+		// HACK: We should pass in the auth info, but for now it's set semi-globally.
+		rnconnectToServer();
+	} catch ( std::exception& ) {
+		// TODO: Error message
+		*rval = BOOLEAN_TO_JSVAL(false);
+	}
+
+	*rval = BOOLEAN_TO_JSVAL(true);
+	return JS_TRUE;
+}
+
+
+/************************************************************************************************
+	steam connection
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, steamconnect) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+	if ( argc < 1 ) return JS_FALSE;
+	
+	int32 arena;
+	JS_ValueToInt32(ctx, argv[0], &arena);
+	const char* callsign = "";
+	if ( argc >= 2 )
+		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[3]));
+
+	// HACK: Move this to sysSteam so we aren't doing this in GUI code.
+	char ticket_data[128];
+	uint32_t ticket_length;
+	HAuthTicket ticket = SteamUser()->GetAuthSessionTicket(ticket_data, array_size(ticket_data),
+	                                                       &ticket_length);
+	SteamLoginResult result = authRequestSteamLogin(ticket_data, ticket_length, arena, callsign);
+	SteamUser()->CancelAuthTicket(ticket);
+
+	if ( result.status = SteamLoginResponse::LoginSuccess )
+		rnsetServerInfo(result.serverIP, result.serverPort, result.otp);
+
+	*rval = INT_TO_JSVAL(result.status);
+	return JS_TRUE;
+}
+
+
+/************************************************************************************************
+	gui state
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, loadrootwindow) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	rnloadRootWindow();
+
+	return JS_TRUE;
 }
 
 
@@ -2582,7 +2672,7 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case OWNERRANK_PROP:
 			*val = (new jsRank(detail.country(), detail.branch(), detail.ownerRank()))->jsVal();
 		break;
-		case OIC_PROP: // guy who is currently in charge (may be null)
+		case OIC_PROP: // player who is currently in charge (may be null)
 		{
 			BrigadeControlList* oic = PlayerClient()->LookupBrigadeOIC(detail.brigadeID());
 			if(oic && oic->m_officer > 0)

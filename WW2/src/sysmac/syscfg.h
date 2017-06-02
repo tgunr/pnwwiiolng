@@ -82,7 +82,7 @@
 # include "strt/strtDTL.h"
 # include "sdm/sdmHash.h"
 
-# include "gl/glew.h"
+# include "GL/glew.h"
 #include <OpenGL/OpenGL.h>
 
 # include "pers/pershud.h"

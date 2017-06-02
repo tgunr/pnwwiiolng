@@ -1069,7 +1069,7 @@ bool fpUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
 	// Set the AnimationFlags
 	fpFPSSetAnimationFlags();
 
-	// update our tps guy
+	// update our tps
 	gr2AnimProcessAnimationFlags(pObject, fpGetFPPersonDataPtr()->AnimationFlags);
 
 	if(!Online)
