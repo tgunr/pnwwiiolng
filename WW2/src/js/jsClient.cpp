@@ -274,7 +274,7 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	SteamLoginResult result = authRequestSteamLogin(ticket_data, ticket_length, arena, callsign);
 	SteamUser()->CancelAuthTicket(ticket);
 
-	if ( result.status = SteamLoginResponse::LoginSuccess )
+	if ( result.status == SteamLoginResponse::LoginSuccess )
 		rnsetServerInfo(result.serverIP, result.serverPort, result.otp);
 
 	*rval = INT_TO_JSVAL(result.status);

@@ -39,12 +39,12 @@ extern void uiChatPrintLineFeedback(int locgroup, int locid, bool iserror, ...);
 template <typename... Args> std::wstring uiChatAssembleUILoc(const char* key, Args... args)
 {
 	static_assert ( all_true<std::is_convertible<Args, const wchar_t*>::value...>::value , "Arguments must be const wchar_t*");
-	return uivChatAssembleUILoc(key, num_args<Args>::value, std::forward<Args>(args)...); 
+	return uivChatAssembleUILoc(key, num_args<Args...>::value, std::forward<Args>(args)...);
 }
 template <typename... Args> void uiChatPrintUILocLine(int icon[CHATICON_MAX], unsigned int color, const char* key, Args... args)
 {
 	static_assert ( all_true<std::is_convertible<Args, const wchar_t*>::value...>::value , "Arguments must be const wchar_t*");
-	uivChatPrintUILocLine(icon, color, key, num_args<Args>::value, std::forward<Args>(args)...);
+	uivChatPrintUILocLine(icon, color, key, num_args<Args...>::value, std::forward<Args>(args)...);
 }
 
 extern void uiChatInvoke();
