@@ -1108,6 +1108,7 @@ extern NSString *WebActionOriginalURLKey;
         
         if (hostAddress != 0) {
             if (! isteulInitialized) {
+                ww2::Client::InitTeul();
                 ww2::Client::Init();
                 
 #ifdef DEBUG_WW2
