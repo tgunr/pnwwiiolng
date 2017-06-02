@@ -26,13 +26,26 @@ extern phui::View* uiChatIconCreate(_xmlNode*, phui::View* parent);
 extern phui::View* uiChatInputCreate(_xmlNode*, phui::View* parent);
 extern phui::DOM::ElementDOM* uiChatIconCreateDOM(const char* classname, phui::View* view, phui::DOM::ElementDOM* parent);
 
+
 extern int uiChatPrintLine(const char* format, ...);
 extern int uiChatPrintLine(const wchar_t* format, ...);
-extern std::wstring uiChatAssembleUILoc(const char* key, ...); // Assemble a string from ui.dtd
-extern void uiChatPrintUILocLine(int icon[CHATICON_MAX], unsigned int, const char* key, ...);
+extern std::wstring uivChatAssembleUILoc(const char* key, int argc, ...); // Assemble a string from ui.dtd
+extern void uivChatPrintUILocLine(int icon[CHATICON_MAX], unsigned int color, const char* key, int argc...);
 extern void uiChatPrintLineColor(unsigned int, const wchar_t* format, ...);
 extern void uiChatPrintLineIcon(int icon[CHATICON_MAX], unsigned int color, const wchar_t* format, ...);
 extern void uiChatPrintLineFeedback(int locgroup, int locid, bool iserror, ...);
+
+// No, the last item in va_list is *not* guaranteed to be null...
+template <typename... Args> std::wstring uiChatAssembleUILoc(const char* key, Args... args)
+{
+	static_assert ( all_true<std::is_convertible<Args, const wchar_t*>::value...>::value , "Arguments must be const wchar_t*");
+	return uivChatAssembleUILoc(key, num_args<Args>::value, std::forward<Args>(args)...); 
+}
+template <typename... Args> void uiChatPrintUILocLine(int icon[CHATICON_MAX], unsigned int color, const char* key, Args... args)
+{
+	static_assert ( all_true<std::is_convertible<Args, const wchar_t*>::value...>::value , "Arguments must be const wchar_t*");
+	uivChatPrintUILocLine(icon, color, key, num_args<Args>::value, std::forward<Args>(args)...);
+}
 
 extern void uiChatInvoke();
 

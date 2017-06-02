@@ -2512,7 +2512,7 @@ UINT32 vehKillVehicle(vehVehicle* Vehicle)
 	if(Vehicle == nullptr) return 0;
     if(Vehicle->InUse == 0) return 0;
 
-	// process flags one more time to catch dead guys that didn't ragdoll
+	// process flags one more time to catch dead vehicles that didn't ragdoll
 	if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		fpProcessVehicleAnimationFlags(Vehicle);
 
@@ -3627,7 +3627,7 @@ UINT32 vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 	vehDetermineExitStatus(&ExitStatus, &rtbFacilityID);
 
-	// send out an update to make sure they ragdoll our guy
+	// send out an update to make sure they ragdoll our vehicle
 	if(ExitStatus == PEXIT_DEAD && Vehicle->VehicleType->Type == VEH_TYPE_PERSON && !fpFPSIsDead())
 	{
 		fpFPSKillTrooper();
@@ -7032,189 +7032,96 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			snprintf((char*)veh->Handle, 10, "C%d", (int)vehicle->uid());
 			veh->Chat_Handle = chatGetHandle((const char*)veh->Handle);
 
-			if(myVehicle->VehicleType->Type == VEH_TYPE_PERSON)
-			{
-				gr2AnimTrooper* newAnimModel = veh->VehicleObjectData->PlaneObject->animModel;
-				gr2AnimTrooper* myAnimModel = myVehicle->VehicleObjectData->PlaneObject->animModel;
+			// do something for vehicles
+			veh->AnimationBits = myVehicle->AnimationBits;
+			veh->PosData = myVehicle->PosData;
+			veh->PosData.AttVel.Pitch = veh->PosData.AttVel.Roll = veh->PosData.AttVel.Yaw = 0;
+			veh->PosData.AttVelSum.Pitch = veh->PosData.AttVelSum.Roll = veh->PosData.AttVelSum.Yaw = 0;
+			veh->PosData.LastUpdateAcc.x = veh->PosData.LastUpdateAcc.y = veh->PosData.LastUpdateAcc.z = 0;
+			veh->PosData.Acc.x = veh->PosData.Acc.y = veh->PosData.Acc.z = 0;
+			veh->PosData.LastUpdateAttVel.Pitch = veh->PosData.LastUpdateAttVel.Roll = veh->PosData.LastUpdateAttVel.Yaw = 0;
+			veh->PosData.Vel.x = veh->PosData.Vel.y = veh->PosData.Vel.z = 0;
 
-				veh->AnimationBits = ((fpPersonData*)myVehicle->ModelData->PersonData)->AnimationFlags;
-				//veh->AnimationBits = myAnimModel->currentFlags;
-				newAnimModel->twist.vehicleYaw = myAnimModel->twist.vehicleYaw;
-				//veh->TPSYaw = myVehicle->interpolator.LastUpdateYaw();
-				veh->interpolator.Copy(myVehicle, veh->AnimationBits);
+			veh->VehicleObjectData->PlaneObject->mat = myVehicle->VehicleObjectData->PlaneObject->mat;
+			veh->VehicleObjectData->PlaneObject->pos = myVehicle->VehicleObjectData->PlaneObject->pos;
 
+			// setup state animations
+			COPY_VSMEMBER(LastUpdateTime);
+			COPY_VSMEMBER(GearSetting);
+			COPY_VSMEMBER(FlapSetting);
+			COPY_VSARRAY(CanopySetting,ML_MAX_CREW_POSITIONS);
+			COPY_VSARRAY(HatchSetting,ML_MAX_CREW_POSITIONS);
 
-				newAnimModel->currentDownWeight = myAnimModel->currentDownWeight;
-				newAnimModel->currentMiddleWeight = myAnimModel->currentMiddleWeight;
-				newAnimModel->currentUpWeight = myAnimModel->currentUpWeight;
-				//newAnimModel->currentMotion = myAnimModel->currentMotion;
+			COPY_VSMEMBER(BombBayDoorSetting);
+			COPY_VSMEMBER(DiveBrakeSetting);
 
-				newAnimModel->twist.SetTwists(newAnimModel->skeleton);
-				newAnimModel->twist.Copy(myAnimModel->twist);
+			COPY_VSMEMBER(GearMoveTime);
+			COPY_VSMEMBER(FlapMoveTime);
 
-				//gr2ModelSetTwists(myAnimModel->skeleton, newAnimModel->skeleton);
+			COPY_VSARRAY(CanopyMoveTime,ML_MAX_CREW_POSITIONS);
+			COPY_VSARRAY(HatchMoveTime,ML_MAX_CREW_POSITIONS);
 
-				//if(myAnimModel->currentPose == TPS_POSETYPE_PRONE)
-				//	gr2ModelSetModelRotation(newAnimModel->skeleton, -90, 100.0f);
+			COPY_VSMEMBER(BombBayDoorMoveTime);
+			COPY_VSMEMBER(DiveBrakeMoveTime);
 
-				//newAnimModel->movingYaw = myAnimModel->movingYaw;
-				//newAnimModel->headYaw = myAnimModel->headYaw;
-				//newAnimModel->torsoYaw = myAnimModel->torsoYaw;
-				//newAnimModel->legsYaw = myAnimModel->legsYaw;
+			COPY_VSARRAY(PropIsDiscSetting,ML_MAX_ENGINES);
+			//COPY_VSARRAY(PropIsDisc,ML_MAX_ENGINES);
 
-				if(false && myAnimModel->currentPose == TPS_POSETYPE_PRONE)
-				{
-					static FLOAT64 addYaw = 90.0f;
+			COPY_VSARRAY(RecoilStartTime,VEH_MAX_MOUNTS);
+			COPY_VSARRAY(RecoilPosition,VEH_MAX_MOUNTS);
+			COPY_VSARRAY(RecoilTime,VEH_MAX_MOUNTS);
 
-					FLOAT64 yaw = myAnimModel->myVehicle->PosData.Att.Yaw;
+			//COPY_VSMEMBER(GearPos);
+			//COPY_VSMEMBER(FlapPos);
 
-					yaw = -yaw;
-					yaw = mlRAD_TO_DEG(yaw);
-					yaw += addYaw;
+			//COPY_VSARRAY(CanopyPos,ML_MAX_CREW_POSITIONS);
+			//COPY_VSARRAY(HatchPos,ML_MAX_CREW_POSITIONS);
 
-					gr2NormalizeAngle(yaw);
+			//COPY_VSMEMBER(BombBayDoorPos);
+			//COPY_VSMEMBER(DiveBrakePos);
 
-					yaw = mlDEG_TO_RAD(yaw);
-					yaw = -yaw;
+			//COPY_VSARRAY(CanopyDOFVar,ML_MAX_CREW_POSITIONS);
+			//COPY_VSARRAY(HatchDOFVar,ML_MAX_CREW_POSITIONS);
 
-					newAnimModel->myVehicle->PosData.Att.Yaw = yaw;
+			//COPY_VSMEMBER(GearDOFVar);
+			//COPY_VSMEMBER(FlapDOFVar);
+			//COPY_VSMEMBER(BombBayDoorDOFVar);
+			//COPY_VSMEMBER(DiveBrakeDOFVar);
 
+			//COPY_VSARRAY(PropDiscSpinRpm,ML_MAX_ENGINES);
+			//COPY_VSARRAY(PropSpinPosDOF,ML_MAX_ENGINES);
 
-					/*
-					FLOAT64 rotation = -90.0f;
+			COPY_VSMEMBER(UseCalculatedTrackAndWheel);
+			COPY_VSARRAY(TrackPos,2);
+			COPY_VSARRAY(WheelPos,ML_MAX_GEARNUM);
+			COPY_VSMEMBER(VehicleSpeed);
 
-					newAnimModel->headYaw += rotation;
-					newAnimModel->torsoYaw += rotation;
-					newAnimModel->legsYaw += rotation;
+			COPY_VSMEMBER(AileronDeflection);
+			COPY_VSMEMBER(ElevatorDeflection);
+			COPY_VSMEMBER(RudderDeflection);
+			COPY_VSMEMBER(LastAileronDeflection);
+			COPY_VSMEMBER(LastElevatorDeflection);
+			COPY_VSMEMBER(LastRudderDeflection);
 
-					gr2NormalizeAngle(newAnimModel->headYaw);
-					gr2NormalizeAngle(newAnimModel->torsoYaw);
-					gr2NormalizeAngle(newAnimModel->legsYaw);
-					*/
+			COPY_VSMEMBER(LastAnimationVehicleSpeed);
+			COPY_VSMEMBER(LastTankFireDeltaTime);
+			COPY_VSMEMBER(LastMainGunSmokeLevel);
+			COPY_VSMEMBER(MainGunSmokeLevel);
+			COPY_VSMEMBER(CockpitSmokeLevel);
 
-					/*
-					piMATRIX rotation;
-					piMATRIX* t = &newAnimModel->myVehicle->VehicleObjectData->PlaneObject->mat;
+			/*
+			uiChatPrintLine("Adding STO vehicle at %.2f,%.2f,%.2f from my vehicle at %.2f,%.2f,%.2f.",
+				veh->PosData.Pos.x,
+				veh->PosData.Pos.y,
+				veh->PosData.Pos.z,
+				myVehicle->PosData.Pos.x,
+				myVehicle->PosData.Pos.y,
+				myVehicle->PosData.Pos.z);
+			*/
 
-					generateRotationMatrix (AROUND_Z, 90.0f, &rotation);
-					math3dMatrixMultiply(t, &rotation, t);
-					*/
-				}
-
-				/*
-				newAnimModel->currentMotion = myAnimModel->currentMotion;
-				newAnimModel->currentMove = myAnimModel->currentMove;
-				newAnimModel->currentPoint = myAnimModel->currentPoint;
-				newAnimModel->currentPoint = myAnimModel->currentPoint;
-				*/
-
-				veh->PosData.Att = myVehicle->ModelData->VehicleAtt;
-				veh->PosData.RenderAtt = myVehicle->ModelData->VehicleAtt;
-				veh->VehicleObjectData->PlaneObject->mat = myVehicle->VehicleObjectData->PlaneObject->mat;
-
-				--newAnimModel->lastUpdateTime;
-
-				// this is so each clone get's a different face
-				//snprintf((char*)veh->Handle, 10, "C%d%d", (int)vehicle->uid(), GetRandom(1000, 1000000));
-				//newAnimModel->model[0]->currentFaceID = -1;
-				//newAnimModel->model[1]->currentFaceID = -1;
-				//newAnimModel->model[2]->currentFaceID = -1;
-
-				fpProcessVehicleAnimationFlags(veh);
-				//gr2AnimPersonalize(veh->VehicleObjectData->PlaneObject, (char*)veh->Handle);
-				gr2AnimUpdateModel(veh->VehicleObjectData->PlaneObject, FALSE);
-				gr2UpdateModel(newAnimModel->skeleton, true);
-
-				++newAnimModel->lastUpdateTime;
-			}
-			else
-			{
-				// do something for vehicles
-				veh->AnimationBits = myVehicle->AnimationBits;
-				veh->PosData = myVehicle->PosData;
-				veh->PosData.AttVel.Pitch = veh->PosData.AttVel.Roll = veh->PosData.AttVel.Yaw = 0;
-				veh->PosData.AttVelSum.Pitch = veh->PosData.AttVelSum.Roll = veh->PosData.AttVelSum.Yaw = 0;
-				veh->PosData.LastUpdateAcc.x = veh->PosData.LastUpdateAcc.y = veh->PosData.LastUpdateAcc.z = 0;
-				veh->PosData.Acc.x = veh->PosData.Acc.y = veh->PosData.Acc.z = 0;
-				veh->PosData.LastUpdateAttVel.Pitch = veh->PosData.LastUpdateAttVel.Roll = veh->PosData.LastUpdateAttVel.Yaw = 0;
-				veh->PosData.Vel.x = veh->PosData.Vel.y = veh->PosData.Vel.z = 0;
-
-				veh->VehicleObjectData->PlaneObject->mat = myVehicle->VehicleObjectData->PlaneObject->mat;
-				veh->VehicleObjectData->PlaneObject->pos = myVehicle->VehicleObjectData->PlaneObject->pos;
-
-				// setup state animations
-				COPY_VSMEMBER(LastUpdateTime);
-				COPY_VSMEMBER(GearSetting);
-				COPY_VSMEMBER(FlapSetting);
-				COPY_VSARRAY(CanopySetting,ML_MAX_CREW_POSITIONS);
-				COPY_VSARRAY(HatchSetting,ML_MAX_CREW_POSITIONS);
-
-				COPY_VSMEMBER(BombBayDoorSetting);
-				COPY_VSMEMBER(DiveBrakeSetting);
-
-				COPY_VSMEMBER(GearMoveTime);
-				COPY_VSMEMBER(FlapMoveTime);
-
-				COPY_VSARRAY(CanopyMoveTime,ML_MAX_CREW_POSITIONS);
-				COPY_VSARRAY(HatchMoveTime,ML_MAX_CREW_POSITIONS);
-
-				COPY_VSMEMBER(BombBayDoorMoveTime);
-				COPY_VSMEMBER(DiveBrakeMoveTime);
-
-				COPY_VSARRAY(PropIsDiscSetting,ML_MAX_ENGINES);
-				//COPY_VSARRAY(PropIsDisc,ML_MAX_ENGINES);
-
-				COPY_VSARRAY(RecoilStartTime,VEH_MAX_MOUNTS);
-				COPY_VSARRAY(RecoilPosition,VEH_MAX_MOUNTS);
-				COPY_VSARRAY(RecoilTime,VEH_MAX_MOUNTS);
-
-				//COPY_VSMEMBER(GearPos);
-				//COPY_VSMEMBER(FlapPos);
-
-				//COPY_VSARRAY(CanopyPos,ML_MAX_CREW_POSITIONS);
-				//COPY_VSARRAY(HatchPos,ML_MAX_CREW_POSITIONS);
-
-				//COPY_VSMEMBER(BombBayDoorPos);
-				//COPY_VSMEMBER(DiveBrakePos);
-
-				//COPY_VSARRAY(CanopyDOFVar,ML_MAX_CREW_POSITIONS);
-				//COPY_VSARRAY(HatchDOFVar,ML_MAX_CREW_POSITIONS);
-
-				//COPY_VSMEMBER(GearDOFVar);
-				//COPY_VSMEMBER(FlapDOFVar);
-				//COPY_VSMEMBER(BombBayDoorDOFVar);
-				//COPY_VSMEMBER(DiveBrakeDOFVar);
-
-				//COPY_VSARRAY(PropDiscSpinRpm,ML_MAX_ENGINES);
-				//COPY_VSARRAY(PropSpinPosDOF,ML_MAX_ENGINES);
-
-				COPY_VSMEMBER(UseCalculatedTrackAndWheel);
-				COPY_VSARRAY(TrackPos,2);
-				COPY_VSARRAY(WheelPos,ML_MAX_GEARNUM);
-				COPY_VSMEMBER(VehicleSpeed);
-
-				COPY_VSMEMBER(AileronDeflection);
-				COPY_VSMEMBER(ElevatorDeflection);
-				COPY_VSMEMBER(RudderDeflection);
-				COPY_VSMEMBER(LastAileronDeflection);
-				COPY_VSMEMBER(LastElevatorDeflection);
-				COPY_VSMEMBER(LastRudderDeflection);
-
-				COPY_VSMEMBER(LastAnimationVehicleSpeed);
-				COPY_VSMEMBER(LastTankFireDeltaTime);
-				COPY_VSMEMBER(LastMainGunSmokeLevel);
-				COPY_VSMEMBER(MainGunSmokeLevel);
-				COPY_VSMEMBER(CockpitSmokeLevel);
-
-				/*
-				uiChatPrintLine("Adding STO vehicle at %.2f,%.2f,%.2f from my vehicle at %.2f,%.2f,%.2f.",
-					veh->PosData.Pos.x,
-					veh->PosData.Pos.y,
-					veh->PosData.Pos.z,
-					myVehicle->PosData.Pos.x,
-					myVehicle->PosData.Pos.y,
-					myVehicle->PosData.Pos.z);
-				*/
+			if ( myVehicle->VehicleType->Type == VEH_TYPE_PERSON ) {
+				// We still use the interpolator for offline clones, because derp.
+				veh->interpolator.ForceSync();
 			}
 
 			for(int i = 0; i < 16; i++)

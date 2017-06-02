@@ -15,6 +15,12 @@ namespace Server
 	{
 		public: using xferid_t = UINT64;
 		public: enum class XferReason : UINT32 { Login, Update, Relogin, Reassign, Mirror, Exit, MaxReasons };
+        public: static inline std::string to_string(XferReason reason) {
+            static_assert(std::is_unsigned<std::underlying_type<XferReason>::type>::value, "Underlying type needs to be unsigned");
+            static const std::vector<std::string> reasons{ "Login", "Update", "Relogin", "Reassign", "Mirror", "Exit" };
+            auto rawReason = static_cast<std::underlying_type<XferReason>::type>(reason);
+            return rawReason < reasons.size() ? reasons[rawReason] : std::to_string(rawReason);
+        }
 
 		private: static xferid_t g_xferID;
 

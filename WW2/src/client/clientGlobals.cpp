@@ -110,6 +110,7 @@ SINT8			ServerApID[64];		// program apId
 SINT8			ServerData[64];		// data passed from auth server
 SINT8			ServerProtocol[64]; // connection protocol
 SINT8			BypassString[64];
+LOGICAL         UseSteamLogin = FALSE; // We should use Steam to authenticate our login
 #if defined(DEBUG_WW2) || defined(ALPHA_RELEASE)
 LOGICAL			WantedUserLogEnabled = TRUE;	// If the user wants the log enabled
 #else
@@ -284,6 +285,7 @@ UINT32			CurrentConv; // Current airplane gun convergence setting
 
 FLOAT32			aimMouse;	// Aiming mouse sensitivity
 SINT8            gAuthServer[128]; // Authentication server to be used
+SINT8            gAuthServerPort[64];
 SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 SINT8            gClientV[32]; // Version to submit
 

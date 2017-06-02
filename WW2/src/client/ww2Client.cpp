@@ -255,6 +255,7 @@ struct ClientClassData
 };
 
 static int clientid;
+static bool clientconnected = false;
 static bool clientinited;
 
 static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
@@ -311,7 +312,7 @@ Client::Client()
 
 Client::~Client()
 {
-	if(clientinited)
+	if(clientconnected)
 	{
 		for(int i = 0; i < Teul::Connection::NumHostTypes; i++)
 		{
@@ -325,6 +326,7 @@ Client::~Client()
 
 			_classdata->connections[i] = nullptr;
 		}
+		clientconnected = false;
 	}
 
 	weapListClear(&_data->weapList);
@@ -2915,16 +2917,38 @@ void ww2::Client::SetKilledByAI(bool status)
 	Init
 *************************************************************************************************/
 
-int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
-{
-	char dbugFileName[21];
-	if(clientinited) return 0;
+bool ww2::Client::InitTeul(void) {
+	if ( clientconnected )
+		return true;
 
 #if defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
 	static const LogMode DBUGLOG_MODE = LogMode::TO_FILE;
 #else
 	static const LogMode DBUGLOG_MODE = LogMode::OFF;
 #endif
+
+	char dbugFileName[21];
+	strprintf(dbugFileName, "wwiiClient");
+	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
+	if ( err > -1 ) {
+		err = commInstallClientCallbacks() 	|
+			chatInstallClientCallbacks()	|
+			strtInstallClientCallbacks() 	|
+			mapInstallClientCallbacks()		|
+			missionInstallCallbacks()		|
+			mmClientInstallCallbacks()		|
+			wwiiClientInstallCallbacks()	|
+			Instance::InstallClientCallbacks();
+	}
+
+	clientconnected = err > -1;
+	return clientconnected;
+}
+
+int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
+{
+	if ( ! clientconnected ) return -1;
+	if(clientinited) return 0;
 
 	// update our default player info data
 	_defaultPlayerIdent.m_playerID		= playerID;
@@ -2935,29 +2959,14 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	// go ahead and set the player ident info in it just to make sure
 	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
 
-	strprintf(dbugFileName, "wwiiClient.%u", playerID);
-	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
+	clientinited = true;
 
-	if(err > -1)
-	{
-		err = 	commInstallClientCallbacks() 	|
-				chatInstallClientCallbacks()	|
-				strtInstallClientCallbacks() 	|
-				mapInstallClientCallbacks()		|
-				missionInstallCallbacks()		|
-				mmClientInstallCallbacks()		|
-				wwiiClientInstallCallbacks()	|
-				Instance::InstallClientCallbacks();
-	}
-
-	if(err == 0)
-		clientinited = true;
-
-	return err;
+	return 0;
 }
 
 void ww2::Client::Kill()
 {
+	clientconnected = false;
 	clientinited = false;
 	teulCloseTransport();
 }
@@ -2970,7 +2979,7 @@ void ww2::Client::Kill()
 
 void ww2::Client::NetUpdate(int /*wait*/)
 {
-	if(clientinited)
+	if(Teul::IsTransportInited())
 	{
 		teulUpdateTransport();
 		Teul::Connection::expire();
@@ -3040,7 +3049,7 @@ unsigned int ww2::Client::OICOfBrigade() const
 
 static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {
-	if(!clientinited)
+	if(!clientconnected)
 		return;
 
 	Client* client = Client::FromTeulIndex(teulIndex);

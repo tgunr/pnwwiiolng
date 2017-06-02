@@ -343,17 +343,18 @@ end
 
 function P.ProgressRateForPlayers(players, side)
 	local totalCapTicks = 100 * host_config.capture.tickInterval_s
+	local progress = 0
 
 	-- No players, return the system uncap rate.
 	if players == 0 then
 		return totalCapTicks / P.autoUncapTime
 	end
 
-	local progress = totalCapTicks / P.captureTimeTable[players]
-
 	-- More than the max?
 	if players > P.maxCapContributors then
 		progress = totalCapTicks / P.minCaptureTime
+	else
+		progress = totalCapTicks / P.captureTimeTable[players]
 	end
 
 	return progress * P.ProgressScaleForSide(side)

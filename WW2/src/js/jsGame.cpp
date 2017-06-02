@@ -33,7 +33,7 @@
 #include "pers/persgunsight.h"
 #include "phui/GraphicsContext.h"
 #include "phui/ConsoleView.h"
-#include "sysLaunchURL.h"
+#include "sys/sysLaunchUrl.h"
 #include "pi/piinfo.h"
 #include "locl/loclApp.h"
 #include "ui/uiChat.h"
