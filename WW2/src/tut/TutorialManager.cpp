@@ -545,11 +545,14 @@ void TutorialManager::SetComplete(const char* id, int key, bool completed)
 		uiRunScript("game.ongraduated()");
 	}
 }
-
 bool TutorialManager::IsComplete(const char* id, int key)
 {
 	if(key < 0 || key >= 64) return false;
     
+     
+	// key is representative of which tutorial out of a set 'id' is called.
+	// Key maps directly to which tutorial you're on for the given set (id)
+
     if(key==1 && strcmp("fighter",id)==0)
     {
         SetComplete("fighter",1,true);
