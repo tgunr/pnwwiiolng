@@ -478,6 +478,7 @@
 		E9C1BDE01E462A38001FD5B0 /* liblibcatmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD31E461EE6001FD5B0 /* liblibcatmath.a */; };
 		E9C1BDE11E462A38001FD5B0 /* liblibcattunnel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD41E461EE6001FD5B0 /* liblibcattunnel.a */; };
 		E9C1BDE21E462B00001FD5B0 /* raknetConn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9C1BDDA1E461F1E001FD5B0 /* raknetConn.cpp */; };
+		E9C3FB6F1EE1A8DC00872413 /* multiClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */; };
 		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
 		FA06C3B51ECF289F00A9977E /* authSteam.h in Headers */ = {isa = PBXBuildFile; fileRef = FA06C3B31ECF289F00A9977E /* authSteam.h */; };
 		FA06C3B61ECF2CD400A9977E /* authSteam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3B21ECF289F00A9977E /* authSteam.cpp */; };
@@ -1594,6 +1595,9 @@
 		E9C1BDD41E461EE6001FD5B0 /* liblibcattunnel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibcattunnel.a; path = lib/mac/liblibcattunnel.a; sourceTree = "<group>"; };
 		E9C1BDDA1E461F1E001FD5B0 /* raknetConn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raknetConn.cpp; path = teul/raknetConn.cpp; sourceTree = "<group>"; };
 		E9C1BDDC1E461F2F001FD5B0 /* raknetConn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = raknetConn.h; sourceTree = "<group>"; };
+		E9C3FB6B1EE1A81C00872413 /* multiClientHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multiClientHelp.h; path = mc/multiClientHelp.h; sourceTree = "<group>"; };
+		E9C3FB6C1EE1A81C00872413 /* multiClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multiClient.h; path = mc/multiClient.h; sourceTree = "<group>"; };
+		E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = multiClient.cpp; path = mc/multiClient.cpp; sourceTree = "<group>"; };
 		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
 		FA06C3B21ECF289F00A9977E /* authSteam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = authSteam.cpp; path = auth/authSteam.cpp; sourceTree = "<group>"; };
 		FA06C3B31ECF289F00A9977E /* authSteam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authSteam.h; path = auth/authSteam.h; sourceTree = "<group>"; };
@@ -3045,6 +3049,7 @@
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				E9C3FB6A1EE1A7F400872413 /* mc */,
 				FA06C3B11ECF27FB00A9977E /* auth */,
 				E97C763D1C85146A00875F44 /* event */,
 				08E5E55513E855A100A5034D /* ez */,
@@ -3269,6 +3274,16 @@
 				E97C765E1C85156300875F44 /* strlcpy.c */,
 			);
 			name = event;
+			sourceTree = "<group>";
+		};
+		E9C3FB6A1EE1A7F400872413 /* mc */ = {
+			isa = PBXGroup;
+			children = (
+				E9C3FB6B1EE1A81C00872413 /* multiClientHelp.h */,
+				E9C3FB6C1EE1A81C00872413 /* multiClient.h */,
+				E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */,
+			);
+			name = mc;
 			sourceTree = "<group>";
 		};
 		FA06C3B11ECF27FB00A9977E /* auth */ = {
@@ -3642,6 +3657,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9C3FB6F1EE1A8DC00872413 /* multiClient.cpp in Sources */,
 				E98C64811E48DF7C00ABE277 /* wwiiBackChannel.cpp in Sources */,
 				FAE0DB8D1DC260AF00A9E63D /* omgChat.omg in Sources */,
 				FAE0DB8E1DC260AF00A9E63D /* omgMissionSortieData.omg in Sources */,
@@ -4253,6 +4269,79 @@
 			};
 			name = Release;
 		};
+		E9C3FB641EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+			};
+			name = MC;
+		};
+		E9C3FB651EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LEX = "$(SRCROOT)/proj/mac/flex";
+				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
+				LEX_SUPPRESS_DEFAULT_RULE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				YACC = "$(SRCROOT)/proj/mac/bison";
+			};
+			name = MC;
+		};
+		E9C3FB661EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_OPTIMIZATION_LEVEL = fast;
+				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				GCC_UNROLL_LOOPS = YES;
+				INFOPLIST_FILE = proj/mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
+				MACH_O_TYPE = mh_execute;
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				WRAPPER_EXTENSION = app;
+			};
+			name = MC;
+		};
+		E9C3FB671EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = MC;
+		};
+		E9C3FB681EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = MC;
+		};
+		E9C3FB691EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = MC;
+		};
 		FA3D8BB21C8BF6D6002C5119 /* Development */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
@@ -4433,6 +4522,7 @@
 				FA3D8BB51C8BF6D6002C5119 /* Development */,
 				085BD0CC110F5D560063F377 /* Release */,
 				E964E0601E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB681EE1A4EF00872413 /* MC */,
 				FAFF044A1C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4445,6 +4535,7 @@
 				FA3D8BB31C8BF6D6002C5119 /* Development */,
 				085BD0CA110F5D560063F377 /* Release */,
 				E964E05E1E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB661EE1A4EF00872413 /* MC */,
 				FAFF04481C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4457,6 +4548,7 @@
 				FA3D8BB21C8BF6D6002C5119 /* Development */,
 				085BD0C9110F5D560063F377 /* Release */,
 				E964E05C1E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB641EE1A4EF00872413 /* MC */,
 				FAFF04471C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4469,6 +4561,7 @@
 				FA3D8BB41C8BF6D6002C5119 /* Development */,
 				085BD0CB110F5D560063F377 /* Release */,
 				E964E05F1E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB671EE1A4EF00872413 /* MC */,
 				FAFF04491C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4481,6 +4574,7 @@
 				FA3D8BB61C8BF6D6002C5119 /* Development */,
 				E97C763B1C8513EB00875F44 /* Release */,
 				E964E0611E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB691EE1A4EF00872413 /* MC */,
 				FAFF044B1C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4493,6 +4587,7 @@
 				FA448CE81D0CB25500C4936D /* Development */,
 				FA448CE91D0CB25500C4936D /* Release */,
 				E964E05D1E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB651EE1A4EF00872413 /* MC */,
 				FA448CEA1D0CB25500C4936D /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
