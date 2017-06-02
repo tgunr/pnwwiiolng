@@ -251,7 +251,7 @@ void InfantryPredictor::NewMessageReceived(Timestamp timestamp, FrameTime frame)
 //------------------------------------------------------------------------------
 
 void InfantryPredictor::UpdateInterpolation(void) {
-	if ( _vehicle->Flags & VEH_FLAGS_IS_CLONE ) {
+	if ( (_vehicle->Flags & VEH_FLAGS_IS_CLONE) ) {
 		pred_pos = curr_msg;
 		return;
 	}
@@ -297,7 +297,7 @@ void InfantryPredictor::UpdateInterpolation(void) {
 //==============================================================================
 
 const Update& InfantryPredictor::Interpolate(FrameTime frame) {
-	if ( _vehicle->Flags & VEH_FLAGS_IS_CLONE || is_dead || (frame == pred_pos.frametime && ! dirty) )
+	if ( (_vehicle->Flags & VEH_FLAGS_IS_CLONE) || is_dead || (frame == pred_pos.frametime && ! dirty) )
 		return pred_pos;
 
 	gr2AnimBitPacker flags(curr_msg.animationFlags);
