@@ -1,10 +1,13 @@
 #include <syscfg.h> // Path is project specific.
 #include <stdarg.h>	// var args
+#include <thread>
+#include <chrono>
 
 #include "tut/TutorialManager.h"
 #include "tut/tutGroupProgress.h"
 #include "ui/uiMain.h"
 #include "client/GameClient.h"
+#include "client/clientSTO.h"
 #include "sdm/sdm.h"
 #include "include/vars.h"
 #include "spt/Random.h"
@@ -20,6 +23,8 @@
 #include "veh/vehmain.h"
 #include "trn/trncd.h"
 #include "ob/obmain.h"
+#include "fp/fpPPO.h"
+#include "wwii/wwiiServerTrackedObject.h"
 
 // defines
 
@@ -33,6 +38,8 @@
 
 // local functions
 static bool _pointInArea(Vec3d& pos, TutorialHandler& handler);
+
+extern PPOSpecLoader specLoader;
 
 // singleton
 static TutorialManager _tutMgr;
@@ -56,7 +63,8 @@ TutorialManager::TutorialManager() :
 	_nextUpdate(0),
 	_stop(false),
 	_allowStrat(true),
-	_prePath("tutorials/")
+	_prePath("tutorials/"),
+	m_fmsBuilt(false)
 {
 }
 
@@ -357,6 +365,12 @@ bool TutorialManager::Stop(bool delayed)
 
 		// clear out the current handlers
 		RemoveHandlers();
+
+		// Remove the Mobile spawn sto that we created in the TutorialManager::_handleEvent function.
+		wwiiRemoveSTO(2147483647);
+
+		//Set this to false so the FMS gets built again if we spawn back in.
+		m_fmsBuilt = false;
 
 		return true;
 	}
@@ -778,6 +792,29 @@ int TutorialManager::_handleEvent(TutorialHandler& handler, va_list* args)
 
 	lua_settop(_tutorial, top);
 
+
+	//Create an FMS only if it isn't already built.
+	//This replaces the old truck based UMS that was loaded via lua.
+	if (!m_fmsBuilt)
+	{
+		WorldPosition_m position((FLOAT64)-314061.23, (FLOAT64)3603759.46, (FLOAT64)101.24);
+		AttitudeVector attitude(0.0f, 0.0f, 1.0f);
+		PPOSpec* spec = specLoader.ppoGetSpec(PPOSpecLoader::_PPO_FMS);
+		if (!spec) uiChatPrintLine("Failed to get PPOSpec in TutorialManager::_handleEvent");
+
+		if (Online)
+		{
+			// create a mssto, it just gets assigned a British flag because there is no player to get the country from at this stage.
+			// assign it the highest uid possible in the hope that this will never cause a duplicate (Frisbones idea :-) )
+			// the server isn't told about this sto.
+			// It is destroyed in the TutorialManager::Stop function.
+			MobileSpawnSTO* sto = new MobileSpawnSTO(2147483647, static_cast<UINT16>(spec->id), position, attitude, (UINT32)1);
+			ServerTrackedObject::addToIndex(sto);
+			sto->setCanExpire(false);
+		}
+		m_fmsBuilt = true;
+	}
+	
 	return keep;
 }
 

@@ -290,6 +290,9 @@ private:
 	// prepath
 	std::string _prePath;
 
+	// used to keep track of whether a FMS has been placed into the world.
+	bool m_fmsBuilt;
+
 }; // tolua_export
 
 #endif // PN_TUT_TUTORIALMANAGER_H
