@@ -483,6 +483,9 @@
 		FA06C3B61ECF2CD400A9977E /* authSteam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3B21ECF289F00A9977E /* authSteam.cpp */; };
 		FA06C3B81ED0DCDF00A9977E /* sysLaunchUrl.h in Headers */ = {isa = PBXBuildFile; fileRef = FA06C3B71ED0DCDF00A9977E /* sysLaunchUrl.h */; };
 		FA06C3BA1EDCA67E00A9977E /* json.hpp in Headers */ = {isa = PBXBuildFile; fileRef = FA06C3B91EDCA67E00A9977E /* json.hpp */; };
+		FA06C3BE1EE18CE200A9977E /* sysSteam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3BB1EE18C8B00A9977E /* sysSteam.cpp */; };
+		FA06C3C21EE18D2100A9977E /* jsAuthHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3BF1EE18D0A00A9977E /* jsAuthHandler.cpp */; };
+		FA06C3C51EE18D5900A9977E /* clientConnections.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3C31EE18D5900A9977E /* clientConnections.cpp */; };
 		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
 		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
 		FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */ = {isa = PBXBuildFile; fileRef = FA13BB181C875F6800095818 /* placeholder-background.png */; };
@@ -1596,6 +1599,12 @@
 		FA06C3B31ECF289F00A9977E /* authSteam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authSteam.h; path = auth/authSteam.h; sourceTree = "<group>"; };
 		FA06C3B71ED0DCDF00A9977E /* sysLaunchUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysLaunchUrl.h; path = src/sys/sysLaunchUrl.h; sourceTree = SOURCE_ROOT; };
 		FA06C3B91EDCA67E00A9977E /* json.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = json.hpp; path = ../../Libraries/json/src/json.hpp; sourceTree = "<group>"; };
+		FA06C3BB1EE18C8B00A9977E /* sysSteam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sysSteam.cpp; path = src/sys/sysSteam.cpp; sourceTree = SOURCE_ROOT; };
+		FA06C3BC1EE18C8B00A9977E /* sysSteam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysSteam.h; path = src/sys/sysSteam.h; sourceTree = SOURCE_ROOT; };
+		FA06C3BF1EE18D0A00A9977E /* jsAuthHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsAuthHandler.cpp; sourceTree = "<group>"; };
+		FA06C3C01EE18D0A00A9977E /* jsAuthHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jsAuthHandler.h; sourceTree = "<group>"; };
+		FA06C3C31EE18D5900A9977E /* clientConnections.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clientConnections.cpp; sourceTree = "<group>"; };
+		FA06C3C41EE18D5900A9977E /* clientConnections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clientConnections.h; sourceTree = "<group>"; };
 		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
 		FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authPlaygateTypes.h; path = src/auth/authPlaygateTypes.h; sourceTree = SOURCE_ROOT; };
 		FA13BB161C86758600095818 /* libevent.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libevent.a; path = proj/mac/build/Debug/libevent.a; sourceTree = "<group>"; };
@@ -1782,6 +1791,8 @@
 		0810485F103DCEE10065E0E2 /* client */ = {
 			isa = PBXGroup;
 			children = (
+				FA06C3C31EE18D5900A9977E /* clientConnections.cpp */,
+				FA06C3C41EE18D5900A9977E /* clientConnections.h */,
 				08104860103DCEE10065E0E2 /* client.cpp */,
 				08104861103DCEE10065E0E2 /* client.h */,
 				08104862103DCEE10065E0E2 /* clientBrigadeControl.cpp */,
@@ -2031,6 +2042,8 @@
 		081049F5103DD2900065E0E2 /* js */ = {
 			isa = PBXGroup;
 			children = (
+				FA06C3BF1EE18D0A00A9977E /* jsAuthHandler.cpp */,
+				FA06C3C01EE18D0A00A9977E /* jsAuthHandler.h */,
 				081049F6103DD2900065E0E2 /* jsClient.cpp */,
 				081049F7103DD2900065E0E2 /* jsClient.h */,
 				081049F8103DD2900065E0E2 /* jsContent.cpp */,
@@ -2590,6 +2603,8 @@
 		08104D50103DFBE90065E0E2 /* sysmac */ = {
 			isa = PBXGroup;
 			children = (
+				FA06C3BB1EE18C8B00A9977E /* sysSteam.cpp */,
+				FA06C3BC1EE18C8B00A9977E /* sysSteam.h */,
 				FA06C3B71ED0DCDF00A9977E /* sysLaunchUrl.h */,
 				FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */,
 				0863B36E10619D66005FDF19 /* clientGlobals.cpp */,
@@ -3115,7 +3130,6 @@
 			isa = PBXGroup;
 			children = (
 				E95E664E1E8301A2005A04FF /* steam_appid.txt */,
-				E99C3E761E744FC6008A435E /* libsteam_api.dylib */,
 				FA3D8BB11C8BF5CC002C5119 /* Config */,
 				FA448CBC1D0CB01100C4936D /* omggen */,
 				0DA6D33608563A0900A53577 /* src */,
@@ -3179,6 +3193,7 @@
 				08744F52107BF977009DB5AF /* libtolua++.a */,
 				FA13BB491C8764BB00095818 /* libz.tbd */,
 				FA13BB4E1C87650800095818 /* libxml2.tbd */,
+				E99C3E761E744FC6008A435E /* libsteam_api.dylib */,
 			);
 			name = lib;
 			sourceTree = "<group>";
@@ -3780,6 +3795,7 @@
 				08104B8E103DF7840065E0E2 /* oglfbo.cpp in Sources */,
 				08104B8F103DF7840065E0E2 /* oglGlobalStates.cpp in Sources */,
 				08104B90103DF7840065E0E2 /* oglMesh.cpp in Sources */,
+				FA06C3C51EE18D5900A9977E /* clientConnections.cpp in Sources */,
 				08104B91103DF7840065E0E2 /* oglTexture.cpp in Sources */,
 				08104B95103DF7B10065E0E2 /* ogrpmain.cpp in Sources */,
 				08104BBF103DF85D0065E0E2 /* BoundingBox.cpp in Sources */,
@@ -3842,6 +3858,7 @@
 				08104C88103DFA190065E0E2 /* sndsSoundControl.cpp in Sources */,
 				08104C97103DFA5B0065E0E2 /* sptmain.cpp in Sources */,
 				08104C98103DFA5B0065E0E2 /* Tree.cpp in Sources */,
+				FA06C3C21EE18D2100A9977E /* jsAuthHandler.cpp in Sources */,
 				08104C99103DFA5B0065E0E2 /* treeData.cpp in Sources */,
 				08104D19103DFA970065E0E2 /* strtClientMessages.cpp in Sources */,
 				08104D2E103DFA970065E0E2 /* strtLua.cpp in Sources */,
@@ -3956,6 +3973,7 @@
 				08977E1E134D007B00C9DCFE /* sneaky.cpp in Sources */,
 				08477139135E279F00325E43 /* trnScenario.cpp in Sources */,
 				08BA6A9A13705A68007321C6 /* SpatialDB.cpp in Sources */,
+				FA06C3BE1EE18CE200A9977E /* sysSteam.cpp in Sources */,
 				08BA6ACF1370776D007321C6 /* CustomMapLayer.cpp in Sources */,
 				08E800BC13745261000F25A9 /* HeightField.cpp in Sources */,
 				088CE9951379D33600F7AE5D /* SpatialDatabase.cpp in Sources */,
