@@ -4,7 +4,7 @@
 #include "build_info.hpp"
 #import "WW2AppDelegate.h"
 #include "sysmain.h"
-#include "sysSteam.h"
+#include "sys/sysSteam.h"
 #include "vars.h"
 #include "HID_Utilities.h"
 #include "HID_Queue_Utilities.h"
