@@ -569,6 +569,14 @@ bool TutorialManager::IsComplete(const char* id, int key)
 {
 	if(key < 0 || key >= 64) return false;
 
+	// HACKHACKHACK: Someone needs to go through the data files and do this properly!!!
+	// Automatically graduate fighter.basic
+	if ( strcmp("fighter", id) == 0 && key == 1 )
+		SetComplete("fighter", 1, true);
+	// Automatically graduate basic.combat
+	if ( strcmp("basic", id) == 0 && key == 6 )
+		SetComplete("basic", 6, true);
+
 	if(_completed.find(id) == _completed.end())
 		_completed[id] = 0;
 
