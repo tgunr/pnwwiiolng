@@ -383,7 +383,6 @@
 		08492F7113170C5000C7F39E /* FTFontAdapted.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08492F7013170C5000C7F39E /* FTFontAdapted.cpp */; };
 		084DD9F91120F37F0020E34F /* mem.h in Headers */ = {isa = PBXBuildFile; fileRef = 084DD9F81120F37F0020E34F /* mem.h */; };
 		084DD9FA1120F37F0020E34F /* mem.h in Headers */ = {isa = PBXBuildFile; fileRef = 084DD9F81120F37F0020E34F /* mem.h */; };
-		0863B34F10619AC8005FDF19 /* libphui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0863B34D10619AC8005FDF19 /* libphui.a */; };
 		0863B35010619AC8005FDF19 /* libspeedtreemac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0863B34E10619AC8005FDF19 /* libspeedtreemac.a */; };
 		087286DF10D1B23B00456009 /* libimapmac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 087286DE10D1B23B00456009 /* libimapmac.a */; };
 		08744F51107BF96D009DB5AF /* liblua5.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08744F50107BF96D009DB5AF /* liblua5.1.a */; };
@@ -487,6 +486,7 @@
 		FA06C3BE1EE18CE200A9977E /* sysSteam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3BB1EE18C8B00A9977E /* sysSteam.cpp */; };
 		FA06C3C21EE18D2100A9977E /* jsAuthHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3BF1EE18D0A00A9977E /* jsAuthHandler.cpp */; };
 		FA06C3C51EE18D5900A9977E /* clientConnections.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3C31EE18D5900A9977E /* clientConnections.cpp */; };
+		FA06C3D51EE2663400A9977E /* libphui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA06C3D01EE2660200A9977E /* libphui.a */; };
 		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
 		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
 		FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */ = {isa = PBXBuildFile; fileRef = FA13BB181C875F6800095818 /* placeholder-background.png */; };
@@ -572,6 +572,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = E97C76341C8513EB00875F44;
 			remoteInfo = event;
+		};
+		FA06C3CF1EE2660200A9977E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA06C3CB1EE2660200A9977E /* phui.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC046055464E500DB518D;
+			remoteInfo = phui;
+		};
+		FA06C3D21EE2661B00A9977E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA06C3CB1EE2660200A9977E /* phui.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
+			remoteInfo = phui;
 		};
 		FA448CF21D0CB82900C4936D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1431,7 +1445,6 @@
 		08492F7013170C5000C7F39E /* FTFontAdapted.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FTFontAdapted.cpp; sourceTree = "<group>"; };
 		084DD9B511206C070020E34F /* updtEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtEnums.h; sourceTree = "<group>"; };
 		084DD9F81120F37F0020E34F /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
-		0863B34D10619AC8005FDF19 /* libphui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphui.a; path = lib/mac/libphui.a; sourceTree = "<group>"; };
 		0863B34E10619AC8005FDF19 /* libspeedtreemac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspeedtreemac.a; path = lib/mac/libspeedtreemac.a; sourceTree = "<group>"; };
 		0863B36E10619D66005FDF19 /* clientGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = clientGlobals.cpp; path = src/client/clientGlobals.cpp; sourceTree = SOURCE_ROOT; };
 		087286DE10D1B23B00456009 /* libimapmac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libimapmac.a; path = lib/mac/libimapmac.a; sourceTree = "<group>"; };
@@ -1609,6 +1622,7 @@
 		FA06C3C01EE18D0A00A9977E /* jsAuthHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jsAuthHandler.h; sourceTree = "<group>"; };
 		FA06C3C31EE18D5900A9977E /* clientConnections.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clientConnections.cpp; sourceTree = "<group>"; };
 		FA06C3C41EE18D5900A9977E /* clientConnections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clientConnections.h; sourceTree = "<group>"; };
+		FA06C3CB1EE2660200A9977E /* phui.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = phui.xcodeproj; path = ../Libraries/phui/proj.mac/phui.xcodeproj; sourceTree = "<group>"; };
 		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
 		FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authPlaygateTypes.h; path = src/auth/authPlaygateTypes.h; sourceTree = SOURCE_ROOT; };
 		FA13BB161C86758600095818 /* libevent.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libevent.a; path = proj/mac/build/Debug/libevent.a; sourceTree = "<group>"; };
@@ -1665,6 +1679,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA06C3D51EE2663400A9977E /* libphui.a in Frameworks */,
 				E9C1BDDD1E462A38001FD5B0 /* libRakNetLibStatic.a in Frameworks */,
 				E9C1BDDE1E462A38001FD5B0 /* liblibcatcommon.a in Frameworks */,
 				E9C1BDDF1E462A38001FD5B0 /* liblibcatcrypt.a in Frameworks */,
@@ -1690,7 +1705,6 @@
 				0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */,
 				0DDF00AC08578C460027461D /* libjs.a in Frameworks */,
 				0DBEF4410A7FD8F60094C53D /* libexpat-ww2.a in Frameworks */,
-				0863B34F10619AC8005FDF19 /* libphui.a in Frameworks */,
 				0863B35010619AC8005FDF19 /* libspeedtreemac.a in Frameworks */,
 				08DDF926106928D800720B71 /* libmacode.a in Frameworks */,
 				E94156B01D259A0300C0565B /* libb64.a in Frameworks */,
@@ -3134,6 +3148,7 @@
 		20286C29FDCF999611CA2CEA /* WW2OL */ = {
 			isa = PBXGroup;
 			children = (
+				FA06C3CB1EE2660200A9977E /* phui.xcodeproj */,
 				E95E664E1E8301A2005A04FF /* steam_appid.txt */,
 				FA3D8BB11C8BF5CC002C5119 /* Config */,
 				FA448CBC1D0CB01100C4936D /* omggen */,
@@ -3189,7 +3204,6 @@
 				E90D96991C6D729D00D5EC52 /* WebKit.framework */,
 				087286DE10D1B23B00456009 /* libimapmac.a */,
 				FA13BB161C86758600095818 /* libevent.a */,
-				0863B34D10619AC8005FDF19 /* libphui.a */,
 				0863B34E10619AC8005FDF19 /* libspeedtreemac.a */,
 				0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */,
 				0DDF00A308578C460027461D /* libHIDUtilities.a */,
@@ -3294,6 +3308,14 @@
 				FA06C3B21ECF289F00A9977E /* authSteam.cpp */,
 			);
 			name = auth;
+			sourceTree = "<group>";
+		};
+		FA06C3CC1EE2660200A9977E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FA06C3D01EE2660200A9977E /* libphui.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		FA3D8BB11C8BF5CC002C5119 /* Config */ = {
@@ -3461,6 +3483,7 @@
 				FA448CA51D0CADA900C4936D /* PBXBuildRule */,
 			);
 			dependencies = (
+				FA06C3D31EE2661B00A9977E /* PBXTargetDependency */,
 				FA448CF31D0CB82900C4936D /* PBXTargetDependency */,
 				E97C76C91C85ABF400875F44 /* PBXTargetDependency */,
 				08D5812D106310A700177892 /* PBXTargetDependency */,
@@ -3550,6 +3573,12 @@
 			);
 			mainGroup = 20286C29FDCF999611CA2CEA /* WW2OL */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = FA06C3CC1EE2660200A9977E /* Products */;
+					ProjectRef = FA06C3CB1EE2660200A9977E /* phui.xcodeproj */;
+				},
+			);
 			projectRoot = ./;
 			targets = (
 				FA448CE11D0CB25500C4936D /* omggen */,
@@ -3560,6 +3589,16 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		FA06C3D01EE2660200A9977E /* libphui.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libphui.a;
+			remoteRef = FA06C3CF1EE2660200A9977E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8D0C4E8C0486CD37000505A6 /* Resources */ = {
@@ -4057,6 +4096,11 @@
 			isa = PBXTargetDependency;
 			target = E97C76341C8513EB00875F44 /* event */;
 			targetProxy = E97C76C81C85ABF400875F44 /* PBXContainerItemProxy */;
+		};
+		FA06C3D31EE2661B00A9977E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = phui;
+			targetProxy = FA06C3D21EE2661B00A9977E /* PBXContainerItemProxy */;
 		};
 		FA448CF31D0CB82900C4936D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
