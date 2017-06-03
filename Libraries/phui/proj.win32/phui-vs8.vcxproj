@@ -207,6 +207,7 @@
     <ClCompile Include="..\src\DOM.cpp" />
     <ClCompile Include="..\src\DropDownTask.cpp" />
     <ClCompile Include="..\src\GLGraphicsContext.cpp" />
+    <ClCompile Include="..\src\GraphicsContext.cpp" />
     <ClCompile Include="..\src\ImageView.cpp" />
     <ClCompile Include="..\src\IMEControl.cpp" />
     <ClCompile Include="..\src\Invoker.cpp" />

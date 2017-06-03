@@ -103,6 +103,7 @@
 		470B71D40E70571B006D9C06 /* wwiiUTF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 470B71D30E70571B006D9C06 /* wwiiUTF.cpp */; };
 		4717733D0F28E5580094DEAA /* IMEControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4717733C0F28E5580094DEAA /* IMEControl.cpp */; };
 		47724CCF0F86C2FC0060F743 /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 47724CCE0F86C2FC0060F743 /* TextContainer.cpp */; };
+		FA06C3CA1EE25ADA00A9977E /* GraphicsContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3C91EE25ADA00A9977E /* GraphicsContext.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -204,6 +205,7 @@
 		47724CCE0F86C2FC0060F743 /* TextContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextContainer.cpp; path = ../src/TextContainer.cpp; sourceTree = SOURCE_ROOT; };
 		D2AAC046055464E500DB518D /* libphui.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libphui.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA06C3C71EE1929200A9977E /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
+		FA06C3C91EE25ADA00A9977E /* GraphicsContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GraphicsContext.cpp; path = ../src/GraphicsContext.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -312,6 +314,7 @@
 				0D31FFFB08843A6200C3CBEA /* CSSViewDrawer.cpp */,
 				0D31FFFC08843A6200C3CBEA /* DOM.cpp */,
 				0D31FFFD08843A6200C3CBEA /* DropDownTask.cpp */,
+				FA06C3C91EE25ADA00A9977E /* GraphicsContext.cpp */,
 				0D31FFFE08843A6200C3CBEA /* GLGraphicsContext.cpp */,
 				0D31FFFF08843A6200C3CBEA /* Groupbox.cpp */,
 				0D31000008843A6200C3CBEA /* ImageView.cpp */,
@@ -514,6 +517,7 @@
 				0D1F958108E877F6008FF0BF /* ContextMenu.cpp in Sources */,
 				0DC3C9440A7BFDE800F14BBB /* ContextMenu.cpp in Sources */,
 				0DCEF7710AD4637000E1D282 /* CtxMenu.cpp in Sources */,
+				FA06C3CA1EE25ADA00A9977E /* GraphicsContext.cpp in Sources */,
 				0DCEF7BC0AD4643900E1D282 /* Panel.cpp in Sources */,
 				470B71CF0E7056BF006D9C06 /* MirrorView.cpp in Sources */,
 				470B71D40E70571B006D9C06 /* wwiiUTF.cpp in Sources */,
