@@ -586,11 +586,16 @@ extern NSString *WebActionOriginalURLKey;
     }
 #endif
     
-#ifndef DEBUG_WW2 // TODO: Make this the first thing that happens ~Victarus
-    if (InitSteam())
-    // abort
+    if (!InitSteam()) {
+        // abort
         [NSApp terminate:self];
-#endif
+    }
+    
+    if (UseSteamLogin) {
+        state = WAIT_APPLE_EVT;
+        [self launchOffline:self];
+        return;
+    }
     
     // This sequence depends on certain implementation details of the
     // BITCrashManager - in particular, that report metadata is processed
