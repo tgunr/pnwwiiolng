@@ -673,10 +673,6 @@ char GetOSBuild()
 // This is the actual winmain
  int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	// We may need to restart if this is a Steam version that wasn't launched properly.
-	if ( ! InitSteam() )
-		return 0;
-
 	int		x, y, w, h, wh, xy;
 	int		bpp, hdw, stencil, wnd;
 	MSG		msg;
@@ -688,6 +684,10 @@ char GetOSBuild()
 	if (!mngoptParse("")) {
 		return 0;
 	}
+
+	// We may need to restart if this is a Steam version that wasn't launched properly.
+	if ( !InitSteam() )
+		return 0;
 
 #if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
 	dbugInit(LogMode::TO_FILE, "wwiiClient");

@@ -264,7 +264,7 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	JS_ValueToInt32(ctx, argv[0], &arena);
 	const char* callsign = "";
 	if ( argc >= 2 )
-		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[3]));
+		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
 
 	// HACK: Move this to sysSteam so we aren't doing this in GUI code.
 	char ticket_data[128];
