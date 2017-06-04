@@ -594,6 +594,8 @@ extern NSString *WebActionOriginalURLKey;
         return;
     }
     
+    [launcherWindow setIsVisible:true];
+    
     // This sequence depends on certain implementation details of the
     // BITCrashManager - in particular, that report metadata is processed
     // synchronously during -startManager, that -userIDForHockeyManager is
