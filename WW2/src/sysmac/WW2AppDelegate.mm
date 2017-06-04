@@ -24,25 +24,12 @@
 #include "loclApp.h"
 #include "auth/authTypes.h"
 #include "auth/authAppIDs.h"
+#include "auth/authDefaults.h"
 #include <netdb.h>
 #include <arpa/inet.h>
 #import <HockeySDK/HockeySDK.h>
 
 #define PLAYGATE_VERSION 0x01010109
-
-#ifdef AUTH_OVERRIDE
-#define DEFAULT_AUTH_SERVER "AUTH_OVERRIDE"
-#else
-
-#if defined(BETA_RELEASE)
-#define DEFAULT_AUTH_SERVER "auth.playnet.com"
-#else
-#define DEFAULT_AUTH_SERVER "auth.playnet.com"
-#endif
-
-#endif
-
-#define DEFAULT_AUTH_PORT WWII::Net::Ports::AuthHost
 
 static void xmlerrorstub (void *ctx, const char *msg, ...) {}
 static void xmlstructurederrorstub(void *userData, xmlErrorPtr error) {}
@@ -637,14 +624,15 @@ extern NSString *WebActionOriginalURLKey;
     [passwordField setDelegate:self];
     [self updateLoginEnabled];
     
-    authServer = [NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding];
-    if (gAuthServer[0]) {
-        authServer = [[NSString alloc] initWithUTF8String:gAuthServer];
+    if (!gAuthServer[0]) {
+        strsafecpy(gAuthServer, DEFAULT_AUTH_SERVER);
     }
-    authPort = DEFAULT_AUTH_PORT;
-    if (gAuthServerPort[0]) {
-        authPort = std::stoul(gAuthServerPort);
+    authServer = @(gAuthServer);
+    
+    if (!gAuthServerPort[0]) {
+        strprintf(gAuthServerPort, "%hu", DEFAULT_AUTH_PORT);
     }
+    authPort = std::stoul(gAuthServerPort);
     
     NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     style.alignment = NSCenterTextAlignment;

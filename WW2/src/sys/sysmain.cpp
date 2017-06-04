@@ -29,6 +29,7 @@
 #include "locl/loclApp.h"
 #include "sn/sndsSoundTypes.h"
 #include "build_info.hpp"
+#include "auth/authDefaults.h"
 
 #ifdef CRASH_HANDLER
 #include "sys/crashhandler.h"
@@ -822,6 +823,14 @@ char GetOSBuild()
 	if (!mngoptParse(""))
 	{
 		return(0);
+	}
+
+	// Reset the globals containing auth host information for use by Steam login
+	if (!gAuthServer[0]) {
+		strsafecpy(gAuthServer, DEFAULT_AUTH_SERVER);
+	}
+	if (!gAuthServerPort[0]) {
+		strprintf(gAuthServerPort, "%hu", DEFAULT_AUTH_PORT);
 	}
 
 #ifdef ANTIHACK
