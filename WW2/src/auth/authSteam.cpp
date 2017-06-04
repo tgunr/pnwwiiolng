@@ -12,7 +12,8 @@
 #include "build_info.hpp"
 #include "json.hpp"
 
-static const std::string authSteamLoginURL = "https://auth.playnet.com/v1/login";
+static const std::string authSteamLoginProtocol = "https";
+static const std::string authSteamLoginResource = "/v1/login";
 
 SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &requestedCallsign)
 {
@@ -22,13 +23,7 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
     sysBasicHTTPResponse response;
     
     request.method = "POST";
-	if (!gAuthServer[0])
-		request.url = authSteamLoginURL;
-	else
-	{
-		request.url = std::string("https://") + gAuthServer +
-			std::string("/v1/login");
-	}
+    request.url = authSteamLoginProtocol + "://" + gAuthServer + authSteamLoginResource;
     request.headers["Content-Type"] = "application/json";
     request.headers["X-WWIIOnline-Client-Version"] = PN_product_version_string; // Not required, just for good measure
     request.content = std::string("{") + // TODO: Do a real JSON encode here instead of just stringing strings together
