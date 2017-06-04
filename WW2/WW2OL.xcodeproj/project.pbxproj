@@ -1623,6 +1623,7 @@
 		FA06C3C31EE18D5900A9977E /* clientConnections.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clientConnections.cpp; sourceTree = "<group>"; };
 		FA06C3C41EE18D5900A9977E /* clientConnections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clientConnections.h; sourceTree = "<group>"; };
 		FA06C3CB1EE2660200A9977E /* phui.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = phui.xcodeproj; path = ../Libraries/phui/proj.mac/phui.xcodeproj; sourceTree = "<group>"; };
+		FA06C3D61EE3AB3200A9977E /* authDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authDefaults.h; path = auth/authDefaults.h; sourceTree = "<group>"; };
 		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
 		FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authPlaygateTypes.h; path = src/auth/authPlaygateTypes.h; sourceTree = SOURCE_ROOT; };
 		FA13BB161C86758600095818 /* libevent.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libevent.a; path = proj/mac/build/Debug/libevent.a; sourceTree = "<group>"; };
@@ -3306,6 +3307,7 @@
 				FA06C3B91EDCA67E00A9977E /* json.hpp */,
 				FA06C3B31ECF289F00A9977E /* authSteam.h */,
 				FA06C3B21ECF289F00A9977E /* authSteam.cpp */,
+				FA06C3D61EE3AB3200A9977E /* authDefaults.h */,
 			);
 			name = auth;
 			sourceTree = "<group>";
@@ -4145,10 +4147,6 @@
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
@@ -4191,10 +4189,6 @@
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
@@ -4249,16 +4243,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_UNROLL_LOOPS = YES;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
@@ -4340,16 +4327,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_UNROLL_LOOPS = YES;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
@@ -4401,10 +4381,6 @@
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
@@ -4516,10 +4492,6 @@
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
