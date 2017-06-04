@@ -169,8 +169,9 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
 			trim(hdrVal);
 
 			// make sure we have two keys - otherwise ignore
-			if (hdrName.length() && hdrVal.length())
-				response.headers.insert( { hdrName, hdrVal } );
+			if (hdrName.length() && hdrVal.length()) {
+				response.headers.insert({ strtolower(hdrName), hdrVal });
+			}
 		}
 
 		// Only parse the content if there is no error

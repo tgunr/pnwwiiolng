@@ -42,7 +42,7 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
         return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
     }
     
-    if (response.headers.find("content-type") == response.headers.end() || response.headers["Content-Type"] != "application/json") {
+    if (response.headers.find("content-type") == response.headers.end() || response.headers["content-type"] != "application/json") {
         // TODO: Logging, better error handling
         return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
     }

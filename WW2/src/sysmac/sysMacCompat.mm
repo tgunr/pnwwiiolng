@@ -207,7 +207,7 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
     response.responseCode = httpURLResponse.statusCode;
     response.responseMessage = [NSHTTPURLResponse localizedStringForStatusCode:httpURLResponse.statusCode].UTF8String;
     [httpURLResponse.allHeaderFields enumerateKeysAndObjectsUsingBlock:^ (NSString *key, NSString *obj, BOOL *stop) {
-        response.headers[key.UTF8String] = obj.UTF8String;
+        response.headers[key.lowercaseString.UTF8String] = obj.UTF8String;
     }];
     response.content.assign(static_cast<const char *>(resultData.bytes), resultData.length);
     return true;
