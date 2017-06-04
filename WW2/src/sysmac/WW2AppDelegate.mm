@@ -578,6 +578,16 @@ extern NSString *WebActionOriginalURLKey;
         [NSApp terminate:self];
     }
     
+    if (!gAuthServer[0]) {
+        strsafecpy(gAuthServer, DEFAULT_AUTH_SERVER);
+    }
+    authServer = @(gAuthServer);
+    
+    if (!gAuthServerPort[0]) {
+        strprintf(gAuthServerPort, "%hu", DEFAULT_AUTH_PORT);
+    }
+    authPort = std::stoul(gAuthServerPort);
+    
     if (UseSteamLogin) {
         state = WAIT_APPLE_EVT;
         [self launchOffline:self];
@@ -623,16 +633,6 @@ extern NSString *WebActionOriginalURLKey;
     [userNameField setDelegate:self];
     [passwordField setDelegate:self];
     [self updateLoginEnabled];
-    
-    if (!gAuthServer[0]) {
-        strsafecpy(gAuthServer, DEFAULT_AUTH_SERVER);
-    }
-    authServer = @(gAuthServer);
-    
-    if (!gAuthServerPort[0]) {
-        strprintf(gAuthServerPort, "%hu", DEFAULT_AUTH_PORT);
-    }
-    authPort = std::stoul(gAuthServerPort);
     
     NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     style.alignment = NSCenterTextAlignment;
