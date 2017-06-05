@@ -29,6 +29,7 @@
 #include "locl/loclApp.h"
 #include "sn/sndsSoundTypes.h"
 #include "build_info.hpp"
+#include "auth/authDefaults.h"
 
 #ifdef CRASH_HANDLER
 #include "sys/crashhandler.h"
@@ -673,10 +674,6 @@ char GetOSBuild()
 // This is the actual winmain
  int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	// We may need to restart if this is a Steam version that wasn't launched properly.
-	if ( ! InitSteam() )
-		return 0;
-
 	int		x, y, w, h, wh, xy;
 	int		bpp, hdw, stencil, wnd;
 	MSG		msg;
@@ -688,6 +685,10 @@ char GetOSBuild()
 	if (!mngoptParse("")) {
 		return 0;
 	}
+
+	// We may need to restart if this is a Steam version that wasn't launched properly.
+	if ( !InitSteam() )
+		return 0;
 
 #if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
 	dbugInit(LogMode::TO_FILE, "wwiiClient");
@@ -822,6 +823,14 @@ char GetOSBuild()
 	if (!mngoptParse(""))
 	{
 		return(0);
+	}
+
+	// Reset the globals containing auth host information for use by Steam login
+	if (!gAuthServer[0]) {
+		strsafecpy(gAuthServer, DEFAULT_AUTH_SERVER);
+	}
+	if (!gAuthServerPort[0]) {
+		strprintf(gAuthServerPort, "%hu", DEFAULT_AUTH_PORT);
 	}
 
 #ifdef ANTIHACK

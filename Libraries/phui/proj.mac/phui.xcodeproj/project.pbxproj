@@ -103,6 +103,7 @@
 		470B71D40E70571B006D9C06 /* wwiiUTF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 470B71D30E70571B006D9C06 /* wwiiUTF.cpp */; };
 		4717733D0F28E5580094DEAA /* IMEControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4717733C0F28E5580094DEAA /* IMEControl.cpp */; };
 		47724CCF0F86C2FC0060F743 /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 47724CCE0F86C2FC0060F743 /* TextContainer.cpp */; };
+		FA06C3CA1EE25ADA00A9977E /* GraphicsContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3C91EE25ADA00A9977E /* GraphicsContext.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -204,6 +205,7 @@
 		47724CCE0F86C2FC0060F743 /* TextContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextContainer.cpp; path = ../src/TextContainer.cpp; sourceTree = SOURCE_ROOT; };
 		D2AAC046055464E500DB518D /* libphui.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libphui.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA06C3C71EE1929200A9977E /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
+		FA06C3C91EE25ADA00A9977E /* GraphicsContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GraphicsContext.cpp; path = ../src/GraphicsContext.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -312,6 +314,7 @@
 				0D31FFFB08843A6200C3CBEA /* CSSViewDrawer.cpp */,
 				0D31FFFC08843A6200C3CBEA /* DOM.cpp */,
 				0D31FFFD08843A6200C3CBEA /* DropDownTask.cpp */,
+				FA06C3C91EE25ADA00A9977E /* GraphicsContext.cpp */,
 				0D31FFFE08843A6200C3CBEA /* GLGraphicsContext.cpp */,
 				0D31FFFF08843A6200C3CBEA /* Groupbox.cpp */,
 				0D31000008843A6200C3CBEA /* ImageView.cpp */,
@@ -514,6 +517,7 @@
 				0D1F958108E877F6008FF0BF /* ContextMenu.cpp in Sources */,
 				0DC3C9440A7BFDE800F14BBB /* ContextMenu.cpp in Sources */,
 				0DCEF7710AD4637000E1D282 /* CtxMenu.cpp in Sources */,
+				FA06C3CA1EE25ADA00A9977E /* GraphicsContext.cpp in Sources */,
 				0DCEF7BC0AD4643900E1D282 /* Panel.cpp in Sources */,
 				470B71CF0E7056BF006D9C06 /* MirrorView.cpp in Sources */,
 				470B71D40E70571B006D9C06 /* wwiiUTF.cpp in Sources */,
@@ -528,11 +532,13 @@
 		0D31FFE208843A1100C3CBEA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -547,17 +553,17 @@
 				);
 				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = phui;
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
 		0D31FFE308843A1100C3CBEA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ADDRESS_SANITIZER_CONTAINER_OVERFLOW = YES;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = XP_UNIX;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -571,8 +577,6 @@
 				);
 				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = phui;
-				VALID_ARCHS = i386;
-				"VALID_ARCHS[sdk=*]" = i386;
 			};
 			name = Release;
 		};
@@ -583,7 +587,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					XP_UNIX,
@@ -604,7 +608,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = XP_UNIX;
 				GCC_VERSION = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;

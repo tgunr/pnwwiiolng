@@ -169,8 +169,9 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
 			trim(hdrVal);
 
 			// make sure we have two keys - otherwise ignore
-			if (hdrName.length() && hdrVal.length())
-				response.headers.insert( { hdrName, hdrVal } );
+			if (hdrName.length() && hdrVal.length()) {
+				response.headers.insert({ strtolower(hdrName), hdrVal });
+			}
 		}
 
 		// Only parse the content if there is no error
@@ -198,7 +199,7 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
 
 				// Do something with the buffer, and get more data
 				success = true;
-				response.responseMessage.append(rawResponseBuffer);
+				response.content.append(rawResponseBuffer);
 				rawResponseBuffer[0] = 0;
 
 			} while (dwRead > 0);

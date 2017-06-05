@@ -2945,7 +2945,7 @@ bool ww2::Client::InitTeul(void) {
 	return clientconnected;
 }
 
-int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
+int ww2::Client::Init(playerid_t playerID, UINT32 otp, unsigned int appVersion)
 {
 	if ( ! clientconnected ) return -1;
 	if(clientinited) return 0;

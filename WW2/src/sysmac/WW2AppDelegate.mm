@@ -24,25 +24,12 @@
 #include "loclApp.h"
 #include "auth/authTypes.h"
 #include "auth/authAppIDs.h"
+#include "auth/authDefaults.h"
 #include <netdb.h>
 #include <arpa/inet.h>
 #import <HockeySDK/HockeySDK.h>
 
 #define PLAYGATE_VERSION 0x01010109
-
-#ifdef AUTH_OVERRIDE
-#define DEFAULT_AUTH_SERVER "AUTH_OVERRIDE"
-#else
-
-#if defined(BETA_RELEASE)
-#define DEFAULT_AUTH_SERVER "auth.playnet.com"
-#else
-#define DEFAULT_AUTH_SERVER "auth.playnet.com"
-#endif
-
-#endif
-
-#define DEFAULT_AUTH_PORT WWII::Net::Ports::AuthHost
 
 static void xmlerrorstub (void *ctx, const char *msg, ...) {}
 static void xmlstructurederrorstub(void *userData, xmlErrorPtr error) {}
@@ -586,11 +573,28 @@ extern NSString *WebActionOriginalURLKey;
     }
 #endif
     
-#ifndef DEBUG_WW2 // TODO: Make this the first thing that happens ~Victarus
-    if (InitSteam())
-    // abort
+    if (!InitSteam()) {
+        // abort
         [NSApp terminate:self];
-#endif
+    }
+    
+    if (!gAuthServer[0]) {
+        strsafecpy(gAuthServer, DEFAULT_AUTH_SERVER);
+    }
+    authServer = @(gAuthServer);
+    
+    if (!gAuthServerPort[0]) {
+        strprintf(gAuthServerPort, "%hu", DEFAULT_AUTH_PORT);
+    }
+    authPort = std::stoul(gAuthServerPort);
+    
+    if (UseSteamLogin) {
+        state = WAIT_APPLE_EVT;
+        [self launchOffline:self];
+        return;
+    }
+    
+    [launcherWindow setIsVisible:true];
     
     // This sequence depends on certain implementation details of the
     // BITCrashManager - in particular, that report metadata is processed
@@ -631,15 +635,6 @@ extern NSString *WebActionOriginalURLKey;
     [userNameField setDelegate:self];
     [passwordField setDelegate:self];
     [self updateLoginEnabled];
-    
-    authServer = [NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding];
-    if (gAuthServer[0]) {
-        authServer = [[NSString alloc] initWithUTF8String:gAuthServer];
-    }
-    authPort = DEFAULT_AUTH_PORT;
-    if (gAuthServerPort[0]) {
-        authPort = std::stoul(gAuthServerPort);
-    }
     
     NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     style.alignment = NSCenterTextAlignment;
@@ -1108,8 +1103,7 @@ extern NSString *WebActionOriginalURLKey;
         
         if (hostAddress != 0) {
             if (! isteulInitialized) {
-                ww2::Client::Init();
-                
+                ww2::Client::InitTeul();                
 #ifdef DEBUG_WW2
                 dbugSetWriteLevel(Debug::ERR_DBUG);
                 dbugSetLogLevel(Debug::ERR_DBUG);
