@@ -40,50 +40,6 @@
     #define DEF_ERR_FLAGS STD_ERR
 #endif
 
-// Support this version at least.
-#define COMPATABILITY_LEVEL 0x010120
-
-#define VERSION_ARENA_ID 26  	//arenaID that the version host connects with
-								//use this to look up gameEntry stuff for
-								//version updates
-
-#define PRESENTER_ARENA_ID 8  	//arenaID for the presenterHost, which is a dummy
-								//host for now that only runs so that we can
-								//get a version of presenter that the client
-								//should be running.  Of course, if you define
-								//HARDCODED_VERSIONS below, you don't need a
-								//presenterHost
-
-
-//if the following is defined, the authhost will not send an APP_LAUNCH
-//with the appID of the version updater when presenter or an appVersion
-//needs updating, but will look up a url based on the appID
-//and WEB_ERR type
-
-#define STRAIGHT_TO_WEB_DOWNLOAD
-#define REDIRECT_TOO_MANY_PLAYERS -2
-
-//if the following is defined, use these values to check if the following
-//apps are up-to-date or not, skip checking their gameEntries.
-//
-//This allows you to not have a presenterHost running.  You will still need a
-//versHost, though, unless you #define STRAIGHT_TO_WEB_DOWNLOAD above
-
-//#define HARDCODED_VERSIONS
-
-#ifdef HARDCODED_VERSIONS
-#define PRESENTER_VERSION   "0.1.0.3"
-#endif
-
-//define the following if you don't want a dispatch to be sent to the game
-//if the customerID that's passed is that of blitz, which is an acct used by
-//watcher to check a game's status
-#define NO_BLITZ_DISPATCH
-
-#ifdef NO_BLITZ_DISPATCH
-#define BLITZ_ID 17374
-#endif
-
 #define SECOND 1000
 #define MINUTE 60000
 #define PLAYER_TIMEOUT (30 * SECOND)
@@ -587,12 +543,6 @@ _updatePresenter(const SINT32 teulIndex, ARENA_REQ& request, UINT32 platform)
 static void
 _sendDispatch(Auth::Dispatch& dispatch, UINT32 otp, UINT32 clientIP, SINT32 teulIndex)
 {
-#ifdef NO_BLITZ_DISPATCH
-	if(dispatch.m_customerID == BLITZ_ID)
-		return; //don't actually send the dispatch, we were just checking to
-				//see if the game host was up
-#endif
-
 	dispatch.m_OTP = otp;
 	dispatch.m_clientIP = clientIP;
 
@@ -1455,24 +1405,6 @@ struct GameListCache
 };
 
 //////////////////////////////////////////////////////////////////////
-// [Deprecated] Create a fake game list for alpha clients that don't
-// log in before requesting server status lists.
-
-#if COMPATABILITY_LEVEL >= 0x010120
-static void
-_initializeClientSubs(std::vector<UCHAR>& clientSubs)
-{
-	// List of the default game IDs we'll pretend we know about.
-	unsigned char defaultGameList[] = { 1, 22, 222 };
-	clientSubs.reserve(sizeof(defaultGameList));
-	for ( UINT32 i = 0; i < clientSubs.capacity(); ++i )
-	{
-		clientSubs.push_back(defaultGameList[i]);
-	}
-}
-#endif
-
-//////////////////////////////////////////////////////////////////////
 // Process a request to get a list of game servers available for the
 // given teulIndex. Contains legacy support for alpha 1.2.0s that
 // should be removed since this alpha was not made publicly
@@ -1484,16 +1416,6 @@ authGetGameList(const SINT32 teulIndex)
 	// Look to see if we have login data for this client.
 	Auth::ClientData* cdata = (Auth::ClientData*)teulGetPersonaData(teulIndex);
 
-#if COMPATABILITY_LEVEL >= 0x010120
-	// [Deprecated] Legacy for clients that didn't log in.
-	static std::vector<UCHAR> defaultClientSubs;
-	if ( defaultClientSubs.empty() )
-		_initializeClientSubs(defaultClientSubs);
-
-	// [Deprecated] If there is login data, use it otherwise use the
-	// statics.
-	const std::vector<UCHAR>& clientSubs = (cdata) ? cdata->m_subscribedArenaIDs : defaultClientSubs;
-#else
 	///TODO: Notify the client of this problem.
 	// No data until you are logged in.
 	if (cdata == NULL)
@@ -1501,9 +1423,8 @@ authGetGameList(const SINT32 teulIndex)
 		dbugLog(_FLW, "t:%d GetGameList with no cdata", teulIndex);
 		return NULL;
 	}
-	const std::vector<UCHAR>& clientSubs = data->m_subscribedArenaIDs;
-#endif
-
+	const std::vector<UCHAR>& clientSubs = cdata->m_subscribedArenaIDs;
+	
 	using CACHES = std::vector<GameListCache>;
 	static CACHES caches;
 
