@@ -92,12 +92,8 @@ bool GameClientInitTeul(void) {
 int GameClientLogin(unsigned int host, playerid_t playerID, UINT32 otp,
 							unsigned int appVersion, UINT16 port)
 {
-#if platOS == OS_MACOS
-    if (!TicketFile[0])
-        PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
-    else
-#endif
 	Client::Init(playerID, otp, appVersion);
+
 	try
 	{
 		if(PlayerClient()->Login(host, port, true) != 0)

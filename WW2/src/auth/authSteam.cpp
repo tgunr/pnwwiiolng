@@ -12,7 +12,8 @@
 #include "build_info.hpp"
 #include "json.hpp"
 
-static const std::string authSteamLoginURL = "https://auth.playnet.com/v1/login";
+static const std::string authSteamLoginProtocol = "http";
+static const std::string authSteamLoginResource = "/v1/login";
 
 SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &requestedCallsign)
 {
@@ -22,17 +23,19 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
     sysBasicHTTPResponse response;
     
     request.method = "POST";
-	if (!gAuthServer[0])
-		request.url = authSteamLoginURL;
-	else
-	{
-		request.url = std::string("https://") + gAuthServer +
-			std::string("/v1/login");
-	}
+    request.url = authSteamLoginProtocol + "://" + gAuthServer + authSteamLoginResource;
     request.headers["Content-Type"] = "application/json";
     request.headers["X-WWIIOnline-Client-Version"] = PN_product_version_string; // Not required, just for good measure
+    
+    const unsigned char *pAuthTicket = reinterpret_cast<const unsigned char *>(authTicket);
+    std::stringstream steamTicketEncoded;
+    for(size_t i=0; i < authTicketLen; i++) {
+        int decVal = pAuthTicket[i];
+        steamTicketEncoded << std::hex << std::setfill('0') << std::setw(2) << decVal;
+    }
+    
     request.content = std::string("{") + // TODO: Do a real JSON encode here instead of just stringing strings together
-        "\"steam_ticket\":" + ""/* hex-encode authTicket */ + ","
+        "\"steam_ticket\":" + "\"" + steamTicketEncoded.str() + "\","
         "\"arena_id\":" + std::to_string(arenaID) +
         (requestedCallsign.empty() ? "" : std::string("\"callsign\":\"") + requestedCallsign + "\"") +
     "}";
@@ -47,7 +50,7 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
         return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
     }
     
-    if (response.headers.find("content-type") == response.headers.end() || response.headers["Content-Type"] != "application/json") {
+    if (response.headers.find("content-type") == response.headers.end() || response.headers["content-type"] != "application/json") {
         // TODO: Logging, better error handling
         return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
     }
