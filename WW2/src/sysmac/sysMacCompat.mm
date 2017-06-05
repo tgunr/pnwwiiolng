@@ -118,22 +118,21 @@ const char* macDocumentsPath()
     return docsFSR;
 }
 
-static char *cmdLine = nullptr;
-
-void SetCommandLine(int argc, const char** argv)
+#import <crt_externs.h>
+const char *GetCommandLineA()
 {
-    std::string allArgs = " "; // ridiculous hack because mngopt is horrifying
-
-    free(cmdLine);
-    for (int i = 1; i < argc; ++i) {
-        allArgs += argv[i] + std::string{ " " };
-    }
-    cmdLine = strdup(allArgs.c_str());
-}
-
-const char *GetCommandLine()
-{
-	return cmdLine ?: "";
+    static std::string allArgs = " "; // Leading space bypasses nasty logic errors in mngoptParse()
+    static dispatch_once_t predicate = 0;
+    
+    dispatch_once(&predicate, ^ {
+        const int * const pargc = _NSGetArgc();
+        const char * const * const * const pargv = _NSGetArgv();
+        
+        for (int i = 1; i < *pargc; ++i) {
+            allArgs += (*pargv)[i] + std::string{ " " };
+        }
+    });
+	return strdup(allArgs.c_str());
 }
 
 void MacVideoInitializationFailed(const char* problem)

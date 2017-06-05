@@ -24,23 +24,6 @@ void sysmainAddArchives();
 static int sysmainInitApp();
 
 int running = 0;
-static int _argc;
-static const char** _argv;
-
-void sysmainGetCommandLineArgs(int* argc, char*** argv)
-{
-	*argc = _argc;
-	*argv = const_cast<char **>(_argv);
-}
-
-void sysmainCommandLine(int argc, const char** argv)
-{
-	SetCommandLine(argc, argv);
-	_argc = argc;
-	_argv = argv;
-
-	mngoptParse((char *)"");
-}
 
 static size_t frames = 0;
 static pthread_t mainthread = NULL;

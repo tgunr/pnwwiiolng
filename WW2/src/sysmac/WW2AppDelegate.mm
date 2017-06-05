@@ -538,6 +538,11 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    if (!mngoptParse()) {
+        [NSApp terminate:self];
+        return;
+    }
+    
     // Wipe out any storage of insecure user info.
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserName"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserPassword"];
@@ -560,6 +565,13 @@ extern NSString *WebActionOriginalURLKey;
     
     cfgPrefsLoad();
     
+    // For complex reasons, we need to call mngoptParse() again here. See the
+    // Windows sysmain.cpp file for details.
+    if (!mngoptParse()) {
+        [NSApp terminate:self];
+        return;
+    }
+    
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
     // By the way, the only way to check that is the ticket file itself since that
     // won't have been parsed yet at this point.
@@ -576,6 +588,7 @@ extern NSString *WebActionOriginalURLKey;
     if (!InitSteam()) {
         // abort
         [NSApp terminate:self];
+        return;
     }
     
     if (!gAuthServer[0]) {

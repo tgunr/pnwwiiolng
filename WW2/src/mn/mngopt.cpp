@@ -5,6 +5,9 @@
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "mn/mngopt.h"
+#if platOS == OS_MACOS
+#include "sysmac/sysMacCompat.h"
+#endif
 
 enum key_TYPE
 {
@@ -118,15 +121,11 @@ static char* _skipFilename(const char* ptr)
 	return (char*)ptr;
 }
 
-LOGICAL mngoptParse(char* InputLine)
+LOGICAL mngoptParse()
 {
 	char*	ptr;
 
-#if platOS == OS_WIN32
 	ptr = _skipFilename(GetCommandLineA());
-#else
-	ptr = _skipFilename(GetCommandLine());
-#endif
 
 	if ( ptr == nullptr )
 		return TRUE;

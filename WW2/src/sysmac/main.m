@@ -11,6 +11,5 @@
 
 int main(int argc, const char * _Nonnull *argv)
 {
-    sysmainCommandLine(argc, argv);
     return NSApplicationMain(argc, argv);
 }
