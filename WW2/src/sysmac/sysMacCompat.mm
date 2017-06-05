@@ -109,8 +109,8 @@ const char* macDocumentsPath()
             // We're giving the prefs folder the permissions it would otherwise have
             // gotten by default here. Would 0750 or 0700 be a better choice?
             [[NSFileManager defaultManager] createDirectoryAtURL:docsDir withIntermediateDirectories:YES attributes:@{
-                                                                                                                       NSFilePosixPermissions: @(0755)
-                                                                                                                       } error:nullptr];
+                NSFilePosixPermissions: @(0755)
+            } error:nullptr];
             docsFSR = strdup(docsDir.fileSystemRepresentation);
         }
     });
