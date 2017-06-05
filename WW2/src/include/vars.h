@@ -116,6 +116,7 @@ extern SINT8			ServerApID[64];		// program apId
 extern SINT8			ServerData[64];		// data passed from auth server
 extern SINT8			ServerProtocol[64]; // connection protocol
 extern SINT8			BypassString[64];
+extern LOGICAL			UseSteamLogin;
 extern LOGICAL			WantedUserLogEnabled;	// If the user wants the log enabled
 extern SCHAR			WantedVideoCard[64];// desired video card name
 extern SCHAR			WantedVideoResolution[32];// desired video resolution

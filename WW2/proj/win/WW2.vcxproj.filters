@@ -1650,6 +1650,15 @@
     <ClInclude Include="..\..\src\auth\authSteam.h">
       <Filter>auth</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\auth\authPack.h">
+      <Filter>auth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsAuthHandler.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysSteam.h">
+      <Filter>sys</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2698,6 +2707,18 @@
     </ClCompile>
     <ClCompile Include="..\..\src\auth\authSteam.cpp">
       <Filter>auth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\clientConnections.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\auth\authPack.cpp">
+      <Filter>auth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsAuthHandler.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\sysSteam.cpp">
+      <Filter>sys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

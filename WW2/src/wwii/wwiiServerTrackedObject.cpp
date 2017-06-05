@@ -254,10 +254,13 @@ void wwiiExpireSTOs()
 
 	// Get me a list of all the expirable STOs
 	STO_MAP::iterator it = stoMap.begin();
-	while ( it != stoMap.end() )
+	while (it != stoMap.end())
 	{
-		if ( it->second->expired() )
-			expired.push_back(it->first);
+		if (it->second->getCanExpire())
+		{
+			if (it->second->expired())
+				expired.push_back(it->first);
+		}
 		++it;
 	}
 

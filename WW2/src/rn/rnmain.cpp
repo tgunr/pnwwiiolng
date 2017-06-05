@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "fio/fio.h"
@@ -74,6 +75,7 @@
 #include "weap/weapammo.h"
 #include "locl/loclMain.h"
 #include "sysmain.h"
+#include "sys/sysSteam.h"
 #include "sdm/sdm.h"
 #include "sdm/StratDB.h"
 #include "js/jsClient.h"
@@ -93,8 +95,6 @@
 #ifdef MULTI_CLIENT
 #include "mc/multiClient.h"
 #endif
-
-#include "steam_api.h"
 
 //#define USE_VTUNE
 
@@ -265,40 +265,27 @@ static int _GetStratData(int scx, int scy, sdm_strat_data* sdmdata)
 //////////////////////////////////////////////////////////////////////
 // Find out whether this is going to be an online session or not.
 
-static UINT32 GameHost, GameOTP;
-static UINT16 GamePort;
+namespace {
+	UINT32 GameHost = 0, GameOTP = 0;
+	UINT16 GamePort = 0;
+}
 
-// globals for steam
-static const int STEAM_APP_ID = 251950;
-bool steamInitialized = false;
-bool installedAsSteamApp = false;
-bool isSteamApp = false;
-
-Covert<bool> ProtectedOnlineFlag = false;
-
-bool rnmainGetOnlineSetting()
-{
+void rncheckPlaygateParams(void) {
 	UINT16 CommType;
 
 	// temp hack until command line params set for going online
-	if (BypassString[0] != '\0')
-	{
-		if (BypassString[0] == 'R')
+	if ( BypassString[0] != '\0' ) {
+		if ( BypassString[0] == 'R' )
 			BypassID = strtoul(&BypassString[1], nullptr, 10);
 		else
 			BypassID = strtoul(&BypassString[0], nullptr, 10);
-	}
-	else
+	} else
 		BypassID = 0;
 
-	if (BypassID != 0 )
-	{
-		Online = 1;
-
-		if (teulGetHost(GameServerIP, &GameHost) == 0)
-		{
+	if ( BypassID != 0 ) {
+		if ( teulGetHost(GameServerIP, &GameHost) == 0 ) {
 			Write_Debug("Unable to translate host address");
-			return false;
+			return;
 		}
 
 		GamePort = WWII::Net::Ports::MapHost;
@@ -306,21 +293,15 @@ bool rnmainGetOnlineSetting()
 		GameOTP = strtoul(GameServerOTP, nullptr, 10);
 
 #if defined(BETA_RELEASE)
-		if(GameOTP == 0)
-		{
+		if ( GameOTP == 0 ) {
 			GameOTP = AUTH_BYPASS_OTP;
 			snprintf(GameServerOTP, sizeof(GameServerOTP)-1, "%u", GameOTP);
 		}
 #endif
-	}
-	else
-	{
+	} else {
 #if defined(AUTH_BYPASS)
-		Online = 1;
-
-		#pragma message("AUTH_BYPASS using Host " AUTH_BYPASS)
-		if (teulGetHost((UCHAR*) AUTH_BYPASS, &GameHost) == 0)
-		{
+#pragma message("AUTH_BYPASS using Host " AUTH_BYPASS)
+		if ( teulGetHost((UCHAR*)AUTH_BYPASS, &GameHost) == 0 ) {
 			Write_Debug("Unable to translate host address");
 			return false;
 		}
@@ -329,83 +310,84 @@ bool rnmainGetOnlineSetting()
 		CommType = TCP;
 		GameOTP = AUTH_BYPASS_OTP;
 #else
-		if (TicketFile[0] != 0)
-		{
-			Online = 1;
-
-			if (!_ParseTicketFile(&GameHost, &GamePort, &CommType, &GameOTP))
-			{
-				Online = 0;
-				return false;
-			}
-		}
-		else if (GameServerIP[0] != 0)
-		{
-			Online = 1;
-
-			if (!_ParseCommandArgs(&GameHost, &GamePort, &CommType, &GameOTP))
-			{
-				Online = 0;
-				return false;
-			}
-		}
+		if ( TicketFile[0] != 0 )
+			_ParseTicketFile(&GameHost, &GamePort, &CommType, &GameOTP);
+		else if ( GameServerIP[0] != 0 )
+			_ParseCommandArgs(&GameHost, &GamePort, &CommType, &GameOTP);
 #endif
 	}
-
-  ProtectedOnlineFlag = Online;
-
-	return true;
 }
 
-static bool _connectClientToGameNetwork()
-{
-	try
-	{
-		UINT32 appversion = 0;
 
-		rnlogoUpdateStatus("loading.network");
+bool rnhasServerInfo(void) {
+	return GameOTP != 0;
+}
 
-        if (gClientV[0] != 0) {
-            teulGetHost(gClientV, &appversion);
-        } else {
-            teulGetHost(PN_product_version_string, &appversion);
-        }
+//////////////////////////////////////////////////////////////////////
 
-		if ( teulMaskNetworkAddress(0) == 0 )
-			teulSetNetworkMask(GameHost);
+Covert<bool> ProtectedOnlineFlag = false;
 
-		if ( GameClientLogin(GameHost, BypassID, GameOTP, appversion, GamePort) < 0 )
-			throw ClientNetError(-1, "connect.fail");
+void rnsetServerInfo(UINT32 serverip, UINT32 serverport, UINT32 otp) {
+	GameHost = serverip;
+	GamePort = serverport;
+	GameOTP = otp;
+}
 
-		if ( PlayerClient()->ChatConnection() < 0 )
-			throw ClientNetError(-1, "connect.chat.fail");
-	}
-	catch (ClientNetError& e)
-	{
-		const char* key = e.What();
+void rnconnectToServer(void) {
+	UINT32 appversion = 0;
 
-		rnlogoUpdateStatus(key);
+	if ( gClientV[0] != 0 )
+		teulGetHost(gClientV, &appversion);
+	else
+		teulGetHost(PN_product_version_string, &appversion);
 
-#if platOS == OS_WIN32
-		MessageBox(nullptr, uiLocString(key).c_str(), uiLocString("connect.popup.title").c_str(), MB_OK | MB_TOPMOST);
-#elif platOS == OS_MACOS
-        PostModalErrorDialog(uiLocString2("connect.popup.title").c_str(), uiLocString2(key).c_str());
-#else
-		fprintf(stderr, "NETWORK ERROR: %s", UTF8(message.c_str()));
-#endif
-		//piExitProgram(_FL, UTF8(message.c_str()));
-        return false;
-	}
+	if ( teulMaskNetworkAddress(0) == 0 )
+		teulSetNetworkMask(GameHost);
+
+	if ( GameClientLogin(GameHost, BypassID, GameOTP, appversion, GamePort) < 0 )
+		throw ClientNetError("connect.fail");
+
+	if ( PlayerClient()->ChatConnection() < 0 )
+		throw ClientNetError("connect.chat.fail");
 
 	// Wipe these variables out.
 	GameHost = static_cast<UINT32>(random());
 	GameOTP = static_cast<UINT32>(random());
 	GamePort = static_cast<UINT16>(random());
 
-	return true;
+	// TODO: Clear this flag if we lose connection so players can continue in offline mode.
+	Online = true;
+	ProtectedOnlineFlag = Online;
+
+	cfgPrefsSendSharedPrefs();
 }
 
-// Init everything for rendering
+void rnloadRootWindow(void) {
+	if ( Online ) {
+		ARENA_VARS::iterator found = g_arenaDescription.find("play_mode");
+		if ( found != g_arenaDescription.end() ) {
+			SINT32 playMode = atoi(found->second.c_str());
+
+			if ( playMode == 2 )
+				uiLoadView("scenarios/lobby");
+			else if ( playMode == 1 )
+				uiLoadView("persona");
+			else
+				uiLoadView("online");
+		} else {
+			uiLoadView("persona");
+		}
+	} else {
+		if ( IsSteamCopy() )
+			uiLoadView("SteamOnlineModeSelect");
+		else
+			// TODO: Reenable once we've figured out in-game patching
+			//uiLoadView("OnlineModeSelect");
+			uiLoadView("offline");
+	}
+}
+
+// Init everything for rendering (HACK: and everything else...)
 LOGICAL rnmainInit()
 {
 #if platOS == OS_WIN32
@@ -421,17 +403,6 @@ LOGICAL rnmainInit()
     rand_s(&value);
     srand(value);
 #endif
-
-	// these globals can be used to validate the state of the game w/steam prior to executing steam related functions
-	steamInitialized = SteamAPI_Init();
-	if (steamInitialized)
-	{
-		installedAsSteamApp = SteamApps()->BIsAppInstalled(STEAM_APP_ID);
-		if (installedAsSteamApp)
-		{
-			isSteamApp = SteamApps()->BIsSubscribedApp(STEAM_APP_ID);
-		}
-	}
 
 	rnlogoSplash();
 
@@ -475,17 +446,14 @@ LOGICAL rnmainInit()
 		return(FALSE);
 	}
 
-    if(Online)
-    {
-		// Time to connect the game to the servers.
-		if(_connectClientToGameNetwork() == false)
+	if ( rnhasServerInfo() ) {
+		try {
+			rnconnectToServer();
+		} catch ( std::exception& e ) {
+			dbugLog(_FLA, "Failed to connect to server: '%s'", e.what());
 			return FALSE;
-
-		// send prefs that are shared between the host and client
-		// these are originated from the client
-		// includes vis player limit
-		cfgPrefsSendSharedPrefs();
-    }
+		}
+	}
 
 	// lets check to make sure we have the minimum spec to run the game
 	if(!piinfoIsSupportedSystem())
@@ -568,60 +536,15 @@ LOGICAL rnmainInit()
 		return FALSE;
 	}
 
-	/* tutorial testing by ramp
-	if(Online)
-	{
-		try
-		{
-			StratDB::StratObject* strat = StratDB::FindStratObject("Antwerp");
-			HCUnit* hcUnit = new HCUnit(WWII_ENGLAND, HCU_BRIGADE, 0, WWII_ENGLAND, BRANCH_LAND, BRANCH_LAND, 9, 0, "English Training Brigade", "1.uk", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
-			hcUnit->addToRegistry();
-
-			strat = StratDB::FindStratObject("Lier");
-			hcUnit = new HCUnit(WWII_FRANCE, HCU_BRIGADE, 0, WWII_FRANCE, BRANCH_LAND, BRANCH_LAND, 9, 0, "French Training Brigade", "1.fr", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
-			hcUnit->addToRegistry();
-
-			strat = StratDB::FindStratObject("Schilde");
-			hcUnit = new HCUnit(WWII_GERMANY, HCU_BRIGADE, 0, WWII_GERMANY, BRANCH_LAND, BRANCH_LAND, 9, 0, "German Training Brigade", "1.de", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
-			hcUnit->addToRegistry();
-		}
-		catch(std::runtime_error)
-		{
-			// do nothing
-		}
-	}
-	*/
-
 	// Should be the last function called in Init!
 	piReleaseTextureHandles();
 
 	_ViewScaleFactor = _WORLD_VIEW_SCALE_FACTOR;
 
+	GameClientInitTeul();
+
 	uiPostInit();
-
-	if(!Online)
-	{
-		uiLoadView("offline");
-	}
-	else
-	{
-		// a bit of conditional logic to determine online entry page
-		// default to campaign mode only
-		SINT32 playMode = 1;
-
-		ARENA_VARS::iterator found = g_arenaDescription.find("play_mode");
-
-		if(found != g_arenaDescription.end())
-			playMode = atoi(found->second.c_str());
-
-		if(playMode == 2)
-			uiLoadView("scenarios/lobby");
-		else if(playMode == 1)
-			uiLoadView("persona");
-		else
-			uiLoadView("online");
-	}
-
+	rnloadRootWindow();
 	uiChatShow();
 
 	// make sure devices get detected
@@ -1281,89 +1204,77 @@ inline std::string& rtrim(std::string& s, const char* t = " \t\n\r\f\v")
     return s;
 }
 
-static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UINT32* cookie)
-{
-    LOGICAL	retval=TRUE;
-    std::string apID, data, serverIP, serverport, serverprotocol, otp, bypass;
+static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UINT32* cookie) {
+	LOGICAL	retval = TRUE;
+	std::string apID, data, serverIP, serverport, serverprotocol, otp, bypass;
 
-    try {
-        std::ifstream  ticketFileStream (TicketFile);
-        std::getline(ticketFileStream, apID); // ignore
-        std::getline(ticketFileStream, data); // ignore
-        std::getline(ticketFileStream, serverIP);
-        std::string temp =serverIP.substr(serverIP.find(" ")+1);
-        std::string ipAddress = rtrim(temp);
-        if (!ipAddress.empty())
-        {
-            *host = strtoul(ipAddress.c_str(), nullptr, 10);
-        }
-        std::getline(ticketFileStream, serverport);
-        std::string ipPort = serverport.substr(serverport.find(" ")+1);
-        if (!ipPort.empty())
-        {
-            *port = static_cast<UINT16>(strtoul(ipPort.c_str(), nullptr, 10));
-        }
-        std::getline(ticketFileStream, serverprotocol);
-        std::string ipProt = serverprotocol.substr(serverprotocol.find(" ")+1);
-        if (!ipProt.empty())
-        {
-            *protocol = static_cast<UINT16>(strtoul(ipProt.c_str(), nullptr, 10));
-        }
-        std::getline(ticketFileStream, otp); // cookie
-        std::string otpText = otp.substr(otp.find(" ")+1);
-        if (!otpText.empty())
-        {
-            *cookie = static_cast<UINT32>(strtoul(otpText.c_str(), nullptr, 10));
-        }
+	try {
+		std::ifstream  ticketFileStream(TicketFile);
+		std::getline(ticketFileStream, apID); // ignore
+		std::getline(ticketFileStream, data); // ignore
+		std::getline(ticketFileStream, serverIP);
+		std::string temp = serverIP.substr(serverIP.find(" ")+1);
+		std::string ipAddress = rtrim(temp);
+		if ( !ipAddress.empty() ) {
+			*host = strtoul(ipAddress.c_str(), nullptr, 10);
+		}
+		std::getline(ticketFileStream, serverport);
+		std::string ipPort = serverport.substr(serverport.find(" ")+1);
+		if ( !ipPort.empty() ) {
+			*port = static_cast<UINT16>(strtoul(ipPort.c_str(), nullptr, 10));
+		}
+		std::getline(ticketFileStream, serverprotocol);
+		std::string ipProt = serverprotocol.substr(serverprotocol.find(" ")+1);
+		if ( !ipProt.empty() ) {
+			*protocol = static_cast<UINT16>(strtoul(ipProt.c_str(), nullptr, 10));
+		}
+		std::getline(ticketFileStream, otp); // cookie
+		std::string otpText = otp.substr(otp.find(" ")+1);
+		if ( !otpText.empty() ) {
+			*cookie = static_cast<UINT32>(strtoul(otpText.c_str(), nullptr, 10));
+		}
 
-        std::getline(ticketFileStream, bypass);
-        if (!bypass.empty())
-        {
-            if (teulGetHost(ipAddress.c_str(), host) == 0)
-            {
-                Write_Debug("Unable to translate host address");
-                return (FALSE);
-            }
+		std::getline(ticketFileStream, bypass);
+		if ( !bypass.empty() ) {
+			if ( teulGetHost(ipAddress.c_str(), host) == 0 ) {
+				Write_Debug("Unable to translate host address");
+				return (FALSE);
+			}
 
-            std::string userId = bypass.substr(bypass.find(" ")+1);
-            if (!userId.empty())
-            {
-                strncpy(BypassString,userId.c_str(),32);
+			std::string userId = bypass.substr(bypass.find(" ")+1);
+			if ( !userId.empty() ) {
+				strncpy(BypassString, userId.c_str(), 32);
 
-                if (BypassString[0] != '\0')
-                {
-                    if (BypassString[0] == 'R')
-                        BypassID = strtoul(&BypassString[1], nullptr, 10);
-                    else
-                        BypassID = strtoul(&BypassString[0], nullptr, 10);
-                }
-                else
-                    BypassID = 0;
-            }
+				if ( BypassString[0] != '\0' ) {
+					if ( BypassString[0] == 'R' )
+						BypassID = strtoul(&BypassString[1], nullptr, 10);
+					else
+						BypassID = strtoul(&BypassString[0], nullptr, 10);
+				} else
+					BypassID = 0;
+			}
 
-        }
-    } catch (std::ifstream::failure e) {
-        Write_Debug( e.what());
-        retval = FALSE;
-        Online = 0;
-    }
+		}
+	} catch ( std::ifstream::failure e ) {
+		Write_Debug(e.what());
+		retval = FALSE;
+		Online = 0;
+	}
 
 
 	return(retval);
 }
 
-static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, UINT32* otp)
-{
+static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, UINT32* otp) {
 
-	if (GameServerIP[0] == 0)
+	if ( GameServerIP[0] == 0 )
 		return FALSE;
-	if (GameServerPort[0] == 0)
+	if ( GameServerPort[0] == 0 )
 		return FALSE;
-	if (GameServerOTP[0] == 0)
+	if ( GameServerOTP[0] == 0 )
 		return FALSE;
 
-	if (teulGetHost(GameServerIP, host) == 0)
-	{
+	if ( teulGetHost(GameServerIP, host) == 0 ) {
 		Write_Debug("Unable to translate host address");
 		return (FALSE);
 	}

@@ -387,6 +387,7 @@ public:
 	void SetHitsPrime(UINT32 hp);
 
 	static Client* FromTeulIndex(int teulIndex);
+	static bool InitTeul(void);
 	static int Init(int playerID = 0, int otp = 0, unsigned int appVersion = 0);
 	static void Kill();
 	static void NetUpdate(int wait=0);

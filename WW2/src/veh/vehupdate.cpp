@@ -1318,7 +1318,8 @@ lastLowUpdateTime = frametime;
 #ifdef DEBUG_UPDATES
 		++duplicateUpdatesIgnored;
 #endif
-		Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
+		// Pointless debug - we know this can happen due to frequency of updates, don't report this anymore.
+		// Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
 		return 0;
 	}
 

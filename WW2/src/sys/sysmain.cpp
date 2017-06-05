@@ -13,6 +13,7 @@
 #include "rn/rnlogo.h"
 #include "sysmain.h"
 #include "systhread.h"
+#include "sysSteam.h"
 #include "sn/sndsSoundControl.h"
 #include "gmlp/gmlpmain.h"
 #include "fio/fio.h"
@@ -672,6 +673,10 @@ char GetOSBuild()
 // This is the actual winmain
  int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	// We may need to restart if this is a Steam version that wasn't launched properly.
+	if ( ! InitSteam() )
+		return 0;
+
 	int		x, y, w, h, wh, xy;
 	int		bpp, hdw, stencil, wnd;
 	MSG		msg;
@@ -742,7 +747,8 @@ char GetOSBuild()
 	WantedWindow = FALSE;
 #ifdef DEBUG_WW2
 	WantedUserLogEnabled = TRUE;
-	WantDataDir = TRUE;
+	//TBD: Disabled for now, force debug clients to specify so we can use it for QA testing.
+	//WantDataDir = TRUE;
 	HasKeyFile = TRUE;
 #elif RELEASE_CLIENT == 0 && defined(BETA_RELEASE)
 	WantedUserLogEnabled = FALSE;
@@ -966,10 +972,7 @@ char GetOSBuild()
 #endif
 #endif
 
-	UINT32 host = 0, otp = 0;
-	UINT16 port = 0;
-	if(rnmainGetOnlineSetting() == false)
-		return FALSE;
+	rncheckPlaygateParams();
 
 #define DONT_USE_THREAD
 #if defined(DONT_USE_THREAD) || defined(DIRECT3D)	// Use this path for a single thread environment else a multi-thread environment
@@ -1250,11 +1253,14 @@ void sysGetMousePosition(int* x, int* y)
 {
 	POINT pt;
 	GetCursorPos(&pt);
-	*x = pt.x - WantedX;
-	*y = pt.y - WantedY;
+	ScreenToClient(myhwnd, &pt);
+	*x = pt.x;
+	*y = pt.y;
 }
 
 void sysSetMousePosition(int x, int y)
 {
-	SetCursorPos(WantedX + x, WantedY + y);
+	POINT pt{x,y};
+	ClientToScreen(myhwnd, &pt);
+	SetCursorPos(pt.x, pt.y);
 }
