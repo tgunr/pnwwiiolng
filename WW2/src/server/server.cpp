@@ -996,9 +996,9 @@ serverInit(UINT32 appVersion
 
 	_myServerInfo = &Server::myServerInfo;
 
-	dbugLog(_FLI, "serverInit: app:%u arena:%u servType:%u(%s) edt:%u server:{enter:%p, leave:%p, status:%p} persona:{cre:%p, rel:%p, act:%p} exit:{pers:%p, cluster:%p} err:%p"
+	dbugLog(_FLI, "serverInit: app:%u arena:%u servType:%u(%s) edt:%u server:{enter:%p, leave:%p, status:%p} persona:{cre:%p, rel:%p, act:%p} exit:{pers:%p, cluster:%p} err:<func>"
 					, appVersion, Server::myServerInfo.stats.arenaID, serverType, g_serverTypes[serverType]
-					, exitDestType, enterCallback, leaveCallback, statusCallback, createPersonaFn, releasePersonaFn, activatePlayerFn, exitPersonaFn, exitClusterFn, errorFunction);
+					, exitDestType, enterCallback, leaveCallback, statusCallback, createPersonaFn, releasePersonaFn, activatePlayerFn, exitPersonaFn, exitClusterFn);
 
 	Server::myServerInfo.stats.address = Server::myInterface.addr[0].ip;
 	Server::myServerInfo.stats.id = static_cast<UINT64>(Server::myServerInfo.stats.address) << 32 | Server::myInterface.pid;

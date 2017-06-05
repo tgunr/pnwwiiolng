@@ -1,6 +1,7 @@
 #pragma once
 
 #include "wwii/wwiiServerTypeEnums.h"
+#include "teul/teulFuncTypes.h"
 
 namespace Server
 {
@@ -16,8 +17,6 @@ using RELEASE_PERSONA_FUNCTION = SINT32(*)(SINT32 teulIndex, class PlayerStatusN
 using ACTIVATE_PLAYER_FUNCTION = SINT32(*)(SINT32 teulIndex , PlayerStatusNode* psn);
 using EXIT_PERSONA_FUNCTION = SINT32(*)(SINT32 teulIndex, PlayerStatusNode* psn, Server::PersonaExit& persXfer);
 using EXIT_CLUSTER_FUNCTION = SINT32(*)(PlayerStatusNode& psn);
-//! Teul error handlers must take this format.
-using ERROR_FUNCTION = void(*)(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const struct TEUL_CALLBACK* const object, SINT32 error);
 
 // -retval indicates failure.
 using SERVER_UPDATE = SINT32(*)(Server::ServerInfo* server, Server::Code scode);
