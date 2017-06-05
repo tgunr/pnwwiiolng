@@ -128,7 +128,7 @@ ENDPOINT::doConnect()
 {
 	if (PN_LIKELY(this->connectFn != nullptr))
 	{
-		dbugLog(_FLN, "t:%d connected calling callback");
+		dbugLog(_FLN, "t:%d connected calling callback", this->teulIndex());
 		this->connectFn(*this);
 	}
 	else if ( protocol != PROTOCOL_UDB && protocol != PROTOCOL_CTRL )	// UDB doesn't connect.

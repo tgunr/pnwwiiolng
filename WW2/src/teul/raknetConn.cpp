@@ -317,7 +317,7 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p)
             dbugLog(_FLW, "Raknet: t:%d no endpoint located for incoming msg: guid-%s", ntohl(*(reinterpret_cast<SINT32 *>(p->data + 1))),
                 p->guid.ToString());
         else
-            dbugLog(_FLW, "Raknet: t:%d no endpoint located for incoming msg: guid-%s", p->guid.ToString());
+            dbugLog(_FLW, "Raknet: t:%d no endpoint located for incoming msg: guid-%s", ntohl(*(reinterpret_cast<SINT32 *>(p->data + 1))), p->guid.ToString());
 	}
 
 }
