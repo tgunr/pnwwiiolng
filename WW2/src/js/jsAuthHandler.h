@@ -1,6 +1,6 @@
 #pragma once
 
-#include <phui/Javascript.h>
+#include "phui/Javascript.h"
 
 namespace Auth {
 	struct GameEntry;
