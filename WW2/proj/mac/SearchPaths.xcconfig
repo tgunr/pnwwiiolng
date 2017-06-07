@@ -66,8 +66,8 @@ FRAMEWORK_SEARCH_PATHS_01   = $(FRAMEWORK_SEARCH_PATHS_02) "$(SRCROOT)/lib/mac"
 FRAMEWORK_SEARCH_PATHS      = $(inherited) $(FRAMEWORK_SEARCH_PATHS_01)
 
 // Shared library search paths
-LIBRARY_SEARCH_PATHS_02     = $(LIBRARY_SEARCH_PATHS_03) "$(SRCROOT)/lib/mac"/**
-LIBRARY_SEARCH_PATHS_01     = $(LIBRARY_SEARCH_PATHS_02) "$(SRCROOT)/../Libraries/SteamSDK/redistributable_bin/osx32"/**
+LIBRARY_SEARCH_PATHS_02     = $(LIBRARY_SEARCH_PATHS_03) "$(SRCROOT)/lib/mac"
+LIBRARY_SEARCH_PATHS_01     = $(LIBRARY_SEARCH_PATHS_02) "$(SRCROOT)/../Libraries/SteamSDK/redistributable_bin/osx32"
 
 
 LIBRARY_SEARCH_PATHS        = $(inherited) $(LIBRARY_SEARCH_PATHS_01)
