@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Tue May 31 07:50:51 CDT 2005
 //
 // Provides code to implement the active mission class

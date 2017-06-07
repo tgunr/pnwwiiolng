@@ -1,11 +1,11 @@
-#include <syscfg.h>
+#include "syscfg.h"
 #include "jsAuthHandler.h"
 
 #include <js/jsexn.h>
 
-#include <auth/authPlaygateTypes.h> // TODO: Move
-#include <client/clientConnections.h>
-#include <ui/uiChat.h>
+#include "auth/authPlaygateTypes.h" // TODO: Move
+#include "client/clientConnections.h"
+#include "ui/uiChat.h"
 
 
 

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*--------------------------------------------------------------------
 Module: trnScenario.cpp
 Description: Module used for testing terrain stuff. Should not be used

@@ -1,8 +1,8 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 #include <algorithm>
 
-#include <steam_api.h> // HACK
+#include "steam_api.h" // HACK
 
 #include "phui/Util.h"
 

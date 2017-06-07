@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*
 ** Lua binding: scen
 ** Generated automatically by tolua++-1.0.92 on 01/04/14 22:00:09.

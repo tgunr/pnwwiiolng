@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "scen/scenMain.h"
 #include "scen/ScenarioManager.h"
 #include "xml/XMLLoader2.h"

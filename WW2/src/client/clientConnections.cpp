@@ -1,19 +1,19 @@
-#include <syscfg.h>
+#include "syscfg.h"
 #include "clientConnections.h"
 
-#include <steam_api.h>
+#include "steam_api.h"
 
-#include <build_info.hpp>
-#include <auth/authAppIDs.h>
-#include <auth/authConstants.h>
-#include <auth/authPack.h>
-#include <auth/authPlaygateTypes.h>
-#include <rn/rnmain.h>
-#include <teul/teulKit.h>
-#include <ui/uiUTF.h>
-#include <wwii/wwiiCallbacks.h>
-#include <wwii/wwiiNetPorts.h>
-#include <wwii/wwiiUTF.h>
+#include "build_info.hpp"
+#include "auth/authAppIDs.h"
+#include "auth/authConstants.h"
+#include "auth/authPack.h"
+#include "auth/authPlaygateTypes.h"
+#include "rn/rnmain.h"
+#include "teul/teulKit.h"
+#include "ui/uiUTF.h"
+#include "wwii/wwiiCallbacks.h"
+#include "wwii/wwiiNetPorts.h"
+#include "wwii/wwiiUTF.h"
 
 //==============================================================================
 

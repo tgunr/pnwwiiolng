@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "pi/piTextureAtlas.h"
 #include "pi/pi.h"
 #include "ld/ldpix.h"

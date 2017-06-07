@@ -486,7 +486,6 @@
 		FA06C3BE1EE18CE200A9977E /* sysSteam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3BB1EE18C8B00A9977E /* sysSteam.cpp */; };
 		FA06C3C21EE18D2100A9977E /* jsAuthHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3BF1EE18D0A00A9977E /* jsAuthHandler.cpp */; };
 		FA06C3C51EE18D5900A9977E /* clientConnections.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3C31EE18D5900A9977E /* clientConnections.cpp */; };
-		FA06C3D51EE2663400A9977E /* libphui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA06C3D01EE2660200A9977E /* libphui.a */; };
 		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
 		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
 		FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */ = {isa = PBXBuildFile; fileRef = FA13BB181C875F6800095818 /* placeholder-background.png */; };
@@ -510,6 +509,7 @@
 		FA5CDD491CD8BA6D00F93668 /* build_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA3D8BA81C8BF201002C5119 /* build_info.cpp */; };
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
 		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
+		FAE0023E1EE7F5660064198F /* libphui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA06C3D01EE2660200A9977E /* libphui.a */; };
 		FAE0DB8D1DC260AF00A9E63D /* omgChat.omg in Sources */ = {isa = PBXBuildFile; fileRef = FA448CA71D0CAE4800C4936D /* omgChat.omg */; };
 		FAE0DB8E1DC260AF00A9E63D /* omgMissionSortieData.omg in Sources */ = {isa = PBXBuildFile; fileRef = FA448CA81D0CAE4800C4936D /* omgMissionSortieData.omg */; };
 /* End PBXBuildFile section */
@@ -522,7 +522,6 @@
 			fileType = pattern.proxy;
 			isEditable = 1;
 			outputFiles = (
-				"$(DERIVED_FILE_DIR)/omg/$(INPUT_FILE_BASE).hxx",
 				"$(DERIVED_FILE_DIR)/omg/$(INPUT_FILE_BASE).cxx",
 			);
 			script = "OMGDSTROOT=\"${DERIVED_FILE_DIR}/omg\"\n\nmkdir -p \"${OMGDSTROOT}\"\n\n\"${BUILT_PRODUCTS_DIR}/omggen\" -D\"${INPUT_FILE_DIR}\" --cxx=\"${OMGDSTROOT}/${INPUT_FILE_BASE}.cxx\" --hxx=\"${OMGDSTROOT}/${INPUT_FILE_BASE}.hxx\" \"${INPUT_FILE_PATH}\"";
@@ -1680,7 +1679,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FA06C3D51EE2663400A9977E /* libphui.a in Frameworks */,
+				FAE0023E1EE7F5660064198F /* libphui.a in Frameworks */,
 				E9C1BDDD1E462A38001FD5B0 /* libRakNetLibStatic.a in Frameworks */,
 				E9C1BDDE1E462A38001FD5B0 /* liblibcatcommon.a in Frameworks */,
 				E9C1BDDF1E462A38001FD5B0 /* liblibcatcrypt.a in Frameworks */,

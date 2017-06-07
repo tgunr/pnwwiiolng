@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // player gauges data
 //
 // this file contains functions for accessing and creating the player's gauge data

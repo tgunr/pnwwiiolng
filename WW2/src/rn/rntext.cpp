@@ -1,4 +1,4 @@
-#include <syscfg.h>
+#include "syscfg.h"
 #include <math.h>
 #include <wchar.h>
 #include "pi/pi.h"
