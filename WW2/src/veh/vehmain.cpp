@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <math.h>
 #include <queue>
 #include <list>
@@ -99,7 +99,7 @@
 
 #include "wwii/wwiiOhYeahCodes.h"
 
-#include <wwii/wwiiPPOLoader.h>
+#include "wwii/wwiiPPOLoader.h"
 extern PPOSpecLoader specLoader;
 
 

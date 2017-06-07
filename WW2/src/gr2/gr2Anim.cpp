@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "gr2/gr2anim.h"
 #include "ob/obmain.h"

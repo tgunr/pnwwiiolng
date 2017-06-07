@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Thu Jun 15 16:22:35 2000
 //
 // All the code to the pack routines for the authple reside here.

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Wed Jul 26 14:24:29 2000
 //
 // This is the actual file containing the functions for manipulating handles

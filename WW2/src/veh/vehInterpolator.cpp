@@ -1,12 +1,12 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "veh/vehInterpolator.h"
 
 #include <cmath>
 
-#include <fp/fpTPSdata.h>
-#include <fp/fpFPS.h>
-#include <gr2/gr2Anim.h>
-#include <math/mathvect.h>
+#include "fp/fpTPSdata.h"
+#include "fp/fpFPS.h"
+#include "gr2/gr2Anim.h"
+#include "math/mathvect.h"
 
 #include "veh/vehmain.h"
 

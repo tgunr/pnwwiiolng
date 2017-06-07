@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides circular linked list management routines.
 //
 // Copyright 1999 Playnet Inc, All rights reserved

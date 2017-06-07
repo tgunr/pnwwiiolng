@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "phui/XMLMessage.h"
 #include "phui/ControlValueMessage.h"
 #include "phui/Message.h"

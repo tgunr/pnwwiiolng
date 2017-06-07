@@ -7,7 +7,7 @@
 //
 // Originating Programmer: Martin Poulin
 
-#include <syscfg.h>
+#include "syscfg.h"
 #include "dbug/dbugInternal.h"
 #include "build_info.hpp"
 #include <fcntl.h>

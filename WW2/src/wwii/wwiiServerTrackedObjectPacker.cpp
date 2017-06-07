@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Fri Nov 12 14:41:14 CST 2010
 //
 // Packers for the server tracked object classes

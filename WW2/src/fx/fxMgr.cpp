@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 ////////////////////////////////////////////////
 // Module: fxMgr.cpp
 // Description: Top level module for FX.

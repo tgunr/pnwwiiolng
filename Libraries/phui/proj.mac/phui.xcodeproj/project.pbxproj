@@ -93,7 +93,6 @@
 		0D3100BC08843A7600C3CBEA /* ViewDrawer.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008708843A7600C3CBEA /* ViewDrawer.h */; };
 		0D3100BD08843A7600C3CBEA /* Viewport.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008808843A7600C3CBEA /* Viewport.h */; };
 		0D3100BF08843A7600C3CBEA /* XMLMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008B08843A7600C3CBEA /* XMLMessage.h */; };
-		0DC3C9440A7BFDE800F14BBB /* ContextMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DC3C9430A7BFDE800F14BBB /* ContextMenu.cpp */; };
 		0DCEF76D0AD4636700E1D282 /* CtxMenu.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DCEF76C0AD4636700E1D282 /* CtxMenu.h */; };
 		0DCEF7710AD4637000E1D282 /* CtxMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEF7700AD4637000E1D282 /* CtxMenu.cpp */; };
 		0DCEF7BC0AD4643900E1D282 /* Panel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEF7BB0AD4643900E1D282 /* Panel.cpp */; };
@@ -515,7 +514,6 @@
 				0D31005108843A6200C3CBEA /* Viewport.cpp in Sources */,
 				0D31005308843A6200C3CBEA /* XMLMessage.cpp in Sources */,
 				0D1F958108E877F6008FF0BF /* ContextMenu.cpp in Sources */,
-				0DC3C9440A7BFDE800F14BBB /* ContextMenu.cpp in Sources */,
 				0DCEF7710AD4637000E1D282 /* CtxMenu.cpp in Sources */,
 				FA06C3CA1EE25ADA00A9977E /* GraphicsContext.cpp in Sources */,
 				0DCEF7BC0AD4643900E1D282 /* Panel.cpp in Sources */,
@@ -583,6 +581,7 @@
 		0D31FFE608843A1100C3CBEA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -604,6 +603,7 @@
 		0D31FFE708843A1100C3CBEA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_CXX_LIBRARY = "libc++";

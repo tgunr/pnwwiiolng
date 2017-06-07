@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Thu Nov  9 15:09:09 CST 2006
 //
 // Client/Host standard functions for HCUnits

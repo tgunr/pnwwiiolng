@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Thu Jul  7 12:23:04 CDT 2005
 //
 // Defines functions relating to the Chat::Who class

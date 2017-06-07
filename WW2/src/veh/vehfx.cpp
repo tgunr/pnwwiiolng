@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////
 // Module: vehfx.cpp
 // Description: Handle vehicle effects. (exhaust..etc)
