@@ -689,7 +689,7 @@ static void _runHost()
 	}
 }
 
-static void _reloadAuthDBRequestHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
+static void _reloadAuthDBRequestHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, const Teul::uWeb::RESTAPIParams &params)
 {
     threadCallback([] (void *) {
         wwiiIRCChannelMessage("-sys,#servers", "++ Reloading Data ++");
@@ -700,6 +700,19 @@ static void _reloadAuthDBRequestHandler(const Teul::uWeb::HTTPRequest &request, 
         .status(200)
         .JSON("{\"status\":\"ok\"}")
         .build(response);
+}
+
+static void _otpDispatchRequestHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, const Teul::uWeb::RESTAPIParams &params)
+{
+    if (params.find("arena_id") == params.end() || !params["arena_id"].is_number_unsigned() ||
+        params.find("user_id") == params.end() || !params["user_id"].is_number_unsigned()) {
+        return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
+    }
+    
+    arenaid_t arena_id = params["arena_id"];
+    userid_t player_id = params["user_id"];
+    
+    
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -757,7 +770,11 @@ main(int argc, const char* argv[])
 
 	threadsEnable();
     
-    Teul::uWeb::s_debugServer.addVirtualFile("Database Reload", "/v0.1/reload/all", _reloadAuthDBRequestHandler);
+    static const Teul::uWeb::RESTAPIRouteList routes = {
+        { { "GET"  }, "/reload/all", _reloadAuthDBRequestHandler },
+        { { "POST" }, "/cluster/{arena_id}/dispatch", _otpDispatchRequestHandler },
+    };
+    Teul::uWeb::s_debugServer.addVirtualPrefix("v1 API", "/v1", std::bind(Teul::uWeb::RESTRouter, std::placeholders::_1, std::placeholders::_2, routes));
 
 	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
 

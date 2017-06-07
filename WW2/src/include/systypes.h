@@ -166,6 +166,8 @@ using TeulDeltaMS = SINT64;
 
 //! Identifier for an arena
 using arenaid_t = uint32_t;
+//! Index for a user/customer ID
+using userid_t = uint32_t;
 //! Index for a player ID
 using playerid_t = uint32_t;
 //! Index for a sortie ID
