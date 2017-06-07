@@ -522,7 +522,6 @@
 			fileType = pattern.proxy;
 			isEditable = 1;
 			outputFiles = (
-				"$(DERIVED_FILE_DIR)/omg/$(INPUT_FILE_BASE).hxx",
 				"$(DERIVED_FILE_DIR)/omg/$(INPUT_FILE_BASE).cxx",
 			);
 			script = "OMGDSTROOT=\"${DERIVED_FILE_DIR}/omg\"\n\nmkdir -p \"${OMGDSTROOT}\"\n\n\"${BUILT_PRODUCTS_DIR}/omggen\" -D\"${INPUT_FILE_DIR}\" --cxx=\"${OMGDSTROOT}/${INPUT_FILE_BASE}.cxx\" --hxx=\"${OMGDSTROOT}/${INPUT_FILE_BASE}.hxx\" \"${INPUT_FILE_PATH}\"";
