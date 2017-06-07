@@ -100,10 +100,6 @@ static HANDLE FindFirstFileA(const char*pattern, WIN32_FIND_DATAA* finddata)
 {
   HANDLE h;
 
-  char* slash = strrchr( pattern, '/' );
-  *slash = 0;
-  strcpy( slash+2, h.pattern ); // skip *
-
   h.dir = opendir(pattern);
   if ( h.dir == 0 )
   {
