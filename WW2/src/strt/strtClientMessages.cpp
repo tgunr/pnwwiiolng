@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Fri Nov  3 13:53:33 2000
 //
 // This file contains the setup and message API that the front-end will use

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "osgImport/ShadowMap.h"
 #include "osgImport/Texture2D.h"
 #include "osgImport/BoundingBox.h"

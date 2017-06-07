@@ -1,6 +1,6 @@
 //
 
-#include <syscfg.h>
+#include "syscfg.h"
 #include <math.h>
 #include <iostream>
 #include <fstream>

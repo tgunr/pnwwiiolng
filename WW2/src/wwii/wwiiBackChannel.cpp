@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Fri Sep 29 18:09:45 CST 2006
 //
 // Management of the 'backchannel' connection via raknet

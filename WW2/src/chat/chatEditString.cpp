@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Thu Oct 13 12:34:07 CDT 2005
 //
 // Allow a player to send a string up to the host

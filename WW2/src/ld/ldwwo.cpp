@@ -7,7 +7,7 @@
  *
  */
 #ifdef SUPPORT_WWO
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "ldwwo.h"
 
 LdWWO::LdWWO(std::string path)

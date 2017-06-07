@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "veh/vehVisDamage.h"
 #include "ogrp/ogrptype.h"
 #include "include/vars.h"

@@ -1,9 +1,8 @@
-#include <syscfg.h>
+#include "syscfg.h"
 #include "sysSteam.h"
 
-#include <steam_api.h>
-
-#include <vars.h>
+#include "steam_api.h"
+#include "vars.h"
 
 
 

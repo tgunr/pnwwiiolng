@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "ogl/oglGlobalStates.h"
 #include "ogl/States.h"
 #include <assert.h>

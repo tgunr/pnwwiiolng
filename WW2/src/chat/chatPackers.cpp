@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Thu Jul 27 16:51:21 2000
 //
 // The actual pack routines for the chat system

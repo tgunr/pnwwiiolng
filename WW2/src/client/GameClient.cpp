@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "phui/MessageLoop.h"
 #include "phui/Message.h"
 

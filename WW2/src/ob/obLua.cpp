@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*
 ** Lua binding: ob
 ** Generated automatically by tolua++-1.0.92 on 08/22/08 16:08:07.

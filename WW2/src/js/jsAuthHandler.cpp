@@ -1,4 +1,4 @@
-#include <syscfg.h>
+#include "syscfg.h"
 #include "jsAuthHandler.h"
 
 #include <js/jsexn.h>

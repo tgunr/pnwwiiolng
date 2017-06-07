@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Wed Nov 1 16:55:26 2000
 //
 //	This is where all declarations for commPack routines for universal

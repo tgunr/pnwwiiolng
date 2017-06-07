@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "js/jsKeymap.h"
 #include "imap/ww2func.h"
 #include "imap/ww2imap.h"

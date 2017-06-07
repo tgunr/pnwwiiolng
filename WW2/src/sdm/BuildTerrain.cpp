@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #if platOS == OS_WIN32
 #include <windows.h>
 #include <commctrl.h>

@@ -1,4 +1,4 @@
-#include <syscfg.h>
+#include "syscfg.h"
 #include "clientConnections.h"
 
 #include <steam_api.h>
