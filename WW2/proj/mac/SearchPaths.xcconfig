@@ -73,4 +73,4 @@ LIBRARY_SEARCH_PATHS_01     = $(LIBRARY_SEARCH_PATHS_02) "$(SRCROOT)/../Librarie
 LIBRARY_SEARCH_PATHS        = $(inherited) $(LIBRARY_SEARCH_PATHS_01)
 
 // Encode use of USER_HEADER_SEARCH_PATHS - this should be off but for now we need it.
-ALWAYS_SEARCH_USER_PATHS = YES
+ALWAYS_SEARCH_USER_PATHS = NO
