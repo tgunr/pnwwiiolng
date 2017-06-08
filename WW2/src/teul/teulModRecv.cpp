@@ -103,6 +103,7 @@ struct POLL_STRUCT
 	nfds_t		m_size;
 	nfds_t		m_count;
 };
+const size_t POLL_STRUCT::CAPACITY;
 static POLL_STRUCT pollData;
 #endif
 
