@@ -1118,8 +1118,8 @@ extern NSString *WebActionOriginalURLKey;
             if (! isteulInitialized) {
                 ww2::Client::InitTeul();                
 #ifdef DEBUG_WW2
-                dbugSetWriteLevel(Debug::ERR_DBUG);
-                dbugSetLogLevel(Debug::ERR_DBUG);
+                dbugSetWriteLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
+                dbugSetLogLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
 #else
                 dbugSetWriteLevel(Debug::ERR_ABORT);
                 dbugSetLogLevel(Debug::ERR_ABORT);

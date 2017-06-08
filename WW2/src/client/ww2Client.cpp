@@ -2921,7 +2921,7 @@ bool ww2::Client::InitTeul(void) {
 	if ( clientconnected )
 		return true;
 
-#if defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
+#if !defined(NDEBUG) || defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
 	static const LogMode DBUGLOG_MODE = LogMode::TO_FILE;
 #else
 	static const LogMode DBUGLOG_MODE = LogMode::OFF;
