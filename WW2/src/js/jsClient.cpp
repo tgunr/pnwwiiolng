@@ -261,7 +261,11 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	if ( argc < 1 ) return JS_FALSE;
 	
 	int32 arena;
-	JS_ValueToInt32(ctx, argv[0], &arena);
+	if (gArena[0]) {
+        arena = strtol(gArena, nullptr, 10);
+    } else {
+        JS_ValueToInt32(ctx, argv[0], &arena);
+    }
 	const char* callsign = "";
 	if ( argc >= 2 )
 		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
