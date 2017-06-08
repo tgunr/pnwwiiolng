@@ -19,9 +19,11 @@
 #include "auth/authPlaygateTypes.h"
 #include "auth/authGame.h"
 #include "auth/authHostMessages.h"
+#include "dbse/dbseHandle.h"
 #include "teul/teulAuth.h"
 #include "teul/teulClosingEnums.h"
 #include "include/infoHostMessages.h"
+#include "include/mydbQuery.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiThreads.h"
@@ -680,11 +682,9 @@ void authProcessArenaRequest(const SINT32 teulIndex, ARENA_REQ& request)
 
 static void _runHost()
 {
-	// Check queues once a second.
 	while ( _running )
 	{
 		teulUpdateTransport(25);
-        
 		threadsCallNextCallback();
 	}
 }
@@ -702,17 +702,177 @@ static void _reloadAuthDBRequestHandler(const Teul::uWeb::HTTPRequest &request, 
         .build(response);
 }
 
+static void _otpErrorResponse(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, int httpStatus, const std::string &message)
+{
+    return Teul::uWeb::HTTPResponseBuilder(request)
+        .status(httpStatus)
+        .JSON(std::string("{\"error\":\"") + message + "\"}")
+        .build(response);
+}
+
+static GAME *_otpGetValidGame(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, arenaid_t arena_id, userid_t user_id, uint32_t app_version, uint32_t app_platform)
+{
+    GAME *game = _findGame(arena_id);
+    
+    if (!game) {
+        dbugLog(_FLW, "uWeb: a:%u c:%u v:%08x p:%u no game registered with requested arena ID", arena_id, user_id, app_version, app_platform);
+        _otpErrorResponse(request, response, 410, "No running arena");
+        return nullptr;
+    }
+    if (game->maxUsers == 0) {
+        dbugLog(_FLN, "uWeb: a:%u c:%u v:%08x p:%u game not currently accepting users", arena_id, user_id, app_version, app_platform);
+        _otpErrorResponse(request, response, 503, "Arena not open");
+        return nullptr;
+    }
+    if (game->currentUsers >= game->maxUsers) {
+        dbugLog(_FLN, "uWeb: a:%u c:%u v:%08x p:%u game too full for another user", arena_id, user_id, app_version, app_platform);
+        _otpErrorResponse(request, response, 503, "Arena full");
+        return nullptr;
+    }
+    if (app_version < game->appInfo[app_platform].min || app_version > game->appInfo[app_platform].max) {
+        dbugLog(_FLA, "uWeb: a:%u c:%u v:%08x p:%u client version too old for arena, how did this happen with a Steam user?", arena_id, user_id, app_version, app_platform);
+        _otpErrorResponse(request, response, 505, "You need an update");
+        return nullptr;
+    }
+    
+    return game;
+}
+
+static std::pair<playerid_t, std::string> _otpValidateUser(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response,
+                                                           arenaid_t arena_id, userid_t user_id, uint32_t app_version, uint32_t app_platform)
+{
+    playerid_t player_id = 0;
+    char callsign[14]; // 14 is the buffer size in an Auth::Dispatch. We're trying to get this done, not fix all the massive design problems.
+    
+    // Validate the account against the database. Refusing to trust
+    // billing's parameters implicitly prevents billing from getting ahead
+    // of its own sync operations.
+    try {
+        std::string callsignQueryStr = "SELECT playerid, callsign FROM `wwiionline`.`wwii_player` WHERE customerid=" + std::to_string(user_id);
+        DBQuery callsignQuery(dbh, callsignQueryStr.c_str());
+        
+        if (!callsignQuery.HasRows() || !callsignQuery.FetchRow()) {
+            dbugLog(_FLN, "uWeb: a:%u c:%u v:%08x p:%u no game database entry for user", arena_id, user_id, app_version, app_platform);
+            _otpErrorResponse(request, response, 404, "No such user");
+            return { 0, "" };
+        }
+        
+        player_id = callsignQuery.Row().NextUInt();
+        callsignQuery.Row().NextString(callsign);
+        if (callsign[0] == 0) {
+            dbugLog(_FLW, "uWeb: a:%u c:%u v:%08x p:%u no callsign for user!", arena_id, user_id, app_version, app_platform);
+            _otpErrorResponse(request, response, 404, "No such user");
+            return { 0, "" };
+        }
+        
+        // This weird combination of join conditions and group by clause
+        // allows us to more uniquely identify certain corner cases in DB
+        // inconsistency.
+        std::string accessQueryStr =
+            "SELECT SUM(IF(s.status='active',1,0)) AS access "
+            "FROM `auth`.`auth_subarenaassoc` a "
+            "LEFT JOIN `auth`.`auth_subscribed` s ON a.subscriptionid=s.subscriptionid "
+            "AND s.customerid=" + std::to_string(user_id) + " "
+            "WHERE a.arenaid=" + std::to_string(arena_id) + " "
+            "GROUP BY a.arenaid";
+        DBQuery accessQuery(dbh, accessQueryStr.c_str());
+        
+        if (!accessQuery.HasRows() || !accessQuery.FetchRow()) {
+            // This means the arena has no associated subscriptions at all, and no one can get into it.
+            dbugLog(_FLW, "uWeb: a:%u has no subscription associations, can not be entered by anyone!", arena_id);
+            _otpErrorResponse(request, response, 400, "Internal error");
+            return { 0, "" };
+        }
+        ABORT_IF_EX(accessQuery.Rows() > 1, "Multiple disjoint arena entries for arena %u!", arena_id); // This is patently impossible unless something is blown in the database.
+        if (accessQuery.Row().NextUInt() < 1) {
+            dbugLog(_FLN, "uWeb: a%u c:%s(%u) v:%08x p:%u user has no active subscriptions for arena, login denied", arena_id, callsign, user_id, app_version, app_platform);
+            _otpErrorResponse(request, response, 401, "No subscription");
+            return { 0, "" };
+        }
+    } catch (std::exception &e) {
+        // Client will receive connection reset error
+        LogAbort("Database error during user lookup for a:%u c:%u v:%08x p:%u - %s", arena_id, user_id, app_version, app_platform, e.what());
+    }
+    
+    return { player_id, callsign };
+}
+
 static void _otpDispatchRequestHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, const Teul::uWeb::RESTAPIParams &params)
 {
-    if (params.find("arena_id") == params.end() || !params["arena_id"].is_number_unsigned() ||
-        params.find("user_id") == params.end() || !params["user_id"].is_number_unsigned()) {
+    if (params.find("arena_id") == params.end() || !params["arena_id"].is_string() ||
+        params.find("user_id") == params.end() || !params["user_id"].is_number_unsigned() ||
+        params.find("app_version") == params.end() || !params["app_version"].is_number_unsigned() ||
+        params.find("app_platform") == params.end() || !params["app_platform"].is_number_unsigned())
+    {
+        dbugLog(_FLA, "uWeb: Received bad request (missing or invalid params) from relay - %s", params.dump().c_str());
         return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
     }
     
-    arenaid_t arena_id = params["arena_id"];
-    userid_t player_id = params["user_id"];
+    std::string arena_id_raw = params["arena_id"];
     
+#ifndef NDEBUG
+    // Do this extra check in debug only; it's wasted cycles in release
+    if (arena_id_raw.find_first_not_of("0123456789") != std::string::npos) {
+        dbugLog(_FLA, "uWeb: Received bad request (bad arena ID pull) from relay - %s", params.dump().c_str());
+        return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
+    }
+#endif
     
+    arenaid_t arena_id = std::strtoul(arena_id_raw.c_str(), nullptr, 10);
+    userid_t user_id = params["user_id"];
+    uint32_t app_version = params["app_version"];
+    uint32_t app_platform = params["app_platform"];
+    
+    // Have to validate platform separately because it gets used as an index later
+    if (app_platform >= OS_MAX_PLAT) {
+        dbugLog(_FLA, "uWeb: Received bad platform value %u from relay", app_platform);
+        return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
+    }
+    
+    // Database operations must happen on the main thread. It's also not
+    // trustworthy to do any network I/O off the main thread with this setup, so
+    // pretty much everything this call does has to happen on the main thread,
+    // even though that's stupid.
+    threadCallbackSync<void>([&] () {
+        // Unfortunately, because this function is not thread-safe, even this
+        // trivial check has to wait for the main thread callback!
+        if (authdbGetArenaAlias(arena_id) == nullptr) {
+            // Note: Do not return the true error here to prevent easy iteration of arena IDs by hackers
+            dbugLog(_FLW, "uWeb: c:%u requested access to invalid arena %u", user_id, arena_id);
+            return _otpErrorResponse(request, response, 400, "Internal error");
+        }
+        
+        // Okay, is there a game on this arena? Repeats the checks from _processLaunchRequest()
+        GAME *game = _otpGetValidGame(request, response, arena_id, user_id, app_version, app_platform);
+        
+        if (!game) {
+            return; // the function already filled in any error response needed
+        }
+        
+        std::pair<playerid_t, std::string> data = _otpValidateUser(request, response, arena_id, user_id, app_version, app_platform);
+        
+        if (data.second.empty()) {
+            return; // the function already filled in any error response needed
+        }
+        
+        // Okay, access granted.
+        SERVER *server = _findOptimumServer(*game);
+        Auth::Dispatch dispatch;
+        
+        strsafecpy(dispatch.m_callsign, data.second.c_str());
+        dispatch.m_customerID = data.first; // THIS IS PLAYER ID DESPITE THE FIELD NAME!!!
+        dispatch.m_appVersion = app_version;
+        dispatch.m_platform = app_platform;
+        dispatch.m_OTP = authGetOTP();
+        dispatch.m_clientIP = 0; // Steam users have no accessible IP
+        
+        _sendDispatch(dispatch, dispatch.m_OTP, 0, server->teulIndex); // Send dispatch to cluster
+        
+        return Teul::uWeb::HTTPResponseBuilder(request)
+            .status(200)
+            .JSON(nlohmann::json{ { "otp", dispatch.m_OTP }, { "serverIP", server->extAddress }, { "serverPort", server->port } }.dump())
+            .build(response);
+    });
 }
 
 //////////////////////////////////////////////////////////////////////
