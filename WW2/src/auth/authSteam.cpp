@@ -12,7 +12,7 @@
 #include "build_info.hpp"
 #include "json.hpp"
 
-static const std::string authSteamLoginProtocol = "http";
+static const std::string authSteamLoginProtocol = "https";
 static const std::string authSteamLoginResource = "/v1/login";
 
 SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &requestedCallsign)
