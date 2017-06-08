@@ -44,16 +44,19 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
     
     if (!sysExecuteHTTPRequest(request, response)) {
         // TODO: Better error handling
+        dbugLog(_FLD, "Failed to execute HTTP request with URL %s", request.url.c_str());
         return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
     }
     
     if (response.responseCode != 200) {
-        // TODO: Logging, better error handling
+        // TODO: Better error handling
+        dbugLog(_FLD, "Server returned non-200 response code %d with URL %s", response.responseCode, request.url.c_str());
         return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
     }
     
     if (response.headers.find("content-type") == response.headers.end() || response.headers["content-type"] != "application/json") {
-        // TODO: Logging, better error handling
+        // TODO: Better error handling
+        dbugLog(_FLD, "Server returned non-JSON content-type with URL %s", request.url.c_str());
         return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
     }
     
@@ -61,11 +64,13 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
         auto responseJson = nlohmann::json::parse(response.content);
         
         if (!responseJson.is_object()) {
-            // TODO: Logging, better error handling
+            // TODO: Better error handling
+            dbugLog(_FLD, "Server returned non-object JSON with URL %s content %s", request.url.c_str(), response.content.c_str());
             return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
         }
         if (responseJson.find("result") == responseJson.end() || !responseJson["result"].is_number_unsigned()) {
-            // TODO: Logging, better error handling
+            // TODO: Better error handling
+            dbugLog(_FLD, "Server returned JSON with no or invalid result code with URL %s content %s", request.url.c_str(), response.content.c_str());
             return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
         }
         
@@ -76,19 +81,23 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
         // should be improved.
         if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginSuccess)) {
             if (responseJson.find("arenaID") == responseJson.end() || !responseJson["arenaID"].is_number_unsigned()) {
-                // TODO: Logging, better error handling
+                // TODO: Better error handling
+                dbugLog(_FLD, "Server returned JSON with no or invalid arena ID with URL %s content %s", request.url.c_str(), response.content.c_str());
                 return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
             }
             if (responseJson.find("otp") == responseJson.end() || !responseJson["otp"].is_number_unsigned()) {
-                // TODO: Logging, better error handling
+                // TODO: Better error handling
+                dbugLog(_FLD, "Server returned JSON with no or invalid OTP with URL %s content %s", request.url.c_str(), response.content.c_str());
                 return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
             }
             if (responseJson.find("serverIP") == responseJson.end() || !responseJson["serverIP"].is_number_unsigned()) {
-                // TODO: Logging, better error handling
+                // TODO: Better error handling
+                dbugLog(_FLD, "Server returned JSON with no or invalid server IP with URL %s content %s", request.url.c_str(), response.content.c_str());
                 return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
             }
             if (responseJson.find("serverPort") == responseJson.end() || !responseJson["serverPort"].is_number_unsigned()) {
-                // TODO: Logging, better error handling
+                // TODO: Better error handling
+                dbugLog(_FLD, "Server returned JSON with no or invalid server port with URL %s content %s", request.url.c_str(), response.content.c_str());
                 return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
             }
             
@@ -103,15 +112,18 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
         } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignRequired)) {
             return { SteamLoginResponse::LoginCallsignRequired, 0, 0, 0, 0 };
         } else {
-            // TODO: Logging, better error handling
+            // TODO: Better error handling
+            dbugLog(_FLD, "Server returned JSON with unknown result code with URL %s content %s", request.url.c_str(), response.content.c_str());
             return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
         }
     } catch (std::invalid_argument &e) {
-        // TODO: Logging, better error handling
+        // TODO: Better error handling
+        dbugLog(_FLD, "Server returned invalid JSON with URL %s content %s", request.url.c_str(), response.content.c_str());
         return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
     } catch (...) {
         // TODO: Narrow this down!
-        // TODO: Logging, better error handling
+        // TODO: Better error handling
+        dbugLog(_FLD, "Server returned something it failed to deal with with URL %s content %s", request.url.c_str(), response.content.c_str());
         return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
     }
     
