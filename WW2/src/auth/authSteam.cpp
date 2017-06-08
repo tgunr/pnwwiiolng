@@ -36,8 +36,10 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
     
     request.content = std::string("{") + // TODO: Do a real JSON encode here instead of just stringing strings together
         "\"steam_ticket\":" + "\"" + steamTicketEncoded.str() + "\","
-        "\"arena_id\":" + std::to_string(arenaID) +
-        (requestedCallsign.empty() ? "" : std::string("\"callsign\":\"") + requestedCallsign + "\"") +
+        "\"arena_id\":" + std::to_string(arenaID) + "," +
+        "\"app_version\":" + std::to_string(PN_build_version_value) + "," +
+        "\"app_platform\":" + std::to_string(platOS - 1) + // HACK!! OS_WIN32 == 1, OS_MACOS == 2, auth platform values are 0 and 1
+        (requestedCallsign.empty() ? "" : std::string(",\"callsign\":\"") + requestedCallsign + "\"") +
     "}";
     
     if (!sysExecuteHTTPRequest(request, response)) {
