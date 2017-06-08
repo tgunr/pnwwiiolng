@@ -554,7 +554,6 @@ void AuthConnection::AppVerifyReceived(const APP_VERIFY& verify) {
 	APP_LAUNCH_REQ req;
 	strlcpy(req.username, login_info.username.c_str(), array_size(req.username));
 	strlcpy((char*)req.password, (const char*)login_info.password_md5, array_size(req.password));
-	req.steamID = steam_id;
 	req.arenaID = verify.arenaID;
 	req.sessionID = verify.sessionID;
 	req.appID = verify.appID;

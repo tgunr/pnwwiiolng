@@ -48,7 +48,6 @@ void authResetConnectInfo(UINT32 gameID);
 //Validates a user against the database, and fills out the game cookie
 //	if they are a good user
 UINT32 authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch& gamecookie, const Auth::ClientData& cdata);
-UINT32 authValidateSteamUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch& gamecookie, const Auth::ClientData& cdata);
 
 // Inserts otp records int ot the authOTP table to be used by
 // our ftp servers for authenication.

@@ -22,33 +22,12 @@ struct ClientData
 		, platform(_platform)
 		, address(_address)
 		, oVersion(_oVersion)
-		, steamID(0)
 		, customerID(0)
 		, arenaID(0)
 		, sessionID(0)
 		, appID(0)
 		, appVersion(0)
 		, m_username(_username), m_password(_password)
-		, m_subscribedArenaIDs()
-		, m_launchRequest(nullptr)
-		, isPlaynet(false)
-		, isPremium(false)
-		{}
-
-	ClientData(SINT32 _teulIndex, UINT32 _platform, UINT32 _address
-				, UINT32 _oVersion, UINT32 _steamID)
-		: server(nullptr)
-		, teulIndex(_teulIndex)
-		, platform(_platform)
-		, address(_address)
-		, oVersion(_oVersion)
-		, steamID(_steamID)
-		, customerID(0)
-		, arenaID(0)
-		, sessionID(0)
-		, appID(0)
-		, appVersion(0)
-		, m_username(""), m_password("")
 		, m_subscribedArenaIDs()
 		, m_launchRequest(nullptr)
 		, isPlaynet(false)
@@ -63,7 +42,6 @@ public:
 	UINT32	platform;
 	UINT32	address;			// address of the remote host
 	UINT32	oVersion;
-	SINT32	steamID;			// steam ID of client
 	SINT32	customerID;			// customer ID of client
 	SINT32	arenaID;
 	UINT32	sessionID;
