@@ -470,9 +470,6 @@ void dbugSetLogLevel(Debug::ERROR_TYPE level)
 	else
 		g_logDebug = false;
 
-	if ( _logger.isInitialized() == false )
-		return;
-
 	_logger.m_logFlags = flags;
 
 	switch(level)
