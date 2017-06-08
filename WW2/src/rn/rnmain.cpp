@@ -546,12 +546,17 @@ LOGICAL rnmainInit()
 	uiPostInit();
 	rnloadRootWindow();
 	uiChatShow();
-
-	// make sure devices get detected
-	// testing for now
-	dimainKill();
-	dimainInit();
-	imapLoadPresets();
+	
+	// This "tear down and re-init" sequence breaks the Steam overlay by
+    // disrupting its sense of the D3D device capture state. Technically, that's
+    // probably a bug in the overlay, but I can't back up our usage of DI in any
+    // universe, so we'll call it our fix anyhow.
+    
+    //make sure devices get detected
+	//testing for now
+	//dimainKill();
+	//dimainInit();
+	//imapLoadPresets();
 	// end testing
 
 #ifdef MULTI_CLIENT
