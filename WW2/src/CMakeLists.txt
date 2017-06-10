@@ -778,7 +778,7 @@ INSTALL(
 INSTALL( DIRECTORY hostproj/lua/ DESTINATION lua COMPONENT lua PATTERN ".git" EXCLUDE PATTERN "*.lua" )
 
 # Embedded webserver root
-INSTALL( DIRECTORY hostproj/web/ DESTINATION web COMPONENT web PATTERN ".git" EXCLUDE )
+INSTALL( DIRECTORY hostproj/web/ DESTINATION web/embedded COMPONENT web PATTERN ".git" EXCLUDE )
 
 ####################################
 ## Tests
