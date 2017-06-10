@@ -262,10 +262,8 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 }
 
 #if defined(WIN32) && defined(UNICODE)
-#define OS_ENVIRONMENT_CFG L"environment.win.cfg"
 #define DEF_ENVIRONMENT_CFG L"environment.cfg"
 #else
-#define OS_ENVIRONMENT_CFG "environment.unix.cfg"
 #define DEF_ENVIRONMENT_CFG "environment.cfg"
 #define PARENT_DIR ".."
 #endif
@@ -297,15 +295,6 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 			{
 				_readConfigEntriesFromFile(file);
 				configEntries.m_foundGeneralFile = true;
-				break;
-			}
-		}
-		for ( size_t i = 0; paths[i] != nullptr; ++i )
-		{
-			if ( file.mapFile(OS_ENVIRONMENT_CFG, paths[i]) )
-			{
-				_readConfigEntriesFromFile(file);
-				configEntries.m_foundOSFile = true;
 				break;
 			}
 		}
@@ -466,11 +455,11 @@ namespace Teul
 		if ( !configEntries.m_foundGeneralFile && !configEntries.m_foundOSFile )
 		{
 #if defined(WIN32) && defined(UNICODE)
-			_ftprintf(stderr, _T("NOTE: Could not find '%s' or '%s' config files, using defaults.\n"),
-				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+			_ftprintf(stderr, _T("NOTE: Could not find '%s' config file, using defaults.\n"),
+				DEF_ENVIRONMENT_CFG);
 #else
-			fprintf(stderr, "NOTE: Could not find '%s' or '%s' config files, using defaults.\n",
-				DEF_ENVIRONMENT_CFG, OS_ENVIRONMENT_CFG);
+			fprintf(stderr, "NOTE: Could not find '%s' config file, using defaults.\n",
+				DEF_ENVIRONMENT_CFG);
 #endif
 		}
 

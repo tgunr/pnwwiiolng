@@ -772,7 +772,8 @@ INSTALL(
 ## File installs
 
 # Environment template files from the source tree
-#INSTALL( FILES environment.cfg environment.win.cfg DESTINATION bin COMPONENT config )
+# Do not actually install this file, otherwise we could accidentally overwrite real config
+#INSTALL( FILES environment.cfg DESTINATION bin COMPONENT config )
 
 # Lua scripts
 INSTALL( DIRECTORY hostproj/lua/ DESTINATION lua COMPONENT lua PATTERN ".git" EXCLUDE PATTERN "*.lua" )
