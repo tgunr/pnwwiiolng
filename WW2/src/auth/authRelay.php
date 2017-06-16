@@ -37,9 +37,14 @@ $steam_ticket = filter_var($data->steam_ticket, FILTER_VALIDATE_REGEXP, ['option
 $arena_id = filter_var($data->arena_id, FILTER_VALIDATE_INT);
 $app_version = filter_var($data->app_version, FILTER_VALIDATE_INT);
 $app_platform = filter_var($data->app_platform, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 2]]);
+if (isset($data->callsign)) {
+    $callsign = filter_var($data->callsign, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => '/^[a-z][a-z0-9]{1,9}$/']]);
+}
 
 if (!is_string($steam_ticket) || !is_integer($arena_id) ||
-    !is_integer($app_version) || !is_integer($app_platform)) {
+    !is_integer($app_version) || !is_integer($app_platform) ||
+    (isset($data->callsign) && !is_string($callsign))
+) {
     RESTfail(400, "Bad input");
 }
 
