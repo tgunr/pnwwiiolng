@@ -781,6 +781,16 @@ INSTALL( DIRECTORY hostproj/lua/ DESTINATION lua COMPONENT lua PATTERN ".git" EX
 # Embedded webserver root
 INSTALL( DIRECTORY hostproj/web/ DESTINATION web/embedded COMPONENT web PATTERN ".git" EXCLUDE )
 
+# Auth relay
+IF ( NOT PN_DISABLE_AUTH )
+    CONFIGURE_FILE( auth/authRelay.apache2.conf.in auth/authRelay.apache2.conf @ONLY )
+    INSTALL(
+        FILES auth/authRelay.php auth/authRelay.apache2.conf
+        DESTINATION web/relay
+        COMPONENT relay
+    )
+ENDIF()
+
 ####################################
 ## Tests
 
