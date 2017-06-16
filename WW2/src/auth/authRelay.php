@@ -11,6 +11,7 @@ if (!extension_loaded('curl')) {
 }
 
 $billing_login_endpoint = 'http://billing.playnet.com:9000';
+$billing_xmlrpc_method = 'steam.requestLogin';
 $auth_otp_endpoint = 'http://localhost:6081/v1/cluster/{arena_id}/dispatch';
 
 function RESTfail(int $status, string $message): void {
@@ -48,6 +49,30 @@ if (!is_string($steam_ticket) || !is_integer($arena_id) ||
     RESTfail(400, "Bad input");
 }
 
+$billing_request_data = [$steam_ticket, $arena_id];
+if (isset(callsign)) {
+    $billing_request_data[] = $callsign;
+}
+$billing_request = xmlrpc_encode_request($billing_xmlrpc_method, $billing_request_data);
+$billing_handle = curl_init($billing_login_endpoint);
+if (!curl_setopt_array($billing_handle, [
+    CURLOPT_CUSTOMREQUEST => 'POST',
+    CURLOPT_POSTFIELDS => $billing_request,
+    CURLOPT_HTTPHEADER => ['Content-Type: application/xml'],
+    CURLOPT_RETURNTRANSFER => true,
+])) {
+    RESTfail(500, "Internal error -1");
+}
+if (($billing_response_raw = curl_exec($billing_handle)) === false) {
+    RESTfail(500, "Internal error -2");
+}
+if (($billing_response_code = curl_getinfo($billing_handle, CURLINFO_HTTP_CODE)) !== 200) {
+    RESTfail($billing_response_code, $billing_response_raw);
+}
+$billing_response = xmlrpc_decode($billing_response_raw);
+if (is_null($billing_response) || $billing_response === false) {
+    RESTfail(500, "Internal error -3");
+}
 // Do billing XML-RPC here
 
 $auth_data = [
