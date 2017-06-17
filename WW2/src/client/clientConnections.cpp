@@ -442,20 +442,6 @@ void AuthConnection::Login(const UsernamePassword& info) {
 }
 
 
-void AuthConnection::Login(uint32_t steamid) {
-	static_assert (std::is_same<AccountID_t, decltype(steamid)>::value &&
-	               std::is_same<decltype(steamid), decltype(Auth::LoginSteamRequest::m_account)>::value,
-	               "typdef mismatch");
-
-	dbugLog(_FLI, "Sending Steam login request");
-	Auth::LoginSteamRequest req(SteamApps()->GetAppOwner().GetAccountID());
-	if ( teulSend(teul_index, _LoginSteamXchg, &req) < 0 ) {
-		action = {ACT_ERROR, UnknownError};
-		return;
-	}
-	action = {ACT_LOGIN, States::Waiting};
-}
-
 //==============
 
 void AuthConnection::PollArenas(void) {
@@ -627,10 +613,6 @@ SINT32 SendLoginRequest(ACTION_OBJECT* a) {
 	return ((Auth::LoginRequest*)a->localRawData)->packer(TEUL_PACK, a);
 }
 
-SINT32 SendLoginSteamRequest(ACTION_OBJECT* a) {
-	return ((Auth::LoginSteamRequest*)a->localRawData)->packer(TEUL_PACK, a);
-}
-
 SINT32 RecvLoginReply(ACTION_OBJECT* a) {
 	if ( ! g_authconn )
 		return 0;
@@ -701,7 +683,6 @@ SINT32 CheckTeulCallbacks(void) {
 
 	BEGIN_CALLBACK_REGISTRATION(Auth::CallbackX) {
 		REGISTER_SENDRECV(AUTH_XCHG_LOGIN_Y, SendLoginRequest, RecvLoginReply, _LoginXchg);
-		REGISTER_SENDRECV(AUTH_XCHG_LOGIN_STEAM_Y, SendLoginSteamRequest, RecvLoginReply, _LoginSteamXchg);
 		//REGISTER_RECEIVER(APP_PLAYGATE_OK_Y, ReceivePlaygateOk);
 		REGISTER_SENDRECV(APP_XCHG_GAME_LIST_Y, RequestArenaList, RecvArenaList, _GetArenaList);
 		REGISTER_SENDER(ARENA_REQ_Y, SendArenaReq, _ArenaReq);
