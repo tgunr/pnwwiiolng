@@ -111,7 +111,7 @@ if ($billing_response['_success'] === 0) {
         header('Content-Type: application/json');
         print json_encode(['result' => 2]);
         exit(0);
-    } else if (in_array(['steam.login.invalid', 'steam.login.banned'], $billing_response['_message'])) {
+    } else if (in_array($billing_response['_message'], ['steam.login.invalid', 'steam.login.banned'])) {
         header('Content-Type: application/json');
         print json_encode(['result' => 1]);
         exit(0);
