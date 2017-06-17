@@ -98,22 +98,6 @@ CFG_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true, "Network address (/24) for 
 CFG_ADDR(publicIP, nullptr, "PUBLIC_IP", true, "The public IP of the mmhost. The chat IP will be just before this IP, and cell hosts will start one after it.");
 CFG_BOOL(oneProcessMode, "0", "ONE_PROCESS_MODE", false, "If enabled, it will not be a fatal error to fail to contact other hosts in the cluster.");
 
-#ifndef PN_DISABLE_AUTH
-CFG_ADDR(authHost, "auth.playnet.com", "AUTH_ADDRESS", true, "Host name or IP Address of the authentication server.");
-CFG_ADDR(authdbAddress, nullptr, "AUTH_DB", true, "Address of the MySQL server hosting the auth database.");
-CFG_STRING(authdbPort, "3306", "AUTH_DB_PORT", true, "Port of the Auth MySQL server if not default.");
-CFG_STRING(authdbPassword, "", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
-CFG_STRING(authdbSchema, "auth", "AUTH_DB_SCHEMA", true, "Schema to use for auth data.");
-CFG_STRING(authdbUser, "authuser", "AUTH_DB_USER", true, "Username when connecting to the auth database.");
-#else
-CFG_ADDR(authHost, nullptr, "AUTH_ADDRESS", false, "Host name or IP Address of the authentication server.");
-CFG_ADDR(authdbAddress, nullptr, "AUTH_DB", false, "Address of the MySQL server hosting the auth database.");
-CFG_STRING(authdbPort, nullptr, "AUTH_DB_PORT", false, "Port of the Auth MySQL server if not default.");
-CFG_STRING(authdbPassword, nullptr, "AUTH_DB_PASSWD", false, "Password to use for the auth database.");
-CFG_STRING(authdbSchema, nullptr, "AUTH_DB_SCHEMA", false, "Schema to use for auth data.");
-CFG_STRING(authdbUser, nullptr, "AUTH_DB_USER", false, "Username when connecting to the auth database.");
-#endif
-
 CFG_UINT(maxClusterUsers, "0", "MM_MAX_USERS", true, "Maxmimum number of players on the mmhost/cluster");
 CFG_UINT(maxCellPlayers, "1250", "MAX_PLAYERS", true, "Maximum number of players on this cell host.");
 CFG_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true, "Network address to use for private cell network or 0.0.0.0 to disable multiple cells (clustering).");
@@ -125,6 +109,22 @@ CFG_STRING(defaultInterface, "eth0", "DEFAULT_IFACE", true, "Name of the network
 #endif
 
 CFG_STRING(manageProcesses, nullptr, "MANAGE_PROCESSES", false, "Semi-colon separated list of processes this machine should run.");
+
+#ifndef PN_DISABLE_AUTH
+#define PN_AUTH_REQUIRED true
+#else
+#define PN_AUTH_REQUIRED false
+#endif
+
+CFG_ADDR(authHost, "auth.playnet.com", "AUTH_ADDRESS", PN_AUTH_REQUIRED, "Host name or IP Address of the authentication server.");
+CFG_ADDR(authdbAddress, nullptr, "AUTH_DB", PN_AUTH_REQUIRED, "Address of the MySQL server hosting the auth database.");
+CFG_STRING(authdbPort, "3306", "AUTH_DB_PORT", PN_AUTH_REQUIRED, "Port of the Auth MySQL server if not default.");
+CFG_STRING(authdbPassword, nullptr, "AUTH_DB_PASSWD", PN_AUTH_REQUIRED, "Password to use for the auth database.");
+CFG_STRING(authdbSchema, nullptr, "AUTH_DB_SCHEMA", PN_AUTH_REQUIRED, "Schema to use for auth data.");
+CFG_STRING(authdbUser, nullptr, "AUTH_DB_USER", PN_AUTH_REQUIRED, "Username when connecting to the auth database.");
+CFG_STRING(authRelayBillingEndpoint, nullptr, "AUTH_RELAY_BILLING_ENDPOINT", PN_AUTH_REQUIRED, "Endpoint for auth relay to connect with billing server");
+
+#undef PN_AUTH_REQUIRED
 
 //////////////////////////////////////////////////////////////////////////
 // Helper for creating ensuring a string is in native path style and

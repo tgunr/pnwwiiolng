@@ -3,6 +3,7 @@
 <Location "/v1/login">
     Alias "@CMAKE_INSTALL_PREFIX@/web/relay/authRelay.php"
     SetHandler application/x-httpd-php
+    SetEnv PN_INSTALL_PATH "@CMAKE_INSTALL_PREFIX@"
 </Location>
 <Directory "@CMAKE_INSTALL_PREFIX@/web/relay/">
     Require all denied

@@ -1,5 +1,9 @@
 <?php
 
+// Implementation note: Using die() is effectively an assertion failure. The user will get
+// no response from the server and the error will be visible in Apache's logs instead. It
+// means something's gone seriously wrong!
+
 if (PHP_VERSION_ID < 70100) {
     die("PHP 7.1 or higher is required.\n");
 }
@@ -10,7 +14,26 @@ if (!extension_loaded('curl')) {
     die("libcurl extension is required.\n");
 }
 
-$billing_login_endpoint = 'http://billing.playnet.com:9000';
+// Dirty evil trick: A cluster's environment.cfg can be parsed as an INI file if you hack
+// the # comments into ; comments.
+if (!isset($_SERVER['PN_INSTALL_PATH'])) {
+    die("Installation path configuration is required.\n");
+}
+$environment_cfg_path = realpath(implode(DIRECTORY_SEPARATOR,
+    [$_SERVER['PN_INSTALL_PATH'], 'wwiiol', 'bin', 'environment.cfg']
+));
+if (!is_string($environment_cfg_raw = @file_get_contents($environment_cfg_path))) {
+    die("Unable to read environment configuration.\n");
+}
+$environment_cfg_fixed = preg_replace('/^#/smu', ';', $environment_cfg_raw);
+if (!is_array($environment_cfg = parse_ini_string($environment_cfg_fixed, false, INI_SCANNER_RAW))) {
+    die("Unable to parse environment configuration.\n");
+}
+if (!isset($environment_cfg['AUTH_RELAY_BILLING_ENDPOINT'])) {
+    die("No billing relay endpoint found in environment configuration.\n");
+}
+
+$billing_login_endpoint = $environment_cfg['AUTH_RELAY_BILLING_ENDPOINT'];
 $billing_xmlrpc_method = 'steam.requestLogin';
 $auth_otp_endpoint = 'http://localhost:6081/v1/cluster/{arena_id}/dispatch';
 
