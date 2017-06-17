@@ -50,7 +50,7 @@ if (!is_string($steam_ticket) || !is_integer($arena_id) ||
 }
 
 $billing_request_data = [$steam_ticket, $arena_id];
-if (isset(callsign)) {
+if (isset($callsign)) {
     $billing_request_data[] = $callsign;
 }
 $billing_request = xmlrpc_encode_request($billing_xmlrpc_method, $billing_request_data);
@@ -73,10 +73,38 @@ $billing_response = xmlrpc_decode($billing_response_raw);
 if (is_null($billing_response) || $billing_response === false) {
     RESTfail(500, "Internal error -3");
 }
+if (xmlrpc_is_fault($billing_response)) {
+    RESTfail(500, "Internal error -4");
+}
+if (!isset($billing_response['_success']) || !is_integer($billing_response['_success'])) {
+    RESTfail(500, "Internal error -5");
+}
+if ($billing_response['_success'] === 0) {
+    if (!isset($billing_response['_message']) || !is_string($billing_response['_message'])) {
+        RESTfail(500, "Internal error -6");
+    }
+    // We recognize only a few specific errors
+    if ($billing_response['_message'] === 'steam.login.callsign_needed') {
+        header('Content-Type: application/json');
+        print json_encode(['result' => 2]);
+        exit(0);
+    } else if (in_array(['steam.login.invalid', 'steam.login.banned'], $billing_response['_message'])) {
+        header('Content-Type: application/json');
+        print json_encode(['result' => 1]);
+        exit(0);
+    } else {
+        RESTfail(500, "Internal error -7");
+    }
+} else {
+    if (!isset($billing_response['user_id']) || !is_integer($billing_response['user_id'])) {
+        RESTfail(500, "Internal error -8");
+    }
+}
+
 // Do billing XML-RPC here
 
 $auth_data = [
-    'user_id' => 0,
+    'user_id' => $billing_response['user_id'],
     'app_version' => $app_version,
     'app_platform' => $app_platform,
 ];
