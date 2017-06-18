@@ -282,8 +282,7 @@ public:
 	public:
 	void setLifespan(UINT32 lifespan)
 	{
-		if(lifespan >= 0)
-			m_lifespan = lifespan;
+        m_lifespan = lifespan;
 	}
 
 	//! Set whether this STO can be automatically removed.

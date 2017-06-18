@@ -19,7 +19,6 @@
 #include "launchApp.h"
 #include "wwii/wwiiUTF.h"
 #include "../WW2/src/auth/authAppIDs.h"
-#include "steam_api.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -75,9 +74,6 @@ BEGIN_MESSAGE_MAP(CPlaygateApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
-static const int STEAM_APP_ID = 251950;
-bool steamInitialized = false;
-
 // CPlaygateApp construction
 
 CPlaygateApp::CPlaygateApp()
@@ -132,8 +128,7 @@ _setInput(bool enable)
 static void
 _attemptConnection()
 {
-	if (loginData.m_steamAccountId == 0)
-		_setInput(false);
+	_setInput(false);
 
 	bool connected = false;
 	bool firstTime = true;
@@ -181,8 +176,7 @@ _attemptConnection()
 	}
 
 	// Ok, now you can start typing stuff.
-	if (loginData.m_steamAccountId == 0)
-		_setInput(true);
+	_setInput(true);
 }
 
 static DWORD WINAPI threadFunc(LPVOID dummyParam)
@@ -363,97 +357,69 @@ BOOL CPlaygateApp::InitInstance()
 		exit(0);
 	}
 
-#ifndef DEBUG_WW2
-	if (!SteamAPI_RestartAppIfNecessary(STEAM_APP_ID))
+
+	// If they've logged in before, recover the data.
+	loginData.Read();
+	// Make sure it's not just or something.
+	loginData.Validate();
+
+	pgState = PgTOS;
+
+	// Load the "region"s data.
+	dbugLog(_FLI, "Regions");
+	if ( !CRegionSelect::ReadRegionsFile() )
+		return FALSE;
+
+	// Show the Terms of Service file
+	// (%exepath%\\data\\playgate\\tos.rtf)
+	dbugLog(_FLI, "TOS");
+	if ( !_TosDialog() )
+		return FALSE;
+
+	pgState = PgRegionSelection;
+
+	// Prompt the user to select their region.
+	dbugLog(_FLI, "Regions follow-up");
+	if ( !RegionSelect() )
+		return FALSE;
+
+	// Update the region
+	const wchar_t* regionName = g_region.name().c_str();
+	if ( wcscmp(regionName, loginData.m_region) != 0 )
 	{
-#endif
-
-		// If they've logged in before, recover the data.
-		loginData.Read();
-		// Make sure it's not just or something.
-		loginData.Validate();
-
-		pgState = PgTOS;
-
-		// Load the "region"s data.
-		dbugLog(_FLI, "Regions");
-		if ( !CRegionSelect::ReadRegionsFile() )
-			return FALSE;
-
-		// Show the Terms of Service file
-		// (%exepath%\\data\\playgate\\tos.rtf)
-		dbugLog(_FLI, "TOS");
-		if ( !_TosDialog() )
-			return FALSE;
-
-		pgState = PgRegionSelection;
-
-		// Prompt the user to select their region.
-		dbugLog(_FLI, "Regions follow-up");
-		if ( !RegionSelect() )
-			return FALSE;
-
-		// Update the region
-		const wchar_t* regionName = g_region.name().c_str();
-		if ( wcscmp(regionName, loginData.m_region) != 0 )
-		{
-			// Arena will change
-			loginData.m_arenaID = 0;
-			wcsncpy_s(loginData.m_region, regionName, sizeof(loginData.m_region));
-			loginData.MarkForWrite();
-		}
-
-		// Verify access to the data directory.
-		if ( _tchdir(g_dataPath.c_str()) != 0 )
-		{
-			dbugLog(_FLA, "Unable to access datapath [%ls]", g_dataPath.c_str());
-			MessageBox(nullptr, GetLoc(ERROR_DATA_FOLDER, g_dataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
-			return FALSE;
-		}
-
-		hStatusMutex = CreateMutex(nullptr, FALSE, nullptr);
-		hExitMutex = CreateMutex(nullptr, TRUE, nullptr);
-		hApplicationMutex = CreateMutex(nullptr, TRUE, nullptr);
-
-		pgState = PgAuthentication;
-
-		DWORD threadId;
-		::CreateThread(nullptr, 0, threadFunc, nullptr,0, &threadId);
-
-		// let app close and restart if it must start through steam
-		if (SteamAPI_Init())
-		{
-			if (SteamApps()->BIsAppInstalled(STEAM_APP_ID))
-			{
-				loginData.m_steamAccountId = SteamApps()->GetAppOwner().GetAccountID();
-			}
-		}
-
-		if (loginData.m_steamAccountId == 0)
-		{
-			if (_Login())
-			{
-				loginData.MarkForWrite();
-
-				pgState = PgServerSelect;
-
-				if (_ServerSelect())
-					loginData.MarkForWrite();
-			}
-		}
-		else
-		{
-			pgState = PgAuthentication;
-			playgate.QueueLogonAttempt();
-
-			ReleaseMutex(hApplicationMutex);
-
-			_ServerSelect();
-		}
-
-#ifndef DEBUG_WW2
+		// Arena will change
+		loginData.m_arenaID = 0;
+		wcsncpy_s(loginData.m_region, regionName, sizeof(loginData.m_region));
+		loginData.MarkForWrite();
 	}
-#endif
+
+	// Verify access to the data directory.
+	if ( _tchdir(g_dataPath.c_str()) != 0 )
+	{
+		dbugLog(_FLA, "Unable to access datapath [%ls]", g_dataPath.c_str());
+		MessageBox(nullptr, GetLoc(ERROR_DATA_FOLDER, g_dataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		return FALSE;
+	}
+
+	hStatusMutex = CreateMutex(nullptr, FALSE, nullptr);
+	hExitMutex = CreateMutex(nullptr, TRUE, nullptr);
+	hApplicationMutex = CreateMutex(nullptr, TRUE, nullptr);
+
+	pgState = PgAuthentication;
+
+	DWORD threadId;
+	::CreateThread(nullptr, 0, threadFunc, nullptr,0, &threadId);
+
+	if (_Login())
+	{
+		loginData.MarkForWrite();
+
+		pgState = PgServerSelect;
+
+		if (_ServerSelect())
+			loginData.MarkForWrite();
+	}
+
 
 	pgState = PgFinished;
 

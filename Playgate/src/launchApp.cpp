@@ -45,7 +45,6 @@ static TEUL_CALLBACK*  _ArenaReq2;
 static TEUL_CALLBACK*  _LaunchReq;
 static TEUL_CALLBACK*  _GetGameList;
 static TEUL_CALLBACK*  _LoginXchg;
-static TEUL_CALLBACK*  _LoginSteamXchg;
 
 static APP_LAUNCH _AppLaunch;
 #ifndef IGNORE_REGISTRY
@@ -85,12 +84,6 @@ Auth::LoginRequest::send()
 	commSend(_LoginXchg, this);
 }
 
-void
-Auth::LoginSteamRequest::send()
-{
-	commSend(_LoginSteamXchg, this);
-}
-
 LOGICAL launchArenaRequest()
 {
 	ARENA_REQ ArenaRequest;
@@ -100,14 +93,8 @@ LOGICAL launchArenaRequest()
 	ArenaRequest.arenaID = loginData.m_arenaID;
 	ArenaRequest.sessionID = 0;
 	ArenaRequest.presenterVersion = g_playgateVersion;
-	ArenaRequest.steamID = loginData.m_steamAccountId;
-
-	// Username is stored as wide characters, convert to UTF8
-	if (loginData.m_steamAccountId == 0)
-	{
-		loginData.GetUsernameAsUTF8(ArenaRequest.username, sizeof(ArenaRequest.username));
-		loginData.GetPasswordMD5(ArenaRequest.password, MAX_PASSWORD);
-	}
+	loginData.GetUsernameAsUTF8(ArenaRequest.username, sizeof(ArenaRequest.username));
+	loginData.GetPasswordMD5(ArenaRequest.password, MAX_PASSWORD);
 
 	if ( commSend(_ArenaReq2, &ArenaRequest) < 0 )
 	{
@@ -139,13 +126,9 @@ SINT32         NumberOfInstances;
 UINT32         CurrentVer;
 #endif
 
-	if (loginData.m_steamAccountId == 0)
-	{
-		loginData.GetUsernameAsUTF8(LaunchRequest.username, sizeof(LaunchRequest.username));
-		loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password) - 1);
-	}
+	loginData.GetUsernameAsUTF8(LaunchRequest.username, sizeof(LaunchRequest.username));
+	loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password) - 1);
 
-	LaunchRequest.steamID = loginData.m_steamAccountId;
 	LaunchRequest.status = 0;
 	LaunchRequest.cdKeySize = 0;
 	LaunchRequest.arenaID = AppVerify->arenaID;
@@ -264,11 +247,6 @@ static SINT32 _SendLaunchReq(ACTION_OBJECT *a)
 static SINT32 _SendLoginRequest(ACTION_OBJECT* a)
 {
 	return ((Auth::LoginRequest*)a->localRawData)->packer(TEUL_PACK, a);
-}
-
-static SINT32 _SendLoginSteamRequest(ACTION_OBJECT* a)
-{
-	return ((Auth::LoginSteamRequest*)a->localRawData)->packer(TEUL_PACK, a);
 }
 
 static SINT32 _ReceiveAppLaunch(ACTION_OBJECT *Action)
@@ -401,9 +379,6 @@ extern SINT32 launchInstallCallbacks(void)
 		_LoginXchg = commInstallMessage(Auth::CallbackX, AUTH_XCHG_LOGIN_Y, _SendLoginRequest, _RecvLoginReply);
 		if ( nullptr == _LoginXchg )
 			throw 8;
-		_LoginSteamXchg = commInstallMessage(Auth::CallbackX, AUTH_XCHG_LOGIN_STEAM_Y, _SendLoginSteamRequest, _RecvLoginReply);
-		if (nullptr == _LoginSteamXchg)
-			throw 9;
 	}
 	catch ( int n )
 	{

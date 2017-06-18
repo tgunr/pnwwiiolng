@@ -19,9 +19,11 @@
 #include "auth/authPlaygateTypes.h"
 #include "auth/authGame.h"
 #include "auth/authHostMessages.h"
+#include "dbse/dbseHandle.h"
 #include "teul/teulAuth.h"
 #include "teul/teulClosingEnums.h"
 #include "include/infoHostMessages.h"
+#include "include/mydbQuery.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiThreads.h"
@@ -38,50 +40,6 @@
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
     #define DEF_ERR_FLAGS STD_ERR
-#endif
-
-// Support this version at least.
-#define COMPATABILITY_LEVEL 0x010120
-
-#define VERSION_ARENA_ID 26  	//arenaID that the version host connects with
-								//use this to look up gameEntry stuff for
-								//version updates
-
-#define PRESENTER_ARENA_ID 8  	//arenaID for the presenterHost, which is a dummy
-								//host for now that only runs so that we can
-								//get a version of presenter that the client
-								//should be running.  Of course, if you define
-								//HARDCODED_VERSIONS below, you don't need a
-								//presenterHost
-
-
-//if the following is defined, the authhost will not send an APP_LAUNCH
-//with the appID of the version updater when presenter or an appVersion
-//needs updating, but will look up a url based on the appID
-//and WEB_ERR type
-
-#define STRAIGHT_TO_WEB_DOWNLOAD
-#define REDIRECT_TOO_MANY_PLAYERS -2
-
-//if the following is defined, use these values to check if the following
-//apps are up-to-date or not, skip checking their gameEntries.
-//
-//This allows you to not have a presenterHost running.  You will still need a
-//versHost, though, unless you #define STRAIGHT_TO_WEB_DOWNLOAD above
-
-//#define HARDCODED_VERSIONS
-
-#ifdef HARDCODED_VERSIONS
-#define PRESENTER_VERSION   "0.1.0.3"
-#endif
-
-//define the following if you don't want a dispatch to be sent to the game
-//if the customerID that's passed is that of blitz, which is an acct used by
-//watcher to check a game's status
-#define NO_BLITZ_DISPATCH
-
-#ifdef NO_BLITZ_DISPATCH
-#define BLITZ_ID 17374
 #endif
 
 #define SECOND 1000
@@ -587,12 +545,6 @@ _updatePresenter(const SINT32 teulIndex, ARENA_REQ& request, UINT32 platform)
 static void
 _sendDispatch(Auth::Dispatch& dispatch, UINT32 otp, UINT32 clientIP, SINT32 teulIndex)
 {
-#ifdef NO_BLITZ_DISPATCH
-	if(dispatch.m_customerID == BLITZ_ID)
-		return; //don't actually send the dispatch, we were just checking to
-				//see if the game host was up
-#endif
-
 	dispatch.m_OTP = otp;
 	dispatch.m_clientIP = clientIP;
 
@@ -730,16 +682,14 @@ void authProcessArenaRequest(const SINT32 teulIndex, ARENA_REQ& request)
 
 static void _runHost()
 {
-	// Check queues once a second.
 	while ( _running )
 	{
 		teulUpdateTransport(25);
-        
 		threadsCallNextCallback();
 	}
 }
 
-static void _reloadAuthDBRequestHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
+static void _reloadAuthDBRequestHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, const Teul::uWeb::RESTAPIParams &params)
 {
     threadCallback([] (void *) {
         wwiiIRCChannelMessage("-sys,#servers", "++ Reloading Data ++");
@@ -750,6 +700,179 @@ static void _reloadAuthDBRequestHandler(const Teul::uWeb::HTTPRequest &request, 
         .status(200)
         .JSON("{\"status\":\"ok\"}")
         .build(response);
+}
+
+static void _otpErrorResponse(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, int httpStatus, const std::string &message)
+{
+    return Teul::uWeb::HTTPResponseBuilder(request)
+        .status(httpStatus)
+        .JSON(std::string("{\"error\":\"") + message + "\"}")
+        .build(response);
+}
+
+static GAME *_otpGetValidGame(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, arenaid_t arena_id, userid_t user_id, uint32_t app_version, uint32_t app_platform)
+{
+    GAME *game = _findGame(arena_id);
+    
+    if (!game) {
+        dbugLog(_FLW, "uWeb: a:%u c:%u v:%08x p:%u no game registered with requested arena ID", arena_id, user_id, app_version, app_platform);
+        _otpErrorResponse(request, response, 410, "No running arena");
+        return nullptr;
+    }
+    if (game->maxUsers == 0) {
+        dbugLog(_FLN, "uWeb: a:%u c:%u v:%08x p:%u game not currently accepting users", arena_id, user_id, app_version, app_platform);
+        _otpErrorResponse(request, response, 503, "Arena not open");
+        return nullptr;
+    }
+    if (game->currentUsers >= game->maxUsers) {
+        dbugLog(_FLN, "uWeb: a:%u c:%u v:%08x p:%u game too full for another user", arena_id, user_id, app_version, app_platform);
+        _otpErrorResponse(request, response, 503, "Arena full");
+        return nullptr;
+    }
+    if (app_version < game->appInfo[app_platform].min || app_version > game->appInfo[app_platform].max) {
+        dbugLog(_FLA, "uWeb: a:%u c:%u v:%08x p:%u client version too old for arena, how did this happen with a Steam user?", arena_id, user_id, app_version, app_platform);
+        _otpErrorResponse(request, response, 505, "You need an update");
+        return nullptr;
+    }
+    
+    return game;
+}
+
+static std::pair<playerid_t, std::string> _otpValidateUser(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response,
+                                                           arenaid_t arena_id, userid_t user_id, uint32_t app_version, uint32_t app_platform)
+{
+    playerid_t player_id = 0;
+    char callsign[14]; // 14 is the buffer size in an Auth::Dispatch. We're trying to get this done, not fix all the massive design problems.
+    
+    // Validate the account against the database. Refusing to trust
+    // billing's parameters implicitly prevents billing from getting ahead
+    // of its own sync operations.
+    try {
+        std::string callsignQueryStr = "SELECT playerid, callsign FROM `wwiionline`.`wwii_player` WHERE customerid=" + std::to_string(user_id);
+        DBQuery callsignQuery(dbh, callsignQueryStr.c_str());
+        
+        if (!callsignQuery.HasRows() || !callsignQuery.FetchRow()) {
+            dbugLog(_FLN, "uWeb: a:%u c:%u v:%08x p:%u no game database entry for user", arena_id, user_id, app_version, app_platform);
+            _otpErrorResponse(request, response, 404, "No such user");
+            return { 0, "" };
+        }
+        
+        player_id = callsignQuery.Row().NextUInt();
+        callsignQuery.Row().NextString(callsign);
+        if (callsign[0] == 0) {
+            dbugLog(_FLW, "uWeb: a:%u c:%u v:%08x p:%u no callsign for user!", arena_id, user_id, app_version, app_platform);
+            _otpErrorResponse(request, response, 404, "No such user");
+            return { 0, "" };
+        }
+        
+        // This weird combination of join conditions and group by clause
+        // allows us to more uniquely identify certain corner cases in DB
+        // inconsistency.
+        std::string accessQueryStr =
+            "SELECT SUM(IF(s.status='active',1,0)) AS access "
+            "FROM `auth`.`auth_subarenaassoc` a "
+            "LEFT JOIN `auth`.`auth_subscribed` s ON a.subscriptionid=s.subscriptionid "
+            "AND s.customerid=" + std::to_string(user_id) + " "
+            "WHERE a.arenaid=" + std::to_string(arena_id) + " "
+            "GROUP BY a.arenaid";
+        DBQuery accessQuery(dbh, accessQueryStr.c_str());
+        
+        if (!accessQuery.HasRows() || !accessQuery.FetchRow()) {
+            // This means the arena has no associated subscriptions at all, and no one can get into it.
+            dbugLog(_FLW, "uWeb: a:%u has no subscription associations, can not be entered by anyone!", arena_id);
+            _otpErrorResponse(request, response, 400, "Internal error");
+            return { 0, "" };
+        }
+        ABORT_IF_EX(accessQuery.Rows() > 1, "Multiple disjoint arena entries for arena %u!", arena_id); // This is patently impossible unless something is blown in the database.
+        if (accessQuery.Row().NextUInt() < 1) {
+            dbugLog(_FLN, "uWeb: a%u c:%s(%u) v:%08x p:%u user has no active subscriptions for arena, login denied", arena_id, callsign, user_id, app_version, app_platform);
+            _otpErrorResponse(request, response, 401, "No subscription");
+            return { 0, "" };
+        }
+    } catch (std::exception &e) {
+        // Client will receive connection reset error
+        LogAbort("Database error during user lookup for a:%u c:%u v:%08x p:%u - %s", arena_id, user_id, app_version, app_platform, e.what());
+    }
+    
+    return { player_id, callsign };
+}
+
+static void _otpDispatchRequestHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, const Teul::uWeb::RESTAPIParams &params)
+{
+    if (params.find("arena_id") == params.end() || !params["arena_id"].is_string() ||
+        params.find("user_id") == params.end() || !params["user_id"].is_number_unsigned() ||
+        params.find("app_version") == params.end() || !params["app_version"].is_number_unsigned() ||
+        params.find("app_platform") == params.end() || !params["app_platform"].is_number_unsigned())
+    {
+        dbugLog(_FLA, "uWeb: Received bad request (missing or invalid params) from relay - %s", params.dump().c_str());
+        return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
+    }
+    
+    std::string arena_id_raw = params["arena_id"];
+    
+#ifndef NDEBUG
+    // Do this extra check in debug only; it's wasted cycles in release
+    if (arena_id_raw.find_first_not_of("0123456789") != std::string::npos) {
+        dbugLog(_FLA, "uWeb: Received bad request (bad arena ID pull) from relay - %s", params.dump().c_str());
+        return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
+    }
+#endif
+    
+    arenaid_t arena_id = std::strtoul(arena_id_raw.c_str(), nullptr, 10);
+    userid_t user_id = params["user_id"];
+    uint32_t app_version = params["app_version"];
+    uint32_t app_platform = params["app_platform"];
+    
+    // Have to validate platform separately because it gets used as an index later
+    if (app_platform >= OS_MAX_PLAT) {
+        dbugLog(_FLA, "uWeb: Received bad platform value %u from relay", app_platform);
+        return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
+    }
+    
+    // Database operations must happen on the main thread. It's also not
+    // trustworthy to do any network I/O off the main thread with this setup, so
+    // pretty much everything this call does has to happen on the main thread,
+    // even though that's stupid.
+    threadCallbackSync<void>([&] () {
+        // Unfortunately, because this function is not thread-safe, even this
+        // trivial check has to wait for the main thread callback!
+        if (authdbGetArenaAlias(arena_id) == nullptr) {
+            // Note: Do not return the true error here to prevent easy iteration of arena IDs by hackers
+            dbugLog(_FLW, "uWeb: c:%u requested access to invalid arena %u", user_id, arena_id);
+            return _otpErrorResponse(request, response, 400, "Internal error");
+        }
+        
+        // Okay, is there a game on this arena? Repeats the checks from _processLaunchRequest()
+        GAME *game = _otpGetValidGame(request, response, arena_id, user_id, app_version, app_platform);
+        
+        if (!game) {
+            return; // the function already filled in any error response needed
+        }
+        
+        std::pair<playerid_t, std::string> data = _otpValidateUser(request, response, arena_id, user_id, app_version, app_platform);
+        
+        if (data.second.empty()) {
+            return; // the function already filled in any error response needed
+        }
+        
+        // Okay, access granted.
+        SERVER *server = _findOptimumServer(*game);
+        Auth::Dispatch dispatch;
+        
+        strsafecpy(dispatch.m_callsign, data.second.c_str());
+        dispatch.m_customerID = data.first; // THIS IS PLAYER ID DESPITE THE FIELD NAME!!!
+        dispatch.m_appVersion = app_version;
+        dispatch.m_platform = app_platform;
+        dispatch.m_OTP = authGetOTP();
+        dispatch.m_clientIP = 0; // Steam users have no accessible IP
+        
+        _sendDispatch(dispatch, dispatch.m_OTP, 0, server->teulIndex); // Send dispatch to cluster
+        
+        return Teul::uWeb::HTTPResponseBuilder(request)
+            .status(200)
+            .JSON(nlohmann::json{ { "otp", dispatch.m_OTP }, { "serverIP", server->extAddress }, { "serverPort", server->port } }.dump())
+            .build(response);
+    });
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -807,7 +930,11 @@ main(int argc, const char* argv[])
 
 	threadsEnable();
     
-    Teul::uWeb::s_debugServer.addVirtualFile("Database Reload", "/v0.1/reload/all", _reloadAuthDBRequestHandler);
+    static const Teul::uWeb::RESTAPIRouteList routes = {
+        { { "GET"  }, "/reload/all", _reloadAuthDBRequestHandler },
+        { { "POST" }, "/cluster/{arena_id}/dispatch", _otpDispatchRequestHandler },
+    };
+    Teul::uWeb::s_debugServer.addVirtualPrefix("v1 API", "/v1", std::bind(Teul::uWeb::RESTRouter, std::placeholders::_1, std::placeholders::_2, routes));
 
 	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
 
@@ -1204,16 +1331,8 @@ _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::Cli
 	}
 
 	// Fill in the dispatch
-	UINT32 error = WEB_ERR_NONE;
-    if (request.username[0] || request.steamID == 0)
-    {
-        error = authValidateUser(teulIndex, request, dispatch, cdata);
-    }
-    else
-    {
-        error = authValidateSteamUser(teulIndex, request, dispatch, cdata);
-    }
-
+	UINT32 error = authValidateUser(teulIndex, request, dispatch, cdata);
+	
 	if ( error != WEB_ERR_NONE )
 	{
 		_authValidateFailed(teulIndex, platform, ip, request, *gameEntry, reply, error);
@@ -1455,24 +1574,6 @@ struct GameListCache
 };
 
 //////////////////////////////////////////////////////////////////////
-// [Deprecated] Create a fake game list for alpha clients that don't
-// log in before requesting server status lists.
-
-#if COMPATABILITY_LEVEL >= 0x010120
-static void
-_initializeClientSubs(std::vector<UCHAR>& clientSubs)
-{
-	// List of the default game IDs we'll pretend we know about.
-	unsigned char defaultGameList[] = { 1, 22, 222 };
-	clientSubs.reserve(sizeof(defaultGameList));
-	for ( UINT32 i = 0; i < clientSubs.capacity(); ++i )
-	{
-		clientSubs.push_back(defaultGameList[i]);
-	}
-}
-#endif
-
-//////////////////////////////////////////////////////////////////////
 // Process a request to get a list of game servers available for the
 // given teulIndex. Contains legacy support for alpha 1.2.0s that
 // should be removed since this alpha was not made publicly
@@ -1484,16 +1585,6 @@ authGetGameList(const SINT32 teulIndex)
 	// Look to see if we have login data for this client.
 	Auth::ClientData* cdata = (Auth::ClientData*)teulGetPersonaData(teulIndex);
 
-#if COMPATABILITY_LEVEL >= 0x010120
-	// [Deprecated] Legacy for clients that didn't log in.
-	static std::vector<UCHAR> defaultClientSubs;
-	if ( defaultClientSubs.empty() )
-		_initializeClientSubs(defaultClientSubs);
-
-	// [Deprecated] If there is login data, use it otherwise use the
-	// statics.
-	const std::vector<UCHAR>& clientSubs = (cdata) ? cdata->m_subscribedArenaIDs : defaultClientSubs;
-#else
 	///TODO: Notify the client of this problem.
 	// No data until you are logged in.
 	if (cdata == NULL)
@@ -1501,9 +1592,8 @@ authGetGameList(const SINT32 teulIndex)
 		dbugLog(_FLW, "t:%d GetGameList with no cdata", teulIndex);
 		return NULL;
 	}
-	const std::vector<UCHAR>& clientSubs = data->m_subscribedArenaIDs;
-#endif
-
+	const std::vector<UCHAR>& clientSubs = cdata->m_subscribedArenaIDs;
+	
 	using CACHES = std::vector<GameListCache>;
 	static CACHES caches;
 
@@ -1580,50 +1670,6 @@ Auth::GameList::populate(const std::vector<UCHAR>& clientSubs)
 		}
 		m_games.push_back(entry);
 	}
-}
-
-SINT32
-Auth::LoginSteamRequest::process(const SINT32 teulIndex)
-{
-	Auth::ClientData* cdata = (Auth::ClientData*)teulGetPersonaData(teulIndex);
-	if (cdata != nullptr)
-	{
-		dbugLog(_FLA, "t:%d c:%s ignoring multiple login requests from client", teulIndex, cdata->m_username.c_str());
-		return -EINVAL;
-	}
-
-	// Get teul's information about this connection such as IP address etc.
-	const UINT32 destAddress = teulGetEndpointRemoteAddress(teulIndex);
-	dbugLog(_FLI, "t:%d auth login request plat:%u ip:%s ov:%u s:%u"
-					, teulIndex
-					, m_platform
-					, teulGetAddress(destAddress)
-					, 0
-					, m_account
-					);
-
-	cdata = new Auth::ClientData(teulIndex
-									, m_platform			// Windows/Mac?
-									, destAddress			// IP address
-									, 0						// oVersion
-									, m_account);	    	// steamID
-
-	// Translate this into a response:
-	WEB_ERR err = (WEB_ERR)validate(teulIndex, *cdata);
-	// Text
-	const char* code = _authenticationErrorString(err);
-	// Filter the playnet status out until you succeed
-	bool isPlaynet = (err == WEB_ERR_NONE) ? cdata->isPlaynet : false;
-
-	Auth::LoginReply response(isPlaynet, code);
-	response.send(teulIndex);
-
-	if ( err == WEB_ERR_NONE )
-		teulSetPersonaData(teulIndex, cdata);
-	else
-		delete cdata;
-
-	return 0;
 }
 
 SINT32

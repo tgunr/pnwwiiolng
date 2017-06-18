@@ -682,7 +682,7 @@ char GetOSBuild()
 	// Pull in the commandline arguments early so that builds
 	// which rely upon a DataPath being set will have it for
 	// use in cfgPrefsLoad(), and so OpenConsole is available now
-	if (!mngoptParse("")) {
+	if (!mngoptParse()) {
 		return 0;
 	}
 
@@ -820,7 +820,7 @@ char GetOSBuild()
 	// Command line options always override configuration file values
 	// But since we needed to parse these above also, the eaiest way
 	// around the chicken-and-egg problem is to just do this twice.
-	if (!mngoptParse(""))
+	if (!mngoptParse())
 	{
 		return(0);
 	}
