@@ -81,26 +81,19 @@ UINT32 trnTODGetTimeOfDay(UINT32 * TimeOfDay)
 {
 	// If we are spawned into a tutorial we do not want it to get dark
 	// so that noobs can easily see tutorial waypoints.
-
 	bool setTimeToMidday = false;
 
 	TutorialManager* tutManager = TutorialManager::GetInstance();
 	if (tutManager != nullptr)
-	{
 		setTimeToMidday = tutManager->getAreSpawnedIn();
-	}
 
 	if (TimeOfDay != nullptr)
 	{
 		if (setTimeToMidday)
-		{
 			// We force the time of day to always be midday.
-			*TimeOfDay = (UINT32)43200; // midday
-		}
+			*TimeOfDay = 44000; // Just slightly past noon (43200)
 		else
-		{
 			*TimeOfDay = _TimeOfDay;
-		}
 	}
 
 	return 0;

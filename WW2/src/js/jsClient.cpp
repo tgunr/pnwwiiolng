@@ -27,6 +27,7 @@
 #include "strt/strtFacilityWeaponList.h"
 #include "uimap/uiMap.h"
 #include "client/GameClient.h"
+#include "client/clientNetError.h"
 #include "ui/uiMain.h"
 #include "js/jsAuthHandler.h"
 #include "js/jsPosition.h"
@@ -241,7 +242,7 @@ JS_FUNCTION_DEF(jsClient, connecttoarena) {
 	try {
 		// HACK: We should pass in the auth info, but for now it's set semi-globally.
 		rnconnectToServer();
-	} catch ( std::exception& ) {
+	} catch ( ClientNetError& ) {
 		// TODO: Error message
 		*rval = BOOLEAN_TO_JSVAL(false);
 	}
