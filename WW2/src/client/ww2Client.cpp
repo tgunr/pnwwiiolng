@@ -255,7 +255,7 @@ struct ClientClassData
 };
 
 static int clientid;
-static bool clientconnected = false;
+static bool teulInitialized = false;
 static bool clientinited;
 
 static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
@@ -312,7 +312,7 @@ Client::Client()
 
 Client::~Client()
 {
-	if(clientconnected)
+	if(teulInitialized)
 	{
 		for(int i = 0; i < Teul::Connection::NumHostTypes; i++)
 		{
@@ -326,7 +326,7 @@ Client::~Client()
 
 			_classdata->connections[i] = nullptr;
 		}
-		clientconnected = false;
+		teulInitialized = false;
 	}
 
 	weapListClear(&_data->weapList);
@@ -2918,7 +2918,7 @@ void ww2::Client::SetKilledByAI(bool status)
 *************************************************************************************************/
 
 bool ww2::Client::InitTeul(void) {
-	if ( clientconnected )
+	if ( teulInitialized )
 		return true;
 
 #if !defined(NDEBUG) || defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
@@ -2941,13 +2941,13 @@ bool ww2::Client::InitTeul(void) {
 			Instance::InstallClientCallbacks();
 	}
 
-	clientconnected = err > -1;
-	return clientconnected;
+	teulInitialized = err > -1;
+	return teulInitialized;
 }
 
 int ww2::Client::Init(playerid_t playerID, UINT32 otp, unsigned int appVersion)
 {
-	if ( ! clientconnected ) return -1;
+	if ( ! teulInitialized ) return -1;
 	if(clientinited) return 0;
 
 	// update our default player info data
@@ -2966,7 +2966,7 @@ int ww2::Client::Init(playerid_t playerID, UINT32 otp, unsigned int appVersion)
 
 void ww2::Client::Kill()
 {
-	clientconnected = false;
+	teulInitialized = false;
 	clientinited = false;
 	teulCloseTransport();
 }
@@ -3049,7 +3049,7 @@ unsigned int ww2::Client::OICOfBrigade() const
 
 static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {
-	if(!clientconnected)
+	if(!teulInitialized)
 		return;
 
 	Client* client = Client::FromTeulIndex(teulIndex);

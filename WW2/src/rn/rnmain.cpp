@@ -446,6 +446,8 @@ LOGICAL rnmainInit()
 		return(FALSE);
 	}
 
+	GameClientInitTeul();
+
 	if ( rnhasServerInfo() ) {
 		try {
 			rnconnectToServer();
@@ -540,8 +542,6 @@ LOGICAL rnmainInit()
 	piReleaseTextureHandles();
 
 	_ViewScaleFactor = _WORLD_VIEW_SCALE_FACTOR;
-
-	GameClientInitTeul();
 
 	uiPostInit();
 	rnloadRootWindow();
