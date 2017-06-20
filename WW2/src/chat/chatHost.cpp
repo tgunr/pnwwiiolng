@@ -95,6 +95,8 @@
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiPPOLoader.h"
 
+using Chat::ARGV;
+
 extern UINT32 serverGetAuthIP();
 
 extern SINT32 serverBroadcastClusterShutdown();

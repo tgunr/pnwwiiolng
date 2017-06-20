@@ -146,6 +146,10 @@ IF ( PN_DEV_BUILD )
     ADD_DEFINITIONS( "-DDEV_BUILD" )
 ENDIF()
 
+IF ( PN_BETA_RELEASE )
+    ADD_DEFINITIONS( "-DBETA_RELEASE" )
+ENDIF()
+
 ####################################
 ## Status output
 MESSAGE( STATUS "${CMAKE_BUILD_TYPE} build, ${BUILD_BITNESS}-bit." )
