@@ -458,7 +458,7 @@ void AuthConnection::PollArenas(void) {
 
 void AuthConnection::SelectArena(const Auth::GameEntry& entry) {
 	dbugLog(_FLI, "Requesting to join arena %d", entry.m_arenaID);
-	ARENA_REQ req{entry.m_arenaID, 0, false, presenter_version, 0, steam_id};
+	ARENA_REQ req{entry.m_arenaID, 0, false, presenter_version, 0};
 	strlcpy(req.username, login_info.username.c_str(), array_size(req.username));
 	//req.password ? unused on auth
 	if ( teulSend(teul_index, _ArenaReq2, &req) < 0 ) {
