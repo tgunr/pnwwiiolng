@@ -95,8 +95,6 @@
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiPPOLoader.h"
 
-using Chat::ARGV;
-
 extern UINT32 serverGetAuthIP();
 
 extern SINT32 serverBroadcastClusterShutdown();
@@ -668,7 +666,7 @@ public:
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
-		ARGV args;
+		Chat::ARGV args;
 		if ( vectorize(arguments, args, 2) < 1 )
 		{
 			help(player);
