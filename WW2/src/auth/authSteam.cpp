@@ -85,7 +85,7 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
                 dbugLog(_FLD, "Server returned JSON with no or invalid arena ID with URL %s content %s", request.url.c_str(), response.content.c_str());
                 return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
             }
-            if (responseJson.find("otp") == responseJson.end() || !responseJson["otp"].is_number_unsigned()) {
+            if (responseJson.find("otp") == responseJson.end()) { //|| !responseJson["otp"].is_number_unsigned()) {
                 // TODO: Better error handling
                 dbugLog(_FLD, "Server returned JSON with no or invalid OTP with URL %s content %s", request.url.c_str(), response.content.c_str());
                 return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
@@ -102,7 +102,7 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
             }
             
             int32_t resultArenaID = responseJson["arenaID"];
-            uint32_t resultOTP = responseJson["otp"];
+            uint32_t resultOTP = std::stoul(responseJson["otp"].get<std::string>());
             uint32_t resultServerIP = std::stoul(responseJson["serverIP"].get<std::string>());
             uint32_t resultServerPort = responseJson["serverPort"];
 
