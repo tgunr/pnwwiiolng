@@ -150,9 +150,9 @@ if (($auth_response_code = curl_getinfo($auth_handle, CURLINFO_HTTP_CODE)) !== 2
 if (!is_object($auth_response = @json_decode($auth_response_raw, false, 512, JSON_BIGINT_AS_STRING))) {
     RESTfail(500, "Internal error 3");
 }
-if (!isset($auth_response->otp) || !is_integer($auth_response->otp) ||
-    !isset($auth_response->serverIP) || !is_integer($auth_response->serverIP) ||
-    !isset($auth_response->serverPort) || !is_integer($auth_response->serverPort))
+if (!isset($auth_response->otp) || // !is_integer($auth_response->otp) ||
+    !isset($auth_response->serverIP) || // !is_integer($auth_response->serverIP) ||
+    !isset($auth_response->serverPort)) // || !is_integer($auth_response->serverPort))
 {
     RESTfail(500, "Internal error 4");
 }
@@ -161,8 +161,8 @@ header('Content-Type: application/json');
 print json_encode([
     'result' => 0,
     'arenaID' => $arena_id,
-    'otp' => $auth_response->otp,
-    'serverIP' => $auth_response->serverIP,
+    'otp' => strval($auth_response->otp),
+    'serverIP' => strval($auth_response->serverIP),
     'serverPort' => $auth_response->serverPort,
 ]);
 
