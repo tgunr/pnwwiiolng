@@ -269,19 +269,6 @@ JS_FUNCTION_DEF(jsGame, bailout)
 	return JS_TRUE;
 }
 
-char* jsGame::basicTrainingIncomplete(char *viewname)
-{
-    bool basicTrainingComplete = TUT_MGR->IsComplete("basic", 0);
-    std::string compareString(viewname);
-    bool compareStringBool = compareString.compare("confirm") == 0;
-    
-    if(compareStringBool && !basicTrainingComplete)
-    {
-        // conditions exist for an ok box instead.
-        return "ok";
-    }
-    return viewname;
-}
 
 /************************************************************************************************
 	load
@@ -290,10 +277,7 @@ char* jsGame::basicTrainingIncomplete(char *viewname)
 JS_FUNCTION_DEF(jsGame,load)
 {
     
-    char* loadviewname = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
-    loadviewname = jsGame::basicTrainingIncomplete(loadviewname);
-    
-	phui::View* view = uiLoadView(loadviewname);
+	phui::View* view = uiLoadView(JS_GetStringBytes(JS_ValueToString(ctx, argv[0])));
 
 	if(view)
 	{
