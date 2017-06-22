@@ -1316,7 +1316,7 @@ BrigadeControlRequest::processRequest(SINT32 teulIndex)
 		case REQ_INVALID:
         default:
 			PLAYER_LOGA("invalid bcr action: %u", m_action);
-			throw _ERROR;
+			throw BCERR_INVALID_REQ;
 		}
 
 		dbugLog(_FLI, "t:%d p:%u c:%s hcu:(%u) action:%s(%u) completed"
