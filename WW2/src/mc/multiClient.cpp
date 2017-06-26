@@ -449,58 +449,37 @@ static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 		return -1;
 	}
 
-	//write notification out to stdout
-//	printf("%d: after selectpersona \n", clientIndex);
-
-
 	// now let's spawn
-	client->RequestDirectSpawn(spec);
-
 	client->ClearWaits();
 	client->SetWait(ww2::Client::SPAWN_NOTIFY_WAIT);
 	client->SetWait(ww2::Client::CELL_CLIENT_WAIT);
-//	client->SetWait(ww2::Client::REDIRECT_WAIT);
+	//client->SetWait(ww2::Client::REDIRECT_WAIT);
+
+	client->RequestDirectSpawn(spec);
 
 	if (client->WaitForMessages(10) != 0)
 	{
 		uiChatPrintLine("%d: spawn request timeout!", clientIndex);
-		// pop us off the queue
-		_cmdQueue.pop_front();
 		return -1;
 	}
-
-	//write notification out to stdout
-//	printf("%d: after WaitForMessages \n", clientIndex);
 
 
 	//Testing - use the same method for vehicle as persona above
 	client->ClearWaits();
 	client->SetWait(ww2::Client::VEHICLE_REPLY_WAIT);
-
 	client->RequestVehicleJoin(client->SpawnNotify().weaponSerial,0);
 
-
-	//write notification out to stdout
-//	printf("%d: after RequestVehicleJoin \n", clientIndex);
-
-
-//	if(client->WaitForMessage(ww2::Client::VEHICLE_REPLY_WAIT, 5) != 0)
 	if (client->WaitForMessages(5) != 0)
 	{
 		uiChatPrintLine("%d: vehicle join request timeout!", clientIndex);
 		return -1;
 	}
 
-//	printf("%d: vehicle join request Completed\n", clientIndex);
-
 	//Update the distance from the pos command by each new client
 	//client->MoveTo(_startx + clientIndex*10, _starty, _startz);
 	client->MoveTo(_startx + clientIndex * 1.50, _starty, _startz);
 
 	uiChatPrintLine("%d: spawned", clientIndex);
-
-	//write notification out to stdout
-//	printf("client %d spawned \n", clientIndex);
 
 	return 0;
 }
