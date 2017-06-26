@@ -449,7 +449,7 @@ static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 		return -1;
 	}
 
-	// now let's spawn
+
 	client->ClearWaits();
 	client->SetWait(ww2::Client::SPAWN_NOTIFY_WAIT);
 	client->SetWait(ww2::Client::CELL_CLIENT_WAIT);
@@ -464,7 +464,6 @@ static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 	}
 
 
-	//Testing - use the same method for vehicle as persona above
 	client->ClearWaits();
 	client->SetWait(ww2::Client::VEHICLE_REPLY_WAIT);
 	client->RequestVehicleJoin(client->SpawnNotify().weaponSerial,0);
@@ -474,6 +473,7 @@ static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 		uiChatPrintLine("%d: vehicle join request timeout!", clientIndex);
 		return -1;
 	}
+
 
 	//Update the distance from the pos command by each new client
 	//client->MoveTo(_startx + clientIndex*10, _starty, _startz);
