@@ -1039,36 +1039,36 @@ static SINT32 dot_graduate(const char* line)
 	// set it if specified
 	if(argc > 0)
 	{
-		if(!stricmp(group, "true") || !stricmp(group, "false"))
+		if(!stricmp(group, "true"))
 		{
-			bool complete = (!stricmp(group, "true")) ? true: false;
-			const char* groups[] = { "basic", "infantry", "armor", "fighter" };
+			const char* groups[] = { "infantry", "armor", "fighter" };
 
-			for(int i = 0; i < 4; i++)
+			for(int i = 0; i < 3; i++)
 			{
-				TUT_MGR->SetComplete(groups[i], -1, complete);
+				TUT_MGR->SetComplete(groups[i], -1, true);
 			}
 
-			uiChatPrintLine("Set all tutorial groups to: %s", (complete) ? "complete": "incomplete");
+			uiChatPrintLine("Basic training is compulsory, all other tutorial groups have been set to complete.");
 		}
+        else if (!stricmp(group, "false"))
+        {
+            const char* groups[] = { "basic", "infantry", "armor", "fighter" };
+
+            for (int i = 0; i < 4; i++)
+            {
+                TUT_MGR->SetComplete(groups[i], -1, false);
+            }
+
+            uiChatPrintLine("Set all tutorial groups to incomplete");
+        }
 		else
 		{
-			int check		= (flag >= 0 && flag < 64) ? flag: 0;
-			bool complete	= TUT_MGR->IsComplete(group, check);
-
-			// toggle it
-			TUT_MGR->SetComplete(group, flag, !complete);
-
-			// check it again
-			complete = TUT_MGR->IsComplete(group, check);
-
-			// print it
-			uiChatPrintLine("%s.%d: %s", group, check, (complete) ? "complete": "incomplete");
+            uiChatPrintLine("We no longer allow you to set individual tutorials to complete/incomplete.");
 		}
 	}
 	else
 	{
-		uiChatPrintLine("You must specify a valid group name.");
+		uiChatPrintLine("You must specify true or false.");
 	}
 
 	return DC_HANDLED;
