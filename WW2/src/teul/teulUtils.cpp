@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides support utilities used in
 // the teul API. The end-user developer
 // should not need the functions provided here.
@@ -58,7 +58,7 @@ teulSyncClock()
 	TeulTimeMS newTimeMS = duration_cast<milliseconds>(now.time_since_epoch()).count();
 #if platBuild == BUILD_SERVER
 	if ( PN_UNLIKELY(newTimeMS < teulClock64) )
-		LogAbort("Time went backwards: %" PR64BitUT " -> %" PR64BitUT "", teulClock64, newTimeMS);
+		dbugLog(_FLW, "Time went backwards: %" PR64BitUT " -> %" PR64BitUT "", teulClock64, newTimeMS);
 #endif
 	// avoid calculations when called many times a millisecond
 	if ( newTimeMS > teulClock64 ) {

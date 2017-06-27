@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Tue Sep  6 20:21:53 CDT 2005
 //
 // Functions for the chatMissionMember.cpp class

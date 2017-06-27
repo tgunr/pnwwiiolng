@@ -78,8 +78,8 @@ public:
 protected:
 	UINT32			m_squadID;					// Squad's ID
 	ChatHandle		m_shortHandle;				// short name packed
-	ChatHandle		m_creatorHandle;			// guy who owns the squad now
-	ChatHandle		m_coHandle;					// guy who owns the squad now
+	ChatHandle		m_creatorHandle;			// player who owns the squad now
+	ChatHandle		m_coHandle;					// player who owns the squad now
 	ChatHandle		m_lastJoiner;
 	UINT32			m_flags;
 	UINT32			m_created;					// date/time of creation

@@ -195,7 +195,7 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(BinOutDir)</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(IntOutDir)</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">false</LinkIncremental>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)\Include;$(SolutionDir)\WW2\include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(SolutionDir)\WW2\include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(SolutionDir)\WW2\lib\win\Debug\3rdParty;$(SolutionDir)\build\client\$(Configuration)\Lib;$(LibraryPath)</LibraryPath>
     <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</IgnoreImportLibrary>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</EnableManagedIncrementalBuild>
@@ -207,20 +207,20 @@
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">false</EnableManagedIncrementalBuild>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</EnableManagedIncrementalBuild>
     <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</EnableManagedIncrementalBuild>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <IncludePath Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(SolutionDir)Libraries\json\src;$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(SolutionDir)\WW2\lib\win\Release\3rdParty;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(SolutionDir)\WW2\lib\win\Release\3rdParty;$(SolutionDir)\build\client\Release\Lib;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(LibraryPath)</LibraryPath>
-    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(SolutionDir)\WW2\lib\win\Release\3rdParty;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(SolutionDir)\WW2\lib\win\Release\3rdParty;$(LibraryPath)</LibraryPath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(SolutionDir)\Libraries\breakpad\src\client\windows\Release\lib;$(DXSDK_DIR)\Lib\x86;$(SolutionDir)Libraries\SteamSDK\redistributable_bin;$(LibraryPath)</LibraryPath>
     <CustomBuildBeforeTargets Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -414,7 +414,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src;$(SolutionDir)Libraries\libxml2\include;$(SolutionDir)Libraries\imap\include;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)Libraries\SteamSDK\public\steam</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src;$(SolutionDir)Libraries\libxml2\include;$(SolutionDir)Libraries\imap\include;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;$(SolutionDir)Libraries\SteamSDK\public\steam</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>platBuild=BUILD_CLIENT;platOS=OS_WIN32;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;WIN32;_WINDOWS;GLEW_STATIC;ODE_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;BUILDING_GRANNY_STATIC;XAUDIO=1;FTGL_LIBRARY_STATIC;CRASH_HANDLER;RELEASE_CLIENT=1;NDEBUG;GM_RELEASE;BETA_RELEASE;VEHICLES_GAME_INFO;ALPHA_RELEASE;EVENT_LOG%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -493,7 +493,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src;$(SolutionDir)Libraries\libxml2\include;$(SolutionDir)Libraries\imap\include;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)Libraries\SteamSDK\public\steam</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)WW2\src\include;$(SolutionDir)WW2\proj;$(SolutionDir)WW2\proj\win;$(SolutionDir)WW2\src\sys;$(SolutionDir)WW2\src;$(SolutionDir)WW2\src\dd;$(SolutionDir)WW2\src\di;$(SolutionDir)WW2\src\mem;$(SolutionDir)Libraries\phui\include;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\opende\include;$(SolutionDir)Libraries\ftgl\src;$(SolutionDir)Libraries\freetype\include;$(SolutionDir)Libraries\phui\include\js;$(SolutionDir)WW2\include\lua;$(SolutionDir)WW2\include;$(SolutionDir)Libraries\;$(SolutionDir)Libraries\tolua++\include;$(SolutionDir)Libraries\libb64\libb64-1.2\include;$(SolutionDir)Libraries\breakpad\src;$(SolutionDir)Libraries\libxml2\include;$(SolutionDir)Libraries\imap\include;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)Libraries\SteamSDK\public\steam;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>platBuild=BUILD_CLIENT;MULTI_CLIENT=1;GM_RELEASE;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -942,6 +942,8 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\auth\authPack.h" />
+    <ClInclude Include="..\..\src\auth\authSteam.h" />
     <ClInclude Include="..\..\src\cfg\cfgCodes.h" />
     <ClInclude Include="..\..\src\cfg\cfgData.h" />
     <ClInclude Include="..\..\src\cfg\cfgLoad.h" />
@@ -1072,6 +1074,7 @@
     <ClInclude Include="..\..\src\include\systypes.h" />
     <ClInclude Include="..\..\src\include\unique_opaque_ptr.hpp" />
     <ClInclude Include="..\..\src\inst\instAction.h" />
+    <ClInclude Include="..\..\src\js\jsAuthHandler.h" />
     <ClInclude Include="..\..\src\maptools\GenerateIcons.h" />
     <ClInclude Include="..\..\src\map\mapSupercellVislevelXfer.h" />
     <ClInclude Include="..\..\src\math\SuperFastHash.h" />
@@ -1080,6 +1083,7 @@
     <ClInclude Include="..\..\src\omg\omgMissionSortieData.hxx" />
     <ClInclude Include="..\..\src\physics\HeightField.h" />
     <ClInclude Include="..\..\src\sys\sysmainHackNonsense.h" />
+    <ClInclude Include="..\..\src\sys\sysSteam.h" />
     <ClInclude Include="..\..\src\teul\teulKit.h" />
     <ClInclude Include="..\..\src\teul\teulNetworkArray.h" />
     <ClInclude Include="..\..\src\teul\teulNetworkMsg.h" />
@@ -1432,6 +1436,8 @@
     <ClInclude Include="..\versionNo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\auth\authPack.cpp" />
+    <ClCompile Include="..\..\src\auth\authSteam.cpp" />
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='AlphaRelease|Win32'">Create</PrecompiledHeader>
@@ -1460,6 +1466,7 @@
     <ClCompile Include="..\..\src\chat\chatWho.cpp" />
     <ClCompile Include="..\..\src\client\client.cpp" />
     <ClCompile Include="..\..\src\client\clientBrigadeControl.cpp" />
+    <ClCompile Include="..\..\src\client\clientConnections.cpp" />
     <ClCompile Include="..\..\src\client\clientGlobals.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">
       </PrecompiledHeader>
@@ -1581,6 +1588,7 @@
     <ClCompile Include="..\..\src\imap\imapLua.cpp" />
     <ClCompile Include="..\..\src\imap\ww2func.cpp" />
     <ClCompile Include="..\..\src\imap\ww2imap.cpp" />
+    <ClCompile Include="..\..\src\js\jsAuthHandler.cpp" />
     <ClCompile Include="..\..\src\js\jsClient.cpp" />
     <ClCompile Include="..\..\src\js\jsContent.cpp" />
     <ClCompile Include="..\..\src\js\jsGame.cpp" />
@@ -1853,6 +1861,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\src\sys\sysreg.cpp" />
+    <ClCompile Include="..\..\src\sys\sysSteam.cpp" />
     <ClCompile Include="..\..\src\sys\systhreadwin.cpp" />
     <ClCompile Include="..\..\SRC\tools\TangentSpaceGenerator.cpp" />
     <ClCompile Include="..\..\src\trn\LensFlare.cpp" />

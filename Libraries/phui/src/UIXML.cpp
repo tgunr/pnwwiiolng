@@ -138,6 +138,9 @@ using namespace phui;
 #define UIXML_MAXWIDTH_FIELD 		"maxwidth"
 #define UIXML_MAXHEIGHT_FIELD 		"maxheight"
 #define UIXML_HISTORY_FIELD 		"history"
+#define UIXML_OBSCURE_FIELD			"obscure"
+#define UIXML_FAKELENGTH_FIELD		"fakelength"
+#define UIXML_MAINTAINFAKE_FIELD	"maintainfake"
 #define UIXML_FONTSHADOWX_FIELD 	"fontshadowx" // for text drawing views
 #define UIXML_FONTSHADOWY_FIELD 	"fontshadowy" // for text drawing views
 #define UIXML_MODAL_FIELD 			"modal"			// for cursor show/hide
@@ -2119,6 +2122,30 @@ static View* create_textcontrol(xmlNodePtr node, View* parent)
 		if(tc)
             tc->SetHistorySize(atoi((char*)val));
 		
+		xmlFree(val);
+	}
+
+	val = xmlGetProp(node, (xmlChar*)UIXML_OBSCURE_FIELD);
+	if ( val ) {
+		TextControl* tc = dynamic_cast<TextControl*>(v);
+		if ( tc )
+			tc->SetObscure(!strcmp((char*)val,"true") ? true : false);
+		xmlFree(val);
+	}
+
+	val = xmlGetProp(node, (xmlChar*)UIXML_FAKELENGTH_FIELD);
+	if ( val ) {
+		TextControl* tc = dynamic_cast<TextControl*>(v);
+		if ( tc )
+			tc->SetFakeLength(atoi((char*)val));
+		xmlFree(val);
+	}
+
+	val = xmlGetProp(node, (xmlChar*)UIXML_MAINTAINFAKE_FIELD);
+	if ( val ) {
+		TextControl* tc = dynamic_cast<TextControl*>(v);
+		if ( tc )
+			tc->SetMaintainFake(!strcmp((char*)val, "true") ? true : false);
 		xmlFree(val);
 	}
 

@@ -353,7 +353,7 @@ chatSquadAcceptCreateInvite(Player* acceptor, Player* creator)
 	SquadControl& control = request.control;
 
 	// Am I in the list of people being requested?
-	// or has the guy started a new request to which I'm not an invitee
+	// or has the player started a new request to which I'm not an invitee
 	// in which case letting me vote would be bad.
 	if ( find(control.m_players.begin(), control.m_players.end(), acceptor->matchHandle()) == control.m_players.end() )
 	{

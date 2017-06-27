@@ -1,10 +1,9 @@
-#ifndef PN_SYSMAC_SYSMACCOMPAT_H
-#define PN_SYSMAC_SYSMACCOMPAT_H 1
+#pragma once
 
 #include <sys/types.h>
 #include <wchar.h>
 
-#include "include/sysTypes.h"
+#include "include/systypes.h"
 
 using DWORD = UINT32;
 
@@ -47,9 +46,9 @@ extern void PostModalErrorDialog(const char *title, const char *message);
 
 extern void chAppDir();
 extern const char *macPreferencesPath();
+extern const char *macDocumentsPath();
 
-extern void SetCommandLine(int argc, const char** argv);
-extern const char *GetCommandLine();
+extern const char *GetCommandLineA();
 
 extern UINT64 GetMicroSeconds();
 extern UINT64 GetMillisecondTick();
@@ -63,5 +62,3 @@ extern char GetOSBuild();
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PN_SYSMAC_SYSMACCOMPAT_H

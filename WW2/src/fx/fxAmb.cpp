@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: fxAmb.cpp
 // Description: Handles ambient sounds. These sounds are played continuously,

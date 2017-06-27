@@ -12,6 +12,7 @@ class FTFontAdaptor
 {
 public:
     FTFontAdaptor() {}
+    virtual ~FTFontAdaptor();
     virtual float Advance(const char* str)=0;
     virtual float Advance(const wchar_t* str)=0;
     virtual void Render(const wchar_t* str)=0;
@@ -135,7 +136,7 @@ private:
     unsigned int mSize;
     float fontScale;
     float scaledBaseline;
-    GLint imageUnits; // 4 is the minimum of any card we support
+    int32_t imageUnits; // 4 is the minimum of any card we support
     
     ScaledCharDataMap scaledChars;
 };

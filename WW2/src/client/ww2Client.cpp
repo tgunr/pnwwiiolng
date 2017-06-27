@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "cfg/cfgPrefs.h"
 #include "chat/chatClientMessages.h"
@@ -255,6 +255,7 @@ struct ClientClassData
 };
 
 static int clientid;
+static bool teulInitialized = false;
 static bool clientinited;
 
 static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
@@ -311,7 +312,7 @@ Client::Client()
 
 Client::~Client()
 {
-	if(clientinited)
+	if(teulInitialized)
 	{
 		for(int i = 0; i < Teul::Connection::NumHostTypes; i++)
 		{
@@ -325,6 +326,7 @@ Client::~Client()
 
 			_classdata->connections[i] = nullptr;
 		}
+		teulInitialized = false;
 	}
 
 	weapListClear(&_data->weapList);
@@ -571,7 +573,11 @@ int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 	Teul::PlayerIdent& ident	= _classdata->playerIdent;
 
 	ClientHostConnection* conn = new ClientHostConnection(Teul::Connection::Map, server, ident, 30*1000);
-	conn->start(this);
+	if (!conn->start(this))
+	{
+		dbugLog(_FLI, "Failed to start host connection");
+		throw ClientNetError("connect.login.auth.failed");
+	}
 
 	StatusMessage("loading.network.loggingin");
 
@@ -2392,8 +2398,9 @@ static void weapListClear(FacilityWeaponList* weapList)
 
 bool Client::CellClientActive() const
 {
-	//return _data->cellClientActive;
-	return false; //CellState()->Connected();
+	//return false;		//CellState->Connected();
+	//Check to see if we are connected to a cell
+	return _classdata->connections[Teul::Connection::Cell]->Connected();
 }
 
 bool Client::MapClientActive() const
@@ -2910,16 +2917,38 @@ void ww2::Client::SetKilledByAI(bool status)
 	Init
 *************************************************************************************************/
 
-int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
-{
-	char dbugFileName[21];
-	if(clientinited) return 0;
+bool ww2::Client::InitTeul(void) {
+	if ( teulInitialized )
+		return true;
 
-#if defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
+#if !defined(NDEBUG) || defined(CONNECTION_TEST_BUILD) || defined(ALPHA_RELEASE)
 	static const LogMode DBUGLOG_MODE = LogMode::TO_FILE;
 #else
 	static const LogMode DBUGLOG_MODE = LogMode::OFF;
 #endif
+
+	char dbugFileName[21];
+	strprintf(dbugFileName, "wwiiClient");
+	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
+	if ( err > -1 ) {
+		err = commInstallClientCallbacks() 	|
+			chatInstallClientCallbacks()	|
+			strtInstallClientCallbacks() 	|
+			mapInstallClientCallbacks()		|
+			missionInstallCallbacks()		|
+			mmClientInstallCallbacks()		|
+			wwiiClientInstallCallbacks()	|
+			Instance::InstallClientCallbacks();
+	}
+
+	teulInitialized = err > -1;
+	return teulInitialized;
+}
+
+int ww2::Client::Init(playerid_t playerID, UINT32 otp, unsigned int appVersion)
+{
+	if ( ! teulInitialized ) return -1;
+	if(clientinited) return 0;
 
 	// update our default player info data
 	_defaultPlayerIdent.m_playerID		= playerID;
@@ -2930,29 +2959,14 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	// go ahead and set the player ident info in it just to make sure
 	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
 
-	strprintf(dbugFileName, "wwiiClient.%u", playerID);
-	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
+	clientinited = true;
 
-	if(err > -1)
-	{
-		err = 	commInstallClientCallbacks() 	|
-				chatInstallClientCallbacks()	|
-				strtInstallClientCallbacks() 	|
-				mapInstallClientCallbacks()		|
-				missionInstallCallbacks()		|
-				mmClientInstallCallbacks()		|
-				wwiiClientInstallCallbacks()	|
-				Instance::InstallClientCallbacks();
-	}
-
-	if(err == 0)
-		clientinited = true;
-
-	return err;
+	return 0;
 }
 
 void ww2::Client::Kill()
 {
+	teulInitialized = false;
 	clientinited = false;
 	teulCloseTransport();
 }
@@ -2965,7 +2979,7 @@ void ww2::Client::Kill()
 
 void ww2::Client::NetUpdate(int /*wait*/)
 {
-	if(clientinited)
+	if(Teul::IsTransportInited())
 	{
 		teulUpdateTransport();
 		Teul::Connection::expire();
@@ -3035,7 +3049,7 @@ unsigned int ww2::Client::OICOfBrigade() const
 
 static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {
-	if(!clientinited)
+	if(!teulInitialized)
 		return;
 
 	Client* client = Client::FromTeulIndex(teulIndex);
@@ -3144,30 +3158,53 @@ int Client::GetWait(MSG_WAIT msg)
 	return _data->waitmsg[msg];
 }
 
+
+/**
+ * Check for messages against a bit mask. Set different fields in the bit mask to test for different conditions
+*/
 int Client::WaitForMessages(int timeout)
 {
-	TeulTimeMS endtime = teulClock64 + (unsigned int)timeout * 1000;
+	//set an end time
+	TeulTimeMS endtime = teulClock64 + (unsigned int)timeout * 1000;		// 1000;
 
+	//initialize the bit mask - using ints here
 	int waits[MAX_MSG_WAIT];
 	memcpy(waits,_data->waitmsg,sizeof(waits));
 
+	//From now until the end
 	for(;teulClock64 < endtime;)
 	{
+		//check for current status
 		NetUpdate();
 
 		bool done = true;
 		for(int i = 0; i < MAX_MSG_WAIT; i++)
 		{
-			if(waits[i] && _data->waitmsg[i] != 0)
+			if((waits[i] && _data->waitmsg[i]) != 0)		//if the waits array and the waitmsg are 1 - follow the if and set done to false
 			{
 				done = false;
 				break;
 			}
 		}
 
-		if(done)
+		if (done)
 			return 0;
 	}
+
+
+
+	//display the offending mask
+	//for (int i = 0; i < MAX_MSG_WAIT; i++)
+	//{
+	//	if ((waits[i] && _data->waitmsg[i]) != 0)		//if the waits array and the waitmsg are 1 - follow the if and set done to false
+	//	{
+	//		printf("Failed mask is %d\n", i);
+	//		break;
+	//	}
+	//}
+
+
+
 
 	return -1;
 }

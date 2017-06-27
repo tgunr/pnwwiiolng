@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Mon Mar 21 12:48:09 CST 2005
 //
 // Wrapper for simplifying the process of creating teulCallbacks

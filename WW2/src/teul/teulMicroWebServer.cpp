@@ -1474,5 +1474,96 @@ void Server::addVirtualPrefix(std::string desc_, std::string prefix_, VirtualFil
 }
 
 //////////////////////////////////////////////////////////////////////
+#ifndef NDEBUG
+#define status_if(cond, stat, ...) do { \
+    if ((cond)) { \
+        return HTTPResponseBuilder(request) \
+            .status(stat, ## __VA_ARGS__) \
+            .header("Connection", "close") \
+            .content("<h1>" #stat " " __VA_ARGS__ "</h1>") \
+            .build(response); \
+    } \
+} while(0)
+#else
+#define status_if(cond, stat, ...) do { if ((cond)) { return HTTPResponseBuilder(request).status(stat).header("Connection", "close").build(response); } } while(0)
+#endif
+
+static std::vector<std::string> _getURLPathComponents(const std::string &requestPath)
+{
+    return split_string(requestPath.substr(0, requestPath.find_first_of("?#")), "/"); // substr(0,npos) == whole string
+}
+
+void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAPIRouteList &routes)
+{
+    std::vector<std::string> components = _getURLPathComponents(request.path);
+    
+    // Verify API path
+    status_if(components.size() < 3, 400, "Not enough path components (3)");
+    status_if(components[0] != "", 400, "How did you get here with no /?");
+    status_if(components[1] != "v1", 400, "How did you get here with no version?");
+    
+    // Basic RESTful routing (not very smart yet)
+    RESTAPIRoute bestMatchingRoute;
+    size_t bestMatchingRouteScore = 0;
+    RESTAPIParams bestMatchingRouteParams;
+
+    for (const RESTAPIRoute &route : routes) {
+        std::vector<std::string> routeComponents = split_string(route.parameterizedPath, "/");
+        bool routeMatch = true;
+        size_t routeScore = 0;
+        RESTAPIParams routeParams = nlohmann::json::object();
+        
+        if (std::find(route.allowedMethods.begin(), route.allowedMethods.end(), request.method) == route.allowedMethods.end()) { continue; }
+        if (routeComponents.size() != components.size() - 1) { continue; }
+        status_if(routeComponents.size() < 2 || routeComponents[0] != "", 500, "Bad route in route table");
+        for (size_t i = 1; i < routeComponents.size(); ++i) {
+            const std::string &component = routeComponents[i];
+            
+            if (component.length() > 2 && component.front() == '{' && component.back() == '}') {
+                routeParams[component.substr(1, component.length() - 2)] = components[i + 1];
+            } else if (component != components[i + 1]) {
+                routeMatch = false;
+                break;
+            } else {
+                ++routeScore; // Route gets 1 point for every matching, non-parameterized path component
+            }
+        }
+        if (routeMatch && routeScore > bestMatchingRouteScore) {
+            bestMatchingRoute = route;
+            bestMatchingRouteScore = routeScore;
+            bestMatchingRouteParams = routeParams;
+        }
+    }
+    status_if(bestMatchingRouteScore == 0, 404, "No matching routes"); // A matching route must always have at least one non-parameterized path component
+    status_if(!bestMatchingRoute.handler, 501, "Unimplemented route");
+    
+    status_if(request.requestData.size() > 0 &&
+              (request.headers.find("content-type") == request.headers.end() ||
+              request.headers.at("content-type") != "application/json"), 400, "Request data must be JSON");
+    
+    nlohmann::json requestParams = nlohmann::json::object();
+    if (request.requestData.size() > 0) {
+        try {
+            requestParams = nlohmann::json::parse(request.requestData);
+        } catch (std::invalid_argument &e) {
+            status_if(true, 400, "Bad JSON");
+        }
+    }
+    status_if(!requestParams.is_object(), 400, "Request JSON must be object");
+    
+    for (nlohmann::json::iterator it = bestMatchingRouteParams.begin(); it != bestMatchingRouteParams.end(); ++it) {
+        status_if(requestParams.find(it.key()) != requestParams.end(), 400, "Request JSON can't have a parameter matching a name in the route parameters");
+        // Technically this is more of an ABORT_IF, but what the hey.
+        requestParams[it.key()] = it.value();
+    }
+    
+    try {
+        return bestMatchingRoute.handler(request, response, requestParams);
+    } catch (std::domain_error &) {
+        status_if(true, 400, "JSON contained invalid type");
+    }
+}
+
+//////////////////////////////////////////////////////////////////////
     } // namespace uWeb
 } // namespace Teul

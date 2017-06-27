@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "xml/XMLLoader2.h"
 
 #if platBuild != BUILD_SERVER

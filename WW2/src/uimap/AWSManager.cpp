@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "uimap/AWSManager.h"
 #include "client/GameClient.h"

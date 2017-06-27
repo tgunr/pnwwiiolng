@@ -905,7 +905,7 @@ static void
 _killDebugWebServer()
 {
 	Teul::uWeb::s_debugServer.cancel();
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    Teul::uWeb::s_debugServer.join();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -996,9 +996,9 @@ serverInit(UINT32 appVersion
 
 	_myServerInfo = &Server::myServerInfo;
 
-	dbugLog(_FLI, "serverInit: app:%u arena:%u servType:%u(%s) edt:%u server:{enter:%p, leave:%p, status:%p} persona:{cre:%p, rel:%p, act:%p} exit:{pers:%p, cluster:%p} err:%p"
+	dbugLog(_FLI, "serverInit: app:%u arena:%u servType:%u(%s) edt:%u server:{enter:%p, leave:%p, status:%p} persona:{cre:%p, rel:%p, act:%p} exit:{pers:%p, cluster:%p} err:<func>"
 					, appVersion, Server::myServerInfo.stats.arenaID, serverType, g_serverTypes[serverType]
-					, exitDestType, enterCallback, leaveCallback, statusCallback, createPersonaFn, releasePersonaFn, activatePlayerFn, exitPersonaFn, exitClusterFn, errorFunction);
+					, exitDestType, enterCallback, leaveCallback, statusCallback, createPersonaFn, releasePersonaFn, activatePlayerFn, exitPersonaFn, exitClusterFn);
 
 	Server::myServerInfo.stats.address = Server::myInterface.addr[0].ip;
 	Server::myServerInfo.stats.id = static_cast<UINT64>(Server::myServerInfo.stats.address) << 32 | Server::myInterface.pid;
@@ -1276,7 +1276,7 @@ Server::HeartBeat::process()
 			if (_statusCallback)
 				(_statusCallback)(server, Server::Code::Status);
 
-			// Check if we've lost our connection to this guy.
+			// Check if we've lost our connection to this server.
 			if ( serverPeeringWithIP(this->address, this->type) == false )
 			{
 				_sendHeartBeat();
@@ -1493,15 +1493,24 @@ ServerManager::SetPlayerTeulIndex(PlayerStatusNode* const psn, SINT32 teulIndex)
 	if ( psn->teulIndex >= 0 )
 	{
 		PLAYERIDX_MAP::iterator it = s_byTeulIndex.find(psn->teulIndex);
+
+		assert ( it != s_byTeulIndex.end() );
 		if ( it == s_byTeulIndex.end() )
-			LogAbort("t:%d p:%u oldt:%d previous instance not registered", teulIndex, psn->id, psn->teulIndex);
+		{
+			dbugLog(_FLA, "t:%d p:%u oldt:%d previous instance not registered", teulIndex, psn->id, psn->teulIndex);
+		}
+		else
+			s_byTeulIndex.erase(psn->teulIndex);
+
+		assert ( it->second == psn );
 		if ( it->second != psn )
-			LogAbort("t:%d p:%u newt:%u oldt:%u oldp:%u previous instance registered to someone else"
+		{
+			dbugLog(_FLA, "t:%d p:%u newt:%u oldt:%u oldp:%u previous instance registered to someone else"
 							, teulIndex, psn->id, psn->teulIndex, (it->second)->teulIndex, (it->second)->id
 							);
-
-		s_byTeulIndex.erase(psn->teulIndex);
-		teulSetPersonaData(psn->teulIndex, nullptr);
+		}
+		else
+			teulSetPersonaData(psn->teulIndex, nullptr);
 	}
 
 	psn->teulIndex = teulIndex;

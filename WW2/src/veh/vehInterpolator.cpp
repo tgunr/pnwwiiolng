@@ -1,12 +1,12 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "veh/vehInterpolator.h"
 
 #include <cmath>
 
-#include <fp/fpTPSdata.h>
-#include <fp/fpFPS.h>
-#include <gr2/gr2Anim.h>
-#include <math/mathvect.h>
+#include "fp/fpTPSdata.h"
+#include "fp/fpFPS.h"
+#include "gr2/gr2Anim.h"
+#include "math/mathvect.h"
 
 #include "veh/vehmain.h"
 
@@ -251,6 +251,11 @@ void InfantryPredictor::NewMessageReceived(Timestamp timestamp, FrameTime frame)
 //------------------------------------------------------------------------------
 
 void InfantryPredictor::UpdateInterpolation(void) {
+	if ( (_vehicle->Flags & VEH_FLAGS_IS_CLONE) ) {
+		pred_pos = curr_msg;
+		return;
+	}
+
 	Update to = curr_msg;
 	to.pos += to.vel * ((curr_msg.frametime - pred_pos.frametime) / 1000.0);
 
@@ -292,14 +297,13 @@ void InfantryPredictor::UpdateInterpolation(void) {
 //==============================================================================
 
 const Update& InfantryPredictor::Interpolate(FrameTime frame) {
-	if ( is_dead || (frame == pred_pos.frametime && ! dirty) )
+	if ( (_vehicle->Flags & VEH_FLAGS_IS_CLONE) || is_dead || (frame == pred_pos.frametime && ! dirty) )
 		return pred_pos;
 
 	gr2AnimBitPacker flags(curr_msg.animationFlags);
 
 	if ( frame < interp_end ) {
 		double t = (double)(frame - interp_beg) / (double)(interp_end - interp_beg);
-		assert ( 0.0 <= t && t <= 1.0 );
 		if ( t < 0.0 ) t = 0.0;
 		if ( t > 1.0 ) t = 1.0;
 
@@ -376,25 +380,10 @@ const Update& InfantryPredictor::Interpolate(FrameTime frame) {
 
 //==============================================================================
 
-void InfantryPredictor::Copy(vehVehicle* v, UINT32 flags) {
-	InfantryPredictor* from = dynamic_cast<InfantryPredictor*>(&v->interpolator);
-	if ( ! from )
-		return;
-
-	dirty = true;
-
-	prev_msg = from->prev_msg;
-	curr_msg = from->curr_msg;
-	pred_pos = from->pred_pos;
-
-	prev_msg.animationFlags = curr_msg.animationFlags = pred_pos.animationFlags = flags;
-
-	prev_msg.pos = curr_msg.pos = pred_pos.pos = v->PosData.Pos;
-
-	FLOAT64VECTOR dir = { -sin(v->PosData.Att.Yaw), -cos(v->PosData.Att.Yaw), 0.0 };
-	prev_msg.dir = curr_msg.dir = pred_pos.dir = dir;
-
-	_vehicle->GetAnim()->twist.predictedYaw = v->GetAnim()->twist.predictedYaw;
+// HACK: Used for offline clones
+void InfantryPredictor::ForceSync(void) {
+	NewPosDataUpdate(pred_pos.timestamp, pred_pos.frametime);
+	pred_pos = prev_msg = curr_msg;
 }
 
 //==============================================================================

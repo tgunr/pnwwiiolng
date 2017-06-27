@@ -97,6 +97,7 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "arena.speedHackRatio",		TYPE_FLOAT,	&host_config.arena.speedHackRatio,		0,		"1.0001",	"Minimum drift ratio to be a speed-hack" }
 ,	{ "arena.mobileSpawnWaypoint",	TYPE_STRING,host_config.arena.mobileSpawnWaypoint, MAX_HANDLE_SIZE, "MSPAWN", "Mobile Spawn Waypoint (gamename)" }
 ,	{ "arena.despawnTime",			TYPE_SINT,	&host_config.arena.despawnTime_s,		3600,	"10",	"Despawn Timer (seconds)" }
+,	{ "arena.allowDirectSpawn",		TYPE_BOOL,	&host_config.arena.allowDirectSpawn,		0,		"n",	"Enable direct spawning used by Multi-Client" }
 
 ,	{ "balance.above",				TYPE_SINT,	&host_config.balance.above,				0,		"0",	"Minimum players top side must have to get side balanced"  }
 ,	{ "balance.delaysMax",			TYPE_SINT, 	&host_config.balance.delaysMax, 		0,		"0",	"Maximum side-balancing delay (seconds)" }

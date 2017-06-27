@@ -192,7 +192,7 @@
     </ResourceCompile>
     <Lib>
       <AdditionalDependencies>xmlparse.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)WW2\lib\win\3rdparty</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)WW2\lib\win\Debug\3rdparty</AdditionalLibraryDirectories>
       <ForceSymbolReferences>
       </ForceSymbolReferences>
     </Lib>

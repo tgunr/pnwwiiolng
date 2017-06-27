@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 #include "fio/fio.h"
 #include "locl/loclMain.h"

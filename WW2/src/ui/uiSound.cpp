@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: uiSound.cpp
 // Description: Wrapper for UI sounds.

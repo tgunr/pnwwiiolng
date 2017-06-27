@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides high-level access to the transport
 // functions used in the teul API. The end-user developer
 // should need only those functions provided here.
@@ -128,7 +128,7 @@ ENDPOINT::doConnect()
 {
 	if (PN_LIKELY(this->connectFn != nullptr))
 	{
-		dbugLog(_FLN, "t:%d connected calling %p", this->teulIndex(), this->connectFn);
+		dbugLog(_FLN, "t:%d connected calling callback", this->teulIndex());
 		this->connectFn(*this);
 	}
 	else if ( protocol != PROTOCOL_UDB && protocol != PROTOCOL_CTRL )	// UDB doesn't connect.
@@ -416,12 +416,17 @@ teulInitTransport(LogMode logType
 	Teul::InitializeWinsock();
 
 	dbugInit(logType, name);
-
+	
+#ifndef NDEBUG
+    dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)LOG_ALL_TO_STDERR));
+    dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)LOG_ALL_TO_STDERR));
+#else
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
 #if defined(ALPHA_RELEASE)
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
 #else
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
+#endif
 #endif
 
 	teulSyncClock();

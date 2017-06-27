@@ -1,6 +1,6 @@
 ####################################
 ## Declare CMake version requirement
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.8.0)
 
 ####################################
 ## Initial CMake config
@@ -26,15 +26,8 @@ PROJECT( WW2GameHosts LANGUAGES C CXX )
 
 ####################################
 ## Require C++14
-#SET( CMAKE_CXX_STANDARD_REQUIRED ON )
-#SET( CMAKE_CXX_STANDARD 14 )
-# Unfortunately, the above doesn't work until CMake 3.1
-#ADD_COMPILE_OPTIONS( "-std=gnu++14" )
-# And unfortunately, that doesn't work either because it breaks pure-C files
-IF ( NOT MSVC )
-	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14" CACHE STRING "" FORCE )
-	SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11" CACHE STRING "" FORCE )
-ENDIF()
+SET( CMAKE_CXX_STANDARD_REQUIRED ON )
+SET( CMAKE_CXX_STANDARD 14 )
 
 ####################################
 ## Determine bitness
@@ -151,6 +144,10 @@ ADD_DEFINITIONS( "-DPUBLIC_RELEASE" )
 
 IF ( PN_DEV_BUILD )
     ADD_DEFINITIONS( "-DDEV_BUILD" )
+ENDIF()
+
+IF ( PN_BETA_RELEASE )
+    ADD_DEFINITIONS( "-DBETA_RELEASE" )
 ENDIF()
 
 ####################################
@@ -287,7 +284,7 @@ ADD_LIBRARY( wwiilib STATIC
     wwii/wwiiNetPorts.h wwii/wwiiCallbacks.h
     # These weren't previously in wwiilib but seem to be required in various places
     auth/authDB.cpp auth/authDB.h src/infoHostMessages.cpp include/infoHostMessages.h
-    src/infoPack.cpp include/infoPack.h dbse/dbseDatabaseSchema.cpp dbse/dbseDatabaseSchema.h
+    src/infoPack.cpp include/infoPack.h
 	xml/XMLLoader2.cpp xml/XMLLoader2.h
 	weap/weapSpawnXML.cpp weap/weapSpawnXML.h
 	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
@@ -321,20 +318,20 @@ IF ( NOT MSVC )
     TARGET_LINK_LIBRARIES( chatClient teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
     SET_PROPERTY( TARGET chatClient PROPERTY FOLDER "Tools" )
     
-    ADD_EXECUTABLE( luaClient src/luaClient.cpp )
-    TARGET_INCLUDE_DIRECTORIES( luaClient
-        PRIVATE ${READLINE_INCLUDE_DIRS}
-        PRIVATE ${NCURSES_INCLUDE_DIRS}
-	PRIVATE ${RAKNET_INCLUDE_DIRS}
-    )
-	USE_WWIILIB_ON( luaClient )
-    TARGET_LINK_LIBRARIES( luaClient
-        teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
-    )
-    SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
+    #ADD_EXECUTABLE( luaClient src/luaClient.cpp )
+    #TARGET_INCLUDE_DIRECTORIES( luaClient
+    #    PRIVATE ${READLINE_INCLUDE_DIRS}
+    #    PRIVATE ${NCURSES_INCLUDE_DIRS}
+	#PRIVATE ${RAKNET_INCLUDE_DIRS}
+    #)
+	#USE_WWIILIB_ON( luaClient )
+    #TARGET_LINK_LIBRARIES( luaClient
+    #    teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
+    #)
+    #SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
 
     INSTALL(
-        TARGETS chatClient luaClient
+        TARGETS chatClient #luaClient
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
@@ -449,10 +446,9 @@ ENDMACRO( ADD_HOST_TARGET )
 IF ( NOT PN_DISABLE_AUTH )
 	ADD_HOST_TARGET( ${AUTH_HOST_EXE} SOURCES
 		auth/authClientData.cpp auth/authClientData.h
-		auth/authDatabaseSchemas.h
 		auth/authGame.h
 		auth/authHost.cpp auth/authHost.h auth/authHostMessages.cpp auth/authHostMessages.h
-		auth/authQueue.cpp auth/authQueue.h auth/authQueuePosition.h wwii/wwiiRunningAverage.h
+		wwii/wwiiRunningAverage.h
 		auth/authOTP.cpp auth/authOTP.h
 		auth/authPack.cpp auth/authPack.h
 		EXTRA_DEFINITIONS "IS_AUTH_HOST"
@@ -780,13 +776,24 @@ INSTALL(
 ## File installs
 
 # Environment template files from the source tree
-#INSTALL( FILES environment.cfg environment.win.cfg DESTINATION bin COMPONENT config )
+# Do not actually install this file, otherwise we could accidentally overwrite real config
+#INSTALL( FILES environment.cfg DESTINATION bin COMPONENT config )
 
 # Lua scripts
 INSTALL( DIRECTORY hostproj/lua/ DESTINATION lua COMPONENT lua PATTERN ".git" EXCLUDE PATTERN "*.lua" )
 
 # Embedded webserver root
-INSTALL( DIRECTORY hostproj/web/ DESTINATION web COMPONENT web PATTERN ".git" EXCLUDE )
+INSTALL( DIRECTORY hostproj/web/ DESTINATION web/embedded COMPONENT web PATTERN ".git" EXCLUDE )
+
+# Auth relay
+IF ( NOT PN_DISABLE_AUTH )
+    CONFIGURE_FILE( auth/authRelay.apache2.conf.in auth/authRelay.apache2.conf @ONLY )
+    INSTALL(
+        FILES auth/authRelay.php auth/authRelay.apache2.conf
+        DESTINATION web/relay
+        COMPONENT relay
+    )
+ENDIF()
 
 ####################################
 ## Tests
@@ -803,7 +810,7 @@ ENDIF()
 # The install process will not execute unless all tests complete.
 ADD_EXECUTABLE( testUnits
     tests/testUnits.cpp tests/testUnits.h tests/testCovert.cpp tests/testLocalizedMessage.cpp
-    tests/testTeulBits.cpp tests/testAuthQueue.cpp auth/authClientData.cpp
+    tests/testTeulBits.cpp auth/authClientData.cpp
     tests/testChatHandle.cpp tests/testFullObjID.cpp tests/testCommandWithArgs.cpp
     tests/testInplaceVector.cpp tests/testPackers.cpp comm/commPackers.cpp
     tests/testChatMissionStatus.cpp tests/testHostGridCell.cpp host/hostGridCell.cpp

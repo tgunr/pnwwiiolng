@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #if platOS == OS_WIN32
 #include <windows.h>
 #include <commctrl.h>
@@ -99,10 +99,6 @@ static bool findNextMatchingEntry( HANDLE&h, WIN32_FIND_DATAA* finddata )
 static HANDLE FindFirstFileA(const char*pattern, WIN32_FIND_DATAA* finddata)
 {
   HANDLE h;
-
-  char* slash = strrchr( pattern, '/' );
-  *slash = 0;
-  strcpy( slash+2, h.pattern ); // skip *
 
   h.dir = opendir(pattern);
   if ( h.dir == 0 )
