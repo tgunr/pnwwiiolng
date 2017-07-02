@@ -8,8 +8,8 @@ extern UINT32 vehInitVehicleAnimation(vehVehicle*);
 extern UINT32 vehUpdateVehicleAnimation(vehVehicle*);
 extern UINT32 vehKillVehicleAnimation(vehVehicle*);
 
-extern UINT32 vehAnimInit(void);
-extern UINT32 vehAnimKill(void);
+extern UINT32 vehAnimInit();
+extern UINT32 vehAnimKill();
 
 extern UINT32 vehAnimUpdateVehicleStateAnimations(vehVehicle*);
 

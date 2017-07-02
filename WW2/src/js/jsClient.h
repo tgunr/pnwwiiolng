@@ -59,7 +59,7 @@ namespace Instance
 	class ClientStatus;
 };
 
-typedef std::map<UINT32, jsMotd*> MotdList;
+using MotdList = std::map<UINT32, jsMotd*>;
 
 // Samples, Threshold, Penalty
 void setChatRateLimiting();
@@ -70,6 +70,10 @@ public:
 	jsClient(ww2::Client*);
 
 	JS_CLASS_DATA;
+	JS_FUNCTION(createauthhandler);
+	JS_FUNCTION(connecttoarena);
+	JS_FUNCTION(steamconnect);
+	JS_FUNCTION(loadrootwindow);
 	JS_FUNCTION(getmisscountry);
 	JS_FUNCTION(getmissbrigade);
 	JS_FUNCTION(acceptmission);

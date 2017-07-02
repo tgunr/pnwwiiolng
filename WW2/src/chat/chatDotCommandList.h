@@ -9,7 +9,7 @@
 
 namespace Chat
 {
-	typedef unsigned short cmdcount_t;
+	using cmdcount_t = unsigned short;
 
 	struct HostCommand
 	{
@@ -19,7 +19,7 @@ namespace Chat
 		SINT32			detail;			// more detailed help (lstr id)
 	};
 
-	typedef std::vector<HostCommand> HostCommands;
+	using HostCommands = std::vector<HostCommand>;
 
 	static inline HostCommands GetHostCommandsFromStream(const UCHAR* source)
 	{

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "gr2/gr2anim.h"
 #include "ob/obmain.h"
@@ -84,7 +84,7 @@ UINT32	bitFields[12] =
 // this is the big granddaddy structure to hold all of the state and info needed for a
 // third person model
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 static FLOAT32		LODForceValue;
 #endif
 
@@ -109,11 +109,11 @@ static void _drawfpscollider();
 // gr2AnimTrooper used to be defined here
 // moved it to the header for easier member access
 
-typedef GR2_POOL<gr2AnimTrooper> GR2_TROOPER_POOL;
+using GR2_TROOPER_POOL = GR2_POOL<gr2AnimTrooper>;
 static GR2_TROOPER_POOL _gr2TrooperPool = GR2_TROOPER_POOL(128, 32, GR2_TROOPER_POOL::NEW);
 
 #ifdef USE_CORPSES
-typedef GR2_POOL<Corpse> GR2_CORPSE_POOL;
+using GR2_CORPSE_POOL = GR2_POOL<Corpse>;
 static GR2_CORPSE_POOL _gr2CorpsePool = GR2_CORPSE_POOL(32, 32, GR2_CORPSE_POOL::NEW);
 #endif
 
@@ -192,10 +192,10 @@ struct gr2AnimMotionBase
 	}
 };
 
-typedef GR2_POOL<RayColliders> GR2_RAY_POOL;
+using GR2_RAY_POOL = GR2_POOL<RayColliders>;
 static GR2_RAY_POOL _gr2RayPool = GR2_RAY_POOL(128);
 
-typedef std::map<gr2AnimTrooper*,RayColliders*> GR2RayMap;
+using GR2RayMap = std::map<gr2AnimTrooper*,RayColliders*>;
 
 static void gr2AnimHandleAttack(gr2AnimTrooper* model, int pose, int move, int point, int weapon);
 static void gr2AnimHandlePoseChange(gr2AnimTrooper* model, int pose, int move, int point, int weapon);
@@ -611,7 +611,7 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 
 	// Try to avoid malloc when possible.
 	if(PN_UNLIKELY(newModel == nullptr))
-		piExitProgram (__FILE__, __LINE__, "gr2AnimCreateModel: Failed to allocate memory for animModel");
+		piExitProgram (_FL, "gr2AnimCreateModel: Failed to allocate memory for animModel");
 
 	// get everything to a default state
 	newModel->Reset();
@@ -836,7 +836,7 @@ LOGICAL gr2AnimUpdateModel (OBJECT* pObject, LOGICAL isFPS)
 	//fpTPSLODType lastLOD = model->currentLOD;
 
 	// determine LOD
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 	if (LODForceValue) {
 		gr2AnimUpdateLOD(model, LODForceValue);
 	} else
@@ -1637,7 +1637,7 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 
 		if(stateTestFlag)// && !pObject->animModel->myVehicle->ModelData) // stateTestFlag &&
 		{
-			sprintf (tempStr, "TPS STATE: %s, %s, %s, %s, %s, %d, %d", (const char*)pObject->animModel->myVehicle->Handle, fpTPSPoseKeyStrings[pose], fpTPSMoveKeyStrings[move], fpTPSWeaponKeyStrings[tpsWeaponType], fpTPSPointKeyStrings[point], currentWeapon, (changeMask & gr2AnimTrooper::DEAD) ? 1 : 0);
+			strprintf(tempStr, "TPS STATE: %s, %s, %s, %s, %s, %d, %d", (const char*)pObject->animModel->myVehicle->Handle, fpTPSPoseKeyStrings[pose], fpTPSMoveKeyStrings[move], fpTPSWeaponKeyStrings[tpsWeaponType], fpTPSPointKeyStrings[point], currentWeapon, (changeMask & gr2AnimTrooper::DEAD) ? 1 : 0);
 			rnmainListText (tempStr);
 		}
 	}
@@ -1812,10 +1812,10 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 	return TRUE;
 }
 
-LOGICAL gr2AnimKillObject (OBJECT* pObject)
+void gr2AnimKillObject(OBJECT& pObject)
 {
 	// stop any sounds
-	pObject->animModel->moveSound.Stop();
+	pObject.animModel->moveSound.Stop();
 
 	/*
 #ifdef USE_CORPSES
@@ -1857,10 +1857,8 @@ LOGICAL gr2AnimKillObject (OBJECT* pObject)
 #endif
 	*/
 
-	_freemodel(pObject->animModel);
-    pObject->animModel = nullptr;
-
-	return TRUE;
+	_freemodel(pObject.animModel);
+    pObject.animModel = nullptr;
 }
 
 LOGICAL gr2AnimDoWeaponCollision (OBJECT* pObject, piVECTOR* startPnt, piVECTOR* endPnt, SINT32* location, piVECTOR* collisionPnt)
@@ -2833,7 +2831,7 @@ SINT32 gr2AnimDeathFlags()
 
 extern void rnlogoUpdateStatus(const char*, ...);
 
-LOGICAL gr2AnimInit (void)
+LOGICAL gr2AnimInit()
 {
 	if(animInited) return TRUE;
 
@@ -2846,7 +2844,7 @@ LOGICAL gr2AnimInit (void)
 		if(size % GR2_MEMORY_MULTIPLE > 0)
 		{
 			snprintf(buf, 255, "gr2AnimTrooper is not byte aligned: size(%ld) %% multiple(%d) = %ld bytes leftover", size, GR2_MEMORY_MULTIPLE, (size % GR2_MEMORY_MULTIPLE));
-			piExitProgram(__FILE__, __LINE__, buf);
+			piExitProgram(_FL, buf);
 		}
 
 #ifdef USE_CORPSES
@@ -2855,7 +2853,7 @@ LOGICAL gr2AnimInit (void)
 		if(size % GR2_MEMORY_MULTIPLE > 0)
 		{
 			snprintf(buf, 255, "Corpse is not byte aligned: size(%ld) %% multiple(%d) = %ld bytes leftover", size, GR2_MEMORY_MULTIPLE, (size % GR2_MEMORY_MULTIPLE));
-			piExitProgram(__FILE__, __LINE__, buf);
+			piExitProgram(_FL, buf);
 		}
 #endif // USE_CORPSES
 
@@ -2953,9 +2951,9 @@ LOGICAL gr2AnimInit (void)
 
 #ifdef USE_CORPSES
 	/*
-     
+
      TBD - is this really meant to be implemented?
-     
+
     ARENA_VARS::iterator itr = g_arenaDescription.find("dead_body_delay");
 
     if(itr != g_arenaDescription.end())
@@ -2973,7 +2971,7 @@ LOGICAL gr2AnimInit (void)
     return TRUE;
 }
 
-void gr2AnimKill (void)
+void gr2AnimKill()
 {
 	_gr2TrooperPool.Free();
 
@@ -4362,7 +4360,7 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 		Write_Log (LOG_FPS, LOG_INFO, "Weapon out of bounds! %d", weapon);
 		// for live this shouldn't be a CTD .. just set to weapon 0 (weapon 0 will always be a valid weapon)
 #ifdef BETA_RELEASE
-		piExitProgram (__FILE__, __LINE__, "Weapon out of bounds in animation flags");
+		piExitProgram (_FL, "Weapon out of bounds in animation flags");
 #else
 		weapon = 0;
 #endif
@@ -4374,7 +4372,7 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 
 		if (stateTestFlag && !anim->myVehicle->ModelData)
 		{
-			sprintf (tempStr, "%s, %s, %s, %d, %d, %d, %d", fpTPSPoseTypeStrings[pose], fpTPSMoveTypeStrings[move], fpTPSPointTypeStrings[point], weapon, death, emote, altWeapon);
+			strprintf(tempStr, "%s, %s, %s, %d, %d, %d, %d", fpTPSPoseTypeStrings[pose], fpTPSMoveTypeStrings[move], fpTPSPointTypeStrings[point], weapon, death, emote, altWeapon);
 //			rnmainListText (tempStr);
 			Write_Log (LOG_FPS, LOG_INFO, tempStr);
 		}
@@ -5102,7 +5100,7 @@ void gr2AnimUpdateSurfaceID(gr2AnimTrooper* model)
 	model->nextSurfaceCheck = frametime + 250;
 }
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 void gr2AnimForceLOD (FLOAT32 lodValue)
 {
 	LODForceValue = lodValue;
@@ -5362,7 +5360,7 @@ void gr2AnimSetWeaponFireTime (OBJECT* pObject, SINT32 time)
 }
 
 #ifdef BETA_RELEASE
-void gr2ToggleStateTest (void)
+void gr2ToggleStateTest()
 {
 	stateTestFlag = !stateTestFlag;
 }
@@ -5726,7 +5724,7 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 	if (++counter > 10)
 		counter = 0;
 
-	sprintf (buf, "inffoot_%d", counter);
+	strprintf(buf, "inffoot_%d", counter);
 
 	math32To64Vec(&pt1, &V1); mathAddVectors(&pt1, &pt1, &WorldOriginOffset);
 	math32To64Vec(&pt2, &V2); mathAddVectors(&pt2, &pt2, &WorldOriginOffset);
@@ -6275,7 +6273,7 @@ void gr2AnimDetermineMotionType(gr2AnimTrooper* model, FLOAT64 angle)
 #ifdef DEBUG_MOTION
 	fpTPSMotionType startMotion = model->currentMotion;
 #endif
-    
+
 	if(angle > DMT_FORWARD && angle < DMT_BACKWARD)
 		model->strafe = TPS_MOVETYPE_STRAFE_RIGHT;
 	else if(angle < -DMT_FORWARD && angle > -DMT_BACKWARD)
@@ -7762,9 +7760,9 @@ void gr2AnimUpdate()
 
 			// don't allow submarining when crawling off ledges
 			/*
-             
+
             FLOAT64 zLowAdjust = -(worldPos.z() - zLow);
-             
+
 			if(zLowAdjust && model->terrainTargetZ < zLowAdjust)
 			{
 				//uiChatPrintLine("ZLow %.2f < %.2f ... clamping!", zLowAdjust, model->terrainTargetZ);
@@ -11167,8 +11165,8 @@ void setEditBlendWeapon(int type)
 			{
 				_editWeapon->Update(true, true);
 
-				SINT32 from = _editWeapon->FindBone(tpsWeapons[type].attachBone);
-				SINT32 to = _editModel->skeleton->FindBone(tpsWeapons[type].attachToBone);
+				SINT32 from = _editWeapon->FindBone((SCHAR *)(tpsWeapons[type].attachBone));
+				SINT32 to = _editModel->skeleton->FindBone((SCHAR *)(tpsWeapons[type].attachToBone));
 				_editModel->skeleton->AddAttachment(_editWeapon, from, to, true);
 				_editModel->skeleton->updateAttachment = true;
 				_editWeapon->updateAttachment = true;

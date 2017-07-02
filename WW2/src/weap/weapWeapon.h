@@ -25,7 +25,7 @@ struct WEAPON
 {
 	WEAPON() : m_spec(NULL_WEAP_SPEC), m_modified(false) { name[0] = fullName[0] = 0; }
 //tolua_end
-	WEAPON(const WEAPON_SPEC& spec, const char* Name, const char* access
+	WEAPON(const WEAPON_SPEC spec, const char* Name, const char* access
 				, UINT16 count, UINT32 lod, UINT32 AlertDist, UINT32 Speed, UINT32 CVCValue
 				);
 //tolua_begin
@@ -37,8 +37,8 @@ public:
 	UINT16 initialAccess() const { return m_initialAccess; }
 	UINT32 localIndex() const { return m_localIndex; }
 	UINT16 nextAccess() const { return m_nextAccess; }
-	const WEAPON_SPEC& spec() const { return m_spec; }
-	WEAPON_SPEC& spec() { return m_spec; }
+	WEAPON_SPEC spec() const { return m_spec; }
+	//WEAPON_SPEC& spec() { return m_spec; }
 
 public:
 	// HOST: Determine if a particular permission mask allows
@@ -90,24 +90,20 @@ public:
 extern WEAPON* weapLookupWeaponByName(const char* weaponName);
 
 // Lookup the weapon with the fast index
-extern WEAPON* weapLookup(const WEAPON_SPEC& spec);
+extern WEAPON* weapLookup(const WEAPON_SPEC spec);
 
 // Look up the weapon by the local index
 extern WEAPON* weapLookupWeaponByIndex(UINT32 localIndex);
 
-static inline const char* weapPrintName(const WEAPON_SPEC* spec)
+static inline const char* weapPrintName(const WEAPON_SPEC spec)
 {
-	if ( spec == nullptr )
-		return "<null>";
-	WEAPON* weap = weapLookup(*spec);
+	const WEAPON* weap = weapLookup(spec);
 	return ( weap == nullptr ) ? weapPrintSpecC(spec) : weap->name;
 }
 
-static inline const char* weapPrintFullName(const WEAPON_SPEC* spec)
+static inline const char* weapPrintFullName(const WEAPON_SPEC spec)
 {
-	if ( spec == nullptr )
-		return "<null>";
-	WEAPON* weap = weapLookup(*spec);
+	const WEAPON* weap = weapLookup(spec);
 	return ( weap == nullptr ) ? weapPrintSpecC(spec) : weap->fullName;
 }
 

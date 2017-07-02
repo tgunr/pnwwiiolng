@@ -92,6 +92,7 @@ struct ClientRole : public Role
 	virtual int RegisterCallbacks() override
 	{
 		BEGIN_CALLBACK_REGISTRATION(Role::Test_X)
+		{
 			REGISTER_RECVSEND(Role::Hello_Y, recvHello, sendHello, s_cbHello);
 
 			REGISTER_RECVSEND(Role::HelloRel_Y, recvHello, sendHello, s_cbRelHello);
@@ -109,8 +110,8 @@ struct ClientRole : public Role
 			REGISTER_SENDER(Role::Unregistered_Y, CallbackRegister::NoDataHandler, s_cbUnregistered);
 
 			REGISTER_RECEIVER(Role::LargePacketAck_Y, recvLargePacketAck);
-
-		END_CALLBACK_REGISTRATION
+		}
+		END_CALLBACK_REGISTRATION(Role::Test_X)
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -140,7 +141,7 @@ struct ClientRole : public Role
 			return;
 
 		const TeulTimeMS delay = (2 * Config::ConnectTimeoutMS) + 500ULL;
-		Dprintf("Keepalive check: %llu delay.\n", delay);
+		Dprintf("Keepalive check: %" PR64BitUT " delay.\n", delay);
 		teulUpdateTransport(delay);
 	}
 
@@ -182,14 +183,15 @@ struct ClientRole : public Role
 		outgoing.m_type = type;
 		outgoing.m_size = rand();
 		outgoing.m_count = 64 + rand() % 64;
+		memset(outgoing.m_data, 0, sizeof(outgoing.m_data));
 
 		if ( (EchoPacketHeader::s_requested % 1000) == 0 )
 		{
-			Iprintf("Echo request #%llu type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
+			Iprintf("Echo request #%" PR64BitUT " type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
 		}
 		else
 		{
-			Dprintf("Echo request #%llu type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
+			Dprintf("Echo request #%" PR64BitUT " type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
 		}
 		teulSend(teulIndex, s_cbEcho, &outgoing);
 	}
@@ -248,7 +250,7 @@ struct ClientRole : public Role
 
 		catchupEchoPackets();
 
-		Iprintf("%llu echo packets sent and acked\n", EchoPacketHeader::s_requested);
+		Iprintf("%" PR64BitUT " echo packets sent and acked\n", EchoPacketHeader::s_requested);
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -369,7 +371,7 @@ struct ClientRole : public Role
 
 		const TeulTimeMS totalElapsedMS = endTimeMS - startTimeMS;
 		const TeulTimeMS avgBatchMS = totalOpenTimesMS / (ConnectionsToTest / ConnectionsAtATime);
-		Iprintf("Done [total: %llums, avg batch time: %llums]!\n", totalElapsedMS, avgBatchMS);
+		Iprintf("Done [total: %" PR64BitUT "ms, avg batch time: %" PR64BitUT "ms]!\n", totalElapsedMS, avgBatchMS);
 	}
 
 	private:
@@ -627,7 +629,7 @@ struct ClientRole : public Role
 	}
 
 	public:
-	void TestVaryingPacketSizes(const SINT32 teulIndex) 
+	void TestVaryingPacketSizes(const SINT32 teulIndex)
 	{
 		if (tSendVariety.isEnabled() == false)
 			return;
@@ -636,7 +638,7 @@ struct ClientRole : public Role
 		size_t msgSizes[] = {256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536};
 		size_t numSizes = sizeof(msgSizes) / sizeof(size_t);
 
-		Iprintf("sending %u messages for each varing size\n", numMsgs);
+		Iprintf("sending %" PRSizeT " messages for each varing size\n", numMsgs);
 
 		uint8_t nextChar = static_cast<uint8_t>('A');
 		Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::Spam_Y));
@@ -651,7 +653,7 @@ struct ClientRole : public Role
 				nextChar = static_cast<uint8_t>('A');
 			}
 
-			Iprintf("sending %u messages for packet size %d\n", numMsgs, msgSizes[i]);
+			Iprintf("sending %" PRSizeT " messages for packet size %" PRSizeT "\n", numMsgs, msgSizes[i]);
 			for (size_t j = 0; j < numMsgs; ++j)
 			{
 				outgoing.send(teulIndex);
@@ -851,7 +853,7 @@ struct ClientRole : public Role
 			throw Teul::Error("Connection timed out", (SINT32)delta);
 		}
 
-		Dprintf("t:%d Getting connected took %llums.\n", teulIndex, delta);
+		Dprintf("t:%d Getting connected took %" PR64BitUT "ms.\n", teulIndex, delta);
 	}
 
 	// Track whether we are currently connected to our primary connection or not.

@@ -11,16 +11,16 @@ enum
 ,	ETEUL_PACKET_TIMED_OUT		=	20001	//! A sent packet has not acknowledged being received.
 ,	ETEUL_SERVER_SHUTDOWN		=	20002	//! Server shutdown.
 ,	ETEUL_DUP_PACKET			=	20004	//! duplicate packet, function fail.
-,	ETEUL_INVAL_BUFFER			=	20005	//! @internal invalid buffer specified.
-,	ETEUL_INVALID_PACKET		=	20006	//! @internal invalid packet or packet structure.
+,	ETEUL_INVAL_BUFFER			=	20005	//! invalid buffer specified.
+,	ETEUL_INVALID_PACKET		=	20006	//! invalid packet or packet structure.
 ,	ETEUL_ILLEGAL_TICKS			=	20008	//! Getting ahead of yourself, aren't you?
 
 ,	ETEUL_ENOSPC_SEND_BUFFER	=	20009	//! no space in send buffer.
-,	ETEUL_ENOSPC_REL_BUFFER		=	20011	//! @internal no space in recv buffer.
+,	ETEUL_ENOSPC_REL_BUFFER		=	20011	//! no space in recv buffer.
 ,	ETEUL_ENOSPC_SEND_SOCKET	=	20012	//! no space in socket, pair down the sends.
 
-,	ETEUL_AUTH_RESTARTED		=	20030	//! @internal Auth was restarted.
-,	ETEUL_AUTH_DOWN				=	20031	//! @internal Could not make connection to auth.
+,	ETEUL_AUTH_RESTARTED		=	20030	//! Auth was restarted.
+,	ETEUL_AUTH_DOWN				=	20031	//! Could not make connection to auth.
 ,	ETEUL_ILLEGAL_PACKET_ORDER	=	20032	//! Out of order packet on TCP connection.
 											//! (probably connection manipulation by player)
 ,	ETEUL_CONNECTION_STALLED	=	20033	//! Difficulty sending keepalives.
@@ -63,8 +63,8 @@ namespace Teul
 
 		static inline SINT32 combineCodes(const UINT32 category_, const SINT32 error_)
 		{
-			const UINT32 unsignedError = (UINT32)((error_ < 0) ? -error_ : error_);
-			return (unsignedError >= CategoryMultiplier) ? unsignedError : (category_ * CategoryMultiplier) + unsignedError;
+			const SINT32 absError = error_ < 0 ? -error_ : error_;
+			return (absError >= CategoryMultiplier) ? absError : SINT32(category_ * CategoryMultiplier) + absError;
 		}
 	}
 }

@@ -29,7 +29,7 @@ struct SquadMemberUpdate
 	UINT32		m_members[SquadControl::CREATE_PLAYERS_REQUIRED];
 	UINT32		m_result;					// Did it work?
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) { a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); return a->offset; }
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); return a->offset; }
 
 	SINT32 receive(SINT32 teulIndex);
 };

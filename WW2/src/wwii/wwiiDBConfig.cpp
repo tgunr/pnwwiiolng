@@ -21,7 +21,7 @@ static UINT32 g_numVars = 0;
 void
 wwiiEscapeString(std::string& text)
 {
-    
+
     for ( UINT32 n = 0; n < text.length(); ++n )
     {
         switch ( text[n] )
@@ -142,7 +142,7 @@ dbUpdateWWIIConfigValue(const char* varName, const char* value, const char* mods
 
 // Function for obtaining the current host_config values
 bool
-dbGetWWIIConfig(DBHANDLE& dbh)
+dbGetWWIIConfig()
 {
 	static bool hasRun = false;
 	if ( !hasRun )
@@ -150,12 +150,16 @@ dbGetWWIIConfig(DBHANDLE& dbh)
 		dbugLog(_FLI, "Loading db config for first time (host_config size = %" PRSizeT " bytes)", sizeof(host_config));
 		hasRun = true;
 	}
+	else
+	{
+		dbugLog(_FLI, "Refreshing db config");
+	}
 
 	try
 	{
 		if ( g_numVars == 0 )
 		{
-			ThreadTextQuery qry(DBThread::Game, "INSERT IGNORE INTO `wwiionline`.`wwii_config` (variableName,value,lastModified,description) VALUES", "");
+			ThreadTextQuery qry(DBThread::Default, "INSERT IGNORE INTO `wwiionline`.`wwii_config` (variableName,value,lastModified,description) VALUES", "");
 			// Count the number of variables we have
 			for ( g_numVars = 0; configMap[g_numVars].type < MAX_WWII_CONFIG_TYPES; g_numVars++ )
 			{
@@ -178,7 +182,7 @@ dbGetWWIIConfig(DBHANDLE& dbh)
 		if ( q.Rows() == 0 )
 			return false;
 
-		ThreadTextQuery qry(DBThread::Game, "DELETE FROM `wwiionline`.`wwii_config` WHERE `variableName` IN (", ")");
+		ThreadTextQuery qry(DBThread::Default, "DELETE FROM `wwiionline`.`wwii_config` WHERE `variableName` IN (", ")");
 		while ( q.FetchRow() )
 		{
 			const DBRow& row = q.Row();

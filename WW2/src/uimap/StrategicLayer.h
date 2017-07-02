@@ -33,7 +33,7 @@ public:
 	// bounding box coords bottom left to top right
 	int _x1,_y1,_x2,_y2;
 
-	typedef std::map<unsigned int, HCUnit* > HCUnitMap;
+	using HCUnitMap = std::map<unsigned int, HCUnit*>;
 	HCUnitMap _units;
 };
 
@@ -55,6 +55,6 @@ public:
 		STRATEGIC_HCLINKS // draws lines between HC Units of the selected division
 	};
 
-	typedef std::map<unsigned int, phui::ref_ptr<SuperCellMapView::MapObject> > StrategicMap;
+	using StrategicMap = std::map<unsigned int, phui::ref_ptr<SuperCellMapView::MapObject> >;
 	StrategicMap _strategic;
 };

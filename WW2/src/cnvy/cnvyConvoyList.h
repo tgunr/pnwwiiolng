@@ -14,7 +14,7 @@ struct CONVOYSTRUCT* cnvyCreateConvoyList(UINT32 numItems);
 CONVOYSTRUCT* cnvyRemoveFirstConvoy(CONVOYSTRUCT** convoyList);
 
 //Inserts a arrivalTime into the convoyList
-LOGICAL cnvyInsertConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy);
+bool cnvyInsertConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy);
 
 //Deletes a arrivalTime from the convoyList
 CONVOYSTRUCT* cnvyDeleteConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy);

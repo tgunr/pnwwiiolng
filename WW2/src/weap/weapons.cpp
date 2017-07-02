@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 
 #include "ob/stride_ptr.h"
@@ -71,7 +71,7 @@ UINT32 _NumWeaponTypes;
 weaponType * _WeaponList; // the ammo type list
 static std::vector<WEAP_FIRE_CALLBACK> _fireCallbacks; // list of callbacks to fire when a weapon is fire
 
-SINT32 weaponsInit(void)
+SINT32 weaponsInit()
 {
 	int WeaponListFile;
 	int CurrentWeaponFile;
@@ -168,10 +168,10 @@ SINT32 weaponsInit(void)
                             if(WeaponType->GhostAmmoType == nullptr)
                             {
                                 char s[128];
-                                sprintf(s, "ghostammotype %s not found", VarContents);
+                                strprintf(s, "ghostammotype %s not found", VarContents);
                                 Write_Debug(s);
 #if defined(BETA_RELEASE) && !defined (_DEBUG) && (platOS == OS_WIN32) // temp define until they fix the data
-                                piExitProgram(__FILE__, __LINE__, s);
+                                piExitProgram(_FL, s);
 #endif
                             }
 
@@ -191,10 +191,10 @@ SINT32 weaponsInit(void)
                             if(WeaponType->AmmoType[VarNum-WEAP_VAR_AMMOTYPE1] == nullptr)
                             {
                                 char s[128];
-                                sprintf(s, "ammotype %s not found", VarContents);
+                                strprintf(s, "ammotype %s not found", VarContents);
                                 Write_Debug(s);
 #if defined(BETA_RELEASE) && !defined (_DEBUG) && (platOS == OS_WIN32) // temp define until they fix the data
-                               piExitProgram(__FILE__, __LINE__, s);
+                               piExitProgram(_FL, s);
 #endif
                             }
 
@@ -282,7 +282,7 @@ UINT32 i;
 	return 0;
 }
 
-UINT32 weaponsKill(void)
+UINT32 weaponsKill()
 {
 	if (_WeaponList != nullptr)
 	{

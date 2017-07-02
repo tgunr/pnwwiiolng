@@ -47,8 +47,8 @@ static SINT32 _recvHandshake(ACTION_OBJECT* const a, Dbse::Handshake& handshake)
 SINT32 dbseInstallHostCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(DBSE_GENERAL_X)
-
+	{
 		REGISTER_RECEIVEOBJ(DBSE_CLIENT_HANDSHAKE_Y, Dbse::Handshake, _recvHandshake);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(DBSE_GENERAL_X)
 }

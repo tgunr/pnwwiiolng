@@ -9,15 +9,15 @@
 
 #include "OpenAL/al.h"
 
-typedef ALuint ALSource;
-typedef ALuint ALBuffer;
+using ALSource = ALuint;
+using ALBuffer = ALuint;
 
 const ALSource ALSource_None = 9999999;
 const ALBuffer ALBuffer_None = 9999999;
 
-typedef struct SoundBuffer
+struct SoundBuffer
 {
   ALBuffer buffer;
   ALSource source;
-} SoundBuffer;
+};
 

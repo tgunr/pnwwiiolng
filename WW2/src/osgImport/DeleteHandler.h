@@ -7,8 +7,8 @@
 class DeleteHandler
 {
 public:
-    typedef std::pair<int, const Referenced*> FrameNumberObjectPair;
-    typedef std::list<FrameNumberObjectPair> ObjectsToDeleteList;
+    using FrameNumberObjectPair = std::pair<int, const Referenced*>;
+    using ObjectsToDeleteList = std::list<FrameNumberObjectPair>;
 
     DeleteHandler(int numberOfFramesToRetainObjects=0);
 

@@ -77,8 +77,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>AS_SERVER;CLOSED_BETA;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions);</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;CLOSED_BETA;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <BrowseInformation>false</BrowseInformation>
@@ -97,8 +97,8 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>AS_SERVER;CLOSED_BETA;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;CLOSED_BETA;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsManaged>false</CompileAsManaged>
@@ -126,8 +126,8 @@
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>AS_SERVER;CLOSED_BETA;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>platBuild=BUILD_CLIENT;CLOSED_BETA;WIN32;_CONSOLE;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\hostproj;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsManaged>false</CompileAsManaged>
@@ -154,6 +154,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Libraries\libevent\libevent.vcxproj">
       <Project>{fe3e7329-9561-4bfc-9e1d-f4bddba2cbb0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\RakNet\Source\RakNet.vcxproj">
+      <Project>{143f9b67-c223-4f2d-b8f9-b644ca710ca6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\WW2\proj\win\libcatid\libcatid.vcxproj">
+      <Project>{7c64282a-fc3f-4ed0-81d4-3be1bb67c90f}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\WW2\proj\win\teulKit\teulKit.vcxproj">
       <Project>{4f492374-dc5c-47d0-ae9f-7df7a50fdecb}</Project>

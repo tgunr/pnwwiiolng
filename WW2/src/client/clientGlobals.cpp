@@ -81,7 +81,6 @@ UINT32			MaxUserClipPlanes;
 UINT32			MaxTextureWidth;
 UINT32			MaxTextureHeight;
 
-LOGICAL          WantedHelp;			// asked for commandline help
 UINT32			WindowAdapter;		// desired adapter
 UINT32			WindowDeviceType;	// desired device type
 UINT32			WindowRefreshRate;	// desired refresh rate
@@ -111,7 +110,12 @@ SINT8			ServerApID[64];		// program apId
 SINT8			ServerData[64];		// data passed from auth server
 SINT8			ServerProtocol[64]; // connection protocol
 SINT8			BypassString[64];
+LOGICAL         UseSteamLogin = FALSE; // We should use Steam to authenticate our login
+#if defined(DEBUG_WW2) || defined(ALPHA_RELEASE)
 LOGICAL			WantedUserLogEnabled = TRUE;	// If the user wants the log enabled
+#else
+LOGICAL			WantedUserLogEnabled = FALSE;	// If the user wants the log enabled
+#endif
 SCHAR			WantedVideoCard[64];// desired video card name
 SCHAR			WantedVideoResolution[32];// desired video resolution
 SCHAR			WantedSoundCard[64];// desired sound card name
@@ -154,8 +158,9 @@ LOGICAL          WantCombatSmoke;    // emersive smoke from damaged buildings an
 SINT32           g_updateReflectionRate; // 0 - 5 seconds
 SINT32           g_iNumBullets;      // Limit to number of displayable bullets.
 SINT32           g_iAmbLevel;        // Frequent = 1; Infrequent = 2; Never = 0;
-SINT32           g_iVisiblePlayerLimit; // 1 = low 2 = medium 3 = high
+SINT32           g_iVisiblePlayerLimit; // 0 = very low, 1 = low, 2 = medium, 3 = high, 4 = very high
 SINT32           g_useNetworkRoute;    // 0, 1, 2 (auto/primary/secondary)
+LOGICAL          g_wantNetcode;        // true = netcode X enabled
 
 SINT32			g_iFSSASamples; 	// 0 = off, 2,4,6,8 (Mac OS X only currently)
 LOGICAL			g_bFSSAHighQuality; // enable high quality FSAA hinting (Mac OS X only currently) XXXX
@@ -187,8 +192,6 @@ SINT32           nErrorCode;         // Set to any user specified error code
 
 SINT32			TexBpp;
 SINT32			TexAlpha;
-
-LOGICAL			TextureReduction;	// force texture reduction
 
 UINT32			DamageLevel;
 
@@ -259,7 +262,11 @@ LOGICAL			gCellClientActive;
 LOGICAL          gWaterShadersEnabled;
 
 LOGICAL			disableButtonInput, disableAxisInput;
+#if defined(DEBUG) || defined(ALPHA_RELEASE)
 LOGICAL			OpenConsole = TRUE;
+#else
+LOGICAL			OpenConsole = FALSE;
+#endif
 LOGICAL			SquadInvites;
 UINT32			OverrideSpawner;
 UINT32			gRegion; // used for china localizations and other functionality differences
@@ -278,10 +285,11 @@ UINT32			CurrentConv; // Current airplane gun convergence setting
 
 FLOAT32			aimMouse;	// Aiming mouse sensitivity
 SINT8            gAuthServer[128]; // Authentication server to be used
+SINT8            gAuthServerPort[64];
 SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 SINT8            gClientV[32]; // Version to submit
 
-#ifdef DEBUG
+#ifdef DEBUG_WW2
 LOGICAL          DebugBuildingMDLFilesOnly = false;
 #endif
 

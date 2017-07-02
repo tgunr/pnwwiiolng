@@ -12,11 +12,8 @@
 #include "dbse/dbseClientMessages.h"
 #include "teul/teulClosingEnums.h"
 #include "teul/teulEndpoint.h"
-#include "server/serverConfigVars.h"
 #include "wwii/wwiiNetPorts.h"
-
-extern ConfigAddr cv_dbsePrimaryAddress;
-extern ConfigUint cv_dbseConnectionTimeout_ms;
+#include "include/configVars.h"
 
 static SINT32 hostIndex = 0;
 static Dbse::ConnectionStatus connected = Dbse::ConnectionStatus::None;
@@ -112,8 +109,10 @@ dbseInit()
 SINT32
 dbseClose()
 {
-	if ( hostIndex >= 0 )
-		return (teulClose(hostIndex), Teul::Closing::DBDClose);
+	if ( hostIndex >= 0 ) {
+        teulClose(hostIndex);
+		return Teul::Closing::DBDClose;
+    }
 	return 0;
 }
 

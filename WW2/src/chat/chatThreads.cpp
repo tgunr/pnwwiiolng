@@ -15,11 +15,6 @@
 // Threads
 //////////////////////////////////////////////////////////////////////
 
-struct BanThread : public PNThread
-{
-	virtual void run() override { chatBanQueueThread();	}
-};
-static BanThread _banThread;
 static StatsThread _statsThread;
 
 //////////////////////////////////////////////////////////////////////
@@ -29,7 +24,7 @@ void
 chatThreadsSetup()
 {
 	threadsSetup();
-	_banThread.start();
+	chatStartBanThread();
 	_statsThread.start();
 }
 
@@ -49,7 +44,7 @@ chatThreadsEnable()
 void
 chatThreadsShutdown()
 {
-	_banThread.cancel();
+	chatCancelBanThread();
 	_statsThread.cancel();
 	threadsShutdown();
 }

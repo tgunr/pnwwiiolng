@@ -20,8 +20,6 @@ UINT32 serverGetMaxClusterUsers();
 #include "wwii/wwiiServerTypeEnums.h"
 void serverEnableDebugWebServer(SERVER_TYPE offset);
 
-void serverInitAddresses();
-
 void serverOpenBroadcastIndexes();
 
 void serverBroadcastHostConfig();
@@ -32,3 +30,4 @@ size_t serverGetPlayerCount(const UINT32 serverType_);
 // by different host types and configuration parameters.
 size_t serverGetClusterCapacity();
 
+void serverOpenLuaClientInterface();	// for strat host

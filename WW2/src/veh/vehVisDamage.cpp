@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "veh/vehVisDamage.h"
 #include "ogrp/ogrptype.h"
 #include "include/vars.h"
@@ -1872,12 +1872,12 @@ static LOGICAL _CollideOnCallback(OBJECT* obj, UINT32 user)
 	_CreateCrapCallback
 *************************************************************************************************/
 
-typedef struct
+struct crapcallbackdata
 {
 	vehVehicle* veh;
 	LOGICAL Explode;
 	const char* visdamgroup;
-} crapcallbackdata;
+};
 
 static LOGICAL _CreateCrapCallback(OBJECT* obj, UINT32 user)
 {
@@ -2020,9 +2020,9 @@ static void _CreateCrap(vehVehicle* veh, OBJECT* obj, const char* visdamgroup, L
 	char MassName[64];
 
 	if(i==0)
-		strncpy(MassName, st->MassObject, 63);
+		strsafecpy(MassName, st->MassObject);
 	else
-		snprintf(MassName, 63, "%s_%d", st->MassObject, i);
+		strprintf(MassName, "%s_%d", st->MassObject, i);
 
 	const vehInertiaComponent* ic = vehFindInertiaComponent(veh->VehicleType, MassName);
 
@@ -2032,8 +2032,8 @@ static void _CreateCrap(vehVehicle* veh, OBJECT* obj, const char* visdamgroup, L
 		{
 #ifdef BETA_RELEASE
 			char s[128];
-			snprintf(s, 127, "no inertia component called %s in mass file!", st->MassObject);
-			piExitProgram(__FILE__, __LINE__, s);
+			strprintf(s, "no inertia component called %s in mass file!", st->MassObject);
+			piExitProgram(_FL, s);
 #endif
 		}
 

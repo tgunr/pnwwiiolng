@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "client/GameClient.h"
 #include "draw/draw2d.h"
@@ -176,8 +176,8 @@ extern char lastbuffer[256];
 
 static ref_ptr<oglMaterial> basiccolor;
 
-static UINT32 _UpdateHeadAndView(void);
-static void _InstallViewControlCallbacks(void);
+static UINT32 _UpdateHeadAndView();
+static void _InstallViewControlCallbacks();
 static UINT32 _GetExternalCameraPosAndAtt(piVECTOR * Pos,piVECTOR * Att);
 static UINT32 _GetInternalCameraPosAndAtt(piVECTOR * Pos,piVECTOR * Att);
 static UINT32 _SlewView(SINT32 Param,UINT32 Id,UINT32 Detach);
@@ -191,29 +191,29 @@ static UINT32 _SetInstrumentsView(SINT32 Param, UINT32 Id, UINT32 Detach);
 static UINT32 _SetGunsightsView(SINT32 Param, UINT32 Id, UINT32 Detach);
 static UINT32 _SetInstrumentView(UINT32 ViewNum);
 static UINT32 _SetGunsightView(UINT32 ViewNum);
-static UINT32 _SetNormalInternalView(void);
+static UINT32 _SetNormalInternalView();
 static LOGICAL _DrawGunsightTree(OBJECT * Object,SINT32 DoSibs);
 
 static UINT32 _UpdateExternalCameraTarget(bool start = false);
-static UINT32 _UpdateCockpitCameraPos(void);
-static UINT32 _UpdatePersonaHealths(void);
-static UINT32 _UpdatePersonaSounds(void);
+static UINT32 _UpdateCockpitCameraPos();
+static UINT32 _UpdatePersonaHealths();
+static UINT32 _UpdatePersonaSounds();
 static LOGICAL _CheckForBlocks(UINT32 Type,SINT32 Position);
-static LOGICAL _BlockView(void);
+static LOGICAL _BlockView();
 
 static UINT32 _SetGunsightToUserDraw(OBJECT * Object,UINT32 IncludeSibs);
 static LOGICAL _DrawGunsightObject(OBJECT * Object);
 
 #if(0)
-static UINT32 _DrawRedoutBlackoutOld(void);
+static UINT32 _DrawRedoutBlackoutOld();
 #endif
-static UINT32 _DrawRedoutBlackoutNew(void);
-static UINT32 _CheckUnderground(void);
+static UINT32 _DrawRedoutBlackoutNew();
+static UINT32 _CheckUnderground();
 
-static int _DoResupplyCheck(void);
-static UINT32 _DoScenarioResupplyCheck(void);
-static UINT32 _DoGroundResupplyCheck(void);
-static UINT32 _DoStaticResupplyCheck(void);
+static int _DoResupplyCheck();
+static UINT32 _DoScenarioResupplyCheck();
+static UINT32 _DoGroundResupplyCheck();
+static UINT32 _DoStaticResupplyCheck();
 LOGICAL _IsValidResupplyVehicle(const vehVehicle* player, const vehVehicle* resupplier, FLOAT64VECTOR* lastPos);
 LOGICAL _IsValidResupplyBuilding(StratDB::StratObject* resupplier);
 StratDB::StratObject* _LookupResupplyBuilding();
@@ -357,7 +357,7 @@ vehVehicle* playerGetVehicle()
 	return persGetPersonaVehiclePtr();
 }
 
-UINT32 persInit(void)
+UINT32 persInit()
 {
 	_ExternalFieldOfView = DEFAULT_EXTERN_FOV;
 
@@ -435,7 +435,7 @@ UINT32 persInit(void)
 	return 0;
 }
 
-UINT32 persKill(void)
+UINT32 persKill()
 {
 	persmsgKill();
 
@@ -448,7 +448,7 @@ UINT32 persKill(void)
 	return 0;
 }
 
-UINT32 persUpdate(void)
+UINT32 persUpdate()
 {
 	// update the player's vehicle controls (hack for now)
 	if (_Persona.VehicleAttached != nullptr)
@@ -577,7 +577,7 @@ static UINT32 _SetFinalExtFOVandFog(FLOAT32 efov)
 }
 
 // FIXME - the results of this function aren't used
-static UINT32 _UpdateCockpitCameraPos(void)
+static UINT32 _UpdateCockpitCameraPos()
 {
 piVECTOR Pos;
 
@@ -1028,7 +1028,7 @@ OBJECT * ObjAtt;
 
 
 #if USE_STATESET
-LOGICAL persDrawGunsight(void)
+LOGICAL persDrawGunsight()
 {
 	// so _DrawStats gets cleared
 	persPrepGunsightDraw();
@@ -1087,7 +1087,7 @@ LOGICAL persDrawGunsight(void)
 	return TRUE;
 }
 #else
-LOGICAL persDrawGunsight(void)
+LOGICAL persDrawGunsight()
 {
 	// so _DrawStats gets cleared
 	persPrepGunsightDraw();
@@ -1163,7 +1163,7 @@ LOGICAL persDrawGunsight(void)
 }
 #endif
 
-static LOGICAL _BlockView(void)
+static LOGICAL _BlockView()
 {
 piMATRIX SavedViewMat;
 piVECTOR V1,V2,V3,V4;
@@ -1946,7 +1946,7 @@ UINT32 persGetCameraPosAndAtt(piVECTOR * Pos,piVECTOR * Att)
 	return 0;
 }
 
-static UINT32 _UpdateHeadAndView(void)
+static UINT32 _UpdateHeadAndView()
 {
 mlVehicleData * VehicleData;
 piMATRIX * Mat;
@@ -2133,18 +2133,16 @@ vehVehicle* persGetPersonaPilotedOnlineVehicle()
 	return nullptr;
 }
 
-UINT32 persGetPersonaPosition(UINT32 * Position)
+UINT32 persGetPersonaPosition()
 {
 	if(EZ_MGR)
 	{
 		// see if we have overriden the game position temporarily
 		SINT32 pos = EZ_MGR->GetGamePosition();
-		if(pos >= 0) return *Position = (UINT32)pos;
+		if(pos >= 0) return (UINT32)pos;
 	}
 
-	*Position = _Persona.Position;
-
-	return 0;
+	return _Persona.Position;
 }
 
 UINT32 persSetPersonaPositionCallback(SINT32 param,UINT32 id,UINT32 Detach)
@@ -2446,7 +2444,7 @@ UINT32 persDetachFromVehicle(vehVehicle* Vehicle)
 	return 0;
 }
 
-UINT32 persDetachPersona(void)
+UINT32 persDetachPersona()
 {
 	_Persona.PersonaPosition = nullptr;
 	_Persona.PersonaBodyDOF = nullptr;
@@ -2976,7 +2974,7 @@ static UINT32 _SetExtFOV(SINT32 Param, UINT32 Id, UINT32 Detach)
 	return 0;
 }
 
-FLOAT32 persGetFogScaleMultiplier(void)
+FLOAT32 persGetFogScaleMultiplier()
 {
 	return _FogScaleMultiplier;
 }
@@ -3048,8 +3046,7 @@ bool _tpsCamera(piVECTOR* pos, piVECTOR* aim)
 		}
 		else
 		{
-			UINT32 seat = 0;
-			persGetPersonaPosition(&seat);
+			UINT32 seat = persGetPersonaPosition();
 			FLOAT64 traverse = -(vehicle->ModelData->TurretTraverse[seat] * 2.0f);
 
 			if(traverse)
@@ -3164,7 +3161,7 @@ UINT32 persAdjustExternalFixedCamera(piVECTOR* Adjustment)
 	return 0;
 }
 
-static void _InstallViewControlCallbacks(void)
+static void _InstallViewControlCallbacks()
 {
 	if (_Persona.VehicleAttached && _Persona.VehicleAttached->VehicleType &&
 		_Persona.VehicleAttached->VehicleType->Type != VEH_TYPE_FLOATER)
@@ -3204,7 +3201,7 @@ static void _InstallViewControlCallbacks(void)
 	imapInstallControlCallback(IMAP_MOM_UI_MAP_ZOOMOUT,uiMapScaleAllMaps);
 }
 
-UINT32 persPersonaIsCreatedOnHost(void)
+UINT32 persPersonaIsCreatedOnHost()
 {
 
 	_Persona.PersonaInstalledOnHost = 1;
@@ -3214,7 +3211,7 @@ UINT32 persPersonaIsCreatedOnHost(void)
 	return 0;
 }
 
-UINT32 persIsPersonaCreated(void)
+UINT32 persIsPersonaCreated()
 {
 	return _Persona.PersonaInstalledOnHost;
 }
@@ -3265,7 +3262,7 @@ UINT32 persGetPlayerVelocity(piVECTOR * Vel)
 	return 0;
 }
 
-static UINT32 _SetNormalInternalView(void)
+static UINT32 _SetNormalInternalView()
 {
 FLOAT32		horizon;
 FLOAT32		fov;
@@ -3468,7 +3465,7 @@ UINT32 persGetCrewDeadForKillScore(UINT32 Position)
 	return 0;
 }
 
-UINT32 persResetVehicleG(void)
+UINT32 persResetVehicleG()
 {
 	_VehicleG = 1.0;
 
@@ -3489,7 +3486,7 @@ UINT32 persSetVehicleG(FLOAT32 VehicleG, vehVehicle* Vehicle)
 	return 0;
 }
 
-static UINT32 _UpdatePersonaHealths(void)
+static UINT32 _UpdatePersonaHealths()
 {
 	UINT32 i;
 	FLOAT32 Delta;
@@ -3886,7 +3883,7 @@ UINT32 persGetMaxBrainOxy(FLOAT32 * MaxBrainOxy, FLOAT32* BlackoutFullPercent)
 	return 0;
 }
 
-UINT32 persDrawRedoutBlackout(void)
+UINT32 persDrawRedoutBlackout()
 {
 	piSetRenderState(piRENDERSTATE_LIGHTING, FALSE);
 
@@ -3910,7 +3907,7 @@ UINT32 persDrawRedoutBlackout(void)
 }
 
 #if(0)
-static UINT32 _DrawRedoutBlackoutOld(void)
+static UINT32 _DrawRedoutBlackoutOld()
 {
 	static UINT32 Color;
 	static FLOAT32 Red,Green,Blue;
@@ -3951,11 +3948,7 @@ static UINT32 _DrawRedoutBlackoutOld(void)
 		}
 		else
 		{
-#if platOS == OS_MACOS
-			Color = piRGBA(Red,Green,Blue,fmin(AlphaValue, 0.75));
-#else
 			Color = piRGBA(Red,Green,Blue, std::min(AlphaValue, 0.75f));
-#endif
 			draw2dTransparentRectangle(0,0,piGetWidth(),piGetHeight(),zdepthLAYER7,Color);
 		}
 	}
@@ -3992,7 +3985,7 @@ static UINT32 _DrawRedoutBlackoutOld(void)
 #endif
 
 // uses the multiplier blend mode
-static UINT32 _DrawRedoutBlackoutNew(void)
+static UINT32 _DrawRedoutBlackoutNew()
 {
 	UINT32 Color;
 	FLOAT32 Red,Green,Blue;
@@ -4135,7 +4128,7 @@ static UINT32 _DrawRedoutBlackoutNew(void)
 	return 0;
 }
 
-static UINT32 _CheckUnderground(void)
+static UINT32 _CheckUnderground()
 {
 
 	// and, of course, disable visibility if the camera goes underground
@@ -4171,7 +4164,7 @@ static UINT32 _CheckUnderground(void)
 	return 0;
 }
 
-UINT32 persUpdateCockpitSmoke(void)
+UINT32 persUpdateCockpitSmoke()
 {
 	if (_CameraMode == _EXTERNAL_CAMERA)
 	{
@@ -4419,7 +4412,7 @@ piVECTOR Att;
 	return 0;
 }
 
-UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL ATPOnly)
+UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, bool ATPOnly)
 {
 	if(vehmainHasBailedOut())
 		return 0;
@@ -4429,16 +4422,12 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 		return 0;
 	}
 
-#if platOS == OS_MACOS
-#ifdef IS_DEBUG
-    printf( "Damage %f position %u location %u atponly %u\n", Damage, Position, Location, ATPOnly );
-#endif
-#endif
+    dbugLog(_FLD, "Damage %f position %u location %u atponly %u\n", Damage, Position, Location, ATPOnly);
 
 	persPersonaHealth& Health = _PersonaHealth[Position];
 	if (Location == PERS_HITLOCATION_HEAD)
 	{
-		if (ATPOnly == FALSE)
+		if (!ATPOnly)
 		{
 			Health.BrainOxyMaxLevel += (FLOAT32)Damage * _BRAIN_DAMAGE_PER_JOULE;
 			Health.BrainOxyLevel += (FLOAT32)Damage * _BRAIN_DAMAGE_PER_JOULE;
@@ -4467,7 +4456,7 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 	}
 	if (Location == PERS_HITLOCATION_TORSO)
 	{
-		if (ATPOnly == FALSE)
+		if (!ATPOnly)
 		{
 			Health.BloodLevel += (FLOAT32)Damage * _BLOOD_LOSS_PER_JOULE_TORSO;
 			Health.ATPMaxLevel += _ATP_INJURY_TORSO_PER_JOULE * (FLOAT32)Damage;
@@ -4486,7 +4475,7 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 	}
 	if (Location == PERS_HITLOCATION_ARMS)
 	{
-		if (ATPOnly == FALSE)
+		if (!ATPOnly)
 		{
 			Health.BloodLevel += (FLOAT32)Damage * _BLOOD_LOSS_PER_JOULE_ARMS;
 			Health.ATPMaxLevel += _ATP_INJURY_ARMS_PER_JOULE * (FLOAT32)Damage;
@@ -4505,7 +4494,7 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 	}
 	if (Location == PERS_HITLOCATION_LEGS)
 	{
-		if (ATPOnly == FALSE)
+		if (!ATPOnly)
 		{
 			Health.BloodLevel += (FLOAT32)Damage * _BLOOD_LOSS_PER_JOULE_LEGS;
 			Health.ATPMaxLevel += _ATP_INJURY_LEGS_PER_JOULE * (FLOAT32)Damage;
@@ -4529,7 +4518,7 @@ UINT32 persApplyDamage(FLOAT64 Damage,UINT32 Position, UINT32 Location, LOGICAL 
 	return 0;
 }
 
-UINT32 _UpdatePersonaSounds(void)
+UINT32 _UpdatePersonaSounds()
 {
 FLOAT32 Volume;
 vehVehicle* Vehicle;
@@ -4613,7 +4602,6 @@ FLOAT32 Pitch;
 		Volume *= persHatchVolumeMultiplier(PosNum);
 
 		// handle engine
-#if platOS != OS_MACOS
 		FLOAT32 TempNum;
 
 		TempNum = (1.0f - _Persona.VehicleAttached->EngineIdleVolume) *
@@ -4623,7 +4611,6 @@ FLOAT32 Pitch;
 		TempNum = (1.0f - _Persona.VehicleAttached->EnginePowerVolume) *
 					(CrewData->EngineFullPowerVol[PosNum]) + (1.0f - CrewData->EngineFullPowerVol[PosNum]);
 		Volume *= TempNum;
-#endif
 
 	}
 	fxSndSetExternalVolume(Volume);
@@ -4910,7 +4897,7 @@ FLOAT32 Damage;
 #define POS_MOVED(pos,chk) (((pos).x != (chk).x) || ((pos).y != (chk).y) || ((pos).z != (chk).z))
 #define POS_RESET(pos) ((pos).x = (pos).y = (pos).z = 0)
 
-int _DoResupplyCheck(void)
+int _DoResupplyCheck()
 {
 	// only check every once in a while (host determined)
 	if(frametime < _resupplyCheck)
@@ -4970,7 +4957,10 @@ static bool _findResupplyFRU(ServerTrackedObject& sto, void* cookie)
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
 
-	if(sto.type() == ServerTrackedObject::_UMS && wwiiSide(sto.flags()) == player->Side)
+    // valid STOs are - Any _UMS type  OR  _PPO type with subtype of Ammo Fru (4)
+    if( (sto.type() == ServerTrackedObject::_UMS ||
+        (sto.type() == ServerTrackedObject::_PPO && sto.subType() == PPOSpecLoader::_PPO_AFRU))
+       && wwiiSide(sto.flags()) == player->Side)
 	{
 		const WorldPosition_m& pos = sto.position();
 
@@ -4989,7 +4979,7 @@ static bool _findResupplyFRU(ServerTrackedObject& sto, void* cookie)
 	return false;
 }
 
-UINT32 _DoGroundResupplyCheck(void)
+UINT32 _DoGroundResupplyCheck()
 {
 	static vehVehicle* VehicleResupplier = nullptr;
 
@@ -5134,7 +5124,7 @@ UINT32 _DoGroundResupplyCheck(void)
 	return GAMEEVENT_RESUPPLY_READY;
 }
 
-UINT32 _DoStaticResupplyCheck(void)
+UINT32 _DoStaticResupplyCheck()
 {
 	static StratDB::StratObject* CurrentResupplier = nullptr;
 
@@ -5226,7 +5216,7 @@ UINT32 _DoStaticResupplyCheck(void)
 	return GAMEEVENT_RESUPPLY_READY;
 }
 
-UINT32 _DoScenarioResupplyCheck(void)
+UINT32 _DoScenarioResupplyCheck()
 {
 	// if we made it this far, there was a valid building near enough to us;
 	// by valid, we mean same side
@@ -5487,7 +5477,7 @@ LOGICAL persIsTired()
 	return (_Persona.breathID > 0);
 }
 
-void persResetHealths(void)
+void persResetHealths()
 {
 	for (int i = 0 ; i < ML_MAX_CREW_POSITIONS ; ++i )
 		_PersonaHealth[i].clear();
@@ -5507,7 +5497,7 @@ void persShakeHead(const char* message)
 	}
 }
 
-void persKillCrew(void)
+void persKillCrew()
 {
 	if(vehmainHasBailedOut())
 		return;
@@ -5533,12 +5523,12 @@ void persKillCrew(void)
 	fpPPOCancel();
 }
 
-bool persAllowHUDUpdate(void)
+bool persAllowHUDUpdate()
 {
 	return (_Persona.BlackoutPercent <= 0.3f);
 }
 
-bool persCanVehicleExit(void)
+bool persCanVehicleExit()
 {
 	if (PN_UNLIKELY(!_Persona.VehicleAttached))
 		return false;
@@ -5569,7 +5559,7 @@ bool persCanVehicleExit(void)
 	return true;
 }
 
-bool persIsCrewDead(void)
+bool persIsCrewDead()
 {
 	if (PN_UNLIKELY(!_Persona.VehicleAttached))
 		return false;
@@ -5797,50 +5787,50 @@ UINT32 persGetPositionOrdnanceNum (UINT32 position)
 	return _Persona.PositionData[position].ordnanceNum;
 }
 
-LOGICAL persIsCanopyExposed(UINT32 position)
+bool persIsCanopyExposed(UINT32 position)
 {
-	if(position >= ML_MAX_CREW_POSITIONS) return FALSE;
-	if(_Persona.VehicleAttached->ModelData->CrewData.AlwaysExposed[position]) return TRUE;
+	if(position >= ML_MAX_CREW_POSITIONS) return false;
+	if(_Persona.VehicleAttached->ModelData->CrewData.AlwaysExposed[position]) return true;
 
 	if(_Persona.VehicleAttached->ModelData->CrewData.ExposedByCanopy[position])
 		return persIsCanopyOpen(position);
 
-	return FALSE;
+	return false;
 }
 
-LOGICAL persIsHatchExposed(UINT32 position)
+bool persIsHatchExposed(UINT32 position)
 {
-	if(position >= ML_MAX_CREW_POSITIONS) return FALSE;
-	if(_Persona.VehicleAttached->ModelData->CrewData.AlwaysExposed[position]) return TRUE;
+	if(position >= ML_MAX_CREW_POSITIONS) return false;
+	if(_Persona.VehicleAttached->ModelData->CrewData.AlwaysExposed[position]) return true;
 
 	if(_Persona.VehicleAttached->ModelData->CrewData.ExposedByHatch[position])
 		return persIsHatchOpen(position);
 
-	return FALSE;
+	return false;
 }
 
-LOGICAL persIsCanopyOpen(UINT32 position)
+bool persIsCanopyOpen(UINT32 position)
 {
-	if(position >= ML_MAX_CREW_POSITIONS) return FALSE;
+	if(position >= ML_MAX_CREW_POSITIONS) return false;
 
 	if(_Persona.VehicleAttached->ModelData->CrewData.DefaultCanopyPosition[0] == 0)
 		return (_Persona.VehicleAttached->StateAnimation.CanopyPos[position] != 0);
 	else
 		return (_Persona.VehicleAttached->StateAnimation.CanopyPos[position] == 0);
 
-	return FALSE;
+	return true;
 }
 
-LOGICAL persIsHatchOpen(UINT32 position)
+bool persIsHatchOpen(UINT32 position)
 {
-	if(position >= ML_MAX_CREW_POSITIONS) return FALSE;
+	if(position >= ML_MAX_CREW_POSITIONS) return false;
 
 	if(_Persona.VehicleAttached->ModelData->CrewData.DefaultHatchPosition[0] == 0)
 		return (_Persona.VehicleAttached->StateAnimation.HatchPos[position] != 0);
 	else
 		return (_Persona.VehicleAttached->StateAnimation.HatchPos[position] == 0);
 
-	return FALSE;
+	return false;
 }
 
 FLOAT32 persCanopyVolumeMultiplier(UINT32 PosNum)
@@ -5901,9 +5891,6 @@ void _playearring(FLOAT32 volume, SINT32 duration)
 	if(persIsInDeathCam())
 		return;
 
-#if FRES
-	// Do nothing for now
-#else
 	_playsound("sounds/ear_ringing.wav", _Persona.earringSoundID, volume * .5f, .7f, duration);
 
 	/*
@@ -5935,7 +5922,6 @@ void _playearring(FLOAT32 volume, SINT32 duration)
 		_Persona.earringSoundID = id;
 	}
 	*/
-#endif
 }
 
 void _playheartbeat(FLOAT32 volume, SINT32 duration)
@@ -5943,9 +5929,6 @@ void _playheartbeat(FLOAT32 volume, SINT32 duration)
 	if(persIsInDeathCam())
 		return;
 
-#if FRES
-	// Do nothing for now
-#else
 	_playsound("sounds/heartbeat.wav", _Persona.heartbeatID, volume, 1.0f, duration);
 	/*
 	SINT32 id = fxSndGetNewSound();
@@ -5976,7 +5959,6 @@ void _playheartbeat(FLOAT32 volume, SINT32 duration)
 		_Persona.heartbeatID = id;
 	}
 	*/
-#endif
 }
 
 void _playbreathing(FLOAT32 volume, FLOAT32 pitch, SINT32 duration)
@@ -5984,9 +5966,6 @@ void _playbreathing(FLOAT32 volume, FLOAT32 pitch, SINT32 duration)
 	if(persIsInDeathCam())
 		return;
 
-#if FRES
-	// Do nothing for now
-#else
 	_playsound("sounds/troop/breath1.wav", _Persona.breathID, volume, pitch, duration);
 
 	/*
@@ -6017,14 +5996,10 @@ void _playbreathing(FLOAT32 volume, FLOAT32 pitch, SINT32 duration)
 		_Persona.breathID = id;
 	}
 	*/
-#endif
 }
 
 void _playshellshock(FLOAT32 volume, SINT32 duration)
 {
-#if FRES
-	// Do nothing for now
-#else
 	//_playsound("sounds//troop//breath1.wav", _Persona.shellshockID, volume, 1.0f, duration);
 
 	_targetBreaths = BREATH_SCALE;
@@ -6059,7 +6034,6 @@ void _playshellshock(FLOAT32 volume, SINT32 duration)
 		_Persona.shellshockID = id;
 	}
 	*/
-#endif
 }
 
 void _playsound(const char* path, SINT32& id, FLOAT32 volume, FLOAT32 pitch, SINT32 duration)

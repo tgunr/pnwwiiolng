@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "veh/vehmain.h"
 #include "veh/vehanim.h"
@@ -15,7 +15,7 @@
 void obmainPrintObject(OBJECT* object, int ident=0);
 
 #include <stack>
-typedef std::stack<mlObjectData*> OBJECT_DATA_POOL;
+using OBJECT_DATA_POOL = std::stack<mlObjectData*>;
 static OBJECT_DATA_POOL _objectDataPool;
 
 /************************************************************************************************

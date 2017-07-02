@@ -165,12 +165,12 @@ extern LOGICAL		fpFPSPlayFallSound(OBJECT* pObject, SINT32 fallType);
 extern LOGICAL		fpFPSIsTrooperSitting(OBJECT* pObject);
 extern LOGICAL		fpFPSIsObjectFPS (OBJECT* pObject);
 extern LOGICAL		fpFPSIsTrooperFalling ();
-extern void		fpFPSDrawGunsight (void);
+extern void		fpFPSDrawGunsight ();
 extern void		fpFPSEnableBinoculars (SINT32 enableBinocs);
 extern void		fpFPSMarkForVehicleCollideCheck(UINT32 flag);
 extern UINT32		fpFPSVehicleCollideCheckNeeded();
 extern void		fpFPSDetermineTrooperLoadout (struct vehVehicle*vehicle, UINT32 weaponTypeNum, SINT32 binocsEnabled, SINT32* weaponArray, SINT32* country, SINT32* weaponOfLastResort, LOGICAL* isParatroop);
-extern LOGICAL		fpFPSIsExternalView (void);
+extern LOGICAL		fpFPSIsExternalView ();
 extern void		fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force);
 extern void		fpFPSEjectShell (OBJECT* pObject, piMATRIX* fireAtt, LOGICAL firstPerson);
 extern UINT32		fpFPSGetResupplyTarget ();
@@ -201,10 +201,10 @@ extern SINT32		fpFPSfxPlayTPSSingleSound(const char* soundName, OBJECT* soundObj
 extern void		fpFPSSetInfantrySurfaceID (SINT32 infSurfID, struct trnCDTerrainObject* TO);
 extern void		fpFPSSetStandingOnVehicle (LOGICAL value);
 
-extern FLOAT64		fpFPSGetBridgeDamage (void);
-extern FLOAT64		fpFPSGetBridgeRepair (void);
+extern FLOAT64		fpFPSGetBridgeDamage ();
+extern FLOAT64		fpFPSGetBridgeRepair ();
 
-extern FLOAT32		fpFPSGetConcussionMod (void);
+extern FLOAT32		fpFPSGetConcussionMod ();
 
 extern FLOAT32		fpFPSGetRedScreenTime ();
 extern FLOAT32		fpFPSGetRedScreenMinAlpha ();
@@ -273,3 +273,12 @@ extern LOGICAL	fpFPSUpdateInfantry(FLOAT64 DeltaTime);
 
 extern FLOAT32 fpFPSGetGrenadeThrowPower();
 extern bool fpFPSCanProjectGrenade();
+
+//--------------
+// !!!HACK!!! - for vehInterpolator
+#include "fpFPSdata.h"
+
+void InitColliderGeometry(void);
+void _updateFPSColliders(void);
+extern fpFPSPositions HACK_forced_pose;
+extern Vec3d* HACK_forced_pos;

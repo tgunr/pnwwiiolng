@@ -1,8 +1,13 @@
 #pragma once
 
+#if defined(HAVE_CONFIG_H)
+#include "config.h"
+#endif
+
 ////////// SYSTEM INCLUDES ONLY -- NO PLAYNET SPECIFICS
 
 #include <algorithm>
+#include <atomic>
 #include <array>
 #include <cassert>
 #include <cctype>
@@ -15,19 +20,22 @@
 #include <cstring>
 #include <ctime>
 #include <limits>
-
 #include <list>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
-
+#include <numeric>
 #include <thread>
 #include <mutex>
 
 #if defined(HAVE_UNISTD_H)
-# include <unistd.h>
+#include <unistd.h>
+#endif
+
+#if defined(HAVE_SYS_PARAM_H)
+#include <sys/param.h>
 #endif
 
 ////////// PLAYNET SYSTYPES NEEDS TO GO HERE
@@ -36,6 +44,7 @@
 
 ////////// PLAYNET INCLUDES GO AFTER HERE
 
+#include "include/strprintf.h"
 #include "include/defs.h"
 #include "dbug/dbug.h"
 #include "dbug/dbugExtErrors.h"
@@ -50,10 +59,28 @@
 #include "teul/teulKit.h"
 #include "teul/teulBasic.h"
 #include "teul/teulPackers.h"
+#include "wwii/wwiiFullObjID.h"
+#include "weap/weapSpec.h"
 #include "wwii/wwiiPermissions.h"
 #include "inst/instTypes.h"
-#include "wwii/wwiiFullObjID.h"
 #include "teul/teulPacket.h"
 #include "weap/weapWeapon.h"
 #include "teul/teulEndpoint.h"
 #include "chat/chatLStringIDs.h"
+#include "str/stringLib.h"
+
+////////// Core utility functions
+
+template <typename T, std::size_t N>
+constexpr std::size_t array_size(T(&)[N]) noexcept { return N; }
+
+
+template <typename... Args>
+struct num_args {
+    static constexpr const size_t value = sizeof...(Args);
+};
+
+
+template <bool...> struct bool_pack;
+template <bool... v>
+using all_true = std::is_same<bool_pack<true, v...>, bool_pack<v..., true>>;

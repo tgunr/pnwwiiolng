@@ -1,0 +1,342 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\mem\AlignedAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\mem\BufferAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\mem\IAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\mem\LargeAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\mem\StdAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\parse\Base64.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\parse\BufferTok.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\time\Clock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\port\EndianNeutral.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\port\SystemInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\HashTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\LinkedLists.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\RefObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\RefSingleton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\Singleton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\lang\Strings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\io\Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\io\LogThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\io\MappedFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\io\Settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\rand\MersenneTwister.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\rand\StdRand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\hash\Murmur.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\threads\Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\threads\RWLock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\threads\Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\threads\WaitableFlag.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\threads\WorkerThreads.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\privatekey\ChaCha.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\cookie\CookieJar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\rand\EntropyGeneric.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\rand\EntropyLinux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\rand\EntropyWindows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\rand\EntropyWindowsCE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\rand\Fortuna.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\hash\HMAC_MD5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\hash\Skein.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\hash\Skein256.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\hash\Skein512.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\hash\VHash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\SecureCompare.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\math\BigMontgomery.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\math\BigPseudoMersenne.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\math\BigRTL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\math\BigTwistedEdwards.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\math\BitMath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\AuthenticatedEncryption.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\EasyHandshake.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\KeyAgreement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\KeyAgreementInitiator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\KeyAgreementResponder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\Keys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\src\crypt\tunnel\TunnelTLS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\AlignedAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\BufferAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\IAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\LargeAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\ResizableBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\ReuseAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\mem\StdAllocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\parse\Base64.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\parse\BufferTok.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\time\Clock.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\port\EndianNeutral.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\port\SystemInfo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\port\WindowsInclude.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\Delegates.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\HashTable.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\LinkedLists.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\MergeSort.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\MulticastDelegates.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\RefObject.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\RefSingleton.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\Singleton.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\lang\Strings.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\io\Log.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\io\LogThread.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\io\MappedFile.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\io\Settings.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\rand\MersenneTwister.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\rand\StdRand.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\hash\Murmur.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\Atomic.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\Mutex.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\RWLock.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\Thread.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\WaitableFlag.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\threads\WorkerThreads.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\cookie\CookieJar.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\hash\HMAC_MD5.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\hash\ICryptHash.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\hash\Skein.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\hash\VHash.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\rand\Fortuna.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\symmetric\ChaCha.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\math\BigMontgomery.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\math\BigPseudoMersenne.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\math\BigRTL.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\math\BigTwistedEdwards.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\math\BitMath.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\AuthenticatedEncryption.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\EasyHandshake.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\KeyAgreement.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\KeyAgreementInitiator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\KeyAgreementResponder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\Keys.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Libraries\RakNet\DependentExtensions\cat\include\cat\crypt\tunnel\TunnelTLS.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

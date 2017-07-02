@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*
  *  sneaky.cpp
  *  WW2OL
@@ -12,7 +12,7 @@
 #include <vector>
 #include <algorithm>
 
-typedef std::vector<GLuint> NameVector;
+using NameVector = std::vector<GLuint>;
 static NameVector names;
 static const int ChunkSize=1000;
 
@@ -44,7 +44,7 @@ GLhandleARB gl_CreateProgram()
 
 #define CHUNCK  256
 
-    typedef std::vector<GLhandleARB> ProgramVector;
+	using ProgramVector = std::vector<GLhandleARB>;
     static ProgramVector programs;
     static size_t idx = 0;
 

@@ -15,12 +15,8 @@
 
 #include <string>
 
-#include "sys/sysWinISO.h"			// Must be the last thing you include
-
-#if(1)
 #define CG_VERSION      _T("1, 2, 0, 0")
 #define CGGL_VERSION   _T("1, 2, 0, 0")
-#endif
 
 static void _cgErrorCallback();
 
@@ -80,7 +76,6 @@ CWW2Shader::CWW2Shader(const SCHAR* shader, SINT32 shaderType)
 //////////////////////////////////////////////////////////////////////
 CWW2Shader::~CWW2Shader()
 {
- #if platOS != OS_MACOS // this gets call from static destructor long after everything has been uninitialized
 	if(isProgram())
     {
         killProgram();
@@ -91,7 +86,6 @@ CWW2Shader::~CWW2Shader()
         cgDestroyContext(m_cgContext);
         m_cgContext = NULL;
     }
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -127,9 +121,7 @@ LOGICAL CWW2Shader::initialize()
 
 #if 0 //def BETA_RELEASE
     SCHAR szBuff[64];
-
-    sprintf(szBuff, "%s", cgGetProfileString(m_cgVprofile));
-
+    strprintf(szBuff, "%s", cgGetProfileString(m_cgVprofile));
     Write_Debug("[CWW2Shader::Init] Latest supported vertex profile is %s", szBuff);
 #endif
 
@@ -149,8 +141,7 @@ LOGICAL CWW2Shader::initialize()
 #endif
 
 #if 0 //def BETA_RELEASE
-    sprintf(szBuff, "%s", cgGetProfileString(m_cgFprofile));
-
+    strprintf(szBuff, "%s", cgGetProfileString(m_cgFprofile));
     Write_Debug("[CWW2Shader::Init] Latest supported fragment profile is %s", szBuff);
 #endif
 
@@ -591,7 +582,7 @@ void _cgErrorCallback()
         strcpy(szErr, "[_cgErrorCallback] ");
         strcat(szErr, p);
         SCHAR s[256];
-        sprintf(s, "%d %s", count++, szErr);
+        strprintf(s, "%d %s", count++, szErr);
         Write_Debug(s);
 
         g_bError = TRUE;

@@ -22,7 +22,7 @@ class Matrixd
 {
     public:
 
-        typedef double value_type;
+        using value_type = double;
 
         inline Matrixd() { makeIdentity(); }
         inline Matrixd( const Matrixd& mat) { set(mat.ptr()); }
@@ -250,7 +250,7 @@ class Matrixd
         void orthoNormalize(const Matrixd& rhs);
 
         // basic utility functions to create new matrices
-        static inline Matrixd identity( void );
+        static inline Matrixd identity();
         static inline Matrixd scale( const Vec3f& sv);
         static inline Matrixd scale( const Vec3d& sv);
         static inline Matrixd scale( value_type sx, value_type sy, value_type sz);
@@ -388,7 +388,7 @@ class Matrixd
 };
 
 // static utility methods
-inline Matrixd Matrixd::identity(void)
+inline Matrixd Matrixd::identity()
 {
     Matrixd m;
     m.makeIdentity();

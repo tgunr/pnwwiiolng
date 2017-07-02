@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "include/vars.h"
 #include "fio/fio.h"
 #include "mem/mem.h"
@@ -73,6 +73,8 @@
 #include "trn/trnScenario.h"
 #include "ez/EZManager.h"
 #include "veh/vehAnimEnum.h"
+#include "fp/fpFPSdata.h"
+#include "fp/fpPPO.h"
 
 #ifdef GR2_BLEND_EDITOR
 #include "gr2/gr2Anim.h"
@@ -125,7 +127,7 @@
 	defines
 *************************************************************************************************/
 
-#if defined(_DEBUG)
+#if defined(DEBUG)
 //#define SPAWN_AT_DINANT_OFFLINE 1
 //#define SPAWN_AT_ANTWERP_OFFLINE 1
 //#define SPAWN_AT_OLD_OFFLINE 1
@@ -334,6 +336,7 @@ FLOAT64 _ThrottlePos; // 0 to 1.0
 FLOAT64 _RudderPos; // -1.0 to 1.0
 UINT32 _ThrottleDecreaseKeyIsDown;
 UINT32 _ThrottleIncreaseKeyIsDown;
+extern  fpsWeaponTypes   currentWeaponModel;
 
 // hack for vehicle analysis input and floatere
 extern char	buffer[256];
@@ -404,7 +407,7 @@ static std::map<std::string, BumpAndFrictionData*> _hashBAF;
 
 static UINT32 _ClearVehicleData(mlVehicleData * VehicleData);
 static UINT32 _ShutDownSoundsAndFx(mlVehicleData* VehicleData);
-UINT32 _ReadBumpAndFrictionTable(void);
+UINT32 _ReadBumpAndFrictionTable();
 
 static UINT32 _UpdateAirfoilComponent(mlComponent * Component, mlVehicleData * VehicleData,FLOAT64 DeltaTime);
 static UINT32 _UpdateHaulPoint(mlComponent * Component,
@@ -486,7 +489,7 @@ static UINT32 _DoODEVehicleCollision(mlVehicleData * VehicleData, FLOAT64 DeltaT
 
 static UINT32 mlDetermineVehicleCollisions(mlVehicleData * VehicleData, FLOAT64 DeltaTime);
 
-static SINT32 mlVehicleUpdateRide(mlVehicleRef VehicleData);
+static SINT32 mlVehicleUpdateRide(mlVehicleData* VehicleData);
 
 #if(0)
 static SINT32 _radioStatic(trnCDTerrainObject* t);
@@ -505,10 +508,10 @@ static LOGICAL mlHoistCollideRoundWithTerrain(piVECTOR const* OldPos, piVECTOR c
 static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData);
 static UINT32 _TraverseAndSetupColorCoding(OBJECT * Object,UINT32 UseAlpha,vehVehicle* Vehicle,
 										   UINT32 CurrentHitmapObjectDisplay);
-static void _LeakTest(void);
+static void _LeakTest();
 #endif
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 static UINT32 _DoEyeOperations(mlVehicleData* VehicleData);
 #endif
 
@@ -540,10 +543,12 @@ static void _HandleContactDamage(vehVehicle* Vehicle);
 static void _DeclareVehicleKilled (mlVehicleData* pVehicleData, mlComponent* pComponent);
 static void _CheckForSecondaryVehicleKill (mlVehicleData* pVehicleData, mlComponent* pComponent);
 
+extern void fpPPOSwitchPPO(bool allowFrus);
+
 /************************************************************************************************
 	mlMain
 *************************************************************************************************/
-UINT32 mlInit(void)
+UINT32 mlInit()
 {
 	_ReadBumpAndFrictionTable();
 
@@ -589,7 +594,7 @@ UINT32 mlUpdate(mlVehicleData * VehicleData,OBJECT * VehicleObject)
 	return 0;
 }
 
-UINT32 mlKill(void)
+UINT32 mlKill()
 {
 	return 0;
 }
@@ -1302,7 +1307,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 
 	vehVehicle* playerVehicle = VehicleData->VehicleMasterPtr;
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 	if(SuperFloat || playerVehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{
 		_DoEyeOperations(VehicleData);
@@ -1315,7 +1320,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 
 		return 0;
 	}
-#endif // ENABLE_FLOATERS
+#endif // GM_RELEASE
 
 	//if(NumTics)
 	//	_UpdateMovingParts(VehicleData,(FLOAT64)(NumTics*TicTime));
@@ -1746,28 +1751,34 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 
 			// check for position switch or ordinance cycle and weapon groups active
 			{
-			SINT32 TempNum;
-
-				persGetPersonaPosition((UINT32*)&TempNum);
+				UINT32 TempNum = persGetPersonaPosition();
 
 				if (VehicleData->CycleAmmo != 0 ||
 					TempNum != VehicleData->LastPlayerPos)
 				{
-					if (TempNum != VehicleData->LastPlayerPos)
+                    // We need to check to see if a PPO is active
+					if (fpPPOGet() != nullptr)
 					{
-						VehicleData->OrdnanceSelected = persGetPositionOrdnanceNum (TempNum);
+						fpPPOSwitchPPO(true);
 					}
 					else
 					{
-						VehicleData->OrdnanceSelected++;
-						if (VehicleData->OrdnanceSelected > VehicleData->CrewData.NumberOfSecondaryWeapons[TempNum])
+						if (TempNum != VehicleData->LastPlayerPos)
 						{
+							VehicleData->OrdnanceSelected = persGetPositionOrdnanceNum (TempNum);
+						}
+						else
+						{
+							VehicleData->OrdnanceSelected++;
+							if (VehicleData->OrdnanceSelected > VehicleData->CrewData.NumberOfSecondaryWeapons[TempNum])
+							{
 							VehicleData->OrdnanceSelected = 0;
+							}
 						}
 					}
 				}
 
-				persSetPositionOrdnanceNum (TempNum, VehicleData->OrdnanceSelected);
+				persSetPositionOrdnanceNum(TempNum, VehicleData->OrdnanceSelected);
 				VehicleData->LastPlayerPos = TempNum;
 			}
 
@@ -2385,24 +2396,20 @@ FLOAT64VECTOR VehicleVelocity;
 	return 0;
 }
 
-UINT32 mlResetPositionState(void)
+void mlResetPositionState()
 {
 	// add stuff here to reset when a position change happens
 	mlPrimaryTriggerDown(0, IMAP_HOLD_MAINTRIGGER, 0);
 	mlSecondaryTriggerDown(0, IMAP_HOLD_SECONDTRIGGER, 0);
-
-	return 0;
 }
 
 
-UINT32 mlResetControlStuff(void)
+void mlResetControlStuff()
 {
 	_StickXPos = 0.0;
 	_StickYPos = 0.0;
 	_RudderPos = 0.0;
 	_ThrottlePos = 0.0;
-
-	return 0;
 }
 
 UINT32 _ProcessControlInputs(UINT32 DeltaTime,mlVehicleData * VehicleData)
@@ -2834,10 +2841,6 @@ if(VehicleData->VehicleMasterPtr->VehicleType->Type == VEH_TYPE_AIR)
 	return 0;
 }
 
-#ifdef __MWERKS__
-#pragma mark -
-#endif
-
 UINT32 mlUpdateComponent(mlComponent* Component, mlVehicleData* VehicleData, FLOAT64 DeltaTime, UINT32 PassNum,
 							FLOAT64VECTOR* SavedVehicleForce, FLOAT64VECTOR* TempNormForceSum)
 {
@@ -3218,7 +3221,7 @@ static UINT32 _UpdateAirfoilComponent(mlComponent* Component, mlVehicleData* Veh
 				if(AirfoilComponentData->ControlSurfaceJammed)
 					VehicleData->CanopyJammed[AirfoilComponentData->Position] = 1;
 
-				// keep applying damage 'til that sucker's ripped off.
+				// keep applying damage 'til that thing's ripped off.
 				if(!Component->ComponentFailed && Component->CurrentDamage < MAX_DAMAGE)
 					Component->CurrentDamage += DRAG_DAMAGE * DeltaTime / 1000.0;
 
@@ -3302,7 +3305,6 @@ UINT32 MountFired = 0;
 mlWeaponMount * Mount = nullptr;
 weapWeapon * Weapon = nullptr;
 vehVehicle* Vehicle = nullptr;
-UINT32 Position = 0;
 
 	if (VehicleData->VehicleObjectData == nullptr)
 	{
@@ -3373,7 +3375,7 @@ UINT32 Position = 0;
 	}
 
 	Mount = (mlWeaponMount*)Component->SpecialData;
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	if(PassNum == 1)
 	{
@@ -4024,7 +4026,7 @@ static UINT32 _UpdateCrew(mlComponent * Component,mlVehicleData * VehicleData)
 			{
 				isDead = persGetCrewIsDead(CrewPosition);
 
-				persApplyDamage((FLOAT32)Component->NewDamage[i],CrewPosition,i, FALSE);
+				persApplyDamage(Component->NewDamage[i], CrewPosition, i, false);
 
 				if(!isDead) // if you're dead what do you care? :)
 				{
@@ -4120,10 +4122,6 @@ FLOAT64 Density1 = 0,Density2 = 0;
 
 	return 0;
 }
-
-#ifdef __MWERKS__
-#pragma mark -
-#endif
 
 UINT32 mlGetElevatorDeflection(FLOAT64 * ReturnVal,FLOAT64 DeltaTime,mlVehicleData * VehicleData)
 {
@@ -4786,7 +4784,7 @@ UINT32 mlSetStarterOff(UINT32 EngineNumber)
 }
 
 
-UINT32 mlIsTailWheelLocked(void)
+UINT32 mlIsTailWheelLocked()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
@@ -4801,7 +4799,7 @@ struct TOPair
 	FLOAT64 distance;
 };
 
-typedef std::list<TOPair> TOList;
+using TOList = std::list<TOPair>;
 
 static bool to_sort(const TOPair& a, const TOPair& b)
 {
@@ -4895,16 +4893,16 @@ static bool _killODETOCollider(trnCDTerrainObject* TO)
 
 #ifdef PARALLEL_BUILDER
 
-typedef struct Temp_Info
+struct Temp_Info
 {
     dSpaceID space;
     bool addBoxCollider;
     trnCDTerrainObject* TO;
     UINT32 odecat;
     Temp_Info( trnCDTerrainObject*o, UINT32 cat, bool addbox, dSpaceID sid ) { TO=o; odecat=cat; addBoxCollider=addbox; space = sid; }
-} Temp_Info;
+};
 
-typedef std::vector<Temp_Info> TEMP_VECTOR;
+using TEMP_VECTOR = std::vector<Temp_Info>;
 
 #endif
 
@@ -6674,7 +6672,7 @@ UINT32 Intersects;
 	return 0;
 }
 
-UINT32 _ReadBumpAndFrictionTable(void)
+UINT32 _ReadBumpAndFrictionTable()
 {
 	static UCHAR Buffer[512];
 	SINT32 FileNum;
@@ -7170,19 +7168,17 @@ UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 									   FLOAT32 * DynamicFriction,
 									   FLOAT32 * RollCoefficientMult,
 									   SINT32 * InfSurfID,
-									   OBJECT * Object,
-									   LOGICAL FrictionMods)
+									   const OBJECT * Object,
+									   bool FrictionMods)
 {
-	LOGICAL		usingDefaultSurface = FALSE;
-
 	if (Object == nullptr)
-	{
 		return 1;
-	}
 
-    UCHAR * StringPtr = nullptr;
-	if(!obmainValidateObject(Object)) return 1;
+	if (!obmainValidateObject(Object)) return 1;
 
+	bool usingDefaultSurface = false;
+
+	UCHAR * StringPtr = nullptr;
 	if(Object->texname == nullptr || Object->texname[0] == '\0')
 	{
 		if(Object->matname == nullptr || Object->matname[0] == '\0')
@@ -7222,7 +7218,7 @@ UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 
     if(StringPtr == nullptr)
     {
-		usingDefaultSurface = TRUE;
+		usingDefaultSurface = true;
 
         hashFind = _hashBAF.find("default");
 
@@ -7246,7 +7242,7 @@ UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 
         if(hashFind == _hashBAF.end())
         {
-			usingDefaultSurface = TRUE;
+			usingDefaultSurface = true;
 
             hashFind = _hashBAF.find("default");
 
@@ -7565,9 +7561,9 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		if (!trnldrFindStratObjectPosition(SpawnSuperCellX,  SpawnSuperCellY, SpawnLocId, &Pos))
 		{
 			char s[128];
-			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
+			strprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
-			piExitProgram(__FILE__,__LINE__,s);
+			piExitProgram(_FL,s);
 		}
 #ifdef BETA_RELEASE
 		}
@@ -7604,9 +7600,9 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		if (!trnldrFindStratObjectPosition(SpawnSuperCellX,  SpawnSuperCellY, SpawnLocId, &Pos))
 		{
 			char s[128];
-			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
+			strprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
-			piExitProgram(__FILE__,__LINE__,s);
+			piExitProgram(_FL,s);
 		}
 #ifdef BETA_RELEASE
 		}
@@ -7646,9 +7642,9 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		if (!trnldrFindStratObjectPosition(SpawnSuperCellX,  SpawnSuperCellY, SpawnLocId, &Pos))
 		{
 			char s[128];
-			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
+			strprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 						SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
-			piExitProgram(__FILE__,__LINE__,s);
+			piExitProgram(_FL,s);
 		}
 #ifdef BETA_RELEASE
 		}
@@ -7701,10 +7697,9 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 			if (SpawnPtr == nullptr)
 			{
 				char s[128];
-
-				sprintf(s,"Cannot find spawn object for scx = %d, scy = %d, id = %d",
+				strprintf(s,"Cannot find spawn object for scx = %d, scy = %d, id = %d",
 							SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
-				piExitProgram(__FILE__,__LINE__,s);
+				piExitProgram(_FL,s);
 			}
 		}
 
@@ -7817,7 +7812,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 	//uiConsoleprintf("SCENARIO: Updating terrain collide lists!");
 	_UpdateTerrainCollideLists(VehicleData,1);
 
-	fxAmbStop(FALSE);
+	fxAmbStop(false);
 
 	trnmainSetLightingUpdate(TRUE);
 	obdrawUpdateTerrainObjectLighting(TRUE);
@@ -7841,9 +7836,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
         // (Eventually need to collide with short collide list)
         if((SINT32)Pos.z == 1)
         {
-            COLLISION c;
-
-            memset(&c, 0, sizeof(COLLISION));
+			COLLISION c{};
 
             c.newpos.x = (FLOAT32)(Pos.x - WorldOriginOffset.x);
             c.newpos.y = (FLOAT32)(Pos.y - WorldOriginOffset.y);
@@ -8262,7 +8255,7 @@ static UINT32 _DoVehicleCollision(mlVehicleData* VehicleData, FLOAT64 DeltaTime,
     FLOAT64VECTOR DeltaVel = {0, 0, 0};
 	piVECTOR Norm = {0, 0, 0};
 	piVECTOR TempPos = {0, 0, 0};
-	FASTCOLLIDE CollisionList[NUM_COLLISION_SLOTS];
+	FASTCOLLIDE CollisionList[NUM_COLLISION_SLOTS]{};
 	FASTCOLLIDE* CollideListPtr = nullptr;
 	UINT32 NumCollides = 0;
 	UINT32 CollideNum = 0;
@@ -8277,8 +8270,6 @@ static UINT32 _DoVehicleCollision(mlVehicleData* VehicleData, FLOAT64 DeltaTime,
 	if(VehicleObjectAnalysis && DisplayCollideLines && IsFirstTic)
 		draw3dLineDebug(V1, V2, colorBLUEALPHA);
 #endif
-
-    memset(CollisionList, 0, sizeof(FASTCOLLIDE) * NUM_COLLISION_SLOTS);
 
 	Vehicle = VehicleData->VehicleMasterPtr;
 	trnGetWorldOriginOffset(&WorldOffsetOrigin);
@@ -8791,10 +8782,6 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 }
 
 
-#ifdef __MWERKS__
-#pragma mark -
-#endif
-
 /************************************************************************************************
 	mlVehicleHandleTurretConvergence
 *************************************************************************************************/
@@ -8980,7 +8967,7 @@ static SINT32 mlVehicleHandleTurretConvergence(mlVehicleData* VehicleData)
 	mlVehicleUpdateRide
 *************************************************************************************************/
 
-SINT32 mlVehicleUpdateRide(mlVehicleRef VehicleData)
+SINT32 mlVehicleUpdateRide(mlVehicleData* VehicleData)
 {
 	vehVehicle* Vehicle = VehicleData->VehicleMasterPtr;
 
@@ -9046,7 +9033,7 @@ static LOGICAL mlSafeToUnhoist(vehVehicle* Vehicle)
 	mlVehicleToggleHoist
 *************************************************************************************************/
 
-SINT32 mlVehicleToggleHoist(mlVehicleRef VehicleData)
+SINT32 mlVehicleToggleHoist(mlVehicleData* VehicleData)
 {
 	vehVehicle* CurrentVehicle;
 	vehVehicle* PlayerVehicle = VehicleData->VehicleMasterPtr;
@@ -9188,7 +9175,7 @@ static vehVehicle* mlFindShipUnderVehicle(vehVehicle* Vehicle)
 	mlVehicleRideTransport
 *************************************************************************************************/
 
-SINT32 mlVehicleRideTransport(mlVehicleRef VehicleData)
+SINT32 mlVehicleRideTransport(mlVehicleData* VehicleData)
 {
 	vehVehicle* RideVehicle;
 	vehVehicle* PlayerVehicle = VehicleData->VehicleMasterPtr;
@@ -9623,10 +9610,6 @@ static LOGICAL mlCollideWithVehicle(vehVehicle* CurrentVehicle, piVECTOR const* 
 	return (NumCollisionSlotsLeft != 32);
 }
 
-#ifdef __MWERKS__
-#pragma mark -
-#endif
-
 #ifdef BETA_RELEASE
 
 // now does* all* vehicles
@@ -10043,7 +10026,7 @@ UINT32 i;
 	_LeakTest
 *************************************************************************************************/
 
-static void _LeakTest(void)
+static void _LeakTest()
 {
 	FLOAT64VECTOR WorldOriginOffset;
 	FASTCOLLIDE CollideList[32], *CollideListPtr;
@@ -10140,10 +10123,6 @@ static void _LeakTest(void)
 
 #endif
 
-#ifdef __MWERKS__
-#pragma mark -
-#endif
-
 // change!
 // now returns true if it was able to tell, false if it wasn't
 //
@@ -10217,40 +10196,29 @@ trnCDTerrainObject*	TO;
 	return TRUE;
 }
 
-LOGICAL mlGetPrimaryPickleSetting(SINT32 * Pickle)
+SINT32 mlGetPrimaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-
-	*Pickle = VehicleData->PicklePrimary;
-
-	return TRUE;
+	return VehicleData->PicklePrimary;
 }
 
-LOGICAL mlGetSecondaryPickleSetting(SINT32 * Pickle)
+SINT32 mlGetSecondaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
-	*Pickle = VehicleData->PickleSecondary;
-
-	return TRUE;
+	return VehicleData->PickleSecondary;
 }
 
-LOGICAL mlResetPrimaryPickleSetting(void)
+void mlResetPrimaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-
 	VehicleData->PicklePrimary = 0;
-
-	return TRUE;
 }
 
-LOGICAL mlResetSecondaryPickleSetting(void)
+void mlResetSecondaryPickleSetting()
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-
 	VehicleData->PickleSecondary = 0;
-
-	return TRUE;
 }
 
 LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total)
@@ -10269,15 +10237,7 @@ LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total)
 	return TRUE;
 }
 
-#ifdef ENABLE_FLOATERS
-
-// more hacked stuff before the rats abandon the ship...
-static FLOAT64	profileFlightVelocity;						// double precision is so 1337!!1
-
-void mlSetProfileFlight()
-{
-	profileFlightVelocity = 200;
-}
+#ifdef GM_RELEASE
 
 // hacked floating eye controller
 static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
@@ -10354,12 +10314,6 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 		if (dipKEYDOWN(buffer,DIK_UP)) 	(trooper) ? Delta.y -= Speed: Delta.y += Speed;
 		if (dipKEYDOWN(buffer,DIK_S))	(trooper) ? Delta.y += Speed: Delta.y -= Speed;
 		if (dipKEYDOWN(buffer,DIK_DOWN)) (trooper) ? Delta.y += Speed: Delta.y -= Speed;
-
-		if(profileFlightVelocity != 0.0)
-		{
-			VehicleData->VehicleRealAtt.Yaw = mlDEG_TO_RAD(81.6);
-			Delta.y += profileFlightVelocity;
-		}
 
 		FLOAT64 rotation = 145.0f;
 
@@ -10503,11 +10457,7 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 	return 0;
 }
 
-#endif // ENABLE_FLOATERS
-
-#ifdef __MWERKS__
-#pragma mark -
-#endif
+#endif // GM_RELEASE
 
 // handles the magical mystery rotational co-ordinate conversion
 

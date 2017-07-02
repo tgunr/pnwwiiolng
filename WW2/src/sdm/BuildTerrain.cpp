@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #if platOS == OS_WIN32
 #include <windows.h>
 #include <commctrl.h>
@@ -47,17 +47,17 @@ using namespace std;
 #include <sys/stat.h>
 #include <dirent.h>
 
-typedef struct WIN32_FIND_DATAA
+struct WIN32_FIND_DATAA
 {
 	struct dirent* ent;
 	char cFileName[256];
-} WIN32_FIND_DATAA;
+};
 
-typedef struct HANDLE
+struct HANDLE	///TODO: This seems like a REALLY bad name.
 {
   DIR* dir;
   const char* pattern;
-} HANDLE;
+};
 
 static bool endsmatch( const char* s, const char* m )
 {
@@ -99,10 +99,6 @@ static bool findNextMatchingEntry( HANDLE&h, WIN32_FIND_DATAA* finddata )
 static HANDLE FindFirstFileA(const char*pattern, WIN32_FIND_DATAA* finddata)
 {
   HANDLE h;
-
-  char* slash = strrchr( pattern, '/' );
-  *slash = 0;
-  strcpy( slash+2, h.pattern ); // skip *
 
   h.dir = opendir(pattern);
   if ( h.dir == 0 )
@@ -246,8 +242,8 @@ static void MergeCPFdata()
 		const _CP* cpCPF = it->second;
 		CP* cpSDM = (CP*)memAlloc(sizeof(CP));
 
-		strcpy(cpSDM->fileName,	cpCPF->objname);
-		strcpy(cpSDM->name, cpCPF->name);
+		strsafecpy(cpSDM->fileName,	cpCPF->objname);
+		strsafecpy(cpSDM->name, cpCPF->name);
 		cpSDM->oid.id		= cpCPF->cpid.id;
 		cpSDM->oid.objClass	= CLASS_CP;
 		cpSDM->oid.objType	= cpCPF->ctype;
@@ -279,11 +275,11 @@ static void MergeCPFdata()
 		if(cpCPF == chokepointCPFmap.end())
 		{
 			logFile << endl << "fatal error: facility(" << facCPF->fid.scx << "," << facCPF->fid.scy << "," << facCPF->fid.id << ") refers to inexistent CP!" << endl;
-			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+			piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 
-		strcpy(facSDM->fileName, facCPF->objname);
-		strcpy(facSDM->name, facCPF->name);
+		strsafecpy(facSDM->fileName, facCPF->objname);
+		strsafecpy(facSDM->name, facCPF->name);
 		facSDM->oid.id			= facCPF->fid.id;
 		facSDM->oid.objClass	= CLASS_FACILITY;
 		facSDM->oid.objType		= facCPF->ftype;
@@ -316,11 +312,11 @@ static void MergeCPFdata()
 		if(facCPF == facilityCPFmap.end())
 		{
 			logFile << endl << "fatal error: building(" << bldCPF->bid.scx << "," << bldCPF->bid.scy << "," << bldCPF->bid.id << ") refers to inexistent facility!" << endl;
-			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+			piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 
-		strcpy(bldSDM->fileName, bldCPF->objname);
-		strcpy(bldSDM->name, bldCPF->name);
+		strsafecpy(bldSDM->fileName, bldCPF->objname);
+		strsafecpy(bldSDM->name, bldCPF->name);
 		bldSDM->oid.id			= bldCPF->bid.id;
 		bldSDM->oid.objClass	= CLASS_BUILDING;
 		bldSDM->oid.objType		= bldCPF->btype;
@@ -350,7 +346,7 @@ static void MergeCPFdata()
 		DEPOT_LINK*	linkSDM	= (DEPOT_LINK*)memAlloc(sizeof(DEPOT_LINK));
 
 
-		strcpy(linkSDM->name, linkCPF->name);
+		strsafecpy(linkSDM->name, linkCPF->name);
 		linkSDM->oid.id					= linkCPF->lid.id;
 		linkSDM->oid.objClass			= CLASS_LINK;
 		linkSDM->oid.objType			= 0;
@@ -365,14 +361,14 @@ static void MergeCPFdata()
 		else
 		{
 			//logFile << endl << "fatal error: link(" << linkCPF->lid.scx << "," << linkCPF->lid.scy << "," << linkCPF->lid.id << ") refers to inexistent firebase!" << endl;
-			//piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+			//piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 
 		BuildingCPFmap::iterator	startBldCPF	= buildingCPFmap.find(StratObjId(linkCPF->lbid.scx, linkCPF->lbid.scy, linkCPF->lbid.id));
 		if(startBldCPF == buildingCPFmap.end())
 		{
 			logFile << endl << "fatal error: link(" << linkCPF->lid.scx << "," << linkCPF->lid.scy << "," << linkCPF->lid.id << ") refers to inexistent start depot!" << endl;
-			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+			piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 
 		linkSDM->startDepotId.Populate(startBldCPF->second, linkCPF->lbid.id, CLASS_BUILDING, startBldCPF->second->btype);
@@ -381,7 +377,7 @@ static void MergeCPFdata()
 		if(endBldCPF == buildingCPFmap.end())
 		{
 			logFile << endl << "fatal error: link(" << linkCPF->lid.scx << "," << linkCPF->lid.scy << "," << linkCPF->lid.id << ") refers to inexistent end depot!" << endl;
-			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+			piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 		}
 		linkSDM->endDepotId.Populate(endBldCPF->second, endBldCPF->second->bid.id, CLASS_BUILDING, endBldCPF->second->btype);
 
@@ -391,7 +387,7 @@ static void MergeCPFdata()
 			if(wptCPF == waypointCPFmap.end())
 			{
 				logFile << endl << "fatal error: link(" << linkCPF->lid.scx << "," << linkCPF->lid.scy << "," << linkCPF->lid.id << ") refers to inexistent waypoint!" << endl;
-				piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+				piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 			}
 			float dx			= (float)(wptCPF->second.first->posx - endBldCPF->second->posx);
 			float dy			= (float)(wptCPF->second.first->posy - endBldCPF->second->posy);
@@ -450,14 +446,14 @@ static void MergeCPFdata()
 			if(linkIt == linkCPFmap.end())
 			{
 				logFile << endl << "fatal error: waypoint(" << wptCPF->wpid.scx << "," << wptCPF->wpid.scy << "," << wptCPF->wpid.id << ") refers to inexistent link!" << endl;
-				piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+				piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 			}
 
 			BuildingCPFmap::iterator	bldIt = buildingCPFmap.find(StratObjId(linkIt->second.first->lbid.scx, linkIt->second.first->lbid.scy, linkIt->second.first->lbid.id));
 			if(bldIt == buildingCPFmap.end())
 			{
 				logFile << endl << "fatal error: link(" << linkIt->second.first->lbid.scx << "," << linkIt->second.first->lbid.scy << "," << linkIt->second.first->lbid.id << ") refers to inexistent building!" << endl;
-				piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+				piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 			}
 
 			wptSDM->nextpt.Populate(bldIt->second, linkIt->second.first->lid.id, CLASS_LINK, 0);
@@ -850,7 +846,7 @@ public:
 
 	private:
 
-		typedef multimap<const PoolModel*, TerrainObject*>	ObjectList;
+		using ObjectList = std::multimap<const PoolModel*, TerrainObject*>;
 
 		struct Octet
 		{
@@ -916,7 +912,7 @@ public:
 		void WriteToSDM();
 };
 
-typedef std::set<SuperCellTerrainData::TerrainObject*> ToDeleteTerrainObjects;
+using ToDeleteTerrainObjects = std::set<SuperCellTerrainData::TerrainObject*>;
 static ToDeleteTerrainObjects TerrainObjectsToDelete;
 
 void TerrainPosition::Set(const Vec3f& absolutePos)
@@ -1572,7 +1568,7 @@ void SuperCellTerrainData::WriteToSDM()
 	{
 		logFile << endl << "Fatal error: superCell(" << supercellX << "," << supercellY << "): too many terrain objects: " << totalObjectCount << endl;
 		logFile << "MAX_TRNOBJ_OCTET has to be increased.";
-		piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+		piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 	}
 
 
@@ -1813,14 +1809,14 @@ SuperCellTerrainData::TerrainObject* SuperCellTerrainData::AddTerrainObject(cons
 		else
             terrainObject->poolModel	= obmgrGetPoolModel("dunes1");
 
-		strcpy(terrainObject->objInfo.objname, terrainObject->poolModel->modelname.c_str());
+		strsafecpy(terrainObject->objInfo.objname, terrainObject->poolModel->modelname.c_str());
 
 		terrainObject->objInfo.ortdrg	= (rand() % 4) * 2;
 	}
 	else
 	{
 		terrainObject->poolModel	= obmgrGetPoolModel(name);
-		strcpy(terrainObject->objInfo.objname, name);
+		strsafecpy(terrainObject->objInfo.objname, name);
 
 		terrainObject->objInfo.ortdrg		= ortdrg;
 	}
@@ -1921,7 +1917,7 @@ SuperCellTerrainData::TerrainObject* SuperCellTerrainData::AddSubObjects(Terrain
                 chokepoint = (CP*)memAlloc(sizeof(*masterObject->stratData.cp));
                 memcpy(chokepoint, masterObject->stratData.cp, sizeof(CP));
 
-                strcpy(chokepoint->fileName, subModelObjectId.fileName);
+                strsafecpy(chokepoint->fileName, subModelObjectId.fileName);
 				chokepoint->posx = subModelObjectId.posX;
 				chokepoint->posy = subModelObjectId.posY;
 
@@ -1949,7 +1945,7 @@ SuperCellTerrainData::TerrainObject* SuperCellTerrainData::AddSubObjects(Terrain
 				facility = (FACILITY*)memAlloc(sizeof(*masterObject->stratData.facility));
                 memcpy(facility, masterObject->stratData.facility, sizeof(FACILITY));
 
-				strcpy(facility->fileName, subModelObjectId.fileName);
+				strsafecpy(facility->fileName, subModelObjectId.fileName);
 				facility->posx = subModelObjectId.posX;
 				facility->posy = subModelObjectId.posY;
 
@@ -1977,7 +1973,7 @@ SuperCellTerrainData::TerrainObject* SuperCellTerrainData::AddSubObjects(Terrain
 				building = (BUILDING*)memAlloc(sizeof(*masterObject->stratData.building));
                 memcpy(building, masterObject->stratData.building, sizeof(BUILDING));
 
-				strcpy(building->fileName, subModelObjectId.fileName);
+				strsafecpy(building->fileName, subModelObjectId.fileName);
 
                 building->oid = masterObject->stratData.building->oid;
                 building->pid = masterObject->stratData.building->pid;
@@ -2443,7 +2439,7 @@ SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& of
     memset(editList, 0, sizeof(TERRAIN_INFO) * MAX_TERRAIN_EDIT_LIST);
     memset(objects, 0, sizeof(DTL_TRNOBJ_INFO) * SDM_SUPERCELL_OCTETS_XY * MAX_TRNOBJ_OCTET);
 
-	sprintf(fileName, "%04x_%04x", (unsigned short)supercellX, (unsigned short)supercellY);
+	strprintf(fileName, "%04x_%04x", (unsigned short)supercellX, (unsigned short)supercellY);
 	//wsprintfA(fileName, "%04x_%04x", (unsigned short)supercellX, (unsigned short)supercellY);
 	if(supercellX == SUPERCELL_INVALID && supercellY == SUPERCELL_INVALID)	cellName = "Default";
 	else	cellName = fileName;
@@ -2538,14 +2534,14 @@ SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& of
 
 	if(cellName.find("Default") != string::npos)
 	{
-		strcpy(texNames[texNameCnt], "water1.bmp");
+		strsafecpy(texNames[texNameCnt], "water1.bmp");
 		texNameCnt++;
 	}
     // Don't force us to have a replacement tile
 #if !WANT_NON_REPLACEMENT_TILES
 	else if(!strstr(texNames[nullTextureIdx], "null1.bmp"))
 	{
-		strcpy(texNames[texNameCnt], "null1.bmp");
+		strsafecpy(texNames[texNameCnt], "null1.bmp");
 		nullTextureIdx = texNameCnt;
 		texNameCnt++;
 	}
@@ -2749,7 +2745,7 @@ static void BuildSDM(int cellX, int cellY)
 
 void PrintModelPerformanceSeverity(fstream& logFile)
 {
-	typedef multimap<float, const PoolModel*>	RemodelingPriorities;
+	using RemodelingPriorities = std::multimap<float, const PoolModel*>;
 	RemodelingPriorities						remodelingPriorities;
 
 
@@ -2812,7 +2808,7 @@ void BuildTerrain(bool mergeAll, short cellX, short cellY)
 	if(!trnldrReadHdrFile(headerFileName.c_str(), &terrainHeader))
 	{
 		logFile << "failed!";
-		piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
+		piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 	}
 	else
         logFile << "done." << endl;

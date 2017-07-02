@@ -16,7 +16,7 @@ class HCUnitLocation
 {
 public:
 	// Constructors
-	HCUnitLocation(UINT32 unitID, const FULL_OBJ_ID& fid)
+	HCUnitLocation(UINT32 unitID, const FULL_OBJ_ID fid)
 		: m_unitID(unitID), m_homeCPID(fid)
 		{}
 	HCUnitLocation(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
@@ -26,7 +26,7 @@ public:
 	~HCUnitLocation() {}
 
 	// Shared member functions
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	// host only member functions
 
@@ -38,5 +38,5 @@ public:
 	FULL_OBJ_ID	m_homeCPID;			// 48 bits	} 64 bits!
 };
 
-typedef teul_network_array<HCUnitLocation> HC_UNIT_LOCATIONS;
+using HC_UNIT_LOCATIONS = teul_network_array<HCUnitLocation>;
 

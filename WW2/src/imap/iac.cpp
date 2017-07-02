@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 
 #include "imap/iac.h"
@@ -346,12 +346,7 @@ static void iac_format(char* name, int maxlen, const wchar_t* format, ...)
 	while((pos = f.find(L"%s")) != std::string::npos)
 		f.replace(pos, 3, L"%ls");
 
-#if platOS == OS_MACOS
-	vswprintf
-#else
-	vswprintf_s
-#endif
-	(buffer, MAX_IAC_NAME, f.c_str(), marker);
+	vswprintf(buffer, MAX_IAC_NAME, f.c_str(), marker);
 
 	strncpy(name, UTF8(buffer), maxlen);
 

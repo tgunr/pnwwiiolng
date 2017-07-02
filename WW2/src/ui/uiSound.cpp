@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: uiSound.cpp
 // Description: Wrapper for UI sounds.
@@ -16,7 +16,7 @@ struct UiSounds
     UiSounds* next;
     UiSounds* prev;
 
-    snSoundPtr s;
+    snSound* s;
 
     SINT32 ID;
 	SCHAR callback[32];

@@ -53,7 +53,7 @@ function bde_strength_check()
  moveIn1h[ALLIED] = "" ; moveIn1h[AXIS] = "" ; moveIn2h[ALLIED] = "" ; moveIn2h[AXIS] = "" ; moveIn4h[ALLIED] = "" ; moveIn4h[AXIS] = ""
  for unit in allStratHCUnits()
  do
-  if unit:isBrigade() and not unit:isSupplyInTransit() and not unit:offMap() and not unit:isTrainingUnit() and unit:toeTemplateHeader() ~= nil then
+  if unit:isBrigade() and not unit:isSupplyInTransit() and not unit:offMap() and not unit:isTrainingUnit() and unit:isSpawnable() then
    if not brigadeStrengths[unit:unitID()] then
     brigadeStrengths[unit:unitID()] = {}
     brigadeStrengths[unit:unitID()][INFANTRY] = 100
@@ -63,7 +63,7 @@ function bde_strength_check()
    bdestr_reportOn(unit, GROUND_VEHICLE, "Armor")
   end
 
-  if unit:isBrigade() and not unit:isTrainingUnit() and unit:toeTemplateHeader() ~= nil then
+  if unit:isBrigade() and not unit:isTrainingUnit() and unit:isSpawnable() then
    function moveReady(lastTimer, nextMove, minTime, rangeSeconds)
      local minSeconds = timeInSeconds(minTime)
      if lastTimer > minSeconds and nextMove <= minSeconds + rangeSeconds then

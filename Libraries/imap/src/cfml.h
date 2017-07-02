@@ -2,7 +2,7 @@
 #define _CFML_H
 
 // Requires the expat library for CFML parser
-#include "xmlparse.h"
+#include "imap/xmlparse.h"
 
 /************************************************************************************************
 	imapcfml

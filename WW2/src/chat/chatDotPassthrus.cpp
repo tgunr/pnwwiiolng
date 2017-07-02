@@ -11,8 +11,6 @@
 
 #include <stdexcept>
 
-#include "versionNo.h"
-
 #include "chat/chatPlayer.h"
 #include "chat/chatDotCommand.h"
 #include "chat/chatHostMessages.h"
@@ -146,7 +144,7 @@ public:
 	DotRedeploy() : DotPassthru("redeploy", "Forcibly redeploy a brigade without checking movement rules or affecting resupply", NO_MASK, LSTR_REDEPLOY_USAGE, LSTR_REDEPLOY_DETAIL) {}
 } dotRedeploy;
 
-#if defined(BETA_RELEASE) || defined(FRES) || defined(TRAINING)
+#if defined(BETA_RELEASE) || defined(TRAINING)
 class DotSetTime : public DotCommand
 {
 public:

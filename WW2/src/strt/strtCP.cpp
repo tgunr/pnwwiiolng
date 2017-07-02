@@ -11,9 +11,8 @@
 
 #define BOTH_WWII_SIDES_PRODUCE	FALSE
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcast.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "chat/chatTypes.h"
 #include "cnvy/cnvyMain.h"
@@ -73,10 +72,6 @@ struct CP_ACC
 	WWII_SIDE_ACC	allied;
 };
 
-#ifdef BETA_RELEASE
-LOGICAL g_logRPProduction;
-#endif
-
 //forward declaration
 //	strat system fuctions
 static void _distributeRPs(CPStruct& cp, SINT32 rpsProduced, WWII_SIDE side);
@@ -94,20 +89,15 @@ static bool _objectReadyToRepair(ObjectStruct& object);
 //	control of a CP manages to reclaim control (ie, they were pushed back but
 //	have rallied to reclaim their army bases).
 
-//	Processing functions
-#ifdef CAN_DAMAGE_MONKEYHEADS
-static LOGICAL _processMonkeyhead(FacilityStruct* facility, WWII_COUNTRY country);
-#endif
-
 //This function is called to remove a CP from contention.  It sets the
 //	contention flag, opens all the bases and links
-static LOGICAL _changeLinks(BRIDGE_ENTRY* linkList, bool closed);
+static bool _changeLinks(BRIDGE_ENTRY* linkList, bool closed);
 
-typedef std::vector<ObjectStruct*> FACTORIES;
+using FACTORIES = std::vector<ObjectStruct*>;
 static FACTORIES _factories;
 FLOAT64 factoryDamageFactor[MAX_COUNTRIES];
 
-typedef std::map<FacilityStruct*, UINT32> REPAIR_QUEUE;
+using REPAIR_QUEUE = std::map<FacilityStruct*, UINT32>;
 static REPAIR_QUEUE _repairQueue;
 
 //////////////////////////////////////////////////////////////////////
@@ -204,17 +194,14 @@ _isAutoRebuildObject(const ObjectStruct& object)
 		case BUILDING_AUTOGUNNER:
 		case BUILDING_BRIDGE:
 			return true;
-		break;
+
 
 		case BUILDING_RESEARCH:
 			return (object.isProductionCenter());
-		break;
+
 		default:
 			return false;
-		break;
 	}
-
-	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -365,7 +352,7 @@ _repairFirebase(FacilityStruct* fb)
 		|| fb->m_lastDamaged > teulTime() - (host_config.fbRepairIntervalM*60)
 		)
 	{
-		betaLog(_FLD, "FB %s repaired, removing from queue", fb->name);
+		dbugLog(_FLD, "FB %s repaired, removing from queue", fb->name);
 		_repairQueue.erase(fb);
 		fb->m_onRepairQueue = false;
 		return false;
@@ -383,7 +370,7 @@ _repairFirebase(FacilityStruct* fb)
 		if ( repairJoules <= 0 )
 			repairJoules = 1;
 
-		betaLog(_FLD, "Repairing %s for %lldj", obj->name, repairJoules);
+		dbugLog(_FLD, "Repairing %s for %" PR64BitT "j", obj->name, repairJoules);
 
 		obj->applyDamage(-repairJoules, 0);
 
@@ -419,7 +406,7 @@ strtProcessFBRepairQueue()
 	}
 	if ( affected > 0 )
 	{
-		betaLog(_FLI, "repaired %u firebases", affected);
+		dbugLog(_FLI, "repaired %u firebases", affected);
 	}
 }
 
@@ -442,7 +429,7 @@ _scheduleFirebaseRepairs(FacilityStruct* facility)
 	if ( facility->m_lastDamaged > REBUILD_OLDER_THAN )
 		return;
 
-	betaLog(_FLD, "Adding %s to repair queue", facility->name);
+	dbugLog(_FLD, "Adding %s to repair queue", facility->name);
 
 	_repairQueue[facility] = teulTime();
 	facility->m_repairRate = host_config.fbRepairIntervalM * 60;
@@ -468,7 +455,7 @@ _repairBridge(ObjectStruct& object)
 	chatSendBroadcast(Chat::_EVERYONE, Instance::_CAMPAIGN, 0, LSTR_BETA, LSTR_AUTO_REPAIR, object.facility->name);
 #endif
 
-	dbugLog(_FLD, "Bridge %s being repaired, %d, %lld/%lld",
+	dbugLog(_FLD, "Bridge %s being repaired, %d, %" PR64BitT "/%" PR64BitT "",
 			object.facility->name,
 			object.visLevel(),
 			object.m_damageJoules,
@@ -476,7 +463,7 @@ _repairBridge(ObjectStruct& object)
 
 	_repairObject(&lastPercentDamage, object);
 
-	dbugLog(_FLD, "Bridge %s repaired, %d, %lld/%lld",
+	dbugLog(_FLD, "Bridge %s repaired, %d, %" PR64BitT "/%" PR64BitT "",
 			object.facility->name,
 			object.visLevel(),
 			object.m_damageJoules,
@@ -486,11 +473,11 @@ _repairBridge(ObjectStruct& object)
 //////////////////////////////////////////////////////////////////////
 //
 // This function actually runs the internal stuff on a CP
-LOGICAL
+void
 strtRunCP(CPStruct& cp)
 {
 	if ( !host_config.isArenaOpen() )
-		return TRUE;
+		return;
 
 	//Get the current time, which is meaningful for time delayed stuff
 	//runtime=time(NULL);
@@ -510,7 +497,7 @@ strtRunCP(CPStruct& cp)
 	if ( !cp.isBridge() )
 	{
 		if ( cp.side == NEUTRAL )
-			return TRUE;
+			return;
 
 		// Update the EWS counters etc.
 		cp.runCycleEvents(runTimeStamp);
@@ -538,22 +525,6 @@ strtRunCP(CPStruct& cp)
 
 		ca.axis.RPsProduced = (UINT32)(ca.axis.RPsProduced * ca.axis.factoryMultiplier);
 		ca.allied.RPsProduced = (UINT32)(ca.allied.RPsProduced * ca.allied.factoryMultiplier);
-
-#ifdef BETA_RELEASE
-		if ( g_logRPProduction )
-		{
-			WWII_SIDE_ACC* sa;
-			if ( cp.side == AXIS )
-				sa = &ca.axis;
-			else
-				sa = &ca.allied;
-
-			dbugLog(_FLI, "%s Stored: %d, Produced: %d, Total: %d"
-					, cp.name
-					, sa->depotRPs, sa->RPsProduced, sa->RPs
-					);
-		}
-#endif
 
 		_repairCP(cp, ca);
 
@@ -583,8 +554,6 @@ strtRunCP(CPStruct& cp)
 			_repairBridge(bridge);
 		}
 	}
-
-	return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -728,7 +697,7 @@ _distributeRPs(CPStruct& cp, SINT32 rpsProduced, WWII_SIDE side)
 		//This is where we do all the requests from the other depots
 		//	we are connected to
 
-		//fprintf(stderr,"Convoy? #%lld stored: %d request: %d\n\n",currentFacility->id
+		//fprintf(stderr,"Convoy? #%" PR64BitT " stored: %d request: %d\n\n",currentFacility->id
 				//, currentFacility->incomingRPs + currentFacility->storedRPs
 				//, currentFacility->requestThreshold);
 
@@ -801,7 +770,7 @@ _repairObject(UCHAR* lastPercentDamage, ObjectStruct& object)
 	*lastPercentDamage = object.percentDamage;
 	object.calcPercentDamage();
 
-	betaLog(_FLI,"%s:repairing:%s %d->%d%%"
+	dbugLog(_FLI,"%s:repairing:%s %d->%d%%"
 					, object.facility->name
 					, object.name
 					, *lastPercentDamage
@@ -861,7 +830,7 @@ _objectReadyToRepair(ObjectStruct& object)
 	if ( _isAutoRebuildObject(object) )
 	{
 #ifdef DEBUG
-		dbugLog(_FLD, "blessing %s with %d rps to repair %lld/%lldj dmg, totalRPs is %u"
+		dbugLog(_FLD, "blessing %s with %d rps to repair %" PR64BitT "/%" PR64BitT "j dmg, totalRPs is %u"
 					, object.name
 					, rpsNeededToRepair
 					, object.m_damageJoules
@@ -893,7 +862,7 @@ _repairFacility(FacilityStruct& facility, WWII_SIDE_ACC& sa, UCHAR* lastPercentD
 	SINT32 rpsAvailable, rpsTransAvailable;
 	UINT32 const * RPs;
 	SINT32	originalCapacity;
-	LOGICAL	needSave = FALSE;
+	bool needSave = false;
 
 	//rpsTransferred tracks the transfer limit for the facility
 	rpsTransferred=0;
@@ -916,7 +885,7 @@ _repairFacility(FacilityStruct& facility, WWII_SIDE_ACC& sa, UCHAR* lastPercentD
 		{
  			_repairObject(lastPercentDamage,  *currentObject);
 
-			needSave = TRUE;
+			needSave = true;
 
  			continue;
 		}
@@ -1033,14 +1002,14 @@ ObjectStruct::applyDamage(const SINT64& joules, UINT32 originatingSortieID)
 {
 	if ( setDamageJoules(m_damageJoules + joules) == false )
 	{
-		dbugLog(_FLI, "%lld joules of damage* not applied* to %s (%s/" PRF_FULL_OBJ_ID ")"
+		dbugLog(_FLI, "%" PR64BitT " joules of damage* not applied* to %s (%s/" PRF_FULL_OBJ_ID ")"
 					, joules, name, filename
 					, PRA_FULL_OBJ_ID(fullObjID)
 					);
 		return;
 	}
 
-	dbugLog(_FLI,"applying %lld joules of damage to object %s(%s/%d:%d:%d) capacity %d (prev %d) of %d, facilityCapacity %d parent %s"
+	dbugLog(_FLI,"applying %" PR64BitT " joules of damage to object %s(%s/%d:%d:%d) capacity %d (prev %d) of %d, facilityCapacity %d parent %s"
 				, joules
 				, name
 				, filename
@@ -1169,9 +1138,9 @@ _tellCrew(const POSTED_WEAPON* posting
 {
 	char numJoules[32];
 	if ( joules < 0 )
-		snprintf(numJoules, 31, "%lld", -joules);
+		snprintf(numJoules, 31, "%" PR64BitT "", -joules);
 	else
-		snprintf(numJoules, 31, "%lld", joules);
+		snprintf(numJoules, 31, "%" PR64BitT "", joules);
 
 	WeapJoinRequestList::const_iterator it;
 	for ( it = posting->m_crewList.begin(); it != posting->m_crewList.end(); ++it )
@@ -1313,8 +1282,8 @@ _getDamageTargetType(const ObjectStruct& object, STRAT_DAMAGE_EFFECT effect)
 			return SDT_AUTOGUNNER;
 	break;
 	case BUILDING_BRIDGE:
-		return SDT_BRIDGE;
-	break;
+	return SDT_BRIDGE;
+
 	case BUILDING_RESEARCH:
 		if ( object.isProductionCenter() )
 			return SDT_FACTORY;
@@ -1355,8 +1324,8 @@ _recordJoulesApplied(const ObjectStruct& object
 			" VALUES"
 				"(%u, %u"
 				", %d, %d, %u, %u"
-				", %u, %llu"
-				", %lld, %lld, %d"
+				", %u, %" PR64BitUT ""
+				", %" PR64BitT ", %" PR64BitT ", %d"
 				")"
 			, weapon.serial
 			, object.facility->uOID
@@ -1372,7 +1341,7 @@ _recordJoulesApplied(const ObjectStruct& object
 		Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_DAMAGE_EVENT_Y));
 		auto& mde = outgoing.construct<MissionDamageEvent>(playerID, weapon.serial, object.fullObjID.Key(), _getDamageTargetType(object, effectLevel), effectLevel, appliedJoules);
 
-		dbugLog(_FLI, "mapt:%d sending p:%u v:%u tt:%d ef:%d j:%lld mission damage event"
+		dbugLog(_FLI, "mapt:%d sending p:%u v:%u tt:%d ef:%d j:%" PR64BitT " mission damage event"
 						, mapEndpoint->teulIndex(), playerID, weapon.serial
 						, mde.m_targetType
 						, mde.m_effectType
@@ -1406,7 +1375,7 @@ _checkDamage(WWII_SIDE vehSide, ObjectStruct* object, const WEAPON_SERIAL& weapo
 
 	if ( object->facility->type == FACILITY_FIREBASE && weapon.spec.wCategory != _INFANTRY )
 	{
-		betaLog(_FLI, "ignoring %llu non-infantry damage joules to half-damaged firebase", damageJoules);
+		dbugLog(_FLI, "ignoring %" PR64BitUT " non-infantry damage joules to half-damaged firebase", damageJoules);
 		return 0LL;
 	}
 
@@ -1420,7 +1389,7 @@ _checkDamage(WWII_SIDE vehSide, ObjectStruct* object, const WEAPON_SERIAL& weapo
 // stratUpdater
 
 void
-strtDamage(const FULL_OBJ_ID& fullObjID, SINT64 damageJoules, const WEAPON_SERIAL& weapon, UINT32 playerID)
+strtDamage(const FULL_OBJ_ID fullObjID, SINT64 damageJoules, const WEAPON_SERIAL& weapon, UINT32 playerID)
 {
 	ObjectStruct*			object = nullptr;
 	UCHAR					prevVisLevel;
@@ -1443,7 +1412,7 @@ strtDamage(const FULL_OBJ_ID& fullObjID, SINT64 damageJoules, const WEAPON_SERIA
 	}
 	if ( !object->facility )
 	{
-		dbugLog(_FLN, "received %lldj joules to non-linked building %d:%d:%u", damageJoules, fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
+		dbugLog(_FLN, "received %" PR64BitT "j joules to non-linked building %d:%d:%u", damageJoules, fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
 		return;
 	}
 
@@ -1478,7 +1447,7 @@ strtDamage(const FULL_OBJ_ID& fullObjID, SINT64 damageJoules, const WEAPON_SERIA
 			recordable = false;
 	}
 
-	betaLog(_FLI, "%u doing %lldj+%lldj/%lldj of damage to %s"
+	dbugLog(_FLI, "%u doing %" PR64BitT "j+%" PR64BitT "j/%" PR64BitT "j of damage to %s"
 					, weapon.serial
 					, object->m_damageJoules
 					, damageJoules
@@ -1561,7 +1530,7 @@ strtCaptureFacility(FacilityStruct& facility, WWII_COUNTRY taker, WWII_COUNTRY h
 	if ( facility.isRDPFactory() && takerSide == facility.originalSide )
 		taker = facility.originalCountry;
 
-	betaLog(_FLI, "%s(%s, %d, %d, %d, %d)", __FUNCTION__, facility.name, taker, holder, force, quietly);
+	dbugLog(_FLI, "%s(%s, %d, %d, %d, %d)", __FUNCTION__, facility.name, taker, holder, force, quietly);
 
 	// Disallow capture without an objective, unless
 	// the caller is really sure they this doing, and
@@ -1596,7 +1565,7 @@ strtCaptureFacility(FacilityStruct& facility, WWII_COUNTRY taker, WWII_COUNTRY h
 bool
 strtConvertFacility(FacilityStruct& facility, WWII_COUNTRY toCountry, bool force, bool quietly)
 {
-	betaLog(_FLI, "converting %s from %d->%d [%s][%s]"
+	dbugLog(_FLI, "converting %s from %d->%d [%s][%s]"
 					, facility.name
 					, facility.country
 					, toCountry
@@ -1607,7 +1576,7 @@ strtConvertFacility(FacilityStruct& facility, WWII_COUNTRY toCountry, bool force
 	if ( facility.country == toCountry && force )
 	{
 		// Quietly force conversion
-		betaLog(_FLI, "conversion needs to be forced, so it will be quiet");
+		dbugLog(_FLI, "conversion needs to be forced, so it will be quiet");
 		strtCaptureFacility(facility, toCountry, facility.country, true, true);
 		return true;
 	}
@@ -1711,20 +1680,20 @@ FacilityStruct::updateSupplyLinks()
 			// make sure the link to us is open and was closed (we dont increment for already open links)
 			if ( m_incomingLink->isEnabled() == false )
 			{
-				dbugLog(_FLIB, "c%d ", cp->numOpenLinks);
+				dbugLog(_FLI, "c%d ", cp->numOpenLinks);
 				cp->numOpenLinks++;
 			}
 
 			// make sure the link to them is open and was closed (we dont increment for already open links)
 			if ( m_outgoingLink->isEnabled() == false )
 			{
-				dbugLog(_FLIB, "e%d ", endDepot.cp->numOpenLinks);
+				dbugLog(_FLI, "e%d ", endDepot.cp->numOpenLinks);
 				endDepot.cp->numOpenLinks++;
 
 				_updateSupplyAndLinkStatus(endDepot.CP());
 			}
 
-			dbugLog(_FLIB,"%s now has  %d open links and other link CP %s has %d open links state %i:%i"
+			dbugLog(_FLI,"%s now has  %d open links and other link CP %s has %d open links state %i:%i"
 				, cp->name, cp->numOpenLinks
 				, endDepot.cp->name
 				, endDepot.cp->numOpenLinks
@@ -1748,20 +1717,20 @@ FacilityStruct::updateSupplyLinks()
 			// make sure the link to them was open  (we dont decrement for already closed links)
 			if( m_incomingLink->isEnabled() )
 			{
-				dbugLog(_FLIB, "c%d ", cp->numOpenLinks);
+				dbugLog(_FLI, "c%d ", cp->numOpenLinks);
 				cp->numOpenLinks--;
 			}
 
 			// make sure the link to them was open  (we dont decrement for already closed links)
 			if( endDepot.m_incomingLink->isEnabled() )
 			{
-				dbugLog(_FLIB, "e%d ", endDepot.cp->numOpenLinks);
+				dbugLog(_FLI, "e%d ", endDepot.cp->numOpenLinks);
 				endDepot.cp->numOpenLinks--;
 
 				_updateSupplyAndLinkStatus(endDepot.CP());
 			}
 
-			dbugLog(_FLIB,"%s now has  %d open links and other link CP %s has %d open links state %i:%i"
+			dbugLog(_FLI,"%s now has  %d open links and other link CP %s has %d open links state %i:%i"
 				, cp->name, cp->numOpenLinks
 				, endDepot.cp->name
 				, endDepot.cp->numOpenLinks
@@ -1808,13 +1777,10 @@ strtResetMonkeyHead(ObjectStruct& object, UINT32 visLevel)
 void
 strtCloseBase(FacilityStruct& facility)
 {
-	if ( g_logDebug )
-	{
-		dbugLog(_FLI, "Closing facility %s " PRF_FULL_OBJ_ID ""
-				, facility.name
-				, PRA_FULL_OBJ_ID(facility.fullObjID)
-				);
-	}
+    dbugLog(_FLD, "Closing facility %s " PRF_FULL_OBJ_ID ""
+            , facility.name
+            , PRA_FULL_OBJ_ID(facility.fullObjID)
+            );
 
 	//Set the flag on the facility indicating its closed
 	facility.setOpen(false);
@@ -1832,10 +1798,7 @@ strtCloseBase(FacilityStruct& facility)
 void
 strtOpenBase(FacilityStruct& facility)
 {
-	if ( g_logDebug )
-	{
-		dbugLog(_FLI, "Opening facility %s " PRF_FULL_OBJ_ID "", facility.name, PRA_FULL_OBJ_ID(facility.fullObjID));
-	}
+    dbugLog(_FLD, "Opening facility %s " PRF_FULL_OBJ_ID "", facility.name, PRA_FULL_OBJ_ID(facility.fullObjID));
 
 	//Set the flag on the facility indicating its open
 	facility.setOpen(true);
@@ -1850,10 +1813,10 @@ strtOpenBase(FacilityStruct& facility)
 //////////////////////////////////////////////////////////////////////
 //
 //Rip through a list of bridge entries and change all the links
-static LOGICAL _changeLinks(BRIDGE_ENTRY* linkList, bool closed)
+static bool _changeLinks(BRIDGE_ENTRY* linkList, bool closed)
 {
 	if (linkList == nullptr)
-		return FALSE;
+		return false;
 
 	BRIDGE_ENTRY* current = linkList;
 	while (current != nullptr)
@@ -1872,14 +1835,14 @@ static LOGICAL _changeLinks(BRIDGE_ENTRY* linkList, bool closed)
 		linkList=linkList->next;
 	}
 
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Capture a facility and log the change and effect.
 
 void
-strtCaptureAndLog(FacilityStruct* facility, const ChatHandle& handle, UINT32 customerID, UINT32 missionID, const HCUnit* unit, UINT32 seconds)
+strtCaptureAndLog(FacilityStruct* facility, const ChatHandle handle, UINT32 customerID, UINT32 missionID, const HCUnit* unit, UINT32 seconds)
 {
 	if ( unit == nullptr )
 	{
@@ -1922,7 +1885,7 @@ strtCaptureAndLog(FacilityStruct* facility, const ChatHandle& handle, UINT32 cus
 
 /*
 static bool
-_fromInsideFacility(const FacilityStruct* facility, const FULL_OBJ_ID& buildingID, UINT32 customerID, const ChatHandle& handle)
+_fromInsideFacility(const FacilityStruct* facility, const FULL_OBJ_ID buildingID, UINT32 customerID, const ChatHandle handle)
 {
 	ObjectStruct* object = strtGetObject(buildingID);
 	if ( object == NULL || object->facility != facility )
@@ -2092,7 +2055,7 @@ _allBrigadesCanFallback(const CPStruct* cp, UINT32 playerID)
 //////////////////////////////////////////////////////////////////////
 // Process a fallback query/executation order
 
-#define FALLBACK_ASSERT(_result_, _x_) if ( (_x_) ) { dbugLog(_FLIB, #_result_ ": " #_x_); return (_result_); }
+#define FALLBACK_ASSERT(_result_, _x_) if ( (_x_) ) { dbugLog(_FLI, #_result_ ": " #_x_); return (_result_); }
 
 UINT32
 strtFallback(CPStruct* cp, WWII_SIDE forSide, FALLBACK_MODE mode, UINT32 playerID)
@@ -2183,9 +2146,9 @@ std::string strtGetFactoryList(WWII_COUNTRY forCountry)
 		if ( obj->facility->originalCountry != forCountry )
 			continue;
 		if ( obj->m_country == forCountry )
-			sprintf(buffer, "%s dmg:%u%%. ", obj->name, obj->percentDamage);
+			strprintf(buffer, "%s dmg:%u%%. ", obj->name, obj->percentDamage);
 		else
-			sprintf(buffer, "%s OWNER:%s dmg:%u%%. ", obj->name, _countryCode[obj->m_country], obj->percentDamage);
+			strprintf(buffer, "%s OWNER:%s dmg:%u%%. ", obj->name, _countryCode[obj->m_country], obj->percentDamage);
 		result += buffer;
 	}
 

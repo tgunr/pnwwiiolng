@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Tue Feb 20 10:40:54 2001
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -11,6 +11,7 @@
 #include <array>
 
 #include "mem/mem.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtDTL.h"
 #include "sdm/sdmHash.h"
 
@@ -117,6 +118,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 #endif
 
 	// TODO: Is there any reason this isn't a vector?
+	// kfsone: It's sparse because of the terrain editor
 	std::map<SINT16, STRAT_BUILDING> bldgMap;
 
 	for (SINT32 i = 0; i< facTable->numFacilities; ++i)
@@ -132,7 +134,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 	{
 		if (! _addBuildingToFacTable(facTable, bd[i]))
 		{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 			const BUILDING& building = bd[i];
 			strtDataErrorParentFacility(building.name, building.fileName, sx, sy, building.oid.id, static_cast<UINT16>(i), building.pid.id);
 #else
@@ -185,7 +187,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 //				Write_Debug("adding %d buildings to sc:%d,%d cell:%d,%d"
 //							,cell->numBuildings,sx,sy,x,y);
 				dst.numBuildings = src.size();
-				const size_t dataSize = sizeof(dst.bid) * dst.numBuildings;
+				const size_t dataSize = sizeof(*dst.bid) * dst.numBuildings;
 				dst.bid = static_cast<decltype(dst.bid)>(memAlloc(dataSize));
 				memcpy(dst.bid, src.data(), dataSize);
 			}
@@ -196,12 +198,12 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 		const size_t maxBldgId = (size_t)(bldgMap.rbegin()->first) + 1;
 
 		bldHash->maxBldID = maxBldgId;
-		
+
 		delete[] bldHash->building;
 		bldHash->building = new STRAT_BUILDING[maxBldgId];
 
 		for ( auto it = bldgMap.begin(), end = bldgMap.end(); it != end; ++it ) {
-			assert ( 0 < it->first && it->first < maxBldgId );
+			assert ( 0 < it->first && (size_t)it->first < (size_t)maxBldgId );
 			bldHash->building[it->first] = it->second;
 		}
 	}

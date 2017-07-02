@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 /*
 	 Copyright 2008 Playnet Inc, All rights reserved
@@ -160,12 +160,13 @@ FILE*	ConfigFile;
 	if (nullptr == ConfigFile)
 	{
 		// try up a directory if not found
-#if platOS == OS_MACOS
-		strcpy(NewName, "::");   // grrrrrrrrrr!
+#if platOS != OS_WIN32
+		strlcpy(NewName, "../", 256);   // grrrrrrrrrr!
+		strlcat(NewName, ConfigName, 256);
 #else
-		strcpy(NewName, "..\\");
+		strcpy_s(NewName, "..\\");
+		strcat_s(NewName, ConfigName);
 #endif
-		strcat(NewName, ConfigName);
 		ConfigFile = fopen(NewName, "rt");
 
 		if (nullptr == ConfigFile)
@@ -173,15 +174,6 @@ FILE*	ConfigFile;
 			return TRUE; // Can't find the file, but that doesn't phase us! We are the
 		}	             // the config parser of peace, love, and happiness
 
-#if platOS != OS_MACOS // We actually know how to unlock files when checking out of SourceSafe
-		_chmod(NewName, _S_IWRITE);
-#endif
-	}
-	else
-	{
-#if platOS != OS_MACOS
-		_chmod(ConfigName, _S_IWRITE);
-#endif
 	}
 
 

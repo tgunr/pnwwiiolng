@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /////////////////////////////////////////////////
 // Module: fxUtl.cpp
 // Description: Common FX utilities module.
@@ -52,7 +52,7 @@ struct MATERIALPROP
 
 };
 
-typedef std::map<std::string, MATERIALPROP *> MaterialPropertiesMap;
+using MaterialPropertiesMap = std::map<std::string, MATERIALPROP *>;
 static MaterialPropertiesMap g_materialProperties;
 
 static SINT32 xmlinputmatch(const SCHAR* name) {return 1;}

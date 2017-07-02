@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #include "pi/pi.h"
@@ -38,9 +38,9 @@
 #include "ogl/oglShadow.h"
 #endif
 
-static Covert<LOGICAL> _doCull(TRUE);
+static Covert<bool> _doCull(true);
 
-typedef std::vector<SORTHEADER*> SortVector;
+using SortVector = std::vector<SORTHEADER*>;
 
 static void*         sortedlisttail;			// the end of the sorted list
 static void*			unsortedlisttail;			// the end of the unsorted list
@@ -345,7 +345,7 @@ LOGICAL obcsGetObjectCullStats(SINT32 * CullObjectCnt,SINT32 * DisplayedObjectCn
 	return TRUE;
 }
 
-LOGICAL obcsInit(void)
+LOGICAL obcsInit()
 {
 	sortfree.prev = sortfree.next = (LISTHEADER*)memAlloc(MINOBJECTS * sizeof(SORTHEADER));
 	if (sortfree.next == nullptr)
@@ -370,7 +370,7 @@ LOGICAL obcsInit(void)
 	return(TRUE);
 }
 
-void obcsKill(void)
+void obcsKill()
 {
 	if (sortfree.prev != nullptr)
 	{
@@ -379,7 +379,7 @@ void obcsKill(void)
 	}
 }
 
-void obcsDoCull(LOGICAL cull)
+void obcsDoCull(bool cull)
 {
     _doCull = cull;
 }
@@ -956,22 +956,22 @@ int obcsCullAndSortShadowObjects(int numobjects, OBJECT* lpobjorig, piVECTOR* lp
     return numobj;
 }
 
-SORTHEADER* obcsGetSortedList(void)
+SORTHEADER* obcsGetSortedList()
 {
 	return((SORTHEADER*)sortedlist.next);
 }
 
-SORTHEADER* obcsGetUnsortedList(void)
+SORTHEADER* obcsGetUnsortedList()
 {
 	return((SORTHEADER*)unsortedlisttail);
 }
 
-SORTHEADER* obcsGetSortedCockpitList(void)
+SORTHEADER* obcsGetSortedCockpitList()
 {
 	return((SORTHEADER*)sortedcockpitlist.next);
 }
 
-SORTHEADER* obcsGetUnsortedCockpitList(void)
+SORTHEADER* obcsGetUnsortedCockpitList()
 {
 	return((SORTHEADER*)unsortedcockpitlisttail);
 }
@@ -1428,7 +1428,7 @@ static LOGICAL UnsortCockpitBSP(SORTHEADER* lpsort)
 #endif
 
 // Fast reset of the sorted list
-void obcsResetSortedList(void)
+void obcsResetSortedList()
 {
     if(!_doCull) return;
 
@@ -1484,7 +1484,7 @@ void obcsResetMultiTexture()
 }
 
 // Fast reset of the unsorted list
-void obcsResetUnsortedList(void)
+void obcsResetUnsortedList()
 {
     if(!_doCull) return;
 
@@ -1512,7 +1512,7 @@ void obcsResetUnsortedList(void)
 }
 
 // Fast reset of the sorted cockpit list
-void obcsResetSortedCockpitList(void)
+void obcsResetSortedCockpitList()
 {
     if(!_doCull) return;
 
@@ -1540,7 +1540,7 @@ void obcsResetSortedCockpitList(void)
 }
 
 // Fast reset of the unsorted cockpit list
-void obcsResetUnsortedCockpitList(void)
+void obcsResetUnsortedCockpitList()
 {
     if(!_doCull) return;
 
@@ -1824,7 +1824,7 @@ piINDICES*		pt;
 	return(TRUE);
 }
 
-SORTHEADER* obcsGetNextSortItem(void)
+SORTHEADER* obcsGetNextSortItem()
 {
 	return((SORTHEADER*)listGetItem((LISTHEADER*)&sortfree));
 }

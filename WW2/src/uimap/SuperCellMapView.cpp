@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <algorithm>
 #include <map>
 #include <list>
@@ -59,7 +59,7 @@ public:
 	SuperCellMapView::Renderer* _renderer;
 	bool _done;
 
-	typedef std::vector<SuperCell*> SuperCellList;
+	using SuperCellList = std::vector<SuperCell*>;
 	SuperCellList _cells;
 };
 
@@ -132,7 +132,7 @@ SuperCellMapView::~SuperCellMapView()
 
 #define ZOOM_SCALE 100.0f
 
-void SuperCellMapView::DrawSelf(void)
+void SuperCellMapView::DrawSelf()
 {
 	if(_autoscale && frametime >= _autoscaletime)
 	{
@@ -810,7 +810,17 @@ SuperCellMapView::Renderer::Renderer() : enabled(true), minscale(.1f), maxscale(
 	{
 		_loadthread = new LoadThread(this);
 		_loadthread->start();
-		while(!_loadthread->isRunning()){}
+		while(!_loadthread->isRunning()){
+#if platOS == OS_WIN32
+            SwitchToThread();
+#elif platOS == OS_MACOS
+            pthread_yield_np();
+#elif platOS == OS_LINUX
+            pthread_yield();
+#else
+#error "Oops"
+#endif
+		}
 	}
 
 	_loadthread->Acquire();
@@ -887,7 +897,6 @@ SuperCellMapView::Renderer::LoadThread::~LoadThread()
 		_doLoad.notify_all();
 	}
     join();
-	while(GameInProgress && isRunning()) {}
 }
 
 void SuperCellMapView::Renderer::LoadThread::LoadSuperCell(SuperCell* sc)

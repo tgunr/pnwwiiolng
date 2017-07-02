@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "chat/chatBrigadeControl.h"
 #include "chat/chatClientMessages.h"
@@ -95,7 +95,7 @@
 #include "veh/vehmain.h"
 #include "veh/vehupdate.h"
 #include "veh/vehVisDamage.h"
-#include "versionNo.h"
+#include "build_info.hpp"
 #include "weap/weapammo.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiServerTrackedObject.h"
@@ -151,8 +151,8 @@ extern char BuzzardFollowVehicle[256];
 extern FLOAT32 BuzzardFollowDistance;
 
 
-extern UINT32 _ReadAmmoTypes(void);
-extern UINT32 _ReadBumpAndFrictionTable(void);
+extern UINT32 _ReadAmmoTypes();
+extern UINT32 _ReadBumpAndFrictionTable();
 
 enum UI_COMMAND_TYPE
 {
@@ -176,8 +176,8 @@ static void _HitmapName(OBJECT* obj, void* p);
 
 SINT32 dot_move(const char* line);
 
-#ifdef ENABLE_FLOATERS
-void vehmainToggleLOD (void);
+#ifdef GM_RELEASE
+void vehmainToggleLOD();
 #endif
 
 static wchar_t _LastCommand[256];
@@ -200,7 +200,7 @@ struct dotCmdInfo
     bool key;				// requires a key file
 };
 
-typedef std::map<std::wstring, dotCmdInfo> dotCmdMap;
+using dotCmdMap = std::map<std::wstring, dotCmdInfo>;
 static dotCmdMap _dotCommands;
 //------------------------------------------------------
 
@@ -218,7 +218,7 @@ static dotCmdMap _dotCommands;
 	Return value is the number of* arguments* excluding the presumed command.
  ************************************************************************************************/
 
-typedef std::vector<std::wstring> ARGV_BASE;
+using ARGV_BASE = std::vector<std::wstring>;
 struct ARGV : public ARGV_BASE
 {
 	ARGV(const char* source, UINT32 maxArguments, bool fillLastArgument);
@@ -480,7 +480,7 @@ static SINT32 dot_conv(const wchar_t* line)
 			UINT16 key = vtype->WeaponSpec.asUINT16();
 
 			char buff[256] = {'\0'};
-			sprintf(buff, "convergence.%d", (SINT32)key);
+			strprintf(buff, "convergence.%d", (SINT32)key);
 
 			cfgPrefsSetInt(buff, (SINT32)range);
 			persGunsightSetConvergenceRange((FLOAT32)range);
@@ -506,7 +506,7 @@ static SINT32 dot_conv(const wchar_t* line)
 			UINT16 key = vtype->WeaponSpec.asUINT16();
 
 			char buff[256] = {'\0'};
-			sprintf(buff, "convergence.%d", (SINT32)key);
+			strprintf(buff, "convergence.%d", (SINT32)key);
 
 			SINT32 range = cfgPrefsGetInt(buff, (SINT32)Convergence);
 
@@ -1039,36 +1039,36 @@ static SINT32 dot_graduate(const char* line)
 	// set it if specified
 	if(argc > 0)
 	{
-		if(!stricmp(group, "true") || !stricmp(group, "false"))
+		if(!stricmp(group, "true"))
 		{
-			bool complete = (!stricmp(group, "true")) ? true: false;
-			const char* groups[] = { "basic", "infantry", "armor", "fighter" };
+			const char* groups[] = { "infantry", "armor", "fighter" };
 
-			for(int i = 0; i < 4; i++)
+			for(int i = 0; i < 3; i++)
 			{
-				TUT_MGR->SetComplete(groups[i], -1, complete);
+				TUT_MGR->SetComplete(groups[i], -1, true);
 			}
 
-			uiChatPrintLine("Set all tutorial groups to: %s", (complete) ? "complete": "incomplete");
+			uiChatPrintLine("Basic training is compulsory, all other tutorial groups have been set to complete.");
 		}
+        else if (!stricmp(group, "false"))
+        {
+            const char* groups[] = { "basic", "infantry", "armor", "fighter" };
+
+            for (int i = 0; i < 4; i++)
+            {
+                TUT_MGR->SetComplete(groups[i], -1, false);
+            }
+
+            uiChatPrintLine("Set all tutorial groups to incomplete");
+        }
 		else
 		{
-			int check		= (flag >= 0 && flag < 64) ? flag: 0;
-			bool complete	= TUT_MGR->IsComplete(group, check);
-
-			// toggle it
-			TUT_MGR->SetComplete(group, flag, !complete);
-
-			// check it again
-			complete = TUT_MGR->IsComplete(group, check);
-
-			// print it
-			uiChatPrintLine("%s.%d: %s", group, check, (complete) ? "complete": "incomplete");
+            uiChatPrintLine("We no longer allow you to set individual tutorials to complete/incomplete.");
 		}
 	}
 	else
 	{
-		uiChatPrintLine("You must specify a valid group name.");
+		uiChatPrintLine("You must specify true or false.");
 	}
 
 	return DC_HANDLED;
@@ -2086,7 +2086,7 @@ static SINT32 dot_bunch(const char* line)
   for (int i=0; i<10; i++ )
     for (int j=0; j<10; j++ )
     {
-      sprintf(s, "vspawn %s %d %d %d", t, j*spread, -i*spread, 0 );
+      strprintf(s, "vspawn %s %d %d %d", t, j*spread, -i*spread, 0 );
       dot_vspawn(s);
     }
 
@@ -2525,9 +2525,7 @@ static SINT32 dot_moreammo(const char* line)
 	if(!veh) return DC_ERROR;
 
 	SINT32 numRounds = 999;
-	UINT32 Position;
-
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	sscanf(line, "%*s %d", &numRounds);
 
@@ -2844,7 +2842,7 @@ static SINT32 dot_die(const char* line)
 
 static SINT32 dot_texture(const char* line)
 {
-    static LOGICAL enabled = 1;
+    static bool enabled = TRUE;
 
     enabled = !enabled;
     rnmainListText("Textures %s", enabled ? "ENABLED" : "DISABLED");
@@ -2852,11 +2850,11 @@ static SINT32 dot_texture(const char* line)
     if(!enabled)
     {
         piDisableTexture();
-        piLockTextureState(1);
+        piLockTextureState(true);
     }
     else
     {
-        piLockTextureState(0);
+        piLockTextureState(false);
         piEnableTexture();
     }
 
@@ -3964,7 +3962,7 @@ static OBJECT* buildingobj = nullptr;
 
 static SINT32 dot_tspawn(const char* input)
 {
-    typedef std::set<OBJECT*> omap;
+    using omap = std::set<OBJECT*>;
 
 	static omap instances;
     std::vector<omap::iterator> remove;
@@ -4088,7 +4086,7 @@ static SINT32 dot_tspawn(const char* input)
             masterInstance = buildingobj;
         else
         {
-            sprintf(obj->name, "%s_%d", model, subModelIndex);
+            strprintf(obj->name, "%s_%d", model, subModelIndex);
         }
 
         if(!buildingobj)
@@ -4425,7 +4423,7 @@ static SINT32 dot_damageoctet(const char* input)
             {
                 char buff[128];
 
-                sprintf(buff, "%s_%d_%d", so->Filename(), so->PosX(), so->PosY());
+                strprintf(buff, "%s_%d_%d", so->Filename(), so->PosX(), so->PosY());
 
                 OBJECT* top = obmainFindTopmostObject(buff);
 
@@ -4454,7 +4452,7 @@ static SINT32 dot_damageoctet(const char* input)
                 {
                     strcpy(model, pm->subModelReferences[i].poolModel->modelname.c_str());
 
-                    sprintf(buff, "%s_%d_%d", model, so->PosX(), so->PosY());
+                    strprintf(buff, "%s_%d_%d", model, so->PosX(), so->PosY());
 
                     OBJECT* o = obmainFindTopmostObject(buff);
 
@@ -4506,7 +4504,7 @@ static SINT32 dot_resetoctet(const char* input)
             if(so->StratType() == SDM_BUILDING_GENERIC || so->StratType() == SDM_BUILDING_AUTOGUNNER)
             {
                 char buff[128];
-                sprintf(buff, "%s_%d_%d", so->Filename(), so->PosX(), so->PosY());
+                strprintf(buff, "%s_%d_%d", so->Filename(), so->PosX(), so->PosY());
 
                 OBJECT* top = obmainFindTopmostObject(buff);
 
@@ -4535,7 +4533,7 @@ static SINT32 dot_resetoctet(const char* input)
                 {
                     strcpy(model, pm->subModelReferences[i].poolModel->modelname.c_str());
 
-                    sprintf(buff, "%s_%d_%d", model, so->PosX(), so->PosY());
+                    strprintf(buff, "%s_%d_%d", model, so->PosX(), so->PosY());
 
                     OBJECT* o = obmainFindTopmostObject(buff);
 
@@ -4598,7 +4596,7 @@ static SINT32 dot_bdamage(const char* input)
 
     for(unsigned int i = 0; i < pm->subModelReferences.size(); i++)
     {
-        sprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
+        strprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
 
         OBJECT* o = obmainFindTopmostObject(model);
 
@@ -4660,10 +4658,8 @@ static SINT32 dot_builder(const char* line)
     }
     else
     {
-        char buff[32];
-        memset(buff, 0, 32);
-
-        sprintf(buff, id < 10 ? "builder00%d" : id < 20 ? "builder0%d" : "builder%d", id);
+		char buff[32]{};
+        strprintf(buff, id < 10 ? "builder00%d" : id < 20 ? "builder0%d" : "builder%d", id);
 
         func = "onbuilder('";
         func += buff;
@@ -4692,7 +4688,7 @@ static SINT32 dot_fogon(const char* line)
 
 static SINT32 dot_cull(const char* line)
 {
-    static LOGICAL toggle = 1;
+    static bool toggle = true;
 
     toggle = !toggle;
 
@@ -4773,7 +4769,7 @@ static SINT32 dot_drawunsortedcockpit(const char* line)
 
 static SINT32 dot_terraindraw(const char* line)
 {
-    static LOGICAL toggle = TRUE;
+    static bool toggle = true;
 
     toggle = !toggle;
 
@@ -4786,7 +4782,7 @@ static SINT32 dot_terraindraw(const char* line)
 
 static SINT32 dot_radclutter(const char* line)
 {
-    static LOGICAL toggle;
+    static bool toggle = false;
     static bool firsttime = true;
 
     if(firsttime)
@@ -4822,7 +4818,7 @@ static int dot_drawalloff(const char* line)
 
 static SINT32 dot_loadtrees(const char* line)
 {
-    static LOGICAL toggle = TRUE;
+    static bool toggle = true;
 
     toggle = !toggle;
 
@@ -5317,12 +5313,12 @@ void _PrintVehHitmap(vehType const* vehtype )
 	return;
 }
 
-typedef struct
+struct hitmapNameList
 {
 	int num;
 	char* name[256];
 	LOGICAL infile[256];
-} hitmapNameList;
+};
 
 /************************************************************************************************
 	_ValidateVehHitmap
@@ -5330,15 +5326,14 @@ typedef struct
 
 static void _ValidateVehHit(vehType const* vehtype)
 {
+	if(!vehtype) return;
+
 	OBJECT* PlaneObject = nullptr, *hitmap, *obj;
-	char str[256] = "\0";
-	hitmapNameList list;
+	char str[256] = { 0 };
+	hitmapNameList list{};
 	int fd, i;
 	FILE* f;
 	LOGICAL found;
-
-	if(!vehtype) return;
-	memset(&list, 0x0, sizeof(list));
 
 	obmgrCreateModelInstance((char*)vehtype->Shape);
 	PlaneObject = obmainFindNamedObject((char*)vehtype->Shape);
@@ -5415,14 +5410,13 @@ static void _ValidateVehHit(vehType const* vehtype)
 
 static void _ValidateVehCmp(vehType const* vehtype)
 {
-	char str[256] = "\0";
-	hitmapNameList list;
+	if (!vehtype) return;
+
+	char str[256] = { 0 };
+	hitmapNameList list{};
 	int fd, i;
 	FILE* f;
 	LOGICAL found;
-
-	if(!vehtype) return;
-	memset(&list, 0x0, sizeof(list));
 
 	snprintf(str, 255, "%s.validcmp", vehtype->Id);
 	f = fopen(str, "w");
@@ -5522,8 +5516,7 @@ static phui::Periodical* TurretTestUpdate;
 static void TurretTestCallback(phui::Periodical*, unsigned int, void*)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
-	UINT32 Position;
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	if(VehicleData && VehicleData->LastTurretTraverse[Position] < 0 && VehicleData->TurretTraverse[Position] > 0)
 	{
@@ -5537,9 +5530,7 @@ static void TurretTestCallback(phui::Periodical*, unsigned int, void*)
 static SINT32 dot_turrettest(const char*)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	UINT32 Position;
-
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	TurretTest = 1;
 	TurretTestStartTime = frametime;
@@ -5577,7 +5568,7 @@ static SINT32 dot_speed(const char*)
 
 
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 
 /************************************************************************************************
 	MoveCmd
@@ -5631,34 +5622,6 @@ SINT32 dot_move(const char* line)
 
 
 	VehicleData->RenderPos = VehicleData->VehiclePos = pos;
-
-	return DC_HANDLED;
-}
-
-//////////////////////////////////////////////////////////////////////
-//	ProfileFlight
-//////////////////////////////////////////////////////////////////////
-
-static SINT32 dot_profileflight(const char* args)
-{
-	FLOAT32	profilingDurationInMinutes	= 6.0f;
-
-	if(!OverrideSpawner)
-	{
-		rnmainListText("Please spawn a buzzard with nospawn enabled for profiling.");
-		return DC_HANDLED;
-	}
-
-	ARGV argv(args, 2, true);
-	// First argument is our function name
-	const wchar_t* profileName = (argv.argc > 1) ? argv[1].c_str() : L"default";
-
-	rnmainListText("Started %ls profiling for the duration of %.1f minute(s) ...", profileName, profilingDurationInMinutes);
-	dot_move("move N51.13.00 E4.11.00 100");
-	mlSetProfileFlight();
-#ifdef BETA_RELEASE
-	logInitProfiling(uiUTF16toUTF8(profileName), profilingDurationInMinutes);
-#endif
 
 	return DC_HANDLED;
 }
@@ -5962,16 +5925,9 @@ static SINT32 dot_vehlod(const char* line)
 	return DC_HANDLED;
 }
 
-#endif // ENABLE_FLOATERS
-
-
+#endif // GM_RELEASE
 
 #ifdef BETA_RELEASE
-#if(0)
-static LOGICAL _CollideRoundWithTerrain(FASTCOLLIDE** CollideListPtr,  UINT32* NumCollisionSlotsLeft,
-											piVECTOR const* OldPos, piVECTOR const* NewPos);
-#endif
-
 /************************************************************************************************
 	TrnTextureCmd
 *************************************************************************************************/
@@ -5997,43 +5953,9 @@ static SINT32 dot_trntex(const char* line)
 	return DC_HANDLED;
 }
 
-/************************************************************************************************
-	_CollideRoundWithTerrain
-*************************************************************************************************/
-
-#if(0)
-static LOGICAL _CollideRoundWithTerrain(FASTCOLLIDE** CollideListPtr,  UINT32* NumCollisionSlotsLeft,
-											piVECTOR const* OldPos, piVECTOR const* NewPos)
-{
-	piVECTOR CollidePnt;
-	OBJECT* CollideObject;
-	SINT32 PolyNum;
-
-	if(*NumCollisionSlotsLeft <= 1) return FALSE;
-
-	if(trnopCollide(OldPos,NewPos,&CollidePnt,&CollideObject,&PolyNum) != 0)
-	{
-		(*CollideListPtr)[0].CollideObject = CollideObject;
-		(*CollideListPtr)[0].TopLevelObject = nullptr;
-		(*CollideListPtr)[0].PolyNum = PolyNum;
-		(*CollideListPtr)[0].CollideTime = 0;// this apparently isn't time but the t param of the collision point on the between old and new pos
-		(*CollideListPtr)[0].CollidePnt = CollidePnt;
-		(*CollideListPtr)[0].OldPos = *OldPos;
-		(*CollideListPtr)[0].NewPos = *NewPos;
-		(*CollideListPtr)[0].Alpha = 1.0;
-		(*NumCollisionSlotsLeft)--;
-		(*CollideListPtr)++;
-
-		return TRUE;
-	}
-
-	return FALSE;
-}
-#endif
-
 static SINT32 dot_drawoctettris(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static bool toggle = false;
 
     toggle = !toggle;
 
@@ -6044,7 +5966,7 @@ static SINT32 dot_drawoctettris(const char* line)
 
 static SINT32 dot_drawobtris(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 
@@ -6055,7 +5977,7 @@ static SINT32 dot_drawobtris(const char* line)
 
 static SINT32 dot_drawobnormals(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 
@@ -6066,7 +5988,7 @@ static SINT32 dot_drawobnormals(const char* line)
 
 static SINT32 dot_drawcolnormals(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 
@@ -6077,7 +5999,7 @@ static SINT32 dot_drawcolnormals(const char* line)
 
 static SINT32 dot_drawbbox(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 
@@ -6092,7 +6014,7 @@ static SINT32 dot_drawcollisionobjects(const char* line)
 {
     extern void obdrawDrawCollisionObjects(LOGICAL);
 
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 
@@ -6105,7 +6027,7 @@ static SINT32 dot_drawcollisionobjects(const char* line)
 
 static SINT32 dot_drawtobbox(const char* line)
 {
-    static LOGICAL toggle = FALSE;
+    static LOGICAL toggle = false;
 
     toggle = !toggle;
 
@@ -6752,7 +6674,7 @@ static int dot_aion(const char* line)
 	Just remember not to share.
 *************************************************************************************************/
 
-//extern SINT32 mmSendDirectSpawn(SINT32 connection, const WEAPON_SPEC& weapon, const FLOAT64VECTOR* location);
+//extern SINT32 mmSendDirectSpawn(SINT32 connection, const WEAPON_SPEC weapon, const FLOAT64VECTOR* location);
 static SINT32 dot_dev(const char* line)
 {
 	const char* p = strchr(line, ' ');
@@ -7076,7 +6998,7 @@ static int dot_ragdolls(const char* line)
 static int dot_version(const char* line)
 {
 	std::string display = "Client version = ";
-	display += STRVER;
+	display += PN_product_version_string;
 
 	uiChatPrintLine(display.c_str());
 
@@ -7222,9 +7144,6 @@ static int dot_texinfo(const char* line)
         case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:   s= "GL_COMPRESSED_RGBA_S3TC_DXT5_EXT"; bytes=4;
           break;
       }
-#if platOS == OS_MACOS
-      printf("%4d %50s [%4d x %4d x %1d = %'12d, (%s)]\n", i, textureName.c_str(), W, H, bytes, W*H*bytes, s);
-#endif
       Write_Debug("%4d %50s [%4ld x %4ld x %1d = %'12ld, (%s)]\n", i, textureName.c_str(),  W, H, bytes, W*H*bytes, s);
     }
   }
@@ -7861,12 +7780,11 @@ void uiDotCommandsInit()
 #endif
 
 	// floater commands
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 	ADD_DOT_COMMAND(move, false);
 	ADD_DOT_COMMAND(follow, false);
 	ADD_DOT_COMMAND(inflod, false);
 	ADD_DOT_COMMAND(vehlod, false);
-	ADD_DOT_COMMAND(profileflight, false);
 #endif
 
 	// beta release commands
@@ -8080,7 +7998,7 @@ void uiDotCommandsInit()
 	// host commands; this allows for
 	// client localization of host commands
 	ADD_HOST_COMMAND(who, false);
-    
+
     // allows extra info to be sent with these commands
     uiDotCommandAdd("bug", dot_clientinfo_command, false);
     uiDotCommandAdd("report", dot_clientinfo_command, false);
@@ -8114,88 +8032,6 @@ void uiDotCommandsInitLoc()
 			it->second.help = help.c_str();
 	}
 }
-
-#if FRES
-
-static SINT32 FRESCamCmd(const char* line)
-{
-	char name[32];
-	int pos = 0;
-	int argc = sscanf(line, "%*s %31s %d", name, &pos);
-
-	if(argc == 1)
-	{
-		if(strcmp(name, "reload") == 0)
-		{
-			vehVehicle* fresVeh = vehFRESParentVehicle();
-			if(fresVeh)
-				vehFRESLoadCamFile(fresVeh->VehicleType);
-			return DC_HANDLED;
-		}else
-		{
-			pos = atoi(name);
-			vehFRESSetCameraPosition(pos);
-			return DC_HANDLED;
-		}
-	}
-
-	vehFRESSetVehicle(name);
-	vehFRESSetCameraPosition(pos);
-
-	if(!uiInGame())
-	{
-//		WEAPON_SPEC weapon = weapFindWeaponByName("uk_buzzard");
-//		PlayerClient()->RequestDirectSpawn(weapon);
-		char spawncmd[32];
-		snprintf(spawncmd, 31, "/buz %s", name);
-		PlayerClient()->SendChatMessage(0, spawncmd);
-	}
-
-	return DC_HANDLED;
-}
-#endif
-
-
-
-#if FRES
-
-static SINT32 FRESCamCmd(const char* line)
-{
-	char name[32];
-	int pos = 0;
-	int argc = sscanf(line, "%*s %31s %d", name, &pos);
-
-	if(argc == 1)
-	{
-		if(strcmp(name, "reload") == 0)
-		{
-			vehVehicle* fresVeh = vehFRESParentVehicle();
-			if(fresVeh)
-				vehFRESLoadCamFile(fresVeh->VehicleType);
-			return 0;
-		}else
-		{
-			pos = atoi(name);
-			vehFRESSetCameraPosition(pos);
-			return 0;
-		}
-	}
-
-	vehFRESSetVehicle(name);
-	vehFRESSetCameraPosition(pos);
-
-	if(!uiInGame())
-	{
-//		WEAPON_SPEC weapon = weapFindWeaponByName("uk_buzzard");
-//		PlayerClient()->RequestDirectSpawn(weapon);
-		char spawncmd[32];
-		snprintf(spawncmd, 31, "/buz %s", name);
-		PlayerClient()->SendChatMessage(0, spawncmd);
-	}
-
-	return 0;
-}
-#endif
 
 void uiDotCommandAddClone(int id)
 {

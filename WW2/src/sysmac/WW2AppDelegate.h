@@ -8,6 +8,7 @@
 // TODO: Remove this
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
 
+@class WebView;
 @interface WW2AppDelegate : NSObject <NSTextFieldDelegate>
 {
     IBOutlet NSPopUpButton* soundType;
@@ -37,11 +38,13 @@
     IBOutlet NSWindow *statusWindow;
     IBOutlet NSTextField *userNameField;
     IBOutlet NSSecureTextField *passwordField;
-    IBOutlet id webView;
+    IBOutlet WebView *webView;
     IBOutlet NSButton *playOnlineButton;
     IBOutlet NSPopUpButton *arenaMenu;
     IBOutlet NSProgressIndicator *arenaLoadingIndicator;
-
+    IBOutlet NSTextField *userLabel;
+    IBOutlet NSTextField *passwordLabel;
+    
     float downloadBoxResizeHeight;
     BOOL isHidingDownloadProgress;
     NSDate* lastStatusUpdateTime;
@@ -64,15 +67,15 @@
     CGOpenGLDisplayMask selectedMonitor;
     NSDictionary* selectedMode;
     NSTimer* hidTimer;
-    
+
     BOOL _passwordEntryIsInitial;
-    
+
     NSURL *_patchFileURL;
     NSError *_error;
     NSString *_userName;
     NSString *_userPassword;
     NSURLSessionDownloadTask *_patchDownloadTask;
-    
+
     NSURLSession *_patchDownloadSession;
     NSByteCountFormatter *_downloadProgressFormatter;
 }
@@ -92,11 +95,11 @@
 - (IBAction)refreshMenuChanged:(id)sender;
 - (IBAction)resolutionMenuChanged:(id)sender;
 
-@property(nonatomic,retain) NSURL *patchFileURL;
-@property(nonatomic,retain) NSError *error;
+@property(nonatomic,strong) NSURL *patchFileURL;
+@property(nonatomic,strong) NSError *error;
 @property(nonatomic,copy) NSString *userName;
 @property(nonatomic,copy) NSString *userPassword;
-@property(nonatomic,retain) NSURLSessionDownloadTask *patchDownloadTask;
+@property(nonatomic,strong) NSURLSessionDownloadTask *patchDownloadTask;
 
 - (void)setCaptureAllDisplays:(bool)x;
 - (void)setFSAA:(int)fs;
@@ -115,7 +118,7 @@
 - (void)launchPatch;
 - (void)movePatchToTrash;
 - (void)setPlayGateStatus:(NSString*)status;
-- (NSString*)MD5digestForString:(NSString*)string;
+- (NSString*)MD5digestForString:(NSData*)rawString;
 - (void)setShowDownloadProgress:(BOOL)showDownloadProgress;
 - (BOOL)shouldUpdateStatus;
 

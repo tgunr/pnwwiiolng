@@ -20,7 +20,7 @@ namespace Instance
 				, UINT32 _createdAt, UINT32 _startedAt
 				, UINT16 _squadMates
 				)
-			: BasicStatus(_descriptor, _capacity, _gameTime_m, _createdAt, _startedAt)
+			: BasicStatus(_descriptor, static_cast<UINT8>(_capacity), _gameTime_m, _createdAt, _startedAt)
 			, m_squadMates(_squadMates)
 			{}
 		ClientStatus(const BasicStatus& rhs_, const UINT16 squadMates_)
@@ -33,7 +33,7 @@ namespace Instance
 
 		UINT16 squadMates() const { return m_squadMates; }
 
-		virtual SINT32 packer(const unsigned int mode, ACTION_OBJECT* const a) override;
+		virtual SINT32 packer(PackMode mode, ACTION_OBJECT* const a) override;
 
 	private:
 		UINT16		m_squadMates;

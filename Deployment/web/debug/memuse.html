@@ -1,0 +1,176 @@
+<html>
+<head>
+ <link rel="stylesheet" type="text/css" href="/style.css" />
+ <title> Memory Usage </title>
+ <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+</head>
+<body>
+<h1 class='heading'>Memory Usage</h1>
+
+<div align='center' style='position:relative; left:40px; width: auto; height:20px'>
+<span class='control'>
+ <label>Refresh Rate:</label>
+ <input class='radio' type='radio' name='freq' value='1' onChange='changeFreq(this)'>1s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='5' onChange='changeFreq(this)'>5s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='10' onChange='changeFreq(this)'>10s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='15' onChange='changeFreq(this)'>15s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='20' onChange='changeFreq(this)'>20s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='30' checked='checked' onChange='changeFreq(this)'>30s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='60' onChange='changeFreq(this)'>60s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='90' onChange='changeFreq(this)'>90s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='120' onChange='changeFreq(this)'>2m</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='300' onChange='changeFreq(this)'>5m</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='600' onChange='changeFreq(this)'>10m</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='900' onChange='changeFreq(this)'>15m</input>
+</span>
+</div>
+
+<br/>
+
+<table width="100%" border='1' id="memUseTable">
+</table>
+<script type="text/javascript">
+var prevUse = {} ;
+var memUse ;
+var timer = null ;
+var refreshRate = 30000 ;
+
+function sortMemUse(a, b)
+{
+ return memUse[b]['cur'] - memUse[a]['cur'] ;
+}
+
+function rescheduleJsonRequest()
+{
+ timer = setTimeout('fetchData()', refreshRate * 1000) ;
+}
+
+function changeFreq(e)
+{
+ clearTimeout(timer) ;
+ refreshRate = e.value ;
+ fetchData() ;
+}
+
+function equalUsage(field, row)
+{
+ if ( field != "allocs" && field != "frees" )
+ {
+  return false ;
+ }
+ return ( parseInt(row["allocs"]) == parseInt(row["frees"]) ) ;
+}
+
+function rxJson(data)
+{
+ timer = null ;
+
+ $('#loading').hide(750) ;
+
+ memUse = data ;
+
+ var memUseIndex = [];
+ var mutEl = document.getElementById("memUseTable") ;
+ var muEl = document.createElement("tbody") ;
+
+ for ( u in memUse ) { memUseIndex.push(u) ; }
+ memUseIndex.sort(sortMemUse) ;
+
+ if ( memUseIndex.length > 0 )
+ {
+  var header = document.createElement("tr") ;
+  var th = document.createElement("th") ;
+  th.appendChild(document.createTextNode("Location")) ;
+  header.appendChild(th) ;
+
+  for ( f in memUse[memUseIndex[0]] )
+  {
+   th = document.createElement("th") ;
+   th.appendChild(document.createTextNode(f)) ;
+   header.appendChild(th) ;
+  }
+  muEl.appendChild(header) ;
+ }
+
+ for ( i in memUseIndex )
+ {
+  var u = memUseIndex[i] ;
+  var mu = memUse[u] ;
+  var prev = prevUse[u] ;
+
+  var tr = document.createElement("tr") ;
+  var th = document.createElement("th") ;
+
+  // Location.
+  th.appendChild(document.createTextNode(u)) ;
+  tr.appendChild(th) ;
+  muEl.appendChild(tr) ;
+
+  // Remaining fields.
+  for ( f in mu )
+  {
+   var value = parseInt(mu[f]) ;
+   var td = document.createElement("td") ;
+   td.appendChild(document.createTextNode(value)) ;
+   var bold = 'normal' ;
+   // Change?
+   if ( f != "la" && prev && prev[f] && prev[f] != value )
+   {
+     var old = parseInt(prev[f]) ;
+     bold = 'bold' ;
+     if ( equalUsage(f, mu) == true )
+     {
+       td.style['color'] = 'green' ;
+     }
+     else if ( old > value )
+     {
+       td.style['color'] = 'blue' ;
+     }
+     else if ( old < value )
+     {
+       td.style['color'] = 'red' ;
+     }
+   }
+   else if ( equalUsage(f, mu) == true )
+   {
+     td.style['color'] = 'green' ;
+   }
+   td.style.fontWeight = bold ;
+   tr.appendChild(td) ;
+  }
+
+  muEl.appendChild(tr) ;
+
+  prevUse[u] = mu ;
+ }
+
+ while ( mutEl.children.length > 0 )
+ {
+  mutEl.removeChild(mutEl.children[0]) ;
+ }
+ mutEl.appendChild(muEl) ;
+
+ rescheduleJsonRequest() ;
+}
+
+function jsonError()
+{
+  $('#loading').hide(900) ;
+  rescheduleJsonRequest() ;
+}
+
+function fetchData()
+{
+  $('#loading').show() ;
+  $.getJSON("/mem.json")
+	.success(rxJson)
+	.error(jsonError)
+    ;
+}
+
+$(document).ready(fetchData()) ;
+</script>
+<div class='footer'/>
+<img width='16' height='16' src='loading.gif' align='absmiddle' id='loading'/>
+</body>
+</html>

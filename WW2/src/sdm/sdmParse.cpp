@@ -14,31 +14,29 @@
 #include "mem/mem.h"
 #include "sdm/sdmParse.h"
 #include "fio/fio.h"
-#if defined(LIMITED_FIO) && LIMITED_FIO != 0
+#if platBuild == BUILD_SERVER
+# undef fioGetString
 # include "fio/fioDefs.h"
 # include "fio/fiod.h"
 #endif
 
 #include "include/io_mapped_file.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 
 // Instead of importing pi.h and its baggage
-typedef struct
+struct piVECTOR
 {
- FLOAT32   x;
- FLOAT32   y;
- FLOAT32   z;
-
-} piVECTOR, *piLPVECTOR;
+	FLOAT32 x, y, z;
+};
 
 #include "trn/trntypes.h"
 
 // Translate CP/Facility names.
-typedef std::map<const std::string,const std::string> TRANSLATIONS;
+using TRANSLATIONS = std::map<const std::string,const std::string>;
 static TRANSLATIONS s_translations;
 
 // Errors translating CPs/Facilities
-typedef std::set<std::string> TRANSLATION_FAILS;
+using TRANSLATION_FAILS = std::set<std::string>;
 static TRANSLATION_FAILS* s_cpTranslationFails, *s_facilityTranslationFails;
 static bool s_translationsRequired = false;
 static const char* s_translationLanguage = "en";
@@ -236,7 +234,7 @@ _reportTranslationFails(const char* listType, TRANSLATION_FAILS& fails)
 	while ( (++it) != fails.end() )
 	{
 		fprintf(stderr, ", %s", (*it).c_str());
-		dbugLog(_FLAB, ", %s", (*it).c_str());
+		dbugLog(_FLA, ", %s", (*it).c_str());
 	}
 	fprintf(stderr, "\n\n");
 
@@ -259,7 +257,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	//get the starting position of cpf data
 	SINT32 sdmLength = _getTerrainFileLength(fd);
-	fiodSeek(fd, sdmLength + (SINT32)sizeof(TERRAINFILE), fioSEEK_SET);
+	fiodSeek(fd, sdmLength + (SINT32)sizeof(TERRAINFILE), SEEK_SET);
 
 	if ( PN_UNLIKELY(fiodRead(fd,&header,sizeof(STRT_DTL_HEADER)) != (int)sizeof(STRT_DTL_HEADER)) )
 	{
@@ -395,7 +393,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 	return 0;
 }
 
-SINT32 sdmCloseFile(void)
+void sdmCloseFile()
 {
 	header.numCPs = currentCP = 0;
 	header.numFacilities = currentFacility  = 0;
@@ -414,8 +412,6 @@ SINT32 sdmCloseFile(void)
 		memFree(currentData);
 		currentData = nullptr;
 	}
-
-	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -448,87 +444,87 @@ sdmFinish()
 	}
 }
 
-UINT16 sdmGetNumCP(void)
+UINT16 sdmGetNumCP()
 {
 	return header.numCPs;
 }
 
-CP* sdmGetNextCP(void)
+CP* sdmGetNextCP()
 {
 	if (cpList == nullptr || currentCP >= header.numCPs)
 		return nullptr;
 	return &cpList[currentCP++];
 }
 
-CP* sdmGetCPArray(void)
+CP* sdmGetCPArray()
 {
     return cpList;
 }
 
-UINT16 sdmGetNumFACILITY(void)
+UINT16 sdmGetNumFACILITY()
 {
 	return header.numFacilities;
 }
 
-FACILITY* sdmGetNextFACILITY(void)
+FACILITY* sdmGetNextFACILITY()
 {
 	if (facilityList == nullptr || currentFacility >= header.numFacilities)
 		return nullptr;
 	return &facilityList[currentFacility++];
 }
 
-FACILITY* sdmGetFACILITYArray(void)
+FACILITY* sdmGetFACILITYArray()
 {
 	return facilityList;
 }
 
-UINT16 sdmGetNumBUILDING(void)
+UINT16 sdmGetNumBUILDING()
 {
 	return header.numBuildings;
 }
 
-BUILDING* sdmGetNextBUILDING(void)
+BUILDING* sdmGetNextBUILDING()
 {
 	if (PN_LIKELY(buildingList != nullptr && currentBuilding < header.numBuildings))
 		return &buildingList[currentBuilding++];
 	return nullptr;
 }
 
-BUILDING* sdmGetBUILDINGArray(void)
+BUILDING* sdmGetBUILDINGArray()
 {
 	return buildingList;
 }
 
-UINT16 sdmGetNumDEPOT_LINK(void)
+UINT16 sdmGetNumDEPOT_LINK()
 {
 	return header.numLinks;
 }
 
-DEPOT_LINK* sdmGetNextDEPOT_LINK(void)
+DEPOT_LINK* sdmGetNextDEPOT_LINK()
 {
 	if (linkList == nullptr || currentLink >= header.numLinks)
 		return nullptr;
 	return &linkList[currentLink++];
 }
 
-UINT16 sdmGetNumWAYPOINT(void)
+UINT16 sdmGetNumWAYPOINT()
 {
 	return header.numWaypoints;
 }
 
-WAYPOINT* sdmGetNextWAYPOINT(void)
+WAYPOINT* sdmGetNextWAYPOINT()
 {
 	if (waypointList == nullptr || currentWaypoint >= header.numWaypoints)
 		return nullptr;
 	return &waypointList[currentWaypoint++];
 }
 
-UINT32 sdmGetTotalStratObjects(void)
+UINT32 sdmGetTotalStratObjects()
 {
 	return header.numCPs + header.numFacilities + header.numBuildings + header.numLinks + header.numWaypoints;
 }
 
-UINT32 sdmGetMaxStratId(void)
+UINT32 sdmGetMaxStratId()
 {
 	return maxId;
 }

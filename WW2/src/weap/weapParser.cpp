@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Tue Feb 20 10:40:54 2001
 //
 // Each weapon type in the game has a unique, four-octet
@@ -40,10 +40,7 @@
 #include "weap/weapList.h"
 #include "parse/countryCodes.h"
 #include "strt/strtDTL.h"
-
-#if platOS != OS_MACOS
-	#include "str/stringLib.h"
-#endif
+#include "str/stringLib.h"
 
 enum
 {
@@ -92,7 +89,7 @@ std::vector<std::unique_ptr<WEAPON>> g_weaponPtrs;
 
 bool weapParseCountry(char* countryfile)
 {
-	strncpy(_fileName, countryfile, PN_MAX_PATH);
+	strsafecpy(_fileName, countryfile);
 
 	_userCallbacks[0].function = _fillCountry;
 
@@ -103,7 +100,7 @@ bool weapParseCountry(char* countryfile)
 
 bool weapParseClasses(char* classFile)
 {
-	strncpy(_fileName,classFile,PN_MAX_PATH);
+	strsafecpy(_fileName, classFile);
 
 	_userCallbacks[0].function = _fillClass;
 	_parseConstant = PARSE_CLASS;
@@ -113,7 +110,7 @@ bool weapParseClasses(char* classFile)
 
 bool weapParseWeapons(char* weapfile, SINT32 country, SINT32 category)
 {
-	strncpy(_fileName,weapfile,PN_MAX_PATH);
+	strsafecpy(_fileName, weapfile);
 
 	_userCallbacks[0].function = _fillWeapon;
 	_parseConstant = PARSE_WEAPON;
@@ -126,7 +123,7 @@ bool weapParseWeapons(char* weapfile, SINT32 country, SINT32 category)
 
 bool weapParseSpawn(char* weapfile, SINT32 country, SINT32 category)
 {
-	strncpy(_fileName,weapfile,PN_MAX_PATH);
+	strsafecpy(_fileName, weapfile);
 
 	_parseConstant = PARSE_SPAWN;
 
@@ -138,20 +135,20 @@ bool weapParseSpawn(char* weapfile, SINT32 country, SINT32 category)
 
 static bool _setSection(int /*numargs*/, FUNCARGS* args)
 {
-	strncpy(_section.name, args[0].svalue, sizeof(_section.name));
+	strsafecpy(_section.name, args[0].svalue);
 
 	switch (_parseConstant)
 	{
 	case PARSE_COUNTRY:
 		strlwr(_section.name);
 
-		strncpy(_userCallbacks[0].type, _section.name, MAX_FUNC_NAME);
+		strsafecpy(_userCallbacks[0].type, _section.name);
 
 		break;
 	case PARSE_CLASS:
 		strlwr(_section.name);
 
-		strncpy(_userCallbacks[0].type, _section.name,MAX_FUNC_NAME);
+		strsafecpy(_userCallbacks[0].type, _section.name);
 
 		_section.spec = weapFindCategory(_section.name);
 
@@ -164,16 +161,14 @@ static bool _setSection(int /*numargs*/, FUNCARGS* args)
 		// these define the list of known weapons.
 		strlwr(_section.name);
 
-		strncpy(_userCallbacks[0].type, _section.name,MAX_FUNC_NAME);
+		strsafecpy(_userCallbacks[0].type, _section.name);
 
 		// Populate the wClass
 		_section.spec = weapFindClass(_section.name);
 
 		if (_section.spec.isNull())
 		{
-#ifdef FRONT_END
-			Write_Debug("invlid class name %s",_section.name);
-#endif // FRONT_END
+			dbugLog(_FLW, "invlid class name %s",_section.name);
 			return false;
 		}
 
@@ -323,7 +318,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 	static const SINT32 _NUM_SPECS = sizeof(argSpec)/sizeof(ARG_SPEC);
 	WEAPON_SPEC thisSpec = NULL_WEAP_SPEC;
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 	bool fNext = false, eNext = false;
 #endif
 
@@ -344,7 +339,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 									);
 		g_weaponPtrs.emplace_back(weapon);
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 		SINT32 i, bIndex;
 		WEAPON_SPEC biasSpec;
 
@@ -434,7 +429,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 	}
 	catch ( std::exception& e )
 	{
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what());
 #else
 		dbugLog(_FLA, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what());
@@ -442,7 +437,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 	}
 	catch ( const char* reason )
 	{
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason);
 #else
 		dbugLog(_FLA, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason);
@@ -477,7 +472,7 @@ static bool _fillSpawn(SINT32 /*numArgs*/, FUNCARGS* args)
 		WEAPON* weap = weapLookupWeaponByName(weapName);
 		if ( weap == nullptr || weap->spec().wType == 0 )
 			throw "weapon not found";
-		const WEAPON_SPEC& spec = weap->spec();
+		WEAPON_SPEC spec = weap->spec();
 		if ( mySpec.wCountry != spec.wCountry )
 			throw "country mismatch";
 		// Allow infantry to spawn at GV_ and AC_ spawners
@@ -493,7 +488,7 @@ static bool _fillSpawn(SINT32 /*numArgs*/, FUNCARGS* args)
 	}
 	catch ( const char* reason )
 	{
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason);
 		return false;
 #else

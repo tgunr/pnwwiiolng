@@ -1,0 +1,29 @@
+{
+	"version_order": "execution",
+    "paths": {
+        "migrations": "%%PHINX_CONFIG_DIR%%/migrations",
+        "seeds": "%%PHINX_CONFIG_DIR%%/seeds"
+    },
+    "environments": {
+        "default_migration_table": "_migrations",
+        "default_database": "development",
+        "production": {
+            "adapter": "mysql",
+            "host": "live1.playnet.com",
+            "name": "wwiionline",
+            "user": "root",
+            "pass": "%%PHINX_DBPASSWORD%%",
+            "port": 3306,
+            "charset": "utf8"
+        },
+        "development": {
+            "adapter": "mysql",
+            "host": "localhost",
+            "name": "wwiionline",
+            "user": "root",
+            "pass": "%%PHINX_DBPASSWORD%%",
+            "port": 3306,
+            "charset": "utf8"
+        }
+    }
+}

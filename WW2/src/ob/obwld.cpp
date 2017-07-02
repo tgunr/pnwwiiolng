@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "pi/pi.h"
 #include "include/vars.h"
@@ -352,9 +352,7 @@ static bool LoadModel(int numargs, FUNCARGS* args)
 static bool LoadCockpitModel(int numargs, FUNCARGS* args)
 {
 	rnlogoUpdateStatus("loading.vehicles");
-	if(g_bBuildMDLS)	obmgrAddModelToPool(args[0].svalue, true);
-	else	obmgrAddModelToPool(args[0].svalue, false);
-
+	obmgrAddModelToPool(args[0].svalue, g_bBuildMDLS);
 	return TRUE;
 }
 
@@ -558,17 +556,14 @@ static bool DynamicLights(int numargs, FUNCARGS* args)
 
 static bool AddDynamicLight(int numargs, FUNCARGS* args)
 {
-UINT32   type;
-LIGHT   light;
-
-	type = FindConstant(args[1].svalue);
+	UINT32 type = FindConstant(args[1].svalue);
 	if (type == 0)
 	{
 		return(FALSE);
 	}
 
 	// init the light
-	memset(&light, 0, sizeof(LIGHT));
+	LIGHT light{};
 	strcpy(light.name, args[0].svalue);
 	light.flags = LITE_ON;
 	light.light.dltType = type;
@@ -852,7 +847,7 @@ logTimerBeginExtMacro(parseWor);
 		return (FALSE);
 logTimerEndExtMacro(parseWor);
 
-#ifdef DEBUG
+#ifdef DEBUG_WW2
 	if (DebugBuildingMDLFilesOnly) {
 		fprintf(stderr, "Done building MDL files. Bailing out.");
 		exit(0);
@@ -862,20 +857,18 @@ logTimerEndExtMacro(parseWor);
 	Write_Debug ("*****************Total time loading blitzwor.csv file: %u milliseconds", T2-T1);
 
 	// Granny2 system (needs materials loaded)
-
-
 #if defined(BETA_RELEASE)
 	if(!NoInfPreload){
 #endif
-	rnlogoUpdateStatus("loading.infantry");
+		rnlogoUpdateStatus("loading.infantry");
 
-	if (!gr2AnimInit())
-	{
-		return(FALSE);
-	}
+		if (!gr2AnimInit())
+		{
+			return(FALSE);
+		}
 
 #if defined(BETA_RELEASE)
-}
+	}
 #endif
 
     rnlogoUpdateStatus("loading.objects");
@@ -888,7 +881,7 @@ logTimerEndExtMacro(parseWor);
 
 }
 
-void obwldKill(void)
+void obwldKill()
 {
 	trnmainKill();
 
@@ -897,13 +890,13 @@ void obwldKill(void)
     Write_Log(LOG_OLD, LOG_INFO, "[obwldKill]");
 }
 
-LOGICAL obwldUpdate(void)
+LOGICAL obwldUpdate()
 {
 	return(TRUE);
 }
 
 #ifdef USE_SHADOWS
-LOGICAL obwldPredrawUpdate(void)
+LOGICAL obwldPredrawUpdate()
 {
 	if (!obdshadUpdate())
 	{

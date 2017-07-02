@@ -52,7 +52,7 @@ private:
         bool fncomp (const char*x, const char*y) {return strcmp(x,y)<0;}
     };
 
-    typedef std::map<const char*, commands,classcomp> CommandMap;
+    using CommandMap = std::map<const char*, commands,classcomp>;
 
     bool loadFromText( );
     void process( const char* start, const char* end );

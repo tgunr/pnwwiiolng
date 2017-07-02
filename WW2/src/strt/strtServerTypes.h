@@ -25,6 +25,8 @@
 
 struct JOIN_LIST;
 
+using CPSET = std::set<CPStruct*>;
+
 //tolua_begin
 
 // Maximum CPs in the strat system
@@ -68,17 +70,7 @@ struct JOIN_LIST;
 
 #define 	FAC_OPEN_FLAG	0x80
 
-typedef std::set<CPStruct*> CPSET;
-
-//The timefactors we have
-enum STRAT_TIMEFACTOR
-{
-	STRAT_DAWN,
-	STRAT_DAY,
-	STRAT_DUSK,
-	STRAT_NIGHT,
-	MAX_STRAT_TIMEFACTOR
-};
+//tolua_end
 
 //Structure used to build a list of people who have requested
 //	permission to join the posters vehicle
@@ -88,19 +80,17 @@ class WeapJoinRequestNode
 	public: static WeapJoinRequestNode* Lookup(UINT32 playerID);
 
 	// Ctor/Dtor
-	public: WeapJoinRequestNode(UINT32 playerID, const ChatHandle& handle, UINT32 missionID);
+	public: WeapJoinRequestNode(UINT32 playerID, const ChatHandle handle, UINT32 missionID);
 	public: ~WeapJoinRequestNode();
 
 	// Add this node to a list - automatically extracts itself
 	// from any list it is currently registered to.
 	public: bool AddToList(JOIN_LIST* toList);
 
-//tolua_end
 	private: void _register();
 	private: void _unregister();
 
 public:
-//tolua_begin
 	//CL linked list stuff
 	WeapJoinRequestNode* prev;
 	WeapJoinRequestNode* next;
@@ -143,6 +133,7 @@ struct BRIDGE_ENTRY
 	LinkStruct* link;
 };
 
+//tolua_begin
 // What smoke to aim for when real damage is done
 #define SMOKE_START_LEVEL SMOKELEVEL_LIGHT
 
@@ -151,10 +142,10 @@ struct BRIDGE_ENTRY
 
 // What's the damage required to "ping" the smoke level?
 #define SMOKE_JOULES 1000
+//tolua_end
 
 class EWSReport
 {
-//tolua_end
 private:
 	UINT32			m_weapon;			// Which vehicle is generating this
 	UINT32			m_time;				// Time of report
@@ -162,9 +153,8 @@ private:
 	UINT8			m_side;				// Side of report
 	UINT8			m_weapCategory;		// Category of weapon in report
 
-	void _incPresence(void);			// Increase presence counts
-	void _decPresence(void);			// Decrease presence counts
-//tolua_begin
+	void _incPresence();				// Increase presence counts
+	void _decPresence();				// Decrease presence counts
 
 public:
 	// Constructor
@@ -188,4 +178,3 @@ struct CP_STATUS
 	CP_STATUS_FLAGS		flags;
 };
 
-//tolua_end

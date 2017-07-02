@@ -14,11 +14,14 @@
 	bool		bVal;
 }
 
-%destructor { if ($<str>$) { free($<str>$); --leakCount; } } <str>
+%destructor { if ($$) { free($$); --leakCount; } } <str>
 
 // declarations
-%token			TKW_DEBUG
 %token			TKW_NAMESPACE
+%token			TKW_CLIENT
+%token			TKW_FRONTEND
+%token			TKW_SERVER
+%token			TKW_DEBUG
 %token			TKW_START_Y
 %token			TKW_TYPE
 %token			TKW_AS
@@ -29,8 +32,12 @@
 
 // statement keywords
 %token			TKW_MESSAGE TKW_GROUP
+%token			TKW_TOCLIENT TKW_TOHOST TKW_GMONLY TKW_INTERNAL
 %token <sVal>	TKW_IF
 %token <sVal>	TKW_ARRAY
+
+// field options
+%token			TKW_FIELD_BITS
 
 // C++ keywords
 %token			TKW_CPP_SCOPE
@@ -45,11 +52,14 @@
 %type <str>		include-filename
 %type <sVal>	valid-group
 %type <sVal>	valid-field
-%type <sVal>	typename scoped-identifier
-%type <sVal>	typedef-as typedef-inc using-directive
+%type <str>		typename scoped-identifier
+%type <str>     typedef-as typedef-bits typedef-inc
+%type <sVal>	using-directive
 %type <bVal>	typedef-ref
 %type <sVal>	message-id enum-id
 %type <str>		array-typename array-typedef array-membername array-dimension
+%type <sVal>	field-option-token
+%type <str>		integer-or-identifier
 
 %%
 
@@ -57,7 +67,9 @@
 /* Top Level definitions */
 /****************************************************************************************************/
 
-file				:	namespace-directive directives
+file				:	namespace-directive client-directive directives
+					|	namespace-directive directive { yyfatal("Missing 'CLIENT' directive after namespace."); }
+					|	{ yyfatal("OMG files must begin with a NAMESPACE directive."); }
 					;
 
 directives			:	directive
@@ -73,6 +85,7 @@ directive			:	debug-directive
 					|	enum-directive
 					;
 
+
 /*
 	NAMESPACE <identifier>;
 	Must be first directive in a file, specifies the scope for the output file.
@@ -80,6 +93,19 @@ directive			:	debug-directive
 namespace-directive	:	TKW_NAMESPACE TIDENTIFIER ';' { omg_namespace($2); }
 					|	TKW_NAMESPACE TIDENTIFIER { yyfatal("Missing semi-colon after '%s %s' directive.", "NAMESPACE", $2); }
 					|	TKW_NAMESPACE { yymissing("identifier", "keyword", "NAMESPACE"); }
+					;
+
+/*
+	GAMECLIENT or HOSTCLIENT;
+	Tells us whether we are writing code that will be used by the game client or by a server.
+*/
+
+client-directive	:	TKW_CLIENT TKW_FRONTEND ';' { omg_client(CL_FRONTEND); }
+					|	TKW_CLIENT TKW_SERVER ';'  { omg_client(CL_SERVER); }
+					|	TKW_CLIENT TKW_FRONTEND { yymissing("semicolon", "CLIENT", "FRONTEND"); }
+					|	TKW_CLIENT TKW_SERVER { yymissing("semicolon", "CLIENT", "FRONTEND"); }
+					|	TKW_CLIENT TIDENTIFIER { yyfatal("Unrecognized CLIENT, expected FRONTEND or SERVER, got %s", $2); }
+					|	TKW_CLIENT { yyfatal("Expecting 'FRONTEND' or 'SERVER' after 'CLIENT' specifier."); }
 					;
 
 /*
@@ -120,9 +146,9 @@ type-directive		:	typedef ';'
 	optional
 	Reads definitions from another .omg file without generating exports of them.
 */
-using-directive		:	TKW_USING QUOTSTRING ';' { $$ = strdup($2); }
-					|	TKW_USING QUOTSTRING { yyfatal("Missing semi-colon after '%s \"%s\"' directive.", "USING", $2); }
-					|	TKW_USING { yymissing("quoted filename", "keyword", "USING"); }
+using-directive		:	TKW_USING QUOTSTRING ';' { $$ = $2; }
+					|	TKW_USING QUOTSTRING { yyfatal("Missing semi-colon after '%s \"%s\"' directive.", "USING", $2); $$ = nullptr; }
+					|	TKW_USING { yymissing("quoted filename", "keyword", "USING"); $$ = nullptr; }
 					;
 
 /*
@@ -130,7 +156,7 @@ using-directive		:	TKW_USING QUOTSTRING ';' { $$ = strdup($2); }
 	optional
 	Adds an #include to the output source.
 */
-include-filename	:	TKW_INCLUDE QUOTSTRING ';' { $$ = strdup($2); }
+include-filename	:	TKW_INCLUDE QUOTSTRING ';' { ++leakCount; $$ = strdup($2); }
 					|	TKW_INCLUDE QUOTSTRING { yyfatal("Missing semi-colon after '%s \"%s\"' directive.", "INCLUDE", $2); $$ = nullptr; }
 					|	TKW_INCLUDE { yymissing("quoted filename", "keyword", "INCLUDE"); $$ = nullptr; }
 					;
@@ -143,17 +169,17 @@ include-filename	:	TKW_INCLUDE QUOTSTRING ';' { $$ = strdup($2); }
 enum-directive		:	enum-id '{' enum-entries '}' ';' { omg_end_enum(); }
 					|	enum-id '{' '}' { yyfatal("Empty enumeration '%s'", $1); }
 					|	enum-id '{' { yyfatal("Mal-formed ENUM directive ('%s')", $1); }
-					|	enum-id { yyfatal("Expected open-brace ('{') after 'ENUM %s' directive.", $1); }
+					|	enum-id { yyfatal("Expected open brace ('{') after 'ENUM %s' directive.", $1); }
 					;
 
 /*
-	MESSAGE <name> { ... };
+	MESSAGE <name> [ '[' [RX] [TX] ']' ] { ... };
 	optional
 	Declares a message structure.
 */
 message-directive	:	message-id message-body ';' { omg_end_message(); }
 					|	message-id message-body { yyfatal("Missing semi-colon after '%s %s' directive.", "MESSAGE", $1); }
-					|	message-id { yymissing("open-brace ('{')", "MESSAGE", $1); }
+					|	message-id { yymissing("open brace ('{')", "MESSAGE", $1); }
 					;
 
 /****************************************************************************************************/
@@ -161,39 +187,59 @@ message-directive	:	message-id message-body ';' { omg_end_message(); }
 /****************************************************************************************************/
 
 /* TYPE */
-typedef				:	TKW_TYPE TIDENTIFIER typedef-as typedef-ref typedef-inc  { omg_type_decl(TypeDef($2, $3, $4, $5)); }
+typedef				:	TKW_TYPE TIDENTIFIER typedef-as typedef-bits typedef-ref typedef-inc  { omg_type_decl(TypeDef($2, $3, atol($4), $5, $6)); }
 					;
 
-typedef-as			:	/* empty */ { $$ = strdup(""); }
-					|	TKW_AS typename { $$ = strdup($2); }
+typedef-as			:	/* empty */ { ++leakCount; $$ = strdup(""); }
+					|	TKW_AS typename { ++leakCount; $$ = strdup($2); }
+					;
+
+typedef-bits		:	/* empty */ { ++leakCount; $$ = strdup(""); }
+					|	TKW_FIELD_BITS '=' TINTEGER { ++leakCount; $$ = strdup($3); }
+					|	TKW_FIELD_BITS '=' { yyfatal("BITS expects an integer argument."); $$ = nullptr; }
+					|	TKW_FIELD_BITS { yyfatal("missing equals sign after BITS"); $$ = nullptr; }
 					;
 
 typedef-ref			:	/* empty */ { $$ = false; }
 					|	TKW_BY_REF { $$ = true; }
 					;
 
-typedef-inc			:	/* empty */ { $$ = strdup(""); }
-					|	TKW_INCLUDE QUOTSTRING { $$ = strdup($2); }
+typedef-inc			:	/* empty */ { ++leakCount; $$ = strdup(""); }
+					|	TKW_INCLUDE QUOTSTRING { ++leakCount; $$ = strdup($2); }
 					;
 
 
 /* ENUM */
-enum-id				:	TKW_ENUM TIDENTIFIER { omg_start_enum($2); $$ = strdup($2); }
+enum-id				:	TKW_ENUM TIDENTIFIER { omg_start_enum($2); $$ = $2; }
 					|	TKW_ENUM { yyfatal("Expected identifier after '%s' directive.", "ENUM"); }
 					;
 
 enum-entries		:	enum-entries ',' enum-entry
 					|	enum-entries ','
 					|	enum-entry
-					;
 
 enum-entry			:	TIDENTIFIER	{ omg_add_enum_value($1); }
 					;
 
 
 /* MESSAGE */
-message-id			:	TKW_MESSAGE TIDENTIFIER	{ omg_start_message($2); $$ = strdup($2); } 
+message-id			:	TKW_MESSAGE TIDENTIFIER	{ omg_start_message($2); } message-attributes { $$ = $2; }
 					|	TKW_MESSAGE { yyfatal("Expected identifier after '%s' directive.", "MESSAGE"); }
+					;
+
+message-attributes	:	/* empty */
+					|	'[' ']'
+					|	'[' message-attr-list ']'
+					;
+
+message-attr-list	:	message-attr-list message-attribute
+					|	message-attribute
+					;
+
+message-attribute	:	TKW_TOCLIENT { omg_message_attr(MA_TOCLIENT); }	/* Client needs a receiver */
+					|	TKW_TOHOST { omg_message_attr(MA_TOHOST); }	/* Server needs a receiver */
+					|	TKW_GMONLY   { omg_message_attr(MA_GMONLY); }	/* Only a GM can send/receive this */
+					|	TKW_INTERNAL { omg_message_attr(MA_INTERNAL); }  /* Server<->server only */
 					;
 
 message-body		:	'{' '}'
@@ -245,15 +291,32 @@ field				:	valid-field ';'
 					|	valid-field { yyfatal("Missing trailing semicolon after field '%s'", $1); }
 					;
 
-valid-field			:	typename TIDENTIFIER { omg_start_field($1, $2); } field-opts { omg_end_field(); $$ = $2; }
+valid-field			: typename TIDENTIFIER { omg_start_field($1, $2); }	field-array-dimensions { omg_end_field(); $$ = $2; }
+					| typename TIDENTIFIER { omg_start_field($1, $2); }	field-opts { omg_end_field(); $$ = $2; }
+					;
+
+field-array-dimensions: array-dimension { omg_field_dimension($1); }
+					|	field-array-dimensions array-dimension { omg_field_dimension($2); }
 					;
 
 field-opts			:	/* empty */
+					|	field-options
+					;
+
+field-options		:	field-options field-option
+					|	field-option
+					;
+
+field-option		:	field-option-token '=' integer-or-identifier { omg_add_field_option($1, $3); }
+					|	field-option-token { omg_add_field_option($1, nullptr); }
+					;
+
+field-option-token	:	TKW_FIELD_BITS { $$ = "bits"; }
 					;
 
 func				:	TCODE_FRAG { omg_add_code($1); }
 				
-typename			:	TIDENTIFIER { $<sVal>$ = $<str>1; }
+typename			:	TIDENTIFIER { ++leakCount; $$ = strdup($1); }
 					|	scoped-identifier
 					;
 
@@ -297,7 +360,7 @@ array-membername	:	/* empty */	{ leakCount++; $$ = strdup(""); }
 
 array-dimension		:	'[' TINTEGER ']' { $$ = $2; }
 					|	'[' TIDENTIFIER ']' { $$ = $2; }
-					|	'[' ']' { yyfatal("Maximum %s size must be specified", "ARRAY"); $$ = nullptr; }
+					|	'[' ']' { yyfatal("Empty array dimension ([]) is invalid."); $$ = nullptr; }
 					;
 
 array-body			:	'{' array-stmts '}'
@@ -306,4 +369,8 @@ array-body			:	'{' array-stmts '}'
 
 array-stmts			:	array-stmt
 					|	array-stmts array-stmt
+					;
+
+integer-or-identifier:	TINTEGER
+					|	TIDENTIFIER
 					;

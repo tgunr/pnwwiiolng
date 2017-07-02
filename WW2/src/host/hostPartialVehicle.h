@@ -40,7 +40,7 @@ struct PartialVehicle
 
 	bool HasFirstTime() const { return (present & PRX_FIRST_TIME);  }
 
-	SINT32 packer(LOGICAL mode, UCHAR* srcData, UINT32 /*version*/=~0)
+	SINT32 packer(PackMode mode, UCHAR* srcData, UINT32 /*version*/=~0)
 	{
 		SINT32 offset = 0;
 		UCHAR* const realData = srcData + 2;

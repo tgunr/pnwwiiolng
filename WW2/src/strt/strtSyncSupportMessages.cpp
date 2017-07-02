@@ -7,8 +7,6 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include "versionNo.h"
-
 #include "include/wthrTime.h"
 #include "server/serverInterface.h"
 #include "strt/strtConstants.h"
@@ -344,24 +342,18 @@ _recvTimeUpdate(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-static SINT32
-_registerStrtXCallbacks()
+SINT32
+strtSyncSupportInstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
+	{
 		REGISTER_RECEIVER(STRT_UPDATE_Y, _recvStratUpdate);
 		REGISTER_RECEIVER(STRT_SYNC_CPS_Y, _recvSyncCPs);
 		REGISTER_RECEIVER(STRT_SYNC_FACILITIES_Y, _recvSyncFacilities);
 		REGISTER_RECEIVER(STRT_SYNC_BUILDINGS_Y, _recvSyncBuildings);
 		REGISTER_RECEIVER(STRT_BROADCAST_CONFIG_UPDATE_Y, _recvConfigUpdate);
 		REGISTER_RECEIVER(STRT_BROADCAST_TIME_UPDATE_Y, _recvTimeUpdate);
-	END_CALLBACK_REGISTRATION
-}
-
-SINT32
-strtSyncSupportInstallCallbacks(void)
-{
-	_registerStrtXCallbacks();
-
-	return 0;
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 

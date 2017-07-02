@@ -13,7 +13,7 @@ class physicsBodyBase;
 class physicsNodeCollider;
 class physicsObjectCollider;
 
-typedef std::set<physicsBodyBase*> physicsBodySet;
+using physicsBodySet = std::set<physicsBodyBase*>;
 
 class physicsObject
 {

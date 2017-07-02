@@ -16,6 +16,7 @@ namespace WWII
 			{
 			// Internal ports
 				PrivateBcast = 6666					// server<->server backbone
+            ,	PrivateCellBcast = 6667				// cell host<->cell host backbone
 			,	InternalAuth = 6002					// Auth<->server interface
 			,	DebugWebServer = 6080				// Debugging web interface
 			,	ChatManagement = 6066				// For rosterClient
@@ -24,6 +25,7 @@ namespace WWII
 
 			// Public ports (customer facing)
 			,	AuthHost = 27015					// Auth Server port
+            ,   AltAuthHost = 27014                 // Auth Server port in Super-CiaB (five-host) mode
 			,	MapHost = 27015						// Map/Login server
 #if defined(PN_DIFFERENT_PORTS)
 			,	ChatHost = 27016					// Chat host server

@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "host/hostFraming.h"
 #include "host/host.h"
 #include "host/hostPlayer.h"
@@ -61,13 +59,13 @@ _getFramingMTU(UINT16 mode)
 	{
 	case UpdateFraming::_MAX:
 		return Teul::TCPMaxPayload;
-	break;
+
 	case UpdateFraming::_LARGE:
 		return Teul::TCPMaxPayload;
-	break;
-	default: break;
+
+	default:
+		return Teul::TCPStdPayload;
 	}
-	return Teul::TCPStdPayload;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -83,7 +81,7 @@ HostVehicle::selectBestFramingMode()
 
 	UINT32 interval = framings[framingMode].updateInterval;
 
-	betaLog(_FLI, "c:%s v:%u selecting framing mode %u [%u] dU:%u", vehicleData.callsign, index, framingMode, mtu, interval);
+	dbugLog(_FLI, "c:%s v:%u selecting framing mode %u [%u] dU:%u", vehicleData.callsign, index, framingMode, mtu, interval);
 
 	if ( isActive() )
 		updateScheduleVehicle(this, interval);
@@ -103,8 +101,7 @@ Player::setFramingMode(UINT16 newMode)
 	if ( vehicle != nullptr )
 	{
 		vehicle->selectBestFramingMode();
-		if ( g_logDebug )
-			dbugLog(_FLD, "t:%d p:%u c:%s v:%u best framing mode %u", teulIndex(), playerID(), callsign(), vehicle->index, vehicle->framingMode);
+        dbugLog(_FLD, "t:%d p:%u c:%s v:%u best framing mode %u", teulIndex(), playerID(), callsign(), vehicle->index, vehicle->framingMode);
 	}
 }
 

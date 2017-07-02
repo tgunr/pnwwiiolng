@@ -16,13 +16,10 @@
 
 #include "sdm/sdmLoad.h"
 #include "teul/teulTime.h"
-#include "dbse/dbseConnection.h"
 #include "dbse/dbseHandle.h"
 #include "wwii/wwiiThreads.h"
 
-#include "sdm/sdmConfigVars.h"
-#include "wwii/wwiidbConfigVars.h"
-#include "server/serverConfigVars.h"
+#include "include/configVars.h"
 
 static bool useIrc = true;
 static irc_session_t* ircSession;
@@ -33,7 +30,6 @@ static char g_origin[80] = "private";
 
 struct stat statBuf;
 
-DBCONNECTION dbConnection;
 extern DBHANDLE dbHandle;
 
 class IrcThread : public PNThread
@@ -184,10 +180,10 @@ _ircSendMessage(const char* channel, const char* message)
 	char channelName[128];
 	if ( channel[0] == '-' )
 	{
-		sprintf(channelName, "#%s%s", cv_clusterName.GetString(), channel);
+		strprintf(channelName, "#%s%s", cv_clusterName.GetString(), channel);
 	}
 	else
-		strcpy(channelName, channel);
+		strsafecpy(channelName, channel);
 
 	irc_cmd_msg(ircSession, channelName, message);
 }
@@ -199,19 +195,19 @@ _ircStart()
 		return;
 
 	char message[80 + sizeof(g_origin)];
-	sprintf(message, "%s terrain: importing new terrain from %s", cv_clusterName.GetString(), g_origin);
+	strprintf(message, "%s terrain: importing new terrain from %s", cv_clusterName.GetString(), g_origin);
 	_ircSendMessage("-sys,#servers", message);
 }
 
 static void
-_ircFinish(const TeulTimeMS& timeTaken)
+_ircFinish(TeulTimeMS timeTaken)
 {
 	if ( ircThread == nullptr || ircSession == nullptr || ircConnected == false )
 		return;
 
 	FLOAT32 seconds = ((FLOAT32)timeTaken) / 1000.0f;
 	char message[128];
-	sprintf(message, "%s terrain: import finished - took %.2f seconds", cv_clusterName.GetString(), seconds);
+	strprintf(message, "%s terrain: import finished - took %.2f seconds", cv_clusterName.GetString(), seconds);
 
 	_ircSendMessage("-sys,#servers", message);
 
@@ -298,28 +294,6 @@ _extract(const char* tarFile)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Check for an origin file
-
-static void
-_checkOriginFile()
-{
-	FILE* fp = fopen(cv_originFile.GetString(), "rb");
-	if ( fp == nullptr )
-	{
-		LogAbort("Unable to access %s/%s"
-				, cv_dataDir.GetString(), cv_originFile.GetString());
-	}
-
-	if ( fgets(g_origin, sizeof(g_origin) - 1, fp) == nullptr )
-	{
-		LogAbort("Unable to read %s/%s"
-			, cv_dataDir.GetString(), cv_originFile.GetString());
-	}
-
-	fclose(fp);
-}
-
-//////////////////////////////////////////////////////////////////////
 //
 
 int
@@ -337,11 +311,6 @@ main(int argc,char** argv)
 	const char* tarFile = nullptr;
 
 	bool argsOk = true;
-#if platOS != OS_WIN32
-	bool useOrigin = true;
-#else
-	bool useOrigin = false;
-#endif
 
 	for ( int i = 1; i < argc; ++i )
 	{
@@ -352,7 +321,6 @@ main(int argc,char** argv)
 			{
 				case '?':
 					usage();
-				break;
 				case 'h':		// Database Host
 					arg = getArgument(argc, argv, i);
 					if ( arg == nullptr )
@@ -376,9 +344,6 @@ main(int argc,char** argv)
 				break;
 				case 'I':
 					useIrc = false;
-				break;
-				case 'O':
-					useOrigin = !useOrigin;
 				break;
 				case 0:
 					fprintf(stderr, "Invalid argument '-'\n");
@@ -409,12 +374,13 @@ main(int argc,char** argv)
 	if ( result < 0 )
 		LogAbort("Unable to access working directory %s: %d", cv_dataDir.GetString(), result);
 
+	dbugInit(LogMode::TO_FILE, "stratLoader");
+	dbugSetLogLevel(Debug::ERR_INFO | STD_ERR);
+	dbugSetWriteLevel(Debug::ERR_INFO | STD_ERR);
+
 	_checkDirectoryStructure();
 
 	_extract(tarFile);
-
-	if ( useOrigin )
-		_checkOriginFile();
 
 	if ( importFileName == nullptr )
 		importFileName = cv_importFile.GetString();
@@ -430,8 +396,6 @@ main(int argc,char** argv)
 	_ircStart();
 	teulSyncClock();
 	TeulTimeMS started = teulClock64;
-
-	threadsReadDBEnvironment();
 
 	if ( dbseInitStratLoader() < 0 )
 		LogAbort("Database (%s:%s) connection failed.", cv_wwiiDBAddress.GetString(), cv_wwiiDBDefaultSchema.GetString());

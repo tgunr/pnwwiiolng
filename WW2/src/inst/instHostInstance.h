@@ -22,13 +22,13 @@ namespace Instance
 
 	//! @brief Functor that takes a HostInstance reference and returns a new HostInstanceImpl
 	//! or derived object.
-	typedef HostInstanceImpl* (HostInstanceImplFactory) (HostInstance&);
+	using HostInstanceImplFactory = HostInstanceImpl*(*)(HostInstance&);
 
 	//! @brief Function to register your host-specific class' new functions.
-	void RegisterHostInstanceImplFactory(HostInstanceImplFactory* factory);
+	void RegisterHostInstanceImplFactory(HostInstanceImplFactory factory);
 
 	//! @brief The host-specific instance implementation object factory.
-	extern HostInstanceImplFactory* s_implFactory;
+	extern HostInstanceImplFactory s_implFactory;
 
 	class HostInstance : public BasicStatus
 	{
@@ -67,7 +67,7 @@ namespace Instance
 
 		const PLAYERS& players() const { return m_players; }
 		PLAYERS& players() { return m_players; }
-		const playerid_t& creator() const { return m_creator; }
+		playerid_t creator() const { return m_creator; }
 
 		// Member functions
 
@@ -86,7 +86,7 @@ namespace Instance
 		void setState(Instance::State newState);
 
 	public:
-		static HostInstance* LookupByUID(const instanceid_t& _uid);
+		static HostInstance* LookupByUID(const instanceid_t _uid);
 
 	private:
 		//! PlayerID of the player who created the instance (may differ from handle)

@@ -1,10 +1,11 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 
 #include "phui/View.h"
 #include "phui/DOM.h"
 
-#include"include/vars.h"
+#include "build_info.hpp"
+#include "include/vars.h"
 #include "js/jsPlayer.h"
 #include "js/jsGame.h"
 #include "js/jsStratDB.h"
@@ -32,7 +33,7 @@
 #include "pers/persgunsight.h"
 #include "phui/GraphicsContext.h"
 #include "phui/ConsoleView.h"
-#include "sysLaunchURL.h"
+#include "sys/sysLaunchUrl.h"
 #include "pi/piinfo.h"
 #include "locl/loclApp.h"
 #include "ui/uiChat.h"
@@ -46,7 +47,7 @@
 #include "fp/fpTPS.h"
 #include "fp/fpPPO.h"
 #include "gr2/gr2Anim.h"
-#include "versionNo.h"
+#include "build_info.hpp"
 #include "scen/ScenarioManager.h"
 #include "ml/mlutility.h"
 
@@ -201,9 +202,9 @@ jsGame::jsGame() : phui::js::Object(&jsclass, nullptr, nullptr,jsfunctions,jspro
 #endif
 	std::string hostversion;
 	getBuildInfo(hostversion);
-	DefineProperty("version", phui::js::ConstString(STRVER));
+	DefineProperty("version", phui::js::NewString(PN_product_version_string));
 	DefineProperty("buildinfo", phui::js::NewString(hostversion.c_str()));
-	DefineProperty("revision", phui::js::NewString(WWII::gitCommitStr));
+	DefineProperty("revision", phui::js::NewString((std::string(PN_code_git_commitish_string)+PN_data_git_commitish_string).c_str()));
 	cps = new phui::js::Array;
 	keymaps = new phui::js::Array;
 	spawnablevehicles = new phui::js::Array;
@@ -268,12 +269,14 @@ JS_FUNCTION_DEF(jsGame, bailout)
 	return JS_TRUE;
 }
 
+
 /************************************************************************************************
 	load
 *************************************************************************************************/
 
 JS_FUNCTION_DEF(jsGame,load)
 {
+    
 	phui::View* view = uiLoadView(JS_GetStringBytes(JS_ValueToString(ctx, argv[0])));
 
 	if(view)
@@ -741,8 +744,7 @@ JS_FUNCTION_DEF(jsGame, spawn)
 		}
 	}
 
-    WEAPON_SERIAL blah;
-    memset(&blah, 0, sizeof(WEAPON_SERIAL));
+	WEAPON_SERIAL blah={0};
 	vehcommSendVehicleRequest(vehtype->VehicleTypeNum,&blah);
 
 	return JS_TRUE;
@@ -786,8 +788,7 @@ JS_FUNCTION_DEF(jsGame, spawnAt)
 			// do old game spawn stuff here
 			mlSetSpawnStuff(0, 0, -1, 1);
 			mlSetMobileSpawnStuff(0, at.x, at.y, at.z, yaw);
-			WEAPON_SERIAL blah;
-            memset(&blah, 0, sizeof(WEAPON_SERIAL));
+			WEAPON_SERIAL blah={0};
 			vehcommSendVehicleRequest(vehtype->VehicleTypeNum, &blah);
 		}
 
@@ -985,7 +986,7 @@ JS_FUNCTION_DEF(jsGame, saveconvergence)
 	if(jsvehtype)
 	{
 		char buff[256] = {'\0'};
-		sprintf(buff, "convergence.%d", (SINT32)jsvehtype->vehtype->WeaponSpec.asUINT16());
+		strprintf(buff, "convergence.%d", (SINT32)jsvehtype->vehtype->WeaponSpec.asUINT16());
 
 		if(isDirty == 1)		// Is there a pending convergence setting change?
 			cfgPrefsSetInt(buff, value);
@@ -1037,7 +1038,7 @@ JS_FUNCTION_DEF(jsGame, getconvergence)
 			UINT16 key = jsvehtype->vehtype->WeaponSpec.asUINT16();
 
 			char buff[256] = {'\0'};
-			sprintf(buff, "convergence.%d", (SINT32)key);
+			strprintf(buff, "convergence.%d", (SINT32)key);
 
 			value = cfgPrefsGetInt(buff, (SINT32)Convergence);
 
@@ -2009,12 +2010,14 @@ JS_FUNCTION_DEF(jsGame, getworldtoscreen)
 
 JS_FUNCTION_DEF(jsGame, resetcontrollers)
 {
+    // We don't actually do this for now because it breaks the Steam overlay
+    
 	// reset devices in case a new one was added
-	dimainKill();
-	dimainInit();
+	//dimainKill();
+	//dimainInit();
 
 	// reselect presets based on new devices and current selections
-	imapLoadPresets();
+	//imapLoadPresets();
 
 	return JS_TRUE;
 }

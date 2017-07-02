@@ -23,16 +23,16 @@ namespace WWII
   template<typename _Tp, size_t _Nm>
     struct inplace_vector
     {
-	  typedef _Tp                                     value_type;
-      typedef value_type&                             reference;
-      typedef const value_type&                       const_reference;
-      typedef value_type*                             iterator;
-      typedef const value_type*		                  const_iterator;
-      typedef inplace_vector<_Tp, _Nm>                self;
-      typedef std::size_t                    	      size_type;
-      typedef std::ptrdiff_t                   	      difference_type;
-      typedef std::reverse_iterator<iterator>	      reverse_iterator;
-      typedef std::reverse_iterator<const_iterator>   const_reverse_iterator;
+	  using value_type = _Tp;
+      using reference = value_type&;
+      using const_reference = const value_type&;
+      using iterator = value_type*;
+      using const_iterator = const value_type*;
+      using self = inplace_vector<_Tp, _Nm>;
+      using size_type = std::size_t;
+      using difference_type = std::ptrdiff_t;
+      using reverse_iterator = std::reverse_iterator<iterator>;
+      using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
       // Support for zero-sized arrays mandatory.
       size_type _M_size;
@@ -275,7 +275,7 @@ namespace WWII
 
   template<size_t _Int, typename _Tp, size_t _Nm>
     struct tuple_element<_Int, inplace_vector<_Tp, _Nm> >
-    { typedef _Tp type; };
+    { using type = _Tp; };
 
   template<size_t _Int, typename _Tp, size_t _Nm>
     inline _Tp&

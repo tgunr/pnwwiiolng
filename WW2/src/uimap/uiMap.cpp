@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string>
 #include <math.h>
 
@@ -451,9 +451,9 @@ void PlayerMapObject::DrawSelf(SuperCellMapView* mv)
 	if(_shownavring)
 	{
 		/*
-         
+
          TBD - Is this code truly obsolete?
-         
+
         float iconscale = mv->Width() / mv->Scale();
 		width = 1000.0f/SDM_SUPERCELL_SIZE * iconscale;
 		float scalescale = pow(10.0f, (float)floor(log10(width/(mv->Width()*.9/2.0)))+1);
@@ -461,7 +461,7 @@ void PlayerMapObject::DrawSelf(SuperCellMapView* mv)
 		//if(mv->NavScale())
 		//	width = height = (mv->Width() * mv->NavScale()) / iconscale;
 		//else
-         
+
          */
 
         width = height = 2000.0f/SDM_SUPERCELL_SIZE/mv->MapScale();
@@ -1039,7 +1039,7 @@ void uiMapActivateWaypoint(const char* name)
 
 void uiMapAddWaypoint(const char* name, int type, int subtype, int x, int y, const char* notes)
 {
-	const ChatHandle& handle = chatGetHandle(name);
+	ChatHandle handle = chatGetHandle(name);
 	Waypoint waypoint(true, handle, handle, (WP_TYPE)type, subtype, x, y, 0, notes);
 	waypoint.setShared(false);
 	PlayerClient()->SetWaypoint(waypoint);
@@ -1142,6 +1142,7 @@ void uiMapAddLayer(SuperCellMapView* mapview, xmlNode* node)
 		{
 			WaypointLayer* wl = new WaypointLayer;
 			wl->_waypointtexid = uiGetTexture("ui/textures/waypoint.bmp");
+			wl->_mortartexid = uiGetTexture("ui/textures/targeticon1.bmp");
 			wl->_contacttexid = uiGetTexture("ui/textures/mapvehicles.bmp");
 			wl->_markertexid = uiGetTexture("ui/textures/marker.bmp");
 			r = wl;

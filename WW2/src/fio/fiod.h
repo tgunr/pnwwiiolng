@@ -3,7 +3,7 @@
 
 namespace IO { class MappedFile; }
 
-extern const char* fiodGetPrepath(void);
+extern const char* fiodGetPrepath();
 extern void fiodSetPrepath(char* newpath);
 
 extern bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize=nullptr);
@@ -24,32 +24,36 @@ extern size_t fiodFileSize(const char* name, bool userdir = false);
 
 extern void fiodmkdir(const char* path);
 
-#if !defined(LIMITED_FIO)
-	extern void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFiles);
-	extern void fiocfgMkDir(const char* path, bool userdir = false);
+#if platBuild == BUILD_CLIENT
 
-	#if platOS == OS_WIN32
-		#define fiocfgOpen fiodOpen
-		#define fiocfgOpenWrite fiodOpenWrite
-		#define fiocfgAccess fiodAccess
-		#define fiocfgModified fiodModified
-		#define fiocfgFileSize fiodFileSize
-	#else
-    size_t fiocfgRead(int fd, void* dptr, size_t length);
-		size_t fiocfgOpen(const char* filename, bool userdir = false);
-		size_t fiocfgOpenWrite(const char* filename, bool userdir = false);
-		LOGICAL fiocfgAccess(const char* filename, bool userdir = false);
-		LOGICAL fiocfgModified(SINT32* modified, const char* filename, bool userdir = false);
-		SINT32 fiocfgFileSize(const char* name, bool userdir = false);
-	#endif
-#else // LIMITED_FIO
-	extern size_t fiodGetString(int hfile, char* string, size_t length);
+extern void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFiles);
+extern void fiocfgMkDir(const char* path, bool userdir = false);
 
-	template<typename _Type>
-	static int fiodGet(int fd, _Type& into)
-	{
-		return fiodRead(fd, &into, sizeof(int));
-	}
+#if platOS == OS_WIN32
+    #define fiocfgOpen fiodOpen
+    #define fiocfgOpenWrite fiodOpenWrite
+    LOGICAL fiocfgAccess(const char* filename, bool userdir = false);
+    #define fiocfgModified fiodModified
+    #define fiocfgFileSize fiodFileSize
+#else
+size_t fiocfgRead(int fd, void* dptr, size_t length);
+    size_t fiocfgOpen(const char* filename, bool userdir = false);
+    size_t fiocfgOpenWrite(const char* filename, bool userdir = false);
+    LOGICAL fiocfgAccess(const char* filename, bool userdir = false);
+    LOGICAL fiocfgModified(SINT32* modified, const char* filename, bool userdir = false);
+    SINT32 fiocfgFileSize(const char* name, bool userdir = false);
+#endif
+
+#else // platBuild == BUILD_CLIENT
+
+extern size_t fiodGetString(int hfile, char* string, size_t length);
+
+template<typename _Type>
+static int fiodGet(int fd, _Type& into)
+{
+    return fiodRead(fd, &into, sizeof(int));
+}
+
 #endif
 
 #if RECORD_FILES

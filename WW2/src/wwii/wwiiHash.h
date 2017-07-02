@@ -25,27 +25,20 @@
 #include <unordered_map>
 #include <unordered_set>
 
-struct OBJECT;
-
-namespace std
-{
-		template<> struct hash<OBJECT*>  { size_t operator()(OBJECT const* o) const  { return *(size_t*)(&o); } };
-		template<> struct hash<void*>  { size_t operator()(void const* o) const  { return *(size_t*)(&o); } };
-}
-
 // Crude hasher for const char* strings
 struct ConstCharHasher
 {
 	size_t operator()(const char* str) const noexcept
 	{
 		uint64_t hash = 0xc3a5c85c97cb3127ULL;
-		const char* it = str;
+		auto* it = str;
 		while (*it) {
-			hash = (hash << 3) ^ *(it++) ^ (hash >> 29);
+			hash = (hash << 3) ^ static_cast<unsigned char>(*(it++)) ^ (hash >> 29);
 		}
-		hash += (it - str) * 0x1b873593;
+		hash += static_cast<uint64_t>(it - str) * 0x1b873593ULL;
 		return (sizeof(size_t) == 4)
 			? static_cast<size_t>(hash % 0xcc9e2d51ULL)
 			: static_cast<size_t>(hash % 0x9ae16a3b2f90404fULL);
 	}
 };
+

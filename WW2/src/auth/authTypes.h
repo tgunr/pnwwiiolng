@@ -118,6 +118,6 @@ struct APP_LAUNCH
 
 };
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	#include "auth/authServerTypes.h"
 #endif

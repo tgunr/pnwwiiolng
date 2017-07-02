@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <vector>
 #include <set>
 #include "ob/obmain.h"
@@ -28,8 +28,8 @@ class gr2PhysicsModel;
 #define ITOM(x) ((x)*0.0254f)			// inches to meters
 #define DEG(x) mlDEG_TO_RAD((double)x)	// degrees to radians
 
-typedef void (*jointParam)(dJointID, int param, double value);
-//typedef std::set<gr2PhysicsModel*> ModelList;
+using jointParam =  void (*)(dJointID, int param, double value);
+//using ModelList = std::set<gr2PhysicsModel*>;
 //static ModelList _models;
 
 static OBJECT* gr2PhysicsGetModelNode();
@@ -328,10 +328,10 @@ void gr2PhysicsBone::Adjust(Matrixd& transform, Vec3d& offset, double angle, int
           TBD -calculate our adjust position
 		Vec3d position = objTransform.getTrans();
 
-		
+
 		position = position + offset;
          */
-        
+
 		// re-save it
 		objTransform.setTrans(offset);
 	}
@@ -2020,12 +2020,12 @@ dJointID gr2PhysicsModel::addJoint(gr2PhysicsBone* from,
 					dJointSetAMotorParam(jointID, dParamLoStop3, DEG(ax3Lo));
 					dJointSetAMotorParam(jointID, dParamHiStop3, DEG(ax3Hi));
 					from->SetJointParams();
-                    
+
                     /*
                       TBD - something related to stiffness we need to do here?
-                    
+
                     double stiffness = 50000.0f;
-                    
+
 					from->SetStiffnessModel(10000.0f, 500.0f, 500);
                      */
 				}
@@ -3168,9 +3168,9 @@ gr2RigidPhysicsModel::gr2RigidPhysicsModel(const char* path, vehVehicle* veh, Ma
 	}
 
 	/*
-     
+
      TBD - Is this code that was broken and needs to be fixed?
-     
+
 	boneTransform = boneTransform * _worldTransform;
 
 	// get our body world transform
@@ -3647,7 +3647,7 @@ void gr2PhysicsKill()
 	physicsObjectSet list;
 
 	// other model types are tracked by other systems, but weapons delete themselves
-	// so since we're exiting, go ahead and kill these guys
+	// so since we're exiting, go ahead and kill these
 	if(physicsFindObject(list, _findWeaponModels))
 	{
 		physicsObjectSet::iterator it = list.begin();

@@ -26,7 +26,7 @@ namespace Chat
 {
 	struct KickNotice
 	{
-		KickNotice(const playerid_t& playerID_, const ChatHandle& handle_, const char* const problem_)
+		KickNotice(const playerid_t playerID_, const ChatHandle handle_, const char* const problem_)
 			: m_playerID(playerID_)
 			, m_handle(handle_)
 			, m_null(0)

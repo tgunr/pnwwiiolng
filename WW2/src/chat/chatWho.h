@@ -27,7 +27,7 @@ enum
 
 namespace Chat
 {
-class Who
+class Who final
 {
 public:
 	Who()
@@ -52,7 +52,7 @@ public:
 	static const UINT32 _DAYS_PER_MONTH = 30;
 
 public:
-	void setBasics(const ChatHandle& withHandle, bool isOnline, bool isInMySquad, RANK_NO withSquadRank, const ChatHandle& withSquadHandle=0LL, UINT32 withJoinedSquad=0)
+	void setBasics(const ChatHandle withHandle, bool isOnline, bool isInMySquad, RANK_NO withSquadRank, const ChatHandle withSquadHandle=0LL, UINT32 withJoinedSquad=0)
 	{
 		m_handle = withHandle;
 		m_online = isOnline;
@@ -77,7 +77,7 @@ public:
 		m_recruiting = isRecruiting;
 	}
 
-	void setExtendedDetails(bool withSpawned, const FULL_OBJ_ID& withNearCP)
+	void setExtendedDetails(bool withSpawned, const FULL_OBJ_ID withNearCP)
 	{
 		m_extendedInfo = true;
 		m_spawned = withSpawned;
@@ -86,7 +86,7 @@ public:
 
 public:
 	// No network handling (send/receive) - those are done by teulNetworkArray
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	// Accessors
@@ -94,18 +94,18 @@ public:
 	BRANCH_ENUM branch() const { return m_branch; }
 	WWII_COUNTRY country() const { return m_country; }
 	bool extendedInfo() const { return m_extendedInfo; }
-	const ChatHandle& handle() const { return m_handle; }
+	ChatHandle handle() const { return m_handle; }
 	UINT32 hcUnitID() const { return m_hcUnitID; }
 	bool highCommander() const { return m_hc; }
 	bool inSameSquad() const { return m_inSameSquad; }
 	bool leadingMission() const { return m_leadingMission; }
 	UINT32 missionID() const { return m_missionID; }
-	const FULL_OBJ_ID& nearCP() const { return m_nearCP; }
+	FULL_OBJ_ID nearCP() const { return m_nearCP; }
 	bool online() const { return m_online; }
 	RANK_NO rank() const { return m_rank; }
 	bool recruiting() const { return m_recruiting; }
 	bool spawned() const { return m_spawned; }
-	const ChatHandle& squadHandle() const { return m_squadHandle; }
+	ChatHandle squadHandle() const { return m_squadHandle; }
 	RANK_NO squadRank() const { return m_squadRank; }
 	UINT32 joinedSquad() const { return m_joinedSquad; }
 

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Thu Jul  7 12:23:04 CDT 2005
 //
 // Defines functions relating to the Chat::Who class
@@ -19,7 +19,7 @@ Chat::Who::Who(ACTION_OBJECT* const a)
 }
 
 static inline SINT32
-_packTimeDelta(LOGICAL mode, UCHAR* message, SINT32 offset, UINT32& time, bool include)
+_packTimeDelta(PackMode mode, UCHAR* message, SINT32 offset, UINT32& time, bool include)
 {
 	if ( !include )
 	{
@@ -57,7 +57,7 @@ _packTimeDelta(LOGICAL mode, UCHAR* message, SINT32 offset, UINT32& time, bool i
 }
 
 SINT32
-Chat::Who::packer(LOGICAL mode, ACTION_OBJECT* a)
+Chat::Who::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	if ( mode == TEUL_UNPACK )
 		new (this) Chat::Who();

@@ -89,8 +89,7 @@ class DirectPacket : public UpdatePacket
 #endif
 		const SINT32 result = teulSend(m_teulIndex, Strat::Events::Callback, this);
 #ifdef HEAVY_DEBUG
-		if ( g_logDebug )
-			dbugLog(_FLDB, " result = %d", result);
+		dbugLog(_FLD, " result = %d", result);
 #endif
 		if ( result < 0 )
 			dbugLog(_FLW, "t:%d err:%d while sending strat event packet", m_teulIndex, result);

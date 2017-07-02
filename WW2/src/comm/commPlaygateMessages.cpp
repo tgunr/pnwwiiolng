@@ -48,10 +48,10 @@ _connectionOpened(ENDPOINT& endpoint)
 
 static void
 _networkError(
-	SINT32 teulIndex
-	, const UCHAR* const data
-	, SINT32 size
-	, const TEUL_CALLBACK* object
+	SINT32 /*teulIndex*/
+	, const UCHAR* const /*data*/
+	, SINT32 /*size*/
+	, const TEUL_CALLBACK* /*object*/
 	, SINT32 error
 	)
 {
@@ -69,10 +69,10 @@ _networkError(
 
 static void
 _teulKitError(
-	SINT32 teulIndex
-	, const UCHAR* const data
-	, SINT32 size
-	, const TEUL_CALLBACK* object
+	SINT32 /*teulIndex*/
+	, const UCHAR* const /*data*/
+	, SINT32 /*size*/
+	, const TEUL_CALLBACK* /*object*/
 	, SINT32 error
 	)
 {
@@ -85,9 +85,9 @@ _teulKitError(
 static void
 _callbackError(
 	const SINT32 teulIndex
-	, const UCHAR* const data
-	, const SINT32 size
-	, const TEUL_CALLBACK* object
+	, const UCHAR* const /*data*/
+	, const SINT32 /*size*/
+	, const TEUL_CALLBACK* /*object*/
 	, const SINT32 error
 	)
 {
@@ -103,9 +103,9 @@ _callbackError(
 // Initialize Playgate's comm functions (network transport).
 
 bool
-commInit(void)
+commInit()
 {
-	if (teulInitTransport(LOG_TO_FILE, "PlayGATE", _teulKitError, nullptr))
+	if (teulInitTransport(LogMode::TO_FILE, "PlayGATE", _teulKitError, nullptr))
 		return false;
 
 #ifdef DEBUG
@@ -126,7 +126,7 @@ commInit(void)
 // Shutdown the network transport.
 
 void
-commKill(void)
+commKill()
 {
 	// If we have an active connection, shut it down.
 	commCloseConnection();
@@ -209,11 +209,11 @@ commCloseConnection()
 // Process network updates. Returns false if there are no connections.
 
 bool
-commUpdate(void)
+commUpdate()
 {
 	teulUpdateTransport(5);
 
-	return ( _haveOpenConnection() );
+	return _haveOpenConnection();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -223,8 +223,8 @@ TEUL_CALLBACK*
 commInstallMessage(
 	UCHAR MessageGroup
 	, UCHAR MessageNumber
-	, ACTION_REF SendFunc
-	, ACTION_REF ReceiveFunc
+	, ACTION SendFunc
+	, ACTION ReceiveFunc
 	)
 {
 	Teul::CallbackInit ci;
@@ -235,7 +235,7 @@ commInstallMessage(
 	ci.recvAction    = ReceiveFunc;
 	ci.error         = _callbackError;
 
-	return (teulAllocCallback(&ci));
+	return teulAllocCallback(&ci);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -253,7 +253,7 @@ commSend(TEUL_CALLBACK* object, void*  data)
 #include "teul/teulConnectionInstruction.h"
 
 int
-Teul::ConnectionInstruction::receive(SINT32 teulIndex)
+Teul::ConnectionInstruction::receive(SINT32 /*teulIndex*/)
 {
 	return -EINVAL;
 }

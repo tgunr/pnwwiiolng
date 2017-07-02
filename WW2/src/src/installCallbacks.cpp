@@ -11,9 +11,10 @@
 #include "strt/strtUpdaterSupportMessages.h"
 #include "wwii/wwiiHostMessages.h"
 
-SINT32	hostInstallAllCallbacks(void)
+SINT32
+hostInstallAllCallbacks()
 {
-SINT32 retval;
+	SINT32 retval;
 
 	if ( (retval = commInstallHostCallbacks()) < 0)
 		return retval;

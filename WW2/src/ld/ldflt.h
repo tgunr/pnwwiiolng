@@ -65,11 +65,7 @@
 #define MAX_GROUP_SIZE		64
 #define MAX_LEVELS			32
 
-
-#ifdef _MWERKS
-	#pragma options align=packed
-#endif
-
+#pragma pack(push)
 #pragma pack(1)
 
 struct Meshpool
@@ -518,11 +514,7 @@ struct fltEXTENSION
 	 short     code;
 };
 
-#pragma pack()
-
-#ifdef _MWERKS
-	#pragma options align=reset
-#endif
+#pragma pack(pop)
 
 #define fltSOLID_BACKFACED    0
 #define fltSOLID_NOBACKFACE   1

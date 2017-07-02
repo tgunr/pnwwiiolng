@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides access to the socket
 // functions used by the teul API. The end-user developer
 // should never need the functions provided here.
@@ -20,6 +20,8 @@
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiNetPorts.h"
+#include "teul/raknetConn.h"
+#include "wwii/wwiiConfig.h"
 
 UINT32 totalPacketsSent;
 UINT32 totalPacketsRecv;
@@ -57,19 +59,20 @@ void teulCleanupSend()
 // endpoint destination.
 
 SINT32
-teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
+teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const UCHAR protocolPreference)
 {
 	if( PN_UNLIKELY(endpoint.state() == IS_DEAD) )
 	{
-		dbugLog(_FLA,"endpoint not open state = %d, index %d callback %d:%d ", endpoint.state(), endpoint.teulIndex(), callback.callX(), callback.callY());
+		dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " endpoint not open, state:%d callback " PRF_CALLBACK ""
+					, endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), endpoint.state(), PRA_CALLBACK(callback));
 		return -ETEUL_CB_CONN_DEAD;
 	}
 
-	dbugLog(_FLD, "t:%d sending callback x:%d(%s) y:%d(%s)", endpoint.teulIndex(), callback.callX(), callback.callXName(), callback.callY(), callback.callYName());
-	
+	dbugLog(_FLD, "t:%d sending callback " PRF_CALLBACK "", endpoint.teulIndex(), PRA_CALLBACK(callback));
+
 	if ( PN_UNLIKELY(callback.m_sendAction == nullptr) )
 	{
-		dbugLog(_FLA, "cant execute null callback x:%d y:%d", callback.callX(), callback.callY());
+		dbugLog(_FLA, "no action for callback " PRF_CALLBACK "", PRA_CALLBACK(callback));
 		return -ETEUL_CB_SEND_NULL;
 	}
 
@@ -90,23 +93,24 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 	const SINT32 packedSizeBits = (callback.m_sendAction)(&actionObj);
 	if ( PN_UNLIKELY(packedSizeBits < 0) )
 	{
-		dbugLog(_FLA, "t:%d cb:%u,%u pack failed:%d probable data corruption", endpoint.teulIndex(), callback.callX(), callback.callY(), packedSizeBits);
+		// probable data corruption
+		dbugLog(_FLA, "t:%d cb:" PRF_CALLBACK " pack failed:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), packedSizeBits);
 		return packedSizeBits;
 	}
 
 	outgoing.setPayloadSizeBytes(Teul::BitsToBytes(packedSizeBits));
 
-	const SINT32 sendResult = outgoing.send(endpoint);
+	const SINT32 sendResult = outgoing.send(endpoint, protocolPreference);
 	if ( PN_UNLIKELY(sendResult < 0) )
 	{
-		dbugLog(_FLW, "t:%d cb:%u,%u send failed:%d", endpoint.teulIndex(), callback.callX(), callback.callY(), sendResult);
+		dbugLog(_FLW, "t:%d callback " PRF_CALLBACK " send failed:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), sendResult);
 		return sendResult;
 	}
 
 	return packedSizeBits;
 }
 
-#if defined(AS_SERVER)
+#if platBuild == BUILD_SERVER
 SINT32
 ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 {
@@ -115,12 +119,12 @@ ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 }
 #endif
 
+//////////////////////////////////////////////////////////////////////
 // Actually write data to a socket.
 
 SINT32
 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port)
 {
-
 	if ( protocol == PROTOCOL_TCP || protocol == PROTOCOL_CTRL )
 	{
 		// dbugLog(_FLD, "about to send sub-packet");
@@ -142,7 +146,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 		inetAddress.sin_port = htons( targetPort );
 	}
 
-	const SINT32 result = ::sendto(socket, (const char*)data, sizeInBytes, 0, (struct sockaddr*)&inetAddress, sizeof(inetAddress));
+	const ssize_t result = ::sendto(socket, (const char*)data, sizeInBytes, 0, (struct sockaddr*)&inetAddress, sizeof(inetAddress));
 	if ( PN_UNLIKELY(result <= 0) )
 	{
 		// Socket closed.
@@ -160,7 +164,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 
 		// Check for an interrupted send attempt.
 		const int err = dbugGetErrno();
-		if ( (err != EAGAIN) & (err != EINTR) & (err != EWOULDBLOCK) )
+		if ( (err != PLAT_EAGAIN) & (err != PLAT_EINTR) & (err != PLAT_EWOULDBLOCK) )
 		{
 			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " send error on send %" PRSizeT " bytes to %u,%u [%u,%hu] attempt, err:%d"
 						, teulIndex(), PRA_SOCKET(socket)
@@ -170,7 +174,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 						);
 			return -ETEUL_ENOSPC_SEND_SOCKET;
 		}
-		else 
+		else
 		{
 			dbugLog(_FLD, "::sendto returned code %d, try again return", err);
 		}
@@ -178,7 +182,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 		return 0;
 	}
 
-	dbugLog(_FLD, "%d bytes sent %d requested", result, sizeInBytes);
+	dbugLog(_FLD, "%" PRSsizeT " bytes sent %" PRSizeT " requested", result, sizeInBytes);
 
 	lastDataSent.makeCurrent();
 
@@ -189,9 +193,35 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 // Try to send or queue a packet to a socket.
 
 SINT32
-ENDPOINT::sendPacket(Teul::Packet& packet)
+ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 {
+
 	const UINT32 packetBytes = packet.packetSizeBytes();
+
+	// First check to see if this should be sent via a RakNet backchannel
+    //      - through configuration, make sure we even have it enabled.
+    //      - application must be asking for UDP
+    //      - channel must exist, be initialized
+    //      - if a client, must also be connected
+	if (protocolPreference == PROTOCOL_UDP &&
+		m_pairdUdpConn != nullptr && m_pairdUdpConn->isInitialized() &&
+		(m_pairdUdpConn->isServer() || m_pairdUdpConn->isConnected()))
+	{
+#if platBuild == BUILD_SERVER
+        if (host_config.netcode3Enabled)
+#endif
+            // No need to encrypt, RakNet has its own encryption
+            if (m_pairdUdpConn->send(packet, *this))
+                return static_cast<SINT32>(packetBytes);
+	}  // fall through if sending failed - transmit via normal path
+
+	packet.header().m_tag = ++this->m_impl->sentTag;
+
+	// Encrypt the data.
+	if (packet.header().packetType() != Teul::Tokens::Unencrypted)
+	{
+		encrypt(packet.encryptable(), packet.header().packetSizeBytes());
+	}
 
 	// If there's no send queue, try and send the data directly.
 	if ( m_impl->m_sendQueue.empty() == true )
@@ -203,11 +233,11 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
 		// Anything but a partial send, the sender handles.
 		if ( PN_UNLIKELY(result < 0) )
-		{	
+		{
 			// If the error was the result of an interruption, then lets just queue the packet
 			// and give it a retry later on.
 			const SINT32 err = dbugGetErrno();
-			if ( (err != EAGAIN) & (err != EINTR) & (err != EWOULDBLOCK) )
+			if ( (err != PLAT_EAGAIN) && (err != PLAT_EINTR) && (err != PLAT_EWOULDBLOCK) )
 			{
 				return result;
 			}
@@ -220,10 +250,10 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 			        teulIndex(), packet.header().m_callX, packet.header().m_callY,
 			        result, packet.packetSizeBytes());
 #endif
-			packet.sentBytes(sent);
+			packet.addBytesSent(sent);
 			if ( packet.sentBytes() >= packetBytes )
 			{
-				return packetBytes;
+				return static_cast<SINT32>(packetBytes);
 			}
 		}
 		// Partial or blocked send falls thru and queues the remainder.
@@ -233,13 +263,14 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 	Teul::Packet* const copy = s_delayedPackets.New(std::move(packet));
 #else
 	Teul::Packet* const copy = s_delayedPackets.New(packet);
+	copy->addBytesSent(packet.sentBytes());
 #endif
 
 	m_impl->m_sendQueue.push_back(copy);
 
 	setWritesPending(true);
 
-	return packetBytes;
+	return static_cast<SINT32>(packetBytes);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -249,7 +280,7 @@ void
 EndpointImpl::FreeFirstPacketInSendQueue()
 {
 	Teul::Packet* packet = m_sendQueue.front();
-	m_sendQueue.erase(m_sendQueue.begin());
+	m_sendQueue.pop_front();
 	s_delayedPackets.Delete(packet);
 }
 
@@ -287,7 +318,7 @@ ENDPOINT::pushSendQueue()
 		        teulIndex(), packet->header().m_callX, packet->header().m_callY,
 		        result, remainingBytes);
 #endif
-		packet->sentBytes((size_t)result);
+		packet->addBytesSent((size_t)result);
 		if ( packet->sentBytes() >= packet->packetSizeBytes() )
 		{
 			// We appear to have sent the data.
@@ -302,7 +333,7 @@ ENDPOINT::pushSendQueue()
 //
 
 SINT32
-Teul::Packet::send(ENDPOINT& endpoint)
+Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 {
 	if ( PN_UNLIKELY(endpoint.state() == IS_LISTENING || endpoint.state() >= IS_CLOSING) )
 	{
@@ -315,9 +346,7 @@ Teul::Packet::send(ENDPOINT& endpoint)
 
 	static_assert( sizeof(header().m_tag) == sizeof(endpoint.m_impl->sentTag), "Endpoint and Packet disagree on tag size" );
 
-	header().m_tag = ++endpoint.m_impl->sentTag;
-
-#if !defined(AS_SERVER)
+#if platBuild == BUILD_CLIENT
 	teulSyncClock();
 	header().m_tick = (Teul::PacketHeader::tick_t)teulClock64;
 #else
@@ -335,13 +364,7 @@ Teul::Packet::send(ENDPOINT& endpoint)
 	ABORT_IF(header().packetSizeBytes() != payloadBytes);
 	m_sent = 0;
 
-	// Encrypt the data.
-	if ( header().packetType() != Teul::Tokens::Unencrypted )
-	{
-		endpoint.encrypt(encryptable(), header().packetSizeBytes());
-	}
-
-	const SINT32 result = endpoint.sendPacket(*this);
+	const SINT32 result = endpoint.sendPacket(*this, protocolPreference);
 	if ( PN_UNLIKELY(result <= 0) )
 	{
 		int err = 0;
@@ -366,16 +389,16 @@ Teul::Packet::send(ENDPOINT& endpoint)
 //////////////////////////////////////////////////////////////////////
 
 SINT32
-teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object)
+teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object, const UCHAR protocol)
 {
 	ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex);
 	if (PN_UNLIKELY(theEndpoint == nullptr))
 	{
-		dbugLog(_FLA, "t:%d x:%d y:%d invalid endpoint in send callback", teulIndex, object.callX(), object.callY());
+		dbugLog(_FLA, "t:%d " PRF_CALLBACK " invalid endpoint in send callback", teulIndex, PRA_CALLBACK(object));
 		return -EINVAL;
 	}
 
-	return teulModSendCALLBACKe(*theEndpoint, object);
+	return teulModSendCALLBACKe(*theEndpoint, object, protocol);
 }
 
 //////////////////////////////////////////////////////////////////////

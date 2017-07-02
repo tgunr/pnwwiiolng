@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Mon Sep 12 15:51:40 CDT 2005
 //
 // Routines for wwiiSquad class
@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////
 // Default constructor
 
-Squad::Squad(UINT32 withSquadID, const ChatHandle& handle, const std::string& withName)
+Squad::Squad(UINT32 withSquadID, const ChatHandle handle, const std::string& withName)
 	: m_squadID(withSquadID)
 	, m_shortHandle(handle)
 	, m_creatorHandle(0LL)
@@ -37,7 +37,6 @@ Squad::Squad(UINT32 withSquadID, const ChatHandle& handle, const std::string& wi
 	, m_description("")
 	, m_motd("")
 	, m_homepage("")
-	, m_callsign(Chat::Name(handle))
 	, m_voiceInfo("")
 	, m_slogan("")
 {
@@ -49,15 +48,13 @@ Squad::Squad(UINT32 withSquadID, const ChatHandle& handle, const std::string& wi
 		m_motd.erase(MOTD_LENGTH);
 	if ( m_homepage.length() > HOMEPAGE_LENGTH )
 		m_homepage.erase(HOMEPAGE_LENGTH);
-	if ( m_callsign.length() > (size_t)MAX_HANDLE_LEN )
-		m_callsign.erase(MAX_HANDLE_LEN);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Packer
 
 SINT32
-Squad::packer(LOGICAL mode, ACTION_OBJECT* a)
+Squad::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_squadID, 0);
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_shortHandle, 0);
@@ -79,8 +76,6 @@ Squad::packer(LOGICAL mode, ACTION_OBJECT* a)
 	a->offset = teulPackSCHAR(mode, a->packed, a->offset, &m_squadTimezone, 0);
 	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_language, 0);
 	a->offset = wwiiPackString(mode, a->packed, a->offset, m_slogan, SLOGAN_LENGTH);
-
-	m_callsign = Chat::Name(m_shortHandle).c_str();
 
 	return a->offset;
 }
@@ -120,7 +115,7 @@ Squad::setSquadNight(const char* string)
 //////////////////////////////////////////////////////////////////////
 // Default constructor
 
-Recruiter::Recruiter(const ChatHandle& withHandle, const Squad* squad)
+Recruiter::Recruiter(const ChatHandle withHandle, const Squad* squad)
 	: m_handle(withHandle)
 	, m_squadHandle(0LL)
 	, m_country(0)
@@ -146,7 +141,7 @@ Recruiter::Recruiter(const ChatHandle& withHandle, const Squad* squad)
 // Packer
 
 SINT32
-Recruiter::packer(LOGICAL mode, ACTION_OBJECT* a)
+Recruiter::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, 0);
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_squadHandle, 0);

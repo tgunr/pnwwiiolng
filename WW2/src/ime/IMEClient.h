@@ -23,13 +23,9 @@ public:
 
         HRESULT hr = S_OK;
 
-#if XAUDIO
-        // CoInitialize done in sysmain once...
-#else
 		hr = CoInitializeEx( nullptr, COINIT_APARTMENTTHREADED );
-#endif
 
-	    if ( SUCCEEDED( hr ) )
+	    if ( SUCCEEDED( hr ) || hr == S_FALSE )
 		{
 			m_bComInit = true;
 
@@ -48,6 +44,11 @@ public:
 		{
 			m_ptim->Release();
 			m_ptim = nullptr;
+		}
+
+		if ( m_bComInit )
+		{
+		    CoUninitialize();
 		}
 
 		m_bComInit = false;

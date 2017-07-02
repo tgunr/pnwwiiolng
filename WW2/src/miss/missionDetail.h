@@ -18,7 +18,7 @@ public:
 	MissionDetail() : m_result(MC_ERROR),m_timeLaunch(0) { *m_desc=0; }
 	~MissionDetail() {}
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	void populate(const Mission* mission, bool isCurrent, bool isLeader, UINT32 launchDelay);
 
 	UINT32 launchDelay() const;
@@ -29,5 +29,5 @@ public:
 	char			m_desc[MapMiss::MISSION_DESC_LENGTH+1];
 };
 
-typedef teul_network_msg<MissionDetail> MISSION_DETAIL;
+using MISSION_DETAIL = teul_network_msg<MissionDetail>;
 

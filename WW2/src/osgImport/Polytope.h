@@ -22,10 +22,10 @@ class Polytope
 
     public:
 
-        typedef unsigned int                    ClippingMask;
-        typedef std::vector<Plane>              PlaneList;
-        typedef std::vector<Vec3f>              VertexList;
-        typedef fast_back_stack<ClippingMask>   MaskStack;
+        using ClippingMask = unsigned int;
+        using PlaneList = std::vector<Plane>;
+        using VertexList = std::vector<Vec3f>;
+        using MaskStack = fast_back_stack<ClippingMask>;
 
         inline Polytope() {setupMask();}
 

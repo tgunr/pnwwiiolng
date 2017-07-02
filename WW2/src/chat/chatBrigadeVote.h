@@ -27,7 +27,7 @@ public:
 	//	REPLACING - player being replaced at end of timeout
 	enum Mode { NOMINATION, OFFER, TOREMOVE, REMOVING, TOREPLACE, TOMOVE, TOATTACK, TOCLEAR, TODEFEND, MAX_VOTE_MODES };
 
-	Vote(Mode voteMode, UINT32 forAction, const ChatHandle& nominee, const ChatHandle& sponsor, UINT32 duration, const FULL_OBJ_ID& origin=nullObjID)
+	Vote(Mode voteMode, BrigadeControl::BRIGADE_ACTION_REQ forAction, const ChatHandle nominee, const ChatHandle sponsor, UINT32 duration, const FULL_OBJ_ID origin=nullObjID)
 		: m_voteMode(voteMode), m_forAction(forAction)
 		, m_nominee(nominee), m_sponsor(sponsor)
 		, m_startedAt(teulTime()), m_closeAt(teulTime() + duration)
@@ -50,7 +50,7 @@ public:
 
 public:
 	Mode		m_voteMode;		// See enums
-	UINT32		m_forAction;
+	BrigadeControl::BRIGADE_ACTION_REQ		m_forAction;
 	// Vote is either for a player or a destination/target
 	ChatHandle	m_nominee;			// Player being proposed
 	ChatHandle	m_sponsor;			// Player who sponsored them

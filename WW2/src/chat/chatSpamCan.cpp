@@ -15,6 +15,8 @@
 #include "chat/chatTimeInterval.h"
 #include "teul/teulTime.h"
 
+using Chat::ARGV;
+
 // Global "spam can", accessible by chatHost.cpp
 SPAM_CAN	theSpamCan;
 UINT32		spamLoops;

@@ -1,5 +1,8 @@
 /build/host
 /build/client
+/build
+/build32
+/build64
 
 *.pyc
 *.pyo
@@ -15,6 +18,8 @@
 /*.suo
 /*.user
 *.vcxproj.user
+*.VC.db
+*.VC.VC.opendb
 .vs
 /BuildLog.htm
 Libraries/*.html
@@ -25,7 +30,31 @@ Libraries/*.pdb
 Libraries/*.sbr
 Libraries/*.suo
 Libraries/*.user
+Libraries/breakpad/src/**/Debug
+Libraries/breakpad/src/**/Release
+Libraries/breakpad/src/**/testdata
 Libraries/BuildLog.htm
+Libraries/libevent/autom4te.cache
+Libraries/libevent/include/event2/event-config.h
+Libraries/libevent/sample/dns-example
+Libraries/libevent/sample/dns-example
+Libraries/libevent/sample/event-test
+Libraries/libevent/sample/hello-world
+Libraries/libevent/sample/http-server
+Libraries/libevent/sample/signal-test
+Libraries/libevent/sample/time-test
+Libraries/libevent/test/bench
+Libraries/libevent/test/bench_cascade
+Libraries/libevent/test/bench_http
+Libraries/libevent/test/bench_httpclient
+Libraries/libevent/test/regress
+Libraries/libevent/test/rpcgen-attempted
+Libraries/libevent/test/test-changelist
+Libraries/libevent/test/test-eof
+Libraries/libevent/test/test-init
+Libraries/libevent/test/test-ratelim
+Libraries/libevent/test/test-time
+Libraries/libevent/test/test-weof
 Libraries/OpenThreads/*.aps
 Libraries/OpenThreads/*.eto
 Libraries/OpenThreads/*.user
@@ -711,6 +740,7 @@ Tools/*.pdb
 Tools/*.sbr
 Tools/*.suo
 Tools/*.user
+Tools/archivetools/build
 Tools/AssetCompare/*.aps
 Tools/AssetCompare/*.eto
 Tools/AssetCompare/*.pfx
@@ -1249,6 +1279,7 @@ WW2/proj/win/[Dd]ebug
 WW2/proj/win/[Rr]elease
 WW2/proj/win/_UpgradeReport_Files
 WW2/proj/win/obj
+WW2/proj/win/res/WW2.rc2
 WW2/proj/win/teulKit/*.aps
 WW2/proj/win/teulKit/*.eto
 WW2/proj/win/teulKit/*.user
@@ -1409,6 +1440,7 @@ WW2/src/log/.dirstamp
 WW2/src/ltmain.sh
 WW2/src/lua/.deps
 WW2/src/lua/.dirstamp
+WW2/src/lua51
 WW2/src/luaClient
 WW2/src/map/.deps
 WW2/src/map/.dirstamp
@@ -1448,6 +1480,9 @@ WW2/src/omg/OMGParser/bin
 WW2/src/omg/OMGParser/obj
 WW2/src/omg/OMGParser/omgParser.csproj.user
 WW2/src/omg/OMGParser/omgParser.suo
+WW2/src/omggen/CTestTestfile.cmake
+WW2/src/omggen/cmake_install.cmake
+WW2/src/omggen/OMGgen.xcodeproj
 WW2/src/omg2/*.pyc
 WW2/src/osgImport/.deps
 WW2/src/osgImport/.dirstamp
@@ -1463,6 +1498,8 @@ WW2/src/pi/.deps
 WW2/src/pi/.dirstamp
 WW2/src/pinghostd
 WW2/src/playback
+WW2/src/RakNet
+WW2/src/Release
 WW2/src/rn/.deps
 WW2/src/rn/.dirstamp
 WW2/src/rosterClient
@@ -1560,6 +1597,7 @@ WW2/src/teul/.deps
 WW2/src/teul/.dirstamp
 WW2/src/tinyxml/.deps
 WW2/src/tinyxml/.dirstamp
+WW2/src/tolua++
 WW2/src/tools/.deps
 WW2/src/tools/.dirstamp
 WW2/src/trn/.deps
@@ -1580,6 +1618,7 @@ WW2/src/weap/.deps
 WW2/src/weap/.dirstamp
 WW2/src/wwii/.deps
 WW2/src/wwii/.dirstamp
+WW2/src/WW2GameHosts.xcodeproj
 WW2/src/xml/.deps
 WW2/src/xml/.dirstamp
 /_UpgradeReport_Files
@@ -1600,6 +1639,12 @@ WW2/src/xml/.dirstamp
 /Libraries/libiconv/MSVC14/Release
 /Libraries/libxml2/win32/VC14/Debug
 /Libraries/libxml2/win32/VC14/Release
+/Libraries/libxml2/compile
+/Libraries/libxml2/include/libxml/xmlversion.h
+/Libraries/libxml2/python/setup.py
+/Libraries/libxml2/Makefile
+/Libraries/libxml2/config.h
+/Libraries/libxml2/libxml2-config.cmake
 
 WW2.psess
 WW2/proj/win/WW2.sdf
@@ -1627,6 +1672,11 @@ WW2.VC.opendb
 *.lo
 *.o
 
+/Deployment/ciab/bootstrap.ini
+/Deployment/ciab/Client/*.tkt
+/Deployment/ciab/Client/*.bat
+/Deployment/ciab/Client/*.sh
+
 xcuserdata/
 
 ww2mods
@@ -1634,3 +1684,13 @@ WW2Archives
 base64
 depend
 libb64.a
+build_info.cpp
+
+Deployment/database/vendor
+Deployment/database/.env
+
+CMakeScripts
+WW2GameHosts.build
+
+Libraries/SteamSDK/client
+

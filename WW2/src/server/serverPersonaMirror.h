@@ -27,7 +27,7 @@ namespace Server
 		}
 		public: virtual SINT32 onReceive(SINT32 teulIndex) override;
 		public: virtual SINT32 onComplete(SINT32 resultCode) const override;
-		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a) override { PersonaXfer::packer(mode, a); }
+		public: virtual void packer(PackMode mode, ACTION_OBJECT* const a) override { PersonaXfer::packer(mode, a); }
 		public: SINT32 send(const playerid_t playerID, class Server::ServerInfo* dest);
 	};
 }

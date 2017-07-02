@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Wed Jul 26 14:24:29 2000
 //
 // This is the actual file containing the functions for manipulating handles
@@ -4845,7 +4845,7 @@ static const int s_wideCharacterMap[65536] =
 // Denote a handle as being simple characters
 
 static void
-_plainHandle(ChatHandle& handle)
+_plainHandle(ChatHandle& handle) noexcept
 {
 	handle &= ~WIDE_HANDLE_BIT;
 }
@@ -4854,7 +4854,7 @@ _plainHandle(ChatHandle& handle)
 // Denote a handle as containing wide characters
 
 static void
-_wideHandle(ChatHandle& handle)
+_wideHandle(ChatHandle& handle) noexcept
 {
 	handle |= WIDE_HANDLE_BIT;
 }
@@ -4875,7 +4875,7 @@ chatGetHandleCharacterSymbol(const wchar_t character)
 
 template<typename _CharType>
 static void
-_plainEncode(const _CharType* const callsign, ChatHandle& handle)
+_plainEncode(const _CharType* const callsign, ChatHandle& handle) noexcept
 {
 	size_t i;
 	for ( i = 0; callsign[i] && i < MAX_HANDLE_WLEN; ++i )
@@ -4898,7 +4898,7 @@ _plainEncode(const _CharType* const callsign, ChatHandle& handle)
 }
 
 static void
-_wideEncode(const wchar_t* const callsign, ChatHandle& handle)
+_wideEncode(const wchar_t* const callsign, ChatHandle& handle) noexcept
 {
 	ChatHandle code = 1;
 	int bits = 0;
@@ -5067,7 +5067,7 @@ chatGetLowercaseHandle(ChatHandle handle)
 }
 
 bool
-chatGetCallsign(char* const callsign, const ChatHandle& srcHandle)
+chatGetCallsign(char* const callsign, const ChatHandle srcHandle)
 {
 	ChatHandle handle = (srcHandle & ~WIDE_HANDLE_BIT);
 	if ( PN_UNLIKELY(handle == 0) )
@@ -5098,7 +5098,7 @@ chatGetCallsign(char* const callsign, const ChatHandle& srcHandle)
 }
 
 bool
-chatGetCallsign(wchar_t* const callsign, const ChatHandle& srcHandle)
+chatGetCallsign(wchar_t* const callsign, const ChatHandle srcHandle)
 {
 	ChatHandle handle = (srcHandle & ~WIDE_HANDLE_BIT);
 	if ( PN_UNLIKELY(handle == 0) )
@@ -5129,7 +5129,7 @@ chatGetCallsign(wchar_t* const callsign, const ChatHandle& srcHandle)
 }
 
 const char*
-chatGetCallsign(const ChatHandle& handle)
+chatGetCallsign(const ChatHandle handle)
 {
 	static const size_t NumInstances = 16;	// must be a power of 2.
 	static Chat::Name callsigns[NumInstances];
@@ -5142,7 +5142,7 @@ chatGetCallsign(const ChatHandle& handle)
 }
 
 const wchar_t*
-chatGetWideCallsign(const ChatHandle& handle)
+chatGetWideCallsign(const ChatHandle handle)
 {
 	static const size_t NumInstances = 16;	// must be a power of 2.
 	static std::array<Chat::NameW, NumInstances> callsigns;
@@ -5155,7 +5155,7 @@ chatGetWideCallsign(const ChatHandle& handle)
 }
 
 bool
-chatIsValidHandle(ChatHandle handle)
+chatIsValidHandle(ChatHandle handle) noexcept
 {
 	if ( false == chatIsWideCallsign(handle) )
 	{
@@ -5175,7 +5175,7 @@ chatIsValidHandle(ChatHandle handle)
 	}
 	else
 	{
-		const ChatHandle unmaskedHandle = handle & ~WIDE_HANDLE_BIT;
+		ChatHandle unmaskedHandle = handle & ~WIDE_HANDLE_BIT;
 		if ( PN_UNLIKELY(unmaskedHandle < PLAIN_CHARACTERS) )
 			return false;	// Less than 1 character
 		if ( PN_UNLIKELY(unmaskedHandle >= (1ULL << ((MAX_WIDE_HANDLE_WCHARS * HANDLE_WCHAR_BITS) + HANDLE_PLAIN_BITS))) )

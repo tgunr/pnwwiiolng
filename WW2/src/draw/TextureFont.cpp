@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*
  *  TextureFont.cpp
  *  WW2OL
@@ -15,7 +15,6 @@
 #include "fio/fio.h"
 #include <iostream>
 #include <sstream>
-#include "wwii/wwiiHash.h"
 #include "draw/TextureFont.h"
 #include "mem/mem.h"
 
@@ -24,12 +23,12 @@ using namespace std;
 TextureFont::TextureFont( const char* name, int size )
 {
     char path[128];
-    sprintf(path, "%s%d.dds", name, size);
+    strprintf(path, "%s%d.dds", name, size);
     textureID = ldLoadTexture( path, 0, LDPIX_SET_FONT_PARMS );
 
     char* text;
     unsigned int filesize = 0;
-    sprintf(path, "%s%d.fnt", name, size);
+    strprintf(path, "%s%d.fnt", name, size);
     fioLoad(path, text, &filesize );
     if ( filesize == 0 || textureID <= 0 )
     {

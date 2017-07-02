@@ -2,7 +2,7 @@
 #include "wwii/wwiiCommandLineArgs.h"
 
 static const char* programName;
-typedef std::vector<Argument> Arguments;
+using Arguments = std::vector<Argument>;
 static Arguments arguments;
 
 //////////////////////////////////////////////////////////////////////

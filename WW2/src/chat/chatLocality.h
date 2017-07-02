@@ -16,13 +16,13 @@ namespace Chat
 	// Notify the chat host of your location - deprecated.
 	struct Locality
 	{
-		Locality(const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, const FULL_OBJ_ID& nearCP)
+		Locality(FLOAT64 x, FLOAT64 y, FLOAT64 z, FULL_OBJ_ID nearCP)
 			: m_x(x), m_y(y), m_z(z), m_nearCP(nearCP)
 			{}
 
 		Locality(ACTION_OBJECT* const a);
 
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 		FLOAT64		m_x, m_y, m_z;		// World co-ordinates
 		FULL_OBJ_ID	m_nearCP;			// Which CP you are near

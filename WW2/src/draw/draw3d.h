@@ -51,7 +51,7 @@ int  draw3dFindDebugObject(const char* name);
 
 void draw3dClearDebugLines();
 void draw3dRemoveDebugObject(int);
-void draw3dRemoveAllDebugObjects(void);
+void draw3dRemoveAllDebugObjects();
 void draw3dInit();
 
 #ifdef BETA_RELEASE

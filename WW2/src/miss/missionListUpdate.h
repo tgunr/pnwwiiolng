@@ -11,5 +11,5 @@
 #include "teul/teulNetworkMsg.h"
 
 class MissionListUpdateMsg : public teul_empty_msg {};
-typedef teul_network_msg<MissionListUpdateMsg> MISSION_LIST_UPDATE;
+using MISSION_LIST_UPDATE = teul_network_msg<MissionListUpdateMsg>;
 

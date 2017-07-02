@@ -37,10 +37,6 @@
 
 // Originating Programmer: Oliver "kfsone" Smith
 
-#ifdef COVERT_USE_CHAOTIC_NUMBERS
-#include "math/mathnum.h"
-#endif
-
 //#define COMPLEX_COVERT
 
 #ifdef MULTI_CLIENT
@@ -50,40 +46,44 @@
 //#define COVERT_USE_CHAOTIC_NUMBERS
 #endif
 
+#ifdef COVERT_USE_CHAOTIC_NUMBERS
+#include "math/mathnum.h"
+#endif
+
 #ifdef DONT_USE_COVERT
 template<typename Tp>
 class Covert
 {
 public:
 	Tp value;
-	Tp Set(const Tp& rhs) { value = rhs; return value;}
-	Tp Get(void) const { return value; }
+	Tp Set(const Tp& rhs) noexcept { value = rhs; return value;}
+	Tp Get() const noexcept { return value; }
 
-	Covert(const Tp& rhs) : value(rhs) {}
-	Covert() : value(0) {}
+	Covert(const Tp& rhs) noexcept : value(rhs) {}
+	Covert() noexcept : value(0) {}
 
 	// Cast to own type operator: so we can be used in most contexts
-	operator Tp () const { return Get(); }
+	operator Tp () const noexcept { return Get(); }
 
 	// Copy operator
-	const Tp operator=(const Covert& rhs) { return Set(rhs.Get()); }
+	const Tp operator=(const Covert& rhs) noexcept { return Set(rhs.Get()); }
 
 	// Assignment operators
-	const Tp operator=(const Tp& rhs)	{ return Set(rhs); }
-	const Tp operator+=(const Tp& rhs)	{ return Set(Get() + rhs); }
-	const Tp operator-=(const Tp& rhs)	{ return Set(Get() - rhs); }
-	const Tp operator*=(const Tp& rhs)	{ return Set(Get() * rhs); }
-	const Tp operator/=(const Tp& rhs)	{ return Set(Get() / rhs); }
-	const Tp operator<<=(const int rhs) { return Set(Get() << rhs); }
-	const Tp operator>>=(const int rhs) { return Set(Get() >> rhs); }
-	const Tp operator++() { return Set(Get()+1); }
-	const Tp operator--() { return Set(Get()-1); }
-	const Tp operator++(int) { return Set(Get()+1); }
-	const Tp operator--(int) { return Set(Get()-1); }
-	const Tp operator&=(const Tp& rhs) { return Set(Get() & rhs); }
-	const Tp operator|=(const Tp& rhs) { return Set(Get() | rhs); }
-	const Tp operator^=(const Tp& rhs) { return Set(Get() ^ rhs); }
-	const Tp operator!() { return !Get(); }
+	const Tp operator=(const Tp& rhs)	noexcept { return Set(rhs); }
+	const Tp operator+=(const Tp& rhs)	noexcept { return Set(Get() + rhs); }
+	const Tp operator-=(const Tp& rhs)	noexcept { return Set(Get() - rhs); }
+	const Tp operator*=(const Tp& rhs)	noexcept { return Set(Get() * rhs); }
+	const Tp operator/=(const Tp& rhs)	noexcept { return Set(Get() / rhs); }
+	const Tp operator<<=(const int rhs) noexcept { return Set(Get() << rhs); }
+	const Tp operator>>=(const int rhs) noexcept { return Set(Get() >> rhs); }
+	const Tp operator++() noexcept { return Set(Get()+1); }
+	const Tp operator--() noexcept { return Set(Get()-1); }
+	const Tp operator++(int) noexcept { return Set(Get()+1); }
+	const Tp operator--(int) noexcept { return Set(Get()-1); }
+	const Tp operator&=(const Tp& rhs) noexcept { return Set(Get() & rhs); }
+	const Tp operator|=(const Tp& rhs) noexcept { return Set(Get() | rhs); }
+	const Tp operator^=(const Tp& rhs) noexcept { return Set(Get() ^ rhs); }
+	const Tp operator!() noexcept { return !Get(); }
 };
 #else
 extern UINT32 wwiiGetUpdateNo(bool increment);
@@ -107,7 +107,6 @@ extern void wwiiOhYeah(const UCHAR);
 template<typename Tp>
 class Covert
 {
-private:
 	UINT64	m_mask;				// Encryption Mask for this instance
 #ifdef RELOCATING_COVERT
 	UINT64*	m_data;				// Pointer to the value
@@ -122,27 +121,26 @@ private:
 	UINT16	m_hits;				// Slowly incrementing modifier
 #endif
 
-
 public:
-	typedef Tp valuetype;
-	typedef Covert<valuetype> selftype;
+	using value_type = Tp;
+	using self_type = Covert<value_type>;
 
 #ifdef RELOCATING_COVERT
-	UINT64& Deref() { return *m_data; }
-	const UINT64& Deref() const { return *m_data; }
+	UINT64& Deref() noexcept { return *m_data; }
+	const UINT64& Deref() const noexcept { return *m_data; }
 #else
-	UINT64& Deref() { return m_data; }
-	const UINT64& Deref() const { return m_data; }
+	UINT64& Deref() noexcept { return m_data; }
+	const UINT64& Deref() const noexcept { return m_data; }
 #endif
 
 	// Function for setting a covert variable
-	valuetype Set(const valuetype& rhs)
+	value_type Set(const value_type& rhs) noexcept
 	{
 		UINT64 t = ((uint64_t)rand() << 32) | rand(); // Deliberately not initialized.
 
 		// Bit-copy RHS into the top of 't', leaving the
 		// pre-existing stack-derived "crap" in the lower bits.
-		*(valuetype*)&t = rhs;
+		*(value_type*)&t = rhs;
 
 		// XOR the value with the 2s-compliment of the mask
 		// Why? So that set(0) does not produce* m_addr == m_mask
@@ -165,9 +163,9 @@ public:
 	}
 
 	// Function for fetching a "covert" variable
-	valuetype Get(void) const
+	value_type Get() const
 	{
-		// Unencrypt the value.
+		// Decrypt the value.
 		UINT64 t = (Deref() ^ ~m_mask);
 
 #ifdef COMPLEX_COVERT
@@ -177,43 +175,49 @@ public:
 			wwiiOhYeah(OH_YEAH_COVERT);
 		}
 #endif
-		return *(valuetype*)&t;
+		return *(value_type*)&t;
 	}
 
 private:
-	bool Equals(const valuetype& rhs) const
+	bool Equals(const self_type& rhs) const
 	{
 		const UINT64 lhsValue = (Deref() ^ ~m_mask);
 		const UINT64 rhsValue = (rhs->Deref() ^ ~ rhs->m_mask);
-		return (*(valuetype*)&lhsValue) == (*(valuetype*)&rhsValue);
+		return *(value_type*)&lhsValue == *(value_type*)&rhsValue;
+	}
+
+	bool Equals(value_type rhsValue) const
+	{
+		const UINT64 lhsValue = (Deref() ^ ~m_mask);
+		return (*(value_type*)&lhsValue) == rhsValue;
 	}
 
 public:
 	// Cast to own type operator: so we can be used in most contexts
-	operator valuetype () const { return Get(); }
+	operator value_type () const { return Get(); }
 
 	// Copy operator
-	const valuetype operator=(const Covert& rhs) { return Set(rhs); }
+	const value_type operator=(const Covert& rhs) { return Set(rhs); }
 
 	// Assignment operators
-	const selftype& operator=(const valuetype& rhs)	{  Set(rhs); return *this; }
-	const selftype& operator+=(const valuetype& rhs)	{  Set(Get() + rhs); return *this; }
-	const selftype& operator-=(const valuetype& rhs)	{  Set(Get() - rhs); return *this; }
-	const selftype& operator*=(const valuetype& rhs)	{  Set(Get() * rhs); return *this; }
-	const selftype& operator/=(const valuetype& rhs)	{  Set(Get() / rhs); return *this; }
-	const selftype& operator<<=(const int rhs) {  Set(Get() << rhs); return *this; }
-	const selftype& operator>>=(const int rhs) {  Set(Get() >> rhs); return *this; }
-	const selftype& operator++() {  Set(Get()+1); return *this; }
-	const selftype& operator--() {  Set(Get()-1); return *this; }
-	const selftype& operator++(int) {  Set(Get()+1); return *this; }
-	const selftype& operator--(int) {  Set(Get()-1); return *this; }
-	const selftype& operator&=(const valuetype& rhs) {  Set(Get() & rhs); return *this; }
-	const selftype& operator|=(const valuetype& rhs) {  Set(Get() | rhs); return *this; }
-	const selftype& operator^=(const valuetype& rhs) {  Set(Get() ^ rhs); return *this; }
-	const valuetype operator!() { return !Get(); }
+	const self_type& operator=(const value_type& rhs)	{  Set(rhs); return *this; }
+	const self_type& operator+=(const value_type& rhs)	{  Set(Get() + rhs); return *this; }
+	const self_type& operator-=(const value_type& rhs)	{  Set(Get() - rhs); return *this; }
+	const self_type& operator*=(const value_type& rhs)	{  Set(Get() * rhs); return *this; }
+	const self_type& operator/=(const value_type& rhs)	{  Set(Get() / rhs); return *this; }
+	const self_type& operator<<=(const int rhs) {  Set(Get() << rhs); return *this; }
+	const self_type& operator>>=(const int rhs) {  Set(Get() >> rhs); return *this; }
+	const self_type& operator++() {  Set(Get()+1); return *this; }
+	const self_type& operator--() {  Set(Get()-1); return *this; }
+	const self_type& operator++(int) {  Set(Get()+1); return *this; }
+	const self_type& operator--(int) {  Set(Get()-1); return *this; }
+	const self_type& operator&=(const value_type& rhs) {  Set(Get() & rhs); return *this; }
+	const self_type& operator|=(const value_type& rhs) {  Set(Get() | rhs); return *this; }
+	const self_type& operator^=(const value_type& rhs) {  Set(Get() ^ rhs); return *this; }
+	const value_type operator!() { return !Get(); }
 
 	// Constructor with assignment
-	Covert(const valuetype& rhs)
+	Covert(const value_type& rhs)
 		: m_mask(0LL)
 		, m_data(0ULL)
 #ifdef COMPLEX_COVERT
@@ -239,7 +243,7 @@ public:
 	}
 
 	// Destructor
-	~Covert()
+	~Covert() noexcept
 	{
 #ifdef RELOCATING_COVERT
 		delete m_data;
@@ -256,18 +260,18 @@ private:
 	}
 #endif
 
-	UINT32 _randomNumber() const
+	UINT32 _randomNumber() const noexcept
 	{
 #ifdef COVERT_USE_CHAOTIC_NUMBERS
-		return (UINT32)abs((mathGetChaoticNumber() << (rand() % 53)) + rand());
+		return (UINT32)mathGetChaoticNumber() << (rand() % 16) + rand();
 #else
 		return (UINT32)rand();
 #endif
 	}
 
-	void _generateMask()
+	void _generateMask() noexcept
 	{
-		// The casting is neccessary to stop truncation to 32 bits during all this
+		// The casting is necessary to stop truncation to 32 bits during all this
 		static const int BIT_SIZE = (int)sizeof(UINT64) << 3;
 		for ( int i = 0; i < BIT_SIZE; i += 32 )
 		{

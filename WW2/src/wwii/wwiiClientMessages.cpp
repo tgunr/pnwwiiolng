@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: April 17 2002
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -21,7 +21,7 @@
 #include "wwii/wwiiFullObjID.h"
 #include "fio/fio.h"
 #include "wwii/wwiiUTF.h"
-
+#include "wwii/wwiiBackChannel.h"
 #include "teul/teulConnection.h"
 
 #include "client/GameClient.h"
@@ -139,12 +139,6 @@ _recordPeers()
 #endif
 
 static SINT32
-_sendWWII_ERROR_INFO(ACTION_OBJECT* const a)
-{
-	return wwiiPackERROR_INFO(TEUL_PACK, a->packed, a->offset, (WWII_ERROR_INFO*) a->localRawData, 0);
-}
-
-static SINT32
 _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 {
 	WWII_ACTIVATE activate;
@@ -160,7 +154,7 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 
 	UINT32 maskedAddr = teulMaskNetworkAddress(activate.hostIP);
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 	lastHostTime = activate.hostTime;
 	lastClientTime = teulTime();
 	lastHostIP = maskedAddr;
@@ -173,6 +167,7 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 		_updatesSent = 0;
 		break;
 	case CELL_HOST:
+		wwiiBackChannelConnect(activate.teulIndex, teulGetAddress(maskedAddr), activate.port, a->teulIndex, activate.playerID, activate.otp, reinterpret_cast<char *>(activate.pkey));
 		clientActivateCell(a->teulIndex, TRUE, maskedAddr, activate.port);
 		_updatesSent = 0;
 		break;
@@ -185,284 +180,11 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
-
-#include "versionNo.h"
-#include "include/vars.h"
-#include "wwii/wwiiCovert.h"
-
-/************************************************************************************************
-	Queued Error Info
-*************************************************************************************************/
-
-#define WW_ERR_MAX 10
-
-static SINT32 eventID;
-Covert<LOGICAL> archiveWasCorrupt;
-static WWII_ERROR_INFO errInfoQueue[WW_ERR_MAX];
-
-static WWII_ERROR_INFO* _getErrInfo();
-static UINT32 _strVerToHex(const char* inStr);
-static void _mangleString(char* inStr, int underscore);
-
-/************************************************************************************************
-	wwiiQueuedSend_WWII_ERROR_INFO
-*************************************************************************************************/
-
-extern SINT32
-wwiiQueuedSend_WWII_ERROR_INFO(WWII_ERROR_INFO* info)
-{
-	WWII_ERROR_INFO* errInfo = _getErrInfo();
-	if(errInfo == nullptr) return -1;
-
-	*errInfo = *info;
-
-	if(errInfo->errorType == WW_ERR_VALIDITY_CHECK)
-		archiveWasCorrupt = 1;
-
-	errInfo->eventID = eventID++;
-	if ( ! errInfo->clientVersion )     errInfo->clientVersion      = _strVerToHex(STRVER);
-	if ( ! errInfo->clientTime )        errInfo->clientTime         = teulTime();
-	if ( ! errInfo->hostTime )          errInfo->hostTime           = errInfo->clientTime - lastClientTime + lastHostTime;
-	if ( ! errInfo->hostIP )            errInfo->hostIP             = lastHostIP;
-	// TODO: Reassociate this with sane, since commit hashes in Git are not numbers (no, they're not hex values either)
-	if ( ! errInfo->clientSourceCommit) errInfo->clientSourceCommit = 0;
-
-	return 0;
-}
-
-
-/************************************************************************************************
-	_errorDumpFile()
-	Returns a FILE* to the file we dump error information to.
-*************************************************************************************************/
-
-static FILE* _errorDumpFile(const char* mode)
-{
-#if platOS == OS_WIN32
-    return fioUserFile(DUMPFILE_NAME, mode);
-#else
-    return fopen(DUMPFILE_NAME, mode);
-#endif
-}
-
-static void deleteDumpFile()
-{
-		std::string path = UserDataPath;
-		path += DUMPFILE_NAME;
-#if platOS == OS_WIN32
-		_unlink(path.c_str());
-#else
-		unlink(path.c_str());
-#endif
-}
-
-/************************************************************************************************
-	wwiiLog_WWII_ERR_INFO
-	// Write data to the ww2errinfo.dmp file
-*************************************************************************************************/
-
-extern SINT32 wwiiLog_WWII_ERR_INFO(WWII_ERROR_INFO* errInfo)
-{
-    FILE* f = _errorDumpFile("w");
-	if(!f) return -1;
-
-	errInfo->clientVersion = _strVerToHex(STRVER);
-	errInfo->clientTime = teulTime();
-	errInfo->hostTime = errInfo->clientTime - lastClientTime + lastHostTime;
-	errInfo->hostIP = lastHostIP;
-	errInfo->archiveWasCorrupt = archiveWasCorrupt;
-
-	fprintf(f, "%u\n%u\n%u\n%u\n%u\n%u\n", errInfo->errorType, errInfo->clientVersion, errInfo->clientTime,
-										errInfo->hostTime, errInfo->hostIP, errInfo->archiveWasCorrupt);
-
-	if(errInfo->errorType == WW_ERR_EXCEPTION)
-	{
-		fprintf(f, "%u\n%u\n", errInfo->data.exceptInfo.exceptionCode, errInfo->data.exceptInfo.exceptionAddr);
-		// write stack array and info
-		for( int i=0; i< WWII_EXCEPTION_INFO::_STACK_LEN; i++)
-		{
-			if ( errInfo->data.exceptInfo.stackAddrs[i]==0)
-			{
-				break;
-			}
-			fprintf(f,"%u\n",errInfo->data.exceptInfo.stackAddrs[i]);
-		}
-		fprintf(f,"0\n"); // end marker
-
-		if ( errInfo->data.exceptInfo.infoText[0] )
-		{
-			for ( int i=0; i<WWII_EXCEPTION_INFO::_STR_LEN; i++ )
-			{
-				if ( errInfo->data.exceptInfo.infoText[i] == '\n' )
-				{
-					errInfo->data.exceptInfo.infoText[i] = '|';
-				}
-				if ( errInfo->data.exceptInfo.infoText[i] == '\'' )
-				{
-					errInfo->data.exceptInfo.infoText[i] = ' ';
-				}
-			}
-			fprintf(f,"%s\n",errInfo->data.exceptInfo.infoText);
-		}
-		else
-		{
-			fprintf(f,"\n");
-		}
-	}
-	else if(errInfo->errorType == WW_ERR_PIEXIT)
-	{
-		_mangleString(errInfo->data.piExitInfo.srcFilename.string, 1);
-		_mangleString(errInfo->data.piExitInfo.errorMessage.string, 1);
-		fprintf(f, "%u\n%s\n%s\n", 	errInfo->data.piExitInfo.srcLine, errInfo->data.piExitInfo.srcFilename.string,
-									errInfo->data.piExitInfo.errorMessage.string);
-	}
-
-#if defined(PROCESS_LIST_SUBMISSIONS)
-	std::string peerNames = _recordPeers();
-	fprintf(f, "Peers: %s\n", peerNames.c_str());
-#endif
-
-	fprintf(f, "\n%s\nThis file contains data on the last abnormal application termination that is used to submit crash information automatically to Playnet. Data solely describes the fault and does not contain any system/personal identification.\n", "$Id: wwiiClientMessages.cpp 3678 2010-05-18 08:10:04Z osmith@CRS $");
-
-	fclose(f);
-
-	return 0;
-}
-
-/************************************************************************************************
-	wwiiSendLog_WWII_ERR_INFO
-*************************************************************************************************/
-
-extern SINT32 wwiiSendLog_WWII_ERR_INFO()
-{
-    FILE* f = _errorDumpFile("r");
-	if(!f) return 0;
-
-	WWII_ERROR_INFO errInfo;
-	memset(&errInfo, 0x0, sizeof(errInfo));
-
-	if(fscanf(f, "%u %u %u %u %u %u", (unsigned int*)&errInfo.errorType, &errInfo.clientVersion,
-				 &errInfo.clientTime, &errInfo.hostTime, &errInfo.hostIP, &errInfo.archiveWasCorrupt) == 6)
-	{
-		if(errInfo.errorType == WW_ERR_EXCEPTION)
-		{
-			fscanf(f, "%u %u", &errInfo.data.exceptInfo.exceptionCode, &errInfo.data.exceptInfo.exceptionAddr);
-			// read stack array and info
-			// read stack until a 0 up to max of 10 items
-			bool readlastzero = false;
-			for( int i=0; i< WWII_EXCEPTION_INFO::_STACK_LEN; i++)
-			{
-				int cnt = fscanf(f,"%u", &errInfo.data.exceptInfo.stackAddrs[i]);
-				if ( (cnt && errInfo.data.exceptInfo.stackAddrs[i]== 0) || cnt==0 )
-				{
-					readlastzero = true;
-					break;
-				}
-			}
-			char s[256];
-			fgets(s, 10, f); // /n
-
-			if ( ! readlastzero )
-			{
-				fgets(s, 10, f); // 0/n
-				readlastzero = false;
-			}
-
-			fgets(errInfo.data.exceptInfo.infoText,WWII_EXCEPTION_INFO::_STR_LEN-1,f);
-		}
-		else if(errInfo.errorType == WW_ERR_PIEXIT)
-		{
-			fscanf(f, "%u %s %s", 	&errInfo.data.piExitInfo.srcLine, errInfo.data.piExitInfo.srcFilename.string,
-									errInfo.data.piExitInfo.errorMessage.string);
-
-			_mangleString(errInfo.data.piExitInfo.srcFilename.string, 0);
-			_mangleString(errInfo.data.piExitInfo.errorMessage.string,0);
-
-			errInfo.data.piExitInfo.srcFilename.length = strnlen(errInfo.data.piExitInfo.srcFilename.string, WWII_ERR_STRING::_MAX_LEN);
-			errInfo.data.piExitInfo.errorMessage.length = strnlen(errInfo.data.piExitInfo.errorMessage.string, WWII_ERR_STRING::_MAX_LEN);
-		}
-
-		wwiiQueuedSend_WWII_ERROR_INFO(&errInfo);
-	}
-
-	fclose(f);
-
-	deleteDumpFile();
-
-	return 0;
-}
-
-/************************************************************************************************
-	_getErrInfo
-*************************************************************************************************/
-
-static WWII_ERROR_INFO* _getErrInfo()
-{
-	int i;
-
-	for(i = 0; i < WW_ERR_MAX; i++)
-	{
-		if(errInfoQueue[i].errorType == WW_ERR_UNKNOWN)
-			return &errInfoQueue[i];
-	}
-
-	return nullptr;
-}
-
-/************************************************************************************************
-	_strVerToHex
-*************************************************************************************************/
-
-static UINT32 _strVerToHex(const char* inStr)
-{
-	UINT32 quad[4];
-	UINT32 vers = 0;
-
-	quad[0] = quad[1] = quad[2] = quad[3] = 0;
-
-	sscanf(inStr, "%u.%u.%u.%u", &quad[0], &quad[1], &quad[2], &quad[3]);
-
-	vers = (quad[3] << 24) | (quad[2] << 16) | (quad[1] << 8) | (quad[0]);
-
-	return vers;
-}
-
-/************************************************************************************************
-	_mangleString
-*************************************************************************************************/
-
-static void _mangleString(char* inStr, int underscore)
-{
-	char* s;
-	char to   = (underscore) ? '_' : ' ';
-	char from = (underscore) ? ' ' : '_';
-
-	for(s = inStr;*s; s++)
-	{
-		if(*s == from)
-		{
-			*s = to;
-		}
-		else if (*s == '\\')
-		{
-			*s='|';
-		}
-	}
-}
-#endif // FRONT_END
-
-SINT32
-wwiiSendWWII_ERROR_INFO(SINT32 connection, WWII_ERROR_INFO* info)
-{
-	return teulSend(connection, _SEND_ERROR_INFO, info);
-}
-
 static SINT32
 _sendPlayerLogin(ACTION_OBJECT* const a)
 {
 	PLAYER_LOGIN* const login = (PLAYER_LOGIN*)a->localRawData;
-	return login->packer(TEUL_PACK, a->packed, a->offset);
+	return login->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -507,18 +229,18 @@ Teul::Connection::login()
 	// the idea being that since traffic is encrypted it'll provide something
 	// to test the packet stream. *shrug*
 	if ( m_playerIdent.m_playerID == 0 )
-		memcpy(login.CopyRightString, AUTH_SEQ, AUTH_SEQ_SIZE);
+		strsafecpy(login.CopyRightString, AUTH_SEQ);
 	else
 	{
 		if ( m_type == Map )
 		{
 			// If we're auth-bypassing into the map host, we send our playerID instead.
-			snprintf((char*)login.CopyRightString, AUTH_SEQ_SIZE, "%u", m_playerIdent.m_playerID);
+			strprintf(login.CopyRightString, "%u", m_playerIdent.m_playerID);
 		}
 		else
 		{
 			// For the other servers, we prefix it with an R. I'm not 100% sure why -- OGS.
-			snprintf((char*)login.CopyRightString, AUTH_SEQ_SIZE, "R%u", m_playerIdent.m_playerID);
+			strprintf(login.CopyRightString, "R%u", m_playerIdent.m_playerID);
 		}
 	}
 
@@ -597,7 +319,7 @@ Teul::Connection::start(class ww2::Client* const client)
 	// tells us that we were able to perform a TCP open,
 	// it doesn't tell us that we're connected yet.
 	SINT32 newTeulIndex = teulOpenSend(m_serverAddr.m_hostIP, m_serverAddr.m_port, s_onConnect, (SINT32)m_timeoutMS, PROTOCOL_TCP, s_onError);
-	if ( newTeulIndex == -1 )
+	if ( newTeulIndex < 0 )
 		return false;
 
 	// Make sure there's not already a connection in progress
@@ -768,9 +490,11 @@ static SINT32
 _registerAuthCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Auth::CallbackX)
+	{
 		REGISTER_SENDER(PLAYER_LOGIN_Y, _sendPlayerLogin, _PLAYER_LOGIN);
 		REGISTER_RECEIVER(PLAYER_LOGIN_REPLY_Y, _recvLoginReply);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Auth::CallbackX)
 }
 
 SINT32
@@ -779,13 +503,12 @@ wwiiClientInstallCallbacks()
 	_registerAuthCallbacks();
 
 	BEGIN_CALLBACK_REGISTRATION(WWII_X)
-
+	{
 		REGISTER_RECEIVER(WWII_ACTIVATE_Y, _recvWWII_ACTIVATE);
 
-		REGISTER_SENDER(WWII_ERROR_INFO_Y, _sendWWII_ERROR_INFO, _SEND_ERROR_INFO);
 		REGISTER_SENDER_NODATA(WWII_USER_ABORTED_APP_Y, _SEND_USER_ABORTED_APP);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(WWII_X)
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -841,27 +564,7 @@ bool wwiiIncrementHits()
 	return true;
 }
 
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
-/************************************************************************************************
-	wwiiServiceQueue_WWII_ERROR_INFO
-*************************************************************************************************/
-
-extern SINT32
-wwiiServiceQueue_WWII_ERROR_INFO()
-{
-	int i;
-	if(PlayerClient()->MapConnection() < 0) return 0;// || !g_bMapClientActive) return 0;
-
-	for(i = 0; i < WW_ERR_MAX; i++ )
-	{
-		if(errInfoQueue[i].errorType == WW_ERR_UNKNOWN) break;
-		wwiiSendWWII_ERROR_INFO(PlayerClient()->MapConnection(), &errInfoQueue[i]);
-	}
-
-	memset(errInfoQueue, 0x0, sizeof(errInfoQueue));
-	return 0;
-}
-
+#if platBuild == BUILD_CLIENT
 //////////////////////////////////////////////////////////////////////
 // Sorry about the name, I didn't want an obvious name for this
 // appearing in a symbol table, beta or otherwise.

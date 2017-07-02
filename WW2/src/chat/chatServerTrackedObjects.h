@@ -9,7 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 void chatReceiveSTO(UINT16 type, ACTION_OBJECT* a);
-bool chatAddServerTrackedObject(class ServerTrackedObject* sto);
 void chatRemoveServerTrackedObject(UINT32 stoUID);
 bool chatPatrolSTOExpirations();
 

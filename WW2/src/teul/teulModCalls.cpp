@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides access to the socket
 // functions used by the teul API. The end-user developer
 // should never need the functions provided here.
@@ -88,14 +88,14 @@ _errorSYN_CALLBACK(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*
 		return;
 	}
 
-	dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " errorSYN: closing error %d clock:%llu", teulIndex, PRA_SOCKET(inEndpoint->socket), error, teulClock64);
+	dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " errorSYN: closing error %d clock:%" PR64BitUT "", teulIndex, PRA_SOCKET(inEndpoint->socket), error, teulClock64);
 	teulClose(*inEndpoint, Teul::Closing::SynErr);
 }
 
 //////////////////////////////////////////////////////////////////////
 
 static SINT32
-_packSYN_TOKEN( LOGICAL mode, UCHAR* const data, SINT32 offset, struct SYN_TOKEN_STRUCT* const tokenRef, SINT32 /*size*/)
+_packSYN_TOKEN( PackMode mode, UCHAR* const data, SINT32 offset, struct SYN_TOKEN_STRUCT* const tokenRef, SINT32 /*size*/)
 {
 	offset = teulPackUINT16(mode, data, offset, &tokenRef->version, 0);
 	offset = teulPackUINT32(mode, data, offset, &tokenRef->timeout, 24);
@@ -110,15 +110,19 @@ static inline void _report(const ACTION_OBJECT* const a, const char* const txt)
 {
 #ifdef DEBUG_CONNECTIONS
 	dbugLog(_FLD, "t:%d[%d] %s", a->teulIndex, (a->endpoint ? a->endpoint->teulIndex() : -999), txt);
+#else
+	silence_unused_parameter_warning(a, txt);
 #endif
 }
 
 static inline void _status(const char* const doing, const char* const what, UINT32 version, const ENDPOINT* const endpoint)
 {
 #ifdef DEBUG_CONNECTIONS
-	dbugLog(_FLD, "t:%d [%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%llx rxs=%16llx",
+	dbugLog(_FLD, "t:%d [%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%" PR64BitUT " rxs=%" PR64BitUT "",
             endpoint->teulIndex(), doing, what, version, endpoint->m_impl->m_version, endpoint->m_impl->m_cryptVersion,
             endpoint->m_impl->m_txCrypt.seed(), endpoint->m_impl->m_rxCrypt.seed());
+#else
+	silence_unused_parameter_warning(doing, what, version, endpoint);
 #endif
 }
 
@@ -150,7 +154,7 @@ static UINT16
 _negotiateVersionNumber(UINT16 remoteVersion, const ENDPOINT* const endpoint)
 {
 	// Datagram delivery services don't use encryption.
-	if ( endpoint->protocol != PROTOCOL_TCP || endpoint->m_peer )
+	if ( !endpoint->isFromClient() )
 	{
 		dbugLog(_FLM, "t:%d non-client connection, disabling encryption", endpoint->teulIndex());
 		return 0;
@@ -201,7 +205,7 @@ _actionRecvSYN_TOKEN(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 
 static SINT32
-_packSYN_ACK_TOKEN(LOGICAL mode, UCHAR* const data, SINT32 offset, struct SYN_TOKEN_STRUCT* tokenRef, SINT32 /*size*/)
+_packSYN_ACK_TOKEN(PackMode mode, UCHAR* const data, SINT32 offset, struct SYN_TOKEN_STRUCT* tokenRef, SINT32 /*size*/)
 {
 	offset = teulPackUINT16(mode, data, offset, &tokenRef->version, 0);
 	offset = teulPackUINT32(mode, data, offset, &tokenRef->timeout, 24);
@@ -364,7 +368,7 @@ _actionRecvFYN_TOKEN(ACTION_OBJECT* const a)
 	if ( (inEndpoint == nullptr) | (FYN_ACK_TOKEN == nullptr) )
 		return -EINVAL;
 
-	if ( (inEndpoint->state() != IS_CLOSING) & (inEndpoint->state() != IS_CLOSED) )
+	if ( inEndpoint->state() < IS_CLOSING )
 	{
 		dbugLog(_FLD, "t:%d rxFyn: closing", a->teulIndex);
 		if ( FYN_TOKEN != nullptr )
@@ -399,7 +403,7 @@ _actionRecvFYN_ACK_TOKEN(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 
 static SINT32
-_packKLIVE_TOKEN (LOGICAL mode, UCHAR* const data, SINT32 offset, KDATA* kt, SINT32 /*size*/)
+_packKLIVE_TOKEN (PackMode mode, UCHAR* const data, SINT32 offset, KDATA* kt, SINT32 /*size*/)
 {
 	return teulPackUCHAR(mode, data, offset, &kt->random, 8);
 }
@@ -407,7 +411,7 @@ _packKLIVE_TOKEN (LOGICAL mode, UCHAR* const data, SINT32 offset, KDATA* kt, SIN
 //////////////////////////////////////////////////////////////////////
 
 static SINT32
-_packKLIVE_ACK_TOKEN(LOGICAL mode,  UCHAR* const data, SINT32 offset, KDATA* kt, SINT32 /*size*/)
+_packKLIVE_ACK_TOKEN(PackMode mode,  UCHAR* const data, SINT32 offset, KDATA* kt, SINT32 /*size*/)
 {
 	return _packKLIVE_TOKEN(mode, data, offset, kt, 0);
 }
@@ -510,11 +514,9 @@ _recvError(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 
 SINT32
-teulInitModCallbacks(void)
+teulInitModCallbacks()
 {
-	Teul::CallbackInit ci;
-
-	memset(&ci, 0, sizeof(ci));
+	Teul::CallbackInit ci{};
 
 	ci.callX 		= Teul::Module::CallbackX;		// the X position in the callback matrix
 	ci.callXName	= TEUL_PACKET_NAMES ? "TMCALLBACKS_X" : "";

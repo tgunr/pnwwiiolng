@@ -22,7 +22,6 @@
 #include "teul/teulNetworkArray.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiPack.h"
-#include "dbse/dbseConnection.h"
 
 extern void rosterMessage(Chat::LocalizedMessage& lmsg) ;
 
@@ -36,8 +35,6 @@ static UINT32 _chatIPAddress=0;
 static UINT16 _chatPort=0;
 static UINT32 _chatOTP=0;
 static UINT32 _chatReconects = 0;
-
-DBCONNECTION dbConnection;
 
 static void _chatClientConnectFunction(ENDPOINT&);
 void _chatClientErrorFunction (SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
@@ -119,7 +116,7 @@ static SINT32 _recvMessage(ACTION_OBJECT* const a)
 
 // Initiate a connection to the chat host
 static void
-_connectToChatHost(void)
+_connectToChatHost()
 {
 	_chatClientConnected = FALSE;
 
@@ -247,9 +244,10 @@ _recvCommandList(ACTION_OBJECT* const a)
 
 //Installs the client callbacks
 SINT32
-chatInstallClientCallbacks(void)
+chatInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
+	{
 
 		REGISTER_SENDER(Chat::CLIENT_MESSAGE_Y, _sendMessage, CHAT_SEND_CLIENT_MESSAGE) ;
 
@@ -258,7 +256,7 @@ chatInstallClientCallbacks(void)
 		REGISTER_RECEIVER(Chat::CLIENT_GCI_MESSAGE_Y, _recvGCIMessage) ;
 		REGISTER_RECEIVER(Chat::LOCALIZED_MESSAGE_Y, _recvLocalisedMessage) ;
 		REGISTER_RECEIVER(Chat::CMD_LIST_Y, _recvCommandList) ;
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 

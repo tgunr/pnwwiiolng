@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides support utilities used in
 // the teul API. The end-user developer
 // should not need the functions provided here.
@@ -40,7 +40,9 @@
 #endif
 
 #include <atomic>
+#include <chrono>
 
+///TODO: We need these to be atomic or thread local or something.
 TeulTimeMS teulClock64;
 UINT32 teulClockTime;
 
@@ -51,7 +53,7 @@ UINT32 teulClockTime;
 // teulTime is just teulClock64 / 1000)
 
 void
-teulSyncClock(void)
+teulSyncClock()
 {
     
     // Each platform has its own version of a monotonic clock
@@ -125,7 +127,7 @@ const char*
 teulGetAddress(const UINT32 host, char* buffer, const size_t bufferSize)
 {
 	const char* p = teulGetAddress(host);
-	strncpy(buffer, p, bufferSize);
+	strsafecpy(buffer, p, bufferSize);
 	return buffer;
 }
 #endif

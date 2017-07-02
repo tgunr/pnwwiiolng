@@ -18,10 +18,10 @@ class ResupplyTicket;
 // A docket is a collection of resupply tickets. They are stored individually
 // but are best processed by collating the individual entries by weap_spec
 // into a RESUPPLY_MANIFEST
-typedef std::list<ResupplyTicket*> RESUPPLY_DOCKET;
-typedef std::map< UINT32, RESUPPLY_DOCKET > RESUPPLY_QUEUE;
-typedef std::map<WEAPON_SPEC, UINT32> RESUPPLY_MANIFEST;
-typedef std::list<ResupplyTicket*> TRANSFERS;
+using RESUPPLY_DOCKET = std::list<ResupplyTicket*>;
+using RESUPPLY_QUEUE = std::map< UINT32, RESUPPLY_DOCKET >;
+using RESUPPLY_MANIFEST = std::map<WEAPON_SPEC, UINT32>;
+using TRANSFERS = std::list<ResupplyTicket*>;
 
 //////////////////////////////////////////////////////////////////////
 // The actual impl
@@ -55,7 +55,7 @@ public:
 
 	UINT32 nextServiceIn_s() const { return (UINT32)((m_nextServiceAt > teulClock64) ? (m_nextServiceAt - teulClock64) / 1000 : 0); }
 
-	static UINT32 ThrottleKey(const FacilityStruct* facility, const WEAPON_SPEC& spec)
+	static UINT32 ThrottleKey(const FacilityStruct* facility, const WEAPON_SPEC spec)
 	{
 		return ( facility->uOID << 16 ) | ( spec.asUINT16() & 0xffff );
 	}
@@ -64,12 +64,12 @@ public:
 	void decrementThrottle(UINT32 key);
 	void incrementThrottle(UINT32 key);
 
-//	void resetThrottleWindow(const FacilityStruct* facility, const WEAPON_SPEC& spec)
+//	void resetThrottleWindow(const FacilityStruct* facility, const WEAPON_SPEC spec)
 //	{
 //		m_throttles.erase(ThrottleKey(facility, spec));
 //	}
 
-	UINT32 throttles(const FacilityStruct* facility, const WEAPON_SPEC& spec) const
+	UINT32 throttles(const FacilityStruct* facility, const WEAPON_SPEC spec) const
 	{
 		THROTTLE_MAP::const_iterator it = m_throttles.find(ThrottleKey(facility, spec));
 		return ( it != m_throttles.end() ) ? it->second.Check() : 0;
@@ -129,7 +129,7 @@ public:
 		UINT32			m_ends;	// When this throttle expires
 		mutable UINT32	m_used;	// Number of this throttle in use
 	};
-	typedef std::map<UINT32, Throttle> THROTTLE_MAP;
+	using THROTTLE_MAP = std::map<UINT32, Throttle>;
 	THROTTLE_MAP	m_throttles;
 #endif
 };

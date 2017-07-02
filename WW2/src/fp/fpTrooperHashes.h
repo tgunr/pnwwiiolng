@@ -2,7 +2,7 @@
 // Created: Mon Jul 11 18:06:13 CDT 2005
 //
 // This file defines "concealled" names for FPS variables. So that
-// hacking little bastards don't get a user-friendly list.
+// hacking little ****s don't get a user-friendly list.
 //
 // If you need to add a new variable, use the hash function
 // defined in fpHash.h

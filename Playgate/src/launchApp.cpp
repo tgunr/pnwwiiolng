@@ -93,8 +93,6 @@ LOGICAL launchArenaRequest()
 	ArenaRequest.arenaID = loginData.m_arenaID;
 	ArenaRequest.sessionID = 0;
 	ArenaRequest.presenterVersion = g_playgateVersion;
-
-	// Username is stored as wide characters, convert to UTF8
 	loginData.GetUsernameAsUTF8(ArenaRequest.username, sizeof(ArenaRequest.username));
 	loginData.GetPasswordMD5(ArenaRequest.password, MAX_PASSWORD);
 
@@ -109,7 +107,7 @@ LOGICAL launchArenaRequest()
 	return TRUE;
 }
 
-static SINT32 _RecievePlayGateOk(ACTION_OBJECT *a)
+static SINT32 _ReceivePlayGateOk(ACTION_OBJECT *a)
 {
 	playgate.SetStatus(GetLoc(AUTH_OK));
 /*
@@ -123,11 +121,13 @@ static SINT32 _RecievePlayGateOk(ACTION_OBJECT *a)
 SINT32 launchAppVerify(SINT32 Connection, APP_VERIFY *AppVerify)
 {
 APP_LAUNCH_REQ LaunchRequest;
+#ifndef IGNORE_REGISTRY
 SINT32         NumberOfInstances;
 UINT32         CurrentVer;
+#endif
 
 	loginData.GetUsernameAsUTF8(LaunchRequest.username, sizeof(LaunchRequest.username));
-	loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password)-1);
+	loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password) - 1);
 
 	LaunchRequest.status = 0;
 	LaunchRequest.cdKeySize = 0;
@@ -332,7 +332,7 @@ static SINT32 _ReceiveAppVerify(ACTION_OBJECT *Action)
 {
 	APP_VERIFY AppVerify;
 
-	//playgate.SetStatus("Recieved app verify");
+	//playgate.SetStatus("Received app verify");
 
 	Action->offset = authPackAPP_VERIFY(TEUL_UNPACK, Action->packed, Action->offset, &AppVerify, 0);
 
@@ -371,7 +371,7 @@ extern SINT32 launchInstallCallbacks(void)
 			throw 4;
 		if ( commInstallMessage(Auth::CallbackX, APP_VERIFY_Y, nullptr, _ReceiveAppVerify) == nullptr)
 			throw 5;
-		if ( commInstallMessage(Auth::CallbackX, APP_PLAYGATE_OK_Y, nullptr, _RecievePlayGateOk) == nullptr )
+		if ( commInstallMessage(Auth::CallbackX, APP_PLAYGATE_OK_Y, nullptr, _ReceivePlayGateOk) == nullptr )
 			throw 6;
 		_GetGameList = commInstallMessage(Auth::CallbackX, APP_XCHG_GAME_LIST_Y, _RequestGameList, _ReceiveGameList);
 		if ( nullptr == _GetGameList )

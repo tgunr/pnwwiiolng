@@ -175,8 +175,8 @@ enum fpTPSMotionType
 	TPS_MOTION_NUM_TYPES
 };
 
-typedef std::map<std::string, int> TPSType;
-typedef std::map<std::string, TPSType> TPSTypes;
+using TPSType = std::map<std::string, int>;
+using TPSTypes = std::map<std::string, TPSType>;
 
 // these are the offsets so we can get the appropriate UI string from the loc file
 #define			FPS_BODYEMOTE_OFFSET	10000

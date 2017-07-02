@@ -30,7 +30,7 @@ struct POSTED_WEAPON
 	};
 
 	POSTED_WEAPON(const WEAPON_SERIAL& withWeaponSerial, SINT16 withPortal, UINT32 withMissionID
-				, UINT32 withCommander, const ChatHandle& withHandle, UINT32 withCrew
+				, UINT32 withCommander, const ChatHandle withHandle, UINT32 withCrew
 				, StratHCUnit* withBrigade, StratHCUnit* withSupplyingBrigade, FacilityStruct* withFacility
 				, bool withMulticrew, bool withImmediateSpawn, bool withIsNonSupplied
 				)
@@ -67,7 +67,7 @@ struct POSTED_WEAPON
 	bool isDead() const { return m_isDead; }
 	bool isNonSupplied() const { return m_isNonSupplied; }
 	UINT32 serial() const { return m_weaponSerial.serial; }
-	const WEAPON_SPEC& spec() const { return m_weaponSerial.spec; }
+	WEAPON_SPEC spec() const { return m_weaponSerial.spec; }
 
 	// Posted weapon list management
 	void insertInto(POSTED_WEAPON*& list);
@@ -156,11 +156,8 @@ private:
 	void _unregister();
 };
 
-typedef std::list<POSTED_WEAPON*> POSTED_WEAPON_LIST;
-
-//tolua_begin
+using POSTED_WEAPON_LIST = std::list<POSTED_WEAPON*>;
 
 //Finds someone in the postedWeapon list
 extern POSTED_WEAPON* strtFindPostedWeapon(UINT32 serialID);
 
-//tolua_end

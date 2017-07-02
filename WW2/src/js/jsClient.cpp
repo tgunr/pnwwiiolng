@@ -1,10 +1,13 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 #include <algorithm>
+
+#include "steam_api.h" // HACK
 
 #include "phui/Util.h"
 
 #include "include/vars.h"
+#include "auth/authSteam.h"
 #include "js/jsClient.h"
 #include "js/jsStratDB.h"
 #include "js/jsGame.h"
@@ -24,7 +27,9 @@
 #include "strt/strtFacilityWeaponList.h"
 #include "uimap/uiMap.h"
 #include "client/GameClient.h"
+#include "client/clientNetError.h"
 #include "ui/uiMain.h"
+#include "js/jsAuthHandler.h"
 #include "js/jsPosition.h"
 #include "wwii/wwiiSquadMsg.h"
 #include "chat/chatSquadControl.h"
@@ -51,6 +56,7 @@
 #include "strt/strtCaptureState.h"
 #include "pers/persmain.h"
 #include "scen/ScenarioManager.h"
+#include "rn/rnmain.h"
 
 #ifdef GR2_BLEND_EDITOR
 #include "gr2/gr2Anim.h"
@@ -71,6 +77,10 @@ static const char* branches[MAX_BRANCHES] = {"none", "army", "airforce", "navy" 
 JSClass jsClient::jsclass = JS_CLASS_MACRO("client");
 JSFunctionSpec jsClient::jsfunctions[] =
 {
+	JS_FUNCTION_SPEC(jsClient, createauthhandler,0),
+	JS_FUNCTION_SPEC(jsClient, connecttoarena,0),
+	JS_FUNCTION_SPEC(jsClient, steamconnect,2),
+	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
 	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
 	JS_FUNCTION_SPEC(jsClient, acceptmission,1),
@@ -203,6 +213,91 @@ jsClient::jsClient(ww2::Client* c) :
 
 jsClient::~jsClient()
 {
+}
+
+
+/************************************************************************************************
+	auth connection
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, createauthhandler) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	// HACK: At some point it would be nice to not have the controllers pointing to a global
+	// connection and actually have that connection be attached to the client or something.
+	*rval = (new jsAuthHandler())->jsVal();
+	return JS_TRUE;
+}
+
+
+/************************************************************************************************
+	arena joining
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, connecttoarena) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	try {
+		// HACK: We should pass in the auth info, but for now it's set semi-globally.
+		rnconnectToServer();
+	} catch ( ClientNetError& ) {
+		// TODO: Error message
+		*rval = BOOLEAN_TO_JSVAL(false);
+	}
+
+	*rval = BOOLEAN_TO_JSVAL(true);
+	return JS_TRUE;
+}
+
+
+/************************************************************************************************
+	steam connection
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, steamconnect) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+	if ( argc < 1 ) return JS_FALSE;
+	
+	int32 arena;
+	if (gArena[0]) {
+        arena = strtol(gArena, nullptr, 10);
+    } else {
+        JS_ValueToInt32(ctx, argv[0], &arena);
+    }
+	const char* callsign = "";
+	if ( argc >= 2 )
+		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
+
+	// HACK: Move this to sysSteam so we aren't doing this in GUI code.
+	char ticket_data[512];
+	uint32_t ticket_length;
+	HAuthTicket ticket = SteamUser()->GetAuthSessionTicket(ticket_data, array_size(ticket_data),
+	                                                       &ticket_length);
+	SteamLoginResult result = authRequestSteamLogin(ticket_data, ticket_length, arena, callsign);
+	SteamUser()->CancelAuthTicket(ticket);
+
+	if ( result.status == SteamLoginResponse::LoginSuccess )
+		rnsetServerInfo(result.serverIP, result.serverPort, result.otp);
+
+	*rval = INT_TO_JSVAL(result.status);
+	return JS_TRUE;
+}
+
+
+/************************************************************************************************
+	gui state
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, loadrootwindow) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	rnloadRootWindow();
+
+	return JS_TRUE;
 }
 
 
@@ -429,7 +524,7 @@ JS_FUNCTION_DEF(jsClient, sendchatmessage)
 		else if(_chatRateSamples)
 		{
 			static int lastChat = 0;
-			static int chatSamples[CHAT_RATE_SAMPLES];
+			static int chatSamples[CHAT_RATE_SAMPLES]{};
 
 			if(_chatRateSamples > CHAT_RATE_SAMPLES)
 				_chatRateSamples = CHAT_RATE_SAMPLES;
@@ -777,8 +872,7 @@ JS_FUNCTION_DEF(jsClient, createmission)
 	std::string missiondesc = UTF8(wmissiondesc);
 	if(missiondesc.empty()) return JS_FALSE;
 
-	MISSION_POST_REQ post;
-	memset(&post, 0x0, sizeof(post));
+	MISSION_POST_REQ post{};
 
 //	WWII_SIDE playerside = weapLookupSide(jsclient->client->PersonaSelected().m_countryID);
 
@@ -786,8 +880,8 @@ JS_FUNCTION_DEF(jsClient, createmission)
 	post.subType = (SINT8)subtype;
 	post.origin = *jsorigin->stratobj->FullObjID();
 	post.target = *jstarget->stratobj->FullObjID();
-	post.descSize = strlen(missiondesc.c_str());
-	strncpy(post.desc,missiondesc.c_str(), MapMiss::MISSION_DESC_LENGTH);
+	post.descSize = static_cast<SINT16>(strlen(missiondesc.c_str()));
+	strsafecpy(post.desc, missiondesc.c_str());
 
 	*rval = INT_TO_JSVAL(0); // trying
 
@@ -1538,9 +1632,9 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 			{
                 /*
                  TODO: Send in whether or not the player was wounded into Mission Results
-                 
+
                  NOTE: unsure whether code here is connected to above statement.
-                 
+
 				const PersonaSelection& persona = PlayerClient()->PersonaSelected();
 				Player* player = playerGetPlayer();
 				vehVehicle* vehicle = playerGetVehicle();
@@ -1800,17 +1894,19 @@ JSBool jsClient::SetProperty(JSContext* ctx, int propid, jsval* val)
 	return JS_TRUE;
 }
 
+#ifndef GM_RELEASE
 /************************************************************************************************
     _isRegularVehicle
 	Looks up the weapon spec and checks if it is a valid vehicle that does not require
-    ENABLE_FLOATERS.
+    GM_RELEASE.
 *************************************************************************************************/
-static bool _isRegularVehicle(const WEAPON_SPEC& spec)
+static bool _isRegularVehicle(const WEAPON_SPEC spec)
 {
 	const WEAPON* weapon = weapLookup(spec);
 
 	return !weapon || weapon->isPlayerWeapon();
 }
+#endif
 
 /************************************************************************************************
 	ProcessWeapList
@@ -1831,7 +1927,7 @@ void jsClient::ProcessWeapList()
 
 		WeaponCounter counter = weaplist.m_counters[i];
 
-#ifndef ENABLE_FLOATERS
+#ifndef GM_RELEASE
 		if(false == _isRegularVehicle(weaplist.m_weapons[i])) {
 			counter.spawnable = WeaponCounter::NOT_PERMITTED;
 		}
@@ -2482,6 +2578,13 @@ JS_FUNCTION_DEF(jsBrigade, move)
 
 JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 {
+	// TODO: This is just a temporary hack to avoid phui related PC crashes - this needs to be further investigated to see why
+	// unit gets corrupted (very well might be this js object that is corrupted)
+	if (unit && (unit->country() >= MAX_COUNTRIES || unit->country() == WWII_NO_COUNTRY))
+	{
+		return JS_FALSE;
+	}
+
 	switch(propid)
 	{
 		case NAME_PROP:
@@ -2500,6 +2603,7 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 				*val = (new jsHCUnit(detail.parent()))->jsVal();
 		break;
 		case DIVISION_PROP:
+			
 			if (unit && unit->parent())
 				*val = phui::js::NewString(UTF16(unit->parent()->name()));
 			else if(detail.parent())
@@ -2581,7 +2685,7 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case OWNERRANK_PROP:
 			*val = (new jsRank(detail.country(), detail.branch(), detail.ownerRank()))->jsVal();
 		break;
-		case OIC_PROP: // guy who is currently in charge (may be null)
+		case OIC_PROP: // player who is currently in charge (may be null)
 		{
 			BrigadeControlList* oic = PlayerClient()->LookupBrigadeOIC(detail.brigadeID());
 			if(oic && oic->m_officer > 0)
@@ -3511,7 +3615,7 @@ JSBool jsSquad::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = phui::js::NewString(UTF16(squad.name().c_str()));
 		break;
 		case SHORTNAME_PROP:
-			*val = phui::js::NewString(UTF16(squad.shortName()));
+			*val = phui::js::NewString(UTF16(squad.callsign().c_str()));
 		break;
 		case CO_PROP:
 		{
@@ -4216,9 +4320,11 @@ JSBool jsInstance::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = phui::js::NewString(chatGetWideCallsign(descriptor->handle()));
 		break;
 		case ID_PROP:
+		{
 			char idBuffer[32+1];
-			snprintf(idBuffer, 32, "%llu", descriptor->id()); // really long long unsigned int?
+			strprintf(idBuffer, "%" PR64BitUT "", descriptor->id());
 			*val = phui::js::NewString(idBuffer);
+		}
 		break;
 		case RESULT_PROP:
 			*val = INT_TO_JSVAL(lastResult);
@@ -4356,10 +4462,10 @@ JS_FUNCTION_DEF(jsClientState, paccess)
 
 JS_FUNCTION_DEF(jsClient, isavailable)
 {
-    
+
 #define AVAIL "available"
 #define INACT "inactive"
-    
+
 	jsPersonaSummary* summary = phui::js::Cast<jsPersonaSummary*>(ctx, argv[0]);
 	if(!summary) return JS_FALSE;
 	else if(strncmp(summary->Summary().availability(), AVAIL, strlen(AVAIL)) == 0 ||

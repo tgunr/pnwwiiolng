@@ -38,13 +38,13 @@ extern SINT32 trnwtrGetTexture(SINT32& texid, SINT32& depth);
 //#undef USE_WATER_EFFECT
 
 	extern LOGICAL trnwtrInit(const SINT8* name);
-	extern void trnwtrKill(void);
+	extern void trnwtrKill();
 
 	extern LOGICAL trnwtrIsWaterTexture(SINT32 texid);
 
-	extern LOGICAL trnwtrUpdate(void);
+	extern LOGICAL trnwtrUpdate();
 	extern LOGICAL trnwtrPreDraw(OBJECT* lpobj);
 	extern LOGICAL trnwtrPreDraw2(OBJECT* lpobj);
 	extern LOGICAL trnwtrPreDrawMultitexture(OBJECT* lpobj, piMATRIX* mtmat);
-	extern LOGICAL trnwtrPostDraw(void);
+	extern LOGICAL trnwtrPostDraw();
     extern LOGICAL trnwtrIsWaterDrawn(FLOAT32& maxheight, FLOAT32& distance);

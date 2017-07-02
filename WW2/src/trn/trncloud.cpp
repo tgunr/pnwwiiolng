@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "pi/pi.h"
 
@@ -24,7 +24,7 @@
 
 static bool _displayclouds = true;
 
-static UINT32				AddCloudWisps(void);
+static UINT32				AddCloudWisps();
 static std::set<OBJECT*>	cloudInstances;
 
 void trncloudToggle(bool toggle)
@@ -56,7 +56,7 @@ void trnCloudDeRegisterCloudInstance(OBJECT* topNode)
 }
 
 
-UINT32 trnCloudUpdate(void)
+UINT32 trnCloudUpdate()
 {
 	AddCloudWisps();
 	return 0;
@@ -114,12 +114,8 @@ static void getWispIntesity(const OBJECT* o, const FLOAT64VECTOR& Pos, float* In
 
 #include "fx/TransformEffect.h"
 #include "ui/uiChat.h"
-static UINT32 AddCloudWisps(void)
+static UINT32 AddCloudWisps()
 {
-#ifdef TERRAIN_EDITOR
-	return(0);
-#endif
-
     static SINT32 _LastUpdateTime;
 	if (frametime - _LastUpdateTime < _WISP_INTERVAL && _LastUpdateTime != 0)
 	{

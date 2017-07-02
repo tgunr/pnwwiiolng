@@ -32,7 +32,7 @@ class Update
 		}
 
 	//! User implemented: somewhere to provide a reference to the Teul Callback for this object.
-	public: static TEUL_CALLBACK* Callback(void);
+	public: static TEUL_CALLBACK* Callback();
 
 	//! Last modified time of the structure or a member var group.
 	protected: TeulTimeMS m_lastModified;
@@ -45,7 +45,7 @@ class Update
 	public: UINT32 groupsChangedBits() const { return 8; }
 
 	///! User implemented: Routine for serializing/deserializing this data.
-	public: bool packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack);
+	public: bool packer(PackMode mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack);
 
 	// Members
 
@@ -74,7 +74,7 @@ class Update
 			ridingSeat.operator=(rhs.ridingSeat);
 			return *this;
 		}
-		virtual void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+		virtual void groupPacker(PackMode mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
 		{
 			UINT32 fieldNo = 0;
 			oneTimeBits.packer(mode, a, lastPack, changes, fieldNo++);
@@ -143,7 +143,7 @@ class Update
 			rotZ.operator=(rhs.rotZ);
 			return *this;
 		}
-		virtual void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
+		virtual void groupPacker(PackMode mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
 		{
 			UINT32 fieldNo = 0;
 			posX.packer(mode, a, lastPack, changes, fieldNo++);

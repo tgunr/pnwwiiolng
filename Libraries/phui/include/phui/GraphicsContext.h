@@ -30,7 +30,7 @@ public:
 	};
 	
 	GraphicsContext() : _io(0), _localTexture(false) {}
-	virtual ~GraphicsContext() {}
+	virtual ~GraphicsContext();
 	
 	virtual void MakeCurrentContext() = 0;
 	

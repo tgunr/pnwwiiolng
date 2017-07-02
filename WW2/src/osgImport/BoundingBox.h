@@ -30,11 +30,11 @@ class BoundingBox
     public:
 
 #ifdef USE_FLOAT_BOUNDINGBOX
-        typedef Vec3f vec_type;
-        typedef float value_type;
+        using vec_type = Vec3f;
+        using value_type = float;
 #else
-        typedef Vec3d vec_type;
-        typedef double value_type;
+        using vec_type = Vec3d;
+        using value_type = double;
 #endif
 
 
@@ -66,7 +66,7 @@ class BoundingBox
     // assignement operator
     inline BoundingBox & operator=(const BoundingBox& bb)
     { _min = bb._min; _max = bb._max; return *this; }
-    
+
     // offset
     inline void offset( value_type diffx, value_type diffy, value_type diffz = 0.0 )
     {

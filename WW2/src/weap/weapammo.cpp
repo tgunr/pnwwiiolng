@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <math.h>
 #include <ctype.h>
@@ -76,20 +76,20 @@ FILE* weaplogFile;
 #define _MAX_NUM_OF_COLLISIONS 32
 #define MAX_TORPEDO_DROP_SPEED 75
 
-typedef struct tagTracerFX
+struct TracerFX
 {
 	FLOAT64VECTOR OldPos;
 	FLOAT64VECTOR NewPos;
 	FLOAT32 Diameter;
-} TracerFX;
+};
 
-typedef struct
+struct shrapTarget
 {
 	FLOAT64VECTOR	targetPos;
 	FLOAT64			radius;
 	void*			target;
 	FLOAT32			maxDist2;
-} shrapTarget;
+};
 
 // Ammo variable types
 enum
@@ -329,7 +329,7 @@ UINT32 weapFindAmmoTypeByName(weapAmmoType ** AmmoType,UCHAR * VarContents)
 	return 0;
 }
 
-UINT32 _ReadAmmoTypes(void)
+UINT32 _ReadAmmoTypes()
 {
 	int AmmoListFile = 0;
 	int CurrentAmmoFile = 0;
@@ -463,7 +463,7 @@ logTimerBeginMacro();
 						if (Object != nullptr)
 						{
 							AmmoType->Object = Object;
-							sprintf(Object->name,"%s%dat",VarContents,CurrentPos); // ensure unique name
+							strprintf(Object->name,"%s%dat",VarContents,CurrentPos); // ensure unique name
 
 							ogrpHideObjectAndSubtree(Object);
 							obmainMoveToNotObjectTree(Object);
@@ -626,7 +626,7 @@ logTimerBeginMacro();
                     break;
                     case WEAP_AMMOVAR_HITEFFECT_TYPE:
                         {
-                            strncpy(AmmoType->hiteffect, (char*)VarContents, 31);
+                            strsafecpy(AmmoType->hiteffect, (char*)VarContents);
                             break;
                         }
 					case WEAP_AMMOVAR_MODELCMX:
@@ -694,7 +694,7 @@ static UINT32 weapAmmoApplyDamageToVehicleComponent(weapAmmo* Ammo, vehVehicle* 
 static UINT32 weapAmmoApplyDamageToObject(weapAmmo* Ammo, const FLOAT64& Energy, trnCDTerrainObject* TO, vehVehicle* InShooterVehicle);
 
 // init
-static UINT32 _ReadBallisticChart(void);
+static UINT32 _ReadBallisticChart();
 
 // ammo list
 static UINT32 _GetNewAmmo(weapAmmo ** AmmoPtr);
@@ -752,7 +752,7 @@ static LOGICAL 	_StickTorpedoToWater(weapAmmo* Ammo);
 	weapAmmoInit
 *************************************************************************************************/
 
-UINT32 weapAmmoInit(void)
+UINT32 weapAmmoInit()
 {
 	SINT32 i;
 
@@ -815,7 +815,7 @@ UINT32 weapAmmoInit(void)
 	weapAmmoKill
 *************************************************************************************************/
 
-UINT32 weapAmmoKill(void)
+UINT32 weapAmmoKill()
 {
 	weapAmmo * CurrentAmmo = nullptr;
     weapAmmo* NextAmmo = nullptr;
@@ -867,7 +867,7 @@ UINT32 weapAmmoKill(void)
 	weapAmmoKillAllAmmo
 *************************************************************************************************/
 
-UINT32 weapAmmoKillAllAmmo(void)
+UINT32 weapAmmoKillAllAmmo()
 {
 	weapAmmo* Ammo = nullptr;
 	weapAmmo* NextAmmo = nullptr;
@@ -946,7 +946,7 @@ void weapAmmoSetFuzeInterval(FLOAT32 interval)
 	weapAmmoGetFuzeInterval
 *************************************************************************************************/
 
-FLOAT32 weapAmmoGetFuzeInterval(void)
+FLOAT32 weapAmmoGetFuzeInterval()
 {
 	return VarFuzeInterval;
 }
@@ -957,7 +957,7 @@ FLOAT32 weapAmmoGetFuzeInterval(void)
 	weapUpdate
 *************************************************************************************************/
 
-UINT32 weapUpdate(void)
+UINT32 weapUpdate()
 {
 	weapAmmo* CurrentAmmo = nullptr;
     weapAmmo* NextAmmo = nullptr;
@@ -1098,7 +1098,7 @@ UINT32 weapAmmoSetRoundPos(piVECTOR* Pos)
 	weapDrawTracers
 *************************************************************************************************/
 
-LOGICAL weapDrawTracers(void)
+LOGICAL weapDrawTracers()
 {
 	FLOAT32 MinU = 0,MinV = 0,MaxU = 0,MaxV = 0;
 	FLOAT32 Len = 0;
@@ -2351,7 +2351,7 @@ static UINT32 weapAmmoApplyDamageToObject(weapAmmo* Ammo, const FLOAT64& Energy,
 	_ReadBallisticChart
 *************************************************************************************************/
 
-static UINT32 _ReadBallisticChart(void)
+static UINT32 _ReadBallisticChart()
 {
 	int CurrentFile = 0;
 	FLOAT32 LastMachNum = 0,CurrentMachNum = 0;
@@ -3448,8 +3448,8 @@ static UINT32 _DoShapedCharge(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FLOAT6
 	AmmoType.ExplosiveEnergy = Ammo->AmmoType->ExplosiveEnergy;
 	AmmoType.Diameter = Ammo->AmmoType->Diameter;
 	AmmoType.SubType = Ammo->AmmoType->SubType;
-	strncpy(AmmoType.ExplosionNameFar, Ammo->AmmoType->ExplosionNameFar,  63);
-    strncpy(AmmoType.ExplosionNameNear,Ammo->AmmoType->ExplosionNameNear, 63);
+	strsafecpy(AmmoType.ExplosionNameFar, Ammo->AmmoType->ExplosionNameFar);
+	strsafecpy(AmmoType.ExplosionNameNear,Ammo->AmmoType->ExplosionNameNear);
 
 	ShapeChargeAmmo.AmmoType = &AmmoType;
 
@@ -4051,8 +4051,7 @@ static LOGICAL _DoProjectileUpdate(weapAmmo* Ammo, FLOAT64VECTOR const* PrevPos,
 
 	if(oldPos == newPos)	return false;
 
-	FASTCOLLIDE CollideList[_MAX_NUM_OF_COLLISIONS];
-	memset(CollideList, 0x0, sizeof(CollideList));
+	FASTCOLLIDE CollideList[_MAX_NUM_OF_COLLISIONS]{};
 
 	UINT32 NumCollisions = _GetProjectileCollisions(Ammo, Ammo->Flags, CollideList, _MAX_NUM_OF_COLLISIONS, &oldPos, &newPos, DeltaTime, CurrentTime);
 	if(NumCollisions <= 0)
@@ -4073,7 +4072,7 @@ static LOGICAL _DoProjectileUpdate(weapAmmo* Ammo, FLOAT64VECTOR const* PrevPos,
 				if(!vehVehicleInList(Vehicle)) // extra level of validity checking
 				{
 #ifdef BETA_RELEASE
-					piExitProgram(__FILE__, __LINE__, "corrupt collide list");
+					piExitProgram(_FL, "corrupt collide list");
 #endif
 					break; // something's hosed let's just break out
 				}
@@ -4422,11 +4421,11 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	// commented out because it doesn't do anything
     /*
      TBD - I guess then we should fix it ???
-     
+
 //	if(Vehicle && Vehicle->ModelData && Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
 //		_TransferMomentum(Vehicle->ModelData, Collision, Ammo, AmmoSpeed - ResidualSpeed);
      */
-    
+
 	if(AmmoStopped)
 		ResidualSpeed = 0;
 
@@ -5119,8 +5118,14 @@ static LOGICAL _UpdateAttachedProjectile(weapAmmo* Ammo)
 	if(Vehicle)
 		weapUpdateVehicleHitmap(Vehicle);
 
-	if(!Ammo->AttachedObject) return TRUE;
-	if(!obmainValidateObject(Ammo->AttachedObject)) return TRUE;
+	if ( ! (Ammo->AttachedObject && obmainValidateObject(Ammo->AttachedObject)) ) {
+		// HACK: If the object is gone, at least trigger the explosion effect.
+		// This is mostly an issue when a PPO is destroyed with satchels attached:
+		// Currently the two events are processed out-of-order, so the killing
+		// explosion won't render on other clients.
+		weapfxAmmoExplosion(Ammo, &Ammo->Position, nullptr, 0);
+		return TRUE;
+	}
 
 	math3dVectorMultiply(&Temp32Vec,&Temp32Vec,&Ammo->AttachedObject->mat);
 	mathAddVectors(&Ammo->Position,&WorldOriginOffset,&Temp32Vec);

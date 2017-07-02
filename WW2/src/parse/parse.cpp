@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Tue Mar 5 10:40:54 2001
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -218,7 +218,7 @@ bool parseValidArgs(ARG_SPEC* argSpec, FUNCARGS* args, SINT32 numArgs, const cha
 	{
 		if (! parseCmpBaseType(argSpec[i].baseType, (BASE_ARG_TYPES)args[i].baseType) )
 		{
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 			dbugLog(_FLA, "########## BLITZWOR IS INVALID ########## missing or bad parameter (%d) type %d, value (%s) to type %d, section %s, line %d"
 						,i,args[i].baseType,args[i].svalue,argSpec[i].baseType,section,lineNum);
 #else
@@ -229,7 +229,7 @@ bool parseValidArgs(ARG_SPEC* argSpec, FUNCARGS* args, SINT32 numArgs, const cha
 		}
 		if (args[i].numBytes > argSpec[i].maxArgBytes)
 		{
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 			dbugLog(_FLA, "########## BLITZWOR IS INVALID ########## parameter (%d) too long type %d, value (%s) to type %d, section %s, line %d"
 						,i,args[i].baseType,args[i].svalue,argSpec[i].baseType,section,lineNum);
 #else

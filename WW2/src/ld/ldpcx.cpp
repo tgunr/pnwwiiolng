@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //	 Copyright 2008 Playnet Inc, All rights reserved
 //	 Not to be distributed in API form except as part of a compiled library
 //	 under License or NDA
@@ -69,8 +69,8 @@ int   stream;
 		return(-1);
 	}
 
-	length = fioSeek(stream, 0, fioSEEK_END);
-	fioSeek(stream, 0, fioSEEK_SET);
+	length = fioSeek(stream, 0, SEEK_END);
+	fioSeek(stream, 0, SEEK_SET);
 	pfh = (PCXHEADER*)memAlloc(length);
 	if (pfh == nullptr)
 	{

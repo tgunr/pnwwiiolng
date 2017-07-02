@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <math.h>
 #include <queue>
 #include <list>
@@ -88,6 +88,7 @@
 #include "weap/weapammo.h"
 #include "weap/weapList.h"
 #include "weap/weapons.h"
+#include "wwii/wwiiPPOLoader.h"
 
 // WWIIOL specific.
 #include "client/clientStrtQueue.h"
@@ -96,12 +97,11 @@
 #include "strt/strtClientMessages.h"
 #include "strt/strtCPFlags.h"
 
-#ifdef TESTMAC
-//extern "C" void spawningin();
-//extern "C" void spawningout();
-#endif
-
 #include "wwii/wwiiOhYeahCodes.h"
+
+#include "wwii/wwiiPPOLoader.h"
+extern PPOSpecLoader specLoader;
+
 
 #define REPORT_ENEMIES
 
@@ -115,7 +115,7 @@ static UINT32 _vCacheTries = 0;
 #endif
 
 #ifdef CLIENT_VEHICLE_CACHING
-typedef std::map<ChatHandle, vehVehicle*> VEHICLE_READY_MAP;
+using VEHICLE_READY_MAP = std::map<ChatHandle, vehVehicle*>;
 
 // map of players we just popped off the vis list
 // we let them linger in case they pop back on quick enough
@@ -123,7 +123,7 @@ static VEHICLE_READY_MAP _readyMap;
 #endif
 
 #ifdef REPORT_ENEMIES
-typedef std::map<SINT32, FLOAT32> ENEMY_REPORTS;
+using ENEMY_REPORTS = std::map<SINT32, FLOAT32>;
 #endif
 
 //static vehVehicle _VehicleHead; // head of linked list
@@ -131,7 +131,7 @@ typedef std::map<SINT32, FLOAT32> ENEMY_REPORTS;
 // used offline and ignored online
 static std::queue<vehVehicle*> g_freeVeh;
 
-typedef std::set<VehicleSTO*> HULK_SET;
+using HULK_SET = std::set<VehicleSTO*>;
 static HULK_SET _hulkqueue;
 
 // used offline and ignored online
@@ -151,8 +151,8 @@ static FLOAT32 _bailoutLife = 0;
 
 static void vehmainSpawn();
 
-typedef std::list<Vehicle::Hit> VEHICLE_HITS;
-typedef std::vector<Vehicle::Hit> VEHICLE_HIT_LIST;
+using VEHICLE_HITS = std::list<Vehicle::Hit>;
+using VEHICLE_HIT_LIST = std::vector<Vehicle::Hit>;
 
 static VEHICLE_HITS _DeferredHitMessages;
 
@@ -206,10 +206,10 @@ UINT32 _UpdateVehicleBoundingBox(mlObjectData* ObjectData,OBJECT * PlaneObject);
 static UINT32 _UpdateVehicleBoundingBox1(mlObjectData* ObjectData,OBJECT * PlaneObject,UINT32* FirstBBox);
 
 static UINT32 _CheckAndUpdateHitmap(vehVehicle* CurrentVehicle);
-static UINT32 _ClearAllVehicles(void);
+static UINT32 _ClearAllVehicles();
 
 #if(0)
-static LOGICAL _CanPlayerExit(void);
+static LOGICAL _CanPlayerExit();
 #endif
 
 #if(0)
@@ -223,7 +223,7 @@ static SINT32 _NumVehicles = 0;
 
 static bool _findRTBFRU(ServerTrackedObject& sto, void* cookie);
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 static SINT32	disableVehLODs;
 #endif
 
@@ -264,9 +264,13 @@ extern SINT32 _CurrentHitmapObjectDisplay;
 
 #endif // BETA_RELEASE
 
+extern std::vector<PPOSpec *> activePPOList;
+extern UINT16 activePPOIndex;
+
 static bool g_canDeployMobileSpawn = false;
 
 extern void vehloadKill();
+extern SINT32 globalMSCoolDownEnd;
 
 static Covert<vehVehicle*> _VehicleHead = new vehVehicle();
 
@@ -294,7 +298,7 @@ static inline OBJECTDOF* _getVehicleSpawnObjectDof(vehVehicle* veh)
 // sets up important damage array by reading its component file
 // also sets total mass for each vehicle (hack for concussion damage)
 
-static void _ReadComponentFiles(void)
+static void _ReadComponentFiles()
 {
 	int i, k;
 	vehType* veh;
@@ -410,7 +414,7 @@ static void _ReadComponentFiles(void)
 logTimerEndMacro();
 }
 
-UINT32 vehInit(void)
+UINT32 vehInit()
 {
 	if(vehtypeInit() !=0 ) return 1;
 
@@ -428,7 +432,7 @@ UINT32 vehInit(void)
     if (!IS_OFFLINE)
     {
         size_t cnt = sizeof(g_vehicles);
-        memset( g_vehicles, cnt, 0xff ); // damn cheaters hopefully choke on this
+        memset( reinterpret_cast<void *>(&g_vehicles[0]), cnt, 0xff ); // damn cheaters hopefully choke on this
     }
 
 	vehAnimInit();
@@ -446,7 +450,7 @@ UINT32 vehInit(void)
 	return 0;
 }
 
-UINT32 vehKill(void)
+UINT32 vehKill()
 {
 vehVehicle*CurrentVehicle, *NextVehicle;
 
@@ -783,7 +787,7 @@ static void _ResetVehicleLODs(vehVehicle* v, bool resetLOD)
 	v->MinVehicleLOD = -1;
 }
 
-static UINT32 _UpdateVehicleLODs(void)
+static UINT32 _UpdateVehicleLODs()
 
 {
 	if (ft500mscount == 0) return 0;
@@ -904,7 +908,7 @@ static UINT32 _UpdateVehicleLODs(void)
 			CurrentVehicle->MinVehicleLOD = 2;
 #endif
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 		// FIXME - not convinced MinVehicleLOD is used!
 		if (disableVehLODs)
 		{
@@ -929,7 +933,7 @@ static UINT32 _UpdateVehicleLODs(void)
 				}
 				if (Object != nullptr)
 				{
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 					if (disableVehLODs)
 					{
 						Object->minlod = 0.0f;
@@ -1324,7 +1328,7 @@ static void _HitMessageUpdate()
 	vehUpdate
 *************************************************************************************************/
 
-UINT32 vehUpdate(void)
+UINT32 vehUpdate()
 {
 	if(_spawnvehicle)
     {
@@ -1374,17 +1378,8 @@ UINT32 vehUpdate(void)
     reports.clear();
 #endif
 
-	// ok we do several passes through the list because order is important for vehicle riding
-	// our vehicle(s) that aren't riding actually i don't know if i need to do this but
-	// may be some issue with display of other vehicles, I have no idea.
-	for (CurrentVehicle = getVehicleHead().getNext(); CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
-	{
-		if (CurrentVehicle->ModelData && CurrentVehicle->RideVehicleHostIndex == 0)
-		{
-			if(vehUpdate1stPersonVehicle(CurrentVehicle) < 0)
-				break;
-		}
-	}
+	if ( PlayerVehicle && PlayerVehicle->ModelData && PlayerVehicle->RideVehicleHostIndex == 0 )
+		vehUpdate1stPersonVehicle(PlayerVehicle);
 
 	// all vehicles that aren't riding on anything
 	for (CurrentVehicle = getVehicleHead().getNext(); CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
@@ -1792,12 +1787,12 @@ static UINT32 _GetNewVehicle(vehVehicle** VehiclePtr) // VEHSTUFF
 #define xDELETE_IMMEDIATELY
 #define DELETE_VEHICLES_DELAY_TIME 10000
 
-typedef struct TempSave
+struct TempSave
 {
     vehVehicle* vehicle;
     SINT32 timeToRemove;
 
-    TempSave(vehVehicle* v, SINT32 t )
+    TempSave(vehVehicle* v, SINT32 t)
     {
         vehicle = v;
         timeToRemove = t + DELETE_VEHICLES_DELAY_TIME;
@@ -1807,7 +1802,7 @@ typedef struct TempSave
         vehicle = nullptr;
         timeToRemove = 0;
     }
-} TempSave;
+};
 
 static std::map<vehVehicle*,TempSave> TempSaveVehicles;
 
@@ -1901,14 +1896,12 @@ static void _CleanVehicle(vehVehicle* v)
 
 #ifdef CLIENT_VEHICLE_CACHING
 
-static LOGICAL _processvehicleobject(struct OBJECT* o, void* userdata)
+static void _processvehicleobject(OBJECT& o, void* userdata)
 {
 	if(userdata)
-		obmainMoveToObjectTree(o);
+		obmainMoveToObjectTree(&o);
 	else
-		obmainMoveToNotObjectTree(o);
-
-	return TRUE;
+		obmainMoveToNotObjectTree(&o);
 }
 
 static UINT32 _AddToReadyList(vehVehicle* Vehicle)
@@ -2502,7 +2495,7 @@ vehVehicle*cur;
 	return FALSE;
 }
 
-vehVehicle*vehFindVehicleByChatHandle(const ChatHandle& chathandle)
+vehVehicle*vehFindVehicleByChatHandle(const ChatHandle chathandle)
 {
 	for ( vehVehicle* cur = getVehicleHead().getNext(); cur != nullptr; cur = cur->getNext())
 	{
@@ -2519,7 +2512,7 @@ UINT32 vehKillVehicle(vehVehicle* Vehicle)
 	if(Vehicle == nullptr) return 0;
     if(Vehicle->InUse == 0) return 0;
 
-	// process flags one more time to catch dead guys that didn't ragdoll
+	// process flags one more time to catch dead vehicles that didn't ragdoll
 	if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		fpProcessVehicleAnimationFlags(Vehicle);
 
@@ -2597,7 +2590,8 @@ UINT32 vehKillVehicle(vehVehicle* Vehicle)
 
 		if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		{
-			fpKill(Vehicle->ModelData);
+			if (Vehicle->ModelData)
+				fpKill(*Vehicle->ModelData);
 		}
 
 		mlKillVehicleData(Vehicle->ModelData);
@@ -2615,7 +2609,8 @@ UINT32 vehKillVehicle(vehVehicle* Vehicle)
 	{
 		if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		{
-			fpKill(Vehicle->ModelData);
+			if (Vehicle->ModelData)
+				fpKill(*Vehicle->ModelData);
 		}
 
 		mlKillVehicleData(Vehicle->ModelData);
@@ -2792,7 +2787,7 @@ static UINT32 _SendDamageUpdate(vehVehicle* CurrentVehicle, vehDamageQue * DQ)
 	}
 	else
 	{
-		teulSend(PlayerClient()->CellConnection(), commCLIENT_HIT, &hit);
+		teulSend(PlayerClient()->CellConnection(), commCLIENT_HIT, &hit, PROTOCOL_UDP);
 	}
 
 	return 0;
@@ -2932,7 +2927,7 @@ UINT32 vehProcessVehicleHit(const Vehicle::Hit& hit)
 	&& ShooterVehicle->VehicleType->Type == VEH_TYPE_PERSON
 	&& TargetVehicle->VehicleType->Type  == VEH_TYPE_PERSON)
 	{
-		vehHit->timeStamp = (UINT16)vehHit->timeStamp;// fucking short timestamp bullshit
+		vehHit->timeStamp = (UINT16)vehHit->timeStamp;// annoying short timestamp nonsense
 		_DeferredHitMessages.push_back(*vehHit);
 	}else*/
 	{
@@ -3129,11 +3124,18 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 		return 0;
 
 	// check for terrain sto first
-	if(TO->IsSTO())
-	{
+	if ( TO->IsSTO() ) {
 		TerrainSTO* sto = static_cast<TerrainSTO*>(TO->TerrainMasterObject->lpspare);
-		const SINT64 joules = (SINT64)Joules;
-		if(sto) sto->applyJoules(joules);
+		if ( sto ) {
+			SINT64 joules = static_cast<SINT64>(Joules);
+			// HACK: Basing damage off Joules makes PPO gameplay design very difficult,
+			// so PPOs use a different scale. It's possible that all STOs will use
+			// something similar at some point in the future.
+			if ( Ammo && (sto->type() == ServerTrackedObject::_PPO || ServerTrackedObject::_UMS) ) {
+				joules = fpPPOScaleJoules(*Ammo, joules);
+			}
+			sto->applyJoules(joules);
+		}
 
 		return 0;
 	}
@@ -3290,6 +3292,10 @@ UINT32 vehExitVehicleTrigger(SINT32 Param, UINT32 Id, UINT32 Detach)
 		}
 	}
 	*/
+
+
+	//what is player does not exist?
+	if (player == nullptr) return 0;
 
 	// handle bailing cases; only for planes right now
 	if(player->ModelData && player->VehicleType->Type == VEH_TYPE_AIR)
@@ -3493,7 +3499,7 @@ LOGICAL vehmainHasBailedOut()
 	return (_bailoutTime > 0) ? TRUE: FALSE;
 }
 
-LOGICAL _CanPlayerExit(void)
+LOGICAL _CanPlayerExit()
 {
 	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
 	if (Vehicle == nullptr || Vehicle->ModelData == nullptr) return FALSE;
@@ -3621,7 +3627,7 @@ UINT32 vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 	vehDetermineExitStatus(&ExitStatus, &rtbFacilityID);
 
-	// send out an update to make sure they ragdoll our guy
+	// send out an update to make sure they ragdoll our vehicle
 	if(ExitStatus == PEXIT_DEAD && Vehicle->VehicleType->Type == VEH_TYPE_PERSON && !fpFPSIsDead())
 	{
 		fpFPSKillTrooper();
@@ -3827,7 +3833,7 @@ void VehicleSTO::load()
     const UCHAR* name = vehtypeGetByIndex(getVehicleTypeNum())->Shape;
 
 	char buf[150];
-    sprintf(buf, "[activate] %s id:%d, veh:%s", type() == _HULK ? "HULK" : "STO", (int)uid(), name);
+    strprintf(buf, "[activate] %s id:%d, veh:%s", type() == _HULK ? "HULK" : "STO", (int)uid(), name);
 	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, uiUTF8toUTF16(buf));
 #endif
 }
@@ -3840,7 +3846,7 @@ void VehicleSTO::deactivate()
     const UCHAR* name = vehtypeGetByIndex(getVehicleTypeNum())->Shape;
 
 	char buf[150];
-    sprintf(buf, "[deactivate] %s id:%d, veh:%s", type() == _HULK ? "HULK" : "STO", (int)uid(), name);
+    strprintf(buf, "[deactivate] %s id:%d, veh:%s", type() == _HULK ? "HULK" : "STO", (int)uid(), name);
 	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, uiUTF8toUTF16(buf));
 #endif
 
@@ -3886,24 +3892,44 @@ vehVehicle* VehicleSTO::getVehicle()
 void MobileSpawnSTO::preProcess()
 {
 	PlayerPlacedSTO::preProcess();
-
-	if(_to)
-		trnFXSetCountryFlags(_to, (SINT32)flags());
 }
 
 void MobileSpawnSTO::postProcess()
 {
 	PlayerPlacedSTO::postProcess();
-
-	if(_to)
-	{
-		trnCDTerrainObject* TO = trncdFindTerrainObject(_to->child);
-
-		// flags is used to pass the country for mobilespawn stos
-		if(TO)
-			TO->Country = (SINT32)flags();
-	}
 }
+
+void PlayerPlacedSTO::preProcess()
+{
+    TerrainSTO::preProcess();
+
+    if (type() == ServerTrackedObject::_UMS || subType() == PPOSpecLoader::_PPO_AFRU)
+    {
+        if(_to)
+            trnFXSetCountryFlags(_to, (SINT32)flags());
+    }
+}
+
+void PlayerPlacedSTO::postProcess()
+{
+    TerrainSTO::postProcess();
+
+    if (type() == ServerTrackedObject::_UMS || subType() == PPOSpecLoader::_PPO_AFRU)
+    {
+        if(_to)
+        {
+            trnCDTerrainObject* TO = trncdFindTerrainObject(_to->child);
+
+            // flags is used to pass the country for mobilespawn stos
+            if(TO)
+                TO->Country = (SINT32)flags();
+        }
+    }
+}
+
+
+
+
 
 BailoutSTO::~BailoutSTO()
 {
@@ -4015,7 +4041,7 @@ const vehType* BailoutSTO::VTYPE(vehVehicle* v)
 	return vt;
 }
 
-static UINT32 _ClearAllVehicles(void)
+static UINT32 _ClearAllVehicles()
 {
 	bool scenario = SCEN_MGR->IsActive();
 
@@ -4289,9 +4315,8 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 		*ExitStatus = PEXIT_OVER_ENEMY_TERRITORY;
 	}
 
-	// check to see if we're a troop and near a FRU
-	if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON &&
-	   (*ExitStatus == PEXIT_OVER_ENEMY_TERRITORY || *ExitStatus == PEXIT_OVER_FRIENDLY_TERRITORY))
+	// check to see if we're near an STO spawn point
+	if ( (*ExitStatus == PEXIT_OVER_ENEMY_TERRITORY || *ExitStatus == PEXIT_OVER_FRIENDLY_TERRITORY) )
 	{
 		if(wwiiForEachSTO(_findRTBFRU))
 			*ExitStatus = PEXIT_RTB;
@@ -4309,7 +4334,7 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 	return 0;
 }
 
-UINT32 vehAdjustAnimationTime(void)
+UINT32 vehAdjustAnimationTime()
 {
 	if (getVehicleHead().getNext() != nullptr)
 	{
@@ -4863,10 +4888,6 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 	return 0;
 }
 
-#ifdef __MWERKS__
-#pragma mark -
-#endif
-
 /************************************************************************************************
 	vehFindInertiaComponent
 *************************************************************************************************/
@@ -5128,7 +5149,7 @@ int vehVehicleSpawned(const vehType* vtype, bool onlyPlayers)
 
 }
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 /************************************************************************************************
 	vehmainToggleLOD .. turns on and off LOD switches (off means all vehicles use LOD 0)
 *************************************************************************************************/
@@ -5294,104 +5315,44 @@ static MSPAWN_RESULT _nearEnemyFacility(FULL_OBJ_ID& foi, int side)
 }
 
 /************************************************************************************************
-	vehmainFRUBuild
+	vehmainPPOBuild
 *************************************************************************************************/
 
-PlayerPlacedObject* vehmainFRUBuild()
-{
+PlayerPlacedObject* vehmainPPOBuild(void) {
+	// Just in case since this isn't tied with the FPS PPO code yet.
+	if ( activePPOList.size() < (size_t)activePPOIndex + 1 ) activePPOIndex = 0;
+	if ( activePPOList.size() == 0 || activePPOList[activePPOIndex] == nullptr ) return nullptr;
+
 	vehVehicle* veh = persGetPersonaVehiclePtr();
-	if(veh == nullptr) return nullptr;
+	if ( veh == nullptr ) return nullptr;
 
-	// do we already have an msp on this misison?
-	bool hasMobileSpawn = PlayerClient()->MobileSpawnMission();
-	bool isMissionLeader = PlayerClient()->IsMissionLeader();
-
-	// now check if we're the mission leader
-	if(hasMobileSpawn && !isMissionLeader)
-	{
-		fpPPOAlert("ppos.fru.notleader");
-		return nullptr;
-	}
-
-	PlayerPlacedObject* fru = fpPPOCreate(FRU_INDEX);
-
-	// set our callbacks
-	//fru->SetValidityCallback(vehmainFRUCheck);
-	fru->SetExecuteCallback(vehmainFRUExecute);
-
-	// for vehicles, fail on validity checks
-	//fru->failOnInvalid = (veh->VehicleType->Type != VEH_TYPE_PERSON);
-
-	// do one update to check our current validity
-	if(fpPPOUpdate())
-	{
-		fpPPOAlert();
-		return nullptr;
-	}
-
-	// start building the irp if we're not a trooper
-	/*
-	if(veh->VehicleType->Type != VEH_TYPE_PERSON)
-	{
-		if(!fru->Build())
-		{
-			fpPPOAlert();
+	// Only the Mission Leader can replace an existing mobile spawn.
+	PPOSpec& spec = *activePPOList[activePPOIndex];
+	if ( spec.spawnable ) {
+		if ( PlayerClient()->MobileSpawnMission() && ! PlayerClient()->IsMissionLeader() ) {
+			fpPPOAlert("ppos.fru.notleader");
 			return nullptr;
 		}
 	}
-	*/
+
+	PlayerPlacedObject* fru = fpPPOCreate(spec.id);
+
+	// set our callbacks
+    if (fru != nullptr)
+    {
+        // do one update to check our current validity
+        if(fpPPOUpdate())
+        {
+            fpPPOAlert();
+            return nullptr;
+        }
+    }
+    else
+    {
+        dbugLog(_FLW, "Failed to create fru - fpPPOCreate for index %d and id %d", activePPOIndex, activePPOList[activePPOIndex]->id);
+    }
 
 	return fru;
-}
-
-bool vehmainFRUExecute()
-{
-	PlayerPlacedObject* fru = fpPPOGet();
-
-	if(fru->valid)
-	{
-		Vec3d finalPos = fru->finalPos;
-		piVECTOR finalAtt = fru->finalAtt;
-
-	    WorldPosition_m position(finalPos.x(), finalPos.y(), finalPos.z());
-		AttitudeVector attitude(finalAtt.x, finalAtt.y, finalAtt.z);
-		vehVehicle* player = persGetPersonaVehiclePtr();
-
-		if(Online)
-		{
-			// create a ppo sto
-			MobileSpawnSTO sto(0, fru->spec->id, position, attitude, (UINT32)player->Country);
-
-			// send the request to the host
-			sto.request(PlayerClient()->ChatConnection());
-		}
-		else
-		{
-			MobileSpawnSTO* sto = new MobileSpawnSTO(0, fru->spec->id, position, attitude, (UINT32)player->Country);
-			ServerTrackedObject::addToIndex(sto);
-			trnCDUpdateCollideLists(true);
-			//sto->Sink();
-		}
-
-		// handle troop specific stuff
-		fpFPSCancelPPO();
-
-		// temp string buffer
-		char nkey[50+1];
-
-		// create name key based on id
-		snprintf(nkey, 50, "ppos.ob%d", fru->spec->id);
-
-		const std::wstring& name = uiLocString(nkey);
-
-		fpPPOAlert("ppos.built", name.c_str());
-	}
-	else
-	{
-		fpPPOAlert();
-	}
-
-	return false;
 }
 
 /************************************************************************************************
@@ -5885,45 +5846,30 @@ bool vehmainRemoveSTO(UINT32 id)
 
 void _updateMobileSpawn()
 {
-    // If we are deploying and have not received a GRANTED from the host within a
-    // timeout period, tell host to undeploy (took too long)
-    if(_isDeployingTimeout())
-    {
-        vehHandleMobileSpawnUpdate(MSDR_LAPSED);
-        vehmainUndeployVehicleForMobileSpawn();
-        return;
-    }
-
-    if(!vehmainIsDeployed())
-    {
-		_checkMobileSpawnAbility();
-        return;
-    }
-
-	/* new mobile spawn functionality
-	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle();
-
-	if(veh && veh->StateAnimation.enumDeployedState == IDE_VEHICLE_DEPLOYED && vehmainIsMobileSpawn())
+	// If we are deploying and have not received a GRANTED from the host within a
+	// timeout period, tell host to undeploy (took too long)
+	if(_isDeployingTimeout())
 	{
-		FLOAT32 buildTime = (FLOAT32)((frametime - veh->deployedTimeout) / (FLOAT32)MOBILE_DEPLOYED_TIMEOUT);
-
-		char script[25+1];
-		sprintf(script, "game.ondeploybuild(%.2f)", buildTime);
-
-		// update the deployment timer
-		uiRunScript(script);
+		vehHandleMobileSpawnUpdate(MSDR_LAPSED);
+		vehmainUndeployVehicleForMobileSpawn();
+		return;
 	}
-	*/
 
-    // Send updates to the host periodically
-    if(frametime - g_mobileUpdateTimer < MOBILE_SPAWN_UPDATE_TIMER)
-    {
-        return;
-    }
+	if(!vehmainIsDeployed())
+	{
+		_checkMobileSpawnAbility();
+		return;
+	}
+
+	// Send updates to the host periodically
+	if(frametime - g_mobileUpdateTimer < MOBILE_SPAWN_UPDATE_TIMER)
+	{
+		return;
+	}
 
 	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle();
 
-    g_mobileUpdateTimer = frametime;
+	g_mobileUpdateTimer = frametime;
 
 	MSPAWN_RESULT permission = _canWeDeploy(veh, false);
 	if(permission != MSDR_GRANTED)
@@ -5934,27 +5880,12 @@ void _updateMobileSpawn()
 		return;
 	}
 
-	/* new mobile spawn functionality
-	if(vehmainIsMobileSpawn() && _isDeployedTimeout())
-	{
-		// our build timer has completed, undeploy and leave an sto UMS
-		mlToggleMobileSpawn(1, IMAP_MOBILE_SPAWN, 0);
+	piVECTOR spawnPos;
+
+	// Get position of the vehicle mobile spawn object
+	if(_getVehicleSpawnObjectPosition(veh, &spawnPos) != 0)
 		return;
-	}
-	*/
 
-    piVECTOR spawnPos;
-
-    // Get position of the vehicle mobile spawn object
-    if(_getVehicleSpawnObjectPosition(veh, &spawnPos) != 0)
-        return;
-
-///FIXME: This functionality is no-longer supported.
-/*
-    // Send position to host
-    ClientMobileSpawnUpdate cmsu(MSST_DEPLOYED, spawnPos.x, spawnPos.y, spawnPos.z);
-	cmsu.send(PlayerClient()->CellConnection());
-*/
 }
 
 /************************************************************************************************
@@ -5962,17 +5893,10 @@ void _updateMobileSpawn()
 *************************************************************************************************/
 void _setVehicleDeployedState(DEPLOYEDSTATE enumState)
 {
-    vehVehicle*veh = persGetPersonaVehiclePtr();
-    if(!veh) return;
+	vehVehicle*veh = persGetPersonaVehiclePtr();
+	if(!veh) return;
 
-	/* new mobile spawn functionality
-	if(enumState == IDE_VEHICLE_DEPLOYED)
-		uiRunScript("game.ondeploystate(true)"); // if we're deployed, tell the ui
-	else
-		uiRunScript("game.ondeploystate(false)"); // all other cases, say we're not
-	*/
-
-    veh->StateAnimation.enumDeployedState = enumState;
+	veh->StateAnimation.enumDeployedState = enumState;
 }
 
 /************************************************************************************************
@@ -6493,7 +6417,7 @@ static void vehmainSpawn()
 	pVehicle = vehFindVehicle(_vehicletospawn.hostIndex);
 
     if(pVehicle == nullptr)
-        piExitProgram(__FILE__,__LINE__,"[vehcommProcessVehicleRequestResponse] pVehicle == nullptr");
+        piExitProgram(_FL,"[vehcommProcessVehicleRequestResponse] pVehicle == nullptr");
 
 	pVehicle->WeaponSerial.source = _vehicletospawn.source;
 	pVehicle->WeaponSerial.serial = _vehicletospawn.hostIndex;
@@ -6551,11 +6475,11 @@ static void vehmainSpawn()
 	}
 #endif
 
-#ifndef ENABLE_FLOATERS
+#ifndef GM_RELEASE
     // Check to make absolutely sure we aren't spawning as a floater
 	if(pVehicle && pVehicle->VehicleType && pVehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{
-  		piExitProgram(__FILE__, __LINE__, "");
+  		piExitProgram(_FL, "");
 	}
 #endif
 
@@ -6566,7 +6490,7 @@ static void vehmainSpawn()
 	UINT16 key = pVehicle->VehicleType->WeaponSpec.asUINT16();
 
 	char buff[256] = {'\0'};
-	sprintf(buff, "convergence.%d", (SINT32)key);
+	strprintf(buff, "convergence.%d", (SINT32)key);
 
 	// set our vehicle's convergence
 	persGunsightSetConvergenceRange((FLOAT32)cfgPrefsGetInt(buff, (SINT32)Convergence));
@@ -6595,7 +6519,7 @@ static void _reportEnemyAircraft(vehVehicle* CurrentVehicle)
 	if(clockangle < 1) clockangle = 12+clockangle;
 
     char buf[64];
-    sprintf(buf, "Enemy aircraft spotted at %d o'clock.", clockangle);
+    strprintf(buf, "Enemy aircraft spotted at %d o'clock.", clockangle);
 	uiChatPrintLineIcon(icons, colorREDALPHA, uiUTF8toUTF16(buf));
 
     if(g_wantMessageAlert)
@@ -6852,32 +6776,6 @@ void vehVehicle::clear()
 
 }
 
-#if defined(FRES)
-static ChatHandle FRESuser;
-static int FRESposition;
-
-void vehFRESSetVehicle(const char* username)
-{
-	FRESuser = chatGetHandle(username);
-}
-
-void vehFRESSetCameraPosition(int position)
-{
-	FRESposition = position;
-}
-
-int vehFRESCameraPosition()
-{
-	return FRESposition;
-}
-
-vehVehicle* vehFRESParentVehicle()
-{
-	return vehFindVehicleByChatHandle(FRESuser);
-}
-
-#endif
-
 #include "physics/physicsMain.h"
 
 void vehmainCreateODECollider(vehVehicle* veh)
@@ -6949,8 +6847,8 @@ ChatHandle vehLastInfantryDamaged()
 
 static WORLD_UPDATE _lastWorldUpdate;
 
-typedef std::map<UINT32 /*vehicleIndex*/, UINT32 /*numUpdates*/ > UPDATES_PER_VEHICLE;
-typedef std::map< UINT32 /* second */, UPDATES_PER_VEHICLE > UPDATES_HISTORY;
+using UPDATES_PER_VEHICLE = std::map<UINT32 /*vehicleIndex*/, UINT32 /*numUpdates*/ >;
+using UPDATES_HISTORY = std::map< UINT32 /* second */, UPDATES_PER_VEHICLE >;
 static UPDATES_HISTORY s_updateHistory;
 
 /* On processing an update for a given vehicle ... */
@@ -7026,7 +6924,7 @@ std::string& vehVehiclesGameInfo()
 
 		char buffer[256] = {0};
 
-		strprintf(buffer, "Vehicles: %u of %u  Received: %u of %zu  Possible: %u\n",
+		strprintf(buffer, "Vehicles: %u of %u dispayed. Updates Received: %u of %zu per frame.  Possible in range: %u\n",
 			numVehiclesDisplayed,
 			maxVehiclesDisplayed,
 			numVehiclesWorldUpdate,
@@ -7134,189 +7032,96 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			snprintf((char*)veh->Handle, 10, "C%d", (int)vehicle->uid());
 			veh->Chat_Handle = chatGetHandle((const char*)veh->Handle);
 
-			if(myVehicle->VehicleType->Type == VEH_TYPE_PERSON)
-			{
-				gr2AnimTrooper* newAnimModel = veh->VehicleObjectData->PlaneObject->animModel;
-				gr2AnimTrooper* myAnimModel = myVehicle->VehicleObjectData->PlaneObject->animModel;
+			// do something for vehicles
+			veh->AnimationBits = myVehicle->AnimationBits;
+			veh->PosData = myVehicle->PosData;
+			veh->PosData.AttVel.Pitch = veh->PosData.AttVel.Roll = veh->PosData.AttVel.Yaw = 0;
+			veh->PosData.AttVelSum.Pitch = veh->PosData.AttVelSum.Roll = veh->PosData.AttVelSum.Yaw = 0;
+			veh->PosData.LastUpdateAcc.x = veh->PosData.LastUpdateAcc.y = veh->PosData.LastUpdateAcc.z = 0;
+			veh->PosData.Acc.x = veh->PosData.Acc.y = veh->PosData.Acc.z = 0;
+			veh->PosData.LastUpdateAttVel.Pitch = veh->PosData.LastUpdateAttVel.Roll = veh->PosData.LastUpdateAttVel.Yaw = 0;
+			veh->PosData.Vel.x = veh->PosData.Vel.y = veh->PosData.Vel.z = 0;
 
-				veh->AnimationBits = ((fpPersonData*)myVehicle->ModelData->PersonData)->AnimationFlags;
-				//veh->AnimationBits = myAnimModel->currentFlags;
-				newAnimModel->twist.vehicleYaw = myAnimModel->twist.vehicleYaw;
-				//veh->TPSYaw = myVehicle->interpolator.LastUpdateYaw();
-				veh->interpolator.Copy(myVehicle, veh->AnimationBits);
+			veh->VehicleObjectData->PlaneObject->mat = myVehicle->VehicleObjectData->PlaneObject->mat;
+			veh->VehicleObjectData->PlaneObject->pos = myVehicle->VehicleObjectData->PlaneObject->pos;
 
+			// setup state animations
+			COPY_VSMEMBER(LastUpdateTime);
+			COPY_VSMEMBER(GearSetting);
+			COPY_VSMEMBER(FlapSetting);
+			COPY_VSARRAY(CanopySetting,ML_MAX_CREW_POSITIONS);
+			COPY_VSARRAY(HatchSetting,ML_MAX_CREW_POSITIONS);
 
-				newAnimModel->currentDownWeight = myAnimModel->currentDownWeight;
-				newAnimModel->currentMiddleWeight = myAnimModel->currentMiddleWeight;
-				newAnimModel->currentUpWeight = myAnimModel->currentUpWeight;
-				//newAnimModel->currentMotion = myAnimModel->currentMotion;
+			COPY_VSMEMBER(BombBayDoorSetting);
+			COPY_VSMEMBER(DiveBrakeSetting);
 
-				newAnimModel->twist.SetTwists(newAnimModel->skeleton);
-				newAnimModel->twist.Copy(myAnimModel->twist);
+			COPY_VSMEMBER(GearMoveTime);
+			COPY_VSMEMBER(FlapMoveTime);
 
-				//gr2ModelSetTwists(myAnimModel->skeleton, newAnimModel->skeleton);
+			COPY_VSARRAY(CanopyMoveTime,ML_MAX_CREW_POSITIONS);
+			COPY_VSARRAY(HatchMoveTime,ML_MAX_CREW_POSITIONS);
 
-				//if(myAnimModel->currentPose == TPS_POSETYPE_PRONE)
-				//	gr2ModelSetModelRotation(newAnimModel->skeleton, -90, 100.0f);
+			COPY_VSMEMBER(BombBayDoorMoveTime);
+			COPY_VSMEMBER(DiveBrakeMoveTime);
 
-				//newAnimModel->movingYaw = myAnimModel->movingYaw;
-				//newAnimModel->headYaw = myAnimModel->headYaw;
-				//newAnimModel->torsoYaw = myAnimModel->torsoYaw;
-				//newAnimModel->legsYaw = myAnimModel->legsYaw;
+			COPY_VSARRAY(PropIsDiscSetting,ML_MAX_ENGINES);
+			//COPY_VSARRAY(PropIsDisc,ML_MAX_ENGINES);
 
-				if(false && myAnimModel->currentPose == TPS_POSETYPE_PRONE)
-				{
-					static FLOAT64 addYaw = 90.0f;
+			COPY_VSARRAY(RecoilStartTime,VEH_MAX_MOUNTS);
+			COPY_VSARRAY(RecoilPosition,VEH_MAX_MOUNTS);
+			COPY_VSARRAY(RecoilTime,VEH_MAX_MOUNTS);
 
-					FLOAT64 yaw = myAnimModel->myVehicle->PosData.Att.Yaw;
+			//COPY_VSMEMBER(GearPos);
+			//COPY_VSMEMBER(FlapPos);
 
-					yaw = -yaw;
-					yaw = mlRAD_TO_DEG(yaw);
-					yaw += addYaw;
+			//COPY_VSARRAY(CanopyPos,ML_MAX_CREW_POSITIONS);
+			//COPY_VSARRAY(HatchPos,ML_MAX_CREW_POSITIONS);
 
-					gr2NormalizeAngle(yaw);
+			//COPY_VSMEMBER(BombBayDoorPos);
+			//COPY_VSMEMBER(DiveBrakePos);
 
-					yaw = mlDEG_TO_RAD(yaw);
-					yaw = -yaw;
+			//COPY_VSARRAY(CanopyDOFVar,ML_MAX_CREW_POSITIONS);
+			//COPY_VSARRAY(HatchDOFVar,ML_MAX_CREW_POSITIONS);
 
-					newAnimModel->myVehicle->PosData.Att.Yaw = yaw;
+			//COPY_VSMEMBER(GearDOFVar);
+			//COPY_VSMEMBER(FlapDOFVar);
+			//COPY_VSMEMBER(BombBayDoorDOFVar);
+			//COPY_VSMEMBER(DiveBrakeDOFVar);
 
+			//COPY_VSARRAY(PropDiscSpinRpm,ML_MAX_ENGINES);
+			//COPY_VSARRAY(PropSpinPosDOF,ML_MAX_ENGINES);
 
-					/*
-					FLOAT64 rotation = -90.0f;
+			COPY_VSMEMBER(UseCalculatedTrackAndWheel);
+			COPY_VSARRAY(TrackPos,2);
+			COPY_VSARRAY(WheelPos,ML_MAX_GEARNUM);
+			COPY_VSMEMBER(VehicleSpeed);
 
-					newAnimModel->headYaw += rotation;
-					newAnimModel->torsoYaw += rotation;
-					newAnimModel->legsYaw += rotation;
+			COPY_VSMEMBER(AileronDeflection);
+			COPY_VSMEMBER(ElevatorDeflection);
+			COPY_VSMEMBER(RudderDeflection);
+			COPY_VSMEMBER(LastAileronDeflection);
+			COPY_VSMEMBER(LastElevatorDeflection);
+			COPY_VSMEMBER(LastRudderDeflection);
 
-					gr2NormalizeAngle(newAnimModel->headYaw);
-					gr2NormalizeAngle(newAnimModel->torsoYaw);
-					gr2NormalizeAngle(newAnimModel->legsYaw);
-					*/
+			COPY_VSMEMBER(LastAnimationVehicleSpeed);
+			COPY_VSMEMBER(LastTankFireDeltaTime);
+			COPY_VSMEMBER(LastMainGunSmokeLevel);
+			COPY_VSMEMBER(MainGunSmokeLevel);
+			COPY_VSMEMBER(CockpitSmokeLevel);
 
-					/*
-					piMATRIX rotation;
-					piMATRIX* t = &newAnimModel->myVehicle->VehicleObjectData->PlaneObject->mat;
+			/*
+			uiChatPrintLine("Adding STO vehicle at %.2f,%.2f,%.2f from my vehicle at %.2f,%.2f,%.2f.",
+				veh->PosData.Pos.x,
+				veh->PosData.Pos.y,
+				veh->PosData.Pos.z,
+				myVehicle->PosData.Pos.x,
+				myVehicle->PosData.Pos.y,
+				myVehicle->PosData.Pos.z);
+			*/
 
-					generateRotationMatrix (AROUND_Z, 90.0f, &rotation);
-					math3dMatrixMultiply(t, &rotation, t);
-					*/
-				}
-
-				/*
-				newAnimModel->currentMotion = myAnimModel->currentMotion;
-				newAnimModel->currentMove = myAnimModel->currentMove;
-				newAnimModel->currentPoint = myAnimModel->currentPoint;
-				newAnimModel->currentPoint = myAnimModel->currentPoint;
-				*/
-
-				veh->PosData.Att = myVehicle->ModelData->VehicleAtt;
-				veh->PosData.RenderAtt = myVehicle->ModelData->VehicleAtt;
-				veh->VehicleObjectData->PlaneObject->mat = myVehicle->VehicleObjectData->PlaneObject->mat;
-
-				--newAnimModel->lastUpdateTime;
-
-				// this is so each clone get's a different face
-				//snprintf((char*)veh->Handle, 10, "C%d%d", (int)vehicle->uid(), GetRandom(1000, 1000000));
-				//newAnimModel->model[0]->currentFaceID = -1;
-				//newAnimModel->model[1]->currentFaceID = -1;
-				//newAnimModel->model[2]->currentFaceID = -1;
-
-				fpProcessVehicleAnimationFlags(veh);
-				//gr2AnimPersonalize(veh->VehicleObjectData->PlaneObject, (char*)veh->Handle);
-				gr2AnimUpdateModel(veh->VehicleObjectData->PlaneObject, FALSE);
-				gr2UpdateModel(newAnimModel->skeleton, true);
-
-				++newAnimModel->lastUpdateTime;
-			}
-			else
-			{
-				// do something for vehicles
-				veh->AnimationBits = myVehicle->AnimationBits;
-				veh->PosData = myVehicle->PosData;
-				veh->PosData.AttVel.Pitch = veh->PosData.AttVel.Roll = veh->PosData.AttVel.Yaw = 0;
-				veh->PosData.AttVelSum.Pitch = veh->PosData.AttVelSum.Roll = veh->PosData.AttVelSum.Yaw = 0;
-				veh->PosData.LastUpdateAcc.x = veh->PosData.LastUpdateAcc.y = veh->PosData.LastUpdateAcc.z = 0;
-				veh->PosData.Acc.x = veh->PosData.Acc.y = veh->PosData.Acc.z = 0;
-				veh->PosData.LastUpdateAttVel.Pitch = veh->PosData.LastUpdateAttVel.Roll = veh->PosData.LastUpdateAttVel.Yaw = 0;
-				veh->PosData.Vel.x = veh->PosData.Vel.y = veh->PosData.Vel.z = 0;
-
-				veh->VehicleObjectData->PlaneObject->mat = myVehicle->VehicleObjectData->PlaneObject->mat;
-				veh->VehicleObjectData->PlaneObject->pos = myVehicle->VehicleObjectData->PlaneObject->pos;
-
-				// setup state animations
-				COPY_VSMEMBER(LastUpdateTime);
-				COPY_VSMEMBER(GearSetting);
-				COPY_VSMEMBER(FlapSetting);
-				COPY_VSARRAY(CanopySetting,ML_MAX_CREW_POSITIONS);
-				COPY_VSARRAY(HatchSetting,ML_MAX_CREW_POSITIONS);
-
-				COPY_VSMEMBER(BombBayDoorSetting);
-				COPY_VSMEMBER(DiveBrakeSetting);
-
-				COPY_VSMEMBER(GearMoveTime);
-				COPY_VSMEMBER(FlapMoveTime);
-
-				COPY_VSARRAY(CanopyMoveTime,ML_MAX_CREW_POSITIONS);
-				COPY_VSARRAY(HatchMoveTime,ML_MAX_CREW_POSITIONS);
-
-				COPY_VSMEMBER(BombBayDoorMoveTime);
-				COPY_VSMEMBER(DiveBrakeMoveTime);
-
-				COPY_VSARRAY(PropIsDiscSetting,ML_MAX_ENGINES);
-				//COPY_VSARRAY(PropIsDisc,ML_MAX_ENGINES);
-
-				COPY_VSARRAY(RecoilStartTime,VEH_MAX_MOUNTS);
-				COPY_VSARRAY(RecoilPosition,VEH_MAX_MOUNTS);
-				COPY_VSARRAY(RecoilTime,VEH_MAX_MOUNTS);
-
-				//COPY_VSMEMBER(GearPos);
-				//COPY_VSMEMBER(FlapPos);
-
-				//COPY_VSARRAY(CanopyPos,ML_MAX_CREW_POSITIONS);
-				//COPY_VSARRAY(HatchPos,ML_MAX_CREW_POSITIONS);
-
-				//COPY_VSMEMBER(BombBayDoorPos);
-				//COPY_VSMEMBER(DiveBrakePos);
-
-				//COPY_VSARRAY(CanopyDOFVar,ML_MAX_CREW_POSITIONS);
-				//COPY_VSARRAY(HatchDOFVar,ML_MAX_CREW_POSITIONS);
-
-				//COPY_VSMEMBER(GearDOFVar);
-				//COPY_VSMEMBER(FlapDOFVar);
-				//COPY_VSMEMBER(BombBayDoorDOFVar);
-				//COPY_VSMEMBER(DiveBrakeDOFVar);
-
-				//COPY_VSARRAY(PropDiscSpinRpm,ML_MAX_ENGINES);
-				//COPY_VSARRAY(PropSpinPosDOF,ML_MAX_ENGINES);
-
-				COPY_VSMEMBER(UseCalculatedTrackAndWheel);
-				COPY_VSARRAY(TrackPos,2);
-				COPY_VSARRAY(WheelPos,ML_MAX_GEARNUM);
-				COPY_VSMEMBER(VehicleSpeed);
-
-				COPY_VSMEMBER(AileronDeflection);
-				COPY_VSMEMBER(ElevatorDeflection);
-				COPY_VSMEMBER(RudderDeflection);
-				COPY_VSMEMBER(LastAileronDeflection);
-				COPY_VSMEMBER(LastElevatorDeflection);
-				COPY_VSMEMBER(LastRudderDeflection);
-
-				COPY_VSMEMBER(LastAnimationVehicleSpeed);
-				COPY_VSMEMBER(LastTankFireDeltaTime);
-				COPY_VSMEMBER(LastMainGunSmokeLevel);
-				COPY_VSMEMBER(MainGunSmokeLevel);
-				COPY_VSMEMBER(CockpitSmokeLevel);
-
-				/*
-				uiChatPrintLine("Adding STO vehicle at %.2f,%.2f,%.2f from my vehicle at %.2f,%.2f,%.2f.",
-					veh->PosData.Pos.x,
-					veh->PosData.Pos.y,
-					veh->PosData.Pos.z,
-					myVehicle->PosData.Pos.x,
-					myVehicle->PosData.Pos.y,
-					myVehicle->PosData.Pos.z);
-				*/
+			if ( myVehicle->VehicleType->Type == VEH_TYPE_PERSON ) {
+				// We still use the interpolator for offline clones, because derp.
+				veh->interpolator.ForceSync();
 			}
 
 			for(int i = 0; i < 16; i++)
@@ -7586,7 +7391,11 @@ bool _findRTBFRU(ServerTrackedObject& sto, void* cookie)
 {
 	vehVehicle* player = persGetPersonaVehiclePtr();
 
-	if(sto.type() == ServerTrackedObject::_UMS && wwiiSide(sto.flags()) == player->Side)
+	UINT16 wClass = player->VehicleType->WeaponSpec.wClass;
+	UINT16 wType = player->VehicleType->WeaponSpec.wType;
+
+	if ( sto.type() == ServerTrackedObject::_UMS && wwiiSide(sto.flags()) == player->Side &&
+	     specLoader.ppoIsSpawnAllowed(sto.subType(), wClass, wType) )
 	{
 		const WorldPosition_m& pos = sto.position();
 

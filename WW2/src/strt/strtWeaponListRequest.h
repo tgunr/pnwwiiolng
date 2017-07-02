@@ -13,7 +13,7 @@
 #pragma pack(push, 1)
 struct WeaponListRequest
 {
-	WeaponListRequest(UINT32 playerID, UINT32 brigadeID, const FULL_OBJ_ID& withFullObjID
+	WeaponListRequest(UINT32 playerID, UINT32 brigadeID, const FULL_OBJ_ID withFullObjID
 						, const PermissionMask& permMask
 						, bool allWeapons, bool isRefresh
 						)

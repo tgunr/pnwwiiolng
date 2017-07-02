@@ -15,8 +15,8 @@
 
 #cmakedefine HAVE_SIGACTION 1
 
-#cmakedefine PN_PLAYNET_PATH "${PN_PLAYNET_PATH}"
+#cmakedefine PN_PLAYNET_PATH R"!!(${PN_PLAYNET_PATH})!!"  // Use a raw string so that 'C:\Playnet' doesn't cause warnings.
 #cmakedefine PN_DISABLE_AUTH 1
+#cmakedefine PN_MEM_DEBUG 1
 
 #cmakedefine PN_DIFFERENT_PORTS 1
-

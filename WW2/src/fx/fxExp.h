@@ -65,7 +65,7 @@ struct FXEXPLOSION
     UINT32 uFlags;
 
     LOGICAL bShockWave;
-    LOGICAL bIsWater;
+    bool bIsWater;
 
     INTCOLOR expWave;
 
@@ -85,7 +85,7 @@ struct FXEXPLOSION
 extern LOGICAL fxExpCreateGenericExp(FLOAT64VECTOR* pPos, FLOAT64 fEnergy);
 extern LOGICAL fxExpDraw(SINT32 iIndex);
 extern LOGICAL fxExpInit();
-extern LOGICAL fxExpKill();
+extern void fxExpKill();
 
 /////////////////////////////
 // void return functions
@@ -103,7 +103,7 @@ extern void fxExpPushFlags(SINT32 iID, UINT32 uFlags);
 extern void fxExpSetColor(piCOLORVALUE* lpColor);
 extern void fxExpSetEmitterObject(SINT32 iID, struct OBJECT* lpObj);
 extern void fxExpSetEnergy(SINT32 iID, FLOAT64 fEnergy);
-extern void fxExpSetIsWater(SINT32 iID, LOGICAL bIsWater);
+extern void fxExpSetIsWater(SINT32 iID, bool bIsWater);
 extern void fxExpSetNormal(SINT32 iID, FLOAT32 x, FLOAT32 y, FLOAT32 z);
 extern void fxExpSetPosition(SINT32 iID, FLOAT64 x, FLOAT64 y, FLOAT64 z);
 extern void fxExpSetPowEnergy(SINT32 iID, FLOAT32 fEnergy);

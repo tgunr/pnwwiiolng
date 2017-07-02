@@ -200,6 +200,9 @@
     <Filter Include="omg\Generated Source">
       <UniqueIdentifier>{828d491a-a561-466c-b3c3-f0306ba21c09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="auth">
+      <UniqueIdentifier>{e23d7e80-2e2b-4cd4-82a7-841bbda438a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\cfg\cfgCodes.h">
@@ -1093,9 +1096,6 @@
     <ClInclude Include="..\..\src\strt\strtWOR.h">
       <Filter>strt</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sys\callstack.h">
-      <Filter>sys</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\sys\crashhandler.h">
       <Filter>sys</Filter>
     </ClInclude>
@@ -1586,7 +1586,6 @@
     <ClInclude Include="..\..\src\ogl\GLCounter.h">
       <Filter>ogl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\client_revision.h" />
     <ClInclude Include="..\..\src\dbug\dbugExtErrors.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -1626,12 +1625,6 @@
     <ClInclude Include="..\..\src\include\precompile_includes.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\imap\imapTypes.h">
-      <Filter>imap</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\math\Rand.h">
-      <Filter>math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\math\SuperFastHash.h">
       <Filter>math</Filter>
     </ClInclude>
@@ -1643,6 +1636,28 @@
     </ClInclude>
     <ClInclude Include="..\..\src\omg\omgChat.hxx">
       <Filter>omg\Generated Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\src\include\unique_opaque_ptr.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiPPOLoader.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiBackChannel.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\auth\authSteam.h">
+      <Filter>auth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\auth\authPack.h">
+      <Filter>auth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsAuthHandler.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysSteam.h">
+      <Filter>sys</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2294,9 +2309,6 @@
     <ClCompile Include="..\..\src\strt\strtUpdaterPack.cpp">
       <Filter>strt</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\sys\callstack.cpp">
-      <Filter>sys</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\sys\crashhandler.cpp">
       <Filter>sys</Filter>
     </ClCompile>
@@ -2672,9 +2684,6 @@
     <ClCompile Include="..\..\src\src\io_mapped_file.cpp">
       <Filter>fio</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\math\Rand.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\math\SuperFastHash.cpp">
       <Filter>math</Filter>
     </ClCompile>
@@ -2686,6 +2695,30 @@
     </ClCompile>
     <ClCompile Include="..\..\src\ob\obinfo.cpp">
       <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiPPOLoader.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiBackChannel.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sdm\GenerateHostTerrain.cpp">
+      <Filter>sdm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\auth\authSteam.cpp">
+      <Filter>auth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\clientConnections.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\auth\authPack.cpp">
+      <Filter>auth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsAuthHandler.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\sysSteam.cpp">
+      <Filter>sys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

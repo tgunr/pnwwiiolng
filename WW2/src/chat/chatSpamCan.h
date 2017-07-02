@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-typedef std::vector<std::string> SPAM_CAN;
+using SPAM_CAN = std::vector<std::string>;
 
 extern SPAM_CAN theSpamCan;
 extern UINT32 spamLoops;

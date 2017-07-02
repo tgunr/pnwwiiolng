@@ -72,7 +72,7 @@ extern LOGICAL fxHitHandleCollision(FASTCOLLIDE cldArray[],
                              SINT32 iIndex);
 extern LOGICAL fxHitInit();
 extern LOGICAL fxHitIsWater(FXHIT* lpExp);
-extern LOGICAL fxHitKill();
+extern void fxHitKill();
 extern LOGICAL fxHitReleaseHit(FXHIT* lpExp);
 extern LOGICAL fxHitSetHitVector(FXHIT* lpExp, FASTCOLLIDE* lpCld, SINT32 i);
 extern LOGICAL fxHitSetCollisionVectors(piVECTOR* pv1,

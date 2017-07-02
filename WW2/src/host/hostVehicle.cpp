@@ -46,7 +46,7 @@ std::map<ChatHandle, HostVehicle*> g_vehicleLookup;
 // Look up a vehicle by it's chat handle.
 
 HostVehicle*
-HostVehicle::Lookup(const ChatHandle& handle)
+HostVehicle::Lookup(const ChatHandle handle)
 {
 	auto it = g_vehicleLookup.find(handle);
 	return ( it != g_vehicleLookup.end() ? it->second : nullptr );
@@ -80,11 +80,12 @@ HostVehicleImpl::reset()
 void
 HostVehicleImpl::resetCaptureTick()
 {
-	TeulTimeMS tickInterval = (TeulTimeMS)host_config.capture.tickInterval_s * 1000;
+	// make up for fact we are sending 10 times per second and being off just slightly will result in a late arrival
+	TeulTimeMS tickInterval = (TeulTimeMS)host_config.capture.tickInterval_s * 1000 - 100;
 	// We need some kind of minimum interval, I chose 250ms.
 	if ( tickInterval == 0 )
 		tickInterval = 250;
-	m_nextCaptureTick = teulClock64 + tickInterval;
+	m_nextCaptureTick += tickInterval;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -175,17 +176,17 @@ HostVehicle::checkLocality(Teul::Packet& packet)
 		{
 #ifdef BETA_RELEASE
 			if ( nearestCP )
-				threadLog(_FLD, "v:%u c:%s approaching area of %s"
+				dbugLog(_FLD, "v:%u c:%s approaching area of %s"
 							, index
 							, callsign()
 							, nearestCP->name);
 			else if ( m_impl->m_nearCP )
-				threadLog(_FLD, "v:%u c:%s departing area of %s"
+				dbugLog(_FLD, "v:%u c:%s departing area of %s"
 							, index
 							, callsign()
 							, m_impl->m_nearCP->name);
 			else
-				threadLog(_FLD, "v:%u c:%s spawned in the wilds"
+				dbugLog(_FLD, "v:%u c:%s spawned in the wilds"
 							, index
 							, callsign()
 							);
@@ -198,7 +199,7 @@ HostVehicle::checkLocality(Teul::Packet& packet)
 	if ( bldgChanged )
 	{
 		loc.m_inCaptureBldg = m_isInCaptureBuilding;
-		if ( loc.m_inCaptureBldg )
+		if ( loc.m_inCaptureBldg && m_inBuildingObject )
 		{
 			loc.m_captureFac = m_inBuildingObject->facility->fullObjID;
 			loc.m_progress = captureProgress;
@@ -286,7 +287,7 @@ HostVehicle::initialize(VEHICLE_HOLDER* const _holder, HostVehicleImpl* const _i
 // Accept a resupply injection
 
 void
-HostVehicle::acceptResupply(UINT32 fromSerial, const ChatHandle& fromHandle, HostVehicle* fromVehicle, const UINT32 fromAddress)
+HostVehicle::acceptResupply(UINT32 fromSerial, const ChatHandle fromHandle, HostVehicle* fromVehicle, const UINT32 fromAddress)
 {
 	if ( players().empty() )
 	{
@@ -297,15 +298,12 @@ HostVehicle::acceptResupply(UINT32 fromSerial, const ChatHandle& fromHandle, Hos
 	// Remember the last people to resupply me.
 	m_impl->m_lastResupplier = fromSerial;
 
-	if ( g_logDebug )
-	{
-		Player* vehCommander = activeCommander();
-		UINT32 id = (vehCommander != nullptr) ? vehCommander->playerID() : 0;
-		dbugLog(_FLD, "p:%u c:%s v:%u accepting resupply from %s"
-						, id, callsign(), index
-						, Chat::Name(fromHandle).c_str()
-						);
-	}
+    Player* vehCommander = activeCommander();
+    UINT32 id = (vehCommander != nullptr) ? vehCommander->playerID() : 0;
+    dbugLog(_FLD, "p:%u c:%s v:%u accepting resupply from %s"
+                    , id, callsign(), index
+                    , Chat::Name(fromHandle).c_str()
+                    );
 
 	commSendClientResupplyIssue(this, fromSerial, fromHandle);
 
@@ -324,7 +322,7 @@ HostVehicle::attachControllingPlayer(const Player& player)
 {
 	assert( isRemote() == false );
 
-	dbugLog(_FLI, "t:%d p:%u c:%s attaching controller to v:%u spec:%u.%u.%u.%u sq:%u in:%u.%u.%llu.%llu"
+	dbugLog(_FLI, "t:%d p:%u c:%s attaching controller to v:%u spec:%u.%u.%u.%u sq:%u in:%u.%u.%" PR64BitUT ".%" PR64BitUT ""
 					, player.teulIndex(), player.playerID(), player.callsign(), index
 					, spec().wCountry, spec().wCategory, spec().wClass, spec().wType
 					, player.squadID()
@@ -397,7 +395,7 @@ HostVehicle::commander() const
 // How many seconds before the vehicle can despawn?
 
 static UINT32
-_despawnTimeLimit(const WEAPON_SPEC& spec, bool isInBuilding)
+_despawnTimeLimit(const WEAPON_SPEC spec, bool isInBuilding)
 {
 	// Arena sets zero despawn time.
 	if ( host_config.isArenaOpen() == false )
@@ -514,7 +512,7 @@ PLAYER_LIST& HostVehicle::players()
 // Accumulate score for resupply actions
 
 void
-HostVehicle::scoreResupply(const ChatHandle& ofHandle)
+HostVehicle::scoreResupply(const ChatHandle ofHandle)
 {
 	for ( auto pit = players().begin(); pit != players().end(); ++pit )
 	{
@@ -571,7 +569,7 @@ HostVehicle::interruptCapture()
 {
 	if ( m_impl->m_captureActive )
 	{
-		threadLog(_FLD, "p:%u c:%s v:%u interrupting capture"
+		dbugLog(_FLD, "p:%u c:%s v:%u interrupting capture"
 						, seats[0], callsign(), index);
 
 		// Determine which status to send.
@@ -594,10 +592,9 @@ HostVehicle::interruptCapture()
 void
 HostVehicle::setInstance(const Instance::Descriptor& _instance)
 {
-	if ( g_logDebug )
-		dbugLog(_FLI, "v:%u setting instance %u.%u.%llu.%llu"
-					, index
-					, _instance.category(), _instance.type(), _instance.handle(), _instance.id());
+    dbugLog(_FLD, "v:%u setting instance %u.%u.%" PR64BitUT ".%" PR64BitUT ""
+                , index
+                , _instance.category(), _instance.type(), _instance.handle(), _instance.id());
 	m_instance = _instance;
 }
 
@@ -679,8 +676,8 @@ HostVehicle::setVehicleKilled(sortieid_t bySortieID)
 	}
 
 	Scoring::Packet<Scoring::Death> packet;
-	Scoring::Actor actVictim(this);
-	Scoring::Actor actShooter;
+	Scoring::Actor actVictim{this};
+	Scoring::Actor actShooter{};
 	actShooter.setSortie(m_killedBySortieID, NULL_WEAP_SPEC, false);
 	if ( m_killedBySortieID != 0 )
 	{
@@ -848,14 +845,14 @@ HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 	{
 		if ( m_inBuildingObject )
 		{
-			threadLog(_FLD, "p:%u c:%s v:%u 0 facilityID for capture"
+			dbugLog(_FLD, "p:%u c:%s v:%u 0 facilityID for capture"
 							, seats[0], callsign(), index
 							);
 		}
 		return;
 	}
 
-	// Tell the strat host to contribute this guy to the capture
+	// Tell the strat host to contribute this player to the capture
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_CAPTURE_CONTRIB_Y));
 	outgoing.construct<Strat::CaptureContributionEvent>(
 							(Strat::CaptureContributionEvent::Status)status
@@ -867,7 +864,7 @@ HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 							,	player->brigadeID()
 						);
 	serverSendPacketToType(outgoing, STRAT_HOST);
-	threadLog(_FLD, "p:%u c:%s v:%u 0 sending cap contrib for %s"
+	dbugLog(_FLD, "p:%u c:%s v:%u 0 sending cap contrib for %s"
 				, seats[0], callsign(), index
 				, m_inBuildingObject && m_inBuildingObject->facility
 					? m_inBuildingObject->facility->name
@@ -911,15 +908,11 @@ HostVehicle::checkCapture()
 	switch ( fac.m_captureStage )
 	{
 	case FacilityStruct::_CAP_DISABLED:
-#ifdef CLOSED_BETA
 //		player->message(LSTR_BETA, LSTR_GENERIC, "Facility is not currently capturable");
-#endif
 	break;
 
 	case FacilityStruct::_CAP_PENDING:
-#ifdef BETA_RELEASE
 //		player->messagef(LSTR_BETA, LSTR_GENERIC, "Facility is not capturable for another %u seconds", fac.getCaptureRemaining());
-#endif
 		if ( m_inBuildingObject->facility->getCaptureRemaining() > 0 )
 		{
 			CaptureState capState;
@@ -930,19 +923,14 @@ HostVehicle::checkCapture()
 
 	case FacilityStruct::_CAP_ENABLED:
 	{
-#ifdef CLOSED_BETA
 //		player->messagef(LSTR_BETA, LSTR_GENERIC, "Facility is at ~%u%%, sending capture contribution", fac.m_captureCounter);
-#endif
 		sendCaptureContribution(player, Strat::CaptureContributionEvent::Active);
 
 		return;
 	}
-	break;
 
 	default:
-#ifdef BETA_RELEASE
-		player->message(LSTR_BETA, LSTR_GENERIC, "Facility in unknown capture state, not attempting capture submission");
-#endif
+        dbugLog(_FLW, "Facility in unknown capture state, not attempting capture submission");
 	break;
 	}
 
@@ -978,7 +966,7 @@ struct FullVehicle
 };
 
 // The free list.
-typedef std::vector<FullVehicle*> FREE_VEHICLES;
+using FREE_VEHICLES = std::vector<FullVehicle*>;
 static FREE_VEHICLES _freeVehicles;
 static std::vector<FullVehicle*> _allocations;
 

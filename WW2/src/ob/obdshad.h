@@ -6,11 +6,11 @@
 #define USE_NEW_SHADOWS
 #undef USE_NEW_SHADOWS
 
-extern LOGICAL obdshadInit(void);
+extern LOGICAL obdshadInit();
 extern LOGICAL obdshadCreate(struct OBJECT* lptop, struct OBJECT* lpobj);
 extern LOGICAL obdshadProject(struct OBJECT* lpobj);
 extern LOGICAL obdshadPosition(struct OBJECT* lpmain, struct OBJECT* lpobj);
-extern LOGICAL obdshadUpdate(void);
+extern LOGICAL obdshadUpdate();
 
 extern void obdshadKill();
 extern void obdBeginShadowMap();

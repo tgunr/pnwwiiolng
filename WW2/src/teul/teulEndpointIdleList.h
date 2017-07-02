@@ -4,7 +4,7 @@
 
 namespace Teul
 {
-	typedef std::list<ENDPOINT*> ENDPOINT_LIST;
+	using ENDPOINT_LIST = std::list<ENDPOINT*>;
 	extern ENDPOINT_LIST idleEndpoints;
 }
 

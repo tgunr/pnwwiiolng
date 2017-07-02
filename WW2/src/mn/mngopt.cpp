@@ -1,10 +1,13 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <ctype.h>
 #include <string.h>
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "mn/mngopt.h"
+#if platOS == OS_MACOS
+#include "sysmac/sysMacCompat.h"
+#endif
 
 enum key_TYPE
 {
@@ -53,7 +56,6 @@ static constexpr size_t sizeof_a(T (&)[N]) { return N; }
 
 //  lowercase ONLY!
 static GVAR vars[] = {
-    NULL_KEY_DEF("help", WantedHelp),
     INT_KEY_DEF("width", WantedWidth),
     INT_KEY_DEF("height", WantedHeight),
     INT_KEY_DEF("bpp", WantedBpp),
@@ -69,6 +71,7 @@ static GVAR vars[] = {
     STRING_KEY_DEF("serverotp", GameServerOTP),
     STRING_KEY_DEF("apid", ServerApID),
     STRING_KEY_DEF("serverprotocol", ServerProtocol),
+    NULL_KEY_DEF("steamlogin", UseSteamLogin),
     LOGICAL_KEY_DEF("log", WantedUserLogEnabled),
     INT_KEY_DEF("side", WantedSide),
     LOGICAL_KEY_DEF("data", WantDataDir),
@@ -86,10 +89,11 @@ static GVAR vars[] = {
     STRING_KEY_DEF("o", HackID),
     NULL_KEY_DEF("altfont", AltFont),
     STRING_KEY_DEF("authserver", gAuthServer),
+    STRING_KEY_DEF("authserverport", gAuthServerPort),
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
     STRING_KEY_DEF("datadir", DataPath),
-#ifdef DEBUG
+#ifdef DEBUG_WW2
     NULL_KEY_DEF("buildmdlonly", DebugBuildingMDLFilesOnly),
 #endif
     { nullptr, ENULL, { nullptr }, 0 },
@@ -117,74 +121,26 @@ static char* _skipFilename(const char* ptr)
 	return (char*)ptr;
 }
 
-static std::vector<std::string> split_string(const std::string &str, const std::string &delimiter, size_t max_split = SIZE_MAX)
-{
-    std::vector<std::string> strings;
-
-    std::string::size_type pos = 0;
-    std::string::size_type prev = 0;
-    while ((pos = str.find(delimiter, prev)) != std::string::npos && strings.size() < (max_split == 0 ? 0 : max_split - 1))
-    {
-        strings.push_back(str.substr(prev, pos - prev));
-        prev = pos + 1;
-    }
-    strings.push_back(str.substr(prev));
-    return strings;
-}
-
-static bool has_prefix(const std::string &str, const std::string &prefix)
-{
-    return str.compare(0, prefix.size(), prefix) == 0;
-}
-
-static std::string strtolower(const std::string &str)
-{
-    std::string result = str;
-    for (char &c : result) { c = static_cast<char>(tolower(c)); }
-    return result;
-}
-
-static std::string strtrim(const std::string &str)
-{
-    size_t snwspos = str.find_first_not_of(" \t\n\v\f\r");
-    
-    if (snwspos == std::string::npos) {
-        return "";
-    }
-    
-    size_t enwspos = str.find_last_not_of(" \t\n\v\f\r");
-    
-    if (enwspos == std::string::npos) {
-        return "";
-    }
-    
-    return str.substr(snwspos, (enwspos + 1) - snwspos);
-}
-
-LOGICAL mngoptParse(char* InputLine)
+LOGICAL mngoptParse()
 {
 	char*	ptr;
-	
-#if platOS == OS_WIN32
+
 	ptr = _skipFilename(GetCommandLineA());
-#else
-	ptr = _skipFilename(GetCommandLine());
-#endif
 
 	if ( ptr == nullptr )
 		return TRUE;
-    
+
     std::vector<std::string> args = split_string(ptr, " ");
-    
+
     for (size_t i = 0, n = args.size(); i < n; i += 2) {
         std::string cmd = strtrim(strtolower(args[i]));
         std::string value = strtrim(strtolower(i < (n - 1) ? args[i + 1] : ""));
-        
+
         if (!has_prefix(cmd, "-")) {
             break;
         }
         auto foundCmd = std::find_if(&vars[0], &vars[sizeof(vars) / sizeof(GVAR)], [c = cmd.substr(1)] (const GVAR &k) { return k.key && k.key == c; });
-        
+
         if (foundCmd == &vars[sizeof(vars) / sizeof(GVAR)]) {
 			Write_Debug("Unknown switch: '%s', '%s'", cmd.c_str(), value.c_str());
             continue;

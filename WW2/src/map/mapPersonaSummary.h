@@ -65,7 +65,7 @@ public:
 	PersonaSummary(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 	// Pack/unpack routine
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	//// ---- Member Functions ---- ////
 
@@ -118,14 +118,14 @@ public:
 	PersonaSummaries() : m_error(false), m_count(0), m_callsign(0LL), m_chatPermissions(nullChatPermissions) { }
 	PersonaSummaries(ACTION_OBJECT* const a) : m_error(false), m_count(0), m_callsign(0LL), m_chatPermissions(), m_accountGoodUntil(0) { a->offset = packer(TEUL_UNPACK, a); }
 
-    SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+    SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
 	// Returns: error < 0  /  ok >= 0
 	SINT32 send(SINT32 teulIndex);		// host "send" function
 	SINT32 receive(SINT32 teulIndex);	// client/host receive function
 
-	LOGICAL			m_error;							// True error occured
+	bool			m_error;							// True error occured
 	UINT32			m_count;							// Number of summaries described
 	ChatHandle		m_callsign;							// Player's handle
 	PersonaSummary	m_summaries[MAX_PLAYER_PERSONAS];	// Array of summaries
@@ -178,7 +178,7 @@ public:
 	SINT32 receive(SINT32 teulIndex);
 
 	// Packer
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	//// ---- Member variables ---- ////
 public:
@@ -194,7 +194,7 @@ public:
 
 	// Private host functions
 private:
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 
 	SINT32 _create(Player*);
 	SINT32 _delete(Player*);

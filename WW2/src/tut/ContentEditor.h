@@ -83,7 +83,7 @@ public:
 		Vec3d position;
 	};
 
-	typedef std::vector<ContentEditor::Point> PointList;
+	using PointList = std::vector<ContentEditor::Point>;
 
 	// describe a series of points; might be a closed loop
 	struct Line
@@ -116,7 +116,7 @@ public:
 		PointList points;
 	};
 
-	typedef std::vector<ContentEditor::Line> LineList;
+	using LineList = std::vector<ContentEditor::Line>;
 
 	struct Plan
 	{

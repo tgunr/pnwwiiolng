@@ -13,10 +13,10 @@ class physicsModel;
 class physicsBodyBase;
 class physicsCollider;
 
-typedef std::set<physicsObject*> physicsObjectSet;
-typedef std::set<physicsModel*> physicsModelSet;
+using physicsObjectSet = std::set<physicsObject*>;
+using physicsModelSet = std::set<physicsModel*>;
 
-typedef physicsObject* (PHYSICS_MODEL_FILTER) (physicsObject*, void* const);
+using PHYSICS_MODEL_FILTER = physicsObject*(*)(physicsObject*, void* const);
 
 extern void physicsInit();
 extern void physicsUpdate(int ms);
@@ -29,8 +29,8 @@ extern Vec3d& physicsGetWorldForce(const FLOAT64VECTOR& pos, bool randFallback =
 extern void physicsAddObject(physicsObject*);
 extern void physicsRemoveObject(physicsObject*, bool now = false);
 extern void physicsRemoveAllObjects(bool includeOwned = false);
-extern physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER* filter, void* const data = nullptr);
-extern bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER* filter, void* const data = nullptr);
+extern physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER filter, void* const data = nullptr);
+extern bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER filter, void* const data = nullptr);
 
 extern void physicsSetStepSize(float);
 extern void physicsSetTimeMultiplier(float);

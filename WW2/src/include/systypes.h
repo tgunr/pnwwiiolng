@@ -85,25 +85,51 @@
 //tolua_end
 
 	#define APIENTRY
-	#define PN_MAX_PATH		260
 
-	typedef LOGICAL (*SYS_DDINITFUNC)(void);
-	typedef LOGICAL (*SYS_D3DINITFUNC)(void);
-	typedef LOGICAL (*SYS_DDRENDERFUNC)(void);
-	typedef LOGICAL (*SYS_D3DRENDERFUNC)(void);
-	typedef void (*SYS_DDKILLFUNC)(void);
-	typedef void (*SYS_D3DKILLFUNC)(void);
+	using SYS_DDINITFUNC = LOGICAL(*)();
+	using SYS_D3DINITFUNC = LOGICAL(*)();
+	using SYS_DDRENDERFUNC = LOGICAL(*)();
+	using SYS_D3DRENDERFUNC = LOGICAL(*)();
+	using SYS_DDKILLFUNC = void(*)();
+	using SYS_D3DKILLFUNC = void(*)();
 
 #else
 #error "platform not defined for systypes.h!"
-#endif // OS_MACOS
+#endif
 
-struct FLOAT64VECTOR
-{
+//==============================================================================
+
+struct FLOAT64VECTOR {
 	FLOAT64 x;
 	FLOAT64 y;
 	FLOAT64 z;
 };
+
+//--------------
+
+inline FLOAT64VECTOR operator + (const FLOAT64VECTOR& v1, const FLOAT64VECTOR& v2)
+{ return { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z }; }
+
+inline FLOAT64VECTOR& operator += (FLOAT64VECTOR& v1, const FLOAT64VECTOR& v2)
+{ v1 = v1 + v2; return v1; }
+
+//--------------
+
+inline FLOAT64VECTOR operator * (const FLOAT64VECTOR& v, double s)
+{ return { v.x * s, v.y * s, v.z * s }; }
+
+inline FLOAT64VECTOR& operator *= (FLOAT64VECTOR& v, double s)
+{ v = v * s; return v; }
+
+//--------------
+
+inline FLOAT64VECTOR operator / (const FLOAT64VECTOR& v, double s)
+{ return { v.x / s, v.y / s, v.z / s }; }
+
+inline FLOAT64VECTOR operator /= (FLOAT64VECTOR& v, double s)
+{ v = v / s; return v; }
+
+//==============================================================================
 
 struct FLOAT32VECTOR
 {
@@ -138,8 +164,10 @@ using TeulTimeMS = UINT64;
 //! Teul type for a millisecond delta (signed).
 using TeulDeltaMS = SINT64;
 
-namespace Instance { typedef UINT64 UniqueID ; }
-
+//! Identifier for an arena
+using arenaid_t = uint32_t;
+//! Index for a user/customer ID
+using userid_t = uint32_t;
 //! Index for a player ID
 using playerid_t = uint32_t;
 //! Index for a sortie ID

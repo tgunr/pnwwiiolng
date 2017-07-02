@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Thu Sep 23 12:45:00 2004
 //
 // Generic Lua glue code.
@@ -205,26 +205,23 @@ bool luaRunScript(const char* script, lua_State* L)
 	}
 
 	// load up the script
-	if(fioAccess(path.c_str()))
-	{
-		int fd = fioOpen(path.c_str());
-		if(fd > -1)
-		{
-			size_t size = fioFileSize(path.c_str());
-			if(size > 0)
-			{
-				char* buffer = new char[size+1];
-				buffer[size] = '\0';
+    int fd = fioOpen(path.c_str());
+    if(fd > -1)
+    {
+        size_t size = fioFileSize(path.c_str());
+        if(size > 0)
+        {
+            char* buffer = new char[size+1];
+            buffer[size] = '\0';
 
-				if(fioRead(fd, buffer, size) == size)
-					success = luaRunObject(path.c_str(), buffer, L);
+            if(fioRead(fd, buffer, size) == size)
+                success = luaRunObject(path.c_str(), buffer, L);
 
-				delete [] buffer;
-			}
+            delete [] buffer;
+        }
 
-			fioClose(fd);
-		}
-	}
+        fioClose(fd);
+    }
 
 	if(success)
 	{
@@ -496,8 +493,7 @@ int _luaSpawn(lua_State* L)
 					if(spawner) mlSetSpawnStuff(spawner->SupercellX(), spawner->SupercellY(), spawner->Id(), 1);
 				}
 
-				WEAPON_SERIAL blah;
-                memset(&blah, 0, sizeof(WEAPON_SERIAL));
+				WEAPON_SERIAL blah={0};
 				vehcommSendVehicleRequest(vtype->VehicleTypeNum, &blah);
 
 				// call spawner
@@ -566,8 +562,7 @@ int _luaSpawnAt(lua_State* L)
 				// do old game spawn stuff here
 				mlSetSpawnStuff(0, 0, -1, 1);
 				mlSetMobileSpawnStuff(0, x, y, z);
-				WEAPON_SERIAL blah;
-                memset(&blah, 0, sizeof(WEAPON_SERIAL));
+				WEAPON_SERIAL blah={0};
 				vehcommSendVehicleRequest(vtype->VehicleTypeNum, &blah);
 				// call spawner
 				success = 1;

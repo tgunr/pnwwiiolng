@@ -25,6 +25,12 @@ struct BANDWIDTH_CHANGE
 	UINT32		mode;
 };
 
+struct NETCODE_CHANGE
+{
+	playerid_t	playerID;
+	bool        netcode;
+};
+
 struct BANDWIDTH_NOTICE
 {
 	playerid_t	playerID;
@@ -33,6 +39,6 @@ struct BANDWIDTH_NOTICE
 	bool		display;
 };
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 #include "chat/chatServerTypes.h"
 #endif

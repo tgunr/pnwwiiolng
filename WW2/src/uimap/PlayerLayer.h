@@ -12,7 +12,7 @@ struct vehVehicle;
 *************************************************************************************************/
 
 // handle, when to blink till (in frametime)
-typedef std::map<ChatHandle, SINT32> PlayerBlinkMap;
+using PlayerBlinkMap = std::map<ChatHandle, SINT32>;
 
 class PlayerLayer;
 
@@ -51,8 +51,8 @@ public:
 	virtual void RenderSuperCells(SuperCellMapView*, int scx1, int scy1, int scx2, int scy2);
 	virtual SuperCell* NewSuperCell(Renderer* r, int scx, int scy) { return 0; }
 
-	typedef std::pair<UINT64,bool> VehicleMapID;
-	typedef std::map<VehicleMapID, phui::ref_ptr<VehicleMapObject> > VehicleMap;
+	using VehicleMapID = std::pair<UINT64,bool>;
+	using VehicleMap = std::map<VehicleMapID, phui::ref_ptr<VehicleMapObject> >;
 
 	VehicleMap _vehicles;
 	int _timeout;

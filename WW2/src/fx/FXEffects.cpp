@@ -1993,7 +1993,7 @@ SINT32 OldTexId,NewTexId;
 	return NewTexId;
 }
 
-SINT32 CFXEffects::RemoveEarliestPockEntry(void)
+SINT32 CFXEffects::RemoveEarliestPockEntry()
 {
 UINT32 i;
 SINT32 EarliestTime;

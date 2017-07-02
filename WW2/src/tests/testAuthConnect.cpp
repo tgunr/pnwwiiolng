@@ -36,7 +36,7 @@ _errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALL
 	{
 		return;
 	}
-	fprintf(stderr, "%llu got error %d attempting connection\n", teulClock64, errorNo);
+	fprintf(stderr, "%" PR64BitUT " got error %d attempting connection\n", teulClock64, errorNo);
 	error = true;
 }
 
@@ -55,7 +55,7 @@ _runTest(UINT32 address)
 
 	teulSyncClock();
 	TeulTimeMS cutoff = teulClock64 + 30000;
-	printf("%llu starting\n", teulClock64);
+	printf("%" PR64BitUT " starting\n", teulClock64);
 	while ( !connected && !error && teulClock64 < cutoff )
 	{
 		teulUpdateTransport(5);
@@ -74,7 +74,7 @@ _runTest(UINT32 address)
 	}
 
 	teulSyncClock();
-	printf("%llu success.\n", teulClock64);
+	printf("%" PR64BitUT " success.\n", teulClock64);
 
 	return 0;
 }
@@ -85,7 +85,7 @@ main(int argc, char* argv[])
 {
 	Teul::ConfigVar::InitializeConfigVars();
 
-	teulInitTransport(LOG_TO_FILE, "./testAuthConnect", nullptr, nullptr);
+	teulInitTransport(LogMode::TO_FILE, "./testAuthConnect", nullptr, nullptr);
 
 	teulSyncClock();
 

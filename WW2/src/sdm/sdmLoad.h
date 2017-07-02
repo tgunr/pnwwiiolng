@@ -5,14 +5,14 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-extern void dbseLoadIndexes(void);
-extern void dbseSaveIndexChanges(void);
+void dbseLoadIndexes();
+void dbseSaveIndexChanges();
 
-extern SINT32 dbseInitStratLoader();
+SINT32 dbseInitStratLoader();
 
-extern SINT32 dbseLoadFile(SCHAR* filename);
+SINT32 dbseLoadFile(SCHAR* filename);
 
-extern SINT32 dbseResolveReferences();
+SINT32 dbseResolveReferences();
 
-extern SINT32 dbseCloseLoader();
+SINT32 dbseCloseLoader();
 

@@ -19,7 +19,7 @@ namespace Teul
 
 	//! @class Teul::ConfigVar
 	//! @brief Describes a configuration variable along with it's supposed type, default value and optional environment variable source.
-	//! @detail Configuration variables describe a runtime manipulatable game setting which starts with
+	//! @details Configuration variables describe a runtime manipulatable game setting which starts with
 	//! a compile time default value that can be superseded by a config file which can be superseded by environment variables.
 	//! The type is used to constrain how we access the variable.
 	class ConfigVar
@@ -48,6 +48,7 @@ namespace Teul
 		const char* GetDefault() const { return m_default; }
 		bool GetRequired() const { return m_required; }
 
+		bool IsInitialized() const noexcept { return m_initialized; }
 		bool IsNumber() const { return (m_type == CVT_UNSIGNED_INT || m_type == CVT_SIGNED_INT); }
 		void Set(const char* str_);
 
@@ -76,6 +77,11 @@ namespace Teul
 
 		//! Dump current config vars to stdout and exit.
 		static void PrintCurrentVars();
+
+		//! Looks up a variable by its env name and returns
+		//!  a pointer to it's value, a pointer to the empty string
+		//!  or a null pointer if the name did not match a variable.
+		static const char* GetEnv(const std::string& varName);
 
 		//! Generate a default config file to specified filename and exit.
 		static void Generate(const char* filename_);
@@ -128,9 +134,11 @@ namespace Teul
 // While that's not terribly complicated for any given compiler, it defeated
 // reasonable levels of readability to get it to work for all three platforms.
 
-typedef Teul::ConfigVar ConfigStr;
-typedef Teul::ConfigVar ConfigUint;
-typedef Teul::ConfigVar ConfigSint;
-typedef Teul::ConfigVar ConfigBool;
-typedef Teul::ConfigVar ConfigAddr;
-typedef Teul::ConfigVar ConfigPath;
+using ConfigStr = Teul::ConfigVar;
+using ConfigUint = Teul::ConfigVar;
+using ConfigSint = Teul::ConfigVar;
+using ConfigBool = Teul::ConfigVar;
+using ConfigAddr = Teul::ConfigVar;
+using ConfigPath = Teul::ConfigVar;
+
+extern const ConfigPath cv_pnPath;

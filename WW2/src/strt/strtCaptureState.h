@@ -73,7 +73,7 @@ public:	CaptureState()
 		, m_counter(0)
 		, m_spawnable(false)
 		, m_rate(0)
-#ifndef AS_SERVER
+#if platBuild == BUILD_CLIENT
 		, m_valid(false)
 #endif
 		{}
@@ -86,7 +86,7 @@ public:	CaptureState(struct ACTION_OBJECT* a)
 		{ packer(TEUL_UNPACK, a); }
 
 	// Network packer
-public:	void packer(LOGICAL mode, struct ACTION_OBJECT* a)
+public:	void packer(PackMode mode, struct ACTION_OBJECT* a)
 	{
 		a->packer(mode, &m_stage, StageBits);
 		a->packer(mode, &m_counter, 16);
@@ -123,7 +123,7 @@ public:	SINT32 GetLastContribution() const
 		return (SINT32) m_rate;
 	}
 
-#ifdef AS_SERVER
+#if platBuild == BUILD_SERVER
 	// Host function to populate
 public:	void populate(const class FacilityStruct* facility, UINT32 forSide, SINT32 rate, bool spawnable);
 	// Only used by the host

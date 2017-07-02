@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <vector>
 #include <map>
 #include <math.h>
@@ -80,7 +80,7 @@
 #endif
 
 #include <regex>
-#include <unordered_map>
+#include "wwii/wwiiHash.h"
 #define RENS std
 
 #ifdef GR2_BLEND_EDITOR
@@ -91,16 +91,9 @@
 #include "ime/imeMain.h"
 #endif
 
-#include "sys/sysWinISO.h"
-
 //#define UI_FONT_NAME "arialbd.ttf"
 //#define UI_CFONT_NAME "simhei.ttf"
 #define UI_FONT_NAME "wqy-zenhei.ttf"
-
-#ifdef TESTMAC
-//extern "C" void spawningin();
-//extern "C" void spawningout();
-#endif
 
 /************************************************************************************************
 	piGraphicsContext
@@ -182,8 +175,8 @@ static bool _holddowncursor;
 static phui::View* _terminal;
 static jsGame* _jsgame;
 static phui::View* _spawnscreen;
-typedef std::unordered_map<std::string, std::wstring> LocMap;
-typedef std::unordered_map<std::string, std::string> InputMap;
+using LocMap = std::unordered_map<std::string, std::wstring>;
+using InputMap = std::unordered_map<std::string, std::string>;
 static LocMap _locstrings;	// all translation strings; language with english fallback
 static InputMap _inputkeys;	// english only keys for input device names and functions
 static void _jsabort(const char*);
@@ -293,7 +286,7 @@ int uiInit()
 
 	// this also sets the default font for _pictx
 	if(!uiSetFontSize(cfgPrefsGetInt(cfgPrefsGetGlobalName(cfgFONT_SIZE), UI_FONT_SIZE)))
-		piExitProgram(__FILE__,__LINE__,"default font not found!");
+		piExitProgram(_FL,"default font not found!");
 
 	uiSetToolTips(cfgPrefsGetBool(cfgPrefsGetGlobalName(cfgENABLE_TOOLTIPS), true));
 
@@ -365,10 +358,6 @@ int uiInit()
 	_despawnUI		= (Online) ? "mission": "offline";
 	_despawnTab		= 0;
 	_despawnReset	= true;
-
-	// force it to chinese is region is china
-	if(gRegion == 5 && gLanguage != gRegion)
-		cfgPrefsSetGlobal(cfgLANGUAGE_CHOICE, &gRegion);
 
 	return 0;
 }
@@ -1023,7 +1012,7 @@ void uiIMEMessageProc(const MSG& m)
 }
 #endif
 
-typedef std::unordered_map<std::string, int> TexMapType;
+using TexMapType = std::unordered_map<std::string, int>;
 
 static TexMapType _texmap;
 
@@ -1175,10 +1164,6 @@ void uiGameToUI()
 
 	// run any scenario specific dot commands associated with despawning
 	SCEN_MGR->RunCommands(TUT_EVENT_DESPAWN);
-
-#ifdef TESTMAC
-//  spawningout();
-#endif
 
 	if(SCEN_MGR->IsActive() && SCEN_MGR->HasFlag(ScenarioManager::RESPAWN_ME))
 	{
@@ -1677,10 +1662,19 @@ bool uiShowBuilderInfo(const wchar_t* strat, bool on)
 
 	return true;
 }
+
 bool uiHasLocFile(const char* name)
 {
 	std::string path = munge_filename(name);
-	return fioAccess(path.c_str());
+	int fd = fioOpen(path.c_str());
+
+    fioClose(fd);
+    // Technically, this is a memory binding violation - while we "know" that fd is a
+    // simple integer value whose "success" meaning was not destroyed by a call to
+    // fioClose(), conceptually we're using an "object" that no longer "exists". However,
+    // it elides a pointless extra boolean variable or code-duplicating if-check, so we
+    // allow it for this annoying workaround for the fioAccess() design flaw.
+    return fd != -1;
 }
 
 static int fioOpenCallback(const char* name)
@@ -1741,13 +1735,6 @@ static size_t fioFileSizeCallback(const char* name)
 
 static int cfgOpenCallback(const char* name)
 {
-#if platOS == OS_MACOS
-
-  if ( strcmp("file:///etc/xml/catalog", name)==0) // suddenly mac tries to open this - missing .dtd?
-  {
-	return -1;
-  }
-#endif
 	std::string path = munge_filename(name);
 	int fd = fiocfgOpen(path.c_str(), true);
 	return fd;
@@ -1784,14 +1771,17 @@ static std::string munge_filename(const char* name)
 	{
 		std::string filename = path.substr(6);
 		path = "languages/"; path += g_szLanguages[gLanguage];
-		path += "/"; path += filename;
+		path += "/" + filename;
 
-		if(gLanguage != IDE_LANGUAGE_ENGLISH && !fioAccess(path.c_str()))
-		{
-			path = "languages/english/";
-			path += filename;
+		if(gLanguage != IDE_LANGUAGE_ENGLISH) {
+		    int fd = fioOpen(path.c_str());
+
+		    if (fd == -1) {
+        		path = "languages/english/" + filename;
+		    } else {
+		        fioClose(fd);
+		    }
 		}
-
 	}
 	else if(ext == ".uixml")
 	{
@@ -1802,31 +1792,6 @@ static std::string munge_filename(const char* name)
 	{
 		path = "fonts/";
 		path += name;
-	}
-	//else if(gRegion != IDE_LANGUAGE_ENGLISH && (ext == ".bmp" || ext == ".dds")) // check for any other language
-	else if(gRegion == IDE_LANGUAGE_CHINESE && (ext == ".bmp" || ext == ".dds")) // only check chinese for now
-	{
-		// lets see if we have any localized images; not done for english
-		std::string filename = path.substr(0, path.size() - 4);
-
-		filename += ".dds";
-
-		const char* regional = fioGetRegionalPath(filename.c_str());
-
-		if(fioAccess(regional))
-		{
-			path = regional;
-		}
-		else
-		{
-			filename.erase(filename.end() - 4, filename.end());
-			filename += ".bmp";
-
-			regional = fioGetRegionalPath(filename.c_str());
-
-			if(fioAccess(regional))
-				path = regional;
-		}
 	}
 
 	return path;
@@ -2246,75 +2211,48 @@ static void pop_gl_state()
 
 static int uiLoadImageFileToSurface(const char* Filename)
 {
-	LOGICAL		loadalpha;
-	char*		ptr;
-	static char basename[256], localname[256], tmpname[256], alphaname[256];
-	int			texid;
-	TEXTURE*	lptex;
+	int texid = -1;
 	UINT32 TransparentColor = colorMAGENTA | colorALPHA;
+    std::string basename = Filename;
 
-	strcpy(basename, Filename);
-	strlwr(basename);
+    basename = basename.substr(0, basename.find_last_of('.'));
+    for (char &c : basename) { c = tolower(c); } // assumes ASCII; this will Breaking Bad on Unicode
 
-	ptr = (char*)strrchr(basename, '.');
-	if (ptr) *ptr = 0;
-
-	texid = piGetNamedTexture(basename);
-	if (piIsTexture(texid, 0))
-	{
+	texid = piGetNamedTexture(basename.c_str());
+	if (piIsTexture(texid, 0)) {
 		piAddTexRef(texid);
-		return(texid);
-	}
-
-	strcpy(localname, basename);
-	strcpy(tmpname, localname);
-	strcat(tmpname, ".dds");
-
-	if(fioAccess(tmpname))
-	{
-		texid = ldddsLoadDDSTexture2D(tmpname, TransparentColor, LDPIX_NO_TEXTURE_GENERATE);
-		if (!piIsTexture(texid, 0))	return -1;
-
-		lptex = piGetTextureData(texid);
-		piSetTextureName(texid, localname);
 		return texid;
 	}
 
-	strcpy(localname, basename);
-	strcpy(tmpname, localname);
-	strcat(tmpname, ".bmp");
+    std::string ddsname = basename + ".dds";
 
-	if(fioAccess(tmpname))
-	{
-		loadalpha = FALSE;
+	if(piIsTexture(texid = ldddsLoadDDSTexture2D(ddsname.c_str(), TransparentColor, LDPIX_NO_TEXTURE_GENERATE), 0)) {
+		piSetTextureName(texid, const_cast<char *>(basename.c_str()));
+		return texid;
+	}
 
-		lstrcpy(alphaname, localname);
-		lstrcat(alphaname, "_alpha.bmp");
-		if (fioAccess(alphaname))
-		{
-			TransparentColor = piRGBA_SETALPHA(TransparentColor,8);
-			loadalpha = TRUE;
-		}
+    std::string bmpname = basename + ".bmp";
+    std::string alphaname = basename + "_alpha.bmp";
+	TEXTURE *lptex = nullptr;
+    int alphaFD = fioOpen(alphaname.c_str());
 
-		texid = ldbmpLoadBMPFileToSurface(tmpname, TransparentColor, 0);
-		if (!piIsTexture(texid, 0))	return -1;
-
+    fioClose(alphaFD); // This is yet another very hacky workaround for broken "need to know if it exists before using it" logic
+    if (alphaFD != -1) { // Technically a use-after-free, but FDs are just integers so it doesn't matter
+        TransparentColor = piRGBA_SETALPHA(TransparentColor, 8);
+    }
+    if (piIsTexture(texid = ldbmpLoadBMPFileToSurface(bmpname.c_str(), TransparentColor, 0), 0)) {
 		lptex = piGetTextureData(texid);
-		piSetTextureName(texid, localname);
-
-		if (loadalpha)
-		{
-			if (!ldbmpLoadBMPAlphaFileToSurface(alphaname, texid, 0))
-			{
+		piSetTextureName(texid, const_cast<char *>(basename.c_str()));
+        if (alphaFD != -1) {
+			if (!ldbmpLoadBMPAlphaFileToSurface(alphaname.c_str(), texid, 0)) {
 				piFreeMipTextures(texid);
-				return(-1);
+				return -1;
 			}
-
 			lptex->hasalpha = TRUE;
 		}
 	}
 
-	return(texid);
+	return texid;
 }
 
 /************************************************************************************************
@@ -2325,34 +2263,6 @@ void piGraphicsContext::SetTexture(int texid) { if(texid > -1) piSetActiveTextur
 void piGraphicsContext::EnableTexture() { piEnableTexture(); }
 void piGraphicsContext::DisableTexture() { piDisableTexture(); }
 void piGraphicsContext::PopState() { GLGraphicsContext::PopState(); piDisableTexture(); }
-#if(0)
-void piGraphicsContext::SetColor(float r, float g, float b, float a)
-{
-	oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(r, g, b, a));
-}
-
-void piGraphicsContext::DrawQuad(const float* coords, const float* uv)
-{
-	if(uv)
-		ogl::SetTextureUnitCoordPointer(GL_TEXTURE0, 2, GL_FLOAT, 0, (void*)&uv[0]);
-
-	ogl::SetVertexPointer(2, GL_FLOAT, 0, (void*)&coords[0]);
-	ogl::DrawArrays(GL_QUADS, 0, 4);
-}
-
-void piGraphicsContext::DrawLineStrip(int count, const float* coords, bool closed)
-{
-	ogl::SetVertexPointer(2, GL_FLOAT, 0, (void*)&coords[0]);
-	ogl::DrawArrays(closed ? GL_LINE_LOOP : GL_LINE_STRIP, 0, count);
-}
-
-void piGraphicsContext::DrawLineStrip(int count, float const* coords, bool closed, float width)
-{
-	glLineWidth((GLfloat)width);
-	DrawLineStrip(count, coords, closed);
-	glLineWidth(1.0f);
-}
-#endif
 
 int uiConsoleprintf(const char* text, ...)
 {
@@ -2368,25 +2278,21 @@ int uiConsoleprintf(const char* text, ...)
 	vsnprintf(buf, sizeof(buf) - 1, text, marker);
 	va_end(marker);
 
-	int len = 0;//printf("%s\n", buf);
-
+	int len = 0;
 	std::string out = buf;
 
 	if(!out.empty())
 	{
 		out.insert(0, "CONSOLE: ");
-
-		if(out[out.size()  - 1] != '\n')
-			out += "\n";
-
+        while (out.size() && out[out.size() - 1] == '\n') {
+            out.resize(out.size() - 1);
+        }
 		Write_Log(LOG_CONSOLE, LOG_INFO, out.c_str());
-
+        out += "\n";
 		if(display) display->AddText(out.c_str());
-
-		len = out.size();
+		return static_cast<int>(out.size());
 	}
-
-	return len;
+    return 0;
 }
 
 const wchar_t* uiUTF8toUTF16(const char* text)
@@ -2427,7 +2333,7 @@ static void _jserror(JSContext* cx, const char* message, JSErrorReport* report)
 
 	if(report->errorNumber == 137)
 	{
-		//piExitProgram(__FILE__,__LINE__, out.c_str());
+		//piExitProgram(_FL, out.c_str());
 	}
 }
 
@@ -3738,7 +3644,7 @@ JSBool jsTargetView::SetProperty(JSContext* ctx, int propid, jsval* val)
 static void _jsabort(const char* msg)
 {
 	uiConsoleprintf("JS ABORT: %s\n", msg);
-	piExitProgram(__FILE__, __LINE__, msg);
+	piExitProgram(_FL, msg);
 }
 
 void uiGC()

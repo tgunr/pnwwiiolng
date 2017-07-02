@@ -16,13 +16,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -75,6 +73,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "..\\res\\Playgate.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -85,7 +84,7 @@ STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP
 EXSTYLE WS_EX_TOPMOST | WS_EX_APPWINDOW
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_TOS,"RichEdit20W",ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,15,106,393,198
+    CONTROL         "",IDC_TOS,"RichEdit20W",WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP | 0x8c4,15,106,393,198
     PUSHBUTTON      "",IDOK,359,308,50,18
     DEFPUSHBUTTON   "",IDCANCEL,15,308,50,18
     CTEXT           "",IDC_HINT,65,308,294,18,SS_CENTERIMAGE | WS_BORDER
@@ -131,10 +130,10 @@ BEGIN
     CTEXT           "Hint",IDC_HINT,7,233,437,21,SS_CENTERIMAGE | WS_BORDER
     CONTROL         "",IDC_FTP_PROGRESS,"msctls_progress32",PBS_SMOOTH | NOT WS_VISIBLE | WS_BORDER,80,255,290,14
     GROUPBOX        "",IDS_SERVERS_GROUP,308,8,136,110
-    LTEXT           "",IDS_SERVERS_LABEL,312,18,124,8
+    LTEXT           "",IDS_SERVERS_LABEL,312,18,124,8,NOT WS_VISIBLE
     GROUPBOX        "",IDS_TOOLS_GROUP,308,119,136,113
-    RTEXT           "",IDC_VERSION_NO,384,0,66,8,0,WS_EX_TRANSPARENT
-    LTEXT           "",IDS_SERVER_NOTE,312,126,126,102
+    RTEXT           "",IDC_VERSION_NO,384,0,66,8,NOT WS_VISIBLE,WS_EX_TRANSPARENT
+    LTEXT           "",IDS_SERVER_NOTE,312,126,126,102,NOT WS_VISIBLE
 END
 
 
@@ -165,7 +164,7 @@ BEGIN
             VALUE "FileDescription", "Battleground Europe Launcher"
             VALUE "FileVersion", "0,1,1,9"
             VALUE "InternalName", "Playgate.exe"
-            VALUE "LegalCopyright", "Copyright (C) 1999-2009, Playnet Inc"
+            VALUE "LegalCopyright", "Copyright (C) 1999-2016, Playnet Inc"
             VALUE "OriginalFilename", "Playgate.exe"
             VALUE "ProductName", "Playgate: Battleground Europe Launcher"
             VALUE "ProductVersion", "0.1.1.9"
@@ -184,7 +183,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_TERMS_OF_SERVICE, DIALOG
     BEGIN
@@ -259,15 +258,26 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_PLAYGATE_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
 END
 
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

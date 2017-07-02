@@ -27,6 +27,8 @@ protected:
 	UINT32				m_playerID;
 	UINT32				m_personaID;
 	UINT32				m_squadID;
+	UINT8				m_updateMode;
+	bool				m_netcode;
 
 	UINT32				m_brigadeID;		//! Current brigade, if they are in one, or 0.
 	UINT32				m_missionID;		//! Current mission, if they are on one, or 0.
@@ -90,13 +92,12 @@ public:
 	RANK_NO	effectiveRank() const { return (m_realRank <= m_maxRank) ? m_realRank : m_maxRank; }
 	RANK_NO squadRank() const { return m_realSquadRank; }
 
-	const ChatHandle& chatHandle() const { return m_chatHandle; }
-	const ChatHandle& matchHandle() const { return m_matchHandle; }
-	const ChatHandle& squadHandle() const { return m_squadHandle; }
+	ChatHandle chatHandle() const { return m_chatHandle; }
+	ChatHandle matchHandle() const { return m_matchHandle; }
+	ChatHandle squadHandle() const { return m_squadHandle; }
 
 	UINT32 weaponSpecNo() const { return m_weaponSpecNo; }
-	const struct WEAPON_SPEC& weaponSpec() const { return *((const WEAPON_SPEC*)&m_weaponSpecNo); }
-	struct WEAPON_SPEC& weaponSpec() { return *((WEAPON_SPEC*)&m_weaponSpecNo); }
+	WEAPON_SPEC weaponSpec() const { return m_weaponSpecNo; }
 
 	const PermissionMask& permissionMask() const { return m_permissionMask; }
 
@@ -105,13 +106,13 @@ public:
 
 	const char* callsign() const { return dispatch().m_callsign; }
 
-	WWII_SIDE side() const { return (WWII_SIDE)m_side; }
-	WWII_COUNTRY country() const { return (WWII_COUNTRY)m_country; }
+	WWII_SIDE side() const { return static_cast<WWII_SIDE>(m_side); }
+	WWII_COUNTRY country() const { return static_cast<WWII_COUNTRY>(m_country); }
 	BRANCH_ENUM branch() const { return m_branch; }
 
 	//// Member functions
 public:
-	bool hasHandle(const ChatHandle& testHandle) const
+	bool hasHandle(const ChatHandle testHandle) const
 	{
 		return this->m_matchHandle == testHandle || this->m_chatHandle == testHandle;
 	}
@@ -129,6 +130,9 @@ public:
 	bool isOfficer() const;	//! If the player is CURRENTLY an officer.
 	bool isPlaynet() const { return this->permissions(IS_PLAYNET); }
 	bool isTrainer() const { return this->permissions(GAME_TRAINER); }
+
+	bool GetNetcode() { return m_netcode; }
+	UINT8 GetUpdateMode() { return m_updateMode; }
 
 	virtual bool message(int prefix, int msgid, const char* const p0="", const char* const p1="", const char* const p2="", const char* const p3="", const char* const p4="", const char* const p5="") const;
 	bool message(int prefix, int msgid, const std::string& text) const { return message(prefix, msgid, text.c_str()); }
@@ -159,6 +163,9 @@ protected:
 public:	///TODO:INST make me protected
 	virtual void ExitBrigade(UINT32 /*exitState*/) { m_brigadeID = 0; }
 	virtual void SetCountry(WWII_COUNTRY toCountry, WWII_SIDE toSide);
+
+	void SetNetcode(bool netcode) { m_netcode = netcode; }
+	void SetUpdateMode(UINT8 updateMode) { m_updateMode = updateMode; }
 
 public:
 	void setDisconnected() { m_teulIndex = -1; }

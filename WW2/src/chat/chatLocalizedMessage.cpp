@@ -14,6 +14,7 @@
 #include "chat/chatLocalizedMessage.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiPlayer.h"
+#include "RakNetTypes.h"
 #include "teul/teulBasic.h"
 
 //	------------------------------	Declarations
@@ -35,8 +36,10 @@ SINT32
 wwiiRegisterPlayerMessageCallback()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
+	{
 		REGISTER_SENDER(Chat::LOCALIZED_MESSAGE_Y, _sendLocalisedMessage, Chat::_SEND_LOCALIZED_MESSAGE);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////

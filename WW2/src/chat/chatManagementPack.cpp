@@ -17,7 +17,7 @@ using namespace Chat;
 // Pack the version 2 management structure
 
 SINT32
-ManagementLogin2::packer(LOGICAL mode, ACTION_OBJECT* a)
+ManagementLogin2::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->packer(mode, &m_version);
 	a->packer(mode, &m_wantHandle);

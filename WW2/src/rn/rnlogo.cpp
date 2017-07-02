@@ -1,6 +1,7 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <stdarg.h>
 
+#include "build_info.hpp"
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "rn/rnlogo.h"
@@ -8,7 +9,6 @@
 #include "gmlp/gmlpmain.h"
 #include "dimain.h"
 #include "imap/iac.h"
-#include "versionNo.h"
 #include "cfg/cfgPrefs.h"
 #include "ui/uiMovieView.h"
 #include "fio/fiod.h"
@@ -23,7 +23,7 @@
 	rnlogo
 *************************************************************************************************/
 
-#if RELEASE_CLIENT != 0
+#if RELEASE_CLIENT != 0 && !defined(DEBUG_WW2)
 #define DISPLAY_LOGO
 #endif
 
@@ -42,7 +42,7 @@ static phui::View* _status;
 static SINT32 _startloadtime;
 static SINT32 _totalloadtime = 10000*60;
 
-extern void UpdateGameClocks(void);
+extern void UpdateGameClocks();
 static bool _keyEntered();
 static bool _isWidescreen();
 
@@ -59,15 +59,11 @@ static const char* _stdSplashScreen = "data/screens/splashscreen43.bmp";
 static const char* _wideLoadingScreen = "data/screens/loadingscreen69.bmp";
 static const char* _stdLoadingScreen = "data/screens/loadingscreen43.bmp";
 
-#ifdef TESTMAC
-std::string currentLoadString;
-#endif
-
 /************************************************************************************************
 	rnlogoInit
 *************************************************************************************************/
 
-LOGICAL rnlogoInit(void)
+LOGICAL rnlogoInit()
 {
 	_keyEntered(); // eat any events that may be in the queue
 
@@ -97,22 +93,11 @@ LOGICAL rnlogoInit(void)
 	phui::View* version = _loadingscreen->FindView("version");
 	if(version)
     {
-        std::string str = STRVER;
+        std::string str = PN_product_version_string;
 
-		// For debug and beta releases, append the commit info.
+		// Append the commit info.
 		str += " : ";
-		str += WWII::gitCommitStr;
-
-#if(0)
-        if(ogl::UseDeprecatedPath())
-        {
-            str += " - deprecated path";
-        }
-        else
-        {
-            str += " - new path";
-        }
-#endif
+		str += PN_code_git_commitish_string + std::string(PN_data_git_commitish_string);
 
         version->SetValue(str.c_str());
     }
@@ -126,7 +111,7 @@ LOGICAL rnlogoInit(void)
 	rnlogoRender
 *************************************************************************************************/
 
-LOGICAL rnlogoRender(void)
+LOGICAL rnlogoRender()
 {
 	piSetDDRender(nullptr);
 
@@ -142,10 +127,10 @@ LOGICAL rnlogoRender(void)
 	rnlogoKill
 *************************************************************************************************/
 
-void rnlogoKill(void)
+void rnlogoKill()
 {
 
-#if (platOS == OS_WIN32) && (RELEASE_CLIENT != 0)
+#if (platOS == OS_WIN32) && (RELEASE_CLIENT != 0) && !defined(DEBUG_WW2)
 	// This is used to force the foreground, active and focus window to be ours.
 	// Some players were changing active windows during game loadup and causing
 	// the game to lose active inputs. We use this to force our app to be the
@@ -188,7 +173,7 @@ void rnUpdateLoadingScreen ()
 	// This block of code allows us to terminate the program during the loading screen display
 	// Also, during Debugging, Alt+Tab works correctly (if not a full screen app)
 	if (!running)
-		piExitProgram(__FILE__, __LINE__, "Exit requested during startup");
+		piExitProgram(_FL, "Exit requested during startup");
 }
 
 /************************************************************************************************
@@ -217,10 +202,6 @@ void rnUpdateLoadingEnd()
 	gAppPrefs->ReplaceOrAddLong(CFG_APP_LOADTIME, _totalloadtime);
 }
 
-#ifdef TESTMAC
-//void memtestnote();
-#endif
-
 /************************************************************************************************
 	rnlogoUpdateStatus
 *************************************************************************************************/
@@ -236,10 +217,6 @@ void rnlogoUpdateStatus(const char* str, ...)
 		char buf[128];
 		vsnprintf(buf, 127, str, marker);
 		va_end(marker);
-#ifdef TESTMAC
-//    currentLoadString = buf;
-//    memtestnote();
-#endif
 		_status->SetValue((uiLocString(buf)).c_str());
 	}
 	rnUpdateLoadingScreen();

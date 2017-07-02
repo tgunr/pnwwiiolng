@@ -744,16 +744,14 @@ void ParticleManager::computebillboard()
 //////////////////////////////////////////////////////////////////////
 SINT32 _backtofront(Particle* l, Particle* r)
 {
-#if platOS == OS_MACOS
-  if ( l == NULL )  // hack for mac particle null ctd
-  {
-    return 0;
-  }
-  if ( r == NULL )
-  {
-    return 1;
-  }
-#endif
+    if ( l == NULL )
+    {
+        return 0;
+    }
+    if ( r == NULL )
+    {
+        return 1;
+    }
 
     return l->_distance2 > r->_distance2;
 }
@@ -1059,13 +1057,12 @@ void ParticleManager::draw(float distance2, int& fxindex)
     {
         p = _draw[fxindex];
 
-#if platOS == OS_MACOS
         if ( p == NULL ) // hack for mac particle null ctd
         {
           fxindex++;
           continue;
         }
-#endif
+
         // Only draw selected particles so it sorts correctly among transparent objects.
         // Particles sorted back to front
         if(p->_distance2 < distance2)

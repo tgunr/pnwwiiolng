@@ -104,7 +104,7 @@
     <Lib />
     <Lib>
       <AdditionalDependencies>xmlparse.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)WW2\lib\win\3rdparty</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)WW2\lib\win\Debug\3rdparty</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -125,7 +125,6 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <OpenMPSupport>true</OpenMPSupport>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <AssemblerOutput>
@@ -138,9 +137,8 @@
       <ControlFlowGuard>false</ControlFlowGuard>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
       <CompileAsManaged>false</CompileAsManaged>
-      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -148,7 +146,7 @@
     </ResourceCompile>
     <Lib>
       <AdditionalDependencies>xmlparse.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)WW2\lib\win\3rdparty</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)WW2\lib\win\Release\3rdparty</AdditionalLibraryDirectories>
       <ForceSymbolReferences>
       </ForceSymbolReferences>
     </Lib>
@@ -194,7 +192,7 @@
     </ResourceCompile>
     <Lib>
       <AdditionalDependencies>xmlparse.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)WW2\lib\win\3rdparty</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)WW2\lib\win\Debug\3rdparty</AdditionalLibraryDirectories>
       <ForceSymbolReferences>
       </ForceSymbolReferences>
     </Lib>

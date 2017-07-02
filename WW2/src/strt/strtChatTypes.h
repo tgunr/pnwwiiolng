@@ -24,13 +24,13 @@ static const int OOB_STRING_SIZE = OOB_STRING_LEN + 1;
 class OOBMessage
 {
 public:
-	OOBMessage(UINT32 playerID, UINT32 brigadeID, const ChatHandle& handleID, const char* command, const char* arguments
-				, const FULL_OBJ_ID& cpID, WWII_SIDE side, WWII_COUNTRY country);
+	OOBMessage(UINT32 playerID, UINT32 brigadeID, const ChatHandle handleID, const char* command, const char* arguments
+				, const FULL_OBJ_ID cpID, WWII_SIDE side, WWII_COUNTRY country);
 	OOBMessage();
 	OOBMessage(ACTION_OBJECT* const a);
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	void send();
 
 	// Used by the host
@@ -60,7 +60,7 @@ enum
 // And so we can tell how big the list is :)
 ,	SC_NUM_COMMANDS
 };
-typedef UINT32 SCMD_ENUM;
+using SCMD_ENUM = UINT32;
 
 // Result codes for strat commands
 enum
@@ -92,7 +92,7 @@ enum
 // And finally:
 ,	SCMD_ERROR						// Must always be the last
 };
-typedef UINT32 SCMD_RESULT;
+using SCMD_RESULT = UINT32;
 
 enum
 {
@@ -122,16 +122,16 @@ public:
 
 	// Code that actually handles the SCMD result;
 	// eventually this should exist on both sides of the connection
-	void process(void);
+	void process();
 
 	~StratCommand() { }
 
 	SINT32 send();
 
-	SINT32 pack(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 pack(PackMode mode, ACTION_OBJECT* a);
 
 	bool describe() const;
 };
 
-typedef std::pair<UINT32,UINT32> POPULATION;
+using POPULATION = std::pair<UINT32,UINT32>;
 

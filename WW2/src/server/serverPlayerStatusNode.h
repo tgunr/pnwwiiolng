@@ -35,7 +35,7 @@ public:
 	playerid_t		id;			// playerid
 	SINT32			teulIndex;
 	UINT32			host;
-	LOGICAL			inAuth;
+	bool			inAuth;
 	UINT32			logins;
 	Server::PlayerStatus			status;
 	Server::Transfer::XferReason	xferState;
@@ -45,7 +45,6 @@ public:
 
 	Teul::TimeMS	timeStamp;
 	void*			localInfo;
-	void*			sessionInfo;
 
 	UINT32			serviceID;
 };

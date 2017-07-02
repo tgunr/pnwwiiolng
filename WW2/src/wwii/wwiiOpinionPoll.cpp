@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Fri Jul 29 11:42:03 CDT 2005
 //
 // Functions for the opinion poll class
@@ -61,17 +61,14 @@ OpinionPoll::addEntry(const char* newEntry)
 	if ( newEntry == nullptr )
 		*dest = 0;
 	else
-	{
-		strncpy(dest, newEntry, _MAX_STRING_LEN);
-		dest[_MAX_STRING_LEN] = 0;
-	}
+		strsafecpy(dest, newEntry, _MAX_STRING_LEN);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Packer function
 
 SINT32
-OpinionPoll::packer(LOGICAL mode, ACTION_OBJECT* a)
+OpinionPoll::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_pollID, 0);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_size, 8);
@@ -90,7 +87,7 @@ OpinionPoll::packer(LOGICAL mode, ACTION_OBJECT* a)
 // Packer function for OpinionChoice
 
 SINT32
-OpinionChoice::packer(LOGICAL mode, ACTION_OBJECT* a)
+OpinionChoice::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_pollID, 0);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_choice, 8);

@@ -77,7 +77,7 @@ public:	// Templated so it can accept char* or wchar_t*
 		// Test wwiiPackHandle on a whole series of offsets.
 		for ( UINT32 baseOffset = 0; baseOffset <= GAME_HANDLE_BITS * 2; ++baseOffset )
 		{
-			sprintf(packBuffer, "%u bits offset", baseOffset);
+			strprintf(packBuffer, "%u bits offset", baseOffset);
 			TestFocus(packBuffer);
 
 			ChatHandle dest = 0;
@@ -126,7 +126,7 @@ ChatHandleTestUnit::Run()
 
 		START_SUB_STAGE( "char->wide->char" )
 
-			strcpy(plainCallsign, FIRST_TEST);
+			strsafecpy(plainCallsign, FIRST_TEST);
 			WWII::ConvertChars(plainCallsign, wideCallsign, sizeof(wideCallsign));
 			plainCallsign[0] = 0;
 			WWII::ConvertChars(wideCallsign, plainCallsign, sizeof(plainCallsign));
@@ -360,7 +360,7 @@ ChatHandleTestUnit::Run()
 			CRITICAL( ExpectTrue(name.Empty()) );
 			CRITICAL( ExpectFalse(name.IsValid()) );
 			CRITICAL( ExpectFalse(name.c_str() == nullptr) &&
-					  ExpectFalse(static_cast<const char*>(name) == nullptr) 
+					  ExpectFalse(static_cast<const char*>(name) == nullptr)
 					  );
 			CRITICAL( ExpectFalse(name.IsWideCallsign()) );
 			CRITICAL( ExpectEqual(name.Handle(), 0ULL) &&
@@ -380,7 +380,7 @@ ChatHandleTestUnit::Run()
 			CRITICAL( ExpectFalse(name.Empty()) );
 			CRITICAL( ExpectTrue(name.IsValid()) );
 			CRITICAL( ExpectFalse(name.c_str() == nullptr) &&
-					  ExpectFalse(static_cast<const char*>(name) == nullptr) 
+					  ExpectFalse(static_cast<const char*>(name) == nullptr)
 					  );
 			CRITICAL( ExpectFalse(name.IsWideCallsign()) );
 			CRITICAL( ExpectTrue(name.Handle() != 0ULL) &&
@@ -405,7 +405,7 @@ ChatHandleTestUnit::Run()
 			CRITICAL( ExpectFalse(name.Empty()) );
 			CRITICAL( ExpectTrue(name.IsValid()) );
 			CRITICAL( ExpectFalse(name.c_str() == nullptr) &&
-					  ExpectFalse(static_cast<const char*>(name) == nullptr) 
+					  ExpectFalse(static_cast<const char*>(name) == nullptr)
 					  );
 			CRITICAL( ExpectFalse(name.IsWideCallsign()) );
 			CRITICAL( ExpectEqual(name.Handle(), handle) &&
@@ -506,7 +506,7 @@ ChatHandleTestUnit::Run()
 		tempName.format("temp%d", n);
 
 		CRITICAL( ExpectEqual(strcmp(firstName, "first"), 0) && ExpectEqual(strcmp(secondName, "second"), 0) );
-		
+
 	END_TEST_STAGE( "Static functions" )
 
 	return true;

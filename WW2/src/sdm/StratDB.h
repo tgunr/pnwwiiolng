@@ -17,14 +17,14 @@ namespace StratDB
 
 class StratObject;
 
-typedef std::vector<StratObject*> StratObjList;
-typedef int (*stratDatafn)(int scx, int scy, sdm_strat_data*);
+using StratObjList = std::vector<StratObject*>;
+using stratDatafn = int(*)(int scx, int scy, sdm_strat_data*);
 
 int Init(stratDatafn);
 void Kill();
 
 StratObject* FindStratObject(const sdm_full_obj_id&);
-StratObject* FindStratObject(const FULL_OBJ_ID&);
+StratObject* FindStratObject(const FULL_OBJ_ID);
 StratObject* FindStratObject(const char* cp, const char* fac = nullptr);
 
 // returns a list of objects with klass and type starting from start
@@ -91,6 +91,7 @@ public:
 	StratObject(sdm_cp const&, int sx, int sy);
 	StratObject(sdm_facility const&, int sx, int sy);
 	StratObject(sdm_building const&, int sx, int sy);
+	virtual ~StratObject() {}
 
 	// Comparison operator == just compare addresses (so that nullptr ptr compares work too)
 	bool operator==(const StratObject& rhs) const { return this == &rhs; }
@@ -110,8 +111,8 @@ public:
 	void SetIndex(unsigned int i) { _index = i; }
 	unsigned int GetIndex() const { return _index; }
 
-typedef std::vector<StratObject*> ChildList;
-typedef std::vector<UINT32> UnitList;
+using ChildList = std::vector<StratObject*>;
+using UnitList = std::vector<UINT32>;
 
 	ChildList ChildStratObjects() const;
 
@@ -125,7 +126,7 @@ typedef std::vector<UINT32> UnitList;
 
 	bool IsSpawnable() const;
 	bool IsDeepWaterPort() const;
-	bool IsRelated(const FULL_OBJ_ID& id) const;
+	bool IsRelated(const FULL_OBJ_ID id) const;
 	bool IsRelated(const StratDB::StratObject* strat) const;
 
 	StratDB::StratObject* GetLinkedDepot() const;

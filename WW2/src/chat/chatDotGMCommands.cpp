@@ -10,7 +10,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
 #include "server/serverReleaseTypeEnum.h"
 #include "server/serverInterface.h"
 
@@ -52,7 +51,9 @@
 #include "wwii/wwiiThreads.h"
 
 extern void serverBroadcastClusterShutdown();
-extern void chatSendChatLog(const playerid_t& subjectID, const ChatHandle& requester);
+extern void chatSendChatLog(const playerid_t subjectID, const ChatHandle requester);
+
+using Chat::ARGV;
 
 //////////////////////////////////////////////////////////////////////
 // Private variables
@@ -76,7 +77,7 @@ _smite(Player* target)
 {
 	if ( target == nullptr ) return;
 
-	// Yes, use the broadcast index because we don't know where this guy is
+	// Yes, use the broadcast index because we don't know where this player is
 	///FIXME: We should know where this player is, thank you teul
 	chatSmitePlayer(target->playerID());
 
@@ -285,11 +286,11 @@ public:
 		target->message(LSTR_WARNING, LSTR_GM_MOVED_YOU, args[1]);
 
 		std::string note = args[1];
-                DBThread::EscapeString(note);
+		DBThread::EscapeString(note);
 
 		if ( note.length() > 400 )
 			note.resize(400);
-		DBThread::Do(DBThread::Default, "CALL wwii.p_add_player_note('%s', %u, 3, '%s')", target->callsign(), player.playerID(), note.c_str());
+		DBThread::Do(DBThread::Default, "CALL `wwii`.`p_add_player_note`('%s', %u, 3, '%s')", target->callsign(), player.playerID(), note.c_str());
 
 		PREP_CHAT_MSG(cmsg, "%s bumping %s: %s", player.callsign(), target->callsign(), args[1]);
 		chatDispatchGMMessage("INFO", cmsg);
@@ -349,16 +350,9 @@ public:
 		}
 
 		FLOAT64VECTOR location;
-		static const ChatHandle snail = chatGetLowercaseHandle("snail");
-		if (player.matchHandle() == snail && (target->playerID() == 3204 || target->playerID() == 833))
-		{
-			location.x = location.y = location.z = 0;
-		} else
-		{
-			location.x = target->lastX();
-			location.y = target->lastY();
-			location.z = target->lastZ();
-		}
+        location.x = target->lastX();
+        location.y = target->lastY();
+        location.z = target->lastZ();
 
 		player.gmNote("GM", command(), args[0], args[1]);
 		PREP_CHAT_MSG(cmsg, "%s /buzzardspawning %s: %s", player.callsign(), target->callsign(), args[1]);
@@ -377,7 +371,7 @@ public:
 //! @internal
 class ChatHistory : public DBThreadQuery
 {
-public:	ChatHistory(const playerid_t& playerID_, const ChatHandle& requester_)
+public:	ChatHistory(const playerid_t playerID_, const ChatHandle requester_)
 	: DBThreadQuery(DBThread::Audit, "ChatHistoryQuery", DBThreadQuery::_CALLBACK
 	, "SELECT logged, message FROM `audit`.`chat_messages`"
 	" WHERE player_id = %u"
@@ -443,7 +437,7 @@ public:
 };
 
 void
-	chatSendChatLog(const playerid_t& subjectID, const ChatHandle& requester)
+	chatSendChatLog(const playerid_t subjectID, const ChatHandle requester)
 {
 	(new ChatHistory(subjectID, requester))->Queue();
 }
@@ -475,7 +469,7 @@ public:
 			return;
 		}
 
-		const ChatHandle handle = chatGetHandle(args[0]);
+		ChatHandle handle = chatGetHandle(args[0]);
 		const Player* const subject = PlayerInterface::Lookup(handle);
 		if (subject == nullptr)
 		{
@@ -583,8 +577,7 @@ public:
 		if (!allow(player)) return false;
 		player.message(LSTR_USAGE, LSTR_GENERIC, "'/debug <condition> on|off'");
 		player.message(LSTR_DETAIL, LSTR_GENERIC, "Sets or clears a debug logging condition on the chat host.");
-		player.message(LSTR_DETAIL, LSTR_GENERIC, "Conditions are: debug, radios, squads, personas and chat.");
-		player.message(LSTR_NOTE, LSTR_GENERIC, "Condition 'debug' is a master setting for all other conditions.");
+		player.message(LSTR_DETAIL, LSTR_GENERIC, "Conditions are: radios, squads, personas and chat.");
 		return true;
 	}
 
@@ -601,7 +594,6 @@ public:
 		static std::map<std::string, bool*> conditions;
 		if (conditions.empty())
 		{
-			conditions["debug"] = &g_logDebug;
 			conditions["radios"] = &g_debugRadios;
 			conditions["squads"] = &g_debugSquads;
 			conditions["personas"] = &g_debugPersonas;
@@ -862,9 +854,9 @@ public:
 
 		char cmsg[MAX_MESSAGE_LENGTH+1];
 		if ( args.size() > 1 && args[1][0] != 0 )
-			snprintf(cmsg, MAX_MESSAGE_LENGTH, "%s grabbing %s: %s", player.callsign(), target->callsign(), args[1]);
+			strprintf(cmsg, "%s grabbing %s: %s", player.callsign(), target->callsign(), args[1]);
 		else
-			snprintf(cmsg, MAX_MESSAGE_LENGTH, "%s grabbing %s", player.callsign(), target->callsign());
+			strprintf(cmsg, "%s grabbing %s", player.callsign(), target->callsign());
 		chatDispatchGMMessage("INFO", cmsg);
 
 		// I want to know if the sender is currently afk'd
@@ -946,7 +938,7 @@ public:
 		_smite(target);
 
 		std::string sqlReason = (reason ? reason : "<no reason given>");
-                DBThread::EscapeString(sqlReason);
+		DBThread::EscapeString(sqlReason);
 
 		DBThread::Do(DBThread::Default, "CALL `wwii`.`p_add_player_note`('%s',%u,4,'%s')", target->callsign(), player.playerID(), sqlReason.c_str());
 	}
@@ -1058,9 +1050,9 @@ public:
 class LastCapQuery : public DBThreadQuery
 {
 public:
-	LastCapQuery(const ChatHandle& byMatchID, const char* clause)
+	LastCapQuery(const ChatHandle byMatchID, const char* clause)
 		: DBThreadQuery(DBThread::Default, "LastCapQuery", DBThreadQuery::_CALLBACK
-			, "SELECT * FROM `strat`.`v_last_captures` %s LIMIT 8", clause
+			, "SELECT * FROM `wwiionline`.`v_last_captures` %s LIMIT 8", clause
 			)
 		, m_matchID(byMatchID)
 		, m_results()
@@ -1140,9 +1132,9 @@ public:
 		if ( property != nullptr )
 		{
 			if ( property->IsCP() )
-				snprintf(clause, MAX_MESSAGE_LENGTH, "WHERE cp_oid = %u", property->OID());
+				strprintf(clause, "WHERE cp_oid = %u", property->OID());
 			else if ( property->IsFacility() )
-				snprintf(clause, MAX_MESSAGE_LENGTH, "WHERE facility_oid = %u", property->OID());
+				strprintf(clause, "WHERE facility_oid = %u", property->OID());
 			player.gmNote("GM", command(), property->Name(), nullptr);
 		}
 		else
@@ -1167,12 +1159,12 @@ public:
 		if ( i == ALLIED )
 		{
 			player.gmNote("GM", command(), "allied", nullptr);
-			snprintf(clause, MAX_MESSAGE_LENGTH, "AND ctry IN (1,2,3,7,8)");
+			strprintf(clause, "AND ctry IN (1,2,3,7,8)");
 		}
 		else if ( i == AXIS )
 		{
 			player.gmNote("GM", command(), "axis", nullptr);
-			snprintf(clause, MAX_MESSAGE_LENGTH,  "AND ctry IN (4,5,6)");
+			strprintf(clause, "AND ctry IN (4,5,6)");
 		}
 		else
 		{
@@ -1180,13 +1172,13 @@ public:
 			if ( i > WWII_NO_COUNTRY )
 			{
 				player.gmNote("GM", command(), _countryName[i], nullptr);
-				snprintf(clause, MAX_MESSAGE_LENGTH, "AND ctry = %u", i);
+				strprintf(clause, "AND ctry = %u", i);
 			}
 			else
 			{
 				Chat::Name callsign(chatGetHandle(arguments));
 				player.gmNote("GM", command(), callsign.c_str(), nullptr);
-				snprintf(clause, MAX_MESSAGE_LENGTH, "AND call = '%s'", callsign.c_str());
+				strprintf(clause, "AND call = '%s'", callsign.c_str());
 			}
 		}
 
@@ -1202,9 +1194,9 @@ public:
 class LastDeathsQuery : public DBThreadQuery
 {
 public:
-	LastDeathsQuery(const ChatHandle& requester, const ChatHandle& handleID)
+	LastDeathsQuery(const ChatHandle requester, const ChatHandle handleID)
 		: DBThreadQuery(DBThread::Default, "LastDeathsQuery", DBThreadQuery::_CALLBACK
-							, "CALL wwii.p_get_last_killers('%s')"
+							, "CALL `wwii`.`p_get_last_killers`('%s')"
 								, Chat::Name(handleID).c_str())
 		, m_requesterID(requester)
 		, m_callsign(handleID)
@@ -1309,9 +1301,9 @@ public:
 class LastKillsQuery : public DBThreadQuery
 {
 public:
-	LastKillsQuery(const ChatHandle& requester, const ChatHandle& handleID)
+	LastKillsQuery(const ChatHandle requester, const ChatHandle handleID)
 		: DBThreadQuery(DBThread::Default, "LastKillsQuery", DBThreadQuery::_CALLBACK
-						, "CALL wwii.p_get_last_kills('%s')"
+						, "CALL `wwii`.`p_get_last_kills`('%s')"
 							, Chat::Name(handleID).c_str())
 		, m_requesterID(requester)
 		, m_callsign(handleID)
@@ -1649,21 +1641,21 @@ public:
 			Player* co = PlayerInterface::Lookup(oldCO);
 			if ( co )
 			{
-				player.message(LSTR_CAUTION, LSTR_SQUAD_CO_ONLINE, squad.shortName(), co->callsign());
+				player.message(LSTR_CAUTION, LSTR_SQUAD_CO_ONLINE, squad.callsign().c_str(), co->callsign());
 				return;
 			}
 			else if ( !force )
 			{
-				player.message(LSTR_CAUTION, LSTR_MAKECO_USE_FORCE, squad.shortName(), Chat::Name(oldCO).c_str());
+				player.message(LSTR_CAUTION, LSTR_MAKECO_USE_FORCE, squad.callsign().c_str(), Chat::Name(oldCO).c_str());
 				return;
 			}
 		}
 
 		list->appointNewCO(subject->matchHandle(), subject);
 
-		player.gmNote("GM", command(), arguments, squad.shortName());
-		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_MAKECO_APPOINTED, subject->callsign(), squad.shortName());
-		player.message(LSTR_NOTE, LSTR_MAKECO_APPOINTED, subject->callsign(), squad.shortName());
+		player.gmNote("GM", command(), arguments, squad.callsign().c_str());
+		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_MAKECO_APPOINTED, subject->callsign(), squad.callsign().c_str());
+		player.message(LSTR_NOTE, LSTR_MAKECO_APPOINTED, subject->callsign(), squad.callsign().c_str());
 	}
 } dotMakeCO;
 
@@ -1675,9 +1667,9 @@ public:
 class QueryPlayerInfo : public DBThreadQuery
 {
 public:
-	QueryPlayerInfo(const ChatHandle& byMatchID, const ChatHandle& handle)
+	QueryPlayerInfo(const ChatHandle byMatchID, const ChatHandle handle)
 		: DBThreadQuery(DBThread::Default, "QueryPlayerInfo", DBThreadQuery::_CALLBACK
-							, "CALL auth.p_get_player_details((SELECT playerid FROM wwiionline.wwii_player WHERE callsign = '%s'), %u)"
+							, "CALL `auth`.`p_get_player_details`((SELECT playerid FROM `wwiionline`.`wwii_player` WHERE callsign = '%s'), %u)"
 								, Chat::Name(handle).c_str(), Server::myServerInfo.stats.arenaID
 							)
 		, m_matchID(byMatchID)
@@ -1844,7 +1836,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 
 	if ( player.isPlaynet() )
 	{
-		snprintf(buf, sizeof(buf), "Pid#%u", playerID());
+		strprintf(buf, "Pid#%u", playerID());
 		_addStr(response, buf);
 	}
 
@@ -1854,7 +1846,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		_addStr(response, "in:none");
 	else
 	{
-		snprintf(buf, sizeof(buf), "in:%llu", player.instance().id());
+		strprintf(buf, "in:%" PR64BitUT "", player.instance().id());
 		_addStr(response, buf);
 	}
 
@@ -1863,17 +1855,15 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		const char* squadName = chatGetSquadCallsign(squadID());
 		if ( squadName != nullptr && squadRank() > 0 )
 		{
-			snprintf(buf, sizeof(buf), "%s:%s"
-				, chatGetSquadRankName(squadRank())
-				, squadName);
+			strprintf(buf, "%s:%s", chatGetSquadRankName(squadRank()), squadName);
 		}
 		else if ( squadRank() == 0 && player.isPlaynet() )
 		{
-			snprintf(buf, sizeof(buf), "Sqd:%s (UNRANKED!)", squadName);
+			strprintf(buf, "Sqd:%s (UNRANKED!)", squadName);
 		}
 		else if ( player.isPlaynet() )
 		{
-			snprintf(buf, sizeof(buf), "Sqd#%u(NO DATA)", squadID());
+			strprintf(buf, "Sqd#%u(NO DATA)", squadID());
 		}
 		else
 		{
@@ -1900,7 +1890,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		}
 		else if ( player.isPlaynet() )
 		{
-			snprintf(buf, sizeof(buf), "B#%u:UNK", brigadeID());
+			strprintf(buf, "B#%u:UNK", brigadeID());
 			_addStr(response, buf);
 		}
 	}
@@ -1910,14 +1900,14 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		RANK_NO erank = effectiveRank();
 		const Rank* myRank = Rank::lookup(erank);
 		if ( myRank != nullptr )
-			snprintf(buf, sizeof(buf)
+			strprintf(buf
 						, "R#%u(%s/%s)"
 							, erank
 							, _rankType(myRank->type())
-							, rankNames[erank]
+							, rankNames[erank].c_str()
 							);
 		else if ( player.isPlaynet() )
-			snprintf(buf, sizeof(buf), "R#%u(INVALID)", erank);
+			strprintf(buf, "R#%u(INVALID)", erank);
 		_addStr(response, buf);
 	}
 
@@ -1931,9 +1921,9 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		char oic[21];
 		HCUnit* unit = HCUnit::Lookup(leadingBrigade());
 		if ( unit )
-			snprintf(oic, sizeof(buf), "OIC:%s", unit->callsign());
+			strprintf(oic, "OIC:%s", unit->callsign());
 		else if ( player.isPlaynet() )
-			snprintf(oic, sizeof(buf), "OIC:#%u", leadingBrigade());
+			strprintf(oic, "OIC:#%u", leadingBrigade());
 		_addStr(response, "OIC");
 	}
 	if ( permissions(ALLIED_COMMAND_STAFF) )
@@ -1949,7 +1939,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 	if ( player.isPlaynet() )
 	{
 		char permissionsHex[64];
-		snprintf(permissionsHex, sizeof(permissionsHex), "PM: %016llx", permissionMask());
+		strprintf(permissionsHex, "PM: %016" PRPermMaskT "", permissionMask());
 		_addStr(response, permissionsHex);
 	}
 
@@ -2156,7 +2146,7 @@ public:
 						" WHERE p.playerID = %u AND p.countryid = %u and p.branchid = %u and r.rankid = %u"
 						, rankNo, player.playerID(), player.country(), player.branch(), rankNo);
 
-		player.message(LSTR_NOTE, LSTR_RANK_SET, rankNames[rankNo]);
+		player.message(LSTR_NOTE, LSTR_RANK_SET, rankNames[rankNo].c_str());
 	}
 } dotSetRank;
 
@@ -2574,7 +2564,7 @@ public:
 class PlayerNote : public DBThreadQuery
 {
 public:
-	PlayerNote(const ChatHandle& handle, UINT32 byPlayerID, const std::string& note, const char* orig)
+	PlayerNote(const ChatHandle handle, UINT32 byPlayerID, const std::string& note, const char* orig)
 		: DBThreadQuery(DBThread::Default, "PlayerNote", DBThreadQuery::_CALLBACK
 							, "CALL `wwii`.`p_add_player_note`('%s', %u, 1, '%s')", Chat::Name(handle).c_str(), byPlayerID, note.c_str())
 								, m_handle(handle), m_byPlayerID(byPlayerID), m_text(orig), m_err("")
@@ -2632,11 +2622,11 @@ public:
 class PlayerNoteQuery : public DBThreadQuery
 {
 public:
-	PlayerNoteQuery(const ChatHandle& handle, UINT32 byPlayerID)
+	PlayerNoteQuery(const ChatHandle handle, UINT32 byPlayerID)
 		: DBThreadQuery(DBThread::Default, "PlayerNoteQuery", DBThreadQuery::_CALLBACK
 						, "SELECT	n.description, n.note_at, n.note_end, n.callsign, n.note"
-			 				" FROM wwiionline.wwii_player p"
-								" LEFT JOIN wwii.v_player_notes n USING (playerid)"
+			 				" FROM `wwiionline`.`wwii_player` p"
+								" LEFT JOIN `wwii`.`v_player_notes` n USING (playerid)"
 			 				" WHERE p.callsign = '%s'"
 			 				" ORDER BY n.note_at DESC"
 			 				" LIMIT 10"
@@ -2755,7 +2745,7 @@ public:
 		if ( args.size() > 1 )
 		{
 			std::string note = args[1];
-                        DBThread::EscapeString(note);
+			DBThread::EscapeString(note);
 
 			if ( note.length() > 399 )
 			{
@@ -2813,11 +2803,11 @@ public:
 
 		// Add the relevant note
 		std::string note = args[1];
-                DBThread::EscapeString(note);
+		DBThread::EscapeString(note);
 
 		if ( note.length() > 400 )
 			note.resize(400);
-		DBThread::Do(DBThread::Default, "CALL wwii.p_add_player_note('%s', %u, 3, '%s')", target->callsign(), player.playerID(), note.c_str());
+		DBThread::Do(DBThread::Default, "CALL `wwii`.`p_add_player_note`('%s', %u, 3, '%s')", target->callsign(), player.playerID(), note.c_str());
 	}
 } dotWarn;
 

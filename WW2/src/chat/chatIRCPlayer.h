@@ -14,7 +14,7 @@
 class IRCPlayer : public ManagementPlayer
 {
 public:
-	typedef std::set<std::string> IRC_CHANNELS;
+	using IRC_CHANNELS = std::set<std::string>;
 
 public:
 	IRCPlayer(const char* nick);

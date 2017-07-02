@@ -14,8 +14,8 @@ class wwiiPlayer;
 class Player;
 
 // Map of players by ID
-typedef std::unordered_map<playerid_t /*playerID*/, class PlayerStatusNode*> PLAYERID_HASH;
-typedef std::map<UINT32 /*teulIndex*/, class PlayerStatusNode*> PLAYERIDX_MAP;
+using PLAYERID_HASH = std::unordered_map<playerid_t /*playerID*/, class PlayerStatusNode*>;
+using PLAYERIDX_MAP = std::map<UINT32 /*teulIndex*/, class PlayerStatusNode*>;
 
 class ServerInterface
 {
@@ -24,6 +24,7 @@ protected:
 	static PLAYERIDX_MAP	s_byTeulIndex;
 
 public:
+    static const PLAYERID_HASH GetOnlinePlayers() { return s_byPlayerID; }
 	static bool isServerEmpty() { return s_byPlayerID.empty(); }
 	static PlayerStatusNode* PlayerStatusNodeByPlayerID(playerid_t id)
 	{

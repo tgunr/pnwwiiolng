@@ -145,7 +145,7 @@ _sendBrigadeListResponse(ACTION_OBJECT* const a)
 SINT32
 BrigadeSummaries::send(SINT32 teulIndex)
 {
-	betaLog(_FLD, "t:%d sending %u brigade summaries", teulIndex, m_count);
+	dbugLog(_FLD, "t:%d sending %u brigade summaries", teulIndex, m_count);
 	return teulSend(teulIndex, _XCHG_BRIGADE_LIST, this);
 }
 
@@ -277,12 +277,12 @@ SendTutProgressBatch(SINT32 teulIndex, Tutorial::GroupProgressBatch& batch)
 // Installs our callbacks
 
 SINT32
-HostInstallCallbacks(void)
+HostInstallCallbacks()
 {
 	wwiiRegisterPlayerMessageCallback();
 
 	BEGIN_CALLBACK_REGISTRATION(Map::CallbackX)
-
+	{
 		REGISTER_RECEIVER(Map::EXIT_WWIIOL_Y, _recvExitWWIIOL);
 
 		REGISTER_SENDER(Map::XCHG_HCUNIT_LIST_Y, _sendHCUnitList, _SEND_HCUNIT_LIST);
@@ -302,8 +302,8 @@ HostInstallCallbacks(void)
 		REGISTER_MSG_RECEIVER(Map::POLL_RESULT_Y, OPINION_CHOICE_MSG);
 
 		REGISTER_SENDER(Map::TUT_PROGRESS_Y, _sendTutProgress, _SEND_TUT_PROGRESS);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Map::CallbackX)
 }
 
 }

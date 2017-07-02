@@ -6,16 +6,16 @@
 //
 // Usages:
 //
-//  Teul::housekeeper myKeeper(void* fn(void), stock_ms_interval);
+//  Teul::housekeeper myKeeper(void* fn(), stock_ms_interval);
 //    Declares a housekeeper for which fn() will be invoked
-//    every time stock_ms_interval miliseconds elapses between
+//    every time stock_ms_interval milliseconds elapses between
 //    calls to myKeeper.poll();
 //
 //  myKeeper.poll();
 //    calls myKeeper.poll(stock_ms_interval);
 //
 //  myKeeper.poll(ms_interval);
-//    if ms_interval is zero, or ms_interval miliseconds
+//    if ms_interval is zero, or ms_interval milliseconds
 //    have elapsed since time we invokved fn() then
 //    fn() is called and true returned. Otherwise
 //    false is returned.
@@ -30,7 +30,7 @@ namespace Teul
 class housekeeper
 {
 public:
-	housekeeper(void (*fn)(void), UINT32 stockInterval_ms)
+	housekeeper(void (*fn)(), UINT32 stockInterval_ms)
 		: m_lastClock(teulClock64)
 		, m_fn(fn)
 		, m_stockInterval_ms(stockInterval_ms)
@@ -49,7 +49,7 @@ public:
 
 private:
 	TeulTimeMS		m_lastClock;
-	void			(*m_fn)(void);
+	void			(*m_fn)();
 	UINT32			m_stockInterval_ms;
 }; // class
 } // namespace

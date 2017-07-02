@@ -11,8 +11,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatPlayer.h"
 #include "chat/chatDB.h"
 #include "chat/chatDecisions.h"
@@ -341,7 +339,7 @@ _haveOpening(Player* player, WWII_SIDE side)
 static bool
 _voted(Player* player, const StratDecision* decision)
 {
-	register ChatHandle handle = player->matchHandle();
+	ChatHandle handle = player->matchHandle();
 
 	for ( UINT32 i = 0; i < decision->m_voters.size(); ++i )
 	{
@@ -446,7 +444,6 @@ _SCMDsuccess(const StratCommand* scmd, const char* command, Player* player, cons
 
 	case SC_ATTACK:
 		LogAbort("SC_ATTACK/DEFEND/CLEAR no-longer supported");
-	break;
 
 	default:
 		dbugLog(_FLW, "Unrecognized scmd reporting success: %d", scmd->m_command);
@@ -574,7 +571,6 @@ _SCMDallowed(const StratCommand* scmd, const char* command, Player* player, cons
 	case SC_DEFEND:
 	case SC_CLEAR:
 		LogAbort("SC_ATTACK/DEFEND/CLEAR no-longer supported");
-	break;
 
 	default:
 		dbugLog(_FLW, "_allowed doesn't recognize this command");
@@ -617,7 +613,7 @@ _commandFailed(const Property* property, WWII_SIDE side)
 // Function for processing an incoming strat command packet (i.e. a result)
 
 void
-StratCommand::process(void)
+StratCommand::process()
 {
 	Player* player = PlayerInterface::Lookup(m_issuer);
 	Property* property = nullptr;
@@ -695,7 +691,10 @@ _validVoter(Player* player, StratDecision* decision)
 	if ( _voted(player, decision) )
 		return false;
 
-	if ( player->inFacility() && memcmp(&player->originCpID(), &decision->m_property->m_fid, sizeof(FULL_OBJ_ID)) == 0 )
+	auto cmp = [](const FULL_OBJ_ID& lhs, const FULL_OBJ_ID&rhs) -> bool {
+		return memcmp(&lhs, &rhs, sizeof(lhs)) == 0;
+	};
+	if ( player->inFacility() && cmp(player->originCpID(), decision->m_property->m_fid) )
 		return true;
 
 	player->message(LSTR_CAUTION, LSTR_MUST_ISSUE_FROM, decision->m_property->Name(), decision->m_property->Name());
@@ -794,7 +793,7 @@ chatVoteFallback(Player* player, const char* id)
 //////////////////////////////////////////////////////////////////////
 
 bool
-chatStartHold(Player* player, const FULL_OBJ_ID& target)
+chatStartHold(Player* player, const FULL_OBJ_ID target)
 {
 	const Property* property = chatFindProperty(target);
 	if ( property == nullptr )
@@ -820,7 +819,7 @@ chatStartHold(Player* player, const FULL_OBJ_ID& target)
 //////////////////////////////////////////////////////////////////////
 
 bool
-chatStartFallback(Player* player, const FULL_OBJ_ID& target)
+chatStartFallback(Player* player, const FULL_OBJ_ID target)
 {
 	const Property* property = chatFindProperty(target);
 	if ( property == nullptr )
@@ -1040,7 +1039,7 @@ chatCheckDecisionQueues()
 //////////////////////////////////////////////////////////////////////
 
 static const PropCP*
-_checkObjectiveTarget(const FULL_OBJ_ID& fid, Player* player)
+_checkObjectiveTarget(const FULL_OBJ_ID fid, Player* player)
 {
 	if ( fid.id == 0 )
 	{
@@ -1076,7 +1075,7 @@ _checkObjectiveTarget(const FULL_OBJ_ID& fid, Player* player)
 //////////////////////////////////////////////////////////////////////
 
 bool
-chatVoteAttack(Player* player, const FULL_OBJ_ID& id)
+chatVoteAttack(Player* player, const FULL_OBJ_ID id)
 {
 	const PropCP* target = _checkObjectiveTarget(id, player);
 	if ( !target )
@@ -1099,7 +1098,7 @@ chatVoteAttack(Player* player, const FULL_OBJ_ID& id)
 //////////////////////////////////////////////////////////////////////
 
 bool
-chatVoteClear(Player* player, const FULL_OBJ_ID& id)
+chatVoteClear(Player* player, const FULL_OBJ_ID id)
 {
 	const PropCP* target = _checkObjectiveTarget(id, player);
 	if ( !target )
@@ -1122,7 +1121,7 @@ chatVoteClear(Player* player, const FULL_OBJ_ID& id)
 //////////////////////////////////////////////////////////////////////
 
 bool
-chatVoteDefend(Player* player, const FULL_OBJ_ID& id)
+chatVoteDefend(Player* player, const FULL_OBJ_ID id)
 {
 	const PropCP* target = _checkObjectiveTarget(id, player);
 	if ( !target )

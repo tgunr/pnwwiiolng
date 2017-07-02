@@ -19,30 +19,30 @@
 #include "strt/strtSupercell.h"
 #include "teul/teulTime.h"
 
-struct GridKey ;
+struct GridKey;
 
 struct GridKey
 {
-	GridKey(SINT32 x, SINT32 y) : m_x(x), m_y(y) {}
-	GridKey(UINT64 key) : m_key(key) {}
-	SINT32 x() const { return m_x ; }
-	SINT32 y() const { return m_y ; }
-	const UINT64& key() const { return m_key ; }
+	constexpr GridKey(SINT32 x, SINT32 y) : m_x(x), m_y(y) {}
+	constexpr GridKey(UINT64 key) : m_key(key) {}
+	constexpr SINT32 x() const { return m_x; }
+	constexpr SINT32 y() const { return m_y; }
+	constexpr const UINT64& key() const { return m_key; }
 
 	union
 	{
-		struct { SINT32 m_x, m_y ; } ;
-		UINT64 m_key ;
-	} ;
-} ;
+		struct { SINT32 m_x, m_y; };
+		UINT64 m_key;
+	};
+};
 
-typedef std::unordered_map<UINT64, class WorldGrid*> _WORLD_HASH ;
-typedef std::set<class WorldGrid*> _WORLD_GRIDS ;
-typedef std::stack<WorldGrid*> _FREE_STACK ;
+using _WORLD_HASH = std::unordered_map<UINT64, class WorldGrid*>;
+using _WORLD_GRIDS = std::set<class WorldGrid*>;
+using _FREE_STACK = std::stack<WorldGrid*>;
 
-typedef std::set<class HostVehicle*> _VEHICLE_LIST ;
+using _VEHICLE_LIST = std::set<class HostVehicle*>;
 
-static WorldGrid* _getGrid(const GridKey& key) ;
+static WorldGrid* _getGrid(const GridKey& key);
 
 //////////////////////////////////////////////////////////////////////
 // WorldGrid class
@@ -302,8 +302,7 @@ updtPatrolGridExpirations()
 		++it ;
 		if ( cell->expired() )
 		{
-			if ( g_logDebug )
-				dbugLog(_FLD, "g:%d,%d expiry time elapsed", cell->gridKey().x(), cell->gridKey().y()) ;
+            dbugLog(_FLD, "g:%d,%d expiry time elapsed", cell->gridKey().x(), cell->gridKey().y()) ;
 			gridHash.erase(cell->gridKey().key()) ;
 			cell->deactivate() ;
 			_freeGrids.push(cell) ;
@@ -325,13 +324,10 @@ HostVehicle::updateGridPosition()
 	if ( m_onGrid && newGX == m_gridX && newGY == m_gridY )
 		return ;
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "v:%u c:%s moved [%d,%d] -> [%d,%d]"
-						, index, callsign()
-						, m_gridX, m_gridY
-						, newGX, newGY) ;
-	}
+    dbugLog(_FLD, "v:%u c:%s moved [%d,%d] -> [%d,%d]"
+                    , index, callsign()
+                    , m_gridX, m_gridY
+                    , newGX, newGY) ;
 
 	WorldGrid* newGrid = _getGrid(GridKey(newGX, newGY)) ;
 	WorldGrid* oldGrid = (m_onGrid) ? oldGrid = _findGrid(GridKey(m_gridX, m_gridY)) : NULL ;
@@ -355,10 +351,9 @@ HostVehicle::removeFromGrid()
 		return ;
 	}
 
-	if ( g_logDebug )
-		dbugLog(_FLD, "v:%u c:%s removing from grid [%d,%d]"
-						, index, callsign()
-						, m_gridX, m_gridY) ;
+    dbugLog(_FLD, "v:%u c:%s removing from grid [%d,%d]"
+                    , index, callsign()
+                    , m_gridX, m_gridY) ;
 
 	WorldGrid* grid = _findGrid(GridKey(m_gridX, m_gridY)) ;
 	if ( grid != NULL )
@@ -391,7 +386,7 @@ updtGridGetVehiclesVector(const HostVehicle* vehicle, const SINT64& range, PLAYE
 
 	_WORLD_GRIDS::const_iterator it ;
 
-	betaLog(_FLD, "v:%u c:%s getting cells within [%d,%d],[%d,%d] %llu range: "
+	betaLog(_FLD, "v:%u c:%s getting cells within [%d,%d],[%d,%d] %" PR64BitUT " range: "
 					, vehicle->index, vehicle->callsign()
 					, botleft.x(), botleft.y(), topright.x(), topright.y()
 					, WorldGrid::_RING_RADIUS) ;
@@ -406,10 +401,7 @@ updtGridGetVehiclesVector(const HostVehicle* vehicle, const SINT64& range, PLAYE
 		cells.push_back(&node->vehicles()) ;
 	}
 
-	if ( g_logDebug )
-	{
-		betaLog(_FLDB, " total: %u cells", cells.size()) ;
-	}
+    betaLog(_FLD, " total: %u cells", cells.size()) ;
 }
 
 // Structure indicates that I currently have you on my "vis list"

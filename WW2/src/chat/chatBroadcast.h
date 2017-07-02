@@ -36,7 +36,7 @@ namespace Chat
 		Broadcast() : LocalizedMessage((LSTRING_ID)-1, (LSTRING_ID)-1), m_type(_EVERYONE), m_instanceID(0ULL), m_targetID(0ULL) {}
 
 	public:
-		Broadcast(BCAST_TYPE typeID_, const instanceid_t& instanceID_, const UINT64 targetID_
+		Broadcast(BCAST_TYPE typeID_, const instanceid_t instanceID_, const UINT64 targetID_
 					, LSTRING_ID prefixID_, LSTRING_ID messageID_
 					, const char* const data0_="", const char* const data1_=""
 					, const char* const data2_="", const char* const data3_=""
@@ -63,7 +63,7 @@ namespace Chat
 }
 
 // HOST: (Non-Chathost) Sends a targeted SYSTEM message to a specific target
-bool chatSendBroadcast(Chat::BCAST_TYPE type, const instanceid_t& instanceID, UINT64 targetID, LSTRING_ID prefix, LSTRING_ID message
+bool chatSendBroadcast(Chat::BCAST_TYPE type, const instanceid_t instanceID, UINT64 targetID, LSTRING_ID prefix, LSTRING_ID message
 						, const char* ptr0="", const char* ptr1="", const char* ptr2="", const char* ptr3="", const char* ptr4="", const char* ptr5="");
 //tolua_end
 

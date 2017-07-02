@@ -10,8 +10,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcast.h"
 #include "chat/chatData.h"
 #include "chat/chatdbClientMessages.h"
@@ -561,7 +559,7 @@ class DotOverrun : public DotCommand
 public:
 	DotOverrun() : DotCommand("overrun", "Signals your town has been overrun by the enemy"
 								, NO_MASK, LSTR_OVERRUN_USAGE, LSTR_OVERRUN_DETAIL
-								) { };
+								) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
@@ -590,7 +588,7 @@ public:
 class LastMoves : public DBThreadQuery
 {
 public:
-	LastMoves(const ChatHandle& byMatchID, WWII_COUNTRY forCountry)
+	LastMoves(const ChatHandle byMatchID, WWII_COUNTRY forCountry)
 		: DBThreadQuery(DBThread::Default, "LastMoves", DBThreadQuery::_CALLBACK
 				,"SELECT	m.moved"
 					 ", u.name"
@@ -679,5 +677,5 @@ public:
 			return;
 		}
 		(new LastMoves(player.matchHandle(), player.country()))->Queue();
-	};
+	}
 } dotLastMoves;

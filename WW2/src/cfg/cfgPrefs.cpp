@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "phui/XMLMessage.h"
 #include "phui/ControlValueMessage.h"
 #include "phui/Message.h"
@@ -77,12 +77,11 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.shademode",			&ShadeMode,					cfgPARAM_UINT,		1,		0,	0, false },
 	{"app.bdithering",			&bDithering,				cfgPARAM_BOOLEAN,	1,		0,	1, false	},
 	{"app.bspecular",			&WantSpecularMaps,			cfgPARAM_BOOLEAN,	1,		0,	1, false	},
-	{"app.texturereduction",	&TextureReduction,			cfgPARAM_BOOLEAN,	1,		0,	1, false	},
-	{"app.sound",				&WantedSoundCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedSoundCard)-1, true	},
+	{"app.sound",				&WantedSoundCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedSoundCard) - 1, true	},
 	{"app.bsoundenable",		&bSoundEnable,				cfgPARAM_BOOLEAN,	0,		0,	1, true	},
 	{"app.b3dsoundenable",		&b3DSoundEnable,			cfgPARAM_BOOLEAN,	0,		0,	1, true	},
-	{"app.video",				&WantedVideoCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoCard)-1, true	},
-	{"app.resolution",			&WantedVideoResolution,		cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoResolution)-1, true	},
+	{"app.video",				&WantedVideoCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoCard) - 1, true	},
+	{"app.resolution",			&WantedVideoResolution,		cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoResolution) - 1, true	},
 	{"app.bnoframerunahead",	&bNoFrameRunahead,			cfgPARAM_BOOLEAN,	0,		0,	1, false	},
 #if platOS == OS_MACOS
 	{"app.enablevsync",	        &g_enableVSync,				cfgPARAM_BOOLEAN,	1,		0,	1, true	},
@@ -115,7 +114,8 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.radialclutter",       nullptr,                       cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.radialdensity",       &g_fRadialDensity,          cfgPARAM_FLOAT,		1,		0,	0, true	},
 	{"app.radialradius",        &g_fRadialRadius,           cfgPARAM_FLOAT,		1,		0,	0, true	},
-	{"app.visplayerlimit",      &g_iVisiblePlayerLimit,     cfgPARAM_SINT,		0,		0,	0, true	},
+	{"app.visplayerlimit",      &g_iVisiblePlayerLimit,     cfgPARAM_SINT,		1,		0,	0, true	},
+	{"app.usenetcode",			&g_wantNetcode,				cfgPARAM_BOOLEAN,   1,      0,  1, true },
 	{"app.fsaasamples",      	&g_iFSSASamples,			cfgPARAM_SINT,		1,		0,	0, false	},
 	{"app.fsaahighquality",		&g_bFSSAHighQuality,        cfgPARAM_BOOLEAN,	1,		0,	1, false	},
 	{"app.soundhighquality",    &g_bSoundHighQuality,       cfgPARAM_BOOLEAN,	1,		0,	1, false	},
@@ -192,6 +192,9 @@ void cfgPrefsSendSharedPrefs()
 	name = cfgPrefsGetGlobalName(cfgVISIBLE_PLAYER_LIMIT);
 	outgoing.construct<Chat::Preference>(CPR_UPDATE_MODE, cfgPrefsGetInt(name, 2));
 
+	name = cfgPrefsGetGlobalName(cfgNETCODE);
+	outgoing.construct<Chat::Preference>(CPR_SET_NETCODE, cfgPrefsGetBool(name, true));
+
 	name = cfgPrefsGetGlobalName(cfgLANGUAGE_CHOICE);
 	outgoing.construct<Chat::Preference>(CPR_CLIENT_LANGUAGE, cfgPrefsGetInt(name, 0));
 	outgoing.construct<Chat::Preference>(CPR_PLAYER_LANGUAGE, cfgPrefsGetInt(name, 0));
@@ -223,10 +226,16 @@ void cfgPrefsSendSharedPref(CHAT_PREFERENCE key)
 			outgoing.append(Chat::Preference(key, cfgPrefsGetInt(name, 2)));
 		}
 		break;
+		case CPR_SET_NETCODE:
+		{
+			const char* name = cfgPrefsGetGlobalName(cfgNETCODE);
+			outgoing.append(Chat::Preference(key, cfgPrefsGetBool(name, true)));
+		}
+		break;
 		case CPR_CLIENT_LANGUAGE: // my ui language
 		case CPR_PLAYER_LANGUAGE: // my spoken language
 		{
-			const char* name = cfgPrefsGetGlobalName(cfgVISIBLE_PLAYER_LIMIT);
+			const char* name = cfgPrefsGetGlobalName(cfgLANGUAGE_CHOICE);
 			outgoing.append(Chat::Preference(key, cfgPrefsGetInt(name, 0)));
 		}
 		break;
@@ -299,7 +308,7 @@ bool cfgPrefsLoad()
 	{
 #if platOS == OS_MACOS
 		char path[4192];
-		sprintf(path, "%swwiiol.cfg", macPreferencesPath());
+		strprintf(path, "%swwiiol.cfg", macPreferencesPath());
 #else
 		static const char path[] = "wwiiol.cfg";
 #endif
@@ -503,15 +512,6 @@ bool cfgPrefsSetGlobal(_cfgPARAMS key, void* value, bool update)
 
 		if(success)
 		{
-			if ( lang != 5 && gLanguage == 5 && update ) // only true if chinese in language popup and we just switched to it
-			{
-				//cfgPrefsSetInt(_prefDetails[cfgLANGUAGE_CHOICE].name, 5);
-				//*(unsigned int*)_prefDetails[cfgLANGUAGE_CHOICE].var = 5;
-				_restartNeeded = true;
-				cfgPrefsSave();
-				return success;
-			}
-
 			if(_prefDetails[key].dynamic) // if its dynamic we try to special process it
 					cfgPrefsProcessGlobal(key);
 			else if(update) // if its not dynamic and we were told to update, then a restart is needed
@@ -1005,7 +1005,6 @@ void cfgPrefsSetDefaults()
 
 	// Always use multitexture
 	MultiTextureEnable = TRUE;
-	TextureReduction = FALSE;
 
 	TextureMagFilter    = piTEXTUREMAG_DEFAULT;				// texture mag filter
 	TextureMinFilter    = piTEXTUREMIN_DEFAULT;				// texture min filter
@@ -1019,6 +1018,7 @@ void cfgPrefsSetDefaults()
 	g_iNumBullets = 128;
 
 	g_iVisiblePlayerLimit = 2; // medium
+	g_wantNetcode = TRUE;
 	g_useNetworkRoute = 0;
 	g_wantSSE2 = FALSE;
 
@@ -1126,11 +1126,6 @@ void cfgPrefsProcessGlobal(_cfgPARAMS key)
 			radclutterDirty();
 			break;
 		}
-		case cfgTEXTURE_REDUCTION:
-		{
-			ldpixSetTextureReduction(TextureReduction);
-		}
-		break;
 		case cfgVIDEO_CARD_RESOLUTION:
 		{
 			cfgPrefsSetResolution();
@@ -1220,6 +1215,11 @@ void cfgPrefsProcessGlobal(_cfgPARAMS key)
 			cfgPrefsSendSharedPref(CPR_UPDATE_MODE); // send it to the host
 		}
 		break;
+		case cfgNETCODE:
+		{
+			cfgPrefsSendSharedPref(CPR_SET_NETCODE); // send it to the host
+		}
+		break;
 		case cfgAWS_LOW:
 		{
 			int color = 0;
@@ -1300,14 +1300,10 @@ void cfgPrefsProcessGlobal(_cfgPARAMS key)
 		case cfgSHADOW_RECEIVERS:
 		{
 #if RELEASE_CLIENT != 0
-#if IS_CHINA
-			// Allow ShadowMapFlags to be 0
-#else
 			if(ShadowMapFlags == 0)
 			{
 				ShadowMapFlags = (SHADOW_TERRAIN | SHADOW_VEHICLES | SHADOW_CORPSES);
 			}
-#endif
 #endif
 			break;
 		}
@@ -1328,7 +1324,7 @@ void cfgPrefsProcessGlobal(_cfgPARAMS key)
         default:
             // nothing else applies
             break;
-            
+
 
 	}
 }

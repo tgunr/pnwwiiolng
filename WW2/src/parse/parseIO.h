@@ -13,13 +13,7 @@
 
 #define MAX_FUNC_NAME 32
 
-#if platOS == OS_WIN32
-	typedef bool (__cdecl* PARSE_FUNCTION)(SINT32 numargs, struct FUNCARGS* args);
-#elif platOS == OS_MACOS || platOS == OS_LINUX
-	typedef bool (*PARSE_FUNCTION)(int numargs, struct FUNCARGS* args);
-#else
-	#error "define this"
-#endif
+using PARSE_FUNCTION = bool(*)(SINT32 numargs, struct FUNCARGS* args);
 
 struct PARSE_CALLBACK
 {

@@ -9,8 +9,8 @@ namespace Teul
 
 	struct NetTimeMS
 	{
-		typedef NetTimeMS self_type;
-		typedef TeulTimeMS value_type;
+		using self_type = NetTimeMS;
+		using value_type = TeulTimeMS;
 
 		value_type	m_time;
 
@@ -27,7 +27,7 @@ namespace Teul
 		static size_t LargeDataBits() { return 40; }
 		static TeulTimeMS Granularity() { return 20ULL; }
 
-		void packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 bits = 0) { return (mode == TEUL_PACK) ? pack(a, bits) : unpack(a, bits); }
+		void packer(PackMode mode, ACTION_OBJECT* const a, SINT32 bits = 0) { return (mode == TEUL_PACK) ? pack(a, bits) : unpack(a, bits); }
 		void pack(ACTION_OBJECT* const a, SINT32 bits = 0) const;
 		void unpack(ACTION_OBJECT* const a, SINT32 bits = 0);
 	};

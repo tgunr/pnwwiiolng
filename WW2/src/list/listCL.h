@@ -7,7 +7,7 @@
 //
 // Originating Programmer: Marty Poulin
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 struct LISTHEADER
 {
 	LISTHEADER* prev;

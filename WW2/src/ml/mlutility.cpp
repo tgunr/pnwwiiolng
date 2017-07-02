@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <ctype.h>
 
 #include "pi/pi.h"
@@ -11,7 +11,6 @@
 #include "math/math3d.h"
 #include "ob/obmain.h"
 #include "ob/obcd.h"
-#include "sys/sysWinISO.h"
 
 UINT32 mlUtilityFindVarname(UINT32* VarNum,
 							const UCHAR* VarName,

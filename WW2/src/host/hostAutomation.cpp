@@ -159,7 +159,7 @@ _initializeFakeWeapons()
 		HostVehicle* fake = hostCreateRemoteVehicle(Instance::g_campaign, serial, weap->spec());
 		assert(fake);
 		SHARED_VEHICLE_INFO& vi = fake->vehicleData;
-		sprintf(vi.callsign, "FAKE%04zu", s_fakes.size());
+		strprintf(vi.callsign, "FAKE%04zu", s_fakes.size());
 		vi.packedCallsign = chatGetHandle(vi.callsign);
 		vi.squad = fakeNo % numWeapons;
 		vi.rank = (fakeNo % 22) + 1;
@@ -239,7 +239,7 @@ Fake::moveAircraft()
 
 //	if ( vi.squad == 1 )
 //	{
-//		dbugLog(_FLI, "t=%llu, w=%g, yaw=%g, x=%g, y=%g, vx=%g, vy=%g", t, w, yaw, x, y, vx, vy);
+//		dbugLog(_FLI, "t=%" PR64BitUT ", w=%g, yaw=%g, x=%g, y=%g, vx=%g, vy=%g", t, w, yaw, x, y, vx, vy);
 //	}
 
 	// Convert to radians

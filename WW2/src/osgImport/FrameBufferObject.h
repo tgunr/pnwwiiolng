@@ -453,8 +453,8 @@
                   GLenum mask,
                   GLenum filter);
 
-        typedef std::map<BufferComponent, FrameBufferAttachment> AttachmentMap;
-        typedef std::vector<GLenum> MultipleRenderingTargets;
+        using AttachmentMap = std::map<BufferComponent, FrameBufferAttachment>;
+        using MultipleRenderingTargets = std::vector<GLenum>;
 
         FrameBufferObject();
 

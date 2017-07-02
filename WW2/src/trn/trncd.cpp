@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #include <math.h>
@@ -53,7 +53,7 @@
 #include "SpatialDB.h"
 #endif
 
-typedef std::map<OBJECT*, trnCDTerrainObject *> mapOBJList;
+using mapOBJList = std::map<OBJECT*, trnCDTerrainObject *>;
 mapOBJList mapOBJ; // All objects associated with a TO
 
 //#define xANDREWCOLLISIONTESTS
@@ -62,19 +62,19 @@ mapOBJList mapOBJ; // All objects associated with a TO
 
 static LOGICAL g_bCheckTreeBox;
 
-typedef struct tagTERRAINID
+struct TERRAINID
 {
     SINT32 x;
     SINT32 y;
     UINT32 stratID;
-} TERRAINID;
+};
 
-typedef std::map<TERRAINID, trnCDTerrainObject *> mapTOList;
+using mapTOList = std::map<TERRAINID, trnCDTerrainObject *>;
 
 static mapTOList mapTO; // Non spawn objects
 static mapTOList mapSpawnTO; // Spawn objects only
 
-typedef std::set<trnCDTerrainObject*> ODEQueueSet;
+using ODEQueueSet = std::set<trnCDTerrainObject*>;
 static ODEQueueSet odeQueue;
 
 static bool _updateCollideLists = false;
@@ -83,7 +83,7 @@ static bool _updateCollideLists = false;
 static std::unordered_set<std::string> _buildingsWithSpawnData;
 
 // Mapping of dof names to the weapon specs allowed to spawn there.
-typedef std::map<std::string, std::vector<UINT32> > dofToWeapSpecs;
+using dofToWeapSpecs = std::map<std::string, std::vector<UINT32>>;
 static std::map<std::string, dofToWeapSpecs> _buildingToDofToClass;
 
 
@@ -133,18 +133,17 @@ bool trnCDTerrainObject::IsCollidable(UINT32 cflags)
 // terrain object collision detection stuff
 
 
-typedef struct tagStratMessageQue
+struct _StratMessageQue
 {
-	struct tagStratMessageQue* prev;
-	struct tagStratMessageQue* next;
+	_StratMessageQue* prev;
+	_StratMessageQue* next;
 
 	SINT32 scx;
 	SINT32 scy;
 	UINT32 Id;
 	SINT32 Country;
 	SINT32 VisLevel;
-
-} _StratMessageQue;
+};
 
 // This was decreased from 24000 because
 // we load in a lot fewer terrain objects now.
@@ -199,7 +198,7 @@ static UINT32 _SetDamageLevel(OBJECT* Object,UINT32 DamageLevel);
 static UINT32 _SetTOObjectCountry(OBJECT * Object, SINT32 Country, UINT32 IncludeSibs);
 static UINT32 _AddStratMsgToQue(SINT32 scx,SINT32 scy,UINT32 Id,SINT32 Country,SINT32 VisLevel);
 
-static _StratMessageQue * _GetNewStratMsg(void);
+static _StratMessageQue * _GetNewStratMsg();
 static UINT32 _FreeStratMsg(_StratMessageQue * StratMsg);
 static UINT32 _RemoveStratMsgFromList(_StratMessageQue * StratMsg);
 static UINT32 _AddStratMsgToFreeList(_StratMessageQue * StratMsg);
@@ -212,10 +211,6 @@ static SINT32 _NullTexId;
 SINT32 trncdReplacementTileTextureID() { return _NullTexId; }
 
 static LOGICAL g_bIgnoreTreeCollide = FALSE;
-
-#ifdef TERRAIN_EDITOR
-SINT32 _CollisionTriCnt;
-#endif
 
 #ifndef _DEBUG
 
@@ -238,7 +233,7 @@ static void HighliteView(piVECTOR* pv, DWORD color)
 
 #endif
 
-static _StratMessageQue * _GetNewStratMsg(void)
+static _StratMessageQue * _GetNewStratMsg()
 {
 _StratMessageQue * StratMsg;
 
@@ -512,29 +507,7 @@ static void _SetupFlagObject(OBJECT& Object)
 {
 	// UINT32 flagnum forces overflow on values less than '0'.
 	const UINT32 FlagNum = Object.name[4] - '0';
-	if (FlagNum < _MAX_COUNTRIES && Object.texid > 0)
-	{
-		// This is ugly; hack for now
-		if(gRegion == 5) // chinese
-		{
-			// Load new textures
-			std::string path = oglGetTextureData(Object.texid)->name;
-			path += ".dds";
-
-			const char* regionalPath = fioGetRegionalPath(path.c_str());
-
-			int id = ldpixLoadImageFileToSurface(regionalPath, 0, LDPIX_MIPMAP);
-
-			if(id > 0 && id != Object.texid)
-			{
-				// If id is valid then free
-				piFreeMipTextures(Object.texid);
-
-				// update the obj tex id
-				Object.texid = id;
-			}
-		}
-
+	if (FlagNum < _MAX_COUNTRIES && Object.texid > 0) {
 		_CountryTexIds[FlagNum] = Object.texid;
 	}
 }
@@ -561,7 +534,7 @@ static void _ScanAndSetupFlags(OBJECT* Object)
 	while (Object != nullptr);
 }
 
-UINT32 trncdInit(void)
+UINT32 trncdInit()
 {
 	trnmainSetObjectCreationCallback(trncdAddTerrainObject);
 	trnmainSetObjectDeletionCallback(trncdRemoveTerrainObject);
@@ -570,7 +543,7 @@ UINT32 trncdInit(void)
 	{
 		Write_Debug("Unable to load terrain object flag file");
 
-		piExitProgram(__FILE__, __LINE__,"Unable to load terrain object flag file");
+		piExitProgram(_FL,"Unable to load terrain object flag file");
 	}
 
 	_FlagObject = obmainFindNamedObject("flagtable1");
@@ -579,7 +552,7 @@ UINT32 trncdInit(void)
 	{
 		Write_Debug("Terrain flag object copied, but unable to find it by name");
 
-		piExitProgram(__FILE__, __LINE__,"Unable to find terrain flag file by name");
+		piExitProgram(_FL,"Unable to find terrain flag file by name");
 	}
 
 	_ScanAndSetupFlags(_FlagObject);
@@ -595,10 +568,10 @@ UINT32 trncdInit(void)
 
 	if (!piIsTexture(_NullTexId, 0))
 	{
-	SINT8 s[256];
-		sprintf(s,"Unable to load up the null terrain texture map! (terrain\\null1.bmp)");
+		char s[256];
+		strprintf(s,"Unable to load up the null terrain texture map! (terrain\\null1.bmp)");
 		Write_Debug(s);
-		piExitProgram(__FILE__, __LINE__,s);
+		piExitProgram(_FL,s);
 	}
 
     _loadSpawnXML("terrain/xml/spawn.xml");
@@ -606,7 +579,7 @@ UINT32 trncdInit(void)
 	return 0;
 }
 
-UINT32 trncdKill(void)
+UINT32 trncdKill()
 {
     if(!mapTO.empty())
     {
@@ -755,9 +728,8 @@ static UINT32 _GetNewCDTerrainObject(trnCDTerrainObject** TerrainObject)
     {
         *TerrainObject = freeToObjects.front();
         freeToObjects.pop_front();
-    }
-
-	memset(*TerrainObject, 0, sizeof(trnCDTerrainObject));
+		memset(*TerrainObject, 0, sizeof(trnCDTerrainObject));
+	}
 
 	if(_AddToListHead(*TerrainObject) == 1)
 	{
@@ -830,9 +802,7 @@ static UINT32 _AddToListHead(trnCDTerrainObject* TO)
 LOGICAL trncdRemoveTerrainObject(OBJECT* Object, SINT32 DummyNum1, SINT32 DummyNum2, UINT32 Id,
 								 REL_OBJ_ID * ObjId)
 {
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Removing overall object %s",Object->name);
-#endif
 
 	if (Object != nullptr)
 	{
@@ -944,10 +914,8 @@ LOGICAL trncdAddTerrainObject(OBJECT* Object,SINT32 SuperCellX, SINT32 SuperCell
     SINT8 * ptr;
     BUILDING_PARAMS* Params;
     SINT32 DamThreshold;
-#ifdef TERRAIN_EDITOR
-    Write_Debug("Adding overall object %s",Object->name);
-#endif
 
+    //Write_Debug("Adding overall object %s",Object->name);
 	if (Object != nullptr)
 	{
 		DamThreshold = 0;
@@ -1038,17 +1006,13 @@ static UINT32 _RemoveTerrainObject(OBJECT* o)
 
     if(I == mapOBJ.end())
     {
-#ifdef TERRAIN_EDITOR
 		Write_Debug("Object being removed that isn't on the collide list!");
-#endif
         return 0;
     }
 
     trnCDTerrainObject* to;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("_RemoveTerrainObject: %s", o->name);
-#endif
 
     to = I->second;
 
@@ -1171,9 +1135,7 @@ _StratMessageQue*	PrevStratMsg;
 		return;
 	}
 
-#ifdef TERRAIN_EDITOR
-	Write_Debug("Adding Object %s, top level %s",Object->name,TopObject->name);
-#endif
+	//Write_Debug("Adding Object %s, top level %s",Object->name,TopObject->name);
 
     mapOBJList::iterator I = mapOBJ.find(Object);
 
@@ -1215,11 +1177,8 @@ _StratMessageQue*	PrevStratMsg;
 	{
 		if(!TO->CollisionObject)
 		{
-#ifdef TERRAIN_EDITOR
-			Write_Debug("Cannot find damage collision object for object %s, using entire object tree instead",
-							TO->TerrainObject->name);
-#endif
-		TO->DamageCollisionObject = Object;
+			//Write_Debug("Cannot find damage collision object for object %s, using entire object tree instead", TO->TerrainObject->name);
+			TO->DamageCollisionObject = Object;
 		}
 		else
 		{
@@ -1230,10 +1189,7 @@ _StratMessageQue*	PrevStratMsg;
 
 	if (TO->CollisionObject == nullptr)
 	{
-#ifdef TERRAIN_EDITOR
-		Write_Debug("Cannot find collision object for object %s, using entire object tree instead",
-						TO->TerrainObject->name);
-#endif
+		//Write_Debug("Cannot find collision object for object %s, using entire object tree instead", TO->TerrainObject->name);
 		TO->CollisionObject = Object;
 	}
 
@@ -1343,8 +1299,8 @@ _StratMessageQue*	PrevStratMsg;
                 else
                 {
                   if (TO->ObjId.objClass == CLASS_FACILITY && TO->DamageLevel != FB_CLOSED_VISLEVEL &&
-                      (TO->ObjId.objType == FACILITY_ARMYBASE || 
-                       TO->ObjId.objType == FACILITY_NAVALBASE || 
+                      (TO->ObjId.objType == FACILITY_ARMYBASE ||
+                       TO->ObjId.objType == FACILITY_NAVALBASE ||
                        TO->ObjId.objType == FACILITY_AIRBASE))
                   {
                     TO->LOD[i]->flag2 |= OBJECT_AIRRAIDSIREN;
@@ -1495,11 +1451,10 @@ UINT32 trnGetSpawnObject(OBJECT** o,
 
     if(I == mapSpawnTO.end())
     {
-        SCHAR s[128];
-
-        sprintf(s, "[trnGetSpawnObject] x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
+        char s[128];
+        strprintf(s, "[trnGetSpawnObject] x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
         Write_Log(LOG_OLD, LOG_FATAL, s);
-        piExitProgram(__FILE__,__LINE__, s);
+        piExitProgram(_FL, s);
         return 1;
     }
 
@@ -1507,11 +1462,10 @@ UINT32 trnGetSpawnObject(OBJECT** o,
 
     if(to->SpawnEntries == 0)
     {
-        SCHAR s[128];
-
-        sprintf(s, "[trnGetSpawnObject] spawn entries = 0 x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
+        char s[128];
+        strprintf(s, "[trnGetSpawnObject] spawn entries = 0 x=%d y=%d id=%d** FAILED**", SuperCellX, SuperCellY, Id);
         Write_Log(LOG_OLD, LOG_FATAL, s);
-        piExitProgram(__FILE__,__LINE__, s);
+        piExitProgram(_FL, s);
         return 1;
     }
 
@@ -2109,21 +2063,10 @@ piINDICES*		pt;
 piVECTOR*		lpcrnr;
 piMATRIX		InvMat;
 
-// The Terrain Editor uses this routine to find collisions
-// in octets that are terrain replacement tiles. The texture
-// objects that have the null1.bmp texture use this flag
-// (OBJECT_SKIPDRAWING) to keep the texture from drawing
-// but we still need collisions on these objects for the
-// Terrain Editor. I* think* this was done for a speed
-// optimization. If this causes trouble in the Terrain
-// Editor, then we may have to duplicate the entire routine
-// just to get the functionality we require. Kango
-#ifndef TERRAIN_EDITOR
 	if (lpobj->flags & OBJECT_SKIPDRAWING)
 	{
 		return FALSE;
 	}
-#endif
 
 	if (lpobj->flags & OBJECT_USEMATRIX)
 	{
@@ -2214,11 +2157,6 @@ piMATRIX		InvMat;
 				math3dScaleVector(&q, &m, d2 - d1);
 				math3dAddVectors(&tp, op, &q);
 
-// terrain editor uses some very long rays for collision for mouse tracking
-// and it creates objects on the fly which don't work too well with this bailout
-// since collision speed isn't essential for terrain editor, we don't use this
-// early out when in terrain editor mode
-#ifndef TERRAIN_EDITOR
 				m = q = tp;
 				m.x -= eps;
 				m.y -= eps;
@@ -2255,7 +2193,6 @@ piMATRIX		InvMat;
 				{
 					continue;
 				}
-#endif
 
 #ifdef CD_POLY_FENCE
 				// polygon fence algorithm
@@ -2411,7 +2348,7 @@ UINT32 TriNum;
 					VertNum, (int)ColObject->numverts, (int)td->numoctetsacross,(int)td->numoctetsdown,
 					Pos.x, Pos.y, objPos[1].x, objPos[1].y, x, y, Width, Height);
 
-			piExitProgram (__FILE__, __LINE__, str);
+			piExitProgram (_FL, str);
 		}
 
 		CenterPos = objPos[VertNum];
@@ -2616,7 +2553,7 @@ UINT32 TriNum;
 				VertNum, (int)ColObject->numverts, (int)td->numoctetsacross,(int)td->numoctetsdown,
 				Pos.x, Pos.y, objPos[1].x, objPos[1].y, x, y, Width, Height);
 
-		piExitProgram (__FILE__, __LINE__, str);
+		piExitProgram (_FL, str);
 	}
 
 	CenterPos = objPos[VertNum];
@@ -3278,7 +3215,7 @@ COLLISION		collision;
 #ifdef EVENT_LOG_TIMES
     static UINT64 count = 0;
     static int number = 0;
-    
+
     UINT64 beginhere = GetMicroSeconds();
 #endif
 
@@ -3349,7 +3286,7 @@ piVECTOR*	lpcrnr;
 #ifdef EVENT_LOG_TIMES
     static UINT64 count = 0;
     static int number = 0, npolys = 0;
-    
+
     UINT64 beginhere = GetMicroSeconds();
 #endif
 
@@ -3758,7 +3695,7 @@ TERRAIN_DETAIL*	td = trndtl;
 		{
 			// could optimize this via some array or list of object names bypassing the
 			// iterate-through-each-object-in-database scan
-			sprintf(objname, "%s_%d_%d", td->trnobj[obnum].objname, (SINT32)td->trnobj[obnum].pos.x, (SINT32)td->trnobj[obnum].pos.y);
+			strprintf(objname, "%s_%d_%d", td->trnobj[obnum].objname, (SINT32)td->trnobj[obnum].pos.x, (SINT32)td->trnobj[obnum].pos.y);
 			lpobj = obmainFindTopmostObject(objname);
 			if (lpobj == nullptr)
 			{
@@ -4997,9 +4934,6 @@ FASTCOLLIDE* CollideList;
 	CollideList = *CollisionList;
 	for (i=0; i < CurrentObject->numtris; i++, CurrentTri++, pcn+=3, psn++)
 	{
-#ifdef TERRAIN_EDITOR
-		_CollisionTriCnt++;
-#endif
 		// first step is to determine if line passes thru the plane of the triangle, and
 		// in the direction of the normal
 		// if not no collision
@@ -6194,12 +6128,12 @@ LOGICAL trncdCollideDownMediumList(piVECTOR* OldPos, piVECTOR* NewPos, UINT32 Fl
 	return(FALSE);
 }
 
-UINT32 trncdGetNumTOs(void)
+UINT32 trncdGetNumTOs()
 {
 	return _NumTO;
 }
 
-UINT32 trncdUpdateStratMsgQue(void)
+UINT32 trncdUpdateStratMsgQue()
 {
 _StratMessageQue * StratMsg;
 _StratMessageQue * PrevStratMsg;
@@ -6252,7 +6186,7 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
         return FALSE;
 
 	piVECTOR OldPos,NewPos;
-	FASTCOLLIDE CollisionList[32];
+	FASTCOLLIDE CollisionList[32]{};
 	FASTCOLLIDE * CollideListPtr;
 	UINT32 TempNum;
 	UINT32 NumCollides;
@@ -6268,8 +6202,6 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
 
 	TempNum = 32;
 	CollideListPtr = CollisionList;
-
-	memset (CollisionList, 0, sizeof (CollisionList));
 
 	NumCollides = 0;
 
@@ -6454,27 +6386,24 @@ void trncdResetFXDamageFlags()
     }
 }
 
-#ifdef _MWERKS
-#pragma mark -
-#endif
 // new collider stuff
 
 /************************************************************************************************
 	trncdDTLCollider
 *************************************************************************************************/
 
-typedef struct trncdDTLCollider
+struct trncdDTLCollider
 {
 	UCHAR IsReplacementOctet[SUPERCELL_OCTETS_XY];
 	OBJECT* txtobj[SUPERCELL_OCTETS_XY];
-} trncdDTLCollider;
+};
 
-typedef struct
+struct collideGrid
 {
 	float originX, originY; // bottom left
 	float cellSizeX, cellSizeY;
 	int   numcols, numrows;
-} collideGrid;
+};
 
 static int collideWithSuperCell(TERRAIN_DETAIL* td, FASTCOLLIDE* collisionList, SINT32 maxcols,
 									piVECTOR const* start, piVECTOR const* end);
@@ -6495,17 +6424,17 @@ static void drawOctetDebug(TERRAIN_DETAIL*, int ox, int oy, int trinum, piVECTOR
 	trncdDTLColliderAlloc
 *************************************************************************************************/
 
-trncdDTLColliderRef trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
+trncdDTLCollider* trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
 {
 	if(td == nullptr) return nullptr;
 	if(td->trindx != SUPERCELL_OCTETS_XY)
 	{
 		char s[64];
 		snprintf(s, 63, "Unexpected size: %d, cell: %d, %d", td->trindx, td->scx, td->scy);
-		piExitProgram(__FILE__, __LINE__, s);
+		piExitProgram(_FL, s);
 	}
 
-	trncdDTLColliderRef ref = (trncdDTLColliderRef)memAlloc(sizeof(trncdDTLCollider));
+	auto* ref = (trncdDTLCollider*)memAlloc(sizeof(trncdDTLCollider));
 
 	if(ref)
 	{
@@ -6534,7 +6463,7 @@ trncdDTLColliderRef trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
 	trncdDTLColliderFree
 *************************************************************************************************/
 
-void trncdDTLColliderFree(trncdDTLColliderRef ref)
+void trncdDTLColliderFree(trncdDTLCollider* ref)
 {
 	if(ref)
 		memFree(ref);
@@ -6560,7 +6489,7 @@ SINT32 trncdCollideWithBaseTerrain(FASTCOLLIDE* collisionList, SINT32 maxcols,
 
 	td = &trndtl[12]; // center terrain tile;
 	if(td == nullptr)
-		piExitProgram(__FILE__, __LINE__, "center tile is nullptr!");
+		piExitProgram(_FL, "center tile is nullptr!");
 
 	// get which supercells to test
 	trnGrid.originX = (FLOAT32)((td->scx - 2) * SUPERCELL_WIDTH  - WorldOriginOffset.x); // relative to
@@ -7282,10 +7211,8 @@ static void damageObject(OBJECT* o)
         {
             for(unsigned int i = 0; i < pm->subModelReferences.size(); i++)
             {
-                sprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
-
+                strprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
                 OBJECT* oo = obmainFindTopmostObject(model);
-
                 if(!oo)
                     continue;
 

@@ -17,7 +17,7 @@
 class FriendLoginQuery : public DBThreadQuery
 {
 public:
-	FriendLoginQuery(const ChatHandle& handle);
+	FriendLoginQuery(const ChatHandle handle);
 	virtual bool Process(const size_t numRows) override
 	{
 		if ( numRows <= 0 )
@@ -44,7 +44,7 @@ public:
 
 static const char* _QUERY = "SELECT f.playerID FROM chat_friends f WHERE f.target = LOWER('%s')";
 
-FriendLoginQuery::FriendLoginQuery(const ChatHandle& handle)
+FriendLoginQuery::FriendLoginQuery(const ChatHandle handle)
 	: DBThreadQuery(DBThread::Default, "FriendLoginQuery", DBThreadQuery::_CALLBACK, _QUERY, Chat::Name(handle).c_str())
 	, m_handle(handle)
 	, m_players()

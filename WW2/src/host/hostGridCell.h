@@ -22,8 +22,8 @@ namespace Grid
 	static const SINT64 MAX_RANGE_CM_SQ = (MAX_VIS_RANGE_M * 100) * (MAX_VIS_RANGE_M * 100);
 
 	// Entities in a particular grid node.
-	typedef std::unordered_set<HostVehicle*> VehicleSet;
-	typedef std::unordered_set<Cell*> Cells;
+	using VehicleSet = std::unordered_set<HostVehicle*>;
+	using Cells = std::unordered_set<Cell*>;
 
 	/// Patrol the grid for cells that have expired.
 	bool PatrolExpirations();

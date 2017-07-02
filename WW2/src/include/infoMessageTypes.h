@@ -103,7 +103,7 @@ struct PLAY_VIDEO
 	PLAY_DX		dx;
 };
 
-typedef UINT32   WIN_MMVERSION_;  /* major (high byte), minor (low byte) */
+using WIN_MMVERSION_ = UINT32  ;  /* major (high byte), minor (low byte) */
 
 #define MAX_MIX_NAME 40
 

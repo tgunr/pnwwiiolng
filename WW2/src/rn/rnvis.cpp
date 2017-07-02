@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <math.h>
 #include "pi/pi.h"
@@ -18,12 +18,12 @@
 #include "osgImport/Polytope.h"
 static Polytope polytope;
 
-LOGICAL rnvisInit(void)
+LOGICAL rnvisInit()
 {
 	return(TRUE);
 }
 
-void rnvisKill(void)
+void rnvisKill()
 {
 }
 

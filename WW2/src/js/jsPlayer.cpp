@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 
 #include "include/vars.h"
@@ -258,7 +258,7 @@ JSBool jsPlayer::GetProperty(JSContext* ctx, int propid, jsval* val)
 				char name[30+1];
 				UINT32 weaponType = fpFPSGetHighlightedWeaponType();
 
-				strncpy(name, fpFPSWeaponKeyStrings[weaponType], 30);
+				strsafecpy(name, fpFPSWeaponKeyStrings[weaponType]);
 
 				switch(weaponType)
 				{
@@ -361,8 +361,7 @@ JSBool jsPlayer::GetProperty(JSContext* ctx, int propid, jsval* val)
 					*val = phui::js::ConstString("stand");
 			}else
 			{
-				UINT32 crewpos;
-				persGetPersonaPosition(&crewpos);
+				UINT32 crewpos = persGetPersonaPosition();
 
 				if(persGetCrewIsDead(crewpos))
 				{
@@ -388,8 +387,7 @@ JSBool jsPlayer::GetProperty(JSContext* ctx, int propid, jsval* val)
 					*val = phui::js::ConstString("trot");
 			}else
 			{
-				UINT32 crewpos;
-				persGetPersonaPosition(&crewpos);
+				UINT32 crewpos = persGetPersonaPosition();
 
 				if(persGetCrewIsDead(crewpos))
 					*val = phui::js::ConstString("dead");

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*
  *  FTFontReplacement.cpp
  *  Replacement for FTGL/Freetype
@@ -41,7 +41,6 @@ static const size_t MAX_CHAR_IN_LINE = 256;
 #include "fio/fio.h"
 #include <iostream>
 #include <sstream>
-#include "wwii/wwiiHash.h"
 #include "draw/fontadaptor.h"
 #include "draw/TextureFont.h"
 
@@ -324,7 +323,7 @@ float FTFontWestern::Advance(const wchar_t* str)
 
 #define ALT_DRAW_TEXT
 
-typedef struct FLPoint { float x,y; } FLPoint;
+struct FLPoint { float x,y; };
 
 template<class T>
 void FTFontWestern::RenderText( const T* str, int len )
@@ -592,7 +591,7 @@ SINT32 FontAdaptor::getTextureId()
 
 // ------------------------------------------------------------------
 
-FontAdaptor::FontAdaptor(FTFontWestern* f)
-: font(f)
+FontAdaptor::FontAdaptor(std::unique_ptr<FTFontWestern> &&f)
+    : font(std::move(f))
 {
 }

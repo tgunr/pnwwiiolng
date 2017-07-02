@@ -39,7 +39,7 @@ public:
 	{
 		if ( m_address == 0 )
 			dbugLog(_FLA, "Tried to create ServerSync for address 0.0.0.0");
-	};
+	}
 
 	// Get the address of this server
 	UINT32 address() const { return m_address; }
@@ -57,7 +57,7 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////
-typedef std::list<ServerSync> SYNC_LIST;
+using SYNC_LIST = std::list<ServerSync>;
 static SYNC_LIST synclist;
 
 //////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ _findServerSync(UINT32 address)
 	{
 		if ( it->address() == address )
 		{
-			betaLog(_FLI, "%s is already on the synclist", teulGetAddress(address));
+			dbugLog(_FLI, "%s is already on the synclist", teulGetAddress(address));
 			return it;
 		}
 	}
@@ -124,7 +124,7 @@ strtAddSyncPeer(UINT32 address)
 	SYNC_LIST::iterator it = _findServerSync(address);
 	if ( it != synclist.end() )
 	{
-		betaLog(_FLI, "%s is already on the synclist", teulGetAddress(address));
+		dbugLog(_FLI, "%s is already on the synclist", teulGetAddress(address));
 		return;
 	}
 

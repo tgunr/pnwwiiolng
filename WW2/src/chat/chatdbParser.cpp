@@ -9,26 +9,20 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatdbHostMessages.h"
 #include "chat/chatdbParser.h"
 #include "chat/chatdbSquadXchg.h"
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"
 #include "chat/chatSquadControl.h"
 #include "chat/chatSquadControlResults.h"
 #include "chat/chatSquadMemberUpdates.h"
 #include "chat/chatTypes.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseConstants.h"
 #include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
 #include "teul/teulEndpointDefs.h"
 #include "teul/teulKit.h"
 #include "teul/teulPackers.h"
-
-extern DBHANDLE dbh;
-extern DBCONNECTION dbConnection;
 
 //////////////////////////////////////////////////////////////////////
 // Read a squad's details
@@ -89,7 +83,7 @@ chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool /*sendMembers*/)
 
 		squad.m_slogan = row.NextString();
 
-		betaLog(_FLI, "sq:%u sending info to chat host", squad.m_squadID);
+		dbugLog(_FLI, "sq:%u sending info to chat host", squad.m_squadID);
 		if ( squadXchg.send(teulIndex) < 0 )
 			dbugLog(_FLA, "squadXchg send failed");
 	}
@@ -145,7 +139,7 @@ _createSquad(UINT32 ownerID, UINT32* members, const Chat::Name& shortName, const
 {
     //DEV-560 - before creating new squad, delete disbanded squad with the same name
     DBQuery qDel(dbh, "DELETE FROM wwii_squads WHERE disbanded = 1 AND LOWER(short_name) = LOWER('%s')", shortName.c_str());
-    
+
     DBQuery q(dbh, "INSERT INTO wwii_squads (creatorid, short_name, name, password, description, active, recruiting, voting, disbanded, created)"
 					" VALUES (%u, '%s', '%s', '', '', 1, 1, 1, 0, now())"
 					, ownerID, shortName.c_str(), fullName);
@@ -155,7 +149,7 @@ _createSquad(UINT32 ownerID, UINT32* members, const Chat::Name& shortName, const
 
 	char playerIDs[(14 * (SquadControl::CREATE_PLAYERS_REQUIRED+1)) + 1];
 	char* p = playerIDs;
-	sprintf(playerIDs, "%u", ownerID);
+	strprintf(playerIDs, "%u", ownerID);
 	for ( UINT32 i = 0; i < SquadControl::CREATE_PLAYERS_REQUIRED; ++i )
 	{
 		while ( *p )
@@ -196,7 +190,7 @@ chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 		{
 		case SquadMemberUpdate::_ADD:
 			LogAbort("SMU::ADD is deprecated");
-		break;
+
 		case SquadMemberUpdate::_PROMOTE:
 		{
 			if ( update.m_handle < 0x40LL ) throw SquadError("invalid handle", SQR_INVALID);
@@ -276,7 +270,6 @@ chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 		default:
 		case SquadMemberUpdate::_INVALID:
 			throw SquadError("Invalid/not implemented yet", SQR_NOT_IMPLEMENTED);
-		break;
 		}
 
 		// Record this event

@@ -232,7 +232,6 @@ static void 	_SortDeviceList(pRecDevice*, UINT32 numDevices);
 static void 	_AssignDeviceNumbers(pRecDevice*, UINT32 numDevices, UINT32* ids, UINT32 numIDs);
 static void 	_LoadAxisCalibration(HID_ELEMENT*, int pos);
 static void 	_LoadJoystickIDs(UINT32* ids);
-static UINT32 	_vcodeToIAC(UINT32 vcode);
 
 static const KEYCODE_MAP_ELEM* _lookupElemByASCII(UINT32 ascii);
 static const KEYCODE_MAP_ELEM* _lookupElemByDIK(UINT32 dik);
@@ -613,7 +612,10 @@ static void realDipSendCocoaKeyboardMouseEvents()
 
         if (cursorHidden && ((mousex < 100 || mousex > (ddpGetWidth() - 100)) || (mousey < 100 || mousey > (ddpGetHeight() - 100))))
         {
-            CGPoint c = { static_cast<CGFloat>(ddpGetWidth() / 2), static_cast<CGFloat>(ddpGetHeight() / 2) };
+            
+            CGPoint c = {
+                static_cast<CGFloat>(ddpGetCenterX()),
+                static_cast<CGFloat>(ddpGetCenterY()) };
             
             CGAssociateMouseAndMouseCursorPosition(false);
             /* Why is this here? We aren't posting a synthetic event, that's in
@@ -629,8 +631,8 @@ static void realDipSendCocoaKeyboardMouseEvents()
             //);
             CGWarpMouseCursorPosition(c);
             CGAssociateMouseAndMouseCursorPosition(true); 
-            lastmousex = ddpGetWidth() / 2;
-            lastmousey = ddpGetHeight() / 2;
+            lastmousex = static_cast<int>(c.x);
+            lastmousey = static_cast<int>(c.y);
         }
         else
         {
@@ -949,7 +951,7 @@ int dipHasKeyboard()
 
 int dipHasMouse()
 {
-	// Because 'false' would mean you are a fucktard.
+	// We don't support lacking a mouse.
 	return 1 ;
 }
 
@@ -1177,34 +1179,6 @@ void _LoadJoystickIDs(UINT32* ids)
 		ids[i] = [[NSUserDefaults standardUserDefaults]	
               integerForKey:[NSString stringWithFormat:@"joy%d", i+1]];
 	}
-}
-
-static UINT32 _vcodeToIAC(UINT32 vcode)
-{
-	static UINT32 state = 0;
-	static 	void* kptr = NULL;
-  
-	UINT32 iac, keytrans;
-	UCHAR c;
-	
-	iac = 0;
-	
-	if(!kptr)
-		kptr  = (void*)GetScriptManagerVariable(smKCHRCache);
-  
-	if(_DIKtoASCII[vcode]) // NOTE: this assumes that all ASCII keys are always grouped in the same spot on the keyboard
-	{
-		keytrans = KeyTranslate(kptr, vcode, (unsigned long*)&state);
-		c = ((UCHAR*)&keytrans)[3];
-		
-		if(isascii(c) && c < MAX_KEYS)
-			iac = _ASCIItoIAC[c];
-	}
-  
-	if(iac == 0)
-		iac  = _DIKtoIAC[vcode];
-  
-	return iac;	
 }
 
 static const KEYCODE_MAP_ELEM* _lookupElemByDIK(UINT32 dik)

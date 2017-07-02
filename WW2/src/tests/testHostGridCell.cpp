@@ -28,7 +28,7 @@ public:	bool TestXYConstructor(Grid::Key::Coord x, Grid::Key::Coord y)
 
 		START_SUB_STAGE( "TestXYConstructor" )
 			char xy[32];
-			sprintf(xy, "%d,%d", x, y);
+			strprintf(xy, "%d,%d", x, y);
 
 			TestFocus(xy);
 
@@ -196,7 +196,7 @@ public: virtual ~HostGridCellTest() {}
 		for ( size_t i = 0; i < numKeys; ++i )
 		{
 			char comparison[32];
-			sprintf(comparison, "cell[%" PRSizeT "]", i);
+			strprintf(comparison, "cell[%" PRSizeT "]", i);
 			START_SUB_STAGE( comparison )
 				// Test if inRange returns the expected (true/false) result.
 				ExpectTrue( cells[0]->inRange(cells[i]->key()) == keys[i].inRangeOfCenter );
@@ -210,7 +210,7 @@ public: virtual ~HostGridCellTest() {}
 	{
 		bool success = false;
 		char center[64];
-		sprintf(center, "Center[%d,%d]", xOffset, yOffset);
+		strprintf(center, "Center[%d,%d]", xOffset, yOffset);
 		START_SUB_STAGE( center )
 			try
 			{
@@ -446,7 +446,7 @@ public: virtual bool Run() override
 */
 
 #ifdef I_WANT_TO_KNOW_MORE
-		fprintf(stderr, "CellRad: %lld, CellRad2: %lld\n", Grid::Cell::Radius_cells, Grid::Cell::Radius_cells2);
+		fprintf(stderr, "CellRad: %" PR64BitT ", CellRad2: %" PR64BitT "\n", Grid::Cell::Radius_cells, Grid::Cell::Radius_cells2);
 
 		UINT32 width = World::Meters::Width / Grid::Cell::Size_m;
 		UINT32 height = World::Meters::Height / Grid::Cell::Size_m;

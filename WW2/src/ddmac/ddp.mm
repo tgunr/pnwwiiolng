@@ -5,7 +5,6 @@
 #include <sys/stat.h>
 #include "cfgPrefs.h"
 #import <Cocoa/Cocoa.h>
-#include "endianess.h"
 
 LOGICAL cursorHidden = false;
 
@@ -233,7 +232,7 @@ LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscree
     resetOGLAttributeValue(oglAttributes, NSOpenGLPFAColorSize, static_cast<NSOpenGLPixelFormatAttribute>(bpp));
     
     ddpView = [[NSOpenGLView alloc] initWithFrame:NSMakeRect(0, 0, width, height)
-                                      pixelFormat:[[[NSOpenGLPixelFormat alloc] initWithAttributes:oglAttributes] autorelease]];
+                                      pixelFormat:[[NSOpenGLPixelFormat alloc] initWithAttributes:oglAttributes]];
     context = ddpView.openGLContext;
     if (!context) {
         throw "Unable To Allocate OpenGL Window Context";
@@ -289,6 +288,22 @@ void ddpSetFullScreen(LOGICAL fullscreen)
     ddpRefreshGLViewport(WantedWidth, WantedHeight);
 }
 
+void ddpTemporarilyEscapeFullscreen(bool begin)
+{
+    // This is a TERRIBLE solution, for the record. It's just a quick hack that works for now.
+    // TODO: Clean this up with something sane.
+    static NSRect oldWinRect;
+    
+    if (begin) {
+        oldWinRect = winRect;
+        winRect = fullRect;
+        ddpSetFullScreen(false);
+    } else {
+        winRect = oldWinRect;
+        ddpSetFullScreen(true);
+    }
+}
+
 void ddpSetupGL(int w, int h)
 {
 	[nsOpenGlContext makeCurrentContext];
@@ -337,10 +352,6 @@ LOGICAL	ddpUpdate()
     if (GeneratingHostTerrain) {
         updateGeneratingHostTerrain();
     }
-#endif
-    
-#ifdef BETA_RELEASE
-	logUpdateProfiling();
 #endif
     
 	if (resetfps)
@@ -410,6 +421,16 @@ void sysGetMousePosition(SINT32 *x, SINT32 *y)
 ////////////////////////////////////////////////////////////////////////////////
 #pragma mark - GETTERS AND STATS -
 ////////////////////////////////////////////////////////////////////////////////
+
+int ddpGetCenterX()
+{
+    return static_cast<int>([[ddpWin screen] frame].origin.x + ([[ddpWin screen] frame].size.width / 2));
+}
+
+int ddpGetCenterY()
+{
+    return static_cast<int>([[ddpWin screen] frame].origin.y + ([[ddpWin screen] frame].size.height / 2));
+}
 
 int ddpGetWidth()
 {
@@ -522,7 +543,7 @@ static NSURL *ddcapGenerateScreenshotURL(NSString *providedName)
                 return;
             }
         }
-        screenshotsDirectory = [screenshotsDir retain];
+        screenshotsDirectory = screenshotsDir;
         
         // Create a date formatter that includes full date and time info,
         // doesn't return "today" etc., and uses the user's formatting settings.

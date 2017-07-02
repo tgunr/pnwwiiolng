@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /////////////////////////////////////////////////////
 // Module: fxBlt.cpp
 // Description: Handle all bullet events.
@@ -172,7 +172,7 @@ void fxBltFreeAll()
 // Function: fxBltKill
 // Description: Release all
 //////////////////////////////////////////////
-LOGICAL fxBltKill()
+void fxBltKill()
 {
     if(g_blts != nullptr)
     {
@@ -185,8 +185,6 @@ LOGICAL fxBltKill()
     memset(&g_bltTail, 0, sizeof(FXBULLET));
     memset(&_freeH, 0, sizeof(FXBULLET));
     memset(&_freeT, 0, sizeof(FXBULLET));
-
-    return TRUE;
 }
 
 //////////////////////////////////////////////
@@ -425,7 +423,7 @@ LOGICAL fxBltGetObjectForBullet(FXBULLET* blt, OBJECT* o)
         blt->o->flag2 |= OBJECT_HAS_FX;
     }
 
-    typedef std::pair<void* , SINT32> ins;
+	using ins = std::pair<void* , SINT32>;
 
     blt->mapIter = g_mappedBullets.insert(ins((void*)o, blt->index + 1));
 

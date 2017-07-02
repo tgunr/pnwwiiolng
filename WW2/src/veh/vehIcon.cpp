@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "include/vars.h"
 #include "gl/glplat.h"
 
@@ -83,16 +83,12 @@ static void   _HandleIconMode(vehVehicle* CurrentVehicle, LOGICAL& DrawRangeCirc
 	vehIconInit
 *************************************************************************************************/
 
-SINT32 vehIconInit(void)
+SINT32 vehIconInit()
 {
-	ldpixSetTextureReduction(FALSE);
-
 	_IconRangeCircleTexId = ldpixLoadImageFileToSurface("iconring1.bmp", colorBLACK, LDPIX_NONE);
 	_RankIcons = drawIconLoad("gamerank");
 	_DeathIcon = drawIconLoad("\\ui\\uidata\\icons\\misc\\icon_death");
 	_ColorRankIcons = drawIconLoad("\\ui\\uidata\\chat\\commrank");
-
-	ldpixSetTextureReduction(TextureReduction);
 
 	imapInstallNonRemovableControlCallback(IMAP_CYCLE_ICON_MODE, _CycleIconMode);
 
@@ -111,7 +107,7 @@ SINT32 vehIconInit(void)
 	vehIconKill
 *************************************************************************************************/
 
-SINT32 vehIconKill(void)
+SINT32 vehIconKill()
 {
 	if (piIsTexture(_IconRangeCircleTexId, 0))
 		piFreeMipTextures(_IconRangeCircleTexId);
@@ -157,6 +153,10 @@ UINT32 vehIconColor(vehVehicle* Vehicle)
 {
 	UINT32 IconColor = 0;
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
+
+	//check for null player vehicle
+	if (PlayerVehicle == nullptr)
+		return colorALPHA;
 
 	if(Vehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{
@@ -344,7 +344,7 @@ SINT32 vehIconUpdate(vehVehicle* Vehicle)
 	vehIconDraw
 *************************************************************************************************/
 
-SINT32 vehIconDrawDeprecated(void)
+SINT32 vehIconDrawDeprecated()
 {
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 	if (!PlayerVehicle)	return 0;
@@ -471,7 +471,7 @@ void vehIconDraw()
 	vehIconMode
 *************************************************************************************************/
 
-SINT32 vehIconMode(void)
+SINT32 vehIconMode()
 {
 	return _IconMode;
 }

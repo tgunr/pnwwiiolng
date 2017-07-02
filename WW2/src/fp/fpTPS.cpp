@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "include/vars.h"
 
@@ -59,7 +59,7 @@ extern void rnUpdateLoadingScreen();
 // loads models with instantiate set to 0
 // loads animations into appropriate place
 // ANYTHING added here will need a cleanup in the kill function
-LOGICAL fpTPSLoad (void)
+LOGICAL fpTPSLoad()
 {
 	int			i, j, k, l;
 	static int			boneCount;
@@ -161,9 +161,6 @@ LOGICAL fpTPSLoad (void)
 	// idle animations
 	memset(fpTPSNumIdleAnims, 0, sizeof (fpTPSNumIdleAnims));
 
-	UINT32 usedBlends = 0;
-	UINT32 unusedBlends = 0;
-
 	TPS_BLEND_MAP::iterator foundBlend;
 
 	// tps blends
@@ -175,75 +172,53 @@ LOGICAL fpTPSLoad (void)
 			{
 				for (l=0; l < TPS_POINTTYPE_NUM_TYPES; l++)
 				{
-					bool exists = false;
-					bool added	= false;
+					const char* key = fpTPSCreateBlendKey(i, j, k, l, TPS_BLENDTYPE_TPS);
+					gr2AnimationBlend *blend = gr2LoadBlendedAnimation(key, boneCount);
 
-					const char* key = fpTPSCreateBlendKey(i, j, k, l, TPS_BLENDTYPE_TPS, &exists);
+					if (blend) {
+					    UINT64 blendID = fpTPSCreateBlendID(i, j, k, l, TPS_BLENDTYPE_TPS);
 
-					if(exists)
-					{
-						UINT64 blendID = fpTPSCreateBlendID(i, j, k, l, TPS_BLENDTYPE_TPS);
-
-						foundBlend = _fpTPSAnimLib.find(blendID);
-
-						if(foundBlend == _fpTPSAnimLib.end())
-						{
-							_fpTPSAnimLib[blendID] = gr2LoadBlendedAnimation((SCHAR*)key, boneCount);
-							added = true;
+						if (_fpTPSAnimLib.find(blendID) == _fpTPSAnimLib.end()) {
+							_fpTPSAnimLib[blendID] = blend;
+						} else {
+						    gr2FreeBlendedAnimation(blend);
+						    dbugLog(_FLD, "Unused blend (this is bloating loading time): %s", key);
 						}
 					}
-
-					if(added)
-						usedBlends++;
-					else
-						unusedBlends++;
 				}
 			}
 		}
-
 		rnUpdateLoadingScreen();
 	}
 
 	// weapon blends
-	if(true)
-	{
-		for (i=0; i < TPS_POSETYPE_NUM_TYPES; i++)
-		{
-			for (j=0; j < TPS_MOVETYPE_NUM_TYPES; j++)
-			{
-				for (k=0; k < NUM_WEAPONS; k++)
-				{
-					for (l=0; l < TPS_POINTTYPE_NUM_TYPES; l++)
-					{
-						bool exists = false;
-						bool added	= false;
+    for (i=0; i < TPS_POSETYPE_NUM_TYPES; i++)
+    {
+        for (j=0; j < TPS_MOVETYPE_NUM_TYPES; j++)
+        {
+            for (k=0; k < NUM_WEAPONS; k++)
+            {
+                for (l=0; l < TPS_POINTTYPE_NUM_TYPES; l++)
+                {
+                    const char* key = fpTPSCreateBlendKey(i, j, k, l, TPS_BLENDTYPE_FPS);
+					gr2AnimationBlend *blend = gr2LoadBlendedAnimation(key, boneCount);
 
-						const char* key = fpTPSCreateBlendKey(i, j, k, l, TPS_BLENDTYPE_FPS, &exists);
+                    if (blend) {
+                        UINT64 blendID = fpTPSCreateBlendID(i, j, k, l, TPS_BLENDTYPE_FPS);
 
-						if(exists)
-						{
-							UINT64 blendID = fpTPSCreateBlendID(i, j, k, l, TPS_BLENDTYPE_FPS);
+                        if(_fpTPSAnimLib.find(blendID) == _fpTPSAnimLib.end()) {
+                            _fpTPSAnimLib[blendID] = blend;
+                        } else {
+						    gr2FreeBlendedAnimation(blend);
+                            dbugLog(_FLD, "Unused blend (this is bloating loading time): %s", key);
+                        }
 
-							foundBlend = _fpTPSAnimLib.find(blendID);
-
-							if(foundBlend == _fpTPSAnimLib.end())
-							{
-								_fpTPSAnimLib[blendID] = gr2LoadBlendedAnimation((SCHAR*)key, boneCount);
-								added = true;
-							}
-						}
-
-						if(added)
-							usedBlends++;
-						else
-							unusedBlends++;
-					}
-				}
-			}
-
-			rnUpdateLoadingScreen();
-		}
-	}
+                    }
+                }
+            }
+        }
+        rnUpdateLoadingScreen();
+    }
 
 	// mixins
 	for (i=0; i < TPS_POSETYPE_NUM_TYPES; i++)
@@ -272,7 +247,7 @@ LOGICAL fpTPSLoad (void)
 
 					snprintf (errorMessage, 254, "ERROR loading blend %s", fpTPSTwitchFiles[i][j]);
 					Write_Log (LOG_FPS, LOG_INFO, "%s", errorMessage);
-					piExitProgram (__FILE__, __LINE__, errorMessage);
+					piExitProgram (_FL, errorMessage);
 				}
 			}
 			else
@@ -346,7 +321,7 @@ LOGICAL fpTPSLoad (void)
 
 				snprintf (errorMessage, 254, "ERROR finding patch %s", fpTPSPatchTextureNames[i]);
 				Write_Log (LOG_FPS, LOG_INFO, "%s", errorMessage);
-				piExitProgram (__FILE__, __LINE__, errorMessage);
+				piExitProgram (_FL, errorMessage);
 			}
 		}
 		else
@@ -374,7 +349,7 @@ LOGICAL fpTPSLoad (void)
 
 		snprintf (errorMessage, 254, "ERROR too many faces in face file .. %d > %d", fpTPSNumFaces, MAX_FACES);
 		Write_Log (LOG_FPS, LOG_INFO, "%s", errorMessage);
-		piExitProgram (__FILE__, __LINE__, errorMessage);
+		piExitProgram (_FL, errorMessage);
 	}
 	memcpy (fpTPSFaceTexIDs, faceIDs, sizeof(SINT32)*fpTPSNumFaces);
 	*/
@@ -389,7 +364,7 @@ LOGICAL fpTPSLoad (void)
 }
 
 // kill the TPS system
-void fpTPSKill (void)
+void fpTPSKill()
 {
 	TPS_BLEND_MAP::iterator it = _fpTPSAnimLib.begin();
 
@@ -473,17 +448,17 @@ void fpTPSDumpStates()
 					if(fpTPSAnimLib[i][j][k][l])
 					{
 						*line = 0;
-						sprintf(line, "<blend type=\"troop\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSAnimLib[i][j][k][l]));
+						strprintf(line, "<blend type=\"troop\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSAnimLib[i][j][k][l]));
 						OS_WRITE(fd, line, strlen(line));
-						sprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
+						strprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
 						OS_WRITE(fd, line, strlen(line));
-						sprintf(line, "\t<state name=\"move\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("move", j));
+						strprintf(line, "\t<state name=\"move\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("move", j));
 						OS_WRITE(fd, line, strlen(line));
-						sprintf(line, "\t<state name=\"weapon\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("weapon", k));
+						strprintf(line, "\t<state name=\"weapon\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("weapon", k));
 						OS_WRITE(fd, line, strlen(line));
-						sprintf(line, "\t<state name=\"pointtype\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pointtype", l));
+						strprintf(line, "\t<state name=\"pointtype\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pointtype", l));
 						OS_WRITE(fd, line, strlen(line));
-						sprintf(line, "</blend>\n");
+						strprintf(line, "</blend>\n");
 						OS_WRITE(fd, line, strlen(line));
 					}
 				}
@@ -498,13 +473,13 @@ void fpTPSDumpStates()
 			if(fpTPSTwitchBlends[i][j])
 			{
 				*line = 0;
-				sprintf(line, "<blend type=\"twitch\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSTwitchBlends[i][j]));
+				strprintf(line, "<blend type=\"twitch\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSTwitchBlends[i][j]));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
+				strprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "\t<state name=\"twitch\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("twitch", j));
+				strprintf(line, "\t<state name=\"twitch\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("twitch", j));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "</blend>\n");
+				strprintf(line, "</blend>\n");
 				OS_WRITE(fd, line, strlen(line));
 			}
 		}
@@ -517,13 +492,13 @@ void fpTPSDumpStates()
 			if(fpTPSDeathBlends[i][j])
 			{
 				*line = 0;
-				sprintf(line, "<blend type=\"death\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSDeathBlends[i][j]));
+				strprintf(line, "<blend type=\"death\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSDeathBlends[i][j]));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
+				strprintf(line, "\t<state name=\"pose\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("pose", i));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "\t<state name=\"death\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("death", j));
+				strprintf(line, "\t<state name=\"death\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("death", j));
 				OS_WRITE(fd, line, strlen(line));
-				sprintf(line, "</blend>\n");
+				strprintf(line, "</blend>\n");
 				OS_WRITE(fd, line, strlen(line));
 			}
 		}
@@ -538,15 +513,15 @@ void fpTPSDumpStates()
 				if(fpTPSCombatEmotes[i][j][k])
 				{
 					*line = 0;
-					sprintf(line, "<blend type=\"combatemote\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSCombatEmotes[i][j][k]));
+					strprintf(line, "<blend type=\"combatemote\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSCombatEmotes[i][j][k]));
 					OS_WRITE(fd, line, strlen(line));
-					sprintf(line, "\t<state name=\"combatemote\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("combatemote", i));
+					strprintf(line, "\t<state name=\"combatemote\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("combatemote", i));
 					OS_WRITE(fd, line, strlen(line));
-					sprintf(line, "\t<state name=\"hand\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("hand", j));
+					strprintf(line, "\t<state name=\"hand\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("hand", j));
 					OS_WRITE(fd, line, strlen(line));
-					sprintf(line, "\t<state name=\"mixin\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("mixin", k));
+					strprintf(line, "\t<state name=\"mixin\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("mixin", k));
 					OS_WRITE(fd, line, strlen(line));
-					sprintf(line, "</blend>\n");
+					strprintf(line, "</blend>\n");
 					OS_WRITE(fd, line, strlen(line));
 				}
 			}
@@ -558,11 +533,11 @@ void fpTPSDumpStates()
 		if(fpTPSBodyEmotes[i])
 		{
 			*line = 0;
-			sprintf(line, "<blend type=\"bodyemote\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSBodyEmotes[i]));
+			strprintf(line, "<blend type=\"bodyemote\" path=\"%s\">\n",gr2GetPathFromBlend(fpTPSBodyEmotes[i]));
 			OS_WRITE(fd, line, strlen(line));
-			sprintf(line, "\t<state name=\"bodyemote\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("bodyemote", i));
+			strprintf(line, "\t<state name=\"bodyemote\" value=\"%s\"/>\n",fpTPSGetTypeNameFromValue("bodyemote", i));
 			OS_WRITE(fd, line, strlen(line));
-			sprintf(line, "</blend>\n");
+			strprintf(line, "</blend>\n");
 			OS_WRITE(fd, line, strlen(line));
 		}
 	}
@@ -571,20 +546,17 @@ void fpTPSDumpStates()
 }
 #endif
 
-const char* fpTPSCreateBlendKey(int pose, int move, int weap, int point, int type, bool* exists)
+const char* fpTPSCreateBlendKey(int pose, int move, int weap, int point, int type)
 {
 	static char key[128+1];
 
 	const char* weapStr = (type == TPS_BLENDTYPE_FPS) ? fpFPSWeaponKeyStrings[weap] : fpTPSWeaponKeyStrings[weap];
 
-	snprintf(key, 128, "gr2Data\\TPS\\blends\\%s_%s_%s_%s.txt",
-					fpTPSPoseKeyStrings[pose],
-					fpTPSMoveKeyStrings[move],
-					weapStr,
-					fpTPSPointKeyStrings[point]);
-
-	if(exists)
-		*exists = (fioAccess(key)) ? true: false;
+	strprintf(key, "gr2Data\\TPS\\blends\\%s_%s_%s_%s.txt",
+	    fpTPSPoseKeyStrings[pose],
+		fpTPSMoveKeyStrings[move],
+		weapStr,
+		fpTPSPointKeyStrings[point]);
 
 	return strstr(key, "T");
 }

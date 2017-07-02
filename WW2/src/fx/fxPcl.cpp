@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 ///////////////////////////////////////////////////
 // Module: fxPcl.cpp
 // Description: Handles 3d particles.
@@ -124,8 +124,6 @@ LOGICAL fxPclInit()
     if(particles == nullptr)
         return FALSE;
 
-//	Uneccessary -- memAlloc == calloc
-//    memset(particles, 0, sizeof(FXPARTICLE) * DEF_FXPCL_MAX_PARTICLES);
     memset(g_fxInitFuncs, 0, sizeof(FXINITFUNC) * IDE_NUMBER_OF_PARTICLES);
     memset(g_fxUpdateFuncs, 0, sizeof(FXUPDATEFUNC) * IDE_NUMBER_OF_PARTICLES);
 
@@ -581,7 +579,7 @@ void fxPclFreeAll()
 // Function: fxPclKill
 // Description:
 //////////////////////////////////////////
-LOGICAL fxPclKill()
+void fxPclKill()
 {
     if(particles != nullptr)
     {
@@ -592,8 +590,6 @@ LOGICAL fxPclKill()
     // Set to nullptr in case of further updates.
     memset(&g_pclHead, 0, sizeof(FXPARTICLE));
     memset(&g_pclTail, 0, sizeof(FXPARTICLE));
-
-    return TRUE;
 }
 
 //////////////////////////////////////////

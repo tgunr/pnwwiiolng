@@ -33,7 +33,7 @@
 //!	request(teulIndex) -- request a list
 //!
 //! Usage:
-//!  typedef network_array<object type> mytype;
+//!  using mytype = network_array<object type>;
 //!	TEUL_CALLBACK* mtype::s_callback;
 //!
 //! If you want the object to handle incoming messages, you will need
@@ -49,7 +49,7 @@ class teul_network_array
 {
 private:
 	//! Short-hand for self-references.
-	typedef teul_network_array<Tp> __self;
+	using self_type = teul_network_array<Tp>;
 
 public:
 	//! ACTION indicates the type of message being sent.
@@ -68,7 +68,7 @@ public:
 	static TEUL_CALLBACK*& callback() { static TEUL_CALLBACK* s_callback = nullptr; return s_callback; }
 
 	//! Required if you will be receiving arrays of this type.
-	static SINT32 receive(SINT32 teulIndex, __self&);
+	static SINT32 receive(SINT32 teulIndex, self_type&);
 
 private:
 	UINT64				m_owner;		//!< 64-bit field to indicate source (e.g. a ChatHandle)
@@ -183,7 +183,7 @@ public:
 	//! @param[in] a ACTION_OBJECT describing the incoming message.
 	static SINT32 callbackRecv(ACTION_OBJECT* const a)
 	{
-		__self incoming;
+		self_type incoming;
 		try
 		{
 			incoming.packer(TEUL_UNPACK, a);
@@ -200,7 +200,7 @@ public:
 	//! @param[in] a ACTION_OBJECT describing the outgoing message.
 	static SINT32 callbackSend(ACTION_OBJECT* const a)
 	{
-		__self* outgoing = (__self*)a->localRawData;
+		self_type* outgoing = (self_type*)a->localRawData;
 		return outgoing->packer(TEUL_PACK, a);
 	}
 
@@ -240,7 +240,7 @@ public:
 	}
 
 	//! Pack/Unpack data.
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_action, 8);
 		if ( mode == TEUL_UNPACK )
@@ -303,7 +303,7 @@ private:
 		}
 
 		// 0 indicates not completed, 1 indicates end of list
-		LOGICAL endOfRun = (m_watermark < size()) ? 0 : 1;
+		bool endOfRun = !(m_watermark < size());
 
 		// 15 bits for count - upto 32768 entries, and 1 bit for 'EOR'
 		if ( endOfRun )
@@ -319,12 +319,12 @@ private:
 	_unpackBody(ACTION_OBJECT* const a)
 	{
 		UINT16 entries = 0;
-		LOGICAL endOfRun = 0;
+		bool endOfRun = false;
 		a->offset = teulPackUINT16(TEUL_UNPACK, a->packed, a->offset, &entries, 16);
 		if ( entries & 0x8000 )
 		{
 			entries &= 0x7fff;
-			endOfRun = 1;
+			endOfRun = true;
 		}
 
 		// Avoid lots of reallocs

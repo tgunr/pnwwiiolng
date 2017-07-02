@@ -258,14 +258,14 @@ function gameAOCandidateSelection (forSide)
 				local score = _scoreAOPotential(unit, cp, link, rcp, country)
 				if score > 0 and (scores[rcp] == nil or score > scores[rcp] or (unit:country() == country and result.candidates[rcp]:country() ~= country)) then 
 					result.candidates[rcp] = unit
-						scores[rcp] = score
-						if not byScore[score] then byScore[score] = {} end
-						table.insert(byScore[score], rcp)
-						if score > result.maxScore then result.maxScore = score end
-					end
+					scores[rcp] = score
+					if not byScore[score] then byScore[score] = {} end
+					table.insert(byScore[score], rcp)
+					if score > result.maxScore then result.maxScore = score end
 				end
 			end
 		end
+	end
 
 	if result.maxScore > 0 then
 		result.best = byScore[result.maxScore]
@@ -352,11 +352,7 @@ function gameSpareAOCapacity (forSide)
 	if gameAOPlacements[forSide] == nil or gameAOPlacements[forSide] < teulClockTime - 30 then
 		chatSendHCMessage(forSide, LSTR_LABELLED_GENERIC, locstr('aoNotice'), stats)
 		log('D', 'autoao', stats .. " considering auto-placement")
-			local noticeDelay = gameAONoticeDelay
-			if (required - placed) == 1 then
-			-- If this is the only spare, sit quietly for an extra 15 minutes to let the HC plan.
-			noticeDelay = gameAONoticeDelay + 15
-			end	
+		local noticeDelay = gameAONoticeDelay
 		_schedulePlacement(forSide, noticeDelay, gameAOWarnings)	-- false := first warning
 		return
 	end

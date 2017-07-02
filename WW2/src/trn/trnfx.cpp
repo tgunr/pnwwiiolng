@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: trnfx.cpp
 // Description:
@@ -203,7 +203,7 @@ bool TerrainSTO::activate()
 	if(0)
 	{
 		char buf[150];
-		sprintf(buf, "[activate] Terrain model: %s id:%d", model(), (int)uid());
+		strprintf(buf, "[activate] Terrain model: %s id:%d", model(), (int)uid());
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, UTF16(buf));
 	}
 #endif
@@ -366,7 +366,7 @@ bool TerrainSTO::load()
 	if(0)
 	{
 		char buf[150];
-		sprintf(buf, "Added MSP terrain object %s at %.2f,%.2f,%.2f", _to->name, _to->mat._41, _to->mat._42, _to->mat._43);
+		strprintf(buf, "Added MSP terrain object %s at %.2f,%.2f,%.2f", _to->name, _to->mat._41, _to->mat._42, _to->mat._43);
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, UTF16(buf));
 	}
 #endif
@@ -404,7 +404,7 @@ void TerrainSTO::deactivate()
 	if(0)
 	{
 		char buf[150];
-		sprintf(buf, "[deactivate] Terrain model: %s id:%d", model(), (int)uid());
+		strprintf(buf, "[deactivate] Terrain model: %s id:%d", model(), (int)uid());
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, UTF16(buf));
 	}
 #endif
@@ -462,7 +462,7 @@ void TerrainSTO::SetCountry(UINT32 country)
         {
             for(unsigned int i = 0; i < pm->subModelReferences.size(); i++)
             {
-                sprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
+                strprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
 
                 OBJECT* oo = obmainFindTopmostObject(model);
                 if(!oo) continue;
@@ -521,7 +521,7 @@ void TerrainSTO::ToggleDamage()
         {
             for(unsigned int i = 0; i < pm->subModelReferences.size(); i++)
             {
-                sprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
+                strprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
 
                 OBJECT* oo = obmainFindTopmostObject(model);
 

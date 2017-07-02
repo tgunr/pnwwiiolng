@@ -132,10 +132,10 @@ chatSendMissionDeletionNotice(const UINT32& missionID)
 // Constructor for a Chat::PersonaUpdate
 
 Chat::PersonaUpdate::PersonaUpdate(
-		const ChatHandle& handle, WWII_COUNTRY country, BRANCH_ENUM branch, RANK_NO rank
+		const ChatHandle handle, WWII_COUNTRY country, BRANCH_ENUM branch, RANK_NO rank
 		, const Instance::Descriptor& instance, const UINT32 sortieID
-		, UINT32 brigade, UINT32 mission, const ChatHandle& leader
-		, const FULL_OBJ_ID& origin, const FULL_OBJ_ID& target, const PermissionMask& mask, const WEAPON_SPEC& weapon
+		, UINT32 brigade, UINT32 mission, const ChatHandle leader
+		, const FULL_OBJ_ID origin, const FULL_OBJ_ID target, const PermissionMask mask, const WEAPON_SPEC weapon
 		, bool isSpawned, bool badChecksum
 	)
 	: m_instance(instance)
@@ -206,10 +206,9 @@ MOBILE_SPAWN_WAYPOINT::receive(SINT32 teulIndex, MOBILE_SPAWN_WAYPOINT& incoming
 
 	if ( wp.m_deployed )
 	{
-		if ( g_logDebug )
-			dbugLog(_FLD, "mswp add m:%u p:%u c:%s sto:%u", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_stoUID);
+        dbugLog(_FLD, "mswp add m:%u p:%u c:%s sto:%u stoSubType:%d", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_stoUID, wp.m_stoSubType);
 		// Request for* where* we want the MSP deployed
-		missAddMobileSpawn(wp.m_missionID, wp.m_playerID, wp.m_ownerCall, wp.m_x, wp.m_y, wp.m_z, wp.m_stoUID);
+		missAddMobileSpawn(wp.m_missionID, wp.m_playerID, wp.m_ownerCall, wp.m_x, wp.m_y, wp.m_z, wp.m_stoUID, wp.m_stoSubType);
 	}
 	else
 	{
@@ -280,15 +279,12 @@ _recvMapPersonaUpdate(ACTION_OBJECT* const a)
 		return -EINVAL;
 	}
 
-	if ( g_logDebug )
-	{
-		player->log(_FLD, "mpu isSquad:%c[%u/%llu/%s] isDecal:%c(%u)"
-							, (update.m_isSquadUpdate ? 'y':'n')
-							, update.m_squadID, update.m_squadHandle, Chat::Name(update.m_squadHandle).c_str()
-							, (update.m_isDecalUpdate ? 'y':'n')
-							, update.m_decal
-							);
-	}
+    player->log(_FLD, "mpu isSquad:%c[%u/%" PR64BitUT "/%s] isDecal:%c(%u)"
+                        , (update.m_isSquadUpdate ? 'y':'n')
+                        , update.m_squadID, update.m_squadHandle, Chat::Name(update.m_squadHandle).c_str()
+                        , (update.m_isDecalUpdate ? 'y':'n')
+                        , update.m_decal
+                        );
 
 	if ( update.m_isSquadUpdate )
 	{
@@ -328,7 +324,7 @@ SINT32
 chatInstallSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
-
+	{
 		// Send only
 		REGISTER_SENDER(Chat::PERSONA_UPDATE_Y, _sendPersonaUpdate, _SEND_PERSONA_UPDATE);
 		REGISTER_SENDER(Chat::SERVER_INFO_Y, _sendServerInfo, _SEND_SERVER_INFO);
@@ -347,7 +343,7 @@ chatInstallSupportCallbacks()
 
 		REGISTER_RECEIVER(Chat::MAP_PERSONA_UPDATE_Y, _recvMapPersonaUpdate);
 		REGISTER_RECEIVER(Chat::MAP_REFRESH_PLAYER_Y, _recvRefreshPlayer);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 

@@ -25,7 +25,7 @@ struct GameEntry
 	GameEntry(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 	// Serializing function
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->offset = wwiiPackString(mode, a->packed, a->offset, m_name, 128);
 		a->packer(mode, &m_arenaID, 8);
@@ -54,7 +54,7 @@ public:
 	// Network Ctor
 	GameList(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 	// Serializing function
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		UINT32 numGames = (UINT32)m_games.size();
 		a->packer(mode, &numGames, 8);
@@ -83,7 +83,7 @@ public:
 	UINT32 size() const { return (m_games.empty() == false) ? (UINT32)m_games.size() : 0; }
 
 	static const UINT32 _MAX_GAMES = 15;
-	typedef std::vector<GameEntry> APP_GAMES;
+	using APP_GAMES = std::vector<GameEntry>;
 	APP_GAMES	m_games;
 	bool isPlaynet;
 };
@@ -101,14 +101,14 @@ struct LoginRequest
 	// Network ctor.
 	LoginRequest(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 	// Serializing function
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->offset = wwiiPackString(mode, a->packed, a->offset, m_account, MAX_UTF8_USERNAME);
 		a->offset = wwiiPackString(mode, a->packed, a->offset, m_passwordMD5, MAX_PASSWORD);
 		a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_platform, 8);
 		return a->offset;
 	}
-	// Host: Log the guy in.
+	// Host: Log the player in.
 	SINT32 process(SINT32 teulIndex);
 	// Client: Send this request
 	void send();
@@ -133,7 +133,7 @@ struct LoginReply
 	// Network Ctor.
 	LoginReply(ACTION_OBJECT* const a) : m_playnet(false), m_code("") { a->offset = packer(TEUL_UNPACK, a); }
 	// Serializing function
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* const a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		a->packer(mode, m_playnet);
 		a->offset = wwiiPackString(mode, a->packed, a->offset, m_code, 16);
@@ -166,7 +166,7 @@ struct LaunchRequest
 			a->offset = packer(TEUL_UNPACK, a);
 		}
 	// Serializing function
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* const a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		a->packer(mode, &m_arenaID, 10);
 		a->packer(mode, &m_appID, 10);
@@ -194,7 +194,7 @@ struct LaunchSuccess
 	LaunchSuccess(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 
 	// Serializing function
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->packer(mode, &m_serverPort, 15);
 		a->packer(mode, &m_otp);
@@ -226,7 +226,7 @@ struct LaunchRedirect
 	}
 
 	// Serializing function
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->offset = wwiiPackString(mode, a->packed, a->offset, m_url, 500);
 		a->packer(mode, m_patchRequired);
@@ -251,7 +251,7 @@ struct VersionCheck
 		}
 
 	void process();		// Host function
-	void packer(LOGICAL mode, ACTION_OBJECT* a)
+	void packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->packer(mode, &m_platform);
 		a->packer(mode, &m_clientVersion);
@@ -272,7 +272,7 @@ struct VersionResponse
 	VersionResponse(ACTION_OBJECT* const a) : m_arenaID(0), m_updateNeeded(false), m_updateAvailable(false) { packer(TEUL_UNPACK, a); }
 
 	void process();		// Client function
-	void packer(LOGICAL mode, ACTION_OBJECT* a)
+	void packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->packer(mode, &m_arenaID);
 		a->packer(mode, m_updateNeeded);
@@ -299,7 +299,7 @@ struct AppGameList
 	SINT32	maxVer[_MAX_GAMES];
 
 	void process();
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->packer(mode, &numGames, 8);
 

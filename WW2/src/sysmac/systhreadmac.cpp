@@ -7,7 +7,7 @@
 	systhread
 *************************************************************************************************/
 
-typedef void* (*pthread_start_routine)(void*);
+using pthread_start_routine = void*(*)(void*);
 
 /************************************************************************************************
 	systhreadCreate
@@ -53,7 +53,7 @@ int systhreadMutexKill(systhread_mutex id)
 		 pthread_mutex_destroy(mutex);
 		 free(mutex);
 	}
-	return 0; 
+	return 0;
 }
 
 /************************************************************************************************
@@ -78,7 +78,7 @@ int systhreadMutexTryLock(systhread_mutex mutex)
 	systhreadMutexUnlock
 *************************************************************************************************/
 
-int systhreadMutexUnlock(systhread_mutex mutex) 
+int systhreadMutexUnlock(systhread_mutex mutex)
 {
 	return pthread_mutex_unlock((pthread_mutex_t*)mutex);
 }

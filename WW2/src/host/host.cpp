@@ -10,9 +10,9 @@
 
 #include "include/clustercfg.h"
 
-#include "versionNo.h"
 #include <stack>
 
+#include "build_info.hpp"
 #include "chat/chatCellHostSupportMessages.h"
 #include "chat/chatCellXfer.h"
 #include "chat/chatConstants.h"
@@ -24,8 +24,6 @@
 #include "comm/commConstants.h"
 #include "comm/commHostMessages.h"
 #include "comm/commTypes.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseWrapper.h"
 #include "host/hostAntiHack.h"
 #include "host/hostAutomation.h"
 #include "host/hostCellNet.h"
@@ -37,7 +35,6 @@
 #include "host/hostTiming.h"
 #include "host/hostVehicle.h"
 #include "host/hostVehicleRequest.h"
-#include "hostproj/hostversion.h"
 #include "include/wthrTime.h"
 #include "inst/instHostInstance.h"
 #include "miss/missHitArrayNode.h"
@@ -93,12 +90,12 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiRTBCodes.h"
 #include "wwii/wwiiSortieManager.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
+#include "teul/raknetConn.h"
+#include "weap/weapDefs.h"
 
 extern SINT32 hostInstallAllCallbacks();
-
-DBCONNECTION dbConnection;
 
 extern std::map<ChatHandle, HostVehicle*> g_vehicleLookup;
 
@@ -106,12 +103,6 @@ namespace Host
 {
 	Stats totalStats, currentStats;
 }
-
-#ifdef CLOSED_BETA
-	#define DEF_ERR_LEVEL Debug::ERR_DBUG
-#else
-	#define DEF_ERR_LEVEL Debug::ERR_INFO
-#endif
 
 #ifdef DEBUG_UPDATES
 UINT32 remoteVehicles = 0;
@@ -130,22 +121,23 @@ UINT32 numVehiclesReported = 0;
 
 #ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
-    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
+    #define DEF_ERR_FLAGS STD_ERR  // LOG_ALL_TO_STDERR
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
     #define DEF_ERR_FLAGS STD_ERR
 #endif
 
 PLAYERS g_players;
-#include "teul/teulConfigVar.h"
-extern ConfigUint cv_maxCellPlayers;
-extern ConfigAddr cv_baseUpdtAddress;
-static SINT32 _userConnections = 0;
+#include "include/configVars.h"
+
+SINT32 _userConnections = 0;
 
 char hostname[32];
 UINT32 _stratHost = 0;
 
-SINT32 updateBcastSend = -1, updateBcastRecv = -1;
+static const SINT32 MAX_BUF_VEH_BROADCAST = 256;
+
+SINT32 updateBcastRecv = -1, updateBcastSend = -1;
 
 static UINT32				_personaCounter;
 static UINT32				_vehicleCounter;
@@ -154,21 +146,20 @@ static UINT32				_vehicleCounter;
 static SINT32 iterationTime = -1, iterationLast = -1;
 */
 
-#include <unordered_map>
-typedef std::unordered_map<sortieid_t, class HostVehicle*> VEHICLE_HASH;
+using VEHICLE_HASH = std::unordered_map<sortieid_t, class HostVehicle*>;
 static VEHICLE_HASH _vehicleHash;
 
-typedef std::vector<HostVehicle*> VEHICLES;
+using VEHICLES = std::vector<HostVehicle*>;
 
 // Tracking of players in a given building
-typedef std::set<HostVehicle*> OCCUPANTS;
+using OCCUPANTS = std::set<HostVehicle*>;
 struct Occupancy
 {
 	Occupancy() : object(nullptr), occupants() {}
 	ObjectStruct*	object;
 	OCCUPANTS		occupants;
 };
-typedef std::unordered_map<ChatHandle, Occupancy> OCCUPANCY_MAP;
+using OCCUPANCY_MAP = std::unordered_map<ChatHandle, Occupancy>;
 static OCCUPANCY_MAP occupancyMap;
 
 // Set this to true to prevent logins to the server.
@@ -245,7 +236,7 @@ _extractPlayerFromVehiclesList(Player& player, HostVehicle& vehicle)
 	if ( it != vehicle.players().end() )
 	{
 		vehicle.players().erase(it);
-		betaLog(_FLI, "t:%d p:%u c:%s v:%u extracting player from vehicle crew:%d, players:%" PRSizeT ""
+		dbugLog(_FLI, "t:%d p:%u c:%s v:%u extracting player from vehicle crew:%d, players:%" PRSizeT ""
 						, player.teulIndex(), player.playerID(), player.callsign(), vehicle.index
 						, vehicle.crew, vehicle.players().size()
 						);
@@ -257,7 +248,7 @@ _extractPlayerFromVehiclesList(Player& player, HostVehicle& vehicle)
 // return the IP address of the current strat host
 
 UINT32
-hostGetStratAddress(void)
+hostGetStratAddress()
 {
 	return _stratHost;
 }
@@ -331,7 +322,7 @@ Host::VehicleRequest::execute()
 {
 	const WEAPON_SERIAL& ws = m_weaponSerial;
 
-	dbugLog(_FLD, "in:%llu v:%u c:%s executing host vehicle request", m_instanceID, m_weaponSerial.serial, Chat::Name(m_handle).c_str());
+	dbugLog(_FLD, "in:%" PR64BitUT " v:%u c:%s executing host vehicle request", m_instanceID, m_weaponSerial.serial, Chat::Name(m_handle).c_str());
 
 	// OGS: There's some upper limit on the size of
 	// weapon serials, probably for packer reasons.
@@ -454,7 +445,7 @@ _joinVehicle(Player& player, const VEHICLE_REQUEST& vRequest)
 	HostVehicle* const vehicle = hostFindVehicleLocal(vRequest.weapon.serial);
 	if (vehicle == nullptr)
 	{
-		dbugLog(_FLAS,"couldnt find or allocate vehicle %d for player id:%d"
+		dbugLog(_FLA,"couldnt find or allocate vehicle %d for player id:%d"
 					, vRequest.weapon.serial, player.playerID());
 		return -EINVAL;
 	}
@@ -514,7 +505,7 @@ hostJoinVehicle(Player& player, const VEHICLE_REQUEST& vRequest)
 	{
 		dbugLog(_FLA, "NOT GOOD: %u attempted join of %s(%d) failed, got %d: sending back to map"
 						, player.playerID()
-						, weapPrintName(&vRequest.weapon.spec)
+						, weapPrintName(vRequest.weapon.spec)
 						, vRequest.weapon.serial
 						, retval
 						);
@@ -586,7 +577,7 @@ Player::Player(const Server::PersonaXfer& personaXfer)
 	{
 		this->m_playerID = personaXfer.dispatch().m_customerID;
 		this->m_teulIndex = -EINVAL;
-		dbugLog(_FLAS, "%s", e.what());
+		dbugLog(_FLA, "%s", e.what());
 		throw std::runtime_error("persona create failed");		///Terminal
 	}
 
@@ -885,7 +876,7 @@ CaptureState::invert(const CaptureState& rhs)
 // kill any players in the building
 
 static void
-_killOccupants(const instanceid_t& instanceID, OCCUPANTS& occupants, UINT32 bySortieID, const char* byBuilding)
+_killOccupants(const instanceid_t instanceID, OCCUPANTS& occupants, UINT32 bySortieID, const char* byBuilding)
 {
 	if ( occupants.empty() )
 		return;
@@ -940,7 +931,7 @@ _killOccupants(const instanceid_t& instanceID, OCCUPANTS& occupants, UINT32 bySo
 }
 
 void
-hostBuildingVisLevelChange(ObjectStruct* object, const instanceid_t& inInstance)
+hostBuildingVisLevelChange(ObjectStruct* object, const instanceid_t inInstance)
 {
 	// Rebuild is not fatal, all other levels are
 	if ( object->visLevel() == VISLEVEL_NORMAL )
@@ -956,7 +947,7 @@ hostBuildingVisLevelChange(ObjectStruct* object, const instanceid_t& inInstance)
 // Award a capture point to all but one player inside a building
 
 void
-hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide)
+hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID buildingID, WWII_SIDE forSide)
 {
 	OCCUPANCY_MAP::iterator it = occupancyMap.find(buildingID.Key());
 	if ( PN_UNLIKELY(it == occupancyMap.end()) )
@@ -1064,16 +1055,20 @@ _isGuarding(Player* const player)
 static void
 _checkPlayerForGuarding(Player* player, bool changingBuilding)
 {
+	auto const vehicle = player->vehicle;
+	if ( PN_UNLIKELY(!vehicle) )
+		return;
+
 	// Are they inside a friendly spawnable?
 	const bool isGuarding = _isGuarding(player);
-	if ( player->vehicle && player->vehicle->m_guardingSince && (false == isGuarding || true == changingBuilding) )
+	if ( vehicle->m_guardingSince && (false == isGuarding || true == changingBuilding) )
 	{
 		_scoreGuarding(player);
 	}
 
-	if ( true == isGuarding && player->vehicle->m_guardingSince == 0 )
+	if ( true == isGuarding && vehicle->m_guardingSince == 0 )
 	{
-		player->vehicle->m_guardingSince = teulClock64;
+		vehicle->m_guardingSince = teulClock64;
 	}
 }
 
@@ -1081,7 +1076,7 @@ _checkPlayerForGuarding(Player* player, bool changingBuilding)
 // Set the current containing building for a vehicle.
 
 void
-HostVehicle::setInBuilding(const FULL_OBJ_ID& newBuildingID)
+HostVehicle::setInBuilding(const FULL_OBJ_ID newBuildingID)
 {
 	// Extract them from the occupancy map for the current building (if any)
 	if ( m_inBuilding != 0 && isRemote() == false )
@@ -1140,7 +1135,7 @@ HostVehicle::setInBuilding(const FULL_OBJ_ID& newBuildingID)
 // Move a players position to a different building
 
 void
-Player::changeFPSBuilding(const FULL_OBJ_ID& newBuildingID, bool inCaptureBuilding)
+Player::changeFPSBuilding(const FULL_OBJ_ID newBuildingID, bool inCaptureBuilding)
 {
 	if ( vehicle == nullptr )
 	{
@@ -1176,7 +1171,7 @@ Player::changeFPSBuilding(const FULL_OBJ_ID& newBuildingID, bool inCaptureBuildi
 		else
 		{
 			char fidBuffer[FULL_OBJ_ID::PrintLen];
-			message(LSTR_BETA, LSTR_ENTERED_UNKNOWN_BUILDING, weapPrintFullObjIDC(&newBuildingID, fidBuffer));
+			message(LSTR_BETA, LSTR_ENTERED_UNKNOWN_BUILDING, weapPrintFullObjIDC(newBuildingID, fidBuffer));
 		}
 	}
 	else
@@ -1234,7 +1229,7 @@ _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const 
 	auto* const sample = (const Teul::TickSample*)(data);
 	if ( player_ == nullptr )
 	{
-		dbugLog(_FLW, "t:%d clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+		dbugLog(_FLW, "t:%d clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 		return;
 	}
 
@@ -1252,7 +1247,7 @@ _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const 
 	ah.m_lastSpeedhackDelta = sample->delta;
 	ah.m_lastSpeedhackBlip = teulTime();
 
-	dbugLog(_FLW, "t:%d p:%u c:%s v:%u blip:%u clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", player.teulIndex(), player.playerID(), player.callsign(), player.sortieID(), ah.m_numBlips, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+	dbugLog(_FLW, "t:%d p:%u c:%s v:%u blip:%u clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", player.teulIndex(), player.playerID(), player.callsign(), player.sortieID(), ah.m_numBlips, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 
 	chatSendTickSample(CELL_HOST, player.playerID(), data);
 }
@@ -1280,7 +1275,8 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN )
 		{
-			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d", teulIndex, error);
+			_userConnections--;
+			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d connCount:%d", teulIndex, error, _userConnections);
 			return;
 		}
 		else
@@ -1293,7 +1289,8 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN && teulIndex == player->teulIndex() )
 		{
-			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected", teulIndex, player->playerID(), player->callsign(), player->sortieID());
+			_userConnections--;
+			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected, userConn:%d", teulIndex, player->playerID(), player->callsign(), player->sortieID(), _userConnections);
 			player->SetTeulIndex(-1);
 		}
 		else
@@ -1478,12 +1475,18 @@ hostAddVehicleToBroadcast(HostVehicle* vehicle, VEHICLE_UPDATE_HEADER* vh)
 	if ( vehicle->isReallyActive() == true )
 		vehHold.present |= PRX_REALLY_ACTIVE;
 
-	UCHAR buffer[256];
-	SINT32 offset = updtPackVehicleBroadcast(TEUL_PACK, buffer, 0, &vehHold, 0);
+	UCHAR buffer[MAX_BUF_VEH_BROADCAST];
+	SINT32 offset = sizeof(SINT32) * 8;  // save space for length
+	offset = updtPackVehicleBroadcast(TEUL_PACK, buffer, offset, &vehHold, 0);
 	if ( offset < 0 )
 	{
-		threadLog(_FLA, "updtPackVehicleBroadcast failed: %d", offset);
+		dbugLog(_FLA, "updtPackVehicleBroadcast failed: %d", offset);
 		return false;
+	}
+	
+	if ((offset/8) > (MAX_BUF_VEH_BROADCAST-1))
+	{
+		dbugLog(_FLA, "While constructing vehicle broadcast: WE WROTE INTO UNALLOCATED SPACE!!!!");
 	}
 
 	return hostSendVehicleBroadcast(buffer, offset);
@@ -1691,6 +1694,20 @@ _personaActivate(SINT32 teulIndex , PlayerStatusNode* psn)
 	activate.serverType = CELL_HOST;
 	activate.hostIP = Server::myServerInfo.stats.address;
 	activate.port = WWII::Net::Ports::CellHost;
+	
+	// If Netcode3 (raknet) is enabled, we need to tell the
+	// client how it can connect to use with NC2.
+	if (host_config.netcode3Enabled)
+	{
+		activate.teulIndex = (UINT32)teulIndex;
+		activate.playerID = player->playerID();
+		activate.otp = psn->dispatch().m_OTP;
+		ENDPOINT *ep = teulGetEndpoint(teulIndex);
+		if (ep != nullptr && ep->m_parent != nullptr && ep->m_parent->m_pairdUdpConn != nullptr)
+		{
+			memcpy(activate.pkey, ep->m_parent->m_pairdUdpConn->getPackedPublicKey(), sizeof(activate.pkey));
+		}
+	}
 
 	const SINT32 retval = wwiiSendActivate(teulIndex, &activate);
 	if ( PN_UNLIKELY(retval < 0) )
@@ -1740,7 +1757,7 @@ _writeEventCounters()
 		bool started = false;
 		for ( auto it = g_eventCounter.begin(), end = g_eventCounter.end(); it != end; ++it )
 		{
-			p += sprintf(p, "%c(%u,'%s',%llu)", (started) ? ',':' ', host, it->first.c_str(), it->second);
+			p += sprintf(p, "%c(%u,'%s',%" PR64BitUT ")", (started) ? ',':' ', host, it->first.c_str(), it->second);
 			started = true;
 		}
 
@@ -1829,7 +1846,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 
 			if ( (!reportedLagging) & (vehicle->m_nextUpdateClock < lowend) )
 			{
-				threadLog(_FLA, "c:%s v:%u*** LAGGING BEHIND UPDATES: wanted update %llums ago"
+				dbugLog(_FLA, "c:%s v:%u*** LAGGING BEHIND UPDATES: wanted update %" PR64BitUT "ms ago"
 								, vehicle->callsign(), vehicle->index, teulClock64 - vehicle->m_nextUpdateClock);
 				reportedLagging = true;
 			}
@@ -1979,7 +1996,10 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 {
 	_calculatePingTime(packet, player, pingOffset);
 
-	SINT32 retval = packet.send(player->teulIndex());
+	// If the player has netcode enhancements enabled, specify a UDP protocol preference
+	// once this netcode version (netcode3) is made permanent, the netcode flag will be used for the next version
+	// and this check will go away.
+	SINT32 retval = packet.send(player->teulIndex(), player->GetNetcode() ? PROTOCOL_UDP : PROTOCOL_UNDEF);
 	if ( retval >= 0 )
 	{
 		player->m_updatesFailed = 0;
@@ -2162,7 +2182,7 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		{
 			Teul::Packet copy(*wu.packet);
 			if ( _sendPacket(copy, players[i], vehicle->index, pingOffset) )
-			{	
+			{
 				result = true;
 #ifdef DEBUG_UPDATES
 				++vehMcrewCrewUpdatesSent;
@@ -2233,7 +2253,7 @@ _sendNextUpdate(HostVehicle* const vehicle)
 // Central server loop.
 
 extern void
-_runHost(void)
+_runHost()
 {
 //	Teul::housekeeper cpEventsHousekeeper(Strat::Events::Publish, 100);
 
@@ -2265,7 +2285,6 @@ _runHost(void)
 		// us to consume. Write upto 64 log entries.
 		TIMER_START
 		threadsCallNextCallback();
-		threadsLogging();
 		TIMER_STOP("threads");
 
 		TIMER_START
@@ -2287,7 +2306,8 @@ _runHost(void)
 		}
 
 		// Send any cell-to-cell vehicle updates generated.
-		hostPushVehicleBroadcasts();
+		// Don't send these, it is subverting the collect and hold policy
+		//hostPushVehicleBroadcasts();
 
 		// For any sorties that have completed the spawning
 		// process, save off the data.
@@ -2377,7 +2397,7 @@ _runHost(void)
 			HostVehicle* const vehicle = *it;
 
 #ifdef HEAVY_DEBUG
-			betaLog(_FLD, "c:%s v:%u sending update fm:%u iv:%ums", callsign, index, vehicle->framingMode, vehicle->m_updateInterval);
+			dbugLog(_FLD, "c:%s v:%u sending update fm:%u iv:%ums", callsign, index, vehicle->framingMode, vehicle->m_updateInterval);
 #endif
 
 			// Send this vehicle it's update.
@@ -2392,9 +2412,9 @@ _runHost(void)
 		if ( teulTime() >= nextStatsReport )
 		{
 			// Report output to client stats every second
-			dbugLog(_FLI, "TV=%u, RV=%u, VS=%u, QV=%u, VR=%u, VUS=%u, VMCU=%u, VCRU=%u, NVR=%u, XF=%u, VT=%u, NU=%u", 
-				totalVehicles, remoteVehicles, vehiclesSkipped, qualifiedVehicles, vehiclesReviewed, vehUpdatesSent, vehMcrewCommanderUpdatesSent, 
-				vehMcrewCrewUpdatesSent, numVehiclesReported, xmissionsFailed, vehiclesThrottled, numberOfUpdatesBehind); 
+			dbugLog(_FLI, "TV=%u, RV=%u, VS=%u, QV=%u, VR=%u, VUS=%u, VMCU=%u, VCRU=%u, NVR=%u, XF=%u, VT=%u, NU=%u",
+				totalVehicles, remoteVehicles, vehiclesSkipped, qualifiedVehicles, vehiclesReviewed, vehUpdatesSent, vehMcrewCommanderUpdatesSent,
+				vehMcrewCrewUpdatesSent, numVehiclesReported, xmissionsFailed, vehiclesThrottled, numberOfUpdatesBehind);
 			totalVehicles = remoteVehicles = vehiclesSkipped = qualifiedVehicles = vehiclesReviewed = vehUpdatesSent = 0;
 			vehMcrewCommanderUpdatesSent = vehMcrewCrewUpdatesSent = xmissionsFailed = vehiclesThrottled = 0;
 			numberOfUpdatesBehind = numVehiclesReported = 0;
@@ -2407,7 +2427,7 @@ _runHost(void)
 			if ( teulClock64 > updateCycleTimeout )
 			{
 				// We overran, we should try sending less updates
-				dbugLog(_FLW, "taking too long to send vehicle updates (%" PRSizeT "): %llums elapsed"
+				dbugLog(_FLW, "taking too long to send vehicle updates (%" PRSizeT "): %" PR64BitUT "ms elapsed"
 								, nextVehicles.size(), teulClock64 - started);
 				if ( maxUpdates > _MIN_UPDATES )
 				{
@@ -2465,20 +2485,16 @@ hostActivateVehicle(HostVehicle* newVehicle, bool checkPlayers)
 
 	if ( newVehicle->isRemote() == true )
 	{
-		if ( g_logDebug )
-			dbugLog(_FLD, "v:%u activating remote vehicle", newVehicle->index);
+        dbugLog(_FLD, "v:%u activating remote vehicle", newVehicle->index);
 	}
 	else
 	{
-		if ( g_logDebug )
-		{
-			const SHARED_VEHICLE_INFO& info = newVehicle->vehicleData;
-			dbugLog(_FLI, "p:%u,%u c:%s v:%u activating local vehicle at %d.%d.%d"
-							, newVehicle->seats[0], newVehicle->seats[1]
-							, info.callsign, newVehicle->index
-							, newVehicle->x_cm(), newVehicle->y_cm(), newVehicle->z_cm()
-							);
-		}
+        const SHARED_VEHICLE_INFO& info = newVehicle->vehicleData;
+        dbugLog(_FLI, "p:%u,%u c:%s v:%u activating local vehicle at %d.%d.%d"
+                        , newVehicle->seats[0], newVehicle->seats[1]
+                        , info.callsign, newVehicle->index
+                        , newVehicle->x_cm(), newVehicle->y_cm(), newVehicle->z_cm()
+                        );
 	}
 
 	newVehicle->setActive(true);
@@ -2558,7 +2574,7 @@ _releaseVehicle(VEHICLE_HOLDER* const vehicleHold, FULL_OBJ_ID toFacility)
 {
 	if (PN_UNLIKELY(vehicleHold == nullptr))
 	{
-		dbugLog(_FLAS,"_releaseVehicle: ERROR vehicleHold = null!!");
+		dbugLog(_FLA,"_releaseVehicle: ERROR vehicleHold = null!!");
 		return;
 	}
 
@@ -2578,7 +2594,7 @@ _releaseVehicle(VEHICLE_HOLDER* const vehicleHold, FULL_OBJ_ID toFacility)
 	{
 		g_sortieReturns.AddSortie(index);
 
-		betaLog(_FLD, "v:%u unscheduling vehicle updates", index);
+		dbugLog(_FLD, "v:%u unscheduling vehicle updates", index);
 		updateUnscheduleVehicle(vehicle);
 	}
 
@@ -2602,9 +2618,7 @@ _releaseVehicle(VEHICLE_HOLDER* const vehicleHold, FULL_OBJ_ID toFacility)
 		}
 		else
 		{
-#ifdef NEW_BCODE
 			hostQueueVehicleRemove(index, vehicle->exitState);
-#endif
 
 			if ( _vehicleCounter > 0 )
 				_vehicleCounter--;
@@ -2786,12 +2800,6 @@ _releaseVehicleList(Player& player)
 }
 
 void
-#ifdef CLOSED_BETA
-Player::processUpdateValues(UINT32 /*updateNo*/, UINT32 /*prime*/)
-{
-	return;
-}
-#else
 Player::processUpdateValues(UINT32 updateNo, UINT32 prime)
 {
 	bool ejectworthy = false;
@@ -2850,7 +2858,6 @@ Player::processUpdateValues(UINT32 updateNo, UINT32 prime)
 
 	m_ejectionCountdown = (rand() % 120) + (3 * (rand() % 30));
 }
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // IRC Commands
@@ -2978,13 +2985,12 @@ int
 main(const int argc, const char* argv[])
 {
 	Server::InitializeProcess(g_serverName, CELL_HOST, _updaterErrorFunction, _killUpdater, argc, argv, {
-		{ "-db", "Deprecated.", false, [](const char*) {} },
-		{ "--reserved", "Flag cell as reserved for recordings.", false, [](const char*) { g_serverReserved = true; } }
+		{ "-db", "Deprecated.", false, [](const char*) {}, nullptr },
+		{ "--reserved", "Flag cell as reserved for recordings.", false, [](const char*) { g_serverReserved = true; }, nullptr }
 	});
 	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
-	threadsReadDBEnvironment();
 	threadsSetup();
 
 	dbugLog(_FLN, "Cell Host starting. Compiled %s at %s ===", __DATE__, __TIME__);
@@ -3021,23 +3027,29 @@ main(const int argc, const char* argv[])
 	wthrInitTime();
 
 	static const UINT32 ClientTimeoutTime_ms = 40 * 1000;
-	if ( !teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, _personaErrorFunction) )
+	if ( !teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, _personaErrorFunction, true) )
 		LogAbort("Unable to open tcp listen port %u", WWII::Net::Ports::CellHost);
 
-	sprintf(hostname, "cell%u", Server::localHost & 255);
+	strprintf(hostname, "cell%u", Server::localHost & 255);
 
 	const UINT32 updateNet = cv_baseUpdtAddress.GetUint32();
-	if ( updateNet != 0 )
+	if (Server::IsBroadcastViaController())
 	{
+		/// kfsone: hack until we need to support cell-to-cell peering via controller
+		g_clustered = false;
+		dbugLog(_FLN, "Clustering disabled: broadcasting via controller");
+	}
+	else if ( updateNet != 0 )
+	{
+		g_clustered = true;
+        
 		dbugLog(_FLM, "Clustering enabled: Broadcast network %s specified.", cv_baseUpdtAddress.GetString());
 
 		const UINT32 updateBcastHost = cv_baseUpdtAddress.GetUint32() | 0x000000ff;
-		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
+		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateCellBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
 		dbugLog(_FLN, "t:%d updateBcastRecv:%s", updateBcastRecv, teulGetAddress(updateBcastHost));
 
-		const UINT32 updateDirectHost = cv_baseUpdtAddress.GetUint32() | (Server::localHost & 0x000000ff);
-		updateBcastSend = teulOpenSend(updateDirectHost, WWII::Net::Ports::PrivateBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
-		dbugLog(_FLN, "t:%d updateBcastSend:%s", updateBcastSend, teulGetAddress(updateDirectHost));
+		updateBcastSend = updateBcastRecv;
 	}
 	else
 	{
@@ -3050,7 +3062,7 @@ main(const int argc, const char* argv[])
 	Server::myServerInfo.stats.port = WWII::Net::Ports::CellHost;
 
 	SINT32 initResult =
-	serverInit(HOST_VERSION
+	serverInit(PN_build_version_value
 				, CELL_HOST, MAP_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback
@@ -3103,7 +3115,6 @@ main(const int argc, const char* argv[])
 		if (g_hostTerminating)
 			return 0;
 		teulUpdateTransport(50);
-		threadsLogging();
 	}
 
 	if ( !g_accepting && !g_serverReserved )
@@ -3113,15 +3124,15 @@ main(const int argc, const char* argv[])
 	for ( UINT32 i = 0; i < 100; ++i )
 	{
 		teulUpdateTransport(10);
-		threadsLogging();
 	}
-
-	threadsLogging();
 
 	if (g_hostTerminating)
 		return 0;
 
 	chatSendAdminMessage("cell host #%u %s", Server::localHost & 255, (g_serverReserved ? "*RESERVED*" : "online"));
+
+	// inform other hosts that we are in need of updating
+	hostForceFirstTimeUpdates();
 
 	_runHost();
 
@@ -3131,7 +3142,7 @@ main(const int argc, const char* argv[])
 	exitHandler();
 }
 
-void HCUnit::setHomeCPID(const FULL_OBJ_ID& id)
+void HCUnit::setHomeCPID(const FULL_OBJ_ID id)
 {
 	m_homeCPID = id;
 }

@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"					// For version dependent code
-
 #include "chat/chatLStringIDs.h"
 #include "host/hostPlayers.h"			// for g_players
 #include "map/mapPlayer.h"
@@ -42,7 +40,7 @@ mapChargeMinutes()
 	try
 	{
 		ThreadTextQuery balanceQry(DBThread::Auth
-									, "UPDATE auth.auth_minute_balance"
+									, "UPDATE `auth`.`auth_minute_balance"
 											" SET balance=balance-1,modified=NOW()"
 											" WHERE customerid IN ("
 										, ") AND balance>0");
@@ -71,7 +69,7 @@ mapChargeMinutes()
 	TeulTimeMS endTime = teulClock64;
 	TeulTimeMS takenTime = endTime - startTime;
 	if ( takenTime > 10 )
-		dbugLog(_FLM, "mmb: %s took %llu milliseconds to charge %" PRSizeT " of %" PRSizeT " customers", __FUNCTION__, takenTime, charged, g_players.size());
+		dbugLog(_FLM, "mmb: %s took %" PR64BitUT " milliseconds to charge %" PRSizeT " of %" PRSizeT " customers", __FUNCTION__, takenTime, charged, g_players.size());
 
 	// Schedule the next run for a second from now
 	nextRun = teulClock64 + 1000;

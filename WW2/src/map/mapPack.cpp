@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Tue Jan 23 13:04:30 2001
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -14,13 +14,14 @@
 #include "mm/mmPack.h"
 #include "teul/teulPackers.h"
 #include "wwii/wwiiPack.h"
+#include "wwii/wwiiPackBool.h"
 #include "wwii/wwiiPackString.h"
 
 //////////////////////////////////////////////////////////////////////
 // Packer function for the PersonaSummary class
 
 SINT32
-PersonaSummary::packer(LOGICAL mode, ACTION_OBJECT* a)
+PersonaSummary::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_personaID, 0);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_lockedThru, 0);
@@ -38,9 +39,9 @@ PersonaSummary::packer(LOGICAL mode, ACTION_OBJECT* a)
 // Function for packing an entire PERSONA_SUMMARYS vector
 
 SINT32
-PersonaSummaries::packer(LOGICAL mode, ACTION_OBJECT* a)
+PersonaSummaries::packer(PackMode mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_error, 1);
+	a->offset = wwiiPackBool(mode, a->packed, a->offset, m_error);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_count, 7);
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_callsign, 0);
 
@@ -64,7 +65,7 @@ PersonaSummaries::packer(LOGICAL mode, ACTION_OBJECT* a)
 // Pack a persona selection packet
 
 SINT32
-PersonaSelection::packer(LOGICAL mode, ACTION_OBJECT* a)
+PersonaSelection::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_status, 8);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_personaID, 0);
@@ -84,7 +85,7 @@ PersonaSelection::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-BrigadeSummary::packer(LOGICAL mode, ACTION_OBJECT* a)
+BrigadeSummary::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_unitID);
 
@@ -105,9 +106,9 @@ BrigadeSummary::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-BrigadeSummaries::packer(LOGICAL mode, ACTION_OBJECT* a)
+BrigadeSummaries::packer(PackMode mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_error, 1);
+	a->offset = wwiiPackBool(mode, a->packed, a->offset, m_error);
 	if ( !m_error )
 	{
 		a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_count, 7);
@@ -125,7 +126,7 @@ BrigadeSummaries::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-BrigadeDetail::packer(LOGICAL mode, ACTION_OBJECT* a)
+BrigadeDetail::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = HCUnit::packer(mode, a);
 	a->offset = BrigadeSummary::packer(mode, a);
@@ -143,7 +144,7 @@ BrigadeDetail::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-BrigadeSelection::packer(LOGICAL mode, ACTION_OBJECT* a)
+BrigadeSelection::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_status, 8);
 
@@ -157,7 +158,7 @@ BrigadeSelection::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-MissionSynopsis::packer(LOGICAL mode, ACTION_OBJECT* const a)
+MissionSynopsis::packer(PackMode mode, ACTION_OBJECT* const a)
 {
 	a->packer(mode, &m_missionID, 0);
 
@@ -185,7 +186,7 @@ MissionSynopsis::packer(LOGICAL mode, ACTION_OBJECT* const a)
 }
 
 SINT32
-MissionList::packer(LOGICAL mode, ACTION_OBJECT* a)
+MissionList::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_status, 2);
 	if ( m_status == MLR_OK )
@@ -195,8 +196,8 @@ MissionList::packer(LOGICAL mode, ACTION_OBJECT* a)
 		{
 			a->offset = m_missions[i].packer(mode, a);
 		}
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_listStart, 1);
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_listEnd, 1);
+		a->offset = wwiiPackBool(mode, a->packed, a->offset, m_listStart);
+		a->offset = wwiiPackBool(mode, a->packed, a->offset, m_listEnd);
 	}
 	else if ( mode == TEUL_UNPACK )
 	{
@@ -204,7 +205,7 @@ MissionList::packer(LOGICAL mode, ACTION_OBJECT* a)
 		m_count = 0;
 	}
 
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_canPost, 1);
+	a->offset = wwiiPackBool(mode, a->packed, a->offset, m_canPost);
 
 	a->offset = m_activeMission.packer(mode, a);
 

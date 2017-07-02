@@ -8,11 +8,10 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include <set>
 
 #include "chat/chatBrigadeMove.h"
+#include "chat/chatName.h"
 #include "chat/chatStratSupportMessages.h"
 #include "cnvy/cnvyMain.h"
 #include "strt/strtCPStruct.h"
@@ -28,7 +27,7 @@
 #include "strt/strtWeaponEntry.h"
 #include "teul/teulTime.h"
 #include "wwii/wwiiConfig.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 
 UINT32 brigadeMoveTime_s;
 UINT32 brigadeFallbackTime_s;
@@ -41,6 +40,8 @@ UINT32 pocketTimeToSlowMoves_s = 60 * 60;
 UINT32 unitReformTime_s;
 
 CPStruct* routDestination[MAX_COUNTRIES];
+
+static std::vector<StratHCUnit*> s_units;
 
 //////////////////////////////////////////////////////////////////////
 // Tell the database and other servers where this HCUnit is
@@ -102,7 +103,7 @@ StratHCUnit::getSupplyPctg(WEAPON_CATEGORY cat) const
 // Needed for HCUnit
 
 void
-HCUnit::setHomeCPID(const FULL_OBJ_ID& destination)
+HCUnit::setHomeCPID(const FULL_OBJ_ID destination)
 {
 	m_homeCPID = destination;
 }
@@ -112,11 +113,11 @@ HCUnit::setHomeCPID(const FULL_OBJ_ID& destination)
 
 StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withParentID
 				, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
-				, const ChatHandle& withHandle, const char* withName, const char* withNick, UINT8 withRank
-				, const FULL_OBJ_ID& withHomeCPID
-				, const ChatHandle& withOwner, RANK_NO withOwnerRank
+				, const ChatHandle withHandle, const char* withName, const char* withNick, UINT8 withRank
+				, const FULL_OBJ_ID withHomeCPID
+				, const ChatHandle withOwner, RANK_NO withOwnerRank
 				, UINT32 withStartCpOID, UINT32 withFallbackCpOID
-				, UINT32 withLastMove, const ChatHandle& withLastMovedBy, UINT32 withNextMove
+				, UINT32 withLastMove, const ChatHandle withLastMovedBy, UINT32 withNextMove
 				, const char* withToeTemplate
 				)
 	: HCUnit(withUnitID, withTypeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCPID, withOwner, withOwnerRank)
@@ -164,6 +165,9 @@ StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withP
 		// we will need to read in any stored levels from the database later.
 		m_toeTemplateHeader->subscribe(this, m_toe);
 	}
+
+	if (isDivision() || isBrigade())
+		s_units.push_back(this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -173,6 +177,7 @@ StratHCUnit::~StratHCUnit()
 {
 	if ( m_toeTemplateHeader != nullptr )
 		m_toeTemplateHeader->unsubscribe(this, m_toe);
+	s_units.erase(std::remove(s_units.begin(), s_units.end(), this));
 	delete &m_impl;
 }
 
@@ -255,14 +260,14 @@ StratHCUnit::save() const
 // Check for a TOE entry
 
 const TOE_::WeaponInstance*
-StratHCUnit::toeWeaponInstance(const WEAPON_SPEC& forWeapon) const
+StratHCUnit::toeWeaponInstance(const WEAPON_SPEC forWeapon) const
 {
 	TOE::const_iterator it = m_toe.find(forWeapon);
 	return ( it != m_toe.end() ) ? &(it->second) : nullptr;
 }
 
 TOE_::WeaponInstance*
-StratHCUnit::toeWeaponInstance(const WEAPON_SPEC& forWeapon)
+StratHCUnit::toeWeaponInstance(const WEAPON_SPEC forWeapon)
 {
 	TOE::iterator it = m_toe.find(forWeapon);
 	return ( it != m_toe.end() ) ? &(it->second) : nullptr;
@@ -580,7 +585,6 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 	if ( cp->controllingSide != side() )
 		return BMR_FAILED_CONTROL;
 
-#ifndef FRES
 	if ( offMap() && cp != homeCP() && cp->isEnemyLinked() )
 		return BMR_FAILED_FRONTLINE;
 
@@ -591,12 +595,10 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 	// this allows movement within a pocket but not into a pocket
 	if ( homeCP() && cp != homeCP() && homeCP()->isSupplied() && cp->isSupplied() == false )
 		return BMR_FAILED_NFL;
-#endif
 
 	switch ( movementType() )
 	{
 	case BRANCH_LAND:
-#ifndef FRES
 		if ( !offMap() )
 		{
 			LinkStruct* link = nullptr;
@@ -624,7 +626,6 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 			if ( isBrigade() && !cp->hasContactWithDivision(this) )
 				return BMR_FAILED_CONTACT;
 		}
-#endif
 
 		// Gotta have ABs to have a land brigade
 		if ( branch() == BRANCH_LAND && !cp->hasABs(side()) )
@@ -642,7 +643,6 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 	break;
 	default:
 		return BMR_FAILED;
-	break;
 	}
 
 	return BMR_APPROVED;
@@ -755,7 +755,7 @@ StratHCUnit::findFallback() const
 
 	if ( offMap() )
 	{
-		dbugLog(_FLIB, "offmaps don't fallback");
+		dbugLog(_FLI, "offmaps don't fallback");
 		return nullptr;
 	}
 
@@ -766,7 +766,7 @@ StratHCUnit::findFallback() const
 			&& canDeployTo(fallbackCP())
 		)
 	{
-		dbugLog(_FLIB, "fallback CP %s is valid", fallbackCP()->name);
+		dbugLog(_FLI, "fallback CP %s is valid", fallbackCP()->name);
 		return fallbackCP();
 	}
 
@@ -785,19 +785,19 @@ StratHCUnit::findFallback() const
 		link = *it;
 		CPStruct* cp = link->endDepot->cp;
 
-		dbugLog(_FLIB, "%s? ", cp->name);
+		dbugLog(_FLI, "%s? ", cp->name);
 
 		// Priority 2: DivHQ
 		if ( parentCP == cp )
 		{
-			dbugLog(_FLIB, "has division!");
+			dbugLog(_FLI, "has division!");
 			return parentCP;
 		}
 
 		const bool isSupplied = cp->isSupplied();
 		if ( hadSupply == true && isSupplied == false )
 		{
-			dbugLog(_FLIB, "<supply ");
+			dbugLog(_FLI, "<supply ");
 			continue;
 		}
 
@@ -805,7 +805,7 @@ StratHCUnit::findFallback() const
 		BRIGADE_MOVE_RESULT bmrResult = deployPermission(cp, false);
 		if ( BMR_APPROVED != bmrResult )
 		{
-			dbugLog(_FLIB, "Xrules[%u] ", bmrResult);
+			dbugLog(_FLI, "Xrules[%u] ", bmrResult);
 			continue;
 		}
 
@@ -814,16 +814,16 @@ StratHCUnit::findFallback() const
 		// Priority 3: DivHQ + 1
 		if ( false == divisionLink && true == hadDivisionLink )
 		{
-			dbugLog(_FLIB, "no-divlink ");
+			dbugLog(_FLI, "no-divlink ");
 			continue;
 		}
 
-		dbugLog(_FLIB, "%d[%c] ", link->distance, (divisionLink ? 'Y' : 'n'));
+		dbugLog(_FLI, "%d[%c] ", link->distance, (divisionLink ? 'Y' : 'n'));
 
 		// Show less interest in contested towns when an uncontested town is available.
 		if ( candidate != nullptr && true == cp->isContested() && false == candidate->endDepot->cp->isContested() )
 		{
-			dbugLog(_FLIB, "<contested ");
+			dbugLog(_FLI, "<contested ");
 			continue;
 		}
 
@@ -832,7 +832,7 @@ StratHCUnit::findFallback() const
 		// brigade or it is towards a friendly brigade.
 		if ( nullptr == candidate || (divisionLink && !hadDivisionLink) || (isSupplied && !hadSupply) || _preferableFallback(candidate, link) )
 		{
-			dbugLog(_FLIB, "candidate ");
+			dbugLog(_FLI, "candidate ");
 			candidate = link;
 			hadDivisionLink = divisionLink;
 			hadSupply = isSupplied;
@@ -841,11 +841,11 @@ StratHCUnit::findFallback() const
 
 	if ( candidate == nullptr )
 	{
-		dbugLog(_FLIB, "no fallback options");
+		dbugLog(_FLI, "no fallback options");
 		return nullptr;
 	}
 
-	dbugLog(_FLIB, "Using %s", candidate->endDepot->cp->name);
+	dbugLog(_FLI, "Using %s", candidate->endDepot->cp->name);
 
 	return candidate->endDepot->cp;
 }
@@ -1050,13 +1050,13 @@ strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 
 	if ( fromEvent != nullptr && brigade->nextEvent() != fromEvent )
 	{
-		betaLog(_FLW, "hcu:%u incorrect event %p", brigadeID, fromEvent);
+		dbugLog(_FLW, "hcu:%u incorrect event %p", brigadeID, fromEvent);
 		return false;
 	}
 
 	if ( !brigade->offMap() )
 	{
-		betaLog(_FLW, "hcu:%u brigade not off-map", brigadeID);
+		dbugLog(_FLW, "hcu:%u brigade not off-map", brigadeID);
 		return true;
 	}
 
@@ -1068,7 +1068,7 @@ strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 
 	if ( brigade->parent()->offMap() )
 	{
-		betaLog(_FLN, "hcu:%u reformation failed -- parent is off-map", brigadeID);
+		dbugLog(_FLN, "hcu:%u reformation failed -- parent is off-map", brigadeID);
 		return false;
 	}
 
@@ -1082,7 +1082,7 @@ strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 // Deliver a number of vehicles into this TOE
 
 bool
-StratHCUnit::depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allowOverstock, ResupplyTicket* const replaceTicket)
+StratHCUnit::depositWeapons(const WEAPON_SPEC spec, UINT16 numUnits, bool allowOverstock, ResupplyTicket* const replaceTicket)
 {
 	if ( allowOverstock && host_config.supply.overstockLimit == 0 )
 		allowOverstock = false;
@@ -1091,7 +1091,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allow
 	if ( offMap() || isTrainingUnit() )
 	{
 		dbugLog(_FLD, "hcu:%u(%s) weap:%s num:%u ignoring -- unit is offmap"
-						, unitID(), callsign(), weapPrintName(&spec), numUnits);
+						, unitID(), callsign(), weapPrintName(spec), numUnits);
 		return false;
 	}
 
@@ -1099,7 +1099,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allow
 	if ( numUnits == 0 )
 	{
 		dbugLog(_FLW, "hcu:%u(%s) weap:%s trying to deposit 0 units"
-						, unitID(), callsign(), weapPrintName(&spec));
+						, unitID(), callsign(), weapPrintName(spec));
 		return false;
 	}
 
@@ -1107,15 +1107,15 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allow
 	if ( entry == nullptr )
 	{
 		dbugLog(_FLA, "hcu:%u(%s) weap:%s weapon not in TOE"
-						, unitID(), callsign(), weapPrintName(&spec));
+						, unitID(), callsign(), weapPrintName(spec));
 		return false;
 	}
 
 	const UINT32 overstockLimit = entry->overstockCapacity();
 	if ( entry->present() >= overstockLimit )
 	{
-		betaLog(_FLI, "hcu:%u(%s) weap:%s equipment pool at/over max oversupply limit (%u/%u->%u)"
-						, unitID(), callsign(), weapPrintName(&spec)
+		dbugLog(_FLI, "hcu:%u(%s) weap:%s equipment pool at/over max oversupply limit (%u/%u->%u)"
+						, unitID(), callsign(), weapPrintName(spec)
 						, entry->present(), entry->capacity(), overstockLimit
 						);
 		return false;
@@ -1123,8 +1123,8 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allow
 
 	if ( allowOverstock == false && entry->present() >= entry->capacity() )
 	{
-		betaLog(_FLI, "hcu:%u(%s) weap:%s equipment pool at capacity (%u/%u)"
-						, unitID(), callsign(), weapPrintName(&spec)
+		dbugLog(_FLI, "hcu:%u(%s) weap:%s equipment pool at capacity (%u/%u)"
+						, unitID(), callsign(), weapPrintName(spec)
 						, entry->present(), entry->capacity()
 						);
 		return false;
@@ -1141,7 +1141,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allow
 		newPresent = entry->present();
 
 	dbugLog(_FLD, "hcu:%u(%s) weap:%s deposit:%u %u=>%u"
-					, unitID(), callsign(), weapPrintName(&spec), numUnits
+					, unitID(), callsign(), weapPrintName(spec), numUnits
 					, entry->present(), newPresent
 					);
 
@@ -1200,7 +1200,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allow
 // Specify a level for a particular vehicle
 
 bool
-StratHCUnit::initializeWeapon(const WEAPON_SPEC& spec, UINT16 numUnits)
+StratHCUnit::initializeWeapon(const WEAPON_SPEC spec, UINT16 numUnits)
 {
 	TOE_::WeaponInstance* const entry = toeWeaponInstance(spec);
 	if ( entry == nullptr )
@@ -1230,34 +1230,34 @@ StratHCUnit::pauseResupplyQueue(UINT32 seconds)
 // Deliver a number of vehicles into this TOE
 
 bool
-StratHCUnit::withdrawWeapons(const WEAPON_SPEC& spec, UINT16 numUnits)
+StratHCUnit::withdrawWeapons(const WEAPON_SPEC spec, UINT16 numUnits)
 {
 	if ( isTrainingUnit() )
 		return true;
 
 	if ( numUnits == 0 )
 	{
-		dbugLog(_FLW, "hcu:%u weap:%s trying to withdraw 0 units", unitID(), weapPrintName(&spec));
+		dbugLog(_FLW, "hcu:%u weap:%s trying to withdraw 0 units", unitID(), weapPrintName(spec));
 		return false;
 	}
 
 	TOE_::WeaponInstance* const entry = toeWeaponInstance(spec);
 	if ( entry == nullptr )
 	{
-		dbugLog(_FLA, "hcu:%u weap:%s weapon not in TOE", unitID(), weapPrintName(&spec));
+		dbugLog(_FLA, "hcu:%u weap:%s weapon not in TOE", unitID(), weapPrintName(spec));
 		return false;
 	}
 
 	if ( entry->present() <= 0 )
 	{
-		dbugLog(_FLA, "hcu:%u weap:%s equipment pool already empty", unitID(), weapPrintName(&spec));
+		dbugLog(_FLA, "hcu:%u weap:%s equipment pool already empty", unitID(), weapPrintName(spec));
 		return false;
 	}
 
 	UINT32 newPresent = (numUnits < entry->present()) ? entry->present() - numUnits : 0;
 
 	dbugLog(_FLD, "hcu:%u weap:%s withdraw:%u %u=>%u"
-					, unitID(), weapPrintName(&spec), numUnits
+					, unitID(), weapPrintName(spec), numUnits
 					, entry->present(), newPresent
 					);
 
@@ -1348,7 +1348,7 @@ StratHCUnit::checkThrottleWindows(const FacilityStruct* const facility) const
 // Check an individual throttle window
 
 UINT32
-StratHCUnit::checkThrottleWindow(const FacilityStruct* const facility, const WEAPON_SPEC& spec) const
+StratHCUnit::checkThrottleWindow(const FacilityStruct* const facility, const WEAPON_SPEC spec) const
 {
 	if ( host_config.supply.enabled == false || host_config.throttle.enabled == false )
 		return 0;
@@ -1385,3 +1385,10 @@ StratHCUnitImpl::incrementThrottle(UINT32 key)
 	throttle.Increment(teulTime() + windowDuration);
 }
 
+//////////////////////////////////////////////////////////////////////
+// Returns a list of all division/brigade units.
+
+std::vector<StratHCUnit*>& strtGetDivisionsAndBrigades()
+{
+	return s_units;
+}

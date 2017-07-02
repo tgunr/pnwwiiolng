@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "math/mathvect.h"
@@ -938,7 +938,7 @@ UINT32 mlInfantryUpdate(mlVehicleData* VehicleData, SINT32 TicTime)
 			if(location >= 0 && location < FP_HIT_LOCATION_NUM)
 			{
 				// -1 to hit location because it's STUPID and is 1 based
-				persApplyDamage(VehicleData->DamageAccrued[j], 0, location, FALSE);
+				persApplyDamage(VehicleData->DamageAccrued[j], 0, location, false);
 				Hit = 1;
 				// turn off lean on damage
 				fpFPSLeanOff();
@@ -968,7 +968,7 @@ UINT32 mlInfantryUpdate(mlVehicleData* VehicleData, SINT32 TicTime)
 	}
 
 
-	// check for dead guy
+	// check for dead vehicle
 	if (!VehicleData->VehicleIsDead && persGetCrewDeadForKillScore(0) == 1)
 	{
 		VehicleData->VehicleIsDead = 1;

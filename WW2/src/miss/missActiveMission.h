@@ -29,7 +29,7 @@ public:
 	ActiveMission(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 // Server only
 public:

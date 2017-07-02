@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string>
 
 #include "phui/GraphicsContext.h"
@@ -150,7 +150,7 @@ void PlayerLayer::RenderSuperCells(SuperCellMapView* mv, int scx1, int scy1, int
 				vehobj->_visible = true;
 				vehobj->_issamemission = true;
 
-				// air guys on the same mission can see other air guys a long way
+				// air players on the same mission can see other air players a long way
 				if(PlayerVehicle && vehtype)
 				{
 					if((PlayerVehicle->VehicleType->Type == VEH_TYPE_AIR && vehtype->Type == VEH_TYPE_AIR) ||

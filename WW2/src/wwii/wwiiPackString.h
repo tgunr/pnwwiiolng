@@ -8,4 +8,4 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern SINT32 wwiiPackString(LOGICAL mode, UCHAR* data, SINT32 offset, std::string& text, SINT32 maxLen);
+extern SINT32 wwiiPackString(PackMode mode, UCHAR* data, SINT32 offset, std::string& text, SINT32 maxLen);

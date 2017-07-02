@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #include <math.h>
@@ -39,7 +39,7 @@ static SINT32		shadow_start_y, shadow_finish_y;
 static SINT32		shadow_width, shadow_height;
 static FLOAT32		sundot;
 
-LOGICAL obdshadInit(void)
+LOGICAL obdshadInit()
 {
     shadow_texture_size = 1 << 6;
 
@@ -972,7 +972,7 @@ piMATRIX		mat;
 }
 
 
-LOGICAL obdshadUpdate(void)
+LOGICAL obdshadUpdate()
 {
     // This routine if totally screwed up. Should be completely removed.
 
@@ -984,7 +984,7 @@ LOGICAL obdshadUpdate(void)
 #ifdef EVENT_LOG_TIMES
     static UINT64 count = 0;
     static int number = 0;
-    
+
     UINT64 beginhere = GetMicroSeconds();
 #endif
 

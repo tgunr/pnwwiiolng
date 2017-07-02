@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Tue Sep  6 20:21:53 CDT 2005
 //
 // Functions for the chatMissionMember.cpp class
@@ -18,7 +18,7 @@ MissionMember::MissionMember(ACTION_OBJECT* const a)
 }
 
 SINT32
-MissionMember::packer(LOGICAL mode, ACTION_OBJECT* a)
+MissionMember::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, 0);
 	a->offset = wwiiPackRankNo(mode, a->packed, a->offset, &m_rank, 0);

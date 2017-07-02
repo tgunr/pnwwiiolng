@@ -1,6 +1,8 @@
 #pragma once
 #if defined(ENABLE_HOST_TIMERS)
 
+///TODO: If nothing else, use std::chrono instead of rdtsc, yeesh.
+
 #if defined(WIN32)
 # include <intrin.h>
 # define rdtsc(x) x = __rdtsc()
@@ -15,7 +17,7 @@ rdtsc(UINT64& x)
 #include <vector>
 namespace Timers
 {
-  extern std::vector< std::pair<const char*, UINT64> > timings;
+  extern std::vector<std::pair<const char*, UINT64>> timings;
   extern TeulTimeMS nextReport;
 }
 
@@ -32,7 +34,7 @@ namespace Timers
 		dbugLog(_FLI, "Timers:"); \
 		for ( size_t i = 0; i < Timers::timings.size(); ++i ) \
 		{ \
-			dbugLog(_FLIB, " %s:%llu", Timers::timings[i].first, Timers::timings[i].second); \
+			dbugLog(_FLI, " %s:%" PR64BitUT "", Timers::timings[i].first, Timers::timings[i].second); \
 		} \
 		Timers::nextReport = teulClock64 + _interval; \
 		TIMER_RESET \

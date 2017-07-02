@@ -38,7 +38,7 @@ public:
 
     GLhandleARB GetHandle() {return _shaderhandle;}
 
-    typedef std::set<glslProgram*> ProgramSet;
+    using ProgramSet = std::set<glslProgram*>;
 
 protected:
     GLhandleARB _shaderhandle;

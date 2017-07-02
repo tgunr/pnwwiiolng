@@ -1,7 +1,6 @@
 #include <syscfg.h> // Path is project specific.
 
-#include "wwii/wwiiHash.h" // does this work on linux?
-# include "dbug/dbug.h"
+#include "dbug/dbug.h"
 #include <map>
 #include <set>
 
@@ -247,7 +246,7 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 //////////////////////////////////////////////////////////////////////
 
 #include "include/io_mapped_file.h"
-typedef std::map<int, IO::MappedFile*> IOMAPPED_FILES;
+using IOMAPPED_FILES = std::map<int, IO::MappedFile*>;
 static IOMAPPED_FILES s_filemap;
 
 //////////////////////////////////////////////////////////////////////
@@ -434,7 +433,7 @@ size_t fiodFileSize(const char* name, bool userdir)
 //////////////////////////////////////////////////////////////////////
 // Returns a pointer to the path prefix
 
-const char* fiodGetPrepath(void)
+const char* fiodGetPrepath()
 {
 	return(DataPath);
 }
@@ -671,7 +670,6 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	UINT32 longestFileName;
 	UINT32 count;
 	SCHAR  curWorkingDir[MAX_PATH];
-	SCHAR  newWorkingDir[MAX_PATH];
 	SCHAR**  list;
 
 	WIN32_FIND_DATAA findData;
@@ -687,15 +685,7 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 
 	GetCurrentDirectoryA(MAX_PATH, curWorkingDir);
 
-	if(dirToSearch == NULL)	// searching within the root of the DataPath
-	{
-		sprintf(newWorkingDir, ".\\");
-	}
-	else
-	{
-		sprintf(newWorkingDir, "%s", dirToSearch);
-	}
-
+	const char* newWorkingDir = dirToSearch ? dirToSearch : ".\\";
 	SetCurrentDirectoryA(newWorkingDir);
 
 	fileHandle = FindFirstFileA("*.*", &findData);
@@ -781,23 +771,19 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	SCHAR* fileName;
 	SCHAR** list;
 	int numFiles = 0;
-	SCHAR newWorkingDir[MAX_PATH];
 	SCHAR filePath[MAX_PATH];
 	struct stat st;
 
 	if(numFilesInDir == NULL || fileList == NULL) return;
 
-	if(dirToSearch == NULL)
-		sprintf(newWorkingDir, "%s", ".\\");
-	else
-		sprintf(newWorkingDir, "%s", dirToSearch);
+	const char* newWorkingDir = dirToSearch ? dirToSearch : ".\\";
 	dir = opendir(os_file_path(newWorkingDir));
 	if(dir == NULL) return;
 
 // Get number of files in directory
 	while((ent = readdir(dir)) != NULL)
 	{
-		sprintf(filePath, "%s%s%s",newWorkingDir, macFileSeparator(), ent->d_name);
+		strprintf(filePath, "%s%s%s",newWorkingDir, macFileSeparator(), ent->d_name);
 		if(!stat(os_file_path(filePath), &st) && S_ISREG(st.st_mode))
 			numFiles++;
 	}
@@ -820,7 +806,7 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 		ent = readdir(dir);
 		if(ent == NULL) break;
 
-		sprintf(filePath, "%s%s%s",newWorkingDir, macFileSeparator(), ent->d_name);
+		strprintf(filePath, "%s%s%s",newWorkingDir, macFileSeparator(), ent->d_name);
 		if(!stat(os_file_path(filePath), &st) && S_ISREG(st.st_mode))
 		{
 			fileName = (SCHAR*)memAlloc(strlen(ent->d_name) + 1);

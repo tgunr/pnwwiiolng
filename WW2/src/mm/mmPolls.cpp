@@ -15,9 +15,9 @@
 
 //////////////////////////////////////////////////////////////////////
 
-typedef std::map<UINT32,OpinionPoll> _POLLS;
+using _POLLS = std::map<UINT32,OpinionPoll>;
 static _POLLS polls;
-static UINT32 g_maxPoll = 0;
+static size_t g_maxPoll = 0;
 static std::mutex _pollsLock;
 
 //////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ _parseQuery(DBQuery& query)
 		OpinionPoll& poll = newPolls[pollID];
 		if ( poll.empty() )
 		{
-			threadLog(_FLD, "poll:%u %s", pollID, row[1]);
+			dbugLog(_FLD, "poll:%u %s", pollID, row[1]);
 			poll.m_pollID = pollID;
 			poll.m_title = row[1];
 		}
@@ -83,11 +83,11 @@ public:
 			}
 			catch ( std::exception& e)
 			{
-				threadLog(_FLW, "Polls: %s", e.what());
+				dbugLog(_FLW, "Polls: %s", e.what());
 			}
 		}
 
-		threadLog(_FLD, "%u polls, highest %u", polls.size(), g_maxPoll);
+		dbugLog(_FLD, "%" PRSizeT " polls, highest %" PRSizeT "", polls.size(), g_maxPoll);
 	}
 };
 
@@ -177,14 +177,14 @@ OPINION_CHOICE_MSG::receive(SINT32 teulIndex, OPINION_CHOICE_MSG& incoming)
 		return 0;
 
 	DBThread::Do(DBThread::Default
-		, "UPDATE LOW_PRIORITY wwii_player SET last_poll = %u WHERE playerid = %u AND last_poll < %u"
+		, "UPDATE wwii_player SET last_poll = %u WHERE playerid = %u AND last_poll < %u"
 			, player->m_lastPoll
 			, player->playerID()
 			, player->m_lastPoll
 	);
 
 	DBThread::Do(DBThread::Default
-		, "UPDATE LOW_PRIORITY wwii_poll_entry SET votes = votes + 1 WHERE pollid = %u AND entryid = %u"
+		, "UPDATE wwii_poll_entry SET votes = votes + 1 WHERE pollid = %u AND entryid = %u"
 			, player->m_lastPoll
 			, data.choice()
 	);

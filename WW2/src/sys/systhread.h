@@ -1,8 +1,8 @@
 #pragma once
 
-typedef int (*systhread_start_routine)(void* userdata);
-typedef void* systhread;
-typedef void* systhread_mutex;
+using systhread_start_routine = int (*)(void* userdata);
+using systhread = void*;
+using systhread_mutex = void*;
 
 /************************************************************************************************
 	systhread

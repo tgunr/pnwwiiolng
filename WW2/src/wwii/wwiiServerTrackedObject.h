@@ -44,7 +44,7 @@ public:
 	WorldPosition_m() : m_x(0.0), m_y(0.0), m_z(0.0) {}
 
 public:
-	void packer(LOGICAL mode, ACTION_OBJECT* a, SINT32 = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
+	void packer(PackMode mode, ACTION_OBJECT* a, SINT32 = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
 	void pack(ACTION_OBJECT* const a, SINT32 = 0) const;
 	void unpack(ACTION_OBJECT* const a, SINT32 = 0);
 
@@ -78,7 +78,7 @@ public:
 	AttitudeVector() : m_x(0.0f), m_y(0.0f), m_z(0.0f) {}
 
 public:
-	void packer(LOGICAL mode, ACTION_OBJECT* a, SINT32 = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
+	void packer(PackMode mode, ACTION_OBJECT* a, SINT32 = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
 	void pack(ACTION_OBJECT* const a, SINT32 = 0) const;
 	void unpack(ACTION_OBJECT* const a, SINT32 = 0);
 
@@ -211,9 +211,9 @@ public:
 	};
 
 public:
-	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	virtual SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 	//! Client function: Ask the host to create an instance of this STO.
 	virtual void request(SINT32 chatIndex);
 #endif
@@ -236,13 +236,13 @@ public:
 	const WorldPosition_m& position() const { return m_position; }
 	//! Get the creation timestamp.
 	//! @return millisecond timestamp of when the STO was created.
-	const TeulTimeMS& created() const { return m_created; }
+	TeulTimeMS created() const { return m_created; }
 	//! Get the client specific flags.
 	//! @return client-specific flags.
 	UINT32 flags() const { return m_flags; }
 	//! Returns the unique ID of the STO's instance.
 	//! @return unique ID of the instance.
-	const instanceid_t& instanceID() const { return m_instanceID; }
+	instanceid_t instanceID() const { return m_instanceID; }
 	//! Return the attitude vector (if any).
 	//! @return Attitude/orientation vector.
 	const AttitudeVector& attitude() const { return m_attitude; }
@@ -278,8 +278,29 @@ public:
 		m_owner = o;
 	}
 
-	//! Get the remaining miliseconds lifespan.
-	//! @return Number of miliseconds until object should expire,
+	//! Set the lifespan of this sto
+	public:
+	void setLifespan(UINT32 lifespan)
+	{
+        m_lifespan = lifespan;
+	}
+
+	//! Set whether this STO can be automatically removed.
+	public:
+	void setCanExpire(bool canExpire)
+	{
+		m_canExpire = canExpire;
+	}
+
+	//! Get whether this STO can expire.
+	public:
+		bool getCanExpire()
+		{
+			return m_canExpire;
+		}
+
+	//! Get the remaining milliseconds lifespan.
+	//! @return Number of milliseconds until object should expire,
 	//!         or zero if object is already past due.
 	UINT32 timeRemaining() const { return expired() ? 0 : (UINT32)lifespan() - (UINT32)age(); }
 
@@ -296,12 +317,13 @@ protected:
 	WorldPosition_m		m_position;				//!< World-relative position of object.
 	AttitudeVector		m_attitude;				//!< Attitude/orientation.
 	TeulTimeMS			m_created;				//!< Creation timestamp.
-	UINT32				m_uid;					//!< Per-camapign unique ID.
+	UINT32				m_uid;					//!< Per-campaign unique ID.
 	UINT16				m_type;					//!< Transport class.
 	UINT16				m_subType;				//!< Client-specific.
 	UINT32				m_flags;				//!< Client data (does not have to be state).
-	UINT32				m_lifespan;				//!< Miliseconds time-to-live.
+	UINT32				m_lifespan;				//!< Milliseconds time-to-live.
 	ChatHandle			m_owner;				//!< ChatHandle of creating player or 0
+	bool				m_canExpire = true;		//!< We may not want some STO's automatically removed.
 
 private:
 	bool m_activated;							//!< Set to true once activated.
@@ -312,7 +334,7 @@ private:
 // Functions
 
 //! Pack the type of an STO only.
-extern SINT32 wwiiPackServerTrackedObjectType(LOGICAL mode, UCHAR* buffer, SINT32 offset, UINT16* type, SINT32 size);
+extern SINT32 wwiiPackServerTrackedObjectType(PackMode mode, UCHAR* buffer, SINT32 offset, UINT16* type, SINT32 size);
 
 //! Remove an STO by its UID.
 extern void wwiiRemoveSTO(UINT32 uid);
@@ -322,12 +344,12 @@ extern ServerTrackedObject* wwiiGetSTO(UINT32 uid);
 //! Walk the STO lists for entries that have expired
 extern void wwiiExpireSTOs();
 
-typedef void (STO_ITERATOR) (ServerTrackedObject&);
-typedef bool (STO_COOKIE_ITERATOR) (ServerTrackedObject& sto, void* cookie);
+using STO_ITERATOR = void(*)(ServerTrackedObject&);
+using STO_COOKIE_ITERATOR = bool(*)(ServerTrackedObject& sto, void* cookie);
 
 //! Patrol function.
-extern void wwiiForEachSTO(STO_ITERATOR&);
-extern bool wwiiForEachSTO(STO_COOKIE_ITERATOR&, void* cookie = nullptr);
+extern void wwiiForEachSTO(STO_ITERATOR);
+extern bool wwiiForEachSTO(STO_COOKIE_ITERATOR, void* cookie = nullptr);
 
 // return a count of the specified type or of all types
 extern UINT32 wwiiCountSTOs(UINT16 type = 0, UINT16 subtype = 0);

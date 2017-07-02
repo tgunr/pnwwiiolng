@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <math.h>
 #include <queue>
@@ -38,7 +38,7 @@
 #include "spt/sptmain.h"
 #endif
 
-typedef struct tagCLUTTER
+struct CLUTTER
 {
     bool kill;
 
@@ -58,8 +58,7 @@ typedef struct tagCLUTTER
 	piMATRIX ObjMatrix;
 
     char grassid[64];
-
-} CLUTTER;
+};
 
 #include <algorithm>
 
@@ -69,7 +68,7 @@ using ClutterHash = std::unordered_set<std::string>;
 static ClutterHash keys;
 #define max_clutter_per_octet 64
 
-typedef std::multimap<std::string, CLUTTER*> ClutterMap;
+using ClutterMap = std::multimap<std::string, CLUTTER*>;
 static ClutterMap cluttermap;
 
 static SINT32 _GetRandomNumberFromSeed(SINT32* Seed);
@@ -78,12 +77,12 @@ static UINT32 _AddClutterToFreeList(CLUTTER * Clutter);
 #if(0)
 static UINT32 _FreeClutter(CLUTTER * Clutter);
 #endif
-static CLUTTER * _GetNewClutter(void);
+static CLUTTER * _GetNewClutter();
 #if(0)
 static void FreeClutter();
 #endif
 
-static UINT32 _RepopulateArray(void);
+static UINT32 _RepopulateArray();
 
 static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX,SINT32 PosY, SINT32* ClutterDensity);
 
@@ -111,12 +110,12 @@ static UINT32 _AddClutterToFreeList(CLUTTER* c)
     return 0;
 }
 
-UINT32 trnClutterInit(void)
+UINT32 trnClutterInit()
 {
 	return 0;
 }
 
-UINT32 trnClutterKill(void)
+UINT32 trnClutterKill()
 {
     trnClutterReset();
     ClutterMap::iterator itr = cluttermap.begin();
@@ -137,7 +136,7 @@ static void FreeClutter()
 }
 #endif
 
-UINT32 trnClutterUpdate(void)
+UINT32 trnClutterUpdate()
 {
     if(!uiInGame())
         return 0;
@@ -233,7 +232,7 @@ static void ClearClutter(const std::string& key)
 #endif
 }
 
-UINT32 trnClutterReset(void)
+UINT32 trnClutterReset()
 {
     ClutterHash::iterator itr = keys.begin();
 
@@ -335,7 +334,7 @@ static void GetGridCenter(int grid, const Vec3d& pos, Vec3d& center)
     }
 }
 
-static UINT32 _RepopulateArray(void)
+static UINT32 _RepopulateArray()
 {
     if(!_drawclutter)
     {
@@ -371,7 +370,7 @@ static UINT32 _RepopulateArray(void)
         GetGridCenter(i, pos, center);
         trnmainGetSupercellAndOctet(center, sx, sy, r, c);
 
-        sprintf(key, "clutter%d%d%d%d", sx, sy, r, c);
+        strprintf(key, "clutter%d%d%d%d", sx, sy, r, c);
         wantedkeys.insert(key);
 
         if(keys.find(key) == keys.end())
@@ -599,7 +598,7 @@ static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX, SINT32 PosY, 
             pos.y = Clutter->Pos.y;
             pos.z = -Clutter->Pos.z;
 
-            sprintf(Clutter->grassid, "clutter%d", _id++);
+            strprintf(Clutter->grassid, "clutter%d", _id++);
 
             const char* type = speedgrassGetGrassByPos(pos);
 

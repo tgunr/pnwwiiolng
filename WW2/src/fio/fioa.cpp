@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "fio/fioa.h"
 #include "fio/fio.h"
@@ -250,13 +250,4 @@ size_t fioaFileSize(const char* filename)
 	paFetchMember(fioa.pf, filename, nullptr, &len);
 
 	return len;
-}
-
-/************************************************************************************************
-	fioaAccess
-*************************************************************************************************/
-
-int fioaAccess(const char* filename)
-{
-	return paFetchMember(fioa.pf, filename, nullptr, nullptr) == 0;
 }

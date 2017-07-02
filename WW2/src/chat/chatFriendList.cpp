@@ -8,15 +8,14 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatLStringIDs.h"
 #include "chat/chatName.h"
 #include "chat/chatPlayer.h"
 #include "include/mydbQuery.h"
 #include "wwii/wwiiDBThreads.h"
+#include "chat/chatFriendList.h"
 
-typedef std::vector<const char*> ARGV;
+using Chat::ARGV;
 
 //	------------------------------	Classes
 
@@ -44,7 +43,7 @@ public:
 
 		while ( Query()->FetchRow() )
 		{
-			const ChatHandle handle = chatGetHandle(Query()->Row()[0]);
+			ChatHandle handle = chatGetHandle(Query()->Row()[0]);
 			m_list.insert(handle);
 		}
 
@@ -64,7 +63,7 @@ static const char* _CHECK_QUERY = "SELECT p.callsign FROM wwii_player p WHERE ca
 class AddSocialCheck : public DBThreadQuery
 {
 public:
-	AddSocialCheck(const playerid_t playerID, const ChatHandle& handle, const bool ignore)
+	AddSocialCheck(const playerid_t playerID, const ChatHandle handle, const bool ignore)
 		: DBThreadQuery(DBThread::Default, "AddSocialCheck", DBThreadQuery::_CALLBACK, _CHECK_QUERY, Chat::Name(handle).c_str())
 		, m_playerID(playerID), m_handle(handle), m_ignore(ignore), m_success(false)
 		{}
@@ -143,7 +142,7 @@ FriendsQuery::Failure()
 // Complete the process of adding someone to the actual social list
 
 static void
-_addSocialToList(Player& player, const ChatHandle& handle, bool ignore)
+_addSocialToList(Player& player, const ChatHandle handle, bool ignore)
 {
 	Chat::Name name(handle);
 
@@ -264,7 +263,7 @@ chatFriendsList(Player& player)
 // Add someone to a social list
 
 void
-_addSocial(Player& player, const ChatHandle& handle, bool ignore)
+_addSocial(Player& player, const ChatHandle handle, bool ignore)
 {
 	HANDLES& list = (ignore) ? player.ignores() : player.friends();
 
@@ -274,7 +273,7 @@ _addSocial(Player& player, const ChatHandle& handle, bool ignore)
 		return;
 	}
 
-	const ChatHandle lowHandle = chatGetLowercaseHandle(handle);
+	ChatHandle lowHandle = chatGetLowercaseHandle(handle);
 	if ( ignore && lowHandle == chatGetLowercaseHandle(systemHandleID) )
 	{
 		player.message(LSTR_SYSTEM, LSTR_IGNORE_SYSTEM1);

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <math.h>
 
@@ -84,26 +84,29 @@
 #include "ogl/GLCounter.h"
 #include "maptools/GenerateIcons.h"
 #include "sdm/BuildTerrain.h"
+#include "wwii/wwiiPPOLoader.h"
 
 #ifdef MULTI_CLIENT
 #include "mc/multiClient.h"
 #endif
 
 #ifdef GENICONS
-#include "GenerateIcons.h"
+#include "maptools/GenerateIcons.h"
 #endif
 
-static void _UpdateInit(void);
-static void _UpdateWorld(void);
-static void _PreRenderUpdateDeprecated(void);
+static void _UpdateInit();
+static void _UpdateWorld();
+static void _PreRenderUpdateDeprecated();
 static void _RenderDeprecated();
-static void _PostRenderUpdateDeprecated(void);
-static void _UpdateKill(void);
-void UpdateGameClocks(void);
+static void _PostRenderUpdateDeprecated();
+static void _UpdateKill();
+void UpdateGameClocks();
 static LOGICAL _PostExternalDrawFunc(LOGICAL IsBeforeStage);
 static LOGICAL _PostInternalDrawFunc(LOGICAL IsBeforeStage);
 static LOGICAL _PostUnsortedDrawFunc(LOGICAL IsBeforeStage);
 static void _CalcFPS();
+
+PPOSpecLoader specLoader;
 
 #define AUTO_AFK_PERIOD 300000	// after 5 minutes, auto-afk turns on
 #define AUTO_AFK_CHECK 5000		// auto-afk checks every 5 seconds
@@ -171,12 +174,15 @@ static void preload_sdms()
 #endif
 }
 
-LOGICAL gmlpMainInit(void)
+LOGICAL gmlpMainInit()
 {
     ShadowMap::GetInstance().init();
     ShadowMap::GetInstance().setPolygonOffset(Vec2f(8, 4));
 
 	ww2imapInit();
+
+	// initialize the PPO mapping, eliminated lazy load
+	specLoader.loadSpecMap();
 
 	rnlogoUpdateStatus("loading.gameloop");
 
@@ -470,7 +476,7 @@ static void PostRenderUpdate()
 #endif
 }
 
-LOGICAL gmlpMainUpdate(void)
+LOGICAL gmlpMainUpdate()
 {
 //	static UINT32 First = 1;
 
@@ -503,7 +509,6 @@ LOGICAL gmlpMainUpdate(void)
     	logTimerCallVoid(PostRenderUpdate);
     }
 
-	wwiiServiceQueue_WWII_ERROR_INFO(); // send any errors to server
 	clientSendPendingSTOJoules();		// send any pending STO damage messages
 
 	// close the game loop
@@ -553,7 +558,7 @@ LOGICAL gmlpMainUpdate(void)
 	return TRUE;
 }
 
-LOGICAL gmlpMainKill(void)
+LOGICAL gmlpMainKill()
 {
     Write_Debug("[gmlpMainKill] Begin");
 
@@ -607,17 +612,17 @@ LOGICAL gmlpMainKill(void)
 //extern void mapProcessSuperCellVislevels();
 
 // initializes stuff for the main update loop
-void _UpdateInit(void)
+void _UpdateInit()
 {
 	UpdateGameClocks(); // adjust the internal game clocks
 
-	if (Online == 1)
+	if (Teul::IsTransportInited())
 	{
-		PlayerClient()->Update();
-
+		if ( Online ) {
+			PlayerClient()->Update();
+			//mapProcessSuperCellVislevels();
+		}
 		teulUpdateTransport(); // process any new messages
-
-		//mapProcessSuperCellVislevels();
 	}
 
 	//if(!imaphackDoKeyboardInputs())
@@ -629,7 +634,7 @@ void _UpdateInit(void)
 
 #include "client/clientStrtQueue.h"
 
-void _UpdateWorld(void)
+void _UpdateWorld()
 {
 #ifdef BETA_RELEASE
 #ifdef GENICONS
@@ -671,7 +676,7 @@ void _UpdateWorld(void)
 }
 
 #if USE_STATESET
-void _PreRenderUpdateDeprecated(void)
+void _PreRenderUpdateDeprecated()
 {
 #ifdef USE_SHADOWS
 	obwldPredrawUpdate();
@@ -744,7 +749,7 @@ void _PreRenderUpdateDeprecated(void)
 }
 #else
 // update stuff to occur before the actual scene render
-void _PreRenderUpdateDeprecated(void)
+void _PreRenderUpdateDeprecated()
 {
 #ifdef USE_SHADOWS
 	logTimerCallVoid(obwldPredrawUpdate);
@@ -836,10 +841,6 @@ void _RenderDeprecated()
 {
     const bool render = uiInGame() && (Online ? g_bVehicleAttached : TRUE);
 
-#if platOS == OS_MACOS
-	//render = !ddpAppHidden();
-#endif
-
 	if(render)
 	{
         // Once per frame frustum setup for culling
@@ -861,10 +862,6 @@ void _RenderDeprecated()
     gmlpHandleFieldOfView();
 
     const bool bRender = uiInGame() && (Online ? g_bVehicleAttached : TRUE);
-
-#if platOS == OS_MACOS
-	//bRender = !ddpAppHidden();
-#endif
 
 	if(bRender)
 	{
@@ -938,7 +935,7 @@ void _RenderDeprecated()
 #endif
 
 // update stuff to occure after the actual scene render
-void _PostRenderUpdateDeprecated(void)
+void _PostRenderUpdateDeprecated()
 {
 	piVECTOR	Pos;
 	piVECTOR	Att;
@@ -990,14 +987,14 @@ void _PostRenderUpdateDeprecated(void)
 }
 
 // any kill functions necessary at end of cycle
-void _UpdateKill(void)
+void _UpdateKill()
 {
 }
 
 //=============================================
 
 // updates the millisecond game clock
-void UpdateGameClocks(void)
+void UpdateGameClocks()
 {
 	static UINT64 starttime = GetMillisecondTick() - 1;
 	const UINT64 newFrametime = GetMillisecondTick();
@@ -1024,7 +1021,7 @@ void UpdateGameClocks(void)
 }
 
 
-UINT32 gmlpHandleFieldOfView(void)
+UINT32 gmlpHandleFieldOfView()
 {
 FLOAT32 ZBufferStart;
 //FLOAT32 ZBufferEnd;
@@ -1100,7 +1097,7 @@ static LOGICAL _PostInternalDrawFunc(LOGICAL IsBeforeStage)
 imap_queue_entry* imapqueue;
 UINT32 imapqueuesize;
 
-void gmlpProcessInputs(void)
+void gmlpProcessInputs()
 {
 	CHAR_INPUT* input;
 	SINT32 count;
@@ -1119,7 +1116,7 @@ void gmlpProcessInputs(void)
 	if(imapqueuesize)
 		inputtime = frametime;
 
-	// auto-afk code, checks every AUTO_AFK_CHECK miliseconds
+	// auto-afk code, checks every AUTO_AFK_CHECK milliseconds
 	if(frametime > afkcheck)
 	{
 		SINT32 isafk = uiIsAFK();

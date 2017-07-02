@@ -29,11 +29,7 @@ enum STRAT_FIREBASE_INIT_MODE
 //	If mode is 1, then all Allied Firebases are opened
 //	If mode is 2, then all Axis Firebases are opened
 //	If mode is 3, then firebases are randomly opened
-extern LOGICAL strtInitStratSystemFirebases(CPStruct* stratSystem);
-
-//This function Sets a firebase on if all conditions are correct (competing
-//	CPs, etc), AND the Firebase is controlled by the side indicated by "side"
-//extern LOGICAL strtSetFBOnControl(FacilityStruct* firebase, WWII_SIDE side);
+extern void strtInitStratSystemFirebases(CPStruct* stratSystem);
 
 //This fucntion opens or closes a firebase at the beginning of the game
 //	NOTE: this should NOT be used to open or close a firebase during
@@ -53,7 +49,6 @@ extern void strtOpenFirebase(FacilityStruct& openingFirebase);
 //This function is called to clear the firebases on BOTH ENDS of a PATH
 //	This function acts on both link the link its passed, and that links
 //	partner
-//extern LOGICAL strtClearFirebases(LinkStruct* link);
 extern void strtClearFirebases(LinkStruct& link);
 
 // Determine whom the new owner should be for an FB

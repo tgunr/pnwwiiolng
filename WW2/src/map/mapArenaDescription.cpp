@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Thu Apr  7 19:54:18 CDT 2005
 //
 // Description of the arena
@@ -75,7 +75,7 @@ ArenaDescription::_unpack(ACTION_OBJECT* const a)
 }
 
 SINT32
-ArenaDescription::packer(LOGICAL mode, ACTION_OBJECT* a)
+ArenaDescription::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	if ( mode == TEUL_PACK )
 		return _pack(a);

@@ -17,7 +17,7 @@ class FacilityStruct;
 struct DOT_COMMANDS
 {
 	const char*	command;
-	LOGICAL (*stub)(char* arguments, OOBMessage& message);
+	bool (*stub)(char* arguments, OOBMessage& message);
 	const char*	description;
 };
 extern DOT_COMMANDS dotCommands[];

@@ -5,7 +5,7 @@
 //
 // Originating Programmer: Oliver "kfs1" Smith
 
-#include <syscfg.h>		// Should use the teulKit syscfg.h
+#include "syscfg.h"		// Should use the teulKit syscfg.h
 
 #include <sys/types.h>
 
@@ -94,41 +94,15 @@ namespace Config
 	static size_t iterFactor = 1;
 }
 
-//////////////////////////////////////////////////////////////////////
-#if platOS == OS_WIN32
-// Windows support.
-// This app is primarily developed for Linux, but the whole point of
-// teulKit is that it's cross-platform, so this code should largely
-// be able to run on both platforms.
-//
-// Naturally, there are a few minor differences here and there...
+#if platBuild != BUILD_SERVER
 
-#if platBuild != TEUL_SERVER
-	// Under Linux, this is supplied by libteulserver.
-	#include "teul/teulConnectionInstruction.h"
-	SINT32
-	Teul::ConnectionInstruction::receive(SINT32 teulIndex)
-	{
-		throw Teul::IndexError(teulIndex, "Unexpected connection instruction received.\n", m_hostIP);
-	}
-#endif
-// End of windows support section.
-#elif platOS == OS_MACOS
-// Mac support.
 #include "teul/teulConnectionInstruction.h"
 SINT32
 Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 {
-	throw Teul::IndexError(teulIndex, "Unexpected connection instruction received.\n", m_hostIP);
+    throw Teul::IndexError(teulIndex, "Unexpected connection instruction received.\n", m_hostIP);
 }
 
-// End of mac support.
-#elif platOS == OS_LINUX
-// Linux support.
-
-// End of linux support.
-#else
-	#error("You need a -DplatOS=OS_... for your platform.")
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -165,7 +139,7 @@ struct EchoPacketHeader
 	static UINT64 s_requested;
 
 	template<typename Type_>
-	void packData(LOGICAL mode, ACTION_OBJECT* const a)
+	void packData(PackMode mode, ACTION_OBJECT* const a)
 	{
 		Type_* data = (Type_*)(m_data);
 		const size_t typeSize = sizeof(Type_) * 8;
@@ -178,7 +152,7 @@ struct EchoPacketHeader
 		}
 	}
 
-	void packer(LOGICAL mode, ACTION_OBJECT* const a)
+	void packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		a->packer(mode, m_direction, 2);
 		a->packer(mode, m_type, 6);
@@ -213,7 +187,6 @@ struct EchoPacketHeader
 		default:
 			Dprintf("Echo type: %u\n", m_type);
 			throw std::runtime_error("Invalid echo type");
-		break;
 		}
 
 		if ( a->offset < 0 )
@@ -332,7 +305,7 @@ struct Role
 
 		// Initialize the teulKit transport, telling it how/where to log,
 		// and providing it with our custom error and shutdown handlers.
-		SINT32 ret = teulInitTransport(LOG_TO_FILE, moduleName, Role::transportErrorFn, nullptr);
+		SINT32 ret = teulInitTransport(LogMode::TO_FILE, moduleName, Role::transportErrorFn, nullptr);
 		if ( ret < 0 )
 			throw Teul::Error("teulInitTransport failed", ret);
 
@@ -476,8 +449,7 @@ struct Role
 			return;
 
 		// UnencryptedBytes is supposed to be '3'.
-		if ( Teul::Packet::UnencryptedBytes != 3 )
-			throw Teul::Error("UnencryptedBytes is not 3", Teul::Packet::UnencryptedBytes);
+		static_assert(Teul::Packet::UnencryptedBytes == 3, "Code depends on size of UnencryptedBytes being 3");
 
 		// Prepare the packet!
 		Dprintf("preparing Teul::Packet\n");
@@ -782,7 +754,7 @@ _doCryptTests()
 		ep.m_impl->m_rxCrypt.newSeed();
 		ep.m_impl->m_txCrypt.setSeed(ep.m_impl->m_rxCrypt.seed());
 
-		Dprintf("- ver %04x. rxSeed = %llu, txSeed = %llu\n", version, ep.m_impl->m_rxCrypt.seed(), ep.m_impl->m_txCrypt.seed());
+		Dprintf("- ver %04x. rxSeed = %" PR64BitUT ", txSeed = %" PR64BitUT "\n", version, ep.m_impl->m_rxCrypt.seed(), ep.m_impl->m_txCrypt.seed());
 
 		memcpy(buf1, buf2, len1);
 		ep.m_impl->m_version = ep.m_impl->m_cryptVersion = version;
@@ -817,7 +789,7 @@ _doCryptTests()
 int
 main(int argc, const char* const argv[])
 {
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	Teul::ConfigVar::InitializeConfigVars();
 #endif
 
@@ -872,4 +844,3 @@ main(int argc, const char* const argv[])
 
 	return result;
 }
-

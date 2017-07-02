@@ -1,7 +1,7 @@
 #pragma once
 
-#if platBuild == TEUL_SERVER
-static_assert( platBuild != TEUL_SERVER, "Can't include vars.h in a server build." );
+#if platBuild == BUILD_SERVER
+static_assert( platBuild != BUILD_SERVER, "Can't include vars.h in a server build." );
 #else
 
 #include "pi/pi.h"
@@ -87,7 +87,6 @@ extern UINT32			MaxUserClipPlanes;
 extern UINT32			MaxTextureWidth;
 extern UINT32			MaxTextureHeight;
 
-extern LOGICAL          WantedHelp;			// asked for commandline help
 extern UINT32			WindowAdapter;		// desired adapter
 extern UINT32			WindowDeviceType;	// desired device type
 extern UINT32			WindowRefreshRate;	// desired refresh rate
@@ -117,6 +116,7 @@ extern SINT8			ServerApID[64];		// program apId
 extern SINT8			ServerData[64];		// data passed from auth server
 extern SINT8			ServerProtocol[64]; // connection protocol
 extern SINT8			BypassString[64];
+extern LOGICAL			UseSteamLogin;
 extern LOGICAL			WantedUserLogEnabled;	// If the user wants the log enabled
 extern SCHAR			WantedVideoCard[64];// desired video card name
 extern SCHAR			WantedVideoResolution[32];// desired video resolution
@@ -160,8 +160,9 @@ extern LOGICAL          WantCombatSmoke;    // emersive smoke from damaged build
 extern SINT32           g_updateReflectionRate; // 0 - 5 seconds
 extern SINT32           g_iNumBullets;      // Limit to number of displayable bullets.
 extern SINT32           g_iAmbLevel;        // Frequent = 1; Infrequent = 2; Never = 0;
-extern SINT32           g_iVisiblePlayerLimit; // 1 = low 2 = medium 3 = high
+extern SINT32           g_iVisiblePlayerLimit; // 0 = very low, 1 = low, 2 = medium, 3 = high, 4 = very high
 extern SINT32           g_useNetworkRoute;    // 0, 1, 2 (auto/primary/secondary)
+extern LOGICAL          g_wantNetcode;        // true = netcode X enabled
 
 extern SINT32			g_iFSSASamples; 	// 0 = off, 2,4,6,8 (Mac OS X only currently)
 extern LOGICAL			g_bFSSAHighQuality; // enable high quality FSAA hinting (Mac OS X only currently) XXXX
@@ -193,8 +194,6 @@ extern SINT32           nErrorCode;         // Set to any user specified error c
 
 extern SINT32			TexBpp;
 extern SINT32			TexAlpha;
-
-extern LOGICAL			TextureReduction;	// force texture reduction
 
 extern UINT32			DamageLevel;
 
@@ -277,17 +276,17 @@ extern LOGICAL          EnableMouseClickToDamageBuildings;
 extern FLOAT32			gTrooperMOD; // LOD scaler mod from preferences
 extern LOGICAL          gCustomTerrain;
 extern UINT32			gEZMode;
-extern UINT32			GameInProgress; // 0 = not running, 1 = running, 2 = quitting
 
 extern UINT32			Convergence; // Global (default) Airplane gun convergence setting
 extern UINT32			CurrentConv; // Current airplane gun convergence setting
 
 extern FLOAT32			aimMouse;	// Aiming mouse sensitivity
 extern SINT8            gAuthServer[128]; // Authentication server to be used
+extern SINT8            gAuthServerPort[64];
 extern SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 extern SINT8            gClientV[32]; // Version to submit
 
-#ifdef DEBUG
+#ifdef DEBUG_WW2
 extern LOGICAL          DebugBuildingMDLFilesOnly;
 #endif
 
@@ -299,11 +298,5 @@ extern LOGICAL          DebugBuildingMDLFilesOnly;
 #endif	// #ifdef BETA_RELEASE
 
 static inline bool IN_COMBAT(SINT32 t) { return (frametime - combattime) <= t; }
-
-namespace WWII
-{
-	extern const unsigned int gitCommitNo;
-	extern const char* const gitCommitStr;
-}
 
 #endif

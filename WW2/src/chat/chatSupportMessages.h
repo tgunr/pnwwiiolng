@@ -13,7 +13,7 @@
 struct MobileSpawnWaypoint;
 
 //This function installs all the host callbacks
-SINT32 chatInstallSupportCallbacks(void);
+SINT32 chatInstallSupportCallbacks();
 
 //This function sends a message to a client apprising it of the location of
 //	the chat server.  To be used after chatSendPlayerInfo tells the chat

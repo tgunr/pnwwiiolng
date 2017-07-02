@@ -46,20 +46,35 @@ extern char* rmtrail(char* str);
 extern char* strescape(char* d, const char* s, char c);
 
 template <size_t _DestSize>
-static inline void strsafecpy(char (&dest)[_DestSize], const char* src)
-{
-	strncpy(dest, src, _DestSize - 1);
-	dest[_DestSize - 1] = 0;
-}
-
-static inline void strsafecpy(char *dest, const char* src, size_t _DestSize)
+static inline void strsafecpy(char (&dest)[_DestSize], const char* src) noexcept
 {
 	strncpy(dest, src, _DestSize - 1);
 	dest[_DestSize - 1] = 0;
 }
 
 template <size_t _DestSize>
-static inline void strsafecpy(wchar_t (&dest)[_DestSize], const wchar_t* src)
+static inline void strsafecpy(wchar_t (&dest)[_DestSize], const wchar_t* src) noexcept
 {
-    wcsncpy(dest, src, _DestSize - 1);
+	wcsncpy(dest, src, _DestSize - 1);
+	dest[_DestSize - 1] = 0;
 }
+
+static inline void strsafecpy(char* dest, const char* src, size_t sizeWithNul) noexcept
+{
+	strncpy(dest, src, sizeWithNul - 1);
+	dest[sizeWithNul - 1] = 0;
+}
+
+static inline void strsafecpy(wchar_t* dest, const wchar_t* src, size_t sizeWithNul) noexcept
+{
+	wcsncpy(dest, src, sizeWithNul - 1);
+	dest[sizeWithNul - 1] = 0;
+}
+
+// Now let's have some actual C++ string utility going on here.
+std::string string_replace(const std::string &haystack, const std::string &needle, const std::string &replacement);
+std::vector<std::string> split_string(const std::string &str, const std::string &delimiter, size_t max_split = SIZE_MAX);
+bool has_prefix(const std::string &str, const std::string &prefix);
+std::string strtolower(const std::string &str);
+std::string strtoupper(const std::string &str);
+std::string strtrim(const std::string &str);

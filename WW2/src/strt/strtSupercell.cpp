@@ -8,16 +8,12 @@
 
 Supercell::~Supercell()
 {
-	if ( cps )
-	{
-		delete [] cps;
-		cps = nullptr;
-	}
-	if ( facilities )
-	{
-		delete [] facilities;
-		facilities = nullptr;
-	}
+	delete [] cps;
+	cps = nullptr;
+
+	delete [] facilities;
+	facilities = nullptr;
+
 	if ( objects )
 	{
 		memFree(objects);

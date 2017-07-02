@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Mon Oct  9 14:31:06 CDT 2006
 //
 // Classes used to request and manipulate brigade lists and OICs
@@ -19,7 +19,7 @@ TEUL_CALLBACK* BrigadeControl::s_callback = nullptr;
 // Base class packer (so much more elegant with Teul::Serialize)
 
 SINT32
-BrigadeControl::packer(LOGICAL mode, ACTION_OBJECT* a)
+BrigadeControl::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	bool haveOfficer = (mode == TEUL_PACK) ? (m_officer != 0) : false;
 	bool haveSponsor = (mode == TEUL_PACK) ? (m_sponsor != 0) : false;
@@ -45,7 +45,7 @@ BrigadeControl::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-BrigadeControlNotice::packer(LOGICAL mode, ACTION_OBJECT* a)
+BrigadeControlNotice::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	BrigadeControl::packer(mode, a);
 

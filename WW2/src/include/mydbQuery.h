@@ -209,7 +209,7 @@ public:
 			throw std::invalid_argument("index out of bounds");
 
 		return m_row[index];
-	};
+	}
 
 	// Can return null
 	const char* NextColumn()
@@ -226,7 +226,9 @@ public:
 		return ( p ) ? p : "";
 	}
 
-	// NOTE: Does not ensure null-byte placement
+	template<size_t N>
+	const char* NextString(char (&dest)[N]) { return NextString(dest, N); }
+
 	const char* NextString(char* destination, size_t maxLen);
 
 	SINT32 NextSInt()
@@ -271,7 +273,7 @@ public:
 		return ( source != nullptr ) ? (FLOAT64)strtod(source, nullptr) : 0.0;
 	}
 
-	void NextWeaponSpec(struct WEAPON_SPEC& spec);
+	void NextWeaponSpec(WEAPON_SPEC& spec);
 
 protected:
 	// Constructor

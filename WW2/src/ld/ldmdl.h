@@ -13,7 +13,7 @@ extern	LOGICAL ldmdlCalcNormals(struct OBJECT* lpobj);
 extern	LOGICAL ldmdlReverseNormals(struct OBJECT* lpobj);
 extern	LOGICAL ldmdlReverseObjectNormals(struct OBJECT* lpobj);
 extern	LOGICAL ldmdlSortObjectTriangles(struct OBJECT* lpobj);
-extern	LOGICAL ldmdlProcessNormalsSerialized(void);
+extern	LOGICAL ldmdlProcessNormalsSerialized();
 extern	void	ldmdlReduceAttachments(struct OBJECT* node);
 extern	void	ldmdlReduceModel(struct OBJECT* lpobj);
 extern	void	ldmdlProcessBounds(struct OBJECT* o);

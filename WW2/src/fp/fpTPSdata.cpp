@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "pi/pi.h"
 #include "str/strpool.h"
 
@@ -6,7 +6,6 @@
 #include "fp/fpTPSdata.h"
 #include "fp/fpTPS.h"
 #include "fio/fio.h"
-#include "sys/sysWinISO.h"
 #include "str/stringLib.h"
 #include "gr2/gr2layer.h"
 
@@ -214,12 +213,12 @@ const SCHAR* fpTPSPointKeyStrings[TPS_POINTTYPE_NUM_TYPES] =
 
 TPSTypes tpsTypesMap;
 
-void fpTPSDataReadTPSFile (void);
-void fpTPSDataReadSurfaceFiles (void);
-void fpTPSDataReadHitLocation (SCHAR* data);
+void fpTPSDataReadTPSFile();
+void fpTPSDataReadSurfaceFiles();
+void fpTPSDataReadHitLocation(SCHAR* data);
 void fpTPSDataInitHitLocations();
 
-void fpTPSDataInit ()
+void fpTPSDataInit()
 {
 	//fpTPSSkeletonFile = TPS_DIR "troopskel";
 	fpTPSSkeletonFile = TPS_DIR "Inf_BaseSkeleton";
@@ -753,7 +752,7 @@ const char* fpTPSGetTypeNameFromValue(const char* type, int value)
 }
 
 
-void fpTPSDataReadTPSFile (void)
+void fpTPSDataReadTPSFile()
 {
 	SINT32	tpsDataFile;
 	static char	buf[255];
@@ -887,7 +886,7 @@ void fpTPSDataInitHitLocations()
 	gr2FreeModel(skeleton);
 }
 
-void fpTPSDataReadSurfaceFiles (void)
+void fpTPSDataReadSurfaceFiles()
 {
 	static char	buf[256];
 	static char	surfFileName[256];
@@ -1221,7 +1220,7 @@ fpTPSWeaponType	fpTPSConvertWeaponTypes(fpFPSWeaponType type)
 	}
 
 	Write_Log (LOG_FPS, LOG_INFO, "fpTPSConvertWeaponTypes: Invalid weapon type passed %d!", type);
-	//piExitProgram (__FILE__, __LINE__, "fpTPSConvertWeaponTypes: Invalid weapon type passed" );
+	//piExitProgram (_FL, "fpTPSConvertWeaponTypes: Invalid weapon type passed" );
 
 	//dumb
 	return TPS_WEAPONTYPE_EMPTY;

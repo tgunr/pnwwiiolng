@@ -88,7 +88,7 @@ bool CWaterSlider::MouseDrag(float x, float y, int button, bool start)
     {
         char s[32];
 
-        sprintf(s, "%f", m_value);
+        strprintf(s, "%f", m_value);
         c->SetValue(s);
 
         switch(m_param)
@@ -265,7 +265,7 @@ void CWaterTool::createSlider(int x,
 
     char str[32];
 
-    sprintf(str, "%3f", trnwtrGetShaderFloat(param));
+    strprintf(str, "%3f", trnwtrGetShaderFloat(param));
 
     c->SetValue(str);
     c->SetTextAlignment(Caption::ALIGN_LEFT);
@@ -317,7 +317,7 @@ void CWaterTool::createSlider2(int x,
 
         char str[32];
 
-        sprintf(str, "%3f", value[i]);
+        strprintf(str, "%3f", value[i]);
 
         c->SetValue(str);
         c->SetTextAlignment(Caption::ALIGN_LEFT);
@@ -387,7 +387,7 @@ void CWaterTool::createSlider3(int x,
 
         char str[32];
 
-        sprintf(str, "%3f", color[i]);
+        strprintf(str, "%3f", color[i]);
 
         c->SetValue(str);
         c->SetTextAlignment(Caption::ALIGN_LEFT);
@@ -534,7 +534,7 @@ void _saveWaterParams()
 
     while(_access(fileName, 0) == 0)
     {
-        sprintf(fileName, "%s%d.txt", p, count++);
+        strprintf(fileName, "%s%d.txt", p, count++);
     }
 
     FILE* fp = fopen(fileName, "w");

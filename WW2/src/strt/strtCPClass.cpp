@@ -10,8 +10,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Patrick "thunder" Magruder
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcast.h"
 #include "chat/chatDefines.h"			// For GCI_...
 #include "chat/chatGCIMessage.h"
@@ -224,7 +222,7 @@ ObjectiveStats::checkLimits(UINT32 currentTime)
 	calculate();
 
 	// Step #1 - save the damn things :)
-#if !defined(TRAINING_SERVER) && !defined(FRES)
+#if !defined(TRAINING_SERVER)
 	save();
 
 	// Now check the stats of both sides to see if they're valid
@@ -273,7 +271,7 @@ ObjectiveStats::checkSideLimits(WWII_SIDE forSide, UINT32 currentTime)
 			{
 				///LOCALIZE
 				char buf[128];
-				sprintf(buf, "[beta] Too many objectives (%u/%u): grace period", m_cityAttacks[forSide], m_cityLimit);
+				strprintf(buf, "[beta] Too many objectives (%u/%u): grace period", m_cityAttacks[forSide], m_cityLimit);
 				chatSendHCMessage(forSide, LSTR_GENERIC, buf);
 			}
 #endif
@@ -587,13 +585,13 @@ _checkUnit(StratHCUnit* unit, const CPStruct* cp)
 	// Ensure we rout parents first.
 	if ( nullptr != unit->parent() && cp == unit->parent()->homeCP() )
 		_checkUnit(unit->parent(), cp);
-	dbugLog(_FLIB, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
+	dbugLog(_FLI, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
 	if ( unit->canDeployTo(cp) )
-		dbugLog(_FLIB, "ok ");
+		dbugLog(_FLI, "ok ");
 	else if ( !unit->rout() )
-		dbugLog(_FLIB, "FAILED ");
+		dbugLog(_FLI, "FAILED ");
 	else
-		dbugLog(_FLIB, "routed ");
+		dbugLog(_FLI, "routed ");
 }
 
 void
@@ -607,21 +605,21 @@ CPStruct::checkHCUnits()
 	{
 		_checkUnit((StratHCUnit*)it->second, this);
 	}
-	dbugLog(_FLIB, "End");
+	dbugLog(_FLI, "End");
 }
 
 //////////////////////////////////////////////////////////////////////
 // Check whether the flags say we're under attack or not
 
 CPStruct*
-CPStruct::checkForUnderAttack(void)
+CPStruct::checkForUnderAttack()
 {
 	///TODO: Differentiate between "people here" and "under attack"
 	if ( flags & CP_EWS_FLAG_MASK )
 	{
 		if ( !isUnderAttack )
 		{
-			betaLog(_FLI, "ews: marking %s as under attack", name);
+			dbugLog(_FLI, "ews: marking %s as under attack", name);
 		}
 		isUnderAttack = true;
 	}
@@ -629,7 +627,7 @@ CPStruct::checkForUnderAttack(void)
 	{
 		if ( isUnderAttack )
 		{
-			betaLog(_FLI, "ews: removing %s under attack flag", name);
+			dbugLog(_FLI, "ews: removing %s under attack flag", name);
 		}
 		isUnderAttack = false;
 	}
@@ -842,6 +840,7 @@ CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
     //HACK: DEV-824 - .hold command temporary disabled
     return SCMD_ERROR;
 
+#ifdef ENABLE_HOLD
 	if ( side != issuer )
 		return SCMD_WRONG_SIDE;
 
@@ -867,6 +866,7 @@ CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
 		return SCMD_SUCCESS;
 
 	return SCMD_ERROR;
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1300,13 +1300,13 @@ CPStruct::setTableStates(bool isNewObjective)
 		if ( !isObjective() )
 		{
 			// No objective, no tables
-			betaLog(_FLD, "NORB hiding %s non-obj table", fac->name);
+			dbugLog(_FLD, "NORB hiding %s non-obj table", fac->name);
 			fac->setCaptureDisabled();
 
 			// If the facility is spawnable and closed, time to wake it up
 			if ( fac->m_spawnable && !fac->isOpen() )
 			{
-				betaLog(_FLI, "opening %s since no objective", fac->name);
+				dbugLog(_FLI, "opening %s since no objective", fac->name);
 				strtOpenBase(*fac);
 			}
 			continue;
@@ -1318,18 +1318,18 @@ CPStruct::setTableStates(bool isNewObjective)
 			// entered contention, they should redraw soon
 			if ( isContested() )
 			{
-				betaLog(_FLD, "RB-MF table %s", fac->name);
+				dbugLog(_FLD, "RB-MF table %s", fac->name);
 				fac->setCapturePending();
 			}
 			else
 			{
-				betaLog(_FLD, "NORB-MF hiding %s", fac->name);
+				dbugLog(_FLD, "NORB-MF hiding %s", fac->name);
 				fac->setCaptureDisabled();
 			}
 		}
 		else if ( isNewObjective )
 		{
-			betaLog(_FLD, "RB show %s table no radio", fac->name);
+			dbugLog(_FLD, "RB show %s table no radio", fac->name);
 			fac->setCapturePending();
 		}
 	}
@@ -1352,7 +1352,7 @@ CPStruct::startObjectiveExpiry(WWII_SIDE forSide, UINT32 delay)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Iterate across the supply centers and propogate supply links outward
+// Iterate across the supply centers and propagate supply links outward
 // from them to all same-side CPs within reach
 
 bool
@@ -1376,7 +1376,7 @@ strtBuildSupplyChains(bool force)
 
 	teulSyncClock();
 	const TeulTimeMS applyEnded = teulClock64;
-	dbugLog(_FLI, "sup: supply routeing took %llums [%llu run, %llu apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded);
+	dbugLog(_FLI, "sup: supply routeing took %" PR64BitUT "ms [%" PR64BitUT " run, %" PR64BitUT " apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded);
 
 	return true;
 }

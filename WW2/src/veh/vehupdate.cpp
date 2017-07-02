@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "pi/pi.h"
 #include "include/vars.h"
@@ -82,15 +82,14 @@ UINT32 vehNotTracked = 0;
 UINT32 unexpectedErrors = 0;
 #endif
 
-typedef struct
+struct IconRank
 {
 	const char* name;
 	UINT32 Rank;
-} IconRank;
+};
 
 static const IconRank _SpecialRanks[] =
 {
-#if !defined(CHINA) && !defined(HAPPYOO)
 	{"killer", 		KILLER_RANK },
 	{"martini", 	MARTINI_RANK },
 	{"toto", 		TOTO_RANK },
@@ -100,7 +99,6 @@ static const IconRank _SpecialRanks[] =
 	{"xoom",        XOOM_RANK },
 	{"ohm",         OHM_RANK },
 	{"victarus",    VICTARUS_RANK },
-#endif
 	{nullptr, 0}
 };
 
@@ -117,7 +115,7 @@ static LOGICAL _GetSoundDistance(FLOAT32* pMin, FLOAT32* pMax, UINT32* pType);
 
 static void vehUpdateRideChanged(vehVehicle*, UINT32 newRideVehicleIdx);
 static void _processBuildingDamage (vehVehicle& Vehicle);
-static void _playWeaponFireSound(SCHAR* sound, OBJECT* o, FLOAT64VECTOR* pos, UINT32 type);
+static void _playWeaponFireSound(const SCHAR* sound, OBJECT* o, const FLOAT64VECTOR* pos, UINT32 type);
 
 UINT32 vehupdateCreatePlayerControlledVehicle(SINT32 VehicleNum,
 											  SINT32 VehicleIdNum,
@@ -628,7 +626,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	VehicleHdr.present |= PR_FIRE_FLAGS;
 
     bool sendTurrets = (Data.HasSentUpdate >= 3);
-    
+
 	// turret traverse
 	TurretMask = 0;
 	NumTurrets = 0;
@@ -826,7 +824,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 			teulSyncClock();
 			cub.size = teulPackUINT64(TEUL_PACK, cub.data, cub.size, &teulClock64, 0);
             if (Online) { // wait until here to check this in case all that junk above actually does something to game state
-                teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub);
+                teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub, PROTOCOL_UDP);
             }
 		}
 	}
@@ -965,7 +963,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 			a roll-over of the 16 bit time value ocurred (roughtly every 65 seconds)?
 		 */
 		if ( timeDiff < 0
-			
+
 			&& !(VehicleHeader->present & PR_ONE_TIME))
 		{
 
@@ -982,7 +980,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 #ifdef BETA_RELEASE
 			SINT32 verifyDiff = PosData->CurrentSenderUpdateTime - PosData->LastSenderUpdateTime;
 #endif
-            
+
 #ifdef BETA_RELEASE
 			dbugLog(_FLI, "Rollover occurred: Old TS: %d, New Old: %d, New TS: %d, diff: %d, verifyDiff: %d",
 				prevCurrent, PosData->LastSenderUpdateTime, thisTS, timeDiff, verifyDiff);
@@ -1000,7 +998,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 	applyStatusBits(PR_STATE0, (void *)&VehicleInfo->stateFlags0, 0, 16, VehicleHeader, Vehicle);
 	applyStatusBits(PR_STATE1, (void *)&VehicleInfo->stateFlags1, 16, 16, VehicleHeader, Vehicle);
 	if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
-		applyStatusBits(PR_VEH_VIS, (void *)&VehicleInfo->visBits, 16, 32, VehicleHeader, Vehicle);
+		applyStatusBits(PR_VEH_VIS, (void *)&VehicleInfo->visBits, 32, 32, VehicleHeader, Vehicle);
 
 	// position
 	// if multicrew, only crew gets this data
@@ -1320,7 +1318,8 @@ lastLowUpdateTime = frametime;
 #ifdef DEBUG_UPDATES
 		++duplicateUpdatesIgnored;
 #endif
-		Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
+		// Pointless debug - we know this can happen due to frequency of updates, don't report this anymore.
+		// Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
 		return 0;
 	}
 
@@ -1579,7 +1578,7 @@ static UINT32 vehupdateInfantry(vehVehicle* Vehicle)
 	vehVehiclePositionData* PosData = &Vehicle->PosData;
 
 	// interpolate from the last position
-	InterpolatorBase::Update const& update	= Vehicle->interpolator.Interpolate(frametime);
+	vehInterpolator::Update const& update	= Vehicle->interpolator.Interpolate(frametime);
 
     // For .vspawn infantry
     if(!Vehicle->isSTO())
@@ -1740,7 +1739,7 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 
 	// Position
 // Absolutely no idea why it works like this
-// Seems to be due to some retardation in the FPS math, but fixing it is
+// Seems to be due to some brokenness in the FPS math, but fixing it is
 // a real potential can of worms
 if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 	PosData->Pos.x += -PosData->Vel.x * Delta;
@@ -2473,9 +2472,9 @@ UINT32 vehResupplyWeapons(struct vehVehicle* Vehicle)
 // Function: _playWeaponFireSound
 // Description:
 //////////////////////////////////////////////////////////////////////
-void _playWeaponFireSound(SCHAR* sound,
+void _playWeaponFireSound(const char* sound,
                           OBJECT* o,
-                          FLOAT64VECTOR* pos,
+                          const FLOAT64VECTOR* pos,
                           UINT32 type)
 {
     SINT32 ID = fxSndGetNewSound();
@@ -2483,51 +2482,33 @@ void _playWeaponFireSound(SCHAR* sound,
     if(ID < 0) return;
 
     FLOAT32 fMin, fMax;
+	_GetSoundDistance(&fMin, &fMax, &type);
 
     // Check if distance file exists.
-    SCHAR* p = nullptr;
-    static SCHAR distSound[128];
-    LOGICAL hasDistant = FALSE;
-  //  LOGICAL canPlayDistantSound = FALSE;
+	std::string distSound(sound);
+	auto p = distSound.rfind(".wav");
+	if (p != distSound.npos)
+	{
+		distSound.replace(distSound.begin() + p, distSound.end(), "_distant.wav");
+        int fd = fioOpen(distSound.c_str());
+        fioClose(fd);
+		if (fd != -1)
+		{
+			piVECTOR v{ (FLOAT32)pos->x, (FLOAT32)pos->y, (FLOAT32)pos->z };
 
-    strncpy(distSound, sound, sizeof(distSound) - 1);
-	distSound[sizeof(distSound)-1] = 0;
+			math3dVectorMultiply(&v, &v, &o->mat);
 
-    p = strstr(distSound, ".wav");
+			FLOAT32 z = math3dDotProduct(&v, &playdir) + playtrans.z;
 
-    if(p)
-    {
-        *p = 0;
-        strcat(distSound, "_distant.wav");
+			if (z > fMax) return;
 
-        if(fioAccess(distSound))
-        {
-            hasDistant = TRUE;
-        }
-    }
-
-    _GetSoundDistance(&fMin, &fMax, &type);
-
-    if(hasDistant)
-    {
-        piVECTOR v;
-
-        v.x = (FLOAT32)pos->x;
-        v.y = (FLOAT32)pos->y;
-        v.z = (FLOAT32)pos->z;
-
-        math3dVectorMultiply(&v, &v, &o->mat);
-
-        FLOAT32 z = math3dDotProduct(&v, &playdir) + playtrans.z;
-
-        if(z > fMax) return;
-
-        if(z > fMax/4 && z <= fMax)
-        {
-            fMin = 150.0f;
-            sound = distSound;
-        }
-    }
+			if (z > fMax / 4 && z <= fMax)
+			{
+				fMin = 150.0f;
+				sound = distSound.c_str();
+			}
+		}
+	}
 
     fxSndSetSoundName(ID, sound);
     fxSndSetPriority(ID, IDE_TP_PRIORITY_HIGH);

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*
  *  FTFontAdapted.cpp
  *  WW2OL
@@ -58,12 +58,6 @@ unsigned int FTFontAdapted::GetFaceSize() const
 
 bool FTFontAdapted::FaceSize(const unsigned int sz)
 {
-    unsigned int siz = sz;
-    if ( gLanguage ==5 && sz < 14 )
-    {
-        siz = 14;
-    }
-
-    return mFont->FaceSize(siz);
+    return mFont->FaceSize(sz);
 }
 

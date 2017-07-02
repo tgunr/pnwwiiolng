@@ -49,7 +49,7 @@ namespace Chat
 	static const UINT16 WIDE_HANDLE_CHARACTERS_SUPPORTED = 6827;
 }
 
-bool chatIsValidHandle(ChatHandle handle);
+bool chatIsValidHandle(ChatHandle handle) noexcept;
 
 //These functions retrieve the unique handleID from the handle and
 //	the handle from the unique handleID
@@ -66,12 +66,12 @@ ChatHandle chatGetLowercaseHandle(ChatHandle handle);
 
 //tolua_begin
 // Convert a handle into a callsign again
-const char* chatGetCallsign(const ChatHandle& handle);
-const wchar_t* chatGetWideCallsign(const ChatHandle& handle);
+const char* chatGetCallsign(const ChatHandle handle);
+const wchar_t* chatGetWideCallsign(const ChatHandle handle);
 // Convert a handle into the supplied buffer
-bool chatGetCallsign(char* into, const ChatHandle& from);
+bool chatGetCallsign(char* into, const ChatHandle from);
 // Wide string variant
-bool chatGetCallsign(wchar_t* into, const ChatHandle& from);
+bool chatGetCallsign(wchar_t* into, const ChatHandle from);
 
 bool chatIsValidCallsign(const char* callsign);
 bool chatIsValidCallsign(const wchar_t* callsign);
@@ -81,6 +81,6 @@ UINT16 chatGetHandleCharacterSymbol(const wchar_t character);
 //tolua_end
 
 // Return true if a callsign contains wide characters
-static inline bool chatIsWideCallsign(const ChatHandle& handle) { return (handle & WIDE_HANDLE_BIT) != 0; }
-static inline bool chatIsWideCallsign(const char* callsign) { return (*(const unsigned char*)callsign > 0x7f); }
-static inline bool chatIsWideCallsign(const wchar_t* callsign) { return (callsign[0] > 0x7f); }
+constexpr bool chatIsWideCallsign(const ChatHandle handle) noexcept { return (handle & WIDE_HANDLE_BIT) != 0; }
+constexpr bool chatIsWideCallsign(const char* callsign) noexcept { return (callsign[0] & 0x80) != 0; }
+constexpr bool chatIsWideCallsign(const wchar_t* callsign) noexcept { return callsign[0] > 0x7f; }

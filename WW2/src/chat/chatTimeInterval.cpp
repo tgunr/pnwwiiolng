@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Tue Oct  4 12:36:49 CDT 2005
 //
 // Function for converting a time_t into a time interval string

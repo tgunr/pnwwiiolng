@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <iostream>
 #include <sstream>
 
@@ -13,8 +13,6 @@
 #include "trn/trnmain.h"
 #include "client/clientStrtQueue.h"
 #include "ui/uiChat.h"
-
-#include "sys/sysWinISO.h"
 
 using namespace StratDB;
 
@@ -32,9 +30,9 @@ static bool operator < (const sdm_lookup_id& a, const sdm_lookup_id& b)
 	return a.id < b.id;
 }
 
-typedef std::pair<int,int> supercell_id;
-typedef std::map<sdm_lookup_id, StratObject*> StratObjectMap;
-typedef std::vector<StratObject*> BuildingList;
+using supercell_id = std::pair<int,int>;
+using StratObjectMap = std::map<sdm_lookup_id, StratObject*>;
+using BuildingList = std::vector<StratObject*>;
 
 struct supercell
 {
@@ -63,12 +61,12 @@ protected:
 	std::vector<StratObject*> _buildings;
 };
 
-typedef std::map<supercell_id, supercell> SuperCellMap;
-typedef std::map<sdm_lookup_id, StratObject::ChildList> ChildMap;
-typedef std::map<sdm_lookup_id, sdm_depot> LinkMap;
-typedef std::map<supercell_id, StratDB::StratObjList> StratObjListMap;
-typedef std::map<std::string, std::wstring> DisplayNameMap;
-typedef std::vector<CPListItem*> CPNameList;
+using SuperCellMap = std::map<supercell_id, supercell>;
+using ChildMap = std::map<sdm_lookup_id, StratObject::ChildList>;
+using LinkMap = std::map<sdm_lookup_id, sdm_depot>;
+using StratObjListMap = std::map<supercell_id, StratDB::StratObjList>;
+using DisplayNameMap = std::map<std::string, std::wstring>;
+using CPNameList = std::vector<CPListItem*>;
 
 static int (*_get_strat_data)(int scx, int scy, sdm_strat_data*);
 
@@ -319,13 +317,7 @@ void StratDB::InitDisplayNames()
 	_nameMap.clear();
     _cpnameList.clear();
 
-	// if chinese, use chinese, otherwise use english (for now)
-	int use = (gLanguage == 5) ? 5: 0;
-
-	std::string path = "languages/";
-	path += g_szLanguages[use];
-	path += "/strat.xml";
-
+	std::string path = std::string("languages/") + g_szLanguages[0] + "/strat.xml";
 	DisplayNameLoader loader(path.c_str());
 	loader.Load();
 
@@ -784,7 +776,7 @@ bool StratObject::IsDeepWaterPort() const
 	return false;
 }
 
-bool StratObject::IsRelated(const FULL_OBJ_ID& id) const
+bool StratObject::IsRelated(const FULL_OBJ_ID id) const
 {
 	return IsRelated(StratDB::FindStratObject(id));
 }
@@ -940,7 +932,7 @@ StratObject* StratDB::FindStratObject(const sdm_full_obj_id& fullid)
 	return it->second;
 }
 
-StratObject* StratDB::FindStratObject(const FULL_OBJ_ID& fullobjid)
+StratObject* StratDB::FindStratObject(const FULL_OBJ_ID fullobjid)
 {
 	return FindStratObject(*(sdm_full_obj_id*)&fullobjid);
 }

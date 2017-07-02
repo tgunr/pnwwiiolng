@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*----------------------------------------------------------------------
 Module: TransformEffect.cpp
 Description:
@@ -27,7 +27,7 @@ Description:
 
 static ParticleMgr* _particlemgr = nullptr;
 
-typedef std::set<TransformEffect*> TransformList;
+using TransformList = std::set<TransformEffect*>;
 static TransformEffect* TxEffects = nullptr;
 
 static TransformList updatelist;
@@ -665,7 +665,7 @@ void ApplyTankFire(struct vehVehicle* v)
 
     for(int i = 0; i < VEH_MAX_FIREPOINTS; i++)
     {
-        sprintf(s,"tfire%d",i+1);
+        strprintf(s, "tfire%d", i+1);
 
         ogrpFindSubObjectByName(&v->StateAnimation.TankFireEmitterPoint[i],
 						        v->VehicleObjectData->EffectsObject,
@@ -1865,7 +1865,7 @@ void TransformEffect::update()
                 e->_lastupdate = frametime;
             }
         }
-       
+
         if(((_flags & REMOVE_ME_WHEN_DONE) && (enablecount == 0)) || _dead)
         {
             removelist.insert(this);

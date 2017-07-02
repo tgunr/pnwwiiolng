@@ -14,7 +14,7 @@
 
 //////////////////////////////////////////////////////////////////////
 
-typedef std::vector< std::pair<UINT32, UINT64> > CHECKSUMS;
+using CHECKSUMS = std::vector< std::pair<UINT32, UINT64>>;
 
 static std::mutex chMutex;
 static CHECKSUMS _checksums;
@@ -48,7 +48,7 @@ public:
 			newChecksums.push_back(std::make_pair(version, checksum));
 		}
 
-		threadLog(_FLD, "%u checksums", newChecksums.size());
+		dbugLog(_FLD, "%" PRSizeT " checksums", newChecksums.size());
 
 		{
 			std::lock_guard<std::mutex> lock(chMutex);

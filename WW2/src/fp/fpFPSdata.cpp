@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 // Date: Tue Jul 12 15:10:07 CDT 2005
 //
@@ -21,8 +21,6 @@
 
 #include "xml/XMLLoader2.h"
 
-#include "sys/sysWinISO.h"
-
 #define	FPS_DIR		"FPS\\"
 
 #define FPS_DATA_DIR		"vehicles\\ground\\groundman\\"
@@ -36,7 +34,7 @@
 
 //#define CACHE_FPS_DATA
 
-typedef std::map<std::string, fpFPSTrooperLoadout> fpFPSLoadoutMap;
+using fpFPSLoadoutMap = std::map<std::string, fpFPSTrooperLoadout>;
 
 const SCHAR*						arms_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
 const SCHAR*						weap_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
@@ -310,6 +308,7 @@ static void _fpFPSReadVisualLoadouts();
 
 static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 {
+    bool hasWarned = false;
 	std::string weapFileName(FPS_WEAP_DATA_DIR);
 	weapFileName += filename;
 
@@ -535,28 +534,16 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 		else if (stricmp(buf, "incConvDists") == 0)
 			fpsWeapons[weapon].incSightDists = (SINT32) atol (varData);
 
-		/*
-		else if (stricmp(buf, "convDist1") == 0)
-			fpsWeapons[weapon].sightDists[0] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist2") == 0)
-			fpsWeapons[weapon].sightDists[1] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist3") == 0)
-			fpsWeapons[weapon].sightDists[2] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist4") == 0)
-			fpsWeapons[weapon].sightDists[3] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist5") == 0)
-			fpsWeapons[weapon].sightDists[4] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist6") == 0)
-			fpsWeapons[weapon].sightDists[5] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist7") == 0)
-			fpsWeapons[weapon].sightDists[6] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist8") == 0)
-			fpsWeapons[weapon].sightDists[7] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist9") == 0)
-			fpsWeapons[weapon].sightDists[8] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist10") == 0)
-			fpsWeapons[weapon].sightDists[9] = (FLOAT32) atof (varData);
-		*/
+		else if (stricmp(buf, "convDist1") == 0 || stricmp(buf, "convDist2") == 0 ||
+                 stricmp(buf, "convDist3") == 0 || stricmp(buf, "convDist4") == 0 ||
+                 stricmp(buf, "convDist5") == 0 || stricmp(buf, "convDist6") == 0 ||
+                 stricmp(buf, "convDist7") == 0 || stricmp(buf, "convDist8") == 0 ||
+                 stricmp(buf, "convDist9") == 0 || stricmp(buf, "convDist10") == 0) {
+            if (!hasWarned) {
+                Write_Log(LOG_FPS, LOG_WARN, "Data file %s is still using old convDistN, consider updating with startConvDists/incConvDists", filename);
+                hasWarned = true;
+            }
+        }
 
 		else if (stricmp(buf, "dryFireSound") == 0)
 			fpsWeapons[weapon].dryFireSound = (SCHAR*) strpool (varData);
@@ -594,8 +581,8 @@ static void _fpFPSDataHandleWeaponTypeString (fpsWeaponTypes weapon, char* types
 
 	fpsWeapons[weapon].weaponType = (fpFPSWeaponType)type;
 
-	static char			defaultTypeFileName[255];
-	sprintf(defaultTypeFileName, "default_%s.txt", fpFPSWeaponTypeStrings[type]);
+	static char defaultTypeFileName[255];
+	strprintf(defaultTypeFileName, "default_%s.txt", fpFPSWeaponTypeStrings[type]);
 
 	_fpFPSDataReadWeaponFile (weapon, defaultTypeFileName);
 }
@@ -620,9 +607,9 @@ void fpFPSDataReadFPSFile()
 
 
 	/*
-     
+
      TBD - is this test code??
-     
+
     UINT64 val1 = fpStringHash("piatFile");
 	UINT64 val1 = fpStringHash("m1garandFile");
 	UINT64 val2 = fpStringHash("colt1911File");
@@ -1196,7 +1183,7 @@ void fpFPSDataReadFPSFile()
 		case fg42gFile_hash:
 			_fpFPSDataReadWeaponFile (FG42G, varData);
 		break;
-		
+
 		case crawlSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_CRAWL] = (SCHAR*) strpool (varData);
 		break;
@@ -1256,7 +1243,7 @@ void fpFPSDataReadFPSFile()
 		break;
 
 		default:
-			Write_Debug("Unknown hash: '%s' : %llu", buf, hash);
+			Write_Debug("Unknown hash: '%s' : %" PR64BitUT "", buf, hash);
 		}
 	}
 

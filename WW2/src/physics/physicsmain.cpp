@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <set>
 #include <map>
 
@@ -33,7 +33,7 @@ struct WorldForce
 	SINT32 expires;
 };
 
-typedef std::vector<WorldForce> WorldForces;
+using WorldForces = std::vector<WorldForce>;
 
 static dWorld* _odeWorld;
 static double _odeStepSize;
@@ -159,7 +159,7 @@ void physicsRemoveAllObjects(bool includeOwned)
     _objects.clear();
 }
 
-physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER* filter, void* const data)
+physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER filter, void* const data)
 {
 	if(filter)
 	{
@@ -176,7 +176,7 @@ physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER* filter, void* const data)
 	return nullptr;
 }
 
-bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER* filter, void* const data)
+bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER filter, void* const data)
 {
 	if(filter)
 	{

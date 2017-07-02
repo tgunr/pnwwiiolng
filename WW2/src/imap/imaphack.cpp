@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //	 Copyright 2008 Playnet Inc, All rights reserved
 //	 Not to be distributed in API form except as part of a compiled library
 //	 under License or NDA
@@ -38,7 +38,7 @@ char lastbuffer[MAX_KEYS];
 
 LOGICAL ProcessKeyboardInput();
 
-UINT32 imaphackDoKeyboardInputs(void)
+UINT32 imaphackDoKeyboardInputs()
 {
 	if (!ProcessKeyboardInput())
 	{
@@ -186,7 +186,7 @@ UINT32 imaphackDoKeyboardInputs(void)
 
             char buffer[64] = {0};
 
-            sprintf(buffer, hour < 10 ? "0%d00" : "%d00", hour);
+            strprintf(buffer, hour < 10 ? "0%d00" : "%d00", hour);
             const wchar_t* str = uiUTF8toUTF16(buffer);
 
             uiChatPrintLine(L"Time set to %s", str);

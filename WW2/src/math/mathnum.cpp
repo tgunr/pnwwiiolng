@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: mathnum.cpp
 // Description: Math Numeric. Handle miscellaneous math functions here.
@@ -11,16 +11,6 @@
 #include <math.h>
 #include "math/math3d.h"
 #include "spt/Random.h"
-
-#ifdef MATHNUM_INLINE
-    #if platOS == OS_MACOS
-        #define INLINE inline
-    #else
-        #define INLINE __forceinline
-    #endif
-#else
-    #define INLINE
-#endif
 
 static CHAOTICSEED g_chaoticSeed;
 
@@ -244,7 +234,7 @@ FLOAT64 fexp(FLOAT64 arg)
 // Function: floatToInt
 // Description: From NVIDIA fastmath.cpp. Handles negatives too.
 //////////////////////////////////////////////////////////////////////
-INLINE void mathFloatToInt(SINT32* int_pointer, FLOAT32 f)
+void mathFloatToInt(SINT32* int_pointer, FLOAT32 f)
 {
 #if platOS == OS_WIN32
   __asm  fld  f
@@ -429,7 +419,7 @@ UINT32 closestPowerOfTwo(UINT32 x)
 // Function: mathTransposeMatrix
 // Description:
 //////////////////////////////////////////////////////////////////////
-INLINE void mathTransposeMatrix(piMATRIX& m)
+void mathTransposeMatrix(piMATRIX& m)
 {
     piMATRIX original = m;
 
@@ -458,7 +448,7 @@ INLINE void mathTransposeMatrix(piMATRIX& m)
 // Function: mathFastInvSqrt
 // Description:
 //////////////////////////////////////////////////////////////////////
-INLINE FLOAT32 mathFastInvSqrt(FLOAT32 value)
+FLOAT32 mathFastInvSqrt(FLOAT32 value)
 {
     static FLOAT32 half = 0.0f;
     static int i = 0;
@@ -478,7 +468,7 @@ INLINE FLOAT32 mathFastInvSqrt(FLOAT32 value)
 // Description: '...when close enough is good enough...'
 // Avoids the sqrt.
 //////////////////////////////////////////////////////////////////////
-INLINE void mathReallyFastNormalize(piVECTOR& in)
+void mathReallyFastNormalize(piVECTOR& in)
 {
     static float invsqrt = 0.0f;
 
@@ -487,5 +477,3 @@ INLINE void mathReallyFastNormalize(piVECTOR& in)
     in.y *= invsqrt;
     in.z *= invsqrt;
 }
-
-#undef INLINE

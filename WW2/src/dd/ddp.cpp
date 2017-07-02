@@ -47,11 +47,11 @@ static int cursorvisible;
 */
 static ATOM						wndAtom;
 
-static LOGICAL					dna;
-static LOGICAL					dss;
-static LOGICAL					state;
-static LOGICAL					resetfps;
-static LOGICAL					focus;
+static bool						dna;
+static bool						dss;
+static bool						state;
+static bool						resetfps;
+static bool						focus;
 
 static SINT32					capture;
 
@@ -93,14 +93,11 @@ HWND				myhwnd;
 	Static functions
 */
 static LRESULT CALLBACK			WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
-static void UpdateTimes(void);
+static void UpdateTimes();
 
 static LOGICAL OnEraseBkgnd(HDC hDC);
 static LOGICAL OnNcActivate(LOGICAL bActive);
-#if(0)
-static LOGICAL MoveSize();
-#endif
-static LOGICAL Create(HWND hwnd);
+static bool Create(HWND hwnd);
 
 static void	Destroy();
 static void	OnClose();
@@ -113,230 +110,7 @@ static void	OnSysKeyUp(UINT nChar, UINT nFlags);
 
 #define USE_NEWGL 0
 
-static int ExceptionHandler(int code, EXCEPTION_POINTERS* ep)
-{
-char*		pStr;
-DWORD		i;
-SYSTEMTIME	SystemTime;
-
-	FILE* ExceptionLog = Fio::OpenLogFile();
-	if ( ExceptionLog )
-	{
-		Write_Debug("Exception handler information...");
-
-	#ifdef EVENT_LOG
-		fprintf(ExceptionLog, "%s Logging Executable\n", SYS_TITLE);
-	#endif
-
-		fprintf(ExceptionLog, "Program compile time: %s %s\n", __DATE__, __TIME__);
-		Write_Debug("Program compile time: %s %s", __DATE__, __TIME__);
-
-		GetLocalTime(&SystemTime);
-		fprintf(ExceptionLog,"Date and time: %d/%d/%d %d:%02d:%02d\n",
-					SystemTime.wMonth,
-					SystemTime.wDay,
-					SystemTime.wYear,
-					SystemTime.wHour,
-					SystemTime.wMinute,
-					SystemTime.wSecond);
-
-		Write_Debug("Date and time: %d/%d/%d %d:%02d:%02d",
-					SystemTime.wMonth,
-					SystemTime.wDay,
-					SystemTime.wYear,
-					SystemTime.wHour,
-					SystemTime.wMinute,
-					SystemTime.wSecond);
-
-		fprintf(ExceptionLog, "Exception code: 0x%08x\n", code);
-		Write_Debug("Exception code: 0x%08x", code);
-
-		switch (code)
-		{
-		case STATUS_WAIT_0:
-			pStr = "Exception: STATUS_WAIT_0";
-			break;
-		case STATUS_ABANDONED_WAIT_0:
-			pStr = "Exception: STATUS_ABANDONED_WAIT_0";
-			break;
-		case STATUS_USER_APC:
-			pStr = "Exception: STATUS_USER_APC";
-			break;
-		case STATUS_TIMEOUT:
-			pStr = "Exception: STATUS_TIMEOUT";
-			break;
-		case STATUS_PENDING:
-			pStr = "Exception: STATUS_PENDING";
-			break;
-		case STATUS_SEGMENT_NOTIFICATION:
-			pStr = "Exception: STATUS_SEGMENT_NOTIFICATION";
-			break;
-		case STATUS_GUARD_PAGE_VIOLATION:
-			pStr = "Exception: STATUS_GUARD_PAGE_VIOLATION";
-			break;
-		case STATUS_DATATYPE_MISALIGNMENT:
-			pStr = "Exception: STATUS_DATATYPE_MISALIGNMENT";
-			break;
-		case STATUS_BREAKPOINT:
-			pStr = "Exception: STATUS_BREAKPOINT";
-			break;
-		case STATUS_SINGLE_STEP:
-			pStr = "Exception: STATUS_SINGLE_STEP";
-			break;
-		case STATUS_ACCESS_VIOLATION:
-			pStr = "Exception: STATUS_ACCESS_VIOLATION";
-			break;
-		case STATUS_IN_PAGE_ERROR:
-			pStr = "Exception: STATUS_IN_PAGE_ERROR";
-			break;
-		case STATUS_INVALID_HANDLE:
-			pStr = "Exception: STATUS_INVALID_HANDLE";
-			break;
-		case STATUS_NO_MEMORY:
-			pStr = "Exception: STATUS_NO_MEMORY";
-			break;
-		case STATUS_ILLEGAL_INSTRUCTION:
-			pStr = "Exception: STATUS_ILLEGAL_INSTRUCTION";
-			break;
-		case STATUS_NONCONTINUABLE_EXCEPTION:
-			pStr = "Exception: STATUS_NONCONTINUABLE_EXCEPTION";
-			break;
-		case STATUS_INVALID_DISPOSITION:
-			pStr = "Exception: STATUS_INVALID_DISPOSITION";
-			break;
-		case STATUS_ARRAY_BOUNDS_EXCEEDED:
-			pStr = "Exception: STATUS_ARRAY_BOUNDS_EXCEEDED";
-			break;
-		case STATUS_FLOAT_DENORMAL_OPERAND:
-			pStr = "Exception: STATUS_FLOAT_DENORMAL_OPERAND";
-			break;
-		case STATUS_FLOAT_DIVIDE_BY_ZERO:
-			pStr = "Exception: STATUS_FLOAT_DIVIDE_BY_ZERO";
-			break;
-		case STATUS_FLOAT_INEXACT_RESULT:
-			pStr = "Exception: STATUS_FLOAT_INEXACT_RESULT";
-			break;
-		case STATUS_FLOAT_INVALID_OPERATION:
-			pStr = "Exception: STATUS_FLOAT_INVALID_OPERATION";
-			break;
-		case STATUS_FLOAT_OVERFLOW:
-			pStr = "Exception: STATUS_FLOAT_OVERFLOW";
-			break;
-		case STATUS_FLOAT_STACK_CHECK:
-			pStr = "Exception: STATUS_FLOAT_STACK_CHECK";
-			break;
-		case STATUS_FLOAT_UNDERFLOW:
-			pStr = "Exception: STATUS_FLOAT_UNDERFLOW";
-			break;
-		case STATUS_INTEGER_DIVIDE_BY_ZERO:
-			pStr = "Exception: STATUS_INTEGER_DIVIDE_BY_ZERO";
-			break;
-		case STATUS_INTEGER_OVERFLOW:
-			pStr = "Exception: STATUS_INTEGER_OVERFLOW";
-			break;
-		case STATUS_PRIVILEGED_INSTRUCTION:
-			pStr = "Exception: STATUS_PRIVILEGED_INSTRUCTION";
-			break;
-		case STATUS_STACK_OVERFLOW:
-			pStr = "Exception: STATUS_STACK_OVERFLOW";
-			break;
-		case STATUS_CONTROL_C_EXIT:
-			pStr = "Exception: STATUS_CONTROL_C_EXIT";
-			break;
-		case STATUS_FLOAT_MULTIPLE_FAULTS:
-			pStr = "Exception: STATUS_FLOAT_MULTIPLE_FAULTS";
-			break;
-		case STATUS_FLOAT_MULTIPLE_TRAPS:
-			pStr = "Exception: STATUS_FLOAT_MULTIPLE_TRAPS";
-			break;
-		default:
-			pStr = "Unknown exception";
-			break;
-		}
-
-		fprintf(ExceptionLog, "%s\n", pStr);
-		Write_Debug("%s", pStr);
-
-		if (ep->ExceptionRecord->ExceptionFlags == EXCEPTION_NONCONTINUABLE)
-		{
-			fprintf(ExceptionLog, "Exception: noncontinuable\n");
-			Write_Debug("Exception: noncontinuable");
-		}
-		else
-		{
-			fprintf(ExceptionLog, "Exception: continuable\n");
-			Write_Debug("Exception: continuable");
-		}
-
-		fprintf(ExceptionLog, "Exception address: 0x%08x\n", ep->ExceptionRecord->ExceptionAddress);
-		Write_Debug("Exception address: 0x%08x", ep->ExceptionRecord->ExceptionAddress);
-
-		for (i=0; i < ep->ExceptionRecord->NumberParameters; i+=2)
-		{
-			fprintf(ExceptionLog, "Exception tried to: %s at address 0x%08x\n", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
-			Write_Debug("Exception tried to: %s at address 0x%08x", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
-		}
-
-		// Has registers
-		fprintf(ExceptionLog, "Exception Registers:\n");
-		Write_Debug("Exception Registers:");
-		if (ep->ContextRecord->ContextFlags & CONTEXT_SEGMENTS)
-		{
-			fprintf(ExceptionLog, "  DS: 0x%08x,  ES: 0x%08x,  FS: 0x%08x,  GS: 0x%08x\n",
-				ep->ContextRecord->SegDs,
-				ep->ContextRecord->SegEs,
-				ep->ContextRecord->SegFs,
-				ep->ContextRecord->SegGs);
-			Write_Debug("  DS: 0x%08x,  ES: 0x%08x,  FS: 0x%08x,  GS: 0x%08x",
-				ep->ContextRecord->SegDs,
-				ep->ContextRecord->SegEs,
-				ep->ContextRecord->SegFs,
-				ep->ContextRecord->SegGs);
-		}
-
-		if (ep->ContextRecord->ContextFlags & CONTEXT_INTEGER)
-		{
-			fprintf(ExceptionLog, " EBP: 0x%08x, ESP: 0x%08x,  SS: 0x%08x, EIP: 0x%08x\n",
-				ep->ContextRecord->Ebp,
-				ep->ContextRecord->Esp,
-				ep->ContextRecord->SegSs,
-				ep->ContextRecord->Eip);
-			Write_Debug(" EBP: 0x%08x, ESP: 0x%08x,  SS: 0x%08x, EIP: 0x%08x",
-				ep->ContextRecord->Ebp,
-				ep->ContextRecord->Esp,
-				ep->ContextRecord->SegSs,
-				ep->ContextRecord->Eip);
-		}
-
-		if (ep->ContextRecord->ContextFlags & CONTEXT_INTEGER)
-		{
-			fprintf(ExceptionLog, " ESI: 0x%08x, EDI: 0x%08x\n EAX: 0x%08x, EBX: 0x%08x, ECX: 0x%08x, EDX: 0x%08x\n",
-				ep->ContextRecord->Esi,
-				ep->ContextRecord->Edi,
-				ep->ContextRecord->Eax,
-				ep->ContextRecord->Ebx,
-				ep->ContextRecord->Ecx,
-				ep->ContextRecord->Edx);
-			Write_Debug(" ESI: 0x%08x, EDI: 0x%08x\r\n EAX: 0x%08x, EBX: 0x%08x, ECX: 0x%08x, EDX: 0x%08x",
-				ep->ContextRecord->Esi,
-				ep->ContextRecord->Edi,
-				ep->ContextRecord->Eax,
-				ep->ContextRecord->Ebx,
-				ep->ContextRecord->Ecx,
-				ep->ContextRecord->Edx);
-		}
-
-		// Has subsequent exception records (if present)
-		ep->ExceptionRecord->ExceptionRecord;
-
-		fflush(ExceptionLog);
-		fclose(ExceptionLog);
-	}
-
-	return(EXCEPTION_EXECUTE_HANDLER);
-}
-
-HINSTANCE ddpGetInstance(void)
+HINSTANCE ddpGetInstance()
 {
 	return (HINSTANCE)hinst;
 }
@@ -346,15 +120,15 @@ void ddpSetInstance(HINSTANCE hnewInst)
 	hinst = hnewInst;
 }
 
-LOGICAL ddpInit(void)
+LOGICAL ddpInit()
 {
-	state = TRUE;
+	state = true;
 	delay = 0;
 	show = DDWND_SHOW_NONE;
-	dna = FALSE;
-	dss = FALSE;
-	resetfps = FALSE;
-	focus = FALSE;
+	dna = false;
+	dss = false;
+	resetfps = false;
+	focus = false;
 	capture = 0;
 	ddinitfunc = nullptr;
 	d3dinitfunc = nullptr;
@@ -370,11 +144,11 @@ LOGICAL ddpInit(void)
 
 	Write_Debug("Completed ddpInit");
 
-	return(TRUE);
+	return TRUE;
 }
 
 #if(0)
-static void DisplayLastError(void)
+static void DisplayLastError()
 {
 LPVOID lpMsgBuf;
 
@@ -422,7 +196,7 @@ bool CreateGLContext(HDC dc)
 	if(err != GLEW_OK)
 	{
 		static char str[255];
-		sprintf(str, "Error: %s\n", glewGetErrorString(err));
+		strprintf(str, "Error: %s\n", glewGetErrorString(err));
         throw str;
 	}
 
@@ -470,7 +244,7 @@ bool CreateGLContext(HDC dc)
 	        if(err != GLEW_OK)
 	        {
 		        static char str[255];
-		        sprintf(str, "Error: %s\n", glewGetErrorString(err));
+		        strprintf(str, "Error: %s\n", glewGetErrorString(err));
                 throw str;
 	        }
         }
@@ -539,7 +313,7 @@ bool CreateGLContext(HDC dc)
 	        if(err != GLEW_OK)
 	        {
 		        static char str[255];
-		        sprintf(str, "Error: %s\n", glewGetErrorString(err));
+		        strprintf(str, "Error: %s\n", glewGetErrorString(err));
                 throw str;
 	        }
         }
@@ -556,14 +330,14 @@ bool CreateGLContext(HDC dc)
 	return true;
 }
 
-static LOGICAL oglBegin(HWND hwnd)
+static bool oglBegin(HWND hwnd)
 {
 	PIXELFORMATDESCRIPTOR	pfd;
 
 	// Already begun
 	if (myhrc != nullptr)
 	{
-		return(TRUE);
+		return true;
 	}
 
 	if (myhdc == nullptr)
@@ -588,17 +362,17 @@ static LOGICAL oglBegin(HWND hwnd)
 		if(wglSwapIntervalEXT)
 			wglSwapIntervalEXT(NO_LOCK_TO_REFRESH);
 
-		return(TRUE);
+		return true;
 	}
 
     catch(std::exception& ex) { _initializationError(ex.what()); }
 	catch(const char* error) { _initializationError(error); }
 	catch(...) { _initializationError("[unknown error]"); }
 
-	return (FALSE);
+	return false;
 }
 
-static void oglEnd(void)
+static void oglEnd()
 {
 	if (myhdc && myhrc)
 	{
@@ -614,10 +388,10 @@ static void oglEnd(void)
 	}
 }
 
-void ddpKill(void)
+void ddpKill()
 {
     // This function is called recursively with Alt-F4
-    static LOGICAL alreadykilled = 0;
+    static bool alreadykilled = false;
 
     if(alreadykilled)
     {
@@ -626,7 +400,7 @@ void ddpKill(void)
 
     ClipCursor(nullptr);
 
-    alreadykilled = 1;
+    alreadykilled = true;
 
 	imeKill();
 
@@ -723,7 +497,7 @@ RECT		rect, wrect;
 	else
 	{
 		// bad flags
-		return(FALSE);
+		return FALSE;
 	}
 
 	memset(&wndClass, 0, sizeof(WNDCLASS));
@@ -740,7 +514,7 @@ RECT		rect, wrect;
 	wndAtom = RegisterClass(&wndClass);
 	if (wndAtom == 0)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	if (myflags & DDWND_FULLSCREEN)
@@ -750,7 +524,7 @@ RECT		rect, wrect;
 
 		if (!ddpSetDisplay(flags))
 		{
-			return(FALSE);
+			return FALSE;
 		}
 
 		rect.left = WantedX;
@@ -809,7 +583,7 @@ RECT		rect, wrect;
 
 	if (!myhwnd)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
     gamerect = rect;
@@ -839,7 +613,7 @@ RECT		rect, wrect;
 	if (!oglBegin(myhwnd))
 	{
 		ddpResetDisplay();
-		return(FALSE);
+		return FALSE;
 	}
 
     // post process globals dependent on GLEW if needed
@@ -851,7 +625,7 @@ RECT		rect, wrect;
 		if (!ddinitfunc())
 		{
 			Write_Debug("DD init failed");
-			return(FALSE);
+			return FALSE;
 		}
 	}
 
@@ -860,7 +634,7 @@ RECT		rect, wrect;
 		if (!d3dinitfunc())
 		{
 			Write_Debug("D3D init failed");
-			return(FALSE);
+			return FALSE;
 		}
 	}
 
@@ -898,7 +672,7 @@ RECT		rect, wrect;
 
 	if (!rnmainInit())
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
     // Lock or don't lock based on player's request in Settings app.
@@ -908,16 +682,16 @@ RECT		rect, wrect;
     if(wglSwapIntervalEXT)
 	    wglSwapIntervalEXT(gSupportSwapInterval);
 
-	return(TRUE);
+	return TRUE;
 }
 
-LOGICAL ddpUpdate(void)
+LOGICAL ddpUpdate()
 {
 #ifdef DONT_USE
 	if (!state)
 	{
 		Write_Debug("State is wrong");
-		return(FALSE);
+		return FALSE;
 	}
 #else
 	if (!focus)
@@ -929,12 +703,12 @@ LOGICAL ddpUpdate(void)
 	if (!IsWindow(myhwnd))
 	{
 		Write_Debug("Not a window");
-		return(FALSE);
+		return FALSE;
 	}
 
 	if (IsIconic(myhwnd))
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	UpdateTimes();
@@ -945,12 +719,8 @@ LOGICAL ddpUpdate(void)
 	// Member draw function
 	if (!ddpDraw())
 	{
-		return(FALSE);
+		return FALSE;
 	}
-
-#ifdef BETA_RELEASE
-	logUpdateProfiling();
-#endif	// #ifdef BETA_RELEASE
 
 	if (resetfps)
 	{
@@ -973,7 +743,7 @@ LOGICAL ddpUpdate(void)
 
 		framecount = 0;
 
-		resetfps = FALSE;
+		resetfps = false;
 	}
 
 	if (capture > 0)
@@ -984,20 +754,16 @@ LOGICAL ddpUpdate(void)
 
 	if (!ddpFlip())
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	// activate or deactivate the ime as needed
 	//imeUpdate();
 
-	// an exit was declared
-	if(GameInProgress == 2)
-		PostMessageA(myhwnd, WM_CLOSE, 0, 0);
-
-	return(TRUE);
+	return TRUE;
 }
 
-LOGICAL ddpFlip(void)
+LOGICAL ddpFlip()
 {
 	if (myhdc && myhrc)
 	{
@@ -1022,14 +788,14 @@ LOGICAL ddpFlip(void)
 			}
 			else
 			{
-				////piExitProgram(__FILE__, __LINE__, "User exit requested!");
+				////piExitProgram(_FL, "User exit requested!");
 				running = FALSE;
 				break;
 			}
 		}
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpGetDDRect(RECT* rect)
@@ -1037,20 +803,20 @@ LOGICAL ddpGetDDRect(RECT* rect)
 	if (myhwnd == nullptr ||
 		rect == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	GetClientRect(myhwnd, (RECT*)rect);
 	ClientToScreen(myhwnd, (LPPOINT)&rect->left);
 	ClientToScreen(myhwnd, (LPPOINT)&rect->right);
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpLockBackbuffer(BYTE** pbyte)
 {
 	//// FIXME
-	return(FALSE);
+	return FALSE;
 }
 
 void ddpUnlockBackbuffer()
@@ -1066,7 +832,7 @@ LPVOID ddpGetBackbuffer()
 LOGICAL ddpGetBackbufferSurface(void** lpdds)
 {
 	//// FIXME
-	return(FALSE);
+	return FALSE;
 }
 
 LOGICAL ddpDraw()
@@ -1108,11 +874,11 @@ RECT		rect;
 		{
 		float           fps;
 
-			sprintf(ssz, "%dx%d", rect.right - rect.left, rect.bottom - rect.top);
+			strprintf(ssz, "%dx%d", rect.right - rect.left, rect.bottom - rect.top);
 			fps = ddpGetFPS();
 			if (fps)
 			{
-				sprintf(txt,"%6.3f fps", fps);
+				strprintf(txt,"%6.3f fps", fps);
 			}
 		}
 	}
@@ -1120,23 +886,17 @@ RECT		rect;
 	return(retval);
 }
 
-LOGICAL ddpDrawNotActive(LOGICAL newdna)
+void ddpDrawNotActive(bool newdna)
 {
-LOGICAL		olddna = dna;
-
 	dna = newdna;
-	return(olddna);
 }
 
-LOGICAL ddpDisableScreenSaver(LOGICAL newdss)
+void ddpDisableScreenSaver(bool newdss)
 {
-LOGICAL		olddss = dss;
-
 	dss = newdss;
-	return(olddss);
 }
 
-static void UpdateTimes(void)
+static void UpdateTimes()
 {
 /*
 UINT32	ticks;
@@ -1172,7 +932,7 @@ UINT32	ticks;
 	framecount += 1;
 }
 
-SINT32 ddpGetTotalPaints(void)
+SINT32 ddpGetTotalPaints()
 {
 	return(framecount);
 }
@@ -1211,7 +971,7 @@ static UINT32	lastframecount;
 
 void ddpResetFPS()
 {
-	resetfps = TRUE;
+	resetfps = true;
 }
 
 void ddpCapture()
@@ -1237,55 +997,55 @@ SINT32 ddpGetBPP()
 LOGICAL ddpSetDDInit(DDWND_DDINITFUNC newfunc)
 {
 	ddinitfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetD3DInit(DDWND_D3DINITFUNC newfunc)
 {
 	d3dinitfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetDDRender(DDWND_DDRENDERFUNC newfunc)
 {
 	ddrenderfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetD3DRender(DDWND_D3DRENDERFUNC newfunc)
 {
 	d3drenderfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetDDKill(DDWND_DDKILLFUNC newfunc)
 {
 	ddkillfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetD3DKill(DDWND_D3DKILLFUNC newfunc)
 {
 	d3dkillfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetMouse(DDWND_MOUSEFUNC newfunc)
 {
 	mousefunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetTimer(DDWND_TIMERFUNC newfunc)
 {
 	timerfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetKeyboard(DDWND_KEYBOARDFUNC newfunc)
 {
 	keyboardfunc = newfunc;
-	return(TRUE);
+	return TRUE;
 }
 
 
@@ -1294,22 +1054,17 @@ UINT32 ddpEngine(LPVOID dummy)
 {
 LOGICAL		retval, *running;
 
-#if !defined(_DEBUG)
-	__try
-	{
-#endif
-
 	running = (LOGICAL*)dummy;
 
 	WantedHdw = FALSE;	//// TEMPORARY (until single pass (i.e. hardware driven) multi-texturing is working)
 
 	if (!ddpInit())
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
-	ddpDrawNotActive(FALSE);
-	ddpDisableScreenSaver(TRUE);
+	ddpDrawNotActive(false);
+	ddpDisableScreenSaver(true);
 
 	ddpSetDDInit(nullptr);//oglInit);
 	ddpSetDDRender(nullptr);//rnlogoRender);
@@ -1338,14 +1093,6 @@ LOGICAL		retval, *running;
 			Sleep(1);
 		}
 	}
-
-#if !defined(_DEBUG)
-	}
-	__except(ExceptionHandler(GetExceptionCode(), GetExceptionInformation()))
-	{
-		Write_Debug("Exception caught!");
-	}
-#endif
 
 	if (myhwnd != nullptr)
 	{
@@ -1446,9 +1193,9 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 				GetClientRect(hwnd, &rect);
 				ClientToScreen(hwnd, (LPPOINT)&rect);
 				xy = MAKELONG(rect.left, rect.top);
-				sysregSetKeyDword(REG_KEY_MAIN, REG_MAIN_LOC, &xy);
+				sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, xy);
 				wh = MAKELONG(rect.right, rect.bottom);
-				sysregSetKeyDword(REG_KEY_MAIN, REG_MAIN_SIZE, &wh);
+				sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, wh);
 			}
 		}
 		break;
@@ -1476,14 +1223,14 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		case SC_KEYMENU:
 			if (state)
 			{
-				return(FALSE);
+				return FALSE;
 			}
 			break;
 		case SC_SCREENSAVE:
 		{
 			if (dss)
 			{
-				return(FALSE);
+				return FALSE;
 			}
 
 			break;
@@ -1503,9 +1250,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 #endif
 
 			if (!state)
-			{
-				state = TRUE;
-			}
+				state = true;
 			break;
 		}
 		default:
@@ -1520,9 +1265,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_ENTERMENULOOP:
 	{
 		if (state)
-		{
-			state = FALSE;
-		}
+			state = false;
 
 		dipUnacquire();
 		Write_Debug("WM_ENTERMENULOOP");
@@ -1531,9 +1274,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_EXITMENULOOP:
 	{
 		if (!state)
-		{
-			state = TRUE;
-		}
+			state = true;
 
 		dipUnacquire();
 		Write_Debug("WM_EXITMENULOOP");
@@ -1542,9 +1283,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_ENTERSIZEMOVE:
 	{
 		if (state)
-		{
-			state = FALSE;
-		}
+			state = false;
 
 		dipUnacquire();
 		Write_Debug("WM_ENTERSIZEMOVE");
@@ -1555,9 +1294,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	RECT  rect;
 
 		if (!state)
-		{
-			state = TRUE;
-		}
+			state = true;
 
 		GetClientRect(myhwnd, &rect);
 		if (ddpGetWidth() != rect.right ||
@@ -1581,9 +1318,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		{
 			WantedBpp = wParam;
 			if (!state)
-			{
-				state = TRUE;
-			}
+				state = true;
 		}
 
 		Write_Debug("WM_DISPLAYCHANGE");
@@ -1661,14 +1396,12 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	return(DefWindowProc(hwnd, umsg, wParam, lParam));
 }
 
-static LOGICAL Create(HWND hwnd)
+static bool Create(HWND hwnd)
 {
-RECT					rect;
+	RECT rect;
 
 	if (hwnd == nullptr)
-	{
-		return(TRUE);
-	}
+		return true;
 
 	GetClientRect(hwnd, &rect);
 
@@ -1686,7 +1419,7 @@ RECT					rect;
 
 	Write_Debug("Completed Create");
 
-	return(TRUE);
+	return true;
 }
 
 static void Destroy()
@@ -1712,27 +1445,6 @@ static void Destroy()
 	return;
 }
 
-#if(0)
-static LOGICAL MoveSize()
-{
-LOGICAL		retval;
-
-	Destroy();
-	retval = Create(myhwnd);
-	if (!retval)
-	{
-		Write_Debug("An error was encountered in MoveSize");
-		PostMessageA(myhwnd, WM_CLOSE, 0, 0);
-	}
-
-	oglResize(WantedWidth, WantedHeight);
-
-	Write_Debug("Completed MoveSize");
-
-	return(retval);
-}
-#endif
-
 static void OnClose()
 {
 	Destroy();
@@ -1749,7 +1461,7 @@ RECT   rect;
 
 	Write_Debug("OnEraseBkgnd");
 
-	return(TRUE);
+	return TRUE;
 }
 
 static void _OnPaint()
@@ -1764,13 +1476,11 @@ static void OnSetFocus(HWND pOldWnd)
 		if (!dna)
 		{
 			if (!state)
-			{
-				state = TRUE;
-			}
+				state = true;
 		}
 	}
 
-	focus = TRUE;
+	focus = true;
 
 	dipAcquire();
 
@@ -1784,13 +1494,11 @@ static void OnKillFocus(HWND pNewWnd)
 		if (!dna)
 		{
 			if (state)
-			{
-				state = FALSE;
-			}
+				state = false;
 		}
 	}
 
-	focus = FALSE;
+	focus = false;
 
 	dipUnacquire();
 
@@ -1834,18 +1542,14 @@ static LOGICAL OnNcActivate(LOGICAL bActive)
 		if (bActive)
 		{
 			if (!state)
-			{
-				state = TRUE;
-			}
+				state = true;
 		}
 		else
 		{
 			if (!dna)
 			{
 				if (state)
-				{
-					state = FALSE;
-				}
+					state = false;
 			}
 		}
 	}
@@ -1865,7 +1569,7 @@ static LOGICAL OnNcActivate(LOGICAL bActive)
 		dipUnacquire();
 	}
 
-	Write_Debug("OnNcActivate %s", state == TRUE ? "TRUE" : "FALSE");
+	Write_Debug("OnNcActivate %s", state ? "TRUE" : "FALSE");
 
 	return(0);
 }
@@ -1877,9 +1581,7 @@ static void OnSysKeyDown(UINT nChar, UINT nFlags)
 		if (!dna)
 		{
 			if (state)
-			{
-				state = FALSE;
-			}
+				state = false;
 		}
 	}
 
@@ -1893,9 +1595,7 @@ static void OnSysKeyUp(UINT nChar, UINT nFlags)
 		if (!dna)
 		{
 			if (!state)
-			{
-				state = TRUE;
-			}
+				state = true;
 		}
 	}
 
@@ -1939,7 +1639,7 @@ SINT32					i, pixelformat, depth, accum, stencil;
 	if (pixelformat == 0)
 	{
 		Write_Debug("Unable to choose a compatible pixel format");
-		return(FALSE);
+		return FALSE;
 	}
 
 	Write_Debug("ChoosePixelFormat recommended #%d", pixelformat);
@@ -2087,10 +1787,10 @@ SINT32					i, pixelformat, depth, accum, stencil;
 	if (!SetPixelFormat(hdc, pixelformat, pfd))
 	{
 		Write_Debug("Unable to set the desired pixel format");
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL ddpSetDisplay(UINT32 flags)
@@ -2165,7 +1865,7 @@ DEVMODE			testmode, presentmode;
 		if (!found)
 		{
 			Write_Debug("No compatible display mode exists");
-			return(FALSE);
+			return FALSE;
 		}
 
 		modenum += 1;
@@ -2202,7 +1902,7 @@ DEVMODE			testmode, presentmode;
 		if (!found)
 		{
 			Write_Debug("No compatible display mode exists");
-			return(FALSE);
+			return FALSE;
 		}
 
 		retval = ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, nullptr, CDS_TEST, nullptr);
@@ -2230,26 +1930,26 @@ DEVMODE			testmode, presentmode;
 			Write_Debug("DISP_CHANGE_SUCCESSFUL");
 			ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, nullptr, CDS_FULLSCREEN, nullptr);
 
-			return(TRUE);
+			return TRUE;
 		}
 
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
-void ddpResetDisplay(void)
+void ddpResetDisplay()
 {
 	ChangeDisplaySettingsEx(displaydevice.DeviceName, nullptr, nullptr, 0, nullptr);
 }
 
 LOGICAL ddpDrawToScreen(LPVOID lpdds)
 {
-	return(TRUE);
+	return TRUE;
 }
 
-DWORD GetMillisecondTick(void)
+DWORD GetMillisecondTick()
 {
 	SINT32					deltaQueryTime, deltaGetTime;
 	_LARGE_INTEGER			frequency			= {0};
@@ -2386,9 +2086,9 @@ static void glScreenCapture()
 	{
 		shotCount += 1;
 #if platOS == OS_WIN32
-		sprintf(fileName, "%s%s%d.bmp", UserDataPath, fptr, shotCount);
+		strprintf(fileName, "%s%s%d.bmp", UserDataPath, fptr, shotCount);
 #else
-		sprintf(fileName, "%s%d.bmp", fptr, shotCount);
+		strprintf(fileName, "%s%d.bmp", fptr, shotCount);
 #endif
 	}
 	while (_access(fileName, 0) == 0);
@@ -2399,10 +2099,10 @@ static void glScreenCapture()
 	capSave(bitmap, WantedWidth, WantedHeight, fileName);
 }
 
-LOGICAL ddcapStart(void)
+LOGICAL ddcapStart()
 {
 	glScreenCapture();
-	return(TRUE);
+	return TRUE;
 }
 
 

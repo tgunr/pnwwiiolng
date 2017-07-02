@@ -17,20 +17,19 @@
 #define MAX_LM_ARG	3
 
 // parse the wor level file with (world) callbacks
-extern bool parseWor(const char* levelfile, PARSE_CALLBACK* world);
+bool parseWor(const char* levelfile, PARSE_CALLBACK* world);
 
 // clean up the memory
-extern void parseWorKill(void);
+void parseWorKill();
 
 // find the cp value for objName
-extern CP_PARAMS* parseGetCPValues(const std::string& objName);
+CP_PARAMS* parseGetCPValues(const std::string& objName);
 
 // find the facility value for objName
-extern FACILITY_PARAMS* parseGetFacilityValues(const std::string& objName);
+FACILITY_PARAMS* parseGetFacilityValues(const std::string& objName);
 
 // find the building value for objName
-extern BUILDING_PARAMS* parseGetBuildingValues(const std::string& objName);
+BUILDING_PARAMS* parseGetBuildingValues(const std::string& objName);
 
 // find the depot link value for objName
-extern DEPOT_LINK_PARAMS* parseGetDepotLinkValues(const std::string& objName);
-
+DEPOT_LINK_PARAMS* parseGetDepotLinkValues(const std::string& objName);

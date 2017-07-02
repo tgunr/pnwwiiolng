@@ -11,5 +11,5 @@
 class Waypoint;
 
 void chatSetMissionWaypoint(UINT32 missionID, const Waypoint& rhs);
-void chatDeleteMissionWaypoint(UINT32 missionID, const ChatHandle& handle);
+void chatDeleteMissionWaypoint(UINT32 missionID, const ChatHandle handle);
 void chatPurgeMissionWaypoints(UINT32 missionID);

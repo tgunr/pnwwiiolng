@@ -22,7 +22,7 @@
 //! send and receive function.
 //!
 //! Usage:
-//!  typedef teul_network_msg<object type> mytype;
+//!  using mytype = teul_network_msg<object type>;
 //!
 //! If you want the object to handle incoming messages, you will need
 //! to declare
@@ -37,9 +37,9 @@ class teul_network_msg
 {
 private:
 	//! Short-hand for the type being encapsulated.
-	typedef _Type valuetype;
+	using value_type = _Type;
 	//! Short-hand for self-references.
-	typedef teul_network_msg<valuetype> selftype;
+	using self_type = teul_network_msg<value_type>;
 
 public:
 	//! ACTION indicates the type of message being sent.
@@ -54,7 +54,7 @@ public:
 	static TEUL_CALLBACK*& callback() { static TEUL_CALLBACK* s_callback; return s_callback; }
 
 	//! Required if you will be receiving arrays of this type.
-	static SINT32 receive(SINT32, selftype&);
+	static SINT32 receive(SINT32, self_type&);
 
 public:
 	//! Constructor without data.
@@ -63,7 +63,7 @@ public:
 		{}
 
 	//! Constructor with data.
-	teul_network_msg(const valuetype& withData, UINT64 withKey=0LL, UINT32 withFlags=0, ACTION withAction=EXCHANGE)
+	teul_network_msg(const value_type& withData, UINT64 withKey=0LL, UINT32 withFlags=0, ACTION withAction=EXCHANGE)
 		: m_key(withKey), m_flags(withFlags), m_action(withAction), m_data(withData)
 		{}
 
@@ -75,14 +75,14 @@ public:
 	ACTION action() const { return m_action; }
 	UINT64 key() const { return m_key; }
 	UINT32 flags() const { return m_flags; }
-	const valuetype& data() const { return m_data; }
-	valuetype& data() { return m_data; }
+	const value_type& data() const { return m_data; }
+	value_type& data() { return m_data; }
 
 public:
 	UINT64		m_key;				//!< Owner/Key identifier field.
 	UINT32		m_flags;			//!< User-defined flags field.
 	ACTION		m_action;			//!< Action type.
-	valuetype	m_data;			//!< The actual data.
+	value_type	m_data;			//!< The actual data.
 
 public:
 	//! Send a request
@@ -128,7 +128,7 @@ public:
 	//! @param[in]	directAddr		IP of the destination host (or 0)
 	SINT32 broadcast(SINT32 broadcastIndex, SINT32 directAddr=0)
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		if ( directAddr == 0 || directAddr == -1 )
 			return teulSend(broadcastIndex, callback(), this);
 		else
@@ -143,7 +143,7 @@ public:
 	//! @param[in] a ACTION_OBJECT describing the incoming message.
 	static SINT32 callbackRecv(ACTION_OBJECT* const a)
 	{
-		selftype incoming;
+		self_type incoming;
 		try
 		{
 			if ( incoming.packer(TEUL_UNPACK, a) < 0 ) return -EINVAL;
@@ -163,13 +163,13 @@ public:
 	//! @param[in] a ACTION_OBJECT describing the outgoing message.
 	static SINT32 callbackSend(ACTION_OBJECT* const a)
 	{
-		selftype* const outgoing = (selftype*)a->localRawData;
+		self_type* const outgoing = (self_type*)a->localRawData;
 		return outgoing->packer(TEUL_PACK, a);
 	}
 
 private:
 	//! Pack/Unpack data.
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* const a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		// Pack the head information
 		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_action, 8);
@@ -190,5 +190,5 @@ class teul_empty_msg
 public:
 	teul_empty_msg() {}
 	teul_empty_msg(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
-	SINT32 packer(LOGICAL /*mode*/, ACTION_OBJECT* const a) { return a->offset; }
+	SINT32 packer(PackMode /*mode*/, ACTION_OBJECT* const a) { return a->offset; }
 };
