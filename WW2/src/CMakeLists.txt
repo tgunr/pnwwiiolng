@@ -192,7 +192,7 @@ add_subdirectory(../../Libraries/RakNet ./RakNet)
 
 # RakNet
 SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
-INCLUDE_DIRECTORIES( ${LIBEVENT_INCLUDE_DIRS} ${RAKNET_INCLUDE_DIRS} )
+INCLUDE_DIRECTORIES( SYSTEM ${LIBEVENT_INCLUDE_DIRS} ${RAKNET_INCLUDE_DIRS} )
 
 ####################################
 # teulserver library, provides teul and the "server" API, for what they're worth
