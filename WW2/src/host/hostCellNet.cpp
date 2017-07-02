@@ -192,7 +192,7 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 		maxSize = sizeBytes;
 
 	// Lets first test to see if we will bust our MTU size if we append this - if so, push out now
-	if ( (vehicleBroadcasts.packetSizeBytes() + sizeBytes) >= static_cast<SINT32>(Teul::MaxMTU))
+	if ( (vehicleBroadcasts.packetSizeBytes() + sizeBytes) >= static_cast<SINT32>(Teul::UDBMaxPayload))
 		hostPushVehicleBroadcasts();
 
 	// store in the final size
