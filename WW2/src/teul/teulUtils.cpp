@@ -56,40 +56,22 @@ void
 teulSyncClock()
 {
     
-    // Each platform has its own version of a monotonic clock
-#if platOS == OS_MACOS || platOS == OS_LINUX
+    static std::mutex oneAtATime;
+    std::lock_guard<std::mutex> lock(oneAtATime);
     
-    timespec currentTimeTS;
+    using namespace std::chrono;
+    auto now = steady_clock::now();
+    TeulTimeMS newTimeMS = static_cast<TeulTimeMS>(duration_cast<milliseconds>(now.time_since_epoch()).count());
     
-#if platOS == OS_MACOS
-    
-    clock_serv_t cclock;
-    mach_timespec_t mts;
-    
-    host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
-    clock_get_time(cclock, &mts);
-    mach_port_deallocate(mach_task_self(), cclock);
-    currentTimeTS.tv_sec = static_cast<__darwin_time_t>(mts.tv_sec);
-    currentTimeTS.tv_nsec = mts.tv_nsec;
-    
-#elif platOS == OS_LINUX
-    
-    clock_gettime(CLOCK_MONOTONIC, &currentTimeTS);
+    // monotonic clocks should not be going backwards
+    if ( PN_UNLIKELY(newTimeMS < teulClock64) )
+        LogAbort("Time went backwards: %" PR64BitUT " -> %" PR64BitUT "", teulClock64, newTimeMS);
 
-#endif
-    
-    teulClock64 = (static_cast<TeulTimeMS>(currentTimeTS.tv_sec) * 1000ULL) +
-    (static_cast<TeulTimeMS>(currentTimeTS.tv_nsec) / 1000000ULL);
-    teulClockTime = (UINT32)currentTimeTS.tv_sec;
-
-#elif platOS == OS_WIN32
-
-    teulClock64 = GetTickCount64();
-    teulClockTime = (UINT32)(teulClock64 / 1000LL);
-
-#else
-#pragma error("No teulSyncClock implementation for this platform")
-#endif
+    // avoid calculations when called many times a millisecond
+    if ( newTimeMS > teulClock64 ) {
+        teulClock64 = newTimeMS;
+        teulClockTime = static_cast<UINT32>(newTimeMS / 1000ULL);
+    }
 
 }
 
