@@ -508,11 +508,22 @@ chatRequestSquad(UINT32 squadID, Player* player)
 	SquadList& list = it->second;
 	SquadMemberEntry* entry = list.find(player->chatHandle());
 	if ( entry == nullptr ) entry = list.find(player->matchHandle());
-	if ( entry == nullptr )
-	{
-		dbugLog(_FLA, "t:%d p:%u c:%s sq:%u unable to find this player in their squad", player->teulIndex(), player->playerID(), player->callsign(), squadID);
-		// Squad may not have finished loading yet.
-		return;
+	if (entry == nullptr && list.squad().callsign() == host_config.squad.defaultSquad) {
+        // Default squad needs to be reloaded so new players will be noticed, pull it in immediate mode
+        chatdbSquadInfo(0, squadID, true);
+        it = g_squads.find(squadID);
+        if (it == g_squads.end()) {
+            dbugLog(_FLW, "sq:%u no such squad!", squadID);
+            return;
+        }
+        list = it->second;
+        entry = list.find(player->chatHandle());
+        if (entry == nullptr) { entry = list.find(player->matchHandle()); }
+    }
+    if (entry == nullptr) {
+        // Squad may not have finished loading yet.
+        dbugLog(_FLA, "t:%d p:%u c:%s sq:%u unable to find this player in their squad", player->teulIndex(), player->playerID(), player->callsign(), squadID);
+        return;
 	}
 
 	if ( g_debugSquads )
