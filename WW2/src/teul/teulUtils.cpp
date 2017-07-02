@@ -64,8 +64,8 @@ teulSyncClock()
     TeulTimeMS newTimeMS = static_cast<TeulTimeMS>(duration_cast<milliseconds>(now.time_since_epoch()).count());
     
     // monotonic clocks should not be going backwards
-    assert( newTimeMS >= teulClock64 );
-
+    ABORT_IF_EX(newTimeMS < teulClock64, "Monotonic time went backwards!");
+    
     // avoid calculations when called many times a millisecond
     if ( newTimeMS > teulClock64 ) {
         teulClock64 = newTimeMS;
