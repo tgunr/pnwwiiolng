@@ -671,9 +671,17 @@ char GetOSBuild()
 	return getVersionInfo().build;
 }
 
+
+namespace {
+	void CheckForVIP(void);
+}
+
+
 // This is the actual winmain
  int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	CheckForVIP(); // TODO: Put this in the main loop somewhere too
+
 	int		x, y, w, h, wh, xy;
 	int		bpp, hdw, stencil, wnd;
 	MSG		msg;
@@ -1273,3 +1281,297 @@ void sysSetMousePosition(int x, int y)
 	ClientToScreen(myhwnd, &pt);
 	SetCursorPos(pt.x, pt.y);
 }
+
+
+// TODO: Cover this stuff up a bit
+#if 1//def ANTIHACK
+namespace {
+
+	//This function works like GetProcAddress 
+	//This function is useful in the event that GetProcAddress is not imported
+	//or when you are concerned it may be hooked
+	FARPROC GetProcedureAddress(HANDLE hModule, const char* pszProcName) {
+		IMAGE_DOS_HEADER* pdhDosHeader = static_cast<IMAGE_DOS_HEADER*>(hModule);
+		//Check if valid PE
+		if ( pdhDosHeader->e_magic != IMAGE_DOS_SIGNATURE ) return 0;
+
+		IMAGE_NT_HEADERS* pndNTHeader = (IMAGE_NT_HEADERS*)(pdhDosHeader->e_lfanew + (long)hModule);
+		if ( pndNTHeader->Signature !=IMAGE_NT_SIGNATURE ) return 0;
+
+		//Traverse the export table to see if we can find the export
+		IMAGE_EXPORT_DIRECTORY* iedExports = (IMAGE_EXPORT_DIRECTORY*)(pndNTHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress + (long)hModule);
+		long* pNames = (long*)(iedExports->AddressOfNames + (long)hModule);
+		short wOrdinalIndex = -1;
+		for ( int i = 0; i < (int)iedExports->NumberOfFunctions; i++ ) {
+			char* pszFunctionName = (char *)(pNames[i] + (long)hModule);
+
+			if ( lstrcmpiA(pszFunctionName, pszProcName) == 0 ) {
+				wOrdinalIndex = i;
+				break;
+			}
+		}
+
+		if ( wOrdinalIndex == -1 ) return 0;
+
+		//wIndex now holds the index of the function name in the names array, which is the index of the ordinal.
+		//The ordinal also acts as the index of the address
+		short* pOrdinals = (short*)(iedExports->AddressOfNameOrdinals + (long)hModule);
+		unsigned long* pAddresses = (unsigned long*)(iedExports->AddressOfFunctions + (long)hModule);
+
+		short wAddressIndex = pOrdinals[wOrdinalIndex] ;
+		return (FARPROC)(pAddresses[wAddressIndex] + (long)hModule);
+	}
+
+	//------
+
+	/*****************************************************************************
+	* Returns the corresponding ordinal number for the specified function name. *
+	*****************************************************************************/
+	DWORD NameToOrdinal(HMODULE hModule, LPCSTR lpProcName) {
+		HINSTANCE               pBase;
+		PIMAGE_DOS_HEADER       pDOSHeader;
+		PIMAGE_NT_HEADERS32     pNTHeader;
+		PIMAGE_EXPORT_DIRECTORY pExportDir;
+		DWORD                   lExportOffset, lExportSize;
+		PDWORD                  pNamesArray;
+		int                     lNumberOfNames;
+		WORD                    nNameIndex;
+		LPCSTR                  szName;
+		PWORD                   pNameOrdinalsArray;
+		int                     i;
+
+		// Library base address   
+		pBase = hModule;
+
+		// Verify DOS header   
+		pDOSHeader = (PIMAGE_DOS_HEADER)pBase;
+		if ( pDOSHeader->e_magic != IMAGE_DOS_SIGNATURE ) // "MZ"   
+			return -1;
+
+		// NT Header   
+		pNTHeader = (PIMAGE_NT_HEADERS)((LONG)pDOSHeader + pDOSHeader->e_lfanew);
+		if ( pNTHeader->Signature != LOWORD(IMAGE_NT_SIGNATURE) ) // "PE"   
+			return -1;
+
+		// RVA of export table   
+		lExportOffset = pNTHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
+		lExportSize = pNTHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
+
+		// Pointer to export table   
+		pExportDir = (PIMAGE_EXPORT_DIRECTORY)((DWORD)pBase + lExportOffset);
+
+		// Pointer and length of AddressOfNames array   
+		pNamesArray = (PDWORD)((DWORD)pBase + pExportDir->AddressOfNames);
+		lNumberOfNames = (int)pExportDir->NumberOfNames;
+
+		// Empty names array   
+		if ( lNumberOfNames == 0 )
+			return -1;
+
+		// Pointer to AddressOfNameOrdinals array   
+		pNameOrdinalsArray = (PWORD)((DWORD)pBase + pExportDir->AddressOfNameOrdinals);
+
+		// Search for name of function in the NamesArray   
+		nNameIndex = -1;
+		for ( i = 0; i < lNumberOfNames; i++ ) {
+			szName = (char *)((DWORD)pBase + pNamesArray[i]);
+
+			if ( !strcmp(szName, lpProcName) ) {
+				nNameIndex = i;
+				break;
+			}
+		}
+
+		// Not found   
+		if ( nNameIndex == (WORD)-1 )
+			return -1;
+
+		// Return ordinal #   
+		return pNameOrdinalsArray[nNameIndex] + pExportDir->Base;
+	}
+
+	#define IMAGE_FIRST_SECTION32( ntheader ) ((PIMAGE_SECTION_HEADER)        \
+		((UINT64*)ntheader +                                               \
+		 FIELD_OFFSET( IMAGE_NT_HEADERS32, OptionalHeader ) +                 \
+		 ((PIMAGE_NT_HEADERS32)(ntheader))->FileHeader.SizeOfOptionalHeader   \
+		))
+
+	/***********************************************************
+	* Returns the length of the exported by ordinal function. *
+	***********************************************************/
+	int GetProcLength(HMODULE hModule, DWORD Ordinal) {
+		HINSTANCE               pBase;
+		PIMAGE_DOS_HEADER       pDOSHeader;
+		PIMAGE_NT_HEADERS32     pNTHeader;
+		PIMAGE_EXPORT_DIRECTORY pExportDir;
+		PIMAGE_SECTION_HEADER   pImageSectionArray;
+		DWORD                   lExportOffset, lExportSize;
+		DWORD                   SectionStart, SectionEnd;
+		PDWORD                  pFunctionArray;
+		FARPROC                 pFunctionAddr, pCurrentFunctionAddr;
+		int                     nNumberOfSections;
+		int                     i, Diff, Length;
+		char                    szForwardedModule[MAX_PATH];
+		char*                   szForwardedFunctionName;
+		HINSTANCE               hForwardedMod;
+
+		// Library base address   
+		pBase = hModule;
+
+		// Verify DOS header   
+		pDOSHeader = (PIMAGE_DOS_HEADER)pBase;
+		if ( pDOSHeader->e_magic != IMAGE_DOS_SIGNATURE ) // "MZ"   
+			return 0;
+
+		// NT Header   
+		pNTHeader = (PIMAGE_NT_HEADERS)((LONG)pDOSHeader + pDOSHeader->e_lfanew);
+		if ( pNTHeader->Signature != LOWORD(IMAGE_NT_SIGNATURE) ) // "PE"   
+			return 0;
+
+		// RVA of export table   
+		lExportOffset = pNTHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
+		lExportSize = pNTHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
+
+		// Pointer to export table and export functions array   
+		pExportDir = (PIMAGE_EXPORT_DIRECTORY)((DWORD)pBase + lExportOffset);
+		pFunctionArray = (PDWORD)((DWORD)pBase + pExportDir->AddressOfFunctions);
+
+		// Check if requested ordinal # is valid   
+		if ( (Ordinal < pExportDir->Base) ||
+			((Ordinal - pExportDir->Base) > pExportDir->NumberOfFunctions) )
+			return 0;
+
+		// This works because the export table cannot have gaps   
+		// (if the ordinal is a gap then the corresponding export table entry contains zero)   
+		pFunctionAddr = (FARPROC)((DWORD)pBase + pFunctionArray[Ordinal - pExportDir->Base]);
+
+		// Export forward ?   
+		if ( ((DWORD)pFunctionAddr >= (DWORD)pExportDir) && ((DWORD)pFunctionAddr < ((DWORD)pExportDir + lExportSize)) ) {
+			szForwardedFunctionName = strchr((char *)pFunctionAddr, '.');
+			if ( !szForwardedFunctionName )
+				return 0;
+
+			// Module (DLL) name and function name   
+			FillMemory(szForwardedModule, sizeof(szForwardedModule), 0);
+			strncpy(szForwardedModule, (char *)pFunctionAddr, szForwardedFunctionName - (char *)pFunctionAddr);
+			szForwardedFunctionName++;
+
+			// Load library   
+			hForwardedMod = LoadLibraryA(szForwardedModule);
+			if ( !hForwardedMod )
+				return 0;
+
+			// Get length of function   
+			Length = GetProcLength(hForwardedMod, NameToOrdinal(hForwardedMod, szForwardedFunctionName));
+			FreeLibrary(hForwardedMod);
+			return Length;
+		}
+
+		Length = INT_MAX;
+
+		for ( i = 1; i <= (int)pExportDir->NumberOfFunctions; i++ ) {
+			pCurrentFunctionAddr = (FARPROC)((DWORD)pBase + pFunctionArray[i - pExportDir->Base]);
+			Diff = (PBYTE)pCurrentFunctionAddr - (PBYTE)pFunctionAddr;
+			if ( Diff > 0 )
+				Length = std::min(Length, Diff);
+		}
+
+		// This is the exported function with the higher address.   
+		// Use the end of the image section to calculate the length of the function.   
+		if ( Length == INT_MAX ) {
+			pImageSectionArray = IMAGE_FIRST_SECTION32(pNTHeader);
+			nNumberOfSections = pNTHeader->FileHeader.NumberOfSections;
+
+			// Search all image sections   
+			for ( i = 0; i < nNumberOfSections; i++ ) {
+				// Code section   
+				if ( pImageSectionArray[i].Characteristics & IMAGE_SCN_CNT_CODE ) {
+					SectionStart = (DWORD)pBase + pImageSectionArray[i].VirtualAddress;
+					SectionEnd = SectionStart + pImageSectionArray[i].Misc.VirtualSize;
+
+					// Function lies within this section ?   
+					if ( (DWORD)pFunctionAddr >= SectionStart && (DWORD)pFunctionAddr <= SectionEnd ) {
+						Length = SectionEnd - (DWORD)pFunctionAddr;
+						break;
+					}
+				}
+			}
+		}
+		return Length;
+	}
+
+
+	const std::pair<const char*, const char*> func_ids[] = {
+		{"opengl32.dll", "glBegin"},
+		{"opengl32.dll", "glEnd"},
+		{"opengl32.dll", "glDepthFunc"},
+		{"opengl32.dll", "glDrawElements"},
+		{"opengl32.dll", "glBindTexture"},
+		{"opengl32.dll", "glGenTextures"},
+		{"opengl32.dll", "glEnable"},
+		{"opengl32.dll", "glDisable"},
+		{"opengl32.dll", "glColor4f"},
+		{"opengl32.dll", "glDepthRange"},
+		{"opengl32.dll", "glGetFloatv"},
+		{"opengl32.dll", "glGetIntegerv"},
+		{"opengl32.dll", "glDrawArrays"},
+		{"opengl32.dll", "glDrawBuffer"},
+		{"opengl32.dll", "glArrayElement"},
+		{"opengl32.dll", "glVertexPointer"},
+		{"opengl32.dll", "glHint"},
+		{"opengl32.dll", "glVertex3f"},
+		// None of the following are apparently changed anymore? :/
+		{"opengl32.dll", "glLoadIdentity"},
+		{"opengl32.dll", "glMatrixMode"},
+		{"opengl32.dll", "glOrtho"},
+		{"opengl32.dll", "glPushMatrix"},
+		{"opengl32.dll", "glPopMatrix"},
+		{"opengl32.dll", "glRasterPos2f"},
+		{"opengl32.dll", "glCallLists"},
+		{"opengl32.dll", "glPopAttrib"},
+		//{"opengl32.dll", "wglUseFontBitmaps"}, // Wrong library?
+		{"opengl32.dll", "glPushAttrib"},
+		{"opengl32.dll", "glGenLists"},
+		{"gdi32.dll", "SwapBuffers"},
+	};
+	uint64_t func_csc[array_size(func_ids)] = {0};
+
+
+	void CheckForVIP(void) {
+		bool first_run = (func_csc[0] == 0);
+
+		int num_changed = 0;
+
+		for ( size_t i = 0 ; i < array_size(func_ids) ; ++i ) {
+			HMODULE lib = LoadLibraryA(func_ids[i].first);
+			const char* func = func_ids[i].second;
+
+			FARPROC addr = GetProcedureAddress(lib, func);
+			if ( !addr )
+				exit(-1);
+			size_t func_len = GetProcLength(lib, NameToOrdinal(lib, func));
+			if ( func_len == 0 )
+				exit(-1);
+
+
+			uint64_t val = 0;
+			for ( DWORD* mem = (DWORD*)addr ; mem < (DWORD*)((const char*)addr + func_len) ; ++mem ) {
+				val = ((val & 0x1f) << (64-5)) | (val >> 5);
+				val += *mem;
+			}
+
+			FreeLibrary(lib);
+
+			if ( first_run ) {
+				//uiChatPrintLine("%16s : %016x", func, val);
+				func_csc[i] = val;
+			} else if ( func_csc[i] != val ) {
+				//uiChatPrintLine("%s has changed!", func);
+				++num_changed;
+			}
+		}
+
+		//uiChatPrintLine("%d/%d functions changed", num_changed, array_size(func_ids));
+	}
+}
+#endif
