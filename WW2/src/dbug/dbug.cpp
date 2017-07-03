@@ -45,7 +45,6 @@ static const char _CLOSE_MSG[] = "\nDebug Message System Closed.\n";
 
 static const size_t MAX_FILE_NUM = 5;
 
-static SINT32 _stdErrFileNo = -1;
 static DebugLogger _logger;
 
 const char* errorTypes[] = {
@@ -209,8 +208,8 @@ _dbugOut(bool logToConsole
 			, const	bool	rollover) noexcept
 {
 	if ( PN_UNLIKELY(logToConsole) ) {
-		OS_WRITE(_stdErrFileNo, outString, (unsigned long)length);
-		if ( PN_UNLIKELY(_logger.m_dbugfile == _stdErrFileNo) )
+		OS_WRITE(STDERR_FILENO, outString, (unsigned long)length);
+		if ( PN_UNLIKELY(_logger.m_dbugfile == STDERR_FILENO) )
 			return;
 	}
 
@@ -219,7 +218,7 @@ _dbugOut(bool logToConsole
 
 	/*size_t retval = */OS_WRITE(_logger.m_dbugfile, outString, (unsigned long)length);
 	///TODO: handle negative retval???
-	if ( _logger.m_dbugfile == _stdErrFileNo )
+	if ( _logger.m_dbugfile == STDERR_FILENO )
 		return;
 }
 
@@ -351,7 +350,6 @@ void dbugInit(LogMode logMode, const char* const filename)
 		return;
 	s_dbugInitialized = true;
 
-    _stdErrFileNo = STDERR_FILENO;
 	setlocale(LC_CTYPE, "");
 
 	Debug::ERROR_TYPE level = Debug::ERR_DBUG;
@@ -410,7 +408,7 @@ void DebugLogger::close() noexcept
 	std::lock_guard<std::mutex> lock(s_dbugOutputMutex);
 	_dbugOut(true, _logger.m_logMode, _CLOSE_MSG, sizeof(_CLOSE_MSG)-1, false);
 
-	if ( m_dbugfile !=  _stdErrFileNo )
+	if ( m_dbugfile !=  STDERR_FILENO )
 		OS_CLOSE(_logger.m_dbugfile);
 	_logger.m_dbugfile = -1;
 }
@@ -528,7 +526,7 @@ static inline SINT32
 _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, const UINT32 errType, const char* const fmt, va_list args)
 {
 	if ( PN_UNLIKELY(_logger.isInitialized() == false) )
-		_logger.initialize(LogMode::TO_FILE,  Debug::ERR_INFO, _stdErrFileNo, "not_initialized");
+		_logger.initialize(LogMode::TO_FILE,  Debug::ERR_INFO, STDERR_FILENO, "not_initialized");
 
 	if ( PN_UNLIKELY(_logger.m_dbugfile < 0 || fmt == nullptr) )
 		return 0;
