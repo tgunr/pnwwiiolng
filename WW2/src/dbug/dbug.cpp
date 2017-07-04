@@ -501,7 +501,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	if ( PN_UNLIKELY(_logger.isInitialized() == false) )
 		_logger.initialize(LogMode::TO_FILE,  Debug::ERR_INFO, STDERR_FILENO, "not_initialized");
 
-	if ( PN_UNLIKELY(_logger.m_dbugfile < 0 || fmt == nullptr) )
+	if ( PN_UNLIKELY(fmt == nullptr) )
 		return 0;
 
 	// split incoming 'errType' into flags bits and type bits
