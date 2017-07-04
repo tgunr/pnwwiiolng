@@ -343,15 +343,14 @@ void dbugInit(LogMode logMode, const char* const filename)
 	_logger.initialize(logMode, level, file, filename);
 
 #if platBuild == BUILD_SERVER && platOS != OS_WIN32
-	signal(SIGUSR2, _handleSIGUSR2);
-	signal(SIGPIPE, SIG_IGN);
-
-	if ( _setSignal(SIGABRT, dbugDumpBacktrace) < 0
-		|| _setSignal(SIGILL, dbugDumpBacktrace) < 0
-		|| _setSignal(SIGFPE, dbugDumpBacktrace) < 0
-		|| _setSignal(SIGSEGV, dbugDumpBacktrace) < 0
-		|| _setSignal(SIGTERM, dbugDumpBacktrace) < 0
-		|| _setSignal(SIGBUS, dbugDumpBacktrace) < 0 )
+	if ( _setSignal(SIGUSR2, _handleSIGUSR2, false) < 0
+        || _setSignal(SIGPIPE, SIG_IGN, false) < 0
+        || _setSignal(SIGABRT, _dbugDumpBacktrace) < 0
+		|| _setSignal(SIGILL, _dbugDumpBacktrace) < 0
+		|| _setSignal(SIGFPE, _dbugDumpBacktrace) < 0
+		|| _setSignal(SIGSEGV, _dbugDumpBacktrace) < 0
+		|| _setSignal(SIGTERM, _dbugDumpBacktrace) < 0
+		|| _setSignal(SIGBUS, _dbugDumpBacktrace) < 0 )
 	{
 		LogAbort("Unable to install signal handlers.");
 	}
