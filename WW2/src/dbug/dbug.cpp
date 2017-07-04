@@ -302,19 +302,13 @@ static void _dbugDumpBacktrace(int signum)
     backtrace_symbols_fd(backtraceAddrs, numAddrs, fd);
 }
 
-static int
-_setSignal(int signum, void (*handler)(int))
+static int _setSignal(int signum, void (*handler)(int), bool resetHandler = true)
 {
 	struct sigaction action;
-	// Get the pre-existing setup.
-	const int err = sigaction(signum, nullptr, &action);
-	if ( err < 0 )
-		return err;
-
-	action.sa_handler = handler;
+	
+    action.sa_handler = handler;
 	sigfillset(&action.sa_mask);
-	action.sa_flags = SA_RESETHAND;
-
+	action.sa_flags = resetHandler ? SA_RESETHAND : 0;
 	return sigaction(signum, &action, nullptr);
 }
 #endif
