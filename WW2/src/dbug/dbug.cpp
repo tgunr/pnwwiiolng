@@ -45,7 +45,6 @@ static const char _CLOSE_MSG[] = "\nDebug Message System Closed.\n";
 
 static const size_t MAX_FILE_NUM = 5;
 
-static SINT32 _stdErrFileNo = -1;
 static DebugLogger _logger;
 
 const char* errorTypes[] = {
@@ -69,15 +68,17 @@ static std::mutex s_dbugOutputMutex;
 
 thread_local char DebugLogger::m_text[DBUG_MAX_STRING + 1];
 
-struct ThreadId
+struct fake_thread_id
 {
-	size_t m_id;
-	static std::atomic<size_t> s_id;
-	ThreadId() : m_id(s_id++) {}
+    size_t m_id;
+    
+    static std::atomic<size_t> s_id;
+    
+    fake_thread_id() : m_id(s_id++) {}
 };
+std::atomic<size_t> fake_thread_id::s_id { 0 };
 
-std::atomic<size_t> ThreadId::s_id { 0 };
-static thread_local ThreadId stl_threadId {};
+static thread_local fake_thread_id current_fake_thread_id {};
 
 //////////////////////////////////////////////////////////////////////
 // Set errno.
@@ -209,8 +210,8 @@ _dbugOut(bool logToConsole
 			, const	bool	rollover) noexcept
 {
 	if ( PN_UNLIKELY(logToConsole) ) {
-		OS_WRITE(_stdErrFileNo, outString, (unsigned long)length);
-		if ( PN_UNLIKELY(_logger.m_dbugfile == _stdErrFileNo) )
+		OS_WRITE(STDERR_FILENO, outString, (unsigned long)length);
+		if ( PN_UNLIKELY(_logger.m_dbugfile == STDERR_FILENO) )
 			return;
 	}
 
@@ -219,7 +220,7 @@ _dbugOut(bool logToConsole
 
 	/*size_t retval = */OS_WRITE(_logger.m_dbugfile, outString, (unsigned long)length);
 	///TODO: handle negative retval???
-	if ( _logger.m_dbugfile == _stdErrFileNo )
+	if ( _logger.m_dbugfile == STDERR_FILENO )
 		return;
 }
 
@@ -271,71 +272,43 @@ _handleSIGUSR2(SINT32)
 
 #include <execinfo.h>
 
-// Needs to be static to avoid allocs during signal.
-static const size_t MaxBacktraceAddrs = 16;
-static void* backtraceAddrs[MaxBacktraceAddrs];
-static char  backtraceReport[128];
-
-//////////////////////////////////////////////////////////////////////
-// Brute-force write to log file.
-
-static void _report(const int fd, const char* const fmt, const int num)
-{
-	const int len = strprintf(backtraceReport, fmt, num);
-	if ( len > 0 )
-		OS_WRITE(fd, (void*)backtraceReport, len);
-}
-
-
 //////////////////////////////////////////////////////////////////////
 // Linux: On a fatal signal, write a backtrace to the log file.
 
-void dbugDumpBacktrace(int signum)
+static const size_t MaxBacktraceAddrs = 32;
+
+static void _dbugDumpBacktrace(int signum)
 {
-	if ( _logger.isInitialized() == false || _logger.m_logMode != LogMode::TO_FILE )
-		return;
-	const int fd = _logger.m_dbugfile;
-	if ( fd < 0 )
-		return;
-
-	if ( signum > 0 )
-	{
-		_report(fd, "\n\n", 0);
-		_report(fd, "*** Process terminating due to fatal signal #%d:\n", signum);
+    int fd = STDERR_FILENO;
+    
+	if ( _logger.isInitialized() && _logger.m_logMode == LogMode::TO_FILE && _logger.m_dbugfile >= 0) {
+        fd = _logger.m_dbugfile;
+    }
+    
+	if ( signum > 0 ) {
+		dprintf(fd, "\n\n");
+		dprintf(fd, "*** Process terminating due to fatal signal #%d:\n", signum);
 	}
 
-	const int numAddrs = backtrace(backtraceAddrs, MaxBacktraceAddrs);
-	if ( numAddrs < 0 )
-	{
-		_report(fd, "Backtrace error: %d\n", numAddrs);
+    void *backtraceAddrs[MaxBacktraceAddrs];
+	int numAddrs = backtrace(backtraceAddrs, MaxBacktraceAddrs);
+	
+	if ( numAddrs < 0 ) {
+		dprintf(fd, "Backtrace error: %d\n", numAddrs);
 		return;
 	}
-	if ( numAddrs == 0 )
-	{
-		_report(fd, "backtrace available.\n", 0);
-		return;
-	}
-
-	_report(fd, "BACKTRACE [Rev unknown, %u functions]:\n", numAddrs);
-
-	backtrace_symbols_fd(backtraceAddrs, numAddrs, fd);
-
-	return;
+	
+    dprintf(fd, "BACKTRACE [Rev %s (code %s/data %s), %u functions]:\n", PN_product_version_string, PN_code_git_commitish_string, PN_data_git_commitish_string, numAddrs);
+    backtrace_symbols_fd(backtraceAddrs, numAddrs, fd);
 }
 
-static int
-_setSignal(int signum, void (*handler)(int))
+static int _setSignal(int signum, void (*handler)(int), bool resetHandler = true)
 {
 	struct sigaction action;
-	// Get the pre-existing setup.
-	const int err = sigaction(signum, nullptr, &action);
-	if ( err < 0 )
-		return err;
-
-	action.sa_handler = handler;
+	
+    action.sa_handler = handler;
 	sigfillset(&action.sa_mask);
-	action.sa_flags = SA_RESETHAND;
-
+	action.sa_flags = resetHandler ? SA_RESETHAND : 0;
 	return sigaction(signum, &action, nullptr);
 }
 #endif
@@ -351,7 +324,6 @@ void dbugInit(LogMode logMode, const char* const filename)
 		return;
 	s_dbugInitialized = true;
 
-    _stdErrFileNo = STDERR_FILENO;
 	setlocale(LC_CTYPE, "");
 
 	Debug::ERROR_TYPE level = Debug::ERR_DBUG;
@@ -371,15 +343,14 @@ void dbugInit(LogMode logMode, const char* const filename)
 	_logger.initialize(logMode, level, file, filename);
 
 #if platBuild == BUILD_SERVER && platOS != OS_WIN32
-	signal(SIGUSR2, _handleSIGUSR2);
-	signal(SIGPIPE, SIG_IGN);
-
-	if ( _setSignal(SIGABRT, dbugDumpBacktrace) < 0
-		|| _setSignal(SIGILL, dbugDumpBacktrace) < 0
-		|| _setSignal(SIGFPE, dbugDumpBacktrace) < 0
-		|| _setSignal(SIGSEGV, dbugDumpBacktrace) < 0
-		|| _setSignal(SIGTERM, dbugDumpBacktrace) < 0
-		|| _setSignal(SIGBUS, dbugDumpBacktrace) < 0 )
+	if ( _setSignal(SIGUSR2, _handleSIGUSR2, false) < 0
+        || _setSignal(SIGPIPE, SIG_IGN, false) < 0
+        || _setSignal(SIGABRT, _dbugDumpBacktrace) < 0
+		|| _setSignal(SIGILL, _dbugDumpBacktrace) < 0
+		|| _setSignal(SIGFPE, _dbugDumpBacktrace) < 0
+		|| _setSignal(SIGSEGV, _dbugDumpBacktrace) < 0
+		|| _setSignal(SIGTERM, _dbugDumpBacktrace) < 0
+		|| _setSignal(SIGBUS, _dbugDumpBacktrace) < 0 )
 	{
 		LogAbort("Unable to install signal handlers.");
 	}
@@ -410,7 +381,7 @@ void DebugLogger::close() noexcept
 	std::lock_guard<std::mutex> lock(s_dbugOutputMutex);
 	_dbugOut(true, _logger.m_logMode, _CLOSE_MSG, sizeof(_CLOSE_MSG)-1, false);
 
-	if ( m_dbugfile !=  _stdErrFileNo )
+	if ( m_dbugfile !=  STDERR_FILENO )
 		OS_CLOSE(_logger.m_dbugfile);
 	_logger.m_dbugfile = -1;
 }
@@ -521,6 +492,25 @@ static const char* sane_basename(const char* const filepath) noexcept
 	return PN_LIKELY(slash) ? slash + 1 : filepath;
 }
 
+// Retrieve the current time to millisecond resolution in portable fashion. The
+// extra math is needed thanks to design flaws in C++'s chrono library.
+static void _getCurrentTime(struct tm &tm, uint32_t &millis)
+{
+    auto now = std::chrono::system_clock::now();
+    time_t nowTime = std::chrono::system_clock::to_time_t(now);
+    auto nowRounded = std::chrono::system_clock::from_time_t(nowTime);
+    
+    // If the time value was rounded upward instead of truncated or rounded down,
+    // adjust for the rounding.
+    if (nowRounded > now) {
+        --nowTime;
+        nowRounded -= std::chrono::seconds(1);
+    }
+    
+    localtime_r(&nowTime, &tm);
+    millis = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::milli>>(now - nowRounded).count();
+}
+
 // _dbugLogPrivate: if the current filename, lineno or string is nullptr then it
 // sets these members.  The parameters are output as a string to the debug
 // file depending on the debug level selected and the current error type.
@@ -528,9 +518,9 @@ static inline SINT32
 _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, const UINT32 errType, const char* const fmt, va_list args)
 {
 	if ( PN_UNLIKELY(_logger.isInitialized() == false) )
-		_logger.initialize(LogMode::TO_FILE,  Debug::ERR_INFO, _stdErrFileNo, "not_initialized");
+		_logger.initialize(LogMode::TO_FILE,  Debug::ERR_INFO, STDERR_FILENO, "not_initialized");
 
-	if ( PN_UNLIKELY(_logger.m_dbugfile < 0 || fmt == nullptr) )
+	if ( PN_UNLIKELY(fmt == nullptr) )
 		return 0;
 
 	// split incoming 'errType' into flags bits and type bits
@@ -541,53 +531,52 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	if ( PN_LIKELY((error != Debug::ERR_FATAL) && (error > minLevel)) )
 		return 0;
 
-	const bool logToConsole = 
-			(error < Debug::ERR_MINOR) || 
-			(error < Debug::ERR_INFO && (flags & STD_ERR)) ||
-			(flags & LOG_ALL_TO_STDERR);
 
-	size_t len = 0;
-	time_t now = (time_t)(teulClock64 / 1000ULL);
-	struct tm tmStruct;
-	struct tm* tm = localtime_r(&now, &tmStruct);
+	struct tm tm;
+	uint32_t ms;
+	
+	_getCurrentTime(tm, ms);
+	
 	char prefix[512];
 	size_t pfxLen = strprintf(prefix, "%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] %" PRSizeT "# "
 							, errorTypes[error]
-							, tm->tm_year + 1900
-							, tm->tm_mon + 1
-							, tm->tm_mday
-							, tm->tm_hour
-							, tm->tm_min
-							, tm->tm_sec
-							, (UINT32)(teulClock64 % 1000)
+							, tm.tm_year + 1900
+							, tm.tm_mon + 1
+							, tm.tm_mday
+							, tm.tm_hour
+							, tm.tm_min
+							, tm.tm_sec
+							, ms
 							, sane_basename(filename)
 							, lineno
-							, stl_threadId.m_id);
-
+							, current_fake_thread_id.m_id);
 	const char* text = nullptr;
-	len = _logger.vformatText(fmt, args);
-	if ( len == (size_t)~0 ) {
+	size_t len = _logger.vformatText(fmt, args);
+	
+    if ( len == (size_t)~0 ) {
 		text = "[ERROR]\n";
 		len = strlen(text);
 	} else {
 		text = _logger.text();
 	}
 
-	//scope
-	{
-        try {
-            std::lock_guard<std::mutex> lock(s_dbugOutputMutex);
-            // re-check: could have changed while we got the lock
-            if ( logToConsole || _logger.m_dbugfile >= 0 ) {
-                _dbugOut(logToConsole, _logger.m_logMode, prefix, pfxLen, false);
-                _dbugOut(logToConsole, _logger.m_logMode, _logger.text(), len, true);
-            }
-        } catch (std::system_error &e) {
-            // This probably means we tried to grab the mutex during exit(),
-            // when it's not valid anymore. Silently ignore.
+    bool logToConsole =
+            (error < Debug::ERR_MINOR) ||
+            (error < Debug::ERR_INFO && (flags & STD_ERR)) ||
+            (flags & LOG_ALL_TO_STDERR);
+            
+    try {
+        std::lock_guard<std::mutex> lock(s_dbugOutputMutex);
+        // re-check: could have changed while we got the lock
+        if ( logToConsole || _logger.m_dbugfile >= 0 ) {
+            _dbugOut(logToConsole, _logger.m_logMode, prefix, pfxLen, false);
+            _dbugOut(logToConsole, _logger.m_logMode, _logger.text(), len, true);
         }
-	}
-
+    } catch (std::system_error &e) {
+        // This probably means we tried to grab the mutex during exit(),
+        // when it's not valid anymore. Silently ignore.
+    }
+    
 	if ( PN_UNLIKELY(error == Debug::ERR_FATAL) ) {
 		abort();
 	}
