@@ -512,10 +512,6 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	if ( PN_LIKELY((error != Debug::ERR_FATAL) && (error > minLevel)) )
 		return 0;
 
-	const bool logToConsole = 
-			(error < Debug::ERR_MINOR) || 
-			(error < Debug::ERR_INFO && (flags & STD_ERR)) ||
-			(flags & LOG_ALL_TO_STDERR);
 
 	size_t len = 0;
 	time_t now = (time_t)(teulClock64 / 1000ULL);
@@ -543,21 +539,23 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		text = _logger.text();
 	}
 
-	//scope
-	{
-        try {
-            std::lock_guard<std::mutex> lock(s_dbugOutputMutex);
-            // re-check: could have changed while we got the lock
-            if ( logToConsole || _logger.m_dbugfile >= 0 ) {
-                _dbugOut(logToConsole, _logger.m_logMode, prefix, pfxLen, false);
-                _dbugOut(logToConsole, _logger.m_logMode, _logger.text(), len, true);
-            }
-        } catch (std::system_error &e) {
-            // This probably means we tried to grab the mutex during exit(),
-            // when it's not valid anymore. Silently ignore.
+    bool logToConsole =
+            (error < Debug::ERR_MINOR) ||
+            (error < Debug::ERR_INFO && (flags & STD_ERR)) ||
+            (flags & LOG_ALL_TO_STDERR);
+            
+    try {
+        std::lock_guard<std::mutex> lock(s_dbugOutputMutex);
+        // re-check: could have changed while we got the lock
+        if ( logToConsole || _logger.m_dbugfile >= 0 ) {
+            _dbugOut(logToConsole, _logger.m_logMode, prefix, pfxLen, false);
+            _dbugOut(logToConsole, _logger.m_logMode, _logger.text(), len, true);
         }
-	}
-
+    } catch (std::system_error &e) {
+        // This probably means we tried to grab the mutex during exit(),
+        // when it's not valid anymore. Silently ignore.
+    }
+    
 	if ( PN_UNLIKELY(error == Debug::ERR_FATAL) ) {
 		abort();
 	}
