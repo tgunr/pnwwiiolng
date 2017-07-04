@@ -68,15 +68,17 @@ static std::mutex s_dbugOutputMutex;
 
 thread_local char DebugLogger::m_text[DBUG_MAX_STRING + 1];
 
-struct ThreadId
+struct fake_thread_id
 {
-	size_t m_id;
-	static std::atomic<size_t> s_id;
-	ThreadId() : m_id(s_id++) {}
+    size_t m_id;
+    
+    static std::atomic<size_t> s_id;
+    
+    fake_thread_id() : m_id(s_id++) {}
 };
+std::atomic<size_t> fake_thread_id::s_id { 0 };
 
-std::atomic<size_t> ThreadId::s_id { 0 };
-static thread_local ThreadId stl_threadId {};
+static thread_local fake_thread_id current_fake_thread_id {};
 
 //////////////////////////////////////////////////////////////////////
 // Set errno.
@@ -560,8 +562,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 							, (UINT32)(teulClock64 % 1000)
 							, sane_basename(filename)
 							, lineno
-							, stl_threadId.m_id);
-
+							, current_fake_thread_id.m_id);
 	const char* text = nullptr;
 	len = _logger.vformatText(fmt, args);
 	if ( len == (size_t)~0 ) {
