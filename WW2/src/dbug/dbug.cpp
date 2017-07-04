@@ -272,56 +272,34 @@ _handleSIGUSR2(SINT32)
 
 #include <execinfo.h>
 
-// Needs to be static to avoid allocs during signal.
-static const size_t MaxBacktraceAddrs = 16;
-static void* backtraceAddrs[MaxBacktraceAddrs];
-static char  backtraceReport[128];
-
-//////////////////////////////////////////////////////////////////////
-// Brute-force write to log file.
-
-static void _report(const int fd, const char* const fmt, const int num)
-{
-	const int len = strprintf(backtraceReport, fmt, num);
-	if ( len > 0 )
-		OS_WRITE(fd, (void*)backtraceReport, len);
-}
-
-
 //////////////////////////////////////////////////////////////////////
 // Linux: On a fatal signal, write a backtrace to the log file.
 
-void dbugDumpBacktrace(int signum)
+static const size_t MaxBacktraceAddrs = 32;
+
+static void _dbugDumpBacktrace(int signum)
 {
-	if ( _logger.isInitialized() == false || _logger.m_logMode != LogMode::TO_FILE )
-		return;
-	const int fd = _logger.m_dbugfile;
-	if ( fd < 0 )
-		return;
-
-	if ( signum > 0 )
-	{
-		_report(fd, "\n\n", 0);
-		_report(fd, "*** Process terminating due to fatal signal #%d:\n", signum);
+    int fd = STDERR_FILENO;
+    
+	if ( _logger.isInitialized() && _logger.m_logMode == LogMode::TO_FILE && _logger.m_dbugfile >= 0) {
+        fd = _logger.m_dbugfile;
+    }
+    
+	if ( signum > 0 ) {
+		dprintf(fd, "\n\n");
+		dprintf(fd, "*** Process terminating due to fatal signal #%d:\n", signum);
 	}
 
-	const int numAddrs = backtrace(backtraceAddrs, MaxBacktraceAddrs);
-	if ( numAddrs < 0 )
-	{
-		_report(fd, "Backtrace error: %d\n", numAddrs);
+    void *backtraceAddrs[MaxBacktraceAddrs];
+	int numAddrs = backtrace(backtraceAddrs, MaxBacktraceAddrs);
+	
+	if ( numAddrs < 0 ) {
+		dprintf(fd, "Backtrace error: %d\n", numAddrs);
 		return;
 	}
-	if ( numAddrs == 0 )
-	{
-		_report(fd, "backtrace available.\n", 0);
-		return;
-	}
-
-	_report(fd, "BACKTRACE [Rev unknown, %u functions]:\n", numAddrs);
-
-	backtrace_symbols_fd(backtraceAddrs, numAddrs, fd);
-
-	return;
+	
+    dprintf(fd, "BACKTRACE [Rev %s (code %s/data %s), %u functions]:\n", PN_product_version_string, PN_code_git_commitish_string, PN_data_git_commitish_string, numAddrs);
+    backtrace_symbols_fd(backtraceAddrs, numAddrs, fd);
 }
 
 static int
