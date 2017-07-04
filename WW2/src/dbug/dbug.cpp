@@ -492,6 +492,25 @@ static const char* sane_basename(const char* const filepath) noexcept
 	return PN_LIKELY(slash) ? slash + 1 : filepath;
 }
 
+// Retrieve the current time to millisecond resolution in portable fashion. The
+// extra math is needed thanks to design flaws in C++'s chrono library.
+static void _getCurrentTime(struct tm &tm, uint32_t &millis)
+{
+    auto now = std::chrono::system_clock::now();
+    time_t nowTime = std::chrono::system_clock::to_time_t(now);
+    auto nowRounded = std::chrono::system_clock::from_time_t(nowTime);
+    
+    // If the time value was rounded upward instead of truncated or rounded down,
+    // adjust for the rounding.
+    if (nowRounded > now) {
+        --nowTime;
+        nowRounded -= std::chrono::seconds(1);
+    }
+    
+    localtime_r(&nowTime, &tm);
+    millis = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::milli>>(now - nowRounded).count();
+}
+
 // _dbugLogPrivate: if the current filename, lineno or string is nullptr then it
 // sets these members.  The parameters are output as a string to the debug
 // file depending on the debug level selected and the current error type.
@@ -513,26 +532,28 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		return 0;
 
 
-	size_t len = 0;
-	time_t now = (time_t)(teulClock64 / 1000ULL);
-	struct tm tmStruct;
-	struct tm* tm = localtime_r(&now, &tmStruct);
+	struct tm tm;
+	uint32_t ms;
+	
+	_getCurrentTime(tm, ms);
+	
 	char prefix[512];
 	size_t pfxLen = strprintf(prefix, "%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] %" PRSizeT "# "
 							, errorTypes[error]
-							, tm->tm_year + 1900
-							, tm->tm_mon + 1
-							, tm->tm_mday
-							, tm->tm_hour
-							, tm->tm_min
-							, tm->tm_sec
-							, (UINT32)(teulClock64 % 1000)
+							, tm.tm_year + 1900
+							, tm.tm_mon + 1
+							, tm.tm_mday
+							, tm.tm_hour
+							, tm.tm_min
+							, tm.tm_sec
+							, ms
 							, sane_basename(filename)
 							, lineno
 							, current_fake_thread_id.m_id);
 	const char* text = nullptr;
-	len = _logger.vformatText(fmt, args);
-	if ( len == (size_t)~0 ) {
+	size_t len = _logger.vformatText(fmt, args);
+	
+    if ( len == (size_t)~0 ) {
 		text = "[ERROR]\n";
 		len = strlen(text);
 	} else {
