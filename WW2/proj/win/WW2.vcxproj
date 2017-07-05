@@ -1082,6 +1082,7 @@
     <ClInclude Include="..\..\src\omg\omgChat.hxx" />
     <ClInclude Include="..\..\src\omg\omgMissionSortieData.hxx" />
     <ClInclude Include="..\..\src\physics\HeightField.h" />
+    <ClInclude Include="..\..\src\sys\sysAntihack.h" />
     <ClInclude Include="..\..\src\sys\sysmainHackNonsense.h" />
     <ClInclude Include="..\..\src\sys\sysSteam.h" />
     <ClInclude Include="..\..\src\teul\teulKit.h" />
@@ -1838,6 +1839,7 @@
     <ClCompile Include="..\..\src\strt\strtLua.cpp" />
     <ClCompile Include="..\..\src\strt\strtUpdaterPack.cpp" />
     <ClCompile Include="..\..\src\sys\crashhandler.cpp" />
+    <ClCompile Include="..\..\src\sys\sysAntihack.cpp" />
     <ClCompile Include="..\..\src\sys\sysLaunchUrlWin.cpp" />
     <ClCompile Include="..\..\src\sys\sysmain.cpp" />
     <ClCompile Include="..\..\src\sys\sysMovieWin.cpp">

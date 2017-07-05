@@ -85,6 +85,7 @@
 #include "maptools/GenerateIcons.h"
 #include "sdm/BuildTerrain.h"
 #include "wwii/wwiiPPOLoader.h"
+#include "sys/sysAntihack.h"
 
 #ifdef MULTI_CLIENT
 #include "mc/multiClient.h"
@@ -1018,6 +1019,11 @@ void UpdateGameClocks()
 	ft50mscount = frametime / 50;
 	ft50msticks = ft50mscount - ticks;
 	ft10mscount = frametime / 10;
+
+	static const auto tick_check_time = NetFrameSync::tick_check_time;
+	// Hiding our antihack stuff as a convoluted hash timer host sync mechanism
+	if ( lastframetime / tick_check_time < frametime / tick_check_time )
+		NetFrameSync::UpdateNextHash();
 }
 
 
