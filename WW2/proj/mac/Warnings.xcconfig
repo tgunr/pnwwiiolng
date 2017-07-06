@@ -21,6 +21,7 @@
 //
 // See the comments in Defines.xcconfig for a bit more info.
 
+WW2_WARNINGS_35 = $(WW2_WARNINGS_36) -Wno-extra-tokens                          // Can't fix this because a lot of upstream headers do it
 WW2_WARNINGS_34 = $(WW2_WARNINGS_35) -Wno-double-promotion                      // Honestly, I just don't care.
 WW2_WARNINGS_33 = $(WW2_WARNINGS_34) -Wno-cstring-format-directive              // It's okay to use %s with NSString, Apple
 WW2_WARNINGS_32 = $(WW2_WARNINGS_33) -Wno-error=c++11-narrowing                 // Don't make this a hard error, even though it should be
