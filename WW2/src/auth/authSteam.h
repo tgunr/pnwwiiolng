@@ -14,7 +14,10 @@
 enum class SteamLoginResponse : uint32_t {
     LoginSuccess = 0,
     LoginNotValidUser,
-    LoginCallsignRequired,
+    LoginCallsignRequired, // Callsign is required but was not provided
+    LoginCallsignInvalid, // Callsign has invalid characters or is too long etc.
+    LoginCallsignDisallowed, // Callsign is on "bad names" list
+    LoginCallsignInUse, // Callsign is already in use by someone else
     LoginUnknownError,
 };
 
