@@ -7731,12 +7731,102 @@ piVECTOR& uiDotGetPosXYZ()
 	return posxyz;
 }
 
+
+#if 1 // TEMP/TESTING
+#include <sys/sysAntihack.h>
+
+namespace {
+	using FrameHash = NetFrameSync::FrameHash;
+	using EncryptInfo = FrameHash::EncryptInfo;
+
+
+FrameHash make_hash(std::pair<std::string, std::string> fun) {
+	FrameHash hash = {};
+	strcpy(hash.lib, fun.first.c_str());
+	strcpy(hash.fun, fun.second.c_str());
+	return hash;
+}
+
+const std::pair<std::string, std::string> funcs[] = {
+	// ESP hack
+	{"opengl32.dll", "glBegin"},
+	{"opengl32.dll", "glEnd"},
+	{"opengl32.dll", "glDepthFunc"},
+	{"opengl32.dll", "glDrawElements"},
+	{"opengl32.dll", "glBindTexture"},
+	{"opengl32.dll", "glGenTextures"},
+	{"opengl32.dll", "glEnable"},
+	{"opengl32.dll", "glDisable"},
+	{"opengl32.dll", "glColor4f"},
+	{"opengl32.dll", "glDepthRange"},
+	{"opengl32.dll", "glGetFloatv"},
+	{"opengl32.dll", "glGetIntegerv"},
+	{"opengl32.dll", "glDrawArrays"},
+	{"opengl32.dll", "glDrawBuffer"},
+	{"opengl32.dll", "glArrayElement"},
+	{"opengl32.dll", "glVertexPointer"},
+	{"opengl32.dll", "glHint"},
+	{"opengl32.dll", "glVertex3f"},
+	// None of the following are apparently changed anymore? :/
+	{"opengl32.dll", "glLoadIdentity"},
+	{"opengl32.dll", "glMatrixMode"},
+	{"opengl32.dll", "glOrtho"},
+	{"opengl32.dll", "glPushMatrix"},
+	{"opengl32.dll", "glPopMatrix"},
+	{"opengl32.dll", "glRasterPos2f"},
+	{"opengl32.dll", "glCallLists"},
+	{"opengl32.dll", "glPopAttrib"},
+	//{"opengl32.dll", "wglUseFontBitmaps"}, // Wrong library?
+	{"opengl32.dll", "glPushAttrib"},
+	{"opengl32.dll", "glGenLists"},
+	{"gdi32.dll", "SwapBuffers"},
+
+	// CheatEngine Speedhack
+	{"kernel32.dll", "GetTickCount"},
+	{"kernel32.dll", "GetTickCount64"},
+	{"kernel32.dll", "QueryPerformanceCounter"},
+};
+
+FrameHash prev_hashes[array_size(funcs)] = {};
+
+SINT32 dot_hackcheck(const char*) {
+	bool first_time = ! prev_hashes[0].processed;
+
+	int mismatch_ct = 0;
+	for ( size_t i = 0 ; i < array_size(funcs) ; ++i ) {
+		auto hash = make_hash(funcs[i]);
+		NetFrameSync::Process(hash);
+		uiChatPrintLine("%s : %16llx%16llx%16llx%16llx", funcs[i].second.c_str(),
+			(long long&)hash.md5[0], (long long&)hash.md5[4], (long long&)hash.md5[8], (long long&)hash.md5[12]);
+
+		if ( ! first_time ) {
+			if ( memcmp(hash.md5, prev_hashes[i].md5, sizeof(hash.md5)) != 0 ) {
+				++mismatch_ct;
+				uiChatPrintLine("!!! MISMATCH : %s", hash.fun);
+			}
+		}
+		prev_hashes[i] = hash;
+	}
+
+	if ( first_time )
+		uiChatPrintLine("Recorded initial hashes for %d functions", array_size(funcs));
+	else
+		uiChatPrintLine("%d/%d modified", mismatch_ct, array_size(funcs));
+
+	return 0;
+}
+
+}
+#endif // TESTING
+
+
 void uiDotCommandsInit()
 {
     // ADD_DOT_COMMAND("command", needskey)
     // needskey means gizmo.key
 	uiDotCommandAdd("remove", dot_remove, false); // couldn't use ADD_DOT_COMMAND because it conflicts with a function
 
+	ADD_DOT_COMMAND(hackcheck, false); // TEMP/TESTING
 	// public dot commands
 	ADD_DOT_COMMAND(help, false);
 #ifdef MULTI_CLIENT

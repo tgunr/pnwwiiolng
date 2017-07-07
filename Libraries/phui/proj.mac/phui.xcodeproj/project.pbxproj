@@ -98,8 +98,6 @@
 		0DCEF7BC0AD4643900E1D282 /* Panel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEF7BB0AD4643900E1D282 /* Panel.cpp */; };
 		0DCEF7BE0AD4644300E1D282 /* Panel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DCEF7BD0AD4644300E1D282 /* Panel.h */; };
 		470B71CF0E7056BF006D9C06 /* MirrorView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 470B71CC0E7056BF006D9C06 /* MirrorView.cpp */; };
-		470B71D10E7056BF006D9C06 /* wwiiUTF.h in Headers */ = {isa = PBXBuildFile; fileRef = 470B71CE0E7056BF006D9C06 /* wwiiUTF.h */; };
-		470B71D40E70571B006D9C06 /* wwiiUTF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 470B71D30E70571B006D9C06 /* wwiiUTF.cpp */; };
 		4717733D0F28E5580094DEAA /* IMEControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4717733C0F28E5580094DEAA /* IMEControl.cpp */; };
 		47724CCF0F86C2FC0060F743 /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 47724CCE0F86C2FC0060F743 /* TextContainer.cpp */; };
 		FA06C3CA1EE25ADA00A9977E /* GraphicsContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3C91EE25ADA00A9977E /* GraphicsContext.cpp */; };
@@ -198,8 +196,6 @@
 		0DCEF7BB0AD4643900E1D282 /* Panel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Panel.cpp; path = ../src/Panel.cpp; sourceTree = SOURCE_ROOT; };
 		0DCEF7BD0AD4644300E1D282 /* Panel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Panel.h; path = ../include/phui/Panel.h; sourceTree = SOURCE_ROOT; };
 		470B71CC0E7056BF006D9C06 /* MirrorView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MirrorView.cpp; path = ../src/MirrorView.cpp; sourceTree = SOURCE_ROOT; };
-		470B71CE0E7056BF006D9C06 /* wwiiUTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wwiiUTF.h; path = ../src/wwiiUTF.h; sourceTree = SOURCE_ROOT; };
-		470B71D30E70571B006D9C06 /* wwiiUTF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wwiiUTF.cpp; path = ../src/wwiiUTF.cpp; sourceTree = SOURCE_ROOT; };
 		4717733C0F28E5580094DEAA /* IMEControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IMEControl.cpp; path = ../src/IMEControl.cpp; sourceTree = SOURCE_ROOT; };
 		47724CCE0F86C2FC0060F743 /* TextContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextContainer.cpp; path = ../src/TextContainer.cpp; sourceTree = SOURCE_ROOT; };
 		D2AAC046055464E500DB518D /* libphui.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libphui.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -296,9 +292,7 @@
 			children = (
 				47724CCE0F86C2FC0060F743 /* TextContainer.cpp */,
 				4717733C0F28E5580094DEAA /* IMEControl.cpp */,
-				470B71D30E70571B006D9C06 /* wwiiUTF.cpp */,
 				470B71CC0E7056BF006D9C06 /* MirrorView.cpp */,
-				470B71CE0E7056BF006D9C06 /* wwiiUTF.h */,
 				0DCEF7700AD4637000E1D282 /* CtxMenu.cpp */,
 				0DC3C9430A7BFDE800F14BBB /* ContextMenu.cpp */,
 				0D1F958008E877F6008FF0BF /* ContextMenu.cpp */,
@@ -418,7 +412,6 @@
 				0D3100BF08843A7600C3CBEA /* XMLMessage.h in Headers */,
 				0DCEF76D0AD4636700E1D282 /* CtxMenu.h in Headers */,
 				0DCEF7BE0AD4644300E1D282 /* Panel.h in Headers */,
-				470B71D10E7056BF006D9C06 /* wwiiUTF.h in Headers */,
 				08C8178012B020C500818A11 /* FTFontReplacement.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -518,7 +511,6 @@
 				FA06C3CA1EE25ADA00A9977E /* GraphicsContext.cpp in Sources */,
 				0DCEF7BC0AD4643900E1D282 /* Panel.cpp in Sources */,
 				470B71CF0E7056BF006D9C06 /* MirrorView.cpp in Sources */,
-				470B71D40E70571B006D9C06 /* wwiiUTF.cpp in Sources */,
 				4717733D0F28E5580094DEAA /* IMEControl.cpp in Sources */,
 				47724CCF0F86C2FC0060F743 /* TextContainer.cpp in Sources */,
 			);

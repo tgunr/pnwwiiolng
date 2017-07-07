@@ -5,6 +5,7 @@
 
 //#define _WIN32_WINNT	0x0400
 #include <stdarg.h>
+#include "sys/sysAntihack.h"
 #include "sys/sysreg.h"
 #include "resource.h"
 #include "pi/pi.h"
@@ -671,9 +672,12 @@ char GetOSBuild()
 	return getVersionInfo().build;
 }
 
+
 // This is the actual winmain
- int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	//NetFrameSync::InitializeHashes(nullptr); // TODO: Pass in functions to check right away.
+
 	int		x, y, w, h, wh, xy;
 	int		bpp, hdw, stencil, wnd;
 	MSG		msg;
