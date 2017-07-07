@@ -137,22 +137,3 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
     return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
 }
 
-/*
-	SINT32	arenaID;
-	UINT32	sessionID;		//The sessionID is used by the chat server, as
-							//	well as any game service that wants sessions
-	SINT32	appID;			//Application ID
-	SINT32	appVersion;		//Version of the app required
-	UINT32	otp;			//One time password, provided authentication was
-							//	successful
-	UINT32	serverIP;		//IP address of the server to connect to
-	UINT32	serverPort;		//port of the game server
-	PROTOCOL protocol;		//Protocol ID
-	SINT32	status;			// server status < 0 is an error, > 0 is # of players
-	SINT32	dataSize;
-	SCHAR	appleID[4];
-	char	data[MAX_PARAM];		//Application data.  Like parameters and such.
-
-	APPDL_ACTION action;	// what to do with a file that we download
-	SINT32	dlAppID;		//Application ID
-*/
