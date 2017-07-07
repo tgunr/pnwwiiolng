@@ -789,7 +789,7 @@ INSTALL( DIRECTORY hostproj/web/ DESTINATION web/embedded COMPONENT web PATTERN 
 IF ( NOT PN_DISABLE_AUTH )
     CONFIGURE_FILE( auth/authRelay.apache2.conf.in auth/authRelay.apache2.conf @ONLY )
     INSTALL(
-        FILES auth/authRelay.php auth/authRelay.apache2.conf
+        FILES auth/authSteam.h auth/authRelay.php auth/authRelay.apache2.conf
         DESTINATION web/relay
         COMPONENT relay
     )
