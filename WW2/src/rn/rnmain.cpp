@@ -350,6 +350,8 @@ void rnconnectToServer(void) {
 	if ( PlayerClient()->ChatConnection() < 0 )
 		throw ClientNetError("connect.chat.fail");
 
+	// TODO: Send antihack info at this point?
+
 	// Wipe these variables out.
 	GameHost = static_cast<UINT32>(random());
 	GameOTP = static_cast<UINT32>(random());
