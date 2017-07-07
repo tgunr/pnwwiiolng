@@ -107,15 +107,10 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
             uint32_t resultServerPort = responseJson["serverPort"];
 
             return { SteamLoginResponse::LoginSuccess, resultArenaID, resultOTP, resultServerIP, resultServerPort };
-        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginNotValidUser)) {
-            return { SteamLoginResponse::LoginNotValidUser, 0, 0, 0, 0 };
-        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignRequired)) {
-            return { SteamLoginResponse::LoginCallsignRequired, 0, 0, 0, 0 };
-        } else {
-            // TODO: Better error handling
-            dbugLog(_FLD, "Server returned JSON with unknown result code with URL %s content %s", request.url.c_str(), response.content.c_str());
-            return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
-        }
+        } else
+            // All other codes are basic types with no meaningful return data, just return the code.
+            return { static_cast<SteamLoginResponse>(resultCode), 0, 0, 0, 0 };
+
     } catch (std::invalid_argument &e) {
         // TODO: Better error handling
         dbugLog(_FLD, "Server returned invalid JSON with URL %s content %s", request.url.c_str(), response.content.c_str());
