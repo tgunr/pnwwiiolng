@@ -7733,6 +7733,7 @@ piVECTOR& uiDotGetPosXYZ()
 
 
 #if 1 // TEMP/TESTING
+#if platOS == OS_WIN32
 #include <sys/sysAntihack.h>
 
 namespace {
@@ -7817,6 +7818,7 @@ SINT32 dot_hackcheck(const char*) {
 }
 
 }
+#endif
 #endif // TESTING
 
 
@@ -7826,7 +7828,9 @@ void uiDotCommandsInit()
     // needskey means gizmo.key
 	uiDotCommandAdd("remove", dot_remove, false); // couldn't use ADD_DOT_COMMAND because it conflicts with a function
 
-	ADD_DOT_COMMAND(hackcheck, false); // TEMP/TESTING
+#if platOS == OS_WINDOWS
+	ADD_DOT_COMMAND(hackcheck, true); // TEMP/TESTING
+#endif
 	// public dot commands
 	ADD_DOT_COMMAND(help, false);
 #ifdef MULTI_CLIENT
