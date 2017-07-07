@@ -676,7 +676,7 @@ char GetOSBuild()
 // This is the actual winmain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	NetFrameSync::InitializeHashes(nullptr); // TODO: Pass in functions to check right away.
+	//NetFrameSync::InitializeHashes(nullptr); // TODO: Pass in functions to check right away.
 
 	int		x, y, w, h, wh, xy;
 	int		bpp, hdw, stencil, wnd;

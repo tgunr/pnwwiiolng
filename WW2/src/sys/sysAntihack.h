@@ -24,6 +24,7 @@ namespace NetFrameSync {
 			a->packer(mode, fun, str_len);
 			a->packer(mode, md5, md5_len);
 			a->packer(mode, &info, 0); // TODO
+			return a->offset;
 		}
 	};
 
@@ -38,4 +39,8 @@ namespace NetFrameSync {
 
 	// Update every X frames
 	static const UINT64 tick_check_time = 500;
+
+
+	// TEMP/TESTING: Exposing for dot command.
+	void Process(FrameHash&);
 }
