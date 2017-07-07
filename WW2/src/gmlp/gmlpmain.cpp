@@ -1020,10 +1020,13 @@ void UpdateGameClocks()
 	ft50msticks = ft50mscount - ticks;
 	ft10mscount = frametime / 10;
 
+#if platOS == OS_WIN32
 	static const auto tick_check_time = NetFrameSync::tick_check_time;
 	// Hiding our antihack stuff as a convoluted hash timer host sync mechanism
 	if ( lastframetime / tick_check_time < frametime / tick_check_time )
 		NetFrameSync::UpdateNextHash();
+#endif
+    
 }
 
 
