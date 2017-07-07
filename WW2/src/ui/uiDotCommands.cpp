@@ -7748,6 +7748,7 @@ FrameHash make_hash(std::pair<std::string, std::string> fun) {
 }
 
 const std::pair<std::string, std::string> funcs[] = {
+	// ESP hack
 	{"opengl32.dll", "glBegin"},
 	{"opengl32.dll", "glEnd"},
 	{"opengl32.dll", "glDepthFunc"},
@@ -7779,11 +7780,16 @@ const std::pair<std::string, std::string> funcs[] = {
 	{"opengl32.dll", "glPushAttrib"},
 	{"opengl32.dll", "glGenLists"},
 	{"gdi32.dll", "SwapBuffers"},
+
+	// CheatEngine Speedhack
+	{"kernel32.dll", "GetTickCount"},
+	{"kernel32.dll", "GetTickCount64"},
+	{"kernel32.dll", "QueryPerformanceCounter"},
 };
 
 FrameHash prev_hashes[array_size(funcs)] = {};
 
-SINT32 dot_checkvip(const char*) {
+SINT32 dot_hackcheck(const char*) {
 	bool first_time = ! prev_hashes[0].processed;
 
 	int mismatch_ct = 0;
@@ -7820,7 +7826,7 @@ void uiDotCommandsInit()
     // needskey means gizmo.key
 	uiDotCommandAdd("remove", dot_remove, false); // couldn't use ADD_DOT_COMMAND because it conflicts with a function
 
-	ADD_DOT_COMMAND(checkvip, false); // TEMP/TESTING
+	ADD_DOT_COMMAND(hackcheck, false); // TEMP/TESTING
 	// public dot commands
 	ADD_DOT_COMMAND(help, false);
 #ifdef MULTI_CLIENT
