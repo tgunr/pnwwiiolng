@@ -90,7 +90,7 @@ HCUnit::HCUnit(UINT32 UnitID, HCUNIT_TYPE Type)
 	, m_training(false)
 {
 	m_callsign[0] = 'U';	// WTF? For consistency
-	m_callsign[1] = 'U';
+	m_callsign[1] = 0;
 	m_name[0] = 'U';
 	m_name[1] = 0;
 	m_shortName[0] = 'U';

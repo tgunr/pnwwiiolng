@@ -19,8 +19,6 @@
 #endif
 
 #include "phui/Util.h"
-//#include "ConvertUTF.h"
-#include "wwiiUTF.h"
 
 using namespace phui;
 

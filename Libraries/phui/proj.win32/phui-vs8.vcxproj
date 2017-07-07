@@ -238,12 +238,10 @@
     <ClCompile Include="..\src\Util.cpp" />
     <ClCompile Include="..\src\View.cpp" />
     <ClCompile Include="..\src\Viewport.cpp" />
-    <ClCompile Include="..\src\wwiiUTF.cpp" />
     <ClCompile Include="..\src\XMLMessage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ConvertUTF.h" />
-    <ClInclude Include="..\src\wwiiUTF.h" />
     <ClInclude Include="..\include\phui\Button.h" />
     <ClInclude Include="..\include\phui\Caption.h" />
     <ClInclude Include="..\include\phui\Checkbox.h" />
