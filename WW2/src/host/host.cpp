@@ -1236,7 +1236,7 @@ _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const 
 	Player& player = *static_cast<Player*>(player_);
 
 	if ( player.m_antiHack == nullptr )
-		player.m_antiHack = new AntiHack;
+		player.m_antiHack = new SpeedhackCheck;
 
 	auto& ah = *player.m_antiHack;
 

@@ -7734,16 +7734,14 @@ piVECTOR& uiDotGetPosXYZ()
 
 #if 1 // TEMP/TESTING
 #include <sys/sysAntihack.h>
+#include <wwii/wwiiAntihack.h>
 
 namespace {
-	using FrameHash = NetFrameSync::FrameHash;
-	using EncryptInfo = FrameHash::EncryptInfo;
-
-
-FrameHash make_hash(std::pair<std::string, std::string> fun) {
-	FrameHash hash = {};
-	strcpy(hash.lib, fun.first.c_str());
-	strcpy(hash.fun, fun.second.c_str());
+FrameHashData make_hash(std::pair<std::string, std::string> fun) {
+	FrameHashData hash = {};
+	MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
+	strcpy(req.lib, fun.first.c_str());
+	strcpy(req.fun, fun.second.c_str());
 	return hash;
 }
 
@@ -7787,22 +7785,24 @@ const std::pair<std::string, std::string> funcs[] = {
 	{"kernel32.dll", "QueryPerformanceCounter"},
 };
 
-FrameHash prev_hashes[array_size(funcs)] = {};
+FrameHashData prev_hashes[array_size(funcs)] = {};
 
 SINT32 dot_hackcheck(const char*) {
-	bool first_time = ! prev_hashes[0].processed;
+	static bool first_time = true;
 
 	int mismatch_ct = 0;
 	for ( size_t i = 0 ; i < array_size(funcs) ; ++i ) {
 		auto hash = make_hash(funcs[i]);
 		NetFrameSync::Process(hash);
-		uiChatPrintLine("%s : %16llx%16llx%16llx%16llx", funcs[i].second.c_str(),
-			(long long&)hash.md5[0], (long long&)hash.md5[4], (long long&)hash.md5[8], (long long&)hash.md5[12]);
+		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
+
+		uiChatPrintLine("%s : %16llx%16llx%16llx%16llx", req.fun,
+			(long long&)req.md5[0], (long long&)req.md5[4], (long long&)req.md5[8], (long long&)req.md5[12]);
 
 		if ( ! first_time ) {
-			if ( memcmp(hash.md5, prev_hashes[i].md5, sizeof(hash.md5)) != 0 ) {
+			if ( memcmp(req.md5, reinterpret_cast<MemoryRequest&>(prev_hashes[i]).md5, sizeof(req.md5)) != 0 ) {
 				++mismatch_ct;
-				uiChatPrintLine("!!! MISMATCH : %s", hash.fun);
+				uiChatPrintLine("!!! MISMATCH : %s", req.fun);
 			}
 		}
 		prev_hashes[i] = hash;
@@ -7813,6 +7813,7 @@ SINT32 dot_hackcheck(const char*) {
 	else
 		uiChatPrintLine("%d/%d modified", mismatch_ct, array_size(funcs));
 
+	first_time = false;
 	return 0;
 }
 

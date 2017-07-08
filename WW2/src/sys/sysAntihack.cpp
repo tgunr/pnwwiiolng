@@ -2,6 +2,7 @@
 #include "sysAntihack.h"
 
 #include <pa/md5.h>
+#include <wwii/wwiiAntihack.h>
 
 
 namespace NetFrameSync {
@@ -92,21 +93,9 @@ namespace {
 
 // The encrypt/decrypt and hash generation code.
 namespace {
-	using EncryptInfo = FrameHash::EncryptInfo;
-
-	void Encrypt(char* out, const char* in, size_t len, EncryptInfo info) {
+	uint32_t GenerateNewEncryptKey(void) {
 		// TODO
-		memcpy(out, in, len);
-	}
-
-	void Decrypt(char* out, const char* in, size_t len, EncryptInfo info) {
-		// TODO
-		memcpy(out, in, len);
-	}
-
-	EncryptInfo GenerateNewEncryptInfo(void) {
-		// TODO
-		return frametime;
+		return 0;
 	}
 
 	void Md5Hash(char md5[16], const char* c, size_t len) {
@@ -119,41 +108,32 @@ namespace {
 	//--------------
 
 } // TEMP/TESTING: Public for dot command.
-	void Process(FrameHash& hash) {
+	void Process(FrameHashData& hash) {
 #if platOS == OS_WIN32
-		static const auto str_len = FrameHash::str_len;
-		static const auto md5_len = FrameHash::md5_len;
+		// Copied to avoid putting anything unencrypted in global memory, even for a moment.
+		FrameHashData data = hash;
+		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(data);
+		Decrypt(req);
 
-		char libname[str_len];
-		Decrypt(libname, hash.lib, str_len, hash.info);
-		char funname[str_len];
-		Decrypt(funname, hash.fun, str_len, hash.info);
-		char md5[md5_len];
-
-		if ( ! hash.processed ) {
-			HMODULE lib = LoadLibraryA(libname);
-			auto info = GetProcedureInfo(lib, funname);
+		if ( true /*TODO: ! hash.processed*/ ) {
+			HMODULE lib = LoadLibraryA(req.lib);
+			auto info = GetProcedureInfo(lib, req.fun);
 			if ( info.addr == NULL ) {
 				dbugLog(_FLW, "Failed to generate seed data for FrameHash function.");
 			} else {
-				Md5Hash(md5, (const char*)info.addr, info.len);
+				Md5Hash(req.md5, (const char*)info.addr, info.len);
 			}
 			FreeLibrary(lib);
-		} else {
-			// Don't overwrite values until we've reported the old ones to the host.
-			Decrypt(md5, hash.md5, md5_len, hash.info);
 		}
 
 		// Even if we haven't pulled new data, reencrypt with new info every update
 		// so it always looks like we're doing something.
-		hash.info = GenerateNewEncryptInfo();
-		Encrypt(hash.lib, libname, str_len, hash.info);
-		Encrypt(hash.fun, funname, str_len, hash.info);
-		Encrypt(hash.md5, md5, md5_len, hash.info);
-		hash.processed = true;
-#else
-		// This is Windows only for now.
-		hash.processed = true;
+		req.key = GenerateNewEncryptKey();
+		Encrypt(req);
+		hash = data;
+
+		// TODO
+		//hash.processed = true;
 #endif
 	}
 //} // TEMP:TESTING
@@ -163,7 +143,7 @@ namespace {
 
 namespace {
 	static const size_t num_hashes = 24;
-	FrameHash hashes[num_hashes] = {};
+	FrameHashData hashes[num_hashes] = {};
 
 	// Send/recv/update are separate to make our messages less predictable: Updates occur
 	size_t update_idx = 0; // Increments every X frames
@@ -176,6 +156,7 @@ void InitializeHashes(const char* data) {
 	// TESTING
 	return;
 
+#if 0
 	static const auto str_len = FrameHash::str_len;
 	for ( size_t i = 0 ; i < num_hashes ; ++i ) {
 		memcpy(hashes[i].lib, data, str_len); data += str_len;
@@ -184,6 +165,7 @@ void InitializeHashes(const char* data) {
 
 	for ( FrameHash& hash : hashes )
 		Process(hash);
+#endif
 }
 
 
@@ -194,9 +176,10 @@ void UpdateNextHash(void) {
 
 
 void DumpHashes(ACTION_OBJECT* a) {
-	for ( FrameHash& hash : hashes ) {
-		if ( ! hash.processed )
-			Process(hash);
+	for ( FrameHashData& hash : hashes ) {
+		// TODO
+		//if ( ! hash.processed )
+		//	Process(hash);
 		hash.packer(TEUL_PACK, a);
 	}
 }
@@ -205,8 +188,9 @@ void DumpHashes(ACTION_OBJECT* a) {
 void SendHash(ACTION_OBJECT* a) {
 	if ( send_idx == recv_idx ) // Can't send a reply to a message we haven't received
 		return;
-	if ( ! hashes[send_idx].processed )
-		return;
+	// TODO
+	//if ( ! hashes[send_idx].processed )
+	//	return;
 
 	hashes[send_idx++].packer(TEUL_PACK, a);
 	if ( send_idx >= num_hashes ) send_idx = 0;

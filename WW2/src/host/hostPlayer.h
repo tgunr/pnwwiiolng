@@ -61,7 +61,7 @@ public:
 	TeulTimeMS				m_lastTimeRxed;			// Host timestamp for the rx'ed value.
 
 	HostVehicle*			vehicle;
-	class AntiHack*			m_antiHack;
+	class SpeedhackCheck* m_antiHack;
 
 	PERSONA_STATE			state;					// enum of condition at this moment
 	UINT32 					stationID;
