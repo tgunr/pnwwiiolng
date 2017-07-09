@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <string>
 
+// IMPORTANT: Keep these in sync with authRelay.php!
 enum class SteamLoginResponse : uint32_t {
     LoginSuccess = 0,
     LoginNotValidUser = 1,

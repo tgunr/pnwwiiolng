@@ -26,6 +26,17 @@ if (!isset($_SERVER['PN_INSTALL_PATH'])) {
 }
 
 ////////////////////////////////////////
+// Steam response code values
+// IMPORTANT: Keep these in sync with authSteam.h!
+define('LoginSuccess', 0);
+define('LoginNotValidUser', 1);
+define('LoginCallsignRequired', 2);
+define('LoginCallsignInvalid', 3);
+define('LoginCallsignDisallowed', 4);
+define('LoginCallsignInUse', 5);
+define('LoginUnknownError', 6);
+
+////////////////////////////////////////
 // Logging
 class dbug {
     private $fh = null;
@@ -64,7 +75,7 @@ class dbug {
         
         $this->log($line, 'A', $message, ...$args);
         http_response_code($status);
-        print json_encode(['result' => 3, 'context_id' => $context_id, 'error' => $output]);
+        print json_encode(['result' => LoginUnknownError, 'context_id' => $context_id, 'error' => $output]);
         exit(0);
     }
 }
@@ -163,7 +174,11 @@ $arena_id = filter_var($data->arena_id, FILTER_VALIDATE_INT);
 $app_version = filter_var($data->app_version, FILTER_VALIDATE_INT);
 $app_platform = filter_var($data->app_platform, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 2]]);
 if (isset($data->callsign)) {
-    $callsign = filter_var($data->callsign, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => '/^[a-z][a-z0-9]{1,9}$/']]);
+    // We are choosing not to filter the callsign at this time so that billing can provide
+    // full validation. Shortcutting the call to billing by detecting a bad callsign here
+    // would prevent proper detection of the incorrect "callsign provided for account
+    // which already has one" scenario, which could result in degraded user experience.
+    $callsign = strval($data->callsign); //filter_var($data->callsign, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => '/^[a-z][a-z0-9]{1,9}$/']]);
 }
 
 if (!is_string($steam_ticket)) {
@@ -222,12 +237,19 @@ if ($billing_response['_success'] === 0) {
     }
     // We recognize only a few specific errors
     if ($billing_response['_message'] === 'steam.login.callsign_needed') {
-        header('Content-Type: application/json');
-        print json_encode(['result' => 2]);
+        print json_encode(['result' => LoginCallsignRequired]);
+        exit(0);
+    } else if ($billing_response['_message'] === 'validate.invalid.wwiionline') {
+        print json_encode(['result' => LoginCallsignInvalid]);
+        exit(0);
+    } else if ($billing_response['_message'] === 'validate.invalid.wwiionline.bad') {
+        print json_encode(['result' => LoginCallsignDisallowed]);
+        exit(0);
+    } else if ($billing_response['_message'] === 'validate.invalid.wwiionline.taken') {
+        print json_encode(['result' => LoginCallsignInUse]);
         exit(0);
     } else if (in_array($billing_response['_message'], ['steam.login.invalid', 'steam.login.banned'])) {
-        header('Content-Type: application/json');
-        print json_encode(['result' => 1]);
+        print json_encode(['result' => LoginNotValidUser]);
         exit(0);
     } else {
         internal_error(__LINE__, "Billing returned unrecognized failure response: req:%s res:%s", $billing_request, var_export($billing_response, true));
@@ -290,7 +312,7 @@ if (!isset($auth_response->serverPort)) {
 ////////////////////////////////////////
 // Final reply
 print json_encode([
-    'result' => 0,
+    'result' => LoginSuccess,
     'arenaID' => $arena_id,
     'otp' => strval($auth_response->otp),
     'serverIP' => strval($auth_response->serverIP),
