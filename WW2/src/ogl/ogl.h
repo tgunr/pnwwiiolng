@@ -1,7 +1,7 @@
 #pragma once
 
 	#include "pi/pi.h"
-	#include "gl/glew.h"
+	#include "GL/glew.h"
 	#include "gl/glplat.h"
 #include "ogl/ogldefs.h"
 #include "math/Matrixf.h"
