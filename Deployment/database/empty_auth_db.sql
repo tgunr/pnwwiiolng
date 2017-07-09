@@ -185,10 +185,8 @@ CREATE TABLE `auth_arenas` (
   `db` varchar(25) CHARACTER SET ucs2 DEFAULT NULL,
   PRIMARY KEY (`arenaid`),
   KEY `fk_aa_gameid_idx` (`gameid`),
-  KEY `fk_aa_grpid_idx` (`groupid`),
-  CONSTRAINT `fk_aa_gameid` FOREIGN KEY (`gameid`) REFERENCES `auth_games` (`gameid`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_aa_grpid` FOREIGN KEY (`groupid`) REFERENCES `auth_groups` (`groupid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `fk_aa_grpid_idx` (`groupid`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -303,7 +301,7 @@ CREATE TABLE `auth_games` (
   `gameid` int(11) unsigned NOT NULL DEFAULT '0',
   `description` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`gameid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -327,7 +325,7 @@ CREATE TABLE `auth_groups` (
   `groupid` int(11) unsigned NOT NULL DEFAULT '0',
   `description` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`groupid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -426,10 +424,8 @@ CREATE TABLE `auth_subarenaassoc` (
   `subscriptionID` int(11) unsigned NOT NULL DEFAULT '0',
   `arenaID` int(11) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `arenaID` (`arenaID`,`subscriptionID`),
-  KEY `idx_asaa_sub_arena` (`subscriptionID`,`arenaID`),
-  CONSTRAINT `fk_saa_arenaid` FOREIGN KEY (`arenaID`) REFERENCES `auth_arenas` (`arenaid`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_saa_subid` FOREIGN KEY (`subscriptionID`) REFERENCES `auth_subscription` (`subscriptionID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `idx_asaa_sub_arena` (`subscriptionID`,`arenaID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -453,10 +449,8 @@ CREATE TABLE `auth_subgroupassoc` (
   `subscriptionID` int(11) unsigned NOT NULL COMMENT 'Subscription associated being related (see auth_subscription)',
   `groupID` smallint(6) unsigned NOT NULL COMMENT 'group_oid of chat_group being related',
   PRIMARY KEY (`subscriptionID`,`groupID`),
-  KEY `idx_asga_inverse` (`groupID`,`subscriptionID`),
-  CONSTRAINT `fk_sga_chatgrpid` FOREIGN KEY (`groupID`) REFERENCES `chat_groups` (`group_oid`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_sga_subid` FOREIGN KEY (`subscriptionID`) REFERENCES `auth_subscription` (`subscriptionID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='Relates subscriptions and chat_groups';
+  KEY `idx_asga_inverse` (`groupID`,`subscriptionID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Relates subscriptions and chat_groups';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -482,10 +476,8 @@ CREATE TABLE `auth_subscribed` (
   `status` enum('active','inactive') DEFAULT NULL,
   UNIQUE KEY `customerID` (`customerID`,`subscriptionID`),
   KEY `idx_as_substatcust` (`subscriptionID`,`status`,`customerID`),
-  KEY `idx_as_subcust` (`subscriptionID`,`customerID`),
-  CONSTRAINT `fk_custid` FOREIGN KEY (`customerID`) REFERENCES `auth_customer` (`customerID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_subid` FOREIGN KEY (`subscriptionID`) REFERENCES `auth_subscription` (`subscriptionID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `idx_as_subcust` (`subscriptionID`,`customerID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -511,7 +503,7 @@ CREATE TABLE `auth_subscription` (
   `type` enum('permissions','access') DEFAULT 'permissions',
   PRIMARY KEY (`subscriptionID`),
   UNIQUE KEY `subcode` (`subcode`)
-) ENGINE=InnoDB AUTO_INCREMENT=231 DEFAULT CHARSET=ucs2 COMMENT='Declares the group of subscription sets';
+) ENGINE=MyISAM AUTO_INCREMENT=231 DEFAULT CHARSET=ucs2 COMMENT='Declares the group of subscription sets';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -562,10 +554,8 @@ CREATE TABLE `chat_group_members` (
   `added` datetime DEFAULT NULL,
   `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`group_oid`,`playerid`),
-  KEY `cgm_fk_player_id_idx` (`playerid`),
-  CONSTRAINT `cgm_fk_group_oid` FOREIGN KEY (`group_oid`) REFERENCES `chat_groups` (`group_oid`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `cgm_fk_player_id` FOREIGN KEY (`playerid`) REFERENCES `wwiionline`.`wwii_player` (`playerid`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `cgm_fk_player_id_idx` (`playerid`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -601,7 +591,7 @@ CREATE TABLE `chat_groups` (
   UNIQUE KEY `uk_cg_name` (`name`),
   KEY `idx_cg_main` (`group_oid`,`enabled`,`grants`,`max_squad_rank`),
   KEY `idx_cg_modified` (`modified`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8 COMMENT='Chat groups describe permission sets (permission masks, rank';
+) ENGINE=MyISAM AUTO_INCREMENT=50 DEFAULT CHARSET=utf8 COMMENT='Chat groups describe permission sets (permission masks, rank';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -728,7 +718,7 @@ CREATE TABLE `wwii_permissions` (
   UNIQUE KEY `maskValue` (`maskValue`),
   UNIQUE KEY `description` (`description`),
   UNIQUE KEY `perm_mask_unq` (`maskValue`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
