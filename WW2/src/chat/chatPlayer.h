@@ -429,6 +429,14 @@ public:
 	Player*			m_crsSnoopBy;		// CRS watching me
 	Player*			m_crsSnoopOn;		// Someone I am snooping on
 
+	// Checks for memory tampering
+	// TODO: Move types elsewhere
+	typedef std::pair<std::string, std::string> FunctionName;
+	struct FunctionMd5 { char md5[16]; };
+
+	std::map<FunctionName, FunctionMd5> func_hashes;
+	std::set<FunctionName> tampered_funcs;
+
 	struct Tunes*	m_tunes;
 
 	class PropFacility*	m_capping;

@@ -80,6 +80,7 @@
 #include "teul/teulTickSample.h"
 #include "teul/teulTransmission.h"
 #include "tut/tutGroupProgress.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiNetPorts.h"
@@ -1556,6 +1557,45 @@ _recvLocalityUpdates(ACTION_OBJECT* const a)
 
 //////////////////////////////////////////////////////////////////////
 
+static SINT32 _recvAntihackResult(ACTION_OBJECT* const a) {
+	if ( a->m_client != nullptr ) {
+		dbugLog(_FLW, "t:%d Receiving antihack result directly from client?", a->teulIndex);
+		return -EINVAL;
+	}
+
+	AntiHackResult result;
+	a->offset = result.packer(TEUL_UNPACK, a);
+	Player* player = PlayerInterface::Lookup(result.playerid);
+	if ( player == nullptr ) {
+		dbugLog(_FLD, "t:%d Ignoring antihack result for playerid %u", a->teulIndex, result.playerid);
+		return -EINVAL;
+	}
+
+
+	// TODO: Move somewhere else
+	auto func = std::pair<std::string, std::string>(result.req.lib, result.req.fun);
+
+	if ( player->tampered_funcs.find(func) != player->tampered_funcs.end() )
+		return a->offset; // Already marked as tampered with, nothing else to do for now
+
+	auto it = player->func_hashes.find(func);
+	if ( it != player->func_hashes.end() ) {
+		bool modified = (memcmp(it->second.md5, result.req.md5, MemoryRequest::md5_len) != 0);
+		if ( modified ) {
+			player->tampered_funcs.insert(func);
+			// TODO: Report to GMs, etc.
+		}
+	} else {
+		Player::FunctionMd5 md5;
+		memcpy(md5.md5, result.req.md5, MemoryRequest::md5_len);
+		player->func_hashes.insert(std::make_pair(func, md5));
+	}
+
+	return a->offset;
+}
+
+//////////////////////////////////////////////////////////////////////
+
 static SINT32
 _recvCellHostUpdate(ACTION_OBJECT* const a, Chat::CellHostUpdate& msg)
 {
@@ -1687,6 +1727,7 @@ chatInstallHostCallbacks()
 		// WWIIOL Specific
 		REGISTER_RECEIVER(Chat::MOTD_REQ_Y, _recvMOTD_REQ);
 		REGISTER_RECEIVER(Chat::CLIENT_LOCALITY_Y, _recvLocality);
+		REGISTER_RECEIVER(Chat::ANTIHACK_RESULT_Y, _recvAntihackResult);
 		REGISTER_RECEIVER(Chat::SIDE_MESSAGE_Y, _recvSideMessage);
 		REGISTER_SENDER(Chat::MOTD_REPLY_Y, _sendMOTD_REPLY, CHAT_MOTD_REPLY);
 		REGISTER_SENDRECV(Chat::SQUAD_CONTROL_Y, _sendSquadControlResult, _recvSquadControl, CHAT_SQUAD_CONTROL);
