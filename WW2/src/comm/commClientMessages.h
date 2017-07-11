@@ -76,7 +76,7 @@ SINT32 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination,	PLAY
 SINT32 commSendVehicleJoin(SINT32 teulIndex, VEHICLE_REQUEST* lvr);
 
 // Function that unpacks and processes an incoming world update
-SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32 offset, const SINT32 size_bytes);
+SINT32 commRecvWorldUpdateData(ACTION_OBJECT* a);
 
 // Notify the host that a vehicle has caused us to die
 void commSendKillNotice(SINT32 hostIndex, UINT32 myVehicleID, UINT32 hostVehicleID);

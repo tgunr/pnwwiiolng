@@ -2109,7 +2109,7 @@ _sendNextUpdate(HostVehicle* const vehicle)
 //		TIMER_REPORT(50)
 		return true;
 	}
-
+	
 	const size_t pingOffset = wu.packet->payloadSizeBytes();
 	wu.packet->append(teulClock64);
 #if defined(ENABLE_CELL_EVENTS)
@@ -2119,6 +2119,14 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		maxCounter = (UINT64)payloadSizeBytes;
 	}
 #endif
+
+	// TODO
+	if ( false ) {
+		MemoryRequest memreq; // = GetNextRequest(player)
+		wu.packet->append(memreq);
+	}
+
+	//--------------
 
 	// Track how many packets behind the connections are
 	UINT32 updatesBehind = 0;

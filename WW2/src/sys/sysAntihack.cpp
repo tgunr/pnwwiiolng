@@ -93,6 +93,14 @@ namespace {
 
 // The encrypt/decrypt and hash generation code.
 namespace {
+	enum HashState { HASH_RECV, HASH_PROC, HASH_SENT };
+	struct StoredHashData {
+		FrameHashData hash;
+		HashState state;
+	};
+
+	//--------------
+
 	uint32_t GenerateNewEncryptKey(void) {
 		// TODO
 		return 0;
@@ -107,15 +115,14 @@ namespace {
 
 	//--------------
 
-} // TEMP/TESTING: Public for dot command.
-	void Process(FrameHashData& hash) {
+	void Process(StoredHashData& data) {
 #if platOS == OS_WIN32
-		// Copied to avoid putting anything unencrypted in global memory, even for a moment.
-		FrameHashData data = hash;
-		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(data);
-		Decrypt(req);
+		// Copied to avoid ever having anything unobfuscated in global memory
+		FrameHashData hash = data.hash;
+		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
+		Decode(req);
 
-		if ( true /*TODO: ! hash.processed*/ ) {
+		if ( data.state == HASH_RECV ) {
 			HMODULE lib = LoadLibraryA(req.lib);
 			auto info = GetProcedureInfo(lib, req.fun);
 			if ( info.addr == NULL ) {
@@ -124,28 +131,34 @@ namespace {
 				Md5Hash(req.md5, (const char*)info.addr, info.len);
 			}
 			FreeLibrary(lib);
+
+			data.state = HASH_PROC;
 		}
 
-		// Even if we haven't pulled new data, reencrypt with new info every update
+		// Even if we haven't pulled new data, reobfuscate every update
 		// so it always looks like we're doing something.
 		req.key = GenerateNewEncryptKey();
-		Encrypt(req);
-		hash = data;
-
-		// TODO
-		//hash.processed = true;
+		Encode(req);
+		data.hash = hash;
+#else
+		// Currently nothing for non-Windows
+		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
+		if ( data.state == HASH_RECV ) {
+			memset(req.md5, (unsigned char)req.key, MemoryRequest::md5_len);
+			data.state = HASH_PROC;
+		}
 #endif
 	}
-//} // TEMP:TESTING
+}
 
 //------------------------------------------------------------------------------
 // Message & update-related code
 
 namespace {
 	static const size_t num_hashes = 24;
-	FrameHashData hashes[num_hashes] = {};
+	StoredHashData hashes[num_hashes] = {};
 
-	// Send/recv/update are separate to make our messages less predictable: Updates occur
+	// Send/recv/update are separate to make our messages less predictable
 	size_t update_idx = 0; // Increments every X frames
 	size_t send_idx = 0;  // Increments every time we send, cannot pass recv
 	size_t recv_idx = 0;  // Increments every time we receive, cannot enter send
@@ -153,10 +166,7 @@ namespace {
 
 
 void InitializeHashes(const char* data) {
-	// TESTING
-	return;
-
-#if 0
+#if 0 // TODO
 	static const auto str_len = FrameHash::str_len;
 	for ( size_t i = 0 ; i < num_hashes ; ++i ) {
 		memcpy(hashes[i].lib, data, str_len); data += str_len;
@@ -176,36 +186,41 @@ void UpdateNextHash(void) {
 
 
 void DumpHashes(ACTION_OBJECT* a) {
-	for ( FrameHashData& hash : hashes ) {
-		// TODO
-		//if ( ! hash.processed )
-		//	Process(hash);
-		hash.packer(TEUL_PACK, a);
+	for ( auto& data : hashes ) {
+		if ( data.state == HASH_RECV )
+			Process(data);
+		if ( data.state == HASH_PROC )
+			data.hash.packer(TEUL_PACK, a);
 	}
 }
 
 
 void SendHash(ACTION_OBJECT* a) {
-	if ( send_idx == recv_idx ) // Can't send a reply to a message we haven't received
+	if ( hashes[send_idx].state != HASH_PROC )
 		return;
-	// TODO
-	//if ( ! hashes[send_idx].processed )
-	//	return;
 
-	hashes[send_idx++].packer(TEUL_PACK, a);
+	hashes[send_idx].hash.packer(TEUL_PACK, a);
+	hashes[send_idx++].state = HASH_SENT;
 	if ( send_idx >= num_hashes ) send_idx = 0;
 }
 
 
 void RecvHash(ACTION_OBJECT* a) {
-	auto next_idx = recv_idx;
+	FrameHashData hash(a);
+	RecvHash(hash);
+}
+
+
+void RecvHash(const FrameHashData& hash) {
+	auto next_idx = recv_idx+1;
 	if ( next_idx >= num_hashes ) next_idx = 0;
 	if ( next_idx == send_idx ) {
 		dbugLog(_FLW, "The host has requested too many frame hashes without giving us time to respond. This can lead to serious sync issues.");
 		return;
 	}
 
-	hashes[recv_idx].packer(TEUL_UNPACK, a);
+	hashes[recv_idx].hash = hash;
+	hashes[recv_idx].state = HASH_RECV;
 	recv_idx = next_idx;
 }
 

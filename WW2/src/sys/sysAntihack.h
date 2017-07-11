@@ -9,13 +9,11 @@ namespace NetFrameSync {
 
 	void DumpHashes(ACTION_OBJECT*); // TODO: Dump stored hashes when we first connect
 	// NOTE: This may not actually send anything; we only send after the hash has been processed.
-	void SendHash(ACTION_OBJECT*); // TODO: 
+	void SendHash(ACTION_OBJECT*);
+
 	void RecvHash(ACTION_OBJECT*);
+	void RecvHash(const FrameHashData&);
 
 	// Update every X frames
 	static const UINT64 tick_check_time = 500;
-
-
-	// TEMP/TESTING: Exposing for dot command.
-	void Process(FrameHashData&);
 }

@@ -2,6 +2,11 @@
 
 
 struct FrameHashData {
+	FrameHashData(void) {}
+	FrameHashData(ACTION_OBJECT* a) {
+		a->offset = packer(TEUL_UNPACK, a);
+	}
+
 	SINT32 packer(PackMode mode, ACTION_OBJECT* a) {
 		a->packer(mode, data, sizeof(data)*8);
 		return a->offset;
@@ -26,19 +31,5 @@ struct MemoryRequest {
 static_assert ( sizeof(FrameHashData) == sizeof(MemoryRequest) ,
                 "Helper struct's size needs to match the obfuscating type's size" );
 
-inline void Encrypt(MemoryRequest&) {} // TODO
-inline void Decrypt(MemoryRequest&) {} // TODO
-
-//------------------------------------------------------------------------------
-
-struct AntiHackResult {
-	UINT32 playerid;
-	// TODO: Currently just passing the decoded request around
-	MemoryRequest req;
-
-	SINT32 packer(PackMode mode, ACTION_OBJECT* a) {
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, &playerid, 32);
-		a->packer(mode, &req, sizeof(req) * 8); // TODO: Be cleaner about this
-		return a->offset;
-	}
-};
+inline void Encode(MemoryRequest&) {} // TODO
+inline void Decode(MemoryRequest&) {} // TODO
