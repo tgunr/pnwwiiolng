@@ -31,5 +31,6 @@ struct MemoryRequest {
 static_assert ( sizeof(FrameHashData) == sizeof(MemoryRequest) ,
                 "Helper struct's size needs to match the obfuscating type's size" );
 
+// NOTE: Encode/decode don't touch the request's key.
 inline void Encode(MemoryRequest&) {} // TODO
 inline void Decode(MemoryRequest&) {} // TODO

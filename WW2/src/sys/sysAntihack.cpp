@@ -101,11 +101,6 @@ namespace {
 
 	//--------------
 
-	uint32_t GenerateNewEncryptKey(void) {
-		// TODO
-		return 0;
-	}
-
 	void Md5Hash(char md5[16], const char* c, size_t len) {
 		MD5_CTX ctx;
 		MD5Init(&ctx);
@@ -137,7 +132,7 @@ namespace {
 
 		// Even if we haven't pulled new data, reobfuscate every update
 		// so it always looks like we're doing something.
-		req.key = GenerateNewEncryptKey();
+		req.key = random();
 		Encode(req);
 		data.hash = hash;
 #else

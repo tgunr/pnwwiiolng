@@ -83,6 +83,7 @@
 #include "updt/updtPackers.h"
 #include "weap/weapList.h"
 #include "wwii/wwiiActivate.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHash.h"
 #include "wwii/wwiiHCUnits.h"
@@ -102,6 +103,33 @@ extern std::map<ChatHandle, HostVehicle*> g_vehicleLookup;
 namespace Host
 {
 	Stats totalStats, currentStats;
+}
+
+// TEMP/HACK: Hardcoded libs to occasionally send memory requests for
+namespace {
+	const std::pair<std::string, std::string> memhash_reqs[] = {
+		// ESP hack
+		{"opengl32.dll", "glBegin"},
+		{"opengl32.dll", "glEnd"},
+		{"opengl32.dll", "glDepthFunc"},
+		{"opengl32.dll", "glDrawElements"},
+		{"opengl32.dll", "glBindTexture"},
+		{"opengl32.dll", "glGenTextures"},
+		{"opengl32.dll", "glEnable"},
+		{"opengl32.dll", "glDisable"},
+		{"opengl32.dll", "glColor4f"},
+		{"opengl32.dll", "glDepthRange"},
+		{"opengl32.dll", "glGetFloatv"},
+		{"opengl32.dll", "glGetIntegerv"},
+		{"opengl32.dll", "glDrawArrays"},
+		{"opengl32.dll", "glDrawBuffer"},
+		{"opengl32.dll", "glArrayElement"},
+		{"opengl32.dll", "glVertexPointer"},
+		{"opengl32.dll", "glHint"},
+		{"opengl32.dll", "glVertex3f"},
+		// CheatEngine Speedhack
+		{"kernel32.dll", "GetTickCount64"},
+	};
 }
 
 #ifdef DEBUG_UPDATES
@@ -1996,6 +2024,31 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 {
 	_calculatePingTime(packet, player, pingOffset);
 
+	// HACK: Potentially add a memory request to the packet
+	if ( player->m_nextMemReq <= teulClock64 ) {
+		size_t i = (random() % array_size(memhash_reqs));
+		const auto& which = memhash_reqs[i];
+		if ( which.first.length() >= MemoryRequest::str_len || which.second.length() >= MemoryRequest::str_len ) {
+			static bool logged = false;
+			if ( ! logged )
+				dbugLog(_FLA, "[%s : %s] string has more than %d characters and cannot be requested! This message will only appear once, so review all other values as well.",
+				        which.first.c_str(), which.second.c_str(), MemoryRequest::str_len);
+			logged = true;
+		} else {
+			MemoryRequest req;
+			strncpy(req.lib, which.first.c_str(), array_size(req.lib));
+			strncpy(req.fun, which.second.c_str(), array_size(req.fun));
+			req.key = random();
+			Encode(req);
+			packet.append(req);
+
+			// TODO: Move constants elsewhere, maybe make configurable
+			const TeulTimeMS min_wait = 250;
+			const TeulTimeMS max_wait = 1500;
+			player->m_nextMemReq = teulClock64 + min_wait + (random() % (max_wait - min_wait));
+		}
+	}
+
 	// If the player has netcode enhancements enabled, specify a UDP protocol preference
 	// once this netcode version (netcode3) is made permanent, the netcode flag will be used for the next version
 	// and this check will go away.
@@ -2119,12 +2172,6 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		maxCounter = (UINT64)payloadSizeBytes;
 	}
 #endif
-
-	// TODO
-	if ( false ) {
-		MemoryRequest memreq; // = GetNextRequest(player)
-		wu.packet->append(memreq);
-	}
 
 	//--------------
 
