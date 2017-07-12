@@ -74,7 +74,9 @@ static SINT32 _sendVehicleJoinRequest( ACTION_OBJECT* const a )
 static SINT32 _sendPeriodicUpdate( ACTION_OBJECT* const a )
 {
 	COMM_UPDATE_BUFFER* const cub = (COMM_UPDATE_BUFFER*)(a->localRawData);
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, cub->data, cub->size);
+	teulPackVoid(TEUL_PACK, a->packed, a->offset, cub->data, cub->size);
+	NetFrameSync::SendHash(a);
+	return a->offset;
 }
 
 static SINT32 _sendStratDamage( ACTION_OBJECT* const a )

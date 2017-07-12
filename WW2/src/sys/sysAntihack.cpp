@@ -194,7 +194,7 @@ void SendHash(ACTION_OBJECT* a) {
 	if ( hashes[send_idx].state != HASH_PROC )
 		return;
 
-	hashes[send_idx].hash.packer(TEUL_PACK, a);
+	a->offset = hashes[send_idx].hash.packer(TEUL_PACK, a);
 	hashes[send_idx++].state = HASH_SENT;
 	if ( send_idx >= num_hashes ) send_idx = 0;
 }
