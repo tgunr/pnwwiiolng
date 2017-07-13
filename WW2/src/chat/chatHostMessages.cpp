@@ -1565,32 +1565,7 @@ static SINT32 _recvMemoryRequestResult(ACTION_OBJECT* const a) {
 
 	auto playerid = a->read<playerid_t>();
 	auto& req = a->read<MemoryRequest>();
-
-	Player* player = PlayerInterface::Lookup(playerid);
-	if ( player == nullptr ) {
-		dbugLog(_FLD, "t:%d Ignoring antihack result for unknown playerid %u", a->teulIndex, playerid);
-		return -EINVAL;
-	}
-
-
-	// TODO: Move somewhere else
-	auto func = std::pair<std::string, std::string>(req.lib, req.fun);
-
-	if ( player->tampered_funcs.find(func) != player->tampered_funcs.end() )
-		return a->offset; // Already marked as tampered with, nothing else to do for now
-
-	auto it = player->func_hashes.find(func);
-	if ( it != player->func_hashes.end() ) {
-		bool modified = (memcmp(it->second.md5, req.md5, MemoryRequest::md5_len) != 0);
-		if ( modified ) {
-			player->tampered_funcs.insert(func);
-			// TODO: Report to GMs, etc.
-		}
-	} else {
-		Player::FunctionMd5 md5;
-		memcpy(md5.md5, req.md5, MemoryRequest::md5_len);
-		player->func_hashes.insert(std::make_pair(func, md5));
-	}
+	Chat::SendMemoryRequestResult(playerid, req);
 
 	return a->offset;
 }

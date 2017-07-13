@@ -15,5 +15,5 @@ namespace NetFrameSync {
 	void RecvHash(const FrameHashData&);
 
 	// Update every X frames
-	static const UINT64 tick_check_time = 500;
+	static const UINT64 tick_check_time = 200;
 }

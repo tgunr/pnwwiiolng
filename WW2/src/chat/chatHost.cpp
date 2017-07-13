@@ -85,6 +85,7 @@
 #include "teul/teulPacket.h"
 #include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBConfig.h"
 #include "wwii/wwiiHCUnits.h"
@@ -736,6 +737,48 @@ Chat::SendModReport(const ChatHandle handle, const Chat::ModReport modType)
 #if defined(KICK_BANS)
 		_delayedBan(handle, days);
 #endif
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void Chat::SendMemoryRequestResult(const playerid_t playerid, const MemoryRequest& req) {
+	Player* player = PlayerInterface::Lookup(playerid);
+	if ( player == nullptr ) {
+		dbugLog(_FLD, "Ignoring memory request result for unknown playerid %u", playerid);
+		return;
+	}
+
+	if ( req.lib[MemoryRequest::str_len-1] != '\0' || req.lib[MemoryRequest::str_len-1] != '\0' ) {
+		dbugLog(_FLN, "?HACK Memory request returned from %s, but lib/fun names aren't null terminated.");
+		return;
+	}
+
+	auto func = std::pair<std::string, std::string>(req.lib, req.fun);
+	if ( player->tampered_funcs.find(func) != player->tampered_funcs.end() )
+		return; // Already marked as tampered with, nothing else to do for now
+
+	auto it = player->func_hashes.find(func);
+	if ( it != player->func_hashes.end() ) {
+		bool modified = (memcmp(it->second.md5, req.md5, MemoryRequest::md5_len) != 0);
+		if ( modified ) {
+			player->tampered_funcs.insert(func);
+
+			// TODO: Use ModReport above?
+			dbugLog(_FLN, "!HACK:%s: [%s / %s]", player->callsign(), req.lib, req.fun);
+			PREP_CHAT_MSG(gmmsg, "%s potential code tampering detected", player->callsign());
+			chatDispatchGMMessage("HOST", gmmsg);
+
+			PREP_CHAT_MSG(crsmsg, "%s code tampering detected [%s : [%s]", player->callsign(), req.lib, req.fun);
+			chatDispatchCRSMessage("HOST", crsmsg);
+
+			// TODO: Put these in their own table
+			chatdbRecordEvent("HACK", player->callsign(), "code tampering", req.lib, req.fun);
+		}
+	} else {
+		Player::FunctionMd5 md5;
+		memcpy(md5.md5, req.md5, MemoryRequest::md5_len);
+		player->func_hashes.insert(std::make_pair(func, md5));
 	}
 }
 
