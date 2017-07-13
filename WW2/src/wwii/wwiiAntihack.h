@@ -31,6 +31,46 @@ struct MemoryRequest {
 static_assert ( sizeof(FrameHashData) == sizeof(MemoryRequest) ,
                 "Helper struct's size needs to match the obfuscating type's size" );
 
-// NOTE: Encode/decode don't touch the request's key.
-inline void Encode(MemoryRequest&) {} // TODO
-inline void Decode(MemoryRequest&) {} // TODO
+
+// TODO: Implement something better when we have more than 10 minutes to spare
+inline void Encode(MemoryRequest& req) {
+	char* beg = reinterpret_cast<char*>(&req);
+	const size_t req_size = sizeof(MemoryRequest) - sizeof(uint32_t); // Ignores key
+	auto Get = [beg, req_size] (int i) -> char& {
+		while ( i < 0 ) i += (int)req_size;
+		while ( i > (int)req_size ) i -= (int)req_size;
+		return *(beg + i);
+	};
+	
+	for ( int i = 0 ; i < req_size ; i += req.key ) {
+		if ( req.key == 0 ) break;
+		std::swap(Get(i), Get(i+req.key));
+	}
+
+	for ( int i = 0 ; i < req_size ; ++i ) {
+		Get(i) += 0xff + i * req.key + i;
+	}
+
+	req.key += 0xff;
+}
+
+inline void Decode(MemoryRequest& req) {
+	char* beg = reinterpret_cast<char*>(&req);
+	const size_t req_size = sizeof(MemoryRequest) - sizeof(uint32_t); // Ignores key
+	auto Get = [beg, req_size] (int i) -> char& {
+		while ( i < 0 ) i += (int)req_size;
+		while ( i > (int)req_size ) i -= (int)req_size;
+		return *(beg + i);
+	};
+
+	req.key -= 0xff;
+
+	for ( int i = 0 ; i < req_size ; ++i ) {
+		Get(i) -= 0xff + i * req.key + i;
+	}
+
+	for ( int i = 0 ; i < req_size ; i += req.key ) {
+		if ( req.key == 0 ) break;
+		std::swap(Get(i), Get(i+req.key));
+	}
+}

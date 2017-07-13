@@ -4,7 +4,7 @@ struct FrameHashData;
 
 // NOTE: Is actually antihack stuff
 namespace NetFrameSync {
-	void InitializeHashes(const char* seed);
+	void InitializeHashes(void);
 	void UpdateNextHash(void);
 
 	void DumpHashes(ACTION_OBJECT*); // TODO: Dump stored hashes when we first connect

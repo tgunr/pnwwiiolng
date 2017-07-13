@@ -1,6 +1,8 @@
 #include "syscfg.h"
 #include "sysAntihack.h"
 
+#include <fio/fio.h>
+#include <mem/mem.h>
 #include <pa/md5.h>
 #include <wwii/wwiiAntihack.h>
 
@@ -160,17 +162,25 @@ namespace {
 }
 
 
-void InitializeHashes(const char* data) {
-#if 0 // TODO
-	static const auto str_len = FrameHash::str_len;
-	for ( size_t i = 0 ; i < num_hashes ; ++i ) {
-		memcpy(hashes[i].lib, data, str_len); data += str_len;
-		memcpy(hashes[i].fun, data, str_len); data += str_len;
+void InitializeHashes(void) {
+	char* data = nullptr;
+	unsigned int size = 0;
+	if ( ! fioLoad("framehash_seed.bin", data, &size) ) {
+		dbugLog(_FLA, "Failed to load seed data for frame hashes! This could lead to serious sync issues.");
+		return;
 	}
 
-	for ( FrameHash& hash : hashes )
-		Process(hash);
-#endif
+	// HACK: Dumped StoredHashData for a bunch of functions and saved it in a file.
+	for ( size_t i = 0 ; i < array_size(hashes) && i < size / sizeof(StoredHashData) ; ++i ) {
+		memcpy(&hashes[i].hash, data + (i * sizeof(StoredHashData)), sizeof(StoredHashData));
+		hashes[i].state = HASH_RECV;
+	}
+
+	memFree(data);
+
+
+	for ( auto& hash : hashes )
+		Process(hash, true);
 }
 
 
