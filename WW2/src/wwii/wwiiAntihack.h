@@ -41,13 +41,8 @@ inline void Encode(MemoryRequest& req) {
 		while ( i > (int)req_size ) i -= (int)req_size;
 		return *(beg + i);
 	};
-	
-	for ( int i = 0 ; i < req_size ; i += req.key ) {
-		if ( req.key == 0 ) break;
-		std::swap(Get(i), Get(i+req.key));
-	}
 
-	for ( int i = 0 ; i < req_size ; ++i ) {
+	for ( int i = 0 ; i < (int)req_size ; ++i ) {
 		Get(i) += 0xff + i * req.key + i;
 	}
 
@@ -65,12 +60,7 @@ inline void Decode(MemoryRequest& req) {
 
 	req.key -= 0xff;
 
-	for ( int i = 0 ; i < req_size ; ++i ) {
+	for ( int i = 0 ; i < (int)req_size ; ++i ) {
 		Get(i) -= 0xff + i * req.key + i;
-	}
-
-	for ( int i = 0 ; i < req_size ; i += req.key ) {
-		if ( req.key == 0 ) break;
-		std::swap(Get(i), Get(i+req.key));
 	}
 }
