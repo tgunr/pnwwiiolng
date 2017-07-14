@@ -43,8 +43,9 @@ namespace {
 				break;
 			}
 		}
-		if ( func_idx == -1 )
+		if ( func_idx == -1 ) {
 			return info;
+		}
 
 		short* ordinals = (short*)(exports->AddressOfNameOrdinals + (LONG)lib);
 		ULONG* addresses = (ULONG*)(exports->AddressOfFunctions + (LONG)lib);
@@ -57,8 +58,9 @@ namespace {
 		for ( DWORD i = 0 ; i < exports->NumberOfFunctions ; ++i ) {
 			FARPROC addr = (FARPROC)(addresses[i] + (LONG)lib);
 			ptrdiff_t diff = (PBYTE)addr - (PBYTE)info.addr;
-			if ( diff > 0 )
+			if ( diff > 0 ) {
 				info.len = std::min(info.len, (size_t)diff);
+			}
 		}
 
 		if ( info.len == std::numeric_limits<decltype(info.len)>::max() ) {
@@ -179,8 +181,9 @@ void InitializeHashes(void) {
 	memFree(data);
 
 
-	for ( auto& hash : hashes )
+	for ( auto& hash : hashes ) {
 		Process(hash, true);
+	}
 }
 
 
@@ -192,17 +195,20 @@ void UpdateNextHash(void) {
 
 void DumpHashes(ACTION_OBJECT* a) {
 	for ( auto& data : hashes ) {
-		if ( data.state == HASH_RECV )
+		if ( data.state == HASH_RECV ) {
 			Process(data);
-		if ( data.state == HASH_PROC )
+		}
+		if ( data.state == HASH_PROC ) {
 			data.hash.packer(TEUL_PACK, a);
+		}
 	}
 }
 
 
 void SendHash(ACTION_OBJECT* a) {
-	if ( hashes[send_idx].state != HASH_PROC )
+	if ( hashes[send_idx].state != HASH_PROC ) {
 		return;
+	}
 
 	a->offset = hashes[send_idx].hash.packer(TEUL_PACK, a);
 	hashes[send_idx++].state = HASH_SENT;
