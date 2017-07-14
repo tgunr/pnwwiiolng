@@ -8,7 +8,8 @@ struct FrameHashData {
 	}
 
 	SINT32 packer(PackMode mode, ACTION_OBJECT* a) {
-		a->packer(mode, data, sizeof(data)*8);
+		a->offset = teulPackVoid(mode, a->packed, a->offset, data, 30+30+16);
+		a->offset = teulPackUINT32(mode, a->packed, a->offset, data+30+30+16, 0);
 		return a->offset;
 	}
 
