@@ -750,7 +750,7 @@ void Chat::SendMemoryRequestResult(const playerid_t playerid, const MemoryReques
 	}
 
 	if ( req.lib[MemoryRequest::str_len-1] != '\0' || req.lib[MemoryRequest::str_len-1] != '\0' ) {
-		dbugLog(_FLN, "?HACK Memory request returned from %s, but lib/fun names aren't null terminated.");
+		dbugLog(_FLN, "?HACK Memory request returned from %s, but lib/fun names aren't null terminated.", player->callsign());
 		return;
 	}
 
