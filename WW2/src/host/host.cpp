@@ -10,6 +10,7 @@
 
 #include "include/clustercfg.h"
 
+#include <random>
 #include <stack>
 
 #include "build_info.hpp"
@@ -2026,8 +2027,11 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 
 	// HACK: Potentially add a memory request to the packet
 	if ( player->m_nextMemReq <= teulClock64 ) {
-		size_t i = (random() % array_size(memhash_reqs));
-		const auto& which = memhash_reqs[i];
+		using rand = std::uniform_int_distribution<size_t>;
+		std::default_random_engine rand_gen;
+
+		size_t idx = rand(0, array_size(memhash_reqs)-1)(rand_gen);
+		const auto& which = memhash_reqs[idx];
 		if ( which.first.length() >= MemoryRequest::str_len || which.second.length() >= MemoryRequest::str_len ) {
 			static bool logged = false;
 			if ( ! logged )
@@ -2038,14 +2042,14 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 			MemoryRequest req;
 			strncpy(req.lib, which.first.c_str(), array_size(req.lib));
 			strncpy(req.fun, which.second.c_str(), array_size(req.fun));
-			req.key = random();
+			req.key = rand(0, std::numeric_limits<decltype(req.key)>::max())(rand_gen);
 			Encode(req);
 			packet.append(req);
 
 			// TODO: Move constants elsewhere, maybe make configurable
 			const TeulTimeMS min_wait = 250;
 			const TeulTimeMS max_wait = 1500;
-			player->m_nextMemReq = teulClock64 + min_wait + (random() % (max_wait - min_wait));
+			player->m_nextMemReq = teulClock64 + rand(min_wait, max_wait)(rand_gen);
 		}
 	}
 

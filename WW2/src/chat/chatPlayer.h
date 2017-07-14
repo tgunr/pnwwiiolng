@@ -432,7 +432,9 @@ public:
 	// Checks for memory tampering
 	// TODO: Move types elsewhere
 	typedef std::pair<std::string, std::string> FunctionName;
-	struct FunctionMd5 { char md5[16]; };
+	// TODO: Make an actual md5 type to avoid redefining this size everywhere.
+	static const size_t md5_size = 16;
+	struct FunctionMd5 { char md5[md5_size]; };
 
 	std::map<FunctionName, FunctionMd5> func_hashes;
 	std::set<FunctionName> tampered_funcs;

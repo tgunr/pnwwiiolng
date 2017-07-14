@@ -1579,7 +1579,7 @@ _recvCellHostUpdate(ACTION_OBJECT* const a, Chat::CellHostUpdate& msg)
 		return -EINVAL;
 	Player* player = PlayerInterface::Lookup(msg.playerID);
 	if (player == nullptr) {
-		dbugLog(_FLD, "t:%d ignoring cell host update for playerid %u", a->teulIndex, msg.playerID);
+		dbugLog(_FLW, "t:%d ignoring cell host update for playerid %u", a->teulIndex, msg.playerID);
 		return -EINVAL;
 	}
 	player->SetCellHost(msg.cellHost);

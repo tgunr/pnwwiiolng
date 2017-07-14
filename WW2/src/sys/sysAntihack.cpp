@@ -1,6 +1,8 @@
 #include "syscfg.h"
 #include "sysAntihack.h"
 
+#include <random>
+
 #include <fio/fio.h>
 #include <mem/mem.h>
 #include <pa/md5.h>
@@ -136,7 +138,8 @@ namespace {
 
 		// Even if we haven't pulled new data, reobfuscate every update
 		// so it always looks like we're doing something.
-		req.key = random();
+		std::default_random_engine rand_gen;
+		req.key = std::uniform_int_distribution<size_t>(0, std::numeric_limits<decltype(req.key)>::max())(rand_gen);
 		Encode(req);
 		data.hash = hash;
 #else
@@ -182,7 +185,7 @@ void InitializeHashes(void) {
 
 
 	for ( auto& hash : hashes ) {
-		Process(hash, true);
+		Process(hash);
 	}
 }
 
