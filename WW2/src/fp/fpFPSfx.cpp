@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "fx/fxMgr.h"
 #include "fx/fxSnd.h"
 #include "fx/fxPcl.h"

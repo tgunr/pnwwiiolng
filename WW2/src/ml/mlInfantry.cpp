@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "math/mathvect.h"
@@ -968,7 +968,7 @@ UINT32 mlInfantryUpdate(mlVehicleData* VehicleData, SINT32 TicTime)
 	}
 
 
-	// check for dead guy
+	// check for dead vehicle
 	if (!VehicleData->VehicleIsDead && persGetCrewDeadForKillScore(0) == 1)
 	{
 		VehicleData->VehicleIsDead = 1;

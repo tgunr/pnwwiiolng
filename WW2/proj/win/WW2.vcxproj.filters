@@ -200,6 +200,9 @@
     <Filter Include="omg\Generated Source">
       <UniqueIdentifier>{828d491a-a561-466c-b3c3-f0306ba21c09}</UniqueIdentifier>
     </Filter>
+    <Filter Include="auth">
+      <UniqueIdentifier>{e23d7e80-2e2b-4cd4-82a7-841bbda438a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\cfg\cfgCodes.h">
@@ -1644,6 +1647,18 @@
     <ClInclude Include="..\..\src\wwii\wwiiBackChannel.h">
       <Filter>wwii</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\auth\authSteam.h">
+      <Filter>auth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\auth\authPack.h">
+      <Filter>auth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsAuthHandler.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysSteam.h">
+      <Filter>sys</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2689,6 +2704,21 @@
     </ClCompile>
     <ClCompile Include="..\..\src\sdm\GenerateHostTerrain.cpp">
       <Filter>sdm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\auth\authSteam.cpp">
+      <Filter>auth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\clientConnections.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\auth\authPack.cpp">
+      <Filter>auth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsAuthHandler.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\sysSteam.cpp">
+      <Filter>sys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

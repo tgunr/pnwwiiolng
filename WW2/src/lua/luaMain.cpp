@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Thu Sep 23 12:45:00 2004
 //
 // Generic Lua glue code.

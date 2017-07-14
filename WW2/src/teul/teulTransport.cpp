@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides high-level access to the transport
 // functions used in the teul API. The end-user developer
 // should need only those functions provided here.
@@ -128,12 +128,12 @@ ENDPOINT::doConnect()
 {
 	if (PN_LIKELY(this->connectFn != nullptr))
 	{
-		WriteLog(LOG_TEUL, LOG_NOTE, "t:%d connected calling %p", this->teulIndex(), this->connectFn);
+		dbugLog(_FLN, "t:%d connected calling callback", this->teulIndex());
 		this->connectFn(*this);
 	}
 	else if ( protocol != PROTOCOL_UDB && protocol != PROTOCOL_CTRL )	// UDB doesn't connect.
 	{
-		WriteLog(LOG_TEUL, LOG_ABORT, "t:%d sock:" PRF_SOCKET " state:%u prot:%u connected NO CONNECT FN", this->teulIndex(), PRA_SOCKET(this->socket), this->state(), this->protocol);
+		dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " state:%u prot:%u connected NO CONNECT FN", this->teulIndex(), PRA_SOCKET(this->socket), this->state(), this->protocol);
 	}
 }
 
@@ -145,12 +145,12 @@ ENDPOINT::doAccept(ENDPOINT& newEndpoint)
 {
 	if (PN_LIKELY(this->connectFn))
 	{
-		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d doing handshaking calling doAccept(t:%d)", this->teulIndex(), newEndpoint.teulIndex());
+		dbugLog(_FLD, "t:%d doing handshaking calling doAccept(t:%d)", this->teulIndex(), newEndpoint.teulIndex());
 		this->connectFn(newEndpoint);
 	}
 	else
 	{
-		WriteLog(LOG_TEUL, LOG_DEBUG, "t:%d done handshaking t:%d", this->teulIndex(), newEndpoint.teulIndex());
+		dbugLog(_FLD, "t:%d done handshaking t:%d", this->teulIndex(), newEndpoint.teulIndex());
 	}
 }
 
@@ -202,7 +202,7 @@ teulOpenListen(const UINT16 portNumber
 					, ERROR_FUNCTION errorFnPtr
 					)
 {
-	WriteLog(LOG_TEUL, LOG_DEBUG,"opening listen port on address 0.0.0.0 port %hu", portNumber);
+	dbugLog(_FLD,"opening listen port on address 0.0.0.0 port %hu", portNumber);
 	return _openListen(0, portNumber,  acceptFnPtr,  timeout,  protocol,  errorFnPtr);
 }
 
@@ -229,7 +229,7 @@ teulOpenListenInterface(const UINT16 portNumber
 		///TODO: See how this handles actual multiple ips: do the callers appreciate
 		///TODO: the fact that they might be getting these calls with different
 		///TODO: teulIndexes? Do they cache them?
-		WriteLog(LOG_TEUL, LOG_DEBUG,"opening listen port on address %s port %d", teulGetAddress(Server::myInterface.addr[i].ip), portNumber);
+		dbugLog(_FLD,"opening listen port on address %s port %d", teulGetAddress(Server::myInterface.addr[i].ip), portNumber);
 		retval = _openListen( Server::myInterface.addr[i].ip
 						,  portNumber
 						,  acceptFnPtr
@@ -260,7 +260,7 @@ teulOpenListenHost(const UINT32 ipAddress
 					, ERROR_FUNCTION errorFnPtr
 					)
 {
-	WriteLog(LOG_TEUL, LOG_DEBUG,"opening listen port on address %s port %d", teulGetAddress(ipAddress), portNumber);
+	dbugLog(_FLD,"opening listen port on address %s port %d", teulGetAddress(ipAddress), portNumber);
 	return _openListen(ipAddress
 					,  portNumber
 					,  acceptFnPtr
@@ -416,19 +416,24 @@ teulInitTransport(LogMode logType
 	Teul::InitializeWinsock();
 
 	dbugInit(logType, name);
-
+	
+#ifndef NDEBUG
+    dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)LOG_ALL_TO_STDERR));
+    dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)LOG_ALL_TO_STDERR));
+#else
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
 #if defined(ALPHA_RELEASE)
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
 #else
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
 #endif
+#endif
 
 	teulSyncClock();
 
 	_transportInited = true;
 
-	WriteLog(LOG_COMM, LOG_INFO, "Initializing TeulKit transport [compiled %s %s]", __DATE__, __TIME__);
+	dbugLog(_FLI, "Initializing TeulKit transport [compiled %s %s]", __DATE__, __TIME__);
 
 	_transportClosing = false;
 
@@ -442,7 +447,7 @@ teulInitTransport(LogMode logType
 	const SINT32 retval = teulModStartup(errorFnPtr);
 	if ( retval < 0 )
 	{
-		WriteLog(LOG_TEUL, LOG_ABORT,"module wont Init");
+		dbugLog(_FLA,"module wont Init");
 		return retval;
 	}
 
@@ -515,7 +520,7 @@ teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data, cons
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
-		WriteLog(LOG_TEUL, LOG_ABORT, "teulSend called with null callback");
+		dbugLog(_FLA, "teulSend called with null callback");
 		return -EINVAL;
 	}
 
@@ -529,13 +534,13 @@ teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data, const 
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
-		WriteLog(LOG_TEUL, LOG_ABORT, "teulSend called with null callback");
+		dbugLog(_FLA, "teulSend called with null callback");
 		return -EINVAL;
 	}
 
 	if (PN_UNLIKELY(teulIndex < 0))
 	{
-		WriteLog(LOG_TEUL, LOG_WARN, "t:%d illegal", teulIndex);
+		dbugLog(_FLW, "t:%d illegal", teulIndex);
 		return teulIndex;
 	}
 
@@ -549,13 +554,13 @@ teulSendTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBACK* callbac
 {
 	if (PN_UNLIKELY(callback == nullptr))
 	{
-		WriteLog(LOG_TEUL, LOG_ABORT,"illegal callback");
+		dbugLog(_FLA,"illegal callback");
 		return -EINVAL;
 	}
 
 	if (PN_UNLIKELY(teulIndex < 0))
 	{
-		WriteLog(LOG_TEUL, LOG_ABORT,"illegal index %d", teulIndex);
+		dbugLog(_FLA,"illegal index %d", teulIndex);
 		return teulIndex;
 	}
 

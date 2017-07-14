@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "fp/fpFPSinternal.h"
 #include "fp/fpPPO.h"

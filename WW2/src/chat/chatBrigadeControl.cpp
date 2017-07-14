@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Mon Oct  9 14:31:06 CDT 2006
 //
 // Classes used to request and manipulate brigade lists and OICs

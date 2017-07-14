@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "pi/pi.h"
 #include "include/vars.h"
@@ -646,7 +646,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 			if (sendTurrets && (TurretTrav[i] != Vehicle.StateAnimation.LastSendTurretTrav[i] ||
 				TurretElev[i] != Vehicle.StateAnimation.LastSendTurretElev[i]))
 			{
-//				WriteLog (LOG_FPS, LOG_INFO, "XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
+//				Write_Log (LOG_FPS, LOG_INFO, "XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
 				//uiChatPrintLine("TURRET XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
 
 				Vehicle.StateAnimation.LastSendTurretTrav[i] = TurretTrav[i];
@@ -712,7 +712,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 			if (sendTurrets && (TurretTrav[i] != Vehicle.StateAnimation.LastSendTurretTrav[i] ||
 				TurretElev[i] != Vehicle.StateAnimation.LastSendTurretElev[i]))
 			{
-				//WriteLog (LOG_FPS, LOG_INFO, "XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
+				//Write_Log (LOG_FPS, LOG_INFO, "XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
 				//uiChatPrintLine("TURRET XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
 
 				// find out what the turret number is
@@ -1118,7 +1118,7 @@ void vehicleRemoveVehicle(UINT32 index)
 {
 	vehVehicle* const Vehicle = vehFindVehicle(index);
 
-	WriteDebug("v:%u removal indicated", index);
+	Write_Debug("v:%u removal indicated", index);
 
 	if (Vehicle != nullptr)
 	{
@@ -1220,9 +1220,9 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 
 			if (VehicleInfo->country > MAX_COUNTRIES)
 			{
-#ifdef DEBUG_UPDATES
-				WriteDebug("Invalid countries specified for vehicle %s, host index %d",VehicleInfo->callsign,
+				Write_Debug("Invalid countries specified for vehicle %s, host index %d",VehicleInfo->callsign,
 								VehicleInfo->index);
+#ifdef DEBUG_UPDATES
 				++unexpectedErrors;
 #endif
 				return 0;
@@ -1231,8 +1231,8 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 				WEAPON* weapon = weapLookup(VehicleInfo->spec());
 				if(weapon == nullptr)
 				{
+					Write_Debug("Weapon not found host veh index %d", VehicleInfo->index);
 #ifdef DEBUG_UPDATES
-					WriteDebug("Weapon not found host veh index %d", VehicleInfo->index);
 					++unexpectedErrors;
 #endif
 					return 0;
@@ -1244,7 +1244,7 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 			if (Vehicle == nullptr)
 			{
 				// we're out of vehicle slots
-				WriteDebug("Out of free vehicle slots for new vehicle");
+				Write_Debug("Out of free vehicle slots for new vehicle");
 #ifdef DEBUG_UPDATES
 				++unexpectedErrors;
 #endif
@@ -1308,8 +1308,8 @@ lastLowUpdateTime = frametime;
 		// vehicle doesn't exist in list
 #ifdef DEBUG_UPDATES
 		++vehNotTracked;
-		WriteDebug("Received an update for vehicle not being tracked, index = %d",Position);
 #endif
+		Write_Debug("Received an update for vehicle not being tracked, index = %d",Position);
 		return 0;
 	}
 
@@ -1317,8 +1317,9 @@ lastLowUpdateTime = frametime;
 	{
 #ifdef DEBUG_UPDATES
 		++duplicateUpdatesIgnored;
-		WriteDebug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
 #endif
+		// Pointless debug - we know this can happen due to frequency of updates, don't report this anymore.
+		// Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
 		return 0;
 	}
 
@@ -1330,7 +1331,7 @@ lastLowUpdateTime = frametime;
 	const SINT32 frameDelta = frametime - Vehicle->PosData.LastReceivedTime;
 	if (frameDelta >= 5000)
 	{
-		WriteDebug("Vehicle index %d %s, delta time between updates = %d",
+		Write_Debug("Vehicle index %d %s, delta time between updates = %d",
 						Vehicle->VehicleHostIndex,
 						Vehicle->Handle,
 						frameDelta);
@@ -1480,7 +1481,7 @@ lastLowUpdateTime = frametime;
 					Vehicle->StateAnimation.TurretTraverse[i] = VehicleInfo->turret.pos[i].x;
 					Vehicle->StateAnimation.TurretElev[i] = VehicleInfo->turret.pos[i].y;
 #endif
-//					WriteLog (LOG_FPS, LOG_INFO, "RCV %d:  %d %d %f %f", i,VehicleInfo->turret.pos[i].x,VehicleInfo->turret.pos[i].y, Vehicle->StateAnimation.TurretTraverse[i] , Vehicle->StateAnimation.TurretElev[i]);
+//					Write_Log (LOG_FPS, LOG_INFO, "RCV %d:  %d %d %f %f", i,VehicleInfo->turret.pos[i].x,VehicleInfo->turret.pos[i].y, Vehicle->StateAnimation.TurretTraverse[i] , Vehicle->StateAnimation.TurretElev[i]);
 					//uiChatPrintLine("TURRET RCV %d:  %d %d %f %f", i,VehicleInfo->turret.pos[i].x,VehicleInfo->turret.pos[i].y, Vehicle->StateAnimation.TurretTraverse[i] , Vehicle->StateAnimation.TurretElev[i]);
 				}
 
@@ -1538,7 +1539,7 @@ lastLowUpdateTime = frametime;
 #else
 							Vehicle->StateAnimation.TurretElev[i] = VehicleInfo->turret.pos[TurretNum].y;
 #endif
-							//WriteLog (LOG_FPS, LOG_INFO, "RCV %d:  %d %d %f %f", i,VehicleInfo->turret.pos[i].x,VehicleInfo->turret.pos[i].y, Vehicle->StateAnimation.TurretTraverse[i] , Vehicle->StateAnimation.TurretElev[i]);
+							//Write_Log (LOG_FPS, LOG_INFO, "RCV %d:  %d %d %f %f", i,VehicleInfo->turret.pos[i].x,VehicleInfo->turret.pos[i].y, Vehicle->StateAnimation.TurretTraverse[i] , Vehicle->StateAnimation.TurretElev[i]);
 							//uiChatPrintLine("TURRET RCV %d:  %d %d %f %f", i,VehicleInfo->turret.pos[i].x,VehicleInfo->turret.pos[i].y, Vehicle->StateAnimation.TurretTraverse[i] , Vehicle->StateAnimation.TurretElev[i]);
 
 							break;
@@ -2622,7 +2623,7 @@ void _processBuildingDamage (vehVehicle& Vehicle)
 	if(Vehicle.DamageQue.Count > VEH_MAX_BUILDINGS_HIT)
 	{
 		damagePacket.numHits = VEH_MAX_BUILDINGS_HIT;
-		WriteDebug("DamageQue.count = %d, exceeded VEH_MAX_BUILDINGS_HIT = %d", Vehicle.DamageQue.Count, VEH_MAX_BUILDINGS_HIT);
+		Write_Debug("DamageQue.count = %d, exceeded VEH_MAX_BUILDINGS_HIT = %d", Vehicle.DamageQue.Count, VEH_MAX_BUILDINGS_HIT);
 	}
 	else
 		damagePacket.numHits = Vehicle.DamageQue.Count;
@@ -2643,7 +2644,7 @@ void _processBuildingDamage (vehVehicle& Vehicle)
 			damage = -cutoffJoules;
 		damagePacket.list[i].damage = damage;
 
-		WriteDebug("WEAP Sending building hit message, scx = %d, scy = %d, id = %d, damage = %lf",
+		Write_Debug("WEAP Sending building hit message, scx = %d, scy = %d, id = %d, damage = %lf",
 							Vehicle.DamageQue.SuperCellX[i],
 							Vehicle.DamageQue.SuperCellY[i],
 							Vehicle.DamageQue.Id[i],

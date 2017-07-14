@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Tue Oct  7 22:26:38 CDT 2008
 //
 // Instancing API, client functions

@@ -172,20 +172,11 @@ void logonAttempt()
 {
 	playgate.SetStatus(GetLoc(AUTH_AUTHENTICATION));
 
-	if (loginData.m_steamAccountId == 0)
-	{
-		char username[sizeof(loginData.m_username) + 1];
-		WWII::ConvertChars(loginData.m_username, username, sizeof(username));
-		dbugLog(_FLI, "Login request \"%s\"", username);
-		Auth::LoginRequest request(username, g_passMD5);
-		request.send();
-	}
-	else
-	{
-		dbugLog(_FLI, "Login Steam request \"%u\"", loginData.m_steamAccountId);
-		Auth::LoginSteamRequest request(loginData.m_steamAccountId);
-		request.send();
-	}
+	char username[sizeof(loginData.m_username) + 1];
+	WWII::ConvertChars(loginData.m_username, username, sizeof(username));
+	dbugLog(_FLI, "Login request \"%s\"", username);
+	Auth::LoginRequest request(username, g_passMD5);
+	request.send();
 }
 
 void Auth::LoginReply::process()

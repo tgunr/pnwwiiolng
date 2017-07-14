@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: February 2017
 //
 // Raknet data backchannel functions
@@ -131,9 +131,9 @@ void RakNetChannel::release()
  */
 int RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
 {
-	PublicKey pk;
+	RakNet::PublicKey pk;
 	pk.remoteServerPublicKey = publicKey;
-	pk.publicKeyMode = PKM_USE_KNOWN_PUBLIC_KEY; // Recommended mode
+	pk.publicKeyMode = RakNet::PKM_USE_KNOWN_PUBLIC_KEY; // Recommended mode
     pk.myPrivateKey = nullptr;
     pk.myPublicKey = nullptr;
 	int retCode = RN_SK_FAILED;
@@ -148,7 +148,7 @@ int RakNetChannel::setPublicKey( char *publicKey, SINT32 teulIndex)
                 // basically a keep alive
                 m_peer->SetOccasionalPing(true);
 
-                if (CONNECTION_ATTEMPT_STARTED != m_peer->Connect(teulGetAddress(ep->destAddress()), ep->destPort(), 0, 0, &pk))
+                if (RakNet::CONNECTION_ATTEMPT_STARTED != m_peer->Connect(teulGetAddress(ep->destAddress()), ep->destPort(), 0, 0, &pk))
                 {
                     m_isConnecting = false;
                     m_isConnected = false;
@@ -200,7 +200,7 @@ void RakNetChannel::update()
 			switch (packetX)
 			{
                 case ID_DISCONNECTION_NOTIFICATION:
-                    dbugLog(_FLN, "Raknet: %s disconnected", p->systemAddress.ToString());
+                    dbugLog(_FLN, "Raknet: %s disconnected, guid-%s", p->systemAddress.ToString(), p->guid.ToString());
                     if (!isServer())
                     {
                         // time to abort netcode3
@@ -218,15 +218,15 @@ void RakNetChannel::update()
                     dbugLog(_FLN, "Raknet: %s connecting", p->systemAddress.ToString());
                     break;
                 case ID_CONNECTION_REQUEST_ACCEPTED:
-                    dbugLog(_FLN, "Raknet: %s connected", p->systemAddress.ToString());
+                    dbugLog(_FLN, "Raknet: %s connected, guid-%s", p->systemAddress.ToString(), p->guid.ToString());
                     m_isConnecting = false;
                     m_isConnected = true;
                     break;
                 case ID_ALREADY_CONNECTED:
-                    dbugLog(_FLW, "Raknet: %s already connected", p->systemAddress.ToString());
+                    dbugLog(_FLW, "Raknet: %s already connected, guid-%s", p->systemAddress.ToString(), p->guid.ToString());
                     break;
                 case ID_CONNECTION_LOST:
-                    dbugLog(_FLW, "Raknet: %s connection lost", p->systemAddress.ToString());
+                    dbugLog(_FLW, "Raknet: %s connection lost, guid-%s", p->systemAddress.ToString(), p->guid.ToString());
                     if (!isServer())
                     {
                         // time to abort netcode3
@@ -271,7 +271,7 @@ void RakNetChannel::update()
                     dbugLog(_FLW, "Raknet: %s Public Key mismatch", p->systemAddress.ToString());
                     break;
                 default:
-                    dbugLog(_FLN, "Raknet: Unknown packet id %u", packetX);
+                    dbugLog(_FLN, "Raknet: Unknown packet id %u on guid-%s", packetX, p->guid.ToString());
                     break;
 			}
             m_peer->DeallocatePacket(p);
@@ -288,9 +288,9 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p)
 {
 	ENDPOINT *sourceEndpoint = (isServer()) ? guidToEndPoint[p->guid] : m_endpoint;
 
+    Teul::PacketHeader* const hdr = reinterpret_cast<Teul::PacketHeader *>(&p->data[1+sizeof(SINT32)]);
 	if (sourceEndpoint != nullptr)
 	{
-		Teul::PacketHeader* const hdr = reinterpret_cast<Teul::PacketHeader *>(&p->data[1+sizeof(SINT32)]);
 		TEUL_CALLBACK* const callback = TEUL_CALLBACK::Lookup(hdr->m_callX, hdr->m_callY);
 		if (PN_UNLIKELY(callback == nullptr))
 		{
@@ -313,7 +313,11 @@ void RakNetChannel::processApplicationPacket(RakNet::Packet *p)
 	else
 	{
 		// NOTE: We might get this if a UDP straggler comes in right as we have closed a connection, its to be expected and can be ignored
-		dbugLog(_FLW, "Raknet: No endpoint located for incoming msg: guid-%s", p->guid.ToString());
+		if (isServer())
+            dbugLog(_FLW, "Raknet: t:%d no endpoint located for incoming msg: guid-%s", ntohl(*(reinterpret_cast<SINT32 *>(p->data + 1))),
+                p->guid.ToString());
+        else
+            dbugLog(_FLW, "Raknet: t:%d no endpoint located for incoming msg: guid-%s", ntohl(*(reinterpret_cast<SINT32 *>(p->data + 1))), p->guid.ToString());
 	}
 
 }
@@ -352,8 +356,8 @@ bool RakNetChannel::send(Teul::Packet& packet, ENDPOINT& endpoint)
     }
     else
     {
-		SystemAddress addr;
-		memset(&addr, 0, sizeof(SystemAddress));
+		RakNet::SystemAddress addr;
+		memset(&addr, 0, sizeof(RakNet::SystemAddress));
 		addr.address.addr4 = endpoint.destSockAddress;
 		guid = addr;
 	}
@@ -413,11 +417,11 @@ void RakNetChannel::disconnectPeer(ENDPOINT *pEndpoint)
 
 void RakNetChannel::disconnect(ENDPOINT *pEndpoint)
 {
-    dbugLog(_FLI, "Raknet: Disconnecting endpoint %p", pEndpoint);
+    dbugLog(_FLI, "Raknet: t:%d Disconnecting endpoint %p", pEndpoint->teulIndex(), pEndpoint);
 
 	// reset all of the associations
-	RakNetGUID defaultGuid;
-	RakNetGUID guid = pEndpoint->m_rakNetGuid;
+	RakNet::RakNetGUID defaultGuid;
+	RakNet::RakNetGUID guid = pEndpoint->m_rakNetGuid;
 	guidToEndPoint[guid] = nullptr;
 	pEndpoint->m_rakNetGuid = defaultGuid;
 	pEndpoint->m_rakNetEnabled = false;

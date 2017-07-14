@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "include/vars.h"
 #include "gl/glplat.h"
 
@@ -153,6 +153,10 @@ UINT32 vehIconColor(vehVehicle* Vehicle)
 {
 	UINT32 IconColor = 0;
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
+
+	//check for null player vehicle
+	if (PlayerVehicle == nullptr)
+		return colorALPHA;
 
 	if(Vehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{

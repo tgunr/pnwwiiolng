@@ -1,4 +1,4 @@
-#include <syscfg.h>	// Path is project specific.
+#include "syscfg.h"	// Path is project specific.
 
 #include "teul/teulPackers.h"
 #include "teul/teulTime.h"

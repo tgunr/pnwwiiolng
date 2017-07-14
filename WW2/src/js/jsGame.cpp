@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 
 #include "phui/View.h"
@@ -33,7 +33,7 @@
 #include "pers/persgunsight.h"
 #include "phui/GraphicsContext.h"
 #include "phui/ConsoleView.h"
-#include "sysLaunchURL.h"
+#include "sys/sysLaunchUrl.h"
 #include "pi/piinfo.h"
 #include "locl/loclApp.h"
 #include "ui/uiChat.h"
@@ -269,13 +269,32 @@ JS_FUNCTION_DEF(jsGame, bailout)
 	return JS_TRUE;
 }
 
+char* jsGame::basicTrainingIncomplete(char *viewname)
+{
+    
+    std::string compareString(viewname);
+    bool compareStringBool = compareString.compare("confirm") == 0;
+    if(compareStringBool)
+    {
+        bool basicTrainingComplete = TUT_MGR->IsComplete("basic", 0);
+        if(!basicTrainingComplete)
+            return "ok";
+        return viewname;
+    }
+    return viewname;
+}
+
 /************************************************************************************************
 	load
 *************************************************************************************************/
 
 JS_FUNCTION_DEF(jsGame,load)
 {
-	phui::View* view = uiLoadView(JS_GetStringBytes(JS_ValueToString(ctx, argv[0])));
+    
+    char* loadviewname = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
+    loadviewname = jsGame::basicTrainingIncomplete(loadviewname);
+    
+	phui::View* view = uiLoadView(loadviewname);
 
 	if(view)
 	{
@@ -2009,12 +2028,14 @@ JS_FUNCTION_DEF(jsGame, getworldtoscreen)
 
 JS_FUNCTION_DEF(jsGame, resetcontrollers)
 {
+    // We don't actually do this for now because it breaks the Steam overlay
+    
 	// reset devices in case a new one was added
-	dimainKill();
-	dimainInit();
+	//dimainKill();
+	//dimainInit();
 
 	// reselect presets based on new devices and current selections
-	imapLoadPresets();
+	//imapLoadPresets();
 
 	return JS_TRUE;
 }

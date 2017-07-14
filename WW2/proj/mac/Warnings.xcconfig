@@ -159,6 +159,7 @@ WW2_WARNINGS_Debug          = $(WW2_WARNINGS_01)
 WW2_WARNINGS_Release        =
 WW2_WARNINGS_BetaRelease    =
 WW2_WARNINGS_GM             =
+WW2_WARNINGS_MC             =
 
 // Actual build setting that Xcode cares about!
 WARNING_CFLAGS = $(WW2_WARNINGS_$(CONFIGURATION))

@@ -24,27 +24,6 @@ void sysmainAddArchives();
 static int sysmainInitApp();
 
 int running = 0;
-static int _argc;
-static const char** _argv;
-
-void sysmainGetCommandLineArgs(int* argc, char*** argv)
-{
-	*argc = _argc;
-	*argv = const_cast<char **>(_argv);
-}
-
-void sysmainCommandLine(int argc, const char** argv)
-{
-	SetCommandLine(argc, argv);
-	_argc = argc;
-	_argv = argv;
-
-#if RELEASE_CLIENT == 0
-	HasKeyFile = 1;
-#endif
-
-	mngoptParse((char *)"");
-}
 
 static size_t frames = 0;
 static pthread_t mainthread = NULL;
@@ -74,11 +53,7 @@ int sysmain()
 		exit(0);
 	}
 #else
-	if(!rnmainGetOnlineSetting())
-	{
-		printf("rnmainGetOnlineSetting: App was not able to initialize!\n");
-		exit(0);
-	}
+	rncheckPlaygateParams();
 
 	if(!rnmainInit())
 	{
@@ -94,8 +69,8 @@ int sysmain()
         frames++;
 		ddpEngine(NULL);
 #ifdef DEBUG_WW2
-        if (frames % 10000 == 0) {
-            WriteLog(LOG_FPS, LOG_DEBUG, "Current FPS: %.1f", 1000.0 / gFPS );
+        if (frames % 100 == 0) {
+            Write_Debug("Current FPS: %.1f", 1000.0 / gFPS );
         }
 #endif
     }
@@ -134,8 +109,8 @@ int sysmainInitApp()
     b3DSoundEnable = 1; // always want 3D enabled with OpenAL
 	//g_bRadialClutter = FALSE; // screwed on the mac at the moment
 
-    Set_Log_Mask(gLogMask);
-	Set_Log_Level(gLogLevel);
+	Enable_Log(LOG_ALL, WantedUserLogEnabled);
+	Set_Log_Level(LOG_INFO);
 
 #if USE_OSG
 	ddpSetD3DRender(osgGameUpdate);

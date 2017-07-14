@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "client/ww2Client.h"
 #include "map/mapPersonaSummary.h"
 #include "map/mapMissionList.h"

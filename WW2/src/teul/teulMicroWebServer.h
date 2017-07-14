@@ -7,6 +7,7 @@
 #include <shared_mutex>
 #include "wwii/wwiiHash.h"
 #include "include/pnThread.h"
+#include "json.hpp"
 
 namespace Teul
 {
@@ -177,6 +178,17 @@ namespace Teul
             private:
                 HTTPResponse m_response;
         };
+        
+        using RESTAPIParams = nlohmann::json;
+        using RESTAPIHandler = std::function<void(const HTTPRequest &, HTTPResponse &, const RESTAPIParams &)>;
+        struct RESTAPIRoute {
+            std::vector<std::string> allowedMethods;
+            std::string parameterizedPath;
+            RESTAPIHandler handler;
+        };
+        using RESTAPIRouteList = std::vector<RESTAPIRoute>;
+        
+        void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAPIRouteList &routes);
         
 		extern Server s_debugServer;
 	}

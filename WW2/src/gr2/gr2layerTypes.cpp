@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string>
 #include <vector>
 #include "gr2/gr2layer.h"

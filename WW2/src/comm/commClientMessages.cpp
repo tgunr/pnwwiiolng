@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Communication with the cell host.
 //
 // Copyright 1999 Playnet Inc, All rights reserved

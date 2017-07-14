@@ -5,7 +5,7 @@
 //
 // Originating Programmer: Oliver "kfs1" Smith
 
-#include <syscfg.h>		// Should use the teulKit syscfg.h
+#include "syscfg.h"		// Should use the teulKit syscfg.h
 
 #include <sys/types.h>
 

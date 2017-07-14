@@ -160,10 +160,17 @@ const char* const channelTypeName[] = {
 
 static bool _running = true;
 
+#ifndef NDEBUG
+bool g_debugRadios = true;
+bool g_debugSquads = true;
+bool g_debugPersonas = true;
+bool g_debugChat = true;
+#else
 bool g_debugRadios = false;
 bool g_debugSquads = false;
 bool g_debugPersonas = false;
 bool g_debugChat = false;
+#endif
 
 const char* const chanTypeName[MAX_CHANNEL_TYPES] =
 {
@@ -247,11 +254,6 @@ static std::vector<TUNE_COMMAND> _tuneCommands = {
 //////////////////////////////////////////////////////////////////////
 // Chat Host
 //////////////////////////////////////////////////////////////////////
-
-struct CampaignFilterFn : public FilterFn
-{
-	bool operator()(const wwiiPlayer* player) const { return player->instance().isCampaign(); }
-};
 
 //////////////////////////////////////////////////////////////////////
 // Send a message to a user connected through the IRC interface.
@@ -528,7 +530,7 @@ chatSideMessage(WWII_SIDE side, LSTRING_ID messageID, const char* const ptr0, co
 	if ( sidePlayers[side].empty() == false )
 	{
 		Chat::LocalizedMessage message(prefix, messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5);
-		chatBroadcastLocMessage(sidePlayers[side].begin(), sidePlayers[side].end(), message, CampaignFilterFn());
+		chatBroadcastLocMessage(sidePlayers[side].begin(), sidePlayers[side].end(), message, [] (const wwiiPlayer *player) { return player->instance().isCampaign(); });
 	}
 
 	return true;
@@ -664,7 +666,7 @@ public:
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
-		ARGV args;
+		Chat::ARGV args;
 		if ( vectorize(arguments, args, 2) < 1 )
 		{
 			help(player);
@@ -2426,9 +2428,9 @@ _personaCreate(const Server::PersonaLogin& login, PlayerStatusNode& psn)
 	}
 
 	if ( g_debugPersonas )
-		dbugLog(_FLD, "t:%d p:%u c:%s -> personaCreate reason %d"
+		dbugLog(_FLD, "t:%d p:%u c:%s -> personaCreate reason %s"
 						, psn.teulIndex, psn.dispatch().m_customerID, psn.dispatch().m_callsign
-						, static_cast<int>(login.reason())
+						, Server::Transfer::to_string(login.reason()).c_str()
 						);
 
 	chatCreatePlayer(&psn, (struct Chat::PlayerInfo*) login.data.auxData);
@@ -3701,17 +3703,6 @@ main(int argc, const char* argv[])
 //////////////////////////////////////////////////////////////////////
 using namespace Teul::uWeb;
 
-using RESTAPIParams = nlohmann::json;
-using RESTAPIHandler = std::function<void(const HTTPRequest &, HTTPResponse &, const RESTAPIParams &)>;
-
-struct RESTAPIRoute {
-    std::vector<std::string> allowedMethods;
-    std::string parameterizedPath;
-    RESTAPIHandler handler;
-};
-
-using RESTAPIRouteList = std::vector<RESTAPIRoute>;
-
 // This struct is the absolute minimum we must know about a player to perform
 // operations on them, whether online or offline.
 struct PlayerControlMinimumData {
@@ -4213,95 +4204,26 @@ static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &resp
         .build(response);
 }
 
-static std::vector<std::string> _getURLPathComponents(const std::string &requestPath)
+static inline RESTAPIHandler RESTThreadCallback(RESTAPIHandler handler)
 {
-    return split_string(requestPath.substr(0, requestPath.find_first_of("?#")), "/"); // substr(0,npos) == whole string
-}
-
-static void _v1APIHandler_unlocked(const HTTPRequest &request, HTTPResponse &response)
-{
-    std::vector<std::string> components = _getURLPathComponents(request.path);
-    
-    // Verify API path
-    status_if(components.size() < 3, 400, "Not enough path components (3)");
-    status_if(components[0] != "", 400, "How did you get here with no /?");
-    status_if(components[1] != "v1", 400, "How did you get here with no version?");
-    
-    // Basic RESTful routing (not very smart yet)
-    static const RESTAPIRouteList routes = {
-        { { "PATCH" }, "/player/{player_id}/squad/promote", _playerControlAPIPromote },
-        { { "PATCH" }, "/player/{player_id}/squad/demote", _playerControlAPIDemote },
-        { { "PATCH" }, "/player/{player_id}/squad/remove", _playerControlAPIRemove },
-        { { "GET"   }, "/player/online", _playerControlAPIList },
-        { { "GET"   }, "/player/list", _playerControlAPIList }, // legacy alias
-        { { "GET"   }, "/squad/{squad_id}/player", _squadControlAPIPlayers },
-        { { "GET"   }, "/squad/{squad_id}/player/online", _squadControlAPIPlayersOnline },
-        { { "PATCH" }, "/squad/{squad_id}", _squadControlAPIPatch },
+    return [&] (const HTTPRequest &req, HTTPResponse &res, const RESTAPIParams &params) {
+        threadCallbackSync<void>([&] { handler(req, res, params); });
     };
-    
-    RESTAPIRoute bestMatchingRoute;
-    size_t bestMatchingRouteScore = 0;
-    RESTAPIParams bestMatchingRouteParams;
-
-    for (const RESTAPIRoute &route : routes) {
-        std::vector<std::string> routeComponents = split_string(route.parameterizedPath, "/");
-        bool routeMatch = true;
-        size_t routeScore = 0;
-        RESTAPIParams routeParams = nlohmann::json::object();
-        
-        if (std::find(route.allowedMethods.begin(), route.allowedMethods.end(), request.method) == route.allowedMethods.end()) { continue; }
-        if (routeComponents.size() != components.size() - 1) { continue; }
-        status_if(routeComponents.size() < 2 || routeComponents[0] != "", 500, "Bad route in route table");
-        for (size_t i = 1; i < routeComponents.size(); ++i) {
-            const std::string &component = routeComponents[i];
-            
-            if (component.length() > 2 && component.front() == '{' && component.back() == '}') {
-                routeParams[component.substr(1, component.length() - 2)] = components[i + 1];
-            } else if (component != components[i + 1]) {
-                routeMatch = false;
-                break;
-            } else {
-                ++routeScore; // Route gets 1 point for every matching, non-parameterized path component
-            }
-        }
-        if (routeMatch && routeScore > bestMatchingRouteScore) {
-            bestMatchingRoute = route;
-            bestMatchingRouteScore = routeScore;
-            bestMatchingRouteParams = routeParams;
-        }
-    }
-    status_if(bestMatchingRouteScore == 0, 404, "No matching routes"); // A matching route must always have at least one non-parameterized path component
-    status_if(!bestMatchingRoute.handler, 501, "Unimplemented route");
-    
-    status_if(request.requestData.size() > 0 &&
-              (request.headers.find("content-type") == request.headers.end() ||
-              request.headers.at("content-type") != "application/json"), 400, "Request data must be JSON");
-    
-    nlohmann::json requestParams = nlohmann::json::object();
-    if (request.requestData.size() > 0) {
-        try {
-            requestParams = nlohmann::json::parse(request.requestData);
-        } catch (std::invalid_argument &e) {
-            status_if(true, 400, "Bad JSON");
-        }
-    }
-    status_if(!requestParams.is_object(), 400, "Request JSON must be object");
-    
-    for (nlohmann::json::iterator it = bestMatchingRouteParams.begin(); it != bestMatchingRouteParams.end(); ++it) {
-        status_if(requestParams.find(it.key()) != requestParams.end(), 400, "Request JSON can't have a parameter matching a name in the route parameters");
-        // Technically this is more of an ABORT_IF, but what the hey.
-        requestParams[it.key()] = it.value();
-    }
-    
-    try {
-        return bestMatchingRoute.handler(request, response, requestParams);
-    } catch (std::domain_error &) {
-        status_if(true, 400, "JSON contained invalid type");
-    }
 }
 
 static void _v1APIHandler(const HTTPRequest &request, HTTPResponse &response)
 {
-    threadCallbackSync<void>([&] { _v1APIHandler_unlocked(request, response); });
+    static const RESTAPIRouteList routes = {
+        { { "PATCH" }, "/player/{player_id}/squad/promote", RESTThreadCallback(_playerControlAPIPromote) },
+        { { "PATCH" }, "/player/{player_id}/squad/demote", RESTThreadCallback(_playerControlAPIDemote) },
+        { { "PATCH" }, "/player/{player_id}/squad/remove", RESTThreadCallback(_playerControlAPIRemove) },
+        { { "GET"   }, "/player/online", RESTThreadCallback(_playerControlAPIList) },
+        { { "GET"   }, "/player/list", RESTThreadCallback(_playerControlAPIList) }, // legacy alias
+        { { "GET"   }, "/squad/{squad_id}/player", RESTThreadCallback(_squadControlAPIPlayers) },
+        { { "GET"   }, "/squad/{squad_id}/player/online", RESTThreadCallback(_squadControlAPIPlayersOnline) },
+        { { "PATCH" }, "/squad/{squad_id}", RESTThreadCallback(_squadControlAPIPatch) },
+    };
+
+    Teul::uWeb::RESTRouter(request, response, routes);
 }
 #undef status_if

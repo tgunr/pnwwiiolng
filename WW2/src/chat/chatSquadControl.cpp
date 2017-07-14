@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Tue Sep 20 18:26:36 CDT 2005
 //
 // Packers etc for SquadControl

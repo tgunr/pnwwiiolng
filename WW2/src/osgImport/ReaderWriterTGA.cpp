@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "osgImport/Texture.h"
 #include "osgImport/ref_ptr.h"
 #include "osgImport/Image.h"

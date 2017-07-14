@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: rntextLoc.c
 // Description: This module should eventually replace rntext.c. This

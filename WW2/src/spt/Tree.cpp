@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #pragma warning(disable:4786)
 
 #include <stdlib.h>

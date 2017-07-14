@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Tue Jan 28 20:00:08 2001
 //
 // All the routines for reading in the weap files

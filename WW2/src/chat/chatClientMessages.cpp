@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Tue Aug  1 16:06:48 2000
 //
 // Client Side API for chat communications

@@ -18,7 +18,9 @@ using namespace phui;
 *************************************************************************************************/
 
 TextControl::TextControl(): Control(), TextContainer()
-{
+, _fakelen(0)
+, _obscure(false)
+, _maintainfake(false) {
 	_value.Convert(Scalar::WideStringT);
 	_textcolor[0] = _textcolor[1] = _textcolor[2] = 0;
 	_textcolor[3] = 1;
@@ -47,6 +49,37 @@ TextControl::~TextControl()
 }
 
 /************************************************************************************************
+	Text Modification
+*************************************************************************************************/
+
+void TextControl::SetText(const wchar_t* text) {
+	if ( ! _maintainfake ) _fakelen = 0;
+	TextContainer::SetText(text);
+}
+
+void TextControl::SetText(const char* text) {
+	if ( ! _maintainfake ) _fakelen = 0;
+	TextContainer::SetText(text);
+}
+
+void TextControl::AddText(const wchar_t* text) {
+	if ( ! _maintainfake ) _fakelen = 0;
+	TextContainer::AddText(text);
+}
+void TextControl::AddText(const char* text) {
+	if ( ! _maintainfake ) _fakelen = 0;
+	TextContainer::AddText(text);
+}
+void TextControl::InsertText(const wchar_t* text, int start, int stop) {
+	if ( ! _maintainfake ) _fakelen = 0;
+	TextContainer::InsertText(text, start, stop);
+}
+void TextControl::RemoveText(int start, int stop) {
+	if ( ! _maintainfake ) _fakelen = 0;
+	TextContainer::RemoveText(start, stop);
+}
+
+/************************************************************************************************
 	DrawSelf
 *************************************************************************************************/
 
@@ -57,10 +90,25 @@ void TextControl::DrawSelf()
 	GraphicsContext* ctx = GetGraphicsContext();
 	 
 	ctx->SetColor(_textcolor[0],_textcolor[1],_textcolor[2],_textcolor[3]);
+
+	const std::wstring* text = &_text;
+
+	std::wstring obstext;
+	// Sanity checking
+	if ( _text.length() > 0 && ! _maintainfake )
+		_fakelen = 0;
+
+	if ( _obscure ) {
+		text = &obstext;
+		if ( _fakelen > 0 )
+			obstext.assign(_fakelen, '*');
+		else
+			obstext.assign(_text.length(), '*');
+	}
 	
-	int tsize				= _text.size();
+	int tsize				= text->size();
 	float fheight		= ctx->FontHeight(_font);
-	float fwidth			= ctx->FontAdvance(_font, _text.c_str());
+	float fwidth			= ctx->FontAdvance(_font, text->c_str());
 
 	if(!tsize)
 	{
@@ -90,7 +138,7 @@ void TextControl::DrawSelf()
 	
 	ctx->EnableTexture();
 	ctx->MovePenPosition(x, y);
-	ctx->DrawString(_font, _text.c_str());
+	ctx->DrawString(_font, text->c_str());
 	ctx->DisableTexture();
 	ctx->MovePenPosition(0, -y);
 	 
@@ -120,7 +168,7 @@ void TextControl::DrawSelf()
 	{
 		float line[4];
 		float spacing = (Height() - fheight)/4;
-		float xpos = ctx->FontAdvance(_font, _text.substr(0, _cursor).c_str());
+		float xpos = ctx->FontAdvance(_font, text->substr(0, _cursor).c_str());
 		
 		line[0] = xpos; line[1] = spacing;
 		line[2] = xpos; line[3] = Height() - spacing;

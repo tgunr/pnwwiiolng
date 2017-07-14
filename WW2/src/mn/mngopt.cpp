@@ -1,10 +1,13 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <ctype.h>
 #include <string.h>
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "mn/mngopt.h"
+#if platOS == OS_MACOS
+#include "sysmac/sysMacCompat.h"
+#endif
 
 enum key_TYPE
 {
@@ -68,6 +71,7 @@ static GVAR vars[] = {
     STRING_KEY_DEF("serverotp", GameServerOTP),
     STRING_KEY_DEF("apid", ServerApID),
     STRING_KEY_DEF("serverprotocol", ServerProtocol),
+    NULL_KEY_DEF("steamlogin", UseSteamLogin),
     LOGICAL_KEY_DEF("log", WantedUserLogEnabled),
     INT_KEY_DEF("side", WantedSide),
     LOGICAL_KEY_DEF("data", WantDataDir),
@@ -85,6 +89,7 @@ static GVAR vars[] = {
     STRING_KEY_DEF("o", HackID),
     NULL_KEY_DEF("altfont", AltFont),
     STRING_KEY_DEF("authserver", gAuthServer),
+    STRING_KEY_DEF("authserverport", gAuthServerPort),
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
     STRING_KEY_DEF("datadir", DataPath),
@@ -119,15 +124,11 @@ static char* _skipFilename(const char* ptr)
 	return (char*)ptr;
 }
 
-LOGICAL mngoptParse(char* InputLine)
+LOGICAL mngoptParse()
 {
 	char*	ptr;
 
-#if platOS == OS_WIN32
 	ptr = _skipFilename(GetCommandLineA());
-#else
-	ptr = _skipFilename(GetCommandLine());
-#endif
 
 	if ( ptr == nullptr )
 		return TRUE;

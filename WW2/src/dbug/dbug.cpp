@@ -7,7 +7,7 @@
 //
 // Originating Programmer: Martin Poulin
 
-#include <syscfg.h>
+#include "syscfg.h"
 #include "dbug/dbugInternal.h"
 #include "build_info.hpp"
 #include <fcntl.h>
@@ -469,9 +469,6 @@ void dbugSetLogLevel(Debug::ERROR_TYPE level)
 		g_logDebug = true;
 	else
 		g_logDebug = false;
-
-	if ( _logger.isInitialized() == false )
-		return;
 
 	_logger.m_logFlags = flags;
 

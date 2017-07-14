@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: vehdecal.cpp
 // Description: Vehicle decals

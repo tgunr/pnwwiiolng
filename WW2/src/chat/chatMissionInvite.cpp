@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Tue Mar 13 15:34:08 CDT 2007
 //
 // CLIENT/HOST: Common chatMissionInvite functions.

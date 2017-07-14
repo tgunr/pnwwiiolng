@@ -1,3 +1,3 @@
 #pragma once
 
-extern LOGICAL mngoptParse(char* CommandLine);
+extern LOGICAL mngoptParse();

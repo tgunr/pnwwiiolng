@@ -26,22 +26,11 @@
 	<string>public.app-category.simulation-games</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 1999-2017 Playnet, Inc.  All Rights Reserved.</string>
-	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
-	<key>NSPrincipalClass</key>
-	<string>BITCrashExceptionApplication</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>www.wwiionline.com</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
-			<key>www.battlegroundeurope.net</key>
+			<key>authdev.playnet.com</key>
 			<dict>
 				<key>NSThirdPartyExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
@@ -56,7 +45,23 @@
 				<key>NSThirdPartyExceptionAllowsInsecureHTTPLoads</key>
 				<true/>
 			</dict>
+			<key>www.battlegroundeurope.net</key>
+			<dict>
+				<key>NSThirdPartyExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+			<key>www.wwiionline.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
 		</dict>
 	</dict>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 1999-2017 Playnet, Inc.  All Rights Reserved.</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>BITCrashExceptionApplication</string>
 </dict>
 </plist>

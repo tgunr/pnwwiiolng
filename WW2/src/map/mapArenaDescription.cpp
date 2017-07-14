@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Thu Apr  7 19:54:18 CDT 2005
 //
 // Description of the arena

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides access to the socket
 // functions used by the teul API. The end-user developer
 // should never need the functions provided here.

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "include/vars.h"
 #include "fio/fio.h"
 #include "mem/mem.h"

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*------------------------------------------------------------------
 Module: osgShader.cpp
 Description: Wrapper for creating vertex/frag shaders

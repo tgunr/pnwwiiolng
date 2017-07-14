@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 /*
 	 Copyright 2008 Playnet Inc, All rights reserved

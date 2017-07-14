@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <math.h>
 
@@ -616,13 +616,13 @@ void _UpdateInit()
 {
 	UpdateGameClocks(); // adjust the internal game clocks
 
-	if (Online == 1)
+	if (Teul::IsTransportInited())
 	{
-		PlayerClient()->Update();
-
+		if ( Online ) {
+			PlayerClient()->Update();
+			//mapProcessSuperCellVislevels();
+		}
 		teulUpdateTransport(); // process any new messages
-
-		//mapProcessSuperCellVislevels();
 	}
 
 	//if(!imaphackDoKeyboardInputs())

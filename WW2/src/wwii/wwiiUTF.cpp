@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Wed Sep  3 20:59:47 CDT 2008
 //
 /*

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides high-level buffer stuffing
 // utility functions used in the teul API.
 //

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #ifdef MULTI_CLIENT
 
 #include <map>
@@ -31,7 +31,7 @@
 
 using interp_cmd = int (*)(int argc, char* argv[]);
 
-struct interp_cmd_lookupg
+struct interp_cmd_lookup
 {
 	const char* name;
 	interp_cmd cmd;
@@ -84,20 +84,20 @@ static interp_cmd_lookup INTERP_CMDS[] =
 	{"chatpctg",	chatpctg_cmd,   CHATPCTG_HELP, false},		// how often to send a random chat message
 	{"ticket", 		ticket_cmd,		TICKET_HELP, false},		// set the login info not including the playerid
 	{"pos", 		pos_cmd,		POS_HELP, false},			// set the start spawn pos
-	{"login", 		login_cmd,		LOGIN_HELP, true},		// login a number of clients
+	{"login", 		login_cmd,		LOGIN_HELP, true},			// login a number of clients
 	{"list", 		list_cmd,		LIST_HELP, false},			// list info about a client or range of clients
-	{"spawn",		spawn_cmd,		SPAWN_HELP, true}, 		// spawn client#(s) vehname facname
+	{"spawn",		spawn_cmd,		SPAWN_HELP, true}, 			// spawn client#(s) vehname facname
 	{"despawn", 	despawn_cmd,	DESPAWN_HELP, true},		// despawn client#(s)
 	{"kill", 		kill_cmd,		KILL_HELP, false},			// kills all clients, save yours if you are online
 	{"data", 		data_cmd,		DATA_HELP, false},			// data client#(s) (pos, vel, att)
 	{"move",		move_cmd,		MOVE_HELP, false},			// move client#(s) [rel, abs] x y z
 	{"rotate",		rotate_cmd,		ROTATE_HELP, false},		// rotate client#(s) [rel, abs] pitch roll yaw
 	{"velocity",  	velocity_cmd,	VEL_HELP, false},			// velocity client#(s) [rel, abs] x y z
-	{"speed",		speed_cmd,		SPEED_HELP, false},		// speed client#(s) speed
+	{"speed",		speed_cmd,		SPEED_HELP, false},			// speed client#(s) speed
 	{"circle",  	circle_cmd,		CIRCLE_HELP, false},		// circle client#(s) [rel, abs] x y z radius speed
 	{"formation",	formation_cmd,	FORM_HELP, false},			// formation client#(s) [rank, file, wedge, circle, grid] (radius/spacing) (orientation) (cols)
 	{"weapons", 	weapons_cmd,	WEAPLIST_HELP, false},		// weaplist facname
-	{"clearq", 		clearq_cmd,	CLEARQ_HELP, false},		// clear out the command queue
+	{"clearq", 		clearq_cmd,		CLEARQ_HELP, false},		// clear out the command queue
 	//{"turret",		turret_cmd,		TURRET_HELP},	// turret client#(s) # elevation traverse
 	//{"fire",		fire_cmd,		FIRE_HELP},			// fire client#(s) mount
 	//{"state",		state_cmd,		STATE_HELP},		// state client#(s) statename on/off
@@ -143,13 +143,13 @@ static UINT32 otp = 0;
 static char data[25+1];
 
 static bool wantChat = true;
-static float chatPercentage = .1f;
+static float chatPercentage = .5f;
 static int playeridStart = DEFAULT_PLAYERID_START;
 float _startx, _starty, _startz;
 
 std::vector<int> players;
 
-static int client_spawn(int clientIndex, WEAPON_SPEC const&);
+//static int client_spawn(int clientIndex, WEAPON_SPEC const&);
 
 static int  interp_parse_args(char* s, char* argv[], int maxargs);
 static void interp_range(char* s, int& start, int& end);
@@ -219,8 +219,10 @@ void multiClientUpdate(int wait, bool force)
 		ClientMap::iterator it = clients.begin();
 		for(; it != clients.end(); ++it)
 		{
-			if(GetRandom(0.0f, 1.0f) < chatPercentage)
+			if (GetRandom(0.0f, 1.0f) < chatPercentage)
+			{
 				it->second->SendChatMessage(0, chats.at(GetRandom(0, chats.size() - 1)).c_str());
+			}
 
 			it->second->Update();
 			it->second->SendUpdate();
@@ -228,10 +230,8 @@ void multiClientUpdate(int wait, bool force)
 	}
 
 	// run any queued commands
-	if(time - nextCmd > 1000 && !_cmdQueue.empty())
+	if(((time - nextCmd) > 1000) && !_cmdQueue.empty())
 	{
-		nextCmd = time;
-
 		// grab the next command to run
 		std::string& cmdToRun = _cmdQueue.front();
 
@@ -243,6 +243,9 @@ void multiClientUpdate(int wait, bool force)
 
 		// pop us off the queue
 		_cmdQueue.pop_front();
+
+        nextCmd = time;
+        
 	}
 }
 
@@ -318,7 +321,6 @@ static void personaFromSpec(const WEAPON_SPEC spec, int& country, int& branch)
 /************************************************************************************************
 	client_login
 *************************************************************************************************/
-
 static int client_login(int clientIndex, int country, int branch)
 {
 	if(host == 0 || otp == 0)
@@ -339,7 +341,6 @@ static int client_login(int clientIndex, int country, int branch)
 			else
 				client->SetPlayerIdent(playeridStart+clientIndex, otp, 0);
 
-			// try logging in
 			err = client->Login(host, 0, wantChat);
 		}
 		catch(ClientNetError& e)
@@ -392,13 +393,17 @@ static int client_login(int clientIndex, int country, int branch)
 
 	uiChatPrintLine("%d: logged in!", clientIndex);
 
+	// try logging in
+	//Need to set side, country, areachat (boolean)
+	client->SetAreaChat(true);
+
+
 	return 0;
 }
 
 /************************************************************************************************
 	client_spawn
 *************************************************************************************************/
-
 static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 {
 	int country = -1;
@@ -444,27 +449,58 @@ static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 		return -1;
 	}
 
+	//write notification out to stdout
+//	printf("%d: after selectpersona \n", clientIndex);
+
+
 	// now let's spawn
 	client->RequestDirectSpawn(spec);
+
 	client->ClearWaits();
 	client->SetWait(ww2::Client::SPAWN_NOTIFY_WAIT);
 	client->SetWait(ww2::Client::CELL_CLIENT_WAIT);
-	client->SetWait(ww2::Client::REDIRECT_WAIT);
-	if(client->WaitForMessages(10) != 0)
+//	client->SetWait(ww2::Client::REDIRECT_WAIT);
+
+	if (client->WaitForMessages(10) != 0)
 	{
 		uiChatPrintLine("%d: spawn request timeout!", clientIndex);
+		// pop us off the queue
+		_cmdQueue.pop_front();
 		return -1;
 	}
 
+	//write notification out to stdout
+//	printf("%d: after WaitForMessages \n", clientIndex);
+
+
+	//Testing - use the same method for vehicle as persona above
+	client->ClearWaits();
+	client->SetWait(ww2::Client::VEHICLE_REPLY_WAIT);
+
 	client->RequestVehicleJoin(client->SpawnNotify().weaponSerial,0);
-	if(client->WaitForMessage(ww2::Client::VEHICLE_REPLY_WAIT, 5) != 0)
+
+
+	//write notification out to stdout
+//	printf("%d: after RequestVehicleJoin \n", clientIndex);
+
+
+//	if(client->WaitForMessage(ww2::Client::VEHICLE_REPLY_WAIT, 5) != 0)
+	if (client->WaitForMessages(5) != 0)
 	{
 		uiChatPrintLine("%d: vehicle join request timeout!", clientIndex);
 		return -1;
 	}
 
-	client->MoveTo(_startx + clientIndex*10, _starty, _startz);
+//	printf("%d: vehicle join request Completed\n", clientIndex);
+
+	//Update the distance from the pos command by each new client
+	//client->MoveTo(_startx + clientIndex*10, _starty, _startz);
+	client->MoveTo(_startx + clientIndex * 1.50, _starty, _startz);
+
 	uiChatPrintLine("%d: spawned", clientIndex);
+
+	//write notification out to stdout
+//	printf("client %d spawned \n", clientIndex);
 
 	return 0;
 }
@@ -472,7 +508,6 @@ static int client_spawn(int clientIndex, const WEAPON_SPEC spec)
 /************************************************************************************************
 	login_cmd
 *************************************************************************************************/
-
 static int login_cmd(int argc, char* argv[])
 {
 	int country, branch;
@@ -493,13 +528,17 @@ static int login_cmd(int argc, char* argv[])
 		//uiChatPrintLine("%d: login failed", i);
 
 		// let all of the currently spawned in clients tell the host they are still alive
-		multiClientUpdate(100, true);
+        
+        // TBD: frisbone, temporarily commented out because it could be triggered from this call
+		//multiClientUpdate(100, true);
 
 		if(Online)
 			PlayerClient()->SendUpdate();
 
 		ww2::Client::NetUpdate(100);
 		usleep(0);
+
+		uiChatPrintLine("%d: logged in", i);
 	}
 
 	return 0;
@@ -508,7 +547,6 @@ static int login_cmd(int argc, char* argv[])
 /************************************************************************************************
 	list_cmd
 *************************************************************************************************/
-
 static int list_cmd(int argc, char* argv[])
 {
 	int start, end;
@@ -567,7 +605,7 @@ static int list_cmd(int argc, char* argv[])
 			if(strcasecmp(spawned, "spawned") == 0)
 				uiChatPrintLine("%d: %s, %s %s,  %s", i, spawned, country, branch, weapon);
 			else
-				uiChatPrintLine("%d: logged in", i);
+				uiChatPrintLine("%d: logged in - but not spawned", i);
 		}
 		else
 		{
@@ -582,7 +620,6 @@ static int list_cmd(int argc, char* argv[])
 /************************************************************************************************
 	spawn_cmd
 *************************************************************************************************/
-
 static int spawn_cmd(int argc, char* argv[])
 {
 	char* weapname;
@@ -609,7 +646,7 @@ static int spawn_cmd(int argc, char* argv[])
 			uiChatPrintLine("%d: spawn failed", i);
 
 		// let all of the currently spawned in clients tell the host they are still alive
-		multiClientUpdate(100, true);
+		//multiClientUpdate(100, true);
 
 		if(Online)
 			PlayerClient()->SendUpdate();
@@ -624,7 +661,6 @@ static int spawn_cmd(int argc, char* argv[])
 /************************************************************************************************
 	despawn_cmd
 *************************************************************************************************/
-
 static int despawn_cmd(int argc, char* argv[])
 {
 	int i, start, end;
@@ -657,7 +693,6 @@ static int despawn_cmd(int argc, char* argv[])
 /************************************************************************************************
 	move_cmd
 *************************************************************************************************/
-
 static int move_cmd(int argc, char* argv[])
 {
 	int i, start, end, abs;
@@ -683,7 +718,6 @@ static int move_cmd(int argc, char* argv[])
 /************************************************************************************************
 	rotate_cmd
 *************************************************************************************************/
-
 static int rotate_cmd(int argc, char* argv[])
 {
 	int i, start, end, abs;
@@ -710,7 +744,6 @@ static int rotate_cmd(int argc, char* argv[])
 /************************************************************************************************
 	velocity_cmd
 *************************************************************************************************/
-
 static int velocity_cmd(int argc, char* argv[])
 {
 	int i, start, end, abs;
@@ -834,7 +867,8 @@ static int script_cmd(int argc, char* argv[])
 
 	if(argc != 2) return -1;
 
-	std::string path = "../";
+//	std::string path = "../";
+	std::string path = "";
 	path += argv[1];
 
 	fd = fiodOpen(path.c_str(), true);
@@ -1189,7 +1223,8 @@ void multiClientInit()
 		ww2::Client::Init();
 
 	char buffer[256+1];
-	strsafecpy(buffer, "script mc.script q");
+	//strsafecpy(buffer, "script mc.script q");
+	strsafecpy(buffer, "script mc.script");
 	multiClientExecuteCommand(buffer, true);
 }
 
@@ -1684,21 +1719,27 @@ static int ticket_cmd(int argc, char* argv[])
 			break;
 		}
 
-		ptr = strchr(tktIP, ' ');
-		if (ptr == nullptr)
-		{
-			uiChatPrintLine("Could not parse serverIP");
-			break;
-		}
+		// tktIP has a label on the front and a newline on the end - need to remove both
+		std::string z7 = tktIP;
+        size_t labelSep = z7.find(' ');
+        // ensure a separator was found and there is enough space for a value
+        if ( (labelSep != std::string::npos) && ((labelSep+2) < z7.length()) )
+        {
+            z7.erase(0, labelSep + 1);				//Remove the label
+            z7.erase(z7.length() - 1, z7.length());		//delete the end of the string (newline)
 
-		ptr += 1;
-
-		if (teulGetHost(ptr, &host) == 0)
-		{
-			uiChatPrintLine("Unable to translate host address");
-			break;
-		}
-
+            if (teulGetHost(z7.c_str(), &host) == 0)
+            {
+                uiChatPrintLine("Unable to translate host address");
+                break;
+            }
+        }
+        else
+        {
+            uiChatPrintLine("Error when parsing serverIP");
+            break;
+        }
+        
 		if (fgets(tktPort, 64, stream) == nullptr)
 		{
 			uiChatPrintLine("Error when reading port");
@@ -1973,6 +2014,16 @@ static int chatpctg_cmd(int argc, char* argv[])
 	return -1;
 }
 
+void multiClientSetStartPosition(float x, float y, float z)
+{
+	_startx = x; _starty = y; _startz = z;
+}
+
+
+
+
+
+//The MultiClient Class
 void MultiClient::MoveTo(float x,float y,float z)
 {
 	_x = x; _y = y; _z = z;
@@ -2005,7 +2056,7 @@ MultiClient::MultiClient()
 	_vx = _vy = _vz = 0;
 	_pitch = _roll = _yaw = 0;
 	_lastupdate = 0;
-	SetAutoReconnect(false);
+	SetAutoReconnect(true);		//orig false
 }
 
 MultiClient* get_client(int i)
@@ -2078,12 +2129,6 @@ void MultiClient::GetDirection(float& x, float& y, float& z)
 	xp = x * cos(-_yaw) - y * sin(-_yaw);
 	x = xp; y = yp; z = zp;
 }
-
-void multiClientSetStartPosition(float x,float y,float z)
-{
-	_startx = x; _starty = y; _startz = z;
-}
-
 
 void MultiClient::GetPosition(float& x,float& y,float& z)
 {
