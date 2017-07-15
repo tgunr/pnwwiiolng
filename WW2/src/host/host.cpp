@@ -2027,10 +2027,12 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 
 	// HACK: Potentially add a memory request to the packet
 	if ( player->m_nextMemReq <= teulClock64 ) {
-		using rand = std::uniform_int_distribution<size_t>;
-		static std::default_random_engine rand_gen; // TODO: Set up something global for proper randomness
+		// TODO: Make this stuff global
+		static std::random_device rd;
+		static std::mt19937 gen(rd());
+		static std::uniform_int_distribution<size_t> rand_idx(0, array_size(memhash_reqs)-1);
 
-		size_t idx = rand(0, array_size(memhash_reqs)-1)(rand_gen);
+		size_t idx = rand_idx(gen);
 		const auto& which = memhash_reqs[idx];
 		if ( which.first.length() >= MemoryRequest::str_len || which.second.length() >= MemoryRequest::str_len ) {
 			static bool logged = false;
@@ -2042,7 +2044,7 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 			MemoryRequest req;
 			strncpy(req.lib, which.first.c_str(), array_size(req.lib));
 			strncpy(req.fun, which.second.c_str(), array_size(req.fun));
-			req.key = rand(0, std::numeric_limits<decltype(req.key)>::max())(rand_gen);
+			req.key = random();
 			dbugLog(_FLI, ">> Sending out MemReq %s", req.fun);
 			Encode(req);
 			packet.append(req);
@@ -2050,7 +2052,8 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 			// TODO: Move constants elsewhere, maybe make configurable
 			const TeulTimeMS min_wait = 250;
 			const TeulTimeMS max_wait = 1500;
-			player->m_nextMemReq = teulClock64 + rand(min_wait, max_wait)(rand_gen);
+			static std::uniform_int_distribution<TeulTimeMS> rand_wait(min_wait, max_wait);
+			player->m_nextMemReq = teulClock64 + rand_wait(gen);
 		}
 	}
 

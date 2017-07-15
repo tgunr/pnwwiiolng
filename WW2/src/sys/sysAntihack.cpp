@@ -141,7 +141,7 @@ namespace {
 		// Even if we haven't pulled new data, reobfuscate every update
 		// so it always looks like we're doing something.
 		std::default_random_engine rand_gen;
-		req.key = std::uniform_int_distribution<size_t>(0, std::numeric_limits<decltype(req.key)>::max())(rand_gen);
+		req.key = (uint32_t)random();
 		Encode(req);
 		data.hash = hash;
 #else

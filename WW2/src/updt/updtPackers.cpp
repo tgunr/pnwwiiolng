@@ -1136,7 +1136,7 @@ SINT32 updtPackSHARED_VEHICLE_INFO(PackMode mode, UCHAR* const data, SINT32 offs
 #endif
 
 	// TODO: Consider properly integrating this client-side instead of tacking it on like this
-	bool has_framehash;
+	bool has_framehash = false;
 #if platBuild == BUILD_CLIENT
 	// HACK: This stuff is built with the assumption that the client sends and the host receives
 	auto right_mode = TEUL_PACK;
