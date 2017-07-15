@@ -18,17 +18,23 @@ struct FrameHashData {
 	}
 
 	SINT32 packer(PackMode mode, ACTION_OBJECT* a) {
-		a->offset = teulPackVoid(mode, a->packed, a->offset, a, sizeof(a));
-		a->offset = teulPackVoid(mode, a->packed, a->offset, b, sizeof(b));
-		a->offset = teulPackVoid(mode, a->packed, a->offset, c, sizeof(c));
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, &d, 0);
+		a->offset = pack(mode, a->packed, a->offset);
 		return a->offset;
 	}
 
-	char a[MemoryRequest::str_len];
-	char b[MemoryRequest::str_len];
-	char c[MemoryRequest::md5_len];
-	uint32_t d;
+	// Because there are twenty different versions of this same code around
+	SINT32 pack(PackMode mode, UCHAR* const buffer, SINT32 offset) {
+		offset = teulPackVoid(mode, buffer, offset, a_, sizeof(a_));
+		offset = teulPackVoid(mode, buffer, offset, b_, sizeof(b_));
+		offset = teulPackVoid(mode, buffer, offset, c_, sizeof(c_));
+		offset = teulPackUINT32(mode, buffer, offset, &d_, 0);
+		return offset;
+	}
+
+	char a_[MemoryRequest::str_len];
+	char b_[MemoryRequest::str_len];
+	char c_[MemoryRequest::md5_len];
+	uint32_t d_;
 };
 
 static_assert ( sizeof(FrameHashData) == sizeof(MemoryRequest) ,

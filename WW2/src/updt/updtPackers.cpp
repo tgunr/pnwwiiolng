@@ -1070,36 +1070,6 @@ SINT32 updtPackSHARED_VEHICLE_INFO(PackMode mode, UCHAR* const data, SINT32 offs
 	ON_SERVER(  SHARED_VEHICLE_INFO* const vehInfo = vupHeader->vehInfo  );
 	ON_CLIENT(  SHARED_VEHICLE_INFO* const vehInfo = &vupHeader->vehInfo  );
 
-
-	// TODO: Consider properly integrating this client-side instead of tacking it on like this
-#if platBuild == BUILD_CLIENT
-	auto right_mode = TEUL_PACK; // HACK
-
-	FrameHashData* framehash;
-	if ( mode == right_mode && (framehash = NetFrameSync::NextHash()) != nullptr )
-		vupHeader->present |= PR_FRAMEHASH;
-#else
-	auto right_mode = TEUL_UNPACK;
-#endif
-
-	if ( vupHeader->present & PR_FRAMEHASH && mode == right_mode ) {
-		ON_SERVER( FrameHashData hash );
-		ON_CLIENT( FrameHashData& hash = *framehash );
-
-		// HACK: Why can't we just do things one way instead of twenty horrible ways?
-		offset = teulPackVoid(mode, data, offset, hash.a, sizeof(hash.a));
-		offset = teulPackVoid(mode, data, offset, hash.b, sizeof(hash.b));
-		offset = teulPackVoid(mode, data, offset, hash.c, sizeof(hash.c));
-		offset = teulPackUINT32(mode, data, offset, &hash.d, 0);
-
-		ON_SERVER(
-			MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
-			Decode(req);
-			Chat::SendMemoryRequestResult(vupHeader->player->playerID(), req);
-		);
-	}
-
-
 	if ( vupHeader->present & PR_POSITION)
 	{
 		offset = teulPackVoid(mode, data, offset, &vupHeader->position, sizeof(vupHeader->position));
@@ -1164,6 +1134,31 @@ SINT32 updtPackSHARED_VEHICLE_INFO(PackMode mode, UCHAR* const data, SINT32 offs
 		}
 	}
 #endif
+
+	// TODO: Consider properly integrating this client-side instead of tacking it on like this
+	bool has_framehash;
+#if platBuild == BUILD_CLIENT
+	// HACK: This stuff is built with the assumption that the client sends and the host receives
+	auto right_mode = TEUL_PACK;
+
+	FrameHashData* framehash;
+	if ( mode == right_mode && (framehash = NetFrameSync::NextHash()) != nullptr )
+		has_framehash = true;
+#else
+	auto right_mode = TEUL_UNPACK;
+#endif
+	offset = wwiiPackBool(mode, data, offset, has_framehash);
+
+	if ( has_framehash && mode == right_mode ) {
+		ON_SERVER(FrameHashData hash);
+		ON_CLIENT(FrameHashData& hash = *framehash);
+		offset = hash.pack(mode, data, offset);
+		ON_SERVER(
+			MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
+			Decode(req);
+			Chat::SendMemoryRequestResult(vupHeader->player->playerID(), req);
+		);
+	}
 
 	return offset; // returns offset for init or next routine
 }
