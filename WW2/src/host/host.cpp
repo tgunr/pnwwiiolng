@@ -2046,8 +2046,14 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 			strncpy(req.fun, which.second.c_str(), array_size(req.fun));
 			req.key = random();
 			dbugLog(_FLI, ">> Sending out MemReq %s", req.fun);
+			player->message(LSTR_NOTE, LSTR_GENERIC, "> MemReq From Server");
 			Encode(req);
-			packet.append(req);
+
+			// FUUUUUUUUUU-
+			packet.append(req.lib, sizeof(req.lib));
+			packet.append(req.fun, sizeof(req.fun));
+			packet.append(req.md5, sizeof(req.md5));
+			packet.append(req.key);
 
 			// TODO: Move constants elsewhere, maybe make configurable
 			const TeulTimeMS min_wait = 250;
