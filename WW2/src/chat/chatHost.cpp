@@ -743,6 +743,8 @@ Chat::SendModReport(const ChatHandle handle, const Chat::ModReport modType)
 //////////////////////////////////////////////////////////////////////
 
 void Chat::SendMemoryRequestResult(const playerid_t playerid, const MemoryRequest& req) {
+	dbugLog(_FLI, ">> Processing MemReq %s", req.fun);
+
 	Player* player = PlayerInterface::Lookup(playerid);
 	if ( player == nullptr ) {
 		dbugLog(_FLD, "Ignoring memory request result for unknown playerid %u", playerid);

@@ -8,8 +8,8 @@ namespace NetFrameSync {
 	void UpdateNextHash(void);
 
 	void DumpHashes(ACTION_OBJECT*); // TODO: Dump stored hashes when we first connect
-	// NOTE: This may not actually send anything; we only send after the hash has been processed.
-	void SendHash(ACTION_OBJECT*);
+	// Retrieves the next hash to be sent, if any
+	FrameHashData* NextHash(void);
 
 	void RecvHash(ACTION_OBJECT*);
 	void RecvHash(const FrameHashData&);

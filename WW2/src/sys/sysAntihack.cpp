@@ -8,6 +8,8 @@
 #include <pa/md5.h>
 #include <wwii/wwiiAntihack.h>
 
+#include <ui/uiChat.h>
+
 
 namespace NetFrameSync {
 
@@ -175,14 +177,12 @@ void InitializeHashes(void) {
 		return;
 	}
 
-	// HACK: Dumped StoredHashData for a bunch of functions and saved it in a file.
-	for ( size_t i = 0 ; i < array_size(hashes) && i < size / sizeof(StoredHashData) ; ++i ) {
-		memcpy(&hashes[i].hash, data + (i * sizeof(StoredHashData)), sizeof(StoredHashData));
+	// HACK: Dumped FrameHashData for a bunch of functions and saved it in a file.
+	for ( size_t i = 0 ; i < array_size(hashes) && i < size / sizeof(FrameHashData) ; ++i ) {
+		memcpy(&hashes[i].hash, data + (i * sizeof(FrameHashData)), sizeof(FrameHashData));
 		hashes[i].state = HASH_RECV;
 	}
-
 	memFree(data);
-
 
 	for ( auto& hash : hashes ) {
 		Process(hash);
@@ -207,15 +207,15 @@ void DumpHashes(ACTION_OBJECT* a) {
 	}
 }
 
-
-void SendHash(ACTION_OBJECT* a) {
+FrameHashData* NextHash(void) {
 	if ( hashes[send_idx].state != HASH_PROC ) {
-		return;
+		return nullptr;
 	}
 
-	a->offset = hashes[send_idx].hash.packer(TEUL_PACK, a);
+	FrameHashData* hash = &hashes[send_idx].hash;
 	hashes[send_idx++].state = HASH_SENT;
 	if ( send_idx >= num_hashes ) send_idx = 0;
+	return hash;
 }
 
 
@@ -230,8 +230,11 @@ void RecvHash(const FrameHashData& hash) {
 	if ( next_idx >= num_hashes ) next_idx = 0;
 	if ( next_idx == send_idx ) {
 		dbugLog(_FLW, "The host has requested too many frame hashes without giving us time to respond. This can lead to serious sync issues.");
+		uiChatPrintLine("Uh oh!");
 		return;
 	}
+
+	uiChatPrintLine("Receiving Hash");
 
 	hashes[recv_idx].hash = hash;
 	hashes[recv_idx].state = HASH_RECV;

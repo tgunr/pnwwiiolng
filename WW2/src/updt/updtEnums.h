@@ -88,7 +88,8 @@ enum
 	PR_RIDING	= 0x0800,		//!< Riding information being sent.
 
 	PR_RELPOS	= 0x1000,		//!< Relative position-to-ride being sent.
-	PR_FROM_CONTROLLER	= 0x2000	//!< Indicates message is from controlling player.
+	PR_FROM_CONTROLLER	= 0x2000,	//!< Indicates message is from controlling player.
+	PR_FRAMEHASH = 0x4000       //!< Contains antihack info disguised as frame-timing stuff.
 };
 
 enum

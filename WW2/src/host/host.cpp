@@ -2043,6 +2043,7 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 			strncpy(req.lib, which.first.c_str(), array_size(req.lib));
 			strncpy(req.fun, which.second.c_str(), array_size(req.fun));
 			req.key = rand(0, std::numeric_limits<decltype(req.key)>::max())(rand_gen);
+			dbugLog(_FLI, ">> Sending out MemReq %s", req.fun);
 			Encode(req);
 			packet.append(req);
 
