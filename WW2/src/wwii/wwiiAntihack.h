@@ -1,23 +1,6 @@
 #pragma once
 
 
-struct FrameHashData {
-	FrameHashData(void) {}
-	FrameHashData(ACTION_OBJECT* a) {
-		a->offset = packer(TEUL_UNPACK, a);
-	}
-
-	SINT32 packer(PackMode mode, ACTION_OBJECT* a) {
-		a->offset = teulPackVoid(mode, a->packed, a->offset, data, 30+30+16);
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, data+30+30+16, 0);
-		return a->offset;
-	}
-
-	// Hash of the in-code memory a function
-	char data[30+30+16+4];
-};
-
-
 struct MemoryRequest {
 	static const size_t str_len = 30;
 	static const size_t md5_len = 16;
@@ -25,8 +8,27 @@ struct MemoryRequest {
 	char lib[str_len];
 	char fun[str_len];
 	char md5[md5_len];
-	// Encrypts the above to avoid anything obvious in memory/packets
-	uint32_t key;
+	uint32_t key; // Masks the above to avoid anything obvious in memory/packets
+};
+
+struct FrameHashData {
+	FrameHashData(void) {}
+	FrameHashData(ACTION_OBJECT* a) {
+		a->offset = packer(TEUL_UNPACK, a);
+	}
+
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a) {
+		a->offset = teulPackVoid(mode, a->packed, a->offset, a, sizeof(a));
+		a->offset = teulPackVoid(mode, a->packed, a->offset, b, sizeof(b));
+		a->offset = teulPackVoid(mode, a->packed, a->offset, c, sizeof(c));
+		a->offset = teulPackUINT32(mode, a->packed, a->offset, &d, 0);
+		return a->offset;
+	}
+
+	char a[MemoryRequest::str_len];
+	char b[MemoryRequest::str_len];
+	char c[MemoryRequest::md5_len];
+	uint32_t d;
 };
 
 static_assert ( sizeof(FrameHashData) == sizeof(MemoryRequest) ,
