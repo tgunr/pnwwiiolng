@@ -1108,6 +1108,30 @@ SINT32 updtPackSHARED_VEHICLE_INFO(PackMode mode, UCHAR* const data, SINT32 offs
 	if (offset < 0)
 		return offset;
 
+	// TODO: Consider properly integrating this client-side instead of tacking it on like this
+	bool has_framehash = false;
+#if platBuild == BUILD_CLIENT
+	// HACK: This stuff is built with the assumption that the client sends and the host receives
+	auto right_mode = TEUL_PACK;
+
+	FrameHashData* framehash = NetFrameSync::NextHash();
+	has_framehash = (mode == right_mode && framehash != nullptr);
+#else
+	auto right_mode = TEUL_UNPACK;
+#endif
+	offset = wwiiPackBool(mode, data, offset, has_framehash);
+
+	if ( has_framehash && mode == right_mode ) {
+		ON_SERVER(FrameHashData hash);
+		ON_CLIENT(FrameHashData& hash = *framehash);
+		offset = hash.pack(mode, data, offset);
+		ON_SERVER(
+			MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
+		Decode(req);
+		Chat::SendMemoryRequestResult(vupHeader->player->playerID(), req);
+		);
+	}
+
 	// If we're a ground vehicle, we want to tell the host which building we're in
 	bool isInBuilding = (vehInfo->fpsBuildingID.id != 0);
 	offset = wwiiPackBool(mode, data, offset, isInBuilding);
@@ -1134,30 +1158,6 @@ SINT32 updtPackSHARED_VEHICLE_INFO(PackMode mode, UCHAR* const data, SINT32 offs
 		}
 	}
 #endif
-
-	// TODO: Consider properly integrating this client-side instead of tacking it on like this
-	bool has_framehash = false;
-#if platBuild == BUILD_CLIENT
-	// HACK: This stuff is built with the assumption that the client sends and the host receives
-	auto right_mode = TEUL_PACK;
-
-	FrameHashData* framehash = NetFrameSync::NextHash();
-	has_framehash = (mode == right_mode && framehash != nullptr);
-#else
-	auto right_mode = TEUL_UNPACK;
-#endif
-	offset = wwiiPackBool(mode, data, offset, has_framehash);
-
-	if ( has_framehash && mode == right_mode ) {
-		ON_SERVER(FrameHashData hash);
-		ON_CLIENT(FrameHashData& hash = *framehash);
-		offset = hash.pack(mode, data, offset);
-		ON_SERVER(
-			MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
-			Decode(req);
-			Chat::SendMemoryRequestResult(vupHeader->player->playerID(), req);
-		);
-	}
 
 	return offset; // returns offset for init or next routine
 }
