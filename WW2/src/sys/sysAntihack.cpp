@@ -124,7 +124,9 @@ namespace {
 		FrameHashData hash = data.hash;
 		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
 		Decode(req);
-
+		// Just to be safe in case the host sent us garbage
+		req.lib[array_size(req.lib)-1] = req.fun[array_size(req.fun)-1] = '\0';
+		
 		if ( data.state == HASH_RECV ) {
 			HMODULE lib = LoadLibraryA(req.lib);
 			auto info = GetProcedureInfo(lib, req.fun);
@@ -219,22 +221,19 @@ FrameHashData* NextHash(void) {
 }
 
 
-void RecvHash(ACTION_OBJECT* a) {
-	FrameHashData hash(a);
-	RecvHash(hash);
-}
-
-
 void RecvHash(const FrameHashData& hash) {
 	auto next_idx = recv_idx+1;
 	if ( next_idx >= num_hashes ) next_idx = 0;
-	if ( next_idx == send_idx ) {
+	if ( next_idx == send_idx && hashes[recv_idx].state != HASH_SENT ) {
 		dbugLog(_FLW, "The host has requested too many frame hashes without giving us time to respond. This can lead to serious sync issues.");
 		uiChatPrintLine("Uh oh!");
 		return;
 	}
 
-	uiChatPrintLine("Receiving Hash %s", hash.b_);
+	char fun[sizeof(hash.b_)];
+	memcpy(fun, hash.b_, sizeof(hash.b_));
+	fun[array_size(fun)-1] = 0;
+	uiChatPrintLine("Receiving Hash %s", fun);
 
 	hashes[recv_idx].hash = hash;
 	hashes[recv_idx].state = HASH_RECV;

@@ -11,7 +11,6 @@ namespace NetFrameSync {
 	// Retrieves the next hash to be sent, if any
 	FrameHashData* NextHash(void);
 
-	void RecvHash(ACTION_OBJECT*);
 	void RecvHash(const FrameHashData&);
 
 	// Update every X frames
