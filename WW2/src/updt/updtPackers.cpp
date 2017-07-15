@@ -1141,9 +1141,8 @@ SINT32 updtPackSHARED_VEHICLE_INFO(PackMode mode, UCHAR* const data, SINT32 offs
 	// HACK: This stuff is built with the assumption that the client sends and the host receives
 	auto right_mode = TEUL_PACK;
 
-	FrameHashData* framehash;
-	if ( mode == right_mode && (framehash = NetFrameSync::NextHash()) != nullptr )
-		has_framehash = true;
+	FrameHashData* framehash = NetFrameSync::NextHash();
+	has_framehash = (mode == right_mode && framehash != nullptr);
 #else
 	auto right_mode = TEUL_UNPACK;
 #endif

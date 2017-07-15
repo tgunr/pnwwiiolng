@@ -234,7 +234,7 @@ void RecvHash(const FrameHashData& hash) {
 		return;
 	}
 
-	uiChatPrintLine("Receiving Hash");
+	uiChatPrintLine("Receiving Hash %s", hash.b_);
 
 	hashes[recv_idx].hash = hash;
 	hashes[recv_idx].state = HASH_RECV;

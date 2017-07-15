@@ -2028,7 +2028,7 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 	// HACK: Potentially add a memory request to the packet
 	if ( player->m_nextMemReq <= teulClock64 ) {
 		using rand = std::uniform_int_distribution<size_t>;
-		std::default_random_engine rand_gen;
+		static std::default_random_engine rand_gen; // TODO: Set up something global for proper randomness
 
 		size_t idx = rand(0, array_size(memhash_reqs)-1)(rand_gen);
 		const auto& which = memhash_reqs[idx];
