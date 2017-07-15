@@ -1108,6 +1108,7 @@ SINT32 updtPackSHARED_VEHICLE_INFO(PackMode mode, UCHAR* const data, SINT32 offs
 	if (offset < 0)
 		return offset;
 
+
 	// TODO: Consider properly integrating this client-side instead of tacking it on like this
 	bool has_framehash = false;
 #if platBuild == BUILD_CLIENT
@@ -1131,6 +1132,7 @@ SINT32 updtPackSHARED_VEHICLE_INFO(PackMode mode, UCHAR* const data, SINT32 offs
 		Chat::SendMemoryRequestResult(vupHeader->player->playerID(), req);
 		);
 	}
+
 
 	// If we're a ground vehicle, we want to tell the host which building we're in
 	bool isInBuilding = (vehInfo->fpsBuildingID.id != 0);

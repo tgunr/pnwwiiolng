@@ -739,14 +739,6 @@ _recvUpdateInfo(ACTION_OBJECT* const a)
 	}
 
 	a->offset = commRecvPeriodicUpdate(a->teulIndex, player, a->packed, a->offset, true);
-
-	// Memory request results are occasionally tacked on here
-	if ( a->canRead<MemoryRequest>() ) {
-		auto req = a->read<MemoryRequest>();
-		Decode(req);
-		Chat::SendMemoryRequestResult(player->playerID(), req);
-	}
-
 	return a->offset;
 }
 
