@@ -742,11 +742,17 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 	bool sizeLimitReached = false;
 
 
-	bool do_framehash = false;
-	ON_SERVER( do_framehash = wu->myVehicle->m_nextMemReq <= teulClock64 );
-	offset = wwiiPackBool(mode, data, offset, do_framehash);
+	UCHAR do_framehash = (UCHAR)false;
+	ON_SERVER( do_framehash = (UCHAR)wu->myVehicle->m_nextMemReq <= teulClock64 );
+	// HACK: World updates are a mess
+	ON_SERVER( data = (UCHAR*)wu->packet->allocateBytes(sizeof(do_framehash)); offset = 0 );
+	offset = teulPackUCHAR(mode, data, offset, &do_framehash, 8);
 	if ( do_framehash ) {
 		ON_SERVER (
+			const size_t alloc_size = sizeof(MemoryRequest);
+			data = (UCHAR*)wu->packet->allocateBytes(alloc_size);
+			offset = 0;
+
 			// TODO: Make this stuff global
 			static std::random_device rd;
 			static std::mt19937 gen(rd());
@@ -758,8 +764,12 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 				static bool logged = false;
 				if ( !logged )
 					dbugLog(_FLA, "[%s : %s] string has more than %d characters and cannot be requested! This message will only appear once, so review all other values as well.",
-						which.first.c_str(), which.second.c_str(), MemoryRequest::str_len);
+					        which.first.c_str(), which.second.c_str(), MemoryRequest::str_len);
 				logged = true;
+
+				// Throw something in there so the client isn't just reading garbage
+				char buf[alloc_size] = {0};
+				teulPackVoid(mode, data, offset, buf, sizeof(buf));
 			} else {
 				MemoryRequest req;
 				strncpy(req.lib, which.first.c_str(), array_size(req.lib));
@@ -769,6 +779,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 				Encode(req);
 
 				offset = reinterpret_cast<FrameHashData&>(req).pack(mode, data, offset);
+				assert ( offset == alloc_size * 8 ); // We'd better have allocated as much as we needed
 
 				// TODO: Move constants elsewhere, maybe make configurable
 				const TeulTimeMS min_wait = 250;

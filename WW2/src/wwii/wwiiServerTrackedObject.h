@@ -280,9 +280,9 @@ public:
 
 	//! Set the lifespan of this sto
 	public:
-	void setLifespan(UINT32 lifespan)
+	void setLifespan(UINT32 l)
 	{
-        m_lifespan = lifespan;
+        m_lifespan = l;
 	}
 
 	//! Set whether this STO can be automatically removed.
