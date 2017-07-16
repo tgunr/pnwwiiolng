@@ -59,6 +59,7 @@ public:
 public:
 	TeulTimeMS				m_lastTimeRx;			// Timestamp on the player's client as of last rx.
 	TeulTimeMS				m_lastTimeRxed;			// Host timestamp for the rx'ed value.
+	TeulTimeMS m_nextMemReq = 0; // The next time to send out a memory request
 
 	HostVehicle*			vehicle;
 	class SpeedhackCheck* m_antiHack;

@@ -743,13 +743,19 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 
 
 	UCHAR do_framehash = (UCHAR)false;
-	ON_SERVER (
-		do_framehash = (UCHAR)wu->myVehicle->m_nextMemReq <= teulClock64;
+	ON_SERVER(
 		// HACK: World updates are a mess
 		const size_t start_bytes = wu->packet->payloadSizeBytes();
-		wu->packet->setPayloadCapacityBytes(start_bytes + 128); // More than enough for our antihack stuff
+		wu->packet->setPayloadCapacityBytes(start_bytes + 128);
 		data = (UCHAR*)wu->packet->writePointer();
 		offset = 0;
+
+		// TODO: Should really be per-player
+		auto pl_it = wu->myVehicle->players().begin();
+		Player* main_player = (pl_it != wu->myVehicle->players().end() ? *pl_it : nullptr);
+		if ( main_player != nullptr && main_player->m_nextMemReq <= teulClock64 ) {
+			do_framehash = (UCHAR)true;
+		}
 	);
 	offset = teulPackUCHAR(mode, data, offset, &do_framehash, 0);
 	if ( do_framehash ) {
@@ -758,7 +764,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 			// TODO: Move constants elsewhere, maybe make configurable
 			const TeulTimeMS min_wait = 350;
 			const TeulTimeMS max_wait = 2000;
-			wu->myVehicle->m_nextMemReq = teulClock64 + min_wait + (random() % (max_wait - min_wait));
+			main_player->m_nextMemReq = teulClock64 + min_wait + (random() % (max_wait - min_wait));
 
 			// TODO: Make some of this randomness stuff global
 			static std::random_device rd;
