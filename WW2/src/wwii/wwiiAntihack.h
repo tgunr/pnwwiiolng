@@ -40,11 +40,8 @@ struct FrameHashData {
 static_assert ( sizeof(FrameHashData) == sizeof(MemoryRequest) ,
                 "Helper struct's size needs to match the obfuscating type's size" );
 
-#define ENABLE_MASKING 1 // TESTING
-
 // TODO: Implement something better when we have more than 10 minutes to spare
 inline void Encode(MemoryRequest& req) {
-#ifdef ENABLE_MASKING
 	char* beg = reinterpret_cast<char*>(&req);
 	const size_t req_size = sizeof(MemoryRequest) - sizeof(uint32_t); // Ignores key
 	auto Get = [beg, req_size] (int i) -> char& {
@@ -58,11 +55,9 @@ inline void Encode(MemoryRequest& req) {
 	}
 
 	req.key += 0xff;
-#endif
 }
 
 inline void Decode(MemoryRequest& req) {
-#ifdef ENABLE_MASKING
 	char* beg = reinterpret_cast<char*>(&req);
 	const size_t req_size = sizeof(MemoryRequest) - sizeof(uint32_t); // Ignores key
 	auto Get = [beg, req_size] (int i) -> char& {
@@ -76,5 +71,4 @@ inline void Decode(MemoryRequest& req) {
 	for ( int i = 0 ; i < (int)req_size ; ++i ) {
 		Get(i) -= 0xff + i * req.key + i;
 	}
-#endif
 }

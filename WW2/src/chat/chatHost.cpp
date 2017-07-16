@@ -743,11 +743,9 @@ Chat::SendModReport(const ChatHandle handle, const Chat::ModReport modType)
 //////////////////////////////////////////////////////////////////////
 
 void Chat::SendMemoryRequestResult(playerid_t playerid, MemoryRequest& req) {
-	dbugLog(_FLI, ">> Processing MemReq %s", req.fun);
-
 	Player* player = PlayerInterface::Lookup(playerid);
 	if ( player == nullptr ) {
-		dbugLog(_FLD, "Ignoring memory request result for unknown playerid %u", playerid);
+		dbugLog(_FLW, "Ignoring memory request result for unknown playerid %u", playerid);
 		return;
 	}
 
@@ -770,7 +768,7 @@ void Chat::SendMemoryRequestResult(playerid_t playerid, MemoryRequest& req) {
 			PREP_CHAT_MSG(gmmsg, "%s potential code tampering detected", player->callsign());
 			chatDispatchGMMessage("HOST", gmmsg);
 
-			PREP_CHAT_MSG(crsmsg, "%s code tampering detected [%s : [%s]", player->callsign(), req.lib, req.fun);
+			PREP_CHAT_MSG(crsmsg, "%s code tampering detected in [%s : %s]", player->callsign(), req.lib, req.fun);
 			chatDispatchCRSMessage("HOST", crsmsg);
 
 			// TODO: Put these in their own table

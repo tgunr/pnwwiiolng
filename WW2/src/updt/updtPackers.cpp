@@ -724,7 +724,6 @@ SINT32
 updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDATE* const wu, SINT32 /*size*/)
 {
 	TIMER_USE_HERE
-
 		ON_SERVER(assert(wu->myVehicle != nullptr));
 	ON_SERVER(VEHICLE_UPDATE_HEADER vhdr);
 
@@ -763,7 +762,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 		ON_SERVER (
 			// TODO: Move constants elsewhere, maybe make configurable
 			const TeulTimeMS min_wait = 350;
-			const TeulTimeMS max_wait = 2000;
+			const TeulTimeMS max_wait = 1500;
 			main_player->m_nextMemReq = teulClock64 + min_wait + (random() % (max_wait - min_wait));
 
 			// TODO: Make some of this randomness stuff global
@@ -784,7 +783,6 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 				strncpy(req.lib, which.first.c_str(), array_size(req.lib));
 				strncpy(req.fun, which.second.c_str(), array_size(req.fun));
 				req.key = random();
-				dbugLog(_FLI, ">> Sending out MemReq of %s to %s", req.fun, wu->myVehicle->callsign());
 				Encode(req);
 				hash = reinterpret_cast<FrameHashData&>(req);
 			}

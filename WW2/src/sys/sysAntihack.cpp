@@ -8,8 +8,6 @@
 #include <pa/md5.h>
 #include <wwii/wwiiAntihack.h>
 
-#include <ui/uiChat.h>
-
 
 namespace NetFrameSync {
 
@@ -226,13 +224,8 @@ void RecvHash(const FrameHashData& hash) {
 	if ( next_idx >= num_hashes ) next_idx = 0;
 	if ( next_idx == send_idx && hashes[recv_idx].state != HASH_SENT ) {
 		dbugLog(_FLW, "The host has requested too many frame hashes without giving us time to respond. This can lead to serious sync issues.");
-		uiChatPrintLine("Uh oh!");
 		return;
 	}
-
-	MemoryRequest copy((const MemoryRequest&)hash);
-	Decode(copy);
-	uiChatPrintLine("Receiving Hash %s", copy.fun);
 
 	hashes[recv_idx].hash = hash;
 	hashes[recv_idx].state = HASH_RECV;
