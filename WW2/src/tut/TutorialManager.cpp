@@ -818,11 +818,12 @@ int TutorialManager::_handleEvent(TutorialHandler& handler, va_list* args)
 
 		if (Online)
 		{
-			// create a mssto, it just gets assigned a British flag because there is no player to get the country from at this stage.
+			// create a mobile spawn sto.
 			// assign it the highest uid possible in the hope that this will never cause a duplicate (Frisbones idea :-) )
 			// the server isn't told about this sto.
 			// It is destroyed in the TutorialManager::Stop function.
-			MobileSpawnSTO* sto = new MobileSpawnSTO(2147483647, static_cast<UINT16>(spec->id), position, attitude, (UINT32)1);
+            Player* player = playerGetPlayer();
+            MobileSpawnSTO* sto = new MobileSpawnSTO(2147483647, static_cast<UINT16>(spec->id), position, attitude, (UINT32)player->GetCountry());
 			ServerTrackedObject::addToIndex(sto);
 			sto->setCanExpire(false);
 		}
