@@ -123,7 +123,8 @@ namespace {
 		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
 		Decode(req);
 		// Just to be safe in case the host sent us garbage
-		req.lib[array_size(req.lib)-1] = req.fun[array_size(req.fun)-1] = '\0';
+		req.lib[array_size(req.lib)-1] = '\0';
+		req.fun[array_size(req.fun)-1] = '\0';
 		
 		if ( data.state == HASH_RECV ) {
 			HMODULE lib = LoadLibraryA(req.lib);
@@ -140,7 +141,6 @@ namespace {
 
 		// Even if we haven't pulled new data, reobfuscate every update
 		// so it always looks like we're doing something.
-		std::default_random_engine rand_gen;
 		req.key = (uint32_t)random();
 		Encode(req);
 		data.hash = hash;

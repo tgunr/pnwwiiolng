@@ -751,7 +751,8 @@ void Chat::SendMemoryRequestResult(playerid_t playerid, MemoryRequest& req) {
 
 	// Can't trust data from the client
 	// TODO: Verify that these are valid to check for tampering
-	req.lib[array_size(req.lib)-1] = req.fun[array_size(req.fun)] = '\0';
+	req.lib[array_size(req.lib)-1] = '\0';
+	req.fun[array_size(req.fun)-1] = '\0';
 
 	auto func = std::pair<std::string, std::string>(req.lib, req.fun);
 	if ( player->tampered_funcs.find(func) != player->tampered_funcs.end() )
