@@ -3,10 +3,10 @@
 
 #include <random>
 
-#include <fio/fio.h>
-#include <mem/mem.h>
-#include <pa/md5.h>
-#include <wwii/wwiiAntihack.h>
+#include "fio/fio.h"
+#include "mem/mem.h"
+#include "pa/md5.h"
+#include "wwii/wwiiAntihack.h"
 
 
 namespace NetFrameSync {
@@ -117,9 +117,9 @@ namespace {
 	//--------------
 
 	void Process(StoredHashData& data) {
+        FrameHashData hash = data.hash;
 #if platOS == OS_WIN32
 		// Copied to avoid ever having anything unobfuscated in global memory
-		FrameHashData hash = data.hash;
 		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
 		Decode(req);
 		// Just to be safe in case the host sent us garbage

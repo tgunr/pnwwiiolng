@@ -430,6 +430,7 @@
 		E91EBF511E744877005AE0A0 /* libsteam_api.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E91EBF4F1E7447F6005AE0A0 /* libsteam_api.dylib */; };
 		E94156B01D259A0300C0565B /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94156AF1D259A0300C0565B /* libb64.a */; };
 		E95E664F1E8301A3005A04FF /* steam_appid.txt in Resources */ = {isa = PBXBuildFile; fileRef = E95E664E1E8301A2005A04FF /* steam_appid.txt */; };
+		E971F7151F1BF65800B500F1 /* sysAntihack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E971F7121F1BF61F00B500F1 /* sysAntihack.cpp */; };
 		E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
 		E97C76161C848E3600875F44 /* CADebugger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B1120222EB00A60CC2 /* CADebugger.cpp */; };
 		E97C76171C848E3A00875F44 /* CADebugMacros.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B3120222EB00A60CC2 /* CADebugMacros.cpp */; };
@@ -1525,6 +1526,8 @@
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E94156AF1D259A0300C0565B /* libb64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libb64.a; path = lib/mac/libb64.a; sourceTree = "<group>"; };
 		E95E664E1E8301A2005A04FF /* steam_appid.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = steam_appid.txt; path = ../opt/ww2mods/steam_appid.txt; sourceTree = "<group>"; };
+		E971F7121F1BF61F00B500F1 /* sysAntihack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sysAntihack.cpp; path = src/sys/sysAntihack.cpp; sourceTree = SOURCE_ROOT; };
+		E971F7131F1BF61F00B500F1 /* sysAntihack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysAntihack.h; path = src/sys/sysAntihack.h; sourceTree = SOURCE_ROOT; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
 		E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader2.cpp; sourceTree = "<group>"; };
 		E97C76351C8513EB00875F44 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2626,6 +2629,8 @@
 		08104D50103DFBE90065E0E2 /* sysmac */ = {
 			isa = PBXGroup;
 			children = (
+				E971F7121F1BF61F00B500F1 /* sysAntihack.cpp */,
+				E971F7131F1BF61F00B500F1 /* sysAntihack.h */,
 				FA06C3BB1EE18C8B00A9977E /* sysSteam.cpp */,
 				FA06C3BC1EE18C8B00A9977E /* sysSteam.h */,
 				FA06C3B71ED0DCDF00A9977E /* sysLaunchUrl.h */,
@@ -3702,6 +3707,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E971F7151F1BF65800B500F1 /* sysAntihack.cpp in Sources */,
 				E9C3FB6F1EE1A8DC00872413 /* multiClient.cpp in Sources */,
 				E98C64811E48DF7C00ABE277 /* wwiiBackChannel.cpp in Sources */,
 				FAE0DB8D1DC260AF00A9E63D /* omgChat.omg in Sources */,
