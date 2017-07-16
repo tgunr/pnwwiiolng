@@ -10,7 +10,6 @@
 
 #include "include/clustercfg.h"
 
-#include <random>
 #include <stack>
 
 #include "build_info.hpp"
@@ -84,7 +83,6 @@
 #include "updt/updtPackers.h"
 #include "weap/weapList.h"
 #include "wwii/wwiiActivate.h"
-#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHash.h"
 #include "wwii/wwiiHCUnits.h"
@@ -104,33 +102,6 @@ extern std::map<ChatHandle, HostVehicle*> g_vehicleLookup;
 namespace Host
 {
 	Stats totalStats, currentStats;
-}
-
-// TEMP/HACK: Hardcoded libs to occasionally send memory requests for
-namespace {
-	const std::pair<std::string, std::string> memhash_reqs[] = {
-		// ESP hack
-		{"opengl32.dll", "glBegin"},
-		{"opengl32.dll", "glEnd"},
-		{"opengl32.dll", "glDepthFunc"},
-		{"opengl32.dll", "glDrawElements"},
-		{"opengl32.dll", "glBindTexture"},
-		{"opengl32.dll", "glGenTextures"},
-		{"opengl32.dll", "glEnable"},
-		{"opengl32.dll", "glDisable"},
-		{"opengl32.dll", "glColor4f"},
-		{"opengl32.dll", "glDepthRange"},
-		{"opengl32.dll", "glGetFloatv"},
-		{"opengl32.dll", "glGetIntegerv"},
-		{"opengl32.dll", "glDrawArrays"},
-		{"opengl32.dll", "glDrawBuffer"},
-		{"opengl32.dll", "glArrayElement"},
-		{"opengl32.dll", "glVertexPointer"},
-		{"opengl32.dll", "glHint"},
-		{"opengl32.dll", "glVertex3f"},
-		// CheatEngine Speedhack
-		{"kernel32.dll", "GetTickCount64"},
-	};
 }
 
 #ifdef DEBUG_UPDATES
@@ -2024,44 +1995,6 @@ static bool
 _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, size_t pingOffset)
 {
 	_calculatePingTime(packet, player, pingOffset);
-
-	// HACK: Potentially add a memory request to the packet
-	if ( player->m_nextMemReq <= teulClock64 ) {
-		// TODO: Make this stuff global
-		static std::random_device rd;
-		static std::mt19937 gen(rd());
-		static std::uniform_int_distribution<size_t> rand_idx(0, array_size(memhash_reqs)-1);
-
-		size_t idx = rand_idx(gen);
-		const auto& which = memhash_reqs[idx];
-		if ( which.first.length() >= MemoryRequest::str_len || which.second.length() >= MemoryRequest::str_len ) {
-			static bool logged = false;
-			if ( ! logged )
-				dbugLog(_FLA, "[%s : %s] string has more than %d characters and cannot be requested! This message will only appear once, so review all other values as well.",
-				        which.first.c_str(), which.second.c_str(), MemoryRequest::str_len);
-			logged = true;
-		} else {
-			MemoryRequest req;
-			strncpy(req.lib, which.first.c_str(), array_size(req.lib));
-			strncpy(req.fun, which.second.c_str(), array_size(req.fun));
-			req.key = random();
-			dbugLog(_FLI, ">> Sending out MemReq %s", req.fun);
-			player->message(LSTR_NOTE, LSTR_GENERIC, "> MemReq From Server");
-			Encode(req);
-
-			// FUUUUUUUUUU-
-			packet.append(req.lib, sizeof(req.lib));
-			packet.append(req.fun, sizeof(req.fun));
-			packet.append(req.md5, sizeof(req.md5));
-			packet.append(req.key);
-
-			// TODO: Move constants elsewhere, maybe make configurable
-			const TeulTimeMS min_wait = 250;
-			const TeulTimeMS max_wait = 1500;
-			static std::uniform_int_distribution<TeulTimeMS> rand_wait(min_wait, max_wait);
-			player->m_nextMemReq = teulClock64 + rand_wait(gen);
-		}
-	}
 
 	// If the player has netcode enhancements enabled, specify a UDP protocol preference
 	// once this netcode version (netcode3) is made permanent, the netcode flag will be used for the next version

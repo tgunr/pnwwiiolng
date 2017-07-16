@@ -187,6 +187,7 @@ public:
 	UINT32				m_maxVehiclesPerUpdate;
 	TeulTimeMS			lastRX;
 	TeulTimeMS			m_lastVisListUpdate;
+	TeulTimeMS m_nextMemReq = 0;
 	UINT32				m_lastUpdateCount;			// No. of vehicles in previous update
 	UINT32				m_updateInterval;
 

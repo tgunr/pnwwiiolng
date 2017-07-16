@@ -15,7 +15,6 @@
 #include "comm/commPackers.h"
 #include "fp/fpFPS.h"
 #include "pers/persmain.h"
-#include "sys/sysAntihack.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulPacket.h"
 #include "updt/updtInfDeath.h"
@@ -24,7 +23,6 @@
 #include "updt/updtVehicleHit.h"
 #include "veh/vehMain.h"
 #include "veh/vehupdate.h"
-#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiPack.h"
 
@@ -170,10 +168,6 @@ SINT32 commRecvWorldUpdateData(ACTION_OBJECT* a)
 	g_lastPing = std::min((UINT32)((teulClock64 - lastPing) / 2), (UINT32)1);
 	pingHistogram.add(g_lastPing);
 	g_averagePing = pingHistogram.average();
-
-	//------
-	if ( a->canRead<FrameHashData>() )
-		NetFrameSync::RecvHash(a->read<FrameHashData>());
 
 #ifdef VEHICLES_GAME_INFO
 	vehSaveLastWorldUpdate(wu);

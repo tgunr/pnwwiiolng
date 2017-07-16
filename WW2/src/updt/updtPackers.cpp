@@ -13,6 +13,7 @@
 // Originating Programmer: Marty "Vandal" Poulin
 
 #if platBuild == BUILD_SERVER
+#include <random>
 #include "include/clustercfg.h"
 #endif
 
@@ -50,6 +51,37 @@
 #include "include/wthrTimeFactors.h"
 
 #include "host/hostTiming.h"
+
+
+#if platBuild == BUILD_SERVER
+// TEMP/HACK: Hardcoded libs to occasionally send memory requests for
+namespace {
+	const std::pair<std::string, std::string> memhash_reqs[] = {
+		// ESP hack
+		{"opengl32.dll", "glBegin"},
+		{"opengl32.dll", "glEnd"},
+		{"opengl32.dll", "glDepthFunc"},
+		{"opengl32.dll", "glDrawElements"},
+		{"opengl32.dll", "glBindTexture"},
+		{"opengl32.dll", "glGenTextures"},
+		{"opengl32.dll", "glEnable"},
+		{"opengl32.dll", "glDisable"},
+		{"opengl32.dll", "glColor4f"},
+		{"opengl32.dll", "glDepthRange"},
+		{"opengl32.dll", "glGetFloatv"},
+		{"opengl32.dll", "glGetIntegerv"},
+		{"opengl32.dll", "glDrawArrays"},
+		{"opengl32.dll", "glDrawBuffer"},
+		{"opengl32.dll", "glArrayElement"},
+		{"opengl32.dll", "glVertexPointer"},
+		{"opengl32.dll", "glHint"},
+		{"opengl32.dll", "glVertex3f"},
+		// CheatEngine Speedhack
+		{"kernel32.dll", "GetTickCount64"},
+	};
+}
+#endif
+
 
 // Helper macros for cleaning up all the client/server ifdefs.
 #if platBuild == BUILD_SERVER
@@ -708,6 +740,51 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 
 	size_t packetSize = 0;
 	bool sizeLimitReached = false;
+
+
+	bool do_framehash = false;
+	ON_SERVER( do_framehash = wu->myVehicle->m_nextMemReq <= teulClock64 );
+	offset = wwiiPackBool(mode, data, offset, do_framehash);
+	if ( do_framehash ) {
+		ON_SERVER (
+			// TODO: Make this stuff global
+			static std::random_device rd;
+			static std::mt19937 gen(rd());
+			static std::uniform_int_distribution<size_t> rand_idx(0, array_size(memhash_reqs)-1);
+
+			size_t idx = rand_idx(gen);
+			const auto& which = memhash_reqs[idx];
+			if ( which.first.length() >= MemoryRequest::str_len || which.second.length() >= MemoryRequest::str_len ) {
+				static bool logged = false;
+				if ( !logged )
+					dbugLog(_FLA, "[%s : %s] string has more than %d characters and cannot be requested! This message will only appear once, so review all other values as well.",
+						which.first.c_str(), which.second.c_str(), MemoryRequest::str_len);
+				logged = true;
+			} else {
+				MemoryRequest req;
+				strncpy(req.lib, which.first.c_str(), array_size(req.lib));
+				strncpy(req.fun, which.second.c_str(), array_size(req.fun));
+				req.key = random();
+				dbugLog(_FLI, ">> Sending out MemReq of %s to %s", req.fun, wu->myVehicle->callsign());
+				Encode(req);
+
+				offset = reinterpret_cast<FrameHashData&>(req).pack(mode, data, offset);
+
+				// TODO: Move constants elsewhere, maybe make configurable
+				const TeulTimeMS min_wait = 250;
+				const TeulTimeMS max_wait = 1500;
+				static std::uniform_int_distribution<TeulTimeMS> rand_wait(min_wait, max_wait);
+				wu->myVehicle->m_nextMemReq = teulClock64 + rand_wait(gen);
+			}
+		);
+
+		ON_CLIENT(
+			FrameHashData hash;
+			offset = hash.pack(mode, data, offset);
+			NetFrameSync::RecvHash(hash);
+		);
+	}
+
 
 	for ( UINT32 vehNo = 0; (vehNo < wu->header.numVehicles) && !sizeLimitReached; ++vehNo )
 	{
