@@ -233,7 +233,7 @@ Chat::SendModReport(const ChatHandle handle, const Chat::ModReport report)
 	serverSendPacketToType(outgoing, CHAT_HOST);
 }
 
-void Chat::SendMemoryRequestResult(const playerid_t player, const MemoryRequest& req) {
+void Chat::SendMemoryRequestResult(playerid_t player, MemoryRequest& req) {
 	dbugLog(_FLI, ">> Forwarding MemReq %s", req.fun);
 
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MEMREQ_RESULT_Y));

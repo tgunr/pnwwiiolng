@@ -742,7 +742,7 @@ Chat::SendModReport(const ChatHandle handle, const Chat::ModReport modType)
 
 //////////////////////////////////////////////////////////////////////
 
-void Chat::SendMemoryRequestResult(const playerid_t playerid, const MemoryRequest& req) {
+void Chat::SendMemoryRequestResult(playerid_t playerid, MemoryRequest& req) {
 	dbugLog(_FLI, ">> Processing MemReq %s", req.fun);
 
 	Player* player = PlayerInterface::Lookup(playerid);
@@ -751,10 +751,9 @@ void Chat::SendMemoryRequestResult(const playerid_t playerid, const MemoryReques
 		return;
 	}
 
-	if ( req.lib[MemoryRequest::str_len-1] != '\0' || req.lib[MemoryRequest::str_len-1] != '\0' ) {
-		dbugLog(_FLN, "?HACK Memory request returned from %s, but lib/fun names aren't null terminated.", player->callsign());
-		return;
-	}
+	// Can't trust data from the client
+	// TODO: Verify that these are valid to check for tampering
+	req.lib[array_size(req.lib)-1] = req.fun[array_size(req.fun)] = '\0';
 
 	auto func = std::pair<std::string, std::string>(req.lib, req.fun);
 	if ( player->tampered_funcs.find(func) != player->tampered_funcs.end() )
