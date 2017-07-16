@@ -1,12 +1,14 @@
 #include "syscfg.h"
 #include "sysAntihack.h"
 
+#if platOS == OS_WIN32
 #include <random>
 
 #include "fio/fio.h"
 #include "mem/mem.h"
 #include "pa/md5.h"
 #include "wwii/wwiiAntihack.h"
+#endif
 
 
 namespace NetFrameSync {
@@ -97,6 +99,7 @@ namespace {
 // The actual anti-hack stuff. Currently just a quick-and-dirty checksum of code
 // to see if it's been modified.
 
+#if platOS == OS_WIN32
 // The encrypt/decrypt and hash generation code.
 namespace {
 	enum HashState { HASH_RECV, HASH_PROC, HASH_SENT };
@@ -117,9 +120,8 @@ namespace {
 	//--------------
 
 	void Process(StoredHashData& data) {
-        FrameHashData hash = data.hash;
-#if platOS == OS_WIN32
 		// Copied to avoid ever having anything unobfuscated in global memory
+		FrameHashData hash = data.hash;
 		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
 		Decode(req);
 		// Just to be safe in case the host sent us garbage
@@ -144,20 +146,14 @@ namespace {
 		req.key = (uint32_t)random();
 		Encode(req);
 		data.hash = hash;
-#else
-		// Currently nothing for non-Windows
-		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
-		if ( data.state == HASH_RECV ) {
-			memset(req.md5, (unsigned char)req.key, MemoryRequest::md5_len);
-			data.state = HASH_PROC;
-		}
-#endif
 	}
 }
+#endif // WIN32
 
 //------------------------------------------------------------------------------
 // Message & update-related code
 
+#if platOS == OS_WIN32
 namespace {
 	static const size_t num_hashes = 24;
 	StoredHashData hashes[num_hashes] = {};
@@ -167,9 +163,11 @@ namespace {
 	size_t send_idx = 0;  // Increments every time we send, cannot pass recv
 	size_t recv_idx = 0;  // Increments every time we receive, cannot enter send
 }
+#endif
 
 
 void InitializeHashes(void) {
+#if platOS == OS_WIN32
 	char* data = nullptr;
 	unsigned int size = 0;
 	if ( ! fioLoad("framehash_seed.bin", data, &size) ) {
@@ -187,27 +185,19 @@ void InitializeHashes(void) {
 	for ( auto& hash : hashes ) {
 		Process(hash);
 	}
+#endif // WIN32
 }
 
 
 void UpdateNextHash(void) {
+#if platOS == OS_WIN32
 	Process(hashes[update_idx++]);
 	if ( update_idx >= num_hashes ) update_idx = 0;
-}
-
-
-void DumpHashes(ACTION_OBJECT* a) {
-	for ( auto& data : hashes ) {
-		if ( data.state == HASH_RECV ) {
-			Process(data);
-		}
-		if ( data.state == HASH_PROC ) {
-			data.hash.packer(TEUL_PACK, a);
-		}
-	}
+#endif
 }
 
 FrameHashData* NextHash(void) {
+#if platOS == OS_WIN32
 	if ( hashes[send_idx].state != HASH_PROC ) {
 		return nullptr;
 	}
@@ -216,10 +206,14 @@ FrameHashData* NextHash(void) {
 	hashes[send_idx++].state = HASH_SENT;
 	if ( send_idx >= num_hashes ) send_idx = 0;
 	return hash;
+#else
+	return nullptr;
+#endif
 }
 
 
 void RecvHash(const FrameHashData& hash) {
+#if platOS == OS_WIN32
 	auto next_idx = recv_idx+1;
 	if ( next_idx >= num_hashes ) next_idx = 0;
 	if ( next_idx == send_idx && hashes[recv_idx].state != HASH_SENT ) {
@@ -230,6 +224,7 @@ void RecvHash(const FrameHashData& hash) {
 	hashes[recv_idx].hash = hash;
 	hashes[recv_idx].state = HASH_RECV;
 	recv_idx = next_idx;
+#endif
 }
 
 
