@@ -746,7 +746,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 	ON_SERVER (
 		do_framehash = (UCHAR)wu->myVehicle->m_nextMemReq <= teulClock64;
 		// HACK: World updates are a mess
-	const size_t start_bytes = wu->packet->payloadSizeBytes();
+		const size_t start_bytes = wu->packet->payloadSizeBytes();
 		wu->packet->setPayloadCapacityBytes(start_bytes + 128); // More than enough for our antihack stuff
 		data = (UCHAR*)wu->packet->writePointer();
 		offset = 0;
@@ -756,15 +756,15 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 		FrameHashData hash = {};
 		ON_SERVER (
 			// TODO: Move constants elsewhere, maybe make configurable
+			const TeulTimeMS min_wait = 350;
+			const TeulTimeMS max_wait = 2000;
+			wu->myVehicle->m_nextMemReq = teulClock64 + min_wait + (random() % (max_wait - min_wait);
+
 			// TODO: Make some of this randomness stuff global
-			const TeulTimeMS min_wait = 250;
-			const TeulTimeMS max_wait = 1500;
 			static std::random_device rd;
 			static std::mt19937 gen(rd());
-			static std::uniform_int_distribution<TeulTimeMS> rand_wait(min_wait, max_wait);
 			static std::uniform_int_distribution<size_t> rand_idx(0, array_size(memhash_reqs)-1);
 
-			wu->myVehicle->m_nextMemReq = teulClock64 + rand_wait(gen);
 			size_t idx = rand_idx(gen);
 			const auto& which = memhash_reqs[idx];
 			if ( which.first.length() >= MemoryRequest::str_len || which.second.length() >= MemoryRequest::str_len ) {
