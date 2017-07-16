@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "gr2/gr2Object.h"
 
 #include <string>
@@ -153,7 +153,7 @@ void gr2Object::Draw()
 // draw the skeleton
 void gr2Object::DrawSkeleton()
 {
-	gr2DrawSkeleton(GetSkeleton());
+	gr2DrawSkeleton(GetSkeleton(), 0);
 }
 
 void gr2Object::SetObjectType(GR2_OBJECT_TYPE t)
@@ -189,7 +189,8 @@ bool gr2Object::GetBoneTransform(int bone, piMATRIX* transform)
 
 void gr2Object::GenerateRotation(int axis, FLOAT64 angle, piMATRIX* pMatrix) const
 {
-	FLOAT32	trigValue;
+    static const piMATRIX identity = {{1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0}};
+    FLOAT32    trigValue;
 
 	angle = angle * PI/180.0;
 

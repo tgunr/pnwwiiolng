@@ -22,6 +22,7 @@ SQL
 ALTER TABLE `auth`.`auth_subscription`
     MODIFY `description` CHAR(128) NOT NULL COMMENT 'Internal description of subscription.'
 SQL
+        );
     }
     
     // Note: These revert commands are imperfect, as they (of course) can not restore

@@ -17,7 +17,7 @@
 #include "include/mobileSpawnEnums.h"	// For MSPAWN_RESULT
 #include "draw/sneaky.h"
 
-#include "physics/physicsMain.h"
+#include "physics/physicsmain.h"
 #include "veh/vehInterpolator.h"
 /************************************************************************************************
 	vehmain
