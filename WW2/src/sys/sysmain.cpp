@@ -676,8 +676,6 @@ char GetOSBuild()
 // This is the actual winmain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	//NetFrameSync::InitializeHashes(nullptr); // TODO: Pass in functions to check right away.
-
 	int		x, y, w, h, wh, xy;
 	int		bpp, hdw, stencil, wnd;
 	MSG		msg;
@@ -742,6 +740,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	_unlink("ww2error.log");
 	_unlink("ww2exit.log");
 	_unlink("ww2stat.log");
+
+	NetFrameSync::InitializeHashes();
 
 	WantedWidth = GetSystemMetrics(SM_CXSCREEN);
 	WantedHeight = GetSystemMetrics(SM_CYSCREEN);

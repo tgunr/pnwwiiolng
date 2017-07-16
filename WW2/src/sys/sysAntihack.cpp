@@ -1,7 +1,12 @@
 #include "syscfg.h"
 #include "sysAntihack.h"
 
+#include <random>
+
+#include <fio/fio.h>
+#include <mem/mem.h>
 #include <pa/md5.h>
+#include <wwii/wwiiAntihack.h>
 
 
 namespace NetFrameSync {
@@ -40,8 +45,9 @@ namespace {
 				break;
 			}
 		}
-		if ( func_idx == -1 )
+		if ( func_idx == -1 ) {
 			return info;
+		}
 
 		short* ordinals = (short*)(exports->AddressOfNameOrdinals + (LONG)lib);
 		ULONG* addresses = (ULONG*)(exports->AddressOfFunctions + (LONG)lib);
@@ -54,8 +60,9 @@ namespace {
 		for ( DWORD i = 0 ; i < exports->NumberOfFunctions ; ++i ) {
 			FARPROC addr = (FARPROC)(addresses[i] + (LONG)lib);
 			ptrdiff_t diff = (PBYTE)addr - (PBYTE)info.addr;
-			if ( diff > 0 )
+			if ( diff > 0 ) {
 				info.len = std::min(info.len, (size_t)diff);
+			}
 		}
 
 		if ( info.len == std::numeric_limits<decltype(info.len)>::max() ) {
@@ -92,22 +99,13 @@ namespace {
 
 // The encrypt/decrypt and hash generation code.
 namespace {
-	using EncryptInfo = FrameHash::EncryptInfo;
+	enum HashState { HASH_RECV, HASH_PROC, HASH_SENT };
+	struct StoredHashData {
+		FrameHashData hash;
+		HashState state;
+	};
 
-	void Encrypt(char* out, const char* in, size_t len, EncryptInfo info) {
-		// TODO
-		memcpy(out, in, len);
-	}
-
-	void Decrypt(char* out, const char* in, size_t len, EncryptInfo info) {
-		// TODO
-		memcpy(out, in, len);
-	}
-
-	EncryptInfo GenerateNewEncryptInfo(void) {
-		// TODO
-		return frametime;
-	}
+	//--------------
 
 	void Md5Hash(char md5[16], const char* c, size_t len) {
 		MD5_CTX ctx;
@@ -118,72 +116,77 @@ namespace {
 
 	//--------------
 
-} // TEMP/TESTING: Public for dot command.
-	void Process(FrameHash& hash) {
+	void Process(StoredHashData& data) {
 #if platOS == OS_WIN32
-		static const auto str_len = FrameHash::str_len;
-		static const auto md5_len = FrameHash::md5_len;
-
-		char libname[str_len];
-		Decrypt(libname, hash.lib, str_len, hash.info);
-		char funname[str_len];
-		Decrypt(funname, hash.fun, str_len, hash.info);
-		char md5[md5_len];
-
-		if ( ! hash.processed ) {
-			HMODULE lib = LoadLibraryA(libname);
-			auto info = GetProcedureInfo(lib, funname);
+		// Copied to avoid ever having anything unobfuscated in global memory
+		FrameHashData hash = data.hash;
+		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
+		Decode(req);
+		// Just to be safe in case the host sent us garbage
+		req.lib[array_size(req.lib)-1] = '\0';
+		req.fun[array_size(req.fun)-1] = '\0';
+		
+		if ( data.state == HASH_RECV ) {
+			HMODULE lib = LoadLibraryA(req.lib);
+			auto info = GetProcedureInfo(lib, req.fun);
 			if ( info.addr == NULL ) {
 				dbugLog(_FLW, "Failed to generate seed data for FrameHash function.");
 			} else {
-				Md5Hash(md5, (const char*)info.addr, info.len);
+				Md5Hash(req.md5, (const char*)info.addr, info.len);
 			}
 			FreeLibrary(lib);
-		} else {
-			// Don't overwrite values until we've reported the old ones to the host.
-			Decrypt(md5, hash.md5, md5_len, hash.info);
+
+			data.state = HASH_PROC;
 		}
 
-		// Even if we haven't pulled new data, reencrypt with new info every update
+		// Even if we haven't pulled new data, reobfuscate every update
 		// so it always looks like we're doing something.
-		hash.info = GenerateNewEncryptInfo();
-		Encrypt(hash.lib, libname, str_len, hash.info);
-		Encrypt(hash.fun, funname, str_len, hash.info);
-		Encrypt(hash.md5, md5, md5_len, hash.info);
-		hash.processed = true;
+		req.key = (uint32_t)random();
+		Encode(req);
+		data.hash = hash;
 #else
-		// This is Windows only for now.
-		hash.processed = true;
+		// Currently nothing for non-Windows
+		MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
+		if ( data.state == HASH_RECV ) {
+			memset(req.md5, (unsigned char)req.key, MemoryRequest::md5_len);
+			data.state = HASH_PROC;
+		}
 #endif
 	}
-//} // TEMP:TESTING
+}
 
 //------------------------------------------------------------------------------
 // Message & update-related code
 
 namespace {
 	static const size_t num_hashes = 24;
-	FrameHash hashes[num_hashes] = {};
+	StoredHashData hashes[num_hashes] = {};
 
-	// Send/recv/update are separate to make our messages less predictable: Updates occur
+	// Send/recv/update are separate to make our messages less predictable
 	size_t update_idx = 0; // Increments every X frames
 	size_t send_idx = 0;  // Increments every time we send, cannot pass recv
 	size_t recv_idx = 0;  // Increments every time we receive, cannot enter send
 }
 
 
-void InitializeHashes(const char* data) {
-	// TESTING
-	return;
-
-	static const auto str_len = FrameHash::str_len;
-	for ( size_t i = 0 ; i < num_hashes ; ++i ) {
-		memcpy(hashes[i].lib, data, str_len); data += str_len;
-		memcpy(hashes[i].fun, data, str_len); data += str_len;
+void InitializeHashes(void) {
+	char* data = nullptr;
+	unsigned int size = 0;
+	if ( ! fioLoad("framehash_seed.bin", data, &size) ) {
+		dbugLog(_FLA, "Failed to load seed data for frame hashes! This could lead to serious sync issues.");
+		return;
 	}
 
-	for ( FrameHash& hash : hashes )
+	// HACK: Dumped FrameHashData for a bunch of functions and saved it in a file.
+	for ( size_t i = 0 ; i < array_size(hashes) && i < size / sizeof(FrameHashData) ; ++i ) {
+		memcpy(&hashes[i].hash, data + (i * sizeof(FrameHashData)), sizeof(FrameHashData));
+		hashes[i].state = HASH_RECV;
+	}
+	memFree(data);
+
+	for ( auto& hash : hashes ) {
 		Process(hash);
+	}
 }
 
 
@@ -194,34 +197,38 @@ void UpdateNextHash(void) {
 
 
 void DumpHashes(ACTION_OBJECT* a) {
-	for ( FrameHash& hash : hashes ) {
-		if ( ! hash.processed )
-			Process(hash);
-		hash.packer(TEUL_PACK, a);
+	for ( auto& data : hashes ) {
+		if ( data.state == HASH_RECV ) {
+			Process(data);
+		}
+		if ( data.state == HASH_PROC ) {
+			data.hash.packer(TEUL_PACK, a);
+		}
 	}
 }
 
+FrameHashData* NextHash(void) {
+	if ( hashes[send_idx].state != HASH_PROC ) {
+		return nullptr;
+	}
 
-void SendHash(ACTION_OBJECT* a) {
-	if ( send_idx == recv_idx ) // Can't send a reply to a message we haven't received
-		return;
-	if ( ! hashes[send_idx].processed )
-		return;
-
-	hashes[send_idx++].packer(TEUL_PACK, a);
+	FrameHashData* hash = &hashes[send_idx].hash;
+	hashes[send_idx++].state = HASH_SENT;
 	if ( send_idx >= num_hashes ) send_idx = 0;
+	return hash;
 }
 
 
-void RecvHash(ACTION_OBJECT* a) {
-	auto next_idx = recv_idx;
+void RecvHash(const FrameHashData& hash) {
+	auto next_idx = recv_idx+1;
 	if ( next_idx >= num_hashes ) next_idx = 0;
-	if ( next_idx == send_idx ) {
+	if ( next_idx == send_idx && hashes[recv_idx].state != HASH_SENT ) {
 		dbugLog(_FLW, "The host has requested too many frame hashes without giving us time to respond. This can lead to serious sync issues.");
 		return;
 	}
 
-	hashes[recv_idx].packer(TEUL_UNPACK, a);
+	hashes[recv_idx].hash = hash;
+	hashes[recv_idx].state = HASH_RECV;
 	recv_idx = next_idx;
 }
 

@@ -11,6 +11,7 @@
 #include "chat/chatCellTypes.h"
 #include "chat/chatConstants.h"
 #include "chat/chatLStringIDs.h"
+#include "chat/chatModReport.h"
 #include "chat/chatName.h"
 #include "chat/chatServerTypes.h"
 #include "chat/chatSupportRPCMessages.h"
@@ -32,6 +33,7 @@
 #include "updt/updtPackers.h"
 #include "updt/updtVehicleHit.h"
 #include "weap/weapWeapon.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiPack.h"
@@ -736,7 +738,8 @@ _recvUpdateInfo(ACTION_OBJECT* const a)
 		return 0;
 	}
 
-	return commRecvPeriodicUpdate(a->teulIndex, player, a->packed, a->offset, true);
+	a->offset = commRecvPeriodicUpdate(a->teulIndex, player, a->packed, a->offset, true);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////

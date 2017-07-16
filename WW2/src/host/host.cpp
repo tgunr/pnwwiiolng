@@ -1236,7 +1236,7 @@ _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const 
 	Player& player = *static_cast<Player*>(player_);
 
 	if ( player.m_antiHack == nullptr )
-		player.m_antiHack = new AntiHack;
+		player.m_antiHack = new SpeedhackCheck;
 
 	auto& ah = *player.m_antiHack;
 
@@ -2109,7 +2109,7 @@ _sendNextUpdate(HostVehicle* const vehicle)
 //		TIMER_REPORT(50)
 		return true;
 	}
-
+	
 	const size_t pingOffset = wu.packet->payloadSizeBytes();
 	wu.packet->append(teulClock64);
 #if defined(ENABLE_CELL_EVENTS)
@@ -2119,6 +2119,8 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		maxCounter = (UINT64)payloadSizeBytes;
 	}
 #endif
+
+	//--------------
 
 	// Track how many packets behind the connections are
 	UINT32 updatesBehind = 0;

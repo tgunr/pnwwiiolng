@@ -1360,6 +1360,7 @@
     <ClInclude Include="..\..\src\weap\weapType.h" />
     <ClInclude Include="..\..\src\weap\weapWeapon.h" />
     <ClInclude Include="..\..\src\wwii\wwiiActivate.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiAntihack.h" />
     <ClInclude Include="..\..\src\wwii\wwiiBackChannel.h" />
     <ClInclude Include="..\..\src\wwii\wwiiCallbacks.h" />
     <ClInclude Include="..\..\src\wwii\wwiiClientMessages.h" />

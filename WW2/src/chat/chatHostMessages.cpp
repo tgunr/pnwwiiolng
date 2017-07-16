@@ -80,6 +80,7 @@
 #include "teul/teulTickSample.h"
 #include "teul/teulTransmission.h"
 #include "tut/tutGroupProgress.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiNetPorts.h"
@@ -1556,6 +1557,21 @@ _recvLocalityUpdates(ACTION_OBJECT* const a)
 
 //////////////////////////////////////////////////////////////////////
 
+static SINT32 _recvMemoryRequestResult(ACTION_OBJECT* const a) {
+	if ( a->m_client != nullptr ) {
+		dbugLog(_FLW, "t:%d Receiving antihack result directly from client?", a->teulIndex);
+		return -EINVAL;
+	}
+
+	auto playerid = a->read<playerid_t>();
+	auto& req = a->read<MemoryRequest>();
+	Chat::SendMemoryRequestResult(playerid, req);
+
+	return a->offset;
+}
+
+//////////////////////////////////////////////////////////////////////
+
 static SINT32
 _recvCellHostUpdate(ACTION_OBJECT* const a, Chat::CellHostUpdate& msg)
 {
@@ -1563,7 +1579,7 @@ _recvCellHostUpdate(ACTION_OBJECT* const a, Chat::CellHostUpdate& msg)
 		return -EINVAL;
 	Player* player = PlayerInterface::Lookup(msg.playerID);
 	if (player == nullptr) {
-		dbugLog(_FLD, "t:%d ignoring cell host update for playerid %u", a->teulIndex, msg.playerID);
+		dbugLog(_FLW, "t:%d ignoring cell host update for playerid %u", a->teulIndex, msg.playerID);
 		return -EINVAL;
 	}
 	player->SetCellHost(msg.cellHost);
@@ -1687,6 +1703,7 @@ chatInstallHostCallbacks()
 		// WWIIOL Specific
 		REGISTER_RECEIVER(Chat::MOTD_REQ_Y, _recvMOTD_REQ);
 		REGISTER_RECEIVER(Chat::CLIENT_LOCALITY_Y, _recvLocality);
+		REGISTER_RECEIVER(Chat::MEMREQ_RESULT_Y, _recvMemoryRequestResult);
 		REGISTER_RECEIVER(Chat::SIDE_MESSAGE_Y, _recvSideMessage);
 		REGISTER_SENDER(Chat::MOTD_REPLY_Y, _sendMOTD_REPLY, CHAT_MOTD_REPLY);
 		REGISTER_SENDRECV(Chat::SQUAD_CONTROL_Y, _sendSquadControlResult, _recvSquadControl, CHAT_SQUAD_CONTROL);

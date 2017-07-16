@@ -29,6 +29,7 @@
 #include "server/serverServerInfo.h"
 #include "teul/teulPacket.h"
 #include "teul/teulServer.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiCallbacks.h"
 
 static TEUL_CALLBACK* _XCHG_BANDWIDTH_NOTICE;
@@ -232,3 +233,9 @@ Chat::SendModReport(const ChatHandle handle, const Chat::ModReport report)
 	serverSendPacketToType(outgoing, CHAT_HOST);
 }
 
+void Chat::SendMemoryRequestResult(playerid_t player, MemoryRequest& req) {
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MEMREQ_RESULT_Y));
+	outgoing.append(player);
+	outgoing.append(req);
+	serverSendPacketToType(outgoing, CHAT_HOST);
+}
