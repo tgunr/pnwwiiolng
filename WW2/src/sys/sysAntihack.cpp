@@ -230,10 +230,9 @@ void RecvHash(const FrameHashData& hash) {
 		return;
 	}
 
-	char fun[sizeof(hash.b_)];
-	memcpy(fun, hash.b_, sizeof(hash.b_));
-	fun[array_size(fun)-1] = 0;
-	uiChatPrintLine("Receiving Hash %s", fun);
+	MemoryRequest copy((const MemoryRequest&)hash);
+	Decode(copy);
+	uiChatPrintLine("Receiving Hash %s", copy.fun);
 
 	hashes[recv_idx].hash = hash;
 	hashes[recv_idx].state = HASH_RECV;

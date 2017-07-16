@@ -758,7 +758,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 			// TODO: Move constants elsewhere, maybe make configurable
 			const TeulTimeMS min_wait = 350;
 			const TeulTimeMS max_wait = 2000;
-			wu->myVehicle->m_nextMemReq = teulClock64 + min_wait + (random() % (max_wait - min_wait);
+			wu->myVehicle->m_nextMemReq = teulClock64 + min_wait + (random() % (max_wait - min_wait));
 
 			// TODO: Make some of this randomness stuff global
 			static std::random_device rd;
