@@ -71,6 +71,7 @@ public:
 
 	JS_CLASS_DATA;
 	JS_FUNCTION(createauthhandler);
+	JS_FUNCTION(issteamcopy);
 	JS_FUNCTION(connecttoarena);
 	JS_FUNCTION(steamconnect);
 	JS_FUNCTION(loadrootwindow);
