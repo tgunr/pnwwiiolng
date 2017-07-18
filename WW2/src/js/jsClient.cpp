@@ -8,6 +8,7 @@
 
 #include "include/vars.h"
 #include "auth/authSteam.h"
+#include "sys/sysSteam.h"
 #include "js/jsClient.h"
 #include "js/jsStratDB.h"
 #include "js/jsGame.h"
@@ -79,6 +80,7 @@ JSFunctionSpec jsClient::jsfunctions[] =
 {
 	JS_FUNCTION_SPEC(jsClient, createauthhandler,0),
 	JS_FUNCTION_SPEC(jsClient, connecttoarena,0),
+	JS_FUNCTION_SPEC(jsClient, issteamcopy,0),
 	JS_FUNCTION_SPEC(jsClient, steamconnect,2),
 	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
@@ -251,6 +253,18 @@ JS_FUNCTION_DEF(jsClient, connecttoarena) {
 	return JS_TRUE;
 }
 
+/************************************************************************************************
+	checking steam
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, issteamcopy) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	*rval = BOOLEAN_TO_JSVAL(IsSteamCopy());
+
+	return JS_TRUE;
+}
 
 /************************************************************************************************
 	steam connection
