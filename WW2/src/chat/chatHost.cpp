@@ -773,7 +773,7 @@ void Chat::SendMemoryRequestResult(playerid_t playerid, MemoryRequest& req) {
 			chatDispatchCRSMessage("HOST", crsmsg);
 
 			// TODO: Put these in their own table
-			chatdbRecordEvent("HACK", player->callsign(), "code tampering", req.lib, req.fun);
+			chatdbRecordEvent("HACK", player->callsign(), "memmod", req.lib, req.fun);
 		}
 	} else {
 		Player::FunctionMd5 md5;
