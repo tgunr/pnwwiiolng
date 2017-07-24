@@ -30,11 +30,6 @@
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
-			<key>authdev.playnet.com</key>
-			<dict>
-				<key>NSThirdPartyExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
 			<key>battlegroundeurope.net</key>
 			<dict>
 				<key>NSThirdPartyExceptionAllowsInsecureHTTPLoads</key>
