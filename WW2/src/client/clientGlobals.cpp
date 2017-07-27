@@ -111,6 +111,7 @@ SINT8			ServerData[64];		// data passed from auth server
 SINT8			ServerProtocol[64]; // connection protocol
 SINT8			BypassString[64];
 LOGICAL         UseSteamLogin = FALSE; // We should use Steam to authenticate our login
+LOGICAL         LaunchSettingsOnly = FALSE; //do not launch settings
 #if defined(DEBUG_WW2) || defined(ALPHA_RELEASE)
 LOGICAL			WantedUserLogEnabled = TRUE;	// If the user wants the log enabled
 #else
