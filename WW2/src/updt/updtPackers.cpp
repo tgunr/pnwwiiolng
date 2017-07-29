@@ -940,11 +940,6 @@ static SINT32 _packUPDATE_HIGH(PackMode mode, UCHAR* const data, SINT32 offset, 
 
 #if platBuild == BUILD_SERVER
 
-static void _badVehicle(SINT32 vehIndex)
-{
-	dbugLog(_FLA, "**** INVOKED _badVehicle -- BEWARE ****");
-}
-
 static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_HOLDER* vhold, UINT32 vehIndex)
 {
 	static HostVehicle tempVehicle;
@@ -977,11 +972,6 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 
 		if (vhold->vehicle == nullptr || ! (vhold->vehicle->isRemote()))
 		{
-			if (Server::myServerInfo.stats.status == Server::SERVER_ACCEPTING)
-			{
-				_badVehicle(vehIndex);
-			}
-
 			dbugLog(_FLA, "rv:%u could not create vehicle node %p is not valid", vehIndex, vhold->vehicle);
 			return -EINVAL;
 		}
@@ -991,12 +981,8 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 		vhold->vehicle = hostFindVehicleLocal(vehIndex);
 		if (vhold->vehicle == nullptr )
 		{
-			static TeulTimeMS nextBlip = teulClock64;
-			if ( Server::myServerInfo.stats.status == Server::SERVER_ACCEPTING && teulClock64 >= nextBlip )
-			{
-				dbugLog(_FLA, "rv:%u not found", vehIndex);
-				nextBlip = teulClock64 + 500;
-			}
+			dbugLog(_FLA, "rv:%u not found", vehIndex);
+
 			// subsitute a dummy vehicle so we can at least unpack
 			vhold->vehicle = &tempVehicle;
 			vhold->vehicle->setRemote();
