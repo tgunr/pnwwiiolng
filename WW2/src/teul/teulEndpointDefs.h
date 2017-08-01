@@ -30,7 +30,7 @@ namespace Teul
 	enum { TCPStdPayload = InternetMTU - OverheadTCP };
 	enum { UDPMaxPayload = MaxMTU - OverheadUDP };
 	enum { UDPStdPayload = InternetMTU - OverheadUDP };
-	enum { UDBMaxPayload = MaxPacket - OverheadUDP };
+	enum { UDBMaxPayload = MaxMTU - OverheadUDP };
 	enum { MaxPackBytes = UDBMaxPayload };
 	enum { MaxPackBits = MaxPackBytes * 8 };
 

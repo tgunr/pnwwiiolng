@@ -27,6 +27,7 @@
 #include "teul/teulPacket.h"
 #include "teul/teulEndpointDefs.h"
 #include "wwii/wwiiThreads.h"
+#include "server/serverServerInfo.h"
 #include <execinfo.h>
 
 #include "wwii/wwiiHash.h"
@@ -36,8 +37,6 @@ static SYNCHED_VEHICLES g_synched;
 static Teul::Packet vehicleBroadcasts(Teul::PacketId(Comm::CallbackX, BCAST_VEH_UPDATE_Y));
 static UINT32 numberOfVehiclesPending = 0;
 static SINT32 maxSize = 0;
-
-extern SINT32 _userConnections;
 
 bool g_clustered = false;
 
@@ -213,12 +212,7 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 
 	// Lets limit our size based on how many connections we have knowing that the average update is about 35 bytes
 	// also - lets do a sanity check on the user connections counter host is tracking
-	int connectionsCounted = 1;
-	if (_userConnections > 0)
-		connectionsCounted = _userConnections;
-	else
-		dbugLog(_FLW, "_userConnections counter is underflowing - currently %d", _userConnections);
-	UINT32 limitPacketSize = static_cast<UINT32>(connectionsCounted) * 35;
+	UINT32 limitPacketSize = static_cast<UINT32>(Server::myServerInfo.m_players.size()) * 35;
 	if ( vehicleBroadcasts.packetSizeBytes() >= limitPacketSize )
 	{
 		hostPushVehicleBroadcasts();
