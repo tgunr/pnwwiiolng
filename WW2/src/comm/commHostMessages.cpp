@@ -55,6 +55,7 @@
 #include "teul/teulEndpoint.h"
 #include "updt/updtDeathByBuilding.h"
 #include "wwii/wwiiFullObjID.h"
+#include "inst/instTypes.h"
 
 #define DEATH_TIMEOUT 30			// A minute
 
@@ -706,7 +707,11 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 		vh.present |= PR_FROM_CONTROLLER;
 	}
 
-	hostAddVehicleToBroadcast(vref, &vh);
+	// Don't broadcast unless we have a valid instance set
+	if (vref->m_instance.id() != Instance::_INVALID)
+        {
+		hostAddVehicleToBroadcast(vref, &vh);
+	}
 
 	player->processUpdateValues(vh.updateNo, vh.updatePrime);
 
