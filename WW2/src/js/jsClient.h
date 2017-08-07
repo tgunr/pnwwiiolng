@@ -73,6 +73,7 @@ public:
 	JS_FUNCTION(createauthhandler);
 	JS_FUNCTION(issteamcopy);
 	JS_FUNCTION(connecttoarena);
+	JS_FUNCTION(startofflinemode);
 	JS_FUNCTION(steamconnect);
 	JS_FUNCTION(loadrootwindow);
 	JS_FUNCTION(getmisscountry);
