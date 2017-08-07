@@ -80,6 +80,7 @@ JSFunctionSpec jsClient::jsfunctions[] =
 {
 	JS_FUNCTION_SPEC(jsClient, createauthhandler,0),
 	JS_FUNCTION_SPEC(jsClient, connecttoarena,0),
+	JS_FUNCTION_SPEC(jsClient, startofflinemode,0),
 	JS_FUNCTION_SPEC(jsClient, issteamcopy,0),
 	JS_FUNCTION_SPEC(jsClient, steamconnect,2),
 	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
@@ -217,7 +218,6 @@ jsClient::~jsClient()
 {
 }
 
-
 /************************************************************************************************
 	auth connection
 *************************************************************************************************/
@@ -231,7 +231,6 @@ JS_FUNCTION_DEF(jsClient, createauthhandler) {
 	*rval = (new jsAuthHandler())->jsVal();
 	return JS_TRUE;
 }
-
 
 /************************************************************************************************
 	arena joining
@@ -250,6 +249,17 @@ JS_FUNCTION_DEF(jsClient, connecttoarena) {
 	}
 
 	*rval = BOOLEAN_TO_JSVAL(true);
+	return JS_TRUE;
+}
+
+/************************************************************************************************
+	arena joining
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, startofflinemode) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+	rnstartOfflineMode();
 	return JS_TRUE;
 }
 

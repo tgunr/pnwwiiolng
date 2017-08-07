@@ -24,6 +24,7 @@
 #include "ob/oblf.h"
 #include "ob/obwld.h"
 #include "ob/obcs.h"
+#include "trn/trnautogun.h"
 #include "trn/trnmain.h"
 #include "trn/trnsky.h"
 #include "trn/trnwtr.h"
@@ -324,6 +325,22 @@ bool rnhasServerInfo(void) {
 }
 
 //////////////////////////////////////////////////////////////////////
+// HACK: Logic wasn't written with us going online/offline after loading.
+namespace {
+	void PostInit(void) {
+		static bool initialized = false;
+		if ( initialized )
+			return;
+
+		cfgPrefsPostInit();
+		trnPostinitAutogunSystem();
+		fxWeatherPostinit();
+
+		initialized = true;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
 
 Covert<bool> ProtectedOnlineFlag = false;
 
@@ -362,7 +379,15 @@ void rnconnectToServer(void) {
 	ProtectedOnlineFlag = Online;
 
 	cfgPrefsSendSharedPrefs();
+
+	PostInit();
 }
+
+void rnstartOfflineMode(void) {
+	PostInit();
+}
+
+//////////////////////////////////////////////////////////////////////
 
 void rnloadRootWindow(void) {
 	if ( Online ) {

@@ -82,10 +82,11 @@ static bool _updateAI = true;
 LOGICAL trnInitAutogunSystem()
 {
 	_ReadAndSetupAutogunTypes();
-
-    _updateAI = Online ? true : false;
-
 	return TRUE;
+}
+
+void trnPostinitAutogunSystem(void) {
+	_updateAI = Online ? true : false;
 }
 
 static LOGICAL _ReadAndSetupAutogunTypes()

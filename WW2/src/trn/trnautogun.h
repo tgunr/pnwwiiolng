@@ -1,6 +1,7 @@
 #pragma once
 
 LOGICAL trnInitAutogunSystem();
+void trnPostinitAutogunSystem(void);
 void trnKillAutogunSystem();
 void trnKillAutogun(struct trnAutoGun ** AutoGun);
 LOGICAL trnAddAutoGun(trnCDTerrainObject * TO);

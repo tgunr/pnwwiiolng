@@ -7,6 +7,7 @@
 
 extern void fxWeatherUpdate();
 extern void fxWeatherInit();
+extern void fxWeatherPostinit(void);
 extern void fxWeatherDrawWindow(struct OBJECT* o);
 extern void fxWeatherSetState(int weather, int seedindex);
 

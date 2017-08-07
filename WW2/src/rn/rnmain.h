@@ -43,6 +43,7 @@
 	extern void rnsetServerInfo(UINT32 serverip, UINT32 serverport, UINT32 otp);
 	extern bool rnhasServerInfo(void);
 	extern void rnconnectToServer(void);
+	extern void rnstartOfflineMode(void);
 	// Sends us to the starting GUI screen based on the server we are/aren't connected to.
 
 	extern void rnloadRootWindow(void);
