@@ -4244,7 +4244,7 @@ static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &resp
 
 static inline RESTAPIHandler RESTThreadCallback(RESTAPIHandler handler)
 {
-    return [&] (const HTTPRequest &req, HTTPResponse &res, const RESTAPIParams &params) {
+    return [handler] (const HTTPRequest &req, HTTPResponse &res, const RESTAPIParams &params) {
         threadCallbackSync<void>([&] { handler(req, res, params); });
     };
 }
