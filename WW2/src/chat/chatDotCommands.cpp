@@ -847,7 +847,7 @@ public:
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
-		player.message(LSTR_NOTE, LSTR_SERVER_TIME, chatTimeString(time(nullptr)));
+		player.message(LSTR_NOTE, LSTR_SERVER_TIME, chatTimeString(teulTime()));
 	}
 } dotTime;
 
