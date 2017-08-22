@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Fri Nov  9 12:42:29 CST 2007
 //
 // SHARED: Client/host functions

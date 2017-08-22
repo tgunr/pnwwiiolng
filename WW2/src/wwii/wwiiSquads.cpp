@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Mon Sep 12 15:51:40 CDT 2005
 //
 // Routines for wwiiSquad class

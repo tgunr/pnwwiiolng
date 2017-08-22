@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: mathnum.cpp
 // Description: Math Numeric. Handle miscellaneous math functions here.

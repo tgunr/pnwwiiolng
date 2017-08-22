@@ -30,6 +30,7 @@ public:
 	jsGame();
 
 void getBuildInfo(std::string& display);
+static char* basicTrainingIncomplete(char* viewname);
 
 JS_CLASS_DATA;
 JS_FUNCTION(load);

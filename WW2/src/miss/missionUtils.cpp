@@ -6,7 +6,7 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-#include <syscfg.h>
+#include "syscfg.h"
 #include "miss/missionUtils.h"
 #include "teul/teulKit.h"
 #include "wwii/wwiiFullObjID.h"

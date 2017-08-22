@@ -3,7 +3,7 @@
 #include "wwii/wwiiHash.h"
 
 #include <map>
-#include "veh/vehMain.h"
+#include "veh/vehmain.h"
 
 // ----------- defines
 #define EZ_MGR EZManager::GetInstance()

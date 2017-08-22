@@ -4,7 +4,7 @@
 static_assert( platBuild != BUILD_SERVER, "Can't include piogl.h in a server build." );
 #endif
 
-#include "gl/glew.h"
+#include "GL/glew.h"
 #include "gl/glplat.h"
 
 #define USE_LINEAR_FOG
@@ -1264,7 +1264,7 @@ enum piRENDERSTATETYPE
 };
 
 
-// these new guys need to be taken care of...
+// these new states need to be taken care of...
 
 enum piRENDERSTATEFOGTYPE
 {

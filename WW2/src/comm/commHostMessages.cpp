@@ -11,6 +11,7 @@
 #include "chat/chatCellTypes.h"
 #include "chat/chatConstants.h"
 #include "chat/chatLStringIDs.h"
+#include "chat/chatModReport.h"
 #include "chat/chatName.h"
 #include "chat/chatServerTypes.h"
 #include "chat/chatSupportRPCMessages.h"
@@ -32,6 +33,7 @@
 #include "updt/updtPackers.h"
 #include "updt/updtVehicleHit.h"
 #include "weap/weapWeapon.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiPack.h"
@@ -53,6 +55,7 @@
 #include "teul/teulEndpoint.h"
 #include "updt/updtDeathByBuilding.h"
 #include "wwii/wwiiFullObjID.h"
+#include "inst/instTypes.h"
 
 #define DEATH_TIMEOUT 30			// A minute
 
@@ -704,7 +707,11 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 		vh.present |= PR_FROM_CONTROLLER;
 	}
 
-	hostAddVehicleToBroadcast(vref, &vh);
+	// Don't broadcast unless we have a valid instance set
+	if (vref->m_instance.id() != Instance::_INVALID)
+        {
+		hostAddVehicleToBroadcast(vref, &vh);
+	}
 
 	player->processUpdateValues(vh.updateNo, vh.updatePrime);
 
@@ -736,7 +743,8 @@ _recvUpdateInfo(ACTION_OBJECT* const a)
 		return 0;
 	}
 
-	return commRecvPeriodicUpdate(a->teulIndex, player, a->packed, a->offset, true);
+	a->offset = commRecvPeriodicUpdate(a->teulIndex, player, a->packed, a->offset, true);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////

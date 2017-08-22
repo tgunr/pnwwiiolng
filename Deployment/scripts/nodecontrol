@@ -1,11 +1,51 @@
 #!/bin/bash
+#
+# 8/5/2017 - frisbone, Created, Adapted from clustercontrol
+#
+# NOTES:
+#        1. Wont return until specified app has been successfully launched (TBD - detect failed launch)
+#        2. If interfaces are not setup homogeneously on the network (e.g. eth0 is broadcast net on one node and eth1 on another)
+#           the file /home/wwiiol/DEFAULT_IFACE can be created with "ethN" to reflect the primary interface adapter.  If someone fixes it later,
+#           simply delete the file.
+function start_server {
+
+    echo starting $1
+
+    logfile="/tmp/"$1".0.log"
+
+    default_iface=""
+    iface_file="/home/wwiiol/DEFAULT_IFACE"
+    if [ -e "$iface_file" ]; then
+        default_iface=`cat $iface_file`
+    fi
+
+    if ! [ -z "$default_iface" ]; then 
+        env DEFAULT_IFACE=$default_iface nohup /playnet/wwiiol/bin/$1 >/dev/null 2>&1 &
+    else
+        nohup /playnet/wwiiol/bin/$1 >/dev/null 2>&1 &
+    fi
+ 
+    while ! [ -e "$logfile" ]
+    do
+        sleep .1
+    done
+
+    if ! [ -z "$2" ]; then 
+        tail -f -n +0 $logfile | while read LOGLINE
+        do
+           [[ "${LOGLINE}" == *"$2"* ]] && pkill -n -P $$ tail
+        done
+    fi
+
+    echo started $1
+}
 
 #############
-# Game Cluster Control Application.
+# Game Cluster Node Control Application.
 #############
 
 if [[ $( whoami ) != "wwiiol" ]]; then
-    echo "clustercontrol must be run as the wwiiol user to prevent permissions issues"
+    echo "nodecontrol must be run as the wwiiol user to prevent permissions issues"
     exit 1
 fi
 
@@ -25,19 +65,13 @@ case "$1" in
 
     # check which application needs to be started and start it
     if [ "$2" = "stratd" ]; then
-        /playnet/wwiiol/bin/dbd >/dev/null 2>&1 &
-        sleep 2
-        /playnet/wwiiol/bin/stratd >/dev/null 2>&1 &
-        echo started dbd and stratd
+        start_server "stratd" "Map state restored"
     elif [ "$2" = "chatd" ]; then
-        /playnet/wwiiol/bin/chatd >/dev/null 2>&1 &
-        echo started chatd
+        start_server "chatd" "strat peer connection complete"
     elif [ "$2" = "cellhost" ]; then
-        /playnet/wwiiol/bin/hostd >/dev/null 2>&1 &
-        echo started hostd -db
+        start_server "hostd" ""
     elif [ "$2" = "mmhostd" ]; then
-        /playnet/wwiiol/bin/mmhostd >/dev/null 2>&1 &
-        echo started mmhostd
+        start_server "mmhostd" "NOW SERVER_ACCEPTING"
     elif [ "$2" = "authHost" ]; then
         /playnet/wwiiol/bin/authHost >/dev/null 2>&1 &
         echo started authHost

@@ -89,7 +89,7 @@ MobileSpawn::incrementSpawnees(const playerid_t forPlayer) const
 	if ( m_playerID == 0 )
 		return;
 
-	// Check the spawnees list to see if this guy has
+	// Check the spawnees list to see if this player has
 	// spawned through you recently
 	SPAWNEES::iterator it = m_spawnees.find(forPlayer);
 	if ( it != m_spawnees.end() )

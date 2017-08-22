@@ -244,10 +244,10 @@ chatForeignizeMessage(WWII_COUNTRY country, size_t maxLen)
 		int symRate, spaceChance;
 		switch (country)
 		{
-			case WWII_GERMANY: symRate = 6, spaceChance = 5; break;
-			case WWII_FRANCE: symRate = 4, spaceChance = 6; break;
-			case MAX_COUNTRIES: symRate = 1, spaceChance = 9; break;
-			default: symRate = 3, spaceChance = 9; break;
+			case WWII_GERMANY: symRate = 6; spaceChance = 5; break;
+			case WWII_FRANCE: symRate = 4; spaceChance = 6; break;
+			case MAX_COUNTRIES: symRate = 1; spaceChance = 9; break;
+			default: symRate = 3; spaceChance = 9; break;
 		}
 
 		// And maybe some dressing
@@ -311,7 +311,7 @@ chatSay(Player* player, Chat::ClientMessage* message, char* phrase, AREA_CHAT_MO
 	break;
 	}
 
-	// Find which cells we need to transmit to for this guy
+	// Find which cells we need to transmit to for this player
 	static PLAYERS_ARRAY array;
 	chatGridGetPlayersVector(player, std::max(friendlyRange2, hostileRange2), array);
 	if ( array.empty() )

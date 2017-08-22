@@ -52,15 +52,15 @@ ewsCheckInterval = timeInSeconds({ minutes = 5 })
 -- After a brigade has been moved how long until the next move?
 -- of a unit within the division
 
-brigadeMoveTime_s = timeInSeconds({ hours = 1 })
-brigadeFallbackTime_s = timeInSeconds({ minutes = 30 })
+brigadeMoveTime_s = timeInSeconds({ minutes = 60 })
+brigadeFallbackTime_s = timeInSeconds({ minutes = 15 })
 
 -- For a division?
-divisionMoveTime_s = timeInSeconds({ hours = 1 })
-divisionFallbackTime_s = timeInSeconds({ minutes = 30 })
+divisionMoveTime_s = timeInSeconds({ minutes = 60 })
+divisionFallbackTime_s = timeInSeconds({ minutes = 15 })
 
 -- If you get kicked off the map?
-unitReformTime_s = timeInSeconds({ hours = 12 })
+unitReformTime_s = timeInSeconds({ hours = 6 })
 
 ----------------------------------------
 -- HCUnit/Pocket controls:

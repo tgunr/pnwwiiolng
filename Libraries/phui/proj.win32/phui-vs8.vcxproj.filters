@@ -141,18 +141,15 @@
     <ClCompile Include="..\src\Viewport.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\wwiiUTF.cpp">
+    <ClCompile Include="..\src\XMLMessage.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\XMLMessage.cpp">
+    <ClCompile Include="..\src\GraphicsContext.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\ConvertUTF.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\wwiiUTF.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\include\phui\Button.h">

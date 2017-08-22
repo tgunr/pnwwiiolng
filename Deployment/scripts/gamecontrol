@@ -1,0 +1,164 @@
+#!/usr/bin/env php
+<?php
+
+// 8/5/2017 - frisbone - Modified, allow nodecontrol to control timing
+//
+// NOTES:
+//         1. Pull out list of servers so the code is independent of what is being controlled
+
+$version = '0.2.1';
+
+include '/playnet/bin/gamecontrolvars.php';
+//
+// Above PHP file should contain the definition of all controllable clusters:
+//
+// Example of entries below:
+//
+// $clusters = [
+//    2 => [
+//        'clusterid' => 2, 'names' => ['Cluster1', 'Dev'], 'arenaid' => 250,
+//        'version' => '1.35.8.1', 'description' => "Open Beta", 'visibility' => 'visible',
+//        'hosts' => [
+//            1 => [ 'hostname' => 'cluster1-1', 'command' => 'strat' ], 2 => [ 'hostname' => 'cluster1-2', 'command' => 'chat' ],
+//            4 => [ 'hostname' => 'cluster1-4', 'command' => 'cell' ],   3 => [ 'hostname' => 'cluster1-3', 'command' => 'map' ],
+//        ],
+//   ];
+//
+function do_help($msg) {
+    global $version, $clusters, $argv;
+    
+    if (!is_null($msg)) {
+        print "{$msg}\n\n";
+    }
+    print "devcontrol version {$version}\n";
+    print "Usage: {$argv[0]} {start|stop|restart|savelogs} cluster {name|ID}\n";
+    print "\n";
+    print "Cluster is one of:\n";
+    foreach ($clusters as $cluster) {
+	if (isset($cluster['name'])) {
+		$name = $cluster['name'];
+	} else {
+		$name = implode("/", $cluster['names']);
+	}
+        print "\t{$name}: ID ${cluster['clusterid']}, arena {$cluster['arenaid']} - {$cluster['description']}\n";
+    }
+    print "\n";
+    print "Examples:\n";
+    print "\tdevcontrol start cluster Dev1\n";
+    print "\tdevcontrol stop cluster Dev2\n";
+    exit(0);
+}
+
+function commandForHost($host, $action, $needTerm) {
+    $cmds = [ '-l', 'wwiiol',
+                '-i', '/root/.ssh/id_rsa.pn.authdev',
+                "{$host['hostname']}.playnet.com",
+                $action
+           ];
+    if ($needTerm) {
+        array_unshift($cmds, '-t');
+    } 
+    return escapeshellcmd('ssh') . ' ' .  implode(' ', array_map('escapeshellarg', $cmds));
+}
+
+function controlCommandForHost($host, $action) {
+    $processmap = [ 'strat' => 'stratd', 'chat' => 'chatd', 'map' => 'mmhostd', 'cell' => 'cellhost'];
+    return "/playnet/bin/nodecontrol {$action} {$processmap[$host['command']]}";
+}
+
+function runCommand($cmd) {
+    print "EXECUTING: {$cmd}\n";
+    passthru($cmd, $exitValue);
+    if ($exitValue != 0) {
+        print "WARNING: Execution failure. Continue? [yN] ";
+        $response = fgets(STDIN);
+        if (is_null($response) || ($response[0] !== 'y' && $response[0] !== 'Y')) {
+            exit($exitValue);
+        }
+    }
+}
+
+function startCluster($cluster) {
+    foreach ($cluster['hosts'] as $n => $host) {
+        runCommand(commandForHost($host, controlCommandForHost($host, 'start'), true));
+        if (isset($delays[$n])) {
+            print "Waiting {$delays[$n]} seconds before next command.\n";
+            sleep($delays[$n]);
+        }
+    }
+}
+
+function stopCluster($cluster) {
+    foreach ($cluster['hosts'] as $n => $host) {
+        runCommand(commandForHost($host, controlCommandForHost($host, 'stop'), false));
+    }
+}
+
+function restartCluster($cluster) {
+    stopCluster($cluster);
+    print "Waiting 5 seconds before starting cluster up again.\n";
+    sleep(5);
+    startCluster($cluster);
+}
+
+function savelogsCluster($cluster) {
+    foreach ($cluster['hosts'] as $n => $host) {
+        runCommand(commandForHost($host, '/playnet/bin/savelogs'));
+    }
+}
+
+if (in_array('--help', $argv)) {
+    do_help(NULL);
+}
+
+if ($argc < 4) {
+    do_help("Not enough arguments");
+}
+
+if (($type = $argv[2]) !== 'cluster') {
+    do_help("Only cluster control is currently supported");
+}
+
+if (!in_array($cmd = $argv[1], ['start', 'stop', 'restart', 'savelogs'])) {
+    do_help("Unknown operation {$cmd}");
+}
+
+$which = $argv[3];
+if (ctype_digit($which)) {
+    if (!isset($clusters[intval($which)])) {
+        do_help("Unknown cluster ID {$which}");
+    }
+    $cluster = $clusters[intval($which)];
+} else {
+    foreach ($clusters as $maybeCluster) {
+	if (isset($maybeCluster['name']) && strtolower($maybeCluster['name']) === strtolower($which)) {
+            $cluster = $maybeCluster;
+        } else if (isset($maybeCluster['names'])) {
+		foreach ($maybeCluster['names'] as $name) {
+			if (strtolower($name) == strtolower($which)) {
+				$cluster = $maybeCluster;
+				break;
+			}
+		}
+	}
+    }
+    if (!isset($cluster)) {
+        do_help("Unknown cluster name {$which}");
+    }
+}
+
+print "Operating on {$which} (ID {$cluster['clusterid']}, arena ID {$cluster['arenaid']})\n";
+if ($cmd === 'start') {
+    startCluster($cluster);
+} else if ($cmd === 'stop') {
+    stopCluster($cluster);
+} else if ($cmd === 'restart') {
+    restartCluster($cluster);
+} else if ($cmd === 'savelogs') {
+    savelogsCluster($cluster);
+} else {
+    print "Bad command- this shouldn't happen.\n";
+    exit(128);
+}
+
+?>

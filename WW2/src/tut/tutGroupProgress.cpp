@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Tue Oct 21 12:47:30 CDT 2008
 //
 // Exchange tutorial progress stuff between client/host

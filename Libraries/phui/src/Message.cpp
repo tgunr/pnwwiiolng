@@ -5,7 +5,6 @@
 
 #include "phui/Message.h"
 
-using namespace std;
 using namespace phui;
 
 /*************************************************************************************************
@@ -86,7 +85,7 @@ void MessageData::FreeData()
 	data = 0;
 }
 
-typedef multimap<string,MessageData*> MessageHash;
+typedef std::multimap<std::string,MessageData*> MessageHash;
 
 /*************************************************************************************************
 	MessageImp
@@ -257,7 +256,7 @@ long Message::AddData(const char* name, long type, const void* data, long size)
 		
 		MessageData* msgData = new MessageData(type, data, size);
 		
-		string str(name);
+		std::string str(name);
 		MessageHash::value_type item(str, msgData);
 		mImp->hash.insert(item);
 		
@@ -443,7 +442,7 @@ long Message::FindData(const char* name, long type, const void **data, long* siz
 	if(!mImp) return NAME_NOT_FOUND;
 	
 	long err = OK;
-	string str(name);
+	std::string str(name);
 		
 	MessageHash::const_iterator it = mImp->hash.find(str);
 	if(it != mImp->hash.end())
@@ -543,7 +542,7 @@ long Message::GetInfo(const char* name, long* typeFound, long* countFound) const
 	if(!mImp) return NAME_NOT_FOUND;
 	
 	long err = OK;
-	string str(name);
+	std::string str(name);
 	
 	MessageHash::const_iterator it = mImp->hash.find(str);
 	if(it != mImp->hash.end())
@@ -593,7 +592,7 @@ long Message::GetInfo(long type, long index, const char** nameFound, long* typeF
 	{
 		if(type == ANY_TYPE || it->second->type == type) i++;
 		
-		string str(it->first);
+		std::string str(it->first);
 
 		while(it != mImp->hash.end())
 		{
@@ -617,7 +616,7 @@ long Message::GetInfo(long type, long index, const char** nameFound, long* typeF
 		*nameFound = it->first.c_str();
 		*typeFound = it->second->type;
 		
-		string str(it->first);
+		std::string str(it->first);
 		for(*countFound = 0; it != mImp->hash.end(); ++it)
 		{
 			if(it->first == str) 
@@ -740,7 +739,7 @@ long Message::ReplaceData(const char *name, long type,
 	if(!mImp) return NAME_NOT_FOUND;
 
 	long err = OK;
-	string str(name);
+	std::string str(name);
 	
 	MessageHash::const_iterator it = mImp->hash.find(str);
 	if(it != mImp->hash.end())
@@ -782,7 +781,7 @@ long Message::RemoveData(const char *name, long index )
 	if(!mImp) return NAME_NOT_FOUND;
 
 	long err = OK;
-	string str(name);
+	std::string str(name);
 	
 	MessageHash::iterator it = mImp->hash.find(str);
 	if(it != mImp->hash.end())
@@ -821,7 +820,7 @@ long Message::RemoveName(const char *name)
 	if(!mImp) return NAME_NOT_FOUND;
 
 	long err = OK;
-	string str(name);
+	std::string str(name);
 	
 	MessageHash::iterator it = mImp->hash.find(str);
 	if(it != mImp->hash.end())

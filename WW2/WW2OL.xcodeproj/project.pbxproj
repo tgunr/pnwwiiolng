@@ -383,7 +383,6 @@
 		08492F7113170C5000C7F39E /* FTFontAdapted.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08492F7013170C5000C7F39E /* FTFontAdapted.cpp */; };
 		084DD9F91120F37F0020E34F /* mem.h in Headers */ = {isa = PBXBuildFile; fileRef = 084DD9F81120F37F0020E34F /* mem.h */; };
 		084DD9FA1120F37F0020E34F /* mem.h in Headers */ = {isa = PBXBuildFile; fileRef = 084DD9F81120F37F0020E34F /* mem.h */; };
-		0863B34F10619AC8005FDF19 /* libphui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0863B34D10619AC8005FDF19 /* libphui.a */; };
 		0863B35010619AC8005FDF19 /* libspeedtreemac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0863B34E10619AC8005FDF19 /* libspeedtreemac.a */; };
 		087286DF10D1B23B00456009 /* libimapmac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 087286DE10D1B23B00456009 /* libimapmac.a */; };
 		08744F51107BF96D009DB5AF /* liblua5.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08744F50107BF96D009DB5AF /* liblua5.1.a */; };
@@ -431,6 +430,7 @@
 		E91EBF511E744877005AE0A0 /* libsteam_api.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E91EBF4F1E7447F6005AE0A0 /* libsteam_api.dylib */; };
 		E94156B01D259A0300C0565B /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94156AF1D259A0300C0565B /* libb64.a */; };
 		E95E664F1E8301A3005A04FF /* steam_appid.txt in Resources */ = {isa = PBXBuildFile; fileRef = E95E664E1E8301A2005A04FF /* steam_appid.txt */; };
+		E971F7151F1BF65800B500F1 /* sysAntihack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E971F7121F1BF61F00B500F1 /* sysAntihack.cpp */; };
 		E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
 		E97C76161C848E3600875F44 /* CADebugger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B1120222EB00A60CC2 /* CADebugger.cpp */; };
 		E97C76171C848E3A00875F44 /* CADebugMacros.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B3120222EB00A60CC2 /* CADebugMacros.cpp */; };
@@ -478,7 +478,15 @@
 		E9C1BDE01E462A38001FD5B0 /* liblibcatmath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD31E461EE6001FD5B0 /* liblibcatmath.a */; };
 		E9C1BDE11E462A38001FD5B0 /* liblibcattunnel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E9C1BDD41E461EE6001FD5B0 /* liblibcattunnel.a */; };
 		E9C1BDE21E462B00001FD5B0 /* raknetConn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9C1BDDA1E461F1E001FD5B0 /* raknetConn.cpp */; };
+		E9C3FB6F1EE1A8DC00872413 /* multiClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */; };
 		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
+		FA06C3B51ECF289F00A9977E /* authSteam.h in Headers */ = {isa = PBXBuildFile; fileRef = FA06C3B31ECF289F00A9977E /* authSteam.h */; };
+		FA06C3B61ECF2CD400A9977E /* authSteam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3B21ECF289F00A9977E /* authSteam.cpp */; };
+		FA06C3B81ED0DCDF00A9977E /* sysLaunchUrl.h in Headers */ = {isa = PBXBuildFile; fileRef = FA06C3B71ED0DCDF00A9977E /* sysLaunchUrl.h */; };
+		FA06C3BA1EDCA67E00A9977E /* json.hpp in Headers */ = {isa = PBXBuildFile; fileRef = FA06C3B91EDCA67E00A9977E /* json.hpp */; };
+		FA06C3BE1EE18CE200A9977E /* sysSteam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3BB1EE18C8B00A9977E /* sysSteam.cpp */; };
+		FA06C3C21EE18D2100A9977E /* jsAuthHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3BF1EE18D0A00A9977E /* jsAuthHandler.cpp */; };
+		FA06C3C51EE18D5900A9977E /* clientConnections.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3C31EE18D5900A9977E /* clientConnections.cpp */; };
 		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
 		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
 		FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */ = {isa = PBXBuildFile; fileRef = FA13BB181C875F6800095818 /* placeholder-background.png */; };
@@ -496,12 +504,14 @@
 		FA37D7531C937F8F00013187 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FA37D7511C937F8F00013187 /* Localizable.strings */; };
 		FA3B631B1D613BA500A5A810 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; };
 		FA3B631C1D613BB400A5A810 /* HockeySDK.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FA3CF98C1F01CECB00C54395 /* gr2Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA3CF9891F01C1F600C54395 /* gr2Object.cpp */; };
 		FA448CEB1D0CB26C00C4936D /* omggen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA448CC71D0CB01100C4936D /* omggen.cpp */; };
 		FA448CEC1D0CB26C00C4936D /* omggen.l in Sources */ = {isa = PBXBuildFile; fileRef = FA448CC91D0CB01100C4936D /* omggen.l */; };
 		FA448CED1D0CB26C00C4936D /* omggen.y in Sources */ = {isa = PBXBuildFile; fileRef = FA448CCC1D0CB01100C4936D /* omggen.y */; };
 		FA5CDD491CD8BA6D00F93668 /* build_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA3D8BA81C8BF201002C5119 /* build_info.cpp */; };
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
 		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
+		FAE0023E1EE7F5660064198F /* libphui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA06C3D01EE2660200A9977E /* libphui.a */; };
 		FAE0DB8D1DC260AF00A9E63D /* omgChat.omg in Sources */ = {isa = PBXBuildFile; fileRef = FA448CA71D0CAE4800C4936D /* omgChat.omg */; };
 		FAE0DB8E1DC260AF00A9E63D /* omgMissionSortieData.omg in Sources */ = {isa = PBXBuildFile; fileRef = FA448CA81D0CAE4800C4936D /* omgMissionSortieData.omg */; };
 /* End PBXBuildFile section */
@@ -514,7 +524,6 @@
 			fileType = pattern.proxy;
 			isEditable = 1;
 			outputFiles = (
-				"$(DERIVED_FILE_DIR)/omg/$(INPUT_FILE_BASE).hxx",
 				"$(DERIVED_FILE_DIR)/omg/$(INPUT_FILE_BASE).cxx",
 			);
 			script = "OMGDSTROOT=\"${DERIVED_FILE_DIR}/omg\"\n\nmkdir -p \"${OMGDSTROOT}\"\n\n\"${BUILT_PRODUCTS_DIR}/omggen\" -D\"${INPUT_FILE_DIR}\" --cxx=\"${OMGDSTROOT}/${INPUT_FILE_BASE}.cxx\" --hxx=\"${OMGDSTROOT}/${INPUT_FILE_BASE}.hxx\" \"${INPUT_FILE_PATH}\"";
@@ -564,6 +573,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = E97C76341C8513EB00875F44;
 			remoteInfo = event;
+		};
+		FA06C3CF1EE2660200A9977E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA06C3CB1EE2660200A9977E /* phui.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC046055464E500DB518D;
+			remoteInfo = phui;
+		};
+		FA06C3D21EE2661B00A9977E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FA06C3CB1EE2660200A9977E /* phui.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
+			remoteInfo = phui;
 		};
 		FA448CF21D0CB82900C4936D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1130,7 +1153,6 @@
 		08104D51103DFBE90065E0E2 /* authClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = authClientMessages.cpp; sourceTree = "<group>"; };
 		08104D52103DFBE90065E0E2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		08104D55103DFBE90065E0E2 /* syscfg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syscfg.h; sourceTree = "<group>"; };
-		08104D56103DFBE90065E0E2 /* sysLaunchUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysLaunchUrl.h; sourceTree = "<group>"; };
 		08104D57103DFBE90065E0E2 /* sysMacCompat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysMacCompat.h; sourceTree = "<group>"; };
 		08104D58103DFBE90065E0E2 /* sysMacCompat.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = sysMacCompat.mm; sourceTree = "<group>"; };
 		08104D59103DFBE90065E0E2 /* sysmain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sysmain.cpp; sourceTree = "<group>"; };
@@ -1424,7 +1446,6 @@
 		08492F7013170C5000C7F39E /* FTFontAdapted.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FTFontAdapted.cpp; sourceTree = "<group>"; };
 		084DD9B511206C070020E34F /* updtEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtEnums.h; sourceTree = "<group>"; };
 		084DD9F81120F37F0020E34F /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
-		0863B34D10619AC8005FDF19 /* libphui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphui.a; path = lib/mac/libphui.a; sourceTree = "<group>"; };
 		0863B34E10619AC8005FDF19 /* libspeedtreemac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspeedtreemac.a; path = lib/mac/libspeedtreemac.a; sourceTree = "<group>"; };
 		0863B36E10619D66005FDF19 /* clientGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = clientGlobals.cpp; path = src/client/clientGlobals.cpp; sourceTree = SOURCE_ROOT; };
 		087286DE10D1B23B00456009 /* libimapmac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libimapmac.a; path = lib/mac/libimapmac.a; sourceTree = "<group>"; };
@@ -1505,6 +1526,8 @@
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E94156AF1D259A0300C0565B /* libb64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libb64.a; path = lib/mac/libb64.a; sourceTree = "<group>"; };
 		E95E664E1E8301A2005A04FF /* steam_appid.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = steam_appid.txt; path = ../opt/ww2mods/steam_appid.txt; sourceTree = "<group>"; };
+		E971F7121F1BF61F00B500F1 /* sysAntihack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sysAntihack.cpp; path = src/sys/sysAntihack.cpp; sourceTree = SOURCE_ROOT; };
+		E971F7131F1BF61F00B500F1 /* sysAntihack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysAntihack.h; path = src/sys/sysAntihack.h; sourceTree = SOURCE_ROOT; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
 		E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader2.cpp; sourceTree = "<group>"; };
 		E97C76351C8513EB00875F44 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1588,7 +1611,22 @@
 		E9C1BDD41E461EE6001FD5B0 /* liblibcattunnel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibcattunnel.a; path = lib/mac/liblibcattunnel.a; sourceTree = "<group>"; };
 		E9C1BDDA1E461F1E001FD5B0 /* raknetConn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raknetConn.cpp; path = teul/raknetConn.cpp; sourceTree = "<group>"; };
 		E9C1BDDC1E461F2F001FD5B0 /* raknetConn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = raknetConn.h; sourceTree = "<group>"; };
+		E9C3FB6B1EE1A81C00872413 /* multiClientHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multiClientHelp.h; path = mc/multiClientHelp.h; sourceTree = "<group>"; };
+		E9C3FB6C1EE1A81C00872413 /* multiClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multiClient.h; path = mc/multiClient.h; sourceTree = "<group>"; };
+		E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = multiClient.cpp; path = mc/multiClient.cpp; sourceTree = "<group>"; };
 		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
+		FA06C3B21ECF289F00A9977E /* authSteam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = authSteam.cpp; path = auth/authSteam.cpp; sourceTree = "<group>"; };
+		FA06C3B31ECF289F00A9977E /* authSteam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authSteam.h; path = auth/authSteam.h; sourceTree = "<group>"; };
+		FA06C3B71ED0DCDF00A9977E /* sysLaunchUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysLaunchUrl.h; path = src/sys/sysLaunchUrl.h; sourceTree = SOURCE_ROOT; };
+		FA06C3B91EDCA67E00A9977E /* json.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = json.hpp; path = ../../Libraries/json/src/json.hpp; sourceTree = "<group>"; };
+		FA06C3BB1EE18C8B00A9977E /* sysSteam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sysSteam.cpp; path = src/sys/sysSteam.cpp; sourceTree = SOURCE_ROOT; };
+		FA06C3BC1EE18C8B00A9977E /* sysSteam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysSteam.h; path = src/sys/sysSteam.h; sourceTree = SOURCE_ROOT; };
+		FA06C3BF1EE18D0A00A9977E /* jsAuthHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsAuthHandler.cpp; sourceTree = "<group>"; };
+		FA06C3C01EE18D0A00A9977E /* jsAuthHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jsAuthHandler.h; sourceTree = "<group>"; };
+		FA06C3C31EE18D5900A9977E /* clientConnections.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clientConnections.cpp; sourceTree = "<group>"; };
+		FA06C3C41EE18D5900A9977E /* clientConnections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clientConnections.h; sourceTree = "<group>"; };
+		FA06C3CB1EE2660200A9977E /* phui.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = phui.xcodeproj; path = ../Libraries/phui/proj.mac/phui.xcodeproj; sourceTree = "<group>"; };
+		FA06C3D61EE3AB3200A9977E /* authDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authDefaults.h; path = auth/authDefaults.h; sourceTree = "<group>"; };
 		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
 		FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authPlaygateTypes.h; path = src/auth/authPlaygateTypes.h; sourceTree = SOURCE_ROOT; };
 		FA13BB161C86758600095818 /* libevent.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libevent.a; path = proj/mac/build/Debug/libevent.a; sourceTree = "<group>"; };
@@ -1607,6 +1645,8 @@
 		FA37D7521C937F8F00013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FA37D7551C937F9800013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		FA3B631A1D613BA500A5A810 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = proj/mac/HockeySDK.framework; sourceTree = "<group>"; };
+		FA3CF9891F01C1F600C54395 /* gr2Object.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gr2Object.cpp; sourceTree = "<group>"; };
+		FA3CF98B1F01C67D00C54395 /* gr2Object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gr2Object.h; sourceTree = "<group>"; };
 		FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CodeSigning.xcconfig; path = proj/mac/CodeSigning.xcconfig; sourceTree = "<group>"; };
 		FA3D8BA81C8BF201002C5119 /* build_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = build_info.cpp; path = "${DERIVED_FILES_DIR}/build_info.cpp"; sourceTree = "<absolute>"; };
 		FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = SearchPaths.xcconfig; path = proj/mac/SearchPaths.xcconfig; sourceTree = "<group>"; };
@@ -1645,6 +1685,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAE0023E1EE7F5660064198F /* libphui.a in Frameworks */,
 				E9C1BDDD1E462A38001FD5B0 /* libRakNetLibStatic.a in Frameworks */,
 				E9C1BDDE1E462A38001FD5B0 /* liblibcatcommon.a in Frameworks */,
 				E9C1BDDF1E462A38001FD5B0 /* liblibcatcrypt.a in Frameworks */,
@@ -1670,7 +1711,6 @@
 				0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */,
 				0DDF00AC08578C460027461D /* libjs.a in Frameworks */,
 				0DBEF4410A7FD8F60094C53D /* libexpat-ww2.a in Frameworks */,
-				0863B34F10619AC8005FDF19 /* libphui.a in Frameworks */,
 				0863B35010619AC8005FDF19 /* libspeedtreemac.a in Frameworks */,
 				08DDF926106928D800720B71 /* libmacode.a in Frameworks */,
 				E94156B01D259A0300C0565B /* libb64.a in Frameworks */,
@@ -1775,6 +1815,8 @@
 		0810485F103DCEE10065E0E2 /* client */ = {
 			isa = PBXGroup;
 			children = (
+				FA06C3C31EE18D5900A9977E /* clientConnections.cpp */,
+				FA06C3C41EE18D5900A9977E /* clientConnections.h */,
 				08104860103DCEE10065E0E2 /* client.cpp */,
 				08104861103DCEE10065E0E2 /* client.h */,
 				08104862103DCEE10065E0E2 /* clientBrigadeControl.cpp */,
@@ -1964,6 +2006,8 @@
 		08104971103DD1A30065E0E2 /* gr2 */ = {
 			isa = PBXGroup;
 			children = (
+				FA3CF98B1F01C67D00C54395 /* gr2Object.h */,
+				FA3CF9891F01C1F600C54395 /* gr2Object.cpp */,
 				0818A91112E745AB0035C3B4 /* gr2layerTypes.cpp */,
 				0818A91212E745AB0035C3B4 /* gr2layerTypes.h */,
 				08104972103DD1A30065E0E2 /* gr2Anim.cpp */,
@@ -2024,6 +2068,8 @@
 		081049F5103DD2900065E0E2 /* js */ = {
 			isa = PBXGroup;
 			children = (
+				FA06C3BF1EE18D0A00A9977E /* jsAuthHandler.cpp */,
+				FA06C3C01EE18D0A00A9977E /* jsAuthHandler.h */,
 				081049F6103DD2900065E0E2 /* jsClient.cpp */,
 				081049F7103DD2900065E0E2 /* jsClient.h */,
 				081049F8103DD2900065E0E2 /* jsContent.cpp */,
@@ -2583,12 +2629,16 @@
 		08104D50103DFBE90065E0E2 /* sysmac */ = {
 			isa = PBXGroup;
 			children = (
+				E971F7121F1BF61F00B500F1 /* sysAntihack.cpp */,
+				E971F7131F1BF61F00B500F1 /* sysAntihack.h */,
+				FA06C3BB1EE18C8B00A9977E /* sysSteam.cpp */,
+				FA06C3BC1EE18C8B00A9977E /* sysSteam.h */,
+				FA06C3B71ED0DCDF00A9977E /* sysLaunchUrl.h */,
 				FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */,
 				0863B36E10619D66005FDF19 /* clientGlobals.cpp */,
 				08104D51103DFBE90065E0E2 /* authClientMessages.cpp */,
 				08104D52103DFBE90065E0E2 /* main.m */,
 				08104D55103DFBE90065E0E2 /* syscfg.h */,
-				08104D56103DFBE90065E0E2 /* sysLaunchUrl.h */,
 				08104D57103DFBE90065E0E2 /* sysMacCompat.h */,
 				08104D58103DFBE90065E0E2 /* sysMacCompat.mm */,
 				08104D59103DFBE90065E0E2 /* sysmain.cpp */,
@@ -3023,6 +3073,8 @@
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				E9C3FB6A1EE1A7F400872413 /* mc */,
+				FA06C3B11ECF27FB00A9977E /* auth */,
 				E97C763D1C85146A00875F44 /* event */,
 				08E5E55513E855A100A5034D /* ez */,
 				08977DDA134CFB7200C9DCFE /* scen */,
@@ -3106,8 +3158,8 @@
 		20286C29FDCF999611CA2CEA /* WW2OL */ = {
 			isa = PBXGroup;
 			children = (
+				FA06C3CB1EE2660200A9977E /* phui.xcodeproj */,
 				E95E664E1E8301A2005A04FF /* steam_appid.txt */,
-				E99C3E761E744FC6008A435E /* libsteam_api.dylib */,
 				FA3D8BB11C8BF5CC002C5119 /* Config */,
 				FA448CBC1D0CB01100C4936D /* omggen */,
 				0DA6D33608563A0900A53577 /* src */,
@@ -3162,7 +3214,6 @@
 				E90D96991C6D729D00D5EC52 /* WebKit.framework */,
 				087286DE10D1B23B00456009 /* libimapmac.a */,
 				FA13BB161C86758600095818 /* libevent.a */,
-				0863B34D10619AC8005FDF19 /* libphui.a */,
 				0863B34E10619AC8005FDF19 /* libspeedtreemac.a */,
 				0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */,
 				0DDF00A308578C460027461D /* libHIDUtilities.a */,
@@ -3171,6 +3222,7 @@
 				08744F52107BF977009DB5AF /* libtolua++.a */,
 				FA13BB491C8764BB00095818 /* libz.tbd */,
 				FA13BB4E1C87650800095818 /* libxml2.tbd */,
+				E99C3E761E744FC6008A435E /* libsteam_api.dylib */,
 			);
 			name = lib;
 			sourceTree = "<group>";
@@ -3248,6 +3300,35 @@
 			name = event;
 			sourceTree = "<group>";
 		};
+		E9C3FB6A1EE1A7F400872413 /* mc */ = {
+			isa = PBXGroup;
+			children = (
+				E9C3FB6B1EE1A81C00872413 /* multiClientHelp.h */,
+				E9C3FB6C1EE1A81C00872413 /* multiClient.h */,
+				E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */,
+			);
+			name = mc;
+			sourceTree = "<group>";
+		};
+		FA06C3B11ECF27FB00A9977E /* auth */ = {
+			isa = PBXGroup;
+			children = (
+				FA06C3B91EDCA67E00A9977E /* json.hpp */,
+				FA06C3B31ECF289F00A9977E /* authSteam.h */,
+				FA06C3B21ECF289F00A9977E /* authSteam.cpp */,
+				FA06C3D61EE3AB3200A9977E /* authDefaults.h */,
+			);
+			name = auth;
+			sourceTree = "<group>";
+		};
+		FA06C3CC1EE2660200A9977E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FA06C3D01EE2660200A9977E /* libphui.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		FA3D8BB11C8BF5CC002C5119 /* Config */ = {
 			isa = PBXGroup;
 			children = (
@@ -3304,13 +3385,16 @@
 				082CF7DF120222EB00A60CC2 /* MacOSX_OALExtensions.h in Headers */,
 				082CF7E0120222EB00A60CC2 /* oalAtomicStack.h in Headers */,
 				082CF7E2120222EB00A60CC2 /* oalBuffer.h in Headers */,
+				FA06C3BA1EDCA67E00A9977E /* json.hpp in Headers */,
 				082CF7E4120222EB00A60CC2 /* oalCaptureDevice.h in Headers */,
 				082CF7E6120222EB00A60CC2 /* oalContext.h in Headers */,
 				082CF7E8120222EB00A60CC2 /* oalDevice.h in Headers */,
 				082CF7EA120222EB00A60CC2 /* oalImp.h in Headers */,
+				FA06C3B81ED0DCDF00A9977E /* sysLaunchUrl.h in Headers */,
 				082CF7EC120222EB00A60CC2 /* oalOSX.h in Headers */,
 				082CF7EE120222EB00A60CC2 /* oalSource.h in Headers */,
 				082CF82A12022CF700A60CC2 /* al.h in Headers */,
+				FA06C3B51ECF289F00A9977E /* authSteam.h in Headers */,
 				082CF82B12022CF700A60CC2 /* alc.h in Headers */,
 				082CF82C12022CF700A60CC2 /* CAAtomicStack.h in Headers */,
 				082CF82D12022CF700A60CC2 /* CAByteOrder.h in Headers */,
@@ -3410,6 +3494,7 @@
 				FA448CA51D0CADA900C4936D /* PBXBuildRule */,
 			);
 			dependencies = (
+				FA06C3D31EE2661B00A9977E /* PBXTargetDependency */,
 				FA448CF31D0CB82900C4936D /* PBXTargetDependency */,
 				E97C76C91C85ABF400875F44 /* PBXTargetDependency */,
 				08D5812D106310A700177892 /* PBXTargetDependency */,
@@ -3499,6 +3584,12 @@
 			);
 			mainGroup = 20286C29FDCF999611CA2CEA /* WW2OL */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = FA06C3CC1EE2660200A9977E /* Products */;
+					ProjectRef = FA06C3CB1EE2660200A9977E /* phui.xcodeproj */;
+				},
+			);
 			projectRoot = ./;
 			targets = (
 				FA448CE11D0CB25500C4936D /* omggen */,
@@ -3509,6 +3600,16 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		FA06C3D01EE2660200A9977E /* libphui.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libphui.a;
+			remoteRef = FA06C3CF1EE2660200A9977E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8D0C4E8C0486CD37000505A6 /* Resources */ = {
@@ -3606,6 +3707,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E971F7151F1BF65800B500F1 /* sysAntihack.cpp in Sources */,
+				E9C3FB6F1EE1A8DC00872413 /* multiClient.cpp in Sources */,
 				E98C64811E48DF7C00ABE277 /* wwiiBackChannel.cpp in Sources */,
 				FAE0DB8D1DC260AF00A9E63D /* omgChat.omg in Sources */,
 				FAE0DB8E1DC260AF00A9E63D /* omgMissionSortieData.omg in Sources */,
@@ -3759,6 +3862,7 @@
 				08104B8E103DF7840065E0E2 /* oglfbo.cpp in Sources */,
 				08104B8F103DF7840065E0E2 /* oglGlobalStates.cpp in Sources */,
 				08104B90103DF7840065E0E2 /* oglMesh.cpp in Sources */,
+				FA06C3C51EE18D5900A9977E /* clientConnections.cpp in Sources */,
 				08104B91103DF7840065E0E2 /* oglTexture.cpp in Sources */,
 				08104B95103DF7B10065E0E2 /* ogrpmain.cpp in Sources */,
 				08104BBF103DF85D0065E0E2 /* BoundingBox.cpp in Sources */,
@@ -3782,6 +3886,7 @@
 				08104BDD103DF8CB0065E0E2 /* parseIO.cpp in Sources */,
 				08104BDE103DF8CB0065E0E2 /* parseWor.cpp in Sources */,
 				08104BED103DF8EA0065E0E2 /* md5c.c in Sources */,
+				FA3CF98C1F01CECB00C54395 /* gr2Object.cpp in Sources */,
 				08104BEE103DF8EA0065E0E2 /* parchive.cpp in Sources */,
 				08104BF1103DF8EA0065E0E2 /* rijndael-alg-fst.c in Sources */,
 				08104BF2103DF8EA0065E0E2 /* rijndael-api-fst.c in Sources */,
@@ -3821,6 +3926,7 @@
 				08104C88103DFA190065E0E2 /* sndsSoundControl.cpp in Sources */,
 				08104C97103DFA5B0065E0E2 /* sptmain.cpp in Sources */,
 				08104C98103DFA5B0065E0E2 /* Tree.cpp in Sources */,
+				FA06C3C21EE18D2100A9977E /* jsAuthHandler.cpp in Sources */,
 				08104C99103DFA5B0065E0E2 /* treeData.cpp in Sources */,
 				08104D19103DFA970065E0E2 /* strtClientMessages.cpp in Sources */,
 				08104D2E103DFA970065E0E2 /* strtLua.cpp in Sources */,
@@ -3872,6 +3978,7 @@
 				08104E68103DFD270065E0E2 /* uiLua.cpp in Sources */,
 				08104E69103DFD270065E0E2 /* uiMain.cpp in Sources */,
 				08104E6A103DFD270065E0E2 /* uiMovieView.cpp in Sources */,
+				FA06C3B61ECF2CD400A9977E /* authSteam.cpp in Sources */,
 				08104E6B103DFD270065E0E2 /* uiSound.cpp in Sources */,
 				08104E7A103DFD480065E0E2 /* updtPackers.cpp in Sources */,
 				08104EA6103DFD750065E0E2 /* vehanim.cpp in Sources */,
@@ -3934,6 +4041,7 @@
 				08977E1E134D007B00C9DCFE /* sneaky.cpp in Sources */,
 				08477139135E279F00325E43 /* trnScenario.cpp in Sources */,
 				08BA6A9A13705A68007321C6 /* SpatialDB.cpp in Sources */,
+				FA06C3BE1EE18CE200A9977E /* sysSteam.cpp in Sources */,
 				08BA6ACF1370776D007321C6 /* CustomMapLayer.cpp in Sources */,
 				08E800BC13745261000F25A9 /* HeightField.cpp in Sources */,
 				088CE9951379D33600F7AE5D /* SpatialDatabase.cpp in Sources */,
@@ -4002,6 +4110,11 @@
 			target = E97C76341C8513EB00875F44 /* event */;
 			targetProxy = E97C76C81C85ABF400875F44 /* PBXContainerItemProxy */;
 		};
+		FA06C3D31EE2661B00A9977E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = phui;
+			targetProxy = FA06C3D21EE2661B00A9977E /* PBXContainerItemProxy */;
+		};
 		FA448CF31D0CB82900C4936D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = FA448CE11D0CB25500C4936D /* omggen */;
@@ -4045,10 +4158,6 @@
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
@@ -4091,10 +4200,6 @@
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
@@ -4149,16 +4254,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_UNROLL_LOOPS = YES;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
@@ -4213,6 +4311,72 @@
 			};
 			name = Release;
 		};
+		E9C3FB641EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+			};
+			name = MC;
+		};
+		E9C3FB651EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LEX = "$(SRCROOT)/proj/mac/flex";
+				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
+				LEX_SUPPRESS_DEFAULT_RULE = YES;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				YACC = "$(SRCROOT)/proj/mac/bison";
+			};
+			name = MC;
+		};
+		E9C3FB661EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				INFOPLIST_FILE = proj/mac/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
+				MACH_O_TYPE = mh_execute;
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				WRAPPER_EXTENSION = app;
+			};
+			name = MC;
+		};
+		E9C3FB671EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = MC;
+		};
+		E9C3FB681EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = MC;
+		};
+		E9C3FB691EE1A4EF00872413 /* MC */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = MC;
+		};
 		FA3D8BB21C8BF6D6002C5119 /* Development */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
@@ -4228,10 +4392,6 @@
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
@@ -4343,10 +4503,6 @@
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
@@ -4393,6 +4549,7 @@
 				FA3D8BB51C8BF6D6002C5119 /* Development */,
 				085BD0CC110F5D560063F377 /* Release */,
 				E964E0601E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB681EE1A4EF00872413 /* MC */,
 				FAFF044A1C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4405,6 +4562,7 @@
 				FA3D8BB31C8BF6D6002C5119 /* Development */,
 				085BD0CA110F5D560063F377 /* Release */,
 				E964E05E1E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB661EE1A4EF00872413 /* MC */,
 				FAFF04481C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4417,6 +4575,7 @@
 				FA3D8BB21C8BF6D6002C5119 /* Development */,
 				085BD0C9110F5D560063F377 /* Release */,
 				E964E05C1E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB641EE1A4EF00872413 /* MC */,
 				FAFF04471C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4429,6 +4588,7 @@
 				FA3D8BB41C8BF6D6002C5119 /* Development */,
 				085BD0CB110F5D560063F377 /* Release */,
 				E964E05F1E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB671EE1A4EF00872413 /* MC */,
 				FAFF04491C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4441,6 +4601,7 @@
 				FA3D8BB61C8BF6D6002C5119 /* Development */,
 				E97C763B1C8513EB00875F44 /* Release */,
 				E964E0611E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB691EE1A4EF00872413 /* MC */,
 				FAFF044B1C9F9E5300C3F5B0 /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -4453,6 +4614,7 @@
 				FA448CE81D0CB25500C4936D /* Development */,
 				FA448CE91D0CB25500C4936D /* Release */,
 				E964E05D1E914A0E00D4BC5F /* BetaRelease */,
+				E9C3FB651EE1A4EF00872413 /* MC */,
 				FA448CEA1D0CB25500C4936D /* GM */,
 			);
 			defaultConfigurationIsVisible = 0;

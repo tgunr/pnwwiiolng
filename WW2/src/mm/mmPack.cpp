@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Tue Apr 17 14:42:44 2001
 //
 // Pack functions for the merged mmhost, including the things necessary to

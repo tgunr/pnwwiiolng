@@ -503,7 +503,7 @@ chatSendSquadCreateRequest(SquadControl& request, Player* player)
 {
     UINT32 squadID = chatProcessSquadReallyCreateRequest(request, player);
     
-	chatdbSquadInfo(0, squadID, false);
+	chatdbSquadInfo(0, squadID, true);
 
     UINT32 result = chatProcessSquadCreateReply(true, player->matchHandle(), player);
     

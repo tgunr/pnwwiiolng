@@ -6,7 +6,7 @@
  *  Copyright 2011 Playnet Inc. All rights reserved.
  *
  */
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #ifdef MODEL_INFO
 

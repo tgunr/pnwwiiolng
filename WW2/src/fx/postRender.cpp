@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*------------------------------------------------------------------
 Module: postRender.cpp
 Description: Handles post render filtering

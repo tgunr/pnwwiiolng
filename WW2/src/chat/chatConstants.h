@@ -38,6 +38,7 @@ namespace Chat
 		TICK_SAMPLE_Y,				// Speed hack report
 		ATTACK_ORDER_Y,				// Strat->Chat attack order replies
 		HOST_LOCALITY_UPDATES_Y,	// Locality update batches.
+		MEMREQ_RESULT_Y, // The result of an antihack message
 
 		// 50 - Insert new client
 		DOT_COMMAND_LIST_Y,	// Used to send the Dot Command Array

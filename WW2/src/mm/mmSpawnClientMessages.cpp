@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Wed Apr 18 13:44:11 2001
 //
 // These are the messages the front end sends and receives in congress with

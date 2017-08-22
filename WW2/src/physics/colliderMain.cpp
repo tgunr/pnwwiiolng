@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "sdm/sdmDefines.h"
 #include "physics/physicsMain.h"
 #include "physics/colliderMain.h"

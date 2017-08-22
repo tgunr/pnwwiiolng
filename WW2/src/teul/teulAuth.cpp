@@ -366,12 +366,6 @@ authAcceptPlayer(const SINT32 teulIndex, const playerid_t playerIP, PLAYER_LOGIN
 		return retval;
 	}
 
-	if ( memcmp(dispatch.m_callsign,"CRS",3) == 0 )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s otp:%u staff-validated", teulIndex, dispatch.m_customerID, dispatch.m_callsign, dispatch.m_OTP);
-		return retval;
-	}
-
 	OTP_NODE* otpNode = _findOTP(loginData.OTP);
 	if ( otpNode == nullptr || otpNode->fromAuth )
 	{

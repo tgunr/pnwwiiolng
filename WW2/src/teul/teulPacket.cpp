@@ -1,4 +1,4 @@
-#include <syscfg.h>	// Path is project dependent.
+#include "syscfg.h"	// Path is project dependent.
 
 #include "mem/mem.h"
 #include "teul/teulCallbackStruct.h"	// For TEUL_CALLBACK details.

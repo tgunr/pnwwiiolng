@@ -76,7 +76,9 @@ constexpr std::size_t array_size(T(&)[N]) noexcept { return N; }
 
 
 template <typename... Args>
-struct num_args { enum { value = sizeof...(Args); }; };
+struct num_args {
+    static constexpr const size_t value = sizeof...(Args);
+};
 
 
 template <bool...> struct bool_pack;

@@ -69,9 +69,12 @@ WW2_DEFINES_BetaRelease_03  = $(WW2_DEFINES_BetaRelease_04) VEHICLES_GAME_INFO  
 WW2_DEFINES_BetaRelease_02  = $(WW2_DEFINES_BetaRelease_03) GM_RELEASE              // 
 WW2_DEFINES_BetaRelease_01  = $(WW2_DEFINES_BetaRelease_02) BETA_RELEASE            // 
 
+WW2_DEFINES_MC_01           = $(WW2_DEFINES_MC_02) MULTI_CLIENT                     // 
+
 // "Gatherers"
 WW2_DEFINES_Development     = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Debug_01) $(WW2_DEFINES_Development_01)
 WW2_DEFINES_Debug           = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Debug_01)
+WW2_DEFINES_MC              = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Release_01) $(WW2_DEFINES_BetaRelease_01) $(WW2_DEFINES_MC_01)
 WW2_DEFINES_BetaRelease     = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Release_01) $(WW2_DEFINES_BetaRelease_01)
 WW2_DEFINES_Release         = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Release_01)
 WW2_DEFINES_GM              = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Release_01) $(WW2_DEFINES_GM_01)

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Wed Nov 1 16:55:26 2000
 //
 //	This is where all declarations for commPack routines for universal
@@ -13,6 +13,7 @@
 // Originating Programmer: Marty "Vandal" Poulin
 
 #if platBuild == BUILD_SERVER
+#include <random>
 #include "include/clustercfg.h"
 #endif
 
@@ -20,9 +21,11 @@
 #include "teul/teulEndpointDefs.h"
 #include "updt/updtPackers.h"
 #include "updt/updtTypes.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiPack.h"
 
 #if platBuild == BUILD_SERVER
+#include "chat/chatModReport.h"
 #include "host/host.h"
 #include "host/hostGridTypes.h"
 #include "host/hostPlayer.h"
@@ -42,11 +45,43 @@
 #include "client/GameClient.h"
 #include "client/ClientSquad.h"
 #include "client/ww2HostState.h"
+#include "sys/sysAntihack.h"
 #endif
 #include "wwii/wwiiPackBool.h"
 #include "include/wthrTimeFactors.h"
 
 #include "host/hostTiming.h"
+
+
+#if platBuild == BUILD_SERVER
+// TEMP/HACK: Hardcoded libs to occasionally send memory requests for
+namespace {
+	const std::pair<std::string, std::string> memhash_reqs[] = {
+		// ESP hack
+		{"opengl32.dll", "glBegin"},
+		{"opengl32.dll", "glEnd"},
+		{"opengl32.dll", "glDepthFunc"},
+		{"opengl32.dll", "glDrawElements"},
+		{"opengl32.dll", "glBindTexture"},
+		{"opengl32.dll", "glGenTextures"},
+		{"opengl32.dll", "glEnable"},
+		{"opengl32.dll", "glDisable"},
+		{"opengl32.dll", "glColor4f"},
+		{"opengl32.dll", "glDepthRange"},
+		{"opengl32.dll", "glGetFloatv"},
+		{"opengl32.dll", "glGetIntegerv"},
+		{"opengl32.dll", "glDrawArrays"},
+		{"opengl32.dll", "glDrawBuffer"},
+		{"opengl32.dll", "glArrayElement"},
+		{"opengl32.dll", "glVertexPointer"},
+		{"opengl32.dll", "glHint"},
+		{"opengl32.dll", "glVertex3f"},
+		// CheatEngine Speedhack
+		{"kernel32.dll", "GetTickCount64"},
+	};
+}
+#endif
+
 
 // Helper macros for cleaning up all the client/server ifdefs.
 #if platBuild == BUILD_SERVER
@@ -689,7 +724,6 @@ SINT32
 updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDATE* const wu, SINT32 /*size*/)
 {
 	TIMER_USE_HERE
-
 		ON_SERVER(assert(wu->myVehicle != nullptr));
 	ON_SERVER(VEHICLE_UPDATE_HEADER vhdr);
 
@@ -705,6 +739,62 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 
 	size_t packetSize = 0;
 	bool sizeLimitReached = false;
+
+
+	UCHAR do_framehash = (UCHAR)false;
+	ON_SERVER(
+		// HACK: World updates are a mess
+		const size_t start_bytes = wu->packet->payloadSizeBytes();
+		wu->packet->setPayloadCapacityBytes(start_bytes + 128);
+		data = (UCHAR*)wu->packet->writePointer();
+		offset = 0;
+
+		// TODO: Should really be per-player
+		auto pl_it = wu->myVehicle->players().begin();
+		Player* main_player = (pl_it != wu->myVehicle->players().end() ? *pl_it : nullptr);
+		if ( main_player != nullptr && main_player->m_nextMemReq <= teulClock64 ) {
+			do_framehash = (UCHAR)true;
+		}
+	);
+	offset = teulPackUCHAR(mode, data, offset, &do_framehash, 0);
+	if ( do_framehash ) {
+		FrameHashData hash = {};
+		ON_SERVER (
+			// TODO: Move constants elsewhere, maybe make configurable
+			const TeulTimeMS min_wait = 350;
+			const TeulTimeMS max_wait = 1500;
+			main_player->m_nextMemReq = teulClock64 + min_wait + (random() % (max_wait - min_wait));
+
+			// TODO: Make some of this randomness stuff global
+			static std::random_device rd;
+			static std::mt19937 gen(rd());
+			static std::uniform_int_distribution<size_t> rand_idx(0, array_size(memhash_reqs)-1);
+
+			size_t idx = rand_idx(gen);
+			const auto& which = memhash_reqs[idx];
+			if ( which.first.length() >= MemoryRequest::str_len || which.second.length() >= MemoryRequest::str_len ) {
+				static bool logged = false;
+				if ( ! logged )
+					dbugLog(_FLA, "[%s : %s] string has more than %d characters and cannot be requested! This message will only appear once, so review all other values as well.",
+					        which.first.c_str(), which.second.c_str(), MemoryRequest::str_len);
+				logged = true;
+			} else {
+				MemoryRequest req;
+				strncpy(req.lib, which.first.c_str(), array_size(req.lib));
+				strncpy(req.fun, which.second.c_str(), array_size(req.fun));
+				req.key = random();
+				Encode(req);
+				hash = reinterpret_cast<FrameHashData&>(req);
+			}
+		);
+
+		offset = hash.pack(mode, data, offset);
+		ON_CLIENT( NetFrameSync::RecvHash(hash) );
+	}
+
+	assert( (offset & 7) == 0 );
+	ON_SERVER( wu->packet->setPayloadSizeBytes(start_bytes + Teul::BitsToBytes(offset)) );
+
 
 	for ( UINT32 vehNo = 0; (vehNo < wu->header.numVehicles) && !sizeLimitReached; ++vehNo )
 	{
@@ -850,11 +940,6 @@ static SINT32 _packUPDATE_HIGH(PackMode mode, UCHAR* const data, SINT32 offset, 
 
 #if platBuild == BUILD_SERVER
 
-static void _badVehicle(SINT32 vehIndex)
-{
-	dbugLog(_FLA, "**** INVOKED _badVehicle -- BEWARE ****");
-}
-
 static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_HOLDER* vhold, UINT32 vehIndex)
 {
 	static HostVehicle tempVehicle;
@@ -887,11 +972,6 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 
 		if (vhold->vehicle == nullptr || ! (vhold->vehicle->isRemote()))
 		{
-			if (Server::myServerInfo.stats.status == Server::SERVER_ACCEPTING)
-			{
-				_badVehicle(vehIndex);
-			}
-
 			dbugLog(_FLA, "rv:%u could not create vehicle node %p is not valid", vehIndex, vhold->vehicle);
 			return -EINVAL;
 		}
@@ -901,12 +981,8 @@ static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offs
 		vhold->vehicle = hostFindVehicleLocal(vehIndex);
 		if (vhold->vehicle == nullptr )
 		{
-			static TeulTimeMS nextBlip = teulClock64;
-			if ( Server::myServerInfo.stats.status == Server::SERVER_ACCEPTING && teulClock64 >= nextBlip )
-			{
-				dbugLog(_FLA, "rv:%u not found", vehIndex);
-				nextBlip = teulClock64 + 500;
-			}
+			dbugLog(_FLA, "rv:%u not found", vehIndex);
+
 			// subsitute a dummy vehicle so we can at least unpack
 			vhold->vehicle = &tempVehicle;
 			vhold->vehicle->setRemote();
@@ -1104,6 +1180,32 @@ SINT32 updtPackSHARED_VEHICLE_INFO(PackMode mode, UCHAR* const data, SINT32 offs
 
 	if (offset < 0)
 		return offset;
+
+
+	// TODO: Consider properly integrating this client-side instead of tacking it on like this
+	bool has_framehash = false;
+#if platBuild == BUILD_CLIENT
+	// HACK: This stuff is built with the assumption that the client sends and the host receives
+	auto right_mode = TEUL_PACK;
+
+	FrameHashData* framehash = NetFrameSync::NextHash();
+	has_framehash = (mode == right_mode && framehash != nullptr);
+#else
+	auto right_mode = TEUL_UNPACK;
+#endif
+	offset = wwiiPackBool(mode, data, offset, has_framehash);
+
+	if ( has_framehash && mode == right_mode ) {
+		ON_SERVER(FrameHashData hash);
+		ON_CLIENT(FrameHashData& hash = *framehash);
+		offset = hash.pack(mode, data, offset);
+		ON_SERVER(
+			MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
+		Decode(req);
+		Chat::SendMemoryRequestResult(vupHeader->player->playerID(), req);
+		);
+	}
+
 
 	// If we're a ground vehicle, we want to tell the host which building we're in
 	bool isInBuilding = (vehInfo->fpsBuildingID.id != 0);

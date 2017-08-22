@@ -34,7 +34,6 @@ struct ARENA_REQ
 	LOGICAL	infoOnly;
 	UINT32	presenterVersion;	//presenter must always send up it's version
 	UINT8	oVersion;			// used by packer for expansion of fields.
-	UINT32	steamID;
 	SCHAR	username[MAX_OLD_USERNAME+1];
 	UCHAR	password[MAX_PASSWORD+1]; // UCHAR expected for MD5
 };
@@ -64,7 +63,6 @@ struct APP_LAUNCH_REQ
 {
 	SCHAR	username[MAX_OLD_USERNAME+1];
 	UCHAR	password[MAX_PASSWORD+1]; // UCHAR expected for MD5
-	UINT32  steamID;
 	SINT32	arenaID;
 	UINT32	sessionID;
 	SINT32	appID;				//Application ID

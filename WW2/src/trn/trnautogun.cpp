@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <math.h>
 
 #include "include/vars.h"
@@ -1693,7 +1693,7 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 			// alive check
 			if (CurrentVehicle->VehicleType->Type == VEH_TYPE_PERSON)
 			{
-				// ignore dead guys
+				// ignore dead vehicles
 
 				if ((CurrentVehicle->VehicleObjectData->PlaneObject) &&
 					(CurrentVehicle->VehicleObjectData->PlaneObject->child) &&

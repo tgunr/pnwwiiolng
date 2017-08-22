@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <codecvt>
 #include "fio/fio.h"
 #include "fio/fiod.h"
@@ -19,7 +19,7 @@
 static SINT32 fio_switch;
 
 /************************************************************************************************
-	fioInit - sets up the user data directory on Windows
+	fioInit - sets up the user data directory on clients
 *************************************************************************************************/
 
 void fioInit()
@@ -48,7 +48,8 @@ void fioInit()
 
 	// Save it off as an ASCII path
 	strcpy_s(UserDataPath, std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(path).c_str());
-
+#elif platOS == OS_MACOS
+    strlcpy(UserDataPath, macDocumentsPath(), _MAX_PATH);
 #endif // OS_WIN32
 }
 

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <vector>
 #include <set>
 #include "ob/obmain.h"
@@ -3647,7 +3647,7 @@ void gr2PhysicsKill()
 	physicsObjectSet list;
 
 	// other model types are tracked by other systems, but weapons delete themselves
-	// so since we're exiting, go ahead and kill these guys
+	// so since we're exiting, go ahead and kill these
 	if(physicsFindObject(list, _findWeaponModels))
 	{
 		physicsObjectSet::iterator it = list.begin();

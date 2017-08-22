@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides support utilities used in
 // the teul API. The end-user developer
 // should not need the functions provided here.
@@ -34,6 +34,11 @@
 #include <unistd.h>
 #endif
 
+#if platOS == OS_MACOS
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
 #include <atomic>
 #include <chrono>
 
@@ -50,21 +55,23 @@ UINT32 teulClockTime;
 void
 teulSyncClock()
 {
-	static std::mutex oneAtATime;
-	std::lock_guard<std::mutex> lock(oneAtATime);
+    
+    static std::mutex oneAtATime;
+    std::lock_guard<std::mutex> lock(oneAtATime);
+    
+    using namespace std::chrono;
+    auto now = steady_clock::now();
+    TeulTimeMS newTimeMS = static_cast<TeulTimeMS>(duration_cast<milliseconds>(now.time_since_epoch()).count());
+    
+    // monotonic clocks should not be going backwards
+    ABORT_IF_EX(newTimeMS < teulClock64, "Monotonic time went backwards!");
+    
+    // avoid calculations when called many times a millisecond
+    if ( newTimeMS > teulClock64 ) {
+        teulClock64 = newTimeMS;
+        teulClockTime = static_cast<UINT32>(newTimeMS / 1000ULL);
+    }
 
-	using namespace std::chrono;
-	auto now = system_clock::now();
-	TeulTimeMS newTimeMS = duration_cast<milliseconds>(now.time_since_epoch()).count();
-#if platBuild == BUILD_SERVER
-	if ( PN_UNLIKELY(newTimeMS < teulClock64) )
-		LogAbort("Time went backwards: %" PR64BitUT " -> %" PR64BitUT "", teulClock64, newTimeMS);
-#endif
-	// avoid calculations when called many times a millisecond
-	if ( newTimeMS > teulClock64 ) {
-		teulClock64 = newTimeMS;
-		teulClockTime = static_cast<UINT32>(newTimeMS / 1000ULL);
-	}
 }
 
 // wrapper for inet_ntoa.

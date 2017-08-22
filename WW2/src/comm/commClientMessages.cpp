@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Communication with the cell host.
 //
 // Copyright 1999 Playnet Inc, All rights reserved
@@ -128,15 +128,15 @@ static SINT32 _recvVehicleAcknowledge( ACTION_OBJECT* const a )
 static RunningAverage<UINT32, 120> pingHistogram;
 SINT32 g_averagePing = 0;
 
-SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32 offset, const SINT32 size_bytes)
+SINT32 commRecvWorldUpdateData(ACTION_OBJECT* a)
 {
 	WORLD_UPDATE wu{};
 
 	// #1 unpack the header.
-	wu.header = *(WORLD_UPDATE::Header*)(data);
-	offset += Teul::BytesToBits(sizeof(wu.header));
+	wu.header = a->read<WORLD_UPDATE::Header>();
 
-	offset = updtPackWORLD_UPDATE(TEUL_UNPACK, data, offset, &wu, 0);
+	// HACK: Because heaven forbid we actually handle unpacking things in a consistent way...
+	a->offset = updtPackWORLD_UPDATE(TEUL_UNPACK, a->packed, a->offset, &wu, 0);
 
 	// Client side sanity check on the vehicle count.
 	if ( wu.header.numVehicles > MAX_VEH_PER_UPDATE )
@@ -160,27 +160,20 @@ SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32
 		vehupdateProcessPositionUpdateMsg(&wu.vehUpdate[i]);
 	}
 
-	clientWorldUpdate(teulIndex, &wu);
+	clientWorldUpdate(a->teulIndex, &wu);
 
-	const size_t offInBytes = Teul::BitsToBytes(offset);
-	if ( offInBytes < (size_t)size_bytes )
-	{
-		TeulTimeMS& lastPing = *(UINT64*)(data + offInBytes);
-		teulSyncClock();
-		g_lastPing = std::min((UINT32)((teulClock64 - lastPing) / 2), (UINT32)1);
-		pingHistogram.add(g_lastPing);
-		g_averagePing = pingHistogram.average();
-	}
-	else
-	{
-		g_lastPing = -1;
-		g_averagePing = 0;
-	}
+	//------
+	auto lastPing = a->read<TeulTimeMS>();
+	teulSyncClock();
+	g_lastPing = std::min((UINT32)((teulClock64 - lastPing) / 2), (UINT32)1);
+	pingHistogram.add(g_lastPing);
+	g_averagePing = pingHistogram.average();
+
 #ifdef VEHICLES_GAME_INFO
 	vehSaveLastWorldUpdate(wu);
 #endif
 
-	return offset;
+	return a->offset;
 }
 
 static SINT32 _recvWorldUpdate( ACTION_OBJECT* const a )
@@ -190,7 +183,7 @@ static SINT32 _recvWorldUpdate( ACTION_OBJECT* const a )
 	{
 #endif
 	dbugWrite(_FLW, "index: %d time: %" PR64BitUT "", a->teulIndex, teulClock64);
-	a->offset = commRecvWorldUpdateData(a->teulIndex, a->packed, a->offset, a->sizeInBytes());
+	a->offset = commRecvWorldUpdateData(a);
 #ifdef MULTI_CLIENT
 	}
 #endif

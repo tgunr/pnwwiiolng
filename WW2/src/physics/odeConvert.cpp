@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "physics/odeConvert.h"
 #include "math/Matrixd.h"
 #include "math/Matrixf.h"
