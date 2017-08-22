@@ -510,7 +510,7 @@ void fpFPSInit(vehVehicle*vehicle)
 	scopeDelay = 0.0f;
 	scopeUp = false;
 
-#if AIMING_WEAPONS
+#ifdef NARROW_AIM_FOV
 	fpsTrooper.mouseGranularity = 0.01;
 #endif
 
@@ -1620,7 +1620,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 			}
 			else
 			{
-#if AIMING_WEAPONS
+#ifdef NARROW_AIM_FOV
 				fpsTrooper.desiredFOV = fpsWeapons[currentWeaponModel].aimFOV/10.0f;
 #else
 				fpsTrooper.desiredFOV = fpsWeapons[currentWeaponModel].aimFOV;
@@ -3820,7 +3820,7 @@ FLOAT32 fpFPSGetBulletDispersion()
 
 //	Write_Log (LOG_FPS, LOG_INFO, "MaxDispersion = %f, min = %f", maxDispersion, minDispersion);
 
-#if AIMING_WEAPONS
+#ifdef NO_DISPERSION
 	return 0.0f;
 #else
 	return (maxDispersion);
@@ -3882,7 +3882,7 @@ void fpFPSGetWobble(FLOAT32* horizWobble, FLOAT32* vertWobble, FLOAT32*	horizAng
 
 	if ((!horizWobble) || (!vertWobble) || (!horizAngle) || (!vertAngle))
 		return;
-#if GUN_WOBBLE
+#ifndef NO_GUN_WOBBLE
 	if ((stateFlags & STATE_DEPLOYED) && (fpsWeapons[currentWeaponModel].staticDeploy))
 #endif
 	{
@@ -9145,8 +9145,7 @@ void fpFPSFireRound (weapWeapon* weapon, piMATRIX* fireAtt, void* FireVehicle)
 		shellEjectTime = -1;
 	}
 
-#if AIMING_WEAPONS
-#else
+#ifndef NO_MUZZLE_RISE
 	if (fpsWeapons[currentWeaponModel].muzzleRise)
 	{
 		FLOAT32		muzzleClimbAmount;
