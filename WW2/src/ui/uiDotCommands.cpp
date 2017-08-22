@@ -6236,9 +6236,11 @@ static SINT32 dot_fog(const char* line)
 	ReloadVehiclesCmd
 *************************************************************************************************/
 
-static SINT32 dot_reloadvehicles(const char* line)
+static SINT32 dot_reloadvehicles(const char*)
 {
 	vehtypeInit();
+	fpFPSDataReadFPSFile();
+	_ReadAmmoTypes();
 	return DC_HANDLED;
 }
 
