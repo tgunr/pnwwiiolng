@@ -864,25 +864,6 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 
 	_applyDamageRestrictions(hit, source);
 
-	VEH_HIT vHit;
-	const size_t numComponents = hit.m_components.size();
-	vHit.numComponents = numComponents;
-	vHit.shooter = hit.m_shooter;
-	vHit.target = hit.m_target;
-
-	UINT64 totalDamageJ = 0LL;
-
-	for ( size_t i = 0; i < numComponents; i++ )
-	{
-		const Vehicle::Hit::Component& comp = hit.m_components[i];
-		vHit.compHit[i].compID = comp.compID;
-		vHit.compHit[i].numHits = comp.NumHits;
-		vHit.compHit[i].damage = comp.m_damage;
-		vHit.compHit[i].priority = comp.isImportant;
-		if ( comp.isImportant )
-			totalDamageJ += comp.m_damage;
-	}
-
 	// TODO DEV-1683: This used to be here, but cross-cell hit events were somehow
 	// not being scored by the mmhost, even though they would still cause damage/death.
 	// The "fix" was to handle the event as soon as the hit came in, just above.
@@ -904,6 +885,12 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 
 		if ( host_config.kills.reportDamage )
 		{
+			UINT64 totalDamageJ = 0LL;
+			for ( const Vehicle::Hit::Component& comp : hit.m_components ) {
+				if ( comp.isImportant )
+					totalDamageJ += comp.m_damage;
+			}
+
 			static char buffer[512];
 			strprintf(buffer, "INCOMING: %" PR64BitT " joules of damage %s %s"
 							, totalDamageJ
