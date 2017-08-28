@@ -774,7 +774,7 @@ _forwardHitsToRemoteServer(const HostVehicle& vehicle, const SINT32 bits, const 
 // Given the details of a hit packet, notify the scoring process.
 
 static void
-_sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter)
+_sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter, const UINT32 numComponentsHit, const UINT64& joules)
 {
 	Scoring::Packet<Scoring::Hit> packet;
 	Scoring::Actor actTarget(&victim);
@@ -783,7 +783,7 @@ _sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter)
 	dbugLog(_FLD, "sending hit event [p:%u]->[p:%u] to map host", actShooter.playerID(), actTarget.playerID());
 
 	Teul::Packet outgoing(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
-	outgoing.construct<Scoring::Hit>(actTarget, actShooter);
+	outgoing.construct<Scoring::Hit>(actTarget, actShooter, numComponentsHit, joules);
 	outgoing.setUnencrypted();
 	if ( !serverSendPacketToType(outgoing, MAP_HOST) )
 		LogAbort("failed to send hit message");
@@ -850,9 +850,6 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 		return false;
 	}
 
-	if ( !vTarget->isRemote() )
-		_sendScoringHitEvent(*vTarget, *vShooter);
-
 	if ( vTarget->isRemote() == true )
 	{
 		vTarget->m_lastHitTime = teulClock64;
@@ -883,10 +880,7 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 			totalDamageJ += comp.m_damage;
 	}
 
-	// TODO DEV-1683: This used to be here, but cross-cell hit events were somehow
-	// not being scored by the mmhost, even though they would still cause damage/death.
-	// The "fix" was to handle the event as soon as the hit came in, just above.
-	//_sendScoringHitEvent(*vTarget, *vShooter);
+	_sendScoringHitEvent(*vTarget, *vShooter, vHit.numComponents, totalDamageJ);
 
 	// We're done processing the packet for ourselves, now we have to
 	// send it on to the victim vehicle.
