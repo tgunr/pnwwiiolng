@@ -850,7 +850,7 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 		return false;
 	}
 
-	if ( !vTarget->isRemote() )
+	if ( ! vShooter->isRemote() )
 		_sendScoringHitEvent(*vTarget, *vShooter);
 
 	if ( vTarget->isRemote() == true )
