@@ -232,14 +232,14 @@ bool Scoring::Hit::process(Player* const lhsPlayer)
 		Scoring::Sortie* const shooterSortie = FindSortieForPlayer(rhsPlayer, rhs().sortieID());
 		if ( shooterSortie != nullptr )
 		{
-			shooterSortie->addHitTo(lhs(), joules());
+			shooterSortie->addHitTo(lhs());
 		}
 	}
 
 	///TODO:SCORING+: Track friendly hits.
 
 	if ( sortie )
-		sortie->addHitBy(rhs(), joules());
+		sortie->addHitBy(rhs());
 
 	return true;
 }
