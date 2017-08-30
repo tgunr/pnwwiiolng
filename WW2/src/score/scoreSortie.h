@@ -21,11 +21,13 @@ public:
 public:
 	struct HitEntry : public Scoring::Actor
 	{
-		HitEntry(const Scoring::Actor& actor_)
+		HitEntry(const Scoring::Actor& actor_, const UINT64& joules_)
 			: Actor(actor_)
+			, m_joules(joules_)
 			, m_timestamp(teulClock64)
 			{}
 
+		UINT64		m_joules;
 		TeulTimeMS	m_timestamp;
 	};
 
@@ -59,8 +61,8 @@ public:
 
 	void attachCrew(Player& crew_);
 
-	bool addHitBy(const Scoring::Actor& actor);
-	void addHitTo(const Scoring::Actor& actor);
+	bool addHitBy(const Scoring::Actor& actor, const UINT64& joules_);
+	void addHitTo(const Scoring::Actor& actor, const UINT64& joules_);
 	void addKill(const sortieid_t sortieID_, const WEAPON_SPEC spec_);
 	void addInteraction(const WEAPON_SPEC spec_);
 

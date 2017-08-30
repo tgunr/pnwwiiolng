@@ -49,6 +49,7 @@ public:
 	class Player* activeCommander() const;
 //	void addVisListRemove(struct GRID_HOLDER* const);
 
+	void applyHit(HostVehicle* shooter, struct VEH_HIT* hits, UINT32* personas);
 	void attachControllingPlayer(const Player& player);
 
 	void interruptCapture();
