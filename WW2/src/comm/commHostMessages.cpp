@@ -850,9 +850,6 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 		return false;
 	}
 
-	if ( ! vShooter->isRemote() )
-		_sendScoringHitEvent(*vTarget, *vShooter);
-
 	if ( vTarget->isRemote() == true )
 	{
 		vTarget->m_lastHitTime = teulClock64;
@@ -864,10 +861,9 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 
 	_applyDamageRestrictions(hit, source);
 
-	// TODO DEV-1683: This used to be here, but cross-cell hit events were somehow
-	// not being scored by the mmhost, even though they would still cause damage/death.
-	// The "fix" was to handle the event as soon as the hit came in, just above.
-	//_sendScoringHitEvent(*vTarget, *vShooter);
+	// TODO DEV-1683: Cross-cell hit events are somehow not being scored by the mmhost,
+	// even though they still cause damage/death to the client being hit.
+	_sendScoringHitEvent(*vTarget, *vShooter);
 
 	// We're done processing the packet for ourselves, now we have to
 	// send it on to the victim vehicle.
