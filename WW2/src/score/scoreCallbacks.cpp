@@ -104,10 +104,19 @@ _recvEvent(ACTION_OBJECT* const a)
 Scoring::Sortie*
 Scoring::FindSortieForPlayer(const Player* const player, const sortieid_t sortieID)
 {
+	Scoring::Sortie* sortie = nullptr;
+
 	// Avoid a lookup if the sortie is current.
 	if ( player && player->sortie() && player->sortie()->sortieID() == sortieID )
-		return const_cast<Scoring::Sortie*>(player->sortie());
-	return Scoring::Sortie::Lookup(sortieID);
+		sortie = const_cast<Scoring::Sortie*>(player->sortie());
+	else
+		sortie = Scoring::Sortie::Lookup(sortieID);
+
+	// Not a disaster, but worth noting when it happens.
+	if ( sortie == nullptr )
+		dbugLog(_FLI, "Could not find sortie v:%u for p:%d", sortieID, player ? player->playerID() : 0);
+
+	return sortie;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -157,10 +166,7 @@ bool Scoring::Despawn::process(Player* const lhsPlayer)
 
 	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
 	if ( sortie == nullptr )
-	{
-		dbugLog(_FLI, " no sortie"); ///TODO:134:REMOVE
 		return true;
-	}
 
 	sortie->setRTB(rtbCode, rhs());
 	sortie->despawned();
