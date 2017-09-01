@@ -105,7 +105,7 @@ Scoring::Sortie*
 Scoring::FindSortieForPlayer(const Player* const player, const sortieid_t sortieID)
 {
 	// Avoid a lookup if the sortie is current.
-	if ( player->sortie() && player->sortie()->sortieID() == sortieID )
+	if ( player && player->sortie() && player->sortie()->sortieID() == sortieID )
 		return const_cast<Scoring::Sortie*>(player->sortie());
 	return Scoring::Sortie::Lookup(sortieID);
 }
@@ -216,30 +216,37 @@ bool Scoring::Guard::process(Player* const lhsPlayer)
 //////////////////////////////////////////////////////////////////////
 // Credit a player for hitting another vehicle.
 
+namespace {
+	struct HitPlayer {
+		HitPlayer(const Scoring::Actor& a)
+			: actor(a)
+			, player(PlayerInterface::Lookup(actor.playerID()))
+			, sortie(Scoring::FindSortieForPlayer(PlayerInterface::Lookup(actor.playerID()), actor.sortieID())) {
+		}
+
+		const Scoring::Actor& actor;
+		Player* player;
+		Scoring::Sortie* sortie;
+	};
+}
+
 bool Scoring::Hit::process(Player* const lhsPlayer)
 {
-	dbugLog(_FLI, " hit"); ///TODO:134:REMOVE
+	HitPlayer shooter(rhs());
+	HitPlayer victim(lhs());
+	assert ( lhsPlayer == victim.player );
 
-	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
-	if ( sortie == nullptr )
-		return true;
+	dbugLog(_FLI, " hit :: [p:%u c:%s v:%u] >> [p:%u c:%s v:%u]",
+	        shooter.actor.playerID(), shooter.player ? shooter.player->callsign() : Chat::Name(shooter.actor.handle()), shooter.actor.sortieID(),
+	        victim .actor.playerID(), victim .player ? victim .player->callsign() : Chat::Name(victim .actor.handle()), victim .actor.sortieID());
 
-	Player* const rhsPlayer = PlayerInterface::Lookup(rhs().playerID());
-	if ( rhsPlayer != nullptr )
-	{
-		++rhsPlayer->missionPacket().scoring().hits;
+	if ( shooter.player )
+		++shooter.player->missionPacket().scoring().hits;
+	if ( shooter.sortie )
+		shooter.sortie->addHitTo(victim.actor);
 
-		Scoring::Sortie* const shooterSortie = FindSortieForPlayer(rhsPlayer, rhs().sortieID());
-		if ( shooterSortie != nullptr )
-		{
-			shooterSortie->addHitTo(lhs());
-		}
-	}
-
-	///TODO:SCORING+: Track friendly hits.
-
-	if ( sortie )
-		sortie->addHitBy(rhs());
+	if ( victim.sortie )
+		victim.sortie->addHitBy(shooter.actor);
 
 	return true;
 }
