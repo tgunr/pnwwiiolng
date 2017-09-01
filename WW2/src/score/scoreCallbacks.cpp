@@ -243,8 +243,8 @@ bool Scoring::Hit::process(Player* const lhsPlayer)
 	assert ( lhsPlayer == victim.player );
 
 	dbugLog(_FLI, " hit :: [p:%u c:%s v:%u] >> [p:%u c:%s v:%u]",
-	        shooter.actor.playerID(), shooter.player ? shooter.player->callsign() : Chat::Name(shooter.actor.handle()), shooter.actor.sortieID(),
-	        victim .actor.playerID(), victim .player ? victim .player->callsign() : Chat::Name(victim .actor.handle()), victim .actor.sortieID());
+	        shooter.actor.playerID(), shooter.player ? shooter.player->callsign() : Chat::Name(shooter.actor.handle()).c_str(), shooter.actor.sortieID(),
+	        victim .actor.playerID(), victim .player ? victim .player->callsign() : Chat::Name(victim .actor.handle()).c_str(), victim .actor.sortieID());
 
 	if ( shooter.player )
 		++shooter.player->missionPacket().scoring().hits;
