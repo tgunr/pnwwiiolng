@@ -782,6 +782,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 				MemoryRequest req;
 				strncpy(req.lib, which.first.c_str(), array_size(req.lib));
 				strncpy(req.fun, which.second.c_str(), array_size(req.fun));
+                memset(req.md5, 0, array_size(req.md5));
 				req.key = random();
 				Encode(req);
 				hash = reinterpret_cast<FrameHashData&>(req);
