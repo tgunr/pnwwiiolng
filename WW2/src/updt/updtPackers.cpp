@@ -1110,11 +1110,13 @@ updtPackVehicleBroadcast(PackMode mode, UCHAR* const data, SINT32 offset, VEHICL
 SINT32
 HostVehicle::packFirstTime(PackMode mode, UCHAR* const data, SINT32 offset)
 {
+    static_assert(sizeof(MISS_FLAGS) == sizeof(UCHAR), "Oops, this won't pack properly");
+    
 	offset = _packONE_TIME_INFO(mode, data, offset, &vehicleData, 0, nullptr);
 	offset = teulPackUINT32(mode, data, offset, &vehicleData.squad, 0);
 	offset = wwiiPackHandle(mode, data, offset, &vehicleData.squadHandle, 0);
 	offset = teulPackUINT32(mode, data, offset, &m_missionID, 0);
-	offset = teulPackUINT32(mode, data, offset, (UINT32*)&m_flags, 0);
+	offset = teulPackUCHAR(mode, data, offset, (UCHAR*)&m_flags, 0); // Unfortunately still need to type-pun this field
 
 //	if (mode == TEUL_UNPACK)
 //	{
