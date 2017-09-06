@@ -591,32 +591,19 @@ size_t fiodFileSize(const char* name, bool userdir)
 // Returns a pointer to the path prefix
 
 #if platBuild == BUILD_CLIENT
-static char *OriginalPrepath = nullptr;
+namespace {
+	bool use_userpath = false;
+}
+
+void fiodSetUserpath(bool userpath) {
+	use_userpath = userpath;
+}
 #endif
 
 const char* fiodGetPrepath()
 {
-	return(DataPath);
+	return use_userpath ? UserDataPath : DataPath;
 }
-
-//////////////////////////////////////////////////////////////////////
-// Changes the path prefix
-
-#if platBuild == BUILD_CLIENT
-void fiodSetPrepath(char* newpath)
-{
-	if (newpath == nullptr) {
-        if (OriginalPrepath) {
-			strsafecpy(DataPath, OriginalPrepath);
-        }
-		return;
-    }
-    if (!OriginalPrepath) {
-        OriginalPrepath = strdup(DataPath);
-    }
-	strsafecpy(DataPath, newpath);
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // Create a directory within prefix space
@@ -1056,33 +1043,18 @@ SINT32 fiocfgFileSize(const char* filename, bool)
 
 LOGICAL fiocfgAccess(const char* filename, bool userdir)
 {
-    if (userdir) {
-        fiodSetPrepath(UserDataPath);
-    }
-
-    int fd = fiodOpen(filename, true);
-    if (fd != -1)
-        fiodClose(fd);
-
-    if (userdir) {
-        fiodSetPrepath(nullptr);
-    }
-    return fd != -1;
+	WITH ( Userpath(userdir) ) {
+		int fd = fiodOpen(filename, true);
+		if (fd != -1)
+			fiodClose(fd);
+		return fd != -1;
+	}
 }
 
 void fiocfgMkDir(const char* path, bool userdir)
 {
-	if(userdir)
-	{
-		fiodSetPrepath(UserDataPath);
-	}
-
-	fiodmkdir(path);
-
-	if(userdir)
-	{
-		fiodSetPrepath(nullptr);
-	}
+	WITH ( Userpath(userdir) )
+		fiodmkdir(path);
 }
 
 #endif

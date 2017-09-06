@@ -4,7 +4,13 @@
 namespace IO { class MappedFile; }
 
 extern const char* fiodGetPrepath();
-extern void fiodSetPrepath(char* newpath);
+extern void fiodSetUserpath(bool userpath);
+
+struct Userpath {
+	Userpath(bool userpath = true) { fiodSetUserpath(userpath); }
+	~Userpath() { fiodSetUserpath(false); }
+	operator bool(void) const { return false; }
+};
 
 extern bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize=nullptr);
 extern IO::MappedFile* fiodGetMappedFile(int fd);

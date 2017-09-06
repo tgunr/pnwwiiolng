@@ -948,17 +948,8 @@ SINT32 fiocfgFileSize(const char* filename, bool)
 
 void fiocfgMkDir(const char* path, bool userdir)
 {
-	if(userdir)
-	{
-		fiodSetPrepath(UserDataPath);
-	}
-
-	fiodmkdir(path);
-
-	if(userdir)
-	{
-		fiodSetPrepath(nullptr);
-	}
+	WITH ( Userpath(userdir) )
+		fiodmkdir(path);
 }
 
 #endif
