@@ -1752,7 +1752,7 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 	// calculate round's actual velocity
 	ProjVel.x = ProjVel.z = 0;
 	// vary round's velocity a bit
-	ProjVel.y = InitVelocity * (1.0 + 0.018 * (mathGetFloat32ChaoticNumber() *  mathGetFloat32ChaoticNumber() *  2.0f - 1.0f));
+	ProjVel.y = InitVelocity * (1.0 + 0.01 * (mathGetFloat32ChaoticNumber() *  mathGetFloat32ChaoticNumber() *  2.0f - 1.0f));
 
 	// add shooter's velocity
 	mathVectorMultiply64(&ProjVel, &ProjVel, FireAtt);
