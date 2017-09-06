@@ -959,7 +959,7 @@ _recvMessage(ACTION_OBJECT* const a)
 
 			// Copy the message without the clientInfo back into the original message
             // Note that destination and source memory overlaps.
-            memmove_s(message.m_message, MAX_IRC_LEN, p, MAX_IRC_LEN);
+            memmove(message.m_message, p, MAX_IRC_LEN);
 
             message.m_length = newLengthOfMessage;
 		}
