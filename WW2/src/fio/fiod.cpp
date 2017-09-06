@@ -182,7 +182,7 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 		pathLen = strlen(buffer);
 	}
 	else {
-		pathLen = pathprintf(buffer, DataPath, name);
+		pathLen = pathprintf(buffer, fiodGetPrepath(), name);
 	}
 
         // must be included for now until data list files can all be cleaned up
@@ -598,12 +598,16 @@ namespace {
 void fiodSetUserpath(bool userpath) {
 	use_userpath = userpath;
 }
-#endif
 
 const char* fiodGetPrepath()
 {
 	return use_userpath ? UserDataPath : DataPath;
 }
+#else
+const char* fiodGetPrepath() {
+	return use_userpath ? UserDataPath : DataPath;
+}
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // Create a directory within prefix space
@@ -618,7 +622,7 @@ void fiodmkdir(const char* path)
 	OS_MKDIR(os_file_path(fullPath), S_IRWXU);
 #elif platOS == OS_WIN32
 
-	pathprintf(fullPath, DataPath, path);
+	pathprintf(fullPath, fiodGetPrepath(), path);
 
 	wchar_t widePath[PATH_MAX+1];
 
@@ -658,7 +662,7 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 		// Else fall through normally
 	}
 
-	pathprintf(fullpath, DataPath, filename);
+	pathprintf(fullpath, fiodGetPrepath(), filename);
 	retval = stat(os_file_path(fullpath), &buffer);
 
 	if (retval == 0)
@@ -678,7 +682,7 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool /* userdir */)
   char fullpath[1024];
   SINT32 retval;
   struct stat buffer;
-  pathprintf(fullpath, DataPath, filename);
+  pathprintf(fullpath, fiodGetPrepath(), filename);
   retval = stat(os_file_path(fullpath), &buffer);
 
   if (retval == 0)
@@ -742,7 +746,7 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
   }
   else
 #endif
-	  pathprintf(fullpath, DataPath, filename);
+	  pathprintf(fullpath, fiodGetPrepath(), filename);
 
     int fd = -1;
 
