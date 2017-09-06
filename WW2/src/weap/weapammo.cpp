@@ -3428,6 +3428,7 @@ static void _DoImprovedShrapnel(const weapAmmo& round, const FLOAT64VECTOR& pos,
 			piVECTOR vel = GetRandomShardVelocity(target, transform, speed);
 			GetRandomShardSize(round_type, shrap_props, shrap_type);
 			weapAmmo shrap = CreateShard(round_type, shrap_type, pos, vel, target.target);
+			shrap.Id = i;
 
 			FLOAT64VECTOR prev_pos = pos;
 #ifdef WEAPON_LOGGING
