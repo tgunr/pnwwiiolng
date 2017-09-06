@@ -957,7 +957,7 @@ void fiocfgMkDir(const char* path, bool userdir)
 
 	if(userdir)
 	{
-		fiodSetPrepath(PREPATH);
+		fiodSetPrepath(nullptr);
 	}
 }
 
