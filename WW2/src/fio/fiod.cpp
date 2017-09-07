@@ -70,165 +70,146 @@ static void recordRef( std::wstring ref )
 #endif
 
 #if platBuild == BUILD_CLIENT
+	#if platOS == OS_WIN32
+		#define CHANGE_SEP  '/'
+		#define OS_SEP      '\\'
+		#define WCHANGE_SEP L'/'
+		#define WOS_SEP     L'\\'
+	#else
+		#define CHANGE_SEP  '\\'
+		#define OS_SEP      '/'
+		#define WCHANGE_SEP L'\\'
+		#define WOS_SEP     L'/'
+	#endif
 
-#if platOS == OS_WIN32
-	#define CHANGE_SEP  '/'
-	#define OS_SEP      '\\'
-	#define WCHANGE_SEP L'/'
-	#define WOS_SEP     L'\\'
+	char* os_file_path(char* path) {
+		for ( char* s = path ; *s; ++s ) {
+			if ( *s == CHANGE_SEP )
+				*s = OS_SEP;
+		}
+		return path;
+	}
+
+	wchar_t* os_file_path(wchar_t* path) {
+		for ( wchar_t* s = path ; *s; ++s ) {
+			if ( *s == WCHANGE_SEP )
+				*s = WOS_SEP;
+		}
+		return path;
+	}
 #else
-	#define CHANGE_SEP  '\\'
-	#define OS_SEP      '/'
-	#define WCHANGE_SEP L'\\'
-	#define WOS_SEP     L'/'
+	#define os_file_path(x) (x)
 #endif
 
-char* os_file_path(char* path) {
-	for ( char* s = path ; *s; s++ ) {
-		if ( *s == CHANGE_SEP )
-			*s = OS_SEP;
-	}
-	return path;
-}
+//--------------
 
-wchar_t* os_file_path(wchar_t* path) {
-	for ( wchar_t* s = path ; *s; s++ ) {
-		if ( *s == WCHANGE_SEP )
-			*s = WOS_SEP;
-	}
-	return path;
-}
-
+UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
+#if platOS == OS_WIN32
+	fullpath_t name[MAX_PATH];
+	WWII::ConvertChars(rawname, name, array_size(name));
+	name[array_size(name)-1] = L'\0';
+#else
+	const char* name = rawname
 #endif
+	return pathprintf(path, MAX_PATH, fiodGetPrepath(), os_file_path(name));
+}
 
 //==============================================================================
+
+#if defined(WIN32) || defined(WIN64)
+	#define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+	#define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
 
 namespace {
 #if platOS != OS_WIN32
 	typedef struct stat stat_t;
-	int GetStat(stat_t& s, const wchar_t* wpath) {
-		char path[MAX_PATH+1];
-		WWII::ConvertChars(wpath, path, array_size(path));
+	int GetStat(stat_t& s, const fullpath_t* path) {
 		return stat(path, &s);
 	};
 #else
 	typedef struct _stat64i32 stat_t;
-	int GetStat(stat_t& s, const wchar_t* path) {
+	int GetStat(stat_t& s, const fullpath_t* path) {
 		return _wstat(path, &s);
 	};
 #endif
 
-	int GetFileStat(stat_t& s, const char* name) {
-		wchar_t path[MAX_PATH];
-		GetFullPath(path, name);
-		return GetStat(s, path);
+	bool GetFileStat(stat_t& s, const char* name, bool userdir, fullpath_t* outpath = nullptr) {
+		fullpath_t locpath[MAX_PATH];
+		fullpath_t* path = (outpath ? outpath : locpath);
+
+		WITH ( UsingUserdir(userdir) )
+			GetFullPath_unsafe(path, name); // TODO: Guarantee outpath's size so this is safe
+		int result = GetStat(s, path);
+		if ( ! (result < 0 || ! S_ISREG(s.st_mode)) )
+			return true;
+		else if ( userdir ) // Look in the default dir as a backup
+			return GetFileStat(s, name, false, outpath);
+		else
+			return false;
 	}
 
-}
-
-//////////////////////////////////////////////////////////////////////
-// Get me the name and size of a given file.
-
-static off_t _getFilePathAndSize(const char* name, bool userdir, wchar_t* widePath, size_t wsize)
-{
-#if platBuild == BUILD_SERVER
-	userdir = false;
-#endif
-
-	// There used to be a check for FILE_URL_DESIGNATOR, but we never use it so whatever.
-	wchar_t wname[MAX_PATH];
-	WWII::ConvertChars(name, wname, array_size(wname));
-	wname[array_size(wname)-1] = L'\0';
-	pathprintf(widePath, wsize, fiodGetPrepath(), wname);
-
-	int retval;
-	stat_t s;
-	WITH ( UsingUserdir(userdir) )
-		retval = GetStat(s, os_file_path(widePath));
-
-#if platOS != OS_WIN32
-	if ( ! (retval < 0 || !S_ISREG(statBuffer.st_mode)) )
-#else
-	if ( ! ( retval < 0 ) )
-#endif
-		return s.st_size;
-	else if ( userdir ) // Try again using the default path
-		return _getFilePathAndSize(name, false, widePath, wsize);
-	else
-		return -1;
+	template <size_t N>
+	bool GetFileStat(stat_t& s, const char* name, bool userdir, fullpath_t (&outpath)[N]) {
+		static_assert ( N == MAX_PATH , "All paths must be MAX_PATH long" );
+		return GetFileStat(s, name, userdir, (fullpath_t*)outpath);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
 // Load an entire file into memory and return a pointer to the memory
+// TODO: Lots of overlap with fiodOpen(), should probably merge some stuff
 
-bool
-fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
-{
-	wchar_t	widePath[PATH_MAX + 1];
-	char	asciiPath[PATH_MAX + 1];
-	widePath[0] = '\0';
-	asciiPath[0] = '\0';
-
+bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize) {
+	assert ( outPtr );
 	outPtr = nullptr;
+	if ( outSize ) *outSize = 0;
 
-	off_t fileSize = _getFilePathAndSize(filename, false, widePath, sizeof(widePath));
-	if ( PN_UNLIKELY(fileSize < 0) )
-	{
-		DEBUG_ERR("Error performing stat on '%s'.", filename);
+
+	fullpath_t path[MAX_PATH];
+	stat_t s;
+	if ( GetFileStat(s, filename, false, path) ) {
+		dbugLog(_FLA, "Unable to stat %" PRpathT, path);
 		return false;
 	}
 
-	if ( PN_UNLIKELY(fileSize == 0) )
+	if ( PN_UNLIKELY(s.st_size == 0) )
 		return true;
 
-	WWIIConvert(widePath, asciiPath);
 
-#if platOS == OS_WIN32
-	// already been converted and path seperators fixed
-	int fd = OS_WOPEN(widePath, O_RDONLY | O_BINARY);
+	int fd = 1;
+	OS_OPEN(&fd, path, O_RDONLY | O_BINARY, 0);
 	recordRef(widePath);
-#else
-	int fd = -1;
-    OS_OPEN(&fd, os_file_path(asciiPath), O_RDONLY | O_BINARY, 0);
-	recordRef(widePath);
-#endif
-	if ( PN_UNLIKELY(fd < 0) )
-	{
-		DEBUG_ERR("Unable to open '%s'.", asciiPath);
+
+	if ( PN_UNLIKELY(fd < 0) ) {
+		dbugLog(_FLA, "Unable to open %" PRpathT, path);
 		return false;
 	}
 
-	static const size_t _PAGE_SIZE = 4096;		// *MUST* be a power of two
-	const size_t allocSize = ((size_t)fileSize + 1 + _PAGE_SIZE) & ~_PAGE_SIZE;
+	const size_t page_size = 4096; // Must be a power of two
+	const size_t alloc_size = ((size_t)s.st_size + 1 + page_size) & ~page_size;
 
-	char* mem = (char*)memAlloc(allocSize);
-	if ( PN_UNLIKELY(mem == nullptr) )
-	{
+	char* mem = (char*)memAlloc(alloc_size);
+	if ( PN_UNLIKELY(mem == nullptr) ) {
 		OS_CLOSE(fd);
-		DEBUG_FATAL("Out of memory loading '%s' (%" PRSizeT " bytes).", filename, allocSize);
+		LogAbort("Out of memory loading '%" PRpathT "' (%" PRSizeT " bytes).", path, alloc_size);
+		return false;
 	}
 
-	int bytesRead = OS_READ(fd, mem, fileSize);
+	int bytes_read = OS_READ(fd, mem, s.st_size);
 	OS_CLOSE(fd);
 
-	if ( bytesRead < 0 )
-	{
-		DEBUG_ERR("Error reading data from %s (fd:%d, size:%u)", asciiPath, fd, (unsigned int)fileSize);
+	if ( bytes_read != s.st_size ) {
+		dbugLog(_FLA, "Error reading data from %" PRpathT " (fd:%d, size:%u, read:%d)",
+		        path, fd, (unsigned int)s.st_size, bytes_read);
 		memFree(mem);
 		return false;
 	}
 
-	if ( bytesRead != fileSize )
-	{
-		DEBUG_ERR("Read error reading %s, got %d bytes instead of %u.", filename, bytesRead, (unsigned int)fileSize);
-	}
-
-	mem[bytesRead] = 0;
-
-	if ( outSize != nullptr )
-		*outSize = (unsigned int)fileSize;
+	mem[bytes_read] = 0;
 
 	outPtr = mem;
+	if ( outSize ) *outSize = (unsigned int)bytes_read;
 
 	return true;
 }
@@ -334,108 +315,71 @@ _lookupFileState(int fd)
 //////////////////////////////////////////////////////////////////////
 // cross-platform 'open' wrapper.
 
-int fiodOpen(const char* filename, bool userdir, int prereadSize)
-{
-	wchar_t widePath[PATH_MAX + 1];
-	char asciiPath[PATH_MAX + 1];
-	widePath[0] = 0;
-	asciiPath[0] = 0;
-
+int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 	dbugLog(_FLD, "fiodOpen(%s, %d, %d)", filename, userdir, prereadSize);
 
-	off_t fileSize = _getFilePathAndSize(filename, userdir, widePath, sizeof(widePath));
-
-	if ( fileSize < 0 )
-	{
-		dbugLog(_FLD, "Could not open file with file size %" PRSsizeT, fileSize);
-		return - 1;
+	fullpath_t path[MAX_PATH];
+	stat_t s;
+	if ( GetFileStat(s, filename, userdir, path) ) {
+		dbugLog(_FLW, "Could not open file");
+		return -1;
 	}
 
-	if ( prereadSize > 0 && fileSize > prereadSize)
-	{
+	off_t read_size = s.st_size;
+	if ( prereadSize > 0 && prereadSize > read_size ) {
 		dbugLog(_FLD, "Altering read size to %d", prereadSize);
-		fileSize = prereadSize; // if too big will be caught below
+		read_size = prereadSize;
 	}
 
-	WWIIConvert(widePath, asciiPath);
+	// Add one byte to make absolutely sure there is a null byte at the end
+	// Then round the size up to the next page size to limit memory fragmentation
+	const size_t page_size = 4096; // Must be a power of two
+	const size_t alloc_size = ((size_t)read_size + 1 + page_size) & ~page_size;
 
-	// Add one byte so I can make absolutely sure there
-	// is a null byte at the end :)
-	// Then round the size up to the next page size to
-	// limit memory fragmentation.
-
-	static const size_t _PAGE_SIZE = 4096;		// *MUST* be a power of two
-	const size_t allocSize = ((size_t)fileSize + 1 + _PAGE_SIZE) & ~_PAGE_SIZE;
-
-	char* mem = (char*)memAlloc(allocSize);
-	if ( PN_UNLIKELY(mem == nullptr) )
-	{
+	char* mem = (char*)memAlloc(alloc_size);
+	if ( PN_UNLIKELY(mem == nullptr) ) {
 #if platBuild == BUILD_SERVER
-		LogAbort("out of memory opening %s", asciiPath);
+		LogAbort("out of memory opening %" PRpathT, path);
 #else
-		Write_Log(LOG_ALL, LOG_FATAL, "out of memory opening %s", asciiPath);
+		Write_Log(LOG_ALL, LOG_FATAL, "out of memory opening %" PRpathT, path);
 		piExitProgram(_FL, "out of memory");
 		return -1;
 #endif
-	}
-	else {
-		dbugLog(_FLD, "Alloc size for new file is %" PRSizeT "", allocSize);
+	} else {
+		dbugLog(_FLD, "Alloc size for new file is %" PRSizeT "", alloc_size);
 	}
 
-	mem[fileSize] = 0;
-
+	mem[read_size] = 0;
 	int fd = -1;
+	try {
+		OS_OPEN(&fd, path, O_RDONLY | O_BINARY, 0);
+		recordRef(path);
 
-	try
-	{
-#if platOS == OS_WIN32
-		// already been converted and path separators fixed
-		fd = OS_WOPEN(widePath, O_RDONLY | O_BINARY);
-		recordRef(widePath);
-#else
-		fd = -1;
-        OS_OPEN(&fd, os_file_path(asciiPath), O_RDONLY | O_BINARY, 0);
-		recordRef(widePath);
-#endif
 		if ( fd < 0 )
 			throw "open failed";
 
-		// Sanity check: we don't already think we have this
-		// descriptor open.
-		assert( s_fileMap.find(fd) == s_fileMap.end() );
+		// Sanity check: We don't think we already have this discriptor open
+		assert ( s_fileMap.find(fd) == s_fileMap.end() );
 
-		// Try to read the file contents into the allocation
-		dbugLog(_FLD, "About to read %" PRSsizeT " bytes from file", fileSize);
-		off_t bytesRead = OS_READ(fd, mem, fileSize);
-		if ( bytesRead < fileSize )
+		dbugLog(_FLD, "About to read %" PRSsizeT " bytes from file", read_size);
+		off_t bytes_read = OS_READ(fd, mem, read_size);
+		if ( bytes_read < read_size )
 			throw "read failed/truncated";
 
-		// Index this allocation into the file map
-		auto& fileMap = s_fileMap[fd];
-		fileMap.Assign(mem, fileSize);
+		auto& file_map = s_fileMap[fd];
+		file_map.Assign(mem, read_size);
 		lastFd = fd;
-		lastResult = &fileMap;
-	}
-	catch ( const char* cause )
-	{
-		// Report
-#if platBuild == BUILD_SERVER
-		dbugLog(_FLD, "fiod:%s:%s", cause, asciiPath);
-#else
-		Write_Log(LOG_OLD, LOG_INFO, "fiod:%s:%s", cause, asciiPath);
-#endif
+		lastResult = &file_map;
 
-		// Relinquish the file descriptor
+		return fd;
+	} catch ( const char* cause ) {
+		dbugLog(_FLW, "fiod:%s:%" PRpathT, cause, path);
+
 		if ( fd >= 0 )
 			OS_CLOSE(fd);
-
-		// Free the memory
 		memFree(mem);
-
 		return -1;
 	}
-
-	return fd;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -517,10 +461,10 @@ void fiodClose(int fd)
 //////////////////////////////////////////////////////////////////////
 // External wrapper for getFilePathAndSize
 
-size_t fiodFileSize(const char* name, bool userdir)
-{
-	wchar_t widePath[PATH_MAX + 1];
-	return _getFilePathAndSize(name, userdir, widePath, sizeof(widePath));
+size_t fiodFileSize(const char* name, bool userdir) {
+	stat_t s;
+	GetFileStat(s, name, userdir);
+	return s.st_size;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -552,11 +496,11 @@ const fullpath_t* fiodGetPrepath() {
 void fiodmkdir(const char* path)
 {
 #if platOS == OS_MACOS || platOS == OS_LINUX
-	char fullPath[PATH_MAX];
+	char fullPath[MAX_PATH];
 	strprintf(fullPath, "%s%s", macPreferencesPath(), path);
 	OS_MKDIR(os_file_path(fullPath), S_IRWXU);
 #elif platOS == OS_WIN32
-	wchar_t fullPath[PATH_MAX];
+	wchar_t fullPath[MAX_PATH];
 	GetFullPath(fullPath, path);
 	OS_WMKDIR(os_file_path(fullPath));
 #endif
@@ -565,17 +509,10 @@ void fiodmkdir(const char* path)
 // ------------------------------
 
 LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir) {
-	int retval;
 	stat_t s;
-
-	WITH ( UsingUserdir(userdir) )
-		retval = GetFileStat(s, filename);
-
-	if ( retval == 0 ) {
+	if ( GetFileStat(s, filename, userdir) ) {
 		*modified = (SINT32)s.st_mtime;
 		return true;
-	} else if ( userdir ) { // Try again using the default path
-		return false;
 	} else {
 		return false;
 	}
@@ -590,10 +527,11 @@ size_t fiodWrite(int hfile, const void* dptr, size_t length)
 }
 
 int fiodOpenWrite(const char* filename, bool userdir) {
-	fullpath_t fullpath[PATH_MAX];
+	fullpath_t fullpath[MAX_PATH];
 	WITH ( UsingUserdir(userdir) )
 		GetFullPath(fullpath, filename);
 
+	// TODO: Only Windows?
 #if platOS == OS_WIN32 && platBuild != BUILD_SERVER
 	// We may also need to create directories for userdir files
 	if ( userdir ) {
@@ -602,17 +540,14 @@ int fiodOpenWrite(const char* filename, bool userdir) {
 		size_t start = 0;
 		size_t pos = str.find(PATH_SEPARATOR_WIDE);
 
-		std::wstring path;
-		while ( pos != std::wstring::npos ) {
+		std::basic_string<fullpath_t> path;
+		while ( pos != std::basic_string<fullpath_t>::npos ) {
 			path += str.substr(start, pos - start);
 			OS_WMKDIR(path.c_str());
-
 			start = pos;
 			pos = str.find(PATH_SEPARATOR_WIDE, pos + 1);
 		}
 	}
-#else
-	assert ( userdir == false );
 #endif
 
 	int fd = -1;

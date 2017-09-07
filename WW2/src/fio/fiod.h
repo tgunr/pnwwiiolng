@@ -71,20 +71,10 @@ static int fiodGet(int fd, _Type& into)
 
 //==============
 
-#if platBuild == BUILD_CLIENT
-	char* os_file_path(char* path);
-	wchar_t* os_file_path(wchar_t* path);
-#else
-	#define os_file_path(x) (x)
-#endif
-
-//--------------
+UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname);
 
 template <size_t N>
 UINT32 GetFullPath(fullpath_t(&path)[N], const char* name) {
-	fullpath_t wname[MAX_PATH];
-	WWII::ConvertChars(name, wname, array_size(wname));
-	wname[array_size(wname)-1] = L'\0';
-
-	return pathprintf(path, fiodGetPrepath(), os_file_path(wname));
+	static_assert ( N == MAX_PATH , "All paths must be MAX_PATH long" );
+	return GetFullPath_unsafe(path, name);
 }
