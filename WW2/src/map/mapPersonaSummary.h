@@ -170,6 +170,13 @@ public:
 		: m_status(s), m_personaID(pid), m_countryID(cid), m_branchID(bid), m_checksum(0), m_rank(0), m_rankPctg(0), m_chatPermissions(nullChatPermissions)
 		{ }
 
+	// copy constructor
+	PersonaSelection(const PersonaSelection & s)
+		: m_status(s.m_status), m_personaID(s.m_personaID), m_countryID(s.m_countryID), 
+		m_branchID(s.m_branchID), m_checksum(s.m_checksum), m_rank(s.m_rank),
+		 m_rankPctg(s.m_rankPctg), m_chatPermissions(s.m_chatPermissions), m_accountGoodUntil(s.m_accountGoodUntil)
+		{ }
+
 	// Construct from network object
 	PersonaSelection(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
@@ -192,8 +199,6 @@ public:
 	ChatPermissions	m_chatPermissions;	// Permission details
 	UINT32			m_accountGoodUntil; // teulTime() + seconds remaining on acct
 
-	// Private host functions
-private:
 #if platBuild == BUILD_SERVER
 
 	SINT32 _create(Player*);

@@ -65,3 +65,4 @@ static const char QRY_INSERT_NEW_PERSONA_RECORD[] =
 		")"
 ;
 
+static const char QRY_SELECT_PERSONA_DATA[] = "CALL `wwii`.`p_get_persona_data`(%u, %u, %u)";
