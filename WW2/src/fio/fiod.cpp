@@ -131,95 +131,80 @@ static wchar_t* os_file_path(wchar_t* path)
 
 #endif
 
+//==============================================================================
+
+namespace {
+	// Trying to deal with Windows wanting wide chars and Unix wanting normal. Goddamn PITA, honestly
+	typedef wchar_t pathchar_t;
+	typedef pathchar_t path_t[MAX_PATH];
+
+	template <size_t N>
+	UINT32 GetFullPath(pathchar_t(&path)[N], const char* name) {
+		static_assert ( N == MAX_PATH , "GetFullPath expects an array of the proper size" );
+
+		path_t wname;
+		WWII::ConvertChars(name, wname, array_size(wname));
+		wname[array_size(wname)-1] = L'\0';
+
+		return pathprintf(path, fiodGetPrepath(), os_file_path(wname));
+	}
+}
+
+//==============================================================================
+
+namespace {
+#if platOS != OS_WIN32
+	typedef struct stat stat_t;
+	int GetStat(stat_t& s, const wchar_t* wpath) {
+		char path[MAX_PATH+1];
+		WWII::ConvertChars(wpath, path, array_size(path));
+		return stat(path, &s);
+	};
+#else
+	typedef struct _stat64i32 stat_t;
+	int GetStat(stat_t& s, const wchar_t* path) {
+		return _wstat(path, &s);
+	};
+#endif
+
+	int GetFileStat(stat_t& s, const char* name) {
+		wchar_t path[MAX_PATH];
+		GetFullPath(path, name);
+		return GetStat(s, path);
+	}
+
+}
+
 //////////////////////////////////////////////////////////////////////
 // Get me the name and size of a given file.
 
-#if platBuild == BUILD_CLIENT
 static off_t _getFilePathAndSize(const char* name, bool userdir, wchar_t* widePath, size_t wsize)
-#else
-static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* widePath, size_t wsize)
-#endif
 {
-	SINT32 retval = 0;
-
-	char buffer[PATH_MAX + 1];
-
-#if platBuild == BUILD_CLIENT
-	if(userdir)
-	{
-		// no bounds checking here, nice
-		pathprintf(buffer, UserDataPath, name);
-
-		if(WWII::ConvertChars(buffer, widePath, wsize))
-		{
-#if platOS == OS_WIN
-			struct _stat64i32 wStatBuffer;
-
-			retval = _wstat(os_file_path(widePath), &wStatBuffer);
-            if (retval == 0)
-            {
-                return wStatBuffer.st_size; // Return what the OS thinks it is
-            }
-#else
-            struct stat statBuffer;
-            retval = stat(os_file_path(buffer), &statBuffer);
-            if (retval == 0)
-            {
-                return statBuffer.st_size; // Return what the OS thinks it is
-            }
-#endif
-		}
-	// Else fall through normally
-	}
+#if platBuild == BUILD_SERVER
+	userdir = false;
 #endif
 
-	// think this works as char* because when we get to here we're talking about relative paths which are all ascii?
-	size_t pathLen = 0;
-	// we don't want file system references to use local data path
-	const char *srchLoc = strstr(name, FILE_URL_DESIGNATOR);
-	if (srchLoc != nullptr) {
-		strncpy(buffer, srchLoc+strlen(FILE_URL_DESIGNATOR), sizeof(buffer));
-		pathLen = strlen(buffer);
-	}
-	else {
-		pathLen = pathprintf(buffer, fiodGetPrepath(), name);
-	}
+	// There used to be a check for FILE_URL_DESIGNATOR, but we never use it so whatever.
+	wchar_t wname[MAX_PATH];
+	WWII::ConvertChars(name, wname, array_size(wname));
+	wname[array_size(wname)-1] = L'\0';
+	pathprintf(widePath, wsize, fiodGetPrepath(), wname);
 
-        // must be included for now until data list files can all be cleaned up
-        for ( size_t i = 0; i < pathLen; ++i )
-        {
-                if ( buffer[i] == '\\' )
-                        buffer[i] = '/';
-        }
-
-	struct stat statBuffer;
-	retval = stat(os_file_path(buffer), &statBuffer);
+	int retval;
+	stat_t s;
+	WITH ( UsingUserdir(userdir) )
+		retval = GetStat(s, os_file_path(widePath));
 
 #if platOS != OS_WIN32
-	///TODO: OGS: I think this works under Windows too...
-	if ( retval < 0 || !S_ISREG(statBuffer.st_mode) )
-	{
-		dbugLog(_FLW, "File could not be opened %s", buffer);
-		return -1;
-	}
+	if ( ! (retval < 0 || !S_ISREG(statBuffer.st_mode)) )
 #else
-	///TODO: OGS: See above: This allows Windows to [try to] open directories like files.
-	if ( retval < 0 )
-	{
-		dbugLog(_FLW, "(WIN32) File could not be opened %s", buffer);
-		return -1;
-	}
+	if ( ! ( retval < 0 ) )
 #endif
-
-	// make sure and update our passed in widePath to the found path
-	if(!WWII::ConvertChars(buffer, widePath, wsize))
-	{
-		dbugLog(_FLW, "Could not be convert chars %s", buffer);
+		return s.st_size;
+	else if ( userdir ) // Try again using the default path
+		return _getFilePathAndSize(name, false, widePath, wsize);
+	else
 		return -1;
-	}
-
-	dbugLog(_FLD, "file size found to be %" PRSsizeT, statBuffer.st_size);
-	return statBuffer.st_size; // Return what the OS thinks it is
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -599,13 +584,13 @@ void fiodSetUserpath(bool userpath) {
 	use_userpath = userpath;
 }
 
-const char* fiodGetPrepath()
+const wchar_t* fiodGetPrepath()
 {
 	return use_userpath ? UserDataPath : DataPath;
 }
 #else
-const char* fiodGetPrepath() {
-	return use_userpath ? UserDataPath : DataPath;
+const wchar_t* fiodGetPrepath() {
+	return DataPath;
 }
 #endif
 
@@ -615,84 +600,36 @@ const char* fiodGetPrepath() {
 #if platBuild == BUILD_CLIENT
 void fiodmkdir(const char* path)
 {
-	char fullPath[PATH_MAX];
-
 #if platOS == OS_MACOS || platOS == OS_LINUX
+	char fullPath[PATH_MAX];
 	strprintf(fullPath, "%s%s", macPreferencesPath(), path);
 	OS_MKDIR(os_file_path(fullPath), S_IRWXU);
 #elif platOS == OS_WIN32
-
-	pathprintf(fullPath, fiodGetPrepath(), path);
-
-	wchar_t widePath[PATH_MAX+1];
-
-	if(WWIIConvert(fullPath, widePath))
-		OS_WMKDIR(os_file_path(widePath));
-
+	wchar_t fullPath[PATH_MAX];
+	GetFullPath(fullPath, path);
+	OS_WMKDIR(os_file_path(fullPath));
 #endif
 }
 
 // ------------------------------
 
-#if platOS == OS_WIN32
-// WIN versions
+LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir) {
+	int retval;
+	stat_t s;
 
-LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
-{
-	char	fullpath[PATH_MAX];
-	SINT32	retval;
-	struct	stat	buffer;
+	WITH ( UsingUserdir(userdir) )
+		retval = GetFileStat(s, filename);
 
-	if(userdir)
-	{
-		pathprintf(fullpath, UserDataPath, filename);
-
-		wchar_t widePath[PATH_MAX+1];
-
-		struct _stat64i32 wbuffer;
-
-		if(WWIIConvert(fullpath, widePath))
-			retval = _wstat(os_file_path(widePath), &wbuffer);
-
-		if(retval == 0)
-		{
-			*modified = (SINT32)wbuffer.st_mtime;
-			return TRUE;
-		}
-		// Else fall through normally
+	if ( retval == 0 ) {
+		*modified = (SINT32)s.st_mtime;
+		return true;
+	} else if ( userdir ) { // Try again using the default path
+		return false;
+	} else {
+		return false;
 	}
-
-	pathprintf(fullpath, fiodGetPrepath(), filename);
-	retval = stat(os_file_path(fullpath), &buffer);
-
-	if (retval == 0)
-	{
-		*modified = (SINT32)buffer.st_mtime;
-	}
-
-	return(retval == 0);
 }
-
-#else
-
-// Mac versions
-
-LOGICAL fiodModified(SINT32* modified, const char* filename, bool /* userdir */)
-{
-  char fullpath[1024];
-  SINT32 retval;
-  struct stat buffer;
-  pathprintf(fullpath, fiodGetPrepath(), filename);
-  retval = stat(os_file_path(fullpath), &buffer);
-
-  if (retval == 0)
-  {
-	*modified = (SINT32)buffer.st_mtime;
-  }
-  return(retval == 0);
-}
-#endif
-#endif  // CLIENT
+#endif // BUILD_CLIENT
 
 // ------------------------------
 
@@ -701,57 +638,35 @@ size_t fiodWrite(int hfile, const void* dptr, size_t length)
   return OS_WRITE(hfile, dptr, length);
 }
 
-#if platOS == OS_WIN32
-int fiodOpenWrite(const char* filename, bool userdir )
-#else
-int fiodOpenWrite(const char* filename, bool /* userdir */)
-#endif
-{
-  char  fullpath[PATH_MAX];
+int fiodOpenWrite(const char* filename, bool userdir) {
+	wchar_t fullpath[PATH_MAX];
+	WITH ( UsingUserdir(userdir) )
+		GetFullPath(fullpath, filename);
 
 #if platOS == OS_WIN32 && platBuild != BUILD_SERVER
-  if(userdir)
-  {
-		// Make sure directorys are created since some filenames contain directory paths.
-		pathprintf(fullpath, UserDataPath, filename);
-
-		wchar_t widePath[PATH_MAX+1];
-
-		WWIIConvert(fullpath, widePath);
-
-	   // Make sure directorys are created since some filenames contain directory paths.
-		std::wstring wpath = widePath;
-
-		for(unsigned int i = 0; i < wpath.length(); i++)
-		{
-			if(wpath[i] == L'/') wpath[i] = L'\\';
-		}
-
-		size_t pos = wpath.find(L'\\');
-		std::wstring path;
+	// We may also need to create directories for userdir files
+	if ( userdir ) {
+		std::wstring str(fullpath);
 
 		size_t start = 0;
+		size_t pos = str.find(PATH_SEPARATOR_WIDE);
 
-		// Need to create directories
-		while(pos != std::wstring::npos)
-		{
-			path += wpath.substr(start, pos - start);
-			int error = OS_WMKDIR(path.c_str());
+		std::wstring path;
+		while ( pos != std::wstring::npos ) {
+			path += str.substr(start, pos - start);
+			OS_WMKDIR(path.c_str());
 
 			start = pos;
-			pos = wpath.find(L'\\', pos + 1);
+			pos = str.find(PATH_SEPARATOR_WIDE, pos + 1);
 		}
-
-		return OS_WOPEN(wpath.c_str(), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
-  }
-  else
+	}
+#else
+	assert ( userdir == false );
 #endif
-	  pathprintf(fullpath, fiodGetPrepath(), filename);
 
-    int fd = -1;
-
-	OS_OPEN(&fd, os_file_path(fullpath), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
-    return fd;
+	int fd = -1;
+	OS_OPEN(&fd, fullpath, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
+	return fd;
 }
 
 #if platBuild == BUILD_SERVER
@@ -1047,7 +962,7 @@ SINT32 fiocfgFileSize(const char* filename, bool)
 
 LOGICAL fiocfgAccess(const char* filename, bool userdir)
 {
-	WITH ( Userpath(userdir) ) {
+	WITH ( UsingUserdir(userdir) ) {
 		int fd = fiodOpen(filename, true);
 		if (fd != -1)
 			fiodClose(fd);
@@ -1057,7 +972,7 @@ LOGICAL fiocfgAccess(const char* filename, bool userdir)
 
 void fiocfgMkDir(const char* path, bool userdir)
 {
-	WITH ( Userpath(userdir) )
+	WITH ( UsingUserdir(userdir) )
 		fiodmkdir(path);
 }
 

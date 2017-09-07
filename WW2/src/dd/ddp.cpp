@@ -2085,6 +2085,8 @@ static void glScreenCapture()
 	do
 	{
 		shotCount += 1;
+		// TODO: Switch to wide string
+
 #if platOS == OS_WIN32
 		strprintf(fileName, "%s%s%d.bmp", UserDataPath, fptr, shotCount);
 #else

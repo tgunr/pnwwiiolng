@@ -34,7 +34,6 @@
 #pragma comment(lib, "event.lib")
 #pragma comment(lib, "ws2_32.lib")
 #define poll(...) WSAPoll(__VA_ARGS__)
-#define PATH_SEPARATOR "\\"
 
 #endif
 

@@ -3,12 +3,12 @@
 
 namespace IO { class MappedFile; }
 
-extern const char* fiodGetPrepath();
+extern const wchar_t* fiodGetPrepath();
 extern void fiodSetUserpath(bool userpath);
 
-struct Userpath {
-	Userpath(bool userpath = true) { fiodSetUserpath(userpath); }
-	~Userpath() { fiodSetUserpath(false); }
+struct UsingUserdir {
+	UsingUserdir(bool userdir = true) { fiodSetUserpath(userdir); }
+	~UsingUserdir() { fiodSetUserpath(false); }
 	operator bool(void) const { return false; }
 };
 

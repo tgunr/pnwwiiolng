@@ -178,6 +178,10 @@ static inline long random() {
 static inline int OS_OPEN(int *fdp, const char *path, int oflag, int cmode) {
     return _sopen_s(fdp, path, oflag, _SH_DENYRW, cmode);
 }
+static inline int OS_OPEN_W(int *fdp, const wchar_t *path, int oflag, int cmode) {
+	return _wsopen_s(fdp, path, oflag, _SH_DENYRW, cmode);
+}
+
 static inline void OS_CLOSE(int fd) { _close(fd); }
 #define OS_WOPEN(...) _wopen(__VA_ARGS__)
 #define OS_READ(...) _read(__VA_ARGS__)
