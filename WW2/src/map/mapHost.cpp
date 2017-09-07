@@ -21,10 +21,16 @@
 #include "miss/missionServerTypes.h"
 #include "miss/missionTypes.h"
 #include "mm/mmdbPersonaSelections.h"
+#include "mm/mmdbLazyFetchPersona.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
 #include "strt/strtFacilityStruct.h"
 #include "strt/strtCPStruct.h"
+#include "mm/mmQueries.h"
+#include "wwii/wwiiDBThreads.h"
+#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiOwnershipEnums.h"
+#include "wwii/wwiiConfig.h"
 
 #include "chat/chatSupportRPCMessages.h"
 
@@ -78,14 +84,10 @@ PersonaSelection::_create(Player* const player)
 		return _sendResult(player->teulIndex(), PSS_SUBSCRIPTION_LIMIT, player->accountGoodUntil());
 	}
 
-	m_personaID = player->createPersonaRecord(m_countryID, m_branchID);
-	if ( m_personaID == 0 )
-	{
-		player->debug("Persona creation failed", "Could not create new persona");
-		return _sendResult(player->teulIndex(), PSS_ERROR);
-	}
+	(new CreatePersonaQuery(*this, player))->Queue();
 
-	return _select(player);
+	// return value is ignored by the caller
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -122,30 +124,9 @@ PersonaSelection::_select(Player* const player)
 	}
 
 	// Ok - so the data looks valid
-	const PERSONA_LOAD_STATUS pls = player->selectPersona(m_personaID, m_countryID, m_branchID);
-	switch (pls)
-	{
-		case PLS_LOADED:
-			dbugLog(_FLI, "t:%d p:%u c:%s loaded persona %d ctry:%d br:%d rk:%u er:%u prog:%u", player->teulIndex(), player->playerID(), player->callsign(), m_personaID, m_countryID, m_branchID, player->realRank(), player->effectiveRank(), player->progress());
-			player->checksum(m_checksum);
-			player->m_hasSelectedPersonaOnce = true;
-		return _sendResult(player->teulIndex(), PSS_SELECT, player->effectiveRank(), player->progress(), player->chatPermissions(), player->accountGoodUntil());
+	(new SelectPersonaQuery(*this, player))->Queue();
 
-		case PLS_LOCKED:
-			player->debug("Persona select refused", "side locked");
-			dbugLog(_FLN, "t:%d p:%u c:%s persona %d locked", player->teulIndex(), player->playerID(), player->callsign(), m_personaID);
-		return _sendResult(player->teulIndex(), PSS_PERSONA_LOCKED);
-
-		case PLS_MISSING:
-			player->debug("Persona select refused", "missing persona");
-			dbugLog(_FLW, "t:%d p:%u c:%s no such persona %d:%d/%d", player->teulIndex(), player->playerID(), player->callsign(), m_personaID, m_countryID, m_branchID);
-		return _sendResult(player->teulIndex(), PSS_MISSING);
-
-		default:
-			player->debug("Persona select refused", "internal error");
-			dbugLog(_FLW, "t:%d p:%u c:%s unknown error %d loading persona", player->teulIndex(), player->playerID(), player->callsign(), pls);
-		return _sendResult(player->teulIndex(), PSS_ERROR);
-	}
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
