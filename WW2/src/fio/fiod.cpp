@@ -110,7 +110,7 @@ namespace {
 		return path;
 	}
 #else
-	inline char os_file_path(char* path) { return path; }
+	inline char* os_file_path(char* path) { return path; }
 #endif
 
 }
@@ -118,12 +118,12 @@ namespace {
 //==============================================================================
 
 UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
-#if platOS == OS_WIN32
 	fullpath_t name[PN_MAX_PATH];
+#if platOS == OS_WIN32
 	WWII::ConvertChars(rawname, name, array_size(name));
 	name[array_size(name)-1] = L'\0';
 #else
-	const char* name = rawname;
+	strsafecpy(name, rawname);
 #endif
 	return pathprintf(path, PN_MAX_PATH, fiodGetPrepath(), os_file_path(name));
 }
