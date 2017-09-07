@@ -498,6 +498,8 @@ const fullpath_t* fiodGetPrepath()
 	return use_userpath ? UserDataPath : DataPath;
 }
 #else
+void fiodSetUserpath(bool) {}
+
 const fullpath_t* fiodGetPrepath() {
 	return DataPath;
 }
