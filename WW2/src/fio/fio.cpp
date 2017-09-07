@@ -42,7 +42,7 @@ void fioInit()
 	CreateDirectory(UserDataPath, nullptr);
 #elif platOS == OS_MACOS
 	// TODO: Need a Mac guy to verify this will work nicely
-	strsafecpy(UserDataPath, std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(macDocumentsPath()).c_str());
+	strsafecpy(UserDataPath, macDocumentsPath());
 #endif
 }
 

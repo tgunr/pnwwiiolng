@@ -1,7 +1,7 @@
 #pragma once
 // The defines for the Archive portion of fiod
 
-#include <wwii/wwiiUTF.h>
+#include "wwii/wwiiUTF.h"
 
 namespace IO { class MappedFile; }
 
