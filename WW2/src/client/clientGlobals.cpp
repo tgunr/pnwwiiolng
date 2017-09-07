@@ -172,8 +172,8 @@ LOGICAL			g_bSoundConvertOnLoad;// convert audio data to best format when loaded
 
 LOGICAL			g_bCaptuerAllDisplays;// capture all displays or just the game display (Mac OS X only currently)
 
-wchar_t DataPath[_MAX_PATH];
-wchar_t UserDataPath[_MAX_PATH];
+fullpath_t DataPath[_MAX_PATH];
+fullpath_t UserDataPath[_MAX_PATH];
 
 FLOAT32			FieldOfView;		// FOV in degrees
 FLOAT32			HorizontalFieldOfView;

@@ -174,8 +174,8 @@ extern LOGICAL			g_bSoundConvertOnLoad;// convert audio data to best format when
 
 extern LOGICAL			g_bCaptuerAllDisplays;// capture all displays or just the game display (Mac OS X only currently)
 
-extern wchar_t DataPath[_MAX_PATH];
-extern wchar_t UserDataPath[_MAX_PATH];
+extern fullpath_t DataPath[_MAX_PATH];
+extern fullpath_t UserDataPath[_MAX_PATH];
 
 extern FLOAT32			FieldOfView;		// FOV in degrees
 extern FLOAT32			HorizontalFieldOfView;

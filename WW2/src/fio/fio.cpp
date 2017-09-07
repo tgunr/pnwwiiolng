@@ -149,13 +149,15 @@ int fioOpen(const char* const filename)
 
 FILE* fioUserFile(const char* filename, const char* mode)
 {
-	std::wstring path = UserDataPath;
-	path += UTF16(filename);
-
+	// HACK: Duplication from fiod:GetFullPath()
+	fullpath_t path[MAX_PATH];
+	WITH ( UsingUserdir() )
+		GetFullPath(path, filename);
+	
 #if platOS == OS_WIN32 && defined(_UNICODE)
-	return _wfopen(path.c_str(), UTF16(mode));
+	return _wfopen(path, UTF16(mode));
 #else
-	return fopen(UTF8(path.c_str()), mode);
+	return fopen(path, mode);
 #endif
 }
 
@@ -652,12 +654,13 @@ namespace Fio
 
 	void DeleteLogFile()
 	{
-		std::wstring path = UserDataPath;
-		path += UTF16(Fio::LogFileName());
+		fullpath_t path[MAX_PATH];
+		WITH ( UsingUserdir() )
+			GetFullPath(path, Fio::LogFileName());
 #if platOS == OS_WIN32
-		_wunlink(path.c_str());
+		_wunlink(path);
 #else
-		unlink(UTF8(path.c_str()));
+		unlink(path);
 #endif
 	}
 

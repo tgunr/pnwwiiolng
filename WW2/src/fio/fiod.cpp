@@ -36,10 +36,6 @@
 # define FILE_URL_DESIGNATOR    "file://"
 
 #if platBuild == BUILD_SERVER
-# define os_file_path(x) (x)
-#endif
-
-#if platBuild == BUILD_SERVER
 #include "include/configVars.h"
 # define DataPath cv_dataDir.GetString()
 #endif
@@ -50,18 +46,6 @@
 
 #ifndef PATH_MAX
 # define PATH_MAX 1024
-#endif
-
-#if platOS == OS_WIN32
-#define CHANGE_SEP 	'/'
-#define OS_SEP		'\\'
-#define WCHANGE_SEP L'/'
-#define WOS_SEP		L'\\'
-#else
-#define CHANGE_SEP 	'\\'
-#define OS_SEP		'/'
-#define WCHANGE_SEP L'\\'
-#define WOS_SEP		L'/'
 #endif
 
 #ifdef RECORD_FILES
@@ -85,70 +69,37 @@ static void recordRef( std::wstring ref )
 #define recordRef(x)
 #endif
 
-/************************************************************************************************
-	os_file_path
-*************************************************************************************************/
-
-template <typename ValueType>
-static std::basic_string<ValueType> safe_os_file_path(const std::basic_string<ValueType> &path)
-{
-    size_t pos = std::basic_string<ValueType>::npos;
-    std::string result = path;
-
-    // Cheap hack: npos + 1 == 0 (size_t is unsigned so it's not UB!)
-    // Also we cheat with the knowledge that L'/' == static_cast<wchar_t>('/') etc.
-    while ((pos = result.find(static_cast<ValueType>(CHANGE_SEP), pos + 1)) != std::string::npos) {
-        result[pos] = static_cast<ValueType>(OS_SEP);
-    }
-    return result;
-}
-
 #if platBuild == BUILD_CLIENT
 
-static char* os_file_path(char* path)
-{
-	char* s = path;
-	for(;*s;s++)
-	{
-		if(*s == CHANGE_SEP)
+#if platOS == OS_WIN32
+	#define CHANGE_SEP  '/'
+	#define OS_SEP      '\\'
+	#define WCHANGE_SEP L'/'
+	#define WOS_SEP     L'\\'
+#else
+	#define CHANGE_SEP  '\\'
+	#define OS_SEP      '/'
+	#define WCHANGE_SEP L'\\'
+	#define WOS_SEP     L'/'
+#endif
+
+char* os_file_path(char* path) {
+	for ( char* s = path ; *s; s++ ) {
+		if ( *s == CHANGE_SEP )
 			*s = OS_SEP;
 	}
-
 	return path;
 }
 
-static wchar_t* os_file_path(wchar_t* path)
-{
-	wchar_t* s = path;
-	for(;*s;s++)
-	{
-		if(*s == WCHANGE_SEP)
+wchar_t* os_file_path(wchar_t* path) {
+	for ( wchar_t* s = path ; *s; s++ ) {
+		if ( *s == WCHANGE_SEP )
 			*s = WOS_SEP;
 	}
-
 	return path;
 }
 
 #endif
-
-//==============================================================================
-
-namespace {
-	// Trying to deal with Windows wanting wide chars and Unix wanting normal. Goddamn PITA, honestly
-	typedef wchar_t pathchar_t;
-	typedef pathchar_t path_t[MAX_PATH];
-
-	template <size_t N>
-	UINT32 GetFullPath(pathchar_t(&path)[N], const char* name) {
-		static_assert ( N == MAX_PATH , "GetFullPath expects an array of the proper size" );
-
-		path_t wname;
-		WWII::ConvertChars(name, wname, array_size(wname));
-		wname[array_size(wname)-1] = L'\0';
-
-		return pathprintf(path, fiodGetPrepath(), os_file_path(wname));
-	}
-}
 
 //==============================================================================
 
@@ -584,12 +535,12 @@ void fiodSetUserpath(bool userpath) {
 	use_userpath = userpath;
 }
 
-const wchar_t* fiodGetPrepath()
+const fullpath_t* fiodGetPrepath()
 {
 	return use_userpath ? UserDataPath : DataPath;
 }
 #else
-const wchar_t* fiodGetPrepath() {
+const fullpath_t* fiodGetPrepath() {
 	return DataPath;
 }
 #endif
@@ -639,7 +590,7 @@ size_t fiodWrite(int hfile, const void* dptr, size_t length)
 }
 
 int fiodOpenWrite(const char* filename, bool userdir) {
-	wchar_t fullpath[PATH_MAX];
+	fullpath_t fullpath[PATH_MAX];
 	WITH ( UsingUserdir(userdir) )
 		GetFullPath(fullpath, filename);
 

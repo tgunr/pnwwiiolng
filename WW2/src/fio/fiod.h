@@ -1,9 +1,11 @@
 #pragma once
 // The defines for the Archive portion of fiod
 
+#include <wwii/wwiiUTF.h>
+
 namespace IO { class MappedFile; }
 
-extern const wchar_t* fiodGetPrepath();
+extern const fullpath_t* fiodGetPrepath();
 extern void fiodSetUserpath(bool userpath);
 
 struct UsingUserdir {
@@ -65,3 +67,24 @@ static int fiodGet(int fd, _Type& into)
 #if RECORD_FILES
     extern void dumpFileRefs();
 #endif
+
+
+//==============
+
+#if platBuild == BUILD_CLIENT
+	char* os_file_path(char* path);
+	wchar_t* os_file_path(wchar_t* path);
+#else
+	#define os_file_path(x) (x)
+#endif
+
+//--------------
+
+template <size_t N>
+UINT32 GetFullPath(fullpath_t(&path)[N], const char* name) {
+	fullpath_t wname[MAX_PATH];
+	WWII::ConvertChars(name, wname, array_size(wname));
+	wname[array_size(wname)-1] = L'\0';
+
+	return pathprintf(path, fiodGetPrepath(), os_file_path(wname));
+}
