@@ -44,10 +44,6 @@
 
 #include "str/stringLib.h"
 
-#ifndef PATH_MAX
-# define PATH_MAX 1024
-#endif
-
 #ifdef RECORD_FILES
 static std::set<std::wstring> ReferencedFiles;
 
@@ -105,13 +101,13 @@ static void recordRef( std::wstring ref )
 
 UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
 #if platOS == OS_WIN32
-	fullpath_t name[MAX_PATH];
+	fullpath_t name[PN_MAX_PATH];
 	WWII::ConvertChars(rawname, name, array_size(name));
 	name[array_size(name)-1] = L'\0';
 #else
 	const char* name = rawname
 #endif
-	return pathprintf(path, MAX_PATH, fiodGetPrepath(), os_file_path(name));
+	return pathprintf(path, PN_MAX_PATH, fiodGetPrepath(), os_file_path(name));
 }
 
 //==============================================================================
@@ -135,7 +131,7 @@ namespace {
 #endif
 
 	bool GetFileStat(stat_t& s, const char* name, bool userdir, fullpath_t* outpath = nullptr) {
-		fullpath_t locpath[MAX_PATH];
+		fullpath_t locpath[PN_MAX_PATH];
 		fullpath_t* path = (outpath ? outpath : locpath);
 
 		WITH ( UsingUserdir(userdir) )
@@ -151,7 +147,7 @@ namespace {
 
 	template <size_t N>
 	bool GetFileStat(stat_t& s, const char* name, bool userdir, fullpath_t (&outpath)[N]) {
-		static_assert ( N == MAX_PATH , "All paths must be MAX_PATH long" );
+		static_assert ( N == PN_MAX_PATH , "All fio paths must be properly sized" );
 		return GetFileStat(s, name, userdir, (fullpath_t*)outpath);
 	}
 }
@@ -164,8 +160,7 @@ bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize) {
 	outPtr = nullptr;
 	if ( outSize ) *outSize = 0;
 
-
-	fullpath_t path[MAX_PATH];
+	fullpath_t path[PN_MAX_PATH];
 	stat_t s;
 	if ( ! GetFileStat(s, filename, false, path) ) {
 		dbugLog(_FLA, "Unable to stat %" PRpathT, path);
@@ -317,7 +312,7 @@ _lookupFileState(int fd)
 int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 	dbugLog(_FLD, "fiodOpen(%s, %d, %d)", filename, userdir, prereadSize);
 
-	fullpath_t path[MAX_PATH];
+	fullpath_t path[PN_MAX_PATH];
 	stat_t s;
 	if ( ! GetFileStat(s, filename, userdir, path) ) {
 		dbugLog(_FLW, "Could not open file");
@@ -497,11 +492,11 @@ const fullpath_t* fiodGetPrepath() {
 void fiodmkdir(const char* path)
 {
 #if platOS == OS_MACOS || platOS == OS_LINUX
-	char fullPath[MAX_PATH];
+	char fullPath[PN_MAX_PATH];
 	strprintf(fullPath, "%s%s", macPreferencesPath(), path);
 	OS_MKDIR(os_file_path(fullPath), S_IRWXU);
 #elif platOS == OS_WIN32
-	wchar_t fullPath[MAX_PATH];
+	wchar_t fullPath[PN_MAX_PATH];
 	GetFullPath(fullPath, path);
 	OS_WMKDIR(os_file_path(fullPath));
 #endif
@@ -528,7 +523,7 @@ size_t fiodWrite(int hfile, const void* dptr, size_t length)
 }
 
 int fiodOpenWrite(const char* filename, bool userdir) {
-	fullpath_t fullpath[MAX_PATH];
+	fullpath_t fullpath[PN_MAX_PATH];
 	WITH ( UsingUserdir(userdir) )
 		GetFullPath(fullpath, filename);
 

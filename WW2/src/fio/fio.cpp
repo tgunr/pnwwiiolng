@@ -149,7 +149,7 @@ int fioOpen(const char* const filename)
 
 FILE* fioUserFile(const char* filename, const char* mode)
 {
-	fullpath_t path[MAX_PATH];
+	fullpath_t path[PN_MAX_PATH];
 	WITH ( UsingUserdir() )
 		GetFullPath(path, filename);
 	
@@ -653,7 +653,7 @@ namespace Fio
 
 	void DeleteLogFile()
 	{
-		fullpath_t path[MAX_PATH];
+		fullpath_t path[PN_MAX_PATH];
 		WITH ( UsingUserdir() )
 			GetFullPath(path, Fio::LogFileName());
 #if platOS == OS_WIN32

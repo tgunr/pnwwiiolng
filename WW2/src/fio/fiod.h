@@ -76,6 +76,6 @@ UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname);
 
 template <size_t N>
 UINT32 GetFullPath(fullpath_t(&path)[N], const char* name) {
-	static_assert ( N == MAX_PATH , "All paths must be MAX_PATH long" );
+	static_assert ( N == PN_MAX_PATH , "All fio paths must be properly sized" );
 	return GetFullPath_unsafe(path, name);
 }
