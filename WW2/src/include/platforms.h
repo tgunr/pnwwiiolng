@@ -179,6 +179,7 @@ static inline long random() {
 // TESTING
 using fullpath_t = wchar_t;
 #define PRpathT "ls"
+#define PATHLit(s) L##s
 
 static inline int OS_OPEN(int *fdp, const wchar_t *path, int oflag, int cmode) {
     return _wsopen_s(fdp, path, oflag, _SH_DENYRW, cmode);
@@ -202,6 +203,7 @@ static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { 
 #elif platOS == OS_MACOS || platOS == OS_LINUX
 
 using fullpath_t = char;
+#define PATHLit(s) s
 #define PRpathT "s"
 
 static inline int OS_OPEN(int *fdp, const fullpath_t *path, int oflag, int cmode) {
