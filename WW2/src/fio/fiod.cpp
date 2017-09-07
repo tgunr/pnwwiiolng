@@ -65,19 +65,35 @@ static void recordRef( std::wstring ref )
 #define recordRef(x)
 #endif
 
-#if platBuild == BUILD_CLIENT
-	#if platOS == OS_WIN32
-		#define CHANGE_SEP  '/'
-		#define OS_SEP      '\\'
-		#define WCHANGE_SEP L'/'
-		#define WOS_SEP     L'\\'
-	#else
-		#define CHANGE_SEP  '\\'
-		#define OS_SEP      '/'
-		#define WCHANGE_SEP L'\\'
-		#define WOS_SEP     L'/'
-	#endif
+//==============================================================================
 
+#if platOS == OS_WIN32
+	#define CHANGE_SEP  '/'
+	#define OS_SEP      '\\'
+	#define WCHANGE_SEP L'/'
+	#define WOS_SEP     L'\\'
+#else
+	#define CHANGE_SEP  '\\'
+	#define OS_SEP      '/'
+	#define WCHANGE_SEP L'\\'
+	#define WOS_SEP     L'/'
+#endif
+
+namespace {
+	template <typename ValueType>
+	std::basic_string<ValueType> safe_os_file_path(const std::basic_string<ValueType> &path) {
+		size_t pos = std::basic_string<ValueType>::npos;
+		std::string result = path;
+
+		// Cheap hack: npos + 1 == 0 (size_t is unsigned so it's not UB!)
+		// Also we cheat with the knowledge that L'/' == static_cast<wchar_t>('/') etc.
+		while ( (pos = result.find(static_cast<ValueType>(CHANGE_SEP), pos + 1)) != std::string::npos ) {
+			result[pos] = static_cast<ValueType>(OS_SEP);
+		}
+		return result;
+	}
+
+#if platBuild == BUILD_CLIENT
 	char* os_file_path(char* path) {
 		for ( char* s = path ; *s; ++s ) {
 			if ( *s == CHANGE_SEP )
@@ -94,10 +110,12 @@ static void recordRef( std::wstring ref )
 		return path;
 	}
 #else
-	#define os_file_path(x) (x)
+	inline char os_file_path(char* path) { return path; }
 #endif
 
-//--------------
+}
+
+//==============================================================================
 
 UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
 #if platOS == OS_WIN32
@@ -105,7 +123,7 @@ UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
 	WWII::ConvertChars(rawname, name, array_size(name));
 	name[array_size(name)-1] = L'\0';
 #else
-	const char* name = rawname
+	const char* name = rawname;
 #endif
 	return pathprintf(path, PN_MAX_PATH, fiodGetPrepath(), os_file_path(name));
 }
@@ -355,7 +373,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 		// Sanity check: We don't think we already have this discriptor open
 		assert ( s_fileMap.find(fd) == s_fileMap.end() );
 
-		dbugLog(_FLD, "About to read %" PRSsizeT " bytes from file", read_size);
+		dbugLog(_FLD, "About to read %" PRSsizeT " bytes from file", (size_t)read_size);
 		off_t bytes_read = OS_READ(fd, mem, read_size);
 		if ( bytes_read < read_size )
 			throw "read failed/truncated";

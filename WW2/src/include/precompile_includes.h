@@ -79,7 +79,7 @@ constexpr void silence_unused_parameter_warning(T&& t, Args&&... args) {
 }
 
 // To avoid complaints about impossible control paths not returning a value.
-NORETURN_FN inline void noreturn_fn(void) {}
+NORETURN_FN inline void noreturn_fn(void) { abort(); }
 
 //==============
 
