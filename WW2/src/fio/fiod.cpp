@@ -139,7 +139,7 @@ namespace {
 		fullpath_t* path = (outpath ? outpath : locpath);
 
 		WITH ( UsingUserdir(userdir) )
-			GetFullPath_unsafe(path, name); // TODO: Guarantee outpath's size so this is safe
+			GetFullPath_unsafe(path, name);
 		int result = GetStat(s, path);
 		if ( ! (result < 0 || ! S_ISREG(s.st_mode)) )
 			return true;
@@ -161,14 +161,13 @@ namespace {
 // TODO: Lots of overlap with fiodOpen(), should probably merge some stuff
 
 bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize) {
-	assert ( outPtr );
 	outPtr = nullptr;
 	if ( outSize ) *outSize = 0;
 
 
 	fullpath_t path[MAX_PATH];
 	stat_t s;
-	if ( GetFileStat(s, filename, false, path) ) {
+	if ( ! GetFileStat(s, filename, false, path) ) {
 		dbugLog(_FLA, "Unable to stat %" PRpathT, path);
 		return false;
 	}
@@ -320,7 +319,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 
 	fullpath_t path[MAX_PATH];
 	stat_t s;
-	if ( GetFileStat(s, filename, userdir, path) ) {
+	if ( ! GetFileStat(s, filename, userdir, path) ) {
 		dbugLog(_FLW, "Could not open file");
 		return -1;
 	}
@@ -463,8 +462,10 @@ void fiodClose(int fd)
 
 size_t fiodFileSize(const char* name, bool userdir) {
 	stat_t s;
-	GetFileStat(s, name, userdir);
-	return s.st_size;
+	if ( GetFileStat(s, name, userdir) )
+		return s.st_size;
+	else
+		return -1;
 }
 
 //////////////////////////////////////////////////////////////////////

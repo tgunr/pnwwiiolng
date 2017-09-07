@@ -149,7 +149,6 @@ int fioOpen(const char* const filename)
 
 FILE* fioUserFile(const char* filename, const char* mode)
 {
-	// HACK: Duplication from fiod:GetFullPath()
 	fullpath_t path[MAX_PATH];
 	WITH ( UsingUserdir() )
 		GetFullPath(path, filename);

@@ -5,6 +5,7 @@
 
 namespace IO { class MappedFile; }
 
+// TODO: Can be made internal
 extern const fullpath_t* fiodGetPrepath();
 extern void fiodSetUserpath(bool userpath);
 
