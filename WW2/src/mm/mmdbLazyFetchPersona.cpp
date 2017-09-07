@@ -20,6 +20,8 @@
 //////////////////////////////////////////////////////////////////////
 bool SelectPersonaQuery::Process(const size_t numRows) {
 
+	dbugLog(_FLD, "SelectPersonaQuery::Process(%d)", numRows);
+
 	UINT32 selectedID = m_ps.m_personaID;
 	m_player->ExitBrigade(PERS_SELECTING_PERSONA);
 	try
@@ -34,6 +36,8 @@ bool SelectPersonaQuery::Process(const size_t numRows) {
 		auto& row = Query()->Row();
 		selectedID = row.NextUInt();
 
+		dbugLog(_FLD, "Selected ID: %d", selectedID);
+
 		// We get a row for all of this personas branch-matching
 		// personas. The country-matching one should be first,
 		// if it isn't, then they don't have a persona.
@@ -44,12 +48,18 @@ bool SelectPersonaQuery::Process(const size_t numRows) {
 			return false;
 		}
 
+		dbugLog(_FLD, "Country = %d, requested = %d", thisCountry, m_ps.m_countryID);
+
 		m_rankNo = (RANK_NO)row.NextUInt();
 		m_rankPoints = row.NextUInt();
+
+		dbugLog(_FLD, "RankNo = %d, Points = %d", m_rankNo, m_rankPoints);
 
 		// Determine if the persona is locked
        		m_player->m_sideLockTime = row.NextUInt();
 		m_player->m_lastSide = (WWII_SIDE)row.NextUInt();
+
+		dbugLog(_FLD, "SL time = %d, last side = %d", m_player->m_sideLockTime, m_player->m_lastSide);
 
 		if ( m_player->m_sideLockTime <= teulTime() )
 		{
@@ -102,6 +112,8 @@ bool SelectPersonaQuery::Process(const size_t numRows) {
 		const RANK_NO globalShareCeiling = std::min(m_player->maxRank(), (RANK_NO)host_config.score.maxGlobalSharedRank);
 		const RANK_NO sideShareCeiling = std::min(m_player->maxRank(), (RANK_NO)host_config.score.maxSideSharedRank);
 
+		dbugLog(_FLD, "Fetching additional Rows");
+
 		while ( Query()->FetchRow() )
 		{
 			auto& altRow = Query()->Row();
@@ -122,6 +134,8 @@ bool SelectPersonaQuery::Process(const size_t numRows) {
                                 m_rankNo = sharedRank;
 
                         m_rankPoints = altPersPoints;
+
+			dbugLog(_FLD, "rank info changed ...");
 
                         m_changed = true;
 		}
@@ -156,14 +170,46 @@ void SelectPersonaQuery::Success() {
 		mapSaveRank(m_player, true); // execute simple query immediately on this thread
 	}
 
+	dbugLog(_FLD, "Setting metered access to %d", m_newMinuteBalance);
+
 	m_player->SetMeteredAccess(m_newMinuteBalance);
 
 	if (m_callBack != nullptr) {
 		m_callBack(m_callbackData, true);
-	}	
+	} else {
+		switch (m_status) {
+			case PLS_LOADED:
+				dbugLog(_FLI, "t:%d p:%u c:%s loaded persona %d ctry:%d br:%d rk:%u er:%u prog:%u", m_player->teulIndex(), m_player->playerID(), 
+					m_player->callsign(), m_ps.m_personaID, m_ps.m_countryID, m_ps.m_branchID, m_player->realRank(), m_player->effectiveRank(), m_player->progress());
+				m_player->checksum(m_ps.m_checksum);
+       				m_player->m_hasSelectedPersonaOnce = true;
+				m_ps._sendResult(m_player->teulIndex(), PSS_SELECT, m_player->effectiveRank(), m_player->progress(), m_player->chatPermissions(), m_player->accountGoodUntil());
+				break;
+			case PLS_LOCKED:
+				m_player->debug("Persona select refused", "side locked");
+				dbugLog(_FLN, "t:%d p:%u c:%s persona %d locked", m_player->teulIndex(), m_player->playerID(), m_player->callsign(), m_ps.m_personaID);
+				m_ps._sendResult(m_player->teulIndex(), PSS_PERSONA_LOCKED);
+				break;
+
+			case PLS_MISSING:
+				m_player->debug("Persona select refused", "missing persona");
+				dbugLog(_FLW, "t:%d p:%u c:%s no such persona %d:%d/%d", m_player->teulIndex(), m_player->playerID(), m_player->callsign(), m_ps.m_personaID, 
+					m_ps.m_countryID, m_ps.m_branchID);
+				m_ps._sendResult(m_player->teulIndex(), PSS_MISSING);
+				break;
+
+			default:
+				m_player->debug("Persona select refused", "internal error");
+				dbugLog(_FLW, "t:%d p:%u c:%s unknown error %d loading persona", m_player->teulIndex(), m_player->playerID(), m_player->callsign(), m_status);
+				m_ps._sendResult(m_player->teulIndex(), PSS_ERROR);
+				break;
+		}
+	}
 }
 
 void SelectPersonaQuery::Failure() {
+	dbugLog(_FLD, "SelectPersonaQuery::Failure()");
+ 
 	if (m_callBack != nullptr) {
 		m_callBack(m_callbackData, false);
 	}	
