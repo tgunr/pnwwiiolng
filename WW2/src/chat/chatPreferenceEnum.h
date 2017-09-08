@@ -21,6 +21,7 @@ enum CHAT_PREFERENCE
 ,	CPR_SET_DECAL			// When the client makes this non-zero,
 							// the host will change the player's decal
 							// and update the database
+,	CPR_SET_NETCODE			// Enables or disables the new netcode 
 
 // Add new entries above here
 

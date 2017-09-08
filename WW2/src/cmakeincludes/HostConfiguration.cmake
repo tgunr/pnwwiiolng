@@ -97,7 +97,7 @@ ELSE()
 			# `-flto`: legacy cishness makes for significant perf gains in this codebase :(
 			# `-fwhole-program-vtables`: Defining inline dtors has pros and cons.
 			# The main con being the compiler may have to make a mess, which this option fixes.
-			ADD_COMPILE_OPTIONS( "-flto" "-fwhole-program-vtables" )
+#			ADD_COMPILE_OPTIONS( "-flto" "-fwhole-program-vtables" )
 		ENDIF()
     ENDIF()
     LINK_LIBRARIES( "-lpthread" )
@@ -105,9 +105,11 @@ ELSE()
     IF ( BUILD_BITNESS EQUAL 64 )
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64" )
 		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64" )
-	ELSE()
+    ELSE()
+        IF ( NOT PN_CLUSTER STREQUAL "rPI" )
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32" )
 		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32" )
+        ENDIF()
     ENDIF()
 
 ENDIF()

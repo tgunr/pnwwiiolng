@@ -36,8 +36,8 @@
 static constexpr unsigned char
     PN_build_version_major = 1,
     PN_build_version_minor = 35,
-    PN_build_version_patch = 7,
-    PN_build_version_build = 2;
+    PN_build_version_patch = 9,
+    PN_build_version_build = 5;
 // END GLOBAL VERSION INFORMATION
 ///////////////////////////////////////////////////////////////////////////////////
 

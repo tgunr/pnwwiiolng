@@ -508,11 +508,22 @@ chatRequestSquad(UINT32 squadID, Player* player)
 	SquadList& list = it->second;
 	SquadMemberEntry* entry = list.find(player->chatHandle());
 	if ( entry == nullptr ) entry = list.find(player->matchHandle());
-	if ( entry == nullptr )
-	{
-		dbugLog(_FLA, "t:%d p:%u c:%s sq:%u unable to find this player in their squad", player->teulIndex(), player->playerID(), player->callsign(), squadID);
-		// Squad may not have finished loading yet.
-		return;
+	if (entry == nullptr && list.squad().callsign() == host_config.squad.defaultSquad) {
+        // Default squad needs to be reloaded so new players will be noticed, pull it in immediate mode
+        chatdbSquadInfo(0, squadID, true);
+        it = g_squads.find(squadID);
+        if (it == g_squads.end()) {
+            dbugLog(_FLW, "sq:%u no such squad!", squadID);
+            return;
+        }
+        list = it->second;
+        entry = list.find(player->chatHandle());
+        if (entry == nullptr) { entry = list.find(player->matchHandle()); }
+    }
+    if (entry == nullptr) {
+        // Squad may not have finished loading yet.
+        dbugLog(_FLA, "t:%d p:%u c:%s sq:%u unable to find this player in their squad", player->teulIndex(), player->playerID(), player->callsign(), squadID);
+        return;
 	}
 
 	if ( g_debugSquads )
@@ -701,7 +712,7 @@ _autoUpdateSquadlist(SquadList& list)
 		if ( player->lastSquadInfoMS() >= list.updated() ) continue;
 		if ( player->lastSquadInfoMS() >= cutoff_ms )
 		{
-			// Lets not spam this guy
+			// Lets not spam this player
 			outOfSync = true;
 			continue;
 		}
@@ -1479,7 +1490,7 @@ chatRequestRecruiter(Player* player, UCHAR language)
 		// So far so good, now perform cream-of-the-crop filtering
 		if ( weight == 0 )
 		{
-			// Guys with recruits or who's squads have already been
+			// Players with recruits or whose squads have already been
 			// listed move down the list
 			weight += chatGetNumberOfRecruits(recruiter->playerID());
 			if ( listedSquads.find(recruiter->squadID()) != listedSquads.end() )
@@ -1503,13 +1514,13 @@ chatRequestRecruiter(Player* player, UCHAR language)
 
 	RECRUITER_WEIGHTING::iterator rit;
 
-	// Do we have room for guys who weren't ideal?
+	// Do we have room for recruiters who weren't ideal?
 	for ( rit = dupes.begin(); outgoing.size() < host_config.squad.recruiterListMax && rit != dupes.end(); ++rit )
 	{
 		outgoing.add(rit->second);
 	}
 
-	// If we didn't reach the minimum list length yet, fill the list out with a bunch more guys.
+	// If we didn't reach the minimum list length yet, fill the list out with a bunch more recruiters.
 	if ( outgoing.size() < host_config.squad.recruiterListMin )
 	{
 		for ( rit = spares.begin(); outgoing.size() < host_config.squad.recruiterListMax && rit != spares.end(); ++rit )

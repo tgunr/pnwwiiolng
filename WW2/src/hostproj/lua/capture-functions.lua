@@ -77,22 +77,22 @@ local P = {
 	-- Maximum number of people we bother tabulating
 ,	maxCapContributors = 12
 	-- After max contributors, points is based on a target time
-,	minCaptureTime = 45
+,	minCaptureTime = 30
 	-- Table of target times for a given number of players
 ,	captureTimeTable =
 	{
-		360		-- 1 guy
-	,	225		-- 2
-	,	205		-- 3
-	,	186		-- 4
-	,	166		-- 5
-	,	148		-- 6
-	,	130		-- 7
-	,	112		-- 8
-	,	 94		-- 9
-	,	 77		-- 10
-	,	 61		-- 11
-	,	 45		-- 12
+		180		-- 1 guy
+	,	112		-- 2
+	,	102		-- 3
+	,	 93		-- 4
+	,	 83		-- 5
+	,	 74		-- 6
+	,	 65		-- 7
+	,	 56		-- 8
+	,	 47		-- 9
+	,	 38		-- 10
+	,	 30		-- 11
+	,	 30		-- 12
 	}
 }
 
@@ -343,17 +343,18 @@ end
 
 function P.ProgressRateForPlayers(players, side)
 	local totalCapTicks = 100 * host_config.capture.tickInterval_s
+	local progress = 0
 
 	-- No players, return the system uncap rate.
 	if players == 0 then
 		return totalCapTicks / P.autoUncapTime
 	end
 
-	local progress = totalCapTicks / P.captureTimeTable[players]
-
 	-- More than the max?
 	if players > P.maxCapContributors then
 		progress = totalCapTicks / P.minCaptureTime
+	else
+		progress = totalCapTicks / P.captureTimeTable[players]
 	end
 
 	return progress * P.ProgressScaleForSide(side)

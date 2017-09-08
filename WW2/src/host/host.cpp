@@ -92,6 +92,8 @@
 #include "wwii/wwiiSortieManager.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
+#include "teul/raknetConn.h"
+#include "weap/weapDefs.h"
 
 extern SINT32 hostInstallAllCallbacks();
 
@@ -127,12 +129,13 @@ UINT32 numVehiclesReported = 0;
 
 PLAYERS g_players;
 #include "include/configVars.h"
-static SINT32 _userConnections = 0;
 
 char hostname[32];
 UINT32 _stratHost = 0;
 
-SINT32 updateBcastSend = -1, updateBcastRecv = -1;
+static const SINT32 MAX_BUF_VEH_BROADCAST = 256;
+
+SINT32 updateBcastRecv = -1, updateBcastSend = -1;
 
 static UINT32				_personaCounter;
 static UINT32				_vehicleCounter;
@@ -1231,7 +1234,7 @@ _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const 
 	Player& player = *static_cast<Player*>(player_);
 
 	if ( player.m_antiHack == nullptr )
-		player.m_antiHack = new AntiHack;
+		player.m_antiHack = new SpeedhackCheck;
 
 	auto& ah = *player.m_antiHack;
 
@@ -1270,7 +1273,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN )
 		{
-			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d", teulIndex, error);
+			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d connCount:%d", teulIndex, error, Server::myServerInfo.m_players.size());
 			return;
 		}
 		else
@@ -1283,7 +1286,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN && teulIndex == player->teulIndex() )
 		{
-			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected", teulIndex, player->playerID(), player->callsign(), player->sortieID());
+			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected, userConn:%d", teulIndex, player->playerID(), player->callsign(), player->sortieID(), Server::myServerInfo.m_players.size());
 			player->SetTeulIndex(-1);
 		}
 		else
@@ -1301,7 +1304,7 @@ _acceptFunction(ENDPOINT& endpoint)
 {
 	dbugLog(_FLD, "t:%d incoming connection from %s:%hu conn#%d"
 					, endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort()
-					, ++_userConnections
+					, Server::myServerInfo.m_players.size()
 					);
 }
 
@@ -1392,8 +1395,6 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	}
 	else if ( error == ENOTCONN && teulIndex >= 0 )
 	{
-		_userConnections--;
-
 		wwiiPlayer* player = ServerInterface::LookupByTeulIndex(teulIndex);
 
 		if ( player != nullptr )
@@ -1402,7 +1403,7 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 						, teulIndex
 						, player->playerID()
 						, player->callsign()
-						, _userConnections
+						, Server::myServerInfo.m_players.size()
 						);
 			player->Release(teulIndex, Server::ReleaseType::EConn);
 		}
@@ -1410,7 +1411,7 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 		{
 			dbugLog(_FLI, "t:%d personaless connection closed, %d connections remaining"
 						, teulIndex
-						, _userConnections
+						, Server::myServerInfo.m_players.size()
 						);
 		}
 	}
@@ -1468,12 +1469,18 @@ hostAddVehicleToBroadcast(HostVehicle* vehicle, VEHICLE_UPDATE_HEADER* vh)
 	if ( vehicle->isReallyActive() == true )
 		vehHold.present |= PRX_REALLY_ACTIVE;
 
-	UCHAR buffer[256];
-	SINT32 offset = updtPackVehicleBroadcast(TEUL_PACK, buffer, 0, &vehHold, 0);
+	UCHAR buffer[MAX_BUF_VEH_BROADCAST];
+	SINT32 offset = sizeof(SINT32) * 8;  // save space for length
+	offset = updtPackVehicleBroadcast(TEUL_PACK, buffer, offset, &vehHold, 0);
 	if ( offset < 0 )
 	{
 		dbugLog(_FLA, "updtPackVehicleBroadcast failed: %d", offset);
 		return false;
+	}
+	
+	if ((offset/8) > (MAX_BUF_VEH_BROADCAST-1))
+	{
+		dbugLog(_FLA, "While constructing vehicle broadcast: WE WROTE INTO UNALLOCATED SPACE!!!!");
 	}
 
 	return hostSendVehicleBroadcast(buffer, offset);
@@ -1681,6 +1688,20 @@ _personaActivate(SINT32 teulIndex , PlayerStatusNode* psn)
 	activate.serverType = CELL_HOST;
 	activate.hostIP = Server::myServerInfo.stats.address;
 	activate.port = WWII::Net::Ports::CellHost;
+	
+	// If Netcode3 (raknet) is enabled, we need to tell the
+	// client how it can connect to use with NC2.
+	if (host_config.netcode3Enabled)
+	{
+		activate.teulIndex = (UINT32)teulIndex;
+		activate.playerID = player->playerID();
+		activate.otp = psn->dispatch().m_OTP;
+		ENDPOINT *ep = teulGetEndpoint(teulIndex);
+		if (ep != nullptr && ep->m_parent != nullptr && ep->m_parent->m_pairdUdpConn != nullptr)
+		{
+			memcpy(activate.pkey, ep->m_parent->m_pairdUdpConn->getPackedPublicKey(), sizeof(activate.pkey));
+		}
+	}
 
 	const SINT32 retval = wwiiSendActivate(teulIndex, &activate);
 	if ( PN_UNLIKELY(retval < 0) )
@@ -1969,7 +1990,10 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 {
 	_calculatePingTime(packet, player, pingOffset);
 
-	SINT32 retval = packet.send(player->teulIndex());
+	// If the player has netcode enhancements enabled, specify a UDP protocol preference
+	// once this netcode version (netcode3) is made permanent, the netcode flag will be used for the next version
+	// and this check will go away.
+	SINT32 retval = packet.send(player->teulIndex(), player->GetNetcode() ? PROTOCOL_UDP : PROTOCOL_UNDEF);
 	if ( retval >= 0 )
 	{
 		player->m_updatesFailed = 0;
@@ -2079,7 +2103,7 @@ _sendNextUpdate(HostVehicle* const vehicle)
 //		TIMER_REPORT(50)
 		return true;
 	}
-
+	
 	const size_t pingOffset = wu.packet->payloadSizeBytes();
 	wu.packet->append(teulClock64);
 #if defined(ENABLE_CELL_EVENTS)
@@ -2089,6 +2113,8 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		maxCounter = (UINT64)payloadSizeBytes;
 	}
 #endif
+
+	//--------------
 
 	// Track how many packets behind the connections are
 	UINT32 updatesBehind = 0;
@@ -2276,7 +2302,8 @@ _runHost()
 		}
 
 		// Send any cell-to-cell vehicle updates generated.
-		hostPushVehicleBroadcasts();
+		// Don't send these, it is subverting the collect and hold policy
+		//hostPushVehicleBroadcasts();
 
 		// For any sorties that have completed the spawning
 		// process, save off the data.
@@ -2587,9 +2614,7 @@ _releaseVehicle(VEHICLE_HOLDER* const vehicleHold, FULL_OBJ_ID toFacility)
 		}
 		else
 		{
-#ifdef NEW_BCODE
 			hostQueueVehicleRemove(index, vehicle->exitState);
-#endif
 
 			if ( _vehicleCounter > 0 )
 				_vehicleCounter--;
@@ -2998,7 +3023,7 @@ main(const int argc, const char* argv[])
 	wthrInitTime();
 
 	static const UINT32 ClientTimeoutTime_ms = 40 * 1000;
-	if ( !teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, _personaErrorFunction) )
+	if ( !teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, _personaErrorFunction, true) )
 		LogAbort("Unable to open tcp listen port %u", WWII::Net::Ports::CellHost);
 
 	strprintf(hostname, "cell%u", Server::localHost & 255);
@@ -3012,15 +3037,15 @@ main(const int argc, const char* argv[])
 	}
 	else if ( updateNet != 0 )
 	{
+		g_clustered = true;
+        
 		dbugLog(_FLM, "Clustering enabled: Broadcast network %s specified.", cv_baseUpdtAddress.GetString());
 
 		const UINT32 updateBcastHost = cv_baseUpdtAddress.GetUint32() | 0x000000ff;
-		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
+		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateCellBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
 		dbugLog(_FLN, "t:%d updateBcastRecv:%s", updateBcastRecv, teulGetAddress(updateBcastHost));
 
-		const UINT32 updateDirectHost = cv_baseUpdtAddress.GetUint32() | (Server::localHost & 0x000000ff);
-		updateBcastSend = teulOpenSend(updateDirectHost, WWII::Net::Ports::PrivateBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
-		dbugLog(_FLN, "t:%d updateBcastSend:%s", updateBcastSend, teulGetAddress(updateDirectHost));
+		updateBcastSend = updateBcastRecv;
 	}
 	else
 	{
@@ -3101,6 +3126,9 @@ main(const int argc, const char* argv[])
 		return 0;
 
 	chatSendAdminMessage("cell host #%u %s", Server::localHost & 255, (g_serverReserved ? "*RESERVED*" : "online"));
+
+	// inform other hosts that we are in need of updating
+	hostForceFirstTimeUpdates();
 
 	_runHost();
 

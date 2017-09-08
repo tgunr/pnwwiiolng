@@ -11,7 +11,9 @@
 // Warnings.xcconfig for information on why it looks like this.
 
 // Header search paths matching both #include <> and #include ""
-HEADER_SERACH_PATHS_17      = $(HEADER_SEARCH_PATHS_18) "$(DERIVED_SOURCES_DIR)"
+HEADER_SERACH_PATHS_19      = $(HEADER_SEARCH_PATHS_20) "$(DERIVED_SOURCES_DIR)"
+HEADER_SEARCH_PATHS_18      = $(HEADER_SEARCH_PATHS_19) "$(SRCROOT)/../Libraries/RakNet/DependentExtensions/cat/include"
+HEADER_SEARCH_PATHS_17      = $(HEADER_SEARCH_PATHS_18) "$(SRCROOT)/../Libraries/RakNet/Source"
 HEADER_SEARCH_PATHS_16      = $(HEADER_SEARCH_PATHS_17) "$(SRCROOT)/../Libraries/imap/include"
 HEADER_SEARCH_PATHS_15      = $(HEADER_SEARCH_PATHS_16) "$(SRCROOT)/../Libraries/libb64/libb64-1.2/include"
 HEADER_SEARCH_PATHS_14      = $(HEADER_SEARCH_PATHS_15) "$(SRCROOT)/../Libraries/libevent/OSX-Code"
@@ -32,6 +34,8 @@ HEADER_SEARCH_PATHS_01      = $(HEADER_SEARCH_PATHS_02) "$(SRCROOT)/../Libraries
 HEADER_SEARCH_PATHS         = $(inherited) $(HEADER_SEARCH_PATHS_01)
 
 // Search paths that only match #include "", not #include <>
+USER_HEADER_SEARCH_PATHS_21 = $(USER_HEADER_SEARCH_PATHS_22) "$(SRCROOT)/../Libraries/SteamSDK/public/steam"
+USER_HEADER_SEARCH_PATHS_20 = $(USER_HEADER_SEARCH_PATHS_21) "$(SRCROOT)/../Libraries/phui/include/js"
 USER_HEADER_SEARCH_PATHS_19 = $(USER_HEADER_SEARCH_PATHS_20) "$(SRCROOT)/../Libraries/imap/include"
 USER_HEADER_SEARCH_PATHS_18 = $(USER_HEADER_SEARCH_PATHS_19) "$(SRCROOT)/../Libraries/libxml2/include/libxml"
 USER_HEADER_SEARCH_PATHS_17 = $(USER_HEADER_SEARCH_PATHS_18) "$(SRCROOT)/../Libraries/glew/include"
@@ -62,9 +66,11 @@ FRAMEWORK_SEARCH_PATHS_01   = $(FRAMEWORK_SEARCH_PATHS_02) "$(SRCROOT)/lib/mac"
 FRAMEWORK_SEARCH_PATHS      = $(inherited) $(FRAMEWORK_SEARCH_PATHS_01)
 
 // Shared library search paths
-LIBRARY_SEARCH_PATHS_01     = $(LIBRARY_SEARCH_PATHS_02) "$(SRCROOT)/lib/mac"/**
+LIBRARY_SEARCH_PATHS_02     = $(LIBRARY_SEARCH_PATHS_03) "$(SRCROOT)/lib/mac"
+LIBRARY_SEARCH_PATHS_01     = $(LIBRARY_SEARCH_PATHS_02) "$(SRCROOT)/../Libraries/SteamSDK/redistributable_bin/osx32"
+
 
 LIBRARY_SEARCH_PATHS        = $(inherited) $(LIBRARY_SEARCH_PATHS_01)
 
 // Encode use of USER_HEADER_SEARCH_PATHS - this should be off but for now we need it.
-ALWAYS_SEARCH_USER_PATHS = YES
+ALWAYS_SEARCH_USER_PATHS = NO

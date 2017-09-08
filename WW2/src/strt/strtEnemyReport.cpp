@@ -113,21 +113,29 @@ static UINT8
 _effectiveCategory(const WEAPON_SERIAL& weapon)
 {
 	WEAPON* entry = weapLookup(weapon.spec);
-	if ( entry->alertDist <= 0 )
-		return 0;
-
-	if ( weapon.spec.wCategory == _GROUND_VEHICLE )
+	if (entry != nullptr)
 	{
-		// Non-tank ground vehicles behave as "ground units" and not armor
-		static WEAPON_SPEC tankSpec;
-		if ( (*(UINT32*)&tankSpec) == 0)
-			tankSpec = weapFindClass("tank");
+		if (entry->alertDist <= 0)
+			return _NO_CATEGORY;
 
-		if ( weapon.spec.wClass != tankSpec.wClass )
-			return _MUNITIONS;
+		if (weapon.spec.wCategory == _GROUND_VEHICLE)
+		{
+			// Non-tank ground vehicles behave as "ground units" and not armor
+			static WEAPON_SPEC tankSpec;
+			if ((*(UINT32*)&tankSpec) == 0)
+				tankSpec = weapFindClass("tank");
+
+			if (weapon.spec.wClass != tankSpec.wClass)
+				return _MUNITIONS;
+		}
+
+		return weapon.spec.wCategory;
 	}
-
-	return weapon.spec.wCategory;
+	else
+	{
+		dbugLog(_FLW, "Weapon spec " PRF_WEAPON_SPEC " not found in lookup.", PRA_WEAPON_SPEC(weapon.spec));
+		return _NO_CATEGORY;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////

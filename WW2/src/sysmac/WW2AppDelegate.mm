@@ -4,6 +4,7 @@
 #include "build_info.hpp"
 #import "WW2AppDelegate.h"
 #include "sysmain.h"
+#include "sys/sysSteam.h"
 #include "vars.h"
 #include "HID_Utilities.h"
 #include "HID_Queue_Utilities.h"
@@ -23,16 +24,12 @@
 #include "loclApp.h"
 #include "auth/authTypes.h"
 #include "auth/authAppIDs.h"
+#include "auth/authDefaults.h"
 #include <netdb.h>
 #include <arpa/inet.h>
-#include "sysLaunchURL.h"
 #import <HockeySDK/HockeySDK.h>
 
 #define PLAYGATE_VERSION 0x01010109
-
-//#define DEFAULT_AUTH_SERVER "auth.playnet.com"
-#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
-#define DEFAULT_AUTH_PORT WWII::Net::Ports::AuthHost
 
 static void xmlerrorstub (void *ctx, const char *msg, ...) {}
 static void xmlstructurederrorstub(void *userData, xmlErrorPtr error) {}
@@ -541,6 +538,86 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    if (!mngoptParse()) {
+        [NSApp terminate:self];
+        return;
+    }
+    
+    // Wipe out any storage of insecure user info.
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserName"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserPassword"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_RememberUserPassword"];
+    
+    xmlSetGenericErrorFunc(0,xmlerrorstub);
+    xmlSetStructuredErrorFunc(0,xmlstructurederrorstub);
+    
+    chAppDir();
+    
+    // Setup the user data path
+    fioInit();
+    
+    fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
+    
+    if(!WantDataDir) {
+        extern void sysmainAddArchives();
+        sysmainAddArchives();
+    }
+    
+    cfgPrefsLoad();
+    
+    // For complex reasons, we need to call mngoptParse() again here. See the
+    // Windows sysmain.cpp file for details.
+    if (!mngoptParse()) {
+        [NSApp terminate:self];
+        return;
+    }
+    
+    // Skip all the auth stuff if we already have an IP as defined by a ticket file
+    // By the way, the only way to check that is the ticket file itself since that
+    // won't have been parsed yet at this point.
+    // Or, if we're only here to build MDLs.
+    // This is only allowed in debug.
+#ifdef DEBUG_WW2
+    if(DebugBuildingMDLFilesOnly || TicketFile[0]) {
+        state = WAIT_APPLE_EVT;
+        [self launchOffline:self];
+        return;
+    }
+#endif
+    
+    if (!InitSteam()) {
+        // abort
+        [NSApp terminate:self];
+        return;
+    }
+    
+    // HACK - I know there must be better ways to deal with this but this is the simplest way I know
+    // to allow steam Mac users to modify settings outside of the game.  This class in general should be
+    // re-written in the future so I don't see a good reason to come up with a better solution now.
+    if (LaunchSettingsOnly) {
+        [self openSettings:self];
+        return;
+    }
+    
+    if (!gAuthServer[0]) {
+        strsafecpy(gAuthServer, DEFAULT_AUTH_SERVER);
+    }
+    authServer = @(gAuthServer);
+    
+    if (!gAuthServerPort[0]) {
+        strprintf(gAuthServerPort, "%hu", DEFAULT_AUTH_PORT);
+    }
+    authPort = std::stoul(gAuthServerPort);
+    
+    if (UseSteamLogin) {
+        state = WAIT_APPLE_EVT;
+        [self launchOffline:self];
+        return;
+    }
+    
+    
+    [launcherWindow setIsVisible:true];
+    
     // This sequence depends on certain implementation details of the
     // BITCrashManager - in particular, that report metadata is processed
     // synchronously during -startManager, that -userIDForHockeyManager is
@@ -556,47 +633,16 @@ extern NSString *WebActionOriginalURLKey;
     [BITHockeyManager sharedHockeyManager].disableFeedbackManager = YES;
     [BITHockeyManager sharedHockeyManager].crashManager.autoSubmitCrashReport = YES;
     [[BITHockeyManager sharedHockeyManager] startManager];
-    // This should no longer be needed, so try to maintain the "not logged in
-    // yet" state if we should crash before the next login.
-    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
     
 #ifdef DEBUG_WW2
     dbugInit(LogMode::TO_FILE, nullptr);
 #else
     dbugInit(LogMode::OFF, nullptr);
 #endif
-
-    // Wipe out any storage of insecure user info.
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserName"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserPassword"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_RememberUserPassword"];
     
-    xmlSetGenericErrorFunc(0,xmlerrorstub);
-    xmlSetStructuredErrorFunc(0,xmlstructurederrorstub);
-    
-    chAppDir();
-    
-    fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
-    
-    if(!WantDataDir) {
-        extern void sysmainAddArchives();
-        sysmainAddArchives();
-    }
-    
-    cfgPrefsLoad();
-    
-    // Skip all the auth stuff if we already have an IP as defined by a ticket file
-    // By the way, the only way to check that is the ticket file itself since that
-    // won't have been parsed yet at this point.
-    // Or, if we're only here to build MDLs.
-    // This is only allowed in debug.
-#ifdef DEBUG_WW2
-    if(DebugBuildingMDLFilesOnly || TicketFile[0]) {
-        state = WAIT_APPLE_EVT;
-        [self launchOffline:self];
-        return;
-    }
-#endif
+    // This should no longer be needed, so try to maintain the "not logged in
+    // yet" state if we should crash before the next login.
+    [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"WW2.lastSuccessfulUsername"];
     
     //  g_buildTerrain = 1;
     
@@ -610,14 +656,7 @@ extern NSString *WebActionOriginalURLKey;
     [self loadUserNamePassword];
     [userNameField setDelegate:self];
     [passwordField setDelegate:self];
-    
     [self updateLoginEnabled];
-    
-    authServer = [NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding];
-    if (gAuthServer[0]) {
-        authServer = [[NSString alloc] initWithUTF8String:gAuthServer];
-    }
-    authPort = DEFAULT_AUTH_PORT;
     
     NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
     style.alignment = NSCenterTextAlignment;
@@ -642,14 +681,15 @@ extern NSString *WebActionOriginalURLKey;
     // But just so ya know, auth CAN provide it.
     arenaLoadingIndicator.hidden = YES;
     [arenaMenu.menu removeAllItems];
-#if DEV_BUILD
+#if defined(DEV_BUILD) || defined(BETA_RELEASE)
     // Developers get a build which lets you pick an arbitrary arena ID. This
     // bit will go away once we've implemented having auth tell us what arenas
     // are available.
     [arenaMenu.menu addItemWithTitle:@"LIVE (1)" action:nullptr keyEquivalent:@""].tag = 1;
     [arenaMenu.menu addItemWithTitle:@"TRAINING (22)" action:nullptr keyEquivalent:@""].tag = 22;
     [arenaMenu.menu addItemWithTitle:@"BETA (222)" action:nullptr keyEquivalent:@""].tag = 222;
-    [arenaMenu.menu addItemWithTitle:@"DEV (250)" action:nullptr keyEquivalent:@""].tag = 250;
+    [arenaMenu.menu addItemWithTitle:@"DEV 4 (101)" action:nullptr keyEquivalent:@""].tag = 101;
+    [arenaMenu.menu addItemWithTitle:@"DEV 1 (250)" action:nullptr keyEquivalent:@""].tag = 250;
     [arenaMenu selectItemWithTag:1];
     arenaMenu.enabled = YES;
 #else
@@ -1085,11 +1125,10 @@ extern NSString *WebActionOriginalURLKey;
         
         if (hostAddress != 0) {
             if (! isteulInitialized) {
-                ww2::Client::Init();
-                
+                ww2::Client::InitTeul();                
 #ifdef DEBUG_WW2
-                dbugSetWriteLevel(Debug::ERR_DBUG);
-                dbugSetLogLevel(Debug::ERR_DBUG);
+                dbugSetWriteLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
+                dbugSetLogLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
 #else
                 dbugSetWriteLevel(Debug::ERR_ABORT);
                 dbugSetLogLevel(Debug::ERR_ABORT);
@@ -1115,6 +1154,7 @@ extern NSString *WebActionOriginalURLKey;
     arenaRequest.arenaID	= arena;
     arenaRequest.sessionID 	= static_cast<UINT32>(session);
     arenaRequest.infoOnly	= 0;
+    
     /*
      int vers[4] = {0,0,0,0};
      
@@ -1330,6 +1370,10 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     cfgPrefsLoad();
     [launcherWindow endSheet:configWindow returnCode:NSModalResponseCancel];
+    
+    if (LaunchSettingsOnly) {
+        [NSApp terminate:self];
+    }
 }
 
 -(IBAction)doOK:(id)sender
@@ -1389,6 +1433,11 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     saveJoystickCalibration();
     
     [launcherWindow endSheet:configWindow returnCode:NSModalResponseOK];
+    
+    if (LaunchSettingsOnly) {
+        [NSApp terminate:self];
+    }
+
 }
 
 -(IBAction)joyChanged:(id)sender
@@ -1890,9 +1939,5 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     [[NSApplication sharedApplication] orderFrontStandardAboutPanelWithOptions:aboutDict];
 }
 
-@end
 
-LOGICAL syslaunchurl(const char* url, LOGICAL local)
-{
-    return TRUE;
-}
+@end

@@ -27,6 +27,8 @@ protected:
 	UINT32				m_playerID;
 	UINT32				m_personaID;
 	UINT32				m_squadID;
+	UINT8				m_updateMode;
+	bool				m_netcode;
 
 	UINT32				m_brigadeID;		//! Current brigade, if they are in one, or 0.
 	UINT32				m_missionID;		//! Current mission, if they are on one, or 0.
@@ -34,17 +36,15 @@ protected:
 
 	UINT16				m_weaponSpecNo;	//! If the player has a weapon, this is it's spec.
 
-#pragma pack(push, 1)
-	WWII_SIDE			m_side : 8;		//! So we can tell which side when no country is selected.
-	WWII_COUNTRY		m_country : 8;		//! Current country.
-	BRANCH_ENUM			m_branch : 8;		//! Which branch they're currently in.
 
-	RANK_NO				m_maxRank;			//! Max game-rank granted by subscription
-	RANK_NO				m_maxSquadRank;	//! Max squad-rank granted by subscription
-	RANK_NO				m_realRank;		//! Rank player would have if no limit imposed.
-	RANK_NO				m_realSquadRank;	//! Squad-rank player would have if no limit imposed.
-#pragma pack(pop)
+    WWII_SIDE           m_side;             //! So we can tell which side when no country is selected.
+    WWII_COUNTRY        m_country;          //! Current country.
+    BRANCH_ENUM         m_branch;           //! Which branch they're currently in.
 
+    RANK_NO             m_maxRank;          //! Max game-rank granted by subscription
+    RANK_NO             m_maxSquadRank;     //! Max squad-rank granted by subscription
+    RANK_NO             m_realRank;         //! Rank player would have if no limit imposed.
+    RANK_NO             m_realSquadRank;    //! Squad-rank player would have if no limit imposed.
 public:
 	ChatHandle			m_chatHandle;
 	ChatHandle			m_matchHandle;
@@ -129,6 +129,9 @@ public:
 	bool isPlaynet() const { return this->permissions(IS_PLAYNET); }
 	bool isTrainer() const { return this->permissions(GAME_TRAINER); }
 
+	bool GetNetcode() { return m_netcode; }
+	UINT8 GetUpdateMode() { return m_updateMode; }
+
 	virtual bool message(int prefix, int msgid, const char* const p0="", const char* const p1="", const char* const p2="", const char* const p3="", const char* const p4="", const char* const p5="") const;
 	bool message(int prefix, int msgid, const std::string& text) const { return message(prefix, msgid, text.c_str()); }
 	virtual bool message(const Chat::LocalizedMessage& lmsg) const;
@@ -158,6 +161,9 @@ protected:
 public:	///TODO:INST make me protected
 	virtual void ExitBrigade(UINT32 /*exitState*/) { m_brigadeID = 0; }
 	virtual void SetCountry(WWII_COUNTRY toCountry, WWII_SIDE toSide);
+
+	void SetNetcode(bool netcode) { m_netcode = netcode; }
+	void SetUpdateMode(UINT8 updateMode) { m_updateMode = updateMode; }
 
 public:
 	void setDisconnected() { m_teulIndex = -1; }

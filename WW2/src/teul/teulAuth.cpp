@@ -121,7 +121,7 @@ SINT32 authGameInit(UINT32 gameHost, UINT32 extHost, UINT16 gamePort
 	if ( !useAuthServer )
 		return 0;
 
-	_authConnection = _openSend(appID, Server::myServerInfo.stats.arenaID, hostVersion, authHost, authPort, gameHost, extHost, gamePort, maxUsers);
+	_authConnection = _openSend(appID, Server::myServerInfo.stats.arenaID, hostVersion, authHost, authPort, extHost, extHost, gamePort, maxUsers);
 	if ( _authConnection < 0 )
 	{
 		dbugWrite(_FLA, "couldn't open auth connection err:%d", _authConnection);
@@ -363,12 +363,6 @@ authAcceptPlayer(const SINT32 teulIndex, const playerid_t playerIP, PLAYER_LOGIN
 	if ( !useAuthServer || _sendNotice == false || retval < 0 )
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s otp:%u validated", teulIndex, dispatch.m_customerID, dispatch.m_callsign, dispatch.m_OTP);
-		return retval;
-	}
-
-	if ( memcmp(dispatch.m_callsign,"CRS",3) == 0 )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s otp:%u staff-validated", teulIndex, dispatch.m_customerID, dispatch.m_callsign, dispatch.m_OTP);
 		return retval;
 	}
 

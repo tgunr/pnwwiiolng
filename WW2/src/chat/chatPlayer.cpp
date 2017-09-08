@@ -1438,9 +1438,22 @@ Player::SetPreference(UINT32 prefId, UINT32 request, bool fromClient)
 	switch ( prefId )
 	{
 	case CPR_UPDATE_MODE:
-		dbugLog(_FLD, "t:%d p:%u c:%s updateMode:%u req:%u"
-						, teulIndex(), playerID(), callsign()
-						, value, request);
+	{
+		if (fromClient)
+		{
+			dbugLog(_FLD, "t:%d p:%u c:%s updateMode from Client:%u req:%u"
+				, teulIndex(), playerID(), callsign()
+				, value, request);
+			chatSendBandwidthNotice(*this, (UINT32)value);
+		}
+		else
+		{
+			dbugLog(_FLD, "t:%d p:%u c:%s updateMode response from cell host:%u req:%u"
+				, teulIndex(), playerID(), callsign()
+				, value, request);
+			SetUpdateMode(value);
+		}
+	}
 	break;
 	case CPR_IS_RECRUITING:
 		if ( squadID() )
@@ -1460,6 +1473,24 @@ Player::SetPreference(UINT32 prefId, UINT32 request, bool fromClient)
 							value, playerID());
 			chatSendMapPersonaUpdate(playerID(), false, 0, 0, true, value);
 		}
+	break;
+	case CPR_SET_NETCODE:
+	{
+		if (fromClient)
+		{
+			dbugLog(_FLD, "t:%d p:%u c:%s netcode from Client:%u req:%u"
+				, teulIndex(), playerID(), callsign()
+				, value, request);
+			SetNetcode(value);
+			chatSendNetcodeNotice(*this, (UINT32)value);
+		}
+		else
+		{
+			dbugLog(_FLD, "t:%d p:%u c:%s netcode response from cell host:%u req:%u"
+				, teulIndex(), playerID(), callsign()
+				, value, request);
+		}
+	}
 	break;
 	default:
 	break;
@@ -1538,6 +1569,7 @@ Player::SetSpawned(bool newValue)
 
 		// If they have a non-zero update mode, then update their vis mode
 		chatSendBandwidthNotice(*this, getPreference(CPR_UPDATE_MODE));
+		chatSendNetcodeNotice(*this, getPreference(CPR_SET_NETCODE));
 
 		if ( m_snoopBy != nullptr )
 		{

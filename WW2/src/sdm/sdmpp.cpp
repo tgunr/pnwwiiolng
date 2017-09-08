@@ -21,7 +21,7 @@
 #include "sdm/sdmParse.h"
 #include "include/defs.h"
 
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 
 static FILE* man;
 const char* program = "sdmpp";

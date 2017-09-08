@@ -108,7 +108,7 @@ struct LoginRequest
 		a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_platform, 8);
 		return a->offset;
 	}
-	// Host: Log the guy in.
+	// Host: Log the player in.
 	SINT32 process(SINT32 teulIndex);
 	// Client: Send this request
 	void send();

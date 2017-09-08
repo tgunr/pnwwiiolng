@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: April 17 2002
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -21,7 +21,7 @@
 #include "wwii/wwiiFullObjID.h"
 #include "fio/fio.h"
 #include "wwii/wwiiUTF.h"
-
+#include "wwii/wwiiBackChannel.h"
 #include "teul/teulConnection.h"
 
 #include "client/GameClient.h"
@@ -167,6 +167,7 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 		_updatesSent = 0;
 		break;
 	case CELL_HOST:
+		wwiiBackChannelConnect(activate.teulIndex, teulGetAddress(maskedAddr), activate.port, a->teulIndex, activate.playerID, activate.otp, reinterpret_cast<char *>(activate.pkey));
 		clientActivateCell(a->teulIndex, TRUE, maskedAddr, activate.port);
 		_updatesSent = 0;
 		break;

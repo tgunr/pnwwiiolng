@@ -116,6 +116,8 @@ extern SINT8			ServerApID[64];		// program apId
 extern SINT8			ServerData[64];		// data passed from auth server
 extern SINT8			ServerProtocol[64]; // connection protocol
 extern SINT8			BypassString[64];
+extern LOGICAL          LaunchSettingsOnly; // stand-alone settings (for mac initially)
+extern LOGICAL			UseSteamLogin;
 extern LOGICAL			WantedUserLogEnabled;	// If the user wants the log enabled
 extern SCHAR			WantedVideoCard[64];// desired video card name
 extern SCHAR			WantedVideoResolution[32];// desired video resolution
@@ -159,8 +161,9 @@ extern LOGICAL          WantCombatSmoke;    // emersive smoke from damaged build
 extern SINT32           g_updateReflectionRate; // 0 - 5 seconds
 extern SINT32           g_iNumBullets;      // Limit to number of displayable bullets.
 extern SINT32           g_iAmbLevel;        // Frequent = 1; Infrequent = 2; Never = 0;
-extern SINT32           g_iVisiblePlayerLimit; // 1 = low 2 = medium 3 = high
+extern SINT32           g_iVisiblePlayerLimit; // 0 = very low, 1 = low, 2 = medium, 3 = high, 4 = very high
 extern SINT32           g_useNetworkRoute;    // 0, 1, 2 (auto/primary/secondary)
+extern LOGICAL          g_wantNetcode;        // true = netcode X enabled
 
 extern SINT32			g_iFSSASamples; 	// 0 = off, 2,4,6,8 (Mac OS X only currently)
 extern LOGICAL			g_bFSSAHighQuality; // enable high quality FSAA hinting (Mac OS X only currently) XXXX
@@ -280,6 +283,7 @@ extern UINT32			CurrentConv; // Current airplane gun convergence setting
 
 extern FLOAT32			aimMouse;	// Aiming mouse sensitivity
 extern SINT8            gAuthServer[128]; // Authentication server to be used
+extern SINT8            gAuthServerPort[64];
 extern SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 extern SINT8            gClientV[32]; // Version to submit
 

@@ -13,7 +13,6 @@ SET out=diff
 .\Assets\xdelta3 -e -f -9 -s "%src%\playarc08.ww2" "%dst%\playarc08.ww2" "%out%\playarc08.ww2.patch"
 .\Assets\xdelta3 -e -f -9 -s "%src%\playarc09.ww2" "%dst%\playarc09.ww2" "%out%\playarc09.ww2.patch"
 .\Assets\xdelta3 -e -f -9 -s "%src%\playarc10.ww2" "%dst%\playarc10.ww2" "%out%\playarc10.ww2.patch"
-.\Assets\xdelta3 -e -f -9 -s "%src%\playarc11.ww2" "%dst%\playarc11.ww2" "%out%\playarc11.ww2.patch"
 .\Assets\xdelta3 -e -f -9 -s "%src%\ww2.exe"       "%dst%\ww2.exe"       "%out%\ww2.exe.patch"
 .\Assets\xdelta3 -e -f -9 -s "%src%\playgate.exe"  "%dst%\playgate.exe"  "%out%\playgate.exe.patch"
 .\Assets\xdelta3 -e -f -9 -s "%src%\license.rtf"   "%dst%\license.rtf"   "%out%\license.rtf.patch"

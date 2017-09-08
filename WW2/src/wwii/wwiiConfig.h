@@ -39,6 +39,7 @@ struct cfARENA
 	FLOAT32	speedHackRatio;			//!< Maximum drift tolerance.
 	UINT16	despawnTime_s;			//!< Seconds to wait before despawning
 	char	mobileSpawnWaypoint[MAX_HANDLE_SIZE];
+	UCHAR	allowDirectSpawn;		//!< Should we allow direct spawning (Multi-Client)
 };
 
 struct cfBALANCE
@@ -251,8 +252,9 @@ struct	WWII_CONFIG
 	cfSUPPLY	supply;
 	cfTHROTTLE	throttle;
 	cfUPDATE	update;
-
 	cfWEATHER	weather;
+
+	UCHAR       netcode3Enabled;
 };
 #pragma pack(pop)
 

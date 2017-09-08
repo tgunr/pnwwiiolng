@@ -1126,9 +1126,6 @@ main(int argc, const char* argv[])
 #if defined(SIGINT)
 	signal(SIGINT, _shutdown);
 #endif
-#if defined(SIGHUP)
-	signal(SIGHUP, _shutdown);
-#endif
 #if defined(SIGUSR1)
 	signal(SIGUSR1, _handleSIGUSR1);
 #endif

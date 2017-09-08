@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides access to the socket
 // functions used by the teul API. The end-user developer
 // should never need the functions provided here.
@@ -103,6 +103,7 @@ struct POLL_STRUCT
 	nfds_t		m_size;
 	nfds_t		m_count;
 };
+const size_t POLL_STRUCT::CAPACITY;
 static POLL_STRUCT pollData;
 #endif
 
@@ -127,7 +128,8 @@ struct DATA_GRAM
 {
 	struct sockaddr_in	sockAddress;
 	Teul::PacketHeader*	contents;	//!< Points to the beginning of the packet data.
-	UINT32				m_size;		//!< Size of the entire object.
+	UINT32				m_size;		//!< Size of the entire object (might be smaller than allocated size)
+	UINT32				m_reqSize;	//!< Original requested size of bucket
 };
 
 #include <stack>
@@ -181,7 +183,8 @@ teulGetDatagram(const UINT32 size)
 	DATA_GRAM* gram = _getNextDatagram(size);
 	// Point contents to memory immediately AFTER the gram header.
 	gram->contents = (Teul::PacketHeader*)(gram + 1);
-	gram->m_size = size;		// The actual requested size.
+	gram->m_size = size;		// The actual size (for now size requested)
+	gram->m_reqSize = size;		// The actual requested size.
 
 	return gram;
 }
@@ -192,7 +195,7 @@ teulGetDatagram(const UINT32 size)
 void
 teulReleaseDatagram(DATA_GRAM* gram)
 {
-	size_t allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(gram->m_size);
+	size_t allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(gram->m_reqSize);
 	if (PN_LIKELY(allocSize <= s_freeDatagrams.size() * DATAGRAM_ROUNDING))
 		s_freeDatagrams[(allocSize / DATAGRAM_ROUNDING) - 1].push(gram);
 	else
@@ -382,7 +385,10 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		getsockname(newSock, (sockaddr*)&newEndpoint->localSockAddress, &len);
 		assert( len == SockAddrLen );
 
+		// endpoints created inherit the parents backchannel
+		newEndpoint->m_pairdUdpConn = endpoint.m_pairdUdpConn;
 		newEndpoint->fromSockAddress = endpoint.fromSockAddress;
+
 		// If we only have a partial address, use the local address to fill it out.
 		static const UINT32 netMask = 0x00ffffff;
 		if ( (newEndpoint->fromSockAddress.sin_addr.s_addr & netMask) == 0 )
@@ -629,7 +635,7 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 		// ignore packets we broadcast..
 		if ( endpoint.protocol == PROTOCOL_UDB && (dgram->sockAddress.sin_addr.s_addr & 0xff000000) == (Server::myInterface.addr[0].naddr & 0xff000000) )
 		{
-			dbugWrite(_FLI, "ignoring packet from %s!", teulGetAddress(ntohl(dgram->sockAddress.sin_addr.s_addr)) );
+			dbugWrite(_FLD, "ignoring packet from %s!", teulGetAddress(ntohl(dgram->sockAddress.sin_addr.s_addr)) );
 			continue;
 		}
 		else
@@ -640,13 +646,21 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 			++packets;
 
 			const UINT32 dgramSize = hdr->packetSizeBytes() + Teul::Packet::UnencryptedBytes;
-			assert( (SINT32)dgramSize == (SINT32)rxSize );
+			if (dgramSize == (UINT32)rxSize)
+			{
+				dgram->m_size = dgramSize;
 
-			dgram->m_size = dgramSize;
-
-			endpoint.m_impl->recvQueue.push_back(dgram);
-//			dbugWrite(_FLI, " pushed %p to %p ", dgram, endpoint.m_impl->recvDataQue);
-			dgram = nullptr;
+				endpoint.m_impl->recvQueue.push_back(dgram);
+				dgram = nullptr;
+			}
+			else
+			{
+				dbugLog(_FLW, "Received datagram from %s for packet of size %d where the size indicated was %u, ignoring!!!",
+					teulGetAddress(ntohl(dgram->sockAddress.sin_addr.s_addr)),
+					rxSize,
+					dgramSize);
+				break;
+			}
 		}
 
 	}
@@ -1087,88 +1101,108 @@ _pollSocketsInner(TeulTimeMS remainder)
 		return;
 	}
 
-	// Wait for some network activity and then check all the endpoints.
-	DWORD waitMessage = WSAWaitForMultipleEvents(eventHandles.size(), &eventHandles[0], FALSE, static_cast<DWORD>(remainder), FALSE);
-	if ( waitMessage == WSA_WAIT_TIMEOUT || waitMessage == WSA_WAIT_FAILED )
-	{
-		return;
-	}
+#if defined(MULTI_CLIENT)
+	int segments = (eventHandles.size() / WSA_MAXIMUM_WAIT_EVENTS) + 1;
+	DWORD tWait = static_cast<DWORD>(remainder / segments);
+	int eventOffset = 0;
+	for (size_t eventOffset = 0; eventOffset < eventHandles.size(); eventOffset += WSA_MAXIMUM_WAIT_EVENTS) {
+#else 
+	DWORD tWait = static_cast<DWORD>(remainder);
+	size_t eventOffset = 0;
+#endif
 
-	WSANETWORKEVENTS eventData;
-	it = idleEndpoints.begin();
-	for (; g_idleInstance == idleInstance && it != idleEndpoints.end(); )
-	{
-		ABORT_IF( *it == nullptr );
-		ENDPOINT& endpoint = *(*it);
-		++it;
-
-		const int enumErr = WSAEnumNetworkEvents(endpoint.socket, endpoint.eventObject, &eventData);
-		if ( enumErr != 0 )
+		// Wait for some network activity and then check all the endpoints.
+		const size_t sizeEvents = std::min(static_cast<size_t>(WSA_MAXIMUM_WAIT_EVENTS),
+			(eventHandles.size() - eventOffset));
+		DWORD waitMessage = WSAWaitForMultipleEvents(sizeEvents, &eventHandles[eventOffset], FALSE, tWait, FALSE);
+		if (waitMessage == WSA_WAIT_TIMEOUT || waitMessage == WSA_WAIT_FAILED)
 		{
-			dbugLog(_FLD, "Aborting, error returned from WSAEnumNetworkEvents %d", enumErr);
+#if defined(MULTI_CLIENT)
 			continue;
+#else
+			return;
+#endif
 		}
 
-		if( eventData.lNetworkEvents & FD_CONNECT )
+		WSANETWORKEVENTS eventData;
+		it = idleEndpoints.begin();
+		for (; g_idleInstance == idleInstance && it != idleEndpoints.end(); ++it)
 		{
-			if ( !_endpointFDConnect(endpoint, eventData) )
+			ABORT_IF(*it == nullptr);
+			ENDPOINT& endpoint = *(*it);
+
+			const int enumErr = WSAEnumNetworkEvents(endpoint.socket, endpoint.eventObject, &eventData);
+			if (enumErr != 0)
 			{
+				dbugLog(_FLD, "Aborting, error returned from WSAEnumNetworkEvents %d", enumErr);
 				continue;
 			}
-		}
 
-		if ( (eventData.lNetworkEvents & FD_WRITE) != 0 )
-		{
-			endpoint.setWritesPending(false);
-		}
-
-		if( (eventData.lNetworkEvents & (FD_READ | FD_OOB)) != 0 )
-		{
-			const SINT32 theErr = _recvDatagram(endpoint);
-			if ( theErr < 0 )
+			if (eventData.lNetworkEvents & FD_CONNECT)
 			{
-				const SINT32 errNo = dbugGetErrno();
-				if ( errNo != 0 )
+				if (!_endpointFDConnect(endpoint, eventData))
 				{
-					const bool notCompleteYet = (errNo == PLAT_EINTR) | (errNo == PLAT_EAGAIN) | (errNo == PLAT_EWOULDBLOCK);
-					if (notCompleteYet)
-					{
-						dbugSetErrno(0);	// Not important.
-					}
-					else
-					{
-						dbugLog(_FLI, "t:%d recv error:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), errNo, teulClock64);
-						teulClose(endpoint, Teul::Closing::RcvDgramError);
-					}
 					continue;
 				}
 			}
-		}
-		else if( eventData.lNetworkEvents & FD_ACCEPT )
-		{
-			if ( endpoint.protocol != PROTOCOL_TCP ) // && endpoint->protocol != CMD )
+
+			if ((eventData.lNetworkEvents & FD_WRITE) != 0)
 			{
-				dbugLog(_FLA, "t:%d received accept for ilegal protocol %d", endpoint.teulIndex(), endpoint.protocol);
+				endpoint.setWritesPending(false);
+			}
+
+			if ((eventData.lNetworkEvents & (FD_READ | FD_OOB)) != 0)
+			{
+				const SINT32 theErr = _recvDatagram(endpoint);
+				if (theErr < 0)
+				{
+					const SINT32 errNo = dbugGetErrno();
+					if (errNo != 0)
+					{
+						const bool notCompleteYet = (errNo == PLAT_EINTR) | (errNo == PLAT_EAGAIN) | (errNo == PLAT_EWOULDBLOCK);
+						if (notCompleteYet)
+						{
+							dbugSetErrno(0);	// Not important.
+						}
+						else
+						{
+							dbugLog(_FLI, "t:%d recv error:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), errNo, teulClock64);
+							teulClose(endpoint, Teul::Closing::RcvDgramError);
+						}
+						continue;
+					}
+				}
+			}
+			else if (eventData.lNetworkEvents & FD_ACCEPT)
+			{
+				if (endpoint.protocol != PROTOCOL_TCP) // && endpoint->protocol != CMD )
+				{
+					dbugLog(_FLA, "t:%d received accept for ilegal protocol %d", endpoint.teulIndex(), endpoint.protocol);
+					continue;
+				}
+
+				if (endpoint.state() != IS_LISTENING)
+				{
+					dbugLog(_FLA, "t:%d received accept on non listening endpoint", endpoint.teulIndex());
+					continue;
+				}
+
+				_acceptConnectTCP(endpoint);
+			}
+			else if (eventData.lNetworkEvents & FD_CLOSE)
+			{
+				dbugLog(_FLI, "t:%d close code:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), eventData.iErrorCode[FD_CLOSE_BIT], teulClock64);
+				teulClose(endpoint, Teul::Closing::FDClose);
 				continue;
 			}
 
-			if ( endpoint.state() != IS_LISTENING)
-			{
-				dbugLog(_FLA, "t:%d received accept on non listening endpoint", endpoint.teulIndex());
-				continue;
-			}
-
-			_acceptConnectTCP(endpoint);
-		}
-		else if( eventData.lNetworkEvents & FD_CLOSE )
-		{
-			dbugLog(_FLI, "t:%d close code:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), eventData.iErrorCode[FD_CLOSE_BIT], teulClock64);
-			teulClose(endpoint, Teul::Closing::FDClose);
-			continue;
+			_routeCALLBACKs(endpoint);
 		}
 
-		_routeCALLBACKs(endpoint);
+#if defined(MULTI_CLIENT)
 	}
+#endif
+
 }
 #endif
 

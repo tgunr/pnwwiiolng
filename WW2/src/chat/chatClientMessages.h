@@ -24,8 +24,9 @@ void chatTargetSelection(const struct FULL_OBJ_ID id);
 
 FULL_OBJ_ID chatGetTargetSelection();
 
-//Tells the chat host what update mode the client has selected
+//Tells the chat host what update mode and netcode the client has selected
 SINT32 chatSendModeNotice(SINT32 teulIndex, UCHAR updateMode);
+SINT32 chatSendNetcodeNotice(SINT32 teulIndex, bool netcode);
 
 //This function tunes the client's radio Index to the channel indicated by
 //	channelID

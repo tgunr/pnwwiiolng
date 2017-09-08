@@ -5,6 +5,7 @@
 
 //#define _WIN32_WINNT	0x0400
 #include <stdarg.h>
+#include "sys/sysAntihack.h"
 #include "sys/sysreg.h"
 #include "resource.h"
 #include "pi/pi.h"
@@ -13,6 +14,7 @@
 #include "rn/rnlogo.h"
 #include "sysmain.h"
 #include "systhread.h"
+#include "sysSteam.h"
 #include "sn/sndsSoundControl.h"
 #include "gmlp/gmlpmain.h"
 #include "fio/fio.h"
@@ -28,6 +30,7 @@
 #include "locl/loclApp.h"
 #include "sn/sndsSoundTypes.h"
 #include "build_info.hpp"
+#include "auth/authDefaults.h"
 
 #ifdef CRASH_HANDLER
 #include "sys/crashhandler.h"
@@ -669,8 +672,9 @@ char GetOSBuild()
 	return getVersionInfo().build;
 }
 
+
 // This is the actual winmain
- int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	int		x, y, w, h, wh, xy;
 	int		bpp, hdw, stencil, wnd;
@@ -680,9 +684,13 @@ char GetOSBuild()
 	// Pull in the commandline arguments early so that builds
 	// which rely upon a DataPath being set will have it for
 	// use in cfgPrefsLoad(), and so OpenConsole is available now
-	if (!mngoptParse("")) {
+	if (!mngoptParse()) {
 		return 0;
 	}
+
+	// We may need to restart if this is a Steam version that wasn't launched properly.
+	if ( !InitSteam() )
+		return 0;
 
 #if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
 	dbugInit(LogMode::TO_FILE, "wwiiClient");
@@ -733,6 +741,8 @@ char GetOSBuild()
 	_unlink("ww2exit.log");
 	_unlink("ww2stat.log");
 
+	NetFrameSync::InitializeHashes();
+
 	WantedWidth = GetSystemMetrics(SM_CXSCREEN);
 	WantedHeight = GetSystemMetrics(SM_CYSCREEN);
 	WantedBpp = TEX_BPP;
@@ -742,7 +752,8 @@ char GetOSBuild()
 	WantedWindow = FALSE;
 #ifdef DEBUG_WW2
 	WantedUserLogEnabled = TRUE;
-	WantDataDir = TRUE;
+	//TBD: Disabled for now, force debug clients to specify so we can use it for QA testing.
+	//WantDataDir = TRUE;
 	HasKeyFile = TRUE;
 #elif RELEASE_CLIENT == 0 && defined(BETA_RELEASE)
 	WantedUserLogEnabled = FALSE;
@@ -813,9 +824,17 @@ char GetOSBuild()
 	// Command line options always override configuration file values
 	// But since we needed to parse these above also, the eaiest way
 	// around the chicken-and-egg problem is to just do this twice.
-	if (!mngoptParse(""))
+	if (!mngoptParse())
 	{
 		return(0);
+	}
+
+	// Reset the globals containing auth host information for use by Steam login
+	if (!gAuthServer[0]) {
+		strsafecpy(gAuthServer, DEFAULT_AUTH_SERVER);
+	}
+	if (!gAuthServerPort[0]) {
+		strprintf(gAuthServerPort, "%hu", DEFAULT_AUTH_PORT);
 	}
 
 #ifdef ANTIHACK
@@ -966,10 +985,7 @@ char GetOSBuild()
 #endif
 #endif
 
-	UINT32 host = 0, otp = 0;
-	UINT16 port = 0;
-	if(rnmainGetOnlineSetting() == false)
-		return FALSE;
+	rncheckPlaygateParams();
 
 #define DONT_USE_THREAD
 #if defined(DONT_USE_THREAD) || defined(DIRECT3D)	// Use this path for a single thread environment else a multi-thread environment
@@ -1250,11 +1266,14 @@ void sysGetMousePosition(int* x, int* y)
 {
 	POINT pt;
 	GetCursorPos(&pt);
-	*x = pt.x - WantedX;
-	*y = pt.y - WantedY;
+	ScreenToClient(myhwnd, &pt);
+	*x = pt.x;
+	*y = pt.y;
 }
 
 void sysSetMousePosition(int x, int y)
 {
-	SetCursorPos(WantedX + x, WantedY + y);
+	POINT pt{x,y};
+	ClientToScreen(myhwnd, &pt);
+	SetCursorPos(pt.x, pt.y);
 }

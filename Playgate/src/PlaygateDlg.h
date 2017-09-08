@@ -11,7 +11,9 @@
 // CPlaygateDlg dialog
 class CPlaygateDlg : public CBDialog
 {
-// Construction
+	DECLARE_DYNAMIC(CPlaygateDlg)
+
+	// Construction
 public:
 	CPlaygateDlg(CWnd* pParent = nullptr);	// standard constructor
 	virtual ~CPlaygateDlg();
@@ -50,4 +52,6 @@ public:
 	afx_msg void OnLbnSelchangeServerList();
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+
 };

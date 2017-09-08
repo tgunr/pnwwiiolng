@@ -30,18 +30,6 @@ using _PROCESSOR = void(*)(DBRow&, void*, UINT32 oid);
 extern void strtInitializeVehicleAccessLevels();
 
 //////////////////////////////////////////////////////////////////////
-
-#if defined IS_STRAT_HOST
-# include "strt/strtDatabaseSchemas.h"
-static void _updateDatabaseSchema()
-{
-	dbugLog(_FLI, "Updating database schema");
-	DB::Schema schema(dbh, "wwii");
-	schema.Update(revisions);
-}
-#endif
-
-//////////////////////////////////////////////////////////////////////
 //Tool for opening DB connection
 bool
 strtInitDB()
@@ -53,9 +41,6 @@ strtInitDB()
 		dbh.connect();
 
 #ifdef IS_STRAT_HOST
-	///TODO: Move to controller or something
-	_updateDatabaseSchema();
-
 	if ( !strtInitHostDB() )
 		retval = false;
 #endif // IS_STRAT_HOST

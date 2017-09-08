@@ -13,13 +13,40 @@
 #include "teul/teulTimeMS.h"
 #include "teul/teulSockTypes.h"		// For SOCKET
 #include "teul/teulFuncTypes.h"
+#include "RakNetTypes.h"
+
+class RakNetChannel;
 
 namespace Teul
 {
 	class Packet;
 }
 
+namespace Teul
+{
+#if platBuild == BUILD_SERVER
+        static const size_t MaxConnections = 6000;
+        static const size_t MaxClusterUsers = 5000;
+#else
+#if !defined(MULTI_CLIENT)
+	// Number of users to support per client (cluster is the host term)
+	static const size_t MaxClusterUsers = 8;
+	// How many endpoints teulKit reserve, also limits the
+	// number of concurrent connections.
+	static const size_t	MaxConnections = MaxClusterUsers * 3 + 4;
+#else
+	// Number of users to support per client instance (cluster is the host term)
+	static const size_t MaxClusterUsers = 2000;
+	// How many endpoints teulKit reserve, also limits the
+	// number of concurrent connections.
+	static const size_t	MaxConnections = MaxClusterUsers * 3 + (MaxClusterUsers / 4);
+#endif
+#endif
+}
+
+
 struct EndpointImpl;
+typedef std::map<RakNet::RakNetGUID, ENDPOINT *> GUID_ENDPOINT_MAP;
 
 #ifdef TEUL_DETAIL_OUTPUT
 #define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )     ep._dbugOutputPacket ( bIsRecv, reinterpret_cast<const uint8_t *>(bpInput), static_cast<size_t>(szBytes) );
@@ -71,9 +98,12 @@ public:
 	bool				m_writesPending : 1;
 	bool				m_haveTicks : 1;		// False until we've started recording ticks.
 	bool				m_peer : 1;			// Peering connection.
+	bool				m_rakNetEnabled : 1;	
 
 	//! Implementation entity for stuff we don't really need to expose to all callers.
 	EndpointImpl*		m_impl;
+	RakNetChannel*		m_pairdUdpConn;
+	RakNet::RakNetGUID  m_rakNetGuid;
 
 	//! Generic pointer to application-specific data associated with
 	//! this connection. Typically either a ww2Client (on the client)
@@ -131,7 +161,7 @@ public:
 
 	//! Attempt to send a packet, or queue it if we cannot
 	//! send it immediately.
-	SINT32 sendPacket(Teul::Packet& packet);
+	SINT32 sendPacket(Teul::Packet& packet, const UCHAR protocolPreference);
 
 	//! Flag the endpoint as having become connected.
 	void setConnected();
@@ -157,6 +187,10 @@ public:
 
 	bool isFromClient() const noexcept { return protocol == PROTOCOL_TCP && !m_peer; }
 
+	RakNetChannel *getBackChannel() {
+		return m_pairdUdpConn;
+	}
+
 private:
 	//! Write the actual data to the socket.
 	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port);
@@ -172,6 +206,7 @@ public:
 
 /* Endpoint functions */
 
+void		teulEndpointBackchannels();
 void		teulCleanupEndpoints();
 
 ENDPOINT* 	teulCreateEndpoint(bool isListening, SINT32 timeout, PROTOCOL protocol);

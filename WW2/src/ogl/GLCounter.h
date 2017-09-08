@@ -2,7 +2,7 @@
 //  Created by Andrew Wulf on 6/20/11.
 //  Copyright 2011
 
-#include "gl/glew.h"
+#include "GL/glew.h"
 #include "gl/glplat.h"
 #include <vector>
 #include <string>

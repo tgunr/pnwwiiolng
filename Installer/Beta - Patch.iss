@@ -13,7 +13,7 @@
 #define WW2ModsDir "ww2mods"
 
 [Setup]
-SignTool=signtool /fd sha256 /d $qBattleground Europe$q /du $qhttp://www.battlegroundeurope.com$q $f
+;SignTool=signtool /fd sha256 /d $qBattleground Europe$q /du $qhttp://www.battlegroundeurope.com$q $f
 
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -43,7 +43,7 @@ SolidCompression=yes
 PrivilegesRequired=admin
 AppendDefaultDirName=False
 UsePreviousAppDir=yes
-AppCopyright=Copyright 1999 - 2016, Playnet, Inc.
+AppCopyright=Copyright 1999 - 2017, Playnet, Inc.
 AllowRootDirectory=True         
 SetupIconFile={#MyAssetsDir}\wwii1.ico
 LicenseFile={#MyAssetsDir}\license.rtf

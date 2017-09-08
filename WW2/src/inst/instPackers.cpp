@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Tue Oct  7 16:59:22 CDT 2008
 //
 // Pack routines for instancing

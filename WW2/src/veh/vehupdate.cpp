@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "pi/pi.h"
 #include "include/vars.h"
@@ -824,7 +824,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 			teulSyncClock();
 			cub.size = teulPackUINT64(TEUL_PACK, cub.data, cub.size, &teulClock64, 0);
             if (Online) { // wait until here to check this in case all that junk above actually does something to game state
-                teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub);
+                teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub, PROTOCOL_UDP);
             }
 		}
 	}
@@ -998,7 +998,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 	applyStatusBits(PR_STATE0, (void *)&VehicleInfo->stateFlags0, 0, 16, VehicleHeader, Vehicle);
 	applyStatusBits(PR_STATE1, (void *)&VehicleInfo->stateFlags1, 16, 16, VehicleHeader, Vehicle);
 	if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
-		applyStatusBits(PR_VEH_VIS, (void *)&VehicleInfo->visBits, 16, 32, VehicleHeader, Vehicle);
+		applyStatusBits(PR_VEH_VIS, (void *)&VehicleInfo->visBits, 32, 32, VehicleHeader, Vehicle);
 
 	// position
 	// if multicrew, only crew gets this data
@@ -1318,7 +1318,8 @@ lastLowUpdateTime = frametime;
 #ifdef DEBUG_UPDATES
 		++duplicateUpdatesIgnored;
 #endif
-		Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
+		// Pointless debug - we know this can happen due to frequency of updates, don't report this anymore.
+		// Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
 		return 0;
 	}
 

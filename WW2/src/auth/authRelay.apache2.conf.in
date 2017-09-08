@@ -1,0 +1,14 @@
+# Add to your Apache configuration a statement which Includes this file.
+
+<Location "/v1/login">
+    Alias "@CMAKE_INSTALL_PREFIX@/web/relay/authRelay.php"
+    SetHandler application/x-httpd-php
+    SetEnv PN_INSTALL_PATH "@CMAKE_INSTALL_PREFIX@"
+</Location>
+<Directory "@CMAKE_INSTALL_PREFIX@/web/relay/">
+    Require all denied
+    AllowOverride none
+    <Files "authRelay.php">
+        Require all granted
+    </Files>
+</Directory>

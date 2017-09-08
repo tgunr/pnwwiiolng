@@ -1,6 +1,6 @@
 ####################################
 ## Declare CMake version requirement
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.8.0)
 
 ####################################
 ## Initial CMake config
@@ -26,15 +26,8 @@ PROJECT( WW2GameHosts LANGUAGES C CXX )
 
 ####################################
 ## Require C++14
-#SET( CMAKE_CXX_STANDARD_REQUIRED ON )
-#SET( CMAKE_CXX_STANDARD 14 )
-# Unfortunately, the above doesn't work until CMake 3.1
-#ADD_COMPILE_OPTIONS( "-std=gnu++14" )
-# And unfortunately, that doesn't work either because it breaks pure-C files
-IF ( NOT MSVC )
-	SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++14" CACHE STRING "" FORCE )
-	SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11" CACHE STRING "" FORCE )
-ENDIF()
+SET( CMAKE_CXX_STANDARD_REQUIRED ON )
+SET( CMAKE_CXX_STANDARD 14 )
 
 ####################################
 ## Determine bitness
@@ -153,6 +146,10 @@ IF ( PN_DEV_BUILD )
     ADD_DEFINITIONS( "-DDEV_BUILD" )
 ENDIF()
 
+IF ( PN_BETA_RELEASE )
+    ADD_DEFINITIONS( "-DBETA_RELEASE" )
+ENDIF()
+
 ####################################
 ## Status output
 MESSAGE( STATUS "${CMAKE_BUILD_TYPE} build, ${BUILD_BITNESS}-bit." )
@@ -195,6 +192,12 @@ ADD_CUSTOM_COMMAND(
 )
 SET_SOURCE_FILES_PROPERTIES( build_info.stamp PROPERTIES SYMBOLIC TRUE )
 
+add_subdirectory(../../Libraries/RakNet ./RakNet)
+
+# RakNet
+SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
+INCLUDE_DIRECTORIES( SYSTEM ${LIBEVENT_INCLUDE_DIRS} ${RAKNET_INCLUDE_DIRS} )
+
 ####################################
 # teulserver library, provides teul and the "server" API, for what they're worth
 ADD_LIBRARY(teulserver STATIC
@@ -221,9 +224,9 @@ ADD_LIBRARY(teulserver STATIC
     teul/teulAuth.cpp teul/teulAuth.h updt/loginTypes.h
     wwii/wwiiConfig.cpp wwii/wwiiConfig.h wwii/wwiiConfigMap.h
     dbug/dbugInternal.h mem/memPool.h
+    teul/raknetConn.cpp teul/raknetConn.h
 )
-TARGET_INCLUDE_DIRECTORIES( teulserver PRIVATE ${LIBEVENT_INCLUDE_DIRS} )
-TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} )
+TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
 SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
 
 ####################################
@@ -281,7 +284,7 @@ ADD_LIBRARY( wwiilib STATIC
     wwii/wwiiNetPorts.h wwii/wwiiCallbacks.h
     # These weren't previously in wwiilib but seem to be required in various places
     auth/authDB.cpp auth/authDB.h src/infoHostMessages.cpp include/infoHostMessages.h
-    src/infoPack.cpp include/infoPack.h dbse/dbseDatabaseSchema.cpp dbse/dbseDatabaseSchema.h
+    src/infoPack.cpp include/infoPack.h
 	xml/XMLLoader2.cpp xml/XMLLoader2.h
 	weap/weapSpawnXML.cpp weap/weapSpawnXML.h
 	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
@@ -312,22 +315,23 @@ IF ( NOT MSVC )
         chat/chatManagementPack.cpp chat/chatRoster.cpp chat/chatRosterClient.cpp
     )
 	USE_WWIILIB_ON( chatClient )
-    TARGET_LINK_LIBRARIES( chatClient teulserver ${MYSQL_LIBRARIES} )
+    TARGET_LINK_LIBRARIES( chatClient teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
     SET_PROPERTY( TARGET chatClient PROPERTY FOLDER "Tools" )
     
-    ADD_EXECUTABLE( luaClient src/luaClient.cpp )
-    TARGET_INCLUDE_DIRECTORIES( luaClient
-        PRIVATE ${READLINE_INCLUDE_DIRS}
-        PRIVATE ${NCURSES_INCLUDE_DIRS}
-    )
-	USE_WWIILIB_ON( luaClient )
-    TARGET_LINK_LIBRARIES( luaClient
-        teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
-    )
-    SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
+    #ADD_EXECUTABLE( luaClient src/luaClient.cpp )
+    #TARGET_INCLUDE_DIRECTORIES( luaClient
+    #    PRIVATE ${READLINE_INCLUDE_DIRS}
+    #    PRIVATE ${NCURSES_INCLUDE_DIRS}
+	#PRIVATE ${RAKNET_INCLUDE_DIRS}
+    #)
+	#USE_WWIILIB_ON( luaClient )
+    #TARGET_LINK_LIBRARIES( luaClient
+    #    teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
+    #)
+    #SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
 
     INSTALL(
-        TARGETS chatClient luaClient
+        TARGETS chatClient #luaClient
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin
@@ -404,7 +408,7 @@ ADD_EXECUTABLE(stratLoader
 		sdm/sdmParse.h
 )
 USE_WWIILIB_ON(stratLoader)
-TARGET_LINK_LIBRARIES(stratLoader teulserver ${MYSQL_LIBRARIES})
+TARGET_LINK_LIBRARIES(stratLoader teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
 SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
 
 
@@ -428,7 +432,7 @@ MACRO( ADD_HOST_TARGET Name )
         TARGET_LINK_LIBRARIES( "${Name}" ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
     ENDIF()
 	USE_WWIILIB_ON( "${Name}" )
-    TARGET_LINK_LIBRARIES( "${Name}" teulserver ${MYSQL_LIBRARIES} )
+    TARGET_LINK_LIBRARIES( "${Name}" teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
     IF ( NOT "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" STREQUAL "" )
         SET_PROPERTY( TARGET "${Name}" PROPERTY COMPILE_DEFINITIONS "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" )
     ENDIF()
@@ -442,10 +446,9 @@ ENDMACRO( ADD_HOST_TARGET )
 IF ( NOT PN_DISABLE_AUTH )
 	ADD_HOST_TARGET( ${AUTH_HOST_EXE} SOURCES
 		auth/authClientData.cpp auth/authClientData.h
-		auth/authDatabaseSchemas.h
 		auth/authGame.h
 		auth/authHost.cpp auth/authHost.h auth/authHostMessages.cpp auth/authHostMessages.h
-		auth/authQueue.cpp auth/authQueue.h auth/authQueuePosition.h wwii/wwiiRunningAverage.h
+		wwii/wwiiRunningAverage.h
 		auth/authOTP.cpp auth/authOTP.h
 		auth/authPack.cpp auth/authPack.h
 		EXTRA_DEFINITIONS "IS_AUTH_HOST"
@@ -459,7 +462,6 @@ ADD_HOST_TARGET( ${CONTROLLER_HOST_EXE} SOURCES
     src/controller.cpp src/controllerGameProcess.cpp src/controllerGameProcess.h
     EXTRA_DEFINITIONS "IS_CONTROLLER_HOST"
 )
-TARGET_INCLUDE_DIRECTORIES( ${CONTROLLER_HOST_EXE} PRIVATE ${LIBEVENT_INCLUDE_DIRS} )
 TARGET_LINK_LIBRARIES( ${CONTROLLER_HOST_EXE} ${LIBEVENT_LIBRARIES} )
 
 ####################################
@@ -542,7 +544,7 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     INSTANCING
     EXTRA_DEFINITIONS "IS_CHAT_HOST"
 )
-TARGET_LINK_LIBRARIES( ${CHAT_HOST_EXE} libb64 )
+TARGET_LINK_LIBRARIES( ${CHAT_HOST_EXE} libb64 ${LIBZ_LIBRARIES})
 
 ####################################
 ## Cell host
@@ -641,6 +643,7 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     mm/mmPolls.cpp mm/mmPolls.h
     mm/mmSpawn.cpp mm/mmSpawn.h
     mm/mmSpawnGrantResponse.cpp mm/mmSpawnGrantResponse.h
+    mm/mmdbLazyFetchPersona.cpp mm/mmdbLazyFetchPersona.h
     score/scoreCallbacks.cpp score/scoreDeath.cpp score/scoreDeath.h score/scoreEvent.h
     score/scoreActor.h score/scoreSortie.cpp score/scoreSortie.h
     wwii/wwiiRTBCodes.h wwii/wwiiHostMessages.cpp wwii/wwiiHostMessages.h
@@ -758,7 +761,7 @@ ELSE()
 	SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY COMPILE_FLAGS
                   "-Wno-unused-function" )
 ENDIF()
-TARGET_INCLUDE_DIRECTORIES( ${STRAT_HOST_EXE} PRIVATE ${TOLUAPP_INCLUDE_DIR} )
+TARGET_INCLUDE_DIRECTORIES( ${STRAT_HOST_EXE} PRIVATE ${TOLUAPP_INCLUDE_DIR})
 
 INSTALL(
     TARGETS
@@ -774,13 +777,24 @@ INSTALL(
 ## File installs
 
 # Environment template files from the source tree
-INSTALL( FILES environment.cfg environment.win.cfg DESTINATION bin COMPONENT config )
+# Do not actually install this file, otherwise we could accidentally overwrite real config
+#INSTALL( FILES environment.cfg DESTINATION bin COMPONENT config )
 
 # Lua scripts
 INSTALL( DIRECTORY hostproj/lua/ DESTINATION lua COMPONENT lua PATTERN ".git" EXCLUDE PATTERN "*.lua" )
 
 # Embedded webserver root
-INSTALL( DIRECTORY hostproj/web/ DESTINATION web COMPONENT web PATTERN ".git" EXCLUDE )
+INSTALL( DIRECTORY hostproj/web/ DESTINATION web/embedded COMPONENT web PATTERN ".git" EXCLUDE )
+
+# Auth relay
+IF ( NOT PN_DISABLE_AUTH )
+    CONFIGURE_FILE( auth/authRelay.apache2.conf.in auth/authRelay.apache2.conf @ONLY )
+    INSTALL(
+        FILES auth/authRelay.php auth/authRelay.apache2.conf
+        DESTINATION web/relay
+        COMPONENT relay
+    )
+ENDIF()
 
 ####################################
 ## Tests
@@ -797,7 +811,7 @@ ENDIF()
 # The install process will not execute unless all tests complete.
 ADD_EXECUTABLE( testUnits
     tests/testUnits.cpp tests/testUnits.h tests/testCovert.cpp tests/testLocalizedMessage.cpp
-    tests/testTeulBits.cpp tests/testAuthQueue.cpp auth/authClientData.cpp
+    tests/testTeulBits.cpp auth/authClientData.cpp
     tests/testChatHandle.cpp tests/testFullObjID.cpp tests/testCommandWithArgs.cpp
     tests/testInplaceVector.cpp tests/testPackers.cpp comm/commPackers.cpp
     tests/testChatMissionStatus.cpp tests/testHostGridCell.cpp host/hostGridCell.cpp
@@ -810,7 +824,7 @@ SET_PROPERTY( TARGET testUnits PROPERTY COMPILE_DEFINITIONS "ENABLE_TESTS" )
 USE_WWIILIB_ON( testUnits )
 TARGET_COMPILE_OPTIONS( testUnits PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
 TARGET_LINK_LIBRARIES( testUnits ${_EXTRA_HOST_LINK_OPTIONS} )
-TARGET_LINK_LIBRARIES( testUnits teulserver ${MYSQL_LIBRARIES} )
+TARGET_LINK_LIBRARIES( testUnits teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
 SET_PROPERTY( TARGET testUnits PROPERTY FOLDER "Test" )
 
 ADD_TEST( testUnits testUnits )
@@ -825,5 +839,6 @@ ADD_EXECUTABLE(testTeul
 USE_WWIILIB_ON( testTeul )
 TARGET_COMPILE_OPTIONS( testTeul PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
 TARGET_LINK_LIBRARIES( testTeul ${_EXTRA_HOST_LINK_OPTIONS} )
-TARGET_LINK_LIBRARIES( testTeul teulserver ${MYSQL_LIBRARIES} )
+TARGET_LINK_LIBRARIES( testTeul teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
 SET_PROPERTY( TARGET testTeul PROPERTY FOLDER "Test" )
+

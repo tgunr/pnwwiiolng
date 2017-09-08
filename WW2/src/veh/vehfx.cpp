@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////
 // Module: vehfx.cpp
 // Description: Handle vehicle effects. (exhaust..etc)
@@ -2789,7 +2789,7 @@ void vehfxRemoveAllEffects(SINT32 iID)
             lpCon->_smokeid[i] = 0;
         }
 
-        if(lpCon->lpVeh->StateAnimation.TankFireSmokeEmitter[i] > 0)
+        if(lpCon->lpVeh != nullptr && lpCon->lpVeh->StateAnimation.TankFireSmokeEmitter[i] > 0)
         {
 #if USE_FX2
             fxremove(lpCon->lpVeh->StateAnimation.TankFireSmokeEmitter[i]);

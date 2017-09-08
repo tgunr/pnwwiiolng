@@ -192,6 +192,10 @@ HRESULT	result;
 		{
 			Write_Debug("Unacquire for keyboard failed");
 		}
+		else
+		{
+			Write_Debug("Keyboard Unacquired");
+		}
 	}
 }
 
@@ -207,6 +211,10 @@ HRESULT	result;
 		if (result != DI_OK && result != DI_NOEFFECT)
 		{
 			Write_Debug("Unacquire for mouse failed");
+		}
+		else
+		{
+			Write_Debug("Mouse Unacquired");
 		}
 	}
 }
@@ -226,6 +234,10 @@ SINT32		i;
 			if (result != DI_OK && result != DI_NOEFFECT)
 			{
 				Write_Debug("Unacquire for joystick failed");
+			}
+			else
+			{
+				Write_Debug("Joystick Unacquired");
 			}
 		}
 	}

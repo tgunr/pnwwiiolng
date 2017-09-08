@@ -20,7 +20,7 @@ SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint);
 
 /* CALLBACK functions */
 
-SINT32 teulModSendCALLBACKe(ENDPOINT& inEndpoint, TEUL_CALLBACK& object);
+SINT32 teulModSendCALLBACKe(ENDPOINT& inEndpoint, TEUL_CALLBACK& object, const UCHAR protocol= PROTOCOL_UNDEF);
 SINT32 teulModSendCallbackTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBACK& object);
 
 void teulMRecvAddToPoll(ENDPOINT& endpoint);

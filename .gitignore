@@ -740,6 +740,7 @@ Tools/*.pdb
 Tools/*.sbr
 Tools/*.suo
 Tools/*.user
+Tools/archivetools/build
 Tools/AssetCompare/*.aps
 Tools/AssetCompare/*.eto
 Tools/AssetCompare/*.pfx
@@ -1439,6 +1440,7 @@ WW2/src/log/.dirstamp
 WW2/src/ltmain.sh
 WW2/src/lua/.deps
 WW2/src/lua/.dirstamp
+WW2/src/lua51
 WW2/src/luaClient
 WW2/src/map/.deps
 WW2/src/map/.dirstamp
@@ -1478,6 +1480,9 @@ WW2/src/omg/OMGParser/bin
 WW2/src/omg/OMGParser/obj
 WW2/src/omg/OMGParser/omgParser.csproj.user
 WW2/src/omg/OMGParser/omgParser.suo
+WW2/src/omggen/CTestTestfile.cmake
+WW2/src/omggen/cmake_install.cmake
+WW2/src/omggen/OMGgen.xcodeproj
 WW2/src/omg2/*.pyc
 WW2/src/osgImport/.deps
 WW2/src/osgImport/.dirstamp
@@ -1493,6 +1498,8 @@ WW2/src/pi/.deps
 WW2/src/pi/.dirstamp
 WW2/src/pinghostd
 WW2/src/playback
+WW2/src/RakNet
+WW2/src/Release
 WW2/src/rn/.deps
 WW2/src/rn/.dirstamp
 WW2/src/rosterClient
@@ -1590,6 +1597,7 @@ WW2/src/teul/.deps
 WW2/src/teul/.dirstamp
 WW2/src/tinyxml/.deps
 WW2/src/tinyxml/.dirstamp
+WW2/src/tolua++
 WW2/src/tools/.deps
 WW2/src/tools/.dirstamp
 WW2/src/trn/.deps
@@ -1610,6 +1618,7 @@ WW2/src/weap/.deps
 WW2/src/weap/.dirstamp
 WW2/src/wwii/.deps
 WW2/src/wwii/.dirstamp
+WW2/src/WW2GameHosts.xcodeproj
 WW2/src/xml/.deps
 WW2/src/xml/.dirstamp
 /_UpgradeReport_Files
@@ -1675,6 +1684,11 @@ WW2Archives
 base64
 depend
 libb64.a
-DebugInstance/Debug/DebugInstance.log
-DebugInstance/Debug/DebugInstance.tlog/DebugInstance.lastbuildstate
 build_info.cpp
+
+Deployment/database/vendor
+Deployment/database/.env
+
+CMakeScripts
+WW2GameHosts.build
+

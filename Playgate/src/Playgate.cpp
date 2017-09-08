@@ -59,16 +59,6 @@ UINT32 webURL;
 
 CPlaygateApp playgate;
 
-enum PlaygateState
-{
-	PgStarting = 0
-,	PgTOS
-,	PgRegionSelection
-,	PgAuthentication
-,	PgServerSelect
-,	PgFinished
-};
-
 static PlaygateState pgState;
 
 //////////////////////////////////////////////////////////////////////
@@ -83,7 +73,6 @@ static CLimitSingleInstance g_SingleInstanceObj(TEXT("Global\\{0DC91C4C-AE4F-43d
 BEGIN_MESSAGE_MAP(CPlaygateApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
-
 
 // CPlaygateApp construction
 
@@ -268,7 +257,7 @@ namespace {
 			std::wstring var(param.begin(), param.begin()+param.find_first_of('='));
 			std::wstring val(param.begin()+param.find_first_of('=')+1, param.end());
 
-            if (var == L"authhost")
+            if (var == L"authserver")
                 WWII::ConvertChars(val.c_str(), g_authHostName, sizeof(g_authHostName));
 			else if ( var == L"path" )
 				g_exePath = val;
@@ -282,7 +271,7 @@ namespace {
 				std::wstring msg(L"Invalid parameter \'");
 				msg += lpszParam;
 				msg += L"\' passed into Playgate.";
-				MessageBox(nullptr, L"Invalid Parameters", msg.c_str(), MB_ICONEXCLAMATION | MB_OK);
+				MessageBox(nullptr, msg.c_str(), L"Invalid Parameters", MB_ICONEXCLAMATION | MB_OK);
 				exit(0);
 			}
 		}
@@ -368,6 +357,7 @@ BOOL CPlaygateApp::InitInstance()
 		exit(0);
 	}
 
+
 	// If they've logged in before, recover the data.
 	loginData.Read();
 	// Make sure it's not just or something.
@@ -419,15 +409,17 @@ BOOL CPlaygateApp::InitInstance()
 
 	DWORD threadId;
 	::CreateThread(nullptr, 0, threadFunc, nullptr,0, &threadId);
-	if ( _Login() )
+
+	if (_Login())
 	{
 		loginData.MarkForWrite();
 
 		pgState = PgServerSelect;
 
-		if ( _ServerSelect() )
+		if (_ServerSelect())
 			loginData.MarkForWrite();
 	}
+
 
 	pgState = PgFinished;
 
@@ -447,6 +439,12 @@ BOOL CPlaygateApp::InitInstance()
 }
 
 void
+CPlaygateApp::SetState(PlaygateState state)
+{
+	pgState = state;
+}
+
+void
 CPlaygateApp::SetStatus(const TCHAR* message, StatusType status) const
 {
 	if ( !hMainWnd ) return;
@@ -455,8 +453,11 @@ CPlaygateApp::SetStatus(const TCHAR* message, StatusType status) const
 	WaitForSingleObject(hStatusMutex, INFINITE);
 	if ( hMainWnd )
 	{
-		hMainWnd->m_hint.SetWindowText(message);
-		hMainWnd->m_hint.SetTextColor((int)status);
+		if (hMainWnd->m_hint.IsWindowVisible())
+		{
+			hMainWnd->m_hint.SetWindowText(message);
+			hMainWnd->m_hint.SetTextColor((int)status);
+		}
 	}
 	ReleaseMutex(hStatusMutex);
 	Sleep(250);

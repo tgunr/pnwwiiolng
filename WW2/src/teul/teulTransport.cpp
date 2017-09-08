@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides high-level access to the transport
 // functions used in the teul API. The end-user developer
 // should need only those functions provided here.
@@ -37,7 +37,17 @@
 #endif
 
 extern SINT32 teulModStartup(ERROR_FUNCTION);
-extern SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn);
+extern SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn, const bool initBackChannel = false);
+
+static SINT32
+_openListen(const UINT32 ipAddress
+	, const UINT16 portNumber
+	, CONNECT_FUNCTION acceptFnPtr
+	, const SINT32 timeout
+	, const PROTOCOL protocol
+	, ERROR_FUNCTION errorFnPtr
+	, const bool initBackChannel = false
+);
 
 SCHAR* teulModuleName;
 SCHAR* teulAppName;
@@ -118,7 +128,7 @@ ENDPOINT::doConnect()
 {
 	if (PN_LIKELY(this->connectFn != nullptr))
 	{
-		dbugLog(_FLN, "t:%d connected calling %p", this->teulIndex(), this->connectFn);
+		dbugLog(_FLN, "t:%d connected calling callback", this->teulIndex());
 		this->connectFn(*this);
 	}
 	else if ( protocol != PROTOCOL_UDB && protocol != PROTOCOL_CTRL )	// UDB doesn't connect.
@@ -172,9 +182,10 @@ _openListen(const UINT32 ipAddress
 			, const SINT32 timeout
 			, const PROTOCOL protocol
 			, ERROR_FUNCTION errorFnPtr
+			, const bool initBackChannel
 			)
 {
-	return teulOpenConnection(true, timeout, protocol, ipAddress, portNumber, acceptFnPtr, errorFnPtr);
+	return teulOpenConnection(true, timeout, protocol, ipAddress, portNumber, acceptFnPtr, errorFnPtr, initBackChannel);
 }
 
 
@@ -206,7 +217,8 @@ teulOpenListenInterface(const UINT16 portNumber
 					, CONNECT_FUNCTION acceptFnPtr
 					, const SINT32 timeout
 					, ERROR_FUNCTION errorFnPtr
-					)
+					, const bool initBackChannel
+)
 {
 	if (PN_UNLIKELY(Teul::IsTransportClosing()))
 		return false;
@@ -224,6 +236,7 @@ teulOpenListenInterface(const UINT16 portNumber
 						,  timeout
 						,  PROTOCOL_TCP
 						,  errorFnPtr
+						,  initBackChannel
 						);
 		if (retval < 0)
 			return false;
@@ -293,10 +306,11 @@ teulOpenSend(UINT32 host
 			, CONNECT_FUNCTION connectFnPtr
 			, const SINT32 timeout
 			, const PROTOCOL protocol
-			, ERROR_FUNCTION errorFnPtr)
+			, ERROR_FUNCTION errorFnPtr
+			, const bool initBackChannel)
 {
 	host = teulMaskNetworkAddress(host);
-	return teulOpenConnection(false, timeout, protocol, host, portNumber, connectFnPtr, errorFnPtr);
+	return teulOpenConnection(false, timeout, protocol, host, portNumber, connectFnPtr, errorFnPtr, initBackChannel);
 }
 
 static UINT32 rawTeulLibVersion;
@@ -402,12 +416,17 @@ teulInitTransport(LogMode logType
 	Teul::InitializeWinsock();
 
 	dbugInit(logType, name);
-
+	
+#ifndef NDEBUG
+    dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)LOG_ALL_TO_STDERR));
+    dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)LOG_ALL_TO_STDERR));
+#else
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
 #if defined(ALPHA_RELEASE)
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
 #else
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
+#endif
 #endif
 
 	teulSyncClock();
@@ -462,6 +481,9 @@ teulUpdateTransport(const TeulTimeMS duration_)
 	extern void serverUpdate();
 	serverUpdate();
 #endif
+
+	// update any back channels configured
+	teulEndpointBackchannels();
 }
 
 // close all connections and the debugger. (teul go bye bye)
@@ -490,11 +512,11 @@ void teulCloseTransport()
 // point the CALLBACK->outData to your data structure and call this
 // function to send it.
 
-extern SINT32 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback);
-extern SINT32 teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& callback);
+extern SINT32 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const UCHAR protocol);
+extern SINT32 teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& callback, const UCHAR protocol);
 
 SINT32
-teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data)
+teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data, const UCHAR protocol)
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
@@ -504,11 +526,11 @@ teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data)
 
 	object->outData = data;
 
-	return teulModSendCALLBACKe(endpoint, *object);
+	return teulModSendCALLBACKe(endpoint, *object, protocol);
 }
 
 SINT32
-teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data)
+teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data, const UCHAR protocol)
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
@@ -524,7 +546,7 @@ teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data)
 
 	object->outData = data;
 
-	return teulModSendCALLBACK(teulIndex, *object);
+	return teulModSendCALLBACK(teulIndex, *object, protocol);
 }
 
 SINT32

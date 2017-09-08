@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Fri Jul 29 11:42:03 CDT 2005
 //
 // Functions for the opinion poll class

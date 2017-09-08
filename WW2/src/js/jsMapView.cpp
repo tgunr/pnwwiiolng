@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 
 #include "phui/Util.h"
@@ -425,7 +425,7 @@ JS_FUNCTION_DEF(jsMapView, enablelayer)
 	if(!dom) return JS_FALSE;
 
 	const char* name = nullptr;
-	long val = 0;
+	int32 val = 0;
 	if(argc > 0)
 		name = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
 	if(argc > 1)

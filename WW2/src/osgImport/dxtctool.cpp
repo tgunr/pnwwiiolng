@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 // Copyright (C) 2002 Tanguy Fautré.
 // For conditions of distribution and use,

@@ -1416,7 +1416,7 @@ static void _emitHeaderEpilog()
 
 static void _emitSourceMast()
 {
-	CXX("#include <syscfg.h> // path is project dependent\n");
+	CXX("#include \"syscfg.h\" // path is project dependent\n");
 	CXX("// @file %s\n", s_cxxFilename.c_str());
 	const char* filename = strrchr(g_currentFile, '/');
 	filename = (filename) ? filename + 1 : g_currentFile;

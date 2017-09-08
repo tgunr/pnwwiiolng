@@ -93,8 +93,6 @@ LOGICAL launchArenaRequest()
 	ArenaRequest.arenaID = loginData.m_arenaID;
 	ArenaRequest.sessionID = 0;
 	ArenaRequest.presenterVersion = g_playgateVersion;
-
-	// Username is stored as wide characters, convert to UTF8
 	loginData.GetUsernameAsUTF8(ArenaRequest.username, sizeof(ArenaRequest.username));
 	loginData.GetPasswordMD5(ArenaRequest.password, MAX_PASSWORD);
 
@@ -129,7 +127,7 @@ UINT32         CurrentVer;
 #endif
 
 	loginData.GetUsernameAsUTF8(LaunchRequest.username, sizeof(LaunchRequest.username));
-	loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password)-1);
+	loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password) - 1);
 
 	LaunchRequest.status = 0;
 	LaunchRequest.cdKeySize = 0;

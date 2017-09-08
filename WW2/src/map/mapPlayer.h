@@ -102,9 +102,6 @@ public:
 	// clear out additional fields.
 	void clearSortieResults(bool leavingMission);
 
-	// Create a new persona for me
-	UINT32 createPersonaRecord(WWII_COUNTRY, BRANCH_ENUM) const;
-
 	void debug(const char* message) const;
 	void debug(const char* label, const char* mask, ...) const;
 
@@ -175,7 +172,6 @@ public:
 	bool SelectBrigade(Brigade* brigade);
 	MISSION_CODE selectMission(class Mission* mission, bool enter);
 	void selectNullPersona();
-	PERSONA_LOAD_STATUS selectPersona(UINT32 personaID, WWII_COUNTRY country, BRANCH_ENUM branch);
 	// Retrieve the player-specific fields from the DB
 	bool selectPlayer(const playerid_t newPlayerID);
 
