@@ -940,7 +940,7 @@ _recvMessage(ACTION_OBJECT* const a)
 		// mark start, find end
 		char *start = ++p;
 
-		p = strchr(p, '\x01');
+		p = strchr(p, '\x01');// Returns a pointer to the first occurrence of '\x01' in the C string.
 		if (!p) {
 
 			dbugLog(_FLA, "Client chat packet received with no terminating control character");
@@ -954,10 +954,14 @@ _recvMessage(ACTION_OBJECT* const a)
 			// decode it
 			message.clientInfo.decode(start);
 
-			// remove it from the message - source is null terminated, limit to max IRC length
-			strsafecpy(message.m_message, p, MAX_IRC_LEN);
+            // Get the length of the message without the clientInfo.
+            size_t newLengthOfMessage = strlen(p);
 
-			message.m_length -= (p - message.m_message);
+			// Copy the message without the clientInfo back into the original message
+            // Note that destination and source memory overlaps.
+            memmove(message.m_message, p, MAX_IRC_LEN);
+
+            message.m_length = newLengthOfMessage;
 		}
 		else
 		{
