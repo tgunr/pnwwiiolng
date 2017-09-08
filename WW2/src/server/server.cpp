@@ -1499,18 +1499,20 @@ ServerManager::SetPlayerTeulIndex(PlayerStatusNode* const psn, SINT32 teulIndex)
 		{
 			dbugLog(_FLA, "t:%d p:%u oldt:%d previous instance not registered", teulIndex, psn->id, psn->teulIndex);
 		}
-		else
-			s_byTeulIndex.erase(psn->teulIndex);
+		else {
+            assert ( it->second == psn );
+            if ( it->second != psn )
+            {
+                dbugLog(_FLA, "t:%d p:%u newt:%u oldt:%u oldp:%u previous instance registered to someone else"
+                                , teulIndex, psn->id, psn->teulIndex, (it->second)->teulIndex, (it->second)->id
+                                );
+            }
+            else
+                teulSetPersonaData(psn->teulIndex, nullptr);
 
-		assert ( it->second == psn );
-		if ( it->second != psn )
-		{
-			dbugLog(_FLA, "t:%d p:%u newt:%u oldt:%u oldp:%u previous instance registered to someone else"
-							, teulIndex, psn->id, psn->teulIndex, (it->second)->teulIndex, (it->second)->id
-							);
-		}
-		else
-			teulSetPersonaData(psn->teulIndex, nullptr);
+            s_byTeulIndex.erase(it);
+        }
+
 	}
 
 	psn->teulIndex = teulIndex;

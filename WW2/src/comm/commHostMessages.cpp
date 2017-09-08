@@ -774,7 +774,7 @@ _forwardHitsToRemoteServer(const HostVehicle& vehicle, const SINT32 bits, const 
 // Given the details of a hit packet, notify the scoring process.
 
 static void
-_sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter, const UINT32 numComponentsHit, const UINT64& joules)
+_sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter)
 {
 	Scoring::Packet<Scoring::Hit> packet;
 	Scoring::Actor actTarget(&victim);
@@ -783,7 +783,7 @@ _sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter, cons
 	dbugLog(_FLD, "sending hit event [p:%u]->[p:%u] to map host", actShooter.playerID(), actTarget.playerID());
 
 	Teul::Packet outgoing(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
-	outgoing.construct<Scoring::Hit>(actTarget, actShooter, numComponentsHit, joules);
+	outgoing.construct<Scoring::Hit>(actTarget, actShooter);
 	outgoing.setUnencrypted();
 	if ( !serverSendPacketToType(outgoing, MAP_HOST) )
 		LogAbort("failed to send hit message");
@@ -861,26 +861,9 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 
 	_applyDamageRestrictions(hit, source);
 
-	VEH_HIT vHit;
-	const size_t numComponents = hit.m_components.size();
-	vHit.numComponents = numComponents;
-	vHit.shooter = hit.m_shooter;
-	vHit.target = hit.m_target;
-
-	UINT64 totalDamageJ = 0LL;
-
-	for ( size_t i = 0; i < numComponents; i++ )
-	{
-		const Vehicle::Hit::Component& comp = hit.m_components[i];
-		vHit.compHit[i].compID = comp.compID;
-		vHit.compHit[i].numHits = comp.NumHits;
-		vHit.compHit[i].damage = comp.m_damage;
-		vHit.compHit[i].priority = comp.isImportant;
-		if ( comp.isImportant )
-			totalDamageJ += comp.m_damage;
-	}
-
-	_sendScoringHitEvent(*vTarget, *vShooter, vHit.numComponents, totalDamageJ);
+	// TODO DEV-1683: Cross-cell hit events are somehow not being scored by the mmhost,
+	// even though they still cause damage/death to the client being hit.
+	_sendScoringHitEvent(*vTarget, *vShooter);
 
 	// We're done processing the packet for ourselves, now we have to
 	// send it on to the victim vehicle.
@@ -898,6 +881,12 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 
 		if ( host_config.kills.reportDamage )
 		{
+			UINT64 totalDamageJ = 0LL;
+			for ( const Vehicle::Hit::Component& comp : hit.m_components ) {
+				if ( comp.isImportant )
+					totalDamageJ += comp.m_damage;
+			}
+
 			static char buffer[512];
 			strprintf(buffer, "INCOMING: %" PR64BitT " joules of damage %s %s"
 							, totalDamageJ

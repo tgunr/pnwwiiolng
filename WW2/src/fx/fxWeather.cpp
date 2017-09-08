@@ -308,9 +308,6 @@ Description:
 -----------------------------------------------------------------------------*/
 void fxWeatherInit()
 {
-    if(!Online)
-        SetTodaysRainTimes(WeatherRandom(0, 15));
-
 #if DEBUG_WW2
 #if(0)
     for(int i = 0; i < max_seeds; i++)
@@ -345,6 +342,11 @@ void fxWeatherInit()
 
     normal = ldTextureLoad("terrain/to/water/water1_normal.dds", LDPIX_FLIP);
 #endif
+}
+
+void fxWeatherPostinit(void) {
+	if ( ! Online )
+		SetTodaysRainTimes(WeatherRandom(0, 15));
 }
 
 #ifdef BETA_RELEASE

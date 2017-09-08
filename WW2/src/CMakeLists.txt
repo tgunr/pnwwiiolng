@@ -643,6 +643,7 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     mm/mmPolls.cpp mm/mmPolls.h
     mm/mmSpawn.cpp mm/mmSpawn.h
     mm/mmSpawnGrantResponse.cpp mm/mmSpawnGrantResponse.h
+    mm/mmdbLazyFetchPersona.cpp mm/mmdbLazyFetchPersona.h
     score/scoreCallbacks.cpp score/scoreDeath.cpp score/scoreDeath.h score/scoreEvent.h
     score/scoreActor.h score/scoreSortie.cpp score/scoreSortie.h
     wwii/wwiiRTBCodes.h wwii/wwiiHostMessages.cpp wwii/wwiiHostMessages.h

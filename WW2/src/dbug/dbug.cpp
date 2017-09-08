@@ -276,6 +276,7 @@ _handleSIGUSR2(SINT32)
 // Linux: On a fatal signal, write a backtrace to the log file.
 
 static const size_t MaxBacktraceAddrs = 32;
+static void *backtraceAddrs[MaxBacktraceAddrs];
 
 static void _dbugDumpBacktrace(int signum)
 {
@@ -290,7 +291,6 @@ static void _dbugDumpBacktrace(int signum)
 		dprintf(fd, "*** Process terminating due to fatal signal #%d:\n", signum);
 	}
 
-    void *backtraceAddrs[MaxBacktraceAddrs];
 	int numAddrs = backtrace(backtraceAddrs, MaxBacktraceAddrs);
 	
 	if ( numAddrs < 0 ) {
