@@ -117,6 +117,20 @@ namespace {
 
 //==============================================================================
 
+namespace {
+	inline UINT32 pathprintf(char* buf, size_t bufsize, const char* lhs, const char* rhs)
+	{ return snprintf(buf, bufsize, "%s" OS_PATHSEP "%s", lhs, rhs); }
+	template<size_t bufSize>
+	UINT32 pathprintf(char(&buf)[bufSize], const char* lhs, const char* rhs)
+	{ return strprintf<bufSize>(buf, "%s" OS_PATHSEP "%s", lhs, rhs); }
+
+	inline UINT32 pathprintf(wchar_t* buf, size_t bufsize, const wchar_t* lhs, const wchar_t* rhs)
+	{ return swprintf(buf, bufsize, L"%ls" OS_PATHSEP_W L"%ls", lhs, rhs); }
+	template<size_t bufSize>
+	UINT32 pathprintf(wchar_t(&buf)[bufSize], const wchar_t* lhs, const wchar_t* rhs)
+	{ return wstrprintf<bufSize>(buf, L"%ls" OS_PATHSEP_W L"%ls", lhs, rhs); }
+}
+
 UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
 	fullpath_t name[PN_MAX_PATH];
 #if platOS == OS_WIN32
@@ -554,14 +568,14 @@ int fiodOpenWrite(const char* filename, bool userdir) {
 		std::wstring str(fullpath);
 
 		size_t start = 0;
-		size_t pos = str.find(PATH_SEPARATOR_WIDE);
+		size_t pos = str.find(OS_PATHSEP_W);
 
 		std::basic_string<fullpath_t> path;
 		while ( pos != std::basic_string<fullpath_t>::npos ) {
 			path += str.substr(start, pos - start);
 			OS_WMKDIR(path.c_str());
 			start = pos;
-			pos = str.find(PATH_SEPARATOR_WIDE, pos + 1);
+			pos = str.find(OS_PATHSEP_W, pos + 1);
 		}
 	}
 #endif

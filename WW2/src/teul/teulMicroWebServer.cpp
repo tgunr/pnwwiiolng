@@ -26,7 +26,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <poll.h>
-#define PATH_SEPARATOR "/"
+#define OS_PATHSEP "/"
 
 #else
 
@@ -1163,7 +1163,7 @@ void Client::sendResponse(const HTTPResponse &response)
         
         if (response.responseVirtualFilePath.length() > 0) {
             // Lots of special handling for file sends
-            if (response.responseVirtualFilePath[0] != PATH_SEPARATOR[0]) {
+            if (response.responseVirtualFilePath[0] != OS_PATHSEP[0]) {
                 dbugLog(_FLA, "uWebServerClient: Virtual file paths must always start with the path separator");
                 throw WebError(500);
             }
@@ -1390,7 +1390,7 @@ void Server::physicalHandler(const HTTPRequest &request, HTTPResponse &response)
         sanitizedVirtualPath = sanitizedVirtualPath.substr(0, sanitizedVirtualPath.length() - 3);
     }
     
-    std::string platformVirtualPath = string_replace(sanitizedVirtualPath, "/", PATH_SEPARATOR);
+    std::string platformVirtualPath = string_replace(sanitizedVirtualPath, "/", OS_PATHSEP);
     
     // The actual check for a 404 won't happen until the sender routines attempt
     // to send the response.
