@@ -75,8 +75,8 @@ namespace {
 
 		// Cheap hack: npos + 1 == 0 (size_t is unsigned so it's not UB!)
 		// Also we cheat with the knowledge that L'/' == static_cast<wchar_t>('/') etc.
-		while ( (pos = result.find(static_cast<ValueType>(WRONG_PATHSEP), pos + 1)) != std::string::npos ) {
-			result[pos] = static_cast<ValueType>(OS_PATHSEP);
+		while ( (pos = result.find(static_cast<ValueType>(WRONG_PATHSEP_C), pos + 1)) != std::string::npos ) {
+			result[pos] = static_cast<ValueType>(OS_PATHSEP_C);
 		}
 		return result;
 	}
@@ -85,16 +85,16 @@ namespace {
 #if 1 //platBuild == BUILD_CLIENT
 	char* os_file_path(char* path) {
 		for ( char* s = path ; *s; ++s ) {
-			if ( *s == WRONG_PATHSEP )
-				*s = OS_PATHSEP;
+			if ( *s == WRONG_PATHSEP_C )
+				*s = OS_PATHSEP_C;
 		}
 		return path;
 	}
 
 	wchar_t* os_file_path(wchar_t* path) {
 		for ( wchar_t* s = path ; *s; ++s ) {
-			if ( *s == WRONG_PATHSEP_W )
-				*s = OS_PATHSEP_W;
+			if ( *s == WRONG_PATHSEP_WC )
+				*s = OS_PATHSEP_WC;
 		}
 		return path;
 	}

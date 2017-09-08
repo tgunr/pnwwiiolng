@@ -176,16 +176,19 @@ static inline long random() {
 }
 
 
-// TESTING
 using fullpath_t = wchar_t;
 #define PRpathT "ls"
 #define PATHLit(s) L##s
 
 #define OS_PATHSEP "\\"
+#define OS_PATHSEP_C '\\'
 #define OS_PATHSEP_W L"\\"
+#define OS_PATHSEP_WC L'\\'
 
 #define WRONG_PATHSEP "/"
+#define WRONG_PATHSEP_C '/'
 #define WRONG_PATHSEP_W L"/"
+#define WRONG_PATHSEP_WC L'/'
 
 static inline int OS_OPEN(int *fdp, const wchar_t *path, int oflag, int cmode) {
     return _wsopen_s(fdp, path, oflag, _SH_DENYRW, cmode);
@@ -213,10 +216,14 @@ using fullpath_t = char;
 #define PRpathT "s"
 
 #define OS_PATHSEP "/"
+#define OS_PATHSEP_C '/'
 #define OS_PATHSEP_W L"/"
+#define OS_PATHSEP_WC L'/'
 
 #define WRONG_PATHSEP "\\"
+#define WRONG_PATHSEP_C '\\'
 #define WRONG_PATHSEP_W L"\\"
+#define WRONG_PATHSEP_WC L'\\'
 
 static inline int OS_OPEN(int *fdp, const fullpath_t *path, int oflag, int cmode) {
     *fdp = open(path, oflag, cmode);
