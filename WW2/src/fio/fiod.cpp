@@ -67,18 +67,6 @@ static void recordRef( std::wstring ref )
 
 //==============================================================================
 
-#if platOS == OS_WIN32
-	#define CHANGE_SEP  '/'
-	#define OS_SEP      '\\'
-	#define WCHANGE_SEP L'/'
-	#define WOS_SEP     L'\\'
-#else
-	#define CHANGE_SEP  '\\'
-	#define OS_SEP      '/'
-	#define WCHANGE_SEP L'\\'
-	#define WOS_SEP     L'/'
-#endif
-
 namespace {
 	template <typename ValueType>
 	std::basic_string<ValueType> safe_os_file_path(const std::basic_string<ValueType> &path) {
@@ -87,32 +75,32 @@ namespace {
 
 		// Cheap hack: npos + 1 == 0 (size_t is unsigned so it's not UB!)
 		// Also we cheat with the knowledge that L'/' == static_cast<wchar_t>('/') etc.
-		while ( (pos = result.find(static_cast<ValueType>(CHANGE_SEP), pos + 1)) != std::string::npos ) {
-			result[pos] = static_cast<ValueType>(OS_SEP);
+		while ( (pos = result.find(static_cast<ValueType>(WRONG_PATHSEP), pos + 1)) != std::string::npos ) {
+			result[pos] = static_cast<ValueType>(OS_PATHSEP);
 		}
 		return result;
 	}
 
-#if platBuild == BUILD_CLIENT
+// Is this some sort of optimization? We don't do a lot of file stuff on the server...
+#if 1 //platBuild == BUILD_CLIENT
 	char* os_file_path(char* path) {
 		for ( char* s = path ; *s; ++s ) {
-			if ( *s == CHANGE_SEP )
-				*s = OS_SEP;
+			if ( *s == WRONG_PATHSEP )
+				*s = OS_PATHSEP;
 		}
 		return path;
 	}
 
 	wchar_t* os_file_path(wchar_t* path) {
 		for ( wchar_t* s = path ; *s; ++s ) {
-			if ( *s == WCHANGE_SEP )
-				*s = WOS_SEP;
+			if ( *s == WRONG_PATHSEP_W )
+				*s = OS_PATHSEP_W;
 		}
 		return path;
 	}
 #else
 	inline char* os_file_path(char* path) { return path; }
 #endif
-
 }
 
 //==============================================================================
