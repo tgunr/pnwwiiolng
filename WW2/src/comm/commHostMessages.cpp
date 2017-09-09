@@ -785,8 +785,8 @@ _sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter)
 	Teul::Packet outgoing(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
 	outgoing.construct<Scoring::Hit>(actTarget, actShooter);
 	outgoing.setUnencrypted();
-	if ( !serverSendPacketToType(outgoing, MAP_HOST) )
-		LogAbort("failed to send hit message");
+	if ( ! serverSendPacketToType(outgoing, MAP_HOST) )
+		dbugLog(_FLA, "failed to send hit message"); // TEMP: Making non-abort until we can diagnose
 }
 
 //////////////////////////////////////////////////////////////////////
