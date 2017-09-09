@@ -56,7 +56,7 @@ public:
 	virtual void dbrun() override;
 };
 
-static const UINT32 NUM_HELPER_THREADS = 2;
+static const UINT32 NUM_HELPER_THREADS = 4;
 
 static ConditionQueue<DBThreadQuery> dbQueue;
 DBQueueThread dbThread[NUM_HELPER_THREADS];
