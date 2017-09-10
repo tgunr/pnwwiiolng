@@ -112,6 +112,7 @@ void Set_Log_Mask(const char* system)
 
 void Write_Debug(const char* str, ...)
 {
+    return;
 	va_list marker;
 
 	va_start(marker, str);

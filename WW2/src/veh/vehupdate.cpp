@@ -1309,7 +1309,7 @@ lastLowUpdateTime = frametime;
 #ifdef DEBUG_UPDATES
 		++vehNotTracked;
 #endif
-		Write_Debug("Received an update for vehicle not being tracked, index = %d",Position);
+//        Write_Debug("Received an update for vehicle not being tracked, index = %d",Position);
 		return 0;
 	}
 

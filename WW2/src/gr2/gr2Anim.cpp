@@ -1337,13 +1337,13 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 
 	if((pose < 0) || (pose >= TPS_POSETYPE_NUM_TYPES))
 	{
-		WriteLog (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Pose out of bounds %d!", pose);
+//        WriteLog (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Pose out of bounds %d!", pose);
 		return TRUE;
 	}
 
 	if((move < 0) || (move >= TPS_MOVETYPE_NUM_TYPES))
 	{
-		WriteLog (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Movement out of bounds %d!", move);
+//        WriteLog (LOG_FPS, LOG_INFO, "gr2AnimSetModelState: Movement out of bounds %d!", move);
 		return TRUE;
 	}
 
@@ -4363,11 +4363,11 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 	{
 		WriteLog (LOG_FPS, LOG_INFO, "Weapon out of bounds! %d", weapon);
 		// for live this shouldn't be a CTD .. just set to weapon 0 (weapon 0 will always be a valid weapon)
-#ifdef BETA_RELEASE
-		piExitProgram (_FL, "Weapon out of bounds in animation flags");
-#else
+//#ifdef BETA_RELEASE
+//        piExitProgram (_FL, "Weapon out of bounds in animation flags");
+//#else
 		weapon = 0;
-#endif
+//#endif
 	}
 
 #ifdef BETA_RELEASE
