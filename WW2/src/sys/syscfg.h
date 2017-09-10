@@ -36,11 +36,8 @@ using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 #define SYS_COMPANY_NAME		"Playnet"
 #define SYS_REGISTRY_NAME		_T(SYS_COMPANY_NAME) _T("\\") _T(SYS_TITLE)
 
-#define PREPATH ".\\Data\\"
 #define TERRAIN_PREPATH "Terrain\\"
 #define GR2DATA_PREPATH "gr2Data\\"
-#define USERDATA_PREPATH "\\Battleground Europe\\"
-#define USERDATA_PREPATH_BETA "\\Battleground Europe TEST\\"
 
 #define HIGHSPEED_LIGHTING
 
