@@ -544,7 +544,7 @@ UINT32 Size;
 						}
 					break;
 				case ML_ENGINE_VARNAME_BASEHORSEPOWER:
-						EngineData->BaseHorsePower = atof((char*)VarContents);
+						EngineData->BaseHorsePower = atof((char*)VarContents) * 1.2;
 					break;
 				case ML_ENGINE_VARNAME_BASEHPALT:
 						EngineData->BaseHorsePowerAlt = atof((char*)VarContents);
@@ -553,7 +553,7 @@ UINT32 Size;
 						EngineData->BaseHpManifoldPress = atof((char*)VarContents);
 					break;
 				case ML_ENGINE_VARNAME_BASEHPRPM:
-						EngineData->BaseHpRpm = atof((char*)VarContents);
+						EngineData->BaseHpRpm = atof((char*)VarContents) * 1.1;
 						EngineData->MaxSafeRPM = EngineData->BaseHpRpm;
 					break;
 				case ML_ENGINE_VARNAME_FUELPERHPSEC:
@@ -708,7 +708,7 @@ UINT32 Size;
 						EngineData->StarterRpm = atof((char*)VarContents);
 						break;
 				case ML_ENGINE_VARNAME_STARTERHP:
-						EngineData->StarterHp = atof((char*)VarContents);
+						EngineData->StarterHp = atof((char*)VarContents) * 1.2;
 						break;
 				case ML_ENGINE_VARNAME_MAXPOWERCOOLSPEED:
 						EngineData->MaxPowerCoolSpeed = atof((char*)VarContents);
