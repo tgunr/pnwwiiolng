@@ -47,3 +47,9 @@ extern const unsigned char* utf16_to_utf8(const wchar_t* val);
 extern const wchar_t* html_encode(const wchar_t*);
 
 }
+
+namespace WWII
+{
+    extern bool ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_inBytes) noexcept;
+    extern bool ConvertChars(const char* source, wchar_t* target, size_t sizeofTarget_inBytes) noexcept;
+}

@@ -71,7 +71,9 @@ public:
 
 	JS_CLASS_DATA;
 	JS_FUNCTION(createauthhandler);
+	JS_FUNCTION(issteamcopy);
 	JS_FUNCTION(connecttoarena);
+	JS_FUNCTION(startofflinemode);
 	JS_FUNCTION(steamconnect);
 	JS_FUNCTION(loadrootwindow);
 	JS_FUNCTION(getmisscountry);
@@ -184,8 +186,8 @@ protected:
 class jsHCUnit : public phui::js::Object
 {
 public:
-	jsHCUnit(HCUnit const*);
-	jsHCUnit(unsigned int unitID);
+	jsHCUnit(HCUnit&);
+	jsHCUnit(UINT32 unitID);
 
 	JS_CLASS_DATA;
 
@@ -196,7 +198,7 @@ public:
 	virtual JSBool SetProperty(JSContext* ctx, int propid, jsval* val);
 
 protected:
-	const HCUnit* unit;
+	UINT32 unitid;
 
 	~jsHCUnit();
 };
@@ -230,7 +232,6 @@ public:
 	void SetDetail(BrigadeDetail const& d) {detail = d; UpdateOfficerArrays(); }
 
 protected:
-	HCUnit* unit;
 	BrigadeDetail detail;
 	phui::js::Array* officerranks;
 	phui::js::Array* officernames;

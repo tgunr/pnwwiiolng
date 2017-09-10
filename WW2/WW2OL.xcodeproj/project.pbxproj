@@ -430,6 +430,7 @@
 		E91EBF511E744877005AE0A0 /* libsteam_api.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E91EBF4F1E7447F6005AE0A0 /* libsteam_api.dylib */; };
 		E94156B01D259A0300C0565B /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94156AF1D259A0300C0565B /* libb64.a */; };
 		E95E664F1E8301A3005A04FF /* steam_appid.txt in Resources */ = {isa = PBXBuildFile; fileRef = E95E664E1E8301A2005A04FF /* steam_appid.txt */; };
+		E971F7151F1BF65800B500F1 /* sysAntihack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E971F7121F1BF61F00B500F1 /* sysAntihack.cpp */; };
 		E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
 		E97C76161C848E3600875F44 /* CADebugger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B1120222EB00A60CC2 /* CADebugger.cpp */; };
 		E97C76171C848E3A00875F44 /* CADebugMacros.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B3120222EB00A60CC2 /* CADebugMacros.cpp */; };
@@ -503,6 +504,7 @@
 		FA37D7531C937F8F00013187 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FA37D7511C937F8F00013187 /* Localizable.strings */; };
 		FA3B631B1D613BA500A5A810 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; };
 		FA3B631C1D613BB400A5A810 /* HockeySDK.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = FA3B631A1D613BA500A5A810 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FA3CF98C1F01CECB00C54395 /* gr2Object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA3CF9891F01C1F600C54395 /* gr2Object.cpp */; };
 		FA448CEB1D0CB26C00C4936D /* omggen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA448CC71D0CB01100C4936D /* omggen.cpp */; };
 		FA448CEC1D0CB26C00C4936D /* omggen.l in Sources */ = {isa = PBXBuildFile; fileRef = FA448CC91D0CB01100C4936D /* omggen.l */; };
 		FA448CED1D0CB26C00C4936D /* omggen.y in Sources */ = {isa = PBXBuildFile; fileRef = FA448CCC1D0CB01100C4936D /* omggen.y */; };
@@ -1524,6 +1526,8 @@
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E94156AF1D259A0300C0565B /* libb64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libb64.a; path = lib/mac/libb64.a; sourceTree = "<group>"; };
 		E95E664E1E8301A2005A04FF /* steam_appid.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = steam_appid.txt; path = ../opt/ww2mods/steam_appid.txt; sourceTree = "<group>"; };
+		E971F7121F1BF61F00B500F1 /* sysAntihack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sysAntihack.cpp; path = src/sys/sysAntihack.cpp; sourceTree = SOURCE_ROOT; };
+		E971F7131F1BF61F00B500F1 /* sysAntihack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysAntihack.h; path = src/sys/sysAntihack.h; sourceTree = SOURCE_ROOT; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
 		E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader2.cpp; sourceTree = "<group>"; };
 		E97C76351C8513EB00875F44 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1641,6 +1645,8 @@
 		FA37D7521C937F8F00013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FA37D7551C937F9800013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		FA3B631A1D613BA500A5A810 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = proj/mac/HockeySDK.framework; sourceTree = "<group>"; };
+		FA3CF9891F01C1F600C54395 /* gr2Object.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gr2Object.cpp; sourceTree = "<group>"; };
+		FA3CF98B1F01C67D00C54395 /* gr2Object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gr2Object.h; sourceTree = "<group>"; };
 		FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CodeSigning.xcconfig; path = proj/mac/CodeSigning.xcconfig; sourceTree = "<group>"; };
 		FA3D8BA81C8BF201002C5119 /* build_info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = build_info.cpp; path = "${DERIVED_FILES_DIR}/build_info.cpp"; sourceTree = "<absolute>"; };
 		FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = SearchPaths.xcconfig; path = proj/mac/SearchPaths.xcconfig; sourceTree = "<group>"; };
@@ -2000,6 +2006,8 @@
 		08104971103DD1A30065E0E2 /* gr2 */ = {
 			isa = PBXGroup;
 			children = (
+				FA3CF98B1F01C67D00C54395 /* gr2Object.h */,
+				FA3CF9891F01C1F600C54395 /* gr2Object.cpp */,
 				0818A91112E745AB0035C3B4 /* gr2layerTypes.cpp */,
 				0818A91212E745AB0035C3B4 /* gr2layerTypes.h */,
 				08104972103DD1A30065E0E2 /* gr2Anim.cpp */,
@@ -2621,6 +2629,8 @@
 		08104D50103DFBE90065E0E2 /* sysmac */ = {
 			isa = PBXGroup;
 			children = (
+				E971F7121F1BF61F00B500F1 /* sysAntihack.cpp */,
+				E971F7131F1BF61F00B500F1 /* sysAntihack.h */,
 				FA06C3BB1EE18C8B00A9977E /* sysSteam.cpp */,
 				FA06C3BC1EE18C8B00A9977E /* sysSteam.h */,
 				FA06C3B71ED0DCDF00A9977E /* sysLaunchUrl.h */,
@@ -3697,6 +3707,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E971F7151F1BF65800B500F1 /* sysAntihack.cpp in Sources */,
 				E9C3FB6F1EE1A8DC00872413 /* multiClient.cpp in Sources */,
 				E98C64811E48DF7C00ABE277 /* wwiiBackChannel.cpp in Sources */,
 				FAE0DB8D1DC260AF00A9E63D /* omgChat.omg in Sources */,
@@ -3875,6 +3886,7 @@
 				08104BDD103DF8CB0065E0E2 /* parseIO.cpp in Sources */,
 				08104BDE103DF8CB0065E0E2 /* parseWor.cpp in Sources */,
 				08104BED103DF8EA0065E0E2 /* md5c.c in Sources */,
+				FA3CF98C1F01CECB00C54395 /* gr2Object.cpp in Sources */,
 				08104BEE103DF8EA0065E0E2 /* parchive.cpp in Sources */,
 				08104BF1103DF8EA0065E0E2 /* rijndael-alg-fst.c in Sources */,
 				08104BF2103DF8EA0065E0E2 /* rijndael-api-fst.c in Sources */,

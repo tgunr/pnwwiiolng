@@ -271,7 +271,7 @@ namespace {
 				std::wstring msg(L"Invalid parameter \'");
 				msg += lpszParam;
 				msg += L"\' passed into Playgate.";
-				MessageBox(nullptr, L"Invalid Parameters", msg.c_str(), MB_ICONEXCLAMATION | MB_OK);
+				MessageBox(nullptr, msg.c_str(), L"Invalid Parameters", MB_ICONEXCLAMATION | MB_OK);
 				exit(0);
 			}
 		}

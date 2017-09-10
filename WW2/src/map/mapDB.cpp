@@ -190,7 +190,7 @@ _connectGameDB()
 			"  `platform` int(11) unsigned default NULL,"
 			"  `rxTime` timestamp NOT NULL,"
 			"  `hostTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-			"  `clientTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+			"  `clientTime` timestamp NOT NULL,"
 			"  `archiveCorrupt` tinyint(3) unsigned default '0',"
 			"  `piExitLine` int(11) unsigned default '0',"
 			"  `piExitFile` char(64) default '',"
@@ -337,27 +337,6 @@ Player::selectPlayer(const playerid_t forPlayerID)
 	return false;
 }
 
-UINT32
-Player::createPersonaRecord(WWII_COUNTRY countryID, BRANCH_ENUM branchID) const
-{
-	try
-	{
-		DBQuery q(dbh, QRY_INSERT_NEW_PERSONA_RECORD, playerID(), countryID, branchID);
-
-		static const char* branches[] = { "NONE", "ARMY", "AIR", "NAVY" };
-		dbugLog(_FLN, "t:%d p:%u c:%s created new %s %s persona id %d"
-						, teulIndex(), playerID(), callsign(), _countryName[countryID], branches[branchID], q.LastInsertID());
-
-		return q.LastInsertID();
-	}
-	catch (std::exception& e)
-	{
-		dbugLog(_FLA, "t:%d p:%u c:%s unable to create persona: %s", teulIndex(), playerID(), callsign(), e.what());
-	}
-
-	return 0;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Advance all of this player's personas in a particular branch to
 // the lower of either the top of the buddy rank system or the
@@ -393,143 +372,6 @@ Player::SetBranch(BRANCH_ENUM newBranch)
 	dbugLog(_FLD, "t:%d p:%u c:%s new branch %u, maxRank now %u"
 					, teulIndex(), playerID(), callsign()
 					, newBranch, m_maxRank);
-}
-
-//////////////////////////////////////////////////////////////////////
-// Retrieve persona data
-
-PERSONA_LOAD_STATUS
-Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM branchID)
-{
-	// Sanity cleanup of various things you may already have
-	ExitBrigade(PERS_SELECTING_PERSONA);
-	try
-	{
-		static const char QRY_SELECT_PERSONA_DATA[] = "CALL `wwii`.`p_get_persona_data`(%u, %u, %u)";
-
-		DBQuery q(dbh, QRY_SELECT_PERSONA_DATA, playerID(), countryID, branchID);
-
-		// If there was no data, there is probably no such persona
-		if ( q.Rows() == 0 || !q.FetchRow() )
-			return PLS_MISSING;
-
-		auto& row = q.Row();
-
-		selectedID = row.NextUInt();								// 0
-
-		// We get a row for all of this personas branch-matching
-		// personas. The country-matching one should be first,
-		// if it isn't, then they don't have a persona.
-		WWII_COUNTRY thisCountry = (WWII_COUNTRY)row.NextUInt();	// 1
-		if ( thisCountry != countryID )
-			return PLS_MISSING;
-
-		RANK_NO myRankNo = (RANK_NO)row.NextUInt();					// 2
-		UINT32 myRankPoints = row.NextUInt();						// 3
-
-		// Determine if the persona is locked
-		m_sideLockTime = row.NextUInt();							// 4
-		m_lastSide = (WWII_SIDE)row.NextUInt();						// 5
-
-		if ( m_sideLockTime <= teulTime() )
-		{
-			m_sideLockTime = 0;
-			m_lastSide = WWII_NO_SIDE;
-		}
-
-		UINT32 lockedFor = isSideLocked(wwiiSide(countryID));
-		if ( lockedFor > 0 )
-		{
-			dbugLog(_FLN, "t:%d p:%u select persona %u:%u/%u is side-locked to %u for %u", teulIndex(), playerID(), selectedID, countryID, branchID, m_lastSide, lockedFor);
-			return PLS_LOCKED;
-		}
-
-		SetPersonaID(selectedID);
-		SetCountry(countryID, wwiiSide(countryID));
-		SetBranch(branchID);
-
-		m_playerMask = row.NextUINT64();							// 6
-		updateMask();
-
-		SetDecal(row.NextUInt());									// 7
-
-		SetSquad(row.NextUInt());									// 8
-		SetSquadHandle(chatGetHandle(row.NextString()));			// 9
-
-		row.NextUInt();	 // playedTime								//10
-		UINT32 newMinuteBalance = row.NextUInt();					//11
-
-		SetRank(myRankNo);
-		m_rankPointsEarned = myRankPoints;
-
-		if ( useRank().permissions(ALL_SPAWN) )
-			dbugLog(_FLD, "t:%d p:%u c:%s persona has ALL_SPAWN", teulIndex(), playerID(), callsign());
-		if ( m_playerMask & ALL_SPAWN )
-			dbugLog(_FLD, "t:%d p:%u c:%s player has ALL_SPAWN", teulIndex(), playerID(), callsign());
-
-		// Now you need to select a brigade
-		SetState(PERS_SELECTING_BRIGADE);
-
-		updateMap();
-
-		updateChat(true);
-
-		// If the player is accessing a persona that might need
-		// to be buddied up, check the other personas for higher
-		// ranks within the same branch
-		const RANK_NO globalShareCeiling = std::min(maxRank(), (RANK_NO)host_config.score.maxGlobalSharedRank);
-		const RANK_NO sideShareCeiling = std::min(maxRank(), (RANK_NO)host_config.score.maxSideSharedRank);
-
-		bool changed = false;
-
-		while ( q.FetchRow() )
-		{
-			auto& altRow = q.Row();
-			altRow.NextUInt();	// Skip personaID
-			const WWII_COUNTRY altPersCountry = (WWII_COUNTRY) altRow.NextUInt();
-			const RANK_NO altPersRankNo = (RANK_NO) altRow.NextUInt();
-			const UINT32 altPersPoints = altRow.NextUInt();
-
-			const bool sameSide = (wwiiSide(altPersCountry) == wwiiSide(thisCountry));
-			const RANK_NO sharedRank = std::min(altPersRankNo, sameSide ? sideShareCeiling : globalShareCeiling);
-
-			if ( myRankNo > sharedRank )
-				continue;
-			if ( myRankNo == sharedRank && (!sameSide || myRankPoints >= altPersPoints) )
-				continue;
-
-			if ( myRankNo < sharedRank )
-				myRankNo = sharedRank;
-
-			myRankPoints = altPersPoints;
-
-			changed = true;
-		}
-
-		if ( changed )
-		{
-			log(_FLI, "applying rank sharing points to %s persona -> rank %u->%u pts %u->%u"
-					, _countryName[country()]
-					, realRank(), myRankNo
-					, m_rankPointsEarned, myRankPoints
-					);
-
-			if ( myRankNo > realRank() )
-				SetRank(myRankNo);
-			m_rankPointsEarned = myRankPoints;
-
-			mapSaveRank(this, false);
-		}
-
-		SetMeteredAccess(newMinuteBalance);
-
-		return PLS_LOADED;
-	}
-	catch (std::exception& e)
-	{
-		dbugLog(_FLW, "t:%d p:%u select persona %u data failed: %s", teulIndex(), playerID(), selectedID, e.what());
-		return PLS_ERROR;
-	}
 }
 
 void

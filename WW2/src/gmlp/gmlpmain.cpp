@@ -66,6 +66,8 @@
 #include "trn/trngrass.h"
 #include "ob/obdshad.h"
 #include "client/clientServerTrackedObjects.h"
+#include "client/GameClient.h"
+#include "client/ww2HostState.h"
 #include "weap/weapList.h"
 #include "wwii/wwiiServerTrackedObject.h"
 #include "physics/physicsMain.h"
@@ -85,6 +87,7 @@
 #include "maptools/GenerateIcons.h"
 #include "sdm/BuildTerrain.h"
 #include "wwii/wwiiPPOLoader.h"
+#include "sys/sysAntihack.h"
 
 #ifdef MULTI_CLIENT
 #include "mc/multiClient.h"
@@ -1018,6 +1021,17 @@ void UpdateGameClocks()
 	ft50mscount = frametime / 50;
 	ft50msticks = ft50mscount - ticks;
 	ft10mscount = frametime / 10;
+
+#if platOS == OS_WIN32
+	// We're hiding our antihack stuff as a convoluted hash timer host sync mechanism.
+	// We only process this stuff when actually connected to the cell host to make
+	// it more difficult to stumble across this mechanism when poking around offline.
+	if ( PlayerClient()->CellState()->Connected() ) {
+		static const auto tick_check_time = NetFrameSync::tick_check_time;
+		if ( lastframetime / tick_check_time < frametime / tick_check_time )
+			NetFrameSync::UpdateNextHash();
+	}
+#endif
 }
 
 

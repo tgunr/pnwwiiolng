@@ -1659,6 +1659,12 @@
     <ClInclude Include="..\..\src\sys\sysSteam.h">
       <Filter>sys</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysAntihack.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiAntihack.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2718,6 +2724,9 @@
       <Filter>js</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\sys\sysSteam.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\sysAntihack.cpp">
       <Filter>sys</Filter>
     </ClCompile>
   </ItemGroup>

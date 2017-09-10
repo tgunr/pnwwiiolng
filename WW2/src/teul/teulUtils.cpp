@@ -34,12 +34,26 @@
 #include <unistd.h>
 #endif
 
+#if platOS == OS_MACOS
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
 #include <atomic>
 #include <chrono>
 
 ///TODO: We need these to be atomic or thread local or something.
 TeulTimeMS teulClock64;
 UINT32 teulClockTime;
+
+//
+// Establish the difference between the monotonic system clock and
+// current zulu time when establishing teulClockTime.  It will get
+// added so teulTime() continues to serve effectively as a wall-clock.
+//
+
+UINT32 teulClockMonoAdjust;
+std::once_flag initMonoAdjust;
 
 // 	----- teulClock
 
@@ -50,21 +64,28 @@ UINT32 teulClockTime;
 void
 teulSyncClock()
 {
-	static std::mutex oneAtATime;
-	std::lock_guard<std::mutex> lock(oneAtATime);
+    
+    static std::mutex oneAtATime;
+    std::lock_guard<std::mutex> lock(oneAtATime);
+    
+    using namespace std::chrono;
+    auto now = steady_clock::now();
+    TeulTimeMS newTimeMS = static_cast<TeulTimeMS>(duration_cast<milliseconds>(now.time_since_epoch()).count());
+    
+    // monotonic clocks should not be going backwards
+    ABORT_IF_EX(newTimeMS < teulClock64, "Monotonic time went backwards!");
+    
+    // avoid calculations when called many times a millisecond
+    if ( newTimeMS > teulClock64 ) {
+        teulClock64 = newTimeMS;
+        teulClockTime = teulClockMonoAdjust + static_cast<UINT32>(newTimeMS / 1000ULL);
+    }
 
-	using namespace std::chrono;
-	auto now = system_clock::now();
-	TeulTimeMS newTimeMS = duration_cast<milliseconds>(now.time_since_epoch()).count();
-#if platBuild == BUILD_SERVER
-	if ( PN_UNLIKELY(newTimeMS < teulClock64) )
-		dbugLog(_FLW, "Time went backwards: %" PR64BitUT " -> %" PR64BitUT "", teulClock64, newTimeMS);
-#endif
-	// avoid calculations when called many times a millisecond
-	if ( newTimeMS > teulClock64 ) {
-		teulClock64 = newTimeMS;
-		teulClockTime = static_cast<UINT32>(newTimeMS / 1000ULL);
-	}
+    std::call_once(initMonoAdjust, []() {
+            teulClockMonoAdjust = time(nullptr) - teulClockTime;
+            teulClockTime += teulClockMonoAdjust;
+        }
+    );
 }
 
 // wrapper for inet_ntoa.

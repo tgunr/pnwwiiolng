@@ -11,6 +11,7 @@
 #include "chat/chatCellTypes.h"
 #include "chat/chatConstants.h"
 #include "chat/chatLStringIDs.h"
+#include "chat/chatModReport.h"
 #include "chat/chatName.h"
 #include "chat/chatServerTypes.h"
 #include "chat/chatSupportRPCMessages.h"
@@ -32,6 +33,7 @@
 #include "updt/updtPackers.h"
 #include "updt/updtVehicleHit.h"
 #include "weap/weapWeapon.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiPack.h"
@@ -53,6 +55,7 @@
 #include "teul/teulEndpoint.h"
 #include "updt/updtDeathByBuilding.h"
 #include "wwii/wwiiFullObjID.h"
+#include "inst/instTypes.h"
 
 #define DEATH_TIMEOUT 30			// A minute
 
@@ -704,7 +707,11 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 		vh.present |= PR_FROM_CONTROLLER;
 	}
 
-	hostAddVehicleToBroadcast(vref, &vh);
+	// Don't broadcast unless we have a valid instance set
+	if (vref->m_instance.id() != Instance::_INVALID)
+        {
+		hostAddVehicleToBroadcast(vref, &vh);
+	}
 
 	player->processUpdateValues(vh.updateNo, vh.updatePrime);
 
@@ -736,7 +743,8 @@ _recvUpdateInfo(ACTION_OBJECT* const a)
 		return 0;
 	}
 
-	return commRecvPeriodicUpdate(a->teulIndex, player, a->packed, a->offset, true);
+	a->offset = commRecvPeriodicUpdate(a->teulIndex, player, a->packed, a->offset, true);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -766,7 +774,7 @@ _forwardHitsToRemoteServer(const HostVehicle& vehicle, const SINT32 bits, const 
 // Given the details of a hit packet, notify the scoring process.
 
 static void
-_sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter, const UINT32 numComponentsHit, const UINT64& joules)
+_sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter)
 {
 	Scoring::Packet<Scoring::Hit> packet;
 	Scoring::Actor actTarget(&victim);
@@ -775,10 +783,10 @@ _sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter, cons
 	dbugLog(_FLD, "sending hit event [p:%u]->[p:%u] to map host", actShooter.playerID(), actTarget.playerID());
 
 	Teul::Packet outgoing(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
-	outgoing.construct<Scoring::Hit>(actTarget, actShooter, numComponentsHit, joules);
+	outgoing.construct<Scoring::Hit>(actTarget, actShooter);
 	outgoing.setUnencrypted();
-	if ( !serverSendPacketToType(outgoing, MAP_HOST) )
-		LogAbort("failed to send hit message");
+	if ( ! serverSendPacketToType(outgoing, MAP_HOST) )
+		dbugLog(_FLA, "failed to send hit message"); // TEMP: Making non-abort until we can diagnose
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -853,26 +861,9 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 
 	_applyDamageRestrictions(hit, source);
 
-	VEH_HIT vHit;
-	const size_t numComponents = hit.m_components.size();
-	vHit.numComponents = numComponents;
-	vHit.shooter = hit.m_shooter;
-	vHit.target = hit.m_target;
-
-	UINT64 totalDamageJ = 0LL;
-
-	for ( size_t i = 0; i < numComponents; i++ )
-	{
-		const Vehicle::Hit::Component& comp = hit.m_components[i];
-		vHit.compHit[i].compID = comp.compID;
-		vHit.compHit[i].numHits = comp.NumHits;
-		vHit.compHit[i].damage = comp.m_damage;
-		vHit.compHit[i].priority = comp.isImportant;
-		if ( comp.isImportant )
-			totalDamageJ += comp.m_damage;
-	}
-
-	_sendScoringHitEvent(*vTarget, *vShooter, vHit.numComponents, totalDamageJ);
+	// TODO DEV-1683: Cross-cell hit events are somehow not being scored by the mmhost,
+	// even though they still cause damage/death to the client being hit.
+	_sendScoringHitEvent(*vTarget, *vShooter);
 
 	// We're done processing the packet for ourselves, now we have to
 	// send it on to the victim vehicle.
@@ -890,6 +881,12 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 
 		if ( host_config.kills.reportDamage )
 		{
+			UINT64 totalDamageJ = 0LL;
+			for ( const Vehicle::Hit::Component& comp : hit.m_components ) {
+				if ( comp.isImportant )
+					totalDamageJ += comp.m_damage;
+			}
+
 			static char buffer[512];
 			strprintf(buffer, "INCOMING: %" PR64BitT " joules of damage %s %s"
 							, totalDamageJ

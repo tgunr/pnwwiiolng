@@ -17,13 +17,17 @@ Scoring::Actor::Actor(const HostVehicle* vehicle)
 	, m_inCaptureBldg(vehicle->isInCaptureBuilding() != WWII_NO_SIDE)
 	, m_balance(Scoring::Balance::Even)
 {
-	if ( vehicle->players().empty() == true )
+	if ( vehicle->players().empty() ) {
+		dbugLog(_FLW, "v:%u has no players attached", vehicle->index);
 		return;
+	}
 
 	// Use the first available player as a guide.
 	const Player* const player = vehicle->players().front();
-	if ( player == nullptr )
+	if ( player == nullptr ) {
+		dbugLog(_FLA, "v:%u Main player is null");
 		return;
+	}
 
 	m_playerID = player->playerID();
 }

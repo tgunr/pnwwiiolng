@@ -5,6 +5,7 @@
 
 //#define _WIN32_WINNT	0x0400
 #include <stdarg.h>
+#include "sys/sysAntihack.h"
 #include "sys/sysreg.h"
 #include "resource.h"
 #include "pi/pi.h"
@@ -671,8 +672,9 @@ char GetOSBuild()
 	return getVersionInfo().build;
 }
 
+
 // This is the actual winmain
- int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	int		x, y, w, h, wh, xy;
 	int		bpp, hdw, stencil, wnd;
@@ -738,6 +740,8 @@ char GetOSBuild()
 	_unlink("ww2error.log");
 	_unlink("ww2exit.log");
 	_unlink("ww2stat.log");
+
+	NetFrameSync::InitializeHashes();
 
 	WantedWidth = GetSystemMetrics(SM_CXSCREEN);
 	WantedHeight = GetSystemMetrics(SM_CYSCREEN);

@@ -429,6 +429,16 @@ public:
 	Player*			m_crsSnoopBy;		// CRS watching me
 	Player*			m_crsSnoopOn;		// Someone I am snooping on
 
+	// Checks for memory tampering
+	// TODO: Move types elsewhere
+	typedef std::pair<std::string, std::string> FunctionName;
+	// TODO: Make an actual md5 type to avoid redefining this size everywhere.
+	static const size_t md5_size = 16;
+	struct FunctionMd5 { char md5[md5_size]; };
+
+	std::map<FunctionName, FunctionMd5> func_hashes;
+	std::set<FunctionName> tampered_funcs;
+
 	struct Tunes*	m_tunes;
 
 	class PropFacility*	m_capping;

@@ -1692,5 +1692,3 @@ Deployment/database/.env
 CMakeScripts
 WW2GameHosts.build
 
-Libraries/SteamSDK/client
-

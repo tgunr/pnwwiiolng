@@ -128,7 +128,8 @@ struct DATA_GRAM
 {
 	struct sockaddr_in	sockAddress;
 	Teul::PacketHeader*	contents;	//!< Points to the beginning of the packet data.
-	UINT32				m_size;		//!< Size of the entire object.
+	UINT32				m_size;		//!< Size of the entire object (might be smaller than allocated size)
+	UINT32				m_reqSize;	//!< Original requested size of bucket
 };
 
 #include <stack>
@@ -182,7 +183,8 @@ teulGetDatagram(const UINT32 size)
 	DATA_GRAM* gram = _getNextDatagram(size);
 	// Point contents to memory immediately AFTER the gram header.
 	gram->contents = (Teul::PacketHeader*)(gram + 1);
-	gram->m_size = size;		// The actual requested size.
+	gram->m_size = size;		// The actual size (for now size requested)
+	gram->m_reqSize = size;		// The actual requested size.
 
 	return gram;
 }
@@ -193,7 +195,7 @@ teulGetDatagram(const UINT32 size)
 void
 teulReleaseDatagram(DATA_GRAM* gram)
 {
-	size_t allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(gram->m_size);
+	size_t allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(gram->m_reqSize);
 	if (PN_LIKELY(allocSize <= s_freeDatagrams.size() * DATAGRAM_ROUNDING))
 		s_freeDatagrams[(allocSize / DATAGRAM_ROUNDING) - 1].push(gram);
 	else
@@ -646,12 +648,9 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 			const UINT32 dgramSize = hdr->packetSizeBytes() + Teul::Packet::UnencryptedBytes;
 			if (dgramSize == (UINT32)rxSize)
 			{
-				assert((SINT32)dgramSize == (SINT32)rxSize);
-
 				dgram->m_size = dgramSize;
 
 				endpoint.m_impl->recvQueue.push_back(dgram);
-				//			dbugWrite(_FLI, " pushed %p to %p ", dgram, endpoint.m_impl->recvDataQue);
 				dgram = nullptr;
 			}
 			else

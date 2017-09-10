@@ -400,6 +400,10 @@ void cfgPrefsInit()
 	}
 }
 
+void cfgPrefsPostInit(void) {
+	if(Online) uiChatInitWordFilter();
+}
+
 /*************************************************************************************************
 	cfgPrefsSyncGlobals (disk to memory)
 *************************************************************************************************/
@@ -1154,7 +1158,6 @@ void cfgPrefsProcessGlobal(_cfgPARAMS key)
 			uiRunScript("game.onlanguagechange()"); // let the ui know the language has changed
 			cfgPrefsSendSharedPref(CPR_CLIENT_LANGUAGE); // send it to the host
 			cfgPrefsSendSharedPref(CPR_PLAYER_LANGUAGE); // send it to the host
-			if(Online) uiChatInitWordFilter();
 			// reset the font we're currently using
 		}
 		break;

@@ -130,8 +130,6 @@ UINT32 numVehiclesReported = 0;
 PLAYERS g_players;
 #include "include/configVars.h"
 
-SINT32 _userConnections = 0;
-
 char hostname[32];
 UINT32 _stratHost = 0;
 
@@ -1236,7 +1234,7 @@ _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const 
 	Player& player = *static_cast<Player*>(player_);
 
 	if ( player.m_antiHack == nullptr )
-		player.m_antiHack = new AntiHack;
+		player.m_antiHack = new SpeedhackCheck;
 
 	auto& ah = *player.m_antiHack;
 
@@ -1275,8 +1273,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN )
 		{
-			_userConnections--;
-			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d connCount:%d", teulIndex, error, _userConnections);
+			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d connCount:%d", teulIndex, error, Server::myServerInfo.m_players.size());
 			return;
 		}
 		else
@@ -1289,8 +1286,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN && teulIndex == player->teulIndex() )
 		{
-			_userConnections--;
-			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected, userConn:%d", teulIndex, player->playerID(), player->callsign(), player->sortieID(), _userConnections);
+			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected, userConn:%d", teulIndex, player->playerID(), player->callsign(), player->sortieID(), Server::myServerInfo.m_players.size());
 			player->SetTeulIndex(-1);
 		}
 		else
@@ -1308,7 +1304,7 @@ _acceptFunction(ENDPOINT& endpoint)
 {
 	dbugLog(_FLD, "t:%d incoming connection from %s:%hu conn#%d"
 					, endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort()
-					, ++_userConnections
+					, Server::myServerInfo.m_players.size()
 					);
 }
 
@@ -1399,8 +1395,6 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	}
 	else if ( error == ENOTCONN && teulIndex >= 0 )
 	{
-		_userConnections--;
-
 		wwiiPlayer* player = ServerInterface::LookupByTeulIndex(teulIndex);
 
 		if ( player != nullptr )
@@ -1409,7 +1403,7 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 						, teulIndex
 						, player->playerID()
 						, player->callsign()
-						, _userConnections
+						, Server::myServerInfo.m_players.size()
 						);
 			player->Release(teulIndex, Server::ReleaseType::EConn);
 		}
@@ -1417,7 +1411,7 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 		{
 			dbugLog(_FLI, "t:%d personaless connection closed, %d connections remaining"
 						, teulIndex
-						, _userConnections
+						, Server::myServerInfo.m_players.size()
 						);
 		}
 	}
@@ -2109,7 +2103,7 @@ _sendNextUpdate(HostVehicle* const vehicle)
 //		TIMER_REPORT(50)
 		return true;
 	}
-
+	
 	const size_t pingOffset = wu.packet->payloadSizeBytes();
 	wu.packet->append(teulClock64);
 #if defined(ENABLE_CELL_EVENTS)
@@ -2119,6 +2113,8 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		maxCounter = (UINT64)payloadSizeBytes;
 	}
 #endif
+
+	//--------------
 
 	// Track how many packets behind the connections are
 	UINT32 updatesBehind = 0;

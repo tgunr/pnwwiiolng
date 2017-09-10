@@ -591,6 +591,14 @@ extern NSString *WebActionOriginalURLKey;
         return;
     }
     
+    // HACK - I know there must be better ways to deal with this but this is the simplest way I know
+    // to allow steam Mac users to modify settings outside of the game.  This class in general should be
+    // re-written in the future so I don't see a good reason to come up with a better solution now.
+    if (LaunchSettingsOnly) {
+        [self openSettings:self];
+        return;
+    }
+    
     if (!gAuthServer[0]) {
         strsafecpy(gAuthServer, DEFAULT_AUTH_SERVER);
     }
@@ -606,6 +614,7 @@ extern NSString *WebActionOriginalURLKey;
         [self launchOffline:self];
         return;
     }
+    
     
     [launcherWindow setIsVisible:true];
     
@@ -1361,6 +1370,10 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     cfgPrefsLoad();
     [launcherWindow endSheet:configWindow returnCode:NSModalResponseCancel];
+    
+    if (LaunchSettingsOnly) {
+        [NSApp terminate:self];
+    }
 }
 
 -(IBAction)doOK:(id)sender
@@ -1420,6 +1433,11 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     saveJoystickCalibration();
     
     [launcherWindow endSheet:configWindow returnCode:NSModalResponseOK];
+    
+    if (LaunchSettingsOnly) {
+        [NSApp terminate:self];
+    }
+
 }
 
 -(IBAction)joyChanged:(id)sender
@@ -1920,5 +1938,6 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 
     [[NSApplication sharedApplication] orderFrontStandardAboutPanelWithOptions:aboutDict];
 }
+
 
 @end

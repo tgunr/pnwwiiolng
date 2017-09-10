@@ -85,6 +85,7 @@
 #include "teul/teulPacket.h"
 #include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBConfig.h"
 #include "wwii/wwiiHCUnits.h"
@@ -736,6 +737,48 @@ Chat::SendModReport(const ChatHandle handle, const Chat::ModReport modType)
 #if defined(KICK_BANS)
 		_delayedBan(handle, days);
 #endif
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void Chat::SendMemoryRequestResult(playerid_t playerid, MemoryRequest& req) {
+	Player* player = PlayerInterface::Lookup(playerid);
+	if ( player == nullptr ) {
+		dbugLog(_FLW, "Ignoring memory request result for unknown playerid %u", playerid);
+		return;
+	}
+
+	// Can't trust data from the client
+	// TODO: Verify that these are valid to check for tampering
+	req.lib[array_size(req.lib)-1] = '\0';
+	req.fun[array_size(req.fun)-1] = '\0';
+
+	auto func = std::pair<std::string, std::string>(req.lib, req.fun);
+	if ( player->tampered_funcs.find(func) != player->tampered_funcs.end() )
+		return; // Already marked as tampered with, nothing else to do for now
+
+	auto it = player->func_hashes.find(func);
+	if ( it != player->func_hashes.end() ) {
+		bool modified = (memcmp(it->second.md5, req.md5, MemoryRequest::md5_len) != 0);
+		if ( modified ) {
+			player->tampered_funcs.insert(func);
+
+			// TODO: Use ModReport above?
+			dbugLog(_FLN, "!HACK:%s: [%s / %s]", player->callsign(), req.lib, req.fun);
+			PREP_CHAT_MSG(gmmsg, "%s potential code tampering detected", player->callsign());
+			chatDispatchGMMessage("HOST", gmmsg);
+
+			PREP_CHAT_MSG(crsmsg, "%s code tampering detected in [%s : %s]", player->callsign(), req.lib, req.fun);
+			chatDispatchCRSMessage("HOST", crsmsg);
+
+			// TODO: Put these in their own table
+			chatdbRecordEvent("HACK", player->callsign(), "memmod", req.lib, req.fun);
+		}
+	} else {
+		Player::FunctionMd5 md5;
+		memcpy(md5.md5, req.md5, MemoryRequest::md5_len);
+		player->func_hashes.insert(std::make_pair(func, md5));
 	}
 }
 
@@ -2255,11 +2298,7 @@ chatRouteSideMessage(WWII_SIDE toSide
 void
 chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample& sample)
 {
-	// TEMP/HACK: This message is occurring far too often, and it's a little
-	// too late to fix it properly. For now, we're just going to ignore it.
-	return;
 
-#ifdef ENABLE_TICK_SAMPLES
 	static std::map<playerid_t, std::pair<UINT32, TeulDeltaMS>> reports;
 	auto it = reports.find(player.playerID());
 	const UINT32 lastReport = (it != reports.end()) ? it->second.first : 0;
@@ -2284,7 +2323,6 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 	          sample.host_ms, sample.client_ms,
 	          sample.delta, sample.ratio);
 	chatdbRecordEvent("HACK", player.callsign(), "speedhack", report, "");
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -4206,7 +4244,7 @@ static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &resp
 
 static inline RESTAPIHandler RESTThreadCallback(RESTAPIHandler handler)
 {
-    return [&] (const HTTPRequest &req, HTTPResponse &res, const RESTAPIParams &params) {
+    return [handler] (const HTTPRequest &req, HTTPResponse &res, const RESTAPIParams &params) {
         threadCallbackSync<void>([&] { handler(req, res, params); });
     };
 }

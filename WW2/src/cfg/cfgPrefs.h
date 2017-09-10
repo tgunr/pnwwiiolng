@@ -44,6 +44,7 @@ bool cfgPrefsLoad(); // loads prefs from disk
 void cfgPrefsSave(); // tolua_export // saves all prefs to disk
 void cfgPrefsKill(); // kills the global prefs object
 void cfgPrefsInit(); // called very late in the load process to post process globals if needed
+void cfgPrefsPostInit(void); // Called after we've decided to go online/offline
 void cfgPrefsSyncGlobals(); // syncs xml config to globals
 void cfgPrefsSyncPrefs(); // syncs globals to xml config
 bool cfgPrefsRestartNeeded(); // returns true if any restart vars are changed

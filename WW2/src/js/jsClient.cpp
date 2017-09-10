@@ -8,6 +8,7 @@
 
 #include "include/vars.h"
 #include "auth/authSteam.h"
+#include "sys/sysSteam.h"
 #include "js/jsClient.h"
 #include "js/jsStratDB.h"
 #include "js/jsGame.h"
@@ -79,6 +80,8 @@ JSFunctionSpec jsClient::jsfunctions[] =
 {
 	JS_FUNCTION_SPEC(jsClient, createauthhandler,0),
 	JS_FUNCTION_SPEC(jsClient, connecttoarena,0),
+	JS_FUNCTION_SPEC(jsClient, startofflinemode,0),
+	JS_FUNCTION_SPEC(jsClient, issteamcopy,0),
 	JS_FUNCTION_SPEC(jsClient, steamconnect,2),
 	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
@@ -215,7 +218,6 @@ jsClient::~jsClient()
 {
 }
 
-
 /************************************************************************************************
 	auth connection
 *************************************************************************************************/
@@ -229,7 +231,6 @@ JS_FUNCTION_DEF(jsClient, createauthhandler) {
 	*rval = (new jsAuthHandler())->jsVal();
 	return JS_TRUE;
 }
-
 
 /************************************************************************************************
 	arena joining
@@ -251,6 +252,29 @@ JS_FUNCTION_DEF(jsClient, connecttoarena) {
 	return JS_TRUE;
 }
 
+/************************************************************************************************
+	arena joining
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, startofflinemode) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+	rnstartOfflineMode();
+	return JS_TRUE;
+}
+
+/************************************************************************************************
+	checking steam
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, issteamcopy) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	*rval = BOOLEAN_TO_JSVAL(IsSteamCopy());
+
+	return JS_TRUE;
+}
 
 /************************************************************************************************
 	steam connection
@@ -2303,10 +2327,9 @@ JSPropertySpec jsBrigade::jsproperties[] =
 
 jsBrigade::jsBrigade(BrigadeDetail const& d)
 			: phui::js::Object(&jsclass, jsfunctions,jsproperties)
-			, unit(0), detail(d), officerranks(0), officernames(0)
+			, detail(d), officerranks(0), officernames(0)
 {
 	JS_CONSTRUCTOR_LOCK;
-	unit = HCUnit::Lookup(d.brigadeID());
 
 	DefineProperty("officernames", officernames = new phui::js::Array);
 	DefineProperty("officerranks", officerranks = new phui::js::Array);
@@ -2323,14 +2346,12 @@ jsBrigade::jsBrigade(BrigadeDetail const& d)
 
 jsBrigade::jsBrigade(BrigadeSummary const& s)
 			: phui::js::Object(&jsclass, jsfunctions,jsproperties)
-			, unit(0), officerranks(0), officernames(0)
+			, officerranks(0), officernames(0)
 
 {
 	JS_CONSTRUCTOR_LOCK;
 	*(BrigadeSummary*)(&detail) = s;
 	detail.m_motd[0] = '\0';
-
-	unit = HCUnit::Lookup(s.brigadeID());
 
 	DefineProperty("officernames", officernames = new phui::js::Array);
 	DefineProperty("officerranks", officerranks = new phui::js::Array);
@@ -2345,10 +2366,10 @@ jsBrigade::jsBrigade(BrigadeSummary const& s)
 
 jsBrigade::jsBrigade(unsigned int brigadeid)
 			: phui::js::Object(&jsclass,jsfunctions,jsproperties)
-			, unit(0), officerranks(0), officernames(0)
+			, officerranks(0), officernames(0)
 {
 	JS_CONSTRUCTOR_LOCK;
-	unit = HCUnit::Lookup(brigadeid);
+	HCUnit* unit = HCUnit::Lookup(brigadeid);
 	if(unit)
 		*(HCUnit*)(&detail) = *unit;
 
@@ -2578,13 +2599,6 @@ JS_FUNCTION_DEF(jsBrigade, move)
 
 JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 {
-	// TODO: This is just a temporary hack to avoid phui related PC crashes - this needs to be further investigated to see why
-	// unit gets corrupted (very well might be this js object that is corrupted)
-	if (unit && (unit->country() >= MAX_COUNTRIES || unit->country() == WWII_NO_COUNTRY))
-	{
-		return JS_FALSE;
-	}
-
 	switch(propid)
 	{
 		case NAME_PROP:
@@ -2596,20 +2610,23 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case ID_PROP:
 			*val = INT_TO_JSVAL(detail.brigadeID());
 		break;
-		case PARENT_PROP:
+		case PARENT_PROP: {
+			// TODO: This ID can be cached
+			HCUnit* unit = HCUnit::Lookup(detail.brigadeID());
 			if(unit != nullptr && unit->parent())
-				*val = (new jsHCUnit(unit->parent()))->jsVal();
-			else if(detail.parent())
-				*val = (new jsHCUnit(detail.parent()))->jsVal();
+				*val = (new jsHCUnit(*unit->parent()))->jsVal();
+			else
+				*val = JSVAL_NULL;
+		}
 		break;
-		case DIVISION_PROP:
-			
+		case DIVISION_PROP: {
+			// TODO: This ID can be cached
+			HCUnit* unit = HCUnit::Lookup(detail.brigadeID());
 			if (unit && unit->parent())
 				*val = phui::js::NewString(UTF16(unit->parent()->name()));
-			else if(detail.parent())
-				*val = phui::js::NewString(UTF16(detail.parent()->name()));
 			else
 				*val = JS_GetEmptyStringValue(ctx);
+		}
 		break;
 		case DIVISION_ID_PROP:
 			*val = INT_TO_JSVAL(detail.m_parentID);
@@ -2632,23 +2649,21 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case OFFICERS_PROP:
 			*val = INT_TO_JSVAL(detail.officers());
 		break;
-		case HOME_PROP:
-            {
-				// this can change, so we look it up everytime
+		case HOME_PROP: {
 				HCUnit* unit = HCUnit::Lookup(detail.m_unitID);
 
 				if(unit)
 					detail.setHomeCPID(unit->homeCPID());
 
-			    StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.m_homeCPID);
-			    if(stratobj)
-				    *val = (new jsStratObject(stratobj->FullObjID()))->jsVal();
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.m_homeCPID);
+				if(stratobj)
+					*val = (new jsStratObject(stratobj->FullObjID()))->jsVal();
 				else
 					*val = JSVAL_NULL;
-            }
+			}
 		break;
 		case OBJECTIVE_PROP:
-        {
+		{
 			StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.objectiveCPID());
 			if(stratobj)
 			{
@@ -2668,7 +2683,7 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 					*val = JSVAL_NULL;
 				}
 			}
-        }
+		}
 		break;
 		case MOBILESPAWNS_PROP:
 			*val = INT_TO_JSVAL(detail.m_mobileSpawns);
@@ -3221,19 +3236,24 @@ JSPropertySpec jsHCUnit::jsproperties[] =
 	jsHCUnit
 *************************************************************************************************/
 
-jsHCUnit::jsHCUnit(HCUnit const* h)
+jsHCUnit::jsHCUnit(HCUnit& h)
 			: phui::js::Object(&jsclass,jsfunctions,jsproperties)
-			, unit(h)
+			, unitid(h.unitID())
 {
 	JS_CONSTRUCTOR_LOCK;
-	DefineProperty("country",  new jsCountry(unit->country()));
+	DefineProperty("country",  new jsCountry(h.country()));
 };
 
-jsHCUnit::jsHCUnit(UINT32 unitID)
+jsHCUnit::jsHCUnit(UINT32 id)
 			: phui::js::Object(&jsclass,jsfunctions,jsproperties)
-			, unit(HCUnit::Lookup(unitID))
+			, unitid(id)
 {
 	JS_CONSTRUCTOR_LOCK;
+	HCUnit* unit = HCUnit::Lookup(unitid);
+	assert(unit);
+	if ( ! unit )
+		return;
+
 	DefineProperty("country",  new jsCountry(unit->country()));
 };
 
@@ -3249,6 +3269,13 @@ JSBool jsHCUnit::GetProperty(JSContext* ctx, int propid, jsval* val)
 {
 	*val = JSVAL_NULL;
 
+	// This *was* a pointer, but the old team abused the privilage so we had to take that away.
+	// TODO: A lot of this can be cached since it never changes.
+	HCUnit* unit = HCUnit::Lookup(unitid);
+	assert(unit);
+	if ( ! unit )
+		return JS_FALSE;
+
 	switch(propid)
 	{
 		case NAME_PROP:
@@ -3263,7 +3290,7 @@ JSBool jsHCUnit::GetProperty(JSContext* ctx, int propid, jsval* val)
 
 		case PARENT_PROP:
 			if(unit != nullptr && unit->parent())
-				*val = (new jsHCUnit(unit->parent()))->jsVal();
+				*val = (new jsHCUnit(*unit->parent()))->jsVal();
 		break;
 
 		case BRANCH_PROP:

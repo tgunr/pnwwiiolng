@@ -2789,7 +2789,7 @@ void vehfxRemoveAllEffects(SINT32 iID)
             lpCon->_smokeid[i] = 0;
         }
 
-        if(lpCon->lpVeh->StateAnimation.TankFireSmokeEmitter[i] > 0)
+        if(lpCon->lpVeh != nullptr && lpCon->lpVeh->StateAnimation.TankFireSmokeEmitter[i] > 0)
         {
 #if USE_FX2
             fxremove(lpCon->lpVeh->StateAnimation.TankFireSmokeEmitter[i]);

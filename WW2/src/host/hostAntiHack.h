@@ -6,10 +6,10 @@
 //! @struct AntiHack
 //! @brief Fields relating to anti-cheat systems for the cell host.
 
-class AntiHack
+class SpeedhackCheck
 {
 public:
-	AntiHack()
+	SpeedhackCheck()
 		: m_lastSpeedhackDelta(0)
 		, m_lastSpeedhackBlip(0)
 		, m_numBlips(0)
