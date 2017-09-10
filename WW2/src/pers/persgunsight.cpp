@@ -1313,7 +1313,7 @@ FLOAT32 Mils;
 		V2.y -= Mils;
 	}
 
-	_draw3dLine(&V1,&V2,colorBLACKALPHA);
+	_draw3dLine(&V1,&V2,colorREDALPHA);
 
 	V1.x = Ptr[2];
 	V1.y = Ptr[3];
@@ -1334,7 +1334,7 @@ FLOAT32 Mils;
 		V2.y -= Mils;
 	}
 
-	_draw3dLine(&V1,&V2,colorBLACKALPHA);
+	_draw3dLine(&V1,&V2,colorGREENALPHA);
 
 	V1.x = Ptr[4];
 	V1.y = Ptr[5];
@@ -1355,7 +1355,7 @@ FLOAT32 Mils;
 		V2.y -= Mils;
 	}
 
-	_draw3dLine(&V1,&V2,colorBLACKALPHA);
+	_draw3dLine(&V1,&V2,colorBLUEALPHA);
 
 	return TRUE;
 }
@@ -1405,7 +1405,7 @@ FLOAT32 Mils;
     if(!ogl::UseDeprecatedPath())
         basiccolor->Apply();
 
-	draw3dTriangle(&V3,&V2,&V1,colorBLACKALPHA,colorBLACKALPHA,colorBLACKALPHA);
+	draw3dTriangle(&V3,&V2,&V1,colorREDALPHA,colorREDALPHA,colorREDALPHA);
 
 	return TRUE;
 }
@@ -2151,7 +2151,7 @@ SINT32 i;
 		{
 			memcpy(&TempFloat32,&(InstView.GE[i].Data),sizeof(FLOAT32));
 
-			*FOV = _BaseFOV / TempFloat32;
+			*FOV = _BaseFOV / (TempFloat32 * (FLOAT32)3.0);
 
 			return TRUE;
 		}
@@ -2171,7 +2171,7 @@ SINT32 i;
 		{
 			memcpy(&TempFloat32,&(GunSightView.GE[i].Data),sizeof(FLOAT32));
 
-			*FOV = _BaseFOV / TempFloat32;
+			*FOV = _BaseFOV / (TempFloat32 * (FLOAT32)3.0);
 
 			return TRUE;
 		}
