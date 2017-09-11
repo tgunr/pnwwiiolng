@@ -30,9 +30,9 @@ static bool _loadDefault();
 
 static void _insertCFGType(WWIIOLXML* data, int type, const char* value);
 
-#include <hash_map>
+#include <unordered_map>
 
-typedef stdext::hash_map<std::string, WWIIOLXML *> PrefsData;
+typedef std::unordered_map<std::string, WWIIOLXML *> PrefsData;
 static PrefsData _xmldata;
 
 extern TCHAR UserDataPath[256];

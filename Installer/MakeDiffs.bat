@@ -15,5 +15,6 @@ SET out=diff
 .\Assets\xdelta3 -e -f -9 -s "%src%\playarc10.ww2" "%dst%\playarc10.ww2" "%out%\playarc10.ww2.patch"
 .\Assets\xdelta3 -e -f -9 -s "%src%\ww2.exe"       "%dst%\ww2.exe"       "%out%\ww2.exe.patch"
 .\Assets\xdelta3 -e -f -9 -s "%src%\playgate.exe"  "%dst%\playgate.exe"  "%out%\playgate.exe.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\Settings.exe"  "%dst%\Settings.exe"  "%out%\Settings.exe.patch"
 .\Assets\xdelta3 -e -f -9 -s "%src%\license.rtf"   "%dst%\license.rtf"   "%out%\license.rtf.patch"
 .\Assets\xdelta3 -e -f -9 -s "%src%\readme.rtf"    "%dst%\readme.rtf"    "%out%\readme.rtf.patch"
