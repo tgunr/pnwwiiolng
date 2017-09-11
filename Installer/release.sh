@@ -609,6 +609,17 @@ if [ "$myos" == "win" ] ; then
         if [ "$skip_step" = false ]; then
             iscc "$fname"
         fi
+        if [ "$skip_step" = false ]; then
+            pushd "$INSTALLER"
+            ./MakeDiffs.bat fallback
+            popd
+        fi
+
+        fname="Installer/$prefix - Patch.iss"
+        build_step "build" "Building" "complete running patch install scripts: "$fname
+        if [ "$skip_step" = false ]; then
+            iscc "$fname"
+        fi
     fi
 
     fname="Installer/$prefix - FullInstall.iss"

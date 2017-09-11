@@ -1,6 +1,10 @@
+if %1%=="fallback" (
+SET src=current
+SET dst=previous
+) else (
 SET src=previous
 SET dst=current
-
+)
 SET out=diff
 
 .\Assets\xdelta3 -e -f -9 -s "%src%\playarc01.ww2" "%dst%\playarc01.ww2" "%out%\playarc01.ww2.patch"
