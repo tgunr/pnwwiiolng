@@ -45,20 +45,19 @@
 #include "str/stringLib.h"
 
 #ifdef RECORD_FILES
-static std::set<std::wstring> ReferencedFiles;
+static std::set<std::string> ReferencedFiles;
 
 void dumpFileRefs()
 {
-	printf("\n\nAll referenced files:");
-	for ( auto it = ReferencedFiles.begin(), end = ReferencedFiles.end(); it != end; ++it)
-	{
-		printf("%ls\n", it->c_str());
-	}
+	printf("\n\nAll referenced files:\n");
+	for ( const auto &file : ReferencedFiles ) {
+        printf("%s\n", file.c_str());
+    }
 }
 
-static void recordRef( std::wstring ref )
+static void recordRef( const std::string &ref )
 {
-	ReferencedFiles.insert(ref);
+    ReferencedFiles.insert(ref);
 }
 
 #else
@@ -193,7 +192,7 @@ bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize) {
 
 	int fd = 1;
 	OS_OPEN(&fd, path, O_RDONLY | O_BINARY, 0);
-	recordRef(widePath);
+	recordRef(path);
 
 	if ( PN_UNLIKELY(fd < 0) ) {
 		dbugLog(_FLA, "Unable to open %" PRpathT, path);
