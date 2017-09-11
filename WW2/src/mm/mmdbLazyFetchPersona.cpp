@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////
 bool SelectPersonaQuery::Process(const size_t numRows) {
 
-	dbugLog(_FLD, "SelectPersonaQuery::Process(%d)", numRows);
+	dbugLog(_FLD, "SelectPersonaQuery::Process(%zu)", numRows);
 
 	UINT32 selectedID = m_ps.m_personaID;
 	m_player->ExitBrigade(PERS_SELECTING_PERSONA);
@@ -150,7 +150,6 @@ bool SelectPersonaQuery::Process(const size_t numRows) {
 		m_status = PLS_ERROR;
 		return false;
 	}
-	return true;
 }
 
 void SelectPersonaQuery::Success() {

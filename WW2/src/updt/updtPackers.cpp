@@ -775,7 +775,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 			if ( which.first.length() >= MemoryRequest::str_len || which.second.length() >= MemoryRequest::str_len ) {
 				static bool logged = false;
 				if ( ! logged )
-					dbugLog(_FLA, "[%s : %s] string has more than %d characters and cannot be requested! This message will only appear once, so review all other values as well.",
+					dbugLog(_FLA, "[%s : %s] string has more than %zu characters and cannot be requested! This message will only appear once, so review all other values as well.",
 					        which.first.c_str(), which.second.c_str(), MemoryRequest::str_len);
 				logged = true;
 			} else {

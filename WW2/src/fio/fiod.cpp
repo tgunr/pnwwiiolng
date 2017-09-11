@@ -80,8 +80,6 @@ namespace {
 		return result;
 	}
 
-// Is this some sort of optimization? We don't do a lot of file stuff on the server...
-#if 1 //platBuild == BUILD_CLIENT
 	char* os_file_path(char* path) {
 		for ( char* s = path ; *s; ++s ) {
 			if ( *s == WRONG_PATHSEP_C )
@@ -89,17 +87,6 @@ namespace {
 		}
 		return path;
 	}
-
-	wchar_t* os_file_path(wchar_t* path) {
-		for ( wchar_t* s = path ; *s; ++s ) {
-			if ( *s == WRONG_PATHSEP_WC )
-				*s = OS_PATHSEP_WC;
-		}
-		return path;
-	}
-#else
-	inline char* os_file_path(char* path) { return path; }
-#endif
 }
 
 //==============================================================================
@@ -111,8 +98,6 @@ namespace {
 	UINT32 pathprintf(char(&buf)[bufSize], const char* lhs, const char* rhs)
 	{ return strprintf<bufSize>(buf, "%s" OS_PATHSEP "%s", lhs, rhs); }
 
-	inline UINT32 pathprintf(wchar_t* buf, size_t bufsize, const wchar_t* lhs, const wchar_t* rhs)
-	{ return swprintf(buf, bufsize, L"%ls" OS_PATHSEP_W L"%ls", lhs, rhs); }
 	template<size_t bufSize>
 	UINT32 pathprintf(wchar_t(&buf)[bufSize], const wchar_t* lhs, const wchar_t* rhs)
 	{ return wstrprintf<bufSize>(buf, L"%ls" OS_PATHSEP_W L"%ls", lhs, rhs); }
