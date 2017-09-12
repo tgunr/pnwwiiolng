@@ -151,10 +151,10 @@ int fileOpen(const char* path)
 /*-------------------------------------------------------------
 fileOpenWrite
 --------------------------------------------------------------*/
-int fileOpenWrite(const char *filename)
+int fileOpenWrite(const wchar_t *filename)
 {
     // Make sure directorys are created since some filenames contain directory paths.
-	std::wstring wpath = (TCHAR*)utf8_to_utf16(filename);
+	std::wstring wpath(filename);
 	
     for(unsigned int i = 0; i < wpath.length(); i++)
     {
@@ -176,9 +176,7 @@ int fileOpenWrite(const char *filename)
         pos = wpath.find(L'\\', pos + 1);
     }
 
-    int handle = _wopen(wpath.c_str(), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD|S_IWRITE);
-
-    return handle;
+    return _wopen(wpath.c_str(), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD|S_IWRITE);
 }
 
 /*-------------------------------------------------------------

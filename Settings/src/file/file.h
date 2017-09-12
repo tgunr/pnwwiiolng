@@ -7,7 +7,7 @@ std::string fileUrlDecode(const char* src);
 int fileRead(int handle, char *buffer, int length);
 int fileClose(int handle);
 int fileOpen(const char *file);
-int fileOpenWrite(const char *file);
+int fileOpenWrite(const wchar_t *file);
 int fileWrite(int handle, const void *data, size_t size);
 int fileSeek(int handle, int offset, int from);
 

@@ -24,7 +24,7 @@ static VALUE _message;
 static int _xmlinputmatch(const char* name) {return 1;}
 static int _bestLanguage();
 
-static bool _loadXML(const char* file);
+static bool _loadXML(const wchar_t* file);
 static bool _loadCFG(const char* file);
 static bool _loadDefault();
 
@@ -50,16 +50,13 @@ bool loadPreferences()
 	std::wstring homepath = UserDataPath;
 	homepath += _T("\\wwiiol.xml");
 	
-	std::string hpath = (const char*)utf16_to_utf8(homepath.c_str());
-	//std::wstring wpath = (const wchar_t*)utf8_to_utf16(hpath.c_str());
-
     _loadDefault();
 
-	bool xmlloaded = _loadXML(hpath.c_str());
+	bool xmlloaded = _loadXML(homepath.c_str());
 	
 	if(!xmlloaded)
 	{
-		xmlloaded = _loadXML("data/wwiiol.xml");
+		xmlloaded = _loadXML(L"data/wwiiol.xml");
 	}
 
     if(!xmlloaded || !getValue("config.authoritative"))
@@ -294,9 +291,10 @@ bool _loadDefault()
 /*-------------------------------------------------------------
 _loadXML
 --------------------------------------------------------------*/
-bool _loadXML(const char* file)
-{   
-    xmlDocPtr doc = xmlReadFile(file, NULL, XML_PARSE_RECOVER);
+bool _loadXML(const wchar_t* filename)
+{
+	int file = _wopen(filename, O_RDONLY | O_BINARY);
+	xmlDocPtr doc = xmlReadFd(file, NULL, NULL, XML_PARSE_RECOVER);
 
     if(!doc)
     {
@@ -472,11 +470,6 @@ _saveAsXML
 --------------------------------------------------------------*/
 void _saveAsXML()
 {
-	std::wstring homepath = UserDataPath;
-	homepath += _T("\\wwiiol.xml");
-
-	std::string hpath = (const char*)utf16_to_utf8(homepath.c_str());
-
     xmlDocPtr doc = NULL;    
 	xmlNodePtr node = NULL;
 
@@ -501,45 +494,22 @@ void _saveAsXML()
         xmlAddChild(node, child);
     }
 
-    xmlRegisterOutputCallbacks(_xmlinputmatch, 
-                              (xmlOutputOpenCallback)fileOpenWrite, 
-                              (xmlOutputWriteCallback)fileWrite, 
-                              (xmlOutputCloseCallback)fileClose); 
-					
-	xmlSaveFormatFileEnc(hpath.c_str(), doc, "UTF-8", 1);
+	xmlRegisterDefaultOutputCallbacks();
+
+	xmlOutputBufferPtr buf = xmlAllocOutputBuffer(nullptr);
+	if ( buf == nullptr )
+		return; // ???
+
+	std::wstring homepath = UserDataPath;
+	homepath += _T("\\wwiiol.xml");
+	buf->context = reinterpret_cast<void*>(fileOpenWrite(homepath.c_str()));
+	buf->writecallback = (xmlOutputWriteCallback)fileWrite;
+	buf->closecallback = (xmlOutputCloseCallback)fileClose;
+
+	xmlSaveFormatFileTo(buf, doc, "UTF-8", 1);
 
 	xmlFreeDoc(doc);
     xmlCleanupOutputCallbacks();
-}
-
-/*-------------------------------------------------------------
-_saveAsCFG
---------------------------------------------------------------*/
-void _saveAsCFG()
-{
-    int handle = fileOpenWrite("wwiiol.cfg");
-
-    PrefsData::iterator itr = _xmldata.begin();
-
-    std::string str;
-
-    char _ret = '\n';
-
-    for(; itr != _xmldata.end(); ++itr)
-    {
-        WWIIOLXML *data = itr->second;
-
-        str = data->name;
-        str += ' ';
-        str += (const char*)data->value.get();
-        str += '\n';
-
-        fileWrite(handle, str.c_str(), str.length());
-        
-        str.clear();
-    }
-
-    fileClose(handle);
 }
 
 /*-------------------------------------------------------------
