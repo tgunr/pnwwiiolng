@@ -93,18 +93,9 @@ SINT32 _dbugWrite(const char* filename, SINT32 lineno, UINT32 errType, FORMAT_AR
 // LogAbort: Fire a ERR_FATAL and abort()
 NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, UINT32 errType, const char* assertion, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(5,6);
 
-// Disable dbugLog() and dbugWrite() if respectively requested.
-#ifdef NO_DEBUG_LOG
-	#define dbugLog(m, fmt, ...) silence_unused_parameter_warning(m, fmt, ## __VA_ARGS__)
-#else
-    #define dbugLog(m, fmt, ...) _dbugLog(m, fmt, ## __VA_ARGS__)
-#endif
-
-#ifdef NO_DEBUG_WRITE
-    #define dbugWrite(m, fmt, ...)
-#else
-	#define dbugWrite(m, fmt, ...) _dbugWrite(m, fmt, ## __VA_ARGS__)
-#endif
+// We used to provide the ability to disable the logging functions globally. We no longer do so.
+#define dbugLog(m, fmt, ...) _dbugLog(m, fmt, ## __VA_ARGS__)
+#define dbugWrite(m, fmt, ...) _dbugWrite(m, fmt, ## __VA_ARGS__)
 
 #define LogAbort(fmt, ...) _LogAbort(_FLF, nullptr, fmt, ## __VA_ARGS__)
 
