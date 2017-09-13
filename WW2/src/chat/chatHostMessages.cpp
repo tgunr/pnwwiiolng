@@ -1107,10 +1107,9 @@ _recvTutProgress(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Instance the ThreadTextQuery class for aggregating
 
-const char* const _PROGRESS_UPDATE_PREFIX = "INSERT INTO `wwii`.`training_progress`(player_id,group_name,progress)VALUES";
-const char* const _PROGRESS_UPDATE_SUFFIX = "ON DUPLICATE KEY UPDATE player_id=values(player_id),group_name=values(group_name),progress=values(progress)";
+const char* const _PROGRESS_UPDATE_PREFIX = "REPLACE INTO `wwii`.`training_progress`(player_id,group_name,progress)VALUES";
 
-static ThreadTextQuery _progressUpdates(DBThread::Default, _PROGRESS_UPDATE_PREFIX, _PROGRESS_UPDATE_SUFFIX);
+static ThreadTextQuery _progressUpdates(DBThread::Default, _PROGRESS_UPDATE_PREFIX, "");
 
 SINT32
 Tutorial::GroupProgress::receive(Player* player) const
