@@ -72,14 +72,14 @@ static std::mutex callbackQueueMutex;
 
 void DBThread::Thread::run()
 {
+    threadIgnoreSIGPIPE();
+
 	m_conn = threadsOpenDBConnection(true);
 	if ( m_conn == nullptr )
 	{
 		dbugLog(_FLA, "unable to connect to mysql database");
 		return;
 	}
-
-	threadIgnoreSIGPIPE();
 
 	dbrun();
 
@@ -98,7 +98,7 @@ DBQueueThread::dbrun()
 
 	while ( !isCancelled() )
 	{
-		DBThreadQuery* query = dbQueue.getNext();
+		DBThreadQuery* query = dbQueue.getNext(); // Note: Blocks until cancelation or item available
 		if ( query == nullptr )
 			break;
 		if ( query->Execute(threadId, m_conn, &dbNo) )
@@ -163,11 +163,10 @@ threadIgnoreSIGPIPE()
 #if platOS != OS_WIN32
 	// Mask the signal we want to ignore
 	sigset_t signal_mask;
+	
 	sigemptyset(&signal_mask);
 	sigaddset(&signal_mask, SIGPIPE);
-
 	pthread_sigmask(SIG_BLOCK, &signal_mask, nullptr);
-#else
 #endif
 }
 
@@ -202,10 +201,9 @@ threadsShutdown()
 	for ( UINT32 i = 0; i < NUM_HELPER_THREADS; ++i )
 	{
 		dbThread[i].cancel();
+        //dbThread[i].join(); // We can't actually join these threads, as there's no way to break the condition queue's wait.
 	}
 	dbQueue.destroy();
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 //////////////////////////////////////////////////////////////////////
