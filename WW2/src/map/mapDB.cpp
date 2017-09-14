@@ -190,7 +190,7 @@ _connectGameDB()
 			"  `platform` int(11) unsigned default NULL,"
 			"  `rxTime` timestamp NOT NULL,"
 			"  `hostTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-			"  `clientTime` timestamp NOT NULL,"
+			"  `clientTime` datetime NULL,"
 			"  `archiveCorrupt` tinyint(3) unsigned default '0',"
 			"  `piExitLine` int(11) unsigned default '0',"
 			"  `piExitFile` char(64) default '',"

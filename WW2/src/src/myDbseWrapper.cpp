@@ -99,7 +99,7 @@ _doMyConnect()
 static std::mutex dbconnMutex;
 
 DB::handle_t*
-dbseGetConnection(bool report)
+dbseGetConnection()
 {
     // Note: This is more thread-safe than it looks, but only because the
     // dbseSetDatabase() function only ever sets the data once, even if the
@@ -119,14 +119,11 @@ dbseGetConnection(bool report)
 		newConn = _doMyConnect();
 	}
 
-	if ( report )
-	{
-		dbugLog(_FLI, "Connection to host '%s:%hu' database '%s' user '%s' reconnect '%s' %s."
-						, s_dbAddress, s_dbPort, s_dbSchema, s_dbUser
-						, ("manual")
-						, ((newConn != nullptr) ? "successful" : "FAILED")
-						);
-	}
+    dbugLog(_FLI, "Connection to host '%s:%hu' database '%s' user '%s' reconnect '%s' %s."
+                    , s_dbAddress, s_dbPort, s_dbSchema, s_dbUser
+                    , ("manual")
+                    , ((newConn != nullptr) ? "successful" : "FAILED")
+                    );
 
 	return newConn;
 }
@@ -137,7 +134,7 @@ DBHANDLE::connect()
 	assert( m_initialized == false );
 
 	//Initialization stuff;
-	m_conn = dbseGetConnection(true);
+	m_conn = dbseGetConnection();
 	if ( nullptr == m_conn )
 		return false;
 
