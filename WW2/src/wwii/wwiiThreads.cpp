@@ -87,35 +87,48 @@ void DBThread::Thread::run()
 	mysql_thread_end();
 }
 
+using namespace std::chrono_literals;
 void
 DBQueueThread::dbrun()
 {
-	const unsigned int threadId = m_id;
-
-	dbugLog(_FLI, "dbc:%u Connected to database", threadId);
+	dbugLog(_FLI, "dbc:%u Connected to database", m_id);
 
 	DBThread::DBNo dbNo = DBThread::Default;
 
 	while ( !isCancelled() )
 	{
-		DBThreadQuery* query = dbQueue.getNext(); // Note: Blocks until cancelation or item available
-		if ( query == nullptr )
+        bool needReconnect = false;
+        DBThreadQuery *query = nullptr;
+        
+        if (!dbQueue.getNextWithin(1s, &query)) {
+            // No queries to make after 1s. Try to keep the DB connection alive.
+            if (mysql_ping(m_conn) != 0) {
+                dbugLog(_FLA, "dbc:%u server connection failure - %d(%s)", m_id, mysql_errno(m_conn), mysql_error(m_conn));
+                needReconnect = true;
+            }
+        } else if (query == nullptr) {
+            // No queries left, queue was destroyed.
 			break;
-		if ( query->Execute(threadId, m_conn, &dbNo) )
-			continue;
+        } else {
+            // Got a query. Try to execute it.
+            if (!query->Execute(m_id, m_conn, &dbNo)) {
+                needReconnect = true;
+            }
+        }
+        if (needReconnect) {
+            threadsCloseDBConnection(m_conn);
+            m_conn = nullptr;
 
-		threadsCloseDBConnection(m_conn);
-		m_conn = nullptr;
-
-		while (!isCancelled() && m_conn == nullptr) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(5));
-			dbugLog(_FLW, "dbc:%u reconnecting to database", threadId);
-			m_conn = threadsOpenDBConnection(true);
-			if ( m_conn == nullptr )
-				dbugLog(_FLA, "dbc:%u unable to reconnect to database", threadId);
-		}
-
-		dbugLog(_FLW, "dbc:%u reconnected to database", threadId);
+            while (!isCancelled() && m_conn == nullptr) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                dbugLog(_FLW, "dbc:%u reconnecting to database", m_id);
+                m_conn = threadsOpenDBConnection(true);
+                if (m_conn == nullptr) {
+                    dbugLog(_FLA, "dbc:%u unable to reconnect to database, will retry", m_id);
+                }
+            }
+            dbugLog(_FLW, "dbc:%u reconnected to database", m_id);
+        }
 	}
 }
 
@@ -130,7 +143,7 @@ DBQueueThread::~DBQueueThread()
 DB::handle_t*
 threadsOpenDBConnection(bool enableAutoCommit)
 {
-	DB::handle_t* newConn = dbseGetConnection(false);
+	DB::handle_t* newConn = dbseGetConnection();
 
 	if ( newConn != nullptr )
 	{
