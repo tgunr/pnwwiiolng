@@ -1,6 +1,6 @@
 #define MyAppID "12"
-#define MyAppVersion GetFileVersion("current/WW2.exe")
-#define MyOldAppVersion GetFileVersion("previous/WW2.exe")
+#define MyAppVersion GetFileVersion(curr+"/WW2.exe")
+#define MyOldAppVersion GetFileVersion(prev+"/WW2.exe")
 
 #define MyAppNameRoot "Battleground Europe"
 #define MyAppName "Battleground Europe - 1.35 Alpha"
