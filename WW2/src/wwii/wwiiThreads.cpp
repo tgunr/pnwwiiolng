@@ -112,10 +112,16 @@ DBQueueThread::dbrun()
         } else {
             // Got a query. Try to execute it.
             if (!query->Execute(m_id, m_conn, &dbNo)) {
-                needReconnect = true;
+				// attempt reconnect only if failure was due to bad connection
+            	if (mysql_ping(m_conn) != 0) {
+	                dbugLog(_FLA, "dbc:%u server connection failure - %d(%s)", m_id, mysql_errno(m_conn), mysql_error(m_conn));
+					needReconnect = true;
+	            }
             }
         }
         if (needReconnect) {
+			dbugLog(_FLW, "reconnecting DB dbc:%u", m_id);
+
             threadsCloseDBConnection(m_conn);
             m_conn = nullptr;
 

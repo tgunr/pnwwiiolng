@@ -10,6 +10,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include <json.hpp>
+#include <mysql.h>
 #include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatBanPlayer.h"
@@ -2815,6 +2816,9 @@ _houseKeeping()
 	,	_lowFrequencyHouseKeeping
 	,	nullptr
 	};
+
+	// keep DB connection alive
+	mysql_ping(dbh);
 
 	if ( housekeeping[step] == nullptr )
 	{

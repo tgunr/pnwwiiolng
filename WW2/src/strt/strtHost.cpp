@@ -8,6 +8,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include <signal.h>  //to catch SIGHUPS with
+#include <mysql.h>
 #include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatStratSupportMessages.h"
@@ -431,6 +432,7 @@ _housekeeping()
 	}
 
 	if ( teulClock64 >= nextSecond ) {
+		mysql_ping(dbh);
 		dbugLog(_FLI, "strat _housekeeping Second procesing, scheduled");
 		nextSecond += 1000;
 		if (nextSecond < teulClock64) {

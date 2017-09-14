@@ -10,6 +10,7 @@
 #include "dbug/dbugExtErrors.h"
 #include "build_info.hpp"
 
+#include <mysql.h>
 #if platOS != OS_WIN32
 #include <netinet/in.h>
 #else
@@ -1275,6 +1276,9 @@ main(int argc, const char* argv[])
 
 		if ( teulClock64 >= nextHousekeeping )
 		{
+			// keep DB connection alive
+			mysql_ping(dbh);
+
 			if ( _housekeeping() == false )
 				nextHousekeeping = teulClock64 + 5000;
 		}
