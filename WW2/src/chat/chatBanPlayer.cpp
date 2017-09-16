@@ -192,10 +192,13 @@ void BanThread::dbrun()
 
 	while ( !isCancelled() )
 	{
-		BAN *ban;
+		BAN *ban = nullptr;
 		if (!banQueue.getNextWithin(5s, &ban)) 
 		{
-			threadsDBReconnect(&m_conn, banThreadRef, this);
+			if (isDBConnectionGone(m_conn)) 
+			{
+				threadsDBReconnect(&m_conn, banThreadRef, this);
+			}
 		} 
 		else 
 		{
