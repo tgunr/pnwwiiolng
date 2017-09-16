@@ -600,7 +600,7 @@ if [ "$myos" == "win" ] ; then
         build_step "create" "Creating" "diff files for patcher"
         if [ "$skip_step" = false ]; then
             pushd "$INSTALLER"
-            ./MakeDiffs.bat current previous
+            ./MakeDiffs.bat previous current
             popd
         fi
 
@@ -611,7 +611,7 @@ if [ "$myos" == "win" ] ; then
         fi
         if [ "$skip_step" = false ]; then
             pushd "$INSTALLER"
-            ./MakeDiffs.bat previous current
+            ./MakeDiffs.bat previous previous
             popd
         fi
 
