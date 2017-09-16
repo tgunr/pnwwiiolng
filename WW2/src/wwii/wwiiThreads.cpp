@@ -12,6 +12,7 @@
 #include <signal.h>
 #include <mutex>
 #include <sstream>
+#include <errmsg.h>
 
 #include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
@@ -97,14 +98,13 @@ DBQueueThread::dbrun()
 
 	while ( !isCancelled() )
 	{
-        bool needReconnect = false;
         DBThreadQuery *query = nullptr;
-        
-        if (!dbQueue.getNextWithin(1s, &query)) {
-            // No queries to make after 1s. Try to keep the DB connection alive.
+
+        if (!dbQueue.getNextWithin(5s, &query)) {
+            // No queries to make after 5s. Try to keep the DB connection alive.
             if (mysql_ping(m_conn) != 0) {
                 dbugLog(_FLA, "dbc:%u server connection failure - %d(%s)", m_id, mysql_errno(m_conn), mysql_error(m_conn));
-                needReconnect = true;
+				threadsDBReconnect(&m_conn, m_id, this);
             }
         } else if (query == nullptr) {
             // No queries left, queue was destroyed.
@@ -113,27 +113,11 @@ DBQueueThread::dbrun()
             // Got a query. Try to execute it.
             if (!query->Execute(m_id, m_conn, &dbNo)) {
 				// attempt reconnect only if failure was due to bad connection
-            	if (mysql_ping(m_conn) != 0) {
+            	if (isDBConnectionGone(m_conn)) {
 	                dbugLog(_FLA, "dbc:%u server connection failure - %d(%s)", m_id, mysql_errno(m_conn), mysql_error(m_conn));
-					needReconnect = true;
+					threadsDBReconnect(&m_conn, m_id, this);
 	            }
             }
-        }
-        if (needReconnect) {
-			dbugLog(_FLW, "reconnecting DB dbc:%u", m_id);
-
-            threadsCloseDBConnection(m_conn);
-            m_conn = nullptr;
-
-            while (!isCancelled() && m_conn == nullptr) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(5));
-                dbugLog(_FLW, "dbc:%u reconnecting to database", m_id);
-                m_conn = threadsOpenDBConnection(true);
-                if (m_conn == nullptr) {
-                    dbugLog(_FLA, "dbc:%u unable to reconnect to database, will retry", m_id);
-                }
-            }
-            dbugLog(_FLW, "dbc:%u reconnected to database", m_id);
         }
 	}
 }
@@ -141,6 +125,65 @@ DBQueueThread::dbrun()
 DBQueueThread::~DBQueueThread()
 {
 	dbQueue.destroy();
+}
+
+bool
+isDBConnectionGone(DB::handle_t *conn)
+{
+	int mysql_err_no = mysql_errno(conn);
+	switch(mysql_err_no)
+	{
+		case CR_SERVER_GONE_ERROR:
+		case CR_SERVER_HANDSHAKE_ERR:
+		case CR_SERVER_LOST:
+		case CR_SERVER_LOST_EXTENDED:
+			return true;
+	}
+
+	return false;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Thread-safe db re-connect
+void
+threadsDBReconnect(DBHANDLE& dbHandle)
+{
+	dbugLog(_FLW, "reconnecting DB on Main thread");
+
+	threadsCloseDBConnection(dbHandle);
+
+	while (!dbHandle.connected()) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		dbugLog(_FLW, "Reconnecting to database, main thread");
+		if (!dbHandle.connect()) {
+			dbugLog(_FLA, "Unable to reconnect to database on main thread, will retry");
+		}
+	}
+	dbugLog(_FLW, "Reconnected to database on main thread");
+}
+
+//////////////////////////////////////////////////////////////////////
+// Thread-safe db re-connect
+void
+threadsDBReconnect(DB::handle_t ** conn, UINT32 threadRef, PNThread *pThread)
+{
+	assert(conn!=nullptr);
+	assert(pThread!=nullptr);
+
+	dbugLog(_FLW, "reconnecting DB dbc:%u", threadRef);
+
+	threadsCloseDBConnection(*conn);
+	*conn = nullptr;
+
+	while (!pThread->isCancelled() && *conn == nullptr) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		dbugLog(_FLW, "dbc:%u reconnecting to database", threadRef);
+		*conn = threadsOpenDBConnection(true);
+		if (*conn == nullptr) {
+			dbugLog(_FLA, "dbc:%u unable to reconnect to database, will retry", threadRef);
+		}
+	}
+	dbugLog(_FLW, "dbc:%u reconnected to database", threadRef);
 }
 
 //////////////////////////////////////////////////////////////////////

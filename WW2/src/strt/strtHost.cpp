@@ -432,7 +432,6 @@ _housekeeping()
 	}
 
 	if ( teulClock64 >= nextSecond ) {
-		mysql_ping(dbh);
 		dbugLog(_FLI, "strat _housekeeping Second procesing, scheduled");
 		nextSecond += 1000;
 		if (nextSecond < teulClock64) {
@@ -444,6 +443,12 @@ _housekeeping()
 
 	if ( teulTime() >= nextObjectiveUpdate )
 	{
+		// keep DB connection alive
+		if (mysql_ping(dbh) != 0) {
+			dbugLog(_FLA, "dbc:Main thread server connection failure - %d(%s)", mysql_errno(dbh), mysql_error(dbh));
+			threadsDBReconnect(dbh);
+		}
+
 		nextObjectiveUpdate += (teulTime()-nextObjectiveUpdate) + 5;
 		bInitiateObjectiveUpdateProcessing = true;
 	}

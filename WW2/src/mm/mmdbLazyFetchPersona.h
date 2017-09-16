@@ -8,11 +8,27 @@
 //
 // Originating Programmer: Ian "frisbone" Frisbie
 
+#include <vector>
 #include "mm/mmEnums.h"
 #include "mm/mmQueries.h"
 #include "wwii/wwiiDBThreads.h"
 
 typedef void (*PersonaCallbackFunction)(void *, bool);
+
+struct BriefPersonaRecord {
+        UINT32 selectedID;
+        WWII_COUNTRY country;
+        RANK_NO rankNo;
+        UINT32 rankPoints;
+        UINT32 sideLockTime;
+        WWII_SIDE lastSide;
+        UINT64 playerMask;
+        UINT32 decal;
+        UINT32 squad;
+        ChatHandle handle;
+        UINT32 playedTime;
+        UINT32 newMinuteBalance;
+};
 
 /*
 	This class allows a lazy selection of the persona when requested (not blocking main thread)
@@ -23,7 +39,7 @@ public:
 		: DBThreadQuery(DBThread::Default, "SelectPersonaQuery", DBThreadQuery::_CALLBACK
 			, QRY_SELECT_PERSONA_DATA, player->playerID(), ps.m_countryID, ps.m_branchID)
 		, m_ps(ps)
-		, m_player(player)
+		, m_pid(player->playerID())
 		, m_callBack(callback) 
 		, m_callbackData(callbackData)
 		, m_newMinuteBalance(0)
@@ -33,7 +49,7 @@ public:
 
 protected:
 	PersonaSelection	m_ps;
-	Player 	*m_player;
+	UINT32 m_pid;
 	PERSONA_LOAD_STATUS m_status;
         PersonaCallbackFunction m_callBack;
 	void *m_callbackData;
@@ -41,8 +57,16 @@ protected:
 	bool m_changed;
 	RANK_NO m_rankNo;
 	UINT32 m_rankPoints;
+	std::vector<BriefPersonaRecord *> personaQueryResult;
 protected:
 	virtual bool Process(const size_t numRows) override;
+
+	void releasePersonaRecords() {
+               // release any records previously allocated
+                for (size_t i=0; i < personaQueryResult.size(); i++)
+                        delete personaQueryResult[i];
+                personaQueryResult.clear();
+	}
 
 protected:
 	virtual void Success() override;

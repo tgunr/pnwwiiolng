@@ -138,6 +138,9 @@ DBHANDLE::connect()
 	if ( nullptr == m_conn )
 		return false;
 
+	// TBD: reflect changes that were done in DB worker threads??  Or because on main thread we shouldn't?
+	// mysql_autocommit(m_conn, 1);
+	
 	m_initialized = true;
 
 	return true;

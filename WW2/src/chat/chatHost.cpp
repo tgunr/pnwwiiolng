@@ -95,6 +95,7 @@
 #include "wwii/wwiiServerTrackedObject.h"
 #include "wwii/wwiiServerTypeEnums.h"
 #include "wwii/wwiiDBThreads.h"
+#include "wwii/wwiiThreads.h"
 #include "wwii/wwiiPPOLoader.h"
 
 extern UINT32 serverGetAuthIP();
@@ -2818,7 +2819,10 @@ _houseKeeping()
 	};
 
 	// keep DB connection alive
-	mysql_ping(dbh);
+	if (mysql_ping(dbh) != 0) {
+		dbugLog(_FLA, "dbc:Main thread server connection failure - %d(%s)", mysql_errno(dbh), mysql_error(dbh));
+		threadsDBReconnect(dbh);
+	}
 
 	if ( housekeeping[step] == nullptr )
 	{

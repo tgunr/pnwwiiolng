@@ -21,6 +21,8 @@
 #include "chat/chatTimeInterval.h"
 #include "include/mydbQuery.h"
 
+using namespace std::chrono_literals;
+
 struct BAN
 {
 	BAN(const ChatHandle handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle issuerHandle)
@@ -134,8 +136,6 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 	try
 	{
-		mysql_ping(conn);
-
 		dbugLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, issuer.c_str(), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, name.c_str());
 
 		message = new char[strlen(ban.m_message.c_str())*2 + 1];
@@ -188,12 +188,23 @@ _processBan(DB::handle_t* conn, BAN& ban)
 void BanThread::dbrun()
 {
 	dbugLog(_FLI, "Ban Queue Thread active");
+	UINT32 banThreadRef = 101;
 
 	while ( !isCancelled() )
 	{
-		auto ban = banQueue.getNext();
-		if (ban)
+		BAN *ban;
+		if (!banQueue.getNextWithin(5s, &ban)) 
+		{
+			threadsDBReconnect(&m_conn, banThreadRef, this);
+		} 
+		else 
+		{
 			_processBan(m_conn, *ban);
+			if (isDBConnectionGone(m_conn))
+			{
+				threadsDBReconnect(&m_conn, banThreadRef, this);
+			}
+		}
 	}
 }
 

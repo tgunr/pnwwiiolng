@@ -139,6 +139,9 @@ _saveSelections(DB::handle_t* conn)
 void
 PersonaSelectionThread::dbrun()
 {
+	// TODO - this should just be refactored to be on a DBThread
+	UINT32 personaThreadRef = 100;  // arbitrary, just don't want it overlapping with DB threads
+
 	dbugLog(_FLM, "Persona-selections thread active");
 
 	while ( !isCancelled() )
@@ -150,11 +153,14 @@ PersonaSelectionThread::dbrun()
 				return;
 		}
 
+		// keep DB connection alive
+		if (mysql_ping(m_conn) != 0) {
+			dbugLog(_FLA, "Persona thread server connection failure - %d(%s)", mysql_errno(m_conn), mysql_error(m_conn));
+			threadsDBReconnect(&m_conn, personaThreadRef, this);
+		}
+
 		if ( !_selectionRequests )
 			continue;
-
-		// Wake the connection up
-		mysql_ping(m_conn);
 
 		_saveSelections(m_conn);
 	}
