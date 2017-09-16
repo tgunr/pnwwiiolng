@@ -150,15 +150,13 @@ threadsDBReconnect(DBHANDLE& dbHandle)
 {
 	dbugLog(_FLW, "reconnecting DB on Main thread");
 
-	threadsCloseDBConnection(dbHandle);
-
-	while (!dbHandle.connected()) {
+	do {
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		dbugLog(_FLW, "Reconnecting to database, main thread");
-		if (!dbHandle.connect()) {
+		if (!dbHandle.reconnect()) {
 			dbugLog(_FLA, "Unable to reconnect to database on main thread, will retry");
 		}
-	}
+	} while (!dbHandle.connected());
 	dbugLog(_FLW, "Reconnected to database on main thread");
 }
 
@@ -168,14 +166,13 @@ void
 threadsDBReconnect(DB::handle_t ** conn, UINT32 threadRef, PNThread *pThread)
 {
 	assert(conn!=nullptr);
-	assert(pThread!=nullptr);
 
 	dbugLog(_FLW, "reconnecting DB dbc:%u", threadRef);
 
 	threadsCloseDBConnection(*conn);
 	*conn = nullptr;
 
-	while (!pThread->isCancelled() && *conn == nullptr) {
+	while ((!pThread || !pThread->isCancelled()) && *conn == nullptr) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		dbugLog(_FLW, "dbc:%u reconnecting to database", threadRef);
 		*conn = threadsOpenDBConnection(true);

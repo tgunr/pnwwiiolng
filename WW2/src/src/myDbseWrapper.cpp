@@ -153,8 +153,17 @@ DBHANDLE::disconnect()
 
 	if ( m_initialized == false )
 		return;
-
 	mysql_close(oldConn);
+}
+
+bool
+DBHANDLE::reconnect()
+{
+    if (m_initialized == false) {
+        return false;
+    }
+    threadsDBReconnect(&m_conn, 0, nullptr);
+    return true;
 }
 
 const char*
