@@ -163,7 +163,8 @@ DBHANDLE::reconnect()
         return false;
     }
     threadsDBReconnect(&m_conn, 0, nullptr);
-    return true;
+    m_initialized = (m_conn != nullptr);
+    return m_initialized;
 }
 
 const char*
