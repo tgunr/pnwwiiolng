@@ -175,9 +175,28 @@ static inline long random() {
     return value; // Win32 is ILP64 means this returns enough entropy for a long
 }
 
-static inline int OS_OPEN(int *fdp, const char *path, int oflag, int cmode) {
-    return _sopen_s(fdp, path, oflag, _SH_DENYRW, cmode);
+
+using fullpath_t = wchar_t;
+#define PRpathT "ls"
+#define PATHLit(s) L##s
+
+#define OS_PATHSEP "\\"
+#define OS_PATHSEP_C '\\'
+#define OS_PATHSEP_W L"\\"
+#define OS_PATHSEP_WC L'\\'
+
+#define WRONG_PATHSEP "/"
+#define WRONG_PATHSEP_C '/'
+#define WRONG_PATHSEP_W L"/"
+#define WRONG_PATHSEP_WC L'/'
+
+static inline int OS_OPEN(int *fdp, const wchar_t *path, int oflag, int cmode) {
+    return _wsopen_s(fdp, path, oflag, _SH_DENYRW, cmode);
 }
+static inline int OS_OPEN(int *fdp, const char *path, int oflag, int cmode) {
+	return _sopen_s(fdp, path, oflag, _SH_DENYRW, cmode);
+}
+
 static inline void OS_CLOSE(int fd) { _close(fd); }
 #define OS_WOPEN(...) _wopen(__VA_ARGS__)
 #define OS_READ(...) _read(__VA_ARGS__)
@@ -192,7 +211,21 @@ static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { 
 // Equivalents for macOS/Linux
 #elif platOS == OS_MACOS || platOS == OS_LINUX
 
-static inline int OS_OPEN(int *fdp, const char *path, int oflag, int cmode) {
+using fullpath_t = char;
+#define PATHLit(s) s
+#define PRpathT "s"
+
+#define OS_PATHSEP "/"
+#define OS_PATHSEP_C '/'
+#define OS_PATHSEP_W L"/"
+#define OS_PATHSEP_WC L'/'
+
+#define WRONG_PATHSEP "\\"
+#define WRONG_PATHSEP_C '\\'
+#define WRONG_PATHSEP_W L"\\"
+#define WRONG_PATHSEP_WC L'\\'
+
+static inline int OS_OPEN(int *fdp, const fullpath_t *path, int oflag, int cmode) {
     *fdp = open(path, oflag, cmode);
     return (*fdp == -1 ? 1 : 0);
 }

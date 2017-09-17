@@ -8,8 +8,6 @@
 #include "parse/parseIO.h"
 #include "strt/strtWOR.h"
 
-#define TH_BLITZ_PATH "/th_blitz/weapon/"
-
 // load module arg spec of parameter checking
 #define	LOAD_MODULE_SPEC {T_STRING,PN_MAX_PATH},{T_FLOAT,4},{T_INT,4}
 

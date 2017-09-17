@@ -47,8 +47,6 @@ static const char* const s_configVarTypes[NUM_CONFIG_VAR_TYPES] =
 ,	"path"
 };
 
-#define PATH_SEPSTR "/"
-
 ////////////////////////////////////////////////////////////////////////////////
 // Registry of all the known config vars.
 
@@ -64,17 +62,17 @@ static ConfigVars& _getConfigVars()
 // Variables.
 
 const CFG_PATH(pnPath, PN_PLAYNET_PATH, "PLAYNET_PATH", true, "Hard-coded playnet directory.");
-CFG_PATH(dataDir, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "data", "DATA_DIR", true, "Top level directory for game data.");
+CFG_PATH(dataDir, PN_PLAYNET_PATH OS_PATHSEP "wwiiol" OS_PATHSEP "data", "DATA_DIR", true, "Top level directory for game data.");
 CFG_PATH(importFile, "importlist.txt", "IMPORT_FILE", true, "File which will specify sdm files to be used by the server.");
 CFG_PATH(terrainSubdir, "terrain", "TERRAIN_SUBDIR", true, "Path from DATA_DIR to the terrain sdm files and origin file.");
 CFG_PATH(originFile, "origin", "ORIGIN_FILE", true, "Name of the file which identifies where the sdm files came from.");
 CFG_STRING(stratLanguage, "en", "STRAT_LANGUAGE", true, "2-letter language code for server localization.");
-CFG_PATH(thblitzPath, "th_blitz" PATH_SEPSTR "weapon", "THBLITZ_PATH", true, "Path from DATA_DIR to the thBlitz csv files.");
+CFG_PATH(thblitzPath, "th_blitz" OS_PATHSEP "weapon", "THBLITZ_PATH", true, "Path from DATA_DIR to the thBlitz csv files.");
 CFG_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS", false, "Disables sdm-loading errors from causing termination.");
 CFG_PATH(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH", true, "DATA_DIR-relative path/filename for the blitzWor csv file");
-CFG_PATH(luaPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "lua", "LUA_BASE_PATH", true, "Path to the Lua scripts.");
+CFG_PATH(luaPath, PN_PLAYNET_PATH OS_PATHSEP "wwiiol" OS_PATHSEP "lua", "LUA_BASE_PATH", true, "Path to the Lua scripts.");
 CFG_PATH(defaultLogPath, nullptr, "LOG_PATH", false, "Default location for log files.");
-CFG_PATH(teulWebPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "web" PATH_SEPSTR "debug", "TEUL_UWEB_PATH", true, "Path to the top-level directory for the internal web server.");
+CFG_PATH(teulWebPath, PN_PLAYNET_PATH OS_PATHSEP "wwiiol" OS_PATHSEP "web" OS_PATHSEP "debug", "TEUL_UWEB_PATH", true, "Path to the top-level directory for the internal web server.");
 CFG_PATH(luaRCFile, "rc.lua", "LUA_RC_FILE", true, "Name of the startup (rc) Lua script");
 CFG_PATH(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true, "Name of the Lua strat library.");
 

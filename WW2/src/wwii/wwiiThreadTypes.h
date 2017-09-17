@@ -72,6 +72,28 @@ public:
 		return true;
 	}
 
+    // Blocking lock attempt with timeout
+    template <class Rep, class Period>
+    bool getNextWithin(const std::chrono::duration<Rep, Period> &duration, _DataType **data) noexcept
+    {
+        // Wait until empty is false
+        std::unique_lock<std::mutex> lock(m_mutex);
+        if (!m_condition.wait_for(lock, duration, [=] () {
+            return m_destructing || !m_queue.empty();
+        })) {
+            *data = nullptr;
+            return false;
+        }
+        if ( m_destructing ) {
+            destroy();
+            *data = nullptr;
+        } else {
+            *data = m_queue.front();
+            m_queue.pop();
+        }
+        return true;
+    }
+
 	// Blocking lock attempt
 	_DataType* getNext() noexcept
 	{

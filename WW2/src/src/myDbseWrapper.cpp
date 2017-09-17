@@ -62,7 +62,7 @@ dbseSetDatabase(const ConfigAddr& addr, const ConfigAddr& port, const ConfigStr&
 // Low-level MySQL connection initialization
 
 static DB::handle_t*
-_doMyConnect(bool autoReconnect)
+_doMyConnect()
 {
 	// Make sure MySQL is initialized and construct a connection structure.
 	DB::handle_t* tempConn = mysql_init(nullptr);
@@ -76,24 +76,11 @@ _doMyConnect(bool autoReconnect)
 	auto flags = CLIENT_MULTI_STATEMENTS | CLIENT_MULTI_RESULTS;
 	if ( cv_mysqlCompression.GetBool() )
 		flags |= CLIENT_COMPRESS;
-
+    
 	if ( mysql_real_connect(tempConn, s_dbAddress, s_dbUser, s_dbPassword, s_dbSchema, s_dbPort, nullptr, flags) == nullptr )
 	{
 		dbugLog(_FLA, "mysql_real_connect failed:\nError %u (%s) \n", mysql_errno(tempConn), mysql_error(tempConn));
 		dbugLog(_FLA, "using host %s:%hu user %s schema %s", s_dbAddress, s_dbPort, s_dbUser, s_dbSchema);
-		return nullptr;
-	}
-
-#if MYSQL_VERSION_ID >= 50003
-	// Enable automatic reconnection
-	my_bool reconnect = (autoReconnect) ? 1 : 0;
-	mysql_options(tempConn, MYSQL_OPT_RECONNECT, &reconnect);
-#endif
-
-	if ( mysql_select_db(tempConn, s_dbSchema) != 0 )
-	{
-		dbugLog(_FLA, "unable to select schema %s", s_dbSchema);
-		mysql_close(tempConn);
 		return nullptr;
 	}
 
@@ -112,8 +99,12 @@ _doMyConnect(bool autoReconnect)
 static std::mutex dbconnMutex;
 
 DB::handle_t*
-dbseGetConnection(bool report, bool autoReconnect)
+dbseGetConnection()
 {
+    // Note: This is more thread-safe than it looks, but only because the
+    // dbseSetDatabase() function only ever sets the data once, even if the
+    // parameters later change, so more calls to it, despite not being properly
+    // locked during this function, are both harmless and ineffectual.
 	dbseSetDatabase(cv_wwiiDBAddress, cv_wwiiDBPort, cv_wwiiDBDefaultSchema, cv_wwiiDBUser, cv_wwiiDBPassword);
 	if ( !s_dbAddress[0] || !s_dbPort || !s_dbSchema[0] || !s_dbUser[0] || !s_dbPassword[0] ) {
 		LogAbort("Missing database configuration, can't connect");
@@ -123,22 +114,16 @@ dbseGetConnection(bool report, bool autoReconnect)
 				, s_dbAddress, s_dbPort, s_dbSchema, s_dbUser);
 
 	DB::handle_t* newConn = nullptr;
-	std::this_thread::sleep_for(std::chrono::microseconds(250));
 	{
 		std::lock_guard<std::mutex> dbconnLock(dbconnMutex);
-		newConn = _doMyConnect(autoReconnect);
+		newConn = _doMyConnect();
 	}
 
-	if ( report )
-	{
-		dbugLog(_FLI, "Connection to host '%s:%hu' database '%s' user '%s' reconnect '%s' %s."
-						, s_dbAddress, s_dbPort, s_dbSchema, s_dbUser
-						, (autoReconnect ? "auto" : "manual")
-						, ((newConn != nullptr) ? "successful" : "FAILED")
-						);
-	}
-
-	std::this_thread::yield();
+    dbugLog(_FLI, "Connection to host '%s:%hu' database '%s' user '%s' reconnect '%s' %s."
+                    , s_dbAddress, s_dbPort, s_dbSchema, s_dbUser
+                    , ("manual")
+                    , ((newConn != nullptr) ? "successful" : "FAILED")
+                    );
 
 	return newConn;
 }
@@ -149,10 +134,12 @@ DBHANDLE::connect()
 	assert( m_initialized == false );
 
 	//Initialization stuff;
-	m_conn = dbseGetConnection(true);
+	m_conn = dbseGetConnection();
 	if ( nullptr == m_conn )
 		return false;
 
+	mysql_autocommit(m_conn, 1);
+	
 	m_initialized = true;
 
 	return true;
@@ -166,8 +153,18 @@ DBHANDLE::disconnect()
 
 	if ( m_initialized == false )
 		return;
-
 	mysql_close(oldConn);
+}
+
+bool
+DBHANDLE::reconnect()
+{
+    if (m_initialized == false) {
+        return false;
+    }
+    threadsDBReconnect(&m_conn, 0, nullptr);
+    m_initialized = (m_conn != nullptr);
+    return m_initialized;
 }
 
 const char*

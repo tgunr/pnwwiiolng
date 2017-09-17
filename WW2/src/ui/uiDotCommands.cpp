@@ -4176,7 +4176,7 @@ static SINT32 dot_tspawn(const char* input)
 #if platOS != OS_MACOS
 static SINT32 dot_heightmap(const char* in)
 {
-    extern void ddpSaveImgAsBitmap(unsigned char* img, int w, int h, const char* filename);
+    extern void ddpSaveImgAsBitmap(unsigned char* img, int w, int h, wchar_t* filename);
 
     char model[128] = {0};
     int res = 0;
@@ -4238,7 +4238,7 @@ static SINT32 dot_heightmap(const char* in)
         pos.x() = x;
     }
 
-    ddpSaveImgAsBitmap(img, res, res, "heightmap.bmp");
+    ddpSaveImgAsBitmap(img, res, res, L"heightmap.bmp");
 
     return DC_HANDLED;
 }

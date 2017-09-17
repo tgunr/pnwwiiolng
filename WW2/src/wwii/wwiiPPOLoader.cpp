@@ -392,7 +392,13 @@ bool PPOSpecLoader::ppoIsSpawnAllowed(int pposubtype, int vehclass, int vehtype)
 	}
 	else
 	{
-		WriteLog(LOG_WEAPON, LOG_WARN, "Unable to match a spec to subtype %d", pposubtype);
+        if (pposubtype != 0) {
+            // The subtype seems to turn out to be zero pretty often. Logging in
+            // that case is both noisy and unhelpful. TODO: Track down where the
+            // zeroes are coming from and whether they're actually worthy of the
+            // warning-level message.
+            dbugLog(_FLW, "Unable to match a spec to subtype %d", pposubtype);
+        }
 	}
 
 	dbugLog(_FLD, "Spawn allowed flag: %d", retVal);

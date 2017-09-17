@@ -50,8 +50,8 @@ static DebugLogger _logger;
 const char* errorTypes[] = {
 	"F",		// fatal error detected, exit program
 	"A",		// error detected, operation aborted
-	"R",		// error detected, routine recovered, operation continues
 	"W",		// possible error detected, operation continues
+    "M",        // error detected, routine recovered, operation continues
 	"N",		// note, operation continues
 	"I",		// informational message
 	"D",		// debug level message

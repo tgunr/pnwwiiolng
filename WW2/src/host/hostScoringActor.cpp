@@ -25,7 +25,7 @@ Scoring::Actor::Actor(const HostVehicle* vehicle)
 	// Use the first available player as a guide.
 	const Player* const player = vehicle->players().front();
 	if ( player == nullptr ) {
-		dbugLog(_FLA, "v:%u Main player is null");
+		dbugLog(_FLA, "v:%u Main player is null",  vehicle->spec().asUINT32());
 		return;
 	}
 

@@ -1273,7 +1273,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN )
 		{
-			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d connCount:%d", teulIndex, error, Server::myServerInfo.m_players.size());
+			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d connCount:%zu", teulIndex, error, Server::myServerInfo.m_players.size());
 			return;
 		}
 		else
@@ -1286,7 +1286,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN && teulIndex == player->teulIndex() )
 		{
-			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected, userConn:%d", teulIndex, player->playerID(), player->callsign(), player->sortieID(), Server::myServerInfo.m_players.size());
+			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected, userConn:%zu", teulIndex, player->playerID(), player->callsign(), player->sortieID(), Server::myServerInfo.m_players.size());
 			player->SetTeulIndex(-1);
 		}
 		else
@@ -1302,7 +1302,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 static void
 _acceptFunction(ENDPOINT& endpoint)
 {
-	dbugLog(_FLD, "t:%d incoming connection from %s:%hu conn#%d"
+	dbugLog(_FLD, "t:%d incoming connection from %s:%hu conn#%zu"
 					, endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort()
 					, Server::myServerInfo.m_players.size()
 					);
@@ -1399,7 +1399,7 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 
 		if ( player != nullptr )
 		{
-			dbugLog(_FLI, "t:%d p:%u c:%s connection closed, %d connections remaining"
+			dbugLog(_FLI, "t:%d p:%u c:%s connection closed, %zu connections remaining"
 						, teulIndex
 						, player->playerID()
 						, player->callsign()
@@ -1409,7 +1409,7 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 		}
 		else
 		{
-			dbugLog(_FLI, "t:%d personaless connection closed, %d connections remaining"
+			dbugLog(_FLI, "t:%d personaless connection closed, %zu connections remaining"
 						, teulIndex
 						, Server::myServerInfo.m_players.size()
 						);

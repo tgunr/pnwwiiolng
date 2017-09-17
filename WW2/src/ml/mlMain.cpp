@@ -7730,8 +7730,21 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		Pos.z += WorldOffsetOrigin.z + 1.0f;
 	}
 
-	if (Vehicle && Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
-		Pos.z += 1.0f;
+    if (Vehicle && Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
+    {
+        Pos.z += 1.0f;
+    }
+
+    //If we are spawning an atg or aa gun from a mobile spawn we add a little to the
+    // spawn in height to try to stop those units from clipping into the terrain
+    // when the MSP has been built over sharp edges or lumps in the terrain.
+    if (MobileSpawn)
+    {
+        if (Vehicle && Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_GROUND)
+        {
+            Pos.z += 0.2f;
+        }
+    }
 
 	if(!MobileSpawn && !SpecialOverride)
 	{
