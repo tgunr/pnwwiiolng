@@ -940,7 +940,7 @@ _recvMessage(ACTION_OBJECT* const a)
 		// mark start, find end
 		char *start = ++p;
 
-		p = strchr(p, '\x01');
+		p = strchr(p, '\x01');// Returns a pointer to the first occurrence of '\x01' in the C string.
 		if (!p) {
 
 			dbugLog(_FLA, "Client chat packet received with no terminating control character");
@@ -954,10 +954,14 @@ _recvMessage(ACTION_OBJECT* const a)
 			// decode it
 			message.clientInfo.decode(start);
 
-			// remove it from the message - source is null terminated, limit to max IRC length
-			strsafecpy(message.m_message, p, MAX_IRC_LEN);
+            // Get the length of the message without the clientInfo.
+            size_t newLengthOfMessage = strlen(p);
 
-			message.m_length -= (p - message.m_message);
+			// Copy the message without the clientInfo back into the original message
+            // Note that destination and source memory overlaps.
+            memmove(message.m_message, p, MAX_IRC_LEN);
+
+            message.m_length = newLengthOfMessage;
 		}
 		else
 		{
@@ -1103,10 +1107,9 @@ _recvTutProgress(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Instance the ThreadTextQuery class for aggregating
 
-const char* const _PROGRESS_UPDATE_PREFIX = "INSERT INTO `wwii`.`training_progress`(player_id,group_name,progress)VALUES";
-const char* const _PROGRESS_UPDATE_SUFFIX = "ON DUPLICATE KEY UPDATE player_id=values(player_id),group_name=values(group_name),progress=values(progress)";
+const char* const _PROGRESS_UPDATE_PREFIX = "REPLACE INTO `wwii`.`training_progress`(player_id,group_name,progress)VALUES";
 
-static ThreadTextQuery _progressUpdates(DBThread::Default, _PROGRESS_UPDATE_PREFIX, _PROGRESS_UPDATE_SUFFIX);
+static ThreadTextQuery _progressUpdates(DBThread::Default, _PROGRESS_UPDATE_PREFIX, "");
 
 SINT32
 Tutorial::GroupProgress::receive(Player* player) const

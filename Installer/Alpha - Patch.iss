@@ -1,6 +1,6 @@
 #define MyAppID "12"
-#define MyAppVersion GetFileVersion("current/WW2.exe")
-#define MyOldAppVersion GetFileVersion("previous/WW2.exe")
+#define MyAppVersion GetFileVersion(curr+"/WW2.exe")
+#define MyOldAppVersion GetFileVersion(prev+"/WW2.exe")
 
 #define MyAppNameRoot "Battleground Europe"
 #define MyAppName "Battleground Europe - 1.35 Alpha"
@@ -108,6 +108,7 @@ Source: "{#MyPatchSourceDir}\playarc08.ww2.patch"; DestDir: "{app}"; BeforeInsta
 Source: "{#MyPatchSourceDir}\playarc09.ww2.patch"; DestDir: "{app}"; BeforeInstall: BackupPatchTgt('playarc09.ww2'); Flags: ignoreversion deleteafterinstall  
 Source: "{#MyPatchSourceDir}\playarc10.ww2.patch"; DestDir: "{app}"; BeforeInstall: BackupPatchTgt('playarc10.ww2'); Flags: ignoreversion deleteafterinstall  
 Source: "{#MyPatchSourceDir}\Playgate.exe.patch";  DestDir: "{app}"; BeforeInstall: BackupPatchTgt('Playgate.exe');  Flags: ignoreversion deleteafterinstall  
+Source: "{#MyPatchSourceDir}\Settings.exe.patch";  DestDir: "{app}"; BeforeInstall: BackupPatchTgt('Settings.exe');  Flags: ignoreversion deleteafterinstall  
 Source: "{#MyPatchSourceDir}\WW2.exe.patch";       DestDir: "{app}"; BeforeInstall: BackupPatchTgt('WW2.exe');       Flags: ignoreversion deleteafterinstall  
 Source: "{#MyPatchSourceDir}\license.rtf.patch";   DestDir: "{app}"; BeforeInstall: BackupPatchTgt('license.rtf');   Flags: ignoreversion deleteafterinstall  
 Source: "{#MyPatchSourceDir}\readme.rtf.patch";    DestDir: "{app}"; BeforeInstall: BackupPatchTgt('readme.rtf');    Flags: ignoreversion deleteafterinstall  
@@ -125,6 +126,7 @@ Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -0 -s ""{app}\playarc09.ww2
 Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -0 -s ""{app}\playarc10.ww2.backup"" ""{app}\playarc10.ww2.patch"" ""{app}\playarc10.ww2"""; Flags: skipifsilent runhidden; AfterInstall: CleanUp('playarc10.ww2')
 Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -0 -s ""{app}\playarc11.ww2.backup"" ""{app}\playarc11.ww2.patch"" ""{app}\playarc11.ww2"""; Flags: skipifsilent runhidden; AfterInstall: CleanUp('playarc10.ww2')
 Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -0 -s ""{app}\Playgate.exe.backup""  ""{app}\Playgate.exe.patch""  ""{app}\Playgate.exe""";  Flags: skipifsilent runhidden; AfterInstall: CleanUp('Playgate.exe')
+Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -0 -s ""{app}\Settings.exe.backup""  ""{app}\Settings.exe.patch""  ""{app}\Settings.exe""";  Flags: skipifsilent runhidden; AfterInstall: CleanUp('Settings.exe')
 Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -0 -s ""{app}\WW2.exe.backup""       ""{app}\WW2.exe.patch""       ""{app}\WW2.exe""";       Flags: skipifsilent runhidden; AfterInstall: CleanUp('WW2.exe')
 Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -0 -s ""{app}\license.rtf.backup""   ""{app}\license.rtf.patch""   ""{app}\license.rtf""";   Flags: skipifsilent runhidden; AfterInstall: CleanUp('license.rtf') 
 Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -0 -s ""{app}\readme.rtf.backup""    ""{app}\readme.rtf.patch""    ""{app}\readme.rtf""";    Flags: skipifsilent runhidden; AfterInstall: CleanUp('readme.rtf')

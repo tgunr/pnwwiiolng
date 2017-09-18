@@ -19,8 +19,8 @@ enum key_TYPE
 	EDWORD,
 	EFLOAT,
 	EDOUBLE,
-	ESTRING
-
+	ESTRING,
+	EWSTRING
 };
 
 struct GVAR
@@ -37,6 +37,7 @@ struct GVAR
         float *floatValue;
         double *doubleValue;
         char *stringValue;
+        wchar_t *wstringValue;
     } valuePtr;
     size_t maxLength;
 };
@@ -53,6 +54,7 @@ static constexpr size_t sizeof_a(T (&)[N]) { return N; }
 #define FLOAT_KEY_DEF(cmd, var) { cmd, EFLOAT, { &var }, 0 }
 #define DOUBLE_KEY_DEF(cmd, var) { cmd, EDOUBLE, { &var }, 0 }
 #define STRING_KEY_DEF(cmd, var) { cmd, ESTRING, { reinterpret_cast<char *>(&var[0]) }, sizeof_a(var) }
+#define WSTRING_KEY_DEF(cmd, var) { cmd, EWSTRING, { reinterpret_cast<wchar_t *>(&var[0]) }, array_size(var) }
 
 //  lowercase ONLY!
 static GVAR vars[] = {
@@ -93,7 +95,11 @@ static GVAR vars[] = {
     STRING_KEY_DEF("authserverport", gAuthServerPort),
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
+#if platOS == OS_WIN32
+    WSTRING_KEY_DEF("datadir", DataPath),
+#else
     STRING_KEY_DEF("datadir", DataPath),
+#endif
 #ifdef DEBUG_WW2
     NULL_KEY_DEF("buildmdlonly", DebugBuildingMDLFilesOnly),
 #endif
@@ -180,6 +186,9 @@ LOGICAL mngoptParse()
                 break;
             case ESTRING:
                 strlcpy(foundCmd->valuePtr.stringValue, value.c_str(), foundCmd->maxLength);
+                break;
+            case EWSTRING:
+                mbstowcs(foundCmd->valuePtr.wstringValue, value.c_str(), foundCmd->maxLength);
                 break;
         }
     }

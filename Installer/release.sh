@@ -70,7 +70,7 @@ DEBUGDIR="$WWII_ROOT/build/client/Debug/Bin"
 LIBDIR="$WWII_ROOT/Installer/libs"
 RELEASEDIR="$WWII_ROOT/build/client/Release/Bin"
 #RELEASELIBDIR="$WWII_ROOT/Build/lib/Win32/Release"
-PRODUCTS="WW2.exe Playgate.exe"
+PRODUCTS="WW2.exe Playgate.exe Settings.exe"
 DATADIRS="DirectXRedist loc playgate screens"
 DATAFILES="steam_appid.txt eula.txt license.rtf readme.rtf regions.txt tos.txt wwii1.ico"
 ASSETFILES="eula.txt license.rtf readme.rtf wwii1.ico"
@@ -550,7 +550,6 @@ if [ "$myos" == "win" ] ; then
             echo "Setting perms on $dstfile"
             chmod 550 $dstfile
         done
-        cp $WWII_ROOT/Installer/previous/Settings.exe $WWII_ROOT/Installer/current/.
         chmod 550 $WWII_ROOT/Installer/current/.
     fi
 
@@ -601,14 +600,25 @@ if [ "$myos" == "win" ] ; then
         build_step "create" "Creating" "diff files for patcher"
         if [ "$skip_step" = false ]; then
             pushd "$INSTALLER"
-            ./MakeDiffs.bat
+            ./MakeDiffs.bat previous current
             popd
         fi
 
         fname="Installer/$prefix - Patch.iss"
         build_step "build" "Building" "complete running patch install scripts: "$fname
         if [ "$skip_step" = false ]; then
-            iscc "$fname"
+            iscc "$fname" /Dcurr=current /Dprev=previous
+        fi
+        if [ "$skip_step" = false ]; then
+            pushd "$INSTALLER"
+            ./MakeDiffs.bat previous previous
+            popd
+        fi
+
+        fname="Installer/$prefix - Patch.iss"
+        build_step "build" "Building" "complete running patch install scripts: "$fname
+        if [ "$skip_step" = false ]; then
+            iscc "$fname" /Dcurr=previous /Dprev=current
         fi
     fi
 
