@@ -41,6 +41,9 @@ public:
 
 	//! Close connection to the given database.
 	void disconnect();
+	
+	//! Reconnect to the database unconditionally
+	bool reconnect();
 
 public:
 	operator const DB::handle_t* () const { return m_initialized ? m_conn : nullptr; }

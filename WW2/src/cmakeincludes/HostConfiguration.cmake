@@ -75,13 +75,12 @@ ELSE()
         LINK_LIBRARIES( "-stdlib=libc++" )
     ENDIF()
 
+    IF ( PN_SANITIZE )
+        ADD_COMPILE_OPTIONS( "-fstack-protector-all" "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+        LINK_LIBRARIES( "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+    ENDIF()
+    
     IF ( CMAKE_BUILD_TYPE MATCHES Debug )
-		IF ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang )	# OR CMAKE_BITNESS EQUAL BUILD_BITNESS: untested.
-			IF ( PN_SANITIZE )
-				SET(_EXTRA_HOST_COMPILE_OPTIONS "-fstack-protector-all" "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
-				SET(_EXTRA_HOST_LINK_OPTIONS "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
-			ENDIF()
-		ENDIF()
     	IF ( CMAKE_CXX_COMPILER_ID MATCHES Clang )
         	ADD_COMPILE_OPTIONS( "-O0" "-g3" )
 		ELSE()

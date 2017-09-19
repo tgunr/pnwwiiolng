@@ -600,25 +600,25 @@ if [ "$myos" == "win" ] ; then
         build_step "create" "Creating" "diff files for patcher"
         if [ "$skip_step" = false ]; then
             pushd "$INSTALLER"
-            ./MakeDiffs.bat
+            ./MakeDiffs.bat previous current
             popd
         fi
 
         fname="Installer/$prefix - Patch.iss"
         build_step "build" "Building" "complete running patch install scripts: "$fname
         if [ "$skip_step" = false ]; then
-            iscc "$fname"
+            iscc "$fname" /Dcurr=current /Dprev=previous
         fi
         if [ "$skip_step" = false ]; then
             pushd "$INSTALLER"
-            ./MakeDiffs.bat fallback
+            ./MakeDiffs.bat previous previous
             popd
         fi
 
         fname="Installer/$prefix - Patch.iss"
         build_step "build" "Building" "complete running patch install scripts: "$fname
         if [ "$skip_step" = false ]; then
-            iscc "$fname"
+            iscc "$fname" /Dcurr=previous /Dprev=current
         fi
     fi
 
