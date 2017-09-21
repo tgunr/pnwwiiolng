@@ -67,7 +67,6 @@ HostVehicleImpl::reset()
 	m_lastResupplier = 0;
 
 	m_stopped = 0;
-	m_deathNoticeNeeded = false;
 
 	m_captureActive = false;
 	m_lastCaptureFacility = 0;
@@ -263,6 +262,7 @@ HostVehicle::initialize(VEHICLE_HOLDER* const _holder, HostVehicleImpl* const _i
 	m_holder->timeStamp = teulClock();
 	m_spawnTime = teulTime();
 	m_cell = nullptr;
+	m_deathNoticeNeeded = false;
 
 //	m_nextUpdateClock = ~0ULL;
 

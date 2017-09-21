@@ -1092,7 +1092,7 @@ _recvKillNotice(ACTION_OBJECT* const a)
 		}
 		else
 		{
-			dbugLog(_FLW, "t:%d p:%u c:%s received kill notice and killer not found", a->teulIndex, player.playerID(), player.callsign(), killerID);
+			dbugLog(_FLW, "t:%d p:%u c:%s received kill notice and killer %u not found", a->teulIndex, player.playerID(), player.callsign(), killerID);
 		}
 	}
 
