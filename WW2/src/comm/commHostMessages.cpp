@@ -1085,7 +1085,7 @@ _recvKillNotice(ACTION_OBJECT* const a)
 		dbugLog(_FLD, "t:%d p:%u c:%s receiving kill notice [%u]", a->teulIndex, player.playerID(), player.callsign(), killerID);	///TODO:134:REMOVE
 #endif
 		player.vehicle->setVehicleKilled(killerID);
-		const HostVehicle* const killer = hostFindVehicleLocal(killerID);
+		HostVehicle* const killer = hostFindVehicleLocal(killerID);
 		if (killer != nullptr)
 		{
 			killer->setVehicleNeedsDeathNotice( true );
