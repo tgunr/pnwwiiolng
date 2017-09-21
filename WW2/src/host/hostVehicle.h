@@ -155,15 +155,15 @@ public:
 	UINT32				index; 	// index is a copy of weapon.serial
 
 	// Booleans
-	bool				m_isRemote : 1;
-	bool				m_isActive : 1;
-	bool				m_isReallyActive : 1;
-	bool				m_isFighter : 1;
-	bool				m_despawnTimerActive : 1;
-	bool				m_isBuzzard : 1;
-	bool				m_hasBeenKilled : 1;
-	bool				m_isInCaptureBuilding : 1;	// True when we're in a capture building.
-	bool				m_deathNoticeNeeded : 1;
+	bool				m_isRemote;
+	bool				m_isActive;
+	bool				m_isReallyActive;
+	bool				m_isFighter;
+	bool				m_despawnTimerActive;
+	bool				m_isBuzzard;
+	bool				m_hasBeenKilled;
+	bool				m_isInCaptureBuilding;	// True when we're in a capture building.
+	bool				m_deathNoticeNeeded;
 
 	HostVehicleImpl*	m_impl;
 	Grid::Cell*			m_cell;
