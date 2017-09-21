@@ -67,6 +67,7 @@ HostVehicleImpl::reset()
 	m_lastResupplier = 0;
 
 	m_stopped = 0;
+	m_deathNoticeNeeded = false;
 
 	m_captureActive = false;
 	m_lastCaptureFacility = 0;

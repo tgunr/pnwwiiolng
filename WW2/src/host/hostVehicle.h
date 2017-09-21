@@ -79,6 +79,8 @@ public:
 	bool shouldBeReallyActive() const { return spawnedTime() > ACTIVE_TO_REALLY_ACTIVE_TIME_S; }
 	bool isRemote() const { return m_isRemote; }
 	bool isVehicleToast();
+	bool hasBeenNotifiedOfVehicleDeath() { return m_deathNoticeNeeded; }
+	void setVehicleNeedsDeathNotice( bool notice ) { m_deathNoticeNeeded = notice; }
 
 	UINT32 killedBySortieID() const { return m_killedBySortieID; }
 
@@ -161,6 +163,7 @@ public:
 	bool				m_isBuzzard : 1;
 	bool				m_hasBeenKilled : 1;
 	bool				m_isInCaptureBuilding : 1;	// True when we're in a capture building.
+	bool				m_deathNoticeNeeded : 1;
 
 	HostVehicleImpl*	m_impl;
 	Grid::Cell*			m_cell;

@@ -1085,6 +1085,15 @@ _recvKillNotice(ACTION_OBJECT* const a)
 		dbugLog(_FLD, "t:%d p:%u c:%s receiving kill notice [%u]", a->teulIndex, player.playerID(), player.callsign(), killerID);	///TODO:134:REMOVE
 #endif
 		player.vehicle->setVehicleKilled(killerID);
+		const HostVehicle* const killer = hostFindVehicleLocal(killerID);
+		if (killer != nullptr)
+		{
+			killer->setVehicleNeedsDeathNotice( true );
+		}
+		else
+		{
+			dbugLog(_FLW, "t:%d p:%u c:%s received kill notice and killer not found", a->teulIndex, player.playerID(), player.callsign(), killerID);
+		}
 	}
 
 	return a->offset;

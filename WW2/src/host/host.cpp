@@ -1819,19 +1819,26 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 			continue;
 		}
 
-		if ( vehicle->m_nextUpdateClock > teulClock64 )
-		{
-#ifdef DEBUG_UPDATES
-			++vehiclesSkipped;
-#endif
-			continue;
-		}
-
 		unsigned int fail = 0;
-		if ( PN_UNLIKELY((vehicle->index == 0) | (vehicle->isActive() == false) | (vehicle->m_holder == nullptr)) )
-			++fail;
-		else if ( PN_UNLIKELY(vehicle->hasConnectedPlayers() == false) )
-			++fail;
+
+		// accelerate the notification to killers of vehicle death
+		if (!vehicle->hasBeenNotifiedOfVehicleDeath())
+		{
+			if ( vehicle->m_nextUpdateClock > teulClock64 )
+			{
+#ifdef DEBUG_UPDATES
+				++vehiclesSkipped;
+#endif
+				continue;
+			}
+
+			if ( PN_UNLIKELY((vehicle->index == 0) | (vehicle->isActive() == false) | (vehicle->m_holder == nullptr)) )
+				++fail;
+			else if ( PN_UNLIKELY(vehicle->hasConnectedPlayers() == false) )
+				++fail;
+		} else {
+			vehicle->setVehicleNeedsDeathNotice( false );	
+		}
 
 		if ( PN_LIKELY(fail == 0) )
 		{
