@@ -12,6 +12,8 @@
 #if platBuild != BUILD_SERVER
 # include "pi/pi.h"
 # include "include/vars.h"
+#else
+# include "include/configVars.h"
 #endif
 
 #include "mem/mem.h"
@@ -34,11 +36,6 @@
 #endif
 
 # define FILE_URL_DESIGNATOR    "file://"
-
-#if platBuild == BUILD_SERVER
-#include "include/configVars.h"
-# define DataPath cv_dataDir.GetString()
-#endif
 
 #include "wwii/wwiiUTF.h"
 
@@ -329,7 +326,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 	fullpath_t path[PN_MAX_PATH];
 	stat_t s;
 	if ( ! GetFileStat(s, filename, userdir, path) ) {
-		dbugLog(_FLW, "Could not open file");
+		dbugLog(_FLW, "Could not open file %s @ " PRpathT, filename, path);
 		return -1;
 	}
 
@@ -497,7 +494,14 @@ const fullpath_t* fiodGetPrepath()
 void fiodSetUserpath(bool) {}
 
 const fullpath_t* fiodGetPrepath() {
-	return DataPath;
+#if platOS != OS_WIN32
+	return cv_dataDir.GetString();
+#else
+	static fullpath_t path[PN_MAX_PATH] = L"";
+	if ( path[0] == L'\0' )
+		WWIIConvert(cv_dataDir.GetString(), path);
+	return path;
+#endif
 }
 #endif
 
