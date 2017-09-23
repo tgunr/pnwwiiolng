@@ -23,7 +23,9 @@ struct CHAR_INPUT
 #define NUM_SLIDERS_PER_JOYSTICK	2
 
 LOGICAL dimainInit();
+LOGICAL dimainInitJoysticks();
 void dimainKill();
+void dimainKillJoysticks();
 LOGICAL dimainGetInputs(imap_queue_entry** plpiac, UINT32* pnumentries);
 
 UINT32 dimainVKToIAC(UINT32 uVK);
