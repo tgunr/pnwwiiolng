@@ -1,6 +1,7 @@
 #include "syscfg.h" // Path is project specific.
 #include <string.h>
 #include <algorithm>
+#include <locale>
 
 #include "steam_api.h" // HACK
 
@@ -280,7 +281,24 @@ JS_FUNCTION_DEF(jsClient, issteamcopy) {
 	steam connection
 *************************************************************************************************/
 
+namespace {
+	bool IsValidCallsign(const char* callsign) {
+		if ( strlen(callsign) < 2 )
+			return false;
+
+		for ( const char* c = callsign ; c != '\0' ; ++c ) {
+			if ( !std::isalnum(*c, std::locale::classic()) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+}
+
 JS_FUNCTION_DEF(jsClient, steamconnect) {
+	assert ( IsSteamCopy() );
+
 	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
 	if ( ! jsclient ) return JS_FALSE;
 	if ( argc < 1 ) return JS_FALSE;
@@ -291,11 +309,18 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
     } else {
         JS_ValueToInt32(ctx, argv[0], &arena);
     }
+
 	const char* callsign = "";
-	if ( argc >= 2 )
+	if ( argc >= 2 ) {
 		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
 
-	// HACK: Move this to sysSteam so we aren't doing this in GUI code.
+		// TODO: Move this stuff out of GUI code.
+		if ( callsign[0] != '\0' && IsValidCallsign(callsign) == false ) {
+			*rval = INT_TO_JSVAL(SteamLoginResponse::LoginCallsignInvalid);
+			return JS_TRUE;
+		}
+	}
+
 	char ticket_data[512];
 	uint32_t ticket_length;
 	HAuthTicket ticket = SteamUser()->GetAuthSessionTicket(ticket_data, array_size(ticket_data),
