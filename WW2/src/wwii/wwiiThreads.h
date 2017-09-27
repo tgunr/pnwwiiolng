@@ -32,6 +32,13 @@ extern void threadsShutdown();
 // Process the next callback on the queue
 extern void threadsCallNextCallback();
 
+// Check the multitude of mysql errors for those indicating server connection is kaput
+extern bool isDBConnectionGone(DB::handle_t *conn);
+
+// handle reconnect logic if error condition necessitates it
+extern void threadsDBReconnect(DBHANDLE& dbh);
+extern void threadsDBReconnect(DB::handle_t ** conn, UINT32 threadRef, PNThread *pThread);
+
 // Open a new database connection in a thread-safe way
 extern DB::handle_t* threadsOpenDBConnection(bool enableAutoCommit);
 

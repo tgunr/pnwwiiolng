@@ -46,6 +46,15 @@
 TeulTimeMS teulClock64;
 UINT32 teulClockTime;
 
+//
+// Establish the difference between the monotonic system clock and
+// current zulu time when establishing teulClockTime.  It will get
+// added so teulTime() continues to serve effectively as a wall-clock.
+//
+
+UINT32 teulClockMonoAdjust;
+std::once_flag initMonoAdjust;
+
 // 	----- teulClock
 
 //////////////////////////////////////////////////////////////////////
@@ -69,9 +78,14 @@ teulSyncClock()
     // avoid calculations when called many times a millisecond
     if ( newTimeMS > teulClock64 ) {
         teulClock64 = newTimeMS;
-        teulClockTime = static_cast<UINT32>(newTimeMS / 1000ULL);
+        teulClockTime = teulClockMonoAdjust + static_cast<UINT32>(newTimeMS / 1000ULL);
     }
 
+    std::call_once(initMonoAdjust, []() {
+            teulClockMonoAdjust = time(nullptr) - teulClockTime;
+            teulClockTime += teulClockMonoAdjust;
+        }
+    );
 }
 
 // wrapper for inet_ntoa.

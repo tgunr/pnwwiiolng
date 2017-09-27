@@ -10,6 +10,7 @@
 #include "dbug/dbugExtErrors.h"
 #include "build_info.hpp"
 
+#include <mysql.h>
 #if platOS != OS_WIN32
 #include <netinet/in.h>
 #else
@@ -83,6 +84,7 @@
 #include "wwii/wwiiActivate.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
+#include "wwii/wwiiThreads.h"
 #include "wwii/wwiiHostMessages.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
@@ -1275,6 +1277,12 @@ main(int argc, const char* argv[])
 
 		if ( teulClock64 >= nextHousekeeping )
 		{
+			// keep DB connection alive
+			if (mysql_ping(dbh) != 0) {
+				dbugLog(_FLA, "dbc:Main thread server connection failure - %d(%s)", mysql_errno(dbh), mysql_error(dbh));
+				threadsDBReconnect(dbh);
+			}       
+
 			if ( _housekeeping() == false )
 				nextHousekeeping = teulClock64 + 5000;
 		}

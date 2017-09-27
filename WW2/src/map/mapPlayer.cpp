@@ -694,7 +694,7 @@ Player::bumpRank()
 	m_rankPointsEarned = 0;
 	m_promoted = true;
 
-	mapSaveRank(this, true);
+	mapSaveRank(this, false);
 
 	dbugLog(_FLI, "t:%d p:%u c:%s PROMOTION to %d", teulIndex(), playerID(), callsign(), next->level());
 #ifdef PROMOTIONS_IN_CHAT
@@ -965,7 +965,7 @@ Player::evaluateMissionPacket()
 	if ( m_rankPointsEarned >= actualRank().points() )
 		bumpRank();
 	else
-		mapSaveRank(this, true);
+		mapSaveRank(this, false);
 
 	// Give the database threads chance to eat the queue
 	std::this_thread::yield();

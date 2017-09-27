@@ -71,16 +71,48 @@
 
 ////////// Core utility functions
 
+// Use to silence warnings about unused parameters.
+template<typename T> constexpr void silence_unused_parameter_warning(T&& t) { void(std::forward<T>(t)); }
+template<typename T, typename... Args>
+constexpr void silence_unused_parameter_warning(T&& t, Args&&... args) {
+	(void)std::forward<T>(t), silence_unused_parameter_warning(std::forward<Args>(args)...);
+}
+
+// To avoid complaints about impossible control paths not returning a value.
+NORETURN_FN inline void noreturn_fn(void) { abort(); }
+
+//==============
+
 template <typename T, std::size_t N>
 constexpr std::size_t array_size(T(&)[N]) noexcept { return N; }
-
 
 template <typename... Args>
 struct num_args {
     static constexpr const size_t value = sizeof...(Args);
 };
 
-
 template <bool...> struct bool_pack;
 template <bool... v>
 using all_true = std::is_same<bool_pack<true, v...>, bool_pack<v..., true>>;
+
+//==============
+// For using RAII to guarantee a function is called at scope exit in a readable way.
+
+struct WrapScope {
+	WrapScope(const std::function<void(void)>& beg, const std::function<void(void)>& e)
+	: end(e) { beg(); }
+	~WrapScope() { end() ; }
+	operator bool (void) const { return false; }
+
+	std::function<void(void)> end;
+};
+
+struct AtScope {
+	AtScope(const std::function<void(void)>& e) : end(e) {}
+	~AtScope() { end(); }
+	operator bool (void) const { return false; }
+
+	std::function<void(void)> end;
+};
+
+#define WITH(...) if ( const auto& _with_=__VA_ARGS__ ) { noreturn_fn(); } else

@@ -593,6 +593,12 @@ _releaseServer(Server::ServerInfo* const server, Server::Code scode)
 					, g_serverTypes[server->stats.type], teulGetAddress(server->stats.address), server->stats.type);
 
 	serverDisconnectPeer(server);
+	
+	if (_exitServer == server) {
+        dbugLog(_FLA, "WARNING: You deleted the exit server, rough times ahead!");
+        // Do not abort here, just in case this is intentional at shutdown.
+        _exitServer = nullptr;
+    }
 
 	delete server;
 }
@@ -1003,6 +1009,10 @@ serverInit(UINT32 appVersion
 	Server::myServerInfo.stats.address = Server::myInterface.addr[0].ip;
 	Server::myServerInfo.stats.id = static_cast<UINT64>(Server::myServerInfo.stats.address) << 32 | Server::myInterface.pid;
 	Server::myServerInfo.stats.type = serverType;
+	
+	if (Server::myServerInfo.stats.id == 0) {
+        dbugLog(_FLA, "WARNING: Host has ID 0, this should not happen! Address is %x, pid is %x", Server::myServerInfo.stats.address, Server::myInterface.pid);
+	}
 
 	Server::myServerInfo.stats.status = Server::SERVER_LOGIN;
 	Server::myServerInfo.stats.m_numPlayers = 0;
@@ -1028,6 +1038,7 @@ serverInit(UINT32 appVersion
 
 	_exitServer = new Server::ServerInfo;
 	_exitServer->stats.type = EXIT_SERVER;
+	_exitServer->stats.id = std::numeric_limits<decltype(_exitServer->stats.id)>::max(); // Prevent crash if main server gets ID 0
 	_addServer(_exitServer);
 	_addServer(&Server::myServerInfo);
 
@@ -1499,18 +1510,20 @@ ServerManager::SetPlayerTeulIndex(PlayerStatusNode* const psn, SINT32 teulIndex)
 		{
 			dbugLog(_FLA, "t:%d p:%u oldt:%d previous instance not registered", teulIndex, psn->id, psn->teulIndex);
 		}
-		else
-			s_byTeulIndex.erase(psn->teulIndex);
+		else {
+            assert ( it->second == psn );
+            if ( it->second != psn )
+            {
+                dbugLog(_FLA, "t:%d p:%u newt:%u oldt:%u oldp:%u previous instance registered to someone else"
+                                , teulIndex, psn->id, psn->teulIndex, (it->second)->teulIndex, (it->second)->id
+                                );
+            }
+            else
+                teulSetPersonaData(psn->teulIndex, nullptr);
 
-		assert ( it->second == psn );
-		if ( it->second != psn )
-		{
-			dbugLog(_FLA, "t:%d p:%u newt:%u oldt:%u oldp:%u previous instance registered to someone else"
-							, teulIndex, psn->id, psn->teulIndex, (it->second)->teulIndex, (it->second)->id
-							);
-		}
-		else
-			teulSetPersonaData(psn->teulIndex, nullptr);
+            s_byTeulIndex.erase(it);
+        }
+
 	}
 
 	psn->teulIndex = teulIndex;

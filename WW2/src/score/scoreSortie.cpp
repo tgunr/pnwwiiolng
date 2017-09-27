@@ -45,6 +45,7 @@ Scoring::Sortie::Sortie(Player& pilot_)
 	, m_spec(pilot_.weapon().spec)
 	, m_rtbCode(RTB_BAIL_FRIENDLY)
 	, m_lastHitBySortieID(0)
+	, m_lastHitTime(0)
 	, m_chatHandle(pilot_.chatHandle())
 	, m_killedBy(0ULL)
 	, m_isPlaynet(pilot_.isPlaynet())
@@ -75,12 +76,12 @@ Scoring::Sortie::~Sortie()
 // Track the last hit to a sortie.
 
 bool
-Scoring::Sortie::addHitBy(const Scoring::Actor& actor_, const UINT64& joules_)
+Scoring::Sortie::addHitBy(const Scoring::Actor& actor_)
 {
 	m_lastHitBySortieID = actor_.sortieID();
 	m_lastHitTime = teulClock64;
 
-	m_hitsTaken.push_back(Scoring::Sortie::HitEntry(actor_, joules_));
+	m_hitsTaken.push_back(Scoring::Sortie::HitEntry(actor_));
 
 	return true;
 }
@@ -89,7 +90,7 @@ Scoring::Sortie::addHitBy(const Scoring::Actor& actor_, const UINT64& joules_)
 // Track hits that we've made.
 
 void
-Scoring::Sortie::addHitTo(const Scoring::Actor& actor_, const UINT64& joules_)
+Scoring::Sortie::addHitTo(const Scoring::Actor& actor_)
 {
 	auto addition = m_sortiesHit.insert(actor_.sortieID());
 	if ( addition.second == false )

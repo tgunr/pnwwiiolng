@@ -10,6 +10,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include <json.hpp>
+#include <mysql.h>
 #include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatBanPlayer.h"
@@ -94,6 +95,7 @@
 #include "wwii/wwiiServerTrackedObject.h"
 #include "wwii/wwiiServerTypeEnums.h"
 #include "wwii/wwiiDBThreads.h"
+#include "wwii/wwiiThreads.h"
 #include "wwii/wwiiPPOLoader.h"
 
 extern UINT32 serverGetAuthIP();
@@ -2816,6 +2818,12 @@ _houseKeeping()
 	,	nullptr
 	};
 
+	// keep DB connection alive
+	if (mysql_ping(dbh) != 0) {
+		dbugLog(_FLA, "dbc:Main thread server connection failure - %d(%s)", mysql_errno(dbh), mysql_error(dbh));
+		threadsDBReconnect(dbh);
+	}
+
 	if ( housekeeping[step] == nullptr )
 	{
 		step = 0;
@@ -4244,7 +4252,7 @@ static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &resp
 
 static inline RESTAPIHandler RESTThreadCallback(RESTAPIHandler handler)
 {
-    return [&] (const HTTPRequest &req, HTTPResponse &res, const RESTAPIParams &params) {
+    return [handler] (const HTTPRequest &req, HTTPResponse &res, const RESTAPIParams &params) {
         threadCallbackSync<void>([&] { handler(req, res, params); });
     };
 }

@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="cfg">
+      <UniqueIdentifier>{9a9a92b7-95b1-40d8-91f9-ffffafcd26b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dx">
+      <UniqueIdentifier>{158ef48f-5d87-4949-899b-b59e0886e06e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="language">
+      <UniqueIdentifier>{b50b97c1-7247-4782-908c-f592c71d66c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="file">
+      <UniqueIdentifier>{0582f771-c36e-4621-9f99-d2d7d9c37467}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="unicode">
+      <UniqueIdentifier>{66005743-7816-4821-8a40-f0cbd9111a6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sys">
+      <UniqueIdentifier>{b0374caa-1599-49c4-b10f-ae14fe13b176}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+    <Filter Include="load">
+      <UniqueIdentifier>{0423f220-5ef1-40cd-a55f-455310962a02}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="settingsDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\cfg\cfgData.cpp">
+      <Filter>cfg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\dx\dx3dinfo.cpp">
+      <Filter>dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\language\language.cpp">
+      <Filter>language</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\file\file.cpp">
+      <Filter>file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\unicode\ConvertUTF.c">
+      <Filter>unicode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sys\cpuid.c">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sys\registry.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\load\load.cpp">
+      <Filter>load</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="settingsDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\cfg\cfgCodes.h">
+      <Filter>cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\cfg\cfgData.h">
+      <Filter>cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\dx\dx3dinfo.h">
+      <Filter>dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\language\language.h">
+      <Filter>language</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\file\file.h">
+      <Filter>file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\unicode\ConvertUTF.h">
+      <Filter>unicode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sys\cpuid.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sys\registry.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\load\load.h">
+      <Filter>load</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="settings.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\settings.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\wwii1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+</Project>

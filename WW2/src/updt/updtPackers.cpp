@@ -775,13 +775,14 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 			if ( which.first.length() >= MemoryRequest::str_len || which.second.length() >= MemoryRequest::str_len ) {
 				static bool logged = false;
 				if ( ! logged )
-					dbugLog(_FLA, "[%s : %s] string has more than %d characters and cannot be requested! This message will only appear once, so review all other values as well.",
+					dbugLog(_FLA, "[%s : %s] string has more than %zu characters and cannot be requested! This message will only appear once, so review all other values as well.",
 					        which.first.c_str(), which.second.c_str(), MemoryRequest::str_len);
 				logged = true;
 			} else {
 				MemoryRequest req;
 				strncpy(req.lib, which.first.c_str(), array_size(req.lib));
 				strncpy(req.fun, which.second.c_str(), array_size(req.fun));
+                memset(req.md5, 0, array_size(req.md5));
 				req.key = random();
 				Encode(req);
 				hash = reinterpret_cast<FrameHashData&>(req);
@@ -1110,11 +1111,13 @@ updtPackVehicleBroadcast(PackMode mode, UCHAR* const data, SINT32 offset, VEHICL
 SINT32
 HostVehicle::packFirstTime(PackMode mode, UCHAR* const data, SINT32 offset)
 {
+    static_assert(sizeof(MISS_FLAGS) == sizeof(UCHAR), "Oops, this won't pack properly");
+    
 	offset = _packONE_TIME_INFO(mode, data, offset, &vehicleData, 0, nullptr);
 	offset = teulPackUINT32(mode, data, offset, &vehicleData.squad, 0);
 	offset = wwiiPackHandle(mode, data, offset, &vehicleData.squadHandle, 0);
 	offset = teulPackUINT32(mode, data, offset, &m_missionID, 0);
-	offset = teulPackUINT32(mode, data, offset, (UINT32*)&m_flags, 0);
+	offset = teulPackUCHAR(mode, data, offset, (UCHAR*)&m_flags, 0); // Unfortunately still need to type-pun this field
 
 //	if (mode == TEUL_UNPACK)
 //	{

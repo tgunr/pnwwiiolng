@@ -505,9 +505,9 @@ RECT		rect, wrect;
 	wndClass.lpfnWndProc    = WindowProc;
 	wndClass.hInstance      = (HINSTANCE)hinst;
 	wndClass.hIcon          = LoadIcon((HINSTANCE)hinst, MAKEINTRESOURCE(IDI_WWII_ICON));
-	wndClass.hCursor        = LoadCursor(nullptr, MAKEINTRESOURCE(IDC_ARROW));
+	wndClass.hCursor        = LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
 	wndClass.hbrBackground  = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	wndClass.lpszMenuName   = nullptr;
+	wndClass.lpszMenuName   = NULL;
 	swprintf(classname, 255, _T("OpenGLClass_%dx%dx%d"), WantedWidth, WantedHeight, WantedBpp);
 	wndClass.lpszClassName  = classname;
 
@@ -1977,7 +1977,7 @@ DWORD GetMillisecondTick()
 	return	correctedQueryTime;
 }
 
-static void capSave(UCHAR* const bptr, UINT32 width, UINT32 height, const char* const bname)
+static void capSave(UCHAR* const bptr, UINT32 width, UINT32 height, const fullpath_t* const bname)
 {
 	const UCHAR*	ptrin;
 	UCHAR*			bits, *ptrout;
@@ -2049,7 +2049,11 @@ static void capSave(UCHAR* const bptr, UINT32 width, UINT32 height, const char* 
 
 			size = dib->bmiHeader.biSize + dib->bmiHeader.biSizeImage;
 
+#if platOS != OS_WIN32
 			FILE* cf = fopen(bname, "wb+");
+#else
+			FILE* cf = _wfopen(bname, L"wb+");
+#endif
 			if ( cf )
 			{
 				fwrite(&bmfh, 1, sizeof(bmfh), cf);
@@ -2063,40 +2067,45 @@ static void capSave(UCHAR* const bptr, UINT32 width, UINT32 height, const char* 
 	free(bptr);
 }
 
-void ddpSaveImgAsBitmap(unsigned char* img, int w, int h, const char* filename)
+void ddpSaveImgAsBitmap(unsigned char* img, int w, int h, wchar_t* filename)
 {
     capSave(img, w, h, filename);
 }
 
-static void glScreenCapture()
-{
-	int shotCount=0;
-	char fileName[128], *fptr;
-	UCHAR* bitmap = (UCHAR*)memAlloc(WantedWidth * WantedHeight * 3);
-	if(bitmap == nullptr)
-		return;
+static void glScreenCapture(void) {
+	// TODO: Switch file stuff to fio
+	// TODO: Switch to writeBMPImage()
+#if platOS == OS_WIN32 // HACK
+	#define topathstr std::to_wstring
+	#define checkfile _waccess
 
-#ifdef BUZZARDCAM
-	fptr = "buzzard";
-#else	// BUZZARDCAM
-	fptr = "SShot";
-#endif	// BUZZARDCAM
-
-	do
-	{
-		shotCount += 1;
-#if platOS == OS_WIN32
-		strprintf(fileName, "%s%s%d.bmp", UserDataPath, fptr, shotCount);
+	std::basic_string<fullpath_t> base_filename(UserDataPath);
 #else
-		strprintf(fileName, "%s%d.bmp", fptr, shotCount);
+	#define topathstr std::to_string
+	#define checkfile _access
+
+	std::basic_string<fullpath_t> base_filename;
 #endif
-	}
-	while (_access(fileName, 0) == 0);
 
+	base_filename += PATHLit("SShot");
+
+	std::basic_string<fullpath_t> filename;
+	int shotCount = 1;
+	do {
+		if ( shotCount > 1000 )
+			return;
+		filename = base_filename + topathstr(shotCount++) + PATHLit(".bmp");
+	} while ( checkfile(filename.c_str(), 0) == 0 );
+
+	UCHAR* bitmap = (UCHAR*)memAlloc(WantedWidth * WantedHeight * 3);
+	if ( bitmap == nullptr )
+		return;
 	glReadPixels(0, 0, WantedWidth, WantedHeight, GL_RGB, GL_UNSIGNED_BYTE, bitmap);
-
 	// Cap save will release the bitmap memory.
-	capSave(bitmap, WantedWidth, WantedHeight, fileName);
+	capSave(bitmap, WantedWidth, WantedHeight, filename.c_str());
+
+	#undef topathstr
+	#undef checkfile
 }
 
 LOGICAL ddcapStart()

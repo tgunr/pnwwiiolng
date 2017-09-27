@@ -14,6 +14,6 @@
 //The first parameter is an array of pointers to connection structs, and the
 //	second parameter is the number of structures to use out of that array
 
-DB::handle_t* dbseGetConnection(bool report, bool autoReconnect=true);
+DB::handle_t* dbseGetConnection();
 
 const char* escapeString(const char* src, char* dest, size_t destSize);

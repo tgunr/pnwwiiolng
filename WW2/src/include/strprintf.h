@@ -10,9 +10,9 @@ UINT32 strprintf(char(&buf)[bufSize], const char* fmt, Args&&... args)
 }
 template<size_t bufSize> UINT32 strprintf(char(&buf)[bufSize], const char* text) { return strprintf(buf, "%s", text); }
 
-// Cross-platform path builder.
-template<size_t bufSize>
-UINT32 pathprintf(char (&buf)[bufSize], const char* lhs, const char* rhs)
-{
-	return strprintf<bufSize>(buf, "%s/%s", lhs, rhs);
+// swprintf wrapper
+template<size_t bufSize, typename... Args>
+UINT32 wstrprintf(wchar_t(&buf)[bufSize], const wchar_t* fmt, Args&&... args) {
+	return static_cast<UINT32>(swprintf(buf, bufSize, fmt, std::forward<Args>(args)...));
 }
+template<size_t bufSize> UINT32 wstrprintf(wchar_t(&buf)[bufSize], const wchar_t* text) { return wstrprintf(buf, L"%s", text); }

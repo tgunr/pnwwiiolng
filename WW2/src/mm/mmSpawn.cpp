@@ -39,6 +39,8 @@
 #include "wwii/wwiiServerTypeEnums.h"	// For CELL_HOST
 #include "wwii/wwiiSortieManager.h"
 #include "wwii/wwiiPPOLoader.h"
+#include "map/mapPersonaSummary.h"
+#include "mm/mmdbLazyFetchPersona.h"
 
 extern PPOSpecLoader specLoader;
 
@@ -244,12 +246,37 @@ _findOrigin(const FacilityStruct* facility, UINT8 weaponCategory)
 	return nullptr;
 }
 
+struct SPAWN_CALLBACK_DATA {
+	UINT32 m_pid;
+	const WEAPON_SPEC m_weapon;
+	FLOAT64VECTOR m_customLocation;
+	bool m_setIdentity;
+	bool m_useCustomLocation;
+
+	SPAWN_CALLBACK_DATA(UINT32 pid, const WEAPON_SPEC weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation) : 
+		m_pid(pid), m_weapon(weapon), m_setIdentity(setIdentity), m_useCustomLocation(useCustomLocation) {
+		m_customLocation.x = customLocation.x;
+		m_customLocation.y = customLocation.y;
+		m_customLocation.z = customLocation.z;
+	}
+};
+
+//////////////////////////////////////////////////////////////////////
+// This will be called on the main thread when persona related DB calls have completed
+void mmPersonaCallback( void *data, bool success ) 
+{
+	SPAWN_CALLBACK_DATA *cb = reinterpret_cast<SPAWN_CALLBACK_DATA *>(data);
+	Player *player = PlayerInterface::Lookup(cb->m_pid);
+	mmDirectSpawn(*player, cb->m_weapon, cb->m_setIdentity, cb->m_useCustomLocation, cb->m_customLocation, true);
+	delete cb;
+}
+
 //////////////////////////////////////////////////////////////////////
 // Handle a "spawn me one of these" request from the command line client
 // NOTE: Caller is responsible for ensuring player is not null
 
 bool
-mmDirectSpawn(Player& player, const WEAPON_SPEC weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation)
+mmDirectSpawn(Player& player, const WEAPON_SPEC weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation, bool bypassLookup)
 {
 	BETAInfo(player.teulIndex());
 
@@ -266,23 +293,20 @@ mmDirectSpawn(Player& player, const WEAPON_SPEC weapon, bool setIdentity, bool u
 			WWII_COUNTRY country = (WWII_COUNTRY)weapon.wCountry;
 			BRANCH_ENUM branch = (player.branch() != BRANCH_NOT_USED) ? player.branch() : BRANCH_LAND;
 			Mission* const mission = missionGetInstanceMission(player.instance().id(), country, branch);
+
 			if ( !mission )
 				throw "unable to find system mission";
 			if ( !mission->brigade() )
 				throw "mission does not have a brigade";
 
-			if ( player.country() != country || player.branch() != mission->branch() )
+			if ( !bypassLookup && (player.country() != country || player.branch() != mission->branch()) )
 			{
-				///TODO: Combine select and create with one database query and have
-				///TODO: done in the background, please.
-				// People are usually going to have a persona
-				if ( player.selectPersona(0, country, mission->branch()) != PLS_LOADED )
-				{
-					// But they might not. This is not the best way to do this.
-					player.createPersonaRecord(country, mission->branch());
-					if ( player.selectPersona(0, country, mission->branch()) != PLS_LOADED )
-						throw "unable to select necessary persona";
-				}
+				PersonaSelection ps(PSS_MISSING, player.playerID(), country, branch);
+
+				// NOTE: we don't need any of that craziness of selecting after creating, it will be done for us
+				SPAWN_CALLBACK_DATA *cbd = new SPAWN_CALLBACK_DATA(player.playerID(), weapon, setIdentity, useCustomLocation, customLocation);
+				(new SelectPersonaQuery(ps, &player, mmPersonaCallback, cbd))->Queue();
+				return false;
 			}
 			if ( player.brigade() != mission->brigade() )
 			{

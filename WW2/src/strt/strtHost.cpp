@@ -8,6 +8,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include <signal.h>  //to catch SIGHUPS with
+#include <mysql.h>
 #include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatStratSupportMessages.h"
@@ -442,6 +443,12 @@ _housekeeping()
 
 	if ( teulTime() >= nextObjectiveUpdate )
 	{
+		// keep DB connection alive
+		if (mysql_ping(dbh) != 0) {
+			dbugLog(_FLA, "dbc:Main thread server connection failure - %d(%s)", mysql_errno(dbh), mysql_error(dbh));
+			threadsDBReconnect(dbh);
+		}
+
 		nextObjectiveUpdate += (teulTime()-nextObjectiveUpdate) + 5;
 		bInitiateObjectiveUpdateProcessing = true;
 	}
