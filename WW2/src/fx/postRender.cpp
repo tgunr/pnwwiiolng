@@ -82,7 +82,7 @@ void PostRenderFilter::init()
     // Note: When testing GL_TEXTURE_RECTANGLE_ARB, set oglCanUseTexture2D
     // to return false, since we need the sun glare FBO to be a GL_TEXTURE_RECTANGLE_ARB
     // too. Just setting canUseTexture2D to false here will produce anomalies.
-    canUseTexture2D = oglCanUseTexture2D(WantedWidth, WantedHeight);
+    canUseTexture2D = oglCanUseTexture2D(ddpGetWidth(), ddpGetHeight());
 
 #if USE_STATESET
     downsize = new RenderStateSet;
@@ -220,8 +220,8 @@ void PostRenderFilter::setupDeprecated()
         tex->setInternalFormat(GL_RGBA8);
         tex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
         tex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
-        tex->setTextureHeight(WantedHeight);
-        tex->setTextureWidth(WantedWidth);
+        tex->setTextureHeight(ddpGetHeight());
+        tex->setTextureWidth(ddpGetWidth());
 
         _scenetexture = tex;
     }
@@ -235,8 +235,8 @@ void PostRenderFilter::setupDeprecated()
         tex->setInternalFormat(GL_RGBA8);
         tex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
         tex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
-        tex->setTextureHeight(WantedHeight);
-        tex->setTextureWidth(WantedWidth);
+        tex->setTextureHeight(ddpGetHeight());
+        tex->setTextureWidth(ddpGetWidth());
 
         _scenetexture = tex;
     }
@@ -295,8 +295,8 @@ void PostRenderFilter::setup()
             tex->setInternalFormat(GL_RGBA8);
             tex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
             tex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
-            tex->setTextureHeight(WantedHeight);
-            tex->setTextureWidth(WantedWidth);
+            tex->setTextureHeight(ddpGetHeight());
+            tex->setTextureWidth(ddpGetWidth());
 
             _scenetexture = tex;
         }
@@ -310,8 +310,8 @@ void PostRenderFilter::setup()
             tex->setInternalFormat(GL_RGBA8);
             tex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
             tex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
-            tex->setTextureHeight(WantedHeight);
-            tex->setTextureWidth(WantedWidth);
+            tex->setTextureHeight(ddpGetHeight());
+            tex->setTextureWidth(ddpGetWidth());
 
             _scenetexture = tex;
         }
@@ -346,8 +346,8 @@ void PostRenderFilter::copyscene()
                         0,
                         0,
                         0,
-                        WantedWidth,
-                        WantedHeight);
+                        ddpGetWidth(),
+                        ddpGetHeight());
 #endif
 }
 
@@ -381,8 +381,8 @@ static void SetupFilterKernel(glslProgram* pgm)
 
     if(canUseTexture2D)
     {
-        dx = 1.0f / (float)WantedWidth;
-        dy = 1.0f / (float)WantedHeight;
+        dx = 1.0f / (float)ddpGetHeight();
+        dy = 1.0f / (float)ddpGetHeight();
     }
 
 #define num_taps 12
@@ -463,7 +463,7 @@ void PostRenderFilter::_createFinalDeprecated()
     final->SetRenderState(new Program(_finalPgm.get()));
     final->SetRenderState(new TextureUnit(0, _depthBlurTex.get()));
     final->SetRenderState(new TextureUnit(1, _blurTex.get()));
-    final->SetRenderState(new Viewport(0, 0, WantedWidth, WantedHeight));
+    final->SetRenderState(new Viewport(0, 0, ddpGetWidth(), ddpGetHeight()));
 
     SetupFilterKernel(_finalPgm.get());
 }
@@ -536,7 +536,7 @@ void PostRenderFilter::_createBlurDeprecated()
     {
         Texture2D* tex = dynamic_cast<Texture2D*>(_blurTex.get());
 
-        tex->setTextureSize(WantedWidth / 4, WantedHeight / 4);
+        tex->setTextureSize(ddpGetWidth() / 4, ddpGetHeight() / 4);
         tex->setInternalFormat(GL_RGBA);
         tex->setSourceFormat(GL_RGBA);
         tex->setSourceType(GL_UNSIGNED_SHORT);
@@ -550,7 +550,7 @@ void PostRenderFilter::_createBlurDeprecated()
     {
         TextureRectangle* tex = dynamic_cast<TextureRectangle*>(_blurTex.get());
 
-        tex->setTextureSize(WantedWidth / 4, WantedHeight / 4);
+        tex->setTextureSize(ddpGetWidth() / 4, ddpGetHeight() / 4);
         tex->setInternalFormat(GL_RGBA);
         tex->setSourceFormat(GL_RGBA);
         tex->setSourceType(GL_UNSIGNED_SHORT);
@@ -578,7 +578,7 @@ void PostRenderFilter::_createBlurDeprecated()
     _blurPgm->GetUniform("offsets")->SetOneTimeApply(true);
 
     Vec2f offsets[16];
-    GetSampleOffsets_DownScale4x4(WantedWidth / 4, WantedHeight / 4, offsets);
+    GetSampleOffsets_DownScale4x4(ddpGetWidth() / 4, ddpGetHeight() / 4, offsets);
 
     for(int i = 0; i < 16; i++)
     {
@@ -593,7 +593,7 @@ void PostRenderFilter::_createBlurDeprecated()
     blur->SetRenderState(blurfbo.get());
     blur->SetRenderState(new Program(_blurPgm.get()));
     blur->SetRenderState(new TextureUnit(0, g_lensFlare.GetSunTexture()));
-    blur->SetRenderState(new Viewport(0, 0, WantedWidth / 4, WantedHeight / 4));
+    blur->SetRenderState(new Viewport(0, 0, ddpGetWidth() / 4, ddpGetHeight() / 4));
 #endif
 }
 
@@ -613,12 +613,12 @@ void PostRenderFilter::_createDownSizeDeprecated()
         Texture2D* tex = dynamic_cast<Texture2D*>(_downsizeTex.get());
         downsizefbo = new FrameBufferObject;
         downsizefbo->setAttachment(FrameBufferObject::COLOR_BUFFER0, FrameBufferAttachment(tex));
-        tex->setTextureSize(WantedWidth / 2, WantedHeight / 2);
+        tex->setTextureSize(ddpGetWidth() / 2, ddpGetHeight() / 2);
     }
     else
     {
         TextureRectangle* tex = dynamic_cast<TextureRectangle*>(_downsizeTex.get());
-        tex->setTextureSize(WantedWidth / 2, WantedHeight / 2);
+        tex->setTextureSize(ddpGetWidth() / 2, ddpGetHeight() / 2);
         downsizefbo = new FrameBufferObject;
         downsizefbo->setAttachment(FrameBufferObject::COLOR_BUFFER0, FrameBufferAttachment(tex));
     }
@@ -650,7 +650,7 @@ void PostRenderFilter::_createDownSizeDeprecated()
     downsize->SetRenderState(downsizefbo.get());
     downsize->SetRenderState(new Program(_downsizePgm.get()));
     downsize->SetRenderState(new TextureUnit(0, _scenetexture));
-    downsize->SetRenderState(new Viewport(0, 0, WantedWidth / 2, WantedHeight / 2));
+    downsize->SetRenderState(new Viewport(0, 0, ddpGetWidth() / 2, ddpGetHeight() / 2));
 #endif
 }
 
@@ -673,12 +673,12 @@ void PostRenderFilter::_createDepthBlurDeprecated()
         Texture2D* tex = dynamic_cast<Texture2D*>(_depthBlurTex.get());
         depthblurfbo = new FrameBufferObject;
         depthblurfbo->setAttachment(FrameBufferObject::COLOR_BUFFER0, FrameBufferAttachment(tex));
-        tex->setTextureSize(WantedWidth, WantedHeight);
+        tex->setTextureSize(ddpGetWidth(), ddpGetHeight());
     }
     else
     {
         TextureRectangle* tex = dynamic_cast<TextureRectangle*>(_depthBlurTex.get());
-        tex->setTextureSize(WantedWidth, WantedHeight);
+        tex->setTextureSize(ddpGetWidth(), ddpGetHeight());
         depthblurfbo = new FrameBufferObject;
         depthblurfbo->setAttachment(FrameBufferObject::COLOR_BUFFER0, FrameBufferAttachment(tex));
     }
@@ -716,7 +716,7 @@ void PostRenderFilter::_createDepthBlurDeprecated()
     depthblur->SetRenderState(new Program(_depthBlurPgm.get()));
     depthblur->SetRenderState(new TextureUnit(0, _scenetexture));
     depthblur->SetRenderState(new TextureUnit(1, obdrawGetSceneDepthTexture()));
-    depthblur->SetRenderState(new Viewport(0, 0, WantedWidth, WantedHeight));
+    depthblur->SetRenderState(new Viewport(0, 0, ddpGetWidth(), ddpGetHeight()));
 }
 
 /*------------------------------------------------------------------
@@ -899,7 +899,7 @@ void PostRenderFilter::_createFakeHDRDeprecated()
     {
         Texture2D* tex = dynamic_cast<Texture2D*>(_fakehdrTex.get());
 
-        tex->setTextureSize(WantedWidth / 4, WantedHeight / 4);
+        tex->setTextureSize(ddpGetWidth() / 4, ddpGetHeight() / 4);
         tex->setInternalFormat(GL_RGBA);
         tex->setSourceFormat(GL_RGBA);
         tex->setSourceType(GL_UNSIGNED_SHORT);
@@ -914,7 +914,7 @@ void PostRenderFilter::_createFakeHDRDeprecated()
     {
         TextureRectangle* tex = dynamic_cast<TextureRectangle*>(_fakehdrTex.get());
 
-        tex->setTextureSize(WantedWidth / 4, WantedHeight / 4);
+        tex->setTextureSize(ddpGetWidth() / 4, ddpGetHeight() / 4);
         tex->setInternalFormat(_scenetexture->getInternalFormat());
         tex->setSourceFormat(_scenetexture->getSourceFormat());
         tex->setSourceType(_scenetexture->getSourceType());
@@ -1011,7 +1011,7 @@ void PostRenderFilter::_createBlur()
     {
         Texture2D* tex = dynamic_cast<Texture2D*>(_blurTex.get());
 
-        tex->setTextureSize(WantedWidth / 4, WantedHeight / 4);
+        tex->setTextureSize(ddpGetWidth() / 4, ddpGetHeight() / 4);
         tex->setInternalFormat(GL_RGBA);
         tex->setSourceFormat(GL_RGBA);
         tex->setSourceType(GL_UNSIGNED_SHORT);
@@ -1025,7 +1025,7 @@ void PostRenderFilter::_createBlur()
     {
         TextureRectangle* tex = dynamic_cast<TextureRectangle*>(_blurTex.get());
 
-        tex->setTextureSize(WantedWidth / 4, WantedHeight / 4);
+        tex->setTextureSize(ddpGetWidth() / 4, ddpGetHeight() / 4);
         tex->setInternalFormat(GL_RGBA);
         tex->setSourceFormat(GL_RGBA);
         tex->setSourceType(GL_UNSIGNED_SHORT);
@@ -1063,7 +1063,7 @@ void PostRenderFilter::_createBlur()
     _blurPgm->GetUniform("offsets")->SetOneTimeApply(true);
 
     Vec2f offsets[16];
-    GetSampleOffsets_DownScale4x4(WantedWidth / 4, WantedHeight / 4, offsets);
+    GetSampleOffsets_DownScale4x4(ddpGetWidth() / 4, ddpGetHeight() / 4, offsets);
 
     for(int i = 0; i < 16; i++)
     {
@@ -1095,12 +1095,12 @@ void PostRenderFilter::_createDownSize()
         Texture2D* tex = dynamic_cast<Texture2D*>(_downsizeTex.get());
         downsizefbo = new FrameBufferObject;
         downsizefbo->setAttachment(FrameBufferObject::COLOR_BUFFER0, FrameBufferAttachment(tex));
-        tex->setTextureSize(WantedWidth / 2, WantedHeight / 2);
+        tex->setTextureSize(ddpGetWidth() / 2, ddpGetHeight() / 2);
     }
     else
     {
         TextureRectangle* tex = dynamic_cast<TextureRectangle*>(_downsizeTex.get());
-        tex->setTextureSize(WantedWidth / 2, WantedHeight / 2);
+        tex->setTextureSize(ddpGetWidth() / 2, ddpGetHeight() / 2);
         downsizefbo = new FrameBufferObject;
         downsizefbo->setAttachment(FrameBufferObject::COLOR_BUFFER0, FrameBufferAttachment(tex));
     }
@@ -1856,7 +1856,7 @@ void PostRenderFilter::drawDeprecated()
     _applyAdaption();
 
     glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, 0);
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     _applyFinal();
 
@@ -1935,7 +1935,7 @@ void PostRenderFilter::draw()
     _applyAdaption();
 
     glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, 0);
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     _applyFinal();
 

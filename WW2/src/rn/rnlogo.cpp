@@ -7,6 +7,7 @@
 #include "rn/rnlogo.h"
 #include "ui/uiMain.h"
 #include "gmlp/gmlpmain.h"
+#include "dd/ddp.h"
 #include "dimain.h"
 #include "imap/iac.h"
 #include "cfg/cfgPrefs.h"
@@ -238,7 +239,7 @@ static bool _keyEntered()
 static bool _isWidescreen()
 {
 	// Determine whether user has selected a widescreen aspect ratio
-	double aspectRatio = (double)WantedWidth/(double)WantedHeight;
+	double aspectRatio = (double)ddpGetWidth()/(double)ddpGetHeight();
 	if(aspectRatio >= 1.6)
 	{
 		return true;
@@ -290,7 +291,7 @@ void rnlogoSplash()
     oglSetActiveTexture(0, texid);
 
 	// screen is represented as -1.0f to 1.0f, so we need a third of 2.0f across for the width
-	float width = (((WantedWidth / WantedHeight) >= 3.0f)) ? 2.0f * .3f: 1.0f;
+	float width = (((ddpGetWidth() / ddpGetHeight()) >= 3.0f)) ? 2.0f * .3f: 1.0f;
 
     piLVERTEX v[4];
     float u1, v1, u2, v2;

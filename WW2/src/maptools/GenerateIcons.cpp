@@ -502,8 +502,8 @@ void GenerateIcons::Capture()
 
   float w = (float)(maxx-minx);
   float h = (float)(maxy-miny);
-  unsigned int sx = WantedWidth / 2 - (unsigned int)(w / 2);
-  unsigned int sy = WantedHeight / 2 - (unsigned int)(h / 2);
+  unsigned int sx = ddpGetWidth() / 2 - (unsigned int)(w / 2);
+  unsigned int sy = ddpGetHeight() / 2 - (unsigned int)(h / 2);
 
   if ( sx >= 0 && sy >= 0 && w > 1 && h > 1 )
   {
@@ -810,7 +810,7 @@ void GenerateScenarioMap::EndRenderDefaults()
     oglSetLight(0, sun);
 
     oglLockViewport(false);
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     positionindex = 0;
     listindex = 0;

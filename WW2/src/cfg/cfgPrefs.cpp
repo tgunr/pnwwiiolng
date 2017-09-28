@@ -1059,7 +1059,7 @@ void cfgPrefsSetDefaults()
 	gr2DrawFlags = 1;
 #endif
 
-	snprintf(WantedVideoResolution, sizeof(WantedVideoResolution), "800x600x32");
+	snprintf(WantedVideoResolution, sizeof(WantedVideoResolution), "0x0x0");
 
 	// special processing gets handled by a call to cfgPrefsSyncGlobals() next
 }

@@ -24,20 +24,12 @@
 	using DDWND_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
 	// flags to indicate mode of operation
-	#define DDWND_FULLSCREEN    0x00000001
+	#define DDWND_FULLSCREEN    0x00000001 // TODO: Review fullscreen stuff
 	#define DDWND_WINDOW        0x00000002
 	#define DDWND_CAPTION       0x00000004
 	#define DDWND_SYSMENU       0x00000008
 	#define DDWND_SIZEABLE      0x00000010
 	#define DDWND_FULLWINDOW    (DDWND_WINDOW|DDWND_CAPTION|DDWND_SYSMENU|DDWND_SIZEABLE)
-
-
-	// flags to control status display
-	#define DDWND_SHOW_NONE     0x00000000
-	#define DDWND_SHOW_SIZE     0x00000001
-	#define DDWND_SHOW_FPS      0x00000002
-	#define DDWND_SHOW_ALL      DDWND_SHOW_SIZE|DDWND_SHOW_FPS
-
 
 	// flags to allow certain devices to be used
 	#define DDWND_ALLOW_TNL		0x00000001
@@ -81,7 +73,6 @@
 	void		ddpCapture();
 	SINT32		ddpGetWidth();
 	SINT32		ddpGetHeight();
-	SINT32		ddpGetBPP();
 	SINT32		ddpGetNumDrivers();
 	LOGICAL		ddpSetDDInit(DDWND_DDINITFUNC newfunc);
 	LOGICAL		ddpSetD3DInit(DDWND_D3DINITFUNC newfunc);

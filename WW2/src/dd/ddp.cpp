@@ -57,7 +57,6 @@ static SINT32					capture;
 
 static TCHAR					classname[256];
 static UINT32					flags;
-static UINT32					show;
 static UINT32					delay;
 static UINT32					starttime;
 static long						framecount;
@@ -97,7 +96,6 @@ static void UpdateTimes();
 
 static LOGICAL OnEraseBkgnd(HDC hDC);
 static LOGICAL OnNcActivate(LOGICAL bActive);
-static bool Create(HWND hwnd);
 
 static void	Destroy();
 static void	OnClose();
@@ -124,7 +122,6 @@ LOGICAL ddpInit()
 {
 	state = true;
 	delay = 0;
-	show = DDWND_SHOW_NONE;
 	dna = false;
 	dss = false;
 	resetfps = false;
@@ -434,6 +431,11 @@ void ddpKill()
 static WNDCLASS	wndClass;
 
 bool ddpCreateWnd(void) {
+	// TODO: Make sure our window isn't completely off the screen.
+	// e.g., config was written with 2 monitors, but now there's only 1.
+
+	// TODO: Deal with Wanted width/height/bpp of -1 by defaulting to max
+
 #if 0 // ???
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
 	x = ((rect.right - rect.left) - WantedWidth) / 2;
@@ -839,9 +841,7 @@ LOGICAL ddpGetBackbufferSurface(void** lpdds)
 
 LOGICAL ddpDraw()
 {
-static SINT8	txt[64]="", ssz[64]="";
-LOGICAL		retval=TRUE;
-RECT		rect;
+	LOGICAL retval = TRUE;
 
 	if (ddrenderfunc != nullptr)
 	{
@@ -856,32 +856,6 @@ RECT		rect;
 		if (!d3drenderfunc())
 		{
 			retval = FALSE;
-		}
-	}
-
-	if (show)
-	{
-		if (flags & DDWND_FULLSCREEN)
-		{
-			rect.top = rect.left = 0;
-			rect.right = WantedWidth;
-			rect.bottom = WantedHeight;
-		}
-		else
-		{
-			GetClientRect(myhwnd, &rect);
-		}
-
-		if ((framecount % 60) == 0)
-		{
-		float           fps;
-
-			strprintf(ssz, "%dx%d", rect.right - rect.left, rect.bottom - rect.top);
-			fps = ddpGetFPS();
-			if (fps)
-			{
-				strprintf(txt,"%6.3f fps", fps);
-			}
 		}
 	}
 
@@ -983,17 +957,12 @@ void ddpCapture()
 
 SINT32 ddpGetWidth()
 {
-	return(WantedWidth);
+	return gamerect.right - gamerect.left;
 }
 
 SINT32 ddpGetHeight()
 {
-	return(WantedHeight);
-}
-
-SINT32 ddpGetBPP()
-{
-	return(WantedBpp);
+	return gamerect.bottom - gamerect.top;
 }
 
 LOGICAL ddpSetDDInit(DDWND_DDINITFUNC newfunc)
@@ -1133,12 +1102,8 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	{
 	case WM_CREATE:
 	{
+		// TODO: Save position/size info?
 		myhwnd = hwnd;
-		if (!Create(hwnd))
-		{
-			return(-1);
-		}
-
 		break;
 	}
 	case WM_DESTROY:
@@ -1185,18 +1150,18 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	}
 	case WM_MOVE:
 	{
-	DWORD	xy, wh;
-	RECT	rect;
-
 		if (!(flags & DDWND_FULLSCREEN))
 		{
 			if (IsWindowVisible(hwnd))
 			{
+				RECT rect;
 				GetClientRect(hwnd, &rect);
 				ClientToScreen(hwnd, (LPPOINT)&rect);
-				xy = MAKELONG(rect.left, rect.top);
+				// We save this stuff to the registry since it isn't too important.
+				// TODO: Make sure our window is still on the screen.
+				DWORD xy = MAKELONG(rect.left, rect.top);
 				sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, xy);
-				wh = MAKELONG(rect.right, rect.bottom);
+				DWORD wh = MAKELONG(rect.right, rect.bottom);
 				sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, wh);
 			}
 		}
@@ -1293,23 +1258,8 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	}
 	case WM_EXITSIZEMOVE:
 	{
-	RECT  rect;
-
-		if (!state)
+		if ( ! state )
 			state = true;
-
-		GetClientRect(myhwnd, &rect);
-		if (ddpGetWidth() != rect.right ||
-			ddpGetHeight() != rect.bottom)
-		{
-			  Destroy();
-			  if (!Create(hwnd))
-			  {
-				  Write_Debug("An error was encountered in WM_EXITSIZEMOVE");
-				  PostMessageA(hwnd, WM_CLOSE, 0, 0);
-			  }
-		}
-
 		dipAcquire();
 		Write_Debug("WM_EXITSIZEMOVE");
 		break;
@@ -1398,32 +1348,6 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	return(DefWindowProc(hwnd, umsg, wParam, lParam));
 }
 
-static bool Create(HWND hwnd)
-{
-	RECT rect;
-
-	if (hwnd == nullptr)
-		return true;
-
-	GetClientRect(hwnd, &rect);
-
-	WantedWidth = rect.right - rect.left;
-	WantedHeight = rect.bottom - rect.top;
-
-	Write_Debug("Create - x=%d, y=%d, w=%d, h=%d, bpp=%d", rect.left, rect.top, WantedWidth, WantedHeight, WantedBpp);
-
-	running = TRUE;
-
-	InvalidateRect(hwnd, nullptr, FALSE);
-
-	ddpResetFPS();
-	//lastframetime = frametime = timeGetTime();
-
-	Write_Debug("Completed Create");
-
-	return true;
-}
-
 static void Destroy()
 {
 	if (running)
@@ -1507,34 +1431,35 @@ static void OnKillFocus(HWND pNewWnd)
 	Write_Debug("OnKillFocus");
 }
 
-static void OnSize(UINT nType, int cx, int cy)
-{
-	if ((WantedWidth != cx || WantedHeight != cy) &&
-		(cx != 0 && cy != 0))
-	{
-		if (flags & DDWND_FULLSCREEN)
-		{
+static void OnSize(UINT nType, int cx, int cy) {
+	Write_Debug("OnSize: x=%d, y=%d", cx, cy);
+
+	if ( cx <= 0 || cy <= 0 )
+		return;
+
+	if ( ddpGetWidth() != cx || ddpGetHeight() != cy ) {
+		// TODO: Review fullscreen stuff.
+		if ( flags & DDWND_FULLSCREEN ) {
 			oglEnd();
 
 			ddpResetDisplay();
 			Sleep(1000);
 			ddpSetDisplay(flags);
 
-			if (!oglBegin(myhwnd))
-			{
+			if ( ! oglBegin(myhwnd) ) {
 				PostQuitMessage(0);
+				return;
 			}
 		}
-		else
-		{
-			WantedWidth = cx;
-			WantedHeight = cy;
-		}
 
-		oglResize(WantedWidth, WantedHeight);
+		oglResize(cx, cy);
 	}
 
-	Write_Debug("OnSize: x=%d, y=%d", cx, cy);
+	// Save the new config
+	if ( (WantedWidth != cx || WantedHeight != cy) && (cx != 0 && cy != 0) ) {
+		WantedWidth = cx;
+		WantedWidth = cy;
+	}
 }
 
 static LOGICAL OnNcActivate(LOGICAL bActive)
@@ -1851,7 +1776,7 @@ DEVMODE			testmode, presentmode;
 				devmode.dmBitsPerPel,
 				devmode.dmDisplayFrequency);
 
-			if (devmode.dmBitsPerPel == (UINT32)WantedBpp &&
+			if (devmode.dmBitsPerPel == (UINT32)WantedBpp && // TODO: Review
 				devmode.dmPelsWidth == (UINT32)WantedWidth &&
 				devmode.dmPelsHeight == (UINT32)WantedHeight &&
 				devmode.dmDisplayOrientation == 0)
@@ -1884,7 +1809,7 @@ DEVMODE			testmode, presentmode;
 				testmode.dmBitsPerPel,
 				testmode.dmDisplayFrequency);
 
-			if (testmode.dmBitsPerPel == (UINT32)WantedBpp &&
+			if (testmode.dmBitsPerPel == (UINT32)WantedBpp && // TODO: Review
 				testmode.dmPelsWidth == (UINT32)WantedWidth &&
 				testmode.dmPelsHeight == (UINT32)WantedHeight &&
 				testmode.dmDisplayOrientation == 0 &&
@@ -2099,12 +2024,12 @@ static void glScreenCapture(void) {
 		filename = base_filename + topathstr(shotCount++) + PATHLit(".bmp");
 	} while ( checkfile(filename.c_str(), 0) == 0 );
 
-	UCHAR* bitmap = (UCHAR*)memAlloc(WantedWidth * WantedHeight * 3);
+	UCHAR* bitmap = (UCHAR*)memAlloc(ddpGetWidth() * ddpGetHeight()* 3);
 	if ( bitmap == nullptr )
 		return;
-	glReadPixels(0, 0, WantedWidth, WantedHeight, GL_RGB, GL_UNSIGNED_BYTE, bitmap);
+	glReadPixels(0, 0, ddpGetWidth(), ddpGetHeight(), GL_RGB, GL_UNSIGNED_BYTE, bitmap);
 	// Cap save will release the bitmap memory.
-	capSave(bitmap, WantedWidth, WantedHeight, filename.c_str());
+	capSave(bitmap, ddpGetWidth(), ddpGetHeight(), filename.c_str());
 
 	#undef topathstr
 	#undef checkfile
