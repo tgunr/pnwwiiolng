@@ -23,24 +23,6 @@
 	using DDWND_TIMERFUNC = void(*)(WPARAM wparam, LPARAM lparam);
 	using DDWND_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
-	// flags to indicate mode of operation
-	#define DDWND_FULLSCREEN    0x00000001 // TODO: Review fullscreen stuff
-	#define DDWND_WINDOW        0x00000002
-	#define DDWND_CAPTION       0x00000004
-	#define DDWND_SYSMENU       0x00000008
-	#define DDWND_SIZEABLE      0x00000010
-	#define DDWND_FULLWINDOW    (DDWND_WINDOW|DDWND_CAPTION|DDWND_SYSMENU|DDWND_SIZEABLE)
-
-	// flags to allow certain devices to be used
-	#define DDWND_ALLOW_TNL		0x00000001
-	#define DDWND_ALLOW_HAL		0x00000002
-	#define DDWND_ALLOW_RGB		0x00000004
-	#define DDWND_ALLOW_MMX		0x00000008
-	#define DDWND_ALLOW_RAMP	0x00000010
-	#define DDWND_ALLOW_REF		0x00000020
-	#define DDWND_ALLOW_NULL	0x00000040
-	#define DDWND_ALLOW_ANY		0x0000007f
-
 	HINSTANCE	ddpGetInstance();
 	void		ddpSetInstance(HINSTANCE hnewInst);
 
@@ -87,7 +69,6 @@
 	// Set the screen to proper pixel depth and size requirements
 	LOGICAL		ddpChooseScreenFormat(HDC hdc, PIXELFORMATDESCRIPTOR* pfd);
 	LOGICAL		ddpSetDisplay(UINT32 flags);
-	void		ddpResetDisplay();
 
 	LOGICAL		ddcapStart();
 

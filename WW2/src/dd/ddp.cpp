@@ -42,6 +42,7 @@ extern void wwiiSendUserAbortedApp();
 
 extern LOGICAL					running;
 static int cursorvisible;
+static HCURSOR cursor = NULL;
 /*
 	Static variables
 */
@@ -56,7 +57,7 @@ static bool						focus;
 static SINT32					capture;
 
 static TCHAR					classname[256];
-static UINT32					flags;
+static bool fullscreen;
 static UINT32					delay;
 static UINT32					starttime;
 static long						framecount;
@@ -80,7 +81,8 @@ static UINT32					modenum, displaynum;
 static DEVMODE					devmode;
 static DISPLAY_DEVICE			displaydevice;
 
-static RECT gamerect;
+// The rendering portion of the window.
+static RECT renderrect;
 
 /*
 	Global variables
@@ -395,26 +397,17 @@ void ddpKill()
         return;
     }
 
-    ClipCursor(nullptr);
+    ClipCursor(NULL);
 
     alreadykilled = true;
 
 	imeKill();
 
-	if (flags & DDWND_FULLSCREEN)
-	{
-		ddpResetDisplay();
-	}
-
 	if (d3dkillfunc != nullptr)
-	{
 		d3dkillfunc();
-	}
 
 	if (ddkillfunc != nullptr)
-	{
 		ddkillfunc();
-	}
 
 	rnmainKill();
 
@@ -424,17 +417,198 @@ void ddpKill()
 
 	if (wndAtom)
 	{
-		UnregisterClass(classname, (HINSTANCE)hinst);
+		UnregisterClass((LPCTSTR)wndAtom, (HINSTANCE)hinst);
 		wndAtom = 0;
 	}
 }
-static WNDCLASS	wndClass;
 
-bool ddpCreateWnd(void) {
-	// TODO: Make sure our window isn't completely off the screen.
-	// e.g., config was written with 2 monitors, but now there's only 1.
+namespace {
+	bool RegisterWindowClass(void) {
+		if ( wndAtom == 0 ) {
+			if ( cursor == NULL )
+				cursor = LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
 
-	// TODO: Deal with Wanted width/height/bpp of -1 by defaulting to max
+			WNDCLASS wc;
+			memset(&wc, 0, sizeof(wc));
+
+			wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+			wc.lpfnWndProc = WindowProc;
+			wc.hInstance = (HINSTANCE)hinst;
+			wc.hIcon = LoadIcon((HINSTANCE)hinst, MAKEINTRESOURCE(IDI_WWII_ICON));
+			wc.hCursor = cursor;
+			wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+			wc.lpszMenuName = NULL;
+			wc.lpszClassName = L"WWIIOL_WC";
+
+			if ( (wndAtom = RegisterClass(&wc)) == 0 )
+				return false;
+		}
+		return true;
+	}
+}
+
+static bool ddpResetWindow(void) {
+	// TODO: Actually make this configurable or get rid of it.
+	HDC hdc = GetDC(NULL);
+	WantedBpp = GetDeviceCaps(hdc, BITSPIXEL);
+	ReleaseDC(NULL, hdc);
+
+	fullscreen = ! WantedWindow;
+
+	if ( ! RegisterWindowClass() )
+		return true;
+
+
+	DWORD style;
+	DWORD exstyle;
+	if ( fullscreen ) {
+		style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
+		exstyle = WS_EX_APPWINDOW;
+	} else {
+		style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW;
+		exstyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+	}
+
+
+	// TODO: Make WantedWidth/Height rendering resolution, and separate from
+	// window size for fullscreen mode (windowed too?)
+	// TODO: Verify the resolution/aspect ratio is something we support.
+	if ( WantedWidth <= 0 || WantedHeight <= 0 ) {
+		if ( fullscreen ) {
+			RECT rect;
+			// TODO: Allow setting fullscreen on other screens (GetMonitorInfo)
+			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+			WantedWidth = rect.right - rect.left;
+			WantedHeight = rect.top - rect.bottom;
+		} else {
+			WantedWidth = 1024;
+			WantedHeight = 768;
+		}
+	}
+
+#ifdef CENTER_WINDOW
+	if ( ! fullscreen ) {
+		RECT rect;
+		SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+		WantedX = ((rect.right - rect.left) - WantedWidth) / 2;
+		WantedY = ((rect.bottom - rect.top) - WantedHeight) / 2;
+	}
+#else
+	#error "Currently no mechanism for setting up default X/Y window position."
+	// TODO: Verify that the window is actually visible.
+	// (e.g., previously configured with multi-monitor setup that changed)
+#endif
+
+	renderrect.left = WantedX;
+	renderrect.right = renderrect.left + WantedWidth;
+	renderrect.top = WantedY;
+	renderrect.bottom = renderrect.top + WantedHeight;
+
+	RECT wrect = renderrect;
+	AdjustWindowRectEx(&wrect, style, FALSE, exstyle);
+
+	bool created_window = false;
+	if ( myhwnd == NULL ) {
+		created_window = true;
+		myhwnd = CreateWindowEx(exstyle, (LPCTSTR)wndAtom, _T(SYS_TITLE), style, wrect.left, wrect.top,
+		                        wrect.right-wrect.left, wrect.bottom-wrect.top,
+		                        NULL, NULL, (HINSTANCE)hinst, NULL);
+		if ( myhwnd == NULL )
+			return false;
+	} else {
+		SetWindowLong(myhwnd, GWL_STYLE, style);
+		SetWindowLong(myhwnd, GWL_EXSTYLE, exstyle);
+		SetWindowPos(myhwnd, NULL,
+		             wrect.left, wrect.top,
+		             wrect.right-wrect.left, wrect.bottom-wrect.top,
+		             SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+	}
+
+	//------
+
+	ClipCursor(&renderrect);
+
+	if ( ! created_window )
+		return true;
+
+
+	{
+		MSG msg;
+		while ( PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE) ) {
+			if ( GetMessage(&msg, NULL, 0, 0) ) {
+				uiIMEMessageProc(msg);
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
+	}
+
+	if ( ! oglBegin(myhwnd) ) {
+		return FALSE;
+	}
+
+	// post process globals dependent on GLEW if needed
+	cfgPrefsInit();
+
+	// Call external init functions; if present
+	if ( ddinitfunc != nullptr ) {
+		if ( ! ddinitfunc() ) {
+			Write_Debug("DD init failed");
+			return false;
+		}
+	}
+
+	if ( d3dinitfunc != nullptr ) {
+		if ( ! d3dinitfunc() ) {
+			Write_Debug("D3D init failed");
+			return false;
+		}
+	}
+
+	lastframetime = 0;
+	ft1000mscount = 0;
+	ft1000msticks = 0;
+	ft500mscount = 0;
+	ft500msticks = 0;
+	ft200mscount = 0;
+	ft200msticks = 0;
+	ft100mscount = 0;
+	ft100msticks = 0;
+	ft50mscount = 0;
+	ft50msticks = 0;
+	ft10mscount = 0;
+	frametime = 0;
+	framecount = 0;
+
+
+	{
+		MSG msg;
+		while ( PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE) ) {
+			if ( GetMessage(&msg, NULL, 0, 0) ) {
+				uiIMEMessageProc(msg);
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
+	}
+
+	IMEBase* ime = imeClient();
+	if ( ime ) ime->Init();
+
+	if ( ! rnmainInit() ) {
+		return false;
+	}
+
+	// Lock or don't lock based on player's request in Settings app.
+	// VSync causes major slowdown during initialization. Enable/Disable here after init done. (ticket #2329)
+	// Forced disable in ddp.cpp before initialization starts.
+	gSupportSwapInterval = g_enableVSync ? LOCK_TO_REFRESH : NO_LOCK_TO_REFRESH;
+	if ( wglSwapIntervalEXT )
+		wglSwapIntervalEXT(gSupportSwapInterval);
+
+	return true;
+
+	//===============================
 
 #if 0 // ???
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
@@ -455,238 +629,10 @@ bool ddpCreateWnd(void) {
 		}
 	}
 #endif
+}
 
-UINT32		style;
-RECT		rect, wrect;
-
-	// Mode information
-	flags			= 0;
-	style			= WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
-
-	if (WantedWindow == false)
-	{
-		WantedWindow = FALSE;
-		flags |= DDWND_FULLSCREEN;
-		style |= WS_POPUP|WS_VISIBLE;
-	}
-	else
-	{
-	HDC     hdc;
-
-		WantedWindow = TRUE;
-
-		hdc = GetDC(nullptr);
-		WantedBpp = GetDeviceCaps(hdc, BITSPIXEL);
-		ReleaseDC(nullptr, hdc);
-
-		style |= WS_POPUP;
-
-		style |= WS_VISIBLE;
-		/*
-		if (myflags & DDWND_CAPTION)
-		{
-	//		style |= WS_CAPTION;
-		}
-
-		if (myflags & DDWND_SYSMENU)
-		{
-			style |= WS_SYSMENU;
-			if (myflags & DDWND_SIZEABLE)
-			{
-			//	style |= WS_MINIMIZEBOX|WS_MAXIMIZEBOX;
-			}
-		}
-
-		if (myflags & DDWND_SIZEABLE)
-		{
-		//	style |= WS_THICKFRAME;
-		}
-		*/
-	}
-
-	memset(&wndClass, 0, sizeof(WNDCLASS));
-	wndClass.style          = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
-	wndClass.lpfnWndProc    = WindowProc;
-	wndClass.hInstance      = (HINSTANCE)hinst;
-	wndClass.hIcon          = LoadIcon((HINSTANCE)hinst, MAKEINTRESOURCE(IDI_WWII_ICON));
-	wndClass.hCursor        = LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
-	wndClass.hbrBackground  = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	wndClass.lpszMenuName   = NULL;
-	swprintf(classname, 255, _T("OpenGLClass_%dx%dx%d"), WantedWidth, WantedHeight, WantedBpp);
-	wndClass.lpszClassName  = classname;
-
-	wndAtom = RegisterClass(&wndClass);
-	if (wndAtom == 0)
-	{
-		return FALSE;
-	}
-
-	if (! WantedWindow)
-	{
-		WantedX = 0;
-		WantedY = 0;
-
-		if (!ddpSetDisplay(flags))
-		{
-			return FALSE;
-		}
-
-		rect.left = WantedX;
-		rect.top = WantedY;
-		rect.right = WantedWidth;
-		rect.bottom = WantedHeight;
-	}
-	else
-	{
-		rect.left = WantedX;
-		rect.top = WantedY;
-		rect.right = WantedX + WantedWidth;
-		rect.bottom = WantedY + WantedHeight;
-
-		AdjustWindowRect(&rect, style, FALSE);
-
-#ifdef CENTER_WINDOW
-		SystemParametersInfo(SPI_GETWORKAREA, 0, &wrect, 0);
-
-		//WantedX = myx = ((wrect.right - wrect.left) - WantedWidth) / 2;
-		//WantedY = myy = ((wrect.bottom - wrect.top) - WantedHeight) / 2;
-		rect.right = WantedX + (rect.right - rect.left);
-		rect.left = WantedX;
-		rect.bottom = WantedY + (rect.bottom - rect.top);
-		rect.top = WantedY;
-#else
-		if (rect.left < 0)
-		{
-			rect.right -= rect.left;
-			rect.left = 0;
-		}
-
-		if (rect.top < 0)
-		{
-			rect.bottom -= rect.top;
-			rect.top = 0;
-		}
-
-		if (rect.right > wrect.right)
-		{
-			rect.left -= rect.right - wrect.right;
-			rect.right = wrect.right;
-		}
-
-		if (rect.bottom > wrect.bottom)
-		{
-			rect.top -= rect.bottom - wrect.bottom;
-			rect.bottom = wrect.bottom;
-		}
-#endif
-	}
-
-	myhwnd = CreateWindowEx(0, wndClass.lpszClassName, _T(SYS_TITLE),
-							style, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
-							NULL, nullptr, (HINSTANCE)hinst, nullptr);
-
-	if (!myhwnd)
-	{
-		return FALSE;
-	}
-
-    gamerect = rect;
-    ClipCursor(&gamerect);
-
-	{
-	MSG		msg;
-
-		while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
-		{
-			if (GetMessage(&msg, nullptr, 0, 0))
-			{
-				uiIMEMessageProc(msg);
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-	}
-
-	GetClientRect(myhwnd, &rect);
-
-//	WantedX = rect.left;
-//	WantedY = rect.top;
-	WantedWidth = rect.right - rect.left;
-	WantedHeight = rect.bottom - rect.top;
-
-	if (!oglBegin(myhwnd))
-	{
-		ddpResetDisplay();
-		return FALSE;
-	}
-
-    // post process globals dependent on GLEW if needed
-	cfgPrefsInit();
-
-	// Call external init functions; if present
-	if (ddinitfunc != nullptr)
-	{
-		if (!ddinitfunc())
-		{
-			Write_Debug("DD init failed");
-			return FALSE;
-		}
-	}
-
-	if (d3dinitfunc != nullptr)
-	{
-		if (!d3dinitfunc())
-		{
-			Write_Debug("D3D init failed");
-			return FALSE;
-		}
-	}
-
-	lastframetime = 0;
-	ft1000mscount = 0;
-	ft1000msticks = 0;
-	ft500mscount = 0;
-	ft500msticks = 0;
-	ft200mscount = 0;
-	ft200msticks = 0;
-	ft100mscount = 0;
-	ft100msticks = 0;
-	ft50mscount = 0;
-	ft50msticks = 0;
-	ft10mscount = 0;
-	frametime = 0;
-	framecount = 0;
-
-	{
-	MSG		msg;
-
-		while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
-		{
-			if (GetMessage(&msg, nullptr, 0, 0))
-			{
-				uiIMEMessageProc(msg);
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-	}
-
-	IMEBase* ime = imeClient();
-	if(ime) ime->Init();
-
-	if (!rnmainInit())
-	{
-		return FALSE;
-	}
-
-    // Lock or don't lock based on player's request in Settings app.
-    // VSync causes major slowdown during initialization. Enable/Disable here after init done. (ticket #2329)
-    // Forced disable in ddp.cpp before initialization starts.
-    gSupportSwapInterval = g_enableVSync ? LOCK_TO_REFRESH : NO_LOCK_TO_REFRESH;
-    if(wglSwapIntervalEXT)
-	    wglSwapIntervalEXT(gSupportSwapInterval);
-
-	return TRUE;
+bool ddpCreateWnd(void) {
+	return ddpResetWindow();
 }
 
 LOGICAL ddpUpdate()
@@ -718,7 +664,7 @@ LOGICAL ddpUpdate()
 	UpdateTimes();
 
 	if(cursorvisible)
-		SetCursor(wndClass.hCursor);
+		SetCursor(cursor);
 
 	// Member draw function
 	if (!ddpDraw())
@@ -957,12 +903,12 @@ void ddpCapture()
 
 SINT32 ddpGetWidth()
 {
-	return gamerect.right - gamerect.left;
+	return WantedWidth;
 }
 
 SINT32 ddpGetHeight()
 {
-	return gamerect.bottom - gamerect.top;
+	return WantedHeight;
 }
 
 LOGICAL ddpSetDDInit(DDWND_DDINITFUNC newfunc)
@@ -1134,7 +1080,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_SETFOCUS:
 	{
 		OnSetFocus((HWND) wParam);
-        ClipCursor(&gamerect);
+        ClipCursor(&renderrect);
 		break;
 	}
 	case WM_KILLFOCUS:
@@ -1150,20 +1096,17 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	}
 	case WM_MOVE:
 	{
-		if (!(flags & DDWND_FULLSCREEN))
+		if (IsWindowVisible(hwnd))
 		{
-			if (IsWindowVisible(hwnd))
-			{
-				RECT rect;
-				GetClientRect(hwnd, &rect);
-				ClientToScreen(hwnd, (LPPOINT)&rect);
-				// We save this stuff to the registry since it isn't too important.
-				// TODO: Make sure our window is still on the screen.
-				DWORD xy = MAKELONG(rect.left, rect.top);
-				sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, xy);
-				DWORD wh = MAKELONG(rect.right, rect.bottom);
-				sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, wh);
-			}
+			RECT rect;
+			GetClientRect(hwnd, &rect);
+			ClientToScreen(hwnd, (LPPOINT)&rect);
+			// We save this stuff to the registry since it isn't too important.
+			// TODO: Make sure our window is still on the screen.
+			DWORD xy = MAKELONG(rect.left, rect.top);
+			sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, xy);
+			DWORD wh = MAKELONG(rect.right, rect.bottom);
+			sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, wh);
 		}
 		break;
 	}
@@ -1266,12 +1209,9 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	}
 	case WM_DISPLAYCHANGE:
 	{
-		if (!(flags & DDWND_FULLSCREEN))
-		{
-			WantedBpp = wParam;
-			if (!state)
-				state = true;
-		}
+		WantedBpp = wParam;
+		if ( !state )
+			state = true;
 
 		Write_Debug("WM_DISPLAYCHANGE");
 		break;
@@ -1397,13 +1337,9 @@ static void _OnPaint()
 
 static void OnSetFocus(HWND pOldWnd)
 {
-	if (!(flags & DDWND_FULLSCREEN))
-	{
-		if (!dna)
-		{
-			if (!state)
-				state = true;
-		}
+	if ( !dna ) {
+		if ( !state )
+			state = true;
 	}
 
 	focus = true;
@@ -1415,13 +1351,9 @@ static void OnSetFocus(HWND pOldWnd)
 
 static void OnKillFocus(HWND pNewWnd)
 {
-	if (!(flags & DDWND_FULLSCREEN))
-	{
-		if (!dna)
-		{
-			if (state)
-				state = false;
-		}
+	if ( !dna ) {
+		if ( state )
+			state = false;
 	}
 
 	focus = false;
@@ -1438,20 +1370,7 @@ static void OnSize(UINT nType, int cx, int cy) {
 		return;
 
 	if ( ddpGetWidth() != cx || ddpGetHeight() != cy ) {
-		// TODO: Review fullscreen stuff.
-		if ( flags & DDWND_FULLSCREEN ) {
-			oglEnd();
-
-			ddpResetDisplay();
-			Sleep(1000);
-			ddpSetDisplay(flags);
-
-			if ( ! oglBegin(myhwnd) ) {
-				PostQuitMessage(0);
-				return;
-			}
-		}
-
+		// TODO: Use actual resolution
 		oglResize(cx, cy);
 	}
 
@@ -1464,20 +1383,13 @@ static void OnSize(UINT nType, int cx, int cy) {
 
 static LOGICAL OnNcActivate(LOGICAL bActive)
 {
-	if (!(flags & DDWND_FULLSCREEN))
-	{
-		if (bActive)
-		{
-			if (!state)
-				state = true;
-		}
-		else
-		{
-			if (!dna)
-			{
-				if (state)
-					state = false;
-			}
+	if ( bActive ) {
+		if ( !state )
+			state = true;
+	} else {
+		if ( !dna ) {
+			if ( state )
+				state = false;
 		}
 	}
 
@@ -1503,13 +1415,9 @@ static LOGICAL OnNcActivate(LOGICAL bActive)
 
 static void OnSysKeyDown(UINT nChar, UINT nFlags)
 {
-	if (!(flags & DDWND_FULLSCREEN))
-	{
-		if (!dna)
-		{
-			if (state)
-				state = false;
-		}
+	if ( !dna ) {
+		if ( state )
+			state = false;
 	}
 
 	Write_Debug("OnSysKeyDown: 0x%x", nChar);
@@ -1517,13 +1425,9 @@ static void OnSysKeyDown(UINT nChar, UINT nFlags)
 
 static void OnSysKeyUp(UINT nChar, UINT nFlags)
 {
-	if (!(flags & DDWND_FULLSCREEN))
-	{
-		if (!dna)
-		{
-			if (!state)
-				state = true;
-		}
+	if ( !dna ) {
+		if ( !state )
+			state = true;
 	}
 
 	Write_Debug("OnSysKeyUp: 0x%x", nChar);
@@ -2047,7 +1951,7 @@ void ddpShowCursor()
 	int count = ShowCursor(TRUE);
 	while(count <= 1)
 			count = ShowCursor(TRUE);
-	SetCursor(wndClass.hCursor);
+	SetCursor(cursor);
 	cursorvisible = 1;
 }
 
