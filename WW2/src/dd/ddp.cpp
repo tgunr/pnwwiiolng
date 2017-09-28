@@ -433,29 +433,41 @@ void ddpKill()
 }
 static WNDCLASS	wndClass;
 
-LOGICAL ddpCreateWnd(SINT32 myx, SINT32 myy, SINT32 mywidth, SINT32 myheight, SINT32 mybpp, UINT32 myflags, HWND parent)
-{
+bool ddpCreateWnd(void) {
+#if 0 // ???
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+	x = ((rect.right - rect.left) - WantedWidth) / 2;
+	y = ((rect.bottom - rect.top) - WantedHeight) / 2;
+
+	// Note: This is an appropriate use of the registry: a user preference it doesn't hurt to lose - Gadget
+	if ( sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, (DWORD*)&wh) &&
+		sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, (DWORD*)&xy) ) {
+		if ( 320 <= LOWORD(wh) && 240 <= HIWORD(wh) ) {
+			WantedWidth = LOWORD(wh);
+			WantedHeight = HIWORD(wh);
+		}
+
+		if ( rect.right > (LOWORD(xy) + LOWORD(wh)) && rect.bottom > (HIWORD(xy) + HIWORD(wh)) ) {
+			x = LOWORD(xy);
+			y = HIWORD(xy);
+		}
+	}
+#endif
+
 UINT32		style;
 RECT		rect, wrect;
 
 	// Mode information
-	WantedX		= myx;
-	WantedY		= myy;
-	WantedWidth	= mywidth;
-	WantedHeight	= myheight;
-	WantedBpp		= mybpp;
-
 	flags			= 0;
 	style			= WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
 
-	if (myflags & DDWND_FULLSCREEN)
+	if (WantedWindow == false)
 	{
 		WantedWindow = FALSE;
 		flags |= DDWND_FULLSCREEN;
 		style |= WS_POPUP|WS_VISIBLE;
 	}
 	else
-	if (myflags & DDWND_WINDOW)
 	{
 	HDC     hdc;
 
@@ -465,16 +477,10 @@ RECT		rect, wrect;
 		WantedBpp = GetDeviceCaps(hdc, BITSPIXEL);
 		ReleaseDC(nullptr, hdc);
 
-		if (parent == nullptr)
-		{
-			style |= WS_POPUP;
-		}
-		else
-		{
-			style |= WS_CHILD;
-		}
+		style |= WS_POPUP;
 
 		style |= WS_VISIBLE;
+		/*
 		if (myflags & DDWND_CAPTION)
 		{
 	//		style |= WS_CAPTION;
@@ -493,11 +499,7 @@ RECT		rect, wrect;
 		{
 		//	style |= WS_THICKFRAME;
 		}
-	}
-	else
-	{
-		// bad flags
-		return FALSE;
+		*/
 	}
 
 	memset(&wndClass, 0, sizeof(WNDCLASS));
@@ -517,7 +519,7 @@ RECT		rect, wrect;
 		return FALSE;
 	}
 
-	if (myflags & DDWND_FULLSCREEN)
+	if (! WantedWindow)
 	{
 		WantedX = 0;
 		WantedY = 0;
@@ -534,22 +536,22 @@ RECT		rect, wrect;
 	}
 	else
 	{
-		rect.left = myx;
-		rect.top = myy;
-		rect.right = myx + WantedWidth;
-		rect.bottom = myy + WantedHeight;
+		rect.left = WantedX;
+		rect.top = WantedY;
+		rect.right = WantedX + WantedWidth;
+		rect.bottom = WantedY + WantedHeight;
 
 		AdjustWindowRect(&rect, style, FALSE);
 
 #ifdef CENTER_WINDOW
 		SystemParametersInfo(SPI_GETWORKAREA, 0, &wrect, 0);
 
-		WantedX = myx = ((wrect.right - wrect.left) - WantedWidth) / 2;
-		WantedY = myy = ((wrect.bottom - wrect.top) - WantedHeight) / 2;
-		rect.right = myx + (rect.right - rect.left);
-		rect.left = myx;
-		rect.bottom = myy + (rect.bottom - rect.top);
-		rect.top = myy;
+		//WantedX = myx = ((wrect.right - wrect.left) - WantedWidth) / 2;
+		//WantedY = myy = ((wrect.bottom - wrect.top) - WantedHeight) / 2;
+		rect.right = WantedX + (rect.right - rect.left);
+		rect.left = WantedX;
+		rect.bottom = WantedY + (rect.bottom - rect.top);
+		rect.top = WantedY;
 #else
 		if (rect.left < 0)
 		{
@@ -579,7 +581,7 @@ RECT		rect, wrect;
 
 	myhwnd = CreateWindowEx(0, wndClass.lpszClassName, _T(SYS_TITLE),
 							style, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
-							parent, nullptr, (HINSTANCE)hinst, nullptr);
+							NULL, nullptr, (HINSTANCE)hinst, nullptr);
 
 	if (!myhwnd)
 	{
@@ -1074,7 +1076,7 @@ LOGICAL		retval, *running;
 	ddpSetD3DRender(gmlpMainUpdate);
 	ddpSetD3DKill(piKill);
 
-	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, nullptr))
+	if (!ddpCreateWnd())
 	{
 		ddpKill();
 		return(0);

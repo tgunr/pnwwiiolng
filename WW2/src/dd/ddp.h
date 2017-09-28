@@ -57,7 +57,7 @@
 	UINT32		ddpEngine(LPVOID dummy);
 	UINT32		ddpEngineCycle(LPVOID dummy);
 
-	LOGICAL		ddpCreateWnd(SINT32 myx, SINT32 myy, SINT32 mywidth, SINT32 myheight, SINT32 mybpp, UINT32 myflags, HWND parent);
+	bool ddpCreateWnd(void);
 
 	LOGICAL		ddpFlip();
 	LOGICAL		ddpUpdate();
