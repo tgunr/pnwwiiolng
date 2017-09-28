@@ -951,7 +951,6 @@
     <ClInclude Include="..\..\src\auth\authSteam.h" />
     <ClInclude Include="..\..\src\cfg\cfgCodes.h" />
     <ClInclude Include="..\..\src\cfg\cfgData.h" />
-    <ClInclude Include="..\..\src\cfg\cfgLoad.h" />
     <ClInclude Include="..\..\src\cfg\cfgLua.h" />
     <ClInclude Include="..\..\src\cfg\cfgPrefs.h" />
     <ClInclude Include="..\..\src\cfg\cfgw2.h" />
@@ -1456,7 +1455,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\src\cfg\cfgLoad.cpp" />
     <ClCompile Include="..\..\src\cfg\cfgLua.cpp" />
     <ClCompile Include="..\..\src\cfg\cfgPrefs.cpp" />
     <ClCompile Include="..\..\src\cfg\cfgw2.cpp" />

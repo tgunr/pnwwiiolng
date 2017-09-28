@@ -12,7 +12,6 @@
 #include "cfg/cfgw2.h"
 #include "ld/ldpix.h"
 #include "pi/pi.h"
-#include "cfg/cfgLoad.h"
 #include "locl/loclLang.h"
 #include "veh/vehIcon.h"
 #include "pi/piinfo.h"
