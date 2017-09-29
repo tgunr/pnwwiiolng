@@ -306,46 +306,61 @@ bool CreateGLContext(HDC dc)
 	return true;
 }
 
-static bool oglBegin(HWND hwnd)
-{
-	PIXELFORMATDESCRIPTOR	pfd;
-
-	// Already begun
-	if (myhrc != nullptr)
-	{
+static bool oglBegin(HWND hwnd) {
+	if ( myhrc != NULL )
 		return true;
-	}
 
-	if (myhdc == nullptr)
-	{
-		myhdc = GetDC(hwnd);
-	}
-
-	try
-	{
-		// Choose a compatible pixel format
-		if (!ddpChooseScreenFormat(myhdc, &pfd))
-		{
-			ReleaseDC(hwnd, myhdc);
-			myhdc = nullptr;
-			throw "Configured resolution not supported by video card";
+	if ( myhdc == NULL ) {
+		if ( (myhdc = GetDC(hwnd)) == NULL ) {
+			dbugLog(_FLA, "Could not create device context");
+			return false;
 		}
-
-        CreateGLContext(myhdc);
-
-		// Disable vsync during initialization. Enabled in rnmainInit (if user specified)
-        // after initialization complete.
-		if(wglSwapIntervalEXT)
-			wglSwapIntervalEXT(NO_LOCK_TO_REFRESH);
-
-		return true;
 	}
 
-    catch(std::exception& ex) { _initializationError(ex.what()); }
-	catch(const char* error) { _initializationError(error); }
-	catch(...) { _initializationError("[unknown error]"); }
+	PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR),
+		1,
+		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+		PFD_TYPE_RGBA,
+		(BYTE)WantedBpp,
+		0,0,0,0,0,0,
+		0,
+		0,
+		0,
+		0,0,0,0,
+		32,
+		0,
+		0,
+		PFD_MAIN_PLANE,
+		0,
+		0,0,0
+	};
 
-	return false;
+	int pixelformat = ChoosePixelFormat(myhdc, &pfd);
+	if ( pixelformat == 0 ) {
+		dbugLog(_FLA, "Could not find compatible pixel format");
+		return false;
+	}
+
+	if ( ! SetPixelFormat(myhdc, pixelformat, &pfd) ) {
+		dbugLog(_FLA, "Could not request pixel format");
+		return false;
+	}
+
+	try {
+		CreateGLContext(myhdc);
+	} catch ( std::exception& ex ) {
+		_initializationError(ex.what()); return false;
+	} catch ( const char* error ) {
+		_initializationError(error); return false;
+	} catch ( ... ) {
+		_initializationError("[unknown error]"); return false;
+	}
+
+	if ( wglSwapIntervalEXT )
+		wglSwapIntervalEXT(NO_LOCK_TO_REFRESH);
+
+	return true;
 }
 
 static void oglEnd()
@@ -374,7 +389,7 @@ void ddpKill()
         return;
     }
 
-    ClipCursor(NULL);
+    //ClipCursor(NULL);
 
     alreadykilled = true;
 
@@ -424,6 +439,18 @@ namespace {
 	}
 }
 
+
+namespace {
+	typedef std::vector<HMONITOR> MonitorList;
+	BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData) {
+		MonitorList* monitors = reinterpret_cast<MonitorList*>(dwData);
+		monitors->push_back(hMonitor);
+		return TRUE;
+	}
+}
+
+// NOTE: Actually modifying an existing window (including code elsewhere) is
+// completely untested and is probably horribly broken.
 static bool ddpResetWindow(void) {
 	// TODO: Actually make this configurable or get rid of it.
 	HDC hdc = GetDC(NULL);
@@ -440,33 +467,45 @@ static bool ddpResetWindow(void) {
 	DWORD exstyle;
 	if ( fullscreen ) {
 		style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
-		exstyle = WS_EX_APPWINDOW;
+		exstyle = WS_EX_APPWINDOW | WS_EX_TOPMOST;
 	} else {
 		style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW;
 		exstyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 	}
 
 
-	// TODO: Make WantedWidth/Height rendering resolution, and separate from
-	// window size for fullscreen mode (windowed too?)
-	// TODO: Verify the resolution/aspect ratio is something we support.
+	MonitorList monitors;
+	if ( EnumDisplayMonitors(NULL, NULL, &MonitorEnumProc, (LPARAM)&monitors) == 0 || monitors.size() == 0 )
+		return false;
+
+	MONITORINFO minfo; minfo.cbSize = sizeof(minfo);
+	for ( HMONITOR monitor : monitors ) {
+		GetMonitorInfo(monitor, &minfo);
+		// TODO: Allow setting fullscreen on other screens
+		if ( minfo.dwFlags & MONITORINFOF_PRIMARY )
+			break;
+	}
+
 	if ( WantedWidth <= 0 || WantedHeight <= 0 ) {
 		if ( fullscreen ) {
-			RECT rect;
-			// TODO: Allow setting fullscreen on other screens (GetMonitorInfo)
-			SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+			RECT rect = minfo.rcMonitor;
 			WantedWidth = rect.right - rect.left;
-			WantedHeight = rect.top - rect.bottom;
+			WantedHeight = rect.bottom - rect.top;
 		} else {
 			WantedWidth = 1024;
 			WantedHeight = 768;
 		}
 	}
 
+	// TODO: Verify the aspect ratio is something we support.
+	if ( WantedWidth < 1024 )
+		WantedWidth = 1024;
+	if ( WantedHeight < 768 )
+		WantedHeight = 768;
+
 #ifdef CENTER_WINDOW
 	if ( ! fullscreen ) {
-		RECT rect;
-		SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+		RECT rect = minfo.rcWork;
 		WantedX = ((rect.right - rect.left) - WantedWidth) / 2;
 		WantedY = ((rect.bottom - rect.top) - WantedHeight) / 2;
 	}
@@ -476,10 +515,21 @@ static bool ddpResetWindow(void) {
 	// (e.g., previously configured with multi-monitor setup that changed)
 #endif
 
-	renderrect.left = WantedX;
-	renderrect.right = renderrect.left + WantedWidth;
-	renderrect.top = WantedY;
-	renderrect.bottom = renderrect.top + WantedHeight;
+	if ( fullscreen ) {
+		renderrect = minfo.rcMonitor;
+		// TEMP: If fullscreen, force to match the monitor's resolution
+		// TODO: Render to an FBO, then render that to the window, or
+		// maybe just consider re-adding windowless fullscreen as an option
+		WantedX = renderrect.left;
+		WantedY = renderrect.bottom;
+		WantedWidth = renderrect.right - renderrect.left;
+		WantedHeight = renderrect.bottom - renderrect.top;
+	} else {
+		renderrect.left = WantedX;
+		renderrect.right = renderrect.left + WantedWidth;
+		renderrect.top = WantedY;
+		renderrect.bottom = renderrect.top + WantedHeight;
+	}
 
 	RECT wrect = renderrect;
 	AdjustWindowRectEx(&wrect, style, FALSE, exstyle);
@@ -501,13 +551,12 @@ static bool ddpResetWindow(void) {
 		             SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 	}
 
-	//------
+	//ClipCursor(&renderrect);
 
-	ClipCursor(&renderrect);
+	//--------------
 
 	if ( ! created_window )
 		return true;
-
 
 	{
 		MSG msg;
@@ -829,13 +878,19 @@ void ddpCapture()
 	capture += 1;
 }
 
-SINT32 ddpGetWidth()
-{
+SINT32 ddpGetWindowWidth(void) {
+	return renderrect.right - renderrect.left;
+}
+
+SINT32 ddpGetWindowHeight(void) {
+	return renderrect.bottom - renderrect.top;
+}
+
+SINT32 ddpGetWidth() {
 	return WantedWidth;
 }
 
-SINT32 ddpGetHeight()
-{
+SINT32 ddpGetHeight() {
 	return WantedHeight;
 }
 
@@ -1008,13 +1063,13 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_SETFOCUS:
 	{
 		OnSetFocus((HWND) wParam);
-        ClipCursor(&renderrect);
+        //ClipCursor(&renderrect);
 		break;
 	}
 	case WM_KILLFOCUS:
 	{
 		OnKillFocus((HWND) wParam);
-        ClipCursor(nullptr);
+        //ClipCursor(nullptr);
 		break;
 	}
 	case WM_NCACTIVATE:
@@ -1297,15 +1352,17 @@ static void OnSize(UINT nType, int cx, int cy) {
 	if ( cx <= 0 || cy <= 0 )
 		return;
 
-	if ( ddpGetWidth() != cx || ddpGetHeight() != cy ) {
-		// TODO: Use actual resolution
-		oglResize(cx, cy);
-	}
+	if ( ! fullscreen ) {
+		// TODO: Force aspect ratio
+		if ( ddpGetWidth() != cx || ddpGetHeight() != cy ) {
+			oglResize(cx, cy);
+		}
 
-	// Save the new config
-	if ( (WantedWidth != cx || WantedHeight != cy) && (cx != 0 && cy != 0) ) {
-		WantedWidth = cx;
-		WantedWidth = cy;
+		// Save the new config
+		if ( (WantedWidth != cx || WantedHeight != cy) && (cx != 0 && cy != 0) ) {
+			WantedWidth = cx;
+			WantedWidth = cy;
+		}
 	}
 }
 
@@ -1359,197 +1416,6 @@ static void OnSysKeyUp(UINT nChar, UINT nFlags)
 	}
 
 	Write_Debug("OnSysKeyUp: 0x%x", nChar);
-}
-
-LOGICAL ddpChooseScreenFormat(HDC hdc, PIXELFORMATDESCRIPTOR* pfd)
-{
-SINT32					i, pixelformat, depth, accum, stencil;
-
-	memset(pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
-
-	pfd->nSize				= sizeof(PIXELFORMATDESCRIPTOR);
-	pfd->nVersion			= 1;
-	pfd->dwFlags			= PFD_DRAW_TO_WINDOW|PFD_SUPPORT_OPENGL|PFD_DOUBLEBUFFER;
-	pfd->iPixelType			= PFD_TYPE_RGBA;
-	pfd->cColorBits			= WantedBpp;
-	pfd->cRedBits			= 0;
-	pfd->cRedShift			= 0;
-	pfd->cGreenBits			= 0;
-	pfd->cGreenShift		= 0;
-	pfd->cBlueBits			= 0;
-	pfd->cBlueShift			= 0;
-	pfd->cAlphaBits			= 0;
-	pfd->cAlphaShift		= 0;
-	pfd->cAccumBits			= 0;
-	pfd->cAccumRedBits		= 0;
-	pfd->cAccumGreenBits	= 0;
-	pfd->cAccumBlueBits		= 0;
-	pfd->cAccumAlphaBits	= 0;
-	pfd->cDepthBits			= 32;
-	pfd->cStencilBits		= 8;
-	pfd->cAuxBuffers		= 0;
-	pfd->iLayerType			= PFD_MAIN_PLANE;
-	pfd->bReserved			= 0;
-	pfd->dwLayerMask		= 0;
-	pfd->dwVisibleMask		= 0;
-	pfd->dwDamageMask		= 0;
-
-	pixelformat = ChoosePixelFormat(hdc, pfd);
-	if (pixelformat == 0)
-	{
-		Write_Debug("Unable to choose a compatible pixel format");
-		return FALSE;
-	}
-
-	Write_Debug("ChoosePixelFormat recommended #%d", pixelformat);
-
-	depth = 24;
-	accum = 0;
-	stencil = 8;
-	for (i=1;; i++)
-	{
-		if (!DescribePixelFormat(hdc, i, sizeof(PIXELFORMATDESCRIPTOR), pfd))
-		{
-			Write_Debug("There were %d pixel formats", i - 1);
-			break;
-		}
-
-#ifdef DDP_EVENT_LOG
-		Write_Debug(" Format #%2d,"
-					" Version=%d,"
-					" Flags=0x%04x,"
-					" PixelType=%s,"
-					" ColorBits=%2d,"
-					" R=%d,"
-					" G=%d,"
-					" B=%d,"
-					" A=%d,"
-					" AccumBits=%2d,"
-					" R=%2d,"
-					" G=%2d,"
-					" B=%2d,"
-					" A=%2d,"
-					" DepthBits=%2d,"
-					" StencilBits=%2d",
-					i,
-					pfd->nVersion,
-					pfd->dwFlags,
-					pfd->iPixelType == PFD_TYPE_RGBA ? "RGB" : "Pal",
-					pfd->cColorBits,
-					pfd->cRedBits,
-					pfd->cGreenBits,
-					pfd->cBlueBits,
-					pfd->cAlphaBits,
-					pfd->cAccumBits,
-					pfd->cAccumRedBits,
-					pfd->cAccumGreenBits,
-					pfd->cAccumBlueBits,
-					pfd->cAccumAlphaBits,
-					pfd->cDepthBits,
-					pfd->cStencilBits);
-#endif	// DDP_EVENT_LOG
-
-#ifdef DDP_EVENT_LOG_EXTREME
-		// Just show all the flags that are set
-		if (pfd->dwFlags & PFD_SUPPORT_DIRECTDRAW)
-		{
-			Write_Debug(" Supports DirectDraw");
-		}
-
-		if (pfd->dwFlags & PFD_GENERIC_ACCELERATED)
-		{
-			Write_Debug(" Hardware accelerated");
-		}
-
-		if (pfd->dwFlags & PFD_SWAP_LAYER_BUFFERS)
-		{
-			Write_Debug(" Swap layer buffers");
-		}
-
-		if (pfd->dwFlags & PFD_SWAP_COPY)
-		{
-			Write_Debug(" Swap Copy");
-		}
-
-		if (pfd->dwFlags & PFD_SWAP_EXCHANGE)
-		{
-			Write_Debug(" Swap exchange");
-		}
-
-		if (pfd->dwFlags & PFD_NEED_SYSTEM_PALETTE)
-		{
-			Write_Debug(" Need system palette");
-		}
-
-		if (pfd->dwFlags & PFD_NEED_PALETTE)
-		{
-			Write_Debug(" Need palette");
-		}
-
-		if (pfd->dwFlags & PFD_GENERIC_FORMAT)
-		{
-			Write_Debug(" Generic format (unaccelerated software)");
-		}
-
-		if (pfd->dwFlags & PFD_SUPPORT_OPENGL)
-		{
-			Write_Debug(" Supports OpenGL");
-		}
-
-		if (pfd->dwFlags & PFD_SUPPORT_GDI)
-		{
-			Write_Debug(" Supports GDI");
-		}
-
-		if (pfd->dwFlags & PFD_DRAW_TO_BITMAP)
-		{
-			Write_Debug(" Can draw to bitmap");
-		}
-
-		if (pfd->dwFlags & PFD_DRAW_TO_WINDOW)
-		{
-			Write_Debug(" Can draw to window");
-		}
-
-		if (pfd->dwFlags & PFD_STEREO)
-		{
-			Write_Debug(" Supports stereoscopic display");
-		}
-
-		if (pfd->dwFlags & PFD_DOUBLEBUFFER)
-		{
-			Write_Debug(" Double buffered");
-		}
-#endif	// DDP_EVENT_LOG_EXTREME
-
-		if ((WantedWindow ? (pfd->dwFlags & PFD_DRAW_TO_WINDOW) : TRUE) &&
-			(pfd->dwFlags & PFD_SUPPORT_OPENGL) &&
-			(pfd->dwFlags & PFD_DOUBLEBUFFER) &&
-			!(pfd->dwFlags & PFD_GENERIC_FORMAT) &&
-			pfd->iLayerType == PFD_MAIN_PLANE &&
-			//pfd->iPixelType == PFD_TYPE_RGBA &&
-			pfd->cDepthBits >= depth &&		// Largest bit depth
-		//	pfd->cAccumBits >= accum &&		// Largest accumulators
-			pfd->cStencilBits >= stencil &&	// Largest stencil buffer
-			pfd->cColorBits == WantedBpp)
-		{
-			depth = pfd->cDepthBits;
-			accum = pfd->cAccumBits;
-			stencil = pfd->cStencilBits;
-			pixelformat = i;
-		}
-	}
-
-	Write_Debug("Deduced pixel format was #%d", pixelformat);
-
-	// Set the pixel format selected
-	if (!SetPixelFormat(hdc, pixelformat, pfd))
-	{
-		Write_Debug("Unable to set the desired pixel format");
-		return FALSE;
-	}
-
-	return TRUE;
 }
 
 void ddpResetDisplay()

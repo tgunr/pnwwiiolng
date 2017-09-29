@@ -43,6 +43,8 @@
 	FLOAT32		ddpGetInstantFPS();
 	void		ddpResetFPS();
 	void		ddpCapture();
+	SINT32 ddpGetWindowWidth(void);
+	SINT32 ddpGetWindowHeight(void);
 	SINT32		ddpGetWidth();
 	SINT32		ddpGetHeight();
 	LOGICAL		ddpSetDDInit(DDWND_DDINITFUNC newfunc);
@@ -54,9 +56,6 @@
 	LOGICAL		ddpSetMouse(DDWND_MOUSEFUNC newfunc);
 	LOGICAL		ddpSetTimer(DDWND_TIMERFUNC newfunc);
 	LOGICAL		ddpSetKeyboard(DDWND_KEYBOARDFUNC newfunc);
-
-	// Set the screen to proper pixel depth and size requirements
-	LOGICAL		ddpChooseScreenFormat(HDC hdc, PIXELFORMATDESCRIPTOR* pfd);
 
 	LOGICAL		ddcapStart();
 
