@@ -146,29 +146,6 @@ LOGICAL ddpInit()
 	return TRUE;
 }
 
-#if(0)
-static void DisplayLastError()
-{
-LPVOID lpMsgBuf;
-
-	FormatMessage(	FORMAT_MESSAGE_ALLOCATE_BUFFER |
-					FORMAT_MESSAGE_FROM_SYSTEM |
-					FORMAT_MESSAGE_IGNORE_INSERTS,
-					nullptr,
-					GetLastError(),
-					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-					(LPTSTR) &lpMsgBuf,
-					0,
-					nullptr);
-
-	// Display the string
-	Write_Debug((const char*)lpMsgBuf);
-
-	// Free the buffer
-	LocalFree(lpMsgBuf);
-}
-#endif
-
 // Stub function that will report an error during the setup of the video card
 // and notify the user
 static inline void _initializationError(const char* problem)
@@ -637,18 +614,10 @@ bool ddpCreateWnd(void) {
 
 LOGICAL ddpUpdate()
 {
-#ifdef DONT_USE
-	if (!state)
-	{
-		Write_Debug("State is wrong");
-		return FALSE;
-	}
-#else
 	if (!focus)
 	{
 		std::this_thread::yield();
 	}
-#endif
 
 	if (!IsWindow(myhwnd))
 	{
@@ -717,10 +686,6 @@ LOGICAL ddpFlip()
 {
 	if (myhdc && myhrc)
 	{
-		// Flush drawing commands
-#if(0)
-		glFlush();
-#endif
 		// Flip the buffers
 		SwapBuffers(myhdc);
 	}
@@ -746,43 +711,6 @@ LOGICAL ddpFlip()
 	}
 
 	return TRUE;
-}
-
-LOGICAL ddpGetDDRect(RECT* rect)
-{
-	if (myhwnd == nullptr ||
-		rect == nullptr)
-	{
-		return FALSE;
-	}
-
-	GetClientRect(myhwnd, (RECT*)rect);
-	ClientToScreen(myhwnd, (LPPOINT)&rect->left);
-	ClientToScreen(myhwnd, (LPPOINT)&rect->right);
-
-	return TRUE;
-}
-
-LOGICAL ddpLockBackbuffer(BYTE** pbyte)
-{
-	//// FIXME
-	return FALSE;
-}
-
-void ddpUnlockBackbuffer()
-{
-}
-
-LPVOID ddpGetBackbuffer()
-{
-	//// FIXME
-	return(nullptr);
-}
-
-LOGICAL ddpGetBackbufferSurface(void** lpdds)
-{
-	//// FIXME
-	return FALSE;
 }
 
 LOGICAL ddpDraw()
@@ -1624,160 +1552,9 @@ SINT32					i, pixelformat, depth, accum, stencil;
 	return TRUE;
 }
 
-LOGICAL ddpSetDisplay(UINT32 flags)
-{
-LOGICAL			found;
-UINT32			retval;
-DEVMODE			testmode, presentmode;
-
-	if (flags & DDWND_FULLSCREEN)
-	{
-		found = FALSE;
-		displaynum = 0;
-		displaydevice.cb = sizeof(DISPLAY_DEVICE);
-		do
-		{
-			if (!EnumDisplayDevices(nullptr, displaynum, &displaydevice, 0))
-			{
-				break;
-			}
-
-			if (displaydevice.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)
-			{
-				found = TRUE;
-				break;
-			}
-
-			displaynum += 1;
-		}
-		while (TRUE);
-
-		if (found)
-		{
-			Write_Debug("Found desktop display device");
-		}
-
-		EnumDisplaySettings(displaydevice.DeviceName, ENUM_CURRENT_SETTINGS, &presentmode);
-		Write_Debug("Present mode: w=%d, h=%d, bpp=%d, ref=%d",
-			presentmode.dmPelsWidth,
-			presentmode.dmPelsHeight,
-			presentmode.dmBitsPerPel,
-			presentmode.dmDisplayFrequency);
-
-		found = FALSE;
-		modenum = 0;
-		Write_Debug("Enumerated modes:");
-		do
-		{
-			if (!EnumDisplaySettings(displaydevice.DeviceName, modenum, &devmode))
-			{
-				break;
-			}
-
-			Write_Debug("                  w=%d, h=%d, bpp=%d, ref=%d",
-				devmode.dmPelsWidth,
-				devmode.dmPelsHeight,
-				devmode.dmBitsPerPel,
-				devmode.dmDisplayFrequency);
-
-			if (devmode.dmBitsPerPel == (UINT32)WantedBpp && // TODO: Review
-				devmode.dmPelsWidth == (UINT32)WantedWidth &&
-				devmode.dmPelsHeight == (UINT32)WantedHeight &&
-				devmode.dmDisplayOrientation == 0)
-			{
-				found = TRUE;
-				break;
-			}
-
-			modenum += 1;
-		}
-		while (TRUE);
-
-		if (!found)
-		{
-			Write_Debug("No compatible display mode exists");
-			return FALSE;
-		}
-
-		modenum += 1;
-		do
-		{
-			if (!EnumDisplaySettings(displaydevice.DeviceName, modenum, &testmode))
-			{
-				break;
-			}
-
-			Write_Debug("                  w=%d, h=%d, bpp=%d, ref=%d",
-				testmode.dmPelsWidth,
-				testmode.dmPelsHeight,
-				testmode.dmBitsPerPel,
-				testmode.dmDisplayFrequency);
-
-			if (testmode.dmBitsPerPel == (UINT32)WantedBpp && // TODO: Review
-				testmode.dmPelsWidth == (UINT32)WantedWidth &&
-				testmode.dmPelsHeight == (UINT32)WantedHeight &&
-				testmode.dmDisplayOrientation == 0 &&
-				testmode.dmDisplayFrequency <= presentmode.dmDisplayFrequency &&
-				(testmode.dmDisplayFrequency == 0 ||
-				(abs((int)testmode.dmDisplayFrequency - (int)presentmode.dmDisplayFrequency) <=
-				abs((int)devmode.dmDisplayFrequency - (int)presentmode.dmDisplayFrequency))))
-			{
-				devmode = testmode;
-				found = TRUE;
-			}
-
-			modenum += 1;
-		}
-		while (TRUE);
-
-		if (!found)
-		{
-			Write_Debug("No compatible display mode exists");
-			return FALSE;
-		}
-
-		retval = ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, nullptr, CDS_TEST, nullptr);
-		switch (retval)
-		{
-		case DISP_CHANGE_BADFLAGS:
-			Write_Debug("DISP_CHANGE_BADFLAGS");
-			break;
-		case DISP_CHANGE_BADMODE:
-			Write_Debug("DISP_CHANGE_BADMODE");
-			break;
-		case DISP_CHANGE_BADPARAM:
-			Write_Debug("DISP_CHANGE_BADPARAM");
-			break;
-		case DISP_CHANGE_FAILED:
-			Write_Debug("DISP_CHANGE_FAILED");
-			break;
-		case DISP_CHANGE_NOTUPDATED:
-			Write_Debug("DISP_CHANGE_NOTUPDATED");
-			break;
-		case DISP_CHANGE_RESTART:
-			Write_Debug("DISP_CHANGE_RESTART");
-			break;
-		case DISP_CHANGE_SUCCESSFUL:
-			Write_Debug("DISP_CHANGE_SUCCESSFUL");
-			ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, nullptr, CDS_FULLSCREEN, nullptr);
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
 void ddpResetDisplay()
 {
 	ChangeDisplaySettingsEx(displaydevice.DeviceName, nullptr, nullptr, 0, nullptr);
-}
-
-LOGICAL ddpDrawToScreen(LPVOID lpdds)
-{
-	return TRUE;
 }
 
 DWORD GetMillisecondTick()

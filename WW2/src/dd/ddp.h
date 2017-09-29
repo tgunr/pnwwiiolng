@@ -35,17 +35,7 @@
 
 	LOGICAL		ddpFlip();
 	LOGICAL		ddpUpdate();
-	LOGICAL		ddpGetDDRect(RECT* rect);
-	LOGICAL		ddpGetAccess();
-	void		ddpReleaseAccess();
-	LOGICAL		ddpLockBackbuffer(UCHAR** pbyte);
-	void		ddpUnlockBackbuffer();
-	LPVOID		ddpGetBackbuffer();
-	LOGICAL		ddpGetBackbufferSurface(void** lpdds);
-	LOGICAL		ddpDrawToScreen(LPVOID lpdds);
 	LOGICAL		ddpDraw();
-	LOGICAL		ddpIsAccessed();
-	LOGICAL		ddpIsLocked();
 	void		ddpDrawNotActive(bool newdna);
 	void		ddpDisableScreenSaver(bool newss);
 	SINT32		ddpGetTotalPaints();
@@ -55,7 +45,6 @@
 	void		ddpCapture();
 	SINT32		ddpGetWidth();
 	SINT32		ddpGetHeight();
-	SINT32		ddpGetNumDrivers();
 	LOGICAL		ddpSetDDInit(DDWND_DDINITFUNC newfunc);
 	LOGICAL		ddpSetD3DInit(DDWND_D3DINITFUNC newfunc);
 	LOGICAL		ddpSetDDRender(DDWND_DDRENDERFUNC newfunc);
@@ -68,7 +57,6 @@
 
 	// Set the screen to proper pixel depth and size requirements
 	LOGICAL		ddpChooseScreenFormat(HDC hdc, PIXELFORMATDESCRIPTOR* pfd);
-	LOGICAL		ddpSetDisplay(UINT32 flags);
 
 	LOGICAL		ddcapStart();
 
