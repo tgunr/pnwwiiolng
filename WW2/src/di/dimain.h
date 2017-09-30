@@ -24,6 +24,7 @@ struct CHAR_INPUT
 
 LOGICAL dimainInit();
 LOGICAL dimainInitJoysticks();
+void dimainInitTrackIR();
 void dimainKill();
 void dimainKillJoysticks();
 LOGICAL dimainGetInputs(imap_queue_entry** plpiac, UINT32* pnumentries);

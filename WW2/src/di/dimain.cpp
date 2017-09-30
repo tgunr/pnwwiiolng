@@ -287,6 +287,11 @@ LOGICAL dimainInitJoysticks()
 	return TRUE;
 }
 
+void dimainInitTrackIR()
+{
+	InitTrackIR();
+}
+
 ////////////////////////////////////////
 // Function: dimainVKToIAC
 // Description: Virtual Key to IAC code

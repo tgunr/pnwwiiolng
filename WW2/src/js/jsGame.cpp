@@ -2015,6 +2015,8 @@ JS_FUNCTION_DEF(jsGame, resetcontrollers)
 	dimainKillJoysticks();
 	dimainInitJoysticks();
 
+	dimainInitTrackIR();
+
 	// reselect presets based on new devices and current selections
 	imapLoadPresets();
 
