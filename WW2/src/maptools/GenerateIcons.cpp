@@ -330,7 +330,7 @@ void GenerateIcons::MakeAtlas()
   }
 
   glBindTexture(GL_TEXTURE_2D, 0);
-  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
   free(background);
 
 }

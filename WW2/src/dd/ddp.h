@@ -57,6 +57,8 @@
 	LOGICAL		ddpSetTimer(DDWND_TIMERFUNC newfunc);
 	LOGICAL		ddpSetKeyboard(DDWND_KEYBOARDFUNC newfunc);
 
+	GLuint ddpDefaultFramebuffer(void);
+
 	LOGICAL		ddcapStart();
 
 	void		ddpShowCursor();

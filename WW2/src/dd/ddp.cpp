@@ -67,6 +67,8 @@ static HRESULT					retval;
 static HDC						myhdc;
 static HGLRC					myhrc;
 
+static GLint default_framebuffer;
+
 static DDWND_DDINITFUNC			ddinitfunc;
 static DDWND_D3DINITFUNC		d3dinitfunc;
 static DDWND_DDRENDERFUNC		ddrenderfunc;
@@ -302,6 +304,8 @@ bool CreateGLContext(HDC dc)
 
 	if(!myhrc)
         return false;
+
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &default_framebuffer);
 
 	return true;
 }
@@ -946,6 +950,11 @@ LOGICAL ddpSetKeyboard(DDWND_KEYBOARDFUNC newfunc)
 {
 	keyboardfunc = newfunc;
 	return TRUE;
+}
+
+
+GLuint ddpDefaultFramebuffer(void) {
+	return default_framebuffer;
 }
 
 

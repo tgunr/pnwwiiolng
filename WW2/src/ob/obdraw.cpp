@@ -2170,7 +2170,7 @@ void _renderWaterRefractions()
 
     g_wantNormalMaps = normalhistory;
 
-    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, 0);
+    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, ddpDefaultFramebuffer());
     oglSetViewport(0, 0, piGetWidth(), piGetHeight());
 #endif
 }

@@ -1855,7 +1855,7 @@ void PostRenderFilter::drawDeprecated()
     _applyBlur();
     _applyAdaption();
 
-    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, 0);
+    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, ddpDefaultFramebuffer());
     oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     _applyFinal();
@@ -1934,7 +1934,7 @@ void PostRenderFilter::draw()
     _applyBlur();
     _applyAdaption();
 
-    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, 0);
+    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, ddpDefaultFramebuffer());
     oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     _applyFinal();
