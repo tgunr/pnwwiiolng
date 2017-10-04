@@ -112,28 +112,36 @@ static void	OnSysKeyUp(UINT nChar, UINT nFlags);
 #define USE_NEWGL 0
 
 namespace {
+	struct MonitorInfo {
+		MonitorInfo(void) { info.cbSize = sizeof(info); }
+		void Refresh(void) { GetMonitorInfo(handle, &info); }
+
+		HMONITOR handle;
+		MONITORINFOEX info;
+	};
+}
+
+//==============================================================================
+
+namespace {
 	static DISPLAY_DEVICE displaydevice = {};
 
-	bool ddpSetDisplay(void) {
+	bool ddpSetDisplay(MonitorInfo& minfo) {
 		// We only need to mess with the display in fullscreen mode
 		if ( window_mode != FULLSCREEN )
 			return true;
 
-		bool found = false;
-		displaydevice.cb = sizeof(DISPLAY_DEVICE);
+		displaydevice.cb = sizeof(displaydevice);
+		// TEMP/HACK: The following returns a device, but apparently not the correct one:
+		//            ChangeDisplaySettingsEx() fails with DISP_CHANGE_BADPARAM
+		//if ( ! EnumDisplayDevices(minfo.info.szDevice, 0, &displaydevice, 0) )
+		//	return false;
 		for ( DWORD i = 0 ; EnumDisplayDevices(NULL, i, &displaydevice, 0) != 0 ; ++i ) {
 			// TODO: Allow user to pick which monitor to use
 			if ( displaydevice.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE ) {
-				found = true;
 				break;
 			}
 		}
-
-		if ( ! found ) {
-			// TODO: If using a user-configured screen, set to primary and try again
-			return false;
-		}
-
 
 		DEVMODE dm;
 		memset(&dm, 0, sizeof(dm));
@@ -149,6 +157,7 @@ namespace {
 			return false;
 		}
 
+		minfo.Refresh();
 		return true;
 	}
 
@@ -502,16 +511,16 @@ namespace {
 		return TRUE;
 	}
 
-	bool ReadWindowConfig(MONITORINFO& minfo) {
-		// TODO: Let the user pick which screen to render to
+	bool ReadWindowConfig(MonitorInfo& minfo) {
 		MonitorList monitors;
 		if ( EnumDisplayMonitors(NULL, NULL, &MonitorEnumProc, (LPARAM)&monitors) == 0 || monitors.size() == 0 )
 			return false;
 
-		minfo.cbSize = sizeof(minfo);
 		for ( HMONITOR monitor : monitors ) {
-			GetMonitorInfo(monitor, &minfo);
-			if ( minfo.dwFlags & MONITORINFOF_PRIMARY )
+			minfo.handle = monitor;
+			minfo.Refresh();
+			// TODO: Let the user pick which screen to render to
+			if ( minfo.info.dwFlags & MONITORINFOF_PRIMARY )
 				break;
 		}
 
@@ -530,7 +539,7 @@ namespace {
 
 		if ( WantedWidth <= 0 || WantedHeight <= 0 ) {
 			if ( window_mode == FULLSCREEN || window_mode == BORDERLESS_FULLSCREEN ) {
-				RECT rect = minfo.rcMonitor;
+				const RECT& rect = minfo.info.rcMonitor;
 				WantedWidth = rect.right - rect.left;
 				WantedHeight = rect.bottom - rect.top;
 			} else {
@@ -541,19 +550,42 @@ namespace {
 
 		return true;
 	}
+
+	bool SetUpDisplay(MonitorInfo& minfo) {
+		if ( window_mode != FULLSCREEN )
+			return true;
+		
+		if ( ddpSetDisplay(minfo) )
+			return true;
+
+		dbugLog(_FLW, "Failed to switch to fullscreen; going with backup settings.");
+		WantedWidth = WantedHeight = 0;
+		ReadWindowConfig(minfo); // HACK: Using this to default the window size
+		if ( ddpSetDisplay(minfo) )
+			return true;
+
+		// TODO: If using a user-selected monitor, try again with default
+
+		dbugLog(_FLW, "Failed with backup settings. Resorting to windowed mode.");
+		WantedWindow = TRUE;
+		WantedWidth = WantedHeight = 0;
+		ReadWindowConfig(minfo);
+
+		return true;
+	}
 }
 
 // NOTE: Actually modifying an existing window (including code elsewhere) is
 // completely untested and is probably horribly broken.
 static bool ddpResetWindow(void) {
-	MONITORINFO minfo;
+	MonitorInfo minfo;
 	if ( ! ReadWindowConfig(minfo) )
 		return false;
 
 	if ( ! RegisterWindowClass() )
 		return false;
 
-	if ( window_mode == FULLSCREEN && ! ddpSetDisplay() )
+	if ( ! SetUpDisplay(minfo) )
 		return false;
 
 
@@ -570,7 +602,7 @@ static bool ddpResetWindow(void) {
 
 #ifdef CENTER_WINDOW
 	if ( window_mode == WINDOWED ) {
-		RECT rect = minfo.rcWork;
+		RECT rect = minfo.info.rcWork;
 		WantedX = ((rect.right - rect.left) - WantedWidth) / 2;
 		WantedY = ((rect.bottom - rect.top) - WantedHeight) / 2;
 	}
@@ -581,11 +613,9 @@ static bool ddpResetWindow(void) {
 #endif
 
 	if ( window_mode == FULLSCREEN ) {
-		// HACK: Reread the config since we may have changed the monitor's resolution
-		ReadWindowConfig(minfo);
-		renderrect = minfo.rcMonitor;
+		renderrect = minfo.info.rcMonitor;
 	} else if ( window_mode == BORDERLESS_FULLSCREEN ) {
-		renderrect = minfo.rcMonitor;
+		renderrect = minfo.info.rcMonitor;
 		// TEMP: Force to match the monitor's resolution
 		// TODO: Render to an FBO, then render that to the window
 		WantedX = renderrect.left;
