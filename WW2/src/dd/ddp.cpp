@@ -57,7 +57,10 @@ static bool						focus;
 static SINT32					capture;
 
 static TCHAR					classname[256];
-static bool fullscreen;
+
+static enum WindowMode {
+	FULLSCREEN, BORDERLESS_FULLSCREEN, WINDOWED
+} window_mode;
 static UINT32					delay;
 static UINT32					starttime;
 static long						framecount;
@@ -78,10 +81,6 @@ static DDWND_D3DKILLFUNC		d3dkillfunc;
 static DDWND_MOUSEFUNC			mousefunc;
 static DDWND_TIMERFUNC			timerfunc;
 static DDWND_KEYBOARDFUNC		keyboardfunc;
-
-static UINT32					modenum, displaynum;
-static DEVMODE					devmode;
-static DISPLAY_DEVICE			displaydevice;
 
 // The rendering portion of the window.
 static RECT renderrect;
@@ -111,6 +110,54 @@ static void	OnSysKeyDown(UINT nChar, UINT nFlags);
 static void	OnSysKeyUp(UINT nChar, UINT nFlags);
 
 #define USE_NEWGL 0
+
+namespace {
+	static DISPLAY_DEVICE displaydevice = {};
+
+	bool ddpSetDisplay(void) {
+		// We only need to mess with the display in fullscreen mode
+		if ( window_mode != FULLSCREEN )
+			return true;
+
+		bool found = false;
+		displaydevice.cb = sizeof(DISPLAY_DEVICE);
+		for ( DWORD i = 0 ; EnumDisplayDevices(NULL, i, &displaydevice, 0) != 0 ; ++i ) {
+			// TODO: Allow user to pick which monitor to use
+			if ( displaydevice.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE ) {
+				found = true;
+				break;
+			}
+		}
+
+		if ( ! found ) {
+			// TODO: If using a user-configured screen, set to primary and try again
+			return false;
+		}
+
+
+		DEVMODE dm;
+		memset(&dm, 0, sizeof(dm));
+		dm.dmSize = sizeof(dm);
+		dm.dmPelsWidth = WantedWidth;
+		dm.dmPelsHeight = WantedHeight;
+		dm.dmBitsPerPel = WantedBpp;
+		dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
+
+		LONG result;
+		if ( (result = ChangeDisplaySettingsEx(displaydevice.DeviceName, &dm, NULL, CDS_FULLSCREEN, NULL)) != DISP_CHANGE_SUCCESSFUL ) {
+			dbugLog(_FLW, "Failed to change display settings: %d", result);
+			return false;
+		}
+
+		return true;
+	}
+
+	void ddpResetDisplay(void) {
+		ChangeDisplaySettingsEx(displaydevice.DeviceName, nullptr, nullptr, 0, nullptr);
+	}
+}
+
+//==============================================================================
 
 HINSTANCE ddpGetInstance()
 {
@@ -393,11 +440,14 @@ void ddpKill()
         return;
     }
 
-    //ClipCursor(NULL);
+    ClipCursor(NULL);
 
     alreadykilled = true;
 
 	imeKill();
+
+	if ( window_mode == FULLSCREEN )
+		ddpResetDisplay();
 
 	if (d3dkillfunc != nullptr)
 		d3dkillfunc();
@@ -451,64 +501,75 @@ namespace {
 		monitors->push_back(hMonitor);
 		return TRUE;
 	}
+
+	bool ReadWindowConfig(MONITORINFO& minfo) {
+		// TODO: Let the user pick which screen to render to
+		MonitorList monitors;
+		if ( EnumDisplayMonitors(NULL, NULL, &MonitorEnumProc, (LPARAM)&monitors) == 0 || monitors.size() == 0 )
+			return false;
+
+		minfo.cbSize = sizeof(minfo);
+		for ( HMONITOR monitor : monitors ) {
+			GetMonitorInfo(monitor, &minfo);
+			if ( minfo.dwFlags & MONITORINFOF_PRIMARY )
+				break;
+		}
+
+
+		// TODO: Actually make this configurable or get rid of it
+		// TODO: Should this be using the monitor we grabbed above?
+		HDC hdc = GetDC(NULL);
+		WantedBpp = GetDeviceCaps(hdc, BITSPIXEL);
+		ReleaseDC(NULL, hdc);
+
+		// TODO: Add borderless fullscreen once its issues have been dealt with
+		if ( ! WantedWindow )
+			window_mode = FULLSCREEN;
+		else
+			window_mode = WINDOWED;
+
+		if ( WantedWidth <= 0 || WantedHeight <= 0 ) {
+			if ( window_mode == FULLSCREEN || window_mode == BORDERLESS_FULLSCREEN ) {
+				RECT rect = minfo.rcMonitor;
+				WantedWidth = rect.right - rect.left;
+				WantedHeight = rect.bottom - rect.top;
+			} else {
+				WantedWidth = 1024;
+				WantedHeight = 768;
+			}
+		}
+
+		return true;
+	}
 }
 
 // NOTE: Actually modifying an existing window (including code elsewhere) is
 // completely untested and is probably horribly broken.
 static bool ddpResetWindow(void) {
-	// TODO: Actually make this configurable or get rid of it.
-	HDC hdc = GetDC(NULL);
-	WantedBpp = GetDeviceCaps(hdc, BITSPIXEL);
-	ReleaseDC(NULL, hdc);
-
-	fullscreen = ! WantedWindow;
+	MONITORINFO minfo;
+	if ( ! ReadWindowConfig(minfo) )
+		return false;
 
 	if ( ! RegisterWindowClass() )
-		return true;
+		return false;
+
+	if ( window_mode == FULLSCREEN && ! ddpSetDisplay() )
+		return false;
 
 
 	DWORD style;
 	DWORD exstyle;
-	if ( fullscreen ) {
-		style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
-		exstyle = WS_EX_APPWINDOW | WS_EX_TOPMOST;
-	} else {
+	if ( window_mode == WINDOWED ) {
 		style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW;
 		exstyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+	} else {
+		style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
+		exstyle = WS_EX_APPWINDOW | WS_EX_TOPMOST;
 	}
 
-
-	MonitorList monitors;
-	if ( EnumDisplayMonitors(NULL, NULL, &MonitorEnumProc, (LPARAM)&monitors) == 0 || monitors.size() == 0 )
-		return false;
-
-	MONITORINFO minfo; minfo.cbSize = sizeof(minfo);
-	for ( HMONITOR monitor : monitors ) {
-		GetMonitorInfo(monitor, &minfo);
-		// TODO: Allow setting fullscreen on other screens
-		if ( minfo.dwFlags & MONITORINFOF_PRIMARY )
-			break;
-	}
-
-	if ( WantedWidth <= 0 || WantedHeight <= 0 ) {
-		if ( fullscreen ) {
-			RECT rect = minfo.rcMonitor;
-			WantedWidth = rect.right - rect.left;
-			WantedHeight = rect.bottom - rect.top;
-		} else {
-			WantedWidth = 1024;
-			WantedHeight = 768;
-		}
-	}
-
-	// TODO: Verify the aspect ratio is something we support.
-	if ( WantedWidth < 1024 )
-		WantedWidth = 1024;
-	if ( WantedHeight < 768 )
-		WantedHeight = 768;
 
 #ifdef CENTER_WINDOW
-	if ( ! fullscreen ) {
+	if ( window_mode == WINDOWED ) {
 		RECT rect = minfo.rcWork;
 		WantedX = ((rect.right - rect.left) - WantedWidth) / 2;
 		WantedY = ((rect.bottom - rect.top) - WantedHeight) / 2;
@@ -519,11 +580,14 @@ static bool ddpResetWindow(void) {
 	// (e.g., previously configured with multi-monitor setup that changed)
 #endif
 
-	if ( fullscreen ) {
+	if ( window_mode == FULLSCREEN ) {
+		// HACK: Reread the config since we may have changed the monitor's resolution
+		ReadWindowConfig(minfo);
 		renderrect = minfo.rcMonitor;
-		// TEMP: If fullscreen, force to match the monitor's resolution
-		// TODO: Render to an FBO, then render that to the window, or
-		// maybe just consider re-adding windowless fullscreen as an option
+	} else if ( window_mode == BORDERLESS_FULLSCREEN ) {
+		renderrect = minfo.rcMonitor;
+		// TEMP: Force to match the monitor's resolution
+		// TODO: Render to an FBO, then render that to the window
 		WantedX = renderrect.left;
 		WantedY = renderrect.bottom;
 		WantedWidth = renderrect.right - renderrect.left;
@@ -555,7 +619,7 @@ static bool ddpResetWindow(void) {
 		             SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 	}
 
-	//ClipCursor(&renderrect);
+	ClipCursor(&renderrect);
 
 	//--------------
 
@@ -574,7 +638,7 @@ static bool ddpResetWindow(void) {
 	}
 
 	if ( ! oglBegin(myhwnd) ) {
-		return FALSE;
+		return false;
 	}
 
 	// post process globals dependent on GLEW if needed
@@ -1072,13 +1136,13 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_SETFOCUS:
 	{
 		OnSetFocus((HWND) wParam);
-        //ClipCursor(&renderrect);
+        ClipCursor(&renderrect);
 		break;
 	}
 	case WM_KILLFOCUS:
 	{
 		OnKillFocus((HWND) wParam);
-        //ClipCursor(nullptr);
+        ClipCursor(nullptr);
 		break;
 	}
 	case WM_NCACTIVATE:
@@ -1361,7 +1425,7 @@ static void OnSize(UINT nType, int cx, int cy) {
 	if ( cx <= 0 || cy <= 0 )
 		return;
 
-	if ( ! fullscreen ) {
+	if ( window_mode == WINDOWED ) {
 		// TODO: Force aspect ratio
 		if ( ddpGetWidth() != cx || ddpGetHeight() != cy ) {
 			oglResize(cx, cy);
@@ -1372,6 +1436,8 @@ static void OnSize(UINT nType, int cx, int cy) {
 			WantedWidth = cx;
 			WantedWidth = cy;
 		}
+	} else {
+		// TODO: Fullscreen/borderless
 	}
 }
 
@@ -1425,11 +1491,6 @@ static void OnSysKeyUp(UINT nChar, UINT nFlags)
 	}
 
 	Write_Debug("OnSysKeyUp: 0x%x", nChar);
-}
-
-void ddpResetDisplay()
-{
-	ChangeDisplaySettingsEx(displaydevice.DeviceName, nullptr, nullptr, 0, nullptr);
 }
 
 DWORD GetMillisecondTick()
