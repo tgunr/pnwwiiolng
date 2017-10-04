@@ -3638,6 +3638,7 @@
 			inputPaths = (
 				"$(SRCROOT)/src/build_info.cpp.in",
 				"$(SRCROOT)/src/build_info.py",
+				"$(SRCROOT)/src/build_info.hpp",
 			);
 			name = "Run Script";
 			outputPaths = (
