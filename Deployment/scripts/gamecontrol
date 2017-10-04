@@ -6,7 +6,7 @@
 // NOTES:
 //         1. Pull out list of servers so the code is independent of what is being controlled
 
-$version = '0.2.1';
+$version = '0.2.2';
 
 include '/playnet/bin/gamecontrolvars.php';
 //
@@ -34,7 +34,7 @@ function do_help($msg) {
         print "{$msg}\n\n";
     }
     print "gamecontrol version {$version}\n";
-    print "Usage: {$argv[0]} {start|stop|restart|savelogs} {cluster|cell} {name|ID} [cell Num]\n";
+    print "Usage: {$argv[0]} {start|stop|stby|restart|savelogs} {cluster|cell} {name|ID} [cell Num]\n";
     print "\n";
     print "Cluster is one of:\n";
     foreach ($clusters as $cluster) {
@@ -49,7 +49,9 @@ function do_help($msg) {
     print "Examples:\n";
     print "\tgamecontrol start cluster Dev1\n";
     print "\tgamecontrol stop cluster Dev2\n";
-    print "\tgamecontrol stop cell Dev2 2\n";
+    print "\tgamecontrol stop cell Dev2 3\n";
+    print "\tgamecontrol stby cell Dev2 4\n";
+    print "\tgamecontrol start cell Dev2 1\n";
     exit(0);
 }
 
@@ -103,7 +105,8 @@ function startCell($cluster, $cellnum) {
 			if ($cellhost['activate']) {
 				runCommand(commandForHost($cellhost, controlCommandForHost($cellhost, 'start', 'cellhost'), true)); 
 			} else {
-    			print "Not starting deactivated cell #{$n} : {$cellhost['hostname']}\n";
+    			print "Not starting deactivated cell #{$n}, tagging as standby : {$cellhost['hostname']}\n";
+        	    runCommand(commandForHost($cellhost, controlCommandForHost($cellhost, 'stby', 'cellhost'), false));
 			}	
 		}
 	}
@@ -123,6 +126,14 @@ function stopCell($cluster, $cellnum) {
     foreach ($cluster['cells'] as $n => $cellhost) {
 		if ($cellnum == 0 || $n == $cellnum) {
         	  runCommand(commandForHost($cellhost, controlCommandForHost($cellhost, 'stop', 'cellhost'), false));
+		}
+	}
+}
+
+function stbyCell($cluster, $cellnum) {
+    foreach ($cluster['cells'] as $n => $cellhost) {
+		if ($n == $cellnum) {
+        	  runCommand(commandForHost($cellhost, controlCommandForHost($cellhost, 'stby', 'cellhost'), false));
 		}
 	}
 }
@@ -160,7 +171,11 @@ if ($type !== 'cluster' && $type !== 'cell') {
     do_help("Only cluster control is currently supported");
 }
 
-if (!in_array($cmd = $argv[1], ['start', 'stop', 'restart', 'savelogs'])) {
+if ($type == 'cluster' && !in_array($cmd = $argv[1], ['start', 'stop', 'restart', 'savelogs'])) {
+    do_help("Unknown operation {$cmd}");
+}
+
+if ($type == 'cell' && !in_array($cmd = $argv[1], ['start', 'stop', 'stby', 'restart', 'savelogs'])) {
     do_help("Unknown operation {$cmd}");
 }
 
@@ -198,6 +213,8 @@ if ($type === 'cell') {
     	startCell($cluster, $cellnum);
 	} else if ($cmd === 'stop') {
     	stopCell($cluster, $cellnum);
+	} else if ($cmd === 'stby') {
+    	stbyCell($cluster, $cellnum);
 	} else if ($cmd === 'restart') {
     	restartCell($cluster, $cellnum);
 	} else {

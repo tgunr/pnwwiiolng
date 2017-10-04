@@ -11,6 +11,8 @@
 #include "include/clustercfg.h"
 
 #include <stack>
+#include <sys/stat.h>
+#include <string>
 
 #include "build_info.hpp"
 #include "chat/chatCellHostSupportMessages.h"
@@ -1546,6 +1548,47 @@ _addNewServer(Server::ServerInfo* server, const bool isEntering)
 }
 
 //////////////////////////////////////////////////////////////////////
+// Makes sure this cell is still supposed to be running
+//  - doesn't need to check very often, every .2Hz is fine
+//
+void
+_cellStatusCheck()
+{
+// TODO: no point in doing anything in a CIAB environment as its not really setup for multi-cell right now
+#if platOS != OS_WIN32
+	const std::string name("/tmp/NODE_DOWN");
+	struct stat info;
+	if (stat(name.c_str(), &info) == 0) 
+	{
+		if (Server::myServerInfo.stats.status != Server::SERVER_MAINTENANCE)
+		{
+			dbugLog(_FLI, "Detected node is being shut down, notify other servers");
+
+			// flag indicates we should not be running, initiate maintenance mode
+			Server::myServerInfo.stats.status = Server::SERVER_MAINTENANCE;
+		}
+		dbugLog(_FLI, "%u open connections remaining", Server::myServerInfo.m_players.size());
+		if (Server::myServerInfo.m_players.size() == 0) 
+		{
+			// mark this cell host for termination
+			dbugLog(_FLI, "Cell host ready for termination");
+			g_hostTerminating = true;			
+		}
+	}
+	else 
+	{
+		if (Server::myServerInfo.stats.status == Server::SERVER_MAINTENANCE)
+		{
+			dbugLog(_FLI, "Detected node shutdown was aborted, notify other servers");
+
+			// flag indicates we should not be running, initiate maintenance mode
+			Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
+		}
+	}
+#endif
+}
+
+//////////////////////////////////////////////////////////////////////
 // Hunt for and remove long-dead vehicles in the remote list
 // Returns the time we should next check for ghosts
 //
@@ -2255,6 +2298,7 @@ _runHost()
 
 	// Time out ghosts every half a second.
 	Teul::housekeeper expiryHouseKeeper(_expireVehicles, 500);
+	Teul::housekeeper cellStatusHouseKeeper(_cellStatusCheck, 5000);
 
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
@@ -2331,6 +2375,10 @@ _runHost()
 		TIMER_START
 		expiryHouseKeeper.poll();
 		TIMER_STOP("expiry");
+
+		TIMER_START
+		cellStatusHouseKeeper.poll();
+		TIMER_STOP("cellstatus");
 
 		// Force the dispatch of any queued up "vehicle despawned"
 		// notifications to the rest of the cluster.
