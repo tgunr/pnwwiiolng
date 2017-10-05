@@ -87,7 +87,6 @@
     <Link>
       <AdditionalDependencies>libxml2.lib;opengl32.lib;glew32s.lib;d3d9.lib;dxguid.lib;dsound.lib;libiconv.lib;expat.lib;zlib.lib;Kernel32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)Settings/lib;$(SolutionDir)build\client\$(Configuration)\Lib;lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
       <IgnoreSpecificDefaultLibraries>libc; libcmt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AssemblyDebug>true</AssemblyDebug>
@@ -126,7 +125,6 @@
       <AdditionalDependencies>libxml2.lib;opengl32.lib;glew32s.lib;d3d9.lib;dxguid.lib;dsound.lib;libiconv.lib;expat.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)Settings/lib;$(SolutionDir)build\client\$(Configuration)\Lib;lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <IgnoreSpecificDefaultLibraries>libc; libcmt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>

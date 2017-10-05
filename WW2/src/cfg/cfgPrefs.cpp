@@ -79,7 +79,7 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.sound",				&WantedSoundCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedSoundCard) - 1, true	},
 	{"app.bsoundenable",		&bSoundEnable,				cfgPARAM_BOOLEAN,	0,		0,	1, true	},
 	{"app.b3dsoundenable",		&b3DSoundEnable,			cfgPARAM_BOOLEAN,	0,		0,	1, true	},
-	{"app.video",				&WantedVideoCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoCard) - 1, true	},
+	{"app.video",				&WantedDisplayDevice,		cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedDisplayDevice) - 1, true	},
 	{"app.resolution",			&WantedVideoResolution,		cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoResolution) - 1, true	},
 	{"app.bnoframerunahead",	&bNoFrameRunahead,			cfgPARAM_BOOLEAN,	0,		0,	1, false	},
 #if platOS == OS_MACOS

@@ -117,7 +117,7 @@ LOGICAL			WantedUserLogEnabled = TRUE;	// If the user wants the log enabled
 #else
 LOGICAL			WantedUserLogEnabled = FALSE;	// If the user wants the log enabled
 #endif
-SCHAR			WantedVideoCard[64];// desired video card name
+SCHAR			WantedDisplayDevice[64];// desired display device name
 SCHAR			WantedVideoResolution[32];// desired video resolution
 SCHAR			WantedSoundCard[64];// desired sound card name
 

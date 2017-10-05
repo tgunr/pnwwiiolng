@@ -22,6 +22,7 @@
 #include "fio/fio.h"
 #include "ogl/oglGlobalStates.h"
 #include "resource.h"
+#include "wwii/wwiiUTF.h"
 
 #include "ddp.h"
 
@@ -111,37 +112,17 @@ static void	OnSysKeyUp(UINT nChar, UINT nFlags);
 
 #define USE_NEWGL 0
 
-namespace {
-	struct MonitorInfo {
-		MonitorInfo(void) { info.cbSize = sizeof(info); }
-		void Refresh(void) { GetMonitorInfo(handle, &info); }
-
-		HMONITOR handle;
-		MONITORINFOEX info;
-	};
-}
-
 //==============================================================================
 
 namespace {
-	static DISPLAY_DEVICE displaydevice = {};
+	DISPLAY_DEVICE primary_display;
+	DISPLAY_DEVICE display = {};
+	DEVMODE devmode = {};
 
-	bool ddpSetDisplay(MonitorInfo& minfo) {
+	bool ddpSetDisplay(void) {
 		// We only need to mess with the display in fullscreen mode
 		if ( window_mode != FULLSCREEN )
 			return true;
-
-		displaydevice.cb = sizeof(displaydevice);
-		// TEMP/HACK: The following returns a device, but apparently not the correct one:
-		//            ChangeDisplaySettingsEx() fails with DISP_CHANGE_BADPARAM
-		//if ( ! EnumDisplayDevices(minfo.info.szDevice, 0, &displaydevice, 0) )
-		//	return false;
-		for ( DWORD i = 0 ; EnumDisplayDevices(NULL, i, &displaydevice, 0) != 0 ; ++i ) {
-			// TODO: Allow user to pick which monitor to use
-			if ( displaydevice.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE ) {
-				break;
-			}
-		}
 
 		DEVMODE dm;
 		memset(&dm, 0, sizeof(dm));
@@ -152,17 +133,16 @@ namespace {
 		dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
 
 		LONG result;
-		if ( (result = ChangeDisplaySettingsEx(displaydevice.DeviceName, &dm, NULL, CDS_FULLSCREEN, NULL)) != DISP_CHANGE_SUCCESSFUL ) {
+		if ( (result = ChangeDisplaySettingsEx(display.DeviceName, &dm, NULL, CDS_FULLSCREEN, NULL)) != DISP_CHANGE_SUCCESSFUL ) {
 			dbugLog(_FLW, "Failed to change display settings: %d", result);
 			return false;
 		}
 
-		minfo.Refresh();
 		return true;
 	}
 
 	void ddpResetDisplay(void) {
-		ChangeDisplaySettingsEx(displaydevice.DeviceName, nullptr, nullptr, 0, nullptr);
+		ChangeDisplaySettingsEx(display.DeviceName, nullptr, nullptr, 0, nullptr);
 	}
 }
 
@@ -511,25 +491,52 @@ namespace {
 		return TRUE;
 	}
 
-	bool ReadWindowConfig(MonitorInfo& minfo) {
+	MONITORINFOEX GetDisplayMonitor(void) {
 		MonitorList monitors;
 		if ( EnumDisplayMonitors(NULL, NULL, &MonitorEnumProc, (LPARAM)&monitors) == 0 || monitors.size() == 0 )
-			return false;
+			LogAbort("Could not retrieve any monitor info at all");
 
+		MONITORINFOEX minfo; minfo.cbSize = sizeof(minfo);
+		MONITORINFOEX primary_minfo;
 		for ( HMONITOR monitor : monitors ) {
-			minfo.handle = monitor;
-			minfo.Refresh();
-			// TODO: Let the user pick which screen to render to
-			if ( minfo.info.dwFlags & MONITORINFOF_PRIMARY )
+			GetMonitorInfo(monitor, &minfo);
+			if ( minfo.dwFlags & MONITORINFOF_PRIMARY )
+				primary_minfo = minfo;
+
+			if ( wcsstr(minfo.szDevice, display.DeviceName) != nullptr ) {
+				return minfo;
+			}
+		}
+
+		dbugLog(_FLA, "WARNING: Could not retrieve the monitor info for the given display device. Resetting both to primary.");
+		display = primary_display;
+		return primary_minfo;
+	}
+
+	void ReadWindowConfig(void) {
+		bool display_found = false;
+		display.cb = sizeof(display);
+		for ( DWORD i = 0 ; EnumDisplayDevices(NULL, i, &display, 0) != 0 ; ++i ) {
+			if ( display.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE )
+				primary_display = display;
+
+			char buf[128]; WWIIConvert(display.DeviceName, buf);
+			if ( strcmp(WantedDisplayDevice, buf) == 0 ) {
+				display_found = true;
 				break;
+			}
+		}
+
+		if ( ! display_found ) {
+			dbugLog(_FLW, "Requested display '%s' not found. Resorting to primary display.", WantedDisplayDevice);
+			display = primary_display;
 		}
 
 
 		// TODO: Actually make this configurable or get rid of it
-		// TODO: Should this be using the monitor we grabbed above?
-		HDC hdc = GetDC(NULL);
-		WantedBpp = GetDeviceCaps(hdc, BITSPIXEL);
-		ReleaseDC(NULL, hdc);
+		if ( WantedBpp < 32 )
+			WantedBpp = 32;
+
 
 		// TODO: Add borderless fullscreen once its issues have been dealt with
 		if ( ! WantedWindow )
@@ -537,9 +544,11 @@ namespace {
 		else
 			window_mode = WINDOWED;
 
+
 		if ( WantedWidth <= 0 || WantedHeight <= 0 ) {
 			if ( window_mode == FULLSCREEN || window_mode == BORDERLESS_FULLSCREEN ) {
-				const RECT& rect = minfo.info.rcMonitor;
+				MONITORINFOEX minfo = GetDisplayMonitor();
+				const RECT& rect = minfo.rcMonitor;
 				WantedWidth = rect.right - rect.left;
 				WantedHeight = rect.bottom - rect.top;
 			} else {
@@ -547,29 +556,32 @@ namespace {
 				WantedHeight = 768;
 			}
 		}
-
-		return true;
 	}
 
-	bool SetUpDisplay(MonitorInfo& minfo) {
+	bool SetUpDisplay(void) {
 		if ( window_mode != FULLSCREEN )
 			return true;
 		
-		if ( ddpSetDisplay(minfo) )
+		if ( ddpSetDisplay() )
 			return true;
 
-		dbugLog(_FLW, "Failed to switch to fullscreen; going with backup settings.");
+		dbugLog(_FLW, "Failed to go fullscreen; trying default resolution.");
 		WantedWidth = WantedHeight = 0;
-		ReadWindowConfig(minfo); // HACK: Using this to default the window size
-		if ( ddpSetDisplay(minfo) )
+		ReadWindowConfig(); // HACK: Using this to default the window size
+		if ( ddpSetDisplay() )
 			return true;
 
-		// TODO: If using a user-selected monitor, try again with default
+		dbugLog(_FLW, "Failed to go fullscreen; trying default display device.");
+		display = primary_display;
+		WantedWidth = WantedHeight = 0;
+		ReadWindowConfig(); // HACK
+		if ( ddpSetDisplay() )
+			return true;
 
-		dbugLog(_FLW, "Failed with backup settings. Resorting to windowed mode.");
+		dbugLog(_FLW, "Failed to go fullscreen. Resorting to windowed mode.");
 		WantedWindow = TRUE;
 		WantedWidth = WantedHeight = 0;
-		ReadWindowConfig(minfo);
+		ReadWindowConfig(); // HACK
 
 		return true;
 	}
@@ -578,15 +590,9 @@ namespace {
 // NOTE: Actually modifying an existing window (including code elsewhere) is
 // completely untested and is probably horribly broken.
 static bool ddpResetWindow(void) {
-	MonitorInfo minfo;
-	if ( ! ReadWindowConfig(minfo) )
-		return false;
-
-	if ( ! RegisterWindowClass() )
-		return false;
-
-	if ( ! SetUpDisplay(minfo) )
-		return false;
+	ReadWindowConfig();
+	if ( ! RegisterWindowClass() ) return false;
+	if ( ! SetUpDisplay() ) return false;
 
 
 	DWORD style;
@@ -599,10 +605,10 @@ static bool ddpResetWindow(void) {
 		exstyle = WS_EX_APPWINDOW | WS_EX_TOPMOST;
 	}
 
-
 #ifdef CENTER_WINDOW
 	if ( window_mode == WINDOWED ) {
-		RECT rect = minfo.info.rcWork;
+		MONITORINFOEX minfo = GetDisplayMonitor();
+		const RECT& rect = minfo.rcWork;
 		WantedX = ((rect.right - rect.left) - WantedWidth) / 2;
 		WantedY = ((rect.bottom - rect.top) - WantedHeight) / 2;
 	}
@@ -612,16 +618,17 @@ static bool ddpResetWindow(void) {
 	// (e.g., previously configured with multi-monitor setup that changed)
 #endif
 
-	if ( window_mode == FULLSCREEN ) {
-		renderrect = minfo.info.rcMonitor;
-	} else if ( window_mode == BORDERLESS_FULLSCREEN ) {
-		renderrect = minfo.info.rcMonitor;
+	if ( window_mode != FULLSCREEN ) {
+		MONITORINFOEX minfo = GetDisplayMonitor();
+		renderrect = minfo.rcMonitor;
 		// TEMP: Force to match the monitor's resolution
 		// TODO: Render to an FBO, then render that to the window
-		WantedX = renderrect.left;
-		WantedY = renderrect.bottom;
-		WantedWidth = renderrect.right - renderrect.left;
-		WantedHeight = renderrect.bottom - renderrect.top;
+		if ( window_mode == BORDERLESS_FULLSCREEN ) {
+			WantedX = renderrect.left;
+			WantedY = renderrect.bottom;
+			WantedWidth = renderrect.right - renderrect.left;
+			WantedHeight = renderrect.bottom - renderrect.top;
+		}
 	} else {
 		renderrect.left = WantedX;
 		renderrect.right = renderrect.left + WantedWidth;
