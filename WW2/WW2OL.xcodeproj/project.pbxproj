@@ -641,7 +641,6 @@
 		0810471E103DCC390065E0E2 /* cfgData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cfgData.cpp; sourceTree = "<group>"; };
 		0810471F103DCC390065E0E2 /* cfgData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cfgData.h; sourceTree = "<group>"; };
 		08104720103DCC390065E0E2 /* cfgLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cfgLoad.cpp; sourceTree = "<group>"; };
-		08104721103DCC390065E0E2 /* cfgLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cfgLoad.h; sourceTree = "<group>"; };
 		08104722103DCC390065E0E2 /* cfgLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cfgLua.cpp; sourceTree = "<group>"; };
 		08104723103DCC390065E0E2 /* cfgLua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cfgLua.h; sourceTree = "<group>"; };
 		08104724103DCC390065E0E2 /* cfgPrefs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cfgPrefs.cpp; sourceTree = "<group>"; };
@@ -1748,7 +1747,6 @@
 				0810471E103DCC390065E0E2 /* cfgData.cpp */,
 				0810471F103DCC390065E0E2 /* cfgData.h */,
 				08104720103DCC390065E0E2 /* cfgLoad.cpp */,
-				08104721103DCC390065E0E2 /* cfgLoad.h */,
 				08104722103DCC390065E0E2 /* cfgLua.cpp */,
 				08104723103DCC390065E0E2 /* cfgLua.h */,
 				08104724103DCC390065E0E2 /* cfgPrefs.cpp */,

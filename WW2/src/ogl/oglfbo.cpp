@@ -232,7 +232,7 @@ SINT32 CFbo::createDepthTextureFBO(GLuint texid)
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
 
     m_depthtexture[fbo] = texid;
 
@@ -368,7 +368,7 @@ LOGICAL CFbo::activateCubemapTarget(SINT32 texture, SINT32 depth, SINT32 face)
 
     if(!checkStatus())
     {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
         return FALSE;
     }
 
@@ -442,7 +442,7 @@ LOGICAL CFbo::activateTarget(SINT32 texture, SINT32 depth)
 
     if(!checkStatus())
     {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
         return FALSE;
     }
 
@@ -469,7 +469,7 @@ LOGICAL CFbo::activateDepthTextureFBO(GLuint fbo)
 
     if(!checkStatus())
     {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
         return FALSE;
     }
 
@@ -498,7 +498,7 @@ void CFbo::deactivate()
                                  GL_RENDERBUFFER_EXT,
                                  0);
 
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
     m_isbound = FALSE;
 
     glViewport(0, 0, piGetWidth(), piGetHeight());

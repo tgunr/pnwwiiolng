@@ -294,32 +294,23 @@ void CsettingsDlg::_setLanguage()
 void CsettingsDlg::_setVideoCard()
 {
     _videocard.ResetContent();
-
-    DWORD i;
-	std::wstring str = _T("");
-
-    for(i = 0; i < _numAdapters; i++)
-    {
-		str = utf8_to_utf16((const unsigned char*)_adapterModes[i]->identifier.Description);
-		_videocard.InsertString(i, str.c_str());
-        _videocard.SetItemData(i, (DWORD_PTR)&_adapterModes[i]->identifier.DeviceIdentifier);
+    for ( size_t i = 0 ; i < displays.size() ; ++i ) {
+        _videocard.InsertString(i, displays[i].c_str());
+        _videocard.SetItemData(i, (DWORD_PTR)displays[i].c_str());
     }
 
     // See if video card is one already in the config file.
     VALUE* value = getValue("app.video");
     
+	std::wstring str;
     if(value)
         value->get(str);
 	
     _videocard.SetCurSel(0);
 
-    static wchar_t ss[1024];
-
-    for(i = 0; i < _numAdapters; i++)
+    for ( size_t i = 0; i < displays.size(); ++i )
     {
-        StringFromGUID2(_adapterModes[i]->identifier.DeviceIdentifier, ss, 1024);
-
-		if(!str.compare(ss))
+		if ( ! str.compare(displays[i]) )
         {
             _videocard.SetCurSel(i);
             break;
@@ -333,8 +324,6 @@ void CsettingsDlg::_setResolution()
 
     int adapter = _videocard.GetCurSel();
 
-    UINT w, h;
-
     wchar_t buffer[128];
     int index = 0;
 
@@ -347,21 +336,16 @@ void CsettingsDlg::_setResolution()
 
     int cursor = 0;
 
-    for(unsigned int i = 0; i < _adapterModes[adapter]->_modes.size(); i++)
-    {
-        w = _adapterModes[adapter]->_modes[i]->Width;
-        h = _adapterModes[adapter]->_modes[i]->Height;
-
-        int bpp = dx3dGetBPP(_adapterModes[adapter]->_modes[i]->Format);
-
-        if(w >= 800 && h >= 600 && bpp >= 32)
-        {
-            wsprintf(buffer, L"%dx%dx%d", w, h, bpp);
-
-			if(!res.compare(buffer))
+    DEVMODE dm; dm.dmSize = sizeof(dm);
+    for ( DWORD i = 0 ; EnumDisplaySettings(displays[adapter].c_str(), i, &dm) ; ++i ) {
+        if ( dm.dmPelsWidth >= 800 && dm.dmPelsHeight >= 600 && dm.dmBitsPerPel >= 32 ) {
+            wsprintf(buffer, L"%dx%dx%d", dm.dmPelsWidth, dm.dmPelsHeight, dm.dmBitsPerPel);
+            if ( _resolution.FindString(0, buffer) >= 0 )
+                continue;
+            _resolution.InsertString(index, buffer);
+            if ( ! res.compare(buffer) )
                 cursor = index;
-			
-            _resolution.InsertString(index++, buffer);
+            ++index;
         }
     }
 
@@ -427,7 +411,10 @@ void CsettingsDlg::_setSoundCard()
 
 void CsettingsDlg::_setDialog()
 {
-    dx3dinfoGetAdaptersAndModes(&_numAdapters, _adapterModes);
+    DISPLAY_DEVICE device; device.cb = sizeof(device);
+    for ( DWORD i = 0 ; EnumDisplayDevices(NULL, i, &device, 0) != 0 ; ++i ) {
+        displays.push_back(device.DeviceName);
+    }
 
     _setLanguage();
     _setVideoCard();
@@ -567,22 +554,15 @@ void CsettingsDlg::OnBnClickedOk()
 
 void CsettingsDlg::OnCbnSelchangeComboVideoCard()
 {
-    CString str;
-
-    int selection = _videocard.GetCurSel();
-   
-    GUID *guid = (GUID *)_videocard.GetItemData(selection);
-    wchar_t ss[1024] = {0};
-
-    StringFromGUID2(*guid, ss, 1024);
+	VALUE* value = getValue("app.video");
+	if ( value ) {
+		int selection = _videocard.GetCurSel();
+		const wchar_t* data = (wchar_t*)_videocard.GetItemData(selection);
+		value->set(data);
+	}
 
     // Reset resolution for this display
     _setResolution();
-
-    VALUE* value = getValue("app.video");
-    
-    if(value)
-        value->set(CW2A(ss));
 }
 
 void CsettingsDlg::OnCbnSelchangeComboResolution()

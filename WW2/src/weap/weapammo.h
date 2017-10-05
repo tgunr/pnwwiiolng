@@ -121,7 +121,3 @@ UINT32 	weapCollideRoundWithVehicles(struct FASTCOLLIDE** CollideListPtr, UINT32
 									 UINT32 CanHitPlayer,  UINT32 CheckOnlyPlayer,
 									 struct FLOAT64VECTOR const* WorldOriginOffset,
 									 UINT32 UseHitBoxInstead, SINT32 Side);
-
-#if USE_STATESET
-void DrawWeaponsInFlight();
-#endif

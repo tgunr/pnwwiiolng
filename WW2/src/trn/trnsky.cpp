@@ -744,8 +744,8 @@ void computeFlareParameters()
     pos.z() /= pos.w();
     pos.w() = 1.0f;
 
-    float halfw = (float)WantedWidth * 0.5f;
-    float halfh = (float)WantedHeight * 0.5f;
+    float halfw = (float)ddpGetWidth() * 0.5f;
+    float halfh = (float)ddpGetHeight() * 0.5f;
 
    // halfw *= (FieldOfView / 90.0f);
    // halfh *= (FieldOfView / 90.0f);
@@ -778,8 +778,8 @@ void computeFlareParameters()
     }
 
     // set flare brightness
-    x /= (float)WantedWidth;
-    y /= (float)WantedHeight;
+    x /= (float)ddpGetWidth();
+    y /= (float)ddpGetHeight();
 
     float distance = math3dFastSqrt((FLOAT32)(((0.5f - x) * (0.5f - x)) + ((0.5f - y) * (0.5f - y))));
 	g_beforebright = Interpolate(0.0f, g_halfMaxBright, 1.0f - (distance * g_distanceScale));
