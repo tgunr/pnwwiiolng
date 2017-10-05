@@ -1554,38 +1554,41 @@ _addNewServer(Server::ServerInfo* server, const bool isEntering)
 void
 _cellStatusCheck()
 {
-// TODO: no point in doing anything in a CIAB environment as its not really setup for multi-cell right now
-#if platOS != OS_WIN32
-	const std::string name("/tmp/NODE_DOWN");
-	struct stat info;
-	if (stat(name.c_str(), &info) == 0) 
+	// TODO: no point in doing anything in a CIAB environment as its not really setup for multi-cell right now
+	if (!Server::IsBroadcastViaController()) 
 	{
-		if (Server::myServerInfo.stats.status != Server::SERVER_MAINTENANCE)
-		{
-			dbugLog(_FLI, "Detected node is being shut down, notify other servers");
+		std::string name(cv_defaultLogPath.GetString());
+		name += "/NODE_DOWN";
 
-			// flag indicates we should not be running, initiate maintenance mode
-			Server::myServerInfo.stats.status = Server::SERVER_MAINTENANCE;
-		}
-		dbugLog(_FLI, "%u open connections remaining", Server::myServerInfo.m_players.size());
-		if (Server::myServerInfo.m_players.size() == 0) 
+		struct stat info;
+		if (stat(name.c_str(), &info) == 0) 
 		{
-			// mark this cell host for termination
-			dbugLog(_FLI, "Cell host ready for termination");
-			g_hostTerminating = true;			
+			if (Server::myServerInfo.stats.status != Server::SERVER_MAINTENANCE)
+			{
+				dbugLog(_FLI, "Detected node is being shut down, notify other servers");
+
+				// flag indicates we should not be running, initiate maintenance mode
+				Server::myServerInfo.stats.status = Server::SERVER_MAINTENANCE;
+			}
+			dbugLog(_FLI, "%u open connections remaining", Server::myServerInfo.m_players.size());
+			if (Server::myServerInfo.m_players.size() == 0) 
+			{
+				// mark this cell host for termination
+				dbugLog(_FLI, "Cell host ready for termination");
+				g_hostTerminating = true;			
+			}
+		}
+		else 
+		{
+			if (!g_hostTerminating && Server::myServerInfo.stats.status == Server::SERVER_MAINTENANCE)
+			{
+				dbugLog(_FLI, "Detected node shutdown was aborted, notify other servers");
+
+				// flag indicates we should not be running, initiate maintenance mode
+				Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
+			}
 		}
 	}
-	else 
-	{
-		if (Server::myServerInfo.stats.status == Server::SERVER_MAINTENANCE)
-		{
-			dbugLog(_FLI, "Detected node shutdown was aborted, notify other servers");
-
-			// flag indicates we should not be running, initiate maintenance mode
-			Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
-		}
-	}
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////
