@@ -43,8 +43,6 @@
 	FLOAT32		ddpGetInstantFPS();
 	void		ddpResetFPS();
 	void		ddpCapture();
-	SINT32 ddpGetWindowWidth(void);
-	SINT32 ddpGetWindowHeight(void);
 	SINT32		ddpGetWidth();
 	SINT32		ddpGetHeight();
 	LOGICAL		ddpSetDDInit(DDWND_DDINITFUNC newfunc);

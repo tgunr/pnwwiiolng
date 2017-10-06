@@ -983,14 +983,6 @@ void ddpCapture()
 	capture += 1;
 }
 
-SINT32 ddpGetWindowWidth(void) {
-	return renderrect.right - renderrect.left;
-}
-
-SINT32 ddpGetWindowHeight(void) {
-	return renderrect.bottom - renderrect.top;
-}
-
 SINT32 ddpGetWidth() {
 	return WantedWidth;
 }
