@@ -119,7 +119,7 @@ int sysmainInitApp()
 #endif
 	ddpSetDDRender(rnlogoRender);
 
-	if(!ddpCreateWnd(0, 0, WantedWidth, WantedHeight, 32, !WantedWindow, atoi(WantedVideoCard), WantedRefreshRate))
+	if(!ddpCreateWnd(0, 0, WantedWidth, WantedHeight, 32, !WantedWindow, atoi(WantedDisplayDevice), WantedRefreshRate))
 	{
 		printf("ddpCreateWnd failed!\n");
 		return -1;

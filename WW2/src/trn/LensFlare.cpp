@@ -26,7 +26,6 @@
 //////////////////////////////////////////////////////////////////////
 //  Preprocessor
 #include "math/math3d.h"
-#include "dd/ddp.h"
 #include "trn/LensFlare.h"
 #include <cmath>
 #include "IdvVector.h"
