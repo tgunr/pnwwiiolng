@@ -286,7 +286,7 @@ namespace {
 		if ( strlen(callsign) < 2 )
 			return false;
 
-		for ( const char* c = callsign ; c != '\0' ; ++c ) {
+		for ( const char* c = callsign ; *c != '\0' ; ++c ) {
 			if ( !std::isalnum(*c, std::locale::classic()) ) {
 				return false;
 			}

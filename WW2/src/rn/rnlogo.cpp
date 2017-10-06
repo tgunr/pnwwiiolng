@@ -7,7 +7,6 @@
 #include "rn/rnlogo.h"
 #include "ui/uiMain.h"
 #include "gmlp/gmlpmain.h"
-#include "dd/ddp.h"
 #include "dimain.h"
 #include "imap/iac.h"
 #include "cfg/cfgPrefs.h"

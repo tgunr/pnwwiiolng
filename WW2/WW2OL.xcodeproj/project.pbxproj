@@ -17,7 +17,6 @@
 		080D1E0A1404397100ECCF00 /* teulPacket.h in Headers */ = {isa = PBXBuildFile; fileRef = 080D1E081404397100ECCF00 /* teulPacket.h */; };
 		080D20C41408371500ECCF00 /* wwiiCallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104EE9103DFE120065E0E2 /* wwiiCallbacks.cpp */; };
 		08104734103DCC390065E0E2 /* cfgData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0810471E103DCC390065E0E2 /* cfgData.cpp */; };
-		08104735103DCC390065E0E2 /* cfgLoad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104720103DCC390065E0E2 /* cfgLoad.cpp */; };
 		08104736103DCC390065E0E2 /* cfgLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104722103DCC390065E0E2 /* cfgLua.cpp */; };
 		08104737103DCC390065E0E2 /* cfgPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104724103DCC390065E0E2 /* cfgPrefs.cpp */; };
 		08104738103DCC390065E0E2 /* cfgw2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104726103DCC390065E0E2 /* cfgw2.cpp */; };
@@ -3714,7 +3713,6 @@
 				E97C76C61C8539BF00875F44 /* XMLLoader.cpp in Sources */,
 				E97C76C71C8539BF00875F44 /* XMLLoader2.cpp in Sources */,
 				08104734103DCC390065E0E2 /* cfgData.cpp in Sources */,
-				08104735103DCC390065E0E2 /* cfgLoad.cpp in Sources */,
 				08104813103DCC7C0065E0E2 /* chatClientMessages.cpp in Sources */,
 				08104736103DCC390065E0E2 /* cfgLua.cpp in Sources */,
 				08104737103DCC390065E0E2 /* cfgPrefs.cpp in Sources */,

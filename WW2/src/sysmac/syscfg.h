@@ -58,6 +58,7 @@
 
 # include "pi/pi.h"
 # include "include/vars.h"
+# include "ddmac/ddp.h"
 
 # include "wwii/wwiiOwnershipEnums.h"
 # include "wwii/wwiiFullObjID.h"
