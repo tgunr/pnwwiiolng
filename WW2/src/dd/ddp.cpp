@@ -124,9 +124,17 @@ namespace {
 		if ( window_mode != FULLSCREEN )
 			return true;
 
-		DEVMODE dm;
-		memset(&dm, 0, sizeof(dm));
-		dm.dmSize = sizeof(dm);
+		// Do a quick check to see if we need to change anything at all
+		DEVMODE dm; dm.dmSize = sizeof(dm);
+		if ( EnumDisplaySettings(display.DeviceName, ENUM_CURRENT_SETTINGS, &dm) ) {
+			if ( dm.dmPelsWidth == WantedWidth && dm.dmPelsHeight == WantedHeight &&
+			     dm.dmBitsPerPel == WantedBpp )
+				return true;
+		} else {
+			dbugLog(_FLW, "Failed to get the current settings for the requested display device");
+		}
+
+		memset(&dm, 0, sizeof(dm)); dm.dmSize = sizeof(dm);
 		dm.dmPelsWidth = WantedWidth;
 		dm.dmPelsHeight = WantedHeight;
 		dm.dmBitsPerPel = WantedBpp;
