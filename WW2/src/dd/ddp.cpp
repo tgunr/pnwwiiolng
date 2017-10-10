@@ -626,17 +626,16 @@ static bool ddpResetWindow(void) {
 	// (e.g., previously configured with multi-monitor setup that changed)
 #endif
 
-	if ( window_mode != FULLSCREEN ) {
+	// TEMP: Force to match the monitor's resolution
+	// TODO: Render to an FBO, then render that to the window
+	if ( window_mode == BORDERLESS_FULLSCREEN ) {
 		MONITORINFOEX minfo = GetDisplayMonitor();
 		renderrect = minfo.rcMonitor;
-		// TEMP: Force to match the monitor's resolution
-		// TODO: Render to an FBO, then render that to the window
-		if ( window_mode == BORDERLESS_FULLSCREEN ) {
-			WantedX = renderrect.left;
-			WantedY = renderrect.bottom;
-			WantedWidth = renderrect.right - renderrect.left;
-			WantedHeight = renderrect.bottom - renderrect.top;
-		}
+
+		WantedX = renderrect.left;
+		WantedY = renderrect.bottom;
+		WantedWidth = renderrect.right - renderrect.left;
+		WantedHeight = renderrect.bottom - renderrect.top;
 	} else {
 		renderrect.left = WantedX;
 		renderrect.right = renderrect.left + WantedWidth;
