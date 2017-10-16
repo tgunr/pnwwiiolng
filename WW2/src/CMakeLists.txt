@@ -537,7 +537,7 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     map/mapAWS.cpp map/mapAWS.h
     map/mapHCUnitLocations.cpp map/mapHCUnitLocations.h
     strt/strtChatTypes.cpp strt/strtChatTypes.h
-    strt/strtSyncSupportMessages.cpp strt/strtSyncSupportMessages.h
+    strt/strtChatSupportMessages.cpp strt/strtChatSupportMessages.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
     dbse/dbseClient.cpp dbse/dbseClient.h dbse/dbseTypes.h dbse/dbseConstants.h
     dbse/dbseClientMessages.cpp dbse/dbseClientMessages.h
