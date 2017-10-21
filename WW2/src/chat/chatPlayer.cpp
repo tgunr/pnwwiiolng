@@ -927,6 +927,9 @@ Player::isVisibleTo(const Player* viewer, bool ignoreSide) const
 	// GMs can always send to everyone
 	if ( viewer->isGM() )
 		return true;
+	// Training chat can be turned OFF.
+	if (m_trOff)
+		return false;
 	// Non-GMs get "unreachable" when a GM is in GM hide mode
 	if ( isGM() )
 		return ( !m_gmHide );

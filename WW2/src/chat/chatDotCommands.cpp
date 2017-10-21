@@ -852,6 +852,38 @@ public:
 } dotTime;
 
 //////////////////////////////////////////////////////////////////////
+// Turn Trainer messages on or off
+//////////////////////////////////////////////////////////////////////
+
+class DotTROff : public DotCommand
+{
+public:
+	DotTROff() : DotCommand("troff", "Detune the TR channel"
+		, NO_MASK, LSTR_TROFF_USAGE, LSTR_TROFF_DETAIL
+	) { }
+
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
+	{
+		player.SetTrOff(true);
+		player.message(LSTR_NOTE, LSTR_TR_OFF, nullptr, nullptr);
+	}
+} dotTROff;
+
+class DotTROn : public DotCommand
+{
+public:
+	DotTROn() : DotCommand("tron", "Retune the TR channel"
+		, NO_MASK, LSTR_TRON_USAGE, LSTR_TRON_DETAIL
+	) { }
+
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
+	{
+		player.SetTrOff(false);
+		player.message(LSTR_NOTE, LSTR_TR_ON, nullptr, nullptr);
+	}
+} dotTROn;
+
+//////////////////////////////////////////////////////////////////////
 // List trainers in the game
 //////////////////////////////////////////////////////////////////////
 

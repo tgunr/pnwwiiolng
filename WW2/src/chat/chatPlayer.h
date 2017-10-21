@@ -216,6 +216,8 @@ public:
 
 	void SetHqOff(bool to) { m_hqOff = to; }
 
+	void SetTrOff(bool to) { m_trOff = to; }
+
 	void SetLeadingBrigade(UINT32 toBrigadeID);
 
 	// Change the personas mission ID
@@ -321,6 +323,7 @@ public:
 	bool haveChannels() const { return m_haveChannels; }
 	bool hcOff() const { return m_hcOff; }
 	bool hqOff() const { return m_hqOff; }
+	bool trOff() const { return m_trOff; }
 	const HANDLES& ignores() const { return m_ignores; }
 	bool initialized() const { return m_initialized; }
 	const Property* insideFacility() const { return m_insideFacility; }
@@ -452,6 +455,7 @@ protected:
 	bool			m_initialized	: 1;
 	bool			m_hqOff			: 1;
 	bool			m_hcOff			: 1;
+	bool			m_trOff         : 1;  // Not visible in the trainer list when true.
 	bool			m_gmHide		: 1;
 	bool			m_gmNote		: 1;
 	bool			m_active		: 1;
