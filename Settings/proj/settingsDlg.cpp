@@ -295,8 +295,11 @@ void CsettingsDlg::_setVideoCard()
 {
     _videocard.ResetContent();
     for ( size_t i = 0 ; i < displays.size() ; ++i ) {
-        _videocard.InsertString(i, displays[i].c_str());
-        _videocard.SetItemData(i, (DWORD_PTR)displays[i].c_str());
+        DEVMODE dm; dm.dmSize = sizeof(dm);
+        if ( EnumDisplaySettings(displays[i].c_str(), 0, &dm) ) {
+            _videocard.InsertString(i, displays[i].c_str());
+            _videocard.SetItemData(i, (DWORD_PTR)displays[i].c_str());
+        }
     }
 
     // See if video card is one already in the config file.
