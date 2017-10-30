@@ -523,15 +523,15 @@ namespace {
 
 	void ReadWindowConfig(void) {
 		bool display_found = false;
-		display.cb = sizeof(display);
-		for ( DWORD i = 0 ; EnumDisplayDevices(NULL, i, &display, 0) != 0 ; ++i ) {
-			if ( display.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE )
-				primary_display = display;
+		DISPLAY_DEVICE tmp_display; tmp_display.cb = sizeof(tmp_display);
+		for ( DWORD i = 0 ; EnumDisplayDevices(NULL, i, &tmp_display, 0) != 0 ; ++i ) {
+			if ( tmp_display.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE )
+				primary_display = tmp_display;
 
-			char buf[128]; WWIIConvert(display.DeviceName, buf);
+			char buf[128]; WWIIConvert(tmp_display.DeviceName, buf);
 			if ( strcmp(WantedDisplayDevice, buf) == 0 ) {
+				display = tmp_display;
 				display_found = true;
-				break;
 			}
 		}
 
@@ -626,17 +626,19 @@ static bool ddpResetWindow(void) {
 	// (e.g., previously configured with multi-monitor setup that changed)
 #endif
 
-	// TEMP: Force to match the monitor's resolution
-	// TODO: Render to an FBO, then render that to the window
-	if ( window_mode == BORDERLESS_FULLSCREEN ) {
+	// TODO: Render to an FBO, then render that to the actual window
+	// The below forces our rendering & display resolutions to match
+	if ( window_mode != WINDOWED ) {
 		MONITORINFOEX minfo = GetDisplayMonitor();
 		renderrect = minfo.rcMonitor;
 
-		WantedX = renderrect.left;
-		WantedY = renderrect.bottom;
-		WantedWidth = renderrect.right - renderrect.left;
-		WantedHeight = renderrect.bottom - renderrect.top;
+		// TEMP: Force the internal resolution to match the monitor's resolution
+		WantedX = minfo.rcMonitor.left;
+		WantedY = minfo.rcMonitor.bottom;
+		WantedWidth = minfo.rcMonitor.right - minfo.rcMonitor.left;
+		WantedHeight = minfo.rcMonitor.bottom - minfo.rcMonitor.top;
 	} else {
+		// TODO: Allow window rect to differ from internal resolution
 		renderrect.left = WantedX;
 		renderrect.right = renderrect.left + WantedWidth;
 		renderrect.top = WantedY;
