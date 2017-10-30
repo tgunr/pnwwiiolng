@@ -633,10 +633,10 @@ static bool ddpResetWindow(void) {
 		renderrect = minfo.rcMonitor;
 
 		// TEMP: Force the internal resolution to match the monitor's resolution
-		WantedX = minfo.left;
-		WantedY = minfo.bottom;
-		WantedWidth = minfo.right - renderrect.left;
-		WantedHeight = minfo.bottom - renderrect.top;
+		WantedX = minfo.rcMonitor.left;
+		WantedY = minfo.rcMonitor.bottom;
+		WantedWidth = minfo.rcMonitor.right - minfo.rcMonitor.left;
+		WantedHeight = minfo.rcMonitor.bottom - minfo.rcMonitor.top;
 	} else {
 		// TODO: Allow window rect to differ from internal resolution
 		renderrect.left = WantedX;
