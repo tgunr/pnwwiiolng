@@ -611,7 +611,7 @@ if [ "$myos" == "win" ] ; then
         fi
         if [ "$skip_step" = false ]; then
             pushd "$INSTALLER"
-            ./MakeDiffs.bat previous previous
+            ./MakeDiffs.bat current previous
             popd
         fi
 
