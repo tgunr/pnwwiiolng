@@ -89,9 +89,9 @@ UINT32			DefTextureAlphaFormat;
 
 SINT32           WantedX;			// desired/actual x
 SINT32           WantedY;			// desired/actual y
-SINT32           WantedWidth;		// desired/actual width
-SINT32           WantedHeight;		// desired/actual height
-SINT32           WantedBpp;			// desired/actual bpp
+SINT32           WantedWidth;		// desired width
+SINT32           WantedHeight;		// desired height
+SINT32           WantedBpp;			// desired bpp
 SINT32          	WantedRefreshRate;
 SINT32           WantedAlpha;		// desired/actual alpha
 LOGICAL          WantedHdw;			// desired/actual hardware
@@ -117,7 +117,7 @@ LOGICAL			WantedUserLogEnabled = TRUE;	// If the user wants the log enabled
 #else
 LOGICAL			WantedUserLogEnabled = FALSE;	// If the user wants the log enabled
 #endif
-SCHAR			WantedVideoCard[64];// desired video card name
+SCHAR			WantedDisplayDevice[64];// desired display device name
 SCHAR			WantedVideoResolution[32];// desired video resolution
 SCHAR			WantedSoundCard[64];// desired sound card name
 

@@ -676,11 +676,6 @@ char GetOSBuild()
 // This is the actual winmain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	int		x, y, w, h, wh, xy;
-	int		bpp, hdw, stencil, wnd;
-	MSG		msg;
-	RECT	rect;
-
 	// Pull in the commandline arguments early so that builds
 	// which rely upon a DataPath being set will have it for
 	// use in cfgPrefsLoad(), and so OpenConsole is available now
@@ -743,13 +738,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	NetFrameSync::InitializeHashes();
 
-	WantedWidth = GetSystemMetrics(SM_CXSCREEN);
-	WantedHeight = GetSystemMetrics(SM_CYSCREEN);
-	WantedBpp = TEX_BPP;
-	WantedAlpha = TEX_ALPHA;
-	WantedHdw = TRUE;
-	WantedStencil = 0;
-	WantedWindow = FALSE;
 #ifdef DEBUG_WW2
 	WantedUserLogEnabled = TRUE;
 	//TBD: Disabled for now, force debug clients to specify so we can use it for QA testing.
@@ -760,27 +748,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	WantDataDir = TRUE;
 	HasKeyFile = FALSE;
 #endif
-
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-	x = ((rect.right - rect.left) - WantedWidth) / 2;
-	y = ((rect.bottom - rect.top) - WantedHeight) / 2;
-
-	// Note: This is an appropriate use of the registry: a user preference it doesn't hurt to lose - Gadget
-	if (sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, (DWORD*)&wh) &&
-		sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, (DWORD*)&xy))
-	{
-		if (320 <= LOWORD(wh) && 240 <= HIWORD(wh))
-		{
-			WantedWidth = LOWORD(wh);
-			WantedHeight = HIWORD(wh);
-		}
-
-		if (rect.right > (LOWORD(xy) + LOWORD(wh)) && rect.bottom > (HIWORD(xy) + HIWORD(wh)))
-		{
-			x = LOWORD(xy);
-			y = HIWORD(xy);
-		}
-	}
 
 #if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
 	LogEnabled = TRUE;
@@ -944,26 +911,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 #endif	//	EVENT_LOG
 
-	w = WantedWidth;
-	h = WantedHeight;
-	bpp = WantedBpp;
-	hdw = WantedHdw;
-	stencil = WantedStencil;
-	wnd = WantedWindow;
-
 	if (!sndsDriverConfig(hInstance))
 	{
 		return 0;
 	}
-
-	WantedX				= x;
-	WantedY				= y;
-	WantedWidth			= w;
-	WantedHeight		= h;
-	WantedBpp			= bpp;
-	WantedHdw			= hdw;
-	WantedStencil		= stencil;
-	WantedWindow		= wnd;
 
 	TexBpp				= WantedBpp;
 	TexAlpha			= WantedAlpha;
@@ -1010,13 +961,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ddpSetD3DRender(gmlpMainUpdate);
 	ddpSetD3DKill(piKill);
 
-	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, nullptr))
+	if ( ! ddpCreateWnd() )
 	{
 		ddpKill();
 		return(0);
 	}
 #endif	// OPENGL3D
 
+	MSG msg;
 	do
 	{
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
@@ -1047,6 +999,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 #else	// DONT_USE_THREAD
 
+	MSG msg;
 	if (threadhandle = systhreadCreate(ddpEngine, &running))
 	{
 		do

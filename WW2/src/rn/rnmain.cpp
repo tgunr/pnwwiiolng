@@ -32,7 +32,6 @@
 #include "trn/trnvars.h"
 #include "trn/trntod.h"
 #include "draw/draw2d.h"
-#include "cfg/cfgLoad.h"
 #include "sn/sndsSoundControl.h"
 #include "dbug/dbugExtErrors.h"
 #include "pers/pershud.h"

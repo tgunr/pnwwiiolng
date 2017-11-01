@@ -282,7 +282,7 @@ int uiInit()
 	_pictx->SetIO(&fioCallbacks);
 
 	_msgloop = new phui::MessageLoop;
-	_viewport = new phui::Viewport(_pictx, 0,0,(float)WantedWidth,(float)WantedHeight);
+	_viewport = new phui::Viewport(_pictx, 0,0,(float)ddpGetWidth(),(float)ddpGetHeight());
 
 	// this also sets the default font for _pictx
 	if(!uiSetFontSize(cfgPrefsGetInt(cfgPrefsGetGlobalName(cfgFONT_SIZE), UI_FONT_SIZE)))
@@ -626,7 +626,7 @@ static float lastMouseX,lastMouseY;
 	sysGetMousePosition(&g_iMouseX, &g_iMouseY);
 
 	x = (float)g_iMouseX;
-	y = (float)(WantedHeight-g_iMouseY);
+	y = (float)(ddpGetHeight()-g_iMouseY);
 
 	if(uiCursorState() != 0)
 	{
@@ -1554,7 +1554,7 @@ int uiCursorState()
 bool uiSetFontSize(unsigned int fontsize, const char* font)
 {
 	const char* setFont = (font) ? font: UI_FONT_NAME;
-	return (_viewport) ? _viewport->SetDefaultFont(setFont, (int)(fontsize * WantedHeight / 768.0)): false;
+	return (_viewport) ? _viewport->SetDefaultFont(setFont, (int)(fontsize * ddpGetHeight() / 768.0)): false;
 }
 
 /************************************************************************************************

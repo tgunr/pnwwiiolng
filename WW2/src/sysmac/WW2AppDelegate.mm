@@ -304,26 +304,7 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
 @end
 // End cribbing
 
-// Workaround for missing NSURLSession definitions in 32-bit macOS
-@interface __NSCFURLSessionTask : NSURLSessionTask
-@end
-
-@interface __NSCFLocalSessionTask : __NSCFURLSessionTask
-@end
-
-@interface __NSCFLocalDownloadTask : __NSCFLocalSessionTask
-@end
-
-@interface __NSCFLocalDownloadTask (WW2Fix32Bit)
-@end
-
-@implementation __NSCFLocalDownloadTask (WW2Fix32Bit)
-- (id)dataAckCompletion { return objc_getAssociatedObject(self, _cmd); }
-- (void)setDataAckCompletion:(id)arg { objc_setAssociatedObject(self, @selector(dataAckCompletion), arg, OBJC_ASSOCIATION_COPY); }
-@end
-// End workaround
-
-@interface WW2AppDelegate () <NSURLSessionDownloadDelegate, WebFrameLoadDelegate, WebPolicyDelegate, BITHockeyManagerDelegate>
+@interface WW2AppDelegate () <NSURLConnectionDataDelegate, WebFrameLoadDelegate, WebPolicyDelegate, BITHockeyManagerDelegate>
 @end
 
 @implementation WW2AppDelegate
@@ -332,7 +313,7 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
 @synthesize patchFileURL = _patchFileURL;
 @synthesize userName = _userName;
 @synthesize userPassword = _userPassword;
-@synthesize patchDownloadTask = _patchDownloadTask;
+@synthesize patchDownloadConnection = _patchDownloadConnection;
 
 ////////////////////////////////////////////////////////////////////////////////
 // WebView magic starts here
@@ -715,8 +696,10 @@ extern NSString *WebActionOriginalURLKey;
 
 - (IBAction)cancelDownload:(id)sender
 {
-    [self.patchDownloadTask cancel];
-    self.patchDownloadTask = nil;
+    [self.patchDownloadConnection cancel];
+    self.patchDownloadConnection = nil;
+    [self movePatchToTrash];
+    self.patchFileURL = nil;
     [self changeState:WAIT_PATCH_ABORTED];
 }
 
@@ -1191,27 +1174,30 @@ extern NSString *WebActionOriginalURLKey;
     state = WAIT_LAUNCH;
 }
 
-- (void)URLSession:(NSURLSession *)session
-              task:(NSURLSessionTask *)task
-willPerformHTTPRedirection:(NSHTTPURLResponse *)response
-        newRequest:(NSURLRequest *)request
- completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler
+static const char patchHandleKey = 0, patchSizeKey = 0, patchWrittenKey = 0;
+
+- (void)connection:(NSURLConnection *)uconnection didReceiveResponse:(NSURLResponse *)response
 {
-    // Disallow HTTP redirects.
-    completionHandler(nil);
+    objc_setAssociatedObject(uconnection, &patchSizeKey, @(response.expectedContentLength), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (void)URLSession:(NSURLSession *)session
-      downloadTask:(NSURLSessionDownloadTask *)downloadTask
-      didWriteData:(int64_t)bytesWritten
- totalBytesWritten:(int64_t)totalBytesWritten
-totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
+- (void)connection:(NSURLConnection *)uconnection didReceiveData:(NSData *)data
 {
+    NSFileHandle *patchFile = objc_getAssociatedObject(uconnection, &patchHandleKey);
+    int64_t patchSize = ((NSNumber *)objc_getAssociatedObject(uconnection, &patchSizeKey)).longLongValue; // no size yet will result in zero here
+    int64_t writtenSoFar = ((NSNumber *)objc_getAssociatedObject(uconnection, &patchWrittenKey)).longLongValue; // none written yet will result in zero here
+    
+    if (!patchFile) {
+        return;
+    }
+    [patchFile writeData:data];
+    writtenSoFar += data.length;
+    objc_setAssociatedObject(uconnection, &patchWrittenKey, @(writtenSoFar), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+
     double percentComplete = 0.0;
     
-    // The linker seems to have trouble with the named constant for now...
-    if (totalBytesExpectedToWrite != /*NSURLSessionTransferSizeUnknown*/-1LL) {
-        percentComplete = (static_cast<double>(totalBytesWritten) / static_cast<double>(totalBytesExpectedToWrite)) * 100.0;
+    if (patchSize != 0) {
+        percentComplete = (static_cast<double>(writtenSoFar) / static_cast<double>(patchSize)) * 100.0;
         [downloadProgressBar setIndeterminate:NO];
         [downloadProgressBar setDoubleValue:percentComplete];
         if (!_downloadProgressFormatter) {
@@ -1221,50 +1207,32 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
             _downloadProgressFormatter.zeroPadsFractionDigits = YES;
         }
         [downloadStatus setStringValue:[NSString stringWithFormat:NSLocalizedString(@"Downloaded %@ of %@, %3.1f%%", @""),
-                                        [_downloadProgressFormatter stringFromByteCount:totalBytesWritten],
-                                        [_downloadProgressFormatter stringFromByteCount:totalBytesExpectedToWrite],
+                                        [_downloadProgressFormatter stringFromByteCount:writtenSoFar],
+                                        [_downloadProgressFormatter stringFromByteCount:patchSize],
                                         percentComplete
-                                        ]];
+        ]];
     } else {
         [downloadProgressBar setIndeterminate:YES];
         [downloadStatus setStringValue:[NSString stringWithFormat:NSLocalizedString(@"Downloaded %@...", @""),
-                                        [_downloadProgressFormatter stringFromByteCount:totalBytesWritten]
-                                        ]];
+                                        [_downloadProgressFormatter stringFromByteCount:writtenSoFar]
+        ]];
     }
 }
 
-- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location
+- (void)connectionDidFinishLoading:(NSURLConnection *)uconnection
 {
+    [((NSFileHandle *)objc_getAssociatedObject(uconnection, &patchHandleKey)) closeFile]; // for good measure, though this should happen anyhow
     [downloadProgressBar setDoubleValue:100.0];
     [downloadStatus setStringValue:NSLocalizedString(@"download completed", @"")];
-    self.patchDownloadTask = nil;
-    _patchDownloadSession = nil;
-    
-    NSError *error = nil;
-    NSURL *patchDir = [[NSFileManager defaultManager] URLForDirectory:NSItemReplacementDirectory
-                                                             inDomain:NSUserDomainMask appropriateForURL:location create:YES error:&error];
-    NSURL *patchFile = [patchDir URLByAppendingPathComponent:reinterpret_cast<NSString * __nonnull>(downloadTask.originalRequest.URL.lastPathComponent) isDirectory:NO];
-    
-    if (!patchDir || !patchFile || ![[NSFileManager defaultManager] moveItemAtURL:location toURL:patchFile error:&error]) {
-        self.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorDownloadFailed userInfo:error.userInfo rootError:error];
-    } else {
-        self.patchFileURL = patchFile;
-    }
-    
+    self.patchDownloadConnection = nil;
     [self advanceState];
 }
 
-- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
     if (error) {
         self.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorDownloadFailed userInfo:nil rootError:error];
     }
-    [self advanceState];
-}
-
-- (void)URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)error
-{
-    self.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorDownloadFailed userInfo:nil rootError:error];
     [self advanceState];
 }
 
@@ -1279,20 +1247,32 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
                               freeWhenDone:NO
                             ];
     NSURL *patchURL = [NSURL URLWithString:rawPatchURL];
-    NSURLSessionConfiguration *patchSessionConfig = [NSURLSessionConfiguration ephemeralSessionConfiguration];
-    
-    patchSessionConfig.timeoutIntervalForRequest = 60.0;
-    patchSessionConfig.allowsCellularAccess = NO;
-    
-    _patchDownloadSession = [NSURLSession sessionWithConfiguration:patchSessionConfig delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-    self.patchDownloadTask = [_patchDownloadSession downloadTaskWithURL:patchURL];
+    NSURLRequest *request = [NSURLRequest requestWithURL:patchURL cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:60.0];
+    NSURLConnection *uconnection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+    NSURL *patchDir = [NSURL fileURLWithPath:@(macDocumentsPath())];
+    NSURL *patchFileURL = [patchDir URLByAppendingPathComponent:patchURL.lastPathComponent];
+    NSError *error = nil;
+    NSFileHandle *patchFile = nil;
+
+    // This is a poor man's touch(1) - there are much better ways of doing this
+    // but in this backwards 32-bit realm where nothing functions properly it's
+    // not worth trying. Just fix this when we go 64-bit.
+    if (![[NSData data] writeToURL:patchFileURL options:0 error:&error] || !(patchFile = [NSFileHandle fileHandleForWritingToURL:patchFileURL error:&error])) {
+        self.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorDownloadFailed userInfo:error.userInfo rootError:error];
+        [self advanceState];
+        return;
+    }
+    self.patchFileURL = patchFileURL;
+    objc_setAssociatedObject(uconnection, &patchHandleKey, patchFile, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [uconnection setDelegateQueue:[NSOperationQueue mainQueue]];
     
     [self setPlayGateStatus:[NSString stringWithFormat:NSLocalizedString(@"Downloading: %@", @""), patchURL.lastPathComponent]];
     [downloadProgressBar setDoubleValue:0];
     [downloadStatus setStringValue:NSLocalizedString(@"(waiting for download to begin)", @"")];
     [self setShowDownloadProgress:YES];
     
-    [self.patchDownloadTask resume];
+    self.patchDownloadConnection = uconnection;
+    [uconnection start];
 }
 
 - (void)launchPatch

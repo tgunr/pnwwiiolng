@@ -995,7 +995,7 @@ static void DrawScenarioCoastBin()
 
     scenariocoast->Apply();
 
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     for(unsigned int i = 0; i < scenariocoastbin.size(); i++)
     {

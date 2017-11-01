@@ -74,9 +74,8 @@
     NSError *_error;
     NSString *_userName;
     NSString *_userPassword;
-    NSURLSessionDownloadTask *_patchDownloadTask;
+    NSURLConnection *_patchDownloadConnection;
 
-    NSURLSession *_patchDownloadSession;
     NSByteCountFormatter *_downloadProgressFormatter;
 }
 
@@ -99,7 +98,7 @@
 @property(nonatomic,strong) NSError *error;
 @property(nonatomic,copy) NSString *userName;
 @property(nonatomic,copy) NSString *userPassword;
-@property(nonatomic,strong) NSURLSessionDownloadTask *patchDownloadTask;
+@property(nonatomic,strong) NSURLConnection *patchDownloadConnection;
 
 - (void)setCaptureAllDisplays:(bool)x;
 - (void)setFSAA:(int)fs;

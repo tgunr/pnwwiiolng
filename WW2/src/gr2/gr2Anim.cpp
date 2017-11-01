@@ -7296,7 +7296,7 @@ void gr2AnimUpdate()
 		return;
 
 #ifdef LOD_ANIMATIONS
-	AllowedErrorAtUnitDistance = GrannyFindAllowedLODError(AllowedErrorInPixels, (SINT32)FieldOfView, (FLOAT32)WantedWidth, 1.0f);
+	AllowedErrorAtUnitDistance = GrannyFindAllowedLODError(AllowedErrorInPixels, (SINT32)FieldOfView, (FLOAT32)ddpGetWidth(), 1.0f);
 #endif
 
 	static colliderQuery collider = colliderQuery(0, false);

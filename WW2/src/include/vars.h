@@ -119,7 +119,7 @@ extern SINT8			BypassString[64];
 extern LOGICAL          LaunchSettingsOnly; // stand-alone settings (for mac initially)
 extern LOGICAL			UseSteamLogin;
 extern LOGICAL			WantedUserLogEnabled;	// If the user wants the log enabled
-extern SCHAR			WantedVideoCard[64];// desired video card name
+extern SCHAR			WantedDisplayDevice[64];// desired video card name
 extern SCHAR			WantedVideoResolution[32];// desired video resolution
 extern SCHAR			WantedSoundCard[64];// desired sound card name
 

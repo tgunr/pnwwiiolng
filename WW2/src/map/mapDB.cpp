@@ -107,15 +107,11 @@ static void _removePrefix(std::string& from, const std::string& prefix)
 static void
 _setArenaDescriptionHostRevision()
 {
-	char hostRevision[200];
-	strprintf(hostRevision, "c:%s d:%s (%s)", PN_code_git_commitish_string, PN_data_git_commitish_string, cv_stratLanguage.GetString());
-
-	std::string revision = hostRevision;
-	_removePrefix(revision, "branches/");
-	_removePrefix(revision, "tags/");
-	g_arenaDescription["host_rev"] = revision;
-
-	dbugLog(_FLI, "set arena host revision to '%s'", revision.c_str());
+    g_arenaDescription["host_rev"] =
+        std::string("c:") + PN_code_git_commitish_string + " " +
+        std::string("d:") + PN_data_git_commitish_string + " " +
+        std::string("(")  + cv_stratLanguage.GetString() + ")";
+	dbugLog(_FLI, "set arena host revision to '%s'", g_arenaDescription["host_rev"].c_str());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -141,8 +137,6 @@ static void _initializeBrigadeLocations()
 static bool
 _readArenaDescription()
 {
-	_setArenaDescriptionHostRevision();
-
 	try
 	{
 		DBQuery q(dbh, QRY_SELECT_ARENA_DESCRIPTION);
@@ -162,6 +156,9 @@ _readArenaDescription()
 			dbugLog(_FLI, "arena config: %s=%s", name, value);
 		}
 
+        // Do this after loading from DB so our host_rev will always override
+        // one that may or may not be in the DB instead of vice versa.
+        _setArenaDescriptionHostRevision();
 		return true;
 	}
 	catch (std::exception& e)

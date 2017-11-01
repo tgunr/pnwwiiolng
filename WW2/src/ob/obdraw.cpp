@@ -1717,7 +1717,7 @@ static bool _initSceneFBO()
 {
     _sceneFBO = new FrameBufferObject;
 
-    if(oglCanUseTexture2D(WantedWidth, WantedHeight))
+    if(oglCanUseTexture2D(ddpGetWidth(), ddpGetHeight()))
     {
         Texture2D* tex = new Texture2D;
 
@@ -1726,14 +1726,14 @@ static bool _initSceneFBO()
         tex->setInternalFormat(GL_RGBA);
         tex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
         tex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
-        tex->setTextureHeight(WantedHeight);
-        tex->setTextureWidth(WantedWidth);
+        tex->setTextureHeight(ddpGetHeight());
+        tex->setTextureWidth(ddpGetWidth());
 
         _sceneRTT = tex;
 
         tex = new Texture2D;
 
-        tex->setTextureSize(WantedWidth, WantedHeight);
+        tex->setTextureSize(ddpGetWidth(), ddpGetHeight());
         tex->setInternalFormat(GL_DEPTH_COMPONENT32F);
         tex->setSourceFormat(GL_DEPTH_COMPONENT);
         tex->setSourceType(GL_FLOAT);
@@ -1772,14 +1772,14 @@ static bool _initSceneFBO()
         tex->setInternalFormat(GL_RGBA8);
         tex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
         tex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
-        tex->setTextureHeight(WantedHeight);
-        tex->setTextureWidth(WantedWidth);
+        tex->setTextureHeight(ddpGetHeight());
+        tex->setTextureWidth(ddpGetWidth());
 
         _sceneRTT = tex;
 
         tex = new TextureRectangle;
 
-        tex->setTextureSize(WantedWidth, WantedHeight);
+        tex->setTextureSize(ddpGetWidth(), ddpGetHeight());
         tex->setInternalFormat(GL_DEPTH_COMPONENT32F);
         tex->setSourceFormat(GL_DEPTH_COMPONENT);
         tex->setSourceType(GL_FLOAT);
@@ -1813,11 +1813,11 @@ static bool _initSceneFBO()
     {
         int samples = 16;
 
-        RenderBuffer* rb1 = new RenderBuffer(WantedWidth, WantedHeight, GL_RGBA, samples);
+        RenderBuffer* rb1 = new RenderBuffer(ddpGetWidth(), ddpGetHeight(), GL_RGBA, samples);
         FrameBufferAttachment* fba1 = new FrameBufferAttachment(rb1);
         _sceneFBO->setAttachment(FrameBufferObject::COLOR_BUFFER, *fba1);
 
-        RenderBuffer* rb2 = new RenderBuffer(WantedWidth, WantedHeight, GL_DEPTH_COMPONENT32F, samples);
+        RenderBuffer* rb2 = new RenderBuffer(ddpGetWidth(), ddpGetHeight(), GL_DEPTH_COMPONENT32F, samples);
         FrameBufferAttachment* fba2 = new FrameBufferAttachment(rb2);
         _sceneFBO->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba2);
     }
@@ -2170,7 +2170,7 @@ void _renderWaterRefractions()
 
     g_wantNormalMaps = normalhistory;
 
-    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, 0);
+    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, ddpDefaultFramebuffer());
     oglSetViewport(0, 0, piGetWidth(), piGetHeight());
 #endif
 }
@@ -4965,12 +4965,12 @@ LOGICAL _drawDeprecatedPath()
             _sceneFBO->Blit(_resolveSceneFBO.get(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             GL_DEPTH_BUFFER_BIT,
                             GL_NEAREST);
         }
@@ -4994,12 +4994,12 @@ LOGICAL _drawDeprecatedPath()
             _sceneFBO->Blit(_resolveSceneFBO.get(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             GL_COLOR_BUFFER_BIT,
                             GL_NEAREST);
         }
