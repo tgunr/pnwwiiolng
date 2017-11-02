@@ -5538,7 +5538,6 @@ LOGICAL obdrawProcessLODCallback(OBJECT* lplod, UINT32 user,piVECTOR* InPos,
 FLOAT32		distsqr;
 FLOAT32		maxlod;
 piVECTOR	pp, pos;
-//piMATRIX	mat;
 OBJECT * 	lplodtopobject;
 FLOAT32		ratio;
 
@@ -5562,48 +5561,12 @@ FLOAT32		ratio;
 		}
 	}
 
-//	pos = lplod->pos;
-/*
-	if (lplodtopobject->flags & OBJECT_USEMATRIX)
-	{
-		// Rotate/Translate position to object space
-		math3dInvertMatrix(&mat, &lplodtopobject->mat);
-		math3dVectorMultiply(&pp, &pp, &mat);
-	}
-	else
-	{
-		if (lplod->flags & OBJECT_USEMATRIX)
-		{
-			// Rotate/Translate position to object space
-			math3dInvertMatrix(&mat, &lplod->mat);
-			math3dVectorMultiply(&pp, &pp, &mat);
-		}
-	}
-*/
-/*
-	if (lplodtopobject->flags & OBJECT_USEMATRIX)
-	{
-		math3dVectorMultiply(&pos,&pos,&lplodtopobject->mat);
-	}
-	else
-	{
-		if (lplod->flags & OBJECT_USEMATRIX)
-		{
-			math3dVectorMultiply(&pos,&pos,&lplod->mat);
-		}
-	}
-*/
 	pos = *InPos;
 
 	math3dSubtractVectors(&pp, &pp, &pos);
 
-	// z axis only applies at 1/2 value, so that planes in the air don't lose
-	// complete vis on the object beyond horizon distance in the z axis
-//	pp.z *= 0.5;
-
 	// factor in field of view, assuming that 90 degree FOV results in normal LOD
 	// cos of 45 degrees = 0.0707106781
-//	ratio =  (0.5f / 0.707106781f) / (FLOAT32)cos(FieldOfView * PI / 180.0 * 0.5);
 	if (LODFieldOfView == TRUE)
 	{
 		if (rnvisVectorFOVCheck(&pos,Radius) == TRUE)
@@ -5618,15 +5581,20 @@ FLOAT32		ratio;
 		math3dScaleVector(&pp,&pp,ratio);
 	}
 
-	// we're disabling this for the time being due to ground objects
-	// popping in/out
-//	math3dScaleVector(&pp, &pp, InvFrameFactor);
-
 #ifndef VEHICLE_OBJECT_ANALYSIS // for artists to test LOD's in-game with external dropped camera
 	if (lplod->flag2 & OBJECT_USERVEHICLE)
 	{
 		distsqr = 1.0f;
 	}
+#ifdef BETA_RELEASE
+    else if (lplod->flag2 & OBJECT_IS_PARTOF_VEHICLE)
+    {
+        OBJECT *lpObj = lplod->modelInstance->rootObject;
+        while (lpObj->child)
+            lpObj = lpObj->child;
+        distsqr = lpObj->distsqr * 100.0f;
+    }
+#endif
 	else
 #endif
 	{
@@ -5634,17 +5602,8 @@ FLOAT32		ratio;
 	}
 
 	maxlod = lplod->maxlod;
-/*
-    FLOAT32 horizon = 0.0f;
-    trnmainGetHorizon(&horizon);
 
-	if (maxlod > horizon * horizon)
-	{
-		maxlod = piLongLikeFloat(FogEnd) + 800.0f;
-		maxlod *= maxlod;
-	}
-*/
-	if (distsqr >= lplod->minlod &&
+    if (distsqr >= lplod->minlod &&
 		distsqr < maxlod)
 	{
 		if (lplodtopobject->flags & OBJECT_SKIPDRAWING)

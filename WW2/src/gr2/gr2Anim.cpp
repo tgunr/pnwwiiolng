@@ -5116,9 +5116,11 @@ void gr2AnimUpdateLOD(struct gr2AnimTrooper* model, FLOAT32 distance)
 	bool aiming = (bool)fpFPSIsAim();
 
 	// bring the distance in if we're looking through binocs
+#ifndef BETA_RELEASE
 	if(binocs) distance *= (unsigned int)binocsAdjust;
 	else if(aiming) distance *= (unsigned int)aimAdjust;
-
+#endif
+    
 	// save our calculated distance
 	UINT32 realDistance = (UINT32)distance;
 
