@@ -47,7 +47,7 @@ class HostVehicleImpl
 
 	// Capture parameters
 	bool			m_captureActive : 1;		// True when we've sent a capture tick.
-	TeulTimeMS		m_nextCaptureTick;
+	TeulTimeMS		m_nextCaptureTick = 0;      // The time to send the next capture update to the client.
 	UINT32			m_lastCaptureFacility;		// uOID if the last facility we were capping
 
 public:
