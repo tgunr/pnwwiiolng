@@ -593,9 +593,9 @@ _processDelayedBan()
 		if ( (ban.m_start > 0) & (ban.m_start <= teulTime()) )
 		{
 			if ( ban.m_days <= 90 )
-				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Due to unusual activity, your account is being suspended pending review. Contact agm@playnet.com.", SYSTEM_PLAYER_ID, systemHandleID);
+				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Due to unusual activity, your account is being suspended pending review. Email agm@corneredrats.com for assistance.", SYSTEM_PLAYER_ID, systemHandleID);
 			else
-				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Your account has been suspended indefinitely. Contact agm@playnet.com assistance.", SYSTEM_PLAYER_ID, systemHandleID);
+				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Your account has been suspended indefinitely. Email agm@corneredrats.com for assistance.", SYSTEM_PLAYER_ID, systemHandleID);
 
 			Chat::Name name(ban.m_handle);
 			strprintf(days, "%u days", ban.m_days);
