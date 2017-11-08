@@ -340,7 +340,7 @@ IF ( NOT MSVC )
 
 ENDIF()
 
-IF ( MSVC )
+#IF ( MSVC )
 	# kfsone: I'm currently using these because they're helpful for cluster-in-a-box,
 
 	# Not currently generated:
@@ -396,7 +396,7 @@ IF ( MSVC )
 	USE_WWIILIB_ON(stratValidator)
 	TARGET_LINK_LIBRARIES(stratValidator teulserver ${MYSQL_LIBRARIES})
 	SET_PROPERTY(TARGET stratValidator PROPERTY FOLDER "Tools")
-ENDIF()
+#ENDIF()
 
 # Reads SDM files and imports portions of them into the game database.
 # Which is a shame, because the hosts wind up reading the SDM files too
