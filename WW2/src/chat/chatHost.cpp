@@ -81,6 +81,7 @@
 #include "server/serverServerInfo.h"
 #include "str/stringLib.h"
 #include "strt/strtChatTypes.h"
+#include "strt/strtChatSupportMessages.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
@@ -3672,6 +3673,7 @@ main(int argc, const char* argv[])
 
 	ABORT_IF(chatInstallHostCallbacks() < 0);
 	ABORT_IF(chatInstallHostManagementCallbacks() < 0);
+	ABORT_IF(strtChatSupportInstallCallbacks() < 0);
 
 	//End broadcast configuration
 
