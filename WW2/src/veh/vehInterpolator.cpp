@@ -298,7 +298,10 @@ void InfantryPredictor::UpdateInterpolation(void) {
 
 const Update& InfantryPredictor::Interpolate(FrameTime frame) {
 	if ( (_vehicle->Flags & VEH_FLAGS_IS_CLONE) || is_dead || (frame == pred_pos.frametime && ! dirty) )
+    {
+        pred_pos.animationFlags = curr_msg.animationFlags;
 		return pred_pos;
+    }
 
 	gr2AnimBitPacker flags(curr_msg.animationFlags);
 
