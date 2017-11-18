@@ -238,6 +238,10 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "throttle.timeM",				TYPE_BYTE,	&host_config.throttle.timeM,			0,		"10",	"Time after which throttles are released (minutes)" }
 
 ,	{ "update.avoidRepeats",		TYPE_BOOL,	&host_config.update.avoidRepeats,		0,		"n",	"Enable re-sending old update data for a vehicle" }
+
+,	{ "update.maxAccumDelay",		TYPE_SINT,	&host_config.update.accumDelayLimit_ms,		0,		"1500",	"Maximum Accumulated Delay allowed before considering player kick" }
+,	{ "update.timeAtLimit",			TYPE_SINT,	&host_config.update.timeAtLimitBeforeKick_s,		0,		"4",	"Seconds of delay must hold at max before player is kicked" }
+
 ,	{ "update.countingEnabled",		TYPE_BOOL,	&host_config.update.countingEnabled,	0,		"n",	"Enable speed hacker monitoring" }
 ,	{ "update.defaultUM",			TYPE_BYTE,	&host_config.update.defaultUM,			0,		"0",	"Default Update Mode (0-4)" }
 ,	{ "update.errorThrottling",		TYPE_BOOL,	&host_config.update.errorThrottling,	0,		"n",	"Enable throttling of updates on congestion" }
