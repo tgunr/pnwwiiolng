@@ -2444,7 +2444,7 @@ bool _AirplaneBailout(piVECTOR* pos, piVECTOR* aim)
 				_exited = true;
 
 			if(_exited)
-				vehExitVehicle(1, 0, 0);
+				vehExitVehicle();
 		}
 
 		if(pos)
@@ -3560,11 +3560,8 @@ LOGICAL _CanPlayerExit()
 
 }
 
-UINT32 vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach)
+UINT32 vehExitVehicle(unsigned int exitCode)
 {
-	if(Param != 1)
-		return 0;
-
 #ifdef GR2_BLEND_EDITOR
 	if(!Online && uiViewport()->FindView("blendedit"))
 		uiDotCommand("/blendeditor"); // toggle it off
@@ -3628,8 +3625,12 @@ UINT32 vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach)
 	vehDetermineExitStatus(&ExitStatus, &rtbFacilityID);
 
 	// send out an update to make sure they ragdoll our vehicle
-	if(ExitStatus == PEXIT_DEAD && Vehicle->VehicleType->Type == VEH_TYPE_PERSON && !fpFPSIsDead())
+	if(exitCode == PEXIT_BAD_CONNECTION || (ExitStatus == PEXIT_DEAD && Vehicle->VehicleType->Type == VEH_TYPE_PERSON && !fpFPSIsDead()))
 	{
+		if (exitCode == PEXIT_BAD_CONNECTION)
+		{
+			uiChatPrintLine("You are being despawned due to a bad connection.  Try again later.");
+		}
 		fpFPSKillTrooper();
 		vehupdateUpdate(TRUE);
 	}

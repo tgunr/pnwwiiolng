@@ -272,7 +272,7 @@ void GameClient::ProcessCrewPostExpired(FE_POST_EXPIRED const& crewexpired)
 void GameClient::ProcessForcedCellExit(unsigned int exitCode)
 {
 	Client::ProcessForcedCellExit(exitCode);
-	vehExitVehicle(1, 0, 0);
+	vehExitVehicle(exitCode);
 }
 
 /************************************************************************************************
