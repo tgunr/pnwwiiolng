@@ -556,6 +556,7 @@ Player::Player(const Server::PersonaXfer& personaXfer)
 	, m_hasDied(false)
 	, exitFacility(nullObjID)
 	, m_fpsBuildingID(nullObjID)
+	, m_exitTeulIndex(0)
 {
 	this->state = Player::_RESERVED;
 	this->sendClose = TRUE;
@@ -641,7 +642,7 @@ _exitPlayer(Player& player)
 		return;
 
 	player.m_hasExited = true;
-
+	player.m_exitTeulIndex = player.teulIndex();
 	if ( player.sortieID() > 0 && player.playerID() > 0 )
 	{
 		DBThread::Do(DBThread::Default
@@ -1983,10 +1984,9 @@ _checkPlayerEjectionCountdown(Player* persona)
 static inline bool
 _checkPlayerTimeToLive(Player* player)
 {
-	if ( PN_LIKELY(player->m_timeToLive <= 0) )
+	if ( PN_LIKELY(player->m_timeToLive == 0) )
 		return false;
-	player->m_timeToLive--;
-	if ( player->m_timeToLive > 0 )
+	if ( player->m_timeToLive > teulClock64 )
 		return false;
 
 	dbugLog(_FLW, "t:%d exhausted timeToLive", player->teulIndex());
@@ -2050,7 +2050,7 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 {
 
 	ENDPOINT* endpoint = teulGetEndpoint(player->teulIndex());
-	if (endpoint != nullptr && endpoint->m_impl != nullptr && !endpoint->m_impl->m_sendQueue.empty())
+	if (!player->m_hasExited && player->m_timeToLive == 0 && endpoint != nullptr && endpoint->m_impl != nullptr && !endpoint->m_impl->m_sendQueue.empty())
 	{
 		// we currently have a queue built up to this user, lets check and see how deep it is
 		UINT32 updtInterval = framings[player->getCurrentFramingMode()].updateInterval;

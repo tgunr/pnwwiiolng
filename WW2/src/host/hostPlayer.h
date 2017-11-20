@@ -87,7 +87,7 @@ public:
 	UINT16					m_updatesSinceRX;
 	UINT16					m_updatesFailed;
 	SINT16					m_lastIndex;			// Last index we were on
-	UINT16					m_timeToLive;
+	TeulTimeMS				m_timeToLive;
 	UCHAR					station;
 
 	bool					active : 1;
@@ -104,5 +104,6 @@ public:
 
 	FULL_OBJ_ID				exitFacility;
 	FULL_OBJ_ID				m_fpsBuildingID;
+        SINT32                          	m_exitTeulIndex;
 };
 

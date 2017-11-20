@@ -127,7 +127,7 @@ _badPlayer(Player& player, const SCHAR* problem, bool alert)
 	if ( alert )
 		chatSendKickNotice(player.playerID(), callsign, problem);
 
-	commSendPlayerExit(player.teulIndex(), PDEST_EXIT, PEXIT_DEAD, nullObjID);
+	commSendPlayerExit(player.teulIndex(), PDEST_EXIT, PEXIT_BAD_CONNECTION, nullObjID);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -139,7 +139,7 @@ commForcePlayerExit(Player& player, const char* reason, bool alert)
 	if ( player.m_timeToLive == 0 )
 	{
 		_badPlayer(player, reason, alert);
-		player.m_timeToLive = 100 + (rand() % 100);
+		player.m_timeToLive = teulClock64 + 2000;
 	}
 }
 
@@ -551,10 +551,15 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 		return -EINVAL;
 	}
 
-	if ( player->m_hasExited )
+	// check to see if the player is trying to send updates without having properly signed in
+	if ( player->m_hasExited && (player->m_exitTeulIndex == 0 || player->m_exitTeulIndex != player->teulIndex()))
 	{
+		player->m_exitTeulIndex = player->teulIndex();
 		dbugLog(_FLM, "t:%d p:%u c:%s received update from player post-exit (lagged data?)"
 						, teulIndex, player->playerID(), player->callsign());
+
+		// resend the player exit notification
+		commSendPlayerExit(player->teulIndex(), PDEST_EXIT, PEXIT_BAD_CONNECTION, nullObjID);
 		return -EINVAL;
 	}
 
@@ -733,7 +738,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 			teulClock64,
 			player->m_lastTimeRx);
 	}
-	else
+	else if (!player->m_hasExited && player->m_timeToLive == 0)
 	{
 		// convert client time to host time
 		TeulTimeMS updateHostTime = player->m_lastTimeRx + player->m_hostClientOffset_ms;
@@ -1036,10 +1041,14 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 		return true;
 	}
 
-	if ( shooter->m_hasExited )
-	{
+	if ( shooter->m_hasExited && (shooter->m_exitTeulIndex == 0 || shooter->m_exitTeulIndex != shooter->teulIndex()))
+        {
+                shooter->m_exitTeulIndex = shooter->teulIndex();
+
 		dbugLog(_FLM, "t:%d p:%u c:%s discarded damage messages: vehicle is exiting"
-						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign());
+						, shooter->teulIndex(), shooter->playerID(), shooter->vehicle->callsign());
+		// resend the player exit notification
+		commSendPlayerExit(shooter->teulIndex(), PDEST_EXIT, PEXIT_BAD_CONNECTION, nullObjID);
 		return true;
 	}
 
