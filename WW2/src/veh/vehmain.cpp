@@ -180,6 +180,8 @@ extern Covert<bool> ProtectedOnlineFlag;
 #define MAX_MED_LODS 4
 #define MAX_HI_LODS 1
 
+#define	BAD_CONNECTION_LOC_ID	602
+
 static vehVehicle& getVehicleHead();
 
 static UINT32 _GetNewVehicle(vehVehicle** VehiclePtr);
@@ -3629,7 +3631,7 @@ UINT32 vehExitVehicle(unsigned int exitCode)
 	{
 		if (exitCode == PEXIT_BAD_CONNECTION)
 		{
-			uiChatPrintLine("You are being despawned due to a bad connection.  Try again later.");
+			uiChatPrintLineColor(colorORANGEALPHA, uiLocString(IDE_LANG_UI, BAD_CONNECTION_LOC_ID).c_str());
 		}
 		fpFPSKillTrooper();
 		vehupdateUpdate(TRUE);
