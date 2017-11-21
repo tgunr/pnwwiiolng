@@ -1726,6 +1726,8 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 		rescuable = true;
 	else if ( m_playerExitCode == PEXIT_OVER_ENEMY_TERRITORY && isDead() == false && hasBeenHit == false )
 		rescuable = true;
+	else if (isDead() && !hasBeenHit)
+		rescuable = true;
 	switch ( m_status )
 	{
 		case _RESERVED:
