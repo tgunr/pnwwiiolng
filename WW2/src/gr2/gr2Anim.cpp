@@ -5116,9 +5116,11 @@ void gr2AnimUpdateLOD(struct gr2AnimTrooper* model, FLOAT32 distance)
 	bool aiming = (bool)fpFPSIsAim();
 
 	// bring the distance in if we're looking through binocs
+#ifndef BETA_RELEASE
 	if(binocs) distance *= (unsigned int)binocsAdjust;
 	else if(aiming) distance *= (unsigned int)aimAdjust;
-
+#endif
+    
 	// save our calculated distance
 	UINT32 realDistance = (UINT32)distance;
 
@@ -7296,7 +7298,7 @@ void gr2AnimUpdate()
 		return;
 
 #ifdef LOD_ANIMATIONS
-	AllowedErrorAtUnitDistance = GrannyFindAllowedLODError(AllowedErrorInPixels, (SINT32)FieldOfView, (FLOAT32)WantedWidth, 1.0f);
+	AllowedErrorAtUnitDistance = GrannyFindAllowedLODError(AllowedErrorInPixels, (SINT32)FieldOfView, (FLOAT32)ddpGetWidth(), 1.0f);
 #endif
 
 	static colliderQuery collider = colliderQuery(0, false);

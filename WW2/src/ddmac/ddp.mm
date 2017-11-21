@@ -304,6 +304,10 @@ void ddpTemporarilyEscapeFullscreen(bool begin)
     }
 }
 
+GLuint ddpDefaultFramebuffer() {
+	return 0;
+}
+
 void ddpSetupGL(int w, int h)
 {
 	[nsOpenGlContext makeCurrentContext];

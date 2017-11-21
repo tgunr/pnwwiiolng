@@ -84,7 +84,7 @@ static GVAR vars[] = {
     NULL_KEY_DEF("logcomm", g_log_comm),
     NULL_KEY_DEF("logfps", g_log_fps),
     NULL_KEY_DEF("logweap", g_log_weap),
-    STRING_KEY_DEF("screen", WantedVideoCard),
+    STRING_KEY_DEF("screen", WantedDisplayDevice),
     NULL_KEY_DEF("nospawn", OverrideSpawner),
     NULL_KEY_DEF("console", OpenConsole),
     LOGICAL_KEY_DEF("ragdolls", gRagdolls),

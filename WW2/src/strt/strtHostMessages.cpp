@@ -910,6 +910,8 @@ _recvLua(ACTION_OBJECT* const a)
 static SINT32
 _recvCaptureContrib(ACTION_OBJECT* const a)
 {
+	//dbugLog(_FLN, "Strat receive capture contrib.");
+
 	if ( a->canRead<Strat::CaptureContributionEvent>() == false )
 		return -EINVAL;
 
@@ -1141,6 +1143,8 @@ strtHostInstallCallbacks()
 void
 strtSendCaptureScoreNotice(const FULL_OBJ_ID fid, WWII_SIDE forSide)
 {
+	//dbugLog(_FLN, "Strat strtSendCaptureScoreNotice()");
+
 	dbugLog(_FLI, "capscore: bld:%d,%d:%u side:%u", fid.cell.ox, fid.cell.oy, fid.id, forSide);
 	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureScore_Y));
 	outgoing.construct<CaptureScore>(fid, forSide);
@@ -1153,6 +1157,8 @@ strtSendCaptureScoreNotice(const FULL_OBJ_ID fid, WWII_SIDE forSide)
 void
 strtSendCaptureState(const FacilityStruct* facility, WWII_SIDE forSide, SINT32 rate, bool spawnable)
 {
+	//dbugLog(_FLN, "Strat send capture state.");
+
 	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureState_Y));
 	auto& state = outgoing.allocate<CaptureState>();
 	state.populate(facility, forSide, rate, spawnable);

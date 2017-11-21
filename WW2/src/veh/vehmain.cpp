@@ -1354,8 +1354,8 @@ UINT32 vehUpdate()
 
 	if(enemyDuration == -1)
 	{
-		// report every 5 minutes
-		enemyDuration = 1000 * 60 * 5;
+		// Default to reporting every 5 minutes
+		//enemyDuration = 1000 * 60 * 5;
 
 		// check for an arena var
 		ARENA_VARS::iterator itr = g_arenaDescription.find("hqreports");

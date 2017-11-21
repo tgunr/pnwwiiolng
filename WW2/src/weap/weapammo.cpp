@@ -4338,6 +4338,8 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 				KE = RichochetSpeed * RichochetSpeed * 0.5 * Ammo->AmmoType->ProjectileWeight;
 				DoSpall = FALSE;
 				Richocheted = TRUE;
+
+				// TODO: Adjust the round's heading and set AmmoStopped = FALSE;
 			}
 		}else // penetrated, bleed off energy
 		{
@@ -4489,14 +4491,8 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 			Write_Log(LOG_WEAP,LOG_INFO,"WEAP %s(%d) fuze detonates", Ammo->AmmoType->Name, Ammo->Id);
 
 		weapfxAmmoExplosion(Ammo, &CollidePos, Collision, (Richocheted) ? 0 : !AmmoStopped);
-		bool doshrap = Collision->Flags & _AMMOCD_FLAG_INTERNALCOMPONENT
-			|| Vehicle->VehicleType->Type == VEH_TYPE_AIR || Vehicle->VehicleType->Type == VEH_TYPE_SEA
-			|| Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_GRENADE;
 
-#ifdef BETA_RELEASE
-		if(weaplogFile) doshrap = true;
-#endif
-		_DoExplosionShrapnel(Ammo, &CollidePos, (AmmoStopped) ? &AmmoDir : &Ammo->Velocity, AmmoCollideTime, doshrap);
+		_DoExplosionShrapnel(Ammo, &CollidePos, (AmmoStopped) ? &AmmoDir : &Ammo->Velocity, AmmoCollideTime, true);
 		_DoExplosionConcussion(Ammo, &CollidePos, Collision->Flags & _AMMOCD_FLAG_INTERNALCOMPONENT);
 
 		AmmoStopped = TRUE;

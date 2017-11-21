@@ -848,6 +848,9 @@ static void ProcessInfantryAnimationFlags(vehVehicle* Vehicle, const VEHICLE_UPD
 #ifdef NEW_INF_PREDICTOR
 	bool useNewPredictor = (_newpredictor && !(Vehicle->Flags & VEH_FLAGS_USE_OLD_INTERPOLATOR));
 
+    UINT32 beforePosAnimFlags = Vehicle->PosData.animationFlags;
+    static UINT32 lastAnimBits = 0;
+    
 	if(useNewPredictor)
 	{
 		if (VehicleHeader->present & PR_STATE0)
@@ -881,6 +884,14 @@ static void ProcessInfantryAnimationFlags(vehVehicle* Vehicle, const VEHICLE_UPD
 #ifdef NEW_INF_PREDICTOR
 	}
 #endif
+    
+    dbugLog(_FLD, "Changes in PosAnimFlags= %X (%X), AnimBits= %X (%X)",
+            (Vehicle->PosData.animationFlags ^ beforePosAnimFlags),
+            Vehicle->PosData.animationFlags,
+            (Vehicle->AnimationBits ^ lastAnimBits),
+            Vehicle->AnimationBits);
+    
+    lastAnimBits = Vehicle->AnimationBits;
 }
 
 /*

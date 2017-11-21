@@ -69,8 +69,7 @@ private:
 
     CBitmap _background;
 
-    DWORD _numAdapters;
-    std::vector<LPADAPTERMODES> _adapterModes;
+    std::vector<std::wstring> displays;
 
     CFont font;
 };

@@ -649,13 +649,34 @@ static void _DrawVehicleIconDeprecated(vehVehicle* CurrentVehicle)
 			{
 				wchar_t buffer[10+1];
 
+                SINT32 selectedLod = 0;
+                SINT32 dist = 0;
 				OBJECT* po = CurrentVehicle->VehicleObjectData->PlaneObject;
 
 				if(CurrentVehicle->VehicleType->Type == VEH_TYPE_PERSON && po->animModel)
-					swprintf(buffer, 10, L"%dm (%d)", (SINT32)po->distsqr, po->animModel->model.GetLOD() + 1); // make it 1 based for producer types
-				else
-					swprintf(buffer, 10, L"%dm", (SINT32)po->distsqr);
-
+                {
+                    selectedLod = po->animModel->model.GetLOD() + 1;
+                    dist = static_cast<SINT32>(po->distsqr);
+                }
+                else
+                {
+                    OBJECT * rootChild = po;
+                    while (rootChild->child != nullptr)
+                        rootChild = rootChild->child;
+                    dist = static_cast<SINT32>(rootChild->distsqr);
+                    for (SINT32 i = 0; i < ML_MAX_LODS; i++)
+                    {
+                        if (CurrentVehicle->VehicleObjectData->LODObjects[i] &&
+                            !(CurrentVehicle->VehicleObjectData->LODObjects[i]->flags & OBJECT_SKIPDRAWING))
+                        {
+                            selectedLod = i+1;
+                            break;
+                        }
+                    }
+                }
+                
+                swprintf(buffer, 10, L"%dm (%d)", dist, selectedLod); // make it 1 based for producer types
+                
 				FLOAT32 squadSize = size * .8f;
 				_DrawIconString(&Pos, squadSize, vOffset, buffer, Color);
 				vOffset += squadSize;

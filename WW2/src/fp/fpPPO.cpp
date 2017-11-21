@@ -909,7 +909,8 @@ bool PlayerPlacedObject::Update()
 
 			// Used to offset progress by however much progress we already have
 
-			float progress = float(coolDownProgress) / float(spec->coolDown);
+            
+            float progress = (spec->coolDown)?(float(coolDownProgress) / float(spec->coolDown)):0.0f;
 
 			char script[128+1];
 			snprintf(script, 128, "game.oncooldown(%f)", progress);

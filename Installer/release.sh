@@ -370,7 +370,7 @@ if [ "$build_patch" = true ] ; then
     winpath2bash "$PREV_RELEASE"
     build_step "copy" "copying" "over previous release for patch from $bashpath"
     if [ "$skip_step" = false ]; then
-        rsync -auv "$bashpath/" "$INSTALLER/previous/"
+        rsync -av "$bashpath/" "$INSTALLER/previous/"
     fi
 fi
 
@@ -611,7 +611,7 @@ if [ "$myos" == "win" ] ; then
         fi
         if [ "$skip_step" = false ]; then
             pushd "$INSTALLER"
-            ./MakeDiffs.bat previous previous
+            ./MakeDiffs.bat current previous
             popd
         fi
 

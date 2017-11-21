@@ -307,7 +307,7 @@ LOGICAL oglSetupRC()
 	glPolygonOffset(0.0f, 0.0f);
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
-	oglResize(WantedWidth, WantedHeight);
+	oglResize(ddpGetWidth(), ddpGetHeight());
 
     if(!HandleGLError(TRUE))
     {
@@ -2114,10 +2114,10 @@ bool oglGetScreenToWorld(int sx, int sy, double& x, double& y, double& z)
 
     // Map mouse position to [-1, 1] normalized coordinates
     Vec3f v;
-    v.x() = 2.0f * (sx) / WantedWidth - 1.0f;
+    v.x() = 2.0f * (sx) / ddpGetWidth() - 1.0f;
 
     // OpenGL 0,0 is bottom left...windows it top left, so reverse (WantedHeight - sy)
-    v.y() = 2.0f * (WantedHeight - sy) / WantedHeight - 1.0f;
+    v.y() = 2.0f * (ddpGetHeight() - sy) / ddpGetHeight() - 1.0f;
 
     // Get z value at this click position
     float depth;
@@ -2141,8 +2141,8 @@ bool oglGetScreenToWorld(int sx, int sy, double& x, double& y, double& z)
 
     viewport[0] = 0;
     viewport[1] = 0;
-    viewport[2] = WantedWidth;
-    viewport[3] = WantedHeight;
+    viewport[2] = ddpGetWidth();
+    viewport[3] = ddpGetHeight();
 
     const piMATRIX& m1 = oglGetModelViewMatrix();
 
@@ -2183,7 +2183,7 @@ bool oglGetScreenToWorld(int sx, int sy, double& x, double& y, double& z)
     projection[15] = m2._44;
 
 	winX = (float)sx;
-	winY = (float)WantedHeight - (float)sy;
+	winY = (float)ddpGetHeight() - (float)sy;
 
     // z depth at this click.
 	glReadPixels(sx, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
@@ -2233,8 +2233,8 @@ LOGICAL oglGetWorldToScreen(double x, double y, double z, double& sx, double& sy
 
     viewport[0] = 0;
     viewport[1] = 0;
-    viewport[2] = WantedWidth;
-    viewport[3] = WantedHeight;
+    viewport[2] = ddpGetWidth();
+    viewport[3] = ddpGetHeight();
 #endif
 
 	if(gluProject(x, y, z, modelMatrix, projMatrix, viewport, &sx, &sy, &sz))

@@ -22,6 +22,7 @@
 #include "fio/fio.h"
 #include "ogl/oglGlobalStates.h"
 #include "resource.h"
+#include "wwii/wwiiUTF.h"
 
 #include "ddp.h"
 
@@ -42,6 +43,7 @@ extern void wwiiSendUserAbortedApp();
 
 extern LOGICAL					running;
 static int cursorvisible;
+static HCURSOR cursor = NULL;
 /*
 	Static variables
 */
@@ -56,8 +58,10 @@ static bool						focus;
 static SINT32					capture;
 
 static TCHAR					classname[256];
-static UINT32					flags;
-static UINT32					show;
+
+static enum WindowMode {
+	FULLSCREEN, BORDERLESS_FULLSCREEN, WINDOWED
+} window_mode;
 static UINT32					delay;
 static UINT32					starttime;
 static long						framecount;
@@ -66,6 +70,8 @@ static HRESULT					retval;
 
 static HDC						myhdc;
 static HGLRC					myhrc;
+
+static GLint default_framebuffer;
 
 static DDWND_DDINITFUNC			ddinitfunc;
 static DDWND_D3DINITFUNC		d3dinitfunc;
@@ -77,11 +83,8 @@ static DDWND_MOUSEFUNC			mousefunc;
 static DDWND_TIMERFUNC			timerfunc;
 static DDWND_KEYBOARDFUNC		keyboardfunc;
 
-static UINT32					modenum, displaynum;
-static DEVMODE					devmode;
-static DISPLAY_DEVICE			displaydevice;
-
-static RECT gamerect;
+// The rendering portion of the window.
+static RECT renderrect;
 
 /*
 	Global variables
@@ -97,7 +100,6 @@ static void UpdateTimes();
 
 static LOGICAL OnEraseBkgnd(HDC hDC);
 static LOGICAL OnNcActivate(LOGICAL bActive);
-static bool Create(HWND hwnd);
 
 static void	Destroy();
 static void	OnClose();
@@ -109,6 +111,50 @@ static void	OnSysKeyDown(UINT nChar, UINT nFlags);
 static void	OnSysKeyUp(UINT nChar, UINT nFlags);
 
 #define USE_NEWGL 0
+
+//==============================================================================
+
+namespace {
+	DISPLAY_DEVICE primary_display;
+	DISPLAY_DEVICE display = {};
+	DEVMODE devmode = {};
+
+	bool ddpSetDisplay(void) {
+		// We only need to mess with the display in fullscreen mode
+		if ( window_mode != FULLSCREEN )
+			return true;
+
+		// Do a quick check to see if we need to change anything at all
+		DEVMODE dm; dm.dmSize = sizeof(dm);
+		if ( EnumDisplaySettings(display.DeviceName, ENUM_CURRENT_SETTINGS, &dm) ) {
+			if ( dm.dmPelsWidth == WantedWidth && dm.dmPelsHeight == WantedHeight &&
+			     dm.dmBitsPerPel == WantedBpp )
+				return true;
+		} else {
+			dbugLog(_FLW, "Failed to get the current settings for the requested display device");
+		}
+
+		memset(&dm, 0, sizeof(dm)); dm.dmSize = sizeof(dm);
+		dm.dmPelsWidth = WantedWidth;
+		dm.dmPelsHeight = WantedHeight;
+		dm.dmBitsPerPel = WantedBpp;
+		dm.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT | DM_BITSPERPEL;
+
+		LONG result;
+		if ( (result = ChangeDisplaySettingsEx(display.DeviceName, &dm, NULL, CDS_FULLSCREEN, NULL)) != DISP_CHANGE_SUCCESSFUL ) {
+			dbugLog(_FLW, "Failed to change display settings: %d", result);
+			return false;
+		}
+
+		return true;
+	}
+
+	void ddpResetDisplay(void) {
+		ChangeDisplaySettingsEx(display.DeviceName, nullptr, nullptr, 0, nullptr);
+	}
+}
+
+//==============================================================================
 
 HINSTANCE ddpGetInstance()
 {
@@ -124,7 +170,6 @@ LOGICAL ddpInit()
 {
 	state = true;
 	delay = 0;
-	show = DDWND_SHOW_NONE;
 	dna = false;
 	dss = false;
 	resetfps = false;
@@ -146,29 +191,6 @@ LOGICAL ddpInit()
 
 	return TRUE;
 }
-
-#if(0)
-static void DisplayLastError()
-{
-LPVOID lpMsgBuf;
-
-	FormatMessage(	FORMAT_MESSAGE_ALLOCATE_BUFFER |
-					FORMAT_MESSAGE_FROM_SYSTEM |
-					FORMAT_MESSAGE_IGNORE_INSERTS,
-					nullptr,
-					GetLastError(),
-					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-					(LPTSTR) &lpMsgBuf,
-					0,
-					nullptr);
-
-	// Display the string
-	Write_Debug((const char*)lpMsgBuf);
-
-	// Free the buffer
-	LocalFree(lpMsgBuf);
-}
-#endif
 
 // Stub function that will report an error during the setup of the video card
 // and notify the user
@@ -327,49 +349,66 @@ bool CreateGLContext(HDC dc)
 	if(!myhrc)
         return false;
 
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &default_framebuffer);
+
 	return true;
 }
 
-static bool oglBegin(HWND hwnd)
-{
-	PIXELFORMATDESCRIPTOR	pfd;
-
-	// Already begun
-	if (myhrc != nullptr)
-	{
+static bool oglBegin(HWND hwnd) {
+	if ( myhrc != NULL )
 		return true;
-	}
 
-	if (myhdc == nullptr)
-	{
-		myhdc = GetDC(hwnd);
-	}
-
-	try
-	{
-		// Choose a compatible pixel format
-		if (!ddpChooseScreenFormat(myhdc, &pfd))
-		{
-			ReleaseDC(hwnd, myhdc);
-			myhdc = nullptr;
-			throw "Configured resolution not supported by video card";
+	if ( myhdc == NULL ) {
+		if ( (myhdc = GetDC(hwnd)) == NULL ) {
+			dbugLog(_FLA, "Could not create device context");
+			return false;
 		}
-
-        CreateGLContext(myhdc);
-
-		// Disable vsync during initialization. Enabled in rnmainInit (if user specified)
-        // after initialization complete.
-		if(wglSwapIntervalEXT)
-			wglSwapIntervalEXT(NO_LOCK_TO_REFRESH);
-
-		return true;
 	}
 
-    catch(std::exception& ex) { _initializationError(ex.what()); }
-	catch(const char* error) { _initializationError(error); }
-	catch(...) { _initializationError("[unknown error]"); }
+	PIXELFORMATDESCRIPTOR pfd = {
+		sizeof(PIXELFORMATDESCRIPTOR),
+		1,
+		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+		PFD_TYPE_RGBA,
+		(BYTE)WantedBpp,
+		0,0,0,0,0,0,
+		0,
+		0,
+		0,
+		0,0,0,0,
+		32,
+		0,
+		0,
+		PFD_MAIN_PLANE,
+		0,
+		0,0,0
+	};
 
-	return false;
+	int pixelformat = ChoosePixelFormat(myhdc, &pfd);
+	if ( pixelformat == 0 ) {
+		dbugLog(_FLA, "Could not find compatible pixel format");
+		return false;
+	}
+
+	if ( ! SetPixelFormat(myhdc, pixelformat, &pfd) ) {
+		dbugLog(_FLA, "Could not request pixel format");
+		return false;
+	}
+
+	try {
+		CreateGLContext(myhdc);
+	} catch ( std::exception& ex ) {
+		_initializationError(ex.what()); return false;
+	} catch ( const char* error ) {
+		_initializationError(error); return false;
+	} catch ( ... ) {
+		_initializationError("[unknown error]"); return false;
+	}
+
+	if ( wglSwapIntervalEXT )
+		wglSwapIntervalEXT(NO_LOCK_TO_REFRESH);
+
+	return true;
 }
 
 static void oglEnd()
@@ -398,26 +437,20 @@ void ddpKill()
         return;
     }
 
-    ClipCursor(nullptr);
+    ClipCursor(NULL);
 
     alreadykilled = true;
 
 	imeKill();
 
-	if (flags & DDWND_FULLSCREEN)
-	{
+	if ( window_mode == FULLSCREEN )
 		ddpResetDisplay();
-	}
 
 	if (d3dkillfunc != nullptr)
-	{
 		d3dkillfunc();
-	}
 
 	if (ddkillfunc != nullptr)
-	{
 		ddkillfunc();
-	}
 
 	rnmainKill();
 
@@ -427,175 +460,222 @@ void ddpKill()
 
 	if (wndAtom)
 	{
-		UnregisterClass(classname, (HINSTANCE)hinst);
+		UnregisterClass((LPCTSTR)wndAtom, (HINSTANCE)hinst);
 		wndAtom = 0;
 	}
 }
-static WNDCLASS	wndClass;
 
-LOGICAL ddpCreateWnd(SINT32 myx, SINT32 myy, SINT32 mywidth, SINT32 myheight, SINT32 mybpp, UINT32 myflags, HWND parent)
-{
-UINT32		style;
-RECT		rect, wrect;
+namespace {
+	bool RegisterWindowClass(void) {
+		if ( wndAtom == 0 ) {
+			if ( cursor == NULL )
+				cursor = LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
 
-	// Mode information
-	WantedX		= myx;
-	WantedY		= myy;
-	WantedWidth	= mywidth;
-	WantedHeight	= myheight;
-	WantedBpp		= mybpp;
+			WNDCLASS wc;
+			memset(&wc, 0, sizeof(wc));
 
-	flags			= 0;
-	style			= WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
+			wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+			wc.lpfnWndProc = WindowProc;
+			wc.hInstance = (HINSTANCE)hinst;
+			wc.hIcon = LoadIcon((HINSTANCE)hinst, MAKEINTRESOURCE(IDI_WWII_ICON));
+			wc.hCursor = cursor;
+			wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+			wc.lpszMenuName = NULL;
+			wc.lpszClassName = L"WWIIOL_WC";
 
-	if (myflags & DDWND_FULLSCREEN)
-	{
-		WantedWindow = FALSE;
-		flags |= DDWND_FULLSCREEN;
-		style |= WS_POPUP|WS_VISIBLE;
+			if ( (wndAtom = RegisterClass(&wc)) == 0 )
+				return false;
+		}
+		return true;
 	}
-	else
-	if (myflags & DDWND_WINDOW)
-	{
-	HDC     hdc;
+}
 
-		WantedWindow = TRUE;
 
-		hdc = GetDC(nullptr);
-		WantedBpp = GetDeviceCaps(hdc, BITSPIXEL);
-		ReleaseDC(nullptr, hdc);
+namespace {
+	typedef std::vector<HMONITOR> MonitorList;
+	BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData) {
+		MonitorList* monitors = reinterpret_cast<MonitorList*>(dwData);
+		monitors->push_back(hMonitor);
+		return TRUE;
+	}
 
-		if (parent == nullptr)
-		{
-			style |= WS_POPUP;
-		}
-		else
-		{
-			style |= WS_CHILD;
-		}
+	MONITORINFOEX GetDisplayMonitor(void) {
+		MonitorList monitors;
+		if ( EnumDisplayMonitors(NULL, NULL, &MonitorEnumProc, (LPARAM)&monitors) == 0 || monitors.size() == 0 )
+			LogAbort("Could not retrieve any monitor info at all");
 
-		style |= WS_VISIBLE;
-		if (myflags & DDWND_CAPTION)
-		{
-	//		style |= WS_CAPTION;
-		}
+		MONITORINFOEX minfo; minfo.cbSize = sizeof(minfo);
+		MONITORINFOEX primary_minfo;
+		for ( HMONITOR monitor : monitors ) {
+			GetMonitorInfo(monitor, &minfo);
+			if ( minfo.dwFlags & MONITORINFOF_PRIMARY )
+				primary_minfo = minfo;
 
-		if (myflags & DDWND_SYSMENU)
-		{
-			style |= WS_SYSMENU;
-			if (myflags & DDWND_SIZEABLE)
-			{
-			//	style |= WS_MINIMIZEBOX|WS_MAXIMIZEBOX;
+			if ( wcsstr(minfo.szDevice, display.DeviceName) != nullptr ) {
+				return minfo;
 			}
 		}
 
-		if (myflags & DDWND_SIZEABLE)
-		{
-		//	style |= WS_THICKFRAME;
-		}
-	}
-	else
-	{
-		// bad flags
-		return FALSE;
+		dbugLog(_FLA, "WARNING: Could not retrieve the monitor info for the given display device. Resetting both to primary.");
+		display = primary_display;
+		return primary_minfo;
 	}
 
-	memset(&wndClass, 0, sizeof(WNDCLASS));
-	wndClass.style          = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
-	wndClass.lpfnWndProc    = WindowProc;
-	wndClass.hInstance      = (HINSTANCE)hinst;
-	wndClass.hIcon          = LoadIcon((HINSTANCE)hinst, MAKEINTRESOURCE(IDI_WWII_ICON));
-	wndClass.hCursor        = LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
-	wndClass.hbrBackground  = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	wndClass.lpszMenuName   = NULL;
-	swprintf(classname, 255, _T("OpenGLClass_%dx%dx%d"), WantedWidth, WantedHeight, WantedBpp);
-	wndClass.lpszClassName  = classname;
+	void ReadWindowConfig(void) {
+		bool display_found = false;
+		DISPLAY_DEVICE tmp_display; tmp_display.cb = sizeof(tmp_display);
+		for ( DWORD i = 0 ; EnumDisplayDevices(NULL, i, &tmp_display, 0) != 0 ; ++i ) {
+			if ( tmp_display.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE )
+				primary_display = tmp_display;
 
-	wndAtom = RegisterClass(&wndClass);
-	if (wndAtom == 0)
-	{
-		return FALSE;
-	}
-
-	if (myflags & DDWND_FULLSCREEN)
-	{
-		WantedX = 0;
-		WantedY = 0;
-
-		if (!ddpSetDisplay(flags))
-		{
-			return FALSE;
+			char buf[128]; WWIIConvert(tmp_display.DeviceName, buf);
+			if ( strcmp(WantedDisplayDevice, buf) == 0 ) {
+				display = tmp_display;
+				display_found = true;
+			}
 		}
 
-		rect.left = WantedX;
-		rect.top = WantedY;
-		rect.right = WantedWidth;
-		rect.bottom = WantedHeight;
-	}
-	else
-	{
-		rect.left = myx;
-		rect.top = myy;
-		rect.right = myx + WantedWidth;
-		rect.bottom = myy + WantedHeight;
+		if ( ! display_found ) {
+			dbugLog(_FLW, "Requested display '%s' not found. Resorting to primary display.", WantedDisplayDevice);
+			display = primary_display;
+		}
 
-		AdjustWindowRect(&rect, style, FALSE);
+
+		// TODO: Actually make this configurable or get rid of it
+		if ( WantedBpp < 32 )
+			WantedBpp = 32;
+
+
+		// TODO: Add borderless fullscreen once its issues have been dealt with
+		if ( ! WantedWindow )
+			window_mode = FULLSCREEN;
+		else
+			window_mode = WINDOWED;
+
+
+		if ( WantedWidth <= 0 || WantedHeight <= 0 ) {
+			if ( window_mode == FULLSCREEN || window_mode == BORDERLESS_FULLSCREEN ) {
+				MONITORINFOEX minfo = GetDisplayMonitor();
+				const RECT& rect = minfo.rcMonitor;
+				WantedWidth = rect.right - rect.left;
+				WantedHeight = rect.bottom - rect.top;
+			} else {
+				WantedWidth = 1024;
+				WantedHeight = 768;
+			}
+		}
+	}
+
+	bool SetUpDisplay(void) {
+		if ( window_mode != FULLSCREEN )
+			return true;
+		
+		if ( ddpSetDisplay() )
+			return true;
+
+		dbugLog(_FLW, "Failed to go fullscreen; trying default resolution.");
+		WantedWidth = WantedHeight = 0;
+		ReadWindowConfig(); // HACK: Using this to default the window size
+		if ( ddpSetDisplay() )
+			return true;
+
+		dbugLog(_FLW, "Failed to go fullscreen; trying default display device.");
+		display = primary_display;
+		WantedWidth = WantedHeight = 0;
+		ReadWindowConfig(); // HACK
+		if ( ddpSetDisplay() )
+			return true;
+
+		dbugLog(_FLW, "Failed to go fullscreen. Resorting to windowed mode.");
+		WantedWindow = TRUE;
+		WantedWidth = WantedHeight = 0;
+		ReadWindowConfig(); // HACK
+
+		return true;
+	}
+}
+
+// NOTE: Actually modifying an existing window (including code elsewhere) is
+// completely untested and is probably horribly broken.
+static bool ddpResetWindow(void) {
+	ReadWindowConfig();
+	if ( ! RegisterWindowClass() ) return false;
+	if ( ! SetUpDisplay() ) return false;
+
+
+	DWORD style;
+	DWORD exstyle;
+	if ( window_mode == WINDOWED ) {
+		style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW;
+		exstyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+	} else {
+		style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
+		exstyle = WS_EX_APPWINDOW | WS_EX_TOPMOST;
+	}
 
 #ifdef CENTER_WINDOW
-		SystemParametersInfo(SPI_GETWORKAREA, 0, &wrect, 0);
-
-		WantedX = myx = ((wrect.right - wrect.left) - WantedWidth) / 2;
-		WantedY = myy = ((wrect.bottom - wrect.top) - WantedHeight) / 2;
-		rect.right = myx + (rect.right - rect.left);
-		rect.left = myx;
-		rect.bottom = myy + (rect.bottom - rect.top);
-		rect.top = myy;
+	if ( window_mode == WINDOWED ) {
+		MONITORINFOEX minfo = GetDisplayMonitor();
+		const RECT& rect = minfo.rcWork;
+		WantedX = ((rect.right - rect.left) - WantedWidth) / 2;
+		WantedY = ((rect.bottom - rect.top) - WantedHeight) / 2;
+	}
 #else
-		if (rect.left < 0)
-		{
-			rect.right -= rect.left;
-			rect.left = 0;
-		}
-
-		if (rect.top < 0)
-		{
-			rect.bottom -= rect.top;
-			rect.top = 0;
-		}
-
-		if (rect.right > wrect.right)
-		{
-			rect.left -= rect.right - wrect.right;
-			rect.right = wrect.right;
-		}
-
-		if (rect.bottom > wrect.bottom)
-		{
-			rect.top -= rect.bottom - wrect.bottom;
-			rect.bottom = wrect.bottom;
-		}
+	#error "Currently no mechanism for setting up default X/Y window position."
+	// TODO: Verify that the window is actually visible.
+	// (e.g., previously configured with multi-monitor setup that changed)
 #endif
+
+	// TODO: Render to an FBO, then render that to the actual window
+	// The below forces our rendering & display resolutions to match
+	if ( window_mode != WINDOWED ) {
+		MONITORINFOEX minfo = GetDisplayMonitor();
+		renderrect = minfo.rcMonitor;
+
+		// TEMP: Force the internal resolution to match the monitor's resolution
+		WantedX = minfo.rcMonitor.left;
+		WantedY = minfo.rcMonitor.bottom;
+		WantedWidth = minfo.rcMonitor.right - minfo.rcMonitor.left;
+		WantedHeight = minfo.rcMonitor.bottom - minfo.rcMonitor.top;
+	} else {
+		// TODO: Allow window rect to differ from internal resolution
+		renderrect.left = WantedX;
+		renderrect.right = renderrect.left + WantedWidth;
+		renderrect.top = WantedY;
+		renderrect.bottom = renderrect.top + WantedHeight;
 	}
 
-	myhwnd = CreateWindowEx(0, wndClass.lpszClassName, _T(SYS_TITLE),
-							style, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
-							parent, nullptr, (HINSTANCE)hinst, nullptr);
+	RECT wrect = renderrect;
+	AdjustWindowRectEx(&wrect, style, FALSE, exstyle);
 
-	if (!myhwnd)
-	{
-		return FALSE;
+	bool created_window = false;
+	if ( myhwnd == NULL ) {
+		created_window = true;
+		myhwnd = CreateWindowEx(exstyle, (LPCTSTR)wndAtom, _T(SYS_TITLE), style, wrect.left, wrect.top,
+		                        wrect.right-wrect.left, wrect.bottom-wrect.top,
+		                        NULL, NULL, (HINSTANCE)hinst, NULL);
+		if ( myhwnd == NULL )
+			return false;
+	} else {
+		SetWindowLong(myhwnd, GWL_STYLE, style);
+		SetWindowLong(myhwnd, GWL_EXSTYLE, exstyle);
+		SetWindowPos(myhwnd, NULL,
+		             wrect.left, wrect.top,
+		             wrect.right-wrect.left, wrect.bottom-wrect.top,
+		             SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 	}
 
-    gamerect = rect;
-    ClipCursor(&gamerect);
+	ClipCursor(&renderrect);
+
+	//--------------
+
+	if ( ! created_window )
+		return true;
 
 	{
-	MSG		msg;
-
-		while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
-		{
-			if (GetMessage(&msg, nullptr, 0, 0))
-			{
+		MSG msg;
+		while ( PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE) ) {
+			if ( GetMessage(&msg, NULL, 0, 0) ) {
 				uiIMEMessageProc(msg);
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -603,38 +683,25 @@ RECT		rect, wrect;
 		}
 	}
 
-	GetClientRect(myhwnd, &rect);
-
-//	WantedX = rect.left;
-//	WantedY = rect.top;
-	WantedWidth = rect.right - rect.left;
-	WantedHeight = rect.bottom - rect.top;
-
-	if (!oglBegin(myhwnd))
-	{
-		ddpResetDisplay();
-		return FALSE;
+	if ( ! oglBegin(myhwnd) ) {
+		return false;
 	}
 
-    // post process globals dependent on GLEW if needed
+	// post process globals dependent on GLEW if needed
 	cfgPrefsInit();
 
 	// Call external init functions; if present
-	if (ddinitfunc != nullptr)
-	{
-		if (!ddinitfunc())
-		{
+	if ( ddinitfunc != nullptr ) {
+		if ( ! ddinitfunc() ) {
 			Write_Debug("DD init failed");
-			return FALSE;
+			return false;
 		}
 	}
 
-	if (d3dinitfunc != nullptr)
-	{
-		if (!d3dinitfunc())
-		{
+	if ( d3dinitfunc != nullptr ) {
+		if ( ! d3dinitfunc() ) {
 			Write_Debug("D3D init failed");
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -653,13 +720,11 @@ RECT		rect, wrect;
 	frametime = 0;
 	framecount = 0;
 
-	{
-	MSG		msg;
 
-		while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
-		{
-			if (GetMessage(&msg, nullptr, 0, 0))
-			{
+	{
+		MSG msg;
+		while ( PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE) ) {
+			if ( GetMessage(&msg, NULL, 0, 0) ) {
 				uiIMEMessageProc(msg);
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -668,37 +733,54 @@ RECT		rect, wrect;
 	}
 
 	IMEBase* ime = imeClient();
-	if(ime) ime->Init();
+	if ( ime ) ime->Init();
 
-	if (!rnmainInit())
-	{
-		return FALSE;
+	if ( ! rnmainInit() ) {
+		return false;
 	}
 
-    // Lock or don't lock based on player's request in Settings app.
-    // VSync causes major slowdown during initialization. Enable/Disable here after init done. (ticket #2329)
-    // Forced disable in ddp.cpp before initialization starts.
-    gSupportSwapInterval = g_enableVSync ? LOCK_TO_REFRESH : NO_LOCK_TO_REFRESH;
-    if(wglSwapIntervalEXT)
-	    wglSwapIntervalEXT(gSupportSwapInterval);
+	// Lock or don't lock based on player's request in Settings app.
+	// VSync causes major slowdown during initialization. Enable/Disable here after init done. (ticket #2329)
+	// Forced disable in ddp.cpp before initialization starts.
+	gSupportSwapInterval = g_enableVSync ? LOCK_TO_REFRESH : NO_LOCK_TO_REFRESH;
+	if ( wglSwapIntervalEXT )
+		wglSwapIntervalEXT(gSupportSwapInterval);
 
-	return TRUE;
+	return true;
+
+	//===============================
+
+#if 0 // ???
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
+	x = ((rect.right - rect.left) - WantedWidth) / 2;
+	y = ((rect.bottom - rect.top) - WantedHeight) / 2;
+
+	// Note: This is an appropriate use of the registry: a user preference it doesn't hurt to lose - Gadget
+	if ( sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, (DWORD*)&wh) &&
+		sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, (DWORD*)&xy) ) {
+		if ( 320 <= LOWORD(wh) && 240 <= HIWORD(wh) ) {
+			WantedWidth = LOWORD(wh);
+			WantedHeight = HIWORD(wh);
+		}
+
+		if ( rect.right > (LOWORD(xy) + LOWORD(wh)) && rect.bottom > (HIWORD(xy) + HIWORD(wh)) ) {
+			x = LOWORD(xy);
+			y = HIWORD(xy);
+		}
+	}
+#endif
+}
+
+bool ddpCreateWnd(void) {
+	return ddpResetWindow();
 }
 
 LOGICAL ddpUpdate()
 {
-#ifdef DONT_USE
-	if (!state)
-	{
-		Write_Debug("State is wrong");
-		return FALSE;
-	}
-#else
 	if (!focus)
 	{
 		std::this_thread::yield();
 	}
-#endif
 
 	if (!IsWindow(myhwnd))
 	{
@@ -714,7 +796,7 @@ LOGICAL ddpUpdate()
 	UpdateTimes();
 
 	if(cursorvisible)
-		SetCursor(wndClass.hCursor);
+		SetCursor(cursor);
 
 	// Member draw function
 	if (!ddpDraw())
@@ -767,10 +849,6 @@ LOGICAL ddpFlip()
 {
 	if (myhdc && myhrc)
 	{
-		// Flush drawing commands
-#if(0)
-		glFlush();
-#endif
 		// Flip the buffers
 		SwapBuffers(myhdc);
 	}
@@ -798,48 +876,9 @@ LOGICAL ddpFlip()
 	return TRUE;
 }
 
-LOGICAL ddpGetDDRect(RECT* rect)
-{
-	if (myhwnd == nullptr ||
-		rect == nullptr)
-	{
-		return FALSE;
-	}
-
-	GetClientRect(myhwnd, (RECT*)rect);
-	ClientToScreen(myhwnd, (LPPOINT)&rect->left);
-	ClientToScreen(myhwnd, (LPPOINT)&rect->right);
-
-	return TRUE;
-}
-
-LOGICAL ddpLockBackbuffer(BYTE** pbyte)
-{
-	//// FIXME
-	return FALSE;
-}
-
-void ddpUnlockBackbuffer()
-{
-}
-
-LPVOID ddpGetBackbuffer()
-{
-	//// FIXME
-	return(nullptr);
-}
-
-LOGICAL ddpGetBackbufferSurface(void** lpdds)
-{
-	//// FIXME
-	return FALSE;
-}
-
 LOGICAL ddpDraw()
 {
-static SINT8	txt[64]="", ssz[64]="";
-LOGICAL		retval=TRUE;
-RECT		rect;
+	LOGICAL retval = TRUE;
 
 	if (ddrenderfunc != nullptr)
 	{
@@ -854,32 +893,6 @@ RECT		rect;
 		if (!d3drenderfunc())
 		{
 			retval = FALSE;
-		}
-	}
-
-	if (show)
-	{
-		if (flags & DDWND_FULLSCREEN)
-		{
-			rect.top = rect.left = 0;
-			rect.right = WantedWidth;
-			rect.bottom = WantedHeight;
-		}
-		else
-		{
-			GetClientRect(myhwnd, &rect);
-		}
-
-		if ((framecount % 60) == 0)
-		{
-		float           fps;
-
-			strprintf(ssz, "%dx%d", rect.right - rect.left, rect.bottom - rect.top);
-			fps = ddpGetFPS();
-			if (fps)
-			{
-				strprintf(txt,"%6.3f fps", fps);
-			}
 		}
 	}
 
@@ -979,19 +992,12 @@ void ddpCapture()
 	capture += 1;
 }
 
-SINT32 ddpGetWidth()
-{
-	return(WantedWidth);
+SINT32 ddpGetWidth() {
+	return WantedWidth;
 }
 
-SINT32 ddpGetHeight()
-{
-	return(WantedHeight);
-}
-
-SINT32 ddpGetBPP()
-{
-	return(WantedBpp);
+SINT32 ddpGetHeight() {
+	return WantedHeight;
 }
 
 LOGICAL ddpSetDDInit(DDWND_DDINITFUNC newfunc)
@@ -1049,6 +1055,11 @@ LOGICAL ddpSetKeyboard(DDWND_KEYBOARDFUNC newfunc)
 }
 
 
+GLuint ddpDefaultFramebuffer(void) {
+	return default_framebuffer;
+}
+
+
 // Detached thread
 UINT32 ddpEngine(LPVOID dummy)
 {
@@ -1074,7 +1085,7 @@ LOGICAL		retval, *running;
 	ddpSetD3DRender(gmlpMainUpdate);
 	ddpSetD3DKill(piKill);
 
-	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, nullptr))
+	if (!ddpCreateWnd())
 	{
 		ddpKill();
 		return(0);
@@ -1131,12 +1142,8 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	{
 	case WM_CREATE:
 	{
+		// TODO: Save position/size info?
 		myhwnd = hwnd;
-		if (!Create(hwnd))
-		{
-			return(-1);
-		}
-
 		break;
 	}
 	case WM_DESTROY:
@@ -1167,7 +1174,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_SETFOCUS:
 	{
 		OnSetFocus((HWND) wParam);
-        ClipCursor(&gamerect);
+        ClipCursor(&renderrect);
 		break;
 	}
 	case WM_KILLFOCUS:
@@ -1183,20 +1190,17 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	}
 	case WM_MOVE:
 	{
-	DWORD	xy, wh;
-	RECT	rect;
-
-		if (!(flags & DDWND_FULLSCREEN))
+		if (IsWindowVisible(hwnd))
 		{
-			if (IsWindowVisible(hwnd))
-			{
-				GetClientRect(hwnd, &rect);
-				ClientToScreen(hwnd, (LPPOINT)&rect);
-				xy = MAKELONG(rect.left, rect.top);
-				sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, xy);
-				wh = MAKELONG(rect.right, rect.bottom);
-				sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, wh);
-			}
+			RECT rect;
+			GetClientRect(hwnd, &rect);
+			ClientToScreen(hwnd, (LPPOINT)&rect);
+			// We save this stuff to the registry since it isn't too important.
+			// TODO: Make sure our window is still on the screen.
+			DWORD xy = MAKELONG(rect.left, rect.top);
+			sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, xy);
+			DWORD wh = MAKELONG(rect.right, rect.bottom);
+			sysregSetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, wh);
 		}
 		break;
 	}
@@ -1291,35 +1295,17 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	}
 	case WM_EXITSIZEMOVE:
 	{
-	RECT  rect;
-
-		if (!state)
+		if ( ! state )
 			state = true;
-
-		GetClientRect(myhwnd, &rect);
-		if (ddpGetWidth() != rect.right ||
-			ddpGetHeight() != rect.bottom)
-		{
-			  Destroy();
-			  if (!Create(hwnd))
-			  {
-				  Write_Debug("An error was encountered in WM_EXITSIZEMOVE");
-				  PostMessageA(hwnd, WM_CLOSE, 0, 0);
-			  }
-		}
-
 		dipAcquire();
 		Write_Debug("WM_EXITSIZEMOVE");
 		break;
 	}
 	case WM_DISPLAYCHANGE:
 	{
-		if (!(flags & DDWND_FULLSCREEN))
-		{
-			WantedBpp = wParam;
-			if (!state)
-				state = true;
-		}
+		WantedBpp = wParam;
+		if ( !state )
+			state = true;
 
 		Write_Debug("WM_DISPLAYCHANGE");
 		break;
@@ -1396,32 +1382,6 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	return(DefWindowProc(hwnd, umsg, wParam, lParam));
 }
 
-static bool Create(HWND hwnd)
-{
-	RECT rect;
-
-	if (hwnd == nullptr)
-		return true;
-
-	GetClientRect(hwnd, &rect);
-
-	WantedWidth = rect.right - rect.left;
-	WantedHeight = rect.bottom - rect.top;
-
-	Write_Debug("Create - x=%d, y=%d, w=%d, h=%d, bpp=%d", rect.left, rect.top, WantedWidth, WantedHeight, WantedBpp);
-
-	running = TRUE;
-
-	InvalidateRect(hwnd, nullptr, FALSE);
-
-	ddpResetFPS();
-	//lastframetime = frametime = timeGetTime();
-
-	Write_Debug("Completed Create");
-
-	return true;
-}
-
 static void Destroy()
 {
 	if (running)
@@ -1471,13 +1431,9 @@ static void _OnPaint()
 
 static void OnSetFocus(HWND pOldWnd)
 {
-	if (!(flags & DDWND_FULLSCREEN))
-	{
-		if (!dna)
-		{
-			if (!state)
-				state = true;
-		}
+	if ( !dna ) {
+		if ( !state )
+			state = true;
 	}
 
 	focus = true;
@@ -1489,13 +1445,9 @@ static void OnSetFocus(HWND pOldWnd)
 
 static void OnKillFocus(HWND pNewWnd)
 {
-	if (!(flags & DDWND_FULLSCREEN))
-	{
-		if (!dna)
-		{
-			if (state)
-				state = false;
-		}
+	if ( !dna ) {
+		if ( state )
+			state = false;
 	}
 
 	focus = false;
@@ -1505,52 +1457,37 @@ static void OnKillFocus(HWND pNewWnd)
 	Write_Debug("OnKillFocus");
 }
 
-static void OnSize(UINT nType, int cx, int cy)
-{
-	if ((WantedWidth != cx || WantedHeight != cy) &&
-		(cx != 0 && cy != 0))
-	{
-		if (flags & DDWND_FULLSCREEN)
-		{
-			oglEnd();
-
-			ddpResetDisplay();
-			Sleep(1000);
-			ddpSetDisplay(flags);
-
-			if (!oglBegin(myhwnd))
-			{
-				PostQuitMessage(0);
-			}
-		}
-		else
-		{
-			WantedWidth = cx;
-			WantedHeight = cy;
-		}
-
-		oglResize(WantedWidth, WantedHeight);
-	}
-
+static void OnSize(UINT nType, int cx, int cy) {
 	Write_Debug("OnSize: x=%d, y=%d", cx, cy);
+
+	if ( cx <= 0 || cy <= 0 )
+		return;
+
+	if ( window_mode == WINDOWED ) {
+		// TODO: Force aspect ratio
+		if ( ddpGetWidth() != cx || ddpGetHeight() != cy ) {
+			oglResize(cx, cy);
+		}
+
+		// Save the new config
+		if ( (WantedWidth != cx || WantedHeight != cy) && (cx != 0 && cy != 0) ) {
+			WantedWidth = cx;
+			WantedWidth = cy;
+		}
+	} else {
+		// TODO: Fullscreen/borderless
+	}
 }
 
 static LOGICAL OnNcActivate(LOGICAL bActive)
 {
-	if (!(flags & DDWND_FULLSCREEN))
-	{
-		if (bActive)
-		{
-			if (!state)
-				state = true;
-		}
-		else
-		{
-			if (!dna)
-			{
-				if (state)
-					state = false;
-			}
+	if ( bActive ) {
+		if ( !state )
+			state = true;
+	} else {
+		if ( !dna ) {
+			if ( state )
+				state = false;
 		}
 	}
 
@@ -1576,13 +1513,9 @@ static LOGICAL OnNcActivate(LOGICAL bActive)
 
 static void OnSysKeyDown(UINT nChar, UINT nFlags)
 {
-	if (!(flags & DDWND_FULLSCREEN))
-	{
-		if (!dna)
-		{
-			if (state)
-				state = false;
-		}
+	if ( !dna ) {
+		if ( state )
+			state = false;
 	}
 
 	Write_Debug("OnSysKeyDown: 0x%x", nChar);
@@ -1590,363 +1523,12 @@ static void OnSysKeyDown(UINT nChar, UINT nFlags)
 
 static void OnSysKeyUp(UINT nChar, UINT nFlags)
 {
-	if (!(flags & DDWND_FULLSCREEN))
-	{
-		if (!dna)
-		{
-			if (!state)
-				state = true;
-		}
+	if ( !dna ) {
+		if ( !state )
+			state = true;
 	}
 
 	Write_Debug("OnSysKeyUp: 0x%x", nChar);
-}
-
-LOGICAL ddpChooseScreenFormat(HDC hdc, PIXELFORMATDESCRIPTOR* pfd)
-{
-SINT32					i, pixelformat, depth, accum, stencil;
-
-	memset(pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
-
-	pfd->nSize				= sizeof(PIXELFORMATDESCRIPTOR);
-	pfd->nVersion			= 1;
-	pfd->dwFlags			= PFD_DRAW_TO_WINDOW|PFD_SUPPORT_OPENGL|PFD_DOUBLEBUFFER;
-	pfd->iPixelType			= PFD_TYPE_RGBA;
-	pfd->cColorBits			= WantedBpp;
-	pfd->cRedBits			= 0;
-	pfd->cRedShift			= 0;
-	pfd->cGreenBits			= 0;
-	pfd->cGreenShift		= 0;
-	pfd->cBlueBits			= 0;
-	pfd->cBlueShift			= 0;
-	pfd->cAlphaBits			= 0;
-	pfd->cAlphaShift		= 0;
-	pfd->cAccumBits			= 0;
-	pfd->cAccumRedBits		= 0;
-	pfd->cAccumGreenBits	= 0;
-	pfd->cAccumBlueBits		= 0;
-	pfd->cAccumAlphaBits	= 0;
-	pfd->cDepthBits			= 32;
-	pfd->cStencilBits		= 8;
-	pfd->cAuxBuffers		= 0;
-	pfd->iLayerType			= PFD_MAIN_PLANE;
-	pfd->bReserved			= 0;
-	pfd->dwLayerMask		= 0;
-	pfd->dwVisibleMask		= 0;
-	pfd->dwDamageMask		= 0;
-
-	pixelformat = ChoosePixelFormat(hdc, pfd);
-	if (pixelformat == 0)
-	{
-		Write_Debug("Unable to choose a compatible pixel format");
-		return FALSE;
-	}
-
-	Write_Debug("ChoosePixelFormat recommended #%d", pixelformat);
-
-	depth = 24;
-	accum = 0;
-	stencil = 8;
-	for (i=1;; i++)
-	{
-		if (!DescribePixelFormat(hdc, i, sizeof(PIXELFORMATDESCRIPTOR), pfd))
-		{
-			Write_Debug("There were %d pixel formats", i - 1);
-			break;
-		}
-
-#ifdef DDP_EVENT_LOG
-		Write_Debug(" Format #%2d,"
-					" Version=%d,"
-					" Flags=0x%04x,"
-					" PixelType=%s,"
-					" ColorBits=%2d,"
-					" R=%d,"
-					" G=%d,"
-					" B=%d,"
-					" A=%d,"
-					" AccumBits=%2d,"
-					" R=%2d,"
-					" G=%2d,"
-					" B=%2d,"
-					" A=%2d,"
-					" DepthBits=%2d,"
-					" StencilBits=%2d",
-					i,
-					pfd->nVersion,
-					pfd->dwFlags,
-					pfd->iPixelType == PFD_TYPE_RGBA ? "RGB" : "Pal",
-					pfd->cColorBits,
-					pfd->cRedBits,
-					pfd->cGreenBits,
-					pfd->cBlueBits,
-					pfd->cAlphaBits,
-					pfd->cAccumBits,
-					pfd->cAccumRedBits,
-					pfd->cAccumGreenBits,
-					pfd->cAccumBlueBits,
-					pfd->cAccumAlphaBits,
-					pfd->cDepthBits,
-					pfd->cStencilBits);
-#endif	// DDP_EVENT_LOG
-
-#ifdef DDP_EVENT_LOG_EXTREME
-		// Just show all the flags that are set
-		if (pfd->dwFlags & PFD_SUPPORT_DIRECTDRAW)
-		{
-			Write_Debug(" Supports DirectDraw");
-		}
-
-		if (pfd->dwFlags & PFD_GENERIC_ACCELERATED)
-		{
-			Write_Debug(" Hardware accelerated");
-		}
-
-		if (pfd->dwFlags & PFD_SWAP_LAYER_BUFFERS)
-		{
-			Write_Debug(" Swap layer buffers");
-		}
-
-		if (pfd->dwFlags & PFD_SWAP_COPY)
-		{
-			Write_Debug(" Swap Copy");
-		}
-
-		if (pfd->dwFlags & PFD_SWAP_EXCHANGE)
-		{
-			Write_Debug(" Swap exchange");
-		}
-
-		if (pfd->dwFlags & PFD_NEED_SYSTEM_PALETTE)
-		{
-			Write_Debug(" Need system palette");
-		}
-
-		if (pfd->dwFlags & PFD_NEED_PALETTE)
-		{
-			Write_Debug(" Need palette");
-		}
-
-		if (pfd->dwFlags & PFD_GENERIC_FORMAT)
-		{
-			Write_Debug(" Generic format (unaccelerated software)");
-		}
-
-		if (pfd->dwFlags & PFD_SUPPORT_OPENGL)
-		{
-			Write_Debug(" Supports OpenGL");
-		}
-
-		if (pfd->dwFlags & PFD_SUPPORT_GDI)
-		{
-			Write_Debug(" Supports GDI");
-		}
-
-		if (pfd->dwFlags & PFD_DRAW_TO_BITMAP)
-		{
-			Write_Debug(" Can draw to bitmap");
-		}
-
-		if (pfd->dwFlags & PFD_DRAW_TO_WINDOW)
-		{
-			Write_Debug(" Can draw to window");
-		}
-
-		if (pfd->dwFlags & PFD_STEREO)
-		{
-			Write_Debug(" Supports stereoscopic display");
-		}
-
-		if (pfd->dwFlags & PFD_DOUBLEBUFFER)
-		{
-			Write_Debug(" Double buffered");
-		}
-#endif	// DDP_EVENT_LOG_EXTREME
-
-		if ((WantedWindow ? (pfd->dwFlags & PFD_DRAW_TO_WINDOW) : TRUE) &&
-			(pfd->dwFlags & PFD_SUPPORT_OPENGL) &&
-			(pfd->dwFlags & PFD_DOUBLEBUFFER) &&
-			!(pfd->dwFlags & PFD_GENERIC_FORMAT) &&
-			pfd->iLayerType == PFD_MAIN_PLANE &&
-			//pfd->iPixelType == PFD_TYPE_RGBA &&
-			pfd->cDepthBits >= depth &&		// Largest bit depth
-		//	pfd->cAccumBits >= accum &&		// Largest accumulators
-			pfd->cStencilBits >= stencil &&	// Largest stencil buffer
-			pfd->cColorBits == WantedBpp)
-		{
-			depth = pfd->cDepthBits;
-			accum = pfd->cAccumBits;
-			stencil = pfd->cStencilBits;
-			pixelformat = i;
-		}
-	}
-
-	Write_Debug("Deduced pixel format was #%d", pixelformat);
-
-	// Set the pixel format selected
-	if (!SetPixelFormat(hdc, pixelformat, pfd))
-	{
-		Write_Debug("Unable to set the desired pixel format");
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
-LOGICAL ddpSetDisplay(UINT32 flags)
-{
-LOGICAL			found;
-UINT32			retval;
-DEVMODE			testmode, presentmode;
-
-	if (flags & DDWND_FULLSCREEN)
-	{
-		found = FALSE;
-		displaynum = 0;
-		displaydevice.cb = sizeof(DISPLAY_DEVICE);
-		do
-		{
-			if (!EnumDisplayDevices(nullptr, displaynum, &displaydevice, 0))
-			{
-				break;
-			}
-
-			if (displaydevice.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE)
-			{
-				found = TRUE;
-				break;
-			}
-
-			displaynum += 1;
-		}
-		while (TRUE);
-
-		if (found)
-		{
-			Write_Debug("Found desktop display device");
-		}
-
-		EnumDisplaySettings(displaydevice.DeviceName, ENUM_CURRENT_SETTINGS, &presentmode);
-		Write_Debug("Present mode: w=%d, h=%d, bpp=%d, ref=%d",
-			presentmode.dmPelsWidth,
-			presentmode.dmPelsHeight,
-			presentmode.dmBitsPerPel,
-			presentmode.dmDisplayFrequency);
-
-		found = FALSE;
-		modenum = 0;
-		Write_Debug("Enumerated modes:");
-		do
-		{
-			if (!EnumDisplaySettings(displaydevice.DeviceName, modenum, &devmode))
-			{
-				break;
-			}
-
-			Write_Debug("                  w=%d, h=%d, bpp=%d, ref=%d",
-				devmode.dmPelsWidth,
-				devmode.dmPelsHeight,
-				devmode.dmBitsPerPel,
-				devmode.dmDisplayFrequency);
-
-			if (devmode.dmBitsPerPel == (UINT32)WantedBpp &&
-				devmode.dmPelsWidth == (UINT32)WantedWidth &&
-				devmode.dmPelsHeight == (UINT32)WantedHeight &&
-				devmode.dmDisplayOrientation == 0)
-			{
-				found = TRUE;
-				break;
-			}
-
-			modenum += 1;
-		}
-		while (TRUE);
-
-		if (!found)
-		{
-			Write_Debug("No compatible display mode exists");
-			return FALSE;
-		}
-
-		modenum += 1;
-		do
-		{
-			if (!EnumDisplaySettings(displaydevice.DeviceName, modenum, &testmode))
-			{
-				break;
-			}
-
-			Write_Debug("                  w=%d, h=%d, bpp=%d, ref=%d",
-				testmode.dmPelsWidth,
-				testmode.dmPelsHeight,
-				testmode.dmBitsPerPel,
-				testmode.dmDisplayFrequency);
-
-			if (testmode.dmBitsPerPel == (UINT32)WantedBpp &&
-				testmode.dmPelsWidth == (UINT32)WantedWidth &&
-				testmode.dmPelsHeight == (UINT32)WantedHeight &&
-				testmode.dmDisplayOrientation == 0 &&
-				testmode.dmDisplayFrequency <= presentmode.dmDisplayFrequency &&
-				(testmode.dmDisplayFrequency == 0 ||
-				(abs((int)testmode.dmDisplayFrequency - (int)presentmode.dmDisplayFrequency) <=
-				abs((int)devmode.dmDisplayFrequency - (int)presentmode.dmDisplayFrequency))))
-			{
-				devmode = testmode;
-				found = TRUE;
-			}
-
-			modenum += 1;
-		}
-		while (TRUE);
-
-		if (!found)
-		{
-			Write_Debug("No compatible display mode exists");
-			return FALSE;
-		}
-
-		retval = ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, nullptr, CDS_TEST, nullptr);
-		switch (retval)
-		{
-		case DISP_CHANGE_BADFLAGS:
-			Write_Debug("DISP_CHANGE_BADFLAGS");
-			break;
-		case DISP_CHANGE_BADMODE:
-			Write_Debug("DISP_CHANGE_BADMODE");
-			break;
-		case DISP_CHANGE_BADPARAM:
-			Write_Debug("DISP_CHANGE_BADPARAM");
-			break;
-		case DISP_CHANGE_FAILED:
-			Write_Debug("DISP_CHANGE_FAILED");
-			break;
-		case DISP_CHANGE_NOTUPDATED:
-			Write_Debug("DISP_CHANGE_NOTUPDATED");
-			break;
-		case DISP_CHANGE_RESTART:
-			Write_Debug("DISP_CHANGE_RESTART");
-			break;
-		case DISP_CHANGE_SUCCESSFUL:
-			Write_Debug("DISP_CHANGE_SUCCESSFUL");
-			ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, nullptr, CDS_FULLSCREEN, nullptr);
-
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	return TRUE;
-}
-
-void ddpResetDisplay()
-{
-	ChangeDisplaySettingsEx(displaydevice.DeviceName, nullptr, nullptr, 0, nullptr);
-}
-
-LOGICAL ddpDrawToScreen(LPVOID lpdds)
-{
-	return TRUE;
 }
 
 DWORD GetMillisecondTick()
@@ -2097,12 +1679,12 @@ static void glScreenCapture(void) {
 		filename = base_filename + topathstr(shotCount++) + PATHLit(".bmp");
 	} while ( checkfile(filename.c_str(), 0) == 0 );
 
-	UCHAR* bitmap = (UCHAR*)memAlloc(WantedWidth * WantedHeight * 3);
+	UCHAR* bitmap = (UCHAR*)memAlloc(ddpGetWidth() * ddpGetHeight()* 3);
 	if ( bitmap == nullptr )
 		return;
-	glReadPixels(0, 0, WantedWidth, WantedHeight, GL_RGB, GL_UNSIGNED_BYTE, bitmap);
+	glReadPixels(0, 0, ddpGetWidth(), ddpGetHeight(), GL_RGB, GL_UNSIGNED_BYTE, bitmap);
 	// Cap save will release the bitmap memory.
-	capSave(bitmap, WantedWidth, WantedHeight, filename.c_str());
+	capSave(bitmap, ddpGetWidth(), ddpGetHeight(), filename.c_str());
 
 	#undef topathstr
 	#undef checkfile
@@ -2120,7 +1702,7 @@ void ddpShowCursor()
 	int count = ShowCursor(TRUE);
 	while(count <= 1)
 			count = ShowCursor(TRUE);
-	SetCursor(wndClass.hCursor);
+	SetCursor(cursor);
 	cursorvisible = 1;
 }
 

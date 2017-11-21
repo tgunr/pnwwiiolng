@@ -905,6 +905,11 @@ JS_FUNCTION_DEF(jsMapView, addwaypoint)
 		wptype = WPT_ENEMY;
 		subtype = WTP_ENEMY_DANGER;
 	}
+    else if(!strcmp(type, "ppo"))
+    {
+        wptype = WPT_ENEMY;
+        subtype = WTP_ENEMY_PPO;
+    }
 	else if(!strcmp(type, "unknown"))
 	{
 		wptype = WPT_ENEMY;

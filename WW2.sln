@@ -858,8 +858,8 @@ Global
 		{A8A11857-FC60-44B2-B8B0-E1487568CEB2}.AlphaRelease|Win32.Build.0 = Release|Win32
 		{A8A11857-FC60-44B2-B8B0-E1487568CEB2}.AlphaRelease|x64.ActiveCfg = Release|Win32
 		{A8A11857-FC60-44B2-B8B0-E1487568CEB2}.AlphaRelease|x64.Build.0 = Release|Win32
-		{A8A11857-FC60-44B2-B8B0-E1487568CEB2}.BetaRelease|Win32.ActiveCfg = Release|Win32
-		{A8A11857-FC60-44B2-B8B0-E1487568CEB2}.BetaRelease|Win32.Build.0 = Release|Win32
+		{A8A11857-FC60-44B2-B8B0-E1487568CEB2}.BetaRelease|Win32.ActiveCfg = BetaRelease|Win32
+		{A8A11857-FC60-44B2-B8B0-E1487568CEB2}.BetaRelease|Win32.Build.0 = BetaRelease|Win32
 		{A8A11857-FC60-44B2-B8B0-E1487568CEB2}.BetaRelease|x64.ActiveCfg = Release|Win32
 		{A8A11857-FC60-44B2-B8B0-E1487568CEB2}.BetaRelease|x64.Build.0 = Release|Win32
 		{A8A11857-FC60-44B2-B8B0-E1487568CEB2}.Buzzard|Win32.ActiveCfg = Release|Win32

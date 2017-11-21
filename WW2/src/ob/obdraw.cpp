@@ -1717,7 +1717,7 @@ static bool _initSceneFBO()
 {
     _sceneFBO = new FrameBufferObject;
 
-    if(oglCanUseTexture2D(WantedWidth, WantedHeight))
+    if(oglCanUseTexture2D(ddpGetWidth(), ddpGetHeight()))
     {
         Texture2D* tex = new Texture2D;
 
@@ -1726,14 +1726,14 @@ static bool _initSceneFBO()
         tex->setInternalFormat(GL_RGBA);
         tex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
         tex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
-        tex->setTextureHeight(WantedHeight);
-        tex->setTextureWidth(WantedWidth);
+        tex->setTextureHeight(ddpGetHeight());
+        tex->setTextureWidth(ddpGetWidth());
 
         _sceneRTT = tex;
 
         tex = new Texture2D;
 
-        tex->setTextureSize(WantedWidth, WantedHeight);
+        tex->setTextureSize(ddpGetWidth(), ddpGetHeight());
         tex->setInternalFormat(GL_DEPTH_COMPONENT32F);
         tex->setSourceFormat(GL_DEPTH_COMPONENT);
         tex->setSourceType(GL_FLOAT);
@@ -1772,14 +1772,14 @@ static bool _initSceneFBO()
         tex->setInternalFormat(GL_RGBA8);
         tex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
         tex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
-        tex->setTextureHeight(WantedHeight);
-        tex->setTextureWidth(WantedWidth);
+        tex->setTextureHeight(ddpGetHeight());
+        tex->setTextureWidth(ddpGetWidth());
 
         _sceneRTT = tex;
 
         tex = new TextureRectangle;
 
-        tex->setTextureSize(WantedWidth, WantedHeight);
+        tex->setTextureSize(ddpGetWidth(), ddpGetHeight());
         tex->setInternalFormat(GL_DEPTH_COMPONENT32F);
         tex->setSourceFormat(GL_DEPTH_COMPONENT);
         tex->setSourceType(GL_FLOAT);
@@ -1813,11 +1813,11 @@ static bool _initSceneFBO()
     {
         int samples = 16;
 
-        RenderBuffer* rb1 = new RenderBuffer(WantedWidth, WantedHeight, GL_RGBA, samples);
+        RenderBuffer* rb1 = new RenderBuffer(ddpGetWidth(), ddpGetHeight(), GL_RGBA, samples);
         FrameBufferAttachment* fba1 = new FrameBufferAttachment(rb1);
         _sceneFBO->setAttachment(FrameBufferObject::COLOR_BUFFER, *fba1);
 
-        RenderBuffer* rb2 = new RenderBuffer(WantedWidth, WantedHeight, GL_DEPTH_COMPONENT32F, samples);
+        RenderBuffer* rb2 = new RenderBuffer(ddpGetWidth(), ddpGetHeight(), GL_DEPTH_COMPONENT32F, samples);
         FrameBufferAttachment* fba2 = new FrameBufferAttachment(rb2);
         _sceneFBO->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba2);
     }
@@ -2170,7 +2170,7 @@ void _renderWaterRefractions()
 
     g_wantNormalMaps = normalhistory;
 
-    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, 0);
+    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, ddpDefaultFramebuffer());
     oglSetViewport(0, 0, piGetWidth(), piGetHeight());
 #endif
 }
@@ -4965,12 +4965,12 @@ LOGICAL _drawDeprecatedPath()
             _sceneFBO->Blit(_resolveSceneFBO.get(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             GL_DEPTH_BUFFER_BIT,
                             GL_NEAREST);
         }
@@ -4994,12 +4994,12 @@ LOGICAL _drawDeprecatedPath()
             _sceneFBO->Blit(_resolveSceneFBO.get(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             GL_COLOR_BUFFER_BIT,
                             GL_NEAREST);
         }
@@ -5538,7 +5538,6 @@ LOGICAL obdrawProcessLODCallback(OBJECT* lplod, UINT32 user,piVECTOR* InPos,
 FLOAT32		distsqr;
 FLOAT32		maxlod;
 piVECTOR	pp, pos;
-//piMATRIX	mat;
 OBJECT * 	lplodtopobject;
 FLOAT32		ratio;
 
@@ -5562,48 +5561,12 @@ FLOAT32		ratio;
 		}
 	}
 
-//	pos = lplod->pos;
-/*
-	if (lplodtopobject->flags & OBJECT_USEMATRIX)
-	{
-		// Rotate/Translate position to object space
-		math3dInvertMatrix(&mat, &lplodtopobject->mat);
-		math3dVectorMultiply(&pp, &pp, &mat);
-	}
-	else
-	{
-		if (lplod->flags & OBJECT_USEMATRIX)
-		{
-			// Rotate/Translate position to object space
-			math3dInvertMatrix(&mat, &lplod->mat);
-			math3dVectorMultiply(&pp, &pp, &mat);
-		}
-	}
-*/
-/*
-	if (lplodtopobject->flags & OBJECT_USEMATRIX)
-	{
-		math3dVectorMultiply(&pos,&pos,&lplodtopobject->mat);
-	}
-	else
-	{
-		if (lplod->flags & OBJECT_USEMATRIX)
-		{
-			math3dVectorMultiply(&pos,&pos,&lplod->mat);
-		}
-	}
-*/
 	pos = *InPos;
 
 	math3dSubtractVectors(&pp, &pp, &pos);
 
-	// z axis only applies at 1/2 value, so that planes in the air don't lose
-	// complete vis on the object beyond horizon distance in the z axis
-//	pp.z *= 0.5;
-
 	// factor in field of view, assuming that 90 degree FOV results in normal LOD
 	// cos of 45 degrees = 0.0707106781
-//	ratio =  (0.5f / 0.707106781f) / (FLOAT32)cos(FieldOfView * PI / 180.0 * 0.5);
 	if (LODFieldOfView == TRUE)
 	{
 		if (rnvisVectorFOVCheck(&pos,Radius) == TRUE)
@@ -5618,15 +5581,20 @@ FLOAT32		ratio;
 		math3dScaleVector(&pp,&pp,ratio);
 	}
 
-	// we're disabling this for the time being due to ground objects
-	// popping in/out
-//	math3dScaleVector(&pp, &pp, InvFrameFactor);
-
 #ifndef VEHICLE_OBJECT_ANALYSIS // for artists to test LOD's in-game with external dropped camera
 	if (lplod->flag2 & OBJECT_USERVEHICLE)
 	{
 		distsqr = 1.0f;
 	}
+#ifdef BETA_RELEASE
+    else if (lplod->flag2 & OBJECT_IS_PARTOF_VEHICLE)
+    {
+        OBJECT *lpObj = lplod->modelInstance->rootObject;
+        while (lpObj->child)
+            lpObj = lpObj->child;
+        distsqr = lpObj->distsqr * 100.0f;
+    }
+#endif
 	else
 #endif
 	{
@@ -5634,17 +5602,8 @@ FLOAT32		ratio;
 	}
 
 	maxlod = lplod->maxlod;
-/*
-    FLOAT32 horizon = 0.0f;
-    trnmainGetHorizon(&horizon);
 
-	if (maxlod > horizon * horizon)
-	{
-		maxlod = piLongLikeFloat(FogEnd) + 800.0f;
-		maxlod *= maxlod;
-	}
-*/
-	if (distsqr >= lplod->minlod &&
+    if (distsqr >= lplod->minlod &&
 		distsqr < maxlod)
 	{
 		if (lplodtopobject->flags & OBJECT_SKIPDRAWING)

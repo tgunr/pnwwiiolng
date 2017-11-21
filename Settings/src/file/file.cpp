@@ -66,10 +66,12 @@ void fileInit()
 
 	const TCHAR* base = registryInstallValue(_T("Version"));
 	
-	if(base)
-	{
+	if(base) {
 		lstrcat(UserDataPath, _T("\\"));
 		lstrcat(UserDataPath, base);
+	} else {
+		lstrcat(UserDataPath, _T("\\"));
+		lstrcat(UserDataPath, _T("Battleground Europe"));
 	}
 #endif // GREEN_INSTALL
 }

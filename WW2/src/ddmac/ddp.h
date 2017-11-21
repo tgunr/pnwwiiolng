@@ -31,6 +31,7 @@ int     ddpGetCenterY();
 UINT32	ddpGetClockTime(UINT32 * Time);
 UINT32	ddpGetTotTime(UINT32 * TotTime);
 
+GLuint ddpDefaultFramebuffer(void);
 void	ddpSetupGL(int w, int h);
 void 	ddpShowCursor();
 void 	ddpHideCursor();

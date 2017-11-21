@@ -1215,7 +1215,7 @@ void uiMapAddLayer(SuperCellMapView* mapview, xmlNode* node)
 			cr->animFlagIcons[WWII_FRANCE]		= uiGetTexture("ui/uidata/icons/brigade/frenbat-anim.bmp");
 			cr->animFlagIcons[WWII_GERMANY]		= uiGetTexture("ui/uidata/icons/brigade/germbat-anim.bmp");
 
-			cr->iconsize = 32 * WantedHeight / 768.0f;
+			cr->iconsize = 32 * ddpGetHeight() / 768.0f;
 			cr->cpupdateonclick = Online;
 			cr->tooltip = uiLocString;
 

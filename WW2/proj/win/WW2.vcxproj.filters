@@ -211,9 +211,6 @@
     <ClInclude Include="..\..\src\cfg\cfgData.h">
       <Filter>cfg</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\cfg\cfgLoad.h">
-      <Filter>cfg</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\cfg\cfgLua.h">
       <Filter>cfg</Filter>
     </ClInclude>
@@ -1668,9 +1665,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
-      <Filter>cfg</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\cfg\cfgLoad.cpp">
       <Filter>cfg</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\cfg\cfgLua.cpp">
