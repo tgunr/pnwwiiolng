@@ -104,6 +104,6 @@ public:
 
 	FULL_OBJ_ID				exitFacility;
 	FULL_OBJ_ID				m_fpsBuildingID;
-        SINT32                          	m_exitTeulIndex;
+	SINT32                          	m_exitTeulIndex;
 };
 

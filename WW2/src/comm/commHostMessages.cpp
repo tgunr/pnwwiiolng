@@ -1042,8 +1042,8 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 	}
 
 	if ( shooter->m_hasExited && (shooter->m_exitTeulIndex == 0 || shooter->m_exitTeulIndex != shooter->teulIndex()))
-        {
-                shooter->m_exitTeulIndex = shooter->teulIndex();
+	{
+		shooter->m_exitTeulIndex = shooter->teulIndex();
 
 		dbugLog(_FLM, "t:%d p:%u c:%s discarded damage messages: vehicle is exiting"
 						, shooter->teulIndex(), shooter->playerID(), shooter->vehicle->callsign());
