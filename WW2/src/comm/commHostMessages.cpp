@@ -127,7 +127,7 @@ _badPlayer(Player& player, const SCHAR* problem, bool alert)
 	if ( alert )
 		chatSendKickNotice(player.playerID(), callsign, problem);
 
-	commSendPlayerExit(player.teulIndex(), PDEST_EXIT, PEXIT_DEAD, nullObjID);
+	commSendPlayerExit(player.teulIndex(), PDEST_EXIT, PEXIT_BAD_CONNECTION, nullObjID);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -139,7 +139,7 @@ commForcePlayerExit(Player& player, const char* reason, bool alert)
 	if ( player.m_timeToLive == 0 )
 	{
 		_badPlayer(player, reason, alert);
-		player.m_timeToLive = 100 + (rand() % 100);
+		player.m_timeToLive = teulClock64 + 2000;
 	}
 }
 
@@ -551,10 +551,15 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 		return -EINVAL;
 	}
 
-	if ( player->m_hasExited )
+	// check to see if the player is trying to send updates without having properly signed in
+	if ( player->m_hasExited && (player->m_exitTeulIndex == 0 || player->m_exitTeulIndex != player->teulIndex()))
 	{
+		player->m_exitTeulIndex = player->teulIndex();
 		dbugLog(_FLM, "t:%d p:%u c:%s received update from player post-exit (lagged data?)"
 						, teulIndex, player->playerID(), player->callsign());
+
+		// resend the player exit notification
+		commSendPlayerExit(player->teulIndex(), PDEST_EXIT, PEXIT_BAD_CONNECTION, nullObjID);
 		return -EINVAL;
 	}
 
@@ -683,7 +688,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 		if ( player->m_timeToLive == 0 )
 		{
 			dbugLog(_FLW, "*** ILLEGAL CHECKSUM EJECTION for %s %d conn %d - KILLING", player->callsign(), player->playerID(), player->m_numConnects);
-			commForcePlayerExit(*player, "Invalid chient", true);
+			commForcePlayerExit(*player, "Invalid client", true);
 		}
 	}
 
@@ -724,6 +729,74 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 
 	if ( teulPackUINT64(TEUL_UNPACK, message, offset, &player->m_lastTimeRx, 0) > offset )
 		player->m_lastTimeRxed = teulClock64;
+
+	if ( !player->m_hostClientOffset_ms ) 
+	{
+		player->m_hostClientOffset_ms = teulClock64 - player->m_lastTimeRx; 
+		dbugLog(_FLD, "IBD: Initializing hostClient clock offset to %llu where host=%llu and client=%llu", 
+			player->m_hostClientOffset_ms,
+			teulClock64,
+			player->m_lastTimeRx);
+	}
+	else if (!player->m_hasExited && player->m_timeToLive == 0)
+	{
+		// convert client time to host time
+		TeulTimeMS updateHostTime = player->m_lastTimeRx + player->m_hostClientOffset_ms;
+		// form an absolute value difference
+		TeulTimeMS elapsedTime_ms = (teulClock64 > updateHostTime)?(teulClock64 - updateHostTime):(updateHostTime - teulClock64);
+
+		dbugLog(_FLD, "IBD: Client (%s, %d) elapsed time = %llu where host time is %llu, translated client time is %llu, untranslated client time is %llu, with fixed offset of %llu",
+			player->callsign(),
+			player->playerID(),
+			elapsedTime_ms,
+			teulClock64,
+			updateHostTime,
+			player->m_lastTimeRx,
+			player->m_hostClientOffset_ms);
+
+		if (elapsedTime_ms >= static_cast<TeulTimeMS>(host_config.update.accumDelayLimit_ms))
+		{
+
+			// No delay yet recorded
+			if (player->m_ibdTimeReachedMaxAccumDelay == 0)
+			{
+				player->m_ibdTimeReachedMaxAccumDelay = teulClock64;
+				// Player has exceeded our grace delay allottment and most be booted
+				dbugLog(_FLW, "*** IBD: Player's accumulated packet delay exceeded limits (%s %d) : Delay %f seconds, first detection ***", 
+					player->callsign(), 
+					player->playerID(), 
+					static_cast<float>(elapsedTime_ms) / 1000.0);
+			}
+			else
+			{
+				TeulTimeMS heldTime_ms = teulClock64 - player->m_ibdTimeReachedMaxAccumDelay;
+				if (heldTime_ms >= static_cast<TeulTimeMS>(host_config.update.timeAtLimitBeforeKick_s * 1000))
+				{
+					// Player has exceeded our grace delay allottment and most be booted
+					dbugLog(_FLW, "*** IBD: Player's accumulated packet delay exceeded limits (%s %d) : Delay %f seconds, for %f seconds***", 
+						player->callsign(), 
+						player->playerID(), 
+						static_cast<float>(elapsedTime_ms) / 1000.0, 
+						static_cast<float>(heldTime_ms) / 1000.0);
+					commForcePlayerExit(*player, "Slow Client Updates (Outbound)", true);
+				}
+				else
+					dbugLog(_FLD, "*** IBD: Player's accumulated packet delay within hold limits (%s %d) : Delay %f seconds, for %f seconds***", 
+						player->callsign(), 
+						player->playerID(), 
+						static_cast<float>(elapsedTime_ms) / 1000.0, 
+						static_cast<float>(heldTime_ms) / 1000.0);
+			}
+		} 
+		else if (player->m_ibdTimeReachedMaxAccumDelay) 
+		{
+			dbugLog(_FLD, "IBD: Resetting client (%s, %d) time reached maximum packet delay inbound, fell below threshold - currently %f", 
+				player->callsign(),
+				player->playerID(),
+				static_cast<float>(elapsedTime_ms) / 1000.0);
+			player->m_ibdTimeReachedMaxAccumDelay = 0;
+		}
+	}
 
 	return offset;
 }
@@ -968,10 +1041,14 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 		return true;
 	}
 
-	if ( shooter->m_hasExited )
+	if ( shooter->m_hasExited && (shooter->m_exitTeulIndex == 0 || shooter->m_exitTeulIndex != shooter->teulIndex()))
 	{
+		shooter->m_exitTeulIndex = shooter->teulIndex();
+
 		dbugLog(_FLM, "t:%d p:%u c:%s discarded damage messages: vehicle is exiting"
-						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign());
+						, shooter->teulIndex(), shooter->playerID(), shooter->vehicle->callsign());
+		// resend the player exit notification
+		commSendPlayerExit(shooter->teulIndex(), PDEST_EXIT, PEXIT_BAD_CONNECTION, nullObjID);
 		return true;
 	}
 

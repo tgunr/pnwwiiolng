@@ -5619,7 +5619,7 @@ bool _persDeathCamera(piVECTOR* pos, piVECTOR* aim)
 		if(frametime > respawnTime && !uiFindView("despawn"))
 		{
 			SCEN_MGR->SetFlag(ScenarioManager::RESPAWN_ME);
-			vehExitVehicle(1,0,0);
+			vehExitVehicle();
 			v->VehicleDeadTime = frametime - 4000; // make it exit right away
 		}
 	}

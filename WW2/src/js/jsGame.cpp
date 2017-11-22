@@ -862,7 +862,7 @@ JS_FUNCTION_DEF(jsGame, despawn)
 	}
 
 	persSetDeathCamForNextUpdate();
-	vehExitVehicle(1,0,0);
+	vehExitVehicle();
 	return JS_TRUE;
 }
 

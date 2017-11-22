@@ -385,12 +385,8 @@ static SINT32 _packVehicleHead(PackMode mode, UCHAR* const data, SINT32 offset, 
 		HostVehicle* const vehicle = hostFindVehicleLocal(myIndex);
 		if (vehicle == nullptr)
 		{
-#ifdef BETA_RELEASE
-			LogAbort("BAD VEHICLE DATA (claimed %u) offset:%d", myIndex, offset);
-#else
-			dbugLog(_FLA, "Invalid vehicle index: %u", myIndex);
+			dbugLog(_FLA, "BAD VEHICLE DATA (claimed %u) offset:%d", myIndex, offset);
 			return -EINVAL;
-#endif
 		}
 		else
 			vehInfo = vupHeader->vehInfo = &vehicle->vehicleData;

@@ -172,6 +172,8 @@ struct cfUPDATE
 	UCHAR	avoidRepeats;		//!< Try to avoid sending vehicles we haven't received updates for.
 	UCHAR	countingEnabled;	//!< Enable packing counting
 	UCHAR	starvationLimit_s;	//!< Seconds without updates before we kick them
+	UINT16	accumDelayLimit_ms;	//!< Maxium Accumulated Delay allowed before considering a player kick
+	UINT16	timeAtLimitBeforeKick_s;//!< Number of seconds accumulated delay must remain at maximum before player is kicked
 	UCHAR	errorThrottling;	//!< Throttle updates on errors/lag
 	UCHAR	visLimitThrottling;	//!< Whether or not to enable vis limit throttling
 	UCHAR	defaultUM;			//!< Which update framing mode to use by default

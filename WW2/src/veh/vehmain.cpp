@@ -180,6 +180,8 @@ extern Covert<bool> ProtectedOnlineFlag;
 #define MAX_MED_LODS 4
 #define MAX_HI_LODS 1
 
+#define	BAD_CONNECTION_LOC_ID	602
+
 static vehVehicle& getVehicleHead();
 
 static UINT32 _GetNewVehicle(vehVehicle** VehiclePtr);
@@ -2444,7 +2446,7 @@ bool _AirplaneBailout(piVECTOR* pos, piVECTOR* aim)
 				_exited = true;
 
 			if(_exited)
-				vehExitVehicle(1, 0, 0);
+				vehExitVehicle();
 		}
 
 		if(pos)
@@ -3560,11 +3562,8 @@ LOGICAL _CanPlayerExit()
 
 }
 
-UINT32 vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach)
+UINT32 vehExitVehicle(unsigned int exitCode)
 {
-	if(Param != 1)
-		return 0;
-
 #ifdef GR2_BLEND_EDITOR
 	if(!Online && uiViewport()->FindView("blendedit"))
 		uiDotCommand("/blendeditor"); // toggle it off
@@ -3628,8 +3627,12 @@ UINT32 vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach)
 	vehDetermineExitStatus(&ExitStatus, &rtbFacilityID);
 
 	// send out an update to make sure they ragdoll our vehicle
-	if(ExitStatus == PEXIT_DEAD && Vehicle->VehicleType->Type == VEH_TYPE_PERSON && !fpFPSIsDead())
+	if(exitCode == PEXIT_BAD_CONNECTION || (ExitStatus == PEXIT_DEAD && Vehicle->VehicleType->Type == VEH_TYPE_PERSON && !fpFPSIsDead()))
 	{
+		if (exitCode == PEXIT_BAD_CONNECTION)
+		{
+			uiChatPrintLineColor(colorORANGEALPHA, uiLocString(IDE_LANG_UI, BAD_CONNECTION_LOC_ID).c_str());
+		}
 		fpFPSKillTrooper();
 		vehupdateUpdate(TRUE);
 	}
