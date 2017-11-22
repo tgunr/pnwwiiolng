@@ -71,7 +71,7 @@ LIBDIR="$WWII_ROOT/Installer/libs"
 RELEASEDIR="$WWII_ROOT/build/client/Release/Bin"
 #RELEASELIBDIR="$WWII_ROOT/Build/lib/Win32/Release"
 PRODUCTS="WW2.exe Playgate.exe Settings.exe"
-DATADIRS="DirectXRedist loc playgate screens"
+DATADIRS="DirectXRedist loc playgate"
 DATAFILES="steam_appid.txt eula.txt license.rtf readme.rtf regions.txt tos.txt wwii1.ico"
 ASSETFILES="eula.txt license.rtf readme.rtf wwii1.ico"
 BUILDDIR="$APPDATA"
@@ -573,7 +573,7 @@ if [ "$myos" == "win" ] ; then
     if [ "$skip_step" = false ]; then
         for folder in $DATADIRS ; do
             mkdir -p "Installer/current/DATA/$folder"
-            rsync -auv --exclude=".DS_Store" "$WW2MODS/DATA/$folder/" "$INSTALLER/current/DATA/$folder/"
+            rsync -auv --exclude=".DS_Store" "$INSTALLER/Dependencies/$folder/" "$INSTALLER/current/DATA/$folder/"
         done
     fi
 
