@@ -3724,6 +3724,7 @@ main(int argc, const char* argv[])
 		index.addAlias("m", "tell");
 		index.addAlias("m", "t");
 		index.addAlias("m", "r");
+		index.addAlias("trainers", "tr");
 
 		dbugLog(_FLI, "DotIndex contains %" PRSizeT " commands", index.size());
 
