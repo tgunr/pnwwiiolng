@@ -21,6 +21,7 @@
 #include "ogl/oglMaterial.h"
 #include "ogl/oglTextureObject.h"
 #include "ob/obdraw.h"
+#include "wwii/wwiiThemes.h"
 
 #if USE_STATESET
 #include "ogl/States.h"
@@ -32,10 +33,6 @@
 #define WANT_LEAF_NORMALS   1
 
 int TextureLoad(std::string& name, unsigned int flags = 0);
-
-#if CHRISTMAS
-static bool xmas = false;
-#endif
 
 static int _dummy_detail = -1;
 
@@ -55,9 +52,6 @@ CTree::CTree()
       nearLodDistanceSqr(0.0f),
       scale(1.0f),
       collidegeom(0),
-#if CHRISTMAS
-      christmas(false),
-#endif
       wind(nullptr)
 
 {
@@ -176,15 +170,6 @@ bool CTree::LoadSPTFile(const char* filename,
     farLodDistance = f;
     nearLodDistanceSqr = n * n;
     farLodDistanceSqr = f * f;
-
-#if CHRISTMAS
-    xmas = false;
-
-    if(strstr(filename, "Christmas"))
-        xmas = true;
-
-    christmas = xmas;
-#endif
 
     CSpeedTreeRT::SetNumWindMatrices(wind->GetNumWindMatrices());
     CSpeedTreeRT::SetTextureFlip(false);
@@ -377,10 +362,10 @@ int TextureLoad(std::string& name, unsigned int flags)
 
     if(postga != -1)
     {
-#if CHRISTMAS
-        if(!xmas)
+		if (WWII::Theme::theme() != WWII::THEME_HOLIDAY_SEASON)
+		{
             name.replace(postga, 4, ".dds");
-#endif
+		}
     }
 
     std::string path = CTree::GetTreeDirectory();
@@ -396,20 +381,21 @@ int TextureLoad(std::string& name, unsigned int flags)
     {
         pos++;
 
-#if CHRISTMAS
-        if(xmas)
+		if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+		{
+
             path += "Christmas_Tree/";
-#endif
+		}
 
         path += name.substr(pos, name.length() - pos);
     }
     else
     {
-#if CHRISTMAS
-        if(xmas)
+		if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+		{
             path += "Christmas_Tree/";
-#endif
-        path += name;
+		}
+		path += name;
     }
 
     return ldTextureLoad(path, flags);
@@ -432,12 +418,10 @@ bool CTree::LoadLeafFrondTexture()
 
     std::string name;
 
-#if CHRISTMAS
-    if(christmas)
+	if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
         name = "terrain/trees4.2/Christmas_Tree/CompositeMap_Diffuse.dds";
     else
-#endif
-    name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_DIFFUSE];
+    	name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_DIFFUSE];
 
     LeafFrondMaps[CSpeedTreeRT::TL_DIFFUSE] = TextureLoad(name, LDPIX_FLIP);
 
@@ -502,12 +486,10 @@ bool CTree::LoadLeafFrondTexture()
 
     std::string name;
 
-#if CHRISTMAS
-    if(christmas)
+	if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
         name = "terrain/trees4.2/Christmas_Tree/CompositeMap_Diffuse.dds";
     else
-#endif
-    name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_DIFFUSE];
+    	name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_DIFFUSE];
 
     LeafFrondMaps[CSpeedTreeRT::TL_DIFFUSE] = TextureLoad(name, LDPIX_FLIP);
 
@@ -536,12 +518,10 @@ bool CTree::LoadLeafFrondTexture()
         }
     }
 
-#if CHRISTMAS
-    if(christmas)
+	if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
         name = "terrain/trees4.2/Christmas_Tree/CompositeMap_Normal.dds";
     else
-#endif
-    name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_NORMAL];
+    	name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_NORMAL];
 
     LeafFrondMaps[CSpeedTreeRT::TL_NORMAL] = TextureLoad(name, LDPIX_FLIP);
 

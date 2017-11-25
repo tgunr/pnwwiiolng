@@ -11,6 +11,8 @@
 #include "ld/ldpix.h"
 #include "ld/ldbmp.h"
 
+extern std::string optionalFileSuffix;
+
 static LOGICAL ispow2(int l)
 {
     if(l <= 0) return FALSE;
@@ -216,11 +218,26 @@ int   stream;
 
 int ldbmpLoadBMPFileToSurface(const char* Filename, UINT32 TransparentColor, UINT32 WantFlags)
 {
-int   texid;
-piBITMAPINFO*  bi;
+	int   texid;
+	piBITMAPINFO*  bi;
     TEXTURE* t = nullptr;
 
-	if (!ldbmpLoadBMPFile(Filename, &bi))
+	std::string str = Filename;
+	std::string::size_type pos = str.rfind('.');
+	std::string ext = ".";
+	if(pos != std::string::npos)
+	{
+		ext = ext + str.substr(pos+1);
+		str.erase(pos, str.length()-pos);
+	}
+
+	// If suffix is defined (theme) and file exists, load that instead
+	std::string fileName = Filename;
+
+	if (fioFileExists(str, optionalFileSuffix, ext))
+		fileName = str + optionalFileSuffix + ext;
+	
+	if (!ldbmpLoadBMPFile(fileName.c_str(), &bi))
 	{
 		return(-1);
 	}

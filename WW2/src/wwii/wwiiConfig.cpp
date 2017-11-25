@@ -97,8 +97,8 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "arena.speedHackRatio",		TYPE_FLOAT,	&host_config.arena.speedHackRatio,		0,		"1.0001",	"Minimum drift ratio to be a speed-hack" }
 ,	{ "arena.mobileSpawnWaypoint",	TYPE_STRING,host_config.arena.mobileSpawnWaypoint, MAX_HANDLE_SIZE, "MSPAWN", "Mobile Spawn Waypoint (gamename)" }
 ,	{ "arena.despawnTime",			TYPE_SINT,	&host_config.arena.despawnTime_s,		3600,	"10",	"Despawn Timer (seconds)" }
-,	{ "arena.allowDirectSpawn",		TYPE_BOOL,	&host_config.arena.allowDirectSpawn,		0,		"n",	"Enable direct spawning used by Multi-Client" }
-
+,	{ "arena.allowDirectSpawn",		TYPE_BOOL,	&host_config.arena.allowDirectSpawn,	0,		"n",	"Enable direct spawning used by Multi-Client" }
+,	{ "arena.theme",				TYPE_SINT,	&host_config.arena.theme, 				0,		"0",	"Themes: 0=None, 1=Christmas, 2=Veterens, 3=Hallowee" }
 ,	{ "balance.above",				TYPE_SINT,	&host_config.balance.above,				0,		"0",	"Minimum players top side must have to get side balanced"  }
 ,	{ "balance.delaysMax",			TYPE_SINT, 	&host_config.balance.delaysMax, 		0,		"0",	"Maximum side-balancing delay (seconds)" }
 ,	{ "balance.delaysPctg",			TYPE_SINT,	&host_config.balance.delaysPctg,		0,		"0",	"Side must have this %age more players to start spawn delays" }

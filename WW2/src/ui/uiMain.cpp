@@ -70,6 +70,7 @@
 #include "wwii/wwiiUTF.h"
 #include "ez/EZManager.h"
 #include "ld/ldtexture.h"
+#include "fio/fio.h"
 
 #ifdef GR2_BLEND_EDITOR
 #include "gr2/gr2Anim.h"
@@ -94,6 +95,8 @@
 //#define UI_FONT_NAME "arialbd.ttf"
 //#define UI_CFONT_NAME "simhei.ttf"
 #define UI_FONT_NAME "wqy-zenhei.ttf"
+
+std::string optionalFileSuffix;
 
 /************************************************************************************************
 	piGraphicsContext
@@ -2133,7 +2136,7 @@ static int uiLoadImageFileToSurface(const char* Filename)
     std::string basename = Filename;
 
     basename = basename.substr(0, basename.find_last_of('.'));
-    for (char &c : basename) { c = tolower(c); } // assumes ASCII; this will Breaking Bad on Unicode
+	std::transform(basename.begin(), basename.end(), basename.begin(), ::tolower);
 
 	texid = piGetNamedTexture(basename.c_str());
 	if (piIsTexture(texid, 0)) {
@@ -2141,26 +2144,28 @@ static int uiLoadImageFileToSurface(const char* Filename)
 		return texid;
 	}
 
-    std::string ddsname = basename + ".dds";
-
-	if(piIsTexture(texid = ldddsLoadDDSTexture2D(ddsname.c_str(), TransparentColor, LDPIX_NO_TEXTURE_GENERATE), 0)) {
-		piSetTextureName(texid, const_cast<char *>(basename.c_str()));
-		return texid;
+	if (fioFileExists(basename, "", ".dds"))
+	{
+		std::string ddsname = basename + ".dds";		
+		if(piIsTexture(texid = ldddsLoadDDSTexture2D(ddsname.c_str(), TransparentColor, LDPIX_NO_TEXTURE_GENERATE), 0)) {
+			piSetTextureName(texid, const_cast<char *>(basename.c_str()));
+			return texid;
+		}
 	}
 
     std::string bmpname = basename + ".bmp";
-    std::string alphaname = basename + "_alpha.bmp";
+	std::string alphaname = basename + "_alpha.bmp";
 	TEXTURE *lptex = nullptr;
-    int alphaFD = fioOpen(alphaname.c_str());
-
-    fioClose(alphaFD); // This is yet another very hacky workaround for broken "need to know if it exists before using it" logic
-    if (alphaFD != -1) { // Technically a use-after-free, but FDs are just integers so it doesn't matter
+	
+	bool isAlpha = fioFileExists(alphaname, "", "");
+    if (isAlpha) {
         TransparentColor = piRGBA_SETALPHA(TransparentColor, 8);
     }
+	
     if (piIsTexture(texid = ldbmpLoadBMPFileToSurface(bmpname.c_str(), TransparentColor, 0), 0)) {
 		lptex = piGetTextureData(texid);
 		piSetTextureName(texid, const_cast<char *>(basename.c_str()));
-        if (alphaFD != -1) {
+        if (isAlpha) {
 			if (!ldbmpLoadBMPAlphaFileToSurface(alphaname.c_str(), texid, 0)) {
 				piFreeMipTextures(texid);
 				return -1;

@@ -19,5 +19,6 @@ extern size_t fioaSeek(int fd, size_t offset, int from);
 extern int fioaEOF(int fd);
 
 extern size_t fioaFileSize(const char* name);
+extern bool fioaFileExists(const char* filename);
 
 extern size_t fioaMap(int fd, const void*& data);

@@ -47,7 +47,6 @@
 #include <string>
 
 #define MAX_LODS    4
-#define CHRISTMAS   0
 
 class oglMaterial;
 
@@ -393,10 +392,6 @@ public:
     dGeomID GetCollideGeom(int i = 0) {return collidegeom[i];}
 
     std::vector<Matrixf> euler;
-
-#if CHRISTMAS
-    bool christmas;
-#endif
 
 protected:
     bool leafRockingState;

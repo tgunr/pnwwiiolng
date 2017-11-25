@@ -36,6 +36,7 @@
 #include "spt/Tree.h"
 #include "scen/ScenarioManager.h"
 #include "trn/trnScenario.h"
+#include "wwii/wwiiThemes.h"
 
 #ifdef BETA_RELEASE
 #include "ui/uiChat.h"
@@ -1688,10 +1689,11 @@ struct ParseTrees
                     // Comment section has tree types as 1 based.
                     SINT16 base = types[i] - 1;
 
-#if CHRISTMAS
-                    if(base == 2)
-                        o->mat._43 -= 0.5f;
-#endif
+					if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+					{
+                    	if(base == 2)
+                        	o->mat._43 -= 0.5f;
+					}
 
                     if(base >= 0)
                     {

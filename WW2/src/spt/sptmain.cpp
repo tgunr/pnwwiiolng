@@ -34,6 +34,7 @@ Description:
 #include "pers/persmain.h"
 #include "math/matheul.h"
 #include "sdm/sdmDefines.h"
+#include "wwii/wwiiThemes.h"
 
 #include <map>
 #include <vector>
@@ -3200,13 +3201,14 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
         pos64.x = x;
         pos64.y = y;
 
-#if CHRISTMAS
-        pos64.z = z;
+		if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+		{
+			pos64.z = z;
 
-        if(types[ii] - 1 != 2)
-            // Sink a little to avoid floating roots
-            pos64.z += 0.5f;
-#endif
+			if(types[ii] - 1 != 2)
+				// Sink a little to avoid floating roots
+				pos64.z += 0.5f;
+		}
 
         if(angle1 == 0.0f && angle2 == 0.0f)
             pos64.z = z;

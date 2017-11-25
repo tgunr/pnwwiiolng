@@ -45,6 +45,8 @@ extern void fioClose(int fd);
 extern LOGICAL fioModified(SINT32* modified, const char* filename);
 extern int 	fioEOF(int fd);
 extern size_t 	fioFileSize(const char* name);
+extern bool fioFileExists(const char* name);
+extern bool fioFileExists(std::string base, std::string suffix, std::string extension);
 
 extern void fioSet(SINT32);
 extern SINT32 fioQuery();

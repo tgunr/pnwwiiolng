@@ -40,6 +40,7 @@ struct cfARENA
 	UINT16	despawnTime_s;			//!< Seconds to wait before despawning
 	char	mobileSpawnWaypoint[MAX_HANDLE_SIZE];
 	UCHAR	allowDirectSpawn;		//!< Should we allow direct spawning (Multi-Client)
+	UINT16  theme;					//!< Non-zero applies client themes like: Christmas, Veterens, Halloween, etc.
 };
 
 struct cfBALANCE

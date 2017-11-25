@@ -1,3 +1,4 @@
+
 #include "syscfg.h" // Path is project specific.
 // Created: April 17 2002
 //
@@ -26,25 +27,26 @@
 
 #include "client/GameClient.h"
 #include "client/client.h"
+#include "wwii/wwiiThemes.h"
+#include "ld/ldtexture.h"
 
 // Login connections by teulIndex.
 static std::map<SINT32, Teul::Connection*> _ConnectionsByTeulIndex;
 static UINT32 _connectionAttempt;
 
-static TEUL_CALLBACK*	_SEND_ERROR_INFO;
 static TEUL_CALLBACK*	_SEND_USER_ABORTED_APP;
 static TEUL_CALLBACK*	_PLAYER_LOGIN;
 
 #define DUMPFILE_NAME "ww2errinfo.dmp"
 
-//static bool _cellActive = false;
 static UINT32 _updatesSent = 0;
 
-SINT32 lastHostTime;
-SINT32 lastClientTime;
-SINT32 lastHostIP;
-
 extern UINT32 teulMaskNetworkAddress(UINT32 address);
+extern UINT32 _ReadAmmoTypes();
+
+bool wwiiIncrementHits();
+void wwiiOhYeah(const UCHAR withCode);
+void wwiiSendUserAbortedApp();
 
 #if defined(PROCESS_LIST_SUBMISSIONS) && platOS == OS_WIN32
 ////
@@ -138,6 +140,8 @@ _recordPeers()
 }
 #endif
 
+WWII::THEME WWII::Theme::m_currentTheme = WWII::THEME_NONE;
+
 static SINT32
 _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 {
@@ -154,15 +158,14 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 
 	UINT32 maskedAddr = teulMaskNetworkAddress(activate.hostIP);
 
-#if platBuild == BUILD_CLIENT
-	lastHostTime = activate.hostTime;
-	lastClientTime = teulTime();
-	lastHostIP = maskedAddr;
-#endif
-
 	switch (activate.serverType)
 	{
 	case MAP_HOST:
+		if (WWII::Theme::theme() != activate.theme)
+		{
+			WWII::Theme::setTheme(activate.theme);
+			ldReloadTextures();
+		}
 		clientActivateMap(a->teulIndex,TRUE, maskedAddr, activate.port);
 		_updatesSent = 0;
 		break;
@@ -553,8 +556,9 @@ UINT32 wwiiHitsPrime()
 bool wwiiIncrementHits()
 {
 	static const int ARBITRARY_NUM_UPDATES = 199;	// Connecting grace period
-	if ( _updatesSent < (UINT32)ARBITRARY_NUM_UPDATES
-	|| (rand() % _hitsPrime) != 0 )
+	
+	// TODO: shouldn't be using rand() also - this anti-hack attribute is questionable in general and probably currently disabled
+	if ( _updatesSent < (UINT32)ARBITRARY_NUM_UPDATES || (static_cast<UINT32>(rand()) % _hitsPrime) != 0 )
 		return false;
 	// Each change increases the rate of change
 	static const int ARBITRARY_MIN_HITS_PRIME = 32801;

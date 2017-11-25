@@ -396,8 +396,6 @@ static_assert( platBuild != BUILD_SERVER, "Can't include piogl.h in a server bui
 #define piLIGHT_ACTIVE         1 //D3DLIGHT_ACTIVE
 #define piLIGHT_NO_SPECULAR    2 //D3DLIGHT_NO_SPECULAR
 
-
-
 struct VERTEXSOURCE
 {
 	UINT32 fvf;
@@ -429,7 +427,9 @@ struct TEXTURE
 
 	LOGICAL					hasalpha;
 	LOGICAL					iswritable;
-
+	std::string				suffix;
+	std::string				ext;
+	
 	FLOAT32                 widthfactor[MAXMIPLEVELS];
 	FLOAT32                 heightfactor[MAXMIPLEVELS];
 
@@ -443,11 +443,11 @@ struct TEXTURE
 	SINT32                  multiTextureInfoID;
 	SINT32                  imagewidth[MAXMIPLEVELS];
 	SINT32                  imageheight[MAXMIPLEVELS];
-	SINT32                  imagesize[MAXMIPLEVELS];
+	UINT32                  imagesize[MAXMIPLEVELS];
 	SINT32                  po2width[MAXMIPLEVELS];
 	SINT32                  po2height[MAXMIPLEVELS];
-	SINT32					comp[MAXMIPLEVELS];
-	SINT32					format[MAXMIPLEVELS];
+	UINT32					comp[MAXMIPLEVELS];
+	UINT32					format[MAXMIPLEVELS];
 	SINT32                  miplevels;
 	SINT32                  normalMap;
 	SINT32                  specularMap;
@@ -457,7 +457,9 @@ struct TEXTURE
 	TEXTURETYPE             type;
 
 	void* 					lpsurf[MAXMIPLEVELS];
-
+	unsigned int			flags;
+	unsigned int			transparentColor;
+	
 #ifdef __cplusplus
 	bool isdds() {return type == TEXTURE_DDS;}
 	bool isbmp() {return type == TEXTURE_BMP;}
@@ -470,6 +472,7 @@ struct TEXTURE3D
 {
 	SINT8                   name[128];
 	LOGICAL					hasalpha;
+	LOGICAL					hasSuffix;
 	LOGICAL					iswritable;
 	UINT32					genlist;
 	SINT32*					texid;
