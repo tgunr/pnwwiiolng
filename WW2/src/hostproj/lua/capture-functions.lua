@@ -77,22 +77,22 @@ local P = {
 	-- Maximum number of people we bother tabulating
 ,	maxCapContributors = 12
 	-- After max contributors, points is based on a target time
-,	minCaptureTime = 30
+,	minCaptureTime = 60
 	-- Table of target times for a given number of players
 ,	captureTimeTable =
 	{
-		180		-- 1 guy
-	,	112		-- 2
-	,	102		-- 3
-	,	 93		-- 4
-	,	 83		-- 5
-	,	 74		-- 6
-	,	 65		-- 7
-	,	 56		-- 8
-	,	 47		-- 9
-	,	 38		-- 10
-	,	 30		-- 11
-	,	 30		-- 12
+		360		-- 1 guy
+	,	330		-- 2
+	,	300		-- 3
+	,	270		-- 4
+	,	210		-- 5
+	,	180		-- 6
+	,	150		-- 7
+	,	120		-- 8
+	,	 90		-- 9
+	,	 60		-- 10
+	,	 60		-- 11
+	,	 60		-- 12
 	}
 }
 
