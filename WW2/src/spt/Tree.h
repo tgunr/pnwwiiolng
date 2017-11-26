@@ -393,6 +393,8 @@ public:
 
     std::vector<Matrixf> euler;
 
+	bool christmas;
+	
 protected:
     bool leafRockingState;
     bool hasHorizBillboardGeom;

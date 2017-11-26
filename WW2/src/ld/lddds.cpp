@@ -8,6 +8,8 @@
 
 #include "ld/ldtexture.h"
 
+extern std::string optionalFileSuffix;
+
 //////////////////////////////////////////////////////////////////////
 // Function: ldddsLoadDDSTexture2D
 // Description: Used for legacy texure loading through ldpix.
@@ -32,8 +34,23 @@ LOGICAL ldddsGenerateTexture(SINT32 texid)
 // ldpix. Uses engine texture object.
 //////////////////////////////////////////////////////////////////////
 SINT32 ldddsLoadDDSTexture(const SCHAR* name, GLenum target, UINT32 flags)
-{
-    return ldTextureLoad(name, flags);
+{	
+	std::string str = name;
+	std::string::size_type pos = str.rfind('.');
+	std::string ext = ".";
+	if(pos != std::string::npos)
+	{
+		ext = ext + str.substr(pos+1);
+		str.erase(pos, str.length()-pos);
+	}
+	
+	// If suffix is defined (theme) and file exists, load that instead
+	std::string fileName = name;
+	
+	if (fioFileExists(str, optionalFileSuffix, ext))
+		fileName = str + optionalFileSuffix + ext;
+	
+    return ldTextureLoad(fileName, flags);
 }
 
 //////////////////////////////////////////////////////////////////////

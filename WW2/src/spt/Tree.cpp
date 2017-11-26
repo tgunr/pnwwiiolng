@@ -52,6 +52,7 @@ CTree::CTree()
       nearLodDistanceSqr(0.0f),
       scale(1.0f),
       collidegeom(0),
+	  christmas(false),
       wind(nullptr)
 
 {
@@ -171,6 +172,9 @@ bool CTree::LoadSPTFile(const char* filename,
     nearLodDistanceSqr = n * n;
     farLodDistanceSqr = f * f;
 
+	if (strstr(filename, "Christmas") && (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON))
+		christmas = true;
+	
     CSpeedTreeRT::SetNumWindMatrices(wind->GetNumWindMatrices());
     CSpeedTreeRT::SetTextureFlip(false);
 
@@ -418,7 +422,7 @@ bool CTree::LoadLeafFrondTexture()
 
     std::string name;
 
-	if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+	if (christmas)
         name = "terrain/trees4.2/Christmas_Tree/CompositeMap_Diffuse.dds";
     else
     	name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_DIFFUSE];
@@ -486,7 +490,7 @@ bool CTree::LoadLeafFrondTexture()
 
     std::string name;
 
-	if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+	if (christmas)
         name = "terrain/trees4.2/Christmas_Tree/CompositeMap_Diffuse.dds";
     else
     	name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_DIFFUSE];
@@ -518,7 +522,7 @@ bool CTree::LoadLeafFrondTexture()
         }
     }
 
-	if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+	if (christmas)
         name = "terrain/trees4.2/Christmas_Tree/CompositeMap_Normal.dds";
     else
     	name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_NORMAL];

@@ -1602,6 +1602,7 @@
 		E99C32551D8607830098798F /* wwiiPPOLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiPPOLoader.h; sourceTree = "<group>"; };
 		E99C32561D8607830098798F /* wwiiPPOLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiPPOLoader.cpp; sourceTree = "<group>"; };
 		E99C3E761E744FC6008A435E /* libsteam_api.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsteam_api.dylib; path = ../Libraries/SteamSDK/redistributable_bin/osx32/libsteam_api.dylib; sourceTree = "<group>"; };
+		E9A8C50B1FC6E46A00F037D0 /* wwiiThemes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wwiiThemes.h; sourceTree = "<group>"; };
 		E9C1BDD01E461EE6001FD5B0 /* libRakNetLibStatic.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libRakNetLibStatic.a; path = lib/mac/libRakNetLibStatic.a; sourceTree = "<group>"; };
 		E9C1BDD11E461EE6001FD5B0 /* liblibcatcommon.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibcatcommon.a; path = lib/mac/liblibcatcommon.a; sourceTree = "<group>"; };
 		E9C1BDD21E461EE6001FD5B0 /* liblibcatcrypt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibcatcrypt.a; path = lib/mac/liblibcatcrypt.a; sourceTree = "<group>"; };
@@ -2891,6 +2892,7 @@
 				08CBC4581291D9EB00C0987C /* wwiiServerTrackedObjectPacker.h */,
 				08289DFE1069D3330056932F /* wwiiHCUnits.h */,
 				08104EE3103DFE120065E0E2 /* wwiiActivate.h */,
+				E9A8C50B1FC6E46A00F037D0 /* wwiiThemes.h */,
 				08104EE9103DFE120065E0E2 /* wwiiCallbacks.cpp */,
 				08104EEA103DFE120065E0E2 /* wwiiCallbacks.h */,
 				08104EEB103DFE120065E0E2 /* wwiiClientMessages.cpp */,
