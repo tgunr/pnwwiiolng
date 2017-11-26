@@ -121,10 +121,15 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
     if (!optionalFileSuffix.empty() && fioFileExists(str, optionalFileSuffix, ext))
         fileName = str + optionalFileSuffix + ext;
 
+    // we get lots of attempts to load files that don't exist so lets not output a warning
+    if (!fioFileExists(fileName.c_str()))
+        return -1;
+    
     ref_ptr<Image> img = loadImage(fileName, flags, transparentColor);
 
     if(!img.valid() || !img->data())
     {
+        dbugLog(_FLW, "Error while loading image file: %s", fileName.c_str());
         return -1;
     }
 

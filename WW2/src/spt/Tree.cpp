@@ -32,7 +32,7 @@
 #define FIND_NO_GEOMETRY    0
 #define WANT_LEAF_NORMALS   1
 
-int TextureLoad(std::string& name, unsigned int flags = 0);
+int TextureLoad(std::string& name, unsigned int flags = 0, bool isXmas = false);
 
 static int _dummy_detail = -1;
 
@@ -350,59 +350,57 @@ bool CTree::LoadSPTFile(const char* filename,
 Function: TextureLoad
 Description:
 ------------------------------------------------------------------------*/
-int TextureLoad(std::string& name, unsigned int flags)
-{
-    if(name.empty())
-    {
+int TextureLoad(std::string& name, unsigned int flags, bool isXmas) {
+	
+	// Don't load empty textures
+	if(name.empty()) {
+		dbugLog(_FLW, "Unable to load,  empty texture specified");
         return -1;
-    }
+	}
+	
+	std::string str = name;
 
-    size_t postga = name.find(".tga");
-
-    if(postga == -1)
-    {
-        postga = name.find(".TGA");
-    }
-
-    if(postga != -1)
-    {
-		if (WWII::Theme::theme() != WWII::THEME_HOLIDAY_SEASON)
-		{
-            name.replace(postga, 4, ".dds");
+	// file name might eroneously already contain a path - lets remove it if so
+	std::string::size_type offset = str.rfind('\\');
+	if (offset != std::string::npos)
+		str = str.substr(offset+1);
+	else {
+		offset = str.rfind('/');
+		if (offset != std::string::npos)  {
+			str = str.substr(offset+1);
 		}
-    }
+	}
+		
+	std::string::size_type pos = str.rfind('.');
+	std::string ext = ".";
+	if(pos != std::string::npos) {
+		ext = ext + str.substr(pos+1);
+		str.erase(pos, str.length()-pos);
+	}
 
-    std::string path = CTree::GetTreeDirectory();
-
-    size_t pos = name.find_last_of("\\");
-
-    if(pos == -1)
-    {
-        pos = name.find_last_of("/");
-    }
-
-    if(pos != -1)
-    {
-        pos++;
-
-		if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
-		{
-
-            path += "Christmas_Tree/";
+	std::string path = CTree::GetTreeDirectory();
+	if (isXmas) {
+		path.append("Christmas_Tree");
+		path.append(OS_PATHSEP);
+	}
+	
+	std::string fileName = path + str + ext;
+	
+	if (!fioFileExists(path, str, ext)) {
+		if (fioFileExists(path, str, ".dds")) {
+			fileName = path + str + ".dds";
+		} else if (fioFileExists(path, str, ".DDS")) {
+			fileName = path + str + ".DDS";
+		} else if (fioFileExists(path, str, ".tga")) {
+			fileName = path + str + ".tga";
+		} else if (fioFileExists(path, str, ".TGA")) {
+			fileName = path + str + ".TGA";
+		} else {
+			dbugLog(_FLW, "Unable to load texture %s with path %s", name.c_str(), path.c_str());
 		}
+	}
 
-        path += name.substr(pos, name.length() - pos);
-    }
-    else
-    {
-		if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
-		{
-            path += "Christmas_Tree/";
-		}
-		path += name;
-    }
-
-    return ldTextureLoad(path, flags);
+    return ldTextureLoad(fileName, flags);
 }
 
 #if USE_STATESET
@@ -423,11 +421,11 @@ bool CTree::LoadLeafFrondTexture()
     std::string name;
 
 	if (christmas)
-        name = "terrain/trees4.2/Christmas_Tree/CompositeMap_Diffuse.dds";
+        name = "CompositeMap_Diffuse.dds";
     else
     	name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_DIFFUSE];
 
-    LeafFrondMaps[CSpeedTreeRT::TL_DIFFUSE] = TextureLoad(name, LDPIX_FLIP);
+    LeafFrondMaps[CSpeedTreeRT::TL_DIFFUSE] = TextureLoad(name, LDPIX_FLIP, christmas);
 
     if(LeafFrondMaps[CSpeedTreeRT::TL_DIFFUSE] > -1)
     {
@@ -456,7 +454,7 @@ bool CTree::LoadLeafFrondTexture()
 
     name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_NORMAL];
 
-    LeafFrondMaps[CSpeedTreeRT::TL_NORMAL] = TextureLoad(name, LDPIX_FLIP);
+    LeafFrondMaps[CSpeedTreeRT::TL_NORMAL] = TextureLoad(name, LDPIX_FLIP, christmas);
 
     if(LeafFrondMaps[CSpeedTreeRT::TL_NORMAL] > -1)
     {
@@ -491,11 +489,11 @@ bool CTree::LoadLeafFrondTexture()
     std::string name;
 
 	if (christmas)
-        name = "terrain/trees4.2/Christmas_Tree/CompositeMap_Diffuse.dds";
+        name = "CompositeMap_Diffuse.dds";
     else
     	name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_DIFFUSE];
 
-    LeafFrondMaps[CSpeedTreeRT::TL_DIFFUSE] = TextureLoad(name, LDPIX_FLIP);
+    LeafFrondMaps[CSpeedTreeRT::TL_DIFFUSE] = TextureLoad(name, LDPIX_FLIP, christmas);
 
     if(LeafFrondMaps[CSpeedTreeRT::TL_DIFFUSE] > -1)
     {
@@ -523,11 +521,11 @@ bool CTree::LoadLeafFrondTexture()
     }
 
 	if (christmas)
-        name = "terrain/trees4.2/Christmas_Tree/CompositeMap_Normal.dds";
+        name = "CompositeMap_Normal.dds";
     else
     	name = mapbank.m_pCompositeMaps[CSpeedTreeRT::TL_NORMAL];
 
-    LeafFrondMaps[CSpeedTreeRT::TL_NORMAL] = TextureLoad(name, LDPIX_FLIP);
+    LeafFrondMaps[CSpeedTreeRT::TL_NORMAL] = TextureLoad(name, LDPIX_FLIP, christmas);
 
     if(LeafFrondMaps[CSpeedTreeRT::TL_NORMAL] > -1)
     {
@@ -570,7 +568,7 @@ bool CTree::LoadBillboardTexture()
             continue;
         }
 
-        BillboardMaps[i] = TextureLoad(name, LDPIX_FLIP);
+		BillboardMaps[i] = TextureLoad(christmas?"CompositeMap_Diffuse_Billboards.dds":name, LDPIX_FLIP, christmas);
 
         if(BillboardMaps[i] > -1)
         {
@@ -617,7 +615,7 @@ bool CTree::LoadBillboardTexture()
             continue;
         }
 
-        BillboardMaps[i] = TextureLoad(name, LDPIX_FLIP);
+		BillboardMaps[i] = TextureLoad(name, LDPIX_FLIP, christmas);
 
         if(BillboardMaps[i] > -1)
         {
@@ -672,7 +670,7 @@ bool CTree::LoadBranchTexture()
     {
         std::string name = mapbank.m_pBranchMaps[i];
 
-        BranchMaps[i] = TextureLoad(name, LDPIX_FLIP);
+        BranchMaps[i] = TextureLoad(name, LDPIX_FLIP, false);
 
         if(BranchMaps[i] > -1)
         {
@@ -730,35 +728,38 @@ bool CTree::LoadBranchTexture()
     {
         std::string name = mapbank.m_pBranchMaps[i];
 
-        BranchMaps[i] = TextureLoad(name, LDPIX_FLIP);
+		if (!name.empty())
+		{
+        	BranchMaps[i] = TextureLoad(name, LDPIX_FLIP, christmas);
 
-        if(BranchMaps[i] > -1)
-        {
-            Texture2D* tex = ldTextureGet2D(BranchMaps[i]);
+			if(BranchMaps[i] > -1)
+			{
+				Texture2D* tex = ldTextureGet2D(BranchMaps[i]);
 
-            if(tex)
-            {
-                tex->setWrap(Texture2D::WRAP_S, Texture2D::REPEAT);
-                tex->setWrap(Texture2D::WRAP_T, Texture2D::REPEAT);
+				if(tex)
+				{
+					tex->setWrap(Texture2D::WRAP_S, Texture2D::REPEAT);
+					tex->setWrap(Texture2D::WRAP_T, Texture2D::REPEAT);
 
-                branchmaterialON->AddTexture(i, BranchMaps[i]);
+					branchmaterialON->AddTexture(i, BranchMaps[i]);
 
-                if(i != CSpeedTreeRT::TL_NORMAL && branchmaterialOFF.valid())
-                    branchmaterialOFF->AddTexture(i, BranchMaps[i]);
-            }
-        }
-        else
-        {
-            if(i == CSpeedTreeRT::TL_DETAIL)
-            {
-                BranchMaps[i] = _dummy_detail;
+					if(i != CSpeedTreeRT::TL_NORMAL && branchmaterialOFF.valid())
+						branchmaterialOFF->AddTexture(i, BranchMaps[i]);
+				}
+			}
+			else
+			{
+				if(i == CSpeedTreeRT::TL_DETAIL)
+				{
+					BranchMaps[i] = _dummy_detail;
 
-                branchmaterialON->AddTexture(i, _dummy_detail);
+					branchmaterialON->AddTexture(i, _dummy_detail);
 
-                if(branchmaterialOFF.valid())
-                    branchmaterialOFF->AddTexture(i, _dummy_detail);
-            }
-        }
+					if(branchmaterialOFF.valid())
+						branchmaterialOFF->AddTexture(i, _dummy_detail);
+				}
+			}
+		}
     }
 
     return true;
