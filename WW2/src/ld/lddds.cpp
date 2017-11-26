@@ -5,8 +5,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "pi/pi.h"
 #include "ld/lddds.h"
-
 #include "ld/ldtexture.h"
+#include "fio/fio.h"
 
 extern std::string optionalFileSuffix;
 
