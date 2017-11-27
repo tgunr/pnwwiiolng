@@ -131,7 +131,7 @@ static void loadXML(const char* path)
 {
     std::string dir = path;
 
-	if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+	if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
 	{
     	dir += "Christmas_Tree/trees.xml";
 	}

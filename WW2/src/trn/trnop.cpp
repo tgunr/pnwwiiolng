@@ -1689,7 +1689,7 @@ struct ParseTrees
                     // Comment section has tree types as 1 based.
                     SINT16 base = types[i] - 1;
 
-					if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+					if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
 					{
                     	if(base == 2)
                         	o->mat._43 -= 0.5f;

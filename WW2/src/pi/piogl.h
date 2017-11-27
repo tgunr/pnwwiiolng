@@ -421,6 +421,7 @@ enum TEXTURETYPE
 	MAX_TEXTURE_TYPES
 };
 
+// NOTE: Do not copy this structure.  If you need a copy then create a copy constructor.
 struct TEXTURE
 {
 	SINT8                   name[128];

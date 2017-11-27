@@ -404,7 +404,7 @@ void fxWeatherSetState(int weather, int seedindex)
 	unsigned int tod;
 	trnTODGetTimeOfDay(&tod);
 
-	if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+	if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
 		weather = 2;
 	
 	// Translate the weather from host variants to client variants.
@@ -506,7 +506,7 @@ static void _killcallback(Particle2* p)
     if(p->expired())
         return;
 
-	if (WWII::Theme::theme() != WWII::THEME_HOLIDAY_SEASON)
+	if (WWII::Theme::theme() != WWII::THEME::THEME_HOLIDAY_SEASON)
 	{
 		Vec3f n(0, 0, -1);
 		TransformEffect* te = TransformEffect::AddEffect("raingroundhit", n, 0, nullptr);
@@ -938,14 +938,14 @@ static void _addparticle(piVECTOR& pos, OBJECT* o)
     int delayoffset = 0;
 
     ParticleMgr* pm = TransformEffect::GetParticleMgr();
-	Particle2* p = pm->createparticle((WWII::Theme::theme()==WWII::THEME_HOLIDAY_SEASON)?"snow":"rain");
+	Particle2* p = pm->createparticle((WWII::Theme::theme()==WWII::THEME::THEME_HOLIDAY_SEASON)?"snow":"rain");
 
     if(!p)
         return;
 
     p->setname("rain");
 
-	if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+	if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
 	{
 		p->_size[0] = 4.0;
 		p->_size[1] = 4.0f;
@@ -1295,7 +1295,7 @@ inline static void _doRain()
 {
     static int lastupdate = 0;
 
-	if (WWII::Theme::theme() != WWII::THEME_HOLIDAY_SEASON)
+	if (WWII::Theme::theme() != WWII::THEME::THEME_HOLIDAY_SEASON)
 	{
 		if(rainparticleemitted && rainsoundid == 0)
 		{
@@ -1319,7 +1319,7 @@ inline static void _doRain()
 
     // RainGridSize per second
 	float rainAdjust = 1.0;
-	if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+	if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
 	{
 		rainAdjust = 0.25;
 	}
@@ -1520,7 +1520,7 @@ void fxWeatherUpdate()
 #ifdef BETA_RELEASE
                 static int nexttime = -1;
 
-				if  (nexttime == -1 && WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+				if  (nexttime == -1 && WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
 				{
 					// keep the holiday cheer going forever!
 					NextRainTime = 0;

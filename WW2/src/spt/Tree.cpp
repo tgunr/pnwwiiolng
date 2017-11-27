@@ -172,7 +172,7 @@ bool CTree::LoadSPTFile(const char* filename,
     nearLodDistanceSqr = n * n;
     farLodDistanceSqr = f * f;
 
-	if (strstr(filename, "Christmas") && (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON))
+	if (strstr(filename, "Christmas") && (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON))
 		christmas = true;
 	
     CSpeedTreeRT::SetNumWindMatrices(wind->GetNumWindMatrices());

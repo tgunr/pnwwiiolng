@@ -8,8 +8,6 @@
 #include "ld/ldtexture.h"
 #include "fio/fio.h"
 
-extern std::string optionalFileSuffix;
-
 //////////////////////////////////////////////////////////////////////
 // Function: ldddsLoadDDSTexture2D
 // Description: Used for legacy texure loading through ldpix.
@@ -47,8 +45,8 @@ SINT32 ldddsLoadDDSTexture(const SCHAR* name, GLenum target, UINT32 flags)
 	// If suffix is defined (theme) and file exists, load that instead
 	std::string fileName = name;
 	
-	if (fioFileExists(str, optionalFileSuffix, ext))
-		fileName = str + optionalFileSuffix + ext;
+	if (fioFileExists(str, ldGetOptionalFileSuffix(), ext))
+		fileName = str + ldGetOptionalFileSuffix() + ext;
 	
     return ldTextureLoad(fileName, flags);
 }

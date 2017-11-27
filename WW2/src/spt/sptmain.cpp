@@ -3201,7 +3201,7 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
         pos64.x = x;
         pos64.y = y;
 
-		if (WWII::Theme::theme() == WWII::THEME_HOLIDAY_SEASON)
+		if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
 		{
 			pos64.z = z;
 

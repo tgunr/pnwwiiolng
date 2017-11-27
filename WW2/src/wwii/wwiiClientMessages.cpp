@@ -141,7 +141,7 @@ _recordPeers()
 }
 #endif
 
-WWII::THEME WWII::Theme::m_currentTheme = WWII::THEME_NONE;
+WWII::THEME WWII::Theme::m_currentTheme = WWII::THEME::THEME_NONE;
 
 static SINT32
 _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
@@ -162,7 +162,7 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 	switch (activate.serverType)
 	{
 	case MAP_HOST:
-		if (WWII::Theme::theme() != activate.theme)
+		if (WWII::Theme::theme() != static_cast<WWII::THEME>(activate.theme))
 		{
 			WWII::Theme::setTheme(activate.theme);
 			ldReloadTextures();

@@ -210,7 +210,7 @@ _dbugOut(bool logToConsole
 			, const	bool	rollover) noexcept
 {
 	if ( PN_UNLIKELY(logToConsole) ) {
-		OS_WRITE(STDERR_FILENO, outString, (unsigned long)length);
+		//OS_WRITE(STDERR_FILENO, outString, (unsigned long)length);
 		if ( PN_UNLIKELY(_logger.m_dbugfile == STDERR_FILENO) )
 			return;
 	}

@@ -12,20 +12,11 @@
 #define wwiiThemes_h
 
 #include <string>
-
-extern std::string optionalFileSuffix;
+#include "ld/ldtexture.h"
 
 namespace WWII
 {
-	enum THEME {
-		THEME_NONE = 0,
-		
-		THEME_HOLIDAY_SEASON,
-		THEME_VETERANS,
-		THEME_HALLOWEEN,
-		
-		THEME_MAX
-	};
+	enum class THEME: UINT32 { THEME_NONE = 0, THEME_HOLIDAY_SEASON, THEME_VETERANS, THEME_HALLOWEEN, THEME_MAX };
 	
 	class Theme
 	{
@@ -33,16 +24,16 @@ namespace WWII
 	private:
 		static std::string toString(THEME theme) {
 			static std::string themeList[] = { "", "_xmas", "_vets", "_spooky" };
-			return (isValid(theme)?themeList[theme]:"");
+			return themeList[static_cast<UINT32>(theme)];
 		}
 		static THEME m_currentTheme;
-		static bool isValid(UINT32 themeRef) { return themeRef < THEME_MAX; }
+		static bool isValid(UINT32 themeRef) { return themeRef < static_cast<UINT32>(THEME::THEME_MAX); }
 	public:
 		static THEME theme() { return m_currentTheme; }
 		static void setTheme(UINT32 theme) {
 			if (isValid(theme)) {
 				m_currentTheme =static_cast<THEME>(theme);
-				optionalFileSuffix = toString(m_currentTheme);
+				ldSetOptionalFileSuffix(toString(m_currentTheme));
 			}
 		}
 	};

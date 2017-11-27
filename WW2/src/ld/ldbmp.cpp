@@ -10,8 +10,7 @@
 #include "fio/fio.h"
 #include "ld/ldpix.h"
 #include "ld/ldbmp.h"
-
-extern std::string optionalFileSuffix;
+#include "ld/ldtexture.h"
 
 static LOGICAL ispow2(int l)
 {
@@ -234,8 +233,8 @@ int ldbmpLoadBMPFileToSurface(const char* Filename, UINT32 TransparentColor, UIN
 	// If suffix is defined (theme) and file exists, load that instead
 	std::string fileName = Filename;
 
-	if (fioFileExists(str, optionalFileSuffix, ext))
-		fileName = str + optionalFileSuffix + ext;
+	if (fioFileExists(str, ldGetOptionalFileSuffix(), ext))
+		fileName = str + ldGetOptionalFileSuffix() + ext;
 	
 	if (!ldbmpLoadBMPFile(fileName.c_str(), &bi))
 	{

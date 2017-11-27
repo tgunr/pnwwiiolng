@@ -20,7 +20,11 @@ static ldTextureMap* Textures = new ldTextureMap(); // crash on exit on Mac avoi
 extern Image* ReadDDSFile(const std::string& name);
 extern Image* ReadTGAFile(const std::string& name);
 extern Image* ReadBMPFile(const std::string& name, unsigned int transparentColor);
-extern std::string optionalFileSuffix;
+
+static std::string optionalFileSuffix;
+
+std::string ldGetOptionalFileSuffix() {return optionalFileSuffix;}
+void ldSetOptionalFileSuffix(std::string suffix) { optionalFileSuffix = suffix; }
 
 /*--------------------------------------------------------------------------------
 Module: loadImage
@@ -104,7 +108,7 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
         str.erase(pos, str.length()-pos);
     }
 
-    if (texid == -1)
+    if (!oglIsTexture(texid, 0))
     {
         // Already loaded?
         texid = oglGetNamedTexture(str.c_str());
@@ -231,7 +235,7 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
 }
 
 /*--------------------------------------------------------------------------------
- Module: loadTexture
+ Module: reloadTexture
  Description:
  --------------------------------------------------------------------------------*/
 static int reloadTexture(int texid, TEXTURE *t )
@@ -244,7 +248,7 @@ static int reloadTexture(int texid, TEXTURE *t )
         fileName = t->name + optionalFileSuffix + t->ext;
         
         // if the suffix hasn't changed, just return - no changes
-        if (t->suffix.compare(optionalFileSuffix)==0)
+        if (t->suffix == optionalFileSuffix)
             return 0;
     }
     else
@@ -347,7 +351,7 @@ void ldReloadTextures()
             std::string fileName = reinterpret_cast<char *>(t->name) + optionalFileSuffix + (t->isdds()?".dds":(t->istga()?".tga":".bmp"));
             
             // if the texture suffix is different than current suffix
-            if (t->suffix.compare(optionalFileSuffix) != 0) {
+            if (t->suffix != optionalFileSuffix) {
                 std::string fName = t->name + t->ext;
                 reloadTexture(textureId, t);
 //                reloadTexture(fName, flags, tc, textureId);
