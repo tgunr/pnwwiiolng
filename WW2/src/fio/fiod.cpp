@@ -464,6 +464,14 @@ void fiodClose(int fd)
 }
 
 //////////////////////////////////////////////////////////////////////
+// External wrapper for fiodFileExists
+
+bool fiodFileExists(const char* name, bool userdir) {
+	stat_t s;
+	return GetFileStat(s, name, userdir);
+}
+
+//////////////////////////////////////////////////////////////////////
 // External wrapper for getFilePathAndSize
 
 size_t fiodFileSize(const char* name, bool userdir) {

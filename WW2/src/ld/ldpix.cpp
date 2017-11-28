@@ -61,7 +61,6 @@ int _loadImageFileToSurface(const char* Filename, UINT32 TransparentColor, UINT3
 {
 	char		basename[256], localname[256], tmpname[256];
 
-	bool WantDXT = (Flags & LDPIX_NO_DXT) == 0;
 	bool WantMipmap = (Flags & LDPIX_MIPMAP) != 0;
 	if (WantMipmap
 		&& (strncasecmp("ui\\", Filename, 3) == 0
@@ -70,7 +69,6 @@ int _loadImageFileToSurface(const char* Filename, UINT32 TransparentColor, UINT3
 	{
 		WantMipmap = false;
 	}
-    bool WantFlags = (WantMipmap ? CRT_FLAG_MIPMAP : CRT_FLAG_NONE) | (WantDXT ? CRT_FLAG_NONE : CRT_FLAG_WRITABLE);
 
 	strsafecpy(basename, Filename);
 	char* ptr = (char*)strrchr(basename, '.');
@@ -95,14 +93,17 @@ int _loadImageFileToSurface(const char* Filename, UINT32 TransparentColor, UINT3
 	for (int i=0; GfxFormats[i].Routine; i++)
 	{
 		strncpy(tmpname + suffixOffset, GfxFormats[i].Extension, sizeof(tmpname) - suffixOffset);
-        if(GfxFormats[i].Routine == ldLoadTexture) {
-            texid = ldLoadTexture(tmpname, TransparentColor, Flags);
-            if (piIsTexture(texid, 0)) {
-                return texid;
-            }
-        } else {
-            assert(false);
-        }
+		// if file exists, load it
+		if (fioFileExists(tmpname)) {
+			if(GfxFormats[i].Routine == ldLoadTexture) {
+				texid = ldLoadTexture(tmpname, TransparentColor, Flags);
+				if (piIsTexture(texid, 0)) {
+					return texid;
+				}
+			} else {
+				assert(false);
+			}
+		}
     }
     return -1;
 }

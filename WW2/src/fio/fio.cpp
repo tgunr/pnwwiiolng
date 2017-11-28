@@ -255,6 +255,38 @@ int fioEOF(int fd)
     }
 }
 
+// Short-cut function to test file for existance with options
+bool fioFileExists(std::string base, std::string suffix, std::string extension)
+{
+	std::string filename = base + suffix + extension;
+	return fioFileExists(filename.c_str());
+}
+
+/************************************************************************************************
+ fioFileExists
+ *************************************************************************************************/
+
+bool fioFileExists(const char* name)
+{
+	switch(fio_switch)
+	{
+		case -1:
+			return false;
+			break;
+		case ISUSERDIRECTORY:
+			WITH ( UsingUserdir() )
+			return fiodFileExists(name);
+			break;
+		case ISDIRECTORY:
+		default:
+			return fiodFileExists(name);
+			break;
+		case ISARCHIVE:
+			return fioaFileExists(name);
+			break;
+	}
+}
+
 /************************************************************************************************
 	fioFileSize
 *************************************************************************************************/

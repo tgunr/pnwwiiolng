@@ -11,6 +11,7 @@ Description:
 #include "scen/ScenarioManager.h"
 #include "fio/fio.h"
 #include "wwii/wwiiHash.h"
+#include "wwii/wwiiThemes.h"
 
 #include <vector>
 #include <deque>
@@ -130,25 +131,27 @@ static void loadXML(const char* path)
 {
     std::string dir = path;
 
-#if CHRISTMAS
-    dir += "Christmas_Tree/trees.xml";
-#else
+	if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
+	{
+    	dir += "Christmas_Tree/trees.xml";
+	}
+	else
+	{
+		if(gCustomTerrain) {
+			dir = SCEN_MGR->MapPath("trees.xml");
 
-    if(gCustomTerrain) {
-        dir = SCEN_MGR->MapPath("trees.xml");
+			int fd = fioOpen(dir.c_str());
 
-        int fd = fioOpen(dir.c_str());
-
-        if (fd == -1) {
-            dir = path;
-            dir += "trees.xml";
-        } else {
-            fioClose(fd);
-        }
-    } else {
-        dir += "trees.xml";
-    }
-#endif
+			if (fd == -1) {
+				dir = path;
+				dir += "trees.xml";
+			} else {
+				fioClose(fd);
+			}
+		} else {
+			dir += "trees.xml";
+		}
+	}
 
     XMLLoader load(dir.c_str());
 

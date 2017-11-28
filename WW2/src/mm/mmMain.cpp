@@ -170,7 +170,8 @@ mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsig
 	activate.teulIndex = 0;
 	activate.playerID = 0;
 	activate.otp = 0;
-
+	activate.theme = host_config.arena.theme;
+	
 	const SINT32 activateResult = wwiiSendActivate(teulIndex, &activate);
 	if ( activateResult < 0 )
 	{

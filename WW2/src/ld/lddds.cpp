@@ -5,8 +5,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "pi/pi.h"
 #include "ld/lddds.h"
-
 #include "ld/ldtexture.h"
+#include "fio/fio.h"
 
 //////////////////////////////////////////////////////////////////////
 // Function: ldddsLoadDDSTexture2D
@@ -32,8 +32,23 @@ LOGICAL ldddsGenerateTexture(SINT32 texid)
 // ldpix. Uses engine texture object.
 //////////////////////////////////////////////////////////////////////
 SINT32 ldddsLoadDDSTexture(const SCHAR* name, GLenum target, UINT32 flags)
-{
-    return ldTextureLoad(name, flags);
+{	
+	std::string str = name;
+	std::string::size_type pos = str.rfind('.');
+	std::string ext = ".";
+	if(pos != std::string::npos)
+	{
+		ext = ext + str.substr(pos+1);
+		str.erase(pos, str.length()-pos);
+	}
+	
+	// If suffix is defined (theme) and file exists, load that instead
+	std::string fileName = name;
+	
+	if (fioFileExists(str, ldGetOptionalFileSuffix(), ext))
+		fileName = str + ldGetOptionalFileSuffix() + ext;
+	
+    return ldTextureLoad(fileName, flags);
 }
 
 //////////////////////////////////////////////////////////////////////
