@@ -458,15 +458,23 @@ struct TEXTURE
 	TEXTURETYPE             type;
 
 	void* 					lpsurf[MAXMIPLEVELS];
-	unsigned int			flags;
-	unsigned int			transparentColor;
+	UINT32					flags;
+	UINT32					transparentColor;
 	
-#ifdef __cplusplus
 	bool isdds() {return type == TEXTURE_DDS;}
 	bool isbmp() {return type == TEXTURE_BMP;}
 	bool istga() {return type == TEXTURE_TGA;}
-#endif
-
+	
+	std::string getExtension() {
+		if (isdds())
+			return ".dds";
+		else if (istga())
+			return ".tga";
+		else if (isbmp())
+			return ".bmp";
+		else
+			return ".bmp";
+	}
 };
 
 struct TEXTURE3D

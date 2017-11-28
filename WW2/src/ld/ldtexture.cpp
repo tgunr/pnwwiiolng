@@ -296,7 +296,7 @@ static int reloadTexture(int texid, TEXTURE *t )
     t->hdevtex[0] = 1;
     t->suffix = optionalFileSuffix;
     
-    if(t->flags & LDPIX_CREATE_SURFACE_DATA)
+    if((t->flags & LDPIX_CREATE_SURFACE_DATA) != 0)
     {
         size_t size = 0;
         
@@ -348,7 +348,7 @@ void ldReloadTextures()
         int textureId = it->first;
         TEXTURE* t = oglGetTextureData(textureId);
         if (t != nullptr) {
-            std::string fileName = reinterpret_cast<char *>(t->name) + optionalFileSuffix + (t->isdds()?".dds":(t->istga()?".tga":".bmp"));
+            std::string fileName = reinterpret_cast<char *>(t->name) + optionalFileSuffix + t->getExtension();
             
             // if the texture suffix is different than current suffix
             if (t->suffix != optionalFileSuffix) {
