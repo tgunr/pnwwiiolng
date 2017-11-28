@@ -140,7 +140,7 @@ else
         xcode_version=$(xcodebuild -version)
         version_rsp=(${xcode_version// / })
         version_nums=(${version_rsp[1]//\./ })
-        if (( version_nums[0] < min_xcode_version_major ))  || (( version_nums[1] < min_xcode_version_minor )); then
+        if (( version_nums[0] < min_xcode_version_major ))  || (( version_nums[1] < min_xcode_version_minor  && version_nums[0] == min_xcode_version_major )); then
             exit_msg=${exit_msg}'|Xcode version incorrect, update to version '$min_xcode_version_major'.'$min_xcode_version_minor' or greater' 
             found_prereq_errors=true
         fi
