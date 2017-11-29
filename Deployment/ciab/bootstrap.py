@@ -34,11 +34,11 @@ def generate_tkt_and_bat(cfg, game_name, player_id):
             bat_file = pathname(CLIENT_PATH, bat_file)
         with open(bat_file, "w") as batfh:
             batfh.write(" ".join([
-                "WW2.exe",
+					cfg.ww2_path,
                     "-ticket", tkt_name,
                     "-window", "1",
-                    "-width", "800",
-                    "-height", "640",
+                    "-width", cfg.client_width,
+                    "-height", cfg.client_height,
                     "-log", "0",
                     "-data", "1",
                     "-datadir", cfg.data_path
@@ -52,8 +52,8 @@ def generate_tkt_and_bat(cfg, game_name, player_id):
                 "open", "-a", "'World War II Online'", "--args",
                     "-ticket", tkt_name,
                     "-window", "1",
-                    "-width", "800",
-                    "-height", "640",
+                    "-width", cfg.client_width,
+                    "-height", cfg.client_height,
                     "-log", "0",
                     "-data", "1",
                     "-datadir", cfg.data_path
@@ -101,7 +101,7 @@ def test_wwiiol_copy_target(cfg, subdir, contents):
         Returns True if we need to copy files, otherwise False.
     """
 
-    s = Step('Checking %s directory(s).' % subdir)
+    s = Step('Checking %s directory(s)' % subdir)
     entry = '%s_origin_path' % subdir
     source_path = getattr(cfg, entry, None)
     if not source_path:
@@ -161,12 +161,12 @@ def verify_lua_directory(cfg):
 
 
 def verify_playnet_path(cfg):
-    s = Step('Checking %s.' % cfg.playnet_path)
+    s = Step('Checking %s' % cfg.playnet_path)
     verify_path(cfg, 'playnet_path', [ 'etc/' ])
 
 
 def verify_wwiiol_path(cfg):
-    s = Step('Checking %s.' % cfg.wwiiol_path)
+    s = Step('Checking %s' % cfg.wwiiol_path)
     verify_path(cfg, 'wwiiol_path', [ 'bin/' ])
     verify_data_directory(cfg)
     verify_bin_directories(cfg)
@@ -174,7 +174,7 @@ def verify_wwiiol_path(cfg):
 
 
 def verify_database_access(cfg):
-    s = Step("Checking database access.")
+    s = Step("Checking database access")
     try:
         cli = MySQLCli(cfg.db_admin_user, cfg.db_admin_pass, cfg.db_host)
     except MySQLCliError as e:
@@ -196,7 +196,7 @@ def verify_database_access(cfg):
 
     if not cfg.populate_db:
         # Check that the game user information they gave us works.
-        ss = Step("Checking database access with game account.")
+        ss = Step("Checking database access with game account")
         try:
             usercli = MySQLCli(cfg.db_game_user, cfg.db_game_pass, cfg.db_host)
         except MySQLCliError as e:
@@ -212,7 +212,7 @@ def verify_database_access(cfg):
 
 
 def verify_config(cfg):
-    s = Step("Verifying config.")
+    s = Step("Verifying config")
     if not os.path.exists(cfg.db_import_file):
         raise MissingPathError("Missing '%s' file." % cfg.db_import_file)
     verify_playnet_path(cfg)
@@ -265,17 +265,17 @@ def main():
         if retry == 'n':
             sys.exit(1)
 
-    step("Connecting to DB.")
+    step("Connecting to DB")
     cli = MySQLCli(cfg.db_admin_user, cfg.db_admin_pass, cfg.db_host)
 
     if cfg.populate_db:
-        step("Creating Game DB user.")
+        step("Creating Game DB User")
         create_user(cli, cfg.db_game_user, cfg.db_game_pass)
 
-        step("Populating database.")
+        step("Populating Databases")
         cli.execute_script(DB_IMPORT_FILE)
 
-    step("Generating environment.cfg.")
+    step("Generating environment.cfg")
     cfg_file = pathname(cfg.playnet_path, "etc", "environment.cfg")
     with open(cfg_file, "w") as envfh:
         envfh.write(
@@ -296,22 +296,23 @@ def main():
             "DBSE_PRIMARY_ADDRESS=localhost\n"
             "DBSE_CONNECTION_TIMEOUT_MS=60000\n"
             "PEER_CONNECTION_TIMEOUT_MS=60000\n"
-            "MANAGE_PROCESSES=dbd;strat;chat;map;cell\n"
+            "MANAGE_PROCESSES=strat;chat;map;cell\n"
 			"AUTH_DB="+cfg.db_host+"\n"
+			"PUBLIC_IP="+cfg.base_address+"\n"
         )
 
     if cfg.xfer_exes:
-        step("Copying executables.")
+        step("Copying Executables")
         shutil.rmtree(cfg.bin_path, ignore_errors=True)
         shutil.copytree(cfg.bin_origin_path, cfg.bin_path, symlinks=True)
 
     if cfg.xfer_lua:
-        step("Copying Lua scripts.")
+        step("Copying Lua Scripts")
         shutil.rmtree(cfg.lua_path, ignore_errors=True)
         shutil.copytree(cfg.lua_origin_path, cfg.lua_path, symlinks=True)
 
     if cfg.xfer_data:
-        step("'%s'ing data." % (cfg.data_transfer.title()))
+        step("'%s'ing Data" % (cfg.data_transfer.title()))
         shutil.rmtree(cfg.data_path, ignore_errors=True)
         if cfg.data_transfer == 'copy':
             shutil.copytree(cfg.data_origin_path, cfg.data_path, symlinks=True)
@@ -321,20 +322,22 @@ def main():
             os.symlink(cfg.data_origin_path, cfg.data_path)
 
     if cfg.import_strat:
-        step("Importing terrain/strat data.")
+        step("Importing Terrain/Strat Data")
         try:
             check_call([pathname(cfg.bin_path, STRAT_LOADER), '-C',
                     cfg.data_path])
         except:
-            die("Unable to import terrain/strat data.")
+            die("Unable to import terrain/strat data")
 
-    step("Generating .tkt and .bat files for test accounts.")
-    for i in range(1, 6):
-        for kind in ('rat', 'plyr'):
-            name, pid = "%s%04dp" % (kind, i), BASE_DEV_ID + i
-            generate_tkt_and_bat(cfg, name, pid)
-
-    step("Complete.")
+    step("Generating .tkt and .bat files for Test Accounts")
+    generate_tkt_and_bat(cfg, '002-Producer', '2')
+    generate_tkt_and_bat(cfg, '003-CRS', '3')
+    generate_tkt_and_bat(cfg, '004-GM', '4')
+    generate_tkt_and_bat(cfg, '005-Trainer', '5')
+    for i in range(6, 101):
+        name, pid = "player-%03dp" % (i), BASE_USR_ID + i
+        generate_tkt_and_bat(cfg, name, pid)
+    step("Complete")
 
 if __name__ == '__main__':
     try:
