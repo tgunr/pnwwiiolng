@@ -29,7 +29,6 @@
 #include "client/client.h"
 #include "wwii/wwiiThemes.h"
 #include "ld/ldtexture.h"
-#include "spt/sptmain.h"
 
 // Login connections by teulIndex.
 static std::map<SINT32, Teul::Connection*> _ConnectionsByTeulIndex;
@@ -162,12 +161,6 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 	switch (activate.serverType)
 	{
 	case MAP_HOST:
-		if (WWII::Theme::theme() != static_cast<WWII::THEME>(activate.theme))
-		{
-			WWII::Theme::setTheme(activate.theme);
-			ldReloadTextures();
-			sptmainInit();
-		}
 		clientActivateMap(a->teulIndex,TRUE, maskedAddr, activate.port);
 		_updatesSent = 0;
 		break;

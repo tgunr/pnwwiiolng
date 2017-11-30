@@ -25,7 +25,6 @@ struct WWII_ACTIVATE
 		, teulIndex(-1)
 		, playerID(0)
 		, otp(0)
-		, theme(0)
 	{
 		pkey[0] = 0;
 	}
@@ -37,7 +36,6 @@ struct WWII_ACTIVATE
 	SINT32		teulIndex;
 	playerid_t	playerID;
 	UINT32		otp;
-	UINT32		theme;
 	UCHAR		pkey[cat::EasyHandshake::PUBLIC_KEY_BYTES];
 
 	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
@@ -49,7 +47,6 @@ struct WWII_ACTIVATE
 		a->packer(mode, teulIndex);
 		a->packer(mode, playerID);
 		a->packer(mode, otp);
-		a->packer(mode, theme);
 		
 		if ( teulIndex != 0 && playerID != 0 )
 			a->offset = teulPackVoid(mode, a->packed, a->offset, pkey, sizeof(pkey));

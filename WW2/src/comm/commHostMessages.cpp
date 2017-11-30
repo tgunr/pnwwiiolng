@@ -1288,7 +1288,7 @@ Host::TimeUpdate::SendFunction(ACTION_OBJECT* const a)
 void
 Host::TimeUpdate::Send(SINT32 teulIndex)
 {
-	Host::TimeUpdate update(wthrGetGameTime(), wthrGetTimeFactor(), wthrGetWeatherPattern(), wthrGetFogPattern());
+	Host::TimeUpdate update(wthrGetGameTime(), wthrGetTimeFactor(), wthrGetWeatherPattern(), wthrGetFogPattern(), host_config.arena.theme);
 	teulSend(teulIndex, Host::TimeUpdate::Callback, &update);
 }
 
