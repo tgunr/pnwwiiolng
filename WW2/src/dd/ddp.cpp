@@ -1438,6 +1438,7 @@ static void OnSetFocus(HWND pOldWnd)
 
 	focus = true;
 
+	ddpResetWindow();
 	dipAcquire();
 
 	Write_Debug("OnSetFocus");
@@ -1452,6 +1453,7 @@ static void OnKillFocus(HWND pNewWnd)
 
 	focus = false;
 
+	ddpResetDisplay();
 	dipUnacquire();
 
 	Write_Debug("OnKillFocus");
