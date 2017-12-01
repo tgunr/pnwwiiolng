@@ -70,6 +70,7 @@
 #include "wwii/wwiiServerTrackedObject.h"
 #include "wwii/wwiiThemes.h"
 #include "spt/sptmain.h"
+#include "wwii/wwiiClientMessages.h"
 
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags);
 
@@ -301,12 +302,7 @@ void GameClient::ProcessGameTimeUpdate(Host::TimeUpdate const& update)
 			fxWeatherSetState(weather, seedindex);
 		}
 		
-		if (WWII::Theme::theme() != static_cast<WWII::THEME>(update.theme))
-		{
-			WWII::Theme::setTheme(update.theme);
-			ldReloadTextures();
-			sptmainInit();
-		}
+		checkThemeChange(static_cast<UINT32>(update.theme));
 
 	}
 

@@ -29,6 +29,7 @@
 #include "client/client.h"
 #include "wwii/wwiiThemes.h"
 #include "ld/ldtexture.h"
+#include "spt/sptmain.h"
 
 // Login connections by teulIndex.
 static std::map<SINT32, Teul::Connection*> _ConnectionsByTeulIndex;
@@ -47,6 +48,17 @@ extern UINT32 _ReadAmmoTypes();
 bool wwiiIncrementHits();
 void wwiiOhYeah(const UCHAR withCode);
 void wwiiSendUserAbortedApp();
+
+// Method checks to see if the theme provided indicates a new theme and if so, activates it
+void checkThemeChange(UINT32 theme)
+{
+	if (WWII::Theme::theme() != static_cast<WWII::THEME>(theme))
+	{
+		WWII::Theme::setTheme(theme);
+		ldReloadTextures();
+		sptmainInit();
+	}
+}
 
 #if defined(PROCESS_LIST_SUBMISSIONS) && platOS == OS_WIN32
 ////
@@ -161,6 +173,7 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 	switch (activate.serverType)
 	{
 	case MAP_HOST:
+		checkThemeChange(activate.theme);
 		clientActivateMap(a->teulIndex,TRUE, maskedAddr, activate.port);
 		_updatesSent = 0;
 		break;
