@@ -29,7 +29,6 @@
   // This can be a full path, or a path relative to ContentRoot
   "FileExclusion" "*.pdb"
   "FileExclusion" "DATA/DirectXRedist"
-  "FileExclusion" "DATA/loc"
   "FileExclusion" "DATA/screens"
   "FileExclusion" "DATA/playgate"
   "FileExclusion" "GIT.placeholder"
