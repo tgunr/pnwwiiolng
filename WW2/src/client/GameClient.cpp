@@ -68,6 +68,9 @@
 #include "strt/strtEventTypes.h"
 #include "strt/strtCPFlags.h"
 #include "wwii/wwiiServerTrackedObject.h"
+#include "wwii/wwiiThemes.h"
+#include "spt/sptmain.h"
+#include "wwii/wwiiClientMessages.h"
 
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags);
 
@@ -298,6 +301,9 @@ void GameClient::ProcessGameTimeUpdate(Host::TimeUpdate const& update)
 		{
 			fxWeatherSetState(weather, seedindex);
 		}
+		
+		checkThemeChange(static_cast<UINT32>(update.theme));
+
 	}
 
 	trnmainSetLightingUpdate(TRUE);

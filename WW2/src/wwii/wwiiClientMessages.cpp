@@ -49,6 +49,17 @@ bool wwiiIncrementHits();
 void wwiiOhYeah(const UCHAR withCode);
 void wwiiSendUserAbortedApp();
 
+// Method checks to see if the theme provided indicates a new theme and if so, activates it
+void checkThemeChange(UINT32 theme)
+{
+	if (WWII::Theme::theme() != static_cast<WWII::THEME>(theme))
+	{
+		WWII::Theme::setTheme(theme);
+		ldReloadTextures();
+		sptmainInit();
+	}
+}
+
 #if defined(PROCESS_LIST_SUBMISSIONS) && platOS == OS_WIN32
 ////
 // Please avoid the use of the word "process"
@@ -162,12 +173,7 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 	switch (activate.serverType)
 	{
 	case MAP_HOST:
-		if (WWII::Theme::theme() != static_cast<WWII::THEME>(activate.theme))
-		{
-			WWII::Theme::setTheme(activate.theme);
-			ldReloadTextures();
-			sptmainInit();
-		}
+		checkThemeChange(activate.theme);
 		clientActivateMap(a->teulIndex,TRUE, maskedAddr, activate.port);
 		_updatesSent = 0;
 		break;

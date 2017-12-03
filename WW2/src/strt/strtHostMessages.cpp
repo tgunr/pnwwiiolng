@@ -265,7 +265,7 @@ SINT32
 strtBroadcastTimeUpdate(UINT32 gameTime, UINT32 timeFactor, UINT32 weatherPattern, UINT32 fogPattern)
 {
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_BROADCAST_TIME_UPDATE_Y));
-	outgoing.construct<Host::TimeUpdate>(gameTime, timeFactor, weatherPattern, fogPattern);
+	outgoing.construct<Host::TimeUpdate>(gameTime, timeFactor, weatherPattern, fogPattern, 0);
 	return serverSendPacketToPeers(outgoing);
 }
 
