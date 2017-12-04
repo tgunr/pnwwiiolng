@@ -287,6 +287,12 @@ void fpTPSDataInit()
 	fpTPSInfantryMeshFiles[AMERICAN_INFANTRY][TPS_LOD_4] = TPS_MESH_DIR "american_inf\\inf_us_lod4";
 	//fpTPSInfantryMeshFiles[AMERICAN_INFANTRY][TPS_LOD_5] = TPS_MESH_DIR "american_inf\\inf_us_lod5";
 
+	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_1] = TPS_MESH_DIR "italian_inf\\inf_it_lod1";
+	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_2] = TPS_MESH_DIR "italian_inf\\inf_it_lod2";
+	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_3] = TPS_MESH_DIR "italian_inf\\inf_it_lod3";
+	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_4] = TPS_MESH_DIR "italian_inf\\inf_it_lod4";
+	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_5] = TPS_MESH_DIR "italian_inf\\inf_it_lod5";
+
 	fpTPSInfantryMeshFiles[BRITISH_PARA_PACK][TPS_LOD_1] = TPS_MESH_DIR "para_brit\\para_uk_chute_lod1";
 	fpTPSInfantryMeshFiles[BRITISH_PARA_PACK][TPS_LOD_2] = TPS_MESH_DIR "para_brit\\para_uk_chute_lod2";
 	fpTPSInfantryMeshFiles[BRITISH_PARA_PACK][TPS_LOD_3] = TPS_MESH_DIR "para_brit\\para_uk_chute_lod3";
@@ -632,7 +638,6 @@ void fpTPSDataInit()
 	// end MIXINS
 
 	fpTPSDefaultFaceNames[BRITISH_INFANTRY] = "face1";
-
 	fpTPSDefaultFaceNames[GERMAN_INFANTRY] = "face2";
 	fpTPSDefaultFaceNames[FRENCH_INFANTRY] = "face3";
 	fpTPSDefaultFaceNames[BRITISH_HC] = "britishofficerhead";
@@ -651,6 +656,7 @@ void fpTPSDataInit()
 	fpTPSDefaultFaceNames[GERMAN_ML] = "06";
 	fpTPSDefaultFaceNames[FRENCH_ML] = "16";
 	fpTPSDefaultFaceNames[AMERICAN_INFANTRY] = "face1";
+	fpTPSDefaultFaceNames[ITALIAN_INFANTRY] = "face2";
 
 #ifdef USE_NEW_DECALS
     int q = 0;

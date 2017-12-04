@@ -69,7 +69,8 @@ const SCHAR* arm_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "arms\\armsmesh-britinf",
 	FPS_DIR "arms\\armsmesh-germinf",
 	FPS_DIR "arms\\armsmesh-frenchinf",
-	FPS_DIR "arms\\armsmesh-britinf" // americans
+	FPS_DIR "arms\\armsmesh-britinf", // Americans
+	FPS_DIR "arms\\armsmesh-germinf" // Italians
 };
 
 const SCHAR* replacement_arms_file = FPS_DIR "arms\\replacement_arms_maps";
@@ -96,7 +97,8 @@ const SCHAR* leg_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "legs\\brit-legs",
 	FPS_DIR "legs\\german-legs",
 	FPS_DIR "legs\\french-legs",
-	FPS_DIR "legs\\brit-legs" // americans
+	FPS_DIR "legs\\brit-legs", // americans
+	FPS_DIR "legs\\german-legs" // Italians
 };
 
 const SCHAR* hud_icons[NUM_ICONS] =
@@ -219,7 +221,8 @@ const SCHAR* armTypeStrings[NUM_INFANTRY_TYPES]			=
 	"ukml",
 	"deml",
 	"frml",
-	"usarmy"
+	"usarmy",
+	"itarmy"
 };
 
 const SCHAR* weapNameStrings[NUM_WEAPONS] =
