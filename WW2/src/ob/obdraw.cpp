@@ -5589,10 +5589,10 @@ FLOAT32		ratio;
 #ifdef BETA_RELEASE
     else if (lplod->flag2 & OBJECT_IS_PARTOF_VEHICLE)
     {
-        OBJECT *lpObj = lplod->modelInstance->rootObject;
-        while (lpObj->child)
-            lpObj = lpObj->child;
-        distsqr = lpObj->distsqr * 100.0f;
+		OBJECT *lpObj = lplod->modelInstance->rootObject;
+
+		distsqr = GetDistance(lpObj, true);
+
     }
 #endif
 	else
@@ -6206,4 +6206,28 @@ int obdrawGetMultiTextureID(int offset)
 void obdrawGetMultiTextureMatrix(int offset, Matrixf& matrix)
 {
     matrix.set(MultiTextureInfo[offset].MultiTextureMatrix);
+}
+
+//This method recursively searches all children and all siblings of the input object for a populated 'distsqr' field.
+//If 'multiply' is 'true', then the found value will be multiplied by 100.0f before being returned. Otherwise the found value is returned unchanged.
+//If it does not find a populated 'distsqr' field, it will return '0'.
+//NOTE: This may result in a performance drop; please investigate toggle options for the LOD Distance display if performance testing is necessary with the Beta Release.
+float GetDistance(OBJECT * lplod, bool multiply)
+{
+	float retval = 0;
+	if (lplod->distsqr > 0)
+	{
+		retval = lplod->distsqr;
+		if (multiply)
+			retval *= 100.0f;
+	}
+	else
+	{
+		if (lplod->child)
+			retval = GetDistance(lplod->child, multiply);
+
+		if (retval <= 0 && lplod->sibling)
+			retval = GetDistance(lplod->sibling, multiply);
+	}
+	return retval;
 }
