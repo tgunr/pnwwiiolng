@@ -180,6 +180,7 @@ const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"GreaseGun",
 	"mp34",
 	"fg42g",
+	"carcano",
 };
 
 const SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES] =
@@ -285,6 +286,7 @@ const SCHAR* weapNameStrings[NUM_WEAPONS] =
 	(SCHAR *)"m3a1",
 	(SCHAR *)"mp34",
 	(SCHAR *)"fg42g",
+	(SCHAR *)"carcano",
 };
 
 class fpFPSVisLoadoutsLoader : public XMLLoader2<fpFPSVisLoadoutsLoader>
@@ -1185,6 +1187,9 @@ void fpFPSDataReadFPSFile()
 		break;
 		case fg42gFile_hash:
 			_fpFPSDataReadWeaponFile (FG42G, varData);
+		break;
+		case carcanoFile_hash:
+			_fpFPSDataReadWeaponFile (CARCANO, varData);
 		break;
 
 		case crawlSound_hash:
@@ -2497,6 +2502,24 @@ void fpFPSDataInit ()
 	arms_anim_files[FG42G][UNDEPLOYING]     = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_deploy";
 	arms_anim_files[FG42G][DEPLOYED_FIRE]   = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_fireDeployed";
 	arms_anim_files[FG42G][DEPLOYED_RELOAD] = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_reload";
+
+	weap_anim_files[CARCANO][RELOAD]      = FPS_DIR "carcano\\weapon\\weap_Carcano_reload";
+	weap_anim_files[CARCANO][STAND_FIRE]  = FPS_DIR "carcano\\weapon\\weap_Carcano_fire";
+	weap_anim_files[CARCANO][CROUCH_FIRE] = FPS_DIR "carcano\\weapon\\weap_Carcano_fire";
+	weap_anim_files[CARCANO][AIM_FIRE]    = FPS_DIR "carcano\\weapon\\weap_Carcano_aimFire";
+	arms_anim_files[CARCANO][RELOAD]      = FPS_DIR "carcano\\arms\\arms_Carcano_reload";
+	arms_anim_files[CARCANO][STAND_FIRE]  = FPS_DIR "carcano\\arms\\arms_Carcano_fire";
+	arms_anim_files[CARCANO][CROUCH_FIRE] = FPS_DIR "carcano\\arms\\arms_Carcano_fire";
+	arms_anim_files[CARCANO][AIM_FIRE]    = FPS_DIR "carcano\\arms\\arms_Carcano_aimFire";
+	arms_anim_files[CARCANO][LOWER]       = FPS_DIR "carcano\\arms\\arms_Carcano_lowered";
+	arms_anim_files[CARCANO][IDLE]        = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
+	arms_anim_files[CARCANO][KNEEL]       = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
+	arms_anim_files[CARCANO][AIM]         = FPS_DIR "carcano\\arms\\arms_Carcano_aim";
+	arms_anim_files[CARCANO][TROT]        = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
+	arms_anim_files[CARCANO][CREEP]       = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
+	arms_anim_files[CARCANO][CRAWL]       = FPS_DIR "carcano\\arms\\arms_Carcano_crawl";
+	arms_anim_files[CARCANO][SPRINT]      = FPS_DIR "carcano\\arms\\arms_Carcano_run";
+	arms_anim_files[CARCANO][SIT]         = FPS_DIR "carcano\\arms\\arms_Carcano_lowered";
 
 	// BRIDGE_REPAIR animation files
 	arms_anim_files[BRIDGE_REPAIR][STAND_FIRE] = FPS_DIR "satchel\\animations\\fire\\satchel-fire(1)";

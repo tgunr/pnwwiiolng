@@ -490,6 +490,7 @@ void fpTPSDataInit()
 	fpTPSWeaponMeshFiles[MP34][TPS_LOD_1]     = TPS_MESH_DIR "mp34\\mp34";
 	fpTPSWeaponMeshFiles[FG42G][TPS_LOD_1]    = TPS_MESH_DIR "fg42g\\fg42g";
 	fpTPSWeaponMeshAltFiles[FG42G][TPS_LOD_1] = TPS_MESH_DIR "fg42g\\fg42g_Deployed";
+	fpTPSWeaponMeshFiles[CARCANO][TPS_LOD_1]  = TPS_MESH_DIR "carcano\\carcano";
 
 	// base pose
 	fpTPSBasePoseFile = TPS_BLEND_DIR "stand\\idle\\ui\\relaxed.txt";
