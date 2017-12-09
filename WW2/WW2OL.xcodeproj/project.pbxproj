@@ -4158,7 +4158,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4200,7 +4200,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4257,7 +4257,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4341,7 +4341,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4392,7 +4392,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4503,7 +4503,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
