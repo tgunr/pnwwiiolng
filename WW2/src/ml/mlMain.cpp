@@ -267,6 +267,10 @@ enum
 	ML_VARNAME_CANOPYJAMSOUND,
 	ML_VARNAME_STATICFRICTION,
 	ML_VARNAME_DYNAMICFRICTION,
+	ML_VARNAME_DEPLOYSOUND,
+	ML_VARNAME_UNDEPLOYSOUND,
+	ML_VARNAME_DEPLOYSOUNDVOLUME,
+	ML_VARNAME_UNDEPLOYSOUNDVOLUME,
 	ML_MAX_VEHICLEVARS
 };
 
@@ -326,7 +330,11 @@ static UCHAR _VehicleTypeVarNames[ML_MAX_VEHICLEVARS][32] = {
 													"flapjamsound",
 													"canopyjamsound",
 													"staticfriction",
-													"dynamicfriction"
+													"dynamicfriction",
+													"deploysound",
+													"undeploysound",
+													"deploysoundvolume",
+													"undeploysoundvolume",
 													};
 
 
@@ -8785,6 +8793,14 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 			{
 				CrewData->SetBombbayDoor[Position] = true;
 				CrewData->BombbayDoorState[Position] = atoi((SCHAR*)VarContents);
+			} else if ( strcmp((SCHAR*)VarName, "deploysound") == 0 ) {
+				strcpy(CrewData->DeploySound[Position], (SCHAR*)VarContents);
+			} else if ( strcmp((SCHAR*)VarName, "undeploysound") == 0 ) {
+				strcpy(CrewData->UndeploySound[Position], (SCHAR*)VarContents);
+			} else if ( strcmp((SCHAR*)VarName, "deploysoundvolume") == 0 ) {
+				CrewData->DeploySoundVolume[Position] = (FLOAT32)atof((SCHAR*)VarContents);
+			} else if ( strcmp((SCHAR*)VarName, "undeploysoundvolume") == 0 ) {
+				CrewData->UndeploySoundVolume[Position] = (FLOAT32)atof((SCHAR*)VarContents);
 			}
 		}
 	}
