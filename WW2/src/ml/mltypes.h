@@ -112,6 +112,10 @@ struct mlPositionData
 	SINT8 HatchSound[ML_MAX_CREW_POSITIONS][32];
 	SINT8 CanopyCloseSound[ML_MAX_CREW_POSITIONS][32];
 	SINT8 HatchCloseSound[ML_MAX_CREW_POSITIONS][32];
+	SINT8 DeploySound[ML_MAX_CREW_POSITIONS][32];
+	SINT8 UndeploySound[ML_MAX_CREW_POSITIONS][32];
+	FLOAT32 DeploySoundVolume[ML_MAX_CREW_POSITIONS];
+	FLOAT32 UndeploySoundVolume[ML_MAX_CREW_POSITIONS];
 
 	UINT32 NumberOfSecondaryWeapons[ML_MAX_CREW_POSITIONS]; // number of secondary weapon groups available, minus 1
 	SINT8 SecondaryWeaponMsg[ML_MAX_CREW_POSITIONS][ML_MAX_WEAPON_GROUPINGS][32]; // what message to display when selecting this weapon group
@@ -416,6 +420,7 @@ struct mlVehicleData
     SINT32  bombbayDoorSoundId;
     SINT32  gearJamSoundId;
     SINT32  canopySoundId[ML_MAX_CREW_POSITIONS];
+    SINT32  deploySoundId; // Note: Not per-position since deployment is currently per-vehicle.
 
 // Collision
 	trnCDTerrainObject* 	MedTrnList[ML_NUM_MED_LIST_ELEMENTS+1]; // anything within 2km of vehicle

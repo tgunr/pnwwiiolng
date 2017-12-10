@@ -805,6 +805,33 @@ UINT32 mlToggleBombBayDoor(SINT32 Param,UINT32 Id,UINT32 Detach)
 					VehicleData->bombbayDoorSoundId = id;
 				}
 			}
+		} else {
+			// HACK: This is the worst garbage in the world: "BombBayDoor" also means deploy weapon
+			if ( VehicleData->deploySoundId > 0 ) {
+				fxSndStopSound(VehicleData->deploySoundId);
+				VehicleData->deploySoundId = 0;
+			}
+
+			SINT32 id = fxSndGetNewSound();
+			if ( id > 0 ) {
+				const UINT32 Position = persGetPersonaPosition();
+				const SINT8* sound = VehicleData->BombBayDoor ? VehicleData->CrewData.DeploySound[Position]
+				                                              : VehicleData->CrewData.UndeploySound[Position];
+				if ( sound ) {
+					fxSndSetSoundName(id, sound);
+					fxSndSetPriority(id, IDE_FP_PRIORITY_MEDIUM);
+					fxSndSetSoundType(id, TYPE_FINITE_SOUND);
+					fxSndSetVolume(id, 1.0f);
+					fxSndSetPitch(id, 1.0f);
+					fxSndSetPlayType(id, DEF_PLAYTYPE_HEAD);
+					fxSndSetKillCallback(id, _soundkill);
+					fxSndSetKillData(id, &VehicleData->deploySoundId);
+
+					if ( fxSndInitSound(id) ) {
+						VehicleData->deploySoundId = id;
+					}
+				}
+			}
 		}
 	}
 
