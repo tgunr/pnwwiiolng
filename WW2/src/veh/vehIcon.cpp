@@ -26,6 +26,7 @@
 #include "ogl/States.h"
 #include "fp/fpFPS.h"
 #include "fx/TransformEffect.h"
+#include "ob/obdraw.h"
 
 /************************************************************************************************
 	vehIcon
@@ -661,9 +662,9 @@ static void _DrawVehicleIconDeprecated(vehVehicle* CurrentVehicle)
                 else
                 {
                     OBJECT * rootChild = po;
-                    while (rootChild->child != nullptr)
-                        rootChild = rootChild->child;
-                    dist = static_cast<SINT32>(rootChild->distsqr);
+
+					dist = static_cast<SINT32>(GetDistance(rootChild, false));
+
                     for (SINT32 i = 0; i < ML_MAX_LODS; i++)
                     {
                         if (CurrentVehicle->VehicleObjectData->LODObjects[i] &&
