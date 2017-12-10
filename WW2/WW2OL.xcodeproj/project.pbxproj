@@ -3550,22 +3550,22 @@
 				LastUpgradeCheck = 0720;
 				TargetAttributes = {
 					080C7E831062F011000A242F = {
-						DevelopmentTeam = J63A54QWD2;
+						DevelopmentTeam = 755QPC3L4G;
 					};
 					47B0ED230E9A66A40089DCC4 = {
-						DevelopmentTeam = J63A54QWD2;
+						DevelopmentTeam = 755QPC3L4G;
 					};
 					8D0C4E890486CD37000505A6 = {
-						DevelopmentTeam = J63A54QWD2;
+						DevelopmentTeam = 755QPC3L4G;
 						ProvisioningStyle = Manual;
 					};
 					E97C76341C8513EB00875F44 = {
 						CreatedOnToolsVersion = 7.2.1;
-						DevelopmentTeam = J63A54QWD2;
+						DevelopmentTeam = 755QPC3L4G;
 					};
 					FA448CE11D0CB25500C4936D = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = J63A54QWD2;
+						DevelopmentTeam = 755QPC3L4G;
 					};
 				};
 			};
@@ -4237,6 +4237,7 @@
 		E964E05D1E914A0E00D4BC5F /* BetaRelease */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4244,6 +4245,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/mac",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.omggen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
@@ -4321,6 +4323,7 @@
 		E9C3FB651EE1A4EF00872413 /* MC */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4328,6 +4331,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/mac",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.omggen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
@@ -4430,6 +4434,7 @@
 		FA448CE71D0CB25500C4936D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4437,6 +4442,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/mac",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.omggen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
@@ -4445,6 +4451,7 @@
 		FA448CE81D0CB25500C4936D /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4452,6 +4459,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/mac",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.omggen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
@@ -4460,6 +4468,7 @@
 		FA448CE91D0CB25500C4936D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4467,6 +4476,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/mac",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.omggen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
@@ -4475,6 +4485,7 @@
 		FA448CEA1D0CB25500C4936D /* GM */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4482,6 +4493,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/mac",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.omggen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
