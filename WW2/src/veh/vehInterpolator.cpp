@@ -383,10 +383,9 @@ const Update& InfantryPredictor::Interpolate(FrameTime frame) {
 
 //==============================================================================
 
-// HACK: Used for offline clones
-void InfantryPredictor::ForceSync(void) {
-	NewPosDataUpdate(pred_pos.timestamp, pred_pos.frametime);
-	pred_pos = prev_msg = curr_msg;
+void InfantryPredictor::SetCloneFlags(UINT32 flags_) {
+	assert ( (_vehicle->Flags & VEH_FLAGS_IS_CLONE) );
+	curr_msg.animationFlags = flags_;
 }
 
 //==============================================================================

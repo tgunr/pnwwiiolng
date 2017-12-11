@@ -4882,7 +4882,7 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 				gr2AnimBitPacker animFlags(anim->currentFlags);
 
 				animFlags.deathState = 1;
-				Vehicle->interpolator.SetFlags(animFlags.pack());
+				Vehicle->interpolator.SetCloneFlags(animFlags.pack());
 			}
 		}
 #endif
@@ -7121,11 +7121,6 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 				myVehicle->PosData.Pos.y,
 				myVehicle->PosData.Pos.z);
 			*/
-
-			if ( myVehicle->VehicleType->Type == VEH_TYPE_PERSON ) {
-				// We still use the interpolator for offline clones, because derp.
-				veh->interpolator.ForceSync();
-			}
 
 			for(int i = 0; i < 16; i++)
 			{
