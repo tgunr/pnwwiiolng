@@ -4478,6 +4478,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.omggen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
 			name = Release;
@@ -4495,6 +4496,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.omggen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
 			name = GM;
