@@ -289,6 +289,8 @@ void GameClient::ProcessGameTimeUpdate(Host::TimeUpdate const& update)
 	// scenarios have custom time of day and weather
 	if(!SCEN_MGR->IsActive())
 	{
+		checkThemeChange(static_cast<UINT32>(update.theme));
+
 		trnTODSetTimeOfDay(update.gametime);
 		trnTODSetTimeMultiplier((FLOAT32)update.factor);
 
@@ -301,9 +303,6 @@ void GameClient::ProcessGameTimeUpdate(Host::TimeUpdate const& update)
 		{
 			fxWeatherSetState(weather, seedindex);
 		}
-		
-		checkThemeChange(static_cast<UINT32>(update.theme));
-
 	}
 
 	trnmainSetLightingUpdate(TRUE);
