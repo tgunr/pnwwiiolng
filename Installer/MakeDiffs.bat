@@ -18,3 +18,4 @@ SET out=diff
 .\Assets\xdelta3 -e -f -9 -s "%src%\Settings.exe"  "%dst%\Settings.exe"  "%out%\Settings.exe.patch"
 .\Assets\xdelta3 -e -f -9 -s "%src%\license.rtf"   "%dst%\license.rtf"   "%out%\license.rtf.patch"
 .\Assets\xdelta3 -e -f -9 -s "%src%\readme.rtf"    "%dst%\readme.rtf"    "%out%\readme.rtf.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\DATA\playgate\tos-bg.bmp"    "%dst%\DATA\playgate\tos-bg.bmp"    "%out%\tos-bg.bmp.patch"

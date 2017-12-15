@@ -97,8 +97,8 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "arena.speedHackRatio",		TYPE_FLOAT,	&host_config.arena.speedHackRatio,		0,		"1.0001",	"Minimum drift ratio to be a speed-hack" }
 ,	{ "arena.mobileSpawnWaypoint",	TYPE_STRING,host_config.arena.mobileSpawnWaypoint, MAX_HANDLE_SIZE, "MSPAWN", "Mobile Spawn Waypoint (gamename)" }
 ,	{ "arena.despawnTime",			TYPE_SINT,	&host_config.arena.despawnTime_s,		3600,	"10",	"Despawn Timer (seconds)" }
-,	{ "arena.allowDirectSpawn",		TYPE_BOOL,	&host_config.arena.allowDirectSpawn,		0,		"n",	"Enable direct spawning used by Multi-Client" }
-
+,	{ "arena.allowDirectSpawn",		TYPE_BOOL,	&host_config.arena.allowDirectSpawn,	0,		"n",	"Enable direct spawning used by Multi-Client" }
+,	{ "arena.theme",				TYPE_SINT,	&host_config.arena.theme, 				0,		"0",	"Themes: 0=None, 1=Christmas, 2=Veterens, 3=Halloween" }
 ,	{ "balance.above",				TYPE_SINT,	&host_config.balance.above,				0,		"0",	"Minimum players top side must have to get side balanced"  }
 ,	{ "balance.delaysMax",			TYPE_SINT, 	&host_config.balance.delaysMax, 		0,		"0",	"Maximum side-balancing delay (seconds)" }
 ,	{ "balance.delaysPctg",			TYPE_SINT,	&host_config.balance.delaysPctg,		0,		"0",	"Side must have this %age more players to start spawn delays" }
@@ -238,6 +238,10 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "throttle.timeM",				TYPE_BYTE,	&host_config.throttle.timeM,			0,		"10",	"Time after which throttles are released (minutes)" }
 
 ,	{ "update.avoidRepeats",		TYPE_BOOL,	&host_config.update.avoidRepeats,		0,		"n",	"Enable re-sending old update data for a vehicle" }
+
+,	{ "update.maxAccumDelay",		TYPE_SINT,	&host_config.update.accumDelayLimit_ms,		0,		"1500",	"Maximum Accumulated Delay allowed before considering player kick" }
+,	{ "update.timeAtLimit",			TYPE_SINT,	&host_config.update.timeAtLimitBeforeKick_s,		0,		"4",	"Seconds of delay must hold at max before player is kicked" }
+
 ,	{ "update.countingEnabled",		TYPE_BOOL,	&host_config.update.countingEnabled,	0,		"n",	"Enable speed hacker monitoring" }
 ,	{ "update.defaultUM",			TYPE_BYTE,	&host_config.update.defaultUM,			0,		"0",	"Default Update Mode (0-4)" }
 ,	{ "update.errorThrottling",		TYPE_BOOL,	&host_config.update.errorThrottling,	0,		"n",	"Enable throttling of updates on congestion" }

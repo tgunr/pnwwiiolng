@@ -140,6 +140,9 @@ _facilityStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, CP_STATUS_FL
 		facility->m_captureProgress = (float)captureCounter;
 	facility->m_captureStateChanged = teulTime() - lastChange;
 
+	//dbugLog(_FLN, "_facilityStatusHandler.m_captureStage: %u m_captureCounter: %u m_captureProgress: %f \n"
+	//	, facility->m_captureStage, facility->m_captureCounter, facility->m_captureProgress);
+
 #if defined(IS_MAP_HOST)
 	if ( hasChanged )
 	{
@@ -237,6 +240,8 @@ _buildingStatusHandler(FULL_OBJ_ID fullObjID, UINT32 visLevel, UINT32 damagedBy)
 static SINT32
 _recvStratUpdate(ACTION_OBJECT* const a)
 {
+	//dbugLog(_FLN, "_recvStratUpdate.");
+
 	if ( a->m_client != nullptr )
 		return -EINVAL;
 

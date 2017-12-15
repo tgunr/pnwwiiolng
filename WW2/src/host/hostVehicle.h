@@ -165,6 +165,9 @@ public:
 	bool				m_isInCaptureBuilding;	// True when we're in a capture building.
 	bool				m_deathNoticeNeeded;
 
+	bool				wasCapPendingLastTick = false; // These 2 are used to stop the capture-
+	UINT16				previousCaptureTimeRemaining = 0; // timer getting stuck at 1 second.
+
 	HostVehicleImpl*	m_impl;
 	Grid::Cell*			m_cell;
 

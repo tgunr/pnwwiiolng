@@ -61,6 +61,10 @@ public:
 	TeulTimeMS				m_lastTimeRxed;			// Host timestamp for the rx'ed value.
 	TeulTimeMS m_nextMemReq = 0; // The next time to send out a memory request
 
+	TeulTimeMS				m_hostClientOffset_ms;		// difference between the host and client monotonic clock
+	TeulTimeMS				m_ibdTimeReachedMaxAccumDelay; 	// track how long we are at the max inbound
+	TeulTimeMS				m_obdTimeReachedMaxAccumDelay; 	// track how long we are at the max outbound
+
 	HostVehicle*			vehicle;
 	class SpeedhackCheck* m_antiHack;
 
@@ -83,7 +87,7 @@ public:
 	UINT16					m_updatesSinceRX;
 	UINT16					m_updatesFailed;
 	SINT16					m_lastIndex;			// Last index we were on
-	UINT16					m_timeToLive;
+	TeulTimeMS				m_timeToLive;
 	UCHAR					station;
 
 	bool					active : 1;
@@ -100,5 +104,6 @@ public:
 
 	FULL_OBJ_ID				exitFacility;
 	FULL_OBJ_ID				m_fpsBuildingID;
+	SINT32                          	m_exitTeulIndex;
 };
 

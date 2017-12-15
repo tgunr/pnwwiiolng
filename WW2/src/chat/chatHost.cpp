@@ -81,6 +81,7 @@
 #include "server/serverServerInfo.h"
 #include "str/stringLib.h"
 #include "strt/strtChatTypes.h"
+#include "strt/strtChatSupportMessages.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
@@ -593,9 +594,9 @@ _processDelayedBan()
 		if ( (ban.m_start > 0) & (ban.m_start <= teulTime()) )
 		{
 			if ( ban.m_days <= 90 )
-				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Due to unusual activity, your account is being suspended pending review. Contact agm@playnet.com.", SYSTEM_PLAYER_ID, systemHandleID);
+				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Due to unusual activity, your account is being suspended pending review. Email agm@corneredrats.com for assistance.", SYSTEM_PLAYER_ID, systemHandleID);
 			else
-				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Your account has been suspended indefinitely. Contact agm@playnet.com assistance.", SYSTEM_PLAYER_ID, systemHandleID);
+				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Your account has been suspended indefinitely. Email agm@corneredrats.com for assistance.", SYSTEM_PLAYER_ID, systemHandleID);
 
 			Chat::Name name(ban.m_handle);
 			strprintf(days, "%u days", ban.m_days);
@@ -3672,6 +3673,7 @@ main(int argc, const char* argv[])
 
 	ABORT_IF(chatInstallHostCallbacks() < 0);
 	ABORT_IF(chatInstallHostManagementCallbacks() < 0);
+	ABORT_IF(strtChatSupportInstallCallbacks() < 0);
 
 	//End broadcast configuration
 
@@ -3722,6 +3724,7 @@ main(int argc, const char* argv[])
 		index.addAlias("m", "tell");
 		index.addAlias("m", "t");
 		index.addAlias("m", "r");
+		index.addAlias("trainers", "tr");
 
 		dbugLog(_FLI, "DotIndex contains %" PRSizeT " commands", index.size());
 

@@ -11,6 +11,12 @@
 #include "strt/strtData.h"
 #include "strt/strtDataErrors.h"
 #include "strt/strtIO.h"
+#include "wwii/wwiiHCUnits.h"
+
+void HCUnit::setHomeCPID(const FULL_OBJ_ID id)
+{
+    m_homeCPID = id;
+}
 
 int
 main(int argc, char** argv)
@@ -36,7 +42,7 @@ main(int argc, char** argv)
 		break;
 	}
 
-	dbugSetLogLevel(Debug::ERR_DBUG);
+	dbugSetLogLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
 
 	auto cpList = strtImportStratData();
 	if ( cpList == nullptr )

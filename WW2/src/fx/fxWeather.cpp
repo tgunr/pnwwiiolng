@@ -21,6 +21,7 @@ Description:
 #include "ui/uiMain.h"
 #include "math/mathnum.h"
 #include "scen/ScenarioManager.h"
+#include "wwii/wwiiThemes.h"
 
 #define RainRow         7
 #define RainColumn      7
@@ -403,6 +404,9 @@ void fxWeatherSetState(int weather, int seedindex)
 	unsigned int tod;
 	trnTODGetTimeOfDay(&tod);
 
+	if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
+		weather = 2;
+	
 	// Translate the weather from host variants to client variants.
     switch(weather)
     {
@@ -502,15 +506,18 @@ static void _killcallback(Particle2* p)
     if(p->expired())
         return;
 
-    Vec3f n(0, 0, -1);
-    TransformEffect* te = TransformEffect::AddEffect("raingroundhit", n, 0, nullptr);
+	if (WWII::Theme::theme() != WWII::THEME::THEME_HOLIDAY_SEASON)
+	{
+		Vec3f n(0, 0, -1);
+		TransformEffect* te = TransformEffect::AddEffect("raingroundhit", n, 0, nullptr);
 
-    if(te)
-    {
-        te->enableemitters(true);;
-        te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
-        te->setmatrix(Matrixf::translate(p->_endpos));
-    }
+		if(te)
+		{
+			te->enableemitters(true);;
+			te->setflag(TransformEffect::REMOVE_ME_WHEN_DONE);
+			te->setmatrix(Matrixf::translate(p->_endpos));
+		}
+	}
 }
 
 #if USE_ODE
@@ -928,20 +935,34 @@ static void _addparticle(piVECTOR& pos, OBJECT* o)
         return;
     }
 
-    static const char* part = "rain";
     int delayoffset = 0;
 
     ParticleMgr* pm = TransformEffect::GetParticleMgr();
-    Particle2* p = pm->createparticle(part);
+	Particle2* p = pm->createparticle((WWII::Theme::theme()==WWII::THEME::THEME_HOLIDAY_SEASON)?"snow":"rain");
 
     if(!p)
         return;
 
     p->setname("rain");
 
-    p->_size[0] = 1.5f;
-    p->_size[1] = 1.5f;
-
+	if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
+	{
+		p->_size[0] = 4.0;
+		p->_size[1] = 4.0f;
+		p->_gravcoef = 2.0f;
+		p->_stretchlength = 0.5f;
+		p->_velocity.set(WeatherRandom(-0.2f, 0.2f), WeatherRandom(-0.2f, 0.2f), 4.0f);
+	}
+	else
+	{
+		p->_size[0] = 1.5f;
+		p->_size[1] = 1.5f;
+		p->_gravcoef = 9.8f;
+		p->_stretchlength = 2.0f;
+		p->_flags |= part_always_stretches;
+		p->_velocity.set(WeatherRandom(-0.2f, 0.2f), WeatherRandom(-0.2f, 0.2f), 16.0f);
+	}
+	
     p->_time[0] = frametime + delayoffset;
     p->_time[3] = p->_time[0] + 3000;
 
@@ -953,15 +974,10 @@ static void _addparticle(piVECTOR& pos, OBJECT* o)
     p->_lastposition = p->_position;
     p->_originalposition = p->_position;
 
-    p->_gravcoef = 9.8f;
-    p->_stretchlength = 2.0f;
-
     p->_flags |= part_has_gravity;
     p->_flags |= part_has_fixstretch;
-    p->_flags |= part_always_stretches;
     p->_flags |= part_follows_player_xy;
 
-    p->_velocity.set(WeatherRandom(-0.2f, 0.2f), WeatherRandom(-0.2f, 0.2f), 16.0f);
 
     float t = speed / 20.0f;
     t = t > 1.0f ? 1.0f : t;
@@ -1279,27 +1295,36 @@ inline static void _doRain()
 {
     static int lastupdate = 0;
 
-    if(rainparticleemitted && rainsoundid == 0)
-    {
-        rainsoundid = fxSndAddInfiniteHeadSound("sounds/rain.wav", IDE_FP_PRIORITY_LOW, 0.0f, 1.0f);
+	if (WWII::Theme::theme() != WWII::THEME::THEME_HOLIDAY_SEASON)
+	{
+		if(rainparticleemitted && rainsoundid == 0)
+		{
+			rainsoundid = fxSndAddInfiniteHeadSound("sounds/rain.wav", IDE_FP_PRIORITY_LOW, 0.0f, 1.0f);
 
-        if(rainsoundid > 0)
-        {
-            fxSndSetKillCallback(rainsoundid, killrain);
-        }
-    }
-    else if(!rainparticleemitted && rainsoundid > 0)
-    {
-        fxSndStopSound(rainsoundid);
-    }
-
+			if(rainsoundid > 0)
+			{
+				fxSndSetKillCallback(rainsoundid, killrain);
+			}
+		}
+		else if(!rainparticleemitted && rainsoundid > 0)
+		{
+			fxSndStopSound(rainsoundid);
+		}
+	}
+	
     if(lastupdate == 0)
         lastupdate = frametime;
 
     float time = (frametime - lastupdate) * 0.001f;
 
     // RainGridSize per second
-    int numemissions = FloatToInt(time * RainGridSize);
+	float rainAdjust = 1.0;
+	if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
+	{
+		rainAdjust = 0.25;
+	}
+	
+    int numemissions = FloatToInt(time * RainGridSize * rainAdjust);
 
     if(numemissions <= 0)
         return;
@@ -1495,14 +1520,23 @@ void fxWeatherUpdate()
 #ifdef BETA_RELEASE
                 static int nexttime = -1;
 
-                if(NextRainTime != -1 && nexttime != NextRainTime)
+				if  (nexttime == -1 && WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
+				{
+					// keep the holiday cheer going forever!
+					NextRainTime = 0;
+					raintimes[0] = tod;
+					nexttime = 0;
+					dorain = true;
+				}
+				else if(NextRainTime != -1 && nexttime != NextRainTime)
                 {
-                    PrintTimeLine();
-                    nexttime = NextRainTime;
+					PrintTimeLine();
+					nexttime = NextRainTime;
                 }
 #endif // BETA_RELEASE
 
-                if(NextRainTime != -1)
+
+				if(NextRainTime != -1)
                 {
                     // Overlaps possible...but who cares.
                     if(NextRainTime < (int)raintimes.size() && tod >= raintimes[NextRainTime])

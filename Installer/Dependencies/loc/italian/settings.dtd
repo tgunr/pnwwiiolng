@@ -1,0 +1,22 @@
+<!ENTITY settings.french "Francese">
+<!ENTITY settings.cancel "Cancella">
+<!ENTITY settings.video "Video">
+<!ENTITY settings.spanish "Spagnolo">
+<!ENTITY settings.resolution "Risoluzione">
+<!ENTITY settings.italian "Italiano">
+<!ENTITY settings.wantsse2 "Esegui file SSE2">
+<!ENTITY settings.connection "Connessione">
+<!ENTITY settings.save "Salva">
+<!ENTITY settings.english "Inglese">
+<!ENTITY settings.useprimary "Usa il primario">
+<!ENTITY settings.video.primary "Driver Video Primario">
+<!ENTITY settings.title "Impostazioni di WWII Online">
+<!ENTITY settings.usebest "Usa il migliore (Raccomandato)">
+<!ENTITY settings.language "Lingua">
+<!ENTITY settings.videocard "Scheda Video">
+<!ENTITY settings.sound.primary "Driver Audio Primario">
+<!ENTITY settings.sound "Audio">
+<!ENTITY settings.chinese "Cinese">
+<!ENTITY settings.soundcard "Scheda Audio">
+<!ENTITY settings.usesecondary "Usa il secondario">
+<!ENTITY settings.german "Tedesco">

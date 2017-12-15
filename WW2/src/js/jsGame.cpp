@@ -862,7 +862,7 @@ JS_FUNCTION_DEF(jsGame, despawn)
 	}
 
 	persSetDeathCamForNextUpdate();
-	vehExitVehicle(1,0,0);
+	vehExitVehicle();
 	return JS_TRUE;
 }
 
@@ -2010,14 +2010,15 @@ JS_FUNCTION_DEF(jsGame, getworldtoscreen)
 
 JS_FUNCTION_DEF(jsGame, resetcontrollers)
 {
-    // We don't actually do this for now because it breaks the Steam overlay
-    
-	// reset devices in case a new one was added
-	//dimainKill();
-	//dimainInit();
+	// Un-acquire and release any current joysticks before searching for
+	// and initialising any that are now connected.
+	dimainKillJoysticks();
+	dimainInitJoysticks();
+
+	dimainInitTrackIR();
 
 	// reselect presets based on new devices and current selections
-	//imapLoadPresets();
+	imapLoadPresets();
 
 	return JS_TRUE;
 }

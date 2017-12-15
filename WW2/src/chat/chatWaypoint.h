@@ -48,6 +48,7 @@ enum
 ,	WTP_ENEMY_DANGER
 ,	WTP_ENEMY_UNKNOWN				// question mark; enemy type unknown
 ,	WTP_ENEMY_MORTAR				// Mortar barrage icon; aka "Aim mortars here"
+,	WTP_ENEMY_PPO                   // 
 };
 // tolua_end
 

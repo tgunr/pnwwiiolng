@@ -524,7 +524,7 @@ vehanimVehicleStateType const* vehFindStateByName(vehType*, const char* name);
 // shouldn't be here
 UINT32 vehApplyDamageToObject(const FLOAT64& Energy, struct trnCDTerrainObject*, vehVehicle* InShooterVehicle, struct weapAmmo* Ammo);
 
-UINT32 	vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach);
+UINT32 	vehExitVehicle(unsigned int exitCode = PEXIT_DEAD);
 UINT32 	vehExitVehicleTrigger(SINT32 Param, UINT32 Id, UINT32 Detach);
 
 SINT32 	vehAttachToRidePoint(vehVehicle*);

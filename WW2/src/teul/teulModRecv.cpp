@@ -1225,7 +1225,7 @@ ENDPOINT::updateSocketEvents()
 #endif
 	pollData.fd[slot].revents = 0;
 
-	if ( ((protocol == PROTOCOL_TCP) & (state() == IS_OPENING) & (m_connected == false)) | (m_writesPending == true) )
+	if ( ((protocol == PROTOCOL_TCP) && (state() == IS_OPENING) && (!m_connected)) || (!m_impl->m_sendQueue.empty()) )
 		pollData.fd[slot].events |= POLLOUT;
 
 	if (pollData.m_maxSock == INVALID_SOCKET)
@@ -1236,7 +1236,7 @@ ENDPOINT::updateSocketEvents()
 	auto flags = FD_READ | FD_OOB | FD_CLOSE;
 	if ( m_connected == false )
 		flags |= FD_CONNECT | FD_ACCEPT;
-	if ( m_writesPending == true )
+	if ( !m_impl->m_sendQueue.empty() )
 		flags |= FD_WRITE;
 
 	WSAEventSelect(socket, eventObject, flags);
@@ -1817,7 +1817,7 @@ ENDPOINT::setWritesPending(const bool pending_)
 		return;
 	}
 	int events = pollData.fd[slot].events & ~POLLOUT;
-	if ( pending_ == true )
+	if ( !m_impl->m_sendQueue.empty() )
 		events |= POLLOUT;
 	pollData.fd[slot].events = events;
 #else

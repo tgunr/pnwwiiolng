@@ -71,7 +71,7 @@ LIBDIR="$WWII_ROOT/Installer/libs"
 RELEASEDIR="$WWII_ROOT/build/client/Release/Bin"
 #RELEASELIBDIR="$WWII_ROOT/Build/lib/Win32/Release"
 PRODUCTS="WW2.exe Playgate.exe Settings.exe"
-DATADIRS="DirectXRedist loc playgate screens"
+DATADIRS="DirectXRedist loc playgate"
 DATAFILES="steam_appid.txt eula.txt license.rtf readme.rtf regions.txt tos.txt wwii1.ico"
 ASSETFILES="eula.txt license.rtf readme.rtf wwii1.ico"
 BUILDDIR="$APPDATA"
@@ -140,7 +140,7 @@ else
         xcode_version=$(xcodebuild -version)
         version_rsp=(${xcode_version// / })
         version_nums=(${version_rsp[1]//\./ })
-        if (( version_nums[0] < min_xcode_version_major ))  || (( version_nums[1] < min_xcode_version_minor )); then
+        if (( version_nums[0] < min_xcode_version_major ))  || (( version_nums[1] < min_xcode_version_minor  && version_nums[0] == min_xcode_version_major )); then
             exit_msg=${exit_msg}'|Xcode version incorrect, update to version '$min_xcode_version_major'.'$min_xcode_version_minor' or greater' 
             found_prereq_errors=true
         fi
@@ -527,13 +527,11 @@ if [ "$skip_step" = false ]; then
             exit 1
         fi
     else
-        codesign=''
         if [ "$isrelease" = true ] ; then
             echo "Cleaning build"
             xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
-            codesign='Developer ID Application: Playnet Inc (J63A54QWD2)'
         fi
-        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= "CODE_SIGN_IDENTITY=$codesign" WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
+        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
     fi
 fi
 
@@ -573,7 +571,7 @@ if [ "$myos" == "win" ] ; then
     if [ "$skip_step" = false ]; then
         for folder in $DATADIRS ; do
             mkdir -p "Installer/current/DATA/$folder"
-            rsync -auv --exclude=".DS_Store" "$WW2MODS/DATA/$folder/" "$INSTALLER/current/DATA/$folder/"
+            rsync -auv --exclude=".DS_Store" "$INSTALLER/Dependencies/$folder/" "$INSTALLER/current/DATA/$folder/"
         done
     fi
 

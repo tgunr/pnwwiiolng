@@ -30,6 +30,7 @@ extern int fiodEOF(int hfile);
 extern LOGICAL fiodAccess(const char* filename, bool userdir = false);
 extern LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir = false);
 extern size_t fiodFileSize(const char* name, bool userdir = false);
+extern bool fiodFileExists(const char* name, bool userdir = false);
 
 extern void fiodmkdir(const char* path);
 

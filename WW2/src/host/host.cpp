@@ -74,6 +74,7 @@
 #include "strt/strtUpdaterSupportMessages.h"
 #include "teul/teulBlipRepeater.h"
 #include "teul/teulClosingEnums.h"
+#include "teul/teulEndpointImpl.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulHousekeeper.h"
 #include "teul/teulKit.h"
@@ -523,6 +524,9 @@ Player::Player(const Server::PersonaXfer& personaXfer)
 	: wwiiPlayer()
 	, m_lastTimeRx(0ULL)
 	, m_lastTimeRxed(0ULL)
+	, m_hostClientOffset_ms(0ULL)
+	, m_ibdTimeReachedMaxAccumDelay(0ULL)
+	, m_obdTimeReachedMaxAccumDelay(0ULL)
 	, vehicle(nullptr)
 	, m_antiHack(nullptr)
 	, state(Player::_RESERVED)
@@ -552,6 +556,7 @@ Player::Player(const Server::PersonaXfer& personaXfer)
 	, m_hasDied(false)
 	, exitFacility(nullObjID)
 	, m_fpsBuildingID(nullObjID)
+	, m_exitTeulIndex(0)
 {
 	this->state = Player::_RESERVED;
 	this->sendClose = TRUE;
@@ -637,7 +642,7 @@ _exitPlayer(Player& player)
 		return;
 
 	player.m_hasExited = true;
-
+	player.m_exitTeulIndex = player.teulIndex();
 	if ( player.sortieID() > 0 && player.playerID() > 0 )
 	{
 		DBThread::Do(DBThread::Default
@@ -1327,6 +1332,9 @@ Player::isInGracePeriod(UINT32 gracePeriod_s, bool includeFirstConnection) const
 void
 Player::resetUpdateSeq()
 {
+	m_hostClientOffset_ms = 0;
+	m_ibdTimeReachedMaxAccumDelay = 0;
+	m_obdTimeReachedMaxAccumDelay = 0;
 	m_expectUpdateNo = 0;
 	m_updatePrime = INIT_UPDATE_PRIME;
 }
@@ -1976,10 +1984,9 @@ _checkPlayerEjectionCountdown(Player* persona)
 static inline bool
 _checkPlayerTimeToLive(Player* player)
 {
-	if ( PN_LIKELY(player->m_timeToLive <= 0) )
+	if ( PN_LIKELY(player->m_timeToLive == 0) )
 		return false;
-	player->m_timeToLive--;
-	if ( player->m_timeToLive > 0 )
+	if ( player->m_timeToLive > teulClock64 )
 		return false;
 
 	dbugLog(_FLW, "t:%d exhausted timeToLive", player->teulIndex());
@@ -2041,6 +2048,64 @@ _calculatePingTime(Teul::Packet& packet, Player* const player, size_t pingOffset
 static bool
 _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, size_t pingOffset)
 {
+
+	ENDPOINT* endpoint = teulGetEndpoint(player->teulIndex());
+	if (!player->m_hasExited && player->m_timeToLive == 0 && endpoint != nullptr && endpoint->m_impl != nullptr && !endpoint->m_impl->m_sendQueue.empty())
+	{
+		// we currently have a queue built up to this user, lets check and see how deep it is
+		UINT32 updtInterval = framings[player->getCurrentFramingMode()].updateInterval;
+		size_t queueSize = endpoint->m_impl->m_sendQueue.size();
+
+		dbugLog(_FLD, "OBD: Client (%s %d) send queue is now %d, estimated at %d ms with update interval %d (mode %d)",
+			player->callsign(),
+			player->playerID(),
+			queueSize, (queueSize * updtInterval), updtInterval, player->getCurrentFramingMode());
+
+		if (queueSize * updtInterval >= host_config.update.accumDelayLimit_ms)
+		{
+			// this player is not accepting updates at the rate we would expect, put them on a tight leash
+			// No delay yet recorded
+			if (player->m_obdTimeReachedMaxAccumDelay == 0)
+			{
+				player->m_obdTimeReachedMaxAccumDelay = teulClock64;
+				// Player has exceeded our grace delay allottment and most be booted
+				dbugLog(_FLW, "*** OBD: Player's accumulated packet delay exceeded limits (%s %d) : queueSize %d, first detection ***",
+					player->callsign(),
+					player->playerID(),
+					queueSize);
+			}
+			else
+			{
+				TeulTimeMS heldTime_ms = teulClock64 - player->m_obdTimeReachedMaxAccumDelay;
+				if (heldTime_ms >= static_cast<TeulTimeMS>(host_config.update.timeAtLimitBeforeKick_s * 1000))
+				{
+					// Player has exceeded our grace delay allottment and most be booted
+					dbugLog(_FLW, "*** OBD: Player's accumulated packet delay exceeded limits (%s %d) : queueSize %d, for %f seconds***",
+						player->callsign(),
+						player->playerID(),
+						queueSize,
+						static_cast<float>(heldTime_ms) / 1000.0);
+					commForcePlayerExit(*player, "Slow Client Updates (Inbound)", true);
+					return false;
+				}
+				else
+					dbugLog(_FLD, "*** OBD: Player's accumulated packet delay within hold limits (%s %d) : queueSize %d, for %f seconds***",
+						player->callsign(),
+						player->playerID(),
+						queueSize,
+						static_cast<float>(heldTime_ms) / 1000.0);
+			}
+		}
+		else if (player->m_obdTimeReachedMaxAccumDelay)
+		{
+			dbugLog(_FLD, "OBD: Resetting client (%s, %d) time reached maximum packet delay outbound, fell below threshold - queue size currently %d", 
+				player->callsign(),
+				player->playerID(),
+				queueSize);
+			player->m_obdTimeReachedMaxAccumDelay = 0;
+		}
+	}
+
 	_calculatePingTime(packet, player, pingOffset);
 
 	// If the player has netcode enhancements enabled, specify a UDP protocol preference

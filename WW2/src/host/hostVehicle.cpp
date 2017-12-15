@@ -906,27 +906,43 @@ HostVehicle::checkCapture()
 
 	// Have we been told the building is capturable?
 	FacilityStruct& fac = *m_inBuildingObject->facility;
+
+	// If this capture is Pending (is on a timer waiting to be capturable) or if
+	// it was Pending on the previous tick but the client doesn't know that is is now
+	// capturable, then we tell the client the time left on the timer.
+	if (fac.m_captureStage == FacilityStruct::_CAP_PENDING || wasCapPendingLastTick)
+	{
+		if (m_inBuildingObject->facility->getCaptureRemaining() >= 0)
+		{
+			//If the time remaining is zero, we only want to send the update once.
+			if (previousCaptureTimeRemaining != 0)
+			{
+				CaptureState capState;
+				capState.populate(m_inBuildingObject->facility, side(), 0, false);
+				sendCaptureState(capState);
+			}
+			previousCaptureTimeRemaining = m_inBuildingObject->facility->getCaptureRemaining();
+			wasCapPendingLastTick = true;
+		}
+	}
+
+
 	switch ( fac.m_captureStage )
 	{
 	case FacilityStruct::_CAP_DISABLED:
 //		player->message(LSTR_BETA, LSTR_GENERIC, "Facility is not currently capturable");
+		wasCapPendingLastTick = false;
 	break;
 
 	case FacilityStruct::_CAP_PENDING:
 //		player->messagef(LSTR_BETA, LSTR_GENERIC, "Facility is not capturable for another %u seconds", fac.getCaptureRemaining());
-		if ( m_inBuildingObject->facility->getCaptureRemaining() > 0 )
-		{
-			CaptureState capState;
-			capState.populate(m_inBuildingObject->facility, side(), 0, false);
-			sendCaptureState(capState);
-		}
 	break;
 
 	case FacilityStruct::_CAP_ENABLED:
 	{
 //		player->messagef(LSTR_BETA, LSTR_GENERIC, "Facility is at ~%u%%, sending capture contribution", fac.m_captureCounter);
 		sendCaptureContribution(player, Strat::CaptureContributionEvent::Active);
-
+		wasCapPendingLastTick = false;
 		return;
 	}
 

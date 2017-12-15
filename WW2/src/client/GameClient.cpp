@@ -68,6 +68,9 @@
 #include "strt/strtEventTypes.h"
 #include "strt/strtCPFlags.h"
 #include "wwii/wwiiServerTrackedObject.h"
+#include "wwii/wwiiThemes.h"
+#include "spt/sptmain.h"
+#include "wwii/wwiiClientMessages.h"
 
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags);
 
@@ -272,7 +275,7 @@ void GameClient::ProcessCrewPostExpired(FE_POST_EXPIRED const& crewexpired)
 void GameClient::ProcessForcedCellExit(unsigned int exitCode)
 {
 	Client::ProcessForcedCellExit(exitCode);
-	vehExitVehicle(1, 0, 0);
+	vehExitVehicle(exitCode);
 }
 
 /************************************************************************************************
@@ -286,6 +289,8 @@ void GameClient::ProcessGameTimeUpdate(Host::TimeUpdate const& update)
 	// scenarios have custom time of day and weather
 	if(!SCEN_MGR->IsActive())
 	{
+		checkThemeChange(static_cast<UINT32>(update.theme));
+
 		trnTODSetTimeOfDay(update.gametime);
 		trnTODSetTimeMultiplier((FLOAT32)update.factor);
 
