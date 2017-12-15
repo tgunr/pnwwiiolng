@@ -116,6 +116,7 @@ Source: "{#MyPatchSourceDir}\Settings.exe.patch";  DestDir: "{app}"; BeforeInsta
 Source: "{#MyPatchSourceDir}\WW2.exe.patch";       DestDir: "{app}"; BeforeInstall: BackupPatchTgt('WW2.exe');       Flags: ignoreversion deleteafterinstall  
 Source: "{#MyPatchSourceDir}\license.rtf.patch";   DestDir: "{app}"; BeforeInstall: BackupPatchTgt('license.rtf');   Flags: ignoreversion deleteafterinstall  
 Source: "{#MyPatchSourceDir}\readme.rtf.patch";    DestDir: "{app}"; BeforeInstall: BackupPatchTgt('readme.rtf');    Flags: ignoreversion deleteafterinstall  
+Source: "{#MyPatchSourceDir}\tos-bg.bmp.patch";    DestDir: "{app}"; BeforeInstall: BackupPatchTgt('DATA\playgate\tos-bg.bmp');    Flags: ignoreversion deleteafterinstall  
 Source: "current\steam_api.dll"; DestDir: "{app}"; Flags: ignoreversion              
 Source: "current\steam_appid.txt"; DestDir: "{app}"; Flags: ignoreversion        
 
@@ -135,6 +136,7 @@ Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -9 -s ""{app}\Settings.exe.
 Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -9 -s ""{app}\WW2.exe.backup""       ""{app}\WW2.exe.patch""       ""{app}\WW2.exe""";       Flags: skipifsilent runhidden; AfterInstall: CleanUp('WW2.exe')
 Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -9 -s ""{app}\license.rtf.backup""   ""{app}\license.rtf.patch""   ""{app}\license.rtf""";   Flags: skipifsilent runhidden; AfterInstall: CleanUp('license.rtf') 
 Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -9 -s ""{app}\readme.rtf.backup""    ""{app}\readme.rtf.patch""    ""{app}\readme.rtf""";    Flags: skipifsilent runhidden; AfterInstall: CleanUp('readme.rtf')
+Filename: "{app}\Xdelta3.exe"; Parameters: "-d -f -q -9 -s ""{app}\DATA\playgate\tos-bg.bmp.backup""    ""{app}\tos-bg.bmp.patch""    ""{app}\DATA\playgate\tos-bg.bmp""";    Flags: skipifsilent runhidden; AfterInstall: CleanUp('DATA\playgate\tos-bg.bmp')
 
 [CODE]
 procedure CleanUp(target: String);

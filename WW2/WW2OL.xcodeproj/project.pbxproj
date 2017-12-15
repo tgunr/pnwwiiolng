@@ -4196,6 +4196,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
@@ -4255,6 +4256,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
@@ -4341,6 +4343,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
@@ -4392,6 +4395,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
@@ -4478,6 +4482,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.omggen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
 			name = Release;
@@ -4495,6 +4500,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.omggen;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
 			name = GM;

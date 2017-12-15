@@ -30,6 +30,7 @@
 #include "wwii/wwiiThemes.h"
 #include "ld/ldtexture.h"
 #include "spt/sptmain.h"
+#include "trn/trnmain.h"
 
 // Login connections by teulIndex.
 static std::map<SINT32, Teul::Connection*> _ConnectionsByTeulIndex;
@@ -57,6 +58,7 @@ void checkThemeChange(UINT32 theme)
 		WWII::Theme::setTheme(theme);
 		ldReloadTextures();
 		sptmainInit();
+		trnmainDoRawUpdate(true);
 	}
 }
 
