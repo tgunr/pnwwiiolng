@@ -485,12 +485,13 @@ void fpTPSDataInit()
 	fpTPSWeaponMeshFiles[PIAT][TPS_LOD_1] = TPS_MESH_DIR "piat\\piat";
 	fpTPSWeaponMeshAltFiles[PIAT][TPS_LOD_1] = TPS_MESH_DIR "piat\\piat";
 
-	fpTPSWeaponMeshFiles[STENMK2][TPS_LOD_1]  = TPS_MESH_DIR "stenmk2\\stenmk2";
-	fpTPSWeaponMeshFiles[M3A1][TPS_LOD_1]     = TPS_MESH_DIR "m3a1\\m3a1";
-	fpTPSWeaponMeshFiles[MP34][TPS_LOD_1]     = TPS_MESH_DIR "mp34\\mp34";
-	fpTPSWeaponMeshFiles[FG42G][TPS_LOD_1]    = TPS_MESH_DIR "fg42g\\fg42g";
-	fpTPSWeaponMeshAltFiles[FG42G][TPS_LOD_1] = TPS_MESH_DIR "fg42g\\fg42g_Deployed";
-	fpTPSWeaponMeshFiles[CARCANO][TPS_LOD_1]  = TPS_MESH_DIR "carcano\\carcano";
+	fpTPSWeaponMeshFiles[STENMK2][TPS_LOD_1]   = TPS_MESH_DIR "stenmk2\\stenmk2";
+	fpTPSWeaponMeshFiles[M3A1][TPS_LOD_1]      = TPS_MESH_DIR "m3a1\\m3a1";
+	fpTPSWeaponMeshFiles[MP34][TPS_LOD_1]      = TPS_MESH_DIR "mp34\\mp34";
+	fpTPSWeaponMeshFiles[FG42G][TPS_LOD_1]     = TPS_MESH_DIR "fg42g\\fg42g";
+	fpTPSWeaponMeshAltFiles[FG42G][TPS_LOD_1]  = TPS_MESH_DIR "fg42g\\fg42g_Deployed";
+	fpTPSWeaponMeshFiles[CARCANO][TPS_LOD_1]   = TPS_MESH_DIR "carcano\\carcano";
+	fpTPSWeaponMeshFiles[BERETTA38][TPS_LOD_1] = TPS_MESH_DIR "beretta38\\beretta38";
 
 	// base pose
 	fpTPSBasePoseFile = TPS_BLEND_DIR "stand\\idle\\ui\\relaxed.txt";

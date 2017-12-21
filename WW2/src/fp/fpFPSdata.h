@@ -112,6 +112,7 @@ enum fpsWeaponTypes
 	MP34,
 	FG42G,
 	CARCANO,
+	BERETTA38,
 	NUM_WEAPONS
 };
 // tolua_end
