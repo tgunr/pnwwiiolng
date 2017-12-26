@@ -2512,10 +2512,12 @@ void fpFPSDataInit ()
 	weap_anim_files[CARCANO][STAND_FIRE]  = FPS_DIR "carcano\\weapon\\weap_Carcano_fire";
 	weap_anim_files[CARCANO][CROUCH_FIRE] = FPS_DIR "carcano\\weapon\\weap_Carcano_fire";
 	weap_anim_files[CARCANO][AIM_FIRE]    = FPS_DIR "carcano\\weapon\\weap_Carcano_aimFire";
+	weap_anim_files[CARCANO][RECYCLE]     = FPS_DIR "carcano\\weapon\\weap_Carcano_recycle";
 	arms_anim_files[CARCANO][RELOAD]      = FPS_DIR "carcano\\arms\\arms_Carcano_reload";
 	arms_anim_files[CARCANO][STAND_FIRE]  = FPS_DIR "carcano\\arms\\arms_Carcano_fire";
 	arms_anim_files[CARCANO][CROUCH_FIRE] = FPS_DIR "carcano\\arms\\arms_Carcano_fire";
 	arms_anim_files[CARCANO][AIM_FIRE]    = FPS_DIR "carcano\\arms\\arms_Carcano_aimFire";
+	arms_anim_files[CARCANO][RECYCLE]     = FPS_DIR "carcano\\arms\\arms_Carcano_recycle";
 	arms_anim_files[CARCANO][LOWER]       = FPS_DIR "carcano\\arms\\arms_Carcano_lowered";
 	arms_anim_files[CARCANO][IDLE]        = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
 	arms_anim_files[CARCANO][KNEEL]       = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
