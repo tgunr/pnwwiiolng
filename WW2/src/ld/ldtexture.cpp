@@ -241,19 +241,10 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
 static int reloadTexture(int texid, TEXTURE *t )
 {
 
-    // If suffix is defined (theme) and file exists, load that instead
-    std::string fileName = t->name + t->ext;
-    if (!optionalFileSuffix.empty() && fioFileExists(t->name, optionalFileSuffix, t->ext))
+    // if the target file dosn't exist OR the current texture suffix is the same as the newly set suffix, ignore, otherwise reload
+    std::string fileName = t->name + optionalFileSuffix + t->ext;
+    if (!fioFileExists(t->name, optionalFileSuffix, t->ext) || (t->suffix == optionalFileSuffix))
     {
-        fileName = t->name + optionalFileSuffix + t->ext;
-        
-        // if the suffix hasn't changed, just return - no changes
-        if (t->suffix == optionalFileSuffix)
-            return 0;
-    }
-    else
-    {
-        // if the current image has no suffix, just return - no changes
         return 0;
     }
     

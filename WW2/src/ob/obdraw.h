@@ -118,3 +118,5 @@ extern int obdrawGetMultiTextureID(int offset);
 extern void obdrawCull();
 extern void obdrawDrawShadowCasters();
 extern void obdrawGetMultiTextureMatrix(int offset, Matrixf& matrix);
+
+extern float GetDistance(OBJECT * lplod, bool multiply);

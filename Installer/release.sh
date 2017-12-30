@@ -527,13 +527,11 @@ if [ "$skip_step" = false ]; then
             exit 1
         fi
     else
-        codesign=''
         if [ "$isrelease" = true ] ; then
             echo "Cleaning build"
             xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
-            codesign='Developer ID Application: Playnet Inc (J63A54QWD2)'
         fi
-        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= "CODE_SIGN_IDENTITY=$codesign" WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
+        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
     fi
 fi
 

@@ -1487,7 +1487,7 @@ static SINT32 dot_vspawn(const char* line)
 				{
 					gr2AnimBitPacker bp = gr2AnimBitPacker(veh->AnimationBits);
 					bp.useAltTrooperMesh = 1;
-					veh->interpolator.SetFlags(bp.pack());
+					veh->interpolator.SetCloneFlags(bp.pack());
 					/*
 					veh->AnimationBits = bp.pack();
 					veh->VehicleObjectData->PlaneObject->animModel->SetFlag(gr2AnimTrooper::USE_ALT_MODEL);
