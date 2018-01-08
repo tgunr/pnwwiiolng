@@ -287,12 +287,6 @@ void fpTPSDataInit()
 	fpTPSInfantryMeshFiles[AMERICAN_INFANTRY][TPS_LOD_4] = TPS_MESH_DIR "american_inf\\inf_us_lod4";
 	//fpTPSInfantryMeshFiles[AMERICAN_INFANTRY][TPS_LOD_5] = TPS_MESH_DIR "american_inf\\inf_us_lod5";
 
-	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_1] = TPS_MESH_DIR "italian_inf\\inf_it_lod1";
-	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_2] = TPS_MESH_DIR "italian_inf\\inf_it_lod2";
-	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_3] = TPS_MESH_DIR "italian_inf\\inf_it_lod3";
-	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_4] = TPS_MESH_DIR "italian_inf\\inf_it_lod4";
-	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_5] = TPS_MESH_DIR "italian_inf\\inf_it_lod5";
-
 	fpTPSInfantryMeshFiles[BRITISH_PARA_PACK][TPS_LOD_1] = TPS_MESH_DIR "para_brit\\para_uk_chute_lod1";
 	fpTPSInfantryMeshFiles[BRITISH_PARA_PACK][TPS_LOD_2] = TPS_MESH_DIR "para_brit\\para_uk_chute_lod2";
 	fpTPSInfantryMeshFiles[BRITISH_PARA_PACK][TPS_LOD_3] = TPS_MESH_DIR "para_brit\\para_uk_chute_lod3";
@@ -485,14 +479,6 @@ void fpTPSDataInit()
 	fpTPSWeaponMeshFiles[PIAT][TPS_LOD_1] = TPS_MESH_DIR "piat\\piat";
 	fpTPSWeaponMeshAltFiles[PIAT][TPS_LOD_1] = TPS_MESH_DIR "piat\\piat";
 
-	fpTPSWeaponMeshFiles[STENMK2][TPS_LOD_1]   = TPS_MESH_DIR "stenmk2\\stenmk2";
-	fpTPSWeaponMeshFiles[M3A1][TPS_LOD_1]      = TPS_MESH_DIR "m3a1\\m3a1";
-	fpTPSWeaponMeshFiles[MP34][TPS_LOD_1]      = TPS_MESH_DIR "mp34\\mp34";
-	fpTPSWeaponMeshFiles[FG42G][TPS_LOD_1]     = TPS_MESH_DIR "fg42g\\fg42g";
-	fpTPSWeaponMeshAltFiles[FG42G][TPS_LOD_1]  = TPS_MESH_DIR "fg42g\\fg42g_Deployed";
-	fpTPSWeaponMeshFiles[CARCANO][TPS_LOD_1]   = TPS_MESH_DIR "carcano\\carcano";
-	fpTPSWeaponMeshFiles[BERETTA38][TPS_LOD_1] = TPS_MESH_DIR "beretta38\\beretta38";
-
 	// base pose
 	fpTPSBasePoseFile = TPS_BLEND_DIR "stand\\idle\\ui\\relaxed.txt";
 	// combat blend
@@ -658,7 +644,6 @@ void fpTPSDataInit()
 	fpTPSDefaultFaceNames[GERMAN_ML] = "06";
 	fpTPSDefaultFaceNames[FRENCH_ML] = "16";
 	fpTPSDefaultFaceNames[AMERICAN_INFANTRY] = "face1";
-	fpTPSDefaultFaceNames[ITALIAN_INFANTRY] = "face2";
 
 #ifdef USE_NEW_DECALS
     int q = 0;

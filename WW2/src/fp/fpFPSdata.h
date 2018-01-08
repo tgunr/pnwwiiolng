@@ -32,7 +32,6 @@ enum fpsInfantryTypes
 	GERMAN_ML,
 	FRENCH_ML,
 	AMERICAN_INFANTRY,
-	ITALIAN_INFANTRY,
 	NUM_INFANTRY_TYPES
 };
 
@@ -111,8 +110,6 @@ enum fpsWeaponTypes
 	M3A1,
 	MP34,
 	FG42G,
-	CARCANO,
-	BERETTA38,
 	NUM_WEAPONS
 };
 // tolua_end
