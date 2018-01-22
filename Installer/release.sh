@@ -628,16 +628,13 @@ if [ "$myos" == "win" ] ; then
 else
     build_step "create" "Creating" "dmg file"
     if [ "$skip_step" = false ]; then
-        pushd "WW2/proj/mac/WW2 Release Items/DropDMG"
-        unzip -o DropDMG.zip
-        popd
         mkdir -p "$HOME/Library/Application Support/DropDMG/"{Configurations,Layouts}
         cp 'WW2/proj/mac/WW2 Release Items/DropDMG/Configurations/ww2.plist' "$HOME/Library/Application Support/DropDMG/Configurations"
         cp -r 'WW2/proj/mac/WW2 Release Items/DropDMG/Layouts/ww2' "$HOME/Library/Application Support/DropDMG/Layouts"
         plutil -replace 'content.options.destinationFolder' -string "$( pwd )/Installer/release/macrelease" "$HOME/Library/Application Support/DropDMG/Configurations/ww2.plist"
         app_path='WW2/proj/mac/build/'$bld_config_dir'/'$mac_app_name
         app_path=$(echo $app_path | sed 's/\\//g')
-        WW2/proj/mac/WW2\ Release\ Items/DropDMG/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg --config-name ww2 "$app_path"
+        /Applications/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg --config-name ww2 "$app_path"
     fi
 fi
 
