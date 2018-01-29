@@ -4492,7 +4492,10 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 
 		weapfxAmmoExplosion(Ammo, &CollidePos, Collision, (Richocheted) ? 0 : !AmmoStopped);
 
-		_DoExplosionShrapnel(Ammo, &CollidePos, (AmmoStopped) ? &AmmoDir : &Ammo->Velocity, AmmoCollideTime, true);
+		bool doshrap = Collision->Flags & _AMMOCD_FLAG_INTERNALCOMPONENT
+		            || Vehicle->VehicleType->Type == VEH_TYPE_AIR || Vehicle->VehicleType->Type == VEH_TYPE_SEA
+		            || Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_GRENADE;
+		_DoExplosionShrapnel(Ammo, &CollidePos, (AmmoStopped) ? &AmmoDir : &Ammo->Velocity, AmmoCollideTime, doshrap);
 		_DoExplosionConcussion(Ammo, &CollidePos, Collision->Flags & _AMMOCD_FLAG_INTERNALCOMPONENT);
 
 		AmmoStopped = TRUE;
