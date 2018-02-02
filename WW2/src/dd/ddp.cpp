@@ -117,7 +117,6 @@ static void	OnSysKeyUp(UINT nChar, UINT nFlags);
 namespace {
 	DISPLAY_DEVICE primary_display;
 	DISPLAY_DEVICE display = {};
-	DEVMODE devmode = {};
 
 	bool ddpSetDisplay(void) {
 		// We only need to mess with the display in fullscreen mode
@@ -1368,6 +1367,13 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 			break;
         }
+	case WM_CANCELMODE:
+	{
+		// If something pops up in front of us while we're true fullscreen, kill our focus.
+		if ( window_mode == FULLSCREEN )
+			ShowWindow(myhwnd, SW_MINIMIZE);
+		Write_Debug("WM_CANCELMODE");
+	}
 	default:
 		{
 			IMEBase* ime = imeClient();
