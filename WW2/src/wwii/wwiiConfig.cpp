@@ -183,8 +183,8 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "sto.ge.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[1],		0,		"120",	"Seconds after a gun emplacement is destroyed before anything else can be placed" }
 ,	{ "sto.ge.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[1],		0,		"60",	"Seconds after placing a gun emplacement before another PPO can be placed" }
 
-,	{ "sto.fmsp.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[2],		0,		"250000000","Cumulative joules damage to destroy a fortified mobile spawn" }
-,	{ "sto.fmsp.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[2],		0,		"1000",	"Minimum joules for damage to be applied to a fortified mobile spawn" }
+,	{ "sto.fmsp.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[2],		0,		"100000000","Cumulative joules damage to destroy a fortified mobile spawn" }
+,	{ "sto.fmsp.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[2],		0,		"10000000",	"Minimum joules for damage to be applied to a fortified mobile spawn" }
 ,	{ "sto.fmsp.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[2],		0,		"120",	"Seconds after fortified MS is destroyed before anything else can be placed" }
 ,	{ "sto.fmsp.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[2],		0,		"60",	"Seconds after placing fortified MS before another PPO can be placed" }
 

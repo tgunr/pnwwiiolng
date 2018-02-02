@@ -478,12 +478,12 @@ void fpTPSDataInit()
 
 	fpTPSWeaponMeshFiles[PIAT][TPS_LOD_1] = TPS_MESH_DIR "piat\\piat";
 	fpTPSWeaponMeshAltFiles[PIAT][TPS_LOD_1] = TPS_MESH_DIR "piat\\piat";
-
-	fpTPSWeaponMeshFiles[STENMK2][TPS_LOD_1]  = TPS_MESH_DIR "stenmk2\\stenmk2";
-	fpTPSWeaponMeshFiles[M3A1][TPS_LOD_1]     = TPS_MESH_DIR "m3a1\\m3a1";
-	fpTPSWeaponMeshFiles[MP34][TPS_LOD_1]     = TPS_MESH_DIR "mp34\\mp34";
-	fpTPSWeaponMeshFiles[FG42G][TPS_LOD_1]    = TPS_MESH_DIR "fg42g\\fg42g";
-	fpTPSWeaponMeshAltFiles[FG42G][TPS_LOD_1] = TPS_MESH_DIR "fg42g\\fg42g_Deployed";
+	
+	fpTPSWeaponMeshFiles[STENMK2][TPS_LOD_1]   = TPS_MESH_DIR "stenmk2\\stenmk2";
+	fpTPSWeaponMeshFiles[M3A1][TPS_LOD_1]      = TPS_MESH_DIR "m3a1\\m3a1";
+	fpTPSWeaponMeshFiles[MP34][TPS_LOD_1]      = TPS_MESH_DIR "mp34\\mp34";
+	fpTPSWeaponMeshFiles[FG42G][TPS_LOD_1]     = TPS_MESH_DIR "fg42g\\fg42g";
+	fpTPSWeaponMeshAltFiles[FG42G][TPS_LOD_1]  = TPS_MESH_DIR "fg42g\\fg42g_Deployed";
 
 	// base pose
 	fpTPSBasePoseFile = TPS_BLEND_DIR "stand\\idle\\ui\\relaxed.txt";
@@ -632,7 +632,6 @@ void fpTPSDataInit()
 	// end MIXINS
 
 	fpTPSDefaultFaceNames[BRITISH_INFANTRY] = "face1";
-
 	fpTPSDefaultFaceNames[GERMAN_INFANTRY] = "face2";
 	fpTPSDefaultFaceNames[FRENCH_INFANTRY] = "face3";
 	fpTPSDefaultFaceNames[BRITISH_HC] = "britishofficerhead";

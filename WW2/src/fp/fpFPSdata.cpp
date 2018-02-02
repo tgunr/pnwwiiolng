@@ -69,7 +69,7 @@ const SCHAR* arm_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "arms\\armsmesh-britinf",
 	FPS_DIR "arms\\armsmesh-germinf",
 	FPS_DIR "arms\\armsmesh-frenchinf",
-	FPS_DIR "arms\\armsmesh-britinf" // americans
+	FPS_DIR "arms\\armsmesh-britinf" // Americans
 };
 
 const SCHAR* replacement_arms_file = FPS_DIR "arms\\replacement_arms_maps";
