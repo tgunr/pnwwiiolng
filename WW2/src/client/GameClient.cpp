@@ -60,6 +60,7 @@
 #include "client/clientStrtQueue.h"
 #include "uimap/CPRenderer.h"
 #include "strt/strtClientMessages.h"
+#include "chat/chatMissionInvite.h"
 #include "chat/chatMissionMember.h"
 #include "chat/chatBrigadeControl.h"
 #include "client/clientBrigadeControlDescriptors.h"
@@ -1749,9 +1750,10 @@ void GameClient::ProcessMissionInvite(const MissionInvite& invite)
 {
 	Client::ProcessMissionInvite(invite);
 
-	// eventually we'll use this to let the host send down
-	// player or squad invites; not used for now
-	//jsclient->RunScript("game.onmissioninvite()");
+	// HACK: This was disabled for recruiter squad invites, and
+	// I'm not about to mess with that for a quick little feature.
+	if ( invite.m_squadHandle != 0 )
+		jsclient->RunScript("game.onmissioninvite()");
 }
 
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags)
