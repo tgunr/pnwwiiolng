@@ -1373,6 +1373,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		if ( window_mode == FULLSCREEN )
 			ShowWindow(myhwnd, SW_MINIMIZE);
 		Write_Debug("WM_CANCELMODE");
+		break;
 	}
 	default:
 		{
