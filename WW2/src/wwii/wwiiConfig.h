@@ -114,6 +114,14 @@ struct cfSCORE
 	UINT16		stratDmgInterval_s;		//!< Number of seconds between strat damages to get score.
 	UINT16		maxGlobalSharedRank;	//!< Cross-side rank sharing.
 	UINT16		maxSideSharedRank;		//!< Cross-country rank sharing within a side.
+	UINT16		destroyAI;		//!< Points awarded for destroying an AI
+	UINT16		infResupplier;		//!< Points awarded for resupplying another player
+	UINT16		resupply;		//!< Points awarded for resupplying equipment while on a resupply mission
+	UINT16		destroyFMS;		//!< Points awarded for destroying an FMS
+	UINT16		repairBridge;		//!< Points awarded for repairing a bridge
+	UINT16		damageBridge;		//!< Points awarded for damaging a bridge
+	UINT16		damageFactory;		//!< Points awarded for damaging a factory
+	UINT16		damageFB;		//!< Points awarded for damaging an FB
 };
 
 struct cfSQUAD

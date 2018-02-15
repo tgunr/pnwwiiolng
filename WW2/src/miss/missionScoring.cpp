@@ -17,12 +17,6 @@
 #include "wwii/wwiiRTBCodes.h"
 #include "score/scoreSortie.h"
 
-static const FLOAT32 CAPTURE_VALUE = 20.0f;	// points per capture
-static const FLOAT32 AI_VALUE = 2.5f;			// points per ai killed
-static const FLOAT32 RESUP_VALUE = 1.0f;		// Points per resupply
-static const FLOAT32 VEHICLE_SUPPLY_SCORE = 5.0f;	// Resupply points
-static const FLOAT32 UMS_KILL_BONUS = 2.0f;	// 2 points for a UMS kill
-
 //////////////////////////////////////////////////////////////////////
 // Calculate the rtbmodifier for a given rtb code
 
@@ -66,18 +60,18 @@ _bonusScore(const Player* player)
 					, scoring.umsKills()
 					);
 
-	bonuses += (FLOAT32)scoring.captures() * CAPTURE_VALUE;
+	bonuses += (FLOAT32)scoring.captures() * host_config.score.capture;
 	bonuses += (FLOAT32)scoring.spawnees() * host_config.sto.mobileSpawneeValue;
 
-	bonuses += (FLOAT32)scoring.aiKills() * AI_VALUE;
-	bonuses += (FLOAT32)scoring.resuppliesScored() * RESUP_VALUE;
-	bonuses += (FLOAT32)scoring.umsKills() * UMS_KILL_BONUS;
+	bonuses += (FLOAT32)scoring.aiKills() * host_config.score.destroyAI;
+	bonuses += (FLOAT32)scoring.resuppliesScored() * host_config.score.infResupplier;
+	bonuses += (FLOAT32)scoring.umsKills() * host_config.score.destroyFMS;
 
 	bonuses += scoring.cappingKills() * host_config.score.capperKillBonus;
 	bonuses += scoring.guardingKills() * host_config.score.guardingKillBonus;
 	bonuses += (FLOAT32)(scoring.guardingPoints());
 
-	FLOAT32 heavyDamageBonus = 10.0f;
+	FLOAT32 heavyDamageBonus = 0;
 	UCHAR wCategory = player->weaponSpec().wCategory;
 	if ( wCategory != 0 && wCategory != _INFANTRY && wCategory != _GROUND_VEHICLE )
 	{
@@ -89,16 +83,16 @@ _bonusScore(const Player* player)
 	}
 
 	if ( scoring.bridgeKills() > 0 )
-		bonuses += heavyDamageBonus;
+		bonuses += host_config.score.damageBridge;
 
 	if ( scoring.factoryKills() > 0 )
-		bonuses += heavyDamageBonus;
+		bonuses += host_config.score.damageFactory;
 
 	if ( scoring.bridgeRepairs() > 0 )
-		bonuses += heavyDamageBonus;
+		bonuses += host_config.score.repairBridge;
 
 	if ( scoring.firebaseKills() > 0 )
-		bonuses += heavyDamageBonus;
+		bonuses += host_config.score.damageFB;
 
 	// Naval bonus for every 20 minutes if you survive 30+ minutes
 	static const int BONUS_TIME = 20 * 60;
@@ -109,7 +103,7 @@ _bonusScore(const Player* player)
 	}
 
 	if ( mp.m_missionType == RESUPPLY && mp.wasSuccessful == true )
-		bonuses += VEHICLE_SUPPLY_SCORE;
+		bonuses += host_config.score.resupply;
 
 	return bonuses;
 }
