@@ -73,14 +73,6 @@ _bonusScore(const Player* player)
 
 	FLOAT32 heavyDamageBonus = 0;
 	UCHAR wCategory = player->weaponSpec().wCategory;
-	if ( wCategory != 0 && wCategory != _INFANTRY && wCategory != _GROUND_VEHICLE )
-	{
-		const UINT8 rtbState = mp.vehicle().rtbState();
-		if ( rtbState == RTB_SUCCESS )
-			heavyDamageBonus = 30.0f;
-		else if ( rtbState == RTB_BAIL_FRIENDLY )
-			heavyDamageBonus = 16.665f;		// 15.0 after rtb mod
-	}
 
 	if ( scoring.bridgeKills() > 0 )
 		bonuses += host_config.score.damageBridge;
