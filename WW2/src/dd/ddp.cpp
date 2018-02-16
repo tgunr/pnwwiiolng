@@ -60,7 +60,7 @@ static SINT32					capture;
 static TCHAR					classname[256];
 
 static enum WindowMode {
-	FULLSCREEN, BORDERLESS_FULLSCREEN, WINDOWED
+	FULLSCREEN, BORDERLESS_WINDOW, WINDOWED
 } window_mode;
 static UINT32					delay;
 static UINT32					starttime;
@@ -534,6 +534,7 @@ namespace {
 			}
 		}
 
+		// TODO: Make sure this works (verified broken after removing a monitor; might be an order thing)
 		if ( ! display_found ) {
 			dbugLog(_FLW, "Requested display '%s' not found. Resorting to primary display.", WantedDisplayDevice);
 			display = primary_display;
@@ -545,15 +546,16 @@ namespace {
 			WantedBpp = 32;
 
 
-		// TODO: Add borderless fullscreen once its issues have been dealt with
-		if ( ! WantedWindow )
-			window_mode = FULLSCREEN;
-		else
+		if ( WantedWindow )
 			window_mode = WINDOWED;
-
+		else if ( WantedBorderless )
+			// TODO: Make borderless default
+			window_mode = BORDERLESS_WINDOW;
+		else
+			window_mode = FULLSCREEN;
 
 		if ( WantedWidth <= 0 || WantedHeight <= 0 ) {
-			if ( window_mode == FULLSCREEN || window_mode == BORDERLESS_FULLSCREEN ) {
+			if ( window_mode == FULLSCREEN || window_mode == BORDERLESS_WINDOW ) {
 				MONITORINFOEX minfo = GetDisplayMonitor();
 				const RECT& rect = minfo.rcMonitor;
 				WantedWidth = rect.right - rect.left;
@@ -609,13 +611,13 @@ static bool ddpResetWindow(void) {
 		exstyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 	} else {
 		style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
-		exstyle = WS_EX_APPWINDOW | WS_EX_TOPMOST;
+		exstyle = WS_EX_APPWINDOW;// | WS_EX_TOPMOST;
 	}
 
 #ifdef CENTER_WINDOW
-	if ( window_mode == WINDOWED ) {
+	if ( window_mode != FULLSCREEN ) {
 		MONITORINFOEX minfo = GetDisplayMonitor();
-		const RECT& rect = minfo.rcWork;
+		const RECT& rect = window_mode == WINDOWED ? minfo.rcWork : minfo.rcMonitor;
 		WantedX = ((rect.right - rect.left) - WantedWidth) / 2;
 		WantedY = ((rect.bottom - rect.top) - WantedHeight) / 2;
 	}
@@ -625,19 +627,16 @@ static bool ddpResetWindow(void) {
 	// (e.g., previously configured with multi-monitor setup that changed)
 #endif
 
-	// TODO: Render to an FBO, then render that to the actual window
-	// The below forces our rendering & display resolutions to match
-	if ( window_mode != WINDOWED ) {
+	// TODO: For borderless window, render to an FBO then render that to the actual window.
+	if ( window_mode == FULLSCREEN ) {
 		MONITORINFOEX minfo = GetDisplayMonitor();
 		renderrect = minfo.rcMonitor;
 
-		// TEMP: Force the internal resolution to match the monitor's resolution
 		WantedX = minfo.rcMonitor.left;
 		WantedY = minfo.rcMonitor.bottom;
 		WantedWidth = minfo.rcMonitor.right - minfo.rcMonitor.left;
 		WantedHeight = minfo.rcMonitor.bottom - minfo.rcMonitor.top;
 	} else {
-		// TODO: Allow window rect to differ from internal resolution
 		renderrect.left = WantedX;
 		renderrect.right = renderrect.left + WantedWidth;
 		renderrect.top = WantedY;
@@ -646,6 +645,13 @@ static bool ddpResetWindow(void) {
 
 	RECT wrect = renderrect;
 	AdjustWindowRectEx(&wrect, style, FALSE, exstyle);
+
+	// HACK: If the window size is the same as the monitor size, alt-tab, etc. acts weird.
+	// I'd implement a proper solution, but the Windows API is garbage and I have no idea
+	// why this happens.
+	if ( window_mode != WINDOWED ) {
+		wrect.bottom += 1;
+	}
 
 	bool created_window = false;
 	if ( myhwnd == NULL ) {
@@ -1178,6 +1184,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	}
 	case WM_KILLFOCUS:
 	{
+		ShowWindow(myhwnd, SW_MINIMIZE);
 		OnKillFocus((HWND) wParam);
         ClipCursor(nullptr);
 		break;
@@ -1367,14 +1374,6 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 
 			break;
         }
-	case WM_CANCELMODE:
-	{
-		// If something pops up in front of us while we're true fullscreen, kill our focus.
-		if ( window_mode == FULLSCREEN )
-			ShowWindow(myhwnd, SW_MINIMIZE);
-		Write_Debug("WM_CANCELMODE");
-		break;
-	}
 	default:
 		{
 			IMEBase* ime = imeClient();
