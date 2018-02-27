@@ -157,12 +157,20 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "oic.withdrawVoteTimeS",		TYPE_SINT,	&host_config.oic.withdrawVoteTime_s,	3600,	"90",	"Duration of attack withdrawl proposals (seconds)" }
 
 ,	{ "score.capperKillBonus",		TYPE_SINT,	&host_config.score.capperKillBonus,		0,		"1",	"Bonus points for killing a player who is inside a capture building" }
-,	{ "score.capture",				TYPE_SINT,	&host_config.score.capture,				0,		"5",	"Points awarded for capture" }
+,	{ "score.capture",				TYPE_SINT,	&host_config.score.capture,				0,		"30",	"Points awarded for capture" }
 ,	{ "score.guardingKillBonus",	TYPE_SINT,	&host_config.score.guardingKillBonus,	0,		"2",	"Bonus points for scoring a kill FROM inside a capture building" }
 ,	{ "score.guardPointPer_s",		TYPE_SINT,	&host_config.score.guardPointPer_m,		0,		"2",	"Time required to score one guard point (minutes)" }
 ,	{ "score.stratDmgInterval_s",	TYPE_SINT,	&host_config.score.stratDmgInterval_s,	0,		"30",	"Minimum time between same strat object awarding points" }
 ,	{ "score.maxGlobalSharedRank",	TYPE_SINT,	&host_config.score.maxGlobalSharedRank,	0,		"5",	"Rank at which rank-sharing cross-sides stops (ranks below this are shared cross-side by branch)" }
 ,	{ "score.maxSideSharedRank",	TYPE_SINT,	&host_config.score.maxSideSharedRank,	0,		"12",	"Rank at which rank-sharing same-side stops (ranks below this are shared by branch among personas on the same side)" }
+,	{ "score.destroyAI",				TYPE_SINT,	&host_config.score.destroyAI,				0,		"10",	"Points awarded for destroying an AI" }
+,	{ "score.infResupplier",				TYPE_SINT,	&host_config.score.infResupplier,				0,		"20",	"Points awarded for resupplying another infantry player" }
+,	{ "score.resupply",				TYPE_SINT,	&host_config.score.resupply,				0,		"30",	"Points awarded for resupplying equipment while on a resupply mission" }
+,	{ "score.destroyFMS",				TYPE_SINT,	&host_config.score.destroyFMS,				0,		"20",	"Points awarded for destroying an FMS" }
+,	{ "score.repairBridge",				TYPE_SINT,	&host_config.score.repairBridge,				0,		"20",	"Points awarded for repairing a bridge" }
+,	{ "score.damageBridge",				TYPE_SINT,	&host_config.score.damageBridge,				0,		"20",	"Points awarded for damaging a bridge" }
+,	{ "score.damageFactory",				TYPE_SINT,	&host_config.score.damageFactory,				0,		"30",	"Points awarded for damaging a factory" }
+,	{ "score.damageFB",				TYPE_SINT,	&host_config.score.damageFB,				0,		"20",	"Points awarded for damaging an FB" }
 
 ,	{ "squad.electionDuration",		TYPE_SINT,	&host_config.squad.electionDuration,	0,		"1",	"Duration of undecided CO elections (days)" }
 ,	{ "squad.electionInterval",		TYPE_SINT,	&host_config.squad.electionInterval,	0,		"7",	"Minimum time between elections for a squad (days)" }
@@ -183,8 +191,8 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "sto.ge.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[1],		0,		"120",	"Seconds after a gun emplacement is destroyed before anything else can be placed" }
 ,	{ "sto.ge.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[1],		0,		"60",	"Seconds after placing a gun emplacement before another PPO can be placed" }
 
-,	{ "sto.fmsp.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[2],		0,		"250000000","Cumulative joules damage to destroy a fortified mobile spawn" }
-,	{ "sto.fmsp.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[2],		0,		"1000",	"Minimum joules for damage to be applied to a fortified mobile spawn" }
+,	{ "sto.fmsp.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[2],		0,		"100000000","Cumulative joules damage to destroy a fortified mobile spawn" }
+,	{ "sto.fmsp.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[2],		0,		"10000000",	"Minimum joules for damage to be applied to a fortified mobile spawn" }
 ,	{ "sto.fmsp.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[2],		0,		"120",	"Seconds after fortified MS is destroyed before anything else can be placed" }
 ,	{ "sto.fmsp.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[2],		0,		"60",	"Seconds after placing fortified MS before another PPO can be placed" }
 

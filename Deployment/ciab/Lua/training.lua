@@ -1,0 +1,6 @@
+deploy("uktrngd", "Fort Montgomery")
+deploy("uktrngb", "Fort Montgomery")
+deploy("frtrngd", "Fort De Gaulle")
+deploy("frtrngb", "Fort De Gaulle")
+deploy("detrngd", "Fort Rommel")
+deploy("detrngb", "Fort Rommel")

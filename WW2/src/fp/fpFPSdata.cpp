@@ -69,8 +69,7 @@ const SCHAR* arm_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "arms\\armsmesh-britinf",
 	FPS_DIR "arms\\armsmesh-germinf",
 	FPS_DIR "arms\\armsmesh-frenchinf",
-	FPS_DIR "arms\\armsmesh-britinf", // Americans
-	FPS_DIR "arms\\armsmesh-germinf" // Italians
+	FPS_DIR "arms\\armsmesh-britinf" // Americans
 };
 
 const SCHAR* replacement_arms_file = FPS_DIR "arms\\replacement_arms_maps";
@@ -97,8 +96,7 @@ const SCHAR* leg_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "legs\\brit-legs",
 	FPS_DIR "legs\\german-legs",
 	FPS_DIR "legs\\french-legs",
-	FPS_DIR "legs\\brit-legs", // americans
-	FPS_DIR "legs\\german-legs" // Italians
+	FPS_DIR "legs\\brit-legs" // americans
 };
 
 const SCHAR* hud_icons[NUM_ICONS] =
@@ -180,8 +178,6 @@ const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"GreaseGun",
 	"mp34",
 	"fg42g",
-	"carcano",
-	"beretta38",
 };
 
 const SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES] =
@@ -223,8 +219,7 @@ const SCHAR* armTypeStrings[NUM_INFANTRY_TYPES]			=
 	"ukml",
 	"deml",
 	"frml",
-	"usarmy",
-	"itarmy"
+	"usarmy"
 };
 
 const SCHAR* weapNameStrings[NUM_WEAPONS] =
@@ -287,8 +282,6 @@ const SCHAR* weapNameStrings[NUM_WEAPONS] =
 	(SCHAR *)"m3a1",
 	(SCHAR *)"mp34",
 	(SCHAR *)"fg42g",
-	(SCHAR *)"carcano",
-	(SCHAR *)"beretta38",
 };
 
 class fpFPSVisLoadoutsLoader : public XMLLoader2<fpFPSVisLoadoutsLoader>
@@ -1189,12 +1182,6 @@ void fpFPSDataReadFPSFile()
 		break;
 		case fg42gFile_hash:
 			_fpFPSDataReadWeaponFile (FG42G, varData);
-		break;
-		case carcanoFile_hash:
-			_fpFPSDataReadWeaponFile (CARCANO, varData);
-		break;
-		case beretta38File_hash:
-			_fpFPSDataReadWeaponFile(BERETTA38, varData);
 		break;
 
 		case crawlSound_hash:
@@ -2507,45 +2494,6 @@ void fpFPSDataInit ()
 	arms_anim_files[FG42G][UNDEPLOYING]     = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_deploy";
 	arms_anim_files[FG42G][DEPLOYED_FIRE]   = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_fireDeployed";
 	arms_anim_files[FG42G][DEPLOYED_RELOAD] = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_reload";
-
-	weap_anim_files[CARCANO][RELOAD]      = FPS_DIR "carcano\\weapon\\weap_Carcano_reload";
-	weap_anim_files[CARCANO][STAND_FIRE]  = FPS_DIR "carcano\\weapon\\weap_Carcano_fire";
-	weap_anim_files[CARCANO][CROUCH_FIRE] = FPS_DIR "carcano\\weapon\\weap_Carcano_fire";
-	weap_anim_files[CARCANO][AIM_FIRE]    = FPS_DIR "carcano\\weapon\\weap_Carcano_aimFire";
-	weap_anim_files[CARCANO][RECYCLE]     = FPS_DIR "carcano\\weapon\\weap_Carcano_recycle";
-	arms_anim_files[CARCANO][RELOAD]      = FPS_DIR "carcano\\arms\\arms_Carcano_reload";
-	arms_anim_files[CARCANO][STAND_FIRE]  = FPS_DIR "carcano\\arms\\arms_Carcano_fire";
-	arms_anim_files[CARCANO][CROUCH_FIRE] = FPS_DIR "carcano\\arms\\arms_Carcano_fire";
-	arms_anim_files[CARCANO][AIM_FIRE]    = FPS_DIR "carcano\\arms\\arms_Carcano_aimFire";
-	arms_anim_files[CARCANO][RECYCLE]     = FPS_DIR "carcano\\arms\\arms_Carcano_recycle";
-	arms_anim_files[CARCANO][LOWER]       = FPS_DIR "carcano\\arms\\arms_Carcano_lowered";
-	arms_anim_files[CARCANO][IDLE]        = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
-	arms_anim_files[CARCANO][KNEEL]       = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
-	arms_anim_files[CARCANO][AIM]         = FPS_DIR "carcano\\arms\\arms_Carcano_aim";
-	arms_anim_files[CARCANO][TROT]        = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
-	arms_anim_files[CARCANO][CREEP]       = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
-	arms_anim_files[CARCANO][CRAWL]       = FPS_DIR "carcano\\arms\\arms_Carcano_crawl";
-	arms_anim_files[CARCANO][SPRINT]      = FPS_DIR "carcano\\arms\\arms_Carcano_run";
-	arms_anim_files[CARCANO][SIT]         = FPS_DIR "carcano\\arms\\arms_Carcano_lowered";
-
-	weap_anim_files[BERETTA38][RELOAD]      = FPS_DIR "beretta38\\weapon\\weap_beretta38_reload";
-	weap_anim_files[BERETTA38][STAND_FIRE]  = FPS_DIR "beretta38\\weapon\\weap_beretta38_fire";
-	weap_anim_files[BERETTA38][CROUCH_FIRE] = FPS_DIR "beretta38\\weapon\\weap_beretta38_fire";
-	weap_anim_files[BERETTA38][AIM_FIRE]    = FPS_DIR "beretta38\\weapon\\weap_beretta38_fire";
-	arms_anim_files[BERETTA38][RELOAD]      = FPS_DIR "beretta38\\arms\\arms_beretta38_reload";
-	arms_anim_files[BERETTA38][STAND_FIRE]  = FPS_DIR "beretta38\\arms\\arms_beretta38_fire";
-	arms_anim_files[BERETTA38][CROUCH_FIRE] = FPS_DIR "beretta38\\arms\\arms_beretta38_fire";
-	arms_anim_files[BERETTA38][AIM_FIRE]    = FPS_DIR "beretta38\\arms\\arms_beretta38_aimFire";
-	arms_anim_files[BERETTA38][LOWER]       = FPS_DIR "beretta38\\arms\\arms_beretta38_lowered";
-	arms_anim_files[BERETTA38][IDLE]        = FPS_DIR "beretta38\\arms\\arms_beretta38_neutral";
-	arms_anim_files[BERETTA38][KNEEL]       = FPS_DIR "beretta38\\arms\\arms_beretta38_neutral";
-	arms_anim_files[BERETTA38][AIM]         = FPS_DIR "beretta38\\arms\\arms_beretta38_aim";
-	arms_anim_files[BERETTA38][AIM_SMG]     = FPS_DIR "beretta38\\arms\\arms_beretta38_aim";
-	arms_anim_files[BERETTA38][TROT]        = FPS_DIR "beretta38\\arms\\arms_beretta38_neutral";
-	arms_anim_files[BERETTA38][CREEP]       = FPS_DIR "beretta38\\arms\\arms_beretta38_neutral";
-	arms_anim_files[BERETTA38][CRAWL]       = FPS_DIR "beretta38\\arms\\arms_beretta38_crawl";
-	arms_anim_files[BERETTA38][SPRINT]      = FPS_DIR "beretta38\\arms\\arms_beretta38_sprint";
-	arms_anim_files[BERETTA38][SIT]         = FPS_DIR "beretta38\\arms\\arms_beretta38_lowered";
 
 	// BRIDGE_REPAIR animation files
 	arms_anim_files[BRIDGE_REPAIR][STAND_FIRE] = FPS_DIR "satchel\\animations\\fire\\satchel-fire(1)";
