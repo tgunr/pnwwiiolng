@@ -291,10 +291,14 @@ _recvJoinMission(ACTION_OBJECT* const a) {
 	MissionJoinRequest::Request request(a);
 
 	Player* target = PlayerInterface::Lookup(request.player);
-	if ( target == nullptr || player.side() != target->side() || target->missionID() == 0 ) {
+	if ( target == nullptr ) {
 		player.message(LSTR_CAUTION, LSTR_JOINMISSION_PLAYERNOTFOUND);
 	} else if ( target->playerID() == player.playerID() ) {
 		player.message(LSTR_CAUTION, LSTR_CANT_VERB_SELF, "/join");
+	} else if ( player.side() != target->side() || target->missionID() == 0 ) {
+		player.message(LSTR_CAUTION, LSTR_JOINMISSION_PLAYERNOTFOUND);
+	} else if ( target->missionID() == player.missionID() ) {
+		player.message(LSTR_CAUTION, LSTR_JOINMISSION_ALREADYONMISSION);
 	} else {
 		// HACK: Omitting squad to show we aren't related to a recruiter join. Blech.
 		MissionInvite invite(target->missionID(), target->country(), target->branch(),
