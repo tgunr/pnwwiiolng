@@ -596,17 +596,17 @@ static SINT32 dot_fuze(const char* line)
 	Join mission by callsign
 *************************************************************************************************/
 
-static SINT32 dot_joinmission(const char* line)
+static SINT32 dot_join(const char* line)
 {
 	if ( ! Online ) return DC_HANDLED;
 	if ( uiInGame() ) {
-		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"Cannot /joinmission while in game");
+		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"Cannot /join while in game");
 		return DC_HANDLED;
 	}
 
 	ARGV argv(line, 1, false);
 	if ( argv.argc != 1 ) {
-		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"/joinmission <callsign>");
+		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"/join <callsign>");
 		return DC_HANDLED;
 	}
 
@@ -7779,7 +7779,7 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(conv, false);
 	ADD_DOT_COMMAND(emote, false);
 	ADD_DOT_COMMAND(em, false);
-	ADD_DOT_COMMAND(joinmission, false);
+	ADD_DOT_COMMAND(join, false);
 	ADD_DOT_COMMAND(autoleader, false);
 	ADD_DOT_COMMAND(recruit, false);
 	ADD_DOT_COMMAND(recruiting, false);

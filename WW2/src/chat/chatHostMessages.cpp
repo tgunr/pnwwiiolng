@@ -291,14 +291,14 @@ _recvJoinMission(ACTION_OBJECT* const a) {
 	MissionJoinRequest::Request request(a);
 
 	Player* target = PlayerInterface::Lookup(request.player);
-	if ( ! target ) {
-		dbugLog(_FLN, "Join mission requested by '%s' for invalid handle '%lu'.", player.callsign(), request.player);
-	} else if ( player.side() != target->side() ) {
-		dbugLog(_FLN, "Denying join mission request since '%s' and '%s' are on different sides.", player.callsign(), target->callsign());
+	if ( target == nullptr || player.side() != target->side() || target->missionID() == 0 ) {
+		player.message(LSTR_CAUTION, LSTR_JOINMISSION_PLAYERNOTFOUND);
+	} else if ( target->playerID() == player.playerID() ) {
+		player.message(LSTR_CAUTION, LSTR_CANT_VERB_SELF, "/join");
 	} else {
 		// HACK: Omitting squad to show we aren't related to a recruiter join. Blech.
 		MissionInvite invite(target->missionID(), target->country(), target->branch(),
-		                     target->brigadeID(), target->chatHandle(), 0, true);
+		                     target->brigadeID(), target->chatHandle(), target->squadHandle(), false);
 		MISSION_INVITE_MSG outgoing(invite);
 		outgoing.send(player.teulIndex());
 	}

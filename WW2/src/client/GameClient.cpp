@@ -1750,9 +1750,9 @@ void GameClient::ProcessMissionInvite(const MissionInvite& invite)
 {
 	Client::ProcessMissionInvite(invite);
 
-	// HACK: This was disabled for recruiter squad invites, and
-	// I'm not about to mess with that for a quick little feature.
-	if ( invite.m_squadHandle != 0 )
+	// HACK: Squad recruiter invites are mandatory and use a different
+	// path because derp.
+	if ( invite.m_isDirective == 0 )
 		jsclient->RunScript("game.onmissioninvite()");
 }
 
