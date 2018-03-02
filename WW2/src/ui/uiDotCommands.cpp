@@ -38,6 +38,7 @@
 #include "math/matheul.h"
 #include "math/mathUnitConversion.h"
 #include "math/mathvect.h"
+#include "miss/missionJoinRequest.h"
 #include "ml/mlCompon.h"
 #include "ml/mlgauges.h"
 #include "ml/mlutility.h"
@@ -120,6 +121,14 @@ namespace Chat { extern HostCommands g_hostDotCommands; }
 #ifdef GR2_BLEND_EDITOR
 #include "pers/pershud.h"
 #endif
+
+namespace {
+	// FEEDBACK: Bad callsign '%s'
+	static SINT32 _badCallsign(const std::wstring& input) {
+		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_CAUTION, LSTR_INVALID_CALLSIGN, input.c_str());
+		return DC_HANDLED;
+	}
+}
 
 /************************************************************************************************
 	uiDotCommand
@@ -584,6 +593,36 @@ static SINT32 dot_fuze(const char* line)
 #endif
 
 /************************************************************************************************
+	Join mission by callsign
+*************************************************************************************************/
+
+static SINT32 dot_join(const char* line)
+{
+	if ( ! Online ) return DC_HANDLED;
+	if ( uiInGame() ) {
+		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"Cannot /join while in game");
+		return DC_HANDLED;
+	}
+
+	ARGV argv(line, 1, false);
+	if ( argv.argc != 1 ) {
+		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"/join <callsign>");
+		return DC_HANDLED;
+	}
+
+	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str());
+	if ( handle == 0LL )
+		return _badCallsign(argv[1]);
+
+	MissionJoinRequest::Request request(handle);
+	request.send(PlayerClient()->ChatConnection());
+
+	return DC_HANDLED;
+}
+
+
+
+/************************************************************************************************
 	Mission Auto Leader
 *************************************************************************************************/
 
@@ -609,13 +648,6 @@ static SINT32 dot_autoleader(const char* line)
 /************************************************************************************************
 	Squad Management Commands
 *************************************************************************************************/
-
-// FEEDBACK: Bad callsign '%s'
-static SINT32 _badCallsign(const std::wstring& input)
-{
-	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_CAUTION, LSTR_INVALID_CALLSIGN, input.c_str());
-	return DC_HANDLED;
-}
 
 static SINT32 dot_recruit(const char* line)
 {
@@ -7747,6 +7779,7 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(conv, false);
 	ADD_DOT_COMMAND(emote, false);
 	ADD_DOT_COMMAND(em, false);
+	ADD_DOT_COMMAND(join, false);
 	ADD_DOT_COMMAND(autoleader, false);
 	ADD_DOT_COMMAND(recruit, false);
 	ADD_DOT_COMMAND(recruiting, false);
