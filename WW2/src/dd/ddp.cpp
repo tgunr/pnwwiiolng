@@ -1179,14 +1179,16 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_SETFOCUS:
 	{
 		OnSetFocus((HWND) wParam);
-        ClipCursor(&renderrect);
+		ClipCursor(&renderrect);
 		break;
 	}
 	case WM_KILLFOCUS:
 	{
-		ShowWindow(myhwnd, SW_MINIMIZE);
+		// HACK: It seems like we don't update properly when minimized,
+		// which can cause problems when connected to a server.
+		//ShowWindow(myhwnd, SW_MINIMIZE);
 		OnKillFocus((HWND) wParam);
-        ClipCursor(nullptr);
+		ClipCursor(nullptr);
 		break;
 	}
 	case WM_NCACTIVATE:
