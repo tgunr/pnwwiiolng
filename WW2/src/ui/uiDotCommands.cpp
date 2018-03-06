@@ -620,7 +620,9 @@ static SINT32 dot_join(const char* line)
 	return DC_HANDLED;
 }
 
-
+static SINT32 dot_j(const char* line) {
+	return dot_join(line);
+}
 
 /************************************************************************************************
 	Mission Auto Leader
@@ -7780,6 +7782,7 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(emote, false);
 	ADD_DOT_COMMAND(em, false);
 	ADD_DOT_COMMAND(join, false);
+	ADD_DOT_COMMAND(j, false);
 	ADD_DOT_COMMAND(autoleader, false);
 	ADD_DOT_COMMAND(recruit, false);
 	ADD_DOT_COMMAND(recruiting, false);
