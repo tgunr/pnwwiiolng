@@ -1,6 +1,8 @@
 // settings.cpp : Defines the class behaviors for the application.
 //
 
+#include "syscfg.h" // Path is project specific.
+
 #include "stdafx.h"
 #include "settings.h"
 #include <vector>

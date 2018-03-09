@@ -109,8 +109,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\;src;$(SolutionDir)\WW2\src;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)Libraries\SteamSDK\public\steam;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ANTIHACK;WIN32;_WINDOWS;FRONT_END;platOS=OS_WIN32;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS;DEBUG_WW2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\;src;$(SolutionDir)WW2\src;$(SolutionDir)Libraries;$(SolutionDir)Libraries\glew\include;$(SolutionDir)Libraries\SteamSDK\public\steam;$(SolutionDir)Libraries\RakNet\Source;$(SolutionDir)Libraries\RakNet\DependentExtensions\cat\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ANTIHACK;WIN32;_WINDOWS;FRONT_END;platOS=OS_WIN32;EXE_BUILD=BUILD_EXE_PLAYGATE;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS;DEBUG_WW2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -313,6 +313,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\WW2\src\fio\fiostructure.cpp" />
     <ClCompile Include="src\Antihack.cpp" />
     <ClCompile Include="src\BDialog.cpp" />
     <ClCompile Include="src\explorer2.cpp" />
@@ -353,7 +354,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\WW2\src\include\precompile_includes.h" />
+    <ClInclude Include="..\WW2\src\fio\fiostructure.h" />
     <ClInclude Include="src\Antihack.h" />
     <ClInclude Include="src\BDialog.h" />
     <ClInclude Include="src\Label.h" />
@@ -367,7 +368,6 @@
     <ClInclude Include="..\WW2\src\wwii\wwiiPackString.h" />
     <ClInclude Include="..\WW2\src\wwii\wwiiUTF.h" />
     <ClInclude Include="src\MoreGetRoutines.h" />
-    <ClInclude Include="..\WW2\src\include\cpuFeatures.h" />
     <ClInclude Include="src\ddp.h" />
     <ClInclude Include="src\explorer2.h" />
     <ClInclude Include="src\ftp.h" />
@@ -392,9 +392,11 @@
     <ClInclude Include="src\TermsOfServiceDlg.h" />
     <ClInclude Include="src\vars.h" />
     <ClInclude Include="src\versionWin.h" />
+    <ClInclude Include="src\ww2src\PG_compiler_check.h" />
+    <ClInclude Include="src\ww2src\PG_platforms.h" />
+    <ClInclude Include="src\ww2src\PG_precompile_includes.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\Playgate.ico" />
     <None Include="res\Playgate.rc2" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
@@ -411,6 +413,11 @@
     <ProjectReference Include="..\WW2\proj\win\teulKit\teulKit.vcxproj">
       <Project>{4f492374-dc5c-47d0-ae9f-7df7a50fdecb}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\WW2\res\WWIIOnLine.ico" />
+    <Image Include="res\bg.bmp" />
+    <Image Include="res\tos-bg.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

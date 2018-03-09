@@ -1,6 +1,8 @@
 /*--------------------------------------------------------------------------------
 load.cpp
 ---------------------------------------------------------------------------------*/
+#include "syscfg.h" // Path is project specific.
+
 #include <Windows.h>
 #include "cfgData.h"
 
@@ -16,6 +18,8 @@ load.cpp
 #include <io.h>
 #include <sys/stat.h>
 #include <map>
+
+wwiiolpath_string GameSettingsFilename = L"wwiiol.xml";  //  -> wwiiol.xml
 
 static bool _xmlfile = false;
 
@@ -35,7 +39,7 @@ static void _insertCFGType(WWIIOLXML* data, int type, const char* value);
 typedef std::unordered_map<std::string, WWIIOLXML *> PrefsData;
 static PrefsData _xmldata;
 
-extern TCHAR UserDataPath[256];
+//  extern TCHAR UserDataPath[256];  //  MJH - Feburary 27, 2018.
 
 /*-------------------------------------------------------------
 loadPreferences
@@ -47,16 +51,26 @@ bool loadPreferences()
                              (xmlInputReadCallback)fileRead,
                              (xmlInputCloseCallback)fileClose);
 
-	std::wstring homepath = UserDataPath;
-	homepath += _T("\\wwiiol.xml");
-	
-    _loadDefault();
+	//  std::wstring homepath = UserDataPath;  //  MJH - Feburary 27, 2018.
+	//  homepath += _T("\\wwiiol.xml");  //  MJH - Feburary 27, 2018.
 
-	bool xmlloaded = _loadXML(homepath.c_str());
+	wwiiolpath_string homePath = ST_userConfigPath;
+	homePath += L"\\";
+	homePath += GameSettingsFilename;
+
+	_loadDefault();
+
+	bool xmlloaded = _loadXML(homePath.c_str());
 	
 	if(!xmlloaded)
 	{
-		xmlloaded = _loadXML(L"data/wwiiol.xml");
+		//  xmlloaded = _loadXML(L"data/wwiiol.xml");  //  MJH - Feburary 27, 2018.
+		
+		wwiiolpath_string workingPath = ST_userConfigPath;
+		workingPath += L"\\DATA\\";
+		workingPath += GameSettingsFilename;
+
+		xmlloaded = _loadXML(workingPath.c_str());  //  MJH - Feburary 27, 2018.
 	}
 
     if(!xmlloaded || !getValue("config.authoritative"))
@@ -85,9 +99,12 @@ int region()
 	return 5;
 #endif
 #else
-	const TCHAR* region = registryInstallValue(_T("Region"));
+	//  const TCHAR* region = registryInstallValue(_T("Region"));  //  MJH - Feburary 27, 2018.
+	//  if(region && !lstrcmp(region, L"china"))  //  MJH - Feburary 27, 2018.
+
+	wwiiolpath_string region = registryInstallValue(_T("Region"));
 	
-	if(region && !lstrcmp(region, _T("china")))
+	if (region != L"china")
 		return 5;
 #endif // GREEN_INSTALL
 	
@@ -500,8 +517,13 @@ void _saveAsXML()
 	if ( buf == nullptr )
 		return; // ???
 
-	std::wstring homepath = UserDataPath;
-	homepath += _T("\\wwiiol.xml");
+	//  std::wstring homepath = UserDataPath;  //  MJH - Feburary 27, 2018.
+	//  homepath += _T("\\wwiiol.xml");  //  MJH - Feburary 27, 2018.
+
+	wwiiolpath_string homepath = ST_userConfigPath;
+	homepath += L"\\";
+	homepath += GameSettingsFilename;
+	
 	buf->context = reinterpret_cast<void*>(fileOpenWrite(homepath.c_str()));
 	buf->writecallback = (xmlOutputWriteCallback)fileWrite;
 	buf->closecallback = (xmlOutputCloseCallback)fileClose;

@@ -2,10 +2,11 @@
 
 #include <windows.h>
 
-#include <dsound.h>
+#include "d3d\mmeapi.h"
+#include "dsound.h"
 #include <vector>
 
-#include "dx3dinfo.h"
+#include "d3d\dx3dinfo.h"
 
 DWORD					numadapters;
 

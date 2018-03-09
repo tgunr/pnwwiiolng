@@ -1,6 +1,9 @@
 /*--------------------------------------------------------------------------------
 file.cpp
 ---------------------------------------------------------------------------------*/
+
+#include "syscfg.h" // Path is project specific.
+
 #include "file.h"
 #include "registry.h"
 #include "language.h"
@@ -20,7 +23,7 @@ file.cpp
 #define WW2OL_APP 1
 #define WW2OL_BETA_APP 12
 
-TCHAR UserDataPath[256];
+//  TCHAR UserDataPath[256];  //  MJH - Feburary 27, 2018.
 
 std::string fileUrlDecode(const char* src)
 {
@@ -62,10 +65,17 @@ void fileInit()
 #if GREEN_INSTALL == 1
 	lstrcat(UserDataPath, _T("."));
 #else
-    SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, NULL, 0, UserDataPath);
+	wchar_t wBuffer[MAX_PATH + 1];
 
-	const TCHAR* base = registryInstallValue(_T("Version"));
+	wwiiolpath_string regBasePath = L"";
+	wwiiolpath_string userConfigPath = L"";
+
+	LOGICAL retValue = FALSE;
 	
+/*	//  MJH - Feburary 27, 2018.  ====  START  ====
+	SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, NULL, 0, UserDataPath);
+	const TCHAR* base = registryInstallValue(_T("Version"));
+
 	if(base) {
 		lstrcat(UserDataPath, _T("\\"));
 		lstrcat(UserDataPath, base);
@@ -73,6 +83,47 @@ void fileInit()
 		lstrcat(UserDataPath, _T("\\"));
 		lstrcat(UserDataPath, _T("Battleground Europe"));
 	}
+*/
+	wBuffer[0] = 0;
+	SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, NULL, 0, wBuffer);
+	regBasePath = registryInstallValue(_T("Version"));
+
+	if (regBasePath == L"")
+		regBasePath = WWIIOnlineDirName;
+
+	//  Registry Path.
+	userConfigPath += wBuffer;
+	userConfigPath += L"\\";
+	userConfigPath += regBasePath;
+
+	//  Initialise Standard Paths.
+	retValue = fioStructureInit();
+
+	ST_userConfigPathSet = FALSE;
+
+	if (userConfigPath != L"")
+	{
+		//  Use the Registry Path FIRST.
+		
+		ST_userConfigPath = userConfigPath;
+		ST_userConfigPathSet = TRUE;
+	}
+	else if (ST_userConfigPath != L"")
+	{
+		//  Use the Initialised Path SECOND.  All is Good.
+		//  ST_userConfigPath = ST_userConfigPath;
+		ST_userConfigPathSet = TRUE;
+	}
+	else
+	{
+		//  This should not happen - NOT Good.
+		wwiiolpath_string tmp = WWIIOnlineDirName;
+		tmp += L" - Settings.";
+
+		MessageBox(nullptr, L"Please check your Client Install.\n\nShutting down.", tmp.c_str(), MB_ICONSTOP | MB_OK);
+		exit(0);
+	}
+	//  MJH - Feburary 27, 2018.  ====  END  ======
 #endif // GREEN_INSTALL
 }
 

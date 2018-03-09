@@ -1665,6 +1665,9 @@
     <ClInclude Include="..\..\src\wwii\wwiiThemes.h">
       <Filter>wwii</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\fio\fiostructure.h">
+      <Filter>fio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2725,6 +2728,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\sys\sysAntihack.cpp">
       <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fio\fiostructure.cpp">
+      <Filter>fio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

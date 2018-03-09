@@ -10,6 +10,9 @@
 #include "resource.h"		// main symbols
 #include "Tchar.h"
 
+#include "include\systypes.h"
+#include "fio\fiostructure.h"
+
 
 // CsettingsApp:
 // See settings.cpp for the implementation of this class

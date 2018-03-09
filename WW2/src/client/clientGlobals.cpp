@@ -172,8 +172,8 @@ LOGICAL			g_bSoundConvertOnLoad;// convert audio data to best format when loaded
 
 LOGICAL			g_bCaptuerAllDisplays;// capture all displays or just the game display (Mac OS X only currently)
 
-fullpath_t DataPath[_MAX_PATH];
-fullpath_t UserDataPath[_MAX_PATH];
+fullpath_t	DataPath[_MAX_PATH];			//  MJH - Feburary 27, 2018.
+//  fullpath_t	UserDataPath[_MAX_PATH];	//  MJH - Feburary 27, 2018.
 
 FLOAT32			FieldOfView;		// FOV in degrees
 FLOAT32			HorizontalFieldOfView;
@@ -250,6 +250,10 @@ LOGICAL			NoBlitzWorPreload;			// don't preload blitz.wor
 LOGICAL			NoInfPreload;				// don't preload infantry
 LOGICAL          g_bBuildMDLS;               // Build MDLS for archives.
 LOGICAL          g_buildTerrain;             // Build SDMs for archives.
+LOGICAL			WantRequiredTraining = FALSE;	//  Want The Basic Tutorials to be Required - MJH (DEV-1999: Remove basic graduation tutorial restriction.)
+												//  LOGICAL:	WantRequiredTraining used in ww2 c++ files.  
+												//  js var:		requireTraining used in: ww2mods\DATA\ui\xml\persona.uixml.
+												//  TODO		SET: requireTraining (js) = WantRequiredTraining (c++)
 
 LOGICAL          g_log_comm;					// turn on logging for LOG_COMM
 LOGICAL          g_log_fps;					// turn on logging for LOG_FPS

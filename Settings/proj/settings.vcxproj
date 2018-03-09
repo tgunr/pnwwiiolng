@@ -86,8 +86,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\include;..\src\cfg;..\src\file;..\src\language;..\src\load;..\src\unicode;..\src\sys;..\proj;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_SETTINGS_EXE_;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;_UNICODE;GREEN_INSTALL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\proj;..\include;..\src\cfg;..\src\file;..\src\language;..\src\load;..\src\unicode;..\src\sys;$(SolutionDir)WW2\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_SETTINGS_EXE_;GLEW_STATIC;_CRT_SECURE_NO_WARNINGS;_UNICODE;GREEN_INSTALL=0;platOS=OS_WIN32;EXE_BUILD=BUILD_EXE_SETTINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -201,8 +201,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\WW2\src\fio\fiostructure.cpp" />
+    <ClCompile Include="..\include\d3d\dx3dinfo.cpp" />
     <ClCompile Include="..\src\cfg\cfgData.cpp" />
-    <ClCompile Include="..\src\dx\dx3dinfo.cpp" />
     <ClCompile Include="..\src\file\file.cpp" />
     <ClCompile Include="..\src\language\language.cpp" />
     <ClCompile Include="..\src\load\load.cpp" />
@@ -218,14 +219,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\WW2\src\fio\fiostructure.h" />
+    <ClInclude Include="..\include\d3d\dx3dinfo.h" />
     <ClInclude Include="..\src\cfg\cfgCodes.h" />
     <ClInclude Include="..\src\cfg\cfgData.h" />
-    <ClInclude Include="..\src\dx\dx3dinfo.h" />
     <ClInclude Include="..\src\file\file.h" />
     <ClInclude Include="..\src\language\language.h" />
     <ClInclude Include="..\src\load\load.h" />
     <ClInclude Include="..\src\sys\cpuid.h" />
     <ClInclude Include="..\src\sys\registry.h" />
+    <ClInclude Include="..\src\sys\syscfg.h" />
     <ClInclude Include="..\src\unicode\ConvertUTF.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="settings.h" />
@@ -239,7 +242,7 @@
     <None Include="res\settings.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\wwii1.ico" />
+    <Image Include="..\..\WW2\res\WWIIOnLine.ico" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

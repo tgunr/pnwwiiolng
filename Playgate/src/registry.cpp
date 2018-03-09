@@ -1,5 +1,10 @@
 #include "stdafx.h"
+#include <errno.h>    //  MJH - Feburary 27, 2018.
 #include "wwii/wwiiUTF.h"
+
+#define errno (*_errno())    //  MJH - Feburary 27, 2018.
+
+//  static wchar_t* WWIIOnlineDirName = _T("WWIIOnLine");    //  MJH - Feburary 27, 2018.
 
 static bool
 _tryKey(HKEY hKey, const char* SubKey, const char* Key, HKEY& RegKey, LPBYTE Value) 
@@ -72,53 +77,127 @@ static inline void _copyPathToString(const char* name, std::wstring& to, wchar_t
 }
 
 bool
-registryGetPaths(std::wstring& exePath, std::wstring& dataPath)
+registryGetPaths(std::wstring& exePath, std::wstring& exeDataPath, std::wstring& userConfigPath)
 {
+	//  Revised: MJH - Feburary 27, 2018.
+	//  bool registryGetPaths(std::wstring& exePath, std::wstring& dataPath)
 	wchar_t wBuffer[MAX_PATH+1];
 	wBuffer[0] = 0;
+
 	const wchar_t* PATH_KEY = L"Path";
+	int returnResult = -10;
+	bool exePathSet = false;
+	bool exeDataPathSet = false;
+	bool userConfigPathSet = false;
+
 #ifdef IGNORE_REGISTRY
-	GetCurrentDirectory(MAX_PATH, wBuffer);
+
+	fioStructureInit();
+
+	exePath = PG_exePath;
+	exeDataPath = PG_exeDataPath;
+	userConfigPath = PG_userConfigPath;
+
+	return true;
+
 #else
-	if ( !_readWideKey(g_registryKeyW, PATH_KEY, wBuffer) || wBuffer[0] == 0 )
+//  The following probably has some issues now.    //  MJH - Feburary 27, 2018.
+
+//  exePath - START.
+	if (!_readWideKey(g_registryKeyW, PATH_KEY, wBuffer) || wBuffer[0] == 0)
 	{
 		dbugLog(_FLA, "Unable to access %s\\%ls", g_registryKey, PATH_KEY);
 		return false;
 	}
-#endif
-	if ( exePath.length() == 0 )
-		_copyPathToString("Path", exePath, wBuffer);
 
+	if (exePath.length() == 0)
+	{
+		_copyPathToString("Path", exePath, wBuffer);
+		exePathSet = true;
+	}
+	//  exePath - END.
+
+
+	//  configPath - START.
 	// Ask Windows where the users documents folder is; oh, and create it if it doesn't exist
 	// because we'll be needing it.
 	wBuffer[0] = 0;
-	if ( SHGetFolderPath(nullptr, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, nullptr, SHGFP_TYPE_CURRENT, wBuffer) != S_OK )
+	if (SHGetFolderPath(nullptr, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, nullptr, SHGFP_TYPE_CURRENT, wBuffer) != S_OK)
 	{
 		dbugLog(_FLA, "SHGetFolderPath(CSIDL_PERSONAL) failed");
 		return false;
 	}
 
-	if ( dataPath.length() == 0 )
-		_copyPathToString("CSIDL_PERSONAL", dataPath, wBuffer);
+	if (dataPath.length() == 0)
+	{
+		_copyPathToString("CSIDL_PERSONAL", configPath, wBuffer);
+		configathSet = true;
+	}
 
-#ifdef IGNORE_REGISTRY
-	_copyPathToString("DataPath", dataPath, L"Battleground Europe");
-#else
 	// Now query HKLM\Software\Playnet\apps\appidN\instanceN\Data for the name of the game folder.
 	wBuffer[0] = 0;
 
 	const wchar_t* DATA_KEY = L"version";
-	if ( !_readWideKey(g_registryKeyW, DATA_KEY, wBuffer) || wBuffer[0] == 0 )
+	if (!_readWideKey(g_registryKeyW, DATA_KEY, wBuffer) || wBuffer[0] == 0)
+	{
+		dbugLog(_FLA, "Unable to access %s\\%s", g_registryKey, DATA_KEY);
+		return false;
+	}
+
+	_copyPathToString("ConfigPath", configPath, wBuffer);
+
+	// make sure it exists
+	returnResult = _wmkdir(configPath.c_str());
+	//  configPath - END.
+
+
+	//  dataPath - START.
+	// Ask Windows where the ProgramData folder is; oh, and attempt create it if it doesn't exist
+	// because we'll be needing it.
+	wBuffer[0] = 0;
+	if (SHGetFolderPath(nullptr, CSIDL_COMMON_APPDATA | CSIDL_FLAG_CREATE, nullptr, SHGFP_TYPE_CURRENT, wBuffer) != S_OK)
+	{
+		dbugLog(_FLA, "SHGetFolderPath(CSIDL_COMMON_APPDATA) failed");
+		return false;
+	}
+
+	if (dataPath.length() == 0)
+		_copyPathToString("CSIDL_COMMON_APPDATA", dataPath, wBuffer);
+
+	// Now query HKLM\Software\Playnet\apps\appidN\instanceN\Data for the name of the game folder.
+	// This is non functional wth the mogdifications.  //  MJH - Feburary 27, 2018.
+	wBuffer[0] = 0;
+
+	const wchar_t* DATA_KEY = L"version";
+	if (!_readWideKey(g_registryKeyW, DATA_KEY, wBuffer) || wBuffer[0] == 0)
 	{
 		dbugLog(_FLA, "Unable to access %s\\%s", g_registryKey, DATA_KEY);
 		return false;
 	}
 
 	_copyPathToString("DataPath", dataPath, wBuffer);
-#endif
 
 	// make sure it exists
-	_wmkdir(dataPath.c_str());
+	returnResult = _wmkdir(dataPath.c_str());
+
+	if (returnResult == -1)
+	{
+		//  Unable to create ProgramData directory. If the Installer (or someone else) has already created, all is ok.
+		PG_exeDataPathSet = FALSE;
+
+		if (PG_userConfigPathSet = TRUE)
+		{
+			dataPath = configPath;
+			_copyPathToString("DataPath", dataPath, L"Bin");
+
+			// make sure it exists
+			returnResult = _wmkdir(dataPath.c_str());
+			if (returnResult == 0)
+				PG_exeDataPathSet = TRUE;
+		}
+	}
+	//  dataPath - END.
+#endif
 
 	return true;
 }

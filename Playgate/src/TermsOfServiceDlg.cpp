@@ -16,7 +16,7 @@ CTermsOfServiceDlg::CTermsOfServiceDlg(CWnd* pParent /*=nullptr*/)
 	//{{AFX_DATA_INIT(CTermsOfServiceDlg)
 	//}}AFX_DATA_INIT
 
-	SetBitmap(pgLoadImage(L"tos-bg.bmp"));
+	SetBitmap(pgLoadImage(L"bg-tos.bmp"));
 	SetBitmapStyle(StyleCenter);
 }
 
@@ -65,7 +65,8 @@ _loadTOS(CRichEditCtrl* const ctrl)
 
 	try
 	{
-		std::wstring filename = g_exePath + _T("\\license.rtf");
+		std::wstring filename = PG_exeDocsPath;  //  MJH - Feburary 27, 2018.
+		filename += L"\\license.rtf";  //  MJH - Feburary 27, 2018.
 		CFile cfile(filename.c_str(), CFile::modeRead);
 		EDITSTREAM es;
 		es.dwCookie = (DWORD)&cfile;
@@ -75,7 +76,7 @@ _loadTOS(CRichEditCtrl* const ctrl)
 	}
 	catch ( ... )
 	{
-		ctrl->SetWindowText(GetLoc(ERROR_TOS));
+		//ctrl->SetWindowText(GetLoc(ERROR_TOS));
 	}
 }
 

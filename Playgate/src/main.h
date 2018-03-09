@@ -2,7 +2,8 @@
 
 #define PG_VER_STRING		"1.1.9"
 #define PLAY_GATE_VERSION	"0." PG_VER_STRING
-#define	PG_COPYRIGHT		PG_VER_STRING " Copyright(C) Playnet Inc, 2001-2009"
+//  #define	PG_COPYRIGHT		PG_VER_STRING " Copyright(C) Playnet Inc, 2001-2009"  //  MJH - Feburary 27, 2018.
+#define	PG_COPYRIGHT		PG_VER_STRING " Copyright(C) Playnet Inc, 2001-2018"
 
 #include "include/systypes.h"
 #include <string>
@@ -42,7 +43,7 @@ extern UINT16	g_authPort;
 extern SINT32 webID; //used for web downloads
 extern UINT32 webURL;
 extern UINT32 g_playgateVersion;
-extern std::wstring g_exePath, g_dataPath;
+//  extern std::wstring g_exePath, g_dataPath;    //  MJH - Feburary 27, 2018.
 extern std::wstring g_exeName, g_exeParams;
 extern SINT32 g_sessionID;
 extern UINT32 g_gameAppID;

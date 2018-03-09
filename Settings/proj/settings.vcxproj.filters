@@ -1,129 +1,139 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Settings Files">
+      <UniqueIdentifier>{8ae54364-4051-44b9-84d2-7b8acdd1a8c0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="cfg">
-      <UniqueIdentifier>{9a9a92b7-95b1-40d8-91f9-ffffafcd26b2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="dx">
-      <UniqueIdentifier>{158ef48f-5d87-4949-899b-b59e0886e06e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="language">
-      <UniqueIdentifier>{b50b97c1-7247-4782-908c-f592c71d66c3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="file">
-      <UniqueIdentifier>{0582f771-c36e-4621-9f99-d2d7d9c37467}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="unicode">
-      <UniqueIdentifier>{66005743-7816-4821-8a40-f0cbd9111a6f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sys">
-      <UniqueIdentifier>{b0374caa-1599-49c4-b10f-ae14fe13b176}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files">
+    <Filter Include="Settings Files\Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
     </Filter>
-    <Filter Include="load">
+    <Filter Include="Settings Files\sys">
+      <UniqueIdentifier>{b0374caa-1599-49c4-b10f-ae14fe13b176}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\unicode">
+      <UniqueIdentifier>{66005743-7816-4821-8a40-f0cbd9111a6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\load">
       <UniqueIdentifier>{0423f220-5ef1-40cd-a55f-455310962a02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\language">
+      <UniqueIdentifier>{b50b97c1-7247-4782-908c-f592c71d66c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\file">
+      <UniqueIdentifier>{0582f771-c36e-4621-9f99-d2d7d9c37467}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\cfg">
+      <UniqueIdentifier>{9a9a92b7-95b1-40d8-91f9-ffffafcd26b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\d3d">
+      <UniqueIdentifier>{29a14d49-0a4a-41f0-9e50-35d114f8df36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ww2 - src">
+      <UniqueIdentifier>{838c7c68-a1df-4b67-8490-f094090e0285}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ww2 - src\fio">
+      <UniqueIdentifier>{80b2670b-6d57-4955-895f-30c9d61c809a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="settings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="settingsDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\cfg\cfgData.cpp">
-      <Filter>cfg</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\dx\dx3dinfo.cpp">
-      <Filter>dx</Filter>
+      <Filter>Settings Files\cfg</Filter>
     </ClCompile>
     <ClCompile Include="..\src\language\language.cpp">
-      <Filter>language</Filter>
+      <Filter>Settings Files\language</Filter>
     </ClCompile>
     <ClCompile Include="..\src\file\file.cpp">
-      <Filter>file</Filter>
+      <Filter>Settings Files\file</Filter>
     </ClCompile>
     <ClCompile Include="..\src\unicode\ConvertUTF.c">
-      <Filter>unicode</Filter>
+      <Filter>Settings Files\unicode</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sys\cpuid.c">
-      <Filter>sys</Filter>
+      <Filter>Settings Files\sys</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sys\registry.cpp">
-      <Filter>sys</Filter>
+      <Filter>Settings Files\sys</Filter>
     </ClCompile>
     <ClCompile Include="..\src\load\load.cpp">
-      <Filter>load</Filter>
+      <Filter>Settings Files\load</Filter>
+    </ClCompile>
+    <ClCompile Include="settings.cpp">
+      <Filter>Settings Files</Filter>
+    </ClCompile>
+    <ClCompile Include="settingsDlg.cpp">
+      <Filter>Settings Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Settings Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\d3d\dx3dinfo.cpp">
+      <Filter>Settings Files\d3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\WW2\src\fio\fiostructure.cpp">
+      <Filter>ww2 - src\fio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="settings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="settingsDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\cfg\cfgCodes.h">
-      <Filter>cfg</Filter>
+      <Filter>Settings Files\cfg</Filter>
     </ClInclude>
     <ClInclude Include="..\src\cfg\cfgData.h">
-      <Filter>cfg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\dx\dx3dinfo.h">
-      <Filter>dx</Filter>
+      <Filter>Settings Files\cfg</Filter>
     </ClInclude>
     <ClInclude Include="..\src\language\language.h">
-      <Filter>language</Filter>
+      <Filter>Settings Files\language</Filter>
     </ClInclude>
     <ClInclude Include="..\src\file\file.h">
-      <Filter>file</Filter>
+      <Filter>Settings Files\file</Filter>
     </ClInclude>
     <ClInclude Include="..\src\unicode\ConvertUTF.h">
-      <Filter>unicode</Filter>
+      <Filter>Settings Files\unicode</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sys\cpuid.h">
-      <Filter>sys</Filter>
+      <Filter>Settings Files\sys</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sys\registry.h">
-      <Filter>sys</Filter>
+      <Filter>Settings Files\sys</Filter>
     </ClInclude>
     <ClInclude Include="..\src\load\load.h">
-      <Filter>load</Filter>
+      <Filter>Settings Files\load</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Settings Files</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>Settings Files</Filter>
+    </ClInclude>
+    <ClInclude Include="settingsDlg.h">
+      <Filter>Settings Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Settings Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\d3d\dx3dinfo.h">
+      <Filter>Settings Files\d3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\WW2\src\fio\fiostructure.h">
+      <Filter>ww2 - src\fio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sys\syscfg.h">
+      <Filter>Settings Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="settings.rc">
-      <Filter>Resource Files</Filter>
+      <Filter>Settings Files\Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\settings.rc2">
-      <Filter>Resource Files</Filter>
+      <Filter>Settings Files\Resource Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\wwii1.ico">
-      <Filter>Resource Files</Filter>
+    <Image Include="..\..\WW2\res\WWIIOnLine.ico">
+      <Filter>Settings Files\Resource Files</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

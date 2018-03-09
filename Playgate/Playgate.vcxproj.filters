@@ -5,18 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Source Files\comm">
-      <UniqueIdentifier>{540c4334-c39c-454f-9236-0cced2d834fb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\auth">
-      <UniqueIdentifier>{53b6de92-fa4c-48b3-be32-01201e2e1bb0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\wwii">
-      <UniqueIdentifier>{58d80bf8-4c02-4ab1-9728-49f1fd6c0657}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\src">
-      <UniqueIdentifier>{f12f8da7-2748-45ad-9f4d-c82a311b51d4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
@@ -24,6 +12,30 @@
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="WW2 - src">
+      <UniqueIdentifier>{4419973a-b2e6-4a82-a93a-b05eb840e4e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src\fio">
+      <UniqueIdentifier>{ca9bf610-1488-43db-a5f7-c2051b31ab0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src\wwii">
+      <UniqueIdentifier>{58d80bf8-4c02-4ab1-9728-49f1fd6c0657}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src\comm">
+      <UniqueIdentifier>{540c4334-c39c-454f-9236-0cced2d834fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src\auth">
+      <UniqueIdentifier>{53b6de92-fa4c-48b3-be32-01201e2e1bb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src\src">
+      <UniqueIdentifier>{e2d9dbbb-6870-4b26-9d59-c6e752a120b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Backgrounds">
+      <UniqueIdentifier>{47295ee3-aa5a-440d-b560-3394e82105d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ww2src">
+      <UniqueIdentifier>{249a1159-58a2-4b9d-acfc-62c2de3c5a62}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -79,75 +91,63 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\WW2\src\comm\commPlaygateMessages.cpp">
-      <Filter>Source Files\comm</Filter>
+      <Filter>WW2 - src\comm</Filter>
     </ClCompile>
     <ClCompile Include="..\WW2\src\auth\authPack.cpp">
-      <Filter>Source Files\auth</Filter>
+      <Filter>WW2 - src\auth</Filter>
     </ClCompile>
     <ClCompile Include="..\WW2\src\wwii\wwiiUTF.cpp">
-      <Filter>Source Files\wwii</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ddp.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\WW2\src\src\infoMessages.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\WW2\src\src\infoPack.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MoreGetRoutines.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ogl.cpp">
-      <Filter>Source Files\src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OglTek.cpp">
-      <Filter>Source Files\src</Filter>
+      <Filter>WW2 - src\wwii</Filter>
     </ClCompile>
     <ClCompile Include="src\Antihack.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\WW2\src\fio\fiostructure.cpp">
+      <Filter>WW2 - src\fio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MoreGetRoutines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ogl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OglTek.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WW2\src\src\infoMessages.cpp">
+      <Filter>WW2 - src\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\WW2\src\src\infoPack.cpp">
+      <Filter>WW2 - src\src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\BDialog.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Label.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pnRegion.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\WW2\src\comm\commPlaygateMessages.h">
-      <Filter>Source Files\comm</Filter>
+      <Filter>WW2 - src\comm</Filter>
     </ClInclude>
     <ClInclude Include="..\WW2\src\auth\authConstants.h">
-      <Filter>Source Files\auth</Filter>
+      <Filter>WW2 - src\auth</Filter>
     </ClInclude>
     <ClInclude Include="..\WW2\src\auth\authPack.h">
-      <Filter>Source Files\auth</Filter>
+      <Filter>WW2 - src\auth</Filter>
     </ClInclude>
     <ClInclude Include="..\WW2\src\auth\authPlaygateTypes.h">
-      <Filter>Source Files\auth</Filter>
+      <Filter>WW2 - src\auth</Filter>
     </ClInclude>
     <ClInclude Include="..\WW2\src\auth\authTypes.h">
-      <Filter>Source Files\auth</Filter>
+      <Filter>WW2 - src\auth</Filter>
     </ClInclude>
     <ClInclude Include="..\WW2\src\wwii\wwiiPackBool.h">
-      <Filter>Source Files\wwii</Filter>
+      <Filter>WW2 - src\wwii</Filter>
     </ClInclude>
     <ClInclude Include="..\WW2\src\wwii\wwiiPackString.h">
-      <Filter>Source Files\wwii</Filter>
+      <Filter>WW2 - src\wwii</Filter>
     </ClInclude>
     <ClInclude Include="..\WW2\src\wwii\wwiiUTF.h">
-      <Filter>Source Files\wwii</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MoreGetRoutines.h">
-      <Filter>Source Files\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\WW2\src\include\cpuFeatures.h">
-      <Filter>Header Files</Filter>
+      <Filter>WW2 - src\wwii</Filter>
     </ClInclude>
     <ClInclude Include="src\ddp.h">
       <Filter>Header Files</Filter>
@@ -221,17 +221,35 @@
     <ClInclude Include="src\versionWin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Antihack.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="..\WW2\src\fio\fiostructure.h">
+      <Filter>WW2 - src\fio</Filter>
     </ClInclude>
-    <ClInclude Include="..\WW2\src\include\precompile_includes.h">
+    <ClInclude Include="src\Label.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pnRegion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MoreGetRoutines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Antihack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ww2src\PG_platforms.h">
+      <Filter>Source Files\ww2src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ww2src\PG_precompile_includes.h">
+      <Filter>Source Files\ww2src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ww2src\PG_compiler_check.h">
+      <Filter>Source Files\ww2src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\Playgate.ico">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\Playgate.rc2">
       <Filter>Resource Files</Filter>
     </None>
@@ -241,5 +259,16 @@
     <ResourceCompile Include="src\Playgate.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\WW2\res\WWIIOnLine.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\bg.bmp">
+      <Filter>Resource Files\Backgrounds</Filter>
+    </Image>
+    <Image Include="res\tos-bg.bmp">
+      <Filter>Resource Files\Backgrounds</Filter>
+    </Image>
   </ItemGroup>
 </Project>

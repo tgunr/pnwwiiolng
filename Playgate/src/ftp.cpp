@@ -151,7 +151,7 @@ int ftpProcess()
 			if ( AppLaunch.action == APPDL_INSTALL)
 			{
 				playgate.SetStatus(GetLoc(PATCH_EXECUTE), AppProgress);
-				if ( launchApplication(_tcharString(_fileName), _T(""), g_dataPath) == false )
+				if ( launchApplication(_tcharString(_fileName), _T(""), PG_exeDataPath) == false )
 				{
 					playgate.SetStatus(GetLoc(PATCH_FAILED), AppError);
 					return 0;

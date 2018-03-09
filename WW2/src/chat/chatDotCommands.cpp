@@ -1154,7 +1154,8 @@ private:
 		responses.push_back("Blame Hasselt for the poor quality of this wtf. It was gonna be funny until I got shot while typing it.");
 		responses.push_back("Too busy watching mercy with a machine gun?");
 		responses.push_back("Parachuting dogs should be careful where they pack their bone");
-		responses.push_back("Battleground Europe train announcements: Welcome to the London Underground. Trains may be in the tunnels below.");
+		//  responses.push_back("Battleground Europe train announcements: Welcome to the London Underground. Trains may be in the tunnels below.");
+		responses.push_back("World War II Online train announcements: Welcome to the London Underground. Trains may be in the tunnels below.");  //  MJH - Feburary 27, 2018.
 		responses.push_back("Could everyone just stop getting shot?");
 		responses.push_back("WTF = Willy Tee Funny?");
 		responses.push_back("Please wait while we bill you a second time...");

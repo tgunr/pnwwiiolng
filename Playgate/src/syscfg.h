@@ -1,5 +1,14 @@
-#ifndef PLAYGATE_SYSCFG_H
-#define PLAYGATE_SYSCFG_H 1
+
+#pragma once
+
+#ifndef __PLAYGATE_SYSCFG_H__
+#define __PLAYGATE_SYSCFG_H__ 1
+
+//  ============================
+//
+//  Playgate.exe - syscfg.h
+//
+//  ============================
 
 #define AUTH_CLIENT
 #define platEndian platLittleEndian
@@ -8,7 +17,8 @@
 
 #include "stdafx.h"
 
-#include "include/platforms.h"
+#include "ww2src\PG_platforms.h"
+
 
 //	------------------------------	Public Definitions
 
@@ -39,4 +49,4 @@ namespace Auth { extern GameList g_games ; }
 #include "main.h"
 #include "registry.h"
 
-#endif // PLAYGATE_SYSCFG_H
+#endif // __PLAYGATE_SYSCFG_H__

@@ -2,6 +2,8 @@
 // Playgate.cpp : Defines the class behaviors for the application.
 //
 
+#include "syscfg.h" // Path is project specific.
+
 #include "Playgate.h"
 #include "PlaygateDlg.h"
 #include "SingleInstanceApp.h"		// For CLimitSingleInstance
@@ -36,7 +38,7 @@ HANDLE		hApplicationMutex;
 HANDLE		hLogonAttemptMutex;
 bool		g_tryLogonAttempt = false;
 
-std::wstring g_dataPath, g_exePath;
+//  std::wstring g_dataPath, g_exePath;      //  MJH - Feburary 27, 2018.
 std::wstring g_exeName = L"ww2.exe", g_exeParams;
 
 UINT32 g_gameAppID;
@@ -257,12 +259,32 @@ namespace {
 			std::wstring var(param.begin(), param.begin()+param.find_first_of('='));
 			std::wstring val(param.begin()+param.find_first_of('=')+1, param.end());
 
-            if (var == L"authserver")
-                WWII::ConvertChars(val.c_str(), g_authHostName, sizeof(g_authHostName));
-			else if ( var == L"path" )
-				g_exePath = val;
+			if (var == L"authserver")
+				WWII::ConvertChars(val.c_str(), g_authHostName, sizeof(g_authHostName));
+			else if (var == L"path")
+			{
+				//  MJH - Feburary 27, 2018.
+				wwiiolpath_string exePath = L"";
+
+				exePath = val;
+				if (exePath.length() == 0)
+				{
+					PG_exePath = val;
+					PG_exePathSet = true;
+				}
+			}
 			else if ( var == L"data" )
-				g_dataPath = val;
+			{
+				//  MJH - Feburary 27, 2018.
+				wwiiolpath_string exePlayarcPath = L"";
+
+				exePlayarcPath = val;
+				if (exePlayarcPath.length() == 0)
+				{
+					PG_exePlayarcPath = val;
+					PG_exePlayarcPathSet = true;
+				}
+			}
 			else if ( var == L"game" )
 				g_exeName = val;
 			else if ( var == L"params" )
@@ -337,31 +359,49 @@ BOOL CPlaygateApp::InitInstance()
 	teulGetHost(PLAY_GATE_VERSION, &g_playgateVersion);
 
 	// Move ourselves to the playgate home
-	if ( registryGetPaths(g_exePath, g_dataPath) == false )
+	if ( registryGetPaths(PG_exePath, PG_exeDataPath, PG_userConfigPath) == false )
 	{
 		dbugLog(_FLA, "Unable to retrieve paths from registry.");
 		MessageBox(nullptr, GetLoc(ERROR_INSTALL), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		exit(0);
 	}
 
-	_tchdir(g_dataPath.c_str());
-
-	commInit();
-
-	registryGetPaths(g_exePath, g_dataPath);
-	dbugLog(_FLM, "Playgate version %s. Command Line: %s. ExePath: %ls. DataPath: %ls.", PG_COPYRIGHT, m_lpCmdLine, g_exePath.c_str(), g_dataPath.c_str());
-
-	if ( _tchdir(g_exePath.c_str()) != 0 )
+	if (_tchdir(PG_exePath.c_str()) != 0)
 	{
-		MessageBox(nullptr, GetLoc(ERROR_APP_FOLDER, g_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		MessageBox(nullptr, GetLoc(ERROR_APP_FOLDER, PG_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		exit(0);
 	}
-
 
 	// If they've logged in before, recover the data.
 	loginData.Read();
 	// Make sure it's not just or something.
 	loginData.Validate();
+
+/*	//  MJH - Feburary 27, 2018.
+
+	_tchdir(PG_exePath.c_str());
+
+	commInit();
+
+	registryGetPaths(PG_exePath, PG_exeDataPath, PG_userConfigPath);
+
+	dbugLog(_FLM, "Playgate version %s. Command Line: %s. ExePath: %ls. DataPath: %ls.", PG_COPYRIGHT, m_lpCmdLine, PG_exePath.c_str(), PG_exePlayarcPath.c_str());
+
+	if ( _tchdir(PG_exePath.c_str()) != 0 )
+	{
+		MessageBox(nullptr, GetLoc(ERROR_APP_FOLDER, PG_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		exit(0);
+	}
+
+	// If they've logged in before, recover the data.
+	loginData.Read();
+	// Make sure it's not just or something.
+	loginData.Validate();
+*/
+
+	commInit();
+
+	dbugLog(_FLM, "Playgate version %s. Command Line: %s. ExePath: %ls. DataPath: %ls.", PG_COPYRIGHT, m_lpCmdLine, PG_exePath.c_str(), PG_exePlayarcPath.c_str());
 
 	pgState = PgTOS;
 
@@ -394,10 +434,10 @@ BOOL CPlaygateApp::InitInstance()
 	}
 
 	// Verify access to the data directory.
-	if ( _tchdir(g_dataPath.c_str()) != 0 )
+	if ( _tchdir(PG_exeDataPath.c_str()) != 0 )
 	{
-		dbugLog(_FLA, "Unable to access datapath [%ls]", g_dataPath.c_str());
-		MessageBox(nullptr, GetLoc(ERROR_DATA_FOLDER, g_dataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		dbugLog(_FLA, "Unable to access datapath [%ls]", PG_exeDataPath.c_str());
+		MessageBox(nullptr, GetLoc(ERROR_DATA_FOLDER, PG_exeDataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		return FALSE;
 	}
 
@@ -575,7 +615,7 @@ void CPlaygateApp::SetWindowText(CWnd* wnd, const char* text)
 
 HBITMAP pgLoadImage(const std::wstring& filename)
 {
-	std::wstring fullName(g_exePath.begin(), g_exePath.end());
+	std::wstring fullName(PG_exePath.begin(), PG_exePath.end());
 	fullName += L"\\data\\playgate\\";
 	fullName += filename;
 	return (HBITMAP)::LoadImage(hMainInstance, fullName.c_str(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);

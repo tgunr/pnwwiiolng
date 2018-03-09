@@ -1,5 +1,8 @@
 // settingsDlg.cpp : implementation file
 //
+
+#include "syscfg.h" // Path is project specific.
+
 #include "stdafx.h"
 #include "settings.h"
 
@@ -11,7 +14,7 @@
 #include "cpuid.h"
 #include "file.h"
 
-#include ".\settingsdlg.h"
+#include "settingsDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

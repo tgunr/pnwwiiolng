@@ -722,7 +722,7 @@ void InstallCrashHandler()
 		CoTaskMemFree(basePath);
 
 		// TODO: This path should really not be hardcoded, but at current there is no correct
-		// support for a safe UserDataPath in fio. Replace with appropriate fioCfg*() call to
+		// support for a safe WW2_UserDataPath in fio. Replace with appropriate fioCfg*() call to
 		// find path the same way the rest of the app does, once the rest of the app doesn't
 		// do it completely wrong. Don't forget that mngopt and fio must be initialized before
 		// using fioCfg*() calls, so this code may have to be moved to WinMainX().
