@@ -127,7 +127,7 @@ _badPlayer(Player& player, const SCHAR* problem, bool alert)
 	if ( alert )
 		chatSendKickNotice(player.playerID(), callsign, problem);
 
-	commSendPlayerExit(player.teulIndex(), PDEST_EXIT, PEXIT_BAD_CONNECTION, nullObjID);
+	commSendPlayerExit(player.teulIndex(), PDEST_EXIT, PEXIT_RTB, player.exitFacility);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -153,7 +153,10 @@ commDropPlayer(Player& player, const bool ignoredPriorKick)
 		_badPlayer(player, "*ignored prior kick message", true);
 
 	_playerExit.destination = PDEST_EXIT;
-	_playerExit.exitCode = PEXIT_DEAD;
+	if (ignoredPriorKick)
+		_playerExit.exitCode = PEXIT_RTB;//mikemudd not sure about this one
+	else
+		_playerExit.exitCode = PEXIT_DEAD;
 	_playerExit.facility = nullObjID;
 
 	hostPlayerLeave(player, _playerExit);
@@ -559,7 +562,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 						, teulIndex, player->playerID(), player->callsign());
 
 		// resend the player exit notification
-		commSendPlayerExit(player->teulIndex(), PDEST_EXIT, PEXIT_BAD_CONNECTION, nullObjID);
+		commSendPlayerExit(player->teulIndex(), PDEST_EXIT, PEXIT_RTB, player->exitFacility); //Was PEXIT_BAD_CONNECTION
 		return -EINVAL;
 	}
 
@@ -1048,7 +1051,7 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 		dbugLog(_FLM, "t:%d p:%u c:%s discarded damage messages: vehicle is exiting"
 						, shooter->teulIndex(), shooter->playerID(), shooter->vehicle->callsign());
 		// resend the player exit notification
-		commSendPlayerExit(shooter->teulIndex(), PDEST_EXIT, PEXIT_BAD_CONNECTION, nullObjID);
+		commSendPlayerExit(shooter->teulIndex(), PDEST_EXIT, PEXIT_RTB, shooter->exitFacility);//Was PEXIT_BAD_CONNECTION
 		return true;
 	}
 
