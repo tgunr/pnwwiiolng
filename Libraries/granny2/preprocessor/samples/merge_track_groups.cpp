@@ -1,13 +1,12 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/merge_track_groups.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #2 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
-#include <assert.h>
 #include <vector>
 #include <set>
 
@@ -28,8 +27,8 @@ MergeTrackGroups(input_file*     InputFiles,
         return false;
     }
 
-    granny_file_info* BaseInfo    = GrannyGetFileInfo(InputFiles[0].GrannyFile);
-    granny_file_info* ReplaceInfo = GrannyGetFileInfo(InputFiles[1].GrannyFile);
+    granny_file_info* BaseInfo    = ExtractFileInfo(InputFiles[0]);
+    granny_file_info* ReplaceInfo = ExtractFileInfo(InputFiles[1]);
     if (!BaseInfo || !ReplaceInfo)
     {
         ErrOut("unable to get granny_file_info from inputs\n");
@@ -75,10 +74,10 @@ MergeTrackGroups(input_file*     InputFiles,
     }}
 
     // Write out the result
-    return SimpleWriteInfo(KeyValues, NumKeyValues, BaseInfo);
+    return SimpleWriteInfo(KeyValues, NumKeyValues, BaseInfo, TempArena);
 }
 
 
-static CommandRegistrar RegLODCalc(MergeTrackGroups, "MergeTrackGroups",
+static CommandRegistrar RegMergeTG(MergeTrackGroups, "MergeTrackGroups",
                                    "Given two animations, replace transform tracks in the first with matching tracks from the second");
 

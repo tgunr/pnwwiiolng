@@ -1,10 +1,10 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/warn_scale_shear.cpp $
-// $DateTime: 2009/04/13 11:08:25 $
-// $Change: 21320 $
-// $Revision: #8 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
@@ -73,7 +73,7 @@ bool WarnScaleShear(input_file&     InputFile,
                     granny_int32x   NumKeyValues,
                     granny_memory_arena*)
 {
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
+    granny_file_info* Info = ExtractFileInfo(InputFile);
     if (Info == 0)
     {
         ErrOut("unable to obtain a granny_file_info from %s\n", InputFile.Filename);
@@ -83,8 +83,17 @@ bool WarnScaleShear(input_file&     InputFile,
     return ExamineFileInfo(Info, InputFile.Filename);
 }
 
+static const char* HelpString =
+    (" WarnScaleShear will look at all Granny transforms in the file (Bones,\n"
+     " animations, etc.), and return an error if any of them contain scale\n"
+     " or shear components other than identity.  This is primarily an example\n"
+     " of how to create a preprocessor command for data verification\n"
+     "\n"
+     "   preprocessor WarnScaleShear file.gr2\n");
+
 static CommandRegistrar RegWarnScaleShear(eSingleFile_MultiRun,
                                           WarnScaleShear,
                                           "WarnScaleShear",
-                                          "Warns (and returns failure) if any components with non-identity scale/shear are found");
+                                          "Warns (and returns failure) if any components with non-identity scale/shear are found",
+                                          HelpString);
 

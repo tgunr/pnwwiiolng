@@ -1,16 +1,17 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/lod_calc.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #17 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
-#include <assert.h>
 #include <stdio.h>
 #include <vector>
 #include <string>
+#include <string.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -28,14 +29,14 @@ bool LODCalc(input_file*     InputFiles,
         return false;
     }
 
-    granny_file_info* ModelInfo = GrannyGetFileInfo(InputFiles[0].GrannyFile);
+    granny_file_info* ModelInfo = ExtractFileInfo(InputFiles[0]);
     if (ModelInfo == 0)
     {
         ErrOut("unable to obtain a granny_file_info from the input model file\n");
         return false;
     }
 
-    granny_file_info* AnimInfo = GrannyGetFileInfo(InputFiles[1].GrannyFile);
+    granny_file_info* AnimInfo = ExtractFileInfo(InputFiles[1]);
     if (AnimInfo == 0)
     {
         ErrOut("unable to obtain a granny_file_info from the input animation file\n");
@@ -123,8 +124,15 @@ bool LODCalc(input_file*     InputFiles,
                     // We can't allocate this from the arena easily, so we'll manually
                     // manage it...
                     TempFiles.push_back(StandInFile);
-                    granny_file_info* StandInInfo = GrannyGetFileInfo(StandInFile);
-                    assert(StandInInfo);
+                    granny_file_info* StandInInfo = 0;
+                    {
+                        // Tiny bit of rigamarole to ensure that we use the correct mod/normal path.
+                        input_file TempInput;
+                        TempInput.GrannyFile = StandInFile;
+                        TempInput.Filename = (char*)StandInFileName;  // doesn't actually change...
+                        StandInInfo = ExtractFileInfo(TempInput);
+                    }
+                    pp_assert(StandInInfo);
 
                     if (StandInInfo->MeshCount == 0)
                         continue;
@@ -189,10 +197,16 @@ bool LODCalc(input_file*     InputFiles,
     }}
 
     // Write out the resulting file...
-    return WriteInfoPreserve(KeyValues, NumKeyValues, AnimInfo, InputFiles[1].GrannyFile, true, true, true);
+    return WriteInfoPreserve(KeyValues, NumKeyValues, AnimInfo, InputFiles[1].GrannyFile, true, true, true, TempArena);
 }
 
+static char const* HelpString =
+    (" LODCalc creates or refreshes animation LOD parameters via sampling for\n"
+     " a specific animation/model pairing. Call with the model file first,\n"
+     " followed by the animation source. These may be the same file.\n"
+     "\n"
+     "    preprocessor LODCalc model.gr2 anim.gr2 -output anim_lod.gr2\n");
 
 static CommandRegistrar RegLODCalc(LODCalc, "LODCalc",
-                                   "Given a model file and an animation file, computes the LOD values for the animation");
-
+                                   "Computes LOD values for an animation",
+                                   HelpString);

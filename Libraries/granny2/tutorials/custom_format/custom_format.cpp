@@ -139,11 +139,6 @@ int main(int, char const*[])
         return EXIT_FAILURE;
     }
 
-#ifdef _MACOSX
-    // If we're on the mac, we want to use ansi file operations
-    GrannySetDefaultFileReaderOpenCallback(GrannyGetOSXAnsiFileReaderOpenCallback());
-#endif
-
     /* When you're working with Granny data definitions, it's a very good idea to make
        sure that the actual size of the object is what Granny thinks it is.  In general
        each member in a Granny structure should be aligned to a 4-byte boundary.  (This
@@ -233,9 +228,9 @@ int main(int, char const*[])
     }
     else
     {
-        // This is an older version, convert
+        // This is an older version, convert.
         ConversionBuffer = GrannyConvertTree(RootObject.Type, RootObject.Object,
-                                             EntityDatabaseType);
+                                             EntityDatabaseType, 0, 0);
         LoadedDB = (EntityDatabase*)ConversionBuffer;
     }
 

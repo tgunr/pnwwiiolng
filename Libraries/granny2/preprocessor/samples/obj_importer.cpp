@@ -1,18 +1,17 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/obj_importer.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #6 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
 
-#define STBI_HEADER_FILE_ONLY
 #include "../stb_image.h"
 
-#include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <fstream>
 #include <strstream>
@@ -107,16 +106,16 @@ BuildMeshFromArrays(granny_memory_arena* TempArena,
         GrannyPushVertex(Builder);
     }
 
-    for (size_t i = 0; i < Tris.size(); ++i)
+    for (size_t TriIdx = 0; TriIdx < Tris.size(); ++TriIdx)
     {
-        Triangle& Tri = Tris[i];
+        Triangle& Tri = Tris[TriIdx];
 
         for (int edge = 0; edge < 3; ++edge)
         {
             GrannySetVertexIndex(Builder, edge, Tri.Position[edge] - 1);
 
             if (HasUVs)
-                GrannySetChannel(Builder, edge, 0, UVs[Tri.UV[edge] - 1].Val);
+                GrannySetChannel(Builder, edge, 0, UVs[Tri.UV[edge] - 1].Val, 2);
 
             if (HasNormals)
             {
@@ -164,7 +163,7 @@ CreateTextureFor(granny_memory_arena* TempArena, char const* TextureName)
     if (!ImageBytes)
         return 0;
 
-    granny_texture_builder* Builder = GrannyBeginRawTexture(x, y, GrannyRGB888PixelFormat, 1);
+    granny_texture_builder* Builder = GrannyBeginBinkTexture(x, y, 10, 0);
     if (!Builder)
     {
         stbi_image_free(ImageBytes);
@@ -225,7 +224,7 @@ bool OBJImport(key_value_pair* KeyValues,
             }
             else if (line.compare(0, 3, "vt ") == 0)
             {
-                Point2 uv = { 0, 0 };
+                Point2 uv = { { 0, 0 } };
                 sscanf(line.c_str() + 3, "%f %f", &uv.Val[0], &uv.Val[1]);
 
                 // reverse uv.  todo: in all cases?
@@ -245,12 +244,17 @@ bool OBJImport(key_value_pair* KeyValues,
                 vector<string> verts;
 
                 size_t curr = 2;
-                while (true)
+                for (;;)
                 {
                     size_t next = line.find_first_of(' ', curr);
+
                     if (next == string::npos)
                     {
-                        verts.push_back(line.substr(curr));
+						while (curr < line.length() && line[curr] == ' ')
+							++curr;
+                        
+						if (curr < line.length())
+							verts.push_back(line.substr(curr));
                         break;
                     }
                     else
@@ -320,7 +324,7 @@ bool OBJImport(key_value_pair* KeyValues,
     }
 
     // Write out the result
-    return SimpleWriteInfo(KeyValues, NumKeyValues, &Converted);
+    return SimpleWriteInfo(KeyValues, NumKeyValues, &Converted, TempArena);
 }
 
 static CommandRegistrar RegOBJImport(OBJImport, "OBJImport",

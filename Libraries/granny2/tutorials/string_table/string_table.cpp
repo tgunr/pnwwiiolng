@@ -121,11 +121,9 @@ int main(int, char const*[])
     }
 
 #ifdef _MACOSX
-    // If we're on the mac, we want to use ansi file operations
-    GrannySetDefaultFileReaderOpenCallback(GrannyGetOSXAnsiFileReaderOpenCallback());
     #define BASE_DIR "../../media/"
 #else
-    #define BASE_DIR "media/"
+    #define BASE_DIR "string_table/media/"
 #endif
 
     /* The first step is to simply create the $file objects as you normally would.  Note

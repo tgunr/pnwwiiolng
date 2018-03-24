@@ -20,7 +20,7 @@ void ExtractCameraInfo(char const* ModelName,
                        granny_variant& CameraInfo);
 
 // Macosx has strcasecmp rather than _stricmp
-#ifdef _MACOSX
+#if defined(_MACOSX) || defined(LINUX)
 #define _stricmp strcasecmp
 #endif
 
@@ -89,13 +89,7 @@ int main(int, char const*[])
         return EXIT_FAILURE;
     }
 
-#ifdef _MACOSX
-    // If we're on the mac, we want to use ansi file operations
-    GrannySetDefaultFileReaderOpenCallback(GrannyGetOSXAnsiFileReaderOpenCallback());
-    const char* LightsCameraFilename = "../../media/lights_and_camera.gr2";
-#else
-    const char* LightsCameraFilename = "media/lights_and_camera.gr2";
-#endif
+    const char* LightsCameraFilename = "media/extended_data/lights_and_camera.gr2";
 
     // Load the test files
     granny_file* LightsCameraFile = GrannyReadEntireFile(LightsCameraFilename);
@@ -218,7 +212,7 @@ void ExtractLightInfo(char const* ModelName,
 
         GrannyConvertSingleObject(LightType, LightObject,
                                   ImportantLightFieldsType,
-                                  &LightFields);
+                                  &LightFields, 0);
     }
 
     printf("  light class: %s\n", LightFields.typeName);
@@ -283,7 +277,7 @@ void ExtractCameraInfo(char const* ModelName,
 
         GrannyConvertSingleObject(CameraType, CameraObject,
                                   ImportantCameraFieldsType,
-                                  &CameraFields);
+                                  &CameraFields, 0);
     }
 
     printf("     camera class: %s\n", CameraFields.typeName);

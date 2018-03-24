@@ -13,7 +13,7 @@
 
 // Controlled with -printlarge
 bool g_alwaysPrintLarge = false;
-
+bool g_includePointers  = true;
 
 // Forward declarations for our object dumpers
 void Indent(int Level);
@@ -48,6 +48,11 @@ ArgCallback(const argparse::Description* Description)
         Description->shortChar == 'l')
     {
         g_alwaysPrintLarge = true;
+    }
+    else if (Description->argumentType == argparse::eNoArg &&
+             Description->shortChar == 'p')
+    {
+        g_includePointers = false;
     }
 
     return true;
@@ -117,22 +122,18 @@ int main(int argc, char const** argv)
         return EXIT_FAILURE;
     }
 
-#ifdef _MACOSX
-    // If we're on the mac, we want to use ansi file operations
-    GrannySetDefaultFileReaderOpenCallback(GrannyGetOSXAnsiFileReaderOpenCallback());
-#endif
-
     int Result = EXIT_FAILURE;
     char const* EXEName = argv[0];
 
     char StringDatabaseName[512] = { 0 };
     argparse::Description ArgDesc[] = {
+        { 'p', "pointerLess",    0, argparse::eNoArg },
         { 'l', "printLong",      0, argparse::eNoArg },
         { 0,   "stringDatabase", 0, argparse::eFilename, StringDatabaseName,  sizeof(StringDatabaseName) }
     };
 
     int RemainingArgs = -1;
-    if (argparse::Parse(argc, argv, ArgDesc, 2, &RemainingArgs,
+    if (argparse::Parse(argc, argv, ArgDesc, 3, &RemainingArgs,
                         ArgCallback, ErrorCallback) != argparse::eNoError)
     {
         printf("Unable to parse argument list\n");
@@ -227,11 +228,20 @@ int main(int argc, char const** argv)
     }
     else
     {
-        printf("Usage: %s [-l/--printLong] [--stringDatabase <name>.gsd] <granny file>\n", EXEName);
+        printf("Usage: %s [-l/--printLong] [-p/--pointerLess] [--stringDatabase <name>.gsd] <granny file>\n", EXEName);
     }
 
     return (Result);
 }
+
+static void CapWithPointer(void* Object)
+{
+    if (g_includePointers)
+        printf("(ptr: %p)\n", Object);
+    else
+        printf("(ptr: omitted)\n");
+}
+
 
 
 /* DEFTUTORIAL EXPGROUP(TutorialTreeWalker) (TutorialTreeWalker_PrintObject, PrintObject) */
@@ -292,12 +302,13 @@ void PrintObject(int Level,
             case GrannyReferenceMember:
             {
                 Indent(Level);
-                void *Object = *(void **)ObjectPtr;
-                if(Object)
+                void *InternalObject = *(void **)ObjectPtr;
+                if(InternalObject)
                 {
-                    printf("%s: (ptr: %p)\n", Type->Name, Object);
+                    printf("%s: ", Type->Name);
+                    CapWithPointer(InternalObject);
                     PrintObject(Level + 1, ObjectHash, TypeHash,
-                                Object, Type->ReferenceType, false);
+                        InternalObject, Type->ReferenceType, false);
                 }
                 else
                 {
@@ -317,11 +328,11 @@ void PrintObject(int Level,
             case GrannyReferenceToArrayMember:
             {
                 int ArrayCount = *(granny_int32 *)ObjectPtr;
-                granny_uint8 *Object =
+                granny_uint8 *InternalObject =
                     *(granny_uint8 **)(ObjectPtr + sizeof(granny_int32));
                 PrintArray(Level, ObjectHash, TypeHash,
                            Type->Name, ArrayCount,
-                           Type->ReferenceType, Object, false);
+                           Type->ReferenceType, InternalObject, false);
             } break;
 
             /* One more level of indirection.  A $ArrayOfReferencesMember points to an
@@ -336,29 +347,30 @@ void PrintObject(int Level,
             {
                 Indent(Level);
                 int ArrayCount = *(granny_int32 *)ObjectPtr;
-                void **Object =
+                void **InternalObject =
                     *(void ***)(ObjectPtr + sizeof(granny_int32));
 
-                if(Object)
+                if(InternalObject)
                 {
-                    printf("%s[%d]: (ptr: %p)\n", Type->Name, ArrayCount, Object);
+                    printf("%s[%d]: ", Type->Name, ArrayCount);
+                    CapWithPointer(InternalObject);
                     {for(int ArrayIndex = 0;
                          ArrayIndex < ArrayCount;
                          ++ArrayIndex)
                     {
                         Indent(Level + 1);
-                        if(*Object)
+                        if(*InternalObject)
                         {
-                            printf("%s[%d]: (ptr: %p)\n", Type->Name, ArrayIndex,
-                                   *Object);
+                            printf("%s[%d]: ", Type->Name, ArrayIndex);
+                            CapWithPointer(*InternalObject);
                             PrintObject(Level + 2, ObjectHash, TypeHash,
-                                        *Object, Type->ReferenceType, false);
+                                        *InternalObject, Type->ReferenceType, false);
                         }
                         else
                         {
                             printf("%s[%d] = 0\n", Type->Name, ArrayIndex);
                         }
-                        ++Object;
+                        ++InternalObject;
                     }}
                 }
                 else
@@ -382,16 +394,18 @@ void PrintObject(int Level,
                 Indent(Level);
                 granny_data_type_definition *VariantType =
                     *(granny_data_type_definition **)ObjectPtr;
-                void *Object =
+                void *InternalObject =
                     *(void **)(ObjectPtr + sizeof(granny_data_type_definition *));
-                if(Object)
+                if(InternalObject)
                 {
-                    printf("%s: (ptr: %p)\n", Type->Name, Object);
-                    Indent(Level + 1); printf("Type: (ptr: %p)\n", VariantType);
+                    printf("%s: ", Type->Name);
+                    CapWithPointer(InternalObject);
+
+                    Indent(Level + 1); printf("Type: "); CapWithPointer(VariantType);
                     PrintType(Level + 2, TypeHash, VariantType);
                     Indent(Level + 1); printf("Value:\n");
                     PrintObject(Level + 2, ObjectHash, TypeHash,
-                                Object, VariantType, false);
+                        InternalObject, VariantType, false);
                 }
                 else
                 {
@@ -422,10 +436,10 @@ void PrintObject(int Level,
 
                 int Count =
                     *(int *)(ObjectPtr + sizeof(granny_data_type_definition *));
-                void *Object =
+                void *InternalObject =
                     *(void **)(ObjectPtr + sizeof(granny_data_type_definition *) + sizeof(int));
                 PrintArray(Level, ObjectHash, TypeHash,
-                           Type->Name, Count, VariantType, Object, false);
+                           Type->Name, Count, VariantType, InternalObject, false);
             } break;
 
             /* An $InlineMember is a structure described by a distinct
@@ -532,6 +546,12 @@ void PrintObject(int Level,
             case GrannyReal16Member:
             {
                 PrintReal16Member(Level, Type, ObjectPtr);
+            } break;
+
+            case GrannyEmptyReferenceMember:
+            {
+                Indent(Level);
+                printf("(void*)%s = [empty reference]\n", Type->Name);
             } break;
 
             /* Catch any bogus values in the Type field.  We should never actually execute
@@ -713,7 +733,7 @@ void PrintFileInfo(char const *FileName, granny_file &GRNFile)
         granny_grn_section const &Section =
             GrannyGetGRNSectionArray(GRNFile.Header)[SectionIndex];
 
-        Indent(2); printf("Section %d:\n", SectionIndex);
+        Indent(2); printf("Section %d: (Base addr: %p)\n", SectionIndex, GRNFile.Sections[SectionIndex]);
         Indent(3); printf("Format: %d\n", Section.Format);
         Indent(3); printf("DataOffset: 0x%x\n", Section.DataOffset);
         Indent(3); printf("DataSize: %d\n", Section.DataSize);
@@ -744,7 +764,8 @@ void PrintArray(int Level,
     Indent(Level);
     if(Object)
     {
-        printf("%s[%d]: (ptr: %p)\n", Name, ArrayCount, Object);
+        printf("%s[%d]: ", Name, ArrayCount);
+        CapWithPointer(Object);
 
         if (g_alwaysPrintLarge || ArrayCount < 512)
         {

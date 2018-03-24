@@ -1,14 +1,13 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/trans_bounds.cpp $
-// $DateTime: 2010/03/08 11:44:14 $
-// $Change: 25619 $
-// $Revision: #4 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
 #include <algorithm>
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -43,25 +42,14 @@ inline void GetPositionFromArray(granny_real32 const* WPMatrix,
 }
 
 
-bool TranslationBounds(input_file&     InputFile,
-                       key_value_pair* KeyValues,
-                       granny_int32x   NumKeyValues,
-                       granny_memory_arena* TempArena)
+granny_file_info*
+TranslationBounds(char const*          OriginalFilename,
+                  char const*          OutputFilename,
+                  granny_file_info*    Info,
+                  key_value_pair*      KeyValues,
+                  granny_int32x        NumKeyValues,
+                  granny_memory_arena* TempArena)
 {
-    char const* OutputFile = FindFirstValueForKey(KeyValues, NumKeyValues, "output");
-    if (OutputFile == 0)
-    {
-        ErrOut("must specify an output file with \"-output <filename>\"\n");
-        return false;
-    }
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     if (Info->AnimationCount != 1 || Info->Animations[0] == 0)
     {
         ErrOut("this version of the command can't handle zero or multiple animations\n");
@@ -89,7 +77,7 @@ bool TranslationBounds(input_file&     InputFile,
             continue;
 
         granny_skeleton* Skeleton = Model->Skeleton;
-        assert(Skeleton);
+        pp_assert(Skeleton);
 
         // Create the instance, and play the animation on it
         granny_model_instance* Instance = GrannyInstantiateModel(Model);
@@ -151,7 +139,7 @@ bool TranslationBounds(input_file&     InputFile,
         {
             granny_variant_builder* VariantBuilder = GrannyBeginVariant(StringTable);
 
-            assert(sizeof(InitialPos[0]) == sizeof(granny_triple));
+            pp_assert(sizeof(InitialPos[0]) == sizeof(granny_triple));
             GrannyAddDynamicArrayMember(VariantBuilder, "InitialPositions",
                                         Skeleton->BoneCount, GrannyTripleType,
                                         &InitialPos[0]);
@@ -166,7 +154,7 @@ bool TranslationBounds(input_file&     InputFile,
             granny_int32x ObjSize  = GrannyGetResultingVariantObjectSize(VariantBuilder);
 
             granny_track_group* TrackGroup = Animation->TrackGroups[TGIdx];
-            assert(TrackGroup);
+            pp_assert(TrackGroup);
 
             GrannyEndVariantInPlace(VariantBuilder,
                                     PushArray(TempArena, TypeSize, granny_uint8),
@@ -181,31 +169,10 @@ bool TranslationBounds(input_file&     InputFile,
         GrannyFreeModelInstance(Instance);
     }
 
-    // Write out the file, we're done!
-    granny_int32x FinalSectionCount = InputFile.GrannyFile->SectionCount;
-    granny_file_builder *Builder = GrannyBeginFile(FinalSectionCount,
-                                                   GrannyCurrentGRNStandardTag,
-                                                   GrannyGRNFileMV_ThisPlatform,
-                                                   GrannyGetTemporaryDirectory(),
-                                                   "Prefix");
-    granny_file_data_tree_writer *Writer =
-        GrannyBeginFileDataTreeWriting(GrannyFileInfoType, Info,
-                                       GrannyStandardDiscardableSection, 0);
-    GrannyPreserveFileSectionFormats(Builder, InputFile.GrannyFile);
-    GrannyPreserveObjectFileSections(Writer, InputFile.GrannyFile);
-
-    GrannyWriteDataTreeToFileBuilder(Writer, Builder);
-    GrannyEndFileDataTreeWriting(Writer);
-
-    bool const success = GrannyEndFile(Builder, OutputFile);
-
-    // Clean up the string table, now that the file has been written
-    GrannyFreeStringTable(StringTable);
-
-    return success;
+	return Info;
 }
 
-static CommandRegistrar RegTranslationBounds(eSingleFile_NoMultiRun,
-                                             TranslationBounds,
+
+static CommandRegistrar RegTranslationBounds(TranslationBounds,
                                              "TranslationBounds",
                                              "Attached bounds information for the input animation");

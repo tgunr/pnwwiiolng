@@ -1,34 +1,48 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/compress_vert_sample.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #6 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 #include <memory.h>
 
-char const* CompNormalSuffix  = ".CompNormal";
-char const* CompTextureSuffix = ".CompTexture";
+static char const* CompNormalSuffix  = ".CompNormal";
+static char const* CompTextureSuffix = ".CompTexture";
+static char const* CompColorSuffix   = ".CompColor";
+
+static granny_real32
+Clamp(granny_real32 Min, granny_real32 Val, granny_real32 Max)
+{
+    if (Val <= Min)
+        return Min;
+    else if (Val >= Max)
+        return Max;
+
+    return Val;
+}
+
 
 // This function scans through the type array looking for normal members (Normal, Tangent,
 // Binormal), and replaces them in the new array with a marker for the new compressed
 // member.  Similarly, it will replace any TextureCoordinate* members with compressed
 // 16bit float members.
 static granny_data_type_definition*
-CreateCompressedType(granny_data_type_definition* VertexType,
+CreateCompressedType(bool CompTex, bool CompNorm, bool CompColor,
+                     granny_data_type_definition* VertexType,
                      granny_memory_arena*         TempArena)
 {
-    assert(VertexType);
-    assert(TempArena);
+    pp_assert(VertexType);
+    pp_assert(TempArena);
 
     granny_int32x const TypeSize  = GrannyGetTotalTypeSize(VertexType);
     granny_int32x const TypeCount = TypeSize / sizeof(granny_data_type_definition);
-    assert(TypeSize != 0 && (TypeSize % sizeof(granny_data_type_definition)) == 0);
+    pp_assert(TypeSize != 0 && (TypeSize % sizeof(granny_data_type_definition)) == 0);
 
     granny_data_type_definition* NewType =
         PushArray(TempArena, TypeCount, granny_data_type_definition);
@@ -36,19 +50,19 @@ CreateCompressedType(granny_data_type_definition* VertexType,
 
     {for(int Idx = 0; Idx < (TypeCount-1); ++Idx)
     {
-        assert(VertexType[Idx].Type != GrannyEndMember);
-        assert(VertexType[Idx].Name != 0);
+        pp_assert(VertexType[Idx].Type != GrannyEndMember);
+        pp_assert(VertexType[Idx].Name != 0);
 
-        if (_stricmp(VertexType[Idx].Name, GrannyVertexNormalName) == 0 ||
-            _stricmp(VertexType[Idx].Name, GrannyVertexTangentName) == 0 ||
-            _stricmp(VertexType[Idx].Name, GrannyVertexBinormalName) == 0)
+        if (CompNorm &&
+            (_stricmp(VertexType[Idx].Name, GrannyVertexNormalName) == 0 ||
+             _stricmp(VertexType[Idx].Name, GrannyVertexTangentName) == 0 ||
+             _stricmp(VertexType[Idx].Name, GrannyVertexBinormalName) == 0))
         {
-            assert(VertexType[Idx].Type == GrannyReal32Member);
-            assert(VertexType[Idx].ArrayWidth == 3);
+            pp_assert(VertexType[Idx].Type == GrannyReal32Member);
+            pp_assert(VertexType[Idx].ArrayWidth == 3);
 
             // compressed normal
             NewType[Idx].Type = GrannyUInt32Member;
-
             NewType[Idx].Name = PushArray(TempArena,
                                           int(strlen(VertexType[Idx].Name) +
                                               strlen(CompNormalSuffix) + 1),
@@ -56,11 +70,12 @@ CreateCompressedType(granny_data_type_definition* VertexType,
             strcpy((char*)NewType[Idx].Name, VertexType[Idx].Name);
             strcat((char*)NewType[Idx].Name, CompNormalSuffix);
         }
-        else if (_strnicmp(VertexType[Idx].Name,
-                           GrannyVertexTextureCoordinatesName,
-                           strlen(GrannyVertexTextureCoordinatesName)) == 0)
+        else if (CompTex &&
+                 (_strnicmp(VertexType[Idx].Name,
+                            GrannyVertexTextureCoordinatesName,
+                            strlen(GrannyVertexTextureCoordinatesName))) == 0)
         {
-            assert(VertexType[Idx].Type == GrannyReal32Member);
+            pp_assert(VertexType[Idx].Type == GrannyReal32Member);
 
             // compressed normal
             NewType[Idx].Type       = GrannyReal16Member;
@@ -73,6 +88,28 @@ CreateCompressedType(granny_data_type_definition* VertexType,
 
             strcpy((char*)NewType[Idx].Name, VertexType[Idx].Name);
             strcat((char*)NewType[Idx].Name, CompTextureSuffix);
+        }
+        else if (CompColor &&
+                 (_strnicmp(VertexType[Idx].Name,
+                            GrannyVertexDiffuseColorName,
+                            strlen(GrannyVertexDiffuseColorName)) == 0 ||
+                  _strnicmp(VertexType[Idx].Name,
+                            GrannyVertexSpecularColorName,
+                            strlen(GrannyVertexSpecularColorName)) == 0))
+        {
+            pp_assert(VertexType[Idx].Type == GrannyReal32Member);
+
+            // compressed normal
+            NewType[Idx].Type       = GrannyUInt32Member;
+            NewType[Idx].ArrayWidth = 0;
+
+            NewType[Idx].Name = PushArray(TempArena,
+                                          int(strlen(VertexType[Idx].Name) +
+                                              strlen(CompColorSuffix) + 1),
+                                          char);
+
+            strcpy((char*)NewType[Idx].Name, VertexType[Idx].Name);
+            strcat((char*)NewType[Idx].Name, CompColorSuffix);
         }
         else
         {
@@ -102,9 +139,9 @@ CompressNormals(int VertexCount,
         float* Norm = (float*)Original;
         granny_uint32& Comp = *((granny_uint32*)Compressed);
 
-        assert(Norm[0] >= -1.0f && Norm[0] <= 1.0f);
-        assert(Norm[1] >= -1.0f && Norm[1] <= 1.0f);
-        assert(Norm[2] >= -1.0f && Norm[2] <= 1.0f);
+        pp_assert(Norm[0] >= -1.0f && Norm[0] <= 1.0f);
+        pp_assert(Norm[1] >= -1.0f && Norm[1] <= 1.0f);
+        pp_assert(Norm[2] >= -1.0f && Norm[2] <= 1.0f);
 
         // D3DDECLTYPE_DHEN3N
         //
@@ -136,27 +173,53 @@ CompressTexCoord(int VertexCount, int NumComponents,
                  void* NewVertices, int OffsetInComp, int StrideComp)
 {
     // Only 2 or 4 for now to maintain DWORD alignment..
-    assert(NumComponents == 2 || NumComponents == 4);
+    pp_assert(NumComponents == 2 || NumComponents == 4);
 
     granny_real32* Original   = (granny_real32*)((granny_uint8*)Vertices + OffsetInOrig);
     granny_real16* Compressed = (granny_real16*)((granny_uint8*)NewVertices + OffsetInComp);
 
     {for(int Idx = 0; Idx < VertexCount; ++Idx)
     {
-        float* Norm = (float*)Original;
         granny_real16* Comp = (granny_real16*)Compressed;
 
         {for(int j = 0; j < NumComponents; ++j)
         {
             Comp[j] = GrannyReal32ToReal16(Original[j]);
-
-            granny_real32 Test;
-            GrannyReal16ToReal32(Comp[j], &Test);
-            Test = Test;
         }}
 
         Original   = (granny_real32*)((granny_uint8*)Original + StrideOrig);
         Compressed = (granny_real16*)((granny_uint8*)Compressed + StrideComp);
+    }}
+}
+
+
+// Step through the vertex arrays, copying uncompressed texture coordinates to the new
+// compressed location
+static void
+CompressColor(int VertexCount, int NumComponents,
+              void* Vertices, int OffsetInOrig, int StrideOrig,
+              void* NewVertices, int OffsetInComp, int StrideComp)
+{
+    // Only 3 or 4 for colors
+    pp_assert(NumComponents == 3 || NumComponents == 4);
+
+    granny_real32* Original   = (granny_real32*)((granny_uint8*)Vertices + OffsetInOrig);
+    granny_uint32* Compressed = (granny_uint32*)((granny_uint8*)NewVertices + OffsetInComp);
+
+    {for(int Idx = 0; Idx < VertexCount; ++Idx)
+    {
+        float* Color = (float*)Original;
+        granny_uint32& Comp = *((granny_uint32*)Compressed);
+
+        Comp = (granny_uint32(granny_uint8(Clamp(0, Color[0], 1) * 255.0f + 0.5f)) << 16  |   // r
+                granny_uint32(granny_uint8(Clamp(0, Color[1], 1) * 255.0f + 0.5f)) << 8   |   // g
+                granny_uint32(granny_uint8(Clamp(0, Color[2], 1) * 255.0f + 0.5f)) << 0);     // b
+
+        if (NumComponents == 4)
+            Comp |= granny_uint32(granny_uint8(Clamp(0, Color[3], 1) * 255.0f + 0.5f)) << 24; // a
+
+        Original   = (granny_real32*)((granny_uint8*)Original   + StrideOrig);
+        Compressed = (granny_uint32*)((granny_uint8*)Compressed + StrideComp);
     }}
 }
 
@@ -177,7 +240,7 @@ CopyCompressedMembers(int VertexCount,
     granny_int32x OffsetInComp = 0;
     {for(int Idx = 0; Type[Idx].Type != GrannyEndMember; ++Idx)
     {
-        assert(NewType[Idx].Type != GrannyEndMember);
+        pp_assert(NewType[Idx].Type != GrannyEndMember);
 
         if (strstr(NewType[Idx].Name, CompNormalSuffix))
         {
@@ -187,9 +250,15 @@ CopyCompressedMembers(int VertexCount,
         }
         else if (strstr(NewType[Idx].Name, CompTextureSuffix))
         {
-            CompressTexCoord(VertexCount, NewType[Idx].ArrayWidth,
+            CompressTexCoord(VertexCount, Type[Idx].ArrayWidth,
                              Vertices, OffsetInOrig, OldVertexSize,
                              NewVertices, OffsetInComp, NewVertexSize);
+        }
+        else if (strstr(NewType[Idx].Name, CompColorSuffix))
+        {
+            CompressColor(VertexCount, Type[Idx].ArrayWidth,
+                          Vertices, OffsetInOrig, OldVertexSize,
+                          NewVertices, OffsetInComp, NewVertexSize);
         }
 
         OffsetInOrig += GrannyGetMemberTypeSize(&Type[Idx]);
@@ -200,28 +269,35 @@ CopyCompressedMembers(int VertexCount,
 // This is the command called by the preprocessor.  The driver iterates through the
 // meshes, computing a new compressed format type for each mesh, and replaces the vertex
 // array with the new version.
-bool
-CompressVertSample(input_file&     InputFile,
-                   key_value_pair* KeyValues,
-                   granny_int32x   NumKeyValues,
+granny_file_info*
+CompressVertSample(char const*          OriginalFilename,
+                   char const*          OutputFilename,
+                   granny_file_info*    Info,
+                   key_value_pair*      KeyValues,
+                   granny_int32x        NumKeyValues,
                    granny_memory_arena* TempArena)
 {
-    // Validate the input.  Our requirements for this command:
-    //  -output key must be present
-    //  The input $file must contain a valid $file_info object
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
+    bool CompTex   = true;
+    bool CompNorm  = true;
+    bool CompColor = true;
     {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
+        char const* DoTexFlag = FindFirstValueForKey(KeyValues, NumKeyValues, "tex");
+        if (DoTexFlag && atoi(DoTexFlag) == 0)
+            CompTex = false;
+
+        char const* DoNormFlag = FindFirstValueForKey(KeyValues, NumKeyValues, "norm");
+        if (DoNormFlag && atoi(DoNormFlag) == 0)
+            CompNorm = false;
+
+        char const* DoColorFlag = FindFirstValueForKey(KeyValues, NumKeyValues, "color");
+        if (DoColorFlag && atoi(DoColorFlag) == 0)
+            CompColor = false;
     }
 
     for (int i = 0; i < Info->MeshCount; i++)
     {
         granny_mesh* Mesh = Info->Meshes[i];
-        assert(Mesh);
+        pp_assert(Mesh);
 
         // Assume there are no morph targets.  We can modify this easily to support them
         // if required.
@@ -234,12 +310,13 @@ CompressVertSample(input_file&     InputFile,
         // Make a modified copy of the vertex type array so we can merge unaltered data
         // from the uncompressed vertices.
         granny_data_type_definition* VertexType = GrannyGetMeshVertexType(Mesh);
-        assert(VertexType);
+        pp_assert(VertexType);
 
         void* Vertices = GrannyGetMeshVertices(Mesh);
 
         granny_data_type_definition* CompressedType =
-            CreateCompressedType(VertexType, TempArena);
+            CreateCompressedType(CompTex, CompNorm, CompColor,
+                                 VertexType, TempArena);
 
         granny_int32x const VertexCount   = GrannyGetMeshVertexCount(Mesh);
         granny_int32x const NewVertexSize = GrannyGetTotalObjectSize(CompressedType);
@@ -266,10 +343,9 @@ CompressVertSample(input_file&     InputFile,
         // alone, they don't change.
     }
 
-    return SimpleWriteInfo(KeyValues, NumKeyValues, Info);
+    return Info;
 }
 
-static CommandRegistrar RegCompressVertSample(eSingleFile_NoMultiRun,
-                                              CompressVertSample, "CompressVertSample",
+static CommandRegistrar RegCompressVertSample(CompressVertSample, "CompressVertSample",
                                               "Compress normals and texture coordinates");
 

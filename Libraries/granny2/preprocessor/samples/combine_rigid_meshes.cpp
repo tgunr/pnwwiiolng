@@ -1,13 +1,13 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/combine_rigid_meshes.cpp $
-// $DateTime: 2009/05/28 17:04:46 $
-// $Change: 21863 $
-// $Revision: #2 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
-#include <assert.h>
+#include "../utilities.h"
 #include <vector>
 #include <set>
 
@@ -110,7 +110,7 @@ MeshFromSpec(CombineSpec& Spec,
                 GrannyConvertSingleObject(OrigMesh->PrimaryVertexData->VertexType,
                                           OldVert,
                                           GrannyPWNT3132VertexType,
-                                          NewVert);
+                                          NewVert, 0);
 
                 NewVert->BoneIndex = BindingIdx;
             }
@@ -143,18 +143,14 @@ MeshFromSpec(CombineSpec& Spec,
 
 
 
-bool CombineRigidMeshes(input_file&     InputFile,
-                        key_value_pair* KeyValues,
-                        granny_int32x   NumKeyValues,
-                        granny_memory_arena* Arena)
+granny_file_info*
+CombineRigidMeshes(char const*          OriginalFilename,
+                   char const*          OutputFilename,
+                   granny_file_info*    Info,
+                   key_value_pair*      KeyValues,
+                   granny_int32x        NumKeyValues,
+                   granny_memory_arena* TempArena)
 {
-    char const* OutputFile = FindFirstValueForKey(KeyValues, NumKeyValues, "output");
-    if (OutputFile == 0)
-    {
-        ErrOut("must specify an output file with \"-output <filename>\"\n");
-        return false;
-    }
-
     char const* BoneLimitStr = FindFirstValueForKey(KeyValues, NumKeyValues, "bonelimit");
     int BoneLimit = -1;
     if (BoneLimitStr != 0)
@@ -164,14 +160,6 @@ bool CombineRigidMeshes(input_file&     InputFile,
         {
             ErrOut("Invalid bone limit number (must be > 0)\n");
         }
-    }
-
-    granny_file* File = InputFile.GrannyFile;
-    granny_file_info* Info = GrannyGetFileInfo(File);
-    if (Info == 0)
-    {
-        ErrOut("must specify an output file with \"-output <filename>\"\n");
-        return false;
     }
 
     vector<granny_mesh*> NewMeshes;
@@ -194,16 +182,21 @@ bool CombineRigidMeshes(input_file&     InputFile,
         if (Mesh->BoneBindingCount == 0)
             continue;
 
-        assert(Mesh->PrimaryTopology->GroupCount == Mesh->MaterialBindingCount);
-        {for(int GroupIdx = 0; GroupIdx < Mesh->MaterialBindingCount; ++GroupIdx)
+        pp_assert(Mesh->PrimaryTopology->GroupCount == Mesh->MaterialBindingCount || Mesh->MaterialBindingCount == 0);
+        {for(int GroupIdx = 0; GroupIdx < Mesh->PrimaryTopology->GroupCount; ++GroupIdx)
         {
-            granny_material_binding& Binding = Mesh->MaterialBindings[GroupIdx];
+            granny_material* BindingMaterial = 0;
+            if (Mesh->MaterialBindingCount)
+            {
+                granny_material_binding& Binding = Mesh->MaterialBindings[GroupIdx];
+                BindingMaterial = Binding.Material;
+            }
 
             bool Found = false;
             {for(int Idx = 0; Idx < (int)Specs.size(); ++Idx)
             {
                 CombineSpec& Spec = Specs[Idx];
-                if (Spec.Material != Binding.Material)
+                if (Spec.Material != BindingMaterial)
                     continue;
 
                 char const* BoneName = Mesh->BoneBindings[0].BoneName;
@@ -227,7 +220,7 @@ bool CombineRigidMeshes(input_file&     InputFile,
             {
                 // New spec
                 CombineSpec spec;
-                spec.Material = Binding.Material;
+                spec.Material = BindingMaterial;
                 spec.Submeshes.push_back(Submesh(Mesh, GroupIdx));
                 spec.UniqueBones.insert(Mesh->BoneBindings[0].BoneName);
                 Specs.push_back(spec);
@@ -237,49 +230,39 @@ bool CombineRigidMeshes(input_file&     InputFile,
 
     {for(int Idx = 0; Idx < (int)Specs.size(); ++Idx)
     {
-        granny_mesh* NewMesh = MeshFromSpec(Specs[Idx], Arena);
+        granny_mesh* NewMesh = MeshFromSpec(Specs[Idx], TempArena);
         NewMeshes.push_back(NewMesh);
     }}
 
+    // Need to move the NewMeshes into the arena from the vector, which will be going bye-bye...
+
     Info->MeshCount = (int)NewMeshes.size();
-    Info->Meshes    = &NewMeshes[0];
+    if (Info->MeshCount != 0)
+    {
+        Info->Meshes    = PushArray(TempArena, Info->MeshCount, granny_mesh*);
+        memcpy(Info->Meshes, &NewMeshes[0], sizeof(granny_mesh*) * Info->MeshCount);
+    }
+    else
+    {
+        Info->Meshes = 0;
+    }
 
     Info->Models[0]->MeshBindingCount = (int)NewMeshes.size();
-    Info->Models[0]->MeshBindings = PushArray(Arena, Info->Models[0]->MeshBindingCount, granny_model_mesh_binding);
+    Info->Models[0]->MeshBindings = PushArray(TempArena, Info->Models[0]->MeshBindingCount, granny_model_mesh_binding);
     for (int Binding = 0; Binding < Info->Models[0]->MeshBindingCount; ++Binding)
         Info->Models[0]->MeshBindings[Binding].Mesh = NewMeshes[Binding];
 
-
     // Replace model bindings...
 
+    // Recompute the bone bounds...
+    if (RecomputeAllBoneBounds(Info) == false)
+        return 0;
+
     // ===================================================================================
     // ===================================================================================
-
-    granny_int32x FinalSectionCount = File->SectionCount;
-    if (FinalSectionCount < GrannyStandardSectionCount)
-        FinalSectionCount = GrannyStandardSectionCount;
-
-    granny_file_builder *Builder = GrannyBeginFile(FinalSectionCount,
-                                                   GrannyCurrentGRNStandardTag,
-                                                   GrannyGRNFileMV_ThisPlatform,
-                                                   GrannyGetTemporaryDirectory(),
-                                                   "Prefix");
-    granny_file_data_tree_writer *Writer =
-        GrannyBeginFileDataTreeWriting(GrannyFileInfoType, Info,
-                                       GrannyStandardDiscardableSection, 0);
-    GrannyPreserveObjectFileSections(Writer, File);
-
-    GrannyWriteDataTreeToFileBuilder(Writer, Builder);
-    GrannyEndFileDataTreeWriting(Writer);
-
-    bool success = GrannyEndFile(Builder, OutputFile);
-    if (!success)
-        ErrOut("failed to write to %s\n", OutputFile);
-
-    return success;
+    return Info;
 }
 
 
-static CommandRegistrar RegCombineRigidMeshes(eSingleFile_NoMultiRun,
-                                              CombineRigidMeshes, "CombineRigidMeshes",
+static CommandRegistrar RegCombineRigidMeshes(CombineRigidMeshes, "CombineRigidMeshes",
                                               "Combines rigid meshes sharing a material into skinned meshes");

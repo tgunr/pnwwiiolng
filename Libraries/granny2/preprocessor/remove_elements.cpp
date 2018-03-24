@@ -1,15 +1,14 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/remove_elements.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #18 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #include <vector>
 #include <algorithm>
 
@@ -25,7 +24,7 @@ bool RemoveObjectElement(void* Object,
                          char const* ElementName,
                          vector<void*>& RemovedObjects)
 {
-    assert(RemovedObjects.size() == 0);
+    pp_assert(RemovedObjects.size() == 0);
 
     granny_uint8* CurrObj = (granny_uint8*)Object;
     granny_data_type_definition* CurrentType = Type;
@@ -58,7 +57,7 @@ bool RemoveObjectElement(void* Object,
                     // 32-bit count followed by a pointer.  0 them both.  No returned
                     // pointers.
                     granny_int32* pCount = (granny_int32x*)(CurrObj);
-                    void** pPointer      = (void**)(CurrObj + 4);
+                    void** pPointer      = (void**)(CurrObj + sizeof(granny_int32));
                     *pCount   = 0;
                     *pPointer = NULL;
 
@@ -70,7 +69,7 @@ bool RemoveObjectElement(void* Object,
                     // 32-bit count followed by a pointer.  0 them both, return the values
                     // contained
                     granny_int32* pCount = (granny_int32x*)(CurrObj);
-                    void*** pPointer     = (void***)(CurrObj + 4);
+                    void*** pPointer     = (void***)(CurrObj + sizeof(granny_int32));
 
                     {for(granny_int32 Idx = 0; Idx < *pCount; ++Idx)
                     {
@@ -102,7 +101,7 @@ bool RemoveObjectElement(void* Object,
                     // types, we don't have to return values to the tree walker.
                     void** pPointer0      = (void**)(CurrObj + 0);
                     granny_int32x* pCount = (granny_int32x*)(CurrObj + sizeof(void*));
-                    void** pPointer1      = (void**)(CurrObj + sizeof(void*) + 4);
+                    void** pPointer1      = (void**)(CurrObj + sizeof(void*) + sizeof(granny_int32));
                     *pPointer0 = NULL;
                     *pCount    = 0;
                     *pPointer1 = NULL;
@@ -128,12 +127,9 @@ bool RemoveObjectElement(void* Object,
 
                     // Bad Type value...
                 default:
-                    assert(false);
+                    pp_assert(false);
                     return false;
             }
-
-
-            return true;
         }
 
         // Advance in the object, and the type array
@@ -151,7 +147,7 @@ bool RecursivelyCleanPointer(void* Object,
                              granny_memory_arena* Arena,
                              vector<void*>& VisitedStack)
 {
-    assert(ValueToRemove != NULL);
+    pp_assert(ValueToRemove != NULL);
 
     // Walk this object
     {
@@ -174,7 +170,7 @@ bool RecursivelyCleanPointer(void* Object,
                     // 32-bit count followed by a pointer.  0 them both, return the values
                     // contained
                     granny_int32* pCount = (granny_int32x*)(CurrObj);
-                    void*** pPointer      = (void***)(CurrObj + 4);
+                    void*** pPointer      = (void***)(CurrObj + sizeof(granny_int32));
 
                     // This is a little weird for a find loop, but we want to handle the case
                     // that multiple pointers in the array could be the object we're looking
@@ -203,7 +199,7 @@ bool RecursivelyCleanPointer(void* Object,
                             if ((*pPointer)[Idx] != ValueToRemove)
                                 NewArray[CurrVal++] = (*pPointer)[Idx];
                         }}
-                        assert(CurrVal == NotTheValue);
+                        pp_assert(CurrVal == NotTheValue);
 
                         *pCount = NotTheValue;
                         *pPointer = NewArray;
@@ -253,11 +249,11 @@ bool RecursivelyCleanPointer(void* Object,
                 case GrannyReferenceToArrayMember:
                 {
                     granny_int32* pCount    = (granny_int32x*)(CurrObj);
-                    granny_uint8** pPointer = (granny_uint8**)(CurrObj + 4);
+                    granny_uint8** pPointer = (granny_uint8**)(CurrObj + sizeof(granny_int32));
 
                     if (*pCount != 0)
                     {
-                        assert(*pPointer != NULL);
+                        pp_assert(*pPointer != NULL);
 
                         if (find(VisitedStack.begin(), VisitedStack.end(), *pPointer) == VisitedStack.end())
                         {
@@ -280,11 +276,11 @@ bool RecursivelyCleanPointer(void* Object,
                 case GrannyArrayOfReferencesMember:
                 {
                     granny_int32* pCount = (granny_int32x*)(CurrObj);
-                    void*** pPointer     = (void***)(CurrObj + 4);
+                    void*** pPointer     = (void***)(CurrObj + sizeof(granny_int32));
 
                     if (*pCount != 0)
                     {
-                        assert(*pPointer != NULL);
+                        pp_assert(*pPointer != NULL);
 
                         {for(granny_int32 Idx = 0; Idx < *pCount; ++Idx)
                         {
@@ -307,7 +303,7 @@ bool RecursivelyCleanPointer(void* Object,
                 case GrannyVariantReferenceMember:
                 {
                     void** pType   = (void**)(CurrObj);
-                    void** pObject = (void**)(CurrObj + 4);
+                    void** pObject = (void**)(CurrObj + sizeof(void*));
 
                     if (*pType != 0 && *pObject != 0)
                     {
@@ -342,21 +338,14 @@ bool RecursivelyCleanPointer(void* Object,
 }
 
 
-bool RemoveElements(input_file&     InputFile,
-                    key_value_pair* KeyValues,
-                    granny_int32x   NumKeyValues,
-                    granny_memory_arena* Arena)
+granny_file_info*
+RemoveElements(char const*          OriginalFilename,
+               char const*          OutputFilename,
+               granny_file_info*    Info,
+               key_value_pair*      KeyValues,
+               granny_int32x        NumKeyValues,
+               granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file* File = InputFile.GrannyFile;
-    granny_file_info* Info = GrannyGetFileInfo(File);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     {for(granny_int32x i = 0; i < NumKeyValues; ++i)
     {
         if (_stricmp(KeyValues[i].Key, "remove") == 0)
@@ -374,7 +363,7 @@ bool RemoveElements(input_file&     InputFile,
             {
                 vector<void*> VisitedStack;
                 if (RecursivelyCleanPointer(Info, GrannyFileInfoType,
-                                            RemovedObjects[j], Arena,
+                                            RemovedObjects[j], TempArena,
                                             VisitedStack) == false)
                 {
                     ErrOut("failed to recursively clean for element: %s\n", KeyValues[i].Value);
@@ -385,13 +374,24 @@ bool RemoveElements(input_file&     InputFile,
     }}
 
 
-    // Write out the modified Info
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, File, true, true, false);
+    return Info;
 }
 
+static const char* HelpString =
+    (" RemoveElements will delete any top level entries in granny_file_info\n"
+     " strucutres.  For instance, it is possible to remove all granny_meshes\n"
+     " from a file with the following command:\n"
+     "\n"
+     "    preprocessor RemoveElements file.gr2 -output file_stripped.gr2 \\\n"
+     "        -remove Meshes -remove TriTopologies -remove VertexDatas\n"
+     "\n"
+     " Be careful, RemoveElements is a 'deep' deletion, any references to\n"
+     " removed elements in other structures (granny_mesh_binding::Mesh, for\n"
+     " instance) will also be zeroed out.\n");
 
-static CommandRegistrar RegRemoveElements(eSingleFile_NoMultiRun,
-                                          RemoveElements,
+
+static CommandRegistrar RegRemoveElements(RemoveElements,
                                           "RemoveElements",
-                                          "Removes granny_file_info members specified by \"-remove Name\" k/v pairs");
+                                          "Removes granny_file_info members specified by \"-remove Name\" k/v pairs",
+                                          HelpString);
 

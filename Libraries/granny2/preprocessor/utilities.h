@@ -1,14 +1,15 @@
 #if !defined(UTILITIES_H)
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/utilities.h $
-// $DateTime: 2008/12/11 15:42:13 $
-// $Change: 19754 $
-// $Revision: #2 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 
 #include <granny.h>
+#include "preprocessor.h"
 #include <functional>
 #include <string.h>
 
@@ -24,6 +25,10 @@ struct CIStrcmp : public std::binary_function<char const*, char const*, bool>
 float GetPosError(granny_transform& One, granny_transform& Two);
 float GetOriError(granny_transform& One, granny_transform& Two);
 float GetSSError(granny_transform& One, granny_transform& Two);
+
+bool RecomputeMeshBoneBounds(granny_model* Model, granny_mesh* Mesh);
+bool RecomputeAllBoneBounds(granny_file_info* Info);
+
 
 
 #define UTILITIES_H
