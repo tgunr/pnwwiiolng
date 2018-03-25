@@ -281,9 +281,21 @@ JS_FUNCTION_DEF(jsClient, issteamcopy) {
 	steam connection
 *************************************************************************************************/
 
+// TODO: Move this out of the GUI code
 namespace {
+	bool IsValidEmail(const char* callsign) {
+		// TEMP: Just make sure the characters are valid.
+		for ( const char* c = callsign ; *c != '\0' ; ++c ) {
+			if ( !std::isalnum(*c, std::locale::classic()) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	bool IsValidCallsign(const char* callsign) {
-		if ( strlen(callsign) < 2 )
+		if ( strlen(callsign) < 2 || strlen(callsign) > 10)
 			return false;
 
 		for ( const char* c = callsign ; *c != '\0' ; ++c ) {
@@ -305,18 +317,25 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	
 	int32 arena;
 	if (gArena[0]) {
-        arena = strtol(gArena, nullptr, 10);
-    } else {
-        JS_ValueToInt32(ctx, argv[0], &arena);
-    }
+		arena = strtol(gArena, nullptr, 10);
+	} else {
+		JS_ValueToInt32(ctx, argv[0], &arena);
+	}
+
+	const char* email = "";
+	if ( argc >= 2 ) {
+		email = JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
+		if ( email[0] != '\0' && IsValidEmail(email) == false ) {
+			*rval = INT_TO_JSVAL((int)SteamLoginResponse::LoginUnknownError + 1); // HACK
+			return JS_TRUE;
+		}
+	}
 
 	const char* callsign = "";
-	if ( argc >= 2 ) {
-		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
-
-		// TODO: Move this stuff out of GUI code.
+	if ( argc >= 3 ) {
+		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[2]));
 		if ( callsign[0] != '\0' && IsValidCallsign(callsign) == false ) {
-			*rval = INT_TO_JSVAL(SteamLoginResponse::LoginCallsignInvalid);
+			*rval = INT_TO_JSVAL((int)SteamLoginResponse::LoginUnknownError + 2); // HACK
 			return JS_TRUE;
 		}
 	}
@@ -325,7 +344,7 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	uint32_t ticket_length;
 	HAuthTicket ticket = SteamUser()->GetAuthSessionTicket(ticket_data, array_size(ticket_data),
 	                                                       &ticket_length);
-	SteamLoginResult result = authRequestSteamLogin(ticket_data, ticket_length, arena, callsign);
+	SteamLoginResult result = authRequestSteamLogin(ticket_data, ticket_length, arena, email, callsign);
 	SteamUser()->CancelAuthTicket(ticket);
 
 	if ( result.status == SteamLoginResponse::LoginSuccess )

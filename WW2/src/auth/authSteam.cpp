@@ -12,6 +12,12 @@
 #include "build_info.hpp"
 #include "json.hpp"
 
+#if 1 // Temporarily disabled pending review by Gadget.
+SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &requestedEmail, const std::string &requestedCallsign) {
+	return { SteamLoginResponse::LoginUnknownError };
+}
+#else
+
 static const std::string authSteamLoginProtocol = "https";
 static const std::string authSteamLoginResource = "/v1/login";
 
@@ -137,3 +143,4 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
     return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
 }
 
+#endif
