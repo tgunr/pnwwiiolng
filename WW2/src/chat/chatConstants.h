@@ -44,6 +44,7 @@ namespace Chat
 		DOT_COMMAND_LIST_Y,	// Used to send the Dot Command Array
 		AWS_Y,					// AWS request/reply
 		HOLD_FALL_INFO_Y,		// Messages about hold/fall votes
+		JOIN_MISSION_Y, // Request the info needed to join another player's mission
 
 		/////  ^^^ INSERT NEW CALLBACKS HERE^^^  /////
 		OMG_Y = 100,				// OMG-numbered callbacks start here

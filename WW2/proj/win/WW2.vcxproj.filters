@@ -1665,6 +1665,9 @@
     <ClInclude Include="..\..\src\wwii\wwiiThemes.h">
       <Filter>wwii</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\miss\missionJoinRequest.h">
+      <Filter>miss</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">

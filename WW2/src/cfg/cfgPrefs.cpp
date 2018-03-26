@@ -1080,14 +1080,16 @@ void cfgPrefsSetResolution()
 	strncpy(str, WantedVideoResolution, Length);
 	str[Length] = 0;
 	Position += Length + 1;
-	WantedWidth = atoi(str);
+	if ( WantedWidth == 0 )
+		WantedWidth = atoi(str);
 
 	// Height
 	Length = strcspn(WantedVideoResolution + Position, "x");
 	strncpy(str, WantedVideoResolution + Position, Length);
 	str[Length] = 0;
 	Position += Length + 1;
-	WantedHeight = atoi(str);
+	if ( WantedHeight == 0 )
+		WantedHeight = atoi(str);
 
 	// Depth
 	Length = strcspn(WantedVideoResolution + Position, "x");

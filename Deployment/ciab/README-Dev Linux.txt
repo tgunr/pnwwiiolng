@@ -21,7 +21,7 @@ You can use something like this to start the client:
 
    ww2.exe -ticket gamename.tkt
       -data 1 -datadir DATA
-      -window 1 -width 800 -height 640
+      -window 1 -width 1280 -height 720
       -log 0 -nowor 1 -noinf 1
 
 (each option on the last line is optional and is designed to speed up startup)

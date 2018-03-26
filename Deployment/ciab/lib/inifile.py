@@ -51,43 +51,46 @@ _ini_spec = [
         Heading(3, 'Bootstrap Configuration'),
 
         Heading(2, 'Database Config'),
-        Field('db_host', '127.0.0.1', 'specify address of MySQL server'),
+        Field('db_host', '127.0.0.1', 'Specify the address of the MySQL server (usually your loopback address)'),
         '',
-        Field('db_admin_user', DB_ADMIN_USER, 'specify administrative'
+        Field('db_admin_user', DB_ADMIN_USER, 'Specify the MySQL administrative'
             ' account/password, used only during this setup'),
         Field('db_admin_pass', DB_ADMIN_PASS),
         '',
-        Field('db_game_user', DB_GAME_USER, 'account game servers will'
-            ' use to access the database. saved in environment.cfg'),
+        Field('db_game_user', DB_GAME_USER, 'The account game servers will'
+            ' use to access the databases, saved in the environment.cfg file'),
         Field('db_game_pass', DB_GAME_PASS),
         '',
 
-        Heading(2, 'Paths/directories'),
-        Field('playnet_path', PLAYNET_PATH, 'installation directory'),
+        Heading(2, 'Paths/Directories'),
+        Field('playnet_path', PLAYNET_PATH, 'Installation directory'),
         '',
-        Field('data_origin_path', '', 'origin for data (if installing).'),
-        Field('data_transfer', 'copy', 'specify whether to copy, move or'
-            ' link the source data into the install directory.'),
-        Field('bin_origin_path', os.path.abspath('Server'), 'where to'
-            ' copy server binaries from (or empty).'),
-        Field('lua_origin_path', os.path.abspath('Lua'), 'where to copy'
-            ' lua scripts from (or empty).'),
+        Field('data_origin_path', '', 'Origin for data (if installing)'),
+        Field('data_transfer', 'copy', 'Specify whether to copy, move or'
+            ' link the source data into the install directory'),
+        Field('bin_origin_path', '', 'Where to'
+            ' copy the server binaries from (or empty)'),
+        Field('lua_origin_path', os.path.abspath('Lua'), 'Where to copy'
+            ' the lua scripts from (or empty)'),
 
         '',
-        Heading(2, 'Less common parameters'),
-        Heading(2, '(These are usually good defaults for a desktop server).'),
-        Field('db_import_file', DB_IMPORT_FILE, 'database source SQL'),
+        Heading(2, 'Less Common Parameters'),
+        Heading(2, '(These are usually good defaults for a desktop server)'),
+        Field('db_import_file', DB_IMPORT_FILE, 'Database source SQL file'),
         Field('cluster_name', 'ciab'),
         Field('app_id', '12'),
         Field('arena_id', '250'),
         Field('base_address', _get_ip_address()),
+        Field('client_width', '1280'),
+        Field('client_height', '720'),
         '',
-        Comment('other paths'),
+        Comment('Other paths'),
         Field('log_path', pathname('%(playnet_path)s', 'tmp')),
         Field('wwiiol_path', pathname('%(playnet_path)s', 'wwiiol')),
         Field('data_path', pathname('%(wwiiol_path)s', 'data')),
         Field('uweb_path', pathname('%(wwiiol_path)s', 'uweb', 'debug')),
         Field('lua_path', pathname('%(wwiiol_path)s', 'lua')),
+        Field('ww2_path', '\"C:\Program Files (x86)\CRS\Battleground Europe\WW2.exe\"'),
 ]
 
 

@@ -1082,6 +1082,7 @@
     <ClInclude Include="..\..\src\maptools\GenerateIcons.h" />
     <ClInclude Include="..\..\src\map\mapSupercellVislevelXfer.h" />
     <ClInclude Include="..\..\src\math\SuperFastHash.h" />
+    <ClInclude Include="..\..\src\miss\missionJoinRequest.h" />
     <ClInclude Include="..\..\src\ogl\GLCounter.h" />
     <ClInclude Include="..\..\src\omg\omgChat.hxx" />
     <ClInclude Include="..\..\src\omg\omgMissionSortieData.hxx" />
