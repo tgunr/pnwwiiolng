@@ -12,16 +12,10 @@
 #include "build_info.hpp"
 #include "json.hpp"
 
-#if 1 // Temporarily disabled pending review by Gadget.
-SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &requestedEmail, const std::string &requestedCallsign) {
-	return { SteamLoginResponse::LoginUnknownError };
-}
-#else
-
 static const std::string authSteamLoginProtocol = "https";
 static const std::string authSteamLoginResource = "/v1/login";
 
-SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &requestedCallsign)
+SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &email, const std::string &requestedCallsign)
 {
     ABORT_IF_EX(authTicket == nullptr || authTicketLen < 1, "Steam auth ticket is required");
     
@@ -46,6 +40,7 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
         "\"app_version\":" + std::to_string(PN_build_version_value) + "," +
         "\"app_platform\":" + std::to_string(platOS - 1) + // HACK!! OS_WIN32 == 1, OS_MACOS == 2, auth platform values are 0 and 1
         (requestedCallsign.empty() ? "" : std::string(",\"callsign\":\"") + requestedCallsign + "\"") +
+        (email.empty() ? "" : std::string(",\"email\":\"") + email + "\"") +
     "}";
     
     if (!sysExecuteHTTPRequest(request, response)) {
@@ -115,14 +110,20 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
             return { SteamLoginResponse::LoginSuccess, resultArenaID, resultOTP, resultServerIP, resultServerPort };
         } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginNotValidUser)) {
             return { SteamLoginResponse::LoginNotValidUser, 0, 0, 0, 0 };
-        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignRequired)) {
-            return { SteamLoginResponse::LoginCallsignRequired, 0, 0, 0, 0 };
+        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginNewUser)) {
+            return { SteamLoginResponse::LoginNewUser, 0, 0, 0, 0 };
         } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignInvalid)) {
             return { SteamLoginResponse::LoginCallsignInvalid, 0, 0, 0, 0 };
         } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignDisallowed)) {
             return { SteamLoginResponse::LoginCallsignDisallowed, 0, 0, 0, 0 };
         } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignInUse)) {
             return { SteamLoginResponse::LoginCallsignInUse, 0, 0, 0, 0 };
+        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginEmailRequired)) {
+            return { SteamLoginResponse::LoginEmailRequired, 0, 0, 0, 0 };
+        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginEmailInvalid)) {
+            return { SteamLoginResponse::LoginEmailInvalid, 0, 0, 0, 0 };
+        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginEmailInUse)) {
+            return { SteamLoginResponse::LoginEmailInUse, 0, 0, 0, 0 };
         } else {
             // TODO: Better error handling
             dbugLog(_FLD, "Server returned JSON with unknown result code with URL %s content %s", request.url.c_str(), response.content.c_str());
@@ -142,5 +143,3 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
     // TODO: Logging, better error handling
     return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
 }
-
-#endif
