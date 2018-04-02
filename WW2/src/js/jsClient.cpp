@@ -284,8 +284,9 @@ JS_FUNCTION_DEF(jsClient, issteamcopy) {
 // TODO: Move this out of the GUI code
 namespace {
 	bool IsValidEmail(const char* email) {
-		// TEMP: Validating emails meaningfully is arbitrarily difficult. This
-        //       is the best it's really possible to do.
+		// TEMP: Validating emails meaningfully is arbitrarily difficult.
+        // Note that even billing only does this:
+        // email+          = ^[^\s]+\@[^\s]+$
         bool hasAt = false;
         bool hasDot = false;
         

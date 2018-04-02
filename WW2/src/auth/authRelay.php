@@ -30,11 +30,14 @@ if (!isset($_SERVER['PN_INSTALL_PATH'])) {
 // IMPORTANT: Keep these in sync with authSteam.h!
 define('LoginSuccess', 0);
 define('LoginNotValidUser', 1);
-define('LoginCallsignRequired', 2);
+define('LoginNewUser', 2);
 define('LoginCallsignInvalid', 3);
 define('LoginCallsignDisallowed', 4);
 define('LoginCallsignInUse', 5);
 define('LoginUnknownError', 6);
+define('LoginEmailRequired', 7);
+define('LoginEmailInvalid', 8);
+define('LoginEmailInUse', 9);
 
 ////////////////////////////////////////
 // Logging
@@ -168,6 +171,9 @@ if (!is_integer($data->app_platform)) {
 if (isset($data->callsign) && !is_string($data->callsign)) {
     bad_input(__LINE__, "Callsign provided but not a string: %s", var_export($data->callsign, true));
 }
+if (isset($data->email) && !is_string($data->email)) {
+    bad_input(__LINE__, "Email provided but not a string: %s", var_export($data->email, true));
+}
 
 $steam_ticket = filter_var($data->steam_ticket, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => '/^([a-zA-Z0-9]+)$/']]);
 $arena_id = filter_var($data->arena_id, FILTER_VALIDATE_INT);
@@ -179,6 +185,10 @@ if (isset($data->callsign)) {
     // would prevent proper detection of the incorrect "callsign provided for account
     // which already has one" scenario, which could result in degraded user experience.
     $callsign = strval($data->callsign); //filter_var($data->callsign, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => '/^[a-z][a-z0-9]{1,9}$/']]);
+}
+if (isset($data->email)) {
+    // Same as callsign above.
+    $email = strval($data->email); //filter_var($data->email, FILTER_VALIDATE_EMAIL, []);
 }
 
 if (!is_string($steam_ticket)) {
@@ -196,12 +206,22 @@ if (!is_integer($app_platform)) {
 if (isset($data->callsign) && !is_string($callsign)) {
     bad_input(__LINE__, "Callsign provided but did not pass validation: %s", $data->callsign);
 }
+if (isset($data->email) && !is_string($email)) {
+    bad_input(__LINE__, "Email provided but did not pass validation: %s", $data->email);
+}
 
 ////////////////////////////////////////
 // Call to billing
 $billing_request_data = [$steam_ticket, $arena_id];
 if (isset($callsign)) {
     $billing_request_data[] = $callsign;
+}
+if (isset($email)) {
+    if (!isset($callsign)) {
+        // Awful hack to deal with existing users who have callsigns but no emails yet.
+        $billing_request_data[] = "";
+    }
+    $billing_request_data[] = $email;
 }
 $billing_request = xmlrpc_encode_request($billing_xmlrpc_method, $billing_request_data, ['verbosity' => 'no_white_space']);
 $billing_handle = curl_init($billing_login_endpoint);
@@ -237,7 +257,7 @@ if ($billing_response['_success'] === 0) {
     }
     // We recognize only a few specific errors
     if ($billing_response['_message'] === 'steam.login.callsign_needed') {
-        print json_encode(['result' => LoginCallsignRequired]);
+        print json_encode(['result' => LoginNewUser]);
         exit(0);
     } else if ($billing_response['_message'] === 'validate.invalid.wwiionline') {
         print json_encode(['result' => LoginCallsignInvalid]);
@@ -250,6 +270,15 @@ if ($billing_response['_success'] === 0) {
         exit(0);
     } else if (in_array($billing_response['_message'], ['steam.login.invalid', 'steam.login.banned'])) {
         print json_encode(['result' => LoginNotValidUser]);
+        exit(0);
+    } else if ($billing_response['_message'] === 'steam.login.email_needed') {
+        print json_encode(['result' => LoginEmailRequired]);
+        exit(0);
+    } else if ($billing_response['_message'] === 'validate.invalid.profile') {
+        print json_encode(['result' => LoginEmailInvalid]);
+        exit(0);
+    } else if ($billing_response['_message'] === 'validate.invalid.profile.email.inuse') {
+        print json_encode(['result' => LoginEmailInUse]);
         exit(0);
     } else {
         internal_error(__LINE__, "Billing returned unrecognized failure response: req:%s res:%s", $billing_request, var_export($billing_response, true));

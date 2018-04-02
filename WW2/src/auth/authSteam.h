@@ -40,5 +40,5 @@ struct SteamLoginResult {
 // Passing a callsign when one is not required will cause the API to return a login failure.
 // Do not pass an email unless you know one is required (i.e. the API returned LoginNewUser or LoginEmailRequired in a previous call)
 // Passing an email when one is not required will cause the API to return a login failure.
-// Both email and callsign are required for new users.
+// Both email and callsign are REQUIRED for new users. LoginNewUser implies and includes LoginEmailRequired.
 SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &email = "", const std::string &requestedCallsign = "");
