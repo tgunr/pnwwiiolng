@@ -2316,7 +2316,7 @@ static void changeMaterials( OBJECT* obj )
 }
 #endif
 
-#define SHOWLDMSGS 1
+//#define SHOWLDMSGS 1
 
 #ifdef SHOWLDMSGS
 # define LDWrite_Debug(fmt, ...) dbugLog(_FLD, fmt, ## __VA_ARGS__);
