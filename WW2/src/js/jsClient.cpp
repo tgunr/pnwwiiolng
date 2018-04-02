@@ -283,15 +283,21 @@ JS_FUNCTION_DEF(jsClient, issteamcopy) {
 
 // TODO: Move this out of the GUI code
 namespace {
-	bool IsValidEmail(const char* callsign) {
-		// TEMP: Just make sure the characters are valid.
-		for ( const char* c = callsign ; *c != '\0' ; ++c ) {
-			if ( !std::isalnum(*c, std::locale::classic()) ) {
+	bool IsValidEmail(const char* email) {
+		// TEMP: Validating emails meaningfully is arbitrarily difficult. This
+        //       is the best it's really possible to do.
+        bool hasAt = false;
+        bool hasDot = false;
+        
+		for ( const char* c = email ; *c != '\0' ; ++c ) {
+			if ( !std::isprint(*c, std::locale::classic()) ) {
 				return false;
 			}
+            if (*c == '@') { hasAt = true; }
+            if (*c == '.') { hasDot = true; }
 		}
 
-		return true;
+		return hasAt && hasDot;
 	}
 
 	bool IsValidCallsign(const char* callsign) {
