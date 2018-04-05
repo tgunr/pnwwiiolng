@@ -3632,8 +3632,10 @@ UINT32 vehExitVehicle(unsigned int exitCode)
 		if (exitCode == PEXIT_BAD_CONNECTION)
 		{
 			uiChatPrintLineColor(colorORANGEALPHA, uiLocString(IDE_LANG_UI, BAD_CONNECTION_LOC_ID).c_str());
+			ExitStatus = PEXIT_RTB;
 		}
-		fpFPSKillTrooper();
+		else
+			fpFPSKillTrooper();
 		vehupdateUpdate(TRUE);
 	}
 
