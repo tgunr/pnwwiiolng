@@ -1,9 +1,9 @@
 /* ========================================================================
    $RCSfile: $
-   $Date: 2009/09/24 $
-   $Revision: #5 $
+   $Date$
+   $Revision$
    $Creator: Dave Moore $
-   (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+   $Notice: $
    ======================================================================== */
 #include "scene.h"
 #include "crowd_scene.h"
@@ -301,6 +301,7 @@ void Scene::CreateD3DObjects ( LPDIRECT3DDEVICE9 d3ddev )
 
         // Create the vertex declaration
         HRESULT hres = d3ddev->CreateVertexDeclaration ( MyVertexElements, &D3DVertexDeclarationAnimated );
+        hres = hres;
         ASSERT ( SUCCEEDED ( hres ) );
     }
 }
@@ -520,7 +521,7 @@ void Mesh::Render(LPDIRECT3DDEVICE9 d3ddev, granny_matrix_4x4* CompositeBuffer)
     for (size_t GroupNum = 0; GroupNum < TriGroupings.size(); GroupNum++)
     {
         const TriGroup& Group = TriGroupings[GroupNum];
-        int NumRemappedBones  = Group.BoneRemapBuffer->size();
+        int NumRemappedBones  = (int)Group.BoneRemapBuffer->size();
 
         for (int BoneNum = 0; BoneNum < NumRemappedBones; BoneNum++)
         {
@@ -610,6 +611,7 @@ void Texture::CreateD3DObjects(LPDIRECT3DDEVICE9 d3ddev)
                                            GrannyImage->MIPLevelCount,
                                            0, D3DFMT_A8R8G8B8,
                                            D3DPOOL_MANAGED, &D3DTexture, NULL );
+    hres = hres;
     ASSERT ( SUCCEEDED ( hres ) );
 
     // Now loop over all the MIP levels and fill them.
@@ -618,8 +620,9 @@ void Texture::CreateD3DObjects(LPDIRECT3DDEVICE9 d3ddev)
     for ( int MIPIndex = 0; MIPIndex < GrannyImage->MIPLevelCount; MIPIndex++ )
     {
         D3DLOCKED_RECT LockedRect;
-        HRESULT hres = D3DTexture->LockRect (MIPIndex, &LockedRect, 0, 0 );
-        ASSERT ( SUCCEEDED ( hres ) );
+        HRESULT recthres = D3DTexture->LockRect (MIPIndex, &LockedRect, 0, 0 );
+        ASSERT ( SUCCEEDED (recthres) );
+        recthres = recthres;
 
         // This call converts to the desired format as well as doing the copy.
         // Note that D3D's notation is the reverse of Granny's - BGRA vs ARGB
@@ -629,8 +632,8 @@ void Texture::CreateD3DObjects(LPDIRECT3DDEVICE9 d3ddev)
                                  LockedRect.Pitch,
                                  LockedRect.pBits );
 
-        hres = D3DTexture->UnlockRect ( MIPIndex );
-        ASSERT ( SUCCEEDED ( hres ) );
+        recthres = D3DTexture->UnlockRect ( MIPIndex );
+        ASSERT ( SUCCEEDED (recthres) );
 
         // Each cycle, the MIP'ing makes the texture half as tall and wide.
         Width  >>= 1;
@@ -859,7 +862,7 @@ static bool CreateSkinnedShader(LPDIRECT3DDEVICE9 d3ddev,
     ID3DXBuffer *d3dxbufferErrors = NULL;
 
     const char *ShaderText = sa.GetShaderText();
-    HRESULT hres = D3DXAssembleShader(ShaderText, strlen(ShaderText), NULL, NULL, 0, &d3dxbufferShader, &d3dxbufferErrors);
+    HRESULT hres = D3DXAssembleShader(ShaderText, (UINT)strlen(ShaderText), NULL, NULL, 0, &d3dxbufferShader, &d3dxbufferErrors);
 
     if( FAILED ( hres ) )
     {
@@ -885,27 +888,27 @@ static bool CreateSkinnedShader(LPDIRECT3DDEVICE9 d3ddev,
 void Mesh::TriGroup::CreateD3DObjects(LPDIRECT3DDEVICE9 d3ddev,
                                       Mesh* TheMesh)
 {
-    granny_mesh* GrannyMesh = TheMesh->GrannyMesh;
+    granny_mesh* TheGrannyMesh = TheMesh->GrannyMesh;
 
     // Let's get our indices in a standard 4-byte format
-    std::vector<DWORD> OriginalIndices(NumTris * 3, -1);
+    std::vector<DWORD> OriginalIndices(NumTris * 3, (DWORD)-1);
     {
-        void* MeshIndices   = GrannyGetMeshIndices(GrannyMesh);
-        const int BytesPer  = GrannyGetMeshBytesPerIndex(GrannyMesh);
+        void* MeshIndices   = GrannyGetMeshIndices(TheGrannyMesh);
+        const int BytesPer  = GrannyGetMeshBytesPerIndex(TheGrannyMesh);
         void* StartIndexPtr = ((granny_uint8*)MeshIndices) + (BytesPer * FirstTri * 3);
 
-        GrannyConvertIndices(OriginalIndices.size(),
+        GrannyConvertIndices((int)OriginalIndices.size(),
                              BytesPer, StartIndexPtr,
-                             sizeof(DWORD), &OriginalIndices[0]);
+                             (int)sizeof(DWORD), &OriginalIndices[0]);
     }
 
     // Extract the vertices. Granny will convert on the way.
-    const int OriginalNumVertices = GrannyGetMeshVertexCount(GrannyMesh);
+    const int OriginalNumVertices = GrannyGetMeshVertexCount(TheGrannyMesh);
     std::vector<MyVertex> OriginalVertices(OriginalNumVertices);
     {
         // Use the standard granny remap call to move to our vert format
         GrannyConvertVertexLayouts(OriginalNumVertices,
-                                   GrannyMesh->PrimaryVertexData->VertexType, GrannyMesh->PrimaryVertexData->Vertices,
+                                   TheGrannyMesh->PrimaryVertexData->VertexType, TheGrannyMesh->PrimaryVertexData->Vertices,
                                    MyVertexType, &OriginalVertices[0]);
     }
 
@@ -974,12 +977,12 @@ void Mesh::TriGroup::CreateD3DObjects(LPDIRECT3DDEVICE9 d3ddev,
 
                 std::vector<int>::const_iterator itr = std::find(RemapVertexToMeshBone.begin(),
                                                                  RemapVertexToMeshBone.end(),
-                                                                 OriginalBoneIndex);
-                int NewBoneIndex = itr - RemapVertexToMeshBone.begin();
+                                                                 (int)OriginalBoneIndex);
+                int NewBoneIndex = int(itr - RemapVertexToMeshBone.begin());
                 if ( NewBoneIndex == int(RemapVertexToMeshBone.size()) )
                 {
                     // Not found, so add it.
-                    NewBoneIndex = BoneRemapBuffer->size();
+                    NewBoneIndex = (int)BoneRemapBuffer->size();
                     RemapVertexToMeshBone.push_back(OriginalBoneIndex);
                     BoneRemapBuffer->push_back(ToBoneIndices[OriginalBoneIndex]);
                     //ASSERT ( BoneRemapBuffer->size() <= VSCONSTANT_MAX_BONE_COUNT );

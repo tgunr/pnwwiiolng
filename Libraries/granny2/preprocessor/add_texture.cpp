@@ -1,18 +1,17 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/add_texture.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #11 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "add_texture.h"
 #include "utilities.h"
 
-#define STBI_HEADER_FILE_ONLY
 #include "stb_image.h"
 
-#include <assert.h>
+#include <stdlib.h>
 #include <map>
 #include <string>
 #include <vector>
@@ -55,9 +54,9 @@ AddTexture(input_file*,
            granny_int32x,
            key_value_pair* KeyValues,
            granny_int32x NumKeyValues,
-           granny_memory_arena* Arena)
+           granny_memory_arena* TempArena)
 {
-    RequireKey("database", "must specify a database with \"-database <filename>\"\n");
+    RequireKey("database", "must specify a database with '-database <filename>'\n");
     char const* DatabaseName = FindFirstValueForKey(KeyValues, NumKeyValues, "database");
 
     granny_file_info Dummy;
@@ -95,7 +94,7 @@ AddTexture(input_file*,
         GrannyEncodeImage(Builder, x, y, x * 4, 1, ImageBytes);
         granny_texture *ResultingTexture =
             GrannyEndTextureInPlace(Builder,
-                                    PushArray(Arena, GrannyGetResultingTextureSize(Builder),
+                                    PushArray(TempArena, GrannyGetResultingTextureSize(Builder),
                                               granny_uint8));
         ResultingTexture->FromFileName = Filename;
         TexMap[Filename] = ResultingTexture;
@@ -108,7 +107,7 @@ AddTexture(input_file*,
     }
 
     int NumNewTextures = (int)TexMap.size();
-    granny_texture** NewTextures = PushArray(Arena, NumNewTextures, granny_texture*);
+    granny_texture** NewTextures = PushArray(TempArena, NumNewTextures, granny_texture*);
     {
         int Idx = 0;
         for (texture_map_t::iterator Itr = TexMap.begin();
@@ -116,7 +115,7 @@ AddTexture(input_file*,
         {
             NewTextures[Idx++] = Itr->second;
         }
-        assert(Idx == NumNewTextures);
+        pp_assert(Idx == NumNewTextures);
     }
 
     Info->TextureCount = NumNewTextures;
@@ -125,10 +124,26 @@ AddTexture(input_file*,
     // Write out the resulting file.  Note that we have to fake the options, since
     // WriteInfoPreserve wants -database, not -output...
     key_value_pair Pair = { "output", (char*)DatabaseName };
-    return WriteInfoPreserve(&Pair, 1, Info, File, true, true, true);
+    return WriteInfoPreserve(&Pair, 1, Info, File, true, true, true, TempArena);
 }
+
+static char const* HelpString =
+    (" AddTexture manipulates a GR2 file that represents a collection of\n"
+     " textures.  The idea is that for textures can be collected into one\n"
+     " file for simple, efficient loading.\n"
+     "\n"
+     " Note that the first time you specify a file with '-database', the\n"
+     " preprocessor will create an empty database.  AddTexture supports any\n"
+     " format loaded by stb_image.\n"
+     " \n"
+     "    preprocessor AddTexture -database textures.gr2 -add tex0.bmp\n"
+     "    preprocessor AddTexture -database textures.gr2 -add ..\\tex1.bmp\n"
+     "    preprocessor AddTexture -database textures.gr2 -add tex2.bmp\n"
+     "    preprocessor AddTexture -database textures.gr2 -add tex5.bmp -add tex6.bmp\n"
+     );
 
 // Register the commands
 static CommandRegistrar RegAddTexture(AddTexture, "AddTexture",
-                                      "Adds a texture to the file specified with '-database'");
+                                      "Adds a texture to the file specified with '-database'",
+                                      HelpString);
 

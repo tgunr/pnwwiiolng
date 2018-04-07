@@ -1,14 +1,13 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/model_mesh_bounds.cpp $
-// $DateTime: 2010/03/18 16:18:02 $
-// $Change: 25775 $
-// $Revision: #2 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
 #include <algorithm>
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -30,25 +29,14 @@ inline void UpdateMax(granny_real32* Base, granny_real32 const* New)
 }
 
 
-bool ModelMeshBounds(input_file&     InputFile,
-                     key_value_pair* KeyValues,
-                     granny_int32x   NumKeyValues,
-                     granny_memory_arena* TempArena)
+granny_file_info*
+ModelMeshBounds(char const*          OriginalFilename,
+                char const*          OutputFilename,
+                granny_file_info*    Info,
+                key_value_pair*      KeyValues,
+                granny_int32x        NumKeyValues,
+                granny_memory_arena* TempArena)
 {
-    char const* OutputFile = FindFirstValueForKey(KeyValues, NumKeyValues, "output");
-    if (OutputFile == 0)
-    {
-        ErrOut("must specify an output file with \"-output <filename>\"\n");
-        return false;
-    }
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     if (Info->ModelCount == 0)
     {
         ErrOut("this version of the command requires at least one model to work with\n");
@@ -56,7 +44,7 @@ bool ModelMeshBounds(input_file&     InputFile,
     }
 
     // We'll use this in the variant builder...
-    granny_string_table* StringTable = GrannyNewStringTable();
+    granny_string_table* StringTable = GrannyNewArenaStringTable(TempArena);
 
     for (int ModelIdx = 0; ModelIdx < Info->ModelCount; ++ModelIdx)
     {
@@ -121,31 +109,13 @@ bool ModelMeshBounds(input_file&     InputFile,
         }
     }
 
-    // Write out the file, we're done!
-    granny_int32x FinalSectionCount = InputFile.GrannyFile->SectionCount;
-    granny_file_builder *Builder = GrannyBeginFile(FinalSectionCount,
-                                                   GrannyCurrentGRNStandardTag,
-                                                   GrannyGRNFileMV_ThisPlatform,
-                                                   GrannyGetTemporaryDirectory(),
-                                                   "Prefix");
-    granny_file_data_tree_writer *Writer =
-        GrannyBeginFileDataTreeWriting(GrannyFileInfoType, Info,
-                                       GrannyStandardDiscardableSection, 0);
-    GrannyPreserveFileSectionFormats(Builder, InputFile.GrannyFile);
-    GrannyPreserveObjectFileSections(Writer, InputFile.GrannyFile);
-
-    GrannyWriteDataTreeToFileBuilder(Writer, Builder);
-    GrannyEndFileDataTreeWriting(Writer);
-
-    bool const success = GrannyEndFile(Builder, OutputFile);
-
-    // Clean up the string table, now that the file has been written
+    // Since we're using an Arena-based string table, we can release it at this point, the
+    // strings are allocated into TempArena, and will remain valid.
     GrannyFreeStringTable(StringTable);
 
-    return success;
+    return Info;
 }
 
-static CommandRegistrar RegModelMeshBounds(eSingleFile_NoMultiRun,
-                                           ModelMeshBounds,
+static CommandRegistrar RegModelMeshBounds(ModelMeshBounds,
                                            "ModelMeshBounds",
-                                           "Attached bounds information for the input animation");
+                                           "Attach bounding volume information for the model's meshes");

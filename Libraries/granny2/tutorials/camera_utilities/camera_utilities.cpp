@@ -120,7 +120,7 @@ bool InitCamera()
 
                 CameraFields CameraFields;
                 GrannyConvertSingleObject(CameraStoredType, CameraObject,
-                                          CameraFieldsType, &CameraFields);
+                                          CameraFieldsType, &CameraFields, 0);
 
                 /* Ok, now we can setup the camera.
                    $-
@@ -341,7 +341,8 @@ INT WINAPI WinMain( HINSTANCE, HINSTANCE, LPSTR, INT )
         return EXIT_FAILURE;
     }
 
-    if (CreateDemoTextures() == false || CreateDemoModels() == false ||
+    if (CreateSimpleTextures(g_pD3DDevice, GlobalScene.SceneFileInfo, GlobalScene.Textures) == false ||
+        CreateSimpleModels(g_pD3DDevice, GlobalScene.SceneFileInfo, GlobalScene.Textures, GlobalScene.Models)   == false ||
         CreateSharedPoses() == false || InitCamera() == false ||
         InitLights() == false)
     {

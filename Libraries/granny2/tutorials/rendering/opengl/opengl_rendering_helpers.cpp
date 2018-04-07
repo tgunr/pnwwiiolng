@@ -1,10 +1,10 @@
 // ========================================================================
-// $File: //jeffr/granny/tutorial/rendering/opengl/opengl_rendering_helpers.cpp $
-// $DateTime: 2007/06/19 22:57:25 $
-// $Change: 15236 $
-// $Revision: #3 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "opengl_rendering.h"
 
@@ -39,10 +39,10 @@ DemoMesh::DemoMesh()
 
 DemoMesh::~DemoMesh()
 {
-	glDeleteBuffers(1, &VertexBufferObject);
-	glDeleteBuffers(1, &IndexBufferObject);
-	VertexBufferObject = 0;
-	IndexBufferObject = 0;
+    glDeleteBuffers(1, &VertexBufferObject);
+    glDeleteBuffers(1, &IndexBufferObject);
+    VertexBufferObject = 0;
+    IndexBufferObject = 0;
 
     // We don't own these
     Mesh = NULL;
@@ -83,9 +83,9 @@ DemoModel::~DemoModel()
 DemoScene::DemoScene()
   : SceneFile(NULL),
     SceneFileInfo(NULL),
+    MaxBoneCount(-1),
     SharedLocalPose(NULL),
-    SharedWorldPose(NULL),
-    MaxBoneCount(-1)
+    SharedWorldPose(NULL)
 {
     // Nada
 }

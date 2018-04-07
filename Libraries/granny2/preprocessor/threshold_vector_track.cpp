@@ -1,16 +1,15 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/threshold_vector_track.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #10 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include "utilities.h"
 
 #include <algorithm>
-#include <assert.h>
 #include <set>
 #include <stdio.h>
 #include <string>
@@ -92,24 +91,18 @@ void ThresholdVecTrack(granny_vector_track& Track,
     }
 }
 
-bool ThresholdVectorTrack(input_file& InputFile,
-                          key_value_pair* KeyValues,
-                          granny_int32x NumKeyValues,
-                          granny_memory_arena* Arena)
+granny_file_info*
+ThresholdVectorTrack(char const*          OriginalFilename,
+                     char const*          OutputFilename,
+                     granny_file_info*    Info,
+                     key_value_pair*      KeyValues,
+                     granny_int32x        NumKeyValues,
+                     granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input model file\n");
-        return false;
-    }
-
     if (Info->AnimationCount == 0)
     {
         ErrOut("File contains no animations\n");
-        return false;
+        return 0;
     }
 
     float Threshold = 0.5f;
@@ -123,7 +116,7 @@ bool ThresholdVectorTrack(input_file& InputFile,
     if (TrackName == 0)
     {
         ErrOut("must provide a name for the new track with -trackname\n");
-        return false;
+        return 0;
     }
 
     set<char const*, CIStrcmp> Tracknames;
@@ -138,29 +131,29 @@ bool ThresholdVectorTrack(input_file& InputFile,
     if (Tracknames.empty())
     {
         ErrOut("no vectortracks to threshold\n");
-        return false;
+        return 0;
     }
 
     {for (int AnimIdx = 0; AnimIdx < Info->AnimationCount; ++AnimIdx)
     {
         granny_animation* Anim = Info->Animations[AnimIdx];
-        assert(Anim);
+        pp_assert(Anim);
 
         {for(int TGIdx = 0; TGIdx < Anim->TrackGroupCount; ++TGIdx)
         {
             granny_track_group* TrackGroup = Anim->TrackGroups[TGIdx];
-            assert(TrackGroup);
+            pp_assert(TrackGroup);
 
             if (TrackGroup->VectorTrackCount == 0)
                 continue;
 
             int NumNewVecTracks = 0;
             granny_vector_track* NewVecTracks =
-                PushArray(Arena, TrackGroup->VectorTrackCount, granny_vector_track);
+                PushArray(TempArena, TrackGroup->VectorTrackCount, granny_vector_track);
 
             int NumNewTextTracks = TrackGroup->TextTrackCount + 1;
             granny_text_track* NewTextTracks =
-                PushArray(Arena, NumNewTextTracks, granny_text_track);
+                PushArray(TempArena, NumNewTextTracks, granny_text_track);
             memcpy(NewTextTracks, TrackGroup->TextTracks,
                    sizeof(granny_text_track) * TrackGroup->TextTrackCount);
 
@@ -170,7 +163,7 @@ bool ThresholdVectorTrack(input_file& InputFile,
                 if (Tracknames.find(TrackGroup->VectorTracks[VTIdx].Name) == Tracknames.end())
                 {
                     NewVecTracks[NumNewVecTracks++] = TrackGroup->VectorTracks[VTIdx];
-                    assert(NumNewVecTracks <= TrackGroup->VectorTrackCount);
+                    pp_assert(NumNewVecTracks <= TrackGroup->VectorTrackCount);
                 }
                 else
                 {
@@ -178,7 +171,7 @@ bool ThresholdVectorTrack(input_file& InputFile,
                     // put it back into the vector tracks...
                     ThresholdVecTrack(TrackGroup->VectorTracks[VTIdx],
                                       Anim->Duration, Anim->TimeStep, Threshold,
-                                      TextEntries, Arena);
+                                      TextEntries, TempArena);
                 }
             }}
 
@@ -190,7 +183,7 @@ bool ThresholdVectorTrack(input_file& InputFile,
             NewTrack.Name = TrackName;
             NewTrack.EntryCount = (granny_int32)TextEntries.size();
             NewTrack.Entries = (granny_text_track_entry*)
-                GrannyMemoryArenaPushBinary(Arena, NewTrack.EntryCount * sizeof(granny_text_track_entry),
+                GrannyMemoryArenaPushBinary(TempArena, NewTrack.EntryCount * sizeof(granny_text_track_entry),
                                             &TextEntries[0]);
 
             TrackGroup->VectorTrackCount = NumNewVecTracks;
@@ -201,12 +194,41 @@ bool ThresholdVectorTrack(input_file& InputFile,
         }}
     }}
 
-    // Write out the modified Info
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, InputFile.GrannyFile, true, true, true);
+    return Info;
 }
 
-static CommandRegistrar RegThresholdVectorTrack(eSingleFile_NoMultiRun,
-                                                ThresholdVectorTrack,
+static const char* HelpString =
+    (" ThresholdVectorTrack converts a granny_vector_track into a \n"
+
+     " granny_text_track.  Maya provides no built-in facility for creating\n"
+     " granny_text_track entities, although Granny has adopted the\n"
+     " convention that keyed Enum Attributes are text keys.  Max has the\n"
+     " Note Track, which is converted into a granny_text_track on export.\n"
+     " ThresholdVectorTrack allows you to threshold a custom attribute\n"
+     " animation into a discrete set of events.  We'll use the example of a\n"
+     " footdown track, which is setup in Maya such that 0.0 means\n"
+     " \"foot is up\" and 1.0 means \"foot is locked to the ground\".\n"
+     "\n"
+     "    preprocessor ThresholdVectorTrack run_cycle.gr2    \\\n"
+     "        -output run_cycle_event.gr2                    \\\n"
+     "        -trackname FootTrack                           \\\n"
+     "        -track l_foot_down                             \\\n"
+     "        -track -r_foot_down                            \\\n"
+     "        -threshold 0.9\n"
+     "\n"
+
+     " This will convert the granny_vector_tracks named \"l_foot_down\" and\n"
+     " \"r_foot_down\" into a single granny_text_track named \"FootTrack\".\n"
+     " It will contain events named \"l_foot_down_lo\", \"l_foot_down_hi\",\n"
+     " (and the equivalent r_foot elements) and the trigger times for each.\n"
+     " The \"_lo\" and \"_hi\" should be interpreted as signal\n"
+     " descriptions.  I.e, if l_foot_down_hi triggers, the foot has just\n"
+     " locked to the ground in this example.  The threshold parameter\n"
+     " indicates at what level in the underlying attribute the transition\n"
+     " should trigger.\n");
+
+static CommandRegistrar RegThresholdVectorTrack(ThresholdVectorTrack,
                                                 "ThresholdVectorTrack",
-                                                "Make text_tracks from vector_tracks");
+                                                "Make text_tracks from vector_tracks",
+                                                HelpString);
 

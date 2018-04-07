@@ -1,13 +1,12 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/recompress_anims_sample.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #5 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
-#include <assert.h>
 #include <stdio.h>
 #include <vector>
 
@@ -53,13 +52,19 @@ RecompressCurve(char const* ComponentName, granny_real32 Tolerance,
                 granny_data_type_definition* ConstantType,
                 granny_real32* IdentityVector)
 {
-    assert(GrannyCurveIsKeyframed(&Curve));
+    pp_assert(GrannyCurveIsKeyframed(&Curve));
 
     int KnotCount = GrannyCurveGetKnotCount(&Curve);
     int Dimension = GrannyCurveGetDimension(&Curve);
 
     vector<granny_real32> Data(KnotCount * Dimension);
+
     GrannyCurveExtractKnotValues(&Curve, 0, KnotCount, 0, &Data[0], GrannyCurveIdentityPosition);
+
+    if( AsQuats)
+    {
+      GrannyEnsureQuaternionContinuity(KnotCount, &Data[0]);
+    }
 
     granny_int32x SolverFlags =
         (GrannyBSplineSolverExtraDOFKnotZero |
@@ -100,20 +105,14 @@ RecompressCurve(char const* ComponentName, granny_real32 Tolerance,
     GrannyDeallocateBSplineSolver(Solver);
 }
 
-bool RecompressAnims(input_file&          InputFile,
-                     key_value_pair*      KeyValues,
-                     granny_int32x        NumKeyValues,
-                     granny_memory_arena* Arena)
+granny_file_info*
+RecompressAnims(char const*          OriginalFilename,
+                char const*          OutputFilename,
+                granny_file_info*    Info,
+                key_value_pair*      KeyValues,
+                granny_int32x        NumKeyValues,
+                granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     {for(int AnimIdx = 0; AnimIdx < Info->AnimationCount; ++AnimIdx)
     {
         granny_animation* Animation = Info->Animations[AnimIdx];
@@ -146,7 +145,7 @@ bool RecompressAnims(input_file&          InputFile,
                 if (GrannyCurveIsKeyframed(&Track.OrientationCurve))
                 {
                     RecompressCurve("Ori", OrientationTolerance,
-                                    Track.OrientationCurve, Animation->TimeStep, false,
+                                    Track.OrientationCurve, Animation->TimeStep, true,
                                     OrientationCurveFormats, ArrayLength(OrientationCurveFormats),
                                     GrannyCurveDataD4Constant32fType,
                                     GrannyCurveIdentityOrientation);
@@ -164,11 +163,19 @@ bool RecompressAnims(input_file&          InputFile,
         }}
     }}
 
-    // Write out the result
-    return SimpleWriteInfo(KeyValues, NumKeyValues, Info);
+    return Info;
 }
 
-static CommandRegistrar RegRecompressAnims(eSingleFile_NoMultiRun,
-                                           RecompressAnims, "RecompressAnims",
-                                           "Convert keyframe curves to compressed curves");
+static char const* HelpString =
+    (" RecompressAnims is an example command that will load a file with keyframed\n"
+     " curves, and recompress them according to pre-decided specifications.\n"
+     " It is intended to illustrate the concept only, you should create your own\n"
+     " version of the command for production use\n"
+     "\n"
+     "   preprocessor RecompressAnims anim.gr2 -output anim_proc.gr2\n");
+
+
+static CommandRegistrar RegRecompressAnims(RecompressAnims, "RecompressAnims",
+                                           "Convert keyframe curves to compressed curves",
+                                           HelpString);
 

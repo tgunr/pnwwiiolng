@@ -1,14 +1,13 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/resection_file.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #7 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
-#include <assert.h>
 
 bool ResectionFile(input_file&     InputFile,
                    key_value_pair* KeyValues,
@@ -16,13 +15,17 @@ bool ResectionFile(input_file&     InputFile,
                    granny_memory_arena* TempArena)
 {
     RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
+    char const* OutputFile = FindFirstValueForKey(KeyValues, NumKeyValues, "output");
+    pp_assert(OutputFile);
 
-    granny_file_info* FileInfo = GrannyGetFileInfo(InputFile.GrannyFile);
+    granny_file_info* FileInfo = ExtractFileInfo(InputFile);
     if (FileInfo == 0)
     {
         ErrOut("unable to obtain a granny_file_info from the input model file\n");
         return false;
     }
+
+    AttachHistoryEntry(FileInfo, TempArena);
 
     // Use the granny standard sections (granny_standard_section_index)
     granny_file_builder* Builder = GrannyBeginFile(GrannyStandardSectionCount,
@@ -30,10 +33,9 @@ bool ResectionFile(input_file&     InputFile,
                                                    GrannyGRNFileMV_ThisPlatform,
                                                    GrannyGetTemporaryDirectory(),
                                                    "Prefix");
-    granny_file_data_tree_writer* Writer =
-        GrannyBeginFileDataTreeWriting(GrannyFileInfoType, FileInfo,
-                                       GrannyStandardDiscardableSection,
-                                       GrannyStandardMainSection);
+
+    granny_file_data_tree_writer* Writer = CreateTreeWriter(OutputFile, FileInfo);
+    pp_assert(Writer);
 
     // The specific section assignments that the exporter creates by default are are as
     // follows:
@@ -122,10 +124,7 @@ bool ResectionFile(input_file&     InputFile,
     GrannyWriteDataTreeToFileBuilder(Writer, Builder);
     GrannyEndFileDataTreeWriting(Writer);
 
-    char const* OutputFile = FindFirstValueForKey(KeyValues, NumKeyValues, "output");
-	assert(OutputFile);
-
-	bool success = GrannyEndFile(Builder, OutputFile);
+    bool success = GrannyEndFile(Builder, OutputFile);
     if (!success)
     {
         ErrOut("failed to write to %s\n", OutputFile);
@@ -134,8 +133,18 @@ bool ResectionFile(input_file&     InputFile,
     return success;
 }
 
+static const char* HelpString =
+    (" ResectionFile restores default sectioning to the Granny file, which\n"
+     " can be altered by preprocessing. Where possible, object sectioning\n"
+     " is preserved in the default preprocessing commands, but for new data,\n"
+     " the intended section is unknown. This command will apply the default\n"
+     " sectioning to everything in a .gr2.\n"
+     "\n"
+     "    preprocessor ResectionFile char.gr2 -output char_sectioned.gr2\n");
+
 static CommandRegistrar RegResectionFile(eSingleFile_NoMultiRun,
                                          ResectionFile,
                                          "ResectionFile",
-                                         "Restores default sectioning to the Granny file");
+                                         "Restores default sectioning to the Granny file",
+                                         HelpString);
 

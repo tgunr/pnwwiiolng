@@ -1,13 +1,12 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/write_raw_file.cpp $
-// $DateTime: 2010/03/08 11:44:14 $
-// $Change: 25619 $
-// $Revision: #4 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <vector>
@@ -43,7 +42,7 @@ bool WriteRawFile(input_file&     InputFile,
         }
     }
 
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
+    granny_file_info* Info = ExtractFileInfo(InputFile);
     if (Info == 0)
     {
         ErrOut("unable to obtain a granny_file_info from the input file\n");
@@ -109,10 +108,10 @@ struct FlipContext
         ObjectHash(GrannyNewPointerHash()),
         TypeHash(GrannyNewPointerHash())
     {
-        assert(LittleBuffer);
-        assert(BigBuffer);
-        assert(ObjectHash);
-        assert(TypeHash);
+        pp_assert(LittleBuffer);
+        pp_assert(BigBuffer);
+        pp_assert(ObjectHash);
+        pp_assert(TypeHash);
     }
 
     ~FlipContext()
@@ -133,7 +132,7 @@ void FlipLocation16(granny_uint8* Location,
                     int NumEntries = 1)
 {
     granny_intaddrx Offset = Location - Context.LittleBuffer;
-    assert(Offset >= 0 && Offset < Context.BufferSize);
+    pp_assert(Offset >= 0 && Offset < Context.BufferSize);
 
     granny_uint16* BigLocation = (granny_uint16*)(Context.BigBuffer + Offset);
     for (int i = 0; i < NumEntries; ++i)
@@ -145,7 +144,7 @@ void FlipLocation32(granny_uint8* Location,
                     int NumEntries = 1)
 {
     granny_intaddrx Offset = Location - Context.LittleBuffer;
-    assert(Offset >= 0 && Offset < Context.BufferSize);
+    pp_assert(Offset >= 0 && Offset < Context.BufferSize);
 
     granny_uint32* BigLocation = (granny_uint32*)(Context.BigBuffer + Offset);
     for (int i = 0; i < NumEntries; ++i)
@@ -159,7 +158,7 @@ void FlipType(granny_data_type_definition* InputType,
         return;
 
     GrannyAddPointerToHash(Context.TypeHash, InputType, 0);
-    assert(sizeof(InputType->Type) == 4);
+    pp_assert(sizeof(InputType->Type) == 4);
 
     // In a type, we need to reverse just a couple of offsets.
     //  Type
@@ -176,7 +175,8 @@ void FlipType(granny_data_type_definition* InputType,
         if (InputType->ReferenceType)
         {
             granny_intaddrx Offset = ((granny_uint8*)InputType->ReferenceType) - Context.LittleBuffer;
-            assert(Offset >= 0 && Offset < Context.BufferSize);
+            pp_assert(Offset >= 0 && Offset < Context.BufferSize);
+			pp_unused(Offset);
 
             FlipType(InputType->ReferenceType, Context);
         }
@@ -185,7 +185,7 @@ void FlipType(granny_data_type_definition* InputType,
     }
 
     // Make sure to get the end member too.  Only need to flip the type for that one...
-    assert(InputType->Type == GrannyEndMember);
+    pp_assert(InputType->Type == GrannyEndMember);
     FlipLocation32((granny_uint8*)&InputType->Type, Context);
 }
 
@@ -327,7 +327,7 @@ void TraverseForFlip(granny_uint8* InputObject,
             */
             default:
             {
-assert(false);
+pp_assert(false);
                 return;
             } break;
         }
@@ -351,14 +351,14 @@ bool SwapRawEndianness(char const* Filename)
             LittleBuffer.resize(FileSize + ChunkSize);
             size_t ThisSize = fread(&LittleBuffer[FileSize], 1, ChunkSize, f);
             FileSize += ThisSize;
-            if (ThisSize != ChunkSize)
+            if ((int)ThisSize != ChunkSize)
                 break;
         }
         LittleBuffer.resize(FileSize);
 
         fclose(f);
     }
-    assert((FileSize % 4) == 0);
+    pp_assert((FileSize % 4) == 0);
 
     // Create a copy that will hold the swapped file
     vector<granny_uint8> BigBuffer = LittleBuffer;

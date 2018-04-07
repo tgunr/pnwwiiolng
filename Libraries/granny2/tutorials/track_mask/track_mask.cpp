@@ -39,11 +39,11 @@ extern DemoScene GlobalScene;
    each $bone, where they can be retrieved with $ExtractTrackMask, or manually, if you
    want.
 
-   When you need to playback an animation with a mask applied, you have to use a
-   $controlled_animation_builder to make your $control, there isn't a way to attach a
-   $track_mask to an existing $control.  As you'll see below this is a fairly
-   straightforward procedure, but if you're unsure about the API, recheck
-   $TutorialCreateControl for details on using $BeginControlledAnimation.
+   When you need to playback an animation with a mask applied, you have two options.  You
+   can use the $controlled_animation_builder to create the control with the $track_mask
+   pre-attached, or you can attach the mask to an existing $control $SetControlModelMask
+   or $SetControlTrackMask.  You might want to reprise $TutorialCreateControl for the
+   pluses and minuses of $BeginControlledAnimation versus $PlayControlledAnimation.
 
    One terminology related item you should be aware of is that Granny understands two
    types of track masks, each of which are implemented as a $track_mask object.  The first
@@ -53,9 +53,9 @@ extern DemoScene GlobalScene;
    "Track TrackMask", the weights are ordered in the same way that $(transform_track)s are
    ordered in the relevant $track_group.  In a "Model TrackMask", the weights are in the
    same order as the $(bone)s in the $(model)'s $skeleton.  When you apply the $track_mask
-   to the animation, you specify either $SetTrackGroupModelMask, or
-   $SetTrackGroupTrackMask.  The meaning of those should now be clear, but the naming
-   convention is tricky, so watch out!
+   to the animation, you specify either $SetTrackGroupModelMask/$SetControlModelMask, or
+   $SetTrackGroupTrackMask/$SetControlTrackMask.  The meaning of those should now be
+   clear, but the naming convention is tricky, so watch out!
 
    The example below is simple the code from $TutorialDX9Rendering, altered so that
    everything not relating to creating and applying the $track_mask is moved out of the
@@ -103,7 +103,8 @@ INT WINAPI WinMain( HINSTANCE, HINSTANCE, LPSTR, INT )
             return EXIT_FAILURE;
         }
 
-        if (CreateDemoTextures() == false || CreateDemoModels() == false ||
+        if (CreateSimpleTextures(g_pD3DDevice, GlobalScene.SceneFileInfo, GlobalScene.Textures) == false ||
+            CreateSimpleModels(g_pD3DDevice, GlobalScene.SceneFileInfo, GlobalScene.Textures, GlobalScene.Models, false) == false ||
             CreateSharedPoses() == false || InitCameraAndLights() == false)
         {
             return EXIT_FAILURE;
@@ -112,9 +113,9 @@ INT WINAPI WinMain( HINSTANCE, HINSTANCE, LPSTR, INT )
 
     /* Ok, this next chunk is the interesting stuff.  In the scene we're using, there are
        several models, but we're only going to work with the Pixomatic character.  We'll
-       create a track mask that selects out ust the upper body.  When we play back the
+       create a track mask that selects out just the upper body.  When we play back the
        animation, the moves for the upper body will be exactly the same as those in
-       $TutorialDX9Rendering, but the legs will stay imobile.  Normally, you'd be playing
+       $TutorialDX9Rendering, but the legs will stay immobile.  Normally, you'd be playing
        a separate animation, or running an IK chain on the legs to blend with the upper
        body, but to demonstrate the process, we'll just leave them static.
 
@@ -128,7 +129,7 @@ INT WINAPI WinMain( HINSTANCE, HINSTANCE, LPSTR, INT )
          ModelIdx < (granny_int32x)GlobalScene.Models.size();
          ++ModelIdx)
     {
-        DemoModel* Model = GlobalScene.Models[ModelIdx];
+        SimpleModel* Model = GlobalScene.Models[ModelIdx];
 
         if (_stricmp(GrannyGetSourceModel(Model->ModelInstance)->Name, "pixo:root") == 0)
         {
@@ -159,30 +160,23 @@ INT WINAPI WinMain( HINSTANCE, HINSTANCE, LPSTR, INT )
                        animation.  I want him to stand still for now, but you can
                        experiment with enabling different parts of his $skeleton.
                     */
-                    granny_int32x UpperBody; GrannyFindBoneByNameLowercase(Skeleton,
-                                                                           "pixo:upperBody", &UpperBody);
+                    granny_int32x UpperBody;
+                    GrannyFindBoneByNameLowercase(Skeleton, "pixo:upperBody", &UpperBody);
 
                     GrannySetSkeletonTrackMaskChainDownwards(TrackMask, Skeleton, UpperBody, 1.0);
                     //GrannySetSkeletonTrackMaskChainUpwards(TrackMask, Skeleton, UpperBody, 1.0);
 
-
-                    /* Since we can't use $PlayControlledAnimation, we'll use the simplest
-                       possible method for creating the $control that allows us to set a
-                       $track_mask.  Check $TutorialCreateControl for more details on this
-                       API path. */
-                    granny_controlled_animation_builder* Builder =
-                        GrannyBeginControlledAnimation(0.0f, Animation);
-
-                    GrannySetTrackGroupTarget(Builder, TrackGroupIndex, Model->ModelInstance);
+                    /* We will use the newer $SetControlModelMask API, since this allows
+                       us to use the simpler $PlayControlledAnimation API.*/
+                    granny_control* Control = GrannyPlayControlledAnimation(0, Animation,
+                                                                            Model->ModelInstance);
 
                     // Here's the key call.  Because we setup the track mask in skeleton
-                    // bone order, use the GrannySetTrackGroupModelMask function.  As
-                    // noted above, the other option here, GrannySetTrackGroupTrackMask is
-                    // for track masks ordered according to transform track order in a
-                    // track group.
-                    GrannySetTrackGroupModelMask(Builder, TrackGroupIndex, TrackMask);
-
-                    granny_control* Control = GrannyEndControlledAnimation(Builder);
+                    // bone order, use the GrannySetControlModelMask function.  As noted
+                    // above, the other option here, GrannySetControlTrackMask is for
+                    // track masks ordered according to transform track order in a track
+                    // group.
+                    GrannySetControlModelMask(Control, Model->ModelInstance, TrackMask);
 
                     /* You can safely ignore the rest of the function.  We're just going
                        to stop looking at the models now that we've set up our control,

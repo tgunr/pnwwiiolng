@@ -1,14 +1,13 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/remove_unchanging_tracks.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #11 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include "utilities.h"
-#include <assert.h>
 #include <stdio.h>
 #include <vector>
 
@@ -18,9 +17,9 @@ void CleanTrackGroup(granny_track_group* TrackGroup,
                      granny_model* Model,
                      granny_memory_arena* Arena)
 {
-    assert(TrackGroup);
-    assert(Model);
-    assert(Model->Skeleton);
+    pp_assert(TrackGroup);
+    pp_assert(Model);
+    pp_assert(Model->Skeleton);
 
     vector<granny_transform_track> RemainingTracks;
     vector<granny_real32> FinalLODs;
@@ -64,7 +63,7 @@ void CleanTrackGroup(granny_track_group* TrackGroup,
         }
     }}
 
-    if (RemainingTracks.size() != TrackGroup->TransformTrackCount)
+    if (int(RemainingTracks.size()) != TrackGroup->TransformTrackCount)
     {
         TrackGroup->TransformTrackCount = (granny_int32)RemainingTracks.size();
         TrackGroup->TransformTracks =
@@ -74,7 +73,7 @@ void CleanTrackGroup(granny_track_group* TrackGroup,
 
         if (FinalLODs.size())
         {
-            assert(FinalLODs.size() == RemainingTracks.size());
+            pp_assert(FinalLODs.size() == RemainingTracks.size());
 
             TrackGroup->TransformLODErrorCount = (granny_int32)FinalLODs.size();
             TrackGroup->TransformLODErrors =
@@ -88,7 +87,7 @@ void CleanTrackGroup(granny_track_group* TrackGroup,
 
 bool RemoveUnchangingTracks(input_file* InputFiles, granny_int32x NumInputFiles,
                             key_value_pair* KeyValues, granny_int32x NumKeyValues,
-                            granny_memory_arena* Arena)
+                            granny_memory_arena* TempArena)
 {
     RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
 
@@ -98,7 +97,7 @@ bool RemoveUnchangingTracks(input_file* InputFiles, granny_int32x NumInputFiles,
         return false;
     }
 
-    granny_file_info* ModelInfo = GrannyGetFileInfo(InputFiles[0].GrannyFile);
+    granny_file_info* ModelInfo = ExtractFileInfo(InputFiles[0]);
     if (ModelInfo == 0)
     {
         ErrOut("unable to obtain a granny_file_info from: %s\n",
@@ -107,7 +106,7 @@ bool RemoveUnchangingTracks(input_file* InputFiles, granny_int32x NumInputFiles,
     }
 
     granny_file* AnimFile = InputFiles[1].GrannyFile;
-    granny_file_info* AnimInfo = GrannyGetFileInfo(AnimFile);
+    granny_file_info* AnimInfo = ExtractFileInfo(InputFiles[1]);
     if (AnimInfo == 0)
     {
         ErrOut("unable to obtain a granny_file_info from: %s\n",
@@ -138,7 +137,7 @@ bool RemoveUnchangingTracks(input_file* InputFiles, granny_int32x NumInputFiles,
 
                 if (_stricmp(Model->Name, TrackGroup->Name) == 0)
                 {
-                    CleanTrackGroup(TrackGroup, Model, Arena);
+                    CleanTrackGroup(TrackGroup, Model, TempArena);
                     Cleaned = true;
                 }
             }}
@@ -153,9 +152,25 @@ bool RemoveUnchangingTracks(input_file* InputFiles, granny_int32x NumInputFiles,
 
 
     // Write out the modified Info
-    return WriteInfoPreserve(KeyValues, NumKeyValues, AnimInfo, AnimFile, true, true, false);
+    return WriteInfoPreserve(KeyValues, NumKeyValues, AnimInfo, AnimFile, true, true, false, TempArena);
 }
 
 
-static CommandRegistrar RegCombineElements(RemoveUnchangingTracks, "RemoveUnchangingTracks",
-                                           "Removes constant tracks from an animation that are the same as the base pose of the model");
+static const char* HelpString =
+    (" RemoveUnchangingTracks examines an animation in relation to the base\n"
+     " pose of a specified model, and removes granny_transform_tracks\n"
+     " where they are constant and match the base pose perfectly. Constant\n"
+     " tracks are quite cheap, but they are not zero-cost on disk, or at\n"
+     " runtime, and this gives you another way to squeeze performance\n"
+     "\n"
+     " Arguments are the same as 'LODCalc', the model is specified first,\n"
+     " with the animation file second.  These may be the same file.\n"
+     "\n"
+     "    preprocessor RemoveUnchangingTracks model.gr2 anim.gr2 -output anim.gr2\n"
+     "\n"
+     "    preprocessor RemoveUnchangingTracks char.gr2 char.gr2 -output char.gr2\n");
+
+static CommandRegistrar RegRemoveUnchanging(RemoveUnchangingTracks,
+                                            "RemoveUnchangingTracks",
+                                            "Removes constant tracks from an animation that are the same as the base pose of the model",
+                                            HelpString);
