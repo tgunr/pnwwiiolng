@@ -71,7 +71,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "..\\..\\WW2\\res\\WWIIOnLine.ico"
+IDR_MAINFRAME           ICON                    "..\\..\\ww2assets\\WWIIOnLine.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -162,9 +162,9 @@ BEGIN
             VALUE "Comments", "https://www.wwiionline.com/"
             VALUE "CompanyName", "Playnet, Inc. / Cornered Rat Software, LLC."
             VALUE "FileDescription", "World War II Online - Launcher"
-            VALUE "FileVersion", "0,1,1,9"
-            VALUE "InternalName", "Playgate.exe"
-            VALUE "LegalCopyright", "Copyright (C) 1999-2018, Playnet Inc"
+            VALUE "FileVersion", "0.1.1.9"
+            VALUE "InternalName", "Playgate"
+            VALUE "LegalCopyright", "© 1999-2018, Playnet Inc."
             VALUE "OriginalFilename", "Playgate.exe"
             VALUE "ProductName", "Playgate: World War II Online - Launcher"
             VALUE "ProductVersion", "0.1.1.9"

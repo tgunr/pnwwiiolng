@@ -23,8 +23,6 @@ file.cpp
 #define WW2OL_APP 1
 #define WW2OL_BETA_APP 12
 
-//  TCHAR UserDataPath[256];  //  MJH - Feburary 27, 2018.
-
 std::string fileUrlDecode(const char* src)
 {
 	char decoded[_MAX_PATH+1];
@@ -72,58 +70,38 @@ void fileInit()
 
 	LOGICAL retValue = FALSE;
 	
-/*	//  MJH - Feburary 27, 2018.  ====  START  ====
-	SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, NULL, 0, UserDataPath);
-	const TCHAR* base = registryInstallValue(_T("Version"));
-
-	if(base) {
-		lstrcat(UserDataPath, _T("\\"));
-		lstrcat(UserDataPath, base);
-	} else {
-		lstrcat(UserDataPath, _T("\\"));
-		lstrcat(UserDataPath, _T("Battleground Europe"));
-	}
-*/
 	wBuffer[0] = 0;
 	SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, NULL, 0, wBuffer);
 	regBasePath = registryInstallValue(_T("Version"));
 
-	if (regBasePath == L"")
+	if (regBasePath == L"" || regBasePath == L"Battleground Europe")
 		regBasePath = WWIIOnlineDirName;
 
 	//  Registry Path.
 	userConfigPath += wBuffer;
-	userConfigPath += L"\\";
-	userConfigPath += regBasePath;
+	userConfigPath += L"\\" + regBasePath;
 
 	//  Initialise Standard Paths.
 	retValue = fioStructureInit();
 
-	ST_userConfigPathSet = FALSE;
-
 	if (userConfigPath != L"")
 	{
 		//  Use the Registry Path FIRST.
-		
-		ST_userConfigPath = userConfigPath;
-		ST_userConfigPathSet = TRUE;
+		WW2_userConfigPath = userConfigPath;
 	}
-	else if (ST_userConfigPath != L"")
+	else if (WW2_userConfigPath != L"")
 	{
 		//  Use the Initialised Path SECOND.  All is Good.
 		//  ST_userConfigPath = ST_userConfigPath;
-		ST_userConfigPathSet = TRUE;
 	}
 	else
 	{
 		//  This should not happen - NOT Good.
-		wwiiolpath_string tmp = WWIIOnlineDirName;
-		tmp += L" - Settings.";
+		std::wstring tmp = WWIIOnlineDirName + L" - Settings.";
 
 		MessageBox(nullptr, L"Please check your Client Install.\n\nShutting down.", tmp.c_str(), MB_ICONSTOP | MB_OK);
 		exit(0);
 	}
-	//  MJH - Feburary 27, 2018.  ====  END  ======
 #endif // GREEN_INSTALL
 }
 

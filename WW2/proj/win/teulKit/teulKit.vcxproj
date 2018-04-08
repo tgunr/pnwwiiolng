@@ -268,6 +268,7 @@
     <ClInclude Include="..\..\..\src\dbug\dbug.h" />
     <ClInclude Include="..\..\..\src\dbug\dbugInternal.h" />
     <ClInclude Include="..\..\..\src\dbug\dbugWErrno.h" />
+    <ClInclude Include="..\..\..\src\fio\fiostructure.h" />
     <ClInclude Include="..\..\..\src\include\precompile_includes.h" />
     <ClInclude Include="..\..\..\src\mem\memPool.h" />
     <ClInclude Include="..\..\..\src\teul\raknetConn.h" />

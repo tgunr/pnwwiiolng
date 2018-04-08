@@ -213,12 +213,10 @@ using ModelStatsMap = map<const PoolModel*, ModelStats>;
 static ModelStatsMap modelStatsMap;
 
 #if platOS == OS_MACOS
-//  static const string		dataPath	= "/Users/ahwulf/ww2data/baseline/DATA/";  //  MJH - Feburary 27, 2018.
 static const string		BT_dataPath = "/Users/ahwulf/ww2data/baseline/DATA/";
 static const string		dtlCpfDir	= "rawTerrain/";
 static const string		sdmDir		= "Terrain/";
 #else
-//  static const string		dataPath	= "Data\\";  //  MJH - Feburary 27, 2018.
 static const string		BT_dataPath = "Data\\";
 static const string		dtlCpfDir	= "rawTerrain\\";
 static const string		sdmDir		= "Terrain\\";
@@ -1573,8 +1571,6 @@ void SuperCellTerrainData::WriteToSDM()
 		piExitProgram (_FL, "As described in terrainBuildLog.txt.");
 	}
 
-
-	//  fileName.append(dataPath + sdmDir + cellName + MERGEFILE_EXTENSION);  //  MJH - Feburary 27, 2018.
 	fileName.append(BT_dataPath + sdmDir + cellName + MERGEFILE_EXTENSION);
 
 #if DEBUG_WW2
@@ -2447,7 +2443,6 @@ SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& of
 	if(supercellX == SUPERCELL_INVALID && supercellY == SUPERCELL_INVALID)	cellName = "Default";
 	else	cellName = fileName;
 
-	//  fullFileName.append(dataPath + dtlCpfDir + cellName + TERRAINFILE_EXTENSION);  //  MJH - Feburary 27, 2018.
 	fullFileName.append(BT_dataPath + dtlCpfDir + cellName + TERRAINFILE_EXTENSION);
 
 	dtlFile = fopen(fullFileName.c_str(), "rb");
@@ -2456,7 +2451,6 @@ SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& of
 		// This can happen when a neighbor to a border cell is requested
 		cellName = "Default";
 		fullFileName.clear();
-		//  fullFileName.append(dataPath + dtlCpfDir + cellName + TERRAINFILE_EXTENSION);  //  MJH - Feburary 27, 2018.
 		fullFileName.append(BT_dataPath + dtlCpfDir + cellName + TERRAINFILE_EXTENSION);
 		dtlFile = fopen(fullFileName.c_str(), "rb");
 
@@ -2791,7 +2785,6 @@ void BuildTerrain(bool mergeAll, short cellX, short cellY)
 	char				headerName[MAX_PATH];	trnmainGetMapName(headerName);
 	WIN32_FIND_DATAA	findData;
 	string				headerFileName	= dtlCpfDir + string(headerName) + string(".hdr");
-	//  string				searchPattern	= dataPath + string(dtlCpfDir) + string("*.dtl");  //  MJH - Feburary 27, 2018.
 	string				searchPattern = BT_dataPath + string(dtlCpfDir) + string("*.dtl");
 	HANDLE				search			= FindFirstFileA(searchPattern.c_str(), &findData);
 	DWORD				startTime		= timeGetTime();

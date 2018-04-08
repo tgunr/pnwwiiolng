@@ -39,8 +39,6 @@ static void _insertCFGType(WWIIOLXML* data, int type, const char* value);
 typedef std::unordered_map<std::string, WWIIOLXML *> PrefsData;
 static PrefsData _xmldata;
 
-//  extern TCHAR UserDataPath[256];  //  MJH - Feburary 27, 2018.
-
 /*-------------------------------------------------------------
 loadPreferences
 --------------------------------------------------------------*/
@@ -51,12 +49,7 @@ bool loadPreferences()
                              (xmlInputReadCallback)fileRead,
                              (xmlInputCloseCallback)fileClose);
 
-	//  std::wstring homepath = UserDataPath;  //  MJH - Feburary 27, 2018.
-	//  homepath += _T("\\wwiiol.xml");  //  MJH - Feburary 27, 2018.
-
-	wwiiolpath_string homePath = ST_userConfigPath;
-	homePath += L"\\";
-	homePath += GameSettingsFilename;
+	wwiiolpath_string homePath = WW2_userConfigPath + L"\\" + GameSettingsFilename;
 
 	_loadDefault();
 
@@ -64,13 +57,9 @@ bool loadPreferences()
 	
 	if(!xmlloaded)
 	{
-		//  xmlloaded = _loadXML(L"data/wwiiol.xml");  //  MJH - Feburary 27, 2018.
-		
-		wwiiolpath_string workingPath = ST_userConfigPath;
-		workingPath += L"\\DATA\\";
-		workingPath += GameSettingsFilename;
+		wwiiolpath_string workingPath = WW2_userConfigPath + L"\\DATA\\" + GameSettingsFilename;
 
-		xmlloaded = _loadXML(workingPath.c_str());  //  MJH - Feburary 27, 2018.
+		xmlloaded = _loadXML(workingPath.c_str());
 	}
 
     if(!xmlloaded || !getValue("config.authoritative"))
@@ -99,12 +88,9 @@ int region()
 	return 5;
 #endif
 #else
-	//  const TCHAR* region = registryInstallValue(_T("Region"));  //  MJH - Feburary 27, 2018.
-	//  if(region && !lstrcmp(region, L"china"))  //  MJH - Feburary 27, 2018.
-
-	wwiiolpath_string region = registryInstallValue(_T("Region"));
+	std::wstring region = registryInstallValue(_T("Region"));
 	
-	if (region != L"china")
+	if (region == L"china")
 		return 5;
 #endif // GREEN_INSTALL
 	
@@ -517,12 +503,7 @@ void _saveAsXML()
 	if ( buf == nullptr )
 		return; // ???
 
-	//  std::wstring homepath = UserDataPath;  //  MJH - Feburary 27, 2018.
-	//  homepath += _T("\\wwiiol.xml");  //  MJH - Feburary 27, 2018.
-
-	wwiiolpath_string homepath = ST_userConfigPath;
-	homepath += L"\\";
-	homepath += GameSettingsFilename;
+	wwiiolpath_string homepath = WW2_userConfigPath + L"\\" + GameSettingsFilename;
 	
 	buf->context = reinterpret_cast<void*>(fileOpenWrite(homepath.c_str()));
 	buf->writecallback = (xmlOutputWriteCallback)fileWrite;

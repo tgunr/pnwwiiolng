@@ -42,6 +42,8 @@ struct GVAR
     size_t maxLength;
 };
 
+fullpath_t DataPath[_MAX_PATH];  //  Used within mngopt.cpp.  MJH - April 8, 2018.
+
 template <typename T, size_t N>
 static constexpr size_t sizeof_a(T (&)[N]) { return N; }
 
@@ -130,6 +132,12 @@ static char* _skipFilename(const char* ptr)
 
 LOGICAL mngoptParse()
 {
+	if (DataPath[0] == 0)
+		strsafecpy(DataPath, WW2_exeDataPath.c_str());
+	
+	if (WantedDataPath == L"" && WantDataDir == TRUE)
+		WantedDataPath = DataPath;
+
 	char*	ptr;
 
 	ptr = _skipFilename(GetCommandLineA());

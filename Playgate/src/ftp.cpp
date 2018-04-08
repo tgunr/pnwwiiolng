@@ -151,7 +151,7 @@ int ftpProcess()
 			if ( AppLaunch.action == APPDL_INSTALL)
 			{
 				playgate.SetStatus(GetLoc(PATCH_EXECUTE), AppProgress);
-				if ( launchApplication(_tcharString(_fileName), _T(""), PG_exeDataPath) == false )
+				if ( launchApplication(_tcharString(_fileName), _T(""), WW2_exeWorkingPath) == false )
 				{
 					playgate.SetStatus(GetLoc(PATCH_FAILED), AppError);
 					return 0;
@@ -259,6 +259,14 @@ void download()
 	SCHAR pwdString[128];
 
 	NextState = STATE_DOWNLOAD;
+
+	wwiiolpath_string ftpLogPath = WW2_exeWorkingPath;
+	wwiiolpath_string ftpStoreToPath = WW2_exeWorkingPath;
+	wwiiolpath_string tempPath = L"";
+	SCHAR logPath[PN_MAX_PATH];
+	SCHAR storeToPath[PN_MAX_PATH];
+	unsigned int retValue;
+
 	//parse filename from URL
 	memset(_fileName,0,sizeof(_fileName));
 	memset(filePath,0,sizeof(filePath));
@@ -326,17 +334,20 @@ void download()
 	playgate.SetStatus(GetLoc(FTP_CONNECTING), AppProgress);
 
 	//Start log file
-	fceSetString(0, FCE_SET_LOG_FILE, "ftplog.txt");
+	ftpLogPath += L"\\ftplog.txt";
+	retValue = Wstring2Char(ftpLogPath, logPath, PN_MAX_PATH);
+	retValue = Wstring2Char(ftpStoreToPath, storeToPath, PN_MAX_PATH);
+
+	fceSetString(0, FCE_SET_LOG_FILE, (SCHAR *) logPath);
 	fceSetString(0, FCE_WRITE_TO_LOG , (SCHAR *) webURL);
 	fceSetString(0, FCE_WRITE_TO_LOG , (SCHAR *) ftpURL);
-	fceSetString(0, FCE_WRITE_TO_LOG , (SCHAR *) filePath);
+	fceSetString(0, FCE_WRITE_TO_LOG, (SCHAR *) storeToPath);
 	fceSetString(0, FCE_WRITE_TO_LOG , (SCHAR *) _fileName);
 
 	if(Code<0)
 	{
 		ftpStop(GetLoc(FTP_NO_CONNECT), webID, (LPARAM)ERR_FTP_CONNECT);
 		return;
-
 	}
 
 	//connect to server
@@ -348,9 +359,15 @@ void download()
 		return;
 	}
 
-	fceSetInteger(0, FCE_SET_PASSIVE, 1); 
+	fceSetInteger(0, FCE_SET_PASSIVE, 1);
 
-	sprintf(_localFileName, "%s",_fileName);
+	GetWC(_fileName, tempPath);
+	ftpStoreToPath += L"\\";
+	ftpStoreToPath += tempPath;
+
+	retValue = Wstring2Char(ftpStoreToPath, _localFileName, PN_MAX_PATH);
+
+	fceSetLocalDir(0, (SCHAR *)storeToPath);
 
 	//Check if local file exists and size
 	FileCheck(_localFileName);
@@ -424,6 +441,39 @@ static void FileCheck(const char *File2)
 	{
 		Exists = 1;
 		AppendStart = GetFileSize(hFile,nullptr);
+		fceSetInteger(0, FCE_SET_APPEND_MODE, 1);
+		fceSetInteger(0, FCE_SET_SERVER_OFFSET, AppendStart);
+		fceSetInteger(0, FCE_SET_CLIENT_OFFSET, AppendStart);
+	}
+
+	CloseHandle(hFile);
+
+	return;
+}
+
+static void FileCheck(wwiiolpath_string targetFile)
+{
+	int Exists; //1=files exists
+	HANDLE hFile;
+
+	//Check and see if file exists
+	hFile = CreateFileW(
+		targetFile.c_str(),		// file name 
+		GENERIC_READ,			// open for reading 
+		1,						// Share
+		nullptr,				// no security 
+		OPEN_EXISTING,			// existing file only 
+		FILE_ATTRIBUTE_NORMAL,	// normal file 
+		nullptr);				// no attr. template 
+
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		Exists = 0;
+	}
+	else
+	{
+		Exists = 1;
+		AppendStart = GetFileSize(hFile, nullptr);
 		fceSetInteger(0, FCE_SET_APPEND_MODE, 1);
 		fceSetInteger(0, FCE_SET_SERVER_OFFSET, AppendStart);
 		fceSetInteger(0, FCE_SET_CLIENT_OFFSET, AppendStart);

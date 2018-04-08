@@ -40,12 +40,15 @@ protected:
     void _initGlew();
     void _setVideoCard();
     void _setResolution();
+	void _getHiDPI();
+	void _setHiDPI();
     void _kill();
     void _adjustOK();
     void _adjustCancel();
     void _setNetwork();
     void _setSoundCard();
     void _saveDialogValues();
+	int getWindowsVersion();
 
 public:
     afx_msg void OnCbnSelchangeComboLanguages();
@@ -57,6 +60,7 @@ public:
     //afx_msg void OnBnClickedCheckRunSse2();
     afx_msg void OnCbnSelchangeComboNetwork();
     afx_msg void OnCbnSelchangeComboSoundCard();
+	afx_msg void OnBnClickedCheckHiDPI();
 
 private:
     CComboBox _language;
@@ -64,12 +68,20 @@ private:
     CComboBox _resolution;
     CComboBox _network;
     CComboBox _soundcard;
+	CButton _hidpi;
 
     //CButton _runsse2;
 
     CBitmap _background;
 
-    std::vector<std::wstring> displays;
+	struct videoDisplay {
+		DWORD indexNumber;
+		std::wstring deviceName;
+		std::wstring deviceString;
+		std::wstring displayName;
+	};
+
+	std::vector <videoDisplay> displayList;
 
     CFont font;
 };

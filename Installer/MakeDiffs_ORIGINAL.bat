@@ -1,0 +1,21 @@
+@echo off
+SET src="%1%"
+SET dst="%2%"
+SET out=diff
+
+.\Assets\xdelta3 -e -f -9 -s "%src%\playarc01.ww2" "%dst%\playarc01.ww2" "%out%\playarc01.ww2.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\playarc02.ww2" "%dst%\playarc02.ww2" "%out%\playarc02.ww2.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\playarc03.ww2" "%dst%\playarc03.ww2" "%out%\playarc03.ww2.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\playarc04.ww2" "%dst%\playarc04.ww2" "%out%\playarc04.ww2.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\playarc05.ww2" "%dst%\playarc05.ww2" "%out%\playarc05.ww2.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\playarc06.ww2" "%dst%\playarc06.ww2" "%out%\playarc06.ww2.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\playarc07.ww2" "%dst%\playarc07.ww2" "%out%\playarc07.ww2.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\playarc08.ww2" "%dst%\playarc08.ww2" "%out%\playarc08.ww2.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\playarc09.ww2" "%dst%\playarc09.ww2" "%out%\playarc09.ww2.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\playarc10.ww2" "%dst%\playarc10.ww2" "%out%\playarc10.ww2.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\ww2.exe"       "%dst%\ww2.exe"       "%out%\ww2.exe.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\playgate.exe"  "%dst%\playgate.exe"  "%out%\playgate.exe.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\Settings.exe"  "%dst%\Settings.exe"  "%out%\Settings.exe.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\license.rtf"   "%dst%\license.rtf"   "%out%\license.rtf.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\readme.rtf"    "%dst%\readme.rtf"    "%out%\readme.rtf.patch"
+.\Assets\xdelta3 -e -f -9 -s "%src%\DATA\playgate\tos-bg.bmp"    "%dst%\DATA\playgate\tos-bg.bmp"    "%out%\tos-bg.bmp.patch"

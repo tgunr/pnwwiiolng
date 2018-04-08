@@ -496,7 +496,15 @@ void fiodSetUserpath(bool userpath) {
 
 const fullpath_t* fiodGetPrepath()
 {
-	return use_userpath ? UserDataPath : DataPath;
+	if (WantDataDir == TRUE && WantedDataPath != L"")
+	{
+		return WantedDataPath.c_str();
+		
+	}
+	else
+	{
+		return use_userpath ? WW2_userConfigPath.c_str() : WW2_exeDataPath.c_str();
+	}
 }
 #else
 void fiodSetUserpath(bool) {}
@@ -704,6 +712,87 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	*fileList = list;
 	*numFilesInDir = numFiles;
 	SetCurrentDirectoryA(curWorkingDir);
+}
+
+UINT32
+fiodGetDirFileList_WC(wwiiolpath_string dirToSearch, std::vector<wwiiolpath_string> &fileList)
+{
+	//  Returns the number of files. 0 = no files or error.
+	UINT32 numFiles = 0;
+	UINT32 longestFileName = 0;
+	UINT32 count = 0;
+	wwiiolpath_string curWorkingDir = L"";
+
+	std::vector<wwiiolpath_string> list;
+
+	wwiiolpath_string findAllSearchSpec = L"*.*";
+
+	WIN32_FIND_DATAW findData;
+	HANDLE fileHandle = INVALID_HANDLE_VALUE;
+
+	wchar_t wBuffer[MAX_PATH + 1];
+
+	wBuffer[0] = 0;
+	GetCurrentDirectory(MAX_PATH, wBuffer);
+
+	curWorkingDir = wBuffer;
+
+	wwiiolpath_string searchDir = dirToSearch.c_str() ? dirToSearch.c_str() : L".\\";
+
+	SetCurrentDirectory(searchDir.c_str());
+
+	fileHandle = FindFirstFile(findAllSearchSpec.c_str(), &findData);
+	numFiles = 0;
+	longestFileName = 0;
+
+	if (fileHandle != INVALID_HANDLE_VALUE)
+	{
+		while (FindNextFile(fileHandle, &findData))
+		{
+			if (!(findData.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY |
+				FILE_ATTRIBUTE_HIDDEN |
+				FILE_ATTRIBUTE_SYSTEM |
+				FILE_ATTRIBUTE_OFFLINE |
+				FILE_ATTRIBUTE_TEMPORARY)))
+			{
+				numFiles++;
+
+				if (wcslen(findData.cFileName) > longestFileName)
+				{
+					longestFileName = wcslen(findData.cFileName);
+				}
+			}
+		}
+	}
+
+	if (numFiles < 1)
+	{
+		return 0;
+	}
+
+	fileHandle = FindFirstFile(findAllSearchSpec.c_str(), &findData);
+	numFiles = 0;
+
+	if (fileHandle != INVALID_HANDLE_VALUE)
+	{
+		while (FindNextFile(fileHandle, &findData))
+		{
+			if (!(findData.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY |
+				FILE_ATTRIBUTE_HIDDEN |
+				FILE_ATTRIBUTE_SYSTEM |
+				FILE_ATTRIBUTE_OFFLINE |
+				FILE_ATTRIBUTE_TEMPORARY)))
+			{
+				list.push_back(findData.cFileName);
+				numFiles++;
+			}
+		}
+	}
+
+	fileList = list;
+	SetCurrentDirectory(curWorkingDir.c_str());
+
+	return numFiles;
 }
 
 #else

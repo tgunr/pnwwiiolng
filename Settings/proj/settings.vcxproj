@@ -239,10 +239,21 @@
     <ResourceCompile Include="settings.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\ww2assets\DATA\loc\chinese\settings.dtd" />
+    <None Include="..\..\ww2assets\DATA\loc\english\mainmenu-english.strings" />
+    <None Include="..\..\ww2assets\DATA\loc\english\settings.dtd" />
+    <None Include="..\..\ww2assets\DATA\loc\french\mainmenu-french.strings" />
+    <None Include="..\..\ww2assets\DATA\loc\french\settings.dtd" />
+    <None Include="..\..\ww2assets\DATA\loc\german\mainmenu-german.strings" />
+    <None Include="..\..\ww2assets\DATA\loc\german\settings.dtd" />
+    <None Include="..\..\ww2assets\DATA\loc\italian\mainmenu-italian.strings" />
+    <None Include="..\..\ww2assets\DATA\loc\italian\settings.dtd" />
+    <None Include="..\..\ww2assets\DATA\loc\spanish\mainmenu-spanish.strings" />
+    <None Include="..\..\ww2assets\DATA\loc\spanish\settings.dtd" />
     <None Include="res\settings.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\WW2\res\WWIIOnLine.ico" />
+    <Image Include="..\..\ww2assets\WWIIOnLine.ico" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

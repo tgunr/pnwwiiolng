@@ -248,12 +248,14 @@
     <ClInclude Include="src\ww2src\PG_compiler_check.h">
       <Filter>Source Files\ww2src</Filter>
     </ClInclude>
+    <ClInclude Include="res\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Playgate.rc2">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Playgate.rc">
@@ -261,13 +263,13 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\WW2\res\WWIIOnLine.ico">
+    <Image Include="..\ww2assets\WWIIOnLine.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\bg.bmp">
+    <Image Include="..\ww2assets\DATA\playgate\bg.bmp">
       <Filter>Resource Files\Backgrounds</Filter>
     </Image>
-    <Image Include="res\tos-bg.bmp">
+    <Image Include="..\ww2assets\DATA\playgate\bg-tos.bmp">
       <Filter>Resource Files\Backgrounds</Filter>
     </Image>
   </ItemGroup>

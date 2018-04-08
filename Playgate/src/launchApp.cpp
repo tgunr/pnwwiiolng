@@ -140,7 +140,7 @@ UINT32         CurrentVer;
 #ifdef IGNORE_REGISTRY
 	// Access Window's version information for the executable.
 	TCHAR buffer[256+1];
-	if ( !GetFileVersion(buffer, sizeof(buffer), (PG_exePath + g_exeName).c_str()) ) {
+	if ( !GetFileVersion(buffer, sizeof(buffer), (WW2_exePath + g_exeName).c_str()) ) {
 		LaunchRequest.status = -1;
 		return 0;
 	}
@@ -313,10 +313,10 @@ static SINT32 _ReceiveAppLaunch(ACTION_OBJECT *Action)
 #ifdef IGNORE_REGISTRY
 	std::wstring param_pattern = L"-serverip $QUAD -serverport $PORT -serverotp $OTP -side $SESSIONID";
 	TCHAR c_params[500]; // HACK
-	_FillInParamValues(&AppLaunch, PG_exePath.c_str(), param_pattern.c_str(), c_params, sizeof(c_params) / sizeof(TCHAR));
+	_FillInParamValues(&AppLaunch, WW2_exePath.c_str(), param_pattern.c_str(), c_params, sizeof(c_params) / sizeof(TCHAR));
 	std::wstring params(c_params + (L" " + g_exeParams));
 
-	launchApplication((PG_exePath + L"/" + g_exeName).c_str(), params.c_str(), PG_exePath.c_str());
+	launchApplication((WW2_exePath + L"/" + g_exeName).c_str(), params.c_str(), WW2_exePath.c_str());
 #else
 	launchAppWin(&AppLaunch, _SavedRegistryKey);
 #endif

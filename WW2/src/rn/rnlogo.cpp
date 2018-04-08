@@ -54,10 +54,10 @@ static void _displayLogo();
 static void _playStartupMovie(const char*);
 #endif
 
-static const char* _wideSplashScreen = "data/screens/splashscreen69.bmp";
-static const char* _stdSplashScreen = "data/screens/splashscreen43.bmp";
-static const char* _wideLoadingScreen = "data/screens/loadingscreen69.bmp";
-static const char* _stdLoadingScreen = "data/screens/loadingscreen43.bmp";
+static const char* _wideSplashScreen = "screens/splashscreen69.bmp";
+static const char* _stdSplashScreen = "screens/splashscreen43.bmp";
+static const char* _wideLoadingScreen = "screens/loadingscreen69.bmp";
+static const char* _stdLoadingScreen = "screens/loadingscreen43.bmp";
 
 /************************************************************************************************
 	rnlogoInit

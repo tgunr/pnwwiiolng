@@ -65,8 +65,8 @@ _loadTOS(CRichEditCtrl* const ctrl)
 
 	try
 	{
-		std::wstring filename = PG_exeDocsPath;  //  MJH - Feburary 27, 2018.
-		filename += L"\\license.rtf";  //  MJH - Feburary 27, 2018.
+		std::wstring filename = WW2_exeDocsPath;
+		filename += L"\\license.rtf";
 		CFile cfile(filename.c_str(), CFile::modeRead);
 		EDITSTREAM es;
 		es.dwCookie = (DWORD)&cfile;

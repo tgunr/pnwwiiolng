@@ -38,8 +38,7 @@ HANDLE		hApplicationMutex;
 HANDLE		hLogonAttemptMutex;
 bool		g_tryLogonAttempt = false;
 
-//  std::wstring g_dataPath, g_exePath;      //  MJH - Feburary 27, 2018.
-std::wstring g_exeName = L"ww2.exe", g_exeParams;
+std::wstring g_exeName = L"\\ww2.exe", g_exeParams;
 
 UINT32 g_gameAppID;
 #ifndef IGNORE_REGISTRY
@@ -263,26 +262,22 @@ namespace {
 				WWII::ConvertChars(val.c_str(), g_authHostName, sizeof(g_authHostName));
 			else if (var == L"path")
 			{
-				//  MJH - Feburary 27, 2018.
 				wwiiolpath_string exePath = L"";
 
 				exePath = val;
 				if (exePath.length() == 0)
 				{
-					PG_exePath = val;
-					PG_exePathSet = true;
+					WW2_exePath = val;
 				}
 			}
 			else if ( var == L"data" )
 			{
-				//  MJH - Feburary 27, 2018.
 				wwiiolpath_string exePlayarcPath = L"";
 
 				exePlayarcPath = val;
 				if (exePlayarcPath.length() == 0)
 				{
-					PG_exePlayarcPath = val;
-					PG_exePlayarcPathSet = true;
+					WW2_exePlayarcPath = val;
 				}
 			}
 			else if ( var == L"game" )
@@ -359,16 +354,16 @@ BOOL CPlaygateApp::InitInstance()
 	teulGetHost(PLAY_GATE_VERSION, &g_playgateVersion);
 
 	// Move ourselves to the playgate home
-	if ( registryGetPaths(PG_exePath, PG_exeDataPath, PG_userConfigPath) == false )
+	if ( registryGetPaths(WW2_exePath, WW2_exeDataPath, WW2_userConfigPath) == false )
 	{
 		dbugLog(_FLA, "Unable to retrieve paths from registry.");
 		MessageBox(nullptr, GetLoc(ERROR_INSTALL), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		exit(0);
 	}
 
-	if (_tchdir(PG_exePath.c_str()) != 0)
+	if (_tchdir(WW2_exePath.c_str()) != 0)
 	{
-		MessageBox(nullptr, GetLoc(ERROR_APP_FOLDER, PG_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		MessageBox(nullptr, GetLoc(ERROR_APP_FOLDER, WW2_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		exit(0);
 	}
 
@@ -377,31 +372,9 @@ BOOL CPlaygateApp::InitInstance()
 	// Make sure it's not just or something.
 	loginData.Validate();
 
-/*	//  MJH - Feburary 27, 2018.
-
-	_tchdir(PG_exePath.c_str());
-
 	commInit();
 
-	registryGetPaths(PG_exePath, PG_exeDataPath, PG_userConfigPath);
-
-	dbugLog(_FLM, "Playgate version %s. Command Line: %s. ExePath: %ls. DataPath: %ls.", PG_COPYRIGHT, m_lpCmdLine, PG_exePath.c_str(), PG_exePlayarcPath.c_str());
-
-	if ( _tchdir(PG_exePath.c_str()) != 0 )
-	{
-		MessageBox(nullptr, GetLoc(ERROR_APP_FOLDER, PG_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
-		exit(0);
-	}
-
-	// If they've logged in before, recover the data.
-	loginData.Read();
-	// Make sure it's not just or something.
-	loginData.Validate();
-*/
-
-	commInit();
-
-	dbugLog(_FLM, "Playgate version %s. Command Line: %s. ExePath: %ls. DataPath: %ls.", PG_COPYRIGHT, m_lpCmdLine, PG_exePath.c_str(), PG_exePlayarcPath.c_str());
+	dbugLog(_FLM, "Playgate launching information:\n\nPlaygate version %s.\nCommand Line: %s.\nExePath: %ls.\nDataPath: %ls.\n\n", PG_COPYRIGHT, m_lpCmdLine, WW2_exePath.c_str(), WW2_exePlayarcPath.c_str());
 
 	pgState = PgTOS;
 
@@ -434,10 +407,10 @@ BOOL CPlaygateApp::InitInstance()
 	}
 
 	// Verify access to the data directory.
-	if ( _tchdir(PG_exeDataPath.c_str()) != 0 )
+	if ( _tchdir(WW2_exeDataPath.c_str()) != 0 )
 	{
-		dbugLog(_FLA, "Unable to access datapath [%ls]", PG_exeDataPath.c_str());
-		MessageBox(nullptr, GetLoc(ERROR_DATA_FOLDER, PG_exeDataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		dbugLog(_FLA, "Unable to access datapath [%ls]", WW2_exeDataPath.c_str());
+		MessageBox(nullptr, GetLoc(ERROR_DATA_FOLDER, WW2_exeDataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		return FALSE;
 	}
 
@@ -615,7 +588,7 @@ void CPlaygateApp::SetWindowText(CWnd* wnd, const char* text)
 
 HBITMAP pgLoadImage(const std::wstring& filename)
 {
-	std::wstring fullName(PG_exePath.begin(), PG_exePath.end());
+	std::wstring fullName(WW2_exePath.begin(), WW2_exePath.end());
 	fullName += L"\\data\\playgate\\";
 	fullName += filename;
 	return (HBITMAP)::LoadImage(hMainInstance, fullName.c_str(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);

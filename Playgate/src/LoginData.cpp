@@ -55,8 +55,7 @@ LoginData::~LoginData()
 bool
 LoginData::Read()
 {
-	//  _stprintf_s(HistoryFilePath, _T("%s\\%s"), UserDataPath.c_str(), HistoryFilename);  //  MJH - Feburary 27, 2018.
-	_stprintf_s(HistoryFilePath, _T("%s\\%s"), PG_userWorkingPath.c_str(), HistoryFilename);  //  \user -> My Documents -> bin.
+	_stprintf_s(HistoryFilePath, _T("%s\\%s"), WW2_userWorkingPath.c_str(), HistoryFilename);  //  \user -> My Documents -> bin.
 
 	int file = -1;
 	errno_t err = _tsopen_s(&file, HistoryFilePath, _O_RDONLY | _O_BINARY, _SH_DENYRW, 0);
@@ -183,7 +182,7 @@ LoginData::Write()
 		m_passMD5[0] = m_passMD5[1] = 0ULL;
 	}
 
-	std::wstring filename = PG_exeDataPath + L"\\";
+	std::wstring filename = WW2_exeDataPath + L"\\";
 	filename += HistoryFilename;
 
 	int file = -1;

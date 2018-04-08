@@ -4,10 +4,6 @@
     <Filter Include="Settings Files">
       <UniqueIdentifier>{8ae54364-4051-44b9-84d2-7b8acdd1a8c0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Settings Files\Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
-    </Filter>
     <Filter Include="Settings Files\sys">
       <UniqueIdentifier>{b0374caa-1599-49c4-b10f-ae14fe13b176}</UniqueIdentifier>
     </Filter>
@@ -34,6 +30,30 @@
     </Filter>
     <Filter Include="ww2 - src\fio">
       <UniqueIdentifier>{80b2670b-6d57-4955-895f-30c9d61c809a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{ac85e990-9984-4c4d-b5da-1bd70b32ee90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files">
+      <UniqueIdentifier>{56846703-f820-4e2b-ae42-50c165787c7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\chinese">
+      <UniqueIdentifier>{6e7d9fa5-bbff-41ca-847a-112d1ca8a898}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\english">
+      <UniqueIdentifier>{27f9f0aa-de7c-416f-8ef3-595044372705}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\french">
+      <UniqueIdentifier>{40316bc0-364f-4bb7-96c2-9da7f10dc03c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\german">
+      <UniqueIdentifier>{653d911f-9e8d-40ba-bc03-951a6bb5fa06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\italian">
+      <UniqueIdentifier>{b5c627e0-f870-4ccd-848d-412c7af2a4d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\spanish">
+      <UniqueIdentifier>{9dd4db96-c983-42fe-aa40-5a9b159538b1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -122,21 +142,54 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="settings.rc">
-      <Filter>Settings Files\Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="res\settings.rc2">
-      <Filter>Settings Files\Resource Files</Filter>
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\ww2assets\DATA\loc\chinese\settings.dtd">
+      <Filter>Resource Files\Location Files\chinese</Filter>
+    </None>
+    <None Include="..\..\ww2assets\DATA\loc\english\mainmenu-english.strings">
+      <Filter>Resource Files\Location Files\english</Filter>
+    </None>
+    <None Include="..\..\ww2assets\DATA\loc\english\settings.dtd">
+      <Filter>Resource Files\Location Files\english</Filter>
+    </None>
+    <None Include="..\..\ww2assets\DATA\loc\french\mainmenu-french.strings">
+      <Filter>Resource Files\Location Files\french</Filter>
+    </None>
+    <None Include="..\..\ww2assets\DATA\loc\french\settings.dtd">
+      <Filter>Resource Files\Location Files\french</Filter>
+    </None>
+    <None Include="..\..\ww2assets\DATA\loc\german\mainmenu-german.strings">
+      <Filter>Resource Files\Location Files\german</Filter>
+    </None>
+    <None Include="..\..\ww2assets\DATA\loc\german\settings.dtd">
+      <Filter>Resource Files\Location Files\german</Filter>
+    </None>
+    <None Include="..\..\ww2assets\DATA\loc\italian\mainmenu-italian.strings">
+      <Filter>Resource Files\Location Files\italian</Filter>
+    </None>
+    <None Include="..\..\ww2assets\DATA\loc\italian\settings.dtd">
+      <Filter>Resource Files\Location Files\italian</Filter>
+    </None>
+    <None Include="..\..\ww2assets\DATA\loc\spanish\mainmenu-spanish.strings">
+      <Filter>Resource Files\Location Files\spanish</Filter>
+    </None>
+    <None Include="..\..\ww2assets\DATA\loc\spanish\settings.dtd">
+      <Filter>Resource Files\Location Files\spanish</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\WW2\res\WWIIOnLine.ico">
-      <Filter>Settings Files\Resource Files</Filter>
-    </Image>
+    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
+    <ResourceCompile Include="settings.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\ww2assets\WWIIOnLine.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

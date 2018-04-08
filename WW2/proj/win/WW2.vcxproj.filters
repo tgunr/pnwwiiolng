@@ -152,9 +152,6 @@
     <Filter Include="wwii">
       <UniqueIdentifier>{08c462a7-8e30-4cf6-9aa3-4f066dc07981}</UniqueIdentifier>
     </Filter>
-    <Filter Include="res">
-      <UniqueIdentifier>{fbc1e2bf-537c-46ab-a015-3286467aa3a6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="physics">
       <UniqueIdentifier>{e621ff6e-56b6-4fc8-8a0b-0408ae186925}</UniqueIdentifier>
     </Filter>
@@ -2734,17 +2731,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\cursor.cur">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\WW2.rc2">
-      <Filter>res</Filter>
-    </None>
-    <None Include="res\wwii1.ico">
-      <Filter>res</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="WW2.rc" />
   </ItemGroup>
   <ItemGroup>
@@ -2754,5 +2740,12 @@
     <OMGGen Include="..\..\src\omg\omgChat.omg">
       <Filter>omg\.OMG Files</Filter>
     </OMGGen>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\ww2assets\WWIIOnLine.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\ww2assets\cursor.cur" />
+    <None Include="res\WW2.rc2.in" />
   </ItemGroup>
 </Project>

@@ -18,6 +18,7 @@
 #define NO_DEBUG_WRITE
 
 #include "include/platforms.h"
+#include "fio/fiostructure.h"
 
 #include <windows.h>
 #undef PostMessage

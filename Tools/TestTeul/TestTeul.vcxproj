@@ -166,9 +166,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\WW2\src\fio\fiostructure.cpp" />
     <ClCompile Include="..\..\WW2\src\tests\testTeul.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\WW2\src\fio\fiostructure.h" />
     <ClInclude Include="..\..\WW2\src\tests\testTeulClient.h" />
     <ClInclude Include="..\..\WW2\src\tests\testTeulServer.h" />
     <ClInclude Include="..\..\WW2\src\teul\syscfg.h" />

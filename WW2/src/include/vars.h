@@ -6,7 +6,7 @@ static_assert( platBuild != BUILD_SERVER, "Can't include vars.h in a server buil
 
 #include "pi/pi.h"
 #include "include/defs.h"
-#include "fio\fiostructure.h"    //  MJH - Feburary 27, 2018.
+#include "fio\fiostructure.h"
 
 // These are configuration variables that are filled
 // from the .CFG file. Corresponding information
@@ -175,30 +175,19 @@ extern LOGICAL			g_bSoundConvertOnLoad;// convert audio data to best format when
 
 extern LOGICAL			g_bCaptuerAllDisplays;// capture all displays or just the game display (Mac OS X only currently)
 
-//  MJH - Feburary 27, 2018. START ===========================
-extern fullpath_t		DataPath[_MAX_PATH];
-//  extern fullpath_t				UserDataPath[_MAX_PATH];
+extern wwiiolpath_string WantedDataPath;		//  SET by the command line - ENABLED by WantDataDir = True < OR > is a Nul String L"".
+extern wwiiolpath_string WWIIOnlineDirName;		//  The ROOT folder for the game install - .\WWIIOnLine
 
-extern wwiiolpath_string		WWIIOnlineDirName;		//  The ROOT folder for the game install - .\WWIIOnLine
-
-extern wwiiolpath_string WW2_exePath;			//	??_exePath - EXE ROOT folder:  \Program * Files -> WWIIOnLine == *.exe, WWIIOnLine.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
-extern wwiiolpath_string WW2_exeBinPath;		//	??_exeBinPath - EXE DLL folder:  \Program * Files -> WWIIOnLine -> bin == *.lib, steam_appid.txt.
-extern wwiiolpath_string WW2_exeDataPath;		//	??_exeDataPath - EXE Support Data folder:  \Program * Files -> WWIIOnLine -> DATA == DirectXRedist(dir), loc(dir), playgate(dir), RuntimeLibraries(dir). 
-extern wwiiolpath_string WW2_exeDocsPath;		//	??_exeDocsPath - EXE Docs Folder:  \Program * Files -> WWIIOnLine -> doc == eula.txt, license.*, regions.txt, tos.txt.
+extern wwiiolpath_string WW2_exePath;			//	??_exePath - Windows - EXE ROOT folder:  \Program * Files -> WWIIOnLine == *.exe, WWIIOnLine.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
+												//	??_exePath - macOS - EXE ROOT folder:  /Applications/WWIIOnline(package) == *.exe, WWIIOnLine.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
+extern wwiiolpath_string WW2_exeDataPath;		//	??_exeDataPath - EXE Support Data folder:  \Program * Files -> WWIIOnLine -> DATA == DirectXRedist(dir), loc(dir), playgate(dir), RuntimeLibraries(dir).
+extern wwiiolpath_string WW2_exeDocsPath;		//	??_exeDocsPath - EXE Docs Folder:  \Program * Files -> WWIIOnLine -> docs == eula.txt, license.*, regions.txt, tos.txt.
 extern wwiiolpath_string WW2_exePlayarcPath;	//	??_exePlayarcPath - EXE playarc folder:  \Program * Files -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
-extern wwiiolpath_string WW2_exeWorkingPath;	//	??_exeWorkingPath - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-extern wwiiolpath_string WW2_userConfigPath;	//	??_userConfigPath - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
+extern wwiiolpath_string WW2_exeWorkingPath;	//	??_exeWorkingPath - Windows - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+												//	??_exeWorkingPath - macOS - EXE Working folder:  /Library/Application Support//WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+extern wwiiolpath_string WW2_userConfigPath;	//	??_userConfigPath - Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
+												//	??_userConfigPath - macOS - USER Config ROOT folder:  /Users/"currentuser"/Documents/WWIIOnline == wwiiol.xml, cfml(dir).
 extern wwiiolpath_string WW2_userWorkingPath;	//	??_userWorkingPath - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
-
-extern LOGICAL WW2_exePathSet;
-extern LOGICAL WW2_exeBinPathSet;
-extern LOGICAL WW2_exeDataPathSet;
-extern LOGICAL WW2_exeDocsPathSet;
-extern LOGICAL WW2_exePlayarcPathSet;
-extern LOGICAL WW2_exeWorkingPathSet;
-extern LOGICAL WW2_userConfigPathSet;
-extern LOGICAL WW2_userWorkingPathSet;
-//  MJH - Feburary 27, 2018. END =============================
 
 extern FLOAT32			FieldOfView;		// FOV in degrees
 extern FLOAT32			HorizontalFieldOfView;

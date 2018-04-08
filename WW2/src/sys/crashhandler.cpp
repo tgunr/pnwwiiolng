@@ -714,24 +714,48 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 
 void InstallCrashHandler()
 {
-	wchar_t *basePath = nullptr;
-	HRESULT result = SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_SIMPLE_IDLIST | KF_FLAG_CREATE, nullptr, &basePath);
-
-	if (SUCCEEDED(result)) {
-		std::wstring dataPath(basePath);
-		CoTaskMemFree(basePath);
-
 		// TODO: This path should really not be hardcoded, but at current there is no correct
 		// support for a safe WW2_UserDataPath in fio. Replace with appropriate fioCfg*() call to
 		// find path the same way the rest of the app does, once the rest of the app doesn't
 		// do it completely wrong. Don't forget that mngopt and fio must be initialized before
 		// using fioCfg*() calls, so this code may have to be moved to WinMainX().
 		// This loop recursively ensures the existence of the directories along the chosen path, such as it is.
-		for (const std::wstring &component : std::vector<std::wstring>{ L"Playnet", L"World War II Online", L"Crash Logs" }) {
-			dataPath += L"\\" + component;
-			CreateDirectory(dataPath.c_str(), nullptr); // we don't care if this fails
-		}
+//		for (const std::wstring &component : std::vector<std::wstring>{ L"Playnet", L"World War II Online", L"Crash Logs" }) {
+//			dataPath += L"\\" + component;
+//			CreateDirectory(dataPath.c_str(), nullptr); // we don't care if this fails
+//		}
 
+	wwiiolpath_string crashLogPath = WW2_exeWorkingPath;
+	int returnResult = -10;
+	bool crashLogsFolderSet = false;
+
+	crashLogPath += L"\\CrashLogs";
+
+	returnResult = -10;
+	_set_errno(0);
+	returnResult = _wmkdir(crashLogPath.c_str());
+
+	if (returnResult == -1)
+	{
+		if (errno == EEXIST)
+		{
+			//  File/Directory Already Exists.
+			crashLogsFolderSet = true;
+		}
+		else
+		{
+			//  errno = ENOENT - Path was not found.
+			dbugLog(_FLW, "Crash Logs Path Creation failed.");
+			crashLogsFolderSet = false;
+		}
+	}
+	else
+	{
+		crashLogsFolderSet = true;
+	}
+
+	if (crashLogsFolderSet == true)
+	{
 		// Allocate the context for the crash handler.
 		gCrashContext = std::make_unique<CrashHandlerContext>();
 
@@ -741,17 +765,29 @@ void InstallCrashHandler()
 
 		// Breakpad is installed here. The check for "did crashes happen in the last run?" is elsewhere.
 		gCrashContext->crashHandler.reset(new google_breakpad::ExceptionHandler(
-			dataPath.c_str(), // Crash log storage path
-			nullptr, // Filter callback (none, we want all exception logs)
-			CrashReportingCallback, // Crash callback
-			gCrashContext.get(), // Callback context (pull the raw pointer)
-			google_breakpad::ExceptionHandler::HANDLER_ALL // Handler types (we want all types)
-		));
-		dbugLog(_FLN, "Installed Breakpad exception handler, now trapping crashes. Log path is %S", dataPath.c_str());
+			// Crash log storage path
+			crashLogPath.c_str(),
 
-		ProcessExistingReports(dataPath);
-	} else {
-		dbugLog(_FLM, "Failed to find %APPDATA%\\Roaming, crash handler not installed.");
+			// Filter callback (none, we want all exception logs)
+			nullptr,
+
+			// Crash callback
+			CrashReportingCallback,
+
+			// Callback context (pull the raw pointer)
+			gCrashContext.get(),
+
+			// Handler types (we want all types)
+			google_breakpad::ExceptionHandler::HANDLER_ALL
+		));
+
+		dbugLog(_FLN, "Installed Breakpad exception handler, now trapping crashes. Log path is %S", crashLogPath.c_str());
+
+		ProcessExistingReports(crashLogPath);
+	}
+	else
+	{
+		dbugLog(_FLW, "SHGetFolderPath(CSIDL_COMMON_APPDATA) failed: &HFFFF.  This should NOT happen, crash handler not installed.");
 	}
 }
 

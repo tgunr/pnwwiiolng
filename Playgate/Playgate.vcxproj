@@ -355,6 +355,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\WW2\src\fio\fiostructure.h" />
+    <ClInclude Include="res\resource.h" />
     <ClInclude Include="src\Antihack.h" />
     <ClInclude Include="src\BDialog.h" />
     <ClInclude Include="src\Label.h" />
@@ -398,7 +399,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Playgate.rc2" />
-    <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\Playgate.rc" />
@@ -415,9 +415,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\WW2\res\WWIIOnLine.ico" />
-    <Image Include="res\bg.bmp" />
-    <Image Include="res\tos-bg.bmp" />
+    <Image Include="..\ww2assets\DATA\playgate\bg-tos.bmp" />
+    <Image Include="..\ww2assets\DATA\playgate\bg.bmp" />
+    <Image Include="..\ww2assets\WWIIOnLine.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

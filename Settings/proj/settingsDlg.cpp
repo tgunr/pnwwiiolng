@@ -7,7 +7,9 @@
 #include "settings.h"
 
 #include <vector>
+#include <sstream>
 #include "settingsDlg.h"
+#include "registry.h"
 
 #include "load.h"
 #include "language.h"
@@ -24,12 +26,14 @@
 #include <GL/gl.h>
 #include "glew/wglew.h"
 
-#define WW2OL_DIR "\\Battleground Europe"
+#include <algorithm>
 
 // CsettingsDlg dialog
 static HGLRC _hrc;
 
 static int _curLanguage = 0;
+bool _runAsAdmin = false;  //  true = Settings.exe is to run with Administrator Privileges. Set from Regestry settings.
+bool _checkedHiDPI = false;
 
 CsettingsDlg::CsettingsDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CsettingsDlg::IDD, pParent)
@@ -55,20 +59,22 @@ void CsettingsDlg::DoDataExchange(CDataExchange* pDX)
 //    DDX_Control(pDX, IDC_CHECK_RUN_SSE2, _runsse2);
     DDX_Control(pDX, IDC_COMBO_NETWORK, _network);
     DDX_Control(pDX, IDC_COMBO_SOUND_CARD, _soundcard);
+	DDX_Control(pDX, IDC_CHECK_HIDPI, _hidpi);
 }
 
 BEGIN_MESSAGE_MAP(CsettingsDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
-    ON_CBN_SELCHANGE(IDC_COMBO_LANGUAGES, OnCbnSelchangeComboLanguages)
-    ON_BN_CLICKED(IDOK, OnBnClickedOk)
-ON_CBN_SELCHANGE(IDC_COMBO_VIDEO_CARD, OnCbnSelchangeComboVideoCard)
-ON_CBN_SELCHANGE(IDC_COMBO_RESOLUTION, OnCbnSelchangeComboResolution)
-ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
-//ON_BN_CLICKED(IDC_CHECK_RUN_SSE2, OnBnClickedCheckRunSse2)
-ON_CBN_SELCHANGE(IDC_COMBO_NETWORK, OnCbnSelchangeComboNetwork)
-ON_CBN_SELCHANGE(IDC_COMBO_SOUND_CARD, OnCbnSelchangeComboSoundCard)
+	ON_CBN_SELCHANGE(IDC_COMBO_LANGUAGES, OnCbnSelchangeComboLanguages)
+	ON_BN_CLICKED(IDOK, OnBnClickedOk)
+	ON_CBN_SELCHANGE(IDC_COMBO_VIDEO_CARD, OnCbnSelchangeComboVideoCard)
+	ON_CBN_SELCHANGE(IDC_COMBO_RESOLUTION, OnCbnSelchangeComboResolution)
+	ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
+	//ON_BN_CLICKED(IDC_CHECK_RUN_SSE2, OnBnClickedCheckRunSse2)
+	ON_CBN_SELCHANGE(IDC_COMBO_NETWORK, OnCbnSelchangeComboNetwork)
+	ON_CBN_SELCHANGE(IDC_COMBO_SOUND_CARD, OnCbnSelchangeComboSoundCard)
+	ON_BN_CLICKED(IDC_CHECK_HIDPI, OnBnClickedCheckHiDPI)
 END_MESSAGE_MAP()
 
 
@@ -170,6 +176,10 @@ BOOL CsettingsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	wwiiolpath_string storedWorkingDir = L"";
+	wchar_t wBuffer[MAX_PATH + 1];
+	char buffer[512 + 1];
+
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
@@ -209,23 +219,31 @@ BOOL CsettingsDlg::OnInitDialog()
     GetDlgItem(IDC_STATIC_RESOLUTION)->SetFont(&font);
     GetDlgItem(IDC_STATIC_SOUND)->SetFont(&font);
     GetDlgItem(IDC_STATIC_SOUND_CARD)->SetFont(&font);
+	GetDlgItem(IDC_STATIC_OPTIONS)->SetFont(&font);
+	GetDlgItem(IDC_CHECK_HIDPI)->SetFont(&font);
 //    GetDlgItem(IDC_CHECK_RUN_SSE2)->SetFont(&font);
 
 	fileInit();
 
-	char buffer[512+1];
+	wBuffer[0] = 0;
+	GetCurrentDirectory(MAX_PATH, wBuffer);
+	storedWorkingDir = wBuffer;
+
+	SetCurrentDirectory(WW2_exeDataPath.c_str());
 
 	for(int i = 0; i < MAX_LANGUAGES; i++)
 	{
-		sprintf_s(buffer, 512, "data/loc/%s/settings.dtd", langNames[i]);
+		sprintf_s(buffer, 512, "loc/%s/settings.dtd", langNames[i]);
 
 		if(!langInit(i, buffer))
 	    {
             // Default to English
-		    sprintf_s(buffer, 512, "data/loc/%s/settings.dtd", langNames[i]);
+			sprintf_s(buffer, 512, "loc/%s/settings.dtd", langNames[i]);
 			langInit(i, buffer);
 		}
 	}
+
+	SetCurrentDirectory(storedWorkingDir.c_str());
 
     // Not used at the moment
 #if(0)
@@ -297,15 +315,16 @@ void CsettingsDlg::_setLanguage()
 void CsettingsDlg::_setVideoCard()
 {
     _videocard.ResetContent();
-    for ( size_t i = 0 ; i < displays.size() ; ++i ) {
-        DEVMODE dm; dm.dmSize = sizeof(dm);
-        if ( EnumDisplaySettings(displays[i].c_str(), 0, &dm) ) {
-            _videocard.InsertString(i, displays[i].c_str());
-            _videocard.SetItemData(i, (DWORD_PTR)displays[i].c_str());
-        }
-    }
 
-    // See if video card is one already in the config file.
+	for (size_t i = 0; i < displayList.size(); ++i) {
+		DEVMODE dm; dm.dmSize = sizeof(dm);
+		if (EnumDisplaySettings(displayList[i].deviceName.c_str(), 0, &dm)) {
+			_videocard.InsertString(i, displayList[i].displayName.c_str());
+			_videocard.SetItemData(i, (DWORD_PTR)displayList[i].deviceName.c_str());
+		}
+	}
+
+	// See if video card is one already in the config file.
     VALUE* value = getValue("app.video");
     
 	std::wstring str;
@@ -314,14 +333,14 @@ void CsettingsDlg::_setVideoCard()
 	
     _videocard.SetCurSel(0);
 
-    for ( size_t i = 0; i < displays.size(); ++i )
-    {
-		if ( ! str.compare(displays[i]) )
-        {
-            _videocard.SetCurSel(i);
-            break;
-        }
-    }
+	for (size_t i = 0; i < displayList.size(); ++i)
+	{
+		if (!str.compare(displayList[i].deviceName))
+		{
+			_videocard.SetCurSel(i);
+			break;
+		}
+	}
 }
 
 void CsettingsDlg::_setResolution()
@@ -342,18 +361,18 @@ void CsettingsDlg::_setResolution()
 
     int cursor = 0;
 
-    DEVMODE dm; dm.dmSize = sizeof(dm);
-    for ( DWORD i = 0 ; EnumDisplaySettings(displays[adapter].c_str(), i, &dm) ; ++i ) {
-        if ( dm.dmPelsWidth >= 800 && dm.dmPelsHeight >= 600 && dm.dmBitsPerPel >= 32 ) {
-            wsprintf(buffer, L"%dx%dx%d", dm.dmPelsWidth, dm.dmPelsHeight, dm.dmBitsPerPel);
-            if ( _resolution.FindString(0, buffer) >= 0 )
-                continue;
-            _resolution.InsertString(index, buffer);
-            if ( ! res.compare(buffer) )
-                cursor = index;
-            ++index;
-        }
-    }
+	DEVMODE dm; dm.dmSize = sizeof(dm);
+	for (DWORD i = 0; EnumDisplaySettings(displayList[adapter].deviceName.c_str(), i, &dm); ++i) {
+		if (dm.dmPelsWidth >= 800 && dm.dmPelsHeight >= 600 && dm.dmBitsPerPel >= 32) {
+			wsprintf(buffer, L"%dx%dx%d", dm.dmPelsWidth, dm.dmPelsHeight, dm.dmBitsPerPel);
+			if (_resolution.FindString(0, buffer) >= 0)
+				continue;
+			_resolution.InsertString(index, buffer);
+			if (!res.compare(buffer))
+				cursor = index;
+			++index;
+		}
+	}
 
     _resolution.SetCurSel(cursor);
 }
@@ -415,18 +434,148 @@ void CsettingsDlg::_setSoundCard()
     _soundcard.SetCurSel(cursor);
 }
 
+void CsettingsDlg::_getHiDPI()
+{
+	std::wstring Key = L"";
+	std::wstring ValueName = L"";
+	static TCHAR ValueData[256 + 1];
+	std::wstring testValue = L"";
+	std::wstring test1 = L"";
+	std::wstring test2 = L"";
+	std::wstring test3 = L"";
+
+/*  Disabled  --  MJH - Feburary 27, 2018.
+	//  Is Settings.exe running with Administrator Privileges?
+	Key = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
+	ValueName = WW2_exePath + L"\\Settings.exe";
+	ValueData[0] = 0; 
+	testValue = L"";
+
+	if (registryGetKeyVal(HKEY_CURRENT_USER, Key.c_str(), ValueName.c_str(), ValueData))
+	{
+		testValue = ValueData;
+		ValueData[0] = 0;
+		transform(testValue.begin(), testValue.end(), testValue.begin(), toupper); // tolower for lower case
+
+		test1 = L"RUNASADMIN";
+		test2 = L"~RUNASADMIN";
+		test3 = L"~ RUNASADMIN";
+
+		if (testValue.compare(test1) == 0 || testValue.compare(test2) == 0 || testValue.compare(test3) == 0)
+		{
+			//  Enable the Check Box.
+			_runAsAdmin = true;
+			GetDlgItem(IDC_CHECK_HIDPI)->EnableWindow(true);
+		}
+		else
+		{
+			//  Disable the Check Box.
+			_runAsAdmin = false;
+			GetDlgItem(IDC_CHECK_HIDPI)->EnableWindow(false);
+		}
+	}
+	else
+	{
+		//  Disable the Check Box.
+		_runAsAdmin = false;
+		GetDlgItem(IDC_CHECK_HIDPI)->EnableWindow(false);
+	}
+*/
+
+	_runAsAdmin = true;
+	GetDlgItem(IDC_CHECK_HIDPI)->EnableWindow(true);
+
+	Key = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
+	ValueName = WW2_exePath + L"\\WW2.exe";
+	ValueData[0] = 0;
+	testValue = L"";
+
+	if (registryGetKeyVal(HKEY_CURRENT_USER, Key.c_str(), ValueName.c_str(), &ValueData[0]))
+	{
+		testValue = ValueData;
+		ValueData[0] = 0;
+		transform(testValue.begin(), testValue.end(), testValue.begin(), toupper); // tolower for lower case
+
+		test1 = L"HIGHDPIAWARE";
+		test2 = L"~HIGHDPIAWARE";
+		test3 = L"~ HIGHDPIAWARE";
+
+		if (testValue.compare(test1) == 0 || testValue.compare(test2) == 0 || testValue.compare(test3) == 0)
+		{
+			//  Check Box Checked.
+			CheckDlgButton(IDC_CHECK_HIDPI, true);
+			_checkedHiDPI = true;
+		}
+		else
+		{
+			//  Check Box Un-Checked.
+			CheckDlgButton(IDC_CHECK_HIDPI, false);
+			_checkedHiDPI = false;
+		}
+	}
+	else
+	{
+		//  Check Box Un-Checked.
+		CheckDlgButton(IDC_CHECK_HIDPI, false);
+		_checkedHiDPI = false;
+	}
+}
+
+void CsettingsDlg::_setHiDPI()
+{
+	if (_runAsAdmin == false)
+		return;
+
+	std::wstring Key = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
+	std::wstring ValueName = WW2_exePath + L"\\WW2.exe";
+	TCHAR valueData[256 + 1];
+	valueData[0] = 0;
+	int currentVersion = getWindowsVersion();
+
+	if (currentVersion > 6002)  //  Windows 8 = 6.2 (6002), Windows 8.1 = 6.3 (6003).
+	{
+		wcsncpy(valueData, L"~ HIGHDPIAWARE", 256 + 1);
+	}
+	else
+	{
+		wcsncpy(valueData, L"HIGHDPIAWARE", 256 + 1);
+	}
+
+	if (_checkedHiDPI)
+	{
+		bool tmp = registrySetKeyVal(HKEY_CURRENT_USER, Key.c_str(), ValueName.c_str(), valueData);
+	}
+	else
+	{
+		bool tmp = registryDeleteKeyValue(HKEY_CURRENT_USER, Key.c_str(), ValueName.c_str());
+	}
+
+	return;
+}
+
 void CsettingsDlg::_setDialog()
 {
-    DISPLAY_DEVICE device; device.cb = sizeof(device);
+	videoDisplay tmpDisplay;
+	displayList.clear();
+	
+	DISPLAY_DEVICE device; device.cb = sizeof(device);
     for ( DWORD i = 0 ; EnumDisplayDevices(NULL, i, &device, 0) != 0 ; ++i ) {
-        displays.push_back(device.DeviceName);
+
+		tmpDisplay.indexNumber = i;
+		tmpDisplay.deviceName = device.DeviceName;
+		tmpDisplay.deviceString = device.DeviceString;
+
+		tmpDisplay.displayName = L"Display " + std::to_wstring(tmpDisplay.indexNumber + 1) + L" - " + tmpDisplay.deviceString;
+		displayList.push_back(tmpDisplay);
     }
 
-    _setLanguage();
+	_runAsAdmin = false; 
+	_setLanguage();
     _setVideoCard();
     _setResolution();
     _setSoundCard();
     _setNetwork();
+	_getHiDPI();
 
     _p_info info;
 
@@ -478,7 +627,13 @@ void CsettingsDlg::_setDialog()
     
     wnd = GetDlgItem(IDC_STATIC_SOUND_CARD);
     wnd->SetWindowText(getLoc(_curLanguage, "settings.soundcard"));
-    
+
+	wnd = GetDlgItem(IDC_STATIC_OPTIONS);
+	wnd->SetWindowText(getLoc(_curLanguage, "settings.options"));
+
+	wnd = GetDlgItem(IDC_CHECK_HIDPI);
+	wnd->SetWindowText(getLoc(_curLanguage, "settings.options.dpi"));
+	
 //    wnd = GetDlgItem(IDC_CHECK_RUN_SSE2);
 //    wnd->SetWindowText(getLoc(_curLanguage, "settings.wantsse2"));
 }
@@ -547,6 +702,7 @@ void CsettingsDlg::_saveDialogValues()
 //    OnBnClickedCheckRunSse2();
     OnCbnSelchangeComboNetwork();
     OnCbnSelchangeComboSoundCard();
+	_setHiDPI();
 }
 
 void CsettingsDlg::OnBnClickedOk()
@@ -606,6 +762,11 @@ void CsettingsDlg::OnBnClickedCheckRunSse2()
 }
 */
 
+void CsettingsDlg::OnBnClickedCheckHiDPI()
+{
+	_checkedHiDPI = _hidpi.GetCheck() ? true : false;
+}
+
 void CsettingsDlg::OnCbnSelchangeComboNetwork()
 {  
     int selection = _network.GetCurSel();
@@ -638,4 +799,57 @@ void CsettingsDlg::OnCbnSelchangeComboSoundCard()
     
     if(value)
         value->set(CW2A(ss));
+}
+
+int CsettingsDlg::getWindowsVersion()
+{
+	int returnValue = 0;
+	HKEY hKey;
+	LONG res;
+
+	int major = 0;
+	int minor = 0;
+	std::wstring pname = L"";
+	std::wstring temp = L"";
+	std::vector<std::wstring> parts;
+
+	res = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"), 0, KEY_QUERY_VALUE, &hKey);
+	if (res == ERROR_SUCCESS)
+	{
+		DWORD dwType = REG_SZ;
+		char currentVersion[300];
+		DWORD len = 300;
+		res = RegQueryValueEx(hKey, _T("CurrentVersion"), NULL, &dwType, (LPBYTE)&currentVersion, &len);
+		if (res == ERROR_SUCCESS)
+		{
+			//LPWSTR
+			//WideCharToMultiByte
+			pname = reinterpret_cast<LPWSTR>(currentVersion);
+
+			std::wstringstream wss(pname);
+			while (std::getline(wss, temp, L'.'))
+				parts.push_back(temp);
+
+			for (unsigned int it = 0; it <= parts.size(); ++it)
+			{
+				if (it == 0)
+					major = std::stoi(parts[it]); // convert to int
+				if (it == 1)
+					minor = std::stoi(parts[it]); // convert to int
+			}
+
+			returnValue = major * 1000;
+			returnValue = returnValue + minor;
+		}
+		else
+		{
+			returnValue = 0;
+		}
+	}
+	else
+	{
+		returnValue = 0;
+	}
+
+	return returnValue;
 }

@@ -37,6 +37,8 @@ extern void fiodmkdir(const char* path);
 #if platBuild == BUILD_CLIENT
 
 extern void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFiles);
+extern UINT32 fiodGetDirFileList_WC(wwiiolpath_string dirToSearch, std::vector<wwiiolpath_string> &fileList);
+
 extern void fiocfgMkDir(const char* path, bool userdir = false);
 
 #if platOS == OS_WIN32

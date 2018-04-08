@@ -6,6 +6,8 @@ enum
 };
 
 extern int fioaAddArchive(const char* archive);
+extern int fioaAddArchive(wwiiolpath_string archive);
+
 extern void fioaKill();
 
 extern int  fioaOpen(const char* filename);

@@ -17,6 +17,9 @@
     <ClCompile Include="..\..\WW2\src\tests\testTeul.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\WW2\src\fio\fiostructure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\WW2\src\teul\teulAcceptStruct.h">
@@ -50,6 +53,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\WW2\src\tests\testTeulServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\WW2\src\fio\fiostructure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

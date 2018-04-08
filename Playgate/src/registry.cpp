@@ -1,10 +1,8 @@
 #include "stdafx.h"
-#include <errno.h>    //  MJH - Feburary 27, 2018.
+#include <errno.h>
 #include "wwii/wwiiUTF.h"
 
-#define errno (*_errno())    //  MJH - Feburary 27, 2018.
-
-//  static wchar_t* WWIIOnlineDirName = _T("WWIIOnLine");    //  MJH - Feburary 27, 2018.
+#define errno (*_errno())
 
 static bool
 _tryKey(HKEY hKey, const char* SubKey, const char* Key, HKEY& RegKey, LPBYTE Value) 
@@ -79,8 +77,6 @@ static inline void _copyPathToString(const char* name, std::wstring& to, wchar_t
 bool
 registryGetPaths(std::wstring& exePath, std::wstring& exeDataPath, std::wstring& userConfigPath)
 {
-	//  Revised: MJH - Feburary 27, 2018.
-	//  bool registryGetPaths(std::wstring& exePath, std::wstring& dataPath)
 	wchar_t wBuffer[MAX_PATH+1];
 	wBuffer[0] = 0;
 
@@ -94,9 +90,9 @@ registryGetPaths(std::wstring& exePath, std::wstring& exeDataPath, std::wstring&
 
 	fioStructureInit();
 
-	exePath = PG_exePath;
-	exeDataPath = PG_exeDataPath;
-	userConfigPath = PG_userConfigPath;
+	exePath = WW2_exePath;
+	exeDataPath = WW2_exeDataPath;
+	userConfigPath = WW2_userConfigPath;
 
 	return true;
 
@@ -183,9 +179,9 @@ registryGetPaths(std::wstring& exePath, std::wstring& exeDataPath, std::wstring&
 	if (returnResult == -1)
 	{
 		//  Unable to create ProgramData directory. If the Installer (or someone else) has already created, all is ok.
-		PG_exeDataPathSet = FALSE;
+		WW2_exeDataPathSet = FALSE;
 
-		if (PG_userConfigPathSet = TRUE)
+		if (WW2_userConfigPathSet = TRUE)
 		{
 			dataPath = configPath;
 			_copyPathToString("DataPath", dataPath, L"Bin");
@@ -193,7 +189,7 @@ registryGetPaths(std::wstring& exePath, std::wstring& exeDataPath, std::wstring&
 			// make sure it exists
 			returnResult = _wmkdir(dataPath.c_str());
 			if (returnResult == 0)
-				PG_exeDataPathSet = TRUE;
+				WW2_exeDataPathSet = TRUE;
 		}
 	}
 	//  dataPath - END.

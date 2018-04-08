@@ -26,23 +26,16 @@ void fioInit()
 {
 #if platOS == OS_WIN32
 	// Default to current directory
-	std::wstring path = L".";
+	LOGICAL resultValue = FALSE;
 
-	// TODO: Switch to FOLDERID_RoamingAppData
-	wchar_t *docsPath = nullptr;
-	if ( SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_SIMPLE_IDLIST | KF_FLAG_CREATE, nullptr, &docsPath)) ) {
-		path = docsPath;
-		path += L"\\Battleground Europe\\"; // TODO: Switch to WWIIOL
-		CoTaskMemFree(docsPath);
-	}
+	resultValue = fioStructureInit();
 
-	strsafecpy(UserDataPath, path.c_str());
+	resultValue = SetCurrentDirectoryW(WW2_userConfigPath.c_str());
 
-	// Ensure our subdirectory exists
-	CreateDirectory(UserDataPath, nullptr);
 #elif platOS == OS_MACOS
 	// TODO: Need a Mac guy to verify this will work nicely
-	strsafecpy(UserDataPath, macDocumentsPath());
+	strsafecpy(WW2_userConfigPath, macDocumentsPath());
+
 #endif
 }
 
@@ -150,11 +143,16 @@ int fioOpen(const char* const filename)
 FILE* fioUserFile(const char* filename, const char* mode)
 {
 	fullpath_t path[PN_MAX_PATH];
-	WITH ( UsingUserdir() )
-		GetFullPath(path, filename);
+
+	wchar_t tmpFilename[PN_MAX_PATH];
+	wwiiolpath_string tmpPath = WW2_exeWorkingPath;
+
+	mbstowcs(tmpFilename, filename, PN_MAX_PATH);
+	tmpPath += L"\\";
+	tmpPath += tmpFilename;
 	
 #if platOS == OS_WIN32 && defined(_UNICODE)
-	return _wfopen(path, UTF16(mode));
+	return _wfopen(tmpPath.c_str(), UTF16(mode));
 #else
 	return fopen(path, mode);
 #endif
