@@ -29,7 +29,7 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Massively Multiplayer Online Game\0"
+            VALUE "Comments", "The Virtual Battlefield Does Exist . . . !\0"
             VALUE "CompanyName", "Playnet, Inc. / Cornered Rat Software, LLC.\0"
             VALUE "FileDescription", "World War II Online - Game Clinet\0"
             VALUE "FileVersion", "${PRODUCT_VERSION_VALUE_MAJOR}.${PRODUCT_VERSION_VALUE_MINOR}.${PRODUCT_VERSION_VALUE_PATCH}.${PRODUCT_VERSION_VALUE_BUILD}\0"

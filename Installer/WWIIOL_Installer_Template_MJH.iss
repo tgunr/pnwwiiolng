@@ -277,7 +277,8 @@ AppSupportURL={#InstallerSupportURL}
 AppUpdatesURL={#InstallerUpdatesURL}
 AppCopyright={#InstallerCopyright}
 UninstallDisplayIcon={app}\{#InstallerIconFileName}
-AppComments={#InstallerWebsiteURL}
+; AppComments={#InstallerWebsiteURL}
+AppComments=The Virtual Battlefield Does Exist . . . !
 
 
 ; WWIIOnline Application - Installer Variables.  =============================
@@ -404,7 +405,7 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalSettings}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalSettings}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 Name: "hiDPIMonitor"; Description: "{cm:HiDPISettings}"; GroupDescription: "{cm:AdditionalSettings}"
-Name: "settingsAsAdmin"; Description: "{cm:SettingsADMIN}"; GroupDescription: "{cm:AdditionalSettings}"; Flags: unchecked
+; Name: "settingsAsAdmin"; Description: "{cm:SettingsADMIN}"; GroupDescription: "{cm:AdditionalSettings}"; Flags: unchecked
 Name: "DirectXRedist"; Description: "{cm:InstallDx}"; GroupDescription: "{cm:ExtInstallers}"
 
 
@@ -441,9 +442,9 @@ Name: "DirectXRedist"; Description: "{cm:InstallDx}"; GroupDescription: "{cm:Ext
   ; InstallerBuildType == "installFull"
   ; InstallerBuildType == "installRollback"
 ;  Source: "{#CurrentFilesRoot}\bin\*"; DestDir: "{app}\bin";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion recursesubdirs
-;  Source: "{#CurrentFilesRoot}\DATA\*"; DestDir: "{app}\DATA";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion recursesubdirs
+  Source: "{#CurrentFilesRoot}\DATA\*"; DestDir: "{app}\DATA";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion recursesubdirs
   Source: "{#CurrentFilesRoot}\docs\*"; DestDir: "{app}\docs";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion recursesubdirs
-;  Source: "{#CurrentFilesRoot}\playarc\*"; DestDir: "{app}\playarc";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion recursesubdirs
+  Source: "{#CurrentFilesRoot}\playarc\*"; DestDir: "{app}\playarc";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion recursesubdirs
   Source: "{#CurrentFilesRoot}\*"; DestDir: "{app}";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion
 
 
@@ -456,7 +457,7 @@ Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFla
 ; Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSDirectXSetup}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
 
 ; Settings.exe: RUNASADMIN
-Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#WWIIOnlineProperties}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue; Tasks: settingsAsAdmin
+; Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#WWIIOnlineProperties}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue; Tasks: settingsAsAdmin
 ; Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#WWIIOnlineProperties}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue; Tasks: settingsAsAdmin
 
 #if InstallerBuildType == "installPatcher"
@@ -467,7 +468,7 @@ Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFla
 #endif
 
 ; Registry: Hi DPI display setup.
-; This settings fails. Seems to be blocked, probably by Windows UAC despite having Admin privileges - MJH.
+; The HKLM settings fails. Seems to be blocked, probably by Windows UAC despite having Admin privileges - MJH.
 Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#WWIIOnlineExe}"; ValueData: "HIGHDPIAWARE"; Flags: createvalueifdoesntexist uninsdeletevalue; Tasks: hiDPIMonitor
 ; Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#WWIIOnlineExe}"; ValueData: "~HIGHDPIAWARE"; Flags: createvalueifdoesntexist uninsdeletevalue; Tasks: hiDPIMonitor
 

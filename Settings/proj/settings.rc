@@ -118,7 +118,7 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "Comments", "https://www.wwiionline.com/"
+            VALUE "Comments", "The Virtual Battlefield Does Exist . . . !"
             VALUE "CompanyName", "Playnet, Inc. / Cornered Rat Software, LLC."
             VALUE "FileDescription", "World War II Online - Settings"
             VALUE "FileVersion", "1.1.0.0"
