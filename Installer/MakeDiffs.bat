@@ -40,26 +40,34 @@ IF NOT DEFINED outputpath (SET outputpath=.\release-candidate\diff)
 SET ww2assetspath=..\.\ww2assets
 
 @echo.
-@echo=============================
+@echo==========================================================================================================
 @echo.
-@echo Batch File Launching Directory:    %launchingdir%
+CD /D "%LaunchingDir%"
+@echo Bat File Launching Directory  :  %CD%
 @echo.
-@echo Previous Path:    %previouspath%
+
+CD /D "%previouspath%"
+@echo Previous Path    =========    :  %CD%
 @echo.
-@echo Current Path:    %currentpath%
+
+CD /D "%LaunchingDir%"
+CD /D "%currentpath%"
+@echo Current Path    ==========    :  %CD%
 @echo.
-@echo Output Path:    %outputpath%
+
+CD /D "%LaunchingDir%"
+CD /D "%outputpath%"
+@echo Output Path    ===========    :  %CD%
 @echo.
-@echo WW2 Assets Path:    %ww2assetspath%
+
+CD /D "%LaunchingDir%"
+CD /D "%ww2assetspath%"
+@echo WW2 Assets Path    =======    :  %CD%
 @echo.
-@echo=============================
+@echo==========================================================================================================
 
 @echo.
 @echo.
-
-
-rem @pause
-
 
 CD /D %launchingdir%
 @echo Current Working Directory: %CD%
@@ -80,9 +88,6 @@ CD %outputpath%
 @echo Current Working Directory: %CD%
 @echo.
 @echo.
-
-rem @echo Deleting ALL files from %outputpath%.
-rem DEL /Q *.*
 
 @echo Deleting ALL .patch files from %outputpath%.
 DEL /Q *.patch
