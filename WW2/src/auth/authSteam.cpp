@@ -133,6 +133,7 @@ static SteamLoginResult _doRequestWithParameters(nlohmann::json params) // param
 SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID)
 {
     return _doRequestWithParameters({
+        { "dispatch", "login" },
         { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
         { "arena_id", arenaID },
     });
@@ -143,7 +144,6 @@ SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicke
     return _doRequestWithParameters({
         { "dispatch", "signup" },
         { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
-        { "arena_id", arenaID },
         { "callsign", callsign },
         { "email", email },
     });
@@ -154,7 +154,6 @@ SteamLoginResult authRequestSteamEmailChange(const void *authTicket, size_t auth
     return _doRequestWithParameters({
         { "dispatch", "email" },
         { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
-        { "arena_id", arenaID },
         { "email", email },
     });
 }
