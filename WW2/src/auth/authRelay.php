@@ -44,6 +44,21 @@ define('LoginEmailInUse', 9);
 define('LoginEmailNotValidated', 10);
 define('LoginExistingUser', 11);
 
+// When debugging, parse the authSteam.h header and compare.
+if (php_sapi_name() == 'cli-server' || php_sapi_name() == 'cli') {
+    $hdr = file_get_contents(implode(DIRECTORY_SEPARATOR, [__DIR__, 'authSteam.h']));
+    preg_match('/enum class SteamLoginResponse : uint32_t \{(.+?)\n\s+INVALID/s', $hdr, $es);
+    $es = array_map("trim", explode("\n", preg_replace('/,.*$/m', '', $es[1]))); $cs = [];
+    foreach (array_filter($es) as $e) { [$k, $v] = explode(" = ", $e); $cs[$k] = $v; }
+    $lcs = array_filter(get_defined_constants(), function ($v) { return strncmp($v, "Login", 5) === 0; },
+        ARRAY_FILTER_USE_KEY); $x = array_diff(array_keys($lcs), array_keys($cs));
+    foreach ($cs as $n => $v) {
+        if (!defined($n)) { early_death("Missing authSteam.h case: {$n}\n"); }
+        if (constant($n) !== intval($v)) { early_death("Bad authSteam.h case: {$n} (want {$v})\n"); }
+    }
+    if (count($x) > 0) { early_death("Extra authSteam.h cases: " . implode(',', $x) . "\n"); }
+}
+
 ////////////////////////////////////////
 // Logging
 class dbug {
