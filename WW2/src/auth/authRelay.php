@@ -24,6 +24,9 @@ if (!extension_loaded('curl')) {
 if (!isset($_SERVER['PN_INSTALL_PATH'])) {
     early_death("Installation path configuration is required.\n");
 }
+define('PHP64', PHP_INT_SIZE == 8 ? true : false);
+define('JSON_DECODE_OPTS', PHP64 ? 0 : JSON_BIGINT_AS_STRING);
+define('JSON_ENCODE_OPTS', PHP64 ? 0 : JSON_NUMERIC_CHECK);
 
 ////////////////////////////////////////
 // Steam response code values
@@ -316,36 +319,36 @@ if (($auth_response_raw = curl_exec($auth_handle)) === false) {
 if (($auth_response_code = curl_getinfo($auth_handle, CURLINFO_HTTP_CODE)) !== 200) {
     internal_error(__LINE__, "Auth request returned HTTP error: req:%s rstat:%u res:%s", $auth_data_encoded, $auth_response_code, $auth_response_raw);
 }
-if (!is_object($auth_response = @json_decode($auth_response_raw, false, 512, JSON_BIGINT_AS_STRING))) {
+if (!is_object($auth_response = @json_decode($auth_response_raw, false, 512, JSON_DECODE_OPTS))) {
     internal_error(__LINE__, "Auth response was not valid JSON: req:%s res:%s", $auth_data_encoded, $auth_response_raw);
 }
 if (!isset($auth_response->otp)) {
     internal_error(__LINE__, "Auth response was missing OTP: req:%s res:%s", $auth_data_encoded, var_export($auth_response, true));
 }
-// if (!is_integer($auth_response->otp)) {
-//     internal_error(__LINE__, "Auth returned success response with non-integer OTP: req:%s res:%s", $auth_data_encoded, var_export($auth_response, true));
-// }
+if (PHP64 && !is_integer($auth_response->otp)) {
+    internal_error(__LINE__, "Auth returned success response with non-integer OTP: req:%s res:%s", $auth_data_encoded, var_export($auth_response, true));
+}
 if (!isset($auth_response->serverIP)) {
     internal_error(__LINE__, "Auth response was missing server IP: req:%s res:%s", $auth_data_encoded, var_export($auth_response, true));
 }
-// if (!is_integer($auth_response->serverIP)) {
-//     internal_error(__LINE__, "Auth returned success response with non-integer server IP: req:%s res:%s", $auth_data_encoded, var_export($auth_response, true));
-// }
+if (PHP64 && !is_integer($auth_response->serverIP)) {
+    internal_error(__LINE__, "Auth returned success response with non-integer server IP: req:%s res:%s", $auth_data_encoded, var_export($auth_response, true));
+}
 if (!isset($auth_response->serverPort)) {
     internal_error(__LINE__, "Auth response was missing server port: req:%s res:%s", $auth_data_encoded, var_export($auth_response, true));
 }
-// if (!is_integer($auth_response->serverPort)) {
-//     internal_error(__LINE__, "Auth returned success response with non-integer server port: req:%s res:%s", $auth_data_encoded, var_export($auth_response, true));
-// }
+if (PHP64 && !is_integer($auth_response->serverPort)) {
+    internal_error(__LINE__, "Auth returned success response with non-integer server port: req:%s res:%s", $auth_data_encoded, var_export($auth_response, true));
+}
 
 ////////////////////////////////////////
 // Final reply
 print json_encode([
     'result' => LoginSuccess,
     'arenaID' => $arena_id,
-    'otp' => strval($auth_response->otp),
-    'serverIP' => strval($auth_response->serverIP),
+    'otp' => $auth_response->otp,
+    'serverIP' => $auth_response->serverIP,
     'serverPort' => $auth_response->serverPort,
-]);
+], JSON_ENCODE_OPTS);
 
 ?>
