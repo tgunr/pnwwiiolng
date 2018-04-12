@@ -95,6 +95,7 @@ static GVAR vars[] = {
     NULL_KEY_DEF("altfont", AltFont),
     STRING_KEY_DEF("authserver", gAuthServer),
     STRING_KEY_DEF("authserverport", gAuthServerPort),
+    STRING_KEY_DEF("authrelayurl", gAuthRelayURL),
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
 #if platOS == OS_WIN32
