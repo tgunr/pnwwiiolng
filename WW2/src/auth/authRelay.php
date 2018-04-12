@@ -41,6 +41,8 @@ define('LoginUnknownError', 6);
 define('LoginEmailRequired', 7);
 define('LoginEmailInvalid', 8);
 define('LoginEmailInUse', 9);
+define('LoginEmailNotValidated', 10);
+define('LoginExistingUser', 11);
 
 ////////////////////////////////////////
 // Logging
