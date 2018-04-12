@@ -333,7 +333,7 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	if ( argc >= 2 ) {
 		email = JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
 		if ( email[0] != '\0' && IsValidEmail(email) == false ) {
-			*rval = INT_TO_JSVAL((int)SteamLoginResponse::LoginUnknownError + 1); // HACK
+			*rval = INT_TO_JSVAL((int)SteamLoginResponse::INVALID_RESPONSE_CODE - 1); // HACK
 			return JS_TRUE;
 		}
 	}
@@ -342,7 +342,7 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	if ( argc >= 3 ) {
 		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[2]));
 		if ( callsign[0] != '\0' && IsValidCallsign(callsign) == false ) {
-			*rval = INT_TO_JSVAL((int)SteamLoginResponse::LoginUnknownError + 2); // HACK
+			*rval = INT_TO_JSVAL((int)SteamLoginResponse::INVALID_RESPONSE_CODE - 2); // HACK
 			return JS_TRUE;
 		}
 	}
@@ -351,7 +351,23 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	uint32_t ticket_length;
 	HAuthTicket ticket = SteamUser()->GetAuthSessionTicket(ticket_data, array_size(ticket_data),
 	                                                       &ticket_length);
-	SteamLoginResult result = authRequestSteamLogin(ticket_data, ticket_length, arena, email, callsign);
+    
+    // TEMPORARY - Victarus, replace this!!!!
+    SteamLoginResult result = SteamLoginResponse::LoginUnknownError;
+    
+    if (callsign[0] == '\0' && email[0] == '\0') {
+        // Plain login
+        result = authRequestSteamLogin(ticket_data, ticket_length, static_cast<uint32_t>(arena));
+    } else if (callsign[0] == '\0') {
+        // Email change/verify request
+        result = authRequestSteamEmailChange(ticket_data, ticket_length, static_cast<uint32_t>(arena), email);
+    } else if (email[0] == '\0') {
+        // Callsign with no email is not a valid combo
+        *rval = INT_TO_JSVAL((int)SteamLoginResponse::INVALID_RESPONSE_CODE - 3); // hack on hack, jack
+        return JS_TRUE;
+    } else {
+        result = authRequestSteamSignup(ticket_data, ticket_length, static_cast<uint32_t>(arena), callsign, email);
+    }
 	SteamUser()->CancelAuthTicket(ticket);
 
 	if ( result.status == SteamLoginResponse::LoginSuccess )
