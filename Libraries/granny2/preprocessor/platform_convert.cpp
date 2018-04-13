@@ -1,16 +1,17 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/platform_convert.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #14 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
+#include "preprocessor_mod_support.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 GRANNY_CALLBACK(granny_uint32) IdentityMapping(void*, char const* String)
 {
@@ -18,38 +19,12 @@ GRANNY_CALLBACK(granny_uint32) IdentityMapping(void*, char const* String)
     return (granny_uint32)(granny_intaddrx)String;
 }
 
-bool PlatformConvert(input_file&     InputFile,
-                     key_value_pair* KeyValues,
-                     granny_int32x   NumKeyValues,
-                     granny_memory_arena*)
+bool GetPlatformMVFromKeyValues(key_value_pair* KeyValues,
+                                granny_int32x   NumKeyValues,
+                                granny_grn_file_magic_value& MagicValue)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file* File      = InputFile.GrannyFile;
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
-    // Default to 32le
-    bool PreserveStringMapping = false;
     granny_int32x PointerSize = 32;
     bool LittleEndian         = true;
-
-    char const* Preserve = FindFirstValueForKey(KeyValues, NumKeyValues, "remapped");
-    if (Preserve)
-    {
-        if (_stricmp(Preserve, "true") == 0)
-        {
-            PreserveStringMapping = true;
-        }
-        else if (_stricmp(Preserve, "false") != 0)
-        {
-            ErrOut("key for -remapped invalid, only \"true\"|\"false\" recognized\n");
-        }
-    }
 
     char const* PointerValue = FindFirstValueForKey(KeyValues, NumKeyValues, "pointer");
     if (PointerValue != 0)
@@ -71,7 +46,6 @@ bool PlatformConvert(input_file&     InputFile,
         }
     }
 
-    granny_grn_file_magic_value MagicValue;
     if (GrannyGetMagicValueForPlatform(PointerSize, LittleEndian, &MagicValue) == false)
     {
         ErrOut("unable to find platform (%dbit, %s-endian)\n",
@@ -79,21 +53,63 @@ bool PlatformConvert(input_file&     InputFile,
         return false;
     }
 
+    return true;
+}
+
+
+bool PlatformConvert(input_file&     InputFile,
+                     key_value_pair* KeyValues,
+                     granny_int32x   NumKeyValues,
+                     granny_memory_arena* TempArena)
+{
+    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
+
+    granny_file* File      = InputFile.GrannyFile;
+
+    // Default to 32le
+    bool PreserveStringMapping = false;
+
+    char const* Preserve = FindFirstValueForKey(KeyValues, NumKeyValues, "remapped");
+    if (Preserve)
+    {
+        if (_stricmp(Preserve, "true") == 0)
+        {
+            PreserveStringMapping = true;
+        }
+        else if (_stricmp(Preserve, "false") != 0)
+        {
+            ErrOut("key for -remapped invalid, only \"true\"|\"false\" recognized\n");
+            return false;
+        }
+    }
+
+    granny_grn_file_magic_value MagicValue;
+    if (!GetPlatformMVFromKeyValues(KeyValues, NumKeyValues, MagicValue))
+    {
+        return false;
+    }
+
     granny_int32x FinalSectionCount = File->SectionCount;
-    if (FinalSectionCount < GrannyStandardSectionCount)
-        FinalSectionCount = GrannyStandardSectionCount;
 
     // Write out the modified Info
     granny_file_builder *Builder =
         GrannyBeginFile(FinalSectionCount,
-                        GrannyCurrentGRNStandardTag,
+                        File->Header->TypeTag,  // we haven't changed this at all, actually.
                         &MagicValue,
                         GrannyGetTemporaryDirectory(),
                         "Prefix");
 
-    granny_file_data_tree_writer *Writer =
-        GrannyBeginFileDataTreeWriting(GrannyFileInfoType, Info,
-                                       GrannyStandardDiscardableSection, 0);
+    // Get this from the utility to account for mod support
+    char const* OutputFile = FindFirstValueForKey(KeyValues, NumKeyValues, "output");
+    pp_assert(OutputFile);
+
+    granny_variant RootType;
+    GrannyGetDataTreeFromFile(File, &RootType);
+
+    granny_file_data_tree_writer *Writer = CreateGenericTreeWriter(OutputFile, RootType.Type, RootType.Object);
+    pp_assert(Writer);
+
+    GrannyPreserveFileSectionFormats(Builder, InputFile.GrannyFile);
     GrannyPreserveObjectFileSections(Writer, File);
     if (PreserveStringMapping)
     {
@@ -104,8 +120,6 @@ bool PlatformConvert(input_file&     InputFile,
     GrannyWriteDataTreeToFileBuilder(Writer, Builder);
     GrannyEndFileDataTreeWriting(Writer);
 
-	char const* OutputFile = FindFirstValueForKey(KeyValues, NumKeyValues, "output");
-	assert(OutputFile);
     bool success = GrannyEndFile(Builder, OutputFile);
     if (!success)
     {
@@ -116,8 +130,21 @@ bool PlatformConvert(input_file&     InputFile,
 }
 
 
+static const char* HelpString =
+    (" PlatformConvert alters the on-disk endian and pointer-size setting\n"
+     " for a Granny file.  Files will always load on any platform, but they\n"
+     " are most efficient when the file byte ordering matches the target\n"
+     " platform.\n"
+     "\n"
+     "     preprocessor PlatformConvert file.gr2 -output file_32_be.gr2 \\\n"
+     "         -pointer 32 -endian big\n"
+     "\n"
+     "     preprocessor PlatformConvert file.gr2 -output file_64_le.gr2 \\\n"
+     "         -pointer 64 -endian little\n");
+
 static CommandRegistrar RegPlatformConvert(eSingleFile_NoMultiRun,
                                            PlatformConvert,
                                            "PlatformConvert",
-                                           "Converts the file to the specified platform.  K/V: -pointer [32|64] -endian [little|big]");
+                                           "Converts the file to the specified platform.",
+                                           HelpString);
 

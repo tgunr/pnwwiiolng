@@ -65,6 +65,7 @@
 #include "map/mapConstants.h"
 #include "map/mapHCUnitLocations.h"
 #include "map/mapPersonaUpdate.h"
+#include "miss/missionJoinRequest.h"
 #include "miss/missionMobileSpawnWaypoint.h"
 #include "miss/missLeaderChange.h"
 #include "score/scorePacket.h"
@@ -277,6 +278,34 @@ _recvAWS(ACTION_OBJECT* const a)
 	}
 
 	chatProcessAWSRequest(player, request);
+
+	return a->offset;
+}
+
+//////////////////////////////////////////////////////////////////////
+//
+
+static SINT32
+_recvJoinMission(ACTION_OBJECT* const a) {
+	REQUIRE_CLIENT_DATA_AS(Player, player);
+	MissionJoinRequest::Request request(a);
+
+	Player* target = PlayerInterface::Lookup(request.player);
+	if ( target == nullptr ) {
+		player.message(LSTR_CAUTION, LSTR_JOINMISSION_PLAYERNOTFOUND);
+	} else if ( target->playerID() == player.playerID() ) {
+		player.message(LSTR_CAUTION, LSTR_CANT_VERB_SELF, "/join");
+	} else if ( player.side() != target->side() || target->missionID() == 0 ) {
+		player.message(LSTR_CAUTION, LSTR_JOINMISSION_PLAYERNOTFOUND);
+	} else if ( target->missionID() == player.missionID() ) {
+		player.message(LSTR_CAUTION, LSTR_JOINMISSION_ALREADYONMISSION);
+	} else {
+		// HACK: Omitting squad to show we aren't related to a recruiter join. Blech.
+		MissionInvite invite(target->missionID(), target->country(), target->branch(),
+		                     target->brigadeID(), target->chatHandle(), target->squadHandle(), false);
+		MISSION_INVITE_MSG outgoing(invite);
+		outgoing.send(player.teulIndex());
+	}
 
 	return a->offset;
 }
@@ -1720,6 +1749,7 @@ chatInstallHostCallbacks()
 		REGISTER_MSG_SENDER(Chat::MISSION_INVITE_Y, MISSION_INVITE_MSG);
 		REGISTER_SENDRECV(Chat::AWS_Y, _sendAWS, _recvAWS, AWS::callback);
 		REGISTER_SENDER(Chat::HOLD_FALL_INFO_Y, _sendHoldFallInfo, HoldFallVote::s_callback);
+		REGISTER_RECEIVER(Chat::JOIN_MISSION_Y, _recvJoinMission);
 		REGISTER_SENDER(Chat::OMG_Y, _sendChatMissionStatus, Chat::MissionStatus::s_callback);
 		REGISTER_MSG_SENDER(Chat::RECRUITER_LIST_Y, RECRUITER_LIST);
 		REGISTER_RECEIVER(Chat::RECRUITER_REQUEST_Y, _recvRecruiterRequest);

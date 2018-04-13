@@ -15,7 +15,7 @@ using namespace std;
 // database that you'll want to completely ignore when you build your
 // own app on top of Granny.  This simply keeps everything very
 // straightfoward.
-char const* const GlobalSceneFilename     = "media\\pixo_final.gr2";
+char const* const GlobalSceneFilename     = "lod\\media\\pixo_final.gr2";
 
 // ---------------------------------------------------------
 // Global D3D Objects: Note that we only have a few shader
@@ -23,34 +23,14 @@ char const* const GlobalSceneFilename     = "media\\pixo_final.gr2";
 IDirect3D9*       g_pD3D = NULL;
 IDirect3DDevice9* g_pD3DDevice = NULL;
 
-IDirect3DVertexDeclaration9*  g_pVertexDecl_Rigid = NULL;
-IDirect3DVertexDeclaration9*  g_pVertexDecl_Skinned = NULL;
-
-ID3DXEffect* g_pEffect = NULL;
-D3DXHANDLE   g_RigidTechnique = NULL;
-D3DXHANDLE   g_SkinnedTechnique = NULL;
-
-D3DXHANDLE g_hMatObj2World;
-D3DXHANDLE g_hMatWorld2View;
-D3DXHANDLE g_hMatView2Clip;
-D3DXHANDLE g_hDirFromLight;
-D3DXHANDLE g_hLightColor;
-D3DXHANDLE g_hAmbientColor;
-D3DXHANDLE g_hSkinningMatrices;
-D3DXHANDLE g_hDiffuseTexture;
-
-
 // ---------------------------------------------------------
 // Win32 objects
 const char* MainWindowTitle = "DirectX9 GrannySample";
 HWND g_hwnd = NULL;
 bool GlobalRunning = false;
 
-bool CreateDemoTextures();
-bool CreateDemoModels();
 bool CreateSharedPoses();
 bool InitCameraAndLights();
-void RenderModel(DemoModel*, int, float*, float*);
 void Update(granny_real32 const CurrentTime,
             granny_real32 const DeltaTime);
 
@@ -156,7 +136,7 @@ DemoScene GlobalScene;
    RenderModel style functions, but it lets us keep all of the LOD calls in one function
    for the purposes of the tutorial.
 */
-void RenderModel(DemoModel* Model, int BufferHeight,
+void RenderModel(SimpleModel* Model, int BufferHeight,
                  float* RenderOffset, float* ComputeOffset)
 {
     /* Compute the distance from the model to the camera, and the render offset matrix */
@@ -219,95 +199,97 @@ void RenderModel(DemoModel* Model, int BufferHeight,
 
 #endif
 
-    /* Iterate across all meshes, and render.  This is exactly the same as the DX9 sample,
-       you can safely ignore everything else in this function. */
-    {for (size_t MeshIndex = 0; MeshIndex < Model->BoundMeshes.size(); ++MeshIndex)
-    {
-        DemoMesh* Mesh = Model->BoundMeshes[MeshIndex];
+    RenderSimpleModel(Model, GlobalScene.SharedWorldPose, g_pD3DDevice);
 
-        // Load the mesh's index buffer.
-        g_pD3DDevice->SetIndices(Mesh->IndexBuffer);
+    // /* Iterate across all meshes, and render.  This is exactly the same as the DX9 sample,
+    //    you can safely ignore everything else in this function. */
+    // {for (size_t MeshIndex = 0; MeshIndex < Model->BoundMeshes.size(); ++MeshIndex)
+    // {
+    //     DemoMesh* Mesh = Model->BoundMeshes[MeshIndex];
 
-        int const *ToBoneIndices =
-            GrannyGetMeshBindingToBoneIndices(Mesh->MeshBinding);
+    //     // Load the mesh's index buffer.
+    //     g_pD3DDevice->SetIndices(Mesh->IndexBuffer);
 
-        if (GrannyMeshIsRigid(Mesh->Mesh))
-        {
-            g_pEffect->SetTechnique(g_RigidTechnique);
-            g_pD3DDevice->SetVertexDeclaration( g_pVertexDecl_Rigid );
-            g_pD3DDevice->SetStreamSource(0, Mesh->VertexBuffer, 0,
-                                          sizeof(granny_pnt332_vertex));
+    //     int const *ToBoneIndices =
+    //         GrannyGetMeshBindingToBoneIndices(Mesh->MeshBinding);
 
-            __declspec(align(16)) granny_matrix_4x4 CompositeMatrix;
-            GrannyBuildIndexedCompositeBuffer(
-                GrannyGetMeshBindingToSkeleton(Mesh->MeshBinding),
-                GlobalScene.SharedWorldPose,
-                ToBoneIndices, 1,
-                &CompositeMatrix);
+    //     if (GrannyMeshIsRigid(Mesh->Mesh))
+    //     {
+    //         g_pEffect->SetTechnique(g_RigidTechnique);
+    //         g_pD3DDevice->SetVertexDeclaration( g_pVertexDecl_Rigid );
+    //         g_pD3DDevice->SetStreamSource(0, Mesh->VertexBuffer, 0,
+    //                                       sizeof(granny_pnt332_vertex));
 
-            g_pEffect->SetMatrix(g_hMatObj2World, (D3DXMATRIX const*)CompositeMatrix);
-        }
-        else
-        {
-            int const NumMeshBones = GrannyGetMeshBindingBoneCount(Mesh->MeshBinding);
-            assert(NumMeshBones <= 64);
+    //         __declspec(align(16)) granny_matrix_4x4 CompositeMatrix;
+    //         GrannyBuildIndexedCompositeBuffer(
+    //             GrannyGetMeshBindingToSkeleton(Mesh->MeshBinding),
+    //             GlobalScene.SharedWorldPose,
+    //             ToBoneIndices, 1,
+    //             &CompositeMatrix);
 
-            g_pEffect->SetTechnique(g_SkinnedTechnique);
-            g_pD3DDevice->SetVertexDeclaration( g_pVertexDecl_Skinned );
+    //         g_pEffect->SetMatrix(g_hMatObj2World, (D3DXMATRIX const*)CompositeMatrix);
+    //     }
+    //     else
+    //     {
+    //         int const NumMeshBones = GrannyGetMeshBindingBoneCount(Mesh->MeshBinding);
+    //         assert(NumMeshBones <= 64);
 
-            g_pD3DDevice->SetStreamSource(0, Mesh->VertexBuffer, 0,
-                                          sizeof(granny_pwnt3432_vertex));
+    //         g_pEffect->SetTechnique(g_SkinnedTechnique);
+    //         g_pD3DDevice->SetVertexDeclaration( g_pVertexDecl_Skinned );
 
-            __declspec(align(16)) granny_matrix_4x4 CompositeBuffer[64];
+    //         g_pD3DDevice->SetStreamSource(0, Mesh->VertexBuffer, 0,
+    //                                       sizeof(granny_pwnt3432_vertex));
 
-            GrannyBuildIndexedCompositeBuffer(
-                GrannyGetMeshBindingToSkeleton(Mesh->MeshBinding),
-                GlobalScene.SharedWorldPose,
-                ToBoneIndices, NumMeshBones,
-                CompositeBuffer);
+    //         __declspec(align(16)) granny_matrix_4x4 CompositeBuffer[64];
 
-            g_pEffect->SetMatrixArray(g_hSkinningMatrices,
-                                      (D3DXMATRIX const*)CompositeBuffer,
-                                      NumMeshBones);
-        }
+    //         GrannyBuildIndexedCompositeBuffer(
+    //             GrannyGetMeshBindingToSkeleton(Mesh->MeshBinding),
+    //             GlobalScene.SharedWorldPose,
+    //             ToBoneIndices, NumMeshBones,
+    //             CompositeBuffer);
 
-        int const VertexCount = GrannyGetMeshVertexCount(Mesh->Mesh);
-        int GroupCount = GrannyGetMeshTriangleGroupCount(Mesh->Mesh);
-        granny_tri_material_group *Group =
-            GrannyGetMeshTriangleGroups(Mesh->Mesh);
-        while(GroupCount--)
-        {
-            if(Group->MaterialIndex < int(Mesh->MaterialBindings.size()) &&
-               Mesh->MaterialBindings[Group->MaterialIndex] != NULL)
-            {
-                DemoTexture* Texture = Mesh->MaterialBindings[Group->MaterialIndex];
-                g_pEffect->SetTexture(g_hDiffuseTexture, Texture->TextureBuffer);
-            }
-            else
-            {
-                g_pEffect->SetTexture(g_hDiffuseTexture, NULL);
-            }
+    //         g_pEffect->SetMatrixArray(g_hSkinningMatrices,
+    //                                   (D3DXMATRIX const*)CompositeBuffer,
+    //                                   NumMeshBones);
+    //     }
 
-            // We know that there's only one pass, but let's be general about this
-            UINT numPasses;
-            g_pEffect->Begin(&numPasses, 0);
-            for (UINT i = 0; i < numPasses; i++)
-            {
-                g_pEffect->BeginPass(i);
+    //     int const VertexCount = GrannyGetMeshVertexCount(Mesh->Mesh);
+    //     int GroupCount = GrannyGetMeshTriangleGroupCount(Mesh->Mesh);
+    //     granny_tri_material_group *Group =
+    //         GrannyGetMeshTriangleGroups(Mesh->Mesh);
+    //     while(GroupCount--)
+    //     {
+    //         if(Group->MaterialIndex < int(Mesh->MaterialBindings.size()) &&
+    //            Mesh->MaterialBindings[Group->MaterialIndex] != NULL)
+    //         {
+    //             DemoTexture* Texture = Mesh->MaterialBindings[Group->MaterialIndex];
+    //             g_pEffect->SetTexture(g_hDiffuseTexture, Texture->TextureBuffer);
+    //         }
+    //         else
+    //         {
+    //             g_pEffect->SetTexture(g_hDiffuseTexture, NULL);
+    //         }
 
-                g_pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,
-                                                   0,
-                                                   0, VertexCount,
-                                                   3*Group->TriFirst,
-                                                   Group->TriCount);
+    //         // We know that there's only one pass, but let's be general about this
+    //         UINT numPasses;
+    //         g_pEffect->Begin(&numPasses, 0);
+    //         for (UINT i = 0; i < numPasses; i++)
+    //         {
+    //             g_pEffect->BeginPass(i);
 
-                g_pEffect->EndPass();
-            }
-            g_pEffect->End();
+    //             g_pD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST,
+    //                                                0,
+    //                                                0, VertexCount,
+    //                                                3*Group->TriFirst,
+    //                                                Group->TriCount);
 
-            ++Group;
-        }
-    }}
+    //             g_pEffect->EndPass();
+    //         }
+    //         g_pEffect->End();
+
+    //         ++Group;
+    //     }
+    // }}
 }
 
 
@@ -327,240 +309,9 @@ void Update(granny_real32 const CurrentTime,
     for (size_t Idx = 0; Idx < GlobalScene.Models.size(); Idx++)
     {
         // Set the model clock
-        DemoModel* Model = GlobalScene.Models[Idx];
+        SimpleModel* Model = GlobalScene.Models[Idx];
         GrannySetModelClock(Model->ModelInstance, CurrentTime);
     }
-}
-
-bool CreateDemoTextures()
-{
-    assert(GlobalScene.SceneFileInfo);
-    assert(g_pD3DDevice);
-
-    /* Iterate across all the textures */
-    granny_file_info* Info = GlobalScene.SceneFileInfo;
-    {for(granny_int32x TexIdx = 0; TexIdx < Info->TextureCount; ++TexIdx)
-    {
-        granny_texture* GrannyTexture = Info->Textures[TexIdx];
-        assert(GrannyTexture);
-
-        if (GrannyTexture->TextureType == GrannyColorMapTextureType &&
-            GrannyTexture->ImageCount == 1)
-        {
-            D3DFORMAT D3DTexFormat;
-            granny_pixel_layout const* GrannyTexFormat;
-            if (GrannyTextureHasAlpha(GrannyTexture))
-            {
-                D3DTexFormat = D3DFMT_A8R8G8B8;
-                GrannyTexFormat = GrannyBGRA8888PixelFormat;
-            }
-            else
-            {
-                D3DTexFormat = D3DFMT_R8G8B8;
-                GrannyTexFormat = GrannyBGR888PixelFormat;
-            }
-
-            DemoTexture* NewTex = new DemoTexture;
-            g_pD3DDevice->CreateTexture(GrannyTexture->Width, GrannyTexture->Height,
-                                        1,
-                                        0, D3DTexFormat,
-                                        D3DPOOL_MANAGED,
-                                        &NewTex->TextureBuffer, NULL);
-            if (!NewTex->TextureBuffer)
-                return false;
-
-            D3DLOCKED_RECT LockedRect;
-            NewTex->TextureBuffer->LockRect(0, &LockedRect, 0, 0);
-
-            GrannyCopyTextureImage(GrannyTexture, 0, 0,
-                                   GrannyTexFormat,
-                                   GrannyTexture->Width,
-                                   GrannyTexture->Height,
-                                   LockedRect.Pitch,
-                                   LockedRect.pBits);
-
-            NewTex->TextureBuffer->UnlockRect(0);
-
-            NewTex->Name = new char[strlen(GrannyTexture->FromFileName) + 1];
-            strcpy(NewTex->Name, GrannyTexture->FromFileName);
-
-            GlobalScene.Textures.push_back(NewTex);
-        }
-    }}
-
-    if (GlobalScene.SceneFile->SectionCount >= GrannyStandardTextureSection)
-    {
-        GrannyFreeFileSection(GlobalScene.SceneFile,
-                              GrannyStandardTextureSection);
-    }
-
-    return true;
-}
-
-DemoMesh* CreateBoundMesh(granny_mesh* GrannyMesh,
-                          granny_model_instance* ModelInstance)
-{
-    assert(GrannyMesh);
-    assert(ModelInstance);
-    assert(g_pD3DDevice);
-
-    granny_model* SourceModel = GrannyGetSourceModel(ModelInstance);
-
-    DemoMesh* NewMesh = new DemoMesh;
-    NewMesh->Mesh = GrannyMesh;
-    NewMesh->MeshBinding = GrannyNewMeshBinding(GrannyMesh,
-                                                SourceModel->Skeleton,
-                                                SourceModel->Skeleton);
-
-    {for(granny_int32x MatIdx = 0; MatIdx < GrannyMesh->MaterialBindingCount; ++MatIdx)
-    {
-        granny_material* Material = GrannyMesh->MaterialBindings[MatIdx].Material;
-        DemoTexture* Found = NULL;
-        if (Material && Material->MapCount >= 1)
-        {
-            {for(granny_int32x MapIdx = 0; MapIdx < Material->MapCount; ++MapIdx)
-            {
-                granny_material_map& Map = Material->Maps[MapIdx];
-
-                if (_stricmp(Map.Usage, "color") == 0 && Map.Material->Texture)
-                {
-                    {for(granny_uint32x i = 0; i < GlobalScene.Textures.size(); ++i)
-                    {
-                        if (_stricmp(Map.Material->Texture->FromFileName, GlobalScene.Textures[i]->Name) == 0)
-                        {
-                            Found = GlobalScene.Textures[i];
-                            break;
-                        }
-                    }}
-                }
-            }}
-        }
-
-        NewMesh->MaterialBindings.push_back(Found);
-    }}
-
-    D3DFORMAT IndexFormat;
-    int BytesPerIndex;
-    int IndexCount = GrannyGetMeshIndexCount(GrannyMesh);
-    if (GrannyGetMeshBytesPerIndex(GrannyMesh) == 2)
-    {
-        IndexFormat = D3DFMT_INDEX16;
-        BytesPerIndex = 2;
-    }
-    else
-    {
-        assert(GrannyGetMeshBytesPerIndex(GrannyMesh) == 4);
-        IndexFormat = D3DFMT_INDEX32;
-        BytesPerIndex = 4;
-    }
-
-    int const IndexBufferSize = BytesPerIndex * IndexCount;
-    g_pD3DDevice->CreateIndexBuffer(IndexBufferSize,
-                                    D3DUSAGE_WRITEONLY,
-                                    IndexFormat,
-                                    D3DPOOL_MANAGED,
-                                    &NewMesh->IndexBuffer, NULL);
-    if (NewMesh->IndexBuffer == 0)
-    {
-        delete NewMesh;
-        return NULL;
-    }
-
-    BYTE *Indices;
-    NewMesh->IndexBuffer->Lock(0, IndexBufferSize, (void**)&Indices, 0);
-    memcpy(Indices, GrannyGetMeshIndices(GrannyMesh), IndexBufferSize);
-    NewMesh->IndexBuffer->Unlock();
-
-    granny_data_type_definition* VertexFormat;
-    int VertexBufferSize;
-    if (GrannyMeshIsRigid(GrannyMesh))
-    {
-        VertexFormat = GrannyPNT332VertexType;
-        VertexBufferSize = (sizeof(granny_pnt332_vertex) *
-                            GrannyGetMeshVertexCount(GrannyMesh));
-    }
-    else
-    {
-        VertexFormat = GrannyPWNT3432VertexType;
-        VertexBufferSize = (sizeof(granny_pwnt3432_vertex) *
-                            GrannyGetMeshVertexCount(GrannyMesh));
-    }
-
-    g_pD3DDevice->CreateVertexBuffer(VertexBufferSize,
-                                     D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED,
-                                     &NewMesh->VertexBuffer, NULL);
-    if (NewMesh->VertexBuffer == 0)
-    {
-        delete NewMesh;
-        return NULL;
-    }
-
-    BYTE *Vertices;
-    NewMesh->VertexBuffer->Lock(0, VertexBufferSize, (void**)&Vertices, 0);
-    GrannyCopyMeshVertices(GrannyMesh, VertexFormat, Vertices);
-    NewMesh->VertexBuffer->Unlock();
-
-    return NewMesh;
-}
-
-bool CreateDemoModels()
-{
-    assert(GlobalScene.SceneFileInfo);
-    assert(g_pD3DDevice);
-
-    /* Iterate across all the models */
-    granny_file_info* Info = GlobalScene.SceneFileInfo;
-    {for(granny_int32x ModelIdx = 0; ModelIdx < Info->ModelCount; ++ModelIdx)
-    {
-        granny_model* GrannyModel = Info->Models[ModelIdx];
-        assert(GrannyModel);
-
-        if (GrannyModel->MeshBindingCount > 0)
-        {
-            DemoModel* NewModel = new DemoModel;
-            GlobalScene.Models.push_back(NewModel);
-
-            NewModel->ModelInstance = GrannyInstantiateModel(GrannyModel);
-            GrannyBuildCompositeTransform4x4(&GrannyModel->InitialPlacement,
-                                             NewModel->InitialMatrix);
-
-            /* Create the meshes that are bound to this model. */
-            {for(granny_int32x MeshIdx = 0;
-                 MeshIdx < GrannyModel->MeshBindingCount;
-                 ++MeshIdx)
-            {
-                granny_mesh* GrannyMesh = GrannyModel->MeshBindings[MeshIdx].Mesh;
-                assert(GrannyMesh);
-
-                DemoMesh* NewMesh = CreateBoundMesh(GrannyMesh, NewModel->ModelInstance);
-                assert(NewMesh);
-                NewModel->BoundMeshes.push_back(NewMesh);
-            }}
-
-            {for(granny_int32x AnimIdx = 0; AnimIdx < Info->AnimationCount; ++AnimIdx)
-            {
-                granny_animation* Animation = Info->Animations[AnimIdx];
-
-                // Simple control, starting at t = 0.0f
-                granny_control *Control =
-                    GrannyPlayControlledAnimation(0.0f, Animation,
-                                                  NewModel->ModelInstance);
-                if (Control)
-                {
-                    // Loop forever
-                    GrannySetControlLoopCount(Control, 0);
-
-                    // Allow Granny to free the control when we delete the instance
-                    GrannyFreeControlOnceUnused(Control);
-
-                    // Only bind one animation to the model
-                    break;
-                }
-            }}
-        }
-    }}
-
-    return true;
 }
 
 bool CreateSharedPoses()
@@ -641,35 +392,33 @@ void Render(int Width, int Height)
 
     if(SUCCEEDED(g_pD3DDevice->BeginScene()))
     {
-        SetTransposedMatrix4x4(g_hMatWorld2View, (FLOAT*)GlobalScene.DemoCamera.View4x4 );
-        SetTransposedMatrix4x4(g_hMatView2Clip, (FLOAT*)GlobalScene.DemoCamera.Projection4x4 );
-        g_pEffect->SetFloatArray(g_hDirFromLight, (FLOAT*)GlobalScene.DirFromLight, 3);
-        g_pEffect->SetFloatArray(g_hLightColor, (FLOAT*)GlobalScene.LightColour, 3);
-        g_pEffect->SetFloatArray(g_hAmbientColor, (FLOAT*)GlobalScene.AmbientColour, 3);
+        SimpleModelSetup(GlobalScene.DemoCamera,
+                         GlobalScene.DirFromLight,
+                         GlobalScene.LightColour,
+                         GlobalScene.AmbientColour);
 
         g_pD3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
         // Loop over the models, and render their meshes.  We do this three times,
-		// to show the full animation, the LODed version at actual size, and what
-		// it would look like if drawn at the same scale as the full version.
+        // to show the full animation, the LODed version at actual size, and what
+        // it would look like if drawn at the same scale as the full version.
         float LeftOffset[3]   = { -40, 0, 0 };
         float CenterOffset[3] = { 0, 0, 0 };
         float RightOffset[3]  = { 40 + 75.0f*GlobalScene.LODNotch, 0, -500.0f*GlobalScene.LODNotch };
-		
-		float* Passes[3][2] = {
-			{ LeftOffset, RightOffset },
-			{ CenterOffset, CenterOffset },
-			{ RightOffset, RightOffset }
-		};
 
-		for (int i = 0; i < 3; i++)
-		{
-			for (size_t Idx = 0; Idx < GlobalScene.Models.size(); Idx++)
-			{
-				RenderModel(GlobalScene.Models[Idx], Height,
-							Passes[i][0], Passes[i][1]);
-			}
-		}
+        float* Passes[3][2] = {
+            { LeftOffset,   RightOffset  },
+            { CenterOffset, CenterOffset },
+            { RightOffset,  RightOffset  }
+        };
+
+        for (int i = 0; i < 3; i++)
+        {
+            for (size_t Idx = 0; Idx < GlobalScene.Models.size(); Idx++)
+            {
+                RenderModel(GlobalScene.Models[Idx], Height, Passes[i][0], Passes[i][1]);
+            }
+        }
 
         g_pD3DDevice->EndScene();
     }
@@ -711,8 +460,8 @@ INT WINAPI WinMain( HINSTANCE, HINSTANCE, LPSTR, INT )
     /* Create our demo objects.  Note that the order is important here, CreateDemoModels
        will be looking up textures as it iterates, and CreateSharedPoses will scan the
        created models. */
-    if (CreateDemoTextures() == false ||
-        CreateDemoModels()   == false ||
+    if (CreateSimpleTextures(g_pD3DDevice, GlobalScene.SceneFileInfo, GlobalScene.Textures) == false ||
+        CreateSimpleModels(g_pD3DDevice, GlobalScene.SceneFileInfo, GlobalScene.Textures, GlobalScene.Models)   == false ||
         CreateSharedPoses()  == false ||
         InitCameraAndLights() == false)
     {

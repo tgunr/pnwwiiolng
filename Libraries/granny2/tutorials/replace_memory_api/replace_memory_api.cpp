@@ -13,7 +13,8 @@
 GRANNY_CALLBACK(void*) CustomAllocator(const char* SourceFile,
                                        granny_int32x SourceLine,
                                        granny_uintaddrx Alignment,
-                                       granny_uintaddrx Size);
+                                       granny_uintaddrx Size,
+                                       granny_int32x    Intent);
 GRANNY_CALLBACK(void) CustomDeallocator(const char* SourceFile,
                                          granny_int32x SourceLine,
                                          void* Memory);
@@ -61,11 +62,9 @@ int main(int, char const*[])
     }
 
 #ifdef _MACOSX
-    // If we're on the mac, we want to use ansi file operations
-    GrannySetDefaultFileReaderOpenCallback(GrannyGetOSXAnsiFileReaderOpenCallback());
     #define BASE_DIR "../../../media/"
 #else
-    #define BASE_DIR "../media/"
+    #define BASE_DIR "media/"
 #endif
 
     /* This is pretty straightforward.  We just call $SetAllocator to install our
@@ -93,15 +92,16 @@ GRANNY_CALLBACK(void*)
 CustomAllocator(const char* SourceFile,
                 const granny_int32x SourceLine,
                 granny_uintaddrx Alignment,
-                granny_uintaddrx Size)
+                granny_uintaddrx Size,
+                granny_int32x Intent)
 {
     assert(SourceFile);
     assert(Alignment > 0);
 
     // Track the requests for the demo
-    printf("Allocate: %d bytes requested\n"
+    printf("Allocate: %u bytes requested as \"%s\"\n"
            "          %s:%d\n",
-           Size, SourceFile, SourceLine);
+           (granny_uint32)Size, GrannyAllocationIntentString(Intent), SourceFile, SourceLine);
 
     /* Size == 0 is a valid allocation, if a little strange.  Granny will never pass this
        value, but we'll imitate the behavior for new or malloc: simply return NULL. */

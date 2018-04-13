@@ -4,7 +4,7 @@
 // $Change: 14382 $
 // $Revision: #2 $
 // 
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 
 
@@ -131,7 +131,7 @@ function BasicBatchExport(SourcePath, DestDir)
 //                     "d:/source_art/standard_settings.ges",
 //                     "d:/tools/postprocess.exe")
 
-/* In addition to the GrannyExport call, described previously, this funtion makes use of
+/* In addition to the GrannyExport call, described previously, this function makes use of
   the GrannyLoadSettings call, which takes a single argument which is the settings file
   to load.  Although not demonstrated here, you can also make the corresponding call,
   GrannySaveSettings, to save to a .ges file rather than load from it.

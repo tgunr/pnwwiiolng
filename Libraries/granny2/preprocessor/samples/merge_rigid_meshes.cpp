@@ -1,14 +1,13 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/merge_rigid_meshes.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #2 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 #include <memory.h>
 
@@ -30,7 +29,7 @@ MeshesCompatible(granny_mesh* One, granny_mesh* Two)
             if (One->MaterialBindings[0].Material != Two->MaterialBindings[0].Material)
                 return false;
 
-			// Acceptable (fall through)
+            // Acceptable (fall through)
         }
         else if (One->MaterialBindingCount == 0 && Two->MaterialBindingCount == 0)
         {
@@ -56,24 +55,25 @@ MeshesCompatible(granny_mesh* One, granny_mesh* Two)
 
 static granny_mesh*
 CreateMergedMesh(vector<granny_mesh*>& MergeList,
-                 granny_memory_arena* TempArena)
+                 granny_memory_arena* TempArena,
+                 vector<const char*>& CollapsedBones)
 {
     int const VertexSize = GrannyGetTotalObjectSize(GrannyGetMeshVertexType(MergeList[0]));
 
     int TotalVertices = 0;
     int TotalIndices  = 0;
-    {for (granny_uint32 Idx = 0; Idx < MergeList.size(); ++Idx)
+    for (granny_uint32 Idx = 0; Idx < MergeList.size(); ++Idx)
     {
         TotalVertices += GrannyGetMeshVertexCount(MergeList[Idx]);
         TotalIndices  += GrannyGetMeshIndexCount(MergeList[Idx]);
-    }}
+    }
 
     granny_uint8* NewVertices = PushArray(TempArena, TotalVertices*VertexSize, granny_uint8);
     granny_int32* NewIndices  = PushArray(TempArena, TotalIndices, granny_int32);
 
     int CurrentVPos = 0;
     int CurrentIPos = 0;
-    {for (granny_uint32 Idx = 0; Idx < MergeList.size(); ++Idx)
+    for (granny_uint32 Idx = 0; Idx < MergeList.size(); ++Idx)
     {
         int const VertCount  = GrannyGetMeshVertexCount(MergeList[Idx]);
         int const IndexCount = GrannyGetMeshIndexCount(MergeList[Idx]);
@@ -83,15 +83,22 @@ CreateMergedMesh(vector<granny_mesh*>& MergeList,
                VertexSize * VertCount);
 
         GrannyCopyMeshIndices(MergeList[Idx], 4, &NewIndices[CurrentIPos]);
-        {for (int Ind = CurrentIPos; Ind < (CurrentIPos + IndexCount); ++Ind)
+        for (int Ind = CurrentIPos; Ind < (CurrentIPos + IndexCount); ++Ind)
         {
             NewIndices[Ind] += CurrentVPos;
-        }}
+        }
 
         CurrentVPos += VertCount;
         CurrentIPos += IndexCount;
-    }}
-    assert((CurrentIPos % 3) == 0);
+
+        //Remember any bones this mesh referenced so we can try to delete them later
+        granny_mesh* MergeMesh = MergeList[Idx];
+        for( granny_int32 BindingIdx=0; BindingIdx < MergeMesh->BoneBindingCount; BindingIdx++ )
+        {
+            CollapsedBones.push_back(MergeMesh->BoneBindings[BindingIdx].BoneName);
+        }
+    }
+    pp_assert((CurrentIPos % 3) == 0);
 
     granny_tri_material_group* Group = PushObject(TempArena, granny_tri_material_group);
     {
@@ -128,8 +135,8 @@ CreateMergedMesh(vector<granny_mesh*>& MergeList,
         Mesh->PrimaryVertexData = VD;
         Mesh->PrimaryTopology = TT;
 
-		Mesh->MaterialBindingCount = MergeList[0]->MaterialBindingCount;
-		Mesh->MaterialBindings = MergeList[0]->MaterialBindings;
+        Mesh->MaterialBindingCount = MergeList[0]->MaterialBindingCount;
+        Mesh->MaterialBindings = MergeList[0]->MaterialBindings;
 
         Mesh->BoneBindingCount = 1;
         Mesh->BoneBindings = PushObject(TempArena, granny_bone_binding);
@@ -141,25 +148,16 @@ CreateMergedMesh(vector<granny_mesh*>& MergeList,
 }
 
 
-bool
-MergeRigidMeshes(input_file&     InputFile,
-                 key_value_pair* KeyValues,
-                 granny_int32x   NumKeyValues,
+granny_file_info*
+MergeRigidMeshes(char const*          OriginalFilename,
+                 char const*          OutputFilename,
+                 granny_file_info*    Info,
+                 key_value_pair*      KeyValues,
+                 granny_int32x        NumKeyValues,
                  granny_memory_arena* TempArena)
 {
-    // Validate the input.  Our requirements for this command:
-    //  -output key must be present
-    //  The input $file must contain a valid $file_info object
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     vector<granny_mesh*> FileMeshes;
+    vector<const char*> CollapsedBones;
     for (int i = 0; i < Info->ModelCount; i++)
     {
         granny_model* Model = Info->Models[i];
@@ -198,7 +196,7 @@ MergeRigidMeshes(input_file&     InputFile,
             }
             else
             {
-                granny_mesh* NewMesh = CreateMergedMesh(MergeList, TempArena);
+                granny_mesh* NewMesh = CreateMergedMesh(MergeList, TempArena, CollapsedBones);
                 NewMeshes.push_back(NewMesh);
             }
         }
@@ -215,10 +213,77 @@ MergeRigidMeshes(input_file&     InputFile,
     Info->Meshes = PushArray(TempArena, (int)FileMeshes.size(), granny_mesh*);
     memcpy(Info->Meshes, &FileMeshes[0], FileMeshes.size() * sizeof(granny_mesh*));
 
-    return SimpleWriteInfo(KeyValues, NumKeyValues, Info);
+    //Push the topologies and vertex datas into the file info. These aren't really useful (they're 
+    //just a mirror of what's in the meshes), but do this anyway for consistency. 
+    Info->VertexDataCount = Info->MeshCount;
+    Info->VertexDatas = PushArray(TempArena, Info->MeshCount, granny_vertex_data*);
+    Info->TriTopologyCount = Info->MeshCount;
+    Info->TriTopologies = PushArray(TempArena, Info->MeshCount, granny_tri_topology*);
+    for( granny_int32 MeshIdx=0; MeshIdx<Info->MeshCount; MeshIdx++ )
+    {
+        Info->VertexDatas[MeshIdx] = Info->Meshes[MeshIdx]->PrimaryVertexData;
+        Info->TriTopologies[MeshIdx] = Info->Meshes[MeshIdx]->PrimaryTopology;
+    }
+
+    //CollapsedBones are the bones we will potentially remove
+    //Remove any CollapsedBones not referenced by mesh bone bindings
+
+    vector<const char*> CollapsedBonesToRemove;
+    for (granny_uint32 CollapseBoneIdx=0; CollapseBoneIdx<CollapsedBones.size(); CollapseBoneIdx++)
+    {
+        bool CollapsedBoneReferenced = false;
+        for (granny_int32 MeshIdx = 0; MeshIdx<Info->MeshCount && !CollapsedBoneReferenced; MeshIdx++)
+        {
+            for( granny_int32 BoneBindingIdx=0; BoneBindingIdx < Info->Meshes[MeshIdx]->BoneBindingCount; BoneBindingIdx++ )
+            {
+                if( _stricmp(CollapsedBones[CollapseBoneIdx],Info->Meshes[MeshIdx]->BoneBindings[BoneBindingIdx].BoneName) == 0)
+                {
+                    CollapsedBoneReferenced = true;
+                    break;
+                }
+            }
+        }
+
+        if( !CollapsedBoneReferenced )
+        {
+            CollapsedBonesToRemove.push_back(CollapsedBones[CollapseBoneIdx]);
+        }
+    }
+
+    for( granny_int32 SkeletonIdx=0; SkeletonIdx < Info->SkeletonCount; SkeletonIdx++ )
+    {
+        granny_skeleton * Skeleton = Info->Skeletons[SkeletonIdx];
+
+        granny_bone* NewBones = PushArray(TempArena, (int)Skeleton->BoneCount, granny_bone);
+        granny_int32 NewBoneCount = 0;
+
+        for( granny_int32 BoneIdx=0; BoneIdx < Skeleton->BoneCount; BoneIdx++ )
+        {
+            bool RemoveThisBone = false;
+            for (granny_uint32 RemoveBoneIdx=0; RemoveBoneIdx<CollapsedBonesToRemove.size(); RemoveBoneIdx++)
+            {
+                const char * RemoveName = CollapsedBonesToRemove[RemoveBoneIdx];
+                if( _stricmp(Skeleton->Bones[BoneIdx].Name,RemoveName) == 0 )
+                {
+                    RemoveThisBone = true;
+                    break;
+                }
+            }
+
+            if( !RemoveThisBone )
+            {
+                NewBones[NewBoneCount] = Skeleton->Bones[BoneIdx];
+                NewBoneCount++;
+            }
+        }
+
+        Skeleton->BoneCount = NewBoneCount;
+        Skeleton->Bones = NewBones;
+    }
+
+    return Info;
 }
 
-static CommandRegistrar RegCompressVertSample(eSingleFile_NoMultiRun,
-                                              MergeRigidMeshes, "MergeRigidMeshes",
+static CommandRegistrar RegCompressVertSample(MergeRigidMeshes, "MergeRigidMeshes",
                                               "Merges compatible rigid meshes into a single object");
 

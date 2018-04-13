@@ -16,9 +16,9 @@ using namespace std;
 //#define USE_MAX_EXAMPLE
 
 #ifdef USE_MAX_EXAMPLE
-char const* const GlobalSceneFilename = "media\\morpher_test.gr2";  // max morpher example
+char const* const GlobalSceneFilename = "morph_targets\\media\\morpher_test.gr2";  // max morpher example
 #else
-char const* const GlobalSceneFilename = "media\\blendshape.gr2";  // maya blendshape example
+char const* const GlobalSceneFilename = "morph_targets\\media\\blendshape.gr2";  // maya blendshape example
 #endif
 
 
@@ -163,6 +163,14 @@ CreateBoundMesh(granny_mesh* GrannyMesh,
        Mesh02, etc., there will be disagreement over ordering.  In this case, since we
        know that the memory is never going away, we'll just pull out the pointer to the
        appropriate $vector_track.
+
+       Note that there is a subtlety here in that $FindVectorTrack requires a TrackKey
+       that helps disambiguate the track in the case that multiple similar
+       $(vector_track)s are present on different $(bone)s in a $skeleton.  Here, there is
+       no chance of ambiguity, since there is one $track_group per morphable $mesh.  So we
+       pass 0 as the TrackKey.  This is not obvious or ideal, but there is less chance of
+       confusion that allowing a GrannyFindVectorTrackByName to return an incorrect
+       $vector_track in the $skeleton case.
     */
     {for(granny_int32x Idx = 0; Idx < GrannyFile->AnimationCount; ++Idx)
     {
@@ -181,9 +189,9 @@ CreateBoundMesh(granny_mesh* GrannyMesh,
                  ++MeshIdx)
             {
                 granny_int32x TrackIdx;
-                if (GrannyFindVectorTrackByName(TrackGroup,
-                                                GrannyMesh->MorphTargets[MeshIdx].ScalarName,
-                                                &TrackIdx))
+                if (GrannyFindVectorTrack(TrackGroup,
+                                          GrannyMesh->MorphTargets[MeshIdx].ScalarName, 0,
+                                          &TrackIdx))
                 {
                     assert(MeshIdx < granny_int32x(NewMesh->MorphTracks.size()));
                     assert(_stricmp(TrackGroup->VectorTracks[TrackIdx].Name,
@@ -287,8 +295,16 @@ void RenderModel(DemoModel* Model)
             // easy to do it here.  If you're using the Maya test file, you should remove
             // this line, the Maya blendshape normalizes to 1.0 by default.
 #ifdef USE_MAX_EXAMPLE
-			MorphConstants[Idx] *= 0.01f;
+            MorphConstants[Idx] *= 0.01f;
 #endif
+
+            // Curve compression error can cause this to go outside the [0,1] range that
+            // we want for the shader.  Clamp the value to make sure nothing weird slips
+            // through.
+            if (MorphConstants[Idx] < 0)
+                MorphConstants[Idx] = 0;
+            else if (MorphConstants[Idx] > 1)
+                MorphConstants[Idx] = 1;
         }}
 
         /* Send the sampled values to the hardware */
@@ -338,7 +354,7 @@ bool InitCameraAndLights()
     GlobalScene.DemoCamera.Offset[0] = 25;
     GlobalScene.DemoCamera.Offset[1] = 25;
     GlobalScene.DemoCamera.Offset[2] = 200;
-	GlobalScene.DemoCamera.ElevAzimRoll[0] = 1;
+    GlobalScene.DemoCamera.ElevAzimRoll[0] = 1;
 
 #else
     granny_file_info* Info = GlobalScene.SceneFileInfo;

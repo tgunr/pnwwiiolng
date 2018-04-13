@@ -1,9 +1,10 @@
 // =======================================================================================
 // opengl_rendering.cpp: Demonstrates rendering an animated mesh in OpenGL
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // =======================================================================================
 #include "opengl_rendering.h"
+#include <string.h>
 #include <vector>
 
 using namespace std;
@@ -11,7 +12,7 @@ using namespace std;
 #define HARDCODED_DISPLAY_WIDTH  800
 #define HARDCODED_DISPLAY_HEIGHT 450
 
-#ifdef _MACOSX
+#if defined(_MACOSX) || defined(linux)
 #define _stricmp strcasecmp
 #define BASE_DIR "../../"
 #else
@@ -22,11 +23,11 @@ using namespace std;
 // database that you'll want to completely ignore when you build your
 // own app on top of Granny.  This simply keeps everything very
 // straightfoward.
-char const* const GlobalSceneFilename     =  BASE_DIR "../media/pixo_dance.gr2";
+char const* const GlobalSceneFilename     =  BASE_DIR "media/pixo_dance.gr2";
 
-char const* const GlobalRigidShaderFile    = BASE_DIR "shaders/Rigid.glsl";
-char const* const GlobalSkinnedShaderFile  = BASE_DIR "shaders/Skinned.glsl";
-char const* const GlobalFragmentShaderFile = BASE_DIR "shaders/Fragment.glsl";
+char const* const GlobalRigidShaderFile    = BASE_DIR "media/shaders/Rigid.glsl";
+char const* const GlobalSkinnedShaderFile  = BASE_DIR "media/shaders/Skinned.glsl";
+char const* const GlobalFragmentShaderFile = BASE_DIR "media/shaders/Fragment.glsl";
 
 bool CreateDemoTextures();
 bool CreateDemoModels();
@@ -143,11 +144,6 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-#ifdef _MACOSX
-    // If we're on the mac, we want to use ansi file operations
-    GrannySetDefaultFileReaderOpenCallback(GrannyGetOSXAnsiFileReaderOpenCallback());
-#endif
-
     // Initialize GLUT
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DEPTH | GLUT_STENCIL | GLUT_DOUBLE | GLUT_RGBA);
@@ -165,7 +161,7 @@ int main(int argc, char** argv)
     /* Load the scene file, and bind the meshes, textures, etc. */
     {
         GlobalScene.SceneFile = GrannyReadEntireFile(GlobalSceneFilename);
-       if (GlobalScene.SceneFile == NULL)
+        if (GlobalScene.SceneFile == NULL)
             return EXIT_FAILURE;
 
         GlobalScene.SceneFileInfo = GrannyGetFileInfo(GlobalScene.SceneFile);
@@ -562,7 +558,7 @@ bool InitCameraAndLights()
 
                 CameraFields CameraFields;
                 GrannyConvertSingleObject(CameraStoredType, CameraObject,
-                                          CameraFieldsType, &CameraFields);
+                                          CameraFieldsType, &CameraFields, 0);
 
                 // Ok, now we can setup the camera...
                 GrannyInitializeDefaultCamera(&GlobalScene.DemoCamera);
@@ -746,12 +742,12 @@ void RenderModel(DemoModel* Model)
 
             /* Now I look up the transform for this mesh, and load it onto the modelview
                stack. */
-            __declspec(align(16)) granny_matrix_4x4 CompositeMatrix;
+            granny_matrix_4x4* CompositeMatrix = (granny_matrix_4x4*)GrannyAllocateCompositeBuffer(1);
             GrannyBuildIndexedCompositeBuffer(
                 GrannyGetMeshBindingToSkeleton(Mesh->MeshBinding),
                 GlobalScene.SharedWorldPose,
                 ToBoneIndices, 1,
-                &CompositeMatrix);
+                CompositeMatrix);
 
             glMatrixMode(GL_MODELVIEW);
             glPushMatrix();
@@ -771,6 +767,8 @@ void RenderModel(DemoModel* Model)
             glTexCoordPointer(2, GL_FLOAT,
                               sizeof(granny_pnt332_vertex),
                               Offset(granny_pnt332_vertex, UV[0]));
+
+            GrannyFreeCompositeBuffer(CompositeMatrix);
         }
         else
         {
@@ -791,7 +789,7 @@ void RenderModel(DemoModel* Model)
                designed to do this for you.  (If you need the matrices transposed, use
                $BuildIndexedCompositeBufferTransposed.)
             */
-            __declspec(align(16)) granny_matrix_4x4 CompositeBuffer[32];
+            granny_matrix_4x4* CompositeBuffer = (granny_matrix_4x4*)GrannyAllocateCompositeBuffer(NumMeshBones);
 
             GrannyBuildIndexedCompositeBuffer(
                 GrannyGetMeshBindingToSkeleton(Mesh->MeshBinding),
@@ -837,6 +835,8 @@ void RenderModel(DemoModel* Model)
                                      false, // NOT normalized
                                      sizeof(granny_pwnt3432_vertex),
                                      Offset(granny_pwnt3432_vertex, BoneIndices[0]));
+
+            GrannyFreeCompositeBuffer(CompositeBuffer);
         }
 
 

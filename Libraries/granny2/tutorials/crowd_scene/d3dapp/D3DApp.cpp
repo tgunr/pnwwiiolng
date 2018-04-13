@@ -1605,7 +1605,7 @@ HRESULT CD3DApplication::DisplayErrorMsg( HRESULT hr, DWORD dwType )
             break;
 
         case D3DAPPERR_MEDIANOTFOUND:
-        case HRESULT_FROM_WIN32( ERROR_FILE_NOT_FOUND ):
+        case __HRESULT_FROM_WIN32( ERROR_FILE_NOT_FOUND ):
             _tcscpy( strMsg, _T("Could not load required media." ) );
             break;
 

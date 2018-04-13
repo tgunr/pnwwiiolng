@@ -4,7 +4,7 @@
 // $Change$
 // $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "replace_file_api_helper.h"
 #include <assert.h>

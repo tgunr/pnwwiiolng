@@ -96,6 +96,8 @@ SINT32          	WantedRefreshRate;
 SINT32           WantedAlpha;		// desired/actual alpha
 LOGICAL          WantedHdw;			// desired/actual hardware
 SINT32           WantedStencil;		// desired/actual hardware
+LOGICAL          WantedFullscreen;	// desired/actual fullscreen
+LOGICAL          WantedBorderless;	// desired/actual borderless window
 LOGICAL          WantedWindow;		// desired/actual window
 SINT32			WantedMode;			// desired/actual mode
 SINT32           WantedSide;         // User selected side from webpage.

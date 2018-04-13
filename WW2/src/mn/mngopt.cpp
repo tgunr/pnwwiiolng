@@ -66,6 +66,8 @@ static GVAR vars[] = {
     INT_KEY_DEF("alpha", WantedAlpha),
     LOGICAL_KEY_DEF("hdw", WantedHdw),
     { "stencil", ELOGICAL, { &WantedStencil }, 0 }, // HACK
+    LOGICAL_KEY_DEF("fullscreen", WantedFullscreen),
+    LOGICAL_KEY_DEF("fullscreen", WantedBorderless),
     LOGICAL_KEY_DEF("window", WantedWindow),
     { "staccato", ELOGICAL, { &UseStaccato }, 0 }, // HACK
     STRING_KEY_DEF("ticket", TicketFile),

@@ -1,11 +1,11 @@
 #if !defined(ADD_TEXTURE_H)
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/add_texture.h $
-// $DateTime: 2009/03/02 17:01:40 $
-// $Change: 20892 $
-// $Revision: #3 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 

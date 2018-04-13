@@ -1369,7 +1369,7 @@ _illegalPacketSequence(SINT32 teulIndex)
 
 	// Flag them so it becomes sticky
 	persona->m_flags.checksumsDirty = true;
-	commForcePlayerExit(*persona, "invalid packet sequence", true);
+	commForcePlayerExit(*persona, "*invalid packet sequence", true);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2085,7 +2085,7 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 						player->playerID(),
 						queueSize,
 						static_cast<float>(heldTime_ms) / 1000.0);
-					commForcePlayerExit(*player, "Slow Client Updates (Inbound)", true);
+					commForcePlayerExit(*player, "*Slow Client Updates (Inbound)", true);
 					return false;
 				}
 				else

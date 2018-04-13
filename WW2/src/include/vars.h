@@ -103,6 +103,8 @@ extern SINT32          	WantedRefreshRate;
 extern SINT32           WantedAlpha;		// desired/actual alpha
 extern LOGICAL          WantedHdw;			// desired/actual hardware
 extern SINT32           WantedStencil;		// desired/actual hardware
+extern LOGICAL          WantedFullscreen;	// desired/actual window
+extern LOGICAL          WantedBorderless;	// desired/actual window
 extern LOGICAL          WantedWindow;		// desired/actual window
 extern SINT32			WantedMode;			// desired/actual mode
 extern SINT32           WantedSide;         // User selected side from webpage.

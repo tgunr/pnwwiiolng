@@ -1,10 +1,10 @@
 // ========================================================================
-// $File: //jeffr/granny/tutorial/s3tc/dx9/s3tc_helpers.cpp $
-// $DateTime: 2009/10/29 11:47:12 $
-// $Change: 23788 $
-// $Revision: #2 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "s3tc_dx9.h"
 
@@ -33,11 +33,13 @@ bool InitializeD3D()
         if(!RegisterClassEx(&WindowClass))
             return false;
 
+        RECT windowRect = { 0, 0, HARDCODED_DISPLAY_WIDTH, HARDCODED_DISPLAY_WIDTH };
+        AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
         g_hwnd = CreateWindowEx(0, WindowClass.lpszClassName, MainWindowTitle,
                                 WS_OVERLAPPEDWINDOW | WS_VISIBLE,
                                 CW_USEDEFAULT, CW_USEDEFAULT,
-                                HARDCODED_DISPLAY_WIDTH,
-                                HARDCODED_DISPLAY_HEIGHT,
+                                windowRect.right - windowRect.left,
+                                windowRect.bottom - windowRect.top,
                                 0, 0, GetModuleHandle(0), 0);
         if (!g_hwnd)
             return false;

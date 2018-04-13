@@ -1,13 +1,13 @@
 #if !defined(DX9_RENDERING_H)
 // ========================================================================
-// $File: //jeffr/granny/tutorial/attachment/attachment.h $
-// $DateTime: 2007/12/01 15:08:51 $
-// $Change: 16678 $
-// $Revision: #2 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
 // See .cpp file for details...
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "granny.h"
 #include <d3d9.h>
@@ -99,7 +99,7 @@ extern IDirect3DPixelShader9* g_pPixelShader;
 
 // ---------------------------------------------------------
 // Global Win32 objects
-extern const char* MainWindowTitle;
+extern LPCTSTR MainWindowTitle;
 extern HWND g_hwnd;
 extern bool GlobalRunning;
 

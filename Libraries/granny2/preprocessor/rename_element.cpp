@@ -1,16 +1,15 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/rename_element.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #8 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <assert.h>
 #include <vector>
 #include <algorithm>
 
@@ -20,12 +19,19 @@ bool ExtractElementIdx(char const* ElementAndIdx,
                        char* OutputElement,
                        granny_int32x* OutputIndex)
 {
-    assert(ElementAndIdx);
-    assert(OutputElement);
-    assert(OutputIndex);
+    pp_assert(ElementAndIdx);
+    pp_assert(OutputElement);
+    pp_assert(OutputIndex);
 
     const char* LeftBracket  = strchr(ElementAndIdx, '[');
     const char* RightBracket = strchr(ElementAndIdx, ']');
+
+    if (_stricmp(ElementAndIdx, "filepath") == 0)
+    {
+        *OutputIndex = -1;
+        strcpy(OutputElement,ElementAndIdx);
+        return true;
+    }
 
     if (!LeftBracket || !RightBracket ||
         RightBracket < LeftBracket || RightBracket == LeftBracket+1)
@@ -59,13 +65,18 @@ bool DoElementRename(granny_file_info* Info,
                      granny_int32x Index,
                      char const* NewName)
 {
+    if (_stricmp(ElementName, "filepath") == 0)
+    {
+        Info->FromFileName = NewName;
+        return true;
+    }
+
     if (Index < 0)
     {
         ErrOut("invalid index (%d)\n", Index);
         return false;
     }
 
-    // Suxors, but there aren't really that many elements to rename at the root level...
     if (_stricmp(ElementName, "materials") == 0)
     {
         if (Index >= Info->MaterialCount)
@@ -90,6 +101,30 @@ bool DoElementRename(granny_file_info* Info,
         if (Info->Animations[Index])
             Info->Animations[Index]->Name = NewName;
     }
+    else if (_stricmp(ElementName, "TrackGroups") == 0)
+    {
+        if (Index >= Info->TrackGroupCount)
+        {
+            ErrOut("invalid index (%d, only %d track_groups present)\n",
+                Index, Info->TrackGroupCount);
+            return false;
+        }
+
+        if (Info->TrackGroups[Index])
+            Info->TrackGroups[Index]->Name = NewName;
+    }
+    else if (_stricmp(ElementName, "textures") == 0)
+    {
+        if (Index >= Info->TextureCount)
+        {
+            ErrOut("invalid index (%d, only %d textures present)\n",
+                Index, Info->TextureCount);
+            return false;
+        }
+
+        if (Info->Textures[Index])
+            Info->Textures[Index]->FromFileName = NewName;
+    }
     else if (_stricmp(ElementName, "meshes") == 0)
     {
         if (Index >= Info->MeshCount)
@@ -107,36 +142,41 @@ bool DoElementRename(granny_file_info* Info,
         if (Index >= Info->ModelCount)
         {
             ErrOut("invalid index (%d, only %d materials present)\n",
-                    Index, Info->ModelCount);
+                Index, Info->ModelCount);
             return false;
         }
 
         if (Info->Models[Index])
             Info->Models[Index]->Name = NewName;
     }
+    else if (_stricmp(ElementName, "skeletons") == 0)
+    {
+        if (Index >= Info->SkeletonCount)
+        {
+            ErrOut("invalid index (%d, only %d skeletons present)\n",
+                Index, Info->SkeletonCount);
+            return false;
+        }
+
+        if (Info->Skeletons[Index])
+            Info->Skeletons[Index]->Name = NewName;
+    }
 
     return true;
 }
 
-bool RenameElement(input_file&     InputFile,
-                   key_value_pair* KeyValues,
-                   granny_int32x   NumKeyValues,
-                   granny_memory_arena* Arena)
+granny_file_info*
+RenameElement(char const*          OriginalFilename,
+              char const*          OutputFilename,
+              granny_file_info*    Info,
+              key_value_pair*      KeyValues,
+              granny_int32x        NumKeyValues,
+              granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
     char const* TargetName = FindFirstValueForKey(KeyValues, NumKeyValues, "newname");
     if (TargetName == 0)
     {
         ErrOut("must specify a Name value with \"-newname <value>\"\n");
-        return false;
-    }
-
-    granny_file* File = InputFile.GrannyFile;
-    granny_file_info* Info = GrannyGetFileInfo(File);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
         return false;
     }
 
@@ -163,18 +203,32 @@ bool RenameElement(input_file&     InputFile,
 
     if (FoundAny)
     {
-        // Write out the modified Info
-        return WriteInfoPreserve(KeyValues, NumKeyValues, Info, File, true, true, false);
+        return Info;
     }
     else
     {
         ErrOut("unable to find any valid \"-rename\" keys\n");
-        return false;
+        return 0;
     }
 }
 
 
-static CommandRegistrar RegRenameElement(eSingleFile_NoMultiRun,
-                                         RenameElement,
+static const char* HelpString =
+    (" RenameElement lets you change the name of any top-level item in\n"
+     " the granny_file_info structure.  It is especially handy for changing\n"
+     " the name of granny_animation objects, which by default are named for\n"
+     " the source Max or Maya file.  If there are multiple animations\n"
+     " in the source file, or if you'd simply like a more convenient name\n"
+     " for the granny_animation, you can use this command to quickly change\n"
+     " the string.\n"
+     "\n"
+     "    preprocessor RenameElement anim.gr2 -output anim.gr2 \\\n"
+     "        -rename Animations[0] -newname \"Walk\"\n"
+     "\n"
+     "    preprocessor RenameElement anim.gr2 -output anim.gr2 \\\n"
+     "        -rename FilePath -newname \"NewName\"\n");
+
+static CommandRegistrar RegRenameElement(RenameElement,
                                          "RenameElement",
-                                         "Renames granny_file_info members specified by \"-rename Name[idx]\"");
+                                         "Renames granny_file_info members specified by \"-rename Name[idx]\"",
+                                         HelpString);
