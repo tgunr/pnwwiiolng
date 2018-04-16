@@ -76,7 +76,7 @@ extern void logTimerReset();
 // initialize timer id to negative, pass returned value with each call to same function,
 // usually you can just call logTimerBegin/EndMacro below instead to handle everything for you
 extern void logTimerBegin(const char* parent, const char* child, int* timerid);
-extern int logTimerEnd(int timerid);
+extern UINT64 logTimerEnd(int timerid);
 
 extern void logTimerPrint(int maintimerid, int frameidx); // specify main loop timer id to calc total time for percentages
 
@@ -99,7 +99,7 @@ logTimerBegin(__FUNCTION__, #x, &timerid_##x);
 logTimerEnd(timerid_##x); 		\
 }
 
-extern float logTimerToMs(int);
+extern float logTimerToMs(UINT64);
 
 #define logTimerCallVoid(x) \
 logTimerBeginExtMacro(x) \

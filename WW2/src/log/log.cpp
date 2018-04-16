@@ -276,22 +276,18 @@ static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 
 #define MAX_TIMERS 1024
 
-#if platOS == OS_WIN32
-extern FLOAT32 GetCPUSpeed();
-#endif
-
 struct logTimer
 {
 	char funcname[128];
 	int callcount; // to handle recursion
-	SINT32 starttime;
-	SINT32 tottime[10]; // last 10 totaltimes
+	UINT64 starttime;
+	UINT64 tottime[10]; // last 10 totaltimes
 };
 
 struct logTimerStat
 {
 	const char* funcname;
-	SINT32 tottime;
+	UINT64 tottime;
 };
 
 static logTimer logTimers[MAX_TIMERS];
@@ -320,7 +316,7 @@ void logTimerReset()
 
 		timer->callcount = 0;
 		timer->starttime = 0;
-		memmove(&timer->tottime[1], &timer->tottime[0], 9 * sizeof(SINT32));
+		memmove(&timer->tottime[1], &timer->tottime[0], 9 * sizeof(SINT64));
 		timer->tottime[0] = 0;
 	}
 }
@@ -362,7 +358,7 @@ void logTimerBegin(const char* parent, const char* child, int* timerid)
 	if(timer)
 	{
 		if(timer->callcount == 0)
-			timer->starttime = piReadTimeStamp32();
+			timer->starttime = piReadTimeStamp64();
 
 		timer->callcount++;
 	}else
@@ -375,9 +371,9 @@ void logTimerBegin(const char* parent, const char* child, int* timerid)
 	logTimerEnd
 *************************************************************************************************/
 
-int logTimerEnd(int timerid)
+UINT64 logTimerEnd(int timerid)
 {
-	int dt = 0;
+	UINT64 dt = 0;
 
 	if(timerid > -1 && timerid < MAX_TIMERS)
 	{
@@ -387,7 +383,7 @@ int logTimerEnd(int timerid)
 
 		if(timer->callcount == 0)
 		{
-			dt =  piReadTimeStamp32() - timer->starttime;
+			dt =  piReadTimeStamp64() - timer->starttime;
 			timer->tottime[0] += dt;
 		}
 	}
@@ -413,8 +409,8 @@ static int logTimerStatCompar(const void* v1, const void* v2)
 
 void logTimerPrint(int maintimerid, int frameidx)
 {
-	int i, numTimers;
-	SINT32 totaltime = 0;
+	size_t i, numTimers;
+	UINT64 totaltime = 0;
 	logTimer* timer;
 	logTimerStat* sortTime;
 
@@ -454,7 +450,7 @@ void logTimerPrint(int maintimerid, int frameidx)
 		if(sortTime->tottime > 0)
 		{
 			Write_Log(LOG_TIMER, LOG_INFO, "%s: %.2f ms %.2f%%", sortTime->funcname, logTimerToMs(sortTime->tottime),
-						(sortTime->tottime / (FLOAT32)totaltime) * 100.0f);
+						(sortTime->tottime / (FLOAT64)totaltime) * 100.0f);
 
 		}
 	}
@@ -464,17 +460,9 @@ void logTimerPrint(int maintimerid, int frameidx)
 	logTimerToMs
 *************************************************************************************************/
 
-float logTimerToMs(int dt)
+float logTimerToMs(UINT64 dt)
 {
-#if platOS == OS_WIN32
-	static FLOAT32 cpuSpeed = -1;
-	if(cpuSpeed < 0)
-		cpuSpeed = GetCPUSpeed() * 1000000.0f;
-
-	return dt / cpuSpeed * 1000.f;
-#elif platOS == OS_MACOS
 	return dt / 1000.0f;
-#endif
 }
 #endif //#ifdef USE_LOG_TIMER
 #endif // EVENT_LOG
