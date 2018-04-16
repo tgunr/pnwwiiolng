@@ -25,6 +25,7 @@ enum
    	LOG_TIMER	= 0x00000800,
     LOG_TEXTURE = 0x00001000,
 	LOG_CONSOLE = 0x00002000,
+    LOG_ERROR   = 0x00004000,
 
 	// Add others as needed
 	LOG_ALL		= 0xffffffff

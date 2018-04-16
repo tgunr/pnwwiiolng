@@ -18,8 +18,8 @@ static std::mutex logLock;
 static UINT32 logMask = LOG_ALL;
 static SINT32 logLevel = LOG_INFO;
 #else
-static UINT32 logMask = 0;
-static SINT32 logLevel = 0;
+static UINT32 logMask = LOG_ERROR;
+static SINT32 logLevel = LOG_FATAL;
 #endif
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker);
@@ -39,7 +39,8 @@ static const char* LOG_SYSTEM_NAMES[32] =
 	"fx",
 	"timer",
     "texture",
-	"console"
+	"console",
+    "ERROR",
 	// NULLS the rest out
 };
 
