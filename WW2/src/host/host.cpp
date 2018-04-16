@@ -2085,7 +2085,7 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 						player->playerID(),
 						queueSize,
 						static_cast<float>(heldTime_ms) / 1000.0);
-					commForcePlayerExit(*player, "*Slow Client Updates (Inbound)", true);
+					commForcePlayerExit(*player, "*slow client updates (Inbound)", true);
 					return false;
 				}
 				else
