@@ -150,31 +150,6 @@ UINT32 Get_Log_Mask()
 	return logMask;
 }
 
-#if platOS == OS_MACOS
-
-/************************************************************************************************
-	logv
-*************************************************************************************************/
-
-static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
-{
-	if(logLevel < level || !(system & logMask)) return;
-
-	vprintf(str, marker);
-	printf("\n");
-}
-
-LOGICAL Open_Debug(const char* filename)
-{
-	return TRUE;
-}
-
-void Close_Debug()
-{
-}
-
-#elif platOS == OS_WIN32
-
 #include "include/vars.h"
 
 static FILE *ofp = nullptr;
@@ -183,26 +158,35 @@ static FILE *ofp = nullptr;
 	Open_Debug
 *************************************************************************************************/
 
+static LOGICAL Open_Debug_Unlocked(const char* filename)
+{
+    if (filename == nullptr) {
+        return false;
+    }
+
+    if (ofp != nullptr) {
+        return true;
+    }
+    ofp = fioUserFile((std::string(filename) + ".log").c_str(), "w");
+    if (ofp == nullptr) {
+        return false;
+    }
+    return true;
+}
+
 LOGICAL Open_Debug(const char* filename)
 {
-	if (filename == nullptr) {
-		return false;
-	}
-
-	{
-		std::lock_guard<std::mutex> guard(logLock);
-
-		if (ofp != nullptr) {
-			return true;
-		}
-		ofp = fioUserFile((std::string(filename) + ".log").c_str(), "w");
-		if (ofp == nullptr) {
-			return false;
-		}
-	}
-
-	Write_Debug("\r\nDebug Message System Open.\r\n");
-	return true;
+    {
+        std::lock_guard<std::mutex> guard(logLock);
+        if (filename == nullptr) {
+            return false;
+        }
+        if (!Open_Debug_Unlocked(filename)) {
+            return false;
+        }
+    }
+    Write_Debug("Debug Message System Open.\n");
+    return true;
 }
 
 /************************************************************************************************
@@ -222,39 +206,66 @@ void Close_Debug()
 /************************************************************************************************
 	logv
 *************************************************************************************************/
+static void _log_outv(const char * const format, va_list args)
+{
+#ifdef DEBUG_WW2
+    vfprintf(stderr, format, args);
+    fflush(stderr);
+#endif
+
+    if (ofp != nullptr) {
+        vfprintf(ofp, format, args);
+        fflush(ofp);
+    }
+}
+
+static void _log_outf(const char * const format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    _log_outv(format, args);
+    va_end(args);
+}
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 {
-	std::lock_guard<std::mutex> guard(logLock);
+    if (system != LOG_ERROR) { // "error" system is never ignored
+        std::lock_guard<std::mutex> guard(logLock);
 
-	if (logLevel < level || (system & logMask) == 0 || str == nullptr) {
-		return;
-	}
+        if (logLevel < level || (system & logMask) == 0 || str == nullptr) {
+            return;
+        }
+    }
 
-	// There's no OutputDebugFormat(), so we fake vasprintf()
-	size_t len = static_cast<size_t>(_vscprintf(str, marker));
-	if (len >= INT_MAX) { return; }
-	std::unique_ptr<char[]> buf = std::make_unique<char[]>(len + 1);
-	vsnprintf_s(buf.get(), len + 1, _TRUNCATE, str, marker);
-
-#ifdef DEBUG_WW2
-	// Output to debugger always
-	OutputDebugStringA(buf.get());
-	OutputDebugStringA("\r\n");
-
-	// Output to stderr always
-	fprintf_s(stderr, "%s\n", buf.get());
-	fflush(stderr);
+    const UINT64 trueTime = GetMillisecondTick();
+    const time_t now = (time_t)(trueTime / 1000);
+    const UINT32 milis = (UINT32)(trueTime % 1000);
+    char myTime[49];
+    char myYear[10];
+    struct tm myTm;
+#if platOS == OS_WIN32
+    localtime_s(&myTm, &now);
+#else
+    localtime_r(&now, &myTm);
 #endif
+    strftime(myTime, sizeof(myTime) - 1, "%a %b %d %X", &myTm);
+    strftime(myYear, sizeof(myYear) - 1, "%Y", &myTm);
 
-	// Output to file, if any
-	if (ofp != nullptr) {
-		fprintf_s(ofp, "%s\n", buf.get());
-		fflush(ofp);
-	}
+    char *cbuf = nullptr;
+    vasprintf(&cbuf, str, marker);
+    std::unique_ptr<char[], std::function<void(void*)>> buf(cbuf, free);
+
+    {
+        std::lock_guard<std::mutex> guard(logLock);
+
+        // For errors, we don't care whether it's a debug/beta/alpha client or
+        // whether logs weren't requested; we need to log these always.
+        if (system == LOG_ERROR && ofp == nullptr) {
+            Open_Debug_Unlocked(SYS_TITLE); // TODO: The name should not be hardcoded in this specific location
+        }
+        _log_outf("[%s.%03u %s] %s\n", myTime, milis, myYear, buf.get());
+    }
 }
-
-#endif // OS_WIN32
 
 #ifdef USE_LOG_TIMER
 /************************************************************************************************
