@@ -1677,6 +1677,7 @@
 		FAFA9A112082890A00CB7918 /* authPack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = authPack.h; sourceTree = "<group>"; };
 		FAFA9A122082890A00CB7918 /* authGameMessages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = authGameMessages.h; sourceTree = "<group>"; };
 		FAFA9A132082890A00CB7918 /* authHostMessages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = authHostMessages.h; sourceTree = "<group>"; };
+		FAFA9A1420828EF700CB7918 /* platforms.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = platforms.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2053,6 +2054,7 @@
 		081049C2103DD2310065E0E2 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				FAFA9A1420828EF700CB7918 /* platforms.h */,
 				081049C7103DD2310065E0E2 /* defs.h */,
 				081049D6103DD2310065E0E2 /* mobileSpawnEnums.h */,
 				081049DC103DD2310065E0E2 /* systypes.h */,

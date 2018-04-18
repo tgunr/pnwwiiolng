@@ -99,7 +99,7 @@ class dbug {
         
         $this->log($line, 'A', $message, ...$args);
         http_response_code($status);
-        print json_encode(['result' => LoginUnknownError, 'context_id' => $context_id, 'error' => $output]);
+        print json_encode(['result' => LoginUnknownError, 'error' => $output]);
         exit(0);
     }
 }

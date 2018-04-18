@@ -12,7 +12,7 @@
 #include "build_info.hpp"
 #include "json.hpp"
 
-static const std::string authSteamLoginResource = "/v1/login";
+static const std::string authSteamRESTPrefix = "/v2/";
 
 static inline SteamLoginResponse _loginResponseFromResultCode(uint32_t resultCode)
 {
@@ -35,15 +35,15 @@ static inline SteamLoginResponse _loginResponseFromResultCode(uint32_t resultCod
     }
 }
 
-static inline std::string _getAuthRelayURL()
+static inline std::string _getAuthRelayURL(const std::string &endpoint)
 {
 #ifndef NDEBUG
     // Only allow override on Development/Debug builds
     if (gAuthRelayURL[0] != 0) {
-        return gAuthRelayURL;
+        return gAuthRelayURL + endpoint;
     }
 #endif
-    return std::string("https://") + gAuthServer + authSteamLoginResource;
+    return std::string("https://") + gAuthServer + authSteamRESTPrefix + endpoint;
 }
 
 static std::string _encodeSteamTicket(const void *authTicket, size_t authTicketLen)
@@ -60,19 +60,16 @@ static std::string _encodeSteamTicket(const void *authTicket, size_t authTicketL
     return result;
 }
 
-static SteamLoginResult _doRequestWithParameters(nlohmann::json params) // params is *purposely* not a const&
+static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nlohmann::json params) // params is *purposely* not a const&
 {
     // Can't make this a static inline function because there's no dbugLogv()!
     #define _requestError(msg, ...) do { dbugLog(_FLD, msg, ## __VA_ARGS__); return SteamLoginResponse::LoginUnknownError; } while (0)
     
-    params["app_version"] = PN_build_version_value;
-    params["app_platform"] = platOS - 1; // HACK: OS_WIN32 == 1, OS_MACOS == 2, auth expects 0 and 1 respectively
-
     sysBasicHTTPRequest request;
     sysBasicHTTPResponse response;
     
     request.method = "POST";
-    request.url = _getAuthRelayURL();
+    request.url = _getAuthRelayURL(endpoint);
     request.headers["Content-Type"] = "application/json";
     request.headers["X-WWIIOnline-Client-Version"] = PN_product_version_string; // Not required, just for good measure
     request.content = params.dump();
@@ -132,17 +129,17 @@ static SteamLoginResult _doRequestWithParameters(nlohmann::json params) // param
 
 SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID)
 {
-    return _doRequestWithParameters({
-        { "dispatch", "login" },
+    return _doRequestWithParameters("login", {
         { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
         { "arena_id", arenaID },
+        { "app_version", PN_build_version_value },
+        { "app_platform", platOS },
     });
 }
 
 SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &callsign, const std::string &email)
 {
-    return _doRequestWithParameters({
-        { "dispatch", "signup" },
+    return _doRequestWithParameters("signup", {
         { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
         { "callsign", callsign },
         { "email", email },
@@ -151,8 +148,7 @@ SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicke
 
 SteamLoginResult authRequestSteamEmailChange(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &email)
 {
-    return _doRequestWithParameters({
-        { "dispatch", "email" },
+    return _doRequestWithParameters("email", {
         { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
         { "email", email },
     });
