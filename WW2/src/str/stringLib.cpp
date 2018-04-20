@@ -168,8 +168,8 @@ int vasprintf(char **result, const char *fmt, va_list args)
 {
     size_t len = static_cast<size_t>(_vscprintf(fmt, args));
     if (len >= INT_MAX) { return -1; }
-    char *buf = reinterpret_cast<char *>(calloc(1, len + 1));
-    vsnprintf_s(buf, len + 1, _TRUNCATE, fmt, args);
+    *result = reinterpret_cast<char *>(calloc(1, len + 1));
+    vsnprintf_s(*result, len + 1, _TRUNCATE, fmt, args);
     return (int)len;
 }
 #endif
