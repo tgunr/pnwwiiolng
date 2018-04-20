@@ -25,6 +25,7 @@
 #include "auth/authTypes.h"
 #include "auth/authAppIDs.h"
 #include "auth/authDefaults.h"
+#include "sys/sysAntihack.h"
 #include <netdb.h>
 #include <arpa/inet.h>
 #import <HockeySDK/HockeySDK.h>
@@ -534,9 +535,29 @@ extern NSString *WebActionOriginalURLKey;
     
     chAppDir();
     
+    // Set up anti-hack stuff - not needed on macOS but do it for good measure anyway
+    NetFrameSync::InitializeHashes();
+    
     // Setup the user data path
     fioInit();
-    
+    Fio::DeleteLogFile();
+
+#ifdef DEBUG_WW2
+    WantedUserLogEnabled = TRUE;
+    HasKeyFile = TRUE;
+#endif
+
+#if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
+    LogEnabled = TRUE;
+    UserLogEnabled = WantedUserLogEnabled;
+    Open_Debug(SYS_TITLE);
+    Enable_Log(LOG_ALL, WantedUserLogEnabled);
+    Set_Log_Level(LOG_INFO);
+#else
+    LogEnabled = FALSE;
+    UserLogEnabled = FALSE;
+#endif
+
     fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
     
     if(!WantDataDir) {

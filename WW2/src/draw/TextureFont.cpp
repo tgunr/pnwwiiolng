@@ -17,6 +17,7 @@
 #include <sstream>
 #include "draw/TextureFont.h"
 #include "mem/mem.h"
+#include "client.h"
 
 using namespace std;
 
@@ -32,8 +33,8 @@ TextureFont::TextureFont( const char* name, int size )
     fioLoad(path, text, &filesize );
     if ( filesize == 0 || textureID <= 0 )
     {
-        printf("western font data not found");
-        exit(-1);
+        clientErrorLog("western font data not found");
+        exit(-1); // TODO: Find a better way to report this error, this happens when archives are missing
     }
 
     nominalSize = size;

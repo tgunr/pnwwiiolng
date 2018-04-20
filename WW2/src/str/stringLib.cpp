@@ -162,3 +162,14 @@ std::string strtrim(const std::string &str)
 
     return str.substr(snwspos, (enwspos + 1) - snwspos);
 }
+
+#if platOS == OS_WIN32
+int vasprintf(char **result, const char *fmt, va_list args)
+{
+    size_t len = static_cast<size_t>(_vscprintf(fmt, args));
+    if (len >= INT_MAX) { return -1; }
+    char *buf = calloc(1, len + 1);
+    vsnprintf_s(buf, len + 1, _TRUNCATE, fmt, args);
+    return (int)len;
+}
+#endif

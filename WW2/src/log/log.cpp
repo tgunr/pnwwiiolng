@@ -18,8 +18,8 @@ static std::mutex logLock;
 static UINT32 logMask = LOG_ALL;
 static SINT32 logLevel = LOG_INFO;
 #else
-static UINT32 logMask = 0;
-static SINT32 logLevel = 0;
+static UINT32 logMask = LOG_ERROR;
+static SINT32 logLevel = LOG_FATAL;
 #endif
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker);
@@ -39,7 +39,8 @@ static const char* LOG_SYSTEM_NAMES[32] =
 	"fx",
 	"timer",
     "texture",
-	"console"
+	"console",
+    "ERROR",
 	// NULLS the rest out
 };
 
@@ -149,31 +150,6 @@ UINT32 Get_Log_Mask()
 	return logMask;
 }
 
-#if platOS == OS_MACOS
-
-/************************************************************************************************
-	logv
-*************************************************************************************************/
-
-static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
-{
-	if(logLevel < level || !(system & logMask)) return;
-
-	vprintf(str, marker);
-	printf("\n");
-}
-
-LOGICAL Open_Debug(const char* filename)
-{
-	return TRUE;
-}
-
-void Close_Debug()
-{
-}
-
-#elif platOS == OS_WIN32
-
 #include "include/vars.h"
 
 static FILE *ofp = nullptr;
@@ -182,26 +158,35 @@ static FILE *ofp = nullptr;
 	Open_Debug
 *************************************************************************************************/
 
+static LOGICAL Open_Debug_Unlocked(const char* filename)
+{
+    if (filename == nullptr) {
+        return false;
+    }
+
+    if (ofp != nullptr) {
+        return true;
+    }
+    ofp = fioUserFile((std::string(filename) + ".log").c_str(), "w");
+    if (ofp == nullptr) {
+        return false;
+    }
+    return true;
+}
+
 LOGICAL Open_Debug(const char* filename)
 {
-	if (filename == nullptr) {
-		return false;
-	}
-
-	{
-		std::lock_guard<std::mutex> guard(logLock);
-
-		if (ofp != nullptr) {
-			return true;
-		}
-		ofp = fioUserFile((std::string(filename) + ".log").c_str(), "w");
-		if (ofp == nullptr) {
-			return false;
-		}
-	}
-
-	Write_Debug("\r\nDebug Message System Open.\r\n");
-	return true;
+    {
+        std::lock_guard<std::mutex> guard(logLock);
+        if (filename == nullptr) {
+            return false;
+        }
+        if (!Open_Debug_Unlocked(filename)) {
+            return false;
+        }
+    }
+    Write_Debug("Debug Message System Open.\n");
+    return true;
 }
 
 /************************************************************************************************
@@ -221,39 +206,66 @@ void Close_Debug()
 /************************************************************************************************
 	logv
 *************************************************************************************************/
+static void _log_outv(const char * const format, va_list args)
+{
+#ifdef DEBUG_WW2
+    vfprintf(stderr, format, args);
+    fflush(stderr);
+#endif
+
+    if (ofp != nullptr) {
+        vfprintf(ofp, format, args);
+        fflush(ofp);
+    }
+}
+
+static void _log_outf(const char * const format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    _log_outv(format, args);
+    va_end(args);
+}
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 {
-	std::lock_guard<std::mutex> guard(logLock);
+    if (system != LOG_ERROR) { // "error" system is never ignored
+        std::lock_guard<std::mutex> guard(logLock);
 
-	if (logLevel < level || (system & logMask) == 0 || str == nullptr) {
-		return;
-	}
+        if (logLevel < level || (system & logMask) == 0 || str == nullptr) {
+            return;
+        }
+    }
 
-	// There's no OutputDebugFormat(), so we fake vasprintf()
-	size_t len = static_cast<size_t>(_vscprintf(str, marker));
-	if (len >= INT_MAX) { return; }
-	std::unique_ptr<char[]> buf = std::make_unique<char[]>(len + 1);
-	vsnprintf_s(buf.get(), len + 1, _TRUNCATE, str, marker);
-
-#ifdef DEBUG_WW2
-	// Output to debugger always
-	OutputDebugStringA(buf.get());
-	OutputDebugStringA("\r\n");
-
-	// Output to stderr always
-	fprintf_s(stderr, "%s\n", buf.get());
-	fflush(stderr);
+    const UINT64 trueTime = GetMillisecondTick();
+    const time_t now = (time_t)(trueTime / 1000);
+    const UINT32 milis = (UINT32)(trueTime % 1000);
+    char myTime[49];
+    char myYear[10];
+    struct tm myTm;
+#if platOS == OS_WIN32
+    localtime_s(&myTm, &now);
+#else
+    localtime_r(&now, &myTm);
 #endif
+    strftime(myTime, sizeof(myTime) - 1, "%a %b %d %X", &myTm);
+    strftime(myYear, sizeof(myYear) - 1, "%Y", &myTm);
 
-	// Output to file, if any
-	if (ofp != nullptr) {
-		fprintf_s(ofp, "%s\n", buf.get());
-		fflush(ofp);
-	}
+    char *cbuf = nullptr;
+    vasprintf(&cbuf, str, marker);
+    std::unique_ptr<char[], std::function<void(void*)>> buf(cbuf, free);
+
+    {
+        std::lock_guard<std::mutex> guard(logLock);
+
+        // For errors, we don't care whether it's a debug/beta/alpha client or
+        // whether logs weren't requested; we need to log these always.
+        if (system == LOG_ERROR && ofp == nullptr) {
+            Open_Debug_Unlocked(SYS_TITLE); // TODO: The name should not be hardcoded in this specific location
+        }
+        _log_outf("[%s.%03u %s] %s\n", myTime, milis, myYear, buf.get());
+    }
 }
-
-#endif // OS_WIN32
 
 #ifdef USE_LOG_TIMER
 /************************************************************************************************
@@ -264,22 +276,18 @@ static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 
 #define MAX_TIMERS 1024
 
-#if platOS == OS_WIN32
-extern FLOAT32 GetCPUSpeed();
-#endif
-
 struct logTimer
 {
 	char funcname[128];
 	int callcount; // to handle recursion
-	SINT32 starttime;
-	SINT32 tottime[10]; // last 10 totaltimes
+	UINT64 starttime;
+	UINT64 tottime[10]; // last 10 totaltimes
 };
 
 struct logTimerStat
 {
 	const char* funcname;
-	SINT32 tottime;
+	UINT64 tottime;
 };
 
 static logTimer logTimers[MAX_TIMERS];
@@ -308,7 +316,7 @@ void logTimerReset()
 
 		timer->callcount = 0;
 		timer->starttime = 0;
-		memmove(&timer->tottime[1], &timer->tottime[0], 9 * sizeof(SINT32));
+		memmove(&timer->tottime[1], &timer->tottime[0], 9 * sizeof(SINT64));
 		timer->tottime[0] = 0;
 	}
 }
@@ -350,7 +358,7 @@ void logTimerBegin(const char* parent, const char* child, int* timerid)
 	if(timer)
 	{
 		if(timer->callcount == 0)
-			timer->starttime = piReadTimeStamp32();
+			timer->starttime = piReadTimeStamp64();
 
 		timer->callcount++;
 	}else
@@ -363,9 +371,9 @@ void logTimerBegin(const char* parent, const char* child, int* timerid)
 	logTimerEnd
 *************************************************************************************************/
 
-int logTimerEnd(int timerid)
+UINT64 logTimerEnd(int timerid)
 {
-	int dt = 0;
+	UINT64 dt = 0;
 
 	if(timerid > -1 && timerid < MAX_TIMERS)
 	{
@@ -375,7 +383,7 @@ int logTimerEnd(int timerid)
 
 		if(timer->callcount == 0)
 		{
-			dt =  piReadTimeStamp32() - timer->starttime;
+			dt =  piReadTimeStamp64() - timer->starttime;
 			timer->tottime[0] += dt;
 		}
 	}
@@ -401,8 +409,8 @@ static int logTimerStatCompar(const void* v1, const void* v2)
 
 void logTimerPrint(int maintimerid, int frameidx)
 {
-	int i, numTimers;
-	SINT32 totaltime = 0;
+	size_t i, numTimers;
+	UINT64 totaltime = 0;
 	logTimer* timer;
 	logTimerStat* sortTime;
 
@@ -442,7 +450,7 @@ void logTimerPrint(int maintimerid, int frameidx)
 		if(sortTime->tottime > 0)
 		{
 			Write_Log(LOG_TIMER, LOG_INFO, "%s: %.2f ms %.2f%%", sortTime->funcname, logTimerToMs(sortTime->tottime),
-						(sortTime->tottime / (FLOAT32)totaltime) * 100.0f);
+						(sortTime->tottime / (FLOAT64)totaltime) * 100.0f);
 
 		}
 	}
@@ -452,17 +460,9 @@ void logTimerPrint(int maintimerid, int frameidx)
 	logTimerToMs
 *************************************************************************************************/
 
-float logTimerToMs(int dt)
+float logTimerToMs(UINT64 dt)
 {
-#if platOS == OS_WIN32
-	static FLOAT32 cpuSpeed = -1;
-	if(cpuSpeed < 0)
-		cpuSpeed = GetCPUSpeed() * 1000000.0f;
-
-	return dt / cpuSpeed * 1000.f;
-#elif platOS == OS_MACOS
 	return dt / 1000.0f;
-#endif
 }
 #endif //#ifdef USE_LOG_TIMER
 #endif // EVENT_LOG

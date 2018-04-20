@@ -106,7 +106,7 @@ const char* macDocumentsPath()
                         URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nullptr];
             docsDir = [docsDir URLByAppendingPathComponent:@"Battleground Europe"];
             
-            // We're giving the prefs folder the permissions it would otherwise have
+            // We're giving the docs folder the permissions it would otherwise have
             // gotten by default here. Would 0750 or 0700 be a better choice?
             [[NSFileManager defaultManager] createDirectoryAtURL:docsDir withIntermediateDirectories:YES attributes:@{
                 NSFilePosixPermissions: @(0755)

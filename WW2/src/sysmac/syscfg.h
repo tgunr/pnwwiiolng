@@ -26,6 +26,9 @@
 
 #define PREPATH getPrePath()
 
+#define SYS_TITLE        "WWIIOL"
+#define SYS_COMPANY_NAME "Playnet"
+
 #define TERRAIN_PREPATH "Terrain\\"
 #define GR2DATA_PREPATH "gr2Data\\"
 

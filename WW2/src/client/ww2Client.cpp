@@ -63,40 +63,16 @@ using namespace ww2;
 
 #include "fio/fio.h"
 
-// How to log something to the WW2_Log.txt file.
-
 void clientErrorLog(const char* const fmt, ...)
 {
-	FILE* fp = Fio::OpenLogFile();
-	if ( fp == nullptr )
-		return;
+    // Inefficient as crud but oh well.
+    va_list args;
+    char *cbuf = nullptr;
+    va_start(args, fmt);
+    vasprintf(&cbuf, fmt, args);
+    std::unique_ptr<char[], std::function<void(void*)>> buf(cbuf, free);
 
-	const time_t now = teulTime();
-	const UINT32 milis = (UINT32)(teulClock64 % 1000ULL);
-	char myTime[49];
-	char myYear[10];
-#if platOS == OS_WIN32
-	tm* myTm = localtime(&now);
-	strftime(myTime, 48, "%a %b %d %X", myTm);
-	strftime(myYear, 9, "%Y", myTm);
-#else
-  struct tm tmStruct;
-	strftime(myTime, 48, "%a %b %d %X", localtime_r(&now, &tmStruct));
-	strftime(myYear, 9, "%Y", localtime_r(&now, &tmStruct));
-#endif
-    if ( myTime[0] == 0 )
-		strcpy(myTime, "unknown");
-
-	fprintf(fp, "[%s.%03u %s] ", myTime, milis, myYear);
-
-	va_list(args);
-	va_start(args, fmt);
-	vfprintf(fp, fmt, args);
-	va_end(args);
-
-	fprintf(fp, "\n");
-
-	fclose(fp);
+    Write_Log(LOG_ERROR, LOG_FATAL, "%s", buf.get());
 }
 
 // default player info
