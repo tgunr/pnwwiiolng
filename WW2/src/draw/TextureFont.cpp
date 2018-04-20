@@ -17,7 +17,7 @@
 #include <sstream>
 #include "draw/TextureFont.h"
 #include "mem/mem.h"
-#include "client.h"
+#include "client/client.h"
 
 using namespace std;
 
