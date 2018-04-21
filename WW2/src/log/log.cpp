@@ -227,6 +227,25 @@ static void _log_outf(const char * const format, ...)
     va_end(args);
 }
 
+// Borrowed from dbug.cpp
+// TODO FIXME: Make this a global utiltiy
+static void _getCurrentTime(struct tm &tm, uint32_t &millis)
+{
+	auto now = std::chrono::system_clock::now();
+	time_t nowTime = std::chrono::system_clock::to_time_t(now);
+	auto nowRounded = std::chrono::system_clock::from_time_t(nowTime);
+
+	// If the time value was rounded upward instead of truncated or rounded down,
+	// adjust for the rounding.
+	if (nowRounded > now) {
+		--nowTime;
+		nowRounded -= std::chrono::seconds(1);
+	}
+
+	localtime_r(&nowTime, &tm);
+	millis = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::milli>>(now - nowRounded).count();
+}
+
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 {
     if (system != LOG_ERROR) { // "error" system is never ignored
@@ -237,18 +256,13 @@ static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
         }
     }
 
-    const UINT64 trueTime = GetMillisecondTick();
-    const time_t now = (time_t)(trueTime / 1000);
-    const UINT32 milis = (UINT32)(trueTime % 1000);
-    char myTime[49];
-    char myYear[10];
-    struct tm myTm;
-#if platOS == OS_WIN32
-    localtime_s(&myTm, &now);
-#else
-    localtime_r(&now, &myTm);
-#endif
-    strftime(myTime, sizeof(myTime) - 1, "%a %b %d %X", &myTm);
+	UINT32 milis;
+	struct tm myTm;
+	_getCurrentTime(myTm, milis);
+	char myTime[49];
+	char myYear[10];
+
+	strftime(myTime, sizeof(myTime) - 1, "%a %b %d %X", &myTm);
     strftime(myYear, sizeof(myYear) - 1, "%Y", &myTm);
 
     char *cbuf = nullptr;
