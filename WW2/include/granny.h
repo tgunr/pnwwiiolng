@@ -1,12 +1,16 @@
 #if !defined(GRANNY_H)
 /* ========================================================================
-   (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+   $Notice: $
    ======================================================================== */
 #define GRANNY_32BIT_PTR 0
 #define GRANNY_64BIT_PTR 0
 
-#if defined(_XENON)
-  // Note - the order of these if/elifs is important, since Xenon ALSO defines _XBOX
+#define GRANNY_LITTLE_ENDIAN 0
+#define GRANNY_BIG_ENDIAN    0
+
+// Note that 360 also defines _XBOX. Since the Xbox is no longer a supported target, it
+// can safely be assumed that _XBOX means Xbox 360 (Xenon) at this point.
+#if defined(_XENON) || defined(_XBOX)
   #define GRANNY_DYNIMP(ret) ret __stdcall
   #define GRANNY_DYNEXP(ret) ret __stdcall
   #define GRANNY_CALLBACK(ret) ret __cdecl
@@ -15,22 +19,10 @@
 
   #undef  GRANNY_32BIT_PTR
   #define GRANNY_32BIT_PTR 1
+  #undef  GRANNY_BIG_ENDIAN
+  #define GRANNY_BIG_ENDIAN 1
   #define GRANNY_64BIT_TYPE __int64
-  #define GRANNY_THREADED 1
-#elif defined(_XBOX)
-  #if defined(_XENON)
-    #error Should never have got here (dll_header.h)
-  #endif
-  #define GRANNY_DYNIMP(ret) ret __stdcall
-  #define GRANNY_DYNEXP(ret) ret __stdcall
-  #define GRANNY_CALLBACK(ret) ret __cdecl
-  #define GRANNY_DYNIMPDATA(type) type
-  #define GRANNY_DYNEXPDATA(type) type
-  #undef  GRANNY_32BIT_PTR
-  #define GRANNY_32BIT_PTR 1
-  #define GRANNY_64BIT_TYPE __int64
-  #define GRANNY_THREADED 1
-#elif defined(_GAMECUBE)
+#elif defined(_GAMECUBE) || defined(CAFE)
   #define GRANNY_DYNIMP(ret) ret
   #define GRANNY_DYNEXP(ret) ret
   #define GRANNY_CALLBACK(ret) ret
@@ -38,6 +30,19 @@
   #define GRANNY_DYNEXPDATA(type) type
   #undef  GRANNY_32BIT_PTR
   #define GRANNY_32BIT_PTR 1
+  #undef  GRANNY_BIG_ENDIAN
+  #define GRANNY_BIG_ENDIAN 1
+  #define GRANNY_64BIT_TYPE long long
+#elif defined(NN_PLATFORM_CTR)
+  #define GRANNY_DYNIMP(ret) ret
+  #define GRANNY_DYNEXP(ret) ret
+  #define GRANNY_CALLBACK(ret) ret
+  #define GRANNY_DYNIMPDATA(type) type
+  #define GRANNY_DYNEXPDATA(type) type
+  #undef  GRANNY_32BIT_PTR
+  #define GRANNY_32BIT_PTR 1
+  #undef  GRANNY_LITTLE_ENDIAN
+  #define GRANNY_LITTLE_ENDIAN 1
   #define GRANNY_64BIT_TYPE long long
 #elif defined(__CELLOS_LV2__)
   // PS3 target (CellOs, not more than one Cello...)
@@ -48,9 +53,10 @@
   #define GRANNY_DYNEXPDATA(type) type
   #undef  GRANNY_32BIT_PTR
   #define GRANNY_32BIT_PTR 1
+  #undef  GRANNY_BIG_ENDIAN
+  #define GRANNY_BIG_ENDIAN 1
   #define GRANNY_64BIT_TYPE long long
-  #define GRANNY_THREADED 1
-#elif defined(_PSX2) || defined(__psp__)
+#elif defined(__psp2__) || defined(SN_TARGET_PSP2)
   #define GRANNY_DYNIMP(ret) ret
   #define GRANNY_DYNEXP(ret) ret
   #define GRANNY_CALLBACK(ret) ret
@@ -58,7 +64,53 @@
   #define GRANNY_DYNEXPDATA(type) type
   #undef  GRANNY_32BIT_PTR
   #define GRANNY_32BIT_PTR 1
+  #undef  GRANNY_LITTLE_ENDIAN
+  #define GRANNY_LITTLE_ENDIAN 1
+  #define GRANNY_64BIT_TYPE long long
+#elif defined(_PSX2)
+  #define GRANNY_DYNIMP(ret) ret
+  #define GRANNY_DYNEXP(ret) ret
+  #define GRANNY_CALLBACK(ret) ret
+  #define GRANNY_DYNIMPDATA(type) type
+  #define GRANNY_DYNEXPDATA(type) type
+  #undef  GRANNY_32BIT_PTR
+  #define GRANNY_32BIT_PTR 1
+  #undef  GRANNY_BIG_ENDIAN
+  #define GRANNY_BIG_ENDIAN 1
   #define GRANNY_64BIT_TYPE long
+#elif defined(__psp__)
+  #define GRANNY_DYNIMP(ret) ret
+  #define GRANNY_DYNEXP(ret) ret
+  #define GRANNY_CALLBACK(ret) ret
+  #define GRANNY_DYNIMPDATA(type) type
+  #define GRANNY_DYNEXPDATA(type) type
+  #undef  GRANNY_32BIT_PTR
+  #define GRANNY_32BIT_PTR 1
+  #undef  GRANNY_LITTLE_ENDIAN
+  #define GRANNY_LITTLE_ENDIAN 1
+  #define GRANNY_64BIT_TYPE long
+#elif defined(_DURANGO)
+    #define GRANNY_DYNIMP(ret) ret
+    #define GRANNY_DYNEXP(ret) ret
+    #define GRANNY_CALLBACK(ret) ret
+    #define GRANNY_DYNIMPDATA(type) type
+    #define GRANNY_DYNEXPDATA(type) type
+    #undef  GRANNY_64BIT_PTR
+    #define GRANNY_64BIT_PTR 1
+    #undef  GRANNY_LITTLE_ENDIAN
+    #define GRANNY_LITTLE_ENDIAN 1
+    #define GRANNY_64BIT_TYPE __int64
+#elif defined(__ORBIS__)
+    #define GRANNY_DYNIMP(ret) ret
+    #define GRANNY_DYNEXP(ret) ret
+    #define GRANNY_CALLBACK(ret) ret
+    #define GRANNY_DYNIMPDATA(type) type
+    #define GRANNY_DYNEXPDATA(type) type
+    #undef  GRANNY_64BIT_PTR
+    #define GRANNY_64BIT_PTR 1
+    #undef  GRANNY_LITTLE_ENDIAN
+    #define GRANNY_LITTLE_ENDIAN 1
+    #define GRANNY_64BIT_TYPE __INT64_TYPE__
 #elif defined(_WIN32)
   #if defined(_WIN64)
     // Yes, X64 defines both _WIN#2 and _WIN64
@@ -69,7 +121,8 @@
     #define GRANNY_DYNEXPDATA(type) __declspec(dllexport) type
     #undef  GRANNY_64BIT_PTR
     #define GRANNY_64BIT_PTR 1
-    #define GRANNY_THREADED 1
+    #undef  GRANNY_LITTLE_ENDIAN
+    #define GRANNY_LITTLE_ENDIAN 1
   #elif defined(GRANNY_MANAGED)
     // Probably could/should do this on 64bit
     #define GRANNY_DYNIMP(ret) [DllImport("granny2.dll")] ret __stdcall
@@ -79,6 +132,8 @@
     #define GRANNY_DYNEXPDATA(type) __declspec(dllexport) type
     #undef  GRANNY_32BIT_PTR
     #define GRANNY_32BIT_PTR 1
+    #undef  GRANNY_LITTLE_ENDIAN
+    #define GRANNY_LITTLE_ENDIAN 1
   #else
     #define GRANNY_DYNIMP(ret) __declspec(dllimport) ret __stdcall
     #define GRANNY_DYNEXP(ret) __declspec(dllexport) ret __stdcall
@@ -87,7 +142,8 @@
     #define GRANNY_DYNEXPDATA(type) __declspec(dllexport) type
     #undef  GRANNY_32BIT_PTR
     #define GRANNY_32BIT_PTR 1
-    #define GRANNY_THREADED 1
+    #undef  GRANNY_LITTLE_ENDIAN
+    #define GRANNY_LITTLE_ENDIAN 1
   #endif
   #define GRANNY_64BIT_TYPE __int64
 #elif defined(_MACOSX) || defined(__MWERKS__)
@@ -96,38 +152,97 @@
   #define GRANNY_CALLBACK(ret) ret
   #define GRANNY_DYNIMPDATA(type) type
   #define GRANNY_DYNEXPDATA(type) type
-  #undef  GRANNY_32BIT_PTR
-  #define GRANNY_32BIT_PTR 1
   #define GRANNY_64BIT_TYPE long long
+
+  #if defined(__ppc__)
+    #undef  GRANNY_32BIT_PTR
+    #define GRANNY_32BIT_PTR 1
+    #undef  GRANNY_BIG_ENDIAN
+    #define GRANNY_BIG_ENDIAN 1
+  #elif defined(__x86_64__)
+    #undef  GRANNY_64BIT_PTR
+    #define GRANNY_64BIT_PTR 1
+    #undef  GRANNY_LITTLE_ENDIAN
+
+    #define GRANNY_LITTLE_ENDIAN 1
+  #else
+    #undef  GRANNY_32BIT_PTR
+    #define GRANNY_32BIT_PTR 1
+    #undef  GRANNY_LITTLE_ENDIAN
+    #define GRANNY_LITTLE_ENDIAN 1
+  #endif
 
   #if defined(__MWERKS__)
     #pragma export on
   #endif
-#elif defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__)
+#elif defined(GENERIC_ARM9)
+  #define GRANNY_DYNIMP(ret) ret
+  #define GRANNY_DYNEXP(ret) ret
+  #define GRANNY_CALLBACK(ret) ret
+  #define GRANNY_DYNIMPDATA(type) type
+  #define GRANNY_DYNEXPDATA(type) type
+  #undef  GRANNY_32BIT_PTR
+  #define GRANNY_32BIT_PTR 1
+  #undef  GRANNY_LITTLE_ENDIAN
+  #define GRANNY_LITTLE_ENDIAN 1
+  #define GRANNY_64BIT_TYPE long long
+#elif defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || defined(__IPHONE_OS_VERSION_MIN_REQUIRED) || defined(TARGET_OS_TV)
   #define GRANNY_IPHONE_EXT 1
   #define GRANNY_DYNIMP(ret) ret
   #define GRANNY_DYNEXP(ret) ret
   #define GRANNY_CALLBACK(ret) ret
   #define GRANNY_DYNIMPDATA(type) type
   #define GRANNY_DYNEXPDATA(type) type
-  #undef  GRANNY_32BIT_PTR
-  #define GRANNY_32BIT_PTR 1
+  #if defined(__x86_64__)
+    #undef  GRANNY_64BIT_PTR
+    #define GRANNY_64BIT_PTR 1
+  #elif defined(__arm64__)
+    #undef  GRANNY_64BIT_PTR
+    #define GRANNY_64BIT_PTR 1
+  #else
+    #undef  GRANNY_32BIT_PTR
+    #define GRANNY_32BIT_PTR 1
+  #endif
+  #undef  GRANNY_LITTLE_ENDIAN
+  #define GRANNY_LITTLE_ENDIAN 1
   #define GRANNY_64BIT_TYPE long long
-#elif defined(linux) || defined(__linux__)
+#elif defined(NN_NINTENDO_SDK)
   #define GRANNY_DYNIMP(ret) ret
   #define GRANNY_DYNEXP(ret) ret
   #define GRANNY_CALLBACK(ret) ret
   #define GRANNY_DYNIMPDATA(type) type
   #define GRANNY_DYNEXPDATA(type) type
-  #undef  GRANNY_32BIT_PTR
-  #define GRANNY_32BIT_PTR 1
+  #undef  GRANNY_64BIT_PTR
+  #define GRANNY_64BIT_PTR 1
+  #undef  GRANNY_LITTLE_ENDIAN
+  #define GRANNY_LITTLE_ENDIAN 1
+  #define GRANNY_64BIT_TYPE long long
+#elif defined(linux) || defined(__linux__) || defined(__native_client__)
+  #define GRANNY_DYNIMP(ret) ret
+  #define GRANNY_DYNEXP(ret) ret
+  #define GRANNY_CALLBACK(ret) ret
+  #define GRANNY_DYNIMPDATA(type) type
+  #define GRANNY_DYNEXPDATA(type) type
+  #if defined(ANDROID_ARM64)
+    #undef  GRANNY_64BIT_PTR
+    #define GRANNY_64BIT_PTR 1
+  // The second clause detects NaCl, which is x64 with 32 bit pointers.                                                            
+  #elif defined(__x86_64__) && (!defined(__SIZEOF_PTRDIFF_T__) || __SIZEOF_PTRDIFF_T__ != 4)
+    #undef  GRANNY_64BIT_PTR
+    #define GRANNY_64BIT_PTR 1
+  #else
+    #undef  GRANNY_32BIT_PTR
+    #define GRANNY_32BIT_PTR 1
+  #endif
+  #undef  GRANNY_LITTLE_ENDIAN
+  #define GRANNY_LITTLE_ENDIAN 1
   #define GRANNY_64BIT_TYPE long long
 #endif
 
 /* Switch the import/export state of the functions depending on who's
    compiling, and what compiler we're using */
-#if (BUILDING_GRANNY || BUILDING_GRANNY_STATIC)
-  #if BUILDING_GRANNY_STATIC
+#if defined(BUILDING_GRANNY) || defined(BUILDING_GRANNY_STATIC)
+  #if defined(BUILDING_GRANNY_STATIC)
     #define GRANNY_DYNLINK(ret) ret
     #define GRANNY_DYNLINKDATA(type) type
   #else
@@ -139,26 +254,72 @@
   #define GRANNY_DYNLINKDATA(type) GRANNY_DYNIMPDATA(type)
 #endif
 
+
+#ifdef GRANNY_NO_NAMESPACE
+   #define GRANNY_NAMESPACE_BEING typedef char Ignored_RequireSemi
+   #define GRANNY_NAMESPACE_END   typedef char Ignored_RequireSemi
+   #define GRANNY
+#else
+   #define GRANNY_NAMESPACE_BEGIN namespace granny {     typedef char Ignored_RequireSemi
+   #define GRANNY_NAMESPACE_END   }                      typedef char Ignored_RequireSemi
+   #define GRANNY granny::
+#endif
+
+// For transparent structures, we'll be defining them later, just do a standard forward decl.
+#define GRANNY_FORWARD_DECL_STRUCT(x) typedef struct granny_ ## x granny_ ## x
+
+#if __cplusplus
+   // In c++ mode, we can correctly relate the granny_ version to the internal namespaced version
+   #define GRANNY_FORWARD_DECL_OPAQUE_STRUCT(x)   \
+      GRANNY_NAMESPACE_BEGIN;                     \
+         struct x;                                \
+      GRANNY_NAMESPACE_END;                       \
+      typedef struct GRANNY x granny_ ## x
+#else
+   // In c mode, just get the structure declared correctly.
+   #define GRANNY_FORWARD_DECL_OPAQUE_STRUCT(x)  GRANNY_FORWARD_DECL_STRUCT(x)
+#endif
+
 #if defined(GRANNY_MANAGED)
    #define GRANNY_STRUCT(x) public x
 #else
    #define GRANNY_STRUCT(x) x
 #endif
 
-/* Setup our packing directives.  Note that Granny assumes packing of
-   its structures.  We ensure that we don't have any alignment less
-   than 4-bytes in general */
-#ifdef _MSC_VER
+
+/* Setup our packing directives.  Note that Granny assumes packing of its structures.  We
+   ensure that we don't have any alignment less than 4-bytes in general, but this is
+   important for 64-bit platforms where pointers are allowed to be unaligned on x86_64.
+
+   Note that where possible, we use the GCC pack(4) compatibility, since later versions
+   emit errors when you pass pointers or references to members of structures that are
+   marked __packed__.  Which is awesome.
+*/
+#define GRANNY_USES_MS_PACKING 0
+
+#if defined(NN_PLATFORM_CTR) || \
+    defined(_MSC_VER) || \
+    defined(__x86_64__) || \
+    defined(__arm64__) || \
+    defined(_MACOSX) || \
+    defined(linux) || defined(__linux__) || defined(LINUX)
+#undef GRANNY_USES_MS_PACKING
+#define GRANNY_USES_MS_PACKING 1
+#endif
+
+
+#if GRANNY_USES_MS_PACKING
 
   // Byte pack, and disable the warning...
   #pragma pack(push)
   #pragma pack(4)
-
-  #pragma warning(push)
-  #pragma warning(disable : 4121) // alignment of a member was sensitive to packing
-  #pragma warning(disable : 4103) // used #pragma pack to change alignment
   #define GrannyAlignAttribute
 
+  #ifdef _MSC_VER
+    #pragma warning(push)
+    #pragma warning(disable : 4121) // alignment of a member was sensitive to packing
+    #pragma warning(disable : 4103) // used #pragma pack to change alignment
+  #endif
 #else
 
   // Assume gcc style __attribute__ packing directives
@@ -201,8 +362,7 @@ typedef granny_int32 granny_int32x;
 typedef granny_int32 granny_int16x;
 typedef granny_int32 granny_int8x;
 
-typedef double        granny_real64x;
-typedef granny_real32 granny_real32x;
+typedef double       granny_real64x;
 
 typedef granny_real32 granny_triple[3];
 typedef granny_real32 granny_quad[4];
@@ -233,12 +393,12 @@ typedef granny_real32 granny_matrix_3x4[3][4];
 // can't store these in files either, hence the "x" on the end.  Note
 // that we do a dance here to get the maximum warning level in VC.NET.
 // __w64 will spew tons of useful warnings when /Wp64 is turned on.
-#if (_MSC_VER >= 1300 && defined(_Wp64))
+#if defined(_MSC_VER) && (_MSC_VER >= 1300 && defined(_Wp64))
 
 // Compiles to the correct size on both platforms
   #if GRANNY_32BIT_PTR
-    typedef __w64 long granny_intaddrx;
-    typedef __w64 unsigned long granny_uintaddrx;
+    typedef __w64 int granny_intaddrx;
+    typedef __w64 unsigned int granny_uintaddrx;
     GrannyTypeSizeCheck(sizeof(void*) == 4);
   #elif GRANNY_64BIT_PTR
     typedef __w64 __int64 granny_intaddrx;
@@ -280,7 +440,6 @@ GrannyTypeSizeCheck(sizeof(granny_int64x)  >= 8);
 GrannyTypeSizeCheck(sizeof(granny_int32x)  >= 4);
 GrannyTypeSizeCheck(sizeof(granny_int16x)  >= 2);
 GrannyTypeSizeCheck(sizeof(granny_int8x)   >= 1);
-GrannyTypeSizeCheck(sizeof(granny_real32x) >= 4);
 GrannyTypeSizeCheck(sizeof(granny_real64x) >= 8);
 
 // Can hold a pointer
@@ -326,27 +485,39 @@ extern "C" {
     // in granny_test_types.cpp if you're compiling the code yourself,
     // and making alterations.
     #if (defined(_GAMECUBE) || defined(_PSX2) || (defined(_MACOSX) && defined(__ppc__)))
-        typedef int bool;
+        #if defined(bool)
+            GrannyTypeSizeCheck(sizeof(bool) == 4);
+        #else
+            typedef int bool;
+        #endif
     #else
-        typedef unsigned char bool;
+        #if defined(bool)
+            GrannyTypeSizeCheck(sizeof(bool) == 1);
+        #else
+            typedef unsigned char bool;
+        #endif
     #endif
 #endif
 typedef enum granny_transform_flags
 {
     GrannyHasPosition = 0x1,
     GrannyHasOrientation = 0x2,
-    GrannyHasScaleShear = 0x4
+    GrannyHasScaleShear = 0x4,
+    Grannytransform_flags_forceint = 0x7fffffff
 } granny_transform_flags;
+GrannyTypeSizeCheck(sizeof(granny_transform_flags) == sizeof(granny_int32));
 
-typedef struct granny_transform granny_transform;
+GRANNY_FORWARD_DECL_STRUCT(transform);
 typedef enum granny_marshalling_type
 {
     GrannyAnyMarshalling = 0x0,
     GrannyInt8Marshalling = 0x1,
     GrannyInt16Marshalling = 0x2,
     GrannyInt32Marshalling = 0x4,
-    GrannyMarshallingMask = 0x7
+    GrannyMarshallingMask = 0x7,
+    Grannymarshalling_type_forceint = 0x7fffffff
 } granny_marshalling_type;
+GrannyTypeSizeCheck(sizeof(granny_marshalling_type) == sizeof(granny_int32));
 typedef enum granny_member_type
 {
     GrannyEndMember,
@@ -373,70 +544,72 @@ typedef enum granny_member_type
     GrannyReal16Member,
     GrannyEmptyReferenceMember,
     GrannyOnePastLastMemberType,
-    GrannyBool32Member = GrannyInt32Member
+    GrannyBool32Member = GrannyInt32Member,
+    Grannymember_type_forceint = 0x7fffffff
 } granny_member_type;
+GrannyTypeSizeCheck(sizeof(granny_member_type) == sizeof(granny_int32));
 
-typedef struct granny_data_type_definition granny_data_type_definition;
+GRANNY_FORWARD_DECL_STRUCT(data_type_definition);
 
-typedef struct granny_variant granny_variant;
+GRANNY_FORWARD_DECL_STRUCT(variant);
 
-typedef struct granny_model_mesh_binding granny_model_mesh_binding;
+GRANNY_FORWARD_DECL_STRUCT(model_mesh_binding);
 
-typedef struct granny_model granny_model;
+GRANNY_FORWARD_DECL_STRUCT(model);
 
-typedef struct granny_model_control_binding granny_model_control_binding;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(model_control_binding);
 
-typedef struct granny_controlled_animation granny_controlled_animation;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(spu_controlled_animation);
 
-typedef struct granny_controlled_pose granny_controlled_pose;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(controlled_pose);
 
-typedef struct granny_model_instance granny_model_instance;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(model_instance);
 
-typedef struct granny_old_curve granny_old_curve;
+GRANNY_FORWARD_DECL_STRUCT(old_curve);
 
-typedef struct granny_curve2 granny_curve2;
+GRANNY_FORWARD_DECL_STRUCT(curve2);
 
-typedef struct granny_curve_data_header granny_curve_data_header;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_header);
 
-typedef struct granny_curve_data_da_keyframes32f granny_curve_data_da_keyframes32f;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_da_keyframes32f);
 
-typedef struct granny_curve_data_da_k32f_c32f granny_curve_data_da_k32f_c32f;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_da_k32f_c32f);
 
-typedef struct granny_curve_data_da_k16u_c16u granny_curve_data_da_k16u_c16u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_da_k16u_c16u);
 
-typedef struct granny_curve_data_da_k8u_c8u granny_curve_data_da_k8u_c8u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_da_k8u_c8u);
 
-typedef struct granny_curve_data_d3_k16u_c16u granny_curve_data_d3_k16u_c16u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d3_k16u_c16u);
 
-typedef struct granny_curve_data_d3_k8u_c8u granny_curve_data_d3_k8u_c8u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d3_k8u_c8u);
 
-typedef struct granny_curve_data_d4n_k16u_c15u granny_curve_data_d4n_k16u_c15u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d4n_k16u_c15u);
 
-typedef struct granny_curve_data_d4n_k8u_c7u granny_curve_data_d4n_k8u_c7u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d4n_k8u_c7u);
 
-typedef struct granny_curve_data_da_identity granny_curve_data_da_identity;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_da_identity);
 
-typedef struct granny_curve_data_da_constant32f granny_curve_data_da_constant32f;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_da_constant32f);
 
-typedef struct granny_curve_data_d3_constant32f granny_curve_data_d3_constant32f;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d3_constant32f);
 
-typedef struct granny_curve_data_d4_constant32f granny_curve_data_d4_constant32f;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d4_constant32f);
 
-typedef struct granny_curve_data_d9i1_k16u_c16u granny_curve_data_d9i1_k16u_c16u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d9i1_k16u_c16u);
 
-typedef struct granny_curve_data_d9i3_k16u_c16u granny_curve_data_d9i3_k16u_c16u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d9i3_k16u_c16u);
 
-typedef struct granny_curve_data_d9i1_k8u_c8u granny_curve_data_d9i1_k8u_c8u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d9i1_k8u_c8u);
 
-typedef struct granny_curve_data_d9i3_k8u_c8u granny_curve_data_d9i3_k8u_c8u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d9i3_k8u_c8u);
 
-typedef struct granny_curve_data_d3i1_k32f_c32f granny_curve_data_d3i1_k32f_c32f;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d3i1_k32f_c32f);
 
-typedef struct granny_curve_data_d3i1_k16u_c16u granny_curve_data_d3i1_k16u_c16u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d3i1_k16u_c16u);
 
-typedef struct granny_curve_data_d3i1_k8u_c8u granny_curve_data_d3i1_k8u_c8u;
+GRANNY_FORWARD_DECL_STRUCT(curve_data_d3i1_k8u_c8u);
 
-typedef struct granny_curve_builder granny_curve_builder;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(curve_builder);
 typedef enum granny_material_texture_type
 {
     GrannyUnknownTextureType,
@@ -449,16 +622,25 @@ typedef enum granny_material_texture_type
     GrannyReflectionTexture,
     GrannyRefractionTexture,
     GrannyDisplacementTexture,
-    GrannyOnePastLastMaterialTextureType
+    GrannyOnePastLastMaterialTextureType,
+    Grannymaterial_texture_type_forceint = 0x7fffffff
 } granny_material_texture_type;
+GrannyTypeSizeCheck(sizeof(granny_material_texture_type) == sizeof(granny_int32));
 
-typedef struct granny_material_map granny_material_map;
+GRANNY_FORWARD_DECL_STRUCT(material_map);
 
-typedef struct granny_material granny_material;
+GRANNY_FORWARD_DECL_STRUCT(material);
 
-typedef struct granny_pixel_layout granny_pixel_layout;
+GRANNY_FORWARD_DECL_STRUCT(pixel_layout);
+typedef enum granny_animation_flags
+{
+    GrannyAnimationDefaultLoopCountValid = 0x1,
+    GrannyAnimationDefaultToLoopClamping = 0x2,
+    Grannyanimation_flags_forceint = 0x7fffffff
+} granny_animation_flags;
+GrannyTypeSizeCheck(sizeof(granny_animation_flags) == sizeof(granny_int32));
 
-typedef struct granny_animation granny_animation;
+GRANNY_FORWARD_DECL_STRUCT(animation);
 typedef enum granny_bound_transform_track_flags
 {
     GrannyBoundPositionCurveIsIdentity = (0x0 << 0),
@@ -475,29 +657,39 @@ typedef enum granny_bound_transform_track_flags
     GrannyBoundScaleShearCurveIsConstant = (0x1 << 4),
     GrannyBoundScaleShearCurveIsKeyframed = (0x2 << 4),
     GrannyBoundScaleShearCurveIsGeneral = (0x3 << 4),
-    GrannyBoundScaleShearCurveFlagMask = (0x3 << 4)
+    GrannyBoundScaleShearCurveFlagMask = (0x3 << 4),
+    Grannybound_transform_track_flags_forceint = 0x7fffffff
 } granny_bound_transform_track_flags;
+GrannyTypeSizeCheck(sizeof(granny_bound_transform_track_flags) == sizeof(granny_int32));
 
-typedef struct granny_bound_transform_track granny_bound_transform_track;
+GRANNY_FORWARD_DECL_STRUCT(bound_transform_track);
 
-typedef struct granny_animation_binding_identifier granny_animation_binding_identifier;
+GRANNY_FORWARD_DECL_STRUCT(animation_binding_identifier);
 
-typedef struct granny_animation_binding granny_animation_binding;
+GRANNY_FORWARD_DECL_STRUCT(animation_binding);
 
-typedef struct granny_animation_lod_builder granny_animation_lod_builder;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(animation_lod_builder);
 
-typedef struct granny_art_tool_info granny_art_tool_info;
+GRANNY_FORWARD_DECL_STRUCT(art_tool_info);
 typedef enum granny_transform_file_flags
 {
     GrannyRenormalizeNormals = 0x1,
-    GrannyReorderTriangleIndices = 0x2
+    GrannyReorderTriangleIndices = 0x2,
+    Grannytransform_file_flags_forceint = 0x7fffffff
 } granny_transform_file_flags;
+GrannyTypeSizeCheck(sizeof(granny_transform_file_flags) == sizeof(granny_int32));
 typedef enum granny_bink_texture_flags
 {
     GrannyBinkEncodeAlpha = 0x1,
     GrannyBinkUseScaledRGBInsteadOfYUV = 0x2,
-    GrannyBinkUseBink1 = 0x4
+    GrannyBinkUseBink1 = 0x4,
+    Grannybink_texture_flags_forceint = 0x7fffffff
 } granny_bink_texture_flags;
+GrannyTypeSizeCheck(sizeof(granny_bink_texture_flags) == sizeof(granny_int32));
+
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(bitknit_state);
+
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(bitknit_decompress_state);
 typedef enum granny_bspline_solver_flags
 {
     GrannyBSplineSolverEvaluateAsQuaternions = 0x1,
@@ -505,12 +697,15 @@ typedef enum granny_bspline_solver_flags
     GrannyBSplineSolverAllowC1Splitting = 0x4,
     GrannyBSplineSolverExtraDOFKnotZero = 0x10,
     GrannyBSplineSolverForceEndpointAlignment = 0x20,
-    GrannyBSplineSolverAllowReduceKeys = 0x40
+    GrannyBSplineSolverAllowReduceKeys = 0x40,
+    GrannyBSplineSolverAllowReduceKeysOnMissedTolerance = 0x80,
+    Grannybspline_solver_flags_forceint = 0x7fffffff
 } granny_bspline_solver_flags;
+GrannyTypeSizeCheck(sizeof(granny_bspline_solver_flags) == sizeof(granny_int32));
 
-typedef struct granny_bspline_solver granny_bspline_solver;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(bspline_solver);
 
-typedef struct granny_bspline_error granny_bspline_error;
+GRANNY_FORWARD_DECL_STRUCT(bspline_error);
 #define GrannyInfiniteFarClipPlane 0.0f
 #define GrannyLCD17PhysicalAspectRatio 1.25f
 #define GrannyNTSCTelevisionPhysicalAspectRatio 1.33f
@@ -526,97 +721,81 @@ typedef enum granny_camera_output_z_range
 {
     GrannyCameraOutputZZeroToOne,
     GrannyCameraOutputZNegativeOneToOne,
-    GrannyCameraOutputZNegativeOneToZero
+    GrannyCameraOutputZNegativeOneToZero,
+    Grannycamera_output_z_range_forceint = 0x7fffffff
 } granny_camera_output_z_range;
+GrannyTypeSizeCheck(sizeof(granny_camera_output_z_range) == sizeof(granny_int32));
 
-typedef struct granny_camera granny_camera;
+GRANNY_FORWARD_DECL_STRUCT(camera);
 
-typedef struct granny_compress_curve_parameters granny_compress_curve_parameters;
+GRANNY_FORWARD_DECL_STRUCT(compress_curve_parameters);
 
-typedef struct granny_control granny_control;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(control);
 typedef enum granny_accumulation_mode
 {
     GrannyNoAccumulation,
     GrannyConstantExtractionAccumulation,
-    GrannyVariableDeltaAccumulation
+    GrannyVariableDeltaAccumulation,
+    Grannyaccumulation_mode_forceint = 0x7fffffff
 } granny_accumulation_mode;
+GrannyTypeSizeCheck(sizeof(granny_accumulation_mode) == sizeof(granny_int32));
 
-typedef struct granny_controlled_animation_builder granny_controlled_animation_builder;
-typedef enum granny_blend_dag_node_type
-{
-    GrannyDagNodeType_Leaf_AnimationBlend,
-    GrannyDagNodeType_Leaf_LocalPose,
-    GrannyDagNodeType_Leaf_Callback,
-    GrannyDagNodeType_OnePastLastLeafType,
-    GrannyDagNodeType_Node_Crossfade,
-    GrannyDagNodeType_Node_WeightedBlend,
-    GrannyDagNodeType_OnePastLast
-} granny_blend_dag_node_type;
+GRANNY_FORWARD_DECL_STRUCT(controlled_animation);
 
-typedef struct granny_blend_dag_node granny_blend_dag_node;
-#define GrannyCurrentDAGStandardTag (0xC0000000 + 8)
-#define GrannyNoNodeIndex -1
-typedef enum granny_dag2_parameter_type
-{
-    GrannyFloatParameterType,
-    GrannyPoseParameterType,
-    GrannyTrackmaskParameterType
-} granny_dag2_parameter_type;
-
-typedef struct granny_dag2_source granny_dag2_source;
-
-typedef struct granny_dag2 granny_dag2;
-
-typedef struct granny_dag2_input_edge granny_dag2_input_edge;
-
-typedef struct granny_dag2_output_edge granny_dag2_output_edge;
-
-typedef struct granny_dag2_node granny_dag2_node;
-
-typedef struct granny_dag2_nodedata_callback granny_dag2_nodedata_callback;
-
-typedef struct granny_dag2_callbacks granny_dag2_callbacks;
-
-typedef struct granny_dag2_info granny_dag2_info;
-
-typedef struct granny_dag2_instance granny_dag2_instance;
-
-typedef struct granny_dag_pose_cache granny_dag_pose_cache;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(controlled_animation_builder);
 typedef enum granny_file_data_tree_flags
 {
-    GrannyExcludeTypeTree = 0x1
+    GrannyExcludeTypeTree = 0x1,
+    Grannydata_tree_flags_forceint = 0x7fffffff
 } granny_file_data_tree_flags;
+GrannyTypeSizeCheck(sizeof(granny_file_data_tree_flags) == sizeof(granny_int32));
 
-typedef struct granny_file_data_tree_writer granny_file_data_tree_writer;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(file_data_tree_writer);
 typedef enum granny_deformation_type
 {
     GrannyDeformPosition = 1,
     GrannyDeformPositionNormal,
     GrannyDeformPositionNormalTangent,
-    GrannyDeformPositionNormalTangentBinormal
+    GrannyDeformPositionNormalTangentBinormal,
+    Grannydeformation_type_forceint = 0x7fffffff
 } granny_deformation_type;
+GrannyTypeSizeCheck(sizeof(granny_deformation_type) == sizeof(granny_int32));
 
-typedef struct granny_exporter_info granny_exporter_info;
+GRANNY_FORWARD_DECL_STRUCT(exporter_info);
 
-typedef struct granny_file granny_file;
+GRANNY_FORWARD_DECL_STRUCT(file);
 
-typedef struct granny_noalloc_loading_mem granny_noalloc_loading_mem;
+GRANNY_FORWARD_DECL_STRUCT(noalloc_loading_mem);
 
-typedef struct granny_file_location granny_file_location;
+GRANNY_FORWARD_DECL_STRUCT(file_location);
 
-typedef struct granny_file_fixup granny_file_fixup;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(file_fixup);
 
-typedef struct granny_file_builder granny_file_builder;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(file_builder);
 typedef enum granny_compression_type
 {
     GrannyNoCompression,
     GrannyOodle0Compression,
     GrannyOodle1Compression,
-    GrannyOnePastLastCompressionType
+    GrannyBitKnitCompression,
+    GrannyBitKnit2Compression,
+    GrannyOnePastLastCompressionType,
+    Grannycompression_type_forceint = 0x7fffffff
 } granny_compression_type;
+GrannyTypeSizeCheck(sizeof(granny_compression_type) == sizeof(granny_int32));
+typedef enum granny_compression_type_flags
+{
+    GrannyEnableFixupCompression = 1 << 0,
+    GrannyEnableSubsectionMerging = 1 << 1,
+    GrannyEnableIncrementalDecompression = 1 << 2,
+    Grannycompression_type_flags_forceint = 0x7fffffff
+} granny_compression_type_flags;
+GrannyTypeSizeCheck(sizeof(granny_compression_type_flags) == sizeof(granny_int32));
 
-typedef struct granny_file_compressor granny_file_compressor;
-#define GrannyCurrentGRNStandardTag (0x80000000 + 50)
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(file_decompressor);
+
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(file_compressor);
+#define GrannyCurrentGRNStandardTag (0x80000000 + 57)
 #define GrannyCurrentGRNFileVersion 7
 #define GrannyGRNExtraTagCount 4
 typedef enum granny_standard_section_index
@@ -629,8 +808,10 @@ typedef enum granny_standard_section_index
     GrannyStandardTextureSection = 5,
     GrannyStandardDiscardableSection = 6,
     GrannyStandardUnloadedSection = 7,
-    GrannyStandardSectionCount
+    GrannyStandardSectionCount,
+    Grannystandard_section_index_forceint = 0x7fffffff
 } granny_standard_section_index;
+GrannyTypeSizeCheck(sizeof(granny_standard_section_index) == sizeof(granny_int32));
 typedef enum granny_grn_type_tag
 {
     GrannyFirstGRNUserTag = 0,
@@ -638,59 +819,63 @@ typedef enum granny_grn_type_tag
     GrannyFirstGRNStandardTag = 0x80000000,
     GrannyLastGRNStandardTag = 0xFFFFFFFF
 } granny_grn_type_tag;
+GrannyTypeSizeCheck(sizeof(granny_grn_type_tag) == sizeof(granny_int32));
 
-typedef struct granny_grn_file_magic_value granny_grn_file_magic_value;
+GRANNY_FORWARD_DECL_STRUCT(grn_file_magic_value);
 
-typedef struct granny_grn_reference granny_grn_reference;
+GRANNY_FORWARD_DECL_STRUCT(grn_reference);
 
-typedef struct granny_grn_pointer_fixup granny_grn_pointer_fixup;
+GRANNY_FORWARD_DECL_STRUCT(grn_pointer_fixup);
 
-typedef struct granny_grn_mixed_marshalling_fixup granny_grn_mixed_marshalling_fixup;
+GRANNY_FORWARD_DECL_STRUCT(grn_mixed_marshalling_fixup);
 
-typedef struct granny_grn_section granny_grn_section;
+GRANNY_FORWARD_DECL_STRUCT(grn_section);
 
-typedef struct granny_grn_file_header granny_grn_file_header;
+GRANNY_FORWARD_DECL_STRUCT(grn_file_header);
 
-typedef struct granny_file_info granny_file_info;
-#define GrannyCloseFileReader(Reader) do { if(Reader) {(*((Reader)->CloseFileReaderCallback))(Reader);} } while (false)
+GRANNY_FORWARD_DECL_STRUCT(file_info);
+#define GrannyCloseFileReader(Reader) { if(Reader) {(*((Reader)->CloseFileReaderCallback))(Reader);} } typedef int __granny_require_semicolon
 #define GrannyReadAtMost(Reader, Pos, Count, Buffer) (*((Reader)->ReadAtMostCallback))(Reader, Pos, Count, Buffer)
 #define GrannyReadExactly(Reader, Pos, Count, Buffer) ((*((Reader)->ReadAtMostCallback))(Reader, Pos, Count, Buffer) == Count)
 #define GrannyGetReaderSize(Reader, SizeVar) ((*((Reader)->GetReaderSizeCallback))(Reader, SizeVar))
 
-typedef struct granny_file_reader granny_file_reader;
-#define GrannyDeleteFileWriter(Writer) (*(Writer)->DeleteFileWriterCallback)(Writer)
-#define GrannyGetWriterPosition(Writer) (*((Writer)->SeekWriterCallback))(Writer, 0, SeekCurrent)
-#define GrannySeekWriterFromStart(Writer, OffsetInUInt8s) (SeekWriterFromStartStub(Writer, OffsetInUInt8s))
-#define GrannySeekWriterFromEnd(Writer, OffsetInUInt8s) (SeekWriterFromEndStub(Writer, OffsetInUInt8s))
-#define GrannySeekWriterFromCurrentPosition(Writer, OffsetInUInt8s) (SeekWriterFromCurrentPositionStub(Writer, OffsetInUInt8s))
-#define GrannyWrite(Writer, UInt8Count, WritePointer) (*((Writer)->WriteCallback))(Writer, UInt8Count, WritePointer)
+GRANNY_FORWARD_DECL_STRUCT(file_reader);
+#define GrannyCloseFileWriter(Writer) { if (Writer) {(*(Writer)->DeleteFileWriterCallback)(Writer);} } typedef int __granny_require_semicolon
+#define GrannyGetWriterPosition(Writer) (*((Writer)->SeekWriterCallback))(Writer, 0, 2)
+#define GrannySeekWriterFromStart(Writer, OffsetInUInt8s) (*((Writer)->SeekWriterCallback))(Writer, OffsetInUInt8s, 0)
+#define GrannySeekWriterFromEnd(Writer, OffsetInUInt8s) (*((Writer)->SeekWriterCallback))(Writer, OffsetInUInt8s, 1)
+#define GrannySeekWriterFromCurrentPosition(Writer, OffsetInUInt8s) (*((Writer)->SeekWriterCallback))(Writer, OffsetInUInt8s, 2)
+#define GrannyWriteBytes(Writer, UInt8Count, WritePointer) (*((Writer)->WriteCallback))(Writer, UInt8Count, WritePointer)
 #define GrannyBeginWriterCRC(Writer) (*((Writer)->BeginCRCCallback))(Writer)
 #define GrannyEndWriterCRC(Writer) (*((Writer)->EndCRCCallback))(Writer)
 #define GrannyWriterIsCRCing(Writer) (((Writer)->CRCing))
 typedef enum granny_file_writer_seek_type
 {
-    GrannySeekStart,
-    GrannySeekEnd,
-    GrannySeekCurrent
+    GrannySeekStart = 0,
+    GrannySeekEnd = 1,
+    GrannySeekCurrent = 2,
+    Grannyfile_writer_seek_type_forceint = 0x7fffffff
 } granny_file_writer_seek_type;
+GrannyTypeSizeCheck(sizeof(granny_file_writer_seek_type) == sizeof(granny_int32));
 
-typedef struct granny_file_writer granny_file_writer;
+GRANNY_FORWARD_DECL_STRUCT(file_writer);
 typedef enum granny_pixel_filter_type
 {
     GrannyCubicPixelFilter,
     GrannyLinearPixelFilter,
     GrannyBoxPixelFilter,
-    GrannyOnePastLastPixelFilterType
+    GrannyOnePastLastPixelFilterType,
+    Grannypixel_filter_type_forceint = 0x7fffffff
 } granny_pixel_filter_type;
+GrannyTypeSizeCheck(sizeof(granny_pixel_filter_type) == sizeof(granny_int32));
 
-typedef struct granny_box_intersection granny_box_intersection;
+GRANNY_FORWARD_DECL_STRUCT(box_intersection);
 
-typedef struct granny_triangle_intersection granny_triangle_intersection;
+GRANNY_FORWARD_DECL_STRUCT(triangle_intersection);
 #define GrannyMaximumSystemFileNameSize (1 << 9)
 #define GrannyMaximumTempFileNameSize (1 << 9)
-#define GrannyMaximumMessageBufferSize (1 << 12)
+#define GrannyMaximumMessageBufferSize (1 << 10)
 #define GrannyMaximumLogFileNameSize (1 << 9)
-#define GrannyMaximumAggregateCount (1 << 6)
 #define GrannyMaximumNumberToStringBuffer (1 << 8)
 #define GrannyMaximumIKLinkCount (1 << 5)
 #define GrannyMaximumMIPLevelCount (1 << 5)
@@ -698,13 +883,10 @@ typedef struct granny_triangle_intersection granny_triangle_intersection;
 #define GrannyMaximumUserData (1 << 2)
 #define GrannyMaximumBoneNameLength (1 << 9)
 #define GrannyMaximumChannelCount (1 << 8)
-#define GrannyMaximumWeightCount (1 << 8)
 #define GrannyMaximumChannelWidth (1 << 2)
 #define GrannyMaximumBSplineDimension 16
 #define GrannyMaximumBSplineKnotPower 16
-#define GrannyDefaultAllocationAlignment 4
-#define GrannyMatrixBufferAlignment 16
-#define GrannyLocalPoseAlignment 16
+#define GrannyMaximumPolygonSides (1 << 7)
 #define GrannyBlockFileFixupCount (1 << 8)
 #define GrannyExpectedUsablePageSize (4000)
 #define GrannyMinimumAllocationsPerFixedBlock (1 << 6)
@@ -721,23 +903,18 @@ typedef struct granny_triangle_intersection granny_triangle_intersection;
 #define GrannyMaximumSectionCount 32
 #define GrannyDefaultLocalPoseFillThreshold 0.2f
 #define GrannyNoSparseBone -1
-typedef enum granny_quaternion_mode
-{
-    GrannyBlendQuaternionDirectly = 0,
-    GrannyBlendQuaternionInverted = 1,
-    GrannyBlendQuaternionNeighborhooded = 2,
-    GrannyBlendQuaternionAccumNeighborhooded = 3
-} granny_quaternion_mode;
 
-typedef struct granny_local_pose granny_local_pose;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(local_pose);
 typedef enum granny_log_message_type
 {
     GrannyIgnoredLogMessage,
     GrannyNoteLogMessage,
     GrannyWarningLogMessage,
     GrannyErrorLogMessage,
-    GrannyOnePastLastMessageType
+    GrannyOnePastLastMessageType,
+    Grannylog_message_type_forceint = 0x7fffffff
 } granny_log_message_type;
+GrannyTypeSizeCheck(sizeof(granny_log_message_type) == sizeof(granny_int32));
 typedef enum granny_log_message_origin
 {
     GrannyNotImplementedLogMessage,
@@ -747,12 +924,18 @@ typedef enum granny_log_message_origin
     GrannyWinXXSubsystemLogMessage,
     GrannyMacOSSubsystemLogMessage,
     GrannyANSISubsystemLogMessage,
+    GrannyNACLSubsystemLogMessage,
     GrannyGamecubeSubsystemLogMessage,
     GrannyPS2SubsystemLogMessage,
     GrannyPSPSubsystemLogMessage,
     GrannyPS3SubsystemLogMessage,
     GrannyXboxSubsystemLogMessage,
     GrannyXenonSubsystemLogMessage,
+    GrannyN3DSSubsystemLogMessage,
+    GrannyWiiSubsystemLogMessage,
+    GrannyWiiUSubsystemLogMessage,
+    GrannyDurangoSubsystemLogMessage,
+    GrannyPS4SubsystemLogMessage,
     GrannyMAXSubsystemLogMessage,
     GrannyMayaSubsystemLogMessage,
     GrannyXSISubsystemLogMessage,
@@ -804,230 +987,296 @@ typedef enum granny_log_message_origin
     GrannyArenaAllocatorLogMessage,
     GrannyFileOperationLogMessage,
     GrannyCameraLogMessage,
-    GrannyOnePastLastMessageOrigin
+    GrannyTelemetryLogMessage,
+    GrannyGStateLogMessage,
+    GrannyOnePastLastMessageOrigin,
+    Grannylog_message_origin_forceint = 0x7fffffff
 } granny_log_message_origin;
+GrannyTypeSizeCheck(sizeof(granny_log_message_origin) == sizeof(granny_int32));
 
-typedef struct granny_log_callback granny_log_callback;
+GRANNY_FORWARD_DECL_STRUCT(log_callback);
+#define GrannyDefaultAllocationAlignment 4
+#define GrannyMatrixBufferAlignment 16
+#define GrannyLocalPoseAlignment 16
+typedef enum granny_allocation_intent
+{
+    GrannyAllocationUnknown = 0,
+    GrannyAllocationTemporary = 1,
+    GrannyAllocationInstance = 2,
+    GrannyAllocationFileData = 3,
+    GrannyAllocationLongTerm = 4,
+    GrannyAllocationBuilder = 5,
+    Grannyallocation_intent_forceint = 0x7fffffff
+} granny_allocation_intent;
+GrannyTypeSizeCheck(sizeof(granny_allocation_intent) == sizeof(granny_int32));
 
-typedef struct granny_allocation_header granny_allocation_header;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(allocation_header);
 
-typedef struct granny_allocation_information granny_allocation_information;
+GRANNY_FORWARD_DECL_STRUCT(allocation_information);
 
-typedef struct granny_memory_arena granny_memory_arena;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(memory_arena);
 
-typedef struct granny_bone_binding granny_bone_binding;
+GRANNY_FORWARD_DECL_STRUCT(bone_binding);
 
-typedef struct granny_material_binding granny_material_binding;
+GRANNY_FORWARD_DECL_STRUCT(material_binding);
 
-typedef struct granny_morph_target granny_morph_target;
+GRANNY_FORWARD_DECL_STRUCT(morph_target);
 
-typedef struct granny_mesh granny_mesh;
+GRANNY_FORWARD_DECL_STRUCT(mesh);
 
-typedef struct granny_mesh_binding granny_mesh_binding;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(mesh_binding);
 
-typedef struct granny_mesh_builder granny_mesh_builder;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(mesh_builder);
 typedef enum granny_deformer_tail_flags
 {
     GrannyDontAllowUncopiedTail,
-    GrannyAllowUncopiedTail
+    GrannyAllowUncopiedTail,
+    GrannyAllowUninitializedDestTail,
+    Grannydeformer_tail_flags_forceint = 0x7fffffff
 } granny_deformer_tail_flags;
+GrannyTypeSizeCheck(sizeof(granny_deformer_tail_flags) == sizeof(granny_int32));
 
-typedef struct granny_mesh_deformer granny_mesh_deformer;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(mesh_deformer);
 typedef enum granny_mirror_axis
 {
     GrannyMirrorXAxis = 0,
     GrannyMirrorYAxis = 1,
     GrannyMirrorZAxis = 2,
-    GrannyMirrorAllAxes = 3
+    GrannyMirrorAllAxes = 3,
+    Grannymirror_axis_forceint = 0x7fffffff
 } granny_mirror_axis;
+GrannyTypeSizeCheck(sizeof(granny_mirror_axis) == sizeof(granny_int32));
 
-typedef struct granny_mirror_specification granny_mirror_specification;
+GRANNY_FORWARD_DECL_STRUCT(mirror_specification);
+#define GrannyCurrentMODStandardTag ((GrannyCurrentGRNStandardTag) | ((MOD_VERSION_TAG) << 15))
 
-typedef struct granny_oodle1_state granny_oodle1_state;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(oodle1_state);
 
-typedef struct granny_periodic_loop granny_periodic_loop;
+GRANNY_FORWARD_DECL_STRUCT(periodic_loop);
 
-typedef struct granny_pointer_hash granny_pointer_hash;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(pointer_hash);
 
-typedef struct granny_retargeter granny_retargeter;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(pointer_hash_iterator);
+
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(pose_cache);
+typedef enum granny_quaternion_mode
+{
+    GrannyBlendQuaternionDirectly = 0,
+    GrannyBlendQuaternionInverted = 1,
+    GrannyBlendQuaternionNeighborhooded = 2,
+    GrannyBlendQuaternionAccumNeighborhooded = 3,
+    Grannyquaternion_mode_forceint = 0x7fffffff
+} granny_quaternion_mode;
+GrannyTypeSizeCheck(sizeof(granny_quaternion_mode) == sizeof(granny_int32));
+
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(retargeter);
 typedef enum granny_s3tc_texture_format
 {
     GrannyS3TCBGR565,
     GrannyS3TCBGRA5551,
     GrannyS3TCBGRA8888MappedAlpha,
     GrannyS3TCBGRA8888InterpolatedAlpha,
-    GrannyOnePastLastS3TCTextureFormat
+    GrannyOnePastLastS3TCTextureFormat,
+    Grannys3tc_texture_format_forceint = 0x7fffffff
 } granny_s3tc_texture_format;
+GrannyTypeSizeCheck(sizeof(granny_s3tc_texture_format) == sizeof(granny_int32));
 #define GrannyNoParentBone -1
 typedef enum granny_skeleton_lod_type
 {
     GrannyNoSkeletonLOD = 0x0,
     GrannyEstimatedLOD = 0x1,
-    GrannyMeasuredLOD = 0x2
+    GrannyMeasuredLOD = 0x2,
+    Grannyskeleton_lod_type_forceint = 0x7fffffff
 } granny_skeleton_lod_type;
+GrannyTypeSizeCheck(sizeof(granny_skeleton_lod_type) == sizeof(granny_int32));
 
-typedef struct granny_bone granny_bone;
+GRANNY_FORWARD_DECL_STRUCT(bone);
 
-typedef struct granny_skeleton granny_skeleton;
+GRANNY_FORWARD_DECL_STRUCT(skeleton);
 
-typedef struct granny_skeleton_builder granny_skeleton_builder;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(skeleton_builder);
 
-typedef struct granny_spu_animation granny_spu_animation;
+GRANNY_FORWARD_DECL_STRUCT(spu_animation);
 
-typedef struct granny_spu_animation_binding_id granny_spu_animation_binding_id;
+GRANNY_FORWARD_DECL_STRUCT(spu_animation_binding_id);
 
-typedef struct granny_spu_animation_binding granny_spu_animation_binding;
+GRANNY_FORWARD_DECL_STRUCT(spu_animation_binding);
 
-typedef struct granny_spu_animation_info granny_spu_animation_info;
+GRANNY_FORWARD_DECL_STRUCT(spu_animation_info);
+typedef enum granny_samplemodel_command_type
+{
+    GrannySPUCommand_Reserved0 = 0,
+    GrannySPUCommand_Reserved1 = 1,
+    GrannySPUCommand_SampleModelAnims = 2,
+    GrannySPUCommand_SampleModelAnimAccelerated = 3,
+    GrannySPUCommand_SampleSingleControl = 4,
+    Grannysamplemodel_command_type_forceint = 0x7fffffff
+} granny_samplemodel_command_type;
+GrannyTypeSizeCheck(sizeof(granny_samplemodel_command_type) == sizeof(granny_int32));
 
-typedef struct granny_controlled_spu_animation_builder granny_controlled_spu_animation_builder;
+GRANNY_FORWARD_DECL_STRUCT(radspu_command_sma);
+
+GRANNY_FORWARD_DECL_STRUCT(radspu_command_ssc);
+
+GRANNY_FORWARD_DECL_STRUCT(radspu_command_sma_accel);
+
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(radspu_command_queue);
+
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(controlled_spu_animation_builder);
 typedef enum granny_spu_curve_types
 {
     GrannySPUCurveTypeReal32 = 0,
     GrannySPUCurveTypeK16 = 1,
     GrannySPUCurveTypeK8 = 2,
     GrannySPUCurveType4nK16 = 3,
-    GrannySPUCurveType4nK8 = 4
+    GrannySPUCurveType4nK8 = 4,
+    Grannyspu_curve_types_forceint = 0x7fffffff
 } granny_spu_curve_types;
+GrannyTypeSizeCheck(sizeof(granny_spu_curve_types) == sizeof(granny_int32));
 typedef enum granny_spu_replication_type
 {
     GrannySPUReplicationRaw = 0,
     GrannySPUReplicationNormOri = 1,
-    GrannySPUReplicationDiagonalSS = 2
+    GrannySPUReplicationDiagonalSS = 2,
+    Grannyspu_replication_type_forceint = 0x7fffffff
 } granny_spu_replication_type;
+GrannyTypeSizeCheck(sizeof(granny_spu_replication_type) == sizeof(granny_int32));
 typedef enum granny_spu_constants
 {
     GrannyMaxSPUBones = 160,
-    GrannyMaxSPUCurveSize = (75 << 10)
+    GrannyMaxSPUTransformTrackSize = (32 << 10),
+    Grannyspu_constants_forceint = 0x7fffffff
 } granny_spu_constants;
+GrannyTypeSizeCheck(sizeof(granny_spu_constants) == sizeof(granny_int32));
 
-typedef struct granny_spu_curve_header_basic granny_spu_curve_header_basic;
+GRANNY_FORWARD_DECL_STRUCT(spu_curve_header_basic);
 
-typedef struct granny_spu_curve_header_quantized granny_spu_curve_header_quantized;
+GRANNY_FORWARD_DECL_STRUCT(spu_curve_header_quantized);
 
-typedef struct granny_spu_curve_header_quantized4n granny_spu_curve_header_quantized4n;
+GRANNY_FORWARD_DECL_STRUCT(spu_curve_header_quantized4n);
 #define GrannySPUTransformTrackNoCurve (0xffffffff)
 
-typedef struct granny_spu_transform_track granny_spu_transform_track;
+GRANNY_FORWARD_DECL_STRUCT(spu_transform_track);
 
-typedef struct granny_spu_track_group granny_spu_track_group;
+GRANNY_FORWARD_DECL_STRUCT(spu_track_group);
 
-typedef struct granny_allocated_block granny_allocated_block;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(allocated_block);
 
-typedef struct granny_stack_allocator granny_stack_allocator;
+GRANNY_FORWARD_DECL_STRUCT(stack_allocator);
 
-typedef struct granny_animation_binding_cache_status granny_animation_binding_cache_status;
+GRANNY_FORWARD_DECL_STRUCT(string_database);
 
-typedef struct granny_stat_hud_alloc_point granny_stat_hud_alloc_point;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(string_table);
 
-typedef struct granny_stat_hud_model_instances granny_stat_hud_model_instances;
+GRANNY_FORWARD_DECL_STRUCT(system_clock);
 
-typedef struct granny_stat_hud_model_controls granny_stat_hud_model_controls;
-
-typedef struct granny_stat_hud_footprint granny_stat_hud_footprint;
-
-typedef struct granny_stat_hud_animation_types granny_stat_hud_animation_types;
-
-typedef struct granny_stat_hud granny_stat_hud;
-
-typedef struct granny_string_database granny_string_database;
-
-typedef struct granny_string_table granny_string_table;
-
-typedef struct granny_system_clock granny_system_clock;
-
-typedef struct granny_tangent_frame granny_tangent_frame;
+GRANNY_FORWARD_DECL_STRUCT(tangent_frame);
 typedef enum granny_texture_type
 {
-    GrannyColorMapTextureType,
-    GrannyCubeMapTextureType,
-    GrannyOnePastLastTextureType
+    GrannyColorMapTextureType = 0,
+    GrannyCubeMapTextureType = 1,
+    GrannyOnePastLastTextureType,
+    Grannytexture_type_forceint = 0x7fffffff
 } granny_texture_type;
+GrannyTypeSizeCheck(sizeof(granny_texture_type) == sizeof(granny_int32));
 typedef enum granny_texture_encoding
 {
-    GrannyUserTextureEncoding,
-    GrannyRawTextureEncoding,
-    GrannyS3TCTextureEncoding,
-    GrannyBinkTextureEncoding,
-    GrannyOnePastLastTextureEncoding
+    GrannyUserTextureEncoding = 0,
+    GrannyRawTextureEncoding = 1,
+    GrannyS3TCTextureEncoding = 2,
+    GrannyBinkTextureEncoding = 3,
+    GrannyYCoCgTextureEncoding = 4,
+    GrannyOnePastLastTextureEncoding,
+    Grannytexture_encoding_forceint = 0x7fffffff
 } granny_texture_encoding;
+GrannyTypeSizeCheck(sizeof(granny_texture_encoding) == sizeof(granny_int32));
 
-typedef struct granny_texture_mip_level granny_texture_mip_level;
+GRANNY_FORWARD_DECL_STRUCT(texture_mip_level);
 
-typedef struct granny_texture_image granny_texture_image;
+GRANNY_FORWARD_DECL_STRUCT(texture_image);
 
-typedef struct granny_texture granny_texture;
+GRANNY_FORWARD_DECL_STRUCT(texture);
 
-typedef struct granny_texture_builder granny_texture_builder;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(texture_builder);
 typedef enum granny_transform_track_flags
 {
-    GrannyUseAccumulatorNeighborhood = 0x1
+    GrannyUseAccumulatorNeighborhood = 0x1,
+    Grannytransform_track_flags_forceint = 0x7fffffff
 } granny_transform_track_flags;
+GrannyTypeSizeCheck(sizeof(granny_transform_track_flags) == sizeof(granny_int32));
 typedef enum granny_track_group_flags
 {
     GrannyAccumulationExtracted = 0x1,
     GrannyTrackGroupIsSorted = 0x2,
-    GrannyAccumulationIsVDA = 0x4
+    GrannyAccumulationIsVDA = 0x4,
+    GrannyTrackGroupIsMorphs = 0x8,
+    Grannytrack_group_flags_forceint = 0x7fffffff
 } granny_track_group_flags;
+GrannyTypeSizeCheck(sizeof(granny_track_group_flags) == sizeof(granny_int32));
 typedef enum granny_vector_diff_mode
 {
     GrannyDiffAsVectors,
     GrannyDiffAsQuaternions,
-    GrannyManhattanMetric
+    GrannyManhattanMetric,
+    Grannyvector_diff_mode_forceint = 0x7fffffff
 } granny_vector_diff_mode;
+GrannyTypeSizeCheck(sizeof(granny_vector_diff_mode) == sizeof(granny_int32));
 
-typedef struct granny_vector_track granny_vector_track;
+GRANNY_FORWARD_DECL_STRUCT(vector_track);
 
-typedef struct granny_transform_track granny_transform_track;
+GRANNY_FORWARD_DECL_STRUCT(transform_track);
 
-typedef struct granny_text_track_entry granny_text_track_entry;
+GRANNY_FORWARD_DECL_STRUCT(text_track_entry);
 
-typedef struct granny_text_track granny_text_track;
+GRANNY_FORWARD_DECL_STRUCT(text_track);
 
-typedef struct granny_track_group granny_track_group;
+GRANNY_FORWARD_DECL_STRUCT(track_group);
 
-typedef struct granny_track_group_builder granny_track_group_builder;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(track_group_builder);
 
-typedef struct granny_track_group_sampler granny_track_group_sampler;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(track_group_sampler);
 typedef enum granny_extract_track_mask_result
 {
     GrannyExtractTrackMaskResult_AllDataPresent,
     GrannyExtractTrackMaskResult_PartialDataPresent,
-    GrannyExtractTrackMaskResult_NoDataPresent
+    GrannyExtractTrackMaskResult_NoDataPresent,
+    Grannyextract_track_mask_forceint = 0x7fffffff
 } granny_extract_track_mask_result;
+GrannyTypeSizeCheck(sizeof(granny_extract_track_mask_result) == sizeof(granny_int32));
 
-typedef struct granny_track_mask granny_track_mask;
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(track_mask);
 
-typedef struct granny_unbound_weight granny_unbound_weight;
+GRANNY_FORWARD_DECL_STRUCT(unbound_weight);
 
-typedef struct granny_unbound_track_mask granny_unbound_track_mask;
+GRANNY_FORWARD_DECL_STRUCT(unbound_track_mask);
 
-typedef struct granny_sample_context granny_sample_context;
+GRANNY_FORWARD_DECL_STRUCT(sample_context);
 #define GrannyTopologyNullIndex 0xFFFFFFFF
 
-typedef struct granny_tri_material_group granny_tri_material_group;
+GRANNY_FORWARD_DECL_STRUCT(tri_material_group);
 
-typedef struct granny_tri_annotation_set granny_tri_annotation_set;
+GRANNY_FORWARD_DECL_STRUCT(tri_annotation_set);
 
-typedef struct granny_tri_topology granny_tri_topology;
+GRANNY_FORWARD_DECL_STRUCT(tri_topology);
 
-typedef struct granny_defined_type granny_defined_type;
+GRANNY_FORWARD_DECL_STRUCT(defined_type);
 
-typedef struct granny_variant_builder granny_variant_builder;
-#define GrannyProductVersion "2.8.35.0"
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(variant_builder);
+#define GrannyProductVersion "2.11.9.1"
 #define GrannyProductMajorVersion 2
-#define GrannyProductMinorVersion 8
-#define GrannyProductBuildNumber 35
-#define GrannyProductCustomization 0
+#define GrannyProductMinorVersion 11
+#define GrannyProductBuildNumber 9
+#define GrannyProductCustomization 1
 #define GrannyProductReleaseName release
 #define GrannyProductCompanyName "RAD Game Tools, Inc."
 #define GrannyProductName "Granny"
-#define GrannyProductCopyright "1999-2008 by RAD Game Tools, Inc., All Rights Reserved."
+#define GrannyProductCopyright "1999-2018 by RAD Game Tools, Inc., All Rights Reserved."
 #define GrannyProductTrademarks ProductName " is a registered trademark of " ProductCompanyName
 #define GrannyProductComments "Who's your Granny?"
 #define GrannyProductSupportAddress "granny3@radgametools.com"
 #define GrannyProductSupportPage "www.radgametools.com/granny.html"
 #define GrannyVersionsMatch GrannyVersionsMatch_(GrannyProductMajorVersion, GrannyProductMinorVersion, GrannyProductBuildNumber, GrannyProductCustomization)
+#define GrannyMaximumWeightCount (1 << 8)
 #define GrannyVertexPositionName "Position"
 #define GrannyVertexNormalName "Normal"
 #define GrannyVertexTangentName "Tangent"
@@ -1040,112 +1289,90 @@ typedef struct granny_variant_builder granny_variant_builder;
 #define GrannyVertexTextureCoordinatesName "TextureCoordinates"
 #define GrannyVertexMorphCurvePrefix "VertexMorphCurve"
 
-typedef struct granny_vertex_annotation_set granny_vertex_annotation_set;
+GRANNY_FORWARD_DECL_STRUCT(vertex_annotation_set);
 
-typedef struct granny_vertex_data granny_vertex_data;
+GRANNY_FORWARD_DECL_STRUCT(vertex_data);
 
-typedef struct granny_p3_vertex granny_p3_vertex;
+GRANNY_FORWARD_DECL_STRUCT(p3_vertex);
 
-typedef struct granny_pt32_vertex granny_pt32_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pt32_vertex);
 
-typedef struct granny_pn33_vertex granny_pn33_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pn33_vertex);
 
-typedef struct granny_png333_vertex granny_png333_vertex;
+GRANNY_FORWARD_DECL_STRUCT(png333_vertex);
 
-typedef struct granny_pngt3332_vertex granny_pngt3332_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pngt3332_vertex);
 
-typedef struct granny_pntg3323_vertex granny_pntg3323_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pntg3323_vertex);
 
-typedef struct granny_pngb3333_vertex granny_pngb3333_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pngb3333_vertex);
 
-typedef struct granny_pnt332_vertex granny_pnt332_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pnt332_vertex);
 
-typedef struct granny_pngbt33332_vertex granny_pngbt33332_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pngbt33332_vertex);
 
-typedef struct granny_pnt333_vertex granny_pnt333_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pnt333_vertex);
 
-typedef struct granny_pngbt33333_vertex granny_pngbt33333_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pngbt33333_vertex);
 
-typedef struct granny_pwn313_vertex granny_pwn313_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwn313_vertex);
 
-typedef struct granny_pwng3133_vertex granny_pwng3133_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwng3133_vertex);
 
-typedef struct granny_pwngt31332_vertex granny_pwngt31332_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwngt31332_vertex);
 
-typedef struct granny_pwngb31333_vertex granny_pwngb31333_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwngb31333_vertex);
 
-typedef struct granny_pwnt3132_vertex granny_pwnt3132_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwnt3132_vertex);
 
-typedef struct granny_pwngbt313332_vertex granny_pwngbt313332_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwngbt313332_vertex);
 
-typedef struct granny_pwn323_vertex granny_pwn323_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwn323_vertex);
 
-typedef struct granny_pwng3233_vertex granny_pwng3233_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwng3233_vertex);
 
-typedef struct granny_pwngt32332_vertex granny_pwngt32332_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwngt32332_vertex);
 
-typedef struct granny_pwngb32333_vertex granny_pwngb32333_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwngb32333_vertex);
 
-typedef struct granny_pwt322_vertex granny_pwt322_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwt322_vertex);
 
-typedef struct granny_pwnt3232_vertex granny_pwnt3232_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwnt3232_vertex);
 
-typedef struct granny_pwngbt323332_vertex granny_pwngbt323332_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwngbt323332_vertex);
 
-typedef struct granny_pwn343_vertex granny_pwn343_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwn343_vertex);
 
-typedef struct granny_pwng3433_vertex granny_pwng3433_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwng3433_vertex);
 
-typedef struct granny_pwngt34332_vertex granny_pwngt34332_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwngt34332_vertex);
 
-typedef struct granny_pwngb34333_vertex granny_pwngb34333_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwngb34333_vertex);
 
-typedef struct granny_pwnt3432_vertex granny_pwnt3432_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwnt3432_vertex);
 
-typedef struct granny_pwngbt343332_vertex granny_pwngbt343332_vertex;
+GRANNY_FORWARD_DECL_STRUCT(pwngbt343332_vertex);
 
-typedef struct granny_vertex_weight_arrays granny_vertex_weight_arrays;
+GRANNY_FORWARD_DECL_STRUCT(vertex_weight_arrays);
 typedef enum granny_composite_flag
 {
     GrannyIncludeComposites = 0,
-    GrannyExcludeComposites = 1
+    GrannyExcludeComposites = 1,
+    Grannycomposite_flag_forceint = 0x7fffffff
 } granny_composite_flag;
+GrannyTypeSizeCheck(sizeof(granny_composite_flag) == sizeof(granny_int32));
 
-typedef struct granny_world_pose granny_world_pose;
-typedef GRANNY_CALLBACK(granny_local_pose *) granny_blend_dag_leaf_callback_sample_callback(void * UserData,
-                                                                                            granny_int32x BoneCount,
-                                                                                            granny_real32 AllowedError,
-                                                                                            granny_int32x const * SparseBoneArray);
-typedef GRANNY_CALLBACK(void) granny_blend_dag_leaf_callback_set_clock_callback(void * UserData,
-                                                                                granny_real32 NewClock);
-typedef GRANNY_CALLBACK(void) granny_blend_dag_leaf_callback_motion_vectors_callback(void * UserData,
-                                                                                     granny_real32 SecondsElapsed,
-                                                                                     granny_real32 * ResultTranslationVec3,
-                                                                                     granny_real32 * ResultRotationVec3,
-                                                                                     bool Inverse);
-typedef GRANNY_CALLBACK(granny_file_info * ) granny_dag2_source_callback(char const*  SourceName,
-                                                                         void *  UserData);
-typedef GRANNY_CALLBACK(granny_local_pose * ) granny_sample_node_pose_callback(granny_dag2_node *  Node,
-                                                                               granny_dag2_instance *  Instance,
-                                                                               granny_int32x OnOutput,
-                                                                               granny_real32 AtTime,
-                                                                               granny_dag_pose_cache *  PoseCache,
-                                                                               void *  UserData);
-typedef GRANNY_CALLBACK(granny_real32) granny_sample_node_scalar_callback(granny_dag2_node *  Node,
-                                                                          granny_dag2_instance *  Instance,
-                                                                          granny_int32x OnOutput,
-                                                                          granny_real32 AtTime,
-                                                                          void *  UserData);
-typedef GRANNY_CALLBACK(bool) granny_get_root_motion_callback(granny_dag2_node *  Node,
-                                                              granny_dag2_instance *  Instance,
-                                                              granny_int32x OnOutput,
-                                                              granny_real32 SecondsElapsed,
-                                                              granny_real32 AtTime,
-                                                              granny_real32 *  ResultTranslation,
-                                                              granny_real32 *  ResultRotation,
-                                                              void *    UserData);
+GRANNY_FORWARD_DECL_OPAQUE_STRUCT(world_pose);
+typedef GRANNY_CALLBACK(bool) granny_conversion_handler(granny_data_type_definition const*  SourceType,
+                                                        void const*  SourceMember,
+                                                        granny_data_type_definition const*  DestType,
+                                                        void *        DestMember);
+typedef GRANNY_CALLBACK(granny_data_type_definition const*) granny_variant_replace_fn(granny_data_type_definition const*  SourceType,
+                                                                                      void const*  SourceMember);
 typedef GRANNY_CALLBACK(char *) granny_rebase_pointers_string_callback(void * Data,
                                                                        granny_uint32 Identifier);
+typedef GRANNY_CALLBACK(void) granny_note_null_location(void *  Data,
+                                                        void *  Location);
 typedef GRANNY_CALLBACK(granny_uint32) granny_file_writer_string_callback(void * Data,
                                                                           char const * String);
 typedef GRANNY_CALLBACK(granny_file_reader *) granny_open_file_reader_callback(char const * FileName);
@@ -1161,7 +1388,7 @@ typedef GRANNY_CALLBACK(granny_file_writer *) granny_open_file_writer_callback(c
 typedef GRANNY_CALLBACK(void) granny_delete_file_writer_callback(granny_file_writer * Writer);
 typedef GRANNY_CALLBACK(granny_int32x) granny_seek_file_writer_callback(granny_file_writer *  Writer,
                                                                         granny_int32x OffsetInUInt8s,
-                                                                        granny_file_writer_seek_type SeekType);
+                                                                        granny_int32x SeekType);
 typedef GRANNY_CALLBACK(bool) granny_write_file_writer_callback(granny_file_writer *  Writer,
                                                                 granny_int32x UInt8Count,
                                                                 void const * WritePointer);
@@ -1176,7 +1403,8 @@ typedef GRANNY_CALLBACK(void) granny_log_function(granny_log_message_type Type,
 typedef GRANNY_CALLBACK(void *) granny_allocate_callback(char const * File,
                                                          granny_int32x Line,
                                                          granny_uintaddrx Alignment,
-                                                         granny_uintaddrx Size);
+                                                         granny_uintaddrx Size,
+                                                         granny_int32x AllocationIntent);
 typedef GRANNY_CALLBACK(void) granny_deallocate_callback(char const * File,
                                                          granny_int32x Line,
                                                          void * Memory);
@@ -1213,7 +1441,7 @@ GRANNY_STRUCT(struct) granny_data_type_definition
     granny_data_type_definition * ReferenceType;
     granny_int32 ArrayWidth;
     granny_int32 Extra[3];
-    granny_uintaddrx Ignored__Ignored;
+    granny_uintaddrx Ignored_Ignored;
 } GrannyAlignAttribute;
 GrannyTypeSizeCheck(sizeof(granny_data_type_definition) == (sizeof(granny_member_type) + 
                                                             sizeof(char const *) + 
@@ -1232,29 +1460,25 @@ GrannyTypeSizeCheck(sizeof(granny_variant) == (sizeof(granny_data_type_definitio
 
 GRANNY_STRUCT(struct) granny_model_mesh_binding
 {
-    granny_mesh * Mesh;
+    granny_mesh *  Mesh;
 } GrannyAlignAttribute;
-GrannyTypeSizeCheck(sizeof(granny_model_mesh_binding) == (sizeof(granny_mesh *)));
+GrannyTypeSizeCheck(sizeof(granny_model_mesh_binding) == (sizeof(granny_mesh * )));
 
 GRANNY_STRUCT(struct) granny_model
 {
     char const * Name;
-    granny_skeleton * Skeleton;
+    granny_skeleton *  Skeleton;
     granny_transform InitialPlacement;
     granny_int32 MeshBindingCount;
-    granny_model_mesh_binding * MeshBindings;
+    granny_model_mesh_binding *  MeshBindings;
     granny_variant ExtendedData;
 } GrannyAlignAttribute;
 GrannyTypeSizeCheck(sizeof(granny_model) == (sizeof(char const *) + 
-                                             sizeof(granny_skeleton *) + 
+                                             sizeof(granny_skeleton * ) + 
                                              sizeof(granny_transform) + 
                                              sizeof(granny_int32) + 
-                                             sizeof(granny_model_mesh_binding *) + 
+                                             sizeof(granny_model_mesh_binding * ) + 
                                              sizeof(granny_variant)));
-struct granny_model_control_binding;
-struct granny_controlled_animation;
-struct granny_controlled_pose;
-struct granny_model_instance;
 
 GRANNY_STRUCT(struct) granny_old_curve
 {
@@ -1555,7 +1779,6 @@ GrannyTypeSizeCheck(sizeof(granny_curve_data_d3i1_k8u_c8u) == (sizeof(granny_cur
                                                                sizeof(granny_real32) * 3 + 
                                                                sizeof(granny_int32) + 
                                                                sizeof(granny_uint8 *)));
-struct granny_curve_builder;
 
 GRANNY_STRUCT(struct) granny_material_map
 {
@@ -1597,13 +1820,19 @@ GRANNY_STRUCT(struct) granny_animation
     granny_real32 Oversampling;
     granny_int32 TrackGroupCount;
     granny_track_group ** TrackGroups;
+    granny_int32 DefaultLoopCount;
+    granny_int32 Flags;
+    granny_variant ExtendedData;
 } GrannyAlignAttribute;
 GrannyTypeSizeCheck(sizeof(granny_animation) == (sizeof(char const *) + 
                                                  sizeof(granny_real32) + 
                                                  sizeof(granny_real32) + 
                                                  sizeof(granny_real32) + 
                                                  sizeof(granny_int32) + 
-                                                 sizeof(granny_track_group **)));
+                                                 sizeof(granny_track_group **) + 
+                                                 sizeof(granny_int32) + 
+                                                 sizeof(granny_int32) + 
+                                                 sizeof(granny_variant)));
 
 GRANNY_STRUCT(struct) granny_bound_transform_track
 {
@@ -1640,7 +1869,6 @@ GRANNY_STRUCT(struct) granny_animation_binding
     granny_animation_binding * PreviousUnused;
     granny_animation_binding * NextUnused;
 };
-struct granny_animation_lod_builder;
 
 GRANNY_STRUCT(struct) granny_art_tool_info
 {
@@ -1665,7 +1893,6 @@ GrannyTypeSizeCheck(sizeof(granny_art_tool_info) == (sizeof(char const *) +
                                                      sizeof(granny_triple) + 
                                                      sizeof(granny_triple) + 
                                                      sizeof(granny_variant)));
-struct granny_bspline_solver;
 
 GRANNY_STRUCT(struct) granny_bspline_error
 {
@@ -1685,7 +1912,7 @@ GRANNY_STRUCT(struct) granny_camera
     granny_real32 FarClipPlane;
     granny_real32 ZRangeEpsilon;
     granny_camera_output_z_range OutputZRange;
-    bool UseQuaternionOrientation;
+    granny_bool32 UseQuaternionOrientation;
     granny_quad Orientation;
     granny_matrix_3x3 OrientationMatrix;
     granny_triple Position;
@@ -1695,13 +1922,16 @@ GRANNY_STRUCT(struct) granny_camera
     granny_matrix_4x4 InverseView4x4;
     granny_matrix_4x4 Projection4x4;
     granny_matrix_4x4 InverseProjection4x4;
+    granny_bool32 MirrorXInView;
+    granny_bool32 MirrorYInView;
+    granny_bool32 MirrorZInView;
 };
 
 GRANNY_STRUCT(struct) granny_compress_curve_parameters
 {
     granny_int32x DesiredDegree;
-    bool AllowDegreeReduction;
-    bool AllowReductionOnMissedTolerance;
+    granny_bool32 AllowDegreeReduction;
+    granny_bool32 AllowReductionOnMissedTolerance;
     granny_real32 ErrorTolerance;
     granny_real32 C0Threshold;
     granny_real32 C1Threshold;
@@ -1711,54 +1941,20 @@ GRANNY_STRUCT(struct) granny_compress_curve_parameters
     granny_data_type_definition * IdentityCompressionType;
     granny_real32 const * IdentityVector;
 };
-struct granny_control;
-struct granny_controlled_animation_builder;
-struct granny_blend_dag_node;
-struct granny_dag2_source;
 
-GRANNY_STRUCT(struct) granny_dag2
+GRANNY_STRUCT(struct) granny_controlled_animation
 {
-    granny_int32 RootNodeIndex;
-    granny_int32 InstanceDataSize;
-    granny_int32 NodeCount;
-    granny_dag2_node **  Nodes;
-    granny_int32 SourceCount;
-    granny_dag2_source **  Sources;
+    granny_animation_binding * Binding;
+    granny_accumulation_mode AccumulationMode;
+    granny_track_mask const * TrackMask;
+    granny_track_mask const * ModelMask;
+    granny_mirror_specification *  MirrorSpec;
 } GrannyAlignAttribute;
-GrannyTypeSizeCheck(sizeof(granny_dag2) == (sizeof(granny_int32) + 
-                                            sizeof(granny_int32) + 
-                                            sizeof(granny_int32) + 
-                                            sizeof(granny_dag2_node ** ) + 
-                                            sizeof(granny_int32) + 
-                                            sizeof(granny_dag2_source ** )));
-struct granny_dag2_input_edge;
-struct granny_dag2_output_edge;
-struct granny_dag2_node;
-
-GRANNY_STRUCT(struct) granny_dag2_nodedata_callback
-{
-    granny_int32 TypeMarker;
-};
-
-GRANNY_STRUCT(struct) granny_dag2_callbacks
-{
-    granny_sample_node_pose_callback *    SamplePoseCallback;
-    granny_sample_node_scalar_callback *  SampleScalarCallback;
-    granny_get_root_motion_callback *     GetRootMotionCallback;
-};
-
-GRANNY_STRUCT(struct) granny_dag2_info
-{
-    granny_int32 DAGCount;
-    granny_dag2 **  DAGs;
-    granny_variant ExtendedData;
-} GrannyAlignAttribute;
-GrannyTypeSizeCheck(sizeof(granny_dag2_info) == (sizeof(granny_int32) + 
-                                                 sizeof(granny_dag2 ** ) + 
-                                                 sizeof(granny_variant)));
-struct granny_dag2_instance;
-struct granny_dag_pose_cache;
-struct granny_file_data_tree_writer;
+GrannyTypeSizeCheck(sizeof(granny_controlled_animation) == (sizeof(granny_animation_binding *) + 
+                                                            sizeof(granny_accumulation_mode) + 
+                                                            sizeof(granny_track_mask const *) + 
+                                                            sizeof(granny_track_mask const *) + 
+                                                            sizeof(granny_mirror_specification * )));
 
 GRANNY_STRUCT(struct) granny_exporter_info
 {
@@ -1778,14 +1974,15 @@ GrannyTypeSizeCheck(sizeof(granny_exporter_info) == (sizeof(char *) +
 
 GRANNY_STRUCT(struct) granny_file
 {
-    bool IsByteReversed;
+    granny_bool32 IsByteReversed;
     granny_grn_file_header * Header;
     granny_grn_file_magic_value *  SourceMagicValue;
     granny_int32x SectionCount;
     void ** Sections;
     bool * Marshalled;
     bool * IsUserMemory;
-    void * ConversionBuffer;
+    void *      ConversionBuffer;
+    granny_uintaddrx ConversionBufferSize;
 };
 
 GRANNY_STRUCT(struct) granny_noalloc_loading_mem
@@ -1808,9 +2005,6 @@ GRANNY_STRUCT(struct) granny_file_location
 GrannyTypeSizeCheck(sizeof(granny_file_location) == (sizeof(granny_uint32) + 
                                                      sizeof(granny_uint32) + 
                                                      sizeof(granny_uint32)));
-struct granny_file_fixup;
-struct granny_file_builder;
-struct granny_file_compressor;
 
 GRANNY_STRUCT(struct) granny_grn_file_magic_value
 {
@@ -1964,7 +2158,7 @@ GRANNY_STRUCT(struct) granny_file_writer
     granny_write_file_writer_callback *     WriteCallback;
     granny_begincrc_file_writer_callback *  BeginCRCCallback;
     granny_endcrc_file_writer_callback *    EndCRCCallback;
-    bool CRCing;
+    granny_bool32 CRCing;
     granny_uint32 CRC;
 };
 
@@ -1983,16 +2177,14 @@ GRANNY_STRUCT(struct) granny_triangle_intersection
     granny_real32 TriangleV;
     granny_triple EdgeU;
     granny_triple EdgeV;
-    bool Backfacing;
+    granny_bool32 Backfacing;
 };
-struct granny_local_pose;
 
 GRANNY_STRUCT(struct) granny_log_callback
 {
     granny_log_function * Function;
     void * UserData;
 };
-struct granny_allocation_header;
 
 GRANNY_STRUCT(struct) granny_allocation_information
 {
@@ -2001,65 +2193,62 @@ GRANNY_STRUCT(struct) granny_allocation_information
     granny_uintaddrx ActualSize;
     char const * SourceFileName;
     granny_int32x SourceLineNumber;
+    granny_intaddrx AllocationNumber;
 };
-struct granny_memory_arena;
 
 GRANNY_STRUCT(struct) granny_bone_binding
 {
-    char const * BoneName;
+    char const*  BoneName;
     granny_triple OBBMin;
     granny_triple OBBMax;
     granny_int32 TriangleCount;
-    granny_int32 * TriangleIndices;
+    granny_int32 *  TriangleIndices;
 } GrannyAlignAttribute;
-GrannyTypeSizeCheck(sizeof(granny_bone_binding) == (sizeof(char const *) + 
+GrannyTypeSizeCheck(sizeof(granny_bone_binding) == (sizeof(char const* ) + 
                                                     sizeof(granny_triple) + 
                                                     sizeof(granny_triple) + 
                                                     sizeof(granny_int32) + 
-                                                    sizeof(granny_int32 *)));
+                                                    sizeof(granny_int32 * )));
 
 GRANNY_STRUCT(struct) granny_material_binding
 {
-    granny_material * Material;
+    granny_material *  Material;
 } GrannyAlignAttribute;
-GrannyTypeSizeCheck(sizeof(granny_material_binding) == (sizeof(granny_material *)));
+GrannyTypeSizeCheck(sizeof(granny_material_binding) == (sizeof(granny_material * )));
 
 GRANNY_STRUCT(struct) granny_morph_target
 {
-    char const * ScalarName;
-    granny_vertex_data * VertexData;
+    char const*  ScalarName;
+    granny_vertex_data *  VertexData;
     granny_int32 DataIsDeltas;
 } GrannyAlignAttribute;
-GrannyTypeSizeCheck(sizeof(granny_morph_target) == (sizeof(char const *) + 
-                                                    sizeof(granny_vertex_data *) + 
+GrannyTypeSizeCheck(sizeof(granny_morph_target) == (sizeof(char const* ) + 
+                                                    sizeof(granny_vertex_data * ) + 
                                                     sizeof(granny_int32)));
 
 GRANNY_STRUCT(struct) granny_mesh
 {
-    char const * Name;
-    granny_vertex_data * PrimaryVertexData;
+    char const*  Name;
+    granny_vertex_data *  PrimaryVertexData;
     granny_int32 MorphTargetCount;
-    granny_morph_target * MorphTargets;
-    granny_tri_topology * PrimaryTopology;
+    granny_morph_target *  MorphTargets;
+    granny_tri_topology *  PrimaryTopology;
     granny_int32 MaterialBindingCount;
-    granny_material_binding * MaterialBindings;
+    granny_material_binding *  MaterialBindings;
     granny_int32 BoneBindingCount;
-    granny_bone_binding * BoneBindings;
+    granny_bone_binding *  BoneBindings;
     granny_variant ExtendedData;
 } GrannyAlignAttribute;
-GrannyTypeSizeCheck(sizeof(granny_mesh) == (sizeof(char const *) + 
-                                            sizeof(granny_vertex_data *) + 
+GrannyTypeSizeCheck(sizeof(granny_mesh) == (sizeof(char const* ) + 
+                                            sizeof(granny_vertex_data * ) + 
                                             sizeof(granny_int32) + 
-                                            sizeof(granny_morph_target *) + 
-                                            sizeof(granny_tri_topology *) + 
+                                            sizeof(granny_morph_target * ) + 
+                                            sizeof(granny_tri_topology * ) + 
                                             sizeof(granny_int32) + 
-                                            sizeof(granny_material_binding *) + 
+                                            sizeof(granny_material_binding * ) + 
                                             sizeof(granny_int32) + 
-                                            sizeof(granny_bone_binding *) + 
+                                            sizeof(granny_bone_binding * ) + 
                                             sizeof(granny_variant)));
-struct granny_mesh_binding;
-struct granny_mesh_builder;
-struct granny_mesh_deformer;
 
 GRANNY_STRUCT(struct) granny_mirror_specification
 {
@@ -2068,7 +2257,6 @@ GRANNY_STRUCT(struct) granny_mirror_specification
     granny_uint16 *  Remaps;
     granny_uint8 *   PostFlips;
 };
-struct granny_oodle1_state;
 
 GRANNY_STRUCT(struct) granny_periodic_loop
 {
@@ -2085,8 +2273,6 @@ GrannyTypeSizeCheck(sizeof(granny_periodic_loop) == (sizeof(granny_real32) +
                                                      sizeof(granny_triple) + 
                                                      sizeof(granny_triple) + 
                                                      sizeof(granny_triple)));
-struct granny_pointer_hash;
-struct granny_retargeter;
 
 GRANNY_STRUCT(struct) granny_bone
 {
@@ -2117,7 +2303,6 @@ GrannyTypeSizeCheck(sizeof(granny_skeleton) == (sizeof(char const *) +
                                                 sizeof(granny_bone *) + 
                                                 sizeof(granny_int32) + 
                                                 sizeof(granny_variant)));
-struct granny_skeleton_builder;
 
 GRANNY_STRUCT(struct) granny_spu_animation
 {
@@ -2159,7 +2344,8 @@ GRANNY_STRUCT(struct) granny_spu_animation_binding
     granny_int32 *  TrackNameRemaps;
     granny_spu_animation_binding * Left;
     granny_spu_animation_binding * Right;
-    granny_int32 UsedBy;
+    granny_int16 RootBoneTrack;
+    granny_int16 UsedBy;
     granny_spu_animation_binding * PreviousUnused;
     granny_spu_animation_binding * NextUnused;
 };
@@ -2173,7 +2359,54 @@ GRANNY_STRUCT(struct) granny_spu_animation_info
 GrannyTypeSizeCheck(sizeof(granny_spu_animation_info) == (sizeof(granny_int32) + 
                                                           sizeof(granny_spu_animation ** ) + 
                                                           sizeof(granny_variant)));
-struct granny_controlled_spu_animation_builder;
+
+GRANNY_STRUCT(struct) granny_radspu_command_sma
+{
+    granny_uint64x InstanceEA;
+    granny_uint64x BoneCount;
+    granny_uint64x LocalPoseTransformsEA;
+    float LocalPoseFillThreshold;
+    float AllowedError;
+} GrannyAlignAttribute;
+GrannyTypeSizeCheck(sizeof(granny_radspu_command_sma) == (sizeof(granny_uint64x) + 
+                                                          sizeof(granny_uint64x) + 
+                                                          sizeof(granny_uint64x) + 
+                                                          sizeof(float) + 
+                                                          sizeof(float)));
+
+GRANNY_STRUCT(struct) granny_radspu_command_ssc
+{
+    granny_uint64x InstanceEA;
+    granny_uint64x ControlEA;
+    granny_uint64x BoneCount;
+    granny_uint64x LocalPoseTransformsEA;
+    float LocalPoseFillThreshold;
+    float AllowedError;
+} GrannyAlignAttribute;
+GrannyTypeSizeCheck(sizeof(granny_radspu_command_ssc) == (sizeof(granny_uint64x) + 
+                                                          sizeof(granny_uint64x) + 
+                                                          sizeof(granny_uint64x) + 
+                                                          sizeof(granny_uint64x) + 
+                                                          sizeof(float) + 
+                                                          sizeof(float)));
+
+GRANNY_STRUCT(struct) granny_radspu_command_sma_accel
+{
+    granny_uint64x InstanceEA;
+    granny_uint64x BoneCount;
+    granny_uint64x OffsetEA;
+    granny_uint64x WorldPoseEA;
+    granny_uint64x CompositeEA;
+    float LocalPoseFillThreshold;
+    float AllowedError;
+} GrannyAlignAttribute;
+GrannyTypeSizeCheck(sizeof(granny_radspu_command_sma_accel) == (sizeof(granny_uint64x) + 
+                                                                sizeof(granny_uint64x) + 
+                                                                sizeof(granny_uint64x) + 
+                                                                sizeof(granny_uint64x) + 
+                                                                sizeof(granny_uint64x) + 
+                                                                sizeof(float) + 
+                                                                sizeof(float)));
 
 GRANNY_STRUCT(struct) granny_spu_curve_header_basic
 {
@@ -2224,7 +2457,7 @@ GRANNY_STRUCT(struct) granny_spu_transform_track
     granny_uint32 PosCurveOffset;
     granny_uint32 OriCurveOffset;
     granny_uint32 SSCurveOffset;
-    granny_uint32 Reserved;
+    granny_uint32 BytesRequiredToSample;
 } GrannyAlignAttribute;
 GrannyTypeSizeCheck(sizeof(granny_spu_transform_track) == (sizeof(granny_uint32) + 
                                                            sizeof(granny_uint32) + 
@@ -2254,7 +2487,6 @@ GrannyTypeSizeCheck(sizeof(granny_spu_track_group) == (sizeof(char const *) +
                                                        sizeof(granny_spu_transform_track * ) + 
                                                        sizeof(granny_int32) + 
                                                        sizeof(granny_uint8 * )));
-struct granny_allocated_block;
 
 GRANNY_STRUCT(struct) granny_stack_allocator
 {
@@ -2268,81 +2500,6 @@ GRANNY_STRUCT(struct) granny_stack_allocator
     granny_allocated_block ** BlockDirectory;
 };
 
-GRANNY_STRUCT(struct) granny_animation_binding_cache_status
-{
-    granny_int32x TotalBindingsCreated;
-    granny_int32x TotalBindingsDestroyed;
-    granny_int32x DirectAcquireCount;
-    granny_int32x IndirectAcquireCount;
-    granny_int32x ReleaseCount;
-    granny_int32x CurrentTotalBindingCount;
-    granny_int32x CurrentUsedBindingCount;
-    granny_int32x CacheHits;
-    granny_int32x CacheMisses;
-    granny_int32x ExplicitFlushCount;
-    granny_int32x ExplicitFlushFrees;
-    granny_int32x OverflowFrees;
-};
-
-GRANNY_STRUCT(struct) granny_stat_hud_alloc_point
-{
-    char * SourceFilename;
-    granny_int32x SourceLineNumber;
-    granny_intaddrx AllocationCount;
-    granny_intaddrx BytesRequested;
-    granny_intaddrx BytesAllocated;
-};
-
-GRANNY_STRUCT(struct) granny_stat_hud_model_instances
-{
-    granny_int32x TotalInstanceCount;
-    granny_int32x TotalInstancedBoneCount;
-    granny_int32x TotalUsedModelCount;
-    granny_int32x MaxInstanceCount;
-    granny_int32x MaxBoneCount;
-    granny_int32x MaxInstanceControlCount;
-};
-
-GRANNY_STRUCT(struct) granny_stat_hud_model_controls
-{
-    granny_int32x TotalControlCount;
-    granny_int32x ActiveControlCount;
-    granny_int32x ActiveAndWeightedControlCount;
-    granny_int32x ActiveAndWeightedButEasedOutControlCount;
-    granny_int32x CompletableControlCount;
-    granny_int32x CompletedControlCount;
-    granny_int32x UnusedControlCount;
-    granny_real32 MinClockTime;
-    granny_real32 MaxClockTime;
-    granny_real32 MinCompletionTime;
-    granny_real32 MaxCompletionTime;
-};
-
-GRANNY_STRUCT(struct) granny_stat_hud_footprint
-{
-    granny_intaddrx TotalAllocationCount;
-    granny_intaddrx TotalBytesRequested;
-    granny_intaddrx TotalBytesAllocated;
-};
-
-GRANNY_STRUCT(struct) granny_stat_hud_animation_types
-{
-    granny_int32x TotalTrackCount;
-    granny_int32x TrackTypes[3][3][3][2];
-};
-
-GRANNY_STRUCT(struct) granny_stat_hud
-{
-    granny_int32x FrameCount;
-    granny_stat_hud_model_instances ModelInstances;
-    granny_stat_hud_model_controls Controls;
-    granny_animation_binding_cache_status AnimBindingCacheStatus;
-    granny_stat_hud_animation_types AnimTypes;
-    granny_stat_hud_footprint Footprint;
-    granny_int32x AllocPointCount;
-    granny_stat_hud_alloc_point * AllocPoints;
-};
-
 GRANNY_STRUCT(struct) granny_string_database
 {
     granny_int32 StringCount;
@@ -2354,7 +2511,6 @@ GrannyTypeSizeCheck(sizeof(granny_string_database) == (sizeof(granny_int32) +
                                                        sizeof(char **) + 
                                                        sizeof(granny_uint32) + 
                                                        sizeof(granny_variant)));
-struct granny_string_table;
 
 GRANNY_STRUCT(struct) granny_system_clock
 {
@@ -2412,7 +2568,6 @@ GrannyTypeSizeCheck(sizeof(granny_texture) == (sizeof(char const *) +
                                                sizeof(granny_int32) + 
                                                sizeof(granny_texture_image *) + 
                                                sizeof(granny_variant)));
-struct granny_texture_builder;
 
 GRANNY_STRUCT(struct) granny_vector_track
 {
@@ -2489,16 +2644,13 @@ GrannyTypeSizeCheck(sizeof(granny_track_group) == (sizeof(char const *) +
                                                    sizeof(granny_triple) + 
                                                    sizeof(granny_periodic_loop *) + 
                                                    sizeof(granny_variant)));
-struct granny_track_group_builder;
-struct granny_track_group_sampler;
-struct granny_track_mask;
 
 GRANNY_STRUCT(struct) granny_unbound_weight
 {
-    char const*  Name;
+    char *   Name;
     granny_real32 Weight;
 } GrannyAlignAttribute;
-GrannyTypeSizeCheck(sizeof(granny_unbound_weight) == (sizeof(char const* ) + 
+GrannyTypeSizeCheck(sizeof(granny_unbound_weight) == (sizeof(char *  ) + 
                                                       sizeof(granny_real32)));
 
 GRANNY_STRUCT(struct) granny_unbound_track_mask
@@ -2515,8 +2667,8 @@ GRANNY_STRUCT(struct) granny_sample_context
 {
     granny_real32 LocalClock;
     granny_real32 LocalDuration;
-    bool UnderflowLoop;
-    bool OverflowLoop;
+    granny_bool32 UnderflowLoop;
+    granny_bool32 OverflowLoop;
     granny_int32x FrameIndex;
 };
 
@@ -2562,6 +2714,10 @@ GRANNY_STRUCT(struct) granny_tri_topology
     granny_int32 * VertexToTriangleMap;
     granny_int32 SideToNeighborCount;
     granny_uint32 * SideToNeighborMap;
+    granny_int32 PolygonIndexStartCount;
+    granny_int32 *   PolygonIndexStarts;
+    granny_int32 PolygonIndexCount;
+    granny_int32 *   PolygonIndices;
     granny_int32 BonesForTriangleCount;
     granny_int32 * BonesForTriangle;
     granny_int32 TriangleToBoneCount;
@@ -2582,6 +2738,10 @@ GrannyTypeSizeCheck(sizeof(granny_tri_topology) == (sizeof(granny_int32) +
                                                     sizeof(granny_int32) + 
                                                     sizeof(granny_uint32 *) + 
                                                     sizeof(granny_int32) + 
+                                                    sizeof(granny_int32 *  ) + 
+                                                    sizeof(granny_int32) + 
+                                                    sizeof(granny_int32 *  ) + 
+                                                    sizeof(granny_int32) + 
                                                     sizeof(granny_int32 *) + 
                                                     sizeof(granny_int32) + 
                                                     sizeof(granny_int32 *) + 
@@ -2594,7 +2754,6 @@ GRANNY_STRUCT(struct) granny_defined_type
     char const*            Name;
     granny_data_type_definition *  Definition;
 };
-struct granny_variant_builder;
 
 GRANNY_STRUCT(struct) granny_vertex_annotation_set
 {
@@ -3025,7 +3184,6 @@ GRANNY_STRUCT(struct) granny_vertex_weight_arrays
 } GrannyAlignAttribute;
 GrannyTypeSizeCheck(sizeof(granny_vertex_weight_arrays) == (sizeof(granny_real32) * GrannyMaximumWeightCount + 
                                                             sizeof(granny_uint32) * GrannyMaximumWeightCount));
-struct granny_world_pose;
 
 /* granny_transform.h bindings: */
 GRANNY_DYNLINK(void) GrannySetTransform(granny_transform * Result,
@@ -3062,6 +3220,11 @@ GRANNY_DYNLINK(void) GrannyLinearBlendTransform(granny_transform * Result,
                                                 granny_transform const * A,
                                                 granny_real32 t,
                                                 granny_transform const * B);
+GRANNY_DYNLINK(void) GrannyLinearBlendTransformNeighborhooded(granny_transform * Result,
+                                                              granny_transform const*  A,
+                                                              granny_real32 t,
+                                                              granny_transform const*  B,
+                                                              granny_transform const*  Neighborhood);
 GRANNY_DYNLINK(void) GrannyBuildInverse(granny_transform * Result,
                                         granny_transform const * Source);
 GRANNY_DYNLINK(void) GrannySimilarityTransform(granny_transform * Result,
@@ -3101,7 +3264,8 @@ GRANNY_DYNLINK(bool) GrannyDataTypesAreEqualWithNameCallback(granny_data_type_de
                                                              granny_data_type_definition const * B,
                                                              granny_string_comparison_callback * Callback);
 GRANNY_DYNLINK(granny_data_type_definition *) GrannyDataTypeBeginsWith(granny_data_type_definition const * Type,
-                                                                       granny_data_type_definition const * Prefix);
+                                                                       granny_data_type_definition const * Prefix,
+                                                                       bool allow_longer_prefix);
 GRANNY_DYNLINK(void) GrannyReverseTypeArray(granny_data_type_definition const * Type,
                                             granny_int32x Count,
                                             void * TypeArray);
@@ -3117,6 +3281,7 @@ extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyTripleType;
 extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyQuadType;
 extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyTransformType;
 extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyMatrix4x4Type;
+extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyVariantType;
 
 /* granny_model.h bindings: */
 GRANNY_DYNLINK(void) GrannyGetModelInitialPlacement4x4(granny_model const * Model,
@@ -3410,6 +3575,9 @@ extern GRANNY_DYNLINKDATA(granny_pixel_layout const  *) GrannyBGRA8888PixelForma
 GRANNY_DYNLINK(bool) GrannyFindTrackGroupForModel(granny_animation const * Animation,
                                                   char const * ModelName,
                                                   granny_int32x * TrackGroupIndex);
+GRANNY_DYNLINK(bool) GrannyFindMorphTrackGroupForMesh(granny_animation const * Animation,
+                                                      char const*  MeshName,
+                                                      granny_int32x * TrackGroupIndex);
 extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyAnimationType;
 
 /* granny_animation_binding.h bindings: */
@@ -3424,6 +3592,8 @@ GRANNY_DYNLINK(void) GrannySetMaximumAnimationBindingCount(granny_int32x Binding
 GRANNY_DYNLINK(void) GrannyFlushAllUnusedAnimationBindings(void);
 GRANNY_DYNLINK(void) GrannyFlushAllBindingsForAnimation(granny_animation const * Animation);
 GRANNY_DYNLINK(void) GrannyFlushAnimationBinding(granny_animation_binding * Binding);
+GRANNY_DYNLINK(void) GrannyFlushBindingsInMemoryRange(void *  Memory,
+                                                      granny_uintaddrx MemorySize);
 GRANNY_DYNLINK(granny_animation_binding *) GrannyGetFirstBindingForAnimation(granny_animation const * Animation);
 GRANNY_DYNLINK(granny_animation_binding *) GrannyGetNextBindingForAnimation(granny_animation const * Animation,
                                                                             granny_animation_binding * Binding);
@@ -3434,7 +3604,6 @@ GRANNY_DYNLINK(void) GrannyRemapAnimationBindingPointers(granny_animation_bindin
                                                          granny_animation const * NewAnimationPointer);
 GRANNY_DYNLINK(void) GrannyRemapAllAnimationBindingPointers(granny_animation const * OldAnimationPointer,
                                                             granny_animation const * NewAnimationPointer);
-GRANNY_DYNLINK(void) GrannyGetAnimationBindingCacheStatus(granny_animation_binding_cache_status * Result);
 GRANNY_DYNLINK(granny_animation_lod_builder *) GrannyCalculateAnimationLODBegin(granny_animation const * Animation,
                                                                                 granny_real32 ManualScaler);
 GRANNY_DYNLINK(void) GrannyCalculateAnimationLODAddMeshBinding(granny_animation_lod_builder * Builder,
@@ -3446,6 +3615,11 @@ GRANNY_DYNLINK(void) GrannyCalculateAnimationLODCleanup(granny_animation_lod_bui
 
 /* granny_art_tool_info.h bindings: */
 extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyArtToolInfoType;
+
+/* granny_back_compat.h bindings: */
+GRANNY_DYNLINK(granny_data_type_definition * ) GrannyGetFileInfoType(void);
+GRANNY_DYNLINK(bool) GrannyClearOldStructures(granny_file_info *  Info,
+                                              granny_memory_arena *  Arena);
 
 /* granny_basis_conversion.h bindings: */
 GRANNY_DYNLINK(bool) GrannyComputeBasisConversion(granny_file_info const * FileInfo,
@@ -3517,135 +3691,18 @@ GRANNY_DYNLINK(void) GrannyBinkDecompressTexture(granny_int32x Width,
                                                  granny_int32x DestStride,
                                                  void * Dest);
 
+/* granny_bitknit_compression.h bindings: */
+GRANNY_DYNLINK(bool) GrannyBitKnitCompress(granny_bitknit_state * BitKnitState,
+                                           granny_uintaddrx BufferSize,
+                                           void const * Buffer);
+GRANNY_DYNLINK(granny_uintaddrx) GrannyBitKnitCompressEnd(granny_bitknit_state * BitKnitState,
+                                                          void ** Buffer);
+GRANNY_DYNLINK(bool) GrannyBitKnitDecompress(granny_uintaddrx CompressedBytesSize,
+                                             void const * CompressedBytes,
+                                             granny_uintaddrx DecompressedBytesSize,
+                                             void * DecompressedBytes);
+
 /* granny_bspline.h bindings: */
-GRANNY_DYNLINK(void) GrannySampleBSpline0x1(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline0x2(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline0x3(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline0x4(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline0x9(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline0xN(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_int32 const  Dimension,
-                                            bool Normalize,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline1x1(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline1x2(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline1x3(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline1x3n(granny_real32 const * ti,
-                                             granny_real32 const * pi,
-                                             granny_real32 t,
-                                             granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline1x4(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline1x4n(granny_real32 const * ti,
-                                             granny_real32 const * pi,
-                                             granny_real32 t,
-                                             granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline1x9(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline1xN(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_int32 const  Dimension,
-                                            bool Normalize,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline2x1(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline2x2(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline2x3(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline2x3n(granny_real32 const * ti,
-                                             granny_real32 const * pi,
-                                             granny_real32 t,
-                                             granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline2x4(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline2x4n(granny_real32 const * ti,
-                                             granny_real32 const * pi,
-                                             granny_real32 t,
-                                             granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline2x9(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline2xN(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_int32 const  Dimension,
-                                            bool Normalize,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline3x1(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline3x2(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline3x3(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline3x3n(granny_real32 const * ti,
-                                             granny_real32 const * pi,
-                                             granny_real32 t,
-                                             granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline3x4(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline3x4n(granny_real32 const * ti,
-                                             granny_real32 const * pi,
-                                             granny_real32 t,
-                                             granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline3x9(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
-GRANNY_DYNLINK(void) GrannySampleBSpline3xN(granny_real32 const * ti,
-                                            granny_real32 const * pi,
-                                            granny_int32 const  Dimension,
-                                            bool Normalize,
-                                            granny_real32 t,
-                                            granny_real32 * Result);
 GRANNY_DYNLINK(void) GrannySampleBSpline(granny_int32x Degree,
                                          granny_int32x Dimension,
                                          bool Normalize,
@@ -3779,6 +3836,8 @@ GRANNY_DYNLINK(void) GrannyGetPickingRay(granny_camera const * Camera,
                                          granny_real32 MouseY,
                                          granny_real32 * Origin,
                                          granny_real32 * Normal);
+GRANNY_DYNLINK(void) GrannyEnsureCameraSeesPoint(granny_camera * Camera,
+                                                 granny_real32 const * Point);
 GRANNY_DYNLINK(void) GrannyGetCameraRelativePlanarBases(granny_camera const * Camera,
                                                         bool ScreenOrthogonal,
                                                         granny_real32 const * PlaneNormal,
@@ -3811,8 +3870,11 @@ GRANNY_DYNLINK(void) GrannyCompleteControlAt(granny_control * Control,
                                              granny_real32 AtSeconds);
 GRANNY_DYNLINK(granny_real32) GrannyGetControlCompletionClock(granny_control const * Control);
 GRANNY_DYNLINK(bool) GrannyGetControlCompletionCheckFlag(granny_control const * Control);
+GRANNY_DYNLINK(bool) GrannyGetControlLocalCompletion(granny_control const * Control);
 GRANNY_DYNLINK(void) GrannySetControlCompletionCheckFlag(granny_control * Control,
                                                          bool CheckComplete);
+GRANNY_DYNLINK(void) GrannySetControlLocalCompletion(granny_control * Control,
+                                                     bool CompleteIsLocal);
 GRANNY_DYNLINK(bool) GrannyControlHasEffect(granny_control * Control);
 GRANNY_DYNLINK(granny_real32) GrannyGetControlClock(granny_control const * Control);
 GRANNY_DYNLINK(void) GrannySetControlClock(granny_control * Control,
@@ -3824,17 +3886,31 @@ GRANNY_DYNLINK(bool) GrannyFreeControlIfComplete(granny_control * Control);
 GRANNY_DYNLINK(granny_real32) GrannyGetControlWeight(granny_control const * Control);
 GRANNY_DYNLINK(void) GrannySetControlWeight(granny_control * Control,
                                             granny_real32 Weight);
+GRANNY_DYNLINK(bool) GrannySetControlModelMask(granny_control const * Control,
+                                               granny_model_instance const*  ModelInstance,
+                                               granny_track_mask *  TrackMask);
+GRANNY_DYNLINK(bool) GrannySetControlTrackMask(granny_control const * Control,
+                                               granny_animation const*  Animation,
+                                               granny_int32x TrackGroupIndex,
+                                               granny_track_mask *  TrackMask);
+GRANNY_DYNLINK(bool) GrannySetSPUControlTrackMask(granny_control const * Control,
+                                                  granny_spu_animation const*  Animation,
+                                                  granny_int32x TrackGroupIndex,
+                                                  granny_track_mask *  TrackMask);
 GRANNY_DYNLINK(granny_track_mask const* ) GrannyGetControlTrackGroupModelMask(granny_control const * Control,
                                                                               granny_model_instance const*  ModelInstance);
 GRANNY_DYNLINK(granny_track_mask const* ) GrannyGetControlTrackGroupTrackMask(granny_control const * Control,
                                                                               granny_animation const*  Animation,
                                                                               granny_int32x TrackGroupIndex);
+GRANNY_DYNLINK(granny_track_mask const* ) GrannyGetSPUControlTrackGroupTrackMask(granny_control const * Control,
+                                                                                 granny_spu_animation const*  Animation,
+                                                                                 granny_int32x TrackGroupIndex);
 GRANNY_DYNLINK(granny_int32x) GrannyGetControlLoopCount(granny_control const * Control);
 GRANNY_DYNLINK(void) GrannySetControlLoopCount(granny_control * Control,
                                                granny_int32x LoopCount);
 GRANNY_DYNLINK(void) GrannyGetControlLoopState(granny_control * Control,
-                                               bool * UnderflowLoop,
-                                               bool * OverflowLoop);
+                                               granny_bool32 *  UnderflowLoop,
+                                               granny_bool32 *  OverflowLoop);
 GRANNY_DYNLINK(granny_int32x) GrannyGetControlLoopIndex(granny_control * Control);
 GRANNY_DYNLINK(void) GrannySetControlLoopIndex(granny_control * Control,
                                                granny_int32x LoopIndex);
@@ -3869,6 +3945,9 @@ GRANNY_DYNLINK(void) GrannySetControlEaseOutCurve(granny_control * Control,
                                                   granny_real32 StartTangent,
                                                   granny_real32 EndTangent,
                                                   granny_real32 EndValue);
+GRANNY_DYNLINK(bool) GrannyGetControlLocalEase(granny_control const*  Control);
+GRANNY_DYNLINK(void) GrannySetControlLocalEase(granny_control *  Control,
+                                               bool EaseIsLocal);
 GRANNY_DYNLINK(granny_real32) GrannyGetControlRawLocalClock(granny_control * Control);
 GRANNY_DYNLINK(void) GrannySetControlRawLocalClock(granny_control * Control,
                                                    granny_real32 LocalClock);
@@ -3886,6 +3965,7 @@ GRANNY_DYNLINK(void) GrannyRecenterControlClocks(granny_control * Control,
 GRANNY_DYNLINK(void) GrannyRecenterAllControlClocks(granny_real32 dCurrentClock);
 GRANNY_DYNLINK(void) GrannyRecenterAllModelInstanceControlClocks(granny_model_instance * ModelInstance,
                                                                  granny_real32 dCurrentClock);
+GRANNY_DYNLINK(bool) GrannyGetControlForceClampedLooping(granny_control * Control);
 GRANNY_DYNLINK(void) GrannySetControlForceClampedLooping(granny_control * Control,
                                                          bool Clamp);
 GRANNY_DYNLINK(void) GrannySetControlTargetState(granny_control * Control,
@@ -3942,8 +4022,30 @@ GRANNY_DYNLINK(void) GrannySetTrackGroupMirrorSpecification(granny_controlled_an
                                                             granny_int32x TrackGroupIndex,
                                                             granny_mirror_specification *  Specification);
 GRANNY_DYNLINK(granny_animation_binding *) GrannyGetAnimationBindingFromControlBinding(granny_model_control_binding * Binding);
+GRANNY_DYNLINK(granny_spu_animation_binding *) GrannyGetSPUAnimationBindingFromControlBinding(granny_model_control_binding * Binding);
 GRANNY_DYNLINK(granny_real32) GrannyGetGlobalLODFadingFactor(void);
 GRANNY_DYNLINK(void) GrannySetGlobalLODFadingFactor(granny_real32 NewValue);
+GRANNY_DYNLINK(granny_accumulation_mode) GrannyAccumulationModeFromTrackGroup(granny_track_group *  TrackGroup);
+GRANNY_DYNLINK(void) GrannyAccumulateControlledAnimation(granny_controlled_animation *  State,
+                                                         granny_sample_context *  Context,
+                                                         granny_real32 BaseWeight,
+                                                         granny_skeleton *  Skeleton,
+                                                         granny_int32x FirstBone,
+                                                         granny_int32x BoneCount,
+                                                         granny_local_pose *  Result,
+                                                         granny_real32 AllowedError,
+                                                         granny_int32x const*  SparseBoneArray);
+GRANNY_DYNLINK(void) GrannyAccumulateControlledAnimationMotionVectors(granny_controlled_animation *  State,
+                                                                      granny_real32 StartLocalClock,
+                                                                      granny_real32 EndLocalClock,
+                                                                      granny_real32 LocalDuration,
+                                                                      granny_real32 Weight,
+                                                                      bool FlipResult,
+                                                                      granny_bound_transform_track * BoundTrack,
+                                                                      granny_transform_track const * SourceTrack,
+                                                                      granny_real32 *  TotalWeight,
+                                                                      granny_real32 *  ResultTranslation,
+                                                                      granny_real32 *  ResultRotation);
 
 /* granny_controlled_pose.h bindings: */
 GRANNY_DYNLINK(granny_control *) GrannyPlayControlledPose(granny_real32 StartTime,
@@ -3951,277 +4053,14 @@ GRANNY_DYNLINK(granny_control *) GrannyPlayControlledPose(granny_real32 StartTim
                                                           granny_local_pose const * Pose,
                                                           granny_model_instance * Model,
                                                           granny_track_mask * ModelMask);
-GRANNY_DYNLINK(granny_local_pose *) GrannyGetLocalPoseFromControlBinding(granny_model_control_binding * Binding);
+GRANNY_DYNLINK(granny_local_pose *) GrannyGetLocalPoseFromControlBinding(granny_model_control_binding *  Binding);
 
-/* granny_dag.h bindings: */
-GRANNY_DYNLINK(bool) GrannyIsBlendDagLeafType(granny_blend_dag_node const * Node);
-GRANNY_DYNLINK(granny_blend_dag_node_type) GrannyGetBlendDagNodeType(granny_blend_dag_node const * Node);
-GRANNY_DYNLINK(granny_blend_dag_node *) GrannyCreateBlendDagNodeAnimationBlend(granny_model_instance * ModelInstance,
-                                                                               bool AutoFree);
-GRANNY_DYNLINK(granny_blend_dag_node *) GrannyCreateBlendDagNodeLocalPose(granny_local_pose * LocalPose,
-                                                                          bool AutoFree);
-GRANNY_DYNLINK(granny_blend_dag_node *) GrannyCreateBlendDagNodeCallback(granny_blend_dag_leaf_callback_sample_callback * SampleCallback,
-                                                                         granny_blend_dag_leaf_callback_set_clock_callback * SetClockCallback,
-                                                                         granny_blend_dag_leaf_callback_motion_vectors_callback * MotionVectorsCallback,
-                                                                         void * UserData);
-GRANNY_DYNLINK(granny_blend_dag_node *) GrannyCreateBlendDagNodeCrossfade(granny_blend_dag_node * DagNode0,
-                                                                          granny_blend_dag_node * DagNode1,
-                                                                          granny_real32 WeightNone,
-                                                                          granny_real32 WeightAll,
-                                                                          granny_track_mask * TrackMask,
-                                                                          bool AutoFreeTrackMask,
-                                                                          granny_int32x BoneCount);
-GRANNY_DYNLINK(granny_blend_dag_node *) GrannyCreateBlendDagNodeWeightedBlend(granny_skeleton * ReferenceSkeleton,
-                                                                              granny_real32 FillThreshold,
-                                                                              granny_quaternion_mode QuaternionBlendingMode,
-                                                                              granny_int32x BoneCount);
-GRANNY_DYNLINK(void) GrannyFreeBlendDagNode(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(void) GrannySetBlendDagNodeAnimationBlend(granny_blend_dag_node * Node,
-                                                         granny_model_instance * ModelInstance,
-                                                         granny_real32 FillThreshold,
-                                                         bool AutoFree);
-GRANNY_DYNLINK(void) GrannySetBlendDagNodeLocalPose(granny_blend_dag_node * Node,
-                                                    granny_local_pose * LocalPose,
-                                                    bool AutoFree);
-GRANNY_DYNLINK(void) GrannySetBlendDagNodeCallbacks(granny_blend_dag_node * Node,
-                                                    granny_blend_dag_leaf_callback_sample_callback * SampleCallback,
-                                                    granny_blend_dag_leaf_callback_set_clock_callback * SetClockCallback,
-                                                    granny_blend_dag_leaf_callback_motion_vectors_callback * MotionVectorsCallback,
-                                                    void * UserData);
-GRANNY_DYNLINK(void) GrannySetBlendDagNodeCrossfade(granny_blend_dag_node * Node,
-                                                    granny_real32 WeightNone,
-                                                    granny_real32 WeightAll,
-                                                    granny_track_mask * TrackMask,
-                                                    bool AutoFreeTrackMask);
-GRANNY_DYNLINK(void) GrannySetBlendDagNodeCrossfadeWeights(granny_blend_dag_node * Node,
-                                                           granny_real32 WeightNone,
-                                                           granny_real32 WeightAll);
-GRANNY_DYNLINK(void) GrannySetBlendDagNodeWeightedBlend(granny_blend_dag_node * Node,
-                                                        granny_skeleton * ReferenceSkeleton,
-                                                        granny_real32 FillThreshold,
-                                                        granny_quaternion_mode QuaternionBlendingMode);
-GRANNY_DYNLINK(granny_model_instance *) GrannyGetBlendDagNodeAnimationBlend(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(granny_local_pose *) GrannyGetBlendDagNodeLocalPose(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(granny_blend_dag_leaf_callback_sample_callback *) GrannyGetBlendDagNodeCallbackSampleCallback(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(granny_blend_dag_leaf_callback_set_clock_callback *) GrannyGetBlendDagNodeCallbackSetClockCallback(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(granny_blend_dag_leaf_callback_motion_vectors_callback *) GrannyGetBlendDagNodeCallbackMotionVectorsCallback(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(void *) GrannyGetBlendDagNodeCallbackUserData(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(granny_track_mask *) GrannyGetBlendDagNodeCrossfadeTrackMask(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(bool) GrannyGetBlendDagNodeCrossfadeWeights(granny_blend_dag_node const * Node,
-                                                           granny_real32 *  WeightNone,
-                                                           granny_real32 *  WeightAll);
-GRANNY_DYNLINK(granny_skeleton *) GrannyGetBlendDagNodeWeightedBlendSkeleton(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(void) GrannyBlendDagNodeAnimationBlendFreeCompletedControls(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(void) GrannyClearBlendDagNodeChildren(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(granny_int32x) GrannyGetBlendDagNodeChildrenCount(granny_blend_dag_node const * Node);
-GRANNY_DYNLINK(void) GrannySetBlendDagNodeChildren(granny_blend_dag_node * Node,
-                                                   granny_int32x NumChildren,
-                                                   granny_blend_dag_node ** ArrayOfChildren);
-GRANNY_DYNLINK(void) GrannySetBlendDagNodeChild(granny_blend_dag_node * Node,
-                                                granny_int32x ChildNumber,
-                                                granny_blend_dag_node * Child);
-GRANNY_DYNLINK(granny_blend_dag_node *) GrannyGetBlendDagNodeChild(granny_blend_dag_node * Node,
-                                                                   granny_int32x ChildNumber);
-GRANNY_DYNLINK(void) GrannyAddBlendDagNodeChild(granny_blend_dag_node * Node,
-                                                granny_blend_dag_node * Child);
-GRANNY_DYNLINK(void) GrannyRemoveBlendDagNodeChild(granny_blend_dag_node * Node,
-                                                   granny_blend_dag_node * Child);
-GRANNY_DYNLINK(granny_blend_dag_node *) GrannyGetBlendDagNodeParent(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(void) GrannySetBlendDagNodeResultTrackMask(granny_blend_dag_node * Node,
-                                                          granny_track_mask * TrackMask,
-                                                          bool AutoFree);
-GRANNY_DYNLINK(granny_track_mask *) GrannyGetBlendDagNodeResultTrackMask(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(void) GrannySetBlendDagNodeResultWeight(granny_blend_dag_node * Node,
-                                                       granny_real32 Weight);
-GRANNY_DYNLINK(granny_real32) GrannyGetBlendDagNodeResultWeight(granny_blend_dag_node const * Node);
-GRANNY_DYNLINK(void) GrannyGetBlendDagTreeMotionVectors(granny_blend_dag_node const * Node,
-                                                        granny_real32 SecondsElapsed,
-                                                        granny_real32 * ResultTranslation,
-                                                        granny_real32 * ResultRotation,
-                                                        bool Inverse);
-GRANNY_DYNLINK(void) GrannyUpdateBlendDagTreeMatrix(granny_blend_dag_node const * Node,
-                                                    granny_real32 SecondsElapsed,
-                                                    granny_real32 const * ModelMatrix4x4,
-                                                    granny_real32 * DestMatrix4x4,
-                                                    bool Inverse);
-GRANNY_DYNLINK(granny_local_pose *) GrannySampleBlendDagTreeLODSparseReentrant(granny_blend_dag_node const * RootNode,
-                                                                               granny_int32x BoneCount,
-                                                                               granny_real32 AllowedError,
-                                                                               granny_int32x const * SparseBoneArray,
-                                                                               granny_dag_pose_cache * PoseCache);
-GRANNY_DYNLINK(granny_local_pose *) GrannySampleBlendDagTreeLODSparse(granny_blend_dag_node const * RootNode,
-                                                                      granny_int32x BoneCount,
-                                                                      granny_real32 AllowedError,
-                                                                      granny_int32x const * SparseBoneArray);
-GRANNY_DYNLINK(granny_local_pose *) GrannySampleBlendDagTree(granny_blend_dag_node const * RootNode,
-                                                             granny_int32x BoneCount);
-GRANNY_DYNLINK(granny_local_pose *) GrannySampleBlendDagTreeLOD(granny_blend_dag_node const * RootNode,
-                                                                granny_int32x BoneCount,
-                                                                granny_real32 AllowedError);
-GRANNY_DYNLINK(granny_local_pose *) GrannySampleBlendDagTreeReentrant(granny_blend_dag_node const * RootNode,
-                                                                      granny_int32x BoneCount,
-                                                                      granny_dag_pose_cache * PoseCache);
-GRANNY_DYNLINK(granny_local_pose *) GrannySampleBlendDagTreeLODReentrant(granny_blend_dag_node const * RootNode,
-                                                                         granny_int32x BoneCount,
-                                                                         granny_real32 AllowedError,
-                                                                         granny_dag_pose_cache * PoseCache);
-GRANNY_DYNLINK(void) GrannySetBlendDagTreeClock(granny_blend_dag_node * RootNode,
-                                                granny_real32 NewClock);
-GRANNY_DYNLINK(void) GrannyGetBlendDagNodeChildren(granny_blend_dag_node * Node,
-                                                   granny_int32x MaxArraySize,
-                                                   granny_blend_dag_node ** ArrayOfChildren);
-GRANNY_DYNLINK(granny_blend_dag_node *) GrannyCreateBlendDagNodeWeightedBlendChildren(granny_skeleton * ReferenceSkeleton,
-                                                                                      granny_real32 FillThreshold,
-                                                                                      granny_quaternion_mode QuaternionBlendingMode,
-                                                                                      granny_int32x BoneCount,
-                                                                                      granny_int32x NumChildren,
-                                                                                      granny_blend_dag_node ** ArrayOfChildren);
-GRANNY_DYNLINK(void) GrannyFreeBlendDagEntireTree(granny_blend_dag_node * RootNode);
-GRANNY_DYNLINK(void) GrannyBlendDagFreeCompletedControlsEntireTree(granny_blend_dag_node * Node);
-GRANNY_DYNLINK(granny_blend_dag_node *) GrannyDuplicateBlendDagTree(granny_blend_dag_node const * SourceTreeRoot,
-                                                                    granny_blend_dag_node const ** SourceNodeList,
-                                                                    granny_blend_dag_node ** DestNodeList,
-                                                                    granny_int32 SizeOfNodeList,
-                                                                    bool AutoFreeCreatedModelInstances);
-GRANNY_DYNLINK(bool) GrannyIsBlendDagNodeValid(granny_blend_dag_node const * Node,
-                                               char const**  ReasonFailed,
-                                               granny_blend_dag_node const ** NodeFailed);
-GRANNY_DYNLINK(bool) GrannyIsBlendDagTreeValid(granny_blend_dag_node const * RootNode,
-                                               char const**  ReasonFailed,
-                                               granny_blend_dag_node const ** NodeFailed);
-GRANNY_DYNLINK(granny_int32x) GrannyFindBlendDagTreeDepth(granny_blend_dag_node const * RootNode);
-
-/* granny_dag2.h bindings: */
-GRANNY_DYNLINK(granny_dag2 * ) GrannyNewDag(void);
-GRANNY_DYNLINK(granny_dag2 * ) GrannyNewDagInPlace(void *  Memory);
-GRANNY_DYNLINK(granny_dag2_node * ) GrannyFindDag2Node(granny_dag2 *  TheDag,
-                                                       granny_dag2_node *  Node,
-                                                       char const*  NodeName);
-GRANNY_DYNLINK(granny_dag2_node * ) GrannyGetDag2Root(granny_dag2 *  TheDag);
-GRANNY_DYNLINK(bool) GrannyBindDag2Sources(granny_dag2 *  TheDag,
-                                           granny_dag2_source_callback *  Callback,
-                                           void *  UserData);
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2SourceType;
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2Type;
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2InputEdgeType;
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2OutputEdgeType;
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeType;
-
-/* granny_dag2_additive_blend.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataAdditiveBlendType;
-
-/* granny_dag2_blend.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataBlendType;
-
-/* granny_dag2_callback.h bindings: */
-GRANNY_DYNLINK(bool) GrannyInstallNodeCallback(granny_dag2_instance *   Instance,
-                                               granny_dag2_node *       Node,
-                                               granny_dag2_callbacks *  Callbacks,
-                                               void *            UserData);
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataCallbackType;
-
-/* granny_dag2_info.h bindings: */
-GRANNY_DYNLINK(granny_dag2_info *) GrannyGetDag2Info(granny_file * File);
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2InfoType;
-
-/* granny_dag2_instance.h bindings: */
-GRANNY_DYNLINK(granny_dag2_instance *) GrannyInstantiateDAG(granny_dag2 *  DAG,
-                                                            granny_model * FromModel,
-                                                            granny_model * ToModel);
-GRANNY_DYNLINK(void) GrannyFreeDAGInstance(granny_dag2_instance * Instance);
-GRANNY_DYNLINK(granny_dag2 *  ) GrannyGetSourceDAG(granny_dag2_instance *  Instance);
-GRANNY_DYNLINK(granny_model * ) GrannyGetDAGTargetModel(granny_dag2_instance *  Instance);
-GRANNY_DYNLINK(bool) GrannySetDag2NodeFloat(granny_dag2_instance *  Instance,
-                                            granny_dag2_node *  Node,
-                                            char const*  ParamName,
-                                            granny_real32 Value);
-GRANNY_DYNLINK(bool) GrannyGetDag2NodeFloat(granny_dag2_instance *  Instance,
-                                            granny_dag2_node *  Node,
-                                            char const*  ParamName,
-                                            granny_real32 *  Value);
-GRANNY_DYNLINK(bool) GrannySetDag2NodeInt32(granny_dag2_instance *  Instance,
-                                            granny_dag2_node *  Node,
-                                            char const*  ParamName,
-                                            granny_int32 Value);
-GRANNY_DYNLINK(bool) GrannyGetDag2NodeInt32(granny_dag2_instance *  Instance,
-                                            granny_dag2_node *  Node,
-                                            char const*  ParamName,
-                                            granny_int32 *  Value);
-GRANNY_DYNLINK(granny_dag2_node * ) GrannyFindMostInfluentialNode(granny_dag2_instance *  Instance,
-                                                                  granny_int32x OnOutput,
-                                                                  granny_real32 AtTime,
-                                                                  granny_int32x *  InfluentialOutput);
-GRANNY_DYNLINK(granny_local_pose * ) GrannySampleDAG(granny_dag2_instance *  Instance,
-                                                     granny_int32x OnOutput,
-                                                     granny_real32 AtTime,
-                                                     granny_dag_pose_cache *  PoseCache);
-GRANNY_DYNLINK(granny_local_pose * ) GrannySampleDAGNode(granny_dag2_instance *  Instance,
-                                                         granny_int32x NodeIndex,
-                                                         granny_int32x OnOutput,
-                                                         granny_real32 AtTime,
-                                                         granny_dag_pose_cache *  PoseCache);
-GRANNY_DYNLINK(granny_track_mask * ) GrannySampleDAGTrackmask(granny_dag2_instance *  Instance,
-                                                              granny_int32x OnOutput,
-                                                              granny_real32 AtTime);
-GRANNY_DYNLINK(granny_track_mask * ) GrannySampleDAGNodeTrackmask(granny_dag2_instance *  Instance,
-                                                                  granny_int32x NodeIndex,
-                                                                  granny_int32x OnOutput,
-                                                                  granny_real32 AtTime);
-GRANNY_DYNLINK(granny_real32) GrannySampleDAGScalar(granny_dag2_instance *  Instance,
-                                                    granny_int32x OnOutput,
-                                                    granny_real32 AtTime);
-GRANNY_DYNLINK(granny_real32) GrannySampleDAGNodeScalar(granny_dag2_instance *  Instance,
-                                                        granny_int32x NodeIndex,
-                                                        granny_int32x OnOutput,
-                                                        granny_real32 AtTime);
-GRANNY_DYNLINK(bool) GrannyUpdateDAGModelMatrix(granny_dag2_instance *  Instance,
-                                                granny_int32x OnOutput,
-                                                granny_real32 SecondsElapsed,
-                                                granny_real32 AtTime,
-                                                granny_real32 const * ModelMatrix4x4,
-                                                granny_real32 * DestMatrix4x4);
-
-/* granny_dag2_locked_blend.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataLockedBlendType;
-
-/* granny_dag2_nway_blend.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataNWayBlendType;
-
-/* granny_dag2_poseanimsource.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataPoseAnimSourceType;
-
-/* granny_dag2_scalarsource.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataScalarSourceEdgeType;
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataScalarSourceType;
-
-/* granny_dag2_scaleoffset.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataScaleOffsetType;
-
-/* granny_dag2_selection.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataSelectionType;
-
-/* granny_dag2_sequence.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataSequenceType;
-
-/* granny_dag2_subgraph.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataSubgraphType;
-
-/* granny_dag2_timeshift.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataTimeShiftType;
-
-/* granny_dag2_trackmask.h bindings: */
-extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyDag2NodeDataTrackmaskType;
-
-/* granny_dag_pose_cache.h bindings: */
-GRANNY_DYNLINK(void) GrannyFreeBlendDagLocalPoseCache(void);
-GRANNY_DYNLINK(granny_dag_pose_cache * ) GrannyGetGlobalDagPoseCache(void);
-GRANNY_DYNLINK(granny_dag_pose_cache *) GrannyCreateDagPoseCache(void);
-GRANNY_DYNLINK(void) GrannyClearDagPoseCache(granny_dag_pose_cache * Cache);
-GRANNY_DYNLINK(void) GrannyFreeDagPoseCache(granny_dag_pose_cache * Cache);
-GRANNY_DYNLINK(void) GrannyReleaseCachePose(granny_dag_pose_cache * Cache,
-                                            granny_local_pose *  Pose);
-GRANNY_DYNLINK(granny_local_pose * ) GrannyGetNewBlendDagLocalPose(granny_dag_pose_cache *  PoseCache,
-                                                                   granny_uint32x NumBones);
+/* granny_crc.h bindings: */
+GRANNY_DYNLINK(void) GrannyBeginCRC32(granny_uint32 * CRC);
+GRANNY_DYNLINK(void) GrannyAddToCRC32(granny_uint32 * CRC,
+                                      granny_uint64x Count,
+                                      void const * UInt8s);
+GRANNY_DYNLINK(void) GrannyEndCRC32(granny_uint32 * CRC);
 
 /* granny_data_type_conversion.h bindings: */
 GRANNY_DYNLINK(bool) GrannyFindMatchingMember(granny_data_type_definition const * SourceType,
@@ -4231,28 +4070,40 @@ GRANNY_DYNLINK(bool) GrannyFindMatchingMember(granny_data_type_definition const 
 GRANNY_DYNLINK(void) GrannyConvertSingleObject(granny_data_type_definition const * SourceType,
                                                void const * SourceObject,
                                                granny_data_type_definition const * DestType,
-                                               void * DestObject);
+                                               void * DestObject,
+                                               granny_conversion_handler *  OverrideHandler);
 GRANNY_DYNLINK(void) GrannyMergeSingleObject(granny_data_type_definition const * SourceType,
                                              void const * SourceObject,
                                              granny_data_type_definition const * DestType,
-                                             void * DestObject);
+                                             void * DestObject,
+                                             granny_conversion_handler *  OverrideHandler);
 GRANNY_DYNLINK(bool) GrannyRemoveMember(granny_data_type_definition *  Type,
                                         void *                  Object,
                                         char const*            MemberName);
 GRANNY_DYNLINK(void *) GrannyConvertTree(granny_data_type_definition const * SourceType,
                                          void const * SourceTree,
-                                         granny_data_type_definition const * DestType);
+                                         granny_data_type_definition const * DestType,
+                                         granny_variant_replace_fn *  VariantReplacer,
+                                         granny_uintaddrx *  ConversionBufferSize);
 GRANNY_DYNLINK(granny_int32x) GrannyGetConvertedTreeSize(granny_data_type_definition const * SourceType,
                                                          void const * SourceTree,
-                                                         granny_data_type_definition const * DestType);
+                                                         granny_data_type_definition const * DestType,
+                                                         granny_variant_replace_fn *  VariantReplacer);
 GRANNY_DYNLINK(void *) GrannyConvertTreeInPlace(granny_data_type_definition const * SourceType,
                                                 void const * SourceTree,
                                                 granny_data_type_definition const * DestType,
-                                                void * Memory);
+                                                void * Memory,
+                                                granny_variant_replace_fn *  VariantReplacer);
 GRANNY_DYNLINK(bool) GrannyRebasePointers(granny_data_type_definition const * Type,
                                           void * Data,
                                           granny_intaddrx Offset,
                                           bool RebaseStrings);
+GRANNY_DYNLINK(bool) GrannyRebasePointersTrackNulls(granny_data_type_definition const * Type,
+                                                    void * Data,
+                                                    granny_intaddrx Offset,
+                                                    bool RebaseStrings,
+                                                    granny_note_null_location *  NoteNullLocationCallback,
+                                                    void *                NoteNullLocationData);
 GRANNY_DYNLINK(bool) GrannyRebasePointersStringCallback(granny_data_type_definition const * Type,
                                                         void * Data,
                                                         granny_intaddrx Offset,
@@ -4295,7 +4146,7 @@ GRANNY_DYNLINK(bool) GrannyFileCRCIsValidFromMemory(granny_int32x MemorySize,
                                                     void * Memory);
 GRANNY_DYNLINK(granny_file *) GrannyReadEntireFile(char const*  FileName);
 GRANNY_DYNLINK(granny_file *) GrannyReadEntireFileFromMemory(granny_int32x MemorySize,
-                                                             void * Memory);
+                                                             void const*  Memory);
 GRANNY_DYNLINK(granny_file *) GrannyReadEntireFileFromReader(granny_file_reader *  Reader);
 GRANNY_DYNLINK(granny_file *) GrannyReadPartialFileFromReader(granny_file_reader *  Reader);
 GRANNY_DYNLINK(bool) GrannyPrepReadEntireFileNoAlloc(granny_file_reader *  Reader,
@@ -4323,6 +4174,11 @@ GRANNY_DYNLINK(bool) GrannyLoadFixupArray(granny_file_reader *  Reader,
                                           granny_grn_section const * Section,
                                           bool FileIsByteReversed,
                                           granny_grn_pointer_fixup **  Array);
+GRANNY_DYNLINK(bool) GrannyLoadMarshallingArray(granny_file_reader *  Reader,
+                                                granny_grn_section const * Section,
+                                                bool FileIsByteReversed,
+                                                granny_grn_mixed_marshalling_fixup **  Array);
+GRANNY_DYNLINK(void) GrannyFreeFixupArray(void *  FixupOrMarshalling);
 GRANNY_DYNLINK(void) GrannyFreeFile(granny_file * File);
 GRANNY_DYNLINK(granny_int32x) GrannyGetFileSectionOfLoadedObject(granny_file const * File,
                                                                  void const * Object);
@@ -4389,9 +4245,6 @@ GRANNY_DYNLINK(granny_file_fixup *) GrannyMarkFileFixup(granny_file_builder * Bu
                                                         granny_file_location const * From,
                                                         granny_int32x FromOffset,
                                                         granny_file_location const * To);
-GRANNY_DYNLINK(void) GrannyAdjustFileFixup(granny_file_builder * Builder,
-                                           granny_file_fixup * Fixup,
-                                           granny_file_location const * NewTo);
 GRANNY_DYNLINK(void) GrannyMarkMarshallingFixup(granny_file_builder * Builder,
                                                 granny_file_location const * Type,
                                                 granny_file_location const * Object,
@@ -4407,6 +4260,7 @@ GRANNY_DYNLINK(void) GrannySetFileExtraTag(granny_file_builder * Builder,
 
 /* granny_file_compressor.h bindings: */
 GRANNY_DYNLINK(granny_int32x) GrannyGetCompressedBytesPaddingSize(granny_compression_type Format);
+GRANNY_DYNLINK(granny_uint32) GrannyGetCompressionTypeFlags(granny_compression_type Format);
 GRANNY_DYNLINK(bool) GrannyDecompressData(granny_compression_type Format,
                                           bool FileIsByteReversed,
                                           granny_int32x CompressedBytesSize,
@@ -4421,6 +4275,16 @@ GRANNY_DYNLINK(bool) GrannyDecompressDataChunk(granny_compression_type Format,
                                                void * CompressedBytes,
                                                granny_int32x DecompressedBytesSize,
                                                void * DecompressedBytes);
+GRANNY_DYNLINK(granny_file_decompressor *) GrannyBeginFileDecompression(granny_compression_type Type,
+                                                                        bool FileIsByteReversed,
+                                                                        granny_int32x DecompressedBytesSize,
+                                                                        void * DecompressedBytes,
+                                                                        granny_int32x WorkMemSize,
+                                                                        void * WorkMemBuffer);
+GRANNY_DYNLINK(bool) GrannyDecompressIncremental(granny_file_decompressor * Decompressor,
+                                                 granny_int32x CompressedBytesSize,
+                                                 void * CompressedBytes);
+GRANNY_DYNLINK(bool) GrannyEndFileDecompression(granny_file_decompressor * Decompressor);
 GRANNY_DYNLINK(granny_file_compressor *) GrannyBeginFileCompression(granny_uint32x ExpandedDataSize,
                                                                     granny_int32x ContentsCount,
                                                                     granny_compression_type Type,
@@ -4479,7 +4343,7 @@ GRANNY_DYNLINK(granny_file_info *) GrannyGetFileInfo(granny_file * File);
 extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyFileInfoType;
 
 /* granny_file_operations.h bindings: */
-GRANNY_DYNLINK(char const *) GrannyGetTemporaryDirectory(void);
+GRANNY_DYNLINK(char const* ) GrannyGetTemporaryDirectory(void);
 
 /* granny_file_reader.h bindings: */
 GRANNY_DYNLINK(bool) GrannyInitializeFileReader(granny_close_file_reader_callback * CloseFileReaderCallback,
@@ -4489,6 +4353,7 @@ GRANNY_DYNLINK(bool) GrannyInitializeFileReader(granny_close_file_reader_callbac
 GRANNY_DYNLINK(granny_file_reader *) GrannyCreatePlatformFileReader(char const * FileNameToOpen);
 GRANNY_DYNLINK(granny_open_file_reader_callback *) GrannyGetDefaultFileReaderOpenCallback(void);
 GRANNY_DYNLINK(void) GrannySetDefaultFileReaderOpenCallback(granny_open_file_reader_callback * OpenFileReaderCallback);
+GRANNY_DYNLINK(void) GrannySetOSSpecificFileParameters(void *  Parameters);
 
 /* granny_file_writer.h bindings: */
 GRANNY_DYNLINK(granny_int32x) GrannyAlignWriterTo(granny_file_writer *  Writer,
@@ -4530,6 +4395,28 @@ GRANNY_DYNLINK(void) GrannyReal16ToReal32(granny_real16 Value,
                                           granny_real32 *  Output);
 
 /* granny_ik.h bindings: */
+GRANNY_DYNLINK(void) GrannyIKUpdateChainDetailed(granny_int32x JointChainLength,
+                                                 granny_int32x *  JointChain,
+                                                 granny_int32x FullJointChainLength,
+                                                 granny_int32x const *  FullJointChain,
+                                                 granny_real32 const * EndEffectorOffset3,
+                                                 granny_real32 const * DesiredPosition3,
+                                                 granny_bool32 IterateDesiredPosition,
+                                                 granny_int32x IterationCount,
+                                                 granny_skeleton const * Skeleton,
+                                                 granny_real32 const*  Offset4x4,
+                                                 granny_local_pose * LocalPose,
+                                                 granny_world_pose * WorldPose);
+GRANNY_DYNLINK(void) GrannyIKUpdateDetailed(granny_int32x JointChainLength,
+                                            granny_int32x *  JointChain,
+                                            granny_real32 const * EndEffectorOffset3,
+                                            granny_real32 const * DesiredPosition3,
+                                            granny_bool32 IterateDesiredPosition,
+                                            granny_int32x IterationCount,
+                                            granny_skeleton const * Skeleton,
+                                            granny_real32 const*  Offset4x4,
+                                            granny_local_pose * LocalPose,
+                                            granny_world_pose * WorldPose);
 GRANNY_DYNLINK(void) GrannyIKUpdate(granny_int32x LinkCount,
                                     granny_int32x EEBoneIndex,
                                     granny_real32 const * DesiredPosition3,
@@ -4538,6 +4425,17 @@ GRANNY_DYNLINK(void) GrannyIKUpdate(granny_int32x LinkCount,
                                     granny_real32 const*  Offset4x4,
                                     granny_local_pose * LocalPose,
                                     granny_world_pose * WorldPose);
+GRANNY_DYNLINK(bool) GrannyIKUpdate2BoneDetailed(granny_int32x EEBoneIndex,
+                                                 granny_int32x KneeBoneIndex,
+                                                 granny_int32x HipBoneIndex,
+                                                 granny_real32 const * DesiredPosition3,
+                                                 granny_real32 const * RestrictedMovementPlaneNormal3,
+                                                 granny_skeleton const * Skeleton,
+                                                 granny_real32 const*  Offset4x4,
+                                                 granny_local_pose * LocalPose,
+                                                 granny_world_pose * WorldPose,
+                                                 granny_real32 HyperExtensionStart,
+                                                 granny_real32 HyperExtensionScale);
 GRANNY_DYNLINK(bool) GrannyIKUpdate2Bone(granny_int32x EEBoneIndex,
                                          granny_real32 const * DesiredPosition3,
                                          granny_real32 const * RestrictedMovementPlaneNormal3,
@@ -4607,6 +4505,21 @@ GRANNY_DYNLINK(void) GrannyBuildRestLocalPose(granny_skeleton const * Skeleton,
                                               granny_int32x FirstBone,
                                               granny_int32x BoneCount,
                                               granny_local_pose * LocalPose);
+GRANNY_DYNLINK(void) GrannyLinearBlend(granny_local_pose *        Into,
+                                       granny_local_pose const*  From,
+                                       granny_local_pose const*  To,
+                                       granny_real32 Amount);
+GRANNY_DYNLINK(void) GrannyLinearBlendNeighborhood(granny_local_pose *        Into,
+                                                   granny_local_pose const*  From,
+                                                   granny_local_pose const*  To,
+                                                   granny_real32 Amount,
+                                                   granny_skeleton *          NeighborhoodSkeleton);
+GRANNY_DYNLINK(void) GrannyLinearBlendRanged(granny_local_pose *        Into,
+                                             granny_local_pose const*  From,
+                                             granny_local_pose const*  To,
+                                             granny_int32x BoneStart,
+                                             granny_int32x BoneCount,
+                                             granny_real32 Amount);
 GRANNY_DYNLINK(void) GrannyAdditiveBlend(granny_local_pose *  Into,
                                          granny_local_pose const*  Additive,
                                          granny_local_pose const*  Base,
@@ -4639,6 +4552,8 @@ GRANNY_DYNLINK(void) GrannyEndLocalPoseAccumulation(granny_local_pose * LocalPos
 GRANNY_DYNLINK(void) GrannyEndLocalPoseAccumulationLOD(granny_local_pose * LocalPose,
                                                        granny_int32x FirstBone,
                                                        granny_int32x BoneCount,
+                                                       granny_int32x FirstValidBone,
+                                                       granny_int32x ValidBoneCount,
                                                        granny_skeleton const * ReferenceSkeleton,
                                                        granny_real32 AllowedError,
                                                        granny_int32x const * SparseBoneArray);
@@ -4682,10 +4597,13 @@ GRANNY_DYNLINK(void) GrannyModulationCompositeLocalPose(granny_local_pose * Base
                                                         granny_real32 WeightAll,
                                                         granny_track_mask * Mask,
                                                         granny_local_pose const * CompositePose);
+GRANNY_DYNLINK(void) GrannyScaleLocalPoseWeight(granny_local_pose * LocalPose,
+                                                granny_real32 Scale);
 GRANNY_DYNLINK(void) GrannyCopyLocalPose(granny_local_pose const * Src,
                                          granny_local_pose * Dst);
 GRANNY_DYNLINK(void) GrannyCopyLocalPoseBoneCount(granny_local_pose const * Src,
                                                   granny_local_pose * Dst,
+                                                  granny_int32x BoneStart,
                                                   granny_int32x BoneCount);
 GRANNY_DYNLINK(granny_int32x) GrannySparseBoneArrayCreateSingleBone(granny_skeleton const * Skeleton,
                                                                     granny_int32x FirstBoneRequired,
@@ -4723,9 +4641,9 @@ GRANNY_DYNLINK(void) GrannyFilterMessage(granny_log_message_origin Origin,
 GRANNY_DYNLINK(void) GrannyFilterAllMessages(bool Enabled);
 
 /* granny_lookat.h bindings: */
-GRANNY_DYNLINK(bool) GrannyIKAimAt(granny_int32x const     HeadBoneIndex,
-                                   granny_int32x const     LinkCount,
-                                   granny_int32x const     InactiveLinkCount,
+GRANNY_DYNLINK(bool) GrannyIKAimAt(granny_int32x HeadBoneIndex,
+                                   granny_int32x LinkCount,
+                                   granny_int32x InactiveLinkCount,
                                    granny_real32 const*    OSOffset3,
                                    granny_real32 const*    OSAimVec3,
                                    granny_real32 const*    OSLevelVec3,
@@ -4742,11 +4660,17 @@ GRANNY_DYNLINK(bool) GrannyIKOrientTowards(granny_int32x BoneIndex,
                                            granny_local_pose *      LocalPose,
                                            granny_real32 *          Offset4x4,
                                            granny_world_pose *      WorldPose);
+GRANNY_DYNLINK(bool) GrannyIKOrientMatch(granny_int32x BoneIndex,
+                                         granny_real32 const *   TargetOrientation,
+                                         granny_skeleton const*  Skeleton,
+                                         granny_local_pose *      LocalPose,
+                                         granny_real32 *          Offset4x4,
+                                         granny_world_pose *      WorldPose);
 
 /* granny_math.h bindings: */
-GRANNY_DYNLINK(void) GrannyConstructQuaternion4(granny_real32 *  Quaternion,
-                                                granny_real32 const * Axis,
-                                                granny_real32 const  Angle);
+GRANNY_DYNLINK(void) GrannyConstructQuaternion4(granny_real32 *        Quaternion,
+                                                granny_real32 const*  Axis,
+                                                granny_real32 Angle);
 GRANNY_DYNLINK(void) GrannyEnsureQuaternionContinuity(granny_int32x QuaternionCount,
                                                       granny_real32 * Quaternions);
 GRANNY_DYNLINK(bool) GrannyMatrixInvert3x3(granny_real32 * Dest3x3,
@@ -4801,6 +4725,7 @@ GRANNY_DYNLINK(void) GrannyGetAllocationInformation(granny_allocation_header con
 GRANNY_DYNLINK(void * ) GrannyBeginAllocationCheck(void);
 GRANNY_DYNLINK(granny_allocation_header * ) GrannyCheckedAllocationsEnd(void * CheckIdentifier);
 GRANNY_DYNLINK(bool) GrannyEndAllocationCheck(void * CheckIdentifier);
+GRANNY_DYNLINK(void) GrannySetBreakAllocation(granny_uintaddrx AllocNum);
 GRANNY_DYNLINK(void) GrannyGetAllocator(granny_allocate_callback ** AllocateCallback,
                                         granny_deallocate_callback ** DeallocateCallback);
 GRANNY_DYNLINK(void) GrannySetAllocator(granny_allocate_callback * AllocateCallback,
@@ -4808,6 +4733,7 @@ GRANNY_DYNLINK(void) GrannySetAllocator(granny_allocate_callback * AllocateCallb
 GRANNY_DYNLINK(void) GrannyFreeBuilderResult(void * Result);
 GRANNY_DYNLINK(void) GrannyAcquireMemorySpinlock(void);
 GRANNY_DYNLINK(void) GrannyReleaseMemorySpinlock(void);
+GRANNY_DYNLINK(char const* ) GrannyAllocationIntentString(granny_int32x Intent);
 
 /* granny_memory_arena.h bindings: */
 GRANNY_DYNLINK(granny_memory_arena *) GrannyNewMemoryArena(void);
@@ -4832,6 +4758,8 @@ GRANNY_DYNLINK(granny_file_reader * ) GrannyCreateMemoryFileReader(granny_int32x
 
 /* granny_memory_file_writer.h bindings: */
 GRANNY_DYNLINK(granny_file_writer *) GrannyCreateMemoryFileWriter(granny_int32x BlockSize);
+GRANNY_DYNLINK(granny_file_writer *) GrannyCreateMemoryFileWriterWithInitialCapacity(granny_int32x BlockSize,
+                                                                                     granny_int32x InitialCapacity);
 GRANNY_DYNLINK(bool) GrannyStealMemoryWriterBuffer(granny_file_writer *  Writer,
                                                    granny_uint8 **       BufferPtr,
                                                    granny_int32x *       BufferSize);
@@ -4939,6 +4867,7 @@ GRANNY_DYNLINK(void) GrannySetChannelTolerance(granny_mesh_builder * Builder,
                                                granny_int32x Channel,
                                                granny_real32 Tolerance);
 GRANNY_DYNLINK(void) GrannyDisableTangentVertexSplits(granny_mesh_builder *  Builder);
+GRANNY_DYNLINK(void) GrannyDisableVertexMerging(granny_mesh_builder *  Builder);
 GRANNY_DYNLINK(void) GrannyPreserveEmptyMaterialGroups(granny_mesh_builder *  Builder);
 GRANNY_DYNLINK(void) GrannySetVertexChannelComponentNames(granny_mesh_builder * Builder,
                                                           granny_int32x ChannelCount,
@@ -4984,10 +4913,12 @@ GRANNY_DYNLINK(granny_int32x) GrannyGetChannelComponentCount(granny_mesh_builder
 GRANNY_DYNLINK(void) GrannySetChannel(granny_mesh_builder * Builder,
                                       granny_int32x Edge,
                                       granny_int32x Channel,
-                                      granny_real32 const * Value);
+                                      granny_real32 const * Value,
+                                      granny_int32x ValueWidth);
 GRANNY_DYNLINK(void) GrannySetMaterial(granny_mesh_builder * Builder,
                                        granny_int32x MaterialIndex);
 GRANNY_DYNLINK(void) GrannyPushTriangle(granny_mesh_builder * Builder);
+GRANNY_DYNLINK(void) GrannyPushPolygon(granny_mesh_builder * Builder);
 GRANNY_DYNLINK(granny_int32x) GrannyGetOriginalVertex(granny_mesh_builder * Builder,
                                                       granny_int32x V);
 
@@ -5013,6 +4944,13 @@ GRANNY_DYNLINK(bool) GrannyBuildMirroringIndices(granny_mirror_specification *  
                                                  granny_skeleton *  Skeleton,
                                                  granny_mirror_name_callback *  NameCallback,
                                                  void * UserData);
+GRANNY_DYNLINK(bool) GrannyMirrorLocalPose(granny_mirror_specification *  Specification,
+                                           granny_skeleton *  Skeleton,
+                                           granny_local_pose *  Pose);
+
+/* granny_mod_support.h bindings: */
+GRANNY_DYNLINK(granny_file_info * ) GrannyGetModFileInfo(granny_file *  File);
+extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyModFileInfoType;
 
 /* granny_oodle1_compression.h bindings: */
 GRANNY_DYNLINK(granny_oodle1_state *) GrannyOodle1BeginSimple(granny_uint32x ExpandedDataSize,
@@ -5037,8 +4975,10 @@ extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyPeriodicLoopType;
 
 /* granny_pointer_hash.h bindings: */
 GRANNY_DYNLINK(granny_pointer_hash *) GrannyNewPointerHash(void);
+GRANNY_DYNLINK(granny_pointer_hash *) GrannyNewPointerHashWithSize(granny_int32x NumElements);
 GRANNY_DYNLINK(void) GrannyDeletePointerHash(granny_pointer_hash * Hash);
-GRANNY_DYNLINK(void) GrannyAddPointerToHash(granny_pointer_hash * Hash,
+GRANNY_DYNLINK(void) GrannyClearPointerHash(granny_pointer_hash * Hash);
+GRANNY_DYNLINK(bool) GrannyAddPointerToHash(granny_pointer_hash * Hash,
                                             void const * Key,
                                             void * Data);
 GRANNY_DYNLINK(void) GrannyRemovePointerFromHash(granny_pointer_hash * Hash,
@@ -5051,6 +4991,30 @@ GRANNY_DYNLINK(bool) GrannySetHashedPointerData(granny_pointer_hash * Hash,
 GRANNY_DYNLINK(bool) GrannyGetHashedPointerData(granny_pointer_hash * Hash,
                                                 void const * Key,
                                                 void ** Data);
+GRANNY_DYNLINK(granny_pointer_hash_iterator * ) GrannyPointerHashBegin(granny_pointer_hash * Hash);
+GRANNY_DYNLINK(void) GrannyDeletePointerHashIterator(granny_pointer_hash * Hash,
+                                                     granny_pointer_hash_iterator *  Iter);
+GRANNY_DYNLINK(void) GrannyPointerHashIteratorNext(granny_pointer_hash * Hash,
+                                                   granny_pointer_hash_iterator *  Iter);
+GRANNY_DYNLINK(bool) GrannyPointerHashIteratorValid(granny_pointer_hash * Hash,
+                                                    granny_pointer_hash_iterator *  Iter);
+GRANNY_DYNLINK(void const* ) GrannyPointerHashIteratorKey(granny_pointer_hash_iterator *  Iter);
+GRANNY_DYNLINK(void *       ) GrannyPointerHashIteratorData(granny_pointer_hash_iterator *  Iter);
+
+/* granny_pose_cache.h bindings: */
+GRANNY_DYNLINK(granny_pose_cache * ) GrannyNewPoseCache(void);
+GRANNY_DYNLINK(void) GrannyClearPoseCache(granny_pose_cache *  Cache);
+GRANNY_DYNLINK(void) GrannyFreePoseCache(granny_pose_cache *  Cache);
+GRANNY_DYNLINK(granny_local_pose * ) GrannyGetCacheLocalPose(granny_pose_cache *  PoseCache,
+                                                             granny_uint32x NumBones);
+GRANNY_DYNLINK(granny_local_pose * ) GrannyGetCacheRestLocalPose(granny_pose_cache *  PoseCache,
+                                                                 granny_model *  ForModel);
+GRANNY_DYNLINK(void) GrannyReleaseCachePose(granny_pose_cache *  Cache,
+                                            granny_local_pose *  Pose);
+GRANNY_DYNLINK(granny_track_mask * ) GrannyGetCacheTrackMask(granny_pose_cache *  PoseCache,
+                                                             granny_uint32x NumBones);
+GRANNY_DYNLINK(void) GrannyReleaseCacheTrackMask(granny_pose_cache *  Cache,
+                                                 granny_track_mask *  Mask);
 
 /* granny_retargeter.h bindings: */
 GRANNY_DYNLINK(granny_retargeter * ) GrannyAcquireRetargeter(granny_model *  From,
@@ -5061,6 +5025,9 @@ GRANNY_DYNLINK(bool) GrannyRetargetPose(granny_local_pose const*  FromPose,
                                         granny_int32x DestBoneStart,
                                         granny_int32x DestBoneCount,
                                         granny_retargeter *  Retargeter);
+GRANNY_DYNLINK(granny_int32 * ) GrannyGetRetargeterSourceIndices(granny_retargeter *  Retargeter);
+GRANNY_DYNLINK(granny_model * ) GrannyGetRetargeterSourceModel(granny_retargeter *  Retargeter);
+GRANNY_DYNLINK(granny_model * ) GrannyGetRetargeterTargetModel(granny_retargeter *  Retargeter);
 
 /* granny_s3tc.h bindings: */
 GRANNY_DYNLINK(granny_pixel_layout const *) GrannyGetS3TCPixelLayout(granny_s3tc_texture_format Format);
@@ -5104,17 +5071,19 @@ GRANNY_DYNLINK(granny_int32x) GrannyGetResultingSkeletonSize(granny_skeleton_bui
 GRANNY_DYNLINK(granny_skeleton *) GrannyEndSkeletonInPlace(granny_skeleton_builder * Builder,
                                                            void * InMemory,
                                                            granny_int32x * RemappingTable);
-GRANNY_DYNLINK(bool) GrannyAddBone(granny_skeleton_builder * Builder,
-                                   granny_real32 const * LocalPosition3,
-                                   granny_real32 const * LocalOrientation4,
-                                   granny_real32 const * LocalScaleShear3x3,
-                                   granny_real32 const * WorldPosition3,
-                                   granny_real32 const * WorldOrientation4,
-                                   granny_real32 const * WorldScaleShear3x3);
-GRANNY_DYNLINK(void) GrannyAddBoneWithInverse(granny_skeleton_builder * Builder,
-                                              granny_real32 const * LocalPosition3,
-                                              granny_real32 const * LocalOrientation4,
-                                              granny_real32 const * LocalScaleShear3x3,
+GRANNY_DYNLINK(bool) GrannyAddBone(granny_skeleton_builder *  Builder,
+                                   char const*        BoneName,
+                                   granny_real32 const*      LocalPosition3,
+                                   granny_real32 const*      LocalOrientation4,
+                                   granny_real32 const*      LocalScaleShear3x3,
+                                   granny_real32 const*      WorldPosition3,
+                                   granny_real32 const*      WorldOrientation4,
+                                   granny_real32 const*      WorldScaleShear3x3);
+GRANNY_DYNLINK(void) GrannyAddBoneWithInverse(granny_skeleton_builder *  Builder,
+                                              char const*        BoneName,
+                                              granny_real32 const*      LocalPosition3,
+                                              granny_real32 const*      LocalOrientation4,
+                                              granny_real32 const*      LocalScaleShear3x3,
                                               granny_matrix_4x4 const*  InverseWorld4x4);
 GRANNY_DYNLINK(void) GrannySetBoneParent(granny_skeleton_builder * Builder,
                                          granny_int32x BoneIndex,
@@ -5144,6 +5113,27 @@ GRANNY_DYNLINK(void) GrannySetMaximumSPUAnimationBindingCount(granny_int32x Bind
 GRANNY_DYNLINK(granny_spu_animation_info * ) GrannyGetSPUAnimationInfo(granny_file * File);
 extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannySPUAnimationInfoType;
 
+/* granny_spu_commands_ppuside.h bindings: */
+GRANNY_DYNLINK(granny_radspu_command_queue * ) GrannyInitCommandQueueSPURS(granny_int32x QueueDepth,
+                                                                           granny_int32x NumTasks,
+                                                                           void const*  SpursTaskBinInfo,
+                                                                           void *        SpursInstance);
+GRANNY_DYNLINK(granny_radspu_command_queue * ) GrannyInitCommandQueueSPUThreads(granny_int32x QueueDepth,
+                                                                                granny_int32x NumTasks,
+                                                                                void const*  ThreadImage);
+GRANNY_DYNLINK(void) GrannyShutdownCommandQueueSPU(granny_radspu_command_queue *  Queue);
+GRANNY_DYNLINK(granny_uint64x) GrannyGetLastInsertedFenceSPU(granny_radspu_command_queue *  Queue);
+GRANNY_DYNLINK(granny_uint64x) GrannyGetCurrentClearedFenceSPU(granny_radspu_command_queue *  Queue);
+GRANNY_DYNLINK(granny_uint64x) GrannyInsertFenceSPU(granny_radspu_command_queue *  Queue);
+GRANNY_DYNLINK(granny_uint64x) GrannyTryInsertCommandSPU(granny_radspu_command_queue *  Queue,
+                                                         granny_int32x CommandType,
+                                                         void const*  CommandBuffer,
+                                                         granny_int32x CommandSize);
+GRANNY_DYNLINK(granny_uint64x) GrannyInsertCommandSPU(granny_radspu_command_queue *  Queue,
+                                                      granny_int32x CommandType,
+                                                      void const*  CommandBuffer,
+                                                      granny_int32x CommandSize);
+
 /* granny_spu_controlled_animation.h bindings: */
 GRANNY_DYNLINK(granny_control *) GrannyPlayControlledSPUAnimation(granny_real32 StartTime,
                                                                   granny_spu_animation const * Animation,
@@ -5164,8 +5154,12 @@ GRANNY_DYNLINK(void) GrannySetSPUTrackGroupBasisTransform(granny_controlled_spu_
                                                           granny_int32x TrackGroupIndex,
                                                           granny_model * FromModel,
                                                           granny_model * ToModel);
+GRANNY_DYNLINK(void) GrannySetSPUTrackGroupMirrorSpecification(granny_controlled_spu_animation_builder *  Builder,
+                                                               granny_int32x TrackGroupIndex,
+                                                               granny_mirror_specification *  Specification);
 
 /* granny_spu_track_group.h bindings: */
+GRANNY_DYNLINK(void) GrannyRecomputeSPUTrackRequiredBytes(granny_spu_track_group *  Group);
 extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannySPUTransformTrackType;
 extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannySPUTrackGroupType;
 
@@ -5192,15 +5186,11 @@ GRANNY_DYNLINK(bool) GrannyMultipleNewStackUnits(granny_stack_allocator * Alloca
 GRANNY_DYNLINK(void) GrannySerializeStack(granny_stack_allocator const * Allocator,
                                           void * Dest);
 
-/* granny_stat_hud.h bindings: */
-GRANNY_DYNLINK(granny_stat_hud *) GrannyCaptureCurrentStats(granny_int32x FramesSinceLastCapture);
-GRANNY_DYNLINK(void) GrannyFreeStats(granny_stat_hud * StatHUD);
-GRANNY_DYNLINK(char **) GrannyDumpStatHUD(granny_stat_hud * StatHUD);
-GRANNY_DYNLINK(void) GrannyFreeStatHUDDump(char ** StatHUDDump);
-
 /* granny_string.h bindings: */
-GRANNY_DYNLINK(granny_int32x) GrannyStringDifference(char const * StringA,
-                                                     char const * StringB);
+GRANNY_DYNLINK(granny_int32x) GrannyStringDifference(char const*  StringA,
+                                                     char const*  StringB);
+
+/* granny_string_comparison_callback.h bindings: */
 GRANNY_DYNLINK(void) GrannySetStringComparisonCallback(granny_string_comparison_callback * Callback);
 
 /* granny_string_database.h bindings: */
@@ -5213,7 +5203,8 @@ GRANNY_DYNLINK(char *) GrannyRebaseToStringDatabase(void * Data,
 extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyStringDatabaseType;
 
 /* granny_string_table.h bindings: */
-GRANNY_DYNLINK(granny_string_table *) GrannyNewStringTable(void);
+GRANNY_DYNLINK(granny_string_table * ) GrannyNewStringTable(void);
+GRANNY_DYNLINK(granny_string_table * ) GrannyNewArenaStringTable(granny_memory_arena *  Arena);
 GRANNY_DYNLINK(void) GrannyFreeStringTable(granny_string_table * Table);
 GRANNY_DYNLINK(char const *) GrannyMapString(granny_string_table * Table,
                                              char const * String);
@@ -5222,11 +5213,16 @@ GRANNY_DYNLINK(char const *) GrannyMapString(granny_string_table * Table,
 GRANNY_DYNLINK(void) GrannyGetSystemSeconds(granny_system_clock *  Result);
 GRANNY_DYNLINK(granny_real32) GrannyGetSecondsElapsed(granny_system_clock const * StartClock,
                                                       granny_system_clock const * EndClock);
-GRANNY_DYNLINK(void) GrannySleepForSeconds(granny_real32 Seconds);
 
 /* granny_tangent_frame.h bindings: */
 GRANNY_DYNLINK(bool) GrannyBuildTangentSpace(granny_mesh_builder *  Builder);
 extern GRANNY_DYNLINKDATA(granny_data_type_definition *) GrannyGBX333VertexType;
+
+/* granny_telemetry.h bindings: */
+GRANNY_DYNLINK(bool) GrannyUseTmLite(void *  Context);
+GRANNY_DYNLINK(bool) GrannyUseTelemetry(void *  Context);
+GRANNY_DYNLINK(void) GrannyTelemetryFrameStats(void);
+GRANNY_DYNLINK(void) GrannyTelemetryComplexStats(void);
 
 /* granny_texture.h bindings: */
 GRANNY_DYNLINK(char const *) GrannyGetTextureTypeName(granny_int32x TextureType);
@@ -5238,6 +5234,8 @@ GRANNY_DYNLINK(granny_int32x) GrannyGetRawImageSize(granny_pixel_layout const * 
 GRANNY_DYNLINK(granny_int32x) GrannyGetS3TCImageSize(granny_s3tc_texture_format Format,
                                                      granny_int32x Width,
                                                      granny_int32x Height);
+GRANNY_DYNLINK(granny_int32x) GrannyGetYCoCgImageSize(granny_int32x Width,
+                                                      granny_int32x Height);
 GRANNY_DYNLINK(bool) GrannyGetRecommendedPixelLayout(granny_texture const * Texture,
                                                      granny_pixel_layout * Layout);
 GRANNY_DYNLINK(bool) GrannyCopyTextureImage(granny_texture const * Texture,
@@ -5267,6 +5265,8 @@ GRANNY_DYNLINK(granny_texture_builder *) GrannyBeginBinkTexture(granny_int32x Wi
                                                                 granny_int32x Height,
                                                                 granny_int32x Compression,
                                                                 granny_uint32x Flags);
+GRANNY_DYNLINK(granny_texture_builder *) GrannyBeginYCoCgTexture(granny_int32x Width,
+                                                                 granny_int32x Height);
 GRANNY_DYNLINK(granny_texture *) GrannyEndTexture(granny_texture_builder * Builder);
 GRANNY_DYNLINK(granny_int32x) GrannyGetResultingTextureSize(granny_texture_builder const * Builder);
 GRANNY_DYNLINK(granny_texture *) GrannyEndTextureInPlace(granny_texture_builder * Builder,
@@ -5344,22 +5344,15 @@ GRANNY_DYNLINK(void) GrannyGetVectorDifferences(granny_int32x VectorDimension,
                                                 granny_vector_diff_mode DiffMode,
                                                 granny_real32 * IdentityDifference,
                                                 granny_real32 * ConstantDifference);
-GRANNY_DYNLINK(bool) GrannyKnotsAreReducible(granny_int32x Degree,
-                                             granny_int32x Dimension,
+GRANNY_DYNLINK(bool) GrannyKnotsAreReducible(granny_int32x Dimension,
                                              granny_int32x KnotCount,
                                              granny_real32 const * Knots,
                                              granny_real32 const * Controls,
                                              granny_real32 const * Identity,
                                              granny_real32 Epsilon,
                                              granny_vector_diff_mode DiffMode,
-                                             granny_int32x * RequiredDegree,
-                                             granny_int32x * RequiredKnotCount);
-GRANNY_DYNLINK(bool) GrannyCurveIsReducible(granny_curve2 const * Curve,
-                                            granny_real32 const * Identity,
-                                            granny_real32 Epsilon,
-                                            granny_vector_diff_mode DiffMode,
-                                            granny_int32x * RequiredDegree,
-                                            granny_int32x * RequiredKnotCount);
+                                             granny_int32x *  RequiredDegree,
+                                             granny_int32x *  RequiredKnotCount);
 GRANNY_DYNLINK(bool) GrannyTransformTrackHasKeyframedCurves(granny_transform_track const * Track);
 GRANNY_DYNLINK(bool) GrannyTransformTrackIsAnimated(granny_transform_track const * Track);
 GRANNY_DYNLINK(bool) GrannyTransformTrackIsIdentity(granny_transform_track const * Track);
@@ -5370,13 +5363,13 @@ GRANNY_DYNLINK(bool) GrannyFindTrackByRule(granny_track_group const * TrackGroup
                                            char const * ProcessedTrackName,
                                            char const * TrackPattern,
                                            granny_int32x * TrackIndex);
-GRANNY_DYNLINK(bool) GrannyFindVectorTrackByName(granny_track_group const * TrackGroup,
-                                                 char const * TrackName,
-                                                 granny_int32x * VectorTrackIndex);
-GRANNY_DYNLINK(bool) GrannyFindVectorTrackByRule(granny_track_group const * TrackGroup,
-                                                 char const * ProcessedTrackName,
-                                                 char const * TrackPattern,
-                                                 granny_int32x * VectorTrackIndex);
+GRANNY_DYNLINK(bool) GrannyFindVectorTrack(granny_track_group const * TrackGroup,
+                                           char const * TrackName,
+                                           granny_uint32 TrackKey,
+                                           granny_int32x * VectorTrackIndex);
+GRANNY_DYNLINK(bool) GrannyFindTextTrackByName(granny_track_group const * TrackGroup,
+                                               char const * TrackName,
+                                               granny_int32x * TextTrackIndex);
 GRANNY_DYNLINK(void) GrannyGetTrackGroupFlags(granny_track_group const * TrackGroup,
                                               granny_uint32 * Flags,
                                               granny_uint32 * VDADOFs);
@@ -5456,11 +5449,11 @@ GRANNY_DYNLINK(void) GrannySetTransformSample(granny_track_group_sampler * Sampl
 
 /* granny_track_mask.h bindings: */
 GRANNY_DYNLINK(granny_int32x) GrannyGetTrackMaskSize(granny_int32x BoneCount);
-GRANNY_DYNLINK(granny_track_mask *) GrannyNewTrackMask(granny_real32 DefaultWeight,
-                                                       granny_int32x BoneCount);
-GRANNY_DYNLINK(granny_track_mask *) GrannyNewTrackMaskInPlace(granny_real32 DefaultWeight,
-                                                              granny_int32x BoneCount,
-                                                              void *  Memory);
+GRANNY_DYNLINK(granny_track_mask * ) GrannyNewTrackMask(granny_real32 DefaultWeight,
+                                                        granny_int32x BoneCount);
+GRANNY_DYNLINK(granny_track_mask * ) GrannyNewTrackMaskInPlace(granny_real32 DefaultWeight,
+                                                               granny_int32x BoneCount,
+                                                               void *  Memory);
 GRANNY_DYNLINK(granny_extract_track_mask_result) GrannyExtractTrackMask(granny_track_mask * TrackMask,
                                                                         granny_int32x BoneCount,
                                                                         granny_skeleton const * Skeleton,
@@ -5473,7 +5466,9 @@ GRANNY_DYNLINK(void) GrannySetTrackMaskBoneWeight(granny_track_mask * Mask,
                                                   granny_int32x BoneIndex,
                                                   granny_real32 Weight);
 GRANNY_DYNLINK(void) GrannyFreeTrackMask(granny_track_mask * Mask);
-GRANNY_DYNLINK(granny_track_mask *) GrannyCopyTrackMask(granny_track_mask const * Mask);
+GRANNY_DYNLINK(bool) GrannyCopyTrackMask(granny_track_mask *  Dest,
+                                         granny_track_mask const * Source);
+GRANNY_DYNLINK(granny_track_mask *) GrannyCloneTrackMask(granny_track_mask const * Mask);
 GRANNY_DYNLINK(void) GrannyInvertTrackMask(granny_track_mask * Mask);
 GRANNY_DYNLINK(void) GrannySetSkeletonTrackMaskFromTrackGroup(granny_track_mask * Mask,
                                                               granny_skeleton const * Skeleton,
@@ -5495,6 +5490,7 @@ GRANNY_DYNLINK(granny_unbound_track_mask *) GrannyNewUnboundTrackMask(granny_rea
 GRANNY_DYNLINK(granny_unbound_track_mask *) GrannyNewUnboundTrackMaskInPlace(granny_real32 DefaultWeight,
                                                                              granny_int32x BoneCount,
                                                                              void *  Memory);
+GRANNY_DYNLINK(void) GrannyFreeUnboundTrackMask(granny_unbound_track_mask * Mask);
 GRANNY_DYNLINK(granny_int32x) GrannyFindMaskIndexForName(granny_unbound_track_mask *  UnboundMask,
                                                          char const*  Name);
 GRANNY_DYNLINK(void) GrannyBindTrackmaskToModel(granny_unbound_track_mask *  UnboundMask,
@@ -5525,6 +5521,10 @@ GRANNY_DYNLINK(granny_track_sampler *) GrannyGetTrackSamplerUUU(void);
 GRANNY_DYNLINK(granny_track_sampler *) GrannyGetTrackSamplerSSS(void);
 GRANNY_DYNLINK(granny_track_sampler *) GrannyGetTrackSamplerIII(void);
 GRANNY_DYNLINK(granny_track_sampler *) GrannyGetTrackSamplerIIU(void);
+GRANNY_DYNLINK(void) GrannySetContextFrameIndex(granny_sample_context *  Context,
+                                                granny_real32 Clock,
+                                                granny_real32 Duration,
+                                                granny_real32 TimeStep);
 
 /* granny_tri_topology.h bindings: */
 GRANNY_DYNLINK(void) GrannyInvertTriTopologyWinding(granny_tri_topology * Topology);
@@ -5546,9 +5546,9 @@ extern GRANNY_DYNLINKDATA(granny_defined_type *) GrannyDefinedTypes;
 
 /* granny_variant_builder.h bindings: */
 GRANNY_DYNLINK(granny_variant_builder *) GrannyBeginVariant(granny_string_table * StringTableBuilder);
-GRANNY_DYNLINK(bool) GrannyEndVariant(granny_variant_builder * Builder,
-                                      granny_data_type_definition ** Type,
-                                      void ** Object);
+GRANNY_DYNLINK(void * ) GrannyEndVariant(granny_variant_builder * Builder,
+                                         granny_data_type_definition ** Type,
+                                         void ** Object);
 GRANNY_DYNLINK(void) GrannyAbortVariant(granny_variant_builder * Builder);
 GRANNY_DYNLINK(granny_int32x) GrannyGetResultingVariantTypeSize(granny_variant_builder const * Builder);
 GRANNY_DYNLINK(granny_int32x) GrannyGetResultingVariantObjectSize(granny_variant_builder const * Builder);
@@ -5713,70 +5713,82 @@ GRANNY_DYNLINK(granny_real32 *) GrannyGetWorldPoseComposite4x4(granny_world_pose
 GRANNY_DYNLINK(granny_matrix_4x4 *) GrannyGetWorldPose4x4Array(granny_world_pose const * WorldPose);
 GRANNY_DYNLINK(granny_matrix_4x4 *) GrannyGetWorldPoseComposite4x4Array(granny_world_pose const * WorldPose);
 GRANNY_DYNLINK(void) GrannyBuildWorldPose(granny_skeleton const * Skeleton,
-                                          granny_int32x const  FirstBone,
-                                          granny_int32x const  BoneCount,
+                                          granny_int32x FirstBone,
+                                          granny_int32x BoneCount,
                                           granny_local_pose const * LocalPose,
                                           granny_real32 const * Offset4x4,
                                           granny_world_pose * Result);
 GRANNY_DYNLINK(void) GrannyBuildWorldPoseNoComposite(granny_skeleton const * Skeleton,
-                                                     granny_int32x const  FirstBone,
-                                                     granny_int32x const  BoneCount,
+                                                     granny_int32x FirstBone,
+                                                     granny_int32x BoneCount,
                                                      granny_local_pose const * LocalPose,
                                                      granny_real32 const * Offset4x4,
                                                      granny_world_pose * Result);
 GRANNY_DYNLINK(void) GrannyBuildWorldPoseLOD(granny_skeleton const * Skeleton,
-                                             granny_int32x const  FirstBone,
-                                             granny_int32x const  BoneCount,
+                                             granny_int32x FirstBone,
+                                             granny_int32x BoneCount,
                                              granny_int32x FirstValidLocalBone,
                                              granny_int32x ValidLocalBoneCount,
                                              granny_local_pose const * LocalPose,
                                              granny_real32 const * Offset4x4,
                                              granny_world_pose * Result);
 GRANNY_DYNLINK(void) GrannyBuildWorldPoseNoCompositeLOD(granny_skeleton const * Skeleton,
-                                                        granny_int32x const  FirstBone,
-                                                        granny_int32x const  BoneCount,
+                                                        granny_int32x FirstBone,
+                                                        granny_int32x BoneCount,
                                                         granny_int32x FirstValidLocalBone,
                                                         granny_int32x ValidLocalBoneCount,
                                                         granny_local_pose const * LocalPose,
                                                         granny_real32 const * Offset4x4,
                                                         granny_world_pose * Result);
 GRANNY_DYNLINK(void) GrannyBuildWorldPoseSparse(granny_skeleton const * Skeleton,
-                                                granny_int32x const  FirstBone,
-                                                granny_int32x const  BoneCount,
+                                                granny_int32x FirstBone,
+                                                granny_int32x BoneCount,
                                                 granny_int32x const * SparseBoneArray,
                                                 granny_int32x const * SparseBoneArrayReverse,
                                                 granny_local_pose const * LocalPose,
                                                 granny_real32 const * Offset4x4,
                                                 granny_world_pose * Result);
 GRANNY_DYNLINK(void) GrannyBuildRestWorldPose(granny_skeleton const * Skeleton,
-                                              granny_int32x const  FirstBone,
-                                              granny_int32x const  BoneCount,
+                                              granny_int32x FirstBone,
+                                              granny_int32x BoneCount,
                                               granny_real32 const * Offset4x4,
                                               granny_world_pose * Result);
 GRANNY_DYNLINK(void) GrannyBuildWorldPoseComposites(granny_skeleton const * Skeleton,
-                                                    granny_int32x const  FirstBone,
-                                                    granny_int32x const  BoneCount,
+                                                    granny_int32x FirstBone,
+                                                    granny_int32x BoneCount,
                                                     granny_world_pose * Result);
 GRANNY_DYNLINK(void) GrannyBuildCompositeBuffer(granny_skeleton const * Skeleton,
-                                                granny_int32x const  FirstBone,
-                                                granny_int32x const  BoneCount,
+                                                granny_int32x FirstBone,
+                                                granny_int32x BoneCount,
                                                 granny_world_pose const * Pose,
                                                 granny_matrix_4x4 *  CompositeBuffer);
 GRANNY_DYNLINK(void) GrannyBuildCompositeBufferTransposed(granny_skeleton const * Skeleton,
-                                                          granny_int32x const  FirstBone,
-                                                          granny_int32x const  BoneCount,
+                                                          granny_int32x FirstBone,
+                                                          granny_int32x BoneCount,
                                                           granny_world_pose const * Pose,
                                                           granny_matrix_3x4 *  CompositeBuffer);
 GRANNY_DYNLINK(void) GrannyBuildIndexedCompositeBuffer(granny_skeleton const * Skeleton,
                                                        granny_world_pose const * Pose,
                                                        granny_int32x const*  Indices,
-                                                       granny_int32x const  IndexCount,
+                                                       granny_int32x IndexCount,
                                                        granny_matrix_4x4 *  CompositeBuffer);
 GRANNY_DYNLINK(void) GrannyBuildIndexedCompositeBufferTransposed(granny_skeleton const * Skeleton,
                                                                  granny_world_pose const * Pose,
                                                                  granny_int32x const*  Indices,
-                                                                 granny_int32x const  IndexCount,
+                                                                 granny_int32x IndexCount,
                                                                  granny_matrix_3x4 *  CompositeBuffer);
+GRANNY_DYNLINK(granny_int32x) GrannyBuildFullJointChainFromJointChain(granny_skeleton const * Skeleton,
+                                                                      granny_int32x JointChainLength,
+                                                                      granny_int32x const *  JointChain,
+                                                                      granny_int32x FullJointChainMaxLength,
+                                                                      granny_int32x *  FullJointChain);
+GRANNY_DYNLINK(void) GrannyUpdateWorldPoseChain(granny_skeleton const * Skeleton,
+                                                granny_int32x FullJointChainIndex,
+                                                granny_int32x FullJointChainLength,
+                                                granny_int32x const *  FullJointChain,
+                                                granny_local_pose * LocalPose,
+                                                granny_real32 const * Offset4x4,
+                                                granny_world_pose * Result);
 GRANNY_DYNLINK(void) GrannyUpdateWorldPoseChildren(granny_skeleton const * Skeleton,
                                                    granny_int32x ParentBone,
                                                    granny_local_pose * LocalPose,
@@ -5788,19 +5800,20 @@ GRANNY_DYNLINK(void) GrannyUpdateWorldPoseChildren(granny_skeleton const * Skele
 #endif
 
 // Don't export this macro...
-#undef GrannyTypeSizeCheck
+#undef GrannySizeCheck
 
 
 // Put the packing state back where it was, and undefine our
 //  attribute macro...
-#ifdef _MSC_VER
+#if GRANNY_USES_MS_PACKING
   #pragma pack(pop)
-  #pragma warning(pop)
+
+  #if defined(_MSC_VER)
+    #pragma warning(pop)
+  #endif
 #endif
 
 #undef GrannyAlignAttribute
-
-
 
 #if defined(__MWERKS__)
   #pragma export off

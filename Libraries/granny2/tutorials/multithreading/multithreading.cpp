@@ -18,12 +18,12 @@ using namespace std;
 
 #define ARRAY_LENGTH(x) (sizeof(x)/sizeof(x[0]))
 
-char const* ModelFilename = "../media/bare_pixo_mesh.gr2";
+char const* ModelFilename = "media/bare_pixo_mesh.gr2";
 char const* AnimationFilenames[] = {
-    "../media/run_cycle_fast.gr2",
-    "../media/run_cycle_slow.gr2",
-    "../media/walk_cycle_fast.gr2",
-    "../media/walk_cycle_slow.gr2"
+    "media/run_cycle_fast.gr2",
+    "media/run_cycle_slow.gr2",
+    "media/walk_cycle_fast.gr2",
+    "media/walk_cycle_slow.gr2"
 };
 
 struct WorkTicket

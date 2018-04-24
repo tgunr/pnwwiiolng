@@ -1,10 +1,10 @@
 // ========================================================================
-// $File: //jeffr/granny/tutorial/rendering/dx9/dx9_rendering_helpers.cpp $
-// $DateTime: 2009/10/29 11:47:12 $
-// $Change: 23788 $
-// $Revision: #4 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "dx9_rendering.h"
 
@@ -13,7 +13,7 @@
 // stuff them out of the documentation autogenerate section.
 // ---------------------------------------------------------------------------------------
 
-char const* const ShaderFile         = "Shaders\\Shaders.hlsl";
+#define ShaderFile TEXT("media\\Shaders\\SimpleModelShader.hlsl")
 
 #define HARDCODED_DISPLAY_WIDTH  1280
 #define HARDCODED_DISPLAY_HEIGHT 720
@@ -32,7 +32,7 @@ bool InitializeD3D()
         WindowClass.hInstance = GetModuleHandle(0);
         //WindowClass.hIcon = LoadIcon(WindowClass.hInstance, MAKEINTRESOURCE(101));
         WindowClass.hCursor = LoadCursor(0, IDC_ARROW);
-        WindowClass.lpszClassName = "DX9Basic_SimpleClass";
+        WindowClass.lpszClassName = TEXT("DX9Basic_SimpleClass");
 
         if(!RegisterClassEx(&WindowClass))
             return false;
@@ -87,18 +87,18 @@ bool InitializeD3D()
 
     ID3DXBuffer* ErrorBuffer = NULL;
     if (D3DXCreateEffectFromFile(g_pD3DDevice,
-                                        ShaderFile,
-                                        NULL,
-                                        NULL,
+                                 ShaderFile,
+                                 NULL,
+                                 NULL,
 #if !defined(DEBUG_VS)
-                                        0,
+                                 0,
 #else
-                                        D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION,
+                                 D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION,
 #endif
-                                        NULL,
-                                        &g_pEffect, &ErrorBuffer) != S_OK)
+                                 NULL,
+                                 &g_pEffect, &ErrorBuffer) != S_OK)
     {
-        OutputDebugString((char*)ErrorBuffer->GetBufferPointer());
+        OutputDebugString((LPCTSTR)ErrorBuffer->GetBufferPointer());
         CHECKED_RELEASE(ErrorBuffer);
         return false;
     }

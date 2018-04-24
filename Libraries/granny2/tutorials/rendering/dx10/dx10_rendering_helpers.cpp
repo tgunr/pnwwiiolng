@@ -1,10 +1,10 @@
 // ========================================================================
-// $File: //jeffr/granny/tutorial/rendering/dx10/dx10_rendering_helpers.cpp $
-// $DateTime: 2009/10/29 11:47:12 $
-// $Change: 23788 $
-// $Revision: #5 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "dx10_rendering.h"
 
@@ -12,7 +12,7 @@
 // These functions may be of interest, but aren't directly relevant to the tutorial, so we
 // stuff them out of the documentation autogenerate section.
 // ---------------------------------------------------------------------------------------
-char const* const ShaderFile         = "Shaders\\Shaders.fx";
+char const* const ShaderFile = "media\\Shaders\\DX10_Shaders.fx";
 
 #define HARDCODED_DISPLAY_WIDTH  1280
 #define HARDCODED_DISPLAY_HEIGHT 720
@@ -148,7 +148,7 @@ bool InitializeD3D()
 
     // Compile the effect
     ID3D10Blob* pErrorBlob   = 0;
-    if (FAILED(D3DX10CreateEffectFromFile("Shaders/Shaders.fx", NULL, NULL, "fx_4_0",
+    if (FAILED(D3DX10CreateEffectFromFile(ShaderFile, NULL, NULL, "fx_4_0",
                                           D3D10_SHADER_ENABLE_STRICTNESS|D3D10_SHADER_DEBUG|D3D10_SHADER_SKIP_OPTIMIZATION,
                                           0, g_pD3DDevice, NULL,
                                           NULL, &g_pEffect10, &pErrorBlob, NULL)))

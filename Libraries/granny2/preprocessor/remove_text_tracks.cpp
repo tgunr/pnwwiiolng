@@ -1,30 +1,23 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/remove_text_tracks.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #6 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
 
 
-bool RemoveTextTracks(input_file&     InputFile,
-                        key_value_pair* KeyValues,
-                        granny_int32x   NumKeyValues,
-                        granny_memory_arena*)
+granny_file_info*
+RemoveTextTracks(char const*          OriginalFilename,
+                 char const*          OutputFilename,
+                 granny_file_info*    Info,
+                 key_value_pair*      KeyValues,
+                 granny_int32x        NumKeyValues,
+                 granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file* File = InputFile.GrannyFile;
-    granny_file_info* Info = GrannyGetFileInfo(File);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     // Remove all text tracks from each track group
     {for(granny_int32x TGIdx = 0; TGIdx < Info->TrackGroupCount; ++TGIdx)
     {
@@ -33,11 +26,17 @@ bool RemoveTextTracks(input_file&     InputFile,
         TrackGroup->TextTracks = 0;
     }}
 
-    // Write out the modified Info
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, File, true, true, false);
+    return Info;
 }
 
-static CommandRegistrar RegRemoveTextTracks(eSingleFile_NoMultiRun,
-                                            RemoveTextTracks,
+static const char* HelpString =
+    (" RemoveTextTracks strips any and all granny_text_tracks that are\n"
+     " contained in the file.  It's like a more restricted version of\n"
+     " 'KillUncommonData'\n"
+     "\n"
+     "    preprocessor RemoveTextTracks file.gr2 -output file_stripped.gr2\n");
+
+static CommandRegistrar RegRemoveTextTracks(RemoveTextTracks,
                                             "RemoveTextTracks",
-                                            "Removes any text tracks contained in the file");
+                                            "Removes any text tracks contained in the file",
+                                            HelpString);

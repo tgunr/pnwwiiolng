@@ -78,3 +78,8 @@ bool has_prefix(const std::string &str, const std::string &prefix);
 std::string strtolower(const std::string &str);
 std::string strtoupper(const std::string &str);
 std::string strtrim(const std::string &str);
+
+#if platOS == OS_WIN32
+int vasprintf(char **result, const char *fmt, va_list args);
+#endif
+

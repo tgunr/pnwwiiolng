@@ -1,17 +1,16 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/dump_mesh_texture.cpp $
-// $DateTime: 2010/03/08 11:44:14 $
-// $Change: 25619 $
-// $Revision: #6 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
 #include <stdio.h>
 #include <vector>
 
-#define STBI_HEADER_FILE_ONLY
-#include "../stb_image.h"
+#include "../stb_image_write.h"
 
 
 using namespace std;
@@ -28,7 +27,7 @@ bool DumpMeshTexture(input_file&     InputFile,
         return false;
     }
 
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
+    granny_file_info* Info = ExtractFileInfo(InputFile);
     if (Info == 0)
     {
         fprintf(stderr, "DumpMeshTexture: unable to obtain a granny_file_info from the input file\n");
@@ -89,15 +88,15 @@ bool DumpMeshTexture(input_file&     InputFile,
         FILE* file = fopen(buffer, "w");
         for (size_t p = 0; p < Positions.size(); p += 3)
             fprintf(file, "v %f %f %f\n", Positions[p + 0], Positions[p + 1], Positions[p + 2]);
-        fprintf(file, "# %d vertices\n\n", Positions.size() / 3);
+        fprintf(file, "# %d vertices\n\n", (int)Positions.size() / 3);
 
         for (size_t n = 0; n < Normals.size(); n += 3)
             fprintf(file, "vn %f %f %f\n", Normals[n + 0], Normals[n + 1], Normals[n + 2]);
-        fprintf(file, "# %d vertex normals\n\n", Normals.size() / 3);
+        fprintf(file, "# %d vertex normals\n\n", (int)Normals.size() / 3);
 
         for (size_t t = 0; t < TexCoords.size(); t += 2)
             fprintf(file, "vt %f %f\n", TexCoords[t + 0], 1.0 - TexCoords[t + 1]);
-        fprintf(file, "# %d vertex texture coords\n\n", TexCoords.size() / 2);
+        fprintf(file, "# %d vertex texture coords\n\n", (int)TexCoords.size() / 2);
 
         fprintf(file, "g %s\n", Mesh->Name);
         vector<granny_int32> MeshIndices(GrannyGetMeshIndexCount(Mesh));
@@ -105,6 +104,15 @@ bool DumpMeshTexture(input_file&     InputFile,
 
         for (size_t mi = 0; mi < MeshIndices.size(); mi += 3)
         {
+            // Silly test to eliminate strictly degenerate tris (they confuse maya)
+            {
+                int v0 = MeshIndices[mi + 0];
+                int v1 = MeshIndices[mi + 1];
+                int v2 = MeshIndices[mi + 2];
+                if (v0 == v1 || v0 == v2 || v1 == v2)
+                    continue;
+            }
+            
             fprintf(file, "f ");
             for (int tv = 0; tv < 3; ++tv)
             {
@@ -114,12 +122,12 @@ bool DumpMeshTexture(input_file&     InputFile,
                 if (!TexCoords.empty())
                     fprintf(file, "/%d", Index);
                 else
-                    fprintf(file, "/", Index);
+                    fprintf(file, "/");
 
                 if (!Normals.empty())
                     fprintf(file, "/%d ", Index);
                 else
-                    fprintf(file, "/ ", Index);
+                    fprintf(file, "/ ");
             }
             fprintf(file, "\n");
         }

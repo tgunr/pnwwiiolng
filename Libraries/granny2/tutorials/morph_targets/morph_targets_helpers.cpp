@@ -1,10 +1,10 @@
 // ========================================================================
-// $File: //jeffr/granny/tutorial/morph_targets/morph_targets_helpers.cpp $
-// $DateTime: 2009/10/29 11:47:12 $
-// $Change: 23788 $
-// $Revision: #5 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "morph_targets.h"
 #include <assert.h>
@@ -47,8 +47,8 @@ DemoScene GlobalScene;
 // stuff them out of the documentation autogenerate section.
 // ---------------------------------------------------------------------------------------
 
-char const* const PixelShaderFile         = "media\\PixelShader.xpu";
-char const* const VertexShaderMorphFile   = "media\\MorphVS.xvu";
+char const* const PixelShaderFile         = "morph_targets\\media\\PixelShader.xpu";
+char const* const VertexShaderMorphFile   = "morph_targets\\media\\MorphVS.xvu";
 
 #define HARDCODED_DISPLAY_WIDTH  1280
 #define HARDCODED_DISPLAY_HEIGHT 720

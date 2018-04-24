@@ -1,6 +1,6 @@
 #pragma once
 
-#include "granny2.h"
+#include "granny.h"
 #include "ogl/oglVertexBuffer.h"
 
 #include <stack>

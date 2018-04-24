@@ -62,13 +62,7 @@ int main(int, char const*[])
         return EXIT_FAILURE;
     }
 
-#ifdef _MACOSX
-    // If we're on the mac, we want to use ansi file operations
-    GrannySetDefaultFileReaderOpenCallback(GrannyGetOSXAnsiFileReaderOpenCallback());
-    const char* GryphonFilename = "../../../media/gryphon.gr2";
-#else
-    const char* GryphonFilename = "../media/gryphon.gr2";
-#endif
+    const char* GryphonFilename = "media/gryphon.gr2";
 
     /* We just call $SetLogCallback to install our callbacks in the Granny runtime.  If
        you want to save the current allocation settings to restore them later, call
@@ -86,6 +80,7 @@ int main(int, char const*[])
        function. */
     granny_file* BadFile = GrannyReadEntireFile("FILE_DOESNT_EXIST.gr2");
     assert(BadFile == 0);
+    BadFile = 0; // silence warning
 
     /* gryphon.gr2 was exported with Granny 2.7.0.6, and requires run-time conversion when
        we request the $file_info, which will send some efficiency warnings to our
