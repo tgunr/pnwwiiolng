@@ -50,12 +50,27 @@ struct SteamLoginResult {
 
 // Request a login when you don't know whether the user is already in the system or not.
 // Also use this API when polling for completion of email verification.
+// Responses from this API:
+//  - LoginNotValidUser: Steam user invalid or banned
+//  - LoginNewUser: This user is not registered; present UI and call `authRequestSteamSignup()` next.
+//  - LoginEmailRequired: This user is an existing Steam user with no email address. Present UI and call `authRequestSteamEmailChange()` next.
+//  - LoginEmailNotValidated: The user needs to verify their email address. Call `authRequestSteamLogin()` to poll verification status or
+//      `authRequestSteamEmailChange()` to request new email send or address change
+//  - LoginSuccess: Login SUCCEEDED. Result object contains server address, OTP, etc.
 SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID);
 
 // Request new user signup given a callsign and email. Both are required.
 // This API will error if called for a user who already has a callsign, whether they have an email or not.
 // If all validation passes, a verification email WILL be sent by this call.
-// This API will never return LoginSuccess.
+// Responses from this API:
+//  - LoginNotValidUser: Steam user invalid or banned
+//  - LoginCallsignInvalid, LoginCallsignDisallowed, LoginCallsignInUse, LoginEmailInvalid, LoginEmailInUse: Obvious
+//  - LoginEmailRequired: This user is an existing Steam user with no email address. Present UI and call `authRequestSteamEmailChange()` next.
+//  - LoginEmailNotValidated: The user needs to verify their email address. Call `authRequestSteamLogin()` to poll verification status or
+//      `authRequestSteamEmailChange()` to request new email send or address change
+//  - LoginExistingUser: This user is already fully signed up and verified. Call `authRequestSteamLogin()` next.
+//  - LoginSuccess: Signup SUCCEEDED. Call `authRequestSteamLogin()` after user verifies their email (or `authRequestSteamEmailChange()` if user requests it).
+//      THE RESULT OBJECT DOES NOT CONTAIN ARENA OR OTP INFORMATION!!!! The user MUST verify their email BEFORE logging in.
 SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &callsign, const std::string &email);
 
 // Request new user email change.
@@ -63,4 +78,10 @@ SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicke
 // Use this API for when the user requests to change the email address they want to verify (such as due to typos)
 // Calling this API will result in a new verification email being sent, EVEN IF THE EMAIL HASN'T CHANGED. It can therefore be used to implement a "resend" button.
 // This API will NOT work to change an email that is already verified!!!
+//  - LoginNotValidUser: Steam user invalid or banned
+//  - LoginNewUser: This user is not registered; present UI and call `authRequestSteamSignup()` next.
+//  - LoginEmailInvalid, LoginEmailInUse: Obvious
+//  - LoginExistingUser: This user is already fully signed up and verified; email can not be changed through this interface. Call `authRequestSteamLogin()` next.
+//  - LoginSuccess: Email send/update SUCCEEDED. Call `authRequestSteamLogin()` after user verifies their email (or `authRequestSteamEmailChange()` if user requests it).
+//      THE RESULT OBJECT DOES NOT CONTAIN ARENA OR OTP INFORMATION!!!! The user MUST verify their email BEFORE logging in.
 SteamLoginResult authRequestSteamEmailChange(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &email);

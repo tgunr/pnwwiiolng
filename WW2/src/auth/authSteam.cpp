@@ -60,7 +60,7 @@ static std::string _encodeSteamTicket(const void *authTicket, size_t authTicketL
     return result;
 }
 
-static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nlohmann::json params) // params is *purposely* not a const&
+static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nlohmann::json params, bool successReadsData = false) // params is *purposely* not a const&
 {
     // Can't make this a static inline function because there's no dbugLogv()!
     #define _requestError(msg, ...) do { dbugLog(_FLD, msg, ## __VA_ARGS__); return SteamLoginResponse::LoginUnknownError; } while (0)
@@ -101,6 +101,10 @@ static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nl
             _requestError("Server returned JSON with unknown result code %u with URL %s content %s", responseJson["result"].get<uint32_t>(), request.url.c_str(), response.content.c_str());
             
         case SteamLoginResponse::LoginSuccess: {
+            if (!successReadsData)  {
+                return resultCode;
+            }
+            
             auto arenaIDPtr = responseJson.find("arenaID");
             auto otpPtr = responseJson.find("otp");
             auto serverIPPtr = responseJson.find("serverIP");
@@ -134,7 +138,7 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
         { "arena_id", arenaID },
         { "app_version", PN_build_version_value },
         { "app_platform", platOS },
-    });
+    }, true);
 }
 
 SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &callsign, const std::string &email)
