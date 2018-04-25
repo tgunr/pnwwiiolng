@@ -28,7 +28,7 @@ struct BrigadeControlDescriptor
 			label += ".me";
 	}
 
-	void getBrigadeDescriptor(UINT32 brigadeID, std::wstring& into) const
+	void getBrigadeDescriptor(HCUnitID brigadeID, std::wstring& into) const
 	{
 		static std::string brigadeName;
 		brigadeName = "";

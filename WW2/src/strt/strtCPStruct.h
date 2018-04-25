@@ -193,10 +193,12 @@ public:
 	void drainHistories();
 	SCMD_RESULT executeFallback();
 	SCMD_RESULT holdAtAllCosts(WWII_SIDE issuer, bool execute);
-	SCMD_RESULT	issueFallback(WWII_SIDE issuer, bool testOnly, UINT32 playerID);
-	void markOverrunReported();			// Add an overrun event to the history
+	SCMD_RESULT issueFallback(WWII_SIDE issuer, bool testOnly, UINT32 playerID);
+	void markOverrunReported(); // Add an overrun event to the history
 	SCMD_RESULT overrun(WWII_SIDE issuer);
-	SCMD_RESULT requestAttack(bool execute, UINT32 brigadeID=0);
+	/// \depreciated Attacks should no longer be based around HC units.
+	SCMD_RESULT requestAttack(bool execute, HCUnitID brigadeID);
+	SCMD_RESULT requestAttack(bool execute) { return requestAttack(execute, HCUnitID::null); }
 	SCMD_RESULT requestClear(WWII_SIDE forSide, UINT32& data, bool execute);
 	SCMD_RESULT requestDefend(WWII_SIDE forSide, bool execute);
 
@@ -229,7 +231,7 @@ public:
 	bool hasABs(WWII_SIDE forSide) const { return armyBasesOwned[forSide] > 0; }
 	bool hasContactWithDivision(const StratHCUnit* unit) const;
 	bool hasFacilities(UINT32 type, WWII_SIDE forSide) const;
-	bool hasHCUnit(UINT32 brigadeID) const;
+	bool hasHCUnit(HCUnitID brigadeID) const;
 
 	bool hasArmorEWS() const { return (flags & (CP_STAT_ENEMY_ARMOR|CP_STAT_HEAVY_ENEMY_ARMOR)) != 0; }
 	bool hasInfantryEWS() const { return (flags & (CP_STAT_ENEMY_INFANTRY|CP_STAT_HEAVY_ENEMY_INF)) != 0; }

@@ -145,7 +145,7 @@ UINT32 vehupdateCreatePlayerControlledVehicle(SINT32 VehicleNum,
 	Vehicle->IsMissionLeader = PlayerClient()->SpawnNotify().isMissionLeader;
 	Vehicle->IsBuilder = PlayerClient()->SpawnNotify().isBuilder;
 	Vehicle->persDecal = PlayerClient()->SpawnNotify().decal;
-    Vehicle->unitDecal = PlayerClient()->BrigadeSelected().m_detail.brigadeID();
+	Vehicle->unitDecal = ToInt(PlayerClient()->BrigadeSelected().m_detail.brigadeID());
 
 	*Vehicle->SquadHandle = 0;
 
@@ -1280,7 +1280,7 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 			else
 				Vehicle->persDecal = 0;
 
-			Vehicle->unitDecal = VehicleInfo->brigadeID;
+			Vehicle->unitDecal = ToInt(VehicleInfo->brigadeID);
 
 			// Special Rat Icon Rank stuff
 			if(isupper(Vehicle->Handle[0]))

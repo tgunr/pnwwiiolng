@@ -58,7 +58,7 @@ void cnvyProcessStratUpdates(UINT32 currentTime);
 // Request expiry of an objective at a later time
 bool cnvyScheduleObjectiveExpiry(CPStruct* cp, WWII_SIDE side, UINT32 expirySeconds);
 
-STRAT_UPDATE* cnvyScheduleBrigadeReformation(UINT32 brigadeID, UINT32 delay);
+STRAT_UPDATE* cnvyScheduleBrigadeReformation(HCUnitID brigadeID, UINT32 delay);
 
 void cnvyCancelBrigadeEvent(struct STRAT_UPDATE* update);
 

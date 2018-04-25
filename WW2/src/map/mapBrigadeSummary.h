@@ -63,7 +63,7 @@ class BrigadeSummary : public HCUnit
 public:
 	//// ---- Class Operators ---- ////
 	// Create from scratch
-	BrigadeSummary(UINT32 withBrigadeID, UINT32 withParentID
+	BrigadeSummary(HCUnitID withBrigadeID, HCUnitID withParentID
 					, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
 					, const ChatHandle withHandle, const char* withName, const char* withNick, UINT8 withRank
 					, FULL_OBJ_ID withHome=nullObjID, const ChatHandle withOwner=0LL, RANK_NO withOwnerRank=0)
@@ -72,7 +72,7 @@ public:
 		, m_active(false), m_missions(0), m_players(0), m_officers(0), m_objectiveCPID(nullObjID), m_mobileSpawns(0), m_canPostHere(false)
 		{ m_languages[0] = 0; }
 
-	BrigadeSummary(UINT32 withBrigadeID=0)
+	BrigadeSummary(HCUnitID withBrigadeID = HCUnitID::null)
 		: HCUnit(withBrigadeID, HCU_BRIGADE)
 		, m_active(false), m_missions(0), m_players(0), m_officers(0), m_objectiveCPID(nullObjID), m_mobileSpawns(0), m_canPostHere(false)
 		{ m_languages[0] = 0; }
@@ -87,7 +87,7 @@ public:
 
 	//// ---- Member Functions ---- ////
 
-	UINT32 brigadeID() const { return m_unitID; }
+	HCUnitID brigadeID() const { return m_unitID; } // TODO: Redundant, remove
 	bool active() const { return m_active; }
 	UINT16 missions() const { return m_missions; }
 	UINT16 players() const { return m_players; }
@@ -148,13 +148,13 @@ public:
 class BrigadeDetail : public BrigadeSummary
 {
 public:
-	BrigadeDetail(UINT32 withBrigadeID, UINT32 withParentID
+	BrigadeDetail(HCUnitID withBrigadeID, HCUnitID withParentID
 					, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
 					, const ChatHandle withHandle, const char* withName, const char* withNick, UINT8 withRank
 					, const FULL_OBJ_ID withHomeCP, const ChatHandle withOwner, RANK_NO withOwnerRank)
 		: BrigadeSummary(withBrigadeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCP, withOwner, withOwnerRank)
 			{ m_motd[0] = m_motto[0] = 0; }
-	BrigadeDetail(UINT32 withBrigadeID=0) : BrigadeSummary(withBrigadeID) { m_motd[0] = m_motto[0] = 0; }
+	BrigadeDetail(HCUnitID withBrigadeID = HCUnitID::null) : BrigadeSummary(withBrigadeID) { m_motd[0] = m_motto[0] = 0; }
 	virtual ~BrigadeDetail() {}
 
 	// Packer
@@ -193,8 +193,8 @@ class BrigadeSelection
 {
 public:
 	// client request constructor
-	BrigadeSelection(BRIGADE_SELECT_STATUS status, UINT32 brigadeID) : m_status(status), m_detail(brigadeID) { }
-	BrigadeSelection() : m_status(BRIG_INVALID), m_detail(0) {}
+	BrigadeSelection(BRIGADE_SELECT_STATUS status, HCUnitID brigadeID) : m_status(status), m_detail(brigadeID) { }
+	BrigadeSelection() : m_status(BRIG_INVALID), m_detail(HCUnitID::null) {}
 
 	// Construct from network object
 	BrigadeSelection(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }

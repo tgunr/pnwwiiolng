@@ -101,8 +101,8 @@ Chat::Who::packer(PackMode mode, ACTION_OBJECT* a)
 	if ( m_branch <= 0 )
 		return a->offset;
 
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_hcUnitID, 16);
-	if ( m_hcUnitID <= 0 || (!m_inSameSquad && !m_extendedInfo) )
+	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_hcUnitID);
+	if ( IsInvalid(m_hcUnitID) || (!m_inSameSquad && !m_extendedInfo) )
 		return a->offset;
 
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_missionID, 0);

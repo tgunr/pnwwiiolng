@@ -982,7 +982,7 @@ Player::ExitBrigade(UINT32 withState)
 	SetState((MM_PERS_STATE)withState);
 
 	// If we're not in a brigade, nothing needs doing
-	if ( brigadeID() == 0 )
+	if ( brigadeID() == HCUnitID::null )
 		return;
 
 	brigade()->removePlayer(this);
@@ -1078,7 +1078,7 @@ Player::fillMissionPacket(Mission* forMission)
 bool
 Player::isBrigadeLeader() const
 {
-	return (brigadeID() && brigade()->owner() == chatHandle());
+	return IsValid(brigadeID()) && brigade()->owner() == chatHandle();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1451,7 +1451,7 @@ Player::SetBrigade(Brigade* newBrigade)
 	if ( m_brigade != nullptr )
 		m_brigadeID = m_brigade->m_unitID;
 	else
-		m_brigadeID = 0;
+		m_brigadeID = HCUnitID::null;
 }
 
 //////////////////////////////////////////////////////////////////////

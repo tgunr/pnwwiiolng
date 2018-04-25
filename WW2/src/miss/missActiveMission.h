@@ -11,6 +11,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include "wwii/wwiiHCUnitsIndex.h"
 #include "wwii/wwiiOwnershipEnums.h"
 #include "mm/mmEnums.h"
 #include "teul/teulPackers.h"
@@ -20,7 +21,7 @@ class Mission;
 class ActiveMission
 {
 public:
-	ActiveMission(UINT32 mission=0, WWII_COUNTRY country=WWII_NO_COUNTRY, BRANCH_ENUM branch=BRANCH_NOT_USED, UINT32 brigade=0)
+	ActiveMission(UINT32 mission=0, WWII_COUNTRY country=WWII_NO_COUNTRY, BRANCH_ENUM branch=BRANCH_NOT_USED, HCUnitID brigade = HCUnitID::null)
 		: m_missionID(mission)
 		, m_countryID(country)
 		, m_branchID(branch)
@@ -40,6 +41,6 @@ public:
 	UINT32			m_missionID;		// 0 or ID of active mission
 	WWII_COUNTRY	m_countryID;		// Country of mission
 	BRANCH_ENUM		m_branchID;		// What branch
-	UINT32			m_brigadeID;		// The brigade it's in
+	HCUnitID		m_brigadeID;		// The brigade it's in
 };
 

@@ -1041,7 +1041,7 @@ _checkEngagementOrSoftcap(WWII_SIDE forSide, const CPStruct* cp)
 // Attack Objective placement request
 
 SCMD_RESULT
-CPStruct::requestAttack(bool execute, UINT32 brigadeID)
+CPStruct::requestAttack(bool execute, HCUnitID brigadeID)
 {
 	StratHCUnit* unit = StratHCUnit::Lookup(brigadeID);
 	if ( unit == nullptr )
@@ -1473,7 +1473,7 @@ CPStruct::removeUnit(const HCUnit& unit)
 // Is a particular HCUnit in this city?
 
 bool
-CPStruct::hasHCUnit(UINT32 unitID) const
+CPStruct::hasHCUnit(HCUnitID unitID) const
 {
 	if ( m_units.empty() )
 		return false;

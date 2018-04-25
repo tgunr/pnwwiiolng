@@ -10,6 +10,7 @@
 
 #include "mm/mmEnums.h"
 #include "wwii/wwiiFullObjID.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 #include "wwii/wwiiOwnershipEnums.h"
 
 // Chat Who Types; 'WHO' is the catch all 'just list me'
@@ -35,7 +36,7 @@ public:
 		, m_inSameSquad(false), m_afk(false), m_hc(false)
 		, m_extendedInfo(false), m_spawned(false), m_leadingMission(false), m_recruiting(false)
 		, m_country(WWII_NO_COUNTRY), m_branch(BRANCH_NOT_USED), m_rank(0)
-		, m_hcUnitID(0)
+		, m_hcUnitID(HCUnitID::null)
 		, m_nearCP(nullObjID)
 		, m_squadRank(0)
 		, m_missionID(0)
@@ -63,7 +64,7 @@ public:
 		m_joinedSquad = withJoinedSquad;
 	}
 
-	void setPrimaryDetails(bool withAfk, bool hc, WWII_COUNTRY withCountry, BRANCH_ENUM withBranch, RANK_NO withRank, UINT32 withHcUnitID, UINT32 withMissionID, bool isLeadingMission, bool isRecruiting)
+	void setPrimaryDetails(bool withAfk, bool hc, WWII_COUNTRY withCountry, BRANCH_ENUM withBranch, RANK_NO withRank, HCUnitID withHcUnitID, UINT32 withMissionID, bool isLeadingMission, bool isRecruiting)
 	{
 		m_extendedInfo = false;
 		m_hc = hc;
@@ -95,7 +96,7 @@ public:
 	WWII_COUNTRY country() const { return m_country; }
 	bool extendedInfo() const { return m_extendedInfo; }
 	ChatHandle handle() const { return m_handle; }
-	UINT32 hcUnitID() const { return m_hcUnitID; }
+	HCUnitID hcUnitID() const { return m_hcUnitID; }
 	bool highCommander() const { return m_hc; }
 	bool inSameSquad() const { return m_inSameSquad; }
 	bool leadingMission() const { return m_leadingMission; }
@@ -125,7 +126,7 @@ private:
 	WWII_COUNTRY	m_country;
 	BRANCH_ENUM		m_branch;
 	RANK_NO			m_rank;
-	UINT32			m_hcUnitID;
+	HCUnitID		m_hcUnitID;
 	FULL_OBJ_ID		m_nearCP;					// Only populated if m_inSquad
 	RANK_NO			m_squadRank;				// Player's rank within their squad
 	UINT32			m_missionID;				// Mission they are on

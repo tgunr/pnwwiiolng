@@ -36,7 +36,7 @@ struct MM_POST_REQUEST
 	bool			multicrew;		// if TRUE we are multicrew wating for a crew
 	bool			immediateSpawn;	// If true, the person is spawned immediately
 
-	UINT32			brigadeID;	// Brigade ID of the user
+	HCUnitID		brigadeID;	// Brigade ID of the user
 };
 
 struct MM_POST_ACCEPT
@@ -73,7 +73,7 @@ struct MM_POST_LIST_REQUEST
 	UINT32 	crewID;
 	UINT32	missionID;
 	FULL_OBJ_ID	facility;
-	UINT32	brigadeID;
+	HCUnitID	brigadeID;
 };
 
 //This message asks for information on a posted weapon

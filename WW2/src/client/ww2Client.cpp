@@ -171,7 +171,7 @@ struct ClientClassData
 			instance(1),
 			country(-1),
 			branch(-1),
-			brigade(-1),
+			brigade(HCUnitID::null),
 			mission(-1)
 		{
 		}
@@ -181,7 +181,7 @@ struct ClientClassData
 		int instance;
 		int country;
 		int branch;
-		int brigade;
+		HCUnitID brigade;
 		int mission;
 	};
 
@@ -201,7 +201,7 @@ struct ClientClassData
 	std::vector<MissionDetail>			missions;
 	std::vector<Waypoint>				waypoints;
 	std::vector<MissionMember>			missionmembers;
-	std::map<int, BrigadeControlList>	oics; // holds a list of current oics
+	std::map<HCUnitID, BrigadeControlList> oics; // holds a list of current oics
 	std::vector<BrigadeControlNotice>	brigadenotices; // keeps track of all brigade control notices
 	ClientSquad							squad;
 	SquadInvite							invitation;
@@ -779,7 +779,7 @@ int Client::RequestRecruiters(int language)
 	Client::LookupBrigadeOIC
 *************************************************************************************************/
 
-BrigadeControlList* Client::LookupBrigadeOIC(int brigadeID) const
+BrigadeControlList* Client::LookupBrigadeOIC(HCUnitID brigadeID) const
 {
 	if(_classdata->oics.find(brigadeID) != _classdata->oics.end())
 		return &_classdata->oics[brigadeID];
@@ -800,7 +800,7 @@ int Client::RequestClientSpawn(WEAPON_SERIAL const& serial, bool wantMobileSpawn
 	Client::RequestBrigadeSelection
 *************************************************************************************************/
 
-int Client::RequestBrigadeSelection(unsigned int brigadeID)
+int Client::RequestBrigadeSelection(HCUnitID brigadeID)
 {
 	BrigadeSelection selection(BRIG_SELECT, brigadeID);
 	return selection.send(MapConnection());
@@ -810,7 +810,7 @@ int Client::RequestBrigadeSelection(unsigned int brigadeID)
 	Client::RequestBrigadeDetail
 *************************************************************************************************/
 
-int Client::RequestBrigadeDetail(unsigned int brigadeID)
+int Client::RequestBrigadeDetail(HCUnitID brigadeID)
 {
 	BrigadeSelection selection(BRIG_DETAIL, brigadeID);
 	return selection.send(MapConnection());
@@ -1302,7 +1302,7 @@ void Client::ProcessMissionMemberUpdate(MissionMember const& missionMember)
 
 void Client::ProcessBrigadeControl(BrigadeControlList const& entry)
 {
-	_classdata->oics[entry.m_brigade] = entry;
+	_classdata->oics[FromInt<HCUnitID>(entry.m_brigade)] = entry;
 }
 
 void Client::ProcessBrigadeControlNotice(const BrigadeControlNotice* const notice)
@@ -1319,7 +1319,7 @@ void Client::ProcessBrigadeControlNotice(const BrigadeControlNotice* const notic
 	}
 	else if(notice->m_notice == BrigadeControl::_REMOVED)
 	{
-		std::map<int, BrigadeControlList>::iterator it = _classdata->oics.find(notice->m_brigadeID);
+		std::map<HCUnitID, BrigadeControlList>::iterator it = _classdata->oics.find(notice->m_brigadeID);
 
 		if(it != _classdata->oics.end())
 		{
@@ -2625,18 +2625,18 @@ bool Client::SelectPersona(const PersonaSummary& persona, bool save, bool force)
 	return false;
 }
 
-bool Client::SelectBrigade(UINT32 brigadeID, bool save, bool force)
+bool Client::SelectBrigade(HCUnitID brigadeID, bool save, bool force)
 {
 	const PersonaSummary* current = GetPersona();
 
 	if(current)
 	{
-		if(brigadeID > 0 && (force || current->m_brigadeID != brigadeID))
+		if(IsValid(brigadeID) && (force || current->m_brigadeID != brigadeID))
 		{
 			RequestBrigadeSelection(brigadeID);
 
 			if(WaitForMessage(ww2::Client::BRIGADE_SELECT_WAIT, 10) != 0)
-				brigadeID = 0;
+				brigadeID = HCUnitID::null;
 		}
 
 		if(current->m_brigadeID == brigadeID)
@@ -2644,7 +2644,7 @@ bool Client::SelectBrigade(UINT32 brigadeID, bool save, bool force)
 			if(save)
 				SavePersona(SAVE_BRIGADE);
 
-			if(current->m_brigadeID > 0)
+			if(IsValid(current->m_brigadeID))
 			{
 				BrigadeControlRequest req;
 				req.requestList(PlayerClient()->ChatConnection(), current->m_countryID, current->m_branchID); // lets get a new list of OIC's
@@ -2996,27 +2996,27 @@ bool ww2::Client::IsHC() const
 
 bool ww2::Client::IsOIC() const
 {
-	return (OICOfBrigade() > 0);
+	return OICOfBrigade() != HCUnitID::null;
 }
 
 /************************************************************************************************
 	OICOfBrigade
 *************************************************************************************************/
 
-unsigned int ww2::Client::OICOfBrigade() const
+HCUnitID ww2::Client::OICOfBrigade() const
 {
 	// check to see if I'm a an OIC
-	std::map<int, BrigadeControlList>::iterator it = _classdata->oics.begin();
+	std::map<HCUnitID, BrigadeControlList>::iterator it = _classdata->oics.begin();
 
 	while(it != _classdata->oics.end())
 	{
 		if(it->second.m_officer == _classdata->personas.m_callsign)
-			return it->second.m_brigade;
+			return FromInt<HCUnitID>(it->second.m_brigade);
 
 		++it;
 	}
 
-	return 0;
+	return HCUnitID::null;
 }
 
 /************************************************************************************************

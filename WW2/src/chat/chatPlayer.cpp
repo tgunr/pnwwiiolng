@@ -296,12 +296,12 @@ Player::~Player()
 	removeFromGrid();
 
 	SetMission(0);
-	changeBrigade(0);
+	changeBrigade(HCUnitID::null);
 
 	SetInstance(Instance::g_invalid);
 
 	// Make sure we don't leak OICs
-	assert( leadingBrigade() == 0 );
+	assert( leadingBrigade() == HCUnitID::null );
 
 	SetSquadInvite(nullptr);
 	if ( m_tunes )
@@ -542,13 +542,13 @@ Player::addToCommandList()
 // Leave my current brigade
 
 void
-Player::changeBrigade(UINT32 newBrigadeID)
+Player::changeBrigade(HCUnitID newBrigadeID)
 {
 	if ( newBrigadeID == brigadeID() )
 		return;
 
 	// If we're leading a HCUnit let us stay within it, but leaving it removes OIC status
-	if ( leadingBrigade() )
+	if ( IsValid(leadingBrigade()) )
 	{
 		HCUnit* newUnit = HCUnit::Lookup(newBrigadeID);
 		if ( !newUnit || !newUnit->isBelowOrEqual(leadingBrigade()) )
@@ -631,9 +631,9 @@ Player::deactivate()
 	m_active = false;
 
 	SetMission(0);
-	changeBrigade(0);
+	changeBrigade(HCUnitID::null);
 
-	assert( leadingBrigade() == 0 );
+	assert( leadingBrigade() == HCUnitID::null );
 
 	removeFromCommandList();
 
@@ -1362,7 +1362,7 @@ Player::SetCountry(WWII_COUNTRY toCountry, WWII_SIDE toSide)
 // Set that this player is leading (or not) a brigade
 
 void
-Player::SetLeadingBrigade(UINT32 toBrigadeID)
+Player::SetLeadingBrigade(HCUnitID toBrigadeID)
 {
 	if ( leadingBrigade() == toBrigadeID )
 		return;
@@ -1850,9 +1850,9 @@ Player::updateRadios(bool newInstance, bool newSide, bool newBrigade, bool newMi
 				detuneRadio(index);
 		break;
 		case BRIGADE_CHANNEL:
-			if ( !node.isPlaceHolder() && !brigadeID() )
+			if ( !node.isPlaceHolder() && IsInvalid(brigadeID()) )
 				setPlaceHolder = true;
-			else if ( node.isPlaceHolder() && brigadeID() )
+			else if ( node.isPlaceHolder() && IsValid(brigadeID()) )
 				setRealChannel = true;
 			else if ( newBrigade | newInstance )
 				retune = true;

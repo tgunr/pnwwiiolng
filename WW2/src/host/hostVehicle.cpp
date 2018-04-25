@@ -633,7 +633,7 @@ HostVehicle::getOneTimeBitsFor(const HostVehicle* const viewer) const
 	}
 	if ( viewer->side() == side() )
 	{
-		if ( brigadeID() > 0 && brigadeID() == viewer->brigadeID() )
+		if ( IsValid(brigadeID()) && brigadeID() == viewer->brigadeID() )
 			oneTimeBits |= OTB_IN_BRIGADE;
 		if ( missionID() > 0 && missionID() == viewer->missionID() )
 			oneTimeBits |= OTB_IN_MISSION;

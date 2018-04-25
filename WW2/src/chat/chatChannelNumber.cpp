@@ -33,11 +33,11 @@ chatGetAdminChannelID()
 
 // Get the ID of a specific brigade channel
 const ChannelID&
-chatGetBrigadeChannelID(const instanceid_t instID, UINT32 brigadeID, WWII_SIDE side)
+chatGetBrigadeChannelID(const instanceid_t instID, HCUnitID brigadeID, WWII_SIDE side)
 {
-	if ( brigadeID == 0 || !isValidSide(side) )
+	if ( brigadeID == HCUnitID::null || !isValidSide(side) )
 		return id_brigade.Specify(instID, 0, side);
-	return id_brigade.Specify(instID, brigadeID, side);
+	return id_brigade.Specify(instID, ToInt(brigadeID), side);
 }
 
 // Get the ID of a channel corresponding to a specific mission
