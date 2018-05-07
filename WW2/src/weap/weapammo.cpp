@@ -4425,9 +4425,10 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 		// Need to nearly or totally penetrate to generate spall
 		if ( PenetrationThickness > 0.9 * Thickness ) {
 			double spall_mult = 1.0;
-			// Overmatch generates more spall. Numbers are from real-world testing.
+			// Overmatch formula is from US Government testing (via scotsman)
 			if ( AmmoSpeed / ResidualSpeed >= 0.75 && Ammo->AmmoType->Diameter >= 2 * Thickness ) {
-				spall_mult = std::max(1.0, 0.1484 + 0.0461329 * Ammo->AmmoType->Diameter);
+				double diam_mm = Ammo->AmmoType->Diameter * 1000.0;
+				spall_mult = std::max(1.0, 0.1484 + 0.0461329 * diam_mm);
 			}
 			_DoSpall(Ammo, (FLOAT32)AmmoSpeed, (FLOAT32)ResidualSpeed, spall_mult, Collision, NewPos, OldPos, Ammo->Flags);
 		}
