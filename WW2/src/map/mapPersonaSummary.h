@@ -102,7 +102,7 @@ public:
 	UINT8			m_rankPctg;		// progress through rank as pctg
 	UINT32			m_lastUsed;
 	UINT32			m_lockedThru;		// Time until it can be used again or 0
-	UINT32			m_brigadeID;		// Last used brigadeID
+	HCUnitID		m_brigadeID;		// Last used brigadeID
 	UINT32			m_availability;	// Is this persona available?
 };
 

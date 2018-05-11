@@ -12,6 +12,7 @@
 #include "inst/instDescriptor.h"		// For Inst::Descriptor
 #include "auth/authDispatch.h"
 #include "wwii/wwiiPermissions.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 #include "miss/missFlags.h"				// For MISS_FLAGS
 
 extern void* teulGetPersonaData(SINT32);
@@ -30,7 +31,7 @@ protected:
 	UINT8				m_updateMode;
 	bool				m_netcode;
 
-	UINT32				m_brigadeID;		//! Current brigade, if they are in one, or 0.
+	HCUnitID			m_brigadeID;		//! Current brigade, if they are in one, or 0.
 	UINT32				m_missionID;		//! Current mission, if they are on one, or 0.
 	UINT32				m_sortieID;		//! Current sortie, if they are on one, or 0.
 
@@ -82,7 +83,7 @@ public:
 	UINT32 squadID() const { return m_squadID; }
 
 	UINT32 missionID() const { return m_missionID; }
-	UINT32 brigadeID() const { return m_brigadeID; }
+	HCUnitID brigadeID() const { return m_brigadeID; }
 	UINT32 sortieID() const { return m_sortieID; }
 	RANK_NO maxRank() const { return m_maxRank; }
 	RANK_NO maxSquadRank() const { return m_maxSquadRank; }
@@ -159,7 +160,7 @@ public:
 protected:
 	void _setCallsign(const char* to, bool isPlayerPlaynet);
 public:	///TODO:INST make me protected
-	virtual void ExitBrigade(UINT32 /*exitState*/) { m_brigadeID = 0; }
+	virtual void ExitBrigade(UINT32 /*exitState*/) { m_brigadeID = HCUnitID::null; }
 	virtual void SetCountry(WWII_COUNTRY toCountry, WWII_SIDE toSide);
 
 	void SetNetcode(bool netcode) { m_netcode = netcode; }

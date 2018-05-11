@@ -12,6 +12,7 @@
 #include "teul/teulPackers.h"
 #include "weap/weapSpec.h"
 #include "wwii/wwiiFullObjID.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 #include "inst/instDescriptor.h"
 
 //Update the mmhost sends the chat system when someone changes a persona
@@ -26,7 +27,7 @@ public:
 	PersonaUpdate(
 		const ChatHandle handle, WWII_COUNTRY country, BRANCH_ENUM branch, RANK_NO rank
 		, const Instance::Descriptor& instance, UINT32 sortieID
-		, UINT32 brigade, UINT32 mission, const ChatHandle leader
+		, HCUnitID brigade, UINT32 mission, const ChatHandle leader
 		, const FULL_OBJ_ID origin, const FULL_OBJ_ID target, const PermissionMask mask, const WEAPON_SPEC weapon
 		, bool isSpawned, bool badChecksum
 	);
@@ -47,7 +48,7 @@ public:
 	FULL_OBJ_ID		m_target;			// The CP ID of the destination of their mission
 	WEAPON_SPEC		m_weapon;			// Weapon spec of current weapon
 	UINT32			m_missionID;		// Mission the player has selected
-	UINT32			m_brigadeID;		// Brigade number
+	HCUnitID		m_brigadeID;		// Brigade number
 	UINT32			m_sortieID;			// Sortie, if any.
 	WWII_COUNTRY	m_country;			// Player's country
 	BRANCH_ENUM		m_branch;

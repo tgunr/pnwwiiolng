@@ -763,7 +763,7 @@ protected:
 			const UINT32 required = row.NextUInt();
 			ps.m_rankPctg = ( required > 0 ? points * 100 / required : 0 );
 			ps.m_lastUsed = row.NextUInt();
-			ps.m_brigadeID = row.NextUInt();
+			ps.m_brigadeID = FromInt<HCUnitID>(row.NextUInt());
 
 			m_results.push_back(ps);
 		}
@@ -1077,7 +1077,7 @@ struct BrigadeDetailsUpdate
 {
 	BrigadeDetailsUpdate() {}
 
-	UINT32			m_brigadeID;
+	HCUnitID		m_brigadeID;
 	UINT32			m_lastModified;
 	ChatHandle		m_owner;
 	RANK_NO			m_ownerRank;
@@ -1134,7 +1134,7 @@ protected:
 			auto& row = Query()->Row();
 			auto& bdu = m_results[i];
 
-			bdu.m_brigadeID = row.NextUInt();
+			bdu.m_brigadeID = FromInt<HCUnitID>(row.NextUInt());
 			bdu.m_lastModified = row.NextUInt();
 			row.NextString(bdu.m_title, sizeof(bdu.m_title));
 			row.NextString(bdu.m_motd, sizeof(bdu.m_motd));

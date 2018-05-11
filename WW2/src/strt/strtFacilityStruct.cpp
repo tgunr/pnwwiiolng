@@ -57,19 +57,19 @@ FacilityStruct::isCapturable() const
 //////////////////////////////////////////////////////////////////////
 // Get the HCUnit providing supply to this facility for a given unit
 
-UINT32
+HCUnitID
 FacilityStruct::getSupplyingUnit(const HCUnit* brigade, const CPStruct* brigadeHomeCP) const
 {
 	// Ensure facility side matches brigade; then we can shortcut to that.
 	if ( side != brigade->side() )
-		return 0;
+		return HCUnitID::null;
 
 	if ( cp->spawningEnabledFor(side) == false && type != FACILITY_DEPOT )
-		return 0;
+		return HCUnitID::null;
 
 	// You can only use firebases when spawning your brigade or divisional equipment.
 	if ( type == FACILITY_FIREBASE && (brigade->isBrigade() == false || brigade->movementType() != BRANCH_LAND) )
-		return 0;
+		return HCUnitID::null;
 
 	// If the CP is here, then its definitely the supplying unit.
 	if ( cp == brigadeHomeCP )
@@ -83,12 +83,12 @@ FacilityStruct::getSupplyingUnit(const HCUnit* brigade, const CPStruct* brigadeH
 	{
 		const FacilityStruct* supplyFac = supplyingFacility(*brigade, false, true);
 		if ( supplyFac == nullptr )
-			return 0;
+			return HCUnitID::null;
 		if ( supplyFac->cp == brigadeHomeCP )
 			return brigade->unitID();
 	}
 
-	return 0;
+	return HCUnitID::null;
 }
 
 //////////////////////////////////////////////////////////////////////

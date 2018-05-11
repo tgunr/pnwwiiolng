@@ -28,7 +28,7 @@ struct CaptureContributionEvent
 	,	Killed
 	};
 	CaptureContributionEvent() {}
-	CaptureContributionEvent(Status withStatus, UINT32 facilityID, const ChatHandle handle, UINT32 playerID, UINT32 sortieID, UINT32 missionID, UINT32 brigadeID)
+	CaptureContributionEvent(Status withStatus, UINT32 facilityID, const ChatHandle handle, UINT32 playerID, UINT32 sortieID, UINT32 missionID, HCUnitID brigadeID)
 		: m_status(withStatus), m_facilityID(facilityID), m_handle(handle), m_playerID(playerID), m_sortieID(sortieID), m_missionID(missionID), m_unitID(brigadeID)
 		{}
 
@@ -38,7 +38,7 @@ struct CaptureContributionEvent
 	UINT32		m_playerID;		// Player ID
 	UINT32		m_sortieID;		// Vehicle Sortie ID
 	UINT32		m_missionID;	// Player's mission
-	UINT32		m_unitID;		// Player's brigade
+	HCUnitID	m_unitID;		// Player's brigade
 };
 }
 //tolua_end

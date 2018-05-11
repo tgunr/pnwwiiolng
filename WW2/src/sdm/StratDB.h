@@ -4,6 +4,7 @@
 #include <string>
 
 #include "sdm/sdm.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 
 struct FULL_OBJ_ID;
 
@@ -112,17 +113,19 @@ public:
 	unsigned int GetIndex() const { return _index; }
 
 using ChildList = std::vector<StratObject*>;
-using UnitList = std::vector<UINT32>;
+using UnitList = std::vector<HCUnitID>;
 
 	ChildList ChildStratObjects() const;
 
-	void AddUnit(unsigned int id);
-	void RemoveUnit(unsigned int id);
-	bool IsUnitHere(unsigned int id) const;
+// tolua_end
+	void AddUnit(HCUnitID id);
+	void RemoveUnit(HCUnitID id);
+	bool IsUnitHere(HCUnitID id) const;
+// tolua_begin
 	const UnitList& GetUnits() const { return _units; }
 	unsigned int GetUnitCount() const { return (unsigned int)_units.size(); }
-	unsigned int FindBestUnit(int s, int c, int b) const;
-	unsigned int FindBestAlliedUnit(int c, int b) const;
+	HCUnitID FindBestUnit(int s, int c, int b) const;
+	HCUnitID FindBestAlliedUnit(int c, int b) const;
 
 	bool IsSpawnable() const;
 	bool IsDeepWaterPort() const;

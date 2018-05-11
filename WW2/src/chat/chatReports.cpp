@@ -25,7 +25,7 @@ ChatReport::ChatReport(UINT16 category, const std::string& report, const ChatHan
 	, m_assigned(0LL)
 	, m_country(0)
 	, m_branch(0)
-	, m_brigade(0)
+	, m_brigade(HCUnitID::null)
 	, m_mission(0)
 	, m_leader(false)
 	, m_weapon(NULL_WEAP_SPEC)
@@ -56,7 +56,7 @@ ChatReport::packer(PackMode mode, ACTION_OBJECT* a)
 		a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_branch, 4);
 		a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_brigade, 0);
 
-		if ( m_brigade > 0 )
+		if ( IsValid(m_brigade) )
 		{
 			a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_mission, 31);
 			a->packer(mode, m_leader);

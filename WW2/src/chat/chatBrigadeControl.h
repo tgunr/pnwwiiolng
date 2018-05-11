@@ -42,6 +42,7 @@
 #include "teul/teulBasic.h"
 #include "teul/teulPackers.h"
 #include "wwii/wwiiFullObjID.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 
 enum BRIGADE_CONTROL_ERROR
 {
@@ -159,11 +160,11 @@ public:
 
 public:
 	BrigadeControl()
-		: m_action(REQ_INVALID), m_country(0), m_branch(0), m_brigadeID(0)
+		: m_action(REQ_INVALID), m_country(0), m_branch(0), m_brigadeID(HCUnitID::null)
 		, m_officer(0), m_sponsor(0)
 		, m_target(nullObjID), m_origin(nullObjID)
 		{}
-	BrigadeControl(BRIGADE_ACTION_REQ action, UCHAR country, UCHAR branch, UINT32 brigadeID, const ChatHandle officer, const ChatHandle sponsor, const FULL_OBJ_ID origin=nullObjID)
+	BrigadeControl(BRIGADE_ACTION_REQ action, UCHAR country, UCHAR branch, HCUnitID brigadeID, const ChatHandle officer, const ChatHandle sponsor, const FULL_OBJ_ID origin=nullObjID)
 		: m_action(action), m_country(country), m_branch(branch), m_brigadeID(brigadeID), m_officer(officer), m_sponsor(sponsor), m_origin(origin)
 		{}
 
@@ -176,7 +177,7 @@ public:
 	BRIGADE_ACTION_REQ		m_action;		// What action you was requested
 	UCHAR		m_country;		// Country affected
 	UCHAR		m_branch;		// Branch affected
-	UINT32		m_brigadeID;	// Brigade No
+	HCUnitID	m_brigadeID;	// Brigade No
 	ChatHandle	m_officer;		// Callsign of officer
 	ChatHandle	m_sponsor;		// Callsign of sponsor (electee/vetoer) where applicable
 	FULL_OBJ_ID	m_target;		// Move destination/attack target
@@ -214,20 +215,20 @@ public:
 	// if the request was not sent to the host for caching reasons.
 	bool requestList(SINT32 teulIndex, UCHAR country, UCHAR branch);
 	// H/C: client volunteering for OIC
-	bool volunteerOIC(SINT32 teulIndex, UINT32 brigade);
+	bool volunteerOIC(SINT32 teulIndex, HCUnitID brigade);
 	// H/C: client nominating an OIC
-	bool nominateOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle nomineeHandle);
+	bool nominateOIC(SINT32 teulIndex, HCUnitID brigade, const ChatHandle nomineeHandle);
 	// H/C: client vetoing an OIC
-	bool vetoOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle onHandle);
+	bool vetoOIC(SINT32 teulIndex, HCUnitID brigade, const ChatHandle onHandle);
 	// H/C: client resigning OIC position of a specified brigade
-	bool resignOIC(SINT32 teulIndex, UINT32 brigade);
+	bool resignOIC(SINT32 teulIndex, HCUnitID brigade);
 	// H/C: client requesting to replace existing OIC (must be HC)
-	bool replaceOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle oldHandle);
+	bool replaceOIC(SINT32 teulIndex, HCUnitID brigade, const ChatHandle oldHandle);
 	// H/C: client wants to remove an existing OIC
-	bool removeOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle oicHandle);
+	bool removeOIC(SINT32 teulIndex, HCUnitID brigade, const ChatHandle oicHandle);
 	// H/C: Propose a brigade move; must specify the location you think you are
 	// moving it from.
-	bool requestBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const FULL_OBJ_ID origin);
+	bool requestBrigadeMove(SINT32 teulIndex, HCUnitID brigade, const FULL_OBJ_ID destination, const FULL_OBJ_ID origin);
 	// H/C: Propose to attack a city with this brigade
 	bool requestAttack(SINT32 teulIndex, const FULL_OBJ_ID destination);
 	// H/C: Propose the cancellation of an attack; not worried about the origin for this one
@@ -235,9 +236,9 @@ public:
 	// H/C: Propose the cancellation of an attack; not worried about the origin for this one
 	bool requestClear(SINT32 teulIndex, const FULL_OBJ_ID destination);
 	// H/C: Veto a brigade move
-	bool vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const FULL_OBJ_ID origin);
+	bool vetoBrigadeMove(SINT32 teulIndex, HCUnitID brigade, const FULL_OBJ_ID destination, const FULL_OBJ_ID origin);
 	// H/C: Veto an objective order
-	bool vetoObjective(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID target);
+	bool vetoObjective(SINT32 teulIndex, HCUnitID brigade, const FULL_OBJ_ID target);
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -279,7 +280,7 @@ public:
 
 	// OICbrigade = id of the brigade you are OICing or 0
 	// amCommander = true if you are a high command staffer
-	bool isVetoable(UINT32 oicBrigade, bool amCommander) const
+	bool isVetoable(HCUnitID oicBrigade, bool amCommander) const
 	{
 		switch ( m_votePermit )
 		{
@@ -287,9 +288,9 @@ public:
 		break;
 		case VP_COMMANDER: return amCommander;
 		break;
-		case VP_OFFICER: return (oicBrigade > 0 || amCommander);
+		case VP_OFFICER: return (oicBrigade != HCUnitID::null || amCommander);
 		break;
-		case VP_OIC: return (oicBrigade > 0 && oicBrigade == m_brigadeID);
+		case VP_OIC: return (oicBrigade != HCUnitID::null && oicBrigade == m_brigadeID);
 		break;
 		default:
 		break;

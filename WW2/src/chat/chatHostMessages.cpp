@@ -532,7 +532,7 @@ chatSendMissionDeleteRequest(UINT32 missionID)
 // the move too, set actionable to true.
 
 void
-chatSendBrigadeMove(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID fid, bool isActionable)
+chatSendBrigadeMove(const ChatHandle byPlayer, bool isGM, HCUnitID brigadeID, const FULL_OBJ_ID fid, bool isActionable)
 {
 	ENDPOINT* stratEndpoint = serverPeerEndpointByType(STRAT_HOST);
 	if (PN_LIKELY(stratEndpoint != nullptr)) {

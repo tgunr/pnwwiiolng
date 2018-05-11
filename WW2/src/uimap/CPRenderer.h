@@ -72,7 +72,7 @@ public:
 		, _objectivealpha(0), _objectivealphaup(true)
 		, _mycountry(0), _myside(0), _cpside(0), _objective(0)
 		, _bestuniticon(0), _altuniticon(0), _unitcount(0)
-		, _bestunit(0), _contended(false)
+		, _bestunit(HCUnitID::null), _contended(false)
 		, _namecolor(0)
 		, _cutoff(0)
 		, _font(-1), _fontwidth(-1) // FondAdvance has a bit of overhead, so cache
@@ -103,7 +103,7 @@ public:
 	MapIcon _straticon;
 	int _bestuniticon, _altuniticon;
 	int _unitcount;
-	UINT32 _bestunit;
+	HCUnitID _bestunit;
 	bool _contended;
 	float* _namecolor;
 	float _cutoff;

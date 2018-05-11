@@ -18,6 +18,7 @@
 
 #if platBuild != BUILD_SERVER
 	#include "wwii/wwiiTypes.h"
+	#include "wwii/wwiiHCUnitsIndex.h"
 #endif
 
 #include "strt/strtTypes.h"
@@ -151,7 +152,7 @@ struct SHARED_VEHICLE_INFO
 	UCHAR				country;
 	UCHAR				side;
 	UCHAR				decal;
-	UINT32				brigadeID;		// ID of the HCUnit this came from
+	HCUnitID			brigadeID;		// ID of the HCUnit this came from
 
 	char				callsign[MAX_HANDLE_SIZE]; // SIZE includes null byte
 

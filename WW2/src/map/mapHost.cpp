@@ -311,7 +311,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 		return _sendResult(teulIndex, BRIG_ERROR);
 	}
 
-	if ( m_detail.brigadeID() == 0 )
+	if ( m_detail.brigadeID() == HCUnitID::null )
 	{
 		chatSendLocalizedMessage(player->playerID(), LSTR_CAUTION, LSTR_BDESEL_REFUSED_ID0);
 		dbugLog(_FLW, "t:%d p:%u c:%s brigade select request with brigade id 0"

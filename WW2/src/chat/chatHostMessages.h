@@ -33,7 +33,7 @@ SINT32 chatSendSmiteUser(UINT32 customerID, const char* handle);
 // Send a strat message containing a command request from a specific player regarding a specific cp
 bool chatSendStratCommand(SINT32 playerID, int cmd, const struct FULL_OBJ_ID cp, WWII_SIDE side);
 
-void chatSendBrigadeMove(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID fid, bool isActionable);
+void chatSendBrigadeMove(const ChatHandle byPlayer, bool isGM, HCUnitID brigadeID, const FULL_OBJ_ID fid, bool isActionable);
 void chatSendHCUnitUpdate(const Player*, UINT32 unitID);
 
 SINT32 chatSendPopulation();

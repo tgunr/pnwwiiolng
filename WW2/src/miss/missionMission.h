@@ -30,7 +30,7 @@ struct MISSION_C_STRUCTURE	// The "c" components of the mission structure that c
 
 	playerid_t			m_playerID;  		//same as Player's playerID
 	playerid_t			m_backupLeader;		// PlayerID of the backup leader (from chat)
-	UINT32				m_brigadeID;		// ID of the brigade we belong to
+	HCUnitID			m_brigadeID;		// ID of the brigade we belong to
 	WWII_COUNTRY		m_country;
 	Brigade*			m_brigade;			// Which brigade it belongs to
 

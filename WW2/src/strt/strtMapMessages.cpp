@@ -318,7 +318,7 @@ static SINT32 _recvMMFacilityCapacityResponse(ACTION_OBJECT* const a)
 //This function sends a request to post a weapon at a facility
 SINT32
 strtSendMMPostRequest(SINT32 connection, UINT32 customerID, const char* callsign
-					, UINT32 missionID, UINT32 brigadeID, const PermissionMask permMask
+					, UINT32 missionID, HCUnitID brigadeID, const PermissionMask permMask
 					, const FULL_OBJ_ID facility, WEAPON_SPEC weapon
 					, bool multicrew, bool immediateSpawn)
 {
@@ -345,7 +345,7 @@ strtSendMMPostRequest(SINT32 connection, UINT32 customerID, const char* callsign
 
 //This function sends a request to list all the posted weapons at a facility
 SINT32
-strtSendMMPostListRequest(SINT32 connection, UINT32 customerID, const char* callsign, UINT32 missionID, UINT32 brigadeID, const FULL_OBJ_ID facility)
+strtSendMMPostListRequest(SINT32 connection, UINT32 customerID, const char* callsign, UINT32 missionID, HCUnitID brigadeID, const FULL_OBJ_ID facility)
 {
 	SINT32 retval;
 	MM_POST_LIST_REQUEST postListRequest;

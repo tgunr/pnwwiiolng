@@ -16,7 +16,9 @@
 SINT32
 HCUnitLocation::packer(PackMode mode, ACTION_OBJECT* a)
 {
-	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_unitID, 0);
+	HCUnitID hcid = FromInt<HCUnitID>(m_unitID);
+	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, hcid, 0);
+	m_unitID = ToInt(hcid);
 	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_homeCPID, 0);
 	return a->offset;
 }

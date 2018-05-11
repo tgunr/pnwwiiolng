@@ -978,7 +978,7 @@ AttackOrder::process()
 {
 	m_result = SCMD_NO_EFFECT;
 	CPStruct* cp = strtGetCPorBridge(m_target);
-	HCUnit* unit = HCUnit::Lookup((UINT32)m_brigadeID);
+	HCUnit* unit = HCUnit::Lookup(m_brigadeID);
 
 	if ( cp == nullptr )
 	{
@@ -1051,8 +1051,8 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 			throw FacilityWeaponList::_INVALID;
 		}
 
-		UINT32 supplyingBrigade = strtGetSupplyingUnit(*facility, request.m_brigadeID);
-		if ( supplyingBrigade == 0 )
+		HCUnitID supplyingBrigade = strtGetSupplyingUnit(*facility, request.m_brigadeID);
+		if ( supplyingBrigade == HCUnitID::null )
 			supplyingBrigade = request.m_brigadeID;
 
 		StratHCUnit* unit = StratHCUnit::Lookup(supplyingBrigade);
