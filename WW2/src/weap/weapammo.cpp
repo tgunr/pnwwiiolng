@@ -702,7 +702,7 @@ static UINT32 _StretchObject(OBJECT * Object,FLOAT32 Stretch);
 static UINT32 _DisplayObject(OBJECT * Object);
 
 // ammo explosion
-static UINT32 _DoSpall(weapAmmo* Ammo, FLOAT32 OriginalSpeed, FLOAT32 RemainingSpeed, FASTCOLLIDE* Collide,
+static UINT32 _DoSpall(weapAmmo* Ammo, FLOAT32 OriginalSpeed, FLOAT32 RemainingSpeed, double spall_mult, FASTCOLLIDE* Collide,
 						piVECTOR const* NewPos, piVECTOR const* OldPos, UINT32 Flags);
 static UINT32 _DoExplosionShrapnel(weapAmmo* Ammo,FLOAT64VECTOR const* InPos, FLOAT64VECTOR const* ProjVel, FLOAT64 CurrentTime, bool doshrap=true);
 static UINT32 _DoShapedCharge(weapAmmo * Ammo, FLOAT64VECTOR const* InPos, FLOAT64VECTOR const* ProjVel, FLOAT64 CurrentTime);
@@ -2775,7 +2775,7 @@ static UINT32 _DisplayObject(OBJECT* Object)
 // don't call this for internal components
 
 static UINT32 _DoSpall(weapAmmo* Ammo,	FLOAT32 OriginalSpeed, FLOAT32 RemainingSpeed,
-						FASTCOLLIDE* Collide, piVECTOR const* NewPos, piVECTOR const* OldPos, UINT32 Flags)
+                       double spall_mult, FASTCOLLIDE* Collide, piVECTOR const* NewPos, piVECTOR const* OldPos, UINT32 Flags)
 {
 	UINT32 i;
 	weapAmmo TempAmmo;
@@ -2827,11 +2827,11 @@ static UINT32 _DoSpall(weapAmmo* Ammo,	FLOAT32 OriginalSpeed, FLOAT32 RemainingS
 
 	Energy = 0.1f * 0.5f * Ammo->AmmoType->ProjectileWeight * (OriginalSpeed * OriginalSpeed - RemainingSpeed * RemainingSpeed);
 
-	NumSpall = (UINT32)(pow(Energy,0.333333f) + 0.5) * 2;
+	NumSpall = (UINT32)((pow(Energy,0.333333f) + 0.5) * 2.0 * spall_mult);
 
 	if (NumSpall == 0) return 0;
 
-	Write_Log(LOG_WEAP,LOG_INFO,"WEAP %s(%d) spalling %d pieces of %s",  Ammo->AmmoType->Name, Ammo->Id, NumSpall, Collide->CollideObject->name);
+	Write_Log(LOG_WEAP,LOG_INFO,"WEAP %s(%d) spalling %d pieces of %s w/ %f overmatch",  Ammo->AmmoType->Name, Ammo->Id, NumSpall, Collide->CollideObject->name, spall_mult);
 
 	IngressSpallVel = OriginalSpeed - RemainingSpeed;
 	EgressSpallVel = RemainingSpeed;
@@ -4206,7 +4206,8 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	// to FALSE, TRUE and 1 which may have ambiguous effects.
 	LOGICAL AmmoStopped = FALSE;
 	LOGICAL Richocheted = FALSE;
-	LOGICAL DoSpall = TRUE;
+	// Spall only if we're hitting external armor
+	LOGICAL DoSpall = (Collision->Flags & _AMMOCD_FLAG_EXTERNALCOMPONENT) && ! (Collision->Flags & _AMMOCD_FLAG_ISPERSONA);
     piVECTOR DeltaVec = {0, 0, 0};
     FLOAT64 ResidualSpeed = 0;
 	FLOAT64 PenetrationConstant = 0;
@@ -4420,13 +4421,17 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	}
 #endif
 
-	// note:  may need to supress spall in the specific object case .. don't have to at the moment
-	// because shrapnel uses an ammotype that is guaranteed to not have modelspall set
-	if(	DoSpall && Ammo->AmmoType->ModelSpall &&
-		(Collision->Flags & _AMMOCD_FLAG_EXTERNALCOMPONENT) && !(Collision->Flags & _AMMOCD_FLAG_ISPERSONA) )
-	{
-		if(PenetrationThickness > .9*Thickness)
-			_DoSpall(Ammo, (FLOAT32)AmmoSpeed, (FLOAT32)ResidualSpeed, Collision, NewPos, OldPos, Ammo->Flags);
+	if ( DoSpall && Ammo->AmmoType->ModelSpall ) {
+		// Need to nearly or totally penetrate to generate spall
+		if ( PenetrationThickness > 0.9 * Thickness ) {
+			double spall_mult = 1.0;
+			// Overmatch formula is from US Government testing (via scotsman)
+			if ( AmmoSpeed / ResidualSpeed >= 0.75 && Ammo->AmmoType->Diameter >= 2 * Thickness ) {
+				double diam_mm = Ammo->AmmoType->Diameter * 1000.0;
+				spall_mult = std::max(1.0, 0.1484 + 0.0461329 * diam_mm);
+			}
+			_DoSpall(Ammo, (FLOAT32)AmmoSpeed, (FLOAT32)ResidualSpeed, spall_mult, Collision, NewPos, OldPos, Ammo->Flags);
+		}
 	}
 
 	// logging
