@@ -11,17 +11,16 @@
 
 #include "teul/teulNetworkArray.h"
 #include "wwii/wwiiFullObjID.h"
-#include "wwii/wwiiHCUnitsIndex.h"
 
 class HCUnitLocation
 {
 public:
 	// Constructors
-	HCUnitLocation(HCUnitID unitID, const FULL_OBJ_ID fid)
-		: m_unitID(ToInt(unitID)), m_homeCPID(fid)
+	HCUnitLocation(UINT32 unitID, const FULL_OBJ_ID fid)
+		: m_unitID(unitID), m_homeCPID(fid)
 		{}
 	HCUnitLocation(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
-	HCUnitLocation() : m_unitID(ToInt(HCUnitID::null)), m_homeCPID(nullObjID) {}
+	HCUnitLocation() : m_unitID(0), m_homeCPID(nullObjID) {}
 
 	// Destructors
 	~HCUnitLocation() {}
@@ -35,7 +34,7 @@ public:
 
 public:
 	// Members
-	PackedHCUnitID	m_unitID;		// 16 bits	} nice round
+	UINT32		m_unitID;			// 16 bits	} nice round
 	FULL_OBJ_ID	m_homeCPID;			// 48 bits	} 64 bits!
 };
 

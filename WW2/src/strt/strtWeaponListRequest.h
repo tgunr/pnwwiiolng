@@ -13,7 +13,7 @@
 #pragma pack(push, 1)
 struct WeaponListRequest
 {
-	WeaponListRequest(UINT32 playerID, HCUnitID brigadeID, const FULL_OBJ_ID withFullObjID
+	WeaponListRequest(UINT32 playerID, UINT32 brigadeID, const FULL_OBJ_ID withFullObjID
 						, const PermissionMask& permMask
 						, bool allWeapons, bool isRefresh
 						)
@@ -26,7 +26,7 @@ struct WeaponListRequest
 	bool send();
 
 	UINT32			m_playerID;		// ID of the player issueing the request
-	HCUnitID		m_brigadeID;	// ID of the briagde
+	UINT32			m_brigadeID;	// ID of the briagde
 	FULL_OBJ_ID		m_fullObjID;	// the facility we want to spawn at
 	PermissionMask	m_permMask;		// Permission mask requested
 	bool			m_allWeapons;	// Flag to display all the weapons instead

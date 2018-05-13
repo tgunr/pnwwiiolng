@@ -51,7 +51,7 @@ enum
 class StratHCUnit : public HCUnit
 {
 public:
-	StratHCUnit(HCUnitID unitID, HCUNIT_TYPE type, HCUnitID parentID
+	StratHCUnit(UINT32 unitID, HCUNIT_TYPE type, UINT32 parentID
 				, WWII_COUNTRY countryID, BRANCH_ENUM branchID, BRANCH_ENUM movementType, UCHAR unitClass
 				, const ChatHandle handle, const char* name, const char* nick, UINT8 rank
 				, const FULL_OBJ_ID homeCP, const ChatHandle owner, RANK_NO ownerRank, UINT32 startCPOID, UINT32 fallbackCpOID
@@ -172,7 +172,7 @@ public:
 	void decrementThrottle(const POSTED_WEAPON* postedWeapon);
 
 public:
-	static StratHCUnit* Lookup(HCUnitID unitID);
+	static StratHCUnit* Lookup(UINT32 unitID);
 	static StratHCUnit* Lookup(const char* name);
 
 //tolua_end
@@ -217,6 +217,6 @@ extern bool strtDeployDivision(HCUnit* division, CPStruct* cp, bool transferSupp
 extern void strtInitializeHCUnits();
 
 /// @return If calling this function caused the brigade to deploy.
-extern bool strtReformBrigade(HCUnitID brigadeID, STRAT_UPDATE* fromEvent=nullptr);
+extern bool strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* fromEvent=nullptr);
 
 //tolua_end

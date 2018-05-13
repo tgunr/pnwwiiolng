@@ -151,8 +151,8 @@ _postWeapon(WeapJoinRequestNode* joinNode
 			, bool isReserve
 			, WEAPON_SPEC weapon
 			, SINT32 missionID
-			, HCUnitID brigadeID
-			, HCUnitID supplyUnitID
+			, UINT32 brigadeID
+			, UINT32 supplyUnitID
 			, const PermissionMask& permMask
 			, UINT32 commander
 			, const ChatHandle handle
@@ -341,8 +341,8 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
                     , facility->name
                     );
 
-		HCUnitID supplyUnitID = strtGetSupplyingUnit(*facility, request.brigadeID);
-		if ( supplyUnitID == HCUnitID::null )
+		UINT32 supplyUnitID = strtGetSupplyingUnit(*facility, request.brigadeID);
+		if ( supplyUnitID == 0 )
 			supplyUnitID = request.brigadeID;
 
 		// Make sure it contains our brigade

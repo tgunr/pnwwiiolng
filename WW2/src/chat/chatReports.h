@@ -62,7 +62,7 @@ public:
 	// What branch they were in
 	UINT16			m_branch;
 	// The HCUnit they were in
-	HCUnitID		m_brigade;
+	UINT32			m_brigade;
 	// ID of their mission, if any
 	UINT32			m_mission;
 	// If they were leading the mission

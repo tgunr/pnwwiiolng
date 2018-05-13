@@ -129,7 +129,7 @@ _validBrigadeOrigin(const HCUnit* unit, const FacilityStruct* facility)
 
 	// We know this depot isn't in the same town as the brigade, so is it
 	// a combat depot origin?
-	if ( facility->getSupplyingUnit(unit, bcp) == HCUnitID::null )
+	if ( facility->getSupplyingUnit(unit, bcp) == 0 )
 	{
 		dbugLog(_FLI, " NO SUP UNIT");
 		return false;
@@ -251,7 +251,7 @@ missionRevokeMissionsFrom(const FacilityStruct& facility)
 bool
 Player::ableToPost() const
 {
-	if ( brigadeID() == HCUnitID::null )
+	if ( brigadeID() == 0 )
 		return false;
 
 	return ableToPostIn(*brigade());
@@ -360,7 +360,7 @@ Mission::~Mission()
 						, country()
 						, branch()
 						, side()
-						, (brigade()) ? brigade()->brigadeID() : HCUnitID::null
+						, (brigade()) ? brigade()->brigadeID() : 0
 						, (brigade()) ? brigade()->name() : "<none>"
 						);
 
@@ -1222,7 +1222,7 @@ missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 co
 		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_EXISTING_MISSION);
 		reply.reasonCode = MC_BY_USER_EXISTS;
 	}
-	else if ( player->brigadeID() == HCUnitID::null )
+	else if ( player->brigadeID() == 0 )
 	{
 		player->log("Mission post denied: no brigade selected");
 		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_NO_BRIGADE);

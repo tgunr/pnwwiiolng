@@ -1879,7 +1879,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		_addStr(response, buf);
 	}
 
-	if ( IsValid(brigadeID()) )
+	if ( brigadeID() )
 	{
 		HCUnit* brig = HCUnit::Lookup(brigadeID());
 		if ( brig )
@@ -1916,7 +1916,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 	if ( inGrab() )
 		_addStr(response, "Grab");
 
-	if ( IsValid(leadingBrigade()) )
+	if ( leadingBrigade() )
 	{
 		char oic[21];
 		HCUnit* unit = HCUnit::Lookup(leadingBrigade());

@@ -12,14 +12,12 @@
 //////////////////////////////////////////////////////////////////////
 // Describes an entry in a brigade control list
 
-#include "wwii/wwiiHCUnitsIndex.h"
-
 #pragma pack(push, 1)
 class BrigadeControlList
 {
 public:
-	BrigadeControlList(const HCUnitID brigade_ = HCUnitID::null, bool canVote_=false) // need default values for the client side
-		: m_brigade(ToInt(brigade_))
+	BrigadeControlList(const UINT16 brigade_=0, bool canVote_=false) // need default values for the client side
+		: m_brigade(brigade_)
 		, m_officer(0)
 		, m_officerRank(0)
 		, m_canTakeCharge(false)
@@ -42,7 +40,7 @@ public:
 #endif
 
 	// Get country/branch info from main brigade list
-	PackedHCUnitID	m_brigade;		// ID of the brigade
+	UINT16		m_brigade;			// ID of the brigade
 	ChatHandle	m_officer;			// Callsign of active OIC or nullptr
 	RANK_NO		m_officerRank;		// Their rank
 	bool		m_canTakeCharge;	// True if you can take charge of this brigade

@@ -204,8 +204,8 @@ JS_FUNCTION_DEF(jsStratObject, validmissionorigin)
 	}
 
 	// must be in my brigade's cp or my division's cp or
-	HCUnitID brigadeID	= PlayerClient()->BrigadeSelected().m_detail.unitID();
-	HCUnitID divisionID	= PlayerClient()->BrigadeSelected().m_detail.parentID();
+	UINT32 brigadeID	= PlayerClient()->BrigadeSelected().m_detail.unitID();
+	UINT32 divisionID	= PlayerClient()->BrigadeSelected().m_detail.parentID();
 	bool nearBrigade	= origin->stratobj->IsUnitHere(brigadeID);
 	bool nearDivision	= origin->stratobj->IsUnitHere(divisionID);
 	bool validLocation	= nearBrigade || nearDivision;

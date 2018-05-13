@@ -180,7 +180,7 @@ public:
 	FacilityStruct* supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool followLinks=true) const;
 
 	FacilityStruct* findLocalAB(WWII_SIDE favorSide) const;
-	HCUnitID getSupplyingUnit(const HCUnit* brigade, const CPStruct* homeCP) const;
+	UINT32 getSupplyingUnit(const HCUnit* brigade, const CPStruct* homeCP) const;
 
 	void recalculateCapacity();
 

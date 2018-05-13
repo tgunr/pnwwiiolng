@@ -21,7 +21,7 @@ struct FULL_OBJ_ID;
 class ChannelID;
 
 const ChannelID& chatGetAdminChannelID();
-const ChannelID& chatGetBrigadeChannelID(const instanceid_t instID, HCUnitID brigadeID, WWII_SIDE side);
+const ChannelID& chatGetBrigadeChannelID(const instanceid_t instID, UINT32 brigadeID, WWII_SIDE side);
 const ChannelID& chatGetMissionChannelID(const instanceid_t instID, UINT32 missionID, WWII_SIDE side);
 const ChannelID& chatGetSquadChannelID(const instanceid_t instID, UINT32 squadID, WWII_SIDE side);
 const ChannelID& chatGetGCIChannelID(const instanceid_t instID, WWII_SIDE side);

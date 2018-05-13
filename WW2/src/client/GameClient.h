@@ -96,7 +96,7 @@ public:
 	virtual void RedirectFailed() override;
 
 	virtual bool SelectPersona(const PersonaSummary& persona, bool save = false, bool force = false) override;
-	virtual bool SelectBrigade(HCUnitID brigadeID, bool save = false, bool force = false) override;
+	virtual bool SelectBrigade(UINT32 brigadeID, bool save = false, bool force = false) override;
 
 	virtual void OnDespawn() override;
 

@@ -19,7 +19,7 @@ public:
 	virtual void Over(SuperCellMapView*,int state){}
 	virtual bool IsHit(SuperCellMapView*, float x, float y) const { return false; }
 
-	void SetDivision(HCUnitID id);
+	void SetDivision(unsigned int id);
 	void SetCP(StratDB::StratObject*);
 	void SetUnits();
 	void SetBounds(const HCUnit*);
@@ -33,7 +33,7 @@ public:
 	// bounding box coords bottom left to top right
 	int _x1,_y1,_x2,_y2;
 
-	using HCUnitMap = std::map<HCUnitID, HCUnit*>;
+	using HCUnitMap = std::map<unsigned int, HCUnit*>;
 	HCUnitMap _units;
 };
 
@@ -47,7 +47,7 @@ public:
 
 	HCLinksMapObject* AddHCLinksMapObject();
 
-	void SetDivision(HCUnitID id);
+	void SetDivision(unsigned int id);
 	void SetCP(StratDB::StratObject* cp);
 
 	enum

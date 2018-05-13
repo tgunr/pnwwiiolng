@@ -19,7 +19,7 @@
 	RenderSuperCells
 *************************************************************************************************/
 
-void StrategicLayer::SetDivision(HCUnitID id)
+void StrategicLayer::SetDivision(unsigned int id)
 {
 	HCLinksMapObject* links = AddHCLinksMapObject();
 
@@ -162,7 +162,7 @@ void HCLinksMapObject::DrawSelf(SuperCellMapView* mv)
     }
 }
 
-void HCLinksMapObject::SetDivision(HCUnitID id)
+void HCLinksMapObject::SetDivision(unsigned int id)
 {
 	_division = GetDivision(HCUnit::Lookup(id));
 	_cp = (_division) ? StratDB::FindStratObject(_division->homeCPID()): nullptr;

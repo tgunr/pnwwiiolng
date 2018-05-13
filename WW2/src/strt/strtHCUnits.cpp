@@ -111,7 +111,7 @@ HCUnit::setHomeCPID(const FULL_OBJ_ID destination)
 //////////////////////////////////////////////////////////////////////
 // Constructor
 
-StratHCUnit::StratHCUnit(HCUnitID withUnitID, HCUNIT_TYPE withTypeID, HCUnitID withParentID
+StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withParentID
 				, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
 				, const ChatHandle withHandle, const char* withName, const char* withNick, UINT8 withRank
 				, const FULL_OBJ_ID withHomeCPID
@@ -369,7 +369,7 @@ strtInitializeHCUnits()
 // Find a StratHCUnit by unitID
 
 StratHCUnit*
-StratHCUnit::Lookup(HCUnitID unitID)
+StratHCUnit::Lookup(UINT32 unitID)
 {
 	HCUnit* unit = HCUnit::Lookup(unitID);
 	if ( unit == nullptr )
@@ -1035,7 +1035,7 @@ strtDeployDivision(HCUnit* unit, CPStruct* cp, bool transferSupply)
 // Reform a brigade at its division HQ
 
 bool
-strtReformBrigade(HCUnitID brigadeID, STRAT_UPDATE* const fromEvent)
+strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 {
 	StratHCUnit* const brigade = StratHCUnit::Lookup(brigadeID);
 	ABORT_IF(brigade == nullptr);

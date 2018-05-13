@@ -45,7 +45,7 @@ class HCUnit
 public:
 	//// ---- Class Operators ---- ////
 	// Create from scratch
-	HCUnit(HCUnitID unit, HCUNIT_TYPE type, HCUnitID parent
+	HCUnit(UINT32 unit, HCUNIT_TYPE type, UINT32 parent
 			, WWII_COUNTRY country, BRANCH_ENUM branch, BRANCH_ENUM movementType, UCHAR unitClass
 			, const ChatHandle handle, const char* name, const char* nick, UINT8 rank
 			, const FULL_OBJ_ID home=nullObjID
@@ -53,7 +53,7 @@ public:
 			);
 
 	// Empty constructor
-	HCUnit(HCUnitID unitID = HCUnitID::null, HCUNIT_TYPE type=HCU_GENERIC);
+	HCUnit(UINT32 unitID=0, HCUNIT_TYPE type=HCU_GENERIC);
 
 	//// Client only functions
 
@@ -73,8 +73,8 @@ public:
 
 	////
 	// Accessors
-	HCUnitID unitID() const { return m_unitID; }
-	HCUnitID parentID() const { return m_parentID; }
+	UINT32 unitID() const { return m_unitID; }
+	UINT32 parentID() const { return m_parentID; }
 	HCUnit* parent() const { return m_parent; }
 	WWII_COUNTRY country() const { return m_countryID; }
 	WWII_SIDE side() const { return ( m_countryID == 4 ) ? AXIS : ALLIED; }
@@ -108,16 +108,14 @@ public:
 	// type of facility
 	bool canUseOrigin(int facilityType) const;
 
-// tolua_end
 	// Is this object below the right hand side object
 	bool isAbove(const HCUnit* rhs) const { return (rhs && rhs->isBelow(unitID())); }
-	bool isAbove(HCUnitID rhs) const { return isAbove(Lookup(rhs)); }
-	bool isBelow(HCUnitID rhs) const;
+	bool isAbove(UINT32 rhs) const { return isAbove(Lookup(rhs)); }
+	bool isBelow(UINT32 rhs) const;
 	bool isBelow(const HCUnit* rhs) const { return rhs && isBelow(rhs->unitID()); }
 
-	bool isBelowOrEqual(HCUnitID rhs) const { return unitID() == rhs || isBelow(rhs); }
+	bool isBelowOrEqual(UINT32 rhs) const { return unitID() == rhs || isBelow(rhs); }
 	bool isBelowOrEqual(const HCUnit* rhs) const { return rhs && ((rhs == this) || isBelow(rhs)); }
-// tolua_begin
 
 	bool isBrigade() const { return m_type == HCU_BRIGADE; }
 	bool isDivision() const { return m_type == HCU_DIVISION; }
@@ -134,7 +132,7 @@ public:
 	// Static functions
 
 	// Find a HCUnit by its unitID
-	static HCUnit* Lookup(HCUnitID unitID);
+	static HCUnit* Lookup(UINT32 unitID);
 	// Find a HCUnit by its 64bit packed callsign
 	static HCUnit* Lookup(const ChatHandle handle);
 	// Find a HCUnit by its short name
@@ -150,9 +148,9 @@ public:
 	//// ---- Class Variables ---- ////
 
 public:
-	HCUnitID		m_unitID;			//!< Non-sequential IDs from the host database
+	UINT32			m_unitID;			//!< Non-sequential IDs from the host database
 	HCUNIT_TYPE		m_type;			//!< What type of structure it is
-	HCUnitID		m_parentID;		//!< unitID of the parent
+	UINT32			m_parentID;		//!< unitID of the parent
 	WWII_COUNTRY	m_countryID;		//!< which country
 	BRANCH_ENUM		m_branchID;		//!< which branch
 	BRANCH_ENUM		m_movementType;	//!< Which branch movement behavior we observe

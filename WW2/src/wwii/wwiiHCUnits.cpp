@@ -67,7 +67,7 @@ wwiiReadHCUnits()
 		if ( q.Rows() == 0 )
 			throw std::domain_error("No HC units matching query");
 
-		HCUnitID unitID = HCUnitID::null, parentID = HCUnitID::null;
+		UINT32 unitID = 0, parentID = 0;
 		HCUNIT_TYPE typeID;
 		WWII_COUNTRY countryID;
 		BRANCH_ENUM branchID;
@@ -90,8 +90,8 @@ wwiiReadHCUnits()
 		{
 			DBRow& row = q.Row();
 
-			unitID = FromInt<HCUnitID>(row.NextUInt());
-			parentID = FromInt<HCUnitID>(row.NextUInt());
+			unitID = row.NextUInt();
+			parentID = row.NextUInt();
 			countryID = (WWII_COUNTRY)row.NextUInt();
 			branchID = (BRANCH_ENUM)row.NextUInt();
 			name = row.NextColumn();
@@ -119,7 +119,7 @@ wwiiReadHCUnits()
 				nick = name;
 			}
 
-			if ( unitID == HCUnitID::null ) throw std::domain_error("HCUnit list contains unit with NULL or 0 unitID");
+			if ( unitID == 0 ) throw std::domain_error("HCUnit list contains unit with NULL or 0 unitID");
 			if ( countryID == 0 ) throw std::domain_error("HCUnit list contains unit with NULL or 0 countryID");
 			if ( branchID == 0 ) throw std::domain_error("HCUnit list contains unit with NULL or 0 branchID");
 			if ( movementType >= MAX_BRANCHES ) throw std::domain_error("HCUnit list contains unit with illegal movementType");

@@ -20,7 +20,7 @@ class NewMission
 {
 public:
 	NewMission()
-		: missionID(0), country(WWII_NO_COUNTRY), brigadeID(HCUnitID::null), missionType(0)
+		: missionID(0), country(WWII_NO_COUNTRY), brigadeID(0), missionType(0)
 		, postedAt(0), postAt(0), launchAt(0)
 		, launchCP_oid(0), launchFac_oid(0), targetCP_oid(0), targetFac_oid(0)
 		, priority(0), weapon()
@@ -42,7 +42,7 @@ public:
 	UINT32	missionID;
 	// Country and side
 	WWII_COUNTRY	country;
-	HCUnitID brigadeID;
+	UINT32	brigadeID;
 	// Type of mission
 	UINT32	missionType;
 	// Who posted it (playerID)

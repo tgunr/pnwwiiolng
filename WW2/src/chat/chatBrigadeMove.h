@@ -18,14 +18,14 @@ class CPStruct;
 class BrigadeMove
 {
 public:
-	BrigadeMove() : m_action(BMR_FAILED), m_brigadeID(HCUnitID::null), m_delay(0), m_actionable(false) {}
+	BrigadeMove() : m_action(BMR_FAILED), m_brigadeID(0), m_delay(0), m_actionable(false) {}
 	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { return (a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this))); }
 	BRIGADE_MOVE_RESULT process(const ChatHandle mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM);
 	void process(const ChatHandle playerHandle) const;
 
 public:
 	BRIGADE_MOVE_RESULT	m_action;		// What we're doing
-	HCUnitID	m_brigadeID;			// Brigade being moved
+	UINT32		m_brigadeID;			// Brigade being moved
 	FULL_OBJ_ID	m_destination;			// Where it moves to
 	UINT32		m_delay;				// How long till the command is/can be executed
 	bool		m_actionable;			// Set to true if you want the strat host to

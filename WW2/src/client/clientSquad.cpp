@@ -50,7 +50,7 @@ bool ClientSquad::isMember(const ChatHandle handle) const
 	return (found != m_members.end()) ? true: false;
 }
 
-bool ClientSquad::isSquadBrigade(const HCUnitID brigadeID, bool excludeMe) const
+bool ClientSquad::isSquadBrigade(const UINT32 brigadeID, bool excludeMe) const
 {
 	SquadMembers::const_iterator it = m_members.begin();
 	ChatHandle me = (excludeMe) ? chatGetLowercaseHandle(PlayerClient()->Personas().m_callsign): 0;

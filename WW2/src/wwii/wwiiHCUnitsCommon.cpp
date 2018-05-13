@@ -22,18 +22,14 @@ using HCUNIT_HANDLES = std::unordered_map<ChatHandle, HCUnit*>;
 static HCUNIT_HANDLES hcUnitsByHandle;
 
 // Ownership of HCUnits
-static std::map<HCUnitID, std::unique_ptr<HCUnit>> s_hcUnitPointers;
+static std::map<UINT32, std::unique_ptr<HCUnit>> s_hcUnitPointers;
 
 // Pack a brigade ID
 
 SINT32
-wwiiPackBrigadeID(PackMode mode, UCHAR* data, SINT32 offset, HCUnitID& brigadeID, SINT32 /*size*/)
+wwiiPackBrigadeID(PackMode mode, UCHAR* data, SINT32 offset, UINT32& brigadeID, SINT32 /*size*/)
 {
-	uint32_t int_id = ToInt(brigadeID);
-	static_assert ( sizeof(int_id) >= sizeof(ToInt(brigadeID)) ,
-	                "Brigade packing type is not large enough" );
-	return teulPackUINT32(mode, data, offset, &int_id, BitsRequired(ToInt(HCUnitID::max)));
-	brigadeID = FromInt<HCUnitID>(int_id);
+	return teulPackUINT32(mode, data, offset, &brigadeID, 16);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -49,7 +45,7 @@ void HCUnit::addToRegistry()
 
 //////////////////////////////////////////////////////////////////////
 
-HCUnit::HCUnit(HCUnitID withUnit, HCUNIT_TYPE withType, HCUnitID withParent
+HCUnit::HCUnit(UINT32 withUnit, HCUNIT_TYPE withType, UINT32 withParent
 			, WWII_COUNTRY withCountry, BRANCH_ENUM withBranch, BRANCH_ENUM withMovementType, UCHAR withUnitClass
 			, const ChatHandle withHandle
 			, const char* withName, const char* nick, UINT8 Rank
@@ -81,8 +77,8 @@ HCUnit::HCUnit(HCUnitID withUnit, HCUNIT_TYPE withType, HCUnitID withParent
 }
 
 	// Empty constructor
-HCUnit::HCUnit(HCUnitID UnitID, HCUNIT_TYPE Type)
-	: m_unitID(UnitID), m_type(Type), m_parentID(HCUnitID::null)
+HCUnit::HCUnit(UINT32 UnitID, HCUNIT_TYPE Type)
+	: m_unitID(UnitID), m_type(Type), m_parentID(0)
 	, m_countryID(WWII_NO_COUNTRY), m_branchID(BRANCH_NOT_USED)
 	, m_handle(0LL)
 	, m_homeCPID(nullObjID)
@@ -112,7 +108,7 @@ HCUnit::HCUnit(ACTION_OBJECT* const a)
 
 HCUnit::~HCUnit()
 {
-	if ( m_registered && IsValid(m_unitID) )
+	if ( m_registered && m_unitID > 0 )
 	{
 		HCUNIT_INDEX::iterator it = hcUnits.find(m_unitID);
 		if ( it != hcUnits.end() && it->second == this )
@@ -197,7 +193,7 @@ HCUnit::packer(PackMode mode, ACTION_OBJECT* a)
 	a->offset = wwiiPackText(mode, a->packed, a->offset, m_name, MAX_HCUNIT_NAME_LENGTH);
 	a->offset = wwiiPackText(mode, a->packed, a->offset, m_shortName, MAX_BRIGADE_SHORT_LENGTH);
 
-	if ( mode == TEUL_UNPACK && IsValid(m_parentID) )
+	if ( mode == TEUL_UNPACK && m_parentID )
 		lookupParent();
 
 	return a->offset;
@@ -207,9 +203,9 @@ HCUnit::packer(PackMode mode, ACTION_OBJECT* a)
 // Determine if a unit is ordered below the unit on the right hand side
 
 bool
-HCUnit::isBelow(HCUnitID rhs) const
+HCUnit::isBelow(UINT32 rhs) const
 {
-	if ( rhs == HCUnitID::null || unitID() == rhs || m_parentID == HCUnitID::null )
+	if ( rhs == 0 || unitID() == rhs || m_parentID == 0 )
 		return false;
 
 	HCUnit* ancestor;
@@ -228,7 +224,7 @@ HCUnit::isBelow(HCUnitID rhs) const
 void
 HCUnit::lookupParent()
 {
-	if ( IsInvalid(m_parentID) || m_parentID == m_unitID )
+	if ( !m_parentID || m_parentID == m_unitID )
 		m_parent = nullptr;
 	else
 		m_parent = Lookup(m_parentID);
@@ -239,7 +235,7 @@ HCUnit::lookupParent()
 // Look up a HCUnit by unitID
 
 HCUnit*
-HCUnit::Lookup(HCUnitID unitID)
+HCUnit::Lookup(UINT32 unitID)
 {
 	HCUNIT_INDEX::iterator it = hcUnits.find(unitID);
 	return (it != hcUnits.end()) ? it->second : nullptr;

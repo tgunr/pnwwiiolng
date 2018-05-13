@@ -159,7 +159,7 @@ _saveData(SAVE_SET& saves, const char* const tableName, const char* const indexF
 static void
 _commitCP(CPStruct* cp)
 {
-	HCUnitID attacker = (cp->isCity() && cp->attackingUnit() != nullptr) ? cp->attackingUnit()->unitID() : HCUnitID::null;
+	UINT16 attacker = (cp->isCity() && cp->attackingUnit() != nullptr) ? cp->attackingUnit()->unitID() : 0;
 	char valuesKey[128];
 	strprintf(valuesKey, "conside=%u,concountry=%u,side=%u,country=%u,contention=%u,is_objective=%u"
 			, cp->controllingSide
@@ -962,11 +962,11 @@ strtdbRestoreTOESupplies()
 						" ORDER BY 1, 2");
 
 		StratHCUnit* unit = nullptr;
-		HCUnitID lastUnitID = HCUnitID::null;
+		UINT32 lastUnitID = 0;
 		WEAPON_SPEC spec;
 		while ( q.FetchRow() )
 		{
-			HCUnitID unitID = FromInt<HCUnitID>(q.Row().NextUInt());
+			UINT32 unitID = q.Row().NextUInt();
 			spec.wCountry = q.Row().NextUInt();
 			spec.wCategory = q.Row().NextUInt();
 			spec.wClass = q.Row().NextUInt();

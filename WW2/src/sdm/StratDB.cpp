@@ -576,7 +576,7 @@ StratObject::ChildList StratObject::ChildStratObjects() const
 	FindBestUnit
 *************************************************************************************************/
 
-HCUnitID StratObject::FindBestUnit(int s, int c, int b) const
+unsigned int StratObject::FindBestUnit(int s, int c, int b) const
 {
 	HCUnit* best = nullptr;
 	HCUnit* unit = nullptr;
@@ -601,13 +601,13 @@ HCUnitID StratObject::FindBestUnit(int s, int c, int b) const
 		}
 	}
 
-	return (best) ? best->unitID(): HCUnitID::null;
+	return (best) ? best->unitID(): 0;
 }
 
 // finds the best allied unit from an allied country
-HCUnitID StratObject::FindBestAlliedUnit(int s, int c) const
+unsigned int StratObject::FindBestAlliedUnit(int s, int c) const
 {
-	HCUnitID best = HCUnitID::null;
+	unsigned int best = 0;
 	HCUnit* unit = 0;
 
 	for(int i = 0; i < (int)_units.size(); ++i)
@@ -627,7 +627,7 @@ HCUnitID StratObject::FindBestAlliedUnit(int s, int c) const
 	return best;
 }
 
-static bool SortUnitsByDivision(const HCUnitID& lhs, const HCUnitID& rhs)
+static bool SortUnitsByDivision(const UINT32& lhs, const UINT32& rhs)
 {
 	const HCUnit* const lu = HCUnit::Lookup(lhs);
 	const HCUnit* const ru = HCUnit::Lookup(rhs);
@@ -660,7 +660,7 @@ static bool SortUnitsByDivision(const HCUnitID& lhs, const HCUnitID& rhs)
 	return strcoll(lu->name(), ru->name()) < 0;
 }
 
-void StratObject::AddUnit(HCUnitID id)
+void StratObject::AddUnit(unsigned int id)
 {
 	UnitList::iterator it = _units.begin();
 
@@ -675,7 +675,7 @@ void StratObject::AddUnit(HCUnitID id)
 	std::sort(_units.begin(), _units.end(), SortUnitsByDivision);
 }
 
-void StratObject::RemoveUnit(HCUnitID id)
+void StratObject::RemoveUnit(unsigned int id)
 {
 	UnitList::iterator it = _units.begin();
 
@@ -689,7 +689,7 @@ void StratObject::RemoveUnit(HCUnitID id)
 	}
 }
 
-bool StratObject::IsUnitHere(HCUnitID id) const
+bool StratObject::IsUnitHere(unsigned int id) const
 {
 	// only cp's have units
 	if(StratClass() == SDM_CLASS_CP)

@@ -65,7 +65,7 @@ public:
 	void announceToSquadChannel();
 
 	// Take me out of my current brigade
-	void changeBrigade(HCUnitID newID);
+	void changeBrigade(UINT32 newID);
 
 	// Set my branch
 	void SetBranch(BRANCH_ENUM newBranch);
@@ -143,7 +143,7 @@ public:
 
 	bool isActiveOfficer() const
 	{
-		if ( IsValid(m_leadingBrigade) && m_leadingBrigade == brigadeID() ) return true;
+		if ( m_leadingBrigade && m_leadingBrigade == brigadeID() ) return true;
 		return isActiveCommander();
 	}
 
@@ -218,7 +218,7 @@ public:
 
 	void SetTrOff(bool to) { m_trOff = to; }
 
-	void SetLeadingBrigade(HCUnitID toBrigadeID);
+	void SetLeadingBrigade(UINT32 toBrigadeID);
 
 	// Change the personas mission ID
 	void SetMission(UINT32 missionID);
@@ -340,7 +340,7 @@ public:
 	const FLOAT64& lastX() const { return m_lastX; }
 	const FLOAT64& lastY() const { return m_lastY; }
 	const FLOAT64& lastZ() const { return m_lastZ; }
-	HCUnitID leadingBrigade() const { return m_leadingBrigade; }
+	UINT32 leadingBrigade() const { return m_leadingBrigade; }
 	bool checkTimerActive(const char*) const;			// Check if a timer has been set and is active.
 	bool checkTimerElapsed(const char*) const;			// Check if a timer is unset or has elapsed.
 	bool noEnemyChat() const { return m_noEnemyChat; }
@@ -450,7 +450,7 @@ public:
 protected:
 	const char*		m_state;
 
-	HCUnitID		m_leadingBrigade;	// ID of brigade they are leading
+	UINT32			m_leadingBrigade;	// ID of brigade they are leading
 
 	bool			m_initialized	: 1;
 	bool			m_hqOff			: 1;

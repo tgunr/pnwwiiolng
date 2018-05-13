@@ -39,7 +39,7 @@ public:
 	/// Default constructor.
 	MissionSynopsis()
 		: m_missionID(0)
-		, m_countryID(WWII_NO_COUNTRY), m_branchID(BRANCH_NOT_USED), m_brigadeID(HCUnitID::null)
+		, m_countryID(WWII_NO_COUNTRY), m_branchID(BRANCH_NOT_USED), m_brigadeID(0)
 		, m_type(RECON), m_subType(0)
 		, m_origin(nullObjID), m_target(nullObjID)
 		, m_hasMobileSpawn(false)
@@ -70,7 +70,7 @@ public:
 	UINT32       m_missionID;      ///< Host's campaign-unique Mission ID.
 	WWII_COUNTRY m_countryID;      ///< The country the mission is for.
 	BRANCH_ENUM  m_branchID;       ///< The branch the mission uses.
-	HCUnitID     m_brigadeID;      ///< The brigade the mission is attached to.
+	UINT32       m_brigadeID;      ///< The brigade the mission is attached to.
 
 	MISSION_TYPE m_type;           ///< Main type (attack, defend, etc).
 	SINT8        m_subType;        ///< Mission sub-type.

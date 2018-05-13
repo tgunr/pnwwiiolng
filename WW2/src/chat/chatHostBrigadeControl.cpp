@@ -37,9 +37,9 @@
 
 class BrigadeController;
 
-using CONTROLLERS = std::map<HCUnitID, BrigadeController*>;
+using CONTROLLERS = std::map<UINT32, BrigadeController*>;
 static CONTROLLERS controllers;
-using ELECTIONS = std::set<HCUnitID>;
+using ELECTIONS = std::set<UINT32>;
 static ELECTIONS elections;
 
 using BRIGADE_UPDATES = std::vector<BrigadeController*>;
@@ -60,9 +60,9 @@ public:
 
 public:
 	// Get will create a controller if you need one
-	static BrigadeController& Get(HCUnitID unitID);
+	static BrigadeController& Get(UINT32 unitID);
 	// Lookup will only return a controller if one exists
-	static BrigadeController* Lookup(HCUnitID unitID);
+	static BrigadeController* Lookup(UINT32 unitID);
 
 public:
     Player* oic() const { return m_oic; }
@@ -152,7 +152,7 @@ BrigadeController::~BrigadeController()
 // Get or create a particular brigade controller
 
 BrigadeController&
-BrigadeController::Get(HCUnitID unitID)
+BrigadeController::Get(UINT32 unitID)
 {
 	BrigadeController* result = nullptr;
 	CONTROLLERS::iterator it = controllers.lower_bound(unitID);
@@ -177,7 +177,7 @@ BrigadeController::Get(HCUnitID unitID)
 // Find a particular brigade controller
 
 BrigadeController*
-BrigadeController::Lookup(HCUnitID unitID)
+BrigadeController::Lookup(UINT32 unitID)
 {
 	CONTROLLERS::iterator it = controllers.find(unitID);
 	return ( it != controllers.end() ) ? it->second : nullptr;
@@ -543,7 +543,7 @@ BrigadeController::removeOIC(BrigadeControl::BRIGADE_ACTION_REQ action, const Ch
 			dbugLog(_FLN, "hcu:%u(%s) during removal OIC was not online", unit().unitID(), unit().callsign());
 		}
 		else if ( nominee->leadingBrigade() == unit().unitID() )
-			nominee->SetLeadingBrigade(HCUnitID::null);
+			nominee->SetLeadingBrigade(0);
 
 		// Make sure we don't try to remove someone else
 		if ( !oic()->hasHandle(oicHandle()) )
@@ -617,7 +617,7 @@ BrigadeController::requestNominate(Player* sponsor, const ChatHandle officerHand
 	if ( !unit().isBrigade() )
 		throw BCERR_WRONG_BRIGADE;
 	_requirePlayerInBrigade(nominee, unit());
-	if ( IsValid(nominee->leadingBrigade()) )
+	if ( nominee->leadingBrigade() )
 		throw BCERR_PLAYER_IS_ALREADY_OIC;
 
 	// Make sure they're not being nominated or removed from another brigade
@@ -659,11 +659,11 @@ BrigadeController::requestVolunteer(Player* player)
 
 	if ( player->brigadeID() != unit().unitID() && !unit().isAbove(player->brigadeID()) )
 		throw BCERR_YOU_WRONG_BRIGADE;
-	if ( IsValid(player->leadingBrigade()) )
+	if ( player->leadingBrigade() )
 	{
 		if ( player->leadingBrigade() != unit().unitID() )
 			throw BCERR_YOU_ALREADY_OIC;
-		player->SetLeadingBrigade(HCUnitID::null);
+		player->SetLeadingBrigade(0);
 	}
 
 	// HC Staff can "take charge" of a brigade (volunteer) anytime they
@@ -751,7 +751,7 @@ BrigadeController::requestReplace(Player* player, const ChatHandle officer)
 
 	// You have to be* in* the brigade
 	_requirePlayerInBrigade(player, unit());
-	if ( IsValid(player->leadingBrigade()) )
+	if ( player->leadingBrigade() )
 		throw BCERR_YOU_ALREADY_OIC;
 
 	// You have to be the owner of the brigade
@@ -818,7 +818,7 @@ BrigadeController::requestMove(Player* player, const FULL_OBJ_ID destination, co
 		HCUnit* playerUnit = HCUnit::Lookup(player->leadingBrigade());
 		if ( !playerUnit )
 			throw BCERR_MUST_BE_HC_STAFF;
-		if ( playerUnit->parentID() == HCUnitID::null )
+		if ( playerUnit->parentID() == 0 )
 			throw BCERR_MUST_BE_OFFICER;
 		if ( !playerUnit->isBelowOrEqual(unit().unitID()) )
 			throw BCERR_MUST_BE_OFFICER;
@@ -1099,7 +1099,7 @@ public:
 		if ( player.noSide() )
 			throw LSTR_SELECT_SIDE;
 
-		if ( IsInvalid(player.brigadeID()) )
+		if ( !player.brigadeID() )
 			throw LSTR_NO_BRIGADE;
 
 		if ( player.uiTarget().Key() == 0 )
@@ -1132,7 +1132,7 @@ public:
 		if ( player.noSide() )
 			throw LSTR_SELECT_SIDE;
 
-		if ( IsInvalid(player.brigadeID()) )
+		if ( !player.brigadeID() )
 			throw LSTR_NO_BRIGADE;
 
 		if ( player.uiTarget().Key() == 0 )
@@ -1219,13 +1219,13 @@ BrigadeControlRequest::processRequest(SINT32 teulIndex)
 
 		if ( isObjective() )
 		{
-			if ( IsValid(player->leadingBrigade()) )
+			if ( player->leadingBrigade() )
 				m_brigadeID = player->leadingBrigade();
 			else
 				m_brigadeID = player->brigadeID();
 		}
 
-		if ( m_brigadeID == HCUnitID::null )
+		if ( m_brigadeID == 0 )
 		{
 			player->log(_FLA, "Requesting brigade 0");
 			throw BCERR_INVALID_REQ;
@@ -1435,7 +1435,7 @@ BrigadeController::processReplacingExpired()
 	checkOIC(false);
 
 	Player* player = PlayerInterface::Lookup(vote()->m_sponsor);
-	if ( player == nullptr || player->brigadeID() != unit().unitID() || IsValid(player->leadingBrigade()) )
+	if ( player == nullptr || player->brigadeID() != unit().unitID() || player->leadingBrigade() )
 	{
 		// The player wanting to take charge has gone offline, so leave the OIC inplace
 		_noticeToOfficers(BrigadeControl::_APPOINTMENT_FAILED, BrigadeControl::REQ_REPLACE, 0, VP_NONE, unit(), vote()->m_nominee, vote()->m_sponsor);
@@ -1707,9 +1707,9 @@ public:
 // opportunity to block the movement.
 
 void
-chatBrigadeMoveProposal(HCUnitID brigadeID, const FULL_OBJ_ID destination, ChatHandle byHandle)
+chatBrigadeMoveProposal(UINT32 brigadeID, const FULL_OBJ_ID destination, ChatHandle byHandle)
 {
-	assert( brigadeID != HCUnitID::null );
+	assert( brigadeID != 0 );
 	if ( byHandle == 0LL )
 		byHandle = systemHandleID;
 
@@ -1824,17 +1824,17 @@ chatBrigadeAttackOrderResponse(AttackOrder& order)
 	break;
 	}
 
-	HCUnitID brigadeID = order.m_brigadeID;
+	UINT32 brigadeID = order.m_brigadeID;
 	try
 	{
-		if ( brigadeID == HCUnitID::null && player )
+		if ( brigadeID == 0 && player )
 		{
-			if ( IsValid(player->leadingBrigade()) )
+			if ( player->leadingBrigade() )
 				brigadeID = player->leadingBrigade();
 			else
 				brigadeID = player->brigadeID();
 		}
-		if ( brigadeID == HCUnitID::null )
+		if ( brigadeID == 0 )
 			throw BCERR_INVALID_REQ;
 
 		BrigadeController& bc = BrigadeController::Get(brigadeID);
@@ -1861,7 +1861,7 @@ chatBrigadeAttackOrderResponse(AttackOrder& order)
 			UINT32 delay = host_config.oic.moveVoteTime_s;
 			if ( player && !player->isActiveCommander() )
 				delay = delay * 2;
-			else if ( player && IsInvalid(player->leadingBrigade()) )
+			else if ( player && !player->leadingBrigade() )
 				delay = delay + delay / 2;
 			bc.voteFor(vote, action, order.m_target.Key(), handle, delay);
 			return;
@@ -1888,10 +1888,10 @@ chatBrigadeAttackOrderResponse(AttackOrder& order)
 // Remove a player from their OIC position in a specific brigade
 
 void
-chatRemoveOICStatus(HCUnitID brigadeID, const ChatHandle handle)
+chatRemoveOICStatus(UINT32 brigadeID, const ChatHandle handle)
 {
 	// Sanity check
-	if ( brigadeID == HCUnitID::null )
+	if ( brigadeID == 0 )
 		return;
 
 	// Check that they* are* actually who we think is running this brigade

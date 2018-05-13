@@ -41,6 +41,12 @@ module wwii
 		const char* callsign();
 		const char* shortName();
 		
+		bool isAbove(const HCUnit* rhs);
+		bool isAbove(UINT16 rhs);
+		bool isBelow(UINT16 rhs);
+		bool isBelow(const HCUnit* rhs);
+		bool isBelowOrEqual(UINT16 rhs);
+		bool isBelowOrEqual(const HCUnit* rhs);
 		bool isBrigade();
 		bool isDivision();
 		bool isMarineUnit();
