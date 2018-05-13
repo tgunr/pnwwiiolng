@@ -29,9 +29,9 @@ static std::map<HCUnitID, std::unique_ptr<HCUnit>> s_hcUnitPointers;
 SINT32
 wwiiPackBrigadeID(PackMode mode, UCHAR* data, SINT32 offset, HCUnitID& brigadeID, SINT32 /*size*/)
 {
-	uint32_t int_id = ToInt(brigadeID);
-	static_assert ( sizeof(int_id) >= sizeof(ToInt(brigadeID)) ,
+	static_assert ( std::numeric_limits<uint32_t>::max() >= ToInt(HCUnitID::max) ,
 	                "Brigade packing type is not large enough" );
+	uint32_t int_id = ToInt(brigadeID);
 	return teulPackUINT32(mode, data, offset, &int_id, BitsRequired(ToInt(HCUnitID::max)));
 	brigadeID = FromInt<HCUnitID>(int_id);
 }

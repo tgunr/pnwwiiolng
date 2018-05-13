@@ -49,7 +49,7 @@ _unitLocationsKeyframe(HC_UNIT_LOCATIONS& hculUpdate)
 		if ( lastMovements[unit->unitID()] < frameWindow )
 			continue;
 
-		entry.m_unitID = ToInt(unit->unitID());
+		entry.m_unitID = unit->unitID();
 		entry.m_homeCPID = unit->homeCPID();
 		hculUpdate.add(entry);
 	}

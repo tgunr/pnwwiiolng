@@ -2022,7 +2022,7 @@ _buildMovementsUpdate(HC_UNIT_LOCATIONS& packet, const UINT64& start, const UINT
 		unit = HCUnit::Lookup(it->first);
 		if ( !unit )
 			continue;
-		entry.m_unitID = ToInt(it->first);
+		entry.m_unitID = it->first;
 		entry.m_homeCPID = unit->homeCPID();
 		packet.add(entry);
 	}
