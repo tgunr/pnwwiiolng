@@ -494,10 +494,10 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 	float* fontcolor	= (_selected) ? _renderer->selectedcolor: _namecolor;
 
 	// draw the bg color box
-	float bgx	= IsValid(_bestunit) ? -(bigiconsize + iconbuffer*2): -iconbuffer;
+	float bgx	= (_bestunit) ? -(bigiconsize + iconbuffer*2): -iconbuffer;
 	float bgy	= -((iconbuffer * 3) + iconsize);
 	float bgh	= fontheight + (iconbuffer * 4) + iconsize;
-	float bgw	= IsValid(_bestunit) ? bigiconsize + fontwidth + iconbuffer*3: fontwidth + iconbuffer*2;
+	float bgw	= (_bestunit) ? bigiconsize + fontwidth + iconbuffer*3: fontwidth + iconbuffer*2;
 
 	phui::BoxVerts box;
 	phui::box_verts_with_pos(box, bgx - 5, bgy, bgw + 34, bgh);
@@ -505,7 +505,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 	if(_contended)
 		ctx->SetColor(.5f,.5f,0.0f,.7f);
 	else
-		ctx->SetColor(.3f,.3f,.3f,IsValid(_bestunit) ? 1.0f: .6f);
+		ctx->SetColor(.3f,.3f,.3f,(_bestunit) ? 1.0f: .6f);
 
 	ctx->DrawQuad(box.verts);
 
@@ -675,7 +675,7 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 	_namecolor		= (_cpside == 1) ? _renderer->alliedcolor: _renderer->axiscolor;
 	_cutoff			= 0;
 	_objective		= 0;
-	_bestunit		= HCUnitID::null;
+	_bestunit		= 0;
 	_bestuniticon	= -1;
 	_unitcount		= 0;
 	_contended		= false;
@@ -712,13 +712,13 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 		// other unit here?
 		_altuniticon = 0;
 
-		if(IsValid(_bestunit))
+		if(_bestunit)
 		{
 			HCUnit* unit = HCUnit::Lookup(_bestunit);
 
 			if(unit)
 			{
-				HCUnitID bestAlliedUnit = _cp.FindBestAlliedUnit(unit->side(), unit->country());
+				UINT32 bestAlliedUnit = _cp.FindBestAlliedUnit(unit->side(), unit->country());
 				HCUnit* alliedUnit = HCUnit::Lookup(bestAlliedUnit);
 
 				switch(unit->country())
@@ -748,7 +748,7 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 		{
 			const BrigadeSelection& current = _renderer->client->BrigadeSelected();
 
-			if(IsValid(current.m_detail.brigadeID()))
+			if(current.m_detail.brigadeID())
 			{
 				HCUnit* myBrigade = HCUnit::Lookup(current.m_detail.brigadeID());
 				HCUnit* myDivision = myBrigade->parent();
@@ -970,7 +970,7 @@ bool CPMapObject::ObjectVisible() const
 		   (_renderer->showfront && cpflags & CP_STAT_ENEMY_LINKED) ||
 		   (_renderer->showrear && !(cpflags & CP_STAT_ENEMY_LINKED)) ||
 		   (_renderer->showobjectives && cpflags & CP_OBJECTIVES) ||
-		   (_renderer->showbrigades && IsValid(_bestunit)) ||
+		   (_renderer->showbrigades && _bestunit) ||
 		   (_renderer->showairfields && cpflags & CP_STAT_HAS_AIRBASE) ||
 		   (_renderer->showports && cpflags & CP_STAT_HAS_NAVYBASE) ||
 		   (_renderer->showdeployments && cpflags & (CP_STAT_HAS_RARE_NAVY | CP_STAT_HAS_RARE_AIR | CP_STAT_HAS_RARE_INF)) ||
@@ -1075,7 +1075,7 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 			int objective		= 0;
 			int cpflags			= _cp.StratFlags(true);
 			int side			= _renderer->client ? (_renderer->client->PersonaSelected().m_countryID == 4) ? 2:1 : 0;
-			HCUnitID myBrigadeID = _renderer->client ? _renderer->client->BrigadeSelected().m_detail.brigadeID() : HCUnitID::null;
+			UINT32 myBrigadeID	= _renderer->client ? _renderer->client->BrigadeSelected().m_detail.brigadeID() : 0;
 
 			if((side == ALLIED && cpflags & CP_STAT_ALLIED_ATTACK_OBJ) ||
 			   (side == AXIS && cpflags & CP_STAT_AXIS_ATTACK_OBJ)) objective = 1;
@@ -1163,7 +1163,7 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 
 				HCUnit* unit			= nullptr;
 				BrigadeControlList* oic	= nullptr;
-				HCUnitID current = HCUnitID::null;
+				unsigned int current	= 0;
 				bool foundMine			= false;
 
 				for(int i = 0; i < (int)units.size(); ++i)

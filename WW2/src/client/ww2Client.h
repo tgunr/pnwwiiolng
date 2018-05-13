@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "chat/chatPrototypes.h"			// Common chat structure protos
-#include "wwii/wwiiHCUnitsIndex.h"
 
 struct SHARED_VEHICLE_INFO;
 struct VEHICLE_REPLY;
@@ -172,8 +171,8 @@ public:
 	virtual int RequestMissionLookup(int missionID); // isn't necessarily a mission in your brigade
 	virtual int RequestClientSpawn(WEAPON_SERIAL const&, bool wantMobileSpawn);
 	virtual int RequestPersonaSelection(PersonaSummary const&);
-	virtual int RequestBrigadeSelection(HCUnitID brigadeID);
-	virtual int RequestBrigadeDetail(HCUnitID brigadeID);
+	virtual int RequestBrigadeSelection(unsigned int brigadeID);
+	virtual int RequestBrigadeDetail(unsigned int brigadeID);
 	virtual int RequestMissionList();
 	virtual int RequestQuickMissionList();
 	virtual int RequestBrigadeList();
@@ -197,7 +196,7 @@ public:
 	virtual bool GetKilledByAI();
 	virtual bool IsHC() const;
 	virtual bool IsOIC() const;
-	virtual HCUnitID OICOfBrigade() const; // return the brigade I'm OIC of or 0
+	virtual unsigned int OICOfBrigade() const; // return the brigade I'm OIC of or 0
 
 	virtual int SetWaypoint(Waypoint const&);
 	virtual int RemoveWaypoint(unsigned long long handle);
@@ -300,7 +299,7 @@ public:
 
 	virtual bool SelectInstance(UINT32 category, UINT32 type = 0, bool save = false, bool force = false);
 	virtual bool SelectPersona(const PersonaSummary& persona, bool save = false, bool force = false);
-	virtual bool SelectBrigade(HCUnitID brigadeID, bool save = false, bool force = false);
+	virtual bool SelectBrigade(UINT32 brigadeID, bool save = false, bool force = false);
 	virtual bool LoadSavedPersona(bool force = false);
 
 	FacilityWeaponList const& WeaponList() const;
@@ -339,7 +338,7 @@ public:
 	OpinionPoll const& GetOpinionPoll() const;
 	VEHICLE_REPLY const& VehicleReply() const;
 	MissionDetail& MissionLookup() const;
-	BrigadeControlList* LookupBrigadeOIC(HCUnitID brigadeID) const;
+	BrigadeControlList* LookupBrigadeOIC(int brigadeID) const;
 	SquadRecruitment& PlayerSquadRecruitment() const;
 	MissionInvite const& GetMissionInvite() const;
 	const Instance::Descriptor& GetInstance() const;

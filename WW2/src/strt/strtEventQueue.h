@@ -30,8 +30,6 @@ enum STRAT_UPDATE_TYPE
 
 struct STRAT_UPDATE : public IntrusiveList<STRAT_UPDATE>::Node
 {
-	using Value = UINT32;
-
 	STRAT_UPDATE() : updateTime(0), type(MAX_STRAT_UPDATE_TYPE), value(0), data(nullptr)
 	{}
 	explicit STRAT_UPDATE(UINT32 updateTime_, STRAT_UPDATE_TYPE type_, UINT32 value_=0, void* data_=nullptr)
@@ -45,7 +43,7 @@ struct STRAT_UPDATE : public IntrusiveList<STRAT_UPDATE>::Node
 	UINT32				updateTime;		// The time the update is going to go out
 										//	in real world time
 	STRAT_UPDATE_TYPE	type;			// type of update
-	Value				value;			// Any value we need to pass
+	UINT32				value;			// Any value we need to pass
 	void* 				data;			// In case of a weapon expiring (or other
 										//	such events), it points to the
 										//	appropriate data

@@ -134,7 +134,7 @@ chatSendMissionDeletionNotice(const UINT32& missionID)
 Chat::PersonaUpdate::PersonaUpdate(
 		const ChatHandle handle, WWII_COUNTRY country, BRANCH_ENUM branch, RANK_NO rank
 		, const Instance::Descriptor& instance, const UINT32 sortieID
-		, HCUnitID brigade, UINT32 mission, const ChatHandle leader
+		, UINT32 brigade, UINT32 mission, const ChatHandle leader
 		, const FULL_OBJ_ID origin, const FULL_OBJ_ID target, const PermissionMask mask, const WEAPON_SPEC weapon
 		, bool isSpawned, bool badChecksum
 	)
@@ -154,7 +154,7 @@ Chat::PersonaUpdate::PersonaUpdate(
 	, m_isSpawned(isSpawned)
 	, m_badChecksum(host_config.arena.checksums ? badChecksum : false)
 {
-	if ( brigade == HCUnitID::null || mission == 0 )
+	if ( brigade == 0 || mission == 0 )
 	{
 		m_origin = nullObjID;
 		m_target = nullObjID;
@@ -170,7 +170,7 @@ SINT32
 BRIGADE_MOVE_MSG::receive(SINT32 teulIndex, BRIGADE_MOVE_MSG& incoming)
 {
 	const BrigadeMove& data = incoming.data();
-	HCUnit* unit = HCUnit::Lookup(data.m_brigadeID);
+	HCUnit* unit = HCUnit::Lookup((UINT32)data.m_brigadeID);
 	if ( unit == nullptr ) throw std::invalid_argument("move message for unknown brigade");
 
 	if ( data.m_destination.id != 0 )

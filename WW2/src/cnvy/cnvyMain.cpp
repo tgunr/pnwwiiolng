@@ -200,9 +200,9 @@ cnvyAddWeaponToExpireList(POSTED_WEAPON& weapon, UINT32 expireSeconds)
 // Schedule a brigade reformation
 
 STRAT_UPDATE*
-cnvyScheduleBrigadeReformation(HCUnitID brigadeID, UINT32 delay)
+cnvyScheduleBrigadeReformation(UINT32 brigadeID, UINT32 delay)
 {
-	if ( brigadeID == HCUnitID::null )
+	if ( brigadeID == 0 )
 	{
 		dbugLog(_FLA, "Requested brigade reformation for id 0 - invalid");
 		return nullptr;
@@ -215,9 +215,7 @@ cnvyScheduleBrigadeReformation(HCUnitID brigadeID, UINT32 delay)
 		return nullptr;
 	}
 
-	static_assert (sizeof(HCUnitID) <= sizeof(STRAT_UPDATE::Value),
-	               "HCUnitID is too large to be transmitted");
-	return _createStratUpdate(teulTime() + delay, STRAT_REFORM_BRIGADE, static_cast<STRAT_UPDATE::Value>(brigadeID));
+	return _createStratUpdate(teulTime() + delay, STRAT_REFORM_BRIGADE, brigadeID);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -576,10 +574,8 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 
 		case STRAT_REFORM_BRIGADE:
 			// Redeploy a brigade to its division
-			static_assert ( sizeof(HCUnitID) <= sizeof(STRAT_UPDATE::Value),
-			                "HCUnitID is too large to be transmitted" );
-			dbugLog(_FLI, "hcu:%u reforming brigade", update->value);
-			strtReformBrigade(static_cast<HCUnitID>(update->value), update);
+			dbugLog(_FLI, "hcu:%u reforming brigade", (UINT32)update->value);
+			strtReformBrigade((UINT32)update->value, update);
 			// HACK: If successful, the above will call StratHCUnit::deploy(), which will in
 			// turn "cancel" the event that triggered deploy(), freeing it. If failed, the
 			// event will remain pointed to by the brigade, which will free it later.

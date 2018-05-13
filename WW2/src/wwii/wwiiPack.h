@@ -7,9 +7,7 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include "wwiiHCUnitsIndex.h"
-
-extern SINT32 wwiiPackBrigadeID(PackMode mode, UCHAR* const data, SINT32 offset, HCUnitID& brigadeID, SINT32 size=0);
+extern SINT32 wwiiPackBrigadeID(PackMode mode, UCHAR* const data, SINT32 offset, UINT32& brigadeID, SINT32 size=0);
 
 extern SINT32 wwiiPackFullObjID(PackMode mode, UCHAR* data, SINT32 offset, FULL_OBJ_ID* const object, SINT32 /*size*/);
 

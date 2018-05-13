@@ -45,6 +45,10 @@ module strat
 			void SetVisLevel(int vislevel);
 			void AddStratFlags(unsigned int flags);
 			void ClearStratFlags(unsigned int flags);
+			
+			void AddUnit(unsigned int id);
+			void RemoveUnit(unsigned int id);
+			bool IsUnitHere(unsigned int id) const;
 		};
 		
 		StratObject* FindStratObject(const FULL_OBJ_ID& id);

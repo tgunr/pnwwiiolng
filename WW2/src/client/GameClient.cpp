@@ -626,7 +626,7 @@ bool GameClient::SelectPersona(const PersonaSummary& selected, bool save, bool f
 	SelectBrigade
 *************************************************************************************************/
 
-bool GameClient::SelectBrigade(HCUnitID brigadeID, bool save, bool force)
+bool GameClient::SelectBrigade(UINT32 brigadeID, bool save, bool force)
 {
 	// try to select it
 	bool ok = Client::SelectBrigade(brigadeID, save, force);

@@ -22,7 +22,7 @@ extern void strtDisableDebugSupply();
 // Get the current supply debug state
 extern bool strtGetDebugSupply();
 
-extern HCUnitID strtGetSupplyingUnit(const FacilityStruct& facility, HCUnitID brigadeID);
+extern UINT32 strtGetSupplyingUnit(const FacilityStruct& facility, UINT32 brigadeID);
 
 // Process the resupply queues
 extern void strtProcessResupply();

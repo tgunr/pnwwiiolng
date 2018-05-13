@@ -1073,6 +1073,161 @@ static int tolua_wwii_wwii_HCUnit_isAbove00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: isAbove of class  HCUnit */
+#ifndef TOLUA_DISABLE_tolua_wwii_wwii_HCUnit_isAbove01
+static int tolua_wwii_wwii_HCUnit_isAbove01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"HCUnit",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  HCUnit* self = (HCUnit*)  tolua_tousertype(tolua_S,1,0);
+  unsigned short rhs = (( unsigned short)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'isAbove'",NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->isAbove(rhs);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_wwii_wwii_HCUnit_isAbove00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: isBelow of class  HCUnit */
+#ifndef TOLUA_DISABLE_tolua_wwii_wwii_HCUnit_isBelow00
+static int tolua_wwii_wwii_HCUnit_isBelow00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"HCUnit",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  HCUnit* self = (HCUnit*)  tolua_tousertype(tolua_S,1,0);
+  unsigned short rhs = (( unsigned short)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'isBelow'",NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->isBelow(rhs);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'isBelow'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: isBelow of class  HCUnit */
+#ifndef TOLUA_DISABLE_tolua_wwii_wwii_HCUnit_isBelow01
+static int tolua_wwii_wwii_HCUnit_isBelow01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"HCUnit",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const HCUnit",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  HCUnit* self = (HCUnit*)  tolua_tousertype(tolua_S,1,0);
+  const HCUnit* rhs = ((const HCUnit*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'isBelow'",NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->isBelow(rhs);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_wwii_wwii_HCUnit_isBelow00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: isBelowOrEqual of class  HCUnit */
+#ifndef TOLUA_DISABLE_tolua_wwii_wwii_HCUnit_isBelowOrEqual00
+static int tolua_wwii_wwii_HCUnit_isBelowOrEqual00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"HCUnit",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  HCUnit* self = (HCUnit*)  tolua_tousertype(tolua_S,1,0);
+  unsigned short rhs = (( unsigned short)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'isBelowOrEqual'",NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->isBelowOrEqual(rhs);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'isBelowOrEqual'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: isBelowOrEqual of class  HCUnit */
+#ifndef TOLUA_DISABLE_tolua_wwii_wwii_HCUnit_isBelowOrEqual01
+static int tolua_wwii_wwii_HCUnit_isBelowOrEqual01(lua_State* tolua_S)
+{
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"HCUnit",0,&tolua_err) ||
+     !tolua_isusertype(tolua_S,2,"const HCUnit",0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+ {
+  HCUnit* self = (HCUnit*)  tolua_tousertype(tolua_S,1,0);
+  const HCUnit* rhs = ((const HCUnit*)  tolua_tousertype(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'isBelowOrEqual'",NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->isBelowOrEqual(rhs);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+tolua_lerror:
+ return tolua_wwii_wwii_HCUnit_isBelowOrEqual00(tolua_S);
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* method: isBrigade of class  HCUnit */
 #ifndef TOLUA_DISABLE_tolua_wwii_wwii_HCUnit_isBrigade00
 static int tolua_wwii_wwii_HCUnit_isBrigade00(lua_State* tolua_S)
@@ -1389,6 +1544,11 @@ TOLUA_API int tolua_wwii_open (lua_State* tolua_S)
     tolua_function(tolua_S,"callsign",tolua_wwii_wwii_HCUnit_callsign00);
     tolua_function(tolua_S,"shortName",tolua_wwii_wwii_HCUnit_shortName00);
     tolua_function(tolua_S,"isAbove",tolua_wwii_wwii_HCUnit_isAbove00);
+    tolua_function(tolua_S,"isAbove",tolua_wwii_wwii_HCUnit_isAbove01);
+    tolua_function(tolua_S,"isBelow",tolua_wwii_wwii_HCUnit_isBelow00);
+    tolua_function(tolua_S,"isBelow",tolua_wwii_wwii_HCUnit_isBelow01);
+    tolua_function(tolua_S,"isBelowOrEqual",tolua_wwii_wwii_HCUnit_isBelowOrEqual00);
+    tolua_function(tolua_S,"isBelowOrEqual",tolua_wwii_wwii_HCUnit_isBelowOrEqual01);
     tolua_function(tolua_S,"isBrigade",tolua_wwii_wwii_HCUnit_isBrigade00);
     tolua_function(tolua_S,"isDivision",tolua_wwii_wwii_HCUnit_isDivision00);
     tolua_function(tolua_S,"isMarineUnit",tolua_wwii_wwii_HCUnit_isMarineUnit00);

@@ -389,7 +389,7 @@ JS_FUNCTION_DEF(jsClient, getmissbrigade) {
 	ww2::Client* client = jsclient->client;
 	for ( auto it = client->Missions().begin() ; it != client->Missions().end() ; ++it ) {
 		if ( it->m_missionID == miss_id ) {
-			*rval = INT_TO_JSVAL(ToInt(it->m_brigadeID));
+			*rval = INT_TO_JSVAL(it->m_brigadeID);
 			return JS_TRUE;
 		}
 	}
@@ -446,7 +446,7 @@ JS_FUNCTION_DEF(jsClient, acceptoicnomination)
 	if(accept)
 	{
 		BrigadeControlRequest req;
-		req.volunteerOIC(PlayerClient()->ChatConnection(), FromInt<HCUnitID>(brigadeID));
+		req.volunteerOIC(PlayerClient()->ChatConnection(), brigadeID);
 	}
 	else
 	{
@@ -469,11 +469,10 @@ JS_FUNCTION_DEF(jsClient, findbrigade)
 	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx,jsobj);
 	if(!jsclient) return JS_FALSE;
 
-	int32 int_id;
-	JS_ValueToInt32(ctx, argv[0], &int_id);
+	int32 brigadeID;
+	JS_ValueToInt32(ctx, argv[0], &brigadeID);
 
-	HCUnitID brigadeID = FromInt<HCUnitID>(int_id);
-	HCUnit* unit = HCUnit::Lookup(brigadeID);
+	HCUnit* unit = HCUnit::Lookup((UINT32)brigadeID);
 	if(unit)
 		*rval = (new jsBrigade(brigadeID))->jsVal();
 
@@ -651,17 +650,14 @@ JS_FUNCTION_DEF(jsClient, selectbrigade)
 	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx,jsobj);
 	if(!jsclient) return JS_FALSE;
 
-	HCUnitID brigadeID;
+	UINT32 brigadeID = 0;
 
 	jsBrigade* jsbrig = phui::js::Cast<jsBrigade*>(ctx, argv[0]);
 
 	if(jsbrig)
 		brigadeID = jsbrig->Detail().brigadeID();
-	else {
-		int32 int_id;
-		JS_ValueToInt32(ctx, argv[0], &int_id); // check to see if we passed in the id itself
-		brigadeID = FromInt<HCUnitID>(int_id);
-	}
+	else
+		JS_ValueToInt32(ctx, argv[0], (int32*)&brigadeID);  // check to see if we passed in the id itself
 
 	if(jsclient->client->SelectBrigade(brigadeID, true, true))
 		*rval = BOOLEAN_TO_JSVAL(JS_TRUE);
@@ -703,13 +699,10 @@ JS_FUNCTION_DEF(jsClient, selectinstance)
 
 		if(persona && jsclient->client->SelectPersona(*persona))
 		{
-			HCUnitID brigade = persona->m_brigadeID;
+			int32 brigade = persona->m_brigadeID;
 
-			if ( argc > 4 ) {
-				int32 int_id;
-				JS_ValueToInt32(ctx, argv[5], &int_id);
-				brigade = FromInt<HCUnitID>(int_id);
-			}
+			if(argc > 4)
+				JS_ValueToInt32(ctx, argv[5], &brigade);
 
 			if(jsclient->client->SelectBrigade(brigade))
 				success = true;
@@ -1855,10 +1848,10 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 		break;
 		case OICOF_PROP:
 		{
-			HCUnitID brigadeID = client->OICOfBrigade();
+			UINT32 brigadeID = client->OICOfBrigade();
 			*val = JSVAL_NULL;
 
-			if( IsValid(brigadeID) )
+			if(brigadeID)
 			{
 				if(!oicof.valid())
 					oicof = new jsBrigade(brigadeID);
@@ -2396,7 +2389,7 @@ jsBrigade::jsBrigade(BrigadeSummary const& s)
 	}
 };
 
-jsBrigade::jsBrigade(HCUnitID brigadeid)
+jsBrigade::jsBrigade(unsigned int brigadeid)
 			: phui::js::Object(&jsclass,jsfunctions,jsproperties)
 			, officerranks(0), officernames(0)
 {
@@ -2575,9 +2568,9 @@ JS_FUNCTION_DEF(jsBrigade, resign)
 	if(!jsbrigade) return JS_FALSE;
 
 	const BrigadeDetail& detail	= jsbrigade->Detail();
-	HCUnitID myOICBrigadeID = PlayerClient()->OICOfBrigade();
+	UINT32 myOICBrigadeID	= PlayerClient()->OICOfBrigade();
 
-	if(myOICBrigadeID == detail.brigadeID())
+	if(myOICBrigadeID == (UINT32)detail.brigadeID())
 	{
 		BrigadeControlRequest req;
 		req.resignOIC(
@@ -2605,7 +2598,7 @@ JS_FUNCTION_DEF(jsBrigade, move)
 
 	const BrigadeDetail& detail	= jsbrigade->Detail();
 
-	if(PlayerClient()->IsHC() || PlayerClient()->OICOfBrigade() != HCUnitID::null)
+	if(PlayerClient()->IsHC() || PlayerClient()->OICOfBrigade() > 0)
 	{
 		jsStratObject* origin = phui::js::Cast<jsStratObject*>(ctx, argv[0]);
 		jsStratObject* target = phui::js::Cast<jsStratObject*>(ctx, argv[1]);
@@ -3276,7 +3269,7 @@ jsHCUnit::jsHCUnit(HCUnit& h)
 	DefineProperty("country",  new jsCountry(h.country()));
 };
 
-jsHCUnit::jsHCUnit(HCUnitID id)
+jsHCUnit::jsHCUnit(UINT32 id)
 			: phui::js::Object(&jsclass,jsfunctions,jsproperties)
 			, unitid(id)
 {
@@ -3951,7 +3944,7 @@ jsChatWho::jsChatWho(Chat::Who const& who) :
 			DefineProperty("country", new jsCountry(who.country()));
 			DefineProperty("rank", new jsRank(who.country(), who.branch(), who.rank()));
 
-			if(IsValid(who.hcUnitID()))
+			if(who.hcUnitID())
 			{
 				DefineProperty("brigade", new jsBrigade(who.hcUnitID()));
 

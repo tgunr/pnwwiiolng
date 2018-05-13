@@ -23,7 +23,7 @@
 #include "chat/chatHostBrigadeControl.h"
 #include "wwii/wwiiConfig.h"
 
-using LAST_MOVEMENTS = std::map<HCUnitID,UINT32>;
+using LAST_MOVEMENTS = std::map<UINT32,UINT32>;
 static LAST_MOVEMENTS lastMovements;
 bool g_newLocations = false;
 
@@ -101,7 +101,7 @@ chatUpdateHCUnitLocations()
 //////////////////////////////////////////////////////////////////////
 
 static void
-_changeHome(const ChatHandle handle, const HCUnitID brigadeID, const FULL_OBJ_ID destinationID)
+_changeHome(const ChatHandle handle, const UINT32 brigadeID, const FULL_OBJ_ID destinationID)
 {
 	HCUnit* const unit = HCUnit::Lookup(brigadeID);
 	if ( unit == nullptr )

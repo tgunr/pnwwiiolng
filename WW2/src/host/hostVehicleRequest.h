@@ -30,7 +30,7 @@ struct VehicleRequest
 	VehicleRequest(const instanceid_t instanceID, sortieid_t serial, const WEAPON_SPEC spec) noexcept
 		: m_instanceID(instanceID)
 		, m_weaponSerial()
-		, m_brigadeID(HCUnitID::null)
+		, m_brigadeID(0)
 		, m_missionID(0)
 		, m_players()
 		, m_handle(0ULL)
@@ -48,7 +48,7 @@ struct VehicleRequest
 	//! The weapon serial stuff.
 	WEAPON_SERIAL	m_weaponSerial;
 	//! Brigade and initial mission ID.
-	HCUnitID		m_brigadeID;
+	UINT32			m_brigadeID;
 	UINT32			m_missionID;
 	//! The origin for the vehicle.
 	//! List of players who will be joining it.

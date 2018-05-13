@@ -13,7 +13,7 @@ enum ORDER_TYPE { ORD_ATTACK, ORD_DEFEND, ORD_CLEAR };
 #pragma pack(push, 1)
 struct AttackOrder
 {
-	AttackOrder(const ChatHandle requester, HCUnitID brigadeID, const FULL_OBJ_ID target, ORDER_TYPE orderType, bool isExecute)
+	AttackOrder(const ChatHandle requester, UINT32 brigadeID, const FULL_OBJ_ID target, ORDER_TYPE orderType, bool isExecute)
 		: m_requester(requester), m_brigadeID(brigadeID), m_target(target), m_orderType((UCHAR)orderType), m_execute(isExecute)
 		, m_result(0), m_delay(0)
 	{
@@ -22,7 +22,7 @@ struct AttackOrder
 	void process();
 
 	ChatHandle	m_requester;
-	HCUnitID	m_brigadeID;
+	UINT32		m_brigadeID;
 	FULL_OBJ_ID	m_target;
 	UCHAR		m_orderType;
 	bool		m_execute;

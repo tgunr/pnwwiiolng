@@ -31,7 +31,7 @@ public:
 	void addMembers(const SquadMembers& members);
 	void removeMember(const Chat::Who& who);
 	bool isMember(const ChatHandle handle) const;
-	bool isSquadBrigade(const HCUnitID brigadeID, bool excludeMe = true) const; // is the squad represented here?
+	bool isSquadBrigade(const UINT32 brigadeID, bool excludeMe = true) const; // is the squad represented here?
 	bool isSquadMission(const UINT32 missionID, bool excludeMe = true) const; // is the squad represented here?
 	const SquadMembers& members(bool reset = false) const;
 	bool modified() const { return m_modified; }

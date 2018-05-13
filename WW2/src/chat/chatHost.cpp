@@ -398,7 +398,7 @@ chatSystemMessage(LSTRING_ID messageID, const char* const ptr0, const char* cons
 //////////////////////////////////////////////////////////////////////
 // Implementation for HCUnitBroadcast...
 
-using SUBORDINATES = std::vector<HCUnitID>;
+using SUBORDINATES = std::vector<UINT32>;
 static SUBORDINATES _currentUnits;
 
 //////////////////////////////////////////////////////////////////////
@@ -408,7 +408,7 @@ bool
 HCUnitBroadcast::operator()(wwiiPlayer* const& wwiiPlayer) const
 {
 	const Player* player = static_cast<const Player*>(wwiiPlayer);
-	if ( player->teulIndex() < 0 || IsInvalid(player->brigadeID()) )
+	if ( player->teulIndex() < 0 || !player->brigadeID() )
 		return false;
 	if ( player->isActiveOfficer() && !player->hcOff() )
 		return true;
@@ -1158,11 +1158,11 @@ _wtfEasterEgg(Player* player, const Chat::ClientMessage* message)
 // Inject the unit name and mission leader as they are available.
 
 bool
-_injectUnitAndLeader(std::string& buffer, const size_t pos, HCUnitID brigadeID, UINT32 missionID, const size_t charsToSubtitute)
+_injectUnitAndLeader(std::string& buffer, const size_t pos, UINT32 brigadeID, UINT32 missionID, const size_t charsToSubtitute)
 {
 	std::string unitName = "";
 
-	if ( IsValid(brigadeID) )
+	if ( brigadeID )
 	{
 		const HCUnit* const unit = HCUnit::Lookup(brigadeID);
 		if ( unit != nullptr )
@@ -1269,7 +1269,7 @@ _processDollars(const Player* player, const char* base, char* start)
 		}
 		else if ( buffer.compare(pos + 1, _NAME_LEN, "lead") == 0 )
 		{
-			translations = _injectUnitAndLeader(buffer, pos, HCUnitID::null, player->missionID(), _TAG_LEN);
+			translations = _injectUnitAndLeader(buffer, pos, 0, player->missionID(), _TAG_LEN);
 		}
 		else if ( buffer.compare(pos + 1, _NAME_LEN, "targ") == 0 )
 		{
@@ -2154,8 +2154,8 @@ Player::tuneRadioToNumberedChannel(UCHAR index, UINT32 channelNo)
 
 struct BrigadeFilter : public FilterFn
 {
-	HCUnitID m_brigadeID;
-	BrigadeFilter(HCUnitID brigadeID) : m_brigadeID(brigadeID) {}
+	UINT32 m_brigadeID;
+	BrigadeFilter(UINT32 brigadeID) : m_brigadeID(brigadeID) {}
 	bool operator()(const wwiiPlayer* cur) const { return (cur->brigadeID() == m_brigadeID); }
 };
 
@@ -2167,7 +2167,7 @@ _distributeHCUnitMessage(Chat::Broadcast& broadcast)
 		return;
 
 	PLAYERS& side = sidePlayers[unit->side()];
-	chatBroadcastLocMessage(side.begin(), side.end(), broadcast, BrigadeFilter(FromInt<HCUnitID>(broadcast.m_targetID)));
+	chatBroadcastLocMessage(side.begin(), side.end(), broadcast, BrigadeFilter(static_cast<UINT32>(broadcast.m_targetID)));
 }
 
 static void
@@ -2970,7 +2970,7 @@ _checkForShutdown()
 	if ( g_shutdownLockedArena + 5 > teulTime() )
 		return false;
 
-	OOBMessage message(0, HCUnitID::null, systemHandleID, "arenalock", "15", nullObjID, WWII_NO_SIDE, WWII_NO_COUNTRY);
+	OOBMessage message(0, 0, systemHandleID, "arenalock", "15", nullObjID, WWII_NO_SIDE, WWII_NO_COUNTRY);
 	message.send();
 	g_shutdownLockedArena = teulTime();
 

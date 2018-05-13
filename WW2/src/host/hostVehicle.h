@@ -53,7 +53,7 @@ public:
 
 	void interruptCapture();
 
-	HCUnitID brigadeID() const { return vehicleData.brigadeID; }
+	UINT32 brigadeID() const { return vehicleData.brigadeID; }
 	const char* callsign() const { return vehicleData.callsign; }
 	bool canDespawnAt(const HostVehicle*) const;
 	bool canSeeHiddenBuzzards() const;

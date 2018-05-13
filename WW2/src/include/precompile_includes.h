@@ -25,7 +25,6 @@
 #include <memory>
 #include <set>
 #include <string>
-#include <type_traits>
 #include <vector>
 #include <numeric>
 #include <thread>
@@ -117,23 +116,3 @@ struct AtScope {
 };
 
 #define WITH(...) if ( const auto& _with_=__VA_ARGS__ ) { noreturn_fn(); } else
-
-//==============
-// Tell the number of bits required to pack a given value.
-
-template <typename T>
-constexpr size_t BitsRequired(T v) {
-	assert ( v > 0 );
-	return (v == 1 ? 1 : 1 + BitsRequired(v>>1));
-}
-
-//==============
-// Quickly cast an enum class to/from its underlying integral type.
-
-template<typename T>
-constexpr auto ToInt(T t) -> typename std::underlying_type<T>::type
-{ return static_cast<typename std::underlying_type<T>::type>(t); }
-
-template<typename T>
-constexpr T FromInt(typename std::underlying_type<T>::type val)
-{ return static_cast<T>(val); }

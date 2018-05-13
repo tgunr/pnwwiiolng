@@ -24,7 +24,7 @@ static const int OOB_STRING_SIZE = OOB_STRING_LEN + 1;
 class OOBMessage
 {
 public:
-	OOBMessage(UINT32 playerID, HCUnitID brigadeID, const ChatHandle handleID, const char* command, const char* arguments
+	OOBMessage(UINT32 playerID, UINT32 brigadeID, const ChatHandle handleID, const char* command, const char* arguments
 				, const FULL_OBJ_ID cpID, WWII_SIDE side, WWII_COUNTRY country);
 	OOBMessage();
 	OOBMessage(ACTION_OBJECT* const a);
@@ -38,7 +38,7 @@ public:
 
 public:
 	UINT32			m_originatorID;		// Player ID of originator (or 0 for system)
-	HCUnitID		m_brigadeID;		// ID of the brigade player is in or requesting
+	UINT32			m_brigadeID;		// ID of the brigade player is in or requesting
 	ChatHandle		m_handleID;			// Packed handle of originator
 	FULL_OBJ_ID		m_cpID;				// Origin facility of the GM
 	WWII_COUNTRY	m_country;			// Country of the sender
@@ -115,7 +115,7 @@ public:
 	WWII_SIDE		m_side;					// Which country they belong to
 	SCMD_RESULT		m_result;				// The result they produced
 	UINT32			m_data;					// For argument passing
-	HCUnitID		m_brigadeID;
+	UINT32			m_brigadeID;
 
 	StratCommand(UINT32 issuer, SCMD_ENUM command, FULL_OBJ_ID cp, WWII_SIDE side, SCMD_RESULT result=SCMD_NO_EFFECT);
 	StratCommand(ACTION_OBJECT* const a);

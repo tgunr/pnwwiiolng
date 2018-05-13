@@ -187,7 +187,7 @@ class jsHCUnit : public phui::js::Object
 {
 public:
 	jsHCUnit(HCUnit&);
-	jsHCUnit(HCUnitID unitID);
+	jsHCUnit(UINT32 unitID);
 
 	JS_CLASS_DATA;
 
@@ -198,7 +198,7 @@ public:
 	virtual JSBool SetProperty(JSContext* ctx, int propid, jsval* val);
 
 protected:
-	HCUnitID unitid;
+	UINT32 unitid;
 
 	~jsHCUnit();
 };
@@ -208,7 +208,7 @@ class jsBrigade : public phui::js::Object
 public:
 	jsBrigade(BrigadeSummary const&);
 	jsBrigade(BrigadeDetail const&);
-	jsBrigade(HCUnitID brigadeid);
+	jsBrigade(unsigned int brigadeid);
 
 	JS_CLASS_DATA;
 	JS_FUNCTION(nominate);

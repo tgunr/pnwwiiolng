@@ -1040,6 +1040,106 @@ static int tolua_strt_strat_StratDB_StratObject_ClearStratFlags00(lua_State* tol
 }
 #endif //#ifndef TOLUA_DISABLE
 
+/* method: AddUnit of class  StratDB::StratObject */
+#ifndef TOLUA_DISABLE_tolua_strt_strat_StratDB_StratObject_AddUnit00
+static int tolua_strt_strat_StratDB_StratObject_AddUnit00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"StratDB::StratObject",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  StratDB::StratObject* self = (StratDB::StratObject*)  tolua_tousertype(tolua_S,1,0);
+  unsigned int id = ((unsigned int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'AddUnit'",NULL);
+#endif
+  {
+   self->AddUnit(id);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'AddUnit'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: RemoveUnit of class  StratDB::StratObject */
+#ifndef TOLUA_DISABLE_tolua_strt_strat_StratDB_StratObject_RemoveUnit00
+static int tolua_strt_strat_StratDB_StratObject_RemoveUnit00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"StratDB::StratObject",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  StratDB::StratObject* self = (StratDB::StratObject*)  tolua_tousertype(tolua_S,1,0);
+  unsigned int id = ((unsigned int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'RemoveUnit'",NULL);
+#endif
+  {
+   self->RemoveUnit(id);
+  }
+ }
+ return 0;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'RemoveUnit'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: IsUnitHere of class  StratDB::StratObject */
+#ifndef TOLUA_DISABLE_tolua_strt_strat_StratDB_StratObject_IsUnitHere00
+static int tolua_strt_strat_StratDB_StratObject_IsUnitHere00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"const StratDB::StratObject",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  const StratDB::StratObject* self = (const StratDB::StratObject*)  tolua_tousertype(tolua_S,1,0);
+  unsigned int id = ((unsigned int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsUnitHere'",NULL);
+#endif
+  {
+   bool tolua_ret = (bool)  self->IsUnitHere(id);
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'IsUnitHere'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
 /* function: StratDB::FindStratObject */
 #ifndef TOLUA_DISABLE_tolua_strt_strat_StratDB_FindStratObject00
 static int tolua_strt_strat_StratDB_FindStratObject00(lua_State* tolua_S)
@@ -1252,6 +1352,9 @@ TOLUA_API int tolua_strt_open (lua_State* tolua_S)
      tolua_function(tolua_S,"SetVisLevel",tolua_strt_strat_StratDB_StratObject_SetVisLevel00);
      tolua_function(tolua_S,"AddStratFlags",tolua_strt_strat_StratDB_StratObject_AddStratFlags00);
      tolua_function(tolua_S,"ClearStratFlags",tolua_strt_strat_StratDB_StratObject_ClearStratFlags00);
+     tolua_function(tolua_S,"AddUnit",tolua_strt_strat_StratDB_StratObject_AddUnit00);
+     tolua_function(tolua_S,"RemoveUnit",tolua_strt_strat_StratDB_StratObject_RemoveUnit00);
+     tolua_function(tolua_S,"IsUnitHere",tolua_strt_strat_StratDB_StratObject_IsUnitHere00);
     tolua_endmodule(tolua_S);
     tolua_function(tolua_S,"FindStratObject",tolua_strt_strat_StratDB_FindStratObject00);
     tolua_function(tolua_S,"FindStratObject",tolua_strt_strat_StratDB_FindStratObject01);

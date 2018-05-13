@@ -118,18 +118,18 @@ strtGetDebugSupply()
 // Find the UnitID of the HQUnit that is providing supply for this
 // brigade at the specified facility
 
-HCUnitID
-strtGetSupplyingUnit(const FacilityStruct& facility, HCUnitID brigadeID)
+UINT32
+strtGetSupplyingUnit(const FacilityStruct& facility, UINT32 brigadeID)
 {
 	// Nothing doing if the town is farked
 	if ( facility.isMilitaryFacility() && facility.CP().side != facility.CP().controllingSide )
-		return HCUnitID::null;
+		return 0;
 
 	const StratHCUnit* brigade = StratHCUnit::Lookup(brigadeID);
 	if ( brigade == nullptr || !brigade->isBrigade() )
 	{
 		dbugLog(_FLA, "hcu:%u is not a brigade", brigadeID);
-		return HCUnitID::null;
+		return 0;
 	}
 
 	return facility.getSupplyingUnit(brigade, brigade->homeCP());

@@ -13,10 +13,10 @@ bool chatPatrolBrigadeElections();
 
 // Place a movement proposal for a brigade, information HC officers and giving them
 // opportunity to block the movement.
-void chatBrigadeMoveProposal(HCUnitID brigadeID, const struct FULL_OBJ_ID destination, ChatHandle byHandle);
+void chatBrigadeMoveProposal(UINT32 brigadeID, const struct FULL_OBJ_ID destination, ChatHandle byHandle);
 
 // Take a player out of the OIC position of the specified brigade
-void chatRemoveOICStatus(HCUnitID brigadeID, const ChatHandle handle);
+void chatRemoveOICStatus(UINT32 brigadeID, const ChatHandle handle);
 
 // Let people know that a unit has been moved
 class HCUnit;
