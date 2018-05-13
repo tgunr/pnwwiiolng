@@ -34,7 +34,7 @@ static inline bool _invalidTeulIndex(SINT32 teulIndex)
 
 static inline bool _invalidBrigade(HCUnitID brigadeID)
 {
-	return IsInvalid(brigadeID);
+	return brigadeID != HCUnitID::null;
 }
 
 //////////////////////////////////////////////////////////////////////
