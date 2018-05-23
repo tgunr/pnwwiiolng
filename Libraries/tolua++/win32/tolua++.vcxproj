@@ -30,7 +30,6 @@
     <ProjectGuid>{9557D2AE-9A8B-447E-B7F1-2A59929A4A06}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>tolua</RootNamespace>
-    <TargetPlatformVersion>8.1</TargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

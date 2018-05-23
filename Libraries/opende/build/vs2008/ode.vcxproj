@@ -18,8 +18,7 @@
     <ProjectGuid>{8AB66B51-5E2C-544A-AA89-117CCE62C46A}</ProjectGuid>
     <RootNamespace>ode</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <TargetPlatformVersion>8.1</TargetPlatformVersion>
-  </PropertyGroup>
+   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>

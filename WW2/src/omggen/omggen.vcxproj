@@ -34,7 +34,6 @@
     <ProjectGuid>{3864753C-C3D8-4704-B538-7792402922E1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>omggen</RootNamespace>
-    <TargetPlatformVersion>8.1</TargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

@@ -19,7 +19,6 @@
     <ProjectGuid>{C1B372C3-12A9-45AA-9D23-4D5024926FAB}</ProjectGuid>
     <RootNamespace>phui</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <TargetPlatformVersion>8.1</TargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
