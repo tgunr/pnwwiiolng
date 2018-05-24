@@ -1503,7 +1503,7 @@ void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAP
     // Verify API path
     status_if(components.size() < 3, 400, "Not enough path components (3)");
     status_if(components[0] != "", 400, "How did you get here with no /?");
-    status_if(components[1] != "v1", 400, "How did you get here with no version?");
+    // Second component was implicitly verified by the virtual prefix handler 
     
     // Basic RESTful routing (not very smart yet)
     RESTAPIRoute bestMatchingRoute;
