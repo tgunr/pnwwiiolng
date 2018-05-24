@@ -379,7 +379,8 @@ class HTTPRequestBodyReader
 {
     public:
         HTTPRequestBodyReader() : m_bufferedBody() {}
-    
+        virtual ~HTTPRequestBodyReader() {}
+
         virtual bool readMoreData(const std::string &data) = 0; // return true if body complete, pass empty data for "EOF received", throw exception on error
         std::string &getFinalRequestBody() { return m_bufferedBody; } // Purposely not const so main request parser can move instead of copy
         virtual size_t getUsedBytes() const = 0;
@@ -392,6 +393,7 @@ class HTTPBlindRequestBodyReader : public HTTPRequestBodyReader
 {
     public:
         HTTPBlindRequestBodyReader() : HTTPRequestBodyReader(), m_seenBytes(0) {}
+        virtual ~HTTPBlindRequestBodyReader() override {}
         virtual bool readMoreData(const std::string &data) override {
             m_bufferedBody += data;
             m_seenBytes += data.length();
@@ -416,6 +418,7 @@ class HTTPDefinedRequestBodyReader : public HTTPRequestBodyReader
             ABORT_IF_EX(m_bufferedBody.length() > m_definedLength, "Someone made a math error, actual buffered data should never exceed desired amount");
             return m_bufferedBody.length() == m_definedLength;
         }
+        virtual ~HTTPDefinedRequestBodyReader() override {}
         virtual size_t getUsedBytes() const override { return m_definedLength; }
     private:
         size_t m_definedLength;
@@ -428,6 +431,7 @@ class HTTPChunkedRequestBodyReader : public HTTPRequestBodyReader
         HTTPChunkedRequestBodyReader() :
             HTTPRequestBodyReader(),
             m_state(State::ReadingChunkSize), m_parseBuffer(), m_parsePointer(0), m_currentChunkLength(0) {}
+        virtual ~HTTPChunkedRequestBodyReader() override {}
         virtual bool readMoreData(const std::string &data) override;
         virtual size_t getUsedBytes() const override { return m_parsePointer; } // used bytes != result length in chunked encoding
     private:
