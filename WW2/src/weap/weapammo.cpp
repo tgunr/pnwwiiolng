@@ -4592,7 +4592,7 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	}
 
 	// start the fuze after checking to see if the arming timer has expired
-	if((Ammo->FuseStartTime == 0) && (Ammo->AmmoType->ExplosiveEnergy > 0))
+	if((Ammo->FuseStartTime == 0) && (Ammo->AmmoType->ExplosiveEnergy > 0) && !(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO))
 	{
 		// only if the FuseStartTime hasn't already been started and there is ExplosiveEnergy left
 		Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
