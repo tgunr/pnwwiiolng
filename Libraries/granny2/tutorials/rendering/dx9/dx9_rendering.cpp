@@ -15,7 +15,7 @@ using namespace std;
 // database that you'll want to completely ignore when you build your
 // own app on top of Granny.  This simply keeps everything very
 // straightfoward.
-char const* const GlobalSceneFilename     = "..\\media\\pixo_dance.gr2";
+char const* const GlobalSceneFilename     = "media\\pixo_dance.gr2";
 
 // ---------------------------------------------------------
 // Global D3D Objects: Note that we only have a few shader
@@ -42,7 +42,6 @@ D3DXHANDLE g_hDiffuseTexture;
 
 // ---------------------------------------------------------
 // Win32 objects
-const char* MainWindowTitle = "DirectX9 GrannySample";
 HWND g_hwnd = NULL;
 bool GlobalRunning = false;
 
@@ -581,7 +580,7 @@ bool InitCameraAndLights()
 
                 CameraFields CameraFields;
                 GrannyConvertSingleObject(CameraStoredType, CameraObject,
-                                          CameraFieldsType, &CameraFields);
+                                          CameraFieldsType, &CameraFields, 0);
 
                 // Ok, now we can setup the camera...
                 GrannyInitializeDefaultCamera(&GlobalScene.DemoCamera);
@@ -760,7 +759,7 @@ void RenderModel(DemoModel* Model)
             assert(NumMeshBones <= 64);
 
             g_pEffect->SetTechnique(g_SkinnedTechnique);
-            g_pD3DDevice->SetVertexDeclaration( g_pVertexDecl_Skinned );
+            g_pD3DDevice->SetVertexDeclaration(g_pVertexDecl_Skinned);
 
             /* Our source vertices are set as stream source 0 */
             g_pD3DDevice->SetStreamSource(0, Mesh->VertexBuffer, 0,

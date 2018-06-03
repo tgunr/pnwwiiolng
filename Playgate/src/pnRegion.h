@@ -31,7 +31,7 @@ class region_error : public std::runtime_error
 public:
     explicit region_error(const char* _name, const char* error)
         : runtime_error(error), m_name(_name) {}
-	virtual ~region_error() _THROW0() {};
+	virtual ~region_error() {};
     const char* name() const { return m_name; }
 
 protected:

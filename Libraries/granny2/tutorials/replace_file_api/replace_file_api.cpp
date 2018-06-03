@@ -86,7 +86,7 @@ int main(int, char const*[])
 #ifdef _MACOSX
     #define BASE_DIR "../../../media/"
 #else
-    #define BASE_DIR "../media/"
+    #define BASE_DIR "media/"
 #endif
 
     /* First, we'll initialize the VFS.  We're going to load just 2 files into memory to

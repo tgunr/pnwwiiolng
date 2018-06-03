@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="s3tc_opengl"
 	ProjectGUID="{EB98C9CF-C1BF-49DC-8D83-99AEC650D352}"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -39,15 +40,17 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4505"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\include;$(DXSDK_DIR)\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="BUILDING_GRANNY_STATIC=1;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
-				Detect64BitPortabilityProblems="true"
+				WarnAsError="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -61,13 +64,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="granny2.lib d3d9.lib"
+				AdditionalDependencies="winmm.lib granny2_static.lib d3d9.lib"
 				OutputFile="$(OutDir)/s3tc_opengl.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\bin\win32;&quot;$(DXSDK_DIR)\lib\x86&quot;;.\glut"
+				AdditionalLibraryDirectories="..\..\..\lib\win32;&quot;$(DXSDK_DIR)\lib\x86&quot;;.\glut"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/s3tc_opengl.pdb"
 				SubSystem="1"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -75,6 +80,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -87,9 +93,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -120,12 +123,14 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/wd4505"
 				AdditionalIncludeDirectories="..\..\..\include;$(DXSDK_DIR)\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="BUILDING_GRANNY_STATIC=1;WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				WarnAsError="true"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -139,14 +144,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="granny2.lib d3d9.lib"
+				AdditionalDependencies="winmm.lib granny2_static.lib d3d9.lib"
 				OutputFile="$(OutDir)/s3tc_opengl.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\bin\win32;&quot;$(DXSDK_DIR)\lib\x86&quot;;.\glut"
+				AdditionalLibraryDirectories="..\..\..\lib\win32;&quot;$(DXSDK_DIR)\lib\x86&quot;;.\glut"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -154,6 +161,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -166,9 +174,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"

@@ -1,13 +1,13 @@
 #if !defined(DX9_RENDERING_H)
 // ========================================================================
-// $File: //jeffr/granny/tutorial/morph_targets/morph_targets.h $
-// $DateTime: 2007/02/02 16:47:04 $
-// $Change: 14338 $
-// $Revision: #3 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
 // See .cpp file for details...
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "granny.h"
 #include <d3d9.h>

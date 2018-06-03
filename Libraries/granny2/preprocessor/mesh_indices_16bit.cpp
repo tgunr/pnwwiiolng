@@ -1,29 +1,23 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/mesh_indices_16bit.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #14 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
 
 
-bool MeshIndices16Bit(input_file&     InputFile,
-                      key_value_pair* KeyValues,
-                      granny_int32x   NumKeyValues,
-                      granny_memory_arena* TempArena)
+granny_file_info*
+MeshIndices16Bit(char const*          OriginalFilename,
+                 char const*          OutputFilename,
+                 granny_file_info*    Info,
+                 key_value_pair*      KeyValues,
+                 granny_int32x        NumKeyValues,
+                 granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     // Optimize all meshes for the pre/post-transform cache
     {for(granny_int32x i = 0; i < Info->MeshCount; i++)
     {
@@ -51,12 +45,20 @@ bool MeshIndices16Bit(input_file&     InputFile,
     }}
 
     // Write out the resulting file...
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, InputFile.GrannyFile, true, true, true);
+    return Info;
 }
 
 
-static CommandRegistrar RegMeshIndices16Bit(eSingleFile_NoMultiRun,
-                                            MeshIndices16Bit,
+static const char* HelpString =
+    (" Where possible, MeshIndices16Bit will change the storage format\n"
+     " of the granny_meshes contained in a gr2 file to 16-bit unsigned\n"
+     " indices.  This can save a significant amount of space in the\n"
+     " file, and at runtime\n"
+     "\n"
+     "    preprocessor MeshIndices16Bit mesh.gr2 -output mesh_16.gr2\n");
+
+static CommandRegistrar RegMeshIndices16Bit(MeshIndices16Bit,
                                             "MeshIndices16Bit",
-                                            "Converts Meshes to 16-bit indices where possible (i.e, vert counts of less than 65536)");
+                                            "Converts Meshes to 16-bit indices where possible (i.e, vert counts of less than 65536)",
+                                            HelpString);
 

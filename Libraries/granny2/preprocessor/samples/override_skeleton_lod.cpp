@@ -1,14 +1,13 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/override_skeleton_lod.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #2 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <fstream>
 #include <strstream>
@@ -47,16 +46,14 @@ bool CreateLODSpec(char const* Filename,
 }
 
 
-bool OverrideSkeletonLOD(input_file&     InputFile,
-                         key_value_pair* KeyValues,
-                         granny_int32x   NumKeyValues,
-                         granny_memory_arena* TempArena)
+granny_file_info*
+OverrideSkeletonLOD(char const*          OriginalFilename,
+                    char const*          OutputFilename,
+                    granny_file_info*    Info,
+                    key_value_pair*      KeyValues,
+                    granny_int32x        NumKeyValues,
+                    granny_memory_arena* TempArena)
 {
-    // Validate the input.  Our requirements for this command:
-    //  -output key must be present
-    //  The input $file must contain a valid $file_info object
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
     char const* LODSpecFile = FindFirstValueForKey(KeyValues, NumKeyValues, "lodspec");
     if (LODSpecFile == 0)
     {
@@ -81,13 +78,6 @@ bool OverrideSkeletonLOD(input_file&     InputFile,
     }
 
 
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     {for (int ModelIdx = 0; ModelIdx < Info->ModelCount; ++ModelIdx)
     {
         granny_model* Model = Info->Models[ModelIdx];
@@ -103,6 +93,7 @@ bool OverrideSkeletonLOD(input_file&     InputFile,
         {for (int BoneIdx = 0; BoneIdx < Skeleton->BoneCount; ++BoneIdx)
         {
             GrannyAddBoneWithInverse(Builder,
+                                     Skeleton->Bones[BoneIdx].Name,
                                      Skeleton->Bones[BoneIdx].LocalTransform.Position,
                                      Skeleton->Bones[BoneIdx].LocalTransform.Orientation,
                                      (granny_real32*)Skeleton->Bones[BoneIdx].LocalTransform.ScaleShear,
@@ -141,9 +132,8 @@ bool OverrideSkeletonLOD(input_file&     InputFile,
                 granny_bone& NewBone = NewSkeleton->Bones[NewBoneIdx];
                 granny_bone& OldBone = Skeleton->Bones[OldBoneIdx];
 
-                // Just the name and the extended data, everything else is created by the
-                // skeleton builder.
-                NewBone.Name          = OldBone.Name;
+                // Just the extended data, everything else is created by the skeleton
+                // builder.
                 NewBone.ExtendedData = OldBone.ExtendedData;
             }}
 
@@ -155,9 +145,8 @@ bool OverrideSkeletonLOD(input_file&     InputFile,
         }
     }}
 
-    // Write out the result
-    return SimpleWriteInfo(KeyValues, NumKeyValues, Info);
+    return Info;
 }
 
-static CommandRegistrar RegOBJImport(eSingleFile_NoMultiRun, OverrideSkeletonLOD, "OverrideSkeletonLOD",
-                                     "Alters the LOD specification of the models in a granny file");
+static CommandRegistrar RegOverrideSkelLOD(OverrideSkeletonLOD, "OverrideSkeletonLOD",
+                                           "Alters the LOD specification of the models in a granny file");

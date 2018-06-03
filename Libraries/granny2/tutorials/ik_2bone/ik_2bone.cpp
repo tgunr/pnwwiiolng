@@ -39,7 +39,7 @@ DemoScene GlobalScene;
 */
 
 /* DEFTUTORIAL EXPGROUP(TutorialIK) (TutorialIK_ComputeLegPosition, ComputeLegPosition) */
-void ComputeLegPosition(DemoModel* Model)
+void ComputeLegPosition(SimpleModel* Model)
 {
     /* Because the IK routines work with both the $local_pose and $world_pose of the
        model, we can't use $SampleModelAnimationsAccelerated, since it might not build a

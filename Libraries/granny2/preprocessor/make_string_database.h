@@ -1,11 +1,11 @@
 #if !defined(MAKE_STRING_DATABASE_H)
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/make_string_database.h $
-// $DateTime: 2009/03/03 13:56:57 $
-// $Change: 20905 $
-// $Revision: #3 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 
 #include "preprocessor.h"

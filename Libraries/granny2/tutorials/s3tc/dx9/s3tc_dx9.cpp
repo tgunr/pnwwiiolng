@@ -13,7 +13,7 @@ using namespace std;
 
 // For the purposes of this demo, texture.gr2 contains nothing but
 // the compressed texture
-char const* const GlobalSceneFilename     = "media\\texture.gr2";
+char const* const GlobalSceneFilename     = "media\\s3tc_texture.gr2";
 
 // ---------------------------------------------------------
 // Global D3D Objects: Note that we only have a few shader

@@ -1,39 +1,28 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/move_meshes_to_origin.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #4 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
 
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 #include <memory.h>
 #include <vector>
 
 using namespace std;
 
-static bool
-MoveMeshesToOrigin(input_file&     InputFile,
-                   key_value_pair* KeyValues,
-                   granny_int32x   NumKeyValues,
+static granny_file_info*
+MoveMeshesToOrigin(char const*          OriginalFilename,
+                   char const*          OutputFilename,
+                   granny_file_info*    Info,
+                   key_value_pair*      KeyValues,
+                   granny_int32x        NumKeyValues,
                    granny_memory_arena* TempArena)
 {
-    // Validate the input.  Our requirements for this command:
-    //  -output key must be present
-    //  The input $file must contain a valid $file_info object
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     {for (int ModelIdx = 0; ModelIdx < Info->ModelCount; ++ModelIdx)
     {
         granny_model* Model = Info->Models[ModelIdx];
@@ -101,9 +90,8 @@ MoveMeshesToOrigin(input_file&     InputFile,
         }}
     }}
 
-    return SimpleWriteInfo(KeyValues, NumKeyValues, Info);
+    return Info;
 }
 
-static CommandRegistrar RegCompressVertSample(eSingleFile_NoMultiRun,
-                                              MoveMeshesToOrigin, "MoveMeshesToOrigin",
+static CommandRegistrar RegCompressVertSample(MoveMeshesToOrigin, "MoveMeshesToOrigin",
                                               "Zeros the starting position of any meshes referenced by a model with a non-identity InitialPlacement");

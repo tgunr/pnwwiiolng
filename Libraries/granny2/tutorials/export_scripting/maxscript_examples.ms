@@ -1,10 +1,10 @@
 -- ========================================================================
--- $File: //jeffr/granny/tutorial/export_scripting/maxscript_examples.ms $
--- $DateTime: 2009/07/06 10:45:59 $
--- $Change: 22265 $
--- $Revision: #4 $
+-- $File$
+-- $DateTime$
+-- $Change$
+-- $Revision$
 --
--- (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+-- $Notice: $
 -- ========================================================================
 
 
@@ -130,7 +130,7 @@ fn BasicBatchExport SourcePath DestDir =
    AdvancedBatchExport "d:/source_art/*.max" "d:/exported_art" "d:/source_art/standard_settings.ges" "d:/tools/postprocess.exe"
    $-
 
-   In addition to the GrannyExport call, described previously, this funtion makes use of
+   In addition to the GrannyExport call, described previously, this function makes use of
    the GrannyLoadSettings call, which takes a single argument which is the settings file
    to load.  Although not demonstrated here, you can also make the corresponding call,
    GrannySaveSettings, to save to a .ges file rather than load from it.

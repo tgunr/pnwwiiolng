@@ -1,14 +1,13 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/remove_unbound_transform_tracks.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #3 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
 #include <stdio.h>
-#include <assert.h>
 #include <vector>
 
 using namespace std;
@@ -93,8 +92,8 @@ RemoveUnboundTransformTracks(input_file*     InputFiles,
         return false;
     }
 
-    granny_file_info* MeshInfo = GrannyGetFileInfo(InputFiles[0].GrannyFile);
-    granny_file_info* AnimInfo = GrannyGetFileInfo(InputFiles[1].GrannyFile);
+    granny_file_info* MeshInfo = ExtractFileInfo(InputFiles[0]);
+    granny_file_info* AnimInfo = ExtractFileInfo(InputFiles[1]);
     if (MeshInfo == 0 || AnimInfo == 0)
     {
         ErrOut("unable to get granny_file_info from inputs\n");
@@ -131,7 +130,7 @@ RemoveUnboundTransformTracks(input_file*     InputFiles,
     }}
 
     // Write out the result
-    return SimpleWriteInfo(KeyValues, NumKeyValues, AnimInfo);
+    return SimpleWriteInfo(KeyValues, NumKeyValues, AnimInfo, TempArena);
 }
 
 

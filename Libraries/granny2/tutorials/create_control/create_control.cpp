@@ -62,11 +62,6 @@ int main(int , char const*[])
         return EXIT_FAILURE;
     }
 
-#ifdef _MACOSX
-    // If we're on the mac, we want to use ansi file operations
-    GrannySetDefaultFileReaderOpenCallback(GrannyGetOSXAnsiFileReaderOpenCallback());
-#endif
-
     /* We're going to assume that you've already retrieved the $animation and the $model
        pointers from the $file_info to simplify this demo.  (Check the demo source for the
        details of how we obtain these pointers.) */
@@ -243,9 +238,9 @@ bool GetTestObjects(granny_file** GrannyFile,
     assert(GrannyFile && Animation && Model);
 
 #ifdef _MACOSX
-    const char* DefaultFileName = "../../../media/pixo_run.gr2";
+    const char* DefaultFileName = "../../media/pixo_run.gr2";
 #else
-    const char* DefaultFileName = "../media/pixo_run.gr2";
+    const char* DefaultFileName = "media/pixo_run.gr2";
 #endif
     *GrannyFile = GrannyReadEntireFile(DefaultFileName);
     if (*GrannyFile == NULL)

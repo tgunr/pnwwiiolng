@@ -1,15 +1,16 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/bones_per_mesh.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #16 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
+#include "utilities.h"
 #include <algorithm>
-#include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <vector>
 
@@ -35,13 +36,15 @@ bool RemapTopologies(granny_file_info* Info,
                      vector<granny_mesh*>& NewMeshes,
                      granny_memory_arena* TempArena);
 
-bool BonesPerMesh(input_file&     InputFile,
-                  key_value_pair* KeyValues,
-                  granny_int32x   NumKeyValues,
-                  granny_memory_arena* TempArena)
-{
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
 
+granny_file_info*
+BonesPerMesh(char const*          /*OriginalFilename*/,
+             char const*          /*OutputFilename*/,
+             granny_file_info*    InputInfo,
+             key_value_pair*      KeyValues,
+             granny_int32x        NumKeyValues,
+             granny_memory_arena* TempArena)
+{
     bool const AddNamePostfix =
         (FindFirstValueForKey(KeyValues, NumKeyValues, "modname") != 0);
 
@@ -50,49 +53,40 @@ bool BonesPerMesh(input_file&     InputFile,
     if (BoneLimitString == 0)
     {
         ErrOut("must specify an bone count limit with \"-bonelimit N\"\n");
-        return false;
+        return 0;
     }
     BoneLimit = atoi(BoneLimitString);
-    if (BoneLimit < 4)
+    if (BoneLimit < 2)
     {
         ErrOut("invalid bonelimit (%d), must be at least 4\n", BoneLimit);
-        return false;
-    }
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
+        return 0;
     }
 
     vector<granny_mesh*> NewMeshes;
-    {for(granny_int32x i = 0; i < Info->MeshCount; i++)
+    {for(granny_int32x i = 0; i < InputInfo->MeshCount; i++)
     {
-        granny_mesh* OriginalMesh = Info->Meshes[i];
+        granny_mesh* OriginalMesh = InputInfo->Meshes[i];
         if (!OriginalMesh)
             continue;
 
-        if (OriginalMesh->MorphTargetCount != 0)
-        {
-            ErrOut("mesh %s has morph targets, which we don't handle\n", OriginalMesh->Name);
-            return false;
-        }
-
-        if (BreakMesh(Info, OriginalMesh, BoneLimit, NewMeshes, AddNamePostfix, TempArena) == false)
+        if (BreakMesh(InputInfo, OriginalMesh, BoneLimit, NewMeshes, AddNamePostfix, TempArena) == false)
         {
             ErrOut("failed to break mesh %s\n", OriginalMesh->Name);
-            return false;
+            return 0;
         }
     }}
 
     // Move NewMeshes into the file info as the Mesh array...
-    Info->MeshCount = (granny_int32)NewMeshes.size();
-    Info->Meshes = PushArray(TempArena, Info->MeshCount, granny_mesh*);
-    memcpy(Info->Meshes, &NewMeshes[0], sizeof(granny_mesh*) * Info->MeshCount);
+    InputInfo->MeshCount = (granny_int32)NewMeshes.size();
+    InputInfo->Meshes = PushArray(TempArena, InputInfo->MeshCount, granny_mesh*);
+    memcpy(InputInfo->Meshes, &NewMeshes[0], sizeof(granny_mesh*) * InputInfo->MeshCount);
 
-    // Write out the resulting file...
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, InputFile.GrannyFile, true, true, true);
+
+    // Recompute the bounds
+    if (RecomputeAllBoneBounds(InputInfo) == false)
+        return 0;
+
+    return InputInfo;
 }
 
 // =====================================================================
@@ -153,7 +147,7 @@ struct NewMeshIntermediate
     NewMeshIntermediate(int NumBones, int NumVerts, int NumTris);
     ~NewMeshIntermediate();
 
-	NewMeshIntermediate const& operator=(NewMeshIntermediate&);  // not allowed, silence, compiler!
+    NewMeshIntermediate const& operator=(NewMeshIntermediate&);  // not allowed, silence, compiler!
     void ClearSubMesh();
     void ClearAll();
 };
@@ -170,6 +164,132 @@ MakePostfixName(char const*          Name,
     return GrannyMemoryArenaPushConcat(TempArena, Name, NumBuffer);
 }
 
+
+static granny_vertex_data*
+CreateModifiedVertData(granny_vertex_data const* VertData,
+                       granny_int32x  NumOrigVerts,
+                       granny_int32x  NumNewVerts,
+                       granny_int32x* NewVertIndices,
+                       granny_int32x  BoneBindingCount,
+                       granny_int32x* BoneRemaps,
+                       granny_memory_arena* TempArena)
+{
+    granny_int32x const VertSize = GrannyGetTotalObjectSize(VertData->VertexType);
+
+    granny_vertex_data* Result = PushObject(TempArena, granny_vertex_data);
+    memset(Result, 0, sizeof(granny_vertex_data));
+
+    Result->VertexType  = VertData->VertexType;
+    Result->VertexCount = NumNewVerts;
+    Result->Vertices    = PushArray(TempArena,
+                                    VertSize * Result->VertexCount,
+                                    granny_uint8);
+
+    Result->VertexComponentNameCount = VertData->VertexComponentNameCount;
+    Result->VertexComponentNames     = VertData->VertexComponentNames;
+
+    // Copy the raw vertex data
+    granny_uint8 const* OldVertices = VertData->Vertices;
+    {for(int i = 0; i < NumOrigVerts; ++i)
+    {
+        if (NewVertIndices[i] == -1)
+            continue;
+
+        granny_uint8 const* OldVert = OldVertices + (VertSize * i);
+        granny_uint8* NewVert = Result->Vertices + (VertSize * NewVertIndices[i]);
+        memcpy(NewVert, OldVert, VertSize);
+    }}
+
+    // Ok, the verts are in the correct order, now we need to
+    // remap the bone indices.  This is a little ticklish, since
+    // we need to scan the data_type_definition to find the
+    // correct offset
+    {
+        int IndexOffset = 0;
+        int NumTypeIndices = 0;
+
+        granny_data_type_definition* Walk = Result->VertexType;
+        while (Walk && Walk->Type != GrannyEndMember)
+        {
+            if (_stricmp(Walk->Name, GrannyVertexBoneIndicesName) == 0)
+            {
+                NumTypeIndices = Walk->ArrayWidth ? Walk->ArrayWidth : 1;
+                break;
+            }
+
+            IndexOffset += GrannyGetMemberTypeSize(Walk);
+            ++Walk;
+        }
+
+        int WeightOffset = 0;
+        int NumTypeWeights = 0;
+
+        Walk = Result->VertexType;
+        while (Walk && Walk->Type != GrannyEndMember)
+        {
+            if (_stricmp(Walk->Name, GrannyVertexBoneWeightsName) == 0)
+            {
+                NumTypeWeights = Walk->ArrayWidth ? Walk->ArrayWidth : 1;
+                break;
+            }
+
+            WeightOffset += GrannyGetMemberTypeSize(Walk);
+            ++Walk;
+        }
+
+        // Must have indices.
+        // May have either *no* weights, or a matching number of weights.
+        if (NumTypeIndices == 0 ||
+            (NumTypeWeights != 0 && (NumTypeWeights != NumTypeIndices)))
+        {
+            ErrOut("Unable to find correctly formatted bone indices/weights in the vertex type (%d %d)\n", NumTypeIndices, NumTypeWeights);
+            return 0;
+        }
+
+        granny_uint8* CurrDestVert = Result->Vertices;
+        {for(int i = 0; i < NumNewVerts; ++i)
+        {
+            granny_uint8* Weights = NumTypeWeights ? (CurrDestVert + WeightOffset) : 0; // only valid if NumTypeWeights != 0
+			pp_unused(Weights);
+
+			granny_uint8* Indices = CurrDestVert + IndexOffset;
+            {for(int j = 0; j < NumTypeIndices; j++)
+            {
+                pp_assert(Indices[j] < BoneBindingCount);
+
+                // The simple pp_assert doesn't always work here.
+                // There is a special case to handle in older
+                // data, where unused bone indices were set to 0,
+                // rather than BoneIndices[0].  We'll manually
+                // handle that case...
+                // pp_assert(BoneRemaps[Indices[j]] != -1);
+
+                if (BoneRemaps[Indices[j]] != -1)
+                {
+                    Indices[j] = granny_uint8(BoneRemaps[Indices[j]]);
+                }
+                else
+                {
+                    // If these arent't true, then the special case
+                    // doesn't apply
+                    pp_assert(j != 0);
+                    pp_assert(NumTypeWeights == 0 || Weights[j] == 0);
+
+                    // Just copy the first index...
+                    Indices[j] = Indices[0];
+                }
+            }}
+
+            // Advance the vertex
+            CurrDestVert += VertSize;
+        }}
+    }
+
+    return Result;
+}
+
+
+
 bool KickoffMesh(granny_mesh*               OriginalMesh,
                  granny_tri_material_group& MaterialGroup,
                  NewMeshIntermediate*       NewMesh,
@@ -182,8 +302,22 @@ bool KickoffMesh(granny_mesh*               OriginalMesh,
     // the bits we don't want...
     granny_mesh* NewGrannyMesh = PushObject(TempArena, granny_mesh);
     NewGrannyMesh->Name = OriginalMesh->Name;
-    NewGrannyMesh->MorphTargetCount = 0;
-    NewGrannyMesh->MorphTargets = 0;
+    NewGrannyMesh->MorphTargetCount = OriginalMesh->MorphTargetCount;
+
+    if (OriginalMesh->MorphTargetCount)
+    {
+        NewGrannyMesh->MorphTargets = PushArray(TempArena, OriginalMesh->MorphTargetCount, granny_morph_target);
+        {for (int Idx = 0; Idx < OriginalMesh->MorphTargetCount; ++Idx)
+        {
+            NewGrannyMesh->MorphTargets[Idx].ScalarName = OriginalMesh->MorphTargets[Idx].ScalarName;
+            NewGrannyMesh->MorphTargets[Idx].DataIsDeltas = OriginalMesh->MorphTargets[Idx].DataIsDeltas;
+        }}
+    }
+    else
+    {
+        NewGrannyMesh->MorphTargets = 0;
+    }
+
     NewGrannyMesh->MaterialBindingCount = 1;
     NewGrannyMesh->MaterialBindings = OriginalMesh->MaterialBindings + MaterialGroup.MaterialIndex;
 
@@ -249,7 +383,7 @@ bool KickoffMesh(granny_mesh*               OriginalMesh,
         NewGrannyMesh->PrimaryTopology->IndexCount = NewMesh->NumIndicesUsed;
         NewGrannyMesh->PrimaryTopology->Indices =
             PushArray(TempArena, NewGrannyMesh->PrimaryTopology->IndexCount, granny_int32);
-        assert(sizeof(int) == sizeof(granny_int32));
+        pp_assert(sizeof(int) == sizeof(granny_int32));
         memcpy(NewGrannyMesh->PrimaryTopology->Indices, NewMesh->TriIndices,
                sizeof(int) * NewGrannyMesh->PrimaryTopology->IndexCount);
     }
@@ -257,115 +391,30 @@ bool KickoffMesh(granny_mesh*               OriginalMesh,
     // Ok, now the hard part, the vertex data.  Again, we're ignoring
     // the vertex annotation.
     {
-        granny_int32x const VertSize = GrannyGetTotalObjectSize(OriginalMesh->PrimaryVertexData->VertexType);
-
-        NewGrannyMesh->PrimaryVertexData = PushObject(TempArena, granny_vertex_data);
-        memset(NewGrannyMesh->PrimaryVertexData, 0, sizeof(granny_vertex_data));
-
-        NewGrannyMesh->PrimaryVertexData->VertexType  = OriginalMesh->PrimaryVertexData->VertexType;
-        NewGrannyMesh->PrimaryVertexData->VertexCount = NewMesh->NumNewVerts;
-        NewGrannyMesh->PrimaryVertexData->Vertices =
-            PushArray(TempArena,
-                      VertSize * NewGrannyMesh->PrimaryVertexData->VertexCount,
-                      granny_uint8);
-
-        NewGrannyMesh->PrimaryVertexData->VertexComponentNameCount =
-            OriginalMesh->PrimaryVertexData->VertexComponentNameCount;
-        NewGrannyMesh->PrimaryVertexData->VertexComponentNames =
-            OriginalMesh->PrimaryVertexData->VertexComponentNames;
-
-        // Copy the raw vertex data
-        granny_uint8 const* OldVertices = (granny_uint8*)GrannyGetMeshVertices(OriginalMesh);
-        {for(int i = 0; i < NewMesh->NumOrigVerts; ++i)
+        NewGrannyMesh->PrimaryVertexData =
+            CreateModifiedVertData(OriginalMesh->PrimaryVertexData,
+                                   NewMesh->NumOrigVerts,
+                                   NewMesh->NumNewVerts,
+                                   NewMesh->NewVertIndices,
+                                   OriginalMesh->BoneBindingCount,
+                                   &BoneRemaps[0], TempArena);
+        if (NewGrannyMesh->PrimaryVertexData == 0)
         {
-            if (NewMesh->NewVertIndices[i] == -1)
-                continue;
-
-            granny_uint8 const* OldVert = OldVertices + (VertSize * i);
-            granny_uint8* NewVert =
-                NewGrannyMesh->PrimaryVertexData->Vertices + (VertSize * NewMesh->NewVertIndices[i]);
-            memcpy(NewVert, OldVert, VertSize);
-        }}
-
-        // Ok, the verts are in the correct order, now we need to
-        // remap the bone indices.  This is a little ticklish, since
-        // we need to scan the data_type_definition to find the
-        // correct offset
-        {
-            int IndexOffset = 0;
-            int NumTypeIndices = -1;
-
-            granny_data_type_definition* Walk = NewGrannyMesh->PrimaryVertexData->VertexType;
-            while (Walk && Walk->Type != GrannyEndMember)
-            {
-                if (_stricmp(Walk->Name, GrannyVertexBoneIndicesName) == 0)
-                {
-                    NumTypeIndices = Walk->ArrayWidth ? Walk->ArrayWidth : 1;
-                    break;
-                }
-
-                IndexOffset += GrannyGetMemberTypeSize(Walk);
-                ++Walk;
-            }
-
-            int WeightOffset = 0;
-            int NumTypeWeights = -1;
-
-            Walk = NewGrannyMesh->PrimaryVertexData->VertexType;
-            while (Walk && Walk->Type != GrannyEndMember)
-            {
-                if (_stricmp(Walk->Name, GrannyVertexBoneWeightsName) == 0)
-                {
-                    NumTypeWeights = Walk->ArrayWidth ? Walk->ArrayWidth : 1;
-                    break;
-                }
-
-                WeightOffset += GrannyGetMemberTypeSize(Walk);
-                ++Walk;
-            }
-
-            if (NumTypeIndices == -1 || NumTypeIndices != NumTypeWeights)
-            {
-                ErrOut("Unable to find the bone indices in the vertex type\n");
-                return false;
-            }
-
-            granny_uint8* CurrDestVert = NewGrannyMesh->PrimaryVertexData->Vertices;
-            {for(int i = 0; i < NewMesh->NumNewVerts; ++i)
-            {
-                granny_uint8* Weights = CurrDestVert + WeightOffset;
-                granny_uint8* Indices = CurrDestVert + IndexOffset;
-
-                {for(int j = 0; j < NumTypeIndices; j++)
-                {
-                    assert(Indices[j] < OriginalMesh->BoneBindingCount);
-
-                    // The simple assert doesn't always work here.
-                    // There is a special case to handle in older
-                    // data, where unused bone indices were set to 0,
-                    // rather than BoneIndices[0].  We'll manually
-                    // handle that case...
-                    // assert(BoneRemaps[Indices[j]] != -1);
-
-                    if (BoneRemaps[Indices[j]] != -1)
-                    {
-                        Indices[j] = granny_uint8(BoneRemaps[Indices[j]]);
-                    }
-                    else
-                    {
-                        // If this isn't true, then the special case
-                        // doesn't apply
-                        assert(j != 0 && Weights[j] == 0);
-
-                        // Just copy the first index...
-                        Indices[j] = Indices[0];
-                    }
-                }}
-
-                // Advance the vertex
-                CurrDestVert += VertSize;
-            }}
+            // Don't try to recover from this one.  Log will have already spilled from
+            // inside this function
+            return false;
         }
+
+        {for (int Idx = 0; Idx < OriginalMesh->MorphTargetCount; ++Idx)
+        {
+            NewGrannyMesh->MorphTargets[Idx].VertexData =
+                CreateModifiedVertData(OriginalMesh->MorphTargets[Idx].VertexData,
+                                       NewMesh->NumOrigVerts,
+                                       NewMesh->NumNewVerts,
+                                       NewMesh->NewVertIndices,
+                                       OriginalMesh->BoneBindingCount,
+                                       &BoneRemaps[0], TempArena);
+        }}
     }
 
     // Add the mesh
@@ -375,12 +424,13 @@ bool KickoffMesh(granny_mesh*               OriginalMesh,
 }
 
 
-bool BreakMesh(granny_file_info*     Info,
-               granny_mesh*          OriginalMesh,
-               granny_int32x         BoneLimit,
-               vector<granny_mesh*>& NewMeshes,
-               bool                  AddNamePostfix,
-               granny_memory_arena*  TempArena)
+bool
+BreakMesh(granny_file_info*     Info,
+          granny_mesh*          OriginalMesh,
+          granny_int32x         BoneLimit,
+          vector<granny_mesh*>& NewMeshes,
+          bool                  AddNamePostfix,
+          granny_memory_arena*  TempArena)
 {
     // Get the number of bones, and handle the easy case...
     int const NumOrigBones = OriginalMesh->BoneBindingCount;
@@ -405,11 +455,12 @@ bool BreakMesh(granny_file_info*     Info,
     WeightVertex *WeightVerts = new WeightVertex[NumOrigVerts];
     {
         memset(WeightVerts, 0, sizeof(WeightVerts) * NumOrigVerts);
-        GrannyConvertVertexLayouts ( NumOrigVerts,
-                                     GrannyGetMeshVertexType ( OriginalMesh ),
-                                     GrannyGetMeshVertices ( OriginalMesh ),
-                                     WeightVertexType,
-                                     WeightVerts );
+        GrannyConvertVertexLayouts(NumOrigVerts,
+                                   GrannyGetMeshVertexType ( OriginalMesh ),
+                                   GrannyGetMeshVertices ( OriginalMesh ),
+                                   WeightVertexType,
+                                   WeightVerts );
+        GrannyOneNormalizeWeights(NumOrigVerts, WeightVertexType, WeightVerts);
 
         // Now scan the verts, and count the non-zero weights
         {for(int i = 0; i < NumOrigVerts; ++i)
@@ -791,9 +842,22 @@ void NewMeshIntermediate::ClearAll()
 }
 
 
-static CommandRegistrar RegBonesPerMesh(eSingleFile_NoMultiRun,
-                                        BonesPerMesh,
+static char const* HelpString =
+    (" BonesPerMesh breaks up granny_mesh objects so that they can be rendered\n"
+     " without requiring more than a set number of bone matrices.  This is\n"
+     " useful when your source art refers to 100 bones, but you only have\n"
+     " constant register space for 50 matrices, for instance\n"
+     "\n"
+     " Specify the maximum number of bones with -bonelimit <N>.  Meshes that\n"
+     " have fewer than N bones will be untouched.\n"
+     " \n"
+     "    preprocessor BonesPerMesh char.gr2 -output char_proc.gr2 -bonelimit 50\n"
+     "    preprocessor BonesPerMesh char.gr2 -output char.gr2 -bonelimit 50\n"
+     );
+
+static CommandRegistrar RegBonesPerMesh(BonesPerMesh,
                                         "BonesPerMesh",
-                                        "Limits meshes to the number of bones specified with \"-bonelimit N\"");
+                                        "Limits meshes to the number of bones specified with \"-bonelimit N\"",
+                                        HelpString);
 
 

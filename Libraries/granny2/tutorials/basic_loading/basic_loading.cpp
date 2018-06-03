@@ -72,15 +72,8 @@ int main(int argc, char const* argv[])
         return EXIT_FAILURE;
     }
 
-#ifdef _MACOSX
-    // If we're on the mac, we want to use ansi file operations
-    GrannySetDefaultFileReaderOpenCallback(GrannyGetOSXAnsiFileReaderOpenCallback());
-    char const* GrannyFilename = "../../../media/gryphon.gr2";
-#else
-    char const* GrannyFilename = "../media/gryphon.gr2";
-#endif
-
     // Take the default file unless an argument was passed
+    char const* GrannyFilename = "media/gryphon.gr2";
     if (argc == 2)
     {
         GrannyFilename = argv[1];

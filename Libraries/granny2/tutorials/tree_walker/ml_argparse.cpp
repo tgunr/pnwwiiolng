@@ -11,7 +11,13 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
+#include <assert.h>   
+#include <stdlib.h>
+
+#ifdef _WIN32
+#define strcasecmp _stricmp
+#define snprintf _snprintf
+#endif
 
 using namespace argparse;
 using namespace std;
@@ -132,14 +138,14 @@ namespace
             case eBoolean:
             {
                 // There are only four valid strings for a boolean argument:
-                if (_stricmp(argString, "true") == 0 ||
-                    _stricmp(argString, "t") == 0)
+                if (strcasecmp(argString, "true") == 0 ||
+                    strcasecmp(argString, "t") == 0)
                 {
                     *((bool*)pDescription->pBuffer) = true;
                     return true;
                 }
-                else if (_stricmp(argString, "false") == 0 ||
-                         _stricmp(argString, "f") == 0)
+                else if (strcasecmp(argString, "false") == 0 ||
+                         strcasecmp(argString, "f") == 0)
                 {
                     *((bool*)pDescription->pBuffer) = false;
                     return true;
@@ -325,7 +331,7 @@ EResult argparse::Parse(int const        argc,
                         {
                             if (GetArgument(&pDescriptions[j], argv[i + 1]) == false)
                             {
-                                _snprintf(sg_errorBuffer, csg_errorBufferSize,
+                                snprintf(sg_errorBuffer, csg_errorBufferSize,
                                           "Invalid option: Misunderstood arg %s to option %s",
                                           argv[i+1], argv[i]);
                                 sg_errorBuffer[csg_errorBufferSize - 1] = '\0';
@@ -344,7 +350,7 @@ EResult argparse::Parse(int const        argc,
             }
             if (argumentFound == false)
             {
-                _snprintf(sg_errorBuffer, csg_errorBufferSize, "Invalid option (%s): Option not understood", argv[i]);
+                snprintf(sg_errorBuffer, csg_errorBufferSize, "Invalid option (%s): Option not understood", argv[i]);
                 sg_errorBuffer[csg_errorBufferSize - 1] = '\0';
                 HandleError(pArgErrorCallback, sg_errorBuffer);
                 return eOptionNotUnderstood;
@@ -380,7 +386,7 @@ EResult argparse::Parse(int const        argc,
                         {
                             if (strlen(argv[i]) != 2 || i >= ArgCount - 1)
                             {
-                                _snprintf(sg_errorBuffer, csg_errorBufferSize,
+                                snprintf(sg_errorBuffer, csg_errorBufferSize,
                                           "Invalid option (%s): Options which take arguments must appear alone",
                                           argv[i]);
                                 sg_errorBuffer[csg_errorBufferSize - 1] = '\0';
@@ -390,7 +396,7 @@ EResult argparse::Parse(int const        argc,
 
                             if (GetArgument(&pDescriptions[j], argv[i + 1]) == false)
                             {
-                                _snprintf(sg_errorBuffer, csg_errorBufferSize,
+                                snprintf(sg_errorBuffer, csg_errorBufferSize,
                                           "Invalid option: Misunderstood arg %s to option %s",
                                           argv[i+1], argv[i]);
                                 sg_errorBuffer[csg_errorBufferSize - 1] = '\0';
@@ -411,7 +417,7 @@ EResult argparse::Parse(int const        argc,
 
                 if (argumentFound == false)
                 {
-                    _snprintf(sg_errorBuffer, csg_errorBufferSize, "Invalid option (%s): Option not understood", argv[i]);
+                    snprintf(sg_errorBuffer, csg_errorBufferSize, "Invalid option (%s): Option not understood", argv[i]);
                     sg_errorBuffer[csg_errorBufferSize - 1] = '\0';
                     HandleError(pArgErrorCallback, sg_errorBuffer);
                     return eOptionNotUnderstood;

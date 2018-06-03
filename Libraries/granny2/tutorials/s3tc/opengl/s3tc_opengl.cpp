@@ -10,19 +10,33 @@
 #include <assert.h>
 #include <vector>
 
-#include <windows.h>
-#include <gl/gl.h>
-#include "glut/glut.h"
+
+
+#if defined(_MACOSX) || defined(linux)
+  #include <GL/glew.h>
+  #include <GL/glut.h>
+#else
+  #include <windows.h>
+  #include <gl/gl.h>
+  #include "glut/glut.h"
+#endif
+
+#if defined(_MACOSX) || defined(linux)
+#define _stricmp strcasecmp
+#define BASE_DIR "../../"
+#else
+#define BASE_DIR ""
+#endif
 
 
 using namespace std;
 
 // For the purposes of this demo, texture.gr2 contains nothing but
 // the compressed texture
-char const* const GlobalSceneFilename     = "media\\texture.gr2";
+char const* const GlobalSceneFilename     =  BASE_DIR "media/s3tc_texture.gr2";
 
 // Some global parameters...
-const char* MainWindowTitle = "S3TC/DX9 GrannySample";
+const char* MainWindowTitle = "S3TC/OpenGL GrannySample";
 GLuint g_texName = 0;
 
 
@@ -30,6 +44,7 @@ GLuint g_texName = 0;
 bool CreateDemoTexture(granny_file_info*);
 void Render();
 
+#ifdef _WIN32
 #define GL_COMPRESSED_RGB_S3TC_DXT1_EXT                   0x83F0
 #define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT                  0x83F1
 #define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT                  0x83F2
@@ -42,7 +57,7 @@ typedef void (APIENTRY* PFNGLCOMPRESSEDTEXIMAGE2DARBPROC) (GLenum target, GLint 
                                                            GLsizei imageSize,
                                                            const GLvoid *data);
 PFNGLCOMPRESSEDTEXIMAGE2DARBPROC glCompressedTexImage2DARB;
-
+#endif
 
 /* DEFTUTORIAL EXPGROUP(TutorialS3TC_OpenGL) (TutorialS3TC_OpenGL_Introduction, Introduction) */
 /* This tutorial demonstrates how to download an S3TC (also called: DXTC) compressed
@@ -87,7 +102,13 @@ int main( int argc, char** argv )
     glutCreateWindow(MainWindowTitle);
     glutDisplayFunc(Render);
 
+#ifdef _WIN32
     glCompressedTexImage2DARB = (PFNGLCOMPRESSEDTEXIMAGE2DARBPROC)wglGetProcAddress("glCompressedTexImage2DARB");
+#else
+     // Initialize the GL Extension Wrangler
+    glewInit();
+#endif
+
     if( !glCompressedTexImage2DARB )
     {
         return EXIT_FAILURE;

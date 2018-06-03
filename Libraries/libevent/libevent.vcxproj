@@ -18,7 +18,6 @@
     <ProjectGuid>{FE3E7329-9561-4BFC-9E1D-F4BDDBA2CBB0}</ProjectGuid>
     <RootNamespace>libevent</RootNamespace>
     <ProjectName>event</ProjectName>
-    <TargetPlatformVersion>8.1</TargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
