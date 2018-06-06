@@ -111,6 +111,8 @@ struct weapAmmoType
 	FLOAT32 FuzeTime;
 	FLOAT32 FuseStartSpeedLoss;
 	UINT32	FuzeType; // for variable fuzing
+	
+	FLOAT32 ArmingTime; // for variable arming timers
 
 	FLOAT32 SelfDestructTime;
 

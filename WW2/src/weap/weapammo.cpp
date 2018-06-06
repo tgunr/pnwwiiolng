@@ -97,6 +97,7 @@ enum
 	WEAP_AMMOVAR_OBJECT,
 	WEAP_AMMOVAR_EXPLOSIVEENERGY,
 	WEAP_AMMOVAR_FUZETIME,
+	WEAP_AMMOVAR_ARMINGTIME,
 	WEAP_AMMOVAR_BALLISTICCOEFFICIENT,
 	WEAP_AMMOVAR_LIFETIME,
 	WEAP_AMMOVAR_STRETCHOBJECT,
@@ -175,6 +176,7 @@ static UCHAR _AmmoTypeVarNames[WEAP_AMMOMAXVAR][32] = {
 	"object",
 	"explosive",
 	"fuzetime",
+	"armingtime",
 	"bc",
 	"lifetime",
 	"stretchobject",
@@ -490,6 +492,9 @@ logTimerBeginMacro();
 						break;
 					case WEAP_AMMOVAR_FUZETIME:
 						AmmoType->FuzeTime = (FLOAT32)atof((char*)VarContents);
+						break;
+					case WEAP_AMMOVAR_ARMINGTIME:
+						AmmoType->ArmingTime = (FLOAT32)atof((char*)VarContents);
 						break;
 					case WEAP_AMMOVAR_BALLISTICCOEFFICIENT:
 						AmmoType->BallisticCoefficient = (FLOAT32)atof((char*)VarContents);
@@ -4347,13 +4352,36 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 			ResidualSpeed = sqrt((KE - KELimit) / .5 / Ammo->AmmoType->ProjectileWeight);
 			KE = KELimit;
 
-			// start fuse
-			if( (Ammo->FuseStartTime == 0) && (Ammo->AmmoType->ExplosiveEnergy > 0) &&
-				(AmmoSpeed - ResidualSpeed > Ammo->AmmoType->FuseStartSpeedLoss) )
+			// start the fuse after checking to see if the arming timer has expired
+			if((Ammo->FuseStartTime == 0) && (Ammo->AmmoType->ExplosiveEnergy > 0)
+				&& (AmmoSpeed - ResidualSpeed > Ammo->AmmoType->FuseStartSpeedLoss))
 			{
-				Ammo->FuseStartTime = AmmoCollideTime;
-				if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
-					Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) fuse started, timer = %.4lf s, t = %lf s", Ammo->AmmoType->Name, Ammo->Id, Ammo->AmmoType->FuzeTime, Ammo->FuseStartTime);
+				// only if the FuseStartTime hasn't already been started and there is ExplosiveEnergy left
+				Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
+
+				if((AmmoCollideTime - Ammo->LaunchTime) >= Ammo->AmmoType->ArmingTime)
+				{
+					// only if the ammo has been released/shot with enough time for the arming time to expire
+					Ammo->FuseStartTime = AmmoCollideTime;
+					
+					if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
+						Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) fuse started, timer = %.4lf s, t = %lf s", Ammo->AmmoType->Name,
+								  Ammo->Id, Ammo->AmmoType->FuzeTime, Ammo->FuseStartTime);
+				}
+				else
+				{
+					if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
+					{
+						persShakeHead("common.headshake.notarmed.bomb");
+					}
+					else
+					{
+						persShakeHead("common.headshake.notarmed");
+					}
+					// since the ammo isn't going to explode, go ahead and kill it
+					_KillAmmo(Ammo);
+					return FALSE;
+				}
 			}
 		}
 	}
@@ -4548,20 +4576,6 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
     mathAddVectors(&CollidePos, &CollidePos, &WorldOriginOffset);
         CollidePos.z = -CollidePos.z;
 
-	// weapon fx
-	if(!(Ammo->Flags & WEAP_AMMOFLAG_NOFX))
-	{
-		// water splash
-		if(_IsWater(Collision->CollideObject))
-			weapfxAmmoWaterSplash(Ammo, &CollidePos, Collision->CollideObject, Collision->PolyNum, KE);
-
-		// weapon explosion fx
-		if(!(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO && !Ammo->TorpedoIsRunning)) // don't want the torp to explode just yet
-		{
-			weapfxAmmoHit(Ammo, Collision, OldPos, NewPos, nullptr, 0, 0);
-		}
-	}
-
 	AmmoSpeed = mathExactVectorLength(&Ammo->Velocity);
 	AmmoCollideTime = CurrentTime - DeltaTime * (1 - Collision->CollideTime);
 
@@ -4577,6 +4591,51 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 		AmmoCollideTime);
 	}
 
+	// start the fuze after checking to see if the arming timer has expired
+	if((Ammo->FuseStartTime == 0) && (Ammo->AmmoType->ExplosiveEnergy > 0) && !(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO))
+	{
+		// only if the FuseStartTime hasn't already been started and there is ExplosiveEnergy left
+		Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
+
+		if((AmmoCollideTime - Ammo->LaunchTime) >= Ammo->AmmoType->ArmingTime)
+		{
+			// only if the ammo has been released/shot with enough time for the arming time to expire
+			Ammo->FuseStartTime = AmmoCollideTime;
+			
+			if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
+				Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) fuse started, timer = %.4lf s, t = %lf s", Ammo->AmmoType->Name,
+						  Ammo->Id, Ammo->AmmoType->FuzeTime, Ammo->FuseStartTime);
+		}
+		else
+		{
+			if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
+			{
+				persShakeHead("common.headshake.notarmed.bomb");
+			}
+			else
+			{
+				persShakeHead("common.headshake.notarmed");
+			}
+			// since the ammo isn't going to explode, go ahead and kill it
+			_KillAmmo(Ammo);
+			return FALSE;
+		}
+	}
+
+	// weapon fx
+	if(!(Ammo->Flags & WEAP_AMMOFLAG_NOFX))
+	{
+		// water splash
+		if(_IsWater(Collision->CollideObject))
+			weapfxAmmoWaterSplash(Ammo, &CollidePos, Collision->CollideObject, Collision->PolyNum, KE);
+
+		// weapon explosion fx
+		if(!(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO && !Ammo->TorpedoIsRunning)) // don't want the torp to explode just yet
+		{
+			weapfxAmmoHit(Ammo, Collision, OldPos, NewPos, nullptr, 0, 0);
+		}
+	}
+	
 	// apply the damage
 	if(TO)
 	{
