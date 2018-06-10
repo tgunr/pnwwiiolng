@@ -281,9 +281,28 @@ JS_FUNCTION_DEF(jsClient, issteamcopy) {
 	steam connection
 *************************************************************************************************/
 
+// TODO: Move this out of the GUI code
 namespace {
+	bool IsValidEmail(const char* email) {
+		// TEMP: Validating emails meaningfully is arbitrarily difficult.
+        // Note that even billing only does this:
+        // email+          = ^[^\s]+\@[^\s]+$
+        bool hasAt = false;
+        bool hasDot = false;
+        
+		for ( const char* c = email ; *c != '\0' ; ++c ) {
+			if ( !std::isprint(*c, std::locale::classic()) ) {
+				return false;
+			}
+            if (*c == '@') { hasAt = true; }
+            if (*c == '.') { hasDot = true; }
+		}
+
+		return hasAt && hasDot;
+	}
+
 	bool IsValidCallsign(const char* callsign) {
-		if ( strlen(callsign) < 2 )
+		if ( strlen(callsign) < 2 || strlen(callsign) > 10)
 			return false;
 
 		for ( const char* c = callsign ; *c != '\0' ; ++c ) {
@@ -296,37 +315,113 @@ namespace {
 	}
 }
 
+namespace {
+	// The point in the login process we're at.
+	enum { LoginReady, LoginNewUser, LoginNeedEmail } steam_login_state = LoginReady;
+
+	void UpdateLoginState(SteamLoginResponse res) {
+		switch ( res ) {
+		case SteamLoginResponse::LoginSuccess:
+			steam_login_state = LoginReady;
+			break;
+		case SteamLoginResponse::LoginNewUser:
+			assert ( steam_login_state == LoginReady );
+			steam_login_state = LoginNewUser;
+			break;
+		case SteamLoginResponse::LoginEmailRequired:
+			assert(steam_login_state == LoginReady);
+			steam_login_state = LoginNeedEmail;
+			break;
+
+		// Issues/conflicts with user input; don't affect state.
+		case SteamLoginResponse::LoginCallsignInvalid:
+		case SteamLoginResponse::LoginCallsignDisallowed:
+		case SteamLoginResponse::LoginCallsignInUse:
+		case SteamLoginResponse::LoginEmailInvalid:
+		case SteamLoginResponse::LoginEmailInUse:
+		case SteamLoginResponse::LoginEmailNotValidated:
+			break;
+
+		// Something went wrong, reset things on our end.
+		case SteamLoginResponse::LoginNotValidUser:
+		case SteamLoginResponse::LoginUnknownError:
+		case SteamLoginResponse::LoginExistingUser:
+			steam_login_state = LoginReady;
+			break;
+		default:
+			dbugLog(_FLW, "Unknown login response %u", res);
+			steam_login_state = LoginReady;
+		}
+	}
+
+	//--------------
+
+	// Simple RAII wrapper to ensure proper setup/takedown for Steam auth tickets.
+	struct SteamAuthSessionTicket {
+		SteamAuthSessionTicket(void)
+		{ handle = SteamUser()->GetAuthSessionTicket(data, array_size(data), &length); }
+		~SteamAuthSessionTicket() { SteamUser()->CancelAuthTicket(handle); }
+
+		HAuthTicket handle;
+		char data[512];
+		uint32_t length;
+	};
+
+	SteamLoginResult AttemptSteamLogin(uint32_t arena, const char* callsign, const char* email) {
+		// Some quick pre-validation to avoid unnecessarily pestering auth.
+		if ( (steam_login_state == LoginNewUser || steam_login_state == LoginNeedEmail) &&
+		     ! IsValidEmail(email) ) {
+			return {SteamLoginResponse::LoginEmailInvalid};
+		}
+		if ( steam_login_state == LoginNewUser && ! IsValidCallsign(callsign) ) {
+			return {SteamLoginResponse::LoginCallsignInvalid};
+		}
+
+		//------
+
+		SteamAuthSessionTicket tkt;
+		switch ( steam_login_state ) {
+		case LoginReady:
+			return authRequestSteamLogin(tkt.data, tkt.length, arena);
+		case LoginNewUser:
+			return authRequestSteamSignup(tkt.data, tkt.length, arena, callsign, email);
+		case LoginNeedEmail:
+			return authRequestSteamEmailChange(tkt.data, tkt.length, arena, email);
+		default:
+			assert ( false );
+			return {SteamLoginResponse::LoginUnknownError};
+		}
+	}
+}
+
 JS_FUNCTION_DEF(jsClient, steamconnect) {
 	assert ( IsSteamCopy() );
 
 	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
 	if ( ! jsclient ) return JS_FALSE;
 	if ( argc < 1 ) return JS_FALSE;
-	
-	int32 arena;
-	if (gArena[0]) {
-        arena = strtol(gArena, nullptr, 10);
-    } else {
-        JS_ValueToInt32(ctx, argv[0], &arena);
-    }
 
-	const char* callsign = "";
-	if ( argc >= 2 ) {
-		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
-
-		// TODO: Move this stuff out of GUI code.
-		if ( callsign[0] != '\0' && IsValidCallsign(callsign) == false ) {
-			*rval = INT_TO_JSVAL(SteamLoginResponse::LoginCallsignInvalid);
-			return JS_TRUE;
-		}
+	uint32_t arena;
+	if ( gArena[0] ) // Overridden by command line
+		arena = static_cast<uint32_t>(strtol(gArena, nullptr, 10));
+	else {
+		int32 jsarena;
+		JS_ValueToInt32(ctx, argv[0], &jsarena);
+		arena = static_cast<uint32_t>(jsarena);
 	}
 
-	char ticket_data[512];
-	uint32_t ticket_length;
-	HAuthTicket ticket = SteamUser()->GetAuthSessionTicket(ticket_data, array_size(ticket_data),
-	                                                       &ticket_length);
-	SteamLoginResult result = authRequestSteamLogin(ticket_data, ticket_length, arena, callsign);
-	SteamUser()->CancelAuthTicket(ticket);
+	const char* email = "";
+	if ( argc >= 2 )
+		email = JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
+
+	const char* callsign = "";
+	if ( argc >= 3 )
+		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[2]));
+
+	//--------------
+
+	SteamLoginResult result = AttemptSteamLogin(arena, callsign, email);
+	UpdateLoginState(result.status);
 
 	if ( result.status == SteamLoginResponse::LoginSuccess )
 		rnsetServerInfo(result.serverIP, result.serverPort, result.otp);

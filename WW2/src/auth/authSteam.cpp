@@ -12,128 +12,148 @@
 #include "build_info.hpp"
 #include "json.hpp"
 
-static const std::string authSteamLoginProtocol = "https";
-static const std::string authSteamLoginResource = "/v1/login";
+static const std::string authSteamRESTPrefix = "/v2/";
 
-SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &requestedCallsign)
+static inline SteamLoginResponse _loginResponseFromResultCode(uint32_t resultCode)
+{
+    switch (resultCode) {
+        case static_cast<uint32_t>(SteamLoginResponse::LoginSuccess):
+        case static_cast<uint32_t>(SteamLoginResponse::LoginNotValidUser):
+        case static_cast<uint32_t>(SteamLoginResponse::LoginNewUser):
+        case static_cast<uint32_t>(SteamLoginResponse::LoginCallsignInvalid):
+        case static_cast<uint32_t>(SteamLoginResponse::LoginCallsignDisallowed):
+        case static_cast<uint32_t>(SteamLoginResponse::LoginCallsignInUse):
+        case static_cast<uint32_t>(SteamLoginResponse::LoginUnknownError):
+        case static_cast<uint32_t>(SteamLoginResponse::LoginEmailRequired):
+        case static_cast<uint32_t>(SteamLoginResponse::LoginEmailInvalid):
+        case static_cast<uint32_t>(SteamLoginResponse::LoginEmailInUse):
+        case static_cast<uint32_t>(SteamLoginResponse::LoginEmailNotValidated):
+        case static_cast<uint32_t>(SteamLoginResponse::LoginExistingUser):
+            return static_cast<SteamLoginResponse>(resultCode);
+        default:
+            return SteamLoginResponse::INVALID_RESPONSE_CODE;
+    }
+}
+
+static inline std::string _getAuthRelayURL(const std::string &endpoint)
+{
+#ifndef NDEBUG
+    // Only allow override on Development/Debug builds
+    if (gAuthRelayURL[0] != 0) {
+        return gAuthRelayURL + endpoint;
+    }
+#endif
+    return std::string("https://") + gAuthServer + authSteamRESTPrefix + endpoint;
+}
+
+static std::string _encodeSteamTicket(const void *authTicket, size_t authTicketLen)
 {
     ABORT_IF_EX(authTicket == nullptr || authTicketLen < 1, "Steam auth ticket is required");
+
+    const uint8_t *pAuthTicket = static_cast<const uint8_t *>(authTicket), *pAuthEnd = pAuthTicket + authTicketLen;
+    std::string result(authTicketLen << 1, 0); // two hex digits per byte
+    
+    for (size_t i = 0; pAuthTicket < pAuthEnd; i += 2, ++pAuthTicket) {
+        result[i + 0] = "0123456789abcdef"[*pAuthTicket >>  4];
+        result[i + 1] = "0123456789abcdef"[*pAuthTicket & 0x7];
+    }
+    return result;
+}
+
+static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nlohmann::json params, bool successReadsData = false) // params is *purposely* not a const&
+{
+    // Can't make this a static inline function because there's no dbugLogv()!
+    #define _requestError(msg, ...) do { dbugLog(_FLD, msg, ## __VA_ARGS__); return SteamLoginResponse::LoginUnknownError; } while (0)
     
     sysBasicHTTPRequest request;
     sysBasicHTTPResponse response;
     
     request.method = "POST";
-    request.url = authSteamLoginProtocol + "://" + gAuthServer + authSteamLoginResource;
+    request.url = _getAuthRelayURL(endpoint);
     request.headers["Content-Type"] = "application/json";
     request.headers["X-WWIIOnline-Client-Version"] = PN_product_version_string; // Not required, just for good measure
-    
-    const unsigned char *pAuthTicket = reinterpret_cast<const unsigned char *>(authTicket);
-    std::stringstream steamTicketEncoded;
-    for(size_t i=0; i < authTicketLen; i++) {
-        int decVal = pAuthTicket[i];
-        steamTicketEncoded << std::hex << std::setfill('0') << std::setw(2) << decVal;
-    }
-    
-    request.content = std::string("{") + // TODO: Do a real JSON encode here instead of just stringing strings together
-        "\"steam_ticket\":" + "\"" + steamTicketEncoded.str() + "\","
-        "\"arena_id\":" + std::to_string(arenaID) + "," +
-        "\"app_version\":" + std::to_string(PN_build_version_value) + "," +
-        "\"app_platform\":" + std::to_string(platOS - 1) + // HACK!! OS_WIN32 == 1, OS_MACOS == 2, auth platform values are 0 and 1
-        (requestedCallsign.empty() ? "" : std::string(",\"callsign\":\"") + requestedCallsign + "\"") +
-    "}";
+    request.content = params.dump();
     
     if (!sysExecuteHTTPRequest(request, response)) {
-        // TODO: Better error handling
-        dbugLog(_FLD, "Failed to execute HTTP request with URL %s", request.url.c_str());
-        return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+        _requestError("Failed to execute HTTP request with URL %s", request.url.c_str());
     }
-    
     if (response.responseCode != 200) {
-        // TODO: Better error handling
-        dbugLog(_FLD, "Server returned non-200 response code %d with URL %s", response.responseCode, request.url.c_str());
-        return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+        _requestError("Server returned non-200 response code %d with URL %s", response.responseCode, request.url.c_str());
     }
-    
     if (response.headers.find("content-type") == response.headers.end() || response.headers["content-type"] != "application/json") {
-        // TODO: Better error handling
-        dbugLog(_FLD, "Server returned non-JSON content-type with URL %s", request.url.c_str());
-        return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+        _requestError("Server returned non-JSON content-type with URL %s", request.url.c_str());
     }
     
-    try {
-        auto responseJson = nlohmann::json::parse(response.content);
-        
-        if (!responseJson.is_object()) {
-            // TODO: Better error handling
-            dbugLog(_FLD, "Server returned non-object JSON with URL %s content %s", request.url.c_str(), response.content.c_str());
-            return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
-        }
-        if (responseJson.find("result") == responseJson.end() || !responseJson["result"].is_number_unsigned()) {
-            // TODO: Better error handling
-            dbugLog(_FLD, "Server returned JSON with no or invalid result code with URL %s content %s", request.url.c_str(), response.content.c_str());
-            return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
-        }
-        
-        uint64_t resultCode = responseJson["result"];
-        
-        // TODO: This is a bad API design - it relies on the auth relay using
-        // the same numeric values as the client-side enum. In the future this
-        // should be improved.
-        if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginSuccess)) {
-            if (responseJson.find("arenaID") == responseJson.end() || !responseJson["arenaID"].is_number_unsigned()) {
-                // TODO: Better error handling
-                dbugLog(_FLD, "Server returned JSON with no or invalid arena ID with URL %s content %s", request.url.c_str(), response.content.c_str());
-                return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
-            }
-            if (responseJson.find("otp") == responseJson.end()) { //|| !responseJson["otp"].is_number_unsigned()) {
-                // TODO: Better error handling
-                dbugLog(_FLD, "Server returned JSON with no or invalid OTP with URL %s content %s", request.url.c_str(), response.content.c_str());
-                return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
-            }
-            if (responseJson.find("serverIP") == responseJson.end()) { //|| !responseJson["serverIP"].is_number_unsigned()) {
-                // TODO: Better error handling
-                dbugLog(_FLD, "Server returned JSON with no or invalid server IP with URL %s content %s", request.url.c_str(), response.content.c_str());
-                return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
-            }
-            if (responseJson.find("serverPort") == responseJson.end() || !responseJson["serverPort"].is_number_unsigned()) {
-                // TODO: Better error handling
-                dbugLog(_FLD, "Server returned JSON with no or invalid server port with URL %s content %s", request.url.c_str(), response.content.c_str());
-                return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+    auto responseJson = nlohmann::json::parse(response.content, nullptr, /*allow_exceptions:*/false);
+    
+    if (responseJson.is_discarded() || !responseJson.is_object()) {
+        _requestError("Server returned invalid or non-object JSON with URL %s content %s", request.url.c_str(), response.content.c_str());
+    }
+
+    auto resultPtr = responseJson.find("result");
+    if (resultPtr == responseJson.end() || !resultPtr->is_number_unsigned()) {
+        _requestError("Server returned JSON with no or invalid result code with URL %s content %s", request.url.c_str(), response.content.c_str());
+    }
+    SteamLoginResponse resultCode = _loginResponseFromResultCode(resultPtr->get<uint32_t>());
+    
+    switch (resultCode) {
+        case SteamLoginResponse::INVALID_RESPONSE_CODE:
+            _requestError("Server returned JSON with unknown result code %u with URL %s content %s", responseJson["result"].get<uint32_t>(), request.url.c_str(), response.content.c_str());
+            
+        case SteamLoginResponse::LoginSuccess: {
+            if (!successReadsData)  {
+                return resultCode;
             }
             
-            int32_t resultArenaID = responseJson["arenaID"];
-            uint32_t resultOTP = std::stoul(responseJson["otp"].get<std::string>());
-            uint32_t resultServerIP = std::stoul(responseJson["serverIP"].get<std::string>());
-            uint32_t resultServerPort = responseJson["serverPort"];
+            auto arenaIDPtr = responseJson.find("arenaID");
+            auto otpPtr = responseJson.find("otp");
+            auto serverIPPtr = responseJson.find("serverIP");
+            auto serverPortPtr = responseJson.find("serverPort");
 
-            return { SteamLoginResponse::LoginSuccess, resultArenaID, resultOTP, resultServerIP, resultServerPort };
-        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginNotValidUser)) {
-            return { SteamLoginResponse::LoginNotValidUser, 0, 0, 0, 0 };
-        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignRequired)) {
-            return { SteamLoginResponse::LoginCallsignRequired, 0, 0, 0, 0 };
-        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignInvalid)) {
-            return { SteamLoginResponse::LoginCallsignInvalid, 0, 0, 0, 0 };
-        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignDisallowed)) {
-            return { SteamLoginResponse::LoginCallsignDisallowed, 0, 0, 0, 0 };
-        } else if (resultCode == static_cast<uint32_t>(SteamLoginResponse::LoginCallsignInUse)) {
-            return { SteamLoginResponse::LoginCallsignInUse, 0, 0, 0, 0 };
-        } else {
-            // TODO: Better error handling
-            dbugLog(_FLD, "Server returned JSON with unknown result code with URL %s content %s", request.url.c_str(), response.content.c_str());
-            return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+            if (arenaIDPtr == responseJson.end() || !arenaIDPtr->is_number_unsigned()) {
+                _requestError("Server returned JSON with no or invalid arena ID with URL %s content %s", request.url.c_str(), response.content.c_str());
+            }
+            if (otpPtr == responseJson.end() || !otpPtr->is_number_unsigned()) {
+                _requestError("Server returned JSON with no or invalid OTP with URL %s content %s", request.url.c_str(), response.content.c_str());
+            }
+            if (serverIPPtr == responseJson.end() || !serverIPPtr->is_number_unsigned()) {
+                _requestError("Server returned JSON with no or invalid server IP with URL %s content %s", request.url.c_str(), response.content.c_str());
+            }
+            if (serverPortPtr == responseJson.end() || !serverPortPtr->is_number_unsigned()) {
+                _requestError("Server returned JSON with no or invalid server port with URL %s content %s", request.url.c_str(), response.content.c_str());
+            }
+
+            return { arenaIDPtr->get<int32_t>(), otpPtr->get<uint32_t>(), serverIPPtr->get<uint32_t>(), serverPortPtr->get<uint32_t>() };
         }
-    } catch (std::invalid_argument &e) {
-        // TODO: Better error handling
-        dbugLog(_FLD, "Server returned invalid JSON with URL %s content %s", request.url.c_str(), response.content.c_str());
-        return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
-    } catch (...) {
-        // TODO: Narrow this down!
-        // TODO: Better error handling
-        dbugLog(_FLD, "Server returned something it failed to deal with with URL %s content %s", request.url.c_str(), response.content.c_str());
-        return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
+        
+        default:
+            return resultCode;
     }
-    
-    // TODO: Logging, better error handling
-    return { SteamLoginResponse::LoginUnknownError, 0, 0, 0, 0 };
 }
 
+SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID)
+{
+    return _doRequestWithParameters("login", {
+        { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
+        { "arena_id", arenaID },
+        { "app_version", PN_build_version_value },
+        { "app_platform", platOS },
+    }, true);
+}
+
+SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &callsign, const std::string &email)
+{
+    return _doRequestWithParameters("signup", {
+        { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
+        { "callsign", callsign },
+        { "email", email },
+    });
+}
+
+SteamLoginResult authRequestSteamEmailChange(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &email)
+{
+    return _doRequestWithParameters("email", {
+        { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
+        { "email", email },
+    });
+}
