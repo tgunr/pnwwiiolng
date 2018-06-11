@@ -27,9 +27,11 @@
 	ww2imap
 *************************************************************************************************/
 
-#define USER_CFML_DIR ((WantDataDir) ? "usercfml" : "cfml")
+//  #define USER_CFML_DIR ((WantDataDir) ? "usercfml" : "cfml")
+#define USER_CFML_DIR "cfml"
 //#define IMAP_PRESETS "cfml" FILE_SEPARATOR "presets.xml"
-#define GLOBAL_CALIBRATION_FILENAME ((WantDataDir) ? "usercfml/global.calib" : "cfml/global.calib")
+//  #define GLOBAL_CALIBRATION_FILENAME ((WantDataDir) ? "usercfml/global.calib" : "cfml/global.calib")
+#define GLOBAL_CALIBRATION_FILENAME "cfml/global.calib"
 #define IMAP_PRESETS "cfml/presets.xml"
 
 #define MAX_VEHICLES 512

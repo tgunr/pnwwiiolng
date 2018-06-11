@@ -148,7 +148,8 @@ int	paOpen(paFILE* pf, const char* archivename, const char* mode)
 {
 	int i;
 
-	wwiiolpath_string curWorkingDir = L""; 
+#if platOS == OS_WIN32
+    wwiiolpath_string curWorkingDir = L"";
 	wchar_t wBuffer[MAX_PATH + 1];
 
 	wBuffer[0] = 0;
@@ -158,7 +159,9 @@ int	paOpen(paFILE* pf, const char* archivename, const char* mode)
 
 	SetCurrentDirectory(WW2_exePlayarcPath.c_str());
 
-	for(i = 0; i < PA_MAX_ARC; i++)
+#endif
+    
+    for(i = 0; i < PA_MAX_ARC; i++)
 	{
 		if(pf->arc[i].f == nullptr)
 		{
@@ -174,7 +177,9 @@ int	paOpen(paFILE* pf, const char* archivename, const char* mode)
 		}
 	}
 
+#if platOS == OS_WIN32
 	SetCurrentDirectory(curWorkingDir.c_str());
+#endif
 
 	return -1;
 }

@@ -118,7 +118,16 @@ UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
 #else
 	strsafecpy(name, rawname);
 #endif
-	return pathprintf(path, PN_MAX_PATH, fiodGetPrepath(), os_file_path(name));
+    //  return pathprintf(path, PN_MAX_PATH, fiodGetPrepath(), os_file_path(name));
+
+    UINT32 retValue = 0;
+    char returnBuffer[MAX_PATH + 1] = "";
+    char *returnValue = returnBuffer;
+    
+    //  retString = fiodGetPrepath();
+    fiodGetPrepath(returnValue);
+    retValue = pathprintf(path, PN_MAX_PATH, returnBuffer, os_file_path(name));
+    return retValue;
 }
 
 //==============================================================================
@@ -144,7 +153,7 @@ namespace {
 	bool GetFileStat(stat_t& s, const char* name, bool userdir, fullpath_t* outpath = nullptr) {
 		fullpath_t locpath[PN_MAX_PATH];
 		fullpath_t* path = (outpath ? outpath : locpath);
-
+        ;
 		WITH ( UsingUserdir(userdir) )
 			GetFullPath_unsafe(path, name);
 		int result = GetStat(s, path);
@@ -494,18 +503,40 @@ void fiodSetUserpath(bool userpath) {
 	use_userpath = userpath;
 }
 
-const fullpath_t* fiodGetPrepath()
+/*const fullpath_t* fiodGetPrepath()
 {
+    char returnBuffer[MAX_PATH + 1] = "";
+    char *returnValue = returnBuffer;
+    
 	if (WantDataDir == TRUE && WantedDataPath != L"")
 	{
-		return WantedDataPath.c_str();
-		
+        Wstring2Char(WantedDataPath, returnBuffer, sizeof(returnBuffer));
 	}
 	else
 	{
-		return use_userpath ? WW2_userConfigPath.c_str() : WW2_exeDataPath.c_str();
-	}
+		wwiiolpath_string tepmString =  use_userpath ? WW2_userConfigPath : WW2_exeDataPath;
+        Wstring2Char(tepmString, returnBuffer, sizeof(returnBuffer));
+    }
+    
+    return returnValue;
 }
+*/
+
+bool fiodGetPrepath(char returnBuffer[MAX_PATH + 1])
+{
+    if (WantDataDir == TRUE && WantedDataPath != L"")
+    {
+        Wstring2Char(WantedDataPath, returnBuffer, MAX_PATH + 1);
+    }
+    else
+    {
+        wwiiolpath_string tepmString =  use_userpath ? WW2_userConfigPath : WW2_exeDataPath;
+        Wstring2Char(tepmString, returnBuffer, MAX_PATH + 1);
+    }
+    
+    return true;
+}
+
 #else
 void fiodSetUserpath(bool) {}
 
@@ -529,7 +560,11 @@ void fiodmkdir(const char* path)
 {
 #if platOS == OS_MACOS || platOS == OS_LINUX
 	char fullPath[PN_MAX_PATH];
-	strprintf(fullPath, "%s%s", macPreferencesPath(), path);
+    char prePath[PN_MAX_PATH];
+    
+    Wstring2Char(WW2_userConfigPath, prePath, PN_MAX_PATH);
+
+    strprintf(fullPath, "%s/%s", prePath, path);
 	OS_MKDIR(os_file_path(fullPath), S_IRWXU);
 #elif platOS == OS_WIN32
 	wchar_t fullPath[PN_MAX_PATH];
@@ -886,7 +921,11 @@ void fiocfgMkDir(const char* path, bool)
 LOGICAL fiocfgAccess(const char* filename, bool)
 {
 	char	fullpath[_MAX_PATH];
-	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
+    char    prePath[_MAX_PATH];
+    
+    Wstring2Char(WW2_userConfigPath, prePath, _MAX_PATH);
+   
+	strprintf(fullpath,"%s/%s", prePath, filename);
     int fd = -1;
     if (OS_OPEN(&fd, os_file_path(fullpath), O_RDONLY, 0) == 0) { // fix for 1083
         OS_CLOSE(fd);
@@ -898,7 +937,11 @@ LOGICAL fiocfgAccess(const char* filename, bool)
 LOGICAL fiocfgModified(SINT32* modified, const char* filename)
 {
 	char	fullpath[_MAX_PATH];
-	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
+    char    prePath[_MAX_PATH];
+    
+    Wstring2Char(WW2_userConfigPath, prePath, _MAX_PATH);
+    
+	strprintf(fullpath,"%s/%s", prePath, filename);
 
 	struct	stat	buffer;
 	int retval = stat(os_file_path(fullpath), &buffer);
@@ -911,10 +954,13 @@ LOGICAL fiocfgModified(SINT32* modified, const char* filename)
 size_t fiocfgOpen(const char* filename, bool)
 {
 	char	fullpath[_MAX_PATH];
+    char    prePath[_MAX_PATH];
 	int		hfile = -1;
 	struct stat st;
-
-	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
+    
+    Wstring2Char(WW2_userConfigPath, prePath, _MAX_PATH);
+    
+	strprintf(fullpath,"%s/%s", prePath, filename);
 	os_file_path(fullpath);
 
 	stat(fullpath, &st);
@@ -926,10 +972,13 @@ size_t fiocfgOpen(const char* filename, bool)
 
 size_t fiocfgOpenWrite(const char* filename, bool)
 {
-	char  fullpath[_MAX_PATH];
-	int   hfile = -1;
+	char    fullpath[_MAX_PATH];
+    char    prePath[_MAX_PATH];
+	int     hfile = -1;
+    
+    Wstring2Char(WW2_userConfigPath, prePath, _MAX_PATH);
 
-	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
+	strprintf(fullpath,"%s/%s", prePath, filename);
 	os_file_path(fullpath);
 
 	OS_OPEN(&hfile, fullpath, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
@@ -939,11 +988,14 @@ size_t fiocfgOpenWrite(const char* filename, bool)
 
 SINT32 fiocfgFileSize(const char* filename, bool)
 {
-	char fullpath[_MAX_PATH];
+	char    fullpath[_MAX_PATH];
+    char    prePath[_MAX_PATH];
 	struct	stat	buffer;
-	SINT32 retval;
+	SINT32  retval;
+    
+    Wstring2Char(WW2_userConfigPath, prePath, _MAX_PATH);
 
-	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
+	strprintf(fullpath,"%s/%s", prePath, filename);
 	os_file_path(fullpath);
 
 	retval = stat(fullpath, &buffer);

@@ -24,17 +24,20 @@ static SINT32 fio_switch;
 
 void fioInit()
 {
+    LOGICAL resultValue = FALSE;
+    
+    // Default to current directory
 #if platOS == OS_WIN32
-	// Default to current directory
-	LOGICAL resultValue = FALSE;
-
-	resultValue = fioStructureInit();
-
-	resultValue = SetCurrentDirectoryW(WW2_userConfigPath.c_str());
+    
+    //  \User -> My Documents -> WWIIOnLine
+    resultValue = fioStructureInit();
+    resultValue = SetCurrentDirectoryW(WW2_userConfigPath.c_str());
 
 #elif platOS == OS_MACOS
-	// TODO: Need a Mac guy to verify this will work nicely
-	strsafecpy(WW2_userConfigPath, macDocumentsPath());
+    
+    //  /Users -> "currentuser" -> Documents -> WWIIOnline
+    resultValue = fioStructureInit();
+    //  resultValue = fioSetCurrentWorkingPath(WW2_userConfigPath);
 
 #endif
 }
@@ -58,7 +61,7 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 
 	// Assess the file size, assume fioFileSize will
 	// report any errors locating the file etc.
-	SINT32 fileSize = fioFileSize(filename);
+	UINT32 fileSize = fioFileSize(filename);
 	if ( PN_UNLIKELY(fileSize < 0) )
 	{
 		return false;
@@ -120,16 +123,21 @@ int fioOpen(const char* const filename)
 
 	switch(fio_switch)
     {
+        //  local "user" directory.
 		case ISUSERDIRECTORY:
-			WITH ( UsingUserdir() )
+            WITH ( UsingUserdir() )
 				fd = fiodOpen(fn);
 		break;
+            
+        //  local directory.
         case ISDIRECTORY:
        	default:
-			fd = fiodOpen(fn);
+            fd = fiodOpen(fn);
        	break;
+            
+        //  playarc virtual directory (playarc).
         case ISARCHIVE:
-			fd = fioaOpen(fn);
+            fd = fioaOpen(fn);
        	break;
     }
 
@@ -148,12 +156,19 @@ FILE* fioUserFile(const char* filename, const char* mode)
 	wwiiolpath_string tmpPath = WW2_exeWorkingPath;
 
 	mbstowcs(tmpFilename, filename, PN_MAX_PATH);
-	tmpPath += L"\\";
-	tmpPath += tmpFilename;
+//	tmpPath += L"\\";
+//	tmpPath += tmpFilename;
 	
 #if platOS == OS_WIN32 && defined(_UNICODE)
-	return _wfopen(tmpPath.c_str(), UTF16(mode));
+    tmpPath += L"\\";
+    tmpPath += tmpFilename;
+
+    return _wfopen(tmpPath.c_str(), UTF16(mode));
 #else
+    tmpPath += L"/";
+    tmpPath += tmpFilename;
+
+    Wstring2Char(tmpPath, path, PN_MAX_PATH);
 	return fopen(path, mode);
 #endif
 }

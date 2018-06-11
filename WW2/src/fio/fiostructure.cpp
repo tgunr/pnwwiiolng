@@ -36,9 +36,9 @@ wwiiolpath_string WW2_exeDataPath;		//	??_exeDataPath - EXE Support Data folder:
 wwiiolpath_string WW2_exeDocsPath;		//	??_exeDocsPath - EXE Docs Folder:  \Program * Files -> WWIIOnLine -> docs == eula.txt, license.*, regions.txt, tos.txt.
 wwiiolpath_string WW2_exePlayarcPath;	//	??_exePlayarcPath - EXE playarc folder:  \Program * Files -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
 wwiiolpath_string WW2_exeWorkingPath;	//	??_exeWorkingPath - Windows - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-										//	??_exeWorkingPath - macOS - EXE Working folder:  /Library/Application Support//WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+										//	??_exeWorkingPath - macOS - EXE Working folder:  /Library -> Application Support -> WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
 wwiiolpath_string WW2_userConfigPath;	//	??_userConfigPath - Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
-										//	??_userConfigPath - macOS - USER Config ROOT folder:  /Users/"currentuser"/Documents/WWIIOnline == wwiiol.xml, cfml(dir).
+										//	??_userConfigPath - macOS - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
 wwiiolpath_string WW2_userWorkingPath;	//	??_userWorkingPath - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
 
 
@@ -48,10 +48,26 @@ fioStructureInit - sets up the data directory structure on clients
 
 LOGICAL fioStructureInit()
 {
+    LOGICAL fioStructureInit_Value = TRUE;
+
+    LOGICAL exePathSet = FALSE;
+    //	LOGICAL exeBinPathSet = FALSE;
+    LOGICAL exeDataPathSet = FALSE;
+    LOGICAL exeDocsPathSet = FALSE;
+    LOGICAL exePlayarcPathSet = FALSE;
+    LOGICAL exeWorkingPathSet = FALSE;
+    LOGICAL userConfigPathSet = FALSE;
+    LOGICAL userWorkingPathSet = FALSE;
+    
+    const wwiiolpath_string WW2filename = L"\\WW2.exe";		// \\WW2.exe
+    const wwiiolpath_string DirNameBIN = L"\\bin";			//  -> bin
+    const wwiiolpath_string DirNameDATA = L"\\DATA";		//  -> DATA
+    const wwiiolpath_string DirNameDOCS = L"\\docs";		//  -> docs
+    const wwiiolpath_string DirNamePLAYARC = L"\\playarc";	//  -> playarc
+
 #if platOS == OS_WIN32
 	//  Returns true if NO errors were encounered.
 
-	LOGICAL fioStructureInit_Value = TRUE;
 	wchar_t wBuffer[MAX_PATH + 1];
 	int returnResult = -10;
 	wwiiolpath_string exeFullPath = L"";
@@ -69,21 +85,6 @@ LOGICAL fioStructureInit()
 	wwiiolpath_string userConfigPath = L"";		//	??_userConfigPath - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
 	wwiiolpath_string userWorkingPath = L"";	//	??_userWorkingPath - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
 	
-	LOGICAL exePathSet = FALSE;
-//	LOGICAL exeBinPathSet = FALSE;
-	LOGICAL exeDataPathSet = FALSE;
-	LOGICAL exeDocsPathSet = FALSE;
-	LOGICAL exePlayarcPathSet = FALSE;
-	LOGICAL exeWorkingPathSet = FALSE;
-	LOGICAL userConfigPathSet = FALSE;
-	LOGICAL userWorkingPathSet = FALSE;
-
-	const wwiiolpath_string WW2filename = L"\\WW2.exe";		// \\WW2.exe
-	const wwiiolpath_string DirNameBIN = L"\\bin";			//  -> bin
-	const wwiiolpath_string DirNameDATA = L"\\DATA";		//  -> DATA
-	const wwiiolpath_string DirNameDOCS = L"\\docs";		//  -> docs
-	const wwiiolpath_string DirNamePLAYARC = L"\\playarc";	//  -> playarc
-
 
 	//  exePath: Setup - START.
 	//	??_exePath - EXE ROOT folder:  \Program * Files -> WWIIOnLine == *.exe, WWIIOnLine.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
@@ -557,7 +558,112 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
 
 #elif platOS == OS_MACOS
 	// TODO: Need a Mac guy to verify this will work nicely
-	strsafecpy(userConfigPath, macDocumentsPath());
+    
+    const char *returnValue;
+    fioStructureInit_Value = TRUE;
+    
+    wwiiolpath_string exePath = L"";			//	??_exePath - EXE ROOT folder:  /Applications -> World War II Online.app == Contents -> _CodeSignature(dir), Frameworks(dir), MacOS(dir -> exefile), Resources(dir) info.plist, PkgInfo and others.
+    wwiiolpath_string exeDataPath = L"";		//	??_exeDataPath - EXE Support Data folder:  /Applications -> World War II Online.app -> Contents -> Resources == placeholder images (x2), playarc.ww2, steam_apid.txt, WWIIOnLine.ico, readme.*, eula.txt, license.*, regions.txt, tos.txt.
+    wwiiolpath_string exePlayarcPath = L"";		//	??_exePlayarcPath - EXE playarc folder:  /Applications -> World War II Online.app -> Contents -> Resources -> playarc.ww2  --OR--  == "-data" command line switch.
+    wwiiolpath_string exeWorkingPath = L"";		//	??_exeWorkingPath - EXE Working folder:  /Library -> Application Support -> WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+    wwiiolpath_string userConfigPath = L"";		//	??_userConfigPath - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
+    wwiiolpath_string userWorkingPath = L"";	//	??_userWorkingPath - USER Working folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin == lg.dat.
+    
+    returnValue = macAppPath();
+    if (returnValue != NULL)
+    {
+        //  /Applications -> World War II Online.app
+        wwiiolpath_string appPath(&returnValue[0], &returnValue[strlen(returnValue)]);
+        exePath = appPath;
+        exePathSet = TRUE;
+    }
+    else
+    {
+        fioStructureInit_Value = FALSE;
+    }
+
+    returnValue = macDataPath();
+    if (returnValue != NULL)
+    {
+        //  /Applications -> World War II Online.app -> Contents -> Resources
+        wwiiolpath_string dataPath(&returnValue[0], &returnValue[strlen(returnValue)]);
+        exeDataPath = dataPath;
+        exeDataPathSet = TRUE;
+    }
+    else
+    {
+        fioStructureInit_Value = FALSE;
+    }
+
+    returnValue = macPlayarcPath();
+    if (returnValue != NULL)
+    {
+        //  /Applications -> World War II Online.app -> Contents -> Resources -> playarc.ww2
+        wwiiolpath_string playarcPath(&returnValue[0], &returnValue[strlen(returnValue)]);
+        exePlayarcPath = playarcPath;
+        exePlayarcPathSet = TRUE;
+    }
+    else
+    {
+        fioStructureInit_Value = FALSE;
+    }
+    
+    returnValue = macWorkingPathAPP();
+    if (returnValue != NULL)
+    {
+        //  /Library -> Application Support -> WWIIOnline
+        wwiiolpath_string workingPathAPP(&returnValue[0], &returnValue[strlen(returnValue)]);
+        exeWorkingPath = workingPathAPP;
+        exeWorkingPathSet = TRUE;
+    }
+    else
+    {
+        fioStructureInit_Value = FALSE;
+    }
+   
+    returnValue = macCrashLogsPath();
+    if (returnValue != NULL)
+    {
+        //  Creates Folder ONLY.
+        
+        //  /Library -> Application Support -> WWIIOnline -> CrashLogs
+        wwiiolpath_string tempPathAPP(&returnValue[0], &returnValue[strlen(returnValue)]);
+        //  exeWorkingPath = workingPathAPP;
+    }
+   
+    returnValue = macUserDocumentsPath();
+    if (returnValue != NULL)
+    {
+        //  /Users -> "currentuser" -> Documents -> WWIIOnline
+        wwiiolpath_string userDocumentsPath(&returnValue[0], &returnValue[strlen(returnValue)]);
+        userConfigPath = userDocumentsPath;
+        userConfigPathSet = TRUE;
+    }
+    else
+    {
+        fioStructureInit_Value = FALSE;
+    }
+
+    returnValue = macUserWorkingPath();
+    if (returnValue != NULL)
+    {
+        //  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin
+        wwiiolpath_string workingPathUSER(&returnValue[0], &returnValue[strlen(returnValue)]);
+        userWorkingPath = workingPathUSER;
+        userWorkingPathSet = TRUE;
+    }
+    else
+    {
+        fioStructureInit_Value = FALSE;
+    }
+    
+    WW2_exePath = exePath;
+    //	WW2_exeBinPath = exeBinPath;
+    WW2_exeDataPath = exeDataPath;
+    WW2_exePlayarcPath = exePlayarcPath;
+    WW2_exeWorkingPath = exeWorkingPath;
+    WW2_userConfigPath = userConfigPath;
+    WW2_userWorkingPath = userWorkingPath;
 #endif
 
 	return fioStructureInit_Value;
@@ -572,19 +678,20 @@ LOGICAL fioStructureVerify()
 }
 
 
-unsigned int Wstring2Char(wwiiolpath_string sourceString, char *destinationString, const size_t sizeLimit)
+unsigned long Wstring2Char(wwiiolpath_string sourceString, char *destinationString, const size_t sizeLimit)
 {
-	unsigned int retValue = 0;
+	unsigned long retValue = 0;
 
 	if (sizeLimit < 1)
 		return 0;
+    
+    if (sourceString.length() == 0)
+        return 0;
 
 	retValue = wcstombs(destinationString, sourceString.c_str(), (sizeLimit - 1));
 	
-	if (retValue == -1)
-	{
-		return 0;
-	}
+	if (retValue == (size_t)-1)
+        return 0;
 
 	if (retValue == (sizeLimit - 1))
 	{
@@ -593,20 +700,38 @@ unsigned int Wstring2Char(wwiiolpath_string sourceString, char *destinationStrin
 	else if (retValue == sourceString.size())
 	{
 		destinationString[sourceString.size()] = '\0';
+        //  wcstombs return does not include the terminating NULL ( L"\0" ).
+        retValue = retValue + 1;
 	}
 
 	return retValue;
 }
 
 
-unsigned int Char2Wstring(char * sourceString, wwiiolpath_string &destinationString, const size_t sizeLimit)
+unsigned long Char2Wstring(char *sourceString, wwiiolpath_string &destinationString, const size_t sizeLimit)
 {
-	unsigned int retValue = 0;
+	unsigned long retValue = strlen(sourceString);
+    unsigned long copyCount = 0;
 
-	if (sizeLimit < 1)
+	if (sizeLimit < 1 || retValue < 1)
 		return 0;
 
-	destinationString.append(sizeLimit, *sourceString);
+    if(retValue > sizeLimit)
+    {
+        copyCount = sizeLimit;
+    }
+    else
+    {
+        copyCount = retValue;
+    }
+
+    //  wwiiolpath_string tmp(&sourceString[0], &sourceString[strlen(sourceString)]);
+    wwiiolpath_string tmp(&sourceString[0], &sourceString[copyCount]);
+    destinationString = tmp;
+    
+    
+    //  destinationString.append(*sourceString, copyCount);
+    retValue = destinationString.length();
 
 	return retValue;
 }
@@ -624,7 +749,8 @@ void GetWC(const char *sourceString, wwiiolpath_string &destinationString)
 
 bool GetExePath(wwiiolpath_string &outFullPath, wwiiolpath_string &outExeName)
 {
-	wchar_t wBuffer[MAX_PATH + 1];
+#if platOS == OS_WIN32
+    wchar_t wBuffer[MAX_PATH + 1];
 	std::wstring returnFullPath = L"";
 
 	// Retrieve the full path for the current module. NULL = calling file (exe).
@@ -640,6 +766,49 @@ bool GetExePath(wwiiolpath_string &outFullPath, wwiiolpath_string &outExeName)
 	outExeName = returnFullPath.substr(found + 1);
 
 	return true;
+#else
+
+    //  const char *returnValue;
+    
+    //  WW2_exePath = L"";
+    //  returnValue = macAppPath();
+    //  wwiiolpath_string exePath(returnValue[0], returnValue[strlen(returnValue)]);
+    //  WW2_exePath = exePath;
+    
+    outFullPath = L"";
+    outExeName = L"";
+    
+    return false;
+#endif
+}
+
+
+wwiiolpath_string fioGetCurrentWorkingPath()
+{
+    char buffer[MAX_PATH];
+    char *answer = getcwd(buffer, sizeof(buffer));
+    wwiiolpath_string retVal;
+    Char2Wstring(answer, retVal, strlen(answer));
+    
+    return retVal;
+}
+
+
+LOGICAL fioSetCurrentWorkingPath(wwiiolpath_string targetPath)
+{
+    LOGICAL retVal = FALSE;
+    char buffer[MAX_PATH];
+    
+    if(targetPath == L"")
+        return FALSE;
+    
+    Wstring2Char(targetPath, buffer, MAX_PATH);
+    int result = chdir(buffer);
+    
+    if (result == 0)
+        retVal = TRUE;
+    
+    return retVal;
 }
 
 

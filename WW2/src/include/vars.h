@@ -6,7 +6,7 @@ static_assert( platBuild != BUILD_SERVER, "Can't include vars.h in a server buil
 
 #include "pi/pi.h"
 #include "include/defs.h"
-#include "fio\fiostructure.h"
+#include "fio/fiostructure.h"
 
 // These are configuration variables that are filled
 // from the .CFG file. Corresponding information

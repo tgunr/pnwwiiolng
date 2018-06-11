@@ -17,6 +17,10 @@
 #include <sys/time.h>
 #include <Cocoa/Cocoa.h>
 
+//  Folder constants
+NSString * const WWIIOnlineFolder = @"WWIIOnLine";
+//  NSString * const WWIIOnlineFolder = @"com.corneredrats.wwiionline";
+
 UINT64 GetMicroSeconds(void)
 {
 	struct timeval tv;
@@ -37,6 +41,7 @@ UINT32 timeGetTime(void)
 
 void chAppDir()
 {
+    //  /Applications -> World War II Online.app -> Contents -> Resources
     @autoreleasepool {
         chdir([NSBundle mainBundle].resourcePath.fileSystemRepresentation);
     }
@@ -68,54 +73,217 @@ char GetOSBuild()
 
 const char* macPreferencesPath()
 {
+    //  /Users -> "currentuser" -> Library -> Preferences -> ww2ol
+    //  /Users -> "currentuser" -> Library -> Preferences -> ww2olcfml
+    //  /Users -> "currentuser" -> Library -> Preferences -> ww2olwwiiolprefs.xml
+    
     static NSURL *prefsDir = nil;
-    static const char *prefsFSR;
+    static const char *targetPathFSR;
     static dispatch_once_t predicate = 0;
     
     dispatch_once(&predicate, ^ {
         @autoreleasepool {
+            prefsDir = [[NSFileManager defaultManager]
+                        URLForDirectory:NSLibraryDirectory
+                        inDomain:NSUserDomainMask
+                        appropriateForURL:nil
+                        create:YES
+                        error:nullptr];
+
             // FIXME: This is a hack to use the prefs directory. Whether this
             // actually belongs there is debatable. Consider Application Support or
             // even Documents instead.
-            prefsDir = [[NSFileManager defaultManager]
-                URLForDirectory:NSLibraryDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nullptr];
             prefsDir = [prefsDir URLByAppendingPathComponent:@"Preferences"];
             prefsDir = [prefsDir URLByAppendingPathComponent:@"ww2ol"];
             
             // We're giving the prefs folder the permissions it would otherwise have
             // gotten by default here. Would 0750 or 0700 be a better choice?
-            [[NSFileManager defaultManager] createDirectoryAtURL:prefsDir withIntermediateDirectories:YES attributes:@{
-                NSFilePosixPermissions: @(0755)
-            } error:nullptr];
-            prefsFSR = strdup(prefsDir.fileSystemRepresentation);
+            [[NSFileManager defaultManager]
+                createDirectoryAtURL:prefsDir
+                withIntermediateDirectories:YES
+                attributes:@{NSFilePosixPermissions: @(0755)
+            }
+            error:nullptr];
+            targetPathFSR = strdup(prefsDir.fileSystemRepresentation);
         }
     });
     
-    return prefsFSR;
+    return targetPathFSR;
 }
 
-const char* macDocumentsPath()
+const char* macAppPath()
 {
-    static NSURL *docsDir = nil;
-    static const char *docsFSR = nullptr;
+    //  /Applications -> World War II Online.app
+    static const char *targetPathFSR;
+    
+    NSBundle *main = [NSBundle mainBundle];
+    //  NSString *tempString = main.executablePath;
+    targetPathFSR = [main.bundlePath UTF8String];
+
+    //  NSString *resourcePath = [main pathForResource:@"ww2" ofType:@"icns"];
+    //  NSURL *appDir = [main URLForResource:@"ww2" withExtension:@"icns"];
+    
+    return targetPathFSR;
+}
+
+const char* macDataPath()
+{
+    //  /Applications -> World War II Online.app -> Contents -> Resources
+    static const char *targetPathFSR;
+    
+    NSBundle *main = [NSBundle mainBundle];
+    targetPathFSR = [main.resourcePath UTF8String];
+    
+    return targetPathFSR;
+}
+
+const char* macPlayarcPath()
+{
+    //  /Applications -> World War II Online.app -> Contents -> Resources -> playarc.ww2
+    static const char *targetPathFSR;
+    
+    NSBundle *main = [NSBundle mainBundle];
+    NSString *playarcPath = [main pathForResource:@"playarc" ofType:@"ww2"];
+    
+    targetPathFSR = [playarcPath UTF8String];
+    
+    return targetPathFSR;
+}
+
+const char* macWorkingPathAPP()
+{
+    //  /Library -> Application Support -> WWIIOnline
+    //  XXXX - /Library -> Application Support -> com.corneredrats.wwiionline
+    //  XXXX - /Users -> Shared -> Library -> Application Support -> WWIIOnline
+    //  XXXX - /Users -> Shared -> Library -> Application Support -> com.corneredrats.wwiionline
+    //  XXXX - /Users -> "currentuser" -> Library -> Application Support -> WWIIOnline
+    //  XXXX - /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline
+    static NSURL *targetPathDir = nil;
+    static const char *targetPathFSR = nullptr;
     static dispatch_once_t predicate = 0;
     
     dispatch_once(&predicate, ^ {
         @autoreleasepool {
-            docsDir = [[NSFileManager defaultManager]
-                        URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nullptr];
-            docsDir = [docsDir URLByAppendingPathComponent:@"Battleground Europe"];
-            
+            targetPathDir = [[NSFileManager defaultManager]
+                             URLForDirectory:NSApplicationSupportDirectory
+                             inDomain:NSLocalDomainMask
+                             //  inDomain:NSUserDomainMask
+                             appropriateForURL:nil
+                             create:YES
+                             error:nullptr];
+            targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
+
             // We're giving the prefs folder the permissions it would otherwise have
             // gotten by default here. Would 0750 or 0700 be a better choice?
-            [[NSFileManager defaultManager] createDirectoryAtURL:docsDir withIntermediateDirectories:YES attributes:@{
-                NSFilePosixPermissions: @(0755)
-            } error:nullptr];
-            docsFSR = strdup(docsDir.fileSystemRepresentation);
+            [[NSFileManager defaultManager]
+                createDirectoryAtURL:targetPathDir
+                withIntermediateDirectories:YES
+                attributes:@{NSFilePosixPermissions: @(0755)
+            }
+            error:nullptr];
+            targetPathFSR = strdup(targetPathDir.fileSystemRepresentation);
         }
     });
     
-    return docsFSR;
+    return targetPathFSR;
+}
+
+const char* macCrashLogsPath()
+{
+    //  /Library -> Application Support -> WWIIOnline -> CrashLogs
+    static NSURL *targetPathDir = nil;
+    static const char *targetPathFSR = nullptr;
+    static dispatch_once_t predicate = 0;
+    
+    dispatch_once(&predicate, ^ {
+        @autoreleasepool {
+            targetPathDir = [[NSFileManager defaultManager]
+                             URLForDirectory:NSApplicationSupportDirectory
+                             inDomain:NSLocalDomainMask
+                             appropriateForURL:nil
+                             create:YES
+                             error:nullptr];
+            targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
+            targetPathDir = [targetPathDir URLByAppendingPathComponent:@"CrashLogs"];
+
+            // We're giving the prefs folder the permissions it would otherwise have
+            // gotten by default here. Would 0750 or 0700 be a better choice?
+            [[NSFileManager defaultManager]
+                createDirectoryAtURL:targetPathDir
+                withIntermediateDirectories:YES
+                attributes:@{NSFilePosixPermissions: @(0755)
+            }
+            error:nullptr];
+            targetPathFSR = strdup(targetPathDir.fileSystemRepresentation);
+        }
+    });
+    
+    return targetPathFSR;
+}
+
+const char* macUserDocumentsPath()
+{
+    //  /Users -> "currentuser" -> Documents -> WWIIOnline
+    static NSURL *targetPathDir = nil;
+    static const char *targetPathFSR = nullptr;
+    static dispatch_once_t predicate = 0;
+    
+    dispatch_once(&predicate, ^ {
+        @autoreleasepool {
+            targetPathDir = [[NSFileManager defaultManager]
+                             URLForDirectory:NSDocumentDirectory
+                             inDomain:NSUserDomainMask
+                             appropriateForURL:nil
+                             create:YES
+                             error:nullptr];
+            targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
+            
+            // We're giving the prefs folder the permissions it would otherwise have
+            // gotten by default here. Would 0750 or 0700 be a better choice?
+            [[NSFileManager defaultManager]
+                createDirectoryAtURL:targetPathDir
+                withIntermediateDirectories:YES
+                attributes:@{NSFilePosixPermissions: @(0755)
+            }
+            error:nullptr];
+            targetPathFSR = strdup(targetPathDir.fileSystemRepresentation);
+        }
+    });
+    
+    return targetPathFSR;
+}
+
+const char* macUserWorkingPath()
+{
+    //  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin
+    static NSURL *targetPathDir = nil;
+    static const char *targetPathFSR = nullptr;
+    static dispatch_once_t predicate = 0;
+    
+    dispatch_once(&predicate, ^ {
+        @autoreleasepool {
+            targetPathDir = [[NSFileManager defaultManager]
+                             URLForDirectory:NSDocumentDirectory
+                             inDomain:NSUserDomainMask
+                             appropriateForURL:nil
+                             create:YES
+                             error:nullptr];
+            targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
+            targetPathDir = [targetPathDir URLByAppendingPathComponent:@"bin"];
+            
+            // We're giving the prefs folder the permissions it would otherwise have
+            // gotten by default here. Would 0750 or 0700 be a better choice?
+            [[NSFileManager defaultManager]
+                createDirectoryAtURL:targetPathDir
+                withIntermediateDirectories:YES
+                attributes:@{NSFilePosixPermissions: @(0755)
+            }
+             error:nullptr];
+            targetPathFSR = strdup(targetPathDir.fileSystemRepresentation);
+        }
+    });
+    
+    return targetPathFSR;
 }
 
 #import <crt_externs.h>

@@ -181,8 +181,11 @@ static void saveJoystickCalibration()
 @end
 
 // Per Apple's recommendedations for error domains
-NSString * const PGErrorDomain = @"com.playnet.wwiiol.PGErrorDomain";
-NSString * const PGteulErrorDomain = @"com.playnet.wwiiol.PGteulErrorDomain";
+//  NSString * const PGErrorDomain = @"com.playnet.wwiiol.PGErrorDomain";
+//  NSString * const PGteulErrorDomain = @"com.playnet.wwiiol.PGteulErrorDomain";
+
+NSString * const PGErrorDomain = @"com.corneredrats.wwiionline.PGErrorDomain";
+NSString * const PGteulErrorDomain = @"com.corneredrats.wwiionline.PGteulErrorDomain";
 
 @interface NSError (WW2Additions)
 + (instancetype)playgateErrorWithDomain:(NSString *)domain code:(int)code userInfo:(NSDictionary *)dict rootError:(NSError *)rootError;
@@ -519,6 +522,12 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    //  /Applications -> World War II Online.app -> Contents -> Resources
+    chAppDir();
+
+    //  Setup the data paths
+    fioInit();
+
     if (!mngoptParse()) {
         [NSApp terminate:self];
         return;
@@ -532,11 +541,14 @@ extern NSString *WebActionOriginalURLKey;
     xmlSetGenericErrorFunc(0,xmlerrorstub);
     xmlSetStructuredErrorFunc(0,xmlstructurederrorstub);
     
-    chAppDir();
+    //  /Applications -> World War II Online.app -> Contents -> Resources
+    //  chAppDir();
     
     // Setup the user data path
-    fioInit();
+    //  fioInit();
     
+    
+    //  ISDIRECTORY
     fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
     
     if(!WantDataDir) {
@@ -1251,7 +1263,8 @@ static const char patchHandleKey = 0, patchSizeKey = 0, patchWrittenKey = 0;
     NSURL *patchURL = [NSURL URLWithString:rawPatchURL];
     NSURLRequest *request = [NSURLRequest requestWithURL:patchURL cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:60.0];
     NSURLConnection *uconnection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-    NSURL *patchDir = [NSURL fileURLWithPath:@(macDocumentsPath())];
+//    NSURL *patchDir = [NSURL fileURLWithPath:@(macDocumentsPath())];
+    NSURL *patchDir = [NSURL fileURLWithPath:@(macWorkingPathAPP())];
     NSURL *patchFileURL = [patchDir URLByAppendingPathComponent:patchURL.lastPathComponent];
     NSError *error = nil;
     NSFileHandle *patchFile = nil;

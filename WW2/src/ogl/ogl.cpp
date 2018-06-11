@@ -544,7 +544,10 @@ SINT32 oglGetNamedTexture(const char* name)
 {
   std::string str = name;
   std::transform(str.begin(), str.end(),str.begin(), ::toupper);
-
+  
+  char buffer[MAX_PATH];
+  char *answer = getcwd(buffer, sizeof(buffer));
+    
   std::replace(str.begin(), str.end(), '\\', '/');
 
   std::map<std::string,SINT32>::iterator it = textureIndex.find(str);

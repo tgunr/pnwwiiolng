@@ -52,10 +52,13 @@ enum enumfiostructure
 
 LOGICAL fioStructureInit();
 LOGICAL fioStructureVerify();
-unsigned int Wstring2Char(wwiiolpath_string sourceString, char *destinationString, const size_t sizeLimit);
-unsigned int Char2Wstring(char * sourceString, wwiiolpath_string &destinationString, const size_t sizeLimit);
+unsigned long Wstring2Char(wwiiolpath_string sourceString, char *destinationString, const size_t sizeLimit);
+unsigned long Char2Wstring(char * sourceString, wwiiolpath_string &destinationString, const size_t sizeLimit);
 bool GetExePath(wwiiolpath_string &outFullPath, wwiiolpath_string &outExeName);
 void GetWC(const char *sourceString, wwiiolpath_string &destinationString);
+wwiiolpath_string fioGetCurrentWorkingPath();
+LOGICAL fioSetCurrentWorkingPath(wwiiolpath_string targetPath);
+void fioStructureForwadDeclare();  //  Dosnt "DO" anything.
 
 
 #endif  //  __FileIOStructure__

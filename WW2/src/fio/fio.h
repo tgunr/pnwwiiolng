@@ -20,9 +20,9 @@ namespace Fio
 
 enum
 {
-    ISDIRECTORY,
-    ISARCHIVE,
-    ISUSERDIRECTORY
+    ISDIRECTORY,       //  local directory.
+    ISARCHIVE,         //  playarc virtual directory.
+    ISUSERDIRECTORY    //  local "user" directory.
 };
 
 #define fioGetString fioGetLine

@@ -42,7 +42,7 @@ struct GVAR
     size_t maxLength;
 };
 
-fullpath_t DataPath[_MAX_PATH];  //  Used within mngopt.cpp.  MJH - April 8, 2018.
+fullpath_t DataPath[MAX_PATH + 1];  //  Used within mngopt.cpp.  MJH - April 8, 2018.
 
 template <typename T, size_t N>
 static constexpr size_t sizeof_a(T (&)[N]) { return N; }
@@ -135,10 +135,10 @@ static char* _skipFilename(const char* ptr)
 LOGICAL mngoptParse()
 {
 	if (DataPath[0] == 0)
-		strsafecpy(DataPath, WW2_exeDataPath.c_str());
+        Wstring2Char(WW2_exeDataPath, DataPath, sizeof(DataPath));
 	
 	if (WantedDataPath == L"" && WantDataDir == TRUE)
-		WantedDataPath = DataPath;
+        Char2Wstring(DataPath, WantedDataPath, _MAX_PATH);
 
 	char*	ptr;
 
@@ -159,7 +159,7 @@ LOGICAL mngoptParse()
         auto foundCmd = std::find_if(&vars[0], &vars[sizeof(vars) / sizeof(GVAR)], [c = cmd.substr(1)] (const GVAR &k) { return k.key && k.key == c; });
 
         if (foundCmd == &vars[sizeof(vars) / sizeof(GVAR)]) {
-			Write_Debug("Unknown switch: '%s', '%s'", cmd.c_str(), value.c_str());
+			Write_Debug("Unknown Command Line switch: '%s', '%s'", cmd.c_str(), value.c_str());
             continue;
         }
         switch (foundCmd->ktype) {

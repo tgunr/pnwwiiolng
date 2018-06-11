@@ -425,6 +425,9 @@
 		0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A308578C460027461D /* libHIDUtilities.a */; };
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
 		47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B0ED240E9A66A40089DCC4 /* libteulKit.a */; };
+		C4B0DDB1208E6ACD00AB7065 /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = C4B0DDB0208E6ACD00AB7065 /* playarc.ww2 */; };
+		C4BCE2CD2086D3E300997BA8 /* fiostructure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C46939BA20866B54002BABD6 /* fiostructure.cpp */; };
+		C4DD508C20CD841100FA382D /* screens in Resources */ = {isa = PBXBuildFile; fileRef = C4DD508B20CD83F400FA382D /* screens */; };
 		E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96991C6D729D00D5EC52 /* WebKit.framework */; };
 		E91EBF511E744877005AE0A0 /* libsteam_api.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E91EBF4F1E7447F6005AE0A0 /* libsteam_api.dylib */; };
 		E94156B01D259A0300C0565B /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E94156AF1D259A0300C0565B /* libb64.a */; };
@@ -508,8 +511,7 @@
 		FA448CEC1D0CB26C00C4936D /* omggen.l in Sources */ = {isa = PBXBuildFile; fileRef = FA448CC91D0CB01100C4936D /* omggen.l */; };
 		FA448CED1D0CB26C00C4936D /* omggen.y in Sources */ = {isa = PBXBuildFile; fileRef = FA448CCC1D0CB01100C4936D /* omggen.y */; };
 		FA5CDD491CD8BA6D00F93668 /* build_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA3D8BA81C8BF201002C5119 /* build_info.cpp */; };
-		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
-		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
+		FA9E123C1C90CF7A000AF44A /* WWIIOnLine.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* WWIIOnLine.icns */; };
 		FAE0023E1EE7F5660064198F /* libphui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA06C3D01EE2660200A9977E /* libphui.a */; };
 		FAE0DB8D1DC260AF00A9E63D /* omgChat.omg in Sources */ = {isa = PBXBuildFile; fileRef = FA448CA71D0CAE4800C4936D /* omgChat.omg */; };
 		FAE0DB8E1DC260AF00A9E63D /* omgMissionSortieData.omg in Sources */ = {isa = PBXBuildFile; fileRef = FA448CA81D0CAE4800C4936D /* omgMissionSortieData.omg */; };
@@ -1152,7 +1154,7 @@
 		08104D52103DFBE90065E0E2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		08104D55103DFBE90065E0E2 /* syscfg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syscfg.h; sourceTree = "<group>"; };
 		08104D57103DFBE90065E0E2 /* sysMacCompat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysMacCompat.h; sourceTree = "<group>"; };
-		08104D58103DFBE90065E0E2 /* sysMacCompat.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = sysMacCompat.mm; sourceTree = "<group>"; };
+		08104D58103DFBE90065E0E2 /* sysMacCompat.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 2; path = sysMacCompat.mm; sourceTree = "<group>"; };
 		08104D59103DFBE90065E0E2 /* sysmain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sysmain.cpp; sourceTree = "<group>"; };
 		08104D5A103DFBE90065E0E2 /* sysmain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysmain.h; sourceTree = "<group>"; };
 		08104D5B103DFBE90065E0E2 /* sysMovie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysMovie.h; sourceTree = "<group>"; };
@@ -1160,7 +1162,7 @@
 		08104D5D103DFBE90065E0E2 /* systhread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = systhread.h; sourceTree = "<group>"; };
 		08104D5E103DFBE90065E0E2 /* systhreadmac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = systhreadmac.cpp; sourceTree = "<group>"; };
 		08104D5F103DFBE90065E0E2 /* WW2AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WW2AppDelegate.h; sourceTree = "<group>"; };
-		08104D60103DFBE90065E0E2 /* WW2AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WW2AppDelegate.mm; sourceTree = "<group>"; };
+		08104D60103DFBE90065E0E2 /* WW2AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; lineEnding = 2; path = WW2AppDelegate.mm; sourceTree = "<group>"; usesTabs = 0; };
 		08104D90103DFC1A0065E0E2 /* teulKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = teulKit.h; sourceTree = "<group>"; };
 		08104D97103DFC1A0065E0E2 /* teulNetworkArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = teulNetworkArray.h; sourceTree = "<group>"; };
 		08104D98103DFC1A0065E0E2 /* teulNetworkMsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = teulNetworkMsg.h; sourceTree = "<group>"; };
@@ -1519,11 +1521,15 @@
 		47B0ED240E9A66A40089DCC4 /* libteulKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libteulKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
 		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C46939BA20866B54002BABD6 /* fiostructure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fiostructure.cpp; sourceTree = "<group>"; };
+		C46939BB20866B54002BABD6 /* fiostructure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fiostructure.h; sourceTree = "<group>"; };
+		C4B0DDB0208E6ACD00AB7065 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = file; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = "<group>"; };
+		C4DD508B20CD83F400FA382D /* screens */ = {isa = PBXFileReference; lastKnownFileType = folder; name = screens; path = ../ww2assets/screens; sourceTree = "<group>"; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		E91EBF4F1E7447F6005AE0A0 /* libsteam_api.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsteam_api.dylib; path = ../Libraries/SteamSDK/redistributable_bin/osx32/libsteam_api.dylib; sourceTree = "<group>"; };
 		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E94156AF1D259A0300C0565B /* libb64.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libb64.a; path = lib/mac/libb64.a; sourceTree = "<group>"; };
-		E95E664E1E8301A2005A04FF /* steam_appid.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = steam_appid.txt; path = ../opt/ww2mods/steam_appid.txt; sourceTree = "<group>"; };
+		E95E664E1E8301A2005A04FF /* steam_appid.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = steam_appid.txt; path = ../ww2assets/steam_appid.txt; sourceTree = "<group>"; };
 		E971F7121F1BF61F00B500F1 /* sysAntihack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sysAntihack.cpp; path = src/sys/sysAntihack.cpp; sourceTree = SOURCE_ROOT; };
 		E971F7131F1BF61F00B500F1 /* sysAntihack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysAntihack.h; path = src/sys/sysAntihack.h; sourceTree = SOURCE_ROOT; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
@@ -1595,8 +1601,7 @@
 		E97C769E1C85156F00875F44 /* select.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = select.c; path = ../../Libraries/libevent/select.c; sourceTree = "<group>"; };
 		E97C769F1C85156F00875F44 /* signal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = signal.c; path = ../../Libraries/libevent/signal.c; sourceTree = "<group>"; };
 		E97C76A01C85156F00875F44 /* strlcpy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = strlcpy.c; path = ../../Libraries/libevent/strlcpy.c; sourceTree = "<group>"; };
-		E97C76CD1C85AFD800875F44 /* ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = ww2.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
-		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = text; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = SOURCE_ROOT; };
+		E97C76CD1C85AFD800875F44 /* WWIIOnLine.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = WWIIOnLine.icns; path = ../ww2assets/osmac/WWIIOnLine.icns; sourceTree = "<group>"; };
 		E98C647E1E48DF5A00ABE277 /* wwiiBackChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiBackChannel.cpp; sourceTree = "<group>"; };
 		E98C647F1E48DF5A00ABE277 /* wwiiBackChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiBackChannel.h; sourceTree = "<group>"; };
 		E99C32551D8607830098798F /* wwiiPPOLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiPPOLoader.h; sourceTree = "<group>"; };
@@ -1626,11 +1631,11 @@
 		FA06C3C41EE18D5900A9977E /* clientConnections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clientConnections.h; sourceTree = "<group>"; };
 		FA06C3CB1EE2660200A9977E /* phui.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = phui.xcodeproj; path = ../Libraries/phui/proj.mac/phui.xcodeproj; sourceTree = "<group>"; };
 		FA06C3D61EE3AB3200A9977E /* authDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authDefaults.h; path = auth/authDefaults.h; sourceTree = "<group>"; };
-		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
+		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../ww2assets/readme.rtf; sourceTree = "<group>"; };
 		FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authPlaygateTypes.h; path = src/auth/authPlaygateTypes.h; sourceTree = SOURCE_ROOT; };
 		FA13BB161C86758600095818 /* libevent.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libevent.a; path = proj/mac/build/Debug/libevent.a; sourceTree = "<group>"; };
-		FA13BB181C875F6800095818 /* placeholder-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "placeholder-background.png"; path = "proj/mac/placeholder-background.png"; sourceTree = "<group>"; };
-		FA13BB191C875F6800095818 /* placeholder-title.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "placeholder-title.png"; path = "proj/mac/placeholder-title.png"; sourceTree = "<group>"; };
+		FA13BB181C875F6800095818 /* placeholder-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "placeholder-background.png"; path = "../ww2assets/osmac/placeholder-background.png"; sourceTree = "<group>"; };
+		FA13BB191C875F6800095818 /* placeholder-title.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "placeholder-title.png"; path = "../ww2assets/osmac/placeholder-title.png"; sourceTree = "<group>"; };
 		FA13BB391C87649000095818 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = System/Library/Frameworks/AGL.framework; sourceTree = SDKROOT; };
 		FA13BB3A1C87649000095818 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		FA13BB3B1C87649000095818 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
@@ -1900,6 +1905,8 @@
 		081048EE103DCFE60065E0E2 /* fio */ = {
 			isa = PBXGroup;
 			children = (
+				C46939BA20866B54002BABD6 /* fiostructure.cpp */,
+				C46939BB20866B54002BABD6 /* fiostructure.h */,
 				081048EF103DCFE60065E0E2 /* fio.cpp */,
 				081048F0103DCFE60065E0E2 /* fio.h */,
 				081048F1103DCFE60065E0E2 /* fioa.cpp */,
@@ -3158,7 +3165,6 @@
 			isa = PBXGroup;
 			children = (
 				FA06C3CB1EE2660200A9977E /* phui.xcodeproj */,
-				E95E664E1E8301A2005A04FF /* steam_appid.txt */,
 				FA3D8BB11C8BF5CC002C5119 /* Config */,
 				FA448CBC1D0CB01100C4936D /* omggen */,
 				0DA6D33608563A0900A53577 /* src */,
@@ -3172,14 +3178,16 @@
 		20286C2CFDCF999611CA2CEA /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
+				C4DD508B20CD83F400FA382D /* screens */,
+				8D0C4E960486CD37000505A6 /* Info.plist */,
 				FA37D7511C937F8F00013187 /* Localizable.strings */,
 				FA37D74D1C937F6E00013187 /* MainMenu.nib */,
-				FA08C0751C8D4A1F0002F4B9 /* readme.rtf */,
-				E97C76D01C85B15800875F44 /* playarc.ww2 */,
-				E97C76CD1C85AFD800875F44 /* ww2.icns */,
 				FA13BB181C875F6800095818 /* placeholder-background.png */,
 				FA13BB191C875F6800095818 /* placeholder-title.png */,
-				8D0C4E960486CD37000505A6 /* Info.plist */,
+				C4B0DDB0208E6ACD00AB7065 /* playarc.ww2 */,
+				FA08C0751C8D4A1F0002F4B9 /* readme.rtf */,
+				E95E664E1E8301A2005A04FF /* steam_appid.txt */,
+				E97C76CD1C85AFD800875F44 /* WWIIOnLine.icns */,
 			);
 			name = rsrc;
 			sourceTree = "<group>";
@@ -3615,14 +3623,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C4DD508C20CD841100FA382D /* screens in Resources */,
+				C4B0DDB1208E6ACD00AB7065 /* playarc.ww2 in Resources */,
 				E95E664F1E8301A3005A04FF /* steam_appid.txt in Resources */,
-				FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */,
 				FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */,
 				FA37D7531C937F8F00013187 /* Localizable.strings in Resources */,
 				FA13BB1B1C875F6800095818 /* placeholder-title.png in Resources */,
 				FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */,
 				FA37D74F1C937F6E00013187 /* MainMenu.nib in Resources */,
-				FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */,
+				FA9E123C1C90CF7A000AF44A /* WWIIOnLine.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3835,6 +3844,7 @@
 				08104B05103DD4890065E0E2 /* mlReadout.cpp in Sources */,
 				08104B06103DD4890065E0E2 /* mlutility.cpp in Sources */,
 				08104B07103DD4890065E0E2 /* mlweapons.cpp in Sources */,
+				C4BCE2CD2086D3E300997BA8 /* fiostructure.cpp in Sources */,
 				08104B08103DD4890065E0E2 /* mlwndtnn.cpp in Sources */,
 				08104B39103DD4C80065E0E2 /* mmPack.cpp in Sources */,
 				08104B3C103DD4C80065E0E2 /* mmSpawnClientMessages.cpp in Sources */,
@@ -4158,7 +4168,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiionline;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4201,7 +4211,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiionline;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4261,7 +4271,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiionline;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4348,7 +4358,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiionline;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4400,7 +4410,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiionline;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4521,7 +4531,7 @@
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
-				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiiol;
+				PRODUCT_BUNDLE_IDENTIFIER = com.corneredrats.wwiionline;
 				PRODUCT_NAME = "World War II Online";
 				WRAPPER_EXTENSION = app;
 			};

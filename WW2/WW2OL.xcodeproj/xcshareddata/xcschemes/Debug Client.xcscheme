@@ -49,6 +49,7 @@
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
+      enableAddressSanitizer = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
       <BuildableProductRunnable
@@ -64,11 +65,19 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "-data 1"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-log 1"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-datadir $(SRCROOT)/../opt/ww2mods/DATA/"
-            isEnabled = "YES">
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-datadir /Volumes/Disk1/DataRootD1/Gitrepos/ww2mods/DATA/"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
