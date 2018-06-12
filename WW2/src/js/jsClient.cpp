@@ -358,14 +358,21 @@ namespace {
 
 	// Simple RAII wrapper to ensure proper setup/takedown for Steam auth tickets.
 	struct SteamAuthSessionTicket {
-		SteamAuthSessionTicket(void)
-		{ handle = SteamUser()->GetAuthSessionTicket(data, array_size(data), &length); }
-		~SteamAuthSessionTicket() { SteamUser()->CancelAuthTicket(handle); }
+        SteamAuthSessionTicket() {}
+		~SteamAuthSessionTicket() {} // do NOT call release() here, it's not safe to do so from a global destructor
+  
+        const char *getData() { LoadIfNeeded(); return data; }
+        uint32_t getLength() { LoadIfNeeded(); return length; }
+        void release() { if (handle != k_HAuthTicketInvalid) { SteamUser()->CancelAuthTicket(handle); } }
 
-		HAuthTicket handle;
-		char data[512];
-		uint32_t length;
+        private:
+		HAuthTicket handle = k_HAuthTicketInvalid;
+		char data[512] = {0};
+		uint32_t length = 0;
+        
+        void LoadIfNeeded() { if (handle == k_HAuthTicketInvalid) { handle = SteamUser()->GetAuthSessionTicket(data, static_cast<int>(array_size(data)), &length); } }
 	};
+    SteamAuthSessionTicket steamAuthTicket;
 
 	SteamLoginResult AttemptSteamLogin(uint32_t arena, const char* callsign, const char* email) {
 		// Some quick pre-validation to avoid unnecessarily pestering auth.
@@ -379,14 +386,24 @@ namespace {
 
 		//------
 
-		SteamAuthSessionTicket tkt;
 		switch ( steam_login_state ) {
 		case LoginReady:
-			return authRequestSteamLogin(tkt.data, tkt.length, arena);
-		case LoginNewUser:
-			return authRequestSteamSignup(tkt.data, tkt.length, arena, callsign, email);
-		case LoginNeedEmail:
-			return authRequestSteamEmailChange(tkt.data, tkt.length, arena, email);
+			return authRequestSteamLogin(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena);
+		case LoginNewUser: {
+            SteamLoginResult result = authRequestSteamSignup(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena, callsign, email);
+            
+            if (result.status == SteamLoginResponse::LoginSuccess) {
+                return {SteamLoginResponse::LoginEmailNotValidated};
+            }
+            return result;
+        }
+		case LoginNeedEmail: {
+			SteamLoginResult result = authRequestSteamEmailChange(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena, email);
+
+            if (result.status == SteamLoginResponse::LoginSuccess) {
+                return {SteamLoginResponse::LoginEmailNotValidated};
+            }
+        }
 		default:
 			assert ( false );
 			return {SteamLoginResponse::LoginUnknownError};
