@@ -42,7 +42,7 @@ static inline std::string _getAuthRelayURL(const std::string &endpoint)
         return gAuthRelayURL + endpoint;
     }
 
-    return std::string("https://secure.wwiionline.com/relay/live") + authSteamRESTPrefix + endpoint;
+    return std::string("https://secure.wwiionline.com/relay") + authSteamRESTPrefix + endpoint;
 }
 
 static std::string _encodeSteamTicket(const void *authTicket, size_t authTicketLen)
