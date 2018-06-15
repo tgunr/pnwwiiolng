@@ -34,6 +34,7 @@
 #include "strt/strtData.h"
 #include "strt/strtFacilityStruct.h"
 #include "tut/tutGroupProgress.h"
+#include "weap/weapLoadIndexes.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiErrorTypes.h"
@@ -42,8 +43,6 @@
 #include "wwii/wwiiThreads.h"
 
 bool activeCountries[MAX_COUNTRIES];
-
-extern void weapLoadIndexes(DB::handle_t* conn);
 
 struct DB_PERM_STRUCT
 {

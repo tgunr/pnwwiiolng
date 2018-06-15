@@ -37,13 +37,12 @@ static inline SteamLoginResponse _loginResponseFromResultCode(uint32_t resultCod
 
 static inline std::string _getAuthRelayURL(const std::string &endpoint)
 {
-#ifndef NDEBUG
     // Only allow override on Development/Debug builds
     if (gAuthRelayURL[0] != 0) {
         return gAuthRelayURL + endpoint;
     }
-#endif
-    return std::string("https://") + gAuthServer + authSteamRESTPrefix + endpoint;
+
+    return std::string("https://secure.wwiionline.com/relay") + authSteamRESTPrefix + endpoint;
 }
 
 static std::string _encodeSteamTicket(const void *authTicket, size_t authTicketLen)
@@ -55,8 +54,9 @@ static std::string _encodeSteamTicket(const void *authTicket, size_t authTicketL
     
     for (size_t i = 0; pAuthTicket < pAuthEnd; i += 2, ++pAuthTicket) {
         result[i + 0] = "0123456789abcdef"[*pAuthTicket >>  4];
-        result[i + 1] = "0123456789abcdef"[*pAuthTicket & 0x7];
+        result[i + 1] = "0123456789abcdef"[*pAuthTicket & 0xf];
     }
+    
     return result;
 }
 
@@ -80,7 +80,7 @@ static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nl
     if (response.responseCode != 200) {
         _requestError("Server returned non-200 response code %d with URL %s", response.responseCode, request.url.c_str());
     }
-    if (response.headers.find("content-type") == response.headers.end() || response.headers["content-type"] != "application/json") {
+    if (response.headers.find("content-type") == response.headers.end() || !has_prefix(response.headers["content-type"], "application/json")) {
         _requestError("Server returned non-JSON content-type with URL %s", request.url.c_str());
     }
     
@@ -133,10 +133,16 @@ static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nl
 
 SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID)
 {
+    uint32_t appVersion = static_cast<uint32_t>(PN_build_version_value);
+    
+    if (gClientV[0]) {
+        teulGetHost(gClientV, &appVersion); // TODO: Anything other than this stupid function
+    }
+    
     return _doRequestWithParameters("login", {
         { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
         { "arena_id", arenaID },
-        { "app_version", PN_build_version_value },
+        { "app_version", appVersion },
         { "app_platform", platOS },
     }, true);
 }

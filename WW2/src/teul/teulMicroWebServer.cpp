@@ -1477,19 +1477,14 @@ void Server::addVirtualPrefix(std::string desc_, std::string prefix_, VirtualFil
 }
 
 //////////////////////////////////////////////////////////////////////
-#ifndef NDEBUG
-#define status_if(cond, stat, ...) do { \
-    if ((cond)) { \
-        return HTTPResponseBuilder(request) \
-            .status(stat, ## __VA_ARGS__) \
-            .header("Connection", "close") \
-            .content("<h1>" #stat " " __VA_ARGS__ "</h1>") \
-            .build(response); \
-    } \
-} while(0)
-#else
-#define status_if(cond, stat, ...) do { if ((cond)) { return HTTPResponseBuilder(request).status(stat).header("Connection", "close").build(response); } } while(0)
-#endif
+static inline void rest_status_if(bool condition, unsigned int code, const char * const additional)
+{
+    if (!condition) {
+        return;
+    }
+    dbugLog(_FLD, "uWebServerRESTClient: Returning status %d: %s", code, additional);
+    throw WebError(code);
+}
 
 static std::vector<std::string> _getURLPathComponents(const std::string &requestPath)
 {
@@ -1501,8 +1496,8 @@ void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAP
     std::vector<std::string> components = _getURLPathComponents(request.path);
     
     // Verify API path
-    status_if(components.size() < 3, 400, "Not enough path components (3)");
-    status_if(components[0] != "", 400, "How did you get here with no /?");
+    rest_status_if(components.size() < 3, 400, "Not enough path components (3)");
+    rest_status_if(components[0] != "", 400, "How did you get here with no /?");
     // Second component was implicitly verified by the virtual prefix handler 
     
     // Basic RESTful routing (not very smart yet)
@@ -1518,7 +1513,7 @@ void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAP
         
         if (std::find(route.allowedMethods.begin(), route.allowedMethods.end(), request.method) == route.allowedMethods.end()) { continue; }
         if (routeComponents.size() != components.size() - 1) { continue; }
-        status_if(routeComponents.size() < 2 || routeComponents[0] != "", 500, "Bad route in route table");
+        rest_status_if(routeComponents.size() < 2 || routeComponents[0] != "", 500, "Bad route in route table");
         for (size_t i = 1; i < routeComponents.size(); ++i) {
             const std::string &component = routeComponents[i];
             
@@ -1537,34 +1532,31 @@ void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAP
             bestMatchingRouteParams = routeParams;
         }
     }
-    status_if(bestMatchingRouteScore == 0, 404, "No matching routes"); // A matching route must always have at least one non-parameterized path component
-    status_if(!bestMatchingRoute.handler, 501, "Unimplemented route");
-    
-    status_if(request.requestData.size() > 0 &&
-              (request.headers.find("content-type") == request.headers.end() ||
-              request.headers.at("content-type") != "application/json"), 400, "Request data must be JSON");
+    rest_status_if(bestMatchingRouteScore == 0, 404, "No matching routes"); // A matching route must always have at least one non-parameterized path component
+    rest_status_if(!bestMatchingRoute.handler, 501, "Unimplemented route");
     
     nlohmann::json requestParams = nlohmann::json::object();
+
     if (request.requestData.size() > 0) {
+        auto contentType = request.headers.find("content-type");
+        
+        rest_status_if(contentType == request.headers.end(), 400, "Request with data must have a Content-type");
+        rest_status_if(!has_prefix(contentType->second, "application/json"), 400, "Request data must be JSON");
+
         try {
             requestParams = nlohmann::json::parse(request.requestData);
-        } catch (std::invalid_argument &e) {
-            status_if(true, 400, "Bad JSON");
+        } catch (nlohmann::json::parse_error &e) {
+            rest_status_if(true, 400, "Bad JSON");
         }
     }
-    status_if(!requestParams.is_object(), 400, "Request JSON must be object");
+    rest_status_if(!requestParams.is_object(), 400, "Request JSON must be object");
     
     for (nlohmann::json::iterator it = bestMatchingRouteParams.begin(); it != bestMatchingRouteParams.end(); ++it) {
-        status_if(requestParams.find(it.key()) != requestParams.end(), 400, "Request JSON can't have a parameter matching a name in the route parameters");
-        // Technically this is more of an ABORT_IF, but what the hey.
+        rest_status_if(requestParams.find(it.key()) != requestParams.end(), 400, "Request JSON can't have a parameter matching a name in the route parameters");
         requestParams[it.key()] = it.value();
     }
     
-    try {
-        return bestMatchingRoute.handler(request, response, requestParams);
-    } catch (std::domain_error &) {
-        status_if(true, 400, "JSON contained invalid type");
-    }
+    return bestMatchingRoute.handler(request, response, requestParams);
 }
 
 //////////////////////////////////////////////////////////////////////
