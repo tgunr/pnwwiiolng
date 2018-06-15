@@ -133,10 +133,16 @@ static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nl
 
 SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID)
 {
+    uint32_t appVersion = static_cast<uint32_t>(PN_build_version_value);
+    
+    if (gClientV[0]) {
+        teulGetHost(gClientV, &appVersion); // TODO: Anything other than this stupid function
+    }
+    
     return _doRequestWithParameters("login", {
         { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
         { "arena_id", arenaID },
-        { "app_version", PN_build_version_value },
+        { "app_version", appVersion },
         { "app_platform", platOS },
     }, true);
 }
