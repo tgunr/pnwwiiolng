@@ -1535,12 +1535,14 @@ void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAP
     rest_status_if(bestMatchingRouteScore == 0, 404, "No matching routes"); // A matching route must always have at least one non-parameterized path component
     rest_status_if(!bestMatchingRoute.handler, 501, "Unimplemented route");
     
-    rest_status_if(request.requestData.size() > 0 &&
-                   (request.headers.find("content-type") == request.headers.end() ||
-                   request.headers.at("content-type") != "application/json"), 400, "Request data must be JSON");
-    
     nlohmann::json requestParams = nlohmann::json::object();
+
     if (request.requestData.size() > 0) {
+        auto contentType = request.headers.find("content-type");
+        
+        rest_status_if(contentType == request.headers.end(), 400, "Request with data must have a Content-type");
+        rest_status_if(!has_prefix(contentType->second, "application/json"), 400, "Request data must be JSON");
+
         try {
             requestParams = nlohmann::json::parse(request.requestData);
         } catch (nlohmann::json::parse_error &e) {
