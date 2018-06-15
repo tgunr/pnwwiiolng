@@ -321,25 +321,42 @@ namespace {
 
 	void UpdateLoginState(SteamLoginResponse res) {
 		switch ( res ) {
+        // Login succeeded - go to initial state
 		case SteamLoginResponse::LoginSuccess:
 			steam_login_state = LoginReady;
 			break;
+        // Need login info - go to new user state
 		case SteamLoginResponse::LoginNewUser:
-			assert ( steam_login_state == LoginReady );
+			assert( steam_login_state == LoginReady );
 			steam_login_state = LoginNewUser;
 			break;
+        // Need email info - go to need email only state
 		case SteamLoginResponse::LoginEmailRequired:
-			assert(steam_login_state == LoginReady);
+			assert( steam_login_state == LoginReady );
 			steam_login_state = LoginNeedEmail;
 			break;
+        // Need email validation - go to initial state (try login next)
+        case SteamLoginResponse::LoginEmailNotValidated:
+            steam_login_state = LoginReady;
+            break;
 
 		// Issues/conflicts with user input; don't affect state.
 		case SteamLoginResponse::LoginCallsignInvalid:
 		case SteamLoginResponse::LoginCallsignDisallowed:
 		case SteamLoginResponse::LoginCallsignInUse:
 		case SteamLoginResponse::LoginEmailInvalid:
+            break;
+
+        // Email in use during Signup flow requires transitioning to Email flow
+        // because EmailInUse during Signup means the callsign is already
+        // immutable in the backend. This is a hacky solution to what is
+        // ultimately a design problem in the database.
 		case SteamLoginResponse::LoginEmailInUse:
-		case SteamLoginResponse::LoginEmailNotValidated:
+            if (steam_login_state == LoginNewUser) { // in Signup flow
+                steam_login_state = LoginNeedEmail;
+            } else {
+                assert( steam_login_state == LoginNeedEmail ); // must be in Email flow if not in Signup flow
+            }
 			break;
 
 		// Something went wrong, reset things on our end.
@@ -403,6 +420,7 @@ namespace {
             if (result.status == SteamLoginResponse::LoginSuccess) {
                 return {SteamLoginResponse::LoginEmailNotValidated};
             }
+            return result;
         }
 		default:
 			assert ( false );
