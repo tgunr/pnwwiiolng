@@ -1543,7 +1543,7 @@ void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAP
     if (request.requestData.size() > 0) {
         try {
             requestParams = nlohmann::json::parse(request.requestData);
-        } catch (std::invalid_argument &e) {
+        } catch (nlohmann::json::parse_error &e) {
             rest_status_if(true, 400, "Bad JSON");
         }
     }
@@ -1551,15 +1551,10 @@ void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAP
     
     for (nlohmann::json::iterator it = bestMatchingRouteParams.begin(); it != bestMatchingRouteParams.end(); ++it) {
         rest_status_if(requestParams.find(it.key()) != requestParams.end(), 400, "Request JSON can't have a parameter matching a name in the route parameters");
-        // Technically this is more of an ABORT_IF, but what the hey.
         requestParams[it.key()] = it.value();
     }
     
-    try {
-        return bestMatchingRoute.handler(request, response, requestParams);
-    } catch (std::domain_error &) {
-        rest_status_if(true, 400, "JSON contained invalid type");
-    }
+    return bestMatchingRoute.handler(request, response, requestParams);
 }
 
 //////////////////////////////////////////////////////////////////////
