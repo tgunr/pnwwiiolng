@@ -11,7 +11,6 @@
 #include "include/pnThread.h"
 #include "dbse/dbseHandle.h"
 
-using MYSQL = struct st_mysql;
 class DBQuery;
 
 using THREAD_CALLBACK = std::function<void(void*)>;
