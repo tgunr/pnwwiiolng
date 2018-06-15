@@ -82,7 +82,7 @@ namespace Teul
             public:
                 Client(Server &owner, SOCKET fd);
             
-                virtual ~Client();
+                virtual ~Client() override;
             
                 void start(ClientList::iterator &myIterator);
                 
