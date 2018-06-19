@@ -471,7 +471,7 @@ JS_FUNCTION_DEF(jsClient, emailReset) {
 	if ( ! jsclient ) return JS_FALSE;
 
 	//UpdateLoginState(SteamLoginResponse::LoginEmailRequired);
-	assert( steam_login_state == LoginNeedEmail );
+	assert( steam_login_state == LoginReady || steam_login_state == LoginNeedEmail );
 	steam_login_state = LoginNeedEmail;
 	return JS_TRUE;
 }
