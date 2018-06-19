@@ -84,6 +84,7 @@ JSFunctionSpec jsClient::jsfunctions[] =
 	JS_FUNCTION_SPEC(jsClient, startofflinemode,0),
 	JS_FUNCTION_SPEC(jsClient, issteamcopy,0),
 	JS_FUNCTION_SPEC(jsClient, steamconnect,2),
+	JS_FUNCTION_SPEC(jsClient, emailReset,0),
 	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
 	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
@@ -465,6 +466,15 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	return JS_TRUE;
 }
 
+JS_FUNCTION_DEF(jsClient, emailReset) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	//UpdateLoginState(SteamLoginResponse::LoginEmailRequired);
+	assert( steam_login_state == LoginNeedEmail );
+	steam_login_state = LoginNeedEmail;
+	return JS_TRUE;
+}
 
 /************************************************************************************************
 	gui state
