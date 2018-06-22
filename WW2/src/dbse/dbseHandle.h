@@ -8,8 +8,7 @@
 // Overloaded operator allows it to be used like a
 // MYSQL* pointer.
 
-using MYSQL_RES = struct st_mysql_res;
-using MYSQL = struct st_mysql;
+#include <mysql.h>
 
 namespace DB
 {

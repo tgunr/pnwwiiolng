@@ -120,7 +120,6 @@ CFG_STRING(authdbPort, "3306", "AUTH_DB_PORT", PN_AUTH_REQUIRED, "Port of the Au
 CFG_STRING(authdbPassword, nullptr, "AUTH_DB_PASSWD", PN_AUTH_REQUIRED, "Password to use for the auth database.");
 CFG_STRING(authdbSchema, nullptr, "AUTH_DB_SCHEMA", PN_AUTH_REQUIRED, "Schema to use for auth data.");
 CFG_STRING(authdbUser, nullptr, "AUTH_DB_USER", PN_AUTH_REQUIRED, "Username when connecting to the auth database.");
-CFG_STRING(authRelayBillingEndpoint, nullptr, "AUTH_RELAY_BILLING_ENDPOINT", PN_AUTH_REQUIRED, "Endpoint for auth relay to connect with billing server");
 
 #undef PN_AUTH_REQUIRED
 

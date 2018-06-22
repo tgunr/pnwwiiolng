@@ -799,7 +799,7 @@ static std::pair<playerid_t, std::string> _otpValidateUser(const Teul::uWeb::HTT
 
 static void _otpDispatchRequestHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, const Teul::uWeb::RESTAPIParams &params)
 {
-    if (params.find("arena_id") == params.end() || !params["arena_id"].is_string() ||
+    if (params.find("arena_id") == params.end() || (!params["arena_id"].is_string() && !params["arena_id"].is_number_unsigned()) ||
         params.find("user_id") == params.end() || !params["user_id"].is_number_unsigned() ||
         params.find("app_version") == params.end() || !params["app_version"].is_number_unsigned() ||
         params.find("app_platform") == params.end() || !params["app_platform"].is_number_unsigned())
@@ -808,17 +808,23 @@ static void _otpDispatchRequestHandler(const Teul::uWeb::HTTPRequest &request, T
         return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
     }
     
-    std::string arena_id_raw = params["arena_id"];
+    arenaid_t arena_id = 0;
     
+    if (params["arena_id"].is_string()) {
+        std::string arena_id_raw = params["arena_id"];
+        
 #ifndef NDEBUG
-    // Do this extra check in debug only; it's wasted cycles in release
-    if (arena_id_raw.find_first_not_of("0123456789") != std::string::npos) {
-        dbugLog(_FLA, "uWeb: Received bad request (bad arena ID pull) from relay - %s", params.dump().c_str());
-        return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
-    }
+        // Do this extra check in debug only; it's wasted cycles in release
+        if (arena_id_raw.find_first_not_of("0123456789") != std::string::npos) {
+            dbugLog(_FLA, "uWeb: Received bad request (bad arena ID pull) from relay - %s", params.dump().c_str());
+            return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
+        }
 #endif
+        arena_id = std::strtoul(arena_id_raw.c_str(), nullptr, 10);
+    } else {
+        arena_id = params["arena_id"];
+    }
     
-    arenaid_t arena_id = std::strtoul(arena_id_raw.c_str(), nullptr, 10);
     userid_t user_id = params["user_id"];
     uint32_t app_version = params["app_version"];
     uint32_t app_platform = params["app_platform"];
@@ -930,11 +936,17 @@ main(int argc, const char* argv[])
 
 	threadsEnable();
     
-    static const Teul::uWeb::RESTAPIRouteList routes = {
+    static const Teul::uWeb::RESTAPIRouteList v1routes = {
         { { "GET"  }, "/reload/all", _reloadAuthDBRequestHandler },
         { { "POST" }, "/cluster/{arena_id}/dispatch", _otpDispatchRequestHandler },
     };
-    Teul::uWeb::s_debugServer.addVirtualPrefix("v1 API", "/v1", std::bind(Teul::uWeb::RESTRouter, std::placeholders::_1, std::placeholders::_2, routes));
+    Teul::uWeb::s_debugServer.addVirtualPrefix("v1 API", "/v1", std::bind(Teul::uWeb::RESTRouter, std::placeholders::_1, std::placeholders::_2, v1routes));
+    
+    static const Teul::uWeb::RESTAPIRouteList v2routes = {
+        { { "GET"  }, "/reload/all", _reloadAuthDBRequestHandler },
+        { { "POST" }, "/cluster/arena/dispatch", _otpDispatchRequestHandler },
+    };
+    Teul::uWeb::s_debugServer.addVirtualPrefix("v2 API", "/v2", std::bind(Teul::uWeb::RESTRouter, std::placeholders::_1, std::placeholders::_2, v2routes));
 
 	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
 

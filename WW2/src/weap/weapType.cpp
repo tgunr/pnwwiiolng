@@ -263,6 +263,12 @@ static void weaponParseAmmoNode(xmlNode* ammoNode)
 		ammoType->FuzeTime = (float)atof((char*)xmlstr);
 		xmlFree(xmlstr);
 	}
+	xmlstr = xmlGetProp(ammoNode, (xmlChar*)"armingtime");
+	if(xmlstr)
+	{
+		ammoType->ArmingTime = (float)atof((char*)xmlstr);
+		xmlFree(xmlstr);
+	}
 	xmlstr = xmlGetProp(ammoNode, (xmlChar*)"bc");
 	if(xmlstr)
 	{
