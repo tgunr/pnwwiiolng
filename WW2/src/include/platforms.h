@@ -158,7 +158,6 @@
 #endif
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
-#define snprintf _snprintf
 #define swprintf swprintf_s
 #define	vswprintf vswprintf_s
 

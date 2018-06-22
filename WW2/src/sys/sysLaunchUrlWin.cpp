@@ -188,9 +188,12 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
 				throw std::exception("unable to get size of content");
 			}
 
-			static char rawResponseBuffer[MAX_RESPONSE_LENGTH];
-			DWORD dwRead;
-			do {
+			DWORD dwRead = 0;
+			do
+			{
+				char rawResponseBuffer[MAX_RESPONSE_LENGTH];
+
+				RtlSecureZeroMemory(rawResponseBuffer, sizeof(rawResponseBuffer));
 				dwRead = 0;
 				if (!InternetReadFile(req, rawResponseBuffer, MAX_RESPONSE_LENGTH, &dwRead) || dwRead == 0)
 				{
@@ -199,9 +202,7 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
 
 				// Do something with the buffer, and get more data
 				success = true;
-				response.content.append(rawResponseBuffer);
-				rawResponseBuffer[0] = 0;
-
+				response.content.append(rawResponseBuffer, dwRead);
 			} while (dwRead > 0);
 		}
 	}

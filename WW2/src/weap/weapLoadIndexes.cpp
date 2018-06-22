@@ -46,7 +46,7 @@ weapSaveVehicleTypes()
 }
 
 void
-weapLoadIndexes(DB::handle_t* conn)
+weapLoadIndexes(DBHANDLE& conn)
 {
 	DBQuery query(conn
 		, "SELECT v.countryID, v.categoryID, v.classID, v.typeID"

@@ -351,7 +351,9 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 		return -1;
 #endif
 	} else {
+#if EXTREME_FIOD_LOGGING
 		dbugLog(_FLD, "Alloc size for new file is %" PRSizeT "", alloc_size);
+#endif
 	}
 
 	mem[read_size] = 0;
@@ -366,7 +368,9 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 		// Sanity check: We don't think we already have this discriptor open
 		assert ( s_fileMap.find(fd) == s_fileMap.end() );
 
+#if EXTREME_FIOD_LOGGING
 		dbugLog(_FLD, "About to read %" PRSsizeT " bytes from file", (size_t)read_size);
+#endif
 		off_t bytes_read = OS_READ(fd, mem, read_size);
 		if ( bytes_read < read_size )
 			throw "read failed/truncated";

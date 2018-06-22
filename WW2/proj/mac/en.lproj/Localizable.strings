@@ -1,4 +1,4 @@
-﻿/* 
+/* 
   Localizable.strings
   WW2OL
 
@@ -46,3 +46,9 @@
 "launch_patch_heading" = "Patch has been downloaded";
 "launch_patch_message" = "The patch has been downloaded and should appear in the Finder momentarily. The game will now quit. If the new version does not appear, go to http://www.battlegroundeurope.net/getting-started for a manual download. This process will be improved in a future patch.";
 "OK" = "OK";
+
+/* Oops, Steam isn't running! */
+"steam_not_running" = "Oops, Steam isn't running!";
+
+/* This is the Steam version of %@ and can't be run directly. Try launching the game from Steam. */
+"steam_not_running_detail" = "This is the Steam version of %@ and can't be run directly. Try launching the game from Steam.";

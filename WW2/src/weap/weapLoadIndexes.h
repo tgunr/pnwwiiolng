@@ -9,7 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 //
-using MYSQL = struct st_mysql;
-extern void weapLoadIndexes(MYSQL* conn);
+extern void weapLoadIndexes(DBHANDLE& conn);
 
 #endif // PN_WEAP_LOADINDEXES_H

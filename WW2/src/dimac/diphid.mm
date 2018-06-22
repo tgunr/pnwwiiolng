@@ -558,11 +558,13 @@ LOGICAL dipSetupMouse(void)
 
 void checkIfInFront()
 {
-    pid_t runningApp = [[[NSWorkspace sharedWorkspace] frontmostApplication] processIdentifier];
-    pid_t activeWW2Id = [[NSProcessInfo processInfo] processIdentifier];
-    appHidden = !NSApp.active || (runningApp != activeWW2Id);
-    if (appHidden) {
-        lastmouseinit = FALSE;
+    @autoreleasepool {
+        pid_t runningApp = [[[NSWorkspace sharedWorkspace] frontmostApplication] processIdentifier];
+        pid_t activeWW2Id = [[NSProcessInfo processInfo] processIdentifier];
+        appHidden = !NSApp.active || (runningApp != activeWW2Id);
+        if (appHidden) {
+            lastmouseinit = FALSE;
+        }
     }
 }
 
