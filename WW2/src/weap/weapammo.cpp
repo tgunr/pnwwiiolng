@@ -4347,20 +4347,12 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 
 				// TODO: Adjust the round's heading and set AmmoStopped = FALSE;
 			}
-			// only if the FuseStartTime hasn't already been started and there is ExplosiveEnergy left
-			if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
+			
+			if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND) && (Ammo->AmmoType->ExplosiveEnergy > 0))
 				Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
 
-			if((AmmoCollideTime - Ammo->LaunchTime) >= Ammo->AmmoType->ArmingTime)
-			{
-				// only if the ammo has been released/shot with enough time for the arming time to expire
-				Ammo->FuseStartTime = AmmoCollideTime;
-				
-				if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
-					Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) fuse started, timer = %.4lf s, t = %lf s", Ammo->AmmoType->Name,
-							  Ammo->Id, Ammo->AmmoType->FuzeTime, Ammo->FuseStartTime);
-			}
-			else
+			// if the ammo has not exceeded the arming timer, give them a head shake and kill it
+			if(((AmmoCollideTime - Ammo->LaunchTime) < Ammo->AmmoType->ArmingTime) && (Ammo->AmmoType->ExplosiveEnergy > 0)) 
 			{
 				if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND)){
 					if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
