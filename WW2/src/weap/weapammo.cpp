@@ -4347,6 +4347,27 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 
 				// TODO: Adjust the round's heading and set AmmoStopped = FALSE;
 			}
+			
+			if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND) && (Ammo->AmmoType->ExplosiveEnergy > 0))
+				Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
+
+			// if the ammo has not exceeded the arming timer, give them a head shake and kill it
+			if(((AmmoCollideTime - Ammo->LaunchTime) < Ammo->AmmoType->ArmingTime) && (Ammo->AmmoType->ExplosiveEnergy > 0)) 
+			{
+				if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND)){
+					if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
+					{
+						persShakeHead("common.headshake.notarmed.bomb");
+					}
+					else
+					{
+						persShakeHead("common.headshake.notarmed");
+					}
+				}
+				// since the ammo isn't going to explode, go ahead and kill it
+				_KillAmmo(Ammo);
+				return FALSE;
+			}
 		}else // penetrated, bleed off energy
 		{
 			ResidualSpeed = sqrt((KE - KELimit) / .5 / Ammo->AmmoType->ProjectileWeight);
@@ -4357,7 +4378,8 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 				&& (AmmoSpeed - ResidualSpeed > Ammo->AmmoType->FuseStartSpeedLoss))
 			{
 				// only if the FuseStartTime hasn't already been started and there is ExplosiveEnergy left
-				Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
+				if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
+					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
 
 				if((AmmoCollideTime - Ammo->LaunchTime) >= Ammo->AmmoType->ArmingTime)
 				{
@@ -4370,13 +4392,15 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 				}
 				else
 				{
-					if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
-					{
-						persShakeHead("common.headshake.notarmed.bomb");
-					}
-					else
-					{
-						persShakeHead("common.headshake.notarmed");
+					if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND)){
+						if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
+						{
+							persShakeHead("common.headshake.notarmed.bomb");
+						}
+						else
+						{
+							persShakeHead("common.headshake.notarmed");
+						}
 					}
 					// since the ammo isn't going to explode, go ahead and kill it
 					_KillAmmo(Ammo);
@@ -4595,7 +4619,8 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	if((Ammo->FuseStartTime == 0) && (Ammo->AmmoType->ExplosiveEnergy > 0) && !(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO))
 	{
 		// only if the FuseStartTime hasn't already been started and there is ExplosiveEnergy left
-		Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
+		if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
+			Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
 
 		if((AmmoCollideTime - Ammo->LaunchTime) >= Ammo->AmmoType->ArmingTime)
 		{
@@ -4608,13 +4633,15 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 		}
 		else
 		{
-			if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
-			{
-				persShakeHead("common.headshake.notarmed.bomb");
-			}
-			else
-			{
-				persShakeHead("common.headshake.notarmed");
+			if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND)){
+				if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
+				{
+					persShakeHead("common.headshake.notarmed.bomb");
+				}
+				else
+				{
+					persShakeHead("common.headshake.notarmed");
+				}
 			}
 			// since the ammo isn't going to explode, go ahead and kill it
 			_KillAmmo(Ammo);
