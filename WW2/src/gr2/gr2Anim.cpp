@@ -662,6 +662,12 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 			_addInfantryLODs(newModel, 1, GERMAN_PARA_NOPACK);
 		}
 		break;
+		case AMERICAN_PARA_PACK:
+		{
+			newModel->chuteModel	= gr2Model::Load(fpTPSParachuteFile, nullptr, nullptr, 1);
+			_addInfantryLODs(newModel, 1, AMERICAN_PARA_NOPACK);
+		}
+		break;
 	}
 
 #ifndef GR2_BLEND_EDITOR

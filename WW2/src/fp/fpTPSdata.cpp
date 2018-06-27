@@ -329,6 +329,18 @@ void fpTPSDataInit()
 	fpTPSInfantryMeshFiles[GERMAN_PARA_NOPACK][TPS_LOD_4] = TPS_MESH_DIR "para_germ\\para_de_lod4";
 	fpTPSInfantryMeshFiles[GERMAN_PARA_NOPACK][TPS_LOD_5] = TPS_MESH_DIR "para_germ\\para_de_lod5";
 
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_PACK][TPS_LOD_1] = TPS_MESH_DIR "para_us\\para_us_chute_lod1";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_PACK][TPS_LOD_2] = TPS_MESH_DIR "para_us\\para_us_chute_lod2";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_PACK][TPS_LOD_3] = TPS_MESH_DIR "para_us\\para_us_chute_lod3";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_PACK][TPS_LOD_4] = TPS_MESH_DIR "para_us\\para_us_chute_lod4";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_PACK][TPS_LOD_5] = TPS_MESH_DIR "para_us\\para_us_chute_lod5";
+
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_NOPACK][TPS_LOD_1] = TPS_MESH_DIR "para_us\\para_us_lod1";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_NOPACK][TPS_LOD_2] = TPS_MESH_DIR "para_us\\para_us_lod2";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_NOPACK][TPS_LOD_3] = TPS_MESH_DIR "para_us\\para_us_lod3";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_NOPACK][TPS_LOD_4] = TPS_MESH_DIR "para_us\\para_us_lod4";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_NOPACK][TPS_LOD_5] = TPS_MESH_DIR "para_us\\para_us_lod5";
+
 	fpTPSWeaponMeshFiles[THOMPSON][TPS_LOD_1] = TPS_MESH_DIR "thompson\\thompson";
 	fpTPSWeaponMeshFiles[THOMPSON][TPS_LOD_2] = TPS_MESH_DIR "thompson\\thompson2";
 
@@ -665,6 +677,9 @@ void fpTPSDataInit()
 	fpTPSDefaultFaceNames[FRENCH_ML] = "16";
 	fpTPSDefaultFaceNames[AMERICAN_INFANTRY] = "face1";
 	fpTPSDefaultFaceNames[ITALIAN_INFANTRY] = "face2";
+	fpTPSDefaultFaceNames[AMERICAN_PARA_PACK] = "16";
+	fpTPSDefaultFaceNames[AMERICAN_PARA_NOPACK] = "16";
+	fpTPSDefaultFaceNames[AMERICAN_PARA_PACK_SELF] = "16";
 
 #ifdef USE_NEW_DECALS
     int q = 0;
@@ -693,6 +708,9 @@ void fpTPSDataInit()
 	fpTPSPatchTextureNames[BRITISH_ML] = "brit5";
 	fpTPSPatchTextureNames[GERMAN_ML] = "germ5";
 	fpTPSPatchTextureNames[FRENCH_ML] = "";
+	fpTPSPatchTextureNames[AMERICAN_PARA_PACK] = "";
+	fpTPSPatchTextureNames[AMERICAN_PARA_NOPACK] = "";
+	fpTPSPatchTextureNames[AMERICAN_PARA_PACK_SELF] = "";
 #endif
 
 	fpTPSParachuteFile = TPS_MESH_DIR "chute\\chute";
