@@ -84,6 +84,7 @@ JSFunctionSpec jsClient::jsfunctions[] =
 	JS_FUNCTION_SPEC(jsClient, startofflinemode,0),
 	JS_FUNCTION_SPEC(jsClient, issteamcopy,0),
 	JS_FUNCTION_SPEC(jsClient, steamconnect,2),
+    JS_FUNCTION_SPEC(jsClient, getLastUnknownErrorCode,0),
 	JS_FUNCTION_SPEC(jsClient, emailReset,0),
 	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
@@ -304,10 +305,14 @@ namespace {
     };
     SteamAuthSessionTicket steamAuthTicket;
     
+    // The most recent response's support code
+    std::string lastSupportCode;
 
     // Update our global (eww) state to reflect the most recent API result
-	void UpdateLoginState(SteamLoginResponse res) {
-		switch ( res ) {
+	void UpdateLoginState(const SteamLoginResult &res) {
+        lastSupportCode = res.supportCode;
+        
+		switch ( res.status ) {
         // Login succeeded - go to initial state
 		case SteamLoginResponse::LoginSuccess:
 			steam_login_state = LoginReady;
@@ -361,7 +366,7 @@ namespace {
 			break;
             
 		default:
-			dbugLog(_FLW, "Unknown login response %u", res);
+			dbugLog(_FLW, "Unknown login response %u", res.status);
 			steam_login_state = LoginReady;
 		}
 	}
@@ -382,7 +387,7 @@ namespace {
             SteamLoginResult result = authRequestSteamSignup(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena, callsign, email);
             
             if (result.status == SteamLoginResponse::LoginSuccess) {
-                return {SteamLoginResponse::LoginEmailNotValidated};
+                return { SteamLoginResponse::LoginEmailNotValidated, result.supportCode };
             }
             return result;
         }
@@ -390,13 +395,13 @@ namespace {
 			SteamLoginResult result = authRequestSteamEmailChange(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena, email);
 
             if (result.status == SteamLoginResponse::LoginSuccess) {
-                return {SteamLoginResponse::LoginEmailNotValidated};
+                return { SteamLoginResponse::LoginEmailNotValidated, result.supportCode };
             }
             return result;
         }
 		default:
 			assert ( false );
-			return {SteamLoginResponse::LoginUnknownError};
+			return { SteamLoginResponse::LoginUnknownError, "01000000-0000-0000-0000-000000000000" };
 		}
 	}
 }
@@ -429,13 +434,24 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	//--------------
 
 	SteamLoginResult result = AttemptSteamLogin(arena, callsign, email);
-	UpdateLoginState(result.status);
+	UpdateLoginState(result);
 
 	if ( result.status == SteamLoginResponse::LoginSuccess )
 		rnsetServerInfo(result.serverIP, result.serverPort, result.otp);
 
 	*rval = INT_TO_JSVAL(result.status);
 	return JS_TRUE;
+}
+
+// Return the most recent support code.
+JS_FUNCTION_DEF(jsClient, getLastUnknownErrorCode) {
+    assert ( IsSteamCopy() );
+
+    jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+    if ( ! jsclient ) return JS_FALSE;
+    
+    *rval = phui::js::NewString(lastSupportCode.c_str());
+    return JS_TRUE;
 }
 
 // Go to the "reset your email" state. We only need this to keep the jsClient side in sync with the JS.

@@ -60,10 +60,24 @@ static std::string _encodeSteamTicket(const void *authTicket, size_t authTicketL
     return result;
 }
 
+static inline std::string FORMAT_FN(1, 2) _cxxfmt(FORMAT_ARG(0) const char * const format, ...)
+{
+    va_list args;
+    char *tmp = nullptr;
+    std::string result;
+    
+    va_start(args, format);
+    vasprintf(&tmp, format, args);
+    va_end(args);
+    result.assign(tmp);
+    free(tmp);
+    return result;
+}
+
 static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nlohmann::json params, bool successReadsData = false) // params is *purposely* not a const&
 {
     // Can't make this a static inline function because there's no dbugLogv()!
-    #define _requestError(msg, ...) do { dbugLog(_FLD, msg, ## __VA_ARGS__); return SteamLoginResponse::LoginUnknownError; } while (0)
+    #define _requestError(msg, code, ...) do { dbugLog(_FLD, msg, ## __VA_ARGS__); return { SteamLoginResponse::LoginUnknownError, code }; } while (0)
     
     sysBasicHTTPRequest request;
     sysBasicHTTPResponse response;
@@ -78,30 +92,36 @@ static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nl
         _requestError("Failed to execute HTTP request with URL %s", request.url.c_str());
     }
     if (response.responseCode != 200) {
-        _requestError("Server returned non-200 response code %d with URL %s", response.responseCode, request.url.c_str());
+        _requestError("Server returned non-200 response code %d with URL %s", _cxxfmt("20000000-0000-0000-0000-%012x", response.responseCode), response.responseCode, request.url.c_str());
     }
+    if (response.headers.find("x-request-id") == response.headers.end()) {
+        _requestError("Server's response has no context ID for URL %s", "30000000-0000-0000-0000-000000000000", request.url.c_str());
+    }
+    
+    std::string requestId = response.headers["x-request-id"];
+    
     if (response.headers.find("content-type") == response.headers.end() || !has_prefix(response.headers["content-type"], "application/json")) {
-        _requestError("Server returned non-JSON content-type with URL %s", request.url.c_str());
+        _requestError("Server returned non-JSON content-type with URL %s", requestId, request.url.c_str());
     }
     
     auto responseJson = nlohmann::json::parse(response.content, nullptr, /*allow_exceptions:*/false);
     if (responseJson.is_discarded() || !responseJson.is_object()) {
-        _requestError("Server returned invalid or non-object JSON with URL %s content %s", request.url.c_str(), response.content.c_str());
+        _requestError("Server returned invalid or non-object JSON with URL %s content %s", requestId, request.url.c_str(), response.content.c_str());
     }
 
     auto resultPtr = responseJson.find("result");
     if (resultPtr == responseJson.end() || !resultPtr->is_number_unsigned()) {
-        _requestError("Server returned JSON with no or invalid result code with URL %s content %s", request.url.c_str(), response.content.c_str());
+        _requestError("Server returned JSON with no or invalid result code with URL %s content %s", requestId, request.url.c_str(), response.content.c_str());
     }
     SteamLoginResponse resultCode = _loginResponseFromResultCode(resultPtr->get<uint32_t>());
     
     switch (resultCode) {
         case SteamLoginResponse::INVALID_RESPONSE_CODE:
-            _requestError("Server returned JSON with unknown result code %u with URL %s content %s", responseJson["result"].get<uint32_t>(), request.url.c_str(), response.content.c_str());
+            _requestError("Server returned JSON with unknown result code %u with URL %s content %s", requestId, responseJson["result"].get<uint32_t>(), request.url.c_str(), response.content.c_str());
             
         case SteamLoginResponse::LoginSuccess: {
             if (!successReadsData)  {
-                return resultCode;
+                return { resultCode, requestId };
             }
             
             auto arenaIDPtr = responseJson.find("arenaID");
@@ -110,23 +130,23 @@ static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nl
             auto serverPortPtr = responseJson.find("serverPort");
 
             if (arenaIDPtr == responseJson.end() || !arenaIDPtr->is_number_unsigned()) {
-                _requestError("Server returned JSON with no or invalid arena ID with URL %s content %s", request.url.c_str(), response.content.c_str());
+                _requestError("Server returned JSON with no or invalid arena ID with URL %s content %s", requestId, request.url.c_str(), response.content.c_str());
             }
             if (otpPtr == responseJson.end() || !otpPtr->is_number_unsigned()) {
-                _requestError("Server returned JSON with no or invalid OTP with URL %s content %s", request.url.c_str(), response.content.c_str());
+                _requestError("Server returned JSON with no or invalid OTP with URL %s content %s", requestId, request.url.c_str(), response.content.c_str());
             }
             if (serverIPPtr == responseJson.end() || !serverIPPtr->is_number_unsigned()) {
-                _requestError("Server returned JSON with no or invalid server IP with URL %s content %s", request.url.c_str(), response.content.c_str());
+                _requestError("Server returned JSON with no or invalid server IP with URL %s content %s", requestId, request.url.c_str(), response.content.c_str());
             }
             if (serverPortPtr == responseJson.end() || !serverPortPtr->is_number_unsigned()) {
-                _requestError("Server returned JSON with no or invalid server port with URL %s content %s", request.url.c_str(), response.content.c_str());
+                _requestError("Server returned JSON with no or invalid server port with URL %s content %s", requestId, request.url.c_str(), response.content.c_str());
             }
 
             return { arenaIDPtr->get<int32_t>(), otpPtr->get<uint32_t>(), serverIPPtr->get<uint32_t>(), serverPortPtr->get<uint32_t>() };
         }
         
         default:
-            return resultCode;
+            return { resultCode, requestId };
     }
 }
 

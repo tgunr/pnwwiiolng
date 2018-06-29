@@ -42,14 +42,18 @@ enum class SteamLoginResponse : uint32_t {
 struct SteamLoginResult {
     // The response code from the relay API. See functions below for expected results of various calls.
     SteamLoginResponse status;
+    
+    // The code to display to the user for support's reference in case of unrecognized error. More or less always valid.
+    std::string supportCode;
+    
     // The authHost's APP_LAUNCH response (effectively). Valid ONLY when returned from authRequestSteamLogin() AND status == LoginSuccess
     int32_t arenaID;
     uint32_t otp;
     uint32_t serverIP;
     uint32_t serverPort;
     
-    SteamLoginResult(SteamLoginResponse error) : status(error), arenaID(0), otp(0), serverIP(0), serverPort(0) {}
-    SteamLoginResult(int32_t arenaID, uint32_t otp, uint32_t serverIP, uint32_t serverPort) : status(SteamLoginResponse::LoginSuccess), arenaID(arenaID), otp(otp), serverIP(serverIP), serverPort(serverPort) {}
+    SteamLoginResult(SteamLoginResponse error, const std::string &code) : status(error), supportCode(code), arenaID(0), otp(0), serverIP(0), serverPort(0) {}
+    SteamLoginResult(int32_t arenaID, uint32_t otp, uint32_t serverIP, uint32_t serverPort) : status(SteamLoginResponse::LoginSuccess), arenaID(arenaID), supportCode(), otp(otp), serverIP(serverIP), serverPort(serverPort) {}
 };
 
 // All below APIs operate synchronously (your thread will block until the request completes, and this may take awhile)
