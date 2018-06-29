@@ -437,13 +437,6 @@ LOGICAL rnmainInit()
 	uiInit();
 	dimainInit();
 
-#if platOS == OS_WIN32
-	// We have to do this here again because a dll loaded with dimainInit() resets the FPU exception mask
-	// and we do want to get FPU exceptions for all the other things done here
-	// OGS: Not on the Mac, you don't :)
-	SetupFPU(true);
-#endif
-
 	// Setup variables
 	if (!SetupVariables())
 	{
