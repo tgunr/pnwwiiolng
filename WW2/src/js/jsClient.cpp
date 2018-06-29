@@ -461,9 +461,17 @@ JS_FUNCTION_DEF(jsClient, emailReset) {
 
 	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
 	if ( ! jsclient ) return JS_FALSE;
+    if ( argc < 1 ) return JS_FALSE;
 
-	assert( steam_login_state == LoginReady || steam_login_state == LoginNeedEmail );
-	steam_login_state = LoginNeedEmail;
+    bool forward = JSVAL_TO_BOOLEAN(argv[1]);
+    
+    if (forward) {
+	    assert( steam_login_state == LoginReady || steam_login_state == LoginNeedEmail );
+	    steam_login_state = LoginNeedEmail;
+    } else {
+        assert( steam_login_state == LoginNeedEmail );
+        steam_login_state = LoginReady;
+    }
 	return JS_TRUE;
 }
 
