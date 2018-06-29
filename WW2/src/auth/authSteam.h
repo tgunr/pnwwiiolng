@@ -13,7 +13,7 @@
 #include <numeric>
 #include <limits>
 
-// IMPORTANT: Keep these in sync with authRelay.php
+// IMPORTANT: Keep these in sync with the auth relay
 // IMPORTANT: DO NOT REORDER OR RENUMBER THESE - only add new ones
 enum class SteamLoginResponse : uint32_t {
     LoginSuccess = 0,
@@ -32,9 +32,14 @@ enum class SteamLoginResponse : uint32_t {
     INVALID_RESPONSE_CODE = std::numeric_limits<uint32_t>::max(), // Do not use this. Never returned from any API
 };
 
-// Some of these fields loosely correspond to those of auth's APP_LAUNCH packet
+// Some of these fields loosely correspond to those of auth's APP_LAUNCH packet.
+// N.B.: Having a structure that effectively has three different layouts all squished
+// together like this without even being a union is bad form, but the redesign necessary
+// to improve on it is not presently worth the trouble.
 struct SteamLoginResult {
+    // The response code from the relay API. See functions below for expected results of various calls.
     SteamLoginResponse status;
+    // The authHost's APP_LAUNCH response (effectively). Valid ONLY when returned from authRequestSteamLogin() AND status == LoginSuccess
     int32_t arenaID;
     uint32_t otp;
     uint32_t serverIP;

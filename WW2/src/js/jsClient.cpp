@@ -320,6 +320,7 @@ namespace {
 	// The point in the login process we're at.
 	enum { LoginReady, LoginNewUser, LoginNeedEmail } steam_login_state = LoginReady;
 
+    // Update our global (eww) state to reflect the most recent API result
 	void UpdateLoginState(SteamLoginResponse res) {
 		switch ( res ) {
         // Login succeeded - go to initial state
@@ -347,7 +348,7 @@ namespace {
 		case SteamLoginResponse::LoginCallsignInUse:
 		case SteamLoginResponse::LoginEmailInvalid:
             break;
-
+            
         // Email in use during Signup flow requires transitioning to Email flow
         // because EmailInUse during Signup means the callsign is already
         // immutable in the backend. This is a hacky solution to what is
@@ -366,6 +367,7 @@ namespace {
 		case SteamLoginResponse::LoginExistingUser:
 			steam_login_state = LoginReady;
 			break;
+            
 		default:
 			dbugLog(_FLW, "Unknown login response %u", res);
 			steam_login_state = LoginReady;
@@ -392,6 +394,7 @@ namespace {
 	};
     SteamAuthSessionTicket steamAuthTicket;
 
+	// Call the appropriate Steam auth API based on our current state
 	SteamLoginResult AttemptSteamLogin(uint32_t arena, const char* callsign, const char* email) {
 		// Some quick pre-validation to avoid unnecessarily pestering auth.
 		if ( (steam_login_state == LoginNewUser || steam_login_state == LoginNeedEmail) &&
@@ -430,6 +433,7 @@ namespace {
 	}
 }
 
+// Perform a login (or signup or email as appropriate) attempt.
 JS_FUNCTION_DEF(jsClient, steamconnect) {
 	assert ( IsSteamCopy() );
 
@@ -466,11 +470,13 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	return JS_TRUE;
 }
 
+// Go to the "reset your email" state. We only need this to keep the jsClient side in sync with the JS.
 JS_FUNCTION_DEF(jsClient, emailReset) {
+    assert ( IsSteamCopy() );
+
 	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
 	if ( ! jsclient ) return JS_FALSE;
 
-	//UpdateLoginState(SteamLoginResponse::LoginEmailRequired);
 	assert( steam_login_state == LoginReady || steam_login_state == LoginNeedEmail );
 	steam_login_state = LoginNeedEmail;
 	return JS_TRUE;

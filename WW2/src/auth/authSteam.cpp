@@ -85,7 +85,6 @@ static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nl
     }
     
     auto responseJson = nlohmann::json::parse(response.content, nullptr, /*allow_exceptions:*/false);
-    
     if (responseJson.is_discarded() || !responseJson.is_object()) {
         _requestError("Server returned invalid or non-object JSON with URL %s content %s", request.url.c_str(), response.content.c_str());
     }
