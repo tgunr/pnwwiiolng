@@ -6156,13 +6156,6 @@ bool obdrawDrawBuildingShadowCasters(int sx,
     return success;
 }
 
-void obdrawDrawAdvertisements()
-{
-#ifdef USE_GAME_ADVERTISING
-    _drawAdvertisements();
-#endif
-}
-
 void obdrawDrawMesh(OBJECT* o)
 {
     if(ogl::UseDeprecatedPath())

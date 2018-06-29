@@ -496,15 +496,6 @@ LOGICAL rnmainInit()
 		rnmainResetPlayer();
 	}
 
-#ifdef USE_GAME_ADVERTISING
-	rnlogoUpdateStatus("loading.extresource");
-	if(!adInit())
-    {
-        // Not an error
-        Write_Log(LOG_OLD, LOG_INFO, "[rnmainInit] adInit FAILED");
-    }
-#endif
-
 	rnlogoUpdateStatus("loading.sounds.init");
 	if (!sndsInit())
 	{
@@ -738,10 +729,6 @@ void rnmainKill()
 		Online = 0;
 		ww2::Client::Kill();
 	}
-
-#ifdef USE_GAME_ADVERTISING
-    adKill();
-#endif
 
 	sptExitApp();
 

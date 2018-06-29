@@ -44,7 +44,6 @@ extern void obdrawDrawWaterRefraction();
 
 extern void obdrawDrawObject(const OBJECT* o, int units = 0);
 extern void obdrawDrawObjectInstanced(const OBJECT* o, int units = 0, int primcount = 1);
-extern void obdrawDrawAdvertisements();
 extern void obdrawDrawUnsorted();
 extern void obdrawDrawSorted();
 extern void obdrawDrawSortedCockpit();
