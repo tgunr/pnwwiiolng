@@ -285,6 +285,25 @@ JS_FUNCTION_DEF(jsClient, issteamcopy) {
 namespace {
 	// The point in the login process we're at.
 	enum { LoginReady, LoginNewUser, LoginNeedEmail } steam_login_state = LoginReady;
+    
+    // Simple RAII wrapper to ensure proper setup/takedown for Steam auth tickets.
+    struct SteamAuthSessionTicket {
+        SteamAuthSessionTicket() {}
+        ~SteamAuthSessionTicket() {} // do NOT call release() here, it's not safe to do so from a global destructor
+  
+        const char *getData() { LoadIfNeeded(); return data; }
+        uint32_t getLength() { LoadIfNeeded(); return length; }
+        void release() { if (handle != k_HAuthTicketInvalid) { SteamUser()->CancelAuthTicket(handle); } }
+
+        private:
+        HAuthTicket handle = k_HAuthTicketInvalid;
+        char data[512] = {0};
+        uint32_t length = 0;
+        
+        void LoadIfNeeded() { if (handle == k_HAuthTicketInvalid) { handle = SteamUser()->GetAuthSessionTicket(data, static_cast<int>(array_size(data)), &length); } }
+    };
+    SteamAuthSessionTicket steamAuthTicket;
+    
 
     // Update our global (eww) state to reflect the most recent API result
 	void UpdateLoginState(SteamLoginResponse res) {
@@ -339,26 +358,6 @@ namespace {
 			steam_login_state = LoginReady;
 		}
 	}
-
-	//--------------
-
-	// Simple RAII wrapper to ensure proper setup/takedown for Steam auth tickets.
-	struct SteamAuthSessionTicket {
-        SteamAuthSessionTicket() {}
-		~SteamAuthSessionTicket() {} // do NOT call release() here, it's not safe to do so from a global destructor
-  
-        const char *getData() { LoadIfNeeded(); return data; }
-        uint32_t getLength() { LoadIfNeeded(); return length; }
-        void release() { if (handle != k_HAuthTicketInvalid) { SteamUser()->CancelAuthTicket(handle); } }
-
-        private:
-		HAuthTicket handle = k_HAuthTicketInvalid;
-		char data[512] = {0};
-		uint32_t length = 0;
-        
-        void LoadIfNeeded() { if (handle == k_HAuthTicketInvalid) { handle = SteamUser()->GetAuthSessionTicket(data, static_cast<int>(array_size(data)), &length); } }
-	};
-    SteamAuthSessionTicket steamAuthTicket;
 
 	// Call the appropriate Steam auth API based on our current state
 	SteamLoginResult AttemptSteamLogin(uint32_t arena, const char* callsign, const char* email) {
