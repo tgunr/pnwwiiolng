@@ -86,6 +86,7 @@ JSFunctionSpec jsClient::jsfunctions[] =
 	JS_FUNCTION_SPEC(jsClient, steamconnect,2),
     JS_FUNCTION_SPEC(jsClient, getLastUnknownErrorCode,0),
 	JS_FUNCTION_SPEC(jsClient, emailReset,0),
+    JS_FUNCTION_SPEC(jsClient, releasesteamticket,0),
 	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
 	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
@@ -464,6 +465,17 @@ JS_FUNCTION_DEF(jsClient, emailReset) {
 	assert( steam_login_state == LoginReady || steam_login_state == LoginNeedEmail );
 	steam_login_state = LoginNeedEmail;
 	return JS_TRUE;
+}
+
+// Attempt not to hold onto Steam tickets longer than strictly necessary
+JS_FUNCTION_DEF(jsClient, releasesteamticket) {
+    assert ( IsSteamCopy() );
+
+    jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+    if ( ! jsclient ) return JS_FALSE;
+
+    steamAuthTicket.release();
+    return JS_TRUE;
 }
 
 /************************************************************************************************

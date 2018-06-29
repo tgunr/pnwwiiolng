@@ -77,6 +77,7 @@ public:
 	JS_FUNCTION(steamconnect);
     JS_FUNCTION(getLastUnknownErrorCode);
 	JS_FUNCTION(emailReset);
+    JS_FUNCTION(releasesteamticket);
 	JS_FUNCTION(loadrootwindow);
 	JS_FUNCTION(getmisscountry);
 	JS_FUNCTION(getmissbrigade);
