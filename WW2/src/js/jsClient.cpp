@@ -282,40 +282,6 @@ JS_FUNCTION_DEF(jsClient, issteamcopy) {
 	steam connection
 *************************************************************************************************/
 
-// TODO: Move this out of the GUI code
-namespace {
-	bool IsValidEmail(const char* email) {
-		// TEMP: Validating emails meaningfully is arbitrarily difficult.
-        // Note that even billing only does this:
-        // email+          = ^[^\s]+\@[^\s]+$
-        bool hasAt = false;
-        bool hasDot = false;
-        
-		for ( const char* c = email ; *c != '\0' ; ++c ) {
-			if ( !std::isprint(*c, std::locale::classic()) ) {
-				return false;
-			}
-            if (*c == '@') { hasAt = true; }
-            if (*c == '.') { hasDot = true; }
-		}
-
-		return hasAt && hasDot;
-	}
-
-	bool IsValidCallsign(const char* callsign) {
-		if ( strlen(callsign) < 2 || strlen(callsign) > 10)
-			return false;
-
-		for ( const char* c = callsign ; *c != '\0' ; ++c ) {
-			if ( !std::isalnum(*c, std::locale::classic()) ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-}
-
 namespace {
 	// The point in the login process we're at.
 	enum { LoginReady, LoginNewUser, LoginNeedEmail } steam_login_state = LoginReady;
@@ -396,14 +362,10 @@ namespace {
 
 	// Call the appropriate Steam auth API based on our current state
 	SteamLoginResult AttemptSteamLogin(uint32_t arena, const char* callsign, const char* email) {
-		// Some quick pre-validation to avoid unnecessarily pestering auth.
-		if ( (steam_login_state == LoginNewUser || steam_login_state == LoginNeedEmail) &&
-		     ! IsValidEmail(email) ) {
-			return {SteamLoginResponse::LoginEmailInvalid};
-		}
-		if ( steam_login_state == LoginNewUser && ! IsValidCallsign(callsign) ) {
-			return {SteamLoginResponse::LoginCallsignInvalid};
-		}
+        // For now, don't try to pre-validate the user's inputs; this pesters the relay more than is
+        // strictly necessary, but allows the rules to be purely under the relay's control in realtime,
+        // rather than requiring a new client build. It also significantly simplifies the already weird
+        // and messy JavaScript driving this UI.
 
 		//------
 
