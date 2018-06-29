@@ -81,6 +81,7 @@ static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nl
     
     sysBasicHTTPRequest request;
     sysBasicHTTPResponse response;
+    uint64_t errorCode = 0;
     
     request.method = "POST";
     request.url = _getAuthRelayURL(endpoint);
@@ -88,8 +89,8 @@ static SteamLoginResult _doRequestWithParameters(const std::string &endpoint, nl
     request.headers["X-WWIIOnline-Client-Version"] = PN_product_version_string; // Not required, just for good measure
     request.content = params.dump();
     
-    if (!sysExecuteHTTPRequest(request, response)) {
-        _requestError("Failed to execute HTTP request with URL %s", request.url.c_str());
+    if (!sysExecuteHTTPRequest(request, response, errorCode)) {
+        _requestError("Failed to execute HTTP request with URL %s", _cxxfmt("10000000-0000-0000-%04llx-%012llx", errorCode >> 48, errorCode & ((1ULL << 48) - 1)), request.url.c_str());
     }
     if (response.responseCode != 200) {
         _requestError("Server returned non-200 response code %d with URL %s", _cxxfmt("20000000-0000-0000-0000-%012x", response.responseCode), response.responseCode, request.url.c_str());
