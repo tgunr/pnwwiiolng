@@ -345,7 +345,14 @@ namespace {
                 assert( steam_login_state == LoginNeedEmail ); // must be in Email flow if not in Signup flow
             }
 			break;
-
+   
+        // State problems on the server side; we need to stick to the Login state.
+        case SteamLoginResponse::LoginArenaDown:
+        case SteamLoginResponse::LoginArenaDenied:
+        case SteamLoginResponse::LoginVersionMismatch:
+            assert( steam_login_state == LoginReady );
+            break;
+        
 		// Something went wrong, reset things on our end.
 		case SteamLoginResponse::LoginNotValidUser:
 		case SteamLoginResponse::LoginUnknownError:

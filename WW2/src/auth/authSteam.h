@@ -28,7 +28,10 @@ enum class SteamLoginResponse : uint32_t {
     LoginEmailInUse = 9, // Email is already in use by someone else
     LoginEmailNotValidated = 10, // Email is not yet validated
     LoginExistingUser = 11, // Signup and email change not allowed on existing accounts
-    
+    LoginArenaDown = 12, // Login succeeded, but the requested arena is offline
+    LoginVersionMismatch = 13, // Login succeeded, but the client is not a version supported by the requested arena
+    LoginArenaDenied = 14, // Login succeeded, but the user does not have access to the requested arena
+
     INVALID_RESPONSE_CODE = std::numeric_limits<uint32_t>::max(), // Do not use this. Never returned from any API
 };
 
@@ -61,6 +64,11 @@ struct SteamLoginResult {
 //  - LoginEmailRequired: This user is an existing Steam user with no email address. Present UI and call `authRequestSteamEmailChange()` next.
 //  - LoginEmailNotValidated: The user needs to verify their email address. Call `authRequestSteamLogin()` to poll verification status or
 //      `authRequestSteamEmailChange()` to request new email send or address change
+//  - LoginArenaDown: The cluster is offline or full. Once arena listing is implemented, this will mean the state changed since the last
+//      time the list was pulled, but for now it's impossible to know whether the arena's up until you've logged in successfully.
+//  - LoginVersionMismatch: This client is too old or too new, did Steam not get a new version yet?
+//  - LoginArenaDenied: This user doesn't have access to the cluster, probably means access was revoked since the arena list was retrieved
+//      (once that's implemented) or they're trying to hack their way into a cluster they shouldn't be accessing.
 //  - LoginSuccess: Login SUCCEEDED. Result object contains server address, OTP, etc.
 SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID);
 
