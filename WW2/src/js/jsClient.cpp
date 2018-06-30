@@ -385,7 +385,7 @@ namespace {
 		case LoginReady:
 			return authRequestSteamLogin(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena);
 		case LoginNewUser: {
-            SteamLoginResult result = authRequestSteamSignup(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena, callsign, email);
+            SteamLoginResult result = authRequestSteamSignup(steamAuthTicket.getData(), steamAuthTicket.getLength(), callsign, email);
             
             if (result.status == SteamLoginResponse::LoginSuccess) {
                 return { SteamLoginResponse::LoginEmailNotValidated, result.supportCode };
@@ -393,7 +393,7 @@ namespace {
             return result;
         }
 		case LoginNeedEmail: {
-			SteamLoginResult result = authRequestSteamEmailChange(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena, email);
+			SteamLoginResult result = authRequestSteamEmailChange(steamAuthTicket.getData(), steamAuthTicket.getLength(), email);
 
             if (result.status == SteamLoginResponse::LoginSuccess) {
                 return { SteamLoginResponse::LoginEmailNotValidated, result.supportCode };

@@ -167,7 +167,7 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
     }, true);
 }
 
-SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &callsign, const std::string &email)
+SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicketLen, const std::string &callsign, const std::string &email)
 {
     return _doRequestWithParameters("signup", {
         { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },
@@ -176,7 +176,7 @@ SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicke
     });
 }
 
-SteamLoginResult authRequestSteamEmailChange(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &email)
+SteamLoginResult authRequestSteamEmailChange(const void *authTicket, size_t authTicketLen, const std::string &email)
 {
     return _doRequestWithParameters("email", {
         { "steam_ticket", _encodeSteamTicket(authTicket, authTicketLen) },

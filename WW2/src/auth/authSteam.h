@@ -88,7 +88,7 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
 //  - LoginExistingUser: This user is already fully signed up and verified. Call `authRequestSteamLogin()` next.
 //  - LoginSuccess: Signup SUCCEEDED. Call `authRequestSteamLogin()` after user verifies their email (or `authRequestSteamEmailChange()` if user requests it).
 //      THE RESULT OBJECT DOES NOT CONTAIN ARENA OR OTP INFORMATION!!!! The user MUST verify their email BEFORE logging in.
-SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &callsign, const std::string &email);
+SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicketLen, const std::string &callsign, const std::string &email);
 
 // Request new user email change.
 // This API will error if called for a user who has no callsign or has already verified their email.
@@ -101,4 +101,4 @@ SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicke
 //  - LoginExistingUser: This user is already fully signed up and verified; email can not be changed through this interface. Call `authRequestSteamLogin()` next.
 //  - LoginSuccess: Email send/update SUCCEEDED. Call `authRequestSteamLogin()` after user verifies their email (or `authRequestSteamEmailChange()` if user requests it).
 //      THE RESULT OBJECT DOES NOT CONTAIN ARENA OR OTP INFORMATION!!!! The user MUST verify their email BEFORE logging in.
-SteamLoginResult authRequestSteamEmailChange(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &email);
+SteamLoginResult authRequestSteamEmailChange(const void *authTicket, size_t authTicketLen, const std::string &email);
