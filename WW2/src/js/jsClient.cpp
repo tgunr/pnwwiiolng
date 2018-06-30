@@ -463,7 +463,7 @@ JS_FUNCTION_DEF(jsClient, emailReset) {
 	if ( ! jsclient ) return JS_FALSE;
     if ( argc < 1 ) return JS_FALSE;
 
-    bool forward = JSVAL_TO_BOOLEAN(argv[1]);
+    bool forward = JSVAL_TO_BOOLEAN(argv[0]);
     
     if (forward) {
 	    assert( steam_login_state == LoginReady || steam_login_state == LoginNeedEmail );
