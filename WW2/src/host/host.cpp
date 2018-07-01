@@ -1369,7 +1369,7 @@ _illegalPacketSequence(SINT32 teulIndex)
 
 	// Flag them so it becomes sticky
 	persona->m_flags.checksumsDirty = true;
-	commForcePlayerExit(*persona, "*invalid packet sequence", true);
+	commForcePlayerExit(*persona, "invalid packet sequence", true);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2024,7 +2024,7 @@ _starvedUpdates(Player* player, HostVehicle* vehicle, bool despawnTimerActive)
 	const UINT32 maxUpdatesBetweenRxs = (FE_UPDATES_PER_SECOND * host_config.update.starvationLimit_s);
 	if ( PN_UNLIKELY(player->m_updatesSinceRX > maxUpdatesBetweenRxs) )
 	{
-		commForcePlayerExit(*player, "*too few updates from client", true);
+		commForcePlayerExit(*player, "too few updates from client", true);
 		return true;
 	}
 
@@ -2085,7 +2085,7 @@ _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, s
 						player->playerID(),
 						queueSize,
 						static_cast<float>(heldTime_ms) / 1000.0);
-					commForcePlayerExit(*player, "*Slow Client Updates (Inbound)", true);
+					commForcePlayerExit(*player, "Slow client updates (Inbound)", true);
 					return false;
 				}
 				else

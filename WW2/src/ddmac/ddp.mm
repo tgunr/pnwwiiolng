@@ -500,6 +500,8 @@ void ddpKill()
 {
 	//CGReleaseAllDisplays();
 	ddpShowCursor();
+    [ddpWin orderOut:nil];
+    [ddpWin close];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

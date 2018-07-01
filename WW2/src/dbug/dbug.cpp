@@ -119,7 +119,11 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
         return;
 
 	// Already qualified.
-	if ( filename[0] == '.' || filename[0] == '/' || filename[0] == '\\' || filename[1] == ':' )
+#if platOS == OS_WIN32
+    if ( filename[0] == '\\' || (isalpha(filename[0]) && filename[1] == ':' && filename[2] == '\\')  ) // yes, this is short-string-safe
+#else
+	if ( (filename[0] == '.' && filename[1] == '/') || filename[0] == '/' )
+#endif
 		strsafecpy(output, filename, outputSize);
 	else
 	{
@@ -131,11 +135,7 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
 		if ( defaultPath && defaultPath[0] != 0 )
 		{
 			OS_MKDIR(defaultPath, 0770);
-#if platOS == OS_WIN32
-			snprintf(output, outputSize, "%s\\%s", defaultPath, filename);
-#else
-			snprintf(output, outputSize, "%s/%s", defaultPath, filename);
-#endif
+			snprintf(output, outputSize, "%s%c%s", defaultPath, OS_PATHSEP_C, filename);
 			return;
 		}
 

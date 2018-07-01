@@ -785,7 +785,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 						player->playerID(), 
 						static_cast<float>(elapsedTime_ms) / 1000.0, 
 						static_cast<float>(heldTime_ms) / 1000.0);
-					commForcePlayerExit(*player, "*Slow Client Updates (Outbound)", true);
+					commForcePlayerExit(*player, "Slow client updates (Outbound)", true);
 				}
 				else
 					dbugLog(_FLD, "*** IBD: Player's accumulated packet delay within hold limits (%s %d) : Delay %f seconds, for %f seconds***", 

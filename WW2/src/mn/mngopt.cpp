@@ -159,7 +159,7 @@ LOGICAL mngoptParse()
         auto foundCmd = std::find_if(&vars[0], &vars[sizeof(vars) / sizeof(GVAR)], [c = cmd.substr(1)] (const GVAR &k) { return k.key && k.key == c; });
 
         if (foundCmd == &vars[sizeof(vars) / sizeof(GVAR)]) {
-			Write_Debug("Unknown Command Line switch: '%s', '%s'", cmd.c_str(), value.c_str());
+			Write_Debug("Unknown Command Line switch:\n '%s', '%s'\n", cmd.c_str(), value.c_str());
             continue;
         }
         switch (foundCmd->ktype) {

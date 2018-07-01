@@ -19,6 +19,7 @@
 
 //  Folder constants
 NSString * const WWIIOnlineFolder = @"WWIIOnLine";
+NSString * const BGEFolder = @"Battleground Europe";
 //  NSString * const WWIIOnlineFolder = @"com.corneredrats.wwiionline";
 
 UINT64 GetMicroSeconds(void)
@@ -71,11 +72,115 @@ char GetOSBuild()
     return 0;
 }
 
+bool CopyOldSetupFiles()
+{
+    bool copyFiles = false;
+    char buffer [2048];
+    int charCount = 0;
+
+    //  const char *folderRename = "_Copied";
+    NSString *folderRename = @"_CopiedWWII";
+    const char *title1 = "Old Game settings Located.";
+    const char *title2 = "Old Game settings Saved.";
+    const char *message1 = "An older version of the Game Settings has been found.\n\nDo you wish to re-use them?";
+    //  Set Later == const char *message2 = "The Directory:\n%s\n\nhas been re-named to:\n%s_Copied.";
+
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *bgePath = [documentsDirectory stringByAppendingPathComponent:BGEFolder];
+    NSString *ww2Path = [documentsDirectory stringByAppendingPathComponent:WWIIOnlineFolder];
+
+    const char *c_filepath = [bgePath UTF8String];
+    buffer[0] = 0;
+    //  charCount = sprintf (buffer, "The Directory:\n%s\n\nhas been re-named to:\n%s_Copied.", c_filepath, c_filepath);
+    //  charCount = sprintf (buffer, "The Directory:\n%s\n\nhas been re-named to:\n%s%s.", c_filepath, c_filepath, folderRename);
+    charCount = sprintf (buffer, "The Directory:\n%s\n\nhas been re-named to:\n%s%s.", c_filepath, c_filepath, [folderRename UTF8String]);
+    const char *message2 = &buffer[0];  //  <<=== Set.
+
+    
+    //  Locate: /Users -> "currentuser" -> Documents -> Battleground Europe
+    if (![fileManager fileExistsAtPath:bgePath])
+        return false;
+    
+    //  Located: /Users -> "currentuser" -> Documents -> Battleground Europe
+
+    
+    //  Verify the User wants to copy the old Setup Files.
+    NSAlert *alert = [[NSAlert alloc] init];
+
+    alert.messageText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:title1] ?: @""); // Force-unwrap those optionals!
+    alert.informativeText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:message1] ?: @"");
+    alert.alertStyle = NSAlertStyleInformational;
+
+    [alert addButtonWithTitle:(@"Yes")];
+    [alert addButtonWithTitle:(@"No")];
+    
+    if ([alert runModal] == NSAlertSecondButtonReturn) {
+        // the User clicked: No, Return.
+        copyFiles = false;
+
+    } else {
+        //  Copy the ENTIRE Contents of:
+        //   /Users -> "currentuser" -> Documents -> Battleground Europe
+        //   TO
+        //   /Users -> "currentuser" -> Documents -> WWIIOnline.
+        
+        NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtPath:bgePath];
+        NSString *target;
+        BOOL success = NO;
+        NSError * error = nil;
+        
+        while ((target = [dirEnum nextObject])) {
+            NSString *targetPath = [bgePath stringByAppendingPathComponent:target];
+            NSString *destPath = [ww2Path stringByAppendingPathComponent:target];
+            
+            success = [fileManager copyItemAtPath:targetPath toPath:destPath error:&error];
+            if(success != YES)
+                //  NSLog(@"Could not copy:-\n\nfrom path:\n%@,\n\nto path:\n%@.\n\nError:\n%@",targetPath, destPath, error);
+                NSLog(@"Could not copy:-\n\nfrom path:\n%@,\n\nto path:\n%@.",targetPath, destPath);
+            error = nil;
+            targetPath = @"";
+        }
+
+        //  Copy Completed.
+
+        
+        //  Re-Name:
+        //   /Users -> "currentuser" -> Documents -> "Battleground Europe"
+        //   TO
+        //   /Users -> "currentuser" -> Documents -> "Battleground Europe_Copied".
+        
+        NSURL *oldDir = [NSURL fileURLWithPath:bgePath];
+        //  NSURL *newDir = [NSURL fileURLWithPath:[bgePath stringByAppendingString:@"_Copied"]];
+        //  NSURL *newDir = [NSURL fileURLWithPath:[bgePath stringByAppendingString:static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:folderRename] ?: @"")]];
+        NSURL *newDir = [NSURL fileURLWithPath:[bgePath stringByAppendingString:folderRename]];
+        success = [fileManager moveItemAtURL: oldDir toURL: newDir error:&error];
+        if(success != YES)
+            //  NSLog(@"Could not copy:-\n\nfrom path:\n%@,\n\nto path:\n%@.\n\nError:\n%@",oldDir, newDir, error);
+            NSLog(@"Could not rename:-\n\nfrom path:\n%@,\n\nto path:\n%@.",oldDir, newDir);
+         error = nil;
+
+        NSAlert *alert1 = [[NSAlert alloc] init];
+
+        alert1.messageText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:title2] ?: @""); // Force-unwrap those optionals!
+        alert1.informativeText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:message2] ?: @"");
+        alert1.alertStyle = NSAlertStyleInformational;
+        
+        [alert1 runModal];
+        copyFiles = true;
+    }
+    
+    return copyFiles;
+}
+
 const char* macPreferencesPath()
 {
     //  /Users -> "currentuser" -> Library -> Preferences -> ww2ol
     //  /Users -> "currentuser" -> Library -> Preferences -> ww2olcfml
     //  /Users -> "currentuser" -> Library -> Preferences -> ww2olwwiiolprefs.xml
+    //
+    //  NOTICE: This function should no longer be referenced within the New Win Istaller Directory structures.
+    //
     
     static NSURL *prefsDir = nil;
     static const char *targetPathFSR;
@@ -133,6 +238,24 @@ const char* macDataPath()
     
     NSBundle *main = [NSBundle mainBundle];
     targetPathFSR = [main.resourcePath UTF8String];
+    
+    return targetPathFSR;
+}
+
+
+const char* macDocsPath()
+{
+    //  /Applications -> World War II Online.app -> Contents -> Resources -> docs
+    static const char *targetPathFSR;
+    
+    NSBundle *main = [NSBundle mainBundle];
+    static NSURL *targetPathDir = [main resourceURL];
+    targetPathDir = [targetPathDir URLByAppendingPathComponent:@"docs"];
+    
+    //NSString *docsPath = [main resourceURL];
+    
+    //targetPathFSR = [targetPathDir UTF8String];
+    targetPathFSR = strdup(targetPathDir.fileSystemRepresentation);
     
     return targetPathFSR;
 }
@@ -271,7 +394,7 @@ const char* macUserWorkingPath()
             targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
             targetPathDir = [targetPathDir URLByAppendingPathComponent:@"bin"];
             
-            // We're giving the prefs folder the permissions it would otherwise have
+            // We're giving the docs folder the permissions it would otherwise have
             // gotten by default here. Would 0750 or 0700 be a better choice?
             [[NSFileManager defaultManager]
                 createDirectoryAtURL:targetPathDir
@@ -312,7 +435,7 @@ void MacVideoInitializationFailed(const char* problem)
     	@"The game was unable to initialize the video display: %s\n"
         @"\n"
         @"Please check your settings and try again. "
-        @"If the problem persists, please visit http://support.playnet.com/.",
+        @"If the problem persists, please visit https://support.wwiionline.com.",
         problem
     ];
     [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];

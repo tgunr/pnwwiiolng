@@ -25,6 +25,7 @@
 #include "auth/authTypes.h"
 #include "auth/authAppIDs.h"
 #include "auth/authDefaults.h"
+#include "sys/sysAntihack.h"
 #include <netdb.h>
 #include <arpa/inet.h>
 #import <HockeySDK/HockeySDK.h>
@@ -340,7 +341,7 @@ static NSString *placeholderHTML = @""
 @"<body>"
 @"<div class=\"hi\">"
 @"<a href=\"http://www.battlegroundeurope.net/\">"
-@"<img style=\"height: 90px;\" src=\"placeholder-title.png\"/>"
+@"<img style=\"height: 140px;\" src=\"placeholder-title.png\"/>"
 @"</a>"
 @"</div>"
 @"</body>"
@@ -527,6 +528,10 @@ extern NSString *WebActionOriginalURLKey;
 
     //  Setup the data paths
     fioInit();
+    
+    //  Check for the existance of a previous Battleground Europe install.
+    //  /Users -> "currentuser" -> Documents -> Battleground Europe
+    CopyOldSetupFiles();
 
     if (!mngoptParse()) {
         [NSApp terminate:self];
@@ -541,14 +546,27 @@ extern NSString *WebActionOriginalURLKey;
     xmlSetGenericErrorFunc(0,xmlerrorstub);
     xmlSetStructuredErrorFunc(0,xmlstructurederrorstub);
     
-    //  /Applications -> World War II Online.app -> Contents -> Resources
-    //  chAppDir();
+    // Set up anti-hack stuff - not needed on macOS but do it for good measure anyway
+    NetFrameSync::InitializeHashes();
     
-    // Setup the user data path
-    //  fioInit();
-    
-    
-    //  ISDIRECTORY
+    Fio::DeleteLogFile();
+
+#ifdef DEBUG_WW2
+    WantedUserLogEnabled = TRUE;
+    HasKeyFile = TRUE;
+#endif
+
+#if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
+    LogEnabled = TRUE;
+    UserLogEnabled = WantedUserLogEnabled;
+    Open_Debug(SYS_TITLE);
+    Enable_Log(LOG_ALL, WantedUserLogEnabled);
+    Set_Log_Level(LOG_INFO);
+#else
+    LogEnabled = FALSE;
+    UserLogEnabled = FALSE;
+#endif
+
     fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
     
     if(!WantDataDir) {
@@ -557,6 +575,8 @@ extern NSString *WebActionOriginalURLKey;
     }
     
     cfgPrefsLoad();
+    
+    Write_Debug("Command Line:\n'%s'\n", GetCommandLineA());
     
     // For complex reasons, we need to call mngoptParse() again here. See the
     // Windows sysmain.cpp file for details.

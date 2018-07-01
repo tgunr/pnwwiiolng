@@ -31,15 +31,18 @@ wwiiolpath_string WantedDataPath = L"";					//  SET by the command line - ENABLE
 wwiiolpath_string WWIIOnlineDirName = L"WWIIOnLine";	//  The ROOT folder for the game install - .\WWIIOnLine
 
 wwiiolpath_string WW2_exePath;			//	??_exePath - Windows - EXE ROOT folder:  \Program * Files -> WWIIOnLine == *.exe, WWIIOnLine.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
-										//	??_exePath - macOS - EXE ROOT folder:  /Applications/WWIIOnline(package) == *.exe, WWIIOnLine.ico, readme.*, *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
+										//	??_exePath - macOS - EXE ROOT folder:  /Applications -> World War II Online.app == Contents -> _CodeSignature(dir), Frameworks(dir), MacOS(dir -> exefile), Resources(dir) info.plist, PkgInfo.
 wwiiolpath_string WW2_exeDataPath;		//	??_exeDataPath - EXE Support Data folder:  \Program * Files -> WWIIOnLine -> DATA == DirectXRedist(dir), loc(dir), playgate(dir), RuntimeLibraries(dir). 
-wwiiolpath_string WW2_exeDocsPath;		//	??_exeDocsPath - EXE Docs Folder:  \Program * Files -> WWIIOnLine -> docs == eula.txt, license.*, regions.txt, tos.txt.
-wwiiolpath_string WW2_exePlayarcPath;	//	??_exePlayarcPath - EXE playarc folder:  \Program * Files -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
+wwiiolpath_string WW2_exeDocsPath;		//	??_exeDocsPath - Windows - EXE Docs Folder:  \Program * Files -> WWIIOnLine -> docs == eula.txt, license.*, regions.txt, tos.txt.
+                                        //	??_exeDocsPath - macOS - EXE Docs Folder:  /Applications -> World War II Online.app -> Contents -> Resources -> docs == eula.txt, license.*, regions.txt, tos.txt.
+wwiiolpath_string WW2_exePlayarcPath;	//	??_exePlayarcPath - Windoes - EXE playarc folder:  \Program * Files -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
+                                        //	??_exePlayarcPath - macOS - EXE playarc folder:  /Applications -> World War II Online.app -> Contents -> Resources == playarc.ww2.
 wwiiolpath_string WW2_exeWorkingPath;	//	??_exeWorkingPath - Windows - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
 										//	??_exeWorkingPath - macOS - EXE Working folder:  /Library -> Application Support -> WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
 wwiiolpath_string WW2_userConfigPath;	//	??_userConfigPath - Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
 										//	??_userConfigPath - macOS - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
-wwiiolpath_string WW2_userWorkingPath;	//	??_userWorkingPath - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
+wwiiolpath_string WW2_userWorkingPath;	//	??_userWorkingPath - Windows - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
+                                        //	??_userWorkingPath - macOS - USER Working folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin == lg.dat.
 
 
 /************************************************************************************************
@@ -322,8 +325,7 @@ LOGICAL fioStructureInit()
 	//  exeWorkingPath - END.
 
 
-/*
-==========================
+/* ==========================
 	//  exeBinPath - START.
 	//	??_exeBinPath - EXE DLL folder:  \Program * Files -> WWIIOnLine -> bin == *.lib, steam_appid.txt.
 	//  This folder should be setup by the installer.
@@ -364,8 +366,7 @@ LOGICAL fioStructureInit()
 		exeBinPathSet = TRUE;
 	}
 	//  exeBinPath - END.
-==========================
-*/
+========================== */
 
 
 	//  exeDataPath: Setup - START.
@@ -557,13 +558,13 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
 	}
 
 #elif platOS == OS_MACOS
-	// TODO: Need a Mac guy to verify this will work nicely
     
     const char *returnValue;
     fioStructureInit_Value = TRUE;
     
-    wwiiolpath_string exePath = L"";			//	??_exePath - EXE ROOT folder:  /Applications -> World War II Online.app == Contents -> _CodeSignature(dir), Frameworks(dir), MacOS(dir -> exefile), Resources(dir) info.plist, PkgInfo and others.
-    wwiiolpath_string exeDataPath = L"";		//	??_exeDataPath - EXE Support Data folder:  /Applications -> World War II Online.app -> Contents -> Resources == placeholder images (x2), playarc.ww2, steam_apid.txt, WWIIOnLine.ico, readme.*, eula.txt, license.*, regions.txt, tos.txt.
+    wwiiolpath_string exePath = L"";			//	??_exePath - EXE ROOT folder:  /Applications -> World War II Online.app == Contents -> _CodeSignature(dir), Frameworks(dir), MacOS(dir -> exefile), Resources(dir) info.plist, PkgInfo.
+    wwiiolpath_string exeDataPath = L"";		//	??_exeDataPath - EXE Support Data folder:  /Applications -> World War II Online.app -> Contents -> Resources == placeholder images (x2), playarc.ww2, steam_apid.txt, WWIIOnLine.ico, readme.*.
+    wwiiolpath_string exeDocsPath = L"";        //	??_exeDocsPath - EXE Docs Folder:  /Applications -> World War II Online.app -> Contents -> Resources -> docs == eula.txt, license.*, regions.txt, tos.txt.
     wwiiolpath_string exePlayarcPath = L"";		//	??_exePlayarcPath - EXE playarc folder:  /Applications -> World War II Online.app -> Contents -> Resources -> playarc.ww2  --OR--  == "-data" command line switch.
     wwiiolpath_string exeWorkingPath = L"";		//	??_exeWorkingPath - EXE Working folder:  /Library -> Application Support -> WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
     wwiiolpath_string userConfigPath = L"";		//	??_userConfigPath - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
@@ -594,6 +595,19 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
     {
         fioStructureInit_Value = FALSE;
     }
+    
+    returnValue = macDocsPath();
+    if (returnValue != NULL)
+    {
+        //  /Applications -> World War II Online.app -> Contents -> Resources -> docs
+        wwiiolpath_string docsPath(&returnValue[0], &returnValue[strlen(returnValue)]);
+        exeDocsPath = docsPath;
+        exeDocsPathSet = TRUE;
+    }
+    else
+    {
+        fioStructureInit_Value = FALSE;
+    }
 
     returnValue = macPlayarcPath();
     if (returnValue != NULL)
@@ -611,6 +625,9 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
     returnValue = macWorkingPathAPP();
     if (returnValue != NULL)
     {
+        //  This folder  MUST  be setup by another porcess as the OS prevents axcess.
+        //  The most likley process is the Mac DropDMG installer.
+
         //  /Library -> Application Support -> WWIIOnline
         wwiiolpath_string workingPathAPP(&returnValue[0], &returnValue[strlen(returnValue)]);
         exeWorkingPath = workingPathAPP;
@@ -660,6 +677,7 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
     WW2_exePath = exePath;
     //	WW2_exeBinPath = exeBinPath;
     WW2_exeDataPath = exeDataPath;
+    WW2_exeDocsPath = exeDocsPath;
     WW2_exePlayarcPath = exePlayarcPath;
     WW2_exeWorkingPath = exeWorkingPath;
     WW2_userConfigPath = userConfigPath;
