@@ -2530,10 +2530,6 @@ LOGICAL trnmainUpdate()
     radclutterUpdate();
     speedgrassUpdate();
 
-#ifdef USE_GAME_ADVERTISING
-    adUpdate();
-#endif
-
     trndataUpdate();
 
 	logTimerEndMacro();
