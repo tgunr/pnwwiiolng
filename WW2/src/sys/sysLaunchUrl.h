@@ -28,5 +28,6 @@ struct sysBasicHTTPResponse {
     std::string content;
 };
 
-// TODO: Return better errors than "failed"
-bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPResponse &response);
+// The errorCode parameter is unmodified if this function returns true. Otherwise,
+// it contains an operating system-specific error code.
+bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPResponse &response, uint64_t &errorCode);

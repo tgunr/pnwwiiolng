@@ -17,6 +17,5 @@ extern BOOL sysmainSetTimer(SYS_TIMERFUNC newfunc);
 extern void sysmainSetMouse(SYS_MOUSEFUNC MouseRoute);
 extern void sysGetMousePosition(int*, int*);
 extern void sysSetMousePosition(int, int);
-extern void SetupFPU(bool enableExceptions);
 
 #endif
